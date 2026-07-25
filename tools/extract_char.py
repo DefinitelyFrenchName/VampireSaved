@@ -112,7 +112,7 @@ ENGINE_ENVELOPE = 0x40000  # sibling-build engine/data addresses drift by
                           # item), not noise
 
 
-def diff_refs(a_blob, b_blob, shifts, allow_engine):
+def diff_refs(a_blob, b_blob, shifts, allow_engine, selfptr=None):
     """Diff two same-length blobs; every diff site must decode as a pointer
     field the oracle explains:
       - 32/24-bit field whose (b - a) delta equals a known region shift
@@ -144,6 +144,22 @@ def diff_refs(a_blob, b_blob, shifts, allow_engine):
                     break
             if site:
                 break
+        if site is None and selfptr:
+            # self-contained data region: any pointer landing inside the
+            # region (in BOTH games' coordinates) relocates by the region
+            # delta regardless of cross-game micro-shifts between sub-blobs
+            sname, a_lo, a_hi, b_lo, b_hi = selfptr
+            for width, span in ((24, 3), (32, 4)):
+                for off in range(max(0, i - span + 1),
+                                 min(i, len(a_blob) - span) + 1):
+                    va = int.from_bytes(a_blob[off:off + span], "big")
+                    vb = int.from_bytes(b_blob[off:off + span], "big")
+                    if va != vb and a_lo <= va < a_hi and b_lo <= vb < b_hi:
+                        site = {"off": off, "width": width, "target": va,
+                                "orc_target": vb, "shift": sname}
+                        break
+                if site:
+                    break
         if site is None and allow_engine:
             for off in range(max(0, i - 3), min(i, len(a_blob) - 4) + 1):
                 va = int.from_bytes(a_blob[off:off + 4], "big")
@@ -172,7 +188,8 @@ def diff_refs(a_blob, b_blob, shifts, allow_engine):
     return refs, unexplained
 
 
-def oracle_extend(a_img, a_start, b_img, b_start, cap, shifts, allow_engine):
+def oracle_extend(a_img, a_start, b_img, b_start, cap, shifts, allow_engine,
+                  selfptr=None):
     """Region length by oracle coverage: extend chunk-by-chunk while the diff
     classifier explains (almost) every differing byte — shared character
     data stays explainable under the known shifts even where pointer-dense
@@ -187,7 +204,7 @@ def oracle_extend(a_img, a_start, b_img, b_start, cap, shifts, allow_engine):
         cb = b_img[b_start + lo:b_start + hi]
         if len(ca) < (hi - lo) or len(cb) < (hi - lo):
             break
-        _, unexplained = diff_refs(ca, cb, shifts, allow_engine)
+        _, unexplained = diff_refs(ca, cb, shifts, allow_engine, selfptr)
         core = [i for i in unexplained
                 if (length - lo) <= i < (length - lo) + SIM_CHUNK]
         if len(core) > SIM_CHUNK // 50:  # >2% unexplained -> out of region
@@ -325,6 +342,8 @@ def main():
     # extra code roots: absent-in-vsavj support routines. Spec per root:
     #   addr           twin by masked pattern search, oracle-bounded
     #   addr:len       same, but length capped/fixed to len
+    #   addr:len:tX    forced oracle twin at X
+    #   addr:len:tX:d  DATA region (raw view, An-relative reads) with twin X
     #   addr:len:s     SOURCE-ONLY: no oracle twin exists (per-game hook,
     #                  content diverges between siblings); length is fixed
     #                  and refs come from the operand scanner (labeled
@@ -337,8 +356,24 @@ def main():
         root = int(parts[0], 0)
         fixed_len = int(parts[1], 0) if len(parts) > 1 and parts[1] else None
         forced_twin = None
+        is_data = len(parts) > 3 and parts[3] == "d"
         if len(parts) > 2 and parts[2].startswith("t"):
             forced_twin = int(parts[2][1:], 0)
+        if is_data:
+            sh_name = f"x{root:06x}"
+            shifts[sh_name] = forced_twin - root
+            sp = (sh_name, root, root + fixed_len, forced_twin,
+                  forced_twin + fixed_len)
+            dlen = oracle_extend(src.data[root:root + fixed_len + 0x100], 0,
+                                 orc.data[forced_twin:forced_twin + fixed_len + 0x100],
+                                 0, fixed_len, shifts, False, selfptr=sp)
+            regions[sh_name] = {"src": root, "orc": forced_twin, "len": dlen,
+                                "grow": fixed_len, "kind": "data",
+                                "shift": sh_name, "selfptr": True}
+            report.append(f"extra region {sh_name}: DATA, twin "
+                          f"0x{forced_twin:06X} (shift {forced_twin - root:+#x}), "
+                          f"len 0x{dlen:X}")
+            continue
         if len(parts) > 2 and parts[2] == "s":
             sh_name = f"x{root:06x}"
             regions[sh_name] = {"src": root, "orc": root, "len": fixed_len,
@@ -427,7 +462,12 @@ def main():
         byte offsets (absolute in-region)."""
         for _ in range(64):
             a, b = region_blob(r)
-            refs, unexplained = diff_refs(a, b, shifts, r["kind"] == "code")
+            sp = None
+            if r.get("selfptr"):
+                g = r.get("grow", r["len"])
+                sp = (r["shift"], r["src"], r["src"] + g,
+                      r["orc"], r["orc"] + g)
+            refs, unexplained = diff_refs(a, b, shifts, r["kind"] == "code", sp)
             fwd = [ref["target"] for ref in refs
                    if ref["shift"] == r["shift"]
                    and ref["target"] >= r["src"] + r["len"]
@@ -591,24 +631,34 @@ def main():
                               f"0x13 immediates (rewritten to the dst slot "
                               f"at generation)")
             if r.get("source_only"):
-                # no oracle: relocation fields come from labeled operands
+                # no oracle: relocation fields come from labeled operands.
+                # bare longs (unlabeled 32-bit ROM values, e.g. move.l #imm
+                # anim-base loads) are included ONLY when they point inside
+                # an extracted region — safe to rewrite, and exactly the
+                # class the labeled scan misses.
                 refs = []
                 for c in sc:
+                    if c["width"] != 32:
+                        continue
+                    tgt = c["target"]
+                    hosts = [rn for rn, rr in regions.items()
+                             if rr["len"] > 0
+                             and rr["src"] <= tgt < rr["src"] + rr["len"]]
                     if c["how"] in ("jsr", "jmp", "pea", "lea", "movea",
-                                    "move_src") and c["width"] == 32:
-                        tgt = c["target"]
-                        hosts = [rn for rn, rr in regions.items()
-                                 if rr["len"] > 0
-                                 and rr["src"] <= tgt < rr["src"] + rr["len"]]
+                                    "move_src"):
                         if hosts:
                             cls = "internal"
                         elif tgt < 0x400000:
                             cls = "engine"
                         else:
                             continue  # RAM/HW: no relocation
-                        refs.append({"off": c["off"], "width": 32,
-                                     "target": tgt, "shift": "engine",
-                                     "class": cls})
+                    elif c["how"] == "bare_long" and hosts:
+                        cls = "internal"
+                    else:
+                        continue
+                    refs.append({"off": c["off"], "width": 32,
+                                 "target": tgt, "shift": "engine",
+                                 "class": cls})
                 r["refs"] = refs
                 report.append(f"  {name}: {len(refs)} scanner-derived refs "
                               f"(source-only region)")

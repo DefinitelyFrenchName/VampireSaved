@@ -59,3 +59,39 @@ head). Root cause to resolve next: the **pool-index correspondence is not
 identity** (vsav2 pools 2/4 map to which vsavj pools?) and the node field
 layout may differ. All instruments (guard traces, write watches, native
 vsav2 ground-truth replay `R×2` pick) are in place; see STATE.md.
+
+## Companion (Anita) chain — resolved mechanism (session 5)
+
+The full spawn chain now decodes end-to-end:
+
+1. Donovan init hook (ported, x088512 zone) allocates a pool-2 slot
+   ($FFB800 family, 0x80 stride — GEOMETRIES ARE IDENTICAL in both games,
+   pool-for-pool: $FF9400/0x100/cat4, $FFB400/0x80/cat8, $FFB800/0x80/catC
+   [+0x3C=0xFF seeded], $FFD400/0x80/cat14) and writes the spawn record
+   (header long [01,00,type,sub] at +0, owner at +0x30/+0x32, id at +0x39).
+   The allocator FAMILY is mapped (vsav2 0x156D6+k*0x16 ↔ vsavj
+   0x016F8E+k*0x16), including pool 4 (0x1572E ↔ 0x016FE6).
+2. Creation handler (type 116 via the extended table-3 hook) state 0 loads
+   Anita's anim table via `movea.l #$2B8060,A0` — the LAST unrelocated
+   piece: a self-relative asset blob (table + scripts + sprite tables) with
+   vhunt2 twin 0x2A4504 and per-sub-blob micro-shifts (−0x13B5C/−0x13B70
+   family). Chunk-BFS over the pointer graph bounds her REACHABLE assets
+   at ~44KB (0x2B8060-0x2C3100 + 0x2D6D00 straggler).
+3. Class registration: vs2 inserted class 7 into dispatch-site-1 (8 cases
+   vs vsavj's 7); site 2 = classes 7-10 (vsavj) / 8-11 (vs2). Class
+   machinery: enqueue cases at 0x015618-table, pumps at 0x01ACAA+ (counts
+   $FFF9C9+K, heads $FFF992+4K).
+4. The +0x3C byte = render/update MODE (0xFF = direct-emit via +0x1C anim;
+   managed modes 0-4 via a 5-case dispatch); the pump path that crashed
+   dereferences +0x1C unconditionally in emit mode.
+
+REMAINING WORK (space-constrained): extract Anita's 44KB asset graph as
+self-pointer data regions and repack the holes — the FULL port needs
+~332KB of the 336.6KB free (hole A 258K + hole B 78K): plan = drop the
+stage-1 scaffolding ops from stage-4+ builds (~10KB), assign hitbox +
+hitbox_proj + aux0_0-3 + Anita to hole B (~78K), everything else to hole A
+(~253K). Margins are <4KB — placement needs the per-region hole hints in
+donovan.toml. The port_patch subclass remap (0xE→0xC) becomes unnecessary
+once she registers via her real machinery — REVERT it when the class-7
+enqueue path is synthesized (site-1 word-table thunk design in this doc's
+history) or keep class-6 if behavior gates pass.

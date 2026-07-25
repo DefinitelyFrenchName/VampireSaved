@@ -364,6 +364,21 @@ def main():
                     blob[off:off + 2] = bytes([0x00, dst_slot])
                     notes.append(f"# {name}+{off:#x}: char-id imm 0x13 -> "
                                  f"{dst_slot:#x}")
+            # targeted port patches (donovan.toml [[port_patch]]): documented
+            # byte edits on ported code, old bytes verified
+            for pp in port.get("port_patch", []):
+                if pp["region"] != name:
+                    continue
+                off = _int(pp["src_addr"]) - r["src"]
+                old = bytes.fromhex(pp["old_hex"])
+                new = bytes.fromhex(pp["new_hex"])
+                if not (0 <= off < r["len"]) or blob[off:off + len(old)] != old:
+                    fail.append(f"port_patch {pp['note']}: bytes at "
+                                f"{name}+{off:#x} != {pp['old_hex']}")
+                    continue
+                blob[off:off + len(new)] = new
+                notes.append(f"# {name}+{off:#x}: port_patch {pp['old_hex']} "
+                             f"-> {pp['new_hex']} ({pp['note']})")
             d = placed[name]
             fixed = out / f"fixed_{name}.bin"
             fixed.write_bytes(bytes(blob))
@@ -509,6 +524,7 @@ def main():
             fragments.append((site, 8, "GEN", "obj_hook engine site"))
 
     if args.stage >= 4:
+        shim_cfg = port.get("init_shim")
         for d in man["dispatch"]:
             newt = None
             tgt = d["src_target"]
@@ -517,6 +533,33 @@ def main():
                 newt = tgt + (placed[host] - man["regions"][host]["src"])
             if newt is None:
                 fail.append(f"{d['table']}: dispatch target {tgt:#x} unplaced")
+                continue
+            if shim_cfg and d["table"] == shim_cfg["dispatch"]:
+                # synthesized pool-seeding init shim (see donovan.toml).
+                # A5 is NOT guaranteed to hold the $FF8000 base at dispatch
+                # time, and the seeder itself is A5-relative — save A5, load
+                # the base, seed if the latch is clear, restore:
+                #   move.l A5,-(SP); lea $FF8000.l,A5; tst.l (latch,A5)
+                #   bne.s +6; jsr seed_entry; movea.l (SP)+,A5; jmp handler
+                sd = alloc("a", 28, "init seed shim")
+                if sd is None:
+                    continue
+                latch = _int(shim_cfg["latch_disp"])
+                shim = (bytes([0x2F, 0x0D])                       # move.l A5,-(SP)
+                        + bytes([0x4B, 0xF9, 0x00, 0xFF, 0x80, 0x00])  # lea $FF8000.l,A5
+                        + bytes([0x4A, 0xAD]) + latch.to_bytes(2, "big")  # tst.l (latch,A5)
+                        + bytes([0x66, 0x06])                     # bne.s skip
+                        + bytes([0x4E, 0xB9])
+                        + _int(shim_cfg["seed_entry"]).to_bytes(4, "big")
+                        + bytes([0x2A, 0x5F])                     # movea.l (SP)+,A5
+                        + bytes([0x4E, 0xF9]) + newt.to_bytes(4, "big"))
+                ops.append({"op": "code", "addr": f"{sd:#x}", "hex": shim.hex()})
+                notes.append(f"code   {sd:#08x} init seed shim (latch A5+"
+                             f"{_int(shim_cfg['latch_disp']):#x}, seeder "
+                             f"{_int(shim_cfg['seed_entry']):#x}) -> handler "
+                             f"{newt:#08x}")
+                fragments.append((sd, 18, "GEN", "pool-seeding init shim"))
+                repoint(d["table"], sd, "donovan handler via seed shim")
             else:
                 repoint(d["table"], newt, "donovan handler")
 

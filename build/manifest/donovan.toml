@@ -26,6 +26,34 @@ end = 0x400000
 # sequence `movea.l (d8,PC,D0.w),A0; moveq #0,D0; jsr (A0)` with
 # `jsr thunk; nop` — semantically identical for vanilla types (proved by
 # the legacy bit-identity gate).
+# Targeted byte patches on ported regions (applied to the fixed blob after
+# relocation; old bytes verified). The companion (Anita) registers itself in
+# object-update class 7 — a queue class that exists only in vsav2 (its
+# subcategory jump table has 8 cases, vsavj's has 7; heads $FFF992+4K,
+# counts $FFF9C9+K). Remap her to vsavj's last class (6, subcat 0xC):
+# update/draw order shifts to the end of class processing — a deliberate
+# M2a approximation recorded in docs/tables/reconciliation.md.
+[[port_patch]]
+region = "x088512"
+src_addr = 0x08B0F8
+old_hex = "000e"
+new_hex = "000c"
+note = "companion queue class 7 (vs2-only) -> vsavj class 6"
+
+# Pool-seeding init shim (stage 4+): vanilla vsav never seeds the
+# secondary-object pools during a normal match, vsav2 always does (its
+# system objects need them) — and Donovan's ecosystem (companion, effects)
+# allocates from them. dispatch_00[0x0F] is routed through a synthesized
+# shim: if the pool-0 free-list head (A5+0x7966) is still zero (never
+# seeded this match), call vsavj's own seeder aggregator entry B
+# (0x016C64 — the direct analog of what vsav2's match flow calls), then
+# fall into his relocated init handler. Idempotent via the head latch;
+# invisible to every other character.
+[init_shim]
+dispatch = "dispatch_00"
+seed_entry = 0x016C64
+latch_disp = 0x7966
+
 # (two of the seven type-dispatch sites need extension; the other five have
 # equal-sized tables in both games — verified session 4)
 [[obj_hook]]
