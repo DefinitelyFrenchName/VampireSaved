@@ -94,7 +94,7 @@ constant shift ≈0x30 — sibling builds).
 | Slot | Character | | Slot | Character |
 |---|---|---|---|---|
 | 0x00 | Bulleta (B.B. Hood) | | 0x08 | Bishamon (0x18 = Oboro Bishamon) |
-| 0x01 | Demitri | | 0x09 | Aulbath (Rikuo) *by elimination* |
+| 0x01 | Demitri | | 0x09 | Aulbath (Rikuo) |
 | 0x02 | Gallon (J. Talbain) | | 0x0A | Sasquatch |
 | 0x03 | Victor | | 0x0B | special: 1898 B, byte-identical in all three sets (Shadow/Marionette machinery?) |
 | 0x04 | Zabel (L. Raptor) | | 0x0C | Q-Bee |
@@ -102,16 +102,18 @@ constant shift ≈0x30 — sibling builds).
 | 0x06 | Anakaris | | 0x0E | Lilith |
 | 0x07 | Felicia | | 0x0F | Jedah |
 
-Every entry except 0x09 was pinned by a scripted pick: cursor path →
-select-screen name snapshot + in-match `RAM:$FF8460` pointer readback
-against the table (tools/pick_probe.sh). 0x09 is the only unclaimed
-character (Aulbath) in the only unclaimed slot; one targeted pick can
-close it formally.
+Every entry pinned by a scripted pick: cursor path → select-screen name
+snapshot + in-match `RAM:$FF8460` pointer readback against the table
+(tools/pick_probe.sh). Aulbath closed via path L,L,D (pointer 0x0A7EFA →
+slot 9, name verified).
 
-## THE PORTED THREE — located (2026-07-25, pick-verified on vsav2)
+## THE PORTED THREE — located (2026-07-25, pick-verified on vsav2 AND vhunt2)
 
 The newcomers live in the **variant half** of the ID space, as directly
-selectable wheel entries:
+selectable wheel entries. Verified independently in both source sets: same
+cursor paths (R×2/R×3/R×4 from Demitri), same slot IDs, pointer readback
+matching each set's own table. vhunt2 base-half assignments also verified
+(1 Demitri, 3 Victor, 4/5/6/7/8 as vsavj):
 
 | Character | Char ID | vsav2 hitbox base | vhunt2 hitbox base |
 |---|---|---|---|

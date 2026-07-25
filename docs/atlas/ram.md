@@ -16,7 +16,19 @@ verified where noted), [D] differential dump experiment, [T] write-trace,
 | `RAM:$FF8109` | round timer (counts down ~1/sec during match) | [D] |
 | `RAM:$FF05xx` | sound-driver work area (differs between MAME/FBNeo boot phase) | [D] |
 
-## Player structs — P1 `$FF8400`, P2 `$FF8500` (0x100 apart) [C, verified D/T]
+## Player blocks — P1 `$FF8400`, P2 `$FF8800` (0x400 apart) [D, corrected]
+
+**Correction (session 3):** the community "P2 = player + 0x100" refers to
+sub-object slots; the actual P2 player block is `$FF8800` (verified: 2P
+run shows Victor's hitbox base at `$FF8860`, `$FF8500` zeroed). Each block
+is 0x400 bytes; combat struct at +0x000, further state above +0x100.
+
+| Extended-block offset | Meaning | Evidence |
+|---|---|---|
+| +0x382 (`$FF8782`/`$FF8B82`) | selected character ID (write 0x18 = Oboro Bishamon — TCRF cheat) | [C:tcrf, D] |
+| +0x392.w (`$FF8792`) | special-meter gauge CANDIDATE (steps 0→0x500→0x1400 while attacking; semantics unconfirmed) | [D] |
+
+## Combat struct (player block +0x000) [C, verified D/T]
 
 | Offset | Meaning | Evidence |
 |---|---|---|
