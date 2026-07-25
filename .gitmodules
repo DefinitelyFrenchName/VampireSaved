@@ -1,0 +1,3 @@
+[submodule "emu/fbneo"]
+	path = emu/fbneo
+	url = https://github.com/finalburnneo/FBNeo.git

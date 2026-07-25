@@ -1,0 +1,56 @@
+# vsavj.toml — the null patch: rebuild vanilla vsavj from reference members.
+# Acceptance (SPEC M0): every output member SHA-1 equals the frozen reference
+# manifest (docs/checksums.txt). No patches, no provenance other than VSAV.
+#
+# A [[file]] entry names one output member and its source "zip/member" in
+# ROMDIR. Later milestones add [[file.patch]]/asm hooks here; tunables become
+# builder flags, never manifest hex edits (CLAUDE.md §5 build conventions).
+
+[set]
+name = "vsavj"
+description = "Vampire Savior (Japan 970519) — null build"
+
+[[file]]
+name = "vm3j.03d"
+source = "vsavj.zip/vm3j.03d"
+provenance = "VSAV"
+
+[[file]]
+name = "vm3j.04d"
+source = "vsavj.zip/vm3j.04d"
+provenance = "VSAV"
+
+[[file]]
+name = "vm3j.05a"
+source = "vsavj.zip/vm3j.05a"
+provenance = "VSAV"
+
+[[file]]
+name = "vm3j.06b"
+source = "vsavj.zip/vm3j.06b"
+provenance = "VSAV"
+
+[[file]]
+name = "vm3j.07b"
+source = "vsavj.zip/vm3j.07b"
+provenance = "VSAV"
+
+[[file]]
+name = "vm3j.08a"
+source = "vsavj.zip/vm3j.08a"
+provenance = "VSAV"
+
+[[file]]
+name = "vm3j.09b"
+source = "vsavj.zip/vm3j.09b"
+provenance = "VSAV"
+
+[[file]]
+name = "vm3j.10b"
+source = "vsavj.zip/vm3j.10b"
+provenance = "VSAV"
+
+[[file]]
+name = "vsavj.key"
+source = "vsavj.zip/vsavj.key"
+provenance = "VSAV"

@@ -1,0 +1,49 @@
+# ── ROM content: never committed, in any form (CLAUDE.md §2 rule 7) ──────────
+# Reference sets live OUTSIDE the tree in $ROMDIR; these patterns are defense
+# in depth in case anything ROM-shaped ever lands inside the repo.
+*.zip
+*.7z
+*.bin
+*.rom
+*.key
+# CPS-2 part-number naming (vsav/vsav2/vhunt2 program, gfx, qsound files)
+vm3*.*
+vs2*.*
+vh2*.*
+*.03[a-e]
+*.04[a-e]
+*.[0-9][0-9]m
+dl-1425*
+# Decrypted / intermediate ROM images
+build/out/
+build/cache/
+*.decrypted
+*.prg
+
+# ── Emulator working dirs and artifacts ───────────────────────────────────────
+# emu/fbneo is a git submodule (gitlink only; its content is never committed here)
+emu/*/build/
+cfg/
+nvram/
+diff/
+inp/
+snap/
+sta/
+mame.ini
+ui.ini
+plugin.ini
+
+# ── Tooling noise ─────────────────────────────────────────────────────────────
+__pycache__/
+*.pyc
+.venv/
+re/ghidra/*
+!re/ghidra/.keep
+!re/ghidra/README.md
+
+# ── OS junk ───────────────────────────────────────────────────────────────────
+.DS_Store
+._*
+
+# ── Exceptions: savestates/replays that tests depend on are force-added ──────
+# (git add -f, per CLAUDE.md savestate hygiene; no blanket un-ignore here)
