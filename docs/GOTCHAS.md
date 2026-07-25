@@ -149,3 +149,24 @@ Port rules that follow:
   RAW, and its source entries must be COPIED FROM THE DECRYPTED view.
 - When reading engine tables for analysis, pick the view by how the ENGINE
   addresses them, not by where they live.
+
+## PC-relative word tables are DATA — never let a pointer heuristic rewrite them (paid: 2026-07-25, ~1h)
+
+68k brief-format dispatch (`jsr/jmp (d8,PC,Dn.w)`) reads a table of 16-bit
+self-relative displacements sitting *inline in the code stream*. Two
+adjacent entries like `0006 0068` decode, to any 32-bit scanner, as a
+plausible ROM pointer `0x00060068` — and a relocation pass will happily
+"fix" them, silently corrupting the table (symptom: a jsr through the
+table lands in the weeds one or two states into the ported behavior, far
+from the actual damage).
+
+Rules now enforced in `tools/extract_char.py`:
+- Every discovered word table's FULL extent is recorded (`table_bytes`)
+  and excluded from the bare-long relocation heuristic.
+- Table length is bounded by the smallest forward displacement (the case
+  code follows the table), so code words are never misread as entries.
+- Escaping entries are rewritten as displacements against actual
+  placement (`pcrel_tblent`), with a shared per-region ILLEGAL tripwire
+  for unported targets — within d16 reach, gap-fitted near the region.
+- Regions whose tables reference each other must keep source-relative
+  spacing: `[[layout_group]]` / `near_map` in build/manifest/donovan.toml.

@@ -8,6 +8,8 @@ dst_slot = 0x0F
 # every bank repoint patches BOTH 0x0F and its aliasing variant row 0x1F
 # (vsavj variant half aliases base except slot 8) — asserted vanilla-equal
 mirror_variant = true
+alloc_wrap = "0x15702,0x1572e"
+near_map = "x0905ae=x088512"
 hole_b_regions = "aux0_4,hitbox"
 
 # free-space holes (verified 0xFF fill, tools/extract free-space scan)

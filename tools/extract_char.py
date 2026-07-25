@@ -691,6 +691,81 @@ def main():
                               f"0x13 immediates (rewritten to the dst slot "
                               f"at generation)")
             if r.get("source_only"):
+                # PC-relative escapes: brief-format word-table dispatches
+                # (jsr/jmp (d8,PC,Xn)) and direct (d16,PC) control flow whose
+                # SOURCE targets leave the region. Their displacements are
+                # identical across sibling games (spacing preserved there),
+                # so neither oracle nor abs-scanner sees them; the generator
+                # rewrites each entry against the actual placement (kind
+                # pcrel_tblent / pcrel_d16), tripwiring unresolved ones.
+                blob = blobs[name]
+                pcrel_refs = []
+                table_spans = []
+                for off in range(0, r["len"] - 4, 2):
+                    w = int.from_bytes(blob[off:off + 2], "big")
+                    if w in (0x4EBB, 0x4EFB):  # jsr/jmp (d8,PC,Xn)
+                        ext = int.from_bytes(blob[off + 2:off + 4], "big")
+                        d8 = ext & 0xFF
+                        if d8 >= 0x80:
+                            continue
+                        base = off + 2 + d8
+                        # a dispatch table cannot extend past its own
+                        # smallest forward target (the case code follows the
+                        # table) — bound entries by that invariant so code
+                        # words are never misread as entries
+                        k = 0
+                        bound = 64 * 2
+                        ents = []
+                        while k * 2 < bound and base + k * 2 + 2 <= r["len"]:
+                            v = int.from_bytes(blob[base + k * 2:base + k * 2 + 2],
+                                               "big", signed=True)
+                            tgt = r["src"] + base + v
+                            if v == 0 or not (0x010000 <= tgt < 0x400000):
+                                break
+                            if 0 < v < bound:
+                                bound = v
+                            if k * 2 >= bound:
+                                break
+                            ents.append((k, tgt))
+                            k += 1
+                        # the whole table extent is DATA (protect it from
+                        # the bare-long heuristic), even the entries that
+                        # stay in-region
+                        n_ent = min(len(ents), max(1, bound // 2))
+                        table_spans.append((base, base + n_ent * 2))
+                        for k, tgt in ents[:n_ent]:
+                            if not (r["src"] <= tgt < r["src"] + r["len"]):
+                                pcrel_refs.append({"kind": "pcrel_tblent",
+                                                   "off": base + k * 2,
+                                                   "base_off": base,
+                                                   "target": tgt})
+                    elif w in (0x4EBA, 0x4EFA):  # jsr/jmp (d16,PC)
+                        v = int.from_bytes(blob[off + 2:off + 4], "big",
+                                           signed=True)
+                        tgt = r["src"] + off + 2 + v
+                        if 0x010000 <= tgt < 0x400000 and not (
+                                r["src"] <= tgt < r["src"] + r["len"]):
+                            pcrel_refs.append({"kind": "pcrel_d16",
+                                               "off": off + 2,
+                                               "base_off": off + 2,
+                                               "target": tgt})
+                r["pcrel_refs"] = pcrel_refs
+                # word-table extents are DATA, not pointers: the bare-long
+                # heuristic must never rewrite inside them (it fused two
+                # adjacent word entries into a bogus 32-bit pointer and
+                # corrupted a dispatch table — session 6)
+                tbl_bytes = set()
+                for ts, te in table_spans:
+                    tbl_bytes.update(range(ts, te))
+                for p_ in pcrel_refs:
+                    tbl_bytes.update(range(p_["base_off"], p_["off"] + 2))
+                r["table_bytes"] = sorted(tbl_bytes)
+                if pcrel_refs:
+                    ext_t = len({p_["target"] for p_ in pcrel_refs})
+                    report.append(f"  {name}: {len(pcrel_refs)} PC-rel escape "
+                                  f"entries ({ext_t} distinct targets) — "
+                                  f"rewritten per placement, unresolved -> "
+                                  f"tripwire")
                 # no oracle: relocation fields come from labeled operands.
                 # bare longs (unlabeled 32-bit ROM values, e.g. move.l #imm
                 # anim-base loads) are included ONLY when they point inside
@@ -713,6 +788,9 @@ def main():
                         else:
                             continue  # RAM/HW: no relocation
                     elif c["how"] == "bare_long" and hosts:
+                        if any(q in tbl_bytes
+                               for q in range(c["off"], c["off"] + 4)):
+                            continue  # inside a PC-rel word table
                         cls = "internal"
                     else:
                         continue

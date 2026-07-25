@@ -217,6 +217,13 @@ local function on_crash(vec)
     f:write(string.format("CRASH %d vec%d PC %06x SP %08x ADDR %s\n",
         frame, vec, fault_pc & 0xFFFFFF, sp,
         fault_addr and string.format("%08x", fault_addr) or "-"))
+    local regs = {}
+    for _, rn in ipairs({"D0","D1","D2","D3","D4","D5","D6","D7",
+                         "A0","A1","A2","A3","A4","A5","A6"}) do
+        local ok, v = pcall(function() return st[rn].value end)
+        regs[#regs + 1] = string.format("%s=%08x", rn, ok and v or 0)
+    end
+    f:write("REGS " .. table.concat(regs, " ") .. "\n")
     -- stack sketch: ROM-plausible longs walking up from SP
     local shown = 0
     for off = 0, 63 * 4, 4 do

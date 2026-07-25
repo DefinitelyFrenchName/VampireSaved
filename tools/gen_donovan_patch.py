@@ -278,8 +278,15 @@ def main():
             notes.append(f"# layout group at {gbase:#x}+{span:#x}: "
                          + ", ".join(f"{m}@{placed[m]:#x}" for m in members)
                          + f"; {sum(ge-gs for gs, ge in gap_free):#x} gap bytes recycled")
+        # near_map: satellite regions that must land within d16 reach of an
+        # anchor region (PC-rel table-entry rewrites) — placed after it
+        near_map = {}
+        for pair in port["port"].get("near_map", "").split(","):
+            if "=" in pair:
+                sat, anchor = pair.split("=")
+                near_map[sat.strip()] = anchor.strip()
         for name in sorted(want, key=lambda n: (regions[n]["kind"] != "code", n)):
-            if name in grouped:
+            if name in grouped or name in near_map:
                 continue
             r = regions[name]
             hole = "b" if name in hole_b_set else "a"
@@ -288,6 +295,35 @@ def main():
                 placed[name] = d
                 fragments.append((d, r["len"], "VS2",
                                   f"donovan {name} (vsav2 0x{r['src']:06X})"))
+        for name, anchor in near_map.items():
+            if name not in want or name not in regions:
+                continue
+            r = regions[name]
+            want_at = placed.get(anchor)
+            if want_at is None:
+                fail.append(f"near_map: anchor {anchor} unplaced for {name}")
+                continue
+            best = None
+            for gi, (gs, ge) in enumerate(gap_free):
+                if ge - gs >= r["len"] and abs(gs - want_at) < 0x6000:
+                    if best is None or abs(gs - want_at) < abs(gap_free[best][0] - want_at):
+                        best = gi
+            if best is not None:
+                gs, ge = gap_free[best]
+                placed[name] = gs
+                gap_free[best] = ((gs + r["len"] + 0xF) & ~0xF, ge)
+            else:
+                d = alloc("a", r["len"], f"region {name} (near {anchor})")
+                if d is None:
+                    continue
+                if abs(d - want_at) >= 0x6000:
+                    fail.append(f"near_map: {name} landed {d:#x}, too far "
+                                f"from {anchor} at {want_at:#x}")
+                placed[name] = d
+            if name in placed:
+                fragments.append((placed[name], r["len"], "VS2",
+                                  f"donovan {name} (near {anchor}, vsav2 "
+                                  f"0x{r['src']:06X})"))
 
         def region_of(target):
             for name, r in regions.items():
@@ -309,6 +345,46 @@ def main():
             notes.append(f"# {where}: unresolved {tgt:#x} -> tripwire "
                          f"{tripwires[tgt]:#x}")
             return tripwires[tgt]
+
+        # ported code assumes VIRGIN pool slots (vs2 spawns before any
+        # recycling); our timeline hands it dirty ones — uninitialized
+        # bytes (+5 substate, +0x3C mode, ...) then feed jump tables.
+        # Wrap the mapped allocators with a zero-fill (category byte at +8
+        # preserved; only HIS calls are wrapped, vanilla allocs untouched).
+        alloc_wrap_set = {_int(x) for x in
+                          port["port"].get("alloc_wrap", "").split(",") if x}
+        alloc_wrappers = {}
+
+        def alloc_wrapper_for(tgt, where):
+            if tgt in alloc_wrappers:
+                return alloc_wrappers[tgt]
+            m = recon.get(tgt)
+            if not (m and m.get("status") == "verified"):
+                fail.append(f"{where}: alloc_wrap target {tgt:#x} has no "
+                            f"verified alloc mapping")
+                return None
+            real = _int(m["vsavj"])
+            wd = alloc("a", 44, f"alloc wrapper {tgt:#x}")
+            if wd is None:
+                return None
+            code = (bytes([0x4E, 0xB9]) + real.to_bytes(4, "big")  # jsr real
+                    + bytes([0x67, 0x20])                          # beq.s done
+                    + bytes([0x48, 0xE7, 0xC0, 0x80])              # movem.l d0-d1/a0,-(sp)
+                    + bytes([0x10, 0x2C, 0x00, 0x08])              # move.b (8,A4),d0
+                    + bytes([0x20, 0x4C])                          # movea.l A4,A0
+                    + bytes([0x32, 0x3C, 0x00, 0x1F])              # move.w #31,d1
+                    + bytes([0x42, 0x98])                          # clr.l (a0)+
+                    + bytes([0x51, 0xC9, 0xFF, 0xFC])              # dbra d1,-4
+                    + bytes([0x19, 0x40, 0x00, 0x08])              # move.b d0,(8,A4)
+                    + bytes([0x4C, 0xDF, 0x01, 0x03])              # movem.l (sp)+
+                    + bytes([0xB8, 0xFC, 0x00, 0x00])              # cmpa.w #0,A4
+                    + bytes([0x4E, 0x75]))                         # rts
+            ops.append({"op": "code", "addr": f"{wd:#x}", "hex": code.hex()})
+            notes.append(f"code   {wd:#08x} slot-clearing alloc wrapper for "
+                         f"{tgt:#x} -> {real:#x} (0x80 cleared, +8 preserved)")
+            fragments.append((wd, 44, "GEN", f"alloc wrapper {tgt:#x}"))
+            alloc_wrappers[tgt] = wd
+            return wd
 
         farm_ports = {}
 
@@ -376,6 +452,8 @@ def main():
                             f"verified reconciliation row")
                 return None
             if cls in ("engine", "pcrel16", "code_neighbor"):
+                if tgt in alloc_wrap_set:
+                    return alloc_wrapper_for(tgt, where)
                 m = recon.get(tgt)
                 if m and m.get("kind") == "farm_port":
                     return farm_port_for(tgt, m, where)
@@ -415,6 +493,56 @@ def main():
                     blob[off:off + 2] = bytes([0x00, dst_slot])
                     notes.append(f"# {name}+{off:#x}: char-id imm 0x13 -> "
                                  f"{dst_slot:#x}")
+            # PC-relative escapes (word-table entries / direct d16) from
+            # source-only regions: rewrite each displacement against actual
+            # placement; unresolved targets -> a shared per-region tripwire
+            # (within d16 reach), so an exercised-but-unported state is LOUD
+            pr_trip = None
+            for ref in r.get("pcrel_refs", []):
+                tgt = ref["target"]
+                host = region_of(tgt)
+                if host and host in placed:
+                    resolved = tgt + (placed[host] - regions[host]["src"])
+                else:
+                    if pr_trip is None:
+                        # must sit within d16 reach of the region: gap-fit
+                        # near the region's placement
+                        want = placed[name]
+                        best = None
+                        for gi, (gs, ge) in enumerate(gap_free):
+                            if ge - gs >= 2 and abs(gs - want) < 0x7000:
+                                if best is None or abs(gs - want) < abs(gap_free[best][0] - want):
+                                    best = gi
+                        if best is not None:
+                            gs, ge = gap_free[best]
+                            pr_trip = gs
+                            gap_free[best] = ((gs + 2 + 0xF) & ~0xF, ge)
+                        else:
+                            pr_trip = alloc("a", 2, f"pcrel tripwire {name}")
+                        if pr_trip is not None:
+                            ops.append({"op": "code", "addr": f"{pr_trip:#x}",
+                                        "hex": "4afc"})
+                            notes.append(f"code   {pr_trip:#08x} ILLEGAL  "
+                                         f"shared pcrel TRIPWIRE for {name}")
+                    resolved = pr_trip
+                if resolved is None:
+                    continue
+                pc_base = placed[name] + ref["base_off"]
+                disp = resolved - pc_base
+                if not (-0x8000 <= disp < 0x8000):
+                    fail.append(f"{name}+{ref['off']:#x}: pcrel rewrite "
+                                f"out of d16 range ({disp:#x}) — place "
+                                f"target slice nearer")
+                    continue
+                blob[ref["off"]:ref["off"] + 2] = \
+                    (disp & 0xFFFF).to_bytes(2, "big")
+            n_pr = len(r.get("pcrel_refs", []))
+            if n_pr:
+                notes.append(f"# {name}: {n_pr} pcrel escape entries "
+                             f"rewritten (tripwire at "
+                             f"{pr_trip:#x})" if pr_trip else
+                             f"# {name}: {n_pr} pcrel escape entries rewritten")
+
             # targeted port patches (donovan.toml [[port_patch]]): documented
             # byte edits on ported code, old bytes verified
             for pp in port.get("port_patch", []):
