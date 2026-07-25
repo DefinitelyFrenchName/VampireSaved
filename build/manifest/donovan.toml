@@ -1,0 +1,28 @@
+# donovan.toml — port configuration for the donovan-m2 patch
+# (consumed by tools/gen_donovan_patch.py; see docs/patch_index.md)
+
+[port]
+src_set = "vsav2"
+src_char = 0x13
+dst_slot = 0x0F
+# every bank repoint patches BOTH 0x0F and its aliasing variant row 0x1F
+# (vsavj variant half aliases base except slot 8) — asserted vanilla-equal
+mirror_variant = true
+
+# free-space holes (verified 0xFF fill, tools/extract free-space scan)
+[hole_a]
+start = 0x0BF6A0
+end = 0x100000
+
+[hole_b]
+start = 0x3EC720
+end = 0x400000
+
+# non-bank repoints (select screen, win quotes, AI, versus tables) land here
+# as stage-5 RE pins their addresses down; op = poke16|poke32, both slots
+# where applicable.
+# [[aux_poke]]
+# name = "..."
+# addr = 0x0
+# op = "poke32"
+# val = 0x0

@@ -1,0 +1,17 @@
+# reconciliation.toml — machine-readable R1 map: vsav2 engine address ->
+# vsavj equivalent, consumed by tools/gen_donovan_patch.py (stage 4+).
+# Human twin with evidence and method: docs/tables/reconciliation.md —
+# update BOTH in the same commit (CLAUDE.md rule 5 / doc taxonomy).
+#
+# The generator hard-fails on any code ref whose target has no row here
+# with status = "verified".
+#
+# kind:   engine_sub | engine_data | bank_ref | pcrel_thunk | absent
+# status: verified | plausible | open
+#
+# [[map]]
+# vsav2 = 0x0280B8
+# vsavj = 0x028DD8
+# kind = "engine_sub"
+# status = "verified"
+# note = "per-char loader; found by find_equiv, pinned by write-trace (M1)"
