@@ -685,22 +685,31 @@ def main():
                          f"extended type table ({n_van} vanilla + "
                          f"{n_src - n_van} ported, {ported} placed)")
             fragments.append((tdst, len(table), "GEN", "proj_hook ext table"))
-            thunk = alloc("a", 14, "obj_hook thunk")
+            thunk = alloc("a", 18, "obj_hook thunk")
         if thunk is not None:
+            # GHOST-CLEAN topology (superset invariant, measured 2026-07-25):
+            # replace ONLY the movea+moveq (6 bytes) with `jmp thunk` and
+            # leave the vanilla `jsr (A0)` at its original address; the
+            # thunk indexes the extended table then jumps BACK to that jsr.
+            # The push therefore happens at the vanilla address with the
+            # vanilla return value — a jsr-into-thunk design pushes a
+            # different return address and leaves divergent ghost bytes
+            # below SP in work RAM, failing the bit-exact legacy gate.
             tk = (bytes([0x41, 0xF9]) + tdst.to_bytes(4, "big")   # lea tbl,A0
                   + bytes([0x20, 0x70, 0x00, 0x00])               # movea.l (A0,D0.w),A0
                   + bytes([0x70, 0x00])                           # moveq #0,D0
-                  + bytes([0x4E, 0xD0]))                          # jmp (A0)
+                  + bytes([0x4E, 0xF9]) + (site + 6).to_bytes(4, "big"))  # jmp site+6 (the vanilla jsr (A0))
             ops.append({"op": "code", "addr": f"{thunk:#x}", "hex": tk.hex()})
-            notes.append(f"code   {thunk:#08x} obj_hook thunk")
-            fragments.append((thunk, 14, "GEN", "obj_hook thunk"))
-            site_patch = bytes([0x4E, 0xB9]) + thunk.to_bytes(4, "big") \
-                + bytes([0x4E, 0x71])
+            notes.append(f"code   {thunk:#08x} obj_hook thunk (ghost-clean: "
+                         f"returns to vanilla jsr)")
+            fragments.append((thunk, len(tk), "GEN", "obj_hook thunk"))
+            site_patch = bytes([0x4E, 0xF9]) + thunk.to_bytes(4, "big")
             ops.append({"op": "code", "addr": f"{site:#x}",
                         "hex": site_patch.hex()})
-            notes.append(f"code   {site:#08x} ENGINE HOOK: dispatch -> jsr "
-                         f"thunk; nop (vanilla types identical via table copy)")
-            fragments.append((site, 8, "GEN", "obj_hook engine site"))
+            notes.append(f"code   {site:#08x} ENGINE HOOK: dispatch -> jmp "
+                         f"thunk; vanilla jsr (A0) at {site + 6:#x} untouched "
+                         f"(vanilla types identical via table copy)")
+            fragments.append((site, 6, "GEN", "obj_hook engine site"))
 
     if args.stage >= 4:
         shim_cfg = port.get("init_shim")

@@ -767,11 +767,98 @@ def main():
                                   f"rewritten per placement, unresolved -> "
                                   f"tripwire")
                 # no oracle: relocation fields come from labeled operands.
-                # bare longs (unlabeled 32-bit ROM values, e.g. move.l #imm
-                # anim-base loads) are included ONLY when they point inside
-                # an extracted region — safe to rewrite, and exactly the
-                # class the labeled scan misses.
+                # bare longs (unlabeled 32-bit ROM values, e.g. inline data
+                # pointers) are included ONLY when they point inside an
+                # extracted region — but instruction operand pairs like
+                # `clr.b $6(a6); moveq #0,d0` (bytes 0006 7000) masquerade
+                # as such pointers and a rewrite corrupts the code (paid:
+                # session 7, docs/GOTCHAS.md). SIBLING VETO: locate the
+                # candidate's context (exact bytes around a wildcarded
+                # long) in the sibling build; a REAL pointer into a moved
+                # region must differ there by that region's sibling shift,
+                # while accidental operand bytes are identical. Only
+                # divergent zones (no sibling context) stay unverified.
+                orc_win_lo = max(0, r["src"] - 0x4000)
+                orc_win = orc.plaintext(
+                    orc_win_lo,
+                    min(0x100000, r["src"] + r["len"] + 0x4000))
+                blob_l = blobs[name]
+                # context comparisons must wildcard LABELED 32-bit ref
+                # fields (engine operands drift between siblings and would
+                # defeat an exact-context match right next to a jsr/jmp).
+                # Other bare-long candidates stay hard context: they are
+                # mostly operand bytes (the point of the veto), and
+                # wildcarding them shreds the anchor in candidate-dense
+                # stretches, silently downgrading the verdict to unverified.
+                wild = set(tbl_bytes)
+                for c_ in sc:
+                    if c_["width"] == 32 and c_["how"] != "bare_long":
+                        wild.update(range(c_["off"], c_["off"] + 4))
+
+                def sibling_longs_exact(off):
+                    """Sibling longs at exact-context matches (8 bytes each
+                    side, no wildcards) — succeeds when no other ref field
+                    sits nearby."""
+                    pre_n = min(8, off)
+                    post_n = min(8, len(blob_l) - off - 4)
+                    if pre_n + post_n < 8:
+                        return None
+                    pre = bytes(blob_l[off - pre_n:off])
+                    post = bytes(blob_l[off + 4:off + 4 + post_n])
+                    vals, p = [], 0
+                    while len(vals) < 8:
+                        p = orc_win.find(pre, p) if pre_n else -1
+                        if p == -1:
+                            break
+                        q = p + pre_n
+                        if orc_win[q + 4:q + 4 + post_n] == post:
+                            vals.append(int.from_bytes(orc_win[q:q + 4],
+                                                       "big"))
+                        p += 1
+                    return vals or None
+
+                def sibling_longs_masked(off):
+                    """Sibling longs at masked-context matches (longest hard
+                    run as anchor, other ref fields wildcarded) — for
+                    candidates sitting next to drifting engine operands."""
+                    lo = max(0, off - 12)
+                    hi = min(len(blob_l), off + 16)
+                    win = blob_l[lo:hi]
+                    mask = [i + lo not in wild and not (off <= i + lo < off + 4)
+                            for i in range(len(win))]
+                    # longest run of hard (non-wildcard) bytes
+                    best, cur = (0, 0), None
+                    for i, m in enumerate(mask + [False]):
+                        if m and cur is None:
+                            cur = i
+                        elif not m and cur is not None:
+                            if i - cur > best[0]:
+                                best = (i - cur, cur)
+                            cur = None
+                    if best[0] < 6:
+                        return None  # not enough hard context to anchor
+                    anchor = bytes(win[best[1]:best[1] + best[0]])
+                    vals, p = [], 0
+                    while len(vals) < 8:
+                        p = orc_win.find(anchor, p)
+                        if p == -1:
+                            break
+                        base_ = p - best[1]
+                        if 0 <= base_ <= len(orc_win) - len(win):
+                            if all(orc_win[base_ + i] == win[i]
+                                   for i in range(len(win)) if mask[i]):
+                                q = base_ + (off - lo)
+                                vals.append(int.from_bytes(
+                                    orc_win[q:q + 4], "big"))
+                        p += 1
+                    return vals or None
+
+                def sibling_longs(off):
+                    return (sibling_longs_exact(off)
+                            or sibling_longs_masked(off))
+
                 refs = []
+                n_conf = n_veto = n_amb = n_unver = 0
                 for c in sc:
                     if c["width"] != 32:
                         continue
@@ -787,10 +874,38 @@ def main():
                             cls = "engine"
                         else:
                             continue  # RAM/HW: no relocation
+                    elif c["how"] in ("movea_imm", "move_imm"):
+                        # immediates are addresses only when they land in a
+                        # ported region; otherwise they may be constants —
+                        # never fabricate engine refs from them
+                        if not hosts:
+                            continue
+                        cls = "internal"
                     elif c["how"] == "bare_long" and hosts:
                         if any(q in tbl_bytes
                                for q in range(c["off"], c["off"] + 4)):
                             continue  # inside a PC-rel word table
+                        exp = shifts.get(regions[hosts[0]]["shift"])
+                        sib = sibling_longs(c["off"])
+                        if sib is not None and exp is not None:
+                            # identical evidence dominates: generic context
+                            # anchors can also hit unrelated sites, and a
+                            # single spurious shift-consistent hit must not
+                            # outvote the true twin (paid: 0x8AA06)
+                            if all(v == tgt for v in sib):
+                                n_veto += 1
+                                continue  # sibling-identical: operand bytes
+                            elif all(v == tgt + exp for v in sib):
+                                n_conf += 1
+                            else:
+                                n_amb += 1
+                                continue  # conflicting sibling evidence
+                        else:
+                            # no sibling context and not a labeled operand:
+                            # with imm loads labeled above, what remains is
+                            # overwhelmingly operand bytes — REJECT, loudly
+                            n_unver += 1
+                            continue
                         cls = "internal"
                     else:
                         continue
@@ -799,7 +914,11 @@ def main():
                                  "class": cls})
                 r["refs"] = refs
                 report.append(f"  {name}: {len(refs)} scanner-derived refs "
-                              f"(source-only region)")
+                              f"(source-only region); bare longs: "
+                              f"{n_conf} sibling-confirmed, {n_veto} vetoed "
+                              f"(operand bytes), {n_amb} rejected "
+                              f"(conflicting evidence), {n_unver} rejected "
+                              f"(divergent zone, unlabeled)")
     if regions["code"]["len"] > 0:
         code_refs = regions["code"]["scan"]
         # cross-check: every oracle 32-bit code ref should be seen by the scanner

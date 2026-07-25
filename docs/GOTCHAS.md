@@ -150,6 +150,67 @@ Port rules that follow:
 - When reading engine tables for analysis, pick the view by how the ENGINE
   addresses them, not by where they live.
 
+## Bare-long "pointers" in code are usually operand pairs — sibling-veto them (paid: 2026-07-25 session 7, ~3h incl. diagnosis)
+
+The bare-long relocation heuristic (any ROM-plausible 32-bit value inside a
+ported code region whose target lands in another ported region) is wrong far
+more often than right in 68k CODE: adjacent instruction operands fuse into
+plausible pointers. Measured in the x088512 companion zone: **47 of ~55
+bare-long candidates were false** — e.g. `clr.b $6(a6); moveq #0,d0`
+(bytes `0006 7000`) read as "pointer 0x00067000" into a ported region and
+rewritten, silently destroying the `moveq`. The resulting crash (vec3 at
+engine 0x015096, frame 3025 — the whole "anim state-index delta" frontier
+of session 6) surfaced thousands of frames later, in ENGINE code, with a
+plausible-looking wrong value: nothing pointed back at the corrupted
+instruction. Diagnosis instrument: conditional logging breakpoint
+(`GUARD_PROBE`/`GUARD_PROBE_COND` on `run_replay_guarded.sh`) at the engine
+consumer, filtering on the relocated table base.
+
+Rules now enforced in `tools/extract_char.py` (source-only regions):
+- Immediate loads (`movea.l #imm,An` / `move.l #imm,Dn`) are LABELED refs
+  (scan_code_refs), accepted only when the target is inside a ported region
+  (immediates may be constants — never fabricate engine refs from them).
+- Every remaining bare-long candidate is checked against the SIBLING build
+  (vhunt2): its context (exact bytes around a wildcarded long; labeled
+  operands wildcarded — they drift between siblings) is located in the
+  sibling; a REAL pointer differs there by the host region's sibling shift,
+  operand bytes are identical. Identical → veto. Conflicting or absent
+  evidence → REJECT (loud in the extract log), never silently rewrite.
+- Identical-evidence dominance: a generic context anchor can match several
+  sibling sites; one spurious shift-consistent hit must not outvote the
+  true twin.
+
+## Engine hooks on hot paths break whole-RAM legacy comparison — by construction (paid: 2026-07-25 session 7, ~2h)
+
+Any hook on a path vanilla executes (the secondary-object dispatch runs for
+every object every frame) adds CPU cycles. Two measured consequences on
+otherwise-vanilla content, both invisible to gameplay:
+1. **Dead-stack ghosts:** interrupts land at skewed instruction boundaries;
+   the handler's exception frame + register saves write the same stack
+   addresses with different VALUES (e.g. a mid-frame work pointer that has
+   advanced further). After return these bytes sit below resting SP
+   ($FF8000 at frame-done) — dead, but inside the whole-RAM checksum.
+   Observed window: `RAM:$FF7F00-$FF7FFF`.
+2. **Sound-handshake phase:** the 68k↔QSound latch byte `RAM:$FF043C`
+   (values 04/08) can phase-shift by one frame — the same mechanism as the
+   `-debug` timeslice GOTCHA's $FF1CF0 latch.
+With BOTH masked (`MASK_RANGES="043c-043d,7f00-8000"` on replay.lua), the
+patched stage-4 build is bit-identical to vanilla for the full 02 replay.
+Note the dispatch pump also runs for MENU-time objects (cursor sparkles,
+UI effects): ghost divergence starts at frame ~470 even in the pick
+replay, long before any match — unmasked divergence constants measured on
+hook-free stage builds (2886, 1080, 4278) are void on hooked builds;
+their masked (live-state) equivalents still hold.
+A jsr-thunk hook additionally pushes a DIFFERENT return address than the
+vanilla site — the ghost-clean topology (patch only the movea/moveq to
+`jmp thunk`, keep the vanilla `jsr (A0)` at its original address, thunk
+jumps back to it) eliminates that source; the interrupt-skew ghosts remain.
+Zero-cycle table extension was investigated and is IMPOSSIBLE here: the
+brief-format dispatch reaches only its inline table, and the code following
+both tables is hot engine code with short branches — not relocatable
+cycle-exactly. Consequence: the legacy gate's comparison basis for hooked
+builds is a maintainer decision (STATE.md, decisions pending).
+
 ## PC-relative word tables are DATA — never let a pointer heuristic rewrite them (paid: 2026-07-25, ~1h)
 
 68k brief-format dispatch (`jsr/jmp (d8,PC,Dn.w)`) reads a table of 16-bit

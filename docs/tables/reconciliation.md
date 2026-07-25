@@ -136,6 +136,56 @@ now COMPLETES and the match runs 137 frames):
   zero-fills the 0x80-byte slot, preserving the category byte at +8.
   Only Donovan's alloc calls are wrapped; vanilla allocations untouched.
 
+## Session 7: the "state-index delta" was tooling corruption — RESOLVED; legacy-gate basis now a pending decision
+
+**The session-6 frontier is CLOSED and its hypothesis was WRONG.** The vec3
+at engine 0x015096 (frame 3025) was not a VS2-vs-vsavj state-space delta:
+the bare-long relocation heuristic had corrupted `moveq #0,d0` at vs2
+0x8A49C (`0006 7000` fused into "pointer 0x00067000") in the ported
+companion tail, so the "distance in range → just advance anim" path reached
+the anim SETTER (vsavj 0x15084, table still in A0=0xE2830) with D0 holding
+an X-distance value instead of a state index. Diagnosis: `GUARD_PROBE`
+conditional logging breakpoint at 0x15084 with `a0==0xe2830` — the D0 hit
+sequence (0,0,2 then 0x80,0x7E,0x7C… every 2 frames from frame 3019) named
+the mechanism directly. 46 further bare-long false positives were latent in
+x088512/x0905ae (one, at vs2 0x8B382 in the class-registration code,
+corrupting `move.w #0,$2a(a5)`). Fix: sibling-veto + immediate-load labels
+in the extractor (docs/GOTCHAS.md). **Result: the full 12_donovan_vs_cpu
+moveset replay (9320 frames) runs END-clean under the -debug guard — no
+crash, no tripwire.** Stage-4 bring-up ladder frontier: none.
+
+**New instrument:** `GUARD_PROBE=hexaddr` + `GUARD_PROBE_COND=expr` on
+`run_replay_guarded.sh` — conditional logging breakpoint, PROBE lines
+(regs + (SP)) in the log, run continues.
+
+**Legacy gate finding (measured this session, predates session-7 changes):**
+the stage-4 build FAILS the bit-exact legacy gate — 02/03 diverge from
+frame ~470, attract from 1145. Root cause is NOT a behavior change: the
+engine-hook thunks cost cycles on the every-object dispatch path, so
+interrupts land at skewed instruction boundaries → (a) dead-stack ghost
+bytes below resting SP ($FF7F00-$FF7FFF), (b) the 68k↔QSound handshake
+latch $FF043C phase-shifts one frame. With exactly those two windows
+masked (`MASK_RANGES="043c-043d,7f00-8000"`), 02 is bit-identical to
+vanilla FULL LENGTH and attract first diverges at exactly 4278 (the Jedah
+demo — the original stage-1 constant). The hooks were also converted to a
+ghost-clean topology (site's first 6 bytes → `jmp thunk`; vanilla
+`jsr (A0)` kept at its original address; thunk jumps back to it) which
+removes the different-return-address ghost source. Zero-cycle table
+extension is impossible (GOTCHAS). **The comparison basis for hooked
+builds (whole-RAM vs live-RAM-with-masked-dead-windows) is a maintainer
+decision — see STATE.md.**
+
+**Open (documented, unreached in current scope):** the companion tail's
+alternate anim table `movea.l #$36784A,A0`, taken when `$3(a6)≠0` (the
+spawn-record sub byte). Donovan's init hook always writes sub=0
+(`move.l #$1007700,(a4)`), and the full moveset replay never takes the
+branch. The operand is intentionally NOT rewritten (no ported region hosts
+it); if a future writer sets sub≠0 the branch reads unrelocated vsavj
+bytes — plant a tripwire or port the table (its graph references aux0_4 +
+a self-band blob near 0x367xxx) at stage-5 close-out.
+
+**Superseded below — session 6's frontier statement, kept for the record:**
+
 **Current frontier (frame 3025, vec3 address error at engine 0x015096):**
 the anim-frame setter reads `movea.l #$E2830,A0` (correctly relocated —
 that table's bytes are byte-identical to native vsav2 at 0x28ED08, so the

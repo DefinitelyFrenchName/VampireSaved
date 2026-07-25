@@ -45,6 +45,8 @@ _OP_LABELS = [
     (0xF1FF, 0x41F9, "lea"),        # lea abs.l,An
     (0xF1FF, 0x2079, "movea"),      # movea.l abs.l,An
     (0xF1FF, 0x2039, "move_src"),   # move.l abs.l,Dn
+    (0xF1FF, 0x207C, "movea_imm"),  # movea.l #imm,An (table-base loads)
+    (0xF1FF, 0x203C, "move_imm"),   # move.l #imm,Dn
     (0xFFFF, 0x0C80, "cmpi_l"),     # cmpi.l #imm,D0 (watchdog-style)
 ]
 

@@ -1,6 +1,39 @@
 # patch_notes — per-change detail: every byte, and why
 
-Newest first. Byte-level op lists are generated (never hand-edited): the
+Newest first.
+
+## donovan-m2 stage 4 — session 7: extraction corruption fixed; ghost-clean hooks (2026-07-25)
+
+Blob-level changes (all via `tools/extract_char.py` regeneration — no ops
+added or removed; region sizes and placements unchanged):
+- 47 false bare-long rewrites REMOVED from x088512 (44) and x0905ae (3):
+  instruction operand pairs (`0006 7000`, `0006 0006`, `0028 3b7c`, …) that
+  had fused into ROM-plausible pointers and were being relocated, corrupting
+  the ported code. One of these (vs2 0x8A49C `moveq #0,d0`) was the entire
+  session-6 crash frontier. Mechanism + new sibling-veto rules:
+  docs/GOTCHAS.md, docs/tables/reconciliation.md Session 7.
+- Real immediate table-base loads (`movea.l #imm,An`, `move.l #imm,Dn`) now
+  labeled by scan_code_refs (`movea_imm`/`move_imm`) and relocated through
+  the labeled path (host-region membership required).
+
+Engine-hook change (`tools/gen_donovan_patch.py` obj_hook):
+- Site patch is now 6 bytes (`jmp thunk` over the movea+moveq); the vanilla
+  `jsr (A0)` at site+6 is left byte-identical and the thunk (18 B, GEN,
+  hole A) ends `jmp site+6` — so the dispatch push happens at the vanilla
+  address with the vanilla return value (ghost-clean; the previous
+  jsr-thunk pushed a different return address into the ghost stack).
+- Vanilla table rows still byte-identical copies; extra rows unchanged.
+
+Verification (this build, fingerprint 67fa01ec…):
+- 12_donovan_vs_cpu (9320 frames) END-clean under -debug guard: no crash,
+  no tripwire (previous frontier: vec3 at frame 3025).
+- Legacy live-state: 02 bit-identical to vanilla full-length and attract
+  first-divergence exactly 4278 under `MASK_RANGES="043c-043d,7f00-8000"`
+  (dead-stack window + QSound handshake latch — the only divergence
+  sources, both cycle-skew artifacts of hot-path hooks; measured
+  impossibility of zero-cycle hooks in docs/GOTCHAS.md). Whole-RAM
+  comparison basis for hooked builds: maintainer decision pending
+  (STATE.md). Byte-level op lists are generated (never hand-edited): the
 authoritative ops for any build come from `tools/gen_donovan_patch.py`
 (`build/donovan/patch/patch_notes_fragment.md` reproduces them); this file
 records what each patch stage changes and why, at merge time.
