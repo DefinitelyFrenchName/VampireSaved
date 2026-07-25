@@ -43,3 +43,20 @@ PASS: relocated base+comp observed live at $FF8460/$FF8464, full round
 (pick to KO/timeout, 9300 frames) completes under guard, -debug window
 exception-free, legacy gate green, pick divergence still exactly 2886.
 Provenance: VS2. Build fingerprint 4cdf9be9b3b31fa4a26a281bf84f0ad775aac114.
+
+## donovan-m2 stage 3 — anim + sprite sub-tables (2026-07-25, session 4)
+
+Donovan's anim region (0x20F00) + 5 sprite/OBJ sub-table clusters injected
+with all internal pointer fields rewritten (3979 fields in anim; cluster
+refs by the aux0 delta); the 4 anim-family bank tables repointed (0x0F +
+0x1F). Jedah dispatch retained. Gate `tests/test_m2a_stage3_anim.sh` PASS —
+no WAIVED-MIXTURE needed: 600-frame idle exception-free under -debug guard,
+anim cursor (+0x1C) observed inside the relocated region (15/15 samples),
+full round completes, legacy gate green.
+
+Finding (measured, gate constant): the SELECT SCREEN reads the hovered
+slot's anim data — with anim repointed, the pick replay's first divergence
+moves from 2886 (match init; stages 1-2) to **1080**, the frame the cursor
+lands on slot 0x0F. Correct superset behavior (hover involves the modified
+slot); explains why 04_select_fuzz/08/09 are in the diverging class.
+Build fingerprint e302f16ec3f1e18074acef8b54c3f2b30d378df7.
