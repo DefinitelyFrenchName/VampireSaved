@@ -19,15 +19,16 @@ system is cracked wide open —
   $FF8109, meter candidate $FF8792.
 
 **M1 acceptance gaps (the remaining work):**
-1. Manifest columns not yet mapped: **animation scripts** (trace struct
-   +0x1C anim-ptr writes), **tile ranges** (follow anim data → sprite/tile
-   ids; R2 risk item — check index field widths while there), **palettes**
-   (trace CPS2 palette upload for a character), **sound cues** (trace
-   QSound command writes during a move).
-2. Start-hold flavor mechanism in VS2/VH2 (hitbox data identical across
-   both games — flavor deltas live in other tables/code; find the toggle).
-3. Variant slot 0x19 occupant in vsav2/vhunt2 (variant of slot 9).
-4. Confirm meter semantics; rounds-won location.
+1. **Animation scripts: DONE** (per-char anim bases in all three sets,
+   newcomers' data regions bounded — character_tables.md).
+2. **Tile ranges**: decode one anim script (Demitri, vsavj `0x12C2FE`) to
+   find sprite/tile id fields; check index widths (R2 risk).
+3. **Palettes**: per-character sprite palette source still open — method
+   and filtered-PC list ready (character_tables.md palette section).
+4. **Sound cues**: trace QSound command writes (`0x618xxx`) during a move.
+5. Variant space: DONE (newcomers 0x10/0x11/0x13 + two Oboros 0x18/0x19;
+   Start-hold claim NOT reproduced — flagged to maintainer in STATE).
+6. Confirm meter semantics; rounds-won location.
 
 **Then M1 exit review** against SPEC §4 acceptance, and on to M2: Donovan
 into vsavj by slot replacement — the located tables + bank layout make the

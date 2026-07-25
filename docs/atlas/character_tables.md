@@ -103,11 +103,16 @@ character by inter-base spacing.
 
 ### Palette pipeline (partial)
 
-Palettes live in CPS2 palette RAM `0x90C000+` and are faded IN PLACE by an
-unrolled adjuster at `PRG:0x014034-0x014060`. The initial ROM→palette
-upload goes through the CPS2 object/DMA staging region (`0x708xxx`
-addresses appear in traces) — the per-character palette source table is
-NOT yet located (open; trace the staging writer next).
+Palettes live in CPS2 palette RAM `0x90C000+`, uploaded straight from ROM
+by the system blitter at `PRG:0x000EF2` (`move.l (a0)+,(a1); or.l
+#$F000F000` — sets full brightness, and **feeds the CPS2 encryption
+watchdog inline**: `cmpi.l #$726A4BAF,d0` lives inside this loop). Fixed
+system pages upload from `PRG:0x38C2A0`/`0x3D7E58` (callers
+`0x000EA8-0x000EE8` → pages `0x90C800/CC00/D000/D400`); a fade adjuster at
+`PRG:0x014034` steps brightness in place. The **per-character sprite
+palette source is still open** — next step: watch `0x90C000,0x800,w`
+during frames 1700-2700 of a pick (character-load window) with
+boot/fade/system-blitter PCs filtered.
 
 ### Ported-three handler code (bank[0] rows; the "code" manifest entry)
 
