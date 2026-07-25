@@ -70,6 +70,12 @@ before session end (persistent suite doctrine, CLAUDE.md §4).
 | RAM atlas | `docs/atlas/ram.md` |
 | M1 acceptance review | `docs/M1_acceptance.md` (both clauses met; R2 quantified) |
 | Write/read tracer | `tests/lua/trace_writes.lua` (WATCH=addr,len[,r|w|rw]) |
+| Program patcher | `tools/patch_prg.py` (JSON ops, word-value space) + `tools/pack_build.sh` |
+| M2 feasibility | `docs/M2_feasibility.md` (3 domains; remaining work list) |
+| Patch-tooling test | `tests/test_patch_prg.sh` (null bit-identical, code re-encrypts) |
+| M2 repoint proof | `tests/test_m2_repoint.sh` (mechanism + superset invariant) |
+
+Run a patched build: `MAME_ROMPATH="<packed_dir>;$ROMDIR" tools/run_mame.sh vsavj ...`
 
 ## Key findings so far
 

@@ -17,8 +17,13 @@ ROMDIR="${ROMDIR:?set ROMDIR to the reference-set directory}"
 SANDBOX="${MAME_SANDBOX:-$(mktemp -d)}"
 mkdir -p "$SANDBOX"
 
+# MAME_ROMPATH overrides the rompath (e.g. "patched_dir;$ROMDIR" for patched
+# builds); defaults to ROMDIR. Everything else (fresh sandbox) is unchanged,
+# so a patched-build run is directly comparable to a frozen vanilla run.
+ROMPATH="${MAME_ROMPATH:-$ROMDIR}"
+
 exec mame "$SET" \
-    -rompath "$ROMDIR" \
+    -rompath "$ROMPATH" \
     -video none -sound none -nothrottle -skip_gameinfo \
     -cfg_directory "$SANDBOX/cfg" \
     -nvram_directory "$SANDBOX/nvram" \

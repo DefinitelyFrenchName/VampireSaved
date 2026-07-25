@@ -20,11 +20,27 @@ Updated: 2026-07-25 (session 3 — §4 amended; D/H/P located; bank labeled)
 
 ## Current milestone
 
-**M1 — Map. ACCEPTED (2026-07-25).** Both SPEC §4 clauses met; full
-assessment in docs/M1_acceptance.md. Deferred sprite-bound exact addresses
-(tile/palette/sound) are proven-reachable and scoped to M3/M4/M5. Next: M2
-(Donovan into vsavj by slot replacement) — pending maintainer's replaced-
-slot sign-off (recommendation below).
+**M2 — Proof of life. IN PROGRESS.** Replaced slot = Jedah (0x0F).
+- Program-patch tooling (`tools/patch_prg.py`) DONE and MAME-verified: data
+  raw, code re-encrypted, null bit-identical (`tests/test_patch_prg.sh`).
+- **Mechanism PROVEN end-to-end on trusted tooling** (`tests/test_m2_repoint.sh`):
+  repointing vsavj Jedah's hitbox-base bank entry to Demitri's takes effect
+  in a live match (RAM:$FF8460 loads the new base), AND the superset
+  invariant holds exactly — 6/6 non-Jedah legacy replays bit-identical;
+  attract bit-identical through frame 4277, diverges at 4278 precisely where
+  its CPU demo shows Jedah (char id 0x0F, verified). Attract legitimately
+  involving the modified slot is correct superset behavior, not a violation.
+- Feasibility assessed (docs/M2_feasibility.md): behavior data portable via
+  ~337KB free vsavj space + data-reads-bypass-encryption; sprite tiles are
+  the R2 wall (may pull M3 forward); QSound = M5.
+- **Next:** author the real Donovan port — extract his program-ROM data from
+  vsav2, relocate into vsavj free space, repoint all slot-0x0F bank entries,
+  re-encrypt his code, resolve R1 engine-delta. Then M2b graphics.
+
+### M1 — Map. ACCEPTED (2026-07-25).
+Both SPEC §4 clauses met; full assessment in docs/M1_acceptance.md.
+Deferred sprite-bound exact addresses (tile/palette/sound) are
+proven-reachable and scoped to M3/M4/M5.
 
 ### M1 detail (all complete)
 - Replay harness: DONE both emulators. Shared `.rpl` input-script format;

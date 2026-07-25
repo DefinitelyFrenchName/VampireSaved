@@ -4,6 +4,19 @@ Evidence classes: [C] community (mame-rr cps2-hitboxes.lua family entry,
 verified where noted), [D] differential dump experiment, [T] write-trace,
 [V] visually verified via snapshot. Every entry lists its evidence.
 
+## Attract-mode demo roster (superset-invariant note)
+
+The attract sequence includes CPU demo matches that feature real characters.
+Verified: `01_attract_long` (7200-frame attract, zero input) runs a **Jedah
+(id 0x0F) vs Victor** demo starting at **frame ~4278**. Consequence for
+patched builds: any change to a character that appears in an attract demo
+will alter that attract from the demo's start frame — this is *correct*
+superset behavior (the attract "involves" the modified character), not a
+violation. The auto-detecting regression runner must treat attract
+expectations as build-fingerprint-dependent when a demo-featured slot is
+modified. (Full attract demo roster: TODO — enumerate all demo matchups so
+the runner knows which builds legitimately change attract.)
+
 ## System / match globals
 
 | Address | Meaning | Evidence |

@@ -65,11 +65,42 @@ perfection is not the point of M2; proving the behavior port is.
 - Throughout: **legacy (non-Jedah) replays must stay bit-identical** — the
   superset invariant. The patch tooling's null round-trip guards this.
 
-## Immediate next steps
+## Progress
 
-1. Patch tooling (`tools/patch_prg.py`): inject blobs + repoint bank slots +
-   re-encrypt code, operating on the decrypted image, splicing back to
-   program files. Null round-trip = bit-identical vsavj (test gate).
-2. Precise extraction of Donovan's program-ROM blocks from vsav2 (the
-   transitive closure from slot-0x13 bank entries).
-3. M2a injection + selectable test.
+1. **Patch tooling — DONE** (`tools/patch_prg.py`, `tools/pack_build.sh`,
+   `tests/test_patch_prg.sh`). MAME-verified.
+2. **Mechanism proven — DONE** (`tests/test_m2_repoint.sh`): repointing a
+   bank slot works in a live game; superset invariant holds exactly.
+
+## Remaining M2 work (future — do not lose track)
+
+### M2a — Donovan behavior port (the next big step)
+- **Precise transitive extraction** of Donovan's program-ROM blocks from
+  vsav2: from each of the ~25 bank tables' slot-0x13 entry, follow the block
+  AND everything it references (anim scripts → sprite sub-tables → …), to a
+  closed set of (addr, length) regions. The per-table entry WIDTHS differ
+  (long-ptr char*4, word char*2, byte char*1, 2D) — extraction and repointing
+  must use the correct width per table (classify from the M1 consumer-site
+  disasm; do NOT use the fuzzy address scanner, which misaligns by 0x10 —
+  use the verified table addresses ...7A/...FA).
+- **Relocation into vsavj free space** (258KB @0x0BF69A enc-zone + 78KB
+  @0x3EC718): place data blocks raw (data reads bypass encryption), code
+  blocks re-encrypted at their new address. Update every slot-0x0F bank
+  entry to point at the new locations.
+- **R1 engine-delta reconciliation:** Donovan's code may call vsav2 engine
+  subroutines at addresses that differ (or are absent) in vsavj, and contain
+  absolute pointers into vsav2 layout. Each must be relocated/reconciled and
+  logged in docs/tables/reconciliation.md. This is the make-or-break risk M2
+  exists to surface.
+- Also repoint: select-screen (portrait/name for slot 0x0F), win-quote / AI /
+  versus tables keyed on char id 0x0F, and the +0x382 select id path.
+
+### M2b — Donovan graphics + sound (harder; may pull M3 forward)
+- Sprite tiles into Jedah's GFX range + 16-bit OBJ code remapping (R2 wall).
+- Palette + QSound (M5-adjacent).
+- If correct graphics prove impossible without GFX-region expansion, that
+  finding pulls M3 forward — document, don't force.
+
+### Regression-runner follow-up
+- Enumerate the full attract demo roster so the auto-detecting runner knows
+  which builds legitimately change `01_attract_long` (see docs/atlas/ram.md).

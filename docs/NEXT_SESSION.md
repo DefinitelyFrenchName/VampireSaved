@@ -1,10 +1,25 @@
 # NEXT_SESSION — 60-second orientation (rewritten every session end)
 
-As of 2026-07-25, end of session 3. **M1 ACCEPTED.**
+As of 2026-07-25, end of session 3. **M1 ACCEPTED; M2 mechanism PROVEN.**
 
-**Where we are:** M0 + M1 complete. Harness (both emulators, deterministic,
-10-replay suite green/frozen) and the full character-data map are done. See
-`docs/M1_acceptance.md` for the clause-by-clause sign-off.
+**Where we are:** M0 + M1 complete. M2 (proof of life, Donovan replaces
+Jedah/slot 0x0F) underway: the slot-replacement *mechanism* is proven
+end-to-end on trusted tooling — program-patch tooling is MAME-verified
+(`tests/test_patch_prg.sh`) and `tests/test_m2_repoint.sh` shows a bank-slot
+repoint takes effect in a live match while the superset invariant holds
+exactly (6/6 non-Jedah replays bit-identical; attract identical until its
+Jedah demo at frame 4278). What remains is authoring the actual Donovan
+data — the big step.
+
+**M2 remaining (see docs/M2_feasibility.md "Remaining M2 work"):**
+- M2a: extract Donovan's program-ROM blocks from vsav2 (transitive closure,
+  per-table entry widths), relocate into vsavj's ~337KB free space, repoint
+  all slot-0x0F bank entries, re-encrypt his code, reconcile R1 engine
+  deltas (log in docs/tables/reconciliation.md), fix select/quote/AI tables.
+- M2b: graphics (sprite tiles into Jedah's GFX range + 16-bit OBJ remap —
+  the R2 wall) + palette + sound. May pull M3 forward.
+
+See `docs/M1_acceptance.md` for the M1 sign-off.
 
 **What's solid:**
 - vsavj slot→character map 16/16 pick-verified.
