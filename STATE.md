@@ -4,13 +4,15 @@ Updated: 2026-07-25 (M0 kickoff session — bench built and green)
 
 ## Current milestone
 
-M0 — Bench. **Nearly complete.** Acceptance status:
+M0 — Bench. **COMPLETE** (2026-07-25). Acceptance status:
 - Null-patch output bit-identical to reference: **PASS** (`tests/test_null_build.sh`)
 - 60s attract replay deterministic across two runs: **PASS** (`tests/test_attract_determinism.sh`, MAME)
 - Headless MAME runner: **DONE** (`tools/run_mame.sh`, MAME 0.288 via Homebrew)
-- Headless FBNeo runner: **IN FLIGHT** — submodule added (`emu/fbneo`), SDL2
-  build was compiling at session end; frontend has no Lua, so the FBNeo-side
-  harness needs a decision (see below)
+- Headless FBNeo runner: **DONE** (`emu/fbneo` submodule, SDL2 build,
+  `tools/run_fbneo.sh` with dummy SDL drivers + sandboxed HOME;
+  `tests/test_fbneo_smoke.sh` PASS). The SDL2 frontend has no scripting, so
+  the per-frame RAM-checksum probe on the FBNeo side is a frontend patch —
+  first M1 task (see below)
 
 Bonus beyond plan: CPS-2 decryption/encryption pipeline
 (`tools/cps2_decrypt.py`) proven bit-identical to MAME's implementation via
@@ -19,24 +21,24 @@ opcode-space dump oracle (`tests/test_decrypt_oracle.sh`). Both directions
 
 ## Next actions
 
-1. **Confirm FBNeo build** completed; smoke-run vsavj in it.
-2. **FBNeo harness approach (M1 entry):** SDL2 frontend has replay
+1. **FBNeo harness patch (M1 entry):** SDL2 frontend has replay
    (`replay.cpp`) and savestate support but no Lua. Options: (a) small
    frontend patch adding a per-frame work-RAM checksum dump + headless/exit
    flags (frontend, not emulation core — allowed); (b) drive via its .fr
    replay format only. Recommendation: (a); it mirrors the MAME Lua probe.
-3. **Obtain `vsav2.zip`** (see Open items) and re-freeze `docs/checksums.txt`.
-4. Start M1: decrypt all three sets, three-way program diff, work-RAM map.
+2. Start M1: three-way program diff (all three sets already decrypt
+   bit-identically to the MAME oracle — images in `build/out/`), work-RAM
+   map, character-data manifests.
 
 ## Open items
 
-- **`vsav2.zip` is not in ROMDIR.** Present: vsav, vsavj, vhunt2, vhunt2r1,
-  qsound_hle (all audited clean, MAME `-verifyroms` green). VS2 is the
-  authoritative character-data base (SPEC §3.1) and one of M1's three
-  diff inputs — needed before M1 can fully start. Human to supply the dump.
+- None blocking. Reference collection is COMPLETE: vsav, vsavj, vsav2,
+  vhunt2, vhunt2r1, qsound_hle — all MAME `-verifyroms` green, all 76
+  members frozen in `docs/checksums.txt` (vsav2 supplied by maintainer
+  mid-session 2026-07-25 and folded in; re-freeze recorded here).
 - ROM packaging fixes from the 2026-07-25 audit are confirmed applied:
   `vhunt2.key` present in both vhunt2 zips (CRC 61306b20), `qsound_hle.zip`
-  present (`dl-1425.bin` CRC d6cf5ef5). Frozen in `docs/checksums.txt`.
+  present (`dl-1425.bin` CRC d6cf5ef5).
 
 ## Decisions made
 
@@ -58,9 +60,12 @@ None.
 
 ## Findings log
 
-- 2026-07-25: vsavj key master `0xfa8f4e33a4b881b9`; opcode-encrypted range
-  is only `PRG:0x000000-0x0FFFFF` (first 1MB of 4MB). Watchdog:
-  `cmpi.l #$726A4BAF, D0`. (From key block; confirmed against MAME `-log`.)
+- 2026-07-25: key masters — vsavj `0xfa8f4e33a4b881b9` (watchdog
+  `cmpi.l #$726A4BAF, D0`), vsav2 `0xd681e4f460371edf`, vhunt2
+  `0x36c1eba326b10f18` (vsav2/vhunt2 share watchdog
+  `cmpi.l #$06920760, D0` — sibling builds). All three: encrypted range
+  `PRG:0x000000-0x0FFFFF` only (first 1MB of 4MB). Decryption of all three
+  proven bit-identical to MAME (`tests/test_decrypt_oracle.sh <set>`).
 - 2026-07-25: ROM file byte order ≠ 68k logical order; cost ~1h; conventions
   locked and oracle-tested (docs/GOTCHAS.md).
 - 2026-07-25: MAME 0.288 vsavj boots and runs attract deterministically

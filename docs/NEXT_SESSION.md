@@ -2,28 +2,25 @@
 
 As of 2026-07-25, end of M0 kickoff session.
 
-**Where we are:** M0 (Bench) essentially complete. Repo scaffolded, git live,
-remote `github.com/DefinitelyFrenchName/VampireSaved`. Reference sets audited
-and frozen (`docs/checksums.txt`); MAME 0.288 installed and passing; CPS-2
-decryption ported to Python and proven bit-identical to MAME's; null-patch
-build reproduces vanilla vsavj deterministically; 60s attract determinism
-test green. FBNeo added as submodule (SDL2 build — check it completed and
-runs vsavj; that was in flight at session end).
+**Where we are:** M0 (Bench) **complete and green**. Repo scaffolded, git
+live, remote `github.com/DefinitelyFrenchName/VampireSaved`. Reference sets
+audited and frozen (`docs/checksums.txt`); MAME 0.288 installed and passing;
+CPS-2 decryption ported to Python and proven bit-identical to MAME's;
+null-patch build reproduces vanilla vsavj deterministically; 60s attract
+determinism green; FBNeo SDL2 built from submodule and boots vsavj headless
+(smoke test green). Four committed tests, all PASS.
 
-**M0 acceptance status:**
-- null-patch output SHA-1 == reference: **PASS** (`tests/test_null_build.sh`)
-- 60s attract replay checksums identical across two runs: **PASS**
-  (`tests/test_attract_determinism.sh`, MAME side)
-- FBNeo headless runner: **IN FLIGHT** — SDL2 frontend has no Lua; decide the
-  FBNeo-side harness approach (frontend patch with RAM-checksum hook +
-  its .fr replay format) at the start of M1.
+**M0 acceptance:** all criteria met — see STATE.md "Current milestone" for
+the line-by-line status with test names.
 
-**Read next:** HANDOFF.md (operational map), then STATE.md (open items:
-vsav2.zip missing from ROMDIR — needed for M1's three-way diff).
+**Read next:** HANDOFF.md (operational map), then STATE.md. No open
+blockers: `vsav2.zip` arrived mid-session; the reference collection is
+complete, all 76 members frozen, and all three sets decrypt bit-identically
+to the MAME oracle (images in `build/out/`, SHA-1s in docs/atlas/README.md).
 
 **Likely next actions (M1 — Map):**
-1. Obtain/audit `vsav2.zip`, re-freeze checksums with it.
-2. FBNeo harness decision + minimal RAM-checksum hook in SDL2 frontend.
-3. Start the three-way diff atlas: `vsavj` vs `vsav2` vs `vhunt2` program
-   ROMs (decrypt all three with the now-proven tool first).
-4. Work-RAM map for match state (attract traces already checksummable).
+1. FBNeo harness decision + minimal RAM-checksum hook in SDL2 frontend
+   (recommendation recorded in STATE.md).
+2. Start the three-way diff atlas: `vsavj` vs `vsav2` vs `vhunt2` decrypted
+   program images.
+3. Work-RAM map for match state (attract traces already checksummable).

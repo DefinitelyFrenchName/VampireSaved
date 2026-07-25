@@ -16,7 +16,10 @@ same commit as anything it describes.
 | MAME headless runner | `tools/run_mame.sh <set> [args]` | MAME 0.288 (brew), fresh sandbox per run |
 | Attract determinism | `tests/test_attract_determinism.sh` | PASS 3600 frames |
 | Decrypt oracle test | `tests/test_decrypt_oracle.sh` | PASS (python == MAME opcode space) |
-| FBNeo | `emu/fbneo` submodule | building; no Lua in SDL2 frontend — harness hooks TBD (M1) |
+| FBNeo | `emu/fbneo` submodule + `tools/run_fbneo.sh` | built (SDL2), headless smoke PASS; no scripting in SDL2 frontend — RAM-checksum hook is the M1 harness patch |
+
+FBNeo build: `(cd emu/fbneo && make sdl2 SKIPDEPEND=1 -j8)` — `SKIPDEPEND=1`
+is mandatory (docs/GOTCHAS.md). Needs brew `sdl2`(-compat) + `sdl2_image`.
 
 ## How to build
 
@@ -40,6 +43,7 @@ export ROMDIR=...
 tests/test_decrypt_oracle.sh          # decryption == MAME's, both byte orders sane
 tests/test_null_build.sh              # null build bit-identical + deterministic
 tests/test_attract_determinism.sh     # 60s attract, per-frame RAM checksums, 2 runs
+tests/test_fbneo_smoke.sh             # FBNeo headless boot + 15s crash-free soak
 ```
 
 All tests are self-contained, take state only via env/args, print PASS/FAIL,

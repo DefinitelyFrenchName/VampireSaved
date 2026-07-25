@@ -37,8 +37,9 @@ HARD_EXPECTATIONS = [
 
 # Sets the project requires (CLAUDE.md §3). vsav.zip is the parent of vsavj
 # (holds shared gfx/qsound), qsound_hle is the shared device set.
-REQUIRED_ZIPS = ["qsound_hle.zip", "vhunt2.zip", "vhunt2r1.zip", "vsav.zip", "vsavj.zip"]
-EXPECTED_MISSING = ["vsav2.zip"]  # flagged in STATE.md; needed from M1 on
+REQUIRED_ZIPS = ["qsound_hle.zip", "vhunt2.zip", "vhunt2r1.zip", "vsav.zip",
+                 "vsav2.zip", "vsavj.zip"]
+EXPECTED_MISSING = []  # complete since 2026-07-25 (vsav2 supplied, MAME-verified)
 
 
 def inventory(romdir: Path):

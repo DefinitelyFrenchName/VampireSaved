@@ -11,10 +11,17 @@ Address notation (CLAUDE.md §5): `PRG:0x0F1234` / `CPU:$0F1234` /
 
 ## Known so far (M0)
 
-### vsavj
-- `PRG:0x000000-0x0FFFFF` — opcode-encrypted region (key master
-  `0xfa8f4e33a4b881b9`); data reads bypass encryption. Decrypted opcode view:
-  `tools/cps2_decrypt.py` output, SHA-1 `22bb468496cc9738d04b26f5df73c04a156a6de1`.
-- `PRG:0x100000-0x3FFFFF` — never opcode-encrypted.
-- `RAM:$FF0000-$FFFFFF` — 68k work RAM (checksummed per-frame by the harness).
-- Watchdog instruction (from key block): `cmpi.l #$726A4BAF, D0`.
+All three sets: 4MB program ROM; opcode-encrypted region is
+`PRG:0x000000-0x0FFFFF` only; data reads always bypass encryption;
+`RAM:$FF0000-$FFFFFF` is 68k work RAM (checksummed per-frame by the
+harness). Decrypted opcode-view images (68k logical order) from
+`tools/cps2_decrypt.py`, each proven bit-identical to MAME's opcode space:
+
+| Set | Key master | Watchdog (from key block) | Opcode-view SHA-1 |
+|---|---|---|---|
+| vsavj | `0xfa8f4e33a4b881b9` | `cmpi.l #$726A4BAF, D0` | `22bb468496cc9738d04b26f5df73c04a156a6de1` |
+| vsav2 | `0xd681e4f460371edf` | `cmpi.l #$06920760, D0` | `a493d5ddd31c8e2627437caf1455a8260d11a45d` |
+| vhunt2 | `0x36c1eba326b10f18` | `cmpi.l #$06920760, D0` | `cdf6930391b2d0392810eda0e2dee8235b27269f` |
+
+vsav2/vhunt2 sharing a watchdog instruction (distinct keys) is early
+evidence of the sibling-build relationship the M1 diff will map.

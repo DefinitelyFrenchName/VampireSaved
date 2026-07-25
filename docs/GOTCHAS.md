@@ -29,6 +29,16 @@ Project conventions locked in after this (see tools/cps2_decrypt.py header):
 working directory only when `-log` is passed. That line is the fastest way to
 get the authoritative key/range for a set.
 
+## FBNeo fresh builds need `SKIPDEPEND=1` (paid: 2026-07-25)
+
+`make sdl2` on a fresh clone dies with `No rule to make target 'driverlist.h',
+needed by 'burn.d'` — the depend-generation path (DEPEND=1 default) wants the
+generated `driverlist.h` via a bare-name prerequisite that vpath can't resolve
+before the file exists. FBNeo's own CI never builds that path: every workflow
+passes `SKIPDEPEND=1`. Use `make sdl2 SKIPDEPEND=1 -j8`. (Consequence: no
+header-change tracking — after editing FBNeo headers, `make clean` or touch
+the affected .cpp files.)
+
 ## Pre-seeded from the ROM-audit round (2026-07-25, before repo existed)
 
 - **MAME audits the whole board, not just the game:** FBNeo has decryption
