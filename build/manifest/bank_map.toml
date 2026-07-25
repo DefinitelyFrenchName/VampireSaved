@@ -392,6 +392,22 @@ kind = "byte2d"
 stride = 0x3C0
 span = 0x3C0
 
-# NOTE: 0x0BF01A..0x0BF69A (between byte2d_b's end and the free-space hole)
-# is not yet mapped to char-indexed tables; the extractor reports whether it
-# differs per set so it can be triaged if it turns out to be char-indexed.
+# ── bank tail (discovered session 4 via ported-code reads) ───────────────────
+# The bank continues past the 2D tables: at least two more per-character
+# pointer tables, read by the id-normalization/char-init engine code.
+[[table]]
+name = "tail_code_ptr"
+vsavj = 0x0BF29A
+kind = "code_ptr"
+stride = 0x80
+
+[[table]]
+name = "tail_data_ptr"
+vsavj = 0x0BF41A
+kind = "data_ptr"
+stride = 0x80
+region = "hitbox"
+
+# NOTE: 0x0BF01A..0x0BF29A, 0x0BF31A..0x0BF41A and 0x0BF49A..0x0BF69A remain
+# unmapped; no ported-code consumer references them yet. Triage if a future
+# stage surfaces reads there.

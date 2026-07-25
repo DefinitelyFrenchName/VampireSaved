@@ -1,17 +1,924 @@
-# reconciliation.toml — machine-readable R1 map: vsav2 engine address ->
-# vsavj equivalent, consumed by tools/gen_donovan_patch.py (stage 4+).
-# Human twin with evidence and method: docs/tables/reconciliation.md —
-# update BOTH in the same commit (CLAUDE.md rule 5 / doc taxonomy).
-#
-# The generator hard-fails on any code ref whose target has no row here
-# with status = "verified".
-#
-# kind:   engine_sub | engine_data | bank_ref | pcrel_thunk | absent
-# status: verified | plausible | open
-#
-# [[map]]
-# vsav2 = 0x0280B8
-# vsavj = 0x028DD8
-# kind = "engine_sub"
-# status = "verified"
-# note = "per-char loader; found by find_equiv, pinned by write-trace (M1)"
+# reconciliation.toml — R1 map (vsav2 -> vsavj). Generated rows
+# by tools/reconcile_batch.py; hand-verified rows are kept as-is.
+# Twin doc: docs/tables/reconciliation.md (same-commit rule).
+
+[[map]]
+vsav2 = 0x004efa
+vsavj = 0x000000
+kind = "engine_data"
+status = "open"
+note = "-; refs: bare_long"
+
+[[map]]
+vsav2 = 0x004f14
+vsavj = 0x004a5e
+kind = "engine_data"
+status = "verified"
+note = "codebytes-unique-w0x10; refs: bare_long"
+
+[[map]]
+vsav2 = 0x004f2e
+vsavj = 0x000000
+kind = "engine_data"
+status = "open"
+note = "-; refs: bare_long"
+
+[[map]]
+vsav2 = 0x004f62
+vsavj = 0x000000
+kind = "engine_data"
+status = "open"
+note = "-; refs: bare_long"
+
+[[map]]
+vsav2 = 0x004f96
+vsavj = 0x000000
+kind = "engine_data"
+status = "open"
+note = "-; refs: bare_long"
+
+[[map]]
+vsav2 = 0x004fb0
+vsavj = 0x000000
+kind = "engine_data"
+status = "open"
+note = "-; refs: bare_long"
+
+[[map]]
+vsav2 = 0x004fca
+vsavj = 0x000000
+kind = "engine_data"
+status = "open"
+note = "-; refs: bare_long"
+
+[[map]]
+vsav2 = 0x005052
+vsavj = 0x004316
+kind = "engine_data"
+status = "verified"
+note = "codebytes-unique-w0x10; refs: bare_long"
+
+[[map]]
+vsav2 = 0x00506c
+vsavj = 0x000000
+kind = "engine_data"
+status = "open"
+note = "-; refs: bare_long"
+
+[[map]]
+vsav2 = 0x005086
+vsavj = 0x000000
+kind = "engine_data"
+status = "open"
+note = "-; refs: bare_long"
+
+[[map]]
+vsav2 = 0x005122
+vsavj = 0x004ce2
+kind = "engine_data"
+status = "verified"
+note = "pattern-1.00-unique-w0x40; refs: bare_long"
+
+[[map]]
+vsav2 = 0x009834
+vsavj = 0x00afd4
+kind = "engine_data"
+status = "verified"
+note = "codebytes-unique-w0x10; refs: bare_long"
+
+[[map]]
+vsav2 = 0x00bc3a
+vsavj = 0x00d5ee
+kind = "engine_data"
+status = "verified"
+note = "pattern-1.00-unique-w0x40; refs: bare_long"
+
+[[map]]
+vsav2 = 0x00bc52
+vsavj = 0x00d606
+kind = "engine_data"
+status = "verified"
+note = "pattern-1.00-unique-w0x40; refs: bare_long"
+
+[[map]]
+vsav2 = 0x00bcb4
+vsavj = 0x00d668
+kind = "engine_data"
+status = "verified"
+note = "pattern-1.00-unique-w0x40; refs: bare_long"
+
+[[map]]
+vsav2 = 0x00bce6
+vsavj = 0x00d69a
+kind = "engine_data"
+status = "verified"
+note = "pattern-1.00-unique-w0x40; refs: bare_long"
+
+[[map]]
+vsav2 = 0x00bd16
+vsavj = 0x00d6ca
+kind = "engine_sub"
+status = "verified"
+note = "pattern-1.00-unique-w0x40; refs: jsr"
+
+[[map]]
+vsav2 = 0x00bd86
+vsavj = 0x00d73a
+kind = "engine_data"
+status = "verified"
+note = "codebytes-unique-w0x10; refs: bare_long"
+
+[[map]]
+vsav2 = 0x00bdc8
+vsavj = 0x00d77c
+kind = "engine_data"
+status = "verified"
+note = "pattern-1.00-unique-w0x30; refs: bare_long"
+
+[[map]]
+vsav2 = 0x01357e
+vsavj = 0x014e8a
+kind = "engine_sub"
+status = "verified"
+note = "callsite-anchored-x2; refs: jsr"
+
+[[map]]
+vsav2 = 0x013724
+vsavj = 0x015030
+kind = "engine_data"
+status = "verified"
+note = "pattern-1.00-unique-w0x40; refs: bare_long"
+
+[[map]]
+vsav2 = 0x013778
+vsavj = 0x015084
+kind = "engine_data"
+status = "verified"
+note = "pattern-1.00-unique-w0x40; refs: bare_long"
+
+[[map]]
+vsav2 = 0x013b32
+vsavj = 0x01543e
+kind = "engine_data"
+status = "verified"
+note = "pattern-1.00-unique-w0x40; refs: bare_long"
+
+[[map]]
+vsav2 = 0x013b5a
+vsavj = 0x015466
+kind = "engine_sub"
+status = "verified"
+note = "pattern-1.00-unique-w0x40; refs: jsr"
+
+[[map]]
+vsav2 = 0x013b7c
+vsavj = 0x015488
+kind = "engine_data"
+status = "verified"
+note = "pattern-1.00-unique-w0x40; refs: bare_long"
+
+[[map]]
+vsav2 = 0x013b8e
+vsavj = 0x01549a
+kind = "engine_data"
+status = "verified"
+note = "pattern-1.00-unique-w0x40; refs: bare_long"
+
+[[map]]
+vsav2 = 0x013bf2
+vsavj = 0x0154fe
+kind = "engine_data"
+status = "verified"
+note = "pattern-1.00-unique-w0x40; refs: bare_long"
+
+[[map]]
+vsav2 = 0x013c0e
+vsavj = 0x01551a
+kind = "engine_data"
+status = "verified"
+note = "pattern-1.00-unique-w0x40; refs: bare_long"
+
+[[map]]
+vsav2 = 0x013c3a
+vsavj = 0x015546
+kind = "engine_data"
+status = "verified"
+note = "pattern-1.00-unique-w0x40; refs: bare_long"
+
+[[map]]
+vsav2 = 0x013c66
+vsavj = 0x015572
+kind = "engine_data"
+status = "verified"
+note = "pattern-1.00-unique-w0x40; refs: bare_long"
+
+[[map]]
+vsav2 = 0x013c92
+vsavj = 0x01559e
+kind = "engine_data"
+status = "verified"
+note = "pattern-1.00-unique-w0x20; refs: bare_long"
+
+[[map]]
+vsav2 = 0x013e1a
+vsavj = 0x015714
+kind = "engine_data"
+status = "verified"
+note = "pattern-1.00-unique-w0x40; refs: bare_long"
+
+[[map]]
+vsav2 = 0x013f3e
+vsavj = 0x015838
+kind = "engine_sub"
+status = "verified"
+note = "pattern-1.00-unique-w0x40; refs: jsr"
+
+[[map]]
+vsav2 = 0x014f90
+vsavj = 0x01688a
+kind = "engine_data"
+status = "verified"
+note = "pattern-1.00-unique-w0x40; refs: bare_long"
+
+[[map]]
+vsav2 = 0x0156d6
+vsavj = 0x016f8e
+kind = "engine_sub"
+status = "verified"
+note = "callsite-anchored-x5; refs: jsr"
+
+[[map]]
+vsav2 = 0x017178
+vsavj = 0x01884e
+kind = "engine_data"
+status = "verified"
+note = "callsite-anchored-x1; refs: bare_long"
+
+[[map]]
+vsav2 = 0x0171fa
+vsavj = 0x0188ba
+kind = "engine_data"
+status = "verified"
+note = "callsite-anchored-x1; refs: bare_long"
+
+[[map]]
+vsav2 = 0x0172b0
+vsavj = 0x018952
+kind = "engine_data"
+status = "verified"
+note = "callsite-anchored-x1; refs: bare_long"
+
+[[map]]
+vsav2 = 0x0172f2
+vsavj = 0x018980
+kind = "engine_data"
+status = "verified"
+note = "callsite-anchored-x1; refs: bare_long"
+
+[[map]]
+vsav2 = 0x01732c
+vsavj = 0x0189ba
+kind = "engine_data"
+status = "verified"
+note = "pattern-1.00-unique-w0x20; refs: bare_long"
+
+[[map]]
+vsav2 = 0x017422
+vsavj = 0x000000
+kind = "engine_data"
+status = "open"
+note = "-; refs: bare_long"
+
+[[map]]
+vsav2 = 0x017522
+vsavj = 0x000000
+kind = "engine_data"
+status = "open"
+note = "-; refs: bare_long"
+
+[[map]]
+vsav2 = 0x017a48
+vsavj = 0x01904e
+kind = "engine_data"
+status = "verified"
+note = "callsite-anchored-x1; refs: bare_long"
+
+[[map]]
+vsav2 = 0x017b22
+vsavj = 0x000000
+kind = "engine_data"
+status = "open"
+note = "-; refs: bare_long"
+
+[[map]]
+vsav2 = 0x017b74
+vsavj = 0x019172
+kind = "engine_data"
+status = "verified"
+note = "pattern-1.00-unique-w0x20; refs: bare_long"
+
+[[map]]
+vsav2 = 0x017be4
+vsavj = 0x0191e2
+kind = "engine_data"
+status = "verified"
+note = "pattern-1.00-unique-w0x40; refs: bare_long"
+
+[[map]]
+vsav2 = 0x017e90
+vsavj = 0x01948e
+kind = "engine_data"
+status = "verified"
+note = "pattern-1.00-unique-w0x20; refs: bare_long"
+
+[[map]]
+vsav2 = 0x024cba
+vsavj = 0x026058
+kind = "engine_data"
+status = "verified"
+note = "pattern-1.00-unique-w0x40; refs: bare_long"
+
+[[map]]
+vsav2 = 0x025eba
+vsavj = 0x026d36
+kind = "engine_sub"
+status = "verified"
+note = "callsite-anchored-x3; refs: jmp,jsr"
+
+[[map]]
+vsav2 = 0x025ee8
+vsavj = 0x026d64
+kind = "engine_sub"
+status = "verified"
+note = "callsite-anchored-x2; refs: bare_long,jmp"
+
+[[map]]
+vsav2 = 0x028122
+vsavj = 0x000000
+kind = "engine_sub"
+status = "open"
+note = "-; refs: jsr"
+
+[[map]]
+vsav2 = 0x028332
+vsavj = 0x02904a
+kind = "engine_sub"
+status = "verified"
+note = "pattern-1.00-unique-w0x40; refs: jsr"
+
+[[map]]
+vsav2 = 0x02834a
+vsavj = 0x029062
+kind = "engine_sub"
+status = "verified"
+note = "pattern-1.00-unique-w0x40; refs: jmp,jsr"
+
+[[map]]
+vsav2 = 0x02839a
+vsavj = 0x0290b2
+kind = "engine_sub"
+status = "verified"
+note = "callsite-anchored-x1; refs: jsr"
+
+[[map]]
+vsav2 = 0x0283be
+vsavj = 0x0290c4
+kind = "engine_sub"
+status = "verified"
+note = "pattern-1.00-unique-w0x40; refs: jsr"
+
+[[map]]
+vsav2 = 0x028484
+vsavj = 0x02918a
+kind = "engine_sub"
+status = "verified"
+note = "pattern-1.00-unique-w0x40; refs: jsr"
+
+[[map]]
+vsav2 = 0x028534
+vsavj = 0x02923a
+kind = "engine_sub"
+status = "verified"
+note = "pattern-1.00-unique-w0x40; refs: jsr"
+
+[[map]]
+vsav2 = 0x028708
+vsavj = 0x029406
+kind = "engine_sub"
+status = "verified"
+note = "callsite-anchored-x1; refs: jsr"
+
+[[map]]
+vsav2 = 0x028778
+vsavj = 0x02947e
+kind = "engine_sub"
+status = "plausible"
+note = "pattern-0.98-w0x40; refs: jsr"
+
+[[map]]
+vsav2 = 0x0289be
+vsavj = 0x02968c
+kind = "engine_sub"
+status = "verified"
+note = "callsite-anchored-x6; refs: jsr"
+
+[[map]]
+vsav2 = 0x028a6a
+vsavj = 0x029738
+kind = "engine_sub"
+status = "verified"
+note = "callsite-anchored-x4; refs: jsr"
+
+[[map]]
+vsav2 = 0x028b7e
+vsavj = 0x02984c
+kind = "engine_sub"
+status = "verified"
+note = "pattern-1.00-unique-w0x40; refs: jmp,jsr"
+
+[[map]]
+vsav2 = 0x028d34
+vsavj = 0x029a02
+kind = "engine_sub"
+status = "verified"
+note = "pattern-1.00-unique-w0x30; refs: jsr"
+
+[[map]]
+vsav2 = 0x028d48
+vsavj = 0x029a16
+kind = "engine_sub"
+status = "verified"
+note = "pattern-1.00-unique-w0x20; refs: jsr"
+
+[[map]]
+vsav2 = 0x028ee6
+vsavj = 0x029bb4
+kind = "engine_sub"
+status = "verified"
+note = "pattern-1.00-unique-w0x30; refs: jsr"
+
+[[map]]
+vsav2 = 0x028f5c
+vsavj = 0x029c2a
+kind = "engine_data"
+status = "verified"
+note = "callsite-anchored-x1; refs: bare_long"
+
+[[map]]
+vsav2 = 0x028fa0
+vsavj = 0x029c6e
+kind = "engine_sub"
+status = "verified"
+note = "pattern-1.00-unique-w0x40; refs: jsr"
+
+[[map]]
+vsav2 = 0x029114
+vsavj = 0x029dda
+kind = "engine_sub"
+status = "verified"
+note = "farm-helper-match; refs: jsr"
+
+[[map]]
+vsav2 = 0x02911c
+vsavj = 0x029de2
+kind = "engine_sub"
+status = "verified"
+note = "farm-helper-match; refs: jsr"
+
+[[map]]
+vsav2 = 0x029124
+vsavj = 0x029dea
+kind = "engine_sub"
+status = "verified"
+note = "farm-helper-match; refs: jsr"
+
+[[map]]
+vsav2 = 0x02912c
+vsavj = 0x029df2
+kind = "engine_sub"
+status = "verified"
+note = "farm-helper-match; refs: jsr"
+
+[[map]]
+vsav2 = 0x029154
+vsavj = 0x029e1a
+kind = "engine_sub"
+status = "verified"
+note = "farm-helper-match; refs: jsr"
+
+[[map]]
+vsav2 = 0x02915c
+vsavj = 0x029eba
+kind = "engine_sub"
+status = "verified"
+note = "farm-helper-match; refs: jsr"
+
+[[map]]
+vsav2 = 0x029164
+vsavj = 0x029eba
+kind = "engine_sub"
+status = "verified"
+note = "farm-helper-match; refs: jsr"
+
+[[map]]
+vsav2 = 0x02916c
+vsavj = 0x029e42
+kind = "engine_sub"
+status = "verified"
+note = "farm-helper-match; refs: jsr"
+
+[[map]]
+vsav2 = 0x029184
+vsavj = 0x000000
+kind = "farm_port"
+status = "verified"
+param_hex = "0001000400150f00"
+common = 0x029f4a
+note = "hand: vsav2-added predicate-farm entry (no vsavj twin); synthesized absolute stub + ported 8B param block"
+
+[[map]]
+vsav2 = 0x02918c
+vsavj = 0x000000
+kind = "farm_port"
+status = "verified"
+param_hex = "000100040015f000"
+common = 0x029f4a
+note = "hand: vsav2-added predicate-farm entry; synthesized stub + param"
+
+[[map]]
+vsav2 = 0x02919c
+vsavj = 0x029e52
+kind = "engine_sub"
+status = "verified"
+note = "farm-helper-match; refs: jsr"
+
+[[map]]
+vsav2 = 0x0291d4
+vsavj = 0x029e82
+kind = "engine_sub"
+status = "verified"
+note = "farm-helper-match; refs: jsr"
+
+[[map]]
+vsav2 = 0x02921c
+vsavj = 0x029ec2
+kind = "engine_sub"
+status = "verified"
+note = "farm-helper-match; refs: jsr"
+
+[[map]]
+vsav2 = 0x029244
+vsavj = 0x029eea
+kind = "engine_sub"
+status = "verified"
+note = "farm-helper-match; refs: jsr"
+
+[[map]]
+vsav2 = 0x02924c
+vsavj = 0x029ef2
+kind = "engine_sub"
+status = "verified"
+note = "farm-helper-match; refs: jsr"
+
+[[map]]
+vsav2 = 0x029950
+vsavj = 0x02a606
+kind = "engine_sub"
+status = "verified"
+note = "codebytes-unique-w0x8; refs: jsr"
+
+[[map]]
+vsav2 = 0x02c68c
+vsavj = 0x02ceb0
+kind = "engine_data"
+status = "verified"
+note = "pattern-1.00-unique-w0x40; refs: bare_long"
+
+[[map]]
+vsav2 = 0x02cb50
+vsavj = 0x02d374
+kind = "engine_sub"
+status = "verified"
+note = "callsite-anchored-x4; refs: jsr"
+
+[[map]]
+vsav2 = 0x02ce82
+vsavj = 0x02d62a
+kind = "engine_data"
+status = "verified"
+note = "callsite-anchored-x4; refs: bare_long"
+
+[[map]]
+vsav2 = 0x04223c
+vsavj = 0x000000
+kind = "engine_sub"
+status = "open"
+note = "-; refs: jmp"
+
+[[map]]
+vsav2 = 0x042418
+vsavj = 0x041220
+kind = "engine_sub"
+status = "verified"
+note = "pattern-1.00-unique-w0x40; refs: jmp"
+
+[[map]]
+vsav2 = 0x04277e
+vsavj = 0x041586
+kind = "engine_sub"
+status = "verified"
+note = "codebytes-unique-w0x18; refs: jmp"
+
+[[map]]
+vsav2 = 0x04287c
+vsavj = 0x041684
+kind = "engine_sub"
+status = "verified"
+note = "codebytes-unique-w0x10; refs: jmp"
+
+[[map]]
+vsav2 = 0x042cee
+vsavj = 0x000000
+kind = "engine_sub"
+status = "open"
+note = "-; refs: jmp"
+
+[[map]]
+vsav2 = 0x042e92
+vsavj = 0x041c7e
+kind = "engine_sub"
+status = "plausible"
+note = "pattern-0.98-w0x60; refs: jmp"
+
+[[map]]
+vsav2 = 0x042f3a
+vsavj = 0x041d26
+kind = "engine_sub"
+status = "plausible"
+note = "pattern-0.98-w0x60; refs: jmp"
+
+[[map]]
+vsav2 = 0x04323e
+vsavj = 0x04202a
+kind = "engine_sub"
+status = "verified"
+note = "pattern-1.00-unique-w0x40; refs: jmp"
+
+[[map]]
+vsav2 = 0x0433f4
+vsavj = 0x0421e0
+kind = "engine_sub"
+status = "verified"
+note = "codebytes-unique-w0x18; refs: jmp"
+
+[[map]]
+vsav2 = 0x04354e
+vsavj = 0x04233a
+kind = "engine_sub"
+status = "verified"
+note = "pattern-1.00-unique-w0x60; refs: jmp"
+
+[[map]]
+vsav2 = 0x043af0
+vsavj = 0x0428dc
+kind = "engine_sub"
+status = "verified"
+note = "pattern-1.00-unique-w0x40; refs: jmp"
+
+[[map]]
+vsav2 = 0x043cba
+vsavj = 0x042aa6
+kind = "engine_sub"
+status = "plausible"
+note = "pattern-0.98-w0x40; refs: jmp"
+
+[[map]]
+vsav2 = 0x044126
+vsavj = 0x042efa
+kind = "engine_sub"
+status = "verified"
+note = "codebytes-unique-w0x18; refs: jmp"
+
+[[map]]
+vsav2 = 0x04415a
+vsavj = 0x042f2e
+kind = "engine_sub"
+status = "verified"
+note = "pattern-1.00-unique-w0x60; refs: jmp"
+
+[[map]]
+vsav2 = 0x044860
+vsavj = 0x043634
+kind = "engine_sub"
+status = "verified"
+note = "codebytes-unique-w0x18; refs: jmp"
+
+[[map]]
+vsav2 = 0x0448a6
+vsavj = 0x02563e
+kind = "engine_sub"
+status = "plausible"
+note = "pattern-0.94-w0x20; refs: jmp"
+
+[[map]]
+vsav2 = 0x0448d4
+vsavj = 0x000000
+kind = "engine_sub"
+status = "open"
+note = "-; refs: jmp"
+
+[[map]]
+vsav2 = 0x046ee8
+vsavj = 0x045ccc
+kind = "engine_data"
+status = "verified"
+note = "callsite-anchored-x5; refs: bare_long"
+
+[[map]]
+vsav2 = 0x05c750
+vsavj = 0x054570
+kind = "engine_data"
+status = "verified"
+note = "callsite-anchored-x14; refs: bare_long"
+
+[[map]]
+vsav2 = 0x05c77a
+vsavj = 0x05459a
+kind = "engine_data"
+status = "verified"
+note = "callsite-anchored-x14; refs: bare_long"
+
+[[map]]
+vsav2 = 0x05c77e
+vsavj = 0x05459a
+kind = "engine_data"
+status = "verified"
+note = "codebytes-unique-w0x8; refs: bare_long"
+
+[[map]]
+vsav2 = 0x05c79e
+vsavj = 0x0545be
+kind = "engine_data"
+status = "verified"
+note = "pattern-1.00-unique-w0x40; refs: bare_long"
+
+[[map]]
+vsav2 = 0x05c7be
+vsavj = 0x0545de
+kind = "engine_sub"
+status = "verified"
+note = "pattern-1.00-unique-w0x40; refs: jmp,jsr"
+
+[[map]]
+vsav2 = 0x06a9be
+vsavj = 0x05e9b4
+kind = "engine_data"
+status = "verified"
+note = "pattern-1.00-unique-w0x20; refs: bare_long"
+
+[[map]]
+vsav2 = 0x06d9d4
+vsavj = 0x061588
+kind = "engine_data"
+status = "verified"
+note = "pattern-1.00-unique-w0x40; refs: bare_long"
+
+[[map]]
+vsav2 = 0x06e4a6
+vsavj = 0x061ed4
+kind = "engine_sub"
+status = "verified"
+note = "pattern-1.00-unique-w0x30; refs: jmp,jsr"
+
+[[map]]
+vsav2 = 0x080a1e
+vsavj = 0x0752b2
+kind = "engine_data"
+status = "verified"
+note = "pattern-1.00-unique-w0x40; refs: bare_long"
+
+[[map]]
+vsav2 = 0x080b46
+vsavj = 0x0753da
+kind = "engine_data"
+status = "verified"
+note = "pattern-1.00-unique-w0x40; refs: bare_long"
+
+[[map]]
+vsav2 = 0x082ae2
+vsavj = 0x077376
+kind = "engine_data"
+status = "verified"
+note = "pattern-1.00-unique-w0x40; refs: bare_long"
+
+[[map]]
+vsav2 = 0x08a5a8
+vsavj = 0x000000
+kind = "engine_sub"
+status = "open"
+note = "-; refs: jsr"
+
+[[map]]
+vsav2 = 0x12f484
+vsavj = 0x000000
+kind = "engine_data"
+status = "open"
+note = "-; refs: bare_long"
+
+[[map]]
+vsav2 = 0x1373c6
+vsavj = 0x14492c
+kind = "engine_data"
+status = "verified"
+note = "pattern-1.00-unique-w0x40; refs: bare_long"
+
+[[map]]
+vsav2 = 0x167bf4
+vsavj = 0x000000
+kind = "engine_data"
+status = "open"
+note = "-; refs: bare_long"
+
+[[map]]
+vsav2 = 0x16c0ec
+vsavj = 0x181560
+kind = "engine_data"
+status = "verified"
+note = "pattern-1.00-unique-w0x40; refs: bare_long"
+
+[[map]]
+vsav2 = 0x17f176
+vsavj = 0x000000
+kind = "engine_data"
+status = "open"
+note = "-; refs: bare_long"
+
+[[map]]
+vsav2 = 0x181592
+vsavj = 0x000000
+kind = "engine_data"
+status = "open"
+note = "-; refs: bare_long"
+
+[[map]]
+vsav2 = 0x1bab42
+vsavj = 0x145212
+kind = "engine_data"
+status = "verified"
+note = "codebytes-unique-w0x8; refs: bare_long"
+
+[[map]]
+vsav2 = 0x1cd326
+vsavj = 0x1e0064
+kind = "engine_data"
+status = "verified"
+note = "pattern-1.00-unique-w0x40; refs: bare_long"
+
+[[map]]
+vsav2 = 0x1d7428
+vsavj = 0x1f3fd2
+kind = "engine_data"
+status = "verified"
+note = "pattern-1.00-unique-w0x40; refs: bare_long"
+
+[[map]]
+vsav2 = 0x2b7ef4
+vsavj = 0x000000
+kind = "engine_data"
+status = "open"
+note = "-; refs: bare_long"
+
+[[map]]
+vsav2 = 0x0d609e
+vsavj = 0x0bbf00
+kind = "bank_ref"
+status = "verified"
+note = "hand: bank delta rule; target bytes byte-identical vsav2<->vsavj (mask table below bank)"
+
+[[map]]
+vsav2 = 0x0d8398
+vsavj = 0x0be1fa
+kind = "bank_ref"
+status = "verified"
+note = "hand: bank delta rule; == vsavj word_pos_b table base, bytes identical"
+
+[[map]]
+vsav2 = 0x0d7c18
+vsavj = 0x0bda7a
+kind = "bank_ref"
+status = "verified"
+note = "hand: proj_hitbox_base TABLE base read by ported support code; delta rule semantically exact (per-char contents legitimately differ; slot 0x0F rows already repointed to Donovan data)"
+
+[[map]]
+vsav2 = 0x0d7c98
+vsavj = 0x0bdafa
+kind = "bank_ref"
+status = "verified"
+note = "hand: proj_hitbox_comp TABLE base; same rationale"
+
+[[map]]
+vsav2 = 0x0d8418
+vsavj = 0x0be27a
+kind = "bank_ref"
+status = "verified"
+note = "hand: gap_be27a pointer TABLE base; delta rule; slot 0x0F row repointed by the generator"

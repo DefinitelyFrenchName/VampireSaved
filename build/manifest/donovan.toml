@@ -18,6 +18,21 @@ end = 0x100000
 start = 0x3EC720
 end = 0x400000
 
+# Secondary-object (projectile) dispatch hook (stage 4+): vsavj's local
+# type table has 58 entries; vsav2's has 76 — the extras are the newcomers'
+# sub-object handlers, and Donovan spawns type 60. The generator builds an
+# extended table in free space (entries 0..57 byte-identical to vanilla,
+# 58..75 = relocated ported handlers) and replaces the 8-byte engine
+# sequence `movea.l (d8,PC,D0.w),A0; moveq #0,D0; jsr (A0)` with
+# `jsr thunk; nop` — semantically identical for vanilla types (proved by
+# the legacy bit-identity gate).
+[proj_hook]
+site = 0x054470
+vanilla_table = 0x054484
+vanilla_entries = 59
+src_table = 0x05C620
+src_entries = 76
+
 # non-bank repoints (select screen, win quotes, AI, versus tables) land here
 # as stage-5 RE pins their addresses down; op = poke16|poke32, both slots
 # where applicable.

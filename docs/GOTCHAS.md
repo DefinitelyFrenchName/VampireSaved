@@ -130,3 +130,22 @@ after the enabling transition and ≥10 frames from any expected boundary;
 cursor moves short (3 frames, no autorepeat ambiguity) on long-stable
 screens; input-neutral after the picks. Within-emulator oracles are
 unaffected (whole-RAM frame-exact remains the standard there).
+
+## PC-relative reads are DECRYPTED reads on CPS-2 (paid: 2026-07-25, ~45min)
+
+The 68000 issues PC-relative operand reads with FC = program space, so the
+CPS-2 B-board decrypts them like opcode fetches. Consequence: tables read
+via `(d8,PC,Dn)` / `(d16,PC)` (e.g. the secondary-object type dispatch at
+vsavj `PRG:0x054470`, table `0x054484`) are stored ENCRYPTED — their bytes
+only make sense in the opcodes view, while normally-addressed data must be
+stored raw. Symptom: a "table" that looks like garbage in the data view but
+decodes perfectly in `*_opcodes.bin` (or vice versa).
+
+Port rules that follow:
+- Whole code regions ported as `code` ops keep working even when they embed
+  PC-read tables — the embedded tables re-encrypt with the code.
+- A hook that changes an access from PC-relative to An-relative (like the
+  proj_hook thunk) changes the fetch space: the new table must be emitted
+  RAW, and its source entries must be COPIED FROM THE DECRYPTED view.
+- When reading engine tables for analysis, pick the view by how the ENGINE
+  addresses them, not by where they live.

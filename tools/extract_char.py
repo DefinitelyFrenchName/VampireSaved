@@ -104,11 +104,12 @@ def entry_size(t):
     return t["stride"] // 32
 
 
-ENGINE_ENVELOPE = 0x2000  # sibling-build engine addresses drift by small,
+ENGINE_ENVELOPE = 0x40000  # sibling-build engine/data addresses drift by
                           # location-dependent deltas (loader +0x2E, code
-                          # +0x30, bank -0x76E ...); a 32-bit both-ROM field
-                          # within this envelope is an engine reference (an
-                          # individually-recorded R1 item), not noise
+                          # +0x30, bank -0x76E, shared-asset data -0x2F88);
+                          # a 32-bit both-ROM field within this envelope is
+                          # an engine reference (an individually-recorded R1
+                          # item), not noise
 
 
 def diff_refs(a_blob, b_blob, shifts, allow_engine):
@@ -153,11 +154,13 @@ def diff_refs(a_blob, b_blob, shifts, allow_engine):
                             "orc_target": vb, "shift": "engine"}
                     break
         if site is None and allow_engine:
+            # real PC-relative displacement drift between sibling builds is
+            # tiny — a tight envelope avoids classifying data words as pcrel
             for off in range(max(0, i - 1), min(i, len(a_blob) - 2) + 1):
                 va = int.from_bytes(a_blob[off:off + 2], "big")
                 vb = int.from_bytes(b_blob[off:off + 2], "big")
                 da = (vb - va + 0x8000) % 0x10000 - 0x8000
-                if va != vb and abs(da) <= ENGINE_ENVELOPE:
+                if va != vb and abs(da) <= 0x200:
                     site = {"off": off, "width": 16, "target": va,
                             "orc_target": vb, "shift": "pcrel16"}
                     break
@@ -205,6 +208,11 @@ def main():
     ap.add_argument("--bank-map", type=Path,
                     default=Path(__file__).resolve().parent.parent
                     / "build" / "manifest" / "bank_map.toml")
+    ap.add_argument("--extra-roots", default="",
+                    help="comma list of vsav2 code addresses to extract as "
+                         "additional regions (absent-in-vsavj support "
+                         "routines found by the R1 loop); each is twinned "
+                         "in the oracle set by masked pattern search")
     args = ap.parse_args()
     char = args.char
     out = args.out_dir
@@ -314,6 +322,84 @@ def main():
     regions["code"] = {"src": cs_s, "orc": cs_o, "len": clen, "grow": CODE_CAP,
                        "kind": "code", "shift": "code"}
 
+    # extra code roots: absent-in-vsavj support routines. Spec per root:
+    #   addr           twin by masked pattern search, oracle-bounded
+    #   addr:len       same, but length capped/fixed to len
+    #   addr:len:s     SOURCE-ONLY: no oracle twin exists (per-game hook,
+    #                  content diverges between siblings); length is fixed
+    #                  and refs come from the operand scanner (labeled
+    #                  opcodes only), not the diff
+    source_only = []
+    for root_s in args.extra_roots.split(","):
+        if not root_s:
+            continue
+        parts = root_s.split(":")
+        root = int(parts[0], 0)
+        fixed_len = int(parts[1], 0) if len(parts) > 1 and parts[1] else None
+        forced_twin = None
+        if len(parts) > 2 and parts[2].startswith("t"):
+            forced_twin = int(parts[2][1:], 0)
+        if len(parts) > 2 and parts[2] == "s":
+            sh_name = f"x{root:06x}"
+            regions[sh_name] = {"src": root, "orc": root, "len": fixed_len,
+                                "kind": "code", "shift": sh_name,
+                                "source_only": True}
+            source_only.append(sh_name)
+            report.append(f"extra region {sh_name}: SOURCE-ONLY, "
+                          f"len 0x{fixed_len:X} (per-game hook; scanner refs)")
+            continue
+        pat = src.plaintext(root, root + 0x40)
+        mask = bytearray(b"\x01" * len(pat))
+        for ref in scan_code_refs.scan(pat, root):
+            for i in range(ref["off"],
+                           min(ref["off"] + ref["width"] // 8, len(mask))):
+                mask[i] = 0
+        # anchor = longest hard run
+        best, cur = (0, 0), None
+        for i, m in enumerate(list(mask) + [0]):
+            if m and cur is None:
+                cur = i
+            elif not m and cur is not None:
+                if i - cur > best[0]:
+                    best = (i - cur, cur)
+                cur = None
+        anchor = bytes(pat[best[1]:best[1] + best[0]])
+        # search the oracle's plaintext around root +- 0x8000; score every
+        # anchor hit with the full mask and take the best (ties -> smallest
+        # |shift|) — the first hit can be a similar-code false friend
+        win_lo = max(0, root - 0x8000)
+        orc_pt_win = orc.plaintext(win_lo, min(0x100000, root + 0x8000))
+        hard = mask.count(1)
+        cands = []
+        pos = orc_pt_win.find(anchor)
+        while pos != -1 and len(cands) < 32:
+            base = pos - best[1]
+            if 0 <= base <= len(orc_pt_win) - len(pat):
+                sc = sum(1 for i in range(len(pat))
+                         if mask[i] and orc_pt_win[base + i] == pat[i]) / hard
+                cands.append((sc, abs(win_lo + base - root), win_lo + base))
+            pos = orc_pt_win.find(anchor, pos + 2)
+        if forced_twin is not None:
+            twin = forced_twin
+        elif not cands:
+            fail.append(f"extra root {root:#x}: no oracle twin found")
+            continue
+        else:
+            cands.sort(key=lambda c: (-c[0], c[1]))
+            twin = cands[0][2]
+        sh_name = f"x{root:06x}"
+        shifts[sh_name] = twin - root
+        cap = fixed_len if fixed_len else 0x4000
+        xlen = oracle_extend(src.plaintext(root, root + cap + 0x100), 0,
+                             orc.plaintext(twin, twin + cap + 0x100), 0,
+                             cap, shifts, True)
+        if fixed_len:
+            xlen = min(xlen, fixed_len)
+        regions[sh_name] = {"src": root, "orc": twin, "len": xlen,
+                            "grow": cap, "kind": "code", "shift": sh_name}
+        report.append(f"extra region {sh_name}: twin 0x{twin:06X} "
+                      f"(shift {twin - root:+#x}), len 0x{xlen:X}")
+
     for name, r in regions.items():
         report.append(f"region {name}: {src_name} 0x{r['src']:06X}+0x{r['len']:X} "
                       f"({r['kind']}, shift {r['shift']})")
@@ -391,6 +477,10 @@ def main():
     for _ in range(8):
         unexplained_by_region = {}
         for name, r in list(regions.items()):
+            if r.get("source_only"):
+                if name not in blobs:
+                    blobs[name] = src.plaintext(r["src"], r["src"] + r["len"])
+                continue  # no oracle; refs come from the scanner later
             if r["len"] > 0:
                 unexplained_by_region[name] = classify_region(name, r)
         # retract discovered shifts whose regions fail validation (a false
@@ -469,6 +559,13 @@ def main():
                 ref["class"] = "bank_ref"
             elif sh == "code":
                 ref["class"] = "code_neighbor"
+            elif abs(shifts.get(sh, 1 << 30)) <= ENGINE_ENVELOPE:
+                # the delta coincides with a ported-region shift but the
+                # target is outside that region: an ordinary engine ref
+                # whose sibling-build drift equals the region's shift
+                ref["class"] = "engine"
+                ref["orc_target"] = ref["target"] + shifts[sh]
+                ref["shift"] = "engine"
             else:
                 ref["class"] = "escape"
         esc = [ref for ref in r.get("refs", []) if ref["class"] == "escape"]
@@ -483,10 +580,40 @@ def main():
                         f"(first +0x{esc[0]['off']:X} -> "
                         f"0x{esc[0]['target']:06X} [{esc[0]['shift']}])")
 
-    # ── code triage scan (semantic labels + same-value refs) ─────────────────
+    # ── code triage scan (semantic labels + same-value refs + charid sites) ──
+    for name, r in regions.items():
+        if r["kind"] == "code" and r["len"] > 0 and name in blobs:
+            sc = scan_code_refs.scan(blobs[name], r["src"])
+            r["scan"] = sc
+            r["charid_sites"] = [c["off"] for c in sc if c["class"] == "charid"]
+            if r["charid_sites"]:
+                report.append(f"  {name}: {len(r['charid_sites'])} char-id "
+                              f"0x13 immediates (rewritten to the dst slot "
+                              f"at generation)")
+            if r.get("source_only"):
+                # no oracle: relocation fields come from labeled operands
+                refs = []
+                for c in sc:
+                    if c["how"] in ("jsr", "jmp", "pea", "lea", "movea",
+                                    "move_src") and c["width"] == 32:
+                        tgt = c["target"]
+                        hosts = [rn for rn, rr in regions.items()
+                                 if rr["len"] > 0
+                                 and rr["src"] <= tgt < rr["src"] + rr["len"]]
+                        if hosts:
+                            cls = "internal"
+                        elif tgt < 0x400000:
+                            cls = "engine"
+                        else:
+                            continue  # RAM/HW: no relocation
+                        refs.append({"off": c["off"], "width": 32,
+                                     "target": tgt, "shift": "engine",
+                                     "class": cls})
+                r["refs"] = refs
+                report.append(f"  {name}: {len(refs)} scanner-derived refs "
+                              f"(source-only region)")
     if regions["code"]["len"] > 0:
-        code_refs = scan_code_refs.scan(blobs["code"], regions["code"]["src"])
-        regions["code"]["scan"] = code_refs
+        code_refs = regions["code"]["scan"]
         # cross-check: every oracle 32-bit code ref should be seen by the scanner
         scanned_offs = {cr["off"] for cr in code_refs}
         missed = [ref for ref in regions["code"]["refs"]
@@ -528,7 +655,11 @@ def main():
                 fail.append(f"{name}[{char:#x}] = {v:#x} outside extracted "
                             f"region '{region}'")
         elif kind == "code_ptr":
-            pass  # handled in the dispatch walk above
+            if not name.startswith("dispatch_"):
+                v = int.from_bytes(raw_s, "big")
+                values.append({"table": name, "kind": "code_ptr",
+                               "ptr": f"{v:#x}"})
+            # dispatch_* handled in the dispatch walk above
         elif kind == "auto":
             win_s = src.data[table_addr(t, origins, src_name):
                              table_addr(t, origins, src_name) + t["stride"]]
@@ -555,7 +686,7 @@ def main():
         "regions": {name: {**{k: v for k, v in r.items() if k != "scan"},
                            "sha1": hashlib.sha1(blobs[name]).hexdigest()
                            if name in blobs else None}
-                    for name, r in regions.items()},
+                    for name, r in regions.items() if r["len"] > 0},
         "code_scan": regions["code"].get("scan", []),
         "dispatch": [{"table": tn, "src_target": v_s, "orc_target": v_o}
                      for tn, v_s, v_o in disp],

@@ -60,3 +60,30 @@ moves from 2886 (match init; stages 1-2) to **1080**, the frame the cursor
 lands on slot 0x0F. Correct superset behavior (hover involves the modified
 slot); explains why 04_select_fuzz/08/09 are in the diverging class.
 Build fingerprint e302f16ec3f1e18074acef8b54c3f2b30d378df7.
+
+## donovan-m2 stage 4 — IN PROGRESS (2026-07-25, session 4)
+
+The R1 campaign, mechanized:
+- reconcile_batch.py resolves engine targets by: masked pattern search
+  (window ladder), jmp-stub dereference, call-site anchoring via veteran
+  parallelism, exact code-byte match (position-independent stubs), and
+  predicate-farm entry matching by parameter-block content. 100+ targets
+  verified; remaining opens route to per-target planted-ILLEGAL TRIPWIRES
+  whose fault PC names exactly which unresolved ref fires.
+- Ported as oracle-validated extra regions: the +0x34 newcomer-support zone
+  (0x5C800+0x6A00), 17 secondary-object handlers (types 59-75), the VS2
+  helper 0x15702, id-normalization 0x26142 and 0x28122, and the source-only
+  per-game hook 0x8A5A8 (char-id 0x13 imm rewritten to 0x0F).
+- FIRST ENGINE HOOK (proj_hook): vsavj's secondary-object dispatch table
+  (0x054484) has 59 entries; vsav2 has 76. Donovan spawns high types. The
+  8-byte dispatch at 0x054470 is replaced with jsr thunk; the thunk indexes
+  a 76-entry extended table (59 vanilla entries byte-identical + ported
+  handlers). PC-relative-reads-are-decrypted rule honored (GOTCHAS).
+- Two more bank-tail per-char pointer tables discovered (vsavj 0x0BF29A
+  code-ptr, 0x0BF41A data-ptr) — mapped + repointed.
+
+STATUS: match RUNS (timer, CPU acts, no crash/tripwire/reset through a full
+moveset-exercise replay). OPEN BUG: Donovan ignores inputs (x static, idle
+anim loop) and takes no damage — input/command processing or box
+resolution; next lead is a vsav2-native ground-truth trace of the walk/X
+writer vs the ported build.

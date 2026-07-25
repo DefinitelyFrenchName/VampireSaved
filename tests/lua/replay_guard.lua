@@ -154,6 +154,21 @@ do
     if a then match_a, match_b = tonumber(a), tonumber(b) end
 end
 
+-- GUARD_PC_LOG="a-b": log CURPC at end of every frame in [a,b] (loop hunts)
+local pclog_a, pclog_b
+do
+    local a, b = (os.getenv("GUARD_PC_LOG") or ""):match("^(%d+)%-(%d+)$")
+    if a then pclog_a, pclog_b = tonumber(a), tonumber(b) end
+end
+
+-- GUARD_TRACE="a-b": debugger instruction trace over frames [a,b] to
+-- <CHECKSUM_OUT>.trace (needs -debug)
+local trace_a, trace_b
+do
+    local a, b = (os.getenv("GUARD_TRACE") or ""):match("^(%d+)%-(%d+)$")
+    if a then trace_a, trace_b = tonumber(a), tonumber(b) end
+end
+
 local f = assert(io.open(out_path, "wb"))
 local frame = 0
 local crashed = false
@@ -222,6 +237,13 @@ local function on_crash(vec)
     machine:exit()
 end
 
+-- GUARD_BREAK="hexaddr": break there and report like a crash (with stack
+-- sketch) — e.g. the soft-reset entry, to catch who restarted the game
+local break_addr = tonumber(os.getenv("GUARD_BREAK") or "", 16)
+if debugger and break_addr then
+    debugger:command(string.format("bpset 0x%x", break_addr))
+end
+
 if debugger then
     emu.register_periodic(function()
         if crashed then return end
@@ -230,6 +252,12 @@ if debugger then
             local vec = handler_vec[pc]
             if vec then
                 on_crash(vec)
+            elseif break_addr and pc == break_addr then
+                if frame > 100 then  -- ignore the boot-time pass
+                    on_crash(99)
+                else
+                    debugger.execution_state = "run"
+                end
             else
                 -- initial debugger halt or unrelated stop: resume silently
                 debugger.execution_state = "run"
@@ -269,6 +297,17 @@ emu.register_frame_done(function()
         local df = assert(io.open(string.format("%s/dump_%d_%06x.bin", out_dir, frame, range[1]), "wb"))
         df:write(program:read_range(range[1], range[2], 8))
         df:close()
+    end
+
+    if trace_a and frame == trace_a then
+        debugger:command(string.format("trace %s.trace,0", out_path))
+    end
+    if trace_a and frame == trace_b then
+        debugger:command("trace off,0")
+    end
+    if pclog_a and frame >= pclog_a and frame <= pclog_b then
+        f:write(string.format("PC %d %06x\n", frame,
+                              cpu.state["CURPC"].value & 0xFFFFFF))
     end
 
     -- cheap-mode PC classification (also harmless under -debug)

@@ -1,0 +1,89 @@
+# 12: slot-0x0F (Donovan after the port; Jedah on vanilla) vs CPU, actively
+# exercising the moveset: normals on both strengths, command motions
+# (QCF/QCB/DP + punch and kick), crouching/jumping attacks, walk pressure.
+# Match starts ~2890; inputs run to ~8000, then idle to round end.
+300-305 sys=C1
+800-803 sys=S1
+1000-1002 p1=U
+1040-1042 p1=U
+1080-1082 p1=R
+1700-1702 p1=1
+# --- round 1: normals ---
+3000-3002 p1=1
+3060-3062 p1=2
+3120-3122 p1=3
+3180-3182 p1=4
+3240-3242 p1=5
+3300-3302 p1=6
+3360-3400 p1=R
+3410-3412 p1=2
+3470-3500 p1=D
+3480-3482 p1=1
+3540-3542 p1=D5
+# --- QCF punch (fireball family) ---
+3600-3604 p1=D
+3605-3609 p1=DR
+3610-3614 p1=R
+3615-3617 p1=2
+# --- QCB punch ---
+3700-3704 p1=D
+3705-3709 p1=DL
+3710-3714 p1=L
+3715-3717 p1=1
+# --- DP motion ---
+3800-3803 p1=R
+3805-3809 p1=D
+3810-3814 p1=DR
+3815-3817 p1=3
+# --- QCF kick ---
+3900-3904 p1=D
+3905-3909 p1=DR
+3910-3914 p1=R
+3915-3917 p1=5
+# --- QCB kick ---
+4000-4004 p1=D
+4005-4009 p1=DL
+4010-4014 p1=L
+4015-4017 p1=4
+# --- jump attacks ---
+4100-4120 p1=U
+4110-4112 p1=2
+4200-4220 p1=UR
+4210-4212 p1=5
+# --- charge back-forward attempt ---
+4300-4400 p1=L
+4401-4405 p1=R
+4406-4408 p1=2
+# --- pressure walk + mixed strings ---
+4500-4700 p1=R
+4520-4522 p1=1
+4560-4562 p1=2
+4600-4602 p1=3
+4640-4642 p1=6
+4750-4752 p1=45
+4800-4802 p1=12
+4850-4852 p1=23
+# --- second motion sweep, other side timing ---
+5000-5004 p1=D
+5005-5009 p1=DR
+5010-5014 p1=R
+5015-5017 p1=1
+5100-5104 p1=D
+5105-5109 p1=DR
+5110-5114 p1=R
+5115-5117 p1=6
+5200-5203 p1=R
+5205-5209 p1=D
+5210-5214 p1=DR
+5215-5217 p1=2
+5300-5340 p1=D
+5320-5322 p1=6
+5400-5440 p1=L
+5420-5422 p1=3
+# --- throws (close + direction + strong) ---
+5500-5560 p1=R
+5561-5563 p1=R2
+5600-5660 p1=R
+5661-5663 p1=R5
+# --- let the round play out ---
+9200 wait
