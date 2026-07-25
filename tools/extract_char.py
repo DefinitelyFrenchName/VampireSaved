@@ -188,6 +188,55 @@ def diff_refs(a_blob, b_blob, shifts, allow_engine, selfptr=None):
     return refs, unexplained
 
 
+def segmented_data_refs(a_img, b_img, a0, b0, length, sname, shifts):
+    """Gap-tolerant oracle diff for multi-blob asset regions: sub-blobs sit
+    at slightly different relative offsets across the sibling games
+    (insertions), so a linear diff loses alignment at the first insertion.
+    Walk in chunks; when unexplained density spikes, RESYNC by searching the
+    oracle image for the next 32-byte exact match within +-0x2000. Returns
+    (refs, segments, dead_zones). Pointer fields are classified with the
+    selfptr rule (both values inside the family windows)."""
+    refs, segments, dead = [], [], []
+    a_off = 0
+    b_delta = 0     # oracle position for a-offset X = b0 + X + b_delta
+    seg_start = 0
+    CH = 0x100
+    sp = (sname, a0, a0 + length + 0x2000, b0 - 0x2000, b0 + length + 0x4000)
+    while a_off < length:
+        n = min(CH, length - a_off)
+        ca = a_img[a0 + a_off:a0 + a_off + n]
+        cb = b_img[b0 + a_off + b_delta:b0 + a_off + b_delta + n]
+        if len(cb) < n:
+            break
+        c_refs, unex = diff_refs(ca, cb, shifts, False, sp)
+        if len(unex) <= max(4, n // 20):
+            for ref in c_refs:
+                ref["off"] = ref["off"] + a_off
+                refs.append(ref)
+            a_off += n
+            continue
+        # alignment wall: resync at the next 32-byte exact match
+        segments.append((seg_start, a_off + unex[0], b_delta))
+        found = False
+        for probe in range(unex[0], min(unex[0] + 0x1000, length - a_off - 32), 4):
+            pat = a_img[a0 + a_off + probe:a0 + a_off + probe + 32]
+            center = b0 + a_off + probe + b_delta
+            pos = b_img.find(pat, max(0, center - 0x2000), center + 0x2000)
+            if pos != -1:
+                dead.append((a_off, a_off + probe))
+                a_off += probe
+                b_delta = pos - (b0 + a_off)
+                seg_start = a_off
+                found = True
+                break
+        if not found:
+            dead.append((a_off, length))
+            a_off = length
+            break
+    segments.append((seg_start, a_off, b_delta))
+    return refs, segments, dead
+
+
 def oracle_extend(a_img, a_start, b_img, b_start, cap, shifts, allow_engine,
                   selfptr=None):
     """Region length by oracle coverage: extend chunk-by-chunk while the diff
@@ -303,6 +352,13 @@ def main():
     for rname, tnames in (("hitbox", ["hitbox_base", "hitbox_comp"]),
                           ("hitbox_proj", ["proj_hitbox_base", "proj_hitbox_comp"])):
         s0, s1 = ptr_bounds(src, src_name, tnames)
+        if rname == "hitbox_proj":
+            # next-ptr has no upper neighbor for the last character and falls
+            # back to +0x4000; the REAL structure is compact (base sub-table
+            # offsets top out at +0x5A, comp strides at +0x400 — measured
+            # session 5). Cap at 0x1000 (2x margin); projectile-behavior
+            # gates verify sufficiency.
+            s1 = min(s1, s0 + 0x1000)
         regions[rname] = {"src": s0, "orc": s0 + shifts["bank"],
                           "len": s1 - s0, "kind": "data", "shift": "bank"}
 
@@ -362,17 +418,19 @@ def main():
         if is_data:
             sh_name = f"x{root:06x}"
             shifts[sh_name] = forced_twin - root
-            sp = (sh_name, root, root + fixed_len, forced_twin,
-                  forced_twin + fixed_len)
-            dlen = oracle_extend(src.data[root:root + fixed_len + 0x100], 0,
-                                 orc.data[forced_twin:forced_twin + fixed_len + 0x100],
-                                 0, fixed_len, shifts, False, selfptr=sp)
-            regions[sh_name] = {"src": root, "orc": forced_twin, "len": dlen,
-                                "grow": fixed_len, "kind": "data",
-                                "shift": sh_name, "selfptr": True}
-            report.append(f"extra region {sh_name}: DATA, twin "
-                          f"0x{forced_twin:06X} (shift {forced_twin - root:+#x}), "
-                          f"len 0x{dlen:X}")
+            shifts[sh_name] = forced_twin - root
+            xrefs, segs, deadz = segmented_data_refs(
+                src.data, orc.data, root, forced_twin, fixed_len,
+                sh_name, shifts)
+            regions[sh_name] = {"src": root, "orc": forced_twin,
+                                "len": fixed_len, "kind": "data",
+                                "shift": sh_name, "pre_classified": True,
+                                "refs": xrefs, "variant_sites": []}
+            report.append(f"extra region {sh_name}: DATA (segmented oracle), "
+                          f"twin 0x{forced_twin:06X}, len 0x{fixed_len:X}, "
+                          f"{len(xrefs)} pointer fields, {len(segs)} segments, "
+                          f"{len(deadz)} dead zones "
+                          f"({sum(b-a for a,b in deadz):#x} bytes unaligned)")
             continue
         if len(parts) > 2 and parts[2] == "s":
             sh_name = f"x{root:06x}"
@@ -517,10 +575,12 @@ def main():
     for _ in range(8):
         unexplained_by_region = {}
         for name, r in list(regions.items()):
-            if r.get("source_only"):
-                if name not in blobs:
-                    blobs[name] = src.plaintext(r["src"], r["src"] + r["len"])
-                continue  # no oracle; refs come from the scanner later
+            if r.get("source_only") or r.get("pre_classified"):
+                if name not in blobs and r["len"] > 0:
+                    blobs[name] = (src.plaintext(r["src"], r["src"] + r["len"])
+                                   if r["kind"] == "code"
+                                   else src.data[r["src"]:r["src"] + r["len"]])
+                continue  # refs come from the scanner / segmented oracle
             if r["len"] > 0:
                 unexplained_by_region[name] = classify_region(name, r)
         # retract discovered shifts whose regions fail validation (a false
@@ -563,7 +623,7 @@ def main():
                 clusters[-1][1] = t
         for ci, (ca, cb) in enumerate(clusters):
             start = ca & ~0xF
-            end = (cb + 0x400 + 0xF) & ~0xF  # tail margin covers the last
+            end = (cb + 0x180 + 0xF) & ~0xF  # tail margin covers the last
             rname = f"{sname}_{ci}"          # sub-table's sequential content
             regions[rname] = {"src": start, "orc": start + delta,
                               "len": end - start, "kind": "data",

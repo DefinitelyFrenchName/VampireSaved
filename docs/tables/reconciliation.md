@@ -95,3 +95,26 @@ donovan.toml. The port_patch subclass remap (0xE→0xC) becomes unnecessary
 once she registers via her real machinery — REVERT it when the class-7
 enqueue path is synthesized (site-1 word-table thunk design in this doc's
 history) or keep class-6 if behavior gates pass.
+
+## Session 5 close: THE FULL PORT FITS — 335K/336.6K placed
+
+Space crisis resolved (was ~9-11K over budget):
+- stage-1 scaffolding ops emitted only for stage 1-3 ladder builds
+- hitbox_proj honestly bounded (0x1000 cap; sub-table offsets top out at
+  +0x5A/+0x400 — the old 0x435A came from the next-ptr +0x4000 fallback)
+- only Donovan's own sub-object handler types ported (59-62); the other
+  13 extras are Huitzil/Pyron's and stay TRIPWIRED
+- aux0 cluster tail margins 0x400 -> 0x180 (gap histogram bound)
+- hole hints: aux0_4 + hitbox_proj -> hole B; Anita (x2b8060) -> hole A
+- RESULT: hole A watermark 0x0FFA50 (1.4K spare), hole B 0x3FB790 (18.6K)
+
+Anita asset region (x2b8060, 44.2K) extracted via the new SEGMENTED
+oracle diff (gap-tolerant: resyncs on 32-byte exact matches after
+insertion walls; 2065 pointer fields across 75 segments, 21K in unaligned
+dead zones extracted raw). Chunk-BFS graph sizing tool proved the
+reachable set before committing space.
+
+CURRENT FRONTIER: vec6 (CHK bounds) at x028122+0x7EE (vs2 0x028910),
+frame 2888 — the ported engine char-init code trips an array bounds guard;
+init is progressing (2886 -> 2888). Next: disassemble the CHK site, find
+the bound + offending index (likely an id/table-space difference).

@@ -168,8 +168,9 @@ def main():
         ops.append({"op": "data", "addr": f"{start:#x}", "hex": blob.hex()})
         notes.append(f"data   {start:#08x} +{len(blob):#x}  {what}")
 
-    # ── stage 1: null relocation ─────────────────────────────────────────────
-    # Jedah player-path hitbox block bounds by next-distinct-pointer on vsavj
+    # ── stage 1: null relocation (scaffolding proof; emitted only for the
+    # stage 1-3 ladder builds — stage 4+ needs the space and overrides every
+    # repoint anyway) ────────────────────────────────────────────────────────
     def vsavj_ptr_bounds(table_names, slot):
         seeds, all_ptrs = [], set()
         for tn in table_names:
@@ -186,10 +187,13 @@ def main():
 
     seeds, jh_start, jh_end = vsavj_ptr_bounds(["hitbox_base", "hitbox_comp"],
                                                dst_slot)
-    jh_len = jh_end - jh_start
+    if args.stage > 3:
+        jh_len = 0  # skip scaffolding
+    else:
+        jh_len = jh_end - jh_start
     notes.append(f"# stage 1: Jedah hitbox block 0x{jh_start:06X}+0x{jh_len:X} "
                  f"(base {seeds[0]:#x} comp {seeds[1]:#x})")
-    dst = alloc("a", jh_len, "jedah hitbox copy")
+    dst = alloc("a", jh_len, "jedah hitbox copy") if jh_len else None
     if dst is not None:
         delta = dst - jh_start
         poke_bytes(dst, vj[jh_start:jh_start + jh_len], "jedah hitbox copy (null reloc)")
@@ -199,7 +203,8 @@ def main():
 
     # trampolines: dispatch_00 via hole A (re-encrypted), dispatch_01 via
     # hole B (outside the encrypted range -> stored raw)
-    for tname, hole in (("dispatch_00", "a"), ("dispatch_01", "b")):
+    for tname, hole in ((("dispatch_00", "a"), ("dispatch_01", "b"))
+                        if args.stage <= 3 else ()):
         a, _ = table_entry_addr(tname, dst_slot)
         target = vj_u32(a)
         tdst = alloc(hole, 6, f"{tname} trampoline")
@@ -230,9 +235,12 @@ def main():
         want = stage_regions(regions, args.stage)
         # allocate every wanted region first (deterministic order: code
         # first so it stays in the encrypted hole, then data)
+        hole_b_set = set(x.strip() for x in
+                         port["port"].get("hole_b_regions", "").split(",") if x)
         for name in sorted(want, key=lambda n: (regions[n]["kind"] != "code", n)):
             r = regions[name]
-            d = alloc("a", r["len"], f"region {name}")
+            hole = "b" if name in hole_b_set else "a"
+            d = alloc(hole, r["len"], f"region {name}")
             if d is not None:
                 placed[name] = d
                 fragments.append((d, r["len"], "VS2",
