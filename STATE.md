@@ -1,7 +1,7 @@
 # STATE — living progress log
 
-Updated: 2026-07-25 (session 4 end — M2a stages 1-3 PASS; stage 4 deep in
-the R1 campaign, Donovan runs, companion-spawn chain is the frontier)
+Updated: 2026-07-25 (session 5 end — M2a stage 4: full port FITS and runs;
+last frontier = companion-code zone under-extraction, see NEXT_SESSION)
 
 ## Session 4 highlights (M2a — the real Donovan port)
 

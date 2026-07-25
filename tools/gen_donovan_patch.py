@@ -119,7 +119,14 @@ def main():
     def vj_u32(addr):
         return int.from_bytes(vj[addr:addr + 4], "big")
 
+    gap_free = []  # (start, end) inside already-claimed group spans
+
     def alloc(hole, size, what, fallback=True):
+        # gap-fit first: reuse dead space inside layout-group spans
+        for gi, (gs, ge) in enumerate(gap_free):
+            if ge - gs >= size:
+                gap_free[gi] = ((gs + size + 0xF) & ~0xF, ge)
+                return gs
         start, end = holes[hole]
         if start + size > end:
             if fallback and hole == "a":
@@ -237,7 +244,43 @@ def main():
         # first so it stays in the encrypted hole, then data)
         hole_b_set = set(x.strip() for x in
                          port["port"].get("hole_b_regions", "").split(",") if x)
+        # layout groups: regions that PC-reference each other must keep
+        # their SOURCE-relative spacing (PC-relative displacements — both
+        # direct and via word jump tables — are invisible to the oracle
+        # because the sibling games preserve spacing too). Allocate the
+        # whole span; recycle the inter-region gaps via gap_free.
+        grouped = set()
+        for grp in port.get("layout_group", []):
+            members = [m for m in grp["regions"].split(",")
+                       if m in regions and m in want]
+            if not members:
+                continue
+            base_src = min(regions[m]["src"] for m in members)
+            span_end = max(regions[m]["src"] + regions[m]["len"]
+                           for m in members)
+            span = span_end - base_src
+            gbase = alloc("a", span, f"layout group ({grp['regions']})")
+            if gbase is None:
+                continue
+            covered = sorted((regions[m]["src"] - base_src,
+                              regions[m]["src"] - base_src + regions[m]["len"])
+                             for m in members)
+            pos = 0
+            for cs, ce in covered:
+                if cs - pos >= 0x20:
+                    gap_free.append((gbase + pos + 0xF & ~0xF, gbase + cs))
+                pos = ce
+            for m in members:
+                placed[m] = gbase + (regions[m]["src"] - base_src)
+                grouped.add(m)
+                fragments.append((placed[m], regions[m]["len"], "VS2",
+                                  f"donovan {m} (grouped, vsav2 0x{regions[m]['src']:06X})"))
+            notes.append(f"# layout group at {gbase:#x}+{span:#x}: "
+                         + ", ".join(f"{m}@{placed[m]:#x}" for m in members)
+                         + f"; {sum(ge-gs for gs, ge in gap_free):#x} gap bytes recycled")
         for name in sorted(want, key=lambda n: (regions[n]["kind"] != "code", n)):
+            if name in grouped:
+                continue
             r = regions[name]
             hole = "b" if name in hole_b_set else "a"
             d = alloc(hole, r["len"], f"region {name}")

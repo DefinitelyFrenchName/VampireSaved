@@ -8,7 +8,7 @@ dst_slot = 0x0F
 # every bank repoint patches BOTH 0x0F and its aliasing variant row 0x1F
 # (vsavj variant half aliases base except slot 8) — asserted vanilla-equal
 mirror_variant = true
-hole_b_regions = "aux0_4,hitbox_proj"
+hole_b_regions = "aux0_4,hitbox"
 
 # free-space holes (verified 0xFF fill, tools/extract free-space scan)
 [hole_a]
@@ -79,3 +79,13 @@ src_entries = 124
 # addr = 0x0
 # op = "poke32"
 # val = 0x0
+
+# Layout groups: regions that PC-reference each other (directly or via
+# word jump tables) keep their source-relative spacing; the inter-region
+# gaps are recycled for small allocations. (Session 5: a handler's
+# jsr (d8,PC,D1.w) into the support zone landed mid-region after repacking.)
+[[layout_group]]
+regions = "code,x05c800,x065952,x065c22,x065e5a,x066ec4"
+
+[[layout_group]]
+regions = "x026142,x028122"
