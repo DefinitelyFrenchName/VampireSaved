@@ -56,6 +56,19 @@ before session end (persistent suite doctrine, CLAUDE.md §4).
 |---|---|---|
 | null vsavj | `12fbb0e1a137a1420824856d3efb0af8fff57be6` | == reference members; zip repacked deterministically |
 
+## M1 additions (2026-07-25, session 2)
+
+| Piece | Where |
+|---|---|
+| Replay format + MAME runner | `.rpl` in `tests/replays/`, `tests/lua/replay.lua`, `tools/run_replay_mame.sh` |
+| FBNeo harness (patched frontend) | `emu/fbneo-patches/0001-…`, `tools/setup_fbneo.sh`, `tools/run_replay_fbneo.sh` |
+| Legacy suite (10 replays, frozen) | `tests/run_suite.sh`, `tests/expected/vsavj/` |
+| Watchpoint write-tracer | `tests/lua/trace_writes.lua` (needs `-debug -debugger none`) |
+| Pick probe (slot mapping) | `tools/pick_probe.sh` |
+| Structural diff | `tools/diff_sets.py` (`--mask-pointers`) |
+| Character tables atlas | `docs/atlas/character_tables.md` (3-set anchor, vsavj slot map complete) |
+| RAM atlas | `docs/atlas/ram.md` |
+
 ## Key findings so far
 
 - vsavj key/range: master `0xfa8f4e33a4b881b9`, encrypted range

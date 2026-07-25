@@ -39,6 +39,6 @@ verified where noted), [D] differential dump experiment, [T] write-trace,
 ## Character ID space (from the per-character tables, see per-set atlas)
 
 IDs are 5-bit: low 4 bits = character slot (16 slots), bit 4 = hidden/alt
-variant. vsavj: slot 0x01 = Demitri, 0x03 = Victor ([T,D,V]); variant space
-differs only at slot 0x08 (Dark Talbain) — all other alt slots alias the
-base table. Full slot→name map: ring experiment (in progress).
+variant. vsavj: variant space differs only at slot 0x08 (Bishamon → Oboro
+Bishamon); all other alt slots alias the base table. Slot→name map:
+docs/atlas/character_tables.md.

@@ -22,15 +22,26 @@ M1 — Map. **Harness half done; mapping half in progress.**
   (human sign-off requested, non-blocking): new-content dual-emulator
   verification = mapped gameplay fields (player structs, HP, positions,
   timer) compared at sync anchors (match start), not whole-RAM checksums.
-- RAM map: community anchor imported (player structs $FF8400/$FF8500,
-  projectiles $FF9400, hitbox ptr offsets, match-active flags $FF8004/8 —
-  from the mame-rr cps2-hitboxes.lua family entry, plus cross-set code
-  anchor triples). Differential experiments next.
+- RAM map: community anchor imported and verified (player structs
+  $FF8400/$FF8500, hitbox ptr offsets, match-active flags), extended by
+  differential experiments + write-traces. See docs/atlas/ram.md.
+- **Character-data plumbing CRACKED (the big one):** write-trace on
+  $FF8480 → per-character loader (vsavj PRG:0x028DD8) → three 32-entry
+  tables indexed by 5-bit char id → located in ALL THREE sets by
+  instruction-pattern search → a whole bank of ~20 per-character tables
+  (vsavj PRG:0x0BD0FA-0x0BE8xx). Slot→name map ~10/16 done empirically
+  (pick + snapshot + pointer readback). Variant slots: vsavj {8}=Oboro
+  Bishamon; vsav2/vhunt2 {0,1,3,8,9} with per-slot hitbox data
+  byte-identical between vsav2 and vhunt2 (both games carry both flavors).
+  vsav2 slots {5,7,15} unclaimed by any vsavj slot — candidate homes of
+  Donovan/Huitzil/Pyron (naming runs on vsav2 pending).
+  **vsavj slot→character map COMPLETE** (16/16, one by elimination).
+  Full detail: docs/atlas/character_tables.md.
 - Three-way diff: window/masked diff built (`tools/diff_sets.py`);
   **finding:** vsavj↔vsav2 share <10% at window level even pointer-masked —
   engines were rebuilt (shifted code, changed PC-relative displacements) and
-  most of the 4MB is game-specific data. The atlas will grow from anchored
-  RE (traces + tables), not blind windowing.
+  most of the 4MB is game-specific data. The atlas grows from anchored
+  RE (traces + tables) — which the character-table crack has now proven out.
 
 ### M0 — Bench. COMPLETE (2026-07-25). Acceptance status:
 - Null-patch output bit-identical to reference: **PASS** (`tests/test_null_build.sh`)
