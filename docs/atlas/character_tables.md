@@ -46,14 +46,48 @@ Variant half (0x10-0x1F) aliases the base half except:
 - **vsav2 ≡ vhunt2 per-slot hitbox data is byte-identical** (all 32 entries)
   — both games carry both flavors; they differ elsewhere (defaults/UI).
 
-## The full per-character table BANK (vsavj)
+## The full per-character table BANK — layout identical in all three sets
 
-The three loader tables are part of a contiguous bank of 32-entry tables,
-stride 0x80, at **PRG:0x0BD0FA-0x0BE8xx**: ~16 code-pointer tables
-(targets in PRG:0x02C000-0x036000 — per-character handler routines), the
-hitbox tables, more data-pointer tables (e.g. 0x0BDA7A/0x0BDAFA), and
-word/byte parameter tables (0x0BE17A+). Semantic labeling per table: open
-item; this bank is the master index for per-character manifests.
+A contiguous bank of 32-entry tables, stride 0x80 between neighbors. Bank
+origin (= first dispatch table) per set — **all internal deltas are
+preserved across sets**, so any table found in vsavj is `origin + same
+delta` in the others (verified for bank[0], hitbox pair, +0x132 word
+table):
+
+| Set | bank[0] (dispatch) | hitbox anchor (delta +0x880) |
+|---|---|---|
+| vsavj | `PRG:0x0BD0FA` | `PRG:0x0BD97A` |
+| vsav2 | `PRG:0x0D7298` | `PRG:0x0D7B18` |
+| vhunt2 | `PRG:0x0D6B2A` | `PRG:0x0D73AA` |
+
+Semantic skeleton (from disassembly of every vsavj consumer site):
+
+- **bank +0x000..+0x700 (0xBD0FA-0xBD7FA, 14 tables): per-character CODE
+  dispatch** — `movea.l (a0,d0.w),a0; jmp/jsr (a0)`. Each table = one
+  engine event (state handlers); entries = per-character routines.
+- +0x780 (0xBD87A), 0xBE2FA: per-char 32-bit parameter values (loaded to
+  D0, not pointers).
+- +0x880/+0x900 (0xBD97A/0xBD9FA): hitbox base + companion ptr (player
+  load path, PRG:0x028DD8). 0xBDA7A/0xBDAFA: the same pair used by the
+  projectile/secondary-object path (PRG:0x0546E6).
+- 0xBDB7A, 0xBE3FA: per-char 8-byte records (two longs read together —
+  movement velocity pairs by usage context).
+- 0xBE17A → struct+0x132 (word); 0xBE1BA/0xBE1FA: word params used in
+  position math; 0xBE7FA: word ADDED to struct+0x14 (Y position) — per-char
+  height/offset; 0xBE83A: range-check word; 0xBE87A → struct+0x15B (byte);
+  0xBE89A/0xBEC5A: 2D byte tables → struct+0x167.
+
+### Ported-three handler code (bank[0] rows; the "code" manifest entry)
+
+| Character | vsav2 handler | vhunt2 handler |
+|---|---|---|
+| Huitzil 0x10 | `PRG:0x057450` | `PRG:0x057486` |
+| Pyron 0x11 | `PRG:0x059424` | `PRG:0x059454` |
+| Donovan 0x13 | `PRG:0x05AE20` | `PRG:0x05AE50` |
+
+Veteran handlers sit in `PRG:0x02Fxxx-0x04Axxx`; the newcomers' code was
+appended at `PRG:0x057xxx-0x05Cxxx` (vsav2/vhunt2 differ by a small
+constant shift ≈0x30 — sibling builds).
 
 ## Slot→character map, vsavj (COMPLETE; select-name/HUD verified picks)
 

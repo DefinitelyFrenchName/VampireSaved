@@ -1,6 +1,22 @@
 # STATE — living progress log
 
-Updated: 2026-07-25 (session 2 — M1 harness milestone-chunk complete)
+Updated: 2026-07-25 (session 3 — §4 amended; D/H/P located; bank labeled)
+
+## Session 3 highlights
+
+- CLAUDE.md §4 dual-emulator amendment applied (maintainer-approved).
+- **Donovan/Huitzil/Pyron located and pinned** (char IDs 0x13/0x10/0x11,
+  hitbox bases + handler code addresses in both vsav2 and vhunt2).
+- Per-character table bank semantically labeled (14 dispatch tables +
+  hitbox pairs + parameter tables); bank layout identical across all three
+  sets (same internal deltas from a per-set origin).
+- RAM atlas: round timer $FF8109, HP +0x50/+0x52 (max 0x120), X/Y
+  +0x10/+0x14 added.
+- Remaining for M1 acceptance: per-character manifests' remaining columns
+  (anim scripts, tile ranges, palettes, sound cues); meter/rounds-won RAM
+  offsets; formal Aulbath slot-9 pick; vhunt2-side pick verification of
+  D/H/P; Start-hold flavor mechanism (VS2-vs-VH2 behavioral deltas are NOT
+  in hitbox data — identical across both games).
 
 ## Current milestone
 
