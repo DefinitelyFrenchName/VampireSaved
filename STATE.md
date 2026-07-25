@@ -1,6 +1,35 @@
 # STATE — living progress log
 
-Updated: 2026-07-25 (session 3 — §4 amended; D/H/P located; bank labeled)
+Updated: 2026-07-25 (session 4 — M2a underway: C0 harness primitives done)
+
+## Session 4 highlights (M2a — the real Donovan port)
+
+- **M2a plan approved** (staged: C0 harness → C1 extraction → C2 generator →
+  bring-up ladder stages 1-5 → close-out). Stage design: null-relocation of
+  Jedah's own data first (tooling proof, zero R1 ambiguity), then Donovan
+  data → anim → code dispatch (R1 surface) → select plumbing.
+- **C0 COMPLETE (harness primitives, all verdict logic ground-truth tested):**
+  - Crash guard: breakpoints on 68k exception handlers, fault PC/ADDR from
+    the exception frame, stack sketch, RAM dump (`replay_guard.lua`,
+    `run_replay_guarded.sh`, `test_crash_guard.sh` — vec3/vec4 positive
+    controls trip correctly).
+  - Dual-emulator field comparator per amended §4: debounced match-start
+    anchors, stable/settled/phase field classes (`compare_fields.py`,
+    `fields_m2a.tsv`, selfcheck green: MAME/FBNeo agree on 16_xemu_2p with
+    1-frame skew).
+  - Auto-detecting suite runner: program-image fingerprint →
+    `tests/expected/<expset>/` dispatch; `.diverge` expectation kind
+    (exact-frame divergence vs frozen full logs). Suite green, 12 replays
+    (added 11_pick_donovan, 16_xemu_2p).
+  - FBNeo verified to load CRC-changed patched zips (no descriptor change
+    needed); `run_replay_fbneo.sh` gained `FBNEO_DUMPS`/`FBNEO_ROMPATH`.
+- **Cross-emulator findings (GOTCHAS paid):** MAME `-debug` perturbs
+  multi-CPU timing (checksum gates must run non-debug); vs-CPU replays have
+  emulator-divergent content (different CPU-picked opponents); menu presses
+  near transitions land on opposite sides of input-accept boundaries;
+  match-start predicate flickers during intros (debounced).
+- **Next:** C1 — `bank_map.toml` + `extract_char.py` (vhunt2 oracle) +
+  `scan_code_refs.py`; first full unresolved-refs report sizes R1.
 
 ## Session 3 highlights
 

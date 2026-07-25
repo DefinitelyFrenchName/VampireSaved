@@ -1,0 +1,12 @@
+# 11: pick slot 0x0F (Jedah in vanilla; Donovan after the M2 port) and idle
+# through match start — promoted from test_m2_repoint.sh's inline pick.
+# Cursor path: U, U, R from the default Demitri position, confirm, then run
+# well past match start. On vanilla builds this picks Jedah; per-build
+# expectations are dispatched on the program-image fingerprint (run_suite).
+300-305 sys=C1
+800-803 sys=S1
+1000-1002 p1=U
+1040-1042 p1=U
+1080-1082 p1=R
+1700-1702 p1=1
+3600 wait

@@ -1,0 +1,4 @@
+# registry.tsv — build fingerprint (program-image SHA-1) -> expectation set
+# Rows added only at freeze time, as a build decision recorded in STATE.md.
+# sha1	expectation-set	notes
+b0eb9ecd8a6fd354f398d4347002b204b784f47c	vsavj	vanilla vsavj (Japan 970519) reference program image

@@ -19,3 +19,15 @@ output into a runnable rompath dir (use `-rompath "<dir>;$ROMDIR"`).
 
 No behavioral patches exist yet. First real entries expected at M2
 (Donovan-replaces-slot proof of life).
+
+## Tooling: verification harness (M2a C0, 2026-07-25)
+
+Crash guard (`tests/lua/replay_guard.lua`), dual-emulator field comparator
+(`tools/compare_fields.py` + `tests/fields_m2a.tsv`), auto-detecting suite
+runner (`tests/run_suite.sh` + `tools/build_fingerprint.py` +
+`tests/expected/registry.tsv` + `tools/check_diverge.py`). All verdict logic
+ground-truth tested (`tests/test_crash_guard.sh`,
+`tests/test_compare_fields_selfcheck.sh`, `tests/test_suite_dispatch.sh`)
+per the CLAUDE.md §4 doctrine. Patched-build suite runs:
+`MAME_ROMPATH="<packed>;$ROMDIR" tests/run_suite.sh` — needs a registry row
+(frozen expectation set) for the build's program-image fingerprint.
