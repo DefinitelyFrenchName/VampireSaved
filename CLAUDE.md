@@ -74,6 +74,22 @@ legacy behavior is a failed change.
   FBNeo and (b) the hacked set on patched FBNeo, checksumming work RAM every
   frame. Legacy-content replays must match for the full script length. First
   divergent frame + RAM diff is the standard bug report format.
+- **Hooked-build legacy comparison (amended 2026-07-25, maintainer-approved):**
+  for builds carrying engine hooks (code the vanilla game executes routed
+  through added instructions), the legacy oracle compares **live RAM**:
+  all work RAM except two named windows, both documented in
+  `docs/atlas/ram.md` — the dead-stack window `RAM:$FF7F00-$FF7FFF`
+  (below resting SP at the frame-done sample point) and the QSound
+  handshake latch `RAM:$FF043C` (one-frame phase). The masked comparison
+  compares every other byte on every frame, so confinement is enforced by
+  construction: divergence outside the windows still fails. Rationale
+  (measured, session 7, docs/GOTCHAS.md): hooks cost cycles; interrupts
+  then land at skewed instruction boundaries in otherwise-vanilla frames,
+  leaving ghost bytes below SP and a phase-shifted sound latch; zero-cycle
+  hooking is impossible on this engine. Whole-RAM frame-exact remains the
+  standard for vanilla oracles, run-to-run determinism, and hook-free
+  builds. New masked windows may only be added by the same route this one
+  took: measured mechanism, documented in the atlas, maintainer sign-off.
 - **Dual-emulator agreement (amended 2026-07-25, maintainer-approved):** for
   new-character content (no vanilla oracle exists), the same replay is run on
   patched FBNeo and patched MAME and the two must agree on **mapped gameplay

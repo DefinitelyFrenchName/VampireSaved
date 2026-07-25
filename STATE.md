@@ -39,6 +39,27 @@ maintainer decision)
   Jedah demo).** Live state is vanilla.
 - `MASK_RANGES` opt-in on replay.lua (canonical checksums unchanged when
   unset); new gate `tests/test_m2a_stage4_code.sh` locks all of the above.
+- **Session-7 extension (after the maintainer approved the masked basis):
+  widening the masked legacy gate from 1 to all 7 exact replays found the
+  v1 masks are not sufficient alone.** Measured:
+  - 03/10/16 each show 1-2 ISOLATED single-frame divergences that fully
+    re-converge (03: frames 829+2093 — 829 is the S2 input-accept
+    boundary; 10: 3007+3129; 16: 829). Transition state captured one
+    frame apart; bytes involved: $FF80B5, object-slot heads
+    $FF8400/$FF8800. A real bug in this deterministic engine cannot
+    re-converge to bit-identical whole-RAM; bounded re-converging
+    flickers are a timing-phase signature. New ground-truthed comparator:
+    `tools/compare_flicker.py` + `tests/test_compare_flicker.sh`.
+  - 06_test_mode diverges PERSISTENTLY from exactly frame 700 — the TS
+    press. Root cause is hook-caused, not ROM-content (stage-3 builds,
+    ROM-modified but hook-free, ran 06 bit-identical): service-mode code
+    reads the phase-shifted QSound latch and the offset propagates into
+    live service state (residue: sound mirror + two checksum/accumulator
+    words). Benign, no gameplay surface, but a letter violation.
+  - 02/05/07 masked-exact full length; attract 4278 and pick 1080 masked
+    diverge-constants hold. Whole-live-state identity therefore holds for
+    all match gameplay; the exceptions are input-boundary flickers and
+    service mode.
 
 ## Sessions 5-6 highlights (M2a stage 4 — the port runs)
 
@@ -171,11 +192,12 @@ maintainer decision)
   generation and relocation tooling complete; stages 1-3 PASS; stage 4
   bring-up DONE — the full moveset replay runs END-clean under guard
   (session 7; the session-6 "state-index delta" was extraction
-  corruption, fixed). Remaining for stage-4 acceptance: the legacy-gate
-  comparison-basis decision (see Decisions pending), then the remaining
-  behavior gates (vsav2-as-oracle field compare at anchors, native pick
-  = cursor R×2; dual-emulator on the 16-pattern replay). Then stage 5
-  (select plumbing) and M2b graphics.
+  corruption, fixed). Legacy-gate basis decided (live-RAM masked windows,
+  see Decisions made) and the masked legacy gate is green over all 9
+  legacy replays. Remaining for stage-4 close: the behavior gates
+  (vsav2-as-oracle field compare at anchors, native pick = cursor R×2;
+  dual-emulator on the 16-pattern replay). Then stage 5 (select
+  plumbing) and M2b graphics.
 
 ### M1 — Map. ACCEPTED (2026-07-25).
 Both SPEC §4 clauses met; full assessment in docs/M1_acceptance.md.
@@ -260,6 +282,19 @@ opcode-space dump oracle (`tests/test_decrypt_oracle.sh`). Both directions
 
 ## Decisions made
 
+- **Legacy-gate basis for hooked builds = live-RAM (masked windows)** —
+  2026-07-25, maintainer approved ("the invariant interpretation reads
+  sound and reliable which is paramount"). For builds carrying engine
+  hooks, legacy comparison masks exactly `RAM:$FF043C` (QSound handshake
+  phase latch) and `RAM:$FF7F00-$FF7FFF` (dead stack below resting SP);
+  every other byte compared every frame (confinement by construction).
+  CLAUDE.md §4 amended; windows documented in docs/atlas/ram.md; masked
+  vanilla expectations frozen under tests/expected/vsavj/masked/ (this
+  session). Suite-runner masked-expectation-kind support lands with the
+  stage-5 freeze. New masked windows require the same route: measured
+  mechanism + atlas entry + maintainer sign-off. *v2 refinement (flicker
+  tolerance + test-mode diverge constant) measured and proposed — see
+  Decisions pending.*
 - **M2 replaced slot = Jedah (slot 0x0F)** — 2026-07-25, maintainer
   approved. Donovan replaces Jedah in vsavj for the proof-of-life
   milestone. Rationale: footprint fit (Jedah 10018 B ≥ Donovan 9358 B),
@@ -279,39 +314,33 @@ opcode-space dump oracle (`tests/test_decrypt_oracle.sh`). Both directions
 
 ## Decisions pending (human)
 
-- **Legacy-gate comparison basis for hooked builds (BLOCKS stage-4
-  acceptance).** Measured (session 7, evidence in docs/GOTCHAS.md and
-  docs/tables/reconciliation.md Session 7): any engine hook on the
-  secondary-object dispatch path adds CPU cycles, which skews where
-  interrupts land during otherwise-vanilla frames. Two divergence
-  windows result, both invisible to gameplay: dead stack bytes
-  RAM:$FF7F00-$FF7FFF (below resting SP at the frame-done sample point)
-  and the 68k↔QSound handshake latch RAM:$FF043C (one-frame phase
-  shift). With exactly these masked, the stage-4 build's live state is
-  bit-identical to vanilla (02 full-length; attract to exactly 4278).
-  Zero-cycle hooking is impossible (measured; GOTCHAS). Options:
-  1. **(Recommended)** Amend §4: for builds carrying engine hooks, the
-     legacy oracle compares all work RAM EXCEPT the two named windows,
-     each documented in docs/atlas/ram.md as provably-dead-at-sample or
-     phase-class; plus keep a confinement lock (masked equality compares
-     every other byte every frame — divergence outside the windows still
-     fails). Precedent: the dual-emulator §4 amendment (also
-     measured-reality-driven).
-  2. Reject hooks entirely and require a hook-free newcomer design
-     (e.g. prove-dead vanilla dispatch rows and reuse them — laborious,
-     risky, and possibly impossible for 17+10 extra types).
-  3. Accept whole-RAM divergence per-replay via .diverge expectations at
-     the first hook execution (weakest: abandons legacy comparison for
-     most of every match).
-  Until decided, stage-4 remains unaccepted; tests/test_m2a_stage4_code.sh
-  locks the measured facts without touching any frozen expectation.
-- See SPEC §7 for the rest. Nothing else blocks current work.
+- **Legacy-gate basis v2 refinement (extends the approved masked basis;
+  evidence in session-7 extension highlights above).** The approved v1
+  (masked windows + everything-else-exact) is implemented and holds for
+  02/05/07/attract/pick — but the full 7-replay widening measured two
+  additional hook-artifact classes: (a) isolated ≤2-frame fully
+  re-converging flickers at input-accept/spawn boundaries (03/10/16),
+  (b) 06_test_mode persistent divergence from the TS-press frame (the
+  masked latch's phase propagates when service-mode code reads it).
+  Proposed v2 (implemented provisionally in `m2a_legacy_gate_masked`,
+  clearly labeled; gate green): per-replay comparison classes —
+  exact (02/05/07), flicker-tolerated via the ground-truthed
+  `tools/compare_flicker.py` (max stretch 2, min re-converge 60, max
+  total 8) for 03/10/16, and a frozen first-divergence constant (700)
+  for 06. Recommendation: approve; the tolerance is tight, every class
+  is mechanism-attributed, and match-gameplay replays remain exact.
+  Alternative: keep v1 strict and drop 03/06/10/16 from the hooked-build
+  legacy set (weaker coverage). CLAUDE.md §4 text will be updated to v2
+  only on sign-off.
+- See SPEC §7 for the rest. Nothing blocks current work.
 - **SPEC §2 fact check (community liaison):** "hold Start while selecting
   D/H/P → other game's flavor" did not reproduce in vsav2 under scripted
   test (evidence in docs/atlas/character_tables.md). Since vsav2≡vhunt2
   character data is byte-identical, the variant policy question (§3.3/§3.4)
   may be moot at the data level — worth confirming with the community what
   the Start-hold is believed to do and on which set/revision.
+  *Maintainer note 2026-07-25: community confirmation expected within
+  hours — fold the answer into the variant-policy items when it lands.*
 
 ## Open bugs
 
