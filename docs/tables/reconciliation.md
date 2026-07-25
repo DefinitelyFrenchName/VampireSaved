@@ -118,3 +118,33 @@ CURRENT FRONTIER: vec6 (CHK bounds) at x028122+0x7EE (vs2 0x028910),
 frame 2888 — the ported engine char-init code trips an array bounds guard;
 init is progressing (2886 -> 2888). Next: disassemble the CHK site, find
 the bound + offending index (likely an id/table-space difference).
+
+## Session 6: PC-relative tables solved; frontier = anim state-index
+
+**Solved this session** (crash advanced 2886 → 3025, i.e. character init
+now COMPLETES and the match runs 137 frames):
+- Brief-format `(d8,PC,Xn)` dispatch tables inside ported code are now
+  discovered, bounded (smallest forward displacement — case code follows
+  the table), protected from the bare-long relocation heuristic, and
+  their escaping entries rewritten as displacements against real
+  placement. A fused pair of word entries (`0006 0068` → "pointer"
+  0x60068) had been silently corrupting a table. See GOTCHAS.
+- `near_map` placement (satellite region within d16 of its anchor) and
+  shared per-region ILLEGAL tripwires within d16 reach.
+- Slot-clearing allocator wrappers: ported code assumes virgin pool
+  slots (vs2 spawns before any recycling); ours get dirty ones. Wrapper
+  zero-fills the 0x80-byte slot, preserving the category byte at +8.
+  Only Donovan's alloc calls are wrapped; vanilla allocations untouched.
+
+**Current frontier (frame 3025, vec3 address error at engine 0x015096):**
+the anim-frame setter reads `movea.l #$E2830,A0` (correctly relocated —
+that table's bytes are byte-identical to native vsav2 at 0x28ED08, so the
+DATA is right), then indexes it with a state byte and lands on an odd
+address (A0=0x0E2831, D0=0xfffe0001 — the loaded entry was 1, not the
+0x010E in the table at index 1). So the INDEX is wrong, not the table:
+something upstream (state/substate byte in the object struct, or the
+byte that selects which anim sub-table is used) holds a vs2-flavored
+value. Next: watch the writer of the index byte (trace back from
+0x0D2092's `cmpi.w #$80,D0` path) and compare against native vsav2 at the
+same anchor; likely another VS2-vs-vsavj state-space delta of the same
+family as the class-7 remap.

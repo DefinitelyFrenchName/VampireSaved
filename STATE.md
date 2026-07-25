@@ -1,6 +1,7 @@
 # STATE — living progress log
 
-Updated: 2026-07-25 (session 5 end — M2a stage 4: full port FITS and runs;
+Updated: 2026-07-25 (session 6 end — M2a stage 4: char-init COMPLETES,
+match runs; frontier = anim state-index delta at frame 3025)
 last frontier = companion-code zone under-extraction, see NEXT_SESSION)
 
 ## Session 4 highlights (M2a — the real Donovan port)

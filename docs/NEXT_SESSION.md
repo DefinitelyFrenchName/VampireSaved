@@ -10,17 +10,18 @@ segmented gap-tolerant oracle diff handles multi-blob asset regions
 ~335K/336.6K. The init chain progresses past pool alloc, spawn record,
 class enqueue, anim-table relocation.
 
-**Pick up EXACTLY here:** guard shows vec4 at anim+0x519C (frame 2888) —
-a PC-relative call from x088512 (dst 0x0D0170) with source target
-~0x905AE: the VS2 companion zone REALLY spans 0x88512-0x915xx (~36K);
-our slice is 0x2F00. Budget left: ~4K (hole A) + ~12.9K (hole B) = 17K <
-24.8K naive extension. NEXT STEP: code-reachability BFS (jsr/jmp/abs +
-PC-rel edges) from Donovan's entry points (0x8B0DA handler, 0x8A5A8 hook,
-type-116 chain) through the zone to bound the true subset; if >17K,
-either group x088512 with its zone remainder (span cost) and reclaim
-elsewhere, or tripwire unreached handlers. All instruments ready:
-GUARD_TRACE, segmented diff, chunk-BFS pattern (session-5 scratch),
-layout groups ([[layout_group]] in donovan.toml).
+**Pick up EXACTLY here (session 6 close):** character init now COMPLETES
+and the match runs — crash moved to frame 3025, a vec3 address error in
+the ENGINE anim-frame setter (0x015096). The anim word table is proven
+byte-identical to native vsav2 (data + relocation correct); the INDEX
+into it is wrong (A0 = table+1: loaded entry was 1, not the 0x010E the
+table holds at index 1). So a state/substate byte upstream carries a
+vs2-flavored value. NEXT STEP: watch the writer of that index (trace back
+through the 0x0D2092 `cmpi.w #$80,D0` path in Donovan's ported handler)
+and compare the same anchor against native vsav2 (pick = cursor R x2) —
+expect another VS2-vs-vsavj state-space delta, same family as the
+class-7 queue remap. Guard now dumps D0-D7/A0-A6 at the fault (REGS
+line), which is how the index was caught.
 
 **Build/test one-liners:** unchanged — see HANDOFF.md M2a section;
 GEN_FLAGS="--allow-plausible --tripwire-open" tools/build_donovan.sh 4 build/donovan
