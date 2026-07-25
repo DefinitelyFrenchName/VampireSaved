@@ -104,6 +104,11 @@ opcode-space dump oracle (`tests/test_decrypt_oracle.sh`). Both directions
 
 ## Decisions made
 
+- **M2 replaced slot = Jedah (slot 0x0F)** — 2026-07-25, maintainer
+  approved. Donovan replaces Jedah in vsavj for the proof-of-life
+  milestone. Rationale: footprint fit (Jedah 10018 B ≥ Donovan 9358 B),
+  boss character (least playtest disruption), keeps Demitri/Victor so the
+  M1 replay suite stays valid.
 - **CLAUDE.md §4 dual-emulator amendment** — 2026-07-25, maintainer:
   new-content cross-emulator verification is field-level at sync anchors
   (mapped gameplay state), not whole-RAM frame-exact; within-emulator
@@ -118,16 +123,6 @@ opcode-space dump oracle (`tests/test_decrypt_oracle.sh`). Both directions
 
 ## Decisions pending (human)
 
-- **M2 replaced-slot choice (SPEC §7 Q1) — recommendation ready.** M2 makes
-  Donovan selectable in vsavj by replacing one slot (no ROM expansion).
-  Donovan's hitbox-data footprint is ~9358 B. Closest-size vsavj slots
-  (least relocation friction): Lilith (9050), Morrigan (8814), Jedah
-  (10018). **Recommendation: replace Jedah (slot 0x0F)** — comfortably
-  larger footprint (room to spare, +660 B headroom for Donovan's data),
-  he's a boss/late-roster character so his absence least disrupts early
-  vs-play testing, and the two control characters the harness leans on
-  (Demitri, Victor) stay put. Keeping Demitri/Victor also preserves the
-  M1 replay suite unchanged. Awaiting maintainer sign-off (gameplay-feel).
 - See SPEC §7 for the rest. None blocks current work.
 - **SPEC §2 fact check (community liaison):** "hold Start while selecting
   D/H/P → other game's flavor" did not reproduce in vsav2 under scripted

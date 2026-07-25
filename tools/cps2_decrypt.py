@@ -322,6 +322,29 @@ class Cipher:
         subkey ^= self._src64
         return _fixup_key2(_expand_key(EXPAND_2ND_BITS, subkey))
 
+    def crypt_words_at(self, words, base_word, decrypt=True):
+        """(De/en)crypt an arbitrary run of 16-bit words as if they lived at
+        word address base_word, base_word+1, ... Used to encrypt an injected
+        code blob into stored form (decrypt=False) or verify. Words outside
+        the key's encrypted range are returned unchanged (raw), matching how
+        the CPU would fetch them. Returns a new list."""
+        lo, hi = self.lower // 2, self.upper // 2
+        fn2 = self.fn2.forward if decrypt else self.fn2.inverse
+        # cache key2 per low-16 seed so repeated addresses are cheap
+        cache = {}
+        out = []
+        for k, w in enumerate(words):
+            a = base_word + k
+            if lo <= a <= hi:
+                i = a & 0xFFFF
+                key2 = cache.get(i)
+                if key2 is None:
+                    key2 = cache[i] = self._key2_for_seed(self.fn1.forward(i, self.key1))
+                out.append(fn2(w, key2))
+            else:
+                out.append(w)
+        return out
+
     def transform(self, words, decrypt=True, progress=None):
         """words: list/array of 16-bit ints indexed by word address."""
         nwords = len(words)
