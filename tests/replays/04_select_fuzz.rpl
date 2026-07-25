@@ -1,0 +1,28 @@
+# 04: character-select stress: simultaneous opposite directions, 1-frame
+# direction storms, multi-button same-frame presses; let the select-screen
+# countdown auto-pick. Bugs live at state transitions (SMS law).
+300-305 sys=C1
+800-803 sys=S1
+# opposite directions held together
+960-980 p1=UD
+990-1010 p1=LR
+# 1-frame alternating storm
+1020 p1=U
+1021 p1=R
+1022 p1=D
+1023 p1=L
+1024 p1=U
+1025 p1=L
+1026 p1=D
+1027 p1=R
+1028 p1=UD
+1029 p1=LR
+1030 p1=UDLR
+# rapid multi-button chords without confirming... (4/5/6 don't confirm alone? play safe: no-confirm chords first)
+1040-1041 p1=45
+1050-1051 p1=56
+1060-1061 p1=46
+# then confirm with everything at once
+1100-1102 p1=123456
+# ride through speed menu + match start
+3400 wait

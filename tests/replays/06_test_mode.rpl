@@ -1,0 +1,10 @@
+# 06: service/test switch during title, brief menu churn, then sit.
+# Exercises the operator screens + EEPROM settings path (sandboxed nvram).
+300-305 sys=C1
+700-760 sys=TS
+1000-1002 p1=D
+1100-1102 p1=D
+1200-1202 p1=1
+1400-1402 p1=D
+1600-1602 p1=1
+3000 wait

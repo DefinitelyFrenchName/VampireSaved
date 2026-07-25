@@ -1,0 +1,20 @@
+# 09: 2P game, P2 cursor wanders and returns, both confirm Demitri (mirror
+# match) — duplicate-character bookkeeping on both sides.
+300-305 sys=C1
+330-335 sys=C2
+800-803 sys=S1
+830-833 sys=S2
+1000-1002 p2=R
+1040-1042 p2=R
+1080-1082 p2=L
+1120-1122 p2=L
+1200-1202 p1=1
+1220-1222 p2=1
+# short mirror fight
+2900-3000 p1=R p2=L
+3020-3022 p1=1 p2=1
+3100-3200 p1=R p2=R
+3220-3222 p1=2 p2=3
+3300-3400 p1=L p2=L
+3420-3422 p1=3 p2=2
+4600 wait

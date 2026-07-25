@@ -1,0 +1,331 @@
+diff --git a/makefile.sdl2 b/makefile.sdl2
+index 3bf65bd..0de57a1 100644
+--- a/makefile.sdl2
++++ b/makefile.sdl2
+@@ -68,7 +68,7 @@ depobj	+= 	neocdlist.o \
+ 			\
+ 			inp_sdl2.o aud_sdl.o support_paths.o ips_manager.o scrn.o localise_gamelist.o romdata.o \
+ 			cd_sdl2.o config.o main.o run.o stringset.o bzip.o drv.o media.o sdl2_gui_ingame.o sdl2_gui_common.o \
+-			inpdipsw.o vid_sdl2opengl.o vid_sdl2.o inputbuf.o replay.o sdl2_gui.o sdl2_inprint.o input_sdl2.o stated.o
++			inpdipsw.o vid_sdl2opengl.o vid_sdl2.o inputbuf.o replay.o sdl2_gui.o sdl2_inprint.o input_sdl2.o stated.o harness.o
+ 
+ ifdef FORCE_PULSE_AUDIO
+ alldir	+= 	intf/audio/linux
+diff --git a/src/burner/sdl/harness.cpp b/src/burner/sdl/harness.cpp
+new file mode 100644
+index 0000000..5b03b3b
+--- /dev/null
++++ b/src/burner/sdl/harness.cpp
+@@ -0,0 +1,224 @@
++// harness.cpp — Vampire Saved test harness for the SDL2 frontend.
++// FRONTEND-ONLY: no emulation-core file is touched by this feature.
++//
++// Plays a scripted input file (same .rpl format as the MAME-side Lua
++// harness), runs N frames headless (no video/audio interfaces required),
++// checksums CPS-2 work RAM (FNV-1a-64 over 68k-logical byte order) after
++// every frame, and writes a log line-compatible with the MAME harness:
++//     "<frame> <%016llx>\n" ... "END <frames>\n"
++//
++// Activated by:  fbneo <set> -hinput <script.rpl> -hout <log> [-hframes N]
++// See tools/run_replay_fbneo.sh in the Vampire Saved repo.
++
++#include "burner.h"
++
++INT32 nHarnessTailFrames = 120;        // extra frames after last scripted input
++char szHarnessInput[MAX_PATH] = "";    // replay script path
++char szHarnessOut[MAX_PATH] = "";      // checksum log path
++char szHarnessDumps[8192] = "";         // "2900:ff8000-ff8700;..." RAM dumps
++INT32 nHarnessFrames = 0;              // explicit total override (0 = auto)
++
++extern UINT8* CpsRamFF;                // CPS-2 work RAM (cps.h)
++extern int InputMake(bool bCopy);
++
++// ── input resolution ─────────────────────────────────────────────────────────
++// .rpl tokens -> BurnInputInfo szInfo names (CPS-2 fighting layout)
++
++struct TokenMap { const char* token; const char* szInfo; };
++static const TokenMap TOKENS[] = {
++    { "p1.U", "p1 up" },    { "p1.D", "p1 down" }, { "p1.L", "p1 left" },
++    { "p1.R", "p1 right" }, { "p1.1", "p1 fire 1" }, { "p1.2", "p1 fire 2" },
++    { "p1.3", "p1 fire 3" }, { "p1.4", "p1 fire 4" }, { "p1.5", "p1 fire 5" },
++    { "p1.6", "p1 fire 6" },
++    { "p2.U", "p2 up" },    { "p2.D", "p2 down" }, { "p2.L", "p2 left" },
++    { "p2.R", "p2 right" }, { "p2.1", "p2 fire 1" }, { "p2.2", "p2 fire 2" },
++    { "p2.3", "p2 fire 3" }, { "p2.4", "p2 fire 4" }, { "p2.5", "p2 fire 5" },
++    { "p2.6", "p2 fire 6" },
++    { "sys.S1", "p1 start" }, { "sys.S2", "p2 start" },
++    { "sys.C1", "p1 coin" },  { "sys.C2", "p2 coin" },
++    { "sys.SV", "service" },  { "sys.TS", "diag" },
++};
++static const int NTOKENS = sizeof(TOKENS) / sizeof(TOKENS[0]);
++
++static UINT8* token_pval[NTOKENS];
++
++static int resolve_inputs()
++{
++    for (int t = 0; t < NTOKENS; t++) token_pval[t] = NULL;
++    struct BurnInputInfo bii;
++    for (UINT32 i = 0; i < nGameInpCount; i++) {
++        memset(&bii, 0, sizeof(bii));
++        if (BurnDrvGetInputInfo(&bii, i)) continue;
++        if (!bii.pVal || !bii.szInfo || bii.nType != BIT_DIGITAL) continue;
++        for (int t = 0; t < NTOKENS; t++)
++            if (!strcmp(bii.szInfo, TOKENS[t].szInfo)) token_pval[t] = bii.pVal;
++    }
++    for (int t = 0; t < NTOKENS; t++)
++        if (!token_pval[t]) {
++            printf("harness: input '%s' (%s) not found in driver\n",
++                   TOKENS[t].token, TOKENS[t].szInfo);
++            return 1;
++        }
++    return 0;
++}
++
++static int token_index(const char* who, const char* tok)
++{
++    char key[16];
++    snprintf(key, sizeof(key), "%s.%s", who, tok);
++    for (int t = 0; t < NTOKENS; t++)
++        if (!strcmp(key, TOKENS[t].token)) return t;
++    return -1;
++}
++
++// ── script parsing ───────────────────────────────────────────────────────────
++// held[frame] = bitmask over TOKENS (NTOKENS <= 32)
++
++static UINT32* held = NULL;
++static UINT32 nScriptFrames = 0;
++
++static int parse_script(const char* path)
++{
++    FILE* f = fopen(path, "r");
++    if (!f) { printf("harness: cannot open %s\n", path); return 1; }
++
++    // pass 1: find last frame
++    char line[512];
++    UINT32 last = 0;
++    while (fgets(line, sizeof(line), f)) {
++        UINT32 a = 0, b = 0;
++        if (sscanf(line, "%u-%u", &a, &b) == 2 || sscanf(line, "%u", &a) == 1) {
++            if (b < a) b = a;
++            if (b > last) last = b;
++        }
++    }
++    nScriptFrames = last + (UINT32)nHarnessTailFrames;
++    if (nHarnessFrames > 0) nScriptFrames = (UINT32)nHarnessFrames;
++    held = (UINT32*)calloc(nScriptFrames + 2, sizeof(UINT32));
++
++    // pass 2: fill masks
++    rewind(f);
++    int lineno = 0;
++    while (fgets(line, sizeof(line), f)) {
++        lineno++;
++        char* hash = strchr(line, '#');
++        if (hash) *hash = 0;
++        char* p = line;
++        while (*p == ' ' || *p == '\t') p++;
++        if (!*p || *p == '\n' || *p == '\r') continue;
++
++        UINT32 a = 0, b = 0;
++        int consumed = 0;
++        if (sscanf(p, "%u-%u%n", &a, &b, &consumed) < 2) {
++            if (sscanf(p, "%u%n", &a, &consumed) < 1) {
++                printf("harness: %s:%d parse error\n", path, lineno);
++                fclose(f); return 1;
++            }
++            b = a;
++        }
++        p += consumed;
++        char spec[64];
++        while (sscanf(p, " %63s%n", spec, &consumed) == 1) {
++            p += consumed;
++            if (!strcmp(spec, "wait")) continue;
++            char* eq = strchr(spec, '=');
++            if (!eq) { printf("harness: %s:%d bad spec '%s'\n", path, lineno, spec); fclose(f); return 1; }
++            *eq = 0;
++            const char* who = spec;
++            const char* toks = eq + 1;
++            int step = strcmp(who, "sys") ? 1 : 2;
++            for (const char* c = toks; *c; c += step) {
++                char tok[3] = { c[0], (char)(step == 2 ? c[1] : 0), 0 };
++                if (step == 2 && !c[1]) { printf("harness: %s:%d dangling sys token\n", path, lineno); fclose(f); return 1; }
++                int idx = token_index(who, tok);
++                if (idx < 0) { printf("harness: %s:%d unknown token %s=%s\n", path, lineno, who, tok); fclose(f); return 1; }
++                for (UINT32 fr = a; fr <= b && fr <= nScriptFrames; fr++)
++                    held[fr] |= (1u << idx);
++            }
++        }
++    }
++    fclose(f);
++    return 0;
++}
++
++// ── checksum ─────────────────────────────────────────────────────────────────
++// FNV-1a-64 over 68k-logical bytes, folded 8 bytes at a time exactly like the
++// MAME Lua side (string.unpack("<i8") == little-endian 64-bit lanes of the
++// logical byte stream).
++
++static UINT64 fnv1a64_workram()
++{
++    UINT64 h = 0xcbf29ce484222325ULL;
++    const UINT64 prime = 0x100000001b3ULL;
++    for (UINT32 off = 0; off < 0x10000; off += 8) {
++        UINT64 lane = 0;
++        for (int k = 7; k >= 0; k--)
++            lane = (lane << 8) | CpsRamFF[(off + k) ^ 1];  // ^1: SEK LE storage -> 68k logical
++        h = (h ^ lane) * prime;
++    }
++    return h;
++}
++
++// ── main loop ────────────────────────────────────────────────────────────────
++
++bool HarnessActive()
++{
++    return szHarnessInput[0] != 0;
++}
++
++int HarnessRun()
++{
++    if (!CpsRamFF) { printf("harness: not a CPS game (CpsRamFF null)\n"); return 1; }
++    if (resolve_inputs()) return 1;
++    if (parse_script(szHarnessInput)) return 1;
++
++    FILE* out = fopen(szHarnessOut[0] ? szHarnessOut : "harness_checksums.txt", "w");
++    if (!out) { printf("harness: cannot write %s\n", szHarnessOut); return 1; }
++
++    // determinism guards (see repo docs/GOTCHAS.md): no hiscore/cheat RAM
++    // writes, no runahead, fixed PRNG seed, no auto savestate (we never call
++    // RunInit/StatedAuto), no audio buffer (emulation-identical per qs.cpp).
++    EnableHiscores = 0;
++    bCheatsAllowed = 0;
++    bRunAhead = 0;
++    BurnRandomSetSeed(0x303808909313ULL);
++    pBurnSoundOut = NULL;
++
++    InputMake(true);  // one normal pass: writes constants + all-zero switches
++
++    for (UINT32 f = 1; f <= nScriptFrames; f++) {
++        // scripted inputs for frame f, active while frame f emulates
++        UINT32 mask = held[f];
++        for (int t = 0; t < NTOKENS; t++)
++            *token_pval[t] = (mask >> t) & 1;
++
++        nFramesEmulated++;
++        nCurrentFrame++;
++        pBurnDraw = NULL;
++        BurnDrvFrame();
++
++        fprintf(out, "%u %016llx\n", f, (unsigned long long)fnv1a64_workram());
++
++        if (szHarnessDumps[0]) {
++            char dumps[8192];
++            snprintf(dumps, sizeof(dumps), "%s", szHarnessDumps);
++            for (char* spec = strtok(dumps, ";"); spec; spec = strtok(NULL, ";")) {
++                UINT32 fr, first, last;
++                if (sscanf(spec, "%u:%x-%x", &fr, &first, &last) != 3 || fr != f)
++                    continue;
++                char path[MAX_PATH + 64];
++                snprintf(path, sizeof(path), "%s.dump_%u_%06x.bin",
++                         szHarnessOut, fr, first);
++                FILE* df = fopen(path, "wb");
++                for (UINT32 a2 = first; a2 <= last; a2++)
++                    fputc(CpsRamFF[(a2 & 0xFFFF) ^ 1], df);  // 68k logical order
++                fclose(df);
++            }
++        }
++    }
++    fprintf(out, "END %u\n", nScriptFrames);
++    fclose(out);
++    printf("harness: %u frames, log %s\n", nScriptFrames, szHarnessOut);
++    free(held);
++    return 0;
++}
+diff --git a/src/burner/sdl/main.cpp b/src/burner/sdl/main.cpp
+index 688404a..d8d8e65 100644
+--- a/src/burner/sdl/main.cpp
++++ b/src/burner/sdl/main.cpp
+@@ -38,6 +38,14 @@ const char* romname = NULL;
+ 
+ extern void InitSupportPaths();
+ 
++// Vampire Saved harness (harness.cpp)
++extern char szHarnessInput[MAX_PATH];
++extern char szHarnessOut[MAX_PATH];
++extern char szHarnessDumps[8192];
++extern INT32 nHarnessFrames;
++extern bool HarnessActive();
++extern int HarnessRun();
++
+ #ifdef BUILD_SDL2
+ SDL_Window* sdlWindow = NULL;
+ #endif
+@@ -116,6 +124,29 @@ int parseSwitches(int argc, char* argv[])
+ 			i++;
+ 			_tcscpy(CDEmuImage, argv[i]);
+ 		}
++		else if (strcmp(argv[i], "-hinput") == 0)   // Vampire Saved harness
++		{
++			if (++i >= argc) return 1;
++			snprintf(szHarnessInput, MAX_PATH, "%s", argv[i]);
++			bSaveconfig = 0;
++		}
++		else if (strcmp(argv[i], "-hout") == 0)
++		{
++			if (++i >= argc) return 1;
++			snprintf(szHarnessOut, MAX_PATH, "%s", argv[i]);
++			bSaveconfig = 0;
++		}
++		else if (strcmp(argv[i], "-hframes") == 0)
++		{
++			if (++i >= argc) return 1;
++			set_commandline_option(nHarnessFrames, atoi(argv[i]));
++		}
++		else if (strcmp(argv[i], "-hdump") == 0)
++		{
++			if (++i >= argc) return 1;
++			snprintf(szHarnessDumps, sizeof(szHarnessDumps), "%s", argv[i]);
++			bSaveconfig = 0;
++		}
+ 	}
+ 	return 0;
+ }
+@@ -246,9 +277,18 @@ void DoGame(int gameToRun)
+ {
+ 	if (!DrvInit(gameToRun, 0))
+ 	{
++		if (HarnessActive())
++		{
++			// headless scripted run: no media/audio init, no RunInit
++			// (avoids StatedAuto auto-savestate load), see harness.cpp
++			HarnessRun();
++		}
++		else
++		{
+ 		MediaInit();
+ 		display_set_controls();
+ 		RunMessageLoop();
++		}
+ 	}
+ 	else
+ 	{
+@@ -401,6 +441,19 @@ int main(int argc, char* argv[])
+ #if defined(BUILD_SDL2) && !defined(SDL_WINDOWS)
+ 	bprintf = AppDebugPrintf;
+ #endif
++
++	if (HarnessActive())
++	{
++		// Determinism: keep ALL mutable per-game state inside the harness
++		// sandbox (cwd). The user config may point these at shared absolute
++		// locations (e.g. ~/Library/Application Support/fbneo), where the
++		// EEPROM bootup counter would make consecutive runs diverge.
++		_stprintf(szAppEEPROMPath, _T("./"));
++		_stprintf(szAppHiscorePath, _T("./"));
++		_stprintf(szAppCheatsPath, _T("./"));
++		bSaveconfig = 0;
++	}
++
+ 	BurnLibInit();
+ 
+ 	// Search for a game now, for use in the menu and loading a games

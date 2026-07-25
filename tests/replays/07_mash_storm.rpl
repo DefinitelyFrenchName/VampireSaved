@@ -1,0 +1,24 @@
+# 07: pathological in-match input: all buttons + all directions held, then
+# frame-parity chaos. Pure state-transition abuse.
+300-305 sys=C1
+800-803 sys=S1
+960-962 p1=1
+2600-2900 p1=UDLR123456
+2950 p1=1
+2951 p1=2
+2952 p1=3
+2953 p1=456
+2954 p1=UD1
+2955 p1=LR2
+2956 p1=U1
+2957 p1=D2
+2958 p1=L3
+2959 p1=R4
+2960-2961 p1=UDLR123456
+2970 p1=135
+2971 p1=246
+2972 p1=UDLR
+2980-3100 p1=R123
+3150-3270 p1=L456
+3300-3800 p1=UDLR123456
+4200 wait

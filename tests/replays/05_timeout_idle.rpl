@@ -1,0 +1,6 @@
+# 05: pick Demitri then touch nothing: timer must run out; covers the
+# timeout round-end transition and post-round state machine.
+300-305 sys=C1
+800-803 sys=S1
+960-962 p1=1
+12000 wait

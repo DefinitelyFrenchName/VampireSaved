@@ -1,0 +1,14 @@
+# 08: P2 coins in and joins mid-match (challenger interrupt), both re-pick,
+# second match plays out. Two full select→match transitions in one replay.
+300-305 sys=C1
+800-803 sys=S1
+960-962 p1=1
+# in match; challenger arrives
+3500-3505 sys=C2
+3600-3603 sys=S2
+# both back at select (timing approximate; cursor churn + confirm)
+3800-3802 p1=1
+3820-3822 p2=R
+3880-3882 p2=1
+# second match after two speed menus
+6800 wait

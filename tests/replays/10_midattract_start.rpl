@@ -1,0 +1,6 @@
+# 10: let attract run into its demo match, then coin+start MID-DEMO —
+# attract interruption transition, the classic place for stale-state bugs.
+3000-3005 sys=C1
+3100-3103 sys=S1
+# select appears ~3250; let countdown auto-pick, ride into the match
+6000 wait

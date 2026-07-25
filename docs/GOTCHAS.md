@@ -39,6 +39,21 @@ passes `SKIPDEPEND=1`. Use `make sdl2 SKIPDEPEND=1 -j8`. (Consequence: no
 header-change tracking — after editing FBNeo headers, `make clean` or touch
 the affected .cpp files.)
 
+## FBNeo shared EEPROM breaks run-to-run determinism (paid: 2026-07-25, ~45min)
+
+Symptom: consecutive scripted FBNeo runs of vsavj diverged from frame ~75 by
+exactly ONE work-RAM byte (`RAM:$FF0CC9`) whose value differed by 1 — the
+game's EEPROM bootup counter. Cause chain: (a) `$HOME` overrides do NOT
+sandbox FBNeo on macOS — the user config ini (loaded from the real
+`~/Library/Application Support/fbneo/`) carries absolute support paths;
+(b) `szAppEEPROMPath` then points every run at the same `vsavj.nv`, and the
+bootup counter increments per boot. Runs shorter than the EEPROM write-back
+looked deterministic, which disguised the cause. Fix: the harness forces
+`szAppEEPROMPath`/hiscore/cheat paths into the per-run sandbox cwd
+(`main.cpp`, harness-active branch). Debug method that found it: per-frame
+full work-RAM dumps from two runs, diffed → first divergent frame + address
+(the standard bug-report format works for emulator bugs too).
+
 ## Pre-seeded from the ROM-audit round (2026-07-25, before repo existed)
 
 - **MAME audits the whole board, not just the game:** FBNeo has decryption

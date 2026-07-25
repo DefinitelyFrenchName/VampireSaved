@@ -1,10 +1,38 @@
 # STATE — living progress log
 
-Updated: 2026-07-25 (M0 kickoff session — bench built and green)
+Updated: 2026-07-25 (session 2 — M1 harness milestone-chunk complete)
 
 ## Current milestone
 
-M0 — Bench. **COMPLETE** (2026-07-25). Acceptance status:
+M1 — Map. **Harness half done; mapping half in progress.**
+- Replay harness: DONE both emulators. Shared `.rpl` input-script format;
+  MAME runner (`tests/lua/replay.lua` — inputs, checksums, snapshots, RAM
+  dumps) and patched-FBNeo runner (`emu/fbneo-patches/0001-…-harness.patch`,
+  `tools/run_replay_fbneo.sh`). Both proven deterministic run-to-run.
+- 10-replay legacy suite: DONE, green, expectations frozen
+  (`tests/run_suite.sh`, `tests/expected/vsavj/`). Semantics spot-verified by
+  snapshot (2P pick, challenger interrupt, mid-attract start all confirmed).
+- **Cross-emulator finding (important):** MAME and FBNeo agree bit-exactly
+  for the first 71 boot frames, then run the same states on *different frame
+  indices* (transitions land ±frames apart; static screens re-sync; ~37
+  work-RAM bytes differ at title — phase-shifted counters + sound-driver
+  area $FF05xx). **Frame-exact whole-RAM dual-emulator comparison does not
+  hold.** Superset-invariant enforcement is unaffected (oracle = same
+  emulator, vanilla vs patched). Recommendation for CLAUDE.md §4 amendment
+  (human sign-off requested, non-blocking): new-content dual-emulator
+  verification = mapped gameplay fields (player structs, HP, positions,
+  timer) compared at sync anchors (match start), not whole-RAM checksums.
+- RAM map: community anchor imported (player structs $FF8400/$FF8500,
+  projectiles $FF9400, hitbox ptr offsets, match-active flags $FF8004/8 —
+  from the mame-rr cps2-hitboxes.lua family entry, plus cross-set code
+  anchor triples). Differential experiments next.
+- Three-way diff: window/masked diff built (`tools/diff_sets.py`);
+  **finding:** vsavj↔vsav2 share <10% at window level even pointer-masked —
+  engines were rebuilt (shifted code, changed PC-relative displacements) and
+  most of the 4MB is game-specific data. The atlas will grow from anchored
+  RE (traces + tables), not blind windowing.
+
+### M0 — Bench. COMPLETE (2026-07-25). Acceptance status:
 - Null-patch output bit-identical to reference: **PASS** (`tests/test_null_build.sh`)
 - 60s attract replay deterministic across two runs: **PASS** (`tests/test_attract_determinism.sh`, MAME)
 - Headless MAME runner: **DONE** (`tools/run_mame.sh`, MAME 0.288 via Homebrew)

@@ -1,0 +1,33 @@
+# 03: two credits, both players in from the title, P1 Demitri vs P2 cursor
+# moved right twice (Victor area), fixed two-sided fight pattern.
+300-305 sys=C1
+330-335 sys=C2
+800-803 sys=S1
+830-833 sys=S2
+# both at select ~950
+1000-1002 p2=R
+1060-1062 p2=R
+1120-1122 p1=1
+1140-1142 p2=1
+# match ~2800 (two speed menus)
+2800-2900 p1=R p2=L
+2920-2922 p1=1 p2=1
+2960-2962 p2=3
+3000-3100 p1=R p2=R
+3120-3122 p1=3 p2=2
+3200-3260 p1=D p2=D
+3280-3282 p1=4 p2=4
+3350-3450 p1=R p2=L
+3470-3472 p1=6 p2=6
+3550-3552 p1=5 p2=5
+3600-3700 p1=L p2=R
+3720-3722 p1=2 p2=1
+3800-3900 p1=R p2=L
+3920-3922 p1=1 p2=3
+4000-4100 p1=R p2=R
+4120-4122 p1=3 p2=1
+4200-4300 p1=L p2=L
+4320-4322 p1=2 p2=2
+4400-4500 p1=R p2=R
+4520-4522 p1=1 p2=1
+5200 wait

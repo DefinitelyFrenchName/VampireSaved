@@ -1,0 +1,3 @@
+# 01 attract: 2 minutes of pure attract mode, zero input.
+# Engine-invariant rule lock: the strongest "did anything at all change" probe.
+7200 wait
