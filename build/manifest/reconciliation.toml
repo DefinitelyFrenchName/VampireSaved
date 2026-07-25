@@ -3,6 +3,20 @@
 # Twin doc: docs/tables/reconciliation.md (same-commit rule).
 
 [[map]]
+vsav2 = 0x004df6
+vsavj = 0x000000
+kind = "engine_data"
+status = "open"
+note = "-; refs: bare_long"
+
+[[map]]
+vsav2 = 0x004e2a
+vsavj = 0x000000
+kind = "engine_data"
+status = "open"
+note = "-; refs: bare_long"
+
+[[map]]
 vsav2 = 0x004efa
 vsavj = 0x000000
 kind = "engine_data"
@@ -67,6 +81,34 @@ note = "-; refs: bare_long"
 
 [[map]]
 vsav2 = 0x005086
+vsavj = 0x000000
+kind = "engine_data"
+status = "open"
+note = "-; refs: bare_long"
+
+[[map]]
+vsav2 = 0x0050a0
+vsavj = 0x000000
+kind = "engine_data"
+status = "open"
+note = "-; refs: bare_long"
+
+[[map]]
+vsav2 = 0x0050ba
+vsavj = 0x000000
+kind = "engine_data"
+status = "open"
+note = "-; refs: bare_long"
+
+[[map]]
+vsav2 = 0x0050d4
+vsavj = 0x000000
+kind = "engine_data"
+status = "open"
+note = "-; refs: bare_long"
+
+[[map]]
+vsav2 = 0x0050ee
 vsavj = 0x000000
 kind = "engine_data"
 status = "open"
@@ -150,6 +192,13 @@ status = "verified"
 note = "pattern-1.00-unique-w0x40; refs: bare_long"
 
 [[map]]
+vsav2 = 0x01374e
+vsavj = 0x01505a
+kind = "engine_data"
+status = "verified"
+note = "callsite-anchored-x11; refs: bare_long"
+
+[[map]]
 vsav2 = 0x013778
 vsavj = 0x015084
 kind = "engine_data"
@@ -220,6 +269,13 @@ status = "verified"
 note = "pattern-1.00-unique-w0x20; refs: bare_long"
 
 [[map]]
+vsav2 = 0x013df2
+vsavj = 0x0156ec
+kind = "engine_data"
+status = "verified"
+note = "pattern-1.00-unique-w0x40; refs: bare_long"
+
+[[map]]
 vsav2 = 0x013e1a
 vsavj = 0x015714
 kind = "engine_data"
@@ -246,6 +302,41 @@ vsavj = 0x016f8e
 kind = "engine_sub"
 status = "verified"
 note = "callsite-anchored-x5; refs: jsr"
+
+[[map]]
+vsav2 = 0x015702
+vsavj = 0x016fba
+kind = "engine_sub"
+status = "verified"
+note = "hand: secondary-object pool-2 allocator. vsav2 family 0x156D6+k*0x16 (count A5+0x7A42+k, list A5+0x79E6+4k) maps to vsavj family 0x016F8E+k*0x16 (count A5+0x79BE+k, list A5+0x7966+4k); pool index 2 both. MUST be mapped, never ported: it reads the game's own RAM allocator bookkeeping."
+
+[[map]]
+vsav2 = 0x01572e
+vsavj = 0x016fe6
+kind = "engine_sub"
+status = "verified"
+note = "hand: pool-4 allocator of the same family (vsav2 0x156D6+k*0x16 <-> vsavj 0x016F8E+k*0x16; pool-0 mapping was independently callsite-anchored)"
+
+[[map]]
+vsav2 = 0x015744
+vsavj = 0x000000
+kind = "engine_data"
+status = "open"
+note = "-; refs: bare_long"
+
+[[map]]
+vsav2 = 0x015770
+vsavj = 0x017028
+kind = "engine_data"
+status = "verified"
+note = "callsite-anchored-x5; refs: bare_long"
+
+[[map]]
+vsav2 = 0x0157c2
+vsavj = 0x01707a
+kind = "engine_data"
+status = "verified"
+note = "callsite-anchored-x2; refs: bare_long"
 
 [[map]]
 vsav2 = 0x017178
@@ -330,6 +421,27 @@ vsavj = 0x01948e
 kind = "engine_data"
 status = "verified"
 note = "pattern-1.00-unique-w0x20; refs: bare_long"
+
+[[map]]
+vsav2 = 0x01dbb6
+vsavj = 0x01f034
+kind = "engine_data"
+status = "verified"
+note = "pattern-1.00-unique-w0x40; refs: bare_long"
+
+[[map]]
+vsav2 = 0x01dfe2
+vsavj = 0x01f458
+kind = "engine_data"
+status = "verified"
+note = "pattern-1.00-unique-w0x40; refs: bare_long"
+
+[[map]]
+vsav2 = 0x0209e4
+vsavj = 0x021d66
+kind = "engine_data"
+status = "verified"
+note = "pattern-1.00-unique-w0x40; refs: bare_long"
 
 [[map]]
 vsav2 = 0x024cba

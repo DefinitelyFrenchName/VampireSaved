@@ -87,3 +87,13 @@ moveset-exercise replay). OPEN BUG: Donovan ignores inputs (x static, idle
 anim loop) and takes no damage — input/command processing or box
 resolution; next lead is a vsav2-native ground-truth trace of the walk/X
 writer vs the ported build.
+
+### Stage 4 addendum (session 4 close)
+
+Second engine hook added: the type-dispatch at 0x05E542 (table 0x05E556,
+114 entries) extended to vsav2's 124 (extra rows = VS2 companion-object
+handlers in the 0x08xxxx zone, ported source-only as region x088512).
+Allocator-family mapping corrected: vsav2 pool helpers 0x15702/0x1572E map
+to vsavj 0x016FBA/0x016FE6 (never ported — they read the game's own RAM
+bookkeeping; see reconciliation.md). Frontier: the companion spawn-node
+protocol (docs/tables/reconciliation.md OPEN FRONTIER).

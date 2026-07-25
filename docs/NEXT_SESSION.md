@@ -1,58 +1,43 @@
 # NEXT_SESSION — 60-second orientation (rewritten every session end)
 
-As of 2026-07-25, end of session 3. **M1 ACCEPTED; M2 mechanism PROVEN.**
+As of 2026-07-25, end of session 4. **M2a stages 1-3 PASS. Stage 4:
+DONOVAN RUNS ON THE VSAVJ ENGINE** — real match, timer, CPU opponent, his
+relocated data live, crash-guard clean through a full moveset-exercise
+round (garbage tiles as expected; graphics are M2b). One chain left before
+the stage-4 gates: the companion (Anita) spawn.
 
-**Where we are:** M0 + M1 complete. M2 (proof of life, Donovan replaces
-Jedah/slot 0x0F) underway: the slot-replacement *mechanism* is proven
-end-to-end on trusted tooling — program-patch tooling is MAME-verified
-(`tests/test_patch_prg.sh`) and `tests/test_m2_repoint.sh` shows a bank-slot
-repoint takes effect in a live match while the superset invariant holds
-exactly (6/6 non-Jedah replays bit-identical; attract identical until its
-Jedah demo at frame 4278). What remains is authoring the actual Donovan
-data — the big step.
+**Pick up EXACTLY here:** the VS2-only init hook (ported source-only from
+vsav2 0x8A5A8-zone) allocates from the secondary-object pools and writes a
+spawn record in VS2's node protocol; vsavj's consumer (jump table on
+`(0x9,A6)` at `PRG:0x0155D0-0x015650`) crashes vec3 on an odd list-head
+(0x17685). Two suspects, in order: (1) the pool-index correspondence is
+not identity — vsav2 pools 2/4 (helpers 0x15702/0x1572E) were mapped to
+vsavj pools 2/4 (0x016FBA/0x016FE6) by family position; verify which vsavj
+pool actually feeds which object category (watch $FF79BE..$FF79CB counts +
+$FF7966+ list heads on vanilla vsavj content that spawns satellites);
+(2) the node field layout differs — likely REWRITE the hook against
+vsavj's protocol (synthesized GEN code) instead of porting VS2's bytes.
+Every instrument is ready: `GUARD_TRACE`/`GUARD_BREAK`/`GUARD_PC_LOG` on
+the guard, trace_writes, native ground truth = vsav2 pick cursor **R×2**
+(12-replay input block, `scratchpad/don12_vs2.rpl` pattern in STATE
+history).
 
-**M2 remaining (see docs/M2_feasibility.md "Remaining M2 work"):**
-- M2a: extract Donovan's program-ROM blocks from vsav2 (transitive closure,
-  per-table entry widths), relocate into vsavj's ~337KB free space, repoint
-  all slot-0x0F bank entries, re-encrypt his code, reconcile R1 engine
-  deltas (log in docs/tables/reconciliation.md), fix select/quote/AI tables.
-- M2b: graphics (sprite tiles into Jedah's GFX range + 16-bit OBJ remap —
-  the R2 wall) + palette + sound. May pull M3 forward.
+**Build/run one-liners:**
+- `GEN_FLAGS="--allow-plausible --tripwire-open" tools/build_donovan.sh 4 build/donovan`
+- `MAME_ROMPATH="$PWD/build/donovan/rompath;$ROMDIR" tools/run_replay_guarded.sh vsavj tests/replays/12_donovan_vs_cpu.rpl out.log box`
+- Legacy gate helpers: `tests/lib/m2a_common.sh`; stage gates
+  `tests/test_m2a_stage{1,2,3}*.sh` (all PASS).
 
-See `docs/M1_acceptance.md` for the M1 sign-off.
+**After the companion chain:** author `test_m2a_stage4_code.sh` (pick +
+moveset replay under -debug guard, zero tripwires; HP-decrease field
+sanity; vsav2-as-oracle compare_fields at anchors; dual-emulator; legacy
+gate), then stage 5 (select-screen aux pokes — portrait/name still say
+"Jedah", fine for now), soak, freeze (registry row = build decision).
 
-**What's solid:**
-- vsavj slot→character map 16/16 pick-verified.
-- Donovan 0x13 / Pyron 0x11 / Huitzil 0x10 pick-verified in BOTH vsav2 and
-  vhunt2; handler code, anim bases, hitbox bases recorded per set.
-- Per-character table bank labeled; layout identical across all 3 sets.
-- Pipelines mapped end-to-end: code, animation, sprite/tile chain, palette,
-  sound — all in docs/atlas/character_tables.md + ram.md.
-- **R2 quantified:** CPS2 OBJ tile field is 16-bit; GFX needs 18-19 bit —
-  the real graphics ceiling. Top technical risk; first M3 investigation.
+**Key context:** R1 map ~120 verified rows + methods in
+docs/tables/reconciliation.md; the two extended-type-table engine hooks
+and the PC-relative-reads-are-decrypted rule in docs/patch_notes.md +
+docs/GOTCHAS.md. Suite GREEN (13 replays, fingerprint-dispatched).
 
-**Two things waiting on the maintainer (neither blocks M2 prep):**
-1. **M2 replaced-slot sign-off.** Recommendation: **replace Jedah (slot
-   0x0F)** — footprint fits Donovan (+660 B headroom), boss character so
-   least playtest disruption, keeps Demitri/Victor (harness controls). Full
-   size table in STATE.md decisions-pending.
-2. **SPEC §2 Start-hold fact** — did not reproduce in vsav2; flagged for
-   community check (STATE.md). Since vsav2≡vhunt2 data is byte-identical,
-   the VS2-vs-VH2 variant policy may simplify.
-
-**M2 plan (make-or-break milestone):** make Donovan selectable in vsavj by
-replacing the chosen slot across the table bank — swap that slot's rows
-(hitbox base, +0x64/+0x132, code dispatch, anim base) to point at Donovan's
-data, inject his data blobs (from vsav2, since data ≡ vhunt2) into free ROM
-that doesn't move legacy content, decrypt/re-encrypt the program changes via
-tools/cps2_decrypt.py, build via the manifest pipeline. Acceptance: full
-Donovan matches + ALL legacy replays still bit-identical (superset
-invariant) + crash-free soak. This is where reconciliation (R1) gets real —
-VS2 data on the vsavj engine may hit rule deltas; the harness surfaces them.
-
-**First M3 task (parked):** decode the OBJ `attr` bitfield to learn how tile
-high bits / bank are supplied and whether frame tile#s are per-character-
-relative — determines M3 difficulty.
-
-**Read:** docs/M1_acceptance.md, STATE.md, docs/atlas/character_tables.md,
-docs/atlas/ram.md, docs/GOTCHAS.md.
+**Read:** STATE.md, docs/tables/reconciliation.md (OPEN FRONTIER section),
+docs/patch_notes.md, docs/GOTCHAS.md (3 new entries).

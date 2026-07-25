@@ -1,6 +1,7 @@
 # STATE — living progress log
 
-Updated: 2026-07-25 (session 4 — M2a underway: C0 harness primitives done)
+Updated: 2026-07-25 (session 4 end — M2a stages 1-3 PASS; stage 4 deep in
+the R1 campaign, Donovan runs, companion-spawn chain is the frontier)
 
 ## Session 4 highlights (M2a — the real Donovan port)
 
@@ -28,8 +29,41 @@ Updated: 2026-07-25 (session 4 — M2a underway: C0 harness primitives done)
   emulator-divergent content (different CPU-picked opponents); menu presses
   near transitions land on opposite sides of input-accept boundaries;
   match-start predicate flickers during intros (debounced).
-- **Next:** C1 — `bank_map.toml` + `extract_char.py` (vhunt2 oracle) +
-  `scan_code_refs.py`; first full unresolved-refs report sizes R1.
+- **C1/C2 COMPLETE:** oracle-validated extraction (`extract_char.py` —
+  every cross-sibling diff byte must classify as a pointer field under a
+  measured shift; auto-discovers new region shifts, e.g. the sprite/OBJ
+  sub-tables at −0x2002C), staged patch generator, `find_equiv.py`
+  (validated at score 1.00 on the known loader), `build_donovan.sh` driver.
+  Donovan footprint closed at ~235KB, 9+ regions.
+- **STAGES 1-3 PASS** (gates in tests/): null relocation (Jedah copy,
+  10018 B — matches M1 exactly), Donovan passive data (full round under
+  guard), anim + sprite sub-tables (idle-coherent; select-screen hover
+  reads anim → pick divergence pin moves 2886→1080 at stage 3+).
+- **STAGE 4 (in progress, deep):** R1 mechanized (`reconcile_batch.py`:
+  pattern ladder, stub-deref, callsite anchoring via veteran parallelism,
+  codebytes, farm-param matching; ~120 verified rows) + per-target
+  TRIPWIRES for opens (fault PC names the target). Ported regions: +0x34
+  newcomer-support zone, 17 extra secondary-object handlers, engine
+  char-init pair, VS2-only 0x8xxxx companion zone (source-only). TWO
+  engine hooks live (extended type-dispatch tables 59→76 and 114→124,
+  jsr-thunk pattern; vanilla rows byte-identical). **Donovan RUNS on the
+  vsavj engine** (match, timer, CPU opponent, HP structs, guard clean,
+  screenshot in scratch) — remaining: he idles/is unhittable because the
+  companion (Anita) spawn chain fails: the ported VS2 init hook speaks
+  VS2's pool/node protocol; vsavj's consumer (0x0155D0 family) differs.
+  Frontier detail: docs/tables/reconciliation.md "OPEN FRONTIER".
+- Suite GREEN, 13 replays (added 11_pick_donovan, 12_donovan_vs_cpu
+  moveset-exercise, 16_xemu_2p; vanilla expectations + full logs frozen).
+- **Next actions (stage 4 close):**
+  1. Decode the pool-index correspondence + spawn-node field protocol
+     (vsav2 node writer = the 0x8A5A8 hook; vsavj consumer =
+     `PRG:0x0155D0-0x015650` jump-table on `(0x9,A6)`; watch $FF79BE+
+     pool heads). Consider REWRITING the hook to vsavj's protocol
+     (synthesized, GEN provenance) instead of porting VS2's.
+  2. Then: stage-4 gates (vsav2-as-oracle field compare at anchors —
+     native Donovan pick on vsav2 = cursor R×2 from default; dual-emulator
+     on 16-pattern replay; legacy gate every build).
+  3. Then stage 5 (select plumbing aux pokes) + soak + freeze.
 
 ## Session 3 highlights
 

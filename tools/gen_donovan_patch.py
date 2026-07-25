@@ -432,8 +432,7 @@ def main():
                 av, _ = table_entry_addr(a_t["table"], var_slot)
                 poke_bytes(av, data, f"{a_t['table']}[{var_slot:#x}] mirror")
 
-    if args.stage >= 4 and "proj_hook" in port:
-        ph = port["proj_hook"]
+    for ph in (port.get("obj_hook", []) if args.stage >= 4 else []):
         site = _int(ph["site"])
         vtab = _int(ph["vanilla_table"])
         n_van = _int(ph["vanilla_entries"])
@@ -449,7 +448,7 @@ def main():
         if opc.is_file():
             got = open(opc, "rb").read()[site:site + 8]
             if got != expect:
-                fail.append(f"proj_hook: engine bytes at {site:#x} != expected "
+                fail.append(f"obj_hook: engine bytes at {site:#x} != expected "
                             f"dispatch sequence ({got.hex()})")
         # BOTH source tables are read PC-relatively by the engine, i.e.
         # through 68k PROGRAM space -> CPS2-decrypted; copy entries from the
@@ -464,21 +463,27 @@ def main():
         for k in range(n_van, n_src):
             tgt = int.from_bytes(src_pt[stab + k * 4:stab + k * 4 + 4], "big")
             host = region_of(tgt)
+            m = recon.get(tgt)
             if host and host in placed:
                 newt = tgt + (placed[host] - regions[host]["src"])
+                ported += 1
+            elif m and (m.get("status") == "verified"
+                        or (args.allow_plausible
+                            and m.get("status") == "plausible")):
+                newt = _int(m["vsavj"])
                 ported += 1
             else:
                 newt = None
             if newt is None:
                 # unported extra type: point at a tripwire so a use is LOUD
-                newt = tripwire_for(tgt, f"proj_hook type {k}") \
+                newt = tripwire_for(tgt, f"obj_hook@{site:#x} type {k}") \
                     if args.tripwire_open else None
                 if newt is None:
-                    fail.append(f"proj_hook: extra type {k} handler {tgt:#x} "
-                                f"not ported/placed")
+                    fail.append(f"obj_hook@{site:#x}: extra type {k} handler "
+                                f"{tgt:#x} not ported/placed")
                     newt = 0
             table += newt.to_bytes(4, "big")
-        tdst = alloc("a", len(table), "proj_hook extended table")
+        tdst = alloc("a", len(table), "obj_hook ext table")
         thunk = None
         if tdst is not None:
             ops.append({"op": "data", "addr": f"{tdst:#x}", "hex": table.hex()})
@@ -486,22 +491,22 @@ def main():
                          f"extended type table ({n_van} vanilla + "
                          f"{n_src - n_van} ported, {ported} placed)")
             fragments.append((tdst, len(table), "GEN", "proj_hook ext table"))
-            thunk = alloc("a", 14, "proj_hook thunk")
+            thunk = alloc("a", 14, "obj_hook thunk")
         if thunk is not None:
             tk = (bytes([0x41, 0xF9]) + tdst.to_bytes(4, "big")   # lea tbl,A0
                   + bytes([0x20, 0x70, 0x00, 0x00])               # movea.l (A0,D0.w),A0
                   + bytes([0x70, 0x00])                           # moveq #0,D0
                   + bytes([0x4E, 0xD0]))                          # jmp (A0)
             ops.append({"op": "code", "addr": f"{thunk:#x}", "hex": tk.hex()})
-            notes.append(f"code   {thunk:#08x} proj_hook thunk")
-            fragments.append((thunk, 14, "GEN", "proj_hook thunk"))
+            notes.append(f"code   {thunk:#08x} obj_hook thunk")
+            fragments.append((thunk, 14, "GEN", "obj_hook thunk"))
             site_patch = bytes([0x4E, 0xB9]) + thunk.to_bytes(4, "big") \
                 + bytes([0x4E, 0x71])
             ops.append({"op": "code", "addr": f"{site:#x}",
                         "hex": site_patch.hex()})
             notes.append(f"code   {site:#08x} ENGINE HOOK: dispatch -> jsr "
                          f"thunk; nop (vanilla types identical via table copy)")
-            fragments.append((site, 8, "GEN", "proj_hook engine site"))
+            fragments.append((site, 8, "GEN", "obj_hook engine site"))
 
     if args.stage >= 4:
         for d in man["dispatch"]:

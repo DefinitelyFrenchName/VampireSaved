@@ -26,12 +26,21 @@ end = 0x400000
 # sequence `movea.l (d8,PC,D0.w),A0; moveq #0,D0; jsr (A0)` with
 # `jsr thunk; nop` — semantically identical for vanilla types (proved by
 # the legacy bit-identity gate).
-[proj_hook]
+# (two of the seven type-dispatch sites need extension; the other five have
+# equal-sized tables in both games — verified session 4)
+[[obj_hook]]
 site = 0x054470
 vanilla_table = 0x054484
 vanilla_entries = 59
 src_table = 0x05C620
 src_entries = 76
+
+[[obj_hook]]
+site = 0x05E542
+vanilla_table = 0x05E556
+vanilla_entries = 114
+src_table = 0x06A51C
+src_entries = 124
 
 # non-bank repoints (select screen, win quotes, AI, versus tables) land here
 # as stage-5 RE pins their addresses down; op = poke16|poke32, both slots
