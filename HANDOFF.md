@@ -95,7 +95,7 @@ Stage gates: `tests/test_m2a_stage{1,2,3}*.sh` (all PASS).
 
 | Piece | Where | Role |
 |---|---|---|
-| Extractor | `tools/extract_char.py` | vsav2→vsavj extraction, **vhunt2 as correctness oracle**: every cross-sibling diff byte must classify as a pointer field under a measured shift. Handles: transitive closure, auto-discovered region shifts, extra roots (`addr:len[:tTWIN[:d]|:s]`), segmented gap-tolerant diff, self-pointer regions, PC-relative word tables |
+| Extractor | `tools/extract_char.py` | vsav2→vsavj extraction, **vhunt2 as correctness oracle**: every cross-sibling diff byte must classify as a pointer field under a measured shift. Handles: transitive closure, auto-discovered region shifts, extra roots (`addr:len[:tTWIN[:d]|:s]`), segmented gap-tolerant diff, self-pointer regions, PC-relative word tables, **bare-long sibling veto in source-only zones** (operand pairs masquerading as pointers — GOTCHAS) |
 | Ref scanner | `tools/scan_code_refs.py` | 68k operand triage (abs.l after known opcodes, bare longs, char-id immediates) |
 | R1 resolver | `tools/reconcile_batch.py` | batch vsav2→vsavj engine mapping: pattern ladder, stub-deref, call-site anchoring, code/data byte match, farm-param matching |
 | Single lookup | `tools/find_equiv.py` | one wildcarded pattern search (validated at 1.00 on the known loader) |
@@ -106,8 +106,13 @@ Stage gates: `tests/test_m2a_stage{1,2,3}*.sh` (all PASS).
 **Debug env** (all on `run_replay_guarded.sh`): `GUARD_DEBUG=0` cheap mode
 (canonical checksums), `GUARD_TRACE=a-b` instruction trace,
 `GUARD_PC_LOG=a-b` per-frame PC, `GUARD_BREAK=hexaddr` break+report,
-`GUARD_MATCH=a-b` in-match flag watch. Faults log `CRASH` + `REGS` +
-`STACK` lines and dump work RAM.
+`GUARD_MATCH=a-b` in-match flag watch, `GUARD_PROBE=hexaddr`
+[+`GUARD_PROBE_COND=expr`] conditional LOGGING breakpoint (PROBE lines:
+regs + (SP); run continues — how the session-7 corruption was caught).
+Faults log `CRASH` + `REGS` + `STACK` lines and dump work RAM.
+`MASK_RANGES="043c-043d,7f00-8000"` on replay.lua = live-state comparison
+(dead-stack + QSound-latch windows excluded; docs/GOTCHAS.md); unset =
+canonical whole-RAM checksums, bit-identical to frozen expectations.
 
 **Ground truth for behavior**: native Donovan on vsav2 — pick with cursor
 **R×2** from the default select position.

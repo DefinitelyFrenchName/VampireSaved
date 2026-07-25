@@ -1,7 +1,44 @@
 # STATE — living progress log
 
-Updated: 2026-07-25 (session 6 end — M2a stage 4: char-init COMPLETES,
-match runs; frontier = anim state-index delta at frame 3025)
+Updated: 2026-07-25 (session 7 end — M2a stage 4: bring-up ladder DONE,
+full moveset replay runs clean; legacy-gate comparison basis awaiting
+maintainer decision)
+
+## Session 7 highlights (M2a stage 4 — frontier closed; the crash was ours)
+
+- **The session-6 "anim state-index delta" was NOT a state-space delta.**
+  It was extraction tooling corruption: the bare-long relocation heuristic
+  fused instruction operand pairs (e.g. `clr.b $6(a6); moveq #0,d0` =
+  `0006 7000`) into plausible pointers and rewrote them — 47 false
+  rewrites latent in the two source-only zones; one destroyed the
+  `moveq #0,d0` anim-state reset, sending an X-distance value into the
+  engine anim setter (the vec3 at 0x015096/frame 3025). Diagnosed with a
+  new guard instrument (`GUARD_PROBE`/`GUARD_PROBE_COND` conditional
+  logging breakpoint — the D0 hit sequence told the whole story).
+- **Extractor hardened (tools/extract_char.py + scan_code_refs.py):**
+  immediate loads (`movea.l #imm`/`move.l #imm`) are now labeled refs;
+  every bare-long candidate is validated against the vhunt2 SIBLING
+  (context match with labeled operands wildcarded): identical sibling
+  bytes → vetoed (operand pair), host-shift-consistent → confirmed,
+  conflicting/absent evidence → rejected loudly. 47 vetoed/rejected,
+  5 confirmed real, 0 silent keeps. Details: docs/GOTCHAS.md.
+- **RESULT: the full 12_donovan_vs_cpu moveset replay (9320 frames) runs
+  END-clean under the -debug crash guard.** No crash, no tripwire. The
+  stage-4 bring-up ladder has no frontier.
+- **Legacy gate measured honestly (this predates session 7's changes):
+  the stage-4 build fails bit-exact whole-RAM comparison** — NOT from a
+  behavior change: engine hooks cost cycles on the every-object dispatch
+  path; interrupts then land at skewed boundaries → dead-stack ghost
+  bytes ($FF7F00-$FF7FFF, below resting SP at frame-done) + the QSound
+  handshake latch $FF043C phase-shifts one frame. Hooks converted to a
+  ghost-clean topology (vanilla `jsr (A0)` kept in place; thunk jmps back
+  to it) removing the push-value ghost; the interrupt-skew ghosts are
+  physically unavoidable (zero-cycle table extension proven impossible —
+  GOTCHAS). **With exactly those two windows masked, 02 is bit-identical
+  to vanilla full-length and attract first diverges at exactly 4278 (the
+  Jedah demo).** Live state is vanilla.
+- `MASK_RANGES` opt-in on replay.lua (canonical checksums unchanged when
+  unset); new gate `tests/test_m2a_stage4_code.sh` locks all of the above.
 
 ## Sessions 5-6 highlights (M2a stage 4 — the port runs)
 
@@ -130,11 +167,15 @@ match runs; frontier = anim state-index delta at frame 3025)
 - Feasibility assessed (docs/M2_feasibility.md): behavior data portable via
   ~337KB free vsavj space + data-reads-bypass-encryption; sprite tiles are
   the R2 wall (may pull M3 forward); QSound = M5.
-- **M2a IN PROGRESS (sessions 4-6, see highlights above):** extraction,
+- **M2a IN PROGRESS (sessions 4-7, see highlights above):** extraction,
   generation and relocation tooling complete; stages 1-3 PASS; stage 4
-  runs a live match with Donovan's ported code/data. Remaining for stage
-  4: one state-index delta (docs/NEXT_SESSION.md), then the stage-4
-  gates. Then stage 5 (select plumbing) and M2b graphics.
+  bring-up DONE — the full moveset replay runs END-clean under guard
+  (session 7; the session-6 "state-index delta" was extraction
+  corruption, fixed). Remaining for stage-4 acceptance: the legacy-gate
+  comparison-basis decision (see Decisions pending), then the remaining
+  behavior gates (vsav2-as-oracle field compare at anchors, native pick
+  = cursor R×2; dual-emulator on the 16-pattern replay). Then stage 5
+  (select plumbing) and M2b graphics.
 
 ### M1 — Map. ACCEPTED (2026-07-25).
 Both SPEC §4 clauses met; full assessment in docs/M1_acceptance.md.
@@ -238,7 +279,33 @@ opcode-space dump oracle (`tests/test_decrypt_oracle.sh`). Both directions
 
 ## Decisions pending (human)
 
-- See SPEC §7 for the rest. None blocks current work.
+- **Legacy-gate comparison basis for hooked builds (BLOCKS stage-4
+  acceptance).** Measured (session 7, evidence in docs/GOTCHAS.md and
+  docs/tables/reconciliation.md Session 7): any engine hook on the
+  secondary-object dispatch path adds CPU cycles, which skews where
+  interrupts land during otherwise-vanilla frames. Two divergence
+  windows result, both invisible to gameplay: dead stack bytes
+  RAM:$FF7F00-$FF7FFF (below resting SP at the frame-done sample point)
+  and the 68k↔QSound handshake latch RAM:$FF043C (one-frame phase
+  shift). With exactly these masked, the stage-4 build's live state is
+  bit-identical to vanilla (02 full-length; attract to exactly 4278).
+  Zero-cycle hooking is impossible (measured; GOTCHAS). Options:
+  1. **(Recommended)** Amend §4: for builds carrying engine hooks, the
+     legacy oracle compares all work RAM EXCEPT the two named windows,
+     each documented in docs/atlas/ram.md as provably-dead-at-sample or
+     phase-class; plus keep a confinement lock (masked equality compares
+     every other byte every frame — divergence outside the windows still
+     fails). Precedent: the dual-emulator §4 amendment (also
+     measured-reality-driven).
+  2. Reject hooks entirely and require a hook-free newcomer design
+     (e.g. prove-dead vanilla dispatch rows and reuse them — laborious,
+     risky, and possibly impossible for 17+10 extra types).
+  3. Accept whole-RAM divergence per-replay via .diverge expectations at
+     the first hook execution (weakest: abandons legacy comparison for
+     most of every match).
+  Until decided, stage-4 remains unaccepted; tests/test_m2a_stage4_code.sh
+  locks the measured facts without touching any frozen expectation.
+- See SPEC §7 for the rest. Nothing else blocks current work.
 - **SPEC §2 fact check (community liaison):** "hold Start while selecting
   D/H/P → other game's flavor" did not reproduce in vsav2 under scripted
   test (evidence in docs/atlas/character_tables.md). Since vsav2≡vhunt2

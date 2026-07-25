@@ -1,39 +1,46 @@
 # NEXT_SESSION — 60-second orientation (rewritten every session end)
 
-As of 2026-07-25, end of session 6. **M2a stage 4: the full port fits,
-Donovan's character init COMPLETES, and the match runs — one state-index
-delta left before the stage-4 gates.**
+As of 2026-07-25, end of session 7. **M2a stage-4 bring-up is DONE: the
+full Donovan moveset replay (9320 frames) runs END-clean under the crash
+guard. Stage-4 acceptance is blocked on ONE maintainer decision.**
 
-**Where we are:** The port is complete in space and structure: ~335K of
-336.6K free ROM placed, all pointer classes relocated (bank/anim/sprite
-sub-tables/asset graph/code), R1 map ~120 verified rows, two engine hooks
-(extended type-dispatch tables), PC-relative word tables handled, layout
-groups + near_map keeping displacement-reachable families together,
-slot-clearing allocator wrappers. Legacy suite GREEN (13 replays) on
-every build. Init chain runs end-to-end: pool alloc → spawn record →
-class enqueue → anim relocation → char-init complete → match live.
+**What closed the session-6 frontier:** the "anim state-index delta" was
+never a state-space delta — the extractor's bare-long heuristic had fused
+instruction operand pairs into fake pointers (47 of them across the two
+source-only zones) and one rewrite destroyed the `moveq #0,d0` anim-state
+reset. Fixed with a sibling-veto (vhunt2 context match) + immediate-load
+labels in scan_code_refs. New instruments that did the work:
+`GUARD_PROBE`/`GUARD_PROBE_COND` (conditional logging breakpoint) and
+`MASK_RANGES` on replay.lua. Full story: docs/GOTCHAS.md (2 new entries),
+docs/tables/reconciliation.md "Session 7".
 
-**Pick up EXACTLY here (session 6 close):** character init now COMPLETES
-and the match runs — crash moved to frame 3025, a vec3 address error in
-the ENGINE anim-frame setter (0x015096). The anim word table is proven
-byte-identical to native vsav2 (data + relocation correct); the INDEX
-into it is wrong (A0 = table+1: loaded entry was 1, not the 0x010E the
-table holds at index 1). So a state/substate byte upstream carries a
-vs2-flavored value. NEXT STEP: watch the writer of that index (trace back
-through the 0x0D2092 `cmpi.w #$80,D0` path in Donovan's ported handler)
-and compare the same anchor against native vsav2 (pick = cursor R x2) —
-expect another VS2-vs-vsavj state-space delta, same family as the
-class-7 queue remap. Guard now dumps D0-D7/A0-A6 at the fault (REGS
-line), which is how the index was caught.
+**THE PENDING DECISION (STATE.md "Decisions pending", first item):**
+engine hooks cost cycles → interrupt-timing skew → two divergence windows
+in otherwise-vanilla content: dead-stack bytes $FF7F00-$FF7FFF and the
+QSound handshake latch $FF043C (one-frame phase). Measured: with exactly
+those masked, 02 is bit-identical to vanilla FULL LENGTH and attract
+diverges at exactly 4278 (Jedah demo). Zero-cycle hooks are impossible
+(GOTCHAS). The maintainer must pick the legacy-gate comparison basis for
+hooked builds (recommendation: live-RAM with the two named windows masked
++ confinement lock). Until then stage 4 is unaccepted but fully working.
 
-**Build/test one-liners:** unchanged — see HANDOFF.md M2a section;
-GEN_FLAGS="--allow-plausible --tripwire-open" tools/build_donovan.sh 4 build/donovan
+**Gate:** `tests/test_m2a_stage4_code.sh` — build + veto fact-lock +
+guarded moveset clean + masked legacy (02 identical, attract 4278) + pick
+diverge 1080. Run it first if anything seems off.
 
-**After the zone closes:** stage-4 gates (test_m2a_stage4_code.sh: pick +
-12-replay moveset under -debug guard zero-tripwire; HP-decrease sanity;
-vsav2-as-oracle compare (native pick = R x2); dual-emulator; legacy gate),
-then stage 5 (select-screen aux pokes), soak, freeze.
+**Small open item:** the companion tail's alternate anim table
+(`movea.l #$36784A,A0`, taken when spawn-record sub byte ≠ 0 — Donovan's
+hook always writes sub=0; branch never taken in the moveset replay).
+Unrelocated on purpose; plant a tripwire or port it at stage-5 close-out
+(reconciliation.md Session 7, "Open").
 
-**Read:** STATE.md, docs/tables/reconciliation.md (sessions 4-6 sections,
-esp. "Session 6"), docs/patch_notes.md (stage-4 progress log),
-docs/GOTCHAS.md (5 entries — the last three were all paid this milestone).
+**After the decision:** remaining stage-4 behavior gates (vsav2-as-oracle
+field compare at anchors — native Donovan pick on vsav2 = cursor R×2;
+dual-emulator agreement on 16_xemu_2p-pattern replay), then stage 5
+(select plumbing aux pokes), soak, freeze.
+
+**Build/debug one-liners:** unchanged — HANDOFF.md M2a section.
+
+**Read:** STATE.md (session 7 highlights + the pending decision),
+docs/GOTCHAS.md (7 entries; the last two are this session's),
+docs/tables/reconciliation.md ("Session 7"), docs/patch_notes.md (top).
