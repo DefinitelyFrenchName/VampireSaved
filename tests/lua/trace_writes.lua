@@ -3,7 +3,8 @@
 -- (used with tools/run_mame.sh; requires -debug on the command line).
 --
 --   env REPLAY       optional input script (same format as replay.lua)
---   env WATCH        "ff8480,4" (start,len — write watch on maincpu program)
+--   env WATCH        "ff8480,4" (start,len) or "ff8480,4,r" / "...,rw"
+--                    (watch mode; default w = writes)
 --   env TRACE_OUT    log path (default trace_writes.txt)
 --   env FRAMES       stop after this many frames (default 3600)
 --
@@ -73,12 +74,13 @@ if replay_path then
     end
 end
 
-local start_addr, len = watch:match("^(%x+),(%d+)$")
-assert(start_addr, "WATCH format: hexaddr,len")
+local start_addr, len, mode = watch:match("^(%x+),(%d+),?(%a*)$")
+assert(start_addr, "WATCH format: hexaddr,len[,r|w|rw]")
+if mode == "" then mode = "w" end
 
 -- register the watchpoint on the maincpu program space
 debugger:command(string.format("focus 0"))
-debugger:command(string.format("wpset %s,%s,w", start_addr, len))
+debugger:command(string.format("wpset %s,%s,%s", start_addr, len, mode))
 
 local pressed = {}
 emu.register_frame_done(function()

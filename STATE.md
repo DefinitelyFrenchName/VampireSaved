@@ -112,7 +112,13 @@ opcode-space dump oracle (`tests/test_decrypt_oracle.sh`). Both directions
 
 ## Decisions pending (human)
 
-- See SPEC §7. None blocks M0 wrap-up or early M1 (diff/atlas work).
+- See SPEC §7. None blocks current work.
+- **SPEC §2 fact check (community liaison):** "hold Start while selecting
+  D/H/P → other game's flavor" did not reproduce in vsav2 under scripted
+  test (evidence in docs/atlas/character_tables.md). Since vsav2≡vhunt2
+  character data is byte-identical, the variant policy question (§3.3/§3.4)
+  may be moot at the data level — worth confirming with the community what
+  the Start-hold is believed to do and on which set/revision.
 
 ## Open bugs
 

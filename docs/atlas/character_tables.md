@@ -126,13 +126,32 @@ so "where does Donovan's <table-thing> live" is now `table[0x13]` in each
 set's bank. Per-slot pointed-to data is byte-identical between vsav2 and
 vhunt2 (hitbox tables verified); pointers differ by a constant-ish shift.
 
-Remaining variant slots in vsav2/vhunt2: `0x18` (Oboro Bishamon, matching
-vsavj) and `0x19` (occupant unnamed — variant of slot 9; check next).
-Open question for the Start-hold flavor mechanism: the VS2-vs-VH2
-*behavioral* differences for D/H/P are NOT in the hitbox data (identical
-across both games) — the flavor toggle must select different rows in other
-tables (movesets/frame data) or different code paths; locate in M1 wrap-up
-or M2.
+### The other two variant datasets: two Oboro-class Bishamons
+
+Match-init ID normalization (vsav2 `PRG:0x01F5A0`, mirrored in vhunt2;
+vsavj has the 0x18 case only): IDs `0x18` AND `0x19` both remap to slot-8
+(Bishamon) *code* while keeping their own *data* rows — so VS2/VH2 carry
+two distinct Oboro-class datasets (0x18 ≈ vsavj's Oboro; 0x19 = a second
+flavor, vsav2/vhunt2-only). The five variant datasets in the siblings are
+therefore: **Huitzil 0x10, Pyron 0x11, Donovan 0x13, Oboro 0x18,
+Oboro-alt 0x19**.
+
+### Start-hold flavor: NOT REPRODUCED (flagged for maintainer)
+
+Measured in vsav2 (Japan 970913), Donovan: holding Start (through select
+confirm and match load) latches exactly one byte — `RAM:$FF87C2` (P1 block
++0x3C2, default 01 in BOTH games, cleared when Start held) — which is
+never read back during play (read-watchpoint trace across idle AND
+attack-chain sequences), and post-chain full-work-RAM state is IDENTICAL
+except that byte. So with these inputs, "hold Start for the other game's
+flavor of D/H/P" (SPEC §2 background fact) produces no behavioral
+difference in vsav2. Either the input method differs, the effect is
+vhunt2-only, it manifests only in untested moves, or the lore is
+imprecise. The latch byte and its one writer/clearer are mapped; revisit
+with maintainer/community input. NOTE for the port: since vsav2≡vhunt2
+per-slot data is byte-identical, the port can carry BOTH Oboro flavors and
+the three newcomers from either set — the "VS2 vs VH2 variant" question
+may reduce to system-mechanics presentation, not character data.
 
 ## Cross-set slot correspondence (verified)
 
