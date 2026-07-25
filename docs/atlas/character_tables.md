@@ -77,6 +77,38 @@ Semantic skeleton (from disassembly of every vsavj consumer site):
   height/offset; 0xBE83A: range-check word; 0xBE87A → struct+0x15B (byte);
   0xBE89A/0xBEC5A: 2D byte tables → struct+0x167.
 
+### Animation index tables (bank extends below bank[0])
+
+The bank's true start is `PRG:0x0BCE7A` (vsavj): three anim-related
+per-character pointer tables at bank[0]−0x280/−0x180/−0x100
+(0x0BCE7A/0x0BCF7A/0x0BCFFA) + the projectile-side table at −0x80
+(0x0BD07A). Anim lookup (writer `PRG:0x027EC0`): per-char anim index table
+→ word offsets → anim scripts; script+0 → struct+0x20, script[8] indexes
+the struct+0x64 table; anim ptr lives at struct+0x1C.
+
+**Per-character anim bases (table A rows; the "animation scripts" manifest
+column):**
+
+| Character | vsavj | vsav2 | vhunt2 |
+|---|---|---|---|
+| Demitri 0x01 | `0x12C2FE` | `0x11DED8` | `0x11036C` |
+| Victor 0x03 | `0x150910` | `0x137E7E` | `0x134FC2` |
+| Huitzil 0x10 | (aliases slot 0) | `0x245872` | `0x231CFE` |
+| Pyron 0x11 | (aliases slot 1) | `0x264086` | `0x250512` |
+| Donovan 0x13 | (aliases slot 3) | `0x27F548` | `0x26B9D4` |
+
+The newcomers' anim data sits in an appended region
+(`PRG:0x23xxxx-0x28xxxx`, outside the encrypted 1MB) — ~110-125KB per
+character by inter-base spacing.
+
+### Palette pipeline (partial)
+
+Palettes live in CPS2 palette RAM `0x90C000+` and are faded IN PLACE by an
+unrolled adjuster at `PRG:0x014034-0x014060`. The initial ROM→palette
+upload goes through the CPS2 object/DMA staging region (`0x708xxx`
+addresses appear in traces) — the per-character palette source table is
+NOT yet located (open; trace the staging writer next).
+
 ### Ported-three handler code (bank[0] rows; the "code" manifest entry)
 
 | Character | vsav2 handler | vhunt2 handler |
