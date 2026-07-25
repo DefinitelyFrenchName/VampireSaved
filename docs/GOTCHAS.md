@@ -71,3 +71,62 @@ full work-RAM dumps from two runs, diffed → first divergent frame + address
 - **Clone/parent split:** `vsavj` and `vhunt2r1` are clones; in split sets
   their gfx/QSound ROMs live in the parent zips (`vsav.zip`, `vhunt2.zip`),
   which must be present alongside.
+
+## MAME `-debug` perturbs multi-CPU timing — never compare its checksums to non-debug runs (paid: 2026-07-25, ~1.5h)
+
+A vsavj replay run under `-debug -debugger none` produces a checksum log that
+diverges from the identical non-debug run at frame 12: `RAM:$FF1CF0.l` (a
+latch toggling 0x00000000/0xFFFFFFFF) is phase-shifted by one frame, with
+±1 knock-on counters later ($FF8080, $FFE420...). It is fully deterministic
+*within* debug mode (two -debug runs are bit-identical) and unaffected by how
+the initial debugger halt is resumed (`-debugscript go` vs Lua periodic —
+identical output). Working theory: the debugger forces finer scheduler
+timeslices, shifting 68k↔Z80/QSound interleave; the mechanism doesn't matter,
+the rule does:
+
+- **Checksum-exact gates (superset invariant, determinism) run WITHOUT
+  `-debug`** — plain `tests/lua/replay.lua` or `replay_guard.lua` cheap mode
+  (`GUARD_DEBUG=0`), which are bit-identical to vanilla expectations.
+- `-debug` guard runs (breakpoint crash detection) are for crash/field-level
+  verdicts only. If a frozen expectation for a -debug run is ever needed, it
+  must be frozen from a -debug run.
+- Two misleading dead ends already explored: it is NOT the debugger's
+  different initial-RAM fill pattern (real, but game clears RAM first), and
+  NOT a lost frame at the initial debugger halt.
+
+Also paid in the same session, worth remembering: in MAME debugger
+expressions, bare hex like `d0` parses as the **register** D0 — always write
+breakpoint/watchpoint addresses with an explicit `0x` prefix
+(`bpset 0xd0`). Symptom: the breakpoint silently never fires (or fires
+somewhere bizarre) for addresses that look like register names.
+
+## Cross-emulator replays: same inputs ≠ same content (paid: 2026-07-25, ~2h)
+
+The MAME↔FBNeo frame offset (a few frames at boot) does more than shift
+frame indices — near any screen transition it changes WHICH content runs.
+Three measured mechanisms, all found while validating `tools/compare_fields.py`:
+
+1. **CPU-chosen opponents differ.** `02_demitri_vs_cpu` picks opponent 0x0E
+   on MAME and 0x0A on FBNeo: the coin lands at a different attract-PRNG
+   state. Any "vs CPU" replay has emulator-divergent content — dual-emulator
+   comparisons must use replays where BOTH characters are scripted picks.
+2. **Menu presses near an input-accept boundary.** In `03_two_player_vs`,
+   S2 pressed 30 frames after S1 (frames 830-833) joins P2 on MAME but NOT
+   on FBNeo (boundary measured between 830 and 836) — FBNeo then runs a
+   1P-vs-CPU game and every downstream state differs. P2's input path itself
+   is fine (verified with a P2-only replay: bit-identical behavior).
+3. **Match-start predicate flickers.** The naive anchor predicate
+   (match-active flags + full HP) is transiently true during round intros;
+   `compare_fields.py` debounces 30 frames before accepting an anchor.
+
+Even with matched content and a 1-frame anchor skew, anim-cursor-derived
+fields (anim ptr, box ids) and mid-intro positions differ by a few frames of
+phase slip — the tests/fields_m2a.tsv `phase` column (stable/settled/phase)
+encodes what is comparable when.
+
+**Authoring rules for dual-emulator replays** (see `16_xemu_2p.rpl`, the
+validated template): both characters scripted; menu presses ≥100 frames
+after the enabling transition and ≥10 frames from any expected boundary;
+cursor moves short (3 frames, no autorepeat ambiguity) on long-stable
+screens; input-neutral after the picks. Within-emulator oracles are
+unaffected (whole-RAM frame-exact remains the standard there).

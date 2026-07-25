@@ -14,6 +14,7 @@ RPL="$(cd "$(dirname "$RPL")" && pwd)/$(basename "$RPL")"
 OUT_DIR="$(cd "$(dirname "$OUT")" && pwd)"; OUT="$OUT_DIR/$(basename "$OUT")"
 
 WORK="${SANDBOX:-$(mktemp -d)}"
+mkdir -p "$WORK"
 REPLAY="$RPL" CHECKSUM_OUT="$OUT" MAME_SANDBOX="$WORK" \
     "$REPO/tools/run_mame.sh" "$SET" \
     -autoboot_script "$REPO/tests/lua/replay.lua" > "$WORK/mame_replay.log" 2>&1 \

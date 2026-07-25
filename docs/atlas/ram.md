@@ -23,7 +23,7 @@ the runner knows which builds legitimately change attract.)
 |---|---|---|
 | `RAM:$FF8004.l` / `$FF8008.l` | match-active check: both == 0x40000 → in-match (alt: $FF8008.w==2 && $FF800A.w>0) | [C] |
 | `RAM:$FF0CC9` | EEPROM-derived bootup-count byte (differs per boot count; the FBNeo determinism bug tell) | [D] |
-| `RAM:$FF811B` | P1 select-screen cursor slot (changes by ±1 per cursor step) | [D] |
+| `RAM:$FF811B` | P1 select-screen cursor slot (changes by ±1 per cursor step) — CAUTION: also observed oscillating every few frames during select (session 3 comparator work); prefer player block +0x382, which tracks the hovered character id live during select | [D] |
 | `RAM:$FF8203` | P1 match-config byte, char-correlated but NOT the char ID (00 Demitri / 02 Victor / 02 Bulleta) | [D] |
 | `RAM:$FF8290` | screen left edge (camera) | [C] |
 | `RAM:$FF8109` | round timer (counts down ~1/sec during match) | [D] |
@@ -38,7 +38,7 @@ is 0x400 bytes; combat struct at +0x000, further state above +0x100.
 
 | Extended-block offset | Meaning | Evidence |
 |---|---|---|
-| +0x382 (`$FF8782`/`$FF8B82`) | selected character ID (write 0x18 = Oboro Bishamon — TCRF cheat) | [C:tcrf, D] |
+| +0x382 (`$FF8782`/`$FF8B82`) | selected character ID (write 0x18 = Oboro Bishamon — TCRF cheat). Updates live with the hovered slot during character select (verified: P2 cursor R,R = 0x05→0x01→0x03 on both emulators); a not-joined side shows a different block signature entirely | [C:tcrf, D] |
 | +0x392.w (`$FF8792`) | special-meter gauge CANDIDATE (steps 0→0x500→0x1400 while attacking; semantics unconfirmed) | [D] |
 
 ## Combat struct (player block +0x000) [C, verified D/T]

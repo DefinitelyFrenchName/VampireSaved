@@ -1,0 +1,42 @@
+# fields_m2a.tsv — mapped gameplay fields compared at sync anchors
+# (CLAUDE.md §4 dual-emulator protocol; sources: docs/atlas/ram.md).
+# Columns: name <TAB> base <TAB> addr <TAB> width <TAB> phase <TAB> note
+#   base:  abs (addr = absolute RAM address) | p1 ($FF8400 + addr) | p2 ($FF8800 + addr)
+#   width: 1 | 2 | 4 bytes, big-endian (68k logical)
+#   phase: stable  = compare at every follow offset (identity/stat fields)
+#          settled = compare only at offsets >= --settle (default 120): valid
+#                    once the round has settled into neutral idle — during the
+#                    intro these are mid-animation and legitimately differ
+#                    cross-emulator by a few frames of phase slip
+#          phase   = anim-cursor-derived; compared only in --exact mode
+#                    (same-emulator frame-aligned runs)
+# Reviewable data, not code (CLAUDE.md rule 5). The anchor predicate itself
+# ($FF8004.l==$FF8008.l==0x40000, both HP==0x120, debounced 30 frames) is
+# documented in tools/compare_fields.py.
+timer	abs	0xFF8109	1	stable	round timer
+p1_char_id	p1	0x382	1	stable	selected character ID
+p2_char_id	p2	0x382	1	stable	selected character ID
+p1_hp	p1	0x50	2	stable	current HP (0x120 at round start)
+p2_hp	p2	0x50	2	stable	current HP
+p1_white_hp	p1	0x52	2	stable	white/displayed HP
+p2_white_hp	p2	0x52	2	stable	white HP
+p1_hitbox_base	p1	0x60	4	stable	per-character hitbox data base (ROM ptr)
+p2_hitbox_base	p2	0x60	4	stable	hitbox base
+p1_ptr64	p1	0x64	4	stable	per-character ptr (table PRG:0x0BD9FA)
+p2_ptr64	p2	0x64	4	stable	per-character ptr
+p1_word132	p1	0x132	2	stable	per-character word (table PRG:0x0BE17A)
+p2_word132	p2	0x132	2	stable	per-character word
+p1_x	p1	0x10	2	settled	X position (start position once idle)
+p2_x	p2	0x10	2	settled	X position
+p1_y	p1	0x14	2	settled	Y position
+p2_y	p2	0x14	2	settled	Y position
+p1_attack_id	p1	0x0A	1	settled	attack id (0 in neutral)
+p2_attack_id	p2	0x0A	1	settled	attack id
+p1_flip	p1	0x0B	1	settled	facing
+p2_flip	p2	0x0B	1	settled	facing
+p1_anim_ptr	p1	0x1C	4	phase	anim script cursor
+p2_anim_ptr	p2	0x1C	4	phase	anim script cursor
+p1_box_ids	p1	0x94	4	phase	current box ids (from anim frame)
+p2_box_ids	p2	0x94	4	phase	box ids
+p1_throw_box	p1	0x98	1	phase	throw box id
+p2_throw_box	p2	0x98	1	phase	throw box id
