@@ -74,17 +74,37 @@ against the table (tools/pick_probe.sh). 0x09 is the only unclaimed
 character (Aulbath) in the only unclaimed slot; one targeted pick can
 close it formally.
 
-## Cross-set slot correspondence (hitbox-blob similarity, coarse)
+## THE PORTED THREE — located (2026-07-25, pick-verified on vsav2)
 
-vsavj[k] ≈ vsav2[k] for k ∈ {0,1,2,3,4,6,8,9,10,11,12,13,14} (diagonal
-dominant). vsav2 slots {5,7,15} are NOT well-claimed by any vsavj slot —
-candidate homes of the three newcomers (Donovan / Huitzil / Pyron). Note
-the similarity metric is coarse (vsavj 5=Morrigan, 7=Felicia, 15=Jedah are
-definitely *in* VS2's lineage, so if {5,7,15} really are D/H/P in vsav2,
-Capcom re-slotted those three veterans elsewhere or dropped them — VS2's
-roster history says Morrigan stayed, so treat ALL of this as UNCONFIRMED
-until the vsav2 naming runs; the select-flow probes for vsav2 are the next
-mapping step).
+The newcomers live in the **variant half** of the ID space, as directly
+selectable wheel entries:
+
+| Character | Char ID | vsav2 hitbox base | vhunt2 hitbox base |
+|---|---|---|---|
+| **Huitzil (Phobos)** | `0x10` (variant of slot 0/Bulleta) | `PRG:0x0C4370` | `PRG:0x0C3C02` |
+| **Pyron** | `0x11` (variant of slot 1/Demitri) | `PRG:0x0C75FE` | `PRG:0x0C6E90` |
+| **Donovan** | `0x13` (variant of slot 3/Victor) | `PRG:0x0C8DF8` | `PRG:0x0C868A` |
+
+Every table in the per-character bank indexes them with these same IDs —
+so "where does Donovan's <table-thing> live" is now `table[0x13]` in each
+set's bank. Per-slot pointed-to data is byte-identical between vsav2 and
+vhunt2 (hitbox tables verified); pointers differ by a constant-ish shift.
+
+Remaining variant slots in vsav2/vhunt2: `0x18` (Oboro Bishamon, matching
+vsavj) and `0x19` (occupant unnamed — variant of slot 9; check next).
+Open question for the Start-hold flavor mechanism: the VS2-vs-VH2
+*behavioral* differences for D/H/P are NOT in the hitbox data (identical
+across both games) — the flavor toggle must select different rows in other
+tables (movesets/frame data) or different code paths; locate in M1 wrap-up
+or M2.
+
+## Cross-set slot correspondence (verified)
+
+Base-half slot assignments are IDENTICAL across the series where the
+character exists: verified by picks — vsav2 slot 0 = Bulleta, 1 = Demitri,
+3 = Victor, 8 = Bishamon (+ diagonal blob similarity for the rest). The
+earlier "vsav2 {5,7,15} unclaimed" reading was similarity-metric noise —
+the newcomers are in variant space, not replacing anyone.
 
 ## Why this matters for the port
 

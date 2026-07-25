@@ -33,10 +33,11 @@ M1 — Map. **Harness half done; mapping half in progress.**
   (pick + snapshot + pointer readback). Variant slots: vsavj {8}=Oboro
   Bishamon; vsav2/vhunt2 {0,1,3,8,9} with per-slot hitbox data
   byte-identical between vsav2 and vhunt2 (both games carry both flavors).
-  vsav2 slots {5,7,15} unclaimed by any vsavj slot — candidate homes of
-  Donovan/Huitzil/Pyron (naming runs on vsav2 pending).
   **vsavj slot→character map COMPLETE** (16/16, one by elimination).
-  Full detail: docs/atlas/character_tables.md.
+  **DONOVAN/HUITZIL/PYRON LOCATED** (pick-verified on vsav2): char IDs
+  0x13/0x10/0x11 — the variant half of slots 3/0/1 — with hitbox bases in
+  both vsav2 and vhunt2 recorded. Base-half slot assignments are identical
+  across the whole series. Full detail: docs/atlas/character_tables.md.
 - Three-way diff: window/masked diff built (`tools/diff_sets.py`);
   **finding:** vsavj↔vsav2 share <10% at window level even pointer-masked —
   engines were rebuilt (shifted code, changed PC-relative displacements) and

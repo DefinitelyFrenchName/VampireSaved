@@ -13,6 +13,7 @@ verified where noted), [D] differential dump experiment, [T] write-trace,
 | `RAM:$FF811B` | P1 select-screen cursor slot (changes by ±1 per cursor step) | [D] |
 | `RAM:$FF8203` | P1 match-config byte, char-correlated but NOT the char ID (00 Demitri / 02 Victor / 02 Bulleta) | [D] |
 | `RAM:$FF8290` | screen left edge (camera) | [C] |
+| `RAM:$FF8109` | round timer (counts down ~1/sec during match) | [D] |
 | `RAM:$FF05xx` | sound-driver work area (differs between MAME/FBNeo boot phase) | [D] |
 
 ## Player structs — P1 `$FF8400`, P2 `$FF8500` (0x100 apart) [C, verified D/T]
@@ -21,7 +22,11 @@ verified where noted), [D] differential dump experiment, [T] write-trace,
 |---|---|---|
 | +0x0B | flip_x (facing) | [C] |
 | +0x0A | attack id (shift 5 for hitbox lookup) | [C] |
+| +0x10.w | X position (signed) | [C: script default, matches update_object] |
+| +0x14.w | Y position (signed) | [C] |
 | +0x1C | anim ptr | [C] |
+| +0x50.w | current HP (round start = 0x120 = 288) | [D] |
+| +0x52.w | white/displayed HP (regenerating damage) | [D] |
 | +0x60.l | per-character hitbox data base (ROM ptr; Demitri 0x93B6A, Victor 0x9769E) | [T,D] |
 | +0x64.l | per-character ptr from table PRG:0x0BD9FA | [T] |
 | +0x80/84/88/8C/90.l | hitbox addr tables: base + word offsets base[0..8] (push=+0x90, vuln=+0x80/84/88, attack=+0x8C) | [C,T] |
