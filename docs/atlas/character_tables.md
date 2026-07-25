@@ -108,11 +108,53 @@ by the system blitter at `PRG:0x000EF2` (`move.l (a0)+,(a1); or.l
 #$F000F000` — sets full brightness, and **feeds the CPS2 encryption
 watchdog inline**: `cmpi.l #$726A4BAF,d0` lives inside this loop). Fixed
 system pages upload from `PRG:0x38C2A0`/`0x3D7E58` (callers
-`0x000EA8-0x000EE8` → pages `0x90C800/CC00/D000/D400`); a fade adjuster at
-`PRG:0x014034` steps brightness in place. The **per-character sprite
-palette source is still open** — next step: watch `0x90C000,0x800,w`
-during frames 1700-2700 of a pick (character-load window) with
-boot/fade/system-blitter PCs filtered.
+`0x000EA8-0x000EE8` → pages `0x90C800/CC00/D000/D400`).
+
+**Per-character sprite palettes (traced):** four ROM palette-source
+pointer slots at `A5+0x7404/0x7408/0x740C/0x7410` (A5 = CPS driver work
+base). The scheduler at `PRG:0x0142C2` copies from those sources into
+palette RAM `0x90C000/C400/C800/CC00` each frame through the fade-in-place
+loop `PRG:0x014034` (via a per-object RAM work buffer, e.g. `RAM:$FF033C`,
+so brightness ramps). A5 = `RAM:$FF8000` (resolved), so these slots are `RAM:$FFF404..0xFFF410`;
+their Demitri values (`0x3A3400/0x3C03C8/0x3D15F0/0x3DE258`) are
+**stage/system pages, character-independent** (identical for Demitri and
+Victor on the same stage). **Per-character SPRITE palettes are separate:**
+confirming Demitri with button 1 vs button 2 changes palette RAM at rows
+`0x90C140-0x90C1A0` (4 sprite palettes), so a character's own palette rides
+its **sprite object's palette bank** (keyed to the sprite set), not a flat
+indexable ROM table like hitbox/anim. Manifest fact established (palette =
+per-character sprite-palette bank, 4×16-color, confirm-button selects the
+color variant); the exact ROM address binds to the sprite set and is
+resolved during sprite porting (M2/M4), not a standalone table lookup.
+
+### Sprites / tiles / sound — pipelines mapped, addresses sprite-bound
+
+**Animation → sprites → tiles chain (decoded):** per-char anim index table
+(§ above) → word offsets → anim scripts → each frame carries a 24-bit ROM
+pointer (e.g. Demitri anim[0] frame → `PRG:0x134B0A`) to a sprite/OBJ
+sub-table → CPS2 OBJ output at `RAM:$708000+` (8-byte entries: X.w, Y.w,
+**tile#.w (16-bit)**, attr.w). Demitri's live tiles cluster ~`0xA3F0-0xA540`.
+
+**R2 (tile index space) — quantified finding:** the OBJ hardware tile field
+is **16-bit** (max 65536 tiles), but the vsav GFX ROM is 32MB ≈ 2^18-2^19
+tiles — so 16 bits cannot address the whole GFX space directly. This is
+almost certainly *the* wall that forced Capcom's two-game split (SPEC §2's
+"graphics address-space ceiling"), now seen concretely. Resolution hinges
+on how the extra high bits are supplied: CPS2 OBJ `attr` high bits and/or a
+gfx bank base. **Concrete next R2 step:** decode the `attr` word bitfield
+(palette / flip / **tile high bits or bank**) from the OBJ emit code, and
+determine whether frame tile#s are per-character-relative (→ port = copy
+tiles to new gfx space + set base; no index surgery) or absolute (→ harder).
+This is the single most important open item for M3 (ROM expansion) and is
+flagged as the R2 deliverable.
+
+**Sound cues (traced):** attacks emit QSound commands via `PRG:0x003190`
+(→ QSound port `0x61800F-0x618019`) and `PRG:0x003140` (→ `0x618001-9`);
+timing verified (voice cues fire exactly on button-press frames). The cue
+ring lives at `RAM:$FF0E0E` (A5-0x71F2); per-character voice sample IDs are
+triggered from the move/anim code. Manifest fact established (sound = per-
+character QSound sample set, triggered by anim/move events); exact per-
+character sample-table ROM address is QSound-bank work for M5.
 
 ### Ported-three handler code (bank[0] rows; the "code" manifest entry)
 

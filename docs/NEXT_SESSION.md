@@ -1,40 +1,43 @@
 # NEXT_SESSION — 60-second orientation (rewritten every session end)
 
-As of 2026-07-25, end of session 3.
+As of 2026-07-25, end of session 3. **M1 ACCEPTED.**
 
-**Where we are:** M1 nearly complete. Harness: done (both emulators,
-deterministic, 10-replay suite green/frozen). Mapping: the character-data
-system is cracked wide open —
+**Where we are:** M0 + M1 complete. Harness (both emulators, deterministic,
+10-replay suite green/frozen) and the full character-data map are done. See
+`docs/M1_acceptance.md` for the clause-by-clause sign-off.
 
-- vsavj slot→character map **16/16 pick-verified** (incl. Aulbath L,L,D).
-- **Donovan 0x13 / Pyron 0x11 / Huitzil 0x10** pick-verified in BOTH vsav2
-  and vhunt2 (variant-half IDs, selectable on the wheel; hitbox bases and
-  bank[0] handler code addresses recorded per set).
-- Per-character table bank semantically labeled (14 dispatch tables +
-  hitbox pairs for player/projectile paths + parameter tables); bank
-  layout identical across the three sets (same deltas from per-set origin).
-- RAM atlas solid: player blocks 0x400 apart (P1 $FF8400 / P2 $FF8800 —
-  the 0x100 spacing belief was WRONG, see corrected ram.md), select char
-  IDs at +0x382, HP +0x50/+0x52 (max 0x120), X/Y +0x10/+0x14, timer
-  $FF8109, meter candidate $FF8792.
+**What's solid:**
+- vsavj slot→character map 16/16 pick-verified.
+- Donovan 0x13 / Pyron 0x11 / Huitzil 0x10 pick-verified in BOTH vsav2 and
+  vhunt2; handler code, anim bases, hitbox bases recorded per set.
+- Per-character table bank labeled; layout identical across all 3 sets.
+- Pipelines mapped end-to-end: code, animation, sprite/tile chain, palette,
+  sound — all in docs/atlas/character_tables.md + ram.md.
+- **R2 quantified:** CPS2 OBJ tile field is 16-bit; GFX needs 18-19 bit —
+  the real graphics ceiling. Top technical risk; first M3 investigation.
 
-**M1 acceptance gaps (the remaining work):**
-1. **Animation scripts: DONE** (per-char anim bases in all three sets,
-   newcomers' data regions bounded — character_tables.md).
-2. **Tile ranges**: decode one anim script (Demitri, vsavj `0x12C2FE`) to
-   find sprite/tile id fields; check index widths (R2 risk).
-3. **Palettes**: per-character sprite palette source still open — method
-   and filtered-PC list ready (character_tables.md palette section).
-4. **Sound cues**: trace QSound command writes (`0x618xxx`) during a move.
-5. Variant space: DONE (newcomers 0x10/0x11/0x13 + two Oboros 0x18/0x19;
-   Start-hold claim NOT reproduced — flagged to maintainer in STATE).
-6. Confirm meter semantics; rounds-won location.
+**Two things waiting on the maintainer (neither blocks M2 prep):**
+1. **M2 replaced-slot sign-off.** Recommendation: **replace Jedah (slot
+   0x0F)** — footprint fits Donovan (+660 B headroom), boss character so
+   least playtest disruption, keeps Demitri/Victor (harness controls). Full
+   size table in STATE.md decisions-pending.
+2. **SPEC §2 Start-hold fact** — did not reproduce in vsav2; flagged for
+   community check (STATE.md). Since vsav2≡vhunt2 data is byte-identical,
+   the VS2-vs-VH2 variant policy may simplify.
 
-**Then M1 exit review** against SPEC §4 acceptance, and on to M2: Donovan
-into vsavj by slot replacement — the located tables + bank layout make the
-injection points obvious (replace a vsavj slot's rows across the bank,
-inject handler code + data, then reconciliation begins).
+**M2 plan (make-or-break milestone):** make Donovan selectable in vsavj by
+replacing the chosen slot across the table bank — swap that slot's rows
+(hitbox base, +0x64/+0x132, code dispatch, anim base) to point at Donovan's
+data, inject his data blobs (from vsav2, since data ≡ vhunt2) into free ROM
+that doesn't move legacy content, decrypt/re-encrypt the program changes via
+tools/cps2_decrypt.py, build via the manifest pipeline. Acceptance: full
+Donovan matches + ALL legacy replays still bit-identical (superset
+invariant) + crash-free soak. This is where reconciliation (R1) gets real —
+VS2 data on the vsavj engine may hit rule deltas; the harness surfaces them.
 
-**Read:** STATE.md, docs/atlas/character_tables.md, docs/atlas/ram.md,
-docs/GOTCHAS.md. All tools/tests self-documenting; suite:
-`ROMDIR=... tests/run_suite.sh`.
+**First M3 task (parked):** decode the OBJ `attr` bitfield to learn how tile
+high bits / bank are supplied and whether frame tile#s are per-character-
+relative — determines M3 difficulty.
+
+**Read:** docs/M1_acceptance.md, STATE.md, docs/atlas/character_tables.md,
+docs/atlas/ram.md, docs/GOTCHAS.md.

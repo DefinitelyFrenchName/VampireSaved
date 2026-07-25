@@ -66,8 +66,10 @@ before session end (persistent suite doctrine, CLAUDE.md §4).
 | Watchpoint write-tracer | `tests/lua/trace_writes.lua` (needs `-debug -debugger none`) |
 | Pick probe (slot mapping) | `tools/pick_probe.sh` |
 | Structural diff | `tools/diff_sets.py` (`--mask-pointers`) |
-| Character tables atlas | `docs/atlas/character_tables.md` (3-set anchor, vsavj slot map complete) |
+| Character tables atlas | `docs/atlas/character_tables.md` (3-set anchor, slot maps, D/H/P located, pipelines) |
 | RAM atlas | `docs/atlas/ram.md` |
+| M1 acceptance review | `docs/M1_acceptance.md` (both clauses met; R2 quantified) |
+| Write/read tracer | `tests/lua/trace_writes.lua` (WATCH=addr,len[,r|w|rw]) |
 
 ## Key findings so far
 
