@@ -35,6 +35,8 @@
 --   STACK <sp8> <val8>            (up to 16 ROM-plausible return addresses)
 --   PCWEEDS <frame> <pc6>         (max 10, then suppressed)
 --   SOFTRESET <frame> <val8>
+--   PROBE <frame> D0=.. D1=.. A0=.. A6=.. RET <sp0.l>   (GUARD_PROBE hits;
+--                                 non-fatal, run continues; PROBE-CAP at 400)
 -- and finally "END <n>" (clean) or "END-CRASH <frame>" (crashed).
 
 local replay_path = assert(os.getenv("REPLAY"), "set REPLAY to the input script path")
@@ -251,6 +253,22 @@ if debugger and break_addr then
     debugger:command(string.format("bpset 0x%x", break_addr))
 end
 
+-- GUARD_PROBE="hexaddr": conditional LOGGING breakpoint — on each hit write
+--   PROBE <frame> D0=<v> D1=<v> A0=<v> A6=<v> RET <(SP)>
+-- and CONTINUE (unlike GUARD_BREAK, which reports and exits). Optional
+-- GUARD_PROBE_COND holds a raw debugger condition (e.g. "a0==0xe2830").
+-- Capped at 400 hits (then the bp is cleared and a PROBE-CAP line written).
+local probe_addr = tonumber(os.getenv("GUARD_PROBE") or "", 16)
+local probe_cond = os.getenv("GUARD_PROBE_COND")
+local probe_hits, PROBE_MAX = 0, 400
+if debugger and probe_addr then
+    if probe_cond and #probe_cond > 0 then
+        debugger:command(string.format("bpset 0x%x,%s", probe_addr, probe_cond))
+    else
+        debugger:command(string.format("bpset 0x%x", probe_addr))
+    end
+end
+
 if debugger then
     emu.register_periodic(function()
         if crashed then return end
@@ -259,6 +277,26 @@ if debugger then
             local vec = handler_vec[pc]
             if vec then
                 on_crash(vec)
+            elseif probe_addr and pc == probe_addr then
+                local st = cpu.state
+                local sp = (st["A7"] or st["SP"]).value
+                f:write(string.format(
+                    "PROBE %d D0=%08x D1=%08x A0=%08x A6=%08x RET %08x\n",
+                    frame, st["D0"].value, st["D1"].value,
+                    st["A0"].value, st["A6"].value, program:read_u32(sp)))
+                probe_hits = probe_hits + 1
+                if probe_hits >= PROBE_MAX then
+                    debugger:command("bpclear")
+                    -- re-arm the crash + break breakpoints the clear removed
+                    for h in pairs(handler_vec) do
+                        debugger:command(string.format("bpset 0x%x", h))
+                    end
+                    if break_addr then
+                        debugger:command(string.format("bpset 0x%x", break_addr))
+                    end
+                    f:write("PROBE-CAP\n")
+                end
+                debugger.execution_state = "run"
             elseif break_addr and pc == break_addr then
                 if frame > 100 then  -- ignore the boot-time pass
                     on_crash(99)

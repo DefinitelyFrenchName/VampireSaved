@@ -6,6 +6,8 @@
 #   env GUARD_DEBUG=0     cheap mode (no -debug); default 1 = authoritative
 #   env CRASH_VECTORS / CODE_RANGES / GUARD_MATCH / DUMPS / SNAP_FRAMES /
 #       TAIL_FRAMES / MAME_ROMPATH pass through to the guard / runner.
+#   env GUARD_PROBE=hexaddr [GUARD_PROBE_COND=expr]  logging breakpoint:
+#       PROBE lines in the log (regs + return addr), run continues.
 #
 # Exit 0 only if the log ends with a clean "END " line AND contains no
 # CRASH/PCWEEDS/SOFTRESET/END-CRASH lines. The log is the bug report.

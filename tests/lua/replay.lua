@@ -12,6 +12,10 @@
 --                     at end of frame N, dump the RAM range to
 --                     <dir of CHECKSUM_OUT>/dump_<frame>_<start>.bin
 --                     (differential RE experiments)
+--   env MASK_RANGES   optional "7f00-7ff0" (offsets from $FF0000, end
+--                     exclusive): exclude window(s) from the checksum.
+--                     Unset = canonical whole-work-RAM checksum (matches
+--                     all frozen expectations). Analysis use only.
 --
 -- Replay script format (tests/replays/*.rpl), line-oriented:
 --   # comment / blank lines ignored
@@ -133,6 +137,35 @@ local program = cpu.spaces["program"]
 local f = assert(io.open(out_path, "wb"))
 local frame = 0
 
+-- MASK_RANGES (opt-in, e.g. "7f00-7ff0"): exclude work-RAM windows (offsets
+-- from $FF0000, end exclusive) from the checksum. Default (unset) is the
+-- canonical whole-work-RAM checksum — bit-identical to all frozen
+-- expectations. Used for the dead-stack-window analysis (docs/GOTCHAS.md:
+-- engine hooks skew interrupt timing; ghost bytes below resting SP differ).
+local mask_ranges = {}
+for a, b in (os.getenv("MASK_RANGES") or ""):gmatch("(%x+)%-(%x+)") do
+    mask_ranges[#mask_ranges + 1] = { tonumber(a, 16), tonumber(b, 16) }
+end
+table.sort(mask_ranges, function(x, y) return x[1] < y[1] end)
+
+local function read_workram_masked()
+    if #mask_ranges == 0 then
+        return program:read_range(0xff0000, 0xffffff, 8)
+    end
+    local parts, pos = {}, 0x0000
+    for _, r in ipairs(mask_ranges) do
+        if r[1] > pos then
+            parts[#parts + 1] = program:read_range(0xff0000 + pos,
+                                                   0xff0000 + r[1] - 1, 8)
+        end
+        pos = r[2]
+    end
+    if pos <= 0xFFFF then
+        parts[#parts + 1] = program:read_range(0xff0000 + pos, 0xffffff, 8)
+    end
+    return table.concat(parts)
+end
+
 local FNV_PRIME = 0x100000001b3
 local function fnv1a64(s)
     local h = 0xcbf29ce484222325
@@ -157,7 +190,7 @@ emu.register_frame_done(function()
     frame = frame + 1
 
     -- checksum first: state at END of frame N
-    f:write(string.format("%d %016x\n", frame, fnv1a64(program:read_range(0xff0000, 0xffffff, 8))))
+    f:write(string.format("%d %016x\n", frame, fnv1a64(read_workram_masked())))
     if snap_at[frame] then manager.machine.video:snapshot() end
     for _, range in ipairs(dump_at[frame] or {}) do
         local df = assert(io.open(string.format("%s/dump_%d_%06x.bin", out_dir, frame, range[1]), "wb"))
