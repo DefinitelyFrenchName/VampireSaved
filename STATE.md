@@ -2,7 +2,41 @@
 
 Updated: 2026-07-25 (session 6 end — M2a stage 4: char-init COMPLETES,
 match runs; frontier = anim state-index delta at frame 3025)
-last frontier = companion-code zone under-extraction, see NEXT_SESSION)
+
+## Sessions 5-6 highlights (M2a stage 4 — the port runs)
+
+- **Companion (Anita) chain decoded end-to-end**: pool geometries are
+  identical per-index in both games; allocator family mapped (never
+  ported — it reads the game's own RAM bookkeeping); creation handler's
+  anim-table pointer was the last unrelocated piece; class-7 (vs2-only
+  update queue) remapped to vsavj's equivalent class.
+- **New extraction capabilities** (all in `tools/extract_char.py`):
+  data-kind extra roots with forced twins; *segmented* gap-tolerant
+  oracle diff (resyncs after cross-game insertions — Anita's 44.2K asset
+  region: 2065 pointer fields over 75 segments); self-pointer
+  classification for micro-shifted multi-blob regions; chunk-BFS graph
+  sizing before committing space; PC-relative word-table discovery with
+  full-extent protection.
+- **New generator capabilities** (`tools/gen_donovan_patch.py`): layout
+  groups (PC-referencing families keep source-relative spacing, gaps
+  recycled), near_map satellite placement within d16, pcrel entry
+  rewrites with shared per-region tripwires, slot-clearing allocator
+  wrappers, port_patch byte edits, stage-1 scaffolding gated to stages
+  1-3.
+- **SPACE BUDGET CLOSED**: ~335K placed of 336.6K free (hole A ~1.4K
+  spare, hole B ~12.9K). Achieved by honest region bounding, porting only
+  Donovan's own sub-object handler types (others tripwired), and tighter
+  margins.
+- **Result**: char-init completes, match runs (timer, CPU opponent, HP
+  structs). Crash frontier moved 2886 → 3025.
+- **Frontier**: vec3 at engine 0x015096 — the anim word table is
+  byte-identical to native vsav2 (data+relocation correct) but the INDEX
+  into it is wrong; a state/substate byte carries a vs2-flavored value.
+  Full detail + next probe: docs/tables/reconciliation.md "Session 6",
+  docs/NEXT_SESSION.md.
+- **GOTCHAS paid**: PC-relative reads are decrypted reads on CPS-2;
+  PC-relative word tables are DATA (a fused pair of word entries was
+  silently corrupting a dispatch table).
 
 ## Session 4 highlights (M2a — the real Donovan port)
 
@@ -49,10 +83,9 @@ last frontier = companion-code zone under-extraction, see NEXT_SESSION)
   engine hooks live (extended type-dispatch tables 59→76 and 114→124,
   jsr-thunk pattern; vanilla rows byte-identical). **Donovan RUNS on the
   vsavj engine** (match, timer, CPU opponent, HP structs, guard clean,
-  screenshot in scratch) — remaining: he idles/is unhittable because the
-  companion (Anita) spawn chain fails: the ported VS2 init hook speaks
-  VS2's pool/node protocol; vsavj's consumer (0x0155D0 family) differs.
-  Frontier detail: docs/tables/reconciliation.md "OPEN FRONTIER".
+  screenshot in scratch). [Superseded by sessions 5-6 above: the companion
+  chain is decoded and the port fits; see that section for the current
+  frontier.]
 - Suite GREEN, 13 replays (added 11_pick_donovan, 12_donovan_vs_cpu
   moveset-exercise, 16_xemu_2p; vanilla expectations + full logs frozen).
 - **Next actions (stage 4 close):**
@@ -97,9 +130,11 @@ last frontier = companion-code zone under-extraction, see NEXT_SESSION)
 - Feasibility assessed (docs/M2_feasibility.md): behavior data portable via
   ~337KB free vsavj space + data-reads-bypass-encryption; sprite tiles are
   the R2 wall (may pull M3 forward); QSound = M5.
-- **Next:** author the real Donovan port — extract his program-ROM data from
-  vsav2, relocate into vsavj free space, repoint all slot-0x0F bank entries,
-  re-encrypt his code, resolve R1 engine-delta. Then M2b graphics.
+- **M2a IN PROGRESS (sessions 4-6, see highlights above):** extraction,
+  generation and relocation tooling complete; stages 1-3 PASS; stage 4
+  runs a live match with Donovan's ported code/data. Remaining for stage
+  4: one state-index delta (docs/NEXT_SESSION.md), then the stage-4
+  gates. Then stage 5 (select plumbing) and M2b graphics.
 
 ### M1 — Map. ACCEPTED (2026-07-25).
 Both SPEC §4 clauses met; full assessment in docs/M1_acceptance.md.

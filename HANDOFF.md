@@ -7,8 +7,8 @@ same commit as anything it describes.
 
 | Piece | Where | Status |
 |---|---|---|
-| Reference sets | `$ROMDIR` (../ROMS, outside repo) | audited clean; **vsav2.zip missing** (see STATE) |
-| Frozen checksum manifest | `docs/checksums.txt` | 55 members, per-file SHA-1 |
+| Reference sets | `$ROMDIR` (../ROMS, outside repo) | audited clean; all 6 zips present (vsav, vsavj, vsav2, vhunt2, vhunt2r1, qsound_hle) |
+| Frozen checksum manifest | `docs/checksums.txt` | 76 members, per-file SHA-1 |
 | ROM audit tool | `tools/audit_roms.py <romdir>` | verify vs manifest; `--freeze` to re-freeze |
 | CPS-2 decrypt/encrypt | `tools/cps2_decrypt.py` | bit-identical to MAME oracle (both directions self-checked) |
 | Null-patch builder | `tools/build_rom.py <romdir> <out.zip>` | deterministic, bit-identical vsavj |
@@ -16,7 +16,7 @@ same commit as anything it describes.
 | MAME headless runner | `tools/run_mame.sh <set> [args]` | MAME 0.288 (brew), fresh sandbox per run |
 | Attract determinism | `tests/test_attract_determinism.sh` | PASS 3600 frames |
 | Decrypt oracle test | `tests/test_decrypt_oracle.sh` | PASS (python == MAME opcode space) |
-| FBNeo | `emu/fbneo` submodule + `tools/run_fbneo.sh` | built (SDL2), headless smoke PASS; no scripting in SDL2 frontend — RAM-checksum hook is the M1 harness patch |
+| FBNeo | `emu/fbneo` submodule + `tools/run_fbneo.sh` | built (SDL2), headless smoke PASS; harness patch applied (`-hinput/-hout/-hframes/-hdump`), loads CRC-changed patched zips |
 
 FBNeo build: `(cd emu/fbneo && make sdl2 SKIPDEPEND=1 -j8)` — `SKIPDEPEND=1`
 is mandatory (docs/GOTCHAS.md). Needs brew `sdl2`(-compat) + `sdl2_image`.
@@ -76,6 +76,41 @@ before session end (persistent suite doctrine, CLAUDE.md §4).
 | M2 repoint proof | `tests/test_m2_repoint.sh` (mechanism + superset invariant) |
 
 Run a patched build: `MAME_ROMPATH="<packed_dir>;$ROMDIR" tools/run_mame.sh vsavj ...`
+
+
+## M2a port pipeline (2026-07-25, sessions 4-6) — how to build/debug Donovan
+
+```sh
+export ROMDIR=/path/to/reference/sets
+# full chain: audit -> extract (vhunt2 oracle) -> generate -> patch -> pack
+GEN_FLAGS="--allow-plausible --tripwire-open" tools/build_donovan.sh 4 build/donovan
+# run it (guarded: exception breakpoints + register dump at fault)
+MAME_ROMPATH="$PWD/build/donovan/rompath;$ROMDIR" \
+  tools/run_replay_guarded.sh vsavj tests/replays/12_donovan_vs_cpu.rpl out.log box
+```
+
+Stages: 1 null-relocation scaffolding, 2 passive data, 3 anim + sprite
+sub-tables, 4 code + support zones + engine hooks, 5 select plumbing.
+Stage gates: `tests/test_m2a_stage{1,2,3}*.sh` (all PASS).
+
+| Piece | Where | Role |
+|---|---|---|
+| Extractor | `tools/extract_char.py` | vsav2→vsavj extraction, **vhunt2 as correctness oracle**: every cross-sibling diff byte must classify as a pointer field under a measured shift. Handles: transitive closure, auto-discovered region shifts, extra roots (`addr:len[:tTWIN[:d]|:s]`), segmented gap-tolerant diff, self-pointer regions, PC-relative word tables |
+| Ref scanner | `tools/scan_code_refs.py` | 68k operand triage (abs.l after known opcodes, bare longs, char-id immediates) |
+| R1 resolver | `tools/reconcile_batch.py` | batch vsav2→vsavj engine mapping: pattern ladder, stub-deref, call-site anchoring, code/data byte match, farm-param matching |
+| Single lookup | `tools/find_equiv.py` | one wildcarded pattern search (validated at 1.00 on the known loader) |
+| Generator | `tools/gen_donovan_patch.py` | staged op-list: hole allocator + layout groups + near_map, pointer/pcrel rewriting, bank repoints (0x0F **and** 0x1F), engine hooks, alloc wrappers, tripwires |
+| Driver | `tools/build_donovan.sh` | the whole chain; `EXTRA_ROOTS` / `GEN_FLAGS` override |
+| Manifests | `build/manifest/{bank_map,donovan,reconciliation}.toml` | table map / port config (holes, groups, hooks, patches) / R1 map |
+
+**Debug env** (all on `run_replay_guarded.sh`): `GUARD_DEBUG=0` cheap mode
+(canonical checksums), `GUARD_TRACE=a-b` instruction trace,
+`GUARD_PC_LOG=a-b` per-frame PC, `GUARD_BREAK=hexaddr` break+report,
+`GUARD_MATCH=a-b` in-match flag watch. Faults log `CRASH` + `REGS` +
+`STACK` lines and dump work RAM.
+
+**Ground truth for behavior**: native Donovan on vsav2 — pick with cursor
+**R×2** from the default select position.
 
 ## M2a C0 additions (2026-07-25, session 4) — verification harness upgrade
 

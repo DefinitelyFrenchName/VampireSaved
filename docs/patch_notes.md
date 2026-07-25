@@ -97,3 +97,42 @@ Allocator-family mapping corrected: vsav2 pool helpers 0x15702/0x1572E map
 to vsavj 0x016FBA/0x016FE6 (never ported — they read the game's own RAM
 bookkeeping; see reconciliation.md). Frontier: the companion spawn-node
 protocol (docs/tables/reconciliation.md OPEN FRONTIER).
+
+### Stage 4 progress — sessions 5-6
+
+Session 5 (companion chain + space):
+- Anita's asset graph (44.2K at vsav2 0x2B8060, vhunt2 twin 0x2A4504)
+  ported as a self-pointer data region via the segmented oracle diff:
+  2065 pointer fields rewritten across 75 segments; 21K of unaligned
+  dead zones carried raw.
+- Class registration: her vs2-only update class remapped to vsavj's
+  equivalent (`[[port_patch]]` 0x0E→0x0C on the ported blob, old bytes
+  verified at generation).
+- Space closed at ~335K/336.6K: stage-1 scaffolding gated to stages 1-3;
+  hitbox_proj honestly bounded (0x1000; the old 0x435A was a next-ptr
+  fallback artifact); only Donovan's own sub-object handler types ported
+  (the other 13 belong to Huitzil/Pyron and stay TRIPWIRED); aux0 tail
+  margins 0x400→0x180; per-region hole hints.
+
+Session 6 (PC-relative correctness — the big one):
+- Brief-format `(d8,PC,Xn)` dispatch tables inside ported code are now
+  discovered, length-bounded by the smallest forward displacement, and
+  their FULL extent recorded as DATA so the bare-long relocation
+  heuristic can never rewrite them. A fused pair of word entries
+  (`0006 0068` read as pointer 0x60068) had been silently corrupting a
+  dispatch table — the crash surfaced two states later, far from the
+  damage. See docs/GOTCHAS.md.
+- Escaping table entries and direct `(d16,PC)` escapes are rewritten as
+  displacements against real placement; unresolved targets route to a
+  shared per-region ILLEGAL tripwire, gap-fitted within d16 reach.
+- `[[layout_group]]` (PC-referencing region families keep source-relative
+  spacing, inter-region gaps recycled by the allocator) and `near_map`
+  (satellite region placed within d16 of its anchor).
+- Slot-clearing allocator wrappers: ported code assumes virgin pool slots
+  (vs2 spawns before any recycling); ours are dirty. The wrapper
+  zero-fills the 0x80-byte slot preserving the category byte at +8, and
+  wraps ONLY Donovan's allocation calls — vanilla allocations untouched.
+- Result: character init COMPLETES and the match runs; crash frontier
+  2886 → 3025. Remaining: one anim state-index delta (the table is
+  byte-identical to native vsav2; the index into it is vs2-flavored).
+  Legacy suite GREEN (13 replays) throughout.
