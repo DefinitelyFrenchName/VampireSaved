@@ -74,10 +74,19 @@ legacy behavior is a failed change.
   FBNeo and (b) the hacked set on patched FBNeo, checksumming work RAM every
   frame. Legacy-content replays must match for the full script length. First
   divergent frame + RAM diff is the standard bug report format.
-- **Dual-emulator agreement:** for new-character content (no vanilla oracle
-  exists), the same replay is run on patched FBNeo and patched MAME; the two
-  must agree frame-by-frame. A bug would have to manifest identically in two
-  unrelated codebases to slip through.
+- **Dual-emulator agreement (amended 2026-07-25, maintainer-approved):** for
+  new-character content (no vanilla oracle exists), the same replay is run on
+  patched FBNeo and patched MAME and the two must agree on **mapped gameplay
+  state compared at sync anchors** (match start, round transitions):
+  character IDs, HP, positions, timer, meter, and the other fields in
+  `docs/atlas/ram.md` — not whole-work-RAM checksums frame-by-frame.
+  Rationale (measured, session 2): the emulators traverse identical states
+  on slightly different frame indices after boot, so frame-exact whole-RAM
+  equality is unachievable between codebases; field-level agreement at
+  anchors preserves the original intent — a bug would still have to manifest
+  identically in two unrelated codebases to slip through. Whole-RAM
+  frame-exact checksums remain the standard **within** each emulator
+  (vanilla-vs-patched superset oracle, run-to-run determinism).
 - **Test matrix growth:** every new capability adds replays. Minimum coverage
   for a ported character: vs each of the 18 (both sides), each stage, Dark
   Force activation/expiry, life-marker transition, timeout, throw/tech

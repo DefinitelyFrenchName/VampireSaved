@@ -81,6 +81,10 @@ opcode-space dump oracle (`tests/test_decrypt_oracle.sh`). Both directions
 
 ## Decisions made
 
+- **CLAUDE.md §4 dual-emulator amendment** — 2026-07-25, maintainer:
+  new-content cross-emulator verification is field-level at sync anchors
+  (mapped gameplay state), not whole-RAM frame-exact; within-emulator
+  oracles stay whole-RAM frame-exact. Text updated in CLAUDE.md §4.
 - **Project name = "Vampire Saved"** — 2026-07-25, maintainer.
 - **Base revision = `vsavj` (Japan 970519)** — 2026-07-24, maintainer. Closed.
 - **Checksum manifest is per-member**, so zip repackaging never matters —
