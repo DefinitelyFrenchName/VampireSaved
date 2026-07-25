@@ -50,3 +50,111 @@ m2a_legacy_gate() {
         gate_fail=1
     fi
 }
+
+# ── Masked legacy gate (CLAUDE.md §4 amendment, 2026-07-25) ──────────────────
+# For builds carrying ENGINE HOOKS: legacy comparison is live-RAM — all work
+# RAM except the two windows documented in docs/atlas/ram.md (dead stack
+# $FF7F00-$FF7FFF at frame-done + QSound handshake latch $FF043C).
+# v2 semantics (measured session 7 extension; maintainer sign-off pending,
+# STATE.md): per-replay comparison classes against FROZEN masked vanilla logs:
+#   exact    02/05/07 + attract/pick diverge-constants: bit-identical
+#   flicker  03/10/16: isolated <=2-frame divergent stretches that fully
+#            re-converge (tools/compare_flicker.py, ground-truthed) — the
+#            input-accept/spawn boundary phase artifact
+#   diverge  06_test_mode: first divergence exactly at the TS press (700);
+#            service-mode code reads the phase-shifted QSound latch and the
+#            offset propagates (persistent, benign, hook-caused — stage-3
+#            hook-free builds run 06 bit-identical)
+# Hook-free builds keep m2a_legacy_gate (unmasked) above.
+M2A_MASK="043c-043d,7f00-8000"
+M2A_MASKED_EXP="tests/expected/vsavj/masked"   # relative to $REPO
+M2A_MASKED_EXACT="02_demitri_vs_cpu 05_timeout_idle 07_mash_storm"
+M2A_MASKED_FLICKER="03_two_player_vs 10_midattract_start 16_xemu_2p"
+M2A_TESTMODE_DIVERGE=700                       # 06: the TS-press frame
+M2A_PICK_DIVERGE_MASKED=1080                   # select-screen anim hover
+
+# m2a_run_masked <rompath> <replay.rpl> <out.log> <sandbox>
+m2a_run_masked() {
+    MASK_RANGES="$M2A_MASK" MAME_ROMPATH="$1" \
+        "$REPO/tools/run_replay_mame.sh" vsavj "$2" "$3" "$4"
+}
+
+# m2a_first_divergence <log_a> <log_b> — prints first differing frame or NONE
+m2a_first_divergence() {
+    python3 - "$1" "$2" <<'PYEOF'
+import sys
+a = open(sys.argv[1]).read().splitlines()
+b = open(sys.argv[2]).read().splitlines()
+print(next((x.split()[0] for x, y in zip(a, b) if x != y), "NONE"))
+PYEOF
+}
+
+# m2a_legacy_gate_masked <rompath> <workdir> — full legacy set against the
+# frozen masked vanilla logs (freeze with m2a_freeze_masked). gate_fail=1
+# on failure.
+m2a_legacy_gate_masked() {
+    _mg_rp="$1"; _mg_w="$2"
+    _mg_exp="$REPO/$M2A_MASKED_EXP"
+    gate_fail=0
+    [ -d "$_mg_exp/logs" ] || { echo "FAIL: no frozen masked logs at $_mg_exp (run m2a_freeze_masked)"; gate_fail=1; return; }
+    for _mg_r in $M2A_MASKED_EXACT; do
+        m2a_run_masked "$_mg_rp" "$REPO/tests/replays/$_mg_r.rpl" \
+            "$_mg_w/$_mg_r.log" "$_mg_w/${_mg_r}box"
+        if cmp -s "$_mg_exp/logs/$_mg_r.log" "$_mg_w/$_mg_r.log"; then
+            echo "  ok: $_mg_r masked bit-identical"
+        else
+            echo "FAIL: $_mg_r masked live-state diverged"; gate_fail=1
+        fi
+    done
+    for _mg_r in $M2A_MASKED_FLICKER; do
+        m2a_run_masked "$_mg_rp" "$REPO/tests/replays/$_mg_r.rpl" \
+            "$_mg_w/$_mg_r.log" "$_mg_w/${_mg_r}box"
+        _mg_v=$(python3 "$REPO/tools/compare_flicker.py" \
+            "$_mg_exp/logs/$_mg_r.log" "$_mg_w/$_mg_r.log") \
+            && echo "  ok: $_mg_r masked ${_mg_v}" \
+            || { echo "FAIL: $_mg_r masked: $_mg_v"; gate_fail=1; }
+    done
+    m2a_run_masked "$_mg_rp" "$REPO/tests/replays/06_test_mode.rpl" \
+        "$_mg_w/06_test_mode.log" "$_mg_w/06box"
+    _mg_div=$(m2a_first_divergence "$_mg_exp/logs/06_test_mode.log" \
+        "$_mg_w/06_test_mode.log")
+    if [ "$_mg_div" = "$M2A_TESTMODE_DIVERGE" ]; then
+        echo "  ok: 06_test_mode masked first-divergence exactly $M2A_TESTMODE_DIVERGE (TS press; latch-phase propagation)"
+    else
+        echo "FAIL: 06_test_mode masked first-divergence $_mg_div (expected $M2A_TESTMODE_DIVERGE)"; gate_fail=1
+    fi
+    m2a_run_masked "$_mg_rp" "$REPO/tests/replays/01_attract_long.rpl" \
+        "$_mg_w/01_attract_long.log" "$_mg_w/01box"
+    _mg_div=$(m2a_first_divergence "$_mg_exp/logs/01_attract_long.log" \
+        "$_mg_w/01_attract_long.log")
+    if [ "$_mg_div" = "$M2A_ATTRACT_DIVERGE" ]; then
+        echo "  ok: attract masked first-divergence exactly $M2A_ATTRACT_DIVERGE (Jedah demo)"
+    else
+        echo "FAIL: attract masked first-divergence $_mg_div (expected $M2A_ATTRACT_DIVERGE)"; gate_fail=1
+    fi
+    m2a_run_masked "$_mg_rp" "$REPO/tests/replays/11_pick_donovan.rpl" \
+        "$_mg_w/11_pick_donovan.log" "$_mg_w/11box"
+    _mg_div=$(m2a_first_divergence "$_mg_exp/logs/11_pick_donovan.log" \
+        "$_mg_w/11_pick_donovan.log")
+    if [ "$_mg_div" = "$M2A_PICK_DIVERGE_MASKED" ]; then
+        echo "  ok: pick masked first-divergence exactly $M2A_PICK_DIVERGE_MASKED (anim hover)"
+    else
+        echo "FAIL: pick masked first-divergence $_mg_div (expected $M2A_PICK_DIVERGE_MASKED)"; gate_fail=1
+    fi
+}
+
+# m2a_freeze_masked <workdir> — one-time: freeze masked VANILLA logs for the
+# whole legacy set (+ sha1s for quick reference). Record the freeze in
+# STATE.md. Deterministic and re-derivable from $ROMDIR.
+m2a_freeze_masked() {
+    _mf_w="$1"
+    _mf_exp="$REPO/$M2A_MASKED_EXP"
+    mkdir -p "$_mf_exp/logs"
+    for _mf_r in $M2A_EXACT_REPLAYS 01_attract_long 11_pick_donovan; do
+        m2a_run_masked "$ROMDIR" "$REPO/tests/replays/$_mf_r.rpl" \
+            "$_mf_w/$_mf_r.log" "$_mf_w/${_mf_r}box"
+        cp "$_mf_w/$_mf_r.log" "$_mf_exp/logs/$_mf_r.log"
+        shasum "$_mf_w/$_mf_r.log" | cut -d' ' -f1 > "$_mf_exp/$_mf_r.sha1"
+        echo "froze $_mf_r (log + sha1)"
+    done
+}

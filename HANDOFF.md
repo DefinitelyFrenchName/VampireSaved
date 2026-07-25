@@ -44,6 +44,9 @@ tests/test_decrypt_oracle.sh          # decryption == MAME's, both byte orders s
 tests/test_null_build.sh              # null build bit-identical + deterministic
 tests/test_attract_determinism.sh     # 60s attract, per-frame RAM checksums, 2 runs
 tests/test_fbneo_smoke.sh             # FBNeo headless boot + 15s crash-free soak
+tests/test_m2a_stage4_code.sh         # stage-4 gate: veto lock + guarded moveset
+                                      # + masked legacy gate (amended §4 basis;
+                                      # frozen masked exps in tests/expected/vsavj/masked/)
 ```
 
 All tests are self-contained, take state only via env/args, print PASS/FAIL,
@@ -130,6 +133,7 @@ canonical whole-RAM checksums, bit-identical to frozen expectations.
 | Auto-detecting suite runner | `tests/run_suite.sh` — `MAME_ROMPATH` fronting, fingerprint → `tests/expected/<expset>/`, `.diverge` expectation kind (exact-frame divergence vs frozen full logs under `expected/<set>/logs/`) |
 | Fingerprint / registry | `tools/build_fingerprint.py`, `tests/expected/registry.tsv` (rows only at freeze time, STATE.md decision) |
 | Diverge checker | `tools/check_diverge.py` |
+| Flicker comparator (hooked-build legacy gate v2) | `tools/compare_flicker.py` + ground truth `tests/test_compare_flicker.sh`; frozen masked vanilla logs `tests/expected/vsavj/masked/` |
 | Dispatch ground truth | `tests/test_suite_dispatch.sh` (no emulator; fast) |
 | FBNeo runner extensions | `tools/run_replay_fbneo.sh`: `FBNEO_DUMPS` (-hdump), `FBNEO_ROMPATH` zip overlay — **verified to load CRC-changed patched zips** |
 

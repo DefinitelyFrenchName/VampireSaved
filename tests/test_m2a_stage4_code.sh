@@ -8,18 +8,14 @@
 #      extract log reports a nonzero veto count.
 #   2. Bring-up: the full 12_donovan_vs_cpu moveset replay (9320 frames)
 #      runs END-clean under the -debug crash guard — no crash, no tripwire.
-#   3. Superset invariant, live state: with the two measured cycle-skew
-#      windows masked (dead stack $FF7F00-$FF7FFF at frame-done + QSound
-#      handshake latch $FF043C — see GOTCHAS "Engine hooks on hot paths"),
-#      02_demitri_vs_cpu is bit-identical to vanilla FULL LENGTH and
-#      attract first diverges exactly at 4278 (the Jedah demo). Masked
-#      equality is also the confinement proof: every byte outside the two
-#      windows is compared on every frame.
-#      NOTE: the whole-RAM (unmasked) comparison basis for hooked builds is
-#      a pending maintainer decision (STATE.md); this gate locks the
-#      measured facts without weakening any frozen expectation.
-#   4. Pick divergence: 11_pick_donovan first diverges from frozen vanilla
-#      at exactly 1080 (select-screen anim hover — stage-3 constant).
+#   3. Superset invariant per the amended CLAUDE.md §4 (masked live-RAM,
+#      maintainer-approved 2026-07-25) with the v2 per-replay classes
+#      (provisional, maintainer sign-off pending — STATE.md):
+#      m2a_legacy_gate_masked runs the full legacy set against frozen
+#      masked vanilla logs — 02/05/07 exact; 03/10/16 flicker-tolerated
+#      (tools/compare_flicker.py, ground-truthed); 06 first-divergence
+#      exactly 700 (TS press; latch-phase propagation into service mode);
+#      attract exactly 4278 (Jedah demo); pick exactly 1080 (anim hover).
 #
 # Usage: ROMDIR=... tests/test_m2a_stage4_code.sh [outbase]
 set -eu
@@ -33,7 +29,6 @@ cd "$REPO"
 . "$REPO/tests/lib/m2a_common.sh"
 
 fail=0
-MASK="043c-043d,7f00-8000"
 
 echo "== build stage 4 =="
 mkdir -p "$OUTBASE"
@@ -69,52 +64,8 @@ else
     cat "$WORK/12_guard.out"; fail=1
 fi
 
-echo "== 3. legacy live-state (masked: dead stack + QSound latch) =="
-for r in 02_demitri_vs_cpu; do
-    MASK_RANGES="$MASK" MAME_ROMPATH="$ROMDIR" tools/run_replay_mame.sh vsavj \
-        "tests/replays/$r.rpl" "$WORK/${r}_van.log" "$WORK/${r}_vanbox"
-    MASK_RANGES="$MASK" MAME_ROMPATH="$RP" tools/run_replay_mame.sh vsavj \
-        "tests/replays/$r.rpl" "$WORK/${r}_pat.log" "$WORK/${r}_patbox"
-    if cmp -s "$WORK/${r}_van.log" "$WORK/${r}_pat.log"; then
-        echo "  ok: $r masked bit-identical full length"
-    else
-        echo "FAIL: $r masked live-state diverged"; fail=1
-    fi
-done
-MASK_RANGES="$MASK" MAME_ROMPATH="$ROMDIR" tools/run_replay_mame.sh vsavj \
-    tests/replays/01_attract_long.rpl "$WORK/att_van.log" "$WORK/att_vanbox"
-MASK_RANGES="$MASK" MAME_ROMPATH="$RP" tools/run_replay_mame.sh vsavj \
-    tests/replays/01_attract_long.rpl "$WORK/att_pat.log" "$WORK/att_patbox"
-att_div=$(python3 - "$WORK/att_van.log" "$WORK/att_pat.log" <<'EOF'
-import sys
-van = open(sys.argv[1]).read().splitlines()
-pat = open(sys.argv[2]).read().splitlines()
-print(next((a.split()[0] for a, b in zip(van, pat) if a != b), "NONE"))
-EOF
-)
-if [ "$att_div" = "4278" ]; then
-    echo "  ok: attract masked first-divergence exactly 4278 (Jedah demo)"
-else
-    echo "FAIL: attract masked first-divergence $att_div (expected 4278)"; fail=1
-fi
-
-echo "== 4. pick divergence (masked live-state; ghost bytes appear from"
-echo "      menu-time object dispatch, so the unmasked constant is void) =="
-MASK_RANGES="$MASK" MAME_ROMPATH="$ROMDIR" tools/run_replay_mame.sh vsavj \
-    tests/replays/11_pick_donovan.rpl "$WORK/pick_van.log" "$WORK/pick_vanbox"
-MASK_RANGES="$MASK" MAME_ROMPATH="$RP" tools/run_replay_mame.sh vsavj \
-    tests/replays/11_pick_donovan.rpl "$WORK/pick.log" "$WORK/pickbox"
-pick_div=$(python3 - "$WORK/pick_van.log" "$WORK/pick.log" <<'EOF'
-import sys
-van = open(sys.argv[1]).read().splitlines()
-pat = open(sys.argv[2]).read().splitlines()
-print(next((a.split()[0] for a, b in zip(van, pat) if a != b), "NONE"))
-EOF
-)
-if [ "$pick_div" = "1080" ]; then
-    echo "  ok: pick replay masked first-divergence exactly 1080 (anim hover)"
-else
-    echo "FAIL: pick masked first-divergence $pick_div (expected 1080)"; fail=1
-fi
+echo "== 3. legacy gate, amended §4 basis (masked live-RAM, frozen expectations) =="
+m2a_legacy_gate_masked "$RP" "$WORK"
+[ "$gate_fail" = 0 ] || fail=1
 
 [ "$fail" = 0 ] && echo "PASS: M2a stage-4 code gate" || { echo "FAIL: M2a stage-4 code gate"; exit 1; }

@@ -1,46 +1,53 @@
 # NEXT_SESSION — 60-second orientation (rewritten every session end)
 
-As of 2026-07-25, end of session 7. **M2a stage-4 bring-up is DONE: the
-full Donovan moveset replay (9320 frames) runs END-clean under the crash
-guard. Stage-4 acceptance is blocked on ONE maintainer decision.**
+As of 2026-07-25, end of session 7 (extended). **M2a stage-4 bring-up is
+DONE. The maintainer approved the live-RAM masked basis (CLAUDE.md §4
+amended, v1). Widening the gate to all 9 legacy replays then measured two
+more hook-artifact classes, so a v2 refinement (flicker tolerance for
+03/10/16 + a test-mode diverge constant for 06) is implemented
+provisionally and AWAITS MAINTAINER SIGN-OFF — STATE.md "Decisions
+pending", first item. The full stage-4 gate is green under v2.**
 
-**What closed the session-6 frontier:** the "anim state-index delta" was
-never a state-space delta — the extractor's bare-long heuristic had fused
-instruction operand pairs into fake pointers (47 of them across the two
-source-only zones) and one rewrite destroyed the `moveq #0,d0` anim-state
-reset. Fixed with a sibling-veto (vhunt2 context match) + immediate-load
-labels in scan_code_refs. New instruments that did the work:
-`GUARD_PROBE`/`GUARD_PROBE_COND` (conditional logging breakpoint) and
-`MASK_RANGES` on replay.lua. Full story: docs/GOTCHAS.md (2 new entries),
-docs/tables/reconciliation.md "Session 7".
+**What happened this session:** (1) the session-6 "anim state-index delta"
+was extraction corruption — the bare-long heuristic fused instruction
+operand pairs into fake pointers; fixed with a vhunt2 sibling-veto +
+immediate-load labels; the full 9320-frame moveset replay runs END-clean.
+(2) Stage-4 legacy gates measured honestly: engine hooks cost cycles →
+interrupt-skew ghosts (dead stack $FF7F00-$FF7FFF) + QSound latch $FF043C
+phase — live state proven bit-identical with exactly those masked.
+(3) Maintainer approved the live-RAM basis; §4 amended (v1); windows
+documented in docs/atlas/ram.md; masked vanilla logs FROZEN under
+`tests/expected/vsavj/masked/` (determinism re-verified at freeze); gate
+helper `m2a_legacy_gate_masked` (v2 classes: exact 02/05/07;
+flicker-tolerated 03/10/16 via ground-truthed `tools/compare_flicker.py`;
+06 diverge@700 = TS press, latch-phase propagation — hook-caused, proven
+by hook-free stage-3 builds running 06 bit-identical);
+`tests/test_m2a_stage4_code.sh` runs the whole stage-4 gate.
 
-**THE PENDING DECISION (STATE.md "Decisions pending", first item):**
-engine hooks cost cycles → interrupt-timing skew → two divergence windows
-in otherwise-vanilla content: dead-stack bytes $FF7F00-$FF7FFF and the
-QSound handshake latch $FF043C (one-frame phase). Measured: with exactly
-those masked, 02 is bit-identical to vanilla FULL LENGTH and attract
-diverges at exactly 4278 (Jedah demo). Zero-cycle hooks are impossible
-(GOTCHAS). The maintainer must pick the legacy-gate comparison basis for
-hooked builds (recommendation: live-RAM with the two named windows masked
-+ confinement lock). Until then stage 4 is unaccepted but fully working.
+**FIRST ACTION NEXT SESSION: get the v2 sign-off (or strict-v1 fallback:
+drop 03/06/10/16 from the hooked legacy set), then update CLAUDE.md §4
+text accordingly.**
 
-**Gate:** `tests/test_m2a_stage4_code.sh` — build + veto fact-lock +
-guarded moveset clean + masked legacy (02 identical, attract 4278) + pick
-diverge 1080. Run it first if anything seems off.
+**NEXT WORK (stage-4 close, then stage 5):**
+1. **vsav2-as-oracle behavior gate:** field-level compare at sync anchors
+   (docs/atlas/ram.md fields, `tools/compare_fields.py`) between ported
+   Donovan on vsavj and native Donovan on vsav2 (pick = cursor **R×2**
+   from default). HP-decrease sanity in a real exchange.
+2. **Dual-emulator gate:** a Donovan replay in the 16_xemu_2p authoring
+   pattern (both picks scripted, GOTCHAS rules) on MAME + FBNeo.
+3. Then stage 5: select-screen plumbing (aux pokes), soak, freeze
+   (registry row + suite masked-expectation kind land at the freeze).
+4. Stage-5 close-out items parked: 0x36784A alternate anim table
+   (tripwire or port; branch currently unreachable — spawn sub byte
+   always 0), Huitzil/Pyron extra handler types stay tripwired.
 
-**Small open item:** the companion tail's alternate anim table
-(`movea.l #$36784A,A0`, taken when spawn-record sub byte ≠ 0 — Donovan's
-hook always writes sub=0; branch never taken in the moveset replay).
-Unrelocated on purpose; plant a tripwire or port it at stage-5 close-out
-(reconciliation.md Session 7, "Open").
+**Watch for:** the community answer on the SPEC §2 Start-hold question
+(maintainer says imminent) — fold into the variant-policy pending items
+(STATE.md) when it lands.
 
-**After the decision:** remaining stage-4 behavior gates (vsav2-as-oracle
-field compare at anchors — native Donovan pick on vsav2 = cursor R×2;
-dual-emulator agreement on 16_xemu_2p-pattern replay), then stage 5
-(select plumbing aux pokes), soak, freeze.
+**Build/debug one-liners:** HANDOFF.md M2a section (probe: GUARD_PROBE /
+GUARD_PROBE_COND; masks: MASK_RANGES — unset = canonical).
 
-**Build/debug one-liners:** unchanged — HANDOFF.md M2a section.
-
-**Read:** STATE.md (session 7 highlights + the pending decision),
-docs/GOTCHAS.md (7 entries; the last two are this session's),
-docs/tables/reconciliation.md ("Session 7"), docs/patch_notes.md (top).
+**Read:** STATE.md (session-7 highlights; Decisions made — the new
+amendment entry), docs/GOTCHAS.md (7 entries), docs/tables/
+reconciliation.md "Session 7", docs/patch_notes.md (top).

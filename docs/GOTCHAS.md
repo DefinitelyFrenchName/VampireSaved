@@ -208,8 +208,10 @@ jumps back to it) eliminates that source; the interrupt-skew ghosts remain.
 Zero-cycle table extension was investigated and is IMPOSSIBLE here: the
 brief-format dispatch reaches only its inline table, and the code following
 both tables is hot engine code with short branches — not relocatable
-cycle-exactly. Consequence: the legacy gate's comparison basis for hooked
-builds is a maintainer decision (STATE.md, decisions pending).
+cycle-exactly. RESOLVED 2026-07-25 (maintainer-approved CLAUDE.md §4
+amendment): hooked-build legacy comparison is live-RAM with exactly these
+two windows masked (docs/atlas/ram.md); frozen masked vanilla expectations
+live in tests/expected/vsavj/masked/, gate helper `m2a_legacy_gate_masked`.
 
 ## PC-relative word tables are DATA — never let a pointer heuristic rewrite them (paid: 2026-07-25, ~1h)
 
