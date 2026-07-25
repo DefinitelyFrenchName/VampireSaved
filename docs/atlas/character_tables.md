@@ -246,3 +246,33 @@ The equivalent tables in vsav2/vhunt2 directly index Donovan/Huitzil/Pyron's
 hitbox and character data. Diffing per-slot pointer *targets* across sets
 (vsav2 slot k data vs vhunt2 slot k data) will produce the per-character
 data manifests (M1 acceptance) without blind ROM diffing.
+
+## M2a extraction findings (session 4, oracle-validated)
+
+`tools/extract_char.py` (vsav2 source, vhunt2 oracle) closed Donovan's full
+program-ROM footprint — see docs/tables/donovan.md for the manifest. Atlas
+facts established in the process:
+
+- **Sprite/OBJ sub-table region located** (the anim→sprite chain's next
+  link): Donovan's 24-bit frame pointers target `PRG:0x334B80-0x360404`
+  (vsav2), shifting by **−0x2002C** to vhunt2 — a distinct region family
+  from anim (−0x13B74). 1088 distinct sub-tables in 5 clusters; leaf data
+  (no further pointers).
+- **Anim region measured**: Donovan `PRG:0x27F548+0x20F00` (135KB — the
+  earlier ~110-125KB estimate was close). Index tables a/b/c/proj at
+  0x27F548/0x28709C/0x287192/0x289EF6 all point inside it.
+- **Projectile-path hitbox data is a separate area**: Donovan proj base
+  `PRG:0x0D0CA8`, comp `0x0D1002` (bank shift family), ~0x435A span —
+  distinct from the player-path block at 0x0C8BB8.
+- **Newcomer dispatch structure**: only bank[0]'s slot-0x13 entry
+  (0x05AE20) is Donovan-unique; dispatch 01-13 target shared newcomer stubs
+  (0x0594xx-0x05ADxx, several tables aliasing one stub). The shared stubs
+  sit below his unique handler inside one contiguous code region
+  (0x059490+0x3200).
+- **Bank gap tables classified by oracle** (docs/tables/donovan.md): most
+  are per-char value tables; `0x0BE27A`/`0x0BE2BA` are pointer tables;
+  `0x0BCEFA`/`0x0BD7FA` remain unresolved (need consumer disasm).
+- **Donovan's code references the bank neighborhood** at vsav2
+  `0x0D609E`/`0x0D8398` — below/above bank[0], mapping to vsavj by the bank
+  delta rule if the neighborhood layout matches (verify at patch
+  generation).

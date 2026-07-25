@@ -47,3 +47,4 @@ re/ghidra/*
 
 # ── Exceptions: savestates/replays that tests depend on are force-added ──────
 # (git add -f, per CLAUDE.md savestate hygiene; no blanket un-ignore here)
+build/donovan/

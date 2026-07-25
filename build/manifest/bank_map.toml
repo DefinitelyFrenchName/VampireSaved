@@ -1,0 +1,397 @@
+# bank_map.toml — the per-character table bank, transcribed from
+# docs/atlas/character_tables.md (M1 consumer-site disassembly). This file is
+# the single source of truth for table addresses/kinds consumed by
+# tools/extract_char.py and tools/gen_donovan_patch.py.
+#
+# NEVER derive table addresses by scanning (docs/GOTCHAS.md: the fuzzy
+# address scanner misaligns by 0x10). Addresses here are vsavj; the other
+# sets are origin + (vsavj_addr - vsavj_origin) — internal deltas are
+# preserved across all three sets (verified M1).
+#
+# kind:
+#   code_ptr  long entries -> per-character 68k routines (repoint to
+#             relocated+re-encrypted code, or reconciled engine routine)
+#   data_ptr  long entries -> per-character data (seed for region extraction;
+#             repoint to relocated copy). 'region' groups seeds.
+#   value32/value16/value8  per-char VALUES (copy, never repoint)
+#   rec8      8 bytes per char (two longs read together; copy)
+#   byte2d    2D byte table, 'span' bytes total (0x1E per char); copy row
+#   auto      gap table with no documented consumer: extractor classifies
+#             from the vsav2<->vhunt2 oracle (byte-identical window = values;
+#             known-shift pointer deltas = pointers) and REPORTS; unresolved
+#             autos are surfaced, not silently skipped
+# stride: bytes from this table's base to the next table (entry width * 32
+#         unless byte2d). Entry addr for char c = base + c*stride/32 for
+#         uniform kinds (byte2d uses span/32 per row).
+#
+# Hard validation anchors (extractor asserts these, vsav2):
+#   dispatch_00[0x13] == 0x05AE20, hitbox_base[0x13] == 0x0C8DF8,
+#   anim_index_a[0x13] == 0x27F548  (docs/atlas/character_tables.md)
+
+[origins]
+vsavj = 0x0BD0FA
+vsav2 = 0x0D7298
+vhunt2 = 0x0D6B2A
+
+# ── anim tables (bank extends below bank[0]; true start 0x0BCE7A) ────────────
+[[table]]
+name = "anim_index_a"
+vsavj = 0x0BCE7A
+kind = "data_ptr"
+stride = 0x80
+region = "anim"
+
+[[table]]
+name = "gap_bcefa"
+vsavj = 0x0BCEFA
+kind = "auto"
+stride = 0x80
+
+[[table]]
+name = "anim_index_b"
+vsavj = 0x0BCF7A
+kind = "data_ptr"
+stride = 0x80
+region = "anim"
+
+[[table]]
+name = "anim_index_c"
+vsavj = 0x0BCFFA
+kind = "data_ptr"
+stride = 0x80
+region = "anim"
+
+[[table]]
+name = "anim_index_proj"
+vsavj = 0x0BD07A
+kind = "data_ptr"
+stride = 0x80
+region = "anim"
+
+# ── 14 code dispatch tables (bank +0x000..+0x700) ────────────────────────────
+[[table]]
+name = "dispatch_00"
+vsavj = 0x0BD0FA
+kind = "code_ptr"
+stride = 0x80
+
+[[table]]
+name = "dispatch_01"
+vsavj = 0x0BD17A
+kind = "code_ptr"
+stride = 0x80
+
+[[table]]
+name = "dispatch_02"
+vsavj = 0x0BD1FA
+kind = "code_ptr"
+stride = 0x80
+
+[[table]]
+name = "dispatch_03"
+vsavj = 0x0BD27A
+kind = "code_ptr"
+stride = 0x80
+
+[[table]]
+name = "dispatch_04"
+vsavj = 0x0BD2FA
+kind = "code_ptr"
+stride = 0x80
+
+[[table]]
+name = "dispatch_05"
+vsavj = 0x0BD37A
+kind = "code_ptr"
+stride = 0x80
+
+[[table]]
+name = "dispatch_06"
+vsavj = 0x0BD3FA
+kind = "code_ptr"
+stride = 0x80
+
+[[table]]
+name = "dispatch_07"
+vsavj = 0x0BD47A
+kind = "code_ptr"
+stride = 0x80
+
+[[table]]
+name = "dispatch_08"
+vsavj = 0x0BD4FA
+kind = "code_ptr"
+stride = 0x80
+
+[[table]]
+name = "dispatch_09"
+vsavj = 0x0BD57A
+kind = "code_ptr"
+stride = 0x80
+
+[[table]]
+name = "dispatch_10"
+vsavj = 0x0BD5FA
+kind = "code_ptr"
+stride = 0x80
+
+[[table]]
+name = "dispatch_11"
+vsavj = 0x0BD67A
+kind = "code_ptr"
+stride = 0x80
+
+[[table]]
+name = "dispatch_12"
+vsavj = 0x0BD6FA
+kind = "code_ptr"
+stride = 0x80
+
+[[table]]
+name = "dispatch_13"
+vsavj = 0x0BD77A
+kind = "code_ptr"
+stride = 0x80
+
+# ── params / hitbox / records ────────────────────────────────────────────────
+[[table]]
+name = "gap_bd7fa"
+vsavj = 0x0BD7FA
+kind = "auto"
+stride = 0x80
+
+[[table]]
+name = "param32_a"
+vsavj = 0x0BD87A
+kind = "value32"
+stride = 0x80
+
+[[table]]
+name = "gap_bd8fa"
+vsavj = 0x0BD8FA
+kind = "auto"
+stride = 0x80
+
+[[table]]
+name = "hitbox_base"
+vsavj = 0x0BD97A
+kind = "data_ptr"
+stride = 0x80
+region = "hitbox"
+
+[[table]]
+name = "hitbox_comp"
+vsavj = 0x0BD9FA
+kind = "data_ptr"
+stride = 0x80
+region = "hitbox"
+
+[[table]]
+name = "proj_hitbox_base"
+vsavj = 0x0BDA7A
+kind = "data_ptr"
+stride = 0x80
+region = "hitbox_proj"
+
+[[table]]
+name = "proj_hitbox_comp"
+vsavj = 0x0BDAFA
+kind = "data_ptr"
+stride = 0x80
+region = "hitbox_proj"
+
+[[table]]
+name = "rec8_a"
+vsavj = 0x0BDB7A
+kind = "rec8"
+stride = 0x100
+
+# ── the 0xBDC7A-0xBE0FA gap: no documented consumers; oracle-classify ────────
+[[table]]
+name = "gap_bdc7a"
+vsavj = 0x0BDC7A
+kind = "auto"
+stride = 0x80
+
+[[table]]
+name = "gap_bdcfa"
+vsavj = 0x0BDCFA
+kind = "auto"
+stride = 0x80
+
+[[table]]
+name = "gap_bdd7a"
+vsavj = 0x0BDD7A
+kind = "auto"
+stride = 0x80
+
+[[table]]
+name = "gap_bddfa"
+vsavj = 0x0BDDFA
+kind = "auto"
+stride = 0x80
+
+[[table]]
+name = "gap_bde7a"
+vsavj = 0x0BDE7A
+kind = "auto"
+stride = 0x80
+
+[[table]]
+name = "gap_bdefa"
+vsavj = 0x0BDEFA
+kind = "auto"
+stride = 0x80
+
+[[table]]
+name = "gap_bdf7a"
+vsavj = 0x0BDF7A
+kind = "auto"
+stride = 0x80
+
+[[table]]
+name = "gap_bdffa"
+vsavj = 0x0BDFFA
+kind = "auto"
+stride = 0x80
+
+[[table]]
+name = "gap_be07a"
+vsavj = 0x0BE07A
+kind = "auto"
+stride = 0x80
+
+[[table]]
+name = "gap_be0fa"
+vsavj = 0x0BE0FA
+kind = "auto"
+stride = 0x80
+
+# ── word tables (stride 0x40) ────────────────────────────────────────────────
+[[table]]
+name = "word132"
+vsavj = 0x0BE17A
+kind = "value16"
+stride = 0x40
+
+[[table]]
+name = "word_pos_a"
+vsavj = 0x0BE1BA
+kind = "value16"
+stride = 0x40
+
+[[table]]
+name = "word_pos_b"
+vsavj = 0x0BE1FA
+kind = "value16"
+stride = 0x40
+
+[[table]]
+name = "gap_be23a"
+vsavj = 0x0BE23A
+kind = "auto"
+stride = 0x40
+
+[[table]]
+name = "gap_be27a"
+vsavj = 0x0BE27A
+kind = "auto"
+stride = 0x40
+
+[[table]]
+name = "gap_be2ba"
+vsavj = 0x0BE2BA
+kind = "auto"
+stride = 0x40
+
+[[table]]
+name = "param32_b"
+vsavj = 0x0BE2FA
+kind = "value32"
+stride = 0x80
+
+[[table]]
+name = "gap_be37a"
+vsavj = 0x0BE37A
+kind = "auto"
+stride = 0x80
+
+[[table]]
+name = "rec8_b"
+vsavj = 0x0BE3FA
+kind = "rec8"
+stride = 0x100
+
+# ── the 0xBE4FA-0xBE7FA gap ──────────────────────────────────────────────────
+[[table]]
+name = "gap_be4fa"
+vsavj = 0x0BE4FA
+kind = "auto"
+stride = 0x80
+
+[[table]]
+name = "gap_be57a"
+vsavj = 0x0BE57A
+kind = "auto"
+stride = 0x80
+
+[[table]]
+name = "gap_be5fa"
+vsavj = 0x0BE5FA
+kind = "auto"
+stride = 0x80
+
+[[table]]
+name = "gap_be67a"
+vsavj = 0x0BE67A
+kind = "auto"
+stride = 0x80
+
+[[table]]
+name = "gap_be6fa"
+vsavj = 0x0BE6FA
+kind = "auto"
+stride = 0x80
+
+[[table]]
+name = "gap_be77a"
+vsavj = 0x0BE77A
+kind = "auto"
+stride = 0x80
+
+# ── tail words / bytes / 2D tables ───────────────────────────────────────────
+[[table]]
+name = "word_y_off"
+vsavj = 0x0BE7FA
+kind = "value16"
+stride = 0x40
+
+[[table]]
+name = "word_range"
+vsavj = 0x0BE83A
+kind = "value16"
+stride = 0x40
+
+[[table]]
+name = "byte15b"
+vsavj = 0x0BE87A
+kind = "value8"
+stride = 0x20
+
+[[table]]
+name = "byte2d_a"
+vsavj = 0x0BE89A
+kind = "byte2d"
+stride = 0x3C0
+span = 0x3C0
+
+[[table]]
+name = "byte2d_b"
+vsavj = 0x0BEC5A
+kind = "byte2d"
+stride = 0x3C0
+span = 0x3C0
+
+# NOTE: 0x0BF01A..0x0BF69A (between byte2d_b's end and the free-space hole)
+# is not yet mapped to char-indexed tables; the extractor reports whether it
+# differs per set so it can be triaged if it turns out to be char-indexed.
