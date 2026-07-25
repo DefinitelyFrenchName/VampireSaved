@@ -293,12 +293,12 @@ def main():
                 continue
             data = bytes.fromhex(v["value"])
             poke_bytes(a, data, f"{v['table']}[{dst_slot:#x}] value")
-            if mirror and t["kind"] != "byte2d":
+            # value-table variant rows are dead data in vanilla (variant ids
+            # resolve to base slots except 0x18), not aliases — poke
+            # unconditionally so any 5-bit-indexed path sees Donovan's value
+            if mirror:
                 av, _ = table_entry_addr(v["table"], var_slot)
-                if vj[av:av + es] == vj[a:a + es]:
-                    poke_bytes(av, data, f"{v['table']}[{var_slot:#x}] mirror")
-                else:
-                    fail.append(f"{v['table']}: variant row not vanilla-aliased")
+                poke_bytes(av, data, f"{v['table']}[{var_slot:#x}] mirror")
         # oracle-classified gap value tables
         for a_t in man["auto_tables"]:
             if a_t["verdict"] != "values":
@@ -311,10 +311,7 @@ def main():
             poke_bytes(a, data, f"{a_t['table']}[{dst_slot:#x}] gap value")
             if mirror:
                 av, _ = table_entry_addr(a_t["table"], var_slot)
-                if vj[av:av + es] == vj[a:a + es]:
-                    poke_bytes(av, data, f"{a_t['table']}[{var_slot:#x}] mirror")
-                else:
-                    fail.append(f"{a_t['table']}: variant row not vanilla-aliased")
+                poke_bytes(av, data, f"{a_t['table']}[{var_slot:#x}] mirror")
 
     if args.stage >= 4:
         for d in man["dispatch"]:
@@ -336,6 +333,12 @@ def main():
                          f" aux {p['name']}")
 
     # ── emit ─────────────────────────────────────────────────────────────────
+    placements = {name: {"dst": placed[name],
+                         "src": man["regions"][name]["src"],
+                         "len": man["regions"][name]["len"]}
+                  for name in placed}
+    (out / "placements.json").write_text(json.dumps(
+        {"stage": args.stage, "regions": placements}, indent=1))
     (out / "patch.json").write_text(json.dumps({"ops": ops}, indent=1))
     (out / "patch_notes_fragment.md").write_text(
         f"# donovan-m2 stage {args.stage} — generated op notes\n\n"

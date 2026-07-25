@@ -32,8 +32,10 @@ fail=0
 RELOC_BASE=000bf7a0      # hitbox_base[0x0F] after stage-1 relocation
 PICK_DIVERGE=2886        # first frame slot-0x0F pointer state hits RAM
 
-# --- build ---------------------------------------------------------------
-ROMDIR="$ROMDIR" "$REPO/tools/build_donovan.sh" 1 "$REPO/build/donovan" | tail -2
+# --- build (no pipe: a generator failure must abort the gate) ------------
+ROMDIR="$ROMDIR" "$REPO/tools/build_donovan.sh" 1 "$REPO/build/donovan" \
+    > "$WORK/build.log" 2>&1 || { tail -15 "$WORK/build.log"; exit 1; }
+tail -2 "$WORK/build.log"
 RP="$REPO/build/donovan/rompath;$ROMDIR"
 
 # --- 1. live effect ------------------------------------------------------

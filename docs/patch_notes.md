@@ -29,3 +29,17 @@ tooling, not R1). Gate: `tests/test_m2a_stage1_nullreloc.sh` (PASS).
   Build fingerprint `e5e3dc6a76a00cabd38fb3884ff5b160629fc118` (stage
   builds are ephemeral scaffolding — not registered in registry.tsv; only
   the stage-5 freeze registers).
+
+## donovan-m2 stage 2 — passive data (2026-07-25, session 4)
+
+Donovan's hitbox (0x25C2 @ relocated 0x0C1DE0) + projectile-hitbox (0x435A)
+blobs injected raw; all per-character value rows poked (params, rec8s,
+words, byte, byte2d rows + oracle-classified gap values), slot 0x0F AND
+variant row 0x1F (value-table variant rows are dead data in vanilla, poked
+unconditionally — the pointer-table alias assert stays). Hitbox pair
+repointed to the relocated blobs; Jedah code/anim retained (stage-1
+trampolines still on dispatch 00/01). Gate `tests/test_m2a_stage2_data.sh`
+PASS: relocated base+comp observed live at $FF8460/$FF8464, full round
+(pick to KO/timeout, 9300 frames) completes under guard, -debug window
+exception-free, legacy gate green, pick divergence still exactly 2886.
+Provenance: VS2. Build fingerprint 4cdf9be9b3b31fa4a26a281bf84f0ad775aac114.
