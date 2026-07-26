@@ -55,8 +55,8 @@ m2a_legacy_gate() {
 # For builds carrying ENGINE HOOKS: legacy comparison is live-RAM — all work
 # RAM except the two windows documented in docs/atlas/ram.md (dead stack
 # $FF7F00-$FF7FFF at frame-done + QSound handshake latch $FF043C).
-# v2 semantics (measured session 7 extension; maintainer sign-off pending,
-# STATE.md): per-replay comparison classes against FROZEN masked vanilla logs:
+# v2 semantics (maintainer-approved 2026-07-27, CLAUDE.md §4): per-replay
+# comparison classes against FROZEN masked vanilla logs:
 #   exact    02/05/07 + attract/pick diverge-constants: bit-identical
 #   flicker  03/10/16: isolated <=2-frame divergent stretches that fully
 #            re-converge (tools/compare_flicker.py, ground-truthed) — the

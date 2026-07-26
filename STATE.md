@@ -60,6 +60,17 @@ maintainer decision)
     diverge-constants hold. Whole-live-state identity therefore holds for
     all match gameplay; the exceptions are input-boundary flickers and
     service mode.
+- **2026-07-27: v2 approved (see Decisions made) and the Start-hold
+  flavor mystery RESOLVED** — community protocol confirmed (Donovan +
+  Huitzil only), mechanism pinned end-to-end with the new instruments
+  (masked comparison found the behavioral fork at the exact QCB+LK
+  frame; read-watch named both consumers, both inside ported regions).
+  One consequence gates the upcoming vsav2-as-oracle behavior gate: the
+  ported build's latch byte defaults to the WRONG flavor (VH2) — the
+  oracle's native side defaults VS2, so QCB+K would diverge at the field
+  compare until the default-flavor decision lands (Decisions pending).
+  Note: 12_donovan_vs_cpu's battery includes QCB+K — the ported
+  VH2-branch code path already runs crash-free under guard.
 
 ## Sessions 5-6 highlights (M2a stage 4 — the port runs)
 
@@ -292,9 +303,19 @@ opcode-space dump oracle (`tests/test_decrypt_oracle.sh`). Both directions
   vanilla expectations frozen under tests/expected/vsavj/masked/ (this
   session). Suite-runner masked-expectation-kind support lands with the
   stage-5 freeze. New masked windows require the same route: measured
-  mechanism + atlas entry + maintainer sign-off. *v2 refinement (flicker
-  tolerance + test-mode diverge constant) measured and proposed — see
-  Decisions pending.*
+  mechanism + atlas entry + maintainer sign-off.
+- **Legacy-gate v2 refinement APPROVED** — 2026-07-27, maintainer
+  ("I'd rather we iterate with as tight setups as we can build rather
+  than try to be perfect and not go forward"). Per-replay classes on the
+  masked basis: exact (02/05/07), flicker-tolerated 03/10/16
+  (`tools/compare_flicker.py`, stretch ≤2 / re-converge ≥60 / total ≤8),
+  frozen diverge constants 06@700, attract@4278, pick@1080. CLAUDE.md §4
+  updated to v2. **Standing watch (maintainer caveat): if flickers grow
+  beyond the frozen inventory (5 frames across 3 replays: 03@829+2093,
+  10@3007+3129, 16@829) or divergences turn systematic, stop and
+  root-cause — that would indicate a deeper issue.** The tolerance caps
+  themselves fail loudly on growth; treat any new flicker frame as a
+  finding to attribute, not noise to absorb.
 - **M2 replaced slot = Jedah (slot 0x0F)** — 2026-07-25, maintainer
   approved. Donovan replaces Jedah in vsavj for the proof-of-life
   milestone. Rationale: footprint fit (Jedah 10018 B ≥ Donovan 9358 B),
@@ -314,33 +335,25 @@ opcode-space dump oracle (`tests/test_decrypt_oracle.sh`). Both directions
 
 ## Decisions pending (human)
 
-- **Legacy-gate basis v2 refinement (extends the approved masked basis;
-  evidence in session-7 extension highlights above).** The approved v1
-  (masked windows + everything-else-exact) is implemented and holds for
-  02/05/07/attract/pick — but the full 7-replay widening measured two
-  additional hook-artifact classes: (a) isolated ≤2-frame fully
-  re-converging flickers at input-accept/spawn boundaries (03/10/16),
-  (b) 06_test_mode persistent divergence from the TS-press frame (the
-  masked latch's phase propagates when service-mode code reads it).
-  Proposed v2 (implemented provisionally in `m2a_legacy_gate_masked`,
-  clearly labeled; gate green): per-replay comparison classes —
-  exact (02/05/07), flicker-tolerated via the ground-truthed
-  `tools/compare_flicker.py` (max stretch 2, min re-converge 60, max
-  total 8) for 03/10/16, and a frozen first-divergence constant (700)
-  for 06. Recommendation: approve; the tolerance is tight, every class
-  is mechanism-attributed, and match-gameplay replays remain exact.
-  Alternative: keep v1 strict and drop 03/06/10/16 from the hooked-build
-  legacy set (weaker coverage). CLAUDE.md §4 text will be updated to v2
-  only on sign-off.
 - See SPEC §7 for the rest. Nothing blocks current work.
-- **SPEC §2 fact check (community liaison):** "hold Start while selecting
-  D/H/P → other game's flavor" did not reproduce in vsav2 under scripted
-  test (evidence in docs/atlas/character_tables.md). Since vsav2≡vhunt2
-  character data is byte-identical, the variant policy question (§3.3/§3.4)
-  may be moot at the data level — worth confirming with the community what
-  the Start-hold is believed to do and on which set/revision.
-  *Maintainer note 2026-07-25: community confirmation expected within
-  hours — fold the answer into the variant-policy items when it lands.*
+- **Ported-Donovan default flavor (gameplay decision; one byte).**
+  Background: the Start-hold flavor select (community-confirmed
+  2026-07-27: Donovan + Huitzil ONLY, hold Start then press punch/kick)
+  is now fully mechanism-pinned — latch `RAM:$FF87C2` (P1 +0x3C2,
+  default 01, cleared by Start-hold), consumed exclusively by the QCB+K
+  special (handler vsav2 0x5A654 + its projectile code 0x65FE6, BOTH
+  inside regions the port already relocates; behavioral fork proven at
+  the exact QCB+LK frame). Full detail:
+  docs/atlas/character_tables.md, tests/experiments/start_hold_flavor/.
+  **Measured on the stage-4 build: vsavj never writes +0x3C2 → the byte
+  is 00 → ported Donovan gets the VH2 flavor of QCB+K by accident.**
+  Decide: (1) **(Recommended)** default 01 = VS2 flavor (init poke via
+  the generator, matches the source game's default), Start-hold selector
+  wiring deferred to stage-5 select plumbing / §3.3-§3.4 variant policy
+  (which now covers only Donovan + Huitzil — Pyron is single-flavor);
+  (2) default 00 = VH2 flavor; (3) leave as-is (= VH2 by accident —
+  not recommended: undocumented accident, and the port's behavior gates
+  compare against native vsav2 which defaults to VS2).
 
 ## Open bugs
 

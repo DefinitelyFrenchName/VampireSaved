@@ -74,22 +74,32 @@ legacy behavior is a failed change.
   FBNeo and (b) the hacked set on patched FBNeo, checksumming work RAM every
   frame. Legacy-content replays must match for the full script length. First
   divergent frame + RAM diff is the standard bug report format.
-- **Hooked-build legacy comparison (amended 2026-07-25, maintainer-approved):**
-  for builds carrying engine hooks (code the vanilla game executes routed
-  through added instructions), the legacy oracle compares **live RAM**:
-  all work RAM except two named windows, both documented in
-  `docs/atlas/ram.md` — the dead-stack window `RAM:$FF7F00-$FF7FFF`
-  (below resting SP at the frame-done sample point) and the QSound
-  handshake latch `RAM:$FF043C` (one-frame phase). The masked comparison
-  compares every other byte on every frame, so confinement is enforced by
-  construction: divergence outside the windows still fails. Rationale
-  (measured, session 7, docs/GOTCHAS.md): hooks cost cycles; interrupts
-  then land at skewed instruction boundaries in otherwise-vanilla frames,
-  leaving ghost bytes below SP and a phase-shifted sound latch; zero-cycle
-  hooking is impossible on this engine. Whole-RAM frame-exact remains the
+- **Hooked-build legacy comparison (amended 2026-07-25 v1, refined to v2
+  2026-07-27, both maintainer-approved):** for builds carrying engine
+  hooks (code the vanilla game executes routed through added
+  instructions), the legacy oracle compares **live RAM**: all work RAM
+  except two named windows, both documented in `docs/atlas/ram.md` — the
+  dead-stack window `RAM:$FF7F00-$FF7FFF` (below resting SP at the
+  frame-done sample point) and the QSound handshake latch `RAM:$FF043C`
+  (one-frame phase). On that masked basis, per-replay comparison classes
+  (v2): **exact** by default; **flicker-tolerated** where measurement
+  shows isolated ≤2-frame divergences that fully re-converge (≥60 frames)
+  with ≤8 divergent frames total (`tools/compare_flicker.py`,
+  ground-truth tested — the input-accept/spawn-boundary phase artifact);
+  **frozen first-divergence constant** where a masked byte's phase
+  provably propagates into live state on a path with no gameplay surface
+  (test mode reading the sound latch). Every non-exact class must be
+  mechanism-attributed and its expectation frozen; a replay may not be
+  reclassified to a looser class without a new measured mechanism and
+  maintainer sign-off. **Standing watch (maintainer, 2026-07-27): if
+  flickers grow beyond the frozen inventory or divergences turn
+  systematic, stop and root-cause — that pattern would indicate a deeper
+  issue, not tolerance noise.** Rationale (measured, session 7,
+  docs/GOTCHAS.md): hooks cost cycles; interrupts land at skewed
+  instruction boundaries in otherwise-vanilla frames; zero-cycle hooking
+  is impossible on this engine. Whole-RAM frame-exact remains the
   standard for vanilla oracles, run-to-run determinism, and hook-free
-  builds. New masked windows may only be added by the same route this one
-  took: measured mechanism, documented in the atlas, maintainer sign-off.
+  builds.
 - **Dual-emulator agreement (amended 2026-07-25, maintainer-approved):** for
   new-character content (no vanilla oracle exists), the same replay is run on
   patched FBNeo and patched MAME and the two must agree on **mapped gameplay

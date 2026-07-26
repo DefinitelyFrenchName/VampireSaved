@@ -10,7 +10,7 @@
 #      runs END-clean under the -debug crash guard — no crash, no tripwire.
 #   3. Superset invariant per the amended CLAUDE.md §4 (masked live-RAM,
 #      maintainer-approved 2026-07-25) with the v2 per-replay classes
-#      (provisional, maintainer sign-off pending — STATE.md):
+#      (maintainer-approved 2026-07-27; standing watch on flicker growth):
 #      m2a_legacy_gate_masked runs the full legacy set against frozen
 #      masked vanilla logs — 02/05/07 exact; 03/10/16 flicker-tolerated
 #      (tools/compare_flicker.py, ground-truthed); 06 first-divergence
