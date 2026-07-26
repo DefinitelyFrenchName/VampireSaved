@@ -215,22 +215,40 @@ flavor, vsav2/vhunt2-only). The five variant datasets in the siblings are
 therefore: **Huitzil 0x10, Pyron 0x11, Donovan 0x13, Oboro 0x18,
 Oboro-alt 0x19**.
 
-### Start-hold flavor: NOT REPRODUCED (flagged for maintainer)
+### Start-hold flavor: RESOLVED (community-confirmed 2026-07-27, mechanism pinned)
 
-Measured in vsav2 (Japan 970913), Donovan: holding Start (through select
-confirm and match load) latches exactly one byte — `RAM:$FF87C2` (P1 block
-+0x3C2, default 01 in BOTH games, cleared when Start held) — which is
-never read back during play (read-watchpoint trace across idle AND
-attack-chain sequences), and post-chain full-work-RAM state is IDENTICAL
-except that byte. So with these inputs, "hold Start for the other game's
-flavor of D/H/P" (SPEC §2 background fact) produces no behavioral
-difference in vsav2. Either the input method differs, the effect is
-vhunt2-only, it manifests only in untested moves, or the lore is
-imprecise. The latch byte and its one writer/clearer are mapped; revisit
-with maintainer/community input. NOTE for the port: since vsav2≡vhunt2
-per-slot data is byte-identical, the port can carry BOTH Oboro flavors and
-the three newcomers from either set — the "VS2 vs VH2 variant" question
-may reduce to system-mechanics presentation, not character data.
+Community (via maintainer): the Start-hold flavor select exists
+**exclusively for Donovan and Huitzil** — hold Start on the character,
+then press punch/kick to select. Not Pyron.
+
+Mechanism, fully measured in vsav2 (Japan 970913), Donovan
+(`tests/experiments/start_hold_flavor/don_specials*.rpl`):
+
+- **Latch:** `RAM:$FF87C2` (P1 block +0x3C2; P2 mirror +0x3C2 off
+  $FF8800). Default 01; holding Start through select confirm clears it
+  to 00 (= the other game's flavor). Session-3 finding stands: with only
+  normals/chains the latch is never read — the consumers are in one
+  command move.
+- **Consumers (read-watch across a full motion battery):** exactly two,
+  both firing on the **QCB+K special**: the command handler at vsav2
+  `PRG:0x05A654` (reads the latch at move start, A6=player struct) and
+  the spawned projectile's code at `PRG:0x065FE6` (reads it again,
+  A6=projectile slot). No other special/super/DF input in the battery
+  reads it.
+- **Behavioral fork proven:** identical replays ± Start-hold are
+  bit-identical (latch masked) until frame 4296 — the exact QCB+LK
+  completion frame — then diverge permanently (the two flavors of the
+  move differ). Pre-battery state is identical except the latch; the
+  pick identity is unchanged (hitbox base 0x0C8DF8 both runs).
+
+**PORT CONSEQUENCE (measured on the stage-4 build):** both consumers live
+inside regions the port already relocates (Donovan code region and
+x065e5a), so the flavor fork ships with the port — but vsavj's engine
+never writes +0x3C2, and on the ported build the byte is **00**: ported
+Donovan currently gets the **VH2 flavor by accident**. Decision recorded
+in STATE.md (recommend default 01 = VS2 flavor via an init poke; the
+Start-hold selector itself is stage-5 select-plumbing / variant-policy
+scope §3.3/§3.4, now narrowed to Donovan + Huitzil).
 
 ## Cross-set slot correspondence (verified)
 

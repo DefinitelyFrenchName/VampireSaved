@@ -24,9 +24,17 @@ flicker-tolerated 03/10/16 via ground-truthed `tools/compare_flicker.py`;
 by hook-free stage-3 builds running 06 bit-identical);
 `tests/test_m2a_stage4_code.sh` runs the whole stage-4 gate.
 
-**FIRST ACTION NEXT SESSION: get the v2 sign-off (or strict-v1 fallback:
-drop 03/06/10/16 from the hooked legacy set), then update CLAUDE.md §4
-text accordingly.**
+**2026-07-27 update: v2 SIGNED OFF (CLAUDE.md §4 now carries v2 + a
+standing watch on flicker growth). Start-hold flavor RESOLVED and
+mechanism-pinned (Donovan+Huitzil only; latch $FF87C2; consumers = QCB+K
+handler + its projectile, both in ported regions) — see
+docs/atlas/character_tables.md and tests/experiments/start_hold_flavor/.**
+
+**FIRST ACTION NEXT SESSION: the default-flavor decision (STATE.md,
+Decisions pending — one byte, recommend 01=VS2). It GATES the
+vsav2-as-oracle behavior gate: native oracle defaults VS2, ported build
+currently lands on VH2 by accident, so QCB+K would fail the field
+compare until decided + poked.**
 
 **NEXT WORK (stage-4 close, then stage 5):**
 1. **vsav2-as-oracle behavior gate:** field-level compare at sync anchors

@@ -1,0 +1,89 @@
+# vsav2 native Donovan (pick R,R from default), then a COMMAND-MOTION
+# battery: QCF/DP/QCB at all strengths, punches and kicks, HCB, charge,
+# double-QCF/QCB supers, P+K pairs (Dark Force attempt). Session-3's
+# don_fight.rpl covered only normals/chains — the Start-hold flavor
+# consumer (latch RAM:$FF87C2) is expected in special/super handlers.
+300-305 sys=C1
+800-803 sys=S1
+1000-1002 p1=R
+1040-1042 p1=R
+1700-1702 p1=1
+# --- in match (~2890). battery, one motion per ~90 frames ---
+# 236+LP / 236+MP / 236+HP
+3300-3302 p1=D
+3303-3305 p1=DR
+3306-3309 p1=R1
+3390-3392 p1=D
+3393-3395 p1=DR
+3396-3399 p1=R2
+3480-3482 p1=D
+3483-3485 p1=DR
+3486-3489 p1=R3
+# 623+LP / 623+HP  (F, D, DF+P)
+3570-3572 p1=R
+3574-3576 p1=D
+3578-3581 p1=DR1
+3660-3662 p1=R
+3664-3666 p1=D
+3668-3671 p1=DR3
+# 214+LP / 214+MP / 214+HP
+3750-3752 p1=D
+3753-3755 p1=DL
+3756-3759 p1=L1
+3840-3842 p1=D
+3843-3845 p1=DL
+3846-3849 p1=L2
+3930-3932 p1=D
+3933-3935 p1=DL
+3936-3939 p1=L3
+# 236+LK / 236+MK / 236+HK
+4020-4022 p1=D
+4023-4025 p1=DR
+4026-4029 p1=R4
+4110-4112 p1=D
+4113-4115 p1=DR
+4116-4119 p1=R5
+4200-4202 p1=D
+4203-4205 p1=DR
+4206-4209 p1=R6
+# 214+LK / 214+HK
+4290-4292 p1=D
+4293-4295 p1=DL
+4296-4299 p1=L4
+4380-4382 p1=D
+4383-4385 p1=DL
+4386-4389 p1=L6
+# 63214+P (HCB)
+4470-4472 p1=R
+4473-4475 p1=DR
+4476-4478 p1=D
+4479-4481 p1=DL
+4482-4485 p1=L1
+# charge B (70f) then F+P
+4560-4630 p1=L
+4632-4636 p1=R2
+# supers: 236236+P, 214214+P, 236236+K
+4720-4722 p1=D
+4723-4725 p1=DR
+4726-4728 p1=R
+4729-4731 p1=D
+4732-4734 p1=DR
+4735-4739 p1=R1
+4830-4832 p1=D
+4833-4835 p1=DL
+4836-4838 p1=L
+4839-4841 p1=D
+4842-4844 p1=DL
+4845-4849 p1=L3
+4940-4942 p1=D
+4943-4945 p1=DR
+4946-4948 p1=R
+4949-4951 p1=D
+4952-4954 p1=DR
+4955-4959 p1=R4
+# P+K same-strength pairs (Dark Force attempts) + all-button mash
+5050-5054 p1=14
+5140-5144 p1=25
+5230-5234 p1=36
+5320-5324 p1=123456
+5500 wait
