@@ -441,7 +441,16 @@ opcode-space dump oracle (`tests/test_decrypt_oracle.sh`). Both directions
 
 ## Decisions pending (human)
 
-- **M2a FREEZE — ON HOLD pending the mash-wedge frontier.** Candidate
+- **M2a FREEZE — BACK ON THE TABLE: register stage-5 fingerprint
+  372b0641…** The entire mash-crash chain is closed (sessions 12-13:
+  sound-farm same-value refs, palette-seq private entry, bank-tail
+  dispatch_15-19, x2b7ef4 region extension — reconciliation.md Sessions
+  12-13). All four gates green; four guarded soaks END-clean; the 40K
+  arcade marathon cycles through game-over/attract normally. Flicker
+  inventory update (attributed): 08 gains a second single-frame flicker
+  (3807) from the corrected sound-call cycle profile. Recommend another
+  playtest round (especially long arcade sessions and mash), then
+  freeze. [Superseded hold note:] Candidate
   advanced to **b2e34c87…** (fixes the session-9 palette-seq hijack — a
   real defect: vsavj's seq ids 0x2CD+ are LIVE vanilla records; the
   shared-consumer base-swaps are replaced by a private stub entry). All

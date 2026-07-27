@@ -422,6 +422,46 @@ kind = "data_ptr"
 stride = 0x80
 region = "hitbox"
 
-# NOTE: 0x0BF01A..0x0BF29A, 0x0BF31A..0x0BF41A and 0x0BF49A..0x0BF69A remain
-# unmapped; no ported-code consumer references them yet. Triage if a future
-# stage surfaces reads there.
+# Bank-tail dispatch run RESOLVED (session 12b/13, the 21_don_mash
+# post-farm-fix crash): the tail holds a RUN of per-char code dispatches
+# consumed by the ENGINE (id-indexed, e.g. the state chain at vsavj
+# 0x23258 movea.l #$BF31A) — the "no ported-code consumer" triage
+# assumption was wrong. Leaving rows on Jedah's handlers corrupts
+# Donovan's anim cursor (Jedah's walker reads (0x18,A0) indirection his
+# records don't have). All five newcomer-window tables added; their vs2
+# rows live inside the ported code region and auto-repoint.
+[[table]]
+name = "dispatch_15"
+vsavj = 0x0BF21A
+kind = "code_ptr"
+stride = 0x80
+
+[[table]]
+name = "dispatch_16"
+vsavj = 0x0BF31A
+kind = "code_ptr"
+stride = 0x80
+
+[[table]]
+name = "dispatch_17"
+vsavj = 0x0BF39A
+kind = "code_ptr"
+stride = 0x80
+
+[[table]]
+name = "dispatch_18"
+vsavj = 0x0BF49A
+kind = "code_ptr"
+stride = 0x80
+
+[[table]]
+name = "dispatch_19"
+vsavj = 0x0BF61A
+kind = "code_ptr"
+stride = 0x80
+
+# Still parked: 0x0BF01A-0x0BF19A (per-char DATA rows into engine-anim
+# space — Donovan's vs2 rows point OUTSIDE his regions; unfired),
+# 0x0BF59A (per-char ENGINE routine rows — vs2 0x25402 needs an R1
+# equivalent; unfired), 0x0BF51A (all-zero), 0x0BF69A (sentinel-like).
+# Triage WITH A CONSUMER TRACE if a soak fires there.

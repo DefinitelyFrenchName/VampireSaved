@@ -41,7 +41,12 @@ done
 # Donovan actually spawns are ported (59-62); the other extras belong to
 # Huitzil/Pyron and stay TRIPWIRED — loud if ever reached (space budget,
 # session 5).
-DEFAULT_ROOTS="0x5c800:0xd100,0x26142:0x1400,0x28122:0xe00,0x88512:0x2f00:s,0x905ae:0x300:s,0x2b8060:0xb0a0:t0x2a4504:d"
+DEFAULT_ROOTS="0x5c800:0xd100,0x26142:0x1400,0x28122:0xe00,0x88512:0x2f00:s,0x905ae:0x300:s,0x2b7ef4:0xb20c:t0x2a4398:d"
+# x2b7ef4 extends the old x2b8060 root 0x16C earlier: a companion anim
+# word table sits just BEFORE the previous bound (session 13 mash crash —
+# its ref was tripwired as data and read as an anim table). Twin verified
+# byte-identical for the extension.
+DEFAULT_ROOTS="$DEFAULT_ROOTS"
 DEFAULT_ROOTS="$DEFAULT_ROOTS,0x65952:0x2d0:t0x65986,0x65c22:0x238:t0x65c56,0x65e5a:0x106a:t0x65e8e,0x66ec4:0x2b8:t0x66ef8"
 python3 tools/extract_char.py "$ROMDIR/vsav2.zip" "$OUTBASE/extract" \
     --char 0x13 --oracle "$ROMDIR/vhunt2.zip" \

@@ -136,6 +136,66 @@ now COMPLETES and the match runs 137 frames):
   zero-fills the 0x80-byte slot, preserving the category byte at +8.
   Only Donovan's alloc calls are wrapped; vanilla allocations untouched.
 
+## Session 13 (2026-07-28): the whole mash-crash chain is CLOSED — bank-tail dispatch run + the pre-region anim table
+
+After the sound-farm fix, the mash soak surfaced two final rungs, both
+found by the standard instruments and both structural:
+
+1. **Bank-tail dispatch run (dispatch_15-19):** the engine state chain at
+   vsavj 0x23258 (`movea.l #$BF31A` + id*4) dispatches through a RUN of
+   per-char code tables at the bank tail (0xBF21A/31A/39A/49A/61A) that
+   the session-4 triage left unmapped ("no ported-code consumer" — wrong:
+   the consumer is the ENGINE). Rows 0x0F still ran JEDAH's handlers on
+   Donovan; Jedah's anim-advance walker dereferences (0x18,A0) of the
+   current record — an indirection Donovan's records don't have —
+   writing a garbage anim cursor (the vec4@0x1AFD6 mid-instruction jump
+   and its ilk). All five tables' vs2 rows land inside the already-ported
+   code region: added to bank_map as dispatch_15-19, auto-repointed.
+   (Parked with documented shapes: 0xBF01A-19A data rows, 0xBF59A engine
+   rows, 0xBF51A zeros, 0xBF69A sentinel.)
+2. **x2b8060 was under-bounded by 0x16C:** a companion anim word table
+   sits at vs2 0x2B7EF4, just BEFORE the region start; its ref rode a
+   tripwire that the anim setter then read as a table (vec3 with A0 in
+   the tripwire band). Root extended to 0x2b7ef4:0xb20c (twin 0x2A4398,
+   extension byte-identical in vhunt2).
+
+RESULT (fingerprint 372b0641): all four guarded soaks END-clean (mash
+14120, moveset 9320, DP-spam 5930, round-2 12120), the 40K arcade
+marathon cycles through game-over and attract normally, and the full
+gate battery is green. Flicker inventory: 08_challenger_join carries a
+second attributable single-frame flicker (3807) since the farm fix
+changed the sound-call cycle profile — same mechanism, within tolerance.
+
+## Session 12b (2026-07-27): THE MASH WEDGE IS ROOT-CAUSED AND FIXED — sibling-coincident sound-farm refs
+
+The mechanical protocol delivered in one pass: video-hash bisection pinned
+the onset to (11160,11170]; the healthy-vs-wedged trace showed the wedged
+frame executes only ~324 unique PCs — kernel + sound service + the ported
+meter loop — and the loop's exit branch NEVER fires. The loop
+(`subi.w #$90,D0; bra` with a `bcs` exit) is mathematically bounded, so
+the only way it runs forever is its `jsr 0x3B2C` corrupting D0 — and it
+does: **vsavj's 0x3B2C is a DIFFERENT sound-farm entry** (no 0x330E save;
+"restores" stale registers via 0x3306) than vs2's 0x3B2C (a
+self-contained save+sfx-0x172+restore entry). The operand was carried
+raw because vs2==vhunt2 at that address — invisible to the sibling diff
+(the same-value hazard scan_code_refs' docstring warned about). Full
+mechanism + rules: docs/GOTCHAS.md (new entry).
+
+FIXES:
+1. extract_char: scanner-labeled engine operands are merged into twinned
+   regions' refs when the sibling diff missed them (33 surfaced).
+2. reconciliation.toml: +20 verified rows — 0x3B2C→0x3AF6 (unique body
+   match), 0x330E/0x3306 identity (24B byte-verified — kernel
+   save/restore), 17 sound-farm entries by save+sfx-id signature
+   (drift −0x36..−0xDA; dual-entry pairs disambiguated by next opword;
+   duplicate-id pair by helper calibration 0x5122↔0x4CE2).
+
+RESULT (fingerprint 450b5800): 26_don_arcade_mash runs the FULL 40K-frame
+marathon — matches, game over, and the post-game attract cycling its
+demos and story scenes normally. The wedge, the "different music"
+(chime-request spam), and every earlier hang manifestation are one bug,
+now closed.
+
 ## Session 12 (2026-07-27): seq-hijack fixed (real defect); the mash wedge remains OPEN — theories eliminated
 
 **FIXED — the palette-sequence hijack (real defect, found while chasing

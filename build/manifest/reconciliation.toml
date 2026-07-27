@@ -1145,3 +1145,159 @@ vsavj = 0x1F3FD2
 kind = "engine_data"
 status = "verified"
 note = "shared effect anim word table; 24-byte content match, unique in vsavj"
+
+# ── Same-value engine refs (session 12: the mash-wedge root cause) ──────────
+# vs2 and vhunt2 farms are layout-identical, so sibling-diff extraction
+# never surfaces these operands; vsavj's farm drifted and the coincident
+# address is a DIFFERENT entry (vsavj 0x3B2C = an unpaired tail entry that
+# restores stale registers — the infinite meter loop). Verified by unique
+# body match (save + read +0x70 + sfx 0x172 + jsr pan-helper + restore).
+[[map]]
+vsav2 = 0x003B2C
+vsavj = 0x003AF6
+kind = "engine_sub"
+status = "verified"
+note = "sound-farm entry sfx 0x172 (stock chime); unique body match; farms drift +/-0x36"
+
+# ── Same-value engine refs, byte-verified identical at target (session 12 audit: 24B plaintext match vs2==vsavj) ──
+[[map]]
+vsav2 = 0x003306
+vsavj = 0x003306
+kind = "engine_sub"
+status = "verified"
+note = "same-value ref; 24B byte-identical at target (kernel/service band)"
+
+[[map]]
+vsav2 = 0x00330e
+vsavj = 0x00330e
+kind = "engine_sub"
+status = "verified"
+note = "same-value ref; 24B byte-identical at target (kernel/service band)"
+
+
+# ── Sound-farm same-value refs resolved by unique whole-entry byte
+# match in vsavj (session 12 batch; entry = bytes to the jmp-0x3306
+# terminator; farms drift so coincident addresses are WRONG entries) ──
+
+# ── Sound-farm same-value refs, matched by save+sfx-id signature
+# (session 12 batch 2; whole-entry match fails on positional bsr
+# displacements — the sfx id immediate is the semantic key) ──
+[[map]]
+vsav2 = 0x003a0c
+vsavj = 0x0039d6
+kind = "engine_sub"
+status = "verified"
+note = "sound-farm entry sfx 0x115; unique save+id signature match"
+
+[[map]]
+vsav2 = 0x003ac4
+vsavj = 0x003a8e
+kind = "engine_sub"
+status = "verified"
+note = "sound-farm entry sfx 0x137; unique save+id signature match"
+
+[[map]]
+vsav2 = 0x003f46
+vsavj = 0x003f10
+kind = "engine_sub"
+status = "verified"
+note = "sound-farm entry sfx 0x136; unique save+id signature match"
+
+[[map]]
+vsav2 = 0x003fae
+vsavj = 0x003f78
+kind = "engine_sub"
+status = "verified"
+note = "sound-farm entry sfx 0x13d; unique save+id signature match"
+
+[[map]]
+vsav2 = 0x003fc8
+vsavj = 0x003f92
+kind = "engine_sub"
+status = "verified"
+note = "sound-farm entry sfx 0x1d5; unique save+id signature match"
+
+[[map]]
+vsav2 = 0x0040ae
+vsavj = 0x00405e
+kind = "engine_sub"
+status = "verified"
+note = "sound-farm entry sfx 0x14a; unique save+id signature match"
+
+[[map]]
+vsav2 = 0x0042d0
+vsavj = 0x004234
+kind = "engine_sub"
+status = "verified"
+note = "sound-farm entry sfx 0x18b; unique save+id signature match"
+
+[[map]]
+vsav2 = 0x0042ea
+vsavj = 0x00424e
+kind = "engine_sub"
+status = "verified"
+note = "sound-farm entry sfx 0x18d; unique save+id signature match"
+
+[[map]]
+vsav2 = 0x0043b2
+vsavj = 0x004316
+kind = "engine_sub"
+status = "verified"
+note = "sound-farm entry sfx 0x173; unique save+id signature match"
+
+[[map]]
+vsav2 = 0x0046a0
+vsavj = 0x0045c6
+kind = "engine_sub"
+status = "verified"
+note = "sound-farm entry sfx 0x299; unique save+id signature match"
+
+[[map]]
+vsav2 = 0x0046e2
+vsavj = 0x004608
+kind = "engine_sub"
+status = "verified"
+note = "sound-farm entry sfx 0x156; unique save+id signature match"
+
+[[map]]
+vsav2 = 0x0046fc
+vsavj = 0x004622
+kind = "engine_sub"
+status = "verified"
+note = "sound-farm entry sfx 0x157; unique save+id signature match"
+
+[[map]]
+vsav2 = 0x004716
+vsavj = 0x00463c
+kind = "engine_sub"
+status = "verified"
+note = "sound-farm entry sfx 0x158; unique save+id signature match"
+
+[[map]]
+vsav2 = 0x004730
+vsavj = 0x004656
+kind = "engine_sub"
+status = "verified"
+note = "sound-farm entry sfx 0x15a; unique save+id signature match"
+
+[[map]]
+vsav2 = 0x003972
+vsavj = 0x00393c
+kind = "engine_sub"
+status = "verified"
+note = "sound-farm entry sfx 0x10a; save+id+next-opword signature (dual-entry disambiguated)"
+
+[[map]]
+vsav2 = 0x0048be
+vsavj = 0x0047e4
+kind = "engine_sub"
+status = "verified"
+note = "sound-farm sfx 0x146; duplicate vsavj entries behaviorally identical (both -> helper 0x4CE2), first picked"
+
+[[map]]
+vsav2 = 0x0048d8
+vsavj = 0x0047fe
+kind = "engine_sub"
+status = "verified"
+note = "sound-farm sfx 0x142 -> helper 0x4CE2 (vs2 helper 0x5122 <-> vsavj 0x4CE2, calibrated on 4 verified rows)"
+

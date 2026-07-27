@@ -2,6 +2,40 @@
 
 Append the moment one is paid for. Read before touching the related area.
 
+## Sibling-coincident engine refs are INVISIBLE to the diff oracle — and the coincident vsavj address is usually a WRONG routine (paid: 2026-07-27 sessions 11c-12, ~a full session across three playtest rounds)
+
+vs2 and vhunt2 are sibling builds: large engine bands (the sound farm,
+kernel services) have IDENTICAL layout across them. An engine operand in
+ported code that COINCIDES across the siblings is not a diff site, so the
+oracle extraction never surfaces it — the operand is carried raw and, on
+vsavj (whose layout DID drift), silently calls whatever happens to live
+at that address. The mash-wedge hang was exactly this: the ported meter
+code's `jsr 0x3B2C` (stock-gain chime, vs2==vhunt2) landed on a DIFFERENT
+vsavj farm entry — an unpaired tail that "restores" stale registers via
+0x3306 without a matching 0x330E save — handing the caller a garbage D0
+and turning a bounded loop into an infinite one (sound-request spam =
+"different music"; main loop never returns = display frozen while
+interrupt-driven RAM keeps changing; no exception ever fires, so crash
+guards are blind to the whole class).
+
+Rules now enforced:
+- `tools/extract_char.py` merges scanner-LABELED engine/ROM operands
+  (jsr/jmp/pea/lea/movea/move_src — never bare longs) into every twinned
+  code region's ref list when the sibling diff didn't already cover the
+  offset — each then requires a reconciliation row or rides a loud
+  tripwire. First run surfaced 33 such refs (17 were wrong-coincident
+  sound-farm entries).
+- Identity rows are legal ONLY with byte-verified identical targets
+  (24B plaintext compare vs2==vsavj — true for the kernel save/restore
+  pair 0x330E/0x3306, false for every farm entry).
+- Farm entries resolve by save+sfx-id signature (whole-entry byte match
+  fails on positional bsr displacements); dual-entry pairs disambiguate
+  by the next opword; duplicate-id entries by helper-target calibration.
+- Debug lesson: a deterministic display-freeze with live RAM and no
+  exception is diagnosed by VIDEO-HASH BISECTION (snapshots → onset ±10)
+  then a full-frame trace — the wedged frame's ~300-unique-PC set reads
+  like a table of contents of what still runs.
+
 ## CPS-2 ROM file byte order is NOT 68k logical order (paid: 2026-07-25, ~1h)
 
 The 16-bit words in the dumped program ROM files are stored **low-byte-first**.

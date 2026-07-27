@@ -687,6 +687,35 @@ def main():
             sc = scan_code_refs.scan(blobs[name], r["src"])
             r["scan"] = sc
             r["charid_sites"] = [c["off"] for c in sc if c["class"] == "charid"]
+            if not r.get("source_only") and not r.get("pre_classified"):
+                # SAME-VALUE ENGINE REFS (session 12, the mash-wedge root
+                # cause): vs2 and vhunt2 are sibling builds — engine
+                # operands that COINCIDE across them are invisible to the
+                # sibling diff, yet vsavj's layout drifted (the ported
+                # meter code's jsr 0x3B2C hit a DIFFERENT vsavj farm entry
+                # at the coincident address). Merge scanner-LABELED
+                # engine/ROM operands (never bare longs) not already
+                # covered by diff-derived refs — each then needs a
+                # reconciliation row or rides a loud tripwire.
+                have = set()
+                for ref in r.get("refs", []):
+                    have.update(range(ref["off"], ref["off"] + ref["width"] // 8))
+                added = 0
+                for c in sc:
+                    if (c["width"] == 32 and c["class"] == "rom"
+                            and c["how"] in ("jsr", "jmp", "pea", "lea",
+                                             "movea", "move_src")
+                            and c["off"] not in have
+                            and (c["off"] + 3) not in have):
+                        r.setdefault("refs", []).append(
+                            {"off": c["off"], "width": 32,
+                             "target": c["target"], "shift": "engine",
+                             "class": "engine"})
+                        added += 1
+                if added:
+                    report.append(f"  {name}: {added} same-value engine "
+                                  f"refs merged from the scanner (sibling-"
+                                  f"coincident operands)")
             if r["charid_sites"]:
                 report.append(f"  {name}: {len(r['charid_sites'])} char-id "
                               f"0x13 immediates (rewritten to the dst slot "
