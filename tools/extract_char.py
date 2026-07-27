@@ -369,9 +369,10 @@ def main():
                        "kind": "data", "shift": "anim"}
 
     # code: span of in-window dispatch targets, similarity-extended (plaintext)
+    # (every code_ptr dispatch table in the bank map — was a hardcoded
+    # range(14) until dispatch_14 was resolved from gap_bd7fa, 2026-07-27)
     disp = []
-    for k in range(14):
-        tn = f"dispatch_{k:02d}"
+    for tn in sorted(n for n in tab if n.startswith("dispatch_")):
         v_s = src.u32(table_addr(tab[tn], origins, src_name) + char * 4)
         v_o = orc.u32(table_addr(tab[tn], origins, orc_name) + char * 4)
         if NEWCOMER_CODE[0] <= v_s < NEWCOMER_CODE[1]:

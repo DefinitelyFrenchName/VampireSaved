@@ -154,10 +154,17 @@ kind = "code_ptr"
 stride = 0x80
 
 # ── params / hitbox / records ────────────────────────────────────────────────
+# dispatch_14: RESOLVED from "gap_bd7fa" kind auto (2026-07-27). Consumer
+# disassembled at engine vsavj 0x026244 (vsav2 0x024EDA): per-character CODE
+# dispatch — `move.b $382(a6),d0; lsl #2; movea.l #table,a0;
+# movea.l (a0,d0.w),a0; jmp (a0)` — the idle/system-state per-char routine
+# (vs2 row 0x13 -> Donovan 0x5AB64, which re-triggers set-anim(0) at
+# intro-end; leaving row 0x0F on Jedah's 0x529B4 caused the oracle box-id
+# divergence — the session-4 "ignores inputs" family).
 [[table]]
-name = "gap_bd7fa"
+name = "dispatch_14"
 vsavj = 0x0BD7FA
-kind = "auto"
+kind = "code_ptr"
 stride = 0x80
 
 [[table]]

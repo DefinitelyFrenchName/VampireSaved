@@ -60,6 +60,23 @@ maintainer decision)
     diverge-constants hold. Whole-live-state identity therefore holds for
     all match gameplay; the exceptions are input-boundary flickers and
     service mode.
+- **2026-07-27 (session 8): the vsav2-as-oracle behavior gate is BUILT
+  and immediately caught two real bugs.** Replay pair 17_don_oracle_*
+  (both games anchor at frame 2363 — sibling engines run identical menu
+  timelines). Bug 1 FIXED+verified: "gap_bd7fa" was really dispatch_14
+  (per-char code dispatch); row 0x0F still ran JEDAH's state routine
+  against Donovan's data (the session-4 "ignores inputs" family) —
+  reclassified, extractor de-hardcoded (walks all dispatch_NN), rows
+  repointed; neutral-idle field compare now agrees on all fields for
+  1100 frames. Bug 2 OPEN (the current frontier): the +0x14E engine
+  state dispatch (vsavj table 0x2A7E2, 89 entries) is EXTENDED in vs2
+  (101 entries — 12 newcomer states); Donovan's VS2-flavor QCB+K writes
+  state 0xB6 → indexes past the vanilla table → ILLEGAL → soft reset.
+  Fix design + details: docs/tables/reconciliation.md "Session 8".
+  HP-decrease sanity holds natively (Victor −11 ×2). NOTE: with
+  dispatch_14 active the 12_donovan moveset replay also reaches the
+  +0x14E states and crashes at 3815 — stage-4 gate lock 2 is KNOWN-RED
+  until the hook lands (legacy gate green; one fix closes both).
 - **2026-07-27: v2 approved (see Decisions made) and the Start-hold
   flavor mystery RESOLVED** — community protocol confirmed (Donovan +
   Huitzil only), mechanism pinned end-to-end with the new instruments

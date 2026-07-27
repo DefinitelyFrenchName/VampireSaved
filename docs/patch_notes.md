@@ -2,6 +2,22 @@
 
 Newest first.
 
+## donovan-m2 stage 4 — dispatch_14 repoint (2026-07-27, session 8)
+
+Two new poke32 ops: rows 0x0F and 0x1F of the per-character CODE dispatch
+table at `PRG:0x0BD7FA` (formerly bank_map "gap_bd7fa", kind auto —
+consumer now disassembled: engine 0x026244 `movea.l (tbl,id*4),A0; jmp
+(A0)`, the per-char idle/system-state routine) → `0x000C0D74`, the
+relocated copy of vsav2's Donovan handler 0x5AB64 (inside the already-
+ported code region — no new space). Until this, vanilla JEDAH's routine
+at 0x529B4 ran against Donovan's data on every idle frame. Found by the
+new vsav2-as-oracle field gate (p1_box_ids disagreed at intro-end);
+after the fix the 1100-frame neutral-idle comparison agrees on every
+field. Extractor change: dispatch tables enumerated from the bank map
+(was hardcoded range(14)). Provenance: repoint = GEN pokes; the handler
+bytes were already VS2-ported. Full narrative:
+docs/tables/reconciliation.md "Session 8".
+
 ## donovan-m2 stage 4 — VS2 default flavor via the init shim (2026-07-27)
 
 The pool-seeding init shim (behind dispatch_00[0x0F]) grows 26→32 bytes:

@@ -136,6 +136,49 @@ now COMPLETES and the match runs 137 frames):
   zero-fills the 0x80-byte slot, preserving the category byte at +8.
   Only Donovan's alloc calls are wrapped; vanilla allocations untouched.
 
+## Session 8 (2026-07-27): the oracle gate works — two real bugs on first contact
+
+The vsav2-as-oracle behavior gate (17_don_oracle_* replay pair, both games
+anchor at the SAME frame 2363 with identical inputs — sibling engines
+traverse identical menu timelines) found, on its first runs:
+
+1. **dispatch_14 missing (FIXED, verified):** the bank's "gap_bd7fa"
+   auto-kind table is really a per-character CODE dispatch (consumer:
+   engine vsavj 0x026244 / vsav2 0x024EDA — `movea.l (tbl,id*4),A0; jmp
+   (A0)` — the idle/system-state per-char routine). Row 0x0F still held
+   Jedah's 0x529B4, so Jedah's state routine ran against Donovan's data:
+   native re-triggers set-anim(0) at intro-end (via vs2 0x5AB64 →
+   0x25EBA), ported didn't → the p1_box_ids oracle mismatch (and the
+   session-4 "ignores inputs" family). Fix: bank_map reclassified
+   gap_bd7fa → dispatch_14 code_ptr; extractor now walks ALL dispatch_NN
+   tables (was a hardcoded range(14)); rows 0x0F/0x1F → relocated 0xC0D74
+   (vs2 0x5AB64, inside the ported code region). RESULT: 1100-frame
+   neutral-idle field comparison agrees on every compared field.
+
+2. **OPEN FRONTIER — the +0x14E state dispatch is an extended engine
+   table:** Donovan's QCB+K (VS2 flavor) writes state 0xB6 to player
+   +0x14E; the engine's brief-word dispatch at vsavj 0x02A7CA
+   (`move.b ($14E,A6),D0; move.w ($12,PC,D0.w),D1; jsr ($E,PC,D1.w)`,
+   table 0x02A7E2, **89 entries**) indexes past its table → garbage
+   displacement → PC lands in data → ILLEGAL → soft reset (RAM-check
+   screen). vsav2's twin site 0x029B50 (table 0x029B6C) has **101
+   entries** — 12 newcomer states (idx 89-100, case block ≈ vs2
+   0x2AB80-0x2AD7E+, Donovan's QCB+K = idx 91 → vs2 0x2AC2E). Fix design
+   (next session): brief-word variant of the obj_hook — patch the site's
+   first 6 bytes to `jmp thunk`; thunk re-reads +0x14E, D0 ≤ 0xB0 →
+   `jmp` back to the vanilla move.w+jsr (ghost-clean for all vanilla
+   states), else dispatch via an extended long-pointer table to the
+   PORTED case block (new extra root ~0x2ab80:0x300:s, sibling-veto
+   protects it; jsr from the thunk + `jmp site+8` on return). NOTE: a
+   naive site survey (797 vsavj vs 779 vsav2 brief sites) needs proper
+   reconcile_batch-style twinning to find any FURTHER extended tables —
+   expect more of this family as the combat battery deepens (bring-up
+   ladder for engine state dispatch).
+
+Also: the in-match battery phase measured natively — Victor takes two
+−11 HPs (HP-decrease sanity holds on the native side); the ported-side
+battery is blocked on frontier 2.
+
 ## Session 7: the "state-index delta" was tooling corruption — RESOLVED; legacy-gate basis now a pending decision
 
 **The session-6 frontier is CLOSED and its hypothesis was WRONG.** The vec3
