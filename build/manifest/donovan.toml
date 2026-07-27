@@ -51,10 +51,15 @@ note = "companion queue class 7 (vs2-only) -> vsavj class 6"
 # bra seq_set) so they are SYNTHESIZED against vsavj equivalents (ret =
 # 0x2A7E0 rts, seq_set = 0x2AD94 — both structurally verified twins).
 # Their seq ids 0x2CD-0x2D8 index the global 32B-stride palette-sequence
-# table (vsavj base 0x39A900), ALSO shorter in vsavj: the 12 records
-# (vs2 0x3B63DC, byte-identical in vhunt2 @0x3963B0) are placed in a hole
-# and the 4 consumer sites get ghost-clean base-swap thunks (movea.l #base
-# is exactly 6 bytes = jmp thunk; no pushes; CCR safe — andi.w follows).
+# table (vsavj base 0x39A900). SESSION 12 CORRECTION: vsavj's table is NOT
+# shorter — it has its OWN live records at those ids (the attract intro's
+# fades use them; the session-9 base-swap thunks hijacked them globally and
+# WEDGED the post-game attract intro — the playtest hang). The 12 VS2
+# records (vs2 0x3B63DC, byte-identical in vhunt2 @0x3963B0) are still
+# placed in a hole, but the stubs now reach them via a PRIVATE entry: a
+# GEN wrapper loads the swapped base and jumps into the engine seq-set
+# AFTER its own movea (seq_set+6, the andi.w) — zero shared-consumer
+# hooks, vanilla palette flows fully untouched.
 [state_hook]
 site = 0x02A7C8
 site_resume = 0x02A7CE
@@ -69,7 +74,6 @@ clr_b_off = 0x181
 clr_w_off = 0x182
 seq_first_id = 0x2CD
 seq_base = 0x39A900
-seq_consumers = "0x02AD82,0x02AD94,0x02B342,0x02B7E8"
 records_src = 0x3B63DC
 records_orc = 0x3963B0
 records_len = 0x180

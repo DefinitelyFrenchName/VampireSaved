@@ -783,33 +783,24 @@ def main():
             notes.append(f"data   {rdst:#08x} +{rlen:#x}  state_hook palette-"
                          f"seq records (ids {seq_id0:#x}-{seq_id0+n_ext-1:#x})")
             fragments.append((rdst, rlen, "VS2", "state_hook seq records"))
+            # PRIVATE seq-set entry (session 12: the session-9 base-swap
+            # consumer thunks hijacked vanilla ids 0x2CD+ — vsavj's table
+            # has its own live records there; the attract intro's fades
+            # use them and WEDGED. Only Donovan's stubs may see the VS2
+            # records: wrapper loads the swapped base and enters the
+            # engine seq-set AFTER its movea — vanilla flows untouched.)
             alt_base = rdst - seq_id0 * 32
-            for cs in sh["seq_consumers"].split(","):
-                cs = int(cs, 0)
-                if (opc_img[cs:cs + 2] != b"\x20\x7c"
-                        or int.from_bytes(opc_img[cs + 2:cs + 6], "big")
-                        != _int(sh["seq_base"])):
-                    fail.append(f"state_hook: consumer at {cs:#x} != "
-                                f"movea.l #seq_base")
-                    continue
-                th = alloc("a", 30, "seq base-swap thunk")
-                if th is None:
-                    continue
-                tk = (b"\x20\x7c" + _int(sh["seq_base"]).to_bytes(4, "big")
-                      + b"\x0c\x40" + seq_id0.to_bytes(2, "big")
-                      + b"\x65\x0c"
-                      + b"\x0c\x40" + (seq_id0 + n_ext).to_bytes(2, "big")
-                      + b"\x64\x06"
-                      + b"\x20\x7c" + alt_base.to_bytes(4, "big")
-                      + b"\x4e\xf9" + (cs + 6).to_bytes(4, "big"))
-                ops.append({"op": "code", "addr": f"{th:#x}", "hex": tk.hex()})
-                ops.append({"op": "code", "addr": f"{cs:#x}",
-                            "hex": (b"\x4e\xf9" + th.to_bytes(4, "big")).hex()})
-                notes.append(f"code   {cs:#08x} ENGINE HOOK: seq-table "
-                             f"base-swap -> thunk {th:#08x} (ids "
-                             f"{seq_id0:#x}+ -> {rdst:#08x})")
-                fragments.append((th, len(tk), "GEN", "seq base-swap thunk"))
-                fragments.append((cs, 6, "GEN", "seq consumer site"))
+            sw = alloc("a", 12, "state_hook private seq entry")
+            if sw is not None:
+                wk = (b"\x20\x7c" + alt_base.to_bytes(4, "big")
+                      + b"\x4e\xf9"
+                      + (_int(sh["seq_set"]) + 6).to_bytes(4, "big"))
+                ops.append({"op": "code", "addr": f"{sw:#x}", "hex": wk.hex()})
+                notes.append(f"code   {sw:#08x} state_hook private seq entry "
+                             f"(records base {rdst:#08x} - {seq_id0:#x}*32 -> "
+                             f"engine {_int(sh['seq_set']) + 6:#x})")
+                fragments.append((sw, 12, "GEN", "state_hook private seq entry"))
+                sh["_seq_entry"] = sw
         stubs = alloc("a", 32 * n_ext, "state_hook case stubs")
         et = alloc("a", 4 * n_ext, "state_hook ext table")
         mt = alloc("a", 50, "state_hook thunk")
@@ -823,7 +814,7 @@ def main():
                          + b"\x42\x6e" + _int(sh["clr_w_off"]).to_bytes(2, "big")
                          + b"\x30\x3c" + (seq_id0 + k).to_bytes(2, "big")
                          + b"\x72\x01"
-                         + b"\x4e\xf9" + _int(sh["seq_set"]).to_bytes(4, "big"))
+                         + b"\x4e\xf9" + sh["_seq_entry"].to_bytes(4, "big"))
             assert len(blob) == 32 * n_ext
             ops.append({"op": "code", "addr": f"{stubs:#x}", "hex": blob.hex()})
             ext = b"".join((stubs + 32 * k).to_bytes(4, "big")

@@ -90,6 +90,15 @@ after first-playtest fixes; freeze awaiting maintainer decision)
   added) — the gate now covers all 13 original replays. 19_don_dp_spam
   joined the code gate's guarded set. New freeze candidate d6d8f273,
   everything green.
+- **2026-07-27 (session 12): the palette-seq hijack is FIXED (private
+  stub entry; vanilla flows untouched — the session-9 base-swap had
+  hijacked LIVE vanilla seq ids 0x2CD+); all gates green on b2e34c87.
+  The sustained-mash wedge REMAINS OPEN — deterministic repro, display
+  freezes while logic runs; eliminated: palette hijack (fixed, wedge
+  persists), meter anomaly (+0x3B2=0 and 99-cap are normal — identical
+  on native vs2 AND vanilla), the "Lilith scene" reading (it was the
+  post-game-over attract flow). Mechanical bisection protocol written
+  (reconciliation.md Session 12). FREEZE ON HOLD until resolved.**
 - **2026-07-27 (session 11b, second playtest round): the mash/time crash
   is FIXED.** DP confirmed fixed by the maintainer; new crash on heavy
   activity reproduced with 21_don_mash (input-chaos soak) — the type-114
@@ -432,7 +441,16 @@ opcode-space dump oracle (`tests/test_decrypt_oracle.sh`). Both directions
 
 ## Decisions pending (human)
 
-- **M2a FREEZE (build decision): register stage-5 fingerprint cdf62d8c…**
+- **M2a FREEZE — ON HOLD pending the mash-wedge frontier.** Candidate
+  advanced to **b2e34c87…** (fixes the session-9 palette-seq hijack — a
+  real defect: vsavj's seq ids 0x2CD+ are LIVE vanilla records; the
+  shared-consumer base-swaps are replaced by a private stub entry). All
+  gates green on it. BUT the sustained-mash wedge (26_don_arcade_mash:
+  display freezes while RAM advances, deterministic, ≤14000 on the new
+  build) is OPEN with all cheap theories eliminated — do not freeze
+  until it is root-caused (protocol in reconciliation.md Session 12).
+  Original freeze text (for after the wedge):
+  register the green fingerprint
   All gates green (moveset, masked legacy, oracle, dual-emulator, flavor
   selector); the M2a bar (selectable, crash-free, behavior observable,
   R1 logged) is met, with graphics deliberately garbled (M2b) and sound

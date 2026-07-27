@@ -136,6 +136,41 @@ now COMPLETES and the match runs 137 frames):
   zero-fills the 0x80-byte slot, preserving the category byte at +8.
   Only Donovan's alloc calls are wrapped; vanilla allocations untouched.
 
+## Session 12 (2026-07-27): seq-hijack fixed (real defect); the mash wedge remains OPEN — theories eliminated
+
+**FIXED — the palette-sequence hijack (real defect, found while chasing
+the wedge):** session 9 assumed vsavj's global palette-seq table ended
+before id 0x2CD; WRONG — vsavj has its own LIVE records there. The
+session-9 base-swap thunks on the 4 shared consumers hijacked those ids
+globally. Redesign (session 12): the 4 consumer sites are RESTORED to
+vanilla; Donovan's 12 state stubs reach the VS2 records via a PRIVATE
+12-byte entry (movea.l #records-0x2CD*32,A0; jmp seq_set+6 — into the
+engine AFTER its own base load). Vanilla palette flows are now fully
+untouched. Moveset + mash soaks green on the new build.
+
+**OPEN — the sustained-mash wedge (deterministic, uncharacterized):**
+26_don_arcade_mash still wedges (new build: mid-match vs Bulleta,
+display-frozen ≤14000 while RAM advances; quiet-27 variant wedges at the
+same frame → not input-driven past 12000). ELIMINATED this session:
+(a) the palette hijack (fixed; wedge persists), (b) meter/stock anomaly
+(+0x3B2=0 and 99-cap are NORMAL — identical on native vs2 Donovan AND
+vanilla Demitri both games; measured from the oracle dumps), (c) the
+"Lilith event scene" interpretation — the old-build sequence was the
+post-game-over ATTRACT flow (intro movie → title → wedge), i.e. the
+wedge follows long mash content, not a specific scene. The PC profile in
+the wedged state shows normal per-frame flows (meter routine + sound
+service) — something stops WRITING THE DISPLAY (OBJ list/palette) while
+logic continues.
+
+**NEXT-SESSION PROTOCOL (mechanical, no theorizing):** (1) video-hash
+bisection on 26/new-build — snapshots every 200 frames in 8000-14000,
+then step 25 → wedge onset ±25; (2) GUARD_TRACE a 2-frame window at
+onset AND at onset-200 (healthy), diff the per-frame call graphs — the
+subsystem present in healthy and absent in wedged frames is the answer
+(prime suspect: the display-list builder / V-blank copy path); (3) also
+diff full RAM at onset±1 for the state byte that flips. All instruments
+exist; the repro is deterministic.
+
 ## Session 11c: playtest round 3 — the hang is the LILITH EVENT SCENE (open frontier, deterministic repro)
 
 Maintainer round 3 (on cdf62d8c): still a hang-like state under mash —
