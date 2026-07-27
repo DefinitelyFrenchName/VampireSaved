@@ -136,6 +136,41 @@ now COMPLETES and the match runs 137 frames):
   zero-fills the 0x80-byte slot, preserving the category byte at +8.
   Only Donovan's alloc calls are wrapped; vanilla allocations untouched.
 
+## Session 11 (2026-07-27): first human playtest — triage of all four findings
+
+Maintainer playtested the stage-5 build. Findings and dispositions:
+
+1. **Garbled sprites, recognizably Donovan + Anita** — expected (M2b).
+2. **Flavor hard to judge by eye** — expected; the machine fork is QCB+K
+   (latch test covers it).
+3. **4-option select (normal/turbo/auto/auto+turbo) suspected VS2-like**
+   — REFUTED as a port artifact: vanilla vsavj with factory-fresh EEPROM
+   shows the identical 4-option menu (pixel-identical snapshots, vanilla
+   vs patched, same fresh NVRAM). The 2-option arcade experience comes
+   from operator-disabled auto modes in the service EEPROM settings.
+4. **DP-spam crash — REAL, reproduced deterministically, root-caused,
+   FIXED.** New replay 19_don_dp_spam (meter build + 42 DP attempts incl.
+   ES pairs) crashes vec4 at engine 0x18498, frame 3711: the DEFENDER-side
+   hit-reaction dispatch (vsavj site 0x18460, table 0x18468, real extent
+   ~81 ids; vs2 twin 0x16D2C/0x16D34) is another EXTENDED brief-word
+   table — vs2 adds reaction ids 0xA2/0xA4/0xA6, and Donovan's **ES DP**
+   inflicts 0xA2 (the 12 battery never pressed two-button ES versions —
+   coverage gap, now closed). The three vs2 cases are position-independent
+   one-liners on A1/A3 (copy attack-record byte +0x17 into defender
+   +0x54, etc.) — synthesized VERBATIM from config hex
+   (donovan.toml [reaction_hook]); ghost-clean topology patches the
+   preceding tst/bne pair and leaves the original dispatch untouched for
+   vanilla ids. 19_don_dp_spam now runs END-clean and joins the code
+   gate's guarded set.
+
+Also fixed this session: **gate coverage gap** — 04_select_fuzz /
+08_challenger_join / 09_mirror_pick had fallen out of the legacy gate
+when it was rebuilt on the masked basis. Measured on the stage-5 build:
+all three are pure FLICKER class (isolated single-frame re-converging —
+04@1525/2009/2195, 08@3507, 09@829); frozen masked vanilla logs added,
+replays added to the gate's flicker list. The masked legacy gate now
+covers all 13 original replays.
+
 ## Session 10 (2026-07-27): the damage pipeline — trio resolved by callsite anchoring; moveset replay CLEAN on the full build
 
 The session-9 "0x17522 trio" is the DAMAGE PIPELINE, and it is NOT

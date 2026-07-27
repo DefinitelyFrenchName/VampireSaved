@@ -74,6 +74,34 @@ records_src = 0x3B63DC
 records_orc = 0x3963B0
 records_len = 0x180
 
+# Hit-reaction dispatch extension (session 11, playtest DP-spam crash):
+# the defender-side reaction dispatch (vsavj site 0x18460
+# `move.w (6,PC,D0.w),D1; jmp (2,PC,D1.w)`, table 0x18468, real extent
+# ~81 ids; vsav2 twin 0x16D2C/0x16D34) is EXTENDED in vs2 by three
+# reaction ids 0xA2/0xA4/0xA6 — Donovan's ES DP inflicts 0xA2 (measured:
+# 19_don_dp_spam crashes vec4 at 0x18498 = garbage decode past the
+# vanilla table). The vs2 cases are position-independent one-liners on
+# A1 (defender) / A3 (attack record), synthesized verbatim:
+#   0xA2 @0x16F70: move.b $17(a3),$54(a1); rts
+#   0xA4 @0x16FEC: move.b #$52,$54(a1); rts
+#   0xA6 @0x16F78: clr.b $121(a1); move.b #1,$54(a1); rts
+# Ghost-clean topology: the PRECEDING `tst.b ($38,A1); bne $18508` pair
+# (8 bytes at 0x18458) becomes `jmp thunk`; the thunk re-creates the
+# tst/branch, range-checks D0, dispatches extended ids via a long table
+# (jmp, not jsr — cases rts to the dispatch's caller), and vanilla ids
+# jmp back to the UNTOUCHED original dispatch at 0x18460.
+[reaction_hook]
+site_prefix = 0x018458
+site_prefix_expect = "4a290038660000aa"
+tst_disp = 0x38
+bne_target = 0x018508
+dispatch = 0x018460
+first_ext = 0xA2
+n_ext = 3
+case_a2 = "136b001700544e75"
+case_a4 = "137c005200544e75"
+case_a6 = "42290121137c000100544e75"
+
 # Pool-seeding init shim (stage 4+): vanilla vsav never seeds the
 # secondary-object pools during a normal match, vsav2 always does (its
 # system objects need them) — and Donovan's ecosystem (companion, effects)

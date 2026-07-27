@@ -54,15 +54,17 @@ if bad:
 print("  ok: all 7 known operand-pair sites byte-identical to source")
 EOF
 
-echo "== 2. guarded moveset replay (full length, -debug guard) =="
-if MAME_ROMPATH="$RP" tools/run_replay_guarded.sh vsavj \
-    tests/replays/12_donovan_vs_cpu.rpl "$WORK/12.log" "$WORK/12box" \
-    > "$WORK/12_guard.out" 2>&1; then
-    echo "  ok: 12_donovan_vs_cpu END-clean under guard"
-else
-    echo "FAIL: guard tripped on 12_donovan_vs_cpu:"
-    cat "$WORK/12_guard.out"; fail=1
-fi
+echo "== 2. guarded replays (full length, -debug guard) =="
+for gr in 12_donovan_vs_cpu 19_don_dp_spam; do
+    if MAME_ROMPATH="$RP" tools/run_replay_guarded.sh vsavj \
+        "tests/replays/$gr.rpl" "$WORK/$gr.log" "$WORK/${gr}box" \
+        > "$WORK/${gr}_guard.out" 2>&1; then
+        echo "  ok: $gr END-clean under guard"
+    else
+        echo "FAIL: guard tripped on $gr:"
+        cat "$WORK/${gr}_guard.out"; fail=1
+    fi
+done
 
 echo "== 3. legacy gate, amended §4 basis (masked live-RAM, frozen expectations) =="
 m2a_legacy_gate_masked "$RP" "$WORK"

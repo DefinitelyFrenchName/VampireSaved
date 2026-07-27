@@ -857,6 +857,65 @@ def main():
             fragments.append((mt, 50, "GEN", "state_hook thunk"))
             fragments.append((site, 6, "GEN", "state_hook engine site"))
 
+    rh = port.get("reaction_hook") if args.stage >= 4 else None
+    if rh:
+        # Hit-reaction dispatch extension (donovan.toml [reaction_hook];
+        # measured constants + design in the toml comment / reconciliation
+        # Session 11). Cases are verbatim position-independent vs2 bytes
+        # from the config (reviewable hex). Ghost-clean: the preceding
+        # tst/bne pair becomes `jmp thunk`; vanilla ids jmp back to the
+        # UNTOUCHED original dispatch.
+        sp = _int(rh["site_prefix"])
+        opc_img = (root / "build/out/vsavj_opcodes.bin").read_bytes()
+        expect = bytes.fromhex(rh["site_prefix_expect"])
+        if opc_img[sp:sp + len(expect)] != expect:
+            fail.append(f"reaction_hook: bytes at {sp:#x} != expected "
+                        f"tst/bne pair ({opc_img[sp:sp+8].hex()})")
+        first_ext = _int(rh["first_ext"])
+        n_ext = _int(rh["n_ext"])
+        cases = [bytes.fromhex(rh[f"case_{first_ext + 2*k:x}"])
+                 for k in range(n_ext)]
+        blob = b"".join(cases)
+        cb = alloc("a", len(blob), "reaction_hook cases")
+        et = alloc("a", 4 * n_ext, "reaction_hook ext table")
+        th = alloc("a", 50, "reaction_hook thunk")
+        if None not in (cb, et, th):
+            ops.append({"op": "code", "addr": f"{cb:#x}", "hex": blob.hex()})
+            offs = []
+            o = 0
+            for c in cases:
+                offs.append(cb + o)
+                o += len(c)
+            ext = b"".join(a.to_bytes(4, "big") for a in offs)
+            ops.append({"op": "data", "addr": f"{et:#x}", "hex": ext.hex()})
+            tk = (bytes([0x4A, 0x29]) + _int(rh["tst_disp"]).to_bytes(2, "big")
+                  + bytes([0x67, 0x06])
+                  + bytes([0x4E, 0xF9]) + _int(rh["bne_target"]).to_bytes(4, "big")
+                  + bytes([0x0C, 0x40]) + first_ext.to_bytes(2, "big")
+                  + bytes([0x65, 0x1A])
+                  + bytes([0x0C, 0x40]) + (first_ext + 2 * n_ext).to_bytes(2, "big")
+                  + bytes([0x64, 0x14])
+                  + bytes([0x32, 0x00])
+                  + bytes([0x04, 0x41]) + first_ext.to_bytes(2, "big")
+                  + bytes([0xD2, 0x41])
+                  + bytes([0x20, 0x7C]) + et.to_bytes(4, "big")
+                  + bytes([0x20, 0x70, 0x10, 0x00])
+                  + bytes([0x4E, 0xD0])
+                  + bytes([0x4E, 0xF9]) + _int(rh["dispatch"]).to_bytes(4, "big"))
+            assert len(tk) == 50, len(tk)
+            ops.append({"op": "code", "addr": f"{th:#x}", "hex": tk.hex()})
+            ops.append({"op": "code", "addr": f"{sp:#x}",
+                        "hex": (b"\x4e\xf9" + th.to_bytes(4, "big")).hex()})
+            notes.append(f"code   {sp:#08x} ENGINE HOOK: hit-reaction "
+                         f"dispatch -> thunk {th:#08x} (vanilla ids jmp back "
+                         f"to untouched {_int(rh['dispatch']):#x}; ids "
+                         f"{first_ext:#x}-{first_ext + 2*n_ext - 2:#x} -> "
+                         f"{n_ext} verbatim vs2 cases at {cb:#08x})")
+            fragments.append((cb, len(blob), "VS2", "reaction_hook cases"))
+            fragments.append((et, 4 * n_ext, "GEN", "reaction_hook ext table"))
+            fragments.append((th, 50, "GEN", "reaction_hook thunk"))
+            fragments.append((sp, 6, "GEN", "reaction_hook engine site"))
+
     if args.stage >= 4:
         shim_cfg = port.get("init_shim")
         for d in man["dispatch"]:

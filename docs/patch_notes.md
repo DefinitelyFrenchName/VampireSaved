@@ -2,6 +2,31 @@
 
 Newest first.
 
+## donovan-m2 stage 5 — reaction_hook: ES-DP crash fix (2026-07-27, session 11, playtest-driven)
+
+Fingerprint d6d8f273… (supersedes 4b65bc63 as the freeze candidate).
+The maintainer's DP-spam crash, reproduced deterministically
+(19_don_dp_spam, vec4 @0x18498 frame 3711), was the defender-side
+hit-reaction dispatch — a third extended brief-word engine table (vsavj
+0x18460/0x18468 ~81 ids; vs2 0x16D2C/0x16D34 adds ids 0xA2/0xA4/0xA6;
+ES DP inflicts 0xA2). Fix ([reaction_hook] in donovan.toml + generic
+emitter):
+- 3 case stubs synthesized VERBATIM from config hex (position-
+  independent vs2 one-liners on A1/A3; VS2 provenance), extended long
+  table (GEN), 50-byte thunk (GEN).
+- Ghost-clean: the preceding `tst.b ($38,A1); bne $18508` pair (8 B at
+  0x18458) becomes `jmp thunk`; the thunk re-creates tst/branch
+  (beq.s + jmp abs), range-checks D0, dispatches extended ids via
+  `jmp (A0)` (cases rts to the dispatch's caller), vanilla ids jmp back
+  to the UNTOUCHED original dispatch at 0x18460 — zero pushes, CCR
+  semantics preserved.
+Coverage additions: 19_don_dp_spam joins the code gate's guarded set
+(ES two-button versions were never exercised before — the gap the
+playtest found); 04/08/09 restored to the masked legacy gate as flicker
+class with frozen masked vanilla logs (they'd fallen out at the v2
+rebuild). Playtest finding 3 (4-option select) refuted as a port
+artifact: vanilla shows the identical menu on factory EEPROM.
+
 ## donovan-m2 stage 5 — Start-hold flavor selector + alternate-table poison (2026-07-27, session 11)
 
 Stage-5 build (fingerprint 4b65bc63…, `tools/build_donovan.sh 5`):

@@ -1,8 +1,7 @@
 # STATE — living progress log
 
-Updated: 2026-07-25 (session 7 end — M2a stage 4: bring-up ladder DONE,
-full moveset replay runs clean; legacy-gate comparison basis awaiting
-maintainer decision)
+Updated: 2026-07-27 (session 11 end — M2a stage 5 green on d6d8f273
+after first-playtest fixes; freeze awaiting maintainer decision)
 
 ## Session 7 highlights (M2a stage 4 — frontier closed; the crash was ours)
 
@@ -62,7 +61,8 @@ maintainer decision)
     service mode.
 - **2026-07-27 (session 11): STAGE 5 BUILT AND FULLY GREEN — M2a is
   functionally complete pending the freeze decision.** Stage-5 build
-  fingerprint **4b65bc63…**: the Start-hold flavor selector is LIVE
+  fingerprint **d6d8f273…** (updated after the playtest fixes —
+  see the session-11 playtest entry below): the Start-hold flavor selector is LIVE
   (init shim reads the per-player Start bitmask $FF8060 at char-init;
   hold YOUR Start through match load → VH2 flavor; verified 3-way by
   the new `tests/test_m2a_flavor_selector.sh` — plain 01 / P1-held 00 /
@@ -71,9 +71,25 @@ maintainer decision)
   loud vec3 at a named block if a future writer arms the branch); the
   aux_poke survey concluded none are needed for the M2a bar (select
   behavior works via bank repoints; portrait/name = M2b GFX). ALL gates
-  green on 4b65bc63: guarded moveset, masked legacy, oracle,
+  green (initially on 4b65bc63; superseded by d6d8f273 after the
+  playtest fixes below): guarded moveset, masked legacy, oracle,
   dual-emulator, flavor selector. **Freeze = pending maintainer build
   decision (see Decisions pending).**
+- **2026-07-27 (session 11, first human playtest):** four findings, all
+  dispositioned (docs/tables/reconciliation.md "Session 11"): garbled
+  sprites = M2b expected; flavor hard to eyeball = expected (QCB+K is
+  the fork); 4-option select = REFUTED as port artifact (vanilla shows
+  the identical menu on factory EEPROM — snapshot-proven); **DP-spam
+  crash = REAL — reproduced deterministically (19_don_dp_spam, ES DP),
+  root-caused to a third extended brief-word engine table (defender
+  hit-reaction dispatch, vs2 adds ids 0xA2/0xA4/0xA6, ES DP inflicts
+  0xA2), FIXED via [reaction_hook]** (verbatim vs2 case stubs from
+  config hex, ghost-clean thunk, original dispatch untouched for
+  vanilla ids). Also closed a gate coverage gap: 04/08/09 restored to
+  the masked legacy gate (measured pure flicker class; frozen logs
+  added) — the gate now covers all 13 original replays. 19_don_dp_spam
+  joined the code gate's guarded set. New freeze candidate d6d8f273,
+  everything green.
 - **2026-07-27 (session 10): BOTH stage-4 gates PASS on one build
   (fingerprint 67753ee3) — the first all-green run with every system
   active.** The "0x17522 trio" turned out to be the DAMAGE PIPELINE and
@@ -405,7 +421,7 @@ opcode-space dump oracle (`tests/test_decrypt_oracle.sh`). Both directions
 
 ## Decisions pending (human)
 
-- **M2a FREEZE (build decision): register stage-5 fingerprint 4b65bc63…**
+- **M2a FREEZE (build decision): register stage-5 fingerprint d6d8f273…**
   All gates green (moveset, masked legacy, oracle, dual-emulator, flavor
   selector); the M2a bar (selectable, crash-free, behavior observable,
   R1 logged) is met, with graphics deliberately garbled (M2b) and sound

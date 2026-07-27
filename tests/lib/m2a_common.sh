@@ -69,7 +69,11 @@ m2a_legacy_gate() {
 M2A_MASK="043c-043d,7f00-8000"
 M2A_MASKED_EXP="tests/expected/vsavj/masked"   # relative to $REPO
 M2A_MASKED_EXACT="02_demitri_vs_cpu 05_timeout_idle 07_mash_storm"
-M2A_MASKED_FLICKER="03_two_player_vs 10_midattract_start 16_xemu_2p"
+M2A_MASKED_FLICKER="03_two_player_vs 10_midattract_start 16_xemu_2p 04_select_fuzz 08_challenger_join 09_mirror_pick"
+# 04/08/09 measured session 11 (playtest follow-up: they had fallen out of
+# the gate when it was rebuilt): pure flicker class — isolated single-frame
+# re-converging divergences (04@1525/2009/2195, 08@3507, 09@829), no
+# persistent hover divergence.
 M2A_TESTMODE_DIVERGE=700                       # 06: the TS-press frame
 M2A_PICK_DIVERGE_MASKED=1080                   # select-screen anim hover
 
@@ -150,7 +154,7 @@ m2a_freeze_masked() {
     _mf_w="$1"
     _mf_exp="$REPO/$M2A_MASKED_EXP"
     mkdir -p "$_mf_exp/logs"
-    for _mf_r in $M2A_EXACT_REPLAYS 01_attract_long 11_pick_donovan; do
+    for _mf_r in $M2A_MASKED_EXACT $M2A_MASKED_FLICKER 06_test_mode 01_attract_long 11_pick_donovan; do
         m2a_run_masked "$ROMDIR" "$REPO/tests/replays/$_mf_r.rpl" \
             "$_mf_w/$_mf_r.log" "$_mf_w/${_mf_r}box"
         cp "$_mf_w/$_mf_r.log" "$_mf_exp/logs/$_mf_r.log"
