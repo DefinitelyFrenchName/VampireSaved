@@ -60,6 +60,21 @@ maintainer decision)
     diverge-constants hold. Whole-live-state identity therefore holds for
     all match gameplay; the exceptions are input-boundary flickers and
     service mode.
+- **2026-07-27 (session 9): the +0x14E frontier is CLOSED and the
+  ORACLE GATE PASSES as a scripted test.** The state hook landed
+  (synthesized case stubs + ghost-clean thunks + relocated palette-seq
+  records + 4 consumer base-swaps — patch_notes session 9); Donovan's 8
+  sound-farm calls stubbed silent (M5 restores; sfx ids recorded in
+  reconciliation.toml); anim_index_a2 resolved from gap auto-kind (was
+  feeding Jedah's anim rows to Donovan's attacks). Moveset replay
+  END-clean again. `tests/test_m2a_stage4_oracle.sh` PASS: anchors equal
+  (2363), neutral window exact, P2 HP trajectories equal (hits land,
+  same damage), and the comparative bound — ported Donovan diverges
+  LESS across the two engines (890 mismatches) than vanilla Demitri
+  does (2379): the residual ~1-frame action-latency skew is the
+  ENGINES' cross-game difference, proven by the 18_veteran_ctl control
+  pair. Remaining stage-4 behavior work: dual-emulator gate (16-pattern
+  Donovan replay on MAME + FBNeo), then stage 5.
 - **2026-07-27 (session 8): the vsav2-as-oracle behavior gate is BUILT
   and immediately caught two real bugs.** Replay pair 17_don_oracle_*
   (both games anchor at frame 2363 — sibling engines run identical menu

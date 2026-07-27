@@ -41,11 +41,18 @@ kind = "data_ptr"
 stride = 0x80
 region = "anim"
 
+# anim_index_a2: RESOLVED from "gap_bcefa" kind auto (2026-07-27, session
+# 9). Consumer = the anim/box setter's branch 1 (vsavj 0x27EB8
+# `movea.l #$bcefa,a0`; vsav2 twin 0x2710C `movea.l #$d7098,a0` — the
+# four-table family with anim_index_a/b and hitbox_base). Leaving row 0x0F
+# unported fed JEDAH's anim-index row to Donovan's attacks on that branch —
+# the oracle's first-jab box-id mismatch (05/06/07 vs 07).
 [[table]]
-name = "gap_bcefa"
+name = "anim_index_a2"
 vsavj = 0x0BCEFA
-kind = "auto"
+kind = "data_ptr"
 stride = 0x80
+region = "anim"
 
 [[table]]
 name = "anim_index_b"

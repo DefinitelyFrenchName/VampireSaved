@@ -1034,3 +1034,81 @@ vsavj = 0x0be27a
 kind = "bank_ref"
 status = "verified"
 note = "hand: gap_be27a pointer TABLE base; delta rule; slot 0x0F row repointed by the generator"
+
+# ── Sound-farm stubs (session 9, 2026-07-27) ────────────────────────────────
+# Donovan's move code calls vs2 sound-farm entries (jsr 0x330E; move.l
+# #sfx,D1; bsr 0x5122; jmp 0x3306). The sfx ids reference VS2's QSound
+# sample set — sample migration is M5. Until then: stub to a known engine
+# rts (vsavj 0x2A7E0) so ported moves play SILENTLY. RESTORE AT M5 —
+# the vs2 sfx ids are recorded per row.
+[[map]]
+vsav2 = 0x004DF6
+vsavj = 0x02A7E0
+kind = "stubbed_sound"
+status = "verified"
+note = "sound farm sfx 0x73E -> rts (M5 restores)"
+
+[[map]]
+vsav2 = 0x004E2A
+vsavj = 0x02A7E0
+kind = "stubbed_sound"
+status = "verified"
+note = "sound farm sfx 0x747 -> rts (M5 restores)"
+
+[[map]]
+vsav2 = 0x00506C
+vsavj = 0x02A7E0
+kind = "stubbed_sound"
+status = "verified"
+note = "sound farm sfx 0x112 -> rts (M5 restores)"
+
+[[map]]
+vsav2 = 0x005086
+vsavj = 0x02A7E0
+kind = "stubbed_sound"
+status = "verified"
+note = "sound farm sfx 0x71D -> rts (M5 restores)"
+
+[[map]]
+vsav2 = 0x0050A0
+vsavj = 0x02A7E0
+kind = "stubbed_sound"
+status = "verified"
+note = "sound farm sfx 0x753 -> rts (M5 restores)"
+
+[[map]]
+vsav2 = 0x0050BA
+vsavj = 0x02A7E0
+kind = "stubbed_sound"
+status = "verified"
+note = "sound farm sfx 0x754 -> rts (M5 restores)"
+
+[[map]]
+vsav2 = 0x0050D4
+vsavj = 0x02A7E0
+kind = "stubbed_sound"
+status = "verified"
+note = "sound farm sfx 0x755 -> rts (M5 restores)"
+
+[[map]]
+vsav2 = 0x0050EE
+vsavj = 0x02A7E0
+kind = "stubbed_sound"
+status = "verified"
+note = "sound farm sfx 0x756 -> rts (M5 restores)"
+
+# ── Pool-family helpers, session 9: structural-match at the family delta
+# (+0x18B8), 14-mnemonic skeleton identical ────────────────────────────────
+[[map]]
+vsav2 = 0x015744
+vsavj = 0x016FFC
+kind = "engine_sub"
+status = "verified"
+note = "pool-family helper; skeleton-match at family delta +0x18B8"
+
+[[map]]
+vsav2 = 0x01581A
+vsavj = 0x0170D2
+kind = "engine_sub"
+status = "verified"
+note = "pool-family helper; skeleton-match at family delta +0x18B8"

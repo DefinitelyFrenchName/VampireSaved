@@ -711,6 +711,123 @@ def main():
                          f"(vanilla types identical via table copy)")
             fragments.append((site, 6, "GEN", "obj_hook engine site"))
 
+    sh = port.get("state_hook") if args.stage >= 4 else None
+    if sh:
+        # +0x14E engine state-dispatch extension (donovan.toml [state_hook];
+        # design + measured constants: docs/tables/reconciliation.md
+        # "Session 8"). Four parts, all GEN except the records (VS2):
+        #   1. 12 palette-seq records -> hole B (raw; byte-identical in
+        #      vhunt2 — verified at config time, asserted here)
+        #   2. ghost-clean base-swap thunks on the 4 seq-table consumers
+        #      (movea.l #base is exactly 6 bytes = jmp thunk; no pushes;
+        #      CCR-safe: andi.w follows at every site)
+        #   3. 12 synthesized case stubs (vs2's are uniform; targets are
+        #      the structurally-verified vsavj twins ret_equiv/seq_set)
+        #   4. the state thunk: vanilla states jmp back to the untouched
+        #      move.w+jsr (ghost-clean); extended states dispatch via a
+        #      long table, preserving D0 (the stubs compare it to +0x14F)
+        site = _int(sh["site"])
+        first_ext = _int(sh["first_ext"])
+        n_ext = _int(sh["n_ext"])
+        seq_id0 = _int(sh["seq_first_id"])
+        opc_img = (root / "build/out/vsavj_opcodes.bin").read_bytes()
+        expect_site = (bytes([0x70, 0x00, 0x10, 0x2E])
+                       + _int(sh["state_off"]).to_bytes(2, "big"))
+        if opc_img[site:site + 6] != expect_site:
+            fail.append(f"state_hook: engine bytes at {site:#x} != "
+                        f"moveq/move.b prefix ({opc_img[site:site+6].hex()})")
+        src_data = (root / f"build/out/{man['src_set']}_data.bin").read_bytes()
+        rlen = _int(sh["records_len"])
+        recs = src_data[_int(sh["records_src"]):_int(sh["records_src"]) + rlen]
+        # sibling-oracle identity check on the records (config-time finding,
+        # re-asserted every build)
+        orc_p = root / f"build/out/{man['oracle_set']}_data.bin"
+        if "records_orc" in sh and orc_p.is_file():
+            orc_data = orc_p.read_bytes()
+            tw = _int(sh["records_orc"])
+            if orc_data[tw:tw + rlen] != recs:
+                fail.append("state_hook: seq records differ from the "
+                            "sibling twin — misbounded or wrong address")
+        rdst = alloc("b", rlen, "state_hook seq records")
+        if rdst is not None:
+            ops.append({"op": "data", "addr": f"{rdst:#x}", "hex": recs.hex()})
+            notes.append(f"data   {rdst:#08x} +{rlen:#x}  state_hook palette-"
+                         f"seq records (ids {seq_id0:#x}-{seq_id0+n_ext-1:#x})")
+            fragments.append((rdst, rlen, "VS2", "state_hook seq records"))
+            alt_base = rdst - seq_id0 * 32
+            for cs in sh["seq_consumers"].split(","):
+                cs = int(cs, 0)
+                if (opc_img[cs:cs + 2] != b"\x20\x7c"
+                        or int.from_bytes(opc_img[cs + 2:cs + 6], "big")
+                        != _int(sh["seq_base"])):
+                    fail.append(f"state_hook: consumer at {cs:#x} != "
+                                f"movea.l #seq_base")
+                    continue
+                th = alloc("a", 30, "seq base-swap thunk")
+                if th is None:
+                    continue
+                tk = (b"\x20\x7c" + _int(sh["seq_base"]).to_bytes(4, "big")
+                      + b"\x0c\x40" + seq_id0.to_bytes(2, "big")
+                      + b"\x65\x0c"
+                      + b"\x0c\x40" + (seq_id0 + n_ext).to_bytes(2, "big")
+                      + b"\x64\x06"
+                      + b"\x20\x7c" + alt_base.to_bytes(4, "big")
+                      + b"\x4e\xf9" + (cs + 6).to_bytes(4, "big"))
+                ops.append({"op": "code", "addr": f"{th:#x}", "hex": tk.hex()})
+                ops.append({"op": "code", "addr": f"{cs:#x}",
+                            "hex": (b"\x4e\xf9" + th.to_bytes(4, "big")).hex()})
+                notes.append(f"code   {cs:#08x} ENGINE HOOK: seq-table "
+                             f"base-swap -> thunk {th:#08x} (ids "
+                             f"{seq_id0:#x}+ -> {rdst:#08x})")
+                fragments.append((th, len(tk), "GEN", "seq base-swap thunk"))
+                fragments.append((cs, 6, "GEN", "seq consumer site"))
+        stubs = alloc("a", 32 * n_ext, "state_hook case stubs")
+        et = alloc("a", 4 * n_ext, "state_hook ext table")
+        mt = alloc("a", 50, "state_hook thunk")
+        if None not in (stubs, et, mt):
+            blob = b""
+            for k in range(n_ext):
+                blob += (b"\xb0\x2e" + _int(sh["prev_state_off"]).to_bytes(2, "big")
+                         + b"\x66\x06"
+                         + b"\x4e\xf9" + _int(sh["ret_equiv"]).to_bytes(4, "big")
+                         + b"\x42\x2e" + _int(sh["clr_b_off"]).to_bytes(2, "big")
+                         + b"\x42\x6e" + _int(sh["clr_w_off"]).to_bytes(2, "big")
+                         + b"\x30\x3c" + (seq_id0 + k).to_bytes(2, "big")
+                         + b"\x72\x01"
+                         + b"\x4e\xf9" + _int(sh["seq_set"]).to_bytes(4, "big"))
+            assert len(blob) == 32 * n_ext
+            ops.append({"op": "code", "addr": f"{stubs:#x}", "hex": blob.hex()})
+            ext = b"".join((stubs + 32 * k).to_bytes(4, "big")
+                           for k in range(n_ext))
+            ops.append({"op": "data", "addr": f"{et:#x}", "hex": ext.hex()})
+            tk = (b"\x70\x00"
+                  + b"\x10\x2e" + _int(sh["state_off"]).to_bytes(2, "big")
+                  + b"\x0c\x40" + first_ext.to_bytes(2, "big")
+                  + b"\x65\x20"
+                  + b"\x0c\x40" + (first_ext + 2 * n_ext).to_bytes(2, "big")
+                  + b"\x64\x1a"
+                  + b"\x32\x00"
+                  + b"\x04\x41" + first_ext.to_bytes(2, "big")
+                  + b"\xd2\x41"
+                  + b"\x20\x7c" + et.to_bytes(4, "big")
+                  + b"\x20\x70\x10\x00"
+                  + b"\x4e\x90"
+                  + b"\x4e\xf9" + _int(sh["site_after"]).to_bytes(4, "big")
+                  + b"\x4e\xf9" + _int(sh["site_resume"]).to_bytes(4, "big"))
+            assert len(tk) == 50
+            ops.append({"op": "code", "addr": f"{mt:#x}", "hex": tk.hex()})
+            ops.append({"op": "code", "addr": f"{site:#x}",
+                        "hex": (b"\x4e\xf9" + mt.to_bytes(4, "big")).hex()})
+            notes.append(f"code   {site:#08x} ENGINE HOOK: +{_int(sh['state_off']):#x} "
+                         f"state dispatch -> thunk {mt:#08x} (vanilla ids "
+                         f"ghost-clean via jmp-back; ids {first_ext:#x}-"
+                         f"{first_ext + 2*n_ext - 2:#x} -> {n_ext} synthesized "
+                         f"stubs at {stubs:#08x}, ext table {et:#08x})")
+            fragments.append((stubs, 32 * n_ext, "GEN", "state_hook case stubs"))
+            fragments.append((et, 4 * n_ext, "GEN", "state_hook ext table"))
+            fragments.append((mt, 50, "GEN", "state_hook thunk"))
+            fragments.append((site, 6, "GEN", "state_hook engine site"))
+
     if args.stage >= 4:
         shim_cfg = port.get("init_shim")
         for d in man["dispatch"]:

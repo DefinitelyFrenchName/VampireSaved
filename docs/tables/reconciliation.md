@@ -136,6 +136,57 @@ now COMPLETES and the match runs 137 frames):
   zero-fills the 0x80-byte slot, preserving the category byte at +8.
   Only Donovan's alloc calls are wrapped; vanilla allocations untouched.
 
+## Session 9 (2026-07-27): +0x14E hook landed; sound stubbed; anim_index_a2; the skew is the ENGINES'
+
+**The +0x14E frontier is CLOSED.** Implemented per the session-8 design
+(`[state_hook]` in donovan.toml, emitter in gen_donovan_patch.py):
+- 12 SYNTHESIZED case stubs (vs2's are uniform 26-byte state stubs;
+  targets = verified twins ret 0x2A7E0 / seq_set 0x2AD94), extended
+  long-pointer table, ghost-clean state thunk (vanilla ids jmp back to
+  the untouched move.w+jsr; D0 preserved for the stubs' +0x14F compare).
+- The stubs' seq ids 0x2CD-0x2D8 index the global palette-seq table
+  (vsavj 0x39A900, 32B stride) — also shorter in vsavj, with NO free
+  space in the andi-#$fff-capped reach: the 12 records (vs2 0x3B63DC,
+  byte-identical in vhunt2 @0x3963B0 — asserted every build) are placed
+  in a hole and the 4 consumer `movea.l #base` sites (0x2AD82/0x2AD94/
+  0x2B342/0x2B7E8) got ghost-clean base-swap thunks (6-byte site fit, no
+  pushes, CCR-safe).
+
+**Sound-farm stubs (8 rows, kind stubbed_sound):** Donovan's move code
+calls vs2 sound-farm entries (jsr 0x330E; move.l #sfx,D1; bsr 0x5122;
+jmp 0x3306). Sample migration is M5 — until then they map to a vsavj rts
+(0x2A7E0) so moves play silently. The vs2 sfx ids are recorded per row in
+reconciliation.toml — RESTORE AT M5.
+
+**anim_index_a2 (bank_map "gap_bcefa" RESOLVED):** the fourth table of
+the anim/box-setter family (consumer vsavj 0x27EB8 / vs2 0x2710C).
+Unported row 0x0F fed Jedah's anim-index row to Donovan's attacks — the
+oracle's first-jab box-id mismatch. Reclassified data_ptr/anim; rows
+repointed (0xD51BE = vs2 0x281696 relocated).
+
+**New verified rows (skeleton-match at the pool-family delta +0x18B8):**
+0x15744→0x16FFC, 0x1581A→0x170D2. **Next rung (moveset replay crashes
+5463 via tripwire for 0x17522):** the vs2-only trio 0x17422/0x17522/
+0x17B22 called from x028122 — 0x17522 is a per-char (5-bit id) 32B-table
+lookup at vs2 0xD22BE with three sub-helpers and a (d8,PC) dispatch on
+$B2(a6); no vsavj skeleton within ±0x3000. Port-vs-map decision needs
+its A5-global usage checked (-0x4B74(A5) family) against the allocator
+rule. NOTE the moveset "END-clean" below was measured BEFORE
+anim_index_a2 deepened the path — the oracle battery window passes on
+the final build; the moveset gate is the 0x17522 rung.
+
+**Results (pre-a2 for the moveset line):** 12_donovan moveset replay
+END-clean (9320 frames, real state machine + VS2-flavor QCB+K). Oracle battery:
+p2 HP trajectories EQUAL (both −11 hits land), disagreements 2201 → 890,
+all remaining = a ~1-frame action-latency skew... **which the veteran
+control proved is the ENGINES' difference, not the port's**: vanilla
+Demitri running the same battery on vsav2-vs-vsavj diverges MORE (2379
+mismatches) than ported Donovan does (890). Frame-exact cross-game
+combat comparison is impossible by construction; the scripted gate
+(`tests/test_m2a_stage4_oracle.sh`) locks: anchors equal (2363), neutral
+window exact (1100 frames), HP-trajectory equality, and the comparative
+bound (ported Donovan ≤ native-veteran divergence).
+
 ## Session 8 (2026-07-27): the oracle gate works — two real bugs on first contact
 
 The vsav2-as-oracle behavior gate (17_don_oracle_* replay pair, both games

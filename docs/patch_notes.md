@@ -2,6 +2,35 @@
 
 Newest first.
 
+## donovan-m2 stage 4 — +0x14E state hook, sound stubs, anim_index_a2 (2026-07-27, session 9)
+
+- **state_hook** (donovan.toml `[state_hook]`, all GEN except records):
+  site 0x02A7C8 first 6 bytes → `jmp thunk`; thunk (50 B, hole A):
+  vanilla ids (< 0xB2) jmp back to the untouched `move.w (0x12,PC,D0.w),
+  D1; jsr (0xE,PC,D1.w)` — ghost-clean; ids 0xB2-0xC8 dispatch via a
+  12-entry long table to synthesized case stubs (32 B each: cmp.b
+  +0x14F; beq→jmp 0x2A7E0 rts; clr.b +0x181; clr.w +0x182; move.w
+  #0x2CD+k,D0; moveq #1,D1; jmp 0x2AD94). D0 preserved through the thunk
+  (stubs compare it). 12 palette-seq records (vs2 0x3B63DC, 0x180 B,
+  vhunt2-twin byte-identity asserted at build) placed as raw data; the 4
+  seq-table consumers (0x2AD82/0x2AD94/0x2B342/0x2B7E8) each get a 30-B
+  base-swap thunk (`movea.l #0x39A900` is exactly 6 bytes → jmp; ids
+  0x2CD-0x2D8 → record base swap; no pushes; andi.w follows every site
+  so CCR is dead). Provenance: GEN thunks/stubs/table, VS2 records.
+- **8 sound-farm stubs** (reconciliation.toml kind=stubbed_sound): vs2
+  sfx calls 0x4DF6/0x4E2A/0x506C/0x5086/0x50A0/0x50BA/0x50D4/0x50EE →
+  vsavj rts 0x2A7E0. Silent until M5 (sfx ids recorded per row).
+- **anim_index_a2** (bank_map): gap_bcefa reclassified data_ptr/anim
+  (fourth anim/box-setter table, consumer 0x27EB8); rows 0x0F/0x1F →
+  0x000D51BE (vs2 0x281696 relocated). Was feeding Jedah's anim-index
+  row to Donovan's attacks.
+
+Verification: moveset replay END-clean (9320 frames); oracle neutral
+window exact ×1100 frames; battery HP trajectories equal; comparative
+bound vs veteran control passes (890 < 2379 — the residual 1-frame skew
+is the two ENGINES' action-latency difference, proven by the control).
+Gate: tests/test_m2a_stage4_oracle.sh.
+
 ## donovan-m2 stage 4 — dispatch_14 repoint (2026-07-27, session 8)
 
 Two new poke32 ops: rows 0x0F and 0x1F of the per-character CODE dispatch
