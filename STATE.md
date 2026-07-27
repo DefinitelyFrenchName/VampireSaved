@@ -304,6 +304,15 @@ opcode-space dump oracle (`tests/test_decrypt_oracle.sh`). Both directions
   session). Suite-runner masked-expectation-kind support lands with the
   stage-5 freeze. New masked windows require the same route: measured
   mechanism + atlas entry + maintainer sign-off.
+- **Ported-Donovan default flavor = VS2** — 2026-07-27, maintainer
+  ("Default should be VS2, as you proposed"). Implemented as a tunable
+  in `build/manifest/donovan.toml` (`[init_shim] flavor_disp=0x3C2,
+  flavor_default=0x01`, rule-5 style): the init shim writes the flavor
+  latch into the initing player's struct (A6+0x3C2) — vsavj never writes
+  it; the ported QCB+K handler + projectile consume it. Verified live:
+  P1 $FF87C2=01 in-match on the flavor-defaulted build. Start-hold
+  selector wiring (clear-to-00 on held Start) = stage-5 select-plumbing
+  scope, §3.3/§3.4 variant policy (Donovan + Huitzil only).
 - **Legacy-gate v2 refinement APPROVED** — 2026-07-27, maintainer
   ("I'd rather we iterate with as tight setups as we can build rather
   than try to be perfect and not go forward"). Per-replay classes on the
@@ -336,24 +345,6 @@ opcode-space dump oracle (`tests/test_decrypt_oracle.sh`). Both directions
 ## Decisions pending (human)
 
 - See SPEC §7 for the rest. Nothing blocks current work.
-- **Ported-Donovan default flavor (gameplay decision; one byte).**
-  Background: the Start-hold flavor select (community-confirmed
-  2026-07-27: Donovan + Huitzil ONLY, hold Start then press punch/kick)
-  is now fully mechanism-pinned — latch `RAM:$FF87C2` (P1 +0x3C2,
-  default 01, cleared by Start-hold), consumed exclusively by the QCB+K
-  special (handler vsav2 0x5A654 + its projectile code 0x65FE6, BOTH
-  inside regions the port already relocates; behavioral fork proven at
-  the exact QCB+LK frame). Full detail:
-  docs/atlas/character_tables.md, tests/experiments/start_hold_flavor/.
-  **Measured on the stage-4 build: vsavj never writes +0x3C2 → the byte
-  is 00 → ported Donovan gets the VH2 flavor of QCB+K by accident.**
-  Decide: (1) **(Recommended)** default 01 = VS2 flavor (init poke via
-  the generator, matches the source game's default), Start-hold selector
-  wiring deferred to stage-5 select plumbing / §3.3-§3.4 variant policy
-  (which now covers only Donovan + Huitzil — Pyron is single-flavor);
-  (2) default 00 = VH2 flavor; (3) leave as-is (= VH2 by accident —
-  not recommended: undocumented accident, and the port's behavior gates
-  compare against native vsav2 which defaults to VS2).
 
 ## Open bugs
 

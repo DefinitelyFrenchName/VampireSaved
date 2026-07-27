@@ -723,16 +723,23 @@ def main():
                 fail.append(f"{d['table']}: dispatch target {tgt:#x} unplaced")
                 continue
             if shim_cfg and d["table"] == shim_cfg["dispatch"]:
-                # synthesized pool-seeding init shim (see donovan.toml).
-                # A5 is NOT guaranteed to hold the $FF8000 base at dispatch
-                # time, and the seeder itself is A5-relative — save A5, load
-                # the base, seed if the latch is clear, restore:
+                # synthesized pool-seeding + flavor-default init shim (see
+                # donovan.toml). A5 is NOT guaranteed to hold the $FF8000
+                # base at dispatch time, and the seeder itself is
+                # A5-relative — save A5, load the base, seed if the pool
+                # latch is clear, restore; then seed the VS2/VH2 flavor
+                # latch in THIS player's struct (A6) — vsavj never writes
+                # it, and Donovan's QCB+K handler + projectile read it
+                # (maintainer decision 2026-07-27: default = VS2):
                 #   move.l A5,-(SP); lea $FF8000.l,A5; tst.l (latch,A5)
-                #   bne.s +6; jsr seed_entry; movea.l (SP)+,A5; jmp handler
-                sd = alloc("a", 28, "init seed shim")
+                #   bne.s +6; jsr seed_entry; movea.l (SP)+,A5
+                #   move.b #flavor_default,(flavor_disp,A6); jmp handler
+                sd = alloc("a", 32, "init seed shim")
                 if sd is None:
                     continue
                 latch = _int(shim_cfg["latch_disp"])
+                flav_d = _int(shim_cfg["flavor_disp"])
+                flav_v = _int(shim_cfg["flavor_default"])
                 shim = (bytes([0x2F, 0x0D])                       # move.l A5,-(SP)
                         + bytes([0x4B, 0xF9, 0x00, 0xFF, 0x80, 0x00])  # lea $FF8000.l,A5
                         + bytes([0x4A, 0xAD]) + latch.to_bytes(2, "big")  # tst.l (latch,A5)
@@ -740,13 +747,17 @@ def main():
                         + bytes([0x4E, 0xB9])
                         + _int(shim_cfg["seed_entry"]).to_bytes(4, "big")
                         + bytes([0x2A, 0x5F])                     # movea.l (SP)+,A5
+                        + bytes([0x1D, 0x7C, 0x00, flav_v])       # move.b #flav,
+                        + flav_d.to_bytes(2, "big")               #   (disp,A6)
                         + bytes([0x4E, 0xF9]) + newt.to_bytes(4, "big"))
                 ops.append({"op": "code", "addr": f"{sd:#x}", "hex": shim.hex()})
-                notes.append(f"code   {sd:#08x} init seed shim (latch A5+"
-                             f"{_int(shim_cfg['latch_disp']):#x}, seeder "
-                             f"{_int(shim_cfg['seed_entry']):#x}) -> handler "
+                notes.append(f"code   {sd:#08x} init shim (pool latch A5+"
+                             f"{latch:#x}, seeder "
+                             f"{_int(shim_cfg['seed_entry']):#x}; flavor "
+                             f"(A6+{flav_d:#x})<-{flav_v:#04x}) -> handler "
                              f"{newt:#08x}")
-                fragments.append((sd, 18, "GEN", "pool-seeding init shim"))
+                fragments.append((sd, len(shim), "GEN",
+                                  "pool-seeding + flavor init shim"))
                 repoint(d["table"], sd, "donovan handler via seed shim")
             else:
                 repoint(d["table"], newt, "donovan handler")

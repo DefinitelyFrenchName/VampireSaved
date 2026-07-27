@@ -245,10 +245,12 @@ Mechanism, fully measured in vsav2 (Japan 970913), Donovan
 inside regions the port already relocates (Donovan code region and
 x065e5a), so the flavor fork ships with the port — but vsavj's engine
 never writes +0x3C2, and on the ported build the byte is **00**: ported
-Donovan currently gets the **VH2 flavor by accident**. Decision recorded
-in STATE.md (recommend default 01 = VS2 flavor via an init poke; the
-Start-hold selector itself is stage-5 select-plumbing / variant-policy
-scope §3.3/§3.4, now narrowed to Donovan + Huitzil).
+Donovan currently gets the **VH2 flavor by accident**. DECIDED 2026-07-27
+(maintainer): default = VS2. The init shim writes 01 to (0x3C2,A6) on
+Donovan init (tunable in donovan.toml `[init_shim]`); verified live on
+the ported build. The Start-hold selector itself is stage-5
+select-plumbing / variant-policy scope §3.3/§3.4, now narrowed to
+Donovan + Huitzil.
 
 ## Cross-set slot correspondence (verified)
 

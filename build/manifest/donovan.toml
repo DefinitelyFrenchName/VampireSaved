@@ -56,6 +56,12 @@ note = "companion queue class 7 (vs2-only) -> vsavj class 6"
 dispatch = "dispatch_00"
 seed_entry = 0x016C64
 latch_disp = 0x7966
+# VS2/VH2 flavor latch (docs/atlas/character_tables.md "Start-hold flavor"):
+# player-struct byte +0x3C2, read by Donovan's QCB+K handler + projectile.
+# vsavj never writes it; the shim seeds the source game's default.
+# 0x01 = VS2 flavor (maintainer decision 2026-07-27), 0x00 = VH2.
+flavor_disp = 0x3C2
+flavor_default = 0x01
 
 # (two of the seven type-dispatch sites need extension; the other five have
 # equal-sized tables in both games — verified session 4)

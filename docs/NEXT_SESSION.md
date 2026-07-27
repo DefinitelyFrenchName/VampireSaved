@@ -30,11 +30,11 @@ mechanism-pinned (Donovan+Huitzil only; latch $FF87C2; consumers = QCB+K
 handler + its projectile, both in ported regions) — see
 docs/atlas/character_tables.md and tests/experiments/start_hold_flavor/.**
 
-**FIRST ACTION NEXT SESSION: the default-flavor decision (STATE.md,
-Decisions pending — one byte, recommend 01=VS2). It GATES the
-vsav2-as-oracle behavior gate: native oracle defaults VS2, ported build
-currently lands on VH2 by accident, so QCB+K would fail the field
-compare until decided + poked.**
+**Default flavor DECIDED (VS2) and implemented: the init shim seeds the
+latch (donovan.toml `[init_shim] flavor_disp/flavor_default`); verified
+live (P1 $FF87C2=01); the moveset replay now exercises the VS2 branch of
+QCB+K. The vsav2-as-oracle behavior gate is UNGATED — it's the next
+work, followed by the dual-emulator gate, then stage 5.**
 
 **NEXT WORK (stage-4 close, then stage 5):**
 1. **vsav2-as-oracle behavior gate:** field-level compare at sync anchors

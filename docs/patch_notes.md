@@ -2,6 +2,23 @@
 
 Newest first.
 
+## donovan-m2 stage 4 — VS2 default flavor via the init shim (2026-07-27)
+
+The pool-seeding init shim (behind dispatch_00[0x0F]) grows 26→32 bytes:
+after the pool-seed branch it now writes the VS2/VH2 flavor latch into
+the initing player's struct — `move.b #$01, $3C2(A6)` — before jumping to
+Donovan's relocated handler. Both values are manifest tunables
+(`[init_shim] flavor_disp / flavor_default`, donovan.toml). Why: vsavj's
+engine never writes +0x3C2; Donovan's ported QCB+K handler (vsav2
+0x5A654) and its projectile (0x65FE6) read it (0x01=VS2, 0x00=VH2 —
+community-confirmed Start-hold mechanism, docs/atlas/character_tables.md);
+without the poke the port took the VH2 branch by accident. Maintainer
+decision 2026-07-27: default VS2. Verified: P1 $FF87C2=01 live in-match;
+the moveset replay now exercises the VS2 branch of QCB+K. Provenance:
+GEN (shim), behavior value in the manifest. Attract/legacy unaffected
+(shim runs only on slot-0x0F init; masked legacy gate green — see the
+gate log for this build's fingerprint).
+
 ## donovan-m2 stage 4 — session 7: extraction corruption fixed; ghost-clean hooks (2026-07-25)
 
 Blob-level changes (all via `tools/extract_char.py` regeneration — no ops
