@@ -20,26 +20,33 @@ differ by ~1 frame of action latency — veteran control proved it);
 the oracle locks are anchors/neutral-exact/HP-trajectory/comparative
 bound.
 
-**NEXT WORK (stage-4 close → stage 5):**
-1. **Dual-emulator gate (the last stage-4 item):** run
-   17_don_oracle_vsavj (it follows the 16_xemu authoring rules — both
-   picks scripted) on MAME AND patched FBNeo (FBNEO_ROMPATH loads
-   CRC-changed zips; FBNEO_DUMPS for field windows), compare mapped
-   fields at anchors via compare_fields WITHOUT --exact (per §4:
-   MAME/FBNeo run same states frames apart). The selfcheck
-   (16_xemu_2p) is the template. Capture as
-   tests/test_m2a_stage4_xemu.sh.
-2. Stage 5: select plumbing (aux pokes; Start-hold flavor selector —
-   Donovan+Huitzil scope per variant policy), soak, freeze (registry
-   row + suite masked-expectation kind + register build sha in
-   HANDOFF registry).
-3. Parked: 0x36784A alternate anim table (tripwire or port at stage-5
-   close); Huitzil/Pyron tripwired handlers; 0x2c31xx data opens
-   (likely Anita DF-only); M5 sound-restoration list (8 rows tagged
-   stubbed_sound).
+**STAGE 4 IS CLOSED.** The dual-emulator gate also passed
+(`tests/test_m2a_stage4_xemu.sh`: patched build on MAME + patched
+FBNeo, anchors 2363/2364, all mapped fields agree at follow 0/60/180).
+All three stage-4 gates green on fingerprint 67753ee3.
 
-**Gates every build:** `tests/test_m2a_stage4_code.sh` +
-`tests/test_m2a_stage4_oracle.sh` (both PASS on 67753ee3).
+**NEXT WORK — STAGE 5 (select plumbing), then soak + freeze:**
+1. Select-screen aux pokes so slot 0x0F presents as Donovan (name/
+   portrait handling is M2b-graphics-adjacent — check M2_feasibility
+   for what's text vs GFX; minimum: correct pick behavior, which
+   already works via the anim repoint).
+2. Start-hold flavor selector (variant policy scope = Donovan +
+   Huitzil): wire Start-held-at-confirm to clear the +0x3C2 latch
+   (vsavj select code doesn't write it; the init shim seeds 01 — a
+   select-time hook or shim extension can clear on Start; SPEC §3.3/3.4
+   presentation questions go to the maintainer).
+3. Stage-5 close-out: 0x36784A alternate anim table (tripwire or
+   port), then SOAK (long-run replays incl. timeout/DF/pursuit per
+   the §4 minimum matrix — grow the replay set), then FREEZE:
+   registry row for the frozen fingerprint, suite masked-expectation
+   kind, build sha in the HANDOFF registry.
+4. Parked: Huitzil/Pyron tripwired handlers (their ports = M3+);
+   0x2c31xx data opens (likely Anita DF-only); M5 sound-restoration
+   list (8 stubbed_sound rows).
+
+**Gates every build:** test_m2a_stage4_code.sh +
+test_m2a_stage4_oracle.sh + test_m2a_stage4_xemu.sh (all PASS on
+67753ee3).
 
 **Read:** STATE.md (sessions 8-10), docs/tables/reconciliation.md
 (Sessions 8-10), docs/patch_notes.md (top three), docs/GOTCHAS.md.

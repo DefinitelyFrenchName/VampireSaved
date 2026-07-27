@@ -69,8 +69,12 @@ maintainer decision)
   (post-process), 0x17B22→0x19128 (KO). Donovan uses vsavj's own damage
   machinery (correct superset semantics). Moveset replay END-clean 9320
   frames; code gate green (incl. masked legacy, flickers unchanged);
-  oracle gate green. Remaining for stage-4 close: the dual-emulator
-  gate. Then stage 5.
+  oracle gate green. **And the dual-emulator gate PASSED
+  (test_m2a_stage4_xemu.sh: patched build on MAME + patched FBNeo,
+  anchors 2363/2364 — 1-frame skew — all mapped fields agree at follow
+  0/60/180). ALL THREE STAGE-4 GATES GREEN on fingerprint 67753ee3:
+  STAGE 4 IS CLOSED.** Next: stage 5 (select plumbing + Start-hold
+  flavor selector), soak, freeze.
 - **2026-07-27 (session 9): the +0x14E frontier is CLOSED and the
   ORACLE GATE PASSES as a scripted test.** The state hook landed
   (synthesized case stubs + ghost-clean thunks + relocated palette-seq
