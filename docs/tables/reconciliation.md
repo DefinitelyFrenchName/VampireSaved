@@ -136,6 +136,38 @@ now COMPLETES and the match runs 137 frames):
   zero-fills the 0x80-byte slot, preserving the category byte at +8.
   Only Donovan's alloc calls are wrapped; vanilla allocations untouched.
 
+## Session 11c: playtest round 3 — the hang is the LILITH EVENT SCENE (open frontier, deterministic repro)
+
+Maintainer round 3 (on cdf62d8c): still a hang-like state under mash —
+screen wipes, a new slow-scrolling background + different music, then
+unresponsive with stale visuals. Chased through five negative repros
+(dual-mash 22, match-win 23, win-mash 24, explicit Dark Force 25 — DF
+ACTIVATES AND EXPIRES CLEANLY, screen-darkening verified by snapshot —
+all END-clean) before landing it with **26_don_arcade_mash** (1P arcade,
+dense chords, multi-match): display freezes between frames 13500-14000
+while RAM keeps ticking (no exception, no tight loop). Snapshot at 13500
+= the **Lilith/Morrigan event cutscene** — corroborating the maintainer's
+very first report ("I was fighting Lilith"). At frame 20000 the P1
+struct is fully TORN DOWN (all zeros) yet Donovan's per-char meter
+routine (ported x028122 code, the +0x109 stock loop at src 0x28D92 —
+correctly identified as meter-gain, jsr 0x3B2C = stock chime, +0x3B2
+selects the stock cap) still executes each frame with A6=$FF8400 and a
+dispatch id of 0x0F (probe D1=0x3C) — something in the event-scene flow
+keeps dispatching slot-0x0F per-char machinery against the empty struct,
+and the scene never advances.
+
+NEXT SESSION (bisection plan): dump the P1 struct + scene-mode globals
+at 13600/13700/13800/13900 to catch the teardown moment; identify WHAT
+dispatches the per-char routine during the cutscene (GUARD_PROBE at the
+dispatch_14 site 0x26244 and dispatch_00 shim with A6/id logging); then
+compare the native vs2 1P arcade flow at its Lilith-event equivalent
+(does vs2 guard its newcomer init against non-match scenes?). Suspects,
+in order: (1) the event scene re-inits P1 via dispatch_00 row 0x0F and
+Donovan's ported init assumes match infrastructure (pools/companion);
+(2) dispatch_14 row 0x0F running in a scene context where Jedah's
+vanilla routine was scene-safe and Donovan's is not; (3) a stale class-6
+companion queue entry surviving scene teardown.
+
 ## Session 11 addendum: second playtest round — the mash/time crash
 
 Playtest round 2 (on d6d8f273): DP fixed ✓; new crash "after ~a round of
