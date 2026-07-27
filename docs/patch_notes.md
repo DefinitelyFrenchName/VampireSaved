@@ -2,6 +2,40 @@
 
 Newest first.
 
+## donovan-m2 stage 5 — Start-hold flavor selector + alternate-table poison (2026-07-27, session 11)
+
+Stage-5 build (fingerprint 4b65bc63…, `tools/build_donovan.sh 5`):
+
+- **Start-hold flavor selector** (init shim 32→68 bytes, GEN): after
+  seeding the VS2 default (01) into the initing player's flavor latch
+  (+0x3C2), the shim tests the per-player Start bitmask at `RAM:$FF8060`
+  (bit 0 = P1 Start, bit 1 = P2 — measured: live through char-init,
+  where the menu-context mirror +0x44 is already cleared) and writes 00
+  (VH2) when the player's own Start is held. `cmpa.l #$FF8400,A6`
+  selects the bit; all added ops are CCR-only — no register clobbers
+  before the handler. Tunables in donovan.toml `[init_shim]`:
+  flavor_default / flavor_held / flavor_hold_flag. UX matches the
+  community-confirmed vs2 protocol (hold your Start from before the
+  confirm press through match load).
+- **imm_poison mechanism** (generator) + first use: the companion tail's
+  unreachable alternate-anim-table operand (`movea.l #$36784A`, taken
+  only when the spawn-record sub byte ≠ 0 — Donovan's hook always writes
+  0) is repointed at a 16-byte GEN poison table (odd-value words): any
+  future writer that makes the branch reachable faults vec3 with A0
+  naming the poison block, instead of silently reading unrelated vsavj
+  bytes.
+- **aux_poke survey result:** none needed for the M2a bar — pick/select
+  behavior already works via the bank repoints; portrait/name are GFX
+  (M2b, placeholder-acceptable); the attract's CPU demo on slot 0x0F
+  runs crash-free every legacy-gate build.
+
+Verification on 4b65bc63: guarded moveset END-clean (9320); masked
+legacy gate green (flicker inventory unchanged); oracle gate PASS;
+dual-emulator gate PASS (anchors 2363/2364); NEW
+`tests/test_m2a_flavor_selector.sh` PASS (plain→01, P1-held→00,
+P2-held→01 — per-player isolation). Freeze (registry row + suite
+masked-expectation kind) awaits the maintainer's build decision.
+
 ## donovan-m2 stage 4 — damage-pipeline R1 rows; BOTH GATES GREEN (2026-07-27, session 10)
 
 No new ops — three R1 rows (reconciliation.toml) turned three tripwires

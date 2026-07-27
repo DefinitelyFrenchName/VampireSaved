@@ -60,6 +60,20 @@ maintainer decision)
     diverge-constants hold. Whole-live-state identity therefore holds for
     all match gameplay; the exceptions are input-boundary flickers and
     service mode.
+- **2026-07-27 (session 11): STAGE 5 BUILT AND FULLY GREEN — M2a is
+  functionally complete pending the freeze decision.** Stage-5 build
+  fingerprint **4b65bc63…**: the Start-hold flavor selector is LIVE
+  (init shim reads the per-player Start bitmask $FF8060 at char-init;
+  hold YOUR Start through match load → VH2 flavor; verified 3-way by
+  the new `tests/test_m2a_flavor_selector.sh` — plain 01 / P1-held 00 /
+  P2-held 01, per-player isolated); the unreachable Anita alternate-
+  anim-table operand is poisoned (new imm_poison generator mechanism —
+  loud vec3 at a named block if a future writer arms the branch); the
+  aux_poke survey concluded none are needed for the M2a bar (select
+  behavior works via bank repoints; portrait/name = M2b GFX). ALL gates
+  green on 4b65bc63: guarded moveset, masked legacy, oracle,
+  dual-emulator, flavor selector. **Freeze = pending maintainer build
+  decision (see Decisions pending).**
 - **2026-07-27 (session 10): BOTH stage-4 gates PASS on one build
   (fingerprint 67753ee3) — the first all-green run with every system
   active.** The "0x17522 trio" turned out to be the DAMAGE PIPELINE and
@@ -391,6 +405,17 @@ opcode-space dump oracle (`tests/test_decrypt_oracle.sh`). Both directions
 
 ## Decisions pending (human)
 
+- **M2a FREEZE (build decision): register stage-5 fingerprint 4b65bc63…**
+  All gates green (moveset, masked legacy, oracle, dual-emulator, flavor
+  selector); the M2a bar (selectable, crash-free, behavior observable,
+  R1 logged) is met, with graphics deliberately garbled (M2b) and sound
+  deliberately silent for Donovan's own sfx (M5, 8 stubbed rows).
+  Recommend: PLAYTEST FIRST (this is the natural hand-on-stick moment —
+  pick slot 0x0F, both flavors via Start-hold, feel the moves), then
+  freeze: registry row + frozen expectations for the pick/attract
+  diverge constants on this fingerprint + suite masked-expectation-kind
+  support (the mechanics are ~an hour of work once you say go). Any
+  feel-wrong findings become replays first (structured reports welcome).
 - See SPEC §7 for the rest. Nothing blocks current work.
 
 ## Open bugs

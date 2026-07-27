@@ -248,9 +248,13 @@ never writes +0x3C2, and on the ported build the byte is **00**: ported
 Donovan currently gets the **VH2 flavor by accident**. DECIDED 2026-07-27
 (maintainer): default = VS2. The init shim writes 01 to (0x3C2,A6) on
 Donovan init (tunable in donovan.toml `[init_shim]`); verified live on
-the ported build. The Start-hold selector itself is stage-5
-select-plumbing / variant-policy scope §3.3/§3.4, now narrowed to
-Donovan + Huitzil.
+the ported build. **Stage 5 (session 11): the Start-hold SELECTOR is
+implemented on vsavj** — the shim additionally tests the per-player
+Start bitmask `RAM:$FF8060` (bit 0 = P1, bit 1 = P2; live through
+char-init — unlike the menu-context mirror at struct +0x44, which
+clears at match load) and seeds 00 (VH2) when the initing player's own
+Start is held. Verified 3-way (`tests/test_m2a_flavor_selector.sh`).
+Huitzil gets the same wiring at his port (M3).
 
 ## Cross-set slot correspondence (verified)
 

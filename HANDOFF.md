@@ -47,6 +47,10 @@ tests/test_fbneo_smoke.sh             # FBNeo headless boot + 15s crash-free soa
 tests/test_m2a_stage4_code.sh         # stage-4 gate: veto lock + guarded moveset
                                       # + masked legacy gate (amended §4 basis;
                                       # frozen masked exps in tests/expected/vsavj/masked/)
+tests/test_m2a_stage4_oracle.sh [rp]  # vsav2-as-oracle: anchors/neutral-exact/
+                                      # HP-trajectory/comparative bound (17+18 replays)
+tests/test_m2a_stage4_xemu.sh  [rp]   # dual-emulator: MAME+FBNeo field agreement
+tests/test_m2a_flavor_selector.sh [rp]# Start-hold flavor latch (stage 5)
 ```
 
 All tests are self-contained, take state only via env/args, print PASS/FAIL,
@@ -58,6 +62,7 @@ before session end (persistent suite doctrine, CLAUDE.md §4).
 | Build | SHA-1 (zip) | Notes |
 |---|---|---|
 | null vsavj | `12fbb0e1a137a1420824856d3efb0af8fff57be6` | == reference members; zip repacked deterministically |
+| donovan-m2 stage 5 (freeze candidate) | fingerprint `4b65bc63507e7f1712324476719393c1d82e24cf` | `tools/build_donovan.sh 5 build/donovan5`; all gates green (moveset/legacy/oracle/xemu/flavor); registry row lands at the maintainer's freeze decision (STATE.md) |
 
 ## M1 additions (2026-07-25, session 2)
 

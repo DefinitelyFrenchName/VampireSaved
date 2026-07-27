@@ -22,6 +22,7 @@ ROMDIR="${ROMDIR:?set ROMDIR}"
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 RPDIR="${1:-$REPO/build/donovan/rompath}"
 [ -d "$RPDIR" ] || { echo "no build at $RPDIR — run tools/build_donovan.sh 4 first"; exit 1; }
+RPDIR="$(cd "$RPDIR" && pwd)"   # FBNeo's rompath overlay needs an absolute path
 WORK="$(mktemp -d)"
 trap 'rm -rf "$WORK"' EXIT
 cd "$REPO"

@@ -89,10 +89,16 @@ seed_entry = 0x016C64
 latch_disp = 0x7966
 # VS2/VH2 flavor latch (docs/atlas/character_tables.md "Start-hold flavor"):
 # player-struct byte +0x3C2, read by Donovan's QCB+K handler + projectile.
-# vsavj never writes it; the shim seeds the source game's default.
+# vsavj never writes it; the shim seeds the source game's default, and
+# (stage 5) holding YOUR Start through match load selects the other
+# flavor — the community-confirmed protocol. flavor_hold_flag is the
+# per-player Start bitmask byte (bit 0 = P1, bit 1 = P2; measured live
+# through char-init, sessions 10-11).
 # 0x01 = VS2 flavor (maintainer decision 2026-07-27), 0x00 = VH2.
 flavor_disp = 0x3C2
 flavor_default = 0x01
+flavor_held = 0x00
+flavor_hold_flag = 0xFF8060
 
 # (two of the seven type-dispatch sites need extension; the other five have
 # equal-sized tables in both games — verified session 4)
@@ -112,12 +118,26 @@ src_entries = 124
 
 # non-bank repoints (select screen, win quotes, AI, versus tables) land here
 # as stage-5 RE pins their addresses down; op = poke16|poke32, both slots
-# where applicable.
+# where applicable. Session 11 findings: pick/select behavior already works
+# via the bank repoints (anim hover, +0x382 id path); portrait/name are
+# GFX (M2b, placeholder-acceptable per the M2a bar); the attract's CPU
+# demo on slot 0x0F runs crash-free (legacy gate, every build).
 # [[aux_poke]]
 # name = "..."
 # addr = 0x0
 # op = "poke32"
 # val = 0x0
+
+# Anita's ALTERNATE anim table (companion tail branch `tst.b $3(a6); bne ->
+# movea.l #$36784A`, taken only when the spawn-record sub byte != 0 —
+# Donovan's hook always writes sub=0, branch proven unreached through the
+# full moveset + oracle batteries). The table is deliberately unported;
+# poison the operand so any future writer faults loudly at a named block.
+[[imm_poison]]
+region = "x088512"
+src_addr = 0x08A300
+old_imm = 0x0036784A
+note = "Anita alternate anim table (sub!=0 branch; unreached — port or map when a writer appears)"
 
 # Layout groups: regions that PC-reference each other (directly or via
 # word jump tables) keep their source-relative spacing; the inter-region

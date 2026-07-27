@@ -543,6 +543,35 @@ def main():
                              f"{pr_trip:#x})" if pr_trip else
                              f"# {name}: {n_pr} pcrel escape entries rewritten")
 
+            # poisoned immediates (donovan.toml [[imm_poison]]): unreachable
+            # movea.l #imm operands whose target is deliberately unported —
+            # repointed at a shared poison table (odd-value words) so any
+            # future writer that makes the branch reachable faults loudly
+            # (vec3, A0 = the poison block) instead of silently reading
+            # unrelated vsavj bytes
+            for ip in port.get("imm_poison", []):
+                if ip["region"] != name:
+                    continue
+                off = _int(ip["src_addr"]) - r["src"]
+                old = _int(ip["old_imm"]).to_bytes(4, "big")
+                if not (0 <= off < r["len"]) or blob[off:off + 4] != old:
+                    fail.append(f"imm_poison {ip['note']}: bytes at "
+                                f"{name}+{off:#x} != {old.hex()}")
+                    continue
+                if "poison_addr" not in port:
+                    pa = alloc("a", 16, "imm_poison table")
+                    if pa is None:
+                        continue
+                    ops.append({"op": "data", "addr": f"{pa:#x}",
+                                "hex": "0001" * 8})
+                    notes.append(f"data   {pa:#08x} +0x10  imm_poison table "
+                                 f"(odd-entry words -> vec3 on use)")
+                    fragments.append((pa, 16, "GEN", "imm_poison table"))
+                    port["poison_addr"] = pa
+                blob[off:off + 4] = port["poison_addr"].to_bytes(4, "big")
+                notes.append(f"# {name}+{off:#x}: imm_poison {old.hex()} -> "
+                             f"{port['poison_addr']:#x} ({ip['note']})")
+
             # targeted port patches (donovan.toml [[port_patch]]): documented
             # byte edits on ported code, old bytes verified
             for pp in port.get("port_patch", []):
@@ -851,30 +880,51 @@ def main():
                 #   move.l A5,-(SP); lea $FF8000.l,A5; tst.l (latch,A5)
                 #   bne.s +6; jsr seed_entry; movea.l (SP)+,A5
                 #   move.b #flavor_default,(flavor_disp,A6); jmp handler
-                sd = alloc("a", 32, "init seed shim")
+                sd = alloc("a", 68, "init seed shim")
                 if sd is None:
                     continue
                 latch = _int(shim_cfg["latch_disp"])
                 flav_d = _int(shim_cfg["flavor_disp"])
                 flav_v = _int(shim_cfg["flavor_default"])
+                # Start-hold flavor selector (stage 5; community-confirmed
+                # protocol, docs/atlas/character_tables.md): the byte at
+                # flavor_hold_flag is a per-player Start bitmask (bit 0 =
+                # P1, bit 1 = P2; live through match load — measured).
+                # Holding YOUR Start through match load selects the other
+                # game's flavor (latch <- flavor_held). All ops CCR-only —
+                # no register clobbers before the handler.
+                hold_flag = _int(shim_cfg["flavor_hold_flag"])
+                flav_h = _int(shim_cfg["flavor_held"])
                 shim = (bytes([0x2F, 0x0D])                       # move.l A5,-(SP)
                         + bytes([0x4B, 0xF9, 0x00, 0xFF, 0x80, 0x00])  # lea $FF8000.l,A5
                         + bytes([0x4A, 0xAD]) + latch.to_bytes(2, "big")  # tst.l (latch,A5)
-                        + bytes([0x66, 0x06])                     # bne.s skip
+                        + bytes([0x66, 0x06])                     # bne.s skip seed
                         + bytes([0x4E, 0xB9])
                         + _int(shim_cfg["seed_entry"]).to_bytes(4, "big")
                         + bytes([0x2A, 0x5F])                     # movea.l (SP)+,A5
-                        + bytes([0x1D, 0x7C, 0x00, flav_v])       # move.b #flav,
-                        + flav_d.to_bytes(2, "big")               #   (disp,A6)
-                        + bytes([0x4E, 0xF9]) + newt.to_bytes(4, "big"))
+                        + bytes([0x1D, 0x7C, 0x00, flav_v])       # move.b #default,
+                        + flav_d.to_bytes(2, "big")               #   (flavor,A6)
+                        + bytes([0xBD, 0xFC, 0x00, 0xFF, 0x84, 0x00])  # cmpa.l #$FF8400,A6
+                        + bytes([0x66, 0x0A])                     # bne.s p2bit
+                        + bytes([0x08, 0x39, 0x00, 0x00])         # btst #0,
+                        + hold_flag.to_bytes(4, "big")            #   (flag).l
+                        + bytes([0x60, 0x08])                     # bra.s join
+                        + bytes([0x08, 0x39, 0x00, 0x01])         # p2bit: btst #1,
+                        + hold_flag.to_bytes(4, "big")            #   (flag).l
+                        + bytes([0x67, 0x06])                     # join: beq.s skip
+                        + bytes([0x1D, 0x7C, 0x00, flav_h])       # move.b #held,
+                        + flav_d.to_bytes(2, "big")               #   (flavor,A6)
+                        + bytes([0x4E, 0xF9]) + newt.to_bytes(4, "big"))  # skip: jmp
+                assert len(shim) == 68, len(shim)
                 ops.append({"op": "code", "addr": f"{sd:#x}", "hex": shim.hex()})
                 notes.append(f"code   {sd:#08x} init shim (pool latch A5+"
                              f"{latch:#x}, seeder "
                              f"{_int(shim_cfg['seed_entry']):#x}; flavor "
-                             f"(A6+{flav_d:#x})<-{flav_v:#04x}) -> handler "
-                             f"{newt:#08x}")
+                             f"(A6+{flav_d:#x})<-{flav_v:#04x}, Start-held "
+                             f"[{hold_flag:#x} bit=player] -> {flav_h:#04x}) "
+                             f"-> handler {newt:#08x}")
                 fragments.append((sd, len(shim), "GEN",
-                                  "pool-seeding + flavor init shim"))
+                                  "pool-seed + flavor(+Start-hold) init shim"))
                 repoint(d["table"], sd, "donovan handler via seed shim")
             else:
                 repoint(d["table"], newt, "donovan handler")
