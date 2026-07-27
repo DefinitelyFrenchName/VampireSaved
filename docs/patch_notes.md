@@ -2,6 +2,24 @@
 
 Newest first.
 
+## donovan-m2 stage 4 — damage-pipeline R1 rows; BOTH GATES GREEN (2026-07-27, session 10)
+
+No new ops — three R1 rows (reconciliation.toml) turned three tripwires
+into real calls: vs2 damage trio 0x17522/0x17422/0x17B22 → vsavj
+0x18B8C/0x18AB0/0x19128 (defense-scaling calc / damage post-process /
+KO handler), callsite-anchored in the byte-parallel damage wrapper
+(vs2 0x17330 ↔ vsavj 0x189BA; found via the KO-write signature). Plus
+two pool-family rows (0x15744→0x16FFC, 0x1581A→0x170D2, skeleton-match
+at +0x18B8). Donovan now uses VSAVJ's own damage machinery — correct
+superset semantics (mapped, never ported, per the allocator rule).
+
+Build fingerprint 67753ee3: `tests/test_m2a_stage4_code.sh` PASS (veto
+lock; moveset replay END-clean 9320 frames — real state machine +
+VS2-flavor QCB+K + damage pipeline; masked legacy green, flicker
+inventory unchanged) AND `tests/test_m2a_stage4_oracle.sh` PASS
+(anchors 2363/2363; neutral exact; HP trajectories equal 288,277,266;
+comparative bound 890 ≤ 2379). First all-green stage-4 run.
+
 ## donovan-m2 stage 4 — +0x14E state hook, sound stubs, anim_index_a2 (2026-07-27, session 9)
 
 - **state_hook** (donovan.toml `[state_hook]`, all GEN except records):

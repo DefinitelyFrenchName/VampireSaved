@@ -1112,3 +1112,27 @@ vsavj = 0x0170D2
 kind = "engine_sub"
 status = "verified"
 note = "pool-family helper; skeleton-match at family delta +0x18B8"
+
+# ── Damage-pipeline trio, session 10: callsite-anchored in the byte-parallel
+# damage wrapper (vs2 0x17330-0x17420 ↔ vsavj 0x189BA-0x18AAE — instruction-
+# for-instruction identical incl. the KO path; every bsr position votes) ────
+[[map]]
+vsav2 = 0x017522
+vsavj = 0x018B8C
+kind = "engine_sub"
+status = "verified"
+note = "per-char defense-scaling calc; callsite-anchored x2 in the damage wrapper"
+
+[[map]]
+vsav2 = 0x017422
+vsavj = 0x018AB0
+kind = "engine_sub"
+status = "verified"
+note = "damage post-process; callsite-anchored in the damage wrapper"
+
+[[map]]
+vsav2 = 0x017B22
+vsavj = 0x019128
+kind = "engine_sub"
+status = "verified"
+note = "KO handler; callsite-anchored in the wrapper's KO path"

@@ -136,6 +136,36 @@ now COMPLETES and the match runs 137 frames):
   zero-fills the 0x80-byte slot, preserving the category byte at +8.
   Only Donovan's alloc calls are wrapped; vanilla allocations untouched.
 
+## Session 10 (2026-07-27): the damage pipeline — trio resolved by callsite anchoring; moveset replay CLEAN on the full build
+
+The session-9 "0x17522 trio" is the DAMAGE PIPELINE, and it is NOT
+vs2-only — the skeleton scan missed it because vsavj's implementations
+drifted internally. The decisive instrument was the KO-write signature
+(`move.w #$FFFF,$50(a1); move.w #$FFFF,$52(a1)` — two hits per game,
+positions parallel), which located vsavj's damage WRAPPER at 0x189BA —
+**instruction-for-instruction byte-parallel** with vs2's 0x17330 wrapper
+(same A5-global shape at drifted displacements, same call structure,
+same KO path). Every bsr position votes:
+
+| vs2 | vsavj | role |
+|---|---|---|
+| 0x17522 | 0x18B8C | per-char defense-scaling calc (5-bit id, 32B table) |
+| 0x17422 | 0x18AB0 | damage post-process |
+| 0x17B22 | 0x19128 | KO handler |
+| 0x173DE | 0x18A6C | halve-damage helper (positional, not yet needed) |
+| 0x17806 | 0x18E46 | (positional, not yet needed) |
+| 0x175AE | 0x18C08 | damage apply (positional, not yet needed) |
+
+Consequence: Donovan's ported char-init code (x028122's jsr sites) now
+calls VSAVJ's own damage machinery — per the allocator rule (engine
+subsystems reading the game's own RAM/table state are MAPPED, never
+ported). His damage scaling therefore uses vsavj's defense table, which
+is the CORRECT superset semantics (he is a vsavj character).
+
+**RESULT: 12_donovan_vs_cpu END-clean (9320 frames) on the FULL build —
+real state machine + VS2-flavor QCB+K + damage pipeline. No crash, no
+tripwire.** Gates re-run on fingerprint 67753ee3 (see STATE).
+
 ## Session 9 (2026-07-27): +0x14E hook landed; sound stubbed; anim_index_a2; the skew is the ENGINES'
 
 **The +0x14E frontier is CLOSED.** Implemented per the session-8 design

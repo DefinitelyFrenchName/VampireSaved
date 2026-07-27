@@ -60,6 +60,17 @@ maintainer decision)
     diverge-constants hold. Whole-live-state identity therefore holds for
     all match gameplay; the exceptions are input-boundary flickers and
     service mode.
+- **2026-07-27 (session 10): BOTH stage-4 gates PASS on one build
+  (fingerprint 67753ee3) — the first all-green run with every system
+  active.** The "0x17522 trio" turned out to be the DAMAGE PIPELINE and
+  is mapped, not ported: the KO-write signature located vsavj's
+  byte-parallel damage wrapper (0x189BA ↔ vs2 0x17330) and every bsr
+  position voted — 0x17522→0x18B8C (defense-scaling), 0x17422→0x18AB0
+  (post-process), 0x17B22→0x19128 (KO). Donovan uses vsavj's own damage
+  machinery (correct superset semantics). Moveset replay END-clean 9320
+  frames; code gate green (incl. masked legacy, flickers unchanged);
+  oracle gate green. Remaining for stage-4 close: the dual-emulator
+  gate. Then stage 5.
 - **2026-07-27 (session 9): the +0x14E frontier is CLOSED and the
   ORACLE GATE PASSES as a scripted test.** The state hook landed
   (synthesized case stubs + ghost-clean thunks + relocated palette-seq
