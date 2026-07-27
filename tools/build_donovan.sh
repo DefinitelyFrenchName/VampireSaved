@@ -19,6 +19,19 @@ cd "$REPO"
 python3 tools/audit_roms.py "$ROMDIR" > /dev/null || {
     echo "ROM audit FAILED — stop (CLAUDE.md §3)"; exit 1; }
 
+# Decrypted analysis views (gitignored intermediates): the extractor and
+# generator read build/out/<set>_{opcodes,data}.bin. Regenerate any that
+# are missing — deterministic from the audited reference sets.
+mkdir -p build/out
+for _set in vsavj vsav2 vhunt2; do
+    if [ ! -f "build/out/${_set}_opcodes.bin" ] || [ ! -f "build/out/${_set}_data.bin" ]; then
+        echo "regenerating decrypted views for $_set ..."
+        python3 tools/cps2_decrypt.py "$ROMDIR/${_set}.zip" \
+            "build/out/${_set}_opcodes.bin" \
+            --data-out "build/out/${_set}_data.bin" | tail -2
+    fi
+done
+
 # EXTRA_ROOTS: absent-in-vsavj support routines ported as extra code
 # regions (found by the stage-4 R1 loop; see docs/tables/reconciliation.md).
 # Default = the full stage-4 set: the +0x34 newcomer-support zone, the tiny
