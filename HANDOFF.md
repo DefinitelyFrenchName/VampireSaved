@@ -62,7 +62,7 @@ before session end (persistent suite doctrine, CLAUDE.md §4).
 | Build | SHA-1 (zip) | Notes |
 |---|---|---|
 | null vsavj | `12fbb0e1a137a1420824856d3efb0af8fff57be6` | == reference members; zip repacked deterministically |
-| donovan-m2 stage 5 (freeze candidate) | fingerprint `d6d8f273f00687e96df91d6524340352838a23b8` | `tools/build_donovan.sh 5 build/donovan5`; all gates green (2 guarded replays incl. ES-DP spam / 13-replay masked legacy / oracle / xemu / flavor); supersedes 4b65bc63 (ES-DP reaction-hook fix); registry row lands at the maintainer's freeze decision (STATE.md) |
+| donovan-m2 stage 5 (freeze candidate) | fingerprint `cdf62d8cc79e7ed6b3248281eb916bae427cb0ba` | `tools/build_donovan.sh 5 build/donovan5`; all gates green (4 guarded soaks incl. ES-DP spam, round-2, input-chaos / 13-replay masked legacy / oracle / xemu / flavor); supersedes d6d8f273 (shared-anim-table remap — mash/time crash fix); registry row lands at the maintainer's freeze decision (STATE.md) |
 
 ## M1 additions (2026-07-25, session 2)
 

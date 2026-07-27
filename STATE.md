@@ -90,6 +90,17 @@ after first-playtest fixes; freeze awaiting maintainer decision)
   added) — the gate now covers all 13 original replays. 19_don_dp_spam
   joined the code gate's guarded set. New freeze candidate d6d8f273,
   everything green.
+- **2026-07-27 (session 11b, second playtest round): the mash/time crash
+  is FIXED.** DP confirmed fixed by the maintainer; new crash on heavy
+  activity reproduced with 21_don_mash (input-chaos soak) — the type-114
+  effect's creation code loads an ENGINE-SHARED anim table via a raw
+  un-hosted movea immediate (vs2 0x1D7428). Fixes: extractor now
+  classifies un-hosted movea.l #imm ROM targets as ENGINE refs (row or
+  tripwire — retires the manual imm_poison, 0x36784A auto-tripwired);
+  new engine_data row 0x1D7428→0x1F3FD2 (unique content match). Round
+  transition alone proven clean (20_don_round2); both soaks join the
+  code gate (4 guarded replays). Full battery green on the NEW freeze
+  candidate **cdf62d8c**.
 - **2026-07-27 (session 10): BOTH stage-4 gates PASS on one build
   (fingerprint 67753ee3) — the first all-green run with every system
   active.** The "0x17522 trio" turned out to be the DAMAGE PIPELINE and
@@ -421,7 +432,7 @@ opcode-space dump oracle (`tests/test_decrypt_oracle.sh`). Both directions
 
 ## Decisions pending (human)
 
-- **M2a FREEZE (build decision): register stage-5 fingerprint d6d8f273…**
+- **M2a FREEZE (build decision): register stage-5 fingerprint cdf62d8c…**
   All gates green (moveset, masked legacy, oracle, dual-emulator, flavor
   selector); the M2a bar (selectable, crash-free, behavior observable,
   R1 logged) is met, with graphics deliberately garbled (M2b) and sound

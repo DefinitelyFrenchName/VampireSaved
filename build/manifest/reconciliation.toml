@@ -1136,3 +1136,12 @@ vsavj = 0x019128
 kind = "engine_sub"
 status = "verified"
 note = "KO handler; callsite-anchored in the wrapper's KO path"
+
+# ── Engine-shared data tables reached from ported movea.l immediates
+# (session 11 mash-soak crash: type-114 effect's set-anim table) ────────────
+[[map]]
+vsav2 = 0x1D7428
+vsavj = 0x1F3FD2
+kind = "engine_data"
+status = "verified"
+note = "shared effect anim word table; 24-byte content match, unique in vsavj"

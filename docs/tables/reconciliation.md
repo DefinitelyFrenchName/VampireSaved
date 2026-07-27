@@ -136,6 +136,30 @@ now COMPLETES and the match runs 137 frames):
   zero-fills the 0x80-byte slot, preserving the category byte at +8.
   Only Donovan's alloc calls are wrapped; vanilla allocations untouched.
 
+## Session 11 addendum: second playtest round — the mash/time crash
+
+Playtest round 2 (on d6d8f273): DP fixed ✓; new crash "after ~a round of
+play OR mad input spam". Round-transition soak alone (20_don_round2,
+idle through timeout into round 2) is CLEAN — the trigger is activity:
+the mash soak (21_don_mash, dense deterministic input chaos incl. Start
+taps) crashes vec3 at engine 0x1AFB2, frame 3219: a **type-114 effect
+object** (companion-pool slot $FFBC00) carries anim cursor 0x1D772A — a
+raw VS2-space pointer. Root cause: its ported creation code does
+`movea.l #$1D7428,A0; jsr set-anim` — the jsr was R1-remapped but the
+TABLE immediate points at an ENGINE-SHARED anim word table hosted by no
+ported region, and unhosted address immediates were being silently
+carried raw (the documented residual-risk case of the sibling veto).
+FIXES:
+1. Extractor rule: `movea.l #imm,An` with an un-hosted ROM target is now
+   an ENGINE ref (addresses by construction) → R1 row or loud tripwire;
+   `move.l #imm,Dn` stays hosted-only (constants). This also retired the
+   manual imm_poison for 0x36784A (now auto-tripwired — one mechanism).
+2. New engine_data row: vs2 0x1D7428 → vsavj 0x1F3FD2 (the same shared
+   effect anim table — 24-byte content match, unique in vsavj).
+RESULT: 21_don_mash END-clean (14120 frames). Since type-114 effects
+also spawn in normal play, this most likely explains BOTH reported
+modes (spam and after-a-round). 20+21 join the code gate's guarded set.
+
 ## Session 11 (2026-07-27): first human playtest — triage of all four findings
 
 Maintainer playtested the stage-5 build. Findings and dispositions:

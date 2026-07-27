@@ -2,6 +2,26 @@
 
 Newest first.
 
+## donovan-m2 stage 5 — shared-table remap: mash/time crash fix (2026-07-27, session 11b)
+
+Fingerprint cdf62d8c… (supersedes d6d8f273). Playtest round 2 found a
+crash on heavy input activity (mash soak repro: 21_don_mash, vec3
+@0x1AFB2 frame 3219): the type-114 effect's ported creation code loads
+an ENGINE-SHARED anim word table via `movea.l #$1D7428` — un-hosted by
+any ported region and previously carried raw (VS2-space pointer on
+vsavj). Changes:
+- extractor: un-hosted `movea.l #imm,An` ROM targets are now ENGINE refs
+  (R1 row or loud tripwire; `move.l #imm,Dn` stays hosted-only —
+  constants must not fabricate refs). Retires the manual imm_poison for
+  0x36784A (auto-tripwired at 0xC29E0 now — same loudness, one
+  mechanism).
+- reconciliation: engine_data row vs2 0x1D7428 → vsavj 0x1F3FD2 (same
+  shared effect anim table; unique 24-byte content match).
+Verified: 21_don_mash (14120 frames of input chaos incl. Start taps,
+across the round boundary) and 20_don_round2 (idle through round
+transition) both END-clean; both join the code gate's guarded set
+(4 guarded replays now). Full battery re-run on cdf62d8c (see STATE).
+
 ## donovan-m2 stage 5 — reaction_hook: ES-DP crash fix (2026-07-27, session 11, playtest-driven)
 
 Fingerprint d6d8f273… (supersedes 4b65bc63 as the freeze candidate).

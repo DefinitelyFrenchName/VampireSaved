@@ -161,11 +161,10 @@ src_entries = 124
 # Donovan's hook always writes sub=0, branch proven unreached through the
 # full moveset + oracle batteries). The table is deliberately unported;
 # poison the operand so any future writer faults loudly at a named block.
-[[imm_poison]]
-region = "x088512"
-src_addr = 0x08A300
-old_imm = 0x0036784A
-note = "Anita alternate anim table (sub!=0 branch; unreached — port or map when a writer appears)"
+# (imm_poison for the Anita alternate table retired session 11: unhosted
+# movea.l immediates are now auto-classified as engine refs, so 0x36784A
+# rides the standard unresolved-engine TRIPWIRE — same loudness, one
+# mechanism. The imm_poison generator support remains for future cases.)
 
 # Layout groups: regions that PC-reference each other (directly or via
 # word jump tables) keep their source-relative spacing; the inter-region

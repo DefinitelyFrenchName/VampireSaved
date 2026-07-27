@@ -875,10 +875,22 @@ def main():
                             cls = "engine"
                         else:
                             continue  # RAM/HW: no relocation
-                    elif c["how"] in ("movea_imm", "move_imm"):
-                        # immediates are addresses only when they land in a
-                        # ported region; otherwise they may be constants —
-                        # never fabricate engine refs from them
+                    elif c["how"] == "movea_imm":
+                        # movea.l #imm,An loads an ADDRESS by construction:
+                        # hosted -> relocate; un-hosted ROM address -> an
+                        # ENGINE-shared table/structure needing an R1 row
+                        # (session 11: the type-114 effect's shared anim
+                        # table 0x1D7428 was silently carried raw and
+                        # faulted on the mash soak). RAM/HW targets skip.
+                        if hosts:
+                            cls = "internal"
+                        elif tgt < 0x400000:
+                            cls = "engine"
+                        else:
+                            continue
+                    elif c["how"] == "move_imm":
+                        # move.l #imm,Dn may be a CONSTANT — hosted only,
+                        # never fabricate engine refs from data values
                         if not hosts:
                             continue
                         cls = "internal"
