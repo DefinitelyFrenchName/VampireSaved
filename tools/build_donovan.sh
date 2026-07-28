@@ -63,6 +63,12 @@ python3 tools/gen_donovan_patch.py "$OUTBASE/extract" "$OUTBASE/patch" \
 python3 tools/patch_prg.py "$ROMDIR/vsavj.zip" "$OUTBASE/prg" \
     --patch "$OUTBASE/patch/patch.json" | tail -3
 
+# (select-screen port: tools/select_port.py exists as WIP — phase 1
+# proved the poked cells are NOT the live chains; the real handles are
+# inline pointer arrays in the shared web (docs/engine_internals.md).
+# Deliberately NOT wired in until the per-char groups are proven —
+# stage 6 ships with Jedah's portrait/name, correct everything else.)
+
 rm -rf "$OUTBASE/rompath"
 ROMDIR="$ROMDIR" tools/pack_build.sh "$OUTBASE/prg" "$OUTBASE/rompath" > /dev/null
 

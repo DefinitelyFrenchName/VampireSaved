@@ -30,6 +30,21 @@ registry row live, suite masked/skip expectation kinds landed)
   by pure fingerprint auto-detection — the one-command-validates-any-
   build doctrine is now real for hooked builds.
 
+## Session 14d highlights (select-screen port: phase 1 = negative result, map corrected)
+
+- Attempted the select-portrait port via the three traced root cells
+  (select_port.py: zone port into Jedah's freed region + pokes). Pokes
+  landed, screen unchanged — the live chains are INLINE pointer arrays
+  in the shared web, not those cells (live object dumps on the patched
+  build; engine_internals corrected). Reverted from the build (stage 6
+  back to verified 71601263 byte-for-byte); select_port.py kept as WIP
+  machinery. The LIVE PREVIEW at select already shows Donovan+Anita
+  correctly; only the big portrait, name banner, and mugshot remain
+  Jedah. Next: two-char differential dumps at the hover moment to pin
+  the per-char inline groups, then in-place 32-bit pointer surgery.
+- Space fact: the eventual select web (~51KB) must live in Jedah's
+  freed anim region — both PRG holes are nearly full.
+
 ## Session 14c highlights (select-screen pipeline mapped)
 
 - Select-portrait/name pipeline fully mapped by live instrumentation

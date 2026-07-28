@@ -206,8 +206,30 @@ Decoded via read/write/breakpoint traces on the live pick replay
   0xD153E — a DIFFERENT consumer family (likely in-match intro/win
   portraits) to inventory when those screens get ported.
 
-Port shape (next): port Donovan's select web (structs+records+coord
-lists) as a data region, place his portrait art in Jedah's freed bank-1
-positions, remap record tile codes, repoint the six root cells + the
-name-table row 0x0F (+P2 rows). All touched vanilla bytes are
-slot-0x0F-only (superset-clean).
+Phase-1 attempt (session 14d) — measured corrections to the map:
+- THE LIVE PREVIEW at select ALREADY WORKS in stage 6 (obj $FFB880
+  carries [0x1C] into the ported anim region with bank 0x4000).
+- The still-Jedah elements at frame 2000 (patched build, live dumps):
+  big portrait = obj $FFB980 [0x1C]=0x267462, frame piece = $FFB900
+  [0x1C]=0x2675E2, more pieces $FFB800/BA00 at 0x2689FA/0x268A3A,
+  wheel = $FFBB00+ at 0x268B8A+ (shared). These chains are INLINE
+  POINTER ARRAYS in the shared web (plain 4-byte record pointers, the
+  walker's flag bytes overlap pointer bytes — semantics still not fully
+  decoded), NOT reached through the three cells phase 1 poked: pokes at
+  0x26739A/0x26768A/NAME_ROW landed and changed nothing on screen.
+- A Demitri-pick dump shows menu objects riding the SHARED element
+  window (0x267F32-0x267F72) during select — the 150-entry records are
+  most likely the WHEEL (15 chars x 10 entries); the per-char big-art
+  group attribution (0x2719xx Jedah confirm records etc.) still needs a
+  two-char differential dump AT THE HOVER moment.
+- SPACE FACT for the eventual port: both PRG holes are nearly full
+  (hole A free ~0xE80, hole B ~0x32A0); the ported select web (~51KB)
+  must live in JEDAH'S FREED ANIM REGION [0x248B88, ~0x267000) — pure
+  slot-0x0F data orphaned by the port; the shared tail 0x267xxx+ is
+  live and must not be overwritten.
+tools/select_port.py holds the phase-1 machinery (zone extraction,
+structure-walked relocation, prg-dir chaining) — NOT wired into the
+build until the real per-char handles are proven by differential dumps
+(hover-moment, two chars). Next session: dump $FFB980's [0x1C] at the
+HOVER frame for two different picks; diff the group spans; patch the
+inline pointers in place (32-bit, slot-0x0F rows only).
