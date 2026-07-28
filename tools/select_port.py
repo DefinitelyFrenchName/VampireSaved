@@ -135,6 +135,22 @@ def main():
               f"({dcnt} entries, {len(rec)}B incl. slack; coords "
               f"{dclist}B at 0x{jcptr:06X})")
 
+    # select-portrait PALETTE rows (playtest round 7: portrait/name
+    # rendered with Jedah's colors). Uploader: vsavj 0x5F136 — source
+    # row = 0x3AC000 + (variant*16 + char)*0x20 (11-variant x 16-char
+    # grid; char 0x0F). vs2 special-cases Donovan (0x6B1A0:
+    # cmpi #$13 -> d0 += 0xC6): rows at 0x3C117C + (0xC6+v)*0x20,
+    # 10 variants. Overwrite Jedah's 11 grid slots in place; variant
+    # indices past Donovan's supply clamp to his last row.
+    JGRID, JCHAR, JVARS = 0x3AC000, 0x0F, 11
+    DBASE, DVARS = 0x3C117C + 0xC6 * 0x20, 10
+    for v in range(JVARS):
+        dst = JGRID + (v * 16 + JCHAR) * 0x20
+        src = DBASE + min(v, DVARS - 1) * 0x20
+        img[dst:dst + 0x20] = vs2[src:src + 0x20]
+    print(f"select palettes: {JVARS} variant rows for char 0x0F "
+          f"<- vs2 Donovan rows @0x{DBASE:06X}")
+
     # dedupe tile pairs (blocks may overlap between records)
     seen = {}
     for s, t in tile_pairs:

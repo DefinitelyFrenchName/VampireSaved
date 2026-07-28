@@ -288,3 +288,26 @@ entirely green. Unreproduced one-off — possibly environmental; the
 masked-legacy helpers now PRESERVE failing logs (build/gate_failures/)
 so any recurrence self-documents with a RAM-diffable log. If it recurs,
 stop and root-cause before any freeze.
+
+### Select palettes + the splash/win map (session 14f)
+
+- SELECT PALETTE FIXED (playtest round 7): the portrait/name palette
+  rows upload from an 11-variant x 16-char grid at vsavj 0x3AC000
+  (uploader 0x5F136: row = base + (variant*16 + char)*0x20, char from
+  the +0x382 select id; palette RAM rows 0x1B/0x1C). vs2 special-cases
+  Donovan in code (0x6B1A0: cmpi #$13 -> += 0xC6): his 10 variant rows
+  at 0x3C117C + (0xC6+v)*0x20. select_port overwrites Jedah's 11 grid
+  slots in place (clamping to Donovan's last row). Battery green
+  (fingerprint 4fc8d14b).
+- VS SPLASH / WIN SCREENS mapped: the busts are drawn by objects
+  ($FFC100/$FFC180) whose [0x1C] anchors are ROOT-TABLE CELLS in three
+  char-scaled families — d0 = char, 4*char, and 0x80+char (P2 = +0x20
+  within each) — over the same table (0x2672AA; vs2 0x2A05E2). The
+  chains are multi-record slide-in animations whose record sizes do NOT
+  pair with Jedah's => in-place replacement impossible; the port needs
+  the phase-1 zone machinery (vs2 web -> Jedah's freed region,
+  structure-walked relocation) + SIX cell pokes. Blocking decode: exact
+  chain termination (flag-byte semantics of the 8-byte structs) so the
+  per-chain record/tile inventory is exact (naive walks wander into
+  neighbors' chains); then art placement (Jedah's freed pool: ~1,072
+  positions left after the select placements).

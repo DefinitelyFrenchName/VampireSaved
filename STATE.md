@@ -31,6 +31,17 @@ follow-up)
   by pure fingerprint auto-detection — the one-command-validates-any-
   build doctrine is now real for hooked builds.
 
+## Session 14f highlights (select palettes fixed; splash/win specified)
+
+- Playtest round 7 (portrait/name correct, PALETTES wrong; splash+win
+  still Jedah) -> palette grid found and ported in place (11 variant
+  rows; vs2 keeps Donovan's rows behind a code special-case +0xC6).
+  Fingerprint 4fc8d14b, full battery green. Splash/win screens fully
+  mapped (bust objects, three char-scaled cell families, six pokes
+  needed); blocked only on the struct flag-byte termination decode for
+  exact chain inventories — then it is the phase-1 zone port with the
+  right cells. See engine_internals.
+
 ## Session 14e highlights (select phase 2 SHIPPED: portrait + name on screen)
 
 - Donovan's big portrait and name banner render at the select screen
