@@ -30,6 +30,29 @@ registry row live, suite masked/skip expectation kinds landed)
   by pure fingerprint auto-detection — the one-command-validates-any-
   build doctrine is now real for hooked builds.
 
+## Session 14b highlights (M2b static phase — R2 cracked)
+
+- MAME WITHHELD all session (user needs the machine; static analysis
+  only). gfx groundwork: canonical CPS-2 tile extraction
+  (tools/gfx_tiles.py — the simms are NOT tile-contiguous, see GOTCHAS),
+  measured: vsav2/vhunt2 share one gfx layout; vsav2-vs-vsav = same art
+  REPACKED (content-addressed match 201K tiles, same-index only 6.5K);
+  vsavj is a program-only clone (gfx lives in vsav.zip).
+- **R2 RESOLVED STATICALLY** (was: "the hard wall"): OBJ tile codes are
+  absolute 16-bit + bank bits from object field +0x18 (Y-word bits
+  13-14; per-char slot-indexed init table vsavj 0x282D4). Full decode of
+  the OBJ record format + emitter chain in docs/engine_internals.md.
+- **Donovan FITS in Jedah's tile band**: 15,171 tiles extent 0x3CB1 vs
+  Jedah's 16,658 extent 0x417F (both measured by tools/obj_records.py,
+  locked in tests/test_gfx_tiles.sh). Port = tile-data re-encode into
+  Jedah's positions + 16-aligned constant delta on record tile words +
+  patch his #$6000 bank setters to #$4000 (slot table gives 0x4000
+  free). No ROM expansion needed for M2b.
+- Open for next: Jedah-band exclusivity walk (no other vsavj consumer),
+  the 112 shared-effect tiles (content-map), portrait/name inventory,
+  then the gfx builder + in-emulator verification (QUEUED until the
+  maintainer frees the machine).
+
 ## Session 7 highlights (M2a stage 4 — frontier closed; the crash was ours)
 
 - **The session-6 "anim state-index delta" was NOT a state-space delta.**

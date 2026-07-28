@@ -141,12 +141,16 @@ tiles — so 16 bits cannot address the whole GFX space directly. This is
 almost certainly *the* wall that forced Capcom's two-game split (SPEC §2's
 "graphics address-space ceiling"), now seen concretely. Resolution hinges
 on how the extra high bits are supplied: CPS2 OBJ `attr` high bits and/or a
-gfx bank base. **Concrete next R2 step:** decode the `attr` word bitfield
-(palette / flip / **tile high bits or bank**) from the OBJ emit code, and
-determine whether frame tile#s are per-character-relative (→ port = copy
-tiles to new gfx space + set base; no index surgery) or absolute (→ harder).
-This is the single most important open item for M3 (ROM expansion) and is
-flagged as the R2 deliverable.
+gfx bank base. **RESOLVED (session 14, docs/engine_internals.md OBJ section):** tile#s
+are ABSOLUTE 16-bit codes written raw; tile bits 16-17 ride the OBJ
+Y-word bits 13-14, OR'd from object field +0x18 (per-char init table
+vsavj `PRG:0x282D4` / vsav2 `PRG:0x27530`, slot-indexed, PC-relative =
+opcode-space read). Multi-tile blocks: row stride 16 with within-row
+wrap => remaps must be 16-aligned. Donovan (bank 3, band 0x863F-0xC2EF,
+15,171 tiles) FITS in Jedah's band (bank 2, 0xAD3D-0xEEBB, 16,658
+tiles) — the R2 wall does NOT require ROM expansion for the Donovan
+port. Inventory tool: tools/obj_records.py; locks:
+tests/test_gfx_tiles.sh.
 
 **Sound cues (traced):** attacks emit QSound commands via `PRG:0x003190`
 (→ QSound port `0x61800F-0x618019`) and `PRG:0x003140` (→ `0x618001-9`);

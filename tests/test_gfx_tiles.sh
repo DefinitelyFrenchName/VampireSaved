@@ -36,5 +36,19 @@ else
     echo "FAIL: cross-game match found=$found same=$same (expect >=195000 / <10000)"; fail=1
 fi
 
+# 4. OBJ record-format + tile-inventory locks (decoded session 14:
+#    format/budget/count/cptr header, (tile,attr) entries, block cells
+#    n&~0xF + dy<<4 + (n+dx)&0xF). Numbers measured on the reference
+#    images; drift means either the walker or the understanding broke.
+python3 tools/cps2_decrypt.py "$ROMDIR/vsavj.zip" "$W/vsavj_op.bin" \
+    --data-out "$W/vsavj_data.bin" > /dev/null 2>&1 || true
+JIMG="$W/vsavj_data.bin"; [ -f "$JIMG" ] || JIMG="$REPO/build/out/vsavj_data.bin"
+jout=$(python3 "$REPO/tools/obj_records.py" "$JIMG" --base 0 \
+    --start 0x248B88 --end 0x26AB88)
+echo "$jout" | grep -q "unique expanded tiles 17737" \
+    && echo "$jout" | grep -q "band 0xAD3D-0xEEBB: 16658 tiles" \
+    && echo "  ok: Jedah OBJ inventory locked (17737 tiles; main band 0xAD3D-0xEEBB)" \
+    || { echo "FAIL: Jedah OBJ inventory drifted:"; echo "$jout" | head -3; fail=1; }
+
 [ "$fail" = 0 ] && echo "PASS: gfx tile layout fact-locks" || echo "FAIL: gfx tile layout fact-locks"
 exit "$fail"
