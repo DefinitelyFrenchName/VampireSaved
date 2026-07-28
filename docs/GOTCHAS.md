@@ -267,3 +267,16 @@ Rules now enforced in `tools/extract_char.py`:
   for unported targets — within d16 reach, gap-fitted near the region.
 - Regions whose tables reference each other must keep source-relative
   spacing: `[[layout_group]]` / `near_map` in build/manifest/donovan.toml.
+
+## Early-session generic rows can masquerade over later-understood structures
+
+The session-5 bare-long pass resolved refs by unique byte match and
+labeled everything it placed `engine_data`. Two of those rows were
+sound-farm entries — so when session 13's farm audit enumerated
+`kind`-tagged farm rows, they were invisible, and the byte match had
+locked onto same-id vsavj entries (ids are in the matched bytes), i.e.
+the same-id-different-meaning trap with a `verified` sticker on it.
+Cost: a second playtest round (214P/214K music). Rule: when a structure
+class gets understood (farm, dispatch bank, …), re-audit ALL earlier
+generic rows whose vs2 address falls in the structure's range — match
+mechanism, not row kind, decides what a row really is.

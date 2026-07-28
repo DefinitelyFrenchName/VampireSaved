@@ -25,10 +25,10 @@ note = "-; refs: bare_long"
 
 [[map]]
 vsav2 = 0x004f14
-vsavj = 0x004a5e
-kind = "engine_data"
+vsavj = 0x02A7E0
+kind = "stubbed_sound"
 status = "verified"
-note = "codebytes-unique-w0x10; refs: bare_long"
+note = "MOVE sfx 0x2D4 (x088512-called, jsr 0x8A0F6): farm entry masquerading as engine_data since the session-5 bare-long pass — codebytes-unique matched the SAME-ID vsavj entry 0x4A5E, whose 0x2D4 has different MEANING (music on 214P/214K, playtest 2026-07-28 round 2) — silent until M5"
 
 [[map]]
 vsav2 = 0x004f2e
@@ -67,10 +67,10 @@ note = "-; refs: bare_long"
 
 [[map]]
 vsav2 = 0x005052
-vsavj = 0x004316
-kind = "engine_data"
+vsavj = 0x02A7E0
+kind = "stubbed_sound"
 status = "verified"
-note = "codebytes-unique-w0x10; refs: bare_long"
+note = "MOVE sfx 0x173 (x088512-called, jsr 0x89632 + jmp 0x895E4): farm entry masquerading as engine_data since the session-5 bare-long pass — matched the SAME-ID vsavj entry 0x4316; id 0x173 is the proven music trigger (the 0x43B2 stub fixed its other caller) — silent until M5"
 
 [[map]]
 vsav2 = 0x00506c
@@ -116,10 +116,10 @@ note = "-; refs: bare_long"
 
 [[map]]
 vsav2 = 0x005122
-vsavj = 0x004ce2
-kind = "engine_data"
+vsavj = 0x02A7E0
+kind = "stubbed_sound"
 status = "verified"
-note = "pattern-1.00-unique-w0x40; refs: bare_long"
+note = "sound HELPER direct call (x026142 dispatcher 0x271B6: id read from word table (6,A0,D2.w) into D3, vs2-semantic by construction): was mapped to vsavj helper 0x4CE2 — any id it forwards has vsavj meaning (the 214P/214K music mechanism); stubbed until M5, where the dispatcher's id table needs translation, not the helper"
 
 [[map]]
 vsav2 = 0x009834

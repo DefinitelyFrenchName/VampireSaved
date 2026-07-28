@@ -2,6 +2,27 @@
 
 Newest first.
 
+## donovan-m2 stage 5 — the last two music triggers: engine_data masquerade rows (2026-07-28, playtest round 2)
+
+Fingerprint a02aeeff… (supersedes eda50a18). Playtest: 214P/214K still
+triggered music after the caller-zone reclassification. Cause: two
+sound-farm entries never appeared in the farm inventory because the
+session-5 bare-long byte-matcher had already mapped them as generic
+`engine_data` — and codebytes-unique matching locks onto the vsavj entry
+carrying the SAME ID BYTES, the exact same-id-different-meaning trap.
+vs2 0x4F14 (sfx 0x2D4 → vsavj 0x4A5E) and vs2 0x5052 (sfx 0x173 →
+vsavj 0x4316), both called from x088512 (special/projectile support —
+the 214 path). Confirming detail: 0x5052's id 0x173 is the id whose
+OTHER caller (0x43B2) the previous build stubbed — one trigger vanished,
+this one stayed. Also stubbed by the same mechanism-audit: vs2 0x5122,
+the sound HELPER itself, direct-called by a table-driven dispatcher at
+vs2 0x271B6 (x026142) that forwards vs2-semantic ids — wrong by
+construction; at M5 the dispatcher's id table needs translation, not the
+helper. Full static audit of every farm-range ref (jsr/bsr/jmp/pea) from
+ported zones: 25 stubbed (ids recorded — the M5 list), 4 live-mapped,
+all init/system-zone (playtest-clean). All gates green; flicker
+inventory unchanged.
+
 ## donovan-m2 stage 5 — move-sfx reclassification (2026-07-28, playtest-driven)
 
 Fingerprint eda50a18… (supersedes 372b0641). Playtest on the crash-free
