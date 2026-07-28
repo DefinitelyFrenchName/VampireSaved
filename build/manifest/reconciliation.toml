@@ -1191,24 +1191,24 @@ note = "sound-farm entry sfx 0x115; unique save+id signature match"
 
 [[map]]
 vsav2 = 0x003ac4
-vsavj = 0x003a8e
-kind = "engine_sub"
+vsavj = 0x02A7E0
+kind = "stubbed_sound"
 status = "verified"
-note = "sound-farm entry sfx 0x137; unique save+id signature match"
+note = "MOVE sfx 0x137 (x05c800-called): same-id vsavj entry has different MEANING (music triggers on 421P/214K etc., playtest 2026-07-28) — silent until M5; the id-matched vsavj entry was 0x137-numbered but semantically unrelated"
 
 [[map]]
 vsav2 = 0x003f46
-vsavj = 0x003f10
-kind = "engine_sub"
+vsavj = 0x02A7E0
+kind = "stubbed_sound"
 status = "verified"
-note = "sound-farm entry sfx 0x136; unique save+id signature match"
+note = "MOVE sfx 0x136 (x05c800-called): same-id vsavj entry has different MEANING (music triggers on 421P/214K etc., playtest 2026-07-28) — silent until M5; the id-matched vsavj entry was 0x136-numbered but semantically unrelated"
 
 [[map]]
 vsav2 = 0x003fae
-vsavj = 0x003f78
-kind = "engine_sub"
+vsavj = 0x02A7E0
+kind = "stubbed_sound"
 status = "verified"
-note = "sound-farm entry sfx 0x13d; unique save+id signature match"
+note = "MOVE sfx 0x13d (x05c800-called): same-id vsavj entry has different MEANING (music triggers on 421P/214K etc., playtest 2026-07-28) — silent until M5; the id-matched vsavj entry was 0x13d-numbered but semantically unrelated"
 
 [[map]]
 vsav2 = 0x003fc8
@@ -1219,66 +1219,66 @@ note = "sound-farm entry sfx 0x1d5; unique save+id signature match"
 
 [[map]]
 vsav2 = 0x0040ae
-vsavj = 0x00405e
-kind = "engine_sub"
+vsavj = 0x02A7E0
+kind = "stubbed_sound"
 status = "verified"
-note = "sound-farm entry sfx 0x14a; unique save+id signature match"
+note = "MOVE sfx 0x14a (x05c800-called): same-id vsavj entry has different MEANING (music triggers on 421P/214K etc., playtest 2026-07-28) — silent until M5; the id-matched vsavj entry was 0x14a-numbered but semantically unrelated"
 
 [[map]]
 vsav2 = 0x0042d0
-vsavj = 0x004234
-kind = "engine_sub"
+vsavj = 0x02A7E0
+kind = "stubbed_sound"
 status = "verified"
-note = "sound-farm entry sfx 0x18b; unique save+id signature match"
+note = "MOVE sfx 0x18b (x05c800-called): same-id vsavj entry has different MEANING (music triggers on 421P/214K etc., playtest 2026-07-28) — silent until M5; the id-matched vsavj entry was 0x18b-numbered but semantically unrelated"
 
 [[map]]
 vsav2 = 0x0042ea
-vsavj = 0x00424e
-kind = "engine_sub"
+vsavj = 0x02A7E0
+kind = "stubbed_sound"
 status = "verified"
-note = "sound-farm entry sfx 0x18d; unique save+id signature match"
+note = "MOVE sfx 0x18d (x05c800-called): same-id vsavj entry has different MEANING (music triggers on 421P/214K etc., playtest 2026-07-28) — silent until M5; the id-matched vsavj entry was 0x18d-numbered but semantically unrelated"
 
 [[map]]
 vsav2 = 0x0043b2
-vsavj = 0x004316
-kind = "engine_sub"
+vsavj = 0x02A7E0
+kind = "stubbed_sound"
 status = "verified"
-note = "sound-farm entry sfx 0x173; unique save+id signature match"
+note = "MOVE sfx 0x173 (x05c800-called): same-id vsavj entry has different MEANING (music triggers on 421P/214K etc., playtest 2026-07-28) — silent until M5; the id-matched vsavj entry was 0x173-numbered but semantically unrelated"
 
 [[map]]
 vsav2 = 0x0046a0
-vsavj = 0x0045c6
-kind = "engine_sub"
+vsavj = 0x02A7E0
+kind = "stubbed_sound"
 status = "verified"
-note = "sound-farm entry sfx 0x299; unique save+id signature match"
+note = "MOVE sfx 0x299 (x05c800-called): same-id vsavj entry has different MEANING (music triggers on 421P/214K etc., playtest 2026-07-28) — silent until M5; the id-matched vsavj entry was 0x299-numbered but semantically unrelated"
 
 [[map]]
 vsav2 = 0x0046e2
-vsavj = 0x004608
-kind = "engine_sub"
+vsavj = 0x02A7E0
+kind = "stubbed_sound"
 status = "verified"
-note = "sound-farm entry sfx 0x156; unique save+id signature match"
+note = "MOVE sfx 0x156 (x05c800-called): same-id vsavj entry has different MEANING (music triggers on 421P/214K etc., playtest 2026-07-28) — silent until M5; the id-matched vsavj entry was 0x156-numbered but semantically unrelated"
 
 [[map]]
 vsav2 = 0x0046fc
-vsavj = 0x004622
-kind = "engine_sub"
+vsavj = 0x02A7E0
+kind = "stubbed_sound"
 status = "verified"
-note = "sound-farm entry sfx 0x157; unique save+id signature match"
+note = "MOVE sfx 0x157 (x05c800-called): same-id vsavj entry has different MEANING (music triggers on 421P/214K etc., playtest 2026-07-28) — silent until M5; the id-matched vsavj entry was 0x157-numbered but semantically unrelated"
 
 [[map]]
 vsav2 = 0x004716
-vsavj = 0x00463c
-kind = "engine_sub"
+vsavj = 0x02A7E0
+kind = "stubbed_sound"
 status = "verified"
-note = "sound-farm entry sfx 0x158; unique save+id signature match"
+note = "MOVE sfx 0x158 (x05c800-called): same-id vsavj entry has different MEANING (music triggers on 421P/214K etc., playtest 2026-07-28) — silent until M5; the id-matched vsavj entry was 0x158-numbered but semantically unrelated"
 
 [[map]]
 vsav2 = 0x004730
-vsavj = 0x004656
-kind = "engine_sub"
+vsavj = 0x02A7E0
+kind = "stubbed_sound"
 status = "verified"
-note = "sound-farm entry sfx 0x15a; unique save+id signature match"
+note = "MOVE sfx 0x15a (x05c800-called): same-id vsavj entry has different MEANING (music triggers on 421P/214K etc., playtest 2026-07-28) — silent until M5; the id-matched vsavj entry was 0x15a-numbered but semantically unrelated"
 
 [[map]]
 vsav2 = 0x003972
@@ -1289,15 +1289,15 @@ note = "sound-farm entry sfx 0x10a; save+id+next-opword signature (dual-entry di
 
 [[map]]
 vsav2 = 0x0048be
-vsavj = 0x0047e4
-kind = "engine_sub"
+vsavj = 0x02A7E0
+kind = "stubbed_sound"
 status = "verified"
-note = "sound-farm sfx 0x146; duplicate vsavj entries behaviorally identical (both -> helper 0x4CE2), first picked"
+note = "MOVE sfx 0x146 (x05c800-called): same-id vsavj entry has different MEANING (music triggers on 421P/214K etc., playtest 2026-07-28) — silent until M5; the id-matched vsavj entry was 0x146-numbered but semantically unrelated"
 
 [[map]]
 vsav2 = 0x0048d8
-vsavj = 0x0047fe
-kind = "engine_sub"
+vsavj = 0x02A7E0
+kind = "stubbed_sound"
 status = "verified"
-note = "sound-farm sfx 0x142 -> helper 0x4CE2 (vs2 helper 0x5122 <-> vsavj 0x4CE2, calibrated on 4 verified rows)"
+note = "MOVE sfx 0x142 (x05c800-called): same-id vsavj entry has different MEANING (music triggers on 421P/214K etc., playtest 2026-07-28) — silent until M5; the id-matched vsavj entry was 0x142-numbered but semantically unrelated"
 

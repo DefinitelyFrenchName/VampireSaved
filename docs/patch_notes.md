@@ -2,6 +2,20 @@
 
 Newest first.
 
+## donovan-m2 stage 5 — move-sfx reclassification (2026-07-28, playtest-driven)
+
+Fingerprint eda50a18… (supersedes 372b0641). Playtest on the crash-free
+build: some specials (e.g. 421P, 214K) deterministically triggered MUSIC
+— the session-12/13 sound-farm rows matched vsavj entries BY SOUND-ID
+NUMBER, which is only valid where the two games agree on that id's
+meaning. Donovan's move-sfx ids collide with vsavj music/other triggers.
+Reclassification by CALLER ZONE: the 14 farm entries called from
+x05c800 (his move-handler support zone) are MOVE sfx → stubbed to rts
+(kind stubbed_sound, ids recorded — the M5 restoration list is now 22
+ids); the 4 called from init/system zones stay mapped (stock chime
+0x172, init-time 0x115/0x10A/0x1D5 — consistent with no music at round
+start). All gates green; soaks END-clean; flicker inventory unchanged.
+
 ## donovan-m2 stage 5 — shared-table remap: mash/time crash fix (2026-07-27, session 11b)
 
 Fingerprint cdf62d8c… (supersedes d6d8f273). Playtest round 2 found a

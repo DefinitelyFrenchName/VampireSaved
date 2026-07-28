@@ -62,7 +62,7 @@ before session end (persistent suite doctrine, CLAUDE.md §4).
 | Build | SHA-1 (zip) | Notes |
 |---|---|---|
 | null vsavj | `12fbb0e1a137a1420824856d3efb0af8fff57be6` | == reference members; zip repacked deterministically |
-| donovan-m2 stage 5 (freeze candidate) | fingerprint `372b0641305700f06d41dc0f1e9df064414e7fa1` | `tools/build_donovan.sh 5 build/donovan5`; all gates green (4 guarded soaks incl. ES-DP spam, round-2, input-chaos / 13-replay masked legacy / oracle / xemu / flavor); supersedes b2e34c87 (sound-farm same-value rows + dispatch_15-19 + x2b7ef4 extension — the full mash-crash chain closed); registry row lands at the maintainer freeze decision (STATE.md) |
+| donovan-m2 stage 5 (freeze candidate) | fingerprint `eda50a18d5ff8c666a8f5db193dff789aec16216` | `tools/build_donovan.sh 5 build/donovan5`; all gates green (4 guarded soaks incl. ES-DP spam, round-2, input-chaos / 13-replay masked legacy / oracle / xemu / flavor); supersedes 372b0641 (move-sfx reclassification — music-on-specials fixed; M5 list = 22 sfx ids); registry row lands at the maintainer freeze decision (STATE.md) |
 
 ## M1 additions (2026-07-25, session 2)
 

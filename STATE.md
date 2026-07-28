@@ -442,7 +442,9 @@ opcode-space dump oracle (`tests/test_decrypt_oracle.sh`). Both directions
 ## Decisions pending (human)
 
 - **M2a FREEZE — BACK ON THE TABLE: register stage-5 fingerprint
-  372b0641…** The entire mash-crash chain is closed (sessions 12-13:
+  eda50a18… (372b0641 + move-sfx reclassification: the playtest's
+  music-on-specials — 14 farm rows stubbed by caller zone; M5 list = 22
+  ids)** The entire mash-crash chain is closed (sessions 12-13:
   sound-farm same-value refs, palette-seq private entry, bank-tail
   dispatch_15-19, x2b7ef4 region extension — reconciliation.md Sessions
   12-13). All four gates green; four guarded soaks END-clean; the 40K
