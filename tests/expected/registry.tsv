@@ -3,3 +3,4 @@
 # sha1	expectation-set	notes
 b0eb9ecd8a6fd354f398d4347002b204b784f47c	vsavj	vanilla vsavj (Japan 970519) reference program image
 a02aeefff4c7a053337b10c923c8c328573788fa	donovan-m2	M2a freeze: donovan-m2 stage 5 (hooked build; masked legacy basis per CLAUDE.md §4 v2) — frozen 2026-07-28, STATE.md
+71601263474dfd7e4afd0741dae696cde22eda4e	donovan-m2b	M2b-core freeze: sprites/palettes/effects in Jedah gfx space (stage 6; masked legacy basis; gfx members vm3.14m c192ddfc 16m 38747f4e 18m 1d69c1b4 20m 08ff44e9) — frozen 2026-07-28, STATE.md

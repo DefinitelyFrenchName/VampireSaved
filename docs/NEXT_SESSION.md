@@ -1,6 +1,18 @@
 # NEXT_SESSION — 60-second orientation (rewritten every session end)
 
-As of 2026-07-28, end of session 14. **M2a IS FROZEN.** Fingerprint
+As of 2026-07-28, end of session 14. **M2a IS FROZEN** and
+**M2b-CORE IS FROZEN** (`71601263474dfd7e4afd0741dae696cde22eda4e` ->
+expectation set `donovan-m2b`; build with
+`tools/build_donovan.sh 6 build/donovan6`, rompath carries BOTH
+vsavj.zip and the patched vsav.zip). Sprites/palettes/effects verified;
+still Jedah: select big portrait, name banner, mugshot; attract
+palette. Select-web map + next step: docs/engine_internals.md
+("Select-screen pipeline", phase-1 corrections at the end). Roster
+ACCESS mechanism decision recorded in STATE Decisions pending
+(recommendation: Oboro-pattern combined input). Older M2a text below
+for reference:
+
+Original M2a freeze notes: Fingerprint
 `a02aeefff4c7a053337b10c923c8c328573788fa`, registered in
 `tests/expected/registry.tsv` as expectation set `donovan-m2`. Maintainer
 playtest round 3 fully clean: no crashes over multiple matches, no music

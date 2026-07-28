@@ -1,7 +1,8 @@
 # STATE — living progress log
 
 Updated: 2026-07-28 (session 14 end — **M2a FROZEN** at a02aeeff…,
-registry row live, suite masked/skip expectation kinds landed)
+**M2b-CORE FROZEN** at 71601263…; select-screen cosmetics = the open
+follow-up)
 
 ## Session 14 highlights (M2a FROZEN)
 
@@ -529,6 +530,18 @@ opcode-space dump oracle (`tests/test_decrypt_oracle.sh`). Both directions
 
 ## Decisions made
 
+- **M2b-CORE FROZEN at fingerprint
+  `71601263474dfd7e4afd0741dae696cde22eda4e`** — 2026-07-28, maintainer
+  ("freeze core deliverables"). Scope: Donovan's sprites, palettes, and
+  effects living in Jedah's gfx space — playtest-clean (rounds 4-6) and
+  fully gate-verified (M2b gate incl. 40K marathon + masked legacy with
+  unchanged flicker inventory; oracle; dual-emulator; flavor; scroll3
+  exclusivity live-measured). Registry row `71601263 -> donovan-m2b`
+  (gfx member sha1s in the registry note — the program fingerprint does
+  not cover them). Deliberately OUT of the core freeze: select-screen
+  big portrait/name banner/mugshot (still Jedah's; pipeline mapped,
+  in-place pointer surgery pending), attract palette path,
+  engine-effect tail. Those continue as follow-up work.
 - **M2a FROZEN at fingerprint `a02aeefff4c7a053337b10c923c8c328573788fa`**
   — 2026-07-28, playtest-gated as decided: maintainer's round-3 playtest
   came back fully clean ("no more graphical bug/crash, even over
@@ -589,6 +602,21 @@ opcode-space dump oracle (`tests/test_decrypt_oracle.sh`). Both directions
 
 ## Decisions pending (human)
 
+- **ROSTER ACCESS MECHANISM (M4-defining, raised by maintainer
+  2026-07-28):** how players select the 18 characters. Option A: full
+  select-screen redesign (new wheel/cursor/portraits — priced by the
+  session-14 select-web archaeology as a milestone of its own, highest
+  UI-regression surface). Option B: combined-input slot sharing — hold
+  Start on a host slot selects the guest (engine-native precedent:
+  Oboro Bishamon is exactly this pattern in vanilla; source-game
+  precedent: vsav2/vhunt2 gate Donovan/Huitzil behind Hold Start +
+  button, community-confirmed; mechanism = generalize the existing
+  Start-hold latch + bank repoints to host/guest per-slot switching).
+  RECOMMENDATION: B, phased — access first, select-screen indication
+  (mugshot/name swap while Start held) as polish; A stays possible
+  later. Host/guest pairings = maintainer/community choice. Orthogonal:
+  3 extra characters' art needs gfx space beyond freed-Jedah either way
+  (the M3 expansion question).
 - See SPEC §7 for the rest. Nothing blocks current work.
 
 ## Open bugs
