@@ -1,4 +1,4 @@
-# SPEC — Vampire Saved: Full-Roster Vampire Savior (CPS-2, emulator-target)
+# SPEC — Vampire Saved: Full-Roster Vampire Savior (CPS-2, emulator-target, EXPERIMENTAL)
 
 Status: draft v0.1 — for review before Claude Code work begins.
 Companion documents: `CLAUDE.md` (operating rules), `STATE.md` (living progress log).
