@@ -10,9 +10,11 @@ Record format (decoded session 14 from the vsavj emitter chain
     (entries = count+1), +6 cptr.l -> X/Y word-pair list, +10 entries
     of (tile.w, attr.w) — 4 bytes each.
   format 0 (handler 0x1AFC6) — DIFFERENT HEADER AND STRIDE:
-    +0 format.w, +2 count.w (doubles as the budget check; entries =
-    count+1), +4 attr.w (ONE attr for the whole record), +6 cptr.l,
-    +10 entries of tile.w — 2 BYTES each.
+    +0 format.w, +2 count.w (doubles as the budget check; `subq #1`
+    BEFORE the dbra => entries = COUNT, not count+1), +4 attr.w (ONE
+    attr for the whole record), +6 cptr.l, +10 entries of tile.w —
+    2 BYTES each. (Session-14b corruption catch: the count+1 misread
+    made the walker treat the NEXT record's format word as a tile.)
   (Session-14b lesson: treating format 0 as 4-byte entries remaps only
   every other tile — the character-select blink, playtest 2026-07-28.)
 
@@ -61,10 +63,10 @@ def walk(dat, base, start, end, cptr_ok):
         if fmt == 0:
             count = int.from_bytes(dat[o + 2:o + 4], "big")
             attr = int.from_bytes(dat[o + 4:o + 6], "big")
-            if not (0 < count + 1 <= 0x100):
+            if not (0 < count <= 0x100):
                 continue
             ent = [(int.from_bytes(dat[o + 10 + 2*k:o + 12 + 2*k], "big"),
-                    attr) for k in range(count + 1)]
+                    attr) for k in range(count)]
         else:
             budget = int.from_bytes(dat[o + 2:o + 4], "big")
             count = int.from_bytes(dat[o + 4:o + 6], "big")

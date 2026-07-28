@@ -639,41 +639,113 @@ def main():
                 seen_rec = set()
                 n_rw = 0
                 # Format-aware walk (tools/obj_records.py header doc):
-                # format 2 = 4-byte (tile,attr) entries, count at +4;
+                # format 2/8 = 4-byte (tile,attr) entries, count at +4;
                 # format 0 = 2-byte tile-only entries, count at +2, one
-                # attr in the header. Mixing them remaps only alternate
-                # tiles of format-0 records (the char-select blink,
-                # playtest 2026-07-28).
+                # attr in the header (the char-select blink lesson).
+                # Two passes: collect entries, then rewrite — band codes
+                # get +delta; NON-band codes (shared-effect art the main
+                # objects draw at their own bank — the residual-blink
+                # class, playtest round 5) get shelf-packed rectangle
+                # targets in the freed Jedah-band tail [eff_lo, eff_hi],
+                # emitted as effect_map.json for the tile placement step.
+                def _entries(o):
+                    fmt = int.from_bytes(blob[o:o + 2], "big")
+                    cptr = int.from_bytes(blob[o + 6:o + 10], "big")
+                    if (fmt > 0x20 or fmt % 2
+                            or not any(lo <= cptr < hi
+                                       for lo, hi in aux_dst)):
+                        return None
+                    if fmt == 0:
+                        # subq #1 before dbra: entries = COUNT (session
+                        # 14b corruption catch — count+1 clobbers the
+                        # next record's format word via the effect map)
+                        count = int.from_bytes(blob[o + 2:o + 4], "big")
+                        if not (0 < count <= 0x100):
+                            return None
+                        attr = int.from_bytes(blob[o + 4:o + 6], "big")
+                        return [(o + 10 + 2 * k, attr)
+                                for k in range(count)]
+                    budget = int.from_bytes(blob[o + 2:o + 4], "big")
+                    count = int.from_bytes(blob[o + 4:o + 6], "big")
+                    if not (0 < count + 1 <= budget <= 0x100):
+                        return None
+                    return [(o + 10 + 4 * k, None) for k in range(count + 1)]
+
+                collected = []
                 for i in range(0, r["len"] - 4, 2):
                     v = int.from_bytes(blob[i:i + 4], "big")
                     if not (base <= v < base + r["len"]) or v in seen_rec:
                         continue
-                    o = v - base
-                    fmt = int.from_bytes(blob[o:o + 2], "big")
-                    cptr = int.from_bytes(blob[o + 6:o + 10], "big")
-                    if (fmt > 0x20 or fmt % 2
-                            or not any(lo <= cptr < hi for lo, hi in aux_dst)):
+                    ent = _entries(v - base)
+                    if ent is None:
                         continue
-                    if fmt == 0:
-                        count = int.from_bytes(blob[o + 2:o + 4], "big")
-                        if not (0 < count + 1 <= 0x100):
-                            continue
-                        toffs = [o + 10 + 2 * k for k in range(count + 1)]
-                    else:
-                        budget = int.from_bytes(blob[o + 2:o + 4], "big")
-                        count = int.from_bytes(blob[o + 4:o + 6], "big")
-                        if not (0 < count + 1 <= budget <= 0x100):
-                            continue
-                        toffs = [o + 10 + 4 * k for k in range(count + 1)]
                     seen_rec.add(v)
-                    for toff in toffs:
+                    collected.append(ent)
+
+                # shelf-pack the non-band blocks (code, bx, by) into the
+                # tail; blocks never cross the 16-tile row in source
+                # (measured), and stay non-crossing at any target column
+                eff_lo, eff_hi = _int(gr["eff_lo"]), _int(gr["eff_hi"])
+                blocks = {}
+                for ent in collected:
+                    for toff, hdr_attr in ent:
                         t = int.from_bytes(blob[toff:toff + 2], "big")
+                        a = (hdr_attr if hdr_attr is not None else
+                             int.from_bytes(blob[toff + 2:toff + 4], "big"))
+                        if not (b_lo <= t <= b_hi):
+                            bx = ((a >> 8) & 15) + 1
+                            by = ((a >> 12) & 15) + 1
+                            blocks.setdefault((t, bx, by), None)
+                shelf_row = eff_lo >> 4
+                shelf_x = 0
+                shelf_h = 0
+                for key in sorted(blocks,
+                                  key=lambda k: (-k[2], -k[1], k[0])):
+                    t, bx, by = key
+                    if shelf_x + bx > 16:
+                        shelf_row += shelf_h
+                        shelf_x = 0
+                        shelf_h = 0
+                    blocks[key] = (shelf_row << 4) + shelf_x
+                    shelf_x += bx
+                    shelf_h = max(shelf_h, by)
+                    if ((shelf_row + shelf_h) << 4) - 1 > eff_hi:
+                        fail.append("gfx_remap: effect shelf overflow past "
+                                    f"{eff_hi:#x}")
+                        break
+
+                n_eff = 0
+                for ent in collected:
+                    for toff, hdr_attr in ent:
+                        t = int.from_bytes(blob[toff:toff + 2], "big")
+                        a = (hdr_attr if hdr_attr is not None else
+                             int.from_bytes(blob[toff + 2:toff + 4], "big"))
                         if b_lo <= t <= b_hi:
-                            blob[toff:toff + 2] = (t + delta).to_bytes(2, "big")
+                            blob[toff:toff + 2] = (t + delta).to_bytes(2,
+                                                                       "big")
                             n_rw += 1
+                        else:
+                            bx = ((a >> 8) & 15) + 1
+                            by = ((a >> 12) & 15) + 1
+                            nt = blocks.get((t, bx, by))
+                            if nt is not None:
+                                blob[toff:toff + 2] = nt.to_bytes(2, "big")
+                                n_eff += 1
+                pairs = []
+                for (t, bx, by), nt in blocks.items():
+                    if nt is None:
+                        continue
+                    for dy in range(by):
+                        for dx in range(bx):
+                            pairs.append([(t & ~0xF) + (dy << 4)
+                                          + ((t + dx) & 0xF),
+                                          (nt & ~0xF) + (dy << 4)
+                                          + ((nt + dx) & 0xF)])
+                json.dump(pairs, (out / "effect_map.json").open("w"))
                 notes.append(f"# {name}: gfx_remap +{delta:#x} on {n_rw} "
-                             f"band tile words in {len(seen_rec)} OBJ records "
-                             f"(band 0x{b_lo:04X}-0x{b_hi:04X})")
+                             f"band tile words + {n_eff} effect words "
+                             f"({len(blocks)} blocks -> tail "
+                             f"0x{eff_lo:04X}+) in {len(seen_rec)} records")
                 if n_rw < 10000:
                     fail.append(f"gfx_remap: only {n_rw} tile words rewritten "
                                 f"(expected ~14k) — walker or band drifted")

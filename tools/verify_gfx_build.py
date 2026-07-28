@@ -1,0 +1,97 @@
+#!/usr/bin/env python3
+"""verify_gfx_build.py — static output-image verification of a stage-6+
+gfx build. This is the check that caught the fmt-0 count corruption
+(session 14b): the OBJ records in the BUILT image are re-walked and must
+match the source walk exactly.
+
+Checks:
+  1. Record parity: the number of records found in the placed anim
+     region equals the number found in the source region (a clobbered
+     format/header word makes a record undetectable — loud here, wild
+     jump at runtime).
+  2. Code containment: every referenced tile code lies inside the
+     placed windows (main band + effect tail) — nothing unremapped,
+     nothing out of range.
+  3. Placed-table sanity: the ported per-char OBJ bank table row 0x0F
+     reads 0x4000 through the real opcode-decryption path.
+
+Usage: verify_gfx_build.py <outbase>   (e.g. build/donovan6)
+Exits nonzero with a FAIL line on any violation.
+"""
+
+import json
+import os
+import subprocess
+import sys
+
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from obj_records import walk  # noqa: E402
+
+AUX_SRC = [(0x334B80, 0x335A90), (0x337460, 0x3375F0),
+           (0x33CCF0, 0x33CE90), (0x34CB60, 0x34CCF0),
+           (0x352120, 0x360190)]
+SRC_BASE, SRC_END = 0x27F548, 0x2A0448
+
+
+def main():
+    outbase = sys.argv[1]
+    pl = json.load(open(f"{outbase}/patch/placements.json"))
+    anim = pl["regions"]["anim"]
+    spec = json.load(open(f"{outbase}/gfx/remap_spec.json"))
+    eff = json.load(open(f"{outbase}/patch/effect_map.json"))
+    lo = spec["placed"][0]
+    hi = max([spec["placed"][1]] + [t for _, t in eff])
+
+    op_path = f"{outbase}/verify_op.bin"
+    data_path = f"{outbase}/verify_data.bin"
+    subprocess.run([sys.executable, "tools/cps2_decrypt.py",
+                    f"{outbase}/rompath/vsavj.zip", op_path,
+                    "--data-out", data_path],
+                   check=True, capture_output=True)
+
+    src = open(f"{outbase}/extract/region_anim.bin", "rb").read()
+    _, s_entries, s_records = walk(
+        src, SRC_BASE, SRC_BASE, SRC_END,
+        lambda c: any(a <= c < b for a, b in AUX_SRC))
+
+    out = open(data_path, "rb").read()
+    aux_dst = [(r["dst"], r["dst"] + r["len"])
+               for n, r in pl["regions"].items() if n.startswith("aux")]
+    tiles, o_entries, o_records = walk(
+        out, 0, anim["dst"], anim["dst"] + anim["len"],
+        lambda c: any(a <= c < b for a, b in aux_dst))
+
+    fail = 0
+    if (s_records, s_entries) != (o_records, o_entries):
+        print(f"FAIL: record/entry parity src ({s_records},{s_entries}) "
+              f"!= out ({o_records},{o_entries}) — header corruption "
+              f"or walker drift")
+        fail = 1
+    else:
+        print(f"  ok: record parity ({o_records} records, "
+              f"{o_entries} entries)")
+    outside = sorted(t for t in tiles if not (lo <= t <= hi))
+    if outside:
+        print(f"FAIL: {len(outside)} tile codes outside placed windows "
+              f"[{lo:#x},{hi:#x}]: {[hex(t) for t in outside[:6]]}")
+        fail = 1
+    else:
+        print(f"  ok: all {len(tiles)} tile codes within "
+              f"[0x{lo:04X},0x{hi:04X}]")
+    opimg = open(op_path, "rb").read()
+    x26 = pl["regions"]["x026142"]["dst"]
+    row0f = int.from_bytes(opimg[x26 + 0x13EE + 0x1E:
+                                 x26 + 0x13EE + 0x20], "big")
+    if row0f != 0x4000:
+        print(f"FAIL: placed bank table row 0x0F = {row0f:#06x} "
+              f"(want 0x4000)")
+        fail = 1
+    else:
+        print("  ok: placed bank table row 0x0F = 0x4000")
+    print("PASS: gfx build output verification" if not fail
+          else "FAIL: gfx build output verification")
+    sys.exit(fail)
+
+
+if __name__ == "__main__":
+    main()

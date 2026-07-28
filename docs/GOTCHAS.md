@@ -308,3 +308,18 @@ playtest round 4, 2026-07-28). Rule: when a structure is
 format-dispatched (jump table), decode EVERY handler's field layout
 before writing a walker; two formats sharing a header shape is an
 assumption, not a fact.
+
+## Loop-count idioms differ per handler: subq-before-dbra means COUNT, not count+1
+
+The fmt-0 OBJ handler does `subq.w #1, d5` before its dbra (entries =
+count); fmt 2 does not (entries = count+1). The count+1 misread made
+the walker treat the NEXT record's format word as one extra tile entry
+— harmless for months (the phantom code 0x0000/0x0002 was outside the
+remap band) until the effect map started rewriting NON-band codes, at
+which point it CLOBBERED the next record's format word (wild jump
+through the format table at runtime). Caught before any playtest by the
+output-image re-walk (record parity 1122 -> 1109), now permanent:
+tools/verify_gfx_build.py runs in every stage-6+ build. Two rules paid
+for here: (1) read the loop-count idiom (subq? dbra initial?) per
+handler, never assume; (2) every data-rewriting pass gets an
+output-side re-parse that must reproduce the source-side counts.

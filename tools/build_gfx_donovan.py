@@ -59,6 +59,9 @@ def main():
     ap.add_argument("outdir")
     ap.add_argument("--tiles", required=True,
                     help="obj_records.py --json output (vs2 tile codes)")
+    ap.add_argument("--effects",
+                    help="effect_map.json from the generator: [src,dst] "
+                         "tile pairs (vs2 bank-3 code -> vsav bank-2 code)")
     args = ap.parse_args()
     os.makedirs(args.outdir, exist_ok=True)
 
@@ -87,11 +90,26 @@ def main():
         write_tile(dst, (code + DELTA), tile)
         written.add(code + DELTA)
 
+    # effect tiles: explicit (src, dst) pairs from the generator's
+    # shelf-pack of the mixed-record shared-effect blocks
+    eff_pairs = []
+    if args.effects:
+        eff_pairs = json.load(open(args.effects))
+        for s, t in eff_pairs:
+            assert SAFE_LO <= t <= SAFE_HI, f"effect dst 0x{t:04X} unsafe"
+            assert t not in written, f"effect dst 0x{t:04X} collides"
+            write_tile(dst, t, tile_bytes(src, 0x10000 + s))
+            written.add(t)
+        print(f"effects: {len(eff_pairs)} tiles placed from effect_map")
+
     # verification 1: every written position reads back as the source tile
     for code in band:
         got = tile_bytes(dst, code + DELTA)
         want = tile_bytes(src, 0x10000 + code)
         assert got == want, f"readback mismatch at dst code 0x{code+DELTA:04X}"
+    for s, t in eff_pairs:
+        assert tile_bytes(dst, t) == tile_bytes(src, 0x10000 + s), \
+            f"effect readback mismatch at 0x{t:04X}"
     # verification 2: untouched positions byte-identical to input
     dirty = 0
     for t2 in range(0, 0x20000):

@@ -74,6 +74,20 @@ registry row live, suite masked/skip expectation kinds landed)
   5cb2b2a9…, output-verified. Awaiting playtest: colors + blink both
   fixed. Then: effect-record map, portraits (art + palettes), attract
   palette path (0xB0AC/0x3A3CA0) if playtest shows wrong attract colors.
+- Playtest round 5 (palettes good; residual blink left-of-P1 + one on
+  Anita; specials clean) -> root-caused STATICALLY: the mixed-record
+  shared-effect entries (116 tiles drawn at bank 2) were still
+  unmapped. Effect map landed: gen shelf-packs their blocks into the
+  freed Jedah-band tail (0xEA40+) + build_gfx places the tiles
+  (effect_map.json); x2b7ef4 companion-effect records verified
+  NO-ACTION (bank 1, engine page byte-identical in place, 1070/1455).
+  EN ROUTE: the count+1 misread of fmt-0 records CORRUPTED build
+  08a12dc6 (next-record format words clobbered) — caught by the
+  output re-walk BEFORE any playtest; fmt-0 = COUNT entries (subq
+  before dbra); tools/verify_gfx_build.py now gates every stage-6+
+  build (record parity + code containment + table check). Current
+  stage-6 fingerprint: 71601263… (parity 1122/1122, all codes in
+  [0xAD8F,0xEAB1], stage 5 still a02aeeff). AWAITING PLAYTEST.
 - STAGE 6 (superseded 06f99f4e) — original notes: fingerprint 06f99f4e… —
   gfx_remap (13,171 tile words / 1,122 records), 6 bank setters
   #$6000->#$4000, [table_fix] (ported bank table was TRUNCATED at row 9

@@ -269,6 +269,15 @@ region = "anim"
 band_lo = 0x863F
 band_hi = 0xC2EF
 delta = 0x2750
+# Non-band codes in MIXED records (shared-effect art drawn by the main
+# bank-2 objects — the residual-blink class, playtest round 5) are
+# shelf-packed into the tail of Jedah's band freed by the main-band
+# placement. The x2b7ef4 companion-effect records need NO remap: their
+# objects run bank 1 (#$2000 setter) against the engine effect page
+# that sits at the SAME absolute indices in vsav (1,070/1,455 tiles
+# byte-identical in place — measured session 14b).
+eff_lo = 0xEA40
+eff_hi = 0xEEBB
 
 # ── M2b sprite palette (session 14; stage 6). The per-char palette
 # pointer table (vsavj 0x38C198 / vs2 0x396B94, long per char, indexed

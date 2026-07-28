@@ -76,7 +76,8 @@ if [ "$STAGE" -ge 6 ]; then
         --cptr-lo 0x300000 --cptr-hi 0x361000 \
         --json "$OUTBASE/donovan_tiles.json" > /dev/null
     python3 tools/build_gfx_donovan.py "$ROMDIR" "$OUTBASE/gfx" \
-        --tiles "$OUTBASE/donovan_tiles.json" | tail -6
+        --tiles "$OUTBASE/donovan_tiles.json" \
+        --effects "$OUTBASE/patch/effect_map.json" | tail -7
     GFXSTAGE="$(mktemp -d)"
     unzip -q -o "$ROMDIR/vsav.zip" -d "$GFXSTAGE"
     cp "$OUTBASE/gfx"/vm3.*m "$GFXSTAGE"/
@@ -84,6 +85,10 @@ if [ "$STAGE" -ge 6 ]; then
     cp "$GFXSTAGE/vsav.zip" "$OUTBASE/rompath/vsav.zip"
     rm -rf "$GFXSTAGE"
     echo "gfx: patched vsav.zip in rompath (ROMDIR untouched)"
+    # static output verification (record parity + code containment +
+    # placed bank table) — the check that caught the fmt-0 count
+    # corruption; a failed build must not reach a playtest
+    python3 tools/verify_gfx_build.py "$OUTBASE"
 fi
 
 python3 tools/build_fingerprint.py "$OUTBASE/rompath;$ROMDIR" --sha-only \
