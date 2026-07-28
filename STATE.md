@@ -31,6 +31,19 @@ follow-up)
   by pure fingerprint auto-detection — the one-command-validates-any-
   build doctrine is now real for hooked builds.
 
+## Session 14e highlights (select phase 2: handles found, surgery specified)
+
+- Differential cursor dumps found THE handles: per-wheel-slot pointer
+  arrays advanced by cursor movement; Jedah's three record cells
+  identified; P2 arrays alias the same records => in-place record
+  replacement fixes both sides, zero pokes. Donovan's three records
+  dumped live on real vsav2 (all smaller => fit in place). Art fit
+  computed (9 blocks incl 8x8 into Jedah's exclusive family art).
+  ONE open safety gate: empirically prove the chosen tile positions
+  are not shared with other chars' VS-splash art (in-match module
+  family, root 0x0B76C0 — structure differs, needs a live dump).
+  Then implement + snapshot-verify + battery. Map in engine_internals.
+
 ## Session 14d highlights (select-screen port: phase 1 = negative result, map corrected)
 
 - Attempted the select-portrait port via the three traced root cells

@@ -233,3 +233,33 @@ build until the real per-char handles are proven by differential dumps
 (hover-moment, two chars). Next session: dump $FFB980's [0x1C] at the
 HOVER frame for two different picks; diff the group spans; patch the
 inline pointers in place (32-bit, slot-0x0F rows only).
+
+### Select-screen phase 2 (session 14e): the real handles, empirically
+
+Differential cursor dumps (menu objects at frames 960-1100 of the pick
+replay) settle it:
+- The three still-Jedah UI pieces ride PER-WHEEL-SLOT pointer arrays,
+  advanced by CURSOR MOVEMENT (stride 8 per wheel step): big portrait
+  (obj $FFB980, array ~0x267416+), name/frame (obj $FFB900, ~0x267596+),
+  highlight (obj $FFBA00, ~0x2689F6+). Jedah's record cells: [0x267466]
+  = 0x271CE8 (big portrait, fmt 2, 17 entries), [0x2675E6] = 0x27221A
+  (name), [0x268A3E] = 0x2724A2 (highlight). P2 arrays are +0x40 copies
+  POINTING AT THE SAME RECORDS — replacing record CONTENT fixes both
+  sides with zero pokes.
+- Donovan's equivalents (live dump on real vsav2, oracle replay, cursor
+  on him): records 0x2A63F0 (7 entries, 38B) / 0x2A657E (14B) /
+  0x2A6750 (14B) — ALL SMALLER than Jedah's → in-place replacement
+  fits, coordinate lists fit inside Jedah's cptr space likewise.
+- Art: Donovan needs 106 bank-1 tiles (9 blocks incl. an 8x8 portrait
+  core); Jedah's select-only exclusive scatter (106 positions) cannot
+  host the 8x8, but his full select+confirm family exclusive art
+  (1,173 positions incl. the VS-bust rectangles) fits all 9 blocks
+  (greedy fit verified; placements recorded in session log).
+- OPEN SAFETY GATE before writing tiles: the placements borrow from
+  what is believed to be Jedah's VS-splash bust art; the in-match
+  module family (root table vsavj 0x0B76C0, helpers 0x3C6CE/0x3DE84 —
+  STRUCTURE DIFFERS from the select table, chains did not parse) must
+  be empirically dumped (VS-splash frame OBJ list) to prove no OTHER
+  character's splash tiles overlap the chosen positions. Then:
+  select_port phase 2 = in-place record surgery + tile placement +
+  code remap, verified by select-screen snapshots + the M2b gate.
