@@ -170,3 +170,44 @@ Remaining before an M2b freeze: select-screen portrait/name art (+their
 palettes, vsavj 0x3B5988/0x3BAEA8 family), the attract palette path
 (0xB0AC/0x3A3CA0), and the x2b7ef4 engine-effect tail (385 non-same-idx
 tiles — minor effect artifacts if any).
+
+## Select-screen (portrait/name) pipeline — mapped (session 14c)
+
+Decoded via read/write/breakpoint traces on the live pick replay
+(trace_writes gained mode "b" = execution breakpoints):
+
+- Menu objects ($FFB800+0x80*n) are OBJ objects drawn by the standard
+  emitter; each gets its anim chain via [obj+0x1C] -> 8-byte frame
+  structs (flags.l with 0xFF top byte, payload.l = OBJ record; flag
+  bit6 = stop, bit7 = indirect). The LIVE character preview at select
+  is the char's own ported records — already correct in stage 6.
+- Element dispatch: master word-offset table `PRG:0x267112` (vs2 twin
+  `0x2A0426`; consumer `lea table; move.w (a0,d0.w); lea (a0,d0.w)` at
+  0x15084), element ids per UI piece — 16-BIT OFFSETS, cannot reach
+  ported regions; not the porting handle.
+- THE PER-CHAR ROOT: helper `PRG:0x5F328` — `movea.l #$2672AA,a0;
+  andi #$ff; lsl #2; lea -4(a0,d0.w)` with d0 from the +0x382 select id
+  (P2 side +0x20 rows; other index families pre-scaled). Root cells
+  read during a full slot-0x0F pick (bp-enumerated): [0x26739A,
+  0x2674AA, 0x2678BA, 0x2678DA, 0x26791A, 0x26799A] — 32-bit longs,
+  FULLY REPOINTABLE. Their chains cover the hover portrait, the
+  confirm-zoom animation (records 0x271Cxx), and small pieces; the
+  name banner rides the per-char long-pointer table `0x26771E` row 0x0F
+  (record 0x2690B6, fmt-4, +0x3800 system glyph codes) with vs2 twin
+  `0x2A0A4A` row 0x13 (record 0x2A1FDC).
+- Jedah's select art: ~2,000 tiles at codes 0xAxxx-0xBxxx in BANK 1
+  (menu objects run +0x18 = 0x2000) — absolute ~0x1A5xx-0x1B9xx; freed
+  when he goes. Donovan's equivalents: vs2 root table `0x2A05E2` rows
+  0x13/0x33 (P1/P2) + the newcomer select-data zone 0x2A1FDC-0x2A8xxx
+  (records/structs; NOT part of any ported region yet), art in vs2
+  bank 1 (the 0x10EF6-0x12728-area vsav2-only clusters).
+- Sibling code twins: vs2 select module ~0x6B3DE (root helper), plus
+  two more root-helper twins at vs2 0x3D314/0x3ED4C reading table
+  0xD153E — a DIFFERENT consumer family (likely in-match intro/win
+  portraits) to inventory when those screens get ported.
+
+Port shape (next): port Donovan's select web (structs+records+coord
+lists) as a data region, place his portrait art in Jedah's freed bank-1
+positions, remap record tile codes, repoint the six root cells + the
+name-table row 0x0F (+P2 rows). All touched vanilla bytes are
+slot-0x0F-only (superset-clean).

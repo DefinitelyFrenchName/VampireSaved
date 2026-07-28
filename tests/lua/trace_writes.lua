@@ -4,7 +4,9 @@
 --
 --   env REPLAY       optional input script (same format as replay.lua)
 --   env WATCH        "ff8480,4" (start,len) or "ff8480,4,r" / "...,rw"
---                    (watch mode; default w = writes)
+--                    (watch mode; default w = writes); mode "b" sets an
+--                    EXECUTION BREAKPOINT at the address instead (len
+--                    ignored) — log registers at a PC (session 14c)
 --   env TRACE_OUT    log path (default trace_writes.txt)
 --   env FRAMES       stop after this many frames (default 3600)
 --
@@ -78,9 +80,13 @@ local start_addr, len, mode = watch:match("^(%x+),(%d+),?(%a*)$")
 assert(start_addr, "WATCH format: hexaddr,len[,r|w|rw]")
 if mode == "" then mode = "w" end
 
--- register the watchpoint on the maincpu program space
+-- register the watchpoint (or breakpoint, mode "b") on the maincpu
 debugger:command(string.format("focus 0"))
-debugger:command(string.format("wpset %s,%s,%s", start_addr, len, mode))
+if mode == "b" then
+    debugger:command(string.format("bpset %s", start_addr))
+else
+    debugger:command(string.format("wpset %s,%s,%s", start_addr, len, mode))
+end
 
 local pressed = {}
 emu.register_frame_done(function()

@@ -30,6 +30,18 @@ registry row live, suite masked/skip expectation kinds landed)
   by pure fingerprint auto-detection — the one-command-validates-any-
   build doctrine is now real for hooked builds.
 
+## Session 14c highlights (select-screen pipeline mapped)
+
+- Select-portrait/name pipeline fully mapped by live instrumentation
+  (docs/engine_internals.md new section): per-char 32-bit root cells
+  enumerated by breakpoint trace (six cells for a full pick), name-table
+  row located, vs2 twins located (master 0x2A0426, roots 0x2A05E2,
+  name 0x2A0A4A row 0x13), Jedah's freed select art sized (~2K bank-1
+  tiles) — the port is a repoint-six-cells + region-port + art-place
+  job, all slot-0x0F-only. trace_writes.lua gained breakpoint mode.
+- MAME Lua gotchas recorded: single-slot register_frame_done vs
+  multi-subscriber notifiers (subscriptions must be pinned).
+
 ## Session 14b highlights (M2b static phase — R2 cracked)
 
 - MAME WITHHELD all session (user needs the machine; static analysis
