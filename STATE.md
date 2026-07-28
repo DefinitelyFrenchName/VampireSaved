@@ -1,7 +1,34 @@
 # STATE — living progress log
 
-Updated: 2026-07-27 (session 11 end — M2a stage 5 green on d6d8f273
-after first-playtest fixes; freeze awaiting maintainer decision)
+Updated: 2026-07-28 (session 14 end — **M2a FROZEN** at a02aeeff…,
+registry row live, suite masked/skip expectation kinds landed)
+
+## Session 14 highlights (M2a FROZEN)
+
+- **Playtest round 3 (maintainer): fully clean** — no crashes over
+  multiple matches, no music from any input. The 214P/214K stragglers
+  were two sound-farm entries masquerading as `engine_data` rows since
+  the session-5 bare-long pass (0x4F14/0x5052 — byte-match locks onto
+  the same-id vsavj entry = the same-id-different-meaning trap with a
+  verified sticker) + the direct-called helper 0x5122. Full farm-ref
+  audit (jsr/bsr/jmp/pea from all ported zones): 25 stubbed / 4 live
+  init-zone rows. GOTCHAS entry added: when a structure class gets
+  understood, re-audit earlier generic rows in its range by MECHANISM,
+  not row kind. Note: sound wrongness is invisible to every RAM-basis
+  gate (music state lives in QSound RAM) — playtest is the only surface
+  catching this class until an M5 harness exists.
+- **M2a FREEZE EXECUTED** (playtest-gated per the standing decision;
+  maintainer confirmation 2026-07-28): registry row
+  `a02aeeff… -> donovan-m2` in tests/expected/registry.tsv;
+  `tests/run_suite.sh` gained the `.masked` expectation kind (exact /
+  flicker-frozen-inventory / diverge classes per CLAUDE.md §4 v2, masked
+  runs auto-selected) and `.skip` (other-romset replays);
+  `tests/expected/donovan-m2/` authored from the frozen gate inventory;
+  Donovan-replay self-expectations frozen on a02aeeff; vanilla
+  expectations frozen for replays 17-26 (drift check on pre-existing
+  vanilla sha1s: none). Validation: `run_suite.sh` GREEN on BOTH builds
+  by pure fingerprint auto-detection — the one-command-validates-any-
+  build doctrine is now real for hooked builds.
 
 ## Session 7 highlights (M2a stage 4 — frontier closed; the crash was ours)
 
@@ -369,14 +396,17 @@ opcode-space dump oracle (`tests/test_decrypt_oracle.sh`). Both directions
 
 ## Next actions
 
-1. **FBNeo harness patch (M1 entry):** SDL2 frontend has replay
-   (`replay.cpp`) and savestate support but no Lua. Options: (a) small
-   frontend patch adding a per-frame work-RAM checksum dump + headless/exit
-   flags (frontend, not emulation core — allowed); (b) drive via its .fr
-   replay format only. Recommendation: (a); it mirrors the MAME Lua probe.
-2. Start M1: three-way program diff (all three sets already decrypt
-   bit-identically to the MAME oracle — images in `build/out/`), work-RAM
-   map, character-data manifests.
+1. **M2b — Donovan graphics** (docs/M2_feasibility.md: the R2 tile
+   wall). First step: measure — tile inventory for slot 0x0F (portrait,
+   name, sprite banks), what the garbled-but-recognizable rendering
+   implies about tile-index vs tile-data remapping, whether M3 (gfx
+   ROM extension via descriptor lines) must be pulled forward.
+2. Suite/watch duties continue: flicker inventory is frozen — any growth
+   or systematic divergence is stop-and-root-cause (CLAUDE.md §4
+   standing watch).
+3. Parked (register per milestone): M5 sound restoration (25 stubbed
+   rows + dispatcher table), Huitzil/Pyron tripwired handlers (M3),
+   bank-tail parked tables, 0x2c31xx data opens.
 
 ## Open items
 
@@ -390,6 +420,15 @@ opcode-space dump oracle (`tests/test_decrypt_oracle.sh`). Both directions
 
 ## Decisions made
 
+- **M2a FROZEN at fingerprint `a02aeefff4c7a053337b10c923c8c328573788fa`**
+  — 2026-07-28, playtest-gated as decided: maintainer's round-3 playtest
+  came back fully clean ("no more graphical bug/crash, even over
+  multiple matches"; "no more music trigger from inputs"). The M2a bar
+  (Donovan selectable, crash-free, behavior observable, R1 logged) is
+  met; graphics deliberately garbled (M2b), Donovan's own sfx
+  deliberately silent (M5, 25 stubbed rows + the 0x271B6 dispatcher id
+  table recorded in reconciliation.toml). Registry row + suite
+  expectation kinds landed the same day (session 14 highlights).
 - **Legacy-gate basis for hooked builds = live-RAM (masked windows)** —
   2026-07-25, maintainer approved ("the invariant interpretation reads
   sound and reliable which is paramount"). For builds carrying engine
@@ -441,38 +480,6 @@ opcode-space dump oracle (`tests/test_decrypt_oracle.sh`). Both directions
 
 ## Decisions pending (human)
 
-- **M2a FREEZE — BACK ON THE TABLE: register stage-5 fingerprint
-  a02aeeff… (eda50a18 + the last two 214P/214K music triggers: session-5
-  engine_data-masquerade farm rows 0x4F14/0x5052 + the direct-called
-  sound helper 0x5122 stubbed; full farm-ref audit — 25 stubbed / 4
-  live init-zone; M5 list = 25 rows incl. the 0x271B6 dispatcher table)** The entire mash-crash chain is closed (sessions 12-13:
-  sound-farm same-value refs, palette-seq private entry, bank-tail
-  dispatch_15-19, x2b7ef4 region extension — reconciliation.md Sessions
-  12-13). All four gates green; four guarded soaks END-clean; the 40K
-  arcade marathon cycles through game-over/attract normally. Flicker
-  inventory update (attributed): 08 gains a second single-frame flicker
-  (3807) from the corrected sound-call cycle profile. Recommend another
-  playtest round (especially long arcade sessions and mash), then
-  freeze. [Superseded hold note:] Candidate
-  advanced to **b2e34c87…** (fixes the session-9 palette-seq hijack — a
-  real defect: vsavj's seq ids 0x2CD+ are LIVE vanilla records; the
-  shared-consumer base-swaps are replaced by a private stub entry). All
-  gates green on it. BUT the sustained-mash wedge (26_don_arcade_mash:
-  display freezes while RAM advances, deterministic, ≤14000 on the new
-  build) is OPEN with all cheap theories eliminated — do not freeze
-  until it is root-caused (protocol in reconciliation.md Session 12).
-  Original freeze text (for after the wedge):
-  register the green fingerprint
-  All gates green (moveset, masked legacy, oracle, dual-emulator, flavor
-  selector); the M2a bar (selectable, crash-free, behavior observable,
-  R1 logged) is met, with graphics deliberately garbled (M2b) and sound
-  deliberately silent for Donovan's own sfx (M5, 8 stubbed rows).
-  Recommend: PLAYTEST FIRST (this is the natural hand-on-stick moment —
-  pick slot 0x0F, both flavors via Start-hold, feel the moves), then
-  freeze: registry row + frozen expectations for the pick/attract
-  diverge constants on this fingerprint + suite masked-expectation-kind
-  support (the mechanics are ~an hour of work once you say go). Any
-  feel-wrong findings become replays first (structured reports welcome).
 - See SPEC §7 for the rest. Nothing blocks current work.
 
 ## Open bugs

@@ -1,38 +1,43 @@
 # NEXT_SESSION — 60-second orientation (rewritten every session end)
 
-As of 2026-07-27, end of session 11. **STAGE 5 IS BUILT AND FULLY GREEN.
-M2a is functionally complete — the freeze is the maintainer's call.**
+As of 2026-07-28, end of session 14. **M2a IS FROZEN.** Fingerprint
+`a02aeefff4c7a053337b10c923c8c328573788fa`, registered in
+`tests/expected/registry.tsv` as expectation set `donovan-m2`. Maintainer
+playtest round 3 fully clean: no crashes over multiple matches, no music
+from any input.
 
-**Stage-5 build:** fingerprint `4b65bc63…` via
-`GEN_FLAGS="--allow-plausible --tripwire-open" tools/build_donovan.sh 5
-build/donovan5`. New in stage 5: the **Start-hold flavor selector**
-(init shim reads the per-player Start bitmask `$FF8060` — bit 0/1 =
-P1/P2, live through char-init; hold YOUR Start through match load →
-VH2 flavor; default VS2) and the **imm_poison** mechanism (the
-unreachable Anita alternate-anim-table operand now faults loudly at a
-named block if ever armed). aux_poke survey: none needed for the M2a
-bar (portrait/name = M2b GFX).
+**Build it:** `GEN_FLAGS="--allow-plausible --tripwire-open"
+tools/build_donovan.sh 5 build/donovan5` (expect the fingerprint above).
 
-**Everything green on 4b65bc63:** guarded moveset (END 9320), masked
-legacy gate (flicker inventory unchanged), oracle gate, dual-emulator
-gate, and the new `tests/test_m2a_flavor_selector.sh` (plain 01 /
-P1-held 00 / P2-held 01).
+**Validate anything with one command:**
+`ROMDIR=... [MAME_ROMPATH="<rompath>;$ROMDIR"] tests/run_suite.sh` — the
+runner fingerprints the build and auto-selects expectations. New kinds
+landed at the freeze: `.masked` (hooked-build legacy basis, CLAUDE.md §4
+v2 — exact / flicker-with-frozen-inventory / diverge classes) and
+`.skip` (other-romset replays). GREEN on both vanilla and the frozen
+build. The stage gates (`tests/test_m2a_stage4_{code,oracle,xemu}.sh`,
+`test_m2a_flavor_selector.sh`) remain the deep battery.
 
-**THE BALL IS IN THE MAINTAINER'S COURT (STATE.md Decisions pending):
-the M2a freeze.** Recommended flow: playtest the build (pick slot 0x0F;
-try both flavors via Start-hold; expect garbled slot-0x0F GFX = M2b
-scope and silent Donovan sfx = M5 scope), then say "freeze": the
-mechanics are ~an hour — registry row for 4b65bc63, frozen pick/attract
-diverge expectations for this fingerprint, suite masked-expectation-kind
-support in run_suite.sh (+ dispatch ground-truth extension). Feel-wrong
-findings should become replays.
+**Session 14's lesson (GOTCHAS, paid for twice):** sound-farm entries
+mapped by the session-5 bare-long byte-matcher masqueraded as
+`engine_data` and byte-matched the SAME-ID vsavj entries — music on
+214P/214K. When a structure class gets understood, re-audit earlier
+generic rows in its range by mechanism. Also: sound wrongness is
+invisible to every RAM-basis gate (QSound RAM) — playtest is the only
+detector until M5 builds a harness.
 
-**After the freeze:** M2b (Donovan graphics — the R2 tile wall; may
-pull M3 forward) per docs/M2_feasibility.md. Parked lists: M5 sound
-restoration (8 stubbed_sound rows), Huitzil/Pyron handler tripwires
-(M3), 0x2c31xx data opens (likely Anita DF-only — revisit with a DF
-replay during M2b/M3 soak).
+**Next: M2b — Donovan graphics** (docs/M2_feasibility.md: the R2 tile
+wall). Start by measuring: slot-0x0F tile inventory (sprites, portrait,
+name), what garbled-but-recognizable implies about index-vs-data
+remapping, and whether M3 (gfx ROM extension via descriptor lines only)
+must be pulled forward. Feel-wrong playtest findings become replays.
 
-**Read:** STATE.md (sessions 8-11 highlights + the freeze decision),
-docs/patch_notes.md (top), docs/tables/reconciliation.md (Sessions
-8-10), HANDOFF.md (build registry + gate list), docs/GOTCHAS.md.
+**Parked lists:** M5 sound restoration (25 stubbed farm rows + the
+0x271B6 dispatcher id table, all recorded in reconciliation.toml),
+Huitzil/Pyron tripwired handlers (M3), bank-tail parked tables
+(0xBF01A-19A data rows, 0xBF59A engine rows), 0x2c31xx data opens
+(likely Anita DF-only).
+
+**Read:** STATE.md (session 14 highlights + Decisions made),
+docs/patch_notes.md (top two entries), HANDOFF.md (build registry),
+docs/GOTCHAS.md (new masquerade entry).
