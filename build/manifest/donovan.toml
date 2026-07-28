@@ -269,3 +269,19 @@ region = "anim"
 band_lo = 0x863F
 band_hi = 0xC2EF
 delta = 0x2750
+
+# ── M2b sprite palette (session 14; stage 6). The per-char palette
+# pointer table (vsavj 0x38C198 / vs2 0x396B94, long per char, indexed
+# by the pre-scaled runtime char id; uploader vsavj 0x1C3FE copies 12
+# rows to palette RAM 0x90C140) was never repointed — Donovan rendered
+# with Jedah's colors (playtest round 4). Port the whole 0x500-byte
+# block (all confirm-button variants) and repoint row 0x0F. Portrait/
+# select-art palette tables (vsavj 0x3B5988/0x3BAEA8 family) ride with
+# the portrait work, not here.
+[palette]
+stage = 6
+src = 0x39CB9C
+len = 0x500
+src_head_hex = "00000FFF0EB80D97"
+table = 0x38C198
+row = 0x0F

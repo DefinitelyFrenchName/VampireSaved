@@ -685,6 +685,33 @@ def main():
             notes.append(f"{op:9s} {d:#08x} +{r['len']:#x}  donovan {name} "
                          f"(from vsav2 0x{r['src']:06X})")
 
+        # [palette] (stage-gated): place the character's sprite-palette
+        # block (all confirm-button variants) raw in hole B and repoint
+        # the engine's per-char palette pointer table row (slot 0x0F —
+        # replaced-slot content, superset-clean). Decoded session 14:
+        # uploader vsavj 0x1C3FE (vs2 twin 0x1AE6E), table indexed by
+        # the pre-scaled char id, 12 rows to palette RAM 0x90C140.
+        pal = port.get("palette")
+        if pal and args.stage >= _int(pal.get("stage", 0)):
+            psrc, plen = _int(pal["src"]), _int(pal["len"])
+            pblock = bytes(src_data_img[psrc:psrc + plen])
+            expect = bytes.fromhex(pal["src_head_hex"])
+            if pblock[:len(expect)] != expect:
+                fail.append(f"palette: src block head at {psrc:#x} != "
+                            f"{pal['src_head_hex']} (image drift?)")
+            else:
+                pa = alloc("b", plen, "sprite palette block")
+                (out / "palette_block.bin").write_bytes(pblock)
+                ops.append({"op": "data_file", "addr": f"{pa:#x}",
+                            "path": "palette_block.bin"})
+                fragments.append((pa, plen, "VS2", "sprite palette block"))
+                ta = _int(pal["table"]) + 4 * _int(pal["row"])
+                ops.append({"op": "poke32", "addr": f"{ta:#x}",
+                            "val": f"{pa:#010x}"})
+                notes.append(f"data     {pa:#08x} +{plen:#x}  sprite palette "
+                             f"block (vsav2 0x{psrc:06X}); poke32 {ta:#08x} "
+                             f"(palette table row {_int(pal['row']):#x})")
+
         # per-char value rows -> vsavj slot 0x0F rows
         for v in man["values"]:
             t = bank[v["table"]]

@@ -128,3 +128,19 @@ In-emulator verification queued behind the maintainer's machine
 availability, incl. the scroll3-vs-band watch (stage art exclusivity has
 strong static evidence — 99.3% band saturation by Jedah's own records +
 visual — but the frame-level confirmation wants a Jedah-stage replay).
+
+### Sprite palette pipeline (session 14b, playtest-driven)
+
+Character sprite palettes: per-char pointer table (vsavj `PRG:0x38C198`,
+vs2 `PRG:0x396B94`; one long per char, indexed by the pre-scaled runtime
+char id), each pointing at a 0x500-byte block (12 rows to palette RAM
+`0x90C140` + confirm-button variants). Uploader vsavj `PRG:0x1C3FE`
+(vs2 twin `0x1AE6E`), copy helper 0x1C3A4; the A5+0x7404..0x7410 page
+slots + fade scheduler (0x142C2) are the separate stage/system path
+(atlas). The M2b port places Donovan's whole block (vs2 0x39CB9C, VS2
+provenance) and poke32s row 0x0F — replaced-slot content, superset-
+clean. Portrait/select-art palette tables (vsavj 0x3B5988/0x3BAEA8
+family, keyed >=0x18-split) ride with the portrait work. Other
+0x90C140 writers (vsavj 0xB0AC attract path, table 0x3A3CA0 keyed by
+$114(a5)) not yet repointed — if the attract demo shows wrong Donovan
+colors, that is the mechanism.

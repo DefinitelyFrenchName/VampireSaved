@@ -67,8 +67,13 @@ registry row live, suite masked/skip expectation kinds landed)
   format-aware in obj_records.py + the generator; new stage-6
   fingerprint f83ff57e… (13,177 words remapped; output re-verified;
   2 stray sub-band tiles 0x813C/0x822C belong to the effect-tail
-  class). GOTCHAS entry added. NEXT: palette port (Jedah's palette
-  source -> Donovan's), then effect-record map.
+  class). GOTCHAS entry added. PALETTE PORTED same session: per-char
+  palette pointer table found (vsavj 0x38C198 / vs2 0x396B94; uploader
+  0x1C3FE -> palette RAM 0x90C140), Donovan's 0x500-byte block (all
+  confirm variants) placed + row 0x0F poke32'd — stage-6 fingerprint
+  5cb2b2a9…, output-verified. Awaiting playtest: colors + blink both
+  fixed. Then: effect-record map, portraits (art + palettes), attract
+  palette path (0xB0AC/0x3A3CA0) if playtest shows wrong attract colors.
 - STAGE 6 (superseded 06f99f4e) — original notes: fingerprint 06f99f4e… —
   gfx_remap (13,171 tile words / 1,122 records), 6 bank setters
   #$6000->#$4000, [table_fix] (ported bank table was TRUNCATED at row 9
