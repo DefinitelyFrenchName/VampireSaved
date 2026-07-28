@@ -87,7 +87,16 @@ registry row live, suite masked/skip expectation kinds landed)
   before dbra); tools/verify_gfx_build.py now gates every stage-6+
   build (record parity + code containment + table check). Current
   stage-6 fingerprint: 71601263… (parity 1122/1122, all codes in
-  [0xAD8F,0xEAB1], stage 5 still a02aeeff). AWAITING PLAYTEST.
+  [0xAD8F,0xEAB1], stage 5 still a02aeeff). Playtest round 6: SPRITES
+  CLEAN (palettes good, blink gone, effects clean; portraits unchanged
+  as expected). MACHINE WINDOW USED: full battery green on 71601263 —
+  new permanent gates tests/test_m2b_stage6.sh (guarded soaks incl 40K
+  marathon + masked legacy, flicker inventory unchanged) and
+  tests/test_m2b_scroll3.sh (0 danger frames; scroll3 base boot-
+  constant, one write in 42K frames) + oracle/xemu/flavor PASS against
+  the stage-6 rompath. M2b CORE IS VERIFIED. Remaining for the M2b
+  freeze decision: portraits/name art + their palettes, attract palette
+  path, engine-effect tail refinement.
 - STAGE 6 (superseded 06f99f4e) — original notes: fingerprint 06f99f4e… —
   gfx_remap (13,171 tile words / 1,122 records), 6 bank setters
   #$6000->#$4000, [table_fix] (ported bank table was TRUNCATED at row 9

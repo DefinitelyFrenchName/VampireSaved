@@ -144,3 +144,29 @@ family, keyed >=0x18-split) ride with the portrait work. Other
 0x90C140 writers (vsavj 0xB0AC attract path, table 0x3A3CA0 keyed by
 $114(a5)) not yet repointed — if the attract demo shows wrong Donovan
 colors, that is the mechanism.
+
+### M2b in-emulator verification (session 14c, machine window)
+
+All green on stage-6 fingerprint 71601263:
+- tests/test_m2b_stage6.sh (the permanent M2b gate): stage-6 build with
+  static output verification inside, five guarded soaks (moveset, DP
+  spam, round-2, input chaos, 40K arcade marathon) END-clean, and the
+  full masked legacy gate — flicker inventory UNCHANGED (the gfx work
+  perturbs zero bytes of legacy live RAM).
+- Oracle + dual-emulator + flavor gates re-run against the stage-6
+  rompath: PASS (HP trajectories, anchors, latches identical to the
+  frozen-stage behavior).
+- tests/test_m2b_scroll3.sh: scroll3-vs-placement exclusivity measured
+  live — tests/lua/scroll3_watch.lua scans the scroll3 tilemap every
+  frame; 0 danger frames over the attract stage rotation, the arcade
+  marathon, and match replays. The scroll3 base register is write-only,
+  written ONCE at boot (PC 0x926, base 0 => map at VRAM 0x900000;
+  proven constant across 42,000 marathon frames via trace_writes
+  WATCH=800106). MAME Lua traps recorded: emu.register_frame_done is a
+  single slot (replay.lua clobbers it — use add_machine_frame_notifier)
+  and add_machine_*_notifier subscriptions must be pinned in globals.
+
+Remaining before an M2b freeze: select-screen portrait/name art (+their
+palettes, vsavj 0x3B5988/0x3BAEA8 family), the attract palette path
+(0xB0AC/0x3A3CA0), and the x2b7ef4 engine-effect tail (385 non-same-idx
+tiles — minor effect artifacts if any).

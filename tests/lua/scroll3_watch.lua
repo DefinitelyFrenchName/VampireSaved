@@ -1,0 +1,75 @@
+-- scroll3_watch.lua — scroll3-vs-OBJ-band exclusivity instrument (M2b).
+-- Wraps replay.lua: installs a write tap on the CPS-A registers to track
+-- the scroll3 tilemap base, and each frame scans the active scroll3 map
+-- for tile codes whose ABSOLUTE gfx index would land in the Donovan
+-- placement window (vsav bank-2 OBJ band). scroll3 absolute index =
+-- 0x10000 + 4*code (measured from the CPS2 draw path, no mapper), so
+-- the danger codes are [(lo-0x10000)/4, (hi-0x10000)/4].
+--
+-- env SCROLL3_OUT   report path (required)
+-- env SCROLL3_LO/HI absolute tile window (default 0x2AD80/0x2EEBB)
+-- plus everything replay.lua takes (REPLAY, CHECKSUM_OUT, ...).
+--
+-- Report: per-frame lines only when danger codes are present; summary
+-- "SCROLL3SUMMARY maxcode=%x bases=... danger=%d" at exit.
+
+local out_path = assert(os.getenv("SCROLL3_OUT"), "set SCROLL3_OUT")
+local lo = tonumber(os.getenv("SCROLL3_LO") or "", 16) or 0x2AD80
+local hi = tonumber(os.getenv("SCROLL3_HI") or "", 16) or 0x2EEBB
+local clo = math.floor((lo - 0x10000) / 4)
+local chi = math.floor((hi - 0x10000) / 4)
+
+local cpu = manager.machine.devices[":maincpu"]
+local space = cpu.spaces["program"]
+
+-- The scroll3 base register is WRITE-ONLY and written ONCE at boot
+-- (PC 0x926 writes #$0000 to the reg block; measured via
+-- trace_writes.lua WATCH=800106 — one hit in 2400 frames). The map
+-- therefore sits at VRAM base 0x900000; SCROLL3_BASE overrides if a
+-- build ever repoints it. Constancy across stages is separately
+-- verified by a full-length trace_writes run (tests notes).
+local scroll3_base = tonumber(os.getenv("SCROLL3_BASE") or "", 16) or 0
+local bases_seen = { [scroll3_base] = true }
+local danger_frames = 0
+local max_code = 0
+local frame = 0
+
+local rep = io.open(out_path, "w")
+
+-- MAME Lua traps (paid for, session 14b): emu.register_frame_done is a
+-- SINGLE slot — replay.lua (dofile'd below) would clobber it; and the
+-- add_machine_*_notifier subscriptions are dropped if the return value
+-- is garbage-collected. Use the multi-subscriber notifier and pin the
+-- subscriptions in globals.
+_G.s3_frame_sub = emu.add_machine_frame_notifier(function()
+    frame = frame + 1
+    -- tilemap: 0x4000 bytes at base<<8 (VRAM $900000 window)
+    local base = 0x900000 + ((scroll3_base << 8) & 0x3ffff)
+    local n_danger = 0
+    for off = 0, 0x3ffe, 4 do          -- (code.w, attr.w) pairs
+        local code = space:read_u16(base + off)
+        if code > max_code then max_code = code end
+        if code >= clo and code <= chi then
+            n_danger = n_danger + 1
+        end
+    end
+    if n_danger > 0 then
+        danger_frames = danger_frames + 1
+        rep:write(string.format("%d danger=%d base=%04x\n",
+                                frame, n_danger, scroll3_base))
+        rep:flush()
+    end
+end)
+
+_G.s3_stop_sub = emu.add_machine_stop_notifier(function()
+    local bl = {}
+    for b in pairs(bases_seen) do bl[#bl + 1] = string.format("%04x", b) end
+    table.sort(bl)
+    rep:write(string.format("SCROLL3SUMMARY maxcode=%04x danger_frames=%d bases=%s\n",
+                            max_code, danger_frames, table.concat(bl, ",")))
+    rep:close()
+end)
+
+-- chain into the standard replay driver (same directory as this script)
+local here = debug.getinfo(1, "S").source:match("@(.*/)") or "./"
+dofile(here .. "replay.lua")
