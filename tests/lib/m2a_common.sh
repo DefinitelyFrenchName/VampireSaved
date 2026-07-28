@@ -101,13 +101,16 @@ m2a_legacy_gate_masked() {
     _mg_exp="$REPO/$M2A_MASKED_EXP"
     gate_fail=0
     [ -d "$_mg_exp/logs" ] || { echo "FAIL: no frozen masked logs at $_mg_exp (run m2a_freeze_masked)"; gate_fail=1; return; }
+    _mg_keep="$REPO/build/gate_failures"
     for _mg_r in $M2A_MASKED_EXACT; do
         m2a_run_masked "$_mg_rp" "$REPO/tests/replays/$_mg_r.rpl" \
             "$_mg_w/$_mg_r.log" "$_mg_w/${_mg_r}box"
         if cmp -s "$_mg_exp/logs/$_mg_r.log" "$_mg_w/$_mg_r.log"; then
             echo "  ok: $_mg_r masked bit-identical"
         else
-            echo "FAIL: $_mg_r masked live-state diverged"; gate_fail=1
+            mkdir -p "$_mg_keep"
+            cp "$_mg_w/$_mg_r.log" "$_mg_keep/$_mg_r.$(date +%s).log"
+            echo "FAIL: $_mg_r masked live-state diverged (log kept in build/gate_failures)"; gate_fail=1
         fi
     done
     for _mg_r in $M2A_MASKED_FLICKER; do
@@ -116,7 +119,9 @@ m2a_legacy_gate_masked() {
         _mg_v=$(python3 "$REPO/tools/compare_flicker.py" \
             "$_mg_exp/logs/$_mg_r.log" "$_mg_w/$_mg_r.log") \
             && echo "  ok: $_mg_r masked ${_mg_v}" \
-            || { echo "FAIL: $_mg_r masked: $_mg_v"; gate_fail=1; }
+            || { mkdir -p "$REPO/build/gate_failures"
+                 cp "$_mg_w/$_mg_r.log" "$REPO/build/gate_failures/$_mg_r.$(date +%s).log"
+                 echo "FAIL: $_mg_r masked: $_mg_v (log kept in build/gate_failures)"; gate_fail=1; }
     done
     m2a_run_masked "$_mg_rp" "$REPO/tests/replays/06_test_mode.rpl" \
         "$_mg_w/06_test_mode.log" "$_mg_w/06box"

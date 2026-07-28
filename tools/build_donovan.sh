@@ -63,11 +63,13 @@ python3 tools/gen_donovan_patch.py "$OUTBASE/extract" "$OUTBASE/patch" \
 python3 tools/patch_prg.py "$ROMDIR/vsavj.zip" "$OUTBASE/prg" \
     --patch "$OUTBASE/patch/patch.json" | tail -3
 
-# (select-screen port: tools/select_port.py exists as WIP — phase 1
-# proved the poked cells are NOT the live chains; the real handles are
-# inline pointer arrays in the shared web (docs/engine_internals.md).
-# Deliberately NOT wired in until the per-char groups are proven —
-# stage 6 ships with Jedah's portrait/name, correct everything else.)
+# Stage 6+: select-screen portrait/name/highlight — in-place record
+# surgery on Jedah's three wheel records (both sides alias them) +
+# bank-1 tile placement map (docs/engine_internals.md phase 2).
+if [ "$STAGE" -ge 6 ]; then
+    python3 tools/select_port.py "$OUTBASE/prg" --vs2 "$ROMDIR/vsav2.zip" \
+        --tiles-out "$OUTBASE/select_tiles.json" | tail -5
+fi
 
 rm -rf "$OUTBASE/rompath"
 ROMDIR="$ROMDIR" tools/pack_build.sh "$OUTBASE/prg" "$OUTBASE/rompath" > /dev/null
@@ -83,7 +85,8 @@ if [ "$STAGE" -ge 6 ]; then
         --json "$OUTBASE/donovan_tiles.json" > /dev/null
     python3 tools/build_gfx_donovan.py "$ROMDIR" "$OUTBASE/gfx" \
         --tiles "$OUTBASE/donovan_tiles.json" \
-        --effects "$OUTBASE/patch/effect_map.json" | tail -7
+        --effects "$OUTBASE/patch/effect_map.json" \
+        --select-tiles "$OUTBASE/select_tiles.json" | tail -8
     GFXSTAGE="$(mktemp -d)"
     unzip -q -o "$ROMDIR/vsav.zip" -d "$GFXSTAGE"
     cp "$OUTBASE/gfx"/vm3.*m "$GFXSTAGE"/

@@ -31,7 +31,22 @@ follow-up)
   by pure fingerprint auto-detection — the one-command-validates-any-
   build doctrine is now real for hooked builds.
 
-## Session 14e highlights (select phase 2: handles found, surgery specified)
+## Session 14e highlights (select phase 2 SHIPPED: portrait + name on screen)
+
+- Donovan's big portrait and name banner render at the select screen
+  (snapshot-verified) — in-place record surgery (select_port.py phase
+  2) + 101 bank-1 tiles placed in Jedah's freed select/splash art.
+  Build e98a357a; splash-frame OBJ dump closed the placement safety
+  gate; cursor-highlight record deliberately kept Jedah's (vs2 wheel
+  geometry mismatch). Full battery: soaks, oracle, xemu, flavor,
+  scroll3 green; masked legacy green on rerun x2.
+- GATE ANOMALY under standing watch: one invocation failed 02/10 masked
+  (84 frames @663 on 10); same build passed everything on reruns,
+  deterministically at the frozen inventory. Unreproduced; failing-log
+  preservation added (build/gate_failures/). Recurrence = stop and
+  root-cause.
+
+## Session 14e (earlier): handles found, surgery specified
 
 - Differential cursor dumps found THE handles: per-wheel-slot pointer
   arrays advanced by cursor movement; Jedah's three record cells

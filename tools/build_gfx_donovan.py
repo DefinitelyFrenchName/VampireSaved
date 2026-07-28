@@ -62,6 +62,10 @@ def main():
     ap.add_argument("--effects",
                     help="effect_map.json from the generator: [src,dst] "
                          "tile pairs (vs2 bank-3 code -> vsav bank-2 code)")
+    ap.add_argument("--select-tiles",
+                    help="select_tiles.json from select_port.py: [src,dst] "
+                         "BANK-1 pairs (group-A members; Jedah's freed "
+                         "select/splash art positions)")
     args = ap.parse_args()
     os.makedirs(args.outdir, exist_ok=True)
 
@@ -128,6 +132,24 @@ def main():
         path = os.path.join(args.outdir, f"vm3.{n}m")
         open(path, "wb").write(buf)
         print(f"  wrote vm3.{n}m sha1 {hashlib.sha1(bytes(buf)).hexdigest()}")
+
+    # select-screen art: bank-1 pairs live in GROUP A (abs 0x10000+code)
+    if args.select_tiles:
+        sel = json.load(open(args.select_tiles))
+        srcA = load_group(z2, "vs2", GROUP_A)
+        dstA = [bytearray(s) for s in load_group(za, "vm3", GROUP_A)]
+        for s_, t_ in sel:
+            write_tile(dstA, 0x10000 + t_, tile_bytes(srcA, 0x10000 + s_))
+        for s_, t_ in sel:
+            assert tile_bytes(dstA, 0x10000 + t_) == \
+                tile_bytes(srcA, 0x10000 + s_), \
+                f"select readback mismatch at bank-1 0x{t_:04X}"
+        print(f"select: {len(sel)} bank-1 tiles placed")
+        for n, buf in zip(GROUP_A, dstA):
+            path = os.path.join(args.outdir, f"vm3.{n}m")
+            open(path, "wb").write(buf)
+            print(f"  wrote vm3.{n}m sha1 "
+                  f"{hashlib.sha1(bytes(buf)).hexdigest()}")
 
     spec = {"delta": DELTA, "band_lo": BAND_LO, "band_hi": BAND_HI,
             "dst_bank_word": DST_BANK << 13,

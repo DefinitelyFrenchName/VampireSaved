@@ -263,3 +263,28 @@ replay) settle it:
   character's splash tiles overlap the chosen positions. Then:
   select_port phase 2 = in-place record surgery + tile placement +
   code remap, verified by select-screen snapshots + the M2b gate.
+
+### Select phase 2 SHIPPED (session 14e, fingerprint e98a357a)
+
+In-place record surgery works: Donovan's big portrait and name banner
+render on the select screen (snapshot-verified, both the hover and
+speed-select phases). tools/select_port.py replaces Jedah's two records
+(0x271CE8 big portrait, 0x27221A name) with Donovan's (both smaller;
+coordinate lists overwritten inside Jedah's own list space; tile codes
+rewritten to the placements), and build_gfx_donovan places the 101
+bank-1 tiles into Jedah's freed select/splash art (group-A members now
+patched too). The third piece (cursor highlight 0x2724A2) is
+deliberately NOT replaced: its vs2 coordinates assume vsav2's wheel
+geometry — replacing it drew a displaced label. Remaining select
+cosmetics: wheel face (background scroll art), highlight ring, VS
+splash bust + win screens (the 0x0B76C0 in-match family), attract
+palette.
+
+GATE ANOMALY (recorded per the CLAUDE.md §4 standing watch): one gate
+invocation showed 02 masked-diverged + 10 with 84 divergent frames from
+frame 663; the SAME build then passed 02/10 individually (twice,
+deterministic, exact frozen inventory) and a full gate rerun was
+entirely green. Unreproduced one-off — possibly environmental; the
+masked-legacy helpers now PRESERVE failing logs (build/gate_failures/)
+so any recurrence self-documents with a RAM-diffable log. If it recurs,
+stop and root-cause before any freeze.
