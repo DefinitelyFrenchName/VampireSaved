@@ -91,3 +91,28 @@ scroll-side inventory must confirm the absolute range 0x2AD80-0x2EEBB
 holds no stage art before any tile write. Also open:
 portrait/name tiles (select screen) are a separate inventory; Anita's
 bank attribution rides the same +0x18 machinery (her spawn sets it).
+
+### M2b tile-data step (session 14, static build + verification)
+
+`tools/build_gfx_donovan.py`: places Donovan's 15,171 main-band tiles
+from vsav2 group-B simms (bank 3) into copies of vsav's group-B simms
+(bank 2) at delta +0x2750 — placed codes 0xAD8F-0xEA3F, above the
+Sasquatch-shared head, inside Jedah's band. Uses the canonical
+extraction plus its verified inverse (`gfx_tiles.write_tile`;
+scatter-back round-trip asserted on every placed tile). Verified every
+untouched tile byte-identical. Emits `remap_spec.json` (delta, band,
+bank words) for the PRG-side patcher. Visual check: placed range
+renders Donovan sprite art.
+
+Remaining for a runnable gfx build (all static): (1) generator
+integration — rewrite tile words (+delta) in the ported anim records,
+patch Donovan's hardcoded #$6000 bank setters to #$4000; (2) the
+effect-record map — 85 of 114 low-code effect tiles resolve
+content-addressed into vsav (scattered banks 0/2 => per-record bank+code
+remap; one record = one object = one bank), 27 unresolved get poison
+codes (loud placeholder, never silent wrong art); (3) pack_build
+rompath must carry the patched vsav.zip (ROMDIR stays pristine).
+In-emulator verification queued behind the maintainer's machine
+availability, incl. the scroll3-vs-band watch (stage art exclusivity has
+strong static evidence — 99.3% band saturation by Jedah's own records +
+visual — but the frame-level confirmation wants a Jedah-stage replay).

@@ -84,6 +84,19 @@ def all_tiles(groups):
             + [tile_bytes(gb, i) for i in range(n)])
 
 
+def write_tile(simms, t2, tile):
+    """Inverse of tile_bytes: scatter a canonical 128B tile back into four
+    mutable simm buffers (bytearrays) at within-group index t2."""
+    b, rem = divmod(128 * t2, 0x200000)
+    chunk, o = divmod(rem, 0x100000)
+    t2p = o // 128
+    for si, s in enumerate(simms):
+        part = tile[si * 32:(si + 1) * 32]
+        base = b * 0x80000 + 64 * t2p + 2 * chunk
+        for r in range(16):
+            s[base + 4 * r: base + 4 * r + 2] = part[2 * r: 2 * r + 2]
+
+
 def decode(tile):
     """Canonical 128B -> 256 pixel values 0-15 (row-major 16x16)."""
     px = bytearray(256)

@@ -51,7 +51,17 @@ registry row live, suite masked/skip expectation kinds landed)
 - Exclusivity walk (player-OBJ, all slots): Jedah's band clean except
   a 44-tile Sasquatch-shared head (0xAD3E-0xAD74) — safe floor 0xAD80,
   usable extent 0x413C >= needed 0x3CB1. STILL FITS.
-- Open for next: SCROLL-side exclusivity (stage art vs absolute range
+- Tile-data step BUILT AND VERIFIED (tools/build_gfx_donovan.py):
+  Donovan's 15,171 tiles placed into patched vm3 group-B members at
+  codes 0xAD8F-0xEA3F bank 2 (delta +0x2750), readback + untouched-byte
+  verification green, placed range visually renders Donovan art.
+  Scroll-side exclusivity: scroll1/2 cannot reach bank 2 (measured from
+  the CPS2 draw path, no mapper); scroll3 can, but Jedah's band is
+  99.3% saturated by his own OBJ records and renders as pure sprite art
+  — residual risk queued as an in-emulator scroll3 watch.
+- Open for next: generator integration (record tile-word remap +delta,
+  #$6000->#$4000 bank setters, effect-record per-bank map 85/27-poison),
+  pack_build patched-vsav rompath, then SCROLL-side (stage art vs absolute range
   0x2AD80-0x2EEBB — Jedah's stage is legacy and must stay intact),
   Zabel slot-0x04 walker gap, the 112 shared-effect tiles
   (content-map), portrait/name inventory, then the gfx builder +
