@@ -31,6 +31,27 @@ follow-up)
   by pure fingerprint auto-detection — the one-command-validates-any-
   build doctrine is now real for hooked builds.
 
+## Session 14g highlights (VS splash SHIPPED; three superset traps caught and fixed)
+
+- VS-splash busts ported (playtest round 8): the six per-char cells'
+  FIRST records are the live ones (object durations read garbage-huge
+  values, so chains never advance). Final surgery set: splash P1/P2 +
+  pal P1 in place (with the wheel portrait + name from phase 2); the
+  hover-P2/pal-P2 records PROVEN SHARED with the win screen on legacy
+  paths and left vanilla; 130 more bank-1 tiles placed. Snapshot: the
+  VS screen shows Donovan's praying-hands bust, correct colors + name.
+- THE MASKED LEGACY GATE CAUGHT THREE REAL SUPERSET VIOLATIONS in this
+  surgery series, each root-caused to the byte (GOTCHAS entry): cell
+  pokes are RAM-visible via stored anchors; record budget words debit a
+  shared frame budget ($FF811B one-byte proof); the win screen reads a
+  "select" record's coordinate list on legacy paths (frame-10732 trace,
+  PC 0x8C6E2). Fixes: in-place only, host budgets preserved, shared
+  records left vanilla. Fingerprint 189fdff3: double gate run green,
+  oracle/xemu/flavor green.
+- Remaining cosmetics: wheel hexagonal mugshot face (background scroll
+  art), win-quote screen (still Jedah — the winner-portrait family, to
+  be found the same way), attract palette.
+
 ## Session 14f highlights (select palettes fixed; splash/win specified)
 
 - Playtest round 7 (portrait/name correct, PALETTES wrong; splash+win

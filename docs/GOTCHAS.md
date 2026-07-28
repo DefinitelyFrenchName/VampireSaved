@@ -323,3 +323,23 @@ tools/verify_gfx_build.py runs in every stage-6+ build. Two rules paid
 for here: (1) read the loop-count idiom (subq? dbra initial?) per
 handler, never assume; (2) every data-rewriting pass gets an
 output-side re-parse that must reproduce the source-side counts.
+
+## "Slot-indexed cell" does not mean "slot-exclusive data" — three surgery traps
+
+The select/splash record surgery tripped the masked legacy gate three
+times, each root-caused to the byte (session 14g):
+1. CELL POKES are RAM-visible: menu objects store chain anchors in work
+   RAM; repointing a cell can change stored pointer values on any
+   legacy replay whose cursor VISITS the slot. In-place record
+   replacement only.
+2. RECORD BUDGET WORDS are globally coupled: the OBJ emitter debits
+   each record's budget from the shared frame budget (d7); a changed
+   budget flips borderline skip decisions on crowded frames (one-byte
+   $FF811B divergence, 04_select_fuzz). Replaced records must keep the
+   HOST's budget word.
+3. Coordinate lists can be read by OTHER SCREENS on legacy paths: the
+   win screen reads the "hover P2" record's coord list (PC 0x8C6E2)
+   in matches with no slot-0x0F character at all (322-frame position
+   divergence in 05_timeout_idle). Every byte range you replace needs
+   a legacy-read proof — the masked legacy gate IS that proof; run it
+   after every record replaced, not at the end of a batch.

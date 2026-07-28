@@ -35,19 +35,39 @@ import sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import cps2_decrypt as cps  # noqa: E402
 
-# (piece, vsavj_record, vs2_record)
-# The third piece (cursor highlight, vsavj rec 0x2724A2) is deliberately
-# NOT replaced: its vs2 coordinates are relative to Donovan's wheel
-# position on vsav2's different wheel geometry — replacing it rendered
-# a displaced label (snapshot, session 14e). Jedah's highlight stays;
-# the wheel face is background scroll art anyway (separate follow-up).
+# (piece, vsavj_record, vs2_record) — in-place record replacements.
+# The cursor highlight (vsavj 0x2724A2) is deliberately NOT replaced:
+# its vs2 coordinates assume vsav2's wheel geometry (displaced label).
+# Session 14g adds the VS-splash/hover/pal family (playtest round 8):
+# the six per-char cells' FIRST records (the objects' duration fields
+# read garbage-huge values, so [0x1C] never advances — only the first
+# record renders). Five fit in place; the P1-hover record (Donovan's
+# 48-entry bust composition) relocates into Jedah's freed anim region
+# with a cell poke (RELOC below).
 RECORDS = [
     ("big portrait", 0x271CE8, 0x2A63F0),
     ("name banner", 0x27221A, 0x2A657E),
+    ("splash P1", 0x273766, 0x2A7F68),
+    ("splash P2", 0x273AAC, 0x2A7F86),
+    # "hover P2" (0x272FB0) and "pal P2" (0x272FDA) are NOT replaced:
+    # the WIN SCREEN reads 0x272FB0's coordinate list on LEGACY paths
+    # (PC 0x8C6E2, frame-10732 trace, session 14g — a one-position
+    # divergence of 322 frames in 05_timeout_idle). Those cells are not
+    # slot-exclusive; both records are visually trivial (1 entry).
+    ("pal P1", 0x2720FA, 0x2A6416),
 ]
+# NO relocated records / cell pokes: legacy replays' cursors VISIT slot
+# 0x0F (hover), so everything they can read must stay RAM-invisible —
+# in-place only, and every replaced record KEEPS JEDAH'S BUDGET WORD
+# (the OBJ emitter debits the shared frame budget by this field; a
+# changed budget shifted borderline skip decisions on crowded frames =
+# the one-byte $FF811B divergence, session 14g RAM diff). The P1-hover
+# big bust record is deliberately NOT ported (the visible portrait and
+# VS busts come from the wheel-array and splash records).
 # block placements (session 14e greedy fit, splash-overlap-verified):
 # (vs2 code, bx, by) -> vsavj bank-1 anchor code
 PLACEMENTS = {
+    # phase 2 (portrait + name; the dead highlight entry removed)
     (0x9F55, 1, 1): 0x7A78,
     (0xAD42, 1, 1): 0x7002,
     (0xAD43, 1, 1): 0x7421,
@@ -56,7 +76,30 @@ PLACEMENTS = {
     (0xAE50, 1, 8): 0xAD4F,
     (0xAE51, 1, 8): 0xADA8,
     (0xAF4B, 5, 2): 0xA2B6,
-    (0xB000, 5, 1): 0xA2D4,
+    # session 14g (splash/hover/pal family, fit into the remaining pool)
+    (0x7A0A, 1, 1): 0xA258, (0x8661, 1, 1): 0xA2CF,
+    (0xAEE6, 4, 2): 0xA327, (0xB2A0, 3, 1): 0xAD60,
+    (0xB9DE, 1, 1): 0xA27F, (0xB9DF, 1, 3): 0xA21F,
+    (0xB9EC, 2, 2): 0xA2F0, (0xB9EE, 1, 1): 0xA27A,
+    (0xB9F5, 3, 3): 0xA2F4, (0xB9F8, 2, 1): 0xAD72,
+    (0xB9FB, 1, 1): 0xA22A, (0xB9FE, 1, 1): 0xA26A,
+    (0xBA08, 1, 1): 0xA25F, (0xBA09, 1, 2): 0xA15F,
+    (0xBA0B, 3, 1): 0xA324, (0xBA0E, 1, 1): 0xA24F,
+    (0xBA0F, 1, 1): 0xA1EE, (0xBA10, 3, 2): 0xA2F7,
+    (0xBA13, 2, 1): 0xAD70, (0xBA18, 1, 1): 0xA244,
+    (0xBA1A, 3, 1): 0xAD54, (0xBA1D, 2, 1): 0xAD1D,
+    (0xBA1F, 1, 1): 0x7C43, (0xBA23, 6, 2): 0xA2D4,
+    (0xBA29, 4, 1): 0xAD50, (0xBA2D, 3, 1): 0xAD63,
+    (0xBA30, 1, 1): 0xA264, (0xBA31, 1, 1): 0x99DB,
+    (0xBA32, 1, 1): 0xA224, (0xBA39, 4, 1): 0xAD37,
+    (0xBA3D, 2, 1): 0xAD74, (0xBA3F, 1, 1): 0xA248,
+    (0xBA40, 5, 1): 0xA30B, (0xBA45, 1, 1): 0xA274,
+    (0xBA46, 5, 2): 0xA2EB, (0xBA4B, 4, 2): 0xA310,
+    (0xBA4F, 1, 3): 0xA1AE, (0xBA50, 3, 1): 0xA317,
+    (0xBA53, 2, 1): 0xA2C4, (0xBA55, 1, 1): 0xA254,
+    (0xBA60, 2, 1): 0xA2F2, (0xBA62, 1, 1): 0xA26F,
+    (0xBA63, 1, 1): 0xA21A, (0xBA64, 1, 1): 0xA1DE,
+    (0xBA65, 1, 1): 0xA234, (0xBA66, 2, 2): 0xA32B,
 }
 
 
@@ -124,8 +167,10 @@ def main():
                     tile_pairs.append([src, dst])
         # write Donovan's coordinate pairs over Jedah's list space
         img[jcptr:jcptr + dclist] = vs2[dcptr:dcptr + dclist]
-        # compose the record: keep Donovan's fmt/budget/count, Jedah's cptr
-        rec = (dfmt.to_bytes(2, "big") + dbud.to_bytes(2, "big")
+        # compose the record: Donovan's fmt/count/entries, JEDAH'S BUDGET
+        # (RAM-invisibility: the budget debits the shared frame budget)
+        # and Jedah's cptr
+        rec = (dfmt.to_bytes(2, "big") + jbud.to_bytes(2, "big")
                + (dcnt - 1).to_bytes(2, "big") + jcptr.to_bytes(4, "big"))
         for t, at in new_ents:
             rec += t.to_bytes(2, "big") + at.to_bytes(2, "big")
@@ -135,6 +180,10 @@ def main():
               f"({dcnt} entries, {len(rec)}B incl. slack; coords "
               f"{dclist}B at 0x{jcptr:06X})")
 
+    # relocated records: place Donovan's record + coordinate list in
+    # Jedah's freed anim region and poke the per-char cell (32-bit,
+    # slot-0x0F-only). The freed region holds his orphaned anim data —
+    # superset-clean to overwrite (same argument as every slot repoint).
     # select-portrait PALETTE rows (playtest round 7: portrait/name
     # rendered with Jedah's colors). Uploader: vsavj 0x5F136 — source
     # row = 0x3AC000 + (variant*16 + char)*0x20 (11-variant x 16-char
