@@ -77,7 +77,7 @@ def main():
     ap.add_argument("extract_dir", type=Path)
     ap.add_argument("out_dir", type=Path)
     ap.add_argument("--vsavj", type=Path, required=True)
-    ap.add_argument("--stage", type=int, required=True, choices=range(1, 6))
+    ap.add_argument("--stage", type=int, required=True, choices=range(1, 7))
     root = Path(__file__).resolve().parent.parent
     ap.add_argument("--port", type=Path, default=root / "build/manifest/donovan.toml")
     ap.add_argument("--recon", type=Path,
@@ -240,6 +240,19 @@ def main():
             return (src_bank_origin + (_int(t["vsavj"]) - VSAVJ_ORIGIN)
                     + src_slot * es)
         want = stage_regions(regions, args.stage)
+        # [table_fix] (stage-gated): a ported region carrying a truncated
+        # engine table grows to cover it; the blob pad + table rewrite
+        # happen in the blob pass below. Must run BEFORE allocation so
+        # the placement reserves the padded length.
+        tf = port.get("table_fix")
+        if tf and args.stage >= _int(tf.get("stage", 0)):
+            tfr = regions.get(tf["region"])
+            if tfr and tfr["len"] < _int(tf["pad_len"]):
+                notes.append(f"# table_fix: region {tf['region']} len "
+                             f"{tfr['len']:#x} -> {_int(tf['pad_len']):#x} "
+                             f"({tf['note']})")
+                tfr["len"] = _int(tf["pad_len"])
+
         # allocate every wanted region first (deterministic order: code
         # first so it stays in the encrypted hole, then data)
         hole_b_set = set(x.strip() for x in
@@ -473,6 +486,18 @@ def main():
         for name in sorted(placed):
             r = regions[name]
             blob = bytearray((args.extract_dir / f"region_{name}.bin").read_bytes())
+            # [table_fix] pad + whole-table rewrite (see the config note in
+            # donovan.toml): zero-pad the blob to the reserved length and
+            # write the documented row values at the table offset.
+            if (tf and tf["region"] == name
+                    and args.stage >= _int(tf.get("stage", 0))):
+                rows = bytes.fromhex(tf["rows_hex"])
+                toff = _int(tf["table_off"])
+                if len(blob) < r["len"]:
+                    blob.extend(b"\x00" * (r["len"] - len(blob)))
+                blob[toff:toff + len(rows)] = rows
+                notes.append(f"# {name}+{toff:#x}: table_fix {len(rows)} "
+                             f"bytes ({tf['note']})")
             for ref in r.get("refs", []):
                 if ref["width"] == 16:  # pcrel16: displacement rewrite TBD
                     newt = relocate_target(ref, f"{name}+{ref['off']:#x}")
@@ -573,9 +598,13 @@ def main():
                              f"{port['poison_addr']:#x} ({ip['note']})")
 
             # targeted port patches (donovan.toml [[port_patch]]): documented
-            # byte edits on ported code, old bytes verified
+            # byte edits on ported code, old bytes verified. Rows may carry
+            # a minimum stage (e.g. the M2b gfx-bank patches are stage-6
+            # only, keeping stage-5 builds byte-identical to the freeze).
             for pp in port.get("port_patch", []):
                 if pp["region"] != name:
+                    continue
+                if args.stage < _int(pp.get("stage", 0)):
                     continue
                 off = _int(pp["src_addr"]) - r["src"]
                 old = bytes.fromhex(pp["old_hex"])
@@ -587,6 +616,54 @@ def main():
                 blob[off:off + len(new)] = new
                 notes.append(f"# {name}+{off:#x}: port_patch {pp['old_hex']} "
                              f"-> {pp['new_hex']} ({pp['note']})")
+
+            # M2b gfx remap (donovan.toml [gfx_remap], stage-gated): walk
+            # the OBJ records in this region (tools/obj_records.py format,
+            # decoded session 14) and shift main-band tile words by the
+            # placement delta. Effect/low codes stay untouched (per-record
+            # effect map is a later step; they render garbled, never crash
+            # — tile codes cannot fault).
+            gr = port.get("gfx_remap")
+            if (gr and gr["region"] == name
+                    and args.stage >= _int(gr.get("stage", 0))):
+                b_lo, b_hi = _int(gr["band_lo"]), _int(gr["band_hi"])
+                delta = _int(gr["delta"])
+                assert delta % 16 == 0, "gfx_remap delta must be 16-aligned"
+                # This pass runs AFTER ref relocation: in-region record
+                # pointers and coordinate-list pointers are already
+                # PLACED (dst) addresses. Scan with the dst base; a valid
+                # cptr lands inside a placed aux region.
+                base = placed[name]
+                aux_dst = [(placed[an], placed[an] + regions[an]["len"])
+                           for an in placed if an.startswith("aux")]
+                seen_rec = set()
+                n_rw = 0
+                for i in range(0, r["len"] - 4, 2):
+                    v = int.from_bytes(blob[i:i + 4], "big")
+                    if not (base <= v < base + r["len"]) or v in seen_rec:
+                        continue
+                    o = v - base
+                    fmt = int.from_bytes(blob[o:o + 2], "big")
+                    budget = int.from_bytes(blob[o + 2:o + 4], "big")
+                    count = int.from_bytes(blob[o + 4:o + 6], "big")
+                    cptr = int.from_bytes(blob[o + 6:o + 10], "big")
+                    if (fmt > 0x20 or fmt % 2
+                            or not (0 < count + 1 <= budget <= 0x100)
+                            or not any(lo <= cptr < hi for lo, hi in aux_dst)):
+                        continue
+                    seen_rec.add(v)
+                    for k in range(count + 1):
+                        toff = o + 10 + 4 * k
+                        t = int.from_bytes(blob[toff:toff + 2], "big")
+                        if b_lo <= t <= b_hi:
+                            blob[toff:toff + 2] = (t + delta).to_bytes(2, "big")
+                            n_rw += 1
+                notes.append(f"# {name}: gfx_remap +{delta:#x} on {n_rw} "
+                             f"band tile words in {len(seen_rec)} OBJ records "
+                             f"(band 0x{b_lo:04X}-0x{b_hi:04X})")
+                if n_rw < 10000:
+                    fail.append(f"gfx_remap: only {n_rw} tile words rewritten "
+                                f"(expected ~14k) — walker or band drifted")
             d = placed[name]
             fixed = out / f"fixed_{name}.bin"
             fixed.write_bytes(bytes(blob))

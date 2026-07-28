@@ -104,14 +104,26 @@ untouched tile byte-identical. Emits `remap_spec.json` (delta, band,
 bank words) for the PRG-side patcher. Visual check: placed range
 renders Donovan sprite art.
 
-Remaining for a runnable gfx build (all static): (1) generator
-integration — rewrite tile words (+delta) in the ported anim records,
-patch Donovan's hardcoded #$6000 bank setters to #$4000; (2) the
-effect-record map — 85 of 114 low-code effect tiles resolve
-content-addressed into vsav (scattered banks 0/2 => per-record bank+code
-remap; one record = one object = one bank), 27 unresolved get poison
-codes (loud placeholder, never silent wrong art); (3) pack_build
-rompath must carry the patched vsav.zip (ROMDIR stays pristine).
+STAGE 6 BUILT (fingerprint 06f99f4e…, statically verified end to end):
+generator gfx_remap pass rewrites the 13,171 main-band tile words in
+all 1,122 OBJ records (runs post-relocation — record/coordinate
+pointers validated against PLACED addresses); six #$6000 bank setters
+port_patched to #$4000 (stage-gated rows); [table_fix] pads x026142 to
+0x1440 and rewrites the WHOLE ported per-char bank table with vanilla
+vsavj values — fixing two stage-5 latent defects: the table was
+truncated at row 9 (the x088512 effect caller d0=0x0A read past the
+ported end) and carried VS2 bank values (row 0x0F = 0x0000 => bank-0
+reads — likely THE main-sprite garble mechanism). Output-image checks:
+placed records walk clean, band exactly 0xAD8F-0xEA3F matching the
+placed tiles, table decrypts to vanilla values, setters #$4000. The
+rompath carries the patched vsav.zip (ROMDIR pristine); stage-5
+rebuilds still reproduce frozen a02aeeff byte-identically.
+Still open before playtest-ready graphics: the effect-record map — 85
+of 114 low-code effect tiles resolve content-addressed into vsav
+(scattered banks 0/2 => per-record bank+code remap; one record = one
+object = one bank), 27 unresolved (effects stay garbled this stage,
+never crash — tile codes cannot fault); portrait/name (select screen)
+tiles; in-emulator verification (QUEUED).
 In-emulator verification queued behind the maintainer's machine
 availability, incl. the scroll3-vs-band watch (stage art exclusivity has
 strong static evidence — 99.3% band saturation by Jedah's own records +

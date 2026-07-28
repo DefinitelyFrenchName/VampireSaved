@@ -10,11 +10,12 @@
 # regenerated from $ROMDIR on every run (repo rule 7).
 set -eu
 
-STAGE="${1:?usage: build_donovan.sh <stage 1-5> [outbase]}"
+STAGE="${1:?usage: build_donovan.sh <stage 1-6> [outbase]}"
 OUTBASE="${2:-build/donovan}"
 ROMDIR="${ROMDIR:?set ROMDIR}"
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"
+mkdir -p "$OUTBASE"
 
 python3 tools/audit_roms.py "$ROMDIR" > /dev/null || {
     echo "ROM audit FAILED — stop (CLAUDE.md §3)"; exit 1; }
@@ -64,6 +65,27 @@ python3 tools/patch_prg.py "$ROMDIR/vsavj.zip" "$OUTBASE/prg" \
 
 rm -rf "$OUTBASE/rompath"
 ROMDIR="$ROMDIR" tools/pack_build.sh "$OUTBASE/prg" "$OUTBASE/rompath" > /dev/null
+
+# Stage 6+: gfx side — place Donovan's tiles into vsav's group-B members
+# (Jedah band) and carry a patched vsav.zip in the rompath so it fronts
+# the pristine ROMDIR copy. Program-side remap is stage-6 generator work
+# (donovan.toml [gfx_remap] + stage-gated port_patch rows).
+if [ "$STAGE" -ge 6 ]; then
+    python3 tools/obj_records.py "$OUTBASE/extract/region_anim.bin" \
+        --base 0x27F548 --start 0x27F548 --end 0x2A0448 \
+        --cptr-lo 0x300000 --cptr-hi 0x361000 \
+        --json "$OUTBASE/donovan_tiles.json" > /dev/null
+    python3 tools/build_gfx_donovan.py "$ROMDIR" "$OUTBASE/gfx" \
+        --tiles "$OUTBASE/donovan_tiles.json" | tail -6
+    GFXSTAGE="$(mktemp -d)"
+    unzip -q -o "$ROMDIR/vsav.zip" -d "$GFXSTAGE"
+    cp "$OUTBASE/gfx"/vm3.*m "$GFXSTAGE"/
+    ( cd "$GFXSTAGE" && rm -f vsav.zip && zip -q -X vsav.zip * )
+    cp "$GFXSTAGE/vsav.zip" "$OUTBASE/rompath/vsav.zip"
+    rm -rf "$GFXSTAGE"
+    echo "gfx: patched vsav.zip in rompath (ROMDIR untouched)"
+fi
+
 python3 tools/build_fingerprint.py "$OUTBASE/rompath;$ROMDIR" --sha-only \
     | sed 's/^/build fingerprint: /'
 echo "OK: stage $STAGE build at $OUTBASE/rompath (fingerprint above; register in tests/expected/registry.tsv at freeze time)"

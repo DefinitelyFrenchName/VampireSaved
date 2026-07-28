@@ -179,3 +179,93 @@ regions = "code,x05c800,x065952,x065c22,x065e5a,x066ec4"
 
 [[layout_group]]
 regions = "x026142,x028122"
+
+# ── M2b gfx integration (session 14; stage 6 only — stage-5 builds stay
+# byte-identical to the a02aeeff freeze). Donovan's OBJ tile codes are
+# absolute-in-bank; his art moves from vs2 bank 3 (codes 0x863F-0xC2EF)
+# to vsav bank 2 at delta +0x2750 (Jedah's band, above the Sasquatch-
+# shared head). Three pieces: the six hardcoded #$6000 bank setters in
+# his regions -> #$4000; the PORTED per-char bank table row 0x0F (his
+# runtime char id) -> 0x4000 (the vs2 row read 0x0000 = the bank-0
+# garble); the anim-region record walk rewriting band tile words
+# (+delta) — [gfx_remap] below. Effect records (low codes, banks 0/1
+# engine art) are deliberately untouched this stage: effects stay
+# garbled until the per-record effect map lands. Tile DATA is placed by
+# tools/build_gfx_donovan.py into vm3 group-B members (rompath vsav.zip).
+
+[[port_patch]]
+stage = 6
+region = "x05c800"
+src_addr = 0x05CF38
+old_hex = "3d7c60000018"
+new_hex = "3d7c40000018"
+note = "OBJ bank setter: vs2 bank 3 -> vsav bank 2 (Jedah band)"
+
+[[port_patch]]
+stage = 6
+region = "x05c800"
+src_addr = 0x0620D4
+old_hex = "397c60000018"
+new_hex = "397c40000018"
+note = "OBJ bank setter (a4 form): vs2 bank 3 -> vsav bank 2"
+
+[[port_patch]]
+stage = 6
+region = "x05c800"
+src_addr = 0x062194
+old_hex = "397c60000018"
+new_hex = "397c40000018"
+note = "OBJ bank setter (a4 form): vs2 bank 3 -> vsav bank 2"
+
+[[port_patch]]
+stage = 6
+region = "x088512"
+src_addr = 0x08873E
+old_hex = "3d7c60000018"
+new_hex = "3d7c40000018"
+note = "OBJ bank setter: vs2 bank 3 -> vsav bank 2"
+
+[[port_patch]]
+stage = 6
+region = "x088512"
+src_addr = 0x089D26
+old_hex = "3d7c60000018"
+new_hex = "3d7c40000018"
+note = "OBJ bank setter: vs2 bank 3 -> vsav bank 2"
+
+[[port_patch]]
+stage = 6
+region = "x088512"
+src_addr = 0x08B100
+old_hex = "3d7c60000018"
+new_hex = "3d7c40000018"
+note = "OBJ bank setter: vs2 bank 3 -> vsav bank 2"
+
+# The ported x026142 blob carries a COPY of the per-char OBJ bank table
+# (vs2 0x27530, read PC-relative by the ported setter 0x2751C and helper
+# 0x27524). Two defects at stage <=5: the region len (0x1400, bounded by
+# genuine vh2 sibling divergence in the table rows) TRUNCATES the table
+# at row 9 — the x088512 effect caller (d0=0x0A) reads past the ported
+# end (garbage bank word); and the in-blob rows hold VS2 values, wrong
+# on vsavj (row 0x0F = 0x0000 = bank 0 — the current sprite garble).
+# Fix: pad the region to cover all 0x18 rows and rewrite the WHOLE
+# table with the VANILLA vsavj values (PRG:0x282D4, opcode space, row
+# 0x0F = 0x4000 = bank 2) — the table semantically answers "bank of
+# char N in THIS game's gfx". Provenance GEN (values below are the
+# vsavj table verbatim; rows 0x10-0x17 mirror 0x00-0x07, dark forms).
+[table_fix]
+stage = 6
+region = "x026142"
+pad_len = 0x1440
+table_off = 0x13EE
+rows_hex = "600060000000200060000000400040000000600040006000600000000000400060006000000020006000000040004000"
+note = "ported per-char OBJ bank table -> vanilla vsavj values (0x282D4)"
+
+# (record + coordinate-list pointers are validated against PLACED
+# addresses at generation time — the pass runs after ref relocation)
+[gfx_remap]
+stage = 6
+region = "anim"
+band_lo = 0x863F
+band_hi = 0xC2EF
+delta = 0x2750
