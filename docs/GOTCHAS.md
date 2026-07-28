@@ -280,3 +280,19 @@ Cost: a second playtest round (214P/214K music). Rule: when a structure
 class gets understood (farm, dispatch bank, …), re-audit ALL earlier
 generic rows whose vs2 address falls in the structure's range — match
 mechanism, not row kind, decides what a row really is.
+
+## CPS-2 gfx simms are not tile-contiguous — naive slicing silently "works" on siblings only
+
+A 16x16 tile's 32 bytes within a simm are 16 two-byte PAIRS at stride 4
+(even/odd word streams of each 0x80000 block feed decoded chunks 1MB
+apart — see tools/gfx_tiles.py header for the exact mapping, derived
+from FBNeo Cps2LoadOne). Slicing contiguous 32-byte runs mixes bytes of
+tiles 1MB apart. The trap: same-index comparisons across sets STILL
+MATCH under wrong slicing (same wrong neighbors on both sides), so a
+sibling calibration (vsav2 vs vhunt2: 200K tiles "match") certifies a
+broken method; all cross-set content-addressed lookups then collapse to
+~3% and look like "the art was re-encoded". Cost: half a session of
+false hypotheses (plane order, palette permutation). Rule: any binary
+structure with a hardware interleave gets its layout verified against
+the emulator's loader source BEFORE bulk analysis, and the layout
+understanding gets a fact-lock test (tests/test_gfx_tiles.sh).
