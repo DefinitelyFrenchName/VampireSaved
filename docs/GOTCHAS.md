@@ -296,3 +296,15 @@ false hypotheses (plane order, palette permutation). Rule: any binary
 structure with a hardware interleave gets its layout verified against
 the emulator's loader source BEFORE bulk analysis, and the layout
 understanding gets a fact-lock test (tests/test_gfx_tiles.sh).
+
+## OBJ record formats differ in ENTRY STRIDE, not just header meaning
+
+Format 2 records: (tile.w, attr.w) 4-byte entries, count at +4. Format 0
+records: tile-only 2-BYTE entries, count at +2, a single attr in the
+header. A unified 4-byte walk "works" — the validation happens to pass —
+but remaps only every other tile of format-0 records. Symptom: sprites
+with ALTERNATING correct/garbage tiles (the character-select blink,
+playtest round 4, 2026-07-28). Rule: when a structure is
+format-dispatched (jump table), decode EVERY handler's field layout
+before writing a walker; two formats sharing a header shape is an
+assumption, not a fact.

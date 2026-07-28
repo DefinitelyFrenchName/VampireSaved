@@ -5,13 +5,16 @@ the gfx tiles they reference.
 Record format (decoded session 14 from the vsavj emitter chain
 0x1ABC8 -> 0x1AC68 -> 0x1ADC6 -> 0x1AF9E; format-2 handler 0x1B234):
 
-  +0  format.w   jump-table selector at the emitter (0 and 2 observed)
-  +2  budget.w   OBJ-entry budget check against remaining d7
-  +4  count.w    entries = count+1 (dbra)
-  +6  ptr.l      -> X/Y coordinate word-pair list (one pair per entry)
-  +10 entries    format 0: (tile.w, attr.w) per entry
-                 format 2: (tile.w, attr.w) per entry (attr palette bits
-                 merged with object +0xF at emit)
+  format 2 (handler 0x1B234):
+    +0 format.w, +2 budget.w (checked vs remaining d7), +4 count.w
+    (entries = count+1), +6 cptr.l -> X/Y word-pair list, +10 entries
+    of (tile.w, attr.w) — 4 bytes each.
+  format 0 (handler 0x1AFC6) — DIFFERENT HEADER AND STRIDE:
+    +0 format.w, +2 count.w (doubles as the budget check; entries =
+    count+1), +4 attr.w (ONE attr for the whole record), +6 cptr.l,
+    +10 entries of tile.w — 2 BYTES each.
+  (Session-14b lesson: treating format 0 as 4-byte entries remaps only
+  every other tile — the character-select blink, playtest 2026-07-28.)
 
 Emit semantics (the R2 answer, atlas character_tables.md):
   - tile.w is ABSOLUTE within a 64K-tile bank; written RAW to OBJ RAM.
@@ -52,18 +55,27 @@ def walk(dat, base, start, end, cptr_ok):
             continue
         o = v - base
         fmt = int.from_bytes(dat[o:o + 2], "big")
-        budget = int.from_bytes(dat[o + 2:o + 4], "big")
-        count = int.from_bytes(dat[o + 4:o + 6], "big")
         cptr = int.from_bytes(dat[o + 6:o + 10], "big")
-        if fmt > 0x20 or fmt % 2 or not (0 < count + 1 <= budget <= 0x100):
+        if fmt > 0x20 or fmt % 2 or not cptr_ok(cptr):
             continue
-        if not cptr_ok(cptr):
-            continue
+        if fmt == 0:
+            count = int.from_bytes(dat[o + 2:o + 4], "big")
+            attr = int.from_bytes(dat[o + 4:o + 6], "big")
+            if not (0 < count + 1 <= 0x100):
+                continue
+            ent = [(int.from_bytes(dat[o + 10 + 2*k:o + 12 + 2*k], "big"),
+                    attr) for k in range(count + 1)]
+        else:
+            budget = int.from_bytes(dat[o + 2:o + 4], "big")
+            count = int.from_bytes(dat[o + 4:o + 6], "big")
+            if not (0 < count + 1 <= budget <= 0x100):
+                continue
+            ent = [(int.from_bytes(dat[o + 10 + 4*k:o + 12 + 4*k], "big"),
+                    int.from_bytes(dat[o + 12 + 4*k:o + 14 + 4*k], "big"))
+                   for k in range(count + 1)]
         seen.add(v)
         records += 1
-        for k in range(count + 1):
-            t = int.from_bytes(dat[o + 10 + 4*k:o + 12 + 4*k], "big")
-            at = int.from_bytes(dat[o + 12 + 4*k:o + 14 + 4*k], "big")
+        for t, at in ent:
             bx = ((at >> 8) & 15) + 1
             by = ((at >> 12) & 15) + 1
             entries += 1

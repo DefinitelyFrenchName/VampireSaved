@@ -638,22 +638,35 @@ def main():
                            for an in placed if an.startswith("aux")]
                 seen_rec = set()
                 n_rw = 0
+                # Format-aware walk (tools/obj_records.py header doc):
+                # format 2 = 4-byte (tile,attr) entries, count at +4;
+                # format 0 = 2-byte tile-only entries, count at +2, one
+                # attr in the header. Mixing them remaps only alternate
+                # tiles of format-0 records (the char-select blink,
+                # playtest 2026-07-28).
                 for i in range(0, r["len"] - 4, 2):
                     v = int.from_bytes(blob[i:i + 4], "big")
                     if not (base <= v < base + r["len"]) or v in seen_rec:
                         continue
                     o = v - base
                     fmt = int.from_bytes(blob[o:o + 2], "big")
-                    budget = int.from_bytes(blob[o + 2:o + 4], "big")
-                    count = int.from_bytes(blob[o + 4:o + 6], "big")
                     cptr = int.from_bytes(blob[o + 6:o + 10], "big")
                     if (fmt > 0x20 or fmt % 2
-                            or not (0 < count + 1 <= budget <= 0x100)
                             or not any(lo <= cptr < hi for lo, hi in aux_dst)):
                         continue
+                    if fmt == 0:
+                        count = int.from_bytes(blob[o + 2:o + 4], "big")
+                        if not (0 < count + 1 <= 0x100):
+                            continue
+                        toffs = [o + 10 + 2 * k for k in range(count + 1)]
+                    else:
+                        budget = int.from_bytes(blob[o + 2:o + 4], "big")
+                        count = int.from_bytes(blob[o + 4:o + 6], "big")
+                        if not (0 < count + 1 <= budget <= 0x100):
+                            continue
+                        toffs = [o + 10 + 4 * k for k in range(count + 1)]
                     seen_rec.add(v)
-                    for k in range(count + 1):
-                        toff = o + 10 + 4 * k
+                    for toff in toffs:
                         t = int.from_bytes(blob[toff:toff + 2], "big")
                         if b_lo <= t <= b_hi:
                             blob[toff:toff + 2] = (t + delta).to_bytes(2, "big")

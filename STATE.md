@@ -59,7 +59,17 @@ registry row live, suite masked/skip expectation kinds landed)
   the CPS2 draw path, no mapper); scroll3 can, but Jedah's band is
   99.3% saturated by his own OBJ records and renders as pure sprite art
   — residual risk queued as an in-emulator scroll3 watch.
-- STAGE 6 BUILT AND STATICALLY VERIFIED: fingerprint 06f99f4e… —
+- Playtest round 4 (maintainer, on their own quick build of 06f99f4e):
+  sprites GOOD and animating correctly; palette = Jedah's (palette port
+  not yet done — expected); blinking/alternating tiles esp. at char
+  select. Root cause: format-0 OBJ records have 2-BYTE tile-only
+  entries (my unified 4-byte walk remapped alternate tiles) — fixed
+  format-aware in obj_records.py + the generator; new stage-6
+  fingerprint f83ff57e… (13,177 words remapped; output re-verified;
+  2 stray sub-band tiles 0x813C/0x822C belong to the effect-tail
+  class). GOTCHAS entry added. NEXT: palette port (Jedah's palette
+  source -> Donovan's), then effect-record map.
+- STAGE 6 (superseded 06f99f4e) — original notes: fingerprint 06f99f4e… —
   gfx_remap (13,171 tile words / 1,122 records), 6 bank setters
   #$6000->#$4000, [table_fix] (ported bank table was TRUNCATED at row 9
   and carried vs2 values — two latent stage-5 defects, now vanilla
