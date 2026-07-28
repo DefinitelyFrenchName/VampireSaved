@@ -48,10 +48,15 @@ registry row live, suite masked/skip expectation kinds landed)
   Jedah's positions + 16-aligned constant delta on record tile words +
   patch his #$6000 bank setters to #$4000 (slot table gives 0x4000
   free). No ROM expansion needed for M2b.
-- Open for next: Jedah-band exclusivity walk (no other vsavj consumer),
-  the 112 shared-effect tiles (content-map), portrait/name inventory,
-  then the gfx builder + in-emulator verification (QUEUED until the
-  maintainer frees the machine).
+- Exclusivity walk (player-OBJ, all slots): Jedah's band clean except
+  a 44-tile Sasquatch-shared head (0xAD3E-0xAD74) — safe floor 0xAD80,
+  usable extent 0x413C >= needed 0x3CB1. STILL FITS.
+- Open for next: SCROLL-side exclusivity (stage art vs absolute range
+  0x2AD80-0x2EEBB — Jedah's stage is legacy and must stay intact),
+  Zabel slot-0x04 walker gap, the 112 shared-effect tiles
+  (content-map), portrait/name inventory, then the gfx builder +
+  in-emulator verification (QUEUED until the maintainer frees the
+  machine).
 
 ## Session 7 highlights (M2a stage 4 — frontier closed; the crash was ours)
 

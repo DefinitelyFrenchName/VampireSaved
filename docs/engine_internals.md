@@ -77,7 +77,17 @@ same delta to every main-band tile word in his ported anim records;
 (3) patch his hardcoded #$6000 bank setters to #$4000 (slot-0x0F table
 row already provides 0x4000 for free); (4) map the 112 shared-effect
 tiles via the content-addressed vsav2->vsav relocation map (their art is
-shared, positions differ). Open items: verify no OTHER vsavj consumer
-references Jedah's band (exclusivity walk over all slots + stages);
+shared, positions differ). Exclusivity (measured, session 14): player-OBJ side, Jedah's band is
+exclusive across all 0x18 slots EXCEPT Sasquatch (slot 0x0A, also bank
+2) sharing 44 tiles at the band head, 0xAD3E-0xAD74 — the safe Donovan
+placement floor is 0xAD80 (16-aligned), leaving extent 0x413C >= the
+needed 0x3CB1. Caveat: slot 0x04 (Zabel) walked to 0 records (walker
+gap — different format or region bounds; he is bank 3, so no
+Jedah-band conflict either way, but close the gap before trusting the
+walker for other purposes). Remaining exclusivity unknowns: STAGE
+(scroll) tiles — scroll layers address the same 32MB via their own
+banking, and Jedah's stage is LEGACY content (all stages stay); the
+scroll-side inventory must confirm the absolute range 0x2AD80-0x2EEBB
+holds no stage art before any tile write. Also open:
 portrait/name tiles (select screen) are a separate inventory; Anita's
 bank attribution rides the same +0x18 machinery (her spawn sets it).
