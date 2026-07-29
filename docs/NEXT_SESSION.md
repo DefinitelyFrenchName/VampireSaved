@@ -25,20 +25,26 @@ FIXED" + the 14p STATE/GOTCHAS updates.
 
 ## Next work (priority)
 
-1. **Stage-7 overlay port — FINISH THE CLOSURE** (sword/statue fix;
-   80% built, parked in build/manifest/overlay.wip — rename to
-   overlay/ to activate). PROVEN legacy-clean: placement in Jedah's
-   dead anim area (segA+tail 0x248D80, segB 0x2557B0, split 0x2A4A48),
-   25 thunked T-sites (match-active + slot-0x0F gate), tile pipeline
-   (3929 pairs). BLOCKER: Donovan-path watchdog crash at match start —
-   false-positive relocations/rewrites corrupt stream data (blind
-   long-scan; 293 relocs + 2811 tile words). FIX: structural-closure
-   walk (T tables -> strips [plain long arrays] -> tag-streams
-   [(FF-tag,ptr) pairs] -> records [fmt handlers all decoded, see
-   STATE 14q]); restrict ALL rewrites to the closure; regenerate via
-   tools/overlay_port.py; iterate with the 02-masked probe
-   (/tmp bisect harness pattern) then full gates. See the three new
-   GOTCHAS before touching anything.
+1. **Stage-7 overlay port — ONE DECODE LEFT** (sword/statue fix; parked
+   in build/manifest/overlay.wip, activate by renaming to overlay/ and
+   regenerating: `python3 tools/overlay_port.py $ROMDIR/.. --ops-vsavj
+   <opcode dump> --emit --out build/manifest/overlay`, then filter pokes
+   per STATE 14q). PROVEN: heap placement in Jedah's dead anim area
+   (legacy-clean full-length), 25 thunked T-sites (match+char-gated,
+   legacy-clean), tile pipeline, object-granular closure with four
+   verified grammars (see STATE 14q continuation). BLOCKER, precisely:
+   streams walked at stride 8 only; the engine stepper family also has
+   0x10/0x18-stride classes chosen PER OBJECT CLASS (engine
+   0x15030-0x15080). Attack-id-indexed table entries whose streams use
+   the bigger strides stay dead -> crash on the first 623P. NEXT: map
+   each poked table (2671C6/2671E6/267224/267284 families) to its
+   stepper class — disassemble the three stepper subroutines around
+   0x15030/0x15057/0x150B6, find their callers/object classes, or trace
+   +0x1C cursor deltas per object slot on vs2 (cursor advances by the
+   stride each anim step — a RAM-dump measurement, no debugger needed).
+   Then re-walk dead entries with the right stride. Probe harness:
+   donprobe.sh pattern in STATE (timer-tick detector — earlier
+   detectors were watchdog-fooled).
 2. Win-quote palette (mechanism pinned earlier: table 0x7F196 +
    ramp blocks ~0x3A14xx; repoint-safe).
 3. A5 work-var displacement audit sweep (same-value class #4).
