@@ -1,5 +1,19 @@
 # NEXT_SESSION — 60-second orientation (rewritten every session end)
 
+CURRENT BUILD: 569859d1 (validated rounds 10+12: specials good, no
+resets). OPEN, priority order:
+1. DONOVAN'S THROW DAMAGE (behavioral! since M2a): bp-trace the damage
+   post-process during a throw on both games, diff the damage inputs,
+   fix the data path. Write 27_don_throw replay. Oracle-gated.
+2. Sword/statue blink: EMPIRICAL-ONLY method (matched sword-object
+   dumps vs2-vs-ours, entry diff). NO heuristic record rewrites — see
+   the f8eda2ca post-mortem (misattribution + board reset).
+3. Anita's-feet green tiles: dump her OBJ entries at the artifact,
+   identify the mismapped placed tile.
+4. Win-quote palette (mechanism pinned, 0x7F196 family); then quote
+   text, HUD name, wheel face, attract palette.
+
+
 As of 2026-07-29 (end of the marathon session 14): M2a FROZEN (a02aeeff),
 M2b-CORE FROZEN (71601263, registry donovan-m2b). Current candidate
 8248296e: select screen fully correct (portrait/name/palettes), VS

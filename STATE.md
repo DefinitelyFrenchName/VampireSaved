@@ -31,7 +31,27 @@ follow-up)
   by pure fingerprint auto-detection — the one-command-validates-any-
   build doctrine is now real for hooked builds.
 
-## Session 14m (f8eda2ca REVERTED — regression + board reset; back to 569859d1)
+## Session 14n (round 12: revert validated; two new items scoped)
+
+- Round 12 on restored 569859d1: specials correct, NO resets — the
+  board reset is pinned to the reverted f8eda2ca with certainty.
+- NEW COSMETIC: solid-green background tiles around ANITA'S FEET (her
+  sprite clean). Likely one/few mismapped tiles in the effect-map or
+  tail placements rendering opaque green where transparency belongs —
+  find by dumping her OBJ entries at the artifact moment and checking
+  which placed tile draws the green block.
+- NEW BEHAVIORAL (present since the beginning, priority — gameplay):
+  DONOVAN'S THROW deals almost no damage vs Savior 2 / native chars.
+  An R1 damage-path gap: his ported throw handler's damage source
+  (immediate value, per-char table row, or engine damage id) resolves
+  wrong on vsavj. Method: bp-trace the damage post-process during a
+  throw on our build AND on real vsav2 (matching inputs), diff the
+  damage arguments; then fix the data path (reconciliation row or
+  value repoint) — oracle-gated. Needs a throw replay (the test
+  matrix's throw/tech coverage gap — write 27_don_throw as part of
+  the fix, per the persistent-suite doctrine).
+
+## Session 14m (f8eda2ca REVERTED — regression + board reset)
 
 - Playtest round 11 on f8eda2ca: blink unchanged, 623P degraded, and a
   BOARD RESET mid-fight (watchdog class). Rule 6 halt: the bank-2
