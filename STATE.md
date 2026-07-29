@@ -5,6 +5,24 @@ cf2109d8 pending gates+playtest: Anita/sword/statue render in-match
 and on the win screen; 3 residual sites excluded; session 14q parked
 state superseded)
 
+## Session 14v (grab-pointer work vars fixed — the Felicia float)
+
+- Round 18: quote palette STILL Jedah's => the quote screen consumes
+  the select-time preload staging; decoding the staging CONSUMER is
+  now the path (the 14u copy-and-repoint plumbing stays — correct and
+  needed either way). And Felicia floated off-screen after a throw:
+  root-caused to 8 unreconciled A5 work-var refs in the ported throw
+  code (grab POINTER stores + a state clr through vs2's layout —
+  garbage into two vsavj engine vars every throw). The A5 audit
+  (open since 14o) is now COMPLETE: no other unreconciled refs in
+  0xB000-0xBFFF anywhere in ported code. 8 port_patch rows shipped;
+  analogs triple-verified in both engines' native throw code.
+- 27_don_throw oracle has drifted (pre-throw hits connect on current
+  builds) — re-freeze needed; grab rows shown outcome-neutral on it.
+- PLAYTEST asks: (a) throw Felicia (or anyone) repeatedly in a
+  Donovan match — the float should be gone; (b) throws should feel
+  vs2-correct.
+
 ## Session 14u (win-quote palette SHIPPED at 1f5fa38e — pending playtest)
 
 - Four masked-gate iterations distilled the survivable design (see

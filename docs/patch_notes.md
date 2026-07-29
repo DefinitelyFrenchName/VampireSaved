@@ -506,3 +506,30 @@ iterations):
   the quote screen renders from the PRELOADED staging rather than the
   0x1C1FA fresh read, Donovan's quote palette will still be Jedah's —
   then the staging CONSUMER is the next decode target.
+
+Session 14v (Felicia-float class: the grab-pointer work vars — audit
+COMPLETED and closed):
+- Playtest round 18: win-quote palette still Jedah's (the quote screen
+  consumes the select-time PRELOAD staging, not the 0x1C1FA fresh
+  read — the staging consumer is the next decode); and Felicia rose
+  off-screen after a throw in a Donovan match (Rainbow-Edition-style
+  float, correctly flagged as a likely port side effect).
+- ROOT CAUSE (the A5 work-var audit, now COMPLETE over 0xB000-0xBFFF
+  across all ported code regions): exactly 8 unreconciled (d16,A5)
+  refs, all in x028122 — the ported throw code stores the thrower/
+  victim OBJECT POINTER WORDS through vs2's layout (-0x4B74/-0x4B72,
+  3 sites each) and clears a state byte at vs2's -0x4B3D (2 sites).
+  Every throw sprayed pointer-magnitude garbage into two unrelated
+  vsavj work vars = the float. Fix: 8 port_patch rows (the -0x52
+  family shift: B48C->B43A, B48E->B43C, B4C3->B471), analogs
+  triple-verified in BOTH engines' native throw code (vsavj pairs
+  0x29694/0x29762/0x29828, clr 0x2968C/0x29738).
+- CCR audit of all 22 thunked overlay sites: clean (every post-site
+  path re-sets flags before any conditional branch) — the thunk class
+  is exonerated for the float.
+- Throw-oracle note: 27_don_throw_vsavj has DRIFTED (pre-throw pokes
+  now connect on current builds: P2 at 278 pre-throw, so the -5
+  full-HP measurement is not reproducible). Bisection showed the grab
+  rows change NOTHING on this replay (none/ptr/clr/all identical) —
+  no evidence of harm; the float verdict is the maintainer's next
+  Donovan-vs-Felicia session. Replay re-freeze queued.

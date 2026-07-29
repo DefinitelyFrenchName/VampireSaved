@@ -352,3 +352,76 @@ src_addr = 0x028AF2
 old_hex = "3b42b496"
 new_hex = "3b42b444"
 note = "throw dmg: white damage -> vsavj layout (-0x4BBC)"
+
+# ── Throw GRAB-POINTER + state-byte work vars (session 14v; playtest
+# round 18: Felicia rose off-screen after a throw). The complete
+# (d16,A5) audit over 0xB000-0xBFFF found exactly these 8 unreconciled
+# refs, all in x028122: the ported throw code stores the thrower/victim
+# OBJECT POINTER WORDS via vs2's layout (-0x4B74/-0x4B72) and clears a
+# state byte at vs2's -0x4B3D — stray writes into unrelated vsavj work
+# vars every throw (pointer-magnitude garbage = the float). Native
+# analogs triple-verified in both engines (vsavj pairs 0x29694/0x29762/
+# 0x29828, clr 0x2968C/0x29738): the uniform -0x52 family shift.
+[[port_patch]]
+stage = 6
+region = "x028122"
+src_addr = 0x0289BE
+old_hex = "422db4c3"
+new_hex = "422db471"
+note = "throw state clr.b: vs2 -0x4B3D -> vsavj -0x4B8F"
+
+[[port_patch]]
+stage = 6
+region = "x028122"
+src_addr = 0x0289C6
+old_hex = "3b4eb48c"
+new_hex = "3b4eb43a"
+note = "grab ptr store a6: vs2 -0x4B74 -> vsavj -0x4BC6"
+
+[[port_patch]]
+stage = 6
+region = "x028122"
+src_addr = 0x0289CA
+old_hex = "3b49b48e"
+new_hex = "3b49b43c"
+note = "grab ptr store a1: vs2 -0x4B72 -> vsavj -0x4BC4"
+
+[[port_patch]]
+stage = 6
+region = "x028122"
+src_addr = 0x028A6A
+old_hex = "422db4c3"
+new_hex = "422db471"
+note = "throw state clr.b (site 2)"
+
+[[port_patch]]
+stage = 6
+region = "x028122"
+src_addr = 0x028A94
+old_hex = "3b4eb48c"
+new_hex = "3b4eb43a"
+note = "grab ptr store a6 (site 2)"
+
+[[port_patch]]
+stage = 6
+region = "x028122"
+src_addr = 0x028A98
+old_hex = "3b49b48e"
+new_hex = "3b49b43c"
+note = "grab ptr store a1 (site 2)"
+
+[[port_patch]]
+stage = 6
+region = "x028122"
+src_addr = 0x028B5A
+old_hex = "3b4eb48c"
+new_hex = "3b4eb43a"
+note = "grab ptr store a6 (site 3)"
+
+[[port_patch]]
+stage = 6
+region = "x028122"
+src_addr = 0x028B5E
+old_hex = "3b49b48e"
+new_hex = "3b49b43c"
+note = "grab ptr store a1 (site 3)"
