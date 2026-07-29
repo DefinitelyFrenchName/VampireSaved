@@ -174,11 +174,17 @@ vsavj = 0x0BD7FA
 kind = "code_ptr"
 stride = 0x80
 
+# param32_a/b are PAIR tables: 8 bytes per char = (forward.l, back.l)
+# movement velocities. They were registered as value32/stride-0x80
+# (4B rows), which made "slot 0x0F" hit FELICIA'S walk-back long
+# (char 7 pair, second half) — her walk drifted 1px/frame-group and
+# desynced the legacy 29_felicia_walljump oracle (session 14w-b).
+# rec8 + stride 0x100 => entry = base + char*8, both longs ported.
 [[table]]
 name = "param32_a"
 vsavj = 0x0BD87A
-kind = "value32"
-stride = 0x80
+kind = "rec8"
+stride = 0x100
 
 [[table]]
 name = "gap_bd8fa"
@@ -321,8 +327,8 @@ stride = 0x40
 [[table]]
 name = "param32_b"
 vsavj = 0x0BE2FA
-kind = "value32"
-stride = 0x80
+kind = "rec8"
+stride = 0x100
 
 [[table]]
 name = "gap_be37a"

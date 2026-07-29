@@ -547,3 +547,15 @@ tables only surface when that char uses that move. Rules earned:
 3. The per-char-row + dark-mirror assumption must be verified PER
    TABLE (the bank table has 0x18 rows with 0x10-0x17 dark forms;
    these physics tables are not char-indexed at all).
+
+## Per-char table entries are PAIRS more often than you think
+
+param32_a/b (movement velocities) span 0x80 per 32 apparent slots and
+were registered as 4-byte rows; they are 16-char tables of 8-byte
+(forward, back) PAIRS. "Slot 0x0F × 4 bytes" = char 7's second long =
+FELICIA'S WALK-BACK — corrupted by Donovan's port since the table
+work landed, at 1px-drift scale that 19 playtest rounds never saw.
+Verify entry layout against vanilla CONTENT before registering any
+table: alternating sign longs (+,-,+,-) are a pair signature; a
+16-char pair table and a 32-char value table have identical spacing.
+The 29_felicia_walljump oracle caught it the day it was frozen.

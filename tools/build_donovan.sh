@@ -49,6 +49,12 @@ DEFAULT_ROOTS="0x5c800:0xd100,0x26142:0x1400,0x28122:0xe00,0x88512:0x2f00:s,0x90
 # byte-identical for the extension.
 DEFAULT_ROOTS="$DEFAULT_ROOTS"
 DEFAULT_ROOTS="$DEFAULT_ROOTS,0x65952:0x2d0:t0x65986,0x65c22:0x238:t0x65c56,0x65e5a:0x106a:t0x65e8e,0x66ec4:0x2b8:t0x66ef8"
+# session 14w-c: type 63 IS spawned by Donovan's own deep-arcade flow —
+# 21_don_mash tripped its tripwire (0xCB880) at frame 10050 once the CPU
+# Felicia moved correctly (the pair-table fix changed the fight flow).
+# The "59-62 only" assumption is measured-wrong for 63; handler ported
+# with the standard +0x34 twin. 64-75 remain tripwired (still unseen).
+DEFAULT_ROOTS="$DEFAULT_ROOTS,0x6717c:0x154:t0x671b0"
 python3 tools/extract_char.py "$ROMDIR/vsav2.zip" "$OUTBASE/extract" \
     --char 0x13 --oracle "$ROMDIR/vhunt2.zip" \
     --extra-roots "${EXTRA_ROOTS:-$DEFAULT_ROOTS}" > "$OUTBASE/extract.log" 2>&1 \

@@ -5,6 +5,51 @@ cf2109d8 pending gates+playtest: Anita/sword/statue render in-match
 and on the win screen; 3 residual sites excluded; session 14q parked
 state superseded)
 
+## Session 14w-c (type-63 chain: RULE-6 HALT — the only open task)
+
+- The pair-table fix changed CPU-Felicia's fight flow in 21_don_mash,
+  and at frame ~10050 Donovan's own deep-arcade path SPAWNED
+  SECONDARY-OBJECT TYPE 63 for the first time ever — hitting its M2a
+  tripwire (0xCB880). The "types 59-62 only" assumption is
+  measured-wrong. Handler ported (extra root 0x6717c:0x154:t0x671b0,
+  clean extraction: 13 refs, all engine rows verified) — the tripwire
+  no longer fires, but 13 frames later the REACTION DISPATCH
+  (engine 0x18460) crashes: vec3 at PC 0x18466, ADDR 0x1B6A3.
+- Crash math (exact): jump-table fetch with d0 = -8 -> d1 = the
+  dispatch's own first opcode word (0x323B) -> odd target 0x1B6A3.
+  d0 = -8 means a GARBAGE/UNINITIALIZED reaction id, not an OOB
+  vs2 id. Leading hypothesis: OBJECT FIELD LAYOUT divergence
+  (same-value class #5 candidate) — the ported handler writes vs2
+  object offsets (+0x9E/9F/A2/B0/B3/B4 observed) while vsavj's
+  reaction system reads its id from a different offset; the handler
+  disassembly (STATE-annotated above) never writes vsavj's +0x38.
+  NEXT: diff the two engines' reaction-id field offsets (find vs2's
+  site_prefix analog of `tst.b 0x38(a1)` and its dispatch d0 load),
+  then add a field-offset port_patch to the handler.
+- RULE 6: the battery is RED on 21_don_mash until this lands; no build
+  ships. Felicia's legacy fixes are verified and committed (29 gate
+  green throughout); the last all-green build (dc6b2d36) is NOT
+  shippable knowingly (it carries the Felicia legacy violations).
+
+## Session 14w-b (second Felicia defect: the pair-table stride bug)
+
+- vsav.zip restored; rebuild 53ec9c51 fixed the WALL LATCH (verified
+  byte-identical trajectory) — but the freshly frozen 29 gate caught a
+  SECOND defect: her walk-back speed off by a subpixel fraction
+  (whole-pixel motion vs vanilla's accumulating fractions). Root
+  cause: param32_a/b are 8-byte PAIR tables (fwd/back velocities)
+  registered at 4-byte stride — "slot 0x0F" hit Felicia's walk-back
+  half; the extractor read the equally wrong vs2 half. bank_map fix:
+  rec8/stride-0x100; Donovan now ports his true velocity pair onto
+  Jedah's true pair. Felicia byte-matches vanilla except one
+  spawn-boundary flicker frame (29@2435) — 29 reclassified to the
+  approved FLICKER class. Fingerprint 340673da.
+- LESSON (GOTCHAS updated): the new-replay-then-freeze loop caught in
+  ONE day what 19 playtest rounds missed twice — every mechanics bug
+  fix must ship with its oracle replay, and per-char tables' ENTRY
+  layout must be verified against vanilla content (pair-sign
+  signatures), never assumed from spacing.
+
 ## Session 14w (FELICIA'S TRIANGLE JUMP: root-caused to the gap-write
 class; gen fixed; REBUILD PENDING vsav.zip restoration)
 

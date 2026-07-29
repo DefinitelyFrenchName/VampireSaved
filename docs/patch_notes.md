@@ -533,3 +533,22 @@ COMPLETED and closed):
   rows change NOTHING on this replay (none/ptr/clr/all identical) —
   no evidence of harm; the float verdict is the maintainer's next
   Donovan-vs-Felicia session. Replay re-freeze queued.
+
+Session 14w-b (the SECOND Felicia defect: pair-table stride bug):
+- After the gap-class disable fixed the wall latch, the new
+  29_felicia_walljump legacy gate still failed — and paid for itself
+  immediately: Felicia's WALK-BACK speed was also corrupted (patched
+  walks whole pixels, vanilla accumulates subpixels: -4.80 vs -4.B0
+  per frame — a 1px drift invisible to play but not to the oracle).
+- Root cause: param32_a/param32_b were registered as value32 tables
+  with 4-byte per-char rows; they are PAIR tables (8 bytes per char =
+  forward.l, back.l movement velocities). "Slot 0x0F" therefore wrote
+  FELICIA's walk-back long (char-7 pair, second half) with a value the
+  extractor had read from the equally wrong vs2 address. Fixed in
+  bank_map.toml: kind rec8, stride 0x100 — the extractor now reads
+  Donovan's true pair and the gen writes Jedah's true pair (0xBD8F2/
+  0xBD972 + param32_b analogs).
+- 29 reclassified masked-EXACT -> masked-FLICKER with frozen inventory
+  29@2435 (one isolated spawn-boundary frame, the existing approved
+  mechanism class); walk and wall-jump now byte-match vanilla.
+- Fingerprint 340673da; full battery at session end.

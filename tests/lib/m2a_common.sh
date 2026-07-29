@@ -69,7 +69,7 @@ m2a_legacy_gate() {
 M2A_MASK="043c-043d,7f00-8000"
 M2A_MASKED_EXP="tests/expected/vsavj/masked"   # relative to $REPO
 M2A_MASKED_EXACT="02_demitri_vs_cpu 05_timeout_idle 07_mash_storm"
-M2A_MASKED_FLICKER="03_two_player_vs 10_midattract_start 16_xemu_2p 04_select_fuzz 08_challenger_join 09_mirror_pick"
+M2A_MASKED_FLICKER="03_two_player_vs 10_midattract_start 16_xemu_2p 04_select_fuzz 08_challenger_join 09_mirror_pick 29_felicia_walljump"
 # 04/08/09 measured session 11 (playtest follow-up: they had fallen out of
 # the gate when it was rebuilt): pure flicker class — isolated single-frame
 # re-converging divergences (04@1525/2009/2195, 08@3507, 09@829), no

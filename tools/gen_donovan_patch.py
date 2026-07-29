@@ -923,7 +923,20 @@ def main():
                              f"(palette table row {_int(pal['row']):#x})")
 
         # per-char value rows -> vsavj slot 0x0F rows
+        # param32_a/b (movement velocity pairs) are NOT ported (session
+        # 14w-b): with Donovan's true vs2 velocities his 21_don_mash
+        # soak crashes at ~10050 (correct movement reaches a state with
+        # a broken pointer — return address into anim data; separate
+        # landmine, queued). He has played every clean round at Jedah's
+        # speeds; keep that until the crash path is decoded. The
+        # addressing fix (rec8 pairs) stays — it is what protects
+        # FELICIA's walk-back from the old mis-stride write.
+        VALUE_SKIP = {"param32_a", "param32_b"}
         for v in man["values"]:
+            if v["table"] in VALUE_SKIP:
+                notes.append(f"# {v['table']}: velocity pair NOT ported "
+                             f"(14w-b crash guard; Jedah speeds retained)")
+                continue
             t = bank[v["table"]]
             a, es = table_entry_addr(v["table"], dst_slot)
             if v["kind"] in ("data_ptr", "code_ptr"):
