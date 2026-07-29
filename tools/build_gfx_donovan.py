@@ -62,6 +62,9 @@ def main():
     ap.add_argument("--effects",
                     help="effect_map.json from the generator: [src,dst] "
                          "tile pairs (vs2 bank-3 code -> vsav bank-2 code)")
+    ap.add_argument("--effect-tail",
+                    help="build/manifest/effect_tail.json: place the "
+                         "missing engine-effect band (vs2 bank-1 ->")
     ap.add_argument("--select-tiles",
                     help="select_tiles.json from select_port.py: [src,dst] "
                          "BANK-1 pairs (group-A members; Jedah's freed "
@@ -133,11 +136,45 @@ def main():
         open(path, "wb").write(buf)
         print(f"  wrote vm3.{n}m sha1 {hashlib.sha1(bytes(buf)).hexdigest()}")
 
+    # effect-tail art: vs2 bank-1 blocks placed at vsav bank-1 anchors
+    if args.effect_tail:
+        et = json.load(open(args.effect_tail))
+        srcA0 = load_group(z2, "vs2", GROUP_A)
+        dstA0 = [bytearray(s) for s in load_group(za, "vm3", GROUP_A)]
+        n = 0
+        for k, v in et["place"].items():
+            tt, bx, by = k.split(",")
+            t = int(tt, 16); anchor = int(v, 16)
+            for dy in range(int(by)):
+                for dx in range(int(bx)):
+                    s_ = (t & ~0xF) + (dy << 4) + ((t + dx) & 0xF)
+                    d_ = (anchor & ~0xF) + (dy << 4) + ((anchor + dx) & 0xF)
+                    write_tile(dstA0, 0x10000 + d_,
+                               tile_bytes(srcA0, 0x10000 + s_))
+                    n += 1
+        for k, v in et["place"].items():
+            tt, bx, by = k.split(",")
+            t = int(tt, 16); anchor = int(v, 16)
+            for dy in range(int(by)):
+                for dx in range(int(bx)):
+                    s_ = (t & ~0xF) + (dy << 4) + ((t + dx) & 0xF)
+                    d_ = (anchor & ~0xF) + (dy << 4) + ((anchor + dx) & 0xF)
+                    assert tile_bytes(dstA0, 0x10000 + d_) == \
+                        tile_bytes(srcA0, 0x10000 + s_)
+        print(f"effect-tail: {n} bank-1 tiles placed")
+        for nm, buf in zip(GROUP_A, dstA0):
+            open(os.path.join(args.outdir, f"vm3.{nm}m"), "wb").write(buf)
+        za_patched = args.outdir  # select pass below must chain on these
     # select-screen art: bank-1 pairs live in GROUP A (abs 0x10000+code)
     if args.select_tiles:
         sel = json.load(open(args.select_tiles))
         srcA = load_group(z2, "vs2", GROUP_A)
-        dstA = [bytearray(s) for s in load_group(za, "vm3", GROUP_A)]
+        if args.effect_tail:
+            # chain on the effect-tail-patched members
+            dstA = [bytearray(open(os.path.join(args.outdir,
+                    f"vm3.{nm}m"), "rb").read()) for nm in GROUP_A]
+        else:
+            dstA = [bytearray(s) for s in load_group(za, "vm3", GROUP_A)]
         for s_, t_ in sel:
             write_tile(dstA, 0x10000 + t_, tile_bytes(srcA, 0x10000 + s_))
         for s_, t_ in sel:

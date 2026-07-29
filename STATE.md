@@ -31,7 +31,27 @@ follow-up)
   by pure fingerprint auto-detection — the one-command-validates-any-
   build doctrine is now real for hooked builds.
 
-## Session 14i-b (round-9 mechanisms pinned; implementation next)
+## Session 14j (THE EFFECT TAIL SHIPPED — elemental swords restored)
+
+- 623P/214K elemental summons render again (snapshot: the flaming Ifrit
+  sword + fire pillar in full). Triage of the 491 companion-effect
+  blocks: 344 same-index; 70 relocatable by content match (page shift
+  +0x47 class, wrap-safety enforced); 77 blocks (263 tiles = vs2's
+  newcomer extension of the engine effect page, 0x0E17-0x0F02) PLACED
+  at vsav bank-1's padding run 0x3640+ (460 blank positions before the
+  system band). Per-entry code remap in the gen (effect_tail pass,
+  build/manifest/effect_tail.json).
+- BONUS LATENT BUG FIXED (third sibling-coincidence strike, GOTCHAS):
+  the records' coordinate lists point into vs2's GLOBAL X/Y pool —
+  same-value across siblings, never relocated; effects have read
+  garbage coordinates since M2a. Fix: 114 lists content-matched into
+  vsavj's own pool, 617 Donovan-specific lists ported (11.3KB fragment,
+  hole B). Sword-glint/blink expected fixed by the same pass.
+- Fingerprint 569859d1: double gate green, oracle/xemu/flavor green.
+  Playtest wanted: 623P/214K/sword in-match, win-quote palette still
+  pending (next), quote text line, HUD name, wheel face, attract pal.
+
+## (earlier) Session 14i-b (round-9 mechanisms pinned)
 
 - WIN-QUOTE "left shift" = NOT a defect: both records' coords are
   identically centered on the object anchor; vsavj's own win-screen

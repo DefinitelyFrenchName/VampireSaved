@@ -343,3 +343,16 @@ times, each root-caused to the byte (session 14g):
    divergence in 05_timeout_idle). Every byte range you replace needs
    a legacy-read proof — the masked legacy gate IS that proof; run it
    after every record replaced, not at the end of a batch.
+
+## The sibling-coincidence gotcha, third strike: the global coordinate pool
+
+The companion-effect records' coordinate-list pointers aim at vs2's
+GLOBAL X/Y pool (0x30xxxx) — same-value in vs2 and vhunt2, so the
+sibling diff never flagged them, and the region ported with raw
+vs2-space cptrs. Latent since M2a: those effects read coordinates from
+unrelated vsavj bytes (masked by their art also being wrong). Every
+same-value pointer class found so far — engine subs (the sound farm),
+engine tables (the OBJ bank table), and now the coordinate pool — was
+invisible to the diff for the same reason. Rule stands: same-value !=
+same-meaning; any pointer INTO shared engine data needs a reconciliation
+row or a content-match, never a pass-through.

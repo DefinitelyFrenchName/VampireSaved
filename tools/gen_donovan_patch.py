@@ -746,6 +746,110 @@ def main():
                              f"band tile words + {n_eff} effect words "
                              f"({len(blocks)} blocks -> tail "
                              f"0x{eff_lo:04X}+) in {len(seen_rec)} records")
+
+            # [effect_tail] (build/manifest/effect_tail.json, session 14j):
+            # the x2b7ef4 companion-effect records draw at BANK 1; the
+            # engine effect page shifted (+0x47 class relocs) and vs2's
+            # elemental-sword band (0x0E17-0x0F02) has no vsav home —
+            # placed at the padding run 0x3640+. Per-block code remap.
+            if name == "x2b7ef4" and args.stage >= 6:
+                et = json.loads((Path(__file__).resolve().parent.parent
+                                 / "build/manifest/effect_tail.json"
+                                 ).read_text())
+                bmap = {}
+                for k, d_ in et["reloc"].items():
+                    tt, bx, by = k.split(",")
+                    bmap[(int(tt, 16), int(bx), int(by))] = int(tt, 16) + d_
+                for k, v in et["place"].items():
+                    tt, bx, by = k.split(",")
+                    bmap[(int(tt, 16), int(bx), int(by))] = int(v, 16)
+                base = placed[name]
+                # The records' coordinate lists live in vs2's GLOBAL
+                # coordinate pool (0x30xxxx) — same-value across the
+                # sibling pair, so the diff never relocated them (the
+                # classic sibling-coincidence gotcha; latent since M2a:
+                # these companion-effect entries have been reading X/Y
+                # from unrelated vsavj bytes). Fix: content-match each
+                # list into VSAVJ's own pool; Donovan-specific lists are
+                # appended to a GEN fragment in hole B.
+                POOL_LO, POOL_HI = 0x300000, 0x361000
+                extra_lists = bytearray()
+                extra_map = {}
+                n_et = n_cfix = n_cport = 0
+                seen2 = set()
+                for i in range(0, r["len"] - 4, 2):
+                    v = int.from_bytes(blob[i:i + 4], "big")
+                    if not (base <= v < base + r["len"]) or v in seen2:
+                        continue
+                    o = v - base
+                    fmt = int.from_bytes(blob[o:o + 2], "big")
+                    cptr = int.from_bytes(blob[o + 6:o + 10], "big")
+                    if (fmt > 0x20 or fmt % 2
+                            or not (POOL_LO <= cptr < POOL_HI)):
+                        continue
+                    if fmt == 0:
+                        cnt = int.from_bytes(blob[o + 2:o + 4], "big")
+                        if not (0 < cnt <= 0x100):
+                            continue
+                        hdr_at = int.from_bytes(blob[o + 4:o + 6], "big")
+                        offs = [(o + 10 + 2 * k, hdr_at) for k in range(cnt)]
+                        npairs = cnt
+                    elif fmt in (2, 8):
+                        budget = int.from_bytes(blob[o + 2:o + 4], "big")
+                        cnt = int.from_bytes(blob[o + 4:o + 6], "big")
+                        if not (0 < cnt + 1 <= budget <= 0x100):
+                            continue
+                        offs = [(o + 10 + 4 * k, None) for k in range(cnt + 1)]
+                        npairs = cnt + 1
+                    else:
+                        continue
+                    seen2.add(v)
+                    # coordinate-list fixup
+                    lst = src_data_img[cptr:cptr + 4 * npairs]
+                    hit = vj.find(bytes(lst), 0x300000, 0x361000)
+                    if hit != -1:
+                        blob[o + 6:o + 10] = hit.to_bytes(4, "big")
+                        n_cfix += 1
+                    else:
+                        key2 = bytes(lst)
+                        if key2 not in extra_map:
+                            extra_map[key2] = len(extra_lists)
+                            extra_lists += lst
+                        blob[o + 6:o + 10] = (0xEE000000
+                                              + extra_map[key2]).to_bytes(
+                                                  4, "big")
+                        n_cport += 1
+                    for toff, hdr_at in offs:
+                        t = int.from_bytes(blob[toff:toff + 2], "big")
+                        a_ = (hdr_at if hdr_at is not None else
+                              int.from_bytes(blob[toff + 2:toff + 4], "big"))
+                        key = (t, ((a_ >> 8) & 15) + 1, ((a_ >> 12) & 15) + 1)
+                        nt = bmap.get(key)
+                        if nt is not None:
+                            blob[toff:toff + 2] = nt.to_bytes(2, "big")
+                            n_et += 1
+                if extra_lists:
+                    la = alloc("b", len(extra_lists),
+                               "companion-effect coordinate lists")
+                    (out / "effect_lists.bin").write_bytes(bytes(extra_lists))
+                    ops.append({"op": "data_file", "addr": f"{la:#x}",
+                                "path": "effect_lists.bin"})
+                    fragments.append((la, len(extra_lists), "VS2",
+                                      "companion-effect coord lists"))
+                    # resolve the 0xEE-tagged placeholders
+                    for i in range(0, r["len"] - 4, 2):
+                        vv = int.from_bytes(blob[i:i + 4], "big")
+                        if (vv >> 24) == 0xEE:
+                            blob[i:i + 4] = (la + (vv & 0xFFFFFF)).to_bytes(
+                                4, "big")
+                notes.append(f"# {name}: effect_tail — {n_et} tile words "
+                             f"remapped, {n_cfix} coord lists matched into "
+                             f"vsavj's pool, {n_cport} ported "
+                             f"({len(extra_lists)}B fragment)")
+                if n_et < 100 or (n_cfix + n_cport) < 100:
+                    fail.append(f"effect_tail: {n_et} tile words / "
+                                f"{n_cfix + n_cport} coord lists — "
+                                f"below expectation, walker drifted")
                 if n_rw < 10000:
                     fail.append(f"gfx_remap: only {n_rw} tile words rewritten "
                                 f"(expected ~14k) — walker or band drifted")
