@@ -31,7 +31,26 @@ follow-up)
   by pure fingerprint auto-detection — the one-command-validates-any-
   build doctrine is now real for hooked builds.
 
-## Session 14k (sword/statue blink: root cause found = OBJ budget saturation)
+## Session 14k-b (blink TRULY root-caused: per-record bank attribution)
+
+- The saturation theory was an artifact: the ~540 null entries are the
+  CLEARED TAIL of the OBJ list (the drawer processes a separate count;
+  real usage ~357/896 — headroom fine). Bisect (worktree rebuild of
+  8248296e) also proved the coord surgery innocent (identical state).
+- REAL MECHANISM (live object dumps): the sword/statue objects draw at
+  BANK 2 (their #\$6000->#\$4000-patched setters) but their records
+  (x2b7ef4 region, e.g. 0x0FCECA with entry codes ~0x0FD2) were treated
+  with BANK-1 semantics by the effect-tail pass. Their anim frames with
+  engine-page codes hit wrong bank-2 positions -> invisible frames =
+  blinking at the anim rate (matches the playtest report exactly:
+  different rate than vs2, statue identical).
+- FIX (next): per-record bank attribution in the x2b7ef4 walk —
+  content-addressed (bank-2 records' low codes match vs2 BANK-3 art =
+  Donovan effect art; bank-1 records match the engine page) — route
+  bank-2 records through the band-tail placement (effect-map style)
+  and keep bank-1 records on the effect-tail path.
+
+## (superseded analysis) Session 14k (OBJ budget saturation theory)
 
 - Playtest round 10: specials CONFIRMED fixed; sword still blinks and
   the round-start statue blinks identically (same palette; vs2 clean).
