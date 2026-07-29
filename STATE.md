@@ -1,8 +1,49 @@
 # STATE — living progress log
 
-Updated: 2026-07-28 (session 14 end — **M2a FROZEN** at a02aeeff…,
-**M2b-CORE FROZEN** at 71601263…; select-screen cosmetics = the open
-follow-up)
+Updated: 2026-07-29 (session 14p — Anita's feet FIXED at f29cf24a;
+sword/statue blink ROOT-CAUSED to the companion-overlay strip web =
+next surgery; M2a frozen a02aeeff…, M2b-core frozen 71601263…)
+
+## Session 14p (feet fixed; blink mechanism = Jedah's overlay records)
+
+- **ANITA'S FEET FIXED** (build f29cf24a): the garble was record
+  0x0FCECA (x2b7ef4) whose 54-record strip draws at BANK 2 (#$4000
+  sub-objects) but was triaged by the BANK-1 effect-tail maps (+0x47
+  reloc → codes 0x0FD2/3 = wrong-page garbage; the earlier "solid
+  green" was the same entries pre-reloc). Empirical attribution per
+  the f8eda2ca mandate: handler-breakpoint trace over 9 replays
+  (tests/lua/obj_record_bank_trace.lua) found the ONE bank-2 record;
+  closure came from its sub-object's record stream (54 recs, 37
+  blocks, vs2 codes 0x0F8B-0x0FBC). Data-only fix:
+  tools/gen_anita_bank2.py → effect_tail.json bank2_recs/bank2_place
+  (shelf rows 0xEAC0-0xEAFF); the generator's surviving bank-2 branch
+  does the rest. OBJ RAM + screenshot verified; gates re-run.
+- **SWORD/STATUE BLINK ROOT-CAUSED** (no fix yet — next surgery): the
+  in-match companion overlay sub-objects ($FFB800-$FFBA00, bank
+  #$2000) walk per-char record-pointer strips; on our build the char
+  slot resolves to JEDAH's strips (0x2674AA-0x268Axx → records
+  0x271D70/0x272156/0x272800/0x272A68…, codes 0xAFxx/0xB4xx/0xCDxx =
+  Jedah's bank-1 darkness art, tile content verified vanilla≠vs2). The
+  "blinking sword/statue" is Jedah's overlay ANIMATING where Donovan's
+  sword-drag/statue belong. vs2 ground truth (handler trace on
+  vsav2, 27_don_throw_vsav2): ~16 sub-objects draw records
+  0x2A1DAE-0x2A3F80 (codes 0xA3E8-0xA499, strips 0x2A0Axx-0x2A1Cxx
+  after root 0x2A05E2). Fix class: select_port-style IN-PLACE
+  strip+record replacement inside Jedah's per-char region — all three
+  superset traps apply (budgets, cell pokes, legacy coord reads);
+  bank-1 codes go through the effect-tail triage (content-match /
+  reloc / place), NOT raw copy. New GOTCHAS entries: bank attribution
+  is an object property; breakpoint traces are lossy SAMPLERS —
+  structural closure required; overlay-strip mechanism.
+- New tools (persistent): tests/lua/obj_record_bank_trace.lua,
+  tests/lua/obj_record_full_trace.lua (all six fmt handlers via the
+  0x1AFBA jump table — vsav2 sibling addresses in header),
+  tools/gen_anita_bank2.py.
+- Throw-damage magnitude (round 13 note "lower than Savior 2"):
+  recorded as a maintainer-feel item — the port routes Donovan's raw
+  damage through VSAVJ's global defense scaling by design; the oracle
+  measured the test throw EQUAL to vs2 (-5). If it should match vs2
+  everywhere, that's a rules decision, not a bug.
 
 ## Session 14 highlights (M2a FROZEN)
 

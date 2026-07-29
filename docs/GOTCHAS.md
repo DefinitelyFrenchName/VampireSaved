@@ -367,3 +367,47 @@ just silently-wrong behavior (the zero-damage throw). Any ported code
 that communicates with engine routines through A5 work vars needs its
 displacements reconciled like ROM refs. Sweep pattern: displacement
 words in the vs2 work-var bands inside ported code regions.
+
+## Per-record BANK attribution: the effect-tail triage has no bank column
+
+The x2b7ef4 gfx triage (same-index / +0x47 reloc / tail-place) is a
+BANK-1 model. Records drawn by #$4000-bank sub-objects (Anita's feet
+strip: 54 records, vs2 codes 0x0F8B-0x0FBC) went through the bank-1
+maps and rendered garbage from the wrong page (solid green, then +0x47
+garble — playtest rounds 10-13). A record's bank is a property of the
+DRAWING OBJECT (+0x18), not of the record: it cannot be derived from
+record content (that was f8eda2ca's content-voting failure, reverted).
+Attribution method that works: breakpoint the OBJ format handlers
+(fmt2 0x1B234 / fmt0 0x1AFC6; A0 = record+2, A6 = object) and read
++0x18(A6) live — tests/lua/obj_record_bank_trace.lua — then close the
+set STRUCTURALLY from the sub-object's own record stream (obj+0x1C
+cursor), never from a global scan. Fix data lives in
+effect_tail.json bank2_recs/bank2_place (tools/gen_anita_bank2.py).
+
+## MAME breakpoint logging is a SAMPLER, not an inventory
+
+The Lua breakpoint pump (periodic callback resuming `debugger.
+execution_state`) drops hits: with six handler breakpoints live during
+frames 2596-2600, four record draws were logged while a write-watch
+proved at least five occurred (obj $FFBC00's draw never appeared).
+Runtime traces give EXISTENCE evidence ("this record IS drawn at bank
+2"), never completeness ("these are ALL the records"). Any fix scoped
+from a trace must be closed structurally (record streams, pointer
+arrays) before it can claim coverage — the Anita-feet 54-record list
+came from the stream walk, not from the trace that found its first
+member.
+
+## The companion overlay draws the HOST's records (sword/statue blink)
+
+The in-match companion overlay sub-objects ($FFB800-$FFBA00 class, bank
+#$2000) walk per-char record-pointer strips selected by CHAR SLOT:
+cursor obj+0x1C points into the char's strip region (vsavj Jedah:
+0x2674AA-0x268Axx -> records 0x271Dxx-0x272Axx, codes 0xAFxx/0xB4xx/
+0xCDxx = Jedah's bank-1 effect art; vs2 Donovan: 0x2A0Axx-0x2A1Cxx ->
+records 0x2A1DAE-0x2A3F80, codes 0xA3E8-0xA499 = sword-drag/statue/
+Anita-body art). On the ported build the slot resolves to JEDAH's
+strips, so his animated darkness overlay renders where Donovan's sword
+and statue belong — the "blinking sword/statue with the same palette"
+(playtest rounds 8-11) is Jedah's overlay animating, not a tile fault.
+Fix class: select_port-style in-place strip+record replacement inside
+Jedah's per-char region (superset traps 1-3 above all apply).

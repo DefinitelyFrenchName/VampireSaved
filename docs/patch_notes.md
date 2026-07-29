@@ -363,3 +363,30 @@ Session 6 (PC-relative correctness — the big one):
   2886 → 3025. Remaining: one anim state-index delta (the table is
   byte-identical to native vsav2; the index into it is vs2-flavored).
   Legacy suite GREEN (13 replays) throughout.
+
+Session 14p (Anita's feet — empirical bank-2 attribution):
+- Playtest round 13 artifact pinned: the garbled tiles at Anita's feet
+  are OBJ entries (bank 2, codes 0x0FD2/0x0FD3 shipped) from record
+  0x0FCECA in x2b7ef4 — vs2 source codes 0x0F8B/0x0F8C rewritten +0x47
+  by the BANK-1 effect-tail reloc class. The record draws on BANK 2
+  (its sub-objects' +0x18 = #$4000), so the bank-1 triage was the wrong
+  model for it: the round-10 "solid green" was the RAW vs2 code against
+  vsav bank-2 content, and the round-13 "garbled mess" was the same
+  entry after the +0x47 mis-reloc landed (build 569859d1).
+- Empirical attribution (f8eda2ca post-mortem compliance): runtime
+  breakpoint trace on the OBJ format handlers over 9 replays
+  (tests/lua/obj_record_bank_trace.lua) — exactly ONE x2b7ef4 record
+  observed at bank 0x4000 (0x0FCECA); set closed structurally via the
+  emitting sub-object's record stream at dst 0x0F619C (src 0x2BA120):
+  54 fmt-2 records 0x0FCECA-0x0FD5A4, 308 tile words, 37 unique
+  (code,1x1) blocks, vs2 codes 0x0F8B-0x0FBC.
+- Fix is data-only: tools/gen_anita_bank2.py regenerates
+  effect_tail.json `bank2_recs` (54 src addresses) + `bank2_place`
+  (37 shelf targets, rows 0xEAC0-0xEAFF, cap 0xEEBB) — the generator's
+  existing bank-2 branch (kept through the f8eda2ca revert) excludes
+  those records from the bank-1 maps, rewrites their tile words to the
+  shelf, and appends [src,dst] pairs to effect_map.json for the gfx
+  step (vs2 bank-3 source content, group B). 308 bank-2 words reported
+  at generation; verified in OBJ RAM (entries now 0xEADA/0xEADB) and
+  on-screen (green blobs gone, frame 2600 of 19_don_dp_spam).
+- Build fingerprint f29cf24a; gates re-run (see STATE).
