@@ -100,8 +100,15 @@ site_prefix_expect = "4a290038660000aa"
 tst_disp = 0x38
 bne_target = 0x018508
 dispatch = 0x018460
-first_ext = 0xA2
-n_ext = 3
+# session 14w-c: id 0x50 (scaled 0xA0) added — the type-63 secondary
+# object's hit-reaction uses it; it was BELOW the old first_ext and fell
+# through to the vanilla table (0x50 entries, ids 0-0x4F) one entry
+# short: table[0x50] read the dispatch's own opcode as a jump offset,
+# odd-target vec3 at 21_don_mash frame ~10063. Case bytes verified
+# verbatim against vs2 table[0x50] -> 0x17024.
+first_ext = 0xA0
+n_ext = 4
+case_a0 = "137c000f00544e75"
 case_a2 = "136b001700544e75"
 case_a4 = "137c005200544e75"
 case_a6 = "42290121137c000100544e75"

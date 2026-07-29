@@ -5,6 +5,22 @@ cf2109d8 pending gates+playtest: Anita/sword/statue render in-match
 and on the win screen; 3 residual sites excluded; session 14q parked
 state superseded)
 
+## Session 14w-c resolution (ALL GREEN at d6a751cb)
+
+- The halt lifted: the type-63 handler's crash was its hit-reaction
+  id 0x50 — past vsavj's vanilla table, below the hook's old ext
+  range. One-slot reaction_hook extension (case verified verbatim
+  against vs2) closed it. Full battery green including both new
+  gates (29_felicia_walljump, pixel menus). SHIPPING d6a751cb.
+- PLAYTEST (round 20): (a) Felicia's triangle jump — wall latch back,
+  and her walk now byte-exact vanilla; (b) throw anyone repeatedly
+  (the grab-pointer fix from 14v rides along); (c) deep arcade runs
+  with Donovan — the type-63 moment (~his 2nd match win region)
+  should now just work; report anything odd there; (d) win-quote
+  palette is STILL Jedah's (known: preload-staging consumer decode
+  queued); sword blink unchanged (overlay parked).
+
+## Session 14w-c original halt record (kept for the mechanism)
 ## Session 14w-c (type-63 chain: RULE-6 HALT — the only open task)
 
 - The pair-table fix changed CPU-Felicia's fight flow in 21_don_mash,

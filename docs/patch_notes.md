@@ -552,3 +552,26 @@ Session 14w-b (the SECOND Felicia defect: pair-table stride bug):
   29@2435 (one isolated spawn-boundary frame, the existing approved
   mechanism class); walk and wall-jump now byte-match vanilla.
 - Fingerprint 340673da; full battery at session end.
+
+Session 14w-c (the type-63 chain closed; ALL GREEN at d6a751cb):
+- The pair-table fix changed CPU-Felicia's flow in 21_don_mash and
+  Donovan's own deep-arcade path spawned SECONDARY-OBJECT TYPE 63 for
+  the first time — the M2a "types 59-62 only" assumption was
+  measured-wrong. Chain, each link verified:
+  1. Type-63 tripwire (0xCB880) fired at ~10050 -> handler ported as
+     extra root 0x6717c:0x154:t0x671b0 (clean extraction, 13 refs,
+     all recon rows verified).
+  2. The handler's hit-reaction uses id 0x50 — the FIRST id past
+     vsavj's 80-entry reaction table and BELOW the hook's old ext
+     range (first_ext 0xA2 = scaled id 0x51): it fell through to the
+     vanilla table one entry short, read the dispatch's own opcode
+     word (0x323B) as a jump offset, and address-errored on the odd
+     target (vec3, PC 0x18466, ADDR 0x1B6A3 — the exact crash math
+     that unlocked it).
+  3. Fix: reaction_hook first_ext 0xA2->0xA0, n_ext 3->4, case_a0 =
+     vs2's id-0x50 case verified verbatim (137c000f00544e75 — the
+     scaled-id model confirmed by matching all three existing cases
+     byte-for-byte against vs2's table).
+- Fingerprint d6a751cb: double M2b gate (masked legacy incl. the new
+  29_felicia_walljump flicker gate + pixel menu gate) + oracle +
+  dual-emulator + flavor ALL PASS. The rule-6 halt is lifted.
