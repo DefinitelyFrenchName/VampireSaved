@@ -261,7 +261,53 @@ def main():
     print(f"select palettes: {JVARS} variant rows for char 0x0F "
           f"<- vs2 Donovan rows @0x{DBASE:06X}")
 
-    # WIN/QUOTE palettes: NOT PORTED (session 14t post-mortem). The
+    # WIN/QUOTE palettes (session 14u — the copy-and-repoint design).
+    # In-place block edits are impossible: the mid-frame script/fade
+    # system reads arbitrary rows of the per-side blocks through its
+    # own PC-relative table (CODE:0x153D0) on legacy paths (the 14t
+    # revert). But the WIN-screen uploaders reach the blocks through
+    # the DATA-side table 0x38C298 (all four movea sites) plus one
+    # hardcoded lea (0x1C424, the char*0x60 view; a second hardcoded
+    # site 0x8396 uses a constant row and never touches char slices —
+    # left vanilla). So: three patched COPIES go into the proven-dead
+    # zone (the parked overlay's legacy-clean placement area), the
+    # data table longs are repointed here, and the gen pokes the
+    # 0x1C424 immediate (code space, re-encrypted there):
+    #   copy A1 0x248D80 (P1, 0xA0-view)  slice [0x960,0xAA0) <- vs2
+    #   copy A2 0x24A8A0 (P2, 0xA0-view)  slice [0x960,0xAA0) <- vs2
+    #   copy B  0x24C3C0 (0x60-view)      slice [0x5A0,0x6E0) <- vs2
+    # (0x60-view dark-char 0x17 reads [0x8A0,0x9E0) — vanilla in copy
+    # B by construction; 0xA0-view copies never serve the 0x60 path.)
+    # Scripts/fades keep reading the ORIGINAL blocks: legacy byte flow
+    # is untouched, and legacy winners read copy bytes identical to
+    # vanilla outside the slot-0x0F slices.
+    BLK = 0x1B20
+    JP1, JP2 = 0x39FDC0, 0x3A18E0
+    DP1, DP2 = 0x3B727C, 0x3B8EDC
+    COPY_A1, COPY_A2, COPY_B = 0x248D80, 0x24A8A0, 0x24C3C0
+    for dst, srcblk, sl_off, don_off in (
+            (COPY_A1, JP1, 0x960, DP1 + 0xBE0),
+            (COPY_A2, JP2, 0x960, DP2 + 0xBE0),
+            (COPY_B,  JP1, 0x5A0, DP1 + 0x720)):
+        img[dst:dst + BLK] = img[srcblk:srcblk + BLK]
+        img[dst + sl_off:dst + sl_off + 0x140] = \
+            vs2[don_off:don_off + 0x140]
+    # v3 (the 14u gate iteration): the shared table 0x38C298 must stay
+    # VANILLA — site 0x1BF56 is a select-time BULK PRELOADER that
+    # stages every char's slice through work RAM on legacy paths
+    # (read-watch: one hit at select entry; both earlier attempts
+    # diverged 03/16 with identical checksums because the preloader
+    # staged the changed 0x0F slice). Instead a PRIVATE table carrying
+    # the copy addresses goes at 0x24DE00, and the gen pokes the three
+    # quote-time reader sites (0x1C1FA/0x1C5CE/0x7D4FC) to it.
+    PRIV_TAB = 0x24DE00
+    img[PRIV_TAB:PRIV_TAB + 4] = COPY_A1.to_bytes(4, "big")
+    img[PRIV_TAB + 4:PRIV_TAB + 8] = COPY_A2.to_bytes(4, "big")
+    print(f"win/quote palettes: 3 block copies at 0x{COPY_A1:06X}+, "
+          f"private side table at 0x{PRIV_TAB:06X} (shared table "
+          f"vanilla; quote-site pokes are the gen's)")
+
+    # (14t post-mortem kept for the record:) The
     # per-side blocks (0x39FDC0/0x3A18E0, char*0xA0 slices) are BULK-
     # STAGED through work RAM mid-frame during 2P select/match on
     # LEGACY paths — an in-place slice edit diverged 03/16 masked for

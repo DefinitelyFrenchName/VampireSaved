@@ -5,6 +5,18 @@ cf2109d8 pending gates+playtest: Anita/sword/statue render in-match
 and on the win screen; 3 residual sites excluded; session 14q parked
 state superseded)
 
+## Session 14u (win-quote palette SHIPPED at 1f5fa38e — pending playtest)
+
+- Four masked-gate iterations distilled the survivable design (see
+  patch_notes 14u): patched block COPIES in dead space + a private
+  pointer table + exactly ONE poked reader site (0x1C1FA, the only
+  exclusively-quote-time one) + the 0x60-view lea. Three select-time
+  bulk preloaders identified by per-site gate bisection (0x1BF56 /
+  0x1C5CE 2P / 0x7D4FC challenger-join) stay vanilla.
+- All gates green on 1f5fa38e. PLAYTEST QUESTION: does a Donovan match
+  win now show his quote palette? If not, the quote screen consumes
+  the preloaded staging and the staging consumer is next.
+
 ## Session 14t (win-quote palette: decoded, port REVERTED by the gate)
 
 - Round 17: menus clean. The palette chain is fully decoded (see

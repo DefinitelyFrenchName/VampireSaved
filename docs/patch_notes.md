@@ -482,3 +482,27 @@ the masked gate; quote-screen coverage begun):
   win-quote art; (from earlier this session) the map/continue screen
   shows correct Donovan art+name.
 - Shipping stays 37269fff; gates green incl. the pixel menu gate.
+
+Session 14u (win-quote palette shipped via copy-and-repoint; four gate
+iterations):
+- The 14t in-place failure led through four masked-gate iterations to
+  a working design: three patched block copies in the proven-dead
+  anim area (A1/A2 = per-side 0xA0-view at 0x248D80/0x24A8A0, slice
+  [0x960,0xAA0) <- vs2 Donovan; B = 0x60-view at 0x24C3C0, slice
+  [0x5A0,0x6E0)), a private side table at 0x24DE00, ONE code-imm
+  poke at the exclusively-quote-time reader site 0x1C1FA, and the
+  0x60-view lea (0x1C426) -> copy B. Everything else — the original
+  blocks, the shared table 0x38C298, and the three PRELOADER sites —
+  stays byte-vanilla.
+- The hard-won map: per-char win-palette slices are BULK-STAGED
+  through work RAM at every select-entry variant on legacy paths, by
+  THREE different sites (0x1BF56 normal select, 0x1C5CE 2P/VS select,
+  0x7D4FC challenger-join) — each found by per-site gate bisection
+  after watchpoint sampling missed two of them. Site attribution is
+  PATH-dependent; only build-level bisection against the replay
+  matrix is trustworthy.
+- Fingerprint 1f5fa38e: double M2b gate (incl. pixel menu gate) +
+  oracle + dual-emulator + flavor ALL PASS. CAVEAT for playtest: if
+  the quote screen renders from the PRELOADED staging rather than the
+  0x1C1FA fresh read, Donovan's quote palette will still be Jedah's —
+  then the staging CONSUMER is the next decode target.
