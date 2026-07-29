@@ -31,7 +31,29 @@ follow-up)
   by pure fingerprint auto-detection — the one-command-validates-any-
   build doctrine is now real for hooked builds.
 
-## Session 14l (bank-attribution fix SHIPPED — sword/statue blink expected fixed)
+## Session 14m (f8eda2ca REVERTED — regression + board reset; back to 569859d1)
+
+- Playtest round 11 on f8eda2ca: blink unchanged, 623P degraded, and a
+  BOARD RESET mid-fight (watchdog class). Rule 6 halt: the bank-2
+  config stripped from effect_tail.json; the build restores 569859d1
+  BYTE-EXACT (the round-10-validated build: specials good, sword
+  blinks = known open issue).
+- Post-mortem of the failed fix: the content-voting attribution was
+  wrong — the ownerbox dump already showed the sword records live in
+  the ANIM region (rec 0x0F32C8 ∈ anim dst), not x2b7ef4; the 14
+  rerouted records were misattributed and the loose record validation
+  (731 detections vs ~151 real) makes false-positive rewrites — the
+  likely reset mechanism. LESSONS: content voting is too weak for
+  bank attribution; only EMPIRICAL object-correlation counts; and any
+  pass that rewrites record bytes must validate records STRICTLY
+  (known-record lists, not heuristic scans).
+- The blink remains open. Correct next method (fresh session):
+  side-by-side sword-object comparison — dump the sword object's
+  [0x1C]/records/entries on real vsav2 and on our build at matched
+  moments; diff entry-by-entry; fix exactly what differs. No rewrites
+  without an empirically-verified record list.
+
+## (reverted) Session 14l (bank-attribution fix)
 
 - The x2b7ef4 walk now attributes records by drawing bank via content
   voting: 14 records (109 blocks, 312 tiles — the sword/statue class,
