@@ -31,6 +31,22 @@ follow-up)
   by pure fingerprint auto-detection — the one-command-validates-any-
   build doctrine is now real for hooked builds.
 
+## Session 14h highlights (win-quote portrait ported; HUD name found)
+
+- Win-quote screen: the family is d0 = 0x40+char over the same root
+  table (found via the Bulleta-quote object dump — no replay reaches
+  Donovan's own quote screen, so visual confirmation is playtest's).
+  His 35-entry win-pose record replaced in place (host budget kept);
+  art fit into Jedah's own freed win tiles + the pool tail (pool-math
+  lesson: variant alias rows 0x1F point at the SAME records — skip
+  them when computing exclusivity). Fingerprint 8248296e, double gate
+  green + companions. The quote TEXT line is a separate object family
+  (cell area 0x2681xx) — next target if the playtest shows Jedah's
+  line under Donovan's portrait.
+- NEW COSMETIC FOUND (snapshot): the in-match HUD name label still
+  reads "Jedah" — added to the list (with wheel mugshot face and
+  attract palette).
+
 ## Session 14g highlights (VS splash SHIPPED; three superset traps caught and fixed)
 
 - VS-splash busts ported (playtest round 8): the six per-char cells'
