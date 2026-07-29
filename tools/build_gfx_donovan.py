@@ -69,6 +69,10 @@ def main():
                     help="select_tiles.json from select_port.py: [src,dst] "
                          "BANK-1 pairs (group-A members; Jedah's freed "
                          "select/splash art positions)")
+    ap.add_argument("--overlay-tiles",
+                    help="overlay_tiles.json from overlay_port.py: [src,dst] "
+                         "BANK-1 pairs (companion-overlay art at dead-Jedah "
+                         "+ padding positions; session 14q)")
     args = ap.parse_args()
     os.makedirs(args.outdir, exist_ok=True)
 
@@ -182,6 +186,30 @@ def main():
                 tile_bytes(srcA, 0x10000 + s_), \
                 f"select readback mismatch at bank-1 0x{t_:04X}"
         print(f"select: {len(sel)} bank-1 tiles placed")
+        for n, buf in zip(GROUP_A, dstA):
+            path = os.path.join(args.outdir, f"vm3.{n}m")
+            open(path, "wb").write(buf)
+            print(f"  wrote vm3.{n}m sha1 "
+                  f"{hashlib.sha1(bytes(buf)).hexdigest()}")
+
+    # companion-overlay art: bank-1 pairs, group A — chains on whatever
+    # group-A members exist so far (effect-tail/select passes)
+    if args.overlay_tiles:
+        ovl = json.load(open(args.overlay_tiles))
+        srcA = load_group(z2, "vs2", GROUP_A)
+        prev = os.path.join(args.outdir, f"vm3.{GROUP_A[0]}m")
+        if os.path.exists(prev):
+            dstA = [bytearray(open(os.path.join(args.outdir,
+                    f"vm3.{nm}m"), "rb").read()) for nm in GROUP_A]
+        else:
+            dstA = [bytearray(s) for s in load_group(za, "vm3", GROUP_A)]
+        for s_, t_ in ovl:
+            write_tile(dstA, 0x10000 + t_, tile_bytes(srcA, 0x10000 + s_))
+        for s_, t_ in ovl:
+            assert tile_bytes(dstA, 0x10000 + t_) == \
+                tile_bytes(srcA, 0x10000 + s_), \
+                f"overlay readback mismatch at bank-1 0x{t_:04X}"
+        print(f"overlay: {len(ovl)} bank-1 tiles placed")
         for n, buf in zip(GROUP_A, dstA):
             path = os.path.join(args.outdir, f"vm3.{n}m")
             open(path, "wb").write(buf)

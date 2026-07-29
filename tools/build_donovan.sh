@@ -83,11 +83,15 @@ if [ "$STAGE" -ge 6 ]; then
         --base 0x27F548 --start 0x27F548 --end 0x2A0448 \
         --cptr-lo 0x300000 --cptr-hi 0x361000 \
         --json "$OUTBASE/donovan_tiles.json" > /dev/null
+    OVERLAY_TILES=""
+    [ -f build/manifest/overlay/overlay_tiles.json ] && \
+        OVERLAY_TILES="--overlay-tiles build/manifest/overlay/overlay_tiles.json"
+    # shellcheck disable=SC2086
     python3 tools/build_gfx_donovan.py "$ROMDIR" "$OUTBASE/gfx" \
         --tiles "$OUTBASE/donovan_tiles.json" \
         --effects "$OUTBASE/patch/effect_map.json" \
         --select-tiles "$OUTBASE/select_tiles.json" \
-        --effect-tail build/manifest/effect_tail.json | tail -9
+        --effect-tail build/manifest/effect_tail.json $OVERLAY_TILES | tail -10
     GFXSTAGE="$(mktemp -d)"
     unzip -q -o "$ROMDIR/vsav.zip" -d "$GFXSTAGE"
     cp "$OUTBASE/gfx"/vm3.*m "$GFXSTAGE"/

@@ -426,3 +426,50 @@ RAM dumps.) Use debugger traces only for EXISTENCE evidence at rare
 events; for anything frame-accurate or complete, use replay.lua DUMPS
 (exact, no debugger) and read state from RAM — companion-slot cursor
 fields survive at frame-done even when the live flag is clear.
+
+## The attract INTRO CUTSCENE is Jedah — per-char display sites are legacy surface
+
+VSAV's attract opening is Jedah's resurrection cutscene: his per-char
+display code (the strip-table `movea.l #T,a0` sites) executes on every
+legacy replay ~frame 888, long before the frozen-4278 demo divergence.
+A static repoint of those sites is therefore a legacy break even though
+the code "belongs to" Jedah. And the sites are additionally reached in
+EVERY match by shared display flows (statically poking them hung a
+Demitri match at 1857 — checksum log froze, the hang signature).
+Working pattern (session 14q, proven 02-masked-clean full-length):
+replace the 6-byte `movea.l #T,a0` with a 6-byte `jsr thunk`; the thunk
+selects vanilla vs ported T on `$FF8004.l == 0x40000` (match active)
+AND a slot-0x0F participant (`$FF8782`/`$FF8B82` char id). Legacy
+matches and the cutscene take the vanilla load byte-exactly; only
+slot-0x0F matches (always Donovan, including the attract demo) see the
+ported tables.
+
+## The per-char strip zone interleaves the SHARED MUSIC POOL
+
+Placing ported data into apparent "gaps" of Jedah's strip/stream area
+(0x267112-0x271CE8) broke legacy replays with sound-driver RAM deltas
+(02_demitri masked diverged at 891/1726; $FF00xx/$FF04xx/$FF06xx state,
+a fabricated stub materializing at $FF001A): the area interleaves the
+music-sequence pool that the sound streamer reads on every path, via
+computed addressing that A-register watchpoint sampling cannot see.
+Watchpoint-based "read maps" are lossy in exactly this blind spot —
+apparent gaps are not evidence of deadness. The only space PROVEN dead
+in this build is what only a slot-0x0F in-match path can reach: Jedah's
+own anim area (streams 0x248D5C-0x25004E, records 0x25570C-0x2601EC,
+attributed via vanilla-demo cursor sampling) — placement there was
+02-masked-clean full-length.
+
+## Blind long-relocation over ported data blobs corrupts streams
+
+Relocating every even-aligned long that "looks like" an in-window
+pointer (the overlay slice: 293 rebased longs, 2811 tile words in 163
+scan-validated records) corrupted enough stream/coordinate data to
+crash the Donovan path at match start (watchdog boot-loop), while the
+identical placement with no rewrites was stable. Coordinate words and
+stream commands alias pointer prefixes at data-blob scale. For record
+regions with a known pointer web (anim, x2b7ef4) the narrow window +
+record validation held; for a MIXED zone (tables + strips + tag
+streams + records + coordinate runs) the rewrite set must come from a
+STRUCTURAL CLOSURE walk (tables -> strips -> streams -> records),
+never from a flat scan. The closure requires decoding the stream node
+language first — that is the stage-7 blocker, not the architecture.

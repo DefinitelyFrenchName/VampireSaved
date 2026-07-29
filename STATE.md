@@ -1,8 +1,50 @@
 # STATE — living progress log
 
-Updated: 2026-07-29 (session 14p — Anita's feet FIXED at f29cf24a;
-sword/statue blink ROOT-CAUSED to the companion-overlay strip web =
-next surgery; M2a frozen a02aeeff…, M2b-core frozen 71601263…)
+Updated: 2026-07-29 (session 14q — overlay port 80% built, PARKED as
+build/manifest/overlay.wip; shipping build = f29cf24a (feet fix,
+playtest-confirmed round 14); M2a frozen a02aeeff…, M2b-core frozen
+71601263…)
+
+## Session 14q (stage-7 overlay port: architecture PROVEN, closure blocked)
+
+- **Round 14 (maintainer): Anita's feet fully clean incl. shadow, no
+  regressions** — f29cf24a validated.
+- Stage-7 build attempt (topology B) reached a proven architecture with
+  one remaining blocker. What is PROVEN (each by masked 02 probes,
+  full-length identical unless noted):
+  1. **Placement**: vs2 overlay slice [0x2A0426,0x2A63F0) split at
+     0x2A4A48 (above max self-relative table reach), segA+cptr-tail at
+     0x248D80, segB at 0x2557B0 — inside JEDAH'S OWN ANIM AREA, the
+     only proven-dead space (slot 0x0F always runs Donovan). Legacy
+     CLEAN. (First two placements failed: Jedah's strip-area "gaps"
+     interleave the shared MUSIC POOL — see GOTCHAS.)
+  2. **Site repoints**: 25 context-verified Jedah T-sites, thunked
+     (`movea.l #T,a0` -> `jsr thunk`; ported T iff match-active AND a
+     slot-0x0F participant). Legacy CLEAN with all 25 active. Static
+     pokes are IMPOSSIBLE (attract cutscene IS Jedah ~888; shared
+     display flows hang other-char matches — measured both).
+  3. **Tile pipeline**: 3929 bank-1 pairs (874 blocks; fmt4/6/8 draw
+     stored+0x3800 — handler decode) placed at dead-Jedah positions +
+     padding; build_gfx --overlay-tiles chain verified.
+- **BLOCKER**: with data+rewrites active the DONOVAN path watchdog-
+  crashes at match start. Cause class: the slice's 293 blind long
+  relocations + 2811 tile-word rewrites in 163 scan-validated records
+  include false positives that corrupt stream/coordinate data (fmt4
+  validation is cptr-less; coordinate words alias pointer prefixes).
+  Fix path: STRUCTURAL CLOSURE — decode the stream node language
+  (tables -> strips -> tag-streams -> records), restrict relocation
+  and rewrites to the closure, leave everything else byte-intact.
+  Groundwork in place: fmt handlers decoded (0x1AFC6/0x1B234/0x1B61A/
+  0x1B6AA/0x1B73E/0x1B7CC; A0=rec+2), strip = plain long array,
+  tag-stream = (FF-tag,ptr) pairs, walker 0x15082 = T + T[2*id]
+  self-relative.
+- Everything parked in build/manifest/overlay.wip/ (gen ignores it
+  until renamed back to overlay/); tools/overlay_port.py +
+  gen thunk assembly + build wiring are committed and inert. Shipping
+  fingerprint re-verified f29cf24a after parking.
+- New GOTCHAS: attract-cutscene-is-Jedah (conditional thunks), music
+  pool interleave (watchpoint read maps have a computed-addressing
+  blind spot), blind relocation corrupts mixed data blobs.
 
 ## Session 14p (feet fixed; blink mechanism = Jedah's overlay records)
 
