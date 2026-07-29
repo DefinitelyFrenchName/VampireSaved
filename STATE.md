@@ -31,6 +31,27 @@ follow-up)
   by pure fingerprint auto-detection — the one-command-validates-any-
   build doctrine is now real for hooked builds.
 
+## Session 14k (sword/statue blink: root cause found = OBJ budget saturation)
+
+- Playtest round 10: specials CONFIRMED fixed; sword still blinks and
+  the round-start statue blinks identically (same palette; vs2 clean).
+- ROOT CAUSE FOUND: the per-frame OBJ list is SATURATED — 897 of 896
+  budgeted entries every frame, of which ~545 are ALL-ZERO entries from
+  a runaway record (suspected fmt-0 count-0 -> subq/dbra wraparound
+  emitting nulls until the budget dies). The sword/statue draw last and
+  get budget-skipped on marginal frames = the blink. NOT the class-7
+  queue (only one site, already remapped; no live 0x0E-class objects),
+  NOT palette-row conflict (row 3 written once), NOT engine budget
+  difference (both games 0x380).
+- NEXT (precise): (1) dump objects + correlate [0x1C] to find the
+  runaway record's owner; (2) rebuild commit 0867b25 (8248296e) and
+  count nulls there to bisect pre/post the coord surgery — the blink
+  predates it per playtest, but the 545-null magnitude needs the same
+  verification; (3) fix = correct the record/chain terminator (and
+  audit the coord-surgery's loose record validation for false-positive
+  rewrites in the x2b7ef4 blob — 731 detections vs ~151 real records
+  is suspicious in itself).
+
 ## Session 14j (THE EFFECT TAIL SHIPPED — elemental swords restored)
 
 - 623P/214K elemental summons render again (snapshot: the flaming Ifrit
