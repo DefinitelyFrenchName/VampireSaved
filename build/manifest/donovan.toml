@@ -294,3 +294,61 @@ len = 0x500
 src_head_hex = "00000FFF0EB80D97"
 table = 0x38C198
 row = 0x0F
+
+# ── Throw-damage work-var reconciliation (session 14n; playtest round
+# 12: "throw barely deals damage"). The ported throw-damage writer
+# (vs2 0x28AC2-0x28AF6, region x028122) stores scaled damage into the
+# A5-relative work vars at VS2's layout (-$4B6C/-$4B6A/-$4B68 =
+# $FF3494/96/98) while vsavj's damage post-process reads ITS layout
+# (-$4BBE/-$4BBC/-$4BBA = $FF3442/44/46) — the damage landed in dead
+# variables (landed-but-zero, proven by the 27_don_throw oracle pair).
+# A5 work-var displacements are the FOURTH same-value sibling-
+# coincidence class (invisible to the vs2/vhunt2 diff). Uniform family
+# shift -0x52; native analog byte-verified at vsavj 0x29790-0x297C0.
+[[port_patch]]
+stage = 6
+region = "x028122"
+src_addr = 0x028AC2
+old_hex = "3b7c0001b498"
+new_hex = "3b7c0001b446"
+note = "throw dmg: flag var -> vsavj layout (-0x4BBA)"
+
+[[port_patch]]
+stage = 6
+region = "x028122"
+src_addr = 0x028AC8
+old_hex = "426db494"
+new_hex = "426db442"
+note = "throw dmg: clr damage var -> vsavj layout (-0x4BBE)"
+
+[[port_patch]]
+stage = 6
+region = "x028122"
+src_addr = 0x028AD8
+old_hex = "3b42b494"
+new_hex = "3b42b442"
+note = "throw dmg: scaled damage -> vsavj layout (-0x4BBE)"
+
+[[port_patch]]
+stage = 6
+region = "x028122"
+src_addr = 0x028ADC
+old_hex = "3b7c0000b498"
+new_hex = "3b7c0000b446"
+note = "throw dmg: flag clear -> vsavj layout (-0x4BBA)"
+
+[[port_patch]]
+stage = 6
+region = "x028122"
+src_addr = 0x028AE2
+old_hex = "426db496"
+new_hex = "426db444"
+note = "throw dmg: clr white var -> vsavj layout (-0x4BBC)"
+
+[[port_patch]]
+stage = 6
+region = "x028122"
+src_addr = 0x028AF2
+old_hex = "3b42b496"
+new_hex = "3b42b444"
+note = "throw dmg: white damage -> vsavj layout (-0x4BBC)"

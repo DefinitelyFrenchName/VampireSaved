@@ -31,6 +31,23 @@ follow-up)
   by pure fingerprint auto-detection — the one-command-validates-any-
   build doctrine is now real for hooked builds.
 
+## Session 14o (THROW DAMAGE FIXED — the fourth same-value class found)
+
+- Donovan's throw deals correct damage (oracle-measured: 288->283 = -5,
+  byte-matching vs2's result at identical inputs, flowing through
+  vsavj's own defense scaling). ROOT CAUSE = the FOURTH same-value
+  sibling-coincidence class: A5-relative WORK-VAR DISPLACEMENTS. The
+  ported throw-damage writer (x028122, vs2 0x28AC2-0x28AF6) stored
+  scaled damage into VS2's work-var layout (-0x4B6C/6A/68) while
+  vsavj's post-process reads ITS layout (-0x4BBE/BC/BA) — damage into
+  dead variables = landed-but-zero. Six displacement port_patches
+  (uniform family shift -0x52; vsavj native analog byte-verified at
+  0x29790). Diagnosed AND verified by the NEW 27_don_throw oracle pair
+  (permanent suite replays; vanilla expectation frozen 086476eb).
+- Fingerprint eb051b12: double gate + oracle/xemu/flavor green.
+- OPEN AUDIT: sweep ALL ported code for (d16,A5) vs2-layout work-var
+  displacements — other dead-var writes may lurk.
+
 ## Session 14n (round 12: revert validated; two new items scoped)
 
 - Round 12 on restored 569859d1: specials correct, NO resets — the

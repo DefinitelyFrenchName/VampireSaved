@@ -356,3 +356,14 @@ engine tables (the OBJ bank table), and now the coordinate pool — was
 invisible to the diff for the same reason. Rule stands: same-value !=
 same-meaning; any pointer INTO shared engine data needs a reconciliation
 row or a content-match, never a pass-through.
+
+## Same-value class #4: A5-relative work-var displacements
+
+The engines' A5 work-variable layouts differ (vsavj damage vars at
+-0x4BBE/BC/BA vs vs2 at -0x4B6C/6A/68 — a uniform -0x52 family shift).
+Ported code writing engine work vars by displacement writes DEAD MEMORY
+on vsavj — no crash, no diff visibility (vs2/vhunt2 share the layout),
+just silently-wrong behavior (the zero-damage throw). Any ported code
+that communicates with engine routines through A5 work vars needs its
+displacements reconciled like ROM refs. Sweep pattern: displacement
+words in the vs2 work-var bands inside ported code regions.
