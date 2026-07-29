@@ -261,6 +261,16 @@ def main():
     print(f"select palettes: {JVARS} variant rows for char 0x0F "
           f"<- vs2 Donovan rows @0x{DBASE:06X}")
 
+    # WIN/QUOTE palettes: NOT PORTED (session 14t post-mortem). The
+    # per-side blocks (0x39FDC0/0x3A18E0, char*0xA0 slices) are BULK-
+    # STAGED through work RAM mid-frame during 2P select/match on
+    # LEGACY paths — an in-place slice edit diverged 03/16 masked for
+    # 3229/2008 frames from select entry (transient: checksum-visible,
+    # frame-done-dump-invisible). Any fix needs the staging reader
+    # decoded first (STATE 14t). The mechanism map (side table
+    # CODE:0x38C298, vs2 0x396C94 -> blocks 0x3B727C/0x3B8EDC, Donovan
+    # char 0x13) is correct and kept for that next attempt.
+
     # dedupe tile pairs (blocks may overlap between records)
     seen = {}
     for s, t in tile_pairs:

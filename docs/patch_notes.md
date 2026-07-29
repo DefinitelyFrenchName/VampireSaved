@@ -455,3 +455,30 @@ latent menu bug fixed):
   oracle + dual-emulator + flavor ALL PASS, menu pixels vanilla-exact,
   global pool byte-identical to vanilla outside the five unshared
   list writes.
+
+Session 14t (win-quote palette: mechanism decoded, port REVERTED by
+the masked gate; quote-screen coverage begun):
+- Round 17 (maintainer): menus confirmed clean on 37269fff.
+- WIN/QUOTE PALETTE MECHANISM fully decoded (static): winner rows
+  0x16-0x1F upload from per-SIDE blocks (side table CODE:0x38C298 ->
+  vsavj P1/P2 0x39FDC0/0x3A18E0) with char*0xA0 slices; vs2 analog
+  0x396C94 -> 0x3B727C/0x3B8EDC, Donovan char 0x13. Secondary paths:
+  char*0x60 reader (same blocks, ~0x1C42E), select-grid variant-10 row
+  (already ported), sprite-table path (already ported).
+- The in-place slice port FAILED the masked gate: 03/16 diverged
+  3229/2008 frames from select entry — the blocks are BULK-STAGED
+  through work RAM mid-frame on legacy 2P paths (transient divergence:
+  visible to the earlier-in-frame checksum sample, invisible to
+  frame-done dumps — a nasty diagnosis; two whole verification rounds
+  were invalidated by dump-read perturbation of the QSound latch
+  before the mechanism emerged). REVERTED to 37269fff byte-exact;
+  the fix needs the staging reader decoded (slot-conditional at the
+  reader, or staged-buffer-aware masking with maintainer sign-off).
+- NEW REPLAY 28_don_quotewin (evolved from 23, which LOSES on current
+  builds — CPU KOs idle Donovan in round 3): wins the match, reaches
+  the "1 WEEK" story card and the continue/quote screen family —
+  the suite's first post-match-screen coverage.
+- New cosmetics logged: LOSS-path quote/continue screen shows JEDAH's
+  win-quote art; (from earlier this session) the map/continue screen
+  shows correct Donovan art+name.
+- Shipping stays 37269fff; gates green incl. the pixel menu gate.

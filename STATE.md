@@ -5,6 +5,26 @@ cf2109d8 pending gates+playtest: Anita/sword/statue render in-match
 and on the win screen; 3 residual sites excluded; session 14q parked
 state superseded)
 
+## Session 14t (win-quote palette: decoded, port REVERTED by the gate)
+
+- Round 17: menus clean. The palette chain is fully decoded (see
+  patch_notes 14t) but the in-place slice port DIVERGED legacy 2P
+  replays (03/16, 3229/2008 frames from select entry): the per-side
+  blocks are bulk-staged through work RAM MID-FRAME on legacy paths —
+  transient divergence visible only to the checksum's sample point.
+  Reverted; shipping stays 37269fff. Next attempt needs the staging
+  reader decoded (find the mid-frame copier of 0x39FDC0/0x3A18E0 and
+  make its slot-0F slice source conditional), or a maintainer-approved
+  masking amendment for the staging buffer.
+- Diagnostic GOTCHA earned: per-frame unmasked checksum/dump runs READ
+  the QSound latch and perturb both builds identically — legacy
+  comparisons must replicate the gate's exact mask set, and mid-frame
+  transients require comparing at the checksum's sample point, not
+  frame-done dumps.
+- NEW REPLAY 28_don_quotewin: wins a match (23 turned out to LOSE on
+  current builds), reaches the story card + continue/quote screens.
+  New cosmetic: loss-path quote screen shows Jedah's win-quote art.
+
 ## Session 14s (playtest round 16: overlay REVERTED; pixel gate born)
 
 - Round 16 (maintainer): Anita/Donovan render correctly BUT (1) the

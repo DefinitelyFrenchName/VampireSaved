@@ -504,3 +504,22 @@ test_m2b_stage6.sh):
    host's coordinates and the ported art draws at the host position).
    The pixel gate is the detector for class 3; the masked gate for
    class 4 — it takes BOTH to make pool surgery safe.
+
+## Mid-frame transients and perturbing probes (win-palette post-mortem)
+
+Two diagnosis traps from session 14t, each of which produced a round of
+false conclusions before the mechanism emerged:
+1. The masked checksum samples EARLIER in the frame than DUMPS do. A
+   divergence in data that is staged into work RAM mid-frame and
+   reused/cleared by frame-done is checksum-visible but INVISIBLE to
+   frame-done dumps — comparing dumps "at the divergent frame" showed
+   byte-identical RAM while 3229 frames of checksums diverged. To
+   inspect a masked-gate divergence, compare at the checksum's sample
+   point (or diff the checksum halves to localize, then trace writes).
+2. Per-frame UNMASKED checksums (and dumps spanning $FF043C) READ the
+   QSound handshake latch and perturb the run — both builds get
+   perturbed identically, so a live patched-vs-vanilla comparison can
+   look clean while the gate's masked (non-perturbing) runs genuinely
+   diverge. Legacy comparisons must replicate the gate's exact mask
+   set. (This also likely explains the session-14 standing-watch gate
+   anomaly: mixed-mask runs are not comparable.)
