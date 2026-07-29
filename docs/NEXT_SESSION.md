@@ -1,5 +1,27 @@
 # NEXT_SESSION — 60-second orientation (rewritten every session end)
 
+As of 2026-07-29 (end of the marathon session 14): M2a FROZEN (a02aeeff),
+M2b-CORE FROZEN (71601263, registry donovan-m2b). Current candidate
+8248296e: select screen fully correct (portrait/name/palettes), VS
+splash correct, win-quote portrait correct. OPEN (diagnosed, plans in
+STATE 14i-b + engine_internals): (1) THE EFFECT TAIL — elemental-sword
+specials (623P/214K) and sword glint lost art (the x2b7ef4 385-tile
+relocated-content tail; block-content match + place + remap; the main
+next chunk); (2) win-quote palette (mechanism pinned: table 0x7F196
+family + ramp blocks ~0x3A14xx; transient pointers => repoint-safe);
+(3) wheel mugshot face (scroll art), HUD name label, quote text line,
+attract palette. Win-quote left-side layout = host-engine design,
+recorded as a feel item.
+
+Tools: select_port.py (in-place record surgery — READ ITS HEADER),
+obj_records.py, gfx_tiles.py, build_gfx_donovan.py, verify_gfx_build.py,
+trace_writes.lua (WATCH=addr,len,r|w|b). GOTCHAS: the three superset
+traps (pokes/budgets/shared-lists) — read before ANY new surgery.
+
+Build: GEN_FLAGS="--allow-plausible --tripwire-open"
+tools/build_donovan.sh 6 build/donovan6. Gates: tests/test_m2b_stage6.sh
+x2 + oracle/xemu/flavor + scroll3.
+
 As of 2026-07-28, end of session 14. **M2a IS FROZEN** and
 **M2b-CORE IS FROZEN** (`71601263474dfd7e4afd0741dae696cde22eda4e` ->
 expectation set `donovan-m2b`; build with

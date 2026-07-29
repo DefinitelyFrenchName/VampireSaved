@@ -31,7 +31,26 @@ follow-up)
   by pure fingerprint auto-detection — the one-command-validates-any-
   build doctrine is now real for hooked builds.
 
-## Session 14i (playtest round 9 diagnosis — three work items scoped)
+## Session 14i-b (round-9 mechanisms pinned; implementation next)
+
+- WIN-QUOTE "left shift" = NOT a defect: both records' coords are
+  identically centered on the object anchor; vsavj's own win-screen
+  layout places the winner's art LEFT (Bulleta's screen confirms).
+  Recorded as a feel item (default = host layout); no code change.
+- WIN-QUOTE PALETTE mechanism found: per-char pointer table at CODE
+  0x7F196 (PC-relative, indexed by winner char*4 from $140(a5), rows to
+  palette RAM 0x17 band) + the ramp path (PC 0x153C2, per-char fade
+  blocks ~0x3A14xx, seeding chain via the win module scripts at
+  0x7E662). Pointers are consumed transiently (A0, никогда stored) —
+  unlike the record cells, ROW REPOINTS ARE RAM-INVISIBLE here: plan =
+  place Donovan's vs2 win-palette blocks (vs2 twin tables to locate by
+  the same code idiom) in Jedah's freed region + repoint row 0x0F in
+  the vsavj tables. Verify with the masked gate as always.
+- Effect tail (elemental swords/sword glint): plan unchanged
+  (block-content matching + placement + record remap) — next session's
+  main chunk with fresh context.
+
+## (earlier same session) Playtest round 9 diagnosis
 
 Playtest round 9 (on 8248296e): win-quote ASSETS correct but palette
 wrong + image shifted left (vs2 layout is right-side); Donovan's sword
