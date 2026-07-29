@@ -39,6 +39,26 @@ next surgery; M2a frozen a02aeeff…, M2b-core frozen 71601263…)
   tests/lua/obj_record_full_trace.lua (all six fmt handlers via the
   0x1AFBA jump table — vsav2 sibling addresses in header),
   tools/gen_anita_bank2.py.
+- **Overlay strip inventory MEASURED** (exact, RAM-dump method — the
+  debugger-desync gotcha rules out bp traces for this): 16 sub-objects
+  $FFB800-$FFBF80, all bank #$2000, cursors in Jedah strip pages
+  0x267xxx/0x268xxx (b800/b880 also walk engine-shared strips
+  0x15Axxx); b900/b980/ba00 dual-phase to bank #$4000 with PORTED
+  cursors (0x0E2xxx sword-anim / 0x0DDxxx / 0x0F619C feet — already
+  correct). Cursor-setter decoded: engine routine 0x15082 computes
+  cursor = T + T[2*id] (T = per-char self-relative word-offset table;
+  Jedah's T = 0x2671C6 measured at one call). vs2 sibling: same 16-slot
+  population walks Donovan strips 0x2A0Axx-0x2A1Cxx → records
+  0x2A1DAE-0x2A3F80 (codes 0xA3E8-0xA499, bank 1).
+- **Stage-7 surgery sketch (next)**: port vs2 overlay region
+  (~[0x2A05E2,0x2A4000), bounds to refine) as a new manifest region;
+  reroute the char-0x0F strip-base lookup (find who loads T=0x2671C6 —
+  per-char table row or computed; repoint to the ported copy); bank-1
+  code triage via the effect-tail classes; coordinate cptrs via the
+  pool content-match; placement needs ~15KB (hole A ~0xE80 + hole B
+  ~0x650 are TIGHT — space audit first; Jedah dead zones are
+  attract-demo-read, gate-guarded by the frozen-4278 class). Vanilla
+  Jedah strip bytes stay untouched.
 - Throw-damage magnitude (round 13 note "lower than Savior 2"):
   recorded as a maintainer-feel item — the port routes Donovan's raw
   damage through VSAVJ's global defense scaling by design; the oracle

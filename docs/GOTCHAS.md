@@ -411,3 +411,18 @@ and statue belong — the "blinking sword/statue with the same palette"
 (playtest rounds 8-11) is Jedah's overlay animating, not a tile fault.
 Fix class: select_port-style in-place strip+record replacement inside
 Jedah's per-char region (superset traps 1-3 above all apply).
+
+## Debugger stops DESYNC replay frame counting
+
+While a Lua breakpoint/watchpoint holds the CPU, MAME keeps emitting
+video frames: `emu.register_frame_done` fires, the script's frame
+counter inflates past emulated time, and replay INPUT PLAYBACK (keyed
+by that counter) drifts — so every high-frequency breakpoint trace
+runs a silently desynced replay, and its logged frame numbers are not
+comparable to replay.lua frame numbers. (Symptom that exposed it: a
+bpset on a routine proven to run 40+ times logged one hit; a "window
+2596-2600" trace saw a different game moment than the same frames'
+RAM dumps.) Use debugger traces only for EXISTENCE evidence at rare
+events; for anything frame-accurate or complete, use replay.lua DUMPS
+(exact, no debugger) and read state from RAM — companion-slot cursor
+fields survive at frame-done even when the live flag is clear.
