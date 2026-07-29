@@ -523,3 +523,27 @@ false conclusions before the mechanism emerged:
    diverge. Legacy comparisons must replicate the gate's exact mask
    set. (This also likely explains the session-14 standing-watch gate
    anomaly: mixed-mask runs are not comparable.)
+
+## Never write an unverified gap (the Felicia wall-jump lesson)
+
+The generator's auto_tables "gap" heuristic treated untyped gaps
+between per-char tables as more per-char rows and wrote slot-0x0F
+values plus 0x1F "dark mirrors" into them — 42 writes, 31 changing
+vanilla engine bytes. The gaps are JUMP-PHYSICS PARAMETER tables:
+index 0x1F holds the wall-jump-back velocity, and 0xFFFF4800 ->
+0xFFFFEC00 broke Felicia's triangle jump in PURE LEGACY matches
+(rounds 18/19; she rides to Y~0x4AB and wraps). Invisible to every
+gate: no replay played Felicia (coverage), and per-char physics
+tables only surface when that char uses that move. Rules earned:
+1. A gap between known tables is NOT a table row. No write without a
+   decoded consumer — speculative "it's probably the same layout"
+   writes into engine space are how legacy mechanics break.
+2. Restore-bisection (copy vanilla bytes over patched spans in a test
+   rompath) is the reliable attribution method for engine deltas —
+   but spans that cut through EXECUTING ported code crash the boot
+   and read as false "fixed"; harden the verdict with liveness
+   (timer tick + match flag), and treat only same-sign results as
+   evidence.
+3. The per-char-row + dark-mirror assumption must be verified PER
+   TABLE (the bank table has 0x18 rows with 0x10-0x17 dark forms;
+   these physics tables are not char-indexed at all).

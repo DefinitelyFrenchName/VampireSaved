@@ -5,6 +5,32 @@ cf2109d8 pending gates+playtest: Anita/sword/statue render in-match
 and on the win screen; 3 residual sites excluded; session 14q parked
 state superseded)
 
+## Session 14w (FELICIA'S TRIANGLE JUMP: root-caused to the gap-write
+class; gen fixed; REBUILD PENDING vsav.zip restoration)
+
+- Round 19 clarified the float = Felicia's WALL JUMP broken (no wall
+  latch; rises off-screen, wraps twice). New replay 29_felicia_walljump
+  reproduces it deterministically — in a PURE LEGACY match (Felicia vs
+  Bulleta): a superset violation that every RAM gate missed because no
+  replay ever played Felicia and per-char physics only surface in use.
+- Root cause via restore-bisection (31 candidate groups eliminated:
+  winpal, all four engine hooks, the select/pool writes, all data
+  members, per-char table rows): the generator's speculative GAP
+  writes. gap_bdc7a[0x1F] (vanilla 0xFFFF4800, the wall-jump-back
+  velocity) was overwritten with Donovan-derived 0xFFFFEC00. 42 gap
+  writes existed, 31 changing vanilla engine bytes — ALL disabled in
+  the gen (session-14w comment in gen_donovan_patch.py). With every
+  gap restored: Felicia latches at the exact vanilla Y and Donovan
+  soaks clean — the writes were pure harm.
+- ALSO exonerated this session: the 22 overlay thunk sites (CCR
+  audit), the sound-farm stubs (ported-call-only by design).
+- **BLOCKED: vsav.zip is missing from ROMDIR** (folder shows recent
+  Finder activity — likely the maintainer's reorganization; cfg/nvram
+  dirs from some unsandboxed MAME run also present). The audit gate
+  correctly halts all builds. Once restored: rebuild, full battery,
+  freeze 29_felicia_walljump's expectation (vanilla-exact class — it
+  is a LEGACY replay), and re-run the throw-oracle refreeze.
+
 ## Session 14v (grab-pointer work vars fixed — the Felicia float)
 
 - Round 18: quote palette STILL Jedah's => the quote screen consumes

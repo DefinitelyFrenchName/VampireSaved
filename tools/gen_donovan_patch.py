@@ -947,7 +947,18 @@ def main():
                 av, _ = table_entry_addr(v["table"], var_slot)
                 poke_bytes(av, data, f"{v['table']}[{var_slot:#x}] mirror")
         # oracle-classified gap value tables
-        for a_t in man["auto_tables"]:
+        # GAP TABLES DISABLED (session 14w): the auto_tables "gap"
+        # heuristic assumed untyped gaps between per-char tables were
+        # more per-char rows and wrote slot-0x0F "values" + 0x1F "dark
+        # mirrors" into them. They are JUMP-PHYSICS PARAMETER tables
+        # (index 0x1F = the wall-jump-back velocity — vanilla
+        # 0xFFFF4800 became 0xFFFFEC00 and broke Felicia's triangle
+        # jump in pure legacy matches, playtest rounds 18/19; found by
+        # per-op restore bisection). 31 of the 42 gap writes changed
+        # vanilla engine bytes with unverified semantics. NOTHING may
+        # be written to a gap without a decoded consumer. Donovan's
+        # own physics come from his ported regions, not these rows.
+        for a_t in (man["auto_tables"] if False else []):
             if a_t["verdict"] == "pointers":
                 # per-entry union semantics: a ROM-plausible entry hosted by
                 # an extracted region repoints; anything else copies verbatim
@@ -1319,7 +1330,8 @@ def main():
     # uploader) must read copy B at 0x24C3C0. Code space — the imm is
     # re-encrypted by patch_prg's code op. Slot-0x0F-only visual
     # surface; the masked gate arbitrates.
-    if args.stage >= 6:
+    WINPAL_ENABLE = False   # 14w: copies broke Felicia's wall jump
+    if args.stage >= 6 and WINPAL_ENABLE:
         ops.append({"op": "code", "addr": "0x1c426", "hex": "0024c3c0"})
         notes.append("# winpal: 0x1C424 lea imm -> copy B 0x24C3C0")
         # quote-time side-table reader -> the private table. Site
@@ -1329,7 +1341,7 @@ def main():
         # the challenger-join path — all three stage block bytes
         # through work RAM on LEGACY replays and must keep the vanilla
         # table. Only 0x1C1FA is exclusively quote-time.
-        for site in (0x1C1FA,):
+        for site in ((0x1C1FA,) if WINPAL_ENABLE else ()):
             ops.append({"op": "code", "addr": f"{site + 2:#x}",
                         "hex": "0024de00"})
         notes.append("# winpal: 3 quote-site table imms -> 0x24DE00")

@@ -1,0 +1,15 @@
+# 29: Felicia triangle-jump probe (session 14w; playtest rounds 18/19:
+# jump-back never latches the wall on the winpal-copies build — she
+# rises off-screen and wraps vertically twice). Picks Felicia (R,R,U
+# from default = id 0x07), then holds up-back to trigger the wall
+# latch at the left edge, twice.
+300-305 sys=C1
+800-803 sys=S1
+1000-1002 p1=R
+1060-1062 p1=R
+1120-1122 p1=U
+1300-1302 p1=1
+2700-2704 p1=L
+2750-2950 p1=UL
+3100-3300 p1=UL
+4200 wait
