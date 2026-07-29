@@ -219,97 +219,292 @@ def main():
     opsJ = Path(args.ops_vsavj).read_bytes()
     print(f"vsavj opcodes sha1 {hashlib.sha1(opsJ).hexdigest()}")
 
-    # ---- slice + pointer relocation (two-part split) -----------------
-    sl = bytearray(vs2[SLICE_LO:SLICE_HI])
-    n_delta = n_sel = 0
-    warn = collections.Counter()
-    for i in range(0, len(sl) - 4, 2):
-        v = int.from_bytes(sl[i:i + 4], "big")
-        if SLICE_LO <= v < SLICE_HI:
-            sl[i:i + 4] = reloc(v).to_bytes(4, "big")
-            n_delta += 1
-        elif v in SELECT_MAP:
-            sl[i:i + 4] = SELECT_MAP[v].to_bytes(4, "big")
-            n_sel += 1
-        elif 0x2A63F0 <= v < 0x2AA000:
-            warn["select-unported"] += 1
-    print(f"slice: {n_delta} intra-longs rebased (split at "
-          f"0x{SPLIT:06X}), {n_sel} select-mapped, warnings {dict(warn)}")
+    # ---- STRUCTURAL CLOSURE v5: object-granular heap port ------------
+    # The overlay streams reference records across the WHOLE per-char
+    # zone (select/win records at 0x2A65xx-0x2A8Fxx, extras at
+    # 0x2ABxxx), so a fixed slice cannot bound the port. Instead the
+    # closure walk (tables -> streams/strips -> records -> cptr lists)
+    # collects OBJECTS; each is copied into a relocatable heap laid
+    # over Jedah's dead anim areas, with every discovered pointer (and
+    # every table entry, which is SELF-RELATIVE and must be recomputed
+    # against placed addresses) rewritten through the placement map.
+    # Stream node grammar (measured at the table targets): 8-byte
+    # (tag.l, ptr.l) nodes; tag = (duration.b, flags.b, param.w); a
+    # node is accepted iff its ptr validates as a record, a sub-stream,
+    # or a select-mapped record. Termination is data-driven (first
+    # invalid node) — over-walk yields harmless extra objects, never a
+    # corrupting rewrite.
+    ZONE_LO, ZONE_HI = 0x2A0426, 0x2AC000
+    ROOTS = [0x2A04FA, 0x2A051E, 0x2A055C, 0x2A05BC, 0x2A0862,
+             0x2A08E2, 0x2A0962, 0x2A0A62, 0x2A0A96]
 
-    # ---- record walk over the (virtually) placed slice ---------------
-    # placed addr -> offset into `sl` (part A and part B are contiguous
-    # slices of the same buffer; only their placed bases differ)
-    def sloff(v):
-        if PLACE_A <= v < PLACE_A + LEN_A:
-            return v - PLACE_A
-        if PLACE_B <= v < PLACE_B + LEN_B:
-            return LEN_A + (v - PLACE_B)
-        return None
+    def in_zone(v):
+        return ZONE_LO <= v < ZONE_HI
 
     def cptr_ok(c):
         return 0x100000 <= c < 0x400000
 
-    # discovery: every relocated long in `sl` that lands in a placed
-    # window is a candidate record start; validate fmt-aware in place
-    recs, skipped_a = {}, 0
-    for i in range(0, len(sl) - 4, 2):
-        v = int.from_bytes(sl[i:i + 4], "big")
-        o = sloff(v)
-        if o is None or v in recs:
-            continue
-        got, ska = walk_via_offset(sl, o, v, cptr_ok)
-        skipped_a += ska
-        if got is not None:
-            recs[v] = got
-    fmtc = collections.Counter(f for f, _, _ in recs.values())
-    print(f"records: {len(recs)} {dict(fmtc)}; fmtA skipped {skipped_a}")
+    def parse_rec(a):
+        if not in_zone(a) or a % 2:
+            return None
+        got, _ = walk_via_offset(vs2, a, a, cptr_ok)
+        return got
 
-    # cptr fixes: for every record whose cptr still aims at vs2 data
-    # space, content-match the X/Y list into vsavj's data image; misses
-    # are PORTED into the free tail of Jedah's strip area after the
-    # slice (the slice is 24KB into a 44KB budget).
-    tail = bytearray()
-    tail_map = {}
-    TAIL_AT = PLACE_A + LEN_A
-    n_cfix = n_cport = n_ckeep = 0
-    for v, (fmt, cptr, ents) in recs.items():
-        if cptr is None:
-            continue
-        o = sloff(v)
-        if PLACE_A <= cptr < PLACE_A + LEN_A or \
-                PLACE_B <= cptr < PLACE_B + LEN_B:
-            n_ckeep += 1        # already relocated intra-slice pointer
+    def rec_size(fmt, ents):
+        if fmt in (0, 6):
+            return 10 + 2 * len(ents)
+        if fmt in (2, 8):
+            return 10 + 4 * len(ents)
+        return 14  # fmt 4: fmt.w budget.w count.w tile_attr.l xy.l
+
+    recs, tables, streams, strips = {}, {}, {}, {}
+    # per-object pointer sites: {obj_addr: [(off_in_obj, target_addr)]}
+    obj_ptrs = {}
+
+    def visit_record(a):
+        if a in recs:
+            return True
+        got = parse_rec(a)
+        if got is None:
+            return False
+        recs[a] = got
+        return True
+
+    def visit_stream(a, depth=0):
+        # NOTE (session 14q handoff): nodes are (tag.l, ptr.l) at
+        # stride 8 here, but the engine's stepper family also walks
+        # 0x10- and 0x18-stride node forms — the stride is a property
+        # of the OBJECT's stepper class (engine 0x15030-0x15080 lea
+        # variants), not derivable from the data (a longest-run
+        # heuristic mis-strides real 8-streams and corrupts them).
+        # The stepper-class -> table mapping is the remaining decode
+        # before the closure is complete.
+        if a in streams or depth > 12 or not in_zone(a) or a % 2:
+            return a in streams
+        streams[a] = 0
+        sites = []
+        o, n = a, 0
+        while in_zone(o + 8):
+            ptr = int.from_bytes(vs2[o + 4:o + 8], "big")
+            if ptr == 0:
+                o += 8
+                n += 1
+                continue
+            ok = (visit_record(ptr) or ptr in SELECT_MAP
+                  or visit_stream(ptr, depth + 1))
+            if not ok:
+                break
+            sites.append((o + 4 - a, ptr))
+            o += 8
+            n += 1
+            if n > 0x400:
+                break
+        if n == 0:
+            del streams[a]
+            return False
+        streams[a] = 8 * n + 8
+        obj_ptrs[a] = sites
+        return True
+
+    def visit_strip(a):
+        if a in strips or not in_zone(a) or a % 2:
+            return a in strips
+        strips[a] = 0
+        sites = []
+        o, n = a, 0
+        while in_zone(o + 4):
+            v = int.from_bytes(vs2[o:o + 4], "big")
+            if visit_record(v) or v in SELECT_MAP:
+                sites.append((o - a, v))
+                o += 4
+                n += 1
+                continue
+            break
+        if n == 0:
+            del strips[a]
+            return False
+        strips[a] = 4 * n + 4
+        obj_ptrs[a] = sites
+        return True
+
+    def visit_whdr_strip(a):
+        """grammar 4: leading word, then a bare long-pointer array at
+        a+2 (measured at the 0x2A0862-family table targets)"""
+        if a in strips or not in_zone(a) or a % 2:
+            return a in strips
+        strips[a] = 0
+        sites = []
+        o, n = a + 2, 0
+        while in_zone(o + 4):
+            v = int.from_bytes(vs2[o:o + 4], "big")
+            if visit_record(v) or v in SELECT_MAP:
+                sites.append((o - a, v))
+                o += 4
+                n += 1
+                continue
+            break
+        if n == 0:
+            del strips[a]
+            return False
+        strips[a] = 2 + 4 * n + 4
+        obj_ptrs[a] = sites
+        return True
+
+    for T in ROOTS:
+        entries, bound, k = [], ZONE_HI, 0
+        while T + 2 * k + 2 <= min(bound, ZONE_HI) and k < 0x100:
+            off = int.from_bytes(vs2[T + 2 * k:T + 2 * k + 2], "big")
+            soff = off - 0x10000 if off >= 0x8000 else off
+            tgt = T + soff
+            if not in_zone(tgt):
+                break
+            entries.append(tgt)
+            if tgt > T:
+                bound = min(bound, tgt)
+            k += 1
+        tables[T] = entries
+        for tgt in entries:
+            (visit_stream(tgt) or visit_strip(tgt)
+             or visit_whdr_strip(tgt) or visit_record(tgt))
+
+    fmtc = collections.Counter(f for f, _, _ in recs.values())
+    print(f"closure: {len(tables)} tables "
+          f"({sum(len(e) for e in tables.values())} entries), "
+          f"{len(streams)} streams, {len(strips)} strips, "
+          f"{len(recs)} records {dict(fmtc)}")
+
+    # cptr lists as objects (content-matched first, ported if missing)
+    cptr_objs = {}
+    for a, (fmt, cptr, ents) in recs.items():
+        if cptr is None or in_zone(cptr):
             continue
         if not (0x100000 <= cptr < 0x400000):
             continue
-        npairs = len(ents)
-        lst = bytes(vs2[cptr:cptr + 4 * npairs])
+        lst = bytes(vs2[cptr:cptr + 4 * len(ents)])
         j = vandata.find(lst)
-        if j != -1:
-            sl[o + 6:o + 10] = (j + 0x100000).to_bytes(4, "big")
-            n_cfix += 1
-        else:
-            if lst not in tail_map:
-                tail_map[lst] = len(tail)
-                tail += lst
-            addr = TAIL_AT + tail_map[lst]
-            sl[o + 6:o + 10] = addr.to_bytes(4, "big")
-            n_cport += 1
-    assert TAIL_AT + len(tail) <= GAP_A_HI, "tail overflows gap A"
-    print(f"cptrs: {n_ckeep} intra-slice, {n_cfix} content-matched, "
-          f"{n_cport} ported to tail ({len(tail)}B at 0x{TAIL_AT:06X})")
+        if j == -1 and cptr not in cptr_objs:
+            cptr_objs[cptr] = 4 * len(ents)
+    print(f"cptr lists: {len(cptr_objs)} need porting")
 
-    # ---- tile placement ----------------------------------------------
-    # census of needed (drawn) codes with block geometry
+    # ---- heap packing -------------------------------------------------
+    HEAPS = [[0x248D80, 0x250100], [0x2557B0, 0x260200]]
+    MAP = {}
+
+    def heap_alloc(size):
+        for h in HEAPS:
+            if h[0] + size <= h[1]:
+                a = h[0]
+                h[0] = (h[0] + size + 1) & ~1
+                return a
+        raise SystemExit(f"heap overflow allocating {size}")
+
+    # a safe terminator object for dead table entries: an immediately
+    # invalid stream node (zero tag) — never a self-pointer into the
+    # table (a walker landing there would read table words as nodes)
+    TERM = heap_alloc(8)
+    # tables first (poke targets), then streams/strips/records/cptrs
+    for T in ROOTS:
+        MAP[T] = heap_alloc(2 * len(tables[T]))
+    for a, sz in sorted(streams.items()):
+        MAP[a] = heap_alloc(sz)
+    for a, sz in sorted(strips.items()):
+        MAP[a] = heap_alloc(sz)
+    for a, (fmt, cptr, ents) in sorted(recs.items()):
+        MAP[a] = heap_alloc(rec_size(fmt, ents))
+    for a, sz in sorted(cptr_objs.items()):
+        MAP[a] = heap_alloc(sz)
+    used = [f"{h[0] - lo:#x}/{hi - lo:#x}"
+            for h, (lo, hi) in zip(HEAPS, [(0x248D80, 0x250100),
+                                           (0x2557B0, 0x260200)])]
+    print(f"heap usage: A {used[0]}, B {used[1]}")
+
+    def mapped(v):
+        if v in MAP:
+            return MAP[v]
+        if v in SELECT_MAP:
+            return SELECT_MAP[v]
+        return None
+
+    # ---- materialize the heap image ----------------------------------
+    # two segment buffers, offsets relative to their heap bases
+    segs = {0x248D80: bytearray(HEAPS[0][0] - 0x248D80),
+            0x2557B0: bytearray(HEAPS[1][0] - 0x2557B0)}
+
+    def seg_of(addr):
+        for base, buf in segs.items():
+            if base <= addr < base + len(buf):
+                return base, buf
+        raise SystemExit(f"address {addr:#x} outside heap segments")
+
+    def write_at(addr, data):
+        base, buf = seg_of(addr)
+        buf[addr - base:addr - base + len(data)] = data
+
+    # tables: recompute self-relative entries against placed addresses
+    for T in ROOTS:
+        nt = MAP[T]
+        # verbatim copy first: over-walked "entries" may be neighboring
+        # data misread as offsets — fabricating words there corrupts it.
+        # Only entries whose targets VALIDATED in the closure are
+        # recomputed; the rest keep their pristine words (their runtime
+        # cursors would be garbage relative to the new base, but ids
+        # that never validated are ids the closure believes unused —
+        # gate/playtest arbitrates).
+        out_words = bytearray(vs2[T:T + 2 * len(tables[T])])
+        live = 0
+        for k, tgt in enumerate(tables[T]):
+            m = mapped(tgt)
+            if m is None:
+                continue
+            d = (m - nt) & 0xFFFF
+            out_words[2 * k:2 * k + 2] = d.to_bytes(2, "big")
+            live += 1
+        print(f"  table {T:06X}: {live}/{len(tables[T])} entries live")
+        write_at(nt, out_words)
+    # streams/strips: raw copy + pointer rewrites
+    for a in list(streams) + list(strips):
+        sz = streams.get(a) or strips[a]
+        blob = bytearray(vs2[a:a + sz])
+        for off, tgt in obj_ptrs[a]:
+            m = mapped(tgt)
+            if m is not None:
+                blob[off:off + 4] = m.to_bytes(4, "big")
+        write_at(MAP[a], blob)
+    # records: copy, fix cptr (heap tail/content-match), tiles later
+    n_cfix = n_cport = n_ckeep = 0
+    for a, (fmt, cptr, ents) in recs.items():
+        sz = rec_size(fmt, ents)
+        blob = bytearray(vs2[a:a + sz])
+        if cptr is not None:
+            if in_zone(cptr):
+                m = mapped(cptr)
+                blob[6:10] = (m if m is not None else cptr).to_bytes(4, "big")
+                n_ckeep += 1
+            elif 0x100000 <= cptr < 0x400000:
+                lst = bytes(vs2[cptr:cptr + 4 * len(ents)])
+                j = vandata.find(lst)
+                if j != -1:
+                    blob[6:10] = (j + 0x100000).to_bytes(4, "big")
+                    n_cfix += 1
+                else:
+                    blob[6:10] = MAP[cptr].to_bytes(4, "big")
+                    n_cport += 1
+        write_at(MAP[a], blob)
+    for a, sz in cptr_objs.items():
+        write_at(MAP[a], vs2[a:a + sz])
+    print(f"cptrs: {n_ckeep} intra-zone, {n_cfix} content-matched, "
+          f"{n_cport} heap-ported")
+
+    # ---- tile placement (heap-record entries) ------------------------
     need = {}
-    for v, (fmt, cptr, ents) in recs.items():
+    for a, (fmt, cptr, ents) in recs.items():
         for eoff, stored, attr in ents:
             d = drawn_code(fmt, stored)
-            a = attr if attr is not None else int.from_bytes(
-                sl[eoff + 2:eoff + 4], "big")
-            bx = ((a >> 8) & 15) + 1
-            by = ((a >> 12) & 15) + 1
-            need.setdefault((d, bx, by), []).append((v, eoff, fmt))
+            at = attr if attr is not None else int.from_bytes(
+                vs2[eoff + 2:eoff + 4], "big")
+            bx = ((at >> 8) & 15) + 1
+            by = ((at >> 12) & 15) + 1
+            need.setdefault((d, bx, by), []).append((a, eoff - a, fmt))
     cells_needed = set()
     for (d, bx, by) in need:
         for dy in range(by):
@@ -317,22 +512,27 @@ def main():
                 cells_needed.add((d & ~0xF) + (dy << 4) + ((d + dx) & 0xF))
     print(f"blocks: {len(need)}, unique cells {len(cells_needed)}")
 
-    # free bank-1 positions: Jedah's dead overlay drawn codes
     def j_cptr_ok(c):
         return 0x100000 <= c < 0x400000
     jrecs, _ = walk_records(vandata, 0x100000, 0x267112, 0x2748F0,
                             j_cptr_ok)
-    KEEP = {0x272FB0, 0x272FDA}   # legacy-read records — codes stay live
+    # also Jedah's in-match anim-area records (0x248D5C-0x2601EC — the
+    # very area the heap overwrites): their drawn bank-1 codes are dead
+    # once the area is unreachable (slot 0x0F always runs Donovan)
+    jrecs2, _ = walk_records(vandata, 0x100000, 0x248000, 0x260200,
+                             j_cptr_ok)
+    jrecs.update(jrecs2)
+    KEEP = {0x272FB0, 0x272FDA}
     jfree = set()
     for v, (fmt, cptr, ents) in jrecs.items():
         if v in KEEP:
             continue
         for eoff, stored, attr in ents:
             d = drawn_code(fmt, stored)
-            a = attr if attr is not None else int.from_bytes(
+            at = attr if attr is not None else int.from_bytes(
                 vandata[eoff + 2:eoff + 4], "big")
-            bx = ((a >> 8) & 15) + 1
-            by = ((a >> 12) & 15) + 1
+            bx = ((at >> 8) & 15) + 1
+            by = ((at >> 12) & 15) + 1
             for dy in range(by):
                 for dx in range(bx):
                     jfree.add((d & ~0xF) + (dy << 4) + ((d + dx) & 0xF))
@@ -340,9 +540,7 @@ def main():
         if v not in KEEP:
             continue
         for eoff, stored, attr in ents:
-            d = drawn_code(fmt, stored)
-            jfree.discard(d)
-    # exclude positions already claimed by select_tiles / effect placements
+            jfree.discard(drawn_code(fmt, stored))
     for claimed in ("build/donovan6/select_tiles.json",
                     "build/donovan/select_tiles.json"):
         cp = Path(claimed)
@@ -354,9 +552,6 @@ def main():
     print(f"free bank-1 positions: {len(jfree)} dead-Jedah + "
           f"{len(pad)} padding = {len(freelist)}")
 
-    # 16-aligned shelf packing of needed blocks into free positions:
-    # greedy row-fit — a block (bx,by) needs bx consecutive columns on
-    # by consecutive rows at the same column window (row stride 16).
     free = set(freelist)
     place = {}
     def fits(base, bx, by):
@@ -382,23 +577,19 @@ def main():
             print(f"  !! no fit for block {d:04X} {bx}x{by}")
     print(f"placed {len(place)}/{len(need)} blocks")
 
-    # rewrite stored codes in the slice
     n_rw = 0
     for key, entlist in need.items():
         base = place.get(key)
         if base is None:
             continue
-        d, bx, by = key
-        for v, eoff, fmt in entlist:
-            new_drawn = base
-            stored = (new_drawn - 0x3800) & 0xFFFF if fmt in (4, 6, 8) \
-                else new_drawn
-            sl[eoff:eoff + 2] = stored.to_bytes(2, "big")
+        for a, rel_off, fmt in entlist:
+            stored = (base - 0x3800) & 0xFFFF if fmt in (4, 6, 8) else base
+            ha = MAP[a] + rel_off
+            hb, hbuf = seg_of(ha)
+            hbuf[ha - hb:ha - hb + 2] = stored.to_bytes(2, "big")
             n_rw += 1
     print(f"tile words rewritten: {n_rw}")
 
-    # tile pairs [src_code, dst_code] (bank-1 codes; the gfx step adds
-    # the 0x10000 group-A offset — same convention as select_tiles.json)
     pairs = []
     for (d, bx, by), base in place.items():
         for dy in range(by):
@@ -406,7 +597,6 @@ def main():
                 s_ = (d & ~0xF) + (dy << 4) + ((d + dx) & 0xF)
                 t_ = (base & ~0xF) + (dy << 4) + ((base + dx) & 0xF)
                 pairs.append([s_, t_])
-    # dedup (blocks sharing cells)
     pairs = sorted({tuple(p) for p in pairs})
     print(f"tile pairs: {len(pairs)}")
 
@@ -425,7 +615,10 @@ def main():
                 # suggests an immediate/absolute long operand.
                 if op in (0x207C, 0x227C, 0x247C, 0x267C, 0x287C, 0x2A7C,
                           0x2C7C, 0x4879) or (op & 0xF1FF) == 0x41F9:
-                    new = reloc(v2)
+                    if v2 not in MAP:
+                        j = opsJ.find(pat, j + 1)
+                        continue
+                    new = MAP[v2]
                     sites.append({"addr": j, "op": f"{op:04X}",
                                   "old": f"{vj:06X}", "new": f"{new:06X}"})
             j = opsJ.find(pat, j + 1)
@@ -446,14 +639,14 @@ def main():
 
     out = Path(args.out)
     out.mkdir(parents=True, exist_ok=True)
-    segA = bytes(sl[:LEN_A]) + bytes(tail)
-    segB = bytes(sl[LEN_A:])
+    segA = bytes(segs[0x248D80])
+    segB = bytes(segs[0x2557B0])
     (out / "overlay_segA.bin").write_bytes(segA)
     (out / "overlay_segB.bin").write_bytes(segB)
     json.dump({"segments": [
-                   {"at": f"{PLACE_A:06X}", "path": "overlay_segA.bin",
+                   {"at": "248D80", "path": "overlay_segA.bin",
                     "len": len(segA)},
-                   {"at": f"{PLACE_B:06X}", "path": "overlay_segB.bin",
+                   {"at": "2557B0", "path": "overlay_segB.bin",
                     "len": len(segB)}],
                "pokes": sites}, (out / "overlay_patch.json").open("w"),
               indent=1)

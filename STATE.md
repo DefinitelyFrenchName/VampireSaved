@@ -45,6 +45,31 @@ playtest-confirmed round 14); M2a frozen a02aeeff…, M2b-core frozen
 - New GOTCHAS: attract-cutscene-is-Jedah (conditional thunks), music
   pool interleave (watchpoint read maps have a computed-addressing
   blind spot), blind relocation corrupts mixed data blobs.
+- **14q continuation (same session): closure v5 built and iterated.**
+  Object-granular heap port (closure walk tables->strips/streams->
+  records; heap over Jedah's dead anim areas; per-object placement
+  map; table entries recomputed only when validated, verbatim
+  otherwise). Grammar discoveries, each verified against data:
+  (1) stream nodes = (tag.l, ptr.l) stride 8, tag = (duration.b,
+  flags.b, param.w), NULL-ptr nodes legal ("no record this phase");
+  (2) grammar-4 = word header + bare long array at +2 (the
+  0x2A0862-family targets); (3) fmt4 record size is 14B; (4) the
+  engine stepper family ALSO walks 0x10/0x18-stride node forms —
+  stride is an OBJECT-STEPPER-CLASS property (0x15030-0x15080 lea
+  variants), NOT table- or data-derivable (a longest-run stride
+  heuristic corrupts real 8-streams — measured, reverted).
+  Probe results (detector: round-timer tick + match flag — earlier
+  detectors were fooled by watchdog reboots keeping stale RAM):
+  data-only ALIVE and legacy-clean; pokes for the 2671C6/267224/
+  267284 tables ALIVE through round start but CRASH ON THE FIRST
+  623P (attack-id-indexed entries hit still-dead table slots);
+  2671E6 (attack-id table, walker 0x15084/inline variants) worst.
+  REMAINING DECODE: map each poked table to its stepper class
+  (which stride its streams use) — then re-walk dead entries with
+  the right stride and the closure should complete. All probe
+  tooling: /Users/koneko/.claude/jobs/*/tmp/donprobe.sh pattern
+  (rebuild-with-poke-subset + timer-tick verdict), op_v5_all.json
+  site list. Shipping build re-parked at f29cf24a.
 
 ## Session 14p (feet fixed; blink mechanism = Jedah's overlay records)
 
