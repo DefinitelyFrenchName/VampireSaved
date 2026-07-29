@@ -428,3 +428,30 @@ Session 14r (COMPANION OVERLAY SHIPPED — sword/statue/Anita in-match):
   truncating. Soaked past frame 8800 clean.
 - Fingerprint cf2109d8 (deterministic re-emit via the baked-in
   VERIFIED_SITES/KILLER_SITES policy in tools/overlay_port.py).
+
+Session 14s (round-16 regressions: overlay reverted, pixel gate born,
+latent menu bug fixed):
+- Playtest round 16: the overlay build corrupted title/select/menu
+  graphics (the tile pool's "OBJ-dead" positions back scroll-layer
+  tiles — CPS-2 layers share ROM bytes) and the red/purple flicker
+  persisted (unpoked table families). Overlay PARKED
+  (build/manifest/overlay.wip); shipping reverted to the feet-fix
+  lineage.
+- NEW PERMANENT GATE: tests/test_gfx_menus.sh — pixel-exact
+  title/select/speed-menu comparison vs frozen vanilla goldens
+  (tests/expected/vsavj/menus/), wired into test_m2b_stage6.sh. RAM
+  and VRAM gates are provably blind to gfx ROM content and to
+  coordinate lists (they flow ROM -> OBJ RAM at draw).
+- The gate's FIRST RUN caught a latent shipped bug: speed-menu
+  TURBO/AUTO text 8px off since the select-screen work. Mechanism:
+  Jedah's 1-pair name-banner coordinate list [0x32A196,0x32A19A) IS
+  the menu record's first pair (the pool nests lists). First fix
+  (relocate lists + repoint cptrs) FAILED the masked gate — cptr
+  values are RAM-visible on select paths (fourth stored-anchor
+  class). Final: cptrs untouched; SHARED lists never written
+  (select_port.py SHARED_LISTS); Donovan's banner draws at the host
+  position.
+- Fingerprint 37269fff: double M2b gate (now incl. the pixel gate) +
+  oracle + dual-emulator + flavor ALL PASS, menu pixels vanilla-exact,
+  global pool byte-identical to vanilla outside the five unshared
+  list writes.

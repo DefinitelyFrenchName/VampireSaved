@@ -5,6 +5,37 @@ cf2109d8 pending gates+playtest: Anita/sword/statue render in-match
 and on the win screen; 3 residual sites excluded; session 14q parked
 state superseded)
 
+## Session 14s (playtest round 16: overlay REVERTED; pixel gate born)
+
+- Round 16 (maintainer): Anita/Donovan render correctly BUT (1) the
+  red/purple flicker persists over the grey sword/statue (unpoked
+  table families still draw Jedah art on top) and (2) MASSIVE menu
+  corruption: title, select, speed menus, VS portraits garbled.
+- Overlay PARKED again (build/manifest/overlay.wip). Cause of (2):
+  the tile pool used OBJ-dead positions whose BYTES back scroll-layer
+  menu art — CPS-2 scroll1/2/3 decode the same ROM bytes (GOTCHAS).
+  Every RAM gate was green throughout: gfx is invisible to RAM-basis
+  comparison. The overlay redesign needs a BYTE-dead pool.
+- **NEW GATE**: tests/test_gfx_menus.sh — pixel-exact comparison of
+  title/select/speed-menu frames vs frozen vanilla goldens
+  (tests/expected/vsavj/menus/), wired into test_m2b_stage6.sh. On its
+  first run it caught a LATENT SHIPPED BUG: the speed-menu TURBO/AUTO
+  text sat 8px off since the select-screen work — select_port's
+  in-place coordinate write hit one byte of the menu record's list
+  (head shared inside Jedah's banner list span). First fix attempt
+  (relocate all lists + repoint cptrs) FAILED the masked gate —
+  cptr values are RAM-visible on select paths (fourth stored-anchor
+  class; 02/03/08 diverged at ~820). Final fix: cptrs untouched,
+  in-place list writes kept, and SHARED lists (the banner's) simply
+  not written — Donovan's banner draws at Jedah's position. Shipping
+  fingerprint 37269fff; pixel gate green; full battery at session
+  end.
+- Overlay next steps (with the WIP): byte-dead tile pool (candidates:
+  bytes of Jedah band art already replaced in group B — his band
+  minus scroll-shared spans, TBD by a scroll-usage census — plus 0xFF
+  padding); the red/purple flicker = the unpoked families
+  (0x2675AA/0x26772A/0x26775A + dead-entry tables).
+
 ## Session 14r (overlay port COMPLETED to a 22-site shipping config)
 
 - Round 15 (maintainer): no regressions on f29cf24a.

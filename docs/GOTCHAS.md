@@ -473,3 +473,34 @@ streams + records + coordinate runs) the rewrite set must come from a
 STRUCTURAL CLOSURE walk (tables -> strips -> streams -> records),
 never from a flat scan. The closure requires decoding the stream node
 language first — that is the stage-7 blocker, not the architecture.
+
+## GFX and coordinate data are INVISIBLE to every RAM-basis gate
+
+Playtest round 16: the overlay build's tile placements corrupted the
+title screen, select screen and speed menus — and the full masked
+legacy battery stayed green, twice. Three distinct blind spots, now
+covered by the pixel gate (tests/test_gfx_menus.sh, wired into
+test_m2b_stage6.sh):
+1. TILE ROM CONTENT: work-RAM checksums never see gfx ROM bytes. Any
+   wrong placement renders garbage with perfect RAM.
+2. SCROLL/OBJ BYTE SHARING: CPS-2 scroll1/2/3 layers decode THE SAME
+   ROM bytes as OBJ tiles at different granularities. An "OBJ-dead"
+   position proves nothing about the scroll tiles backed by those
+   bytes — the overlay's dead-Jedah OBJ pool trashed menu tilemap art.
+   A placement pool must be BYTE-dead for every consumer, not
+   index-dead for one decoder. (The proven-safe classes so far: bytes
+   of art the port itself replaced, and 0xFF padding runs.)
+3. COORDINATE LISTS flow ROM -> OBJ RAM at draw time, never through
+   work RAM. select_port's in-place list write shifted the speed-menu
+   TURBO/AUTO text 8px for seven shipped builds: Jedah's 1-pair
+   name-banner list [0x32A196,0x32A19A) IS the speed-menu record's
+   first coordinate pair — the pool nests lists inside lists.
+4. ...but CPTR VALUES ARE RAM-VISIBLE (the fourth stored-anchor
+   class): relocate-and-repoint diverged 02/03/08 masked at select
+   entry (~frame 820) — select-screen init caches list pointers into
+   work RAM on legacy paths. The working rule pair: NEVER change a
+   host record's cptr, and NEVER write pool bytes another consumer
+   shares (SHARED_LISTS in select_port.py; shared lists keep the
+   host's coordinates and the ported art draws at the host position).
+   The pixel gate is the detector for class 3; the masked gate for
+   class 4 — it takes BOTH to make pool surgery safe.

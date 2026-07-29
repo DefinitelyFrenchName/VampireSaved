@@ -149,6 +149,13 @@ def u32(d, o):
     return int.from_bytes(d[o:o + 4], "big")
 
 
+# Coordinate lists shared with other consumers (session 14s): Jedah's
+# name-banner list [0x32A196,0x32A19A) doubles as the speed-menu text
+# record's first pair. Shared lists are never written (see the surgery
+# comment); extend this set if the pixel gate ever fingers another.
+SHARED_LISTS = {0x32A196}
+
+
 def parse_record(d, r):
     fmt = u16(d, r)
     assert fmt in (2, 8), f"unexpected record fmt {fmt} at {r:#x}"
@@ -203,8 +210,24 @@ def main():
                     src = (t & ~0xF) + (dy << 4) + ((t + dx) & 0xF)
                     dst = (anchor & ~0xF) + (dy << 4) + ((anchor + dx) & 0xF)
                     tile_pairs.append([src, dst])
-        # write Donovan's coordinate pairs over Jedah's list space
-        img[jcptr:jcptr + dclist] = vs2[dcptr:dcptr + dclist]
+        # Coordinate handling (session 14s, two hard-won rules):
+        # 1. The record's CPTR must stay JEDAH'S — cptr values are
+        #    RAM-VISIBLE: select-screen init caches list pointers into
+        #    work RAM on LEGACY paths (relocating them diverged
+        #    02/03/08 masked at select entry ~frame 820 — the fourth
+        #    stored-anchor class).
+        # 2. The list bytes may only be written if NO other consumer
+        #    shares the span: Jedah's 1-pair name-banner list IS the
+        #    speed-menu record's first pair (one byte shifted the
+        #    TURBO/AUTO text 8px for seven shipped builds —
+        #    RAM/VRAM-invisible, caught by tests/test_gfx_menus.sh).
+        #    Shared lists keep Jedah's coordinates: Donovan's art draws
+        #    at the host position (slot-0x0F-only cosmetic).
+        if jcptr in SHARED_LISTS:
+            print(f"{name}: coord list 0x{jcptr:06X} SHARED — keeping "
+                  f"Jedah's pairs (Donovan draws at host position)")
+        else:
+            img[jcptr:jcptr + dclist] = vs2[dcptr:dcptr + dclist]
         # compose the record: Donovan's fmt/count/entries, JEDAH'S BUDGET
         # (RAM-invisibility: the budget debits the shared frame budget)
         # and Jedah's cptr

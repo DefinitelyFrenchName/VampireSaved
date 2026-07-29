@@ -45,6 +45,12 @@ done
 
 echo "== 2. legacy gate, amended §4 basis (masked live-RAM) =="
 m2a_legacy_gate_masked "$RP" "$WORK"
+
+# pixel-level menu gate (session 14s): RAM/VRAM gates are blind to gfx
+# ROM content and to coordinate lists that only land in OBJ RAM — this
+# catches both classes (title / select / speed menu vs frozen vanilla
+# goldens, tests/expected/vsavj/menus/).
+if tests/test_gfx_menus.sh; then :; else fail=1; fi
 [ "$gate_fail" = 0 ] || fail=1
 
 [ "$fail" = 0 ] && echo "PASS: M2b stage-6 gate" || echo "FAIL: M2b stage-6 gate"
