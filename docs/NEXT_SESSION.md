@@ -26,15 +26,31 @@ FIXED" + the 14p STATE/GOTCHAS updates.
 ## Next work (priority)
 
 1. **Stage-7: overlay strip port** (fixes sword/statue blink — the top
-   visible defect). Steps: (a) space audit (~15KB needed; holes tight);
-   (b) find the char-0x0F strip-base lookup (engine setter 0x15082,
-   cursor = T + T[2*id], Jedah T = 0x2671C6 — who loads T? per-char
-   table row hoped); (c) new manifest region porting vs2
-   ~[0x2A05E2,0x2A4000); (d) bank-1 code triage (effect-tail classes)
-   + pool cptr content-match; (e) gates + snapshot verify. Superset
-   traps: budgets/cell-pokes/legacy coord reads; Jedah attract demo
-   reads his strips — leave vanilla bytes, repoint only the lookup
-   (frozen-4278 class guards it).
+   visible defect). T-lookup ANSWERED this session: T is HARDCODED as
+   immediates at 10 sites in JEDAH's per-char engine code (0x5F8C8,
+   0x5FABC, 0x5FBD0, 0x5FDDA, 0x5FE4C, 0x5FF5A, 0x6190E, 0x619FA,
+   0x837D4, 0x8C678 — opcode-space search for 0x002671C6); the overlay
+   runs JEDAH's code via the vanilla slot dispatch, and per-char
+   behavior lives in the DATA (streams/strips) his code walks. Two
+   topologies assessed:
+   - **B (recommended): port the data, poke the 10 immediates.** Port
+     vs2's overlay streams+strips+records (~[0x2A05E2,0x2A4000),
+     bounds via three-way diff — CAUTION: engine-shared blocks
+     0x2A3B40/0x2A3B7C interleave the span), then repoint Jedah's 10
+     T-immediates to the ported copy. Vanilla Jedah strip BYTES stay
+     (attract demo reads them; frozen-4278 class guards the poked
+     sites). Risk to verify: Jedah-code stream-walker constants beyond
+     T (sibling-diff his 10 routines vs vs2's Donovan analogs first).
+   - A (bigger): reroute the slot dispatch to the PORTED Donovan
+     overlay code (9 T-load sites already inside ported regions —
+     vs2 code 0x0891F8->0x2A0600 is the prime root-load; their strip
+     refs are currently open/tripwired recon rows). More faithful,
+     more surface.
+   Then: (b) space audit (~15KB; hole A ~0xE80 + hole B ~0x650 are
+   NOT enough — needs a real ledger pass); (c) bank-1 code triage
+   (effect-tail classes) for codes 0xA3E8-0xA499; (d) pool cptr
+   content-match; (e) engine-shared strips 0x15ADxx content-compare
+   vs2-vs-vsavj (b800/b880 walk them); (f) gates + snapshots.
 2. Win-quote palette (mechanism pinned earlier: table 0x7F196 +
    ramp blocks ~0x3A14xx; repoint-safe).
 3. A5 work-var displacement audit sweep (same-value class #4).
