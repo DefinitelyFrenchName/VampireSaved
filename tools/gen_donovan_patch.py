@@ -773,9 +773,19 @@ def main():
                 # list into VSAVJ's own pool; Donovan-specific lists are
                 # appended to a GEN fragment in hole B.
                 POOL_LO, POOL_HI = 0x300000, 0x361000
+                # bank-2-attributed records (sword/statue class, session
+                # 14k-b): drawn by #\$4000-patched objects — their entries
+                # use the BAND-TAIL placements (vs2 bank-3 content), not
+                # the bank-1 maps. Keyed by SOURCE record address.
+                b2_recs = {int(x, 16) for x in et.get("bank2_recs", [])}
+                b2map = {}
+                for k, v_ in et.get("bank2_place", {}).items():
+                    tt, bx, by = k.split(",")
+                    b2map[(int(tt, 16), int(bx), int(by))] = int(v_, 16)
+                b2_pairs = []
                 extra_lists = bytearray()
                 extra_map = {}
-                n_et = n_cfix = n_cport = 0
+                n_et = n_b2 = n_cfix = n_cport = 0
                 seen2 = set()
                 for i in range(0, r["len"] - 4, 2):
                     v = int.from_bytes(blob[i:i + 4], "big")
@@ -804,6 +814,8 @@ def main():
                     else:
                         continue
                     seen2.add(v)
+                    src_v = v - base + r["src"]
+                    is_b2 = src_v in b2_recs
                     # coordinate-list fixup
                     lst = src_data_img[cptr:cptr + 4 * npairs]
                     hit = vj.find(bytes(lst), 0x300000, 0x361000)
@@ -824,6 +836,20 @@ def main():
                         a_ = (hdr_at if hdr_at is not None else
                               int.from_bytes(blob[toff + 2:toff + 4], "big"))
                         key = (t, ((a_ >> 8) & 15) + 1, ((a_ >> 12) & 15) + 1)
+                        if is_b2:
+                            nt = b2map.get(key)
+                            if nt is not None:
+                                blob[toff:toff + 2] = nt.to_bytes(2, "big")
+                                n_b2 += 1
+                                bx2, by2 = key[1], key[2]
+                                for dy in range(by2):
+                                    for dx in range(bx2):
+                                        b2_pairs.append([
+                                            (t & ~0xF) + (dy << 4)
+                                            + ((t + dx) & 0xF),
+                                            (nt & ~0xF) + (dy << 4)
+                                            + ((nt + dx) & 0xF)])
+                            continue
                         nt = bmap.get(key)
                         if nt is not None:
                             blob[toff:toff + 2] = nt.to_bytes(2, "big")
@@ -842,10 +868,18 @@ def main():
                         if (vv >> 24) == 0xEE:
                             blob[i:i + 4] = (la + (vv & 0xFFFFFF)).to_bytes(
                                 4, "big")
-                notes.append(f"# {name}: effect_tail — {n_et} tile words "
-                             f"remapped, {n_cfix} coord lists matched into "
-                             f"vsavj's pool, {n_cport} ported "
-                             f"({len(extra_lists)}B fragment)")
+                if b2_pairs:
+                    emj = json.loads((out / "effect_map.json").read_text())
+                    known = {tuple(p) for p in emj}
+                    for p in b2_pairs:
+                        if (p[0], p[1]) not in known:
+                            emj.append(p)
+                            known.add((p[0], p[1]))
+                    (out / "effect_map.json").write_text(json.dumps(emj))
+                notes.append(f"# {name}: effect_tail — {n_et} bank-1 words, "
+                             f"{n_b2} bank-2 words (tail placements), "
+                             f"{n_cfix} coord lists matched, {n_cport} "
+                             f"ported ({len(extra_lists)}B fragment)")
                 if n_et < 100 or (n_cfix + n_cport) < 100:
                     fail.append(f"effect_tail: {n_et} tile words / "
                                 f"{n_cfix + n_cport} coord lists — "

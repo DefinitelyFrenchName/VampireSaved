@@ -31,6 +31,17 @@ follow-up)
   by pure fingerprint auto-detection — the one-command-validates-any-
   build doctrine is now real for hooked builds.
 
+## Session 14l (bank-attribution fix SHIPPED — sword/statue blink expected fixed)
+
+- The x2b7ef4 walk now attributes records by drawing bank via content
+  voting: 14 records (109 blocks, 312 tiles — the sword/statue class,
+  bank-2 objects) route through band-tail placements (vs2 bank-3
+  content at 0xEA40+, 722 tail positions spare); the rest keep the
+  bank-1 effect-tail path. Fingerprint f8eda2ca: double gate green,
+  companions green. Playtest verdict wanted on: sword steadiness,
+  round-start statue, specials still good, win-quote palette (still
+  pending implementation), general sweep.
+
 ## Session 14k-b (blink TRULY root-caused: per-record bank attribution)
 
 - The saturation theory was an artifact: the ~540 null entries are the
