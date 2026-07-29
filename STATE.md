@@ -31,6 +31,29 @@ follow-up)
   by pure fingerprint auto-detection — the one-command-validates-any-
   build doctrine is now real for hooked builds.
 
+## Session 14i (playtest round 9 diagnosis — three work items scoped)
+
+Playtest round 9 (on 8248296e): win-quote ASSETS correct but palette
+wrong + image shifted left (vs2 layout is right-side); Donovan's sword
+blinks/vanishes in-match; the elemental-sword specials (623P Blizzard
+/ 214K Ifrit) LOST their big blue/yellow effect sprites. Diagnosis:
+- FLASH/SWORD = the deferred x2b7ef4 engine-effect tail, NOT a fresh
+  regression: those effect records were never remapped in ANY build
+  (deliberately left as-is because 1,070/1,455 tiles are same-index in
+  vsav); the elemental-sword and sword-glint art is among the ~385
+  tiles whose vsav bank-1 positions moved — codes point at wrong/blank
+  art. Promoted from 'minor tail' to MUST-FIX. Plan: block-level
+  content matching (vs2 bank-1 blocks -> vsav bank-1 relocated
+  positions; place the truly-missing into free bank-1 space), per-entry
+  code remap in the ported x2b7ef4/anim records via the gen effect-map
+  mechanism.
+- WIN-QUOTE X-SHIFT: Donovan's ported coordinate list is vs2-layout
+  (right side); fix = constant X translation computed from the two
+  records' bounding anchors, applied when writing coords.
+- WIN-QUOTE PALETTE: the win screen ramps its palette from ANOTHER
+  per-char grid (~0x3A14xx for Bulleta; ramp writer PC 0x153C2,
+  source-formula base to pin down like the select grid at 0x3AC000).
+
 ## Session 14h highlights (win-quote portrait ported; HUD name found)
 
 - Win-quote screen: the family is d0 = 0x40+char over the same root
