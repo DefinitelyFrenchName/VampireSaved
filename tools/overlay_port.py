@@ -84,6 +84,27 @@ SELECT_MAP = {
     0x2A7F86: 0x273AAC, 0x2A6416: 0x2720FA, 0x2A8CF8: 0x274642,
 }
 POOL_LO, POOL_HI = 0x300000, 0x361000
+
+# Poke-site policy (session 14r, all empirically probed on the Donovan
+# path with the timer-tick detector):
+# - only context-verified sites (cross-matched against the vs2 analog
+#   instruction contexts, tsite map) are eligible;
+# - three sites are EXCLUDED as measured crashers — their ids resolve
+#   to table entries the closure cannot yet validate (the ±4-anchored /
+#   site-biased indexing variants, STATE 14q/14r):
+#     0x5D8B8  (267224 table, id=[a6+3])
+#     0x5EE22  (2671E6 table, attack id)
+#     0x918F0  (2671E6 table, inline walker)
+#   Their features keep walking Jedah's vanilla tables (the strip zone
+#   is NOT clobbered by this port) — residual wrong-art on those paths,
+#   no crash. Revisit with the indexing-variant decode.
+VERIFIED_SITES = {
+    0x5D8B8, 0x5D978, 0x5DAAA, 0x5DCAA, 0x5E39E, 0x5E48E, 0x5EE22,
+    0x5F582, 0x5F6F0, 0x5F8C8, 0x5FABC, 0x5FBD0, 0x5FDDA, 0x5FE4C,
+    0x5FF5A, 0x616F8, 0x61878, 0x6190E, 0x619FA, 0x61A6A, 0x837D4,
+    0x8C5E2, 0x8C5F8, 0x8C678, 0x918F0,
+}
+KILLER_SITES = {0x5D8B8, 0x5EE22, 0x918F0}
 PAD_LO, PAD_HI = 0x3640, 0x3800     # bank-1 padding run (group A idx +0x10000)
 
 
@@ -157,7 +178,12 @@ def walk_via_offset(img, o, addr, cptr_ok):
     if fmt > 0x0A or fmt % 2:
         return None, 0
     if fmt == 0x0A:
-        return None, 1
+        # composite sub-dispatch record (handler 0x1B7CC): carried as an
+        # OPAQUE object — copied verbatim, no internal relocation or
+        # tile rewrites (garbled art beats a truncated stream; the
+        # session-14r replay-12 crash was a stream truncated at an fmtA
+        # ref, address error in the composite handler)
+        return (0x0A, None, []), 0
     if fmt in (0, 6):
         cnt = int.from_bytes(img[o + 2:o + 4], "big")
         if not (0 < cnt <= 0x100):
@@ -256,6 +282,7 @@ def main():
         if fmt in (2, 8):
             return 10 + 4 * len(ents)
         return 14  # fmt 4: fmt.w budget.w count.w tile_attr.l xy.l
+        # (fmt 0xA sized via opaque_size at pack time, never here)
 
     recs, tables, streams, strips = {}, {}, {}, {}
     # per-object pointer sites: {obj_addr: [(off_in_obj, target_addr)]}
@@ -271,38 +298,52 @@ def main():
         return True
 
     def visit_stream(a, depth=0):
-        # NOTE (session 14q handoff): nodes are (tag.l, ptr.l) at
-        # stride 8 here, but the engine's stepper family also walks
-        # 0x10- and 0x18-stride node forms — the stride is a property
-        # of the OBJECT's stepper class (engine 0x15030-0x15080 lea
-        # variants), not derivable from the data (a longest-run
-        # heuristic mis-strides real 8-streams and corrupts them).
-        # The stepper-class -> table mapping is the remaining decode
-        # before the closure is complete.
-        if a in streams or depth > 12 or not in_zone(a) or a % 2:
+        # Stride-8 node grammar, COMPLETE (stepper 0x15030 decode,
+        # session 14r): node = (dur.b, flags.b, param.w, ptr.l).
+        #   flags == 0     -> draw [ptr], advance +8
+        #   flags & 0x80   -> 12-byte node: cursor JUMPS to the long at
+        #                     +8 (attack-anim loops); linear walk ends
+        #   flags & 0x40   -> terminal node (stepper sets $21(a6));
+        #                     stream ends
+        # ptr == 0 is a legal "no record this phase" node. Jedah's
+        # module calls ONLY this stepper (395-caller census; the
+        # 0x10/0x18-stride steppers belong to other chars' modules).
+        if a in streams or depth > 24 or not in_zone(a) or a % 2:
             return a in streams
         streams[a] = 0
         sites = []
         o, n = a, 0
+        ok_stream = False
         while in_zone(o + 8):
+            flags = vs2[o + 1]
             ptr = int.from_bytes(vs2[o + 4:o + 8], "big")
-            if ptr == 0:
-                o += 8
-                n += 1
-                continue
-            ok = (visit_record(ptr) or ptr in SELECT_MAP
-                  or visit_stream(ptr, depth + 1))
-            if not ok:
+            ptr_ok = (ptr == 0 or visit_record(ptr) or ptr in SELECT_MAP
+                      or visit_stream(ptr, depth + 1))
+            if not ptr_ok:
                 break
-            sites.append((o + 4 - a, ptr))
-            o += 8
+            if ptr:
+                sites.append((o + 4 - a, ptr))
             n += 1
+            if flags & 0x80:
+                if not in_zone(o + 12):
+                    break
+                jump = int.from_bytes(vs2[o + 8:o + 12], "big")
+                if visit_stream(jump, depth + 1):
+                    sites.append((o + 8 - a, jump))
+                o += 12
+                ok_stream = True
+                break
+            if flags & 0x40:
+                o += 8
+                ok_stream = True
+                break
+            o += 8
             if n > 0x400:
                 break
         if n == 0:
             del streams[a]
             return False
-        streams[a] = 8 * n + 8
+        streams[a] = (o - a) + (0 if ok_stream else 8)
         obj_ptrs[a] = sites
         return True
 
@@ -402,6 +443,16 @@ def main():
     # invalid stream node (zero tag) — never a self-pointer into the
     # table (a walker landing there would read table words as nodes)
     TERM = heap_alloc(8)
+    # opaque (fmtA) records: size = distance to the next discovered
+    # object in vs2 address order, capped
+    all_addrs = sorted(set(list(recs) + list(streams) + list(strips)
+                           + list(ROOTS)))
+    def opaque_size(a):
+        import bisect
+        i = bisect.bisect_right(all_addrs, a)
+        nxt = all_addrs[i] if i < len(all_addrs) else a + 0x200
+        return max(0x10, min(nxt - a, 0x200))
+
     # tables first (poke targets), then streams/strips/records/cptrs
     for T in ROOTS:
         MAP[T] = heap_alloc(2 * len(tables[T]))
@@ -410,7 +461,8 @@ def main():
     for a, sz in sorted(strips.items()):
         MAP[a] = heap_alloc(sz)
     for a, (fmt, cptr, ents) in sorted(recs.items()):
-        MAP[a] = heap_alloc(rec_size(fmt, ents))
+        sz = opaque_size(a) if fmt == 0x0A else rec_size(fmt, ents)
+        MAP[a] = heap_alloc(sz)
     for a, sz in sorted(cptr_objs.items()):
         MAP[a] = heap_alloc(sz)
     used = [f"{h[0] - lo:#x}/{hi - lo:#x}"
@@ -473,7 +525,7 @@ def main():
     # records: copy, fix cptr (heap tail/content-match), tiles later
     n_cfix = n_cport = n_ckeep = 0
     for a, (fmt, cptr, ents) in recs.items():
-        sz = rec_size(fmt, ents)
+        sz = opaque_size(a) if fmt == 0x0A else rec_size(fmt, ents)
         blob = bytearray(vs2[a:a + sz])
         if cptr is not None:
             if in_zone(cptr):
@@ -615,7 +667,8 @@ def main():
                 # suggests an immediate/absolute long operand.
                 if op in (0x207C, 0x227C, 0x247C, 0x267C, 0x287C, 0x2A7C,
                           0x2C7C, 0x4879) or (op & 0xF1FF) == 0x41F9:
-                    if v2 not in MAP:
+                    if (v2 not in MAP or j not in VERIFIED_SITES
+                            or j in KILLER_SITES):
                         j = opsJ.find(pat, j + 1)
                         continue
                     new = MAP[v2]

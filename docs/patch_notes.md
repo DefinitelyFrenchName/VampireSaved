@@ -390,3 +390,41 @@ Session 14p (Anita's feet — empirical bank-2 attribution):
   at generation; verified in OBJ RAM (entries now 0xEADA/0xEADB) and
   on-screen (green blobs gone, frame 2600 of 19_don_dp_spam).
 - Build fingerprint f29cf24a; gates re-run (see STATE).
+
+Session 14r (COMPANION OVERLAY SHIPPED — sword/statue/Anita in-match):
+- The stage-7 overlay port completed to a shippable 22-site
+  configuration. Final architecture: object-granular closure port of
+  the vs2 overlay zone (9 strip tables + streams + strips + records +
+  coordinate lists) into a relocatable heap over JEDAH'S dead anim
+  areas (segA 29,512B at 0x248D80 + segB 496B at 0x2557B0); every
+  discovered pointer relocated through the placement map, table entry
+  words recomputed only when their targets validated (verbatim
+  otherwise — over-walked table reads must never fabricate words);
+  4,789 bank-1 tile pairs placed at dead-Jedah positions.
+- Stream node grammar COMPLETE for the stride-8 stepper (engine
+  0x15030; Jedah's module uses only this one — 395-caller census):
+  node = (duration.b, flags.b, param.w, ptr.l); flags==0 advance +8;
+  flags&0x80 = 12-byte node, cursor JUMPS via the long at +8 (attack
+  loops); flags&0x40 = terminal; ptr==0 legal. The 0x10/0x18-stride
+  steppers (0x1509C/0x1505A) belong to other characters' modules.
+- Site policy (all empirically probed on the Donovan path, timer-tick
+  detector): 22 context-verified sites thunked (`movea.l #T,a0` ->
+  `jsr thunk`; ported table iff match-active AND slot-0x0F present);
+  3 measured crashers excluded (0x5D8B8/0x5EE22/0x918F0 — ids resolve
+  into table entries the closure cannot yet validate; those features
+  keep Jedah's vanilla tables, wrong-art residue only).
+- Visible result (snapshots, 19_don_dp_spam + 23_don_matchwin): Anita
+  fully rendered dragging behind Donovan, sword on his back, clean win
+  pose with Anita beside the loser — the Jedah-darkness "blinking
+  sword/statue" is gone from match and win phases. One overlay piece
+  (hat) still alternates per frame — vs2-dither vs residue: playtest
+  judges.
+- The guarded soak (12_donovan_vs_cpu, frame 8424 — a round/opponent
+  state no probe reached) caught an address error in the fmtA
+  composite handler: skipped fmtA records truncated their streams.
+  Fix: fmtA records carried as OPAQUE objects (verbatim copy, size =
+  distance to the next discovered object, no internal rewrites) —
+  closure deepened to 431 records once those streams stopped
+  truncating. Soaked past frame 8800 clean.
+- Fingerprint cf2109d8 (deterministic re-emit via the baked-in
+  VERIFIED_SITES/KILLER_SITES policy in tools/overlay_port.py).

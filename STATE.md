@@ -1,6 +1,37 @@
 # STATE — living progress log
 
-Updated: 2026-07-29 (session 14q — overlay port 80% built, PARKED as
+Updated: 2026-07-29 (session 14r — COMPANION OVERLAY SHIPPED at
+cf2109d8 pending gates+playtest: Anita/sword/statue render in-match
+and on the win screen; 3 residual sites excluded; session 14q parked
+state superseded)
+
+## Session 14r (overlay port COMPLETED to a 22-site shipping config)
+
+- Round 15 (maintainer): no regressions on f29cf24a.
+- The stride-8 stream grammar was completed (flags 0x80 = 12-byte
+  jump node — the attack-anim loops that caused every attack-input
+  crash; 0x40 = terminal; ptr 0 legal), the heap port regenerated
+  (segB collapsed 22KB -> 496B once stream extents were真 bounded),
+  and every context-verified site probed individually on the Donovan
+  path with the watchdog-proof timer-tick detector. 22 sites ALIVE
+  through DP-spam and win screens; 3 crashers excluded and documented
+  in tools/overlay_port.py (VERIFIED_SITES / KILLER_SITES policy —
+  the emit is deterministic; fingerprint cf2109d8 after the fmtA-opaque fix — the guarded soak caught a frame-8424 address error from streams truncated at skipped fmtA records).
+- VISIBLE: Anita fully drawn dragging behind Donovan; sword on his
+  back; clean win pose. The Jedah-darkness blink is gone. Open
+  question for playtest: the hat piece alternates per frame (vs2
+  dither vs residue).
+- Remaining for a later pass: the 3 excluded sites (indexing-variant
+  decode: ±4-anchored table entries / site-biased ids), the four
+  100%-dead tables (0x2A0862 family — win/vignette features via
+  whdr-strips partially live), fmtA composite records (20 skipped).
+- Gates: full battery re-running clean at session end (a first run
+  was voided by a build-tree race with foreground rebuilds — gate
+  scripts rebuild build/donovan6 themselves; never rebuild while the
+  battery runs).
+
+<!-- superseded header: session 14q -->
+Updated (superseded): 2026-07-29 (session 14q — overlay port 80% built, PARKED as
 build/manifest/overlay.wip; shipping build = f29cf24a (feet fix,
 playtest-confirmed round 14); M2a frozen a02aeeff…, M2b-core frozen
 71601263…)
