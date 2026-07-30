@@ -18,17 +18,16 @@ Open items, in maintainer priority order:
 1. SWORD CONFIRMED (round 27) — blocker closed. Leftovers, non-blocking:
    blade palette (red/grey vs native silver — blink family), 6HP hitbox
    worry (oracle HP matched; a hitbox A/B replay would settle it).
-1b. Victor-shock body garble on Donovan (rounds 27+28 = ONE defect;
-   14z-6's stale-bucket model was wrong, 14z-7's fix was a phantom —
-   both post-mortems in STATE/GOTCHAS): the victim held-pose cursor
-   enters Donovan's sequence one jump-node off (opposite node order vs
-   native; body pieces draw ~0x20-adjacent band tiles). Entry is
-   computed by the reaction/state machinery, NOT the anim-number
-   tables. START AT: the seq_set path (vsavj 0x2AD94, +0x14E state
-   machine) and the hold-reaction's per-char seq record for slot 0x0F.
-   Probes: replay pair 33_victor_6hp (the user's exact repro), OBJ
-   pairing method, tap_writes. Acceptance: pixel A/B on replay 33
-   BOTH zap and between-zap frames, fix-on vs fix-off.
+1b. Electric-hit DARKEN curtain (rounds 27-29, UNIFIED — read STATE
+   14z-9b first; supersedes all prior models): the engine darkens the
+   screen during electric hits by displaying the OBJ curtain buckets
+   WITHOUT rewriting them; on vsavj+Donovan they hold his VS-portrait
+   pieces (garble when shown: the hold) and the darken fails to engage
+   on 5HP (bright reel). Fix plan in STATE: dark-fill the buckets at
+   match start via the 14z-7 countdown mechanism (payload = proper dark
+   entries copied from a vanilla Lilith-victim reference, NOT clr.l),
+   then verify the 5HP darken engages. Probes: replays 33/34/35; the
+   ODD-frame sampling rule (GOTCHAS) is mandatory here.
 2. Palette family (non-blocker): win-quote + HUD mini-portrait rows'
    true consumer still undecoded. Start from a palette-RAM write trace
    on the quote screen (rows 0x16-0x1F), NOT from the uploader tables

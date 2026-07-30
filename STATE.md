@@ -5,6 +5,43 @@ cf2109d8 pending gates+playtest: Anita/sword/statue render in-match
 and on the win screen; 3 residual sites excluded; session 14q parked
 state superseded)
 
+## Session 14z-9b (round 29: THE UNIFIED MODEL — it's the electric-hit DARKEN curtain)
+
+Round-29 precision (electrified state at the hard knockdown) + odd-frame
+sampling finally exposed the real subsystem: the ELECTRIC-HIT SCREEN
+DARKEN. Measured (replay 35, odd frames 2671-2681): native darkens the
+whole screen through the electrified reel; PORTED DOES NOT DARKEN AT
+ALL on the 5HP hit. The darken is drawn by extending the OBJ list into
+the curtain buckets (0x600/0xA00 tails) WITHOUT rewriting them — the
+engine relies on them holding dark tiles. This unifies every sighting:
+- vs2: VS-screen leftovers there are dark 444f columns -> darken works.
+- vsavj+Donovan: the VS screen leaves HIS PORTRAIT PIECES there (c625)
+  -> when the buckets are displayed (the electric hold / Mega Shock),
+  they draw Donovan-band tiles over the victim = the round-27 "garbled
+  tiles on Donovan" (and Lilith stays clean: her VS layout leaves
+  benign content). In the 5HP case the darken never engages on ported
+  (activation divergence, cause not yet traced) so the electrified reel
+  plays bright-but-clean = matches every "coherent" probe this session.
+- The 14z-7 clear targeted the RIGHT buckets with the WRONG value
+  (transparent, not dark) and its A/B compared frames OUTSIDE the
+  darken window (why clear-on/off looked identical) — the round-28
+  "body garbled" was likely the hold viewed with transparent-vs-dark
+  curtain compositing.
+NEXT (the actual fix, two parts):
+1. Fill the curtain buckets with the proper DARK tile entries (vsavj's
+   own curtain code — read what vanilla vsavj leaves there in a
+   Lilith-victim run, e.g. the fc1b-family, and reproduce that grid)
+   at match start — the 14z-7 countdown mechanism is EXACTLY right for
+   the timing (arm at init, fill ~0x50 frames in); only the payload
+   changes from clr.l to writing proper (x,y,code,attr) entries.
+2. Trace why the darken extension doesn't engage on ported for normal
+   electric hits (list-terminator/extension length at the hit frames;
+   compare NAT/POR 2671 OBJ list extents) — possibly the same bucket
+   content participates in the activation decision, in which case fix
+   1 alone may resolve it. Acceptance: replay 35 odd-frame pixel A/B
+   (darken present, no garble, body coherent) + replay 33 hold frames
+   + the full battery + pixel probes 17/31.
+
 ## Session 14z-9 (round 28 correction chased to ground: the electric-family display chain is VERIFIED CORRECT end-to-end; no reproducible garble)
 
 Round-28 correction (the reported move = Victor 5HP / f.6HP normals,

@@ -697,3 +697,16 @@ games' VANILLA characters have differing script data (vs2-Victor
 commands hold poses in the opposite order from vsavj-Victor) — a
 divergence in what the two games DISPLAY is not automatically a port
 bug; check who commands the difference before blaming the port.
+
+## The electric-hit DARKEN displays never-rewritten OBJ buckets — and
+## effect windows need ODD-frame sampling
+The screen-dim on electric hits is drawn by extending the sprite list
+into the tail buckets, trusting their CONTENT from long-ago writes (the
+VS fade). Any character whose VS screen leaves non-dark pieces there
+(ported Donovan's portrait) garbles the darken; and a build change that
+empties them (the 14z-7 clear) silently removes the darken instead.
+Verification traps paid for: the darken window is ~10 frames and my
+even-frame sampling missed it entirely across three sessions; and an
+A/B of a curtain change is meaningless unless the compared frames
+actually DISPLAY the curtain (check the list extent includes the
+buckets at the sampled frame).
