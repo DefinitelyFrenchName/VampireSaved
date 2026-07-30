@@ -808,6 +808,20 @@ blinks/vanishes in-match; the elemental-sword specials (623P Blizzard
   dual-emulator, flavor selector. **Freeze = pending maintainer build
   decision (see Decisions pending).**
 - **2026-07-27 (session 11, first human playtest):** four findings, all
+- **Palette-uploader poke vs exact-gate class (session 14y)**: poking
+  the select/HUD palette-row uploader (CODE:0x1BF56 -> the patched
+  win-palette copies) fixes the HUD mini-portrait green pixels
+  (round 21), the select-portrait palettes and most likely the
+  win-quote palette — all through one site. Cost: the select-entry
+  bulk upload leaves a ONE-FRAME work-RAM trace at the known
+  spawn-boundary flicker frame (829), so 02/05/07 would move from
+  masked-EXACT to masked-FLICKER (inventory @829, the already-
+  approved mechanism class; verified: exactly 1 divergent frame,
+  full re-convergence, pixel gates green). Recommendation: accept
+  the reclassification — it is the same mechanism class the other
+  six legacy replays already carry at the same frame. Until signed
+  off, the poke is reverted and the palettes stay Jedah's.
+
   dispositioned (docs/tables/reconciliation.md "Session 11"): garbled
   sprites = M2b expected; flavor hard to eyeball = expected (QCB+K is
   the fork); 4-option select = REFUTED as port artifact (vanilla shows

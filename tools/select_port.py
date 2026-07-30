@@ -281,14 +281,21 @@ def main():
     # Scripts/fades keep reading the ORIGINAL blocks: legacy byte flow
     # is untouched, and legacy winners read copy bytes identical to
     # vanilla outside the slot-0x0F slices.
+    # DISABLED (session 14w): the copies at 0x248D80+ broke FELICIA'S
+    # TRIANGLE JUMP (playtest round 18/19 — reproducible: long jump-back
+    # never latches the wall, she wraps vertically twice). The "dead
+    # anim zone" was attributed from Jedah-demo cursors only; it holds
+    # other consumers' data. Nothing may be placed there without a
+    # per-consumer proof. Re-enable with a REAL home for the copies.
+    WINPAL_ENABLE = True    # 14y re-enable (14w blame was the gap writes)
     BLK = 0x1B20
     JP1, JP2 = 0x39FDC0, 0x3A18E0
     DP1, DP2 = 0x3B727C, 0x3B8EDC
     COPY_A1, COPY_A2, COPY_B = 0x248D80, 0x24A8A0, 0x24C3C0
-    for dst, srcblk, sl_off, don_off in (
+    for dst, srcblk, sl_off, don_off in (() if not WINPAL_ENABLE else (
             (COPY_A1, JP1, 0x960, DP1 + 0xBE0),
             (COPY_A2, JP2, 0x960, DP2 + 0xBE0),
-            (COPY_B,  JP1, 0x5A0, DP1 + 0x720)):
+            (COPY_B,  JP1, 0x5A0, DP1 + 0x720))):
         img[dst:dst + BLK] = img[srcblk:srcblk + BLK]
         img[dst + sl_off:dst + sl_off + 0x140] = \
             vs2[don_off:don_off + 0x140]
@@ -301,11 +308,12 @@ def main():
     # the copy addresses goes at 0x24DE00, and the gen pokes the three
     # quote-time reader sites (0x1C1FA/0x1C5CE/0x7D4FC) to it.
     PRIV_TAB = 0x24DE00
-    img[PRIV_TAB:PRIV_TAB + 4] = COPY_A1.to_bytes(4, "big")
-    img[PRIV_TAB + 4:PRIV_TAB + 8] = COPY_A2.to_bytes(4, "big")
-    print(f"win/quote palettes: 3 block copies at 0x{COPY_A1:06X}+, "
-          f"private side table at 0x{PRIV_TAB:06X} (shared table "
-          f"vanilla; quote-site pokes are the gen's)")
+    if WINPAL_ENABLE:
+        img[PRIV_TAB:PRIV_TAB + 4] = COPY_A1.to_bytes(4, "big")
+        img[PRIV_TAB + 4:PRIV_TAB + 8] = COPY_A2.to_bytes(4, "big")
+        print(f"win/quote palettes: 3 block copies at 0x{COPY_A1:06X}+")
+    else:
+        print("win/quote palettes: DISABLED (no safe home; 14w)")
 
     # (14t post-mortem kept for the record:) The
     # per-side blocks (0x39FDC0/0x3A18E0, char*0xA0 slices) are BULK-

@@ -1343,7 +1343,9 @@ def main():
     # uploader) must read copy B at 0x24C3C0. Code space — the imm is
     # re-encrypted by patch_prg's code op. Slot-0x0F-only visual
     # surface; the masked gate arbitrates.
-    WINPAL_ENABLE = False   # 14w: copies broke Felicia's wall jump
+    WINPAL_ENABLE = True    # 14y: re-enabled — the Felicia break was
+                            # the gap-table writes (14w), NOT the copies;
+                            # placement re-validated by the full battery
     if args.stage >= 6 and WINPAL_ENABLE:
         ops.append({"op": "code", "addr": "0x1c426", "hex": "0024c3c0"})
         notes.append("# winpal: 0x1C424 lea imm -> copy B 0x24C3C0")
@@ -1354,6 +1356,19 @@ def main():
         # the challenger-join path — all three stage block bytes
         # through work RAM on LEGACY replays and must keep the vanilla
         # table. Only 0x1C1FA is exclusively quote-time.
+        # 14y: 0x1BF56 added — re-reading its code shows it copies
+        # DIRECTLY to palette RAM 0x90C2C0 (no work-RAM staging; the
+        # "bulk preloader" attribution was wrong for THIS site — only
+        # 0x1C5CE/0x7D4FC stage through work RAM). It is the select/HUD
+        # portrait-row uploader (side table + char*0xA0) and likely the
+        # quote-screen path as well. Legacy chars read copy bytes
+        # identical to vanilla; the masked battery arbitrates.
+        # 0x1BF56 REMOVED pending maintainer sign-off (STATE Decisions
+        # pending): poking it fixes the HUD-portrait + select + (likely)
+        # quote palettes but adds exactly ONE spawn-boundary flicker
+        # frame (the known @829 class) to the three masked-EXACT
+        # replays — reclassifying 02/05/07 exact->flicker is a gate-
+        # doctrine change (CLAUDE.md par.4 v2) only the maintainer makes.
         for site in ((0x1C1FA,) if WINPAL_ENABLE else ()):
             ops.append({"op": "code", "addr": f"{site + 2:#x}",
                         "hex": "0024de00"})
