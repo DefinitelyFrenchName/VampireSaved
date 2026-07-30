@@ -5,6 +5,38 @@ cf2109d8 pending gates+playtest: Anita/sword/statue render in-match
 and on the win screen; 3 residual sites excluded; session 14q parked
 state superseded)
 
+## Session 14z-8 (round 28: the 14z-7 clear was a PHANTOM FIX — reverted; the real shock-garble mechanism characterized)
+
+- Round-28 report (Victor 6HP: effect ~fine, DONOVAN'S BODY garbled)
+  prompted a controlled A/B: clear-on (ccb4ab6a) vs clear-off
+  (2da7d910) on the new 6HP probe replay 33 — PIXEL-IDENTICAL on every
+  shock frame. The clear changed NOTHING for the real move; the body
+  garble exists on both builds and is THE SAME defect as round-27's
+  report (one bug seen twice, not two bugs). objram_clear disabled
+  (build restored byte-exact 2da7d910); test_don_shock.sh REMOVED (it
+  asserted the phantom); the 14z-7 mechanism survives in git if the
+  transparent-tail idea is ever wanted for real.
+- 14z-7's validation error, recorded: the probe snapshotted only ZAP
+  frames (flash silhouette hides the body) and the 236HP-grab framing
+  measured curtain buckets that the actual defect never touches.
+- REAL MECHANISM (measured, replay 33, NAT 2742 / POR 2744):
+  * Donovan's held-body pieces draw with band codes ~0x20 OFF native's
+    (adjacent tiles: recognizable colors, garbled chunks ✓ user
+    report); burst pieces likewise resolve into his band instead of
+    the shared low-code fire art.
+  * The victim's held-pose cursor ENTERS the sequence wrong: NAT
+    enters 0x287430 then settles 0x287418; POR enters map(0x287418)
+    then settles map(0x287430) — the SAME two nodes, OPPOSITE order
+    (the +0x18 "phase skew" noted in 14z-6 was this defect, not skew).
+  * The entry cursor is NOT resolved via the anim-number tables (no
+    index in either game's table yields those nodes) and NOT stored as
+    a data long — it is computed by the reaction/state machinery. Next
+    thread: the seq_set path (vsavj 0x2AD94, the +0x14E state
+    machine's cursor initializer, cf. state_hook config) and how the
+    hold-reaction's seq record resolves per char for slot 0x0F.
+- Probes: replay pair 33_victor_6hp (committed); the 26-frame drain
+  confirms 32/33 exercise the same electric-grab family.
+
 ## Session 14z-7 (Victor-shock garble FIXED — stale-OBJ countdown clear)
 
 Fix shipped for the round-27 shock garble (build 1507c286-family, final

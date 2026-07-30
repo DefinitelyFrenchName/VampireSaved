@@ -675,3 +675,14 @@ robust pattern: arm a counter at init, decrement per frame while
 match-active, act at zero (~0x50 frames) — replay-timing independent,
 and doing the action in the object-UPDATE phase means the same frame's
 list rebuild hides it (no visible blank).
+
+## Phantom fixes: validate against the USER'S repro, at the RIGHT frames
+14z-7 shipped a fix validated by (a) a probe move that only resembled
+the reported one and (b) snapshots taken only at zap frames, where the
+flash silhouette hides the victim's body. The fix cleared buckets the
+real defect never reads; a controlled A/B on the correct move (replay
+33) showed pixel-identical output with the fix on and off. Rules paid
+for: reproduce with the reporter's EXACT input first; snapshot every
+phase of a cyclic effect (zap AND between-zap); and before shipping a
+visual fix, A/B the fix-on/fix-off builds on the reproducing replay —
+"the metric improved" (buckets zeroed) is not "the pixels changed".

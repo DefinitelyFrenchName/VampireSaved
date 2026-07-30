@@ -241,9 +241,9 @@ data   0x3ff9b0 +0x180  state_hook palette-seq records (ids 0x2cd-0x2d8)
 code   0x0cbb30 state_hook private seq entry (records base 0x3ff9b0 - 0x2cd*32 -> engine 0x2ad9a)
 code   0x02a7c8 ENGINE HOOK: +0x14e state dispatch -> thunk 0x0cbf70 (vanilla ids ghost-clean via jmp-back; ids 0xb2-0xc8 -> 12 synthesized stubs at 0x0ff180, ext table 0x0cbf40)
 code   0x018458 ENGINE HOOK: hit-reaction dispatch -> thunk 0x0cbfe0 (vanilla ids jmp back to untouched 0x18460; ids 0xa0-0xa6 -> 4 verbatim vs2 cases at 0x0cbfb0)
-code   0x0cc020 init shim (pool latch A5+0x7966, seeder 0x16c64; flavor (A6+0x3c2)<-0x01, Start-held [0xff8060 bit=player] -> 0x00) -> handler 0x0c1030
-poke32 0x0bd136 <- 0x000cc020  dispatch_00[0xf] donovan handler via seed shim
-poke32 0x0bd176 <- 0x000cc020  dispatch_00[0x1f] variant mirror
+code   0x0cf310 init shim (pool latch A5+0x7966, seeder 0x16c64; flavor (A6+0x3c2)<-0x01, Start-held [0xff8060 bit=player] -> 0x00) -> handler 0x0c1030
+poke32 0x0bd136 <- 0x000cf310  dispatch_00[0xf] donovan handler via seed shim
+poke32 0x0bd176 <- 0x000cf310  dispatch_00[0x1f] variant mirror
 poke32 0x0bd1b6 <- 0x000bf6aa  dispatch_01[0xf] donovan handler
 poke32 0x0bd1f6 <- 0x000bf6aa  dispatch_01[0x1f] variant mirror
 poke32 0x0bd236 <- 0x000bff64  dispatch_02[0xf] donovan handler
@@ -282,4 +282,5 @@ poke32 0x0bf4d6 <- 0x000c1124  dispatch_18[0xf] donovan handler
 poke32 0x0bf516 <- 0x000c1124  dispatch_18[0x1f] variant mirror
 poke32 0x0bf656 <- 0x000c1106  dispatch_19[0xf] donovan handler
 poke32 0x0bf696 <- 0x000c1106  dispatch_19[0x1f] variant mirror
+code   0x0cc020 +0x3a  objram clear blob; sword-exit site 0x0cc110 detoured
 data   0x0b19f8 +0xe50  data_port throw_victim_keyframes <- vsav2 0x0ca1ca (0 fixes)

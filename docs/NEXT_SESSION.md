@@ -1,6 +1,8 @@
 # Next session — 60-second orientation
 
-Build: 2da7d910 (stage 6): the SWORD SWING BLOCKER IS FIXED (see STATE
+Build: 2da7d910 (stage 6) — RESTORED again after the 14z-7 phantom-fix
+revert (round 28; read STATE 14z-8 first). The SWORD SWING BLOCKER IS
+FIXED (see STATE
 14z-5 — the unmasked set-anim entry / patched_clone reconciliation fix).
 Awaiting playtest confirmation (round 27): armed normals should show the
 blade arcs; verify no new visual regressions (pixel A/B rule stands:
@@ -16,13 +18,17 @@ Open items, in maintainer priority order:
 1. SWORD CONFIRMED (round 27) — blocker closed. Leftovers, non-blocking:
    blade palette (red/grey vs native silver — blink family), 6HP hitbox
    worry (oracle HP matched; a hitbox A/B replay would settle it).
-1b. Victor-shock garble on Donovan (round 27, scoped 14z-6 — read STATE
-   first): stale OBJ-list exposure during the shock's curtain grid;
-   remaining work = pin the Donovan-specific list-length divergence
-   (walk T_d for the shock ENTRY number, compare the full composition's
-   piece budgets vs Jedah's, or diff list terminators per frame between
-   32_vsavj and a Lilith-victim control). Probes ready: replays 32_*,
-   OBJ pairing method in the session transcript, tap_writes 32-bit.
+1b. Victor-shock body garble on Donovan (rounds 27+28 = ONE defect;
+   14z-6's stale-bucket model was wrong, 14z-7's fix was a phantom —
+   both post-mortems in STATE/GOTCHAS): the victim held-pose cursor
+   enters Donovan's sequence one jump-node off (opposite node order vs
+   native; body pieces draw ~0x20-adjacent band tiles). Entry is
+   computed by the reaction/state machinery, NOT the anim-number
+   tables. START AT: the seq_set path (vsavj 0x2AD94, +0x14E state
+   machine) and the hold-reaction's per-char seq record for slot 0x0F.
+   Probes: replay pair 33_victor_6hp (the user's exact repro), OBJ
+   pairing method, tap_writes. Acceptance: pixel A/B on replay 33
+   BOTH zap and between-zap frames, fix-on vs fix-off.
 2. Palette family (non-blocker): win-quote + HUD mini-portrait rows'
    true consumer still undecoded. Start from a palette-RAM write trace
    on the quote screen (rows 0x16-0x1F), NOT from the uploader tables

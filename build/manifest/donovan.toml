@@ -141,7 +141,16 @@ latch_disp = 0x7966
 # Vanilla chars leave benign dark tiles (Lilith clean); the clear makes
 # our exposed tail transparent instead. Shim is slot-0F-dispatch-hosted
 # -> legacy matches never execute it.
-objram_clear = true
+# ROUND-28 REVERT: with the clear active, Victor's 6HP shock (the
+# NORMAL-shock path — NOT the 236HP path replay 32 probes) draws the
+# electric effect fine but GARBLES DONOVAN'S BODY: the 6HP shock
+# evidently RE-USES tail-bucket entries to draw the victim, and the
+# clear empties them. The 14z-7 model (stale junk, safe to zero) is
+# WRONG for this path — the buckets are a live re-display buffer for
+# some shock variants. Disabled pending the real mechanism; replay 33
+# (Victor 6HP) must become the probe, and any future fix must pass
+# BOTH 32 and 33 pixel checks.
+objram_clear = false
 flavor_disp = 0x3C2
 flavor_default = 0x01
 flavor_held = 0x00

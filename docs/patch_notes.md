@@ -712,3 +712,15 @@ Session 14z-7 (Victor-shock stale-OBJ fix):
 - New gate tests/test_don_shock.sh (replay 32, tail buckets zero at
   f2740). Accepted approximation: transparent instead of vs2's benign
   dark leftovers in the shock curtain buckets.
+
+Session 14z-8 (14z-7 revert; real shock mechanism characterized):
+- objram_clear = false (manifest, with post-mortem); the init-shim
+  marker and sword-exit blob are no longer emitted. Build byte-exact
+  2da7d910 (the round-27 sword-confirmed fingerprint).
+- tests/test_don_shock.sh removed (asserted the phantom metric).
+- New probe pair tests/replays/33_victor_6hp_{vsavj,vsav2}.
+- Real defect (round-27 = round-28, one bug): the victim held-pose
+  cursor enters Donovan's sequence one jump-node off (nodes visited in
+  opposite order vs native) -> body pieces draw ~0x20-adjacent band
+  tiles. Entry is computed by the reaction/seq_set machinery — next
+  session thread in STATE 14z-8.
