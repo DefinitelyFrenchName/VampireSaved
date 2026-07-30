@@ -559,3 +559,40 @@ Verify entry layout against vanilla CONTENT before registering any
 table: alternating sign longs (+,-,+,-) are a pair signature; a
 16-char pair table and a 32-char value table have identical spacing.
 The 29_felicia_walljump oracle caught it the day it was frozen.
+
+## CPS-2 program zips store CODE encrypted — static byte reads of code are noise
+Paid for in session 14z-2 (an hour of "why does the ported region disassemble
+to garbage"). The romset zips (+ .key) hold ENCRYPTED opcodes; only DATA
+reads bypass the crypt. Any static analysis of code regions — diffing a
+build against vanilla, disassembling a ported routine, searching for an
+instruction pattern — must use the DECRYPTED opcode space:
+`tests/lua/dump_opcodes.lua` (MAME's own cps2crypt is the oracle), or the
+pipeline's `build/out/*_opcodes.bin`. Data tables MAY be read raw from the
+zip members (remember ROM_LOAD16_WORD_SWAP byte order). A "code" op in
+patch_prg re-encrypts; that's why plaintext jsr bytes are never found in
+the members.
+
+## MAME Lua write taps are silently dropped on handler re-install
+`space:install_write_tap` dies (no error) whenever anything re-installs
+handlers over the space — CPS-2 does this right after boot. Symptom: tap
+logs boot writes only, reads as "nobody writes this field," which is a
+WRONG conclusion. `tests/lua/tap_writes.lua` carries the fix (re-install
+via `add_change_notifier`); use it instead of hand-rolling taps. Taps are
+the right tool for hot fields (positions) where trace_writes.lua-style
+watchpoint stops would desync the replay.
+
+## Disabling a heuristic CLASS wholesale can revert load-bearing writes
+Session 14w disabled the gap auto-table class to fix Felicia's jump
+physics — collateral: the class had ALSO been covering the throw
+victim-keyframe pointer table (gap_be27a), so the throw cinematic broke in
+the SAME build that carried the 14v grab rows and the winpal copies. Three
+suspects on one commit produced two successive wrong convictions (grab
+rows, then winpal copies), each "confirmed" by build-timeline correlation.
+Lessons: (1) when killing a heuristic class, enumerate what it was
+actually writing and re-port the load-bearing members explicitly; (2)
+build-timeline correlation is attribution, not proof — only a mechanism
+trace (here: the tap on the victim's X/Y naming PC 0xCE51C and its table
+read) convicts; (3) a "fixed/broken" verdict from play sampling is weaker
+than a replay trace — the round-21 "throw restored" confirmation sampled
+clean-looking throws on a build where the replay shows 21 teleport-scale
+jumps.

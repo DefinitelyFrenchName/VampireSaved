@@ -618,3 +618,30 @@ coverage gate):
 - GOTCHAS reinforced (no new entry — the same two lessons): "dead
   zone" claims require per-consumer proof, and every mechanic class
   needs replay coverage BEFORE data lands near its tables.
+
+Session 14z-2 (throw victim-teleport root cause + fix):
+- ROOT CAUSE (mechanism-traced, not timeline-inferred): Donovan's throw
+  cinematic positions the victim via the pointer-of-tables at
+  PRG:0x0BE27A (indexed by thrower id; consumers: vanilla
+  0x2804C/0x280C4/0x2813E/0x5316A/0x6E788 + the ported twins in region
+  x026142). Slot 0x0F's entry (PRG:0x0B19F8) held Jedah's keyframe
+  table (0x198 bytes/victim); Donovan's anim keyframe indices are
+  authored for vs2's 0xC8-stride table -> mis-indexed records ->
+  garbage thrower-relative offsets -> the victim teleports. The gap
+  auto-table class had been covering this table until its 14w disable.
+- FIX: [[data_port]] row `throw_victim_keyframes` — vs2 0x0CA1CA
+  (0xE50 bytes; vhunt2 twin 0x0C9A5C byte-identical, asserted every
+  build) placed over Jedah's zone at PRG:0x0B19F8 (0x1828 available;
+  remainder vanilla-dead). Self-relative table, no relocation. One
+  in-blob fix: victim-offset word [0x0F] 0x0B30 -> 0x0D88 (vs2's
+  Donovan-victim block) for the mirror match. Guards: sibling-oracle
+  identity, dest old-content head, dst_end bound, old-verified fixes.
+- New generator construct [[data_port]] (gen_donovan_patch.py, stage
+  >= 6): bulk source-set data over verified vanilla spans, with the
+  guard set above. First user is this row.
+- New tool tests/lua/tap_writes.lua: notifier-hardened write taps (see
+  GOTCHAS: taps dropped on handler re-install; debugger watchpoints
+  desync replays on hot fields).
+- Measured: replay 27 victim trace 21 teleport-scale jumps -> 4
+  structured slam keyframes (2 per throw, consistent phases). Build
+  597ae55b.

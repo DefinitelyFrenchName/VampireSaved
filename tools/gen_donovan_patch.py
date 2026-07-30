@@ -1337,6 +1337,59 @@ def main():
             notes.append(f"{p['op']} {_int(p['addr']):#08x} <- {_int(p['val']):#x} "
                          f" aux {p['name']}")
 
+    # ── data_port: bulk source-set data placed over verified vanilla spans ──
+    # Every row must state its full mechanism in the manifest. Guards:
+    # sibling-oracle byte identity (orc), destination old-content head
+    # (dst_old_head — proves we overwrite exactly the span we think we do),
+    # explicit destination bound (dst_end), and old-verified in-blob fixes.
+    if args.stage >= 6:
+        for dp in port.get("data_port", []):
+            nm = dp["name"]
+            src, dst, ln = _int(dp["src"]), _int(dp["dst"]), _int(dp["len"])
+            sdat = (root / f"build/out/{man['src_set']}_data.bin").read_bytes()
+            blob = bytearray(sdat[src:src + ln])
+            if len(blob) != ln:
+                fail.append(f"data_port {nm}: src read short")
+                continue
+            if "orc" in dp:
+                odat = (root / f"build/out/{man['oracle_set']}_data.bin"
+                        ).read_bytes()
+                tw = _int(dp["orc"])
+                if odat[tw:tw + ln] != bytes(blob):
+                    fail.append(f"data_port {nm}: sibling twin at {tw:#x} "
+                                f"differs — misbounded or wrong address")
+                    continue
+            if dst + ln > _int(dp["dst_end"]):
+                fail.append(f"data_port {nm}: {ln:#x} bytes overrun dst_end "
+                            f"{_int(dp['dst_end']):#x}")
+                continue
+            vdat = (root / "build/out/vsavj_data.bin").read_bytes()
+            oh = bytes.fromhex(dp["dst_old_head"])
+            if vdat[dst:dst + len(oh)] != oh:
+                fail.append(f"data_port {nm}: dest old-content mismatch at "
+                            f"{dst:#x} ({vdat[dst:dst+len(oh)].hex()})")
+                continue
+            ok = True
+            for fx in dp.get("fix", []):
+                off = _int(fx["off"])
+                old = bytes.fromhex(fx["old_hex"])
+                new = bytes.fromhex(fx["new_hex"])
+                if bytes(blob[off:off + len(old)]) != old:
+                    fail.append(f"data_port {nm}: fix@{off:#x} old bytes "
+                                f"mismatch ({bytes(blob[off:off+len(old)]).hex()})")
+                    ok = False
+                    break
+                blob[off:off + len(new)] = new
+            if not ok:
+                continue
+            ops.append({"op": "data", "addr": f"{dst:#x}",
+                        "hex": bytes(blob).hex()})
+            notes.append(f"data   {dst:#08x} +{ln:#x}  data_port {nm} <- "
+                         f"{man['src_set']} {src:#08x} "
+                         f"({len(dp.get('fix', []))} fixes)")
+            fragments.append((dst, ln, "VS2",
+                              f"data_port {nm} ({man['src_set']} {src:#06x})"))
+
     # ── win/quote palette 0x60-view repoint (session 14u) ─────────────────────
     # Companion to select_port's block copies: the hardcoded
     # `lea 0x39FDC0,a0` at CODE:0x1C424 (the char*0x60-view win-screen

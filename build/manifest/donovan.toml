@@ -440,3 +440,41 @@ src_addr = 0x028B5E
 old_hex = "3b49b48e"
 new_hex = "3b49b43c"
 note = "grab ptr store a1 (site 3)"
+
+# Throw victim-keyframe table (session 14z-2 — the ACTUAL throw-teleport
+# root cause). The victim positioner (vanilla trio 0x2804C/0x280C4/0x2813E
+# plus 0x5316A/0x6E788, and the ported twins at x026142) reads the
+# pointer-of-tables at 0xBE27A indexed by THROWER id; slot 0x0F's entry
+# (0x0B19F8) held JEDAH's keyframe table (0x198 bytes/victim), which
+# Donovan's anim keyframe indices — authored against vs2's 0xC8-stride
+# layout — mis-index: garbage thrower-relative offsets, the victim
+# teleports through every throw cinematic. Pre-14w the gap auto-table
+# heuristic happened to cover this table; the 14w wholesale class disable
+# reverted it to vanilla in the same build that carried the 14v grab rows
+# and the winpal copies, which is why both were successively (wrongly)
+# convicted. Fix is the established slot-0F in-place mechanism: vs2
+# Donovan's table (0x0CA1CA, 0xE50 bytes, vhunt2 twin 0x0C9A5C
+# byte-identical) placed over Jedah's zone (0x1828 — fits, remainder
+# stays vanilla-dead). The table is fully self-relative (offset words +
+# keyframe records, no pointers). Legacy surface: 0xBE27A slot 0x0F is
+# only consulted for a slot-0F THROWER — no masked-EXACT replay fields
+# one; the attract Jedah-demo divergence stays frozen at 4278 (first
+# divergence precedes any throw). fix row: victim-offset word [0x0F]
+# 0x0B30 (vs2's Jedah-victim block) -> 0x0D88 (vs2's Donovan-victim
+# block, its entry [0x13]) so the mirror match uses Donovan-victim
+# keyframes — in this flavor victim id 0x0F IS Donovan.
+[[data_port]]
+stage = 6
+name = "throw_victim_keyframes"
+src = 0x0CA1CA
+len = 0xE50
+orc = 0x0C9A5C
+dst = 0x0B19F8
+dst_end = 0x0B3220
+dst_old_head = "004001d80370050806a0083809d00b68"
+
+[[data_port.fix]]
+off = 0x1E
+old_hex = "0b30"
+new_hex = "0d88"
+note = "mirror-match victim entry: Jedah-victim -> Donovan-victim block"

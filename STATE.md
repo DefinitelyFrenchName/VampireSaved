@@ -5,6 +5,28 @@ cf2109d8 pending gates+playtest: Anita/sword/statue render in-match
 and on the win screen; 3 residual sites excluded; session 14q parked
 state superseded)
 
+## Session 14z-2 (throw teleport ROOT-CAUSED and fixed: victim-keyframe table)
+
+- Round 23: throw still broken on byte-exact ad372a6b -> round-21
+  confirmation was a sampling miss; winpal conviction was WRONG (as was
+  the grab-row one). Mechanism trace (new tools/lua: tap_writes.lua):
+  victim X/Y written by ported positioner (PC 0xCE51C, region x026142,
+  vs2 0x0272CE) walking the pointer-of-tables 0xBE27A[thrower id] —
+  slot 0x0F still pointed at JEDAH's keyframe table (0x0B19F8, stride
+  0x198/victim) while Donovan's anim indices assume vs2's 0xC8-stride
+  layout. Pre-14w the gap auto-table class covered this table; the 14w
+  wholesale disable reverted it (Felicia-fix collateral).
+- Fix: new [[data_port]] manifest construct (gen_donovan_patch.py) —
+  vs2 Donovan's victim-keyframe table (0x0CA1CA, 0xE50, vhunt2 twin
+  0x0C9A5C byte-identical, both asserted at build time) placed in-place
+  over Jedah's slot-0F zone (fits in 0x1828), mirror-victim offset word
+  fixed [0x0F]: 0x0B30->0x0D88. Replay 27 trace: 21 teleport-scale
+  jumps -> 4 structured slam keyframes (authentic cinematic motion).
+  Build 597ae55b. Legacy surface: slot-0F throwers only; attract@4278
+  unchanged (diverges before any throw).
+- 27_don_quotewin/27 drift note: the throw connects at 3050/3650 on
+  current builds; re-freeze of the 27 oracle still queued.
+
 ## Session 14z (round 22: winpal copies convicted and fully reverted)
 
 - The throw victim-teleport reappeared on e7682289 and the timeline
