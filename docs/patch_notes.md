@@ -732,3 +732,10 @@ Session 14z-9 (no ROM change; electric family verified end-to-end):
   pixels coherent. 14z-8's "wrong node" reclassified: cross-game
   Victor script-order difference (see STATE 14z-9 and GOTCHAS).
 - REGLOG register capture added to tests/lua/tap_writes.lua.
+
+Session 14z-9c (no ROM change; THE tile-window collision found):
+- Vanilla control run proved the curtain buckets and darken behavior
+  vanilla-faithful; the real defect is the band-remap target window
+  (0xADCF-0xEA3F) overwriting vanilla-referenced tiles (0xC625 curtain
+  smoke -> Donovan chunks; visual render-diff confirmed). Fix = audit
+  + re-placement, plan in STATE 14z-9c. Probes 35/36 committed.

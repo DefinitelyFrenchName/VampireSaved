@@ -5,6 +5,45 @@ cf2109d8 pending gates+playtest: Anita/sword/statue render in-match
 and on the win screen; 3 residual sites excluded; session 14q parked
 state superseded)
 
+## Session 14z-9c (ROUND-29 ROOT CAUSE, FINAL AND PHYSICAL: the Jedah-band tile window is NOT dead)
+
+The vanilla control run (replay 34's inputs on VANILLA vsavj = Jedah vs
+Victor) collapsed every prior model and exposed the truth:
+- The OBJ curtain buckets are IDENTICAL vanilla-vs-build (fc1b/c625/
+  fbc9/f76d/fbee columns) — c625 is a VANILLA code, not our remap
+  output. 14z-6/7/9b's bucket theories are all void.
+- Vanilla vsavj does NOT darken on electric normals (the darken is a
+  VS2-only presentation feature) — the "missing darken" is
+  vanilla-faithful. vs2-Victor's hold-pose order difference likewise.
+- THE ACTUAL DEFECT (tile render, vanilla vs build, tiles 0x2C625+):
+  vanilla holds soft pale curtain/smoke art; the BUILD holds DONOVAN
+  BODY CHUNKS — because the tile port's band remap TARGETS
+  0xADCF-0xEA3F inside the "SAFE" window 0xAD80-0xEEBB (build_gfx
+  session-14 assumption: Jedah's band is free once Jedah is replaced).
+  VANILLA CONTENT REFERENCES TILES IN THAT WINDOW: measured consumer =
+  the VS-fade/curtain columns (code c625 drawn by slot-0F-adjacent
+  system compositions, displayed during electric holds -> Donovan
+  chunks as columns = round-27 "garbled tiles on Donovan"); the
+  electrified-knockdown sprite sighting (round 29) is the same class.
+  Lilith matches don't reference those codes -> clean ✓.
+- EVERY other layer is verified vanilla-faithful (records, anims,
+  cptr, coords, spark, banks) — the garble is purely stolen tile
+  positions.
+
+FIX (next session, M2b-scale, machinery already parameterized):
+1. AUDIT: enumerate vanilla-REFERENCED tile codes in 0xAD80-0xEEBB
+   (walk vanilla OBJ records reachable in gameplay + the VS/system
+   compositions; gfx_tiles + obj_records tooling) -> the set of
+   positions that must NOT be overwritten.
+2. Re-place: choose a new DELTA / placement (build_gfx_donovan.py
+   DELTA + [gfx_remap] band values + effect_map shelf) that avoids the
+   audited positions (or split placement around them). Rebuild gfx +
+   prg (the remap machinery regenerates codes everywhere).
+3. Acceptance: render-compare the audited vanilla positions
+   (byte-identical to vanilla), the hold replay 33 curtain columns
+   (soft dark, not chunks), electrified knockdown by playtest, plus
+   the full battery + all pixel probes.
+
 ## Session 14z-9b (round 29: THE UNIFIED MODEL — it's the electric-hit DARKEN curtain)
 
 Round-29 precision (electrified state at the hard knockdown) + odd-frame

@@ -710,3 +710,17 @@ even-frame sampling missed it entirely across three sessions; and an
 A/B of a curtain change is meaningless unless the compared frames
 actually DISPLAY the curtain (check the list extent includes the
 buckets at the sampled frame).
+
+## "This char's band is free once the char is replaced" — NO: bands hold
+## SYSTEM-REFERENCED tiles too
+The session-14 tile placement assumed Jedah's OBJ band (0xAD80-0xEEBB)
+was writable once Donovan replaced him. FALSE: vanilla system content
+references tiles inside per-char bands — measured: the VS-fade curtain
+columns draw code 0xC625 (soft smoke art in vanilla, Donovan body
+chunks on the build), displayed during electric holds. Any future tile
+placement must AUDIT actual vanilla references into the target window
+(not just "whose band is it"), and the round-27/28/29 garble odyssey is
+the cost of skipping that audit: five wrong models (stale buckets,
+phantom clear, script order, phase artifacts, missing darken) before
+the vanilla CONTROL RUN — always run the vanilla control FIRST when a
+visual differs; it would have ended this in one session.

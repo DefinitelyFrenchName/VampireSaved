@@ -18,16 +18,16 @@ Open items, in maintainer priority order:
 1. SWORD CONFIRMED (round 27) — blocker closed. Leftovers, non-blocking:
    blade palette (red/grey vs native silver — blink family), 6HP hitbox
    worry (oracle HP matched; a hitbox A/B replay would settle it).
-1b. Electric-hit DARKEN curtain (rounds 27-29, UNIFIED — read STATE
-   14z-9b first; supersedes all prior models): the engine darkens the
-   screen during electric hits by displaying the OBJ curtain buckets
-   WITHOUT rewriting them; on vsavj+Donovan they hold his VS-portrait
-   pieces (garble when shown: the hold) and the darken fails to engage
-   on 5HP (bright reel). Fix plan in STATE: dark-fill the buckets at
-   match start via the 14z-7 countdown mechanism (payload = proper dark
-   entries copied from a vanilla Lilith-victim reference, NOT clr.l),
-   then verify the 5HP darken engages. Probes: replays 33/34/35; the
-   ODD-frame sampling rule (GOTCHAS) is mandatory here.
+1b. THE GARBLE ROOT CAUSE (rounds 27-29, FINAL — STATE 14z-9c): the
+   tile port's band-remap target window overlaps vanilla-referenced
+   tile positions (measured: 0xC625 VS-curtain smoke art replaced by
+   Donovan chunks; render-diff proof). Fix = (1) audit vanilla
+   references into 0xAD80-0xEEBB, (2) re-place Donovan's band/shelf
+   (DELTA + gfx_remap + effect_map are parameterized) avoiding them,
+   (3) acceptance: vanilla-position render-identity + replay-33
+   curtain + playtest + battery + probes. Read the new GOTCHAS entry
+   ("bands hold SYSTEM-REFERENCED tiles") and ALWAYS run the vanilla
+   control first.
 2. Palette family (non-blocker): win-quote + HUD mini-portrait rows'
    true consumer still undecoded. Start from a palette-RAM write trace
    on the quote screen (rows 0x16-0x1F), NOT from the uploader tables
