@@ -630,3 +630,21 @@ display path must ship with a before/after SNAP_FRAMES pixel comparison
 on a replay that exercises it (replay 17 hit frames 3477-3481 is the
 ready-made spark probe). Also: never assume an object field is dead
 because one path leaves it stale — prove it by pixel A/B, not by RAM.
+
+## Sibling twins can differ by ONE hoisted instruction — codebyte-matching lies
+The round-26 sword root cause: vs2 refactored the set-anim-by-number
+resolver into TWO entries — 0x5C77A applies `andi.w #$ff,d0` and falls
+through; 0x5C77E skips it (so Savior-2 extended anim numbers 0x100+ can
+resolve). vsavj's twin embeds the mask MID-routine with a single entry.
+The auto-matcher byte-matched the shared prefix and emitted a "verified"
+row mapping the UNMASKED vs2 entry to the MASKED vsavj routine — every
+ported call truncated its anim number (0x127 -> 0x27) and resolved a
+wrong-but-valid node in the right table. Nothing crashed; the sword
+simply played idle anims through every attack. Lessons: (1) when a vs2
+ref lands a few bytes past a routine head, check what those skipped
+bytes DO — an entry that skips a masking/clamping instruction is a
+different function; (2) "wrong data, right table" bugs present as
+plausible-but-wrong behavior, invisible to every RAM/crash gate — only
+behavior probes (the sword gate) catch the regression class. Fix
+mechanism: reconciliation kind `patched_clone` (vanilla bytes minus the
+divergent instruction, ported refs only).

@@ -24,23 +24,24 @@
 | `PRG:0x0CB810` | 0xC | GEN | farm-port stub 0x29184 |
 | `PRG:0x0CB830` | 0xC | GEN | farm-port stub 0x2918c |
 | `PRG:0x0CB840` | 0x2C | GEN | alloc wrapper 0x1572e |
+| `PRG:0x0CB8E0` | 0x40 | GEN | patched clone 0x5459a (vs2 0x5c77e) |
 | `PRG:0x3FCD60` | 0x2C48 | VS2 | companion-effect coord lists |
 | `PRG:0x0CEAF0` | 0x500 | VS2 | sprite palette block |
 | `PRG:0x0CEFF0` | 0x130 | GEN | proj_hook ext table |
-| `PRG:0x0CBAA0` | 0x12 | GEN | obj_hook thunk |
+| `PRG:0x0CBAE0` | 0x12 | GEN | obj_hook thunk |
 | `PRG:0x054470` | 0x6 | GEN | obj_hook engine site |
 | `PRG:0x0CF120` | 0x1F0 | GEN | proj_hook ext table |
-| `PRG:0x0CBAD0` | 0x12 | GEN | obj_hook thunk |
+| `PRG:0x0CBB10` | 0x12 | GEN | obj_hook thunk |
 | `PRG:0x05E542` | 0x6 | GEN | obj_hook engine site |
 | `PRG:0x3FF9B0` | 0x180 | VS2 | state_hook seq records |
-| `PRG:0x0CBAF0` | 0xC | GEN | state_hook private seq entry |
+| `PRG:0x0CBB30` | 0xC | GEN | state_hook private seq entry |
 | `PRG:0x0FF180` | 0x180 | GEN | state_hook case stubs |
-| `PRG:0x0CBB00` | 0x30 | GEN | state_hook ext table |
-| `PRG:0x0CBB30` | 0x32 | GEN | state_hook thunk |
+| `PRG:0x0CBF40` | 0x30 | GEN | state_hook ext table |
+| `PRG:0x0CBF70` | 0x32 | GEN | state_hook thunk |
 | `PRG:0x02A7C8` | 0x6 | GEN | state_hook engine site |
-| `PRG:0x0CBF40` | 0x24 | VS2 | reaction_hook cases |
-| `PRG:0x0CBF70` | 0x10 | GEN | reaction_hook ext table |
-| `PRG:0x0CBF80` | 0x32 | GEN | reaction_hook thunk |
+| `PRG:0x0CBFB0` | 0x24 | VS2 | reaction_hook cases |
+| `PRG:0x0CBB40` | 0x10 | GEN | reaction_hook ext table |
+| `PRG:0x0CBFE0` | 0x32 | GEN | reaction_hook thunk |
 | `PRG:0x018458` | 0x6 | GEN | reaction_hook engine site |
-| `PRG:0x0CBFC0` | 0x44 | GEN | pool-seed + flavor(+Start-hold) init shim |
+| `PRG:0x0CC020` | 0x44 | GEN | pool-seed + flavor(+Start-hold) init shim |
 | `PRG:0x0B19F8` | 0xE50 | VS2 | data_port throw_victim_keyframes (vsav2 0xca1ca) |

@@ -81,47 +81,48 @@ code   0x0cb8d0 ILLEGAL  TRIPWIRE for unresolved 0x181592
 code_file 0x0c2a10 +0x6a00  donovan x05c800 (from vsav2 0x05C800)
 code_file 0x0cbb62 +0x2d0  donovan x065952 (from vsav2 0x065952)
 code_file 0x0cbe32 +0x100  donovan x065c22 (from vsav2 0x065C22)
+code   0x0cb8e0 +0x40  patched clone of 0x5459a for vs2 0x5c77e (unmasked set-anim entry; false byte-matc)
 code_file 0x0cc06a +0x106a  donovan x065e5a (from vsav2 0x065E5A)
 code_file 0x0cd0d4 +0x2b8  donovan x066ec4 (from vsav2 0x066EC4)
 code_file 0x0c28a0 +0x154  donovan x06717c (from vsav2 0x06717C)
-code   0x0cb8e0 ILLEGAL  TRIPWIRE for unresolved 0x24edd4
-# x088512+0x1362: unresolved 0x24edd4 -> tripwire 0xcb8e0
-# x088512+0x13a0: unresolved 0x24edd4 -> tripwire 0xcb8e0
-# x088512+0x13e4: unresolved 0x24edd4 -> tripwire 0xcb8e0
-# x088512+0x1428: unresolved 0x24edd4 -> tripwire 0xcb8e0
-# x088512+0x1464: unresolved 0x24edd4 -> tripwire 0xcb8e0
-# x088512+0x14a2: unresolved 0x24edd4 -> tripwire 0xcb8e0
-# x088512+0x150a: unresolved 0x24edd4 -> tripwire 0xcb8e0
-# x088512+0x154e: unresolved 0x24edd4 -> tripwire 0xcb8e0
-# x088512+0x1590: unresolved 0x24edd4 -> tripwire 0xcb8e0
-# x088512+0x15f0: unresolved 0x24edd4 -> tripwire 0xcb8e0
-# x088512+0x1670: unresolved 0x24edd4 -> tripwire 0xcb8e0
-code   0x0cb8f0 ILLEGAL  TRIPWIRE for unresolved 0x24a3ce
-# x088512+0x16d8: unresolved 0x24a3ce -> tripwire 0xcb8f0
-# x088512+0x1732: unresolved 0x24edd4 -> tripwire 0xcb8e0
-# x088512+0x1796: unresolved 0x24edd4 -> tripwire 0xcb8e0
-# x088512+0x17fa: unresolved 0x24edd4 -> tripwire 0xcb8e0
-# x088512+0x18ee: unresolved 0x24edd4 -> tripwire 0xcb8e0
-# x088512+0x191c: unresolved 0x24edd4 -> tripwire 0xcb8e0
-# x088512+0x194a: unresolved 0x24edd4 -> tripwire 0xcb8e0
-# x088512+0x1994: unresolved 0x24edd4 -> tripwire 0xcb8e0
-# x088512+0x1cd2: unresolved 0x24edd4 -> tripwire 0xcb8e0
-# x088512+0x1d1a: unresolved 0x24edd4 -> tripwire 0xcb8e0
-code   0x0cb900 ILLEGAL  TRIPWIRE for unresolved 0x36784a
-# x088512+0x1dee: unresolved 0x36784a -> tripwire 0xcb900
-code   0x0cb910 ILLEGAL  TRIPWIRE for unresolved 0x25111e
-# x088512+0x2156: unresolved 0x25111e -> tripwire 0xcb910
-# x088512+0x21d2: unresolved 0x25111e -> tripwire 0xcb910
-# x088512+0x26e2: unresolved 0x25111e -> tripwire 0xcb910
-code   0x0cb920 ILLEGAL  TRIPWIRE for unresolved 0x2695d0
-# x088512+0x2894: unresolved 0x2695d0 -> tripwire 0xcb920
-# x088512+0x28ce: unresolved 0x24edd4 -> tripwire 0xcb8e0
-# x088512+0x290c: unresolved 0x24edd4 -> tripwire 0xcb8e0
-# x088512+0x294a: unresolved 0x24edd4 -> tripwire 0xcb8e0
-# x088512+0x2986: unresolved 0x24edd4 -> tripwire 0xcb8e0
-# x088512+0x29c4: unresolved 0x24edd4 -> tripwire 0xcb8e0
-# x088512+0x2a2c: unresolved 0x24edd4 -> tripwire 0xcb8e0
-# x088512+0x2a6a: unresolved 0x24edd4 -> tripwire 0xcb8e0
+code   0x0cb920 ILLEGAL  TRIPWIRE for unresolved 0x24edd4
+# x088512+0x1362: unresolved 0x24edd4 -> tripwire 0xcb920
+# x088512+0x13a0: unresolved 0x24edd4 -> tripwire 0xcb920
+# x088512+0x13e4: unresolved 0x24edd4 -> tripwire 0xcb920
+# x088512+0x1428: unresolved 0x24edd4 -> tripwire 0xcb920
+# x088512+0x1464: unresolved 0x24edd4 -> tripwire 0xcb920
+# x088512+0x14a2: unresolved 0x24edd4 -> tripwire 0xcb920
+# x088512+0x150a: unresolved 0x24edd4 -> tripwire 0xcb920
+# x088512+0x154e: unresolved 0x24edd4 -> tripwire 0xcb920
+# x088512+0x1590: unresolved 0x24edd4 -> tripwire 0xcb920
+# x088512+0x15f0: unresolved 0x24edd4 -> tripwire 0xcb920
+# x088512+0x1670: unresolved 0x24edd4 -> tripwire 0xcb920
+code   0x0cb930 ILLEGAL  TRIPWIRE for unresolved 0x24a3ce
+# x088512+0x16d8: unresolved 0x24a3ce -> tripwire 0xcb930
+# x088512+0x1732: unresolved 0x24edd4 -> tripwire 0xcb920
+# x088512+0x1796: unresolved 0x24edd4 -> tripwire 0xcb920
+# x088512+0x17fa: unresolved 0x24edd4 -> tripwire 0xcb920
+# x088512+0x18ee: unresolved 0x24edd4 -> tripwire 0xcb920
+# x088512+0x191c: unresolved 0x24edd4 -> tripwire 0xcb920
+# x088512+0x194a: unresolved 0x24edd4 -> tripwire 0xcb920
+# x088512+0x1994: unresolved 0x24edd4 -> tripwire 0xcb920
+# x088512+0x1cd2: unresolved 0x24edd4 -> tripwire 0xcb920
+# x088512+0x1d1a: unresolved 0x24edd4 -> tripwire 0xcb920
+code   0x0cb940 ILLEGAL  TRIPWIRE for unresolved 0x36784a
+# x088512+0x1dee: unresolved 0x36784a -> tripwire 0xcb940
+code   0x0cb950 ILLEGAL  TRIPWIRE for unresolved 0x25111e
+# x088512+0x2156: unresolved 0x25111e -> tripwire 0xcb950
+# x088512+0x21d2: unresolved 0x25111e -> tripwire 0xcb950
+# x088512+0x26e2: unresolved 0x25111e -> tripwire 0xcb950
+code   0x0cb960 ILLEGAL  TRIPWIRE for unresolved 0x2695d0
+# x088512+0x2894: unresolved 0x2695d0 -> tripwire 0xcb960
+# x088512+0x28ce: unresolved 0x24edd4 -> tripwire 0xcb920
+# x088512+0x290c: unresolved 0x24edd4 -> tripwire 0xcb920
+# x088512+0x294a: unresolved 0x24edd4 -> tripwire 0xcb920
+# x088512+0x2986: unresolved 0x24edd4 -> tripwire 0xcb920
+# x088512+0x29c4: unresolved 0x24edd4 -> tripwire 0xcb920
+# x088512+0x2a2c: unresolved 0x24edd4 -> tripwire 0xcb920
+# x088512+0x2a6a: unresolved 0x24edd4 -> tripwire 0xcb920
 # x088512+0x209c: char-id imm 0x13 -> 0xf
 code   0x0cead0 ILLEGAL  shared pcrel TRIPWIRE for x088512
 # x088512: 9 pcrel escape entries rewritten (tripwire at 0xcead0)
@@ -133,28 +134,28 @@ code_file 0x0d0170 +0x2f00  donovan x088512 (from vsav2 0x088512)
 code   0x0ceae0 ILLEGAL  shared pcrel TRIPWIRE for x0905ae
 # x0905ae: 2 pcrel escape entries rewritten (tripwire at 0xceae0)
 code_file 0x0ce7d0 +0x300  donovan x0905ae (from vsav2 0x0905AE)
-code   0x0cb930 ILLEGAL  TRIPWIRE for unresolved 0x2c3136
-# x2b7ef4+0xb0c9: unresolved 0x2c3136 -> tripwire 0xcb930
-code   0x0cb940 ILLEGAL  TRIPWIRE for unresolved 0x2c3170
-# x2b7ef4+0xb0d1: unresolved 0x2c3170 -> tripwire 0xcb940
-code   0x0cb950 ILLEGAL  TRIPWIRE for unresolved 0x2c31aa
-# x2b7ef4+0xb0d9: unresolved 0x2c31aa -> tripwire 0xcb950
-code   0x0cb960 ILLEGAL  TRIPWIRE for unresolved 0x2c31e4
-# x2b7ef4+0xb0fd: unresolved 0x2c31e4 -> tripwire 0xcb960
-code   0x0cb970 ILLEGAL  TRIPWIRE for unresolved 0x2c3236
-# x2b7ef4+0xb105: unresolved 0x2c3236 -> tripwire 0xcb970
-code   0x0cb980 ILLEGAL  TRIPWIRE for unresolved 0x2c325c
-# x2b7ef4+0xb10d: unresolved 0x2c325c -> tripwire 0xcb980
-code   0x0cb990 ILLEGAL  TRIPWIRE for unresolved 0x2c3272
-# x2b7ef4+0xb115: unresolved 0x2c3272 -> tripwire 0xcb990
-code   0x0cb9a0 ILLEGAL  TRIPWIRE for unresolved 0x2c3280
-# x2b7ef4+0xb11d: unresolved 0x2c3280 -> tripwire 0xcb9a0
-code   0x0cb9b0 ILLEGAL  TRIPWIRE for unresolved 0x2c3296
-# x2b7ef4+0xb125: unresolved 0x2c3296 -> tripwire 0xcb9b0
-code   0x0cb9c0 ILLEGAL  TRIPWIRE for unresolved 0x2c32a4
-# x2b7ef4+0xb12d: unresolved 0x2c32a4 -> tripwire 0xcb9c0
-code   0x0cb9d0 ILLEGAL  TRIPWIRE for unresolved 0x2c32b2
-# x2b7ef4+0xb135: unresolved 0x2c32b2 -> tripwire 0xcb9d0
+code   0x0cb970 ILLEGAL  TRIPWIRE for unresolved 0x2c3136
+# x2b7ef4+0xb0c9: unresolved 0x2c3136 -> tripwire 0xcb970
+code   0x0cb980 ILLEGAL  TRIPWIRE for unresolved 0x2c3170
+# x2b7ef4+0xb0d1: unresolved 0x2c3170 -> tripwire 0xcb980
+code   0x0cb990 ILLEGAL  TRIPWIRE for unresolved 0x2c31aa
+# x2b7ef4+0xb0d9: unresolved 0x2c31aa -> tripwire 0xcb990
+code   0x0cb9a0 ILLEGAL  TRIPWIRE for unresolved 0x2c31e4
+# x2b7ef4+0xb0fd: unresolved 0x2c31e4 -> tripwire 0xcb9a0
+code   0x0cb9b0 ILLEGAL  TRIPWIRE for unresolved 0x2c3236
+# x2b7ef4+0xb105: unresolved 0x2c3236 -> tripwire 0xcb9b0
+code   0x0cb9c0 ILLEGAL  TRIPWIRE for unresolved 0x2c325c
+# x2b7ef4+0xb10d: unresolved 0x2c325c -> tripwire 0xcb9c0
+code   0x0cb9d0 ILLEGAL  TRIPWIRE for unresolved 0x2c3272
+# x2b7ef4+0xb115: unresolved 0x2c3272 -> tripwire 0xcb9d0
+code   0x0cb9e0 ILLEGAL  TRIPWIRE for unresolved 0x2c3280
+# x2b7ef4+0xb11d: unresolved 0x2c3280 -> tripwire 0xcb9e0
+code   0x0cb9f0 ILLEGAL  TRIPWIRE for unresolved 0x2c3296
+# x2b7ef4+0xb125: unresolved 0x2c3296 -> tripwire 0xcb9f0
+code   0x0cba00 ILLEGAL  TRIPWIRE for unresolved 0x2c32a4
+# x2b7ef4+0xb12d: unresolved 0x2c32a4 -> tripwire 0xcba00
+code   0x0cba10 ILLEGAL  TRIPWIRE for unresolved 0x2c32b2
+# x2b7ef4+0xb135: unresolved 0x2c32b2 -> tripwire 0xcba10
 # x2b7ef4: effect_tail — 128 bank-1 words, 308 bank-2 words (tail placements), 114 coord lists matched, 617 ported (11336B fragment)
 data_file 0x0f3f70 +0xb20c  donovan x2b7ef4 (from vsav2 0x2B7EF4)
 data     0x0ceaf0 +0x500  sprite palette block (vsav2 0x39CB9C); poke32 0x38c1d4 (palette table row 0xf)
@@ -202,47 +203,47 @@ poke32 0x0bf2d6 <- 0x000bfcec  tail_code_ptr[0xf] donovan code
 poke32 0x0bf316 <- 0x000bfcec  tail_code_ptr[0x1f] variant mirror
 poke32 0x0bf456 <- 0x003fcbf2  tail_data_ptr[0xf] donovan hitbox
 poke32 0x0bf496 <- 0x003fcbf2  tail_data_ptr[0x1f] variant mirror
-code   0x0cb9e0 ILLEGAL  TRIPWIRE for unresolved 0x672d0
-# obj_hook@0x54470 type 64: unresolved 0x672d0 -> tripwire 0xcb9e0
-code   0x0cb9f0 ILLEGAL  TRIPWIRE for unresolved 0x67550
-# obj_hook@0x54470 type 65: unresolved 0x67550 -> tripwire 0xcb9f0
-code   0x0cba00 ILLEGAL  TRIPWIRE for unresolved 0x67846
-# obj_hook@0x54470 type 66: unresolved 0x67846 -> tripwire 0xcba00
-code   0x0cba10 ILLEGAL  TRIPWIRE for unresolved 0x67a00
-# obj_hook@0x54470 type 67: unresolved 0x67a00 -> tripwire 0xcba10
-code   0x0cba20 ILLEGAL  TRIPWIRE for unresolved 0x6800c
-# obj_hook@0x54470 type 68: unresolved 0x6800c -> tripwire 0xcba20
-code   0x0cba30 ILLEGAL  TRIPWIRE for unresolved 0x68458
-# obj_hook@0x54470 type 69: unresolved 0x68458 -> tripwire 0xcba30
-code   0x0cba40 ILLEGAL  TRIPWIRE for unresolved 0x68768
-# obj_hook@0x54470 type 70: unresolved 0x68768 -> tripwire 0xcba40
-code   0x0cba50 ILLEGAL  TRIPWIRE for unresolved 0x689cc
-# obj_hook@0x54470 type 71: unresolved 0x689cc -> tripwire 0xcba50
-code   0x0cba60 ILLEGAL  TRIPWIRE for unresolved 0x68c78
-# obj_hook@0x54470 type 72: unresolved 0x68c78 -> tripwire 0xcba60
-code   0x0cba70 ILLEGAL  TRIPWIRE for unresolved 0x69046
-# obj_hook@0x54470 type 73: unresolved 0x69046 -> tripwire 0xcba70
-code   0x0cba80 ILLEGAL  TRIPWIRE for unresolved 0x692f6
-# obj_hook@0x54470 type 74: unresolved 0x692f6 -> tripwire 0xcba80
-code   0x0cba90 ILLEGAL  TRIPWIRE for unresolved 0x6965e
-# obj_hook@0x54470 type 75: unresolved 0x6965e -> tripwire 0xcba90
+code   0x0cba20 ILLEGAL  TRIPWIRE for unresolved 0x672d0
+# obj_hook@0x54470 type 64: unresolved 0x672d0 -> tripwire 0xcba20
+code   0x0cba30 ILLEGAL  TRIPWIRE for unresolved 0x67550
+# obj_hook@0x54470 type 65: unresolved 0x67550 -> tripwire 0xcba30
+code   0x0cba40 ILLEGAL  TRIPWIRE for unresolved 0x67846
+# obj_hook@0x54470 type 66: unresolved 0x67846 -> tripwire 0xcba40
+code   0x0cba50 ILLEGAL  TRIPWIRE for unresolved 0x67a00
+# obj_hook@0x54470 type 67: unresolved 0x67a00 -> tripwire 0xcba50
+code   0x0cba60 ILLEGAL  TRIPWIRE for unresolved 0x6800c
+# obj_hook@0x54470 type 68: unresolved 0x6800c -> tripwire 0xcba60
+code   0x0cba70 ILLEGAL  TRIPWIRE for unresolved 0x68458
+# obj_hook@0x54470 type 69: unresolved 0x68458 -> tripwire 0xcba70
+code   0x0cba80 ILLEGAL  TRIPWIRE for unresolved 0x68768
+# obj_hook@0x54470 type 70: unresolved 0x68768 -> tripwire 0xcba80
+code   0x0cba90 ILLEGAL  TRIPWIRE for unresolved 0x689cc
+# obj_hook@0x54470 type 71: unresolved 0x689cc -> tripwire 0xcba90
+code   0x0cbaa0 ILLEGAL  TRIPWIRE for unresolved 0x68c78
+# obj_hook@0x54470 type 72: unresolved 0x68c78 -> tripwire 0xcbaa0
+code   0x0cbab0 ILLEGAL  TRIPWIRE for unresolved 0x69046
+# obj_hook@0x54470 type 73: unresolved 0x69046 -> tripwire 0xcbab0
+code   0x0cbac0 ILLEGAL  TRIPWIRE for unresolved 0x692f6
+# obj_hook@0x54470 type 74: unresolved 0x692f6 -> tripwire 0xcbac0
+code   0x0cbad0 ILLEGAL  TRIPWIRE for unresolved 0x6965e
+# obj_hook@0x54470 type 75: unresolved 0x6965e -> tripwire 0xcbad0
 data   0x0ceff0 +0x130  proj_hook extended type table (59 vanilla + 17 ported, 5 placed)
-code   0x0cbaa0 obj_hook thunk (ghost-clean: returns to vanilla jsr)
+code   0x0cbae0 obj_hook thunk (ghost-clean: returns to vanilla jsr)
 code   0x054470 ENGINE HOOK: dispatch -> jmp thunk; vanilla jsr (A0) at 0x54476 untouched (vanilla types identical via table copy)
-code   0x0cbac0 ILLEGAL  TRIPWIRE for unresolved 0x6a70c
-# obj_hook@0x5e542 type 121: unresolved 0x6a70c -> tripwire 0xcbac0
-# obj_hook@0x5e542 type 122: unresolved 0x6a70c -> tripwire 0xcbac0
-# obj_hook@0x5e542 type 123: unresolved 0x6a70c -> tripwire 0xcbac0
+code   0x0cbb00 ILLEGAL  TRIPWIRE for unresolved 0x6a70c
+# obj_hook@0x5e542 type 121: unresolved 0x6a70c -> tripwire 0xcbb00
+# obj_hook@0x5e542 type 122: unresolved 0x6a70c -> tripwire 0xcbb00
+# obj_hook@0x5e542 type 123: unresolved 0x6a70c -> tripwire 0xcbb00
 data   0x0cf120 +0x1f0  proj_hook extended type table (114 vanilla + 10 ported, 7 placed)
-code   0x0cbad0 obj_hook thunk (ghost-clean: returns to vanilla jsr)
+code   0x0cbb10 obj_hook thunk (ghost-clean: returns to vanilla jsr)
 code   0x05e542 ENGINE HOOK: dispatch -> jmp thunk; vanilla jsr (A0) at 0x5e548 untouched (vanilla types identical via table copy)
 data   0x3ff9b0 +0x180  state_hook palette-seq records (ids 0x2cd-0x2d8)
-code   0x0cbaf0 state_hook private seq entry (records base 0x3ff9b0 - 0x2cd*32 -> engine 0x2ad9a)
-code   0x02a7c8 ENGINE HOOK: +0x14e state dispatch -> thunk 0x0cbb30 (vanilla ids ghost-clean via jmp-back; ids 0xb2-0xc8 -> 12 synthesized stubs at 0x0ff180, ext table 0x0cbb00)
-code   0x018458 ENGINE HOOK: hit-reaction dispatch -> thunk 0x0cbf80 (vanilla ids jmp back to untouched 0x18460; ids 0xa0-0xa6 -> 4 verbatim vs2 cases at 0x0cbf40)
-code   0x0cbfc0 init shim (pool latch A5+0x7966, seeder 0x16c64; flavor (A6+0x3c2)<-0x01, Start-held [0xff8060 bit=player] -> 0x00) -> handler 0x0c1030
-poke32 0x0bd136 <- 0x000cbfc0  dispatch_00[0xf] donovan handler via seed shim
-poke32 0x0bd176 <- 0x000cbfc0  dispatch_00[0x1f] variant mirror
+code   0x0cbb30 state_hook private seq entry (records base 0x3ff9b0 - 0x2cd*32 -> engine 0x2ad9a)
+code   0x02a7c8 ENGINE HOOK: +0x14e state dispatch -> thunk 0x0cbf70 (vanilla ids ghost-clean via jmp-back; ids 0xb2-0xc8 -> 12 synthesized stubs at 0x0ff180, ext table 0x0cbf40)
+code   0x018458 ENGINE HOOK: hit-reaction dispatch -> thunk 0x0cbfe0 (vanilla ids jmp back to untouched 0x18460; ids 0xa0-0xa6 -> 4 verbatim vs2 cases at 0x0cbfb0)
+code   0x0cc020 init shim (pool latch A5+0x7966, seeder 0x16c64; flavor (A6+0x3c2)<-0x01, Start-held [0xff8060 bit=player] -> 0x00) -> handler 0x0c1030
+poke32 0x0bd136 <- 0x000cc020  dispatch_00[0xf] donovan handler via seed shim
+poke32 0x0bd176 <- 0x000cc020  dispatch_00[0x1f] variant mirror
 poke32 0x0bd1b6 <- 0x000bf6aa  dispatch_01[0xf] donovan handler
 poke32 0x0bd1f6 <- 0x000bf6aa  dispatch_01[0x1f] variant mirror
 poke32 0x0bd236 <- 0x000bff64  dispatch_02[0xf] donovan handler

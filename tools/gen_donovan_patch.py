@@ -344,6 +344,41 @@ def main():
                     return name
             return None
 
+        patched_clones = {}  # target -> placed clone address
+
+        def patched_clone_for(tgt, m, where):
+            """vs2-only entry points whose vsavj "twin" is a FALSE byte-match
+            (e.g. vs2 0x5C77E = the UNMASKED set-anim entry; vsavj embeds
+            `andi.w #$ff,d0` mid-routine with no unmasked entry — Donovan's
+            sword anim numbers 0x124-0x201 truncate through it, round-26
+            sword-swing root cause). Synthesize the true equivalent: clone
+            the vanilla routine bytes and apply the row's patch (old->new,
+            deletion allowed), placed once in hole a."""
+            if tgt not in patched_clones:
+                src = _int(m["clone_src"])
+                ln = _int(m["clone_len"])
+                body = bytearray(
+                    (root / "build/out/vsavj_opcodes.bin").read_bytes()[src:src + ln])
+                old = bytes.fromhex(m["patch_old"])
+                new = bytes.fromhex(m.get("patch_new", ""))
+                i = bytes(body).find(old)
+                if i < 0 or bytes(body).find(old, i + 1) >= 0:
+                    fail.append(f"{where}: patched_clone {tgt:#x}: patch_old "
+                                f"not found or not unique in clone span")
+                    return None
+                body[i:i + len(old)] = new
+                cd = alloc("a", len(body), f"patched clone {tgt:#x}")
+                if cd is None:
+                    return None
+                ops.append({"op": "code", "addr": f"{cd:#x}",
+                            "hex": bytes(body).hex()})
+                notes.append(f"code   {cd:#08x} +{len(body):#x}  patched clone "
+                             f"of {src:#x} for vs2 {tgt:#x} ({m.get('note','')[:40]})")
+                fragments.append((cd, len(body), "GEN",
+                                  f"patched clone {src:#06x} (vs2 {tgt:#06x})"))
+                patched_clones[tgt] = cd
+            return patched_clones[tgt]
+
         tripwires = {}  # unresolved target -> planted-ILLEGAL address
 
         def tripwire_for(tgt, where):
@@ -470,6 +505,8 @@ def main():
                 m = recon.get(tgt)
                 if m and m.get("kind") == "farm_port":
                     return farm_port_for(tgt, m, where)
+                if m and m.get("kind") == "patched_clone":
+                    return patched_clone_for(tgt, m, where)
                 ok = m and (m.get("status") == "verified"
                             or (args.allow_plausible
                                 and m.get("status") == "plausible"))

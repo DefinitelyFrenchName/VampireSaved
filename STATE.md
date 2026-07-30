@@ -5,6 +5,41 @@ cf2109d8 pending gates+playtest: Anita/sword/statue render in-match
 and on the win screen; 3 residual sites excluded; session 14q parked
 state superseded)
 
+## Session 14z-5 (round 26 continuation: SWORD SWING FIXED — build 2da7d910)
+
+The armed-normal sword swing is FIXED at root. Full chain (each link
+measured): Donovan's anim nodes carry a sword-pose word at node+0xE;
+his ported sword-command routine (vs2 0x65EBA family, placed 0xCC0CA)
+adds 0x23 and calls set-anim-by-number on the sword object; numbers are
+0x124-0x201. vs2 calls the UNMASKED resolver entry (0x5C77E — vs2
+hoisted `andi.w #$ff` to a skippable pre-entry at 0x5C77A); vsavj's
+twin embeds the mask, and the auto-matched reconciliation row sent
+ported calls into it -> numbers truncated -> wrong-but-valid nodes in
+Donovan's own (correctly repointed) number table at 0xBD07A[0x0F] ->
+sword idled through every attack. Everything else (pose data, table
+repoint, tiles, +0x9C char id) was verified correct along the way.
+- Fix: new reconciliation kind `patched_clone` (gen) — vanilla resolver
+  bytes minus the andi, placed in hole a, ported refs only; vanilla
+  callers untouched (36 vanilla call sites keep the masked original).
+- Verified: sword walks 0xE19D8-0xE1AB0 (= vs2 0x28DE98-0x28DF28 swing
+  family), idx-0 command lands, SNAP pixel shows the blade arc, Anita
+  present, spark clean. New permanent gate tests/test_don_sword.sh
+  (replay 31_don_6hp probe, node 0xE1A20 assertion).
+- Red-herring bookkeeping (measured, valuable): the type-3 "spark" is
+  the GENERIC hit starburst (vs2's global effect table T=0x2B7EF4 = the
+  head of ported region x2b7ef4) and renders CORRECTLY on our build;
+  the 14z-3 "sword-arc effect object" interpretation was wrong. Effect
+  strip tables: vsavj T=0x283690 (12 abs code refs), per-char anim
+  number tables: vsavj 0xBD07A / vs2 0xD7218 (row 0x0F repointed to
+  0xDDA1E by the bank port — verified correct).
+
+## Round 26 (2026-07-30, maintainer): 597ae55b re-confirmed clean
+
+On-hit effects verified clean in play; no regression observed. State
+clean for further work. Current work: the sword-swing display-side
+redirect (the one remaining blocker step; see 14z-3/14z-4 and
+NEXT_SESSION for the full map and the atomic-change design rules).
+
 ## Session 14z-4 (round 25: spark-thunk visual regression; full rollback to 597ae55b)
 
 - Round-25 report (maintainer): garbled effect sprites on hit. Pixel

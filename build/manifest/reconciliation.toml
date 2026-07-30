@@ -860,12 +860,27 @@ kind = "engine_data"
 status = "verified"
 note = "callsite-anchored-x14; refs: bare_long"
 
+# Session 14z-5 (round-26 sword-swing root cause): vs2 0x5C77E is the
+# UNMASKED set-anim-by-number entry — vs2 hoisted `andi.w #$ff,d0` to a
+# pre-entry at 0x5C77A so extended anim numbers (Donovan sword poses
+# 0x101-0x1DE -> numbers 0x124-0x201) can skip it. vsavj's twin embeds
+# the mask mid-routine (0x545B0) with NO unmasked entry, so the old
+# codebytes-match row was a FALSE equivalence: every ported call
+# truncated (0x127 -> 0x27) and resolved a wrong-but-valid node in
+# Donovan's own repointed number table (0xBD07A row 0x0F) — the sword
+# played idle-family anims instead of swings. patched_clone = vanilla
+# 0x5459A bytes minus the andi, placed in hole a; ONLY ported refs
+# route there (vanilla callers keep the masked original untouched).
 [[map]]
 vsav2 = 0x05c77e
 vsavj = 0x05459a
-kind = "engine_data"
+kind = "patched_clone"
 status = "verified"
-note = "codebytes-unique-w0x8; refs: bare_long"
+clone_src = 0x05459a
+clone_len = 0x44
+patch_old = "024000ff"
+patch_new = ""
+note = "unmasked set-anim entry; false byte-match to the masked vsavj twin"
 
 [[map]]
 vsav2 = 0x05c79e

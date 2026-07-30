@@ -676,3 +676,19 @@ Session 14z-4 (round-25 regression rollback):
   replay-17 hit-frame snapshots pixel-verified clean.
 - New acceptance rule for effect/display changes (GOTCHAS): pixel A/B
   via SNAP_FRAMES on an exercising replay, alongside the battery.
+
+Session 14z-5 (sword swing root-caused and fixed; build 2da7d910):
+- Reconciliation row vs2 0x05C77E converted from the FALSE codebytes
+  match (-> masked vsavj 0x5459A) to new kind `patched_clone`:
+  clone_src 0x5459A, clone_len 0x44, patch removes `andi.w #$ff,d0`
+  (024000ff). The generator places the clone once in hole a and routes
+  ONLY ported engine refs there; all 36 vanilla call sites keep the
+  masked original (legacy surface untouched — the clone is new code in
+  formerly-0xFF space).
+- gen_donovan_patch.py: `patched_clone` kind in the engine-ref resolver
+  (cached, old-bytes uniqueness check on the patch site).
+- New behavior gate tests/test_don_sword.sh + replay pair
+  31_don_6hp_{vsavj,vsav2}: 6HP whiff at round start; asserts the sword
+  object resolves swing node 0x0E1A20 (= vs2 0x28DEF8) with idx 0.
+- Measured collaterals recorded in STATE (generic-spark red herring,
+  effect table map, number-table map).
