@@ -663,3 +663,15 @@ looks like bad tiles can be perfectly-good OLD entries;
 common way OBJ entries are written) truncated to the LOW word, hiding
 the code word entirely (fixed: %08x). Grep for a 16-bit value must
 account for it appearing in either half of a long write.
+
+## "Run once at match start" is a TIMING TRAP — use a match-active countdown
+Three failed single-shot placements for the OBJ-tail clear (14z-7, all
+measured): char-init fires DURING the VS screen (which redraws the
+polluted buckets every frame until ~30 frames before round start); the
+sword routine's first per-frame execution ALSO lands mid-VS (companion
+objects live from char-init); and $FF8004==0x40000 is set during the VS
+screen too, so it cannot distinguish "round visually started". The
+robust pattern: arm a counter at init, decrement per frame while
+match-active, act at zero (~0x50 frames) — replay-timing independent,
+and doing the action in the object-UPDATE phase means the same frame's
+list rebuild hides it (no visible blank).

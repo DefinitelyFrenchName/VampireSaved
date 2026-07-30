@@ -134,6 +134,14 @@ latch_disp = 0x7966
 # per-player Start bitmask byte (bit 0 = P1, bit 1 = P2; measured live
 # through char-init, sessions 10-11).
 # 0x01 = VS2 flavor (maintainer decision 2026-07-27), 0x00 = VH2.
+# objram_clear (session 14z-7): zero the 8KB OBJ list at Donovan
+# char-init — stale VS-screen leftovers in the tail priority buckets get
+# re-displayed by list-extending effects (Victor 236HP darkening) and
+# Donovan's leftovers are his VS portrait pieces = the round-27 garble.
+# Vanilla chars leave benign dark tiles (Lilith clean); the clear makes
+# our exposed tail transparent instead. Shim is slot-0F-dispatch-hosted
+# -> legacy matches never execute it.
+objram_clear = true
 flavor_disp = 0x3C2
 flavor_default = 0x01
 flavor_held = 0x00

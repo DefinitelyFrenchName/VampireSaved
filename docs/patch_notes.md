@@ -699,3 +699,16 @@ Session 14z-6 (no ROM change; Victor-shock garble scoped):
   during the shock composition (see STATE 14z-6); fix deferred with
   full instrumentation (replay pair 32, OBJ pairing method) in place.
 - tap_writes.lua: 32-bit data logging (GOTCHAS entry).
+
+Session 14z-7 (Victor-shock stale-OBJ fix):
+- init_shim objram_clear v2: arms countdown 0x50 at $FF7F00 (was a
+  char-init-time 8KB clear — ran mid-VS-screen, repolluted; measured).
+- New GEN blob (alloc a, 0x3A bytes): detours the ported sword
+  routine's per-frame exit jmp (placed 0xCC110, old target 0x1551A);
+  match-active-gated countdown; at zero clears OBJ RAM 0x708000-9FFF
+  once in the update phase and falls through to the original target.
+  Donovan-only execution by construction; $FF7F00 and the OBJ list are
+  legacy-masked/rebuilt state — legacy RAM surface untouched.
+- New gate tests/test_don_shock.sh (replay 32, tail buckets zero at
+  f2740). Accepted approximation: transparent instead of vs2's benign
+  dark leftovers in the shock curtain buckets.

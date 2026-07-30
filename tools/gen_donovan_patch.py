@@ -1318,7 +1318,8 @@ def main():
                 #   move.l A5,-(SP); lea $FF8000.l,A5; tst.l (latch,A5)
                 #   bne.s +6; jsr seed_entry; movea.l (SP)+,A5
                 #   move.b #flavor_default,(flavor_disp,A6); jmp handler
-                sd = alloc("a", 68, "init seed shim")
+                sd = alloc("a", 76 if shim_cfg.get("objram_clear") else 68,
+                           "init seed shim")
                 if sd is None:
                     continue
                 latch = _int(shim_cfg["latch_disp"])
@@ -1333,6 +1334,26 @@ def main():
                 # no register clobbers before the handler.
                 hold_flag = _int(shim_cfg["flavor_hold_flag"])
                 flav_h = _int(shim_cfg["flavor_held"])
+                # OBJ-RAM stale-tail clear (session 14z-7, manifest flag
+                # objram_clear): zero the full 8KB sprite list once per
+                # Donovan char-init. The VS-screen/fade leftovers in the
+                # tail priority buckets are re-DISPLAYED by effects that
+                # extend the list (Victor 236HP curtain) — vanilla chars
+                # leave benign dark tiles there, Donovan leaves his VS
+                # portrait pieces (the round-27 shock garble). Clearing at
+                # init (screen blanked) makes the exposed tail transparent.
+                # Register-safe: d0/a0 saved; CCR irrelevant (next op sets).
+                # 14z-7 v2: char-init runs DURING the VS screen (measured:
+                # clear at f2362, VS draws past f2364 and re-pollutes) — so
+                # the shim only ARMS a marker in the dead-stack scratch
+                # ($FF7F00, legacy-masked; worst-case clobber = one missed
+                # or one spurious clear, both benign). Donovan's per-frame
+                # sword routine consumes it at round start (first frame
+                # after the VS screen) and clears the OBJ list there — see
+                # the objram_clear blob below.
+                objclr = b""
+                if shim_cfg.get("objram_clear"):
+                    objclr = bytes.fromhex("13fc005000ff7f00")  # move.b #$50,$ff7f00.l (countdown)
                 shim = (bytes([0x2F, 0x0D])                       # move.l A5,-(SP)
                         + bytes([0x4B, 0xF9, 0x00, 0xFF, 0x80, 0x00])  # lea $FF8000.l,A5
                         + bytes([0x4A, 0xAD]) + latch.to_bytes(2, "big")  # tst.l (latch,A5)
@@ -1342,6 +1363,7 @@ def main():
                         + bytes([0x2A, 0x5F])                     # movea.l (SP)+,A5
                         + bytes([0x1D, 0x7C, 0x00, flav_v])       # move.b #default,
                         + flav_d.to_bytes(2, "big")               #   (flavor,A6)
+                        + objclr                                  # OBJ-RAM tail clear
                         + bytes([0xBD, 0xFC, 0x00, 0xFF, 0x84, 0x00])  # cmpa.l #$FF8400,A6
                         + bytes([0x66, 0x0A])                     # bne.s p2bit
                         + bytes([0x08, 0x39, 0x00, 0x00])         # btst #0,
@@ -1353,7 +1375,7 @@ def main():
                         + bytes([0x1D, 0x7C, 0x00, flav_h])       # move.b #held,
                         + flav_d.to_bytes(2, "big")               #   (flavor,A6)
                         + bytes([0x4E, 0xF9]) + newt.to_bytes(4, "big"))  # skip: jmp
-                assert len(shim) == 68, len(shim)
+                assert len(shim) == 68 + len(objclr), len(shim)
                 ops.append({"op": "code", "addr": f"{sd:#x}", "hex": shim.hex()})
                 notes.append(f"code   {sd:#08x} init shim (pool latch A5+"
                              f"{latch:#x}, seeder "
@@ -1366,6 +1388,64 @@ def main():
                 repoint(d["table"], sd, "donovan handler via seed shim")
             else:
                 repoint(d["table"], newt, "donovan handler")
+
+    # ── objram_clear round-start blob (14z-7 v2, pairs with the init-shim
+    # marker): detour the ported sword routine's per-frame exit
+    # (vs2 0x65F00 `jmp $13C0E` -> placed x065e5a+0xA6, relocated target
+    # 0x1551A) through a blob that, when the $FF7F00 marker is armed,
+    # clears the full 8KB OBJ list once (both display halves are
+    # CPU-visible; the active list rebuilds next frame, the stale
+    # VS-screen tail — Donovan's portrait pieces, the round-27 Victor-
+    # shock garble — stays cleared). Donovan-gated by construction: the
+    # blob only runs from HIS routine; legacy paths never execute it and
+    # $FF7F00 is inside the masked dead-stack window.
+    if args.stage >= 6 and (port.get("init_shim") or {}).get("objram_clear"):
+        if "x065e5a" not in placed:
+            fail.append("objram_clear: region x065e5a not placed")
+        else:
+            site = placed["x065e5a"] + (0x65F00 - 0x65E5A)
+            ret = 0x1551A
+            # v3: the sword object lives from char-init, so its routine
+            # runs DURING the VS screen — gate the consume on the match-
+            # active flag ($FF8004.l == 0x40000, the established overlay-
+            # thunk gate) so the clear fires on the first real match frame.
+            # v4: single-shot clears kept racing pre-match drawers (VS
+            # screen redraws through ~f2470; the sword exit path first
+            # runs ~f2460) — the marker is now a COUNTDOWN (0x50 frames,
+            # decremented only while match-active): the clear lands ~80
+            # frames into the round, deterministically past every
+            # pre-match drawer, replay-timing independent. It runs in the
+            # object-update phase, so the same frame's list rebuild
+            # repaints all ACTIVE entries — no visible blank; only stale
+            # tail buckets stay cleared.
+            blob = (bytes.fromhex("4a3900ff7f00")      # tst.b $ff7f00.l
+                    + bytes.fromhex("672c")            # beq.s done
+                    + bytes.fromhex("0cb90004000000ff8004")  # cmpi.l #$40000,$ff8004.l
+                    + bytes.fromhex("6620")            # bne.s done (marker kept)
+                    + bytes.fromhex("533900ff7f00")    # subq.b #1,$ff7f00.l
+                    + bytes.fromhex("6618")            # bne.s done (still counting)
+                    + bytes.fromhex("48e78080")        # movem.l d0/a0,-(sp)
+                    + bytes.fromhex("41f900708000")    # lea $708000.l,a0
+                    + bytes.fromhex("303c07ff")        # move.w #$7ff,d0
+                    + bytes.fromhex("4298")            # clr.l (a0)+
+                    + bytes.fromhex("51c8fffc")        # dbra d0,.-2
+                    + bytes.fromhex("4cdf0101")        # movem.l (sp)+,d0/a0
+                    + bytes.fromhex("4ef9") + ret.to_bytes(4, "big"))  # done: jmp
+            # branch checks: all three branches land on the final jmp
+            assert 8 + 0x2C == len(blob) - 6, (hex(len(blob)))
+            assert 0x14 + 0x20 == len(blob) - 6, (hex(len(blob)))
+            assert 0x1C + 0x18 == len(blob) - 6, (hex(len(blob)))
+            bd = alloc("a", len(blob), "objram round-start clear blob")
+            if bd is None:
+                fail.append("objram_clear: no room for blob")
+            else:
+                ops.append({"op": "code", "addr": f"{bd:#x}", "hex": blob.hex()})
+                ops.append({"op": "code", "addr": f"{site:#x}",
+                            "hex": "4ef9" + f"{bd:08x}"})
+                notes.append(f"code   {bd:#08x} +{len(blob):#x}  objram clear "
+                             f"blob; sword-exit site {site:#08x} detoured")
+                fragments.append((bd, len(blob), "GEN", "objram clear blob"))
+                fragments.append((site, 6, "GEN", "objram clear detour site"))
 
     if args.stage >= 5:
         for p in port.get("aux_poke", []):

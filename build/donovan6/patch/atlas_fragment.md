@@ -43,5 +43,7 @@
 | `PRG:0x0CBB40` | 0x10 | GEN | reaction_hook ext table |
 | `PRG:0x0CBFE0` | 0x32 | GEN | reaction_hook thunk |
 | `PRG:0x018458` | 0x6 | GEN | reaction_hook engine site |
-| `PRG:0x0CC020` | 0x44 | GEN | pool-seed + flavor(+Start-hold) init shim |
+| `PRG:0x0CF310` | 0x4C | GEN | pool-seed + flavor(+Start-hold) init shim |
+| `PRG:0x0CC020` | 0x3A | GEN | objram clear blob |
+| `PRG:0x0CC110` | 0x6 | GEN | objram clear detour site |
 | `PRG:0x0B19F8` | 0xE50 | VS2 | data_port throw_victim_keyframes (vsav2 0xca1ca) |

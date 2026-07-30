@@ -5,6 +5,33 @@ cf2109d8 pending gates+playtest: Anita/sword/statue render in-match
 and on the win screen; 3 residual sites excluded; session 14q parked
 state superseded)
 
+## Session 14z-7 (Victor-shock garble FIXED — stale-OBJ countdown clear)
+
+Fix shipped for the round-27 shock garble (build 1507c286-family, final
+fingerprint in the registry/commit). Mechanism recap: the shock curtain
+re-displays OBJ-list tail buckets holding VS-screen leftovers; with
+Donovan those leftovers are his portrait pieces (band tiles) = garble.
+Fix (two GEN pieces, both Donovan-gated, zero legacy execution):
+- init_shim (objram_clear flag) now ARMS a countdown marker 0x50 at
+  $FF7F00 (dead-stack scratch, legacy-masked; clobber failure modes
+  benign in both directions).
+- A new blob detours the ported sword routine's per-frame exit
+  (vs2 0x65F00 jmp, placed site 0xCC110): while match-active
+  ($FF8004==0x40000) it decrements the marker; at zero it clears the
+  full 8KB OBJ list ONCE, in the object-update phase (same-frame
+  rebuild repaints all active entries — no visible blank; stale tails
+  stay zero).
+Journey (measured, in GOTCHAS-worthy detail): single-shot clears at
+char-init and at first-sword-exit both LOST to pre-match drawers (VS
+screen redraws through ~f2470; char-init runs DURING the VS screen;
+the match-active flag is set during the VS screen too). The countdown
+makes the timing replay-independent (~80 frames into the round).
+Verified: tail buckets all-zero at the shock zap; zap pixels coherent
+(no patchwork); pixel probes 17@3479 (spark+Anita) and 31@2618 (sword
+arc) IDENTICAL to goldens. New permanent gate tests/test_don_shock.sh.
+Note vs native: where vs2 shows benign dark leftovers in the curtain,
+we show transparent — an accepted M2a-class approximation (recorded).
+
 ## Session 14z-6 (round 27: sword CONFIRMED; Victor-shock garble scoped)
 
 - Round-27 playtest: SWORD VISIBLE ON EVERY MOVE TRIED — the 14z-5 fix
