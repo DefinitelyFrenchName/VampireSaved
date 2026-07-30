@@ -1,0 +1,16 @@
+# 30: LEGACY THROW coverage (session 14z). No legacy replay ever threw —
+# which let the winpal copies corrupt throw-cinematic data undetected
+# (round-22 victim-teleport). Demitri (default hover) throws the CPU
+# early and repeatedly: walk in, F+MP throw attempts.
+300-305 sys=C1
+800-803 sys=S1
+1300-1302 p1=1
+2600-2900 p1=R
+2950-2953 p1=R2
+3100-3300 p1=R
+3350-3353 p1=R2
+3500-3700 p1=R
+3750-3753 p1=R5
+3900-4100 p1=R
+4150-4153 p1=R2
+4600 wait

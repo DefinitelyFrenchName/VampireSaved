@@ -5,6 +5,20 @@ cf2109d8 pending gates+playtest: Anita/sword/statue render in-match
 and on the win screen; 3 residual sites excluded; session 14q parked
 state superseded)
 
+## Session 14z (round 22: winpal copies convicted and fully reverted)
+
+- The throw victim-teleport reappeared on e7682289 and the timeline
+  convicts the WINPAL COPIES (0x248D80), not the 14v grab rows: the
+  zone holds throw-cinematic data; no legacy replay threw (coverage
+  blindness). Full revert to byte-exact ad372a6b; 14y doctrine
+  amendment VOID (02/05/07 exact restored, pick 1080); new permanent
+  masked-EXACT gate 30_demitri_throw. Palettes were NOT visibly
+  improved by the copies anyway — the quote/HUD row consumer remains
+  UNDECODED (none of 0x1BF56/0x1C1FA/0x1C426/0x7D4FC/0x1C5CE feeds
+  the visibly-wrong rows). Next palette attempt starts from a runtime
+  trace of the ACTUAL row writes on the quote screen/HUD, with the
+  throw + pixel gates watching.
+
 ## Session 14x (round 20: throw rollback per maintainer; sword-attack rendering logged)
 
 - Round 20: triangle jump CONFIRMED FIXED. But the 14v grab-pointer

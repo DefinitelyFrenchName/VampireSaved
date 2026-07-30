@@ -287,7 +287,16 @@ def main():
     # anim zone" was attributed from Jedah-demo cursors only; it holds
     # other consumers' data. Nothing may be placed there without a
     # per-consumer proof. Re-enable with a REAL home for the copies.
-    WINPAL_ENABLE = True    # 14y re-enable (14w blame was the gap writes)
+    # 14z: OFF FOR GOOD at this placement. Round-22 timeline convicts
+    # the COPIES (0x248D80 zone) of the throw victim-teleport bug:
+    # broken on every copies-active build (d6a751cb, e7682289), healthy
+    # without them (ad372a6b) — the 14v grab-row rollback "fixed" it
+    # only by coincidence of the 14w winpal disable. The zone holds
+    # throw-cinematic/victim-sequence data; NO legacy replay throws
+    # (coverage gap now closed by 30_demitri_throw). The palettes the
+    # copies served never visibly improved (the quote/HUD rows come
+    # from a still-undecoded path), so nothing is lost.
+    WINPAL_ENABLE = False
     BLK = 0x1B20
     JP1, JP2 = 0x39FDC0, 0x3A18E0
     DP1, DP2 = 0x3B727C, 0x3B8EDC

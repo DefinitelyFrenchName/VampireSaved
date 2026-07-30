@@ -1343,9 +1343,8 @@ def main():
     # uploader) must read copy B at 0x24C3C0. Code space — the imm is
     # re-encrypted by patch_prg's code op. Slot-0x0F-only visual
     # surface; the masked gate arbitrates.
-    WINPAL_ENABLE = True    # 14y: re-enabled — the Felicia break was
-                            # the gap-table writes (14w), NOT the copies;
-                            # placement re-validated by the full battery
+    WINPAL_ENABLE = False   # 14z: copies convicted of the throw
+                            # victim-teleport (see select_port note)
     if args.stage >= 6 and WINPAL_ENABLE:
         ops.append({"op": "code", "addr": "0x1c426", "hex": "0024c3c0"})
         notes.append("# winpal: 0x1C424 lea imm -> copy B 0x24C3C0")

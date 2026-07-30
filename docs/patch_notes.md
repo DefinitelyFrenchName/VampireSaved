@@ -593,3 +593,28 @@ amendment; HUD/select/quote palette family fix):
   divergence). Attract UNCHANGED at exactly 4278.
 - Fingerprint e7682289: full battery green twice; flicker inventory
   grew by exactly the predicted frames and nothing else.
+
+Session 14z (round 22: the copies convicted; full winpal revert; throw
+coverage gate):
+- Round 22: palettes did NOT visibly improve (win-quote still Jedah's,
+  HUD mouth/eyebrow still green on green/tan) AND the throw
+  victim-teleport reappeared. The TIMELINE convicts the winpal COPIES
+  at 0x248D80 (broken on every copies-active build d6a751cb/e7682289,
+  healthy without them on ad372a6b): the 14v grab-row rollback "fixed"
+  the throw only because the 14w winpal-disable rode the same build.
+  The "dead zone" holds THROW-CINEMATIC/victim-sequence data — and no
+  legacy replay ever threw, so the masked gates were blind (the same
+  coverage failure class as Felicia's wall jump).
+- FULL REVERT: winpal disabled for good at this placement (post-mortem
+  in select_port.py); gates restored (02/05/07 masked-EXACT, pick
+  constant 1080); the 14y doctrine amendment is VOID. Build byte-exact
+  ad372a6b — the round-21 throw-confirmed fingerprint, verified by
+  identical hash.
+- NEW PERMANENT GATE: 30_demitri_throw (legacy throw coverage,
+  masked-EXACT, deterministic freeze) — would have caught the copies
+  bug the day they landed. The palette family (quote + HUD rows)
+  returns to open decode: none of the three poked uploader sites feeds
+  the visibly-wrong rows; the true consumer is still unfound.
+- GOTCHAS reinforced (no new entry — the same two lessons): "dead
+  zone" claims require per-consumer proof, and every mechanic class
+  needs replay coverage BEFORE data lands near its tables.
