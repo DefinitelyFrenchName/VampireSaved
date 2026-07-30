@@ -97,6 +97,19 @@ local function install_tap()
                 hits = hits + 1
                 by_pc[pc] = (by_pc[pc] or 0) + 1
                 local extra = ""
+                if os.getenv("REGLOG") then
+                    -- full register capture at write time (pcall-guarded):
+                    -- names the source table pointers for computed cursors
+                    local ok, res = pcall(function()
+                        local st = cpu.state
+                        local r = {}
+                        for _, n in ipairs({"D0","D1","D2","D3","A0","A1","A2","A3","A4","A6"}) do
+                            r[#r + 1] = n .. "=" .. string.format("%08x", st[n].value)
+                        end
+                        return " " .. table.concat(r, " ")
+                    end)
+                    extra = ok and res or (" regerr")
+                end
                 if os.getenv("STACKLOG") then
                     -- candidate return addresses from the top of the stack:
                     -- caller attribution for engine-internal writer PCs

@@ -686,3 +686,14 @@ for: reproduce with the reporter's EXACT input first; snapshot every
 phase of a cyclic effect (zap AND between-zap); and before shipping a
 visual fix, A/B the fix-on/fix-off builds on the reproducing replay —
 "the metric improved" (buckets zeroed) is not "the pixels changed".
+
+## Cross-game A/B pixel comparison: align by DISPLAYED RECORD, not frame
+Two false "garble" verdicts in one session (14z-9): the engines skew
+1-2 frames, so same-frame snapshots can compare DIFFERENT anim records
+— a mid-flail pose against a settle pose reads as scattered garbage.
+Align by the victim's cursor value (dump +0x1C, snapshot the frames
+where both games display the SAME mapped node). Also: the sibling
+games' VANILLA characters have differing script data (vs2-Victor
+commands hold poses in the opposite order from vsavj-Victor) — a
+divergence in what the two games DISPLAY is not automatically a port
+bug; check who commands the difference before blaming the port.

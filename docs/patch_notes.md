@@ -724,3 +724,11 @@ Session 14z-8 (14z-7 revert; real shock mechanism characterized):
   opposite order vs native) -> body pieces draw ~0x20-adjacent band
   tiles. Entry is computed by the reaction/seq_set machinery — next
   session thread in STATE 14z-8.
+
+Session 14z-9 (no ROM change; electric family verified end-to-end):
+- Probe pair 34_victor_5hp_{vsavj,vsav2} added (standing 5HP + f.6HP).
+- No defect found: reaction anims, records, codes, attrs, cptr
+  relocation, coordinate content all byte-verified; phase-aligned
+  pixels coherent. 14z-8's "wrong node" reclassified: cross-game
+  Victor script-order difference (see STATE 14z-9 and GOTCHAS).
+- REGLOG register capture added to tests/lua/tap_writes.lua.

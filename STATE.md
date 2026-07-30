@@ -5,6 +5,37 @@ cf2109d8 pending gates+playtest: Anita/sword/statue render in-match
 and on the win screen; 3 residual sites excluded; session 14q parked
 state superseded)
 
+## Session 14z-9 (round 28 correction chased to ground: the electric-family display chain is VERIFIED CORRECT end-to-end; no reproducible garble)
+
+Round-28 correction (the reported move = Victor 5HP / f.6HP normals,
+not the grab) prompted probe 34 (both games, standing 5HP + f.6HP,
+four clean single hits). Every link measured, all CORRECT:
+- Hit-reaction anim: entry + every step maps EXACTLY (0xDB890 =
+  map(0x287D68), 0x18-node steps in lockstep).
+- The displayed record: fmt2 head, piece codes (band +0x2750), attrs,
+  cptr RELOCATION (0x3F1CC8 = mapped aux0_4), and the coordinate-list
+  CONTENT — all byte-verified against vs2.
+- Phase-aligned pixels (POR f2668 vs NAT f2666, same record): Donovan
+  coherent — beads, tunic, reel pose. The earlier "scattered pieces"
+  crop was a 2-frame PHASE ARTIFACT (engines skew; the flail pose reads
+  as garble when compared against a different record's frame).
+- The grab-hold "wrong node" of 14z-8 is ALSO RESOLVED as legitimate:
+  REGLOG capture shows vs2-Victor commands victim poses (0x29E ->
+  0x286) while vsavj-Victor commands (0x286 -> 0x29E) — HIS OWN script
+  data differs between the games; Donovan's table resolves BOTH numbers
+  to the correctly-mapped nodes. The two games display different
+  (each-legitimate) hold poses. Cross-game-legit class, like the
+  attract-demo divergence.
+STATUS: after three probes (32 grab/Mega-Shock family, 33 close grab,
+34 normals) NO instrumented garble reproduces on the current build
+(2da7d910); every display chain checked is byte-correct. The round-27/
+28 reports remain REAL-BUT-UNREPRODUCED — the missing variable is
+WHICH exact situation the maintainer saw (candidates: ES versions,
+crouching/air victim state, dizzy electrocution loop, specific move).
+AWAITING maintainer round-29: exact move + situation (screenshot
+ideal). Tooling ready to pin it within minutes once identified
+(REGLOG tap, phase-aligned snaps, OBJ pairing).
+
 ## Session 14z-8 (round 28: the 14z-7 clear was a PHANTOM FIX — reverted; the real shock-garble mechanism characterized)
 
 - Round-28 report (Victor 6HP: effect ~fine, DONOVAN'S BODY garbled)
