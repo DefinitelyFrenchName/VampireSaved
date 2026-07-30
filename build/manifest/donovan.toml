@@ -505,15 +505,32 @@ note = "mirror-match victim entry: Jedah-victim -> Donovan-victim block"
 # Stale-+0x9A risk (a prior occupant leaving 0x0F) is bounded by: no
 # legacy content can produce a slot-0F attacker id in the pools; masked
 # gates arbitrate every build.
+# 14z-4 addendum: spawn_mark is NOT visually inert either — pixel A/B
+# (replay 17 f3479/3481) shows ANITA VANISHING while a marked spark is
+# live: +0x9A carries display semantics on live objects (it is the
+# owner-char-id field other spawner paths write; display reads it), or
+# the allocator's returned slot aliases companion state. BOTH halves of
+# the spark fix are staged to 99 pending the display-side redirect,
+# designed with a discriminator that is PROVEN dead (pixel A/B is now
+# part of the acceptance for any spark-path change).
 [[site_thunk]]
-stage = 6
+stage = 99
 name = "spark_spawn_mark"
 site = 0x018F2E
 old_hex = "4eb900016fba"
 thunk_hex = "4eb900016fba670000120c2e000f038266000008197c000f009a4e75"
 
+# ROUND-25 REGRESSION + ROLLBACK (session 14z-4): bank_swap alone GARBLES
+# Donovan's hit sparks — marked sparks draw with bank 0x4000 while still
+# walking VANILLA strips (the display-side table redirect has not landed),
+# and vanilla tile codes against the Donovan band render as garbled tile
+# blocks (measured: replay 17 f3477-3481 snapshots, pre-thunk clean
+# starburst vs thunked garble; user-reported round 25). The two halves —
+# tile bank AND strip redirect — are ONE change and must ship together.
+# Staged to 99 until the display-side redirect exists; spawn_mark stays
+# (invisible, RAM-inert for legacy, needed by the coming redirect).
 [[site_thunk]]
-stage = 6
+stage = 99
 name = "spark_bank_swap"
 site = 0x05E7C6
 old_hex = "3d7c00000018"

@@ -1,6 +1,8 @@
 # Next session — 60-second orientation
 
-Build: cfe757a1 (stage 6). Throw fix CONFIRMED by round-24 playtest.
+Build: 597ae55b (stage 6) — RESTORED byte-exact after the round-25
+regression (see STATE 14z-4: both spark thunks convicted by pixel A/B,
+staged to 99). Throw fix CONFIRMED by round-24 playtest.
 Priority context (maintainer, recorded in STATE): the missing sword-swing
 visual on armed normals is the one TRUE BLOCKER; palettes/blinking are
 ship-compromisable.
@@ -19,15 +21,18 @@ Next concrete actions:
    effect-class objects (start from tools/overlay_port.py
    VERIFIED_SITES = {0x5D8B8, 0x5EE22, 0x918F0} and the GOTCHAS entry
    "The companion overlay draws the HOST's records").
-2. Apply the proven 14q site-thunk pattern ([[site_thunk]] construct is
-   now first-class): gate on the spark's +0x9A==0x0F mark (per-object,
-   no slot ambiguity) and serve a rebuilt Donovan effect table; the vs2
-   source family is T=0x2B0786 (self-relative words; must be REBUILT
-   against the ported record placements, not copied — 16-bit offsets
-   can't span to 0xF3F70).
-3. Verify: replay 17 f3475+ anim must walk 0xF420C+ (= vs2 0x2B8190+);
-   then full battery; then playtest (the arc should be VISIBLE — tiles
-   are already in the build).
+2. Design a discriminator that is PROVEN dead (round-25: +0x9A is NOT
+   spare — it hid Anita; see GOTCHAS "pixel A/B"). Candidates: derive
+   Donovan-ness display-side from the strip source itself, or find a
+   byte proven unread by pixel A/B + code audit. Then apply the 14q
+   site-thunk pattern ([[site_thunk]] is first-class, rows staged at 99
+   ready to revive): serve a rebuilt Donovan effect table (vs2 family
+   T=0x2B0786; self-relative words must be REBUILT against ported
+   record placements — 16-bit offsets can't span to 0xF3F70). Tile
+   bank 0x4000 (spark_bank_swap) must land in the SAME change.
+3. Verify: replay 17 f3475+ anim walks 0xF420C+ (= vs2 0x2B8190+);
+   pixel A/B on f3477-3481 (spark clean, ANITA PRESENT); full battery;
+   then playtest.
 
 ## Also open
 - 27 oracle re-freeze (throw connects at 3050/3650).

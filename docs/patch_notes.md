@@ -664,3 +664,15 @@ Session 14z-3 (sword-swing blocker: staged thunks + generic construct):
   Necessary but NOT sufficient: the swing still resolves vanilla art
   because number->strip resolution is display-side (see STATE 14z-3 and
   the two new GOTCHAS). Fingerprint cfe757a1.
+
+Session 14z-4 (round-25 regression rollback):
+- Both 14z-3 site_thunk rows (spark_spawn_mark, spark_bank_swap) staged
+  to 99 after pixel A/B convicted them: bank-without-strips garbles the
+  spark; the +0x9A mark hides Anita (display semantics, not a spare
+  byte). gen_donovan_patch.py: site_thunk and data_port loops now honor
+  per-row `stage` (previously unconditional at stage >= 6 — the
+  data_port row worked by coincidence of both being 6).
+- Build restored to fingerprint 597ae55b (byte-exact round-24 build);
+  replay-17 hit-frame snapshots pixel-verified clean.
+- New acceptance rule for effect/display changes (GOTCHAS): pixel A/B
+  via SNAP_FRAMES on an exercising replay, alongside the battery.

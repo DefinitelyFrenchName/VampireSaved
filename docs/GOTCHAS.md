@@ -616,3 +616,17 @@ fields or numbers at spawn/first-tick does NOT change which strip is
 walked; only the display-side table selection does. Object +0x18/+0x1A
 (0x0000/0x4000/0x6000 | 0xE000) are TILE-bank attributes, not anim-table
 selectors.
+
+## The RAM gate cannot see NEW-CHAR visual wrongness — pixel A/B is the tool
+Round-25 lesson, twice in one change: (1) spark_bank_swap drew garbled
+tile blocks (bank 0x4000 under vanilla strips) and (2) spark_spawn_mark
+made ANITA vanish while a marked spark was live (+0x9A carries display
+semantics — it is the owner-char-id field other spawner paths write).
+BOTH passed the full battery: masked legacy gates only cover legacy
+content (the thunks were slot-0F-gated), the oracle gate compares mapped
+FIELDS, and the menu pixel gate covers menus. New-character VISUAL
+correctness has no automated gate — any change touching the effect/
+display path must ship with a before/after SNAP_FRAMES pixel comparison
+on a replay that exercises it (replay 17 hit frames 3477-3481 is the
+ready-made spark probe). Also: never assume an object field is dead
+because one path leaves it stale — prove it by pixel A/B, not by RAM.

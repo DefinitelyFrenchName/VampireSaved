@@ -5,6 +5,23 @@ cf2109d8 pending gates+playtest: Anita/sword/statue render in-match
 and on the win screen; 3 residual sites excluded; session 14q parked
 state superseded)
 
+## Session 14z-4 (round 25: spark-thunk visual regression; full rollback to 597ae55b)
+
+- Round-25 report (maintainer): garbled effect sprites on hit. Pixel
+  A/B (new probe: SNAP_FRAMES on replay 17, frames 3477-3481) convicts
+  BOTH 14z-3 thunks: bank_swap garbles the spark (Donovan tile bank
+  under vanilla strips), and spawn_mark makes ANITA vanish while a
+  marked spark is live (+0x9A = owner-char-id with display semantics;
+  "spare field" assumption WRONG). Both rows staged to 99; per-row
+  stage filters added to site_thunk/data_port loops (they were being
+  applied unconditionally at stage >= 6). Build restored byte-exact to
+  597ae55b (round-24 throw-confirmed); battery green.
+- The sword-swing fix design is updated: tile bank + strip redirect +
+  a PROVEN-dead discriminator must land as ONE change, accepted only
+  with the pixel probe alongside the battery (new GOTCHAS entry).
+- 597ae55b hit sparks verified CLEAN pixel-wise (the user's "maybe the
+  previous build too" is answered: no — the garble was 14z-3-only).
+
 ## Session 14z-3 (the sword-swing BLOCKER: mechanism fully mapped, fix staged)
 
 Round-24 continuation. The missing "circular sword attack" on armed

@@ -1344,6 +1344,8 @@ def main():
     # explicit destination bound (dst_end), and old-verified in-blob fixes.
     if args.stage >= 6:
         for dp in port.get("data_port", []):
+            if args.stage < _int(dp.get("stage", 0)):
+                continue
             nm = dp["name"]
             src, dst, ln = _int(dp["src"]), _int(dp["dst"]), _int(dp["len"])
             sdat = (root / f"build/out/{man['src_set']}_data.bin").read_bytes()
@@ -1399,6 +1401,8 @@ def main():
     if args.stage >= 6:
         opc_img_st = None
         for st in port.get("site_thunk", []):
+            if args.stage < _int(st.get("stage", 0)):
+                continue
             nm = st["name"]
             site = _int(st["site"])
             old = bytes.fromhex(st["old_hex"])
