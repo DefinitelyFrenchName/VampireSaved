@@ -1,32 +1,39 @@
 # Next session — 60-second orientation
 
-Build: 597ae55b (stage 6). The throw victim-teleport is ROOT-CAUSED and
-fixed: slot-0F victim-keyframe table (0xBE27A -> 0xB19F8) now carries vs2
-Donovan's table via the new [[data_port]] manifest construct. Awaiting
-round-24 playtest confirmation of: throw cinematic clean (incl. visual),
-no regressions elsewhere.
+Build: cfe757a1 (stage 6). Throw fix CONFIRMED by round-24 playtest.
+Priority context (maintainer, recorded in STATE): the missing sword-swing
+visual on armed normals is the one TRUE BLOCKER; palettes/blinking are
+ship-compromisable.
 
-Wrong-conviction post-mortem is in GOTCHAS ("Disabling a heuristic
-CLASS...") — grab rows and winpal copies were both innocent of the
-teleport; convictions by build-timeline correlation, refuted by the tap
-trace. Consequences to revisit:
-1. Grab-pointer rows (stage 99): rolled back on the belief they broke
-   the throw. They may be legitimate — BUT round-20's report came from a
-   build where the keyframe table had just reverted, so their effect was
-   never observed in isolation. Re-test them only deliberately, one
-   change alone, with 27+30 gates watching.
-2. Winpal copies (0x248D80 zone): still forbidden as a HOME (the zone is
-   Jedah throw-cinematic data per the atlas conviction — REVISIT whether
-   that attribution also came from the timeline error; the copies were
-   convicted of THIS bug, which they did not cause. The zone may in fact
-   be safe. Re-derive from the atlas before reusing.) Palette family
-   still open: quote/HUD rows' true consumer undecoded.
-3. Throw-oracle 27 re-freeze still queued (throw connects at 3050/3650).
+## The one remaining step of the sword-swing fix (map is complete)
 
-Open visual items: sword/statue red-purple flicker (parked overlay), 6HP
-armed sword swing not rendered, HUD name "Jedah", loss-path quote art,
-HUD mini-portrait palette, win-quote palette.
+Read STATE "Session 14z-3" first. Everything up to the display processor
+is done and verified live on build cfe757a1 (spark spawns, variant,
+timing, tile-bank 0x4000, +0x9A=0x0F Donovan mark). The single missing
+piece: the display-side number->record STRIP TABLE selection still
+serves slot-0F vanilla (Jedah-family) tables — ported sparks walk
+0x28391C+ instead of the already-ported sword-arc records at 0xF420C+.
 
-Tools: tests/lua/tap_writes.lua (hot-field write attribution without
-replay desync), dump_opcodes.lua for ANY code-region analysis (GOTCHAS:
-zips store code encrypted).
+Next concrete actions:
+1. Find the display-processor site that picks the strip table for
+   effect-class objects (start from tools/overlay_port.py
+   VERIFIED_SITES = {0x5D8B8, 0x5EE22, 0x918F0} and the GOTCHAS entry
+   "The companion overlay draws the HOST's records").
+2. Apply the proven 14q site-thunk pattern ([[site_thunk]] construct is
+   now first-class): gate on the spark's +0x9A==0x0F mark (per-object,
+   no slot ambiguity) and serve a rebuilt Donovan effect table; the vs2
+   source family is T=0x2B0786 (self-relative words; must be REBUILT
+   against the ported record placements, not copied — 16-bit offsets
+   can't span to 0xF3F70).
+3. Verify: replay 17 f3475+ anim must walk 0xF420C+ (= vs2 0x2B8190+);
+   then full battery; then playtest (the arc should be VISIBLE — tiles
+   are already in the build).
+
+## Also open
+- 27 oracle re-freeze (throw connects at 3050/3650).
+- Wrong-conviction cleanups: grab rows (stage 99) isolated re-test;
+  0x248D80 zone attribution re-derivation. See prior NEXT_SESSION notes
+  in git history.
+- Palette family (non-blocker): quote/HUD row consumer undecoded.
+- Sword/statue blink (non-blocker): parked overlay, needs byte-dead
+  tile pool.

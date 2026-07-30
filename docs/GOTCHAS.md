@@ -596,3 +596,23 @@ read) convicts; (3) a "fixed/broken" verdict from play sampling is weaker
 than a replay trace — the round-21 "throw restored" confirmation sampled
 clean-looking throws on a build where the replay shows 21 teleport-scale
 jumps.
+
+## In the engine hit-spark spawner, a1 is the VICTIM, a6 the attacker
+The shared spark spawner (vsavj 0x18EFC, vs2 0x178C2 twin) reads the
+attack record via a3 and checks `$54(a1)`/`$382(a1)` — but a1 is the
+DEFENDER (reaction-side remaps; vs2's char specials 6/0x10/0x11 there are
+victim-specific spark handling). The attacker is a6. A thunk gating "is
+the attacker Donovan" on `$382(a1)` silently gates on the victim and
+never fires (cost a build-and-measure round; measured live: a1=ff8800
+victim, a6=ff8400 attacker, bp at the spawn-mark thunk).
+
+## Anim numbers: facing adds 0x300; set-anim QUEUES, display resolves
+`jsr $4CE2`-family set-anim helpers add 0x300 to the anim number when the
+facing bit ($70) is set, then queue (number, params) into the command
+ring at a5-0x71F2 (writer 0x31DA). The number→record-strip resolution
+happens LATER in the display processor via per-char strip tables (the
+`movea.l #T,a0` site family from the overlay work) — so patching bank
+fields or numbers at spawn/first-tick does NOT change which strip is
+walked; only the display-side table selection does. Object +0x18/+0x1A
+(0x0000/0x4000/0x6000 | 0xE000) are TILE-bank attributes, not anim-table
+selectors.

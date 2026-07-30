@@ -645,3 +645,22 @@ Session 14z-2 (throw victim-teleport root cause + fix):
 - Measured: replay 27 victim trace 21 teleport-scale jumps -> 4
   structured slam keyframes (2 per throw, consistent phases). Build
   597ae55b.
+
+Session 14z-3 (sword-swing blocker: staged thunks + generic construct):
+- New generator construct [[site_thunk]] (stage >= 6): generic 6-byte
+  engine-site -> jsr thunk (the 14q pattern productized). Old bytes
+  verified against the vanilla opcode image; thunk hex authored in the
+  manifest; placed in hole a; site re-encrypted as a code op.
+- spark_spawn_mark @0x018F2E (allocator jsr wrapped): on successful
+  spark alloc, if ATTACKER (a6) char id == 0x0F, write 0x0F to the
+  spark's spare +0x9A. Gated write: legacy content (no slot-0F
+  attacker possible; Jedah replaced in this flavor) never writes.
+- spark_bank_swap @0x05E7C6 (type-3 first-tick bank write): marked
+  sparks get OBJ tile-bank +0x18 = 0x4000 (vsav bank 2, the Jedah
+  band where all Donovan art lives) instead of vanilla 0x0000. Flags
+  behavior preserved on the vanilla path (same final move.w; the
+  fall-through resets ccr via move.b before any branch).
+- Both verified live (replay 17 f3475+: +0x9A=0f, bank18=4000).
+  Necessary but NOT sufficient: the swing still resolves vanilla art
+  because number->strip resolution is display-side (see STATE 14z-3 and
+  the two new GOTCHAS). Fingerprint cfe757a1.

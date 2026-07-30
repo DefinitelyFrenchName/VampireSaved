@@ -282,3 +282,5 @@ poke32 0x0bf516 <- 0x000c1124  dispatch_18[0x1f] variant mirror
 poke32 0x0bf656 <- 0x000c1106  dispatch_19[0xf] donovan handler
 poke32 0x0bf696 <- 0x000c1106  dispatch_19[0x1f] variant mirror
 data   0x0b19f8 +0xe50  data_port throw_victim_keyframes <- vsav2 0x0ca1ca (0 fixes)
+code   0x0cc010 +0x1c  site_thunk spark_spawn_mark; site 0x018f2e jsr-routed
+code   0x0cc030 +0x1a  site_thunk spark_bank_swap; site 0x05e7c6 jsr-routed

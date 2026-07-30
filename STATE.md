@@ -5,6 +5,45 @@ cf2109d8 pending gates+playtest: Anita/sword/statue render in-match
 and on the win screen; 3 residual sites excluded; session 14q parked
 state superseded)
 
+## Session 14z-3 (the sword-swing BLOCKER: mechanism fully mapped, fix staged)
+
+Round-24 continuation. The missing "circular sword attack" on armed
+normals is DECODED end-to-end (replay 17, native-vs-ported A/B):
+
+- vs2 draws armed-normal sword swings as TYPE-3 EFFECT objects
+  (hit-located, ~10-frame strips). Spawn chain: shared engine spark
+  spawner (vsavj 0x18EFC / vs2 0x178C2; a3=attack record, +0x12 spark
+  id & 0x7F, remap tables byte-IDENTICAL between the games, allocator
+  vsavj 0x16FBA / vs2 0x15702) -> type-3 first-tick case (vsavj 0x5E7B2
+  / vs2 0x6A7A6, dispatched through the obj_hook-extended table
+  0x5E556) -> variant (+0x59) -> param record (anim number 0x102) ->
+  set-anim (0x4CE2: facing adds 0x300) -> COMMAND QUEUE (0x31DA) ->
+  display processor resolves number->record via PER-CHAR strip tables.
+- On the ported build everything matches native (type 3, variant 3,
+  position, timing, 10-frame life) EXCEPT the resolved strip: native
+  walks vs2 0x2B8190+ (Donovan sword-arc records, ALREADY PORTED at
+  0xF420C+ in region x2b7ef4); ported walks vanilla 0x28391C+ (slot-0F
+  = Jedah-family effect art) — because the display-side strip-table
+  selection still serves slot-0F vanilla tables. Self-relative 16-bit
+  offsets make in-place table repointing impossible (ported records are
+  1.6MB away; the effect-table zone is overlap-packed shared pool).
+- STAGED (build cfe757a1, gated slot-0F-attacker-only, legacy-inert by
+  construction): [[site_thunk]] generic construct (gen) + two thunks:
+  spark_spawn_mark (allocator wrapper: marks spark +0x9A=0x0F when the
+  ATTACKER (a6!) is char 0x0F) and spark_bank_swap (first-tick: +0x18
+  tile-bank 0x0000 -> 0x4000 for marked sparks — the same vs2-bank-3 ->
+  vsav-bank-2 remap as his six port_patch bank setters). Verified live:
+  mark + bank land; anim unchanged as expected (tile bank != anim
+  table).
+- REMAINING STEP (next session): redirect the DISPLAY-side strip-table
+  selection for slot-0F effect objects to a rebuilt Donovan effect
+  table (vs2 T at 0x2B0786 family) — the same per-char display-site
+  thunk pattern proven in 14q, and the same site family already
+  catalogued by tools/overlay_port.py (VERIFIED_SITES). The +0x9A mark
+  gives the consumer a per-object Donovan discriminator if needed.
+  Sword-arc RECORDS and TILES are already in the build; only the table
+  selection is missing.
+
 ## Maintainer priority statement (round 24, 2026-07-30)
 
 Round-24 playtest CONFIRMS the throw fix (597ae55b). Standing compromise

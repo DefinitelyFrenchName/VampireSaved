@@ -478,3 +478,43 @@ off = 0x1E
 old_hex = "0b30"
 new_hex = "0d88"
 note = "mirror-match victim entry: Jedah-victim -> Donovan-victim block"
+
+# Armed-normal sword-swing effects (session 14z-3, the round-24 BLOCKER).
+# Donovan's sword swings on armed normals are drawn as type-3 effect
+# objects (hit-located, 10-frame strips): the shared engine spark spawner
+# (vanilla 0x18EFC..: a3=attack record, +0x12 spark id -> remap 0x1A610,
+# jsr 0x16FBA) allocates them and the shared type-3 first-tick case
+# (0x5E7B2, dispatched via the obj_hook-extended table 0x5E556) writes
+# the OBJ bank field +0x18 = 0x0000 (vanilla band). vs2's twin (0x6A7A6)
+# writes 0x6000 (vs2 bank 3 = Donovan's effect band). Our port maps all
+# Donovan art to vsav bank 2 (0x4000, the Jedah band — same remap as the
+# six port_patch bank setters in his own code), so his swing strips
+# resolve to VANILLA art (measured: anim walks 0x28391C+ instead of the
+# ported 0xF420C+ = vs2 0x2B8190+ sword arc; replay 17, frames 3475+).
+# Cannot patch the shared handler globally (every char's sparks route
+# through it) -> per-spark gating, two thunks:
+#   spawn_mark: wraps the vanilla spawner's allocator call; on success,
+#   if the ATTACKER (a6; a1 is the VICTIM in this spawner — measured,
+#   bp @thunk: a1=ff8800 victim, a6=ff8400 attacker) is char id 0x0F,
+#   marks the spark's spare +0x9A
+#   (=0x0F). Gated write -> legacy attackers (never slot-0F in this
+#   build; Jedah is replaced) leave RAM untouched.
+#   bank_swap: replaces the first-tick bank write; +0x9A==0x0F ->
+#   0x4000, else the vanilla 0x0000 (flags preserved: vanilla path ends
+#   with the same move.w; fall-through next reads +0x59 resetting ccr).
+# Stale-+0x9A risk (a prior occupant leaving 0x0F) is bounded by: no
+# legacy content can produce a slot-0F attacker id in the pools; masked
+# gates arbitrate every build.
+[[site_thunk]]
+stage = 6
+name = "spark_spawn_mark"
+site = 0x018F2E
+old_hex = "4eb900016fba"
+thunk_hex = "4eb900016fba670000120c2e000f038266000008197c000f009a4e75"
+
+[[site_thunk]]
+stage = 6
+name = "spark_bank_swap"
+site = 0x05E7C6
+old_hex = "3d7c00000018"
+thunk_hex = "0c2e000f009a6600000a3d7c400000184e753d7c000000184e75"

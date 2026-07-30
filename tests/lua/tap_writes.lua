@@ -96,8 +96,27 @@ local function install_tap()
                 local pc = cpu.state["CURPC"].value
                 hits = hits + 1
                 by_pc[pc] = (by_pc[pc] or 0) + 1
-                f:write(string.format("frame %d PC %06x off %06x data %04x mask %04x\n",
-                                      frame, pc, offset, data, mask))
+                local extra = ""
+                if os.getenv("STACKLOG") then
+                    -- candidate return addresses from the top of the stack:
+                    -- caller attribution for engine-internal writer PCs
+                    -- (m68k register name differs by MAME version: SP or A7;
+                    -- memory reads inside a tap are pcall-guarded)
+                    local ok, res = pcall(function()
+                        local st = cpu.state
+                        local spr = st["SP"] or st["A7"]
+                        local sp = spr.value
+                        local r = {}
+                        for k = 0, 4 do
+                            r[#r + 1] = string.format("%08x",
+                                                      space:read_u32(sp + k * 4))
+                        end
+                        return " stack " .. table.concat(r, " ")
+                    end)
+                    extra = ok and res or (" stackerr " .. tostring(res))
+                end
+                f:write(string.format("frame %d PC %06x off %06x data %04x mask %04x%s\n",
+                                      frame, pc, offset, data, mask, extra))
             end
         end)
     installing = false

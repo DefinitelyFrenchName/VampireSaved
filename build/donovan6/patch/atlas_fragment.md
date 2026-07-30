@@ -44,3 +44,7 @@
 | `PRG:0x018458` | 0x6 | GEN | reaction_hook engine site |
 | `PRG:0x0CBFC0` | 0x44 | GEN | pool-seed + flavor(+Start-hold) init shim |
 | `PRG:0x0B19F8` | 0xE50 | VS2 | data_port throw_victim_keyframes (vsav2 0xca1ca) |
+| `PRG:0x0CC010` | 0x1C | GEN | site_thunk spark_spawn_mark |
+| `PRG:0x018F2E` | 0x6 | GEN | site_thunk spark_spawn_mark engine site |
+| `PRG:0x0CC030` | 0x1A | GEN | site_thunk spark_bank_swap |
+| `PRG:0x05E7C6` | 0x6 | GEN | site_thunk spark_bank_swap engine site |

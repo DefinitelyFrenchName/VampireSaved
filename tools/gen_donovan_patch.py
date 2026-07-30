@@ -1390,6 +1390,40 @@ def main():
             fragments.append((dst, ln, "VS2",
                               f"data_port {nm} ({man['src_set']} {src:#06x})"))
 
+    # ── site_thunk: generic 6-byte engine-site -> jsr thunk (14q pattern) ───
+    # The thunk body is authored hex (must preserve the displaced
+    # instruction's semantics on its vanilla path, including flags where
+    # the fall-through consumes them). Old bytes verified against the
+    # vanilla opcode image; thunk placed in hole "a"; site patched to
+    # jsr thunk (6 bytes, code-op so it re-encrypts).
+    if args.stage >= 6:
+        opc_img_st = None
+        for st in port.get("site_thunk", []):
+            nm = st["name"]
+            site = _int(st["site"])
+            old = bytes.fromhex(st["old_hex"])
+            if len(old) != 6:
+                fail.append(f"site_thunk {nm}: displaced site must be 6 bytes")
+                continue
+            if opc_img_st is None:
+                opc_img_st = (root / "build/out/vsavj_opcodes.bin").read_bytes()
+            if opc_img_st[site:site + 6] != old:
+                fail.append(f"site_thunk {nm}: vanilla bytes at {site:#x} != "
+                            f"old_hex ({opc_img_st[site:site+6].hex()})")
+                continue
+            body = bytes.fromhex(st["thunk_hex"])
+            td = alloc("a", len(body), f"site_thunk {nm}")
+            if td is None:
+                fail.append(f"site_thunk {nm}: no room in hole a")
+                continue
+            ops.append({"op": "code", "addr": f"{td:#x}", "hex": body.hex()})
+            ops.append({"op": "code", "addr": f"{site:#x}",
+                        "hex": "4eb9" + f"{td:08x}"})
+            notes.append(f"code   {td:#08x} +{len(body):#x}  site_thunk {nm}; "
+                         f"site {site:#08x} jsr-routed")
+            fragments.append((td, len(body), "GEN", f"site_thunk {nm}"))
+            fragments.append((site, 6, "GEN", f"site_thunk {nm} engine site"))
+
     # ── win/quote palette 0x60-view repoint (session 14u) ─────────────────────
     # Companion to select_port's block copies: the hardcoded
     # `lea 0x39FDC0,a0` at CODE:0x1C424 (the char*0x60-view win-screen
