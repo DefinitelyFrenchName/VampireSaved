@@ -719,70 +719,127 @@ def main():
                     seen_rec.add(v)
                     collected.append(ent)
 
-                # shelf-pack the non-band blocks (code, bx, by) into the
-                # tail; blocks never cross the 16-tile row in source
-                # (measured), and stay non-crossing at any target column
+                # session 14z-10: PROTECTED-TILE POLICY. Vanilla content
+                # references tile positions inside the "Jedah band" window
+                # (manifest protected_tiles.json, runtime-audited: the VS
+                # curtain c625, the 0xE4xx-0xE8xx shared block, round-UI
+                # codes — the round-27..29 garble class). One rectangle
+                # first-fit allocator over the hole-punched pool serves
+                # BOTH the effect shelf AND band blocks whose remapped
+                # span would land on a protected position. Blocks never
+                # cross a 16-column row (measured invariant, preserved).
                 eff_lo, eff_hi = _int(gr["eff_lo"]), _int(gr["eff_hi"])
+                prot_doc = json.loads(
+                    (root / "build/manifest/protected_tiles.json").read_text())
+                protected = {int(x, 16) for x in prot_doc["protected"]}
+                pool_ranges = [(int(a, 16), int(b, 16))
+                               for a, b in prot_doc["pool"]]
+                free = set()
+                for a_, b_ in pool_ranges:
+                    free.update(range(a_, b_))
+                free -= protected
+                # effect_tail.json bank2 placements (Anita feet) live in
+                # the same code space — their spans are not free
+                _et = json.loads((root / "build/manifest/effect_tail.json"
+                                  ).read_text())
+                for _k, _v in _et.get("bank2_place", {}).items():
+                    _c, _bx, _by = _k.split(",")
+                    _h = int(_v, 16)
+                    for _dy in range(int(_by)):
+                        for _dx in range(int(_bx)):
+                            free.discard((_h & ~0xF) + (_dy << 4)
+                                         + ((_h + _dx) & 0xF))
+
+                def span_of(head, bx, by):
+                    return [(head & ~0xF) + (dy << 4) + ((head + dx) & 0xF)
+                            for dy in range(by) for dx in range(bx)]
+
+                def fit_block(bx, by):
+                    for a_, b_ in pool_ranges:
+                        for p in range(a_, b_):
+                            if (p & 0xF) + bx > 16:
+                                continue
+                            cells = span_of(p, bx, by)
+                            if any(c not in free for c in cells):
+                                continue
+                            for c in cells:
+                                free.discard(c)
+                            return p
+                    return None
+
                 blocks = {}
+                nonexc_band_srcs = set()
                 for ent in collected:
                     for toff, hdr_attr in ent:
                         t = int.from_bytes(blob[toff:toff + 2], "big")
                         a = (hdr_attr if hdr_attr is not None else
                              int.from_bytes(blob[toff + 2:toff + 4], "big"))
-                        if not (b_lo <= t <= b_hi):
-                            bx = ((a >> 8) & 15) + 1
-                            by = ((a >> 12) & 15) + 1
-                            blocks.setdefault((t, bx, by), None)
-                shelf_row = eff_lo >> 4
-                shelf_x = 0
-                shelf_h = 0
+                        bx = ((a >> 8) & 15) + 1
+                        by = ((a >> 12) & 15) + 1
+                        if b_lo <= t <= b_hi:
+                            if any(c in protected
+                                   for c in span_of(t + delta, bx, by)):
+                                blocks.setdefault((t, bx, by, True), None)
+                            else:
+                                nonexc_band_srcs.update(span_of(t, bx, by))
+                        else:
+                            blocks.setdefault((t, bx, by, False), None)
                 for key in sorted(blocks,
                                   key=lambda k: (-k[2], -k[1], k[0])):
-                    t, bx, by = key
-                    if shelf_x + bx > 16:
-                        shelf_row += shelf_h
-                        shelf_x = 0
-                        shelf_h = 0
-                    blocks[key] = (shelf_row << 4) + shelf_x
-                    shelf_x += bx
-                    shelf_h = max(shelf_h, by)
-                    if ((shelf_row + shelf_h) << 4) - 1 > eff_hi:
-                        fail.append("gfx_remap: effect shelf overflow past "
-                                    f"{eff_hi:#x}")
-                        break
+                    t, bx, by, _isb = key
+                    nt = fit_block(bx, by)
+                    if nt is None:
+                        fail.append(f"gfx_remap: protected-pool overflow "
+                                    f"placing block {t:#x} {bx}x{by}")
+                        continue
+                    blocks[key] = nt
 
                 n_eff = 0
+                n_exc = 0
                 for ent in collected:
                     for toff, hdr_attr in ent:
                         t = int.from_bytes(blob[toff:toff + 2], "big")
                         a = (hdr_attr if hdr_attr is not None else
                              int.from_bytes(blob[toff + 2:toff + 4], "big"))
+                        bx = ((a >> 8) & 15) + 1
+                        by = ((a >> 12) & 15) + 1
                         if b_lo <= t <= b_hi:
-                            blob[toff:toff + 2] = (t + delta).to_bytes(2,
-                                                                       "big")
-                            n_rw += 1
+                            nt = blocks.get((t, bx, by, True))
+                            if nt is not None:
+                                blob[toff:toff + 2] = nt.to_bytes(2, "big")
+                                n_exc += 1
+                            else:
+                                blob[toff:toff + 2] = (t + delta).to_bytes(
+                                    2, "big")
+                                n_rw += 1
                         else:
-                            bx = ((a >> 8) & 15) + 1
-                            by = ((a >> 12) & 15) + 1
-                            nt = blocks.get((t, bx, by))
+                            nt = blocks.get((t, bx, by, False))
                             if nt is not None:
                                 blob[toff:toff + 2] = nt.to_bytes(2, "big")
                                 n_eff += 1
                 pairs = []
-                for (t, bx, by), nt in blocks.items():
+                exc_srcs = set()
+                for (t, bx, by, isb), nt in blocks.items():
                     if nt is None:
                         continue
-                    for dy in range(by):
-                        for dx in range(bx):
-                            pairs.append([(t & ~0xF) + (dy << 4)
-                                          + ((t + dx) & 0xF),
-                                          (nt & ~0xF) + (dy << 4)
-                                          + ((nt + dx) & 0xF)])
+                    src_span = span_of(t, bx, by)
+                    dst_span = span_of(nt, bx, by)
+                    pairs.extend([s, d] for s, d in zip(src_span, dst_span))
+                    if isb:
+                        exc_srcs.update(src_span)
                 json.dump(pairs, (out / "effect_map.json").open("w"))
+                # band srcs relocated by exception AND not otherwise needed
+                # at src+delta must be skipped by build_gfx's band loop
+                # (their delta target is a protected position!)
+                skip = sorted(exc_srcs - nonexc_band_srcs)
+                json.dump({"skip_band_src": skip},
+                          (out / "tile_exceptions.json").open("w"))
                 notes.append(f"# {name}: gfx_remap +{delta:#x} on {n_rw} "
-                             f"band tile words + {n_eff} effect words "
-                             f"({len(blocks)} blocks -> tail "
-                             f"0x{eff_lo:04X}+) in {len(seen_rec)} records")
+                             f"band tile words, {n_exc} exception words, "
+                             f"{n_eff} effect words ({len(blocks)} blocks "
+                             f"pooled; {len(skip)} band srcs skipped; "
+                             f"{len(protected)} protected) in "
+                             f"{len(seen_rec)} records")
 
             # [effect_tail] (build/manifest/effect_tail.json, session 14j):
             # the x2b7ef4 companion-effect records draw at BANK 1; the

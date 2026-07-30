@@ -28,6 +28,19 @@ local f = assert(io.open(out_path, "wb"))
 local frame = 0
 local hits = 0
 local by_pc = {}
+-- COLLECT mode ("lo,hi" hex): instead of per-write log lines, accumulate
+-- the SET of tile-code values (entry offset %8 == 4) written in-window
+-- whose value falls in [lo,hi]; dumped as CODE lines at END. For
+-- vanilla tile-usage audits (session 14z-10).
+local collect_lo, collect_hi
+do
+    local c = os.getenv("COLLECT")
+    if c then
+        local a, b = c:match("^(%x+),(%x+)$")
+        collect_lo, collect_hi = tonumber(a, 16), tonumber(b, 16)
+    end
+end
+local collected = {}
 
 -- input playback (same subset as trace_writes.lua)
 local held = {}
@@ -92,6 +105,23 @@ local function install_tap()
     installing = true
     tap = space:install_write_tap(start_addr, start_addr + tonumber(len) - 1,
         "tapw", function(offset, data, mask)
+            if collect_lo then
+                if frame >= wa and frame <= wb and offset % 8 == 4 then
+                    local v = data & 0xFFFF
+                    if mask & 0xFFFF == 0 then v = (data >> 16) & 0xFFFF end
+                    if v >= collect_lo and v <= collect_hi then
+                        -- bucket by writer class: vanilla code vs ported
+                        -- holes (a: 0xBF6A0-0x100000, b: 0x3EC720-0x400000)
+                        local pc = cpu.state["CURPC"].value
+                        local ported = (pc >= 0xBF6A0 and pc < 0x100000)
+                                       or (pc >= 0x3EC720 and pc < 0x400000)
+                        local key = v + (ported and 0x10000 or 0)
+                        collected[key] = (collected[key] or 0) + 1
+                    end
+                end
+                hits = hits + 1
+                return
+            end
             if frame >= wa and frame <= wb then
                 local pc = cpu.state["CURPC"].value
                 hits = hits + 1
@@ -154,6 +184,15 @@ emu.register_frame_done(function()
     end
     if frame >= max_frames then
         f:write(string.format("END %d hits %d\n", frame, hits))
+        if collect_lo then
+            local ks = {}
+            for v in pairs(collected) do ks[#ks + 1] = v end
+            table.sort(ks)
+            for _, v in ipairs(ks) do
+                f:write(string.format("CODE %04x %s %d\n", v & 0xFFFF,
+                        (v >= 0x10000) and "ported" or "vanilla", collected[v]))
+            end
+        end
         local pcs = {}
         for pc, n in pairs(by_pc) do pcs[#pcs + 1] = { pc, n } end
         table.sort(pcs, function(x, y) return x[2] > y[2] end)

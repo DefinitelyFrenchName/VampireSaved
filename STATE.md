@@ -5,6 +5,36 @@ cf2109d8 pending gates+playtest: Anita/sword/statue render in-match
 and on the win screen; 3 residual sites excluded; session 14q parked
 state superseded)
 
+## Session 14z-10 (THE GARBLE FIX SHIPPED: protected-tile policy + exception pool)
+
+Implemented the 14z-9c plan end-to-end (build 272bfbbb):
+- build/manifest/protected_tiles.json: 358 in-match vanilla-referenced
+  positions (runtime audit via tap_writes COLLECT mode over the pure-
+  legacy suite; full-run union of 574 recorded as observed_full_run —
+  attract-cutscene-only usage NOT enforced, pool capacity + accepted
+  attract divergence). Pool = 1256 doubly-vetted free cells (window
+  minus our outputs minus ALL audited usage minus build-run residuals,
+  clamped >= 0xAD80: the Sasquatch-shared band head is not free — the
+  build_gfx SAFE_LO assert caught my pool overreach).
+- gen_donovan_patch gfx_remap: unified rectangle first-fit allocator
+  over the hole-punched pool serves the effect shelf AND band blocks
+  whose remapped span hits a protected position (775 band srcs
+  exception-relocated); emits tile_exceptions.json (skip list) +
+  extended effect_map pairs; excludes effect_tail bank2 spans.
+- build_gfx_donovan: skips exception srcs in the band loop; readback
+  verifier exception-aware. build_donovan.sh: set -o pipefail (a
+  crashed build_gfx had been silently packing STALE tiles — two full
+  "fix" builds shipped unchanged gfx before the readback-assert crash
+  was noticed; GOTCHAS).
+- effect_tail.json: 11 Anita bank2 blocks relocated off protected
+  positions; generator now coordinates with its spans.
+- verify_gfx_build: pool-aware containment + a standing "no tile on
+  protected positions" assertion.
+VERIFIED: 358/358 protected positions byte-identical to vanilla; the
+electric-hold frame renders clean (no chunk columns); pixel probes
+17@3479 and 31@2618 IDENTICAL to goldens; battery running at commit
+time (result in the round-30 report).
+
 ## Session 14z-9c (ROUND-29 ROOT CAUSE, FINAL AND PHYSICAL: the Jedah-band tile window is NOT dead)
 
 The vanilla control run (replay 34's inputs on VANILLA vsavj = Jedah vs

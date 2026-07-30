@@ -724,3 +724,13 @@ the cost of skipping that audit: five wrong models (stale buckets,
 phantom clear, script order, phase artifacts, missing darken) before
 the vanilla CONTROL RUN — always run the vanilla control FIRST when a
 visual differs; it would have ended this in one session.
+
+## Pipe a build tool through tail and a crash packs STALE artifacts
+build_donovan.sh piped build_gfx through `| tail -10` without pipefail:
+when the readback assert crashed build_gfx mid-run, the pipeline kept
+going and re-zipped the PREVIOUS build's tiles — two consecutive "fix"
+builds shipped byte-identical gfx while printing fresh-looking logs
+(the program-side fingerprint still changed, masking it further). Fixed
+with set -o pipefail; the tell was mtime: gfx/vm3.14m an hour older
+than the rompath zip. Check artifact mtimes when a fix "changes
+nothing".

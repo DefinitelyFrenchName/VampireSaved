@@ -96,7 +96,18 @@ def main():
     # src bank 3 -> group-B index = 0x10000 + code
     # dst bank 2 -> group-B index = 0x00000 + code
     written = set()
+    # session 14z-10: band srcs whose delta target is a PROTECTED vanilla
+    # position are relocated by the generator's exception pool (they
+    # arrive via effect_map pairs instead) — never write their delta slot.
+    skip_band = set()
+    exc_path = (os.path.join(os.path.dirname(args.effects), "tile_exceptions.json")
+                if args.effects else "")
+    if exc_path and os.path.exists(exc_path):
+        skip_band = set(json.load(open(exc_path))["skip_band_src"])
+        print(f"tile exceptions: {len(skip_band)} band srcs skipped")
     for code in band:
+        if code in skip_band:
+            continue
         tile = tile_bytes(src, 0x10000 + code)
         write_tile(dst, (code + DELTA), tile)
         written.add(code + DELTA)
@@ -114,7 +125,11 @@ def main():
         print(f"effects: {len(eff_pairs)} tiles placed from effect_map")
 
     # verification 1: every written position reads back as the source tile
+    # (14z-10: exception-relocated srcs are NOT at delta positions — their
+    # readback happens via eff_pairs below)
     for code in band:
+        if code in skip_band:
+            continue
         got = tile_bytes(dst, code + DELTA)
         want = tile_bytes(src, 0x10000 + code)
         assert got == want, f"readback mismatch at dst code 0x{code+DELTA:04X}"

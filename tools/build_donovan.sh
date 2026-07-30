@@ -9,6 +9,7 @@
 # All ROM-derived intermediates live under <outbase> (gitignored) and are
 # regenerated from $ROMDIR on every run (repo rule 7).
 set -eu
+set -o pipefail  # 14z-10: a crashed build_gfx must not pack stale tiles silently
 
 STAGE="${1:?usage: build_donovan.sh <stage 1-6> [outbase]}"
 OUTBASE="${2:-build/donovan}"

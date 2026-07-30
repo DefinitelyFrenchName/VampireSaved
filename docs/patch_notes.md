@@ -739,3 +739,13 @@ Session 14z-9c (no ROM change; THE tile-window collision found):
   (0xADCF-0xEA3F) overwriting vanilla-referenced tiles (0xC625 curtain
   smoke -> Donovan chunks; visual render-diff confirmed). Fix = audit
   + re-placement, plan in STATE 14z-9c. Probes 35/36 committed.
+
+Session 14z-10 (protected-tile policy; build 272bfbbb):
+- New manifest build/manifest/protected_tiles.json (audited vanilla-
+  referenced positions + vetted free pool). Generator: unified
+  exception allocator (775 band srcs relocated, pairs via effect_map,
+  skip list via tile_exceptions.json). build_gfx: skip-aware band loop
+  + readback. effect_tail: 11 Anita blocks moved. verify_gfx_build:
+  protected-position assertion (standing). build_donovan.sh: pipefail.
+- Verified: 358/358 protected positions vanilla-identical; hold frame
+  clean; probes 17/31 pixel-identical to goldens.

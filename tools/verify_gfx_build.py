@@ -70,7 +70,25 @@ def main():
     else:
         print(f"  ok: record parity ({o_records} records, "
               f"{o_entries} entries)")
-    outside = sorted(t for t in tiles if not (lo <= t <= hi))
+    # session 14z-10: codes may also land in the protected-tile POOL
+    # (manifest protected_tiles.json) — vanilla-vetted free positions the
+    # exception allocator uses; and NEVER on a protected position.
+    import json as _json
+    _pd = _json.loads(open("build/manifest/protected_tiles.json").read())
+    _pool = set()
+    for _a, _b in _pd["pool"]:
+        _pool.update(range(int(_a, 16), int(_b, 16)))
+    _prot = {int(x, 16) for x in _pd["protected"]}
+    onprot = sorted(t for t in tiles if t in _prot)
+    if onprot:
+        print(f"FAIL: {len(onprot)} tile codes on PROTECTED positions: "
+              f"{[hex(t) for t in onprot[:6]]}")
+        fail = 1
+    else:
+        print(f"  ok: no tile codes on protected positions "
+              f"({len(_prot)} protected)")
+    outside = sorted(t for t in tiles
+                     if not (lo <= t <= hi) and t not in _pool)
     if outside:
         print(f"FAIL: {len(outside)} tile codes outside placed windows "
               f"[{lo:#x},{hi:#x}]: {[hex(t) for t in outside[:6]]}")
