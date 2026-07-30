@@ -68,6 +68,24 @@ m2a_legacy_gate() {
 # Hook-free builds keep m2a_legacy_gate (unmasked) above.
 M2A_MASK="043c-043d,7f00-8000"
 M2A_MASKED_EXP="tests/expected/vsavj/masked"   # relative to $REPO
+# What each legacy replay exercises (all vanilla-content; a gate name is
+# <NN>_<character>_<mechanic> — the character is the vanilla char driving
+# the scenario, NOT a porting target):
+#   02_demitri_vs_cpu    baseline match: movement, normals, CPU rounds
+#   05_timeout_idle      timer expiry path, idle anims, timeout judging
+#   07_mash_storm        input-storm: simultaneous presses, frame-1 actions
+#   30_demitri_throw     THROW machinery: grab, victim-keyframe positioner
+#                        (0xBE27A table walk), cinematic, damage — added
+#                        14z after the throw-data blind spot let the
+#                        copies-era corruption through ungated
+#   03_two_player_vs     2P match: both input rows live, round handoffs
+#   10_midattract_start  Start pressed mid-attract: demo teardown path
+#   16_xemu_2p           2P pattern shared with the dual-emulator gate
+#   04_select_fuzz       select-screen cursor fuzzing, edge picks
+#   08_challenger_join   mid-match challenger interrupt path
+#   09_mirror_pick       mirror-match pick (same-char palette side rules)
+#   29_felicia_walljump  wall-latch/triangle-jump physics — added 14w
+#                        after the gap-table collateral broke it ungated
 M2A_MASKED_EXACT="02_demitri_vs_cpu 05_timeout_idle 07_mash_storm 30_demitri_throw"
 M2A_MASKED_FLICKER="03_two_player_vs 10_midattract_start 16_xemu_2p 04_select_fuzz 08_challenger_join 09_mirror_pick 29_felicia_walljump"
 # 04/08/09 measured session 11 (playtest follow-up: they had fallen out of

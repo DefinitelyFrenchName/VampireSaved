@@ -5,6 +5,17 @@ cf2109d8 pending gates+playtest: Anita/sword/statue render in-match
 and on the win screen; 3 residual sites excluded; session 14q parked
 state superseded)
 
+## Maintainer priority statement (round 24, 2026-07-30)
+
+Round-24 playtest CONFIRMS the throw fix (597ae55b). Standing compromise
+hierarchy from the maintainer, recorded verbatim in intent: the MISSING
+SWORD SPRITE on armed normals (e.g. 6HP: circular swing not rendered,
+hitbox possibly the unarmed variant) is a TRUE BLOCKER for the port.
+Palette issues (win-quote, HUD mini-portrait) and the red/purple
+sword/statue blinking are NOT blockers — ship-compromisable if it comes
+to it. This is a compromise hierarchy, not an ordering command for the
+work queue.
+
 ## Session 14z-2 (throw teleport ROOT-CAUSED and fixed: victim-keyframe table)
 
 - Round 23: throw still broken on byte-exact ad372a6b -> round-21
