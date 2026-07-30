@@ -5,6 +5,38 @@ cf2109d8 pending gates+playtest: Anita/sword/statue render in-match
 and on the win screen; 3 residual sites excluded; session 14q parked
 state superseded)
 
+## Session 14z-6 (round 27: sword CONFIRMED; Victor-shock garble scoped)
+
+- Round-27 playtest: SWORD VISIBLE ON EVERY MOVE TRIED — the 14z-5 fix
+  is confirmed in play. The blocker is CLOSED (cosmetics remain: blade
+  palette family, non-blocker).
+- New report: Victor's electricity (236HP) garbles tiles ON Donovan
+  (clean on Lilith). Scoped this session (replay pair 32_victor_shock,
+  OBJ-RAM dumps + write taps, snapshots):
+  * Reproduced deterministically; multi-hit shock connects on both
+    games; Donovan's shock POSE anim resolves the correct ported family
+    (0xDAF58 ~ vs2 0x287418+skew) and his shock record head
+    (fmt2/budget 0x23/count 0x0D) is byte-identical to vs2's.
+  * The garbled art = the shock's darkening/cage GRID: native draws a
+    uniform repeated-tile grid; ported draws a MIX of correct columns
+    (Victor's vsavj codes f76d/fbc9) and STALE OBJ-list entries never
+    rewritten since the match-intro (frame ~2313, e.g. code c625 = a
+    Donovan band tile from his intro pieces; written by engine drawer
+    PC 0x1B8BE, exposed at shock time with zero writes in between —
+    proven by whole-run offset taps).
+  * => mechanism = Donovan-specific OBJ-list length/terminator
+    divergence during the shock composition exposes stale list tail;
+    the divergence source (piece counts / budgets of other records in
+    the composition, or the curtain drawer's slot arithmetic) is NOT
+    yet pinned. Shock ENTRY-node number lookup needs a T-walk (0xDAF58
+    is an interior node — direct T_d[2n] search fails).
+  * Class: non-blocker (maintainer hierarchy); almost certainly NOT a
+    regression — present since the record/tile port (user had not
+    fought Victor before).
+- Instrumentation ready for the fix session: replays 32_victor_shock_
+  {vsavj,vsav2}, OBJ-RAM dump/pairing scripts (transcript), tap_writes
+  with 32-bit data logging (this session's fix).
+
 ## Session 14z-5 (round 26 continuation: SWORD SWING FIXED — build 2da7d910)
 
 The armed-normal sword swing is FIXED at root. Full chain (each link

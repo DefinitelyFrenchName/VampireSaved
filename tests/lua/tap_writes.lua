@@ -115,7 +115,7 @@ local function install_tap()
                     end)
                     extra = ok and res or (" stackerr " .. tostring(res))
                 end
-                f:write(string.format("frame %d PC %06x off %06x data %04x mask %04x%s\n",
+                f:write(string.format("frame %d PC %06x off %06x data %08x mask %08x%s\n",
                                       frame, pc, offset, data, mask, extra))
             end
         end)

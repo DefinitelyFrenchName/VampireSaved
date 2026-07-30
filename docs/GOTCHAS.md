@@ -648,3 +648,18 @@ plausible-but-wrong behavior, invisible to every RAM/crash gate — only
 behavior probes (the sword gate) catch the regression class. Fix
 mechanism: reconciliation kind `patched_clone` (vanilla bytes minus the
 divergent instruction, ported refs only).
+
+## OBJ-RAM diffing: entries move every frame, stale tails linger, dumps
+## and taps CAN legitimately disagree
+Three traps from the Victor-shock investigation (session 14z-6):
+(1) sprite-list entries relocate between frames — "who writes offset X"
+is only meaningful frame-by-frame, and content seen at X may have been
+written there thousands of frames ago (the c625 curtain column was an
+intro-time leftover exposed mid-match by a longer list);
+(2) the region past the active terminator holds STALE entries that
+render again the moment a composition extends the list — garble that
+looks like bad tiles can be perfectly-good OLD entries;
+(3) tap_writes originally logged data as %04x — 32-bit moves (the
+common way OBJ entries are written) truncated to the LOW word, hiding
+the code word entirely (fixed: %08x). Grep for a 16-bit value must
+account for it appearing in either half of a long write.

@@ -692,3 +692,10 @@ Session 14z-5 (sword swing root-caused and fixed; build 2da7d910):
   object resolves swing node 0x0E1A20 (= vs2 0x28DEF8) with idx 0.
 - Measured collaterals recorded in STATE (generic-spark red herring,
   effect table map, number-table map).
+
+Session 14z-6 (no ROM change; Victor-shock garble scoped):
+- No patch rows changed. Round-27 confirms the sword fix (14z-5).
+- Victor-shock-on-Donovan garble scoped to stale-OBJ-list exposure
+  during the shock composition (see STATE 14z-6); fix deferred with
+  full instrumentation (replay pair 32, OBJ pairing method) in place.
+- tap_writes.lua: 32-bit data logging (GOTCHAS entry).
