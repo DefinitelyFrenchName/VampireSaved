@@ -5,6 +5,26 @@ cf2109d8 pending gates+playtest: Anita/sword/statue render in-match
 and on the win screen; 3 residual sites excluded; session 14q parked
 state superseded)
 
+## Session 14x (round 20: throw rollback per maintainer; sword-attack rendering logged)
+
+- Round 20: triangle jump CONFIRMED FIXED. But the 14v grab-pointer
+  reconciliation BROKE Donovan's throw in play — maintainer decision:
+  roll it back, keep only the Felicia fixes. Done (the 8 rows gated
+  to stage 99 with a full post-mortem note in donovan.toml): the
+  vsavj engine consumes its grab-pointer vars with native-throw
+  semantics that conflict with the ported throw's flow; the original
+  stray writes are silent and the throw worked for 19 rounds with
+  them. Re-attempt requires decoding the engine-side consumer first.
+- NEW MECHANICS/RENDERING ITEM (round 20): on some normals the SWORD
+  ATTACK doesn't render even when equipped — e.g. round-start 6HP:
+  Donovan's sprite and damage look right, but the sword's circular
+  swing isn't drawn and the hitbox may be the unarmed one. Ties into
+  the sword/overlay rendering work (the parked overlay + the sword
+  records) — keep in scope for the sword-rendering search: the
+  armed/unarmed variant selection may involve the same per-state
+  record webs.
+- Fingerprint ad372a6b; battery at session end.
+
 ## Session 14w-c resolution (ALL GREEN at d6a751cb)
 
 - The halt lifted: the type-63 handler's crash was its hit-reaction
