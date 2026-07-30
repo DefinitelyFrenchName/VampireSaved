@@ -13,12 +13,16 @@ round-27 confirms the swing looks complete; the sword's own +0x18 tile
 bank comes from Donovan's ported code (correct 0x4000 already).
 
 Open items, in maintainer priority order:
-1. (was the blocker — now pending confirmation) sword swing: confirm in
-   play, then close. Sword-family leftovers, non-blocking: blade palette
-   (renders red/grey vs native silver — same family as the red/purple
-   sword/statue blink; parked overlay), 6HP hitbox worry (user round-20:
-   "hitbox may be unarmed" — oracle HP values matched, likely fine, but
-   a dedicated hitbox A/B replay would settle it).
+1. SWORD CONFIRMED (round 27) — blocker closed. Leftovers, non-blocking:
+   blade palette (red/grey vs native silver — blink family), 6HP hitbox
+   worry (oracle HP matched; a hitbox A/B replay would settle it).
+1b. Victor-shock garble on Donovan (round 27, scoped 14z-6 — read STATE
+   first): stale OBJ-list exposure during the shock's curtain grid;
+   remaining work = pin the Donovan-specific list-length divergence
+   (walk T_d for the shock ENTRY number, compare the full composition's
+   piece budgets vs Jedah's, or diff list terminators per frame between
+   32_vsavj and a Lilith-victim control). Probes ready: replays 32_*,
+   OBJ pairing method in the session transcript, tap_writes 32-bit.
 2. Palette family (non-blocker): win-quote + HUD mini-portrait rows'
    true consumer still undecoded. Start from a palette-RAM write trace
    on the quote screen (rows 0x16-0x1F), NOT from the uploader tables
