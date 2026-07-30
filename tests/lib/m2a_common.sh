@@ -68,14 +68,18 @@ m2a_legacy_gate() {
 # Hook-free builds keep m2a_legacy_gate (unmasked) above.
 M2A_MASK="043c-043d,7f00-8000"
 M2A_MASKED_EXP="tests/expected/vsavj/masked"   # relative to $REPO
-M2A_MASKED_EXACT="02_demitri_vs_cpu 05_timeout_idle 07_mash_storm"
-M2A_MASKED_FLICKER="03_two_player_vs 10_midattract_start 16_xemu_2p 04_select_fuzz 08_challenger_join 09_mirror_pick 29_felicia_walljump"
+M2A_MASKED_EXACT=""
+M2A_MASKED_FLICKER="02_demitri_vs_cpu 05_timeout_idle 07_mash_storm 03_two_player_vs 10_midattract_start 16_xemu_2p 04_select_fuzz 08_challenger_join 09_mirror_pick 29_felicia_walljump"
 # 04/08/09 measured session 11 (playtest follow-up: they had fallen out of
 # the gate when it was rebuilt): pure flicker class — isolated single-frame
 # re-converging divergences (04@1525/2009/2195, 08@3507, 09@829), no
 # persistent hover divergence.
 M2A_TESTMODE_DIVERGE=700                       # 06: the TS-press frame
-M2A_PICK_DIVERGE_MASKED=1080                   # select-screen anim hover
+# 14y (maintainer-approved palette-uploader poke): the select-entry
+# palette upload now diverges at the spawn-boundary frame 829, BEFORE
+# the old anim-hover constant (1080). Mechanism = the approved @829
+# class; revert with the poke if it proves problematic.
+M2A_PICK_DIVERGE_MASKED=829
 
 # m2a_run_masked <rompath> <replay.rpl> <out.log> <sandbox>
 m2a_run_masked() {

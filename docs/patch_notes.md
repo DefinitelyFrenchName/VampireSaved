@@ -575,3 +575,21 @@ Session 14w-c (the type-63 chain closed; ALL GREEN at d6a751cb):
 - Fingerprint d6a751cb: double M2b gate (masked legacy incl. the new
   29_felicia_walljump flicker gate + pixel menu gate) + oracle +
   dual-emulator + flavor ALL PASS. The rule-6 halt is lifted.
+
+Session 14y (palette uploader poked — maintainer-approved doctrine
+amendment; HUD/select/quote palette family fix):
+- Round 21's HUD mini-portrait note led to re-reading CODE:0x1BF56:
+  it uploads palette rows DIRECTLY to palette RAM (the 14u "work-RAM
+  bulk preloader" attribution was wrong for this site — only
+  0x1C5CE/0x7D4FC stage through work RAM). Poking its side-table imm
+  to the patched win-palette copies routes the select/HUD/quote
+  palette-row family through Donovan's slices in one stroke.
+- Measured cost + doctrine amendment (maintainer-approved, round 22,
+  revert-if-problematic): the select-entry upload leaves exactly ONE
+  work-RAM trace frame at the known spawn-boundary flicker frame —
+  02/05/07 reclassified masked-EXACT -> masked-FLICKER@829 (the
+  already-approved mechanism class), pick's frozen first-divergence
+  constant 1080 -> 829 (the upload precedes the old anim-hover
+  divergence). Attract UNCHANGED at exactly 4278.
+- Fingerprint e7682289: full battery green twice; flicker inventory
+  grew by exactly the predicted frames and nothing else.

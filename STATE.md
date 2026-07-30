@@ -808,6 +808,9 @@ blinks/vanishes in-match; the elemental-sword specials (623P Blizzard
   dual-emulator, flavor selector. **Freeze = pending maintainer build
   decision (see Decisions pending).**
 - **2026-07-27 (session 11, first human playtest):** four findings, all
+- DECIDED (round 22, maintainer): palette-uploader poke ACCEPTED —
+  02/05/07 reclassified flicker@829, pick constant 829; revert path
+  documented if playtest shows problems. (original entry follows:)
 - **Palette-uploader poke vs exact-gate class (session 14y)**: poking
   the select/HUD palette-row uploader (CODE:0x1BF56 -> the patched
   win-palette copies) fixes the HUD mini-portrait green pixels

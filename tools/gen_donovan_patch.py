@@ -1363,13 +1363,14 @@ def main():
         # portrait-row uploader (side table + char*0xA0) and likely the
         # quote-screen path as well. Legacy chars read copy bytes
         # identical to vanilla; the masked battery arbitrates.
-        # 0x1BF56 REMOVED pending maintainer sign-off (STATE Decisions
-        # pending): poking it fixes the HUD-portrait + select + (likely)
-        # quote palettes but adds exactly ONE spawn-boundary flicker
-        # frame (the known @829 class) to the three masked-EXACT
-        # replays — reclassifying 02/05/07 exact->flicker is a gate-
-        # doctrine change (CLAUDE.md par.4 v2) only the maintainer makes.
-        for site in ((0x1C1FA,) if WINPAL_ENABLE else ()):
+        # 0x1BF56 ACTIVE (maintainer sign-off, session 14y round 22):
+        # the select/HUD palette-row uploader reads the patched copies —
+        # fixes HUD mini-portrait, select portraits and the quote
+        # palette family. Cost accepted: one spawn-boundary flicker
+        # frame (@829, the approved mechanism class) on 02/05/07,
+        # reclassified masked-EXACT -> masked-FLICKER; revert-and-
+        # rethink if playtest shows problems (maintainer's terms).
+        for site in ((0x1C1FA, 0x1BF56) if WINPAL_ENABLE else ()):
             ops.append({"op": "code", "addr": f"{site + 2:#x}",
                         "hex": "0024de00"})
         notes.append("# winpal: 3 quote-site table imms -> 0x24DE00")
