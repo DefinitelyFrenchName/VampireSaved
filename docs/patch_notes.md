@@ -783,3 +783,10 @@ Session 14z-14 (third palette table; blink driver mapped; build 40256bae):
   queue at $FF8280 with ROM script pointers (0x376518 family); the
   id->source computation is the one unpinned link (STATE 14z-14 has
   the full map and the pre-planned next tap).
+
+Session 14z-15 (no ROM change; blink driver fully mapped):
+- The $FF8280 job block = engine stage-setup installation (hardcoded
+  immediates 0x1F142); per-stage descriptor table 0x1F92E; script
+  0x376518 refreshes weapon palette rows 0x0C-0x0D; the red = row
+  0x0D sourced from Jedah's block (+0xCD0). One resolution map from
+  the fix; see STATE 14z-15.

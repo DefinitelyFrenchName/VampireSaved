@@ -5,6 +5,30 @@ cf2109d8 pending gates+playtest: Anita/sword/statue render in-match
 and on the win screen; 3 residual sites excluded; session 14q parked
 state superseded)
 
+## Session 14z-15 (blink driver FULLY mapped: the stage palette-anim refresh system)
+
+Final layer measured (continuing 14z-14 without playtest input):
+- The job block at $FF8280 is installed ONCE at match load by the
+  ENGINE's stage setup (PC 0x1F142/0x1F14A: `move.l #$371C98,$30(a6)` /
+  `move.l #$376518,$34(a6)` — hardcoded engine immediates; a6=FF8280).
+  Upstream: a PER-STAGE palette-anim descriptor is copied from table
+  0x1F92E (indexed by the stage number at $100(a5)) into -$3C78(a5),
+  0x80 bytes; the script 0x376518 carries `0dXY 018Z` row-refresh
+  commands (waits 0x0020...).
+- The 4-frame cycle = the script refreshing char palette rows 0x0C-0x0D
+  (the weapon rows): row 0x0C sources the ported block (+0x50 = grey ✓)
+  while row 0x0D's refresh resolves 0x39FBF0 = JEDAH's block +0xCD0 —
+  a FOURTH slot-0F-sourced resolution (id 0x18E-family -> address),
+  whose map is the last unpinned link.
+- NEXT (first move): run the identical REGLOG tap on the VANILLA
+  control (Jedah vs Victor, replay 34 inputs) — vanilla-Jedah should
+  ALSO read 0x39FBF0 (his own rows; correct for him). Then resolve how
+  id 0x18E maps to that address (the stage descriptor at -$3C78(a5) or
+  a fourth per-char table) and repoint the slot-0F resolution to the
+  ported effect block rows (the vs2 block is 0xDC0 and contains the
+  analog rows). All prior repoints (tables 1-3) remain correct and
+  shipped.
+
 ## Session 14z-14 (sword-blink fix session: driver mapped to the palette-JOB system; third table repointed; ONE tap from the finish)
 
 Progress (build 40256bae):
