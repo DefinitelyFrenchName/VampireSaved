@@ -14,15 +14,8 @@ generic hit starburst, correct on our build). Delete the rows once
 round-27 confirms the swing looks complete; the sword's own +0x18 tile
 bank comes from Donovan's ported code (correct 0x4000 already).
 
-SWORD/STATUE BLINK — COMPLETE fix design ready (STATE 14z-16; it
-supersedes 14z-13/14/15 notes): vs2 is STEADY (no cycle — confirmed
-live); vsavj's universal red accent (global rows 0x39FBF0+, ids
-0x297-0x29A base 0x39A910) is the blink. Fix = private modified copy
-of the refresh script 0x376518 + the 14z-7 countdown blob swapping
-$FF82B4 to it (Donovan-gated, once per match, zero legacy execution).
-First hour: pin the script command semantics by experiment (modify
-entries in the private copy, read out with the REGLOG row tap at
-90c180). Then acceptance: steady grey, odd-frame pixel A/B, battery.
+SWORD/STATUE BLINK: FIXED (14z-17, build f4a7e00e) — awaiting
+playtest confirmation (steady pale sword/statue, no red arcs).
 
 Open itemsOpen items, in maintainer priority order:
 1. SWORD CONFIRMED (round 27) — blocker closed. Leftovers, non-blocking:
