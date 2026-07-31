@@ -749,3 +749,30 @@ window widened to cover src+dst). Also: never run pixel probes in
 parallel with a running battery — three concurrent MAME instances
 flaked a replay timeline into a different attract phase; standalone
 reruns are the only trustworthy probe results.
+
+## Palette rows 0x10+ belong to the P2 CHARACTER — attribute rows with a
+## roster-varied control, not a same-roster control
+The 14z-18 "statue rows 0x10/0x11" attribution was wrong twice over:
+every probe match used P2=Victor, so rows 0x10/0x11 "matching native
+vs2" proved only that both games upload VICTOR identically — and the
+"statue accent family" 0x39B040 was Victor's own glow data. The
+data_port that "stilled the statue" actually deadened Victor's glow in
+every match including pure-legacy (superset violation, shipped in
+fa89812, reverted 14z-19). Two rules paid for: (1) before attributing
+a palette row/data block to a new-char object, run the VANILLA control
+(P1=Jedah cell picks vanilla Jedah with the same replay — one run
+showed the identical row-0x10 alternation) AND a control with a
+DIFFERENT P2; (2) ROM->palette-RAM writes never transit work RAM, so
+the masked legacy gate is BLIND to palette-data edits — every palette
+data_port needs its own static byte guard (test_don_accent.sh
+pattern).
+
+## A0-at-write is post-increment — SECOND payment (14z-18 tail row)
+The "accent super-cycle phase 2 reads 0x39FC00-0x39FC3F" conclusion
+derived a 0x40-byte window from two logged A0 values without
+subtracting the movem batch size: the real march reads exactly T0
+(0x39FBE0-FF) and T1 (0x39FC00-1F), overlapping by design (the slide
+IS Jedah's glow animation). The misread placed a "tail" replacement on
+dead ground and left the visible bug alive through a playtest round.
+When deriving a read WINDOW from tap A0 values: subtract batch size
+from EVERY logged value first, then take min/max.

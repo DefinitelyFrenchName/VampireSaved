@@ -5,7 +5,70 @@ cf2109d8 pending gates+playtest: Anita/sword/statue render in-match
 and on the win screen; 3 residual sites excluded; session 14q parked
 state superseded)
 
-## Session 14z-18 (round 34: accent super-cycle completed; statue rows found and fixed; two new items logged)
+## Session 14z-19 (round 35: LEGACY VIOLATION found+reverted; accent march understood; sword blink fixed for real)
+
+Round-35 captures (19-29) showed both fixes had failed. Root-caused by
+direct palette-RAM per-frame dumps (a new discriminating instrument —
+DUMPS over 0x90Cxxx) + vanilla control taps. The corrected world model
+(several 14z-17/18 conclusions were WRONG — corrections below):
+
+- **THE PALETTE-ROW MAP (corrected):** rows 0x0A-0x0F = P1 character
+  extended region; **rows 0x10+ = P2 CHARACTER's rows** (not "statue
+  rows"). 0x38D1A0 = VICTOR's sprite block (char id 3 — every probe
+  match had P2=Victor, which is why rows 0x10/0x11 "matched native":
+  both games upload Victor identically). Char id 0x0F = JEDAH in
+  vanilla (the U,U,R select cell); our dev builds replace his slot.
+- **14z-18's statue_accent_rows was a SUPERSET VIOLATION:** 0x39B040
+  is Victor's OWN accent data (his in-match glow cycle — vanilla
+  control alternates row 0x10 between 0x38D1A0/0x39B040 exactly like
+  our build). The data_port overwrote it → Victor's glow deadened in
+  ALL matches incl. pure-legacy. Invisible to the masked RAM gate
+  (ROM->palette-RAM path never transits work RAM) and outside the
+  pixel-gate frames. REVERTED (row deleted; bytes pristine again);
+  permanent guard added (tests/test_don_accent.sh asserts 0x39B040-7F
+  == vanilla + Victor's row-0x10 cycle alive in-match).
+- **The sword blink, actual mechanism:** the engine MARCHES row 0x0C
+  through a 4-frame source cycle: accent T0 (0x39FBE0), T1 (0x39FC00
+  = T0+0x20, overlapping window — the slide animates Jedah's glow),
+  sprite block +0x40 ×2. Row 0x0D is never accent-cycled. vs2 has no
+  march (re-reads block+0x40 steadily). 14z-18's "super-cycle tail to
+  0x39FC3F" was an A0 post-increment misread (second time paying that
+  trap). FIX: T0 and T1 both hold vs2 row-C content (weapon_accent_t0/
+  _t1); 0x39FC20 holds row-D content (weapon_accent_rowd_slot — the
+  would-be row-D slot, no observed reader, authentic content either
+  way). Measured on the new build: row 0x0C single-variant across the
+  idle window, byte-equal to native vs2. The statue's BLINK was the
+  same row-0x0C march (statue pieces share the row) — also dead now.
+- **Statue steady miscolor remains (open):** palette row 0x0F is
+  wrong — it's filled by the venue fixture (2 rows 0x0E/0x0F from
+  0x3B5940, global legacy data, untouchable) and vs2 then OVERRIDES it
+  per-char from Donovan's intro block at vs2 0x3CB7DC (2 rows; the red
+  ramp for the statue keyhole/accents lives at 0x3CB7FC). vsavj's
+  engine has NO per-char override path for slot 0x0F (vs2 added CODE
+  for it — immediates at vs2 0x1a97e/0x1ac24/0x1aff8/0x2acc6/...).
+  Porting needs a slot-0F-conditional 2-row upload hook (rows 0x0E/
+  0x0F, dst 0x90C1C0 + bank 0x91C1C0, post-fade or via staging) — NEXT
+  SESSION. Expected visible result meanwhile: statue/sword no longer
+  blink; some statue accent pieces steadily miscolored (vsavj fixture
+  colors: blue/grey ramp instead of vs2's red ramp).
+- **NEW open item:** per-char table B at 0x38C1D8 (second sprite-
+  palette pointer table — alt punch/kick color sets; true table family
+  layout at 0x38C198 is FOUR 16-slot tables at +0x00/+0x40/+0x80/+0xC0
+  + 2 misc pointers, data starts +0x108) — slot 0x0F NOT repointed:
+  alt-color Donovan likely loads Jedah's palette. Port vs2's table-B
+  block (check vs2 analog) or interim-repoint to the same block.
+- **ROMDIR event:** qsound_hle.zip had vanished from ROMDIR (audit
+  FAIL per §3; the dir also carries fresh cfg/nvram — an emulator has
+  been run against it directly). Restored byte-verified copy from
+  build/donovan6/rompath (dl-1425.bin SHA-1 matches the frozen
+  manifest); audit green again. Maintainer: please keep the reference
+  dir play-free.
+- Build entry point note: stage-6 dev builds require
+  GEN_FLAGS="--allow-plausible --tripwire-open" (as test_m2b_stage6.sh
+  does); a bare build_donovan.sh 6 fails on 58 open reconciliation
+  refs — expected, not a regression.
+
+## Session 14z-18 (round 34: accent super-cycle completed; statue rows found and fixed; two new items logged) — CONCLUSIONS CORRECTED IN 14z-19
 
 - Round-34: the first blink fix was HALF the cycle. Measured over 200
   frames: phase 2 reads 0x39FC00-0x39FC3F (starts +0x20 into phase 1's

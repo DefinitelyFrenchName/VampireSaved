@@ -809,3 +809,28 @@ Session 14z-18 (blink super-cycle + statue; build 53223293):
   accent coverage; statue_accent_rows (0x39B040, 0x40, src_image
   vsavj: base-phase copy) stills the statue. Both ranges audited
   slot-0F-exclusive. data_port gains src_image.
+
+Session 14z-19 (round 35: 14z-18 corrections; the real sword fix; Victor revert):
+- REVERT statue_accent_rows (dst 0x39B040): that range is VICTOR's
+  accent data (P2 rows 0x10/0x11 are the P2 character's rows; char id
+  3 = Victor; 0x38D1A0 is his sprite block). Overwriting it was a
+  superset violation — Victor's glow deadened in all matches. Bytes
+  pristine again; guarded forever by tests/test_don_accent.sh.
+- weapon_accent_rows (0x40 over T0+T1) + weapon_accent_tail (0x39FC20,
+  half-row-offset content) RESTRUCTURED into three rows:
+  - weapon_accent_t0: vs2 0x39CBDC (row C) -> 0x39FBE0
+  - weapon_accent_t1: vs2 0x39CBDC (row C) -> 0x39FC00 (the marched
+    second slot — 14z-18 had row D content here = the residual blink)
+  - weapon_accent_rowd_slot: vs2 0x39CBFC (row D) -> 0x39FC20 (layout
+    companion slot; no observed reader; authentic content either way)
+  Mechanism: engine marches row 0x0C sources T0 -> T1 -> block+0x40 ×2
+  each 4 frames (vanilla-Jedah control identical); both marched slots
+  now carry identical row-C bytes = steady, byte-equal to native vs2
+  (measured, 40-frame idle window).
+- New gate tests/test_don_accent.sh: static (T0==T1==vs2 rowC, rowD
+  slot content, 0x39B040-7F == vanilla) + behavioral (row 0x0C single
+  variant == frozen native content; Victor row 0x10 cycle alive).
+- Open (next session): palette row 0x0F fixture override port (vs2
+  0x3CB7DC 2-row block -> rows 0x0E/0x0F; needs slot-0F-conditional
+  hook — vsavj has no per-char override path); table B 0x38C1D8
+  slot-0F repoint (alt-color Donovan).

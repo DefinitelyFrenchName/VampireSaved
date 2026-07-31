@@ -582,53 +582,63 @@ site = 0x05E7C6
 old_hex = "3d7c00000018"
 thunk_hex = "0c2e000f009a6600000a3d7c400000184e753d7c000000184e75"
 
-# Sword/statue red blink (sessions 14z-13..17, rounds 16..33 — THE
-# oldest standing cosmetic). Mechanism (fully measured): vsavj's
-# universal palette-accent alternates the weapon rows 0x0C-0x0D every
-# 2 frames between the char sprite block (+0x50, grey) and FOUR global
-# accent rows at 0x39FBF0-0x39FC2F (base 0x39A910 family) — red,
-# authored for JEDAH's theme. vs2 has no such alternation: it refreshes
-# the weapon rows STEADILY from the sprite block (live-tapped, native).
-# The red rows are read by NO pure-legacy content (collector audit:
-# 02/30/29 replays, zero hits — slot-0F-exclusive = Jedah's accent) ->
-# in-place replacement, the established class. Content = vs2's sprite
-# block +0x50 (the exact rows vs2 displays steadily): the vsavj accent
-# keeps cycling, but between identical values = steady grey = the vs2
-# look via the host mechanism. Expected to also fix the red arcs around
-# the sword (round-33 image 9) and the statue's blink (same rows).
+# Sword red blink (sessions 14z-13..19, rounds 16..35 — THE oldest
+# standing cosmetic). CORRECTED mechanism (fully measured, 14z-19):
+# the engine MARCHES palette row 0x0C (P1 weapon row) through a
+# 4-frame cycle of upload sources: accent T0 (0x39FBE0), accent T1
+# (0x39FC00 = T0+0x20 — an overlapping window: for Jedah the slide
+# animates his glow), then sprite block +0x40 twice. Row 0x0D is set
+# once at match start and never accent-cycled. vs2 has no march at
+# all: it re-reads block+0x40 (= 0x39CBDC) steadily. The accent slots
+# are slot-0x0F-gated (vanilla = Jedah's; read only when slot 0x0F
+# plays — re-verified 14z-19 with a vanilla P1=Jedah control run) ->
+# in-place replacement stays the right class. Fix: BOTH marched slots
+# carry row-C content, so every phase of the host march uploads the
+# same bytes = steady = the exact vs2 look. (The 14z-18 "super-cycle
+# tail to 0x39FC3F" was an A0 post-increment misreading — the march
+# reads exactly T0 and T1; docs/GOTCHAS.md.)
 [[data_port]]
 stage = 6
-name = "weapon_accent_rows"
+name = "weapon_accent_t0"
 src = 0x39CBDC
-len = 0x40
+len = 0x20
 dst = 0x39FBE0
-dst_end = 0x39FC20
+dst_end = 0x39FC00
 dst_old_head = "01110d000b020902"
 
-# 14z-18 (round-34): the accent SUPER-cycle reads 0x39FBE0-0x39FC3F
-# (phase 2 starts at +0x20 and extends 0x20 past the first fix — the
-# "darker grey + red spots" residual). Cover the tail: phase-2 row-D
-# slot gets the same pale row-D content. Legacy audit: zero reads.
 [[data_port]]
 stage = 6
-name = "weapon_accent_tail"
-src = 0x39CBEC
+name = "weapon_accent_t1"
+src = 0x39CBDC
+len = 0x20
+dst = 0x39FC00
+dst_end = 0x39FC20
+dst_old_head = "01110f980f760f53"
+
+# Row-D companion slot (layout position 0x39FC20 = the would-be T0 of
+# a row-0x0D accent pair; no march observed reading it in-match or
+# attract, but the 14z-18 tail row had left half-offset garble here —
+# hold authentic row-D content instead, correct under any hypothetical
+# row-D march, inert otherwise). Slot-0F-gated like the pair above.
+[[data_port]]
+stage = 6
+name = "weapon_accent_rowd_slot"
+src = 0x39CBFC
 len = 0x20
 dst = 0x39FC20
 dst_end = 0x39FC40
 dst_old_head = "01110b0209020803"
 
-# 14z-18: THE STATUE rows (0x10/0x11) alternate their base rows
-# (0x38D1A0-DF, correct grey — vanilla-neutral content) with a second
-# accent family at 0x39B040-7F (the statue's blink). Zero legacy reads
-# (audited); make the accent phase identical to the base phase —
-# steady, via a vanilla->vanilla copy (src_image = "vsavj").
-[[data_port]]
-stage = 6
-name = "statue_accent_rows"
-src_image = "vsavj"
-src = 0x38D1A0
-len = 0x40
-dst = 0x39B040
-dst_end = 0x39B080
-dst_old_head = "030c098f086f074e"
+# 14z-19 REVERT of 14z-18 "statue_accent_rows" (dst 0x39B040): that
+# row misread the mechanism. Palette rows 0x10/0x11 are the P2
+# CHARACTER's rows (P2 was Victor in every probe), 0x38D1A0 is
+# VICTOR's sprite block (char id 3), and 0x39B040 is VICTOR's OWN
+# accent data — legacy-read in every match he plays (vanilla control
+# run alternates row 0x10 between the same two sources). Overwriting
+# it was a superset violation invisible to the RAM gate (ROM ->
+# palette-RAM path) — reverted by deleting the row; the legacy bytes
+# at 0x39B040-7F are pristine again. Guard: tests/test_don_accent.sh
+# asserts them against vanilla. The statue's actual blink was the
+# row-0x0C march above (statue pieces share it); its remaining steady
+# miscolor is the un-ported row-0x0E/0x0F intro fixture override
+# (vs2 0x3CB7DC block) — open item, see STATE.md 14z-19.

@@ -51,6 +51,10 @@ tests/test_m2a_stage4_oracle.sh [rp]  # vsav2-as-oracle: anchors/neutral-exact/
                                       # HP-trajectory/comparative bound (17+18 replays)
 tests/test_m2a_stage4_xemu.sh  [rp]   # dual-emulator: MAME+FBNeo field agreement
 tests/test_m2a_flavor_selector.sh [rp]# Start-hold flavor latch (stage 5)
+tests/test_don_sword.sh        [rp]   # sword-swing behavior gate (anim node)
+tests/test_don_accent.sh       [rp]   # weapon-accent steadiness + VICTOR-accent
+                                      # legacy byte guard (palette data_ports are
+                                      # RAM-gate-blind — this is their only lock)
 ```
 
 All tests are self-contained, take state only via env/args, print PASS/FAIL,
