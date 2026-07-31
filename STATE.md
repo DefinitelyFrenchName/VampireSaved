@@ -5,6 +5,43 @@ cf2109d8 pending gates+playtest: Anita/sword/statue render in-match
 and on the win screen; 3 residual sites excluded; session 14q parked
 state superseded)
 
+## Session 14z-13 (round 33: electrocute FULLY CONFIRMED incl. yellow; sword blink mechanism DECODED)
+
+- Round-33 playtest: the electrocute is CORRECT — structure AND colors,
+  yellow burst included. The 14z-12 purple-vs-yellow decision DISSOLVES:
+  the burst/tint colors ride the per-char effect-palette block, so
+  Donovan naturally brought vs2's yellow while vanilla characters keep
+  their own — the ideal outcome, zero engine surface. (My "global
+  purple" analysis was half-right: the global rows exist but the
+  per-char block dominates the visible result.)
+- SWORD/STATUE BLINK — mechanism fully decoded (round-33 two-frame
+  captures: grey frame + red frame cycling):
+  * The sword idles through a stride-8 palette-seq stream (his
+    companion data in x2b7ef4; sword nodes @0xF77E2+, statue twin
+    @0xFA89A+; per-node seq id = 0x200 | flags byte -> ids 0x292-0x29D).
+  * Streams are IDENTICAL vs2-vs-build; the ids resolve in the GLOBAL
+    palette-seq table (vsavj 0x39A900 / vs2 0x3B0A3C, 0x20-byte rows):
+    vs2 rows 0x297-0x29A = blue-grey shimmer (0322/0433/0744 family —
+    the sword's intended subtle sheen); vsavj rows at the same ids =
+    RED fade records (0d00/0b02 family) = the red frames. Uploader =
+    0x2AD64-family writing pal RAM row 0x0C; live-tap confirmed the
+    alternation grey(ported block rows)/red(global rows).
+  * No data-only fix exists: vsavj's global table has NO matching grey
+    rows anywhere (full scan) and NO free ids (no FF gaps in the
+    0x1000-id window); the table itself is legacy surface.
+  * FIX DESIGN (state_hook precedent, next session): locate the seq-
+    TRIGGER call in the ported companion handler (it computes
+    0x200|flags and invokes the engine uploader); wrap it (ported-code
+    call site = legacy-clean): ids 0x292-0x29D -> a GEN blob uploading
+    from 4 privately-placed vs2 rows (vs2 0x3B0A3C + id*0x20, 0x80
+    bytes total) to the row from context; other ids -> original path.
+    Acceptance: sword/statue steady grey-shimmer, no red; pixel A/B
+    at multiple phases (the odd-frame rule); battery.
+- NOTE the param-word difference build-vs-vs2 in those nodes
+  (0x2C -> 0x0F, all nodes): predates this session's changes; the
+  drawn palette row (0x0C) comes out right regardless — investigate
+  during the fix, do not assume it is wrong.
+
 ## Session 14z-12 (round 32: X-ray STRUCTURE confirmed; effect-palette block ported; purple-vs-yellow = DECISION)
 
 Round-32 captures confirm the 14z-11 sweep: the electrocute X-ray now

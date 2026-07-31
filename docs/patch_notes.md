@@ -769,3 +769,9 @@ Session 14z-12 (effect-palette block; build fbf10960):
 - Purple electricity ruled vanilla-faithful (global palette-seq table;
   vanilla control identical); vs2-yellow recorded as a pending
   maintainer decision in STATE.
+
+Session 14z-13 (no ROM change; sword-blink mechanism decoded):
+- Round-33 confirms the electrocute fully (yellow included — per-char
+  block carries it; decision dissolved). Sword/statue blink root cause
+  measured end-to-end: global palette-seq id collision (see STATE
+  14z-13 for the complete map and the wrap-the-trigger fix design).

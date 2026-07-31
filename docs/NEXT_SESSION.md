@@ -14,7 +14,13 @@ generic hit starburst, correct on our build). Delete the rows once
 round-27 confirms the swing looks complete; the sword's own +0x18 tile
 bank comes from Donovan's ported code (correct 0x4000 already).
 
-Open items, in maintainer priority order:
+SWORD/STATUE BLINK is now the top actionable item — mechanism fully
+decoded in STATE 14z-13 (global palette-seq id collision; wrap the
+ported seq-trigger call, serve 4 private vs2 rows). Everything needed
+is measured: node streams @0xF77E2/0xFA89A, ids 0x292-0x29D, vs2 rows
+@0x3B0A3C+id*0x20, uploader 0x2AD64-family, live-tap method proven.
+
+Open itemsOpen items, in maintainer priority order:
 1. SWORD CONFIRMED (round 27) — blocker closed. Leftovers, non-blocking:
    blade palette (red/grey vs native silver — blink family), 6HP hitbox
    worry (oracle HP matched; a hitbox A/B replay would settle it).
