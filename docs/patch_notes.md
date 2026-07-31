@@ -921,3 +921,12 @@ Session 14z-24 (select-sword FIXED; stage 6 live):
 - Gate: test_don_colors.sh section 3 (composition + order + frozen
   codes; replay 44). replay.lua: POKES facility (tap_writes mirror).
 - Five manifest rows live at stage 6; build d1db9c0b.
+
+Session 14z-26 (Change Immortal KO: hit-class table extension):
+- data_port hit_class_props_ext: vs2 0x28026 (6 bytes, classes
+  0x4E-0x53: 0f1b1f190f03) -> vsavj 0x28D4E (zero spare capacity in
+  the per-hit-class property table 0x28D00; reaction dispatch 0x2380C
+  family). Root cause of round-39's SPECIAL FINISH neutral-pose bug;
+  electrocute shake now fires on deity KO. Known-partial: shake->
+  collapse handoff still missing (STATE 14z-26). Gate:
+  tests/test_don_reactions.sh (+ battery 3c); replay 48 promoted.

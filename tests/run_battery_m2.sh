@@ -14,7 +14,8 @@
 #                              fixture-override rows, shock-window
 #                              vanilla lock (palette ROM->RAM is
 #                              RAM-gate-blind; these are the only locks)
-#   3b. test_don_colors.sh   — kick-color + mirror rows native-locked
+#   3b. test_don_colors.sh   — kick-color + mirror rows + select sword
+#   3c. test_don_reactions.sh — hit-class property routing (0x4E-0x53)
 #   4. test_m2a_stage4_oracle.sh — vsav2-as-oracle field gates
 #   5. test_m2a_stage4_xemu.sh   — MAME/FBNeo dual-emulator agreement
 #   6. test_m2a_flavor_selector.sh — Start-hold latch
@@ -33,6 +34,7 @@ tests/test_m2b_stage6.sh "$OUTBASE"
 tests/test_don_sword.sh "$OUTBASE/rompath"
 tests/test_don_accent.sh "$OUTBASE/rompath"
 tests/test_don_colors.sh "$OUTBASE/rompath"
+tests/test_don_reactions.sh "$OUTBASE/rompath"
 tests/test_m2a_stage4_oracle.sh "$OUTBASE/rompath"
 tests/test_m2a_stage4_xemu.sh "$OUTBASE/rompath"
 tests/test_m2a_flavor_selector.sh "$OUTBASE/rompath"

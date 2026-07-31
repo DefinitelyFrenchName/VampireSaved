@@ -21,6 +21,42 @@ state superseded)
   ($FF8782 reads exactly 0x0F at the sites' run time in a real match
   flow, both mirror sides trigger).
 
+## Session 14z-26 (round 39: 421P correction -> ROOT CAUSE FOUND + partial fix shipped; collapse handoff remains)
+
+Maintainer corrected round-38's report: the bug move is **421P with
+sword (Change Immortal — the blue deity multi-hit summon)**, kill by
+its damage at any spacing; capture shows SPECIAL FINISH + victim
+standing neutral. Reproduced deterministically in one 2P run (replay
+48 + HP poke), then traced end to end:
+
+- The reaction dispatch (0x2380C family, ~60 call sites) indexes the
+  per-HIT-CLASS property table 0x28D00 with victim+0x54. The deity's
+  hits carry class 0x4E. **vs2 EXTENDED the table with classes
+  0x4E-0x53 (values 0f 1b 1f 19 0f 03); vsavj's table is zero there**
+  -> the special branch (electrocute/special-finish reaction — native
+  control shows the victim shaking in the lightning X-ray, hence the
+  SPECIAL FINISH banner) never fires; the victim's plain hitstun
+  expires into idle. Also explains the attacker link: the deity's
+  hits attribute to Donovan himself (+0x32 = 0x8400), so this is
+  class-driven, not attacker-object-driven.
+- FIX SHIPPED: data_port hit_class_props_ext — 6 bytes vs2 0x28026 ->
+  vsavj 0x28D4E (zero-filled spare capacity; terminator untouched).
+  Legacy-safe by construction: no vanilla attack emits classes >
+  0x49. Measured: deity KO now fires the electrocute shake (node
+  0x157EBC) with the X-ray burst — and other ported moves using the
+  new classes get their reactions routed too (the maintainer's
+  "other specials" suspicion).
+- REMAINING (next session): the shake->COLLAPSE handoff. Native: shake
+  loop (two alternating nodes) then collapse node; ours: single
+  static shake node, then release to idle — a second consumer of the
+  property value diverges (engine-version drift in the dispatch's
+  branch targets, or a follow-up resolver). Same comparative-tap
+  methodology, one level deeper. Gate test_don_reactions.sh freezes
+  the current partial (shake fires) and carries a STRENGTHEN-note for
+  the collapse.
+- Also logged from round 39: possible wrong palette on the deity when
+  summoned WITHOUT the sword (maintainer double-checking).
+
 ## Session 14z-25 (round 38: select-sword CONFIRMED by maintainer; 421K match-end KO bug logged + repro hunt banked)
 
 - **Round 38 maintainer confirmation: the select-screen sword renders

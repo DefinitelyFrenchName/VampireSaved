@@ -767,3 +767,28 @@ name = "select_companion_resolve_s2"
 site = 0x084624
 old_hex = "4eb900015084"
 thunk_hex = "0c2e000f000a67064ef900015084326e0030137c0008003c303c010b4ef900015088"
+
+# 14z-26: HIT-CLASS PROPERTY TABLE EXTENSION (round-39 report: Change
+# Immortal 421P killing blow leaves the victim standing in neutral at
+# match end — no SPECIAL FINISH death). Mechanism (measured end to
+# end): the reaction dispatch (0x2380C family) indexes the per-hit-
+# class property table at 0x28D00 with the victim's +0x54 class byte;
+# vs2 EXTENDED the table with classes 0x4E-0x53 for the new
+# characters' moves (the deity's hits carry class 0x4E -> property
+# 0x0F routes the electrocute/special-finish reaction — measured on
+# native: the victim shakes in the lightning X-ray, hence the SPECIAL
+# FINISH banner). vsavj's table is ZERO there (spare zero-filled
+# capacity, terminator at +0x5F untouched), so the special branch
+# never fires and the victim's hitstun expires into idle. In-place
+# 6-byte port; legacy-safe by construction: no vanilla attack emits
+# classes > 0x49 (the entries are dead until ported attack data
+# references them). Likely also fixes reaction quirks on OTHER ported
+# moves using the new classes.
+[[data_port]]
+stage = 6
+name = "hit_class_props_ext"
+src = 0x028026
+len = 0x6
+dst = 0x028D4E
+dst_end = 0x028D54
+dst_old_head = "000000000000"
