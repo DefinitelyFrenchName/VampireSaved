@@ -5,6 +5,38 @@ cf2109d8 pending gates+playtest: Anita/sword/statue render in-match
 and on the win screen; 3 residual sites excluded; session 14q parked
 state superseded)
 
+## Session 14z-16 (blink: vs2 STEADY confirmed; the complete fix design)
+
+Ground truth closed the loop (live taps, both games, same replay):
+- NATIVE VS2: Donovan's weapon rows 0x0C-0x0D refresh EVERY frame from
+  ONE steady source — his sprite block +0x50/+0x60. NO alternation.
+  (The maintainer's wager confirmed: vs2 does not cycle at all.)
+- VANILLA VSAVJ (Jedah control): the SAME 4-frame alternation we see —
+  sprite block +0x50 vs the global rows 0x39FBF0-0x39FC2F (base
+  0x39A910 + ids 0x297-0x29A; the 14z-13 id model was right, base off
+  by a 0x10 header). The red accent is UNIVERSAL vsavj styling (fine on
+  vanilla art that was designed for it); Donovan's vs2-designed sword
+  art + vsavj's red accent = the blink.
+- The refresh script (0x376518) is installed ONCE per match by engine
+  setup (immediates 0x1F142/0x1F14A -> job block $FF82B0/B4; +0x34 is
+  the active script). vs2 uses different scripts (installers at
+  0x1D846/0x1DCC4/0x1E088: 0x36BD34/0x37F534/0x38FD94 by mode).
+FIX DESIGN (zero legacy execution, reuses proven machinery):
+1. Place a PRIVATE copy of the 0x376518 script with the red-sourcing
+   phases changed to block-sourcing (or waits) — the one remaining
+   unknown is the command semantics ("0dXY 018Z" entries + waits);
+   determined by a short experiment: NOP/modify entries in the private
+   copy and observe the upload sources shift (2-3 build cycles, the
+   REGLOG row tap is the readout).
+2. Revive the 14z-7 countdown mechanism (init-shim marker + sword-exit
+   blob — Donovan-gated by construction, once per match, post-install):
+   payload = `move.l #PRIVATE,$FF82B4` (swap the active script pointer
+   in the RAM job block; the engine re-installs per match, our blob
+   re-swaps per match ✓).
+3. Acceptance: sword/statue steady grey (multi-phase pixel A/B incl.
+   odd frames), vanilla control UNTOUCHED (the swap only runs in
+   Donovan matches), full battery, playtest.
+
 ## Session 14z-15 (blink driver FULLY mapped: the stage palette-anim refresh system)
 
 Final layer measured (continuing 14z-14 without playtest input):

@@ -790,3 +790,8 @@ Session 14z-15 (no ROM change; blink driver fully mapped):
   0x376518 refreshes weapon palette rows 0x0C-0x0D; the red = row
   0x0D sourced from Jedah's block (+0xCD0). One resolution map from
   the fix; see STATE 14z-15.
+
+Session 14z-16 (no ROM change; blink fix design complete):
+- vs2 measured STEADY (no weapon-row cycling); vsavj's universal red
+  accent identified as the blink source; full fix design (private
+  script + countdown-blob pointer swap) in STATE 14z-16.

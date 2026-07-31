@@ -14,18 +14,15 @@ generic hit starburst, correct on our build). Delete the rows once
 round-27 confirms the swing looks complete; the sword's own +0x18 tile
 bank comes from Donovan's ported code (correct 0x4000 already).
 
-SWORD/STATUE BLINK — the 14z-13 stream/global-id model was superseded
-by 14z-14 measurements (read BOTH): the true driver is a palette JOB
-QUEUE at $FF8280 (jobs carry ROM script ptrs 0x376518-family + target
-row); the red job's source (0x39FBF0, 0x40 bytes, 2 frames of the
-4-frame cycle) is computed, not stored. DONE in 14z-15: the enqueuer is engine
-match-setup (immediates at 0x1F142; per-stage descriptor from table
-0x1F92E via $100(a5); script 0x376518 refreshes rows 0x0C-0x0D). The
-red = row 0x0D's refresh sourcing Jedah's block +0xCD0. FIRST MOVE:
-the vanilla control tap (does Jedah read 0x39FBF0 too - expected yes),
-then pin the id-0x18E -> address map (stage descriptor at -$3C78(a5)
-or a fourth per-char table) and repoint slot-0F to the ported block. The 14z-14 third-table repoint
-(0x38C258) is shipped and harmless.
+SWORD/STATUE BLINK — COMPLETE fix design ready (STATE 14z-16; it
+supersedes 14z-13/14/15 notes): vs2 is STEADY (no cycle — confirmed
+live); vsavj's universal red accent (global rows 0x39FBF0+, ids
+0x297-0x29A base 0x39A910) is the blink. Fix = private modified copy
+of the refresh script 0x376518 + the 14z-7 countdown blob swapping
+$FF82B4 to it (Donovan-gated, once per match, zero legacy execution).
+First hour: pin the script command semantics by experiment (modify
+entries in the private copy, read out with the REGLOG row tap at
+90c180). Then acceptance: steady grey, odd-frame pixel A/B, battery.
 
 Open itemsOpen items, in maintainer priority order:
 1. SWORD CONFIRMED (round 27) — blocker closed. Leftovers, non-blocking:
