@@ -21,6 +21,55 @@ state superseded)
   ($FF8782 reads exactly 0x0F at the sites' run time in a real match
   flow, both mirror sides trigger).
 
+## Session 14z-21c (select-sword: FULL activation chain reverse-engineered; fix ready to implement)
+
+Correction to 14z-21b: NOT the companion-overlay record system — the
+select venue has its own dedicated select-companion machinery. Complete
+chain (all measured live on vs2 + twin-located in vsavj):
+
+- The select-companion OBJECT exists on our build (obj $FFD480, char id
+  0x0F cached) but stays DORMANT: alive flag +1 stays 0, no anim.
+- vs2 activation (frame-1159 trace, hover-change to Donovan): a
+  per-frame companion KEEPER routine dispatches on the hovered CHAR ID
+  through a 32-entry PC-relative jump table; most entries -> deactivate,
+  Donovan (0x13) -> a handler doing `lea 0x289EF6,a0; jsr 0x13778`
+  (resolver: node = table + table[id*2]; writes obj+0x1C) -> initial
+  node 0x28DAF0; sets +4=0x0202, +0/+1=0x0101 (alive).
+- The sword pieces are then drawn per frame by select-engine walker
+  PC 0x19E24 from records at ~0x29AFE0+ (format: [attr,code] pairs +
+  0x11x0x09 header + coord-list long; per-anim-frame records), coord
+  lists at 0x352150+ (INSIDE the overlay pool window [0x300000,
+  0x361000)), tile codes 0x863F-0x864D (in-match sword band — remap
+  exists), palette row 0x17.
+- vsavj TWIN keeper found at ~0x844E0 (owner-id cache sig 1d6b0382000a
+  is unique); its jump table (after the second `4efb 1002`, ~0x8456C+4)
+  has entry 0x0C (and one later entry) -> handler at disp +0x46 doing
+  `lea 0x2083BC,a0` (or 0x2087CA by flag a6+3) `; jsr 0x15084`
+  (resolver twin, sig-verified). Entry 0x0F = 0x0040 (deactivate).
+
+FIX PLAN (next session):
+1. Port the data chain: vs2 node-offset table 0x289EF6 (extent TBD),
+   nodes ~0x28DAxx, records 0x29AFxx-0x29B1xx(+ per-frame set), coord
+   lists 0x352150+ (check overlay-pool coverage first — POOL_LO/HI in
+   tools/overlay_port.py may already carry them), tile-code remap via
+   the existing gfx_remap map.
+2. Route vsavj jump-table entry 0x0F (word 0x0040 -> 0x0046) so slot
+   0x0F enters the existing char-0x0C handler.
+3. site_thunk the handler's two `lea` sites (0x2083BC/0x2087CA
+   immediates) char-conditionally: owner id 0x0F -> ported table (the
+   fixture_row0f pattern; check flag-dead safety + also the later
+   state's `lea 0x283690` site).
+4. LEGACY RISK CHECKPOINT: the keeper consults entry 0x0F whenever the
+   select cursor hovers the Jedah cell — 04_select_fuzz (flicker
+   inventory) and the pick frozen-divergence may shift. If flickers
+   drift, that is EXPECTED mechanism here, but per the standing watch
+   it must be mechanism-attributed and re-frozen with maintainer
+   sign-off — flag it in the session report, do not silently refreeze.
+5. Gate: extend test_don_colors.sh (or new) — select-hover OBJ list
+   must contain the 8 sword entries at frozen native positions/codes
+   (remapped); include a vanilla-side assertion that a non-companion
+   char's hover keeps entry-0x0F path dormant.
+
 ## Session 14z-21b (select-screen sword: mechanism PINNED, fix scoped; 2026-07-31)
 
 OBJ-RAM A/B at select hover (ours frame 1290 vs native vs2 frame 1350,
