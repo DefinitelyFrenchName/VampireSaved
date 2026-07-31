@@ -581,3 +581,26 @@ name = "spark_bank_swap"
 site = 0x05E7C6
 old_hex = "3d7c00000018"
 thunk_hex = "0c2e000f009a6600000a3d7c400000184e753d7c000000184e75"
+
+# Sword/statue red blink (sessions 14z-13..17, rounds 16..33 — THE
+# oldest standing cosmetic). Mechanism (fully measured): vsavj's
+# universal palette-accent alternates the weapon rows 0x0C-0x0D every
+# 2 frames between the char sprite block (+0x50, grey) and FOUR global
+# accent rows at 0x39FBF0-0x39FC2F (base 0x39A910 family) — red,
+# authored for JEDAH's theme. vs2 has no such alternation: it refreshes
+# the weapon rows STEADILY from the sprite block (live-tapped, native).
+# The red rows are read by NO pure-legacy content (collector audit:
+# 02/30/29 replays, zero hits — slot-0F-exclusive = Jedah's accent) ->
+# in-place replacement, the established class. Content = vs2's sprite
+# block +0x50 (the exact rows vs2 displays steadily): the vsavj accent
+# keeps cycling, but between identical values = steady grey = the vs2
+# look via the host mechanism. Expected to also fix the red arcs around
+# the sword (round-33 image 9) and the statue's blink (same rows).
+[[data_port]]
+stage = 6
+name = "weapon_accent_rows"
+src = 0x39CBDC
+len = 0x40
+dst = 0x39FBE0
+dst_end = 0x39FC20
+dst_old_head = "01110d000b020902"

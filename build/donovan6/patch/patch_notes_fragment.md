@@ -285,3 +285,4 @@ poke32 0x0bf516 <- 0x000c1124  dispatch_18[0x1f] variant mirror
 poke32 0x0bf656 <- 0x000c1106  dispatch_19[0xf] donovan handler
 poke32 0x0bf696 <- 0x000c1106  dispatch_19[0x1f] variant mirror
 data   0x0b19f8 +0xe50  data_port throw_victim_keyframes <- vsav2 0x0ca1ca (0 fixes)
+data   0x39fbe0 +0x40  data_port weapon_accent_rows <- vsav2 0x39cbdc (0 fixes)

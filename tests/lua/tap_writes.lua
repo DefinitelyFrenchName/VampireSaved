@@ -169,9 +169,33 @@ local notifier = space:add_change_notifier(function(mode)
     if not installing and mode:find("w") then install_tap() end
 end)
 
+-- POKES="frame:addr:hexbytes;..." — write bytes at the given frame
+-- (memory experiments: hot-swap RAM structures mid-replay)
+local pokes = {}
+do
+    local p = os.getenv("POKES")
+    if p then
+        for spec in p:gmatch("[^;]+") do
+            local fr, addr, hexs = spec:match("^(%d+):(%x+):(%x+)$")
+            if fr then
+                pokes[#pokes + 1] = { tonumber(fr), tonumber(addr, 16), hexs }
+            end
+        end
+    end
+end
+
 local pressed = {}
 emu.register_frame_done(function()
     frame = frame + 1
+    for _, pk in ipairs(pokes) do
+        if pk[1] == frame then
+            local a = pk[2]
+            for b in pk[3]:gmatch("%x%x") do
+                space:write_u8(a, tonumber(b, 16))
+                a = a + 1
+            end
+        end
+    end
     if FIELDS then
         local want = {}
         for _, fldo in ipairs(held[frame + 1] or {}) do want[fldo] = true end

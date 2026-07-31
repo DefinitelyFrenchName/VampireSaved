@@ -795,3 +795,11 @@ Session 14z-16 (no ROM change; blink fix design complete):
 - vs2 measured STEADY (no weapon-row cycling); vsavj's universal red
   accent identified as the blink source; full fix design (private
   script + countdown-blob pointer swap) in STATE 14z-16.
+
+Session 14z-17 (SWORD/STATUE BLINK FIXED; build f4a7e00e):
+- data_port `weapon_accent_rows`: vs2 0x39CBDC (0x40, his pale sword
+  rows) over vsavj 0x39FBE0 (the four Jedah-theme accent rows; audited
+  slot-0F-exclusive — zero legacy reads across 02/30/29 collectors).
+  The accent cycle persists but alternates identical values = steady.
+- tap_writes.lua: POKES facility (frame-scheduled RAM writes for
+  live experiments).

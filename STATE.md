@@ -5,6 +5,29 @@ cf2109d8 pending gates+playtest: Anita/sword/statue render in-match
 and on the win screen; 3 residual sites excluded; session 14q parked
 state superseded)
 
+## Session 14z-17 (THE SWORD/STATUE BLINK IS FIXED — build f4a7e00e)
+
+The rounds-16..33 blink is dead. Final mechanism + fix:
+- The engine's accent path caches nothing: the red phase reads FOUR
+  global accent rows at 0x39FBE0-0x39FC1F (the A0-was-post-increment
+  correction; base family 0x39A910). A collector audit over the pure-
+  legacy replays (02/30/29) found ZERO reads of those rows by any
+  non-slot-0F content — they are JEDAH's theme rows, exclusively.
+- FIX (in-place slot-0F class, zero code, zero legacy cycles):
+  data_port `weapon_accent_rows` — vs2's sprite-block rows +0x40
+  (0x39CBDC, the exact pale-metal tones vs2 displays steadily) written
+  over the four red rows. The vsavj accent mechanism keeps alternating
+  — between identical values — yielding vs2's steady look through the
+  host engine. Verified: uploads now carry ffff/fcdf/f9ad/f87a (pale
+  family, no red); four consecutive-phase snapshots show a steady
+  pale sword. Also expected fixed: the statue blink and the red arcs
+  around the sword (same rows).
+- Session-14z-16's POKES facility (tap_writes) and the pointer-nuke
+  differential were the tools that exonerated the stage-script system
+  and exposed the +0x3A4 cache / global-path split; the +0x3A4 cache
+  is correctly initialized (0x1C68E reads the repointed table-1 ✓) —
+  no further work needed there.
+
 ## Session 14z-16 (blink: vs2 STEADY confirmed; the complete fix design)
 
 Ground truth closed the loop (live taps, both games, same replay):
