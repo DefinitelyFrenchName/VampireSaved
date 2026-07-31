@@ -14,11 +14,15 @@ generic hit starburst, correct on our build). Delete the rows once
 round-27 confirms the swing looks complete; the sword's own +0x18 tile
 bank comes from Donovan's ported code (correct 0x4000 already).
 
-SWORD/STATUE BLINK is now the top actionable item — mechanism fully
-decoded in STATE 14z-13 (global palette-seq id collision; wrap the
-ported seq-trigger call, serve 4 private vs2 rows). Everything needed
-is measured: node streams @0xF77E2/0xFA89A, ids 0x292-0x29D, vs2 rows
-@0x3B0A3C+id*0x20, uploader 0x2AD64-family, live-tap method proven.
+SWORD/STATUE BLINK — the 14z-13 stream/global-id model was superseded
+by 14z-14 measurements (read BOTH): the true driver is a palette JOB
+QUEUE at $FF8280 (jobs carry ROM script ptrs 0x376518-family + target
+row); the red job's source (0x39FBF0, 0x40 bytes, 2 frames of the
+4-frame cycle) is computed, not stored. FIRST MOVE next session:
+REGLOG-tap the queue slot fields (~$FF82A0-B0) to catch the enqueuer,
+or bp the job processor upstream of 0x2AD3C reading (a3). Then
+redirect per the slot-0F patterns. The 14z-14 third-table repoint
+(0x38C258) is shipped and harmless.
 
 Open itemsOpen items, in maintainer priority order:
 1. SWORD CONFIRMED (round 27) — blocker closed. Leftovers, non-blocking:

@@ -338,6 +338,15 @@ src_head_hex = "00000cde0aae088b"
 table = 0x38C218
 row = 0x0F
 hole = "a"
+# 14z-14 (round-33 sword blink): the THIRD per-char palette table
+# (0x38C258) shares Jedah's block with 0x38C218 in vanilla (both ->
+# 0x398F20); the un-repointed row 0x0F served Jedah rows at +0xCD0 =
+# THE RED FRAMES of the sword/statue blink (live-tapped: red source
+# 0x39FBF0 = 0x398F20+0xCD0). Mirror the vanilla sharing: point it at
+# the same ported effect block (vs2's own third table does not even
+# extend to Donovan - its engine never uses it for him; ours reads it
+# through the slot-0F path, so it must see HIS rows).
+extra_tables = "0x38C258"
 
 # ── Throw-damage work-var reconciliation (session 14n; playtest round
 # 12: "throw barely deals damage"). The ported throw-damage writer

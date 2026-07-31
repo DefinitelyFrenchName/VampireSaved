@@ -5,6 +5,34 @@ cf2109d8 pending gates+playtest: Anita/sword/statue render in-match
 and on the win screen; 3 residual sites excluded; session 14q parked
 state superseded)
 
+## Session 14z-14 (sword-blink fix session: driver mapped to the palette-JOB system; third table repointed; ONE tap from the finish)
+
+Progress (build 40256bae):
+- SHIPPED: the THIRD per-char palette table (0x38C258) row 0x0F
+  repointed to the ported effect block ([[palette]] extra_tables
+  support; vanilla shares one block between tables 2+3, we now mirror
+  that). Harmless-by-construction (slot-0F only, row content = his own
+  block); may serve other status paths.
+- The repoint did NOT stop the red frames: live source still 0x39FBF0.
+  Driver chain mapped this session (each link measured):
+  * The uploads run under a6=DONOVAN with A3=$FF8280 = a palette JOB
+    QUEUE in engine work RAM; jobs carry ROM SCRIPT pointers (live:
+    0x371C98, 0x376518) + the target row (0x0C observed).
+  * The script at 0x376518: entries like `0020 0000` (waits) and
+    `0d0X 018Y` commands (ids 0x181/0x18E family) — the id->source
+    computation NOT yet pinned (0x39FBF0 not literal anywhere in the
+    queue page or scripts; computed).
+  * +0x14E is set-and-cleared within the frame (frame-done dumps
+    always 0 — the transient GOTCHA); the observed clear PC 0x2A7DA.
+- NEXT (one focused session, first move pre-planned): find the RAM
+  long/word feeding A0 for the red job — REGLOG tap candidates: the
+  queue slot fields around $FF82A8 (the two script pointers sit at
+  ~$FF82A0/AC per the dump), and/or bp the job-processor entry
+  upstream of 0x2AD3C reading (a3). Once the enqueuer/computation is
+  named, redirect per the established slot-0F patterns. All probes/
+  replays in place; the 4-frame cycle fingerprint: 2 frames from
+  0x39FBF0 (0x40 bytes), 2 from sprite-block+0x50.
+
 ## Session 14z-13 (round 33: electrocute FULLY CONFIRMED incl. yellow; sword blink mechanism DECODED)
 
 - Round-33 playtest: the electrocute is CORRECT — structure AND colors,

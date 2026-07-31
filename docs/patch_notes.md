@@ -775,3 +775,11 @@ Session 14z-13 (no ROM change; sword-blink mechanism decoded):
   block carries it; decision dissolved). Sword/statue blink root cause
   measured end-to-end: global palette-seq id collision (see STATE
   14z-13 for the complete map and the wrap-the-trigger fix design).
+
+Session 14z-14 (third palette table; blink driver mapped; build 40256bae):
+- [[palette]] extra_tables support; 0x38C258 row 0x0F -> the ported
+  effect block (mirrors vanilla table-2/3 sharing).
+- Sword-blink red source NOT yet silenced: driver = a palette-JOB
+  queue at $FF8280 with ROM script pointers (0x376518 family); the
+  id->source computation is the one unpinned link (STATE 14z-14 has
+  the full map and the pre-planned next tap).

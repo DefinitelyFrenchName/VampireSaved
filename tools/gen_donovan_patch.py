@@ -1058,12 +1058,17 @@ def main():
             (out / fn).write_bytes(pblock)
             ops.append({"op": "data_file", "addr": f"{pa:#x}", "path": fn})
             fragments.append((pa, plen, "VS2", f"{pname} palette block"))
-            ta = _int(pal["table"]) + 4 * _int(pal["row"])
-            ops.append({"op": "poke32", "addr": f"{ta:#x}",
-                        "val": f"{pa:#010x}"})
-            notes.append(f"data     {pa:#08x} +{plen:#x}  {pname} palette "
-                         f"block (vsav2 0x{psrc:06X}); poke32 {ta:#08x} "
-                         f"(palette table row {_int(pal['row']):#x})")
+            tables = [_int(pal["table"])] + [
+                _int(x) for x in
+                str(pal.get("extra_tables", "")).split(",") if x]
+            for tb in tables:
+                ta = tb + 4 * _int(pal["row"])
+                ops.append({"op": "poke32", "addr": f"{ta:#x}",
+                            "val": f"{pa:#010x}"})
+                notes.append(f"data     {pa:#08x} +{plen:#x}  {pname} "
+                             f"palette block (vsav2 0x{psrc:06X}); poke32 "
+                             f"{ta:#08x} (table {tb:#x} row "
+                             f"{_int(pal['row']):#x})")
 
         # per-char value rows -> vsavj slot 0x0F rows
         # param32_a/b (movement velocity pairs) are NOT ported (session

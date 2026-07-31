@@ -158,8 +158,9 @@ code   0x0cba10 ILLEGAL  TRIPWIRE for unresolved 0x2c32b2
 # x2b7ef4+0xb135: unresolved 0x2c32b2 -> tripwire 0xcba10
 # x2b7ef4: effect_tail — 128 bank-1 words, 308 bank-2 words (tail placements), 114 coord lists matched, 617 ported (11336B fragment)
 data_file 0x0f3f70 +0xb20c  donovan x2b7ef4 (from vsav2 0x2B7EF4)
-data     0x0ceaf0 +0x500  sprite palette block (vsav2 0x39CB9C); poke32 0x38c1d4 (palette table row 0xf)
-data     0x0ff180 +0xdc0  effect palette block (vsav2 0x3ADFDC); poke32 0x38c254 (palette table row 0xf)
+data     0x0ceaf0 +0x500  sprite palette block (vsav2 0x39CB9C); poke32 0x38c1d4 (table 0x38c198 row 0xf)
+data     0x0ff180 +0xdc0  effect palette block (vsav2 0x3ADFDC); poke32 0x38c254 (table 0x38c218 row 0xf)
+data     0x0ff180 +0xdc0  effect palette block (vsav2 0x3ADFDC); poke32 0x38c294 (table 0x38c258 row 0xf)
 poke32 0x0bceb6 <- 0x000d3070  anim_index_a[0xf] donovan anim
 poke32 0x0bcef6 <- 0x000d3070  anim_index_a[0x1f] variant mirror
 poke32 0x0bcf36 <- 0x000d51be  anim_index_a2[0xf] donovan anim
