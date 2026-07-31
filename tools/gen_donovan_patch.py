@@ -1036,26 +1036,34 @@ def main():
         # replaced-slot content, superset-clean). Decoded session 14:
         # uploader vsavj 0x1C3FE (vs2 twin 0x1AE6E), table indexed by
         # the pre-scaled char id, 12 rows to palette RAM 0x90C140.
-        pal = port.get("palette")
-        if pal and args.stage >= _int(pal.get("stage", 0)):
+        pals = port.get("palette")
+        if isinstance(pals, dict):
+            pals = [pals]
+        for pal in (pals or []):
+            if args.stage < _int(pal.get("stage", 0)):
+                continue
             psrc, plen = _int(pal["src"]), _int(pal["len"])
+            pname = pal.get("name", "sprite")
             pblock = bytes(src_data_img[psrc:psrc + plen])
             expect = bytes.fromhex(pal["src_head_hex"])
             if pblock[:len(expect)] != expect:
-                fail.append(f"palette: src block head at {psrc:#x} != "
-                            f"{pal['src_head_hex']} (image drift?)")
-            else:
-                pa = alloc("b", plen, "sprite palette block")
-                (out / "palette_block.bin").write_bytes(pblock)
-                ops.append({"op": "data_file", "addr": f"{pa:#x}",
-                            "path": "palette_block.bin"})
-                fragments.append((pa, plen, "VS2", "sprite palette block"))
-                ta = _int(pal["table"]) + 4 * _int(pal["row"])
-                ops.append({"op": "poke32", "addr": f"{ta:#x}",
-                            "val": f"{pa:#010x}"})
-                notes.append(f"data     {pa:#08x} +{plen:#x}  sprite palette "
-                             f"block (vsav2 0x{psrc:06X}); poke32 {ta:#08x} "
-                             f"(palette table row {_int(pal['row']):#x})")
+                fail.append(f"palette {pname}: src block head at {psrc:#x} "
+                            f"!= {pal['src_head_hex']} (image drift?)")
+                continue
+            pa = alloc(pal.get("hole", "b"), plen, f"{pname} palette block")
+            if pa is None:
+                fail.append(f"palette {pname}: no room")
+                continue
+            fn = f"palette_block_{pname}.bin"
+            (out / fn).write_bytes(pblock)
+            ops.append({"op": "data_file", "addr": f"{pa:#x}", "path": fn})
+            fragments.append((pa, plen, "VS2", f"{pname} palette block"))
+            ta = _int(pal["table"]) + 4 * _int(pal["row"])
+            ops.append({"op": "poke32", "addr": f"{ta:#x}",
+                        "val": f"{pa:#010x}"})
+            notes.append(f"data     {pa:#08x} +{plen:#x}  {pname} palette "
+                         f"block (vsav2 0x{psrc:06X}); poke32 {ta:#08x} "
+                         f"(palette table row {_int(pal['row']):#x})")
 
         # per-char value rows -> vsavj slot 0x0F rows
         # param32_a/b (movement velocity pairs) are NOT ported (session

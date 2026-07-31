@@ -5,6 +5,36 @@ cf2109d8 pending gates+playtest: Anita/sword/statue render in-match
 and on the win screen; 3 residual sites excluded; session 14q parked
 state superseded)
 
+## Session 14z-12 (round 32: X-ray STRUCTURE confirmed; effect-palette block ported; purple-vs-yellow = DECISION)
+
+Round-32 captures confirm the 14z-11 sweep: the electrocute X-ray now
+renders Donovan's own silhouette (structure correct). Remaining color
+layer, split in two:
+1. FIXED (build fbf10960): the X-ray/status BODY TINT came from the
+   SECOND per-char palette table (vsavj 0x38C218 = main+0x80, uploader
+   family 0x2AD20: per-char blocks of 0x20-byte effect/flash palette
+   rows) — never repointed, serving Jedah's greys (the round-4 body-
+   palette bug, one table over). Ported vs2 Donovan's block (0x3ADFDC,
+   0xDC0, per-char stride uniform) via the palette machinery
+   (now multi-entry [[palette]]); row 0x0F repointed. Expected side
+   effect: the red/purple sword & statue blink is the same sequence
+   family — playtest should re-check it.
+2. NOT A BUG (measured): the PURPLE electricity/flash. The flash rows
+   upload from the GLOBAL palette-sequence table (0x39A900 family; live
+   A0=0x39FBF0 = global row ~0x297) — vanilla vsavj presents ALL
+   electrocutes purple (control: vanilla Victor-vs-Jedah, same purple)
+   while vs2 styles its own engine yellow. Making Donovan-victim
+   electricity vs2-yellow would need per-victim redirection of a
+   GLOBAL engine sequence (new mechanism, legacy surface) and would
+   make him inconsistent with the rest of the vsavj cast.
+
+DECISION PENDING (maintainer): electric-flash color for Donovan
+victims — (a) keep vsavj-native purple (RECOMMENDED: consistent with
+every other character, zero legacy surface, faithful to the host
+engine), or (b) engineer vs2-yellow for slot-0F victims (new
+per-victim seq-redirect mechanism on a global table; visible
+inconsistency with the cast; nontrivial legacy-risk surface).
+
 ## Session 14z-11 (round 31: the X-RAY OVERLAY — offset-computed records swept; build 6f96f45b)
 
 Round-31 captures (Victor P1 vs CPU Donovan P2, electrocute at the

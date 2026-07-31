@@ -758,3 +758,14 @@ Session 14z-11 (X-ray overlay sweep; build 6f96f45b):
 - The electrocute X-ray overlay now draws Donovan's own ported art
   (was: raw vs2 codes over vanilla/Donovan-band positions = the
   round-27..31 white-block garble on victims).
+
+Session 14z-12 (effect-palette block; build fbf10960):
+- [[palette]] machinery multi-entry; new "effect" entry: vs2 0x3ADFDC
+  (0xDC0, Donovan's effect/flash palette block) placed in hole a,
+  vsavj table 0x38C218 row 0x0F repointed (the second per-char palette
+  table — main+0x80 — uploader family 0x2AD20; was serving Jedah's
+  greys = the grey X-ray body of round 32, and likely the sword/statue
+  red-purple blink family).
+- Purple electricity ruled vanilla-faithful (global palette-seq table;
+  vanilla control identical); vs2-yellow recorded as a pending
+  maintainer decision in STATE.

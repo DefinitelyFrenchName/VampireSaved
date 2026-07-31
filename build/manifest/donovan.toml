@@ -311,13 +311,33 @@ eff_hi = 0xEEBB
 # block (all confirm-button variants) and repoint row 0x0F. Portrait/
 # select-art palette tables (vsavj 0x3B5988/0x3BAEA8 family) ride with
 # the portrait work, not here.
-[palette]
+[[palette]]
+name = "sprite"
 stage = 6
 src = 0x39CB9C
 len = 0x500
 src_head_hex = "00000FFF0EB80D97"
 table = 0x38C198
 row = 0x0F
+
+# ── Effect/flash palette block (session 14z-12; round-32 captures: the
+# electrocute X-ray rendered grey with purple electricity = JEDAH'S
+# effect palettes). The SECOND per-char palette table (vsavj 0x38C218 =
+# main+0x80; vs2 0x396C14) holds each char's palette-effect SEQUENCES
+# (electrocute flash, DarkForce/status tints — uploader 0x2AD20 family:
+# per-char block, 0x20-byte rows, indexed by effect-palette id) and was
+# never repointed. Donovan's vs2 block = 0x3ADFDC, uniform per-char
+# stride 0xDC0. Expected side effect: the red/purple sword & statue
+# blink (the same sequence family) should resolve too.
+[[palette]]
+name = "effect"
+stage = 6
+src = 0x3ADFDC
+len = 0xDC0
+src_head_hex = "00000cde0aae088b"
+table = 0x38C218
+row = 0x0F
+hole = "a"
 
 # ── Throw-damage work-var reconciliation (session 14n; playtest round
 # 12: "throw barely deals damage"). The ported throw-damage writer

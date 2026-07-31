@@ -159,6 +159,7 @@ code   0x0cba10 ILLEGAL  TRIPWIRE for unresolved 0x2c32b2
 # x2b7ef4: effect_tail — 128 bank-1 words, 308 bank-2 words (tail placements), 114 coord lists matched, 617 ported (11336B fragment)
 data_file 0x0f3f70 +0xb20c  donovan x2b7ef4 (from vsav2 0x2B7EF4)
 data     0x0ceaf0 +0x500  sprite palette block (vsav2 0x39CB9C); poke32 0x38c1d4 (palette table row 0xf)
+data     0x0ff180 +0xdc0  effect palette block (vsav2 0x3ADFDC); poke32 0x38c254 (palette table row 0xf)
 poke32 0x0bceb6 <- 0x000d3070  anim_index_a[0xf] donovan anim
 poke32 0x0bcef6 <- 0x000d3070  anim_index_a[0x1f] variant mirror
 poke32 0x0bcf36 <- 0x000d51be  anim_index_a2[0xf] donovan anim
@@ -239,7 +240,7 @@ code   0x0cbb10 obj_hook thunk (ghost-clean: returns to vanilla jsr)
 code   0x05e542 ENGINE HOOK: dispatch -> jmp thunk; vanilla jsr (A0) at 0x5e548 untouched (vanilla types identical via table copy)
 data   0x3ff9b0 +0x180  state_hook palette-seq records (ids 0x2cd-0x2d8)
 code   0x0cbb30 state_hook private seq entry (records base 0x3ff9b0 - 0x2cd*32 -> engine 0x2ad9a)
-code   0x02a7c8 ENGINE HOOK: +0x14e state dispatch -> thunk 0x0cbf70 (vanilla ids ghost-clean via jmp-back; ids 0xb2-0xc8 -> 12 synthesized stubs at 0x0ff180, ext table 0x0cbf40)
+code   0x02a7c8 ENGINE HOOK: +0x14e state dispatch -> thunk 0x0cbf70 (vanilla ids ghost-clean via jmp-back; ids 0xb2-0xc8 -> 12 synthesized stubs at 0x3ffb30, ext table 0x0cbf40)
 code   0x018458 ENGINE HOOK: hit-reaction dispatch -> thunk 0x0cbfe0 (vanilla ids jmp back to untouched 0x18460; ids 0xa0-0xa6 -> 4 verbatim vs2 cases at 0x0cbfb0)
 code   0x0cc020 init shim (pool latch A5+0x7966, seeder 0x16c64; flavor (A6+0x3c2)<-0x01, Start-held [0xff8060 bit=player] -> 0x00) -> handler 0x0c1030
 poke32 0x0bd136 <- 0x000cc020  dispatch_00[0xf] donovan handler via seed shim
