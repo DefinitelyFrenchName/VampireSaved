@@ -65,6 +65,19 @@ assert rowc == {NATIVE_C}, \
     f"row 0x0C not steady/native ({len(rowc)} variants): " + \
     "; ".join(v.hex() for v in sorted(rowc)[:3])
 print(f"  ok: row 0x0C steady over {len(frames)} frames, native-vs2 content")
+# rows 0x0E/0x0F: the 14z-20 fixture-override thunk must yield native
+# content (row 0x0F = the statue red ramp; measured live on vs2).
+# GOTCHA guarded here: a hole-"a" thunk placement stores embedded data
+# as ciphertext (crypt range) — this catches any regression to garbage.
+NATIVE_E = bytes.fromhex(
+    'fd00fffffdddfbbbf33bf54ff65ff76ff216f111f112f113f115f216f228f000')
+NATIVE_F = bytes.fromhex(
+    'f01dfffffdddfbbbfa22fe32fe43fe54f500f000f100f200f400f500f611f001')
+rowe = {dumps[f][0x40:0x60] for f in frames}
+rowf = {dumps[f][0x60:0x80] for f in frames}
+assert rowe == {NATIVE_E}, f"row 0x0E wrong: {sorted(rowe)[0].hex()}"
+assert rowf == {NATIVE_F}, f"row 0x0F wrong (fixture override): {sorted(rowf)[0].hex()}"
+print("  ok: rows 0x0E/0x0F native (fixture override live, data readable)")
 assert len(row10) == 2, \
     f"P2 Victor row 0x10 must CYCLE (vanilla glow) — saw {len(row10)} variant(s)"
 print("  ok: Victor row 0x10 glow cycling (legacy behavior alive)")

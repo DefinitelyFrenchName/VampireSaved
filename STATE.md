@@ -5,6 +5,44 @@ cf2109d8 pending gates+playtest: Anita/sword/statue render in-match
 and on the win screen; 3 residual sites excluded; session 14q parked
 state superseded)
 
+## Session 14z-20 (row-0x0F fixture override SHIPPED; sword-shock aura resolved as engine-global; 2026-07-31)
+
+- **Row-0x0F fixture override (the statue's steady miscolor) DONE:**
+  two [[site_thunk]] rows hook the staged fixture sites 0x1C586 (bank
+  0, staging+fade) and 0x1C59A (bank 1) — shared by match intro AND
+  attract (measured; the six direct fixture sites serve other venues
+  and are NOT hooked pending measured need). Thunk: if either char id
+  byte ($FF8782/$FF8B82 = obj+0x382) == 0x0F, a0 = embedded vs2
+  override block (vs2 0x3CB7DC, 0x40 bytes — row 0 byte-identical to
+  the vanilla fixture's row 0x0E, row 1 = the statue red ramp); else
+  vanilla 0x3B5940, flag-safe (both sites' fall-throughs kill CCR).
+  Measured on build 73f4f5a5: palette rows 0x04-0x0F ALL byte-equal
+  to native vs2 in-match; rows 0x0E/0x0F frozen into
+  tests/test_don_accent.sh.
+- **GOTCHA PAID (generator extended):** hole "a" lies inside the CPS-2
+  crypt range — site_thunk bodies placed there are stored re-encrypted
+  for opcode fetches, so EMBEDDED DATA read via data loads comes back
+  as ciphertext (first build produced garbage palette rows). site_thunk
+  now takes hole = "b" (required for any thunk carrying data);
+  docs/GOTCHAS.md entry added.
+- **Sword-shock red-vs-yellow RESOLVED as engine-global aesthetics,
+  decision pending:** the electrocute arc/glow writes to P1 rows 0-3
+  come from GLOBAL vsavj tables (accent family idx ~0x711/0x970/0x9A4
+  region; base row block 0x39A7E0) — identical sources for Donovan,
+  vanilla Jedah, AND a non-slot-0F victim (three-way tap). vs2 simply
+  re-themed those global tables yellow. Our build shows correct
+  VSAVJ-native shock colors; there is NO porting defect and NO
+  side-effect risk (nothing of ours touches that system). Making
+  Donovan's shock yellow would need either a global re-theme (legacy
+  visual change — ruled out) or a slot-0F-conditional arc-table hook
+  (inconsistent with vsavj's victim-independent styling). See
+  "Decisions pending".
+- Control-run GOTCHA within a gotcha: the first "vanilla control" for
+  the shock tap used the SAME slot (vanilla Jedah = slot 0x0F picks) —
+  worthless for per-slot attribution; the discriminating control was a
+  DIFFERENT victim (default-cursor char). Vanilla controls must vary
+  the dimension under test, not just the build.
+
 ## Session 14z-19 addendum (round 36 CONFIRMED, 2026-07-31)
 
 Maintainer playtest on b80e0e67: **sword and statue no longer blink;
@@ -1897,6 +1935,18 @@ opcode-space dump oracle (`tests/test_decrypt_oracle.sh`). Both directions
 
 ## Decisions pending (human)
 
+- **ELECTROCUTE ARC COLORS ON DONOVAN (round-36 item, resolved to a
+  choice 14z-20):** vsavj's shock arcs/glow (P1 rows 0-3 writers) are
+  ENGINE-GLOBAL and victim-independent (measured three ways); vs2
+  re-themed the same global tables yellow. Our build shows vsavj-native
+  colors (red-ish arcs around the sword) — technically correct-for-host
+  behavior, no side-effect risk. Options: (A) keep vsavj-native shock
+  styling for all victims including Donovan — zero risk, in-game
+  consistency (RECOMMENDED); (B) slot-0F-conditional arc-table override
+  so Donovan victims get vs2-yellow — authentic to vs2 footage but
+  makes shock color victim-dependent, which neither game does, and adds
+  hook surface on a hot per-frame path; (C) global re-theme to vs2
+  yellow — ruled out (legacy visual change). Maintainer call.
 - **ROSTER ACCESS MECHANISM (M4-defining, raised by maintainer
   2026-07-28):** how players select the 18 characters. Option A: full
   select-screen redesign (new wheel/cursor/portraits — priced by the

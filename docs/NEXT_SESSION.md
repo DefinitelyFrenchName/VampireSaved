@@ -26,13 +26,14 @@ docs/GOTCHAS.md (P2-row attribution; A0 post-increment second payment).
    side-effects. Hypotheses + measurement plan: STATE.md 14z-19
    addendum — investigate alongside item 1 (same setup, likely same
    root: a palette row resolved through an un-repointed path).
-1. **Row-0x0F fixture override port** (the statue miscolor): vs2 runs a
-   per-char 2-row copy (vs2 0x3CB7DC → palette rows 0x0E/0x0F, red ramp
-   at 0x3CB7FC) after the global venue fixture (vsavj analog 0x3B5940 —
-   LEGACY, untouchable). vsavj has no per-char override path; needs a
-   slot-0F-conditional upload hook (rows 0x0E/0x0F → 0x90C1C0 +
-   0x91C1C0 bank, post-fade or via the $FF40xx staging). Data must be
-   data_ported into a hole first.
+1. **DONE 14z-20 — awaiting playtest:** row-0x0F fixture override
+   shipped (site_thunk pair at 0x1C586/0x1C59A, hole-"b" embedded vs2
+   block; STATE 14z-20). Expect: statue accents vs2-correct (red ramp)
+   in match intro + attract. Sword-shock red-vs-yellow = engine-global
+   vsavj styling — now a Decisions-pending item (recommend accept), NOT
+   a bug. If the maintainer reports statue still wrong on some OTHER
+   screen (win/continue), measure which fixture site serves it and add
+   that site to the hook set.
 2. **Table B 0x38C1D8 slot-0F repoint** (alt-color Donovan currently
    loads Jedah's block 0x390CA0): port vs2's table-B block or interim-
    repoint to the default block (0xCEAF0). Table family layout:

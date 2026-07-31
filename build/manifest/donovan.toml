@@ -642,3 +642,40 @@ dst_old_head = "01110b0209020803"
 # row-0x0C march above (statue pieces share it); its remaining steady
 # miscolor is the un-ported row-0x0E/0x0F intro fixture override
 # (vs2 0x3CB7DC block) — open item, see STATE.md 14z-19.
+
+# 14z-20: PALETTE ROW 0x0F FIXTURE OVERRIDE (the statue's steady
+# miscolor + row-0x0F consumers). Mechanism (measured, STATE 14z-19):
+# every venue loads palette rows 0x0E/0x0F from the global fixture
+# block 0x3B5940 (legacy, untouchable); vs2 then OVERRIDES both rows
+# per-char for Donovan from 0x3CB7DC — row 0 of that block is
+# byte-identical to the fixture's row 0x0E (vs2 re-themes only row
+# 0x0F: the statue red ramp at 0x3CB7FC). vsavj has no per-char
+# override path, so the two staged fixture sites (0x1C586 bank 0 via
+# staging+fade, 0x1C59A bank 1 direct; shared by match intro AND
+# attract — both measured) get a thunk: if either player's char id
+# (byte obj+0x382 -> $FF8782/$FF8B82, initialized before these sites
+# run — the same pass stages the char block resolved from them) is
+# 0x0F, a0 = embedded vs2 override block (0x40 bytes after the code;
+# hole "b" REQUIRED: hole "a" is inside the CPS-2 crypt range and
+# embedded data would be stored as ciphertext for data reads);
+# else a0 = 0x3B5940, byte-equivalent to the replaced movea.l. Flags:
+# thunk clobbers CCR where movea.l did not — both sites are followed
+# by lea/lea/moveq resp. lea/moveq, so flags are dead (verified).
+# The six direct fixture sites (0xB06E, 0x1BF12/24, 0x1C1B6/C8,
+# 0x203D8) serve other venues where char-id staleness is unproven —
+# NOT hooked; add per-site only with a measured venue that needs it.
+[[site_thunk]]
+stage = 6
+name = "fixture_row0f_override_bank0"
+hole = "b"
+site = 0x01C586
+old_hex = "207c003b5940"
+thunk_hex = "0c39000f00ff878267120c39000f00ff8b82670841f9003b59404e7541fa00044e750d000fff0ddd0bbb033b054f065f076f02160111011201130115021602280000001d0fff0ddd0bbb0a220e320e430e5405000000010002000400050006110001"
+
+[[site_thunk]]
+stage = 6
+name = "fixture_row0f_override_bank1"
+hole = "b"
+site = 0x01C59A
+old_hex = "207c003b5940"
+thunk_hex = "0c39000f00ff878267120c39000f00ff8b82670841f9003b59404e7541fa00044e750d000fff0ddd0bbb033b054f065f076f02160111011201130115021602280000001d0fff0ddd0bbb0a220e320e430e5405000000010002000400050006110001"

@@ -834,3 +834,24 @@ Session 14z-19 (round 35: 14z-18 corrections; the real sword fix; Victor revert)
   0x3CB7DC 2-row block -> rows 0x0E/0x0F; needs slot-0F-conditional
   hook — vsavj has no per-char override path); table B 0x38C1D8
   slot-0F repoint (alt-color Donovan).
+
+Session 14z-20 (row-0x0F fixture override; shock-aura triage):
+- [[site_thunk]] fixture_row0f_override_bank{0,1} (stage 6, hole "b"):
+  sites 0x1C586/0x1C59A (`movea.l #$3B5940,a0`, the staged venue
+  fixture loads for palette rows 0x0E/0x0F, both banks; shared by
+  match intro + attract — measured). Thunk: char id ($FF8782 or
+  $FF8B82) == 0x0F -> a0 = embedded vs2 block (vs2 0x3CB7DC, 0x40
+  bytes; row 0 == vanilla fixture row 0x0E byte-identical, row 1 = the
+  statue red ramp); else vanilla address. Flags dead at both
+  fall-throughs (lea/moveq). Six direct fixture sites left unhooked
+  (other venues, char-id staleness unproven — add only with measured
+  need). Result: palette rows 0x04-0x0F all byte-equal to native vs2
+  in-match (build 73f4f5a5).
+- gen_donovan_patch.py: site_thunk `hole` option (data-carrying thunks
+  MUST use "b" — crypt-range gotcha, first build shipped ciphertext
+  palette; docs/GOTCHAS.md).
+- test_don_accent.sh: rows 0x0E/0x0F frozen native constants added
+  (also guards the crypt-range regression class).
+- Shock-aura red-vs-yellow: engine-global vsavj styling (three-way tap:
+  Donovan / vanilla Jedah / different victim — identical global
+  sources). No defect; maintainer decision recorded in STATE.md.

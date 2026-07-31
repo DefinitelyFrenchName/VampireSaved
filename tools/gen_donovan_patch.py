@@ -1645,9 +1645,15 @@ def main():
                             f"old_hex ({opc_img_st[site:site+6].hex()})")
                 continue
             body = bytes.fromhex(st["thunk_hex"])
-            td = alloc("a", len(body), f"site_thunk {nm}")
+            # hole "b" is REQUIRED for thunks carrying embedded data read
+            # via data loads: hole "a" lies inside the CPS-2 crypt range,
+            # where placed bytes are stored re-encrypted for opcode
+            # fetches — data reads bypass decryption and see ciphertext
+            # (14z-20, paid for; docs/GOTCHAS.md).
+            hole_sel = st.get("hole", "a")
+            td = alloc(hole_sel, len(body), f"site_thunk {nm}")
             if td is None:
-                fail.append(f"site_thunk {nm}: no room in hole a")
+                fail.append(f"site_thunk {nm}: no room in hole {hole_sel}")
                 continue
             ops.append({"op": "code", "addr": f"{td:#x}", "hex": body.hex()})
             ops.append({"op": "code", "addr": f"{site:#x}",

@@ -776,3 +776,25 @@ IS Jedah's glow animation). The misread placed a "tail" replacement on
 dead ground and left the visible bug alive through a playtest round.
 When deriving a read WINDOW from tap A0 values: subtract batch size
 from EVERY logged value first, then take min/max.
+
+## Hole "a" is inside the CPS-2 crypt range — thunks with EMBEDDED DATA
+## must go to hole "b"
+Placed code is stored re-encrypted wherever the address falls inside
+the crypt range, so opcode fetches decrypt correctly — but DATA READS
+bypass decryption. A site_thunk carrying an embedded palette block
+after its rts placed in hole "a" (0xBF6A0-0x100000) executed fine and
+returned the right pointer, while every movem data read of the block
+came back as ciphertext: garbage palette rows, code demonstrably
+"working". Hole "b" (0x3EC720+) is outside the crypt range — raw
+storage, data-readable, still executable. site_thunk rows now take
+hole = "b"; use it for ANY thunk whose body is read as data. The tell:
+placed bytes plaintext in-zip = outside crypt range; garbled = inside.
+
+## A same-slot "vanilla control" controls nothing — vary the dimension
+## under test
+The first vanilla control for the shock-aura tap picked vanilla Jedah
+— the SAME slot 0x0F as ported Donovan — so identical tap sources
+proved nothing about per-slot vs global. The discriminating control
+was a different victim (default-cursor char): identical sources there
+= engine-global. When testing "is X per-char?", the control must vary
+the char, not just the build.
