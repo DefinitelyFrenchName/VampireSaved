@@ -709,7 +709,7 @@ thunk_hex = "0c39000f00ff878267120c39000f00ff8b82670841f9003b59404e7541fa00044e7
 # codes of a different anim frame). Re-enable to stage 6 after the
 # walk-gap fix (STATE 14z-22).
 [[code_word]]
-stage = 99
+stage = 6
 name = "select_companion_entry_0f"
 addr = 0x084594
 old_hex = "0040"
@@ -727,14 +727,14 @@ new_hex = "0046"
 # 0x15088, the same masked/unmasked pair pattern as the sword-swing
 # fix). Pure code, no embedded data -> hole "a" is safe.
 [[site_thunk]]
-stage = 99
+stage = 6
 name = "select_companion_tbl_a"
 site = 0x0845EC
 old_hex = "207c002083bc"
 thunk_hex = "0c2e000f000a6708207c002083bc4e75207c000dda1e4e75"
 
 [[site_thunk]]
-stage = 99
+stage = 6
 name = "select_companion_tbl_b"
 site = 0x0845F8
 old_hex = "207c002087ca"
@@ -743,21 +743,27 @@ thunk_hex = "0c2e000f000a6708207c002087ca4e75207c000dda1e4e75"
 # Resolver call sites in the same handler: 0x84602 (state 1; next op
 # moveq — flags dead) and 0x84624 (state-2 re-resolve from the saved
 # table at +0x40 = 0xDDA1E via the lea thunks; next op jmp). Owner
-# 0x0F -> inject d0 = 0x10B and tail-jump the UNMASKED resolver
-# 0x15088 -> node 0x0E1780 (ported vs2 0x28DC58, the settled
-# back-sword pose measured on native); else tail-jump the vanilla
-# masked resolver 0x15084 with everything untouched (char 0x0C's
-# behavior byte-identical). Tail-call keeps the site's return address.
+# 0x0F -> (a) set the OWNER's draw-behind flag +0x3C = 8 (owner ptr =
+# word $30(a6); vs2's Donovan handler carries `move.b #8,$3C(a4)` —
+# an instruction with NO vsavj occurrence — and without it the
+# companion's second emission lands AFTER the owner's body in the OBJ
+# list, drawing the whole sword over the sprite; measured: one-shot
+# set persists and flips the list order to native's sword-then-body;
+# a1 is dead at both sites), (b) inject d0 = 0x10B and tail-jump the
+# UNMASKED resolver 0x15088 -> node 0x0E1780 (ported vs2 0x28DC58,
+# the settled back-sword pose); else tail-jump the vanilla masked
+# resolver 0x15084 with everything untouched (char 0x0C byte-
+# identical). Tail-call keeps the site's return address.
 [[site_thunk]]
-stage = 99
+stage = 6
 name = "select_companion_resolve_s1"
 site = 0x084602
 old_hex = "4eb900015084"
-thunk_hex = "0c2e000f000a67064ef900015084303c010b4ef900015088"
+thunk_hex = "0c2e000f000a67064ef900015084326e0030137c0008003c303c010b4ef900015088"
 
 [[site_thunk]]
-stage = 99
+stage = 6
 name = "select_companion_resolve_s2"
 site = 0x084624
 old_hex = "4eb900015084"
-thunk_hex = "0c2e000f000a67064ef900015084303c010b4ef900015088"
+thunk_hex = "0c2e000f000a67064ef900015084326e0030137c0008003c303c010b4ef900015088"

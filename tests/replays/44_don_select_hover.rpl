@@ -1,0 +1,19 @@
+# 44: select-hover probe (14z-21..24): 2P coins+starts, P1 cursor
+# U,U,R onto the Jedah cell (slot 0x0F = Donovan), NO confirm — holds
+# the select screen for the companion-sword composition gate.
+# 17 (vsavj side): ported-Donovan oracle replay — P1 slot 0x0F (U,U,R from
+# default = Jedah's position), P2 Victor (R,R), 16_xemu authoring rules.
+# In-match battery appended at anchor-relative offsets (see gate script).
+300-305 sys=C1
+420-425 sys=C2
+800-803 sys=S1
+940-943 sys=S2
+1100-1102 p1=U
+1160-1162 p1=U
+1220-1222 p1=R
+1104-1106 p2=U
+1164-1166 p2=U
+1300 wait
+
+2450 wait
+

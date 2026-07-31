@@ -21,6 +21,40 @@ state superseded)
   ($FF8782 reads exactly 0x0F at the sites' run time in a real match
   flow, both mirror sides trigger).
 
+## Session 14z-24 (SELECT-SWORD FIXED — draw-behind flag; machinery live at stage 6, battery pending)
+
+The 14z-23 "offset+priority" resolved to pure LIST ORDER — and the
+"32px offset" was an occlusion illusion (the sword spans x=99-163 in
+BOTH games; native's body occludes 99-128, showing only hilt + hip
+tip; ours drew the whole span on top). Chain of proof:
+
+- Full-word entry compare (the 14z-23 masked-bits suspicion): the Y
+  high bits are the TILE BANK field (ours 0x4000=bank2, native
+  0x6000=bank3 — both correct for their art locations; the earlier
+  "spawn position difference" was a misread of this field).
+- Software compositor over the dumped entries reproduced the visual
+  difference from identical data -> not art, not palette, not values:
+  DRAW ORDER. List maps: native emits sword-copy1, sword-copy2, THEN
+  body (sword behind); ours emitted sword1, BODY, sword2 (second copy
+  over the body).
+- vs2's Donovan handler carries `move.b #8,$3C(a4)` — sets the
+  OWNER's draw-behind flag for the companion; the instruction has ZERO
+  occurrences in vsavj. POKE experiment: one-shot set of owner+0x3C=8
+  flips our list order to native's and PERSISTS (45+ frames).
+- FIX: the two resolver-call thunks' 0x0F branch now also does
+  `movea.w $30(a6),a1; move.b #8,$3C(a1)` (owner ptr; a1 dead at both
+  sites). Result: OBJ order native-exact, snapshot A/B shows the
+  tucked back-sword matching vs2.
+- All five rows LIVE at stage 6 (build d1db9c0b). New gate:
+  test_don_colors.sh section 3 (sword entries present + all-before-
+  body order + frozen code set; replay 44_don_select_hover promoted).
+  replay.lua gained POKES (mirrors tap_writes; persistent-suite
+  capture of the poke experiment mechanism).
+- 14z-21c LEGACY CHECKPOINT pending the battery: select_fuzz flicker
+  inventory / pick divergence may shift now that slot-0F hover
+  activates the companion. Any drift -> mechanism-attributed and
+  reported for maintainer sign-off, NOT silently refrozen.
+
 ## Session 14z-23 (select-sword: diagnosis CORRECTED — offset+priority, not missing art; still staged 99)
 
 Continued investigation with the machinery temporarily reactivated

@@ -71,3 +71,37 @@ check('alt', ALT, 'kick-color pick')
 check('mirror', MIR, 'Donovan mirror')
 EOF
 echo "PASS: Donovan color-set gate (alt + mirror native-locked)"
+
+# ── 3. select-screen companion sword (session 14z-24) ────────────────
+# The select venue's companion machinery (code_word + 4 thunks, STATE
+# 14z-22/23/24) must produce the native composition: sword entries
+# present, drawn BEHIND the body (all sword-band entries precede all
+# body-band entries in the OBJ list — the owner +0x3C draw-behind flag,
+# vs2-only instruction ported via the resolve thunks).
+mkdir -p "$WORK/sel"
+DUMPS="1290:708000-709000" REPLAY="$REPO/tests/replays/44_don_select_hover.rpl" \
+    CHECKSUM_OUT="$WORK/sel/c.log" MAME_SANDBOX="$WORK/sel" \
+    MAME_ROMPATH="$RPDIR;$ROMDIR" tools/run_mame.sh vsavj \
+    -autoboot_script "$REPO/tests/lua/replay.lua" > /dev/null 2>&1
+
+python3 - "$WORK/sel/dump_1290_708000.bin" <<'EOF2'
+import sys
+d = open(sys.argv[1],'rb').read()
+seq = []
+codes = set()
+for i in range(0, len(d)-8, 8):
+    code = int.from_bytes(d[i+4:i+6],'big')
+    x = int.from_bytes(d[i:i+2],'big') & 0x3FF
+    if x and x < 200:
+        if 0xAD8F <= code <= 0xAD9F:
+            seq.append('S'); codes.add(code)
+        elif 0xBE00 <= code <= 0xBFFF or code == 0xEC5E:
+            seq.append('b')
+s = ''.join(seq)
+assert s.count('S') >= 16, f"sword entries missing on select ({s.count('S')})"
+assert 'bS' not in s, f"sword drawn OVER the body (order {s}) — +0x3C flag regressed"
+FROZEN = {0xAD8F,0xAD90,0xAD91,0xAD92,0xAD93,0xAD98,0xAD99,0xAD9B,0xAD9C,0xAD9D}
+assert codes == FROZEN, f"sword code set drifted: {sorted(hex(c) for c in codes)}"
+print(f"  ok: select sword composed behind the body ({s.count('S')} entries, order {s[:12]}...)")
+EOF2
+echo "PASS: select companion sword gate"

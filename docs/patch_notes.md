@@ -907,3 +907,17 @@ Session 14z-23 (select-sword diagnosis corrected; still staged 99):
   and in front of the body (coordinate-base/priority, not art). Full
   facts + next-session plan in STATE 14z-23. Build restaged to
   bit-identical 73f4f5a5.
+
+Session 14z-24 (select-sword FIXED; stage 6 live):
+- Root cause of the 14z-23 composition defect: OBJ list order. vs2's
+  Donovan select handler sets the owner's draw-behind flag (+0x3C=8,
+  `move.b #8,$3C(a4)` — no vsavj occurrence); without it the
+  companion's second emission draws over the body. The resolver-call
+  thunks now set it in the 0x0F branch (owner ptr from $30(a6), a1
+  dead at both sites). One-shot set persists (measured).
+- The "32px offset" was occlusion illusion; Y-word high bits = tile
+  bank field (both games correct). Software-compositor triage caught
+  the order difference from identical entry data.
+- Gate: test_don_colors.sh section 3 (composition + order + frozen
+  codes; replay 44). replay.lua: POKES facility (tap_writes mirror).
+- Five manifest rows live at stage 6; build d1db9c0b.
