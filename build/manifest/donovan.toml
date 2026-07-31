@@ -604,3 +604,31 @@ len = 0x40
 dst = 0x39FBE0
 dst_end = 0x39FC20
 dst_old_head = "01110d000b020902"
+
+# 14z-18 (round-34): the accent SUPER-cycle reads 0x39FBE0-0x39FC3F
+# (phase 2 starts at +0x20 and extends 0x20 past the first fix — the
+# "darker grey + red spots" residual). Cover the tail: phase-2 row-D
+# slot gets the same pale row-D content. Legacy audit: zero reads.
+[[data_port]]
+stage = 6
+name = "weapon_accent_tail"
+src = 0x39CBEC
+len = 0x20
+dst = 0x39FC20
+dst_end = 0x39FC40
+dst_old_head = "01110b0209020803"
+
+# 14z-18: THE STATUE rows (0x10/0x11) alternate their base rows
+# (0x38D1A0-DF, correct grey — vanilla-neutral content) with a second
+# accent family at 0x39B040-7F (the statue's blink). Zero legacy reads
+# (audited); make the accent phase identical to the base phase —
+# steady, via a vanilla->vanilla copy (src_image = "vsavj").
+[[data_port]]
+stage = 6
+name = "statue_accent_rows"
+src_image = "vsavj"
+src = 0x38D1A0
+len = 0x40
+dst = 0x39B040
+dst_end = 0x39B080
+dst_old_head = "030c098f086f074e"

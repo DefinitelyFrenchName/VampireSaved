@@ -47,3 +47,5 @@
 | `PRG:0x0CC020` | 0x44 | GEN | pool-seed + flavor(+Start-hold) init shim |
 | `PRG:0x0B19F8` | 0xE50 | VS2 | data_port throw_victim_keyframes (vsav2 0xca1ca) |
 | `PRG:0x39FBE0` | 0x40 | VS2 | data_port weapon_accent_rows (vsav2 0x39cbdc) |
+| `PRG:0x39FC20` | 0x20 | VS2 | data_port weapon_accent_tail (vsav2 0x39cbec) |
+| `PRG:0x39B040` | 0x40 | VS2 | data_port statue_accent_rows (vsav2 0x38d1a0) |

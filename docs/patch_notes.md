@@ -803,3 +803,9 @@ Session 14z-17 (SWORD/STATUE BLINK FIXED; build f4a7e00e):
   The accent cycle persists but alternates identical values = steady.
 - tap_writes.lua: POKES facility (frame-scheduled RAM writes for
   live experiments).
+
+Session 14z-18 (blink super-cycle + statue; build 53223293):
+- data_port weapon_accent_tail (0x39FC20, 0x20) completes the weapon
+  accent coverage; statue_accent_rows (0x39B040, 0x40, src_image
+  vsavj: base-phase copy) stills the statue. Both ranges audited
+  slot-0F-exclusive. data_port gains src_image.

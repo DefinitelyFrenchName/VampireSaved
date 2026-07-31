@@ -5,6 +5,33 @@ cf2109d8 pending gates+playtest: Anita/sword/statue render in-match
 and on the win screen; 3 residual sites excluded; session 14q parked
 state superseded)
 
+## Session 14z-18 (round 34: accent super-cycle completed; statue rows found and fixed; two new items logged)
+
+- Round-34: the first blink fix was HALF the cycle. Measured over 200
+  frames: phase 2 reads 0x39FC00-0x39FC3F (starts +0x20 into phase 1's
+  range and extends 0x20 past it — the residual "darker grey + red
+  spots"). Tail row covered (data_port weapon_accent_tail).
+- THE STATUE: rows 0x10/0x11, alternating base rows 0x38D1A0-DF
+  (correct grey) with a second accent family 0x39B040-7F (the blink).
+  Zero legacy reads (audited). Fixed by making the accent phase
+  identical to the base phase — vanilla->vanilla copy via the new
+  data_port src_image option. Build 53223293.
+- Verified: the row C/D upload spectrum now carries only authentic art
+  values (pale metals + his sash browns; the graduated red RAMP is
+  gone; isolated warm accents are his real palette content).
+- NEW ITEMS (round-34 report, logged for next sessions):
+  1. SELECT-SCREEN Donovan big sprite missing the back-mounted sword
+     (user captures; likely the select-art strip lacks the weapon
+     overlay piece — task #18 territory).
+  2. SPEED-MODE menus: the maintainer pushes back on an earlier claim
+     of auto/auto+turbo availability — measured behavior: non-Donovan
+     chars offer Standard/Turbo only in 1P; PvP produces inconsistent
+     per-side option sets (captures show P1 NORMAL/AUTO vs P2 NORMAL/
+     TURBO/AUTO/AUTO&TURBO). Possibly vanilla-quirk, possibly an
+     interaction with the Start-hold flavor shim (it reads Start state
+     during match load — the same input the speed menu consumes).
+     UNINVESTIGATED; the maintainer marks it not-urgent.
+
 ## Session 14z-17 (THE SWORD/STATUE BLINK IS FIXED — build f4a7e00e)
 
 The rounds-16..33 blink is dead. Final mechanism + fix:

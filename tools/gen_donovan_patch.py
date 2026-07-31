@@ -1576,7 +1576,8 @@ def main():
                 continue
             nm = dp["name"]
             src, dst, ln = _int(dp["src"]), _int(dp["dst"]), _int(dp["len"])
-            sdat = (root / f"build/out/{man['src_set']}_data.bin").read_bytes()
+            _img = dp.get("src_image", man["src_set"])
+            sdat = (root / f"build/out/{_img}_data.bin").read_bytes()
             blob = bytearray(sdat[src:src + ln])
             if len(blob) != ln:
                 fail.append(f"data_port {nm}: src read short")
