@@ -52,9 +52,12 @@ tests/test_m2a_stage4_oracle.sh [rp]  # vsav2-as-oracle: anchors/neutral-exact/
 tests/test_m2a_stage4_xemu.sh  [rp]   # dual-emulator: MAME+FBNeo field agreement
 tests/test_m2a_flavor_selector.sh [rp]# Start-hold flavor latch (stage 5)
 tests/test_don_sword.sh        [rp]   # sword-swing behavior gate (anim node)
-tests/test_don_accent.sh       [rp]   # weapon-accent steadiness + VICTOR-accent
-                                      # legacy byte guard (palette data_ports are
-                                      # RAM-gate-blind — this is their only lock)
+tests/test_don_accent.sh       [rp]   # palette locks: accent steadiness, VICTOR
+                                      # byte guard + cycle, fixture-override rows,
+                                      # shock-window vanilla lock (palette ROM->RAM
+                                      # is RAM-gate-blind — these are the only locks)
+tests/run_battery_m2.sh [outbase]     # THE deliverable battery: audit + all of the
+                                      # above in order; run before ANY build commit
 ```
 
 All tests are self-contained, take state only via env/args, print PASS/FAIL,

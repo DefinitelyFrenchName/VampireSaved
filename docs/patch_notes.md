@@ -855,3 +855,16 @@ Session 14z-20 (row-0x0F fixture override; shock-aura triage):
 - Shock-aura red-vs-yellow: engine-global vsavj styling (three-way tap:
   Donovan / vanilla Jedah / different victim — identical global
   sources). No defect; maintainer decision recorded in STATE.md.
+
+Session 14z-20 addendum (suite hardening after maintainer discipline check):
+- Maintainer confirmed 14z-20 playtest (statue good, keep vsavj shock
+  styling — decision recorded + LOCKED).
+- test_don_accent.sh section 3: shock-window vanilla lock (arc tuple
+  set == frozen vanilla; row-0 pulse within vsavj ramp; override rows
+  hold under effect load). Frozen constants derived from a VANILLA run.
+- tests/replays/40_victor_5hp_defaultchar_vsavj.rpl: the discriminating
+  different-victim control promoted from scratch (persistent-suite
+  doctrine).
+- tests/run_battery_m2.sh: the deliverable battery codified as one
+  script (audit + 6 gate sections) — the pre-commit chain is no longer
+  chat-memory.

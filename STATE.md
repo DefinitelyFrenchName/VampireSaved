@@ -1933,20 +1933,18 @@ opcode-space dump oracle (`tests/test_decrypt_oracle.sh`). Both directions
   files are LE-word storage; all derived images are 68k logical (BE) order.
   See docs/GOTCHAS.md first entry.
 
+## Decision made (maintainer, 2026-07-31): electrocute arc colors
+
+Keep vsavj-native shock styling for all victims including Donovan
+(option A of the 14z-20 write-up): the arcs/glow are engine-global and
+victim-independent; vs2's yellow was a game-wide re-theme, not per-char
+data. "Less work, less risk, and we can always come back to it after
+all the more important work." LOCKED in tests/test_don_accent.sh
+section 3 (shock-window vanilla lock, frozen from a vanilla run) —
+revisiting requires changing that gate deliberately.
+
 ## Decisions pending (human)
 
-- **ELECTROCUTE ARC COLORS ON DONOVAN (round-36 item, resolved to a
-  choice 14z-20):** vsavj's shock arcs/glow (P1 rows 0-3 writers) are
-  ENGINE-GLOBAL and victim-independent (measured three ways); vs2
-  re-themed the same global tables yellow. Our build shows vsavj-native
-  colors (red-ish arcs around the sword) — technically correct-for-host
-  behavior, no side-effect risk. Options: (A) keep vsavj-native shock
-  styling for all victims including Donovan — zero risk, in-game
-  consistency (RECOMMENDED); (B) slot-0F-conditional arc-table override
-  so Donovan victims get vs2-yellow — authentic to vs2 footage but
-  makes shock color victim-dependent, which neither game does, and adds
-  hook surface on a hot per-frame path; (C) global re-theme to vs2
-  yellow — ruled out (legacy visual change). Maintainer call.
 - **ROSTER ACCESS MECHANISM (M4-defining, raised by maintainer
   2026-07-28):** how players select the 18 characters. Option A: full
   select-screen redesign (new wheel/cursor/portraits — priced by the

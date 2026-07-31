@@ -82,4 +82,47 @@ assert len(row10) == 2, \
     f"P2 Victor row 0x10 must CYCLE (vanilla glow) — saw {len(row10)} variant(s)"
 print("  ok: Victor row 0x10 glow cycling (legacy behavior alive)")
 EOF
+# ── 3. shock-window lock (round 36 / maintainer decision 14z-20) ─────
+# The electrocute arc/glow writers on P1 rows 0-3 are ENGINE-GLOBAL
+# (three-way tap: Donovan / vanilla Jedah / different victim — same
+# sources; STATE 14z-20). Maintainer decision: KEEP vsavj-native shock
+# styling. This lock freezes that decision: on Victor's 5HP electrocute
+# the arc entries (row 1, entries 11-14) must cycle through exactly the
+# VANILLA-derived tuple set, the row-0 pulse entry must stay inside the
+# vsavj-native blue-white ramp (vs2's re-theme would show ffxx yellow),
+# and the fixture-override rows must hold native content under effect
+# load. Frozen from a vanilla run, session 14z-20 (arc values are
+# global, so they freeze char-independently).
+DUMPS=$(python3 -c "print(';'.join(f'{f}:90c000-90c1ff' for f in range(2655,2696)))")
+mkdir -p "$WORK/shock"
+DUMPS="$DUMPS" REPLAY="$REPO/tests/replays/34_victor_5hp_vsavj.rpl" \
+    CHECKSUM_OUT="$WORK/shock/c.log" MAME_SANDBOX="$WORK/shock" \
+    MAME_ROMPATH="$RPDIR;$ROMDIR" tools/run_mame.sh vsavj \
+    -autoboot_script "$REPO/tests/lua/replay.lua" > /dev/null 2>&1
+
+python3 - "$WORK/shock" <<'EOF'
+import glob, os, sys
+work = sys.argv[1]
+d = {}
+for p in glob.glob(os.path.join(work, 'dump_*_90c000.bin')):
+    d[int(os.path.basename(p).split('_')[1])] = open(p, 'rb').read()
+frames = sorted(d)
+assert len(frames) >= 30, f"only {len(frames)} shock dumps captured"
+VAN_ARCS = {'f00bf05df0aef0ff', 'f0fff5fffaffffff', 'f17df2bef3fff03c',
+            'f5cef7fff07df2ae', 'f7defbfff0bef3ce', 'f7fff07df2aef5ce',
+            'fbfff0bef3cef7de'}
+VAN_RAMP = {'f0a5', 'f0b6', 'f0c6', 'f0d7', 'f0e8', 'f0f9'}
+arcs = {d[f][0x36:0x3e].hex() for f in frames}
+assert arcs == VAN_ARCS, f"shock arc set drifted from vanilla: {sorted(arcs)}"
+e8 = {d[f][0x10:0x12].hex() for f in frames}
+assert e8 <= VAN_RAMP and len(e8) >= 3, \
+    f"row-0 pulse not vsavj-native ramp: {sorted(e8)}"
+NATIVE_E = bytes.fromhex(
+    'fd00fffffdddfbbbf33bf54ff65ff76ff216f111f112f113f115f216f228f000')
+NATIVE_F = bytes.fromhex(
+    'f01dfffffdddfbbbfa22fe32fe43fe54f500f000f100f200f400f500f611f001')
+assert {d[f][0x1c0:0x1e0] for f in frames} == {NATIVE_E}, "row 0x0E drifted under shock"
+assert {d[f][0x1e0:0x200] for f in frames} == {NATIVE_F}, "row 0x0F drifted under shock"
+print(f"  ok: shock arcs vanilla-locked ({len(frames)} frames), pulse in-ramp, override rows hold")
+EOF
 echo "PASS: Donovan weapon-accent + Victor-accent gate"
