@@ -21,6 +21,49 @@ state superseded)
   ($FF8782 reads exactly 0x0F at the sites' run time in a real match
   flow, both mirror sides trigger).
 
+## Session 14z-28 (round 41: 14z-27 class remap REVERTED — gameplay regression; three-consumer map final; deity palette item confirmed)
+
+Round-41 results: auras fixed ✓, match-end death fixed ✓ — BUT the
+class remap broke the MOVE: 421P became a single-hit hard knockdown
+(class 0x04 semantics) instead of a standing up-to-8-hit multi.
+Gameplay regression outranks the cosmetics it fixed -> REVERTED to
+round-38 behavior (class 0x4E, property 0): the move plays correctly;
+the match-end neutral-pose cosmetic returns, accepted interim.
+
+**THE DEFINITIVE MAP (all measured; the next-session fix is a
+per-consumer extension of class 0x4E with vs2 semantics, NOT a class
+remap):**
+1. ON-HIT reaction: property table 0x28D00[class]. vs2 value 0x0F =
+   standing electric shake, no knockdown (correct for the multi-hit).
+   Restoring 0x0F alone reproduces 14z-26: move correct, shake on
+   hits, but wrong per-victim aura colors + no death chain.
+2. PER-VICTIM AURA ROW: with property 0x0F the vsavj engine uploads
+   victim_effect_block[row 0x0F] — row semantics drifted between
+   engines (vsavj victims hold other art there: Lilith green,
+   Morrigan red; some chars coincidentally yellow). Fix = find the
+   effect-row derivation from the property (uploader 0x2AD20 family
+   feed) and remap 0x0F -> the native electric row for this venue
+   (site_thunk or table extension at THAT consumer).
+3. DEATH PATH: re-reads victim+0x54 (class) beyond the property table
+   — with class 0x4E the collapse never chains (shake self-loops 255f
+   then idle). Fix = find the death-path's class consumer (tap the
+   victim node writes during the KO with class 0x4E + property 0x0F
+   and follow the non-chaining branch) and extend ITS 0x4E entry.
+   (Poke-proof exists: with class 0x04 the full chain runs to node
+   0x158210 — the target end state.)
+- Gate test_don_reactions.sh REWRITTEN as the gameplay lock: 421P
+  must multi-hit (>=2 damage steps) and never enter knockdown-family
+  nodes vs a standing opponent. The death-chain assertions to restore
+  when the fix lands are preserved in the file comment + git history.
+- Round-41 also CONFIRMS (with A/B captures): the SWORDLESS deity
+  (421P after 421K plants the sword) has wrong palettes — ours
+  yellow-centric with yellow lightning at the sword, vs2's
+  blue-centric with white lightning. Same family as consumer 2 (the
+  deity's own object palette rows for the swordless variant) — fold
+  into the same fix session.
+- hit_class_props_ext reduced to classes 0x50-0x53 only (unreferenced
+  today, future-proofing); 0x4E/0x4F revert to vanilla zero.
+
 ## Session 14z-27 (round 40: CHANGE IMMORTAL KO FULLY FIXED — native class remap; aura palettes explained)
 
 Round-40 report (bug persists at match end + wrong shock-aura palettes

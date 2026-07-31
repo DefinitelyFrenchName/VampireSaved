@@ -944,3 +944,12 @@ Session 14z-27 (Change Immortal: native class remap — complete fix):
   vs2's effect-row semantics drift on vanilla victims — eliminated by
   the class remap. Legacy control: pure-legacy shock palettes
   byte-identical to vanilla.
+
+Session 14z-28 (round 41: class remap reverted; behavior locked):
+- REVERT 14z-27 region_fix class remaps + the 0x4E/0x4F property pair
+  (gameplay regression: single-hit knockdown on a standing multi-hit
+  move). Interim = round-38 behavior. Three-consumer map + next-fix
+  plan in STATE 14z-28; test_don_reactions.sh rewritten as the
+  gameplay lock (multi-hit, no standing knockdown).
+- Confirmed item: swordless-deity palette (yellow vs vs2 blue) — fold
+  into the consumer-2 fix.
