@@ -4,7 +4,7 @@
 # table_fix: region x026142 len 0x1400 -> 0x1440 (ported per-char OBJ bank table -> vanilla vsavj values (0x282D4))
 # layout group at 0xbf6a0+0xdcec: code@0xbf6a0, x05c800@0xc2a10, x065952@0xcbb62, x065c22@0xcbe32, x065e5a@0xcc06a, x066ec4@0xcd0d4; 0x29ec gap bytes recycled
 # layout group at 0xcd390+0x2de0: x026142@0xcd390, x028122@0xcf370; 0x358c gap bytes recycled
-# anim: gfx_remap +0x2750 on 12954 band tile words, 223 exception words, 1113 effect words (237 blocks pooled; 775 band srcs skipped; 358 protected) in 1122 records
+# anim: gfx_remap +0x2750 on 13418 band tile words, 223 exception words, 1123 effect words (237 blocks pooled; 775 band srcs skipped; 358 protected) in 1160 records
 data_file 0x0d3070 +0x20f00  donovan anim (from vsav2 0x27F548)
 data_file 0x0c9410 +0xf10  donovan aux0_0 (from vsav2 0x334B80)
 data_file 0x0ca320 +0x190  donovan aux0_1 (from vsav2 0x337460)

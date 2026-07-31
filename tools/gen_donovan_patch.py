@@ -718,6 +718,41 @@ def main():
                         continue
                     seen_rec.add(v)
                     collected.append(ent)
+                # sweep pass (14z-11, mirrors obj_records.walk): offset-
+                # computed records (the aux-chain X-ray overlays) have no
+                # in-region pointer — scan every even offset as a head
+                # with the same validation so their band words remap too.
+                for i in range(0, r["len"] - 10, 2):
+                    v = base + i
+                    if v in seen_rec:
+                        continue
+                    ent = _entries(i)
+                    if ent is None:
+                        continue
+                    # sweep-only strictness (mirrors obj_records):
+                    # small pieces, modest budget, band-coherent entries
+                    if int.from_bytes(blob[i:i + 2], "big") != 0:
+                        if int.from_bytes(blob[i + 2:i + 4], "big") > 0x40:
+                            continue
+                    _codes = []
+                    _ok = True
+                    for _toff, _ha in ent:
+                        _t = int.from_bytes(blob[_toff:_toff + 2], "big")
+                        _a = (_ha if _ha is not None else
+                              int.from_bytes(blob[_toff + 2:_toff + 4],
+                                             "big"))
+                        if (((_a >> 8) & 15) + 1 > 8
+                                or ((_a >> 12) & 15) + 1 > 8):
+                            _ok = False
+                            break
+                        _codes.append(_t)
+                    if not _ok or not _codes:
+                        continue
+                    if sum(1 for _t in _codes
+                           if 0x8000 <= _t <= 0xEEBB) * 2 < len(_codes):
+                        continue
+                    seen_rec.add(v)
+                    collected.append(ent)
 
                 # session 14z-10: PROTECTED-TILE POLICY. Vanilla content
                 # references tile positions inside the "Jedah band" window
@@ -782,6 +817,12 @@ def main():
                                 blocks.setdefault((t, bx, by, True), None)
                             else:
                                 nonexc_band_srcs.update(span_of(t, bx, by))
+                                # their delta targets WILL be written by
+                                # the band loop — never allocate there
+                                # (the pool in the manifest is static;
+                                # the sweep grows the inventory)
+                                for c in span_of(t + delta, bx, by):
+                                    free.discard(c)
                         else:
                             blocks.setdefault((t, bx, by, False), None)
                 for key in sorted(blocks,

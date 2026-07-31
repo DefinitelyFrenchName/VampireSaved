@@ -749,3 +749,12 @@ Session 14z-10 (protected-tile policy; build 272bfbbb):
   protected-position assertion (standing). build_donovan.sh: pipefail.
 - Verified: 358/358 protected positions vanilla-identical; hold frame
   clean; probes 17/31 pixel-identical to goldens.
+
+Session 14z-11 (X-ray overlay sweep; build 6f96f45b):
+- obj_records.py walk(): sweep pass (offset-computed record heads,
+  strict validation); gen gfx_remap: mirrored sweep + dynamic pool
+  trim vs the grown inventory. 38 records / 338 tiles added; parity
+  1160/14764 maintained; protected-position assertion green.
+- The electrocute X-ray overlay now draws Donovan's own ported art
+  (was: raw vs2 codes over vanilla/Donovan-band positions = the
+  round-27..31 white-block garble on victims).

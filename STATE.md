@@ -5,6 +5,37 @@ cf2109d8 pending gates+playtest: Anita/sword/statue render in-match
 and on the win screen; 3 residual sites excluded; session 14q parked
 state superseded)
 
+## Session 14z-11 (round 31: the X-RAY OVERLAY — offset-computed records swept; build 6f96f45b)
+
+Round-31 captures (Victor P1 vs CPU Donovan P2, electrocute at the
+knockdown) pinned the LAST piece of the garble family:
+- The electrocute draws a per-victim X-RAY OVERLAY record every frame
+  of the reel. Donovan's X-ray records live in the anim region but are
+  reached by OFFSET COMPUTATION (the aux/+0x64 chain) — no in-region
+  pointer — so BOTH the inventory walk (extraction) and the gfx_remap
+  walk missed them: their vs2-band tile words shipped UNREMAPPED and
+  their art was never copied. On vsavj they drew whatever sat at the
+  raw vs2 code positions (Jedah/mixed art on pre-14z-10 builds; the
+  user's white-block captures ✓). Proof: NAT and POR OBJ dumps showed
+  IDENTICAL RAW code values (ae10/adfb/b041...) at the overlay pieces.
+- FIX: a SWEEP pass in obj_records.walk AND the generator's gfx_remap
+  walk — every even offset validated as a record head (fmt/budget/
+  count/cptr window + sweep-only strictness: budget<=0x40, block
+  pieces <=8x8, >=50% band-coherent entries). 38 new records / 338 new
+  tiles inventoried, remapped, and placed (parity 1160/14764 both
+  sides). The static pool is now also trimmed dynamically at gen time
+  against the actual band output (the sweep grew the inventory past
+  the baked manifest pool).
+- Verified: zero unremapped vs2-band codes in the electrocute OBJ zone
+  (was: raw ae10/adfb family every frame); protected 358/358; probes
+  17@3479 and 31@2618 pixel-IDENTICAL standalone. Measurement GOTCHA
+  paid: pixel probes run IN PARALLEL with a battery can flake the
+  replay timeline (a probe showed Morrigan's intro at a match frame;
+  standalone rerun identical) — never run probes concurrently.
+- Round-31's other lessons: the X-ray shows on EVERY zap (the three
+  captures at timers 96/93/90), no knockdown needed; the KO/hard-
+  knockdown framing was mine, not the data's.
+
 ## Session 14z-10 (THE GARBLE FIX SHIPPED: protected-tile policy + exception pool)
 
 Implemented the 14z-9c plan end-to-end (build 272bfbbb):

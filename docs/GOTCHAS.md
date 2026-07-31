@@ -734,3 +734,18 @@ builds shipped byte-identical gfx while printing fresh-looking logs
 with set -o pipefail; the tell was mtime: gfx/vm3.14m an hour older
 than the rompath zip. Check artifact mtimes when a fix "changes
 nothing".
+
+## Record walks that follow POINTERS miss offset-computed records
+The electrocute X-ray overlays (and by implication other aux-chain
+display records) are located by arithmetic (aux table + index*4), not
+by any in-region pointer — a pointer-following walk never visits them,
+so they silently ship with UNREMAPPED tile words and UNCOPIED art. The
+tell in the data: NAT and POR OBJ dumps showing IDENTICAL raw code
+values at the same pieces (a ported record should differ by the remap
+delta). Fixed with a validated every-even-offset sweep in BOTH walks
+(obj_records + gen) — the sweep MUST use identical rules on source and
+output or the parity check trips on its own remapped values (band
+window widened to cover src+dst). Also: never run pixel probes in
+parallel with a running battery — three concurrent MAME instances
+flaked a replay timeline into a different attract phase; standalone
+reruns are the only trustworthy probe results.

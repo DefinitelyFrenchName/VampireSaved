@@ -84,6 +84,58 @@ def walk(dat, base, start, end, cptr_ok):
             for dy in range(by):
                 for dx in range(bx):
                     tiles.add((t & ~0xF) + (dy << 4) + ((t + dx) & 0xF))
+    # SWEEP pass (session 14z-11): records reached by OFFSET COMPUTATION
+    # (the aux/+0x64 chain — e.g. the electrocute X-ray overlays) have no
+    # in-region pointer and the pass above misses them: their band words
+    # stayed unremapped and their tiles uninventoried (the round-31
+    # X-ray garble). Scan every even offset as a candidate head with the
+    # same strict validation; the header+cptr joint constraint keeps
+    # false positives negligible in record-zone data.
+    for a in range(start, end - 10, 2):
+        if a in seen:
+            continue
+        o = a - base
+        fmt = int.from_bytes(dat[o:o + 2], "big")
+        cptr = int.from_bytes(dat[o + 6:o + 10], "big")
+        if fmt > 0x20 or fmt % 2 or not cptr_ok(cptr):
+            continue
+        if fmt == 0:
+            count = int.from_bytes(dat[o + 2:o + 4], "big")
+            attr = int.from_bytes(dat[o + 4:o + 6], "big")
+            if not (0 < count <= 0x100):
+                continue
+            ent = [(int.from_bytes(dat[o + 10 + 2*k:o + 12 + 2*k], "big"),
+                    attr) for k in range(count)]
+        else:
+            budget = int.from_bytes(dat[o + 2:o + 4], "big")
+            count = int.from_bytes(dat[o + 4:o + 6], "big")
+            if not (0 < count + 1 <= budget <= 0x100):
+                continue
+            ent = [(int.from_bytes(dat[o + 10 + 4*k:o + 12 + 4*k], "big"),
+                    int.from_bytes(dat[o + 12 + 4*k:o + 14 + 4*k], "big"))
+                   for k in range(count + 1)]
+        # sweep-only strictness: real overlay records are small-piece,
+        # modest-budget, band-coherent — reject pseudo-headers
+        if fmt != 0:
+            if not (int.from_bytes(dat[o + 2:o + 4], "big") <= 0x40):
+                continue
+        if not ent:
+            continue
+        _band = sum(1 for _t, _ in ent if 0x8000 <= _t <= 0xEEBB)
+        if _band * 2 < len(ent):
+            continue
+        if any(((_a >> 8) & 15) + 1 > 8 or ((_a >> 12) & 15) + 1 > 8
+               for _, _a in ent):
+            continue
+        seen.add(a)
+        records += 1
+        for t, at in ent:
+            bx = ((at >> 8) & 15) + 1
+            by = ((at >> 12) & 15) + 1
+            entries += 1
+            for dy in range(by):
+                for dx in range(bx):
+                    tiles.add((t & ~0xF) + (dy << 4) + ((t + dx) & 0xF))
     return tiles, entries, records
 
 

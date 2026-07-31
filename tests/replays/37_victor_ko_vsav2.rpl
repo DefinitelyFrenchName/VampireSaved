@@ -1,0 +1,65 @@
+# 17 (vsav2 side): native-Donovan oracle replay — P1 Donovan (R,R from
+# default), P2 Victor (R,R), 16_xemu authoring rules (both picks scripted,
+# generous menu margins). In-match battery is appended at anchor-relative
+# offsets once the anchor frame is pinned (see test_m2a_stage4_oracle.sh).
+300-305 sys=C1
+420-425 sys=C2
+800-803 sys=S1
+940-943 sys=S2
+1100-1102 p1=R
+1160-1162 p1=R
+1104-1106 p2=R
+1164-1166 p2=R
+1300-1302 p1=1
+1360-1362 p2=1
+# 37: electric KO probe v2 (14z-11): drive Donovan to the electric
+# KO X-ray; long walk-ins to hold corner spacing.
+2560-2634 p2=L
+2640-2643 p2=3
+2720-2794 p2=L
+2800-2803 p2=3
+2880-2954 p2=L
+2960-2963 p2=3
+3040-3114 p2=L
+3120-3123 p2=3
+3200-3274 p2=L
+3280-3283 p2=3
+3360-3434 p2=L
+3440-3443 p2=3
+3520-3594 p2=L
+3600-3603 p2=3
+3680-3754 p2=L
+3760-3763 p2=3
+3840-3914 p2=L
+3920-3923 p2=3
+4000-4074 p2=L
+4080-4083 p2=3
+4160-4234 p2=L
+4240-4243 p2=3
+4320-4394 p2=L
+4400-4403 p2=3
+4480-4554 p2=L
+4560-4563 p2=3
+4640-4714 p2=L
+4720-4723 p2=3
+4800-4874 p2=L
+4880-4883 p2=3
+4960-5034 p2=L
+5040-5043 p2=3
+5120-5194 p2=L
+5200-5203 p2=3
+5280-5354 p2=L
+5360-5363 p2=3
+5440-5514 p2=L
+5520-5523 p2=3
+5600-5674 p2=L
+5680-5683 p2=3
+5760-5834 p2=L
+5840-5843 p2=3
+5920-5994 p2=L
+6000-6003 p2=3
+6080-6154 p2=L
+6160-6163 p2=3
+6240-6314 p2=L
+6320-6323 p2=3
+6900 wait
