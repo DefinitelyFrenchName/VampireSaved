@@ -5,6 +5,28 @@ cf2109d8 pending gates+playtest: Anita/sword/statue render in-match
 and on the win screen; 3 residual sites excluded; session 14q parked
 state superseded)
 
+## Session 14z-19 addendum (round 36 CONFIRMED, 2026-07-31)
+
+Maintainer playtest on b80e0e67: **sword and statue no longer blink;
+electrocuted sprites clean including Donovan.** The rounds-16..35
+blink saga is closed.
+
+- **NEW TRACKED ITEM (round 36):** during Victor's electrocute, the
+  electric effect SURROUNDING THE SWORD renders red instead of vs2's
+  yellow (the body X-ray + body aura are correct). Maintainer: not a
+  blocker, but track it — "might not be purely cosmetic or without
+  other side-effects." Mechanism hypothesis (untested): the sword is a
+  separate OBJ from the body; its shock-overlay pieces may resolve
+  their palette row through a path we haven't repointed — candidates:
+  (a) the un-ported row-0x0E/0x0F fixture override (open item — red =
+  could be residual Jedah-theme content in a row the overlay
+  references), (b) an effect-table row indexed by the sword object's
+  own identity rather than the owner char (the effect [[palette]] port
+  covered char-indexed tables 0x38C218/0x38C258 only). Investigate
+  together with the row-0x0F port: same measurement setup (replay
+  34/35 electrocute window, palette-RAM dumps + OBJ record palette-row
+  attributes of the sword overlay pieces).
+
 ## Session 14z-19 (round 35: LEGACY VIOLATION found+reverted; accent march understood; sword blink fixed for real)
 
 Round-35 captures (19-29) showed both fixes had failed. Root-caused by
