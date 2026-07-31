@@ -535,6 +535,24 @@ def main():
                 blob[toff:toff + len(rows)] = rows
                 notes.append(f"# {name}+{toff:#x}: table_fix {len(rows)} "
                              f"bytes ({tf['note']})")
+            # [[region_fix]] (14z-27): guarded byte patches inside an
+            # extractor region blob (old-verified against the extracted
+            # source bytes) — for value-level porting decisions the
+            # extraction faithfully copies but the host engine needs
+            # differently (e.g. hit-class remaps).
+            for rf in port.get("region_fix", []):
+                if rf["region"] != name or args.stage < _int(rf.get("stage", 0)):
+                    continue
+                roff = _int(rf["off"])
+                rold = bytes.fromhex(rf["old_hex"])
+                rnew = bytes.fromhex(rf["new_hex"])
+                if bytes(blob[roff:roff + len(rold)]) != rold:
+                    fail.append(f"region_fix {name}+{roff:#x}: old bytes "
+                                f"mismatch ({bytes(blob[roff:roff+len(rold)]).hex()})")
+                    continue
+                blob[roff:roff + len(rnew)] = rnew
+                notes.append(f"# {name}+{roff:#x}: region_fix "
+                             f"{rold.hex()} -> {rnew.hex()} ({rf.get('note','')})")
             for ref in r.get("refs", []):
                 if ref["width"] == 16:  # pcrel16: displacement rewrite TBD
                     newt = relocate_target(ref, f"{name}+{ref['off']:#x}")

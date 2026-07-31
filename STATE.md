@@ -21,6 +21,42 @@ state superseded)
   ($FF8782 reads exactly 0x0F at the sites' run time in a real match
   flow, both mirror sides trigger).
 
+## Session 14z-27 (round 40: CHANGE IMMORTAL KO FULLY FIXED — native class remap; aura palettes explained)
+
+Round-40 report (bug persists at match end + wrong shock-aura palettes
+on Lilith/green, Morrigan/red under some shocks) resolved completely:
+
+- Legacy exonerated first: pure-legacy Victor-shock palette RAM is
+  byte-identical to vanilla (full-row diff, replay 40) — the wrong
+  auras occur only under DONOVAN'S OWN electric hits (the deity),
+  i.e. they were enabled by 14z-26's property extension.
+- Root cause, full depth: the deity's 7 attack records carry vs2's
+  EXTENDED hit class 0x4E. Multiple engine consumers index per-class
+  structures the vsavj engine only sizes to <=0x49: the property table
+  (14z-26 fixed one consumer), the DEATH PATH (re-reads the class ->
+  collapse never chained), and the per-victim EFFECT-ROW selection
+  (vs2's row semantics drifted: vanilla victims hold other art at the
+  row vs2's property selects -> per-victim wrong aura colors).
+- FIX (14z-27): remap all 7 deity records to the NATIVE electric
+  class 0x04 (Victor's) at the extraction-blob level — new generator
+  kind [[region_fix]] (guarded old/new byte patches inside extractor
+  region blobs; region "hitbox" +0x11A9..+0x1269 stride 0x20).
+  Measured end to end WITHOUT pokes: full electric reaction chain ->
+  grounded death node 0x158210 (the same terminal node as any healthy
+  electric KO), SPECIAL FINISH + PERFECT over a properly downed
+  victim. Aura = native effect rows every vanilla victim supports ->
+  correct yellow by construction (the class-0x4E path no longer
+  exists). The 14z-26 property-table extension STAYS (classes
+  0x4F-0x53 remain routed for any future ported move; the 0x4E slot
+  is now unreferenced).
+- Gate test_don_reactions.sh STRENGTHENED: asserts the grounded death
+  node at f2950/f3030 (idle loop = the old bug).
+- Trade-off recorded: the deity now uses vsavj's class-0x04 semantics
+  (Victor-electric) rather than vs2's 0x4E nuances — visually and
+  mechanically equivalent at the level playtest can see (reaction,
+  aura, death); if a nuance difference surfaces, revisit with a
+  per-consumer extension instead of the remap.
+
 ## Session 14z-26 (round 39: 421P correction -> ROOT CAUSE FOUND + partial fix shipped; collapse handoff remains)
 
 Maintainer corrected round-38's report: the bug move is **421P with

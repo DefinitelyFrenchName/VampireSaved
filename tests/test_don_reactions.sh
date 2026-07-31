@@ -8,10 +8,10 @@
 # back up; with it the electrocute/special-finish reaction fires
 # (shake node 0x157EBC family at the KO).
 #
-# KNOWN-PARTIAL (14z-26): the shake->collapse handoff is still
-# missing (victim stands after the shake; native vs2 collapses).
-# When that lands, STRENGTHEN this gate to assert the collapse node
-# instead of tolerating the release.
+# STRENGTHENED 14z-27: the deity's 7 attack records are remapped to
+# the native electric class 0x04 (region_fix rows) — the victim must
+# run the full native electrocute death and SETTLE ON the grounded
+# node 0x158210 (the same terminal node as any healthy electric KO).
 #
 # Usage: ROMDIR=... tests/test_don_reactions.sh [rompath_dir]
 set -eu
@@ -24,7 +24,7 @@ trap 'rm -rf "$WORK"' EXIT
 cd "$REPO"
 
 POKES="2600:ff8850:00010001" \
-DUMPS="2670:ff8800-ff8830;2690:ff8800-ff8830" \
+DUMPS="2670:ff8800-ff8830;2950:ff8800-ff8830;3030:ff8800-ff8830" \
     REPLAY="$REPO/tests/replays/48_don_immortal_ko.rpl" \
     CHECKSUM_OUT="$WORK/c.log" MAME_SANDBOX="$WORK" \
     MAME_ROMPATH="$RPDIR;$ROMDIR" tools/run_mame.sh vsavj \
@@ -33,13 +33,17 @@ DUMPS="2670:ff8800-ff8830;2690:ff8800-ff8830" \
 python3 - "$WORK" <<'EOF2'
 import sys, os
 work = sys.argv[1]
-for fr in (2670, 2690):
+d = open(os.path.join(work, 'dump_2670_ff8800.bin'), 'rb').read()
+node = int.from_bytes(d[0x1c:0x20], 'big')
+assert 0x157C00 <= node <= 0x1585FF, (
+    f"victim not in electric reaction at f2670: {node:#x} "
+    f"(plain hitstun/idle -> class remap regressed)")
+for fr in (2950, 3030):
     d = open(os.path.join(work, f'dump_{fr}_ff8800.bin'), 'rb').read()
     node = int.from_bytes(d[0x1c:0x20], 'big')
-    assert node == 0x157EBC, (
-        f"victim node at f{fr} = {node:#x}, expected electrocute shake "
-        f"0x157EBC (0x157AC0 = plain hitstun -> hit_class_props_ext "
-        f"regressed)")
-print("  ok: deity KO routes the electrocute shake (class 0x4E property)")
+    assert node == 0x158210, (
+        f"victim node at f{fr} = {node:#x}, expected grounded death "
+        f"0x158210 (idle loop = the round-39 neutral-pose bug)")
+print("  ok: deity KO runs the full native electric death (grounded at 0x158210)")
 EOF2
 echo "PASS: Donovan hit-class reaction gate"

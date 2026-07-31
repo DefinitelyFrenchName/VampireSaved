@@ -930,3 +930,17 @@ Session 14z-26 (Change Immortal KO: hit-class table extension):
   electrocute shake now fires on deity KO. Known-partial: shake->
   collapse handoff still missing (STATE 14z-26). Gate:
   tests/test_don_reactions.sh (+ battery 3c); replay 48 promoted.
+
+Session 14z-27 (Change Immortal: native class remap — complete fix):
+- gen_donovan_patch.py: [[region_fix]] kind (guarded byte patches in
+  extractor region blobs).
+- donovan.toml: 7 region_fix rows — deity attack records' class 0x4E
+  -> 0x04 (region "hitbox"); hit_class_props_ext restructured into
+  _hi (0x50-0x53 from vs2) + _4e4f (word-aligned pair "231b",
+  content-match source; 0x4E slot now unreferenced by any attack).
+- Result (no pokes): full native electric death on deity KO; correct
+  per-victim aura colors by construction. Gate strengthened to the
+  grounded node. Round-40's Lilith-green/Morrigan-red aura explained:
+  vs2's effect-row semantics drift on vanilla victims — eliminated by
+  the class remap. Legacy control: pure-legacy shock palettes
+  byte-identical to vanilla.

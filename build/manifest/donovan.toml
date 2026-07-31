@@ -786,9 +786,92 @@ thunk_hex = "0c2e000f000a67064ef900015084326e0030137c0008003c303c010b4ef90001508
 # moves using the new classes.
 [[data_port]]
 stage = 6
-name = "hit_class_props_ext"
-src = 0x028026
-len = 0x6
-dst = 0x028D4E
+name = "hit_class_props_ext_hi"
+src = 0x028028
+len = 0x4
+dst = 0x028D50
 dst_end = 0x028D54
-dst_old_head = "000000000000"
+dst_old_head = "00000000"
+
+# Classes 0x4E-0x4F separately (word alignment): 0x4E gets the
+# VSAVJ-NATIVE electric property 0x23 (Victor's class-0x04 value) —
+# vs2's 0x0F selects per-victim effect row 0x0F whose layout drifted
+# between engines (round-40: Lilith green aura, Morrigan red; vanilla
+# victims hold other art at row 0x0F). 0x23 routes the full native
+# electrocute pipeline incl. the death collapse. 0x4F keeps vs2's
+# 0x1B. Source = a verified "231b" byte pair in the VANILLA image
+# (content-match source, src_image vsavj — the value pair is what
+# matters; provenance note here is the authority).
+[[data_port]]
+stage = 6
+name = "hit_class_props_ext_4e4f"
+src_image = "vsavj"
+src = 0x010F95
+len = 0x2
+dst = 0x028D4E
+dst_end = 0x028D50
+dst_old_head = "0000"
+
+# 14z-27: CHANGE IMMORTAL CLASS REMAP (round-40). The deity's 7
+# attack records carry vs2's extended hit class 0x4E; multiple engine
+# consumers index per-class structures the vsavj engine sizes at
+# <=0x49 (property table was one; the death path re-reads the class).
+# Remap all 7 records to the native electric class 0x04 (Victor's) at
+# the extraction-blob level: full native reaction/aura/death support
+# on every vanilla victim (poke-verified: SPECIAL FINISH + collapse +
+# correct aura).
+[[region_fix]]
+stage = 6
+region = "hitbox"
+off = 0x11a9
+old_hex = "4e"
+new_hex = "04"
+note = "deity hit 1/7: class 0x4E (vs2 extended electric) -> 0x04 (vsavj native electric) — the class byte is re-read by the death path beyond the property table; native class routes the complete electrocute pipeline incl. the collapse (round-40 fix, measured)"
+
+[[region_fix]]
+stage = 6
+region = "hitbox"
+off = 0x11c9
+old_hex = "4e"
+new_hex = "04"
+note = "deity hit 2/7: class 0x4E (vs2 extended electric) -> 0x04 (vsavj native electric) — the class byte is re-read by the death path beyond the property table; native class routes the complete electrocute pipeline incl. the collapse (round-40 fix, measured)"
+
+[[region_fix]]
+stage = 6
+region = "hitbox"
+off = 0x11e9
+old_hex = "4e"
+new_hex = "04"
+note = "deity hit 3/7: class 0x4E (vs2 extended electric) -> 0x04 (vsavj native electric) — the class byte is re-read by the death path beyond the property table; native class routes the complete electrocute pipeline incl. the collapse (round-40 fix, measured)"
+
+[[region_fix]]
+stage = 6
+region = "hitbox"
+off = 0x1209
+old_hex = "4e"
+new_hex = "04"
+note = "deity hit 4/7: class 0x4E (vs2 extended electric) -> 0x04 (vsavj native electric) — the class byte is re-read by the death path beyond the property table; native class routes the complete electrocute pipeline incl. the collapse (round-40 fix, measured)"
+
+[[region_fix]]
+stage = 6
+region = "hitbox"
+off = 0x1229
+old_hex = "4e"
+new_hex = "04"
+note = "deity hit 5/7: class 0x4E (vs2 extended electric) -> 0x04 (vsavj native electric) — the class byte is re-read by the death path beyond the property table; native class routes the complete electrocute pipeline incl. the collapse (round-40 fix, measured)"
+
+[[region_fix]]
+stage = 6
+region = "hitbox"
+off = 0x1249
+old_hex = "4e"
+new_hex = "04"
+note = "deity hit 6/7: class 0x4E (vs2 extended electric) -> 0x04 (vsavj native electric) — the class byte is re-read by the death path beyond the property table; native class routes the complete electrocute pipeline incl. the collapse (round-40 fix, measured)"
+
+[[region_fix]]
+stage = 6
+region = "hitbox"
+off = 0x1269
+old_hex = "4e"
+new_hex = "04"
+note = "deity hit 7/7: class 0x4E (vs2 extended electric) -> 0x04 (vsavj native electric) — the class byte is re-read by the death path beyond the property table; native class routes the complete electrocute pipeline incl. the collapse (round-40 fix, measured)"
