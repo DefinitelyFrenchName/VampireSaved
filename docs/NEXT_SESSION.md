@@ -34,11 +34,16 @@ docs/GOTCHAS.md (P2-row attribution; A0 post-increment second payment).
    a bug. If the maintainer reports statue still wrong on some OTHER
    screen (win/continue), measure which fixture site serves it and add
    that site to the hook set.
-2. **Table B 0x38C1D8 slot-0F repoint** (alt-color Donovan currently
-   loads Jedah's block 0x390CA0): port vs2's table-B block or interim-
-   repoint to the default block (0xCEAF0). Table family layout:
-   STATE.md 14z-19.
-3. Then the queue: select-screen sword (task #18), speed-mode PvP
+2. **CLOSED 14z-21 (no bug):** alt-color + Donovan mirror are
+   byte-identical to native vs2; table B is never consulted on
+   Donovan's paths. Locked in tests/test_don_colors.sh.
+2b. **Select-screen sword — mechanism pinned (STATE 14z-21b):** the
+   sword on the select standing sprite is the companion-overlay system
+   running on the select venue in vs2 (8 duplicated entries, pal row
+   0x17); our 22 verified overlay sites cover match/win only. Fix =
+   find + verify the select-venue spawner site, extend VERIFIED_SITES,
+   re-emit overlay port, timer-tick-probe on the select path.
+3. Then the queue: speed-mode PvP
    anomalies (not urgent per maintainer), win-quote/HUD palettes.
 
 ## Watch out

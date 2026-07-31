@@ -868,3 +868,20 @@ Session 14z-20 addendum (suite hardening after maintainer discipline check):
 - tests/run_battery_m2.sh: the deliverable battery codified as one
   script (audit + 6 gate sections) — the pre-commit chain is no longer
   chat-memory.
+
+Session 14z-21 (alt-color/table-B item closed NO-BUG; mirror verified; select-web P2 paths mapped):
+- Kick-color Donovan: byte-identical to native vs2 (rows 0x0A-0x0D) —
+  the alt set is block+0x180 INSIDE the ported 0x500 sprite block;
+  table A repoint covers it. Donovan MIRROR (both slot 0x0F):
+  P1+P2 rows 0x0A-0x15 byte-identical to native vs2 (replay 43 ground
+  truth) — the mirror alternate is engine-composed from the same
+  block. Table B (0x38C1D8) is never consulted on Donovan's paths; the
+  14z-19 concern closes with no patch needed.
+- Select-screen navigation mapped (live +0x382 hover walks): vsavj P2
+  -> Jedah orb = U,U,U (web ids logged in the walk transcripts; P2
+  U,U = Gallon 0x02, U,U,L = 0x0C, U,U,L,L,U = 0x07); vs2 P2 ->
+  Donovan = L,L,L,L (P2 default hover 0x05). Victor = char id 3
+  re-confirmed (ram.md R,R note + replay-31 pick).
+- New replays: 41_don_altcolor_{vsavj,vsav2}, 42_don_mirror_vsavj,
+  43_don_mirror_vsav2. New gate: tests/test_don_colors.sh (frozen
+  native rows for alt + mirror); added to run_battery_m2.sh.

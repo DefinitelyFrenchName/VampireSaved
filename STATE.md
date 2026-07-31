@@ -5,6 +5,48 @@ cf2109d8 pending gates+playtest: Anita/sword/statue render in-match
 and on the win screen; 3 residual sites excluded; session 14q parked
 state superseded)
 
+## Session 14z-21 (queue: alt-color item closed NO-BUG; mirror native-exact; 2026-07-31)
+
+- Kick-color pick AND Donovan-mirror both byte-identical to native vs2
+  (P1 rows 0x0A-0x0F, P2 rows 0x10-0x15; ground truth replays 41/43 on
+  vsav2). The alt color set = block+0x180 inside the already-ported
+  0x500 sprite block; the mirror alternate is engine-composed from the
+  same block. **Table B (0x38C1D8) is never consulted on Donovan's
+  paths — the 14z-19 open item closes with no patch.** Locked in
+  tests/test_don_colors.sh (frozen native rows; battery section 3b).
+- Select-web P2 navigation mapped via live +0x382 hover walks: P2 ->
+  Jedah orb = U,U,U (vsavj); P2 -> Donovan = L,L,L,L (vs2 grid).
+  Replays 41-43 capture the paths permanently.
+- Also validated live: the fixture-override thunk's char-id condition
+  ($FF8782 reads exactly 0x0F at the sites' run time in a real match
+  flow, both mirror sides trigger).
+
+## Session 14z-21b (select-screen sword: mechanism PINNED, fix scoped; 2026-07-31)
+
+OBJ-RAM A/B at select hover (ours frame 1290 vs native vs2 frame 1350,
+dumps in the walk transcripts; select A/B crop saved):
+- The standing select sprite = record-drawn from the ported in-match
+  tile placements (our codes 0xBE9D-0xBF7E, pal row 0x15, positions
+  matching native's 0x97xx/0x98xx piece-for-piece) — the M2b select
+  port works for the BODY.
+- Native vs2 additionally draws **8 sword entries: codes 0x863F,
+  0x8640, 0x8642, 0x8643, 0x8648, 0x864B, palette row 0x17, each
+  duplicated, x=99-115 y=102-166** (hilt above head + blade at hip).
+  Ours has none. The duplication + separate palette row + in-match-band
+  codes = the COMPANION-OVERLAY record system running on the select
+  venue in vs2 — a venue not among the 22 verified overlay poke sites
+  (14r port verified on match/win paths only).
+- FIX SHAPE (next session): locate vs2's select-venue overlay spawner
+  site (tap the ported-zone record walks during vs2 select; the tsite
+  cross-match machinery in tools/overlay_port.py), find the vsavj
+  analog site, context-verify, add to VERIFIED_SITES, re-emit, and
+  probe with the timer-tick detector on the SELECT path (the 14r
+  methodology). Watch: select venue runs on legacy paths for every
+  char — the site must be char-gated like the rest of the overlay
+  system. Also noticed (cosmetic, low): ours draws one extra piece
+  (code 0xEC47, effect band) at x=80 y=120 that native lacks —
+  investigate alongside.
+
 ## Session 14z-20 (row-0x0F fixture override SHIPPED; sword-shock aura resolved as engine-global; 2026-07-31)
 
 - **Row-0x0F fixture override (the statue's steady miscolor) DONE:**
