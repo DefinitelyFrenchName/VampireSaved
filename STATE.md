@@ -21,6 +21,35 @@ state superseded)
   ($FF8782 reads exactly 0x0F at the sites' run time in a real match
   flow, both mirror sides trigger).
 
+## Session 14z-29 (consumer-trace session: supplementary facts; repo stays at the 14z-28 interim)
+
+Started the per-consumer extension (round-42 go-ahead). Facts added
+this session (build work was local-only; repo/ship state remains
+d6cfdaf3 = the 14z-28 interim — the consumer-1 restore alone would
+re-introduce the reported wrong-aura state, so it ships only together
+with consumer 2):
+
+- Consumer-1 restore verified REPRODUCIBLE: re-adding the 6-byte
+  property port rebuilds BIT-IDENTICAL fd8f0628 (the 14z-26 state).
+- The shake TINT mechanism is NOT per-hit palette uploads: zero
+  palette-RAM writes land during the hit/shake window; the victim's
+  flash-row fields are correctly initialized (+0x18B = 0x10, +0x3A4 =
+  base block, +0x3A8 = 0x90C200); the post-shake write at ~f2667 is
+  the base-row REFRESH, not a tint. The tint is therefore OBJ-attr
+  and/or preloaded-row content — per-victim wrongness must come from
+  content preloaded per victim (match-init staging) or per-victim row
+  choice in the reaction records.
+- With VICTOR as the victim, the shake state is NATIVE-EQUIVALENT at
+  the palette+OBJ level (full A/B vs vs2: row contents match mod
+  pulse phase; victim-zone attr histograms match) — consistent with
+  the maintainer's list (Victor-family correct). The divergence ONLY
+  manifests with victims like Lilith/Morrigan.
+- NEXT SESSION PREREQ: map P2 select paths for Lilith and Morrigan
+  (web ids 0x08/0x09/0x0B were never visited in the 14z-21 walk) ->
+  author deity-shake repros with those victims -> A/B the shake state
+  vs native to catch the divergent element (attr row vs preloaded
+  content) -> then consumers 2+3 fixes per the 14z-28 map.
+
 ## Session 14z-28 (round 41: 14z-27 class remap REVERTED — gameplay regression; three-consumer map final; deity palette item confirmed)
 
 Round-41 results: auras fixed ✓, match-end death fixed ✓ — BUT the
