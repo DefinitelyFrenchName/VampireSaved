@@ -21,6 +21,23 @@ state superseded)
   ($FF8782 reads exactly 0x0F at the sites' run time in a real match
   flow, both mirror sides trigger).
 
+## Session 14z-25 (round 38: select-sword CONFIRMED by maintainer; 421K match-end KO bug logged + repro hunt banked)
+
+- **Round 38 maintainer confirmation: the select-screen sword renders
+  as expected** (cursor on Jedah's cell). 14z-24 closes confirmed.
+- **NEW BUG (maintainer, non-blocking): Donovan 421K (at least 421HK)
+  ending a MATCH leaves the opponent in neutral pose** — no KO anim,
+  no knockdown; the same move ending a non-final round triggers its
+  hard knockdown correctly. Repro hunt this session did NOT land the
+  bug: match-end KOs on the move's LAUNCHER hit animate correctly in
+  both 2P and arcade environments (three clean repros) — the bug
+  needs the hard-knockdown-causing hit as the killer, which scripted
+  spacings never achieved. All experiments + facts + timeline banked
+  in tests/experiments/421k_ko/ (persistent-suite doctrine); needs
+  the killing-hit configuration from the maintainer or a spacing
+  sweep. GOTCHA-class note recorded there: POKE VALUES feed the CPU
+  AI — any poke change reshuffles downstream choreography.
+
 ## Session 14z-24 (SELECT-SWORD FIXED — draw-behind flag; machinery live at stage 6, battery pending)
 
 The 14z-23 "offset+priority" resolved to pure LIST ORDER — and the
