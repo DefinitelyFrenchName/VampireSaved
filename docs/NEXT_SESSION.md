@@ -37,15 +37,15 @@ docs/GOTCHAS.md (P2-row attribution; A0 post-increment second payment).
 2. **CLOSED 14z-21 (no bug):** alt-color + Donovan mirror are
    byte-identical to native vs2; table B is never consulted on
    Donovan's paths. Locked in tests/test_don_colors.sh.
-2b. **Select-screen sword — FULLY reverse-engineered, fix ready
-   (STATE 14z-21c):** dedicated select-companion machinery (NOT the
-   overlay port). vsavj keeper at ~0x844E0 dispatches hovered char id
-   through a jump table (entry 0x0F = deactivate); fix = port vs2's
-   node/record/coord data chain, flip table entry 0x0F to the existing
-   +0x46 handler, and char-conditionally thunk the handler's lea
-   sites. Legacy checkpoint: select_fuzz flickers / pick divergence
-   may shift — mechanism-attribute + maintainer sign-off required, no
-   silent refreeze. Full plan + all addresses in STATE 14z-21c.
+2b. **Select-screen sword — machinery BUILT+VERIFIED, staged 99
+   (STATE 14z-22):** activation + resolution byte-perfect vs native
+   (page-A OBJ entries). ONE blocker: a second select drawer renders
+   an un-walked record subset with RAW vs2 codes (Jedah giant-blade
+   art). Next: find the second drawer's record-pointer source, extend
+   the gen record walk, verify raw-code entries gone (unfiltered OBJ
+   diff — see GOTCHAS), flip the five donovan.toml rows from stage 99
+   to 6, THEN run the 14z-21c legacy checkpoint (select_fuzz/pick
+   expectations may shift; maintainer sign-off, no silent refreeze).
 3. Then the queue: speed-mode PvP
    anomalies (not urgent per maintainer), win-quote/HUD palettes.
 

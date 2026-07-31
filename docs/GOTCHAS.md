@@ -798,3 +798,24 @@ proved nothing about per-slot vs global. The discriminating control
 was a different victim (default-cursor char): identical sources there
 = engine-global. When testing "is X per-char?", the control must vary
 the char, not just the build.
+
+## The tile-placement pool is block-aware first-fit — carving cells out
+## CASCADES the whole allocation
+Reserving 4 cells (free.discard) for a fixed-position need moved 267
+effect-shelf placements: the allocator fits RECTANGLES into runs, and
+removing mid-run cells re-routes every later fit. The generated set
+stays internally consistent, but the ROM diff explodes and any
+frozen/checked-in artifact that referenced old cells silently
+mismatches. Fixed-position tile needs must allocate at the pool TAIL
+or ride the existing exception flow. (14z-22; the change was reverted
+— the "missing" tiles turned out unreferenced anyway.)
+
+## OBJ RAM dumps span BOTH pages — filter by code range and you will
+## blame the wrong drawer
+A 4KB dump at 0x708000 contains multiple drawers' output (main walker,
+doubling/fade drawer, second page). Filtering entries to the expected
+code band showed a byte-perfect match while the SCREEN showed garbage:
+the garbage came from OTHER entries (raw unremapped codes) outside the
+filter. When a render contradicts an OBJ-level match, diff the FULL
+unfiltered entry set both sides first (14z-22 — found the un-walked
+record subset in minutes once unfiltered).

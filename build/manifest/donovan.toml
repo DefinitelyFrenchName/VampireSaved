@@ -679,3 +679,85 @@ hole = "b"
 site = 0x01C59A
 old_hex = "207c003b5940"
 thunk_hex = "0c39000f00ff878267120c39000f00ff8b82670841f9003b59404e7541fa00044e750d000fff0ddd0bbb033b054f065f076f02160111011201130115021602280000001d0fff0ddd0bbb0a220e320e430e5405000000010002000400050006110001"
+
+# 14z-22: SELECT-SCREEN SWORD (round-34 item; full RE in STATE
+# 14z-21c). The select venue runs a dedicated companion KEEPER
+# (~0x844E0) that dispatches the hovered char id through a 32-entry
+# jump table (base 0x84576); vanilla entry 0x0F = +0x40 (deactivate —
+# Jedah had no select companion), char 0x0C's entry = +0x46 = a
+# handler that resolves the companion's node from the OWNER's anim
+# table (lea table; jsr resolver 0x15084; d0 = owner's current anim
+# number — the same owner-mirroring scheme as the in-match sword).
+# Donovan's whole data chain (offset table -> nodes -> records with
+# remapped tile codes -> coord lists in hole b) was already carried by
+# the anim-region closure: his ported anim table lives at 0x0DDA1E
+# (byte-identical offsets to vs2 0x289EF6, verified). Fix = route
+# entry 0x0F to the existing +0x46 handler and make the handler's two
+# table lea sites char-conditional. Legacy note: entry 0x0F is only
+# consulted when the keeper's owner is char 0x0F (the replaced slot);
+# select_fuzz/pick expectation drift, if any, must be mechanism-
+# attributed and re-frozen with maintainer sign-off (STATE 14z-21c
+# checkpoint) — the battery decides.
+#
+# STAGED TO 99 (14z-22): the machinery below is VERIFIED CORRECT (the
+# companion activates, resolves the ported back-sword node 0x0E1780,
+# and page-A OBJ entries match native byte-for-byte mod the code
+# delta) — but activation also wakes a SECOND select drawer that
+# renders a record subset the gen record walk never remapped (raw vs2
+# band codes -> vanilla vsav art = Jedah's giant blade over the
+# sprite; measured: second-page OBJ entries carry raw 0x97xx body
+# codes of a different anim frame). Re-enable to stage 6 after the
+# walk-gap fix (STATE 14z-22).
+[[code_word]]
+stage = 99
+name = "select_companion_entry_0f"
+addr = 0x084594
+old_hex = "0040"
+new_hex = "0046"
+
+# Handler table sites: 0x845EC (lea 0x2083BC; next op tst — flags
+# dead) and 0x845F8 (lea 0x2087CA; next op move.l — sets flags before
+# any read). Thunks: owner id (cached at $a(a6) by the keeper's
+# dispatch) == 0x0F -> lea the ported Donovan anim table 0x0DDA1E,
+# else the vanilla lea. The node INDEX is injected at the resolver
+# call sites below (0x10B > 0xFF exceeds the masked resolver's 8-bit
+# range — the measured flourish node at index 0xFC SELF-LOOPS, giving
+# a permanent oversized blade; the settled back-sword node 0x28DC58 =
+# offset 0x3D62 = index 0x10B needs the UNMASKED resolver entry
+# 0x15088, the same masked/unmasked pair pattern as the sword-swing
+# fix). Pure code, no embedded data -> hole "a" is safe.
+[[site_thunk]]
+stage = 99
+name = "select_companion_tbl_a"
+site = 0x0845EC
+old_hex = "207c002083bc"
+thunk_hex = "0c2e000f000a6708207c002083bc4e75207c000dda1e4e75"
+
+[[site_thunk]]
+stage = 99
+name = "select_companion_tbl_b"
+site = 0x0845F8
+old_hex = "207c002087ca"
+thunk_hex = "0c2e000f000a6708207c002087ca4e75207c000dda1e4e75"
+
+# Resolver call sites in the same handler: 0x84602 (state 1; next op
+# moveq — flags dead) and 0x84624 (state-2 re-resolve from the saved
+# table at +0x40 = 0xDDA1E via the lea thunks; next op jmp). Owner
+# 0x0F -> inject d0 = 0x10B and tail-jump the UNMASKED resolver
+# 0x15088 -> node 0x0E1780 (ported vs2 0x28DC58, the settled
+# back-sword pose measured on native); else tail-jump the vanilla
+# masked resolver 0x15084 with everything untouched (char 0x0C's
+# behavior byte-identical). Tail-call keeps the site's return address.
+[[site_thunk]]
+stage = 99
+name = "select_companion_resolve_s1"
+site = 0x084602
+old_hex = "4eb900015084"
+thunk_hex = "0c2e000f000a67064ef900015084303c010b4ef900015088"
+
+[[site_thunk]]
+stage = 99
+name = "select_companion_resolve_s2"
+site = 0x084624
+old_hex = "4eb900015084"
+thunk_hex = "0c2e000f000a67064ef900015084303c010b4ef900015088"

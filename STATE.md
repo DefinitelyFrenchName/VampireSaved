@@ -21,6 +21,54 @@ state superseded)
   ($FF8782 reads exactly 0x0F at the sites' run time in a real match
   flow, both mirror sides trigger).
 
+## Session 14z-22 (select-sword: machinery BUILT+VERIFIED, staged 99 pending the record-walk-gap fix)
+
+Implemented the 14z-21c plan and verified it end-to-end, then found one
+deeper blocker and staged the feature off (build back to bit-identical
+73f4f5a5 — the staging discipline's no-regression proof).
+
+WHAT WORKS (all measured on live builds):
+- code_word generator kind added (guarded 2-byte code patch — jump-table
+  entries can't take a 6-byte site_thunk without clobbering neighbors).
+- Jump-table entry 0x0F -> +0x46 handler; the keeper activates the
+  companion (alive, positioned, char id 0x0F).
+- The handler's number source reads 0 on the vsavj select engine, and
+  index limits bite: the flourish node (index 0xFC) SELF-LOOPS (a
+  permanent oversized blade), and the settled back-sword node sits at
+  index 0x10B > 0xFF — beyond the MASKED resolver's 8-bit range. Fix
+  shape: thunk the handler's two resolver CALL SITES (0x84602 state-1,
+  0x84624 state-2) — owner 0x0F -> inject d0=0x10B + tail-jump the
+  UNMASKED resolver entry 0x15088 (the 0x5C77A/E masked/unmasked pair
+  pattern, third occurrence). Result: companion holds ported node
+  0x0E1780 (= vs2 0x28DC58, the settled pose) and the page-A OBJ
+  entries match native BYTE-FOR-BYTE mod +0x2750 (positions, attrs,
+  sizes, palette row 0x17, duplication pattern).
+
+THE BLOCKER (fully measured, not yet fixed):
+- Activation also wakes a SECOND select drawer whose record subset the
+  gen's anim-region record walk NEVER REMAPS: second-page OBJ entries
+  carry RAW vs2 band codes (0x97xx body pieces of a different anim
+  frame, 0x8650/0x8658 etc.) which index VANILLA vsav art — visually
+  Jedah's giant blade diagonally across the select sprite. This walk
+  gap also explains the 4 unreferenced-looking tiles (0x8644-47) and
+  the old "extra piece 0xEC47" note (14z-21b) — those drawers were
+  always running; activation made their output prominent.
+- DEAD END LOGGED: placing "missing" tiles via a new build_gfx
+  --extra-tiles path + reserving their cells in the generator pool
+  CASCADED the first-fit allocation (267 effect placements moved — the
+  allocator is block-aware; removing 4 cells splits runs). Reverted
+  entirely. Any future fixed-position tile need must allocate at the
+  POOL TAIL or ride the existing exception flow, never carve early
+  cells.
+- NEXT: find how the second drawer's records are referenced (separate
+  record-pointer table or cptr indirection the walk misses), extend
+  the walk (or add the records to the remap set), verify raw-code
+  entries gone, THEN restage the five rows to 6. All five rows +
+  comments sit in donovan.toml staged 99; flipping stage is the only
+  re-enable step.
+- Legacy checkpoint from 14z-21c still pending a stage-6 battery run
+  (the staged-99 build needed none — bit-identical to green).
+
 ## Session 14z-21c (select-sword: FULL activation chain reverse-engineered; fix ready to implement)
 
 Correction to 14z-21b: NOT the companion-overlay record system — the

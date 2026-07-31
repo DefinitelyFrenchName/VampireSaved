@@ -1663,6 +1663,34 @@ def main():
             fragments.append((td, len(body), "GEN", f"site_thunk {nm}"))
             fragments.append((site, 6, "GEN", f"site_thunk {nm} engine site"))
 
+    # ── code_word: guarded single-word code patch (session 14z-22) ─────────
+    # For data-in-code words a 6-byte site_thunk cannot touch without
+    # clobbering neighbors (jump-table entries, embedded constants).
+    # old_hex verified against the vanilla opcode image; emitted as a
+    # code op so crypt-range re-encryption applies.
+    if args.stage >= 6:
+        opc_img_cw = None
+        for cw in port.get("code_word", []):
+            if args.stage < _int(cw.get("stage", 0)):
+                continue
+            nm = cw["name"]
+            addr = _int(cw["addr"])
+            old = bytes.fromhex(cw["old_hex"])
+            new = bytes.fromhex(cw["new_hex"])
+            if len(old) != 2 or len(new) != 2:
+                fail.append(f"code_word {nm}: old/new must be exactly 2 bytes")
+                continue
+            if opc_img_cw is None:
+                opc_img_cw = (root / "build/out/vsavj_opcodes.bin").read_bytes()
+            if opc_img_cw[addr:addr + 2] != old:
+                fail.append(f"code_word {nm}: vanilla bytes at {addr:#x} != "
+                            f"old_hex ({opc_img_cw[addr:addr+2].hex()})")
+                continue
+            ops.append({"op": "code", "addr": f"{addr:#x}", "hex": new.hex()})
+            notes.append(f"code   {addr:#08x} +0x2  code_word {nm} "
+                         f"({old.hex()} -> {new.hex()})")
+            fragments.append((addr, 2, "GEN", f"code_word {nm}"))
+
     # ── win/quote palette 0x60-view repoint (session 14u) ─────────────────────
     # Companion to select_port's block copies: the hardcoded
     # `lea 0x39FDC0,a0` at CODE:0x1C424 (the char*0x60-view win-screen

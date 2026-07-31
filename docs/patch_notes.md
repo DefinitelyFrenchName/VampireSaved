@@ -885,3 +885,16 @@ Session 14z-21 (alt-color/table-B item closed NO-BUG; mirror verified; select-we
 - New replays: 41_don_altcolor_{vsavj,vsav2}, 42_don_mirror_vsavj,
   43_don_mirror_vsav2. New gate: tests/test_don_colors.sh (frozen
   native rows for alt + mirror); added to run_battery_m2.sh.
+
+Session 14z-22 (select-sword machinery built + staged 99):
+- gen_donovan_patch.py: [[code_word]] kind (guarded 2-byte code patch).
+- donovan.toml: select_companion_entry_0f (jump-table 0x84594
+  0040->0046) + 4 site_thunks (handler table leas 0x845EC/0x845F8 ->
+  ported anim table 0xDDA1E for owner 0x0F; resolver call sites
+  0x84602/0x84624 -> inject idx 0x10B + unmasked resolver 0x15088).
+  ALL STAGED 99: activation verified byte-perfect on page A, but a
+  second select drawer renders an un-walked record subset with raw vs2
+  codes (Jedah giant-blade art) — re-enable after the walk-gap fix.
+  Staged-99 build reproduces 73f4f5a5 bit-identically.
+- Dead end reverted: build_gfx --extra-tiles + pool reservation
+  (allocation cascade, 267 moved placements; docs/GOTCHAS.md).
