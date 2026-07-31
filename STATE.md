@@ -21,6 +21,45 @@ state superseded)
   ($FF8782 reads exactly 0x0F at the sites' run time in a real match
   flow, both mirror sides trigger).
 
+## Session 14z-23 (select-sword: diagnosis CORRECTED — offset+priority, not missing art; still staged 99)
+
+Continued investigation with the machinery temporarily reactivated
+(local only; restaged 99 + bit-identical 73f4f5a5 at session end).
+The 14z-22 "record-walk gap / raw-code second drawer" hypothesis is
+WRONG — corrections:
+
+- The "raw vs2 codes" OBJ entries are STALE UNRENDERED JUNK beyond the
+  active list extent (a full-window write tap over frames 1000-1292
+  shows those values are never written; they are leftovers in OBJ RAM
+  the parse picked up). Red herring; no walk gap on that evidence.
+- The sword TILE ART is verified correct two ways: byte-compare AND
+  rendered side-by-side (shapes identical to vs2 bank-3 originals at
+  our bank-2 positions, incl. all block-expansion cells).
+- The OBJ ENTRY SETS are byte-identical to native (positions, attrs,
+  sizes, palette row, duplication) — yet the RENDER differs. Four-way
+  snapshot comparison (native f1210/f1500, ours f1700) shows the real
+  defect: ours draws the same-size sword ~32px RIGHT of native and IN
+  FRONT of the body; native draws it tucked BEHIND the sprite (hilt
+  above the head, blade mostly hidden). So: a COORDINATE-BASE and/or
+  PRIORITY/list-order difference in how the select venue composes the
+  companion — not art, not palette, not the entry values themselves.
+- Suggestive measured fact: the companion (and owner) POSITION words
+  differ between engines at spawn — ours 0x4000/0xA000 vs vs2
+  0x6000/0xA000 (0x2000 = 32px in 8.8 — matches the observed shift).
+  The dumped entry coords nonetheless MATCH native (x=99...), implying
+  the visible copy is rendered via a base/section mechanism the flat
+  entry parse does not capture (CPS2 list sections carry base offsets;
+  the e0ef/2058-class entries are candidates for section headers).
+- NEXT SESSION (fresh head, systematic): (1) decode the OBJ list
+  SECTION structure (headers/bases/order) in both dumps rather than
+  flat entries; (2) attribute the visible copy: poke a single tile's
+  art in a scratch build and see which rendered copy changes; (3) the
+  32px delta likely traces to the keeper's spawn-position source
+  (owner mirror at +0x10/+0x14) — find where vs2's select positions
+  its owner vs ours; (4) priority: check attr bit-5/list-order
+  semantics for the select venue. All five manifest rows remain staged
+  99; build bit-identical to shipped 73f4f5a5.
+
 ## Session 14z-22 (select-sword: machinery BUILT+VERIFIED, staged 99 pending the record-walk-gap fix)
 
 Implemented the 14z-21c plan and verified it end-to-end, then found one

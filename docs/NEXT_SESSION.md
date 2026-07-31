@@ -37,15 +37,15 @@ docs/GOTCHAS.md (P2-row attribution; A0 post-increment second payment).
 2. **CLOSED 14z-21 (no bug):** alt-color + Donovan mirror are
    byte-identical to native vs2; table B is never consulted on
    Donovan's paths. Locked in tests/test_don_colors.sh.
-2b. **Select-screen sword — machinery BUILT+VERIFIED, staged 99
-   (STATE 14z-22):** activation + resolution byte-perfect vs native
-   (page-A OBJ entries). ONE blocker: a second select drawer renders
-   an un-walked record subset with RAW vs2 codes (Jedah giant-blade
-   art). Next: find the second drawer's record-pointer source, extend
-   the gen record walk, verify raw-code entries gone (unfiltered OBJ
-   diff — see GOTCHAS), flip the five donovan.toml rows from stage 99
-   to 6, THEN run the 14z-21c legacy checkpoint (select_fuzz/pick
-   expectations may shift; maintainer sign-off, no silent refreeze).
+2b. **Select-screen sword — machinery verified; visual blocked on a
+   COORDINATE-BASE/PRIORITY difference (STATE 14z-23, which corrects
+   14z-22's walk-gap hypothesis):** entries+tiles+palette all
+   byte-identical to native, but the sword renders ~32px right and in
+   front of the body instead of tucked behind. Next: decode the OBJ
+   list SECTION structure (bases/order), attribute the visible copy
+   via a scratch tile poke, trace the keeper's spawn-position source
+   (0x4000 vs vs2's 0x6000), check priority semantics. Then flip the
+   five rows to stage 6 + run the 14z-21c legacy checkpoint.
 3. Then the queue: speed-mode PvP
    anomalies (not urgent per maintainer), win-quote/HUD palettes.
 

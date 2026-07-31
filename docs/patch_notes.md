@@ -898,3 +898,12 @@ Session 14z-22 (select-sword machinery built + staged 99):
   Staged-99 build reproduces 73f4f5a5 bit-identically.
 - Dead end reverted: build_gfx --extra-tiles + pool reservation
   (allocation cascade, 267 moved placements; docs/GOTCHAS.md).
+
+Session 14z-23 (select-sword diagnosis corrected; still staged 99):
+- 14z-22's "record-walk gap" retracted: the raw-code entries are stale
+  unrendered OBJ junk (write-tap proof). Art verified correct by
+  byte-compare AND visual tile render; entry sets byte-identical to
+  native. Real defect: the rendered sword sits ~32px right of native
+  and in front of the body (coordinate-base/priority, not art). Full
+  facts + next-session plan in STATE 14z-23. Build restaged to
+  bit-identical 73f4f5a5.
