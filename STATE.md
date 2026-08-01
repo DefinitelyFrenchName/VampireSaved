@@ -21,6 +21,39 @@ state superseded)
   ($FF8782 reads exactly 0x0F at the sites' run time in a real match
   flow, both mirror sides trigger).
 
+## Session 14z-32 (round 45: blink fix CONFIRMED everywhere but the select screen; column-crash fix session)
+
+- Round-45 maintainer: blinking gone in-match for all colors ✓; ONE
+  residual — the select screen at/after CONFIRMING Donovan still
+  blinks. TRACKED as minor cosmetic (maintainer's call): hypothesis =
+  select-venue objects don't carry the +0x3A4 cached block ptr (the
+  match char-init at 0x1C68E sets it), so the color-aware thunk's
+  nonzero-guard falls back to the vanilla punch-color slots on that
+  screen only. Revisit if it proves important (fix shape: fallback
+  via owner-link's block or a select-venue init of +0x3A4).
+- This session: the column-crash mechanism FULLY decoded (fix scoped,
+  next session):
+  - The fault instruction = the record-type JUMP DISPATCH (0x185Cx:
+    `move.b $17(a3),d0; add; move.w (pc-table,d0); jmp (pc,d0)`) — a
+    garbage type byte from A3=0xCAA5A produced displacement 0xB26D ->
+    jmp to odd 0x13847 = vec3.
+  - 0xCAxxx refs in the ported anim region are NOT stale: the
+    extractor's pool CONTENT-MATCHER mapped vs2 pool spans
+    (0x33xxxx) onto byte-identical VANILLA data (21 fields inventory:
+    0xE9514/56/64, 0xEFBFA/C12/C2A, 0xF21BC/2208/2252/22DA,
+    0xFF038/40, +9 more — scan script in the session log). For COORD
+    LISTS that is sound; for the swordless-variant's ATTACK RECORDS
+    the match extent is shallower than what the KO path walks -> the
+    walk exits the matched span into unrelated vanilla bytes ->
+    garbage record -> wild jump.
+  - FIX (next session): port the vs2 pool spans behind the
+    swordless-variant fields properly (vs2 sources 0x3358E8/0x33746C/
+    0x335908/0x33CCF4 + extents from the record format) into a hole
+    and region_fix the node fields; OR narrow the content-matcher to
+    coord-list cptrs only and let the extractor port the rest. The
+    deterministic guarded repro (experiments/421k_ko/50 + POKES
+    2890:ff8850:00010001) becomes the gate when green.
+
 ## Session 14z-31 (round 44: BLINK ROOT-CAUSED + FIXED (color-aware accent); CRASH REPRODUCED + PINPOINTED)
 
 Round-44 maintainer answers unblocked both fronts:
