@@ -21,6 +21,31 @@ state superseded)
   ($FF8782 reads exactly 0x0F at the sites' run time in a real match
   flow, both mirror sides trigger).
 
+## Session 14z-36 (SWORDED-421P SHOCK + DEATH FIXED — the final reconcile; the class-0x4E saga closes)
+
+- The decisive fact: **vs2's dispatch maps record type 0x4E to the
+  TYPE-6 handler** (word[0x4E] == word[0x06] == 0x11A) — on vs2 the
+  sworded deity's hits were ALWAYS native class 8 (the tiny type-6
+  handler: victim+0x117 flag + class := 8). Our "class 0x4E" was
+  vsavj's renumbered copy-handler artifact. The whole three-consumer
+  property plan (14z-28) is RETIRED — nothing legitimate ever
+  referenced class 0x4E.
+- FIX: 7 region_fix remaps (hitbox +0x11A9..+0x1269): sworded deity
+  record types 0x4E -> 0x06 = the same proven mechanics as the
+  working swordless column. Measured: full electrocute shake
+  (alternating nodes), fall sequence, grounded death 0x158210 on the
+  fatal hit; NON-fatal = 10 damage steps (the electric stun holds the
+  victim through the full multi-hit — up from 2 pre-fix, matching
+  vs2's behavior), no knockdown on a standing opponent.
+- test_don_reactions.sh: death-chain assertions restored (section 2)
+  alongside the gameplay lock. hit_class_props_ext_hi (0x50-0x53)
+  stays as inert future-proofing.
+- Remaining queue (all cosmetic): swordless-deity palette (yellow vs
+  vs2 blue), select-screen post-confirm blink (tracked minor), ES
+  deity nuance (its records now class-0x4E-copy interim = plain
+  reactions; if the maintainer wants ES-specific presentation, map
+  vs2's class-0x51 property intent 0x19 properly).
+
 ## Session 14z-35 (type-0x51 cluster resolved — the engines RENUMBERED the copy-class record family; latent crash preempted)
 
 - Read vs2's "dedicated" type-0x51 handler: SIX BYTES — `move.b

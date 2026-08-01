@@ -983,3 +983,11 @@ Session 14z-35 (type-0x51 cluster: latent crash preempted):
   0x1868C); on vsavj type 0x51 indexed past the 0x50-entry dispatch
   table (wild jump). No handler port needed — the renumbering insight
   closes the record-type saga.
+
+Session 14z-36 (sworded-421P shock+death fixed):
+- 7 region_fix rows (hitbox): sworded deity record types 0x4E -> 0x06
+  (vs2-alias-proven: vs2 word[0x4E]==word[0x06]) = native class-8
+  electric. Full shake + death chain + 10-step multi-hit (electric
+  stun holds the victim, matching vs2); no standing knockdown.
+  Retires the 14z-28 three-consumer property plan. Gate: death-chain
+  assertions restored in test_don_reactions.sh.

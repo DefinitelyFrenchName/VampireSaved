@@ -996,3 +996,72 @@ old_hex = "51"
 new_hex = "4e"
 note = "ES-deity record type 0x51 -> 0x4E (vsavj copy-class handler; latent wild-jump preempted)"
 
+
+# 14z-36: SWORDED-421P SHOCK (round-46 go-ahead; the final reconcile).
+# vs2's own dispatch maps record type 0x4E to the TYPE-6 handler
+# (word[0x4E] == word[0x06] == 0x11A): on vs2 the sworded deity's
+# hits were ALWAYS class 8 (the native electric class — the tiny
+# type-6 handler sets victim+0x117 flag and class := 8). Our measured
+# "class 0x4E" was vsavj's renumbered copy-handler artifact (vsavj
+# type-0x4E = the copy-class routine). Remap the 7 sworded records
+# 0x4E -> 0x06: full native electric pipeline (standing multi-hit
+# shock, correct per-victim aura rows, death collapse) — the same
+# proven mechanics as the working swordless column (type-6 records).
+# This retires the hit-class-0x4E property plan entirely (nothing
+# references class 0x4E on the deity paths anymore).
+[[region_fix]]
+stage = 6
+region = "hitbox"
+off = 0x11a9
+old_hex = "4e"
+new_hex = "06"
+note = "sworded deity hit 1/7: type 0x4E -> 0x06 (vs2 dispatch alias — class-8 native electric)"
+
+[[region_fix]]
+stage = 6
+region = "hitbox"
+off = 0x11c9
+old_hex = "4e"
+new_hex = "06"
+note = "sworded deity hit 2/7: type 0x4E -> 0x06 (vs2 dispatch alias — class-8 native electric)"
+
+[[region_fix]]
+stage = 6
+region = "hitbox"
+off = 0x11e9
+old_hex = "4e"
+new_hex = "06"
+note = "sworded deity hit 3/7: type 0x4E -> 0x06 (vs2 dispatch alias — class-8 native electric)"
+
+[[region_fix]]
+stage = 6
+region = "hitbox"
+off = 0x1209
+old_hex = "4e"
+new_hex = "06"
+note = "sworded deity hit 4/7: type 0x4E -> 0x06 (vs2 dispatch alias — class-8 native electric)"
+
+[[region_fix]]
+stage = 6
+region = "hitbox"
+off = 0x1229
+old_hex = "4e"
+new_hex = "06"
+note = "sworded deity hit 5/7: type 0x4E -> 0x06 (vs2 dispatch alias — class-8 native electric)"
+
+[[region_fix]]
+stage = 6
+region = "hitbox"
+off = 0x1249
+old_hex = "4e"
+new_hex = "06"
+note = "sworded deity hit 6/7: type 0x4E -> 0x06 (vs2 dispatch alias — class-8 native electric)"
+
+[[region_fix]]
+stage = 6
+region = "hitbox"
+off = 0x1269
+old_hex = "4e"
+new_hex = "06"
+note = "sworded deity hit 7/7: type 0x4E -> 0x06 (vs2 dispatch alias — class-8 native electric)"
+

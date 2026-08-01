@@ -7,13 +7,11 @@
 # (single-hit hard knockdown) and was reverted; this gate keeps any
 # future fix honest on the move's core behavior.
 #
-# KNOWN-OPEN (14z-28): the match-end KO by this move shows the
-# neutral-pose cosmetic bug (three class-0x4E consumers need vs2
-# semantics: reaction property, death-path re-read, per-victim aura
-# row — full map in STATE 14z-28). When the per-consumer fix lands,
-# EXTEND this gate with the death-chain assertions (grounded node
-# 0x158210 at f2950/f3030 with the HP=1 poke — see git history of
-# this file for the exact form).
+# STRENGTHENED 14z-36: the sworded deity's records are remapped to
+# type 0x06 (vs2-alias-proven: vs2 word[0x4E]==word[0x06]) = native
+# class-8 electric — section 2 asserts the complete death chain on a
+# fatal hit (grounded node 0x158210), closing the round-39
+# neutral-pose bug for the sworded variant too.
 #
 # Usage: ROMDIR=... tests/test_don_reactions.sh [rompath_dir]
 set -eu
@@ -49,5 +47,25 @@ for f in frames:
     prev = hp
 assert hits >= 2, f"only {hits} damage steps — 421P must multi-hit"
 print(f"  ok: 421P multi-hits ({hits} steps) with no knockdown on a standing opponent")
+EOF2
+# ── 2. fatal: the full native electric death chain ───────────────────
+mkdir -p "$WORK/ko"
+POKES="2600:ff8850:00010001" \
+DUMPS="2950:ff8800-ff8830;3030:ff8800-ff8830" \
+    REPLAY="$REPO/tests/replays/48_don_immortal_ko.rpl" \
+    CHECKSUM_OUT="$WORK/ko/c.log" MAME_SANDBOX="$WORK/ko" \
+    MAME_ROMPATH="$RPDIR;$ROMDIR" tools/run_mame.sh vsavj \
+    -autoboot_script "$REPO/tests/lua/replay.lua" > /dev/null 2>&1
+
+python3 - "$WORK/ko" <<'EOF2'
+import sys, os
+work = sys.argv[1]
+for fr in (2950, 3030):
+    d = open(os.path.join(work, f'dump_{fr}_ff8800.bin'), 'rb').read()
+    node = int.from_bytes(d[0x1c:0x20], 'big')
+    assert node == 0x158210, (
+        f"victim node at f{fr} = {node:#x}, expected grounded death "
+        f"0x158210 (idle loop = the round-39 neutral-pose bug)")
+print("  ok: deity KO runs the full native electric death (grounded at 0x158210)")
 EOF2
 echo "PASS: Donovan hit-class reaction gate"
