@@ -41,8 +41,33 @@ Round-52 maintainer results:
   builds (maintainer, rounds 51-52). Also mapped: the stock decays
   during idle (ff8505 1->0 between f3360 and f3455 with no inputs)
   — earlier "too late" ES attempts were doubly doomed.
-- **NEXT SESSION (bounded, static-first): disassemble the ported
-  handler's ES branch** — Donovan's LS/DP handlers are ported vs2
+- **14z-43c meter-field facts (round-53 datum: maintainer ES'd with
+  1 DISPLAYED stock — a persistent state):**
+  - +0x105 (ff8505) = a ~45-48f TRANSIENT raised by performing any
+    special (measured 1 at f3325-3355, 0 at f3370 after DP3 at
+    3318; re-raised by the next special). NOT the persistent stock
+    the maintainer uses. The real stock counter = UNMAPPED.
+  - +0x107 ff->fe fires when a special is performed with +0x105
+    recently set — including with NO stock (vanilla Demitri control)
+    — it is NOT ES consumption; every earlier "meter consumed" read
+    based on it was wrong.
+  - Vanilla Demitri scripted-pair control: INVALID as run (no
+    stock; chain 0x12E51A = one stride below HP fireball 0x12E69A =
+    a fallback, not the ES). Vanilla needs real meter too before it
+    discriminates harness-vs-port.
+  - Post-DP timing: actionable ~f3360, +0x105 dead ~f3365 — the
+    window is ~empty; pair presses during recovery are eaten. More
+    replay threading is the wrong tool.
+- **NEXT SESSION (bounded, static-first): disassemble the ENGINE's
+  ES-accept + meter check** — find the command-accept code that
+  distinguishes ES (two buttons) from normal and READS the meter
+  (who reads ff8505/06/07 and the real stock field at accept time;
+  start from writers via tap on ff8500-ff8510 during a
+  stock-gaining flow, then disassemble the readers). That yields
+  (a) the true stock field -> POKE it to script the ES reliably,
+  (b) whether Donovan's accept differs from vanilla at all. Then
+  unlock the whole ES chain: gate, 9-hit A/B, mash, neutral-pose
+  repro. Also: disassemble the ported handler's ES branch — Donovan's LS/DP handlers are ported vs2
   code; find the ES-vs-normal decision (which input/meter field at
   which offset, what threshold) in the vs2 source region, check
   what it reads on vsavj, and whether scripted vs manual input
