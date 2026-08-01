@@ -21,6 +21,29 @@ state superseded)
   ($FF8782 reads exactly 0x0F at the sites' run time in a real match
   flow, both mirror sides trigger).
 
+## Session 14z-40 (mash bridge: the walker block audited clean — divergence narrowed to three reconciled engine-call pairs)
+
+- Full instruction-level diff of the ported walker block (x026142 @
+  0xCD390, 0x1440 bytes) vs the vs2 original: 92 changed longs, ALL
+  accounted for — anim-table repoints (0xD7xxx -> 0xBD87A-family),
+  internal port retargets, and the DELIBERATE [table_fix] bank table
+  (+0x13EE). The walker's own logic is byte-faithful. Two findings:
+  1. The mash/cadence divergence must therefore live in one of the
+     THREE RECONCILED ENGINE CALLS inside the walker:
+       - vs2 0x082AE2 -> vsavj 0x073376   (region+0xA8)
+       - vs2 0x02CE82 -> vsavj 0x02D62A   (region+0xEB2)
+       - vs2 0x005122 -> vsavj 0x02A7E0   (region+0x1074)
+     One of these is the advance/input helper whose vsavj analog
+     drifts semantically (sibling-verified structurally, engine-
+     drifted behaviorally). NEXT SESSION: disassemble each pair,
+     compare, bridge the drifted one.
+  2. SIDE FINDING (potential separate bug): the region tail (+0x142E)
+     originally holds a small per-char lookup routine (`move.w
+     $100(a5),d0; move.w (pc-table,d0),$1A(a6); rts`) that the
+     table_fix pad ZEROED in our build. If anything calls
+     region+0x142E it executes zeros. Audit callers next session;
+     if called, restore the routine above the rewritten table.
+
 ## Session 14z-39 (round 49: maintainer clarifications — the Lightning Sword reference data)
 
 Maintainer-provided ground truth (community-corroborated):
