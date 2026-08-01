@@ -21,6 +21,34 @@ state superseded)
   ($FF8782 reads exactly 0x0F at the sites' run time in a real match
   flow, both mirror sides trigger).
 
+## Session 14z-41 (call-pair audit: pair 3 = the known sound stub; PAIR 1 = the real suspect — a lost spawner)
+
+- Pair 3 (vs2 0x5122 -> vsavj 0x2A7E0): DELIBERATE — the
+  "stubbed_sound" reconciliation row (the 214-input music-change fix;
+  correct vsavj twin 0x4CE2 documented in the row's own note; sfx
+  return at M5 with id-table translation). Flow-equivalent (rts), so
+  NOT the mash/cadence divergence. Side-answer: this is why Donovan's
+  moves are silent.
+- Pair 2 (vs2 0x2CE82 -> vsavj 0x2D62A): previously verified
+  engine_data row; not re-audited (low suspicion).
+- **PAIR 1 (vs2 0x82AE2 -> vsavj 0x73376): THE SUSPECT.** vs2's
+  routine = a SPAWNER helper: `jsr 0x15702; beq; move.l #$01006000,
+  (a4); move.w a6,$30(a4)` — twice = allocates & initializes TWO
+  support objects, owner-linked. The mapped vsavj 0x73376 reads as an
+  instruction-fragment tail falling into rts = an EFFECTIVE
+  (unintended) STUB — the walker's early-frame call spawns nothing.
+  Two lost support objects during Lightning Sword = prime candidate
+  for the cadence/hit-count divergence (e.g., the objects drive the
+  hit timing/mash sampling).
+- NEXT SESSION: (1) understand vs2 0x82AE2's role for this move
+  (what the two objects do — tap their slots on native during the
+  move); (2) find vsavj's TRUE analog (search for the same spawn
+  pattern `4eb9 ... 671c 28bc 0100...` in vsavj) or port the helper
+  (it's ~0x30 bytes, calls 0x15702 = the shared alloc — check that
+  address's vsavj analog too); (3) fix the reconciliation row,
+  rebuild, measure hits (expect 6-7 no-mash HP) and cadence (expect
+  ~1.5-5f/node); (4) gate both.
+
 ## Session 14z-40 (mash bridge: the walker block audited clean — divergence narrowed to three reconciled engine-call pairs)
 
 - Full instruction-level diff of the ported walker block (x026142 @
