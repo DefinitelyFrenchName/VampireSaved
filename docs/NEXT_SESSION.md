@@ -45,13 +45,16 @@ attribute any drift, maintainer sign-off, never silently refreeze).
 
 ## Queued next (in order)
 
-1. **Maintainer round: Lightning Sword** — expect confirmation of
-   hit counts (base ~6-7 HP at range) and speed; ask about LP/MP/ES
-   versions if they test them (our fix is strength-independent —
-   the constants live in the shared reaction handler).
-2. ~~Region-tail zeroed routine (x026142+0x142E)~~ CLOSED 14z-42:
-   no callers (vs2's only ref = engine init bsr at 0x20C9E, never
-   ported; built image has zero refs to 0xCE7BE). Dead code.
+1. **ES Change Immortal class-0x51 port — UPGRADED to accuracy item
+   (round 51: ES base 8 vs native 9, no mash extension).** Full
+   analysis + fix shape in STATE 14z-42c. The 14z-33 discipline
+   applies (type-dispatch extension; this area crashes when done
+   casually). Gate afterward: ES replay (needs meter — poke or
+   build via whiffs) asserting 9 base hits; re-check mash.
+2. Donovan lose/continue screen (round-51 captures): wrong palette
+   on the figure, garbled Anita-portrait blocks, wrong background.
+   Loser-portrait family — group with the M2b select-portrait
+   remainder (docs/engine_internals select-screen section).
 3. Swordless-deity palette (yellow vs vs2 blue figure/lightning —
    maintainer captures round 41). Same family as the deity's obj
    palette rows; untouched so far.
@@ -59,9 +62,10 @@ attribute any drift, maintainer sign-off, never silently refreeze).
    objs lack +0x3A4 (cached block ptr) -> the color-aware accent
    thunks fall back to punch-color slots on that screen only. Fix
    shape: select-venue init of +0x3A4 or owner-link fallback.
-5. ES Change Immortal presentation (records remapped to plain class
-   0x4E-copy interim; vs2 intent = class 0x51/property 0x19) — ask
-   maintainer if wanted.
+5. Match-end neutral-pose KO: PARKED (round 51, maintainer's call —
+   flaky, once vs Morrigan, 4 scripted variants clean; gate section
+   3 is the tripwire). Wanted datums if it recurs: victim char +
+   victim's state at the kill.
 6. Sounds: Donovan sfx silent by design (stubbed_sound rows; M5 task
    = dispatcher id-table translation, NOT unstubbing the helper —
    see reconciliation row note at vsav2=0x005122). NOTE from 14z-42:

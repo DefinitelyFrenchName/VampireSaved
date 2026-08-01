@@ -4,6 +4,40 @@ Updated: 2026-08-01 (session 14z-42 — Lightning Sword root cause
 FOUND + fix built: engine-drifted hit-freeze constants, NOT the
 spawner; 14z-41's lost-spawner theory overturned by measurement)
 
+## Session 14z-42c (round 51: LP/MP closed as native; ES = the known class-0x51 interim, UPGRADED to accuracy item; win-screen art item added; KO bug parked)
+
+Round-51 maintainer answers:
+- **LP/MP mash CLOSED NO-BUG:** maintainer struggles to extend LP/MP
+  on native VS2 too ("mechanism likely sound") — matches our
+  instrumented 3->4 extension proof. Native behavior.
+- **ES UPGRADED to gameplay-accuracy item:** definitely 9 base on
+  VS2, ours 8 — and ES mash extends on neither... ours at all.
+  MECHANISM HYPOTHESIS (connects to the 14z-35/36 interim): the ES
+  deity's 6 records were remapped type 0x51 -> 0x4E (crash fix —
+  vsavj's type dispatch ends at 0x4F); vsavj property[0x4E] = 0
+  (14z-28 revert) -> ES hits take a PLAIN reaction, not vs2's
+  class-0x51/property-0x19 electric path -> different freeze/re-hit
+  pacing (one hit fewer) and plausibly no mash sampling. FIX SHAPE
+  (next session, 14z-33 discipline — this area crashes when done
+  casually): extend the record-type dispatch to 0x51 (existing
+  engine-hook pattern), route to the 6-byte copy handler (class :=
+  0x51), property[0x51] = 0x19 already present in
+  hit_class_props_ext_hi; then A/B the property-0x19 reaction
+  handler pair for constant drift (the 14z-42 freeze lesson — may
+  need a third freeze thunk there).
+- **NEW TRACKED ITEM: Donovan lose/continue screen** (maintainer
+  captures, Desktop screenshots 2026-08-01 22.38/22.42): ours has
+  (a) the Donovan figure in a wrong washed-purple palette, (b)
+  garbled tile blocks bottom-left where Anita's portrait art
+  belongs, (c) wrong background composition vs VS2's moon/Anita
+  arrangement. Loser-portrait art/palette family — group with the
+  M2b select-portrait remainder.
+- **Match-end neutral-pose KO PARKED (maintainer's call):** happened
+  once vs Morrigan, not reproducible since ("very flaky... worth
+  leaving alone for now"). Our 4-variant clean repro + the new gate
+  section 3 stay as the tripwire. If it recurs: victim char + what
+  the victim was doing at the kill are the wanted datums.
+
 ## Session 14z-42b (round 50: freeze fix CONFIRMED; neutral-pose match-end KO reported — 4 repro variants all CLEAN; context question queued)
 
 Round-50 maintainer results on 4f8220fc:
