@@ -54,3 +54,9 @@ these scripts) and trace the divergence writer.
   U,U,D,D = 0x09 Aulbath. Ids 0x08/0x0B still unreached (Morrigan/
   Lilith candidates); crash repro may not need them if the crash is
   position- not char-specific.
+
+## Round-49 correction
+
+The plant is 214K 'Killshread Plant' (421K works via input leniency).
+Lightning Sword reference hit ranges: LP 3-5, MP 5-9, HP 7-11, ES
+9-13; far HP = 6 (range-limited). See STATE 14z-39.

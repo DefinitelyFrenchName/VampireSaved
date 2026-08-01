@@ -21,6 +21,36 @@ state superseded)
   ($FF8782 reads exactly 0x0F at the sites' run time in a real match
   flow, both mirror sides trigger).
 
+## Session 14z-39 (round 49: maintainer clarifications — the Lightning Sword reference data)
+
+Maintainer-provided ground truth (community-corroborated):
+- Plant = **214K "Killshread Plant"** (not 421K; input leniency
+  accepts both — matches the 14z-31 finding).
+- **Lightning Sword (sworded 421P) hit ranges: LP 3-5, MP 5-9,
+  HP 7-11, ES 9-13** (base to max-mash). Far HP = 6 only (range:
+  after 6 hits the opponent exits reach despite the shock's pushback
+  limiting). Max counts need VERY fast mashing; regular mashing gives
+  ~half the bonus (maintainer reliably reaches 9 on HP).
+- **Our fixed counts (7/11/15) EXCEED the community maxima (5/9/11)**
+  — two readings: (a) the engine's hard loop ceiling sits above
+  human-reachable mash (ours = ceiling), or (b) our loop count is
+  outright wrong. Distinguish next session at the code level.
+- **NEW: animation speed** — VS2/vanilla Savior play the move MUCH
+  faster; ours is visibly slower. This matches the 14z-37 cadence
+  measurement (ours ~11 frames/node vs native ~1.5-5) — a SECOND
+  divergence beyond the loop count. Note: ours advances nodes via
+  PORTED code (PC ~0xCE38A, in the x05c800 character-code region =
+  Donovan's own move handler), while native vs2 advances via its
+  ENGINE walker (0x2713C) — the handler/walker division of labor
+  differs between the builds and is the prime suspect for BOTH the
+  cadence and the loop-count divergence (e.g., handler = the
+  mash-advance path firing on garbage input reads; walker = the
+  default-timer path).
+- NEXT SESSION (bounded): disassemble the ported handler around
+  0xCE38A via its vs2 source in the x05c800 region; map the advance
+  logic + its input read; bridge; then gate: no-mash HP = 6-7 hits
+  AND cadence within native bounds.
+
 ## Session 14z-38 (mash bridge: three fields exonerated; theory sharpened to the input-struct read)
 
 - Poke experiments: zeroing obj +0x126 / +0x12E / +0x1B0 continuously
