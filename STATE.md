@@ -21,6 +21,31 @@ state superseded)
   ($FF8782 reads exactly 0x0F at the sites' run time in a real match
   flow, both mirror sides trigger).
 
+## Session 14z-38 (mash bridge: three fields exonerated; theory sharpened to the input-struct read)
+
+- Poke experiments: zeroing obj +0x126 / +0x12E / +0x1B0 continuously
+  during the move does NOT shorten it (14 hits regardless) — the
+  loop condition does not read those obj fields.
+- Sharpened theory: ours behaves as PERMANENTLY MASHED — the ported
+  vs2 walker's loop-op likely reads the per-player INPUT-STATE
+  structures at vs2 offsets; vsavj's input layout differs, so the
+  read returns garbage/nonzero = "still mashing" = always loop to the
+  cap (7/11/15 per strength = the caps).
+- Interpreter note: vs2 advances these nodes with its ENGINE walker
+  (PC 0x2713C); ours with the PORTED copy (PC ~0xCE38A, hole a) —
+  same vs2 semantics, so the divergence is in what the READ hits, not
+  the opcode logic.
+- MAINTAINER QUESTION that would confirm cheaply: in VS2, what is the
+  actual maximum hit count with maximum mashing? If ~7/11/15 (our
+  fixed counts), ours == permanently-mashed exactly, confirming the
+  input-read theory.
+- NEXT SESSION (bounded, fresh context): statically disassemble the
+  ported walker's loop-op handler (the script-op dispatch for the
+  node ops [cf14][0b][target]-family) in the vs2 original around the
+  0x27xxx walker; find the input/mash read; bridge with a thunk
+  (vsavj input state -> the expected field/offset). Then gate the
+  no-mash base counts (6-7 hits HP version).
+
 ## Session 14z-37 (round 48: shock CONFIRMED with a caveat — hit counts maxed; mash mechanic mapped to the doorstep)
 
 - Maintainer: the electric shake holds like VS2 ✓ — but hit counts
