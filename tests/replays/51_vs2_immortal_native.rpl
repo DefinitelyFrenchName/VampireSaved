@@ -1,0 +1,25 @@
+# 51: NATIVE vs2 Lightning Sword ground truth (session 14z-42 — the
+# hit-freeze root-cause instrument). P1 Donovan (R,R from default on
+# the vs2 grid), P2 R,R (Victor), walk fwd 2500-2560, sworded 421+HP
+# at 2610-2624, no poke. Run on VSAV2. Native datums at this spacing:
+# 6 hits ~10f apart (f2635..2684), 3 node-loop iterations
+# (0x284988-0x284A48 x3), attacker freeze 4-5f/hit (victim-reaction
+# handler 0x226E0: victim $5c=0xC, attacker $5c=4, victim $147=0xC),
+# move 2619-2725. Companion no-mash replay for ours: 48_don_immortal_ko
+# (no poke). Node tap: TAP=ff841c,4; HP tap: TAP=ff8850,4.
+300-305 sys=C1
+420-425 sys=C2
+800-803 sys=S1
+940-943 sys=S2
+1100-1102 p1=R
+1160-1162 p1=R
+1104-1106 p2=R
+1164-1166 p2=R
+1300-1302 p1=1
+1360-1362 p2=1
+2500-2560 p1=R
+2610-2612 p1=L
+2614-2616 p1=D
+2618-2622 p1=DL
+2620-2624 p1=3
+3400 wait

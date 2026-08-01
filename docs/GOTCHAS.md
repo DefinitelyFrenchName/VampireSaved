@@ -819,3 +819,27 @@ the garbage came from OTHER entries (raw unremapped codes) outside the
 filter. When a render contradicts an OBJ-level match, diff the FULL
 unfiltered entry set both sides first (14z-22 — found the un-walked
 record subset in minutes once unfiltered).
+
+## A cited address in a session log is a CLAIM, not a fact — re-verify
+## against the manifest/built image before planning on it
+Session 14z-41 read the reconciliation row's vsavj target as 0x73376,
+disassembled THAT address, found an instruction-fragment tail falling
+into rts, and planned a whole next-session fix around the "accidental
+stub". The row actually said 0x77376 (one hex digit away) — the
+byte-identical true spawner twin — and the built image called it
+correctly all along. One digit cost a session plan. When a log entry
+names an address as "the mapped target", grep the manifest row AND
+xxd the built image at the call site before building any theory on
+it. (14z-42; the misread survived two session summaries unchallenged.)
+
+## Hit-freeze constants are ENGINE-GENERATION tuning, not ported data —
+## sibling-verified structure can still drift behaviorally
+The vsavj and vs2 victim-reaction handlers are structural twins
+(field-for-field), but the freeze constants inside them differ
+(attacker +0x5C: 0x0B vsavj vs 0x04 vs2; victim 0x18 vs 0x0C): vs2
+retuned the shared engine for its rapid multi-hits. Any ported move
+whose FEEL depends on engine-side constants (freeze, shake, gravity
+tables) can diverge with zero byte differences in the ported regions
+— A/B-measure the engine fields (tap the obj struct at event frames
+on both games), don't audit only the ported bytes. (14z-42: this one
+drift WAS both maintainer symptoms — hit count and animation speed.)

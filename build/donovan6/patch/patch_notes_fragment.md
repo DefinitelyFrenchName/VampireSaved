@@ -22,7 +22,29 @@ code   0x0cb880 ILLEGAL  TRIPWIRE for unresolved 0x42cee
 code   0x0cb890 ILLEGAL  TRIPWIRE for unresolved 0x448d4
 # code+0x3092: unresolved 0x448d4 -> tripwire 0xcb890
 code_file 0x0bf6a0 +0x3200  donovan code (from vsav2 0x059490)
+# hitbox+0x10e9: region_fix 51 -> 4e (ES-deity record type 0x51 -> 0x4E (vsavj copy-class handler; latent wild-jump preempted))
+# hitbox+0x1109: region_fix 51 -> 4e (ES-deity record type 0x51 -> 0x4E (vsavj copy-class handler; latent wild-jump preempted))
+# hitbox+0x1129: region_fix 51 -> 4e (ES-deity record type 0x51 -> 0x4E (vsavj copy-class handler; latent wild-jump preempted))
+# hitbox+0x1149: region_fix 51 -> 4e (ES-deity record type 0x51 -> 0x4E (vsavj copy-class handler; latent wild-jump preempted))
+# hitbox+0x1169: region_fix 51 -> 4e (ES-deity record type 0x51 -> 0x4E (vsavj copy-class handler; latent wild-jump preempted))
+# hitbox+0x1189: region_fix 51 -> 4e (ES-deity record type 0x51 -> 0x4E (vsavj copy-class handler; latent wild-jump preempted))
+# hitbox+0x11a9: region_fix 4e -> 06 (sworded deity hit 1/7: type 0x4E -> 0x06 (vs2 dispatch alias — class-8 native electric))
+# hitbox+0x11c9: region_fix 4e -> 06 (sworded deity hit 2/7: type 0x4E -> 0x06 (vs2 dispatch alias — class-8 native electric))
+# hitbox+0x11e9: region_fix 4e -> 06 (sworded deity hit 3/7: type 0x4E -> 0x06 (vs2 dispatch alias — class-8 native electric))
+# hitbox+0x1209: region_fix 4e -> 06 (sworded deity hit 4/7: type 0x4E -> 0x06 (vs2 dispatch alias — class-8 native electric))
+# hitbox+0x1229: region_fix 4e -> 06 (sworded deity hit 5/7: type 0x4E -> 0x06 (vs2 dispatch alias — class-8 native electric))
+# hitbox+0x1249: region_fix 4e -> 06 (sworded deity hit 6/7: type 0x4E -> 0x06 (vs2 dispatch alias — class-8 native electric))
+# hitbox+0x1269: region_fix 4e -> 06 (sworded deity hit 7/7: type 0x4E -> 0x06 (vs2 dispatch alias — class-8 native electric))
 data_file 0x3fa790 +0x25c2  donovan hitbox (from vsav2 0x0C8BB8)
+# hitbox_proj+0x291: region_fix 52 -> 06 (column KO record type 0x52 -> 0x06 (vs2 dispatch alias; vsavj table ends at 0x4F -> wild jump))
+# hitbox_proj+0x2b1: region_fix 52 -> 06 (column sibling hit record, same type-0x52 alias remap (would crash on its own kill timing))
+# hitbox_proj+0x2d1: region_fix 52 -> 06 (column sibling hit record, same type-0x52 alias remap (would crash on its own kill timing))
+# hitbox_proj+0x131: region_fix 50 -> 0f (extended record type 0x50 -> 0x0F (vs2 dispatch alias: entry 0x50 word 0x16E == entry 0x0F's; same wild-jump class past vsavj's 0x4F table end))
+# hitbox_proj+0x151: region_fix 50 -> 0f (extended record type 0x50 -> 0x0F (vs2 dispatch alias: entry 0x50 word 0x16E == entry 0x0F's; same wild-jump class past vsavj's 0x4F table end))
+# hitbox_proj+0x2f1: region_fix 50 -> 0f (extended record type 0x50 -> 0x0F (vs2 dispatch alias: entry 0x50 word 0x16E == entry 0x0F's; same wild-jump class past vsavj's 0x4F table end))
+# hitbox_proj+0x311: region_fix 50 -> 0f (extended record type 0x50 -> 0x0F (vs2 dispatch alias: entry 0x50 word 0x16E == entry 0x0F's; same wild-jump class past vsavj's 0x4F table end))
+# hitbox_proj+0x331: region_fix 50 -> 0f (extended record type 0x50 -> 0x0F (vs2 dispatch alias: entry 0x50 word 0x16E == entry 0x0F's; same wild-jump class past vsavj's 0x4F table end))
+# hitbox_proj+0x351: region_fix 50 -> 0f (extended record type 0x50 -> 0x0F (vs2 dispatch alias: entry 0x50 word 0x16E == entry 0x0F's; same wild-jump class past vsavj's 0x4F table end))
 data_file 0x0ca7e0 +0x1000  donovan hitbox_proj (from vsav2 0x0D0CA8)
 # x026142+0x13ee: table_fix 48 bytes (ported per-char OBJ bank table -> vanilla vsavj values (0x282D4))
 # bank_ref 0xd7a18 -> 0xbd87a (delta rule, 16B byte-identical)
@@ -285,6 +307,20 @@ poke32 0x0bf516 <- 0x000c1124  dispatch_18[0x1f] variant mirror
 poke32 0x0bf656 <- 0x000c1106  dispatch_19[0xf] donovan handler
 poke32 0x0bf696 <- 0x000c1106  dispatch_19[0x1f] variant mirror
 data   0x0b19f8 +0xe50  data_port throw_victim_keyframes <- vsav2 0x0ca1ca (0 fixes)
-data   0x39fbe0 +0x40  data_port weapon_accent_rows <- vsav2 0x39cbdc (0 fixes)
-data   0x39fc20 +0x20  data_port weapon_accent_tail <- vsav2 0x39cbec (0 fixes)
-data   0x39b040 +0x40  data_port statue_accent_rows <- vsav2 0x38d1a0 (0 fixes)
+data   0x39fbe0 +0x20  data_port weapon_accent_t0 <- vsav2 0x39cbdc (0 fixes)
+data   0x39fc00 +0x20  data_port weapon_accent_t1 <- vsav2 0x39cbdc (0 fixes)
+data   0x39fc20 +0x20  data_port weapon_accent_rowd_slot <- vsav2 0x39cbfc (0 fixes)
+data   0x028d50 +0x4  data_port hit_class_props_ext_hi <- vsav2 0x028028 (0 fixes)
+code   0x3ffcb0 +0x62  site_thunk fixture_row0f_override_bank0; site 0x01c586 jsr-routed
+code   0x3ffd20 +0x62  site_thunk fixture_row0f_override_bank1; site 0x01c59a jsr-routed
+code   0x0cf310 +0x18  site_thunk select_companion_tbl_a; site 0x0845ec jsr-routed
+code   0x0cf330 +0x18  site_thunk select_companion_tbl_b; site 0x0845f8 jsr-routed
+code   0x0fff40 +0x22  site_thunk select_companion_resolve_s1; site 0x084602 jsr-routed
+code   0x0fff70 +0x22  site_thunk select_companion_resolve_s2; site 0x084624 jsr-routed
+code   0x0cf350 +0x1c  site_thunk accent_color_aware_0; site 0x02ad82 jsr-routed
+code   0x0fffa0 +0x1c  site_thunk accent_color_aware_1; site 0x02ad94 jsr-routed
+code   0x0fffc0 +0x1c  site_thunk accent_color_aware_2; site 0x02b342 jsr-routed
+code   0x0fffe0 +0x1c  site_thunk accent_color_aware_3; site 0x02b7e8 jsr-routed
+code   0x3ffd90 +0x2a  site_thunk ls_freeze_vs2_victim; site 0x023ad8 jsr-routed
+code   0x3ffdc0 +0x24  site_thunk ls_freeze_vs2_attacker; site 0x023ade jsr-routed
+code   0x084594 +0x2  code_word select_companion_entry_0f (0040 -> 0046)

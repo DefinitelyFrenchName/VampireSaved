@@ -13,6 +13,15 @@
 # fatal hit (grounded node 0x158210), closing the round-39
 # neutral-pose bug for the sworded variant too.
 #
+# STRENGTHENED 14z-42 (hit-freeze fix, ls_freeze_vs2_* thunks): the
+# no-mash HP version at this spacing is NATIVE-CLASS — total damage
+# <= 10 (native == 10: 5-point initial sword hit + 5 deity ticks;
+# the pre-fix build dealt 22) and the last damage lands by f2700
+# (native window ends ~2689; the slow pre-fix build hit until ~2797
+# — a layout-independent duration proxy for the cadence). Mash
+# extension verified native-equal separately (3 -> 4 loop
+# iterations on both games, session 14z-42).
+#
 # Usage: ROMDIR=... tests/test_don_reactions.sh [rompath_dir]
 set -eu
 ROMDIR="${ROMDIR:?set ROMDIR}"
@@ -36,6 +45,7 @@ frames = sorted(int(os.path.basename(p).split('_')[1])
                 for p in glob.glob(os.path.join(work, 'dump_*_ff8850.bin')))
 assert len(frames) >= 10, f"only {len(frames)} dumps"
 prev = None; hits = 0
+hp_first = hp_last = None; last_hit_frame = None
 for f in frames:
     hp = int.from_bytes(open(os.path.join(work, f'dump_{f}_ff8850.bin'),'rb').read()[:2],'big')
     ob = open(os.path.join(work, f'dump_{f}_ff8800.bin'),'rb').read()
@@ -43,10 +53,20 @@ for f in frames:
     assert not (0x157F00 <= node <= 0x1586FF), (
         f"victim in knockdown-family node {node:#x} at f{f} — 421P must "
         f"not knock down a standing opponent (the 14z-27 regression)")
-    if prev is not None and hp < prev: hits += 1
-    prev = hp
+    if hp_first is None: hp_first = hp
+    if prev is not None and hp < prev:
+        hits += 1; last_hit_frame = f
+    prev = hp; hp_last = hp
 assert hits >= 2, f"only {hits} damage steps — 421P must multi-hit"
-print(f"  ok: 421P multi-hits ({hits} steps) with no knockdown on a standing opponent")
+total = hp_first - hp_last
+assert total <= 10, (
+    f"{total} total damage no-mash — exceeds the native total of 10 "
+    f"(hit-freeze regression: the pre-14z-42 build dealt 22)")
+assert last_hit_frame is not None and last_hit_frame <= 2700, (
+    f"last damage step at f{last_hit_frame} — past the native-class window "
+    f"(<=2700); the move is running slow (hit-freeze regression)")
+print(f"  ok: 421P multi-hits ({hits} steps, {total} total, last at "
+      f"f{last_hit_frame}) native-class, no knockdown on a standing opponent")
 EOF2
 # ── 2. fatal: the full native electric death chain ───────────────────
 mkdir -p "$WORK/ko"

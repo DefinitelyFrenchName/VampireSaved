@@ -852,6 +852,49 @@ old_hex = "207c0039a900"
 thunk_hex = "0c2e000f0382660c202e03a46706204070024e75207c0039a9004e75"
 
 
+# 14z-42: LIGHTNING SWORD HIT-FREEZE (the mash/cadence divergence,
+# rounds 47-49 — root cause measured end to end this session).
+# vsavj's electric-shake reaction handler 0x23AC8 is the structural
+# twin of vs2's 0x226E0 (same field sequence, same property-table
+# tail) but carries the OLDER engine's freeze tuning: attacker
+# +0x5C = 0x0B / victim +0x5C = 0x18, where vs2 retuned to 0x04 /
+# 0x0C for its rapid multi-hits. Every deity hit froze our Donovan
+# ~11f (native ~4f) -> the same 3-iteration node loop stretched to
+# ~2.1x length -> the deity's own ~10-12f hit cycle filled the
+# longer window with 14-15 hits instead of 6-7. One drift = BOTH
+# maintainer symptoms (hit count + visible slowness). The three
+# reconciled walker calls (14z-40 suspects) are exonerated: probes
+# show 0x82AE2 / 0x2CE82 never execute during the move natively,
+# and 0x5122 is the deliberate sound stub; the reconciliation row
+# for 0x82AE2 was ALREADY correct (0x77376 — 14z-41 misread it as
+# 0x73376). Thunks: attacker link (a4, loaded from victim+0x32 at
+# 0x23AD4) must be a PLAYER block (0x8400/0x8800 — guards against
+# non-player +0x32 words where +0x382 would read garbage) AND char
+# id 0x0F -> vs2 constants; else the byte-identical vanilla write
+# (same CCR: last op = the original move.b). vs2's extra victim
+# $147=0xC write deliberately NOT ported yet — measure first
+# (candidate for the residual ~2f hit-period delta; revisit if the
+# period stays 12f vs native 10f).
+# MEASURED (same session, first build): constants alone -> freeze
+# 5f ✓ but hit period 7f (native 10f), count still 14: the victim
+# freeze was doubling as vsavj's only re-hit gate. vs2's $147=0xC
+# IS the re-hit gate (period ~10f) — ported into the Donovan branch
+# (flag-identical: 0x0C and 0x18 set the same CCR bits).
+[[site_thunk]]
+stage = 6
+name = "ls_freeze_vs2_victim"
+site = 0x023AD8
+old_hex = "1d7c0018005c"
+thunk_hex = "b8fc84006706b8fc880066160c2c000f0382660e1d7c000c005c1d7c000c01474e751d7c0018005c4e75"
+
+[[site_thunk]]
+stage = 6
+name = "ls_freeze_vs2_attacker"
+site = 0x023ADE
+old_hex = "197c000b005c"
+thunk_hex = "b8fc84006706b8fc880066100c2c000f03826608197c0004005c4e75197c000b005c4e75"
+
+
 # 14z-33: COLUMN-CRASH FIX (round-45 go-ahead; full decode in STATE
 # 14z-31/32). The swordless-421P column's KO record (hitbox_proj
 # +0x27A) carries vs2's EXTENDED record type 0x52; vsavj's record-type

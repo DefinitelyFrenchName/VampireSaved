@@ -61,7 +61,10 @@ is 0x400 bytes; combat struct at +0x000, further state above +0x100.
 | +0x0A | attack id (shift 5 for hitbox lookup) | [C] |
 | +0x10.w | X position (signed) | [C: script default, matches update_object] |
 | +0x14.w | Y position (signed) | [C] |
-| +0x1C | anim ptr | [C] |
+| +0x1C | anim ptr (node write: vs2 walker PC 0x2713C / vsavj 0x27EE8 family / ported walker 0xCE38A) | [C] |
+| +0x20 | anim node timer (node duration byte countdown; held while +0x5C runs) | [D: 14z-42] |
+| +0x32.w | attacker/owner attribution link (word addr, sign-extends to the player block; reaction handlers deref it for attacker-side writes) | [D: 14z-26/42] |
+| +0x5C | hit-freeze counter (blocks +0x20 decrement; set per hit on BOTH victim and attacker by the reaction handlers — electric-shake pair: vsavj 0x23AC8 writes 0x18/0x0B where vs2 0x226E0 writes 0x0C/0x04; engine-generation drift, see engine_internals) | [D: 14z-42] |
 | +0x50.w | current HP (round start = 0x120 = 288) | [D] |
 | +0x52.w | white/displayed HP (regenerating damage) | [D] |
 | +0x60.l | per-character hitbox data base (ROM ptr; Demitri 0x93B6A, Victor 0x9769E) | [T,D] |
@@ -69,7 +72,8 @@ is 0x400 bytes; combat struct at +0x000, further state above +0x100.
 | +0x80/84/88/8C/90.l | hitbox addr tables: base + word offsets base[0..8] (push=+0x90, vuln=+0x80/84/88, attack=+0x8C) | [C,T] |
 | +0x94..0x97 | current box ids (vuln×3, push) | [C] |
 | +0x98 | throw box id | [C] |
-| +0x11E,+0x134,+0x145,+0x147,+0x1A4 | invulnerability/status flags | [C] |
+| +0x11E,+0x134,+0x145,+0x1A4 | invulnerability/status flags | [C] |
+| +0x147 | multi-hit RE-HIT GATE (victim-side; vs2's electric-shake handler sets 0x0C per hit -> ~10f hit period; vsavj's handler never writes it — without it the victim freeze doubles as the gate) | [D: 14z-42, measured 7f/10f/12f periods] |
 | +0x132.w | per-character word from table PRG:0x0BE17A | [T] |
 
 ## Projectiles

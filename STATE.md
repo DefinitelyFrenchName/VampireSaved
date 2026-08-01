@@ -1,9 +1,95 @@
 # STATE — living progress log
 
-Updated: 2026-07-29 (session 14r — COMPANION OVERLAY SHIPPED at
-cf2109d8 pending gates+playtest: Anita/sword/statue render in-match
-and on the win screen; 3 residual sites excluded; session 14q parked
-state superseded)
+Updated: 2026-08-01 (session 14z-42 — Lightning Sword root cause
+FOUND + fix built: engine-drifted hit-freeze constants, NOT the
+spawner; 14z-41's lost-spawner theory overturned by measurement)
+
+## Session 14z-42 (Lightning Sword: ROOT CAUSE = hit-freeze engine drift; 14z-40/41 suspects all exonerated)
+
+Measurement session on native vs2 (scratch replay recreated per
+NEXT_SESSION spec) vs our build (replay 48, no poke). Every 14z-40/41
+suspect died under instrumentation; the real mechanism emerged whole:
+
+- **14z-41's PAIR-1 "lost spawner" theory: DEAD, twice over.**
+  (a) GUARD_PROBE at vs2 0x82AE2 across the whole native replay:
+  ZERO hits — the spawner is never called during Lightning Sword
+  (move confirmed on-screen in the same run). (b) The reconciliation
+  row was ALREADY CORRECT: manifest maps 0x082AE2 -> 0x077376 and
+  the built image calls jsr 0x77376 at 0xCD438. **14z-41 misread
+  0x77376 as 0x73376** (one hex digit) and analyzed the phantom
+  address; vsavj 0x77376 is the byte-identical spawner twin (alloc
+  0x16FBA = vs2 0x15702's analog, ids 0x01006000/0x01006002, unique
+  in the image). GOTCHAS entry added.
+- Pair 2 (vs2 0x2CE82): also ZERO probe hits whole-replay. Pair 3 =
+  the deliberate sound stub. **None of the three reconciled walker
+  calls executes during the move** — the 14z-40 inference collapses.
+- **Node-path A/B (tap ff841c both sides): IDENTICAL structure.**
+  Same 14-node ramp, same 9-node loop (native 0x284988-0x284A48 =
+  ours 0xD84B0-0xD8570, port offset +0xB3B28), **exactly 3 loop
+  iterations no-mash on BOTH**, same exit link over the extension
+  block (4A48 -> 4CA8 = 8570 -> 87D0), same 10-node tail. The
+  14z-38 "permanently mashed" theory is DEAD: 7/11/15 were never
+  mash caps — they're base-loop hit counts inflated per-iteration.
+- **THE DIVERGENCE: attacker hit-freeze per deity hit.** Timer tap
+  (obj+0x20) + P2-HP tap, both sides: native = 6 hits, 4-5f freeze
+  starting at each hit frame; ours = 14 hits, 9-11f freeze. Longer
+  freeze stretches the same 3-iteration loop ~2.1x; the deity's own
+  ~10-12f hit cycle fills the longer window with more hits. ONE
+  drift = BOTH maintainer symptoms (count + visible slowness).
+- **Freeze source found (full-obj tap at hit frame + disasm):** the
+  victim-reaction handler pair — vs2 0x226E0 == vsavj 0x23AC8
+  (structural twins; property tables 0x27FD8/0x28D00 byte-identical
+  through class 0x4D; both handlers fire once per hit, probed). The
+  CONSTANTS drifted between engine generations: victim +0x5C = 0x0C
+  (vs2) vs 0x18 (vsavj); **attacker +0x5C = 0x04 (vs2) vs 0x0B
+  (vsavj)**; vs2 also writes victim $147=0xC which vsavj's handler
+  lacks. vsav = older engine; vs2 retuned the electric-shake
+  reaction for its rapid multi-hits.
+- **FIX (built this session): site_thunks ls_freeze_vs2_victim /
+  ls_freeze_vs2_attacker** on the two 6-byte freeze writes (vsavj
+  0x23AD8/0x23ADE): attacker link a4 must be a player block
+  (0x8400/0x8800 guard — non-player +0x32 words would make +0x382 a
+  garbage read) AND char id 0x0F -> vs2 constants (0x0C/0x04); else
+  byte-identical vanilla write (CCR-safe: last else-op = the
+  original move.b). $147=0xC was first left out and measured:
+  constants alone gave freeze 5f ✓ but hit period 7f and STILL 14
+  hits — the victim freeze had been doubling as vsavj's only
+  re-hit gate; **vs2's victim $147=0xC IS the re-hit gate**. Ported
+  into the Donovan branch (flag-identical CCR).
+- **RESULT (build fingerprint 4f8220fc, replay 48 no-poke):
+  NATIVE-EXACT CLASS — 6 damage events at ~10f period (native: 6
+  at ~10f), total damage 10 == native 10 exactly (5-point initial
+  sword hit + 5 deity ticks; pre-fix: 22), 3 loop iterations,
+  cadence histogram near-identical (1-5f), move 113f vs native
+  106f.** Both maintainer symptoms resolved in one
+  mechanism-attributed change of two site_thunks.
+- **MASH VERIFIED NATIVE-EQUAL: both games extend 3 -> 4 loop
+  iterations under identical mash input** (LP/MP alternating every
+  3f through the loop window). The mash mechanic was never broken;
+  14z-38's input-struct theory retired. Replays promoted:
+  51_vs2_immortal_native / 52_vs2_immortal_mash /
+  53_don_immortal_mash (native datums in the headers).
+- Instruments this session (all no-debugger tap_writes or
+  GUARD_PROBE; scratch replay 48_immortal_v2 recreated for vsav2 —
+  picks R,R / R,R, 421+HP at 2610-2624, no poke): node tap ff841c,
+  timer tap ff8420, HP tap ff8850, full-obj tap ff8400,400 at the
+  hit frame, probes 82ae2/2ce82/226e0/23ac8.
+- **14z-40's side finding (region-tail zeroed routine, +0x142E)
+  CLOSED — NO CALLERS:** vs2's only reference to 0x27570 is `bsr.w`
+  at 0x20C9E inside the ENGINE's object-init chain (never ported;
+  vsavj objects init through the vsavj twin and its own per-char
+  tables). The built image has ZERO references to ours 0xCE7BE
+  (jsr/jmp/bare-long/relative all searched). Dead code; the
+  table_fix pad stands.
+- Walker mechanics decoded along the way (engine_internals TODO):
+  node = 0x18 bytes, +0 duration byte -> obj+0x20 countdown
+  (decrement PC vs2 0x271C4 = ours 0xCE412), +1 flags (0x80 =
+  follow link at +0x18), +4 sprite record ptr, +0x10 the
+  [cf14]..[0b] op family; loop node 4A48 links back via +0x18
+  pointer 0x284988; freeze holds the decrement (the "floating
+  holds" that tracked hit frames, not fixed nodes).
+
+## Session 14z-21 (queue: alt-color item closed NO-BUG; mirror native-exact; 2026-07-31)
 
 ## Session 14z-21 (queue: alt-color item closed NO-BUG; mirror native-exact; 2026-07-31)
 

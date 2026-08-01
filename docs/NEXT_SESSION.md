@@ -1,101 +1,100 @@
-# NEXT SESSION — orientation (written at context limit, session 14z-41, 2026-08-01)
+# NEXT SESSION — orientation (session 14z-42, 2026-08-01)
 
-Read STATE.md sessions 14z-36..41 after this. The maintainer tests
-frequently and reports precisely — their reports are the project's
-best instrument; reference data they provide goes straight into gates.
+Read STATE.md session 14z-42 (and 14z-36..41 for the arc) after this.
+The maintainer tests frequently and reports precisely — their reports
+are the project's best instrument; reference data they provide goes
+straight into gates.
 
-## Ship state — build 0a55bc58 (all maintainer-confirmed)
+## Ship state — LIGHTNING SWORD FIXED, battery pending/green
 
+Build fingerprint `4f8220fc` (dev head; register at freeze time).
 Battery: `ROMDIR="/Users/koneko/Developer/Vampire Saved/ROMS" tests/run_battery_m2.sh`
-(57 checks; ~35 min; ROM audit runs first per CLAUDE.md §3).
+(57 checks; ~35 min; ROM audit first per CLAUDE.md §3).
 Dev builds: `GEN_FLAGS="--allow-plausible --tripwire-open" tools/build_donovan.sh 6 build/donovan6`
 (a bare build FAILS on 58 open reconciliation refs — expected).
 
-Working & gated: select-screen sword (behind-flag composition);
-color-aware accent (no sword/statue blink, any select button,
-in-match); shock auras correct everywhere; sworded + swordless 421P
-shock + electrocute death (record-type aliases 0x4E/0x50/0x51/0x52 ->
-06/0F/4E/06, all vs2-dispatch-proven); column-KO crash fixed + gated;
-alt-color + mirror native-exact; 421P multi-hit no-knockdown gameplay
-lock.
+## What 14z-42 closed (the active task from 14z-37..41)
 
-## ACTIVE TASK — Lightning Sword hit count + animation speed
+**Lightning Sword hit count + animation speed: ONE bug, fixed and
+gated.** The 14z-41 "lost spawner" theory was overturned by
+measurement (vs2 never calls 0x82AE2 during the move; the
+reconciliation row was already correct — 14z-41 misread 0x77376 as
+0x73376, GOTCHAS entry added). Real cause: vsavj's electric-shake
+reaction handler (0x23AC8, twin of vs2 0x226E0) carries older-engine
+freeze tuning (attacker +0x5C = 0x0B vs vs2 0x04; victim 0x18 vs
+0x0C) and lacks vs2's victim +0x147 = 0x0C re-hit gate. Fix =
+ls_freeze_vs2_{victim,attacker} site_thunks (donovan.toml, 14z-42
+block): player-block + char-0x0F guarded, vs2 constants + $147 in
+the Donovan branch, byte-identical vanilla else.
 
-Symptoms (maintainer + measured): our sworded 421P always deals the
-cap (7 LP / 11 MP / 15 HP hits) vs VS2's mash mechanic (base 3/5/7,
-max-mash 5/9/11, ES 9-13; far HP = 6 by range); our animation runs
-~11 frames/node vs native ~1.5-5 (visibly slower).
+Measured on 4f8220fc: 6 damage events / 10 total damage == native
+exactly; 3 loop iterations; cadence 1-5f; mash extends 3 -> 4
+iterations on BOTH games (mash was never broken — 14z-38 theory
+retired). Gate: test_don_reactions.sh extended (total <= 10,
+last-hit <= f2700) — PASS. Replays 51/52/53 promoted with native
+datums in headers. Engine internals: walker node format + freeze
+subsystem documented (docs/engine_internals.md); RAM atlas +0x5C /
++0x147 / +0x20 / +0x32 rows added.
 
-ROOT CAUSE PINPOINTED (14z-40/41): the move's anim runs through the
-PORTED vs2 walker block (region x026142, placed at PRG:0x0CD390, len
-0x1440; walker node-write PC ours 0xCE38A == vs2 0x2713C). The block
-is byte-faithful except relocations. Divergence = **the reconciled
-engine call at region+0xA8 (ours 0xCD438): vs2 0x082AE2 -> vsavj
-0x073376. vs2's routine is a SPAWNER** (jsr 0x15702 alloc; beq;
-move.l #$01006000,(a4); move.w a6,$30(a4) — TWICE = two owner-linked
-support objects). **vsavj 0x73376 is an instruction-fragment tail
-falling into rts = accidental stub — the objects never spawn.**
+## IMMEDIATE: if the battery was not green at session end
 
-Plan:
-1. Native role-tap: run `tmp` replay 48_immortal_v2 on vsav2 (P1
-   Donovan R,R; 421+HP at 2610-2624; POKES supported in replay.lua/
-   replay_guard.lua/tap_writes.lua as "frame:addr:hexbytes;...").
-   Find the two spawned objects (tap writes of 0x01006000, or scan
-   obj RAM ff9000+ for new alive objs at move start) and observe
-   their behavior (hit pacing? input sampling?).
-2. Find vsavj's true analog: search vsavj opcodes for the spawn
-   pattern (jsr <alloc>; 671c; 28bc 0100...) — also verify what
-   vs2 0x15702's vsavj analog is (the shared alloc). If no analog,
-   port the ~0x30-byte helper (reconciliation patched_clone class or
-   site_thunk-placed code) with its alloc call reconciled.
-3. Fix the reconciliation row (build/manifest/reconciliation.toml,
-   the row mapping 0x082AE2; current wrong vsavj = 0x073376), rebuild,
-   measure: replay tests/replays/48_don_immortal_ko.rpl no-poke ->
-   expect ~6-7 hits (HP version, this spacing) and node cadence
-   1.5-5f (tap ff841c with REGLOG; walker PC changes from 0xCE38A
-   pattern). Fatal path must still reach grounded node 0x158210.
-4. Gate: extend tests/test_don_reactions.sh — no-mash hit-count upper
-   bound (<=7 for HP at this spacing) + keep existing asserts. Then
-   full battery; watch the frozen flicker inventory (standing watch).
+Check the tail of the battery log first. Watch items: the freeze
+thunks hook LEGACY code (0x23AD8/0x23ADE) — hook cycle skew may
+shift the frozen flicker inventory (standing watch: mechanism-
+attribute any drift, maintainer sign-off, never silently refreeze).
 
-Measurement kit: replays in tests/replays/ (48 = deity KO w/ HP poke
-2600:ff8850:00010001; 50 = column crash, guarded); scratch replays in
-/Users/koneko/.claude/jobs/*/tmp are GONE next session — recreate from
-the replay comments. P2 HP = ff8850 (word, +white at ff8852). P1 obj
-ff8400 (+0x1C anim node, +0x382 char id); P2 ff8800. Deity = P1's own
-anim. vs2-side replay: picks P1 R,R / P2 R,R, motion L,D,DL+3.
+## Queued next (in order)
 
-## Queued after (in order)
-
-1. Region-tail zeroed routine (x026142+0x142E, ours 0xCE7BE): the
-   table_fix pad zeroed a per-char lookup (`move.w $100(a5),d0;
-   move.w (pc-table,d0),$1A(a6); rts`). Audit callers (search for
-   jsr/jmp to 0xCE7BE or region+0x142E refs); restore if called.
-2. Swordless-deity palette (yellow vs vs2 blue figure/lightning —
+1. **Maintainer round: Lightning Sword** — expect confirmation of
+   hit counts (base ~6-7 HP at range) and speed; ask about LP/MP/ES
+   versions if they test them (our fix is strength-independent —
+   the constants live in the shared reaction handler).
+2. ~~Region-tail zeroed routine (x026142+0x142E)~~ CLOSED 14z-42:
+   no callers (vs2's only ref = engine init bsr at 0x20C9E, never
+   ported; built image has zero refs to 0xCE7BE). Dead code.
+3. Swordless-deity palette (yellow vs vs2 blue figure/lightning —
    maintainer captures round 41). Same family as the deity's obj
    palette rows; untouched so far.
-3. Select-screen post-confirm blink (tracked minor): select-venue
+4. Select-screen post-confirm blink (tracked minor): select-venue
    objs lack +0x3A4 (cached block ptr) -> the color-aware accent
    thunks fall back to punch-color slots on that screen only. Fix
    shape: select-venue init of +0x3A4 or owner-link fallback.
-4. ES Change Immortal presentation (records remapped to plain class
+5. ES Change Immortal presentation (records remapped to plain class
    0x4E-copy interim; vs2 intent = class 0x51/property 0x19) — ask
    maintainer if wanted.
-5. Sounds: Donovan sfx silent by design (stubbed_sound rows; M5 task
+6. Sounds: Donovan sfx silent by design (stubbed_sound rows; M5 task
    = dispatcher id-table translation, NOT unstubbing the helper —
-   see reconciliation row note at vsav2=0x005122).
+   see reconciliation row note at vsav2=0x005122). NOTE from 14z-42:
+   the walker's per-node sfx call site and its param tables are now
+   mapped (engine_internals walker section) — useful for M5.
+
+## Measurement kit (14z-42-proven)
+
+- Replays: 48 = deity KO (HP poke 2600:ff8850:00010001 via POKES
+  env); 51 = NATIVE vs2 no-mash ground truth; 52/53 = mash pair
+  (native/ours); 50 = column crash (guarded).
+- P2 HP = ff8850.w; P1 obj ff8400 (+0x1C anim node, +0x20 node
+  timer, +0x5C freeze, +0x147 re-hit gate, +0x382 char id).
+- tap_writes.lua (no debugger, replay-exact frames): TAP=addr,len
+  WINDOW=a,b REPLAY=... TRACE_OUT=...; GUARD_PROBE=hexaddr on
+  run_replay_guarded.sh for "does PC X execute" (D0/D1/A0/A6/RET
+  logged; -debug mode: moves still come out, verified 14z-42).
+- Node-sequence/cadence/hit-period analysis one-liners: session
+  14z-42 transcript scripts (parse tap logs, pair ff841c/ff841e
+  writes, dedup consecutive, Counter loop visits).
 
 ## Gotchas most likely to bite next session
 
+- A cited address in a session log is a CLAIM — grep the manifest
+  and xxd the built image before building a theory on it (the
+  14z-41 one-digit misread; GOTCHAS).
+- Engine-side tuning constants (freeze/shake/gravity) can drift
+  between engine generations with zero ported-byte differences —
+  A/B-tap the obj fields at event frames, don't audit bytes only.
 - Read embedded/code tables from the right image: opcodes.bin for
-  CODE, data.bin for embedded DATA (decrypt split). Zip program bytes
-  are encrypted in 0x000000-0x100000 (hole a) — placed code there is
-  stored re-encrypted; data-carrying thunks must use hole b.
-- A0-in-REGLOG is post-increment (subtract batch size before deriving
-  windows). Controls must vary the dimension under test (same-slot
-  "controls" control nothing).
-- POKE VALUES feed the CPU AI — any poke change reshuffles downstream
-  choreography in multi-round scripted replays.
-- The battery script builds donovan6 itself — never rebuild while it
-  runs. Background any run >10 min.
+  CODE, data.bin for embedded DATA. zsh eats `===` in echo args.
+- POKE VALUES feed the CPU AI — any poke change reshuffles
+  downstream choreography in multi-round scripted replays.
+- The battery script builds donovan6 itself — never rebuild while
+  it runs. Background any run >10 min.
 - ROMDIR must pass tools/audit_roms.py first; keep it play-free.

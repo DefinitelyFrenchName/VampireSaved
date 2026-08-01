@@ -46,6 +46,32 @@
 | `PRG:0x018458` | 0x6 | GEN | reaction_hook engine site |
 | `PRG:0x0CC020` | 0x44 | GEN | pool-seed + flavor(+Start-hold) init shim |
 | `PRG:0x0B19F8` | 0xE50 | VS2 | data_port throw_victim_keyframes (vsav2 0xca1ca) |
-| `PRG:0x39FBE0` | 0x40 | VS2 | data_port weapon_accent_rows (vsav2 0x39cbdc) |
-| `PRG:0x39FC20` | 0x20 | VS2 | data_port weapon_accent_tail (vsav2 0x39cbec) |
-| `PRG:0x39B040` | 0x40 | VS2 | data_port statue_accent_rows (vsav2 0x38d1a0) |
+| `PRG:0x39FBE0` | 0x20 | VS2 | data_port weapon_accent_t0 (vsav2 0x39cbdc) |
+| `PRG:0x39FC00` | 0x20 | VS2 | data_port weapon_accent_t1 (vsav2 0x39cbdc) |
+| `PRG:0x39FC20` | 0x20 | VS2 | data_port weapon_accent_rowd_slot (vsav2 0x39cbfc) |
+| `PRG:0x028D50` | 0x4 | VS2 | data_port hit_class_props_ext_hi (vsav2 0x28028) |
+| `PRG:0x3FFCB0` | 0x62 | GEN | site_thunk fixture_row0f_override_bank0 |
+| `PRG:0x01C586` | 0x6 | GEN | site_thunk fixture_row0f_override_bank0 engine site |
+| `PRG:0x3FFD20` | 0x62 | GEN | site_thunk fixture_row0f_override_bank1 |
+| `PRG:0x01C59A` | 0x6 | GEN | site_thunk fixture_row0f_override_bank1 engine site |
+| `PRG:0x0CF310` | 0x18 | GEN | site_thunk select_companion_tbl_a |
+| `PRG:0x0845EC` | 0x6 | GEN | site_thunk select_companion_tbl_a engine site |
+| `PRG:0x0CF330` | 0x18 | GEN | site_thunk select_companion_tbl_b |
+| `PRG:0x0845F8` | 0x6 | GEN | site_thunk select_companion_tbl_b engine site |
+| `PRG:0x0FFF40` | 0x22 | GEN | site_thunk select_companion_resolve_s1 |
+| `PRG:0x084602` | 0x6 | GEN | site_thunk select_companion_resolve_s1 engine site |
+| `PRG:0x0FFF70` | 0x22 | GEN | site_thunk select_companion_resolve_s2 |
+| `PRG:0x084624` | 0x6 | GEN | site_thunk select_companion_resolve_s2 engine site |
+| `PRG:0x0CF350` | 0x1C | GEN | site_thunk accent_color_aware_0 |
+| `PRG:0x02AD82` | 0x6 | GEN | site_thunk accent_color_aware_0 engine site |
+| `PRG:0x0FFFA0` | 0x1C | GEN | site_thunk accent_color_aware_1 |
+| `PRG:0x02AD94` | 0x6 | GEN | site_thunk accent_color_aware_1 engine site |
+| `PRG:0x0FFFC0` | 0x1C | GEN | site_thunk accent_color_aware_2 |
+| `PRG:0x02B342` | 0x6 | GEN | site_thunk accent_color_aware_2 engine site |
+| `PRG:0x0FFFE0` | 0x1C | GEN | site_thunk accent_color_aware_3 |
+| `PRG:0x02B7E8` | 0x6 | GEN | site_thunk accent_color_aware_3 engine site |
+| `PRG:0x3FFD90` | 0x2A | GEN | site_thunk ls_freeze_vs2_victim |
+| `PRG:0x023AD8` | 0x6 | GEN | site_thunk ls_freeze_vs2_victim engine site |
+| `PRG:0x3FFDC0` | 0x24 | GEN | site_thunk ls_freeze_vs2_attacker |
+| `PRG:0x023ADE` | 0x6 | GEN | site_thunk ls_freeze_vs2_attacker engine site |
+| `PRG:0x084594` | 0x2 | GEN | code_word select_companion_entry_0f |

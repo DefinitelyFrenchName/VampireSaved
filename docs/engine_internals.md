@@ -311,3 +311,47 @@ stop and root-cause before any freeze.
   per-chain record/tile inventory is exact (naive walks wander into
   neighbors' chains); then art placement (Jedah's freed pool: ~1,072
   positions left after the select placements).
+
+## Anim-script walker + hit-freeze / reaction subsystem (session 14z-42, measured)
+
+The per-object anim interpreter ("walker") both engines share
+(vs2 block 0x26142-0x27582; vsavj twin family at 0x27Exx; our port of
+the vs2 block sits at PRG:0x0CD390, so ported-object node writes show
+PC 0xCE38A = vs2 0x2713C + port offset):
+
+- **Node format (0x18 bytes):** +0 duration byte — loaded into
+  obj+0x20 as a countdown (`move.l (a0),$20(a6)` on node set;
+  decrement at vs2 0x271C4 `subq.b #1,$20(a6)`, ours 0xCE412); +1
+  flags (bit7 = follow the LINK at +0x18 instead of advancing
+  sequentially — loop-backs are links, e.g. the Lightning Sword loop
+  node 0x284A48 links +0x18 -> 0x284988); +4.l sprite-record ptr;
+  +8.w/+0xA hitbox-family words; +0x10.. the [cf14]..[0b] script-op
+  area; +0x16 byte nonzero -> per-node sfx (jsr 0x5122 on vs2 with
+  d1/d2/d3 from the per-char table 0xD95B8 — the call our
+  stubbed_sound row silences).
+- **Node write:** `move.l a0,$1c(a6)` at vs2 0x2713C. Two writes in
+  one frame = a zero/1-duration chain, normal.
+- **Hit-freeze ("the floating holds"):** on each connected hit the
+  victim-side reaction handler freezes BOTH parties via obj+0x5C
+  (walker timer hold — obj+0x20 simply stops decrementing while
+  +0x5C runs). Because freezes track hit frames, holds float across
+  nodes between loop iterations; they are NOT data durations.
+- **Victim-reaction handlers** (dispatched per hit; the electric-
+  shake one: vs2 0x226E0 == vsavj 0x23AC8, structural twins, probed
+  1 hit = 1 entry): write victim +0x5C / attacker +0x5C (attacker
+  found via victim+0x32 link), +0x14E=4, victim +0x120->+0x0B,
+  +0x3A->+0x14, clr +0x16, then property-table lookup
+  (vs2 0x27FD8 == vsavj 0x28D00, byte-identical through class 0x4D)
+  -> reaction node. **ENGINE-GENERATION DRIFT: the constants.**
+  vsavj (older): victim 0x18, attacker 0x0B, no +0x147 write.
+  vs2 (newer): victim 0x0C, attacker 0x04, PLUS victim +0x147=0x0C —
+  and **+0x147 is the multi-hit re-hit gate** (period ~10f with it,
+  ~victim-freeze-length without it: vsavj-constants gave 12f, vs2
+  freeze without $147 gave 7f, vs2 full semantics 10f).
+- **Mash extension:** extends the LOOP-LINK iteration count (3 base
+  -> 4 measured with LP/MP-alternating mash on both games; maintainer
+  max-mash datums 5/9/11 per strength). The mechanism is
+  engine-equivalent between the games — no port surface.
+- Our fix for Donovan-attributed electric hits:
+  ls_freeze_vs2_{victim,attacker} site_thunks at vsavj
+  0x23AD8/0x23ADE (see donovan.toml 14z-42 block).
