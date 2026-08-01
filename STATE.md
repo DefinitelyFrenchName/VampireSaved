@@ -21,6 +21,31 @@ state superseded)
   ($FF8782 reads exactly 0x0F at the sites' run time in a real match
   flow, both mirror sides trigger).
 
+## Session 14z-33 (COLUMN CRASH FIXED — record-type dispatch aliases; permanent guarded gate)
+
+- Root cause (completing 14z-32's decode): the column's KO records
+  carry vs2's EXTENDED record types (3x 0x52 + 6x 0x50 in region
+  hitbox_proj, record stride 0x20); vsavj's record-type dispatch
+  table (0x185CC family) ends at entry 0x4F -> those types fetch CODE
+  BYTES as jump displacements (0x52 -> 0xB26D -> odd jmp = the vec3
+  reset). The 14z-32 "content-match over-reach" theory was WRONG (the
+  aux0 regions are proper ports; retracted) — the data was faithful;
+  the ENGINE's table was short. Same +6-extension pattern as the hit
+  classes (0x4E-0x53), one table deeper.
+- FIX: region_fix type-byte remaps, alias-PROVEN by vs2's own
+  dispatch table (the 14z-27 lesson codified: remap only when the
+  source engine itself proves equivalence): 0x52 -> 0x06 (vs2 words
+  identical) and 0x50 -> 0x0F (same). All 9 records fixed. The
+  type-0x51 cluster (region hitbox, 0xC9CA1+ stride 0x20 — likely the
+  SWORDED variant's records) is NOT alias-provable from the table
+  read (entry 0x51's vs2 word = 0x0BA, inside-table anomaly) — LOGGED
+  UNTOUCHED; if a sworded-421P context ever faults, start there.
+- Verified: guarded crash replay END-clean; visual = SPECIAL FINISH +
+  YOU WIN over a properly downed victim (this KO path even ends
+  correctly downed). Permanent gate tests/test_don_column.sh (guarded
+  replay 50, battery 3d).
+- The plant = QCB+K (214K) — replay 50 documents the working input.
+
 ## Session 14z-32 (round 45: blink fix CONFIRMED everywhere but the select screen; column-crash fix session)
 
 - Round-45 maintainer: blinking gone in-match for all colors ✓; ONE

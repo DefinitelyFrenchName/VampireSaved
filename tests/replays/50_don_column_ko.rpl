@@ -1,0 +1,24 @@
+# 50: swordless-421P column KO (14z-31..33): plant via QCB+HK (214K,
+# the flavor-consuming throw; sword lands right side), P2 walks onto
+# it, HP poked to 1 (gate env), column kill. Crashed with vec3 before
+# the 14z-33 record-type alias remaps; must run END-clean guarded.
+300-305 sys=C1
+420-425 sys=C2
+800-803 sys=S1
+940-943 sys=S2
+1100-1102 p1=U
+1160-1162 p1=U
+1220-1222 p1=R
+1104-1106 p2=R
+1164-1166 p2=R
+1300-1302 p1=1
+1360-1362 p2=1
+2650-2654 p1=D
+2655-2659 p1=DL
+2660-2668 p1=L
+2664-2670 p1=6
+2900-2904 p1=D
+2905-2909 p1=DL
+2910-2918 p1=L
+2914-2920 p1=3
+3400 wait

@@ -966,3 +966,12 @@ Session 14z-31 (color-aware accent; crash pinpointed):
   guarded fault: vec3 @ PC 0x185D8, A3=0xCAA5A (vanilla Jedah attack
   data) on the column projectile's KO — unported record pointer;
   repoint next session.
+
+Session 14z-33 (column crash fixed):
+- 9 region_fix rows in hitbox_proj: record types 0x52->0x06 (x3) and
+  0x50->0x0F (x6) — vs2-dispatch-alias-proven remaps; vsavj's
+  record-type table ends at 0x4F and fetched code bytes as jump
+  displacements (vec3 reset). 14z-32's content-match theory retracted
+  (aux0 ports are correct). Type-0x51 cluster logged untouched (no
+  alias proof). Gate: tests/test_don_column.sh (guarded replay 50) +
+  battery 3d.

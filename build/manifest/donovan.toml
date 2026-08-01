@@ -851,3 +851,90 @@ site = 0x02B7E8
 old_hex = "207c0039a900"
 thunk_hex = "0c2e000f0382660c202e03a46706204070024e75207c0039a9004e75"
 
+
+# 14z-33: COLUMN-CRASH FIX (round-45 go-ahead; full decode in STATE
+# 14z-31/32). The swordless-421P column's KO record (hitbox_proj
+# +0x27A) carries vs2's EXTENDED record type 0x52; vsavj's record-type
+# dispatch table (0x185CC family) ends at entry 0x4F, so type 0x52
+# fetches CODE BYTES as the jump displacement (0xB26D -> odd-address
+# jmp = the vec3 reset). vs2's own table maps type 0x52 to the SAME
+# handler as types 6/7 (displacement alias) — so remapping the type
+# byte to 0x06 is semantically identical BY VS2'S OWN DEFINITION (the
+# lesson of the 14z-27 class-remap failure applied: only remap when
+# the source engine itself proves equivalence).
+[[region_fix]]
+stage = 6
+region = "hitbox_proj"
+off = 0x291
+old_hex = "52"
+new_hex = "06"
+note = "column KO record type 0x52 -> 0x06 (vs2 dispatch alias; vsavj table ends at 0x4F -> wild jump)"
+
+# 14z-33 sweep: the column's sibling records + the type-0x50 set
+# (all alias-proven by vs2's own dispatch table; the type-0x51
+# cluster in region hitbox is NOT alias-provable yet — logged in
+# STATE, untouched).
+[[region_fix]]
+stage = 6
+region = "hitbox_proj"
+off = 0x2b1
+old_hex = "52"
+new_hex = "06"
+note = "column sibling hit record, same type-0x52 alias remap (would crash on its own kill timing)"
+
+[[region_fix]]
+stage = 6
+region = "hitbox_proj"
+off = 0x2d1
+old_hex = "52"
+new_hex = "06"
+note = "column sibling hit record, same type-0x52 alias remap (would crash on its own kill timing)"
+
+[[region_fix]]
+stage = 6
+region = "hitbox_proj"
+off = 0x131
+old_hex = "50"
+new_hex = "0f"
+note = "extended record type 0x50 -> 0x0F (vs2 dispatch alias: entry 0x50 word 0x16E == entry 0x0F's; same wild-jump class past vsavj's 0x4F table end)"
+
+[[region_fix]]
+stage = 6
+region = "hitbox_proj"
+off = 0x151
+old_hex = "50"
+new_hex = "0f"
+note = "extended record type 0x50 -> 0x0F (vs2 dispatch alias: entry 0x50 word 0x16E == entry 0x0F's; same wild-jump class past vsavj's 0x4F table end)"
+
+[[region_fix]]
+stage = 6
+region = "hitbox_proj"
+off = 0x2f1
+old_hex = "50"
+new_hex = "0f"
+note = "extended record type 0x50 -> 0x0F (vs2 dispatch alias: entry 0x50 word 0x16E == entry 0x0F's; same wild-jump class past vsavj's 0x4F table end)"
+
+[[region_fix]]
+stage = 6
+region = "hitbox_proj"
+off = 0x311
+old_hex = "50"
+new_hex = "0f"
+note = "extended record type 0x50 -> 0x0F (vs2 dispatch alias: entry 0x50 word 0x16E == entry 0x0F's; same wild-jump class past vsavj's 0x4F table end)"
+
+[[region_fix]]
+stage = 6
+region = "hitbox_proj"
+off = 0x331
+old_hex = "50"
+new_hex = "0f"
+note = "extended record type 0x50 -> 0x0F (vs2 dispatch alias: entry 0x50 word 0x16E == entry 0x0F's; same wild-jump class past vsavj's 0x4F table end)"
+
+[[region_fix]]
+stage = 6
+region = "hitbox_proj"
+off = 0x351
+old_hex = "50"
+new_hex = "0f"
+note = "extended record type 0x50 -> 0x0F (vs2 dispatch alias: entry 0x50 word 0x16E == entry 0x0F's; same wild-jump class past vsavj's 0x4F table end)"
+
