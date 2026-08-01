@@ -332,9 +332,26 @@ for _, group in pairs(FIELDS) do
 end
 local pressed = {}
 
+-- POKES="frame:addr:hexbytes;..." — scheduled RAM writes (mirrors
+-- replay.lua / tap_writes.lua; lets guarded runs use HP-poke repros)
+local pokes = {}
+for spec in (os.getenv("POKES") or ""):gmatch("[^;]+") do
+    local fr, addr, hexs = spec:match("^(%d+):(%x+):(%x+)$")
+    if fr then pokes[#pokes + 1] = { tonumber(fr), tonumber(addr, 16), hexs } end
+end
+
 emu.register_frame_done(function()
     if crashed then return end
     frame = frame + 1
+    for _, pk in ipairs(pokes) do
+        if pk[1] == frame then
+            local a = pk[2]
+            for b in pk[3]:gmatch("%x%x") do
+                program:write_u8(a, tonumber(b, 16))
+                a = a + 1
+            end
+        end
+    end
 
     f:write(string.format("%d %016x\n", frame, fnv1a64(program:read_range(0xff0000, 0xffffff, 8))))
     if snap_at[frame] then machine.video:snapshot() end

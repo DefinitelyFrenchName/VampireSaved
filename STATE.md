@@ -21,6 +21,37 @@ state superseded)
   ($FF8782 reads exactly 0x0F at the sites' run time in a real match
   flow, both mirror sides trigger).
 
+## Session 14z-30 (round 43: crash triage — repro scaffold built, blocked on the plant input; classification of the other reports)
+
+Round-43 reports classified:
+1. "421P lost electric/shock properties" — EXPECTED interim: the
+   current build's class/property state is byte-identical to the
+   round-38 builds (the revert); the victim shake returns with
+   consumers 2+3.
+2. **CRASH (blocker): swordless 421P round-ending kill with the victim
+   at the planted-sword location (user: vs Morrigan).** Repro scaffold
+   built (49_column_ko_wip: plant -> P2 walks onto the sword -> HP
+   poke -> column kill, guarded + POKES now supported in
+   replay_guard.lua) but BLOCKED: scripted 421K does not produce the
+   plant (tried HK + LK with the deity-proven motion shape; LK gives
+   a low sword action that ends re-armed). NEED FROM MAINTAINER: the
+   exact plant input nuance (button? held? ES/meter? special state?)
+   — or whether the crash also occurs with the SWORDED 421P at
+   point-blank. Suspicion: the swordless variant's attack records
+   (hitbox_proj region?) carry extended classes or the KO path for
+   that variant runs vs2-only code; scan hitbox_proj for classes >
+   0x49 next.
+4. "Sword/statue blinking again (grey shades)" — the normal-state
+   accent rows are GATE-VERIFIED steady on this exact build (battery
+   green, test_don_accent). Hypothesis: the blink lives in the
+   PLANTED-SWORD state (a separate accent surface for the swordless
+   weapon rows — same family as the fixed one, new territory from the
+   round-43 421K testing). NEED FROM MAINTAINER: does the blink
+   appear from round start, or only after a 421K plant?
+5. Auras yellow ✓ (no regression).
+- Select-web: P1 default hover = Demitri (0x04); U,U,D,D = Aulbath
+  (0x09). 0x08/0x0B (Morrigan/Lilith candidates) still unmapped.
+
 ## Session 14z-29 (consumer-trace session: supplementary facts; repo stays at the 14z-28 interim)
 
 Started the per-consumer extension (round-42 go-ahead). Facts added

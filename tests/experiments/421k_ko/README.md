@@ -36,3 +36,21 @@ mid-range slide? victim airborne or grounded?) OR systematic spacing
 sweep landing the hard-knockdown hit as the killer. Then: compare the
 victim's node path at match-end vs round-end KO (dump obj+0x1C as in
 these scripts) and trace the divergence writer.
+
+## Session 14z-30 additions (round-43 triage)
+
+- 49_column_ko_wip.rpl: the crash-repro scaffold (plant -> P2 walks
+  onto the sword -> HP poke -> swordless 421P kill). BLOCKED on the
+  plant: scripted 421+K (both LK and HK, deity-proven motion shape)
+  does not produce the sword plant — 421LK yields a low sword action
+  that ends re-armed. Needs the maintainer's exact plant input
+  (button/hold/meter?) or a savestate.
+- The SWORDED 421P round-end KO on the current interim build
+  reproduces the NEUTRAL-POSE end cleanly with Victor (SPECIAL FINISH
+  over a standing victim) — usable as the consumer-3 test case.
+- replay_guard.lua now supports POKES (guarded crash repros with HP
+  pokes).
+- P2 select-web additions: U (from default) = 0x04 Demitri hover;
+  U,U,D,D = 0x09 Aulbath. Ids 0x08/0x0B still unreached (Morrigan/
+  Lilith candidates); crash repro may not need them if the crash is
+  position- not char-specific.
