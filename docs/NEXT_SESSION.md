@@ -4,18 +4,11 @@ Updated: session 14z-19 (2026-07-31).
 
 ## Where things stand
 
-Round-35 playtest showed the 14z-18 blink fixes had FAILED — and the
-statue "fix" was a silent **superset violation** (it overwrote VICTOR's
-accent rows at 0x39B040; palette rows 0x10+ are the **P2 character's**
-rows, not statue rows). Session 14z-19 reverted it, understood the real
-mechanism (the engine MARCHES row 0x0C through accent slots T0/T1 —
-overlapping windows, the slide is Jedah's glow animation), and fixed the
-sword blink properly: both marched slots now hold vs2 row-C content.
-Measured: row 0x0C steady + byte-equal to native vs2 over the idle
-window; Victor's glow cycle restored. New permanent gate:
-`tests/test_don_accent.sh` (static byte guards + behavioral steadiness +
-Victor-cycle-alive). Full corrected model: STATE.md 14z-19; traps paid:
-docs/GOTCHAS.md (P2-row attribution; A0 post-increment second payment).
+Round-46: the column crash is CONFIRMED FIXED and the swordless 421P
+has its shock back (the record-type remaps route presentation too —
+STATE 14z-34). Every blocker is closed. The shipped build f500a6bc
+carries: select-screen sword, color-aware accent (no blinking any
+color, in-match), correct auras, column KO clean.
 
 ## Next work, in order
 
@@ -37,11 +30,14 @@ docs/GOTCHAS.md (P2-row attribution; A0 post-increment second payment).
 2. **CLOSED 14z-21 (no bug):** alt-color + Donovan mirror are
    byte-identical to native vs2; table B is never consulted on
    Donovan's paths. Locked in tests/test_don_colors.sh.
-2b. **DONE 14z-24 — select-screen sword FIXED and live at stage 6**
-   (draw-behind flag +0x3C, the vs2-only instruction; STATE 14z-24).
-   Gate: test_don_colors.sh section 3. Await maintainer playtest of
-   the select screen (sword should sit tucked behind the sprite,
-   hilt over the head — matching vs2).
+2b. **Sworded-421P shock + death (supersedes the consumer-2/3 plan):**
+   port vs2's small dedicated type-0x51 handler (dispatch+0xBA in
+   vs2) and route type 0x51 to it (thunk at the dispatch's
+   `d040 303b 0006`, testing d0==0xA2). Full analysis: STATE 14z-34.
+   Then re-evaluate whether the hit-class property extension is still
+   needed. Remaining cosmetics after: swordless-deity palette,
+   select-screen post-confirm blink (tracked minor).
+
 3. Then the queue: speed-mode PvP
    anomalies (not urgent per maintainer), win-quote/HUD palettes.
 

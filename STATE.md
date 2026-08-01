@@ -21,6 +21,28 @@ state superseded)
   ($FF8782 reads exactly 0x0F at the sites' run time in a real match
   flow, both mirror sides trigger).
 
+## Session 14z-34 (round 46: crash fix CONFIRMED + swordless shock RESTORED — the record-type insight reframes the remaining queue)
+
+- Maintainer: crash no longer reproducible ✓ AND Morrigan gets the
+  proper shock effect on swordless 421P ✓ — the type remaps restored
+  the hit PRESENTATION too: the record TYPE (not only the hit class)
+  routes the reaction/shock. Types 0x0F/0x06 = electric-presentation
+  record families.
+- REFRAME of the open queue: the SWORDED 421P's missing shock (the
+  14z-28 interim) is likely the SAME mechanism — its records are the
+  type-0x51 cluster (region hitbox, 0xC9CA1+ stride 0x20). Re-analysis
+  of vs2's dispatch: entry 0x51 -> displacement 0x0BA = PAST the
+  table end = a small DEDICATED vs2 handler (not an alias — the
+  earlier "inside-table anomaly" was a miscount; vs2's table = 0x54
+  entries/0xA8 bytes, so 0xBA is a legit handler just after it).
+  Type 0x51 = genuinely new vs2 behavior -> next session: port that
+  small handler (patched_clone class) + route type 0x51 to it via a
+  thunk at the dispatch's `d040 303b 0006` site (6 bytes; bounds-
+  extend for d0==0xA2), then the sworded shake/death and possibly the
+  whole consumer-2/3 plan collapse into this one port. The property-
+  table extension (consumer 1) may become redundant — re-evaluate
+  after the handler port.
+
 ## Session 14z-33 (COLUMN CRASH FIXED — record-type dispatch aliases; permanent guarded gate)
 
 - Root cause (completing 14z-32's decode): the column's KO records
