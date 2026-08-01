@@ -938,3 +938,61 @@ old_hex = "50"
 new_hex = "0f"
 note = "extended record type 0x50 -> 0x0F (vs2 dispatch alias: entry 0x50 word 0x16E == entry 0x0F's; same wild-jump class past vsavj's 0x4F table end)"
 
+
+# 14z-35: the type-0x51 record cluster (region hitbox, 6 records —
+# ES-variant deity hits by position). vs2's type-0x51 handler is
+# byte-identical to VSAVJ'S OWN types-0x4E/0x4F handler (`move.b
+# $17(a3),$54(a1); rts` — the engines RENUMBERED this record family;
+# 'hit class' == record type for it). On vsavj, type 0x51 indexes
+# PAST the dispatch table = wild jump = LATENT CRASH on whatever move
+# fires these records. Remap 0x51 -> 0x4E (the identical vsavj
+# handler; the resulting victim class becomes 0x4E = the same family
+# as the rest of the deity's hits — consistent interim semantics).
+[[region_fix]]
+stage = 6
+region = "hitbox"
+off = 0x10e9
+old_hex = "51"
+new_hex = "4e"
+note = "ES-deity record type 0x51 -> 0x4E (vsavj copy-class handler; latent wild-jump preempted)"
+
+[[region_fix]]
+stage = 6
+region = "hitbox"
+off = 0x1109
+old_hex = "51"
+new_hex = "4e"
+note = "ES-deity record type 0x51 -> 0x4E (vsavj copy-class handler; latent wild-jump preempted)"
+
+[[region_fix]]
+stage = 6
+region = "hitbox"
+off = 0x1129
+old_hex = "51"
+new_hex = "4e"
+note = "ES-deity record type 0x51 -> 0x4E (vsavj copy-class handler; latent wild-jump preempted)"
+
+[[region_fix]]
+stage = 6
+region = "hitbox"
+off = 0x1149
+old_hex = "51"
+new_hex = "4e"
+note = "ES-deity record type 0x51 -> 0x4E (vsavj copy-class handler; latent wild-jump preempted)"
+
+[[region_fix]]
+stage = 6
+region = "hitbox"
+off = 0x1169
+old_hex = "51"
+new_hex = "4e"
+note = "ES-deity record type 0x51 -> 0x4E (vsavj copy-class handler; latent wild-jump preempted)"
+
+[[region_fix]]
+stage = 6
+region = "hitbox"
+off = 0x1189
+old_hex = "51"
+new_hex = "4e"
+note = "ES-deity record type 0x51 -> 0x4E (vsavj copy-class handler; latent wild-jump preempted)"
+

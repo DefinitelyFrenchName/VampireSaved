@@ -975,3 +975,11 @@ Session 14z-33 (column crash fixed):
   (aux0 ports are correct). Type-0x51 cluster logged untouched (no
   alias proof). Gate: tests/test_don_column.sh (guarded replay 50) +
   battery 3d.
+
+Session 14z-35 (type-0x51 cluster: latent crash preempted):
+- 6 region_fix rows (region hitbox): ES-deity record types 0x51 ->
+  0x4E. vs2's type-0x51 handler is byte-identical to vsavj's
+  types-0x4E/0x4F handler (the copy-class six-byte routine at
+  0x1868C); on vsavj type 0x51 indexed past the 0x50-entry dispatch
+  table (wild jump). No handler port needed — the renumbering insight
+  closes the record-type saga.

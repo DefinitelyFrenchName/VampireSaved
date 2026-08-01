@@ -21,6 +21,34 @@ state superseded)
   ($FF8782 reads exactly 0x0F at the sites' run time in a real match
   flow, both mirror sides trigger).
 
+## Session 14z-35 (type-0x51 cluster resolved — the engines RENUMBERED the copy-class record family; latent crash preempted)
+
+- Read vs2's "dedicated" type-0x51 handler: SIX BYTES — `move.b
+  $17(a3),$54(a1); rts` = "copy my type byte into the victim's
+  hit-class field". VSAVJ HAS THE IDENTICAL HANDLER — serving ITS
+  types 0x4E/0x4F (it is the class-writer PC 0x1868C from the 14z-26
+  taps). The engines renumbered this record family; for it, "hit
+  class" == record type. This RECONCILES the whole arc: the sworded
+  deity's 0x4E records already used vsavj's copy handler correctly
+  (same semantics by luck of the numbering); no handler port needed
+  anywhere.
+- The 6-record type-0x51 cluster (region hitbox, 0xC9CA1+ stride
+  0x20, 3 distinct records x2 — ES-variant deity hits by position) =
+  LATENT WILD-JUMP CRASHES on vsavj (type 0x51 indexes past the
+  0x50-entry dispatch table). Remapped 0x51 -> 0x4E (region_fix x6):
+  identical handler, victim class 0x4E = consistent with the rest of
+  the deity family. Preempted before any playtest hit it (probably
+  the ES Change Immortal KO).
+- Dispatch-table geometry corrected on the record: vsavj table = 0x50
+  entries (0x00-0x4F; 0xA0 bytes; first handler at +0xB2 after a
+  0x12-byte gap); vs2 table = 0x54 entries (0x00-0x53).
+- Queue after this: the sworded-421P on-hit shake/death (= the
+  original consumer-2/3 property work — the type insight did NOT
+  supersede it after all, since the sworded records were already
+  correctly classed 0x4E; their missing shake = the property-table
+  interim, unchanged), swordless-deity palette, select-screen
+  post-confirm blink (tracked).
+
 ## Session 14z-34 (round 46: crash fix CONFIRMED + swordless shock RESTORED — the record-type insight reframes the remaining queue)
 
 - Maintainer: crash no longer reproducible ✓ AND Morrigan gets the
