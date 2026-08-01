@@ -68,6 +68,15 @@ def check(sub, rows, tag):
         assert got == exp, f"{tag}: row {row:#04x} drifted:\n  got {got}\n  exp {exp}"
     print(f"  ok: {tag} rows match frozen native set ({len(rows)} rows)")
 check('alt', ALT, 'kick-color pick')
+# 14z-31: the accent march must be COLOR-AWARE — kick-color row 0x0C
+# steady across frames (the round-44 grey blink = punch-color accent
+# slots cycling against alt bases; fixed by the accent_color_aware
+# thunks reading the object's cached block ptr).
+d0 = open(os.path.join(work, 'alt', 'dump_2440_90c000.bin'), 'rb').read()
+d1 = open(os.path.join(work, 'alt', 'dump_2450_90c000.bin'), 'rb').read()
+assert d0[0x180:0x1A0] == d1[0x180:0x1A0] == bytes.fromhex(ALT[0x0c]), \
+    "kick-color row 0x0C blinks or drifted (accent not color-aware)"
+print("  ok: kick-color sword row steady (color-aware accent)")
 check('mirror', MIR, 'Donovan mirror')
 EOF
 echo "PASS: Donovan color-set gate (alt + mirror native-locked)"

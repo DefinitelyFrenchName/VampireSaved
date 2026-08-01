@@ -21,6 +21,46 @@ state superseded)
   ($FF8782 reads exactly 0x0F at the sites' run time in a real match
   flow, both mirror sides trigger).
 
+## Session 14z-31 (round 44: BLINK ROOT-CAUSED + FIXED (color-aware accent); CRASH REPRODUCED + PINPOINTED)
+
+Round-44 maintainer answers unblocked both fronts:
+
+**BLINK ("from the moment you select Donovan") — FIXED:**
+- Root cause: the accent march's static slots T0/T1 hold PUNCH-color
+  row-C content; selecting with any other button loads the alt block,
+  so the march cycles alt-base vs punch-accent = grey-shade blink
+  (select screen AND in-match). The accent gate stayed green because
+  its replay picks with LP — a coverage gap, now closed.
+- Fix: accent_color_aware_{0..3} site_thunks at the uploader's four
+  family-base sites (lea 0x39A900): owner char 0x0F -> a0 = the
+  object's cached palette-block ptr (+0x3A4 = the SELECTED color,
+  nonzero-guarded), d0=2 (-> block+0x40 = row C) — every march phase
+  reads the same color-correct row = vs2's steady semantics for any
+  color. Else-branch byte-equivalent. Measured: kick-color row 0x0C
+  single-variant == the frozen ALT row-C content; punch path
+  unchanged (accent gate green). test_don_colors gains the alt-
+  steadiness assertion.
+
+**CRASH — DETERMINISTIC REPRO + FAULT SITE:**
+- The plant move is QCB+K (214K — the flavor-consuming sword throw;
+  the "421K" notation confusion cost the previous session's attempts;
+  the thrown sword plants where it lands, right side from round
+  start).
+- Repro (tests/experiments/421k_ko/50_column_crash.rpl + HP poke
+  2890): plant, then swordless 421P(214P-side motion works too) —
+  the column kills P2 -> MACHINE RESET at f~2943.
+- Guarded: **vec3 ADDRESS ERROR, PC 0x185D8 (hit-apply family, near
+  the 0x1868C class writer), faulting address 0x13847 (odd), A3 =
+  0xCAA5A = VANILLA JEDAH'S ATTACK-DATA REGION, A6 = 0xFF9400 (the
+  column projectile obj)** — the column's attack-record pointer was
+  never repointed to ported data; the KO path dereferences a garbage
+  field from Jedah's records -> odd-address access. NEXT: find what
+  loads A3 for the column obj (per-projectile record table or the
+  spawner's immediates — same porting class as the throw-table fix)
+  and repoint; the crash repro then becomes the permanent gate.
+- Also explains round-43 item 2 fully; the sworded 421P KO does NOT
+  crash (its records are ported) — matching the maintainer's report.
+
 ## Session 14z-30 (round 43: crash triage — repro scaffold built, blocked on the plant input; classification of the other reports)
 
 Round-43 reports classified:

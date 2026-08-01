@@ -953,3 +953,16 @@ Session 14z-28 (round 41: class remap reverted; behavior locked):
   gameplay lock (multi-hit, no standing knockdown).
 - Confirmed item: swordless-deity palette (yellow vs vs2 blue) — fold
   into the consumer-2 fix.
+
+Session 14z-31 (color-aware accent; crash pinpointed):
+- site_thunks accent_color_aware_{0..3} (uploader family-base sites
+  0x2AD82/0x2AD94/0x2B342/0x2B7E8): slot-0F accent jobs read the
+  object's cached block ptr +0x40 (selected color) instead of the
+  static punch-color slots — the round-44 grey blink (any non-LP
+  selection) fixed for select+match; weapon_accent_t0/_t1/rowd_slot
+  become inert for slot 0F (kept as layout documentation).
+- test_don_colors: kick-color row-0x0C steadiness assertion.
+- Column crash: deterministic repro (experiments/421k_ko/50) +
+  guarded fault: vec3 @ PC 0x185D8, A3=0xCAA5A (vanilla Jedah attack
+  data) on the column projectile's KO — unported record pointer;
+  repoint next session.

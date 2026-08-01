@@ -805,3 +805,49 @@ dst_end = 0x028D54
 dst_old_head = "00000000"
 
 
+
+
+# 14z-31: COLOR-AWARE ACCENT (round-44: "sword starts blinking the
+# moment you SELECT Donovan"). The accent march's static slots T0/T1
+# (weapon_accent_t0/_t1) hold PUNCH-color row-C content; selecting
+# Donovan with any other button loads the alt-color block, so the
+# march cycles alt-base vs punch-accent = grey-shade blink (select
+# screen AND in-match; the accent gate's replay picks with LP, which
+# is why it stayed green). Fix: thunk the accent uploader's four
+# family-base sites (lea 0x39A900; all followed by andi/lsl/lea —
+# flags dead) — owner char 0x0F -> a0 = the object's cached palette
+# block ptr (+0x3A4, always the SELECTED color; guarded nonzero) and
+# d0 = 2 (-> +0x40 after the following andi/lsl = the block's row-C
+# slot), making every march phase read the same color-correct row =
+# vs2's steady semantics for any color. Else branch byte-equivalent
+# (legacy accents untouched). The weapon_accent_t0/_t1/rowd_slot data
+# ports become inert for slot 0x0F (kept: harmless, and they document
+# the slot layout).
+[[site_thunk]]
+stage = 6
+name = "accent_color_aware_0"
+site = 0x02AD82
+old_hex = "207c0039a900"
+thunk_hex = "0c2e000f0382660c202e03a46706204070024e75207c0039a9004e75"
+
+[[site_thunk]]
+stage = 6
+name = "accent_color_aware_1"
+site = 0x02AD94
+old_hex = "207c0039a900"
+thunk_hex = "0c2e000f0382660c202e03a46706204070024e75207c0039a9004e75"
+
+[[site_thunk]]
+stage = 6
+name = "accent_color_aware_2"
+site = 0x02B342
+old_hex = "207c0039a900"
+thunk_hex = "0c2e000f0382660c202e03a46706204070024e75207c0039a9004e75"
+
+[[site_thunk]]
+stage = 6
+name = "accent_color_aware_3"
+site = 0x02B7E8
+old_hex = "207c0039a900"
+thunk_hex = "0c2e000f0382660c202e03a46706204070024e75207c0039a9004e75"
+
