@@ -21,6 +21,35 @@ state superseded)
   ($FF8782 reads exactly 0x0F at the sites' run time in a real match
   flow, both mirror sides trigger).
 
+## Session 14z-37 (round 48: shock CONFIRMED with a caveat — hit counts maxed; mash mechanic mapped to the doorstep)
+
+- Maintainer: the electric shake holds like VS2 ✓ — but hit counts
+  are FIXED MAXIMA (7 LK / 11 MK / 15 HK) vs VS2's mash mechanic
+  (base 3/5/7-or-6, extended by mashing; ~9 reachable with HK+mash).
+  Measured: ours 14-15 hits vs native 6 at identical inputs (no
+  mash) — ours always plays the cap.
+- Mechanism mapped this session (all measured):
+  - The deity = Donovan's own anim; the multi-hit = a NODE LOOP
+    (loop-back node relocated correctly; node data byte-faithful).
+  - The loop is executed by the PORTED VS2 WALKER (ours advances
+    nodes at PC ~0xCE38A in hole a = vs2's own interpreter code) —
+    opcode semantics authentic; the loop DECISION therefore reads an
+    ENGINE-MAINTAINED field that vsavj doesn't feed the same way.
+  - Candidate fields from the vs2 walker's upstream code: +0x126
+    (press mask, `move.w $126(a6)`) gated by +0x169; also +0x1B0
+    counter. Registers at the loop-back write are identical across
+    games (decision is upstream of the write).
+- NEXT SESSION: disassemble the ported walker's loop-op handler
+  (around 0xCE2xx-0xCE4xx in the built image / vs2 0x270xx),
+  identify the exact mash-condition read, check whether vsavj's
+  engine maintains that field during button mashing (tap writes on a
+  vanilla mash move), and bridge it (init_shim/site_thunk feeding
+  vsavj's input state into the field the ported walker reads). Gate
+  afterward: hit-count assertions (no-mash = base counts).
+- Ship state: 0a55bc58 remains strictly better than pre-14z-36
+  (shock + death correct; counts too generous). The maintainer's
+  caveat = the one open gameplay-accuracy item.
+
 ## Session 14z-36 (SWORDED-421P SHOCK + DEATH FIXED — the final reconcile; the class-0x4E saga closes)
 
 - The decisive fact: **vs2's dispatch maps record type 0x4E to the
