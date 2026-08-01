@@ -1,13 +1,17 @@
-# NEXT SESSION — orientation (session 14z-42, 2026-08-01)
+# NEXT SESSION — orientation (session 14z-43b, 2026-08-02)
 
-Read STATE.md session 14z-42 (and 14z-36..41 for the arc) after this.
+Read STATE.md sessions 14z-42..43b (the Lightning Sword + ES arc)
+after this.
 The maintainer tests frequently and reports precisely — their reports
 are the project's best instrument; reference data they provide goes
 straight into gates.
 
-## Ship state — LIGHTNING SWORD FIXED, battery pending/green
+## Ship state — LS fixed + ES class-0x51 port shipped, battery GREEN
 
-Build fingerprint `4f8220fc` (dev head; register at freeze time).
+Build fingerprint `22ada38e` (dev head; register at freeze time).
+Maintainer-confirmed on it (round 52): LS native-class; ES still 8
+hits vs Morrigan (range A/B pending); ES finish = the neutral-pose
+KO trigger (queue item 1).
 Battery: `ROMDIR="/Users/koneko/Developer/Vampire Saved/ROMS" tests/run_battery_m2.sh`
 (57 checks; ~35 min; ROM audit first per CLAUDE.md §3).
 Dev builds: `GEN_FLAGS="--allow-plausible --tripwire-open" tools/build_donovan.sh 6 build/donovan6`
@@ -45,7 +49,24 @@ attribute any drift, maintainer sign-off, never silently refreeze).
 
 ## Queued next (in order)
 
-1. **ES gate: finish the measurement the 14z-43 port needs.** The
+1. **ES scripted-accept root cause (BLOCKS everything ES).** Session
+   14z-43b hard fact: every scripted button-pair falls back to the
+   LP version on current builds (both DP and LS; stock present;
+   same-frame AND offset pairs; chain-start nodes prove it: DP LP
+   0xD6EE8/MP 0xD7050/HP 0xD71B8) while MANUAL ES works (rounds
+   51-52). Replay 19's ES DPs worked when written (session 11) —
+   silent coverage loss (GOTCHAS). Static-first plan: disassemble
+   the ported handler's ES-vs-normal branch in the vs2 source
+   region, find what it reads (input pair mask? meter threshold?
+   which offset), A/B that field scripted-vs-manual-shaped inputs.
+   Stock byte = ff8505 (decays during idle!), gauge = ff850B.
+   Maintainer question queued: their meter state at a successful
+   manual ES. Unlocks: ES gate + 9-hit A/B + mash-to-11 + the
+   ES-KILL NEUTRAL-POSE repro (round 52: ES finish at final KO =
+   THE trigger; death path likely can't chain class 0x51 — the
+   14z-28 finding; class-poke repro inconclusive, needs a real ES
+   kill).
+2. **ES gate: finish the measurement the 14z-43 port needs.** The
    class-0x51 port is BUILT and crash-gated (build 22ada38e; STATE
    14z-43 — including the pc-relative/data-space GOTCHA that cost a
    vec3). Remaining: (a) decode the meter STOCK byte (ff8505/06/07;
@@ -58,22 +79,22 @@ attribute any drift, maintainer sign-off, never silently refreeze).
    pair for freeze-constant drift (the 14z-42 lesson) once hits
    land. Chain map + fallback rule (pair -> lowest button) in
    STATE 14z-43.
-2. Donovan lose/continue screen (round-51 captures): wrong palette
+3. Donovan lose/continue screen (round-51 captures): wrong palette
    on the figure, garbled Anita-portrait blocks, wrong background.
    Loser-portrait family — group with the M2b select-portrait
    remainder (docs/engine_internals select-screen section).
-3. Swordless-deity palette (yellow vs vs2 blue figure/lightning —
+4. Swordless-deity palette (yellow vs vs2 blue figure/lightning —
    maintainer captures round 41). Same family as the deity's obj
    palette rows; untouched so far.
-4. Select-screen post-confirm blink (tracked minor): select-venue
+5. Select-screen post-confirm blink (tracked minor): select-venue
    objs lack +0x3A4 (cached block ptr) -> the color-aware accent
    thunks fall back to punch-color slots on that screen only. Fix
    shape: select-venue init of +0x3A4 or owner-link fallback.
-5. Match-end neutral-pose KO: PARKED (round 51, maintainer's call —
+6. Match-end neutral-pose KO: UNPARKED — folded into item 1 (the trigger is the ES finish) (round 51, maintainer's call —
    flaky, once vs Morrigan, 4 scripted variants clean; gate section
    3 is the tripwire). Wanted datums if it recurs: victim char +
    victim's state at the kill.
-6. Sounds: Donovan sfx silent by design (stubbed_sound rows; M5 task
+7. Sounds: Donovan sfx silent by design (stubbed_sound rows; M5 task
    = dispatcher id-table translation, NOT unstubbing the helper —
    see reconciliation row note at vsav2=0x005122). NOTE from 14z-42:
    the walker's per-node sfx call site and its param tables are now

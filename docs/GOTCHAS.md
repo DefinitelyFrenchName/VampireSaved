@@ -858,3 +858,17 @@ READ MODE, not the address, when choosing the view AND when relocating
 code. Fix pattern: hook an instruction BEFORE the pc-relative read and
 rts back into the untouched original (the reaction_hook "ghost-clean"
 topology).
+
+## A no-crash soak can silently lose the behavior it was written to
+## exercise — assert the behavior, not just survival
+Replay 19's ES DP pairs demonstrably produced ES moves when written
+(session 11: the ES crash was MEASURED from them). On current builds
+every scripted button-pair falls back to the LP version (chain-start
+node proves it) — with a stock present, same-frame or 1f-offset pairs
+alike, for both DP and Lightning Sword — while MANUAL ES works fine.
+The DP-spam gate stayed green throughout because it only asserts
+END-clean. When a soak exists to exercise a specific mechanism, add
+one assertion that the mechanism actually fired (here: the ES chain's
+node family in a dump), or its coverage can quietly evaporate.
+(14z-43b; when the scripted-accept divergence is root-caused, note it
+here.)

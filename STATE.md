@@ -4,6 +4,58 @@ Updated: 2026-08-01 (session 14z-42 — Lightning Sword root cause
 FOUND + fix built: engine-drifted hit-freeze constants, NOT the
 spawner; 14z-41's lost-spawner theory overturned by measurement)
 
+## Session 14z-43b (round 52 on 22ada38e: THE NEUTRAL-POSE TRIGGER FOUND — it's the ES FINISH; death-path class consumer = the suspect)
+
+Round-52 maintainer results:
+- **ES vs Morrigan: still 8 hits** (native claim 9). Maintainer
+  suspects distance-dependence — plausible (the far-HP=6 datum);
+  needs a same-victim same-spacing native A/B before calling it a
+  divergence. PENDING the ES-input/meter work.
+- **NEUTRAL-POSE KO REPRODUCED: ES finish at final KO** (vs
+  Morrigan). RECLASSIFIES the round-50 flaky bug: it was an ES kill
+  all along (trigger = move VARIANT — why the 4 non-ES match-end
+  repro variants stayed clean and why the maintainer couldn't
+  re-trigger it). MECHANISM SUSPECT: the death path re-reads victim
+  +0x54 (the 14z-28 finding #3) — an ES kill leaves class 0x51
+  (this build) / 0x4E-with-property-0 (previous build) there, and
+  vsavj's death-path class consumer knows neither -> collapse never
+  chains -> standing neutral. Native vs2 handles class 0x51 on its
+  death path (tables extend to 0x53).
+- Visuals: "slightly faster, possibly more VS2-like" (soft signal,
+  consistent with property-0x19 now live).
+- REPRO ATTEMPT (class poke): normal deity kill + victim+0x54 = 0x51
+  poked f2638-2642 -> death chain STILL correct (0x158210).
+  INCONCLUSIVE, not a refutation: frame-boundary pokes likely miss
+  the same-frame class consume at the fatal hit. The real repro
+  needs an actual ES kill.
+- **SCRIPTED PAIR-ES ACCEPT IS BROKEN ON CURRENT BUILDS (new hard
+  fact, both moves):** replay 19's own ES DP pairs (DR12/DR13, both
+  buttons SAME frame, stock byte ff8505=01 present) now produce the
+  LP-fallback DP chain (0xD6EE8) — as do 1f-offset pairs with the
+  diagonal held, and every LS pair variant. Chain-start nodes prove
+  the fallback (DP chains: LP 0xD6EE8 / MP 0xD7050 / HP 0xD71B8,
+  stride 0x168). Replay 19 demonstrably produced ES DPs when
+  written (session 11 measured the ES crash from them) — the
+  behavior evaporated at some unknown build and the no-crash soak
+  stayed green (GOTCHAS entry added). MANUAL ES works on the same
+  builds (maintainer, rounds 51-52). Also mapped: the stock decays
+  during idle (ff8505 1->0 between f3360 and f3455 with no inputs)
+  — earlier "too late" ES attempts were doubly doomed.
+- **NEXT SESSION (bounded, static-first): disassemble the ported
+  handler's ES branch** — Donovan's LS/DP handlers are ported vs2
+  code; find the ES-vs-normal decision (which input/meter field at
+  which offset, what threshold) in the vs2 source region, check
+  what it reads on vsavj, and whether scripted vs manual input
+  states differ there (suspect family: the pressed-pair mask read
+  at a vs2-era offset, or a meter-threshold field our port doesn't
+  feed identically). Fixing scripted-ES accept unlocks: the ES
+  gate (chain family after HP's = 0x284A64+/0xD8588+), the 9-hit
+  A/B, the mash-to-11 check, AND the ES-kill neutral-pose repro
+  (task: death-path class consumer for 0x51). MAINTAINER QUESTION
+  queued: what is your meter state when the ES comes out (full
+  bar? banked stocks?) — cheap discriminator for the accept
+  condition.
+
 ## Session 14z-43 (ES class-0x51 port BUILT + crash-gated; the pc-relative/data-space gotcha paid; ES behavior measurement blocked on meter mapping)
 
 The 14z-42c queue item 1 implemented (build 22ada38e, battery run at
