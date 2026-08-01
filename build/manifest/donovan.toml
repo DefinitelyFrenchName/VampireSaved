@@ -894,6 +894,43 @@ site = 0x023ADE
 old_hex = "197c000b005c"
 thunk_hex = "b8fc84006706b8fc880066100c2c000f03826608197c0004005c4e75197c000b005c4e75"
 
+# 14z-43: ES CHANGE IMMORTAL class-0x51 port (round-51 upgrade: ES
+# base 8 vs native 9 + no mash extension = the 14z-35 interim's
+# gameplay cost). The ES deity records natively carry type 0x51;
+# 14z-35 remapped them to 0x4E to preempt a wild jump in the
+# KO-branch type dispatch (0x185CC family, table 0x185DA = 0x50
+# entries) — but 0x4E lands on property[0x4E] = 0 = plain reaction
+# (wrong freeze family, hence the count/mash drift). Proper fix,
+# vs2-dispatch-proven (its entry 0x51 -> the dedicated copy handler
+# just past its table): the six region_fix rows above are RETIRED
+# (staged 99, records carry native 0x51) and the dispatch site
+# 0x185D0 (`add.w d0,d0; move.w $185DA(pc,d0.w),d0`) is thunked:
+# type 0x51 -> pop the site return + jmp the copy handler 0x1868C
+# (class := 0x51 -> property[0x51] = 0x19 via hit_class_props_ext_hi,
+# already live); any other type -> plain rts back into the UNTOUCHED
+# vanilla read+jmp at 0x185D0 (CCR from cmpi is dead — the add.w at
+# 0x185D0 sets it first). SITE CHOICE IS LOAD-BEARING (gotcha paid
+# in-session, vec3 at the KO hit): the first attempt hooked 0x185D0
+# and absolutized the table read as move.w (a0,d0) — but the vanilla
+# `move.w $185DA(pc,d0)` is a PC-RELATIVE operand = 68000 PROGRAM-
+# SPACE reference = DECRYPTED on CPS-2, while (a0,d0) is a DATA-
+# space reference = raw bytes; the data view of table[6] is 0x53BF
+# = the measured crash displacement. Hooking the moveq/move.b pair
+# instead leaves the read+jmp vanilla and class-correct.
+# Consumer audit (all three $17(a3) readers):
+# 0x1843A/0x18460 dispatch = already extended (reaction_hook
+# case_a2, vs2-verbatim, DP-spam-gated); 0x185CA-0x185D8 = this
+# thunk's dispatch; 0x18B30 byte-table assigner = only reachable
+# THROUGH the two dispatches, and both route 0x51 to the copy
+# handler exactly as vs2 does -> never sees 0x51 (same
+# unreachability as native).
+[[site_thunk]]
+stage = 6
+name = "es_type51_dispatch"
+site = 0x0185CA
+old_hex = "7000102b0017"
+thunk_hex = "7000102b00170c00005167024e75588f4ef90001868c"
+
 
 # 14z-33: COLUMN-CRASH FIX (round-45 go-ahead; full decode in STATE
 # 14z-31/32). The swordless-421P column's KO record (hitbox_proj
@@ -992,52 +1029,52 @@ note = "extended record type 0x50 -> 0x0F (vs2 dispatch alias: entry 0x50 word 0
 # handler; the resulting victim class becomes 0x4E = the same family
 # as the rest of the deity's hits — consistent interim semantics).
 [[region_fix]]
-stage = 6
+stage = 99
 region = "hitbox"
 off = 0x10e9
 old_hex = "51"
 new_hex = "4e"
-note = "ES-deity record type 0x51 -> 0x4E (vsavj copy-class handler; latent wild-jump preempted)"
+note = "RETIRED 14z-43 (was: 0x51->0x4E crash preempt) — superseded by the es_type51_dispatch thunk; records carry native 0x51 again"
 
 [[region_fix]]
-stage = 6
+stage = 99
 region = "hitbox"
 off = 0x1109
 old_hex = "51"
 new_hex = "4e"
-note = "ES-deity record type 0x51 -> 0x4E (vsavj copy-class handler; latent wild-jump preempted)"
+note = "RETIRED 14z-43 (was: 0x51->0x4E crash preempt) — superseded by the es_type51_dispatch thunk; records carry native 0x51 again"
 
 [[region_fix]]
-stage = 6
+stage = 99
 region = "hitbox"
 off = 0x1129
 old_hex = "51"
 new_hex = "4e"
-note = "ES-deity record type 0x51 -> 0x4E (vsavj copy-class handler; latent wild-jump preempted)"
+note = "RETIRED 14z-43 (was: 0x51->0x4E crash preempt) — superseded by the es_type51_dispatch thunk; records carry native 0x51 again"
 
 [[region_fix]]
-stage = 6
+stage = 99
 region = "hitbox"
 off = 0x1149
 old_hex = "51"
 new_hex = "4e"
-note = "ES-deity record type 0x51 -> 0x4E (vsavj copy-class handler; latent wild-jump preempted)"
+note = "RETIRED 14z-43 (was: 0x51->0x4E crash preempt) — superseded by the es_type51_dispatch thunk; records carry native 0x51 again"
 
 [[region_fix]]
-stage = 6
+stage = 99
 region = "hitbox"
 off = 0x1169
 old_hex = "51"
 new_hex = "4e"
-note = "ES-deity record type 0x51 -> 0x4E (vsavj copy-class handler; latent wild-jump preempted)"
+note = "RETIRED 14z-43 (was: 0x51->0x4E crash preempt) — superseded by the es_type51_dispatch thunk; records carry native 0x51 again"
 
 [[region_fix]]
-stage = 6
+stage = 99
 region = "hitbox"
 off = 0x1189
 old_hex = "51"
 new_hex = "4e"
-note = "ES-deity record type 0x51 -> 0x4E (vsavj copy-class handler; latent wild-jump preempted)"
+note = "RETIRED 14z-43 (was: 0x51->0x4E crash preempt) — superseded by the es_type51_dispatch thunk; records carry native 0x51 again"
 
 
 # 14z-36: SWORDED-421P SHOCK (round-46 go-ahead; the final reconcile).

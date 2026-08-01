@@ -74,4 +74,6 @@
 | `PRG:0x023AD8` | 0x6 | GEN | site_thunk ls_freeze_vs2_victim engine site |
 | `PRG:0x3FFDC0` | 0x24 | GEN | site_thunk ls_freeze_vs2_attacker |
 | `PRG:0x023ADE` | 0x6 | GEN | site_thunk ls_freeze_vs2_attacker engine site |
+| `PRG:0x3FFDF0` | 0x16 | GEN | site_thunk es_type51_dispatch |
+| `PRG:0x0185CA` | 0x6 | GEN | site_thunk es_type51_dispatch engine site |
 | `PRG:0x084594` | 0x2 | GEN | code_word select_companion_entry_0f |

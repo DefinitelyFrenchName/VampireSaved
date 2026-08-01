@@ -4,6 +4,56 @@ Updated: 2026-08-01 (session 14z-42 — Lightning Sword root cause
 FOUND + fix built: engine-drifted hit-freeze constants, NOT the
 spawner; 14z-41's lost-spawner theory overturned by measurement)
 
+## Session 14z-43 (ES class-0x51 port BUILT + crash-gated; the pc-relative/data-space gotcha paid; ES behavior measurement blocked on meter mapping)
+
+The 14z-42c queue item 1 implemented (build 22ada38e, battery run at
+session end):
+- **The port:** six region_fix 0x51->0x4E rows RETIRED (staged 99,
+  the ES-deity records carry native type 0x51 again) + site_thunk
+  es_type51_dispatch. Consumer audit of all three $17(a3) readers
+  in STATE 14z-42c's plan held up: reaction dispatch already
+  extended (case_a2), KO-branch dispatch = the new thunk, byte-table
+  assigner unreachable for 0x51 (same as native vs2).
+- **GOTCHA PAID (vec3 at the first KO hit, fully traced):** the
+  first thunk shape hooked the dispatch's read site and absolutized
+  `move.w $185DA(pc,d0),d0` as `lea/move.w (a0,d0)` — but
+  pc-relative operands are 68000 PROGRAM-space references
+  (CPS-2-decrypted) while (An)-based are DATA-space (raw bytes):
+  the read returned ciphertext (data-view table[6] = 0x53BF = the
+  measured odd jmp target). Fix: hook the PRECEDING moveq/move.b
+  pair (0x185CA) and rts into the untouched vanilla read+jmp — the
+  reaction_hook ghost-clean topology. docs/GOTCHAS.md entry added
+  (includes the corollary: table-view choice follows the READ MODE,
+  not the address — pc-relative tables live in opcodes.bin,
+  lea(pc)+(a0,dn) tables in data.bin).
+- **Crash coverage GREEN on 22ada38e:** guarded deity-KO (poke),
+  guarded ES-attempt run, test_don_reactions all 3 sections
+  (round-1 KO, match-end KO, sword-kill) PASS. Residual exposure =
+  the property-0x19 reaction handler receiving live ES hits — a
+  LEGACY handler (property 0x19 serves vanilla classes 0x09/0x33/…)
+  so no crash surface; possible freeze-constant drift there is the
+  known follow-up (A/B once an ES replay lands hits).
+- **ES behavior measurement BLOCKED, parked:** scripted ES attempts
+  all fell back to the LP chain. Chain map established (even 0x244
+  spacing, both games): LP 0x284398/0xD7EC0, MP 0x2845DC/0xD8104,
+  HP 0x284820/0xD8348 — and the "extension block" the no-mash loop
+  jumps over (0x284A60+) is therefore almost certainly THE ES
+  CHAIN, never a mash extension (14z-42's mash datum — 3->4 loop
+  iterations — stands independently). Pair-button fallback picks
+  the LOWEST button (13->LP, 23->MP). Meter fields partially
+  mapped: P1 gauge byte ff850B (grows ~0x0C-0x30/action), stock
+  encoding at ff8505/06/07 NOT yet decoded (+07 00->ff->fe pattern
+  recurs across ES attempts on both games; can't distinguish
+  "no stock" from "consumed" yet). NEXT SESSION (bounded): map the
+  stock byte properly (tap writes to ff8500-ff8510 across a known
+  manual-ES flow), then author the ES gate replay (recipe: replay
+  19 prologue + 421+pair with the accept-shape variants — pair 1f
+  apart or long DL hold both accept on ours), assert ES chain
+  0xD8xxx (ES = HP+0x244 family) + 9 base hits + mash to 11 + KO
+  clean. Scratch replays es3/es4/es5 + all findings in the session
+  log; input-accept EDGE note: exact-simultaneous pair at DL-release
+  frame is accept-flaky on ours no-debug (variants v1/v4 accept).
+
 ## Session 14z-42c (round 51: LP/MP closed as native; ES = the known class-0x51 interim, UPGRADED to accuracy item; win-screen art item added; KO bug parked)
 
 Round-51 maintainer answers:
@@ -31,7 +81,11 @@ Round-51 maintainer answers:
   garbled tile blocks bottom-left where Anita's portrait art
   belongs, (c) wrong background composition vs VS2's moon/Anita
   arrangement. Loser-portrait art/palette family — group with the
-  M2b select-portrait remainder.
+  M2b select-portrait remainder. MAINTAINER HUNCH (round 52): the
+  washed palette "looks a lot like Jedah colours" — mechanically
+  plausible (slot-0x0F-indexed palette table unported = serves
+  Jedah's rows; the accent/fixture failure family). Check the
+  lose-screen palette source first when this item runs.
 - **Match-end neutral-pose KO PARKED (maintainer's call):** happened
   once vs Morrigan, not reproducible since ("very flaky... worth
   leaving alone for now"). Our 4-variant clean repro + the new gate

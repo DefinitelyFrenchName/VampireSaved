@@ -45,12 +45,19 @@ attribute any drift, maintainer sign-off, never silently refreeze).
 
 ## Queued next (in order)
 
-1. **ES Change Immortal class-0x51 port — UPGRADED to accuracy item
-   (round 51: ES base 8 vs native 9, no mash extension).** Full
-   analysis + fix shape in STATE 14z-42c. The 14z-33 discipline
-   applies (type-dispatch extension; this area crashes when done
-   casually). Gate afterward: ES replay (needs meter — poke or
-   build via whiffs) asserting 9 base hits; re-check mash.
+1. **ES gate: finish the measurement the 14z-43 port needs.** The
+   class-0x51 port is BUILT and crash-gated (build 22ada38e; STATE
+   14z-43 — including the pc-relative/data-space GOTCHA that cost a
+   vec3). Remaining: (a) decode the meter STOCK byte (ff8505/06/07;
+   gauge = ff850B — tap writes across a manual-ES flow); (b) ES
+   replay: replay-19 prologue + 421+pair, pair 1f apart (the
+   accept-shape that works no-debug); assert the ES CHAIN (family
+   0x284A64/ported 0xD81xx+0x244*3 — the block after HP's chain,
+   previously mislabeled "mash extension") + 9 base hits + mash to
+   ~11 + ES KO clean; (c) A/B the property-0x19 reaction handler
+   pair for freeze-constant drift (the 14z-42 lesson) once hits
+   land. Chain map + fallback rule (pair -> lowest button) in
+   STATE 14z-43.
 2. Donovan lose/continue screen (round-51 captures): wrong palette
    on the figure, garbled Anita-portrait blocks, wrong background.
    Loser-portrait family — group with the M2b select-portrait

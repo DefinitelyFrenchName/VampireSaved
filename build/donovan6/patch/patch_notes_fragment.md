@@ -22,12 +22,6 @@ code   0x0cb880 ILLEGAL  TRIPWIRE for unresolved 0x42cee
 code   0x0cb890 ILLEGAL  TRIPWIRE for unresolved 0x448d4
 # code+0x3092: unresolved 0x448d4 -> tripwire 0xcb890
 code_file 0x0bf6a0 +0x3200  donovan code (from vsav2 0x059490)
-# hitbox+0x10e9: region_fix 51 -> 4e (ES-deity record type 0x51 -> 0x4E (vsavj copy-class handler; latent wild-jump preempted))
-# hitbox+0x1109: region_fix 51 -> 4e (ES-deity record type 0x51 -> 0x4E (vsavj copy-class handler; latent wild-jump preempted))
-# hitbox+0x1129: region_fix 51 -> 4e (ES-deity record type 0x51 -> 0x4E (vsavj copy-class handler; latent wild-jump preempted))
-# hitbox+0x1149: region_fix 51 -> 4e (ES-deity record type 0x51 -> 0x4E (vsavj copy-class handler; latent wild-jump preempted))
-# hitbox+0x1169: region_fix 51 -> 4e (ES-deity record type 0x51 -> 0x4E (vsavj copy-class handler; latent wild-jump preempted))
-# hitbox+0x1189: region_fix 51 -> 4e (ES-deity record type 0x51 -> 0x4E (vsavj copy-class handler; latent wild-jump preempted))
 # hitbox+0x11a9: region_fix 4e -> 06 (sworded deity hit 1/7: type 0x4E -> 0x06 (vs2 dispatch alias — class-8 native electric))
 # hitbox+0x11c9: region_fix 4e -> 06 (sworded deity hit 2/7: type 0x4E -> 0x06 (vs2 dispatch alias — class-8 native electric))
 # hitbox+0x11e9: region_fix 4e -> 06 (sworded deity hit 3/7: type 0x4E -> 0x06 (vs2 dispatch alias — class-8 native electric))
@@ -323,4 +317,5 @@ code   0x0fffc0 +0x1c  site_thunk accent_color_aware_2; site 0x02b342 jsr-routed
 code   0x0fffe0 +0x1c  site_thunk accent_color_aware_3; site 0x02b7e8 jsr-routed
 code   0x3ffd90 +0x2a  site_thunk ls_freeze_vs2_victim; site 0x023ad8 jsr-routed
 code   0x3ffdc0 +0x24  site_thunk ls_freeze_vs2_attacker; site 0x023ade jsr-routed
+code   0x3ffdf0 +0x16  site_thunk es_type51_dispatch; site 0x0185ca jsr-routed
 code   0x084594 +0x2  code_word select_companion_entry_0f (0040 -> 0046)

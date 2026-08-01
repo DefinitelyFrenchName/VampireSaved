@@ -843,3 +843,18 @@ tables) can diverge with zero byte differences in the ported regions
 — A/B-measure the engine fields (tap the obj struct at event frames
 on both games), don't audit only the ported bytes. (14z-42: this one
 drift WAS both maintainer symptoms — hit count and animation speed.)
+
+## PC-relative reads are PROGRAM-space; (An)-based reads are DATA-space —
+## absolutizing a pc-relative table read on CPS-2 reads CIPHERTEXT
+The 68000 classes `(d16,PC)`/`(d8,PC,Xn)` operand fetches as program
+references; CPS-2 decrypts program-space accesses in 0x000000-0x100000.
+A site_thunk that faithfully "reproduced" `move.w $185DA(pc,d0),d0` as
+`lea $185DA,a0; move.w (a0,d0),d0` read the encrypted bytes instead
+(data view table[6] = 0x53BF -> odd jmp target -> vec3 at the first KO
+hit; 14z-43). Corollary: a table read via `(pc,...)` lives in the
+OPCODES image; the same table read via `lea (pc)`+`(a0,...)` (the
+property table 0x28D00 pattern) lives in the DATA image — check the
+READ MODE, not the address, when choosing the view AND when relocating
+code. Fix pattern: hook an instruction BEFORE the pc-relative read and
+rts back into the untouched original (the reaction_hook "ghost-clean"
+topology).
