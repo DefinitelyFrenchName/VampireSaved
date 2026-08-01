@@ -88,4 +88,27 @@ for fr in (2950, 3030):
         f"0x158210 (idle loop = the round-39 neutral-pose bug)")
 print("  ok: deity KO runs the full native electric death (grounded at 0x158210)")
 EOF2
+# ── 3. MATCH-END (round-2 clinching) deity KO — the round-50 blind spot:
+#      sections 1-2 only ever kill in round 1; the neutral-pose bug family
+#      (14z-25 round 38) is match-end-specific. Replay 54 wins round 1 with
+#      the deity, then kills again in round 2 (match over) — the victim
+#      must still chain to the grounded death node.
+mkdir -p "$WORK/me"
+POKES="2400:ff8850:00080008;3100:ff8850:00080008" \
+DUMPS="3420:ff8800-ff8830;3650:ff8800-ff8830" \
+    REPLAY="$REPO/tests/replays/54_don_matchend_ko.rpl" \
+    CHECKSUM_OUT="$WORK/me/c.log" MAME_SANDBOX="$WORK/me" \
+    MAME_ROMPATH="$RPDIR;$ROMDIR" tools/run_mame.sh vsavj \
+    -autoboot_script "$REPO/tests/lua/replay.lua" > /dev/null 2>&1
+
+python3 - "$WORK/me" <<'EOF2'
+import sys, os
+work = sys.argv[1]
+d = open(os.path.join(work, 'dump_3650_ff8800.bin'), 'rb').read()
+node = int.from_bytes(d[0x1c:0x20], 'big')
+assert node == 0x158210, (
+    f"match-end victim node at f3650 = {node:#x}, expected grounded death "
+    f"0x158210 (neutral pose = the round-38/50 match-end bug family)")
+print("  ok: MATCH-END deity KO chains to the grounded death (0x158210)")
+EOF2
 echo "PASS: Donovan hit-class reaction gate"

@@ -4,6 +4,40 @@ Updated: 2026-08-01 (session 14z-42 — Lightning Sword root cause
 FOUND + fix built: engine-drifted hit-freeze constants, NOT the
 spawner; 14z-41's lost-spawner theory overturned by measurement)
 
+## Session 14z-42b (round 50: freeze fix CONFIRMED; neutral-pose match-end KO reported — 4 repro variants all CLEAN; context question queued)
+
+Round-50 maintainer results on 4f8220fc:
+- **Core fix confirmed: no strength overshoots; feel/speed similar
+  to VS2 overall.** HP mash reaches 9 (their reliable native max) ✓.
+- **TRACKED (non-blockers, maintainer's words):** (a) ES undershoots
+  — 8 minimum vs the 9-13 reference (and 10 max-mash vs theory 11);
+  (b) LP/MP get NO mash extension (should reach ~5 / 6-9). Note HP
+  mash works (9) and the scripted mash A/B extended 3->4 on both
+  games — so the mash READ works; the per-strength extension
+  windows/loop params are the suspects. Investigate with per-strength
+  node taps (LP=btn1, MP=btn2, ES) vs native.
+- **BLOCKER REPORTED: match-end KO with Lightning Sword (possibly
+  any special) leaves the opponent in neutral pose again** (the
+  round-38 bug family). REPRO ATTEMPTS THIS SESSION — ALL CLEAN on
+  4f8220fc (correct grounded death 0x158210 + SPECIAL FINISH, snaps
+  verified): (1) round-1 mid-shock kill; (2) MATCH-END (round-2
+  clinching) mid-shock kill; (3) match-end kill by the INITIAL
+  SWORD HIT (different records than the deity); (4) match-end kill
+  during MASH-EXTENSION iterations. All vs Victor, 2P mode,
+  standing victim. New replay 54_don_matchend_ko + gate section 3
+  close the gate's round-1-only blind spot permanently.
+- The bug therefore needs context we don't have: candidates =
+  victim char (theirs != Victor?), ARCADE/vs-CPU mode (moving/
+  crouching/airborne victim at the kill — our victims always stand),
+  the swordless variant or 421K column as the killer, or a round
+  pattern other than 2-0. NOTE: 14z-25 (round 38, 421K) never
+  reproduced either — this may be the SAME never-fixed pre-existing
+  bug, newly visible because the move is now good enough to close
+  matches with; not necessarily a freeze-fix regression. QUESTIONS
+  SENT to maintainer: exact killer move/variant, victim char, mode
+  (arcade or 2P), victim state at the kill (standing/crouch/air/
+  mid-move), round pattern, SPECIAL FINISH banner shown or not.
+
 ## Session 14z-42 (Lightning Sword: ROOT CAUSE = hit-freeze engine drift; 14z-40/41 suspects all exonerated)
 
 Measurement session on native vs2 (scratch replay recreated per
