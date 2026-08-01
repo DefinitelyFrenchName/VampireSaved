@@ -39,8 +39,14 @@ Round-43 reports classified:
    — or whether the crash also occurs with the SWORDED 421P at
    point-blank. Suspicion: the swordless variant's attack records
    (hitbox_proj region?) carry extended classes or the KO path for
-   that variant runs vs2-only code; scan hitbox_proj for classes >
-   0x49 next.
+   that variant runs vs2-only code. SCANNED (14z-30 addendum):
+   hitbox_proj carries ONLY vanilla-range classes (0x0F, 0x14) — the
+   crash is NOT the extended-class family. Redirected suspicion: the
+   three EXCLUDED overlay KILLER_SITES (0x5D8B8/0x5EE22/0x918F0 —
+   attack-id table walkers, "residual wrong-art, no crash" verified
+   on NORMAL paths only) — a round-end KO in the swordless state may
+   reach them in an unverified context. Next: reproduce (needs the
+   plant input), then a guarded run with the exception-vector report.
 4. "Sword/statue blinking again (grey shades)" — the normal-state
    accent rows are GATE-VERIFIED steady on this exact build (battery
    green, test_don_accent). Hypothesis: the blink lives in the
