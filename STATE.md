@@ -1,11 +1,9 @@
 # STATE — living progress log
 
-Updated: 2026-08-02 (session 14z-51 — M5 DISCOVERY DONE: QSound
-path fully mapped (68k ring -> Z80 driver -> chip regs), id sweeps
-run on both games; SHARED SFX USE IDENTICAL IDS; 6-8 Donovan voice
-samples absent from vsav's full sample ROMs — port-vs-silent
-decision pending; music-bug mechanism re-diagnosis required before
-unstubbing)
+Updated: 2026-08-03 (session 14z-52 — M5: MUSIC BUG ROOT-CAUSED
+(vsavj 0x7xx = music tracks, vs2 0x7xx = Donovan's voice bank), 13
+sound rows restored, sound gate added; the remaining sound is
+BLOCKED ON ROM SPACE — decision queued)
 
 ## Session 14z-49 (rounds 61-62: HUD MUGSHOT + NAME + SELECT MEDALLION — the whole per-slot venue-asset family fixed)
 
@@ -65,6 +63,63 @@ Build `b91647c7da14ded6316cee8dc057c8daf1c3fb1e` (donovan6, stage 6).
   re-verified: Donovan medallion in Jedah's ringed cell, Gallon's
   werewolf 3x3 restored, VS-splash big portrait + name were already
   correct.
+
+## Session 14z-52 (M5 phase 1: music bug root-caused; 13 rows restored; the rest is a SPACE problem)
+
+**THE MUSIC BUG, SOLVED (measured, not theorised):** vsavj's sound-id
+range **0x700-0x7FF holds MUSIC TRACKS**; vs2 reuses that exact range
+for **Donovan's voice bank**. Profiling every id his table uses on both
+sets (voice count / key-on count / sample identity — the music
+signature is unmistakable: 8-15 voices, dozens of key-ons, 4-12
+distinct samples) gives the definitive breakdown of his 47 table ids:
+  - **6 SHARED** (0x110 0x111 0x112 0x119 0x152 0x202) — same id, same
+    sample content on both sets;
+  - **30 are MUSIC TRACKS on vsavj** (0x700-0x71F, 0x750-0x757);
+  - **9 have NO sample in vsav at all** (vsav's sample ROMs are full);
+  - 2 are vs2-silent anyway.
+That is why 214P/214K played music in round 2. The session-5 theory
+("same ids mean different things") was wrong in general — most ids ARE
+shared — but accidentally right about the range Donovan leans on.
+
+**Phase 1 shipped (build ae701ffb):** 13 stubbed sound-farm rows
+restored to their vsavj same-id entries (content-verified per id,
+including the odd-shaped 0x18d entry whose vsavj twin is byte-identical
+at 0x424E); 11 rows kept silent, each now carrying its MEASURED reason
+instead of the blanket session-9 note. **Honest caveat: those 13
+entries never fire in any of our 8 Donovan replays** — correct, but
+currently inaudible.
+
+**Where Donovan's sound actually lives (and why it is still silent):**
+the per-node walker path — ported dispatcher (built at ~0xCE3B8) reads
+`lea 0xBF41A,a0; movea.l (a0,charid*4),a0; move.w (a0,idx*8),d1` then
+calls the helper. That helper stub absorbs **~400 calls per match**.
+Enabling it needs Donovan's own record array because slot 0x0F still
+resolves to JEDAH's array (~40 entries) while Donovan's scripts index
+up to **43** (measured, replays 12/25/56) — so it would both play
+Jedah's sounds and read past the array end into neighbouring data
+(random ids, music range included).
+
+**Implemented but BLOCKED ON ROM SPACE:** a new declarative generator
+kind `[[sound_table]]` (tools/gen_donovan_patch.py) ports a per-char
+record array with an **id allowlist**, zeroing every unplayable id —
+the engine's dispatcher skips `id == 0` (`tst.w d1; beq`), so those
+sounds stay silent instead of playing music. The manifest row
+(don_sfx_records: 44 entries, keep_ids = the 6 shared) is written and
+COMMENTED OUT: it needs 0x160 bytes and **both code holes are full** —
+allocating it evicts the two ls_freeze site_thunks. Tried hole a and
+hole b; neither fits. New decision queued (see Decisions pending).
+
+**Gate added: tests/test_don_sound.sh** — sound is invisible to every
+RAM and pixel gate we own, so this is the only detector. It replays 4
+Donovan scripts, taps the 68k sound ring, and (a) FAILS if any
+0x700-0x7FF id is ever enqueued (the music tripwire), (b) freezes the
+exact id inventory per replay. Green on ae701ffb; inventories verified
+deterministic across two passes each.
+
+Instruments promoted: tests/lua/ring_tap.lua (ring id tap),
+tests/lua/qs_sweep.lua + tools/qs_analyze.py (14z-51). Gotcha paid:
+a 68k `move.l` reaches a memory tap as TWO word writes, so the sound
+id lands at entry+2, not entry+0 — a tap keyed on +0 sees only zeros.
 
 ## Session 14z-51 (M5 sounds: discovery phase — the id-space myth dies)
 
@@ -3490,6 +3545,29 @@ Extension policy stands: future palette-block ports extend the
 window per measured slot, never pre-widen.
 
 ## Decisions pending (human)
+
+- **M5 SOUND NEEDS A DATA HOME (14z-52, blocks the rest of M5):** both
+  code holes are exhausted (hole a full; hole b < 0x160 free), so
+  Donovan's 0x160-byte sound record array — the thing standing between
+  him and working move sounds — has nowhere to live. Options: A) reuse
+  **Jedah's freed anim region** [0x248B88, 0x267000): ~120KB of dead
+  content on this build, but it is also the earmarked home for the
+  eventual ported select web, and it needs its own dead-space audit
+  before first use (nothing has been placed there yet); B) shrink
+  existing hole usage (the deprecation candidates in patch_index —
+  weapon_accent_t0/_t1/rowd_slot are inert since 14z-31 and could be
+  reclaimed); C) grow the program region via driver descriptor (the
+  same class of change as the QSound question below, larger blast
+  radius). RECOMMENDATION: **B first** (reclaim what is already dead
+  and inert, no new territory), then A with an audit when M3 forces the
+  bigger question. Either way this is a placement policy call, not a
+  code change I should make unilaterally.
+- **M5 VOICE SAMPLES (14z-51, unchanged):** even with the table placed,
+  39 of Donovan's 47 sounds stay silent because vsav's sample ROMs have
+  no room and no matching content (his voice bank). Options: A) ship
+  voiceless (all shared sfx work); B) grow the QSound sample region via
+  descriptor; C) overwrite low-value vsav samples. Recommendation: A
+  now, revisit B at M3.
 
 - **M5 VOICE SAMPLES (14z-51):** 6-8 of Donovan's sounds (his voice
   lines / vs2-new sfx: ids 0x71D/0x73E/0x753-0x756, likely the "Change

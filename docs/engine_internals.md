@@ -524,3 +524,31 @@ same-id-different-content — vsavj reuses those ids for other sounds).
 window). Sample ROMs are FULL (no blank 64K blocks) — porting voice
 samples means growing the QSound region (descriptor change) or
 sacrificing content; maintainer decision material.
+
+### The per-node sfx dispatcher and per-char record arrays (14z-52)
+
+The walker's per-node sound call (node +0x16 nonzero) runs a dispatcher
+that is ported into our build at ~`PRG:0xCE3B8` (vanilla twin
+`PRG:0x27F16`, vs2 `PRG:0x271B6`):
+
+    moveq #0,d1 ; move.b $382(a6),d1 ; lsl.w #2,d1     ; char id * 4
+    lea  $BF41A,a0 ; movea.l (a0,d1.w),a0              ; per-char array
+    lsl.w #3,d0 ; move.w (a0,d0.w),d1                  ; d1 = sound id
+    tst.b $BC(a5) ; beq +4 ; move.w (2,a0,d0.w),d1     ; alt id variant
+    tst.w d1 ; beq skip                                ; **id 0 = SILENT**
+    ... move.b (4/5,a0,d0.w),d2 ; move.w (6,a0,d0.w),d3 ; jsr helper
+
+- Per-char pointer tables: vsavj `0xBF41A`, vs2 `0xD95B8` (20 rows,
+  4-byte pointers; row = char id). Record entries are 8 bytes:
+  `id.w, alt_id.w, p4.b, p5.b, d3.w`.
+- **`id == 0` is the engine's own silence path** — the clean way to
+  suppress a sound with no faithful equivalent (used by the
+  `[[sound_table]]` allowlist).
+- Array lengths are implicit (indexed, never bounded): vsavj Jedah's
+  array runs ~40 entries, Donovan's vs2 array 44 (his scripts index up
+  to 43 — measured). Porting a newcomer's array is therefore mandatory
+  before enabling this path for a replaced slot: the vanilla slot's
+  array is both wrong AND too short.
+- Helper: vsavj `0x4CE2` / vs2 `0x5122` — `btst #0,$70(a6)` then
+  `addi.w #$300,d1` (the +0x300 id alias seen in the sweep maps) and
+  jumps into the enqueue path.

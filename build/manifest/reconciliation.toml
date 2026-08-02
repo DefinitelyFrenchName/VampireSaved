@@ -25,10 +25,10 @@ note = "-; refs: bare_long"
 
 [[map]]
 vsav2 = 0x004f14
-vsavj = 0x02A7E0
-kind = "stubbed_sound"
+vsavj = 0x004a5e
+kind = "sound_farm"
 status = "verified"
-note = "MOVE sfx 0x2D4 (x088512-called, jsr 0x8A0F6): farm entry masquerading as engine_data since the session-5 bare-long pass — codebytes-unique matched the SAME-ID vsavj entry 0x4A5E, whose 0x2D4 has different MEANING (music on 214P/214K, playtest 2026-07-28 round 2) — silent until M5"
+note = "M5 RESTORED (14z-52): sfx id 0x2d4 -> vsavj same-id farm entry 0x04a5e. Sample content verified IDENTICAL across sets (QSound key-on probe: same bank/start after relocation, docs/m5/). The session-9 stub and the session-5 same-id-means-music theory were both wrong for this id."
 
 [[map]]
 vsav2 = 0x004f2e
@@ -70,7 +70,7 @@ vsav2 = 0x005052
 vsavj = 0x02A7E0
 kind = "stubbed_sound"
 status = "verified"
-note = "MOVE sfx 0x173 (x088512-called, jsr 0x89632 + jmp 0x895E4): farm entry masquerading as engine_data since the session-5 bare-long pass — matched the SAME-ID vsavj entry 0x4316; id 0x173 is the proven music trigger (the 0x43B2 stub fixed its other caller) — silent until M5"
+note = "M5 KEPT SILENT (14z-52): sfx id 0x173 — vsavj same-id keys DIFFERENT sample content. Measured, docs/m5/don_id_plan.json; restoring it would play the wrong sound. Revisit only with ported samples (STATE decision: voice samples)."
 
 [[map]]
 vsav2 = 0x00506c
@@ -119,7 +119,7 @@ vsav2 = 0x005122
 vsavj = 0x02A7E0
 kind = "stubbed_sound"
 status = "verified"
-note = "sound HELPER direct call (x026142 dispatcher 0x271B6: id read from word table (6,A0,D2.w) into D3, vs2-semantic by construction): was mapped to vsavj helper 0x4CE2 — any id it forwards has vsavj meaning (the 214P/214K music mechanism); stubbed until M5, where the dispatcher's id table needs translation, not the helper"
+note = "STILL STUBBED, now for a MEASURED reason (14z-52). This is the per-node sfx helper (vsavj twin 0x4CE2) and it carries ~400 calls per match — it is where ALL of Donovan s move sound lives. It cannot be enabled alone: the ported dispatcher resolves slot 0x0F to JEDAH s record array, which is ~40 entries while Donovan s scripts index up to 43 (measured, replays 12/25/56) — so it would read past the array AND play Jedah s sounds. The fix is the [[sound_table]] don_sfx_records row in donovan.toml (written, id-allowlisted, generator kind implemented) which is BLOCKED ON ROM SPACE: both holes are full. See STATE 14z-52."
 
 [[map]]
 vsav2 = 0x009834
@@ -1056,7 +1056,16 @@ kind = "bank_ref"
 status = "verified"
 note = "hand: gap_be27a pointer TABLE base; delta rule; slot 0x0F row repointed by the generator"
 
-# ── Sound-farm stubs (session 9, 2026-07-27) ────────────────────────────────
+# ── Sound farm (session 9 stubs; 14z-52 M5 phase 1 partial restore) ────────
+# 14z-52: the QSound id space was MEASURED on both sets (sweep instrument
+# tests/lua/qs_sweep.lua; maps in docs/m5/). Result: shared sfx keep
+# IDENTICAL ids across the family, so 13 of these rows restore by pointing
+# at the vsavj SAME-ID farm entry (content-verified). The rest stay silent
+# with a per-row measured reason — crucially, vsavj's 0x700-0x7FF range
+# holds MUSIC TRACKS where vs2 put Donovan's voice bank: that (not "same
+# ids mean different things") is the real mechanism behind the round-2
+# music-on-214P bug.
+# ── original session-9 note ────────────────────────────────────────────────
 # Donovan's move code calls vs2 sound-farm entries (jsr 0x330E; move.l
 # #sfx,D1; bsr 0x5122; jmp 0x3306). The sfx ids reference VS2's QSound
 # sample set — sample migration is M5. Until then: stub to a known engine
@@ -1067,56 +1076,56 @@ vsav2 = 0x004DF6
 vsavj = 0x02A7E0
 kind = "stubbed_sound"
 status = "verified"
-note = "sound farm sfx 0x73E -> rts (M5 restores)"
+note = "M5 KEPT SILENT (14z-52): sfx id 0x73e — sample ABSENT from vsav's (full) sample ROMs. Measured, docs/m5/don_id_plan.json; restoring it would play the wrong sound. Revisit only with ported samples (STATE decision: voice samples)."
 
 [[map]]
 vsav2 = 0x004E2A
 vsavj = 0x02A7E0
 kind = "stubbed_sound"
 status = "verified"
-note = "sound farm sfx 0x747 -> rts (M5 restores)"
+note = "M5 KEPT SILENT (14z-52): sfx id 0x747 — sample ABSENT from vsav's (full) sample ROMs. Measured, docs/m5/don_id_plan.json; restoring it would play the wrong sound. Revisit only with ported samples (STATE decision: voice samples)."
 
 [[map]]
 vsav2 = 0x00506C
 vsavj = 0x02A7E0
 kind = "stubbed_sound"
 status = "verified"
-note = "sound farm sfx 0x112 -> rts (M5 restores)"
+note = "M5 KEPT SILENT (14z-52): sfx id 0x112 — restorable id but vsavj has NO farm entry loading it — needs a ported clone (M5 phase 2). Measured, docs/m5/don_id_plan.json; restoring it would play the wrong sound. Revisit only with ported samples (STATE decision: voice samples)."
 
 [[map]]
 vsav2 = 0x005086
 vsavj = 0x02A7E0
 kind = "stubbed_sound"
 status = "verified"
-note = "sound farm sfx 0x71D -> rts (M5 restores)"
+note = "M5 KEPT SILENT (14z-52): sfx id 0x71d — vsavj id is a MUSIC TRACK (multi-voice, sustained — measured). Measured, docs/m5/don_id_plan.json; restoring it would play the wrong sound. Revisit only with ported samples (STATE decision: voice samples)."
 
 [[map]]
 vsav2 = 0x0050A0
 vsavj = 0x02A7E0
 kind = "stubbed_sound"
 status = "verified"
-note = "sound farm sfx 0x753 -> rts (M5 restores)"
+note = "M5 KEPT SILENT (14z-52): sfx id 0x753 — vsavj id is a MUSIC TRACK (multi-voice, sustained — measured). Measured, docs/m5/don_id_plan.json; restoring it would play the wrong sound. Revisit only with ported samples (STATE decision: voice samples)."
 
 [[map]]
 vsav2 = 0x0050BA
 vsavj = 0x02A7E0
 kind = "stubbed_sound"
 status = "verified"
-note = "sound farm sfx 0x754 -> rts (M5 restores)"
+note = "M5 KEPT SILENT (14z-52): sfx id 0x754 — vsavj id is a MUSIC TRACK (multi-voice, sustained — measured). Measured, docs/m5/don_id_plan.json; restoring it would play the wrong sound. Revisit only with ported samples (STATE decision: voice samples)."
 
 [[map]]
 vsav2 = 0x0050D4
 vsavj = 0x02A7E0
 kind = "stubbed_sound"
 status = "verified"
-note = "sound farm sfx 0x755 -> rts (M5 restores)"
+note = "M5 KEPT SILENT (14z-52): sfx id 0x755 — vsavj id is a MUSIC TRACK (multi-voice, sustained — measured). Measured, docs/m5/don_id_plan.json; restoring it would play the wrong sound. Revisit only with ported samples (STATE decision: voice samples)."
 
 [[map]]
 vsav2 = 0x0050EE
 vsavj = 0x02A7E0
 kind = "stubbed_sound"
 status = "verified"
-note = "sound farm sfx 0x756 -> rts (M5 restores)"
+note = "M5 KEPT SILENT (14z-52): sfx id 0x756 — vsavj id is a MUSIC TRACK (multi-voice, sustained — measured). Measured, docs/m5/don_id_plan.json; restoring it would play the wrong sound. Revisit only with ported samples (STATE decision: voice samples)."
 
 # ── Pool-family helpers, session 9: structural-match at the family delta
 # (+0x18B8), 14-mnemonic skeleton identical ────────────────────────────────
@@ -1212,24 +1221,24 @@ note = "sound-farm entry sfx 0x115; unique save+id signature match"
 
 [[map]]
 vsav2 = 0x003ac4
-vsavj = 0x02A7E0
-kind = "stubbed_sound"
+vsavj = 0x003a8e
+kind = "sound_farm"
 status = "verified"
-note = "MOVE sfx 0x137 (x05c800-called): same-id vsavj entry has different MEANING (music triggers on 421P/214K etc., playtest 2026-07-28) — silent until M5; the id-matched vsavj entry was 0x137-numbered but semantically unrelated"
+note = "M5 RESTORED (14z-52): sfx id 0x137 -> vsavj same-id farm entry 0x03a8e. Sample content verified IDENTICAL across sets (QSound key-on probe: same bank/start after relocation, docs/m5/). The session-9 stub and the session-5 same-id-means-music theory were both wrong for this id."
 
 [[map]]
 vsav2 = 0x003f46
-vsavj = 0x02A7E0
-kind = "stubbed_sound"
+vsavj = 0x003f10
+kind = "sound_farm"
 status = "verified"
-note = "MOVE sfx 0x136 (x05c800-called): same-id vsavj entry has different MEANING (music triggers on 421P/214K etc., playtest 2026-07-28) — silent until M5; the id-matched vsavj entry was 0x136-numbered but semantically unrelated"
+note = "M5 RESTORED (14z-52): sfx id 0x136 -> vsavj same-id farm entry 0x03f10. Sample content verified IDENTICAL across sets (QSound key-on probe: same bank/start after relocation, docs/m5/). The session-9 stub and the session-5 same-id-means-music theory were both wrong for this id."
 
 [[map]]
 vsav2 = 0x003fae
-vsavj = 0x02A7E0
-kind = "stubbed_sound"
+vsavj = 0x003f78
+kind = "sound_farm"
 status = "verified"
-note = "MOVE sfx 0x13d (x05c800-called): same-id vsavj entry has different MEANING (music triggers on 421P/214K etc., playtest 2026-07-28) — silent until M5; the id-matched vsavj entry was 0x13d-numbered but semantically unrelated"
+note = "M5 RESTORED (14z-52): sfx id 0x13d -> vsavj same-id farm entry 0x03f78. Sample content verified IDENTICAL across sets (QSound key-on probe: same bank/start after relocation, docs/m5/). The session-9 stub and the session-5 same-id-means-music theory were both wrong for this id."
 
 [[map]]
 vsav2 = 0x003fc8
@@ -1243,63 +1252,63 @@ vsav2 = 0x0040ae
 vsavj = 0x02A7E0
 kind = "stubbed_sound"
 status = "verified"
-note = "MOVE sfx 0x14a (x05c800-called): same-id vsavj entry has different MEANING (music triggers on 421P/214K etc., playtest 2026-07-28) — silent until M5; the id-matched vsavj entry was 0x14a-numbered but semantically unrelated"
+note = "M5 KEPT SILENT (14z-52): sfx id 0x14a — sample ABSENT from vsav's (full) sample ROMs. Measured, docs/m5/don_id_plan.json; restoring it would play the wrong sound. Revisit only with ported samples (STATE decision: voice samples)."
 
 [[map]]
 vsav2 = 0x0042d0
-vsavj = 0x02A7E0
-kind = "stubbed_sound"
+vsavj = 0x004234
+kind = "sound_farm"
 status = "verified"
-note = "MOVE sfx 0x18b (x05c800-called): same-id vsavj entry has different MEANING (music triggers on 421P/214K etc., playtest 2026-07-28) — silent until M5; the id-matched vsavj entry was 0x18b-numbered but semantically unrelated"
+note = "M5 RESTORED (14z-52): sfx id 0x18b -> vsavj same-id farm entry 0x04234. Sample content verified IDENTICAL across sets (QSound key-on probe: same bank/start after relocation, docs/m5/). The session-9 stub and the session-5 same-id-means-music theory were both wrong for this id."
 
 [[map]]
 vsav2 = 0x0042ea
-vsavj = 0x02A7E0
-kind = "stubbed_sound"
+vsavj = 0x00424e
+kind = "sound_farm"
 status = "verified"
-note = "MOVE sfx 0x18d (x05c800-called): same-id vsavj entry has different MEANING (music triggers on 421P/214K etc., playtest 2026-07-28) — silent until M5; the id-matched vsavj entry was 0x18d-numbered but semantically unrelated"
+note = "M5 RESTORED (14z-52): sfx id 0x18d -> vsavj same-id farm entry 0x0424e. Sample content verified IDENTICAL across sets (QSound key-on probe: same bank/start after relocation, docs/m5/). The session-9 stub and the session-5 same-id-means-music theory were both wrong for this id."
 
 [[map]]
 vsav2 = 0x0043b2
 vsavj = 0x02A7E0
 kind = "stubbed_sound"
 status = "verified"
-note = "MOVE sfx 0x173 (x05c800-called): same-id vsavj entry has different MEANING (music triggers on 421P/214K etc., playtest 2026-07-28) — silent until M5; the id-matched vsavj entry was 0x173-numbered but semantically unrelated"
+note = "M5 KEPT SILENT (14z-52): sfx id 0x173 — vsavj same-id keys DIFFERENT sample content. Measured, docs/m5/don_id_plan.json; restoring it would play the wrong sound. Revisit only with ported samples (STATE decision: voice samples)."
 
 [[map]]
 vsav2 = 0x0046a0
-vsavj = 0x02A7E0
-kind = "stubbed_sound"
+vsavj = 0x0045c6
+kind = "sound_farm"
 status = "verified"
-note = "MOVE sfx 0x299 (x05c800-called): same-id vsavj entry has different MEANING (music triggers on 421P/214K etc., playtest 2026-07-28) — silent until M5; the id-matched vsavj entry was 0x299-numbered but semantically unrelated"
+note = "M5 RESTORED (14z-52): sfx id 0x299 -> vsavj same-id farm entry 0x045c6. Sample content verified IDENTICAL across sets (QSound key-on probe: same bank/start after relocation, docs/m5/). The session-9 stub and the session-5 same-id-means-music theory were both wrong for this id."
 
 [[map]]
 vsav2 = 0x0046e2
-vsavj = 0x02A7E0
-kind = "stubbed_sound"
+vsavj = 0x004608
+kind = "sound_farm"
 status = "verified"
-note = "MOVE sfx 0x156 (x05c800-called): same-id vsavj entry has different MEANING (music triggers on 421P/214K etc., playtest 2026-07-28) — silent until M5; the id-matched vsavj entry was 0x156-numbered but semantically unrelated"
+note = "M5 RESTORED (14z-52): sfx id 0x156 -> vsavj same-id farm entry 0x04608. Sample content verified IDENTICAL across sets (QSound key-on probe: same bank/start after relocation, docs/m5/). The session-9 stub and the session-5 same-id-means-music theory were both wrong for this id."
 
 [[map]]
 vsav2 = 0x0046fc
-vsavj = 0x02A7E0
-kind = "stubbed_sound"
+vsavj = 0x004622
+kind = "sound_farm"
 status = "verified"
-note = "MOVE sfx 0x157 (x05c800-called): same-id vsavj entry has different MEANING (music triggers on 421P/214K etc., playtest 2026-07-28) — silent until M5; the id-matched vsavj entry was 0x157-numbered but semantically unrelated"
+note = "M5 RESTORED (14z-52): sfx id 0x157 -> vsavj same-id farm entry 0x04622. Sample content verified IDENTICAL across sets (QSound key-on probe: same bank/start after relocation, docs/m5/). The session-9 stub and the session-5 same-id-means-music theory were both wrong for this id."
 
 [[map]]
 vsav2 = 0x004716
-vsavj = 0x02A7E0
-kind = "stubbed_sound"
+vsavj = 0x00463c
+kind = "sound_farm"
 status = "verified"
-note = "MOVE sfx 0x158 (x05c800-called): same-id vsavj entry has different MEANING (music triggers on 421P/214K etc., playtest 2026-07-28) — silent until M5; the id-matched vsavj entry was 0x158-numbered but semantically unrelated"
+note = "M5 RESTORED (14z-52): sfx id 0x158 -> vsavj same-id farm entry 0x0463c. Sample content verified IDENTICAL across sets (QSound key-on probe: same bank/start after relocation, docs/m5/). The session-9 stub and the session-5 same-id-means-music theory were both wrong for this id."
 
 [[map]]
 vsav2 = 0x004730
-vsavj = 0x02A7E0
-kind = "stubbed_sound"
+vsavj = 0x004656
+kind = "sound_farm"
 status = "verified"
-note = "MOVE sfx 0x15a (x05c800-called): same-id vsavj entry has different MEANING (music triggers on 421P/214K etc., playtest 2026-07-28) — silent until M5; the id-matched vsavj entry was 0x15a-numbered but semantically unrelated"
+note = "M5 RESTORED (14z-52): sfx id 0x15a -> vsavj same-id farm entry 0x04656. Sample content verified IDENTICAL across sets (QSound key-on probe: same bank/start after relocation, docs/m5/). The session-9 stub and the session-5 same-id-means-music theory were both wrong for this id."
 
 [[map]]
 vsav2 = 0x003972
@@ -1310,15 +1319,15 @@ note = "sound-farm entry sfx 0x10a; save+id+next-opword signature (dual-entry di
 
 [[map]]
 vsav2 = 0x0048be
-vsavj = 0x02A7E0
-kind = "stubbed_sound"
+vsavj = 0x0047e4
+kind = "sound_farm"
 status = "verified"
-note = "MOVE sfx 0x146 (x05c800-called): same-id vsavj entry has different MEANING (music triggers on 421P/214K etc., playtest 2026-07-28) — silent until M5; the id-matched vsavj entry was 0x146-numbered but semantically unrelated"
+note = "M5 RESTORED (14z-52): sfx id 0x146 -> vsavj same-id farm entry 0x047e4. Sample content verified IDENTICAL across sets (QSound key-on probe: same bank/start after relocation, docs/m5/). The session-9 stub and the session-5 same-id-means-music theory were both wrong for this id."
 
 [[map]]
 vsav2 = 0x0048d8
-vsavj = 0x02A7E0
-kind = "stubbed_sound"
+vsavj = 0x0047fe
+kind = "sound_farm"
 status = "verified"
-note = "MOVE sfx 0x142 (x05c800-called): same-id vsavj entry has different MEANING (music triggers on 421P/214K etc., playtest 2026-07-28) — silent until M5; the id-matched vsavj entry was 0x142-numbered but semantically unrelated"
+note = "M5 RESTORED (14z-52): sfx id 0x142 -> vsavj same-id farm entry 0x047fe. Sample content verified IDENTICAL across sets (QSound key-on probe: same bank/start after relocation, docs/m5/). The session-9 stub and the session-5 same-id-means-music theory were both wrong for this id."
 

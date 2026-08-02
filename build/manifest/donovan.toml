@@ -1443,3 +1443,38 @@ len = 0x20
 dst = 0x3A3A80
 dst_end = 0x3A3AA0
 dst_old_head = "0ffc0dc80b9609730cff0bcf0a9d097a"
+
+# ── 14z-52 M5: Donovan's per-char QSound record array ─────────────────────
+# The walker's per-node sfx path (ported dispatcher, built at ~0xCE3B8)
+# reads `lea 0xBF41A,a0; movea.l (a0,charid*4),a0; move.w (a0,idx*8),d1`
+# and calls the sound helper. Slot 0x0F's row still pointed at JEDAH's
+# array, whose live length is ~40 entries — while Donovan's scripts index
+# up to 43 (measured, replays 12/25/56). Unstubbing the helper without
+# this row would read PAST Jedah's array into neighbouring data (random
+# ids, including the 0x7xx music range). So: port Donovan's own 44-entry
+# array, hole-allocated, and repoint row 0x0F.
+#
+# keep_ids = the ONLY ids of his table whose sample exists on vsavj with
+# identical content (QSound key-on probe, both sets, docs/m5/):
+#   0x110 0x111 0x112 0x119 0x152 0x202
+# Everything else in his table is either a vsavj MUSIC TRACK (0x700-0x71F,
+# 0x750-0x757 — 30 ids) or a sample absent from vsav's (byte-full) sample
+# ROMs (9 ids). Those are zeroed: the engine skips id==0, so they stay
+# SILENT instead of playing music//the wrong sound. Restoring them needs
+# ported voice samples — STATE "Decisions pending: M5 voice samples".
+# BLOCKED ON ROM SPACE (14z-52): enabling this needs 0x160 bytes and BOTH
+# code holes are full (a: exhausted, b: <0x160 free) — the two ls_freeze
+# site_thunks lose their home if this allocates. Un-comment together with
+# the sound_helper row in reconciliation.toml ONCE a data home is decided
+# (candidate: Jedah's freed anim region [0x248B88,0x267000) — needs its own
+# dead-space audit; it is also the earmarked home for the ported select web).
+# [[sound_table]]
+# stage = 6
+# name = "don_sfx_records"
+# hole = "b"          # data blob: keep it out of the (full) code hole a
+# src = 0x0CB01A
+# entries = 44
+# ptr_table = 0x0BF41A
+# ptr_row = 0x0F
+# ptr_old = 0x000B3220
+# keep_ids = "0x110,0x111,0x112,0x119,0x152,0x202"

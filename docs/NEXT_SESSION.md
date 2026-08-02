@@ -1,14 +1,22 @@
-# NEXT SESSION — orientation (session 14z-49, 2026-08-02)
+# NEXT SESSION — orientation (session 14z-52, 2026-08-03)
 
-Read STATE.md session 14z-49 (HUD mugshot/name + select medallion)
-after this.
+Read STATE.md sessions 14z-51..52 (the M5 sound arc) after this.
 The maintainer tests frequently and reports precisely — their reports
 are the project's best instrument; reference data they provide goes
 straight into gates.
 
-## Ship state — all three per-slot venue assets show DONOVAN
+## Ship state — M2b+ASSETS frozen; M5 sound half-done and BLOCKED
 
-Build fingerprint `b91647c7` — **FROZEN as donovan-m2c (round 65)**.
+Frozen reference: `b91647c7` = **donovan-m2c** (round 65; validate any
+copy with `tests/run_suite.sh`, fingerprint auto-detects).
+Dev head: **`ae701ffb`** = m2c + the 14z-52 sound restores (13 farm
+rows; battery GREEN incl. the new sound gate). NOT frozen.
+
+**M5 is blocked on a placement decision, not on understanding** — the
+music bug is root-caused (vsavj 0x700-0x7FF = MUSIC, vs2 = Donovan's
+voice bank) and the fix is written; it needs 0x160 bytes and both code
+holes are full. Two decisions wait in STATE "Decisions pending":
+where the sound table lives, and whether to port voice samples.
 The whole 14z-48b asset family is closed on it: in-fight HUD mugshot
 (brown Donovan 2x2 beside the timer), HUD name plate ("Donovan" gold
 script), select-wheel medallion (Donovan icon in Jedah's ringed
@@ -18,6 +26,18 @@ Battery: `ROMDIR="/Users/koneko/Developer/Vampire Saved/ROMS" tests/run_battery_
 (~35 min; ROM audit first per CLAUDE.md §3).
 Dev builds: `GEN_FLAGS="--allow-plausible --tripwire-open" tools/build_donovan.sh 6 build/donovan6`
 (a bare build FAILS on 58 open reconciliation refs — expected).
+
+## What 14z-52 did (read STATE 14z-52 for the full measurement)
+
+- Root-caused the music bug; restored 13 sound rows (correct but
+  currently inaudible — they never fire in our replays).
+- Found where Donovan's sound actually lives: the per-node dispatcher
+  path (~400 helper calls/match), which needs his own record array
+  (slot 0x0F still resolves to Jedah's, and it is too short).
+- Wrote `[[sound_table]]` (generator kind + manifest row, id-allowlisted)
+  — COMMENTED OUT, blocked on space.
+- Added `tests/test_don_sound.sh` (music-range tripwire + frozen id
+  inventories) and wired it into the battery.
 
 ## What 14z-49 closed
 
@@ -47,10 +67,14 @@ Dev builds: `GEN_FLAGS="--allow-plausible --tripwire-open" tools/build_donovan.s
 1. ~~Maintainer verification round on `b91647c7`~~ DONE (round 63):
    "both medallion portraits are clean, no regression". Still open
    on their side: the full-cast ES-finish pass.
-2. **M5 sounds** (next real milestone item): dispatcher id-table
-   translation, NOT unstubbing the helper (reconciliation row note
-   at vsav2=0x005122). The walker's per-node sfx call site + param
-   tables are mapped (engine_internals walker section).
+2. **M5 sounds — resume here after the placement decision:**
+   un-comment `[[sound_table]] don_sfx_records` in donovan.toml AND
+   the sound_helper row in reconciliation.toml (both carry full
+   instructions), point `hole =` at whatever home is chosen, rebuild,
+   then re-run tests/test_don_sound.sh: the music tripwire must stay
+   clean and the id inventories will legitimately GROW (that is the
+   sound appearing — re-freeze them deliberately, with a listening
+   round from the maintainer).
 3. ~~Freeze candidacy~~ DONE (round 65): **M2b+ASSETS FROZEN at
    `b91647c7` -> donovan-m2c** (registry row + expectation set +
    suite green by auto-detection; HANDOFF registry row). Validate

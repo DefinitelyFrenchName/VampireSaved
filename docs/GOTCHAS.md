@@ -930,3 +930,26 @@ including several on the SAME frame — work fine ';'-joined (the
 existing gates already relied on this; the comma form cost three
 blind reruns this session). Symptom to recognize: rc=3 +
 FileNotFoundError on the first expected dump.
+
+## A 68k move.l reaches a memory tap as TWO word writes — a tap keyed
+## on the entry base sees only the (zero) high word
+The sound-ring tap looked for ids at `FF0E0E + n*16` and reported
+"nobody ever plays a sound" across eight Donovan replays. The enqueue
+is `move.l d1,(a4,d0.w)`; MAME's write tap fires twice, at +0 (high
+word, always 0 for a 12-bit id) and at +2 (the id). Keying on `%16==0`
+filtered out every real event and left only ring-clear traffic. When a
+tap over a known-busy structure reports nothing, suspect the access
+WIDTH before concluding the code path is dead — and log a few raw
+(addr, data) pairs unfiltered first.
+
+## Sound is invisible to every RAM and pixel gate — it needs its own
+The masked legacy gate, the field oracles and the pixel menu gates were
+ALL green while Donovan was completely silent, and equally green when a
+sound path was wired to vsavj's music-track id range (the round-2
+"214P plays music" bug). Sound state lives in a ring the gates mask as
+noise and in a Z80/QSound pipeline they never look at. tests/
+test_don_sound.sh exists because of this: it taps the ring, fails on
+any id in the music range, and freezes the per-replay id inventory.
+Any subsystem whose output leaves the 68k address space (sound today,
+anything sent to another processor tomorrow) needs a dedicated
+detector — "the battery is green" says nothing about it.

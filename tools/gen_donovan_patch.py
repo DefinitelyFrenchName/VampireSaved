@@ -1677,6 +1677,63 @@ def main():
             fragments.append((dst, ln, "VS2",
                               f"data_port {nm} ({man['src_set']} {src:#06x})"))
 
+    # ── sound_table (14z-52): port a per-char QSound record array with an
+    # ID ALLOWLIST. The engine's own dispatcher skips a record whose id
+    # word is 0 (`tst.w d1; beq`), so ids that have no faithful vsavj
+    # meaning are zeroed rather than translated — silence beats the wrong
+    # sound, and vsavj's 0x700-0x7FF ids are MUSIC TRACKS where vs2 put
+    # the newcomer voice bank (14z-52 measurement, docs/m5/). The blob is
+    # hole-allocated and the per-char pointer row is repointed, so the
+    # array length is bounded by OUR measurement (max index used + 1),
+    # not by the length of the slot's vanilla array.
+    if args.stage >= 6:
+        for st in port.get("sound_table", []):
+            if args.stage < _int(st.get("stage", 0)):
+                continue
+            nm = st["name"]
+            src = _int(st["src"])
+            n = _int(st["entries"])
+            keep = {_int(x) for x in str(st["keep_ids"]).split(",") if x.strip()}
+            sdat = (root / f"build/out/{man['src_set']}_data.bin").read_bytes()
+            blob = bytearray(sdat[src:src + n * 8])
+            if len(blob) != n * 8:
+                fail.append(f"sound_table {nm}: src read short")
+                continue
+            zeroed = []
+            for i in range(n):
+                o = i * 8
+                sid = int.from_bytes(blob[o:o + 2], "big")
+                alt = int.from_bytes(blob[o + 2:o + 4], "big")
+                if sid and sid not in keep:
+                    zeroed.append((i, sid))
+                    blob[o:o + 2] = b"\x00\x00"
+                if alt and alt not in keep:
+                    blob[o + 2:o + 4] = b"\x00\x00"
+            dst = alloc(st.get("hole", "a"), len(blob), f"sound_table {nm}")
+            if dst is None:
+                continue
+            ptr_at = _int(st["ptr_table"]) + _int(st["ptr_row"]) * 4
+            old_ptr = vj_u32(ptr_at)
+            if "ptr_old" in st and old_ptr != _int(st["ptr_old"]):
+                fail.append(f"sound_table {nm}: ptr row holds {old_ptr:#x}, "
+                            f"manifest expects {_int(st['ptr_old']):#x}")
+                continue
+            ops.append({"op": "data", "addr": f"{dst:#x}",
+                        "hex": bytes(blob).hex()})
+            ops.append({"op": "poke32", "addr": f"{ptr_at:#x}",
+                        "val": f"{dst:#x}"})
+            kept = [f"{int.from_bytes(blob[i*8:i*8+2],'big'):#05x}@{i}"
+                    for i in range(n) if int.from_bytes(blob[i*8:i*8+2], "big")]
+            notes.append(f"data   {dst:#08x} +{len(blob):#x}  sound_table {nm} "
+                         f"<- {man['src_set']} {src:#08x} ({n} entries; "
+                         f"kept {kept}; zeroed {len(zeroed)} unplayable ids)")
+            notes.append(f"poke32 {ptr_at:#08x} <- {dst:#x}  "
+                         f"sound_table {nm} per-char ptr row "
+                         f"{_int(st['ptr_row']):#04x} (was {old_ptr:#x})")
+            fragments.append((dst, len(blob), "VS2",
+                              f"sound_table {nm} ({man['src_set']} {src:#06x}, "
+                              f"id-allowlisted)"))
+
     # ── site_thunk: generic 6-byte engine-site -> jsr thunk (14q pattern) ───
     # The thunk body is authored hex (must preserve the displaced
     # instruction's semantics on its vanilla path, including flags where
