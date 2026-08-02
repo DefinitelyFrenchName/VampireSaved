@@ -476,3 +476,51 @@ medallion recolor; future Huitzil/Pyron rows) surfaces in this buffer
 during fades in LEGACY replays. Handled by the third masked window
 (tests/lib/m2a_common.sh M2A_MASK + docs/atlas/ram.md; pending
 maintainer ratification, STATE 14z-49b).
+
+## Sound subsystem: the QSound command path (session 14z-51, measured)
+
+Architecture (all measured live, both games):
+
+- **68k side is id-only.** Game code queues `{id.l, d2.l, d3.l, pad}`
+  16-byte entries into a ring at `RAM:$FF0E0E` (0x100 entries), write
+  index word at `RAM:$FF1E0E` (enqueue routine PRG:0x31EA, a5=FF8000
+  with negative displacements). A per-frame pump transmits pending ids
+  to the sound board as 16-byte port packets (`0x618000-0x61801E`,
+  id hi/lo at +0/+2; keepalive at 0x619FFC). No sample knowledge on
+  the 68k side at all.
+- **The sound driver is a Z80** (`vm3.01/02`, 256KB banked; vs2 twins
+  `vs2.01/02`). Family-shared code head (identical to 0xD85), then
+  per-game data. It drives the QSound chip via the classic triplet
+  interface at Z80 `0xD800`→ no: **`0xD000/D001/D002`** (data hi, data
+  lo, reg#).
+- **QSound chip regs:** voice v params at reg v*8+k — k=1 start addr,
+  2 pitch, 3 phase (0x8000 = KEY-ON marker), 4 loop, 5 end, 6 vol;
+  **bank for voice v is written at reg ((v-1)&15)*8** (the +1 hardware
+  quirk). Sample address = (bank&0x7F)<<16 | start, into the 8MB
+  11m+12m image.
+- **Instrument (promoted): tests/lua/qs_sweep.lua** — replay-driven
+  venue + ring-poke id sweeps + chip-write log; parse with
+  tools/qs_analyze.py (key-on extraction with last-known reg
+  tracking). Sweeps run in TEST MODE (silent; ring index rests at
+  0x70 in both games at f1050 on replay 06). 12-frame windows
+  misattribute delayed-attack sfx — re-probe suspects with 45-frame
+  spacing.
+
+### The 14z-51 id-space result (docs/m5/keyons_*.json)
+
+Sweeping ids 0x000-0x7FF on both games (2048 pokes each): 1613 vsavj /
+1370 vs2 ids key voices. **For the shared sfx library the two games
+use IDENTICAL ids** — vs2 0x136/0x137/0x13d/0x142/0x146/0x112/0x156/
+0x157/0x158/0x15a/0x18b/0x18d/0x299/0x2d4 all exist on vsavj as the
+SAME id keying the SAME sample content (relocated in the image;
+content-verified). The session-5 "same-id means music in vsavj" theory
+is dead — the 214P/214K music bug's real mechanism must be re-diagnosed
+(suspect: the per-char dispatcher table indirection `(6,a0,d2.w)` or
+corrupted id flow through the farm path) BEFORE unstubbing.
+vs2-ONLY samples (absent from vsav's 8MB — Donovan voice/new sfx):
+ids 0x71d, 0x73e, 0x753, 0x754, 0x755, 0x756 (+0x14a and 0x173 are
+same-id-different-content — vsavj reuses those ids for other sounds).
+0x747 keys nothing in either probe so far (needs params or longer
+window). Sample ROMs are FULL (no blank 64K blocks) — porting voice
+samples means growing the QSound region (descriptor change) or
+sacrificing content; maintainer decision material.

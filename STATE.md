@@ -1,8 +1,11 @@
 # STATE — living progress log
 
-Updated: 2026-08-02 (session 14z-50 — M2b+ASSETS FROZEN at
-b91647c7 -> donovan-m2c, maintainer decision; suite green by
-fingerprint auto-detection; next: M5 sounds)
+Updated: 2026-08-02 (session 14z-51 — M5 DISCOVERY DONE: QSound
+path fully mapped (68k ring -> Z80 driver -> chip regs), id sweeps
+run on both games; SHARED SFX USE IDENTICAL IDS; 6-8 Donovan voice
+samples absent from vsav's full sample ROMs — port-vs-silent
+decision pending; music-bug mechanism re-diagnosis required before
+unstubbing)
 
 ## Session 14z-49 (rounds 61-62: HUD MUGSHOT + NAME + SELECT MEDALLION — the whole per-slot venue-asset family fixed)
 
@@ -62,6 +65,42 @@ Build `b91647c7da14ded6316cee8dc057c8daf1c3fb1e` (donovan6, stage 6).
   re-verified: Donovan medallion in Jedah's ringed cell, Gallon's
   werewolf 3x3 restored, VS-splash big portrait + name were already
   correct.
+
+## Session 14z-51 (M5 sounds: discovery phase — the id-space myth dies)
+
+Method: built the ring-poke + chip-write-tap instrument
+(tests/lua/qs_sweep.lua + tools/qs_analyze.py; full path decode in
+engine_internals "Sound subsystem"). Swept ids 0x000-0x7FF on BOTH
+games in silent test mode; extracted per-id QSound key-ons
+(bank/start/end -> sample address -> content compare across images).
+
+FINDINGS (docs/m5/keyons_*.json = the measured id maps):
+- **Shared sfx keep IDENTICAL ids across the family.** All 14
+  content-shared stubbed MOVE-sfx ids exist on vsavj as the same id
+  keying the same (relocated) sample. NO id translation table is
+  needed for these.
+- **The session-5 "same-id = music in vsavj" theory is DEAD** —
+  vsavj 0x136/0x137/etc are the same sword/impact sfx as vs2's. The
+  round-2 music-on-214P bug therefore has a DIFFERENT mechanism
+  (suspects: the (6,a0,d2.w) dispatcher-table indirection, or id
+  corruption through the farm-call path). MUST be re-diagnosed with
+  the new instrument before any unstub ships.
+- **vs2-only content (absent from vsav's sample ROMs): ids 0x71D,
+  0x73E, 0x753, 0x754, 0x755, 0x756** — Donovan voice lines/new sfx;
+  0x14A and 0x173 are same-id-DIFFERENT-content (vsavj reuses them);
+  0x747 keys nothing on either side yet (params/window). vsav's
+  11m/12m are FULL (zero blank blocks): porting voices = grow the
+  QSound sample region (descriptor-level change, CLAUDE.md rule 1
+  allows load-map changes) or replace something. DECISION MATERIAL.
+- Instrument notes: ring FF0E0E/index FF1E0E (a5=FF8000, negative
+  displacements — the FF8E0E literal is a sign-extension trap);
+  Z80 chip triplets at D000-D002; bank reg belongs to voice+1;
+  12-frame sweep windows misattribute delayed-attack sfx.
+
+NEXT (in order): (1) re-diagnose the 214P/214K music mechanism with
+the sweep instrument on the DONOVAN BUILD (poke the exact farm-path
+ids, watch what reaches the ring); (2) decide + implement the
+shared-sfx unstubs; (3) the voice-samples decision.
 
 ## Session 14z-50 (round 65: M2b+ASSETS FREEZE at b91647c7)
 
@@ -3451,6 +3490,19 @@ Extension policy stands: future palette-block ports extend the
 window per measured slot, never pre-widen.
 
 ## Decisions pending (human)
+
+- **M5 VOICE SAMPLES (14z-51):** 6-8 of Donovan's sounds (his voice
+  lines / vs2-new sfx: ids 0x71D/0x73E/0x753-0x756, likely the "Change
+  Immortal" family) do not exist in vsav's sample ROMs, which are
+  byte-full. Options: A) ship M5 with those specific sounds silent
+  (shared sfx all restorable regardless); B) grow the QSound sample
+  region via driver descriptor (vm3.11m/12m from 4MB->8MB members or
+  add members; CLAUDE.md rule 1 permits load-map changes; MiSTer
+  impact unknown); C) overwrite low-value vsav content (risky,
+  superset-invariant-adjacent). Recommendation: A now (matches the
+  current "silent by design" behavior for exactly the sounds that
+  cannot be faithful), revisit B at M3 when Huitzil/Pyron force the
+  same question at scale.
 
 - **ROSTER ACCESS MECHANISM (M4-defining, raised by maintainer
   2026-07-28):** how players select the 18 characters. Option A: full
