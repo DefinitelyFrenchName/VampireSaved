@@ -4,3 +4,4 @@
 b0eb9ecd8a6fd354f398d4347002b204b784f47c	vsavj	vanilla vsavj (Japan 970519) reference program image
 a02aeefff4c7a053337b10c923c8c328573788fa	donovan-m2	M2a freeze: donovan-m2 stage 5 (hooked build; masked legacy basis per CLAUDE.md §4 v2) — frozen 2026-07-28, STATE.md
 71601263474dfd7e4afd0741dae696cde22eda4e	donovan-m2b	M2b-core freeze: sprites/palettes/effects in Jedah gfx space (stage 6; masked legacy basis; gfx members vm3.14m c192ddfc 16m 38747f4e 18m 1d69c1b4 20m 08ff44e9) — frozen 2026-07-28, STATE.md
+b91647c7da14ded6316cee8dc057c8daf1c3fb1e	donovan-m2c	M2b+assets freeze: 14z-42..49 arc (LS freeze thunks, ES chain + meter, win screen, deity states, accent fallback, HC farm_ports, HUD mugshot/name, select medallion) on the 3-window masked basis (ratified round 64; audit tests/audit_mask_window_ff4182.sh); gfx members vm3: 13m 52dd7aed 15m f09160d7 17m ff777431 19m d5cfc4ae 14m a8807f9b 16m 637e6ddd 18m cc195b17 20m 499a1781 — frozen 2026-08-02, STATE.md

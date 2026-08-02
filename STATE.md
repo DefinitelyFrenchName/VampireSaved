@@ -1,8 +1,8 @@
 # STATE — living progress log
 
-Updated: 2026-08-02 (session 14z-49d — third mask window
-MAINTAINER-RATIFIED after the recolor-necessity A/B; scripted
-window audit added per their "be prepared to confirm one day")
+Updated: 2026-08-02 (session 14z-50 — M2b+ASSETS FROZEN at
+b91647c7 -> donovan-m2c, maintainer decision; suite green by
+fingerprint auto-detection; next: M5 sounds)
 
 ## Session 14z-49 (rounds 61-62: HUD MUGSHOT + NAME + SELECT MEDALLION — the whole per-slot venue-asset family fixed)
 
@@ -62,6 +62,36 @@ Build `b91647c7da14ded6316cee8dc057c8daf1c3fb1e` (donovan6, stage 6).
   re-verified: Donovan medallion in Jedah's ringed cell, Gallon's
   werewolf 3x3 restored, VS-splash big portrait + name were already
   correct.
+
+## Session 14z-50 (round 65: M2b+ASSETS FREEZE at b91647c7)
+
+Maintainer decision: freeze before starting M5 sounds ("this is
+mechanically sound as far as we can tell"). Procedure per the
+M2b-CORE precedent (e14e591):
+
+- `tests/expected/registry.tsv`: `b91647c7…` -> `donovan-m2c`
+  (all 8 patched vm3 gfx member sha1s in the note — group A now
+  carries effect-tail/HUD/medallion art, so A-members are recorded
+  alongside B for the first time).
+- `tests/expected/donovan-m2c/`: 14 authored .masked rows (the
+  current battery-measured inventory — NOTE 08_challenger_join is
+  `flicker 1 3507` here vs m2b's `2 3507,3807`, and 29/30 gained
+  masked rows, both post-m2b gate additions), 16 .skip rows (every
+  vsav2-target replay incl. the 14z-era native ground-truth
+  replays 51/52/57), and self-frozen sha1+log expectations for the
+  33 vsavj Donovan replays, frozen on b91647c7 (each run twice,
+  determinism-checked, by run_suite --freeze).
+- SYNC BUG CAUGHT AT FREEZE TIME: `run_suite.sh` carries its own
+  MASK copy ("must stay in sync with M2A_MASK") — it still had the
+  two-window basis; the third window would have failed every
+  masked row of the freeze suite. Synced + comment updated. The
+  duplication is a standing trap; if a fourth window is ever
+  added, grep for MASK_RANGES consumers.
+- Validation: freeze pass green; plain `run_suite.sh` pass green
+  end-to-end by pure fingerprint auto-detection (masked rows
+  validated against authored expectations in that pass — freeze
+  mode does not check them).
+- HANDOFF build registry row added; patch_index status updated.
 
 ## Session 14z-49d (round 64: mask window RATIFIED; recolor necessity proven; audit script)
 
@@ -3402,6 +3432,12 @@ data. "Less work, less risk, and we can always come back to it after
 all the more important work." LOCKED in tests/test_don_accent.sh
 section 3 (shock-window vanilla lock, frozen from a vanilla run) —
 revisiting requires changing that gate deliberately.
+
+## Decision made (maintainer, 2026-08-02, round 65): M2b+ASSETS freeze
+
+Freeze `b91647c7` as `donovan-m2c` before starting M5 sounds —
+"mechanically sound as far as we can tell" (rounds 52-64 playtest
+arc + full battery + suite). Frozen basis: three masked windows.
 
 ## Decision made (maintainer, 2026-08-02, round 64): third mask window
 

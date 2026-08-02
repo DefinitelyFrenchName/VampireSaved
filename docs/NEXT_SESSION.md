@@ -8,7 +8,7 @@ straight into gates.
 
 ## Ship state — all three per-slot venue assets show DONOVAN
 
-Build fingerprint `b91647c7` (dev head; register at freeze time).
+Build fingerprint `b91647c7` — **FROZEN as donovan-m2c (round 65)**.
 The whole 14z-48b asset family is closed on it: in-fight HUD mugshot
 (brown Donovan 2x2 beside the timer), HUD name plate ("Donovan" gold
 script), select-wheel medallion (Donovan icon in Jedah's ringed
@@ -51,11 +51,11 @@ Dev builds: `GEN_FLAGS="--allow-plausible --tripwire-open" tools/build_donovan.s
    translation, NOT unstubbing the helper (reconciliation row note
    at vsav2=0x005122). The walker's per-node sfx call site + param
    tables are mapped (engine_internals walker section).
-3. **Freeze candidacy:** the dev head has accumulated 14z-42..49
-   (LS freeze, ES chain, win screen, deity states, accent fallback,
-   HC farm_ports, HUD/medallion assets) — all gate-locked and
-   maintainer-confirmed except 14z-49 (pending round). Consider
-   proposing an M2b-CORE+1 freeze after the maintainer round.
+3. ~~Freeze candidacy~~ DONE (round 65): **M2b+ASSETS FROZEN at
+   `b91647c7` -> donovan-m2c** (registry row + expectation set +
+   suite green by auto-detection; HANDOFF registry row). Validate
+   any copy of the frozen build with `ROMDIR=... MAME_ROMPATH=
+   "<rompath>;$ROMDIR" tests/run_suite.sh`.
 4. Small parked items: row-0x0F fixture override port (statue
    accents), table-B 0x38C1D8 slot-0F repoint (alt-color), win-quote
    palette, mash A/B for ES version.

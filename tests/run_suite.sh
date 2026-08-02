@@ -53,10 +53,11 @@ check_diverge() {
     python3 "$REPO/tools/check_diverge.py" "$1" "$2" "$REPO/tests/expected"
 }
 
-# The two masked windows of the amended legacy basis (docs/atlas/ram.md:
-# dead stack $FF7F00-$FF7FFF + QSound handshake latch $FF043C). Must stay
-# in sync with M2A_MASK in tests/lib/m2a_common.sh.
-MASK="043c-043d,7f00-8000"
+# The masked windows of the amended legacy basis (docs/atlas/ram.md:
+# dead stack $FF7F00-$FF7FFF + QSound latch $FF043C + the 14z-49 palette
+# staging slot $FF4182-$FF41A1, ratified round 64). Must stay in sync
+# with M2A_MASK in tests/lib/m2a_common.sh.
+MASK="043c-043d,4182-41a2,7f00-8000"
 
 fail=0
 for rpl in "$REPO"/tests/replays/*.rpl; do
