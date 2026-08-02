@@ -28,4 +28,26 @@ else
     echo "FAIL: guard tripped on the column KO:"; grep -A3 "GUARD TRIPPED" "$WORK/out.txt" | head -6
     exit 1
 fi
+# ── 14z-46: swordless-deity palette lock (rounds 41/55 arc). The
+#    summon's seq-state stub must upload vs2's record 0x2D4 -> P1
+#    rows 0x0B/0x0C at f2913 (the per-stub seq_ids map; the old
+#    consecutive-id synthesis uploaded 0x2D3 = the yellow deity).
+#    Frozen from native vs2 (plant_vs2 replay, f2960). No poke — the
+#    palette beat is pre-KO and poke-free frames are choreography-
+#    identical to the gate's guarded run history.
+mkdir -p "$WORK/pal"
+DUMPS="2960:90c160-90c1a0" \
+    REPLAY="$REPO/tests/replays/50_don_column_ko.rpl" \
+    CHECKSUM_OUT="$WORK/pal/c.log" MAME_SANDBOX="$WORK/pal" \
+    MAME_ROMPATH="$RPDIR;$ROMDIR" tools/run_mame.sh vsavj \
+    -autoboot_script "$REPO/tests/lua/replay.lua" > /dev/null 2>&1
+python3 - "$WORK/pal" <<'EOF2'
+import sys, os
+FROZEN = "ff00f55cf66ef78ff8aff9bffadffcfffffff0aff0cff0effafffdfff111f007f000fffffdfffcdff9adf87af635ffeafdb8fa86f864f653fbcef88bfe00f002"
+d = open(os.path.join(sys.argv[1], 'dump_2960_90c160.bin'),'rb').read()[:0x40]
+assert d.hex() == FROZEN, (
+    "swordless-deity rows 0x0B/0x0C diverge from native vs2 (yellow "
+    "deity = wrong seq record; check [state_hook] seq_ids)")
+print("  ok: swordless-deity palette rows native-locked (0x0B/0x0C)")
+EOF2
 echo "PASS: Donovan column-KO crash gate"

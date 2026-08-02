@@ -1318,20 +1318,58 @@ def main():
                              f"engine {_int(sh['seq_set']) + 6:#x})")
                 fragments.append((sw, 12, "GEN", "state_hook private seq entry"))
                 sh["_seq_entry"] = sw
+        # 14z-46: per-stub seq ids (vs2's cases are NOT consecutive — the
+        # original synthesis held only for the first three). Config
+        # seq_ids: one entry per ext state; -1 = dead state (never
+        # written by the ported code, vs2 case non-uniform) -> safe
+        # no-op stub (jmp ret_equiv). Live ids are re-verified against
+        # vs2's OWN dispatch table at build time.
+        seq_ids = ([-1 if x.strip() == "-" else int(x.strip(), 0)
+                    for x in sh["seq_ids"].split(",")]
+                   if "seq_ids" in sh else
+                   [seq_id0 + k for k in range(n_ext)])
+        if len(seq_ids) != n_ext:
+            fail.append(f"state_hook: seq_ids has {len(seq_ids)} entries, "
+                        f"n_ext = {n_ext}")
+        if "src_dispatch_table" in sh:
+            src_opc = (root / f"build/out/{man['src_set']}_opcodes.bin").read_bytes()
+            stab = _int(sh["src_dispatch_table"])
+            sidx0 = _int(sh["src_first_idx"])
+            for k, sid in enumerate(seq_ids):
+                if sid < 0:
+                    continue
+                w = int.from_bytes(src_opc[stab + 2*(sidx0+k):stab + 2*(sidx0+k) + 2], "big")
+                case = src_opc[stab + w:stab + w + 0x20]
+                m = case.find(b"\x30\x3c")
+                real = int.from_bytes(case[m+2:m+4], "big") if m >= 0 else None
+                if real != sid:
+                    fail.append(f"state_hook: seq_ids[{k}] = {sid:#x} but the "
+                                f"src case (idx {sidx0+k}) carries "
+                                f"{real if real is None else hex(real)}")
+                lo = seq_id0
+                if not (lo <= sid < lo + rlen // 32):
+                    fail.append(f"state_hook: seq_ids[{k}] = {sid:#x} outside "
+                                f"the ported record block "
+                                f"[{lo:#x},{lo + rlen//32:#x})")
         stubs = alloc("a", 32 * n_ext, "state_hook case stubs")
         et = alloc("a", 4 * n_ext, "state_hook ext table")
         mt = alloc("a", 50, "state_hook thunk")
         if None not in (stubs, et, mt):
             blob = b""
             for k in range(n_ext):
-                blob += (b"\xb0\x2e" + _int(sh["prev_state_off"]).to_bytes(2, "big")
-                         + b"\x66\x06"
-                         + b"\x4e\xf9" + _int(sh["ret_equiv"]).to_bytes(4, "big")
-                         + b"\x42\x2e" + _int(sh["clr_b_off"]).to_bytes(2, "big")
-                         + b"\x42\x6e" + _int(sh["clr_w_off"]).to_bytes(2, "big")
-                         + b"\x30\x3c" + (seq_id0 + k).to_bytes(2, "big")
-                         + b"\x72\x01"
-                         + b"\x4e\xf9" + sh["_seq_entry"].to_bytes(4, "big"))
+                if seq_ids[k] < 0:
+                    piece = b"\x4e\xf9" + _int(sh["ret_equiv"]).to_bytes(4, "big")
+                    piece += b"\x4e\x71" * ((32 - len(piece)) // 2)
+                else:
+                    piece = (b"\xb0\x2e" + _int(sh["prev_state_off"]).to_bytes(2, "big")
+                             + b"\x66\x06"
+                             + b"\x4e\xf9" + _int(sh["ret_equiv"]).to_bytes(4, "big")
+                             + b"\x42\x2e" + _int(sh["clr_b_off"]).to_bytes(2, "big")
+                             + b"\x42\x6e" + _int(sh["clr_w_off"]).to_bytes(2, "big")
+                             + b"\x30\x3c" + seq_ids[k].to_bytes(2, "big")
+                             + b"\x72\x01"
+                             + b"\x4e\xf9" + sh["_seq_entry"].to_bytes(4, "big"))
+                blob += piece
             assert len(blob) == 32 * n_ext
             ops.append({"op": "code", "addr": f"{stubs:#x}", "hex": blob.hex()})
             ext = b"".join((stubs + 32 * k).to_bytes(4, "big")

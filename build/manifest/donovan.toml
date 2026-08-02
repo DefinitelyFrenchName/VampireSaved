@@ -73,6 +73,24 @@ prev_state_off = 0x14F
 clr_b_off = 0x181
 clr_w_off = 0x182
 seq_first_id = 0x2CD
+# 14z-46 CORRECTION (the swordless-deity palette root cause): vs2's
+# 12 extension-state cases do NOT carry consecutive seq ids — the
+# synthesis assumption held only for the first three (why sampling
+# looked uniform). Real per-state map extracted from vs2's own
+# dispatch table (0x29B6C, idx 89-100) and re-verified at build
+# time: ids [2cd 2ce 2cf 2d3 2d1 — 2d4 — — — 2cd —]. Entries -1 =
+# states Donovan's ported code NEVER writes (verified by image scan
+# for move.b #state,$14E writes: dead = 0xBC/0xC0/0xC2/0xC4/0xC8)
+# AND whose vs2 cases are non-uniform (two direct fixture-block
+# uploads from 0x3CB7DC, one id-0x290+color case, one bsr+bra
+# double-action case — full census in STATE 14z-46); they get safe
+# no-op stubs (jmp ret_equiv, no palette change) — if a future port
+# starts writing one, upgrade its stub to the real vs2 shape.
+# Live latent fixes beyond the deity: state 0xB8 (2d0->2d3), state
+# 0xC6 (2d7->2cd, 4 write sites).
+seq_ids = "0x2CD,0x2CE,0x2CF,0x2D3,0x2D1,-,0x2D4,-,-,-,0x2CD,-"
+src_dispatch_table = 0x29B6C
+src_first_idx = 89
 seq_base = 0x39A900
 records_src = 0x3B63DC
 records_orc = 0x3963B0

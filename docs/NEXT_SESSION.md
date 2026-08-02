@@ -67,9 +67,11 @@ attribute any drift, maintainer sign-off, never silently refreeze).
    fixed; lose/continue = no issue (lose = opponent's win screen +
    shared continue screen). ARC CLOSED. NOTE: hole B nearly full
    (0x1F0 free).
-4. Swordless-deity palette (yellow vs vs2 blue figure/lightning —
-   maintainer captures round 41). Same family as the deity's obj
-   palette rows; untouched so far.
+4. ~~Swordless-deity palette~~ FIXED 14z-46 (build c45bdc45,
+   gate-locked): the state_hook seq-id synthesis was wrong for 8 of
+   12 stubs (full census in STATE 14z-46; GOTCHAS entry). Fixed the
+   deity (state 0xBE) + two other LIVE latent states (0xB8, 0xC6);
+   dead states = safe no-op stubs with the upgrade spec documented.
 5. Select-screen post-confirm blink (tracked minor): select-venue
    objs lack +0x3A4 (cached block ptr) -> the color-aware accent
    thunks fall back to punch-color slots on that screen only. Fix

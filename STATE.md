@@ -5,6 +5,45 @@ system disassembled, scripted ES unlocked, ES 9 hits native-exact,
 AND the round-52 ES-finish neutral-pose KO fixed; battery pending
 at entry-writing time)
 
+## Session 14z-46 (SWORDLESS-DEITY PALETTE FIXED — the state_hook seq-id synthesis was wrong for 8 of 12 stubs; battery pending at entry time)
+
+The round-41 item (ours yellow deity/lightning vs vs2 blue/white)
+root-caused to a SYNTHESIS BUG in the session-8/9 [state_hook]
+machinery (build c45bdc45):
+- **Mechanism:** the swordless summon fires ext state 0xBE (k=6);
+  our stub uploaded seq record 0x2D3 (consecutive-id assumption
+  seq_first_id+k); vs2's own case for that state carries **0x2D4**
+  (trace-proven, both games, upload at f2913 -> P1 row 0x0B family).
+  The full vs2 case census (dispatch table 0x29B6C idx 89-100):
+  ids [2cd 2ce 2cf 2d3 2d1 (fixture) 2d4 (290+color) 29e (29e+bsr)
+  2cd (fixture)] — consecutive ONLY for the first three (why the
+  synthesis sampling looked uniform). Two cases are direct fixture-
+  block uploads (base 0x3CB7DC +0x140 by +0x3C3, +color*0x20 —
+  targets rows 0x14/0x15 and 0x0E), one adds the COLOR to id 0x290,
+  one double-acts via bsr+bra. Vanilla-range ids 0x290-0x29E:
+  records DRIFTED between engines (vsavj's content differs).
+- **Live-state census (image scan for move.b #state,$14E):**
+  Donovan's code writes only 0xB2/B4/B6/B8/BA/BE/C6 (k=0,1,2,3,4,
+  6,10). ALL the awkward cases (both fixture, 290+color, bsr) are
+  DEAD STATES. Beyond the deity (k=6), two LIVE latent wrong-record
+  bugs fixed in the same stroke: state 0xB8 (2d0 -> 2d3) and state
+  0xC6, 4 write sites (2d7 -> 2cd).
+- **FIX:** [state_hook] seq_ids per-stub map (comma-string;
+  _minitoml has no array-of-int support) + generator emits per-stub
+  ids, build-time-verified against vs2's OWN dispatch table; dead
+  states get safe no-op stubs (jmp ret_equiv — no palette change;
+  if a future port writes one, upgrade to the real vs2 case shape —
+  the census above is the spec; hole-b budget note: the fixture
+  block would need ~0x240, only ~0x1F0 free).
+- **Verified:** deity rows 0x0B/0x0C byte-MATCH native at f2960;
+  snapshot = blue deity + white/blue lightning (the native look).
+  Victim-shock coloring differences at the same frame = shock PHASE
+  (ours 2-HIT vs native 3-HIT at the sample — alternating X-ray
+  frames), not palette. GATE: test_don_column.sh + native-locked
+  rows 0x0B/0x0C (frozen from plant_vs2 f2960).
+- Replay promoted: 57_vs2_plant_native.rpl (the native ground
+  truth; datums in its header).
+
 ## Session 14z-45b (round 56 on 4f69589d: win screen maintainer-CONFIRMED; lose/continue NO-ISSUE)
 
 - **Win screen fixed ✓** (maintainer).

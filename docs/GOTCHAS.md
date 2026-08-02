@@ -872,3 +872,19 @@ one assertion that the mechanism actually fired (here: the ES chain's
 node family in a dump), or its coverage can quietly evaporate.
 (14z-43b; when the scripted-accept divergence is root-caused, note it
 here.)
+
+## Sampled uniformity is not uniformity — extract the FULL set before
+## synthesizing engine cases
+The state_hook synthesis (session 8) sampled vs2's extension-state
+cases, saw three consecutive seq ids (0x2CD/2CE/2CF) and uniform stub
+shapes, and generated all 12 as `seq_first_id + k`. The real census
+(14z-46): only the first three are consecutive; ids jump (2d3, 2d1,
+2d4), repeat (2cd twice, 29e twice), dip into the vanilla range
+(0x290+color — whose records DRIFTED between engines), and two
+"stubs" are entirely different shapes (direct fixture-block palette
+uploads). 8 of 12 synthesized stubs were wrong; three were LIVE bugs
+(the yellow swordless deity among them, shipped for ~25 rounds).
+When synthesizing N parallel engine cases from a sibling, disassemble
+ALL N and diff them against each other first — and add a build-time
+assertion against the source engine's own table (the seq_ids
+verification pattern) so config drift fails the build.
