@@ -56,8 +56,8 @@ m2a_legacy_gate() {
 # RAM except the windows documented in docs/atlas/ram.md (dead stack
 # $FF7F00-$FF7FFF at frame-done + QSound handshake latch $FF043C + the
 # 14z-49 window below).
-# THIRD WINDOW $FF4182-$FF41A1 (added 14z-49, PENDING MAINTAINER
-# RATIFICATION): the palette-fade staging buffer's slot for select
+# THIRD WINDOW $FF4182-$FF41A1 (added 14z-49, MAINTAINER-RATIFIED
+# 2026-08-02 round 64): the palette-fade staging buffer's slot for select
 # palette-block-A row 14. The 14z-49 medallion recolor (Donovan's icon on
 # the replaced Jedah slot) legitimately changes that ROM row; venue fades
 # (measured: the match->win fade, 05_timeout_idle f9126) stage block-A rows
@@ -67,6 +67,9 @@ m2a_legacy_gate() {
 # row 14 with its own colors — win screens pixel-compare 0-diff vanilla vs
 # patched at f9200/f9400). Masking the 0x20-byte slot keeps 05 verified
 # full-length instead of demoting it to a first-divergence constant.
+# AUDIT ON SUSPICION: tests/audit_mask_window_ff4182.sh re-proves the
+# window's divergence is exactly the designed row content and nothing
+# else (full spec: docs/atlas/ram.md row + STATE 14z-49b).
 # Future slot ports (Huitzil/Pyron rows) must extend this window with THEIR
 # measured slots deliberately — do not pre-widen.
 # v2 semantics (maintainer-approved 2026-07-27, CLAUDE.md §4): per-replay

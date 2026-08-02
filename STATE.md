@@ -1,8 +1,8 @@
 # STATE — living progress log
 
-Updated: 2026-08-02 (session 14z-49c — 14z-49 MAINTAINER-CONFIRMED
-on b91647c7: "both medallion portraits are clean, no regression";
-third mask window still awaits explicit ratification)
+Updated: 2026-08-02 (session 14z-49d — third mask window
+MAINTAINER-RATIFIED after the recolor-necessity A/B; scripted
+window audit added per their "be prepared to confirm one day")
 
 ## Session 14z-49 (rounds 61-62: HUD MUGSHOT + NAME + SELECT MEDALLION — the whole per-slot venue-asset family fixed)
 
@@ -62,6 +62,36 @@ Build `b91647c7da14ded6316cee8dc057c8daf1c3fb1e` (donovan6, stage 6).
   re-verified: Donovan medallion in Jedah's ringed cell, Gallon's
   werewolf 3x3 restored, VS-splash big portrait + name were already
   correct.
+
+## Session 14z-49d (round 64: mask window RATIFIED; recolor necessity proven; audit script)
+
+- Maintainer asked whether Donovan's icon could ride Jedah's vanilla
+  row 14 (no recolor -> no mask window at all). MEASURED, twice:
+  (a) raw palette swap: Donovan renders purple-faced (skin indices
+  land on Jedah's lavenders); (b) index-remapped art onto the
+  vanilla row (best hand-tuned map): the icon's 7-step brown ramp
+  collapses onto Jedah's 3 browns — face flattens to two tan bands,
+  hair goes muddy blue-grey. Both renders shown to the maintainer
+  (session scratch med_pal_ab.png / med_pal_tuned.png; method: the
+  gfx_tiles offline renderer + live palette dumps). CONCLUSION: the
+  recolor is genuinely required; option C (remap) rejected on
+  quality, option B (truncate 05's verification) rejected on
+  coverage.
+- **THIRD MASK WINDOW RATIFIED (maintainer, round 64): option A
+  stands.** Decision moved from pending to made below. Their
+  condition — "document in detail what's the window we're ignoring
+  ... best be prepared in case we need to confirm one day" —
+  honored three ways: the expanded docs/atlas/ram.md row (now
+  carries both expected content values + when-to-rerun triggers),
+  the m2a_common.sh basis comment, and a NEW SCRIPTED AUDIT:
+  `tests/audit_mask_window_ff4182.sh` — reruns the original
+  attribution measurement (05_timeout_idle f9126 on vanilla +
+  build) and asserts (1) vanilla slot == vanilla row, (2) build
+  slot == the designed ported row, (3) every neighborhood byte
+  OUTSIDE the window ($FF4140-$FF41DF) is identical — i.e., the
+  blind spot hides the designed diff and NOTHING else. On-demand
+  (not battery): run on any new $FF41xx-adjacent divergence, row-14
+  retune, or before extending the window family for Huitzil/Pyron.
 
 ## Session 14z-49c (round 63: 14z-49 maintainer-CONFIRMED)
 
@@ -3373,17 +3403,19 @@ all the more important work." LOCKED in tests/test_don_accent.sh
 section 3 (shock-window vanilla lock, frozen from a vanilla run) —
 revisiting requires changing that gate deliberately.
 
+## Decision made (maintainer, 2026-08-02, round 64): third mask window
+
+`RAM:$FF4182-$FF41A1` (palette-fade staging slot for select block-A
+row 14) RATIFIED into the masked legacy basis — option A of the
+14z-49b write-up, after the recolor-necessity A/B (14z-49d) showed
+options B and C strictly worse. Condition attached and honored:
+detailed documentation + a standing confirmation path
+(`tests/audit_mask_window_ff4182.sh`; spec in docs/atlas/ram.md).
+Extension policy stands: future palette-block ports extend the
+window per measured slot, never pre-widen.
+
 ## Decisions pending (human)
 
-- **RATIFY THE THIRD MASK WINDOW (14z-49b, verification-basis
-  change):** `RAM:$FF4182-$FF41A1` (palette-fade staging slot for
-  select block-A row 14) added to the masked legacy basis so the
-  INTENDED medallion recolor stops failing 05_timeout_idle on a
-  display-only path. Full mechanism + measurements in the 14z-49b
-  entry; the alternative (freeze 05 at first-divergence 9126) loses
-  3,000 frames of post-round-machine coverage. Recommendation:
-  ratify. Revert path if declined: remove "4182-41a2" from M2A_MASK
-  + re-freeze + pick the first-divergence-constant class instead.
 - **ROSTER ACCESS MECHANISM (M4-defining, raised by maintainer
   2026-07-28):** how players select the 18 characters. Option A: full
   select-screen redesign (new wheel/cursor/portraits — priced by the

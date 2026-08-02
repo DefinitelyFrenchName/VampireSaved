@@ -40,12 +40,10 @@ Dev builds: `GEN_FLAGS="--allow-plausible --tripwire-open" tools/build_donovan.s
 
 ## Queued next (in order)
 
-0. **MAINTAINER RATIFICATION NEEDED (verification-basis change):**
-   third masked window `$FF4182-$FF41A1` — the palette-fade staging
-   slot where the INTENDED medallion recolor surfaced in
-   05_timeout_idle. Full write-up: STATE 14z-49b + Decisions
-   pending. All frozen masked logs were regenerated on the new
-   basis (they're in the commit).
+0. ~~Maintainer ratification of the third mask window~~ RATIFIED
+   (round 64) after the recolor-necessity A/B. Confirmation path if
+   ever suspected: `tests/audit_mask_window_ff4182.sh` (spec in
+   docs/atlas/ram.md).
 1. ~~Maintainer verification round on `b91647c7`~~ DONE (round 63):
    "both medallion portraits are clean, no regression". Still open
    on their side: the full-cast ES-finish pass.
