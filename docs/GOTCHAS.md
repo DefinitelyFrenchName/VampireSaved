@@ -888,3 +888,19 @@ When synthesizing N parallel engine cases from a sibling, disassemble
 ALL N and diff them against each other first — and add a build-time
 assertion against the source engine's own table (the seq_ids
 verification pattern) so config drift fails the build.
+
+## Fuzzy code-similarity reconciliation collapses near-identical
+## helpers — content-verify PARAMETER TABLES, not just code shape
+The motion-helper family (`lea <table>(pc),a3; bra <dispatcher>`) is
+30+ near-identical 8-byte routines differing ONLY in table address
+and dispatcher target. The farm-helper-match ladder mapped vs2
+0x2915C AND 0x29164 to the SAME vsavj helper (two distinct motions
+can't share one table) and 0x2916C to a shifted-table neighbor —
+all three "verified". Result: every half-circle move dead for ~50
+playtest rounds (never tested = never caught; round 58). For
+helper-family reconciliation the identity that matters is the
+PARAMETER (table content + dispatcher kind), and vs2 CHANGED some
+motion definitions so exact twins don't always exist — the
+farm_port kind (port table + stub) is the correct fallback, and it
+already existed for two hand-done rows. Content-match census script
+in the 14z-48 session log.

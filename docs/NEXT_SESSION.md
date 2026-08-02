@@ -49,6 +49,13 @@ attribute any drift, maintainer sign-off, never silently refreeze).
 
 ## Queued next (in order)
 
+0. **Maintainer round on the half-circle fix build (dbbcd74c):**
+   Blizzard Sword (41236P), Sword Grapple (c.63214MP/HP), Press of
+   Death (41236K + stock) — all three now trigger (gate-locked,
+   replays 59/60). Feel/behavior vs vs2 = the round's question.
+   Also still pending: full-cast ES-finish pass; HUD portrait
+   palette (tracked minor, 14z-45 method when queued).
+
 1. ~~Maintainer round on `314568f5`~~ DONE (round 54): ES hit
    counts ✓, visuals ✓, finishes provisionally ✓ (full-cast pass
    pending on the maintainer's side — if any victim shows the

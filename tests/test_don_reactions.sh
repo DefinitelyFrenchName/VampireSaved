@@ -179,4 +179,30 @@ for fr in (2950, 3030):
         f"0x158210 (the round-52 ES-finish neutral-pose bug)")
 print("  ok: ES kill chains to the grounded death (the round-52 fix holds)")
 EOF2
+# ── 5. HALF-CIRCLE COMMAND ACCEPT (14z-48, round-58 blocker): the
+#      farm-helper-match reconciliation had collapsed distinct vs2
+#      motion tables; Blizzard Sword (41236P) and Sword Grapple
+#      (63214MP) lock the corrected farm_port rows. Assertion = the
+#      move CHAIN is entered (P1 node in the move's ported range)
+#      shortly after the input; the pre-fix build fell back to
+#      normals (nodes elsewhere).
+mkdir -p "$WORK/hc1" "$WORK/hc2"
+DUMPS="2632:ff8400-ff8430;2640:ff8400-ff8430"     REPLAY="$REPO/tests/replays/59_don_blizzard_hcf.rpl"     CHECKSUM_OUT="$WORK/hc1/c.log" MAME_SANDBOX="$WORK/hc1"     MAME_ROMPATH="$RPDIR;$ROMDIR" tools/run_mame.sh vsavj     -autoboot_script "$REPO/tests/lua/replay.lua" > /dev/null 2>&1
+DUMPS="2780:ff8400-ff8430;2800:ff8400-ff8430"     REPLAY="$REPO/tests/replays/60_don_grapple_hcb.rpl"     CHECKSUM_OUT="$WORK/hc2/c.log" MAME_SANDBOX="$WORK/hc2"     MAME_ROMPATH="$RPDIR;$ROMDIR" tools/run_mame.sh vsavj     -autoboot_script "$REPO/tests/lua/replay.lua" > /dev/null 2>&1
+python3 - "$WORK" <<'EOF2'
+import sys, os
+work = sys.argv[1]
+def node(sub, fr):
+    d = open(os.path.join(work, sub, f'dump_{fr}_ff8400.bin'),'rb').read()
+    return int.from_bytes(d[0x1c:0x20],'big')
+bz = [node('hc1', f) for f in (2632, 2640)]
+assert any(0x0D7980 <= n <= 0x0D8340 for n in bz), (
+    f"Blizzard Sword chain not entered (nodes {[hex(n) for n in bz]}) — "
+    f"41236 accept broken (check the 0x2916C farm_port row)")
+gr = [node('hc2', f) for f in (2780, 2800)]
+assert any(0x0D0000 <= n <= 0x0DF000 and not (0x0D3000 <= n <= 0x0D3800) for n in gr), (
+    f"Sword Grapple not triggered (nodes {[hex(n) for n in gr]}) — "
+    f"63214 accept broken (check the 0x2915C/0x29164 farm_port rows)")
+print("  ok: half-circle commands accept (Blizzard 41236 + Grapple 63214)")
+EOF2
 echo "PASS: Donovan hit-class reaction gate"

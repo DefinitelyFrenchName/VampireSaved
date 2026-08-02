@@ -5,6 +5,53 @@ system disassembled, scripted ES unlocked, ES 9 hits native-exact,
 AND the round-52 ES-finish neutral-pose KO fixed; battery pending
 at entry-writing time)
 
+## Session 14z-48 (round 58: HALF-CIRCLE MOVES FIXED — the farm-helper-match had collapsed distinct motion tables; battery pending at entry time)
+
+Round-58 results first: ES arc fully maintainer-confirmed (their
+input issue, feel adequate, finishes clean incl. match-end ES LS);
+select blink confirmed dead; NEW MINOR tracked = in-fight HUD
+portrait palette (task list); NEW BLOCKER = no half-circle move
+works (41236P Blizzard Sword / c.63214MP-HP Sword Grapple / 41236K
+Press of Death EX) — all fine on vs2, never tested before on ours.
+
+ROOT CAUSE (fully traced, build dbbcd74c):
+- Command flow: per-char eval handler (table 0xD7718[char] -> the
+  ported Donovan code) calls tiny ENGINE MOTION HELPERS (`lea
+  <step-table>(pc),a3; bra <tracker-dispatcher>`; family at vs2
+  0x29114-0x291EC = vsavj 0x29DC2-0x29F42), each = one motion shape.
+  Trackers live in the player obj (+0x308..+0x338 per command);
+  dispatcher state machines: state 2 = 4-bit direction-code match
+  vs +0x12A, state 4 = 0x7700-bitmask match vs +0x1AC|+0x1AE; the
+  dispatchers ARE proper twins (vs2 0x292A4 == vsavj 0x29F4A etc.).
+  Step tables are DATA-view (lea(pc) + (a3,d0) reads — the 14z-43
+  gotcha applied to the analysis itself: first dump used the wrong
+  image).
+- THE BUG: three reconciliation rows from the fuzzy
+  "farm-helper-match" ladder mapped vs2 helpers to WRONG vsavj
+  helpers: 0x2915C AND 0x29164 (the 63214 pair, tables
+  [1,5,4,6,+12]) BOTH -> vsavj 0x29EBA (different table AND
+  different dispatcher kind); 0x2916C (the 41236 triple-table) ->
+  0x29E42 (shifted table). vsavj has NO exact twins for these vs2
+  motions (VS2 changed/extended the definitions). All OTHER
+  Donovan helper rows content-verify EXACT (0x29114/1C/24/2C/54/
+  9C/D4 -> their targets ✓; 0x29184/8C were already correct
+  farm_port rows — the mechanism existed!).
+- FIX: the three rows converted to kind=farm_port (param_hex = the
+  vs2 table spans verbatim: 0x299CE/0x299DA 6 words each,
+  0x299E6..0x29A06 16 words; common = 0x29F4A = the content-
+  verified dispatcher twin). The generator's existing farm_port
+  emitter places the tables as raw data (data-space reads correct
+  in hole a) + 12-byte stubs.
+- VERIFIED: Blizzard Sword chain entered at f2627 = ported analog
+  0xD7980 of native 0x283E58 AT THE SAME FRAME; snapshots: ice
+  deity + snowflake ✓, Sword Grapple giant-sword whip ✓, Press of
+  Death deity press with stock consumed ✓. GATE: reaction gate
+  section 5 (Blizzard + Grapple chain locks; replays 59/60).
+- Census discipline note: matched helpers by TABLE CONTENT +
+  dispatcher kind, not code similarity — the farm ladder's
+  similarity matching is exactly what collapsed two motions onto
+  one target (GOTCHAS entry).
+
 ## Session 14z-47 (SELECT POST-CONFIRM BLINK FIXED — accent thunks gain the owner-link venue fallback; battery pending at entry time)
 
 The last tracked cosmetic (14z-32) closed, build b43c7352:

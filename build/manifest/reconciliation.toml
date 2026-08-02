@@ -620,24 +620,30 @@ note = "farm-helper-match; refs: jsr"
 
 [[map]]
 vsav2 = 0x02915c
-vsavj = 0x029eba
-kind = "engine_sub"
+vsavj = 0x000000
+kind = "farm_port"
 status = "verified"
-note = "farm-helper-match; refs: jsr"
+param_hex = "000100050004000600120f00"
+common = 0x029f4a
+note = "14z-48 RE-VERIFIED BY TABLE CONTENT: the farm-helper-match collapsed distinct motions (0x2915C AND 0x29164 both -> 0x29EBA, wrong table AND wrong dispatcher kind; 0x2916C -> 0x29E42 shifted table). No vsavj twin carries this exact motion table -> ported param + stub to the content-verified dispatcher twin 0x29F4A. THE half-circle fix (Blizzard Sword / Sword Grapple / Press of Death)"
 
 [[map]]
 vsav2 = 0x029164
-vsavj = 0x029eba
-kind = "engine_sub"
+vsavj = 0x000000
+kind = "farm_port"
 status = "verified"
-note = "farm-helper-match; refs: jsr"
+param_hex = "00010005000400060012f000"
+common = 0x029f4a
+note = "14z-48 RE-VERIFIED BY TABLE CONTENT: the farm-helper-match collapsed distinct motions (0x2915C AND 0x29164 both -> 0x29EBA, wrong table AND wrong dispatcher kind; 0x2916C -> 0x29E42 shifted table). No vsavj twin carries this exact motion table -> ported param + stub to the content-verified dispatcher twin 0x29F4A. THE half-circle fix (Blizzard Sword / Sword Grapple / Press of Death)"
 
 [[map]]
 vsav2 = 0x02916c
-vsavj = 0x029e42
-kind = "engine_sub"
+vsavj = 0x000000
+kind = "farm_port"
 status = "verified"
-note = "farm-helper-match; refs: jsr"
+param_hex = "000200060004000500110f0000020006000400150f000002000600040015f000"
+common = 0x029f4a
+note = "14z-48 RE-VERIFIED BY TABLE CONTENT: the farm-helper-match collapsed distinct motions (0x2915C AND 0x29164 both -> 0x29EBA, wrong table AND wrong dispatcher kind; 0x2916C -> 0x29E42 shifted table). No vsavj twin carries this exact motion table -> ported param + stub to the content-verified dispatcher twin 0x29F4A. THE half-circle fix (Blizzard Sword / Sword Grapple / Press of Death)"
 
 [[map]]
 vsav2 = 0x029184
