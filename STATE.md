@@ -1,8 +1,8 @@
 # STATE — living progress log
 
-Updated: 2026-08-02 (session 14z-49b — HUD mugshot + name AND select
-medallion all show Donovan; battery GREEN on the amended masked
-basis; third mask window awaits maintainer ratification)
+Updated: 2026-08-02 (session 14z-49c — 14z-49 MAINTAINER-CONFIRMED
+on b91647c7: "both medallion portraits are clean, no regression";
+third mask window still awaits explicit ratification)
 
 ## Session 14z-49 (rounds 61-62: HUD MUGSHOT + NAME + SELECT MEDALLION — the whole per-slot venue-asset family fixed)
 
@@ -62,6 +62,18 @@ Build `b91647c7da14ded6316cee8dc057c8daf1c3fb1e` (donovan6, stage 6).
   re-verified: Donovan medallion in Jedah's ringed cell, Gallon's
   werewolf 3x3 restored, VS-splash big portrait + name were already
   correct.
+
+## Session 14z-49c (round 63: 14z-49 maintainer-CONFIRMED)
+
+- Maintainer, on `b91647c7`: **"both medallion portraits are clean,
+  no regression, great success"** — the select medallion and the
+  in-fight HUD mugshot/name close CONFIRMED. The whole 14z-48b
+  venue-asset family is done.
+- Still outstanding from their side: the full-cast ES-finish pass
+  (their earlier commitment, unprompted here).
+- The third-mask-window ratification was NOT explicitly addressed
+  in the confirmation message — it remains in Decisions pending
+  until they answer it directly.
 
 ## Session 14z-49b (battery divergence root-caused: the palette-fade staging buffer; THIRD MASK WINDOW — **MAINTAINER RATIFICATION NEEDED**)
 

@@ -46,11 +46,9 @@ Dev builds: `GEN_FLAGS="--allow-plausible --tripwire-open" tools/build_donovan.s
    05_timeout_idle. Full write-up: STATE 14z-49b + Decisions
    pending. All frozen masked logs were regenerated on the new
    basis (they're in the commit).
-1. **Maintainer verification round on `b91647c7`:** HUD mugshot +
-   name in-fight, select medallion (their original items), plus
-   their pending full-cast ES-finish pass. If the medallion palette
-   reads off, the suspect is row-14 block B (another sub-venue's
-   copy, deliberately untouched — STATE 14z-49).
+1. ~~Maintainer verification round on `b91647c7`~~ DONE (round 63):
+   "both medallion portraits are clean, no regression". Still open
+   on their side: the full-cast ES-finish pass.
 2. **M5 sounds** (next real milestone item): dispatcher id-table
    translation, NOT unstubbing the helper (reconciliation row note
    at vsav2=0x005122). The walker's per-node sfx call site + param
