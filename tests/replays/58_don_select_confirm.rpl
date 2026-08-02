@@ -1,0 +1,17 @@
+# 58: select post-confirm accent lock (14z-47). P1 hovers the Jedah
+# cell (U,U,R) and confirms Donovan with HK (btn 6); P2 never
+# confirms — the post-confirm select state persists. Native vs2
+# ground truth (select R,R + confirm 6): P1 accent rows 0x0A-0x0D
+# steady and equal to the frozen set in test_don_colors section 4.
+# Guards the accent_color_aware owner-link fallback (venue objects
+# carry the owner at +0x30; the pre-fix thunk fell back to vanilla
+# punch rows -> the 14z-32 post-confirm blink).
+300-305 sys=C1
+420-425 sys=C2
+800-803 sys=S1
+940-943 sys=S2
+1100-1102 p1=U
+1160-1162 p1=U
+1220-1222 p1=R
+1300-1302 p1=6
+2200 wait

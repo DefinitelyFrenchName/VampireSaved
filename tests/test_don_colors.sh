@@ -79,6 +79,29 @@ assert d0[0x180:0x1A0] == d1[0x180:0x1A0] == bytes.fromhex(ALT[0x0c]), \
 print("  ok: kick-color sword row steady (color-aware accent)")
 check('mirror', MIR, 'Donovan mirror')
 EOF
+# ── 4. select POST-CONFIRM accent lock (14z-47; the 14z-32 blink).
+#      Replay 58 confirms with HK; rows 0x0A-0x0D must be steady
+#      across consecutive frames AND equal the frozen native vs2 set
+#      (select R,R + confirm 6, f1500).
+mkdir -p "$WORK/pc"
+DUMPS="1500:90c140-90c1c0;1501:90c140-90c1c0;1502:90c140-90c1c0" \
+    REPLAY="$REPO/tests/replays/58_don_select_confirm.rpl" \
+    CHECKSUM_OUT="$WORK/pc/c.log" MAME_SANDBOX="$WORK/pc" \
+    MAME_ROMPATH="$RPDIR;$ROMDIR" tools/run_mame.sh vsavj \
+    -autoboot_script "$REPO/tests/lua/replay.lua" > /dev/null 2>&1
+python3 - "$WORK/pc" <<'EOF2'
+import sys, os
+work = sys.argv[1]
+FROZEN = "f000fcecffdafea8fd99fb78f967f856f605f666f888faaafd87ffa8fffff00af320fdddfa98f876f765f654f543fff1ffb1fd81fc62ff11f37ff13cf128f00bf333ffcaffa7fd84fa52fffffdddfaaaf777faeff5aef66cf549fc36f2b6f00cf222fff3ffb5ff85ff43fb32f821f9def6abf589f367f245fdddfaaaf777f00d"
+dumps = [open(os.path.join(work, f'dump_{f}_90c140.bin'),'rb').read()[:0x80] for f in (1500,1501,1502)]
+assert dumps[0] == dumps[1] == dumps[2], (
+    "post-confirm accent rows not steady (the 14z-32 blink is back; "
+    "check the accent_color_aware owner-link fallback)")
+assert dumps[0].hex() == FROZEN, (
+    "post-confirm accent rows diverge from the frozen native vs2 set "
+    "(punch-color fallback? check accent_color_aware venue branch)")
+print("  ok: select post-confirm accents steady + native-locked (rows 0x0A-0x0D)")
+EOF2
 echo "PASS: Donovan color-set gate (alt + mirror native-locked)"
 
 # ── 3. select-screen companion sword (session 14z-24) ────────────────

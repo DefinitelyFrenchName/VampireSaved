@@ -864,33 +864,44 @@ dst_old_head = "0000"
 # (legacy accents untouched). The weapon_accent_t0/_t1/rowd_slot data
 # ports become inert for slot 0x0F (kept: harmless, and they document
 # the slot layout).
+# 14z-47 EXTENSION (select post-confirm blink, 14z-32 tracked item):
+# at the select venue the marching object is NOT the player (a6 =
+# venue obj, +0x382 = venue id) so the char check always fell to
+# vanilla punch-color slots -> post-confirm blink for non-punch
+# picks. The venue objects carry the standard OWNER LINK at +0x30
+# (measured: ffb880 -> 0x8400, P2 twin ffba80 -> 0x8800). New
+# fallback layer: owner via +0x30 (movea.w sign-extend), owner char
+# == 0x0F -> block = [0x38C1D4].l + color(+0x3AE(owner))*0x80 — the
+# EXACT match-init computation (0x1C670-0x1C68E) with the ported
+# block array. Null/foreign owner links read ROM 0x382 = 0xA5 !=
+# 0x0F -> vanilla (verified). Legacy: only owner-char-0x0F changes.
 [[site_thunk]]
 stage = 6
 name = "accent_color_aware_0"
 site = 0x02AD82
 old_hex = "207c0039a900"
-thunk_hex = "0c2e000f0382660c202e03a46706204070024e75207c0039a9004e75"
+thunk_hex = "0c2e000f0382660c202e03a46726204070024e75306e00300c28000f038266147000102803aeef4820790038c1d4d0c070024e75207c0039a9004e75"
 
 [[site_thunk]]
 stage = 6
 name = "accent_color_aware_1"
 site = 0x02AD94
 old_hex = "207c0039a900"
-thunk_hex = "0c2e000f0382660c202e03a46706204070024e75207c0039a9004e75"
+thunk_hex = "0c2e000f0382660c202e03a46726204070024e75306e00300c28000f038266147000102803aeef4820790038c1d4d0c070024e75207c0039a9004e75"
 
 [[site_thunk]]
 stage = 6
 name = "accent_color_aware_2"
 site = 0x02B342
 old_hex = "207c0039a900"
-thunk_hex = "0c2e000f0382660c202e03a46706204070024e75207c0039a9004e75"
+thunk_hex = "0c2e000f0382660c202e03a46726204070024e75306e00300c28000f038266147000102803aeef4820790038c1d4d0c070024e75207c0039a9004e75"
 
 [[site_thunk]]
 stage = 6
 name = "accent_color_aware_3"
 site = 0x02B7E8
 old_hex = "207c0039a900"
-thunk_hex = "0c2e000f0382660c202e03a46706204070024e75207c0039a9004e75"
+thunk_hex = "0c2e000f0382660c202e03a46726204070024e75306e00300c28000f038266147000102803aeef4820790038c1d4d0c070024e75207c0039a9004e75"
 
 
 # 14z-42: LIGHTNING SWORD HIT-FREEZE (the mash/cadence divergence,

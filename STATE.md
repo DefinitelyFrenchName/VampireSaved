@@ -5,6 +5,34 @@ system disassembled, scripted ES unlocked, ES 9 hits native-exact,
 AND the round-52 ES-finish neutral-pose KO fixed; battery pending
 at entry-writing time)
 
+## Session 14z-47 (SELECT POST-CONFIRM BLINK FIXED — accent thunks gain the owner-link venue fallback; battery pending at entry time)
+
+The last tracked cosmetic (14z-32) closed, build b43c7352:
+- **Mechanism (measured):** at the select venue the accent-marching
+  object is NOT the player (a6 = venue obj ffb880, +0x382 = venue
+  id 0x07) so the color-aware thunks' char check always fell to the
+  vanilla punch-color slots -> post-confirm blink for non-punch
+  picks. The venue objects carry the standard OWNER LINK at +0x30
+  (ffb880 -> 0x8400; P2 twin ffba80 -> 0x8800), and the PLAYER
+  object already holds the picked color (+0x3AE, e.g. 5 for HK)
+  at confirm time.
+- **FIX:** all four accent_color_aware thunks extended with a venue
+  fallback: owner via +0x30 (movea.w sign-extend), owner char ==
+  0x0F -> block = [0x38C1D4].l + color*0x80 (the EXACT match-init
+  computation 0x1C670-0x1C68E against the ported block array at
+  0x0CEAF0). Null/foreign owner links read ROM byte 0x382 = 0xA5
+  != 0x0F -> vanilla (verified). In-match path untouched; legacy
+  changes only for owner-char-0x0F.
+- **Verified NATIVE-EXACT:** post-confirm (HK) P1 accent rows
+  0x0A-0x0D steady across consecutive frames AND byte-equal to
+  native vs2's select post-confirm state (direct A/B, both games
+  select-confirm-6 at the same frames). Gate: test_don_colors
+  section 4 (frozen native rows + steadiness; replay 58 promoted).
+- Method note: an early "expected" reference computed from block
+  indexing was WRONG (grey ramp) — the direct native A/B was the
+  authority; per-frame CONSECUTIVE sampling needed (20f sampling
+  phase-locks with the 4f march = false steadiness).
+
 ## Session 14z-46 (SWORDLESS-DEITY PALETTE FIXED — the state_hook seq-id synthesis was wrong for 8 of 12 stubs; battery pending at entry time)
 
 The round-41 item (ours yellow deity/lightning vs vs2 blue/white)

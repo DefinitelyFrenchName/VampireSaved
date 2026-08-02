@@ -72,10 +72,10 @@ attribute any drift, maintainer sign-off, never silently refreeze).
    12 stubs (full census in STATE 14z-46; GOTCHAS entry). Fixed the
    deity (state 0xBE) + two other LIVE latent states (0xB8, 0xC6);
    dead states = safe no-op stubs with the upgrade spec documented.
-5. Select-screen post-confirm blink (tracked minor): select-venue
-   objs lack +0x3A4 (cached block ptr) -> the color-aware accent
-   thunks fall back to punch-color slots on that screen only. Fix
-   shape: select-venue init of +0x3A4 or owner-link fallback.
+5. ~~Select-screen post-confirm blink~~ FIXED 14z-47 (build
+   b43c7352, gate-locked): accent thunks gained the owner-link
+   (+0x30) venue fallback computing the block exactly like
+   match-init. Rows 0x0A-0x0D native-exact + steady post-confirm.
 6. Match-end neutral-pose KO: UNPARKED — folded into item 1 (the trigger is the ES finish) (round 51, maintainer's call —
    flaky, once vs Morrigan, 4 scripted variants clean; gate section
    3 is the tripwire). Wanted datums if it recurs: victim char +
