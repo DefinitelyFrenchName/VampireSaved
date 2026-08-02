@@ -5,6 +5,22 @@ system disassembled, scripted ES unlocked, ES 9 hits native-exact,
 AND the round-52 ES-finish neutral-pose KO fixed; battery pending
 at entry-writing time)
 
+## Session 14z-44b (round 54 on 314568f5: ES arc maintainer-CONFIRMED; round-34 speed-mode item closed NO-BUG)
+
+- **ES hit counts correct ✓. ES visuals look correct ✓** (the 14z-28
+  aura concern rides the native path and passes the eyeball round).
+- **ES finishes "seem corrected"** — provisional ✓ pending the
+  maintainer's full-cast pass; the gate (section 4) plus round-1 +
+  match-end scripted kills stand as the harness evidence. If any
+  cast member shows the neutral pose again, the six 0x51-positional
+  records' property-0x19 path is the first suspect (STATE 14z-44).
+- **Round-34 item 2 (speed-mode menus: STANDARD/TURBO/AUTO/
+  AUTO&TURBO inconsistencies) CLOSED NO-BUG by the maintainer:**
+  the same behavior reproduces on NATIVE vsavj — the original
+  remark traced to European-vsav expectations or a test-harness
+  difference on their side, not our build. The Start-hold-shim
+  interaction hypothesis is moot; nothing to investigate.
+
 ## Session 14z-44 (maintainer go-ahead: disassembly — the whole ES arc closes in one session)
 
 The round-53 clarification ("1 stock = one banked full bar") +

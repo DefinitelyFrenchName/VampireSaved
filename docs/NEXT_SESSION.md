@@ -49,15 +49,12 @@ attribute any drift, maintainer sign-off, never silently refreeze).
 
 ## Queued next (in order)
 
-1. **Maintainer round on build `314568f5`:** ES Lightning Sword —
-   expect base 9 hits (was 8), mash extension worth re-testing, ES
-   finishes must land the proper death (the round-52 neutral pose
-   is FIXED and gated: match-end ES kill verified). Also eyeball ES
-   aura/palette colors per victim (the 14z-28 aura concern now
-   rides the native class-8 path — likely correct, unverified
-   visually). If ES anomalies appear at unusual spacings, the six
-   0x51-positional records' property-0x19 handler pair is the
-   remaining unaudited path (A/B it with the 14z-42 method).
+1. ~~Maintainer round on `314568f5`~~ DONE (round 54): ES hit
+   counts ✓, visuals ✓, finishes provisionally ✓ (full-cast pass
+   pending on the maintainer's side — if any victim shows the
+   neutral pose, suspect the six 0x51-positional records'
+   property-0x19 path first). Round-34 speed-mode item closed
+   NO-BUG (reproduces on native vsavj).
 2. **ES/meter follow-ups (small):** consider a mash A/B for the ES
    version (52/53-style pair with the stock poke); the DP-spam
    soak's lost ES coverage can now be restored cheaply (stock poke
