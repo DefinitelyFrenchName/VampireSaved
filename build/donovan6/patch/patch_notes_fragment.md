@@ -35,7 +35,7 @@ code_file 0x0bf6a0 +0x3200  donovan code (from vsav2 0x059490)
 # hitbox+0x12e9: region_fix 4e -> 06 (ES-variant deity record type 0x4E -> 0x06 (14z-44; vs2-alias-proven, the 14z-36 pattern))
 # hitbox+0x1309: region_fix 4e -> 06 (ES-variant deity record type 0x4E -> 0x06 (14z-44; vs2-alias-proven, the 14z-36 pattern))
 # hitbox+0x1329: region_fix 4e -> 06 (ES-variant deity record type 0x4E -> 0x06 (14z-44; vs2-alias-proven, the 14z-36 pattern))
-# hitbox+0x1349: region_fix 4e -> 06 (sworded deity hit 7/7: type 0x4E -> 0x06 (vs2 dispatch alias — class-8 native electric))
+# hitbox+0x1349: region_fix 4e -> 06 (ES-variant deity record type 0x4E -> 0x06 (14z-44; vs2-alias-proven, the 14z-36 pattern))
 data_file 0x3fa790 +0x25c2  donovan hitbox (from vsav2 0x0C8BB8)
 # hitbox_proj+0x291: region_fix 52 -> 06 (column KO record type 0x52 -> 0x06 (vs2 dispatch alias; vsavj table ends at 0x4F -> wild jump))
 # hitbox_proj+0x2b1: region_fix 52 -> 06 (column sibling hit record, same type-0x52 alias remap (would crash on its own kill timing))
@@ -313,6 +313,14 @@ data   0x39fc00 +0x20  data_port weapon_accent_t1 <- vsav2 0x39cbdc (0 fixes)
 data   0x39fc20 +0x20  data_port weapon_accent_rowd_slot <- vsav2 0x39cbfc (0 fixes)
 data   0x028d50 +0x4  data_port hit_class_props_ext_hi <- vsav2 0x028028 (0 fixes)
 data   0x028d4e +0x2  data_port hit_class_props_ext_lo <- vsav2 0x028026 (0 fixes)
+data   0x3ae060 +0xa0  data_port win_pal_slot0f_c0 <- vsav2 0x3c365c (0 fixes)
+data   0x3aeb00 +0xa0  data_port win_pal_slot0f_c1 <- vsav2 0x3c419c (0 fixes)
+data   0x3af5a0 +0xa0  data_port win_pal_slot0f_c2 <- vsav2 0x3c4cdc (0 fixes)
+data   0x3b0040 +0xa0  data_port win_pal_slot0f_c3 <- vsav2 0x3c581c (0 fixes)
+data   0x3b0ae0 +0xa0  data_port win_pal_slot0f_c4 <- vsav2 0x3c635c (0 fixes)
+data   0x3b1580 +0xa0  data_port win_pal_slot0f_c5 <- vsav2 0x3c6e9c (0 fixes)
+data   0x3b2020 +0xa0  data_port win_pal_slot0f_c6 <- vsav2 0x3c79dc (0 fixes)
+data   0x3b2ac0 +0xa0  data_port win_pal_slot0f_c7 <- vsav2 0x3c851c (0 fixes)
 code   0x3ffcb0 +0x62  site_thunk fixture_row0f_override_bank0; site 0x01c586 jsr-routed
 code   0x3ffd20 +0x62  site_thunk fixture_row0f_override_bank1; site 0x01c59a jsr-routed
 code   0x0cf310 +0x18  site_thunk select_companion_tbl_a; site 0x0845ec jsr-routed
@@ -327,3 +335,7 @@ code   0x3ffd90 +0x2a  site_thunk ls_freeze_vs2_victim; site 0x023ad8 jsr-routed
 code   0x3ffdc0 +0x24  site_thunk ls_freeze_vs2_attacker; site 0x023ade jsr-routed
 code   0x3ffdf0 +0x16  site_thunk es_type51_dispatch; site 0x0185ca jsr-routed
 code   0x084594 +0x2  code_word select_companion_entry_0f (0040 -> 0046)
+code   0x05f23c +0x2  code_word win_pos_x_slot0f (0070 -> 00f0)
+code   0x05f23e +0x2  code_word win_pos_y_slot0f (0080 -> 0098)
+code   0x05f27c +0x2  code_word win_pos_x_slot1f (0070 -> 00f0)
+code   0x05f27e +0x2  code_word win_pos_y_slot1f (0080 -> 0098)

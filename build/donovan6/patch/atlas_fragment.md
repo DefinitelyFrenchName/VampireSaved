@@ -51,6 +51,14 @@
 | `PRG:0x39FC20` | 0x20 | VS2 | data_port weapon_accent_rowd_slot (vsav2 0x39cbfc) |
 | `PRG:0x028D50` | 0x4 | VS2 | data_port hit_class_props_ext_hi (vsav2 0x28028) |
 | `PRG:0x028D4E` | 0x2 | VS2 | data_port hit_class_props_ext_lo (vsav2 0x28026) |
+| `PRG:0x3AE060` | 0xA0 | VS2 | data_port win_pal_slot0f_c0 (vsav2 0x3c365c) |
+| `PRG:0x3AEB00` | 0xA0 | VS2 | data_port win_pal_slot0f_c1 (vsav2 0x3c419c) |
+| `PRG:0x3AF5A0` | 0xA0 | VS2 | data_port win_pal_slot0f_c2 (vsav2 0x3c4cdc) |
+| `PRG:0x3B0040` | 0xA0 | VS2 | data_port win_pal_slot0f_c3 (vsav2 0x3c581c) |
+| `PRG:0x3B0AE0` | 0xA0 | VS2 | data_port win_pal_slot0f_c4 (vsav2 0x3c635c) |
+| `PRG:0x3B1580` | 0xA0 | VS2 | data_port win_pal_slot0f_c5 (vsav2 0x3c6e9c) |
+| `PRG:0x3B2020` | 0xA0 | VS2 | data_port win_pal_slot0f_c6 (vsav2 0x3c79dc) |
+| `PRG:0x3B2AC0` | 0xA0 | VS2 | data_port win_pal_slot0f_c7 (vsav2 0x3c851c) |
 | `PRG:0x3FFCB0` | 0x62 | GEN | site_thunk fixture_row0f_override_bank0 |
 | `PRG:0x01C586` | 0x6 | GEN | site_thunk fixture_row0f_override_bank0 engine site |
 | `PRG:0x3FFD20` | 0x62 | GEN | site_thunk fixture_row0f_override_bank1 |
@@ -78,3 +86,7 @@
 | `PRG:0x3FFDF0` | 0x16 | GEN | site_thunk es_type51_dispatch |
 | `PRG:0x0185CA` | 0x6 | GEN | site_thunk es_type51_dispatch engine site |
 | `PRG:0x084594` | 0x2 | GEN | code_word select_companion_entry_0f |
+| `PRG:0x05F23C` | 0x2 | GEN | code_word win_pos_x_slot0f |
+| `PRG:0x05F23E` | 0x2 | GEN | code_word win_pos_y_slot0f |
+| `PRG:0x05F27C` | 0x2 | GEN | code_word win_pos_x_slot1f |
+| `PRG:0x05F27E` | 0x2 | GEN | code_word win_pos_y_slot1f |

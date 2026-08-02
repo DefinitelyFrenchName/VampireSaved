@@ -1233,5 +1233,136 @@ old_hex = "4e"
 new_hex = "06"
 note = "ES-variant deity record type 0x4E -> 0x06 (14z-44; vs2-alias-proven, the 14z-36 pattern)"
 
+
+# 14z-45: WIN SCREEN (rounds 51/55 — Donovan's victory art washed
+# purple, Anita a grey silhouette, BOTH figures shifted (-128,+24)).
+# Mechanism (fully measured): the win-portrait drawer object
+# (ffb800) takes BOTH its position and its 5-row palette set
+# (rows 0x15-0x19) from per-WINNER-char engine tables:
+#   - position: pc-relative table 0x5F200 (4 bytes/char) read at
+#     0x5F1A0/0x5F1A6 — entry 0x0F = Jedah's base (0x70,0x80); vs2's
+#     Donovan = (0xF0,0x98) [twin table 0x6B210 + obj A/B at f4100].
+#   - palette: base load `movea.l #$3AD700,a0` at 0x5F1B6, then
+#     (color*17 + id)*0xA0 -> 5 rows via uploader 0x1C3A4 (d7=4) —
+#     slot 0x0F = Jedah's win rows = the wash + the grey Anita ramp.
+# FIXES:
+#   - code_word x4: table entries 0x0F AND 0x1F (mirror-variant
+#     doctrine) -> vs2's (0x00F0, 0x0098). Slot content is Donovan's
+#     everywhere on this build; vanilla Jedah win art is unreachable.
+#     The table is read PC-RELATIVE = program space -> code rows
+#     (the 14z-43 gotcha respected).
+#   - data_port x8 win_pal_slot0f_c0..c7: JEDAH'S OWN SLICES of the
+#     vanilla win-palette table REPLACED IN PLACE (dst = 0x3AD700 +
+#     (color*17 + 0x0F)*0xA0) with vs2's Donovan 5-row sets (src =
+#     0x3C365C + color*0xB40; color stride 0xB40 = 18 chars x 5
+#     rows; sources verified row-for-row against native win-screen
+#     palette RAM, replay matchend_vs2 f4100). No hook needed — the
+#     vanilla per-char math lands on the replaced content; vanilla
+#     Jedah's win screen is unreachable on this build (slot
+#     replaced). First choice was a data-carrying thunk in hole b —
+#     it no longer fits (watermark 0x3FFE10); in-place slot-content
+#     replacement is also the cleaner class. Provenance: VS2 (table
+#     region now mixed VSAV/VS2 — atlas updated).
+[[code_word]]
+stage = 6
+name = "win_pos_x_slot0f"
+addr = 0x05F23C
+old_hex = "0070"
+new_hex = "00f0"
+
+[[code_word]]
+stage = 6
+name = "win_pos_y_slot0f"
+addr = 0x05F23E
+old_hex = "0080"
+new_hex = "0098"
+
+[[code_word]]
+stage = 6
+name = "win_pos_x_slot1f"
+addr = 0x05F27C
+old_hex = "0070"
+new_hex = "00f0"
+
+[[code_word]]
+stage = 6
+name = "win_pos_y_slot1f"
+addr = 0x05F27E
+old_hex = "0080"
+new_hex = "0098"
+
+[[data_port]]
+stage = 6
+name = "win_pal_slot0f_c0"
+src = 0x3c365c
+len = 0xa0
+dst = 0x3ae060
+dst_end = 0x3ae100
+dst_old_head = "02130326"
+
+[[data_port]]
+stage = 6
+name = "win_pal_slot0f_c1"
+src = 0x3c419c
+len = 0xa0
+dst = 0x3aeb00
+dst_end = 0x3aeba0
+dst_old_head = "02130704"
+
+[[data_port]]
+stage = 6
+name = "win_pal_slot0f_c2"
+src = 0x3c4cdc
+len = 0xa0
+dst = 0x3af5a0
+dst_end = 0x3af640
+dst_old_head = "02220333"
+
+[[data_port]]
+stage = 6
+name = "win_pal_slot0f_c3"
+src = 0x3c581c
+len = 0xa0
+dst = 0x3b0040
+dst_end = 0x3b00e0
+dst_old_head = "01110222"
+
+[[data_port]]
+stage = 6
+name = "win_pal_slot0f_c4"
+src = 0x3c635c
+len = 0xa0
+dst = 0x3b0ae0
+dst_end = 0x3b0b80
+dst_old_head = "01110313"
+
+[[data_port]]
+stage = 6
+name = "win_pal_slot0f_c5"
+src = 0x3c6e9c
+len = 0xa0
+dst = 0x3b1580
+dst_end = 0x3b1620
+dst_old_head = "01110123"
+
+[[data_port]]
+stage = 6
+name = "win_pal_slot0f_c6"
+src = 0x3c79dc
+len = 0xa0
+dst = 0x3b2020
+dst_end = 0x3b20c0
+dst_old_head = "01110530"
+
+[[data_port]]
+stage = 6
+name = "win_pal_slot0f_c7"
+src = 0x3c851c
+len = 0xa0
+dst = 0x3b2ac0
+dst_end = 0x3b2b60
+dst_old_head = "01110233"
+
+
 note = "sworded deity hit 7/7: type 0x4E -> 0x06 (vs2 dispatch alias — class-8 native electric)"
 

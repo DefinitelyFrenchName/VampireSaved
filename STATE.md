@@ -5,6 +5,47 @@ system disassembled, scripted ES unlocked, ES 9 hits native-exact,
 AND the round-52 ES-finish neutral-pose KO fixed; battery pending
 at entry-writing time)
 
+## Session 14z-45 (WIN SCREEN FIXED — palette + composition, native-locked; battery pending at entry time)
+
+One measurement session closed all three round-51/55 defects (build
+4f69589d):
+- **Mechanism (all measured):** the win-portrait drawer object
+  (ffb800; the second object ffb880 = text/frame, already correct)
+  takes position AND palette from per-WINNER-char engine tables:
+  - position: pc-relative table 0x5F200 (4B/char), read at
+    0x5F1A0/A6 by the setter (winner id from +0x382(a4)); entry
+    0x0F = Jedah's (0x70,0x80) vs vs2 Donovan (0xF0,0x98) [vs2 twin
+    0x6B1EC/table 0x6B210] = EXACTLY the (-128,+24) OBJ shift
+    measured entry-for-entry at f4100.
+  - palette: `movea.l #$3AD700,a0` at 0x5F1B6 + (color*17+id)*0xA0
+    -> 5 rows (0x15-0x19) via uploader 0x1C3A4 (d7=4). Slot 0x0F =
+    Jedah's rows = the purple wash (rows 15-17) AND Anita's grey
+    silhouette (rows 18-19 = pure grey ramps).
+  - vs2's Donovan win-palette: contiguous 5-row sets per color at
+    0x3C365C + color*0xB40 (stride = 18 chars x 5 rows; verified
+    row-for-row vs native win-screen palette RAM at f4100).
+- **FIXES:** code_word x4 (position entries 0x0F AND 0x1F ->
+  0x00F0/0x0098; table is pc-relative/program-space -> code rows,
+  the 14z-43 gotcha respected) + data_port x8 win_pal_slot0f_c0..c7
+  (Jedah's 8 color slices of the vanilla table REPLACED IN PLACE
+  with vs2's sets — first-choice hole-b thunk didn't fit: hole B
+  watermark 0x3FFE10, only 0x1F0 free; in-place slot-content
+  replacement is the cleaner class anyway).
+- **Verified:** rows 0x15-0x19 byte-MATCH native at f4100 for the
+  gate color; OBJ base entry native-exact (160,32); snapshot
+  visually identical to the native reference. GATE: reaction gate
+  section 3 extended with win-screen locks (frozen native rows +
+  composition base). Tool note: replay.lua DUMPS ranges are
+  END-INCLUSIVE (dump = end-start+1 bytes) — trim before comparing
+  to frozen hex.
+- Residual to watch (maintainer eyeball): non-gate COLORS (the 8
+  ported sets are all vs2-verbatim so all should be right); rows
+  outside 0x15-0x19 (vs2 has extra win-venue sub-uploads, e.g. its
+  0x3C2A3C one-row-per-color block targeting other rows — if any
+  element still looks off, A/B rows 0x1A+ next). HOLE-B PRESSURE
+  NOTED: 0x1F0 bytes free — future data-carrying thunks need a plan
+  (reclaim staged-99 rows or a second hole).
+
 ## Session 14z-44c (round 55: WIN-screen item corrected + sharpened)
 
 Maintainer corrections to the round-51 screen captures (they show

@@ -95,7 +95,7 @@ EOF2
 #      must still chain to the grounded death node.
 mkdir -p "$WORK/me"
 POKES="2400:ff8850:00080008;3100:ff8850:00080008" \
-DUMPS="3420:ff8800-ff8830;3650:ff8800-ff8830" \
+DUMPS="3420:ff8800-ff8830;3650:ff8800-ff8830;4100:90c2a0-90c340;4100:708020-708028" \
     REPLAY="$REPO/tests/replays/54_don_matchend_ko.rpl" \
     CHECKSUM_OUT="$WORK/me/c.log" MAME_SANDBOX="$WORK/me" \
     MAME_ROMPATH="$RPDIR;$ROMDIR" tools/run_mame.sh vsavj \
@@ -110,6 +110,23 @@ assert node == 0x158210, (
     f"match-end victim node at f3650 = {node:#x}, expected grounded death "
     f"0x158210 (neutral pose = the round-38/50 match-end bug family)")
 print("  ok: MATCH-END deity KO chains to the grounded death (0x158210)")
+# 14z-45 WIN-SCREEN LOCKS (same run, f4100 = the victory screen):
+# palette rows 0x15-0x19 must be the native vs2 win set (frozen from
+# matchend_vs2 f4100) and the portrait composition base must be
+# native (first OBJ entry at 160,32 — the pre-fix build drew at
+# 32,56 = the round-51/55 left-shift).
+FROZEN = "fffdffb8fd96fc86fb75f964f753f542f331ffd7feb5fd93fb73f0f8f0f8f055fffdffb8fd96fc86fb75f964f753f542fd93ff43fd32fb22f912fadef7abf056fffdf0f8fd96fc86fb75f964f753f542f331ffd7fd93fadef7abf47bf258f057fffdffc9ffb8fe96fc86fa75f753f542f331fd32f932fadef7abf47bf248f058fffdffc9ffb8fe96fc86fa75f753f542f331fd32fb22f912fadef7abf47bf059"
+pal = open(os.path.join(work, 'dump_4100_90c2a0.bin'),'rb').read()[:0xa0]
+assert pal.hex() == FROZEN, (
+    "win-screen palette rows 0x15-0x19 diverge from the frozen native set "
+    "(the round-51 wash = Jedah's rows; check win_pal_slot0f_c* data_ports)")
+import struct
+ob = open(os.path.join(work, 'dump_4100_708020.bin'),'rb').read()
+x, y = struct.unpack('>HH', ob[:4])
+assert (x & 0x3ff, y & 0x3ff) == (160, 32), (
+    f"win-portrait base entry at ({x & 0x3ff},{y & 0x3ff}), native = (160,32) "
+    f"(the round-55 shift; check win_pos_*_slot0f code_words)")
+print("  ok: win screen native-locked (palette rows 15-19 + composition base)")
 EOF2
 # ── 4. ES Lightning Sword (14z-44): 9-hit native lock + ES-death lock.
 #      Replay 56 needs a banked stock (POKES ff8509 — the ES resolver

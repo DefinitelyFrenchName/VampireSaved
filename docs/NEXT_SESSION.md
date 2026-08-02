@@ -60,15 +60,13 @@ attribute any drift, maintainer sign-off, never silently refreeze).
    soak's lost ES coverage can now be restored cheaply (stock poke
    before its first pair — add an ES-chain assertion per the
    GOTCHAS lesson).
-3. Donovan WIN screen (round-51 captures, CORRECTED round 55: it's
-   the victory art, not lose/continue): (a) wrong washed palette on
-   Donovan (Jedah-colors hunch — slot-0x0F-indexed palette table);
-   (b) Anita hard to see — palette/render-path, NOT garbled art;
-   (c) BOTH figures shifted LEFT vs VS2 — coordinate-base suspect
-   (win-venue record composition; use the 14z-23 full-OBJ-dump
-   method + section-base words). Records ported at M2b
-   ("select/VS/win-quote records"); win-quote palette was already
-   an open M2b item — same family.
+3. ~~Donovan WIN screen~~ FIXED 14z-45 (build 4f69589d, gate-locked):
+   per-winner-char tables — position entries 0x0F/0x1F patched to
+   vs2's (0xF0,0x98), Jedah's 8 win-palette color slices replaced
+   in place with vs2's Donovan sets. Maintainer round: confirm all
+   colors + the LOSE screen (their check in progress); if any
+   element still off, A/B palette rows 0x1A+ (vs2 has extra
+   win-venue sub-uploads). NOTE: hole B nearly full (0x1F0 free).
 4. Swordless-deity palette (yellow vs vs2 blue figure/lightning —
    maintainer captures round 41). Same family as the deity's obj
    palette rows; untouched so far.
