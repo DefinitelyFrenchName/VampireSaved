@@ -53,7 +53,10 @@ attribute any drift, maintainer sign-off, never silently refreeze).
    register and execute properly, graphics good. Remaining queue:
    (a) SELECT-SCREEN PORTRAIT MEDALLION still Jedah's (re-listed —
    the M2b select-portrait remainder; 14z-45 method); (b) in-fight
-   HUD portrait palette (round 58, minor); (c) maintainer's
+   HUD mugshot + NAME = JEDAH'S (round-60 captures: wrong ART and
+   name text, not palette — same family as (a), do together; note
+   the VS screen already shows correct Donovan art/name, so
+   per-venue sources differ); (c) maintainer's
    full-cast ES-finish pass (their side); (d) M5 sounds. The
    command/motion subsystem is now documented in engine_internals
    (14z-48 section).

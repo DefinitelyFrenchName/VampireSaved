@@ -5,6 +5,29 @@ system disassembled, scripted ES unlocked, ES 9 hits native-exact,
 AND the round-52 ES-finish neutral-pose KO fixed; battery pending
 at entry-writing time)
 
+## Session 14z-48b (rounds 59-60: HC moves maintainer-CONFIRMED; HUD portrait = wrong ART not palette; select medallion re-listed)
+
+- **All half-circle moves register and execute properly; graphics
+  good** (maintainer, dbbcd74c).
+- Maintainer challenged the "no vsavj equivalent" wording —
+  correct challenge; precision note added to 14z-48 below (their
+  standing ask honored: findings documented — the command/motion
+  subsystem now has an engine_internals section).
+- **IN-FIGHT HUD ITEM SHARPENED (maintainer captures, Desktop
+  22.42.45 ours / 22.38.20 vs2): the mugshot beside the timer is
+  JEDAH'S ART (yellow/red) and the name text reads "JEDAH" — vs
+  vs2's brown Donovan mugshot + "Donovan" name.** Not a palette
+  issue: the wrong PORTRAIT + NAME. Visible in every session
+  snapshot in hindsight. = the M2b "select portrait/name/mugshot"
+  remainder, one family with:
+- **RE-LISTED: character-select portrait MEDALLION still Jedah's**
+  (forgotten off the queue; now tracked). All three surfaces
+  (select medallion, HUD mugshot, HUD name) = per-slot venue asset
+  tables — one investigation, the 14z-45 method (find the venue's
+  per-char art/palette/name sources, repoint slot 0x0F; the name
+  text also needs Donovan's glyphs — check what the VS-screen name
+  uses, ours shows correct "Donovan" there... verify).
+
 ## Session 14z-48 (round 58: HALF-CIRCLE MOVES FIXED — the farm-helper-match had collapsed distinct motion tables; battery pending at entry time)
 
 Round-58 results first: ES arc fully maintainer-confirmed (their
@@ -31,8 +54,20 @@ ROOT CAUSE (fully traced, build dbbcd74c):
   helpers: 0x2915C AND 0x29164 (the 63214 pair, tables
   [1,5,4,6,+12]) BOTH -> vsavj 0x29EBA (different table AND
   different dispatcher kind); 0x2916C (the 41236 triple-table) ->
-  0x29E42 (shifted table). vsavj has NO exact twins for these vs2
-  motions (VS2 changed/extended the definitions). All OTHER
+  0x29E42 (shifted table). PRECISION (round-59 maintainer
+  challenge, verified by caller scan): vsavj HAS half-circle
+  motion tables — its near-match helpers (0x29E22/2A/32/3A...) are
+  called from a dozen vanilla char code blocks (Morrigan Valkyrie
+  Turn, Lilith Mystic Arrow / Gloomy Puppet Show, Bulleta et al.).
+  What vsavj lacks is a BYTE-EXACT copy of VS2'S RE-TUNED versions
+  of these three tables: 63214 = vsavj [1,5,4,16] (4 steps, final
+  dir+flag fused) vs vs2 [1,5,4,6,12] (5 steps, final step SPLIT)
+  — an input-leniency retune between engine generations, the same
+  tuning family as the 14z-42 freeze constants. DECISION EMBEDDED
+  IN THE FIX: Donovan's HCs use vs2's exact tables (vs2 input
+  feel — the project default); mapping to vsavj's native
+  near-tables (vanilla-cast HC feel) remains a two-line
+  alternative if playtest ever prefers it. All OTHER
   Donovan helper rows content-verify EXACT (0x29114/1C/24/2C/54/
   9C/D4 -> their targets ✓; 0x29184/8C were already correct
   farm_port rows — the mechanism existed!).
