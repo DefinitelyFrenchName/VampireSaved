@@ -5,6 +5,27 @@ system disassembled, scripted ES unlocked, ES 9 hits native-exact,
 AND the round-52 ES-finish neutral-pose KO fixed; battery pending
 at entry-writing time)
 
+## Session 14z-44c (round 55: WIN-screen item corrected + sharpened)
+
+Maintainer corrections to the round-51 screen captures (they show
+the WIN screen — Donovan's victory art over the continue counter —
+NOT a lose/continue-specific screen):
+- Anita is NOT garbled — she is hard to see because of the wrong
+  palette + "weird rendering" (so: palette/render-path defect, not
+  missing/corrupt art).
+- NEW datum: **BOTH Donovan and Anita are shifted LEFT vs VS2's
+  composition** (compare the two captures). Smells like a
+  coordinate-BASE difference in the win-venue record composition —
+  same investigation family as the 14z-23 select-sword offset
+  (which resolved to draw-order/occlusion, via OBJ section bases),
+  or a genuine base-X drift in the ported win-screen records.
+- Investigation entry points when this item runs: the win-quote/
+  win-screen records were ported at M2b ("select/VS/win-quote
+  records"); palette = the slot-0x0F-indexed family (maintainer's
+  Jedah-colors hunch, round 52); position = OBJ dumps at the win
+  screen on both games (the 14z-23 full-entry method) + check the
+  venue's section-base words.
+
 ## Session 14z-44b (round 54 on 314568f5: ES arc maintainer-CONFIRMED; round-34 speed-mode item closed NO-BUG)
 
 - **ES hit counts correct ✓. ES visuals look correct ✓** (the 14z-28
