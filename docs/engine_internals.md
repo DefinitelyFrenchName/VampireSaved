@@ -355,3 +355,46 @@ PC 0xCE38A = vs2 0x2713C + port offset):
 - Our fix for Donovan-attributed electric hits:
   ls_freeze_vs2_{victim,attacker} site_thunks at vsavj
   0x23AD8/0x23ADE (see donovan.toml 14z-42 block).
+
+## Command-input / motion-tracker subsystem (session 14z-48, measured both engines)
+
+How special-move inputs are recognized (identical architecture in
+vsavj and vs2; addresses vs2 / vsavj-twin):
+
+- **Per-char command evaluation:** engine table 0xD7718[char_id]
+  (vs2) -> the character's own eval handler, run per frame. The
+  handler calls one MOTION HELPER per command it owns.
+- **Motion helpers:** tiny routines, one per motion shape+facing:
+  `lea <step-table>(pc),a3; bra <tracker-dispatcher>`. Families:
+  vs2 0x29114-0x291EC (tables 0x29974-0x29A80), vsavj
+  0x29DC2-0x29F42 (tables 0x2A610-0x2A780). Right/left facing =
+  paired tables (terminators 0x0F00 / 0xF000). The step tables are
+  read via (a3,d0) = DATA-space (the pc-relative lea only computes
+  the address): read them from data.bin, and any port must place
+  them as raw data (the farm_port emitter does).
+- **Trackers:** per-command progress structs in the player object
+  (+0x308..+0x338, 8 bytes each: +0 state, +1 step index, +4
+  timeout counter). A helper's dispatcher advances its tracker:
+  state machine with (state 2) exact-direction match — step word
+  low nibble vs the 4-bit direction code at obj+0x12A, flag bit 7
+  = mask-mode — and (state 4) bitmask match — step word & 0x7700
+  vs obj+0x1AC|+0x1AE — plus flag bits (bit 4 = advance-and-
+  continue same frame, bits B/F = diagonal-leniency classes).
+  Completion returns d0=1 to the char handler, which stamps the
+  matched command id at obj+0x106 (+0x105 = trigger latch); the
+  trigger dispatcher (0x21BFC / table 0xD7398[char]) then runs the
+  move-start.
+- **Dispatcher kinds:** several dispatcher entries exist per engine
+  (vs2 0x292A4/0x2938A/0x29422..., vsavj 0x29F4A/0x2A030/0x2A0C8/
+  0x2A128/0x2A1B4/0x2A2EA/0x2A42E) — motion vs charge vs
+  button-sequence families. The state machines of corresponding
+  kinds are proper twins ACROSS engines; only the TABLES differ.
+- **Engine-generation retune (the 14z-48 trap):** VS2 changed some
+  motion TABLE definitions vs vsavj — e.g. 63214: vsavj
+  [1,5,4,16] (final step dir+flag fused) vs vs2 [1,5,4,6,12]
+  (final step split; extra required entry) — an input-leniency
+  retune. vsavj's own HC tables serve the vanilla cast (Morrigan/
+  Lilith/Bulleta...; verified by caller scan). Ported newcomers
+  should carry vs2's exact tables via farm_port rows (vs2 input
+  feel); reconciliation of helper families MUST match by table
+  content + dispatcher kind, never code similarity (GOTCHAS).

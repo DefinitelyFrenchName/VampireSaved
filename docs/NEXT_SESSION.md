@@ -49,12 +49,14 @@ attribute any drift, maintainer sign-off, never silently refreeze).
 
 ## Queued next (in order)
 
-0. **Maintainer round on the half-circle fix build (dbbcd74c):**
-   Blizzard Sword (41236P), Sword Grapple (c.63214MP/HP), Press of
-   Death (41236K + stock) — all three now trigger (gate-locked,
-   replays 59/60). Feel/behavior vs vs2 = the round's question.
-   Also still pending: full-cast ES-finish pass; HUD portrait
-   palette (tracked minor, 14z-45 method when queued).
+0. ~~Half-circle fix round~~ CONFIRMED (round 59): all moves
+   register and execute properly, graphics good. Remaining queue:
+   (a) SELECT-SCREEN PORTRAIT MEDALLION still Jedah's (re-listed —
+   the M2b select-portrait remainder; 14z-45 method); (b) in-fight
+   HUD portrait palette (round 58, minor); (c) maintainer's
+   full-cast ES-finish pass (their side); (d) M5 sounds. The
+   command/motion subsystem is now documented in engine_internals
+   (14z-48 section).
 
 1. ~~Maintainer round on `314568f5`~~ DONE (round 54): ES hit
    counts ✓, visuals ✓, finishes provisionally ✓ (full-cast pass
