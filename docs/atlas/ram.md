@@ -72,6 +72,11 @@ is 0x400 bytes; combat struct at +0x000, further state above +0x100.
 | +0x80/84/88/8C/90.l | hitbox addr tables: base + word offsets base[0..8] (push=+0x90, vuln=+0x80/84/88, attack=+0x8C) | [C,T] |
 | +0x94..0x97 | current box ids (vuln×3, push) | [C] |
 | +0x98 | throw box id | [C] |
+| +0x102 | resolved strength/flavor byte (written by the ES/strength resolver — ported code 0xCF598 on our build) | [D: 14z-44] |
+| +0x105 | ~48f transient raised by performing any special (gauge-blink family; NOT the stock) | [D: 14z-44] |
+| +0x107 | resolver marker: 0xFF = single-button, 0xFE = pair downgraded (no stock); NOT meter consumption | [D: 14z-44] |
+| +0x109 | **BANKED STOCK COUNT** (cap 0x63=99; the displayed stocks). The ES resolver tests this for two-button presses — poke it (ff8509 P1) to script ES moves | [D: 14z-44, disasm] |
+| +0x10A.w | current meter-bar fraction; full bar = 0x90 units -> converts to +1 stock (gauge adder caps/converts here) | [D: 14z-44, disasm] |
 | +0x11E,+0x134,+0x145,+0x1A4 | invulnerability/status flags | [C] |
 | +0x147 | multi-hit RE-HIT GATE (victim-side; vs2's electric-shake handler sets 0x0C per hit -> ~10f hit period; vsavj's handler never writes it — without it the victim freeze doubles as the gate) | [D: 14z-42, measured 7f/10f/12f periods] |
 | +0x132.w | per-character word from table PRG:0x0BE17A | [T] |

@@ -1,8 +1,73 @@
 # STATE — living progress log
 
-Updated: 2026-08-01 (session 14z-42 — Lightning Sword root cause
-FOUND + fix built: engine-drifted hit-freeze constants, NOT the
-spawner; 14z-41's lost-spawner theory overturned by measurement)
+Updated: 2026-08-02 (session 14z-44 — ES CHAIN COMPLETE: meter
+system disassembled, scripted ES unlocked, ES 9 hits native-exact,
+AND the round-52 ES-finish neutral-pose KO fixed; battery pending
+at entry-writing time)
+
+## Session 14z-44 (maintainer go-ahead: disassembly — the whole ES arc closes in one session)
+
+The round-53 clarification ("1 stock = one banked full bar") +
+disassembly go-ahead produced a clean chain of discoveries:
+
+- **METER SYSTEM DECODED (write-tap -> disasm of the writers, most
+  of which live in OUR ported hole-a code):**
+  - obj+0x109 (ff8509 P1) = **BANKED STOCK COUNT**, cap 0x63 (99) —
+    the maintainer's displayed stocks. THE ES GATE FIELD.
+  - obj+0x10A.w = current bar fraction, **full at 0x90 units** (the
+    gauge adder converts 0x90 -> +1 stock; my "gauge 0x54" readings
+    were fractions of 0x90 — no scripted run ever banked a bar).
+  - obj+0x105 = ~48f transient raised by any special (gauge-blink);
+    obj+0x107 ff/fe = resolver markers (fe = pair downgraded), NOT
+    consumption. obj+0x102 = resolved strength/flavor byte.
+  - **The ES/strength resolver = ported code at 0xCF598**: reads
+    press masks +0x126|+0x128, bits 4-6 = punches, pair table ->
+    (strength, flag); for pairs tests **+0x109 nonzero** -> ES,
+    else downgrade to lowest-button strength + 0xFE marker.
+  - => **NO ACCEPT BUG EVER EXISTED.** All scripted "ES" attempts
+    (LS pairs, replay 19's own DP pairs, the vanilla Demitri
+    control) had 0 banked stocks. Replay 19's ES coverage
+    evaporated because the 14z-42 freeze fix REDUCED HIT COUNTS ->
+    less meter -> the same prologue stopped banking a stock (the
+    exact "silent soak coverage loss" mechanism).
+  - **Scripted ES recipe: POKES ff8509 (e.g. :09) + pair press.**
+    Verified on BOTH games (vs2 field identical — the resolver is
+    ported vs2 code).
+- **ES chain confirmed both sides: vs2 0x284A64 == ours 0xD858C**
+  (the block after HP's chain — 14z-43's inference correct), 9-node
+  loop x4 base (HP: x3).
+- **ES 8-hit undershoot ROOT CAUSE: a THIRD deity record subset.**
+  The raw hitbox blob has 14 strided 0x4E type bytes at
+  +0x11A9..+0x1349: 14z-36 remapped only the first 7 (sworded).
+  The other 7 (+0x1289..+0x1349) = the ES-variant records, still
+  0x4E -> class 0x4E -> vsavj property[0x4E]=0 (the 14z-28 revert)
+  -> victim's stun peaked 3f, escaped after ~3 hits. Restoring
+  property[0x4E]=0x0F alone moved the failure to the 14z-26
+  "static shake node, no re-hit" second-consumer divergence (1
+  hit) — property is NOT sufficient for class 0x4E, exactly as
+  14z-26..28 found. FIX = the 14z-36 pattern extended: 7 region_fix
+  rows 0x4E -> 0x06 (vs2-alias-proven: word[0x4E]==word[0x06]) ->
+  native class-8 electric chain end-to-end, where the 14z-42
+  ls_freeze_vs2 thunks already supply vs2 constants.
+- **MEASURED (build 314568f5): ES = 9 hits at ~10f, damage
+  011b->0113 == native EXACTLY** (native f2632-2710, ours
+  f2633-2718).
+- **ROUND-52 ES-FINISH NEUTRAL-POSE KO: FIXED by the same remap**
+  (class 8 death = the proven native electric chain): round-1 ES
+  kill -> grounded 0x158210 ✓; MATCH-END ES kill (the maintainer's
+  exact scenario, replay-54 variant) -> fall 0x157FCC -> grounded
+  0x158210 ✓. The death-path class-0x4E hole (14z-28 finding #3)
+  remains OPEN in general but is no longer on any live path (no
+  record emits class 0x4E/0x51... the six 0x51 ES-positional
+  records remain 0x51 -> property 0x19; their hits didn't connect
+  at gate spacing — if a maintainer round shows ES anomalies at
+  other spacings, A/B the 0x19 handler pair next).
+- hit_class_props_ext_lo added (property[0x4E/4F] = vs2 0f 1b):
+  vs2-authentic future-proofing; no live consumer after the remap.
+- Gate: test_don_reactions section 4 (ES 9-hit lock via stock poke
+  + ES-kill grounded lock; replay 56 promoted with native datums).
+  Replay 55 (WIP scaffold) superseded by 56.
+- RAM atlas: +0x102/+0x105/+0x107/+0x109/+0x10A rows added.
 
 ## Session 14z-43b (round 52 on 22ada38e: THE NEUTRAL-POSE TRIGGER FOUND — it's the ES FINISH; death-path class consumer = the suspect)
 

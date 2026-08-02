@@ -111,4 +111,55 @@ assert node == 0x158210, (
     f"0x158210 (neutral pose = the round-38/50 match-end bug family)")
 print("  ok: MATCH-END deity KO chains to the grounded death (0x158210)")
 EOF2
+# ── 4. ES Lightning Sword (14z-44): 9-hit native lock + ES-death lock.
+#      Replay 56 needs a banked stock (POKES ff8509 — the ES resolver
+#      tests +0x109 for pair presses). Native datums in the replay
+#      header. Guards the ES record-type remaps (0x4E->0x06 x7) and
+#      the round-52 ES-finish neutral-pose bug.
+mkdir -p "$WORK/es"
+DUMPS=$(python3 -c "print(';'.join(f'{f}:ff8850-ff8854' for f in range(2625,2745,10)))")
+POKES="2550:ff8509:09" DUMPS="$DUMPS" \
+    REPLAY="$REPO/tests/replays/56_don_es_ls.rpl" \
+    CHECKSUM_OUT="$WORK/es/c.log" MAME_SANDBOX="$WORK/es" \
+    MAME_ROMPATH="$RPDIR;$ROMDIR" tools/run_mame.sh vsavj \
+    -autoboot_script "$REPO/tests/lua/replay.lua" > /dev/null 2>&1
+
+python3 - "$WORK/es" <<'EOF2'
+import sys, os, glob
+work = sys.argv[1]
+frames = sorted(int(os.path.basename(p).split('_')[1])
+                for p in glob.glob(os.path.join(work, 'dump_*_ff8850.bin')))
+assert len(frames) >= 10, f"only {len(frames)} ES dumps"
+prev = None; hits = 0; first = last = None
+for f in frames:
+    hp = int.from_bytes(open(os.path.join(work, f'dump_{f}_ff8850.bin'),'rb').read()[:2],'big')
+    if first is None: first = hp
+    if prev is not None and hp < prev: hits += 1
+    prev = hp; last = hp
+total = first - last
+assert 11 <= total <= 13, (
+    f"ES total damage {total} — native == 13 (9 hits: 5-pt sword + 8 ticks); "
+    f"pre-14z-44 builds dealt 6-11 (victim escaped the shake)")
+assert hits >= 7, f"only {hits} ES damage steps at 10f sampling — native-class is 8-9"
+print(f"  ok: ES 421P native-class ({hits} steps, {total} total)")
+EOF2
+mkdir -p "$WORK/esko"
+POKES="2550:ff8509:09;2600:ff8850:00010001" \
+DUMPS="2950:ff8800-ff8830;3030:ff8800-ff8830" \
+    REPLAY="$REPO/tests/replays/56_don_es_ls.rpl" \
+    CHECKSUM_OUT="$WORK/esko/c.log" MAME_SANDBOX="$WORK/esko" \
+    MAME_ROMPATH="$RPDIR;$ROMDIR" tools/run_mame.sh vsavj \
+    -autoboot_script "$REPO/tests/lua/replay.lua" > /dev/null 2>&1
+
+python3 - "$WORK/esko" <<'EOF2'
+import sys, os
+work = sys.argv[1]
+for fr in (2950, 3030):
+    d = open(os.path.join(work, f'dump_{fr}_ff8800.bin'), 'rb').read()
+    node = int.from_bytes(d[0x1c:0x20], 'big')
+    assert node == 0x158210, (
+        f"ES-kill victim node at f{fr} = {node:#x}, expected grounded death "
+        f"0x158210 (the round-52 ES-finish neutral-pose bug)")
+print("  ok: ES kill chains to the grounded death (the round-52 fix holds)")
+EOF2
 echo "PASS: Donovan hit-class reaction gate"

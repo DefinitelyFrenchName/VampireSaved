@@ -804,6 +804,29 @@ dst = 0x028D50
 dst_end = 0x028D54
 dst_old_head = "00000000"
 
+# 14z-44: property[0x4E/0x4F] RESTORED (partial un-revert of 14z-28).
+# The ES deity's hits carry class 0x4E (measured, both games: the
+# hit-apply writes 0x4E — ours via the copy handler 0x1868C, vs2 via
+# its dedicated #$4E reaction case 0x16FE4). vs2 property[0x4E] =
+# 0x0F routes them into the electric-shake handler (0x226E0 ==
+# vsavj 0x23AC8) — where the 14z-42 ls_freeze_vs2 thunks already
+# supply vs2 constants + the $147 re-hit gate. With our zeroed
+# entry the ES victim's stun peaked at 3f (hit-apply's own write) ->
+# popped out after 3 hits (native: held, 9 hits). The 14z-28
+# revert's premise ("nothing references 0x4E") was wrong for the ES
+# variant. The 14z-28 death-path gap for class 0x4E (ES-finish
+# neutral pose, round 52) is NOT closed by this row — tracked
+# separately. The 14z-28 aura concern rides the shake handler; ES
+# gate must include a palette/aura eyeball round.
+[[data_port]]
+stage = 6
+name = "hit_class_props_ext_lo"
+src = 0x028026
+len = 0x2
+dst = 0x028D4E
+dst_end = 0x028D50
+dst_old_head = "0000"
+
 
 
 
@@ -1143,5 +1166,72 @@ region = "hitbox"
 off = 0x1269
 old_hex = "4e"
 new_hex = "06"
+
+# 14z-44: the ES-VARIANT deity records — the THIRD 0x4E-typed subset
+# (raw-blob scan: 14 strided 0x4E type bytes at +0x11A9..+0x1349;
+# 14z-36 remapped only the first 7 = the sworded set). Same
+# vs2-alias proof (word[0x4E] == word[0x06] in vs2's own dispatch)
+# -> native class-8 electric chain end-to-end (alternating shake,
+# $147 re-hits via the ls_freeze_vs2 thunks, death 0x158210).
+# Measured before this fix (build 22f0d898): ES victim entered a
+# SINGLE STATIC shake node for ~21f then released after 1 hit — the
+# 14z-26 "second consumer" divergence for class 0x4E, unfixable by
+# property alone.
+[[region_fix]]
+stage = 6
+region = "hitbox"
+off = 0x1289
+old_hex = "4e"
+new_hex = "06"
+note = "ES-variant deity record type 0x4E -> 0x06 (14z-44; vs2-alias-proven, the 14z-36 pattern)"
+
+[[region_fix]]
+stage = 6
+region = "hitbox"
+off = 0x12a9
+old_hex = "4e"
+new_hex = "06"
+note = "ES-variant deity record type 0x4E -> 0x06 (14z-44; vs2-alias-proven, the 14z-36 pattern)"
+
+[[region_fix]]
+stage = 6
+region = "hitbox"
+off = 0x12c9
+old_hex = "4e"
+new_hex = "06"
+note = "ES-variant deity record type 0x4E -> 0x06 (14z-44; vs2-alias-proven, the 14z-36 pattern)"
+
+[[region_fix]]
+stage = 6
+region = "hitbox"
+off = 0x12e9
+old_hex = "4e"
+new_hex = "06"
+note = "ES-variant deity record type 0x4E -> 0x06 (14z-44; vs2-alias-proven, the 14z-36 pattern)"
+
+[[region_fix]]
+stage = 6
+region = "hitbox"
+off = 0x1309
+old_hex = "4e"
+new_hex = "06"
+note = "ES-variant deity record type 0x4E -> 0x06 (14z-44; vs2-alias-proven, the 14z-36 pattern)"
+
+[[region_fix]]
+stage = 6
+region = "hitbox"
+off = 0x1329
+old_hex = "4e"
+new_hex = "06"
+note = "ES-variant deity record type 0x4E -> 0x06 (14z-44; vs2-alias-proven, the 14z-36 pattern)"
+
+[[region_fix]]
+stage = 6
+region = "hitbox"
+off = 0x1349
+old_hex = "4e"
+new_hex = "06"
+note = "ES-variant deity record type 0x4E -> 0x06 (14z-44; vs2-alias-proven, the 14z-36 pattern)"
+
 note = "sworded deity hit 7/7: type 0x4E -> 0x06 (vs2 dispatch alias — class-8 native electric)"
 

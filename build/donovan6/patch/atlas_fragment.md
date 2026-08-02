@@ -50,6 +50,7 @@
 | `PRG:0x39FC00` | 0x20 | VS2 | data_port weapon_accent_t1 (vsav2 0x39cbdc) |
 | `PRG:0x39FC20` | 0x20 | VS2 | data_port weapon_accent_rowd_slot (vsav2 0x39cbfc) |
 | `PRG:0x028D50` | 0x4 | VS2 | data_port hit_class_props_ext_hi (vsav2 0x28028) |
+| `PRG:0x028D4E` | 0x2 | VS2 | data_port hit_class_props_ext_lo (vsav2 0x28026) |
 | `PRG:0x3FFCB0` | 0x62 | GEN | site_thunk fixture_row0f_override_bank0 |
 | `PRG:0x01C586` | 0x6 | GEN | site_thunk fixture_row0f_override_bank0 engine site |
 | `PRG:0x3FFD20` | 0x62 | GEN | site_thunk fixture_row0f_override_bank1 |

@@ -49,36 +49,20 @@ attribute any drift, maintainer sign-off, never silently refreeze).
 
 ## Queued next (in order)
 
-1. **ES scripted-accept root cause (BLOCKS everything ES).** Session
-   14z-43b hard fact: every scripted button-pair falls back to the
-   LP version on current builds (both DP and LS; stock present;
-   same-frame AND offset pairs; chain-start nodes prove it: DP LP
-   0xD6EE8/MP 0xD7050/HP 0xD71B8) while MANUAL ES works (rounds
-   51-52). Replay 19's ES DPs worked when written (session 11) —
-   silent coverage loss (GOTCHAS). Static-first plan: disassemble
-   the ported handler's ES-vs-normal branch in the vs2 source
-   region, find what it reads (input pair mask? meter threshold?
-   which offset), A/B that field scripted-vs-manual-shaped inputs.
-   Stock byte = ff8505 (decays during idle!), gauge = ff850B.
-   Maintainer question queued: their meter state at a successful
-   manual ES. Unlocks: ES gate + 9-hit A/B + mash-to-11 + the
-   ES-KILL NEUTRAL-POSE repro (round 52: ES finish at final KO =
-   THE trigger; death path likely can't chain class 0x51 — the
-   14z-28 finding; class-poke repro inconclusive, needs a real ES
-   kill).
-2. **ES gate: finish the measurement the 14z-43 port needs.** The
-   class-0x51 port is BUILT and crash-gated (build 22ada38e; STATE
-   14z-43 — including the pc-relative/data-space GOTCHA that cost a
-   vec3). Remaining: (a) decode the meter STOCK byte (ff8505/06/07;
-   gauge = ff850B — tap writes across a manual-ES flow); (b) ES
-   replay: replay-19 prologue + 421+pair, pair 1f apart (the
-   accept-shape that works no-debug); assert the ES CHAIN (family
-   0x284A64/ported 0xD81xx+0x244*3 — the block after HP's chain,
-   previously mislabeled "mash extension") + 9 base hits + mash to
-   ~11 + ES KO clean; (c) A/B the property-0x19 reaction handler
-   pair for freeze-constant drift (the 14z-42 lesson) once hits
-   land. Chain map + fallback rule (pair -> lowest button) in
-   STATE 14z-43.
+1. **Maintainer round on build `314568f5`:** ES Lightning Sword —
+   expect base 9 hits (was 8), mash extension worth re-testing, ES
+   finishes must land the proper death (the round-52 neutral pose
+   is FIXED and gated: match-end ES kill verified). Also eyeball ES
+   aura/palette colors per victim (the 14z-28 aura concern now
+   rides the native class-8 path — likely correct, unverified
+   visually). If ES anomalies appear at unusual spacings, the six
+   0x51-positional records' property-0x19 handler pair is the
+   remaining unaudited path (A/B it with the 14z-42 method).
+2. **ES/meter follow-ups (small):** consider a mash A/B for the ES
+   version (52/53-style pair with the stock poke); the DP-spam
+   soak's lost ES coverage can now be restored cheaply (stock poke
+   before its first pair — add an ES-chain assertion per the
+   GOTCHAS lesson).
 3. Donovan lose/continue screen (round-51 captures): wrong palette
    on the figure, garbled Anita-portrait blocks, wrong background.
    Loser-portrait family — group with the M2b select-portrait
