@@ -202,6 +202,27 @@ src_entries = 124
 # op = "poke32"
 # val = 0x0
 
+# 14z-49: HUD name-plate table entry for slot 0x0F (per-char table
+# 0x898C4, 8B/char, read via lea(pc)+(a0,d0) = DATA view -> raw
+# pokes). Jedah entry [0x056E0102 FFF0 0002] -> Donovan: plate code
+# 0x868C (art at bank-1 pool tail 0xBE8C, effect_tail.json) + vs2's
+# entry attrs verbatim (0202 = 3x1 pal2; x offset -0x18; advance 3;
+# vs2 table 0x9910E entry 0x13 = 0x0B550202 FFE8 0003). The HUD
+# MUGSHOT needs no pokes: Donovan's 2x2 (vs2 0x4362) is placed INTO
+# Jedah's own cells 0x3DC8 (in-place slot-content replacement; table
+# 0x89884 entry 0x0F untouched).
+[[aux_poke]]
+name = "hud_name_entry_0f_hi"
+addr = 0x08993C
+op = "poke32"
+val = 0x868C0202
+
+[[aux_poke]]
+name = "hud_name_entry_0f_lo"
+addr = 0x089940
+op = "poke32"
+val = 0xFFE80003
+
 # Anita's ALTERNATE anim table (companion tail branch `tst.b $3(a6); bne ->
 # movea.l #$36784A`, taken only when the spawn-record sub byte != 0 —
 # Donovan's hook always writes sub=0, branch proven unreached through the
@@ -1395,3 +1416,30 @@ dst_old_head = "01110233"
 
 note = "sworded deity hit 7/7: type 0x4E -> 0x06 (vs2 dispatch alias — class-8 native electric)"
 
+
+# ── 14z-49 select-wheel medallion (slot 0x0F = Jedah -> Donovan) ──
+# The select wheel is ONE static OBJ record at data 0x272A72 (code/attr
+# pairs; coords via header ptr -> list 0x32A50A). CELL IDENTITY WAS
+# MEASURED, NOT ASSUMED (first attempt hit the wrong cell): the cursor
+# ring (pal-1e pieces, replay 58 f1500) centers on (256,72) = the 3x2
+# cell code 0xB526 attr 0x1214 at (236,57) — JEDAH's cell (purple
+# wing-wrapped icon; the maintainer's "still Jedah's" medallion). The
+# big 3x3 b4e3/pal-07 cell next to it is GALLON's werewolf face (the
+# wheel's top-front perspective cell), NOT Jedah's — left untouched.
+# Donovan's vs2 icon = code 0xB10B 3x2 (identified against Pyron b0f5 /
+# Huitzil b108 by color render; vs2 wheel pal != char id). Same 3x2
+# geometry as Jedah's cell -> art + palette only, no record retune:
+#   art   : effect_tail place '0xB10B,3,2' -> '0xB526' (tiles b526-8/
+#           b536-8; whole-image scan: record 0x272A7A is the only live
+#           b526 reference; b529+ = next cell's art, untouched)
+#   colors: select pal row 14, block A only (0x3A3A80 = the live-match
+#           copy; block B row 14 differs = other sub-venue, untouched)
+#           <- vs2 row-05 source 0x3BAFDC (Donovan icon's live row)
+[[data_port]]
+stage = 6
+name = "med_pal_row14_a"
+src = 0x3BAFDC
+len = 0x20
+dst = 0x3A3A80
+dst_end = 0x3A3AA0
+dst_old_head = "0ffc0dc80b9609730cff0bcf0a9d097a"

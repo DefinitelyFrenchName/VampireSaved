@@ -149,7 +149,10 @@
   "0x0EDF,1,1": "0x3743",
   "0x0EE9,1,1": "0x3744",
   "0x0EEF,1,1": "0x3745",
-  "0x0EFF,1,1": "0x3746"
+  "0x0EFF,1,1": "0x3746",
+  "0x4D62,2,2": "0x3DC8",
+  "0x4D55,3,1": "0xBE8C",
+  "0xB10B,3,2": "0xB526"
  },
  "bank2_recs": [
   "0x2C0E4E",
@@ -246,5 +249,8 @@
   "0x0FBB,1,1": "0xEAF0",
   "0x0FBC,1,1": "0xEAF1"
  },
- "_bank2_note": "session 14z-10: entries colliding with protected_tiles.json relocated into the vetted free pool (was: freed-band-tail assumption, disproved by the vanilla runtime audit)."
+ "_bank2_note": "session 14z-10: entries colliding with protected_tiles.json relocated into the vetted free pool (was: freed-band-tail assumption, disproved by the vanilla runtime audit).",
+ "_mugshot_note": "14z-49: Donovan's HUD mugshot (vs2 bank-1 2x2 at code 0x4D62 \u2014 LIVE-OBJ verified; vs2's HUD stager adds 0x4200 to table codes where vsavj adds 0x3800) placed INTO Jedah's own mugshot cells 0x3DC8 (table 0x89884 entry 0x0F = 0x05C8 untouched).",
+ "_name_plate_note": "14z-49: Donovan's HUD name plate (vs2 3x1 at code 0x4D55, live-OBJ verified, attr 0202 pal 2) placed at the bank-1 pool tail 0xBE8C-0xBE8E; vsavj name table 0x898C4 entry 0x0F repointed via aux_poke (code 0x868C = 0xBE8C - vsavj's 0x3800 base).",
+ "_medallion_note": "14z-49: Donovan's select-wheel medallion (vs2 bank-1 3x2 code 0xB10B, identified against Pyron b0f5/Huitzil b108 by color render; vs2 wheel pal!=char-id) placed over JEDAH's cell tiles b526-8/b536-8 (cursor-ring-verified cell, replay 58; the 3x3 b4e3 next to it is GALLON's, untouched). Colors via donovan.toml med_pal_row14_a (select pal row 14 block A <- vs2 row-05 src 0x3BAFDC)."
 }

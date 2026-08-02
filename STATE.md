@@ -1,9 +1,123 @@
 # STATE — living progress log
 
-Updated: 2026-08-02 (session 14z-44 — ES CHAIN COMPLETE: meter
-system disassembled, scripted ES unlocked, ES 9 hits native-exact,
-AND the round-52 ES-finish neutral-pose KO fixed; battery pending
-at entry-writing time)
+Updated: 2026-08-02 (session 14z-49b — HUD mugshot + name AND select
+medallion all show Donovan; battery GREEN on the amended masked
+basis; third mask window awaits maintainer ratification)
+
+## Session 14z-49 (rounds 61-62: HUD MUGSHOT + NAME + SELECT MEDALLION — the whole per-slot venue-asset family fixed)
+
+Build `b91647c7da14ded6316cee8dc057c8daf1c3fb1e` (donovan6, stage 6).
+
+- **HUD pipeline mapped (in-fight top strip is OBJ, staged from
+  per-char tables):** emitter `PRG:0x1BB3C` → RAM records at
+  `RAM:$FF5D94` → stagers `PRG:0x89370/0x8939C` (mugshot) and
+  `PRG:0x89684` (name) → per-char tables `PRG:0x89884` (mugshot
+  code words) and `PRG:0x898C4` (name entries, 8B/char). **Stager
+  bases differ per game: vsavj adds +0x3800 to table codes, vs2
+  adds +0x4200** (live-OBJ measured after the first placement from
+  +0x3800-assumed vs2 addresses drew garbage). vs2 twins: tables
+  `0x990CE`/`0x9910E`, Donovan row 0x13 (mugshot 0x0B62 → OBJ
+  0x4D62 2x2; name 0x0B55.. → 0x4D55 3x1 pal 02).
+- **HUD fix (uncommitted last session, corrected + committed now):**
+  mugshot = effect_tail place `'0x4D62,2,2' -> '0x3DC8'` (into the
+  cells slot 0x0F's own table entry 0x05C8 already points at — no
+  code patch); name = place `'0x4D55,3,1' -> '0xBE8C'` (bank-1 pool
+  tail) + aux_pokes `hud_name_entry_0f_hi/lo` repointing name-table
+  entry 0x0F (0x8993C ← 0x868C0202, 0x89940 ← 0xFFE80003; 0x868C =
+  0xBE8C − 0x3800). Live-verified: mugshot entry (0x3DC8 2x2 pal 0A
+  at 200,32), name plate (0xBE8C 3x1 pal 02 at 144,40), f2600
+  replay 56. Gate: reactions §4 extension.
+- **SELECT WHEEL DECODED (docs/engine_internals.md):** the wheel is
+  ONE static OBJ record at data `0x272A72` — 18 (code,attr) pairs,
+  coords via header pointer → list `0x32A50A` (center-relative,
+  shared byte-identical with vs2's list). Cells are fixed
+  perspective sizes (3x2/2x2, ONE 3x3); the wheel does not rotate
+  or hover-zoom; the cursor ring (pal-1e pieces) just moves.
+- **WRONG-CELL TRAP PAID FOR (GOTCHAS entry): the big 3x3 pal-07
+  cell (code b4e3 at 264,64) is GALLON's medallion** (top-front
+  perspective cell, werewolf face — first read as "Jedah" from the
+  pal-07 = char-07 numerology). **Jedah's actual cell = code
+  0xB526 attr 0x1214 pal 14 at (236,57)** — identified by
+  measuring the cursor-ring center (256,72) in replay 58 and by
+  color-rendering the art (purple wing-wrapped icon = the
+  maintainer's "still Jedah's" medallion). First attempt shipped
+  Donovan onto Gallon's cell (attr+coord retune included); caught
+  same-session by ring-center check; fully reverted.
+- **Medallion fix (minimal — same 3x2 geometry as the vs2 icon):**
+  art = effect_tail place `'0xB10B,3,2' -> '0xB526'` (vs2 Donovan
+  icon, identified against Pyron b0f5/Huitzil b108 by color render
+  — vs2's wheel pal indices ≠ char ids for the appended trio);
+  colors = data_port `med_pal_row14_a` (select pal row 14, block A
+  copy 0x3A3A80 only — block B's row 14 belongs to another
+  sub-venue — ← vs2 row-05 source 0x3BAFDC). No record retune
+  needed. Live row 14 lands byte-equal to vs2's live Donovan-icon
+  row. Gate: colors §4 extension (row-14 freeze + record intact +
+  Gallon-cell-intact tripwire).
+- **Tooling gotcha (GOTCHAS): replay.lua DUMPS separator is `;`,
+  not `,`** — comma-joined multi-dumps die rc=3 with no artifacts;
+  same-frame multi-window dumps are fine with `;`.
+- Verification: colors + reactions gates extended and green on
+  `b91647c7`; full battery queued (results below when done).
+- Select screens (mode-select wheel view + VS splash) visually
+  re-verified: Donovan medallion in Jedah's ringed cell, Gallon's
+  werewolf 3x3 restored, VS-splash big portrait + name were already
+  correct.
+
+## Session 14z-49b (battery divergence root-caused: the palette-fade staging buffer; THIRD MASK WINDOW — **MAINTAINER RATIFICATION NEEDED**)
+
+First battery on the 14z-49 build FAILED two ways; both root-caused
+to completion the same session (rule 6 honored):
+
+1. **05_timeout_idle masked live-state diverged at f9126** (first
+   red on this replay ever; batteries 43-48 green). Byte-for-byte
+   attribution: the divergent bytes `RAM:$FF4183-$FF41A1` are select
+   palette-block-A row 14 — vanilla values vs the 14z-49 ported
+   Donovan-icon values, F-bright applied, row slot based at $FF4182.
+   Mechanism: **venue fades stage palette-block rows through a
+   work-RAM staging buffer** ($FF4182 + row*0x20 family); f9126 is
+   the match→win fade after the round-1 timeout (Lilith CPU win).
+   The medallion recolor is a DESIGNED content change to that ROM
+   row, so the buffer now legitimately differs wherever a fade
+   stages block A — even in legacy replays that never touch slot
+   0x0F. Crucially: the live select screen itself does NOT stage
+   through this buffer (frames 1-9125 incl. the full select were
+   bit-identical), and the win screen's OWN palette overwrites row
+   14 — **legacy win screens pixel-compare 0-diff vanilla vs
+   patched (f9200 + f9400 measured)**. Display-only, no gameplay
+   surface, no visible surface.
+   FIX: third masked window `$FF4182-$FF41A1` (M2A_MASK
+   "4182-41a2"), narrowly the one row slot; docs/atlas/ram.md row
+   added; all 14 frozen masked vanilla logs regenerated with the
+   new basis (m2a_freeze_masked). Chosen over demoting 05 to a
+   first-divergence constant because the mask keeps all 12,120
+   frames verified (the replay's post-round state machine coverage
+   lives AFTER f9126). **This is a legacy-oracle basis change —
+   the two existing windows are maintainer-approved, so this one
+   is flagged PENDING MAINTAINER RATIFICATION** (revert = drop the
+   mask range + re-freeze, cheap). Standing-watch note: this was
+   root-caused, not tolerated — the class is "designed content on
+   a display path", not flicker growth.
+   Follow-on fact for M3: ANY select palette-block content change
+   (Huitzil/Pyron rows later) will surface in this buffer family —
+   extend the window with measured slots at that time.
+
+2. **Pixel menu gate FAIL frames 950/1250 (880 px)** — the gate's
+   own 14s design note predicted this exactly ("full-frame compare
+   is valid until the wheel mugshot itself is ported, then this
+   needs a mask"): the 880 pixels are the intended Donovan
+   medallion diff on the two wheel-visible frames. FIX: the
+   promised mask — the 48x32 cell box screen (172,41)-(220,73)
+   zeroed on both sides for 950/1250; the box's correctness is
+   covered by the colors-gate medallion locks + the build-time
+   byte-exact art assert. Title frame 650 stays full-frame.
+
+**Battery re-run on the new basis: GREEN** (battery_49b): 05 masked
+bit-identical full-length again; flicker inventory IDENTICAL to
+frozen (03@829,2093 / 10@3007,3129 / 16@829 / 04@1525,2009,2195 /
+08@3507 / 09@829 / 29@2436 — no growth, standing watch satisfied);
+divergence constants unchanged (06@700, attract@4278, pick@1080);
+pixel gates pass with only the medallion box masked (650
+full-frame). All 14z-49 gates green on `b91647c7`.
 
 ## Session 14z-48b (rounds 59-60: HC moves maintainer-CONFIRMED; HUD portrait = wrong ART not palette; select medallion re-listed)
 
@@ -3249,6 +3363,15 @@ revisiting requires changing that gate deliberately.
 
 ## Decisions pending (human)
 
+- **RATIFY THE THIRD MASK WINDOW (14z-49b, verification-basis
+  change):** `RAM:$FF4182-$FF41A1` (palette-fade staging slot for
+  select block-A row 14) added to the masked legacy basis so the
+  INTENDED medallion recolor stops failing 05_timeout_idle on a
+  display-only path. Full mechanism + measurements in the 14z-49b
+  entry; the alternative (freeze 05 at first-divergence 9126) loses
+  3,000 frames of post-round-machine coverage. Recommendation:
+  ratify. Revert path if declined: remove "4182-41a2" from M2A_MASK
+  + re-freeze + pick the first-divergence-constant class instead.
 - **ROSTER ACCESS MECHANISM (M4-defining, raised by maintainer
   2026-07-28):** how players select the 18 characters. Option A: full
   select-screen redesign (new wheel/cursor/portraits — priced by the

@@ -135,6 +135,7 @@ EOF2
 #      the round-52 ES-finish neutral-pose bug.
 mkdir -p "$WORK/es"
 DUMPS=$(python3 -c "print(';'.join(f'{f}:ff8850-ff8854' for f in range(2625,2745,10)))")
+DUMPS="2600:708000-708200;$DUMPS"
 POKES="2550:ff8509:09" DUMPS="$DUMPS" \
     REPLAY="$REPO/tests/replays/56_don_es_ls.rpl" \
     CHECKSUM_OUT="$WORK/es/c.log" MAME_SANDBOX="$WORK/es" \
@@ -159,6 +160,25 @@ assert 11 <= total <= 13, (
     f"pre-14z-44 builds dealt 6-11 (victim escaped the shake)")
 assert hits >= 7, f"only {hits} ES damage steps at 10f sampling — native-class is 8-9"
 print(f"  ok: ES 421P native-class ({hits} steps, {total} total)")
+# 14z-49 HUD asset lock (in-match, f2600): Donovan's mugshot and name
+# plate must ride the repointed/replaced cells — mugshot = table-0x0F
+# code 0x05C8 + vsavj stager base 0x3800 = OBJ code 0x3DC8 (2x2 pal 0A,
+# P1 flank x=200,y=32), name = pool-tail code 0xBE8C via the aux_poke'd
+# table entry (3x1 pal 02 at x=144,y=40). Art content is asserted
+# byte-exact by the gfx builder; this locks the live plumbing.
+d = open(os.path.join(work, 'dump_2600_708000.bin'), 'rb').read()
+ents = set()
+for i in range(0, len(d) - 8, 8):
+    x = int.from_bytes(d[i:i+2], 'big') & 0x3FF
+    y = int.from_bytes(d[i+2:i+4], 'big') & 0x3FF
+    code = int.from_bytes(d[i+4:i+6], 'big')
+    attr = int.from_bytes(d[i+6:i+8], 'big')
+    ents.add((x, y, code, attr))
+assert (200, 32, 0x3DC8, 0x112A) in ents, \
+    "HUD mugshot entry (0x3DC8 2x2 pal 0A at 200,32) missing — table 0x0F/stager drift?"
+assert (144, 40, 0xBE8C, 0x0202) in ents, \
+    "HUD name plate entry (0xBE8C 3x1 pal 02 at 144,40) missing — name-table aux_poke drift?"
+print("  ok: HUD mugshot + name plate ride the 14z-49 cells (0x3DC8 / 0xBE8C)")
 EOF2
 mkdir -p "$WORK/esko"
 POKES="2550:ff8509:09;2600:ff8850:00010001" \

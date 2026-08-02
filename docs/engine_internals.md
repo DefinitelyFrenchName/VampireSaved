@@ -398,3 +398,81 @@ vsavj and vs2; addresses vs2 / vsavj-twin):
   should carry vs2's exact tables via farm_port rows (vs2 input
   feel); reconciliation of helper families MUST match by table
   content + dispatcher kind, never code similarity (GOTCHAS).
+
+## In-fight HUD asset tables + the select-wheel record (session 14z-49, measured)
+
+Two venue-asset families, both per-slot, both now serving Donovan on
+slot 0x0F.
+
+### In-fight HUD top strip (mugshot beside the timer, name under the bar)
+
+OBJ sprites, staged per frame from per-char tables:
+
+- Emitter `PRG:0x1BB3C` reads RAM-staged records at `RAM:$FF5D94`.
+- Stagers: mugshot `PRG:0x89370`/`0x8939C`, name `PRG:0x89684`.
+- Per-char tables: mugshot code words `PRG:0x89884` (entry 0x0F =
+  0x05C8), name entries `PRG:0x898C4` (8 bytes/char: code word,
+  attr word, x offset word, width word).
+- **Stager base is per-GAME: vsavj adds +0x3800 to table codes, vs2
+  adds +0x4200.** (Measured from live OBJ: vs2 Donovan mugshot OBJ
+  code 0x4D62 = table 0x0B62 + 0x4200; assuming +0x3800 placed the
+  wrong vs2 art on the first attempt.)
+- vs2 twins: tables `0x990CE` / `0x9910E`, Donovan row 0x13.
+- Live lock values (replay 56 f2600, P1 Donovan vs P2 Victor):
+  mugshot (200,32) code 0x3DC8 2x2 attr 0x112A; name (144,40) code
+  0xBE8C 3x1 attr 0x0202. P2 mugshot rides (280,32) with its own
+  table entry. Gate: test_don_reactions ES section.
+- The in-match strip does NOT exist on the VS splash (different
+  venue with its own big-portrait records — that one was already
+  correct for Donovan).
+
+### Select wheel (the medallion ring)
+
+ONE static OBJ record, no rotation, no hover zoom — the cursor ring
+(pal-1e pieces) is the only thing that moves:
+
+- Record at data `0x272A92` region (pairs start `0x272A72`): 18
+  (code word, attr word) pairs; a header longword `0x0032A50A`
+  points at the coordinate list (center-relative x,y word pairs;
+  wheel center raw ≈ (256,176); list byte-identical to vs2's at
+  `0x303AAC` for the shared 18 entries).
+- Cells are fixed perspective sizes: 3x2 close, 2x2 far, ONE 3x3
+  (the top-front cell). Cell → char map is by ART, not by pal
+  index: **the 3x3 pal-07 cell at (264,64) is GALLON's** (werewolf
+  face); **Jedah's cell = code 0xB526 attr 0x1214 pal 14 at
+  (236,57)** — the purple wing-wrapped icon, the cell the cursor
+  ring brackets when picking slot 0x0F (ring center (256,72),
+  replay 58).
+- Palette: each cell owns a select-venue palette row (row == attr
+  pal index). Row sources live in two 32-row blocks: A `0x3A3800`
+  (the wheel view — live-verified rows land at `90C000 + row*0x20`
+  with the bright nibble forced to F) and B `0x3A3C00` (another
+  sub-venue; its row 14 content differs — only block A's row 14 is
+  the wheel's).
+- vs2's wheel: same record family at `0x2A6D8C+` with THREE record
+  variants (base 18-cell + two 21-cell variants appending the
+  newcomers) — there Jedah is demoted to 3x2 `b113 1207` and
+  nobody is 3x3. The vs2 newcomer icons: Donovan = `0xB10B` 3x2
+  (vs2 pal row 05), Pyron = `0xB0F5` (row 11), Huitzil = `0xB108`
+  (row 13, the gold one). Identified by color render, NOT by pal
+  numerology (see GOTCHAS).
+- Donovan-on-slot-0x0F fix: art `'0xB10B,3,2' -> '0xB526'`
+  (effect_tail), colors data_port `med_pal_row14_a` (block A row 14
+  <- vs2 `0x3BAFDC`). Record and coords untouched. Gate:
+  test_don_colors select section (frozen row 14 + record-intact +
+  Gallon-cell tripwire).
+
+### The palette-fade staging buffer (14z-49b, measured)
+
+Venue FADES stage palette-block rows through a work-RAM buffer before
+they land at `90C000`: select block-A row 14's slot is
+`RAM:$FF4182-$FF41A1` (family: $FF4182 + row*0x20). Measured on the
+match→win fade (05_timeout_idle f9126). The LIVE select screen does
+NOT go through this buffer (a full select traversal stays
+bit-identical), and the destination venue's own palette overwrites
+the staged rows — so buffer content is display-only and transient.
+Consequence: any ROM-side select palette-block content change (the
+medallion recolor; future Huitzil/Pyron rows) surfaces in this buffer
+during fades in LEGACY replays. Handled by the third masked window
+(tests/lib/m2a_common.sh M2A_MASK + docs/atlas/ram.md; pending
+maintainer ratification, STATE 14z-49b).

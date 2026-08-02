@@ -28,6 +28,7 @@ this list require a measured mechanism + maintainer sign-off.
 |---|---|---|---|
 | `RAM:$FF7F00-$FF7FFF` | system stack reserve; SP rests at $FF8000 at the frame-done sample point, so everything below is dead (stale return addresses, abandoned exception frames, interrupt-time register saves). Hook cycle-skew makes these bytes differ while live state is identical. Observed divergence extent: $FF7FA0-$FF7FFF | ghost (dead at sample) | [D: frame-boundary dumps vanilla vs hooked, session 7] |
 | `RAM:$FF043C` | 68k↔QSound handshake latch (values 04/08, toggles per frame); phase-shifts one frame under hook cycle skew — same family as the $FF1CF0 latch under `-debug` (GOTCHAS) | phase | [D: single-byte diff isolation, session 7] |
+| `RAM:$FF4182-$FF41A1` | palette-fade staging buffer: the 0x20-byte slot where select palette-block-A row 14 lands when a venue fade stages block-A rows (measured: match→win fade). The 14z-49 medallion recolor changes that ROM row by design, so the slot's content legitimately differs from vanilla on this build. Display-only (buffer → 90C000; the destination venue overwrites row 14 — legacy win screens pixel-compare 0-diff). Masked as of 14z-49, **PENDING MAINTAINER RATIFICATION** | designed content (this build) | [D: 05_timeout_idle f9126 byte-for-byte attribution + win-screen pixel A/B, session 14z-49] |
 
 ## System / match globals
 

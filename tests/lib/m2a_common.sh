@@ -53,8 +53,22 @@ m2a_legacy_gate() {
 
 # ── Masked legacy gate (CLAUDE.md §4 amendment, 2026-07-25) ──────────────────
 # For builds carrying ENGINE HOOKS: legacy comparison is live-RAM — all work
-# RAM except the two windows documented in docs/atlas/ram.md (dead stack
-# $FF7F00-$FF7FFF at frame-done + QSound handshake latch $FF043C).
+# RAM except the windows documented in docs/atlas/ram.md (dead stack
+# $FF7F00-$FF7FFF at frame-done + QSound handshake latch $FF043C + the
+# 14z-49 window below).
+# THIRD WINDOW $FF4182-$FF41A1 (added 14z-49, PENDING MAINTAINER
+# RATIFICATION): the palette-fade staging buffer's slot for select
+# palette-block-A row 14. The 14z-49 medallion recolor (Donovan's icon on
+# the replaced Jedah slot) legitimately changes that ROM row; venue fades
+# (measured: the match->win fade, 05_timeout_idle f9126) stage block-A rows
+# through this work-RAM buffer, so the intended content difference surfaced
+# in a legacy replay. Mechanism fully attributed byte-for-byte (STATE
+# 14z-49b); display-only path (buffer -> 90C000; the win venue overwrites
+# row 14 with its own colors — win screens pixel-compare 0-diff vanilla vs
+# patched at f9200/f9400). Masking the 0x20-byte slot keeps 05 verified
+# full-length instead of demoting it to a first-divergence constant.
+# Future slot ports (Huitzil/Pyron rows) must extend this window with THEIR
+# measured slots deliberately — do not pre-widen.
 # v2 semantics (maintainer-approved 2026-07-27, CLAUDE.md §4): per-replay
 # comparison classes against FROZEN masked vanilla logs:
 #   exact    02/05/07 + attract/pick diverge-constants: bit-identical
@@ -66,7 +80,7 @@ m2a_legacy_gate() {
 #            offset propagates (persistent, benign, hook-caused — stage-3
 #            hook-free builds run 06 bit-identical)
 # Hook-free builds keep m2a_legacy_gate (unmasked) above.
-M2A_MASK="043c-043d,7f00-8000"
+M2A_MASK="043c-043d,4182-41a2,7f00-8000"
 M2A_MASKED_EXP="tests/expected/vsavj/masked"   # relative to $REPO
 # What each legacy replay exercises (all vanilla-content; a gate name is
 # <NN>_<character>_<mechanic> — the character is the vanilla char driving

@@ -310,6 +310,8 @@ poke32 0x0bf4d6 <- 0x000c1124  dispatch_18[0xf] donovan handler
 poke32 0x0bf516 <- 0x000c1124  dispatch_18[0x1f] variant mirror
 poke32 0x0bf656 <- 0x000c1106  dispatch_19[0xf] donovan handler
 poke32 0x0bf696 <- 0x000c1106  dispatch_19[0x1f] variant mirror
+poke32 0x08993c <- 0x868c0202  aux hud_name_entry_0f_hi
+poke32 0x089940 <- 0xffe80003  aux hud_name_entry_0f_lo
 data   0x0b19f8 +0xe50  data_port throw_victim_keyframes <- vsav2 0x0ca1ca (0 fixes)
 data   0x39fbe0 +0x20  data_port weapon_accent_t0 <- vsav2 0x39cbdc (0 fixes)
 data   0x39fc00 +0x20  data_port weapon_accent_t1 <- vsav2 0x39cbdc (0 fixes)
@@ -324,6 +326,7 @@ data   0x3b0ae0 +0xa0  data_port win_pal_slot0f_c4 <- vsav2 0x3c635c (0 fixes)
 data   0x3b1580 +0xa0  data_port win_pal_slot0f_c5 <- vsav2 0x3c6e9c (0 fixes)
 data   0x3b2020 +0xa0  data_port win_pal_slot0f_c6 <- vsav2 0x3c79dc (0 fixes)
 data   0x3b2ac0 +0xa0  data_port win_pal_slot0f_c7 <- vsav2 0x3c851c (0 fixes)
+data   0x3a3a80 +0x20  data_port med_pal_row14_a <- vsav2 0x3bafdc (0 fixes)
 code   0x3ffcb0 +0x62  site_thunk fixture_row0f_override_bank0; site 0x01c586 jsr-routed
 code   0x3ffd20 +0x62  site_thunk fixture_row0f_override_bank1; site 0x01c59a jsr-routed
 code   0x0fff40 +0x18  site_thunk select_companion_tbl_a; site 0x0845ec jsr-routed

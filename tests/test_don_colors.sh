@@ -84,7 +84,7 @@ EOF
 #      across consecutive frames AND equal the frozen native vs2 set
 #      (select R,R + confirm 6, f1500).
 mkdir -p "$WORK/pc"
-DUMPS="1500:90c140-90c1c0;1501:90c140-90c1c0;1502:90c140-90c1c0" \
+DUMPS="1500:90c140-90c1c0;1501:90c140-90c1c0;1502:90c140-90c1c0;1500:90c280-90c2a0;1500:708000-708500" \
     REPLAY="$REPO/tests/replays/58_don_select_confirm.rpl" \
     CHECKSUM_OUT="$WORK/pc/c.log" MAME_SANDBOX="$WORK/pc" \
     MAME_ROMPATH="$RPDIR;$ROMDIR" tools/run_mame.sh vsavj \
@@ -101,6 +101,32 @@ assert dumps[0].hex() == FROZEN, (
     "post-confirm accent rows diverge from the frozen native vs2 set "
     "(punch-color fallback? check accent_color_aware venue branch)")
 print("  ok: select post-confirm accents steady + native-locked (rows 0x0A-0x0D)")
+# 14z-49 select-wheel medallion lock. Donovan's cell = JEDAH's old
+# wheel cell (code 0xB526 attr 0x1214 pal 14 at 236,57 — the cell the
+# cursor ring centers on; measured, session 14z-49). Locks:
+#   1. pal row 14 == the ported vs2 Donovan-icon row (src 0x3BAFDC,
+#      live-verified equal to vs2's select row 05);
+#   2. the wheel record entry intact (art replacement is build-time
+#      byte-asserted; this locks the record + palette plumbing);
+#   3. GALLON's big 3x3 cell (b4e3 attr 2207 at 264,64) untouched —
+#      the first 14z-49 attempt wrongly retuned it; never again.
+row14 = open(os.path.join(work, 'dump_1500_90c280.bin'), 'rb').read()[:0x20]
+FROZEN14 = "fffffda8fc86fb75fa64f743f532f322facef78df458ffd6fb84fc22f922f005"
+assert row14.hex() == FROZEN14, (
+    f"select pal row 14 (Donovan medallion) drifted:\n  got {row14.hex()}\n  exp {FROZEN14}")
+d = open(os.path.join(work, 'dump_1500_708000.bin'), 'rb').read()
+ents = set()
+for i in range(0, len(d) - 8, 8):
+    x = int.from_bytes(d[i:i+2], 'big') & 0x3FF
+    y = int.from_bytes(d[i+2:i+4], 'big') & 0x3FF
+    code = int.from_bytes(d[i+4:i+6], 'big')
+    attr = int.from_bytes(d[i+6:i+8], 'big')
+    ents.add((x, y, code, attr))
+assert (236, 57, 0xB526, 0x1214) in ents, \
+    "Donovan medallion cell (b526 3x2 pal 14 at 236,57) missing from wheel record"
+assert (264, 64, 0xB4E3, 0x2207) in ents, \
+    "Gallon's 3x3 cell (b4e3 2207 at 264,64) altered — wrong-cell retune is back"
+print("  ok: select medallion native-locked (row 14 + wheel record + Gallon intact)")
 EOF2
 echo "PASS: Donovan color-set gate (alt + mirror native-locked)"
 

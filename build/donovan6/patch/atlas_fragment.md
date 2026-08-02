@@ -62,6 +62,7 @@
 | `PRG:0x3B1580` | 0xA0 | VS2 | data_port win_pal_slot0f_c5 (vsav2 0x3c6e9c) |
 | `PRG:0x3B2020` | 0xA0 | VS2 | data_port win_pal_slot0f_c6 (vsav2 0x3c79dc) |
 | `PRG:0x3B2AC0` | 0xA0 | VS2 | data_port win_pal_slot0f_c7 (vsav2 0x3c851c) |
+| `PRG:0x3A3A80` | 0x20 | VS2 | data_port med_pal_row14_a (vsav2 0x3bafdc) |
 | `PRG:0x3FFCB0` | 0x62 | GEN | site_thunk fixture_row0f_override_bank0 |
 | `PRG:0x01C586` | 0x6 | GEN | site_thunk fixture_row0f_override_bank0 engine site |
 | `PRG:0x3FFD20` | 0x62 | GEN | site_thunk fixture_row0f_override_bank1 |

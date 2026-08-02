@@ -904,3 +904,29 @@ motion definitions so exact twins don't always exist — the
 farm_port kind (port table + stub) is the correct fallback, and it
 already existed for two hand-done rows. Content-match census script
 in the 14z-48 session log.
+
+## Venue-asset numerology: palette index ≠ character id; identify
+## cells by MEASURING the cursor, not by suggestive constants
+The select wheel's big 3x3 cell uses pal row 07, and Jedah's vsavj
+char id is 0x07 — so it "obviously" was Jedah's medallion. It's
+GALLON's (pal indices in the wheel record are display rows; vs2's
+appended trio proves the point — Donovan's icon rides vs2 pal row
+05, Anakaris' row). First 14z-49 attempt shipped Donovan's face
+onto Gallon's cell (with an attr+coord retune on top). The correct
+cell (Jedah's, 0xB526 at 236,57) was found in minutes once measured
+properly: (a) center the CURSOR RING's pal-1e pieces over the cell
+boxes, (b) color-render candidate cell art with its live palette
+row and eyeball it against known faces. Both checks are one dump +
+one render; do them BEFORE writing any manifest row that targets a
+"per-char" venue asset. (Bonus in the same family: vs2's gold
+"Donovan" icon guess was actually Huitzil — a color render against
+the character's design settles it instantly.)
+
+## replay.lua DUMPS separator is ';' — commas die silently late
+`DUMPS="a:r1,b:r2"` exits rc=3 after a full emulator boot with no
+dump artifacts and no error text (the lua parser takes the whole
+comma-joined string as one malformed spec). Multiple windows —
+including several on the SAME frame — work fine ';'-joined (the
+existing gates already relied on this; the comma form cost three
+blind reruns this session). Symptom to recognize: rc=3 +
+FileNotFoundError on the first expected dump.

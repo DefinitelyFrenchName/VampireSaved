@@ -991,3 +991,32 @@ Session 14z-36 (sworded-421P shock+death fixed):
   stun holds the victim, matching vs2); no standing knockdown.
   Retires the 14z-28 three-consumer property plan. Gate: death-chain
   assertions restored in test_don_reactions.sh.
+
+Session 14z-49 (HUD mugshot/name + select medallion — per-slot venue
+assets, all art/data byte detail):
+- effect_tail.json place '0x4D62,2,2' -> '0x3DC8': vs2 Donovan HUD
+  mugshot (4 bank-1 tiles 0x14D62/63 + 0x14D72/73) over the cells
+  vsavj mugshot-table entry 0x0F (PRG:0x89884 + 0x1E = 0x05C8, +0x3800
+  stager base = OBJ 0x3DC8) already points at. No code/table bytes
+  touched for the mugshot.
+- effect_tail.json place '0x4D55,3,1' -> '0xBE8C': vs2 name-plate art
+  (3 tiles) at the bank-1 pool tail 0x1BE8C-0x1BE8E.
+- aux_pokes hud_name_entry_0f_hi/lo: name-table (PRG:0x898C4) entry
+  0x0F = 8 bytes at 0x8993C rewritten 0x868C0202 0xFFE80003 (code
+  0x868C = 0xBE8C - 0x3800; attr/pal + x-offset/width words copied
+  from vs2's Donovan row shape).
+- effect_tail.json place '0xB10B,3,2' -> '0xB526': vs2 Donovan select
+  medallion (6 bank-1 tiles) over Jedah's wheel-cell tiles
+  0x1B526-28/0x1B536-38. Cell identity measured (cursor-ring center +
+  color render), NOT assumed — first attempt targeted Gallon's 3x3
+  b4e3 cell with an attr 2207->1207 poke + coord (8,-112)->(8,-104)
+  poke; both REVERTED before commit, tiles restored by rebuild.
+- data_port med_pal_row14_a: 0x20 bytes, vsavj 0x3A3A80 (select
+  palette block A row 14 — the wheel view's live copy; block B copy
+  0x3A3CE0+0x280 left untouched, different content = other sub-venue)
+  <- vs2 0x3BAFDC (Donovan icon's row-05 source). Live row 14 lands
+  byte-equal to vs2's live select row 05.
+- Gates: test_don_reactions ES section + f2600 OBJ locks (mugshot
+  entry 200,32,0x3DC8,0x112A; name 144,40,0xBE8C,0x0202);
+  test_don_colors select section + row-14 freeze, wheel-record-intact
+  and Gallon-cell-intact (264,64,0xB4E3,0x2207) assertions.
