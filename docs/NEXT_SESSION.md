@@ -63,10 +63,10 @@ attribute any drift, maintainer sign-off, never silently refreeze).
 3. ~~Donovan WIN screen~~ FIXED 14z-45 (build 4f69589d, gate-locked):
    per-winner-char tables — position entries 0x0F/0x1F patched to
    vs2's (0xF0,0x98), Jedah's 8 win-palette color slices replaced
-   in place with vs2's Donovan sets. Maintainer round: confirm all
-   colors + the LOSE screen (their check in progress); if any
-   element still off, A/B palette rows 0x1A+ (vs2 has extra
-   win-venue sub-uploads). NOTE: hole B nearly full (0x1F0 free).
+   in place with vs2's Donovan sets. Round 56: maintainer CONFIRMED
+   fixed; lose/continue = no issue (lose = opponent's win screen +
+   shared continue screen). ARC CLOSED. NOTE: hole B nearly full
+   (0x1F0 free).
 4. Swordless-deity palette (yellow vs vs2 blue figure/lightning —
    maintainer captures round 41). Same family as the deity's obj
    palette rows; untouched so far.
