@@ -11,100 +11,12 @@ index 3bf65bd..0de57a1 100644
  
  ifdef FORCE_PULSE_AUDIO
  alldir	+= 	intf/audio/linux
-diff --git a/src/burner/sdl/main.cpp b/src/burner/sdl/main.cpp
-index 688404a..d8d8e65 100644
---- a/src/burner/sdl/main.cpp
-+++ b/src/burner/sdl/main.cpp
-@@ -38,6 +38,14 @@ const char* romname = NULL;
- 
- extern void InitSupportPaths();
- 
-+// Vampire Saved harness (harness.cpp)
-+extern char szHarnessInput[MAX_PATH];
-+extern char szHarnessOut[MAX_PATH];
-+extern char szHarnessDumps[8192];
-+extern INT32 nHarnessFrames;
-+extern bool HarnessActive();
-+extern int HarnessRun();
-+
- #ifdef BUILD_SDL2
- SDL_Window* sdlWindow = NULL;
- #endif
-@@ -116,6 +124,29 @@ int parseSwitches(int argc, char* argv[])
- 			i++;
- 			_tcscpy(CDEmuImage, argv[i]);
- 		}
-+		else if (strcmp(argv[i], "-hinput") == 0)   // Vampire Saved harness
-+		{
-+			if (++i >= argc) return 1;
-+			snprintf(szHarnessInput, MAX_PATH, "%s", argv[i]);
-+			bSaveconfig = 0;
-+		}
-+		else if (strcmp(argv[i], "-hout") == 0)
-+		{
-+			if (++i >= argc) return 1;
-+			snprintf(szHarnessOut, MAX_PATH, "%s", argv[i]);
-+			bSaveconfig = 0;
-+		}
-+		else if (strcmp(argv[i], "-hframes") == 0)
-+		{
-+			if (++i >= argc) return 1;
-+			set_commandline_option(nHarnessFrames, atoi(argv[i]));
-+		}
-+		else if (strcmp(argv[i], "-hdump") == 0)
-+		{
-+			if (++i >= argc) return 1;
-+			snprintf(szHarnessDumps, sizeof(szHarnessDumps), "%s", argv[i]);
-+			bSaveconfig = 0;
-+		}
- 	}
- 	return 0;
- }
-@@ -246,9 +277,18 @@ void DoGame(int gameToRun)
- {
- 	if (!DrvInit(gameToRun, 0))
- 	{
-+		if (HarnessActive())
-+		{
-+			// headless scripted run: no media/audio init, no RunInit
-+			// (avoids StatedAuto auto-savestate load), see harness.cpp
-+			HarnessRun();
-+		}
-+		else
-+		{
- 		MediaInit();
- 		display_set_controls();
- 		RunMessageLoop();
-+		}
- 	}
- 	else
- 	{
-@@ -401,6 +441,19 @@ int main(int argc, char* argv[])
- #if defined(BUILD_SDL2) && !defined(SDL_WINDOWS)
- 	bprintf = AppDebugPrintf;
- #endif
-+
-+	if (HarnessActive())
-+	{
-+		// Determinism: keep ALL mutable per-game state inside the harness
-+		// sandbox (cwd). The user config may point these at shared absolute
-+		// locations (e.g. ~/Library/Application Support/fbneo), where the
-+		// EEPROM bootup counter would make consecutive runs diverge.
-+		_stprintf(szAppEEPROMPath, _T("./"));
-+		_stprintf(szAppHiscorePath, _T("./"));
-+		_stprintf(szAppCheatsPath, _T("./"));
-+		bSaveconfig = 0;
-+	}
-+
- 	BurnLibInit();
- 
- 	// Search for a game now, for use in the menu and loading a games
 diff --git a/src/burner/sdl/harness.cpp b/src/burner/sdl/harness.cpp
 new file mode 100644
-index 0000000..d48ebc8
+index 0000000..ec94aa8
 --- /dev/null
 +++ b/src/burner/sdl/harness.cpp
-@@ -0,0 +1,289 @@
+@@ -0,0 +1,452 @@
 +// harness.cpp — Vampire Saved test harness for the SDL2 frontend.
 +// FRONTEND-ONLY: no emulation-core file is touched by this feature.
 +//
@@ -126,6 +38,10 @@ index 0000000..d48ebc8
 +// See tools/run_replay_fbneo.sh in the Vampire Saved repo.
 +
 +#include "burner.h"
++// Public 68k interface: SekMapHandler / SekSetWrite*Handler / SekGetPC.
++// Including a public CPU *interface header* is not modifying an emulation
++// core file — no core source is touched by this feature (Rule 1).
++#include "m68000_intf.h"
 +
 +INT32 nHarnessTailFrames = 120;        // extra frames after last scripted input
 +char szHarnessInput[MAX_PATH] = "";    // replay script path
@@ -134,8 +50,34 @@ index 0000000..d48ebc8
 +INT32 nHarnessFrames = 0;              // explicit total override (0 = auto)
 +
 +extern UINT8* CpsRamFF;                // CPS-2 work RAM (cps.h)
++extern UINT8* CpsRam708;               // OBJ RAM  ($708000-$709FFF)
++extern UINT8* CpsRam90;                // palette / gfx RAM ($900000-$92FFFF)
 +extern UINT8* CpsGfx; extern UINT32 nCpsGfxLen;   // decoded tile buffer
 +extern int InputMake(bool bCopy);
++
++static UINT32 nHarnessFrame = 0;       // current frame, for instrument logs
++
++// ── 68k address -> host byte pointer (B5b) ───────────────────────────────────
++// The dump/poke instruments originally reached work RAM only. Resolving the
++// address instead lets them reach OBJ RAM and palette RAM too, which is what
++// the venue-asset work actually needs.
++//
++// BYTE ORDER: FBNeo stores these buffers with the 68k-logical byte at index
++// (offset ^ 1) — the SEK little-endian storage convention. Every accessor
++// here applies that swap, so callers always speak 68k-logical addresses,
++// exactly like the MAME-side Lua instruments. This is the repo's #1 gotcha
++// (docs/GOTCHAS.md); getting it wrong here would silently mis-report every
++// byte rather than fail loudly.
++static UINT8* harness_mem(UINT32 a)
++{
++    if (a >= 0xFF0000 && a <= 0xFFFFFF && CpsRamFF)
++        return &CpsRamFF[((a - 0xFF0000) & 0xFFFF) ^ 1];
++    if (a >= 0x708000 && a <= 0x709FFF && CpsRam708)
++        return &CpsRam708[((a - 0x708000) & 0x1FFF) ^ 1];
++    if (a >= 0x900000 && a <= 0x92FFFF && CpsRam90)
++        return &CpsRam90[((a - 0x900000) & 0x3FFFF) ^ 1];
++    return NULL;
++}
 +
 +// ── input resolution ─────────────────────────────────────────────────────────
 +// .rpl tokens -> BurnInputInfo szInfo names (CPS-2 fighting layout)
@@ -286,6 +228,127 @@ index 0000000..d48ebc8
 +    return h;
 +}
 +
++// ── write tap with PC attribution (B5b, FBNEO_HTAP) ──────────────────────────
++// The MAME side has had "who wrote this address?" since M1 (trace_writes.lua /
++// tap_writes.lua); FBNeo had nothing, which mattered because FBNeo is the
++// PRIMARY target. Frontend-only: SekMapHandler + SekSetWrite*Handler are part
++// of the public 68k interface, so no emulation-core file is touched (Rule 1).
++//
++// Handler slot 7: the capcom drivers use 0-6 and SEK_MAXHANDLER is 10.
++//
++// The handler MUST write through faithfully or it corrupts the game. That is
++// not argued, it is gated: tests/test_fbneo_taps.sh requires a full replay
++// with the tap installed over work RAM to be checksum-identical to an
++// untapped run. A wrong write-through diverges immediately and loudly.
++//
++// FBNEO_HTAP="<start>-<end>[;<start>-<end>...]" (68k hex addresses)
++// FBNEO_HTAP_OUT=<path>   (default: <hout>.tap)
++// Log line: "<frame> <addr> <value> <B|W> pc=<pc>"
++
++#define HARNESS_TAP_SLOT 7
++#define HARNESS_TAP_MAX  8
++
++static UINT32 nTapLo[HARNESS_TAP_MAX], nTapHi[HARNESS_TAP_MAX];
++static int    nTapCount = 0;
++static FILE*  tapOut = NULL;
++
++static bool tap_hit(UINT32 a)
++{
++    for (int i = 0; i < nTapCount; i++)
++        if (a >= nTapLo[i] && a <= nTapHi[i]) return true;
++    return false;
++}
++
++// Write-through helpers. A 68k byte at address a lives at (offset ^ 1); a
++// 68k word at even address a therefore occupies host bytes [off] = low,
++// [off+1] = high, which on a little-endian host is a plain UINT16 store.
++static void harness_write_byte(UINT32 a, UINT8 d)
++{
++    UINT8* p = harness_mem(a);
++    if (p) *p = d;
++}
++static void harness_write_word(UINT32 a, UINT16 d)
++{
++    UINT8* hi = harness_mem(a);        // 68k high byte
++    UINT8* lo = harness_mem(a + 1);    // 68k low byte
++    if (hi) *hi = (UINT8)(d >> 8);
++    if (lo) *lo = (UINT8)(d & 0xFF);
++}
++
++static void __fastcall HarnessTapWriteByte(UINT32 a, UINT8 d)
++{
++    if (tapOut && tap_hit(a))
++        fprintf(tapOut, "%u %06x %02x B pc=%06x\n",
++                nHarnessFrame, a, d, (unsigned)SekGetPC(-1));
++    harness_write_byte(a, d);
++}
++
++static void __fastcall HarnessTapWriteWord(UINT32 a, UINT16 d)
++{
++    if (tapOut && tap_hit(a))
++        fprintf(tapOut, "%u %06x %04x W pc=%06x\n",
++                nHarnessFrame, a, d, (unsigned)SekGetPC(-1));
++    harness_write_word(a, d);
++}
++
++// Install over the PAGE-ALIGNED span covering the requested ranges. FBNeo
++// maps memory by page, so the handler necessarily sees a superset; tap_hit()
++// filters to the exact bytes asked for, and the write-through is identical
++// either way.
++static void harness_install_tap()
++{
++    const char* spec = getenv("FBNEO_HTAP");
++    if (!spec || !spec[0]) return;
++
++    char buf[1024]; snprintf(buf, sizeof(buf), "%s", spec);
++    UINT32 lo = 0xFFFFFFFF, hi = 0;
++    for (char* s = strtok(buf, ";"); s && nTapCount < HARNESS_TAP_MAX; s = strtok(NULL, ";")) {
++        UINT32 a0, a1;
++        if (sscanf(s, "%x-%x", &a0, &a1) != 2 || a1 < a0) {
++            printf("harness: bad FBNEO_HTAP range '%s'\n", s);
++            continue;
++        }
++        nTapLo[nTapCount] = a0; nTapHi[nTapCount] = a1; nTapCount++;
++        if (a0 < lo) lo = a0;
++        if (a1 > hi) hi = a1;
++    }
++    if (!nTapCount) return;
++
++    const char* outPath = getenv("FBNEO_HTAP_OUT");
++    char path[MAX_PATH + 16];
++    if (outPath && outPath[0]) snprintf(path, sizeof(path), "%s", outPath);
++    else                       snprintf(path, sizeof(path), "%s.tap", szHarnessOut);
++    tapOut = fopen(path, "w");
++    if (!tapOut) { printf("harness: cannot write %s\n", path); nTapCount = 0; return; }
++    fprintf(tapOut, "# frame addr value size pc  (68k-logical addresses)\n");
++
++    SekSetWriteByteHandler(HARNESS_TAP_SLOT, HarnessTapWriteByte);
++    SekSetWriteWordHandler(HARNESS_TAP_SLOT, HarnessTapWriteWord);
++    SekMapHandler(HARNESS_TAP_SLOT, lo & ~0xFFF, hi | 0xFFF, MAP_WRITE);
++    printf("harness: write tap on %d range(s), pages %06x-%06x -> %s\n",
++           nTapCount, lo & ~0xFFF, hi | 0xFFF, path);
++}
++
++// ── frame-scheduled pokes (B5b, FBNEO_HPOKE) ─────────────────────────────────
++// Mirrors POKES on the MAME side: "frame:addr:hexbytes;..." applied at the
++// START of the named frame, before it emulates.
++static void harness_apply_pokes(UINT32 frame)
++{
++    const char* spec = getenv("FBNEO_HPOKE");
++    if (!spec || !spec[0]) return;
++    char buf[4096]; snprintf(buf, sizeof(buf), "%s", spec);
++    for (char* s = strtok(buf, ";"); s; s = strtok(NULL, ";")) {
++        UINT32 fr, addr; char hex[512];
++        if (sscanf(s, "%u:%x:%511s", &fr, &addr, hex) != 3 || fr != frame) continue;
++        for (const char* h = hex; h[0] && h[1]; h += 2) {
++            unsigned v;
++            if (sscanf(h, "%2x", &v) != 1) break;
++            harness_write_byte(addr++, (UINT8)v);
++        }
++        printf("harness: poke frame %u @%06x = %s\n", fr, addr, hex);
++    }
++}
++
 +// ── main loop ────────────────────────────────────────────────────────────────
 +
 +bool HarnessActive()
@@ -331,7 +394,12 @@ index 0000000..d48ebc8
 +        printf("harness: video on, %dx%d -> %s\n", nVidW, nVidH, szVideoOut);
 +    }
 +
++    harness_install_tap();   // FBNEO_HTAP (no-op unless set)
++
 +    for (UINT32 f = 1; f <= nScriptFrames; f++) {
++        nHarnessFrame = f;
++        harness_apply_pokes(f);   // FBNEO_HPOKE (no-op unless set)
++
 +        // scripted inputs for frame f, active while frame f emulates
 +        UINT32 mask = held[f];
 +        for (int t = 0; t < NTOKENS; t++)
@@ -358,8 +426,14 @@ index 0000000..d48ebc8
 +                snprintf(path, sizeof(path), "%s.dump_%u_%06x.bin",
 +                         szHarnessOut, fr, first);
 +                FILE* df = fopen(path, "wb");
-+                for (UINT32 a2 = first; a2 <= last; a2++)
-+                    fputc(CpsRamFF[(a2 & 0xFFFF) ^ 1], df);  // 68k logical order
++                // B5b: resolved by ADDRESS, so this now reaches OBJ RAM
++                // ($708000) and palette RAM ($900000) as well as work RAM.
++                // Unresolvable addresses write 0xFF rather than silently
++                // emitting work-RAM bytes for a region that is not work RAM.
++                for (UINT32 a2 = first; a2 <= last; a2++) {
++                    const UINT8* p = harness_mem(a2);
++                    fputc(p ? *p : 0xFF, df);   // 68k logical order
++                }
 +                fclose(df);
 +            }
 +        }
@@ -389,8 +463,97 @@ index 0000000..d48ebc8
 +    fprintf(out, "END %u\n", nScriptFrames);
 +    fclose(out);
 +    if (vout) { fprintf(vout, "END %u\n", nScriptFrames); fclose(vout); }
++    if (tapOut) { fprintf(tapOut, "END %u\n", nScriptFrames); fclose(tapOut); tapOut = NULL; }
 +    if (pHarnessFB) { free(pHarnessFB); pHarnessFB = NULL; }
 +    printf("harness: %u frames, log %s\n", nScriptFrames, szHarnessOut);
 +    free(held);
 +    return 0;
 +}
+diff --git a/src/burner/sdl/main.cpp b/src/burner/sdl/main.cpp
+index 688404a..d8d8e65 100644
+--- a/src/burner/sdl/main.cpp
++++ b/src/burner/sdl/main.cpp
+@@ -38,6 +38,14 @@ const char* romname = NULL;
+ 
+ extern void InitSupportPaths();
+ 
++// Vampire Saved harness (harness.cpp)
++extern char szHarnessInput[MAX_PATH];
++extern char szHarnessOut[MAX_PATH];
++extern char szHarnessDumps[8192];
++extern INT32 nHarnessFrames;
++extern bool HarnessActive();
++extern int HarnessRun();
++
+ #ifdef BUILD_SDL2
+ SDL_Window* sdlWindow = NULL;
+ #endif
+@@ -116,6 +124,29 @@ int parseSwitches(int argc, char* argv[])
+ 			i++;
+ 			_tcscpy(CDEmuImage, argv[i]);
+ 		}
++		else if (strcmp(argv[i], "-hinput") == 0)   // Vampire Saved harness
++		{
++			if (++i >= argc) return 1;
++			snprintf(szHarnessInput, MAX_PATH, "%s", argv[i]);
++			bSaveconfig = 0;
++		}
++		else if (strcmp(argv[i], "-hout") == 0)
++		{
++			if (++i >= argc) return 1;
++			snprintf(szHarnessOut, MAX_PATH, "%s", argv[i]);
++			bSaveconfig = 0;
++		}
++		else if (strcmp(argv[i], "-hframes") == 0)
++		{
++			if (++i >= argc) return 1;
++			set_commandline_option(nHarnessFrames, atoi(argv[i]));
++		}
++		else if (strcmp(argv[i], "-hdump") == 0)
++		{
++			if (++i >= argc) return 1;
++			snprintf(szHarnessDumps, sizeof(szHarnessDumps), "%s", argv[i]);
++			bSaveconfig = 0;
++		}
+ 	}
+ 	return 0;
+ }
+@@ -246,9 +277,18 @@ void DoGame(int gameToRun)
+ {
+ 	if (!DrvInit(gameToRun, 0))
+ 	{
++		if (HarnessActive())
++		{
++			// headless scripted run: no media/audio init, no RunInit
++			// (avoids StatedAuto auto-savestate load), see harness.cpp
++			HarnessRun();
++		}
++		else
++		{
+ 		MediaInit();
+ 		display_set_controls();
+ 		RunMessageLoop();
++		}
+ 	}
+ 	else
+ 	{
+@@ -401,6 +441,19 @@ int main(int argc, char* argv[])
+ #if defined(BUILD_SDL2) && !defined(SDL_WINDOWS)
+ 	bprintf = AppDebugPrintf;
+ #endif
++
++	if (HarnessActive())
++	{
++		// Determinism: keep ALL mutable per-game state inside the harness
++		// sandbox (cwd). The user config may point these at shared absolute
++		// locations (e.g. ~/Library/Application Support/fbneo), where the
++		// EEPROM bootup counter would make consecutive runs diverge.
++		_stprintf(szAppEEPROMPath, _T("./"));
++		_stprintf(szAppHiscorePath, _T("./"));
++		_stprintf(szAppCheatsPath, _T("./"));
++		bSaveconfig = 0;
++	}
++
+ 	BurnLibInit();
+ 
+ 	// Search for a game now, for use in the menu and loading a games

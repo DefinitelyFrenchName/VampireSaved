@@ -147,12 +147,21 @@ Portability notes for `tools/setup_mame.sh` (currently macOS-shaped):
 
 ## Queued next
 
-1. **B5b — suite preservation** (gates any FBNeo-only decision). Part
-   delivered: both emulators now have per-frame framebuffer capture
-   (`FBNEO_HVIDEO`, `VIDEO_OUT`) and FBNeo has a gfx-buffer dump
-   (`FBNEO_HGFX`). Remaining instrument gaps on the FBNeo side: write taps
-   with PC attribution, probe breakpoints with register capture,
-   frame-scheduled pokes, OBJ/palette RAM dumps.
+1. ~~**B5b — suite preservation**~~ **DONE (14z-59e)**, except one item
+   blocked by Rule 1. FBNeo now has `FBNEO_HTAP` (write tap with PC
+   attribution), `FBNEO_HPOKE` (frame-scheduled pokes) and address-resolved
+   dumps reaching OBJ/palette RAM, all frontend-only and gated by
+   `tests/test_fbneo_instruments.sh` (non-perturbing, positive controls,
+   and a byte-for-byte cross-check against MAME).
+   **BLOCKED: probe breakpoints with register capture.** `m68000_intf.h`
+   exposes no instruction-level hook, so it cannot be done without touching
+   a CPU core file. Written up in STATE 14z-59e with three options; the
+   need largely evaporated when B5 gave MAME proven parity, so its
+   `GUARD_PROBE` is the answer for now.
+   **Also uncovered there: the FBNeo emulator superset invariant had been
+   passing vacuously** (`WIDE=0` never reverted the profile patch, so the
+   "reference" carried it). Fixed, asserted in both the build and the gate,
+   and the invariant is now established for real at 36/36.
 2. **Phase C — multi-tenant pipeline.** Start with the address-space model
    (declarative region list + placement classes in `gen_donovan_patch.py`),
    which also unblocks the stuck 352-byte sound table. Then per-tenant

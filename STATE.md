@@ -5,6 +5,94 @@ parity PROVEN, and the WIDE profile ported to it**. Plus an unplanned
 finding that matters more than the port: MAME is not perfectly
 deterministic run-to-run, and the whole oracle assumed it was)
 
+## Session 14z-59e (B5b — FBNeo instruments; and a VACUOUS gate uncovered)
+
+### THE FINDING: the FBNeo emulator superset invariant was never actually tested
+
+`WIDE=0 tools/setup_fbneo.sh` printed *"harness-only build (reference
+binary for the superset invariant)"* and built a binary that **carried the
+WIDE profile**. It only ever SKIPPED applying the patch; it never reverted
+it, and the submodule working tree keeps the patch from the previous
+build. So `tests/test_wide_profile.sh` section 1 — reference vs WIDE
+binary on stock vsavj — was comparing **WIDE against WIDE**, which passes
+trivially.
+
+That section is the **emulator superset invariant**, Rule 1 v2 clause 3:
+the entire justification for permitting emulator changes at all. A vacuous
+pass there is the most expensive kind of green, and it is not knowable
+retroactively how the maintainer's `fbneo_ref` was built.
+
+Fixed and then **established for real**: with a reference verified free of
+the profile (the driver title string is compiled in, so `grep` on the
+binary settles it), the gate is **36/36** — RAM *and* framebuffer, over the
+12-replay corpus. The invariant now measures what it claims.
+
+- `WIDE=0` **reverts** the patch and refuses to build if `Cps2Wide` survives.
+- Both builds assert on the ARTIFACT, in both directions (a reference that
+  carries the profile and a WIDE build that lacks it are equally broken).
+- `test_wide_profile.sh` FAILS if `FBNEO_REF` contains the profile string.
+
+Third member of one family this session — after `git apply` silently
+skipping with exit 0, and the MAME submodule gitlink drifting the WIDE
+binary to 0.289. **The tool reports success while the artifact is not what
+was asked for.** The standing lesson: assert on the artifact, never on the
+exit code.
+
+### The instruments (B5b proper) — all frontend-only
+
+FBNeo is the PRIMARY target (GGPO netplay reference), yet the oracle had
+strictly better debugging than the platform players use. Closed, via the
+public 68k interface only (`SekMapHandler` / `SekSetWrite*Handler` /
+`SekGetPC`) plus the CPS RAM pointers — **no emulation-core file touched**:
+
+| Env | Instrument |
+|---|---|
+| `FBNEO_HTAP="lo-hi[;...]"` | write tap with **PC attribution** (handler slot 7; capcom uses 0-6) |
+| `FBNEO_HPOKE="frame:addr:hex"` | frame-scheduled pokes |
+| `FBNEO_DUMPS` | now resolves by ADDRESS — reaches OBJ RAM `$708000` and palette `$900000`, not just work RAM |
+
+Gate: `tests/test_fbneo_instruments.sh`, and it tests the way this project
+requires rather than "it ran":
+- **NON-PERTURBATION** — the tap swaps direct memory mapping for a handler
+  that must write through faithfully. A tapped replay is checksum-identical
+  to an untapped one, so a wrong write-through cannot hide.
+- **POSITIVE CONTROLS** — 1,048,406 writes captured with PCs; the poke
+  diverges at exactly the poked frame. An instrument that reports nothing
+  proves nothing (the B4 vacuous-relocation lesson).
+- **ORACLE CROSS-CHECK** — palette `$900000` dumps are **byte-identical to
+  MAME**, which independently validates the `^1` byte-order swap (the
+  repo's #1 gotcha). Taken at a frame where the region is stable across the
+  known MAME/FBNeo frame skew, so the match is not a timing coincidence.
+
+### B5b acceptance: a known finding RE-DERIVED on FBNeo
+
+Per STATE 14z-53 the bar is not "features exist" but "re-derive known
+findings". The FBNeo tap on `RAM:$FF5D94` independently lands on the HUD
+stagers documented in 14z-49 from MAME: PCs `089376/08937c` at **0x89370**
+and `0893a0/a4/a8/ac` at **0x8939C**, with the boot RAM-clear at `0x000d36`.
+It also **refines** the record: the emitter `PRG:0x1BB3C` does NOT write
+those records directly — the stagers do.
+
+### BLOCKED BY RULE 1: probe breakpoints with register capture
+
+The last instrument on the B5b list cannot be built frontend-only.
+`src/cpu/m68000_intf.h` exposes no instruction-level hook or breakpoint
+API — only memory handlers, `SekGetPC`, and the IRQ callback. A PC-matching
+probe needs a per-instruction callback, which lives in the CPU core.
+Per CLAUDE.md rule 1 this is written up rather than worked around.
+
+Options if it is ever needed: **A)** approximate with a write tap on a
+address the routine touches (covers most "did we reach here" questions and
+is already available); **B)** use MAME's `GUARD_PROBE`, which still exists
+and now has proven parity — the reason to reach for FBNeo probes largely
+evaporated when B5 succeeded; **C)** widen Rule 1 to admit a gated
+instruction hook — a real emulator-core change, needing maintainer
+ratification, and not justified by current need.
+
+Reproducibility (14z-58e standard): the FBNeo submodule was reverted to
+pristine, `tools/setup_fbneo.sh` re-applied both patches from the committed
+files, and the instruments gate passed on the result.
+
 ## Session 14z-59 (B5 — MAME parity + the profile ported; and the determinism finding)
 
 **B5 IS COMPLETE AND GREEN:** parity **62/62**, MAME WIDE gate **36/36**

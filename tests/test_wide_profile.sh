@@ -49,7 +49,19 @@ python3 tools/build_fingerprint.py "$ROMDIR" --set vsavj --full \
     | sed 's/^/  stock /'
 
 echo "== 1. emulator superset invariant (stock vsavj: reference binary vs WIDE binary) =="
-if [ -n "${FBNEO_REF:-}" ] && [ -x "${FBNEO_REF}" ]; then
+if [ -n "${FBNEO_REF:-}" ] && [ -x "${FBNEO_REF}" ] \
+   && grep -q "CPS-2 WIDE v1" "${FBNEO_REF}" 2>/dev/null; then
+    # Paid for 14z-59e: `WIDE=0 tools/setup_fbneo.sh` used to only SKIP
+    # applying the profile patch, never revert it, so a reference built from
+    # a tree that already carried it came out WITH the profile. Section 1
+    # then compared WIDE against WIDE and passed trivially — the invariant
+    # that justifies allowing emulator changes at all was measuring nothing.
+    # The driver title string is compiled in, so this catches it statically.
+    echo "  FAIL: FBNEO_REF carries the CPS-2 WIDE profile — it is NOT a"
+    echo "        pre-patch reference, and this comparison would be vacuous."
+    echo "        Rebuild it: WIDE=0 tools/setup_fbneo.sh (now reverts properly)"
+    fail=1
+elif [ -n "${FBNEO_REF:-}" ] && [ -x "${FBNEO_REF}" ]; then
     for rp in $CORPUS; do
         FBNEO_HVIDEO="$WORK/ref_$rp.vid" FBNEO_BIN="$FBNEO_REF" tools/run_replay_fbneo.sh vsavj \
             "$REPO/tests/replays/$rp.rpl" "$WORK/ref_$rp.log" "$WORK/sb_ref_$rp" >/dev/null 2>&1

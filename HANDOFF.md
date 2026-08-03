@@ -16,7 +16,7 @@ same commit as anything it describes.
 | MAME headless runner | `tools/run_mame.sh <set> [args]` | MAME 0.288 (brew), fresh sandbox per run |
 | Attract determinism | `tests/test_attract_determinism.sh` | PASS 3600 frames |
 | Decrypt oracle test | `tests/test_decrypt_oracle.sh` | PASS (python == MAME opcode space) |
-| FBNeo | `emu/fbneo` submodule + `tools/setup_fbneo.sh` | built (SDL2); TWO patches: `0001` harness (frontend-only: `-hinput/-hout/-hframes/-hdump`, plus `FBNEO_HVIDEO` framebuffer checksums and `FBNEO_HGFX` gfx-buffer dumps) and `0002` the CPS-2 WIDE profile (driver descriptor + one gated core line). **CRC WARNING:** FBNeo matches zip members by CRC — a mismatched gfx/QSound member is silently replaced by 0xFF fill while still logging `(OK)` (docs/GOTCHAS.md) |
+| FBNeo | `emu/fbneo` submodule + `tools/setup_fbneo.sh` | built (SDL2); TWO patches: `0001` harness (frontend-only: `-hinput/-hout/-hframes/-hdump`, plus `FBNEO_HVIDEO` framebuffer checksums, `FBNEO_HGFX` gfx-buffer dumps, and the B5b set — `FBNEO_HTAP` write tap with PC attribution, `FBNEO_HPOKE` frame-scheduled pokes, address-resolved dumps reaching OBJ/palette RAM) and `0002` the CPS-2 WIDE profile (driver descriptor + one gated core line). **CRC WARNING:** FBNeo matches zip members by CRC — a mismatched gfx/QSound member is silently replaced by 0xFF fill while still logging `(OK)` (docs/GOTCHAS.md) |
 
 FBNeo build: `(cd emu/fbneo && make sdl2 SKIPDEPEND=1 -j8)` — `SKIPDEPEND=1`
 is mandatory (docs/GOTCHAS.md). Needs brew `sdl2`(-compat) + `sdl2_image`.
@@ -43,7 +43,7 @@ negative control — sprites render pixel-perfect from the appended banks
 (9/9), and relocated data is genuinely read from `CPU:$400000+`.
 
 ```sh
-WIDE=0 tools/setup_fbneo.sh && cp emu/fbneo/fbneo /somewhere/fbneo_ref  # reference binary, ONCE
+WIDE=0 tools/setup_fbneo.sh && cp emu/fbneo/fbneo /somewhere/fbneo_ref  # reference binary
 tools/setup_fbneo.sh                                                    # the WIDE binary
 python3 tools/build_wide_romset.py "$ROMDIR" build/wide0/rompath \
         --qsound 2 --gfx 4 --prg 4 --gfx-copy-group-b                   # prints the descriptor
@@ -52,6 +52,13 @@ ROMDIR=... FBNEO_REF=/somewhere/fbneo_ref tests/test_wide_profile.sh    # 36 che
 ```
 The reference binary MUST differ from the build under test by ONLY patch
 0002 — build it from the same tree state or the comparison measures noise.
+**Rebuild the reference whenever the harness changes**, and always in the
+order above: `WIDE=0` now REVERTS the profile patch (it used to merely skip
+applying it, so a "reference" built from a tree that already carried the
+patch came out WITH the profile, and section 1 compared WIDE against WIDE —
+a vacuous pass on the one invariant that justifies emulator changes at all,
+14z-59e). Both the build and the gate now assert on the binary itself, so
+this cannot recur silently.
 
 Authoring into the extension: raw (no encryption above `PRG:0x0FFFFF`),
 FILE byte order (`words_to_file_bytes(words_from_logical_bytes(...))`),
@@ -212,6 +219,9 @@ tests/test_replay_video_selfcheck.sh  # ground truth for replay.lua VIDEO_OUT (t
 tests/test_mame_determinism.sh        # RUNS=/JOBS=/PROBE= repetitions; measures the
                                       # run-to-run divergence rate the whole oracle
                                       # assumes is zero (see STATE 14z-59)
+tests/test_fbneo_instruments.sh       # B5b: FBNeo write tap (non-perturbing + re-derives
+                                      # a known MAME finding), pokes, and address-resolved
+                                      # dumps cross-checked byte-for-byte against MAME
 tests/test_input_integrity.sh         # ground truth for the input-integrity check:
                                       # silent on clean runs, catches a stray
                                       # un-scripted press at the right frame. MAME's

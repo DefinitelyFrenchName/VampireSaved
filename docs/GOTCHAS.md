@@ -1268,3 +1268,35 @@ check now masks to the union of bits the harness can actually drive, which
 loses no detection power because host keystrokes land on controller bits.
 Caught by testing the checker before trusting it (CLAUDE.md §4) — had it
 shipped silent-but-wrong in the other direction, it would have been worse.
+
+## `WIDE=0 tools/setup_fbneo.sh` did not produce a clean reference — it only
+## SKIPPED applying the profile patch, never reverted it
+(paid: 2026-08-03, B5b — the FBNeo emulator superset invariant may never
+have actually been tested)
+`setup_fbneo.sh` applies the CPS-2 WIDE patch to the submodule WORKING TREE
+and leaves it there. On the next invocation with `WIDE=0` the script took
+the "skip" branch, printed **"WIDE=0: harness-only build (reference binary
+for the superset invariant)"** — and built a binary that still **carried the
+profile**, because the tree had never been reverted.
+
+Consequence: `tests/test_wide_profile.sh` section 1 compares FBNEO_REF
+against the WIDE binary. With a contaminated reference it was comparing
+**WIDE against WIDE**, which passes trivially. That section is the
+*emulator superset invariant* — the entire justification for permitting
+emulator changes under Rule 1 v2. A vacuous pass there is the most
+expensive kind of green.
+
+Fixes:
+- `WIDE=0` now **reverts** the patch (`git apply -R`) and refuses to build
+  if `Cps2Wide` survives.
+- Both builds assert on the ARTIFACT: the driver title string "CPS-2 WIDE
+  v1" is compiled in, so `grep` on the binary answers "does this build carry
+  the profile?" in both directions — a reference that has it and a WIDE
+  build that lacks it are equally broken.
+- `tests/test_wide_profile.sh` now FAILS if `FBNEO_REF` contains that
+  string, so a contaminated reference can never quietly pass again.
+
+Third member of the same family this session, after `git apply` silently
+skipping (exit 0) and the MAME submodule gitlink drifting to 0.289: **the
+tool reports success while the artifact is not what was asked for.** Assert
+on the artifact.
