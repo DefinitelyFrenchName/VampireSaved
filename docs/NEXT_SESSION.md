@@ -1,28 +1,42 @@
-# NEXT SESSION — orientation (session 14z-54, 2026-08-03)
+# NEXT SESSION — orientation (session 14z-55, 2026-08-03)
 
-Read STATE.md sessions 14z-53..54 (the CPS-2 WIDE pivot, Phase A, and
-Phase B0/B1) and
+Read STATE.md sessions 14z-53..55 (the CPS-2 WIDE pivot, Phase A, and
+Phase B0-B3) and
 docs/cps2_wide.md after this. The approved architecture plan is archived
 at ~/.claude/plans/glowing-bouncing-iverson.md.
 The maintainer tests frequently and reports precisely — their reports are
 the project's best instrument; reference data they provide goes straight
 into gates.
 
-## Ship state — frozen build stands; WIDE profile half-proven
+## Ship state — WIDE v1 fully declared and proven INERT; not yet proven USABLE
 
-Frozen reference: `b91647c7` = **donovan-m2c** (stock-size; unaffected by
-any of the WIDE work). Dev head for the Donovan content: `ae701ffb`.
+Frozen reference: `b91647c7` = **donovan-m2c** (stock-size, untouched by
+any WIDE work). Donovan content dev head: `ae701ffb`.
 
-**CPS-2 WIDE v1** (docs/cps2_wide.md): PRG 6 MB / GFX 48 MB / QSound
-16 MB, profile-gated, governed by Rule 1 v2. Phase A all green; **B0
-(QSound) and B1 (GFX) are grown and proven inert** — 24/24 bit-identical
-each, on both the emulator superset invariant and profile inertness. So
-far the profile has cost **zero** emulator core lines; B2 adds its only
-conditional.
+**CPS-2 WIDE v1 is declared in full and inert**: PRG 6 MB / GFX 48 MB /
+QSound 16 MB. B0-B3 all pass 24/24 (work RAM AND framebuffer) on both
+invariants. Total emulator cost: **one widened condition** in
+`cps_obj.cpp` plus the `Cps2Wide` flag lifecycle — everything else is
+descriptor table data.
 
-FBNeo now carries two separate patches: `0001` (frontend harness) and
-`0002` (the WIDE driver descriptor). `tools/setup_fbneo.sh` applies both,
-or `WIDE=0` for the harness-only reference binary.
+**Every grown region is still ZERO-FILLED.** The space is declared, not
+demonstrated. Do not build content plans on it until B4 lands.
+
+Run the gate:
+```
+WIDE=0 tools/setup_fbneo.sh          # once: harness-only REFERENCE binary
+cp emu/fbneo/fbneo /somewhere/fbneo_ref
+tools/setup_fbneo.sh                 # the WIDE binary
+python3 tools/build_wide_romset.py "$ROMDIR" build/wide0/rompath \
+        --qsound 2 --gfx 4 --prg 4
+ROMDIR=... FBNEO_REF=/somewhere/fbneo_ref tests/test_wide_profile.sh
+```
+The reference MUST come from the same tree state with only patch 0002
+reverted — a drifting reference produces noise that looks like findings.
+
+FBNeo carries two patches with deliberately separate trust surfaces:
+`0001` (frontend harness, now incl. framebuffer capture) and `0002` (the
+WIDE driver + the one gated core line).
 
 ## What 14z-52 did (read STATE 14z-52 for the full measurement)
 
@@ -55,39 +69,32 @@ or `WIDE=0` for the harness-only reference binary.
   cursor ring + color-render the art, never trust index==char-id)
   and the replay.lua DUMPS separator (';' — commas rc=3 silently).
 
-## Queued next — Phase B continues (B0 and B1 are DONE and green)
+## Queued next — B4, the step that proves the space is real
 
-Gate for every step: `ROMDIR=... FBNEO_REF=<pre-wide binary> tests/test_wide_profile.sh`
-(build the reference once with `WIDE=0 tools/setup_fbneo.sh`, keep it
-somewhere outside the tree). Rebuild the overlay with
-`tools/build_wide_romset.py <romdir> build/wide0/rompath --qsound 2 --gfx 4`.
+- ~~B0 QSound~~ / ~~B1 GFX~~ / ~~B2 19-bit tile~~ / ~~B3 PRG~~ — **all
+  green, 24/24 each.**
+- **B4 — the canary build. Highest value per unit of work in the plan,
+  and the first step that is allowed to FAIL for interesting reasons.**
+  Two positive controls, both against bit-exact vanilla oracles:
+  1. *PRG*: relocate an EXISTING character's anim block into the 6 MB
+     extension and repoint its bank-table entry. Tests reachability,
+     32-bit pointer width through the bank tables, PC-relative distance
+     over multi-MB, and the raw/encrypted boundary at once. Legacy
+     behaviour must stay bit-identical.
+  2. *GFX*: copy one legacy tile into gfx group C and set its bank value
+     so bit 12 is on; it must render identically to the original. This is
+     the proof the 19-bit path REACHES the new banks — B2 only proved it
+     harmless.
+  If either fails, the profile needs rework BEFORE any character content
+  is authored — that is exactly why B4 comes before Phase C.
+- **B5 / B5b — MAME parity, then suite preservation.** Note B5b is already
+  part-delivered: FBNeo now has framebuffer capture. Remaining instrument
+  gaps for an FBNeo-only fallback: write taps with PC attribution, probe
+  breakpoints with register capture, frame-scheduled pokes, and dumps of
+  the non-work-RAM buffers (OBJ/palette/gfx RAM live outside CpsRamFF).
 
-- ~~B0 QSound 8->16 MB~~ **DONE, 24/24 bit-identical.**
-- ~~B1 GFX 32->48 MB~~ **DONE, 24/24 bit-identical.**
-- **B2 — the bit-12 promote line**, the profile's ONLY real core edit.
-  Add a `Cps2Wide` flag (set by the vsavjw driver entry, never by the
-  stock ones) and make `cps_obj.cpp:429-434` do the CPS-2 Turbo promotion
-  under it: `if (y & 0x1000) y |= 0x8000; n |= (y & 0xE000) << 3;`. Take
-  the line, NOT the Turbo profile (which also forces 32 MHz, the PRG
-  clamp, a different tile loader and a scroll hack). The gate's emulator
-  superset invariant is what proves the flag never leaks into stock runs.
-- **B3 — PRG 4 -> 6 MB.** A1 measured this as zero core lines
-  (`SekMapMemory(CpsRom, 0, nCpsRomLen-1)` already covers it). Append four
-  zero-filled 0x80000 program members to the vsavjw descriptor. Watch the
-  encryption boundary: only $000000-$0FFFFF is encrypted, so extension
-  space is raw — which makes it EASIER to use than hole A.
-- **B4 — the canary build** (highest value per unit of work): relocate an
-  EXISTING character's anim block into the PRG extension and repoint its
-  bank entry, and move one legacy tile into gfx group C with a bank value
-  carrying bit 12. Both have bit-exact vanilla oracles, so one build tests
-  reachability, 32-bit pointer width, PC-relative distance, the crypt
-  boundary and 19-bit addressing at once.
-- **B5 / B5b — MAME parity, then suite preservation.** Never reduce
-  coverage: FBNeo-only requires porting the instruments into harness.cpp
-  and proving equivalence against known findings first.
-
-Then Phase C (multi-tenant pipeline; its first item, the address-space
-model, also unblocks the stuck 352-byte sound table) and Phase D.
+Then Phase C (multi-tenant pipeline; its first item — the address-space
+model — also unblocks the stuck 352-byte sound table) and Phase D.
 
 ## Measurement kit (14z-49 additions)
 
