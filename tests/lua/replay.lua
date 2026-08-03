@@ -12,6 +12,13 @@
 --                     at end of frame N, dump the RAM range to
 --                     <dir of CHECKSUM_OUT>/dump_<frame>_<start>.bin
 --                     (differential RE experiments)
+--   env INPUT_OUT     optional path: per-frame raw input-port values
+--                     ("<frame> <IN0> <IN1> <IN2>"). Proves whether a
+--                     divergence was caused by HOST input leaking into the
+--                     emulated controls (a MAME window can take focus even
+--                     under -video none). tools/run_mame.sh disables all
+--                     host input providers; this is the detector for when
+--                     something slips past that.
 --   env VIDEO_OUT     optional path: per-frame FRAMEBUFFER checksum log, the
 --                     MAME twin of FBNeo's FBNEO_HVIDEO. Opt-in and written
 --                     to a SEPARATE file, so every frozen RAM expectation is
@@ -46,11 +53,19 @@ local tail_frames = tonumber(os.getenv("TAIL_FRAMES") or "") or 120
 -- ── field lookup ─────────────────────────────────────────────────────────────
 
 local ioport = manager.machine.ioport
+-- FIELD_INFO[field] = { port tag, bit mask }, recorded here at construction
+-- so the input-integrity check below never has to re-derive which port a
+-- field belongs to. Keyed by the exact object stored in FIELDS, which is
+-- the only reference the rest of the script ever uses (MAME may hand out a
+-- fresh wrapper per lookup, so identity matching against port.fields later
+-- would be unreliable).
+local FIELD_INFO = {}
 local function field_of(port, name)
     local p = ioport.ports[port]
     assert(p, "no port " .. port)
     local f = p.fields[name]
     assert(f, "no field '" .. name .. "' in " .. port)
+    FIELD_INFO[f] = { port, f.mask }
     return f
 end
 
@@ -197,6 +212,79 @@ local function fnv1a64(s)
     return h
 end
 
+-- INPUT_OUT: per-frame raw input-port values, written alongside (never into)
+-- the RAM log. Defence in depth against the ONE failure mode that can
+-- corrupt a replay without corrupting the emulator: host input reaching the
+-- emulated controls.
+--
+-- MAME's "-video none" still creates a window that can take focus, and a
+-- stray host keystroke maps straight onto P1 directions/buttons/coins/start.
+-- The result is a run whose inputs are no longer the script's — RAM diverges
+-- for as long as the key is held and then RE-CONVERGES once the replay's own
+-- staging reasserts, which is exactly the signature of the two unexplained
+-- 14z-59 divergences. tools/run_mame.sh now disables all four host input
+-- providers so this cannot happen; this log makes it PROVABLE rather than
+-- suspected if it ever does. On any divergence, diff the input logs first:
+-- if they differ, the cause is external input and the investigation is over.
+local input_out = os.getenv("INPUT_OUT")
+local inf, in_ports
+if input_out then
+    inf = assert(io.open(input_out, "wb"))
+    in_ports = {}
+    for _, tag in ipairs({ ":IN0", ":IN1", ":IN2" }) do
+        in_ports[#in_ports + 1] = assert(ioport.ports[tag], "no port " .. tag)
+    end
+end
+
+-- ── INPUT INTEGRITY ASSERTION (always on, no env flag) ──────────────────
+-- The log above is evidence after the fact; this is the guard. The harness
+-- knows exactly which fields it staged for each frame, so it can verify
+-- that the live ports contain THAT AND NOTHING ELSE. Any extra bit means
+-- an input arrived from outside the script — a host keystroke on MAME's
+-- focus-stealing window, a joystick, a stuck modifier — and the run is no
+-- longer a replay of anything. Cheap: three port reads and a compare.
+--
+-- Deliberately not opt-in. The failure it catches is silent, produces a
+-- plausible-looking log, and cost this project three hours of statistics
+-- before the maintainer suggested the mechanism.
+local inject_frame = tonumber(os.getenv("INPUT_INJECT_TEST") or "")
+local INTEGRITY = os.getenv("NO_INPUT_CHECK") == nil
+local PORT_TAGS = { ":IN0", ":IN1", ":IN2" }
+local integ_ports, baseline, controlled = {}, {}, {}
+local violations, first_violation = 0, nil
+if INTEGRITY then
+    for _, tag in ipairs(PORT_TAGS) do
+        integ_ports[tag] = assert(ioport.ports[tag], "no port " .. tag)
+        controlled[tag] = 0
+    end
+    -- Compare ONLY the bits this harness can drive. :IN2 also carries the
+    -- EEPROM data line, which legitimately toggles during boot and has
+    -- nothing to do with controller input — comparing whole ports flagged
+    -- every single replay at frame 77 (ground truth: the check was wrong,
+    -- not the runs). Host keystrokes land on controller bits, so masking to
+    -- them loses no detection power.
+    for _, group in pairs(FIELDS) do
+        for _, field in pairs(group) do
+            local info = FIELD_INFO[field]
+            controlled[info[1]] = controlled[info[1]] | info[2]
+        end
+    end
+end
+
+-- Expected port values for a given frame's held set: start from the idle
+-- baseline and clear each pressed field's mask (CPS-2 inputs are active
+-- low). Returns nil until the baseline has been captured on frame 1.
+local function expected_ports(frame_held)
+    if not baseline[PORT_TAGS[1]] then return nil end
+    local exp = {}
+    for _, tag in ipairs(PORT_TAGS) do exp[tag] = baseline[tag] end
+    for _, field in ipairs(frame_held or {}) do
+        local info = FIELD_INFO[field]
+        if info then exp[info[1]] = exp[info[1]] & ~info[2] end
+    end
+    return exp
+end
+
 -- VIDEO_OUT: per-frame framebuffer checksum, written alongside (never into)
 -- the RAM log. Same FNV-1a64 and same "<frame> <hash>" line format.
 local video_out = os.getenv("VIDEO_OUT")
@@ -230,6 +318,32 @@ emu.register_frame_done(function()
     if vf then
         vf:write(string.format("%d %016x\n", frame, fnv1a64(video_screen:pixels())))
     end
+    if inf then
+        inf:write(string.format("%d %04x %04x %04x\n", frame,
+            in_ports[1]:read(), in_ports[2]:read(), in_ports[3]:read()))
+    end
+    if INTEGRITY then
+        -- The set in effect DURING this frame is the one staged at the end
+        -- of the previous frame, i.e. held[frame]. (held[1] is never staged
+        -- — nothing runs before frame 1 — so frame 1 is always idle and is
+        -- where the baseline is captured.)
+        if frame == 1 then
+            for _, tag in ipairs(PORT_TAGS) do
+                baseline[tag] = integ_ports[tag]:read() & controlled[tag]
+            end
+        else
+            local exp = expected_ports(held[frame])
+            for _, tag in ipairs(PORT_TAGS) do
+                local got = integ_ports[tag]:read() & controlled[tag]
+                if exp[tag] ~= got then
+                    violations = violations + 1
+                    first_violation = first_violation or
+                        string.format("frame %d port %s expected %04x got %04x (mask %04x)",
+                                      frame, tag, exp[tag], got, controlled[tag])
+                end
+            end
+        end
+    end
     if snap_at[frame] then manager.machine.video:snapshot() end
     for _, range in ipairs(dump_at[frame] or {}) do
         local df = assert(io.open(string.format("%s/dump_%d_%06x.bin", out_dir, frame, range[1]), "wb"))
@@ -248,10 +362,29 @@ emu.register_frame_done(function()
         end
     end
 
+    -- TEST-ONLY positive control (INPUT_INJECT_TEST=<frame>): simulate a
+    -- stray HOST keypress by pressing a button that held[] does not record,
+    -- for exactly one frame. The integrity check above must then fire at
+    -- that frame. A check that has only ever been silent is not evidence of
+    -- anything; tests/test_input_integrity.sh exercises both directions.
+    if inject_frame and (frame + 1) == inject_frame then
+        local f = FIELDS.p1["1"]
+        f:set_value(1)
+        pressed[f] = true   -- so the next frame's staging releases it
+    end
+
     if frame >= total_frames then
+        -- A violation means inputs reached the machine from outside the
+        -- script, so this log is not a replay of anything. Say so IN the
+        -- log, before END, where every consumer will trip over it rather
+        -- than silently comparing a corrupt run.
+        if violations > 0 then
+            f:write(string.format("INPUT-VIOLATION %d %s\n", violations, first_violation))
+        end
         f:write(string.format("END %d\n", frame))
         f:close()
         if vf then vf:write(string.format("END %d\n", frame)); vf:close() end
+        if inf then inf:write(string.format("END %d\n", frame)); inf:close() end
         manager.machine:exit()
     end
 end)

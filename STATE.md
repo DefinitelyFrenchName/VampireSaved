@@ -126,6 +126,60 @@ nothing in ~2,400 subsequent runs, reads as a **transient condition local
 to that window**, not a property of the emulator, the build, the replay or
 the gate. What that condition was is NOT established.
 
+### 14z-59c — THE MAINTAINER SUPPLIED THE MECHANISM
+
+Offered explicitly as context rather than a diagnosis, and it fits
+everything the measurement could not explain:
+
+> the harness runs on the maintainer's **main laptop**, which they
+> sometimes need to use. MAME has no true headless mode — even under
+> `-video none` it creates a window that **takes focus**. Focus was
+> reclaimed and inputs were made during that period. Separately, MAME can
+> crash in some circumstances.
+
+**Why this explains the signature and the statistics both.** MAME's
+default keyboard map covers P1 directions, buttons, coins and start, so a
+host keystroke on that window is injected into the EMULATED controls. RAM
+then diverges for as long as the key is held and **re-converges** the
+moment the replay's own per-frame staging reasserts every field — exactly
+the bounded, self-healing windows observed (190-205, 218-245). It also
+explains the clustering: both events fall in one ~35-minute execution (the
+machine was in use), and ~2,400 later runs on an idle machine found
+nothing. A flat per-run rate and machine load were both RULED OUT by
+measurement; this survives all of it.
+
+**Not confirmed** — the two events predate any input logging, so this
+cannot be proven retroactively. It is the leading explanation, and the
+hole is now closed in both directions:
+
+- **PREVENT** — `tools/run_mame.sh` now passes `-keyboardprovider none
+  -mouseprovider none -joystickprovider none -lightgunprovider none`.
+  A run that can absorb a stray keypress is not an oracle. Verified
+  non-perturbing: the frozen suite reproduces bit-for-bit.
+- **DETECT** — `tests/lua/replay.lua` verifies EVERY frame that the live
+  controller bits are exactly what it staged, writes `INPUT-VIOLATION`
+  into the log otherwise, and `run_replay_mame.sh` rejects the run.
+  Always on (`NO_INPUT_CHECK` to disable). Had this existed, the two
+  divergences would have been diagnosed in seconds instead of costing
+  ~2,400 runs of statistics.
+- **GROUND TRUTH** — `tests/test_input_integrity.sh`, both directions:
+  silent and non-perturbing on a clean run; a single-frame un-scripted
+  press caught at exactly the injected frame
+  (`INPUT-VIOLATION 1 frame 500 port :IN0 expected 7f7f got 7f6f`).
+  The positive control uses `INPUT_INJECT_TEST=<frame>`, which presses a
+  button without recording it in `held[]` — what a host keystroke looks
+  like to the harness.
+
+**A bug the ground truth caught in the checker's first draft:** comparing
+whole ports flagged EVERY replay at frame 77, because `:IN2` mixes the
+**EEPROM data line** in with the coin/start bits. The check now masks to
+bits the harness can actually drive. Testing verdict logic before trusting
+it is doctrine for exactly this reason.
+
+**The crash half** is already covered: `run_replay_mame.sh` requires a
+terminating `END` line, so a crashed or truncated run fails rather than
+being compared.
+
 **Status: BOUNDED AND OPEN, not root-caused.** Honest summary of what A
 bought: it killed two hypotheses (flat per-run rate; machine load), showed
 the events cluster, and put an upper bound of ~0.14%/run on the boot

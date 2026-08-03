@@ -27,8 +27,22 @@ ROMPATH="${MAME_ROMPATH:-$ROMDIR}"
 # at the pinned source build (tools/setup_mame.sh) and at the WIDE-patched
 # binary. Nothing else about the invocation changes, so the runs stay
 # comparable to every frozen log.
+# INPUT ISOLATION (added 14z-59c). MAME's "-video none" still creates a
+# window that can take focus, and any host keystroke that lands on it is
+# injected into the EMULATED controls — MAME's default keyboard map covers
+# P1 directions/buttons, coins and start. A replay is only reproducible if
+# its inputs come exclusively from the script, so all four host input
+# providers are disabled. This is not a preference; a run that can absorb a
+# stray keypress is not an oracle.
+# The maintainer runs the harness on their working laptop, which makes this
+# a live hazard rather than a theoretical one, and it is the leading
+# explanation for the two 14z-59 divergences (STATE.md).
+# Verified non-perturbing: the frozen vanilla suite reproduces bit-for-bit
+# with these flags set.
 exec "${MAME_BIN:-mame}" "$SET" \
     -rompath "$ROMPATH" \
+    -keyboardprovider none -mouseprovider none \
+    -joystickprovider none -lightgunprovider none \
     -video none -sound none -nothrottle -skip_gameinfo \
     -cfg_directory "$SANDBOX/cfg" \
     -nvram_directory "$SANDBOX/nvram" \

@@ -161,9 +161,14 @@ tests/test_mame_parity.sh             # B5 PREREQUISITE: the pinned MAME source 
 tests/test_mame_wide.sh               # the MAME twin of test_wide_profile.sh
 tests/test_replay_video_selfcheck.sh  # ground truth for replay.lua VIDEO_OUT (the MAME
                                       # framebuffer checksum) — both directions
-tests/test_mame_determinism.sh        # RUNS=n boot-probe repetitions; measures the
+tests/test_mame_determinism.sh        # RUNS=/JOBS=/PROBE= repetitions; measures the
                                       # run-to-run divergence rate the whole oracle
                                       # assumes is zero (see STATE 14z-59)
+tests/test_input_integrity.sh         # ground truth for the input-integrity check:
+                                      # silent on clean runs, catches a stray
+                                      # un-scripted press at the right frame. MAME's
+                                      # window takes focus even under -video none,
+                                      # so host keys reach the emulated controls
 tests/audit_mask_window_ff4182.sh     # on-demand: proves the masked palette-staging
                                       # window hides the designed diff and nothing else
 ```

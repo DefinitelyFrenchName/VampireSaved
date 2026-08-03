@@ -20,3 +20,13 @@ REPLAY="$RPL" CHECKSUM_OUT="$OUT" MAME_SANDBOX="$WORK" \
     -autoboot_script "$REPO/tests/lua/replay.lua" > "$WORK/mame_replay.log" 2>&1 \
     || { cat "$WORK/mame_replay.log"; exit 1; }
 grep -q "^END " "$OUT" || { echo "replay did not complete (no END line)"; cat "$WORK/mame_replay.log"; exit 1; }
+# Input-integrity violation: host input reached the emulated controls, so
+# this run is not a replay of the script and must never be compared against
+# anything. Fail here rather than let a corrupt log into a gate.
+if grep -q "^INPUT-VIOLATION " "$OUT"; then
+    echo "INPUT INTEGRITY VIOLATION — external input reached the machine:"
+    grep "^INPUT-VIOLATION " "$OUT"
+    echo "  (tools/run_mame.sh disables all host input providers; if this"
+    echo "   fires, something bypassed that. The run is discarded.)"
+    exit 1
+fi

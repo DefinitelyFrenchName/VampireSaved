@@ -59,15 +59,66 @@ What the measurement established (STATE 14z-59 has the tables):
   executions are clean. Reads as a transient local to that ~35-minute
   window. What that condition was is NOT established.
 
-**If it recurs, the first question is what else was running on the
-machine** — that is the surviving hypothesis and nothing in the harness
-records it. `tools/analyze_divergence.py` (ground-truthed) classifies the
-preserved pair as PHASE SHIFT k / TRANSIENT / PERMANENT, and both gates
-keep artifacts under `build/gate_failures/` (which IS tracked in git —
-failure logs are evidence, do not gitignore it).
+**LEADING EXPLANATION (maintainer, 14z-59c): host input.** MAME has no
+true headless mode — `-video none` still creates a window that can TAKE
+FOCUS, and the harness runs on the maintainer's working laptop. A host
+keystroke lands on MAME's default map (P1 directions/buttons/coins/start)
+and is injected into the emulated controls; RAM then diverges while the key
+is held and RE-CONVERGES when the script's staging reasserts — exactly the
+observed signature, and it explains the clustering into one window while
+~2,400 idle-machine runs stayed clean. Not confirmed (the events predate
+input logging), but the hole is closed both ways:
+
+- `tools/run_mame.sh` disables all four host input providers.
+- `replay.lua` asserts every frame that the live controller bits are what
+  it staged, writes `INPUT-VIOLATION`, and the runner rejects the run.
+  Always on; `NO_INPUT_CHECK=1` disables.
+- `tests/test_input_integrity.sh` ground-truths both directions.
+- `INPUT_OUT=<path>` logs raw per-frame port values when you want evidence.
+
+**So if a MAME gate ever goes red again, check the log for
+`INPUT-VIOLATION` FIRST** — that turns the whole class of problem into a
+named, one-line answer. Then `tools/analyze_divergence.py` (ground-truthed)
+classifies the preserved pair as PHASE SHIFT k / TRANSIENT / PERMANENT.
+Both gates keep artifacts under `build/gate_failures/`, which **IS tracked
+in git** — failure logs are evidence, do not gitignore it.
+
+Note also: MAME can crash outright. Already covered — `run_replay_mame.sh`
+requires a terminating `END` line, so a truncated run fails rather than
+being silently compared.
 
 Rerunnable: `RUNS=`, `JOBS=`, `PROBE=`, `SET=` on
 `tests/test_mame_determinism.sh`.
+
+## MOVING THE HARNESS TO ANOTHER MACHINE (planned, 2026-08-03)
+
+The maintainer intends to move the harness to a machine where runs cannot
+be interrupted. That removes the focus-stealing hazard at the source and is
+the right fix; the prevent/detect work above stays useful either way (it
+also covers joysticks, stuck modifiers, and any future MAME that ignores
+the provider flags).
+
+**Run `tests/test_mame_parity.sh` on the new machine BEFORE trusting any
+result there.** It is not just the B5 gate — it is the machine-migration
+gate, and it already asks exactly the right question: does this build, on
+this hardware, reproduce every frozen oracle log bit-for-bit? A different
+CPU, compiler version or libc is a change of INSTRUMENT in precisely the
+sense that gate was written to catch. If it passes, every frozen
+expectation in `tests/expected/` transfers unchanged. If it fails, STOP —
+do not re-freeze to make it green; that would silently redefine the
+baseline the whole superset invariant rests on.
+
+Portability notes for `tools/setup_mame.sh` (currently macOS-shaped):
+- `sysctl -n hw.ncpu` for the job count → `nproc` on Linux.
+- Prereqs `brew install sdl3 pkgconf` → distro packages (`libsdl3-dev`,
+  `pkgconf`). The SDL3-via-pkg-config requirement is not macOS-specific.
+- The space-free build mirror stays regardless: it costs one rsync, keeps
+  the submodule pristine, and avoids re-discovering the GENie space bug if
+  the repo ever lands on a path with a space again.
+- `$HOME` being a git repository broke `git apply` here (GOTCHAS). The
+  script now uses `patch(1)`, so the new machine is unaffected either way.
+- `ROMDIR` is machine-specific and deliberately not recorded in the repo —
+  re-export it, and run `tools/audit_roms.py` first as always.
 
 ## Two MAME facts that CONSTRAIN the profile
 

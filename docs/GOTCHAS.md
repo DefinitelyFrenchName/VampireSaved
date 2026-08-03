@@ -1221,3 +1221,50 @@ Side observation worth keeping: 0.288 and 0.289 produced **bit-identical**
 work RAM and framebuffers across the 12-replay legacy corpus, so CPS-2
 emulation did not change between those releases. Useful to know, and not a
 substitute for pinning.
+
+## MAME's "-video none" STILL creates a window that can take focus — and
+## host keystrokes are injected into the EMULATED controls
+(mechanism supplied by the maintainer, 2026-08-03; implicated in the two
+unexplained 14z-59 divergences)
+MAME has no true headless mode the way some emulators do. Even with
+`-video none` it creates a window, and that window can steal focus. Any
+key pressed while it has focus goes to MAME's default keyboard map, which
+covers **P1 directions, buttons 1-6, coins and start**. The harness runs on
+the maintainer's working laptop, so this is a live hazard, not a
+theoretical one — the machine gets used, focus gets grabbed back, and
+keystrokes land wherever they land.
+
+**Why it matches the observed signature exactly:** a stray press injects
+input the replay script never asked for, RAM diverges for as long as the
+key is held, and then RE-CONVERGES the moment the script's own per-frame
+staging reasserts every field. Both 14z-59 divergences were bounded
+windows that fully re-converged (frames 190-205 and 218-245), both in a
+single ~35-minute execution, and neither reproduced in ~2,400 later runs
+on an idle machine. A per-run rate and machine load were both ruled out by
+measurement; this explains what those could not. **Not confirmed as the
+cause — the events were not captured with an input log — but it is the
+leading explanation and it is now both prevented and detectable.**
+
+Two responses, both in place:
+- **PREVENT**: `tools/run_mame.sh` passes `-keyboardprovider none
+  -mouseprovider none -joystickprovider none -lightgunprovider none`.
+  Verified non-perturbing against the frozen suite.
+- **DETECT**: `tests/lua/replay.lua` checks EVERY frame that the live
+  controller bits are exactly what it staged, writes `INPUT-VIOLATION`
+  into the log if not, and `tools/run_replay_mame.sh` fails the run.
+  Ground truth both directions: `tests/test_input_integrity.sh`.
+
+Related: MAME can also crash outright in some circumstances. That is
+already caught — `run_replay_mame.sh` requires a terminating `END` line,
+so a truncated log fails rather than being compared.
+
+## The input-integrity check's first draft flagged EVERY replay — :IN2
+## carries the EEPROM data line
+Comparing whole input ports against "baseline with the staged bits
+cleared" fired on every single run at frame 77 (`:IN2` expected `ffff`, got
+`fffe`). Not external input: **`:IN2` mixes the EEPROM serial data line in
+with the coin/start bits**, and it legitimately toggles during boot. The
+check now masks to the union of bits the harness can actually drive, which
+loses no detection power because host keystrokes land on controller bits.
+Caught by testing the checker before trusting it (CLAUDE.md §4) — had it
+shipped silent-but-wrong in the other direction, it would have been worse.
