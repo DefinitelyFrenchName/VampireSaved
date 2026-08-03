@@ -5,6 +5,75 @@ parity PROVEN, and the WIDE profile ported to it**. Plus an unplanned
 finding that matters more than the port: MAME is not perfectly
 deterministic run-to-run, and the whole oracle assumed it was)
 
+## Session 14z-59f (Phase C step 1 — the address-space model)
+
+**The allocator is now declarative, and the refactor moved ZERO bytes.**
+
+Placement used to be two hard-coded holes with a bump allocator and an
+a→b fallback. It is now an ordered `[[space]]` list in
+`build/manifest/donovan.toml`, each with a class (`crypt` = inside the
+CPS-2 encryption window so code is re-encrypted / `raw`), an optional
+`profile` gate, and a `fallback`. Legacy `alloc("a"/"b")` call sites
+resolve through it unchanged.
+
+Proven bit-identical **three times** — refactor alone, then with the
+spaces declared, then with the WIDE profile enabled — all
+`ae701ffb06d0cbf3462cad1a9faa47534a3c00e4`, matching the documented dev
+head. Gate: `tests/test_phasec_spaces.sh`.
+
+### What the new summary line reveals
+
+```
+stage 6: 224 ops, hole_a 0x100000/0x100000 (free 0x0),
+                  hole_b 0x3FFEF0/0x400000 (free 0x110)
+```
+**hole_a is completely full; hole_b has 272 bytes left.** The 14z-52 space
+crisis, now a number the build prints on every run instead of a claim.
+The stuck sound table needs 0x160 = 352 bytes.
+
+### Profile gating, by construction rather than by discipline
+
+`wide_ext` (`$400010-$600000`, 2 MB) is declared but carries
+`profile = "cps2-wide-v1"`, so it **does not exist** for a stock build —
+enabling the profile alone still produced the identical fingerprint,
+because nothing allocates there yet. Content rows gate the same way: the
+`[[sound_table]]` row is now uncommented with `profile = "cps2-wide-v1"`
+and `hole = "wide_ext"`, and a stock build skips it entirely.
+
+Note the extension is CONTIGUOUS with hole_b, which ends exactly at
+`$400000`; the 16-byte gap is the CpsFrg window, reserved and never
+allocated (and the emulators disagree about reads there — 14z-59, so the
+reservation is load-bearing).
+
+### THE NEXT CONCRETE STEP, now precisely specified
+
+Allocating into the extension fails with a diagnosis rather than a crash:
+
+> `space wide_ext allocation 0x400010+0x160 for sound_table
+> don_sfx_records lies beyond the 0x400000-byte program image. The
+> profile's extension is declared and the ADDRESS SPACE is proven usable
+> (WIDE B4, both emulators), but the build pipeline does not yet GROW the
+> program image or emit the extra ROM members.`
+
+So the remaining work is **pipeline, not address space**: grow the program
+image to 6 MB and emit the four appended 512 KB members (`vsw.41-44`) with
+their real CRCs, through `patch_prg.py` / `pack_build.sh`. The address
+space itself is settled and proven.
+
+### Consequence the maintainer should weigh
+
+A build that uses the extension **requires the `vsavjw` driver and a
+patched emulator** — today's Donovan builds run on STOCK FBNeo/MAME. For
+netplay that means peers need the same binary and the same set
+(docs/cps2_wide.md already says so). That is a shipping decision, not a
+placement detail, which is why the sound_table row is profile-gated rather
+than simply switched on. **It also supersedes the M5 SOUND DATA HOME
+decision still listed below**: option C ("grow the program region via
+driver descriptor") was rejected then as "larger blast radius", but WIDE
+has since been demonstrated on both emulators, so it is now the cheap
+option and options A/B (evicting live thunks, auditing Jedah's anim
+region) are no longer forced.
+
 ## Session 14z-59e (B5b — FBNeo instruments; and a VACUOUS gate uncovered)
 
 ### THE FINDING: the FBNeo emulator superset invariant was never actually tested

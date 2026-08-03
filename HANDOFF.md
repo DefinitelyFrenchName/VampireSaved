@@ -219,6 +219,9 @@ tests/test_replay_video_selfcheck.sh  # ground truth for replay.lua VIDEO_OUT (t
 tests/test_mame_determinism.sh        # RUNS=/JOBS=/PROBE= repetitions; measures the
                                       # run-to-run divergence rate the whole oracle
                                       # assumes is zero (see STATE 14z-59)
+tests/test_phasec_spaces.sh           # Phase C: the declarative address-space model is
+                                      # byte-for-byte inert on a stock build, and the
+                                      # WIDE extension is gated by construction
 tests/test_fbneo_instruments.sh       # B5b: FBNeo write tap (non-perturbing + re-derives
                                       # a known MAME finding), pokes, and address-resolved
                                       # dumps cross-checked byte-for-byte against MAME

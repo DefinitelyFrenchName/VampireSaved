@@ -162,11 +162,26 @@ Portability notes for `tools/setup_mame.sh` (currently macOS-shaped):
    passing vacuously** (`WIDE=0` never reverted the profile patch, so the
    "reference" carried it). Fixed, asserted in both the build and the gate,
    and the invariant is now established for real at 36/36.
-2. **Phase C — multi-tenant pipeline.** Start with the address-space model
-   (declarative region list + placement classes in `gen_donovan_patch.py`),
-   which also unblocks the stuck 352-byte sound table. Then per-tenant
-   manifests, slot parameterisation, gfx band planning, and moving Donovan
-   off Jedah's slot.
+2. **Phase C — multi-tenant pipeline.** Step 1 **DONE (14z-59f)**: the
+   address-space model is declarative (`[[space]]` in
+   `build/manifest/donovan.toml` — classes, profile gates, fallback), and
+   the refactor is proven byte-identical three ways
+   (`tests/test_phasec_spaces.sh`). The build now PRINTS the space crisis
+   every run: `hole_a free 0x0, hole_b free 0x110` against a 0x160 sound
+   table.
+   **NEXT, precisely specified: the blocker is PIPELINE, not address
+   space.** Grow the program image to 6 MB and emit the four appended
+   512 KB members (`vsw.41-44`) with real CRCs via `patch_prg.py` /
+   `pack_build.sh`. Allocating into `wide_ext` today fails with exactly
+   that diagnosis rather than crashing.
+   Then per-tenant manifests, slot parameterisation, gfx band planning,
+   and moving Donovan off Jedah's slot.
+   **Weigh first:** a build that uses the extension REQUIRES the `vsavjw`
+   driver and a patched emulator (today's Donovan builds run on stock
+   FBNeo/MAME; netplay peers would need the same binary and set). That is
+   why the `[[sound_table]]` row is profile-gated rather than switched on.
+   It also supersedes the "M5 SOUND DATA HOME" decision in STATE.md —
+   option C is now the cheap one.
 3. The determinism measurement above, whenever there is idle machine time.
 
 **Content may be authored into the extension** — B4 opened that gate and

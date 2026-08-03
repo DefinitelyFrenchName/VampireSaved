@@ -87,6 +87,11 @@ def main():
     ap.add_argument("--allow-plausible", action="store_true",
                     help="use reconciliation rows with status=plausible "
                          "(experiment builds; behavior gates arbitrate)")
+    ap.add_argument("--profile", default=None,
+                    help="build profile name; enables address spaces gated on "
+                         "it (e.g. cps2-wide-v1). Without it, profile-gated "
+                         "spaces do not exist and a stock-size build cannot "
+                         "accidentally depend on them.")
     ap.add_argument("--tripwire-open", action="store_true",
                     help="route refs with missing/open reconciliation rows "
                          "to per-target planted-ILLEGAL tripwires instead of "
@@ -108,8 +113,57 @@ def main():
     dst_slot = _int(port["port"]["dst_slot"])
     var_slot = dst_slot | 0x10
     mirror = port["port"].get("mirror_variant", True)
-    holes = {"a": [_int(port["hole_a"]["start"]), _int(port["hole_a"]["end"])],
-             "b": [_int(port["hole_b"]["start"]), _int(port["hole_b"]["end"])]}
+    # ── address-space model (Phase C) ────────────────────────────────────────
+    # Placement used to be two hard-coded holes. It is now a declarative,
+    # ORDERED list of spaces, because the roster does not fit in two holes and
+    # "which hole?" is the wrong question once the WIDE extension exists.
+    #
+    # A space is {name, start, end, cur, class, profile, fallback}:
+    #   class   "crypt" = inside the CPS-2 encryption window, so CODE placed
+    #                     here must be re-encrypted; "raw" = outside it.
+    #   profile when set, the space only exists for that build profile, so a
+    #           stock-size build cannot accidentally allocate into space that
+    #           only a patched emulator provides.
+    #   fallback name of the next space to try on overflow.
+    #
+    # Manifests may declare [[space]] entries; a manifest with only the legacy
+    # [hole_a]/[hole_b] sections synthesises the identical two-space list, so
+    # existing builds are byte-for-byte unchanged (asserted by
+    # tests/test_phasec_spaces.sh).
+    spaces = {}
+    order = []
+    decl = port.get("space", [])
+    if decl:
+        for s in decl:
+            nm = s["name"]
+            spaces[nm] = {"name": nm, "start": _int(s["start"]),
+                          "end": _int(s["end"]), "cur": _int(s["start"]),
+                          "class": s.get("class", "raw"),
+                          "profile": s.get("profile"),
+                          "fallback": s.get("fallback")}
+            order.append(nm)
+    else:
+        spaces["hole_a"] = {"name": "hole_a", "start": _int(port["hole_a"]["start"]),
+                            "end": _int(port["hole_a"]["end"]),
+                            "cur": _int(port["hole_a"]["start"]),
+                            "class": "crypt", "profile": None, "fallback": "hole_b"}
+        spaces["hole_b"] = {"name": "hole_b", "start": _int(port["hole_b"]["start"]),
+                            "end": _int(port["hole_b"]["end"]),
+                            "cur": _int(port["hole_b"]["start"]),
+                            "class": "raw", "profile": None, "fallback": None}
+        order = ["hole_a", "hole_b"]
+
+    # Legacy call sites say alloc("a"/"b", ...); keep that vocabulary.
+    ALIAS = {"a": "hole_a", "b": "hole_b"}
+
+    # Drop spaces belonging to a profile we are not building for. Doing this
+    # by CONSTRUCTION (rather than by remembering not to use them) is what
+    # makes a stock build incapable of depending on the WIDE extension.
+    for nm in list(spaces):
+        pr = spaces[nm]["profile"]
+        if pr and pr != args.profile:
+            del spaces[nm]
+            order.remove(nm)
 
     ops = []
     notes = []
@@ -122,22 +176,49 @@ def main():
     gap_free = []  # (start, end) inside already-claimed group spans
 
     def alloc(hole, size, what, fallback=True):
+        """Place `size` bytes, returning the destination address.
+
+        `hole` names a space ("a"/"b" are the legacy aliases). On overflow the
+        space's declared `fallback` chain is followed, so growing the address
+        space is a manifest edit rather than a code edit.
+        """
         # gap-fit first: reuse dead space inside layout-group spans
         for gi, (gs, ge) in enumerate(gap_free):
             if ge - gs >= size:
                 gap_free[gi] = ((gs + size + 0xF) & ~0xF, ge)
                 return gs
-        start, end = holes[hole]
-        if start + size > end:
-            if fallback and hole == "a":
-                return alloc("b", size, what, fallback=False)
-            fail.append(f"hole {hole} overflow allocating 0x{size:X} for {what}")
+        nm = ALIAS.get(hole, hole)
+        sp = spaces.get(nm)
+        if sp is None:
+            fail.append(f"no address space '{hole}' for {what}"
+                        + (f" (profile '{args.profile}')" if args.profile else
+                           " (is it profile-gated? pass --profile)"))
+            return None
+        start = sp["cur"]
+        if start + size > sp["end"]:
+            nxt = sp["fallback"] if fallback else None
+            if nxt and nxt in spaces:
+                return alloc(nxt, size, what, fallback=True)
+            fail.append(f"space {nm} overflow allocating 0x{size:X} for {what} "
+                        f"(free 0x{max(0, sp['end'] - start):X})")
+            return None
+        # The 0xFF-fill check reads the BASE program image, so a space that
+        # lies beyond it cannot be validated — or written — until the pipeline
+        # grows the image. Say exactly that instead of dying on an index.
+        if start + size > len(vj):
+            fail.append(
+                f"space {nm} allocation 0x{start:06X}+0x{size:X} for {what} lies "
+                f"beyond the 0x{len(vj):X}-byte program image. The profile's "
+                f"extension is declared and the ADDRESS SPACE is proven usable "
+                f"(WIDE B4, both emulators), but the build pipeline does not yet "
+                f"GROW the program image or emit the extra ROM members — that is "
+                f"the next Phase C step (STATE 14z-59f).")
             return None
         for i in range(start, start + size):
             if vj[i] != 0xFF:
                 fail.append(f"dest 0x{i:06X} for {what} is not 0xFF fill")
                 return None
-        holes[hole][0] = (start + size + 0xF) & ~0xF
+        sp["cur"] = (start + size + 0xF) & ~0xF
         return start
 
     def table_entry_addr(tname, slot):
@@ -1690,6 +1771,12 @@ def main():
         for st in port.get("sound_table", []):
             if args.stage < _int(st.get("stage", 0)):
                 continue
+            # Profile-gated CONTENT, the companion to profile-gated space: a
+            # row that lives in the WIDE extension must not be emitted into a
+            # stock-size build, where it would either fail to allocate or —
+            # worse — silently land somewhere else.
+            if st.get("profile") and st["profile"] != args.profile:
+                continue
             nm = st["name"]
             src = _int(st["src"])
             n = _int(st["entries"])
@@ -1924,8 +2011,9 @@ def main():
         + "\n".join(f"| `PRG:0x{d:06X}` | 0x{ln:X} | {pv} | {w} |"
                     for d, ln, pv, w in fragments) + "\n")
     print(f"stage {args.stage}: {len(ops)} ops, "
-          f"hole A watermark 0x{holes['a'][0]:06X}, "
-          f"hole B watermark 0x{holes['b'][0]:06X}")
+          + ", ".join(f"{sp['name']} 0x{sp['cur']:06X}/0x{sp['end']:06X} "
+                      f"(free 0x{max(0, sp['end'] - sp['cur']):X})"
+                      for sp in (spaces[n] for n in order)))
     if fail:
         print(f"\nGENERATION FAILED ({len(fail)}):")
         seen = set()

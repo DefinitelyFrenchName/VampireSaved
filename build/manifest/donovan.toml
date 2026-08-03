@@ -21,6 +21,49 @@ end = 0x100000
 start = 0x3EC720
 end = 0x400000
 
+# ── ADDRESS-SPACE MODEL (Phase C) ────────────────────────────────────────────
+# Ordered list of places ported content may live. This supersedes the two
+# hard-coded holes above (kept only as the legacy fallback for older
+# manifests); the allocator resolves "a"/"b" to hole_a/hole_b, so declaring
+# these changes nothing on its own — asserted byte-for-byte by
+# tests/test_phasec_spaces.sh.
+#
+#   class    "crypt" = inside the CPS-2 encryption window ($000000-$0FFFFF),
+#                      so CODE placed here is re-encrypted; "raw" = outside.
+#   profile  the space EXISTS only when the build is made with that profile.
+#            A stock-size build therefore cannot accidentally allocate into
+#            space that only a patched emulator provides — by construction,
+#            not by remembering.
+#   fallback next space to try on overflow.
+[[space]]
+name = "hole_a"
+start = 0x0BF6A0
+end = 0x100000
+class = "crypt"
+fallback = "hole_b"
+
+[[space]]
+name = "hole_b"
+start = 0x3EC720
+end = 0x400000
+class = "raw"
+fallback = "wide_ext"
+
+# CPS-2 WIDE v1 program extension: 4MB -> 6MB, proven readable by B4 on BOTH
+# emulators (docs/cps2_wide.md). Contiguous with hole_b, which ends exactly at
+# $400000 — the 16-byte gap is the CpsFrg register window, reserved and never
+# allocated. Everything here is OUTSIDE the encryption window, so raw.
+#
+# GATED: only exists with --profile cps2-wide-v1. A build that uses it
+# REQUIRES the vsavjw driver and a patched emulator, which is a shipping
+# decision, not a placement detail — see STATE.md "Decisions pending".
+[[space]]
+name = "wide_ext"
+start = 0x400010
+end = 0x600000
+class = "raw"
+profile = "cps2-wide-v1"
+
 # Secondary-object (projectile) dispatch hook (stage 4+): vsavj's local
 # type table has 58 entries; vsav2's has 76 — the extras are the newcomers'
 # sub-object handlers, and Donovan spawns type 60. The generator builds an
@@ -1468,13 +1511,19 @@ dst_old_head = "0ffc0dc80b9609730cff0bcf0a9d097a"
 # the sound_helper row in reconciliation.toml ONCE a data home is decided
 # (candidate: Jedah's freed anim region [0x248B88,0x267000) — needs its own
 # dead-space audit; it is also the earmarked home for the ported select web).
-# [[sound_table]]
-# stage = 6
-# name = "don_sfx_records"
-# hole = "b"          # data blob: keep it out of the (full) code hole a
-# src = 0x0CB01A
-# entries = 44
-# ptr_table = 0x0BF41A
-# ptr_row = 0x0F
-# ptr_old = 0x000B3220
-# keep_ids = "0x110,0x111,0x112,0x119,0x152,0x202"
+# UNBLOCKED (Phase C): the 0x160-byte array now has a home in the CPS-2 WIDE
+# program extension. Profile-gated, so a stock-size build skips this row
+# entirely and stays byte-identical; only --profile cps2-wide-v1 emits it.
+# Enabling it for a SHIPPING build means the build requires the vsavjw driver
+# and a patched emulator — a maintainer decision (STATE.md).
+[[sound_table]]
+stage = 6
+profile = "cps2-wide-v1"
+name = "don_sfx_records"
+hole = "wide_ext"   # 2MB free; hole_a is full and hole_b has 0x110 left
+src = 0x0CB01A
+entries = 44
+ptr_table = 0x0BF41A
+ptr_row = 0x0F
+ptr_old = 0x000B3220
+keep_ids = "0x110,0x111,0x112,0x119,0x152,0x202"
