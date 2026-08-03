@@ -1347,3 +1347,33 @@ manifest row that places the array, NOT by a hand-edited reconciliation
 status and NOT by a profile name. If the array is not placed, the helper
 stays stubbed by construction, and no ordering of edits can produce a live
 helper with no array.
+
+## The CPS-2 encrypted range is INCLUSIVE of its upper word — 0x100001, not
+## 0x100000 (measured 14z-59k)
+The project quotes vsavj's encrypted range as `PRG:0x000000-0x100000`
+("first 1MB only"). The limit test is `<=` on the WORD address, in both our
+`Cipher.crypt_words_at` (`lo <= a <= hi`) and MAME's `cps2crypt.cpp`
+(`a >= lower_limit && a <= upper_limit`). So the word at byte `0x100000` is
+still ENCRYPTED and the first raw word is at `0x100002`.
+
+No current placement is affected — `hole_a` ends at `0x100000` exclusive, so
+all of it is inside; `hole_b` and the WIDE extension are far outside. It
+matters the moment anything is placed at exactly the boundary.
+
+Found by a test whose FIRST DRAFT asserted the opposite. The code was right
+and the new test was wrong — which is the argument for writing the test
+before trusting the behaviour, not after.
+
+## Ported CODE above the encryption window is stored RAW, automatically
+`patch_prg.py` re-encrypts every `code`/`code_file` op unconditionally, so
+it looks like code placed above 1MB would be corrupted. It is not:
+`Cipher.crypt_words_at` is RANGE-AWARE and returns out-of-range words
+unchanged, matching how the CPU fetches them. That is what makes the CPS-2
+WIDE extension (`$400010-$600000`) viable as a home for ported CHARACTER
+code — Donovan's port alone is ~338 KiB and Huitzil/Pyron are comparable,
+so this property is load-bearing for the whole roster.
+
+Locked by `tests/test_crypt_boundary.sh`, in both directions (inside must
+transform and round-trip; outside must pass through byte-identical). If it
+ever fails, ported code above 1MB becomes executable garbage rather than a
+loud failure — so it fails the build rather than warning.

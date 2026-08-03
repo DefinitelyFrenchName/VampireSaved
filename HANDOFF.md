@@ -219,6 +219,8 @@ tests/test_replay_video_selfcheck.sh  # ground truth for replay.lua VIDEO_OUT (t
 tests/test_mame_determinism.sh        # RUNS=/JOBS=/PROBE= repetitions; measures the
                                       # run-to-run divergence rate the whole oracle
                                       # assumes is zero (see STATE 14z-59)
+tests/test_crypt_boundary.sh          # code above the encryption window is stored RAW
+                                      # (load-bearing: character code in the extension)
 tests/test_dualtrack.sh               # dual-track: WIDE is legacy-IDENTICAL to stock,
                                       # differs only on patched-slot content, and the
                                       # attract difference is byte-attributed
