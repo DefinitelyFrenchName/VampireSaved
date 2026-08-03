@@ -108,10 +108,40 @@ def main():
     args = ap.parse_args()
 
     names, lengths, words, keybytes = load_stored(args.src)
+
+    # ── program-image extension (Phase C step 2) ─────────────────────────────
+    # The generator states the requirement in patch.json ("image"), because it
+    # is what knows the build profile. Grow BEFORE applying ops, so ops may
+    # target extension addresses. Fill is 0xFF to match the allocator's
+    # "destination must be 0xFF fill" contract.
+    #
+    # NOTE the CRC consequence: these appended members carry real content, so
+    # their CRCs will NOT match the zero-fill CRCs in the emulator descriptors.
+    # For PRG members that is tolerated (unlike gfx/QSound, where FBNeo
+    # silently substitutes 0xFF fill — docs/GOTCHAS.md). Verified, not assumed:
+    # tests/test_phasec_image.sh.
+    spec = json.loads(args.patch.read_text()) if args.patch else {}
+    image = spec.get("image")
+    if image:
+        base = sum(lengths)
+        target, msize = int(image["extend_to"]), int(image["member_size"])
+        fill = int(image.get("fill", 0xFF))
+        if target < base or (target - base) % msize:
+            raise SystemExit(f"image: bad extend_to {target:#x} from base {base:#x}")
+        add = (target - base) // msize
+        if add != len(image["member_names"]):
+            raise SystemExit("image: member_names count does not match extend_to")
+        fillword = (fill << 8) | fill
+        words.extend([fillword] * ((target - base) // 2))
+        names = list(names) + list(image["member_names"])
+        lengths = list(lengths) + [msize] * add
+        print(f"image: {base:#x} -> {target:#x} "
+              f"(+{add} x {msize:#x}: {', '.join(image['member_names'])}, "
+              f"fill {fill:#04x})")
+
     orig = list(words)
 
     if args.patch:
-        spec = json.loads(args.patch.read_text())
         apply_ops(words, keybytes, spec.get("ops", []), args.patch.resolve().parent)
     else:
         print("null patch (no ops)")

@@ -79,7 +79,22 @@ if [ "$STAGE" -ge 6 ]; then
 fi
 
 rm -rf "$OUTBASE/rompath"
-ROMDIR="$ROMDIR" tools/pack_build.sh "$OUTBASE/prg" "$OUTBASE/rompath" > /dev/null
+# CPS-2 WIDE builds pack as the vsavjw SET and fold in the profile's appended
+# gfx/QSound members, which this pipeline does not produce itself. Detected
+# from the generator's own output (patch.json carries an "image" block only
+# when a profile-gated space was actually used), so the set name can never
+# disagree with what was built.
+PACK_SET="vsavj"
+PACK_MERGE=""
+if python3 -c "import json,sys; sys.exit(0 if json.load(open('$OUTBASE/patch/patch.json')).get('image') else 1)" 2>/dev/null; then
+    PACK_SET="vsavjw"
+    PACK_MERGE="${WIDE_ROMSET:-build/wide0/rompath/vsavjw.zip}"
+    echo "WIDE build: packing as $PACK_SET (merging $PACK_MERGE)"
+    ROMDIR="$ROMDIR" tools/pack_build.sh "$OUTBASE/prg" "$OUTBASE/rompath" \
+        --set "$PACK_SET" --merge "$PACK_MERGE" > /dev/null
+else
+    ROMDIR="$ROMDIR" tools/pack_build.sh "$OUTBASE/prg" "$OUTBASE/rompath" > /dev/null
+fi
 
 # Stage 6+: gfx side — place Donovan's tiles into vsav's group-B members
 # (Jedah band) and carry a patched vsav.zip in the rompath so it fronts

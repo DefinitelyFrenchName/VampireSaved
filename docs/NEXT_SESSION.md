@@ -169,13 +169,19 @@ Portability notes for `tools/setup_mame.sh` (currently macOS-shaped):
    (`tests/test_phasec_spaces.sh`). The build now PRINTS the space crisis
    every run: `hole_a free 0x0, hole_b free 0x110` against a 0x160 sound
    table.
-   **NEXT, precisely specified: the blocker is PIPELINE, not address
-   space.** Grow the program image to 6 MB and emit the four appended
-   512 KB members (`vsw.41-44`) with real CRCs via `patch_prg.py` /
-   `pack_build.sh`. Allocating into `wide_ext` today fails with exactly
-   that diagnosis rather than crashing.
-   Then per-tenant manifests, slot parameterisation, gfx band planning,
-   and moving Donovan off Jedah's slot.
+   **Step 2 DONE (14z-59h): M5 SOUND IS UNBLOCKED.** The image grows to
+   6 MB, the WIDE romset packs as `vsavjw` with four extension members,
+   runs on BOTH emulators (9,320 frames clean), and the 68k **provably
+   reads** the relocated sound table — the negative control (zero the
+   table) diverges at frame 3121. Stock stays `ae701ffb`. Gate:
+   `tests/test_phasec_image.sh`. WIDE fingerprint `b0eb9ecd`.
+   Build it: `KEY_SET=vsavj GEN_FLAGS="--allow-plausible --tripwire-open
+   --profile cps2-wide-v1" tools/build_donovan.sh 6 <out>`.
+   **NEXT:** finish M5 sound on the WIDE track (the table is READ, which
+   is not yet AUDIBLE — the 6 shared ids were never observed firing in the
+   8 Donovan replays, so an audible test needs a replay that triggers
+   them). Then per-tenant manifests, slot parameterisation, gfx band
+   planning, and moving Donovan off Jedah's slot.
    **Weigh first:** a build that uses the extension REQUIRES the `vsavjw`
    driver and a patched emulator (today's Donovan builds run on stock
    FBNeo/MAME; netplay peers would need the same binary and set). That is

@@ -44,8 +44,17 @@ def main():
 
     op_path = f"{outbase}/verify_op.bin"
     data_path = f"{outbase}/verify_data.bin"
+    # The packed set name follows the build profile: a CPS-2 WIDE build packs
+    # as vsavjw. Discover it rather than hard-coding vsavj, so this gate keeps
+    # verifying the artifact that was actually produced.
+    import glob
+    cands = [z for z in glob.glob(f"{outbase}/rompath/*.zip")
+             if os.path.basename(z).startswith("vsavj")]
+    if not cands:
+        raise SystemExit(f"verify: no vsavj*.zip in {outbase}/rompath")
+    prg_zip = sorted(cands, key=len)[-1]   # prefer vsavjw.zip over vsavj.zip
     subprocess.run([sys.executable, "tools/cps2_decrypt.py",
-                    f"{outbase}/rompath/vsavj.zip", op_path,
+                    prg_zip, op_path,
                     "--data-out", data_path],
                    check=True, capture_output=True)
 

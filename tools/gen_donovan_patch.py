@@ -202,22 +202,23 @@ def main():
             fail.append(f"space {nm} overflow allocating 0x{size:X} for {what} "
                         f"(free 0x{max(0, sp['end'] - start):X})")
             return None
-        # The 0xFF-fill check reads the BASE program image, so a space that
-        # lies beyond it cannot be validated — or written — until the pipeline
-        # grows the image. Say exactly that instead of dying on an index.
+        # Beyond the base image is legal ONLY in a profile-gated space: the
+        # patcher grows the image and emits the appended members (the "image"
+        # block written below). Extension bytes are 0xFF fill by construction,
+        # so there is nothing to verify there — but in BASE space the
+        # 0xFF-fill check still guards every byte.
         if start + size > len(vj):
-            fail.append(
-                f"space {nm} allocation 0x{start:06X}+0x{size:X} for {what} lies "
-                f"beyond the 0x{len(vj):X}-byte program image. The profile's "
-                f"extension is declared and the ADDRESS SPACE is proven usable "
-                f"(WIDE B4, both emulators), but the build pipeline does not yet "
-                f"GROW the program image or emit the extra ROM members — that is "
-                f"the next Phase C step (STATE 14z-59f).")
-            return None
-        for i in range(start, start + size):
-            if vj[i] != 0xFF:
-                fail.append(f"dest 0x{i:06X} for {what} is not 0xFF fill")
+            if not sp["profile"]:
+                fail.append(
+                    f"space {nm} allocation 0x{start:06X}+0x{size:X} for {what} "
+                    f"lies beyond the 0x{len(vj):X}-byte program image, and {nm} "
+                    f"is not profile-gated — a stock build cannot grow the image.")
                 return None
+        else:
+            for i in range(start, start + size):
+                if vj[i] != 0xFF:
+                    fail.append(f"dest 0x{i:06X} for {what} is not 0xFF fill")
+                    return None
         sp["cur"] = (start + size + 0xF) & ~0xF
         return start
 
@@ -2002,7 +2003,41 @@ def main():
                   for name in placed}
     (out / "placements.json").write_text(json.dumps(
         {"stage": args.stage, "regions": placements}, indent=1))
-    (out / "patch.json").write_text(json.dumps({"ops": ops}, indent=1))
+    # ── program-image extension (Phase C step 2) ─────────────────────────────
+    # If any op lands beyond the base 4MB image, the patcher must GROW the
+    # image and emit the appended ROM members. The generator is what knows the
+    # profile, so it states the requirement here rather than patch_prg.py
+    # re-deriving it. Emitted only when a profile space was actually used, so
+    # a WIDE build that happens to need no extension stays byte-identical to
+    # the stock one.
+    ext_spaces = [spaces[n] for n in order
+                  if spaces[n]["profile"] and spaces[n]["cur"] > spaces[n]["start"]]
+    image = None
+    if ext_spaces:
+        # Size to the PROFILE's declared extent, not to what we happened to
+        # use. The emulator descriptors declare a fixed shape (PRG 6MB as four
+        # appended 512KB members) and a romset that carries fewer members
+        # simply fails to load. Content decides nothing about image geometry.
+        need = max(sp["end"] for sp in ext_spaces)
+        msize = 0x80000
+        base = len(vj)
+        count = -(-(need - base) // msize)        # ceil
+        image = {"extend_to": base + count * msize,
+                 "member_size": msize,
+                 # Names and sizes MUST match the vsavjw descriptors in BOTH
+                 # emulator patches; one romset feeds both.
+                 "member_names": [f"vsw.{41 + i}" for i in range(count)],
+                 # 0xFF, so the allocator's "dest must be 0xFF fill" check
+                 # holds for extension space exactly as it does for the holes.
+                 "fill": 0xFF,
+                 "profile": args.profile}
+        notes.append(f"# image: extend to {image['extend_to']:#x} "
+                     f"({count} x {msize:#x} member(s): "
+                     f"{', '.join(image['member_names'])})")
+    spec = {"ops": ops}
+    if image:
+        spec["image"] = image
+    (out / "patch.json").write_text(json.dumps(spec, indent=1))
     (out / "patch_notes_fragment.md").write_text(
         f"# donovan-m2 stage {args.stage} — generated op notes\n\n"
         + "\n".join(notes) + "\n")

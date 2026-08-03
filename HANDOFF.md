@@ -219,6 +219,9 @@ tests/test_replay_video_selfcheck.sh  # ground truth for replay.lua VIDEO_OUT (t
 tests/test_mame_determinism.sh        # RUNS=/JOBS=/PROBE= repetitions; measures the
                                       # run-to-run divergence rate the whole oracle
                                       # assumes is zero (see STATE 14z-59)
+tests/test_phasec_image.sh            # Phase C step 2: image grows to 6MB, WIDE romset
+                                      # shaped+runs, extension PROVABLY READ (negative
+                                      # control), stock build untouched
 tests/test_phasec_spaces.sh           # Phase C: the declarative address-space model is
                                       # byte-for-byte inert on a stock build, and the
                                       # WIDE extension is gated by construction

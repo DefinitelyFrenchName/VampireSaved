@@ -5,6 +5,74 @@ parity PROVEN, and the WIDE profile ported to it**. Plus an unplanned
 finding that matters more than the port: MAME is not perfectly
 deterministic run-to-run, and the whole oracle assumed it was)
 
+## Session 14z-59h (Phase C step 2 — the image grows; M5 SOUND UNBLOCKED)
+
+**The 352-byte sound table has a home, and the 68k provably reads it.**
+The blocker that has stood since 14z-52 is gone.
+
+| Link | Evidence |
+|---|---|
+| generator states the requirement | `image: 0x400000 -> 0x600000 (+4 x 0x80000)` in patch.json |
+| patcher grows the image before ops | table lands at `CPU:$400010` |
+| packer emits `vsavjw.zip`, merging gfx/QSound | 4 extension + 6 profile members, sizes checked |
+| runs on FBNeo (`vsavjw`) | 9,320 frames, clean END |
+| runs on MAME (`vsavjw`) | 9,320 frames, clean END |
+| **NEGATIVE CONTROL** | zeroing the table diverges at **frame 3121** |
+| stock build | still `ae701ffb`, byte-identical |
+
+Gate: `tests/test_phasec_image.sh` (all four properties at once).
+WIDE build fingerprint: `b0eb9ecd8a6fd354f398d4347002b204b784f47c`.
+
+**The negative control is the point.** B4 taught that a relocation which
+"passes" proves nothing if the data is never read, so the gate zeroes the
+table and REQUIRES behaviour to change. Without that, "it booted" would
+have been indistinguishable from "the pointer row is dead".
+
+### Two design rules banked
+
+1. **Image shape follows the PROFILE, not the content.** The first attempt
+   emitted one extension member because only 0x160 bytes were used — but
+   the emulator descriptors declare four, and a set carrying fewer simply
+   fails to load. Geometry is the profile's business; content decides
+   nothing about it.
+2. **The packed set name is DERIVED from the generator's own output.**
+   `patch.json` carries an `image` block only when a profile-gated space
+   was actually used, so the set name (`vsavj` vs `vsavjw`) can never
+   disagree with what was built. No second place to keep the profile in
+   sync.
+
+### Note on `-verifyroms`
+
+MAME reports `romset vsavjw [vsav] is bad` on CRC for this build. That is
+expected for ANY patched build — patching a member changes its CRC, and
+the stock Donovan build has always done the same — and both emulators run
+it regardless. The consequence worth remembering: **the ROM audit cannot
+distinguish "patched as intended" from "corrupted"**, which is exactly why
+the negative control carries the weight instead of the audit.
+
+### Pipeline changes (all shared code — hence property 1 of the gate)
+
+- `gen_donovan_patch.py`: emits the `image` block; extension addresses are
+  legal only in a profile-gated space.
+- `patch_prg.py`: `image` support — grows the word array with 0xFF fill
+  BEFORE ops, appends the members on write.
+- `pack_build.sh`: `--merge` (fold in members this build does not produce;
+  ours always win) and `KEY_SET` (a profile clone takes its parent's key).
+  The key is fetched AFTER the merge, since ROMDIR has no `vsavjw.zip`.
+- `build_donovan.sh`: detects the `image` block and packs as `vsavjw`.
+- `verify_gfx_build.py`: discovers the packed set instead of hard-coding
+  `vsavj.zip`.
+
+### What this unblocks, and what it does NOT
+
+M5 sound can proceed on the WIDE track. Still open and unchanged: the
+**voice samples** decision (8 MB of QSound headroom, hard-capped by MAME's
+16 MB ceiling), and whether those 6 shared sfx ids actually fire in a
+replay — the table is now READ, which is not the same as AUDIBLE. The
+14z-52 caveat stands: those entries were never observed firing in the
+8 Donovan replays, so an audible test still needs a replay that triggers
+them.
+
 ## Session 14z-59g (DECISIONS RATIFIED: dual-track build; upstreaming deferred)
 
 **Maintainer, 2026-08-04.**
