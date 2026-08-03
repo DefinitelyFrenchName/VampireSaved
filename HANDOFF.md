@@ -16,10 +16,47 @@ same commit as anything it describes.
 | MAME headless runner | `tools/run_mame.sh <set> [args]` | MAME 0.288 (brew), fresh sandbox per run |
 | Attract determinism | `tests/test_attract_determinism.sh` | PASS 3600 frames |
 | Decrypt oracle test | `tests/test_decrypt_oracle.sh` | PASS (python == MAME opcode space) |
-| FBNeo | `emu/fbneo` submodule + `tools/run_fbneo.sh` | built (SDL2), headless smoke PASS; harness patch applied (`-hinput/-hout/-hframes/-hdump`), loads CRC-changed patched zips |
+| FBNeo | `emu/fbneo` submodule + `tools/setup_fbneo.sh` | built (SDL2); TWO patches: `0001` harness (frontend-only: `-hinput/-hout/-hframes/-hdump`, plus `FBNEO_HVIDEO` framebuffer checksums and `FBNEO_HGFX` gfx-buffer dumps) and `0002` the CPS-2 WIDE profile (driver descriptor + one gated core line). **CRC WARNING:** FBNeo matches zip members by CRC — a mismatched gfx/QSound member is silently replaced by 0xFF fill while still logging `(OK)` (docs/GOTCHAS.md) |
 
 FBNeo build: `(cd emu/fbneo && make sdl2 SKIPDEPEND=1 -j8)` — `SKIPDEPEND=1`
 is mandatory (docs/GOTCHAS.md). Needs brew `sdl2`(-compat) + `sdl2_image`.
+
+## CPS-2 WIDE — the extended hardware profile (2026-08-03, B0-B4 all green)
+
+**Why it exists:** all 18 characters do not fit a stock CPS-2 (measured
+deficit ~886 KiB program, ~6-7 MB tiles). WIDE is the named, versioned
+profile that makes the roster physically possible. Spec + all measurements:
+**`docs/cps2_wide.md`** (read it before touching any of this).
+
+```
+CPS-2 WIDE v1   PRG 6 MB | GFX 48 MB (19-bit tiles) | QSound 16 MB
+```
+Emulator cost: **one widened condition** in `cps_obj.cpp` plus the
+`Cps2Wide` flag lifecycle. Everything else is descriptor table data.
+Governed by **Rule 1 v2** (profile-gated + emulator superset invariant);
+the profile runs under a separate driver entry `vsavjw`, so stock `vsavj`
+and every other CPS-2 game are untouched by construction.
+
+Status: **demonstrated, not just declared.** B0-B3 inert (24/24 RAM AND
+framebuffer); B4 proves the space usable on both axes, each with a
+negative control — sprites render pixel-perfect from the appended banks
+(9/9), and relocated data is genuinely read from `CPU:$400000+`.
+
+```sh
+WIDE=0 tools/setup_fbneo.sh && cp emu/fbneo/fbneo /somewhere/fbneo_ref  # reference binary, ONCE
+tools/setup_fbneo.sh                                                    # the WIDE binary
+python3 tools/build_wide_romset.py "$ROMDIR" build/wide0/rompath \
+        --qsound 2 --gfx 4 --prg 4 --gfx-copy-group-b                   # prints the descriptor
+                                                                        # rows incl. CRCs - paste them in
+ROMDIR=... FBNEO_REF=/somewhere/fbneo_ref tests/test_wide_profile.sh    # 36 checks, 3 sections
+```
+The reference binary MUST differ from the build under test by ONLY patch
+0002 — build it from the same tree state or the comparison measures noise.
+
+Authoring into the extension: raw (no encryption above `PRG:0x0FFFFF`),
+FILE byte order (`words_to_file_bytes(words_from_logical_bytes(...))`),
+the member's REAL CRC in the descriptor, and `$400000-$40000F` reserved
+(CpsFrg registers, now read-shadowed by ROM).
 
 ## How to build
 
@@ -56,8 +93,17 @@ tests/test_don_accent.sh       [rp]   # palette locks: accent steadiness, VICTOR
                                       # byte guard + cycle, fixture-override rows,
                                       # shock-window vanilla lock (palette ROM->RAM
                                       # is RAM-gate-blind — these are the only locks)
+tests/test_don_sound.sh        [rp]   # sound-ring gate: NO vsavj music-range id may
+                                      # be enqueued + frozen per-replay id inventories
+                                      # (sound is invisible to every other gate)
 tests/run_battery_m2.sh [outbase]     # THE deliverable battery: audit + all of the
                                       # above in order; run before ANY build commit
+tests/audit_wide_phase_a.sh           # WIDE Phase A measurements (rerunnable; ground-
+                                      # truths its own instrument before trusting nulls)
+tests/test_wide_profile.sh            # WIDE profile gate: emulator superset invariant
+                                      # + inertness + the B4 canary (needs FBNEO_REF)
+tests/audit_mask_window_ff4182.sh     # on-demand: proves the masked palette-staging
+                                      # window hides the designed diff and nothing else
 ```
 
 All tests are self-contained, take state only via env/args, print PASS/FAIL,
