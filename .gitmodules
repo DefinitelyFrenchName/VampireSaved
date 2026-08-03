@@ -1,3 +1,6 @@
 [submodule "emu/fbneo"]
 	path = emu/fbneo
 	url = https://github.com/finalburnneo/FBNeo.git
+[submodule "emu/mame"]
+	path = emu/mame
+	url = https://github.com/mamedev/mame.git

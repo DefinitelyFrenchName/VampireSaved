@@ -1,0 +1,6 @@
+# boot_probe: no input, 400 frames of pure boot.
+# Short on purpose — tests/test_mame_determinism.sh runs it dozens of times.
+# The B5 run-to-run divergences (session 14z-59) both appeared in this
+# window (frames ~190 and ~218), so a cheap probe that covers it is worth
+# more than a long replay that mostly measures a settled game.
+400 wait

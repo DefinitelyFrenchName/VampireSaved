@@ -83,7 +83,8 @@ legacy corpus, 24 comparisons per run.
 | **B3** | PRG 4 -> 6 MB (4 appended 512KB members) | **PASS** — 24/24 bit-identical; A1's zero-core-lines prediction held |
 | **B4 (gfx)** | content fetched from the new 19-bit banks | **PASS** — 9/9 replays RAM+pixel identical with 15 characters' sprites served from banks 4/5 |
 | **B4 (prg)** | code/data fetched from above 4MB | **PASS** — all 20 per-char sound tables relocated to CPU $400000+, RAM identical; negative control (same rows -> zeros) DOES diverge, so the reads are real |
-| B5/B5b | MAME parity / suite preservation | pending |
+| **B5** | MAME parity + the profile ported to MAME | **PASS** — parity 62/62 on the unpatched source build; the MAME WIDE gate 36/36 (superset invariant + inertness + B4 canary, RAM **and** framebuffer) |
+| B5b | suite preservation | pending |
 
 **The gate compares work RAM AND the framebuffer.** That second half was
 added at B2 and is not garnish: the FBNeo harness historically ran with
@@ -267,6 +268,91 @@ this and can proceed independently — but note the same discipline: pick a
 relocation whose only observable is "the data was read", e.g. copy a data
 block into the extension and repoint one pointer, and require
 bit-identical RAM.
+
+## B5 — MAME parity, and the profile ported to MAME
+
+MAME is the project's independent verification oracle. A Homebrew binary
+cannot follow a descriptor change, so B5 pins MAME **0.288** as a submodule
+(`emu/mame`, tag `mame0288`, commit `27a8d9e8`) and builds it from source.
+
+### The order matters: parity BEFORE the patch
+
+Every MAME-side expectation this project owns was frozen against the
+Homebrew binary. Swapping in a source build changes the INSTRUMENT, not the
+subject. So `tests/test_mame_parity.sh` proves the **unpatched** source
+build is indistinguishable from the reference first, and refuses to run at
+all against a binary that knows the `vsavjw` driver. Only then does the
+profile patch go near it. Same discipline as `FBNEO_REF`.
+
+Build: `tools/setup_mame.sh` (`WIDE=0` for the reference binary). Two
+things about it are non-obvious and are written up in docs/GOTCHAS.md:
+the build runs from an rsync'd **space-free mirror** because MAME's GENie
+cannot handle the space in this repository's path (and symlinks do not
+help — `getcwd()` defeats them), and it is a **SOURCES-filtered** CPS-2-only
+build, minutes instead of hours. Whether that filtering changes emulation
+is not argued, it is measured by the parity gate.
+
+### The emulator change, MAME side
+
+`emu/mame-patches/0002-cps2-wide-v1.patch` — **164 lines added, exactly ONE
+line removed**, and that one line is the sprite tile-code composition:
+
+```c
+-		const int code = base[i + 2] + ((y & 0x6000) << 3);
++		const int code = base[i + 2]
++				+ ((m_cps2_wide ? cps2_wide_bankbits(y) : (y & 0x6000)) << 3);
+```
+
+`cps2_wide_bankbits()` is the same CPS-2 Turbo rule FBNeo uses (promote bit
+12 into bit 15 after the list walk). Everything else is additive: two
+widened address maps, a `cps2wide` machine config, the `vsavjw` ROM
+descriptor, one `GAME()` row and one `mame.lst` row. The flag is a driver
+member set at machine-config time, so — unlike FBNeo's file-scope
+`Cps2Wide`, which must be explicitly cleared in `DrvExit` — it cannot leak
+into another game: MAME builds a fresh driver object per run.
+
+### Two things MAME taught us that FBNeo did not
+
+1. **16 MB of QSound is exactly MAME's ceiling.** `qsound_device` is a
+   `device_rom_interface<24>` — 24 address bits. WIDE v1's 16 MB fits with
+   nothing to spare. Growing QSound further would mean widening a SHARED
+   MAME device, which is outside what Rule 1 v2 permits (it would stop
+   being profile-gated). **WIDE v1's QSound size is therefore a hard
+   ceiling, not a chosen number**, and any future voice-bank pressure has
+   to be solved by exclusivity/banking rather than by growing the region.
+2. **`$400000-$40000F` behaves differently in the two emulators.** FBNeo's
+   `SekMapMemory(CpsRom, 0, nCpsRomLen-1)` read-shadows the CPS2 output
+   registers with ROM (writes still reach the handler); MAME keeps them
+   readable, because its base map re-declares them after the ROM range.
+   This is a genuine divergence and it is unobservable ONLY because the
+   profile reserves that window. **Never allocate there** — the reservation
+   is now load-bearing for dual-emulator agreement, not just tidiness.
+
+### Gates added
+
+| Gate | What it establishes | Result |
+|---|---|---|
+| `tests/test_mame_parity.sh` | the unpatched source build reproduces every frozen oracle log bit-for-bit, and is byte-identical to the reference binary on every other replay, on vsavj **and** vsav2 | **62/62** |
+| `tests/test_replay_video_selfcheck.sh` | replay.lua's new `VIDEO_OUT` framebuffer checksum is live, deterministic, non-perturbing, and detects a known pixel difference **without** crying wolf on a known-identical frame | **4/4** |
+| `tests/test_mame_wide.sh` | the MAME twin of `test_wide_profile.sh`: superset invariant + inertness + the B4 canary, each on work RAM **and** framebuffer | **36/36** |
+| `tests/test_mame_determinism.sh` | bounds the run-to-run divergence rate the whole oracle assumes is zero | 480/480 on the boot probe (see the caveat in STATE 14z-59) |
+
+Independent confirmation that the two descriptors agree: MAME's own
+`-verifyroms vsavjw` reports **"romset vsavjw [vsav] is good"** against the
+romset `tools/build_wide_romset.py` writes for FBNeo. Both emulators are
+demonstrably being fed the same bytes.
+
+**The MAME B4 canary passing is not a repeat of the FBNeo result, it is a
+second opinion on it.** Two unrelated codebases, each with its own loader,
+its own interleave and its own gfx decode, both fetch fifteen characters'
+sprites from address space that did not exist before and render every one
+of twelve legacy replays pixel-identically.
+
+`tests/lua/replay.lua` gained `VIDEO_OUT=<path>`, the MAME twin of
+`FBNEO_HVIDEO`. It had to exist before any MAME WIDE result could be
+believed: the 19-bit tile address is entirely a rendering change, and a
+RAM-only gate reports it green without executing the modified line. This is
+the same blind spot 14z-55 found on the FBNeo side, in the other emulator.
 
 ## Known limits, stated up front
 

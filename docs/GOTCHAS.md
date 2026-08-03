@@ -1094,3 +1094,130 @@ replays. Any "I moved X and nothing changed, therefore X works" test must
 be paired with "I broke X and something changed". The fixed version
 relocated all 20 tables, where the zeros variant does diverge and the
 identical result is real evidence.
+
+## MAME's build system cannot handle a SPACE anywhere in the source path
+(paid: 2026-08-03, B5 — ~30 min)
+This repository lives under `.../Vampire Saved/...`. MAME's GENie build
+dies on that. `scripts/genie.lua:18` carries the escaping line
+**commented out upstream**, and `SOURCES=` builds shell out to
+`makedep.py` with `MAME_DIR` unquoted, so genie reports the useless
+`Error creating projects from specified source files` (the same command
+run by hand works fine — that is the tell).
+
+**A symlink does NOT fix it.** GENie resolves the physical path through
+`getcwd()`, so a space-free symlink into the repo lands right back on the
+space. Verified: `cd $HOME/.cache/.../mame-link && pwd -P` prints the
+space path.
+
+The fix is `tools/setup_mame.sh`: the pinned submodule stays the pristine
+source of truth and never gets built in, and the build runs from an
+rsync'd, space-free mirror under `~/.cache/vampire-saved/`.
+
+## rsync `--exclude 'build/'` also excludes `scripts/build/`
+(paid: same session, ~10 min)
+An unanchored rsync pattern matches a directory of that name at ANY
+depth. Mirroring MAME while trying to skip its output `build/` also
+dropped `scripts/build/`, whose `complay.py` every layout rule depends
+on. Symptom is far from the cause: `make: *** No rule to make target
+'build/generated/mame/layout/18w.lh', needed by 'generate'` — a missing
+RULE, because the pattern rule's `complay.py` prerequisite could not be
+found. Anchor mirror excludes: `--exclude '/build/'`.
+
+## MAME 0.288's OSD is SDL3 and it is found ONLY through pkg-config
+(paid: same session, ~8 min of wasted compile)
+`scripts/src/osd/sdl3.lua` decides between framework and library linkage
+by asking pkg-config. With pkg-config absent it silently picks framework
+linkage, and the build then dies **several minutes in** with
+`fatal error: 'SDL3/SDL.h' file not found`. Having the sdl3 library
+installed is not enough. Prerequisites are `brew install sdl3 pkgconf`,
+and after installing pkgconf the build needs `REGENIE=1` — the detection
+is baked into the generated project files.
+
+## A SOURCES-filtered MAME build silently omits drivers missing from mame.lst
+(noted while porting WIDE to MAME)
+`make SUBTARGET=cps2 SOURCES=src/mame/capcom/cps2.cpp` builds only the
+CPS-2 drivers — minutes instead of hours — but the driver list is
+generated from `src/mame/mame.lst`. A new `GAME(...)` entry that is not
+also added to `mame.lst` compiles fine and is then simply ABSENT from the
+binary, with no warning. Both WIDE gates therefore assert
+`-listfull vsavjw` before trusting anything else. Also note the binary is
+named after the SUBTARGET (`cps2`), not `mamecps2`.
+
+## The MAME replay harness was blind to the video path too — until B5
+The FBNeo lesson (14z-55, `pBurnDraw = NULL`) applies verbatim to MAME:
+`tests/lua/replay.lua` checksummed work RAM only, so any MAME gate was
+structurally blind to rendering — and the CPS-2 WIDE 19-bit tile address
+is *entirely* a rendering change. `VIDEO_OUT=<path>` now writes a
+per-frame framebuffer checksum alongside (never into) the RAM log, and
+`tests/test_replay_video_selfcheck.sh` ground-truths it in both
+directions before any gate trusts it. Measured: 5,520 frames of
+`02_demitri_vs_cpu` produce 3,952 distinct framebuffer checksums, and the
+RAM log stays bit-identical to the frozen expectation with it enabled.
+
+## `git apply` SILENTLY SKIPS the patch when the target is inside another
+## repo's working tree — and exits 0 (paid: 2026-08-03, B5)
+`tools/setup_mame.sh` builds from a mirror under `~/.cache/vampire-saved/`.
+On this machine **`$HOME` is itself a git repository**, so the mirror sits
+at prefix `.cache/vampire-saved/mame/` inside it. `git -C <mirror> apply
+0002-cps2-wide-v1.patch` therefore read the diff's paths
+(`src/mame/capcom/cps2.cpp`) as **$HOME-repo-root-relative**, found them
+outside the current prefix, printed `Skipped patch 'src/...'` — and
+**returned 0**. `git apply --check` "passed" for the same reason.
+
+Result: the script printed "CPS-2 WIDE profile patch applied", MAME built
+cleanly for nine minutes, and produced a completely STOCK binary. Nothing
+in any exit code said otherwise. Only `-listfull vsavjw` caught it.
+
+Rules that follow:
+- Use **`patch -p1 -d <dir>`** for out-of-tree trees. patch(1) has no
+  repository semantics and cannot be confused by an ancestor `.git`.
+- **Never treat an exit code as evidence that a patch landed.** Assert on
+  the RESULT: grep the patched file for a marker, and assert the built
+  ARTIFACT has the feature (`setup_mame.sh` now does both, and also
+  asserts that a `WIDE=0` reference binary does NOT know `vsavjw`).
+- Same family as the FBNeo CRC trap above: the toolchain reported success
+  while silently substituting nothing. Assume this failure mode exists in
+  every "it said OK" step of the build.
+
+## `src/mame/mame.lst` contains no inline comments — do not add the first
+16,000+ entries, and the only `//` lines in the whole file are the two
+license headers. A trailing `// comment` after a driver name may or may
+not survive the list parser; there is no upstream precedent to lean on and
+nothing to gain. Add the bare driver name and document it in
+docs/patch_index.md instead.
+
+## `git submodule add` stages the DEFAULT BRANCH, not the tag you check out
+(paid: 2026-08-03, B5 — invalidated a green 36/36 gate run)
+The sequence
+
+    git submodule add --depth 1 <url> emu/mame
+    git -C emu/mame fetch --depth 1 origin tag mame0288
+    git -C emu/mame checkout mame0288          # working tree only!
+
+leaves the SUPERPROJECT INDEX pointing at the default branch head — the
+`add` staged it before the checkout, and the checkout never re-staged.
+Everything looks right (`git -C emu/mame log -1` shows the tag's commit)
+until something runs `git submodule update`, which dutifully restores the
+INDEXED commit and silently moves the tree back to master.
+
+That is exactly what `tools/setup_mame.sh` does on every invocation. The
+reference binary had been built before the reset (0.288) and the WIDE
+binary after it (**0.289**), so the emulator superset invariant compared
+two different MAME VERSIONS and still reported 36/36. The result was true
+about those two binaries and meaningless as the claim it was making —
+"the patched binary differs from the reference only by the profile patch".
+The drifting-reference trap of 14z-55, in a new costume.
+
+Rules:
+- After checking out a tag in a submodule, **`git add <submodule>`**.
+- Do not rely on the gitlink alone: `setup_mame.sh` now hard-codes the
+  pinned SHA and refuses to build anything else. A build that silently
+  changes the instrument is worse than a build that fails.
+- Annotated tags: `git rev-parse mame0288` returns the TAG OBJECT sha
+  (`2c38dc6e`), not the commit (`27a8d9e8`). Compare with
+  `mame0288^{commit}` or you will "discover" a mismatch that is not one.
+
+Side observation worth keeping: 0.288 and 0.289 produced **bit-identical**
+work RAM and framebuffers across the 12-replay legacy corpus, so CPS-2
+emulation did not change between those releases. Useful to know, and not a
+substitute for pinning.

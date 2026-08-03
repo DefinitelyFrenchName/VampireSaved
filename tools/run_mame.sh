@@ -22,7 +22,12 @@ mkdir -p "$SANDBOX"
 # so a patched-build run is directly comparable to a frozen vanilla run.
 ROMPATH="${MAME_ROMPATH:-$ROMDIR}"
 
-exec mame "$SET" \
+# MAME_BIN selects the emulator binary; defaults to whatever `mame` is on PATH
+# (the Homebrew 0.288 the frozen expectations were created with). B5 points it
+# at the pinned source build (tools/setup_mame.sh) and at the WIDE-patched
+# binary. Nothing else about the invocation changes, so the runs stay
+# comparable to every frozen log.
+exec "${MAME_BIN:-mame}" "$SET" \
     -rompath "$ROMPATH" \
     -video none -sound none -nothrottle -skip_gameinfo \
     -cfg_directory "$SANDBOX/cfg" \

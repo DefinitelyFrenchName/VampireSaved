@@ -1,9 +1,197 @@
 # STATE — living progress log
 
-Updated: 2026-08-03 (session 14z-58 — **B4 COMPLETE, BOTH HALVES**: gfx
-renders pixel-perfect from the appended 19-bit banks (9/9) and the 68k
-reads relocated data from CPU $400000+ — each with a negative control.
-CPS-2 WIDE v1 is DEMONSTRATED, not merely declared)
+Updated: 2026-08-03 (session 14z-59 — **B5: MAME pinned, built from source,
+parity PROVEN, and the WIDE profile ported to it**. Plus an unplanned
+finding that matters more than the port: MAME is not perfectly
+deterministic run-to-run, and the whole oracle assumed it was)
+
+## Session 14z-59 (B5 — MAME parity + the profile ported; and the determinism finding)
+
+**B5 IS COMPLETE AND GREEN:** parity **62/62**, MAME WIDE gate **36/36**
+(superset invariant + inertness + B4 canary, work RAM AND framebuffer over
+the 12-replay legacy corpus), VIDEO_OUT self-check **4/4**. MAME's own
+`-verifyroms vsavjw` reports the romset good, so both emulators are
+provably fed identical bytes. **The B4 canary passing on MAME is a SECOND
+OPINION, not a repeat**: two unrelated codebases, each with its own
+loader, interleave and gfx decode, both serve fifteen characters' sprites
+from the appended 19-bit banks with every legacy replay pixel-identical.
+
+### What B5 delivered
+
+- **MAME 0.288 pinned**: submodule `emu/mame`, tag `mame0288`, commit
+  `27a8d9e8`. `tools/setup_mame.sh` builds it; `tools/run_mame.sh` gained
+  `MAME_BIN` (default `mame`, so every existing gate is untouched).
+- **Parity proven BEFORE the patch** (`tests/test_mame_parity.sh`): the
+  UNPATCHED source build reproduces all 24 frozen vsavj oracle logs
+  bit-for-bit AND is byte-identical to the Homebrew reference on the other
+  38 replays, on vsavj and vsav2 alike — 62/62. The gate refuses to run
+  against a binary that knows `vsavjw`, because calling that "parity"
+  would be a lie. Swapping the binary changes the INSTRUMENT; if the
+  instrument moved, every MAME finding since session 1 would be in
+  question.
+- **The profile ported**: `emu/mame-patches/0002-cps2-wide-v1.patch`,
+  **164 lines added, exactly ONE removed** — the sprite tile-code
+  composition, gated on a `m_cps2_wide` driver member. Everything else is
+  additive (two widened maps, a `cps2wide` machine config, the `vsavjw`
+  descriptor, one `GAME()` row, one `mame.lst` row). Verified to apply
+  cleanly to the pristine pinned tree.
+- **`VIDEO_OUT`** added to `tests/lua/replay.lua` — the MAME twin of
+  `FBNEO_HVIDEO`. MAME's harness had the SAME video blind spot 14z-55
+  found in FBNeo's, and the WIDE change is entirely a rendering change, so
+  a RAM-only MAME gate would have reported it green without executing the
+  modified line. Ground-truthed both ways by
+  `tests/test_replay_video_selfcheck.sh` against the known donovan6
+  medallion diff (frame 650 must MATCH, frames 950/1250 must DIFFER).
+  Measured: 3,952 distinct framebuffer checksums over 5,520 frames, and
+  the RAM log stays bit-identical to the frozen expectation with it on.
+
+### Two MAME-only facts that CONSTRAIN the profile
+
+1. **16 MB of QSound is MAME's hard ceiling.** `qsound_device` is a
+   `device_rom_interface<24>` — 24 address bits. WIDE v1's 16 MB fits with
+   nothing to spare. Growing QSound further would mean widening a SHARED
+   MAME device, which stops being profile-gated and falls outside Rule 1
+   v2. **The v1 QSound size is therefore a ceiling, not a chosen number** —
+   future voice-bank pressure has to be solved by exclusivity/banking.
+2. **`$400000-$40000F` reads differ between the emulators.** FBNeo's
+   `SekMapMemory(CpsRom, 0, nCpsRomLen-1)` read-shadows the CPS2 output
+   registers with ROM; MAME's base map re-declares them after the ROM
+   range, so they stay readable. A genuine divergence, unobservable ONLY
+   because the profile reserves that window — the reservation is now
+   load-bearing for dual-emulator agreement, not tidiness.
+
+### THE FINDING: MAME is not perfectly deterministic run-to-run
+
+The first full parity execution produced **two divergences in 126 runs**,
+and neither is a source-vs-Homebrew difference:
+
+| Replay | Set | Window | Comparison |
+|---|---|---|---|
+| `08_challenger_join` | vsavj | frames 190-205 | source vs source (same binary!) |
+| `41_don_altcolor_vsav2` | vsav2 | frames 218-245 | reference vs source |
+
+Both sit in the **boot window**, both **re-converge**, and both refuse to
+reproduce on demand: `08` is 48/48 identical on re-runs, `41` is 12/12
+identical across six runs of EACH binary. The immediate re-run of the
+whole gate came back **62/62 clean**. So the phenomenon is real, rare, and
+belongs to the emulator/harness — not to the WIDE work and not to the
+source build.
+
+This matters beyond B5: **every frozen MAME expectation this project owns
+assumes run-to-run determinism**, and `run_suite.sh`'s twice-run check has
+been green for many sessions, which is hard to square with two failures in
+one 126-run execution. Either something changed, or the rate is low and
+two landed together.
+
+**What the follow-up measurements say (all run this session):**
+
+| Regime | Runs | Divergences |
+|---|---|---|
+| parity gate, execution 1 (full-length replays) | 126 | **2** |
+| parity gate, execution 2 (identical, clean machine) | 126 | 0 |
+| targeted repeats of `08` and `41` (full-length, both binaries) | 60 | 0 |
+| boot probe, 4 combos (src/ref x vsavj/vsav2), 120 each | 480 | 0 |
+
+Point estimate from full-length replays: **2 in 312 ≈ 0.6%/run**. The
+480-run boot-probe sweep is clean, but it does **not** refute that: the
+probe is 520 frames against replays of 3,000-12,000, and if it covered the
+same trigger, 0-in-480 at 1.6%/run would be a ~0.04% coincidence. The
+honest reading is that **the probe probably does not cover the trigger**,
+and the boot window is where the divergence SURFACED, not necessarily
+where it originates. Getting real statistical power needs ~300 full-length
+runs of one replay (~1.5 h); `PROBE=<rpl>` on the determinism gate does
+exactly that and is the recommended next measurement.
+
+Instruments built to settle it rather than argue about it:
+- `tools/analyze_divergence.py` — classifies a divergent pair as
+  **PHASE SHIFT k** (timing: B[n] == A[n-k], nothing computed a different
+  value), **TRANSIENT** (real state differed, then was overwritten) or
+  **PERMANENT**. Its verdict logic is itself validated against a synthetic
+  phase shift and an identical pair before use (CLAUDE.md §4).
+- Both new gates now **preserve divergent logs** to `build/gate_failures/`.
+  Deleting the evidence in an EXIT trap is what made both of today's
+  occurrences unanalysable; that cost is not paid twice.
+- `tests/probes/boot_probe.rpl` (400 frames, ~2s) + a new
+  `tests/test_mame_determinism.sh` measure the RATE at volume, since the
+  boot window is where both anomalies appeared. `tests/probes/` exists
+  because `run_suite.sh` demands a frozen expectation for every
+  `tests/replays/*.rpl`, and a diagnostic probe must not force an
+  expectation row into all four expectation sets.
+
+### The trap that nearly shipped a false green
+
+The first WIDE build succeeded, ran nine minutes, printed "CPS-2 WIDE
+profile patch applied" — and produced a **completely STOCK binary**.
+`$HOME` on this machine is itself a git repository, so the build mirror at
+`~/.cache/vampire-saved/mame` sits inside its working tree; `git -C
+<mirror> apply` therefore read the diff's paths as $HOME-repo-root-
+relative, found them outside the current prefix, printed `Skipped patch
+'src/...'` and **exited 0**. `git apply --check` "passed" for the same
+reason. Nothing in any exit code disagreed.
+
+The only thing that caught it was the `-listfull vsavjw` assertion, which
+existed only because the mame.lst gotcha had already been written up.
+Fixed three ways: `patch -p1 -d` instead of `git apply` (no repository
+semantics), a post-apply grep asserting both files carry the change, and
+an end-to-end assertion that the BUILT BINARY knows `vsavjw` — plus the
+inverse for `WIDE=0`, so a reference binary that accidentally carries the
+profile also fails loudly. Same family as the FBNeo CRC trap: **the
+toolchain reports success while silently substituting nothing.** Treat
+"it said OK" as unverified in every build step.
+
+### The SECOND false green, caught the same way
+
+The first WIDE gate run came back 36/36 — and was **invalid**. The WIDE
+binary was MAME **0.289**, the reference **0.288**, so the emulator
+superset invariant compared two MAME VERSIONS rather than measuring the
+patch. Cause: `git submodule add` stages the DEFAULT BRANCH head, and the
+subsequent `git -C emu/mame checkout mame0288` touched only the working
+tree — never re-staged. `setup_mame.sh` runs `git submodule update` every
+invocation, which faithfully restored the indexed commit (master) and
+silently moved the tree to 0.289. The reference had been built before that
+reset, the WIDE binary after it. **The drifting-reference trap of 14z-55,
+in a new costume: the comparison passes and stops meaning anything.**
+
+Fixed and re-run VALID at **36/36**, both binaries reporting 0.288 and the
+two build mirrors differing in exactly the two files the patch touches:
+- submodule staged at `27a8d9e8` (annotated-tag note: `git rev-parse
+  mame0288` gives the TAG OBJECT `2c38dc6e`, not the commit);
+- `setup_mame.sh` hard-codes the pinned SHA and **refuses to build any
+  other revision** — a build that silently changes the instrument is worse
+  than one that fails;
+- `test_mame_wide.sh` now asserts the two binaries report the SAME version
+  before comparing them.
+
+Banked observation: 0.288 and 0.289 are **bit-identical** on work RAM and
+framebuffer across the 12-replay corpus, so CPS-2 emulation did not change
+between those releases. Useful, and not a substitute for pinning.
+
+### A useful side effect: replay.lua's change is proven non-perturbing
+
+`VIDEO_OUT` was added to `tests/lua/replay.lua` BEFORE the second parity
+execution, which then reproduced all 24 frozen vsavj oracle logs
+bit-for-bit and matched the reference binary on 38 more. So the harness
+edit is not merely believed harmless when disabled — it is measured
+harmless across the entire frozen corpus.
+
+### Build traps paid for (all in GOTCHAS)
+
+- **MAME's GENie cannot handle a space in the source path**, and this repo
+  has one. `scripts/genie.lua:18` has the escaping line commented out
+  upstream, and `SOURCES=` builds shell out to `makedep.py` with
+  `MAME_DIR` unquoted. **Symlinks do not help** — `getcwd()` resolves
+  through them. Hence the rsync'd space-free mirror under
+  `~/.cache/vampire-saved/`, with the submodule kept pristine.
+- rsync `--exclude 'build/'` is unanchored and also drops `scripts/build/`,
+  whose `complay.py` every layout rule needs — surfacing as a baffling
+  "No rule to make target ...18w.lh".
+- MAME 0.288's OSD is **SDL3, found only through pkg-config**; without it
+  the build silently picks framework linkage and dies minutes in on
+  `'SDL3/SDL.h' file not found`. Prereqs: `brew install sdl3 pkgconf`,
+  then `REGENIE=1`.
+- A `SOURCES=`-filtered build **silently omits any driver missing from
+  `src/mame/mame.lst`**; both WIDE gates assert `-listfull vsavjw` first.
+  The binary is named `cps2`, not `mamecps2`.
 
 ## Session 14z-49 (rounds 61-62: HUD MUGSHOT + NAME + SELECT MEDALLION — the whole per-slot venue-asset family fixed)
 
@@ -3929,6 +4117,36 @@ window per measured slot, never pre-widen.
 
 ## Decisions pending (human)
 
+- **THE ORACLE ASSUMES PERFECT RUN-TO-RUN DETERMINISM, AND WE NOW HAVE
+  COUNTEREXAMPLES (14z-59, B5).** Two divergences in one 126-run gate
+  execution (`08_challenger_join` src-vs-src, `41_don_altcolor_vsav2`
+  ref-vs-src), both in the boot window, both re-converging, neither
+  reproducible in 666 subsequent runs. Not a source-vs-Homebrew
+  difference — both binaries reproduce both replays identically on
+  re-run. Point estimate ~0.6%/run on full-length replays.
+  **Why this needs the maintainer and not me:** every MAME gate the
+  project owns is a run-to-run comparison, so a non-zero rate is a
+  FALSE-FAILURE rate on all of them, and CLAUDE.md §4 (the comparison
+  classes and their approval rules) is maintainer-governed territory —
+  the flicker-tolerance precedent was explicitly maintainer-approved,
+  and the standing watch says "if divergences turn systematic, stop and
+  root-cause". Options: **A)** measure first, decide after — run
+  `PROBE=tests/replays/08_challenger_join.rpl RUNS=300
+  tests/test_mame_determinism.sh` (~1.5 h, background) to get real power
+  on the rate before changing any policy; **B)** keep every gate strict
+  and treat any divergence as a hard failure requiring root-cause (the
+  current behaviour — correct, but if the rate is real it will
+  intermittently red the battery for reasons unrelated to the change
+  under test); **C)** define a new §4 comparison class for
+  "unreproducible single-run transient" with a mandatory automatic
+  re-run and a frozen occurrence log — this is the tolerance-shaped
+  option and the one most at risk of hiding a real bug, so it should not
+  be adopted without A first. **RECOMMENDATION: A, then B until the
+  measurement says otherwise.** Nothing in the WIDE work depends on this
+  resolving; parity re-ran 62/62 green and the gates are strict today.
+  Artifacts + classification (`tools/analyze_divergence.py`, PHASE
+  SHIFT / TRANSIENT / PERMANENT) are wired into both new gates so the
+  next occurrence is diagnosable instead of merely annoying.
 - **M5 SOUND NEEDS A DATA HOME (14z-52, blocks the rest of M5):** both
   code holes are exhausted (hole a full; hole b < 0x160 free), so
   Donovan's 0x160-byte sound record array — the thing standing between

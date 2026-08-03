@@ -12,6 +12,16 @@
 --                     at end of frame N, dump the RAM range to
 --                     <dir of CHECKSUM_OUT>/dump_<frame>_<start>.bin
 --                     (differential RE experiments)
+--   env VIDEO_OUT     optional path: per-frame FRAMEBUFFER checksum log, the
+--                     MAME twin of FBNeo's FBNEO_HVIDEO. Opt-in and written
+--                     to a SEPARATE file, so every frozen RAM expectation is
+--                     untouched. Exists because a RAM-only gate is
+--                     structurally blind to the entire video path — the
+--                     CPS-2 WIDE 19-bit tile address is a rendering change
+--                     and produces byte-identical RAM logs whether it works
+--                     or draws garbage (session 14z-55 paid for this on the
+--                     FBNeo side). Ground-truth it before trusting a null:
+--                     tests/test_replay_video_selfcheck.sh
 --   env MASK_RANGES   optional "7f00-7ff0" (offsets from $FF0000, end
 --                     exclusive): exclude window(s) from the checksum.
 --                     Unset = canonical whole-work-RAM checksum (matches
@@ -187,6 +197,15 @@ local function fnv1a64(s)
     return h
 end
 
+-- VIDEO_OUT: per-frame framebuffer checksum, written alongside (never into)
+-- the RAM log. Same FNV-1a64 and same "<frame> <hash>" line format.
+local video_out = os.getenv("VIDEO_OUT")
+local vf, video_screen
+if video_out then
+    vf = assert(io.open(video_out, "wb"))
+    video_screen = assert(manager.machine.screens[":screen"], "no :screen device")
+end
+
 -- every field we might touch, for release bookkeeping
 local all_fields = {}
 for _, group in pairs(FIELDS) do
@@ -208,6 +227,9 @@ emu.register_frame_done(function()
 
     -- checksum first: state at END of frame N
     f:write(string.format("%d %016x\n", frame, fnv1a64(read_workram_masked())))
+    if vf then
+        vf:write(string.format("%d %016x\n", frame, fnv1a64(video_screen:pixels())))
+    end
     if snap_at[frame] then manager.machine.video:snapshot() end
     for _, range in ipairs(dump_at[frame] or {}) do
         local df = assert(io.open(string.format("%s/dump_%d_%06x.bin", out_dir, frame, range[1]), "wb"))
@@ -229,6 +251,7 @@ emu.register_frame_done(function()
     if frame >= total_frames then
         f:write(string.format("END %d\n", frame))
         f:close()
+        if vf then vf:write(string.format("END %d\n", frame)); vf:close() end
         manager.machine:exit()
     end
 end)

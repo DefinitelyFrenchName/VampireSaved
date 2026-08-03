@@ -58,6 +58,59 @@ FILE byte order (`words_to_file_bytes(words_from_logical_bytes(...))`),
 the member's REAL CRC in the descriptor, and `$400000-$40000F` reserved
 (CpsFrg registers, now read-shadowed by ROM).
 
+## MAME from source (B5, 2026-08-03) — the oracle now follows the profile
+
+MAME is pinned as a submodule: `emu/mame`, tag **mame0288**, commit
+`27a8d9e8`. A Homebrew binary cannot follow a descriptor change, so the
+WIDE profile needs a source build.
+
+Status: parity **62/62**, MAME WIDE gate **36/36** (superset invariant +
+inertness + B4 canary, work RAM AND framebuffer). `-verifyroms vsavjw`
+reports the romset good, so both emulators load byte-identical members.
+
+```sh
+WIDE=0 tools/setup_mame.sh     # reference binary -> ~/.cache/vampire-saved/mame-ref/cps2
+tools/setup_mame.sh            # WIDE binary      -> ~/.cache/vampire-saved/mame/cps2
+ROMDIR=... tests/test_mame_parity.sh          # RUN THIS FIRST (see below)
+ROMDIR=... tests/test_mame_wide.sh            # superset invariant + inertness + B4 canary
+```
+
+**Order is not optional.** `test_mame_parity.sh` proves the UNPATCHED
+source build reproduces every frozen oracle log bit-for-bit before the
+profile patch is allowed near it — swapping the binary changes the
+INSTRUMENT, and an instrument that moved invalidates every MAME finding
+since session 1. The gate refuses to run against a binary that knows
+`vsavjw`.
+
+Three things about the build that will bite otherwise (all in GOTCHAS):
+- it builds from an **rsync'd mirror under `~/.cache/vampire-saved/`**
+  because MAME's GENie cannot handle the **space** in this repo's path,
+  and a symlink does not help (`getcwd()` resolves through it);
+- prerequisites are `brew install sdl3 pkgconf` — MAME 0.288's OSD is SDL3
+  and it is found ONLY via pkg-config, otherwise the build dies minutes in;
+- it is a `SOURCES=`-filtered CPS-2-only build (minutes, not hours), the
+  binary is named `cps2`, and **a driver missing from `src/mame/mame.lst`
+  is silently absent from it**.
+
+Patch: `emu/mame-patches/0002-cps2-wide-v1.patch` — 164 lines added, exactly
+**one** line removed (the sprite tile-code composition). Everything else is
+additive. Keep it member-for-member identical to the FBNeo descriptor: one
+romset zip feeds both emulators.
+
+Two MAME-only facts that constrain the profile:
+- **16 MB QSound is MAME's ceiling** — `qsound_device` is a
+  `device_rom_interface<24>`. WIDE v1 fits exactly; growing further would
+  mean widening a SHARED device, which is outside Rule 1 v2.
+- **`$400000-$40000F` reads differ between the emulators** (FBNeo
+  ROM-shadows the CPS2 output registers, MAME keeps them readable). Only the
+  profile's reservation makes that unobservable — never allocate there.
+
+`tests/lua/replay.lua` gained **`VIDEO_OUT=<path>`**, the MAME twin of
+`FBNEO_HVIDEO` (per-frame framebuffer checksum, opt-in, written to a
+separate file so no frozen RAM expectation moves). MAME's harness had the
+same video blind spot FBNeo did, and the WIDE change is entirely a
+rendering change. Ground truth: `tests/test_replay_video_selfcheck.sh`.
+
 ## How to build
 
 ```sh
@@ -102,6 +155,15 @@ tests/audit_wide_phase_a.sh           # WIDE Phase A measurements (rerunnable; g
                                       # truths its own instrument before trusting nulls)
 tests/test_wide_profile.sh            # WIDE profile gate: emulator superset invariant
                                       # + inertness + the B4 canary (needs FBNEO_REF)
+tests/test_mame_parity.sh             # B5 PREREQUISITE: the pinned MAME source build
+                                      # reproduces every frozen oracle log bit-for-bit
+                                      # (refuses to run on a WIDE-patched binary)
+tests/test_mame_wide.sh               # the MAME twin of test_wide_profile.sh
+tests/test_replay_video_selfcheck.sh  # ground truth for replay.lua VIDEO_OUT (the MAME
+                                      # framebuffer checksum) — both directions
+tests/test_mame_determinism.sh        # RUNS=n boot-probe repetitions; measures the
+                                      # run-to-run divergence rate the whole oracle
+                                      # assumes is zero (see STATE 14z-59)
 tests/audit_mask_window_ff4182.sh     # on-demand: proves the masked palette-staging
                                       # window hides the designed diff and nothing else
 ```
