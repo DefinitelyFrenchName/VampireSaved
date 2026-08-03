@@ -1,44 +1,34 @@
-# NEXT SESSION — orientation (session 14z-57, 2026-08-03)
+# NEXT SESSION — orientation (session 14z-58, 2026-08-03)
 
-Read STATE.md sessions 14z-53..57 (the CPS-2 WIDE pivot, Phase A,
-Phase B0-B3, and the two B4 canary attempts) and
+Read STATE.md sessions 14z-53..58 (the CPS-2 WIDE pivot, Phase A,
+Phase B0-B4) and
 docs/cps2_wide.md after this. The approved architecture plan is archived
 at ~/.claude/plans/glowing-bouncing-iverson.md.
 The maintainer tests frequently and reports precisely — their reports are
 the project's best instrument; reference data they provide goes straight
 into gates.
 
-## Ship state — WIDE v1 fully declared and proven INERT; not yet proven USABLE
+## Ship state — CPS-2 WIDE v1 is DEMONSTRATED (B0-B4 all pass)
 
 Frozen reference: `b91647c7` = **donovan-m2c** (stock-size, untouched by
-any WIDE work). Donovan content dev head: `ae701ffb`.
+the WIDE work). Donovan content dev head: `ae701ffb`.
 
-**CPS-2 WIDE v1 is declared in full and inert**: PRG 6 MB / GFX 48 MB /
-QSound 16 MB. B0-B3 all pass 24/24 (work RAM AND framebuffer) on both
-invariants. Total emulator cost: **one widened condition** in
-`cps_obj.cpp` plus the `Cps2Wide` flag lifecycle — everything else is
-descriptor table data.
+**The extended profile works.** PRG 6 MB / GFX 48 MB / QSound 16 MB, for
+a total emulator cost of ONE widened condition in `cps_obj.cpp` plus the
+`Cps2Wide` flag lifecycle. Proven, each with a negative control:
 
-**Every grown region is still ZERO-FILLED and the space is declared, not
-demonstrated.** B4 attempt 1 was an invalid canary (see below); the
-redesigned one is the immediate next task. Do not author content into the
-extension until it passes.
+- **B0-B3 inert** — 24/24 bit-identical (work RAM AND framebuffer) on
+  both the emulator superset invariant and profile inertness.
+- **B4 gfx USABLE** — 9/9 replays render pixel-perfect with 15
+  characters' sprites fetched from the appended 19-bit banks.
+- **B4 prg USABLE** — all 20 per-char sound tables relocated to
+  `CPU:$400000+` and genuinely read (the zeros control diverges).
 
-Run the gate:
-```
-WIDE=0 tools/setup_fbneo.sh          # once: harness-only REFERENCE binary
-cp emu/fbneo/fbneo /somewhere/fbneo_ref
-tools/setup_fbneo.sh                 # the WIDE binary
-python3 tools/build_wide_romset.py "$ROMDIR" build/wide0/rompath \
-        --qsound 2 --gfx 4 --prg 4
-ROMDIR=... FBNEO_REF=/somewhere/fbneo_ref tests/test_wide_profile.sh
-```
-The reference MUST come from the same tree state with only patch 0002
-reverted — a drifting reference produces noise that looks like findings.
-
-FBNeo carries two patches with deliberately separate trust surfaces:
-`0001` (frontend harness, now incl. framebuffer capture) and `0002` (the
-WIDE driver + the one gated core line).
+Gate (36 checks): `ROMDIR=... FBNEO_REF=<harness-only binary>
+tests/test_wide_profile.sh` — section 3 is the standing B4 canary.
+Build the romset with `tools/build_wide_romset.py ... --gfx-copy-group-b`
+(it prints the descriptor rows, CRCs included — **paste them in, a CRC
+mismatch silently loads 0xFF**).
 
 ## What 14z-52 did (read STATE 14z-52 for the full measurement)
 
@@ -71,52 +61,28 @@ WIDE driver + the one gated core line).
   cursor ring + color-render the art, never trust index==char-id)
   and the replay.lua DUMPS separator (';' — commas rc=3 silently).
 
-## Queued next — B4 is ONE MEASUREMENT from its answer
+## Queued next — B5/B5b, then Phase C
 
-State: the canary is now a clean single-variable experiment and it FAILS
-in an informative way. Everything except one link in the chain is proven.
+1. **B5 — MAME parity.** Pin MAME 0.288 as a submodule, add
+   `tools/setup_mame.sh`, and require the source build to reproduce the
+   existing frozen oracle results bit-for-bit BEFORE any profile patch.
+   Then port the WIDE descriptor + the one gated line.
+2. **B5b — suite preservation** (gates any FBNeo-only decision). Already
+   part-delivered: FBNeo now has framebuffer capture AND a gfx-buffer
+   dump (`FBNEO_HGFX`). Remaining instrument gaps: write taps with PC
+   attribution, probe breakpoints with register capture, frame-scheduled
+   pokes, and OBJ/palette RAM dumps.
+3. **Phase C — multi-tenant pipeline.** Start with the address-space
+   model (declarative region list + placement classes in
+   `gen_donovan_patch.py`), which also unblocks the stuck 352-byte sound
+   table. Then per-tenant manifests, slot parameterisation, gfx band
+   planning, and moving Donovan off Jedah's slot.
 
-**Proven (don't re-derive):**
-- Regions are genuinely real — FBNeo's own load report says
-  `68K 0x00600000`, `Graphics 0x03000000`, `QSound 0x01000000`.
-- All 12 gfx members load OK, group C included.
-- The 19-bit address path is CORRECT: `y=0xb065` -> `n=0x0536CA` ->
-  byte `0x29B6500`, i.e. bank 5 at the same offset within group C
-  (`0x9B6500`) that the source tile has within group B. Guard passes.
-- Group C's content is NOT what gets fetched (zero-filled vs
-  copy-of-group-B render identically).
-
-**So the bug is in where the loader PUT the bytes.** Do this:
-
-1. Add a gfx-buffer dump to the harness (`CpsGfx` + offset + length ->
-   file). Small, and it is on the B5b instrument list anyway.
-2. Dump 128 bytes at `0x29B6500` and at `0x19B6500` on the canary build.
-   Equal -> the address path and placement are both fine and the fault is
-   further down (palette/decode); different -> **load-map bug**, fix in
-   `Cps2LoadTiles` / `Cps2LoadOne` / the `CpsGfxLoad` advancement for a
-   third group.
-3. Re-run the canary; pixel-identical is the pass condition.
-
-Reproduce the canary:
-```
-python3 tools/build_wide_romset.py "$ROMDIR" build/wide0/rompath \
-        --qsound 2 --gfx 4 --prg 4 --gfx-copy-group-b
-CPS2_WIDE_CANARY=1 FBNEO_HVIDEO=/tmp/can.vid ROMDIR=... \
-  FBNEO_ROMPATH=$PWD/build/wide0/rompath \
-  tools/run_replay_fbneo.sh vsavjw tests/replays/02_demitri_vs_cpu.rpl /tmp/can.log /tmp/sb
-# compare /tmp/can.vid against the same replay on stock vsavj
-```
-Emulator output (region sizes, per-member load lines, any printf) goes to
-`<sandbox>/fbneo_replay.log`, NOT the terminal. And no `FBNEO_HVIDEO`
-means the sprite path never executes.
-
-**Do not author content into the extension until B4 passes.** PRG 6MB /
-GFX 48MB / QSound 16MB are declared and inert (B0-B3, 24/24 each, gate
-re-run green with the canary off) but the gfx half is not yet usable.
-The PRG half of B4 is independent and can proceed in parallel: copy a
-data block into the extension, repoint ONE pointer (candidate: a per-char
-sound record array via `PRG:0xBF41A`, ~400 reads/match), require
-bit-identical RAM.
+**Content may now be authored into the extension** — that was the gate
+B4 existed to open. Extension authoring rules: raw (no encryption above
+`PRG:0x0FFFFF`), FILE byte order
+(`words_to_file_bytes(words_from_logical_bytes(...))`), real CRC in the
+descriptor, and `$400000-$40000F` reserved (CpsFrg, read-shadowed).
 
 ## Measurement kit (14z-49 additions)
 
