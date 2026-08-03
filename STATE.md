@@ -4425,13 +4425,6 @@ window per measured slot, never pre-widen.
   and inert, no new territory), then A with an audit when M3 forces the
   bigger question. Either way this is a placement policy call, not a
   code change I should make unilaterally.
-- **M5 VOICE SAMPLES (14z-51, unchanged):** even with the table placed,
-  39 of Donovan's 47 sounds stay silent because vsav's sample ROMs have
-  no room and no matching content (his voice bank). Options: A) ship
-  voiceless (all shared sfx work); B) grow the QSound sample region via
-  descriptor; C) overwrite low-value vsav samples. Recommendation: A
-  now, revisit B at M3.
-
 - **M5 VOICE SAMPLES (14z-51):** 6-8 of Donovan's sounds (his voice
   lines / vs2-new sfx: ids 0x71D/0x73E/0x753-0x756, likely the "Change
   Immortal" family) do not exist in vsav's sample ROMs, which are
@@ -4444,6 +4437,15 @@ window per measured slot, never pre-widen.
   current "silent by design" behavior for exactly the sounds that
   cannot be faithful), revisit B at M3 when Huitzil/Pyron force the
   same question at scale.
+  **UPDATED 14z-59f — option B now has a measured hard ceiling.** CPS-2
+  WIDE v1 already declares QSound at **16 MB, which is MAME's maximum**
+  (`qsound_device` is a `device_rom_interface<24>`, 24 address bits). So
+  B is available and proven on both emulators up to 16 MB and NOT ONE
+  BYTE further: growing past it would mean widening a SHARED MAME device,
+  which is outside Rule 1 v2. If Donovan + Huitzil + Pyron voice banks do
+  not fit in the 8 MB the profile adds, the answer has to be exclusivity
+  or banking, not more region. Worth sizing that before committing to B
+  at M3. (Two duplicate copies of this entry were merged here.)
 
 - **ROSTER ACCESS MECHANISM (M4-defining, raised by maintainer
   2026-07-28):** how players select the 18 characters. Option A: full
