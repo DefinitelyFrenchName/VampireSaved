@@ -38,25 +38,36 @@ repo's path (GOTCHAS).
 
 ## READ THIS BEFORE TRUSTING ANY MAME GATE
 
-**MAME is not provably deterministic run-to-run.** Two divergences appeared
-in one 126-run parity execution (`08_challenger_join`, `41_don_altcolor_vsav2`),
-both in the boot window, both re-converging, neither reproducible in 666
-subsequent runs, and neither a source-vs-Homebrew difference. Point
-estimate ~0.6%/run on full-length replays.
+**Two run-to-run divergences were observed, and the cause is still
+UNKNOWN.** `08_challenger_join` and `41_don_altcolor_vsav2`, both in the
+boot window, both re-converging, neither a source-vs-Homebrew difference.
 
-This is in **STATE.md "Decisions pending"** and needs the maintainer,
-because §4's comparison classes are their call and a non-zero rate is a
-false-failure rate on every MAME gate we own. Gates are STRICT today —
-any divergence fails. Recommended next measurement (~1.5 h, background):
+**Policy RATIFIED by the maintainer 2026-08-03: "A, then B".** A (measure
+first) is DONE; B (**every MAME gate stays strict**) is in force. Option C
+(a tolerance class for unreproducible transients) is **not adopted and may
+not be re-proposed** — A found no rate, so nothing justifies loosening.
+CLAUDE.md §4 is unchanged; no comparison class was added or weakened.
 
-```sh
-PROBE=tests/replays/08_challenger_join.rpl RUNS=300 \
-  ROMDIR=... MAME_BIN=~/.cache/vampire-saved/mame-ref/cps2 \
-  tests/test_mame_determinism.sh
-```
-If it recurs, `tools/analyze_divergence.py` classifies the preserved pair
-(PHASE SHIFT k = timing / TRANSIENT / PERMANENT) and both gates now keep
-their artifacts under `build/gate_failures/`.
+What the measurement established (STATE 14z-59 has the tables):
+- ~2,400 clean runs across four regimes since.
+- **Flat per-run boot-window rate: RULED OUT** (1-in-8,300). The
+  520-frame `tests/probes/boot_probe.rpl` is bit-identical to `08` for
+  frames 1-299 — verified, not assumed — so it genuinely covers the window
+  both events began in, and 2,080 clean probe runs contradict the rate.
+- **Machine load: RULED OUT** (600 runs at parallelism 6).
+- **Both events fall in ONE parity execution**; three further full gate
+  executions are clean. Reads as a transient local to that ~35-minute
+  window. What that condition was is NOT established.
+
+**If it recurs, the first question is what else was running on the
+machine** — that is the surviving hypothesis and nothing in the harness
+records it. `tools/analyze_divergence.py` (ground-truthed) classifies the
+preserved pair as PHASE SHIFT k / TRANSIENT / PERMANENT, and both gates
+keep artifacts under `build/gate_failures/` (which IS tracked in git —
+failure logs are evidence, do not gitignore it).
+
+Rerunnable: `RUNS=`, `JOBS=`, `PROBE=`, `SET=` on
+`tests/test_mame_determinism.sh`.
 
 ## Two MAME facts that CONSTRAIN the profile
 

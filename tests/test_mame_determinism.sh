@@ -47,32 +47,49 @@ echo "binary : $BIN"
 echo "         sha1 $(shasum "$BIN" | cut -d' ' -f1)"
 echo "set    : $SET   runs: $RUNS   probe: $(basename "$PROBE")"
 
+# JOBS>1 runs the repetitions concurrently. Both regimes matter and they
+# test different hypotheses: SEQUENTIAL reproduces the regime the observed
+# divergences appeared in, PARALLEL stresses the machine, which is the
+# obvious suspect if the cause is anything environmental rather than
+# intra-process. Report them separately; do not average them together.
+JOBS="${JOBS:-1}"
+echo "jobs   : $JOBS ($([ "$JOBS" = 1 ] && echo sequential || echo parallel))"
+
 bad=0
 ref=""
-for i in $(seq 1 "$RUNS"); do
-    if ! MAME_BIN="$BIN" tools/run_replay_mame.sh "$SET" "$PROBE" \
-            "$WORK/r$i.log" "$WORK/sb$i" >/dev/null 2>&1; then
-        echo "  run $i: RUN-FAIL"
-        bad=$((bad + 1))
-        continue
-    fi
-    if [ -z "$ref" ]; then
-        ref="$WORK/r$i.log"
-        echo "  run $i: reference $(shasum "$ref" | cut -d' ' -f1)"
-        continue
-    fi
-    if ! cmp -s "$ref" "$WORK/r$i.log"; then
-        echo "  run $i: DIVERGED from run 1"
-        mkdir -p "$ARTIFACTS"
-        cp "$ref" "$ARTIFACTS/run1.log"
-        cp "$WORK/r$i.log" "$ARTIFACTS/run$i.log"
-        python3 tools/analyze_divergence.py "$ref" "$WORK/r$i.log" \
-            | sed 's/^/    /' | tee "$ARTIFACTS/run$i.verdict"
-        bad=$((bad + 1))
-    else
-        rm -f "$WORK/r$i.log"
-    fi
-    rm -rf "$WORK/sb$i"
+i=0
+while [ "$i" -lt "$RUNS" ]; do
+    batch=0
+    first=$((i + 1))
+    while [ "$batch" -lt "$JOBS" ] && [ "$i" -lt "$RUNS" ]; do
+        i=$((i + 1))
+        batch=$((batch + 1))
+        ( MAME_BIN="$BIN" tools/run_replay_mame.sh "$SET" "$PROBE" \
+              "$WORK/r$i.log" "$WORK/sb$i" >/dev/null 2>&1 ) &
+    done
+    wait
+    n="$first"
+    while [ "$n" -le "$i" ]; do
+        if [ ! -s "$WORK/r$n.log" ]; then
+            echo "  run $n: RUN-FAIL"
+            bad=$((bad + 1))
+        elif [ -z "$ref" ]; then
+            ref="$WORK/ref.log"
+            cp "$WORK/r$n.log" "$ref"
+            echo "  run $n: reference $(shasum "$ref" | cut -d' ' -f1)"
+        elif ! cmp -s "$ref" "$WORK/r$n.log"; then
+            echo "  run $n: DIVERGED from the reference run"
+            mkdir -p "$ARTIFACTS"
+            cp "$ref" "$ARTIFACTS/ref.log"
+            cp "$WORK/r$n.log" "$ARTIFACTS/run$n.log"
+            python3 tools/analyze_divergence.py "$ref" "$WORK/r$n.log" \
+                | sed 's/^/    /' | tee "$ARTIFACTS/run$n.verdict"
+            bad=$((bad + 1))
+        fi
+        rm -f "$WORK/r$n.log"
+        rm -rf "$WORK/sb$n"
+        n=$((n + 1))
+    done
 done
 
 echo

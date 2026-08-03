@@ -17,8 +17,6 @@ dl-1425*
 # Decrypted / intermediate ROM images
 build/out/
 build/cache/
-# Gate diagnostic artifacts (divergent logs preserved on failure, B5)
-build/gate_failures/
 *.decrypted
 *.prg
 

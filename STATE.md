@@ -60,6 +60,87 @@ from the appended 19-bit banks with every legacy replay pixel-identical.
    because the profile reserves that window — the reservation is now
    load-bearing for dual-emulator agreement, not tidiness.
 
+### DETERMINISM POLICY — RATIFIED (maintainer, 2026-08-03)
+
+Maintainer, on the options recorded below: *"I agree with your conclusions
+in STATE.md: 'RECOMMENDATION: A, then B until the measurement says
+otherwise' can be enforced."*
+
+**The policy, now in force:**
+- **A — measure first.** Bound the run-to-run divergence rate before any
+  §4 policy changes. Instrument: `tests/test_mame_determinism.sh`
+  (`RUNS`, `JOBS`, `PROBE`, `SET`).
+- **B — every MAME gate stays STRICT until that measurement says
+  otherwise.** Any divergence is a hard failure requiring root-cause. No
+  automatic re-run, no tolerance class, no "flake" verdict.
+- **C (a new "unreproducible transient" comparison class) is NOT adopted**
+  and may not be proposed again without the measurement from A. It is the
+  tolerance-shaped option and the one most able to hide a real bug.
+
+This does not amend CLAUDE.md §4 — it declines to. The existing classes
+(exact / flicker-tolerated / frozen first-divergence constant) are
+unchanged, and nothing has been loosened.
+
+**Proxy validated before spending the budget:** the 520-frame
+`tests/probes/boot_probe.rpl` is **bit-identical to `08_challenger_join`
+for frames 1-299**, so it genuinely exercises the window both divergences
+appeared in — at ~3s per run instead of ~15s. That is what makes a
+high-volume measurement affordable, and it is a measured fact, not an
+assumption.
+
+**MEASUREMENT RESULT (A, executed 2026-08-03): all regimes CLEAN, and the
+clean result is itself the finding.**
+
+| Regime | Runs | Divergences |
+|---|---|---|
+| 1 — boot probe, sequential | 1000 | 0 |
+| 2 — boot probe, parallel x6 (load hypothesis) | 600 | 0 |
+| 3 — full `08_challenger_join`, sequential | 150 | 0 |
+| (earlier) boot probe, 4 combos | 480 | 0 |
+| (earlier) full-length replays, all sources | 312 | **2** |
+
+**A flat per-run boot-window rate is RULED OUT.** The probe is a validated
+proxy for frames 1-299 and both divergences began at frames 190/218,
+inside that window. 2,080 clean probe runs against a 0.43%/run point
+estimate from full-length replays is a **1-in-8,300** coincidence
+(`P(0 | 0.43%) = 1.2e-4`). The two events are real — they have diffs — but
+they are not a simple per-run property of emulating those frames.
+
+**What that leaves.** Every controlled regime repeated ONE replay on ONE
+romset. The parity gate — the only place the phenomenon has ever appeared —
+alternates replays AND romsets (vsavj/vsav2) across ~250 processes. So
+regime 4 re-ran the GATE ITSELF twice rather than doing more repetitions of
+a single replay, which the statistics say would be wasted time. The load
+hypothesis is already dead (regime 2, parallel x6).
+
+| Regime 4 — the exact failing configuration | Comparisons | Divergences |
+|---|---|---|
+| parity execution 1 | 63 | **2** |
+| parity executions 2, 3, 4 | 189 | 0 |
+
+**BOTH EVENTS ARE IN ONE EXECUTION.** That clustering is the strongest
+signal available: an intrinsic per-run property would scatter across
+executions, and heterogeneity-as-trigger would have reproduced in three
+more full gate runs. Two events inside a single ~35-minute window, then
+nothing in ~2,400 subsequent runs, reads as a **transient condition local
+to that window**, not a property of the emulator, the build, the replay or
+the gate. What that condition was is NOT established.
+
+**Status: BOUNDED AND OPEN, not root-caused.** Honest summary of what A
+bought: it killed two hypotheses (flat per-run rate; machine load), showed
+the events cluster, and put an upper bound of ~0.14%/run on the boot
+window. It did not find a mechanism. Four clean regimes are not a
+resolution — the two events have diffs and happened.
+
+**Policy consequence: nothing loosens.** The measurement did not find a
+rate, so by its own terms it cannot justify relaxing anything; **B stays
+in force**, C remains un-adopted, gates stay strict, and
+`tools/analyze_divergence.py` + the preserved artifacts stand ready to
+classify occurrence #3 the moment it appears. If it recurs, the first
+question to answer is what else was running on the machine — that is the
+hypothesis this measurement leaves standing, and the one nothing in the
+harness currently records.
+
 ### THE FINDING: MAME is not perfectly deterministic run-to-run
 
 The first full parity execution produced **two divergences in 126 runs**,
@@ -4117,36 +4198,6 @@ window per measured slot, never pre-widen.
 
 ## Decisions pending (human)
 
-- **THE ORACLE ASSUMES PERFECT RUN-TO-RUN DETERMINISM, AND WE NOW HAVE
-  COUNTEREXAMPLES (14z-59, B5).** Two divergences in one 126-run gate
-  execution (`08_challenger_join` src-vs-src, `41_don_altcolor_vsav2`
-  ref-vs-src), both in the boot window, both re-converging, neither
-  reproducible in 666 subsequent runs. Not a source-vs-Homebrew
-  difference — both binaries reproduce both replays identically on
-  re-run. Point estimate ~0.6%/run on full-length replays.
-  **Why this needs the maintainer and not me:** every MAME gate the
-  project owns is a run-to-run comparison, so a non-zero rate is a
-  FALSE-FAILURE rate on all of them, and CLAUDE.md §4 (the comparison
-  classes and their approval rules) is maintainer-governed territory —
-  the flicker-tolerance precedent was explicitly maintainer-approved,
-  and the standing watch says "if divergences turn systematic, stop and
-  root-cause". Options: **A)** measure first, decide after — run
-  `PROBE=tests/replays/08_challenger_join.rpl RUNS=300
-  tests/test_mame_determinism.sh` (~1.5 h, background) to get real power
-  on the rate before changing any policy; **B)** keep every gate strict
-  and treat any divergence as a hard failure requiring root-cause (the
-  current behaviour — correct, but if the rate is real it will
-  intermittently red the battery for reasons unrelated to the change
-  under test); **C)** define a new §4 comparison class for
-  "unreproducible single-run transient" with a mandatory automatic
-  re-run and a frozen occurrence log — this is the tolerance-shaped
-  option and the one most at risk of hiding a real bug, so it should not
-  be adopted without A first. **RECOMMENDATION: A, then B until the
-  measurement says otherwise.** Nothing in the WIDE work depends on this
-  resolving; parity re-ran 62/62 green and the gates are strict today.
-  Artifacts + classification (`tools/analyze_divergence.py`, PHASE
-  SHIFT / TRANSIENT / PERMANENT) are wired into both new gates so the
-  next occurrence is diagnosable instead of merely annoying.
 - **M5 SOUND NEEDS A DATA HOME (14z-52, blocks the rest of M5):** both
   code holes are exhausted (hole a full; hole b < 0x160 free), so
   Donovan's 0x160-byte sound record array — the thing standing between
