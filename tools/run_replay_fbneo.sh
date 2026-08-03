@@ -8,6 +8,7 @@
 #                      land next to <out.log> as <out.log>.dump_<f>_<a>.bin
 #   env FBNEO_ROMPATH  optional dir of zips overlaying $ROMDIR (patched-build
 #                      runs: its vsavj.zip wins over the reference one)
+#   env FBNEO_BIN      optional alternate fbneo binary (A/B of emulator builds)
 set -eu
 
 SET="${1:?usage: run_replay_fbneo.sh <set> <replay.rpl> <out.log> [sandbox]}"
@@ -16,7 +17,9 @@ OUT="${3:?output log path required}"
 SANDBOX="${4:-}"
 ROMDIR="${ROMDIR:?set ROMDIR to the reference-set directory}"
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
-FBNEO="$REPO/emu/fbneo/fbneo"
+# FBNEO_BIN overrides the binary — used by the WIDE emulator superset
+# invariant, which A/Bs a pre-patch build against the patched one.
+FBNEO="${FBNEO_BIN:-$REPO/emu/fbneo/fbneo}"
 [ -x "$FBNEO" ] || { echo "no FBNeo binary; build: (cd emu/fbneo && make sdl2 SKIPDEPEND=1 -j8)"; exit 1; }
 
 RPL="$(cd "$(dirname "$RPL")" && pwd)/$(basename "$RPL")"

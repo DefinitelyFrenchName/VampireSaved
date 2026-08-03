@@ -1,0 +1,72 @@
+diff --git a/src/burn/drv/capcom/d_cps2.cpp b/src/burn/drv/capcom/d_cps2.cpp
+index 6931097..04d4f2c 100644
+--- a/src/burn/drv/capcom/d_cps2.cpp
++++ b/src/burn/drv/capcom/d_cps2.cpp
+@@ -8822,6 +8822,50 @@ static struct BurnRomInfo VsavjRomDesc[] = {
+ STD_ROM_PICK(Vsavj)
+ STD_ROM_FN(Vsavj)
+ 
++// ── CPS-2 WIDE v1 (Vampire Saved project) ──
++// vsavj with the EXTENDED QSOUND REGION: 8MB -> 16MB, as four uniform 4MB
++// members. Pure descriptor change — FBNeo derives every region size from
++// this table (CpsGetROMs sums nCpsQSamLen) and the QSound reader masks with
++// `rom_mask = nCpsQSamLen - 1` (qs_c.cpp), so no code change is needed, and
++// nothing here touches the stock vsav/vsavj entries.
++// The length MUST stay a power of two or that mask is wrong: 8->16MB is
++// legal, 8->12MB is not.
++// The two added members are zero-filled placeholders at this stage (B0);
++// they exist to prove the grown region is inert before any content uses it.
++// Profile spec + Phase A measurements: docs/cps2_wide.md.
++static struct BurnRomInfo VsavjwRomDesc[] = {
++	{ "vm3j.03d",      0x080000, 0x2a2e74a4, CPS2_PRG_68K | BRF_ESS | BRF_PRG },
++	{ "vm3j.04d",      0x080000, 0x1c2427bc, CPS2_PRG_68K | BRF_ESS | BRF_PRG },
++	{ "vm3j.05a",      0x080000, 0x95ce88d5, CPS2_PRG_68K | BRF_ESS | BRF_PRG },
++	{ "vm3j.06b",      0x080000, 0x2c4297e0, CPS2_PRG_68K | BRF_ESS | BRF_PRG },
++	{ "vm3j.07b",      0x080000, 0xa38aaae7, CPS2_PRG_68K | BRF_ESS | BRF_PRG },
++	{ "vm3j.08a",      0x080000, 0x5773e5c9, CPS2_PRG_68K | BRF_ESS | BRF_PRG },
++	{ "vm3j.09b",      0x080000, 0xd064f8b9, CPS2_PRG_68K | BRF_ESS | BRF_PRG },
++	{ "vm3j.10b",      0x080000, 0x434518e9, CPS2_PRG_68K | BRF_ESS | BRF_PRG },
++
++	{ "vm3.13m",       0x400000, 0xfd8a11eb, CPS2_GFX | BRF_GRA },
++	{ "vm3.15m",       0x400000, 0xdd1e7d4e, CPS2_GFX | BRF_GRA },
++	{ "vm3.17m",       0x400000, 0x6b89445e, CPS2_GFX | BRF_GRA },
++	{ "vm3.19m",       0x400000, 0x3830fdc7, CPS2_GFX | BRF_GRA },
++	{ "vm3.14m",       0x400000, 0xc1a28e6c, CPS2_GFX | BRF_GRA },
++	{ "vm3.16m",       0x400000, 0x194a7304, CPS2_GFX | BRF_GRA },
++	{ "vm3.18m",       0x400000, 0xdf9a9f47, CPS2_GFX | BRF_GRA },
++	{ "vm3.20m",       0x400000, 0xc22fc3d9, CPS2_GFX | BRF_GRA },
++
++	{ "vm3.01",        0x020000, 0xf778769b, CPS2_PRG_Z80 | BRF_ESS | BRF_PRG },
++	{ "vm3.02",        0x020000, 0xcc09faa1, CPS2_PRG_Z80 | BRF_ESS | BRF_PRG },
++
++	{ "vm3.11m",       0x400000, 0xe80e956e, CPS2_QSND | BRF_SND },
++	{ "vm3.12m",       0x400000, 0x9cd71557, CPS2_QSND | BRF_SND },
++	{ "vsw.21m",       0x400000, 0x1147406a, CPS2_QSND | BRF_SND },   // WIDE v1
++	{ "vsw.22m",       0x400000, 0x1147406a, CPS2_QSND | BRF_SND },   // WIDE v1
++
++	{ "vsavj.key",     0x000014, 0x36d28ab8, CPS2_ENCRYPTION_KEY },
++};
++
++STD_ROM_PICK(Vsavjw)
++STD_ROM_FN(Vsavjw)
++
+ static struct BurnRomInfo VsavuRomDesc[] = {
+ 	{ "vm3u.03d",      0x080000, 0x1f295274, CPS2_PRG_68K | BRF_ESS | BRF_PRG },
+ 	{ "vm3u.04d",      0x080000, 0xc46adf81, CPS2_PRG_68K | BRF_ESS | BRF_PRG },
+@@ -12553,6 +12597,16 @@ struct BurnDriver BurnDrvCpsVsavj = {
+ 	&CpsRecalcPal, 0x1000, 384, 224, 4, 3
+ };
+ 
++struct BurnDriver BurnDrvCpsVsavjw = {
++	"vsavjw", "vsav", NULL, NULL, "1997",
++	"Vampire Savior: The Lord of Vampire (Japan 970519, CPS-2 WIDE v1)\0", NULL, "Capcom", "CPS2",
++	NULL, NULL, NULL, NULL,
++	BDF_GAME_WORKING | BDF_CLONE | BDF_HISCORE_SUPPORTED, 2, HARDWARE_CAPCOM_CPS2, GBF_VSFIGHT, FBF_DSTLK,
++	NULL, VsavjwRomInfo, VsavjwRomName, NULL, NULL, NULL, NULL, Cps2FightingInputInfo, NULL,
++	Cps2Init, DrvExit, Cps2Frame, CpsRedraw, CpsAreaScan,
++	&CpsRecalcPal, 0x1000, 384, 224, 4, 3
++};
++
+ struct BurnDriver BurnDrvCpsVsavu = {
+ 	"vsavu", "vsav", NULL, NULL, "1997",
+ 	"Vampire Savior: The Lord of Vampire (USA 970519)\0", NULL, "Capcom", "CPS2",
