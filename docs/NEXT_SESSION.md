@@ -1,7 +1,7 @@
-# NEXT SESSION — orientation (session 14z-56, 2026-08-03)
+# NEXT SESSION — orientation (session 14z-57, 2026-08-03)
 
-Read STATE.md sessions 14z-53..56 (the CPS-2 WIDE pivot, Phase A,
-Phase B0-B3, and the invalid B4 canary) and
+Read STATE.md sessions 14z-53..57 (the CPS-2 WIDE pivot, Phase A,
+Phase B0-B3, and the two B4 canary attempts) and
 docs/cps2_wide.md after this. The approved architecture plan is archived
 at ~/.claude/plans/glowing-bouncing-iverson.md.
 The maintainer tests frequently and reports precisely — their reports are
@@ -71,42 +71,52 @@ WIDE driver + the one gated core line).
   cursor ring + color-render the art, never trust index==char-id)
   and the replay.lua DUMPS separator (';' — commas rc=3 silently).
 
-## Queued next — B4 REDESIGNED (attempt 1 was an invalid canary)
+## Queued next — B4 is ONE MEASUREMENT from its answer
 
-Attempt 1 remapped 15 characters' per-char bank rows to the new gfx banks
-and required pixel-identical output. It failed uninterpretably, because
-**the per-char bank word also drives game logic** — the same program
-diverges in work RAM under MAME, which has no extended-bank support at
-all. Two variables moved; neither could be blamed. Full write-up: STATE
-14z-56 + docs/cps2_wide.md.
+State: the canary is now a clean single-variable experiment and it FAILS
+in an informative way. Everything except one link in the chain is proven.
 
-It did establish something valuable: **the game emits the WIDE encoding
-correctly** (y-word census shows bit 12 set with the bank field shifted
-exactly as designed — nothing strips it). So the remaining question is
-purely emulator-side.
+**Proven (don't re-derive):**
+- Regions are genuinely real — FBNeo's own load report says
+  `68K 0x00600000`, `Graphics 0x03000000`, `QSound 0x01000000`.
+- All 12 gfx members load OK, group C included.
+- The 19-bit address path is CORRECT: `y=0xb065` -> `n=0x0536CA` ->
+  byte `0x29B6500`, i.e. bank 5 at the same offset within group C
+  (`0x9B6500`) that the source tile has within group B. Guard passes.
+- Group C's content is NOT what gets fetched (zero-filled vs
+  copy-of-group-B render identically).
 
-**Do this — change the EMULATOR, not the ROM, so only pixels can move:**
-1. Group C as a byte copy of group B (already scripted; see the canary
-   build steps in STATE 14z-56 / the scratch scripts).
-2. A TEST-ONLY env flag (never part of the shipped profile) that ORs
-   `0x1000` into the y-word of bank-2/3 sprites at the promote point in
-   `cps_obj.cpp`.
-3. Run the STOCK rom. Work RAM must be bit-identical (guaranteed — the
-   ROM is untouched) and the framebuffer must be bit-identical too, since
-   banks 4/5 now hold the same tiles as banks 2/3.
-   Pixel-identical then proves exactly one thing: the 19-bit path and
-   group C placement/loading are correct.
-4. PRG half, same discipline: copy a data block into the 6 MB extension
-   and repoint ONE pointer to it; require bit-identical RAM. Candidate
-   with heavy exercise: a per-char sound record array via the pointer
-   table at `PRG:0xBF41A` (~400 reads/match).
+**So the bug is in where the loader PUT the bytes.** Do this:
 
-**Do not author content into the extension until this passes.** The space
-is declared and inert (B0-B3, 24/24 each) but its usability is unproven.
+1. Add a gfx-buffer dump to the harness (`CpsGfx` + offset + length ->
+   file). Small, and it is on the B5b instrument list anyway.
+2. Dump 128 bytes at `0x29B6500` and at `0x19B6500` on the canary build.
+   Equal -> the address path and placement are both fine and the fault is
+   further down (palette/decode); different -> **load-map bug**, fix in
+   `Cps2LoadTiles` / `Cps2LoadOne` / the `CpsGfxLoad` advancement for a
+   third group.
+3. Re-run the canary; pixel-identical is the pass condition.
 
-Then B5/B5b (MAME parity, suite preservation — note FBNeo already gained
-framebuffer capture), Phase C (multi-tenant pipeline; its address-space
-model also unblocks the 352-byte sound table), Phase D.
+Reproduce the canary:
+```
+python3 tools/build_wide_romset.py "$ROMDIR" build/wide0/rompath \
+        --qsound 2 --gfx 4 --prg 4 --gfx-copy-group-b
+CPS2_WIDE_CANARY=1 FBNEO_HVIDEO=/tmp/can.vid ROMDIR=... \
+  FBNEO_ROMPATH=$PWD/build/wide0/rompath \
+  tools/run_replay_fbneo.sh vsavjw tests/replays/02_demitri_vs_cpu.rpl /tmp/can.log /tmp/sb
+# compare /tmp/can.vid against the same replay on stock vsavj
+```
+Emulator output (region sizes, per-member load lines, any printf) goes to
+`<sandbox>/fbneo_replay.log`, NOT the terminal. And no `FBNEO_HVIDEO`
+means the sprite path never executes.
+
+**Do not author content into the extension until B4 passes.** PRG 6MB /
+GFX 48MB / QSound 16MB are declared and inert (B0-B3, 24/24 each, gate
+re-run green with the canary off) but the gfx half is not yet usable.
+The PRG half of B4 is independent and can proceed in parallel: copy a
+data block into the extension, repoint ONE pointer (candidate: a per-char
+sound record array via `PRG:0xBF41A`, ~400 reads/match), require
+bit-identical RAM.
 
 ## Measurement kit (14z-49 additions)
 
