@@ -1,7 +1,7 @@
-# NEXT SESSION — orientation (session 14z-55, 2026-08-03)
+# NEXT SESSION — orientation (session 14z-56, 2026-08-03)
 
-Read STATE.md sessions 14z-53..55 (the CPS-2 WIDE pivot, Phase A, and
-Phase B0-B3) and
+Read STATE.md sessions 14z-53..56 (the CPS-2 WIDE pivot, Phase A,
+Phase B0-B3, and the invalid B4 canary) and
 docs/cps2_wide.md after this. The approved architecture plan is archived
 at ~/.claude/plans/glowing-bouncing-iverson.md.
 The maintainer tests frequently and reports precisely — their reports are
@@ -19,8 +19,10 @@ invariants. Total emulator cost: **one widened condition** in
 `cps_obj.cpp` plus the `Cps2Wide` flag lifecycle — everything else is
 descriptor table data.
 
-**Every grown region is still ZERO-FILLED.** The space is declared, not
-demonstrated. Do not build content plans on it until B4 lands.
+**Every grown region is still ZERO-FILLED and the space is declared, not
+demonstrated.** B4 attempt 1 was an invalid canary (see below); the
+redesigned one is the immediate next task. Do not author content into the
+extension until it passes.
 
 Run the gate:
 ```
@@ -69,32 +71,42 @@ WIDE driver + the one gated core line).
   cursor ring + color-render the art, never trust index==char-id)
   and the replay.lua DUMPS separator (';' — commas rc=3 silently).
 
-## Queued next — B4, the step that proves the space is real
+## Queued next — B4 REDESIGNED (attempt 1 was an invalid canary)
 
-- ~~B0 QSound~~ / ~~B1 GFX~~ / ~~B2 19-bit tile~~ / ~~B3 PRG~~ — **all
-  green, 24/24 each.**
-- **B4 — the canary build. Highest value per unit of work in the plan,
-  and the first step that is allowed to FAIL for interesting reasons.**
-  Two positive controls, both against bit-exact vanilla oracles:
-  1. *PRG*: relocate an EXISTING character's anim block into the 6 MB
-     extension and repoint its bank-table entry. Tests reachability,
-     32-bit pointer width through the bank tables, PC-relative distance
-     over multi-MB, and the raw/encrypted boundary at once. Legacy
-     behaviour must stay bit-identical.
-  2. *GFX*: copy one legacy tile into gfx group C and set its bank value
-     so bit 12 is on; it must render identically to the original. This is
-     the proof the 19-bit path REACHES the new banks — B2 only proved it
-     harmless.
-  If either fails, the profile needs rework BEFORE any character content
-  is authored — that is exactly why B4 comes before Phase C.
-- **B5 / B5b — MAME parity, then suite preservation.** Note B5b is already
-  part-delivered: FBNeo now has framebuffer capture. Remaining instrument
-  gaps for an FBNeo-only fallback: write taps with PC attribution, probe
-  breakpoints with register capture, frame-scheduled pokes, and dumps of
-  the non-work-RAM buffers (OBJ/palette/gfx RAM live outside CpsRamFF).
+Attempt 1 remapped 15 characters' per-char bank rows to the new gfx banks
+and required pixel-identical output. It failed uninterpretably, because
+**the per-char bank word also drives game logic** — the same program
+diverges in work RAM under MAME, which has no extended-bank support at
+all. Two variables moved; neither could be blamed. Full write-up: STATE
+14z-56 + docs/cps2_wide.md.
 
-Then Phase C (multi-tenant pipeline; its first item — the address-space
-model — also unblocks the stuck 352-byte sound table) and Phase D.
+It did establish something valuable: **the game emits the WIDE encoding
+correctly** (y-word census shows bit 12 set with the bank field shifted
+exactly as designed — nothing strips it). So the remaining question is
+purely emulator-side.
+
+**Do this — change the EMULATOR, not the ROM, so only pixels can move:**
+1. Group C as a byte copy of group B (already scripted; see the canary
+   build steps in STATE 14z-56 / the scratch scripts).
+2. A TEST-ONLY env flag (never part of the shipped profile) that ORs
+   `0x1000` into the y-word of bank-2/3 sprites at the promote point in
+   `cps_obj.cpp`.
+3. Run the STOCK rom. Work RAM must be bit-identical (guaranteed — the
+   ROM is untouched) and the framebuffer must be bit-identical too, since
+   banks 4/5 now hold the same tiles as banks 2/3.
+   Pixel-identical then proves exactly one thing: the 19-bit path and
+   group C placement/loading are correct.
+4. PRG half, same discipline: copy a data block into the 6 MB extension
+   and repoint ONE pointer to it; require bit-identical RAM. Candidate
+   with heavy exercise: a per-char sound record array via the pointer
+   table at `PRG:0xBF41A` (~400 reads/match).
+
+**Do not author content into the extension until this passes.** The space
+is declared and inert (B0-B3, 24/24 each) but its usability is unproven.
+
+Then B5/B5b (MAME parity, suite preservation — note FBNeo already gained
+framebuffer capture), Phase C (multi-tenant pipeline; its address-space
+model also unblocks the 352-byte sound table), Phase D.
 
 ## Measurement kit (14z-49 additions)
 
