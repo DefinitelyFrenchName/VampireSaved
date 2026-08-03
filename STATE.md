@@ -1,9 +1,9 @@
 # STATE — living progress log
 
-Updated: 2026-08-03 (session 14z-58 — **B4 GFX PASSES**: sprites render
-pixel-perfect from the appended 19-bit banks, 9/9 replays. Root cause of
-the earlier failure was a DESCRIPTOR CRC MISMATCH silently loading 0xFF.
-The gfx half of CPS-2 WIDE is proven USABLE)
+Updated: 2026-08-03 (session 14z-58 — **B4 COMPLETE, BOTH HALVES**: gfx
+renders pixel-perfect from the appended 19-bit banks (9/9) and the 68k
+reads relocated data from CPU $400000+ — each with a negative control.
+CPS-2 WIDE v1 is DEMONSTRATED, not merely declared)
 
 ## Session 14z-49 (rounds 61-62: HUD MUGSHOT + NAME + SELECT MEDALLION — the whole per-slot venue-asset family fixed)
 
@@ -74,6 +74,24 @@ pixel-identical.** Fifteen characters' sprites are being fetched from
 address space that did not exist before, and nothing moves by one pixel.
 The 19-bit tile address works end to end: descriptor -> loader -> bank
 bits -> bit-12 promote -> fetch -> render.
+
+### B4 PRG half: PASS — and the control that saved it from being a lie
+
+Relocated **all 20 per-char sound record arrays** into the extension
+(`CPU:$400000+`, 1KB each) and repointed every row of the table at
+`PRG:0xBF41A`. RAM bit-identical across 02/01/30.
+
+**My first PRG attempt was VACUOUS and the negative control caught it.**
+Relocating only char 00's array "passed" — but pointing that same row at
+ZERO FILL also changed nothing, i.e. the row is never read in those
+replays. With all 20 rows relocated the zeros variant DOES diverge, so
+the identical result is real evidence. Always pair a relocation pass with
+"point it at garbage and prove the behaviour changes".
+
+Authoring notes for extension content: above `PRG:0x0FFFFF` there is no
+encryption (write raw), but the member still needs FILE byte order
+(`words_to_file_bytes(words_from_logical_bytes(...))`) and its REAL CRC
+in the descriptor.
 
 ### Root cause of the 14z-57 failure: FBNeo matches zip members by CRC
 

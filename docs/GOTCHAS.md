@@ -1084,3 +1084,13 @@ Rules that follow:
 - Diagnostic shortcut: 0xFF in a region that should hold data means "not
   loaded"; 0x00 means "loaded but empty/never written" (the buffer is
   memset to 0 at allocation).
+
+## A relocation test with no negative control proves nothing
+The CPS-2 WIDE PRG canary relocated one character's sound table into the
+extension and came back RAM-identical — apparently proving the 68k could
+read above 4MB. It proved nothing: pointing the same table at ZERO FILL
+was *also* RAM-identical, because that row is never read in those
+replays. Any "I moved X and nothing changed, therefore X works" test must
+be paired with "I broke X and something changed". The fixed version
+relocated all 20 tables, where the zeros variant does diverge and the
+identical result is real evidence.

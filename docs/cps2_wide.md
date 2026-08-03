@@ -82,6 +82,7 @@ legacy corpus, 24 comparisons per run.
 | **B2** | the bit-12 promote line under `Cps2Wide` | **PASS** — 24/24 bit-identical incl. framebuffer |
 | **B3** | PRG 4 -> 6 MB (4 appended 512KB members) | **PASS** — 24/24 bit-identical; A1's zero-core-lines prediction held |
 | **B4 (gfx)** | content fetched from the new 19-bit banks | **PASS** — 9/9 replays RAM+pixel identical with 15 characters' sprites served from banks 4/5 |
+| **B4 (prg)** | code/data fetched from above 4MB | **PASS** — all 20 per-char sound tables relocated to CPU $400000+, RAM identical; negative control (same rows -> zeros) DOES diverge, so the reads are real |
 | B5/B5b | MAME parity / suite preservation | pending |
 
 **The gate compares work RAM AND the framebuffer.** That second half was
@@ -134,6 +135,26 @@ patched binary running stock unmodified vsavj must reproduce the frozen
 vanilla expectations bit-for-bit, enforced as a battery gate; mirrored in
 a second emulator where practical; and ratified per profile version.
 
+### B4 prg: PASSED, with the control that made it meaningful
+
+Relocated **all 20 per-character sound record arrays** into the program
+extension (`CPU:$400000+`, 1KB per character) and repointed every row of
+the pointer table at `PRG:0xBF41A`. Result: RAM bit-identical across
+02/01/30.
+
+**The first attempt at this was VACUOUS and the control caught it.**
+Relocating only char 00's array passed — but pointing that same row at
+zero fill *also* changed nothing, proving the row is simply never read in
+those replays. A pass with no negative control is not evidence. With all
+20 rows relocated, the zeros variant DOES diverge, so the identical
+result is real: **the 68k is genuinely fetching data from above 4MB.**
+
+Note for authors: everything above `PRG:0x0FFFFF` is outside the
+encryption window, so extension content is written RAW (no re-encryption)
+— but it must still be laid out in FILE byte order, i.e. converted with
+`cps2_decrypt.words_to_file_bytes(words_from_logical_bytes(...))`, and
+the member's real CRC must go into the descriptor.
+
 ## Where the profile stands
 
 Declared and proven inert: **PRG 6 MB, GFX 48 MB, QSound 16 MB** — the
@@ -141,13 +162,14 @@ full v1 shape. Total emulator cost so far: **one widened condition** in
 `cps_obj.cpp` plus the flag's definition/extern/init/reset. Everything
 else is descriptor table data.
 
-What is NOT yet proven: that the new space is *usable*. Every growth step
-so far is zero-filled, and the 19-bit path is only shown to be harmless
-(vanilla never sets bit 12). **B4 must supply the positive control** —
-relocate an existing character's anim block into the PRG extension and
-move a legacy tile into gfx group C with bit 12 set, both against
-bit-exact vanilla oracles. Until B4, treat the extension as declared, not
-demonstrated.
+**B4 has now proven the space USABLE on both axes**, each with a negative
+control: sprites render pixel-perfect from the appended 19-bit gfx banks
+(9/9 replays), and the 68k reads relocated data from `CPU:$400000+`
+(RAM-identical, and provably not vacuous). The profile is no longer just
+"declared and inert" — it is demonstrated.
+
+Remaining before content work: B5/B5b (MAME parity, or the suite-
+preservation gate if MAME cannot follow).
 
 ## B4 attempt 1 — invalid canary, and what it did establish (14z-56)
 
