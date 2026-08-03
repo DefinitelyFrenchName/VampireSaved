@@ -64,6 +64,27 @@ Build `b91647c7da14ded6316cee8dc057c8daf1c3fb1e` (donovan6, stage 6).
   werewolf 3x3 restored, VS-splash big portrait + name were already
   correct.
 
+## Session 14z-58e (handoff hygiene: reproducibility PROVEN)
+
+Closing checks before handing off, all green:
+
+- **The committed patches rebuild the emulator from a pristine tree.**
+  Reverted the submodule working tree entirely (including deleting
+  `harness.cpp`), ran `tools/setup_fbneo.sh`, and the resulting binary
+  passes the full WIDE gate — **36 checks**. So `0001` (frontend harness
+  incl. framebuffer + gfx dumps) and `0002` (WIDE descriptor + the one
+  gated core line) are complete and self-sufficient; nothing this session
+  achieved lives only in an uncommitted working file.
+- HANDOFF.md updated: it is the first read of any session and still
+  described only the Donovan/M2b world. Now carries the WIDE section
+  (what/why/status/exact commands/authoring rules) and the gates added
+  since. Its FBNeo row also corrected — the old "loads CRC-changed
+  patched zips" claim is what made the 14z-57 CRC trap so expensive.
+
+Handoff state: B0-B4 green, gate 36/36, working tree clean apart from the
+expected submodule modification. Next session starts at B5 (MAME parity)
+or Phase C (address-space model) — both specified in NEXT_SESSION.
+
 ## Session 14z-58 (WIDE B4 GFX: PASS — the new banks are real, and the CRC trap)
 
 **The profile's central question is answered: the appended graphics banks
