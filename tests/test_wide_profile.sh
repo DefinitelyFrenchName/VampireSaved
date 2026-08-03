@@ -95,8 +95,45 @@ if [ -n "${fail_skipped:-}" ]; then
     echo "PARTIAL: profile inert, but the emulator superset invariant was NOT run"
     exit 2
 fi
+# ── 3. B4 CANARY: are the new gfx banks actually USABLE? ────────────────
+# Inertness (sections 1-2) only proves the profile does no harm. This
+# proves the 19-bit tile address REACHES the appended banks: with
+# CPS2_WIDE_CANARY=1 the emulator relocates bank-2/3 sprites into WIDE
+# banks 4/5 at draw time, and the romset must carry group C as a byte copy
+# of group B (build with --gfx-copy-group-b). Stock ROM both sides, so RAM
+# is identical by construction and only pixels can move.
+if python3 - "$WIDE_ROMPATH" <<'PYEOF'
+import sys, zipfile, hashlib, os
+z = zipfile.ZipFile(os.path.join(sys.argv[1], "vsavjw.zip"))
+p = zipfile.ZipFile(os.path.join(os.environ["ROMDIR"], "vsav.zip"))
+ok = all(hashlib.sha1(z.read(c)).digest() == hashlib.sha1(p.read(b)).digest()
+         for c, b in zip(("vsw.31m","vsw.33m","vsw.35m","vsw.37m"),
+                         ("vm3.14m","vm3.16m","vm3.18m","vm3.20m"))
+         if c in z.namelist())
+sys.exit(0 if ok and "vsw.31m" in z.namelist() else 1)
+PYEOF
+then
+    echo "== 3. B4 canary: sprites served from the appended gfx banks =="
+    for rp in $CORPUS; do
+        FBNEO_HVIDEO="$WORK/cs_$rp.vid" tools/run_replay_fbneo.sh vsavj \
+            "$REPO/tests/replays/$rp.rpl" "$WORK/cs_$rp.log" "$WORK/csb_$rp" >/dev/null 2>&1
+        CPS2_WIDE_CANARY=1 FBNEO_HVIDEO="$WORK/cw_$rp.vid" FBNEO_ROMPATH="$WIDE_ROMPATH" \
+            tools/run_replay_fbneo.sh vsavjw \
+            "$REPO/tests/replays/$rp.rpl" "$WORK/cw_$rp.log" "$WORK/cwb_$rp" >/dev/null 2>&1
+        if cmp -s "$WORK/cs_$rp.log" "$WORK/cw_$rp.log" \
+           && cmp -s "$WORK/cs_$rp.vid" "$WORK/cw_$rp.vid"; then
+            echo "  ok: $rp identical with sprites fetched from banks 4/5"
+        else
+            echo "  FAIL: $rp — the appended banks do not render correctly"
+            fail=1
+        fi
+    done
+else
+    echo "== 3. B4 canary: SKIPPED (romset lacks the group-B copy;"
+    echo "     rebuild with tools/build_wide_romset.py ... --gfx-copy-group-b) =="
+fi
+
+[ "$fail" = 0 ] || { echo "FAIL: CPS-2 WIDE profile gate"; exit 1; }
 echo "PASS: CPS-2 WIDE profile gate (emulator superset invariant + inertness,"
 echo "      work RAM AND framebuffer, over $(echo $CORPUS | wc -w | tr -d ' ') replays)"
-echo "NOTE: inertness is not functionality. The 19-bit tile path is proven"
-echo "      HARMLESS here because vanilla never sets y-word bit 12; that it"
-echo "      actually REACHES the new gfx banks is proven by B4's canary build."
+echo "      plus the B4 canary: the 19-bit path REACHES the appended banks.)"

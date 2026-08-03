@@ -1,9 +1,9 @@
 # STATE — living progress log
 
-Updated: 2026-08-03 (session 14z-57 — WIDE B0-B3 green; B4 attempt 2 is a
-CLEAN single-variable FAIL, narrowed to the gfx loader: address path
-proven correct, region proven real, but group C's bytes are not what is
-fetched. One measurement away from the cause)
+Updated: 2026-08-03 (session 14z-58 — **B4 GFX PASSES**: sprites render
+pixel-perfect from the appended 19-bit banks, 9/9 replays. Root cause of
+the earlier failure was a DESCRIPTOR CRC MISMATCH silently loading 0xFF.
+The gfx half of CPS-2 WIDE is proven USABLE)
 
 ## Session 14z-49 (rounds 61-62: HUD MUGSHOT + NAME + SELECT MEDALLION — the whole per-slot venue-asset family fixed)
 
@@ -63,6 +63,57 @@ Build `b91647c7da14ded6316cee8dc057c8daf1c3fb1e` (donovan6, stage 6).
   re-verified: Donovan medallion in Jedah's ringed cell, Gallon's
   werewolf 3x3 restored, VS-splash big portrait + name were already
   correct.
+
+## Session 14z-58 (WIDE B4 GFX: PASS — the new banks are real, and the CRC trap)
+
+**The profile's central question is answered: the appended graphics banks
+are usable.** With the emulator-side canary relocating bank-2/3 sprites
+into WIDE banks 4/5 at draw time, group C loaded as a byte copy of group
+B, and the STOCK rom on both sides: **9/9 legacy replays RAM- AND
+pixel-identical.** Fifteen characters' sprites are being fetched from
+address space that did not exist before, and nothing moves by one pixel.
+The 19-bit tile address works end to end: descriptor -> loader -> bank
+bits -> bit-12 promote -> fetch -> render.
+
+### Root cause of the 14z-57 failure: FBNeo matches zip members by CRC
+
+The appended members declared the CRC of ZERO FILL while the file held a
+copy of group B. FBNeo therefore loaded **0xFF fill** for them — and
+still printed `Loading graphics (vsw.31m)... (OK)`. Everything else in
+the chain had already been verified correct, which is exactly why it was
+so confusing.
+
+**This CONTRADICTS an earlier note in this repo** ("FBNeo verified to load
+CRC-changed patched zips (no descriptor change needed)"). That is true
+only in the sense that FBNeo does not refuse to run; for gfx/QSound
+members a CRC mismatch silently substitutes 0xFF. Corrected in GOTCHAS.
+
+Diagnostic path worth reusing (it is now written up in cps2_wide.md):
+1. `FBNEO_HGFX=<off>-<end>` gfx-buffer dump (new harness capability) —
+   showed 32-48MB reading 0xFF while groups A/B held data;
+2. the decoder ORs into a ZERO-filled buffer, so 0xFF proves the SOURCE
+   bytes were 0xFF, i.e. the member never arrived;
+3. from there the CRC mismatch was two minutes away.
+   Memory-content shorthand: **0xFF = not loaded; 0x00 = loaded but
+   empty** (the buffer is memset to 0 at allocation).
+
+### Hardening
+
+- `tools/build_wide_romset.py` now PRINTS the exact descriptor rows
+  (name/size/CRC) for every member it writes — paste them into the
+  descriptor; a mismatch is silent.
+- `tests/test_wide_profile.sh` gained **section 3, the B4 canary**, so
+  "the appended banks actually render" is now a standing gate, not a
+  one-off experiment. It self-skips (loudly) if the romset was not built
+  with `--gfx-copy-group-b`. Full gate: **36 checks green**.
+- Temporary debug probes removed; both FBNeo patches regenerated with
+  clean scopes.
+
+### Status
+
+PRG 6MB / GFX 48MB / QSound 16MB: declared, inert, and — for gfx — proven
+USABLE. Remaining for B4: the PRG half (relocate real data above 4MB and
+repoint one pointer; require bit-identical RAM). Then B5/B5b.
 
 ## Session 14z-57 (WIDE B4 attempt 2 — clean fail, narrowed to the loader)
 

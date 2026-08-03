@@ -15,6 +15,7 @@ build in this project is fed to the emulator.
 Usage: build_wide_romset.py <romdir> <outdir> [--qsound 2] [--gfx 0]
 """
 import argparse
+import binascii
 import hashlib
 import os
 import zipfile

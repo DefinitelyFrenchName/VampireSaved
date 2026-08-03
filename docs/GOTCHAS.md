@@ -1056,3 +1056,31 @@ NOTHING — which reads exactly like "my feature flag is not being set".
 nothing. That log is also where FBNeo prints its region sizes and
 per-member "Loading graphics (x)... (OK)" lines — the fastest way to
 confirm a descriptor change actually took effect.
+
+## FBNeo matches zip members by CRC — a mismatch loads 0xFF FILL and
+## still prints "(OK)"
+This is the single nastiest trap found in the WIDE work, and it
+CONTRADICTS an earlier note in this repo ("FBNeo verified to load
+CRC-changed patched zips (no descriptor change needed)"). That note is
+true only in the narrow sense that FBNeo does not refuse to RUN. What it
+actually does when a member's CRC does not match the descriptor is load
+**0xFF fill** for that member — while the log still prints
+`Loading graphics (name)... (OK)`.
+
+Symptom: an appended gfx group that reports OK, sizes correctly
+(`Graphics data: 0x03000000`), has a correct load destination, a correct
+computed tile address and a passing bounds check — and renders nothing,
+with the region reading 0xFF in memory. Because `Cps2Load100000` ORs into
+a zero-filled buffer, "all 0xFF" is proof the SOURCE bytes were 0xFF,
+i.e. the file content never arrived.
+
+Rules that follow:
+- Any appended/modified member must have its REAL CRC in the descriptor.
+  `tools/build_wide_romset.py` now prints the exact descriptor rows
+  (name/size/CRC) for everything it writes — paste those in.
+- When the patched PROGRAM members change (every Donovan build), the
+  program members are loaded by a path that tolerates this; do not
+  generalise "CRC does not matter" from that to gfx/QSound members.
+- Diagnostic shortcut: 0xFF in a region that should hold data means "not
+  loaded"; 0x00 means "loaded but empty/never written" (the buffer is
+  memset to 0 at allocation).

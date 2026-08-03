@@ -101,10 +101,10 @@ index 688404a..d8d8e65 100644
  	// Search for a game now, for use in the menu and loading a games
 diff --git a/src/burner/sdl/harness.cpp b/src/burner/sdl/harness.cpp
 new file mode 100644
-index 0000000..09711d8
+index 0000000..d48ebc8
 --- /dev/null
 +++ b/src/burner/sdl/harness.cpp
-@@ -0,0 +1,266 @@
+@@ -0,0 +1,289 @@
 +// harness.cpp — Vampire Saved test harness for the SDL2 frontend.
 +// FRONTEND-ONLY: no emulation-core file is touched by this feature.
 +//
@@ -134,6 +134,7 @@ index 0000000..09711d8
 +INT32 nHarnessFrames = 0;              // explicit total override (0 = auto)
 +
 +extern UINT8* CpsRamFF;                // CPS-2 work RAM (cps.h)
++extern UINT8* CpsGfx; extern UINT32 nCpsGfxLen;   // decoded tile buffer
 +extern int InputMake(bool bCopy);
 +
 +// ── input resolution ─────────────────────────────────────────────────────────
@@ -363,6 +364,28 @@ index 0000000..09711d8
 +            }
 +        }
 +    }
++    // FBNEO_HGFX="<hexoff>-<hexend>[;...]": dump slices of the DECODED tile
++    // buffer. The RAM/framebuffer logs cannot answer "did the loader put the
++    // bytes where the address path expects them?" - this can, and it is the
++    // instrument the WIDE B4 investigation needed (also on the B5b list).
++    const char* szGfx = getenv("FBNEO_HGFX");
++    if (szGfx && szGfx[0] && CpsGfx) {
++        char spec[1024]; snprintf(spec, sizeof(spec), "%s", szGfx);
++        for (char* s = strtok(spec, ";"); s; s = strtok(NULL, ";")) {
++            UINT32 a0, a1;
++            if (sscanf(s, "%x-%x", &a0, &a1) != 2 || a1 < a0) continue;
++            if (a1 >= nCpsGfxLen) { printf("harness: gfx %08x-%08x beyond "
++                "nCpsGfxLen %08x\n", a0, a1, (unsigned)nCpsGfxLen); continue; }
++            char path[MAX_PATH + 64];
++            snprintf(path, sizeof(path), "%s.gfx_%08x.bin", szHarnessOut, a0);
++            FILE* gf = fopen(path, "wb");
++            if (!gf) continue;
++            fwrite(CpsGfx + a0, 1, a1 - a0 + 1, gf);
++            fclose(gf);
++            printf("harness: gfx dump %08x-%08x -> %s\n", a0, a1, path);
++        }
++    }
++
 +    fprintf(out, "END %u\n", nScriptFrames);
 +    fclose(out);
 +    if (vout) { fprintf(vout, "END %u\n", nScriptFrames); fclose(vout); }

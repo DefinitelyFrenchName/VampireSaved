@@ -81,7 +81,7 @@ legacy corpus, 24 comparisons per run.
 | **B1** | GFX 32 -> 48 MB (4 appended 4 MB members, one whole group) | **PASS** — 24/24 bit-identical; A3's prediction held |
 | **B2** | the bit-12 promote line under `Cps2Wide` | **PASS** — 24/24 bit-identical incl. framebuffer |
 | **B3** | PRG 4 -> 6 MB (4 appended 512KB members) | **PASS** — 24/24 bit-identical; A1's zero-core-lines prediction held |
-| B4 | canary: content fetched from the new banks | **ATTEMPT 2 = CLEAN FAIL.** Address composition proven correct; the bytes fetched are not group C's. Narrowed to the loader/placement — see below |
+| **B4 (gfx)** | content fetched from the new 19-bit banks | **PASS** — 9/9 replays RAM+pixel identical with 15 characters' sprites served from banks 4/5 |
 | B5/B5b | MAME parity / suite preservation | pending |
 
 **The gate compares work RAM AND the framebuffer.** That second half was
@@ -169,9 +169,29 @@ What the attempt DID establish, both useful:
 - **The per-char bank word carries game logic**, now documented in
   engine_internals + GOTCHAS.
 
-### Attempt 2 (emulator-side canary) — a clean, single-variable FAIL
+### B4 gfx: PASSED — the new banks are real and usable
 
-Implemented as designed: `CPS2_WIDE_CANARY=1` relocates bank-2/3 sprites
+With `CPS2_WIDE_CANARY=1` relocating bank-2/3 sprites into WIDE banks 4/5
+at draw time, gfx group C loaded as a byte copy of group B, and the STOCK
+rom: **9/9 legacy replays are RAM- and pixel-identical.** Fifteen
+characters' sprites are being fetched from address space that did not
+exist before, and nothing moves by a single pixel.
+
+That closes the question the whole profile hinged on: **the 19-bit tile
+address works end to end** — descriptor -> loader -> bank bits -> promote
+-> fetch -> render.
+
+**Root cause of the earlier failure: the descriptor CRC.** FBNeo matches
+zip members by CRC. The appended members carried the CRC of zero fill
+while the file held a copy of group B, so FBNeo loaded **0xFF fill** for
+them — and still printed `(OK)`. Everything else in the chain had been
+verified correct, which is why the failure was so confusing. Fullwrite-up in
+GOTCHAS; `tools/build_wide_romset.py` now prints the exact descriptor
+rows (name/size/CRC) for every member it writes.
+
+### The diagnostic path that got there (for reuse)
+
+Attempt 2 as designed: `CPS2_WIDE_CANARY=1` relocates bank-2/3 sprites
 into WIDE banks 4/5 at draw time, with gfx group C loaded as a byte copy
 of group B, running the STOCK rom. Result:
 
@@ -196,14 +216,14 @@ placement/interleave for a third group** (`Cps2LoadTiles` /
 `Cps2LoadOne`, `CpsGfxLoad` advancement) — i.e. group C's bytes are
 landing somewhere other than 32MB, or in a different interleave.
 
-**Next step (one measurement, not a guess):** dump `CpsGfx` around byte
-`0x29B6500` at runtime and compare against the expected 128-byte tile
-from group B at `0x19B6500`. If they differ, the loader placed the data
-elsewhere and the fix is in the load map, not the address path. A gfx-RAM
-dump is a small harness addition and is on the B5b instrument list
-anyway.
+**That measurement is what cracked it:** a gfx-buffer dump
+(`FBNEO_HGFX=<hexoff>-<hexend>`, added to the harness) showed the whole
+32-48MB range reading 0xFF while groups A/B held data. Since the tile
+decoder ORs into a zero-filled buffer, 0xFF could only mean the source
+bytes were 0xFF — i.e. the member never arrived. From there the CRC
+mismatch was two minutes away.
 
-### The canary design (kept — it worked as a diagnostic)
+### The canary design (kept — it is the reusable proof for future banks)
 
 Change the EMULATOR, not the ROM, so game state is identical by
 construction and only pixels can move:
