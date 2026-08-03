@@ -5,6 +5,54 @@ parity PROVEN, and the WIDE profile ported to it**. Plus an unplanned
 finding that matters more than the port: MAME is not perfectly
 deterministic run-to-run, and the whole oracle assumed it was)
 
+## Session 14z-59j (dual-track invariant ESTABLISHED, byte-attributed)
+
+The dual-track decision is only coherent if the WIDE build is a genuine
+SUPERSET of the stock one. `tests/test_dualtrack.sh` establishes that as a
+live A/B between the two builds — no frozen expectations, so it needs no
+freeze decision and is machine-independent.
+
+| | Result |
+|---|---|
+| 11 legacy replays (never reach the patched slot) | **bit-identical** |
+| 5 patched-slot replays (attract + 4 Donovan) | **differ**, as they must |
+| attract difference, byte-attributed | 57 bytes: 54 dead-stack, 3 sound-driver, **0 gameplay** |
+
+**Why this matters operationally:** legacy behaviour being bit-identical is
+what lets every gate that passes on the stock build transfer to the WIDE
+build without re-plumbing ten gates for the `vsavjw` set.
+
+### A misclassification my own gate made, and the measurement that fixed it
+
+The first run failed `01_attract_long`. I had put it in the LEGACY group —
+wrong: the attract demo **features the patched slot**, which is exactly why
+the stock build already carries `diverge vsavj/masked 4278` for it. The
+existing expectation was the evidence, sitting in the repo the whole time.
+
+Rather than reclassify and move on, the divergence was attributed byte for
+byte (whole work-RAM dumps from both builds at frame 4400):
+
+- **54 bytes in `$FF7FA0-$FF7FEF`** — inside the dead-stack window
+  `$FF7F00-$FF7FFF` that CLAUDE.md §4 already masks (hook cycle skew, below
+  resting SP; ghost bytes, not live state).
+- **3 bytes at `$FF055B-$FF055D`** — `RAM:$FF05xx` is the **sound-driver
+  work area** per docs/atlas/ram.md, i.e. precisely what a live sfx helper
+  is supposed to touch.
+- **Zero bytes of gameplay state.**
+
+Second lesson banked: the gate had also been comparing WHOLE work RAM,
+which includes the dead-stack window — the wrong basis for a
+hooked-vs-hooked comparison. §4's masked basis exists for exactly this.
+
+### New instrument: `tools/attribute_ramdiff.py`
+
+"The two builds differ, and that's expected" is not a verdict, it is the
+absence of one. This turns it into an assertion: every differing byte must
+fall inside a window the caller can NAME, and stray addresses are printed
+so the next question ("what lives at `$FFxxxx`?") is immediately askable
+against the RAM atlas. It refuses to be quieted by widening a window —
+that instruction is in its own failure output.
+
 ## Session 14z-59i (M5 SOUND IS AUDIBLE; WIDE build registered; a false fingerprint corrected)
 
 ### Donovan's move sounds now play — and no music
