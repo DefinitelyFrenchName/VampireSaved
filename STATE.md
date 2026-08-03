@@ -5,6 +5,48 @@ parity PROVEN, and the WIDE profile ported to it**. Plus an unplanned
 finding that matters more than the port: MAME is not perfectly
 deterministic run-to-run, and the whole oracle assumed it was)
 
+## Session 14z-59g (DECISIONS RATIFIED: dual-track build; upstreaming deferred)
+
+**Maintainer, 2026-08-04.**
+
+### 1. DUAL-TRACK — ratified
+
+- **WIDE is the ROSTER build.** Content that needs the extension goes
+  there; M3 (Huitzil + Pyron) has no other option — Phase A measured
+  1,112 bytes free against a ~886 KiB deficit, so that was arithmetic, not
+  preference.
+- **The stock-size build stays**, frozen at `ae701ffb`, as the
+  compatibility artifact that runs on unpatched FBNeo/MAME. It keeps
+  playtesters off custom binaries until M3 forces the move, and keeps the
+  frozen `donovan-m2c` expectations exercised.
+- Cost: one extra build in the battery. The profile gating built in
+  14z-59f already produces both from ONE manifest, and
+  `tests/test_phasec_spaces.sh` asserts the stock build stays
+  byte-identical.
+
+**Consequence to hold on to:** the stock build must never silently gain a
+dependency on the extension. That is enforced by construction —
+profile-gated spaces and profile-gated content rows do not exist for a
+build that did not ask for them — not by remembering.
+
+### 2. UPSTREAMING — deferred, "too early"
+
+Not a goal yet, not ruled out. Practical effect: **keep both 0002 patches
+minimal and separable**, which is already the standing discipline (the
+harness patch is frontend-only and deliberately split from the profile
+patch; the profile costs one gated conditional per emulator). Nothing to
+change today; revisit once the roster actually works. If upstream ever
+accepted `vsavjw`, players would get the profile in stock builds and the
+custom-binary objection would largely evaporate — worth remembering when
+weighing distribution later.
+
+### 3. Correction banked while settling this
+
+The M5 sound-home entry's recommendation ("option B: reclaim the inert
+weapon_accent rows") was based on a misreading — those rows are palette
+`data_port`s outside both holes and free ZERO hole bytes. Detail in
+Decisions pending below.
+
 ## Session 14z-59f (Phase C step 1 — the address-space model)
 
 **The allocator is now declarative, and the refactor moved ZERO bytes.**
@@ -4409,22 +4451,23 @@ window per measured slot, never pre-widen.
 
 ## Decisions pending (human)
 
-- **M5 SOUND NEEDS A DATA HOME (14z-52, blocks the rest of M5):** both
-  code holes are exhausted (hole a full; hole b < 0x160 free), so
-  Donovan's 0x160-byte sound record array — the thing standing between
-  him and working move sounds — has nowhere to live. Options: A) reuse
-  **Jedah's freed anim region** [0x248B88, 0x267000): ~120KB of dead
-  content on this build, but it is also the earmarked home for the
-  eventual ported select web, and it needs its own dead-space audit
-  before first use (nothing has been placed there yet); B) shrink
-  existing hole usage (the deprecation candidates in patch_index —
-  weapon_accent_t0/_t1/rowd_slot are inert since 14z-31 and could be
-  reclaimed); C) grow the program region via driver descriptor (the
-  same class of change as the QSound question below, larger blast
-  radius). RECOMMENDATION: **B first** (reclaim what is already dead
-  and inert, no new territory), then A with an audit when M3 forces the
-  bigger question. Either way this is a placement policy call, not a
-  code change I should make unilaterally.
+- ~~**M5 SOUND NEEDS A DATA HOME (14z-52)**~~ **SETTLED 2026-08-04 by the
+  dual-track decision below: it lives in `wide_ext`.** Two corrections to
+  the record that got it there:
+  **(a) Option B was DEAD and the recommendation was wrong.** It proposed
+  reclaiming the "inert since 14z-31" `weapon_accent_t0/_t1/rowd_slot`
+  rows. Measured 14z-59g: those are `data_port` rows writing 0x20 bytes
+  each to `0x39FBE0-0x39FC40`, which is in NEITHER hole (`hole_a`
+  `0x0BF6A0-0x100000`, `hole_b` `0x3EC720-0x400000`). They are in-place
+  palette overwrites, not hole allocations, so reclaiming them frees
+  **zero** of the 352 bytes needed. The original entry mistook them for
+  hole tenants.
+  **(b) Option C stopped being expensive.** It was rejected as "larger
+  blast radius" before WIDE existed; WIDE is now demonstrated on both
+  emulators, so it is the cheap option — and option A (Jedah's anim
+  region) keeps its unaudited dead space AND stays available for the
+  ported select web, which was its earmarked purpose all along.
+
 - **M5 VOICE SAMPLES (14z-51):** 6-8 of Donovan's sounds (his voice
   lines / vs2-new sfx: ids 0x71D/0x73E/0x753-0x756, likely the "Change
   Immortal" family) do not exist in vsav's sample ROMs, which are
