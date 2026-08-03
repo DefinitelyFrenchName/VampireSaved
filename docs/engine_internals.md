@@ -580,3 +580,23 @@ into bit 15 for address composition only, after the terminator check —
 bits are supplied from data (per-char OBJ bank table `PRG:0x282D4` and a
 few `move.w #$X000` setters), reaching banks 4-7 may require no game-side
 code change at all.
+
+### Per-char OBJ bank table (PRG:0x282D4) — measured 14z-56
+
+0x18 word rows indexed by character id, read through the **opcode
+(decrypted)** view — a pc-relative access, so it lives in
+`vsavj_opcodes.bin`, not the data view (the standing pc-relative/data-space
+rule). Values are the OBJ y-word bank bits: `0x0000/0x2000/0x4000/0x6000`
+= tile-address bits 16-17, i.e. which 8MB gfx bank the character's sprites
+are fetched from. Vanilla vsavj rows (char 00..17):
+
+    6000 6000 0000 2000 6000 0000 4000 4000 0000 6000 4000 6000
+    6000 0000 0000 4000 6000 6000 0000 2000 6000 0000 4000 4000
+
+Slot 0x0F reads `0x4000` (bank 2) — the value the Donovan gfx build
+asserts after porting.
+
+**It is not display-only.** Changing a row alters game state as well as
+tile fetch: a build with 15 rows remapped diverges in work RAM at frame
+890 under MAME, which has no extended-bank support at all (14z-56
+measurement, GOTCHAS). Treat the row as behaviour-bearing.

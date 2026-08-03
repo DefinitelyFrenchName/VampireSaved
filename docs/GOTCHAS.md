@@ -1018,3 +1018,29 @@ tree state with only the patch under test reverted (`WIDE=0
 tools/setup_fbneo.sh`). Same discipline as any controlled experiment: one
 variable. A reference that drifts is worse than no reference, because its
 failures look like real findings.
+
+## The per-char OBJ bank word is NOT a display-only attribute
+The per-character OBJ bank table (`PRG:0x282D4`, opcode/decrypted view,
+0x18 word rows of 0x0000/0x2000/0x4000/0x6000) looks like a pure
+"which gfx bank do this character's tiles live in" display attribute. It
+is not: changing a row perturbs GAME STATE. Measured — the same modified
+program run under MAME, which has no extended-bank support whatsoever,
+diverges in work RAM at frame 890 (FBNeo diverges at 894 on the same
+replay). So the word is read on some logic path as well as the sprite
+path. Anything that repoints a character's tile bank must expect, and
+account for, a behavioural change — it is not a cosmetic edit.
+
+## A canary must change exactly ONE thing, or it cannot answer anything
+The first CPS-2 WIDE B4 canary tried to prove the new 19-bit gfx banks
+were reachable by remapping 15 characters' bank-table rows to the new
+banks and requiring pixel-identical output. It failed — and the failure
+was uninterpretable, because the same edit ALSO changed game logic (see
+above). Two variables moved at once, so neither "the emulator path is
+broken" nor "the game strips the bit" could be concluded. The isolation
+that DID work was cheap and should have come first: run the modified
+program under the OTHER emulator (which lacks the feature entirely) and
+diff — that immediately separated "game behaves differently" from
+"emulator renders differently". Design canaries so that exactly one
+subsystem can account for the result, and prefer changing the EMULATOR
+under a test-only flag over changing the ROM when the ROM change has
+side effects.

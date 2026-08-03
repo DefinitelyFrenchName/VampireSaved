@@ -1,8 +1,9 @@
 # STATE — living progress log
 
-Updated: 2026-08-03 (session 14z-55 — WIDE B0-B3 ALL GREEN: the full v1
-shape (PRG 6MB / GFX 48MB / QSound 16MB) is declared and proven inert for
-one widened emulator condition. Next: B4 must prove it USABLE)
+Updated: 2026-08-03 (session 14z-56 — WIDE B0-B3 green; B4 attempt 1 was
+an INVALID canary (two variables at once) and is redesigned. Two solid
+findings banked: the game emits the WIDE encoding correctly, and the
+per-char bank word is not display-only)
 
 ## Session 14z-49 (rounds 61-62: HUD MUGSHOT + NAME + SELECT MEDALLION — the whole per-slot venue-asset family fixed)
 
@@ -62,6 +63,48 @@ Build `b91647c7da14ded6316cee8dc057c8daf1c3fb1e` (donovan6, stage 6).
   re-verified: Donovan medallion in Jedah's ringed cell, Gallon's
   werewolf 3x3 restored, VS-splash big portrait + name were already
   correct.
+
+## Session 14z-56 (WIDE B4 attempt 1: an invalid canary, honestly)
+
+**Result: the canary was wrong, not the profile.** Recording it in full
+because the reasoning matters more than the outcome.
+
+The canary: make gfx group C a byte copy of group B, remap 15 characters'
+per-char bank rows from banks 2/3 to WIDE banks 4/5, require
+pixel-identical rendering. It diverged on RAM *and* pixels from ~f894.
+
+Diagnosis, in order:
+1. Suspected the game masked the new bank bit away. Found five
+   `andi.w #$6000` sites and widened them all to `#$7000` — **no change**,
+   hypothesis dead.
+2. Ruled out `nCpsObjectBank` (it is the OBJ RAM double-buffer selector,
+   not a tile bank).
+3. **The isolation that actually worked, and should have been first:** ran
+   the modified program under MAME, which has NO extended-bank support at
+   all. RAM diverges there too, at frame 890. So a game-behaviour change
+   fully accounts for the result and the canary says NOTHING about the
+   emulator's 19-bit path.
+
+**Two findings banked (both documented in engine_internals + GOTCHAS):**
+- **The game emits the WIDE encoding correctly.** y-word census of the
+  modified program (objy_bits.lua under MAME): `bit12=1`, bank field
+  shifted exactly as designed. Nothing strips the bit — the game side of
+  19-bit addressing is fine.
+- **The per-char OBJ bank word (PRG:0x282D4, opcode view) is NOT
+  display-only** — it drives game logic too. Vanilla row values recorded
+  in engine_internals. Any future tile-bank repoint must expect a
+  behavioural change, not a cosmetic one.
+
+**Redesigned canary (next action, spec in docs/cps2_wide.md):** change the
+EMULATOR under a test-only env flag instead of the ROM — OR 0x1000 into
+bank-2/3 sprites' y-words at the promote point, run the STOCK rom, and
+require both RAM (guaranteed identical, no ROM change) and framebuffer
+identical. Then exactly one subsystem can explain any difference.
+
+Profile status is UNCHANGED and still honest: PRG 6MB / GFX 48MB / QSound
+16MB declared and proven inert (B0-B3, 24/24 each); usability of the new
+space remains UNPROVEN until the redesigned B4 passes. No content should
+be authored into the extension before then.
 
 ## Session 14z-55 (WIDE B2 — the 19-bit tile address; and the gate's video blind spot)
 

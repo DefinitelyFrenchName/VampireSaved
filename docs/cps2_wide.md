@@ -81,7 +81,7 @@ legacy corpus, 24 comparisons per run.
 | **B1** | GFX 32 -> 48 MB (4 appended 4 MB members, one whole group) | **PASS** — 24/24 bit-identical; A3's prediction held |
 | **B2** | the bit-12 promote line under `Cps2Wide` | **PASS** — 24/24 bit-identical incl. framebuffer |
 | **B3** | PRG 4 -> 6 MB (4 appended 512KB members) | **PASS** — 24/24 bit-identical; A1's zero-core-lines prediction held |
-| B4 | canary: real content relocated into the new space | pending |
+| B4 | canary: real content relocated into the new space | **ATTEMPT 1 INVALID** — the canary changed two variables at once; redesign below |
 | B5/B5b | MAME parity / suite preservation | pending |
 
 **The gate compares work RAM AND the framebuffer.** That second half was
@@ -148,6 +148,49 @@ relocate an existing character's anim block into the PRG extension and
 move a legacy tile into gfx group C with bit 12 set, both against
 bit-exact vanilla oracles. Until B4, treat the extension as declared, not
 demonstrated.
+
+## B4 attempt 1 — invalid canary, and what it did establish (14z-56)
+
+The first canary made group C a byte copy of group B, remapped 15
+characters' bank rows from banks 2/3 to WIDE banks 4/5, and required
+pixel-identical output. It failed on both RAM and pixels from ~frame 894.
+
+**The failure is uninterpretable, because the edit moved two variables.**
+The per-char bank word is not display-only: the same modified program
+diverges in work RAM at frame 890 under MAME, which has no extended-bank
+support at all. So "game behaves differently" fully accounts for the
+result and says nothing about the emulator's 19-bit path.
+
+What the attempt DID establish, both useful:
+- **The game emits the WIDE encoding correctly.** A y-word census of the
+  modified program (`tests/lua/objy_bits.lua` under MAME) shows
+  `bit12=1` with the bank field shifted exactly as designed
+  (banks 2/3 -> bit-12 + banks 0/1). Nothing in the game strips it.
+- **The per-char bank word carries game logic**, now documented in
+  engine_internals + GOTCHAS.
+
+### Redesigned canary (do this next)
+
+Change the EMULATOR, not the ROM, so game state is identical by
+construction and only pixels can move:
+
+1. Build group C as a byte copy of group B (already scripted).
+2. Add a TEST-ONLY flag (env-gated, never part of the shipped profile)
+   that ORs `0x1000` into the y-word of sprites whose bank field reads
+   bank 2/3, at the same point the promote happens in `cps_obj.cpp`.
+3. Run the stock ROM. Work RAM MUST be bit-identical (guaranteed — no ROM
+   change), and the framebuffer MUST be bit-identical too, because banks
+   4/5 now hold the same tiles as banks 2/3.
+
+Pixel-identical output then proves exactly one thing and nothing else:
+the 19-bit address path plus group C placement/loading are correct. A
+difference localises to the emulator with no game-side ambiguity.
+
+The PRG half of B4 (relocating real code/data above 4MB) is unaffected by
+this and can proceed independently — but note the same discipline: pick a
+relocation whose only observable is "the data was read", e.g. copy a data
+block into the extension and repoint one pointer, and require
+bit-identical RAM.
 
 ## Known limits, stated up front
 
