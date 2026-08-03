@@ -70,12 +70,39 @@ the bank bits are data (per-char OBJ bank table `PRG:0x282D4` plus a few
 `move.w #$X000` setters), so a bank value carrying bit 12 flows through
 existing tables.
 
+## Phase B progress (proving the profile inert, one variable per build)
+
+Gate: `tests/test_wide_profile.sh` — both invariants over the 12-replay
+legacy corpus, 24 comparisons per run.
+
+| Step | What grew | Result |
+|---|---|---|
+| **B0** | QSound 8 -> 16 MB (2 appended 4 MB members) | **PASS** — 24/24 bit-identical, zero core lines |
+| **B1** | GFX 32 -> 48 MB (4 appended 4 MB members, one whole group) | **PASS** — 24/24 bit-identical; A3's prediction held |
+| B2 | the bit-12 promote line under `Cps2Wide` | pending |
+| B3 | PRG 4 -> 6 MB | pending (A1 says linear is inert) |
+| B4 | canary: real content relocated into the new space | pending |
+| B5/B5b | MAME parity / suite preservation | pending |
+
+Both invariants are enforced on every run:
+1. **Emulator superset invariant** — the patched binary running STOCK
+   vsavj is bit-identical to a pre-patch reference binary
+   (`FBNEO_REF=...`; build one with `WIDE=0 tools/setup_fbneo.sh`). The
+   gate exits 2 and says so loudly if no reference is supplied — an unrun
+   invariant must never read as green.
+2. **Profile inertness** — the WIDE set is bit-identical to the stock set
+   on the same binary.
+
+Build the overlay with `tools/build_wide_romset.py <romdir> <outdir>
+--qsound 2 --gfx 4` (symlinks the reference zips, writes one clone zip;
+ROMDIR is never modified).
+
 ## Emulator change budget (measured, not estimated)
 
 | Change | FBNeo | Class |
 |---|---|---|
-| QSound 8 → 16 MB | descriptor only | descriptor |
-| GFX 32 → 48 MB (4 appended members) | descriptor only | descriptor |
+| QSound 8 → 16 MB | descriptor only (**B0 verified**) | descriptor |
+| GFX 32 → 48 MB (4 appended members) | descriptor only (**B1 verified**) | descriptor |
 | PRG 4 → 6 MB | **zero lines** (A1) | descriptor |
 | 19-bit tile address (bit-12 promote) | ~2 conditional lines, `cps_obj.cpp:429-434`, gated on a new `Cps2Wide` flag | **core, profile-gated** |
 | New driver entry carrying the profile | new `BurnRomInfo` + `BurnDriver` beside `VsavjRomDesc[]` | descriptor |

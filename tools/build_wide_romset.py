@@ -58,7 +58,7 @@ def main():
         for i in range(a.qsound):
             zf.writestr(f"vsw.{21+i}m", blank)
         for i in range(a.gfx):
-            zf.writestr(f"vsw.{31+i}m", blank)
+            zf.writestr(f"vsw.{31+2*i}m", blank)  # odd names mirror the stock interleave
     print(f"  wrote {out_path}: vsavj members + {a.qsound} QSound + {a.gfx} GFX "
           f"appended ({MEMBER*(a.qsound+a.gfx)//(1024*1024)} MB of zero fill)")
     print("  NOTE: descriptor sizes in FBNeo's VsavjwRomDesc[] must match "

@@ -984,3 +984,14 @@ carries an `installing` flag for exactly this reason; new instruments
 must copy it. (Separately: MAME can segfault during teardown AFTER
 `manager.machine:exit()`. The log is already written, so scripted audits
 must assert on the instrument's own SUMMARY line, never on the exit code.)
+
+## FBNeo's d_cps2.cpp is not valid UTF-8, and SKIPDEPEND hides driver edits
+Two traps when scripting FBNeo descriptor changes. (1) `d_cps2.cpp`
+contains game titles in local encodings, so `open(path).read()` dies with
+a UnicodeDecodeError — edit it in BYTE mode, and remember a Python bytes
+literal cannot contain non-ASCII characters (an em-dash in a comment is
+enough to fail the edit while the surrounding script "succeeds"). (2) The
+build uses `SKIPDEPEND=1`, which does not track header or driver changes:
+after editing a driver, `touch` the source or the link silently reuses the
+old object and the emulator keeps the previous descriptor. Symptom: a
+grown region that measures exactly like the stock one.

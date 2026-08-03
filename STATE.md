@@ -1,9 +1,8 @@
 # STATE — living progress log
 
-Updated: 2026-08-03 (session 14z-53 — PROJECT PIVOT: the 18-character
-goal needs an extended hardware profile. CPS-2 WIDE v1 designed and
-approved in principle; Phase A measurements ALL GREEN, and two of them
-corrected the architecture)
+Updated: 2026-08-03 (session 14z-54 — WIDE Phase B under way: QSound
+16MB (B0) and GFX 48MB (B1) both PROVEN INERT on the emulator superset
+invariant AND profile inertness, 24/24 bit-identical each)
 
 ## Session 14z-49 (rounds 61-62: HUD MUGSHOT + NAME + SELECT MEDALLION — the whole per-slot venue-asset family fixed)
 
@@ -63,6 +62,54 @@ Build `b91647c7da14ded6316cee8dc057c8daf1c3fb1e` (donovan6, stage 6).
   re-verified: Donovan medallion in Jedah's ringed cell, Gallon's
   werewolf 3x3 restored, VS-splash big portrait + name were already
   correct.
+
+## Session 14z-54 (WIDE Phase B0+B1: the first two regions grown and proven inert)
+
+Both steps green on the new gate `tests/test_wide_profile.sh`
+(12-replay legacy corpus x 2 invariants = 24 comparisons per run):
+
+- **B0 — QSound 8 -> 16 MB.** New FBNeo driver entry `vsavjw` (clone of
+  vsav) declaring four uniform 4 MB QSound members. **Zero core lines** —
+  FBNeo derives nCpsQSamLen from the descriptor table and masks with
+  `nCpsQSamLen-1`. 24/24 bit-identical.
+- **B1 — GFX 32 -> 48 MB.** One appended group of four uniform 4 MB
+  members (the loader consumes gfx four at a time and mis-sizes if any
+  member differs, so groups of four / equal sizes are structural, not
+  stylistic). 24/24 bit-identical — **A3's prediction held**: no legacy
+  draw depended on the 32 MB address wrap.
+
+**The two invariants, both enforced every run:**
+1. *Emulator superset invariant* (Rule 1 v2 clause 3) — the patched binary
+   running STOCK vsavj is bit-identical to a pre-patch reference binary.
+   `WIDE=0 tools/setup_fbneo.sh` builds that reference. The gate exits 2
+   with a loud notice if no reference is supplied; an unrun invariant must
+   never read as green.
+2. *Profile inertness* — WIDE set vs stock set on the same binary.
+
+**Fingerprint blind spot confirmed and partly closed.** The dispatch
+fingerprint hashes PROGRAM members only, so gfx/QSound content and the
+emulator profile were invisible to build identity (they survived only as
+hand-written registry notes — and the patched builds DO change gfx
+members). Added `build_fingerprint.py --full`: whole-set fingerprint plus
+a per-region breakdown, which now reports WIDE as 16 gfx/qsnd members /
+64 MB against stock's 10 / 40 MB. Promoting --full to the dispatch key is
+deliberate future work: it changes every fingerprint and so needs the
+registry rows recomputed (expectation CONTENT is unaffected — a registry
+update, not a re-freeze).
+
+Artifacts: `emu/fbneo-patches/0002-cps2-wide-v1-qsound16.patch` (kept
+SEPARATE from the frontend harness patch so the trust surfaces stay
+separable), `tools/build_wide_romset.py`, `tests/test_wide_profile.sh`,
+`tools/setup_fbneo.sh` gains WIDE=0/1.
+
+Two traps paid for: FBNeo's `d_cps2.cpp` is not valid UTF-8 (game titles
+in local encodings) so scripted edits must be byte-mode; and SKIPDEPEND=1
+does not track header/driver changes, so a driver edit needs its object
+touched explicitly or the build silently keeps the old descriptor.
+
+NEXT: B2 (the bit-12 promote line under a `Cps2Wide` flag — the profile's
+only real core edit), B3 (PRG 4->6 MB, which A1 says costs zero lines),
+then B4 the canary build.
 
 ## Session 14z-53 (RE-CONTEXTUALIZED: from "fit in the holes" to CPS-2 WIDE; Phase A measurements complete)
 
