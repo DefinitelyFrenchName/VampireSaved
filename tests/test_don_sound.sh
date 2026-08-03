@@ -15,7 +15,11 @@
 # loud failure, not a silent behavior change (sound is invisible to every
 # RAM/pixel gate we have, so this is the only detector).
 #
-# Usage: ROMDIR=... tests/test_don_sound.sh [rompath_dir]
+# Usage: ROMDIR=... [SET=vsavjw] tests/test_don_sound.sh [rompath_dir]
+#   SET selects the driver, so this gate can be pointed at a CPS-2 WIDE
+#   build (packed as vsavjw) as well as a stock one. The tripwire below is
+#   the SAME either way — and it matters MORE on the WIDE track, which is
+#   where the per-node sfx helper is actually live.
 set -eu
 ROMDIR="${ROMDIR:?set ROMDIR}"
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
@@ -29,7 +33,7 @@ for rp in 12_donovan_vs_cpu 19_don_dp_spam 25_don_darkforce 56_don_es_ls; do
     REPLAY="$REPO/tests/replays/$rp.rpl" FRAMES=3400 \
         TRACE_OUT="$WORK/$rp.txt" MAME_SANDBOX="$WORK/$rp" \
         CHECKSUM_OUT="$WORK/$rp/c.log" MAME_ROMPATH="$RPDIR;$ROMDIR" \
-        tools/run_mame.sh vsavj \
+        tools/run_mame.sh "${SET:-vsavj}" \
         -autoboot_script "$REPO/tests/lua/ring_tap.lua" > /dev/null 2>&1
 done
 
@@ -51,6 +55,23 @@ EXPECT = {
                        0x170,0x171,0x470,0x471,0x498,0x49a,0x62b,0xff00,0xff05,
                        0xff07},
 }
+# ── WIDE-track overlay (14z-59i) ─────────────────────────────────────────
+# On the CPS-2 WIDE build the per-node sfx helper is LIVE and the ported
+# record array is present, so Donovan's shared sfx finally reach the ring.
+# These ids are ADDITIONS to the stock inventory, and every one of them is
+# from the keep_ids allowlist (samples verified identical on vsavj). The
+# music range stays empty — that assert above is unchanged and is the
+# property that actually matters.
+WIDE_EXTRA = {
+    "12_donovan_vs_cpu": {0x110, 0x111, 0x112},
+    "19_don_dp_spam":    {0x110, 0x111},
+    "25_don_darkforce":  {0x110},
+    "56_don_es_ls":      {0x119},
+}
+if os.environ.get("SET", "vsavj").endswith("w"):
+    for _rp, _extra in WIDE_EXTRA.items():
+        EXPECT[_rp] = EXPECT[_rp] | _extra
+
 fail = 0
 for rp in sorted(EXPECT):
     p = os.path.join(work, f"{rp}.txt")

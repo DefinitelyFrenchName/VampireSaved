@@ -5,6 +5,79 @@ parity PROVEN, and the WIDE profile ported to it**. Plus an unplanned
 finding that matters more than the port: MAME is not perfectly
 deterministic run-to-run, and the whole oracle assumed it was)
 
+## Session 14z-59i (M5 SOUND IS AUDIBLE; WIDE build registered; a false fingerprint corrected)
+
+### Donovan's move sounds now play — and no music
+
+The 14z-52 blocker is fully closed. Placing the record array was only half;
+the **per-node sfx helper** (vs2 `0x5122` -> vsavj `0x4CE2`) was still
+stubbed, absorbing ~400 calls per match. Un-stubbed on the WIDE track:
+
+| Replay | ids that now reach the QSound ring |
+|---|---|
+| 12_donovan_vs_cpu | 0x110, 0x111, 0x112 |
+| 19_don_dp_spam | 0x110, 0x111 |
+| 25_don_darkforce | 0x110 |
+| 56_don_es_ls | 0x119 |
+
+Every one is from the `keep_ids` allowlist (samples verified byte-identical
+on vsavj), `missing=[]`, and **zero music-range ids** — the `0x700-0x7FF`
+tripwire in `tests/test_don_sound.sh` never fired. That tripwire is the
+whole point: it is the round-2 "music instead of sfx" bug, and it stays
+shut. Stock track unchanged and still green.
+
+This answers the 14z-52 caveat directly ("those entries never fire in any
+of our 8 Donovan replays"): with the helper live they fire in all four
+sound replays.
+
+### The safety coupling is STRUCTURAL
+
+Un-stubbing the helper while slot 0x0F still resolves to JEDAH's array
+(~40 entries, Donovan indexes to 43) reads PAST it and enqueues whatever
+follows — including the music range. So the un-stub is driven by the
+`unstub` field of the SAME `[[sound_table]]` row that places the array, not
+by a reconciliation status or a profile name. **No ordering of edits can
+produce a live helper with no array.**
+
+### THE CORRECTION: 14z-59h reported a fingerprint that was not the build's
+
+`build_donovan.sh` fingerprinted without `--set`, so it defaulted to
+`vsavj`; a WIDE build (packed `vsavjw`) found no `vsavj.zip` in its own
+rompath, **fell through to `$ROMDIR`, and reported the PRISTINE reference
+ROM's fingerprint**. `b0eb9ecd` is the vanilla row already in
+registry.tsv. Two different builds reported the same value, and it was
+neither of theirs — and it made the helper un-stub look like a no-op.
+
+Also fixed: `_PRG_RE` did not match `vsw.41-.44`, so extension CONTENT was
+invisible to build identity — 14z-54's gfx/QSound blind spot in a new
+region. Both in GOTCHAS.
+
+Real fingerprints, measured after both fixes:
+
+| Build | Fingerprint |
+|---|---|
+| stock (vsavj) | `ae701ffb…` (unchanged) |
+| WIDE, helper live | **`ac52eeff…`** |
+| WIDE, helper stubbed (control) | `ec457c9d…` |
+
+The control proves the un-stub is real end-to-end, which the broken
+fingerprint had hidden.
+
+### Registered (task 2)
+
+`ac52eeff… -> donovan-m5w` in `tests/expected/registry.tsv`.
+`tests/test_don_sound.sh` gained `SET=` (default `vsavj`, so stock is
+untouched) and a WIDE inventory overlay. Both tracks PASS.
+
+### READY FOR PLAYTEST
+
+Build: `KEY_SET=vsavj GEN_FLAGS="--allow-plausible --tripwire-open
+--profile cps2-wide-v1" tools/build_donovan.sh 6 <out>`
+Run: patched FBNeo, driver **vsavjw**, `-rompath "<out>/rompath;$ROMDIR"`.
+What to listen for: Donovan's normals/specials should now have their shared
+impact/sword sfx. His VOICE lines are still silent by design — those
+samples do not exist in vsav's ROMs (STATE "M5 voice samples", still open).
+
 ## Session 14z-59h (Phase C step 2 — the image grows; M5 SOUND UNBLOCKED)
 
 **The 352-byte sound table has a home, and the 68k provably reads it.**
@@ -21,7 +94,7 @@ The blocker that has stood since 14z-52 is gone.
 | stock build | still `ae701ffb`, byte-identical |
 
 Gate: `tests/test_phasec_image.sh` (all four properties at once).
-WIDE build fingerprint: `b0eb9ecd8a6fd354f398d4347002b204b784f47c`.
+WIDE build fingerprint: ~~`b0eb9ecd`~~ **WRONG — see 14z-59i.** That is the PRISTINE vsavj fingerprint; the builder was fingerprinting the reference ROM. Real value: `ac52eeff`.
 
 **The negative control is the point.** B4 taught that a relocation which
 "passes" proves nothing if the data is never read, so the gate zeroes the

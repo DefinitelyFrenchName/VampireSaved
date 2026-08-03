@@ -1527,3 +1527,9 @@ ptr_table = 0x0BF41A
 ptr_row = 0x0F
 ptr_old = 0x000B3220
 keep_ids = "0x110,0x111,0x112,0x119,0x152,0x202"
+# Un-stub the per-node sfx helper (vs2 0x005122 -> vsavj twin 0x004CE2, the
+# address recorded in its reconciliation row). Placing it HERE and not in
+# reconciliation.toml is deliberate: the helper is only safe once this
+# array exists, so the two must be impossible to enable separately. A stock
+# build skips this whole row and the helper stays stubbed.
+unstub = "0x005122=0x004CE2"

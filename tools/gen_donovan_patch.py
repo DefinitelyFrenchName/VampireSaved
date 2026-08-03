@@ -110,6 +110,40 @@ def main():
         for m in toml_loads(args.recon.read_text()).get("map", []):
             recon[_int(m["vsav2"])] = m
 
+    # ── M5: the per-node sfx helper goes live ONLY with the record array ─────
+    # 14z-52 measured exactly why this coupling has to be structural. The
+    # ported dispatcher resolves slot 0x0F through the per-char pointer table;
+    # without THIS character's own array, that row still points at JEDAH's
+    # (~40 live entries) while Donovan's scripts index up to 43. An un-stubbed
+    # helper would therefore read PAST the array and enqueue whatever follows
+    # — including the vsavj 0x700-0x7FF MUSIC range. That is the original
+    # 214P/214K "music instead of sfx" bug, and it is a shipping-grade defect.
+    #
+    # So the un-stub is driven by the SAME manifest row that places the array,
+    # not by a profile name and not by a hand-edited reconciliation status. If
+    # the array is not placed — a stock-size build, where the row is
+    # profile-gated away — the helper stays stubbed BY CONSTRUCTION. There is
+    # no ordering of edits that can produce a live helper with no array.
+    unstubbed = []
+    for _st in port.get("sound_table", []):
+        if args.stage < _int(_st.get("stage", 0)):
+            continue
+        if _st.get("profile") and _st["profile"] != args.profile:
+            continue
+        for _spec in str(_st.get("unstub", "")).split(","):
+            _spec = _spec.strip()
+            if not _spec:
+                continue
+            _v2, _vj = (_int(x) for x in _spec.split("="))
+            _row = recon.get(_v2)
+            if _row is None:
+                fail_early = f"sound_table {_st['name']}: unstub {_v2:#x} has no recon row"
+                raise SystemExit(fail_early)
+            _row["vsavj"] = _vj
+            _row["kind"] = "engine"
+            _row["status"] = "verified"
+            unstubbed.append((_st["name"], _v2, _vj))
+
     dst_slot = _int(port["port"]["dst_slot"])
     var_slot = dst_slot | 0x10
     mirror = port["port"].get("mirror_variant", True)
@@ -2010,6 +2044,9 @@ def main():
     # re-deriving it. Emitted only when a profile space was actually used, so
     # a WIDE build that happens to need no extension stays byte-identical to
     # the stock one.
+    for _n, _v2, _vj in unstubbed:
+        notes.append(f"# M5: sfx helper {_v2:#x} UN-STUBBED -> vsavj {_vj:#x} "
+                     f"(record array {_n} is placed)")
     ext_spaces = [spaces[n] for n in order
                   if spaces[n]["profile"] and spaces[n]["cur"] > spaces[n]["start"]]
     image = None

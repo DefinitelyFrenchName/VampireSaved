@@ -1300,3 +1300,50 @@ Third member of the same family this session, after `git apply` silently
 skipping (exit 0) and the MAME submodule gitlink drifting to 0.289: **the
 tool reports success while the artifact is not what was asked for.** Assert
 on the artifact.
+
+## A build-fingerprint call without `--set` silently fingerprints the
+## PRISTINE reference ROM (paid: 2026-08-04, 14z-59i)
+`tools/build_donovan.sh` ended with
+`build_fingerprint.py "$OUTBASE/rompath;$ROMDIR" --sha-only` — no `--set`,
+so it defaulted to `vsavj`. That was harmless while every build packed as
+`vsavj`. The moment a build packed as **`vsavjw`** (CPS-2 WIDE), the tool
+found no `vsavj.zip` in the build's own rompath, **fell through to
+`$ROMDIR`**, and reported the UNTOUCHED REFERENCE ROM's fingerprint as the
+build's.
+
+Symptom: `b0eb9ecd…` reported for a WIDE build — which is exactly the
+`vsavj` row already sitting in `tests/expected/registry.tsv` as "vanilla
+vsavj reference program image". Two different builds reported the same
+fingerprint, and it was the fingerprint of neither of them. It also made a
+real code change (un-stubbing the sfx helper) look like it produced
+identical output.
+
+Rules:
+- A rompath is a SEARCH PATH. Anything that resolves a set by name through
+  one can silently answer from the reference directory. Always name the
+  set you actually built.
+- If a fingerprint ever equals a known reference row, treat that as a bug
+  until proven otherwise — a patched build cannot hash to the pristine ROM.
+
+## `_PRG_RE` did not match the WIDE extension members, so extension content
+## was invisible to the build fingerprint
+`\.(0[3-9]|10)[a-z]?$` matches the stock program chips but not `vsw.41-.44`.
+Two WIDE builds differing ONLY in extension content therefore hashed
+identically — the same blind spot 14z-54 found for gfx/QSound members, in a
+new region. Widened to `\.(0[3-9]|10|4[1-4])[a-z]?$`; `int("41")` sorts
+after `int("10")`, which is the load order. Verified the alternation does
+not accidentally catch gfx/QSound names (`.11m`, `.14m`, `.21m`, `.31m` all
+still excluded).
+
+## The sfx helper and the record array must be impossible to enable separately
+Un-stubbing the per-node sfx helper (vs2 `0x5122` -> vsavj `0x4CE2`) while
+slot 0x0F's pointer row still resolves to JEDAH's array means reading PAST
+that array (~40 entries) with indices up to 43 — enqueuing whatever follows,
+including the vsavj `0x700-0x7FF` MUSIC range. That is the original
+214P/214K "music instead of sfx" bug.
+
+So the un-stub is driven by the `unstub` field of the SAME `[[sound_table]]`
+manifest row that places the array, NOT by a hand-edited reconciliation
+status and NOT by a profile name. If the array is not placed, the helper
+stays stubbed by construction, and no ordering of edits can produce a live
+helper with no array.

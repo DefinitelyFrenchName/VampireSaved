@@ -366,7 +366,13 @@ class Cipher:
 
 # ── set handling ─────────────────────────────────────────────────────────────
 
-_PRG_RE = re.compile(r"\.(0[3-9]|10)[a-z]?$")
+# Program members: the stock .03-.10 pair-numbered chips, plus the CPS-2
+# WIDE extension members vsw.41-.44. Without the 4x alternation the
+# extension was invisible to the build fingerprint, so two WIDE builds
+# differing only in extension CONTENT hashed identically — the same blind
+# spot 14z-54 found for gfx/QSound. Ordering still works: int("41") sorts
+# after int("10"), which is the load order.
+_PRG_RE = re.compile(r"\.(0[3-9]|10|4[1-4])[a-z]?$")
 
 
 def words_from_file_bytes(blob):

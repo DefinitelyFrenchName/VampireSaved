@@ -127,6 +127,10 @@ if [ "$STAGE" -ge 6 ]; then
     python3 tools/verify_gfx_build.py "$OUTBASE"
 fi
 
-python3 tools/build_fingerprint.py "$OUTBASE/rompath;$ROMDIR" --sha-only \
+# Fingerprint the SET WE PACKED. Omitting --set defaulted to vsavj, so a
+# WIDE build (packed as vsavjw) found no vsavj.zip in its own rompath and
+# silently fell through to the PRISTINE reference in $ROMDIR — reporting the
+# untouched ROM's fingerprint as the build's. Caught 14z-59i.
+python3 tools/build_fingerprint.py "$OUTBASE/rompath;$ROMDIR" --set "$PACK_SET" --sha-only \
     | sed 's/^/build fingerprint: /'
 echo "OK: stage $STAGE build at $OUTBASE/rompath (fingerprint above; register in tests/expected/registry.tsv at freeze time)"
