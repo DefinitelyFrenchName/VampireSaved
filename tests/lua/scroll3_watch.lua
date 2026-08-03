@@ -33,6 +33,11 @@ local bases_seen = { [scroll3_base] = true }
 local danger_frames = 0
 local max_code = 0
 local frame = 0
+-- WIDE A3 census counters (additive; SCROLL3SUMMARY's contract is unchanged)
+s3_blank_cells = 0     -- cells holding the 0xFFFF blank sentinel
+s3_high_cells = 0      -- cells holding a REAL code >= 0xC000
+s3_high_codes = {}     -- distinct real high codes -> count
+s3_max_real = 0        -- max code excluding the sentinel
 
 local rep = io.open(out_path, "w")
 
@@ -49,6 +54,21 @@ _G.s3_frame_sub = emu.add_machine_frame_notifier(function()
     for off = 0, 0x3ffe, 4 do          -- (code.w, attr.w) pairs
         local code = space:read_u16(base + off)
         if code > max_code then max_code = code end
+        -- WIDE A3 census: scroll3's absolute tile index is 0x10000+4*code,
+        -- so code >= 0xC000 exceeds the 0x40000-tile region and today WRAPS
+        -- via nCpsGfxMask. Growing the gfx region moves that wrap point, so
+        -- we need to know whether any REAL code gets there — 0xFFFF is the
+        -- blank/uninitialised sentinel and must be counted separately or it
+        -- masquerades as a blocker.
+        if code >= 0xC000 then
+            if code == 0xFFFF then
+                s3_blank_cells = s3_blank_cells + 1
+            else
+                s3_high_cells = s3_high_cells + 1
+                s3_high_codes[code] = (s3_high_codes[code] or 0) + 1
+                if code > s3_max_real then s3_max_real = code end
+            end
+        end
         if code >= clo and code <= chi then
             n_danger = n_danger + 1
         end
@@ -67,6 +87,15 @@ _G.s3_stop_sub = emu.add_machine_stop_notifier(function()
     table.sort(bl)
     rep:write(string.format("SCROLL3SUMMARY maxcode=%04x danger_frames=%d bases=%s\n",
                             max_code, danger_frames, table.concat(bl, ",")))
+    local hl, n = {}, 0
+    for c, k in pairs(s3_high_codes) do
+        n = n + 1
+        if n <= 12 then hl[#hl + 1] = string.format("%04x:%d", c, k) end
+    end
+    table.sort(hl)
+    rep:write(string.format(
+        "SCROLL3CENSUS max_real=%04x high_cells=%d distinct_high=%d blank_cells=%d high=%s\n",
+        s3_max_real, s3_high_cells, n, s3_blank_cells, table.concat(hl, ",")))
     rep:close()
 end)
 

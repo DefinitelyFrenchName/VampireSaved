@@ -953,3 +953,34 @@ any id in the music range, and freezes the per-replay id inventory.
 Any subsystem whose output leaves the 68k address space (sound today,
 anything sent to another processor tomorrow) needs a dedicated
 detector — "the battery is green" says nothing about it.
+
+## OBJ y-word bit 15 is the sprite-list TERMINATOR, not a spare bit
+The plan for a 19th tile-address bit was "widen the OBJ mask 0x6000 ->
+0xE000", i.e. use y-word bit 15. That bit ends the sprite list
+(`CpsObjGet`: `if (ps[1] & 0x8000) break;`), so setting it on a sprite
+would silently drop every sprite after it. Capcom's own CPS-2 Turbo hits
+this and promotes **bit 12** instead (`if (y & 0x1000) y |= 0x8000`)
+AFTER the terminator check. Two lessons: (a) the free bit is 12, with
+hardware precedent; (b) before treating any bit in a hardware structure
+as spare, find the code that CONSUMES the structure — a census of "which
+bits are set" cannot tell you which bits are load-bearing.
+
+## Censusing a structure without knowing its terminator counts garbage
+The first y-word census scanned all of OBJ RAM and reported 841 sprites
+with bit 15 set — "vanilla uses the bit, plan dead". Every one of them
+was stale data PAST the list terminator, never drawn. The same trap in
+the scroll3 tilemap: raw `maxcode` is always 0xFFFF because unused cells
+hold that sentinel, which reads as "legacy content reaches the address
+wrap" when nothing of the sort is happening. Walk structures the way the
+hardware walks them (respect terminators, bounds and buffer selection),
+and separate sentinels from real values, or the measurement will confi-
+dently answer a question you did not ask.
+
+## A MAME Lua tap installer must guard against its own change notifier
+Installing a memory tap can itself fire the space-change notifier; if the
+notifier reinstalls taps unguarded, it recurses until the stack dies —
+MAME segfaults with no Lua error and no diagnostic. `tap_writes.lua`
+carries an `installing` flag for exactly this reason; new instruments
+must copy it. (Separately: MAME can segfault during teardown AFTER
+`manager.machine:exit()`. The log is already written, so scripted audits
+must assert on the instrument's own SUMMARY line, never on the exit code.)

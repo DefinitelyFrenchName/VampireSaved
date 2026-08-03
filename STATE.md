@@ -1,9 +1,9 @@
 # STATE — living progress log
 
-Updated: 2026-08-03 (session 14z-52 — M5: MUSIC BUG ROOT-CAUSED
-(vsavj 0x7xx = music tracks, vs2 0x7xx = Donovan's voice bank), 13
-sound rows restored, sound gate added; the remaining sound is
-BLOCKED ON ROM SPACE — decision queued)
+Updated: 2026-08-03 (session 14z-53 — PROJECT PIVOT: the 18-character
+goal needs an extended hardware profile. CPS-2 WIDE v1 designed and
+approved in principle; Phase A measurements ALL GREEN, and two of them
+corrected the architecture)
 
 ## Session 14z-49 (rounds 61-62: HUD MUGSHOT + NAME + SELECT MEDALLION — the whole per-slot venue-asset family fixed)
 
@@ -63,6 +63,89 @@ Build `b91647c7da14ded6316cee8dc057c8daf1c3fb1e` (donovan6, stage 6).
   re-verified: Donovan medallion in Jedah's ringed cell, Gallon's
   werewolf 3x3 restored, VS-splash big portrait + name were already
   correct.
+
+## Session 14z-53 (RE-CONTEXTUALIZED: from "fit in the holes" to CPS-2 WIDE; Phase A measurements complete)
+
+**The maintainer re-stated the goal and it changes the shape of the
+work:** the target is all 18 characters; a stock CPS-2 provably cannot
+hold them; the target platform is EMULATION with **FBNeo primary** (it is
+the GGPO rollback-netplay reference, which is in the ideal scope), MAME
+as oracle where it can follow, MiSTer nice-to-have. The Donovan work is a
+**proof of concept** — it proved characters can be ported and surfaced
+the limits; it never addressed structuring the ROM for three characters.
+
+**The measured wall** (this is why the pivot is forced, not chosen):
+
+| Resource | Free today | 1 char costs | 3 need | Deficit |
+|---|---|---|---|---|
+| PRG | 1,112 B | ~338 KiB | ~1.0 MB | ~886 KiB |
+| GFX | ~370 tiles | ~16-18K tiles | ~50K tiles | ~6-7 MB |
+| QSound | 0 | — | 3 voice banks | ~8 MB |
+
+Slot replacement cannot pay: only ~134 KiB of Jedah's PRG was ever
+identified as dead (unaudited, already double-booked), and the GFX
+equivalent audit already found the "dead" band held 358 protected codes.
+
+### Decisions taken (maintainer, round 66)
+
+1. **Rule 1 v2 — profile-gated emulator changes.** Emulator edits allowed
+   only inside a named versioned profile, bounded/declarative, gated on a
+   driver flag, and subject to an **emulator superset invariant** (patched
+   binary + stock vsavj must reproduce frozen vanilla expectations
+   bit-for-bit). Ratified per profile version.
+2. **Size the profile ONCE**: PRG 6 MB / GFX 48 MB / QSound 16 MB
+   (every size change forces a full expectation re-freeze).
+3. **MAME**: attempt the pinned source build; FBNeo is primary if
+   alignment becomes a wall — **but losing MAME must never mean losing
+   test coverage** (maintainer's rider). The FBNeo-only path is gated
+   behind porting the instrument set into harness.cpp and PROVING
+   equivalence by re-deriving known findings.
+4. Phase A measurements before any growth.
+
+Profile spec drafted: **docs/cps2_wide.md** (v1 DRAFT, awaiting
+ratification after Phase B). Approved plan archived at
+~/.claude/plans/glowing-bouncing-iverson.md.
+
+### Phase A — ALL FOUR GREEN (tests/audit_wide_phase_a.sh, vanilla corpus)
+
+- **A1: PRG growth is FREE.** Zero reads into any candidate extension
+  window across the whole legacy corpus. FBNeo already maps program ROM
+  as `SekMapMemory(CpsRom, 0, nCpsRomLen-1)`, so growing to 6 MB costs
+  **zero core lines** — the `$A00000` fallback window is unnecessary.
+  Instrument ground-truthed first (control window saw 252,705 work-RAM
+  reads) so the null result is evidence, not blindness.
+- **A2: the 19th tile bit exists — but NOT where the plan said.**
+  **y-word bit 15 is the CPS-2 sprite-list TERMINATOR** (`CpsObjGet:
+  if (ps[1] & 0x8000) break`), so the proposed 0x6000->0xE000 mask
+  widening would have dropped every sprite after the first one carrying
+  it. Capcom's own CPS-2 Turbo solves this by promoting **bit 12** after
+  the terminator check; measurement confirms vanilla never sets bit 12 on
+  a live sprite, so WIDE adopts the Turbo rule. The whole profile now
+  costs **one gated conditional** of emulation logic.
+- **A3: gfx growth does not disturb scroll3.** No real legacy code
+  reaches the 0xC000 wrap threshold (max real code 0x0; only the 0xFFFF
+  blank sentinel sits high). First pass reported a false BLOCKED because
+  the raw census counted the sentinel — corrected with a real-vs-sentinel
+  split. B1's pixel gate remains the definitive confirmation.
+- **A4: Z80 is not a constraint.** 27,727 B free in vm3.01/02 (largest
+  run 13,961 B) — ample for new sample-table rows. This was the only
+  completely unmeasured region in the project.
+
+New instruments (committed, rerunnable): tests/lua/unmapped_probe.lua,
+tests/lua/objy_bits.lua, tools/audit_z80_space.py, plus a real-vs-sentinel
+census added to tests/lua/scroll3_watch.lua (its existing SCROLL3SUMMARY
+contract untouched; the new data is a separate SCROLL3CENSUS line).
+Three GOTCHAS paid for: the terminator trap, censusing without knowing a
+structure's terminator, and the tap-installer reentrancy segfault.
+
+### NEXT: Phase B (prove the profile inert, one variable per build)
+
+B0 QSound 16 MB (legal today, rehearses the workflow, fixes the
+fingerprint's blind spot) -> B1 GFX 48 MB zero-filled -> B2 the bit-12
+line under `Cps2Wide` -> B3 PRG 6 MB -> B4 the canary build (relocate an
+EXISTING character's anim block into the extension + one legacy tile into
+the new gfx group, both against a bit-exact vanilla oracle) -> B5 MAME
+parity / B5b suite preservation.
 
 ## Session 14z-52 (M5 phase 1: music bug root-caused; 13 rows restored; the rest is a SPACE problem)
 

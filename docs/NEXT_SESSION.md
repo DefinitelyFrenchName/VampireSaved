@@ -1,31 +1,29 @@
-# NEXT SESSION — orientation (session 14z-52, 2026-08-03)
+# NEXT SESSION — orientation (session 14z-53, 2026-08-03)
 
-Read STATE.md sessions 14z-51..52 (the M5 sound arc) after this.
-The maintainer tests frequently and reports precisely — their reports
-are the project's best instrument; reference data they provide goes
-straight into gates.
+Read STATE.md session 14z-53 (the CPS-2 WIDE pivot + Phase A results) and
+docs/cps2_wide.md after this. The approved architecture plan is archived
+at ~/.claude/plans/glowing-bouncing-iverson.md.
+The maintainer tests frequently and reports precisely — their reports are
+the project's best instrument; reference data they provide goes straight
+into gates.
 
-## Ship state — M2b+ASSETS frozen; M5 sound half-done and BLOCKED
+## Ship state — frozen build stands; the project has pivoted to CPS-2 WIDE
 
-Frozen reference: `b91647c7` = **donovan-m2c** (round 65; validate any
-copy with `tests/run_suite.sh`, fingerprint auto-detects).
-Dev head: **`ae701ffb`** = m2c + the 14z-52 sound restores (13 farm
-rows; battery GREEN incl. the new sound gate). NOT frozen.
+Frozen reference: `b91647c7` = **donovan-m2c** (validate any copy with
+`tests/run_suite.sh`; fingerprint auto-detects).
+Dev head: `ae701ffb` (m2c + the 14z-52 sound restores; battery green).
 
-**M5 is blocked on a placement decision, not on understanding** — the
-music bug is root-caused (vsavj 0x700-0x7FF = MUSIC, vs2 = Donovan's
-voice bank) and the fix is written; it needs 0x160 bytes and both code
-holes are full. Two decisions wait in STATE "Decisions pending":
-where the sound table lives, and whether to port voice samples.
-The whole 14z-48b asset family is closed on it: in-fight HUD mugshot
-(brown Donovan 2x2 beside the timer), HUD name plate ("Donovan" gold
-script), select-wheel medallion (Donovan icon in Jedah's ringed
-cell). Colors + reactions gates extended and green; battery result:
-see STATE 14z-49 (queued at entry time).
-Battery: `ROMDIR="/Users/koneko/Developer/Vampire Saved/ROMS" tests/run_battery_m2.sh`
-(~35 min; ROM audit first per CLAUDE.md §3).
-Dev builds: `GEN_FLAGS="--allow-plausible --tripwire-open" tools/build_donovan.sh 6 build/donovan6`
-(a bare build FAILS on 58 open reconciliation refs — expected).
+**The work has re-contextualized.** The 18-character goal cannot fit a
+stock CPS-2 (measured: ~886 KiB PRG and ~6-7 MB of tiles short), so the
+project now has a named extended hardware profile — **CPS-2 WIDE v1**
+(PRG 6 MB / GFX 48 MB / QSound 16 MB), spec in `docs/cps2_wide.md`,
+governed by Rule 1 v2 (profile-gated emulator changes + an emulator
+superset invariant). **Phase A measurements are all green** and two of
+them corrected the design — see STATE 14z-53. The entire profile costs
+ONE gated conditional of emulation logic; everything else is table data.
+
+Phase A is rerunnable in one command:
+`ROMDIR=... tests/audit_wide_phase_a.sh`
 
 ## What 14z-52 did (read STATE 14z-52 for the full measurement)
 
@@ -58,31 +56,42 @@ Dev builds: `GEN_FLAGS="--allow-plausible --tripwire-open" tools/build_donovan.s
   cursor ring + color-render the art, never trust index==char-id)
   and the replay.lua DUMPS separator (';' — commas rc=3 silently).
 
-## Queued next (in order)
+## Queued next — Phase B: prove the profile inert (one variable per build)
 
-0. ~~Maintainer ratification of the third mask window~~ RATIFIED
-   (round 64) after the recolor-necessity A/B. Confirmation path if
-   ever suspected: `tests/audit_mask_window_ff4182.sh` (spec in
-   docs/atlas/ram.md).
-1. ~~Maintainer verification round on `b91647c7`~~ DONE (round 63):
-   "both medallion portraits are clean, no regression". Still open
-   on their side: the full-cast ES-finish pass.
-2. **M5 sounds — resume here after the placement decision:**
-   un-comment `[[sound_table]] don_sfx_records` in donovan.toml AND
-   the sound_helper row in reconciliation.toml (both carry full
-   instructions), point `hole =` at whatever home is chosen, rebuild,
-   then re-run tests/test_don_sound.sh: the music tripwire must stay
-   clean and the id inventories will legitimately GROW (that is the
-   sound appearing — re-freeze them deliberately, with a listening
-   round from the maintainer).
-3. ~~Freeze candidacy~~ DONE (round 65): **M2b+ASSETS FROZEN at
-   `b91647c7` -> donovan-m2c** (registry row + expectation set +
-   suite green by auto-detection; HANDOFF registry row). Validate
-   any copy of the frozen build with `ROMDIR=... MAME_ROMPATH=
-   "<rompath>;$ROMDIR" tests/run_suite.sh`.
-4. Small parked items: row-0x0F fixture override port (statue
-   accents), table-B 0x38C1D8 slot-0F repoint (alt-color), win-quote
-   palette, mash A/B for ES version.
+Each step is its own build and its own gate, so a failure names exactly
+one variable. Gate = `tests/run_battery_m2.sh` PLUS the new emulator
+superset invariant (patched binary running STOCK vsavj must reproduce the
+frozen vanilla expectations bit-for-bit).
+
+1. **B0 — QSound 8 -> 16 MB**, two zero-filled 4 MB members. Legal under
+   Rule 1 even as originally written; zero core lines. Rehearses the whole
+   grow-and-prove workflow at minimum risk. **Also fix the fingerprint
+   here**: `tools/build_fingerprint.py` covers only the program image, so
+   gfx/qsound members and the emulator profile are currently invisible to
+   it (they live in a hand-written registry note).
+2. **B1 — GFX 32 -> 48 MB**, four zero-filled members, no bit widening.
+   Isolates `nCpsGfxLen`/`nCpsGfxMask`. A3 predicts inert; if the build
+   disagrees with the prediction, stop and re-derive.
+3. **B2 — the bit-12 promote line** under a new `Cps2Wide` driver flag
+   (new clone descriptor beside `VsavjRomDesc[]`; never mutate the stock
+   descriptor).
+4. **B3 — PRG 4 -> 6 MB**, zero-filled extension (A1 says linear is safe).
+5. **B4 — the canary build** (highest value per unit of work): relocate an
+   EXISTING character's anim block into the PRG extension + move one
+   legacy tile into the new gfx group with a bank value carrying bit 12,
+   and draw it. Both have bit-exact vanilla oracles, so this tests
+   reachability, pointer width, PC-relative distance, the encryption
+   boundary and 19-bit addressing at once with zero RE ambiguity.
+6. **B5 / B5b — MAME parity, then (only if MAME walls) suite migration to
+   FBNeo.** Never drop coverage: B5b requires porting the instruments into
+   harness.cpp and proving equivalence by re-deriving known findings.
+
+Then Phase C (multi-tenant pipeline; starts with the address-space model,
+which also unblocks the stuck 352-byte sound table) and Phase D
+(Huitzil, Pyron, select screen).
+
+Parked, unaffected: the M5 voice-sample decision (B0 unblocks it), the
+roster-access mechanism (resolves after the roster physically exists).
 
 ## Measurement kit (14z-49 additions)
 

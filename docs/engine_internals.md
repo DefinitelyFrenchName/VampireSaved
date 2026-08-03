@@ -552,3 +552,31 @@ that is ported into our build at ~`PRG:0xCE3B8` (vanilla twin
 - Helper: vsavj `0x4CE2` / vs2 `0x5122` — `btst #0,$70(a6)` then
   `addi.w #$300,d1` (the +0x300 id alias seen in the sweep maps) and
   jumps into the enqueue path.
+
+### OBJ sprite-list structure (measured 14z-53, WIDE Phase A)
+
+The CPS-2 sprite list is 8-byte entries `(x.w, y.w, code.w, attr.w)`, up
+to 0x400 of them, in one of two buffers 0x8000 apart (FBNeo selects with
+`CpsRam708 + ((nCpsObjectBank ^ 1) << 15)`). Two terminators end the walk:
+
+- **y-word bit 15 set** — end of list (`CpsObjGet`);
+- **attr >= 0xFF00** — end of list (the "ringdest" case).
+
+Anything after either terminator is stale data that is never drawn; a
+census that ignores this over-counts badly (GOTCHAS).
+
+y-word bit layout as used by vanilla vsav (measured, full legacy corpus):
+
+| Bits | Meaning | Vanilla usage |
+|---|---|---|
+| 0-9 | Y position (10-bit signed) | live |
+| 13-14 | tile-address bits 16-17 (the gfx bank) | live: banks 0-3 |
+| 15 | **list terminator** | live (as terminator) |
+| 8-12 | unused by vsav | **bit 12 free** — the WIDE 19th address bit |
+
+The 19-bit rule (CPS-2 Turbo precedent, adopted by WIDE): promote bit 12
+into bit 15 for address composition only, after the terminator check —
+`if (y & 0x1000) y |= 0x8000; n |= (y & 0xE000) << 3`. Since the bank
+bits are supplied from data (per-char OBJ bank table `PRG:0x282D4` and a
+few `move.w #$X000` setters), reaching banks 4-7 may require no game-side
+code change at all.
