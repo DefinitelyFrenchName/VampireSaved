@@ -11,12 +11,100 @@ index 3bf65bd..0de57a1 100644
  
  ifdef FORCE_PULSE_AUDIO
  alldir	+= 	intf/audio/linux
+diff --git a/src/burner/sdl/main.cpp b/src/burner/sdl/main.cpp
+index 688404a..d8d8e65 100644
+--- a/src/burner/sdl/main.cpp
++++ b/src/burner/sdl/main.cpp
+@@ -38,6 +38,14 @@ const char* romname = NULL;
+ 
+ extern void InitSupportPaths();
+ 
++// Vampire Saved harness (harness.cpp)
++extern char szHarnessInput[MAX_PATH];
++extern char szHarnessOut[MAX_PATH];
++extern char szHarnessDumps[8192];
++extern INT32 nHarnessFrames;
++extern bool HarnessActive();
++extern int HarnessRun();
++
+ #ifdef BUILD_SDL2
+ SDL_Window* sdlWindow = NULL;
+ #endif
+@@ -116,6 +124,29 @@ int parseSwitches(int argc, char* argv[])
+ 			i++;
+ 			_tcscpy(CDEmuImage, argv[i]);
+ 		}
++		else if (strcmp(argv[i], "-hinput") == 0)   // Vampire Saved harness
++		{
++			if (++i >= argc) return 1;
++			snprintf(szHarnessInput, MAX_PATH, "%s", argv[i]);
++			bSaveconfig = 0;
++		}
++		else if (strcmp(argv[i], "-hout") == 0)
++		{
++			if (++i >= argc) return 1;
++			snprintf(szHarnessOut, MAX_PATH, "%s", argv[i]);
++			bSaveconfig = 0;
++		}
++		else if (strcmp(argv[i], "-hframes") == 0)
++		{
++			if (++i >= argc) return 1;
++			set_commandline_option(nHarnessFrames, atoi(argv[i]));
++		}
++		else if (strcmp(argv[i], "-hdump") == 0)
++		{
++			if (++i >= argc) return 1;
++			snprintf(szHarnessDumps, sizeof(szHarnessDumps), "%s", argv[i]);
++			bSaveconfig = 0;
++		}
+ 	}
+ 	return 0;
+ }
+@@ -246,9 +277,18 @@ void DoGame(int gameToRun)
+ {
+ 	if (!DrvInit(gameToRun, 0))
+ 	{
++		if (HarnessActive())
++		{
++			// headless scripted run: no media/audio init, no RunInit
++			// (avoids StatedAuto auto-savestate load), see harness.cpp
++			HarnessRun();
++		}
++		else
++		{
+ 		MediaInit();
+ 		display_set_controls();
+ 		RunMessageLoop();
++		}
+ 	}
+ 	else
+ 	{
+@@ -401,6 +441,19 @@ int main(int argc, char* argv[])
+ #if defined(BUILD_SDL2) && !defined(SDL_WINDOWS)
+ 	bprintf = AppDebugPrintf;
+ #endif
++
++	if (HarnessActive())
++	{
++		// Determinism: keep ALL mutable per-game state inside the harness
++		// sandbox (cwd). The user config may point these at shared absolute
++		// locations (e.g. ~/Library/Application Support/fbneo), where the
++		// EEPROM bootup counter would make consecutive runs diverge.
++		_stprintf(szAppEEPROMPath, _T("./"));
++		_stprintf(szAppHiscorePath, _T("./"));
++		_stprintf(szAppCheatsPath, _T("./"));
++		bSaveconfig = 0;
++	}
++
+ 	BurnLibInit();
+ 
+ 	// Search for a game now, for use in the menu and loading a games
 diff --git a/src/burner/sdl/harness.cpp b/src/burner/sdl/harness.cpp
 new file mode 100644
-index 0000000..5b03b3b
+index 0000000..09711d8
 --- /dev/null
 +++ b/src/burner/sdl/harness.cpp
-@@ -0,0 +1,224 @@
+@@ -0,0 +1,266 @@
 +// harness.cpp — Vampire Saved test harness for the SDL2 frontend.
 +// FRONTEND-ONLY: no emulation-core file is touched by this feature.
 +//
@@ -25,6 +113,14 @@ index 0000000..5b03b3b
 +// checksums CPS-2 work RAM (FNV-1a-64 over 68k-logical byte order) after
 +// every frame, and writes a log line-compatible with the MAME harness:
 +//     "<frame> <%016llx>\n" ... "END <frames>\n"
++//
++// VIDEO (opt-in, env FBNEO_HVIDEO=<path>): renders each frame into an
++// off-screen buffer and logs a per-frame FRAMEBUFFER checksum. Default
++// stays pBurnDraw=NULL so every existing log and frozen expectation is
++// unchanged. This exists because the RAM checksum is BLIND to the whole
++// video path -- a rendering change (e.g. the CPS-2 WIDE 19-bit sprite
++// tile address) is invisible to it, so a RAM-only gate would "pass" a
++// build whose graphics were broken.
 +//
 +// Activated by:  fbneo <set> -hinput <script.rpl> -hout <log> [-hframes N]
 +// See tools/run_replay_fbneo.sh in the Vampire Saved repo.
@@ -165,6 +261,17 @@ index 0000000..5b03b3b
 +// MAME Lua side (string.unpack("<i8") == little-endian 64-bit lanes of the
 +// logical byte stream).
 +
++static UINT8* pHarnessFB = NULL;       // off-screen render target (video mode)
++static INT32 nHarnessFBLen = 0;
++
++static UINT64 fnv1a64_buf(const UINT8* p, INT32 len)
++{
++    UINT64 h = 0xcbf29ce484222325ULL;
++    const UINT64 prime = 0x100000001b3ULL;
++    for (INT32 i = 0; i < len; i++) h = (h ^ p[i]) * prime;
++    return h;
++}
++
 +static UINT64 fnv1a64_workram()
 +{
 +    UINT64 h = 0xcbf29ce484222325ULL;
@@ -205,6 +312,24 @@ index 0000000..5b03b3b
 +
 +    InputMake(true);  // one normal pass: writes constants + all-zero switches
 +
++    // optional off-screen video (FBNEO_HVIDEO=<framebuffer checksum log>)
++    const char* szVideoOut = getenv("FBNEO_HVIDEO");
++    FILE* vout = NULL;
++    INT32 nVidW = 0, nVidH = 0;
++    if (szVideoOut && szVideoOut[0]) {
++        BurnDrvGetVisibleSize(&nVidW, &nVidH);
++        SetBurnHighCol(16);                 // fixed 16bpp: deterministic and
++        nBurnBpp = 2;                       // independent of any display setup
++        nBurnPitch = nVidW * nBurnBpp;
++        nHarnessFBLen = nVidW * nVidH * nBurnBpp;
++        pHarnessFB = (UINT8*)malloc(nHarnessFBLen);
++        memset(pHarnessFB, 0, nHarnessFBLen);
++        vout = fopen(szVideoOut, "w");
++        if (!vout) { printf("harness: cannot write %s\n", szVideoOut); return 1; }
++        fprintf(vout, "# framebuffer checksums %dx%d %dbpp\n", nVidW, nVidH, nBurnBpp * 8);
++        printf("harness: video on, %dx%d -> %s\n", nVidW, nVidH, szVideoOut);
++    }
++
 +    for (UINT32 f = 1; f <= nScriptFrames; f++) {
 +        // scripted inputs for frame f, active while frame f emulates
 +        UINT32 mask = held[f];
@@ -213,10 +338,13 @@ index 0000000..5b03b3b
 +
 +        nFramesEmulated++;
 +        nCurrentFrame++;
-+        pBurnDraw = NULL;
++        pBurnDraw = pHarnessFB;   // NULL unless video mode is on
 +        BurnDrvFrame();
 +
 +        fprintf(out, "%u %016llx\n", f, (unsigned long long)fnv1a64_workram());
++        if (vout)
++            fprintf(vout, "%u %016llx\n", f,
++                    (unsigned long long)fnv1a64_buf(pHarnessFB, nHarnessFBLen));
 +
 +        if (szHarnessDumps[0]) {
 +            char dumps[8192];
@@ -237,95 +365,9 @@ index 0000000..5b03b3b
 +    }
 +    fprintf(out, "END %u\n", nScriptFrames);
 +    fclose(out);
++    if (vout) { fprintf(vout, "END %u\n", nScriptFrames); fclose(vout); }
++    if (pHarnessFB) { free(pHarnessFB); pHarnessFB = NULL; }
 +    printf("harness: %u frames, log %s\n", nScriptFrames, szHarnessOut);
 +    free(held);
 +    return 0;
 +}
-diff --git a/src/burner/sdl/main.cpp b/src/burner/sdl/main.cpp
-index 688404a..d8d8e65 100644
---- a/src/burner/sdl/main.cpp
-+++ b/src/burner/sdl/main.cpp
-@@ -38,6 +38,14 @@ const char* romname = NULL;
- 
- extern void InitSupportPaths();
- 
-+// Vampire Saved harness (harness.cpp)
-+extern char szHarnessInput[MAX_PATH];
-+extern char szHarnessOut[MAX_PATH];
-+extern char szHarnessDumps[8192];
-+extern INT32 nHarnessFrames;
-+extern bool HarnessActive();
-+extern int HarnessRun();
-+
- #ifdef BUILD_SDL2
- SDL_Window* sdlWindow = NULL;
- #endif
-@@ -116,6 +124,29 @@ int parseSwitches(int argc, char* argv[])
- 			i++;
- 			_tcscpy(CDEmuImage, argv[i]);
- 		}
-+		else if (strcmp(argv[i], "-hinput") == 0)   // Vampire Saved harness
-+		{
-+			if (++i >= argc) return 1;
-+			snprintf(szHarnessInput, MAX_PATH, "%s", argv[i]);
-+			bSaveconfig = 0;
-+		}
-+		else if (strcmp(argv[i], "-hout") == 0)
-+		{
-+			if (++i >= argc) return 1;
-+			snprintf(szHarnessOut, MAX_PATH, "%s", argv[i]);
-+			bSaveconfig = 0;
-+		}
-+		else if (strcmp(argv[i], "-hframes") == 0)
-+		{
-+			if (++i >= argc) return 1;
-+			set_commandline_option(nHarnessFrames, atoi(argv[i]));
-+		}
-+		else if (strcmp(argv[i], "-hdump") == 0)
-+		{
-+			if (++i >= argc) return 1;
-+			snprintf(szHarnessDumps, sizeof(szHarnessDumps), "%s", argv[i]);
-+			bSaveconfig = 0;
-+		}
- 	}
- 	return 0;
- }
-@@ -246,9 +277,18 @@ void DoGame(int gameToRun)
- {
- 	if (!DrvInit(gameToRun, 0))
- 	{
-+		if (HarnessActive())
-+		{
-+			// headless scripted run: no media/audio init, no RunInit
-+			// (avoids StatedAuto auto-savestate load), see harness.cpp
-+			HarnessRun();
-+		}
-+		else
-+		{
- 		MediaInit();
- 		display_set_controls();
- 		RunMessageLoop();
-+		}
- 	}
- 	else
- 	{
-@@ -401,6 +441,19 @@ int main(int argc, char* argv[])
- #if defined(BUILD_SDL2) && !defined(SDL_WINDOWS)
- 	bprintf = AppDebugPrintf;
- #endif
-+
-+	if (HarnessActive())
-+	{
-+		// Determinism: keep ALL mutable per-game state inside the harness
-+		// sandbox (cwd). The user config may point these at shared absolute
-+		// locations (e.g. ~/Library/Application Support/fbneo), where the
-+		// EEPROM bootup counter would make consecutive runs diverge.
-+		_stprintf(szAppEEPROMPath, _T("./"));
-+		_stprintf(szAppHiscorePath, _T("./"));
-+		_stprintf(szAppCheatsPath, _T("./"));
-+		bSaveconfig = 0;
-+	}
-+
- 	BurnLibInit();
- 
- 	// Search for a game now, for use in the menu and loading a games

@@ -29,13 +29,16 @@ fi
 # Keeping the trust surfaces separable is the point.
 # Set WIDE=0 to build the harness-only reference binary that
 # tests/test_wide_profile.sh needs for the emulator superset invariant.
-WPATCH="$REPO/emu/fbneo-patches/0002-cps2-wide-v1-qsound16.patch"
+# IMPORTANT: that reference must differ from the test binary ONLY by this
+# patch — build it from the SAME tree state (harness included), or the
+# comparison silently measures unrelated frontend differences instead.
+WPATCH="$REPO/emu/fbneo-patches/0002-cps2-wide-v1.patch"
 if [ "${WIDE:-1}" = "0" ]; then
     echo "WIDE=0: harness-only build (reference binary for the superset invariant)"
 elif git -C "$FB" apply --check "$WPATCH" 2>/dev/null; then
     git -C "$FB" apply "$WPATCH"
     echo "CPS-2 WIDE profile patch applied"
-elif grep -q VsavjwRomDesc "$FB/src/burn/drv/capcom/d_cps2.cpp" 2>/dev/null; then
+elif grep -q Cps2Wide "$FB/src/burn/drv/capcom/cps.h" 2>/dev/null; then
     echo "CPS-2 WIDE profile patch already present"
 else
     echo "WIDE patch neither applies nor present — submodule state unexpected" >&2
@@ -44,6 +47,6 @@ fi
 
 # SKIPDEPEND=1 means header changes are NOT tracked (docs/GOTCHAS.md), so a
 # driver edit needs its object invalidated explicitly.
-touch "$FB/src/burn/drv/capcom/d_cps2.cpp"
+touch "$FB/src/burn/drv/capcom/d_cps2.cpp" "$FB/src/burn/drv/capcom/cps_obj.cpp"
 cd "$FB" && make sdl2 SKIPDEPEND=1 -j"$(sysctl -n hw.ncpu 2>/dev/null || echo 4)"
 echo "built: $FB/fbneo"

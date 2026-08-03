@@ -16,8 +16,13 @@
 #     to the stock set on the same binary. Any difference means a grown
 #     region is NOT inert and the profile is not safe to build content on.
 #
-# Both compare the harness's per-frame work-RAM checksum logs over the
-# legacy corpus — the same basis the ROM-side gates use.
+# Both compare, over the legacy corpus, BOTH:
+#   * the per-frame work-RAM checksum (the basis the ROM-side gates use), and
+#   * the per-frame FRAMEBUFFER checksum (FBNEO_HVIDEO).
+# The framebuffer half is not optional garnish: the RAM checksum is BLIND to
+# the entire video path — the harness historically ran with pBurnDraw=NULL —
+# so a rendering change such as the WIDE 19-bit sprite tile address produces
+# byte-identical RAM logs whether it works or is catastrophically broken.
 #
 # Usage:
 #   ROMDIR=... [FBNEO_REF=/path/to/pre-wide/fbneo] tests/test_wide_profile.sh
@@ -46,15 +51,17 @@ python3 tools/build_fingerprint.py "$ROMDIR" --set vsavj --full \
 echo "== 1. emulator superset invariant (stock vsavj: reference binary vs WIDE binary) =="
 if [ -n "${FBNEO_REF:-}" ] && [ -x "${FBNEO_REF}" ]; then
     for rp in $CORPUS; do
-        FBNEO_BIN="$FBNEO_REF" tools/run_replay_fbneo.sh vsavj \
+        FBNEO_HVIDEO="$WORK/ref_$rp.vid" FBNEO_BIN="$FBNEO_REF" tools/run_replay_fbneo.sh vsavj \
             "$REPO/tests/replays/$rp.rpl" "$WORK/ref_$rp.log" "$WORK/sb_ref_$rp" >/dev/null 2>&1
-        tools/run_replay_fbneo.sh vsavj \
+        FBNEO_HVIDEO="$WORK/new_$rp.vid" tools/run_replay_fbneo.sh vsavj \
             "$REPO/tests/replays/$rp.rpl" "$WORK/new_$rp.log" "$WORK/sb_new_$rp" >/dev/null 2>&1
-        if cmp -s "$WORK/ref_$rp.log" "$WORK/new_$rp.log"; then
-            echo "  ok: $rp bit-identical"
+        if cmp -s "$WORK/ref_$rp.log" "$WORK/new_$rp.log" \
+           && cmp -s "$WORK/ref_$rp.vid" "$WORK/new_$rp.vid"; then
+            echo "  ok: $rp bit-identical (RAM + framebuffer)"
         else
             echo "  FAIL: $rp — the patched binary changed STOCK vsavj behaviour"
-            diff "$WORK/ref_$rp.log" "$WORK/new_$rp.log" | head -3
+            cmp -s "$WORK/ref_$rp.log" "$WORK/new_$rp.log" || echo "    (work RAM differs)"
+            cmp -s "$WORK/ref_$rp.vid" "$WORK/new_$rp.vid" || echo "    (framebuffer differs)"
             fail=1
         fi
     done
@@ -68,15 +75,17 @@ fi
 
 echo "== 2. profile inertness (WIDE set vs stock set, same binary) =="
 for rp in $CORPUS; do
-    tools/run_replay_fbneo.sh vsavj \
+    FBNEO_HVIDEO="$WORK/stock_$rp.vid" tools/run_replay_fbneo.sh vsavj \
         "$REPO/tests/replays/$rp.rpl" "$WORK/stock_$rp.log" "$WORK/sb_s_$rp" >/dev/null 2>&1
-    FBNEO_ROMPATH="$WIDE_ROMPATH" tools/run_replay_fbneo.sh vsavjw \
+    FBNEO_HVIDEO="$WORK/wide_$rp.vid" FBNEO_ROMPATH="$WIDE_ROMPATH" tools/run_replay_fbneo.sh vsavjw \
         "$REPO/tests/replays/$rp.rpl" "$WORK/wide_$rp.log" "$WORK/sb_w_$rp" >/dev/null 2>&1
-    if cmp -s "$WORK/stock_$rp.log" "$WORK/wide_$rp.log"; then
-        echo "  ok: $rp bit-identical on the grown regions"
+    if cmp -s "$WORK/stock_$rp.log" "$WORK/wide_$rp.log" \
+       && cmp -s "$WORK/stock_$rp.vid" "$WORK/wide_$rp.vid"; then
+        echo "  ok: $rp bit-identical on the grown regions (RAM + framebuffer)"
     else
         echo "  FAIL: $rp — a grown region is NOT inert"
-        diff "$WORK/stock_$rp.log" "$WORK/wide_$rp.log" | head -3
+        cmp -s "$WORK/stock_$rp.log" "$WORK/wide_$rp.log" || echo "    (work RAM differs)"
+        cmp -s "$WORK/stock_$rp.vid" "$WORK/wide_$rp.vid" || echo "    (framebuffer differs)"
         fail=1
     fi
 done
@@ -86,4 +95,8 @@ if [ -n "${fail_skipped:-}" ]; then
     echo "PARTIAL: profile inert, but the emulator superset invariant was NOT run"
     exit 2
 fi
-echo "PASS: CPS-2 WIDE profile gate (emulator superset invariant + inertness)"
+echo "PASS: CPS-2 WIDE profile gate (emulator superset invariant + inertness,"
+echo "      work RAM AND framebuffer, over $(echo $CORPUS | wc -w | tr -d ' ') replays)"
+echo "NOTE: inertness is not functionality. The 19-bit tile path is proven"
+echo "      HARMLESS here because vanilla never sets y-word bit 12; that it"
+echo "      actually REACHES the new gfx banks is proven by B4's canary build."

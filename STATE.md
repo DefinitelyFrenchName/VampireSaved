@@ -1,8 +1,8 @@
 # STATE — living progress log
 
-Updated: 2026-08-03 (session 14z-54 — WIDE Phase B under way: QSound
-16MB (B0) and GFX 48MB (B1) both PROVEN INERT on the emulator superset
-invariant AND profile inertness, 24/24 bit-identical each)
+Updated: 2026-08-03 (session 14z-55 — WIDE Phase B0/B1/B2 all green.
+The profile's only core edit is in. Big finding: the FBNeo gate was
+BLIND to video; it now compares framebuffers too)
 
 ## Session 14z-49 (rounds 61-62: HUD MUGSHOT + NAME + SELECT MEDALLION — the whole per-slot venue-asset family fixed)
 
@@ -62,6 +62,56 @@ Build `b91647c7da14ded6316cee8dc057c8daf1c3fb1e` (donovan6, stage 6).
   re-verified: Donovan medallion in Jedah's ringed cell, Gallon's
   werewolf 3x3 restored, VS-splash big portrait + name were already
   correct.
+
+## Session 14z-55 (WIDE B2 — the 19-bit tile address; and the gate's video blind spot)
+
+**B2 done: the profile's ONLY core emulator edit is in and proven inert.**
+`Cps2Wide` flag (defined beside `Cps2Turbo` in cps_rw.cpp, extern in
+cps.h, set by `Cps2WideInit` for the vsavjw driver only, cleared in
+DrvExit so it can never leak into another game) gates the 19-bit sprite
+tile address in cps_obj.cpp:
+
+    if (Cps2Turbo || Cps2Wide) {
+        if (ps[1] & 0x1000) ps[1] |= 0x8000;      // bit 12 -> bit 15
+        n |= (ps[1] & 0xe000) << 3;               // 19 bits, 64MB reach
+    }
+
+Gate: 24/24 bit-identical, work RAM AND framebuffer.
+
+### THE FINDING OF THIS SESSION: the FBNeo gate never rendered a pixel
+
+The harness ran every frame with `pBurnDraw = NULL`. Correct for a
+work-RAM oracle, but it means **the emulator-side gate was structurally
+blind to the entire video path** — and B2's change lives ENTIRELY in the
+video path. A RAM-only gate would have reported B2 green without ever
+executing the modified line. (Every pixel test the project owns is
+MAME-side; FBNeo had none.)
+
+Fixed: opt-in framebuffer checksums in harness.cpp (`FBNEO_HVIDEO=<path>`,
+16bpp off-screen render, per-frame FNV-1a; default still pBurnDraw=NULL so
+every frozen expectation is untouched). Verified live: 384x224, 3,932
+distinct checksums across one replay, so it is genuinely rendering.
+tests/test_wide_profile.sh now compares RAM **and** framebuffer on both
+invariants. This is also the first delivery of a B5b instrument — FBNeo
+now has a pixel gate, which the FBNeo-only fallback would require anyway.
+
+**Inertness is not functionality** — stated explicitly in the gate output.
+B2 proves the 19-bit path is harmless (vanilla never sets bit 12). Proving
+it REACHES the new banks is B4's job, and B4 must carry that positive
+control.
+
+### Second trap: a drifting A/B reference is worse than none
+
+The first emulator-superset run "failed" 5 replays. Cause: the reference
+binary predated the harness video feature, so it emitted no framebuffer
+log — noise, not signal. A reference must differ from the build under test
+by EXACTLY the patch under test; `WIDE=0 tools/setup_fbneo.sh` now builds
+one from the same tree state, and the docs say so.
+
+Patch hygiene: the two FBNeo patches were regenerated with clean scopes —
+`0001-vampire-saved-harness.patch` (frontend only: makefile, main.cpp,
+harness.cpp incl. video) and `0002-cps2-wide-v1.patch` (exactly the five
+CPS-2 driver files). Trust surfaces stay separable, as Rule 1 v2 requires.
 
 ## Session 14z-54 (WIDE Phase B0+B1: the first two regions grown and proven inert)
 

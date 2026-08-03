@@ -995,3 +995,26 @@ build uses `SKIPDEPEND=1`, which does not track header or driver changes:
 after editing a driver, `touch` the source or the link silently reuses the
 old object and the emulator keeps the previous descriptor. Symptom: a
 grown region that measures exactly like the stock one.
+
+## The FBNeo gate never rendered a pixel — RAM checksums are blind to video
+The FBNeo harness ran every frame with `pBurnDraw = NULL`. That is correct
+for speed and for a work-RAM oracle, but it means the emulator-side gate
+could not see the video path AT ALL: a change to sprite/tile rendering
+produces byte-identical RAM logs whether it works or draws garbage. This
+was discovered while trying to verify the CPS-2 WIDE 19-bit tile address,
+whose entire effect is in `cps_obj.cpp` — the gate would have "passed" it
+without ever executing the modified line. Fixed by an opt-in framebuffer
+checksum (`FBNEO_HVIDEO=<path>`, harness.cpp), now compared alongside RAM
+in tests/test_wide_profile.sh. General lesson: before trusting a gate on a
+change, confirm the gate's instrumentation actually EXECUTES the code path
+you changed.
+
+## An A/B reference binary must differ by exactly one thing
+The emulator superset invariant compares a patched build against a
+reference build. The first reference was an older binary that predated the
+harness's video capability, so it produced no framebuffer log and every
+comparison "failed" — noise, not signal. Build the reference from the SAME
+tree state with only the patch under test reverted (`WIDE=0
+tools/setup_fbneo.sh`). Same discipline as any controlled experiment: one
+variable. A reference that drifts is worse than no reference, because its
+failures look like real findings.

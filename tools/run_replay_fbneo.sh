@@ -9,6 +9,9 @@
 #   env FBNEO_ROMPATH  optional dir of zips overlaying $ROMDIR (patched-build
 #                      runs: its vsavj.zip wins over the reference one)
 #   env FBNEO_BIN      optional alternate fbneo binary (A/B of emulator builds)
+#   env FBNEO_HVIDEO   optional path for per-frame FRAMEBUFFER checksums.
+#                      The RAM checksum is blind to the whole video path, so
+#                      any rendering change needs this to be tested at all.
 set -eu
 
 SET="${1:?usage: run_replay_fbneo.sh <set> <replay.rpl> <out.log> [sandbox]}"
