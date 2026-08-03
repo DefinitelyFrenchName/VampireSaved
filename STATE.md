@@ -1,8 +1,8 @@
 # STATE — living progress log
 
-Updated: 2026-08-03 (session 14z-55 — WIDE Phase B0/B1/B2 all green.
-The profile's only core edit is in. Big finding: the FBNeo gate was
-BLIND to video; it now compares framebuffers too)
+Updated: 2026-08-03 (session 14z-55 — WIDE B0-B3 ALL GREEN: the full v1
+shape (PRG 6MB / GFX 48MB / QSound 16MB) is declared and proven inert for
+one widened emulator condition. Next: B4 must prove it USABLE)
 
 ## Session 14z-49 (rounds 61-62: HUD MUGSHOT + NAME + SELECT MEDALLION — the whole per-slot venue-asset family fixed)
 
@@ -99,6 +99,33 @@ now has a pixel gate, which the FBNeo-only fallback would require anyway.
 B2 proves the 19-bit path is harmless (vanilla never sets bit 12). Proving
 it REACHES the new banks is B4's job, and B4 must carry that positive
 control.
+
+### B3 — PRG 4 -> 6 MB: green, and A1's prediction held exactly
+
+Four appended 512KB program members. **Zero emulator core lines**, as A1
+measured: FBNeo maps program ROM as `SekMapMemory(CpsRom, 0,
+nCpsRomLen-1)`, so the declaration is the mapping. 24/24 bit-identical
+(RAM + framebuffer). Notes for whoever authors into it:
+- everything above `PRG:0x0FFFFF` is OUTSIDE the CPS-2 encryption window,
+  so extension space is RAW — easier to author into than the original
+  in-crypt hole A;
+- `$400000-$40000F` (CpsFrg registers) is now read-shadowed by ROM and is
+  reserved, never-allocate. Writes still reach the register handler.
+
+**The full v1 shape is now declared and inert: PRG 6MB / GFX 48MB /
+QSound 16MB, for a total emulator cost of ONE widened condition.**
+
+But: every step so far is ZERO-FILLED. The space is declared, not
+demonstrated. B4 is the step that proves it usable, and it must carry the
+positive controls (relocated anim block executing from the extension; a
+legacy tile rendering from gfx group C with bit 12 set).
+
+Also fixed: the `--full` fingerprint's region classifier put the new
+program members under gfx/qsnd (it keys off filename; FBNeo keys off
+descriptor type). WIDE members are now named so the heuristic stays
+right, and the tool documents that it hashes the union of resolved zips —
+a superset of what the driver loads, so it is an artifact identity, not a
+statement of what was mapped.
 
 ### Second trap: a drifting A/B reference is worse than none
 

@@ -80,7 +80,7 @@ legacy corpus, 24 comparisons per run.
 | **B0** | QSound 8 -> 16 MB (2 appended 4 MB members) | **PASS** — 24/24 bit-identical, zero core lines |
 | **B1** | GFX 32 -> 48 MB (4 appended 4 MB members, one whole group) | **PASS** — 24/24 bit-identical; A3's prediction held |
 | **B2** | the bit-12 promote line under `Cps2Wide` | **PASS** — 24/24 bit-identical incl. framebuffer |
-| B3 | PRG 4 -> 6 MB | pending (A1 says linear is inert) |
+| **B3** | PRG 4 -> 6 MB (4 appended 512KB members) | **PASS** — 24/24 bit-identical; A1's zero-core-lines prediction held |
 | B4 | canary: real content relocated into the new space | pending |
 | B5/B5b | MAME parity / suite preservation | pending |
 
@@ -117,7 +117,7 @@ ROMDIR is never modified).
 |---|---|---|
 | QSound 8 → 16 MB | descriptor only (**B0 verified**) | descriptor |
 | GFX 32 → 48 MB (4 appended members) | descriptor only (**B1 verified**) | descriptor |
-| PRG 4 → 6 MB | **zero lines** (A1) | descriptor |
+| PRG 4 → 6 MB | **zero lines** (A1; **B3 verified**) | descriptor |
 | 19-bit tile address (bit-12 promote) | one condition widened at `cps_obj.cpp:429-434` + flag definition/extern/init/reset, gated on `Cps2Wide` (**B2 verified**) | **core, profile-gated** |
 | New driver entry carrying the profile | new `BurnRomInfo` + `BurnDriver` beside `VsavjRomDesc[]` | descriptor |
 
@@ -133,6 +133,21 @@ construction); subject to the **emulator superset invariant** — the
 patched binary running stock unmodified vsavj must reproduce the frozen
 vanilla expectations bit-for-bit, enforced as a battery gate; mirrored in
 a second emulator where practical; and ratified per profile version.
+
+## Where the profile stands
+
+Declared and proven inert: **PRG 6 MB, GFX 48 MB, QSound 16 MB** — the
+full v1 shape. Total emulator cost so far: **one widened condition** in
+`cps_obj.cpp` plus the flag's definition/extern/init/reset. Everything
+else is descriptor table data.
+
+What is NOT yet proven: that the new space is *usable*. Every growth step
+so far is zero-filled, and the 19-bit path is only shown to be harmless
+(vanilla never sets bit 12). **B4 must supply the positive control** —
+relocate an existing character's anim block into the PRG extension and
+move a legacy tile into gfx group C with bit 12 set, both against
+bit-exact vanilla oracles. Until B4, treat the extension as declared, not
+demonstrated.
 
 ## Known limits, stated up front
 

@@ -25,7 +25,11 @@ different gfx/QSound members — or run under different emulator hardware
 profiles — fingerprint identically, and today that difference survives only
 as a hand-written note in the registry. `--full` computes a whole-set
 fingerprint (every member of every resolved zip, plus a per-region
-breakdown) which closes it for reporting and freeze records. Promoting
+breakdown) which closes it for reporting and freeze records. CAVEAT: it
+hashes the union of the resolved zips, which is a SUPERSET of what the
+driver actually loads (a clone zip's parent carries the other regions'
+program members too). It is a faithful identity for "this artifact set",
+not a statement of "what the emulator mapped". Promoting
 --full to the dispatch key is deliberate future work: it changes every
 existing fingerprint and so requires recomputing the registry rows (the
 expectation CONTENT is unaffected — it is a registry update, not a
@@ -66,12 +70,18 @@ def full_fingerprint(zpaths):
                 data = zf.read(n)
                 h.update(n.encode())
                 h.update(data)
-                if cps._PRG_RE.search(n):
-                    region = "prg"
-                elif n.endswith(".key"):
+                # Classify by NAME, which is a heuristic: FBNeo/MAME classify
+                # by descriptor type, and this tool cannot read the driver
+                # table. WIDE's appended members are named so the heuristic
+                # stays right: "vsw.NNm" = gfx/qsnd, "vsw.NN" = program.
+                if n.endswith(".key"):
                     region = "key"
                 elif n.endswith((".01", ".02")):
                     region = "z80"
+                elif n.startswith("vsw."):
+                    region = "gfx/qsnd" if n.endswith("m") else "prg"
+                elif cps._PRG_RE.search(n):
+                    region = "prg"
                 else:
                     region = "gfx/qsnd"
                 cnt, size = per.get(region, (0, 0))

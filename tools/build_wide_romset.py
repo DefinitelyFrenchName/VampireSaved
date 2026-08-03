@@ -32,6 +32,8 @@ def main():
                     help="appended 4MB QSound members (2 => 8MB->16MB)")
     ap.add_argument("--gfx", type=int, default=0,
                     help="appended 4MB GFX members (must be a multiple of 4)")
+    ap.add_argument("--prg", type=int, default=0,
+                    help="appended 512KB program members (4 => 4MB->6MB)")
     a = ap.parse_args()
     if a.gfx % 4:
         raise SystemExit("--gfx must be a multiple of 4 (the loader consumes "
@@ -59,8 +61,11 @@ def main():
             zf.writestr(f"vsw.{21+i}m", blank)
         for i in range(a.gfx):
             zf.writestr(f"vsw.{31+2*i}m", blank)  # odd names mirror the stock interleave
+        for i in range(a.prg):
+            zf.writestr(f"vsw.{41+i}", b"\x00" * 0x80000)
     print(f"  wrote {out_path}: vsavj members + {a.qsound} QSound + {a.gfx} GFX "
-          f"appended ({MEMBER*(a.qsound+a.gfx)//(1024*1024)} MB of zero fill)")
+          f"+ {a.prg} PRG appended "
+          f"({(MEMBER*(a.qsound+a.gfx) + 0x80000*a.prg)//(1024*1024)} MB of zero fill)")
     print("  NOTE: descriptor sizes in FBNeo's VsavjwRomDesc[] must match "
           "these members exactly — a member LARGER than its declared length "
           "is silently truncated at load (load.cpp), with no diagnostic.")
