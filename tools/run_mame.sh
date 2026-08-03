@@ -27,6 +27,19 @@ ROMPATH="${MAME_ROMPATH:-$ROMDIR}"
 # at the pinned source build (tools/setup_mame.sh) and at the WIDE-patched
 # binary. Nothing else about the invocation changes, so the runs stay
 # comparable to every frozen log.
+# TRUE HEADLESS (added 14z-59d). MAME's "-video none" still creates an SDL
+# window; SDL_VIDEODRIVER=dummy means SDL creates no window AT ALL, so
+# there is nothing to steal focus and nothing for a stray keystroke to land
+# on. This is the fix at the source and it works on the current machine
+# today — no migration required.
+# Measured non-perturbing: work RAM bit-identical to the frozen
+# expectations, and VIDEO_OUT still captures a live framebuffer (3,952
+# distinct checksums over 5,520 frames, unchanged), because the emulated
+# bitmap is internal to MAME and owes nothing to SDL.
+# Override with SDL_VIDEODRIVER=<driver> if a run ever needs a real window.
+: "${SDL_VIDEODRIVER:=dummy}"
+export SDL_VIDEODRIVER
+
 # INPUT ISOLATION (added 14z-59c). MAME's "-video none" still creates a
 # window that can take focus, and any host keystroke that lands on it is
 # injected into the EMULATED controls — MAME's default keyboard map covers

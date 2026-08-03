@@ -111,6 +111,54 @@ separate file so no frozen RAM expectation moves). MAME's harness had the
 same video blind spot FBNeo did, and the WIDE change is entirely a
 rendering change. Ground truth: `tests/test_replay_video_selfcheck.sh`.
 
+## Platform / migration notes (14z-59d)
+
+**The focus problem is already solved in place.** `tools/run_mame.sh` now
+exports `SDL_VIDEODRIVER=dummy`, so SDL creates **no window at all** — there
+is nothing to take focus and nothing for a stray keystroke to land on.
+Measured non-perturbing: work RAM bit-identical to the frozen expectations,
+and `VIDEO_OUT` still captures a live framebuffer (3,952 distinct checksums
+over 5,520 frames — the emulated bitmap is internal to MAME and owes
+nothing to SDL). Combined with the input-provider isolation and the
+per-frame integrity assertion, a migration is now a *choice*, not a
+necessity.
+
+**What is actually at risk in a move: only the MAME expectations.**
+- `tests/expected/**` are ABSOLUTE frozen values, and they are **MAME-only**
+  — `run_suite.sh` drives MAME.
+- Every FBNeo gate (`test_wide_profile.sh`, `test_fbneo_replay_determinism.sh`,
+  the xemu gates) is a **live A/B comparison** and carries no frozen file,
+  so it is machine-independent by construction. Verified by inspection.
+- So `tests/test_mame_parity.sh` **is the migration gate**, and it covers
+  the entire exposure. Run it on the target before trusting anything. If it
+  fails, do NOT re-freeze to make it green — that silently redefines the
+  baseline the superset invariant rests on.
+
+**Does CPU architecture matter (ARM64 vs x86_64)?** It should not, and the
+reason is specific rather than hopeful:
+- MAME emulates CPS-2's 68000, Z80 and QSound DSP16 with **interpreters**.
+  MAME's DRC/UML recompilers cover other CPU families (MIPS/PPC/SH), none
+  of which CPS-2 uses — so there is no JIT whose codegen could differ.
+- FBNeo ships an **A68K x86 assembly** 68000 core, but `BUILD_A68K` is
+  commented out in its makefile and x64 targets undefine it anyway, so both
+  ARM64 and x86_64 builds use the portable Musashi C core.
+- All candidate hosts are little-endian, and `replay.lua` reads with an
+  explicit `"<i8"`, so the checksum stream is endian-pinned regardless.
+
+Still: that is an argument, not a measurement. `test_mame_parity.sh` is the
+measurement, it is cheap, and it exists.
+
+**Step-by-step Windows/WSL2 (and Linux) setup: `docs/WSL2_SETUP.md`** —
+written for someone who has not used WSL2, and section 7 is the acceptance
+test that decides whether a machine can be trusted.
+
+**Target ranking for this toolchain** (POSIX shell + SDL builds):
+| Target | Verdict |
+|---|---|
+| **Linux** | Best destination. Native SDL builds for both emulators, every `tests/*.sh` runs unchanged, true headless trivially. Only edit: `sysctl -n hw.ncpu` → `nproc` in `tools/setup_mame.sh`. |
+| **Intel Mac** | Lowest friction *today* — the scripts are already macOS-shaped and brew provides sdl3/pkgconf. Good stepping stone; architecture is a non-issue per the analysis above. |
+| **Windows 10** | Highest porting cost natively: the harness is POSIX shell plus FBNeo's **SDL** frontend, so it needs MSYS2 for both emulators and a POSIX shell for every gate. **Use WSL2 and treat it as the Linux target** — that is the pragmatic path if this is the machine that is free. |
+
 ## How to build
 
 ```sh

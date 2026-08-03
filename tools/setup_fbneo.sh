@@ -48,5 +48,7 @@ fi
 # SKIPDEPEND=1 means header changes are NOT tracked (docs/GOTCHAS.md), so a
 # driver edit needs its object invalidated explicitly.
 touch "$FB/src/burn/drv/capcom/d_cps2.cpp" "$FB/src/burn/drv/capcom/cps_obj.cpp"
-cd "$FB" && make sdl2 SKIPDEPEND=1 -j"$(sysctl -n hw.ncpu 2>/dev/null || echo 4)"
+# Portable job count: nproc on Linux/WSL2, sysctl on macOS.
+cd "$FB" && make sdl2 SKIPDEPEND=1 \
+    -j"$(nproc 2>/dev/null || sysctl -n hw.ncpu 2>/dev/null || echo 4)"
 echo "built: $FB/fbneo"

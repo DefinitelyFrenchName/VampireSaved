@@ -90,13 +90,26 @@ being silently compared.
 Rerunnable: `RUNS=`, `JOBS=`, `PROBE=`, `SET=` on
 `tests/test_mame_determinism.sh`.
 
-## MOVING THE HARNESS TO ANOTHER MACHINE (planned, 2026-08-03)
+## MOVING THE HARNESS TO ANOTHER MACHINE — full analysis in HANDOFF.md
 
-The maintainer intends to move the harness to a machine where runs cannot
-be interrupted. That removes the focus-stealing hazard at the source and is
-the right fix; the prevent/detect work above stays useful either way (it
-also covers joysticks, stuck modifiers, and any future MAME that ignores
-the provider flags).
+**The move is no longer urgent.** `SDL_VIDEODRIVER=dummy` (now the default
+in `tools/run_mame.sh`) means SDL creates NO window at all, so the
+focus-stealing hazard is gone on the current machine — measured
+non-perturbing, and `VIDEO_OUT` still works. Migrate deliberately, not
+under pressure.
+
+Short version of the HANDOFF analysis:
+- **Only the MAME expectations are at risk.** `tests/expected/**` is
+  absolute and MAME-only; every FBNeo gate is a live A/B with no frozen
+  file, so it is machine-independent by construction.
+- **Architecture (ARM64 vs x86_64) should not matter**: MAME uses
+  interpreters for CPS-2's 68000/Z80/DSP16 (its DRCs cover other CPU
+  families entirely), FBNeo's x86 A68K asm core is disabled in its
+  makefile, and all hosts are little-endian with an endian-pinned
+  checksum. That is an argument, not a measurement — run the gate.
+- **Ranking**: Linux best; Intel Mac lowest-friction today; Windows 10
+  natively costly (POSIX shell + SDL frontends) — **use WSL2 and treat it
+  as Linux**.
 
 **Run `tests/test_mame_parity.sh` on the new machine BEFORE trusting any
 result there.** It is not just the B5 gate — it is the machine-migration

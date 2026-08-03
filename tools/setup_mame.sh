@@ -13,10 +13,18 @@
 # Idempotent: pins the submodule, mirrors it, applies our patches (skipped if
 # already applied), builds. Prints the resulting binary path.
 #
-# Prerequisites (brew): sdl3, pkgconf. MAME 0.288's OSD is SDL3 and its
-# scripts/src/osd/sdl3.lua finds it through pkg-config ONLY — with pkg-config
-# absent it silently falls back to framework linkage and the build dies on
-# 'SDL3/SDL.h' file not found, several minutes in (docs/GOTCHAS.md).
+# Prerequisites:
+#   macOS       brew install sdl3 pkgconf
+#   Debian/WSL2 apt install libsdl3-dev pkgconf build-essential python3
+# MAME 0.288's OSD is SDL3 and its scripts/src/osd/sdl3.lua finds it through
+# pkg-config ONLY — with pkg-config absent it silently falls back to
+# framework linkage and the build dies on 'SDL3/SDL.h' file not found,
+# several minutes in (docs/GOTCHAS.md). That is not macOS-specific.
+#
+# WSL2 note: keep BOTH the repo and MAME_BUILD_ROOT on the ext4 filesystem
+# (~/...), never under /mnt/c. Building ~900 MB of sources across the
+# 9p/drvfs bridge is dramatically slower and has its own file-semantics
+# surprises.
 #
 # WHY AN OUT-OF-TREE MIRROR (docs/GOTCHAS.md):
 #   MAME's GENie build system does not support spaces anywhere in the source
@@ -36,7 +44,8 @@ set -eu
 
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 SRC="$REPO/emu/mame"
-JOBS="${MAME_JOBS:-$(sysctl -n hw.ncpu 2>/dev/null || echo 4)}"
+# Portable job count: nproc on Linux/WSL2, sysctl on macOS.
+JOBS="${MAME_JOBS:-$(nproc 2>/dev/null || sysctl -n hw.ncpu 2>/dev/null || echo 4)}"
 
 # WIDE and reference builds get SEPARATE roots by default so both binaries
 # exist at once — the emulator superset invariant compares them, so building
