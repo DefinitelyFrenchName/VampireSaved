@@ -1,9 +1,9 @@
 # STATE — living progress log
 
-Updated: 2026-08-03 (session 14z-56 — WIDE B0-B3 green; B4 attempt 1 was
-an INVALID canary (two variables at once) and is redesigned. Two solid
-findings banked: the game emits the WIDE encoding correctly, and the
-per-char bank word is not display-only)
+Updated: 2026-08-03 (session 14z-57 — WIDE B0-B3 green; B4 attempt 2 is a
+CLEAN single-variable FAIL, narrowed to the gfx loader: address path
+proven correct, region proven real, but group C's bytes are not what is
+fetched. One measurement away from the cause)
 
 ## Session 14z-49 (rounds 61-62: HUD MUGSHOT + NAME + SELECT MEDALLION — the whole per-slot venue-asset family fixed)
 
@@ -63,6 +63,49 @@ Build `b91647c7da14ded6316cee8dc057c8daf1c3fb1e` (donovan6, stage 6).
   re-verified: Donovan medallion in Jedah's ringed cell, Gallon's
   werewolf 3x3 restored, VS-splash big portrait + name were already
   correct.
+
+## Session 14z-57 (WIDE B4 attempt 2 — clean fail, narrowed to the loader)
+
+The redesigned canary works as a diagnostic: `CPS2_WIDE_CANARY=1`
+relocates bank-2/3 sprites into WIDE banks 4/5 **at draw time**, with gfx
+group C loaded as a byte copy of group B, running the STOCK rom. Work RAM
+is bit-identical (the ROM is untouched — single variable, as intended);
+pixels differ on ~4,400 frames.
+
+**What is now PROVEN (all measured this session):**
+- The regions are genuinely real, from the emulator's own load report:
+  `68K ROM 0x00600000`, `Graphics 0x03000000`, `QSound 0x01000000`.
+  B0/B1/B3 are not paper changes.
+- All twelve gfx members load OK, group C included.
+- **The 19-bit address path is CORRECT.** Instrumented at the composition
+  point: `y=0xb065` -> `n=0x0536CA` -> byte `0x29B6500` = bank 5 at
+  offset `0x9B6500` within group C — exactly the offset the source tile
+  occupies within group B. The guard passes (`mask=0x03ffffff`,
+  `len=0x03000000`).
+- **Group C's content is not what gets fetched**: a zero-filled group C
+  and a copy-of-group-B group C render identically.
+
+**Therefore:** sprite record -> bank bits -> promote -> address -> guard
+are all correct, and the failure lies in WHERE THE LOADER PUT THE BYTES.
+Suspect `Cps2LoadTiles`/`Cps2LoadOne`/`CpsGfxLoad` advancement for a
+third group.
+
+**Next step is one measurement, not a guess:** dump `CpsGfx` around byte
+`0x29B6500` at runtime and compare with the expected tile at
+`0x19B6500` (group B). Differ -> load-map bug, and the address path is
+exonerated. A gfx-buffer dump is a small harness addition and is on the
+B5b instrument list regardless.
+
+Housekeeping: debug printfs removed; the env-gated canary probe is kept
+(it is a genuine diagnostic and is off by default); patch 0002
+regenerated; **profile gate re-run green 24/24 with the canary off**, so
+the tree is in a known-good state.
+
+Also worth recording: two self-inflicted detours cost real time — running
+the instrumented build WITHOUT `FBNEO_HVIDEO` (no video => the sprite
+path never executes => no output, which looked like "the flag is not
+set"), and forgetting that the runner captures the emulator's stdout to
+`<sandbox>/fbneo_replay.log` rather than the terminal.
 
 ## Session 14z-56 (WIDE B4 attempt 1: an invalid canary, honestly)
 

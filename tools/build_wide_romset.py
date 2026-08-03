@@ -34,6 +34,10 @@ def main():
                     help="appended 4MB GFX members (must be a multiple of 4)")
     ap.add_argument("--prg", type=int, default=0,
                     help="appended 512KB program members (4 => 4MB->6MB)")
+    ap.add_argument("--gfx-copy-group-b", action="store_true",
+                    help="fill the appended GFX group with a byte copy of the "
+                         "stock group B instead of zeros, so WIDE banks 4/5 "
+                         "mirror banks 2/3 (the B4 canary)")
     a = ap.parse_args()
     if a.gfx % 4:
         raise SystemExit("--gfx must be a multiple of 4 (the loader consumes "
@@ -59,8 +63,14 @@ def main():
             zf.writestr(n, src.read(n))
         for i in range(a.qsound):
             zf.writestr(f"vsw.{21+i}m", blank)
+        GROUP_B = ["vm3.14m", "vm3.16m", "vm3.18m", "vm3.20m"]
+        parent = zipfile.ZipFile(os.path.join(a.romdir, "vsav.zip"))
         for i in range(a.gfx):
-            zf.writestr(f"vsw.{31+2*i}m", blank)  # odd names mirror the stock interleave
+            name = f"vsw.{31+2*i}m"   # odd names mirror the stock interleave
+            if a.gfx_copy_group_b and i < len(GROUP_B):
+                zf.writestr(name, parent.read(GROUP_B[i]))
+            else:
+                zf.writestr(name, blank)
         for i in range(a.prg):
             zf.writestr(f"vsw.{41+i}", b"\x00" * 0x80000)
     print(f"  wrote {out_path}: vsavj members + {a.qsound} QSound + {a.gfx} GFX "

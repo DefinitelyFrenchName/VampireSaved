@@ -81,7 +81,7 @@ legacy corpus, 24 comparisons per run.
 | **B1** | GFX 32 -> 48 MB (4 appended 4 MB members, one whole group) | **PASS** — 24/24 bit-identical; A3's prediction held |
 | **B2** | the bit-12 promote line under `Cps2Wide` | **PASS** — 24/24 bit-identical incl. framebuffer |
 | **B3** | PRG 4 -> 6 MB (4 appended 512KB members) | **PASS** — 24/24 bit-identical; A1's zero-core-lines prediction held |
-| B4 | canary: real content relocated into the new space | **ATTEMPT 1 INVALID** — the canary changed two variables at once; redesign below |
+| B4 | canary: content fetched from the new banks | **ATTEMPT 2 = CLEAN FAIL.** Address composition proven correct; the bytes fetched are not group C's. Narrowed to the loader/placement — see below |
 | B5/B5b | MAME parity / suite preservation | pending |
 
 **The gate compares work RAM AND the framebuffer.** That second half was
@@ -169,7 +169,41 @@ What the attempt DID establish, both useful:
 - **The per-char bank word carries game logic**, now documented in
   engine_internals + GOTCHAS.
 
-### Redesigned canary (do this next)
+### Attempt 2 (emulator-side canary) — a clean, single-variable FAIL
+
+Implemented as designed: `CPS2_WIDE_CANARY=1` relocates bank-2/3 sprites
+into WIDE banks 4/5 at draw time, with gfx group C loaded as a byte copy
+of group B, running the STOCK rom. Result:
+
+- **work RAM bit-identical** (guaranteed — the ROM is untouched), so the
+  canary is genuinely single-variable this time;
+- **pixels differ** on ~4,400 frames.
+
+Narrowed, with measurements:
+
+| Checked | Result |
+|---|---|
+| Region actually sized? | **Yes** — emulator reports `68K 0x00600000`, `Graphics 0x03000000`, `QSound 0x01000000`. All three growths are real. |
+| Group C members loaded? | **Yes** — `Loading graphics (vsw.31m/33m/35m/37m)... (OK)`. |
+| Address composition? | **Correct.** Instrumented: `y=0xb065` → `n=0x0536CA` → byte `0x29B6500`. That is bank 5 at exactly the same offset within group C (`0x9B6500`) that the source tile occupies within group B. |
+| Fetch guard? | Passes: `nCpsGfxMask=0x03ffffff`, `nCpsGfxLen=0x03000000`, address below the limit. |
+| Does group C CONTENT matter? | **No** — a zero-filled group C and a copy-of-group-B group C render *identically*. The bytes being fetched are not the ones we placed. |
+
+So everything from the sprite record to the pointer arithmetic is right,
+and the region is real and loaded, yet the data at that pointer is not
+what the loader was given. **The remaining suspect is the loader's
+placement/interleave for a third group** (`Cps2LoadTiles` /
+`Cps2LoadOne`, `CpsGfxLoad` advancement) — i.e. group C's bytes are
+landing somewhere other than 32MB, or in a different interleave.
+
+**Next step (one measurement, not a guess):** dump `CpsGfx` around byte
+`0x29B6500` at runtime and compare against the expected 128-byte tile
+from group B at `0x19B6500`. If they differ, the loader placed the data
+elsewhere and the fix is in the load map, not the address path. A gfx-RAM
+dump is a small harness addition and is on the B5b instrument list
+anyway.
+
+### The canary design (kept — it worked as a diagnostic)
 
 Change the EMULATOR, not the ROM, so game state is identical by
 construction and only pixels can move:

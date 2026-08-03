@@ -1,36 +1,46 @@
 diff --git a/src/burn/drv/capcom/cps.cpp b/src/burn/drv/capcom/cps.cpp
-index 4e76431..b2e0af6 100644
+index 4e76431..c855f1b 100644
 --- a/src/burn/drv/capcom/cps.cpp
 +++ b/src/burn/drv/capcom/cps.cpp
-@@ -2373,6 +2373,7 @@ INT32 CpsExit()
+@@ -2373,6 +2373,8 @@ INT32 CpsExit()
  		BurnSampleExit();
  		Cps2Turbo = 0;
  	}
 +	Cps2Wide = 0;   // never leak the profile into the next game loaded
++	Cps2WideCanary = 0;
  
  	return 0;
  }
 diff --git a/src/burn/drv/capcom/cps.h b/src/burn/drv/capcom/cps.h
-index 4caf9bf..26fc076 100644
+index 4caf9bf..133e402 100644
 --- a/src/burn/drv/capcom/cps.h
 +++ b/src/burn/drv/capcom/cps.h
-@@ -284,6 +284,7 @@ extern INT32 Dinohunt;
+@@ -284,6 +284,8 @@ extern INT32 Dinohunt;
  extern INT32 Port6SoundWrite;
  extern INT32 CpsBootlegEEPROM;
  extern INT32 Cps2Turbo;
 +extern INT32 Cps2Wide;      // CPS-2 WIDE v1 profile
++extern INT32 Cps2WideCanary;  // TEST-ONLY bank-relocation probe (B4)
  extern INT32 Jurassic99;
  extern INT32 Dinoh;
  extern INT32 Wofhfh;
 diff --git a/src/burn/drv/capcom/cps_obj.cpp b/src/burn/drv/capcom/cps_obj.cpp
-index 5cefed4..d085998 100644
+index 5cefed4..63c744b 100644
 --- a/src/burn/drv/capcom/cps_obj.cpp
 +++ b/src/burn/drv/capcom/cps_obj.cpp
-@@ -426,7 +426,10 @@ INT32 Cps2ObjDraw(INT32 nLevelFrom, INT32 nLevelTo)
+@@ -426,7 +426,18 @@ INT32 Cps2ObjDraw(INT32 nLevelFrom, INT32 nLevelTo)
  //		y -= CpsSaveFrg[0][0xB];
  
  #endif
 -		if (Cps2Turbo) {
++		if (Cps2WideCanary && (BURN_ENDIAN_SWAP_INT16(ps[1]) & 0x4000)) {
++			// B4 probe: bank2 (0x4000) -> bank4 (0x1000), bank3 (0x6000) ->
++			// bank5 (0x3000). With gfx group C loaded as a byte copy of group
++			// B, the tiles are identical, so correct 19-bit addressing must
++			// render pixel-identically to stock.
++			ps[1] = BURN_ENDIAN_SWAP_INT16(
++				(UINT16)((BURN_ENDIAN_SWAP_INT16(ps[1]) & ~0x4000) | 0x1000));
++		}
 +		if (Cps2Turbo || Cps2Wide) {
 +			// 19-bit tile address (64MB reach). y-word bit 15 cannot carry it:
 +			// CpsObjGet uses it as the END-OF-SPRITE-LIST marker, so the bit is
@@ -39,10 +49,10 @@ index 5cefed4..d085998 100644
  			n |= (BURN_ENDIAN_SWAP_INT16(ps[1]) & 0xe000) << 3;	// high bits of address
  		} else {
 diff --git a/src/burn/drv/capcom/cps_rw.cpp b/src/burn/drv/capcom/cps_rw.cpp
-index 1f70f87..4f93da5 100644
+index 1f70f87..ef8cd71 100644
 --- a/src/burn/drv/capcom/cps_rw.cpp
 +++ b/src/burn/drv/capcom/cps_rw.cpp
-@@ -48,6 +48,10 @@ INT32 Dinohunt = 0;
+@@ -48,6 +48,15 @@ INT32 Dinohunt = 0;
  INT32 Port6SoundWrite = 0;
  INT32 CpsBootlegEEPROM = 0;
  INT32 Cps2Turbo = 0;
@@ -50,14 +60,19 @@ index 1f70f87..4f93da5 100644
 +// the vsavjw driver init, cleared on exit. Gates the 19-bit sprite tile
 +// address; see docs/cps2_wide.md in that project.
 +INT32 Cps2Wide = 0;
++// TEST-ONLY (CPS2_WIDE_CANARY=1): relocates bank-2/3 sprites into the
++// WIDE banks 4/5 at draw time, WITHOUT touching the ROM, so game state is
++// identical by construction and only pixels can move. Never set in a
++// shipped build; see docs/cps2_wide.md (B4).
++INT32 Cps2WideCanary = 0;
  INT32 Jurassic99 = 0;
  INT32 Dinoh = 0;
  INT32 Wofhfh = 0;
 diff --git a/src/burn/drv/capcom/d_cps2.cpp b/src/burn/drv/capcom/d_cps2.cpp
-index 6931097..fed17c5 100644
+index 6931097..36dad18 100644
 --- a/src/burn/drv/capcom/d_cps2.cpp
 +++ b/src/burn/drv/capcom/d_cps2.cpp
-@@ -8822,6 +8822,66 @@ static struct BurnRomInfo VsavjRomDesc[] = {
+@@ -8822,6 +8822,80 @@ static struct BurnRomInfo VsavjRomDesc[] = {
  STD_ROM_PICK(Vsavj)
  STD_ROM_FN(Vsavj)
  
@@ -81,6 +96,19 @@ index 6931097..fed17c5 100644
 +	{ "vm3j.08a",      0x080000, 0x5773e5c9, CPS2_PRG_68K | BRF_ESS | BRF_PRG },
 +	{ "vm3j.09b",      0x080000, 0xd064f8b9, CPS2_PRG_68K | BRF_ESS | BRF_PRG },
 +	{ "vm3j.10b",      0x080000, 0x434518e9, CPS2_PRG_68K | BRF_ESS | BRF_PRG },
++
++	// WIDE v1 program extension: 4MB -> 6MB. FBNeo maps program ROM as
++	// SekMapMemory(CpsRom, 0, nCpsRomLen-1), so growth is descriptor-only
++	// (Phase A/A1 measured: vanilla never reads $400000-$5FFFFF, so the
++	// newly-covered window shadows nothing live). Everything above
++	// $0FFFFF is OUTSIDE the CPS-2 encryption window, so this space is
++	// raw - simpler to author into than the original in-crypt hole.
++	// Reserved, never allocate: $400000-$40000F (CpsFrg regs, now
++	// read-shadowed by ROM; writes still reach the handler).
++	{ "vsw.41",        0x080000, 0x75660aac, CPS2_PRG_68K | BRF_ESS | BRF_PRG },   // WIDE v1
++	{ "vsw.42",        0x080000, 0x75660aac, CPS2_PRG_68K | BRF_ESS | BRF_PRG },   // WIDE v1
++	{ "vsw.43",        0x080000, 0x75660aac, CPS2_PRG_68K | BRF_ESS | BRF_PRG },   // WIDE v1
++	{ "vsw.44",        0x080000, 0x75660aac, CPS2_PRG_68K | BRF_ESS | BRF_PRG },   // WIDE v1
 +
 +	{ "vm3.13m",       0x400000, 0xfd8a11eb, CPS2_GFX | BRF_GRA },
 +	{ "vm3.15m",       0x400000, 0xdd1e7d4e, CPS2_GFX | BRF_GRA },
@@ -117,6 +145,7 @@ index 6931097..fed17c5 100644
 +static INT32 Cps2WideInit()
 +{
 +	Cps2Wide = 1;
++	Cps2WideCanary = (getenv("CPS2_WIDE_CANARY") != NULL);   // TEST-ONLY
 +	bprintf(0, _T("CPS-2 WIDE v1 profile active\n"));
 +	return Cps2Init();
 +}
@@ -124,7 +153,7 @@ index 6931097..fed17c5 100644
  static struct BurnRomInfo VsavuRomDesc[] = {
  	{ "vm3u.03d",      0x080000, 0x1f295274, CPS2_PRG_68K | BRF_ESS | BRF_PRG },
  	{ "vm3u.04d",      0x080000, 0xc46adf81, CPS2_PRG_68K | BRF_ESS | BRF_PRG },
-@@ -12553,6 +12613,16 @@ struct BurnDriver BurnDrvCpsVsavj = {
+@@ -12553,6 +12627,16 @@ struct BurnDriver BurnDrvCpsVsavj = {
  	&CpsRecalcPal, 0x1000, 384, 224, 4, 3
  };
  

@@ -1044,3 +1044,15 @@ diff — that immediately separated "game behaves differently" from
 subsystem can account for the result, and prefer changing the EMULATOR
 under a test-only flag over changing the ROM when the ROM change has
 side effects.
+
+## FBNeo harness: no video means the sprite path never runs, and stdout
+## is captured to the sandbox log
+Two ways to waste an hour while instrumenting FBNeo. (1) The harness only
+renders when `FBNEO_HVIDEO` is set; without it `pBurnDraw` is NULL and
+`Cps2ObjDraw` is never called, so a printf in the sprite path produces
+NOTHING — which reads exactly like "my feature flag is not being set".
+(2) `tools/run_replay_fbneo.sh` redirects the emulator's stdout+stderr to
+`<sandbox>/fbneo_replay.log`; grepping the command's own output finds
+nothing. That log is also where FBNeo prints its region sizes and
+per-member "Loading graphics (x)... (OK)" lines — the fastest way to
+confirm a descriptor change actually took effect.
