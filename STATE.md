@@ -5,6 +5,78 @@ parity PROVEN, and the WIDE profile ported to it**. Plus an unplanned
 finding that matters more than the port: MAME is not perfectly
 deterministic run-to-run, and the whole oracle assumed it was)
 
+## Session 14z-59l (ROSTER ACCESS decided; the vs2 wheel measured properly)
+
+### Decision (maintainer, 2026-08-04)
+
+**Option 1 — an altered character select screen — is the target.** Capcom
+made one for the Vampire Collection / Chronicle console ports, and the
+maintainer owns them and can supply a pixel-accurate capture.
+Simplification they set: **keep the existing roster's cells exactly where
+they are and append the three newcomers**, keeping the random-select
+medallion in its original place. Imperfect medallion art on the three new
+cells is acceptable; **mechanical soundness is not**.
+
+**Option 2 (fallback): the hold-Start alternate-selection system.** Lesser
+implementation — the vs2 characters have their own alternates, so vsav
+characters would have to be "stacked" to free slots. Only if option 1 fails.
+
+### What vs2 actually contains (measured 14z-59l; corrects two of my claims)
+
+I twice reported that vs2 hands us the layout we want. Both were wrong, and
+both came from a MISALIGNED record base found by pattern-searching for the
+newcomer icon codes rather than by following the header pointer.
+
+The wheel records are located by a coord-list longword at `base-4` (that is
+how vsavj's `0x0032A50A` sits at `0x272A6E`). Scanning for those pointers
+finds the real records:
+
+| Record | Coord list | Entries | 3x3? | Notes |
+|---|---|---|---|---|
+| vsavj `0x272A72` | `0x32A50A` | 18 | **yes** (idx 8, Gallon, pal 07) | the shipped vsav wheel |
+| vs2 `0x2A6D8C` | `0x303AAC` | 18 | — | list byte-identical to vsavj's 18 |
+| **vs2 `0x2A6E5C`** | **`0x303B68`** | **24** | **NO** | the newcomer wheel |
+
+**CORRECTION 1:** I said "entry 8 is still 3x3, so appending does not force
+demoting Gallon's cell". False. The real 24-entry record has **zero** 3x3
+cells — the pal-07 character is split into a 3x2 (`b113`) plus a 2x1
+(`b0ee`). The original 14z-49 note ("nobody is 3x3") was right.
+
+**CORRECTION 2:** I said vs2 "appends three cells at (-24,-88) (-8,-88)
+(+8,-88)" to the shared layout. False — those are entries 0-2 of a
+DIFFERENT list. Measured properly, the 24 entries occupy **21 distinct
+positions**: the three newcomer cells overdraw three placeholder cells.
+
+| newcomer | entry | draws over | position |
+|---|---|---|---|
+| Huitzil `b108` pal 13 | 21 | entry 8 (`b100`) | raw (256,104) |
+| Pyron `b0f5` pal 11 | 22 | entry 0 (`b0cf`) | raw (232,88) |
+| Donovan `b10b` pal 05 | 23 | entry 12 (`b100`) | raw (208,104) |
+
+### So what is actually usable
+
+vs2 **does** give us Capcom's own **21-position wheel geometry** — but it is
+a REARRANGEMENT, not vsavj's 18 plus three. Its coord list is a different
+list, and its positions do not match vsavj's. Two paths follow:
+
+- **(a) Adopt vs2's 21-position layout wholesale.** Official geometry,
+  already in a ROM we own, ports with existing machinery. Cost: every
+  existing cell moves, and the 3x3 is lost — contrary to the maintainer's
+  "keep the original roster in its state".
+- **(b) Keep vsavj's 18 positions and author 3 new ones** (the decision).
+  vs2 still supplies the three medallion ART codes and palette rows, which
+  is the expensive part; only the three coordinates and the navigation are
+  new. **This is where the console-port capture is needed** — as the
+  reference for where Capcom put them in a VSav-style wheel.
+
+### The unanswered — and harder — half: CURSOR NAVIGATION
+
+Everything above is where cells are DRAWN. What makes it "mechanically
+sound" is what the cursor does: how a direction press maps to the next
+cell. That mechanism is NOT yet located. It is the real work of this task,
+it is independent of the art, and it is what a wrong answer would make
+unplayable rather than merely ugly. Next investigative step.
+
 ## Session 14z-59j (dual-track invariant ESTABLISHED, byte-attributed)
 
 The dual-track decision is only coherent if the WIDE build is a genuine
@@ -4679,21 +4751,9 @@ window per measured slot, never pre-widen.
   or banking, not more region. Worth sizing that before committing to B
   at M3. (Two duplicate copies of this entry were merged here.)
 
-- **ROSTER ACCESS MECHANISM (M4-defining, raised by maintainer
-  2026-07-28):** how players select the 18 characters. Option A: full
-  select-screen redesign (new wheel/cursor/portraits — priced by the
-  session-14 select-web archaeology as a milestone of its own, highest
-  UI-regression surface). Option B: combined-input slot sharing — hold
-  Start on a host slot selects the guest (engine-native precedent:
-  Oboro Bishamon is exactly this pattern in vanilla; source-game
-  precedent: vsav2/vhunt2 gate Donovan/Huitzil behind Hold Start +
-  button, community-confirmed; mechanism = generalize the existing
-  Start-hold latch + bank repoints to host/guest per-slot switching).
-  RECOMMENDATION: B, phased — access first, select-screen indication
-  (mugshot/name swap while Start held) as polish; A stays possible
-  later. Host/guest pairings = maintainer/community choice. Orthogonal:
-  3 extra characters' art needs gfx space beyond freed-Jedah either way
-  (the M3 expansion question).
+- ~~**ROSTER ACCESS MECHANISM**~~ **DECIDED 2026-08-04: option 1, an
+  altered select screen keeping the existing cells and appending the three
+  newcomers; hold-Start alternates are the fallback. See 14z-59l.**
 - See SPEC §7 for the rest. Nothing blocks current work.
 
 ## Open bugs
