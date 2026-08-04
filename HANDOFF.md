@@ -262,6 +262,11 @@ tests/test_select_wheel.sh            # the select cursor, 4 sections: tables de
 tests/test_id_space.sh                # freezes the id space: 0 out-of-range variant
                                       # rows, the 5 sites that fold the id to 4 bits,
                                       # and vsav2's 2-fold/6-widened reference shape
+tests/audit_id_writers.sh             # on-demand (22 MAME runs): every character-id
+                                      # VALUE vanilla ever assigns, both player structs.
+                                      # Fails if any legacy gameplay path writes an id in
+                                      # 0x10-0x1F — the invariant that would make a tenant
+                                      # on a variant id superset-safe by construction
 tests/audit_mask_window_ff4182.sh     # on-demand: proves the masked palette-staging
                                       # window hides the designed diff and nothing else
 ```

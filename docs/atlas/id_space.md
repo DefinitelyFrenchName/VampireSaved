@@ -170,38 +170,52 @@ And one (`0x04FAC4`) is a free win: its table already has the rows.
 > from the DATA image it is plainly 32 aliased rows. The mask is a
 > convention there, not a constraint.
 
-## Which ids vanilla ever assigns (measured) — and why it matters
+## Which ids vanilla ever assigns (measured over the corpus)
 
-Tapping the P1 id field `RAM:$FF8782` across legacy replays
-(`01_attract_long`, `03_two_player_vs`, `04_select_fuzz`, `09_mirror_pick`)
-gives every value vanilla writes and the PC that wrote it:
+Audit: `tests/audit_id_writers.sh` (on-demand, 22 MAME runs). Both player
+structs are tapped — `RAM:$FF8782` and `RAM:$FF8B82` — because the CPU
+opponent, the attract assignment and the challenger path write **only** to
+P2, and a P1-only tap misses all three.
 
-| writer | values |
-|---|---|
-| `PRG:0x020A80` (the select commit) | `00 01 03 06 08` — i.e. cursor cells |
-| `PRG:0x000D34` / `0x000D3A` / `0x000DD8` / `0x016E4C` | `00`, `FF` — boot RAM clear |
-| `PRG:0x009008` | `01` |
+Measured over **11 legacy replays × 2 fields = 22 tap logs**, every one
+carrying its `END` summary line:
 
-**No value in `0x10-0x1F` was written at all.** That matters because it is
-the shape of a much stronger superset argument than the current
-slot-`0x0F` replacement: if vanilla can never *produce* a variant-half id,
-then a newcomer living at `0x13` occupies rows **no legacy path can
-reach**, and the superset invariant holds by construction rather than by
-in-place surgery.
+| writer | ids written | what it is |
+|---|---|---|
+| `PRG:0x020A80` | `00 01 03 05 06 08` | the select commit (cursor cell) |
+| `PRG:0x00AEF6` | `0A 0C 0E` | the CPU-opponent picker |
+| `PRG:0x005BF4` | `02 0F` | attract assignment, P1 |
+| `PRG:0x005BFA` | `00 03` | attract assignment, P2 |
+| `PRG:0x008A86` | `05` | challenger / 2P join |
+| `PRG:0x009008` | `01` | P1 init |
+| `0x000D34` `0x000D3A` `0x000DD8` `0x016E4C` `0x016E4E` | `00`, `FF` | boot RAM clear |
 
-Stated at the strength the evidence supports: this is **four replays, not
-a proof**. Two things must hold before leaning on it:
+Union of ids written by any gameplay path:
+`00 01 02 03 05 06 08 0A 0C 0E 0F` — **not one value in `0x10-0x1F`.**
 
-1. `0x18` (Oboro Bishamon) is a variant id vanilla *does* use, and it did
-   not appear here — so that path exists and simply was not exercised.
-   Whatever reaches it is the counterexample to characterise.
-2. The **id-cycling selector** above writes the field directly, wrapping to
-   `0-15` in vsavj. Any newcomer at `0x10+` is unreachable through it until
-   its mask is widened — the same edit vsav2 already made.
+**Why this matters.** If no legacy gameplay path can produce a variant-half
+id, a tenant at `0x13` occupies rows **no legacy content can reach**, and
+the superset invariant holds *by construction* rather than by in-place
+surgery. The current slot-`0x0F` port needs that surgery precisely because
+legacy cursors visit Jedah's cell and legacy code reads his records — see
+the three superset traps in `GOTCHAS`. Moving a tenant onto a variant id
+should therefore make the invariant EASIER to hold, not harder.
 
-The measurement is cheap to extend; do it over the full legacy corpus, and
-include whatever drives the Oboro path, before treating "vanilla never
-writes the variant half" as a load-bearing invariant.
+**The gap, stated plainly.** `0x18` (Oboro Bishamon) *is* a variant id
+vanilla uses — four sites compare against it (`PRG:0x018F9A`, `0x026FBE`,
+`0x0293A8`, `0x043000`) — and **no replay in this corpus reaches it**. So
+what is established is "no legacy replay in the corpus writes the variant
+half", not "vanilla cannot". A tenant must still avoid `0x18`, and the
+Oboro entry path is worth characterising before the argument is leaned on
+harder. Nothing static was found that sets bit 4 of the id directly; the
+confirm path at `PRG:0x020ABE` takes its value from `$45(a6)` gated on
+`$43(a6)`, which is the thread to pull.
+
+The audit's verdict logic is ground-truthed in both directions: an injected
+variant-half write from a gameplay PC fails it, and a tap log missing its
+`END` line fails it (MAME can segfault in teardown *after* writing a
+complete log — the exit code is deliberately ignored, the `END` line is the
+artifact that decides).
 
 ## The arcade-opponent path (a fourth roster work item)
 

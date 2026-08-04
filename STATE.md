@@ -181,22 +181,41 @@ toggle over ids 0/1** on a second cycling path (flag at `a5-0x50B8`), i.e.
 a range restriction. `mask_class()` now separates `#$0f` (folds the variant
 half) from `#$1f` (full 5-bit) from everything else.
 
-### A superset argument worth developing (measured, not yet proven)
+### THE SUPERSET ARGUMENT, now measured over the whole corpus
 
-Tapping `RAM:$FF8782` across four legacy replays: the only gameplay writer
-is the select commit `PRG:0x020A80`, and every value is a cursor cell
-(`00 01 03 06 08`); the rest is boot RAM-clear. **Nothing writes
-`0x10-0x1F`.**
+Done: `tests/audit_id_writers.sh` (on-demand, 22 MAME runs). Both player
+structs tapped — the CPU opponent, attract assignment and challenger path
+write **only** to P2, so a P1-only tap misses three of the six writers.
 
-If that holds over the full corpus, a newcomer at `0x13` sits in rows **no
-legacy path can reach**, and the superset invariant becomes structural
-rather than something in-place surgery has to preserve — a materially
-better position than replacing Jedah at `0x0F`. Two caveats before leaning
-on it: `0x18` (Oboro) is a variant id vanilla *does* use and did not appear
-(that path exists, unexercised), and the id-cycling selector above wraps to
-`0-15`, so a newcomer is unreachable through it until that mask is widened.
-Four replays is not a proof; extending the tap over the full legacy corpus
-is cheap and is the obvious next measurement.
+**11 legacy replays × 2 fields = 22 tap logs, all with their `END` line.**
+Six gameplay writers found:
+
+| writer | ids | |
+|---|---|---|
+| `0x020A80` | `00 01 03 05 06 08` | select commit |
+| `0x00AEF6` | `0A 0C 0E` | CPU opponent |
+| `0x005BF4` / `0x005BFA` | `02 0F` / `00 03` | attract |
+| `0x008A86` | `05` | challenger join |
+| `0x009008` | `01` | P1 init |
+
+Union: `00 01 02 03 05 06 08 0A 0C 0E 0F` — **not one variant-half value.**
+
+So a tenant at `0x13` would occupy rows no legacy content can reach, and
+the superset invariant would hold *by construction* instead of by the
+in-place record surgery slot `0x0F` demands (the three superset traps in
+GOTCHAS exist because legacy cursors visit Jedah's cell). Moving a tenant
+onto a variant id should make the invariant EASIER, not harder — which is
+the strongest argument yet for the `0x13` move.
+
+**The gap, stated plainly:** `0x18` (Oboro) IS a variant id vanilla uses —
+four sites compare against it (`0x018F9A`, `0x026FBE`, `0x0293A8`,
+`0x043000`) — and no replay in the corpus reaches it. Established is "no
+legacy replay here writes the variant half", not "vanilla cannot". Nothing
+static sets bit 4 of the id directly; the confirm path `PRG:0x020ABE` takes
+its value from `$45(a6)` gated on `$43(a6)`, which is the thread to pull.
+Verdict logic ground-truthed both ways (injected variant write fails;
+missing `END` line fails — MAME segfaults in teardown after writing a
+complete log, so the exit code is ignored by design).
 
 ### A FOURTH work item found: the arcade-opponent path
 
