@@ -199,6 +199,50 @@ The measurement is cheap to extend; do it over the full legacy corpus, and
 include whatever drives the Oboro path, before treating "vanilla never
 writes the variant half" as a load-bearing invariant.
 
+## The arcade-opponent path (a fourth roster work item)
+
+"Selectable" is not "fightable". Tapping the **P2** id field `RAM:$FF8B82`
+found three gameplay writers the P1 tap never sees:
+
+| writer | what it is |
+|---|---|
+| `PRG:0x00AEF6` | the CPU-opponent picker |
+| `PRG:0x005BFA` | attract-demo character assignment |
+| `PRG:0x008A86` | the challenger / 2P-join path |
+| `PRG:0x020A80` | the same select commit, with `a6` = P2's struct |
+
+The picker (`PRG:0x00AED8`) reads well for our purposes:
+
+```
+00AED8  moveq   #$ff,d0          ; index = -1
+00AEDA  move.l  $110(a5),d2      ; 32-bit "already fought" mask
+00AEDE  lea     -$61b8(a5),a2    ; opponent ORDER LIST (work RAM)
+00AEE2  addq.w  #$1,d0
+00AEE4  move.b  (a2,d0.w),d1     ; candidate id
+00AEE8  cmp.w   $138(a5),d0      ; list LENGTH
+00AEEC  bcc.b   $aef2
+00AEEE  btst.l  d1,d2            ; used?  <- LONG btst: bits 0-31
+00AEF0  bne.b   $aee2
+00AEF6  move.b  d1,$382(a1)      ; commit the opponent
+```
+
+Two things follow:
+
+- **The used-mask is already 32 bits wide** (`btst.l`), so it accommodates
+  5-bit ids with no change. One less thing to widen.
+- The candidate ids come from an **order list in work RAM at `a5-0x61B8`
+  with its length at `$138(a5)`**. Adding newcomers to the arcade ladder
+  means extending that list and its length — a distinct work item from the
+  select wheel, and easy to forget because the wheel is the visible half.
+
+Downstream, `PRG:0x00B094` takes the picked list index, reads the id, and
+does `id * 32` into a palette-source pool at `PRG:0x3A3CA0` (the opponent's
+VS-screen palette). That pool holds **real, non-aliased data at variant
+ids** and continues past 32 entries, so a tenant at `0x13` lands on real
+memory rather than out of bounds — the entry there is currently a
+placeholder-looking grayscale ramp, i.e. content the tenant must supply
+rather than a bound to fix.
+
 ## What a per-tenant manifest must declare
 
 Falls straight out of the above:
@@ -219,7 +263,10 @@ Falls straight out of the above:
    slot test (trivial), and `0x03E40`/`0x04082` need a free anim-number
    block because `0x360-0x36F` is genuinely 16 wide (hard — and the two
    vs2 left folded).
-5. **Tables whose per-id layout is still unverified** (`rec8`, `byte2d`,
+5. **Arcade-ladder membership** — the opponent order list at `a5-0x61B8`
+   and its length `$138(a5)`, plus the VS palette block at
+   `PRG:0x3A3CA0 + id*32`. Selectable is not fightable.
+6. **Tables whose per-id layout is still unverified** (`rec8`, `byte2d`,
    `auto` gaps) — these must be resolved by decoding a consumer before a
    tenant is declared to own a row in them. Writing a speculative row into
    one is precisely the Felicia wall-jump defect.

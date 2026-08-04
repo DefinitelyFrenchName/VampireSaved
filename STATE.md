@@ -183,6 +183,23 @@ on it: `0x18` (Oboro) is a variant id vanilla *does* use and did not appear
 Four replays is not a proof; extending the tap over the full legacy corpus
 is cheap and is the obvious next measurement.
 
+### A FOURTH work item found: the arcade-opponent path
+
+Tapping the **P2** id field surfaced three writers the P1 tap never sees:
+the CPU-opponent picker `PRG:0x00AEF6`, the attract assignment
+`PRG:0x005BFA`, and the challenger/2P join `PRG:0x008A86` (plus the same
+select commit with `a6`=P2). None writes a variant-half id either.
+
+The picker uses an **order list in work RAM at `a5-0x61B8`, length
+`$138(a5)`**, and a **32-bit** already-fought mask (`btst.l $110(a5)`) —
+so the mask needs no widening, but the newcomers must be added to the
+ladder list, which is a distinct job from the select wheel and easy to miss
+because the wheel is the visible half. Downstream, `PRG:0x00B094` indexes
+the VS-screen palette pool at `PRG:0x3A3CA0 + id*32`; that pool has real,
+non-aliased data at variant ids (id `0x13` is a placeholder grey ramp), so
+it is content to author, not a bound to fix. **Selectable is not
+fightable** — now item 5 on the per-tenant declaration list.
+
 ### Prep for the capture: cell POSITIONS measured, and a negative result
 
 So the maintainer's PNG lands on ready ground.
