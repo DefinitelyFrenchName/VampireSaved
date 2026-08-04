@@ -156,6 +156,26 @@ def direct_masks(img, limit=0x400000):
     return out
 
 
+def immediate_id_writes(img, limit=0x100000):
+    """`move.b #imm,$382(An)` — a HARDCODED character id stored into the id
+    field. Any immediate in 0x10-0x1F means vanilla itself can produce a
+    variant-half id, so that id is RESERVED and no tenant may take it.
+
+    ($382 is a distinctive displacement, unlike small offsets such as $3,
+    which collide with every other struct's fields — that collision is what
+    made a wider sweep of this kind unusable.)
+    """
+    out = []
+    for a in range(0, limit, 2):
+        # move.b #imm,(d16,An) = 0x1 1 7C | An ... : 0x1d7c for a6
+        if img[a] != 0x1D or img[a + 1] not in (0x7C,):
+            continue
+        if img[a + 4:a + 6] != b"\x03\x82":
+            continue
+        out.append((a, img[a + 3]))
+    return out
+
+
 def mask_class(imm):
     """A mask FOLDS the variant half only if it keeps the low nibble whole
     and clears bit 4 — i.e. exactly #$0f. #$1f is the full 5-bit id. Any
@@ -245,6 +265,15 @@ def main():
           "instructions\n  of the read, stopping at the first branch — it is "
           "NOT proof that the site\n  does not narrow the id later. The "
           "folding list below is a LOWER BOUND." % 10)
+
+    imm_writes = immediate_id_writes(imgs["op"])
+    print("\n  HARDCODED id values written into the id field:")
+    for a, v in imm_writes:
+        note = "   <-- VARIANT HALF: id is RESERVED" if 0x10 <= v <= 0x1F else ""
+        print("    %06X  move.b #$%02x,$382(a6)%s" % (a, v, note))
+    reserved = sorted({v for _, v in imm_writes if 0x10 <= v <= 0x1F})
+    print("  variant-half ids vanilla can produce by immediate: %s"
+          % (" ".join("%02X" % v for v in reserved) or "none found"))
 
     direct = direct_masks(imgs["op"])
     print("\n  masks applied DIRECTLY to the id field in memory "

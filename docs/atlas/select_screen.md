@@ -238,6 +238,21 @@ enough — so the mechanism is present but unexercised by the corpus.
 > without that qualifier is the in-struct version of the
 > displacement-collision trap.
 
+## The Gallon variant path — vanilla's one immediate variant-half id
+
+`PRG:0x020B9C`, on the select screen: with the cursor on Gallon (id `0x02`),
+an input bit held (`btst #$7,$394(a6)`), and a confirm of **2-3 punches**
+(`d0` in `300/500/600/700`) or **2-3 kicks** (`3000/5000/6000/7000`), the id
+is overwritten with **`0x12`** — Gallon's variant — with `d1` recording
+which of the two. Id `0x12`'s per-character data rows are byte-identical to
+`0x02`'s, so it is the same character under a different id.
+
+This is the only place vanilla writes a variant-half id as an immediate,
+and it makes `0x12` **reserved**: no tenant may take it
+(`docs/atlas/id_space.md`). It is also the likely resolution of the
+"Dark Talbain rides a different mechanism" open item in
+`character_tables.md`.
+
 ## Re-measuring
 
 ```sh

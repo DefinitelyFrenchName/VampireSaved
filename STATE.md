@@ -217,6 +217,44 @@ Verdict logic ground-truthed both ways (injected variant write fails;
 missing `END` line fails — MAME segfaults in teardown after writing a
 complete log, so the exit code is ignored by design).
 
+### RESERVED IDS — vanilla DOES use part of the variant half (14z-60k)
+
+The most consequential finding of the session, and it corrects a working
+assumption I had been carrying. Scanning for `move.b #imm,$382(An)` — a
+hardcoded id stored into the id field:
+
+| set | reserved variant ids | where |
+|---|---|---|
+| **vsavj** | **`0x12`** | `PRG:0x020BB6`, `PRG:0x020BC6` |
+| **vsav2** | `0x19` | `PRG:0x01F864` |
+
+vsavj's is the **Gallon variant** path on the select screen: cursor on
+Gallon (`0x02`), an input bit held (`btst #$7,$394(a6)`), confirmed with
+**2-3 punches** (`d0` in `300/500/600/700`) or **2-3 kicks**
+(`3000/5000/6000/7000`) → id becomes `0x12`, `d1` recording which. Id
+`0x12`'s per-char rows are byte-identical aliases of `0x02` (hitbox,
+dispatch, anim index, `word132`) — the same character under a different id.
+
+That is very likely the **Dark Talbain** mechanism `character_tables.md`
+has carried as an open item ("must ride a different mechanism"). Recorded
+as consistent-with, not proven — nobody has selected it and watched.
+
+vs2's `0x19` is its second Oboro-class dataset, and its neighbouring
+`#$08` writes at `0x01F5A8`/`0x01F5BC` sit inside the match-init id
+normalisation the atlas already places at `PRG:0x01F5A0`. Two independent
+records agreeing is why the scan is trusted.
+
+**What it changes.** The free-id set is smaller than "anything above
+`0x0F`": taken are `0x00-0x0F`, **`0x12`**, and `0x18`. Free are `0x10`,
+`0x11`, `0x13` — exactly what the plan targets, **but only by luck**. Had
+the plan reached for `0x12` it would have collided with a shipped secret.
+`tests/test_id_space.sh` now locks the reserved set (14 checks), so growth
+fails the gate rather than surfacing after a build.
+
+It also scopes the corpus audit correctly: its PASS means "no legacy replay
+HERE writes the variant half", never "vanilla cannot" — vanilla plainly
+can, on an input no replay performs.
+
 ### A FOURTH work item found: the arcade-opponent path
 
 Tapping the **P2** id field surfaced three writers the P1 tap never sees:

@@ -201,7 +201,12 @@ legacy cursors visit Jedah's cell and legacy code reads his records — see
 the three superset traps in `GOTCHAS`. Moving a tenant onto a variant id
 should therefore make the invariant EASIER to hold, not harder.
 
-**The gap, stated plainly.** `0x18` (Oboro Bishamon) *is* a variant id
+**The gap, stated plainly — and it is bigger than first written.** Vanilla
+CAN produce a variant-half id: `0x12`, via the Gallon-variant select path
+above (found after this audit, by a different method). No replay in the
+corpus triggers it, so the audit's PASS stands as measured — but the claim
+it supports is "no legacy replay HERE writes the variant half", never
+"vanilla cannot". Likewise `0x18` (Oboro Bishamon) *is* a variant id
 vanilla uses — four sites compare against it (`PRG:0x018F9A`, `0x026FBE`,
 `0x0293A8`, `0x043000`) — and **no replay in this corpus reaches it**. So
 what is established is "no legacy replay in the corpus writes the variant
@@ -262,6 +267,53 @@ ids** and continues past 32 entries, so a tenant at `0x13` lands on real
 memory rather than out of bounds — the entry there is currently a
 placeholder-looking grayscale ramp, i.e. content the tenant must supply
 rather than a bound to fix.
+
+## RESERVED IDS — vanilla does use part of the variant half
+
+Found by scanning for `move.b #imm,$382(An)` (a hardcoded id stored into
+the id field; `$382` is a distinctive displacement, unlike small offsets
+like `$3` which collide with every other struct):
+
+| set | reserved variant ids | where |
+|---|---|---|
+| **vsavj** | **`0x12`** | `PRG:0x020BB6`, `PRG:0x020BC6` |
+| **vsav2** | `0x19` | `PRG:0x01F864` |
+
+vsavj's `0x12` is the **Gallon variant** path, on the select screen:
+
+```
+020B9C  cmpi.b #$2,$382(a6)   ; cursor is on id 0x02 (Gallon / J. Talbain)
+020BA4  btst   #$7,$394(a6)   ; a specific input bit held
+020BAC  bsr    $20c18         ; d0 in {300,500,600,700}  = 2-3 PUNCHES
+020BB6  move.b #$12,$382(a6)  ; -> id 0x12          (d1 = 0)
+020BBC  bsr    $20c38         ; d0 in {3000,5000,6000,7000} = 2-3 KICKS
+020BC6  move.b #$12,$382(a6)  ; -> id 0x12          (d1 = 1)
+```
+
+Id `0x12`'s per-character rows are **byte-identical aliases of `0x02`**
+(hitbox base, dispatch, anim index, `word132` all verified equal), i.e. the
+same character under a different id — which is how an alternate version
+that shares its data would be built. This is consistent with the
+**Dark Talbain** secret that `character_tables.md` records as "must ride a
+different mechanism; open item", and is very likely its resolution. Stated
+as consistent-with rather than proven: nobody has selected it and watched.
+
+vsav2's `0x19` is its second Oboro-class dataset, exactly as
+`character_tables.md` documents; its neighbouring sites `0x01F5A8`/`0x01F5BC`
+write `#$08`, which is the match-init id normalisation the atlas already
+places at `PRG:0x01F5A0`. Two independent records agreeing is why this scan
+is trusted.
+
+**Consequence for the roster.** The free-id set is smaller than "everything
+above `0x0F`":
+
+- **taken:** `0x00-0x0F` (the wheel), `0x12` (Gallon variant), `0x18`
+  (Oboro — vanilla uses it, entry path still unlocated)
+- **free, and what the plan targets:** `0x10`, `0x11`, `0x13`
+
+The plan survives unchanged, but only because it happened to pick around
+`0x12`. `tests/test_id_space.sh` now locks the reserved set, so growth
+fails the gate instead of surfacing after a build.
 
 ## What a per-tenant manifest must declare
 

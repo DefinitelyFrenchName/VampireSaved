@@ -39,6 +39,13 @@ Variant half (0x10-0x1F) aliases the base half except:
   variant dataset 0x18 (base 0x0B3450) is **Oboro Bishamon**, the hidden
   boss version. (Early hypothesis "Dark Talbain" was wrong — Dark Talbain
   must ride a different mechanism; open item.)
+  **RESOLVED 14z-60k (likely):** the select screen writes id **`0x12`**
+  outright at `PRG:0x020BB6`/`0x020BC6` when the cursor is on Gallon
+  (`0x02`) and the confirm is 2-3 punches or 2-3 kicks with an input bit
+  held. `0x12`'s data rows are byte-identical aliases of `0x02`, i.e. the
+  same character under a different id — the shape a Dark Talbain would
+  take. Detail in `docs/atlas/id_space.md`; not yet confirmed by playing
+  it.
 - **vsav2 & vhunt2: slots {0x0, 0x1, 0x3, 0x8, 0x9}** → five true alternate
   datasets. This is Capcom's own dual-flavor (Start-hold) infrastructure —
   the mechanism SPEC §3.3 wants to reuse. Which characters occupy them in

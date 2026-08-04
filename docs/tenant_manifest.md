@@ -83,8 +83,12 @@ assertion rather than a convention:
 1. **`wheel.cell == id`.** Measured, not assumed — the commit site writes
    one value to both fields.
 2. **No two tenants share an `id`**, and no tenant takes an id vanilla
-   uses: `0x00-0x0F`, plus **`0x18`** (Oboro Bishamon) and any other
-   variant row measured as `distinct` in `id_space.md`.
+   uses. The measured reserved set is `0x00-0x0F` (the wheel), **`0x12`**
+   (the Gallon variant / Dark Talbain path — vanilla writes it outright at
+   `PRG:0x020BB6`/`0x020BC6`) and **`0x18`** (Oboro Bishamon). That leaves
+   `0x10`, `0x11`, `0x13` — which is what the plan targets, but only by
+   luck, so the loader must check the list rather than assume it.
+   `tests/test_id_space.sh` locks the reserved set.
 3. **Every folding site in the measured list appears in `[tenant.folds]`.**
    If the census grows — and it has already grown once, from five sites to
    seven — a tenant manifest that predates the growth must FAIL rather than

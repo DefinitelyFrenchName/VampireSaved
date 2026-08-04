@@ -20,6 +20,10 @@
 #     lock on both classes and on the total.
 #   * the only variant rows holding their OWN data are 0x18 (Oboro
 #     Bishamon) and word_pos_a[0x16] (Anakaris).
+#   * RESERVED IDS: vanilla writes 0x12 outright (the Gallon-variant /
+#     Dark Talbain select path at PRG:0x020BB6/0x020BC6), so 0x12 is not
+#     free for a tenant. Growth of this set invalidates a roster plan that
+#     assumes 0x10/0x11/0x13 are available.
 # And for vsav2, which ships three characters on variant ids:
 #   * its bank rows are distinct at 10 11 13 18 19, and it folds at only 2
 #     sites — the evidence that widening the folding sites is the fix.
@@ -71,6 +75,15 @@ want "variant rows with own data: 0x18 only, in the bank" "$WORK/vsavj.txt" \
 want "the Anakaris variant outlier word_pos_a[0x16]" "$WORK/vsavj.txt" \
      "word_pos_a         0BE1BA  distinct at 16"
 
+# RESERVED IDS. vanilla writes id 0x12 outright at two sites (the Gallon
+# variant / Dark Talbain path), so 0x12 is NOT free for a tenant. If this
+# set ever grows, a roster plan built on "0x10/0x11/0x13 are free" must be
+# re-checked BEFORE anything is built on it.
+want "vsavj reserves id 0x12 (two hardcoded writes)" "$WORK/vsavj.txt" \
+     "variant-half ids vanilla can produce by immediate: 12"
+want "  the two 0x12 sites are where they were" "$WORK/vsavj.txt" \
+     "020BB6  move.b #\$12,\$382(a6)"
+
 echo "== vsav2: the roster-on-variant-ids reference =="
 want "bank rows distinct at 10 11 13 18 19" "$WORK/vsav2.txt" \
      "dispatch_00        0D7298  distinct at 10 11 13 18 19"
@@ -78,6 +91,8 @@ want "folds at only 2 sites (widened elsewhere)" "$WORK/vsav2.txt" \
      "TOTAL FOLDING SITES: 2"
 want "vs2 widened the id-cycling mask to #\$1f" "$WORK/vsav2.txt" \
      "00F492  andi.b #\$1f,\$382(a4)   full 5-bit"
+want "vs2 reserves 0x19 (its second Oboro dataset)" "$WORK/vsav2.txt" \
+     "variant-half ids vanilla can produce by immediate: 19"
 
 if [ "$fail" = 0 ]; then echo "ID SPACE: PASS"; else echo "ID SPACE: FAIL"; fi
 exit "$fail"

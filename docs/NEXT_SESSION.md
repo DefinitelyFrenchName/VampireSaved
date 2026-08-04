@@ -47,6 +47,11 @@ now unblocked. Full detail: `docs/atlas/id_space.md`.
 - **So option 1 needs NO indirection.** Give the newcomers their native vs2
   ids — **Huitzil `0x10`, Pyron `0x11`, Donovan `0x13`** — and every ported
   bank row lands at its own index with no renumbering.
+- **RESERVED IDS (14z-60k):** vanilla itself writes id **`0x12`** (the
+  Gallon-variant / Dark Talbain select path, `PRG:0x020BB6`/`0x020BC6`),
+  and uses `0x18` (Oboro). So the free set is `0x10`, `0x11`, `0x13` —
+  what the plan targets, **but only by luck**. The gate locks the reserved
+  set so growth fails loudly.
 - Caveat, and it already paid out: the list is a **LOWER BOUND**. Two
   walkers agreed on 5, then sites 6 and 7 turned up — masks applied
   straight to the id field in memory, which no *register* dataflow walk can
