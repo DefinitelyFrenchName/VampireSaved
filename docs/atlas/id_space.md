@@ -23,13 +23,13 @@ Row `0x10+k` compared against row `k` for every id-indexed table.
 
 | vsavj | count |
 |---|---|
-| layout-verified tables | 39 |
-| variant rows that are byte-identical copies (`alias`) | 603 |
+| layout-verified tables | 40 |
+| variant rows that are byte-identical copies (`alias`) | 619 |
 | variant rows holding their own data (`distinct`) | 21 |
 | variant rows that do not exist (`out-of-range`) | **0** |
 
 Zero out-of-range is the load-bearing number: every id `0x00-0x1F` has real
-storage in all 39 tables. The per-character bank is physically 32 rows
+storage in all 40 tables. The per-character bank is physically 32 rows
 throughout — 64 tables packed back-to-back, each table's entry 31 ending
 exactly where the next begins. The two tables outside the bank agree: the
 OBJ bank table `PRG:0x0282D4` is 32 words ending exactly where code resumes
@@ -76,28 +76,57 @@ this is a per-site data question, not a wall.
 > **CAVEAT, stated because it bounds the claim.** `none` means no
 > mask/compare was seen within 10 instructions of the read, stopping at the
 > first branch. It is not proof that those sites never narrow the id. **The
-> five-site folding list is a LOWER BOUND.** Closing it means deepening the
-> walk and following branches; the gate freezes what is known so growth is
-> visible.
+> five-site folding list is a LOWER BOUND**, and the gate freezes it so
+> growth is visible.
+
+**How far the bound has been pushed.** A second, independent scan — running
+*through* conditional branches and tracking the destination register until
+it is redefined, 40 instructions deep instead of 10 — finds **exactly the
+same five sites**. Two strategies with different failure modes agreeing is
+the strongest evidence available short of a complete dataflow analysis.
+
+What is still genuinely open: **62 of the 269 reads copy the id straight
+into another memory field** rather than a data register, across 14 distinct
+fields —
+
+| field | sites | field | sites |
+|---|---|---|---|
+| `$a(a6)` | 16 | `$39(a6)` | 4 |
+| `$a(a4)` | 13 | `$b1(a4)` / `$39(a4)` / `$9(a6)` | 2 each |
+| `$b1(a6)` | 11 | `$3(a6)`, `$3e0(a6)`, `$3bd(a6)`, `$45(a6)`, `$9c(a4)` | 1 each |
+| `$58(a4)` | 5 | | |
+
+A complete folding census has to follow those fields to *their* consumers.
+`$a(An)` is the owner-char-id an object carries, so its readers are the
+likely place for further masks. Not done, and named here so it is not
+mistaken for done.
 
 ## The five vsavj folding sites
 
-| Site | What it does | vs2 |
-|---|---|---|
-| `PRG:0x003E40` | `d1 = 0x360 + (id & 0x0F)` → `bsr $4CE2` — a per-character **sound id** in a 16-wide range | same code at `0x003E76` — **vs2 kept the fold** |
-| `PRG:0x004082` | the same computation reached through `a4` | pattern absent (refactored) |
-| `PRG:0x00A43E` | `(id & 0x0F)` → `$130(a5)` work var, with a struct pointer at `$13A(a5)` | pattern absent (changed) |
-| `PRG:0x0409EC` | `(id & 0x0F)` compared against `#$06` — a per-character special case on slot 6 | same code at `0x041BDC` — **vs2 kept the fold** |
-| `PRG:0x04FAC4` | `(id & 0x0F) * 24` into the 16-row record table at `PRG:0x04FFA8` | pattern absent (changed) |
+Each was decoded to its consumer; the fixes are not all the same shape.
 
-Two of the five are folds vs2 *deliberately kept* — a newcomer sharing its
-base character's sound-id base and slot-6 special case was acceptable to
-Capcom. The other three vs2 changed, which is where the porting work is.
+| Site | What it computes | Why it folds | Fix class |
+|---|---|---|---|
+| `PRG:0x003E40` | `d1 = 0x360 + (id & 0x0F)`, then `bsr $4CE2` (the set-anim helper: `btst #0,$70(a6)` facing → `addi.w #$300,d1` → `jmp $3316`), wrapped in the kernel save/restore pair `$330E`/`$3306` | **the anim NUMBER BLOCK is genuinely 16 wide**: `0x360-0x36F` is one number per character, and `0x370` onward is already taken (the `0x04FFA8` table below holds `0x0370-0x03D7`). Widening to `#$1f` would run `0x360-0x37F` straight into it | **hard** — needs a free anim-number block, not a mask edit. vs2 **kept this fold** |
+| `PRG:0x004082` | the same computation through `a4` | same | same as above |
+| `PRG:0x00A43E` | `(id & 0x0F)` → `$130(a5)`, plus a struct pointer at `$13A(a5)` and a state kick (`$4(a5)=0x0A`, `$106(a5)=1`) | `$130(a5)` is written ONLY here and read at 15 sites clustered at `0x01BF9x-0x01C38x` and `0x021AC8-0x021C8E` — beside the select-screen code, i.e. the **per-slot venue-asset display family** (mugshot / name / medallion), whose arrays are 16-wide | **medium** — the same 16-wide per-slot arrays the project already ports for Donovan; extend those, then widen |
+| `PRG:0x0409EC` | `(id & 0x0F)` compared against `#$06` — a behavioural special case for slot 6 (Anakaris) | not a table at all, just a slot test | **trivial** — a newcomer is only affected if it must inherit or avoid Anakaris' special case. vs2 **kept this fold** |
+| `PRG:0x04FAC4` | `(id & 0x0F) * 24` into `PRG:0x04FFA8` — 12 words per character (6 pairs; `tst.b $bc(a5)` selects +0 or +2), values `0x0370-0x03D7` | **nothing structural.** Measured: that table is **32 rows × 24 bytes**, ending cleanly at `0x0502A8`, with rows `0x10-0x1F` byte-identical copies of `0x00-0x0F` | **easy** — the rows already exist; fill the tenant's row and widen the mask to `#$1f` |
 
-`0x04FAC4` is the instructive one: the fold is there because the table it
-indexes genuinely has 16 rows. Widening that site means growing a table,
-not deleting an `andi` — the mask is a symptom of the structure behind it.
-Every site needs that judgement made individually.
+So the five are not one problem. Two (`0x03E40`/`0x04082`) are constrained
+by an anim-number block that is really 16 wide — and those are exactly the
+two vs2 chose to keep, which is the strongest available evidence that
+inheriting there is acceptable. One (`0x0409EC`) is a slot test. One
+(`0x00A43E`) rides the venue-asset arrays already on the port's work list.
+And one (`0x04FAC4`) is a free win: its table already has the rows.
+
+> **Correction (same session).** The first pass of this page said
+> `0x04FAC4` "folds because the table it indexes genuinely has 16 rows".
+> That was wrong, and wrong in the familiar way — the table was read out of
+> the OPCODE image, where a `lea (pc)` + `(An,Dn)` table is high-entropy
+> noise, and 16 rows of noise look as much like 16 rows as like 32. Read
+> from the DATA image it is plainly 32 aliased rows. The mask is a
+> convention there, not a constraint.
 
 ## What a per-tenant manifest must declare
 
@@ -113,7 +142,12 @@ Falls straight out of the above:
    have a row at the tenant's id.
 4. **Folding sites the tenant needs widened** — from the list above, per
    tenant, with a decision recorded for each: inherit the base character's
-   value (as vs2 does twice) or widen.
+   value (as vs2 does twice) or widen. The five are not equal work:
+   `0x04FAC4` is a fill-the-row-and-widen (easy), `0x00A43E` rides the
+   venue-asset arrays already on the port's list (medium), `0x0409EC` is a
+   slot test (trivial), and `0x03E40`/`0x04082` need a free anim-number
+   block because `0x360-0x36F` is genuinely 16 wide (hard — and the two
+   vs2 left folded).
 5. **Tables whose per-id layout is still unverified** (`rec8`, `byte2d`,
    `auto` gaps) — these must be resolved by decoding a consumer before a
    tenant is declared to own a row in them. Writing a speculative row into

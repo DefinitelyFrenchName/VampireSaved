@@ -56,6 +56,10 @@ EXTRA_TABLES = {
         # name, addr, entry bytes, rows, view, consumer
         ("obj_bank", 0x0282D4, 2, 32, "op", "0x282BA/0x282C8 (pc-rel indexed)"),
         ("wheel_adjacency", 0x0211E4, 8, 32, "dat", "0x020A70 (lea + (An,Dn))"),
+        # 12 words/char (6 pairs, $bc(a5) picks +0/+2), values 0x0370-0x03D7.
+        # Its consumer PRG:0x04FAC4 masks the id to 4 bits even though the
+        # table has 32 real rows — the mask is convention, not structure.
+        ("anim_pairs", 0x04FFA8, 24, 32, "dat", "0x04FAC4 (lea (pc) + (An,Dn))"),
     ],
     "vsav2": [
         ("obj_bank", 0x027530, 2, 32, "op", "per docs/atlas/character_tables.md"),

@@ -101,6 +101,61 @@ within 10 instructions of the read (the walk stops at the first branch).
 That is not proof they never narrow the id — **the five-site list is a
 LOWER BOUND**, and `test_id_space.sh` freezes it so growth is visible.
 
+### Follow-up pass: the bound pushed, and one of my own claims corrected
+
+Done without maintainer input, after the first write-up.
+
+**The lower bound is now much tighter.** A second scan strategy — running
+*through* conditional branches and tracking the register until it is
+redefined, 40 instructions deep instead of 10 — finds **exactly the same
+five sites**. Two walkers with different failure modes agreeing is the
+strongest evidence short of full dataflow. What remains genuinely open is
+named rather than hidden: **62 of the 269 reads copy the id into another
+memory field** (14 distinct fields; `$a(a6)`×16, `$a(a4)`×13, `$b1(a6)`×11
+lead), and a complete census must follow those to their consumers.
+
+**CORRECTION to my own first pass.** I wrote that `PRG:0x04FAC4` "folds
+because the table it indexes genuinely has 16 rows". Wrong — and wrong in
+the house style: I read that table out of the OPCODE image, where a
+`lea (pc)` + `(An,Dn)` table is high-entropy noise, and 16 rows of noise
+look exactly as much like 16 rows as like 32. From the DATA image it is
+plainly **32 rows × 24 bytes** (12 words/char, 6 pairs, `$bc(a5)` picks
++0/+2, values `0x0370-0x03D7`), ending cleanly at `0x0502A8`, upper 16
+byte-identical to lower 16. The mask there is convention, not structure —
+which makes the answer *stronger*. Now measured by the gate as table
+`anim_pairs` (counts moved to 40 tables / 619 alias / 21 distinct /
+**0 out-of-range**).
+
+**The five sites are not equal work** (full table in `id_space.md`):
+
+| Site | Fix class |
+|---|---|
+| `0x04FAC4` anim-pair table | **easy** — rows already exist; fill and widen |
+| `0x0409EC` slot-6 behavioural test | **trivial** — a slot test, no table |
+| `0x00A43E` → `$130(a5)` | **medium** — written only here, read at 15 sites beside the select code: the per-slot venue-asset arrays (mugshot/name/medallion), 16-wide, already on the port's list |
+| `0x03E40` / `0x04082` anim `0x360+id` | **hard** — the anim NUMBER BLOCK really is 16 wide: `0x370+` is already occupied by the `0x04FFA8` table, so widening the mask collides. **These are the two vs2 left folded.** |
+
+### DECISION FOR THE MAINTAINER (gameplay-visible)
+
+The `0x360+id` anim family is the one item the measurement cannot settle
+alone, and it is a "player could feel it" call, so it is not mine:
+
+- **Option A — inherit (recommended).** A newcomer at `0x13` plays anim
+  `0x363` (Victor's number in that block). **This is exactly what vsav2
+  ships** — Capcom kept both folds — so it is known not to break their
+  version of these characters.
+- **Option B — relocate the block.** Find a free 32-wide anim-number range
+  and widen both sites. Costs a numbering audit and touches shared engine
+  code for a family we cannot yet name.
+
+What is known about the family: entry `PRG:0x003E3A` (kernel save `$330E`
+→ set anim `0x360+id` via `$4CE2` → restore `$3306`), called from the
+state handler at `PRG:0x024002`, which sets `$140(a6)=0x20`,
+`$14E(a6)=0x10` and then routes `$54(a6)` through the property table
+`0x28D00` into the anim setter `0x27EC0`. **Naming it needs a runtime
+probe** — deliberately not guessed. Recommendation stands at A regardless,
+because vs2 is a shipped existence proof.
+
 ### Consequence for the roster (option 1)
 
 **No indirection is needed.** Give the newcomers their native vs2 ids —
@@ -4856,6 +4911,19 @@ Extension policy stands: future palette-block ports extend the
 window per measured slot, never pre-widen.
 
 ## Decisions pending (human)
+
+- **THE `0x360+id` ANIM BLOCK (14z-60)** — of the five sites that fold the
+  character id to 4 bits, three are ordinary porting work; two
+  (`PRG:0x003E40`, `PRG:0x004082`) compute a per-character anim number in a
+  block that is genuinely 16 wide (`0x360-0x36F`, with `0x370+` already
+  occupied). **Option A: inherit** — a newcomer at `0x13` plays `0x363`,
+  which is exactly what vsav2 ships, Capcom having left both folds in
+  place. **Option B: relocate** the block to a free 32-wide range and widen
+  both sites — a numbering audit plus shared-engine edits, for a family we
+  cannot yet name. **Recommendation: A**, on the strength of vs2 being a
+  shipped existence proof; revisit only if a playtest shows the inherited
+  animation is wrong for a newcomer. Detail in session 14z-60 and
+  `docs/atlas/id_space.md`.
 
 - ~~**M5 SOUND NEEDS A DATA HOME (14z-52)**~~ **SETTLED 2026-08-04 by the
   dual-track decision below: it lives in `wide_ext`.** Two corrections to

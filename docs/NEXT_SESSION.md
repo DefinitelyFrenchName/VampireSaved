@@ -45,9 +45,12 @@ now unblocked. Full detail: `docs/atlas/id_space.md`.
 - **So option 1 needs NO indirection.** Give the newcomers their native vs2
   ids — **Huitzil `0x10`, Pyron `0x11`, Donovan `0x13`** — and every ported
   bank row lands at its own index with no renumbering.
-- Caveat that bounds it: 226 of 269 read sites showed no mask within 10
-  instructions; **the five-site list is a LOWER BOUND**, frozen by
-  `tests/test_id_space.sh` so growth is visible.
+- Caveat that bounds it: **the five-site list is a LOWER BOUND**, frozen by
+  `tests/test_id_space.sh` so growth is visible. A second scan strategy
+  (through branches, tracking the register to redefinition, 40 deep) finds
+  **the same five** — but 62 of the 269 reads copy the id into another
+  memory field (14 fields; `$a(a6)`/`$a(a4)`/`$b1(a6)` lead), and following
+  those to their consumers is not done.
 
 ## The select cursor is MEASURED (14z-60) — and the old record was wrong
 
@@ -73,10 +76,16 @@ Everything mechanical is measured. Remaining for option 1:
    neighbouring rows so the three are reachable — 24 bytes of new table
    plus the reachability edits. vs2's own table is the worked example
    (`python3 tools/select_wheel.py build/out/vsav2_data.bin --set vsav2`).
-2. **A decision per folding site** (5 listed in `id_space.md`): inherit the
-   base character's value, as vs2 chose twice, or widen. `PRG:0x04FAC4`
-   folds because its table genuinely has 16 rows — widening it means
-   growing a table, so each site needs its own judgement.
+2. **A decision per folding site** (5, all decoded to their consumers in
+   `id_space.md`, and they are NOT equal work):
+   `0x04FAC4` **easy** — its table already has 32 rows, so fill the
+   tenant's row and widen the mask; `0x0409EC` **trivial** — a slot-6
+   behavioural test; `0x00A43E` **medium** — rides the 16-wide venue-asset
+   arrays already on the port's list; `0x03E40`/`0x04082` **hard** — the
+   anim-number block `0x360-0x36F` really is 16 wide (`0x370+` is taken),
+   and these are the two vs2 left folded. **That last one is a maintainer
+   decision, now in STATE "Decisions pending" with a recommendation
+   (inherit, as vs2 does).**
 3. **Cell coordinates + medallion art** — waiting on the maintainer's
    console-port capture (below).
 4. Then per-tenant manifests, on the declaration list in `id_space.md`.

@@ -10,7 +10,9 @@
 #
 # The frozen facts (vsavj, measured 14z-60 — docs/atlas/id_space.md):
 #   * 0 out-of-range variant rows across the layout-verified tables: every
-#     id 0x00-0x1F has real storage in all of them.
+#     id 0x00-0x1F has real storage in all of them — including anim_pairs
+#     (PRG:0x04FFA8), whose consumer masks to 4 bits anyway, so that mask is
+#     convention and not structure.
 #   * exactly 5 sites fold the id to 4 bits, at known addresses.
 #   * the only variant rows holding their OWN data are 0x18 (Oboro
 #     Bishamon) and word_pos_a[0x16] (Anakaris).
@@ -53,7 +55,7 @@ done
 
 echo "== vsavj: every id has storage, and the folding set is known =="
 want "no variant row is out-of-range" "$WORK/vsavj.txt" \
-     "603 alias, 21 distinct, 0 out-of-range"
+     "40 tables x 16 variant ids: 619 alias, 21 distinct, 0 out-of-range"
 want "exactly the 5 known folding sites" "$WORK/vsavj.txt" \
      "mask #\$0f: 003E40 004082 00A43E 0409EC 04FAC4"
 want "variant rows with own data: 0x18 only, in the bank" "$WORK/vsavj.txt" \
