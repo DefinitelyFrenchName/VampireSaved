@@ -1403,3 +1403,64 @@ Related: `grep -q "CPS-2 WIDE v1" <binary>` is NOT a reliable way to ask
 whether a binary carries the profile — it gave a false negative on FBNeo
 here. Use `strings -a | grep`, or ask the emulator (`-listfull vsavjw` for
 MAME).
+
+## A worktree branched from a STALE `origin/main` silently changes the
+## instrument (paid: 2026-08-04, 14z-60)
+`EnterWorktree` (and `git worktree add` with a `fresh` base ref) branches
+from **`origin/<default-branch>`**, not from local `main`. On this machine
+origin trails local main by ~18 sessions, so a worktree created to do new
+work came up on 14z-41-era code: `run_mame.sh` WITHOUT the 14z-59
+input-provider isolation, `tests/` missing ten gates, `tools/` predating
+several fixes. Half a session of measurement ran on it before a missing
+test file gave it away — nothing in the worktree announces which commit it
+is based on.
+
+This is the drifting-reference trap (14z-55, the FBNeo `WIDE=0` reference;
+14z-58, the MAME gitlink at 0.289) in a new costume: **the tool reported
+success while the instrument was not the one being claimed.** The results
+survived re-measurement here — byte-identical decrypted images, identical
+walk — but that was luck, not method.
+
+Rules:
+- After creating a worktree, `git log --oneline -1` and compare against the
+  branch you meant to base on. `git reset --hard main` fixes it in place.
+- Any measurement that will be QUOTED must record which commit the tooling
+  came from, the same way analysis scripts print the SHA-1 of the ROM they
+  read.
+
+## capstone m68k mnemonics carry a SIZE SUFFIX — equality tests match
+## nothing and report a confident null (paid: 2026-08-04, 14z-60)
+`i.mnemonic` is `andi.w`, `move.b`, `add.w` — never bare `andi`/`move`. A
+classifier written as `if i.mnemonic in ("andi", "and")` therefore matches
+**zero** instructions, and the first run of `tools/audit_id_space.py`
+reported "269 read sites, 0 masks — no site narrows the character id",
+which is both wrong and exactly the answer the author was hoping for.
+
+Same family as the sound-ring tap that reported "nobody ever plays a
+sound" (access width) and the OBJ census that counted stale entries past
+the terminator: **a measurement returning a clean null is a bug report
+about the measurement until proven otherwise.** Compare on the stem
+(`mnemonic.split(".")[0]`), and sanity-check any classifier against one
+site you have already read by hand.
+
+## TABLE A's shape cannot tell U/D from L/R — the direction labelling needs
+## an external fact
+The select screen's joystick-nibble table marks every opposing pair
+illegal. That structure is SYMMETRIC under swapping which bit-pair is
+vertical, so "it decodes perfectly" holds for both labellings and proves
+neither. The first read of the wheel graph assumed bit0=Up and produced a
+self-consistent adjacency matrix that disagreed with a known cursor path.
+Pinned instead by two prior independent records (`11_pick_donovan.rpl`'s
+U,U,R → `0x0F`, the atlas's L,L,D → `0x09`), which have a unique joint
+solution over all 8 labellings × 16 start cells — and which also recover
+the documented default cell, a third agreement that was not fitted.
+Real order: **bit0=R, bit1=L, bit2=D, bit3=U**. Lesson: when a structure's
+symmetry admits several readings, the disambiguating evidence has to come
+from outside the structure.
+
+## MAME write taps must be WORD-ALIGNED
+`install_write_tap` on `ff8403,1` dies with "start address has low bits
+set, did you mean ff8402?" — and it is a hard error that kills the script
+after a full boot. Tap the containing word (`ff8402,2`) and filter on the
+logged mask/offset. Byte writes arrive with the value replicated across
+the word (`data 00000303` for a byte `0x03`), so mask the low byte.

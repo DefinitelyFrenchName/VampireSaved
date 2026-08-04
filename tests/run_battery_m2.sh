@@ -3,6 +3,8 @@
 # stage-6 dev build must pass before any commit that touches the build
 # (CLAUDE.md rule 2 / persistent-suite doctrine). One command, no
 # chat-memory chain. Sections:
+#   0. test_id_space.sh / test_select_wheel.sh — reference-ROM rule locks
+#      (id-space shape, select-cursor mechanism); build-independent
 #   1. test_m2b_stage6.sh    — build (with dev GEN_FLAGS) + static gfx
 #                              verification, guarded soaks, MASKED LEGACY
 #                              GATE (frozen flicker inventory — watch for
@@ -33,6 +35,13 @@ cd "$REPO"
 
 python3 tools/audit_roms.py "$ROMDIR" > /dev/null || {
     echo "ROM audit FAILED — stop (CLAUDE.md §3)"; exit 1; }
+
+# Rule locks on the REFERENCE ROM (CLAUDE.md §4: engine-invariant locks run
+# on every build). Build-independent, so they run first and cheaply fail
+# before anything expensive: the select-cursor mechanism and the shape of
+# the character-id space, both of which the roster work builds on.
+tests/test_id_space.sh
+tests/test_select_wheel.sh
 
 tests/test_m2b_stage6.sh "$OUTBASE"
 tests/test_don_sword.sh "$OUTBASE/rompath"

@@ -1,9 +1,138 @@
 # STATE — living progress log
 
-Updated: 2026-08-04 (session 14z-59..59m — **B5 + B5b + Phase C steps 1-2**:
-MAME pinned and parity-proven, the WIDE profile on BOTH emulators, FBNeo
-instruments, a declarative address-space model, and **M5 sound AUDIBLE** on
-a dual-track build. Roster access DECIDED. Awaiting playtest of `ac52eeff`)
+Updated: 2026-08-04 (session 14z-60 — the select-cursor mechanism
+**re-derived and MEASURED**, and the **id-space question ANSWERED**:
+conventional, so option 1 needs no indirection. Two new gates. Previous:
+14z-59..59m — B5 + B5b + Phase C steps 1-2, M5 sound AUDIBLE, `ac52eeff`
+awaiting playtest)
+
+## Session 14z-60 (select cursor MEASURED; the id space is CONVENTIONAL)
+
+Two queued items closed, in the order the maintainer set: re-verify and
+record the cursor mapping, then census the id space.
+
+New: `docs/atlas/select_screen.md`, `docs/atlas/id_space.md`,
+`tests/test_select_wheel.sh` (9 checks), `tests/test_id_space.sh` (7),
+`tools/select_wheel.py`, `tools/check_wheel_walk.py`,
+`tools/audit_id_space.py`. No ROM change; no build produced.
+
+### Why this ran before the roster design
+
+The cursor mechanism 14z-59l/59n recorded existed **only in
+`docs/NEXT_SESSION.md`** — not in STATE.md, the atlas, or any test. STATE's
+own 14z-59l section said the opposite ("that mechanism is NOT yet
+located"), and NEXT_SESSION is rewritten wholesale every session, so the
+finding was one rewrite from being lost and nobody but its author could
+check it. Re-deriving it cost half a session and **corrected it**.
+
+### The mechanism, re-derived and measured
+
+Full detail in `docs/atlas/select_screen.md`. What changed versus the log:
+
+- **The commit site is `PRG:0x020A7C` (cell) and `PRG:0x020A80` (char id),
+  not `PRG:0x020A84`.** `0x020A84` is the `bsr.w $20C98` after them, and
+  the `bmi` target for the no-move path. Measured: 145/145 navigation
+  writes came from `0x020A7C`. The 14z-41 lesson, repeated verbatim — a
+  cited address in a session log is a claim.
+- **Direction order is R,L,D,U (bits 0-3), not U,D,L,R.** TABLE A's
+  structure cannot distinguish the two: "opposing pairs are illegal" is
+  symmetric under swapping which pair is vertical. Pinned by two prior
+  independent records — `11_pick_donovan.rpl` (U,U,R → `0x0F`) and the
+  atlas's Aulbath path (L,L,D → `0x09`) — which have a UNIQUE joint
+  solution over all 8 labellings × 16 start cells, and which also recover
+  the documented default cell `0x01`.
+- **Both tables are DATA-space**, reached by `lea`/`movea.l` + `(An,Dn)`.
+  In the opcode image they are convincing garbage.
+- The substance of the original claim stands: both stores take the same
+  `d0`, so **the wheel cell index IS the character id**.
+
+Also found while measuring: `PRG:0x0209DA` writes the default cell,
+`PRG:0x020AA6` clears it on confirm, and `PRG:0x020A98` special-cases cell
+`0x0B` at confirm — the slot `character_tables.md` lists as "special".
+
+### Measured, not just read
+
+`select_wheel.py` generates an input script visiting **every** (cell,
+direction) pair and states what each press must produce;
+`check_wheel_walk.py` requires the emulator to produce exactly that.
+Result: **145 presses, all 128 pairs, exact**, constant frame offset, no
+write to the cell byte from anywhere but the commit PC. Four negative
+controls on the checker — one of which feeds it the old `0x020A84` and
+must fail, so the correction is evidenced by the gate itself.
+
+### THE ID-SPACE ANSWER: conventional
+
+| vsavj | |
+|---|---|
+| layout-verified id-indexed tables | 39 |
+| variant rows that are byte copies | 603 |
+| variant rows with their own data | 21 |
+| **variant rows that do not exist** | **0** |
+
+Every id `0x00-0x1F` has real storage in every one of them. The bank is
+physically 32 rows (64 tables packed back-to-back, each ending exactly
+where the next begins); the OBJ bank table and the wheel table agree.
+
+The narrowing is not in the data but in a small set of **consumer sites
+that mask to 4 bits — 5 in vsavj**, enumerated with addresses in
+`id_space.md`. And the reference case settles how to read that:
+
+| | vsavj | vsav2 |
+|---|---|---|
+| `andi #$0f` (folds `0x1x`→`0x0x`) | **5** | **2** |
+| `andi #$1f` (full 5-bit) | 3 | **6** |
+
+**vsav2 ships three characters on variant ids by widening the folding
+sites** — 2 remaining, and it kept those two deliberately (a newcomer
+sharing its base character's sound-id base and slot-6 special case). So
+this is a finite per-site work list, not a wall.
+
+Two findings worth keeping:
+- `word_pos_a[0x16] = 0x0018` — every character holds `0x0010` except
+  Anakaris (`0x06` = `0x0020`), and his VARIANT id holds a third value.
+  vsavj already uses a variant row differentially outside slot 8.
+- `PRG:0x04FAC4` folds because the table it indexes (`PRG:0x04FFA8`,
+  24-byte records) genuinely has 16 rows. Widening that site means growing
+  a table — the mask is a symptom of the structure behind it, so each of
+  the five needs its own judgement.
+
+**Bounding the claim honestly:** 226 of 269 read sites showed no mask
+within 10 instructions of the read (the walk stops at the first branch).
+That is not proof they never narrow the id — **the five-site list is a
+LOWER BOUND**, and `test_id_space.sh` freezes it so growth is visible.
+
+### Consequence for the roster (option 1)
+
+**No indirection is needed.** Give the newcomers their native vs2 ids —
+Huitzil `0x10`, Pyron `0x11`, Donovan `0x13` — and every ported bank row
+lands at its own index with no renumbering, matching the cells vs2 already
+ships. Remaining work: three TABLE B rows plus reachability edits to
+neighbouring rows, and a decision per folding site. `id_space.md` lists
+what a per-tenant manifest must declare.
+
+Note this moves Donovan off slot `0x0F` (Jedah) to `0x13` — the "moving
+Donovan off Jedah's slot" item already queued, now with a target id.
+
+### Independent confirmation, from the bytes alone
+
+vs2's wheel table has live rows at `0x10`/`0x11`/`0x13` and DEAD (`$ff`)
+rows at `0x02`/`0x09`/`0x0A`. Against the atlas slot map those three are
+Gallon, Aulbath and Sasquatch — **exactly the characters Vampire Savior 2
+dropped** to make room for Donovan, Huitzil and Pyron. The public roster
+swap falls out of the adjacency bytes, which is independent confirmation
+that the cell index is the character id.
+
+### A process failure worth recording
+
+`EnterWorktree` branched from **`origin/main` (6fe3c04, 14z-41)**, not
+local `main` (ed5dc10) — origin is ~18 sessions stale. The first half of
+the measurement therefore ran on 14z-41-era tooling, including
+`run_mame.sh` from before the 14z-59 input-provider isolation. Caught by a
+missing test file; the branch was moved to local `main` and **everything
+was re-measured**. The decrypted images came out byte-identical (same
+SHA-1s) and the walk gave the identical result, so nothing was invalidated
+— but that was luck, not method. This is the "the instrument moved" hazard
+in a new costume, and it is now in GOTCHAS.
 
 ## Session 14z-59l (ROSTER ACCESS decided; the vs2 wheel measured properly)
 
@@ -76,6 +205,14 @@ sound" is what the cursor does: how a direction press maps to the next
 cell. That mechanism is NOT yet located. It is the real work of this task,
 it is independent of the art, and it is what a wrong answer would make
 unplayable rather than merely ugly. Next investigative step.
+
+> **CLOSED in 14z-60 — and the record it left was partly wrong.** The
+> mechanism is now measured and lives in `docs/atlas/select_screen.md`
+> (gate `tests/test_select_wheel.sh`). The follow-up notes written into
+> `docs/NEXT_SESSION.md` after this section named `PRG:0x020A84` as the
+> commit site; the commit stores are `PRG:0x020A7C` / `PRG:0x020A80`, and
+> the direction order is R,L,D,U rather than U,D,L,R. See session 14z-60
+> at the top of this file.
 
 ## Session 14z-59j (dual-track invariant ESTABLISHED, byte-attributed)
 
@@ -4683,6 +4820,14 @@ opcode-space dump oracle (`tests/test_decrypt_oracle.sh`). Both directions
   files are LE-word storage; all derived images are 68k logical (BE) order.
   See docs/GOTCHAS.md first entry.
 
+## Decision made (maintainer, 2026-08-04): M5 voice samples = A then B
+
+"A then B, gates stay strict, option C is rejected." Ship the unfaithful
+voice lines silent now; revisit growing the QSound region at M3 within the
+measured 16 MB `device_rom_interface<24>` ceiling; never overwrite vsav
+content for sample room. Recorded in full under "Decisions pending" above,
+where the option analysis lives.
+
 ## Decision made (maintainer, 2026-07-31): electrocute arc colors
 
 Keep vsavj-native shock styling for all victims including Donovan
@@ -4729,7 +4874,18 @@ window per measured slot, never pre-widen.
   region) keeps its unaudited dead space AND stays available for the
   ported select web, which was its earmarked purpose all along.
 
-- **M5 VOICE SAMPLES (14z-51):** 6-8 of Donovan's sounds (his voice
+- ~~**M5 VOICE SAMPLES (14z-51)**~~ **DECIDED 2026-08-04 (maintainer):
+  "A then B, gates stay strict, option C is rejected."** Ship M5 with those
+  specific sounds silent now (option A — it matches the current
+  silent-by-design behaviour for exactly the sounds that cannot be
+  faithful); revisit growing the QSound sample region (option B) at M3,
+  when Huitzil and Pyron force the same question at scale, inside the
+  measured 16 MB ceiling. **Option C (overwriting low-value vsav content)
+  is rejected** and may not be re-proposed — it is superset-invariant-
+  adjacent. Original entry with the full option analysis kept below.
+
+- **M5 VOICE SAMPLES (14z-51) — the analysis behind the decision above:**
+  6-8 of Donovan's sounds (his voice
   lines / vs2-new sfx: ids 0x71D/0x73E/0x753-0x756, likely the "Change
   Immortal" family) do not exist in vsav's sample ROMs, which are
   byte-full. Options: A) ship M5 with those specific sounds silent
