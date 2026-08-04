@@ -1377,3 +1377,29 @@ Locked by `tests/test_crypt_boundary.sh`, in both directions (inside must
 transform and round-trip; outside must pass through byte-identical). If it
 ever fails, ported code above 1MB becomes executable garbage rather than a
 loud failure — so it fails the build rather than warning.
+
+## "Unknown system: vsavjw" is an EMULATOR problem, not a ROM problem —
+## and renaming the zip to force it is actively harmful
+`vsavjw` is a DRIVER compiled into the patched FBNeo/MAME. Stock MAME (and
+Homebrew MAME in particular) will never know it, and reports "unknown
+system" — which reads like a bad dump and is not one. A filename cannot
+create a driver.
+
+**Do not rename `vsavjw.zip` to `vsavj.zip`.** Stock MAME then loads it
+under the STOCK descriptor: 4MB program region, eight members, `vsw.41-44`
+absent from the descriptor and therefore ignored. But the code in a WIDE
+build has the per-node sfx helper LIVE, with slot 0x0F's sound pointer row
+aimed at `$400010` — which on a 4MB map is not ROM at all, it is the CPS2
+output register window (CpsFrg). Donovan's dispatcher would read hardware
+registers as sound records: garbage ids, potentially inside the
+`0x700-0x7FF` MUSIC range. It boots, it looks plausible, and it is exactly
+the round-2 music bug the id allowlist exists to prevent.
+
+Use `tools/run_wide.sh <build_dir> [fbneo|mame]`, which asserts all three
+things that must agree (patched binary carries the profile, set name
+`vsavjw`, rompath fronting the build) and says which one is wrong.
+
+Related: `grep -q "CPS-2 WIDE v1" <binary>` is NOT a reliable way to ask
+whether a binary carries the profile — it gave a false negative on FBNeo
+here. Use `strings -a | grep`, or ask the emulator (`-listfull vsavjw` for
+MAME).

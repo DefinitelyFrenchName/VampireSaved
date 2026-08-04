@@ -118,6 +118,22 @@ separate file so no frozen RAM expectation moves). MAME's harness had the
 same video blind spot FBNeo did, and the WIDE change is entirely a
 rendering change. Ground truth: `tests/test_replay_video_selfcheck.sh`.
 
+## Running a CPS-2 WIDE build (playtest)
+
+```sh
+export ROMDIR=/path/to/reference/sets
+tools/run_wide.sh build/m5w fbneo      # or: ... mame
+```
+Three things must agree — the PATCHED binary (the `vsavjw` driver exists
+only there), the set name `vsavjw`, and a rompath fronting the build over
+`$ROMDIR`. `run_wide.sh` asserts all three and says which is wrong.
+
+**Stock MAME reports "unknown system" and that is an EMULATOR problem, not
+a ROM problem. Never rename `vsavjw.zip` to `vsavj.zip` to force it** — it
+boots under the stock 4MB descriptor with the sfx helper live and the sound
+pointer aimed at the CPS2 register window, re-creating the music bug while
+looking fine (docs/GOTCHAS.md).
+
 ## Platform / migration notes (14z-59d)
 
 **The focus problem is already solved in place.** `tools/run_mame.sh` now
