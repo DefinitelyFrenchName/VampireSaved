@@ -1,216 +1,134 @@
-# NEXT SESSION — orientation (session 14z-59, 2026-08-03)
+# NEXT SESSION — orientation (session 14z-59, 2026-08-04)
 
-Read STATE.md session **14z-59** (B5) and 14z-53..58 (the CPS-2 WIDE pivot,
-Phase A, Phase B0-B4), then docs/cps2_wide.md. The approved architecture
-plan is archived at ~/.claude/plans/glowing-bouncing-iverson.md.
-The maintainer tests frequently and reports precisely — their reports are
-the project's best instrument; reference data they provide goes straight
-into gates.
+Read STATE.md sessions **14z-59 .. 14z-59m** (this session: B5, B5b, Phase C
+steps 1-2, and the roster decision), then `docs/cps2_wide.md`. The approved
+architecture plan is archived at ~/.claude/plans/glowing-bouncing-iverson.md.
+The maintainer tests frequently and reports precisely — their reports are the
+project's best instrument; reference data they provide goes straight into gates.
 
-## Ship state — CPS-2 WIDE v1 is demonstrated on BOTH emulators
+## Ship state — DUAL TRACK, both green
 
-Frozen reference: `b91647c7` = **donovan-m2c** (stock-size, untouched by
-the WIDE work). Donovan content dev head: `ae701ffb`.
+| Track | Fingerprint | Packs as | Runs on |
+|---|---|---|---|
+| **stock** (compatibility) | `ae701ffb` | `vsavj.zip` | unpatched FBNeo/MAME |
+| **WIDE** (roster) | `ac52eeff` → `donovan-m5w` | `vsavjw.zip` | PATCHED emulators only |
 
-PRG 6 MB / GFX 48 MB / QSound 16 MB, for a total emulator cost of **one
-gated conditional** in each emulator plus descriptor table data.
+Both come from ONE manifest; the stock build is structurally incapable of
+depending on the extension (profile-gated spaces and content rows do not
+exist for a build that did not ask for them).
 
-| | FBNeo | MAME 0.288 (`emu/mame`, tag `mame0288`) |
-|---|---|---|
-| profile patch | `emu/fbneo-patches/0002` | `emu/mame-patches/0002` (164 lines added, **1** removed) |
-| gate | `tests/test_wide_profile.sh` — 36 checks | `tests/test_mame_wide.sh` — **36/36** |
-| B4 canary | 9/9 pixel-identical | 12/12 pixel-identical |
-
-**B5 is done.** MAME is pinned, built from source, parity-proven **62/62**
-on the UNPATCHED build before the patch went near it, and now carries the
-profile. `-verifyroms vsavjw` confirms both emulators load byte-identical
-romsets.
+**M5 sound is AUDIBLE on the WIDE track** — Donovan's shared sfx reach the
+QSound ring for the first time, with zero music-range ids. Awaiting playtest.
 
 ```sh
-WIDE=0 tools/setup_mame.sh      # reference binary  -> ~/.cache/vampire-saved/mame-ref/cps2
-tools/setup_mame.sh             # WIDE binary       -> ~/.cache/vampire-saved/mame/cps2
-ROMDIR=... tests/test_mame_parity.sh    # ALWAYS FIRST, on the unpatched build
-ROMDIR=... tests/test_mame_wide.sh
+export ROMDIR=/path/to/reference/sets
+KEY_SET=vsavj GEN_FLAGS="--allow-plausible --tripwire-open \
+  --profile cps2-wide-v1" tools/build_donovan.sh 6 build/m5w
+tools/run_wide.sh build/m5w fbneo        # or: ... mame
 ```
-Prereqs: `brew install sdl3 pkgconf`. The build runs from a space-free
-mirror under `~/.cache/` — MAME's GENie cannot handle the space in this
-repo's path (GOTCHAS).
+**Stock MAME says "unknown system" — that is an EMULATOR problem, not a ROM
+problem, and renaming `vsavjw.zip` to `vsavj.zip` re-creates the music bug
+while looking fine.** See GOTCHAS.
 
-## READ THIS BEFORE TRUSTING ANY MAME GATE
+## DO THIS FIRST — the id-space question (blocks the roster design)
 
-**Two run-to-run divergences were observed, and the cause is still
-UNKNOWN.** `08_challenger_join` and `41_don_altcolor_vsav2`, both in the
-boot window, both re-converging, neither a source-vs-Homebrew difference.
+The select-cursor mechanism is now fully mapped (14z-59l):
 
-**Policy RATIFIED by the maintainer 2026-08-03: "A, then B".** A (measure
-first) is DONE; B (**every MAME gate stays strict**) is in force. Option C
-(a tolerance class for unreproducible transients) is **not adopted and may
-not be re-proposed** — A found no rate, so nothing justifies loosening.
-CLAUDE.md §4 is unchanged; no comparison class was added or weakened.
+- `TABLE A` `PRG:0x0211D4` (16B) — joystick nibble → direction index 0-7.
+- `TABLE B` `PRG:0x0211E4` (128B) — **8-way adjacency, 8 bytes per cell,
+  16 cells**. Verified period-16, every cell a target, fully connected.
+- Commit site `PRG:0x020A84`: `move.b d0,($03,a6)` and `move.b d0,($382,a6)`
+  write **the same value** — so **the wheel cell index IS the character id**.
 
-What the measurement established (STATE 14z-59 has the tables):
-- ~2,400 clean runs across four regimes since.
-- **Flat per-run boot-window rate: RULED OUT** (1-in-8,300). The
-  520-frame `tests/probes/boot_probe.rpl` is bit-identical to `08` for
-  frames 1-299 — verified, not assumed — so it genuinely covers the window
-  both events began in, and 2,080 clean probe runs contradict the rate.
-- **Machine load: RULED OUT** (600 runs at parallelism 6).
-- **Both events fall in ONE parity execution**; three further full gate
-  executions are clean. Reads as a transient local to that ~35-minute
-  window. What that condition was is NOT established.
+Adding 3 cells is therefore 24 bytes of table plus edits so they are
+reachable — a pure data change. **But** ids `0x10-0x1F` are the variant/
+alternate half that aliases `0x00-0x0F` (`mirror_variant = true`; every bank
+repoint patches both `0x0F` and `0x1F`).
 
-**LEADING EXPLANATION (maintainer, 14z-59c): host input.** MAME has no
-true headless mode — `-video none` still creates a window that can TAKE
-FOCUS, and the harness runs on the maintainer's working laptop. A host
-keystroke lands on MAME's default map (P1 directions/buttons/coins/start)
-and is injected into the emulated controls; RAM then diverges while the key
-is held and RE-CONVERGES when the script's staging reasserts — exactly the
-observed signature, and it explains the clustering into one window while
-~2,400 idle-machine runs stayed clean. Not confirmed (the events predate
-input logging), but the hole is closed both ways:
+**THE QUESTION: is that aliasing a hard architectural half, or a convention
+only some tables follow?** The answer decides whether option 1 needs three
+genuinely free ids or an indirection between wheel slot and character id —
+and it decides what a per-tenant manifest must declare. **Do this before
+designing per-tenant manifests**, or the abstraction will be wrong.
+Method: the write tap now exists — `FBNEO_HTAP` on the id-consuming tables,
+plus a census of who masks/compares against `0x0F`/`0x10`.
 
-- `tools/run_mame.sh` disables all four host input providers.
-- `replay.lua` asserts every frame that the live controller bits are what
-  it staged, writes `INPUT-VIOLATION`, and the runner rejects the run.
-  Always on; `NO_INPUT_CHECK=1` disables.
-- `tests/test_input_integrity.sh` ground-truths both directions.
-- `INPUT_OUT=<path>` logs raw per-frame port values when you want evidence.
+## Roster access — DECIDED (maintainer, 2026-08-04)
 
-**So if a MAME gate ever goes red again, check the log for
-`INPUT-VIOLATION` FIRST** — that turns the whole class of problem into a
-named, one-line answer. Then `tools/analyze_divergence.py` (ground-truthed)
-classifies the preserved pair as PHASE SHIFT k / TRANSIENT / PERMANENT.
-Both gates keep artifacts under `build/gate_failures/`, which **IS tracked
-in git** — failure logs are evidence, do not gitignore it.
+**Option 1: an altered select screen.** Keep the existing cells and the
+random medallion exactly where they are; **append** the three newcomers.
+Imperfect new-medallion art is acceptable; mechanical soundness is not.
+Fallback (only if 1 fails): hold-Start alternates, which needs vsav
+characters "stacked" to free slots.
 
-Note also: MAME can crash outright. Already covered — `run_replay_mame.sh`
-requires a terminating `END` line, so a truncated run fails rather than
-being silently compared.
+Measured, and it corrects two earlier claims of mine (14z-59l):
+- vsavj wheel `0x272A72` / coords `0x32A50A`: 18 OBJ entries (2 are 1x1
+  decorations), 16 navigable cells, one 3x3 (Gallon, pal 07).
+- vs2 `0x2A6E5C` / coords `0x303B68`: 24 entries over **21 distinct
+  positions**, **no 3x3**; the three newcomers OVERDRAW placeholder cells.
+  So vs2 gives Capcom's 21-position geometry as a **rearrangement**, NOT
+  vsavj's 18 plus three. It still supplies the newcomer medallion ART codes
+  (`b108` Huitzil pal 13, `b0f5` Pyron pal 11, `b10b` Donovan pal 05) —
+  the expensive part.
+- Records are found by a coord-list longword at `base-4`. Pattern-searching
+  for icon codes finds MISALIGNED bases; that is what produced both wrong
+  claims.
 
-Rerunnable: `RUNS=`, `JOBS=`, `PROBE=`, `SET=` on
-`tests/test_mame_determinism.sh`.
+**Waiting on the maintainer:** a full-frame lossless PNG of the console-port
+select screen at native resolution, ideally with the cursor on each of the
+three newcomers (and P1/P2 if both differ). It pins the three cell
+coordinates and lets the intended adjacency edits be inferred.
 
-## MOVING THE HARNESS TO ANOTHER MACHINE — full analysis in HANDOFF.md
+## Still open (maintainer)
 
-**The move is no longer urgent.** `SDL_VIDEODRIVER=dummy` (now the default
-in `tools/run_mame.sh`) means SDL creates NO window at all, so the
-focus-stealing hazard is gone on the current machine — measured
-non-perturbing, and `VIDEO_OUT` still works. Migrate deliberately, not
-under pressure.
+- **M5 voice samples** — 8 MB of QSound headroom, hard-capped by MAME's
+  16 MB ceiling (`device_rom_interface<24>`). If three voice banks do not
+  fit, the answer is exclusivity/banking, not more region.
+- **MAME determinism** — policy "A then B" ratified; A measured (~2,400
+  clean runs; flat per-run rate and machine load both RULED OUT), leading
+  explanation is host input, now closed at source. Gates stay STRICT; option
+  C (a tolerance class) is NOT adopted and may not be re-proposed.
 
-Short version of the HANDOFF analysis:
-- **Only the MAME expectations are at risk.** `tests/expected/**` is
-  absolute and MAME-only; every FBNeo gate is a live A/B with no frozen
-  file, so it is machine-independent by construction.
-- **Architecture (ARM64 vs x86_64) should not matter**: MAME uses
-  interpreters for CPS-2's 68000/Z80/DSP16 (its DRCs cover other CPU
-  families entirely), FBNeo's x86 A68K asm core is disabled in its
-  makefile, and all hosts are little-endian with an endian-pinned
-  checksum. That is an argument, not a measurement — run the gate.
-- **Ranking**: Linux best; Intel Mac lowest-friction today; Windows 10
-  natively costly (POSIX shell + SDL frontends) — **use WSL2 and treat it
-  as Linux**.
+## Queued work
 
-**Run `tests/test_mame_parity.sh` on the new machine BEFORE trusting any
-result there.** It is not just the B5 gate — it is the machine-migration
-gate, and it already asks exactly the right question: does this build, on
-this hardware, reproduce every frozen oracle log bit-for-bit? A different
-CPU, compiler version or libc is a change of INSTRUMENT in precisely the
-sense that gate was written to catch. If it passes, every frozen
-expectation in `tests/expected/` transfers unchanged. If it fails, STOP —
-do not re-freeze to make it green; that would silently redefine the
-baseline the whole superset invariant rests on.
+1. The id-space question above.
+2. **Per-tenant manifests** — after (1). Then slot parameterisation, gfx band
+   planning, moving Donovan off Jedah's slot.
+3. WSL2 stand-up on the Windows box (`docs/WSL2_SETUP.md`);
+   `tests/test_mame_parity.sh` is the machine-migration gate. If it fails
+   there, do NOT re-freeze to make it green.
 
-Portability notes for `tools/setup_mame.sh` (currently macOS-shaped):
-- `sysctl -n hw.ncpu` for the job count → `nproc` on Linux.
-- Prereqs `brew install sdl3 pkgconf` → distro packages (`libsdl3-dev`,
-  `pkgconf`). The SDL3-via-pkg-config requirement is not macOS-specific.
-- The space-free build mirror stays regardless: it costs one rsync, keeps
-  the submodule pristine, and avoids re-discovering the GENie space bug if
-  the repo ever lands on a path with a space again.
-- `$HOME` being a git repository broke `git apply` here (GOTCHAS). The
-  script now uses `patch(1)`, so the new machine is unaffected either way.
-- `ROMDIR` is machine-specific and deliberately not recorded in the repo —
-  re-export it, and run `tools/audit_roms.py` first as always.
+## Gates added this session
 
-## Two MAME facts that CONSTRAIN the profile
+`test_mame_parity.sh` (62/62) · `test_mame_wide.sh` (36/36) ·
+`test_replay_video_selfcheck.sh` · `test_mame_determinism.sh` ·
+`test_input_integrity.sh` · `test_fbneo_instruments.sh` ·
+`test_phasec_spaces.sh` · `test_phasec_image.sh` · `test_dualtrack.sh` ·
+`test_crypt_boundary.sh`
 
-1. **16 MB QSound is MAME's hard ceiling** — `qsound_device` is a
-   `device_rom_interface<24>`. WIDE v1 fits with nothing spare; growing it
-   further means widening a SHARED device, outside Rule 1 v2. Future
-   voice-bank pressure must be solved by exclusivity/banking, not size.
-   (Relevant to the M5 voice-samples decision still pending.)
-2. **`$400000-$40000F` reads differ between the emulators** (FBNeo
-   ROM-shadows the CPS2 output registers, MAME keeps them readable). Only
-   the profile's reservation makes that unobservable — **never allocate
-   there**; it is load-bearing for dual-emulator agreement now.
+New instruments: `tools/analyze_divergence.py`, `tools/attribute_ramdiff.py`,
+`tools/setup_mame.sh`, `tools/run_wide.sh`; FBNeo `FBNEO_HTAP` /
+`FBNEO_HPOKE` / address-resolved dumps; MAME `VIDEO_OUT` / `INPUT_OUT`.
 
-## Queued next
+## The lesson this session kept re-teaching
 
-1. ~~**B5b — suite preservation**~~ **DONE (14z-59e)**, except one item
-   blocked by Rule 1. FBNeo now has `FBNEO_HTAP` (write tap with PC
-   attribution), `FBNEO_HPOKE` (frame-scheduled pokes) and address-resolved
-   dumps reaching OBJ/palette RAM, all frontend-only and gated by
-   `tests/test_fbneo_instruments.sh` (non-perturbing, positive controls,
-   and a byte-for-byte cross-check against MAME).
-   **BLOCKED: probe breakpoints with register capture.** `m68000_intf.h`
-   exposes no instruction-level hook, so it cannot be done without touching
-   a CPU core file. Written up in STATE 14z-59e with three options; the
-   need largely evaporated when B5 gave MAME proven parity, so its
-   `GUARD_PROBE` is the answer for now.
-   **Also uncovered there: the FBNeo emulator superset invariant had been
-   passing vacuously** (`WIDE=0` never reverted the profile patch, so the
-   "reference" carried it). Fixed, asserted in both the build and the gate,
-   and the invariant is now established for real at 36/36.
-2. **Phase C — multi-tenant pipeline.** Step 1 **DONE (14z-59f)**: the
-   address-space model is declarative (`[[space]]` in
-   `build/manifest/donovan.toml` — classes, profile gates, fallback), and
-   the refactor is proven byte-identical three ways
-   (`tests/test_phasec_spaces.sh`). The build now PRINTS the space crisis
-   every run: `hole_a free 0x0, hole_b free 0x110` against a 0x160 sound
-   table.
-   **Step 2 DONE (14z-59h): M5 SOUND IS UNBLOCKED.** The image grows to
-   6 MB, the WIDE romset packs as `vsavjw` with four extension members,
-   runs on BOTH emulators (9,320 frames clean), and the 68k **provably
-   reads** the relocated sound table — the negative control (zero the
-   table) diverges at frame 3121. Stock stays `ae701ffb`. Gate:
-   `tests/test_phasec_image.sh`. WIDE fingerprint `b0eb9ecd`.
-   Build it: `KEY_SET=vsavj GEN_FLAGS="--allow-plausible --tripwire-open
-   --profile cps2-wide-v1" tools/build_donovan.sh 6 <out>`.
-   **NEXT:** finish M5 sound on the WIDE track (the table is READ, which
-   is not yet AUDIBLE — the 6 shared ids were never observed firing in the
-   8 Donovan replays, so an audible test needs a replay that triggers
-   them). Then per-tenant manifests, slot parameterisation, gfx band
-   planning, and moving Donovan off Jedah's slot.
-   **Weigh first:** a build that uses the extension REQUIRES the `vsavjw`
-   driver and a patched emulator (today's Donovan builds run on stock
-   FBNeo/MAME; netplay peers would need the same binary and set). That is
-   why the `[[sound_table]]` row is profile-gated rather than switched on.
-   It also supersedes the "M5 SOUND DATA HOME" decision in STATE.md —
-   option C is now the cheap one.
-3. The determinism measurement above, whenever there is idle machine time.
-
-**Content may be authored into the extension** — B4 opened that gate and
-B5 confirmed it on a second emulator. Rules: raw (no encryption above
-`PRG:0x0FFFFF`), FILE byte order
-(`words_to_file_bytes(words_from_logical_bytes(...))`), the member's REAL
-CRC in BOTH descriptors, and `$400000-$40000F` reserved.
+**Four false greens, all the same shape: the tool reported success while
+measuring or producing the wrong artifact.** `git apply` silently skipping
+and exiting 0; a submodule gitlink drifting the WIDE binary to 0.289; a
+fingerprint call without `--set` hashing the PRISTINE reference ROM; and
+`WIDE=0` never reverting the profile patch, so the FBNeo superset invariant
+had been comparing WIDE against WIDE. **Assert on the artifact, never on the
+exit code.** Three further bugs were in my own new tests' verdict logic,
+caught only because §4 requires ground-truthing a verdict before trusting it.
 
 ## Gotchas most likely to bite next session
 
-- **"It said OK" is not evidence.** `git apply` silently skips and exits 0
-  when the target is inside another repo's worktree (`$HOME` is one here);
-  FBNeo silently loads 0xFF fill on a CRC mismatch while printing `(OK)`.
-  Assert on the ARTIFACT, not the exit code.
-- A SOURCES-filtered MAME build silently omits any driver missing from
-  `src/mame/mame.lst`; `mame.lst` has no inline comments anywhere.
-- DUMPS separator is ';' — comma multi-dumps exit rc=3 with no artifacts.
-- Venue asset cells: identify by cursor-ring measurement + color render,
-  never by pal-index/char-id numerology (the Gallon trap).
-- A cited address in a session log is a CLAIM — grep the manifest and xxd
-  the built image before building a theory on it.
-- POKE VALUES feed the CPU AI — any poke change reshuffles downstream
-  choreography in multi-round scripted replays.
-- The battery script builds donovan6 itself — never rebuild while it runs.
-  Background any run >10 min.
-- ROMDIR must pass tools/audit_roms.py first; keep it play-free.
+- `grep -q "STRING" <binary>` is unreliable — use `strings -a | grep`, or
+  ask the emulator (`-listfull vsavjw`).
+- Wheel/OBJ records: find them by the coord pointer at `base-4`, never by
+  pattern-searching for icon codes.
+- Tables read via `lea (pc)` are DATA-view — dumping them from the opcode
+  image gives plausible garbage.
+- A fingerprint equal to a known registry row means a bug, not a match.
+- DUMPS separator is `;`; ranges are END-INCLUSIVE.
+- `ROMDIR` must pass `tools/audit_roms.py` first; keep it play-free.

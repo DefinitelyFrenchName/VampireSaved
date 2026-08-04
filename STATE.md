@@ -1,9 +1,9 @@
 # STATE — living progress log
 
-Updated: 2026-08-03 (session 14z-59 — **B5: MAME pinned, built from source,
-parity PROVEN, and the WIDE profile ported to it**. Plus an unplanned
-finding that matters more than the port: MAME is not perfectly
-deterministic run-to-run, and the whole oracle assumed it was)
+Updated: 2026-08-04 (session 14z-59..59m — **B5 + B5b + Phase C steps 1-2**:
+MAME pinned and parity-proven, the WIDE profile on BOTH emulators, FBNeo
+instruments, a declarative address-space model, and **M5 sound AUDIBLE** on
+a dual-track build. Roster access DECIDED. Awaiting playtest of `ac52eeff`)
 
 ## Session 14z-59l (ROSTER ACCESS decided; the vs2 wheel measured properly)
 
