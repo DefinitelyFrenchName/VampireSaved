@@ -1464,3 +1464,32 @@ set, did you mean ff8402?" — and it is a hard error that kills the script
 after a full boot. Tap the containing word (`ff8402,2`) and filter on the
 logged mask/offset. Byte writes arrive with the value replicated across
 the word (`data 00000303` for a byte `0x03`), so mask the low byte.
+
+## A register-dataflow walk CANNOT see a mask applied straight to a memory
+## field — two folding sites hid behind that for a whole session
+(paid: 2026-08-04, 14z-60)
+`tools/audit_id_space.py` censused every site that narrows the character id
+by tracking the register each read went into. Two independent walker
+strategies (stop-at-branch, and follow-through-branches-until-redefined)
+agreed on five sites, which read as strong corroboration. It was not: the
+id-cycling selector masks the field IN PLACE —
+
+    010E28  addq.b  #$1, $382(a4)
+    010E2C  andi.b  #$0f,$382(a4)      <- no destination register
+
+— so there is no register to track and neither walker could ever have seen
+it. Found only by disassembling the selector by hand while chasing a
+different question. Two agreeing measurements are only as good as their
+SHARED assumption; here both assumed the value passes through a register.
+
+Rules: when censusing "who narrows/reads value X", enumerate the ADDRESSING
+MODES that can touch X (register-destination reads, read-modify-write on
+memory, and — still open here — the value being copied into another field
+and narrowed there), not just the one the first example used. And treat a
+"two methods agree" result as weak when both methods share a premise.
+
+Bonus verdict bug from the same pass: classifying "folds the variant half"
+as `imm < 0x10` miscounted vsav2's `andi.b #$01,$382(a4)`, which is a
+2-value toggle over ids 0/1 on a second cycling path, not a fold. A mask
+folds the variant half only if it keeps the low nibble whole and clears bit
+4 — i.e. exactly `#$0f`.

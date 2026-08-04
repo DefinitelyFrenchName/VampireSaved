@@ -38,19 +38,22 @@ now unblocked. Full detail: `docs/atlas/id_space.md`.
 - Every id `0x00-0x1F` has **real storage** in all 40 layout-verified
   id-indexed tables — **0 out-of-range**. vsavj just fills the upper half
   with copies (except `0x18` Oboro, and `word_pos_a[0x16]`).
-- The only narrowing is **5 consumer sites that mask to 4 bits**
-  (addresses in the atlas page). **vsav2 folds at only 2** and masks to 5
-  bits at 6 sites where vsavj does at 3 — Capcom shipped three characters
-  on variant ids by *widening those sites*. Finite work list, not a wall.
+- The only narrowing is **7 sites that mask the id to 4 bits** — 5 reached
+  through a register, plus 2 that mask the field DIRECTLY in memory (the
+  id-cycling selector). **vsav2 has 2.** The cleanest evidence in the whole
+  investigation is that selector: `andi.b #$0f,$382(a4)` in vsavj vs
+  `andi.b #$1f,$382(a4)` in vsav2 — the same instruction, one nibble apart.
+  Finite work list, not a wall.
 - **So option 1 needs NO indirection.** Give the newcomers their native vs2
   ids — **Huitzil `0x10`, Pyron `0x11`, Donovan `0x13`** — and every ported
   bank row lands at its own index with no renumbering.
-- Caveat that bounds it: **the five-site list is a LOWER BOUND**, frozen by
-  `tests/test_id_space.sh` so growth is visible. A second scan strategy
-  (through branches, tracking the register to redefinition, 40 deep) finds
-  **the same five** — but 62 of the 269 reads copy the id into another
-  memory field (14 fields; `$a(a6)`/`$a(a4)`/`$b1(a6)` lead), and following
-  those to their consumers is not done.
+- Caveat, and it already paid out: the list is a **LOWER BOUND**. Two
+  walkers agreed on 5, then sites 6 and 7 turned up — masks applied
+  straight to the id field in memory, which no *register* dataflow walk can
+  see. Still open: 62 of the 269 reads copy the id into another memory
+  field (14 fields; `$a(a6)`/`$a(a4)`/`$b1(a6)` lead); a bounded census of
+  `$b1`/`$58`/`$9c` found no further folds, but `$a(An)` needs
+  base-register-aware dataflow, not a byte scan.
 
 ## The select cursor is MEASURED (14z-60) — and the old record was wrong
 
@@ -94,7 +97,14 @@ Everything mechanical is measured. Remaining for option 1:
    HAND-TUNED (best geometric fit 100/128 = 78%, horizontal wrap period
    184), so the three rows and neighbouring edits must be **authored and
    verified, never generated**.
-4. Then per-tenant manifests, on the declaration list in `id_space.md`.
+4. **Extend the id-writer tap over the full legacy corpus.** Four replays
+   show the ONLY gameplay writer of `RAM:$FF8782` is the select commit, and
+   it never writes `0x10-0x1F`. If that holds everywhere, a newcomer at
+   `0x13` sits where no legacy path can reach — the superset invariant
+   becomes structural instead of surgical, which is a much better position
+   than replacing Jedah. Catch: `0x18` (Oboro) is a variant id vanilla DOES
+   use and did not appear, so find what drives it.
+5. Then per-tenant manifests, on the declaration list in `id_space.md`.
 
 Note this moves Donovan off slot `0x0F` (Jedah) onto `0x13`, which is the
 already-queued "move Donovan off Jedah's slot", now with a target id.

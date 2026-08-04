@@ -60,7 +60,9 @@ tracked forward, and the first mask or compare applied to it recorded.
 
 | classification | vsavj | vsav2 |
 |---|---|---|
-| `andi #$0f` — **folds** `0x1x` onto `0x0x` | **5** | **2** |
+| `andi #$0f` via a register — **folds** `0x1x` onto `0x0x` | **5** | **2** |
+| `andi.b #$0f,$382(An)` — folds, applied DIRECTLY in memory | **2** | 0 |
+| **total folding sites** | **7** | **2** |
 | `andi #$1f` — full 5-bit | 3 | 6 |
 | `andi #$3e` — 5-bit, pre-scaled ×2 | 1 | 1 |
 | `cmpi #$10` | 0 | 1 |
@@ -79,11 +81,37 @@ this is a per-site data question, not a wall.
 > five-site folding list is a LOWER BOUND**, and the gate freezes it so
 > growth is visible.
 
-**How far the bound has been pushed.** A second, independent scan — running
-*through* conditional branches and tracking the destination register until
-it is redefined, 40 instructions deep instead of 10 — finds **exactly the
-same five sites**. Two strategies with different failure modes agreeing is
-the strongest evidence available short of a complete dataflow analysis.
+**How far the bound has been pushed — and where it broke.** A second,
+independent scan (through conditional branches, tracking the register to
+redefinition, 40 instructions deep) finds exactly the same five
+register-path sites. Then a **sixth and seventh turned up that neither
+walker could ever have seen**:
+
+```
+vsavj 010E28  addq.b  #$1, $382(a4)      vsav2 00F48E  addq.b  #$1, $382(a4)
+      010E2C  andi.b  #$0f,$382(a4)            00F492  andi.b  #$1f,$382(a4)
+      010E36  subq.b  #$1, $382(a4)            00F4AE  subq.b  #$1, $382(a4)
+      010E3A  andi.b  #$0f,$382(a4)            00F4B2  andi.b  #$1f,$382(a4)
+```
+
+This is the **id-cycling selector** — step the character id up or down and
+wrap it. vsavj wraps to `0-15`; **vsav2 wraps to `0-31`.** The same
+instruction in both games, one nibble apart: Capcom widening this exact
+site is what let their cycling selector reach characters in the variant
+half.
+
+Both walkers missed it because both keyed on *register* dataflow, and these
+instructions read-modify-write memory with no destination register. Found
+by disassembling the selector by hand. The lesson generalises: **a dataflow
+walk over registers cannot see a mask applied straight to a memory field**,
+and the tool now scans for that class separately (`direct_masks`).
+
+vs2's selector also carries `andi.b #$01,$382(a4)` on a second path, chosen
+by a flag at `a5-0x50B8` — a 2-value toggle over ids 0/1 for another menu
+context. That is a **range restriction, not a fold**, and an earlier
+"`imm < 0x10` means folding" test miscounted it; `mask_class()` now
+distinguishes `#$0f` (folds the variant half), `#$1f` (full 5-bit) and
+everything else.
 
 What is still genuinely open: **62 of the 269 reads copy the id straight
 into another memory field** rather than a data register, across 14 distinct
@@ -137,6 +165,39 @@ And one (`0x04FAC4`) is a free win: its table already has the rows.
 > noise, and 16 rows of noise look as much like 16 rows as like 32. Read
 > from the DATA image it is plainly 32 aliased rows. The mask is a
 > convention there, not a constraint.
+
+## Which ids vanilla ever assigns (measured) — and why it matters
+
+Tapping the P1 id field `RAM:$FF8782` across legacy replays
+(`01_attract_long`, `03_two_player_vs`, `04_select_fuzz`, `09_mirror_pick`)
+gives every value vanilla writes and the PC that wrote it:
+
+| writer | values |
+|---|---|
+| `PRG:0x020A80` (the select commit) | `00 01 03 06 08` — i.e. cursor cells |
+| `PRG:0x000D34` / `0x000D3A` / `0x000DD8` / `0x016E4C` | `00`, `FF` — boot RAM clear |
+| `PRG:0x009008` | `01` |
+
+**No value in `0x10-0x1F` was written at all.** That matters because it is
+the shape of a much stronger superset argument than the current
+slot-`0x0F` replacement: if vanilla can never *produce* a variant-half id,
+then a newcomer living at `0x13` occupies rows **no legacy path can
+reach**, and the superset invariant holds by construction rather than by
+in-place surgery.
+
+Stated at the strength the evidence supports: this is **four replays, not
+a proof**. Two things must hold before leaning on it:
+
+1. `0x18` (Oboro Bishamon) is a variant id vanilla *does* use, and it did
+   not appear here — so that path exists and simply was not exercised.
+   Whatever reaches it is the counterexample to characterise.
+2. The **id-cycling selector** above writes the field directly, wrapping to
+   `0-15` in vsavj. Any newcomer at `0x10+` is unreachable through it until
+   its mask is widened — the same edit vsav2 already made.
+
+The measurement is cheap to extend; do it over the full legacy corpus, and
+include whatever drives the Oboro path, before treating "vanilla never
+writes the variant half" as a load-bearing invariant.
 
 ## What a per-tenant manifest must declare
 

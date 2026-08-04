@@ -135,6 +135,54 @@ which makes the answer *stronger*. Now measured by the gate as table
 | `0x00A43E` → `$130(a5)` | **medium** — written only here, read at 15 sites beside the select code: the per-slot venue-asset arrays (mugshot/name/medallion), 16-wide, already on the port's list |
 | `0x03E40` / `0x04082` anim `0x360+id` | **hard** — the anim NUMBER BLOCK really is 16 wide: `0x370+` is already occupied by the `0x04FFA8` table, so widening the mask collides. **These are the two vs2 left folded.** |
 
+### TWO MORE FOLDING SITES — and Capcom's fix, one nibble wide
+
+Continuing without input, and it corrected the count. Chasing "does vanilla
+ever assign a variant-half id" turned up the **id-cycling selector**:
+
+```
+vsavj 010E28  addq.b #$1,$382(a4)     vsav2 00F48E  addq.b #$1,$382(a4)
+      010E2C  andi.b #$0f,$382(a4)          00F492  andi.b #$1f,$382(a4)
+      010E36  subq.b #$1,$382(a4)           00F4AE  subq.b #$1,$382(a4)
+      010E3A  andi.b #$0f,$382(a4)          00F4B2  andi.b #$1f,$382(a4)
+```
+
+**The same instruction in both games, one nibble apart.** vsavj wraps the
+cycling id to `0-15`; vsav2 wraps to `0-31`. That is Capcom's widening of
+this exact site, and it is the most direct evidence in the whole
+investigation that the variant half is convention plus a finite edit list.
+
+**Both my walkers were structurally blind to it.** Both keyed on register
+dataflow; these instructions read-modify-write memory with no destination
+register. Found only by disassembling the selector by hand. The count is
+now **7 folding sites in vsavj** (5 register-path + 2 direct-to-memory)
+against **2 in vsav2**, and `audit_id_space.py` scans the class separately.
+So yesterday's "LOWER BOUND" caveat was not throat-clearing — it was
+load-bearing, and it paid out within a day.
+
+A verdict bug of my own in the same pass: the first version flagged vs2's
+`andi.b #$01,$382(a4)` as a fold because `imm < 0x10`. It is a **2-value
+toggle over ids 0/1** on a second cycling path (flag at `a5-0x50B8`), i.e.
+a range restriction. `mask_class()` now separates `#$0f` (folds the variant
+half) from `#$1f` (full 5-bit) from everything else.
+
+### A superset argument worth developing (measured, not yet proven)
+
+Tapping `RAM:$FF8782` across four legacy replays: the only gameplay writer
+is the select commit `PRG:0x020A80`, and every value is a cursor cell
+(`00 01 03 06 08`); the rest is boot RAM-clear. **Nothing writes
+`0x10-0x1F`.**
+
+If that holds over the full corpus, a newcomer at `0x13` sits in rows **no
+legacy path can reach**, and the superset invariant becomes structural
+rather than something in-place surgery has to preserve — a materially
+better position than replacing Jedah at `0x0F`. Two caveats before leaning
+on it: `0x18` (Oboro) is a variant id vanilla *does* use and did not appear
+(that path exists, unexercised), and the id-cycling selector above wraps to
+`0-15`, so a newcomer is unreachable through it until that mask is widened.
+Four replays is not a proof; extending the tap over the full legacy corpus
+is cheap and is the obvious next measurement.
+
 ### Prep for the capture: cell POSITIONS measured, and a negative result
 
 So the maintainer's PNG lands on ready ground.

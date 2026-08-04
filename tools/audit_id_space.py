@@ -135,6 +135,41 @@ def first_mask(md, img, addr, reg, depth=10):
 BANK_ORIGIN = {"vsavj": 0x0BD0FA, "vsav2": 0x0D7298}
 
 
+def direct_masks(img, limit=0x400000):
+    """`andi.b #imm,$382(An)` — a mask applied STRAIGHT TO THE ID FIELD in
+    memory, with no destination register.
+
+    This class is invisible to any register-dataflow walk, and both of this
+    tool's earlier walkers missed it for exactly that reason: they tracked
+    the register a read went into, and these instructions do not read into
+    one. Found only because the id-cycling selector was disassembled by
+    hand. Encoding: andi.b #imm,(d16,An) = 0x0228|An, imm byte, disp word.
+    """
+    out = []
+    for a in range(0, limit, 2):
+        hi, lo = img[a], img[a + 1]
+        if hi != 0x02 or not (0x28 <= lo <= 0x2F):
+            continue
+        if img[a + 4:a + 6] != b"\x03\x82":
+            continue
+        out.append((a, img[a + 3], lo & 7))
+    return out
+
+
+def mask_class(imm):
+    """A mask FOLDS the variant half only if it keeps the low nibble whole
+    and clears bit 4 — i.e. exactly #$0f. #$1f is the full 5-bit id. Any
+    other value is a RANGE RESTRICTION for some menu context and must not be
+    counted as a fold: vsav2 cycles ids with #$1f in one mode and #$01 in
+    another (a 2-value toggle selected by a5-0x50B8), and a naive
+    "imm < 0x10 means folding" test miscounts that #$01 as a fold."""
+    if imm == 0x0F:
+        return "folds-variant-half"
+    if imm == 0x1F:
+        return "full 5-bit"
+    return "range-restriction #$%02x" % imm
+
+
 def load_bank_tables(path, set_name):
     """-> (decoded, undecoded). `auto` rows are gaps with NO decoded
     consumer; docs/GOTCHAS.md ("Never write an unverified gap") is explicit
@@ -211,14 +246,35 @@ def main():
           "NOT proof that the site\n  does not narrow the id later. The "
           "folding list below is a LOWER BOUND." % 10)
 
+    direct = direct_masks(imgs["op"])
+    print("\n  masks applied DIRECTLY to the id field in memory "
+          "(no destination register — invisible to a dataflow walk):")
+    if direct:
+        for a, imm, an in direct:
+            cls = mask_class(imm)
+            print("    %06X  andi.b #$%02x,$382(a%d)   %s%s"
+                  % (a, imm, an, cls,
+                     "   <-- FOLDS" if cls == "folds-variant-half" else ""))
+    else:
+        print("    none")
+
     folding = {k: v for k, v in buckets.items()
                if k.startswith("mask") and int(k.split("#$")[1], 16) < 0x10}
     print("\n  sites masking the id BELOW 5 bits (these fold 0x1x -> 0x0x):")
+    nfold = 0
     if folding:
         for k, v in folding.items():
             print("    %s: %s" % (k, " ".join("%06X" % a for a in v)))
-    else:
+            nfold += len(v)
+    dfold = [a for a, imm, _ in direct
+             if mask_class(imm) == "folds-variant-half"]
+    if dfold:
+        print("    direct-to-memory: %s"
+              % " ".join("%06X" % a for a in dfold))
+        nfold += len(dfold)
+    if not nfold:
         print("    none")
+    print("    TOTAL FOLDING SITES: %d" % nfold)
 
     print("\n== 2. DATA: do the upper rows exist, and what is in them? ==")
     dec, und = load_bank_tables(args.bank_map, args.set)

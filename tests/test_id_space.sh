@@ -13,7 +13,11 @@
 #     id 0x00-0x1F has real storage in all of them — including anim_pairs
 #     (PRG:0x04FFA8), whose consumer masks to 4 bits anyway, so that mask is
 #     convention and not structure.
-#   * exactly 5 sites fold the id to 4 bits, at known addresses.
+#   * exactly 7 sites fold the id to 4 bits: 5 reached through a register,
+#     plus 2 that mask the id field DIRECTLY in memory (the id-cycling
+#     selector). The direct pair is invisible to register dataflow and was
+#     missed by two walkers before being found by hand — hence the explicit
+#     lock on both classes and on the total.
 #   * the only variant rows holding their OWN data are 0x18 (Oboro
 #     Bishamon) and word_pos_a[0x16] (Anakaris).
 # And for vsav2, which ships three characters on variant ids:
@@ -56,8 +60,12 @@ done
 echo "== vsavj: every id has storage, and the folding set is known =="
 want "no variant row is out-of-range" "$WORK/vsavj.txt" \
      "40 tables x 16 variant ids: 619 alias, 21 distinct, 0 out-of-range"
-want "exactly the 5 known folding sites" "$WORK/vsavj.txt" \
+want "the 5 register-path folding sites" "$WORK/vsavj.txt" \
      "mask #\$0f: 003E40 004082 00A43E 0409EC 04FAC4"
+want "the 2 direct-to-memory folds (id cycling)" "$WORK/vsavj.txt" \
+     "direct-to-memory: 010E2C 010E3A"
+want "7 folding sites in total" "$WORK/vsavj.txt" \
+     "TOTAL FOLDING SITES: 7"
 want "variant rows with own data: 0x18 only, in the bank" "$WORK/vsavj.txt" \
      "hitbox_base        0BD97A  distinct at 18"
 want "the Anakaris variant outlier word_pos_a[0x16]" "$WORK/vsavj.txt" \
@@ -67,7 +75,9 @@ echo "== vsav2: the roster-on-variant-ids reference =="
 want "bank rows distinct at 10 11 13 18 19" "$WORK/vsav2.txt" \
      "dispatch_00        0D7298  distinct at 10 11 13 18 19"
 want "folds at only 2 sites (widened elsewhere)" "$WORK/vsav2.txt" \
-     "mask #\$0f: 003E76 041BDC"
+     "TOTAL FOLDING SITES: 2"
+want "vs2 widened the id-cycling mask to #\$1f" "$WORK/vsav2.txt" \
+     "00F492  andi.b #\$1f,\$382(a4)   full 5-bit"
 
 if [ "$fail" = 0 ]; then echo "ID SPACE: PASS"; else echo "ID SPACE: FAIL"; fi
 exit "$fail"
