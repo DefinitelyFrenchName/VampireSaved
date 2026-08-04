@@ -104,7 +104,15 @@ Everything mechanical is measured. Remaining for option 1:
    becomes structural instead of surgical, which is a much better position
    than replacing Jedah. Catch: `0x18` (Oboro) is a variant id vanilla DOES
    use and did not appear, so find what drives it.
-5. Then per-tenant manifests, on the declaration list in `id_space.md`.
+5. **Per-tenant manifests — a SCHEMA PROPOSAL now exists**:
+   `docs/tenant_manifest.md`. Nothing consumes it yet; it is written to be
+   argued with. Key points: `[[tenant]]` replaces `[port]`,
+   `mirror_variant` disappears (a variant id has no mirror), each tenant
+   declares its wheel cell + adjacency + `reachable_from`, its arcade-ladder
+   membership, and a decision for EVERY measured folding site — so a census
+   that grows fails a stale manifest instead of silently inheriting.
+   Migration in three falsifiable steps, starting with a byte-identical
+   refactor at `id = 0x0F`.
 
 Note this moves Donovan off slot `0x0F` (Jedah) onto `0x13`, which is the
 already-queued "move Donovan off Jedah's slot", now with a target id.

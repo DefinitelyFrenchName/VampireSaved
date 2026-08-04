@@ -136,6 +136,20 @@ were found later this session — 14z-60e — bringing the total to seven):
 | `0x00A43E` → `$130(a5)` | **medium** — written only here, read at 15 sites beside the select code: the per-slot venue-asset arrays (mugshot/name/medallion), 16-wide, already on the port's list |
 | `0x03E40` / `0x04082` anim `0x360+id` | **hard** — the anim NUMBER BLOCK really is 16 wide: `0x370+` is already occupied by the `0x04FFA8` table, so widening the mask collides. **These are the two vs2 left folded.** |
 
+### Per-tenant manifest: schema PROPOSED (14z-60h)
+
+`docs/tenant_manifest.md`, unblocked by the id-space answer. Not
+implemented and nothing consumes it — written to be argued with first.
+`[[tenant]]` replaces `[port]`; `mirror_variant` disappears (a tenant that
+IS a variant id has no mirror, and one at `0x13` must not touch Victor at
+`0x03`). Each tenant declares the three registries measurement turned up —
+select wheel (cell, position, adjacency, `reachable_from`), arcade ladder
+(opponent list + VS palette), and a decision for **every** folding site, so
+that a census which grows fails a stale manifest rather than silently
+inheriting. Migration is three falsifiable steps: byte-identical refactor
+at `id=0x0F` (Phase C discipline), then the move to `0x13` with its own
+battery and playtest, then Huitzil and Pyron.
+
 ### TWO MORE FOLDING SITES — and Capcom's fix, one nibble wide
 
 Continuing without input, and it corrected the count. Chasing "does vanilla
