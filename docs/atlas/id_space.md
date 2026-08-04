@@ -98,8 +98,18 @@ fields —
 
 A complete folding census has to follow those fields to *their* consumers.
 `$a(An)` is the owner-char-id an object carries, so its readers are the
-likely place for further masks. Not done, and named here so it is not
-mistaken for done.
+likely place for further masks.
+
+A **bounded** follow-up censused the three distinctive fields — `$b1`
+(2 register reads), `$58` (26), `$9c` (6) — and found **no `andi` below
+`#$10`** among them; the masks present are `#$1ff`/`#$3ff`/`#$7ff`
+(position arithmetic) and `#$7700` (buttons). Treat that as suggestive, not
+conclusive: **the same displacement on a different base register is a
+different field**, so some of those 26 `$58` reads are not the `$58(a4)`
+the id was written into. `$a(An)` and `$9(An)` were not censused at all —
+displacements that small collide with every other struct field, so the scan
+would be mostly noise. Closing this properly needs base-register-aware
+dataflow, not a byte scan.
 
 ## The five vsavj folding sites
 
