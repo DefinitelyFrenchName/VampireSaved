@@ -97,13 +97,15 @@ Everything mechanical is measured. Remaining for option 1:
    HAND-TUNED (best geometric fit 100/128 = 78%, horizontal wrap period
    184), so the three rows and neighbouring edits must be **authored and
    verified, never generated**.
-4. **Extend the id-writer tap over the full legacy corpus.** Four replays
-   show the ONLY gameplay writer of `RAM:$FF8782` is the select commit, and
-   it never writes `0x10-0x1F`. If that holds everywhere, a newcomer at
-   `0x13` sits where no legacy path can reach — the superset invariant
-   becomes structural instead of surgical, which is a much better position
-   than replacing Jedah. Catch: `0x18` (Oboro) is a variant id vanilla DOES
-   use and did not appear, so find what drives it.
+4. **DONE — the id-writer measurement** (`tests/audit_id_writers.sh`,
+   on-demand). 11 replays × both player structs = 22 tap logs; six gameplay
+   writers; union `00 01 02 03 05 06 08 0A 0C 0E 0F` — **no variant-half
+   id**. So a tenant at `0x13` would sit where legacy cannot reach and the
+   superset invariant would hold BY CONSTRUCTION — the strongest argument
+   for the move off Jedah's slot. Remaining thread: `0x18` (Oboro) is a
+   variant id vanilla DOES use and no replay reaches it; nothing static
+   sets bit 4 of the id, and `PRG:0x020ABE` takes its value from `$45(a6)`
+   gated on `$43(a6)` — pull that next.
 5. **Per-tenant manifests — a SCHEMA PROPOSAL now exists**:
    `docs/tenant_manifest.md`. Nothing consumes it yet; it is written to be
    argued with. Key points: `[[tenant]]` replaces `[port]`,
