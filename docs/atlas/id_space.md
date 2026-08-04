@@ -207,9 +207,11 @@ vanilla uses — four sites compare against it (`PRG:0x018F9A`, `0x026FBE`,
 what is established is "no legacy replay in the corpus writes the variant
 half", not "vanilla cannot". A tenant must still avoid `0x18`, and the
 Oboro entry path is worth characterising before the argument is leaned on
-harder. Nothing static was found that sets bit 4 of the id directly; the
-confirm path at `PRG:0x020ABE` takes its value from `$45(a6)` gated on
-`$43(a6)`, which is the thread to pull.
+harder. Nothing static was found that sets bit 4 of the id directly. **The
+`$43`/`$45` confirm-path override has since been decoded and ruled out**
+(`select_screen.md`): `$45` can only hold `$ff` or a copy of the current
+cursor cell, so it cannot introduce a variant id. Oboro's entry path is
+still unlocated, and it is the one remaining hole in this argument.
 
 The audit's verdict logic is ground-truthed in both directions: an injected
 variant-half write from a gameplay PC fails it, and a tap log missing its

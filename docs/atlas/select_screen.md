@@ -190,6 +190,54 @@ and edit neighbouring rows so the three are reachable. See
 `docs/atlas/id_space.md` for which ids are actually free to take, which is
 a different question and the constraint that governs.
 
+## The confirm-path id override ($43 / $45) — decoded, and NOT the Oboro path
+
+At confirm, `PRG:0x020AAE` can replace the committed id:
+
+```
+020AAE  tst.b   $43(a6)          ; override armed?
+020AB2  beq.b   $20ac2
+020AB8  move.b  $45(a6),d0       ; the replacement id
+020ABC  bmi.b   $20ac2           ; $ff = none, skip
+020ABE  move.b  d0,$382(a6)
+```
+
+Both inputs are produced on the select screen, and both are now decoded:
+
+```
+020C98  cmpi.b #$b,$3(a6)        ; ON the special cell 0x0B
+020CAC  addq.b #$1,$42(a6)       ; held...
+020CB0  cmpi.b #$5,$42(a6)       ; ...5 frames
+020CB8  st.b   $43(a6)           ; -> arm the override
+020CBE  clr.b  $42(a6) / 020CC2  clr.b $43(a6)   ; otherwise disarm
+
+020CD8  cmpi.b #$b,$3(a6)        ; NOT on cell 0x0B
+020CE4  cmp.b  $46(a6),d0        ; same cell as last frame?
+020CF6  cmpi.b #$3,$44(a6)       ; hovered 3 frames
+020CFE  move.b $382(a6),$45(a6)  ; -> $45 = the CURRENT cursor id
+020D0A  st.b   $45(a6)           ; else $45 = $ff
+```
+
+**`$45` can only ever hold `$ff` or a copy of the current cursor cell**, and
+TABLE B constrains that to `0x00-0x0F`. So this override — the one dynamic
+id-rewrite in the select code — **cannot introduce a variant-half id**. It
+is therefore *not* the route by which vanilla reaches `0x18` (Oboro
+Bishamon), and that entry path remains unlocated.
+
+Measured alongside: across `03`/`04`/`09` neither `0x020CB8` nor
+`0x020CFE` ever fires — no replay holds a button on the select screen long
+enough — so the mechanism is present but unexercised by the corpus.
+
+> **Caution: `$42-$45` on the player struct are SHARED SCRATCH.** The same
+> bytes are reused by in-match code for unrelated purposes — `0x0273E6`
+> writes a stepped ramp (`00 08 10 … F8`), `0x02F6D4` writes `0x28`,
+> `0x031132`/`0x03113E` write `0x80`/`0xFB`. A value of `0x28` in `$45`
+> would be outside the 5-bit id space entirely, and is harmless only
+> because the confirm path runs during SELECT, not during a match. Any
+> claim about these bytes has to be qualified by phase — reading them
+> without that qualifier is the in-struct version of the
+> displacement-collision trap.
+
 ## Re-measuring
 
 ```sh
