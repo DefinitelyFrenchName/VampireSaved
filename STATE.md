@@ -98,8 +98,8 @@ Two findings worth keeping:
 
 **Bounding the claim honestly:** 226 of 269 read sites showed no mask
 within 10 instructions of the read (the walk stops at the first branch).
-That is not proof they never narrow the id — **the five-site list is a
-LOWER BOUND**, and `test_id_space.sh` freezes it so growth is visible.
+That is not proof they never narrow the id — **the list is a
+LOWER BOUND** (it grew to seven later the same session, see 14z-60e), and `test_id_space.sh` freezes it so growth is visible.
 
 ### Follow-up pass: the bound pushed, and one of my own claims corrected
 
@@ -126,7 +126,8 @@ which makes the answer *stronger*. Now measured by the gate as table
 `anim_pairs` (counts moved to 40 tables / 619 alias / 21 distinct /
 **0 out-of-range**).
 
-**The five sites are not equal work** (full table in `id_space.md`):
+**The sites are not equal work** (full table in `id_space.md`; two more
+were found later this session — 14z-60e — bringing the total to seven):
 
 | Site | Fix class |
 |---|---|
@@ -5000,8 +5001,8 @@ window per measured slot, never pre-widen.
 
 ## Decisions pending (human)
 
-- **THE `0x360+id` ANIM BLOCK (14z-60)** — of the five sites that fold the
-  character id to 4 bits, three are ordinary porting work; two
+- **THE `0x360+id` ANIM BLOCK (14z-60)** — of the seven sites that fold the
+  character id to 4 bits, five are ordinary porting work; two
   (`PRG:0x003E40`, `PRG:0x004082`) compute a per-character anim number in a
   block that is genuinely 16 wide (`0x360-0x36F`, with `0x370+` already
   occupied). **Option A: inherit** — a newcomer at `0x13` plays `0x363`,

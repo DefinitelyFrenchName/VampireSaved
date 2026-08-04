@@ -70,7 +70,7 @@ tracked forward, and the first mask or compare applied to it recorded.
 | no mask seen in window | 226 | 258 |
 | **read sites total** | **269** | **305** |
 
-**vsav2 folds at 2 sites where vsavj folds at 5, and masks to 5 bits at 6
+**vsav2 folds at 2 sites where vsavj folds at 7, and masks to 5 bits at 6
 sites where vsavj does at 3.** That is Capcom widening the consumers that
 needed to tell a variant character from its base — the direct evidence that
 this is a per-site data question, not a wall.
@@ -78,8 +78,8 @@ this is a per-site data question, not a wall.
 > **CAVEAT, stated because it bounds the claim.** `none` means no
 > mask/compare was seen within 10 instructions of the read, stopping at the
 > first branch. It is not proof that those sites never narrow the id. **The
-> five-site folding list is a LOWER BOUND**, and the gate freezes it so
-> growth is visible.
+> folding list is a LOWER BOUND**, and the gate freezes it so growth is
+> visible — it has already grown once, from five to seven, see below.
 
 **How far the bound has been pushed — and where it broke.** A second,
 independent scan (through conditional branches, tracking the register to
@@ -139,9 +139,11 @@ displacements that small collide with every other struct field, so the scan
 would be mostly noise. Closing this properly needs base-register-aware
 dataflow, not a byte scan.
 
-## The five vsavj folding sites
+## The seven vsavj folding sites
 
-Each was decoded to its consumer; the fixes are not all the same shape.
+Each was decoded to its consumer; the fixes are not all the same shape. The
+first five narrow the id through a register; the last two mask the field
+directly in memory.
 
 | Site | What it computes | Why it folds | Fix class |
 |---|---|---|---|
@@ -150,6 +152,8 @@ Each was decoded to its consumer; the fixes are not all the same shape.
 | `PRG:0x00A43E` | `(id & 0x0F)` → `$130(a5)`, plus a struct pointer at `$13A(a5)` and a state kick (`$4(a5)=0x0A`, `$106(a5)=1`) | `$130(a5)` is written ONLY here and read at 15 sites clustered at `0x01BF9x-0x01C38x` and `0x021AC8-0x021C8E` — beside the select-screen code, i.e. the **per-slot venue-asset display family** (mugshot / name / medallion), whose arrays are 16-wide | **medium** — the same 16-wide per-slot arrays the project already ports for Donovan; extend those, then widen |
 | `PRG:0x0409EC` | `(id & 0x0F)` compared against `#$06` — a behavioural special case for slot 6 (Anakaris) | not a table at all, just a slot test | **trivial** — a newcomer is only affected if it must inherit or avoid Anakaris' special case. vs2 **kept this fold** |
 | `PRG:0x04FAC4` | `(id & 0x0F) * 24` into `PRG:0x04FFA8` — 12 words per character (6 pairs; `tst.b $bc(a5)` selects +0 or +2), values `0x0370-0x03D7` | **nothing structural.** Measured: that table is **32 rows × 24 bytes**, ending cleanly at `0x0502A8`, with rows `0x10-0x1F` byte-identical copies of `0x00-0x0F` | **easy** — the rows already exist; fill the tenant's row and widen the mask to `#$1f` |
+| `PRG:0x010E2C` | `andi.b #$0f,$382(a4)` after `addq.b #$1` — the id-cycling selector, stepping up | nothing structural; vsav2 does the identical thing with `#$1f` | **easy** — one nibble, exactly as vsav2 shipped it |
+| `PRG:0x010E3A` | the same after `subq.b #$1` — stepping down | same | same |
 
 So the five are not one problem. Two (`0x03E40`/`0x04082`) are constrained
 by an anim-number block that is really 16 wide — and those are exactly the
