@@ -135,6 +135,29 @@ which makes the answer *stronger*. Now measured by the gate as table
 | `0x00A43E` → `$130(a5)` | **medium** — written only here, read at 15 sites beside the select code: the per-slot venue-asset arrays (mugshot/name/medallion), 16-wide, already on the port's list |
 | `0x03E40` / `0x04082` anim `0x360+id` | **hard** — the anim NUMBER BLOCK really is 16 wide: `0x370+` is already occupied by the `0x04FFA8` table, so widening the mask collides. **These are the two vs2 left folded.** |
 
+### Prep for the capture: cell POSITIONS measured, and a negative result
+
+So the maintainer's PNG lands on ready ground.
+
+**Cell → screen position, all 16, measured** (`tools/wheel_positions.py`,
+frozen in gate section 4). They cannot be read statically — the wheel
+record lists 18 OBJ entries in DRAWING order, not cell order — so the
+cursor is parked on each cell and its ring (**palette `0x1E`**) read out of
+OBJ RAM. Cell `0x0F` measures (248, 64), which corroborates 14z-49's
+independent identification of Jedah's medallion at (236, 57) by art
+rendering: same cell, two unrelated methods, offset by the ring size.
+
+**NEGATIVE RESULT worth more than the map: the adjacency is HAND-TUNED.**
+Fitting TABLE B with "step to the nearest cell in this direction's sector"
+reaches at best **100/128 (78%)** — with horizontal wrap (period 184; the
+wheel wraps left↔right, which is why cell `01` at x=160 goes L to `05` at
+x=336), no vertical wrap, ±65° sectors. Plain nearest-in-sector gets 67%.
+About a fifth of Capcom's entries are deliberate choices no simple rule
+predicts. **So the three new rows and the neighbouring edits must be
+AUTHORED and verified, never generated** — a generated table would be
+plausibly wrong in exactly the way only playtesting catches. The validator
+(`select_wheel.py`) and the emulator gate are the safety net.
+
 ### DECISION FOR THE MAINTAINER (gameplay-visible)
 
 The `0x360+id` anim family is the one item the measurement cannot settle

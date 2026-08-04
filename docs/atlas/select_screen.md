@@ -141,6 +141,47 @@ navigates to it, but the Start-hold variant path can put that id in
 does, byte for byte. vsavj's 16 duplicate rows are the same idea applied
 uniformly.
 
+## Where the cells are on screen (measured)
+
+Positions cannot be read statically: the wheel record lists 18 OBJ entries
+in **drawing order**, not cell order, so no static mapping assigns a
+coordinate to a cell. Measured instead by parking the cursor on each cell
+and reading the cursor ring — **palette `0x1E`** — out of OBJ RAM at
+`0x708000`. Tool: `tools/wheel_positions.py`; frozen in section 4 of the
+gate.
+
+| cell | centre | | cell | centre |
+|---|---|---|---|---|
+| `00` | (224, 112) | | `08` | (224, 144) |
+| `01` | (160, 112) | | `09` | (272, 144) |
+| `02` | (280,  80) | | `0A` | (304, 128) |
+| `03` | (192,  96) | | `0B` | (248, 152) |
+| `04` | (304,  96) | | `0C` | (248,  96) |
+| `05` | (336, 112) | | `0D` | (248, 128) |
+| `06` | (192, 128) | | `0E` | (272, 112) |
+| `07` | (208,  80) | | `0F` | (248,  64) |
+
+Corroborated independently: 14z-49 identified Jedah's medallion (`0xB526`)
+at (236, 57) by rendering candidate art; cell `0x0F` measures (248, 64)
+here — the same cell reached by a different method, offset by the ring's
+size (the earlier figure is a sprite corner, this is the ring centre).
+
+### The adjacency is HAND-TUNED — do not generate it from geometry
+
+Worth knowing before someone builds an auto-generator. Fitting the shipped
+TABLE B with "step to the nearest cell inside this direction's sector"
+reproduces at best **100 of 128 transitions (78%)** — with horizontal wrap
+(period 184; the wheel wraps left↔right, cell `01` at x=160 goes L to `05`
+at x=336) , no vertical wrap, and ±65° sectors. Every simpler variant does
+worse; plain nearest-in-sector with no wrap manages 67%.
+
+So ~22% of Capcom's entries are deliberate hand choices that no simple rule
+predicts. **Adding cells means AUTHORING their rows and the neighbouring
+edits, then verifying** — `tools/select_wheel.py` checks the result
+(targets live, graph connected, nothing orphaned) and
+`tests/test_select_wheel.sh` measures it in the emulator. A generated table
+would be plausibly wrong in a way only playtesting would catch.
+
 ### Consequence for the roster (option 1)
 
 Appending three cells needs **no indirection and no new mechanism**. It is

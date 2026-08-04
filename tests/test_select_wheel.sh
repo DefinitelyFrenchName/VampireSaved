@@ -124,6 +124,56 @@ PY
     done
 fi
 
+note "== section 4: MEASURED — where each cell sits on screen =="
+if [ "${WHEEL_STATIC_ONLY:-0}" = "1" ]; then
+    note "  SKIP  (WHEEL_STATIC_ONLY=1)"
+else
+    # Positions cannot be read statically: the wheel record lists 18 OBJ
+    # entries in DRAWING order, not cell order. Measured instead by parking
+    # the cursor on each cell and reading the palette-0x1E ring out of OBJ
+    # RAM. Needed to place three new cells relative to the existing ones.
+    python3 tools/wheel_positions.py --data "$WORK/vsavj_dat.bin" \
+        --tour "$WORK/tour.rpl" --meta "$WORK/tour.json" >/dev/null 2>&1
+    TDUMPS=$(python3 -c "import json;print(json.load(open('$WORK/tour.json'))['dumps'])")
+    REPLAY="$WORK/tour.rpl" DUMPS="$TDUMPS" CHECKSUM_OUT="$WORK/tour_ck.log" \
+        MAME_SANDBOX="$WORK/tour_sbx" \
+        tools/run_mame.sh vsavj -autoboot_script tests/lua/replay.lua \
+        >"$WORK/tour_run.log" 2>&1 || {
+        note "  FAIL  tour run"; tail -8 "$WORK/tour_run.log"; fail=1; }
+    python3 tools/wheel_positions.py --meta "$WORK/tour.json" \
+        --extract "$WORK" >"$WORK/pos.txt" 2>&1 || {
+        note "  FAIL  position extraction"; tail -5 "$WORK/pos.txt"; fail=1; }
+    # frozen: measured 14z-60, docs/atlas/select_screen.md
+    cat >"$WORK/pos.want" <<'POS'
+  cell 00: (224, 112)
+  cell 01: (160, 112)
+  cell 02: (280,  80)
+  cell 03: (192,  96)
+  cell 04: (304,  96)
+  cell 05: (336, 112)
+  cell 06: (192, 128)
+  cell 07: (208,  80)
+  cell 08: (224, 144)
+  cell 09: (272, 144)
+  cell 0A: (304, 128)
+  cell 0B: (248, 152)
+  cell 0C: (248,  96)
+  cell 0D: (248, 128)
+  cell 0E: (272, 112)
+  cell 0F: (248,  64)
+POS
+    miss=0
+    while IFS= read -r line; do
+        grep -qF "$line" "$WORK/pos.txt" || { miss=$((miss + 1))
+            note "        missing: $line"; }
+    done <"$WORK/pos.want"
+    if [ "$miss" = 0 ]; then
+        note "  PASS  all 16 cell positions match the frozen map"
+    else
+        note "  FAIL  $miss cell positions moved"; fail=1
+    fi
+fi
+
 if [ "$fail" = 0 ]; then
     note "SELECT WHEEL: PASS"
 else

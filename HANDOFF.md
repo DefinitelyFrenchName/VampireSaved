@@ -254,10 +254,11 @@ tests/test_input_integrity.sh         # ground truth for the input-integrity che
                                       # un-scripted press at the right frame. MAME's
                                       # window takes focus even under -video none,
                                       # so host keys reach the emulated controls
-tests/test_select_wheel.sh            # the select cursor: tables decoded from the ROM
-                                      # AND a generated walk over all 128 (cell,
-                                      # direction) pairs measured in MAME, plus four
-                                      # negative controls on the checker's verdicts
+tests/test_select_wheel.sh            # the select cursor, 4 sections: tables decoded
+                                      # from the ROM; a generated walk over all 128
+                                      # (cell,direction) pairs measured in MAME; four
+                                      # negative controls on the checker's verdicts;
+                                      # and all 16 cell screen positions measured
 tests/test_id_space.sh                # freezes the id space: 0 out-of-range variant
                                       # rows, the 5 sites that fold the id to 4 bits,
                                       # and vsav2's 2-fold/6-widened reference shape
@@ -296,7 +297,7 @@ before session end (persistent suite doctrine, CLAUDE.md §4).
 | M2 feasibility | `docs/M2_feasibility.md` (3 domains; remaining work list) |
 | Patch-tooling test | `tests/test_patch_prg.sh` (null bit-identical, code re-encrypts) |
 | M2 repoint proof | `tests/test_m2_repoint.sh` (mechanism + superset invariant) |
-| Select wheel + id space (14z-60) | `tools/select_wheel.py` (decode/verify TABLE A+B, generate a full-coverage walk), `tools/check_wheel_walk.py` (measured vs predicted), `tools/audit_id_space.py` (id width at every consumer + the variant-row alias matrix); atlas `docs/atlas/select_screen.md`, `docs/atlas/id_space.md` |
+| Select wheel + id space (14z-60) | `tools/select_wheel.py` (decode/verify TABLE A+B, generate a full-coverage walk), `tools/check_wheel_walk.py` (measured vs predicted), `tools/audit_id_space.py` (id width at every consumer + the variant-row alias matrix), `tools/wheel_positions.py` (cell -> screen position, measured from the palette-0x1E cursor ring in OBJ RAM); atlas `docs/atlas/select_screen.md`, `docs/atlas/id_space.md` |
 
 Run a patched build: `MAME_ROMPATH="<packed_dir>;$ROMDIR" tools/run_mame.sh vsavj ...`
 

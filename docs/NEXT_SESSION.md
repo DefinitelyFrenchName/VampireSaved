@@ -35,7 +35,7 @@ renaming `vsavjw.zip` to `vsavj.zip` re-creates the music bug.** See GOTCHAS.
 It blocked the roster design and the per-tenant manifest shape. Both are
 now unblocked. Full detail: `docs/atlas/id_space.md`.
 
-- Every id `0x00-0x1F` has **real storage** in all 39 layout-verified
+- Every id `0x00-0x1F` has **real storage** in all 40 layout-verified
   id-indexed tables — **0 out-of-range**. vsavj just fills the upper half
   with copies (except `0x18` Oboro, and `word_pos_a[0x16]`).
 - The only narrowing is **5 consumer sites that mask to 4 bits**
@@ -87,7 +87,13 @@ Everything mechanical is measured. Remaining for option 1:
    decision, now in STATE "Decisions pending" with a recommendation
    (inherit, as vs2 does).**
 3. **Cell coordinates + medallion art** — waiting on the maintainer's
-   console-port capture (below).
+   console-port capture (below). Ready for it: all 16 existing cell
+   POSITIONS are measured and frozen (`tools/wheel_positions.py`, gate
+   section 4), so the capture only has to pin the three NEW positions
+   relative to them. And a negative result to respect — the adjacency is
+   HAND-TUNED (best geometric fit 100/128 = 78%, horizontal wrap period
+   184), so the three rows and neighbouring edits must be **authored and
+   verified, never generated**.
 4. Then per-tenant manifests, on the declaration list in `id_space.md`.
 
 Note this moves Donovan off slot `0x0F` (Jedah) onto `0x13`, which is the
@@ -107,10 +113,10 @@ already-queued "move Donovan off Jedah's slot", now with a target id.
 
 ## Gates added this session
 
-`test_select_wheel.sh` (9 checks: static decode both sets + 128 measured
-transitions + 4 negative controls) · `test_id_space.sh` (7 checks).
+`test_select_wheel.sh` (12 checks over 4 sections: static decode both sets,
+128 measured transitions, 4 negative controls, 16 measured cell positions) · `test_id_space.sh` (7 checks).
 New instruments: `tools/select_wheel.py`, `tools/check_wheel_walk.py`,
-`tools/audit_id_space.py`. New atlas pages: `docs/atlas/select_screen.md`,
+`tools/audit_id_space.py`, `tools/wheel_positions.py`. New atlas pages: `docs/atlas/select_screen.md`,
 `docs/atlas/id_space.md`.
 
 ## The lesson this session kept re-teaching
