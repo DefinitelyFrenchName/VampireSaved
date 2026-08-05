@@ -1,173 +1,125 @@
-# NEXT SESSION — orientation (session 14z-60, 2026-08-04)
+# NEXT SESSION — orientation (session 14z-60, 2026-08-05)
 
-Read STATE.md session **14z-60** first (it closes the two queued items and
-corrects the previous session's cursor record), then `14z-59..59m` for the
-WIDE/dual-track background, then `docs/cps2_wide.md`. The approved
-architecture plan is archived at ~/.claude/plans/glowing-bouncing-iverson.md.
-The maintainer tests frequently and reports precisely — their reports are the
-project's best instrument; reference data they provide goes straight into gates.
+Read STATE.md **14z-60y first** (the open bug), then `14z-60..60x` for what
+this session built. The maintainer tests frequently and reports precisely —
+their reports are the project's best instrument.
 
-## Ship state — DUAL TRACK, both green
+## STOP HERE FIRST — the open bug (CLAUDE.md §6)
 
-| Track | Fingerprint | Packs as | Runs on |
-|---|---|---|---|
-| **stock** (compatibility) | `ae701ffb` | `vsavj.zip` | unpatched FBNeo/MAME |
-| **WIDE** (roster) | `ac52eeff` → `donovan-m5w` | `vsavjw.zip` | PATCHED emulators only |
+**WIDE renders Donovan and Anita with WRONG TILES**, character select
+through match. Maintainer playtest of `build/m5w` (`ac52eeff`, built Aug 4 —
+nothing from this session; `run_wide.sh` only launches, it never builds).
+Mechanically sound otherwise: no gameplay issue, shapes/specials/hit- and
+hurtboxes all align. Minor win-screen palette issues, tracked separately.
 
-Both come from ONE manifest; the stock build is structurally incapable of
-depending on the extension.
+**§6 says a failing regression is the only task until it is green.** The
+`0x13` move waits.
 
-**M5 sound is AUDIBLE on the WIDE track** — Donovan's shared sfx reach the
-QSound ring, zero music-range ids. **Still awaiting the maintainer's FBNeo
-playtest of `ac52eeff`.**
+Two hypotheses are already **excluded by measurement**, so do not re-run
+them:
+
+- *the patched gfx never reaches the WIDE set* — false. `build/m5w`'s
+  `vm3.13m` differs from pristine; `vsw.3xm` are extension banks (zero
+  fill), not where the art lives.
+- *the FBNeo CRC trap (0xFF fill, logged as OK)* — false. `FBNEO_HGFX`
+  dumped the DECODED tile buffer at Donovan's band (tile `0xAD8F` → byte
+  `0x56C780`) from WIDE and from the known-good stock build `donovan6`:
+  both `sha1 f3cb6aa95b294b9506206d93e335f8a09f43347e`, zero `0xFF` bytes.
+  Tiles load correctly and identically on both tracks.
+
+**So the fault is tile ADDRESSING at draw time** — the one line the WIDE
+profile removes in `cps_obj.cpp` (sprite tile-code composition for 19-bit
+addressing). Fits the symptom (record geometry right, fetch displaced) and
+fits it being the same on FBNeo and MAME, which share the patch.
+
+**Suspect, unconfirmed:** GOTCHAS records the free tile-address bit as
+**y-word bit 12** (CPS-2 Turbo precedent) — but bit 12 is also a legitimate
+Y-coordinate bit. A sprite at such a Y gets its tile address shifted a 64K
+page under WIDE. Would also explain the B4 canary passing: it proved
+LEGACY replays pixel-identical, and legacy content may never sit at such a
+Y. New content does.
+
+**Next measurement:** dump OBJ RAM for a Donovan sprite on the WIDE build,
+check his entries' y-words for bit 12, then A/B that frame's framebuffer
+against stock. Reproduce the gfx dump with:
 
 ```sh
-export ROMDIR=/path/to/reference/sets
-KEY_SET=vsavj GEN_FLAGS="--allow-plausible --tripwire-open \
-  --profile cps2-wide-v1" tools/build_donovan.sh 6 build/m5w
-tools/run_wide.sh build/m5w fbneo        # or: ... mame
+export ROMDIR=/Users/koneko/Developer/Vampire_Saved/ROMS
+FBNEO_BIN=<repo>/emu/fbneo/fbneo \
+FBNEO_ROMPATH=<repo>/build/m5w/rompath \
+FBNEO_HGFX="0056c780-0056cf7f" \
+tools/run_replay_fbneo.sh vsavjw tests/replays/11_pick_donovan.rpl \
+    /ABSOLUTE/out.log /ABSOLUTE/sandbox      # sandbox MUST be absolute
 ```
-**Stock MAME says "unknown system" — that is an EMULATOR problem, and
-renaming `vsavjw.zip` to `vsavj.zip` re-creates the music bug.** See GOTCHAS.
 
-## The id-space question is ANSWERED (14z-60): CONVENTIONAL
+If confirmed it is a defect in **our emulator profile**, not the port —
+Rule 1 territory, and it blocks the WIDE track.
 
-It blocked the roster design and the per-tenant manifest shape. Both are
-now unblocked. Full detail: `docs/atlas/id_space.md`.
+## THE PATH CHANGED — `Vampire Saved` → `Vampire_Saved`
 
-- Every id `0x00-0x1F` has **real storage** in all 40 layout-verified
-  id-indexed tables — **0 out-of-range**. vsavj just fills the upper half
-  with copies (except `0x18` Oboro, and `word_pos_a[0x16]`).
-- The only narrowing is **7 sites that mask the id to 4 bits** — 5 reached
-  through a register, plus 2 that mask the field DIRECTLY in memory (the
-  id-cycling selector). **vsav2 has 2.** The cleanest evidence in the whole
-  investigation is that selector: `andi.b #$0f,$382(a4)` in vsavj vs
-  `andi.b #$1f,$382(a4)` in vsav2 — the same instruction, one nibble apart.
-  Finite work list, not a wall.
-- **So option 1 needs NO indirection.** Give the newcomers their native vs2
-  ids — **Huitzil `0x10`, Pyron `0x11`, Donovan `0x13`** — and every ported
-  bank row lands at its own index with no renumbering.
-- **RESERVED IDS (14z-60k):** vanilla itself writes id **`0x12`** (the
-  Gallon-variant / Dark Talbain select path, `PRG:0x020BB6`/`0x020BC6`),
-  and uses `0x18` (Oboro). So the free set is `0x10`, `0x11`, `0x13` —
-  what the plan targets, **but only by luck**. The gate locks the reserved
-  set so growth fails loudly.
-- Caveat, and it already paid out: the list is a **LOWER BOUND**. Two
-  walkers agreed on 5, then sites 6 and 7 turned up — masks applied
-  straight to the id field in memory, which no *register* dataflow walk can
-  see. Still open: 62 of the 269 reads copy the id into another memory
-  field (14 fields; `$a(a6)`/`$a(a4)`/`$b1(a6)` lead); a bounded census of
-  `$b1`/`$58`/`$9c` found no further folds, but `$a(An)` needs
-  base-register-aware dataflow, not a byte scan.
+The repo now lives at `/Users/koneko/Developer/Vampire_Saved/VampireSaved`
+(the space is gone). Consequences:
 
-## The select cursor is MEASURED (14z-60) — and the old record was wrong
+- Commits were unaffected, but an in-flight worktree pinned to the old
+  absolute path was orphaned mid-session (GOTCHAS entry added). **Commit
+  before anything that moves the tree.**
+- A fresh worktree branches from `origin/main`, which trails local `main`
+  badly — `git reset --hard main` right after creating one.
+- **Opportunity, not yet taken:** `tools/setup_mame.sh` builds from an
+  rsync'd mirror under `~/.cache/vampire-saved/` *only because MAME's GENie
+  could not handle the space*. That constraint is gone. Simplifying it would
+  remove a whole class of drift, but it changes the INSTRUMENT, so it needs
+  `tests/test_mame_parity.sh` green before and after.
 
-`docs/atlas/select_screen.md`, gate `tests/test_select_wheel.sh`.
+## Ship state
 
-- `TABLE A` `PRG:0x0211D4` (16 B) — joystick nibble → direction 0-7.
-- `TABLE B` `PRG:0x0211E4` — 8-way adjacency, 8 bytes/cell, **32 rows**.
-- **Commit: `PRG:0x020A7C`** (cursor cell) and **`PRG:0x020A80`** (char id),
-  same value — so the wheel cell index IS the character id. *The
-  previously recorded `PRG:0x020A84` is the `bsr` after them.*
-- **Direction order is R,L,D,U** — not U,D,L,R. TABLE A's shape cannot
-  distinguish the two (see GOTCHAS).
-- Both tables are **DATA-space**; in the opcode image they are convincing
-  garbage.
-- Verified live: a generated walk over **all 128 (cell,direction) pairs**
-  reproduces TABLE B exactly, every write from the commit PC.
+| Track | Fingerprint | Packs as | Status |
+|---|---|---|---|
+| **stock** | `ae701ffb` | `vsavj.zip` | playtested clean to round 65 |
+| **WIDE** | `ac52eeff` (m5w) | `vsavjw.zip` | **sprite garble — open bug** |
 
-## DO THIS FIRST — the roster edit is now a specified data change
+## What this session landed (14z-60..60y)
 
-Everything mechanical is measured. Remaining for option 1:
+- **Select wheel EXTENDED**: three cells at `0x10`/`0x11`/`0x13`, adjacency
+  measured from the maintainer's PS1 video and translated by position, 28
+  bytes of TABLE B, record + coord list copied to `wide_ext` with one
+  pointer repointed. Nothing shifted. `docs/atlas/select_screen.md`.
+- **Id space ANSWERED**: conventional. `0x10`/`0x11`/`0x13` free; `0x12`
+  (Dark Talbain) and `0x18` (Oboro) RESERVED. 7 folding sites on `$382`,
+  and the count is PER-FIELD — derived fields carry their own (see
+  `venue_assets.md`). `docs/atlas/id_space.md`.
+- **`[[tenant]]` schema RATIFIED and implemented** for one tenant,
+  byte-identical on both tracks at `id = 0x0F`. The gfx half is
+  tenant-driven too (`patch/tenant.json`).
+- **CLAUDE.md §4 class v3 RATIFIED**: "bounded re-convergent window", for
+  the select screen. STRICTER than the class beside it. Checker
+  `tools/compare_window.py`, ground-truthed by `tests/test_compare_window.sh`.
+- **Venue assets measured**: sprite palettes are CLEAN for a variant tenant
+  (32-row pointer table, repoint one row); select/VS palette blocks are
+  folded and cosmetic. `docs/atlas/venue_assets.md`.
 
-1. **Three TABLE B rows** at `0x10`/`0x11`/`0x13` plus edits to
-   neighbouring rows so the three are reachable — 24 bytes of new table
-   plus the reachability edits. vs2's own table is the worked example
-   (`python3 tools/select_wheel.py build/out/vsav2_data.bin --set vsav2`).
-2. **A decision per folding site** (5, all decoded to their consumers in
-   `id_space.md`, and they are NOT equal work):
-   `0x04FAC4` **easy** — its table already has 32 rows, so fill the
-   tenant's row and widen the mask; `0x0409EC` **trivial** — a slot-6
-   behavioural test; `0x00A43E` **medium** — rides the 16-wide venue-asset
-   arrays already on the port's list; `0x03E40`/`0x04082` **hard** — the
-   anim-number block `0x360-0x36F` really is 16 wide (`0x370+` is taken),
-   and these are the two vs2 left folded. **That last one is a maintainer
-   decision, now in STATE "Decisions pending" with a recommendation
-   (inherit, as vs2 does).**
-3. **Cell coordinates + medallion art** — waiting on the maintainer's
-   console-port capture (below). Ready for it: all 16 existing cell
-   POSITIONS are measured and frozen (`tools/wheel_positions.py`, gate
-   section 4), so the capture only has to pin the three NEW positions
-   relative to them. And a negative result to respect — the adjacency is
-   HAND-TUNED (best geometric fit 100/128 = 78%, horizontal wrap period
-   184), so the three rows and neighbouring edits must be **authored and
-   verified, never generated**.
-4. **DONE — the id-writer measurement** (`tests/audit_id_writers.sh`,
-   on-demand). 11 replays × both player structs = 22 tap logs; six gameplay
-   writers; union `00 01 02 03 05 06 08 0A 0C 0E 0F` — **no variant-half
-   id**. So a tenant at `0x13` would sit where legacy cannot reach and the
-   superset invariant would hold BY CONSTRUCTION — the strongest argument
-   for the move off Jedah's slot. Remaining thread: `0x18` (Oboro) is a
-   variant id vanilla DOES use and no replay reaches it; nothing static
-   sets bit 4 of the id, and `PRG:0x020ABE` takes its value from `$45(a6)`
-   gated on `$43(a6)` — pull that next.
-5. **Per-tenant manifests — a SCHEMA PROPOSAL now exists**:
-   `docs/tenant_manifest.md`. Nothing consumes it yet; it is written to be
-   argued with. Key points: `[[tenant]]` replaces `[port]`,
-   `mirror_variant` disappears (a variant id has no mirror), each tenant
-   declares its wheel cell + adjacency + `reachable_from`, its arcade-ladder
-   membership, and a decision for EVERY measured folding site — so a census
-   that grows fails a stale manifest instead of silently inheriting.
-   Migration in three falsifiable steps, starting with a byte-identical
-   refactor at `id = 0x0F`.
+## Queued, after the bug
 
-Note this moves Donovan off slot `0x0F` (Jedah) onto `0x13`, which is the
-already-queued "move Donovan off Jedah's slot", now with a target id.
-
-## Waiting on the maintainer
-
-- **FBNeo playtest of `ac52eeff`** (the WIDE build with audible M5 sound).
-- **A full-frame lossless PNG of the console-port select screen** at native
-  resolution, ideally with the cursor on each of the three newcomers (and
-  P1/P2 if they differ). It pins the three cell coordinates and lets the
-  intended adjacency edits be inferred.
-- **M5 voice samples: DECIDED 2026-08-04** — A then B, option C rejected,
-  gates stay strict. Nothing to ask.
-- **MAME determinism** — policy "A then B" ratified; gates stay STRICT;
-  option C (a tolerance class) is NOT adopted and may not be re-proposed.
-
-## Gates added this session
-
-`test_select_wheel.sh` (12 checks over 4 sections: static decode both sets,
-128 measured transitions, 4 negative controls, 16 measured cell positions) · `test_id_space.sh` (7 checks).
-New instruments: `tools/select_wheel.py`, `tools/check_wheel_walk.py`,
-`tools/audit_id_space.py`, `tools/wheel_positions.py`. New atlas pages: `docs/atlas/select_screen.md`,
-`docs/atlas/id_space.md`.
-
-## The lesson this session kept re-teaching
-
-**A finding that lives in only one document is not a finding yet.** The
-cursor mechanism existed solely in the previous NEXT_SESSION.md — a file
-rewritten wholesale every session — with one address wrong, and STATE.md
-flatly contradicting it. Re-deriving it took half a session and corrected
-two things. Findings go in the atlas AND a gate, at discovery time.
-
-Second: **a clean null is a bug report about the measurement.** The
-id-space classifier's first run said "no site narrows the character id"
-because capstone mnemonics carry size suffixes and every comparison
-silently matched nothing — the answer the author was hoping for, from a
-tool that had measured nothing at all.
+1. **M3a de-substitution**: tenant `0x0F` → `0x13`. Prep is done — the
+   19 executable slot assumptions are enumerated (14z-60w), the thunk id is
+   now tenant-driven, the bank-table row is explicit. Remaining unknown:
+   `select_port.py` replaces Jedah's select records IN PLACE, so at `0x13`
+   the tenant needs its OWN records — that mechanism changes shape.
+   Acceptance criterion: legacy Jedah replays return to **bit-identical
+   vanilla**.
+2. Fightability: the arcade opponent list (`a5-0x61B8`, length `$138(a5)`).
+3. Huitzil `0x10` and Pyron `0x11`.
+4. Medallion art (deferred deliberately until after de-substitution).
 
 ## Gotchas most likely to bite next session
 
-- A worktree branches from **`origin/main`**, which here is ~18 sessions
-  stale — check `git log -1` after creating one (new GOTCHAS entry).
-- MAME write taps must be **word-aligned** (`ff8402,2`, not `ff8403,1`).
-- Tables read via `lea (pc)` are DATA-view; `(d8,PC,Dn)` operand fetches are
-  OPCODE-view. Check the READ MODE, not the address.
-- `grep -q "STRING" <binary>` is unreliable — use `strings -a | grep`.
-- Wheel/OBJ records: find them by the coord pointer at `base-4`, never by
-  pattern-searching for icon codes.
-- A fingerprint equal to a known registry row means a bug, not a match.
-- DUMPS separator is `;`; ranges are END-INCLUSIVE.
-- `ROMDIR` must pass `tools/audit_roms.py` first; keep it play-free.
+- **Audit manifests, not just code**: `donovan.toml` carries hand-authored
+  machine code in `thunk_hex`; a slot id hid there as `000f`. Grep the
+  ENCODED form too.
+- A generator and its validator written by the same hand share a blind
+  spot — the validator must encode what the ENGINE does, not what the
+  generator meant.
+- `run_replay_fbneo.sh` needs an **absolute** sandbox path (it `cd`s there).
+- FBNeo has **no `-rompath`**; it reads `roms/` relative to cwd.
+- MAME write taps must be word-aligned; MAME can segfault in teardown AFTER
+  writing a complete log, so assert on the `END` line, never the exit code.

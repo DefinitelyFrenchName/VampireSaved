@@ -170,6 +170,23 @@ boots under the stock 4MB descriptor with the sfx helper live and the sound
 pointer aimed at the CPS2 register window, re-creating the music bug while
 looking fine. See GOTCHAS.
 
+
+## Repo path changed (2026-08-05): `Vampire Saved` -> `Vampire_Saved`
+
+The project root is now `/Users/koneko/Developer/Vampire_Saved/VampireSaved`
+— the space is gone. Nothing in git was affected, but:
+
+- An in-flight worktree pinned to the old absolute path was orphaned
+  mid-session. **Commit before anything that moves the tree**, and
+  `git worktree prune` after a path change (a stale locked entry survives
+  the directory it names).
+- A fresh worktree branches from `origin/main`, which trails local `main`
+  badly here — `git reset --hard main` immediately after creating one.
+- **`tools/setup_mame.sh`'s rsync mirror exists ONLY because GENie could not
+  handle the space.** That constraint is gone, so the mirror could be
+  dropped — but it changes the INSTRUMENT, so `tests/test_mame_parity.sh`
+  must be green before and after. Not attempted yet.
+
 ## Platform / migration notes (14z-59d)
 
 **The focus problem is already solved in place.** `tools/run_mame.sh` now

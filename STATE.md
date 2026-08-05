@@ -1,11 +1,10 @@
 # STATE — living progress log
 
-Updated: 2026-08-04 (session 14z-60 — the select-cursor mechanism
-**re-derived and MEASURED**, and the **id-space question ANSWERED**:
-conventional, so option 1 needs no indirection. Two new gates. Previous:
-14z-59..59m — B5 + B5b + Phase C steps 1-2, M5 sound AUDIBLE, `ac52eeff`
-awaiting playtest)
-
+Updated: 2026-08-05 (session 14z-60..60y — the select wheel EXTENDED and
+measured, the id space ANSWERED, the `[[tenant]]` schema and CLAUDE.md §4
+class v3 RATIFIED. **Ends on an OPEN BUG: WIDE renders Donovan/Anita with
+wrong tiles** — read 14z-60y first; §6 makes it the only task. Repo path
+changed: `Vampire Saved` -> `Vampire_Saved`)
 ## Session 14z-60 (select cursor MEASURED; the id space is CONVENTIONAL)
 
 Two queued items closed, in the order the maintainer set: re-verify and
@@ -5350,7 +5349,17 @@ window per measured slot, never pre-widen.
 
 ## Open bugs
 
-None.
+- **WIDE sprite garble (14z-60y) — BLOCKS THE WIDE TRACK.** Donovan and
+  Anita render with wrong tiles from character select through the match on
+  `build/m5w` (`ac52eeff`); mechanics, hitboxes and hurtboxes are correct.
+  Tile DATA is proven fine (decoded-buffer dumps byte-identical to the
+  known-good stock build, no 0xFF fill), so the fault is tile ADDRESSING at
+  draw time — i.e. the WIDE profile's 19-bit tile-code composition in
+  `cps_obj.cpp`. Suspect: y-word bit 12 is both the promoted address bit and
+  a legitimate Y coordinate bit. Full write-up and the next measurement are
+  in session 14z-60y. CLAUDE.md §6: this is the only task until green.
+- Minor win-screen palette issues, same playtest. Lower priority, and
+  probably unrelated — keep them separate until one is root-caused.
 
 ## Findings log
 
