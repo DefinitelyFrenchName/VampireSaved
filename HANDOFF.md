@@ -354,11 +354,14 @@ tests/audit_id_writers.sh             # on-demand (22 MAME runs): every characte
                                       # on a variant id superset-safe by construction
 tests/audit_mask_window_ff4182.sh     # on-demand: proves the masked palette-staging
                                       # window hides the designed diff and nothing else
-tests/test_select_arrays.sh           # the select record-pointer array (M3a): 32 rows
-                                      # per player at PRG:0x26742A / +0x80, indexed by
-                                      # cell/id with NO 4-bit fold, rows 0x10-0x1F variant
-                                      # aliases. Static model + a one-byte corruption
-                                      # control + the ENGINE's own row sequence. ~10s
+tests/test_select_arrays.sh           # the select record-pointer arrays (M3a): all THREE
+                                      # UI pieces (portrait 0x26742A, name 0x2675AA,
+                                      # highlight 0x268A02), 32 rows per player with P2 at
+                                      # +0x80, indexed by cell/id with NO 4-bit fold, rows
+                                      # 0x10-0x1F variant aliases. A tenant at 0x13 costs
+                                      # SIX longs. Static model + a one-byte corruption
+                                      # control + the ENGINE's own row sequence for each
+                                      # piece. ~13s
 tests/test_compare_composite.sh       # ground truth for the PROPOSED §4 composite
                                       # class (frozen flicker inventory + frozen
                                       # bounded windows): 7 synthetic cases + a

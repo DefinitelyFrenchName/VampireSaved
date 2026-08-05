@@ -431,11 +431,27 @@ Measured for M3a, to answer "the tenant needs its own select records at
 **simpler**: at a variant id the whole mechanism is two longs.
 
 ```
-P1 array   PRG:0x26742A    stride 4    rows 0x00-0x1F
-P2 array   PRG:0x2674AA    = P1 + 0x80, same shape
+stride     4      rows 0x00-0x1F per player, P2 array at P1 + 0x80
 index      the CELL/ID, and the consumer masks to EIGHT bits, not four
 rows 0x10-0x1F   byte-identical aliases of 0x00-0x0F — the VARIANT HALF
 ```
+
+**All three UI pieces share that model** — each measured separately:
+
+| piece | P1 array | P2 array | id 0x13 owns (P1 / P2) |
+|---|---|---|---|
+| big portrait | `PRG:0x26742A` | `PRG:0x2674AA` | `0x267476` / `0x2674F6` |
+| name banner | `PRG:0x2675AA` | `PRG:0x26762A` | `0x2675F6` / `0x267676` |
+| cursor highlight | `PRG:0x268A02` | `PRG:0x268A82` | `0x268A4E` / `0x268ACE` |
+
+So the tenant move costs **six longs**, all in the variant half.
+
+**Adjacency worth knowing:** the wheel record pointer `PRG:0x2689FE`
+(→ `0x272A68` — the single referrer 14z-60r must repoint to relocate the
+wheel) sits immediately BEFORE the highlight array's row `0x00`. That is
+why a read tap on the highlight array interleaves one constant record with
+the per-cell ones, and it is another reminder that this region is packed
+end to end.
 
 Chain: the consumers at `PRG:0x05F328` and `PRG:0x06C0E0` do
 `movea.l #$2672AA,a0` + `lea $FC(a0,d0.w),a0` (the second adds `d1 = 0x80`
@@ -470,11 +486,10 @@ extension) — a placement question, not a mechanism one.
 Frozen by `tests/test_select_arrays.sh` (static model + a one-byte
 corruption control + the engine's own row sequence, ~10 s).
 
-**Not yet measured: the sibling arrays.** This is the piece reached through
-`$1C(a6)`. The name banner and cursor highlight ride their own arrays; the
-recipe above (tap the region, walk the cursor, compare against the row
-arithmetic) transfers directly, and should be run before the port relies on
-them.
+**The sibling arrays are measured too** (table above). Each was confirmed
+the same way — tap the array, walk the cursor, compare the fetched records
+against the row arithmetic — and each matched on all four cursor positions.
+The gate runs all three.
 
 ## Re-measuring
 

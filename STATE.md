@@ -178,12 +178,31 @@ New: `tools/select_arrays.py`, `tests/test_select_arrays.sh` (static model
 + a one-byte corruption control + the engine's own row sequence, ~10 s),
 `docs/atlas/select_screen.md` section.
 
-**What is still owed before M3a can be built:** the sibling arrays (name
-banner, cursor highlight) have not been measured the same way — the recipe
-transfers directly and is cheap. And the tenant's record BYTES need a home:
-in-place surgery fits them inside Jedah's records today; at `0x13` they
-must be placed (Jedah's freed space or the WIDE extension). That is a
-placement question, not a mechanism one.
+**All three UI pieces now measured** — same model, each confirmed on all
+four cursor positions:
+
+| piece | P1 array | P2 array | id 0x13 owns (P1 / P2) |
+|---|---|---|---|
+| big portrait | `PRG:0x26742A` | `PRG:0x2674AA` | `0x267476` / `0x2674F6` |
+| name banner | `PRG:0x2675AA` | `PRG:0x26762A` | `0x2675F6` / `0x267676` |
+| cursor highlight | `PRG:0x268A02` | `PRG:0x268A82` | `0x268A4E` / `0x268ACE` |
+
+**The tenant move costs six longs**, all in the variant half, all currently
+Victor aliases. The gate freezes all six plus the adjacent wheel record
+pointer.
+
+One structural fact fell out while attributing tap noise: `PRG:0x2689FE`
+(the wheel record pointer, the single referrer 14z-60r must repoint to
+relocate the wheel) sits **immediately before** the highlight array's row
+`0x00`. Its record is read every other frame throughout the select screen,
+which is what the interleaved constant in the highlight tap was. The region
+is packed end to end — more evidence for "relocate, never grow in place".
+
+**What is still owed before M3a can be built:** the tenant's record BYTES
+need a home. In-place surgery fits them inside Jedah's records today; at
+`0x13` they must be placed (Jedah's freed space or the WIDE extension).
+That is a placement question, not a mechanism one — and the mechanism is
+now fully measured.
 
 ### THE WIDE REFERENCE FROZEN (maintainer: "freeze and register as wide
 ### reference first, then we resume")
