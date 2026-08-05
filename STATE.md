@@ -5035,6 +5035,30 @@ opcode-space dump oracle (`tests/test_decrypt_oracle.sh`). Both directions
   files are LE-word storage; all derived images are 68k logical (BE) order.
   See docs/GOTCHAS.md first entry.
 
+## Decision made (maintainer, 2026-08-05): new cells SNAP to vsav's lattice
+
+"It feels safer to conform to arcade vsav and snap to it. As long as the UX
+is good enough, I don't even mind if the look is not great." So the three
+appended cells take positions derived from vsav's own hexagon rather than
+PS1's pixel coordinates.
+
+Derived layout (`build/manifest/wheel_layout_proposed.json`): vsav's wheel
+is a clean hexagon, rows 1-2-3-4-3-2-1 at y=64..144 every 16, then a single
+centre-line cell at y=152 (+8). Mirroring that bottom signature downward:
+
+| cell | id | position |
+|---|---|---|
+| random (unchanged) | `0x0B` | (248, 152) |
+| Huitzil/Phobos | `0x10` | (224, 168) |
+| Donovan | `0x13` | (272, 168) |
+| Pyron | `0x11` | (248, 176) |
+
+This is geometrically IDENTICAL to the PS1 port's shape (pair, then single
+on the centre line); only the id assignment differs, per the maintainer's
+amendment — random keeps its vsav cell and Pyron goes to the very bottom.
+28 bytes of TABLE B change. Adjacency is still a geometric DRAFT pending
+the cursor-movement video.
+
 ## Decision made (maintainer, 2026-08-05): 0x360+id anim block = INHERIT
 
 Option A: the newcomers inherit their base character's animation from the

@@ -128,7 +128,15 @@ def draft_adjacency(pos, cell):
             s = L / max(proj, 1e-9)
             if best is None or s < best[0]:
                 best = (s, o)
-        out[name] = best[1] if best else None
+        # No cell in this sector => point at SELF, never 0xFF. The engine
+        # writes TABLE B's byte straight into $3(a6) AND $382(a6) with no
+        # validity check (the `bmi` guards TABLE A's output, not this read),
+        # so an 0xFF here is committed as character id 0xFF and indexes ~1KB
+        # past every 32-entry table. Vanilla's idiom for "no move that way"
+        # is self-reference, used at exactly the wheel's extremes: cell 0x0B
+        # Down and cell 0x0F Up both point at themselves, and no live
+        # vanilla row contains 0xFF.
+        out[name] = best[1] if best else cell
     return out
 
 
@@ -142,6 +150,14 @@ def validate(rows, new_cells):
     """The checks the engine's behaviour actually depends on."""
     errs, warns = [], []
     live = {c for c, r in enumerate(rows) if any(v != 0xFF for v in r)}
+    # An 0xFF INSIDE a live row is committed as character id 0xFF and
+    # indexes ~1KB past every 32-entry table. Vanilla never does it.
+    for c in sorted(live):
+        for d, v in enumerate(rows[c]):
+            if v == 0xFF:
+                errs.append("cell %02X %s is 0xFF in a LIVE row — the engine "
+                            "would commit id 0xFF (use self-reference for "
+                            "'no move', as vanilla does)" % (c, DIR_ORDER[d]))
     for c in sorted(live):
         for d, v in enumerate(rows[c]):
             if v == 0xFF:

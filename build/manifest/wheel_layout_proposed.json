@@ -1,0 +1,15 @@
+{
+  "_comment": "PROPOSED snapped wheel extension (14z-60o). Geometry mirrors vsav's own hexagon bottom (pair at +16, single at +8) and matches the PS1 port's SHAPE; only the id assignment differs, per the maintainer's amendment: random STAYS at 0x0B (248,152) and Pyron goes to the very bottom. ADJACENCY BELOW IS A GEOMETRIC DRAFT - pending the cursor-movement video.",
+  "cells": {
+    "10": {"pos": [224, 168], "_who": "Huitzil/Phobos"},
+    "13": {"pos": [272, 168], "_who": "Donovan"},
+    "11": {"pos": [248, 176], "_who": "Pyron"}
+  },
+  "edges_in": [
+    {"from": "0x0B", "dir": "DL", "to": "0x10"},
+    {"from": "0x0B", "dir": "DR", "to": "0x13"},
+    {"from": "0x0B", "dir": "D",  "to": "0x11"},
+    {"from": "0x08", "dir": "D",  "to": "0x10"},
+    {"from": "0x09", "dir": "D",  "to": "0x13"}
+  ]
+}

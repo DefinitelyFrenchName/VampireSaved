@@ -19,12 +19,14 @@
 #
 # SECTIONS
 #   1  static decode + structure, vsavj and vsav2 (no emulator)
-#   2  the checker's own verdict logic, against known-bad inputs
-#   3  MEASURED: a generated walk visiting every (cell,direction) pair,
-#      tapped in MAME, compared press-by-press against TABLE B
+#   2  generate the full-coverage walk
+#   3  MEASURED: that walk visiting every (cell,direction) pair, tapped in
+#      MAME, compared press-by-press — plus four negative controls on the
+#      checker's own verdict logic
+#   4  MEASURED: where each cell sits on screen (palette-0x1E cursor ring)
+#   5  the layout proposer refuses an unsound wheel (no emulator)
 #
-# Section 3 needs ROMDIR; sections 1-2 do not. Set WHEEL_STATIC_ONLY=1 to
-# skip it (machine without a working MAME).
+# Sections 3-4 need a working MAME; set WHEEL_STATIC_ONLY=1 to skip them.
 #
 # Usage: ROMDIR=... tests/test_select_wheel.sh
 set -eu
@@ -173,6 +175,37 @@ POS
         note "  FAIL  $miss cell positions moved"; fail=1
     fi
 fi
+
+note "== section 5: the layout proposer refuses an unsound wheel =="
+# An 0xFF inside a LIVE row is committed straight into $3(a6) AND $382(a6)
+# (no validity check on TABLE B's read), i.e. character id 0xFF indexing
+# ~1KB past every 32-entry table. Vanilla never does it — its idiom for
+# "no move that way" is SELF-REFERENCE (cell 0x0B Down, cell 0x0F Up). The
+# proposer's first draft emitted 0xFF and its validator passed it; both are
+# fixed, and this pins them.
+cat >"$WORK/lay_ok.json" <<'JSON'
+{"cells": {"10": {"pos": [224,168]}, "13": {"pos": [272,168]},
+           "11": {"pos": [248,176]}},
+ "edges_in": [{"from":"0x0B","dir":"DL","to":"0x10"},
+              {"from":"0x0B","dir":"DR","to":"0x13"},
+              {"from":"0x0B","dir":"D","to":"0x11"}]}
+JSON
+cat >"$WORK/lay_ff.json" <<'JSON'
+{"cells": {"10": {"pos": [224,168], "adjacency": {"D": "0xFF"}},
+           "13": {"pos": [272,168]}, "11": {"pos": [248,176]}},
+ "edges_in": [{"from":"0x0B","dir":"DL","to":"0x10"},
+              {"from":"0x0B","dir":"DR","to":"0x13"},
+              {"from":"0x0B","dir":"D","to":"0x11"}]}
+JSON
+check "the snapped layout validates" 0 \
+    python3 tools/wheel_layout.py propose --data "$WORK/vsavj_dat.bin" \
+        --layout "$WORK/lay_ok.json"
+check "an 0xFF in a live row is REJECTED" 1 \
+    python3 tools/wheel_layout.py propose --data "$WORK/vsavj_dat.bin" \
+        --layout "$WORK/lay_ff.json"
+grep -q "no live vanilla row contains 0xFF\|self-reference" tools/wheel_layout.py \
+    && note "  PASS  the self-reference idiom is documented at the fallback" \
+    || { note "  FAIL  fallback rationale missing"; fail=1; }
 
 if [ "$fail" = 0 ]; then
     note "SELECT WHEEL: PASS"

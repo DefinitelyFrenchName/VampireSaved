@@ -1515,3 +1515,32 @@ they share a CLI** — the same conceptual argument was supported by one and
 silently dropped by the other; and **assert on the emulator's own load
 output**, not on the process starting. A healthy WIDE start prints
 `CPS-2 WIDE v1 profile active` and 31 `(OK)` member lines.
+
+## An 0xFF inside a LIVE select-wheel row is committed as character id 0xFF
+(caught before shipping, 2026-08-05, 14z-60o)
+The navigation routine reads TABLE B and stores the byte with **no validity
+check**:
+
+    020A78  move.b  (a0,d1.w),d0     ; new cell = row[direction]
+    020A7C  move.b  d0,$3(a6)        ; committed, unconditionally
+    020A80  move.b  d0,$382(a6)      ; ...as the CHARACTER ID too
+
+The `bmi` earlier in the routine guards TABLE A's output (the direction),
+**not** this read. So an `0xFF` sitting in a live cell's row is written
+straight into the character id, which then indexes ~1KB past every 32-entry
+per-character table. Wild pointers, not a clean failure.
+
+Vanilla never does it: no live row contains `0xFF`, and the idiom for "no
+move that way" is **self-reference** — cell `0x0B`'s Down and cell `0x0F`'s
+Up both point at themselves, exactly at the wheel's bottom and top.
+
+`tools/wheel_layout.py`'s first draft emitted `0xFF` for directions with no
+cell in that sector, **and its validator passed the result** — the tool
+would have produced a crash-on-Down wheel that looked fine in review. Both
+halves are fixed (fallback is self-reference; `0xFF` in a live row is now a
+hard error) and pinned by section 5 of `tests/test_select_wheel.sh`.
+
+General form, and the third time this project has paid it: **a generator and
+its validator written by the same hand share the same blind spot.** The
+validator must encode what the ENGINE does with the data, not what the
+generator intended to produce.
