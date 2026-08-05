@@ -1533,3 +1533,37 @@ keep_ids = "0x110,0x111,0x112,0x119,0x152,0x202"
 # array exists, so the two must be impossible to enable separately. A stock
 # build skips this whole row and the helper stays stubbed.
 unstub = "0x005122=0x004CE2"
+
+# ── SELECT WHEEL: three appended cells (14z-60s) ────────────────────────────
+# Adds Huitzil/Phobos (0x10), Pyron (0x11) and Donovan (0x13) to the
+# character-select wheel. Profile-gated CONTENT: a stock build skips this
+# row entirely and its fingerprint is unchanged.
+#
+# NOTHING IS SHIFTED. Two structures must grow and neither can grow in
+# place, but both are pointer-reached with exactly ONE referrer each and no
+# interior aliasing (measured, docs/atlas/select_screen.md), so the vanilla
+# bytes stay where they are and two pointers change:
+#   record     PRG:0x272A68  <- referenced only by PRG:0x2689FE
+#   coord list PRG:0x32A50A  <- referenced only by the record's own cptr
+# TABLE B needs no relocation at all: rows 0x10/0x11/0x13 already exist as
+# unused alias copies, so it is a 28-byte in-place edit.
+#
+# The budget word is deliberately CARRIED OVER unchanged from the vanilla
+# record (docs/GOTCHAS.md: the OBJ emitter debits it from a shared per-frame
+# budget, and a changed budget once flipped a borderline skip decision into
+# a one-byte $FF811B divergence). 85 >= 21 entries, so it still covers them.
+[[select_wheel]]
+stage = 6
+profile = "cps2-wide-v1"
+name = "roster21"
+layout = "build/manifest/wheel_layout_proposed.json"
+hole = "wide_ext"
+table_b = 0x0211E4          # 32 rows x 8; edited IN PLACE
+record = 0x272A68           # vanilla wheel record (copied, never modified)
+record_ptr = 0x2689FE       # its single referrer
+coord_list = 0x32A50A       # vanilla coord list (copied, never modified)
+# vanilla values asserted before anything is emitted — if any of these has
+# moved, the manifest is describing a ROM we are not building against.
+expect_count = 17
+expect_budget = 0x55
+expect_cptr = 0x32A50A

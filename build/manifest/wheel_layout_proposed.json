@@ -1,21 +1,93 @@
 {
-  "_comment": "Wheel extension, adjacency MEASURED from the PS1 console port (maintainer video, 2026-08-05) and translated BY POSITION: PS1 puts Pyron in vsav's random cell and random at the very bottom; we keep random at 0x0B and put Pyron at the bottom, so those two rows swap. Positions snapped to vsav's own lattice (14z-60o).",
-  "cells": {
-    "10": {"pos": [224, 168], "_who": "Huitzil/Phobos",
-           "adjacency": {"R":"0x11","L":"0x06","D":"0x11","U":"0x08",
-                         "DR":"0x11","DL":"0x10","UR":"0x0B","UL":"0x06"}},
-    "13": {"pos": [272, 168], "_who": "Donovan",
-           "adjacency": {"R":"0x09","L":"0x11","D":"0x11","U":"0x09",
-                         "DR":"0x13","DL":"0x11","UR":"0x09","UL":"0x0B"}},
-    "11": {"pos": [248, 176], "_who": "Pyron",
-           "adjacency": {"R":"0x13","L":"0x10","D":"0x11","U":"0x0B",
-                         "DR":"0x13","DL":"0x10","UR":"0x13","UL":"0x10"}}
+ "_comment": "Wheel extension, adjacency MEASURED from the PS1 console port (maintainer video, 2026-08-05) and translated BY POSITION: PS1 puts Pyron in vsav's random cell and random at the very bottom; we keep random at 0x0B and put Pyron at the bottom, so those two rows swap. Positions snapped to vsav's own lattice (14z-60o).",
+ "cells": {
+  "10": {
+   "pos": [
+    224,
+    168
+   ],
+   "_who": "Huitzil/Phobos",
+   "adjacency": {
+    "R": "0x11",
+    "L": "0x06",
+    "D": "0x11",
+    "U": "0x08",
+    "DR": "0x11",
+    "DL": "0x10",
+    "UR": "0x0B",
+    "UL": "0x06"
+   },
+   "tile": "0xb108",
+   "attr": "0x1213",
+   "_src": "vsav2 wheel entry 21 (Huitzil/Phobos), 3x2 pal 0x13"
   },
-  "edges_in": [
-    {"from": "0x08", "dir": "D",  "to": "0x10"},
-    {"from": "0x09", "dir": "D",  "to": "0x13"},
-    {"from": "0x0B", "dir": "D",  "to": "0x11"},
-    {"from": "0x0B", "dir": "DL", "to": "0x10"},
-    {"from": "0x0B", "dir": "DR", "to": "0x13"}
-  ]
+  "13": {
+   "pos": [
+    272,
+    168
+   ],
+   "_who": "Donovan",
+   "adjacency": {
+    "R": "0x09",
+    "L": "0x11",
+    "D": "0x11",
+    "U": "0x09",
+    "DR": "0x13",
+    "DL": "0x11",
+    "UR": "0x09",
+    "UL": "0x0B"
+   },
+   "tile": "0xb10b",
+   "attr": "0x1205",
+   "_src": "vsav2 wheel entry 23 (Donovan), 3x2 pal 0x05"
+  },
+  "11": {
+   "pos": [
+    248,
+    176
+   ],
+   "_who": "Pyron",
+   "adjacency": {
+    "R": "0x13",
+    "L": "0x10",
+    "D": "0x11",
+    "U": "0x0B",
+    "DR": "0x13",
+    "DL": "0x10",
+    "UR": "0x13",
+    "UL": "0x10"
+   },
+   "tile": "0xb0f5",
+   "attr": "0x1211",
+   "_src": "vsav2 wheel entry 22 (Pyron), 3x2 pal 0x11"
+  }
+ },
+ "edges_in": [
+  {
+   "from": "0x08",
+   "dir": "D",
+   "to": "0x10"
+  },
+  {
+   "from": "0x09",
+   "dir": "D",
+   "to": "0x13"
+  },
+  {
+   "from": "0x0B",
+   "dir": "D",
+   "to": "0x11"
+  },
+  {
+   "from": "0x0B",
+   "dir": "DL",
+   "to": "0x10"
+  },
+  {
+   "from": "0x0B",
+   "dir": "DR",
+   "to": "0x13"
+  }
+ ],
+ "_art_note": "tile/attr copied from vsav2's own newcomer wheel record (PRG:0x2A6E52, entries 21-23). The tile CODES are placeholders until the art is placed in our gfx; the palette rows (0x13/0x11/0x05) are vs2 rows that vsavj uses for other characters, so colours will be off until the palette work lands. Maintainer: imperfect medallion art is acceptable, mechanical soundness is not."
 }

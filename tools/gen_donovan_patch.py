@@ -33,6 +33,7 @@ Usage:
 
 import argparse
 import json
+import struct
 import sys
 from pathlib import Path
 
@@ -1855,6 +1856,127 @@ def main():
             fragments.append((dst, len(blob), "VS2",
                               f"sound_table {nm} ({man['src_set']} {src:#06x}, "
                               f"id-allowlisted)"))
+
+    # ── select_wheel (14z-60s): append three cells to the character-select
+    # wheel. Three edits, none of which shifts a byte of existing content:
+    #   1. TABLE B in place — rows 0x10/0x11/0x13 physically exist already as
+    #      unused alias copies, so the new rows and the inbound edges are a
+    #      28-byte overwrite, no growth, no relocation.
+    #   2. the OBJ record and its coordinate list COPIED into profile-gated
+    #      space, widened by three entries, with the vanilla budget word
+    #      carried over (GOTCHAS: the emitter debits it from a shared
+    #      per-frame budget; a change once flipped a skip decision into a
+    #      one-byte $FF811B divergence). 85 >= 21 entries.
+    #   3. one longword repointed, the record's single referrer.
+    # The vanilla record and list are left untouched where they are: measured
+    # to have exactly one referrer each and no interior pointers
+    # (docs/atlas/select_screen.md), which is what makes copy-and-repoint
+    # safe rather than a relocation that has to be prayed over.
+    if args.stage >= 6:
+        for sw in port.get("select_wheel", []):
+            if args.stage < _int(sw.get("stage", 0)):
+                continue
+            if sw.get("profile") and sw["profile"] != args.profile:
+                continue
+            nm = sw["name"]
+            lay = json.loads((root / sw["layout"]).read_text())
+            tb = _int(sw["table_b"])
+            rec = _int(sw["record"])
+            recptr = _int(sw["record_ptr"])
+            clist = _int(sw["coord_list"])
+
+            fmtw, budget, count = struct.unpack(">HHH", vj[rec:rec + 6])
+            cptr = int.from_bytes(vj[rec + 6:rec + 10], "big")
+            nvan = count + 1
+            bad = []
+            if count != _int(sw["expect_count"]):
+                bad.append(f"count {count} != {_int(sw['expect_count'])}")
+            if budget != _int(sw["expect_budget"]):
+                bad.append(f"budget {budget:#x} != {_int(sw['expect_budget']):#x}")
+            if cptr != _int(sw["expect_cptr"]):
+                bad.append(f"cptr {cptr:#x} != {_int(sw['expect_cptr']):#x}")
+            if vj_u32(recptr) != rec:
+                bad.append(f"{recptr:#x} holds {vj_u32(recptr):#x}, not {rec:#x}")
+            if bad:
+                fail.append(f"select_wheel {nm}: vanilla anchors moved: "
+                            + "; ".join(bad))
+                continue
+
+            DIRS = ["R", "L", "D", "U", "DR", "DL", "UR", "UL"]
+            # Cell keys are BARE HEX ("10", "11", "13") — parse them as hex
+            # explicitly. _int() treats a bare decimal string as decimal, so
+            # "10"/"11"/"13" came out as 0x0A/0x0B/0x0D and the new rows were
+            # written over Sasquatch, random and Lei-Lei while the newcomers
+            # were never created at all. Caught only because two tools
+            # disagreed on the changed-byte count by 2 (14z-60s).
+            def _cell(k):
+                c = int(str(k), 16)
+                if not (0x10 <= c <= 0x1F):
+                    fail.append(f"select_wheel {nm}: new cell {c:#04x} is not "
+                                f"in the variant half 0x10-0x1F — a new cell "
+                                f"may never overwrite a vanilla cell")
+                if c in (0x12, 0x18):
+                    fail.append(f"select_wheel {nm}: id {c:#04x} is RESERVED "
+                                f"(docs/atlas/id_space.md)")
+                return c
+            # --- 1. TABLE B, in place -------------------------------------
+            rows = [bytearray(vj[tb + c * 8: tb + c * 8 + 8]) for c in range(32)]
+            for k, spec in lay["cells"].items():
+                c = _cell(k)
+                for i, dname in enumerate(DIRS):
+                    rows[c][i] = _int(spec["adjacency"][dname])
+            for e in lay.get("edges_in", []):
+                rows[_int(e["from"])][DIRS.index(e["dir"])] = _int(e["to"])
+            nb = 0
+            for c in range(32):
+                if bytes(rows[c]) != vj[tb + c * 8: tb + c * 8 + 8]:
+                    ops.append({"op": "data", "addr": f"{tb + c * 8:#x}",
+                                "hex": bytes(rows[c]).hex()})
+                    nb += sum(1 for i in range(8)
+                              if rows[c][i] != vj[tb + c * 8 + i])
+            notes.append(f"data   {tb:#08x}        select_wheel {nm}: TABLE B "
+                         f"in place, {nb} bytes over "
+                         f"{len(lay['cells'])} new rows + "
+                         f"{len(lay.get('edges_in', []))} inbound edges")
+
+            # --- 2. coord list: copy + append ------------------------------
+            newcells = [(_cell(k), v) for k, v in lay["cells"].items()]
+            newcells.sort(key=lambda kv: kv[0])
+            cl = bytearray(vj[clist:clist + nvan * 4])
+            for _c, spec in newcells:
+                x, y = spec["pos"]
+                cl += struct.pack(">hh", int(x), int(y))
+            cl_dst = alloc(sw.get("hole", "a"), len(cl),
+                           f"select_wheel {nm} coords")
+            if cl_dst is None:
+                continue
+
+            # --- 3. record: copy + append + repoint ------------------------
+            body = bytearray(vj[rec:rec + 10 + nvan * 4])
+            struct.pack_into(">H", body, 4, nvan + len(newcells) - 1)  # count
+            struct.pack_into(">I", body, 6, cl_dst)                    # cptr
+            for _c, spec in newcells:
+                body += struct.pack(">HH", _int(spec["tile"]), _int(spec["attr"]))
+            rec_dst = alloc(sw.get("hole", "a"), len(body),
+                            f"select_wheel {nm} record")
+            if rec_dst is None:
+                continue
+
+            ops.append({"op": "data", "addr": f"{cl_dst:#x}", "hex": bytes(cl).hex()})
+            ops.append({"op": "data", "addr": f"{rec_dst:#x}", "hex": bytes(body).hex()})
+            ops.append({"op": "poke32", "addr": f"{recptr:#x}", "val": f"{rec_dst:#x}"})
+            notes.append(f"data   {cl_dst:#08x} +{len(cl):#x}  select_wheel {nm} "
+                         f"coord list ({nvan} vanilla + {len(newcells)} new)")
+            notes.append(f"data   {rec_dst:#08x} +{len(body):#x}  select_wheel {nm} "
+                         f"record (count {count}->{nvan + len(newcells) - 1}, "
+                         f"budget {budget:#x} CARRIED OVER, cptr -> {cl_dst:#x})")
+            notes.append(f"poke32 {recptr:#08x} <- {rec_dst:#x}  select_wheel "
+                         f"{nm} record ptr (was {rec:#x}; the record's ONLY "
+                         f"referrer — vanilla record and list are untouched)")
+            fragments.append((rec_dst, len(body), "NEW",
+                              f"select_wheel {nm} record (21 cells)"))
+            fragments.append((cl_dst, len(cl), "NEW",
+                              f"select_wheel {nm} coord list"))
 
     # ── site_thunk: generic 6-byte engine-site -> jsr thunk (14q pattern) ───
     # The thunk body is authored hex (must preserve the displaced
