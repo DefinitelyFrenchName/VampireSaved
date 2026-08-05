@@ -136,6 +136,68 @@ hands too, not only of the tile fix.
 2026-08-04 (option A: the unfaithful voice lines ship silent) — not a gap
 found, a gap already chosen.
 
+### THE WIDE REFERENCE FROZEN (maintainer: "freeze and register as wide
+### reference first, then we resume")
+
+Registered `9bac6ee378e1a5ce0674423279c357a4d2a076ec -> donovan-m5w`.
+The withdrawn `ac52eeff` row is kept in `registry.tsv` **commented out, on
+purpose**: the known-bad build must fail as UNREGISTERED rather than
+validate against this set. Verified both ways — the new build resolves to
+`donovan-m5w`, `m5w` exits 2 with the loud message.
+
+Expectation set `tests/expected/donovan-m5w/`: 16 `.skip` (replays that
+target other romsets), the Donovan-specific replays self-frozen as `.sha1`
++ full logs, and the legacy replays authored from MEASUREMENT against the
+frozen vanilla masked logs — never copied from another build's set.
+
+**What the measurement showed, and why it stops short of a complete freeze.**
+Eight legacy replays fit an existing ratified class exactly:
+
+| replay | class | vs donovan-m2c |
+|---|---|---|
+| `01_attract_long` | `diverge 4278` | unchanged |
+| `06_test_mode` | `diverge 700` | unchanged |
+| `11_pick_donovan` | `diverge 890` | moved from 1080 — the select screen now differs EARLIER (wheel extension), then the pick diverges as before |
+| `02`, `05`, `07` | `window 890 1622` | were `exact`; now the §4 v3 select window |
+| `30_demitri_throw` | `window 890 1962` | was `exact` |
+
+The other **seven show a composite shape that no single class can
+express**: the frozen hook-flicker inventory PLUS one bounded window per
+select-screen ENTRY. The decomposition is exact — every flicker frame
+matches donovan-m2c's frozen inventory, **not one added and not one
+missing**:
+
+| replay | flicker (== m2c inventory) | window(s) | identical after |
+|---|---|---|---|
+| `03_two_player_vs` | 829, 2093 | 890-1802 | 3227 |
+| `04_select_fuzz` | 1525, 2009, 2195 | 890-1051 | 1325 |
+| `08_challenger_join` | 3507 | 890-1622, **3809-4542** | 2378 |
+| `09_mirror_pick` | 829 | 890-1882 | 2838 |
+| `10_midattract_start` | 3007, 3129 | 3190-5712 | 408 |
+| `16_xemu_2p` | 829 | 890-2022 | 2298 |
+| `29_felicia_walljump` | 2436 | 890-1962 | 1884 |
+
+Two of those rows are mechanism confirmations rather than anomalies:
+`08_challenger_join` has TWO windows because the challenger join enters the
+select screen a second time, and `10_midattract_start`'s onset is 3190 (not
+890) because it starts mid-attract, so select entry comes later. Both are
+what the mechanism predicts, which is the point of writing predictions
+down.
+
+§4 says a replay may not be reclassified without a new measured mechanism
+AND maintainer sign-off, so those seven are **NOT frozen**. They carry
+`.pending` expectations — a new expectation kind that reports
+`PENDING — not validated`, prints the measured shape and the proposed spec,
+and **fails the suite**. An unvalidated replay must never read as green;
+`.skip` would have been the comfortable lie.
+
+So `run_suite.sh` on the WIDE reference is RED by exactly seven replays,
+each red for a stated, measured reason. Everything else is frozen and green.
+
+Also wired: the ratified §4 v3 `window` class is now a `.masked` class in
+`run_suite.sh` (it existed as a checker with ground truth, but nothing in
+the suite could express it).
+
 ### Gates re-run after the change (§6)
 
 | gate | result |
@@ -5370,7 +5432,40 @@ window per measured slot, never pre-widen.
 
 ## Decisions pending (human)
 
-- **FREEZE THE WIDE TRACK? (14z-61).** `build/m5_wide` (`9bac6ee3`) is now
+- **RATIFY A COMPOSITE §4 CLASS? (14z-61) — blocks 7 replays of the WIDE
+  reference freeze.** Seven legacy replays measure as the frozen
+  hook-flicker inventory PLUS one bounded re-convergent window per
+  select-screen ENTRY (table in 14z-61). Both halves are already ratified —
+  `flicker` (§4 v2) and `window` (§4 v3) — but no single class expresses
+  their conjunction, so those replays cannot be frozen without either a new
+  class or a fudge. They are `.pending` and fail the suite meanwhile.
+
+  **Proposal: `composite <baseset> <flicker-csv> <window-list>`**, defined
+  as the strict CONJUNCTION of the two: every divergent run must be
+  accounted for by name, the flicker set must match the frozen inventory
+  exactly, the window list must match exactly, and the run must fully
+  re-converge. It tolerates nothing that `flicker` and `window` do not each
+  tolerate, and it is strictly stronger than either alone.
+
+  Implemented and ground-truthed ahead of the decision so ratification is
+  one word rather than a session: `tools/compare_composite.py`,
+  `tests/test_compare_composite.sh` (7 synthetic cases + a no-loophole
+  check — extra flicker frame FAILS, missing flicker frame FAILS, onset
+  moved one frame FAILS, no re-convergence FAILS, bit-identical FAILS, an
+  unfrozen second window FAILS). **Nothing validates against it until you
+  say so**: accepting means turning each `.pending` file into a `.masked`
+  one carrying the spec it already prints.
+
+  **Recommendation: ratify.** The alternative readings are worse — calling
+  these replays `skip` hides a real comparison, and widening `flicker` to
+  swallow a 900-frame run would be the loosening §4's standing watch exists
+  to prevent.
+
+- ~~**FREEZE THE WIDE TRACK? (14z-61).**~~ **DONE 2026-08-05 (maintainer:
+  "yes freeze and register as wide reference first, then we resume").**
+  `9bac6ee3 -> donovan-m5w`; see 14z-61. Original entry below.
+
+- **FREEZE THE WIDE TRACK? (14z-61) — the analysis behind the decision.** `build/m5_wide` (`9bac6ee3`) is now
   playtest-confirmed with and without Donovan, both WIDE profile gates are
   green, and the new rendering + member-identity gates are green. The
   registry convention is that rows are added at FREEZE time as a STATE.md

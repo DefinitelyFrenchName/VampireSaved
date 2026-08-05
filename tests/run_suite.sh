@@ -22,6 +22,14 @@
 #                                    §4 v2 — drift in either direction is a
 #                                    loud failure, not tolerance headroom)
 #       diverge <baseset> <frame>    first divergence exactly at <frame>
+#       window <baseset> <onset> <end>   §4 v3 "bounded re-convergent
+#                                    window" (tools/compare_window.py): ONE
+#                                    contiguous run, fixed onset, full
+#                                    re-convergence, match state untouched.
+#                                    For the select screen the roster work
+#                                    deliberately extends. A bit-identical
+#                                    pair FAILS this class — the expectation
+#                                    asserts the divergence exists.
 #   <name>.diverge expectation ("<baseset> <frame>"): the log must be
 #     line-identical to the frozen full log tests/expected/<baseset>/logs/
 #     <name>.log through frame-1 and FIRST diverge exactly at <frame> —
@@ -67,6 +75,20 @@ for rpl in "$REPO"/tests/replays/*.rpl; do
         echo "SKIP ($(cat "$EXPDIR/$name.skip"))"
         continue
     fi
+    # .pending: the shape has been MEASURED but its comparison class is not
+    # ratified yet, so there is nothing legitimate to compare against. This
+    # is a FAILURE, not a skip — an unvalidated replay must never read as
+    # green — but it names the reason and the proposed spec instead of
+    # printing a bare NO-EXPECTATION. Added 14z-61 for the WIDE reference,
+    # whose select-reaching replays show "frozen flicker inventory + one
+    # bounded window per select ENTRY", a composite of two ratified classes
+    # that the vocabulary cannot yet express (CLAUDE.md §4 needs sign-off).
+    if [ -f "$EXPDIR/$name.pending" ]; then
+        echo "PENDING — not validated"
+        sed 's/^/                         /' "$EXPDIR/$name.pending"
+        fail=1
+        continue
+    fi
     RUNMASK=""
     [ -f "$EXPDIR/$name.masked" ] && RUNMASK="$MASK"
     MASK_RANGES="$RUNMASK" "$REPO/tools/run_replay_mame.sh" "$SET" "$rpl" "$WORK/$name.1.log" || { echo "RUN-FAIL"; fail=1; continue; }
@@ -106,6 +128,34 @@ for rpl in "$REPO"/tests/replays/*.rpl; do
         diverge)
             printf '%s %s' "$base" "$args" > "$WORK/$name.mdiverge"
             check_diverge "$WORK/$name.1.log" "$WORK/$name.mdiverge" || fail=1 ;;
+        window)
+            # CLAUDE.md §4 v3 "bounded re-convergent window", ratified
+            # 2026-08-05 for the select screen the roster work extends.
+            # args: "<onset> <end>". STRICTER than flicker and than the
+            # frozen first-divergence constant: one contiguous run, a fixed
+            # onset, full re-convergence, match state untouched. The checker
+            # also fails on a bit-IDENTICAL pair, because this expectation
+            # asserts the divergence exists.
+            wonset=${args%% *}; wend=${args##* }
+            if out=$(python3 "$REPO/tools/compare_window.py" "$baselog" \
+                        "$WORK/$name.1.log" --onset "$wonset" --end "$wend" 2>&1); then
+                echo "PASS masked-window ($(echo "$out" | head -1))"
+            else
+                echo "FAIL masked-window: $(echo "$out" | tr '\n' ' ')"; fail=1
+            fi ;;
+        composite)
+            # PROPOSED §4 class (STATE 14z-61), strict conjunction of
+            # `flicker` and `window`: args "<flicker-csv> <window-list>".
+            # Nothing uses it until a .pending expectation is ratified into
+            # one — the implementation exists so that decision costs a word,
+            # not a session. Ground truth: tests/test_compare_composite.sh.
+            cfl=${args%% *}; cwin=${args##* }
+            if out=$(python3 "$REPO/tools/compare_composite.py" "$baselog" \
+                        "$WORK/$name.1.log" --flicker "$cfl" --windows "$cwin" 2>&1); then
+                echo "PASS masked-composite ($(echo "$out" | head -1))"
+            else
+                echo "FAIL masked-composite: $(echo "$out" | tr '\n' ' ')"; fail=1
+            fi ;;
         *)
             echo "FAIL unknown .masked class '$class'"; fail=1 ;;
         esac

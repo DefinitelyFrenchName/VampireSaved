@@ -354,6 +354,12 @@ tests/audit_id_writers.sh             # on-demand (22 MAME runs): every characte
                                       # on a variant id superset-safe by construction
 tests/audit_mask_window_ff4182.sh     # on-demand: proves the masked palette-staging
                                       # window hides the designed diff and nothing else
+tests/test_compare_composite.sh       # ground truth for the PROPOSED §4 composite
+                                      # class (frozen flicker inventory + frozen
+                                      # bounded windows): 7 synthetic cases + a
+                                      # no-loophole check. No emulator. The class is
+                                      # implemented but nothing validates against it
+                                      # until the maintainer ratifies it (STATE 14z-61)
 tests/test_romset_identity.sh         # ground truth for tools/audit_romset_identity.py:
                                       # no member may carry the PRISTINE bytes of a member
                                       # the build patched (both emulators resolve a ROM
@@ -385,7 +391,8 @@ before session end (persistent suite doctrine, CLAUDE.md §4).
 
 | Build | SHA-1 (zip) | Notes |
 |---|---|---|
-| **m5_wide / m5_stock (current pair, 2026-08-05, 14z-61)** | fingerprints `9bac6ee378e1a5ce0674423279c357a4d2a076ec` (WIDE) / `ae701ffb06d0cbf3462cad1a9faa47534a3c00e4` (stock) | rebuilt through the fixed romset pipeline (group C zero-filled; `audit_romset_identity.py` clean). The stock rebuild reproduces its registered fingerprint exactly. Gates: `tests/test_wide_render_content.sh` PASS — 3,721/3,721 frames pixel-identical across the two tracks on `11_pick_donovan`, with a positive control. **Maintainer playtest 2026-08-05: confirmed good with and without Donovan** (no regression, graphics, gameplay, sounds). Not yet frozen/registered — the freeze decision is in STATE "Decisions pending" |
+| **donovan-m5w — THE WIDE REFERENCE (FROZEN 2026-08-05, 14z-61)** | fingerprint `9bac6ee378e1a5ce0674423279c357a4d2a076ec` | `build/m5_wide`; REGISTERED `-> donovan-m5w`. Rebuilt through the fixed romset pipeline (group C zero-filled; `audit_romset_identity.py` clean) + the 14z-60 select-wheel extension. Maintainer playtest confirmed with and without Donovan. Gates: `test_wide_profile.sh`, `test_mame_wide.sh`, `test_wide_render_content.sh` (3,721/3,721 frames pixel-identical to the stock track), `test_romset_identity.sh` — all PASS. Expectation set `tests/expected/donovan-m5w/`: 33 self-frozen `.sha1` + full logs, 7 authored `.masked` (`diverge` ×3, §4 v3 `window` ×4), 16 `.skip`, **7 `.pending`** — the composite-shape replays awaiting §4 ratification (STATE "Decisions pending"), so `run_suite.sh` is RED by exactly those seven, each for a stated measured reason |
+| **m5_stock (the stock twin, 2026-08-05)** | fingerprint `ae701ffb06d0cbf3462cad1a9faa47534a3c00e4` | `build/m5_stock`; the rebuild reproduces this fingerprint exactly. Not registered — it is the dual-track partner and the rendering gate's reference |
 | ~~m5w~~ **KNOWN-BAD, kept as evidence** | `ac52eeff` | the 14z-60y sprite garble: its `vsavjw.zip` carries group C as byte copies of group B, so the loader served pristine tiles for the patched group B. Do not playtest. `python3 tools/audit_romset_identity.py build/m5w/rompath` names all four shadows |
 | null vsavj | `12fbb0e1a137a1420824856d3efb0af8fff57be6` | == reference members; zip repacked deterministically |
 | **donovan-m2c (M2b+ASSETS FROZEN 2026-08-02)** | fingerprint `b91647c7da14ded6316cee8dc057c8daf1c3fb1e` | `tools/build_donovan.sh 6 build/donovan6`; REGISTERED `-> donovan-m2c`; the 14z-42..49 arc on top of M2b-CORE: LS hit-freeze thunks, full ES chain + meter decode, win screen, deity seq-states, accent owner-link fallback, HC motion farm_ports, HUD mugshot/name, select medallion; masked legacy basis = THREE windows (palette staging slot $FF4182-$FF41A1 ratified round 64; audit `tests/audit_mask_window_ff4182.sh`); gates: full battery GREEN (battery_49b) + `run_suite.sh` GREEN by fingerprint auto-detection; maintainer-confirmed rounds 52-64; gfx member sha1s in registry note |

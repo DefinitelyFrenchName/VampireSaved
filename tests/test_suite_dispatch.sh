@@ -76,5 +76,40 @@ else
     echo "  ok: missing base log -> FAIL"
 fi
 
+# --- 3. the runner knows every expectation kind it can meet ------------------
+# A kind the runner does not implement is silently useless — and a `.pending`
+# that read as a skip would be the exact "unvalidated looks green" failure
+# the WIDE freeze exists to avoid (14z-61). Cheap structural check: every
+# kind used anywhere under tests/expected/ must be handled in run_suite.sh.
+echo "  -- expectation kinds"
+# Only files whose stem is an actual replay name are expectations; PNGs,
+# frozen logs and stray .DS_Store are data, not kinds.
+kinds=$(for f in "$REPO"/tests/expected/*/*.*; do
+            [ -f "$f" ] || continue
+            b="$(basename "$f")"; stem="${b%.*}"; ext="${b##*.}"
+            [ -f "$REPO/tests/replays/$stem.rpl" ] || continue
+            [ "$ext" = "sha1" ] && continue
+            echo "$ext"
+        done | sort -u)
+for k in $kinds; do
+    if grep -q "\.$k\"" "$REPO/tests/run_suite.sh"; then
+        echo "  ok: '.$k' expectations are handled by run_suite.sh"
+    else
+        echo "FAIL: '.$k' expectation files exist but run_suite.sh never reads them"
+        fail=1
+    fi
+done
+
+# And every .masked CLASS in use must be a class the runner implements.
+classes=$(cat "$REPO"/tests/expected/*/*.masked 2>/dev/null | awk '{print $1}' | sort -u)
+for c in $classes; do
+    if grep -q "^        $c)" "$REPO/tests/run_suite.sh"; then
+        echo "  ok: masked class '$c' is implemented"
+    else
+        echo "FAIL: masked class '$c' is used in an expectation but not implemented"
+        fail=1
+    fi
+done
+
 [ "$fail" = 0 ] && echo "PASS: suite dispatch verdicts validated" \
     || { echo "SUITE RED"; exit 1; }
