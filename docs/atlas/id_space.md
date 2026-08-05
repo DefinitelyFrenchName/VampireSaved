@@ -124,6 +124,13 @@ fields —
 | `$b1(a6)` | 11 | `$3(a6)`, `$3e0(a6)`, `$3bd(a6)`, `$45(a6)`, `$9c(a4)` | 1 each |
 | `$58(a4)` | 5 | | |
 
+**One such fold is now measured**, and it matters: `PRG:0x00A43E` stores
+the folded id at `$130(a5)`, and `PRG:0x01BF98` masks it to 4 bits AGAIN on
+the way into the select/VS palette-block tables
+(`docs/atlas/venue_assets.md`). So **the folding-site count on this page is
+PER-FIELD** — it counts folds applied to `$382(An)`, and derived fields
+carry their own. Do not read "7 sites" as "7 places in the game".
+
 A complete folding census has to follow those fields to *their* consumers.
 `$a(An)` is the owner-char-id an object carries, so its readers are the
 likely place for further masks.
