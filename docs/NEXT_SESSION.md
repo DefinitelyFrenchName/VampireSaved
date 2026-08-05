@@ -76,6 +76,17 @@ and skew by a frame or two, so compare at anchors (or by displayed record),
 never by raw frame index — see the cross-emulator and cross-game alignment
 entries in GOTCHAS.
 
+**Maintainer direction (2026-08-05), from the Sailor Moon SNES project:**
+internal monitoring can be green while the OUTPUT is corrupt — there, data
+loaded correctly but in the wrong MANNER, and only the standard output
+showed it. Full visual coverage is unrealistic; a few smoke tests over
+visuals that have broken BEFORE and whose check we already know is not.
+**`docs/visual_smoke_tests.md`** turns that into an inventory of seven, each
+a real past breakage with its repro, plus the design rules (compare output
+not RAM; A/B a reference build rather than freezing pixel hashes; align by
+anchor not frame index; sample the whole cycle of a cyclic effect; run the
+vanilla control first).
+
 ## THE PATH CHANGED — `Vampire Saved` → `Vampire_Saved`
 
 The repo now lives at `/Users/koneko/Developer/Vampire_Saved/VampireSaved`
