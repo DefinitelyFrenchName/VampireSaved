@@ -116,6 +116,11 @@ def normalise_tenants(port, profile=None, override=None):
             f"character's gfx band, and a stock build has nowhere else to put "
             f"them. Build with --profile, or declare a base-half id for the "
             f"stock track via [tenant.id_by_profile].")
+    if tid in (0x12, 0x18):
+        raise SystemExit(
+            f"gen_donovan_patch: tenant id {tid:#04x} is RESERVED "
+            f"(docs/atlas/id_space.md): 0x12 is the Gallon select variant "
+            f"vanilla writes as an immediate, 0x18 is Oboro Bishamon.")
     p = dict(port.get("port", {}))
     p["src_set"] = t["src_set"]
     p["src_char"] = t["src_char"]
@@ -2067,6 +2072,146 @@ def main():
                               f"select_wheel {nm} record (21 cells)"))
             fragments.append((cl_dst, len(cl), "NEW",
                               f"select_wheel {nm} coord list"))
+
+    # ── select_records (M3a, 14z-62): the tenant's OWN select records at a
+    # variant id — what the hovered cell displays. Three UI pieces (portrait,
+    # name banner, cursor highlight) each ride a 32-row x 4-byte
+    # record-pointer array per player (P2 array = P1 + 0x80), indexed by the
+    # cursor CELL/ID with NO 4-bit fold; rows 0x10-0x1F alias 0x00-0x0F in
+    # vanilla, and no legacy gameplay path writes a variant-half id — so
+    # repointing the tenant's two rows per piece touches nothing legacy
+    # content can reach, BY CONSTRUCTION (docs/atlas/select_screen.md;
+    # tests/test_select_arrays.sh, tests/audit_id_writers.sh). At the
+    # substituted slot 0x0F this section is INERT: select_port.py's in-place
+    # surgery remains that track's mechanism, and the frozen references
+    # rebuild byte-identically.
+    #
+    # Composed records keep VS2'S OWN budget words: the budget debits the OBJ
+    # emitter's shared frame budget only on frames that DRAW the record, and
+    # a variant row draws only when the tenant is hovered — new-character
+    # content by definition (contrast select_port's in-place surgery, which
+    # must keep the host's budget because legacy cursors visit slot 0x0F).
+    #
+    # Tile codes are remapped through select_port.PLACEMENTS (the single
+    # placement map — the tenant's select art still sits in the host band
+    # until the gfx half moves it to WIDE group C). Entries with no placement
+    # keep their vs2 codes as DOCUMENTED PLACEHOLDERS where the manifest row
+    # allows it (the ratified medallion policy: imperfect art is acceptable,
+    # mechanical soundness is not). The pairs the composed records rely on
+    # are emitted as select_tiles.json so the gfx stage places exactly the
+    # art these records reference — and none of the slot-0x0F-only families
+    # (splash/win-quote), whose Jedah art therefore returns to vanilla on
+    # variant-id builds.
+    if args.stage >= 6 and dst_slot >= 0x10 and port.get("select_records"):
+        import select_port as _selp
+        _src_char = _int(port["port"]["src_char"])
+        src_data = (root / f"build/out/{man['src_set']}_data.bin").read_bytes()
+
+        def _u16(b, o):
+            return int.from_bytes(b[o:o + 2], "big")
+
+        def _u32(b, o):
+            return int.from_bytes(b[o:o + 4], "big")
+
+        sel_pairs = {}
+        for sr in port["select_records"]:
+            if args.stage < _int(sr.get("stage", 0)):
+                continue
+            nm = sr["name"]
+            for side in ("p1", "p2"):
+                vj_base = _int(sr[f"vj_{side}"])
+                vj_row = vj_base + 4 * dst_slot
+                vj_alias = vj_base + 4 * (dst_slot & 0x0F)
+                exp_alias = _int(sr[f"expect_vj_alias_{side}"])
+                vsrc = _u32(src_data, _int(sr[f"vs2_{side}"]) + 4 * _src_char)
+                bad = []
+                if vj_u32(vj_alias) != exp_alias:
+                    bad.append(f"vj base-half row {vj_alias:#x} holds "
+                               f"{vj_u32(vj_alias):#x}, expected {exp_alias:#x}")
+                if vj_u32(vj_row) != exp_alias:
+                    bad.append(f"vj variant row {vj_row:#x} holds "
+                               f"{vj_u32(vj_row):#x} — does not alias its "
+                               f"base-half counterpart {exp_alias:#x}")
+                if vsrc != _int(sr[f"expect_vs2_{side}"]):
+                    bad.append(f"vs2 {side} row holds {vsrc:#x}, expected "
+                               f"{_int(sr[f'expect_vs2_{side}']):#x}")
+                if bad:
+                    fail.append(f"select_records {nm}/{side}: vanilla anchors "
+                                "moved: " + "; ".join(bad))
+                    continue
+                fmt, bud, cm1 = struct.unpack(">HHH", src_data[vsrc:vsrc + 6])
+                cnt = cm1 + 1
+                cptr = _u32(src_data, vsrc + 6)
+                ents = [(_u16(src_data, vsrc + 10 + 4 * k),
+                         _u16(src_data, vsrc + 12 + 4 * k)) for k in range(cnt)]
+                new_ents, holders = [], []
+                for t, at in ents:
+                    bx = ((at >> 8) & 15) + 1
+                    by = ((at >> 12) & 15) + 1
+                    anchor = _selp.PLACEMENTS.get((t, bx, by))
+                    if anchor is None:
+                        if not sr.get("allow_placeholder_tiles", False):
+                            fail.append(
+                                f"select_records {nm}/{side}: no placement "
+                                f"for block (0x{t:04X},{bx},{by}) and "
+                                f"placeholders not allowed for this piece")
+                        holders.append(t)
+                        new_ents.append((t, at))
+                        continue
+                    new_ents.append((anchor, at))
+                    for dy in range(by):
+                        for dx in range(bx):
+                            s = (t & ~0xF) + (dy << 4) + ((t + dx) & 0xF)
+                            d = (anchor & ~0xF) + (dy << 4) + ((anchor + dx) & 0xF)
+                            if sel_pairs.get(s, d) != d:
+                                fail.append(f"select_records {nm}/{side}: "
+                                            f"conflicting placement for tile "
+                                            f"0x{s:04X}")
+                            sel_pairs[s] = d
+                cl = src_data[cptr:cptr + 4 * cnt]
+                cl_dst = alloc(sr.get("hole", "a"), len(cl),
+                               f"select_records {nm}/{side} coords")
+                if cl_dst is None:
+                    continue
+                body = struct.pack(">HHH", fmt, bud, cnt - 1)
+                body += cl_dst.to_bytes(4, "big")
+                for t, at in new_ents:
+                    body += struct.pack(">HH", t, at)
+                rec_dst = alloc(sr.get("hole", "a"), len(body),
+                                f"select_records {nm}/{side} record")
+                if rec_dst is None:
+                    continue
+                ops.append({"op": "data", "addr": f"{cl_dst:#x}",
+                            "hex": cl.hex()})
+                ops.append({"op": "data", "addr": f"{rec_dst:#x}",
+                            "hex": body.hex()})
+                ops.append({"op": "poke32", "addr": f"{vj_row:#x}",
+                            "val": f"{rec_dst:#x}"})
+                ph = ("" if not holders else
+                      ", PLACEHOLDER tile code(s) "
+                      + "/".join(f"0x{t:04X}" for t in holders)
+                      + " — unplaced until the gfx half")
+                notes.append(f"data   {cl_dst:#08x} +{len(cl):#x}  "
+                             f"select_records {nm}/{side} coord list "
+                             f"({cnt} pairs, vs2 {cptr:#x})")
+                notes.append(f"data   {rec_dst:#08x} +{len(body):#x}  "
+                             f"select_records {nm}/{side} record (vs2 "
+                             f"{vsrc:#x}, {cnt} entries, budget {bud:#x} = "
+                             f"vs2's own{ph})")
+                notes.append(f"poke32 {vj_row:#08x} <- {rec_dst:#x}  "
+                             f"select_records {nm}/{side} array row "
+                             f"{dst_slot:#04x} (was {exp_alias:#x}, the "
+                             f"base-half alias)")
+                fragments.append((cl_dst, len(cl), "VS2",
+                                  f"select_records {nm}/{side} coord list"))
+                fragments.append((rec_dst, len(body), "VS2",
+                                  f"select_records {nm}/{side} record"))
+        _pairs = sorted([s, d] for s, d in sel_pairs.items())
+        (out / "select_tiles.json").write_text(json.dumps(_pairs))
+        notes.append(f"# select_records: {len(_pairs)} bank-1 tile placements "
+                     f"-> select_tiles.json (only the composed records' art; "
+                     f"the slot-0x0F splash/win-quote families are NOT "
+                     f"placed, so that Jedah art stays vanilla)")
 
     # ── site_thunk: generic 6-byte engine-site -> jsr thunk (14q pattern) ───
     # The thunk body is authored hex (must preserve the displaced

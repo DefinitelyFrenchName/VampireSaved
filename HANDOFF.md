@@ -362,12 +362,23 @@ tests/test_select_arrays.sh           # the select record-pointer arrays (M3a): 
                                       # SIX longs. Static model + a one-byte corruption
                                       # control + the ENGINE's own row sequence for each
                                       # piece. ~13s
-tests/test_compare_composite.sh       # ground truth for the PROPOSED §4 composite
-                                      # class (frozen flicker inventory + frozen
-                                      # bounded windows): 7 synthetic cases + a
-                                      # no-loophole check. No emulator. The class is
-                                      # implemented but nothing validates against it
-                                      # until the maintainer ratifies it (STATE 14z-61)
+tests/test_tenant_id.sh               # the tenant id is a BUILD INPUT: resolution,
+                                      # the variant-id-needs-profile refusal, and the
+                                      # frozen-reference reproducibility guard (no
+                                      # id_by_profile until M3a completes). ~1s
+tests/test_tenant_select_records.sh   # M3a select-records mechanism (14z-62): a
+                                      # variant-id build carries the tenant's OWN six
+                                      # select records (space-model allocations, six
+                                      # array rows poked) and the host's select-family
+                                      # program bytes are VANILLA. Static re-derivation
+                                      # + verdict-logic negative controls + the engine's
+                                      # own row fetch onto cell 0x13 (replay 36, WIDE
+                                      # MAME). Self-builds at 0x13 unless given a build
+tests/test_compare_composite.sh       # ground truth for the §4 v4 composite class
+                                      # (frozen flicker inventory + frozen bounded
+                                      # windows, RATIFIED 2026-08-06): 7 synthetic
+                                      # cases + a no-loophole check. No emulator.
+                                      # donovan-m5w freezes 7 replays in this class
 tests/test_romset_identity.sh         # ground truth for tools/audit_romset_identity.py:
                                       # no member may carry the PRISTINE bytes of a member
                                       # the build patched (both emulators resolve a ROM

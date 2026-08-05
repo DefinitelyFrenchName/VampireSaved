@@ -1,15 +1,131 @@
 # STATE — living progress log
 
-Updated: 2026-08-06 (session 14z-61 — **the WIDE sprite garble is ROOT-CAUSED,
-FIXED and PLAYTEST-CONFIRMED**: it was never a rendering defect, it was a
-romset member the loader silently preferred over the patched one. The WIDE
-track is unblocked; the roster queue resumes at M3a. Read 14z-61 first. Earlier
-this day, 14z-60..60z: select wheel EXTENDED, id space ANSWERED, `[[tenant]]`
-schema and CLAUDE.md §4 class v3 RATIFIED. Repo path changed:
-`Vampire Saved` -> `Vampire_Saved`. **Session closed at a deliberate
-boundary**: M3a's program half is done and both frozen references still
-rebuild exactly; its two remaining halves are content PLACEMENT and are
-specified in docs/NEXT_SESSION.md, which is the first read.)
+Updated: 2026-08-06 (session 14z-62 — **the M3a select-records half is DONE
+and GATED**: at a variant tenant id the generator composes the tenant's own
+six select records (three UI pieces × P1/P2) into space-model allocations
+and pokes the six variant-half array rows; select_port does not run and the
+host's select-family program bytes return to VANILLA. Both frozen
+references still rebuild bit-identically. What remains of M3a is the GFX
+half — and 14z-62 measured that it gates the select screen's VISUALS too:
+the host's select art lives in his own fighter band. Read 14z-62, then
+docs/NEXT_SESSION.md.)
+
+## Session 14z-62 (M3a select records LANDED — composition moved into the
+## generator; the host's records are vanilla again at 0x13)
+
+The smaller half of M3a, exactly as queued by 14z-61. The ordering
+question NEXT_SESSION flagged is settled, the mechanism is implemented,
+gated, and measured end-to-end in the emulator.
+
+### The ordering decision: composition moved INTO the generator
+
+The question was: `gen_donovan_patch.py` (which owns the space model) runs
+BEFORE `select_port.py` (which composed the record bytes) — so either the
+generator emits an allocation for select_port to consume, or the records
+move into the generator. **The records moved into the generator**, as a
+declarative `[[select_records]]` section (one row per UI piece,
+`build/manifest/donovan.toml`), for four reasons:
+
+1. every program-image write flows through patch.json — allocator 0xFF-fill
+   checks, profile gating, provenance fragments, the image-extension block;
+   a select_port writing into generator-owned space would need an address
+   side-channel AND would bypass all of that;
+2. the `select_wheel` section is the proven template (vanilla-anchor
+   assertions, copy into profile-gated space, repoint, notes);
+3. inertness at `0x0F` is by construction — the section is gated on a
+   variant-half tenant id, so the frozen references rebuild untouched and
+   select_port's code is not modified at all;
+4. one brain: the generator also emits the tile-pair map its composed
+   records imply (importing `select_port.PLACEMENTS`, the single placement
+   table), so records and art cannot disagree.
+
+`build_donovan.sh` picks the mechanism by tenant id (from
+`patch/tenant.json`): base-half id → select_port surgery as always;
+variant-half id → select_port is NOT run and the generator's
+`select_tiles.json` feeds the gfx stage. The two mechanisms are recorded
+as mutually exclusive in `docs/patch_index.md`.
+
+### Measured on the way in (all static, from the decrypted data images)
+
+- **vs2 carries the same three arrays, same 32-row × 4-byte model with
+  P2 = P1 + 0x80**: portrait `PRG:0x2A0762`, name `PRG:0x2A08E2`,
+  highlight `PRG:0x2A18FE`. Found via the single referrer to the known
+  Donovan portrait record `0x2A63F0` (= row 0x13), shape-verified on both
+  halves. vs2's variant half is NOT an alias bank: rows 0x10/0x11/0x13
+  hold the newcomers' own records, 0x12 aliases Gallon (dark Talbain).
+- **The six Donovan source records** (P1/P2 × portrait/name/highlight):
+  `0x2A63F0/0x2A6416`, `0x2A657E/0x2A76A4`, `0x2A6750/0x2A6F00`.
+- **The highlight piece is the LIT NAME LABEL** — vs2's P1 name banner and
+  P1 highlight share one coordinate list (`0x303734`), same 5-wide block
+  at (-40,-16). That is what M2b's "displaced label" note was seeing, and
+  why highlight records are per-character art, not a generic ring.
+- select_port's `RECORDS` list contains the P2 portrait record mislabeled
+  "pal P1" (`0x2720FA` = P2 row 0x0F; source `0x2A6416` = vs2's P2
+  portrait) — correctly wired under a wrong name, a relic of the corrected
+  +0x40 model. Recorded here; the 0x0F track is frozen so the label stays.
+
+### What landed
+
+- `[[select_records]]` × 3 in the manifest (frozen vanilla anchors: the
+  six vj alias values AND the six vs2 row values), generator section that
+  composes each record with **vs2's own budget words** (variant rows are
+  unreachable by legacy ids — audit_id_writers — so the budget debits only
+  tenant-drawn frames), coord lists copied verbatim, tiles remapped via
+  PLACEMENTS, and four PLACEHOLDER codes kept where no placement exists
+  (name/p2 0xB22C+0xB2A5, highlight/p1 0xB000, highlight/p2 0xB129 — the
+  ratified medallion policy, until the gfx half).
+- Six poke32s: `0x267476/0x2674F6`, `0x2675F6/0x267676`,
+  `0x268A4E/0x268ACE` ← the composed records (byte detail in
+  docs/patch_notes.md 14z-62).
+- Host program bytes VANILLA at 0x13: the record block
+  `PRG:0x271900-0x274700`, the select-palette grid column for char 0x0F,
+  the shared name-banner coord list. One fewer program member is patched.
+- Reserved-id refusals in `normalise_tenants`: 0x12 and 0x18.
+- **Gate `tests/test_tenant_select_records.sh`** (in the battery, with
+  `test_tenant_id.sh`): static composition RE-DERIVED independently
+  (tools/check_tenant_select.py, prints the poked rows for the runtime
+  section); three negative controls (pristine image, flipped composed
+  byte, flipped host byte — the verdict logic is itself tested); and the
+  engine's own row sequence walking onto cell 0x13 (new replay
+  `36_pick_tenant_cell.rpl`: L,L,D,D from default = 0x01→0x05→0x0A→0x09→
+  0x13) — all three pieces fetch rows 0x01,0x05,0x0A,0x09 then the
+  TENANT's composed record. All sections PASS.
+- **Frozen references verified**: stock rebuilds to `ae701ffb`, WIDE to
+  `9bac6ee3`, both exact, after every change.
+- Scratch build `build/m3a_selrec` (`dd88f343`): snapshots confirm the
+  tenant cell shows Donovan's portrait + name, the pick reaches the speed
+  menu, and legacy hover (Demitri) is vanilla.
+
+### The finding that shapes the gfx half: the host's select ART lives in
+### his own FIGHTER band
+
+With Jedah's records vanilla again, his select portrait still garbles on
+the 0x13 build. Measured: **89 of his 92 portrait tiles sit inside the
+tenant-placed fighter band `[0xAD8F,0xEA3F]`** — the select portrait art
+is bank-2 (his own band), not select-bank art. His name banner happens to
+fall in placement gaps and renders correctly. So visual de-substitution of
+the select screen is NOT a records problem — it completes when the gfx
+half moves the tenant's band to WIDE group C, at which point the host band
+returns to pristine wholesale. (Also interim and expected: Donovan's
+portrait shows in Victor-ish colors — the select-palette uploader resolves
+id 0x13 into Victor's grid neighborhood; the palette route at a variant id
+is one of the unmeasured mechanisms below.)
+
+### Still open on the select screen at a variant id (measure before build)
+
+- **Splash (VS screen), win-quote, and select-palette mechanisms at
+  0x13.** select_port's other families (splash P1/P2, pal, win quote,
+  palette grid) are slot-0x0F-only in-place edits and are now simply NOT
+  applied on variant-id builds — those paths resolve id 0x13 through
+  whatever the engine does natively (folds → Victor-ish content).
+  Mechanisms unmeasured; vs2 special-cases some of them (its palette
+  uploader has a literal `cmpi #$13` redirect at `0x6B1A0`). Measure the
+  vsavj consumers before porting.
+- **P2-side runtime measurement**: the gate's runtime section drives the
+  P1 cursor; P2 rows/records are verified statically. A 2P replay onto
+  cell 0x13 would close that (the mechanism is identical).
+- The four placeholder tile blocks render as wrong pixels until the gfx
+  half (documented, ratified policy).
 
 ## Session 14z-61 (WIDE GARBLE FIXED — a shadowed ROM member, not the
 ## emulator; and the rendering gate that should have caught it)

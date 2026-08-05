@@ -491,6 +491,48 @@ the same way — tap the array, walk the cursor, compare the fetched records
 against the row arithmetic — and each matched on all four cursor positions.
 The gate runs all three.
 
+## The tenant move IMPLEMENTED (14z-62) — and vs2's own arrays
+
+The mechanism above is now built: on a variant-id build
+(`--tenant-id 0x13 --profile cps2-wide-v1`) the generator's
+`select_records` section composes the tenant's six records into space-model
+allocations and pokes the six rows; `select_port.py` does not run and the
+host's select-family program bytes are vanilla again. Gate:
+`tests/test_tenant_select_records.sh` (independent re-derivation + negative
+controls + the engine's own row fetch onto cell `0x13`, replay 36).
+
+**vs2 carries the same three arrays, same 32-row/+0x80 model** — the source
+records are read from them at row `src_char`, never hand-listed:
+
+| piece | vs2 P1 array | vs2 P2 | row 0x13 (Donovan) P1 / P2 |
+|---|---|---|---|
+| big portrait | `PRG:0x2A0762` | `+0x80` | `0x2A63F0` / `0x2A6416` |
+| name banner | `PRG:0x2A08E2` | `+0x80` | `0x2A657E` / `0x2A76A4` |
+| cursor highlight | `PRG:0x2A18FE` | `+0x80` | `0x2A6750` / `0x2A6F00` |
+
+Found via the single referrer to the known Donovan portrait record
+(`0x2A63F0`, the record M2b already ported) and shape-verified on both
+halves. Unlike vsavj, vs2's variant half is NOT a pure alias: rows
+`0x10/0x11/0x13` hold the newcomers' own records (and `0x12` aliases
+Gallon's — dark Talbain again). The name banner P1 record and the P1
+highlight share one coordinate list (`0x303734`): **the highlight piece is
+the LIT name label**, which is what M2b's "displaced label" note was
+seeing.
+
+**Vanilla record shapes, for reference:** the P1 name banner is one 5x2
+block; the P2 name is a small 1-2 entry tag (budget 0x3, at (-24,-8), attr
+`0215`) in both engines — P1 and P2 really are different record sets, not
+copies (the corrected +0x80 model).
+
+**A coupling to know before expecting visual de-substitution:** the host's
+select ART mostly lives in his own bank-2 FIGHTER band, not in the select
+bank — measured: 89 of Jedah's 92 portrait tiles sit inside the
+tenant-placed band `[0xAD8F,0xEA3F]`. So with records de-substituted his
+portrait still garbles wherever the tenant's fighter tiles landed (his
+name banner happens to fall in placement gaps and renders). This resolves
+when the gfx half moves the tenant's band to WIDE group C; it is not a
+record problem.
+
 ## Re-measuring
 
 ```sh

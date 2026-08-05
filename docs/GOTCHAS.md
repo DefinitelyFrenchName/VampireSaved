@@ -1711,3 +1711,19 @@ Rules:
   (pristine vs patched) — or it can prove nothing. `test_wide_render_
   content.sh` section 4 does this, and it caught a field-index slip in its
   own checker on the first run.
+
+## "Inside the placed band window" is NOT "overwritten" (14z-62)
+
+`remap_spec.json`'s `placed` is a `[min, max]` BOUND of the tenant's tile
+placement, and the placement inside it is SPARSE (per-record tiles from the
+OBJ walk, not a wholesale block copy). Intersecting a record's tiles with
+the WINDOW says "may be clobbered", not "is clobbered" — Jedah's name
+banner (8/8 tiles inside the window) renders perfectly on the 0x13 build
+because its tiles fall in placement gaps, while his portrait (89/92
+inside) garbles. Concluding from the window alone gets both wrong.
+
+Rule: to decide whether art survives a placement, intersect with the
+ACTUAL placed tile set (expand the placement pairs/records), or measure
+the pixels (`test_wide_render_content.sh`-style). The window is a bound,
+useful only for a fast "cannot be affected" exoneration when the
+intersection is EMPTY.

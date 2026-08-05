@@ -4,7 +4,10 @@
 # (CLAUDE.md rule 2 / persistent-suite doctrine). One command, no
 # chat-memory chain. Sections:
 #   0. test_id_space.sh / test_select_wheel.sh — reference-ROM rule locks
-#      (id-space shape, select-cursor mechanism); build-independent
+#      (id-space shape, select-cursor mechanism); build-independent;
+#      + test_romset_identity.sh / test_tenant_id.sh (cheap rule locks) and
+#      test_tenant_select_records.sh (M3a variant-id select mechanism —
+#      self-builds at 0x13, needs the WIDE MAME binary)
 #   1. test_m2b_stage6.sh    — build (with dev GEN_FLAGS) + static gfx
 #                              verification, guarded soaks, MASKED LEGACY
 #                              GATE (frozen flicker inventory — watch for
@@ -47,6 +50,19 @@ tests/test_select_wheel.sh
 # lived: a merged member carrying the pristine bytes of a patched member,
 # which both emulators prefer by hash. Cheap, build-independent, no emulator.
 tests/test_romset_identity.sh
+# The tenant id is a build input and the frozen reference must stay
+# reproducible while the M3a move is in progress. Cheap, no emulator.
+tests/test_tenant_id.sh
+# The M3a select-records mechanism (14z-62): a variant-id build must carry
+# the tenant's OWN select records and the host's must be vanilla bytes.
+# Builds its own 0x13 scratch build and measures the row fetch in MAME, so
+# it needs the WIDE emulator; skipped with a note where that is absent.
+if [ -x "${MAME_WIDE_BIN:-$HOME/.cache/vampire-saved/mame/cps2}" ]; then
+    tests/test_tenant_select_records.sh
+else
+    echo "note: tenant select-records gate skipped (no WIDE MAME binary —"
+    echo "      tools/setup_mame.sh; gate: tests/test_tenant_select_records.sh)"
+fi
 
 tests/test_m2b_stage6.sh "$OUTBASE"
 # The set under test must itself be free of that shadowing.

@@ -1611,3 +1611,76 @@ coord_list = 0x32A50A       # vanilla coord list (copied, never modified)
 expect_count = 17
 expect_budget = 0x55
 expect_cptr = 0x32A50A
+
+# ── SELECT RECORDS at a variant id (M3a select-records half, 14z-62) ─────────
+# The tenant's OWN select records: what the hovered cell displays. Emitted
+# ONLY when the tenant occupies a variant-half id (>= 0x10) — at the
+# substituted slot 0x0F, tools/select_port.py's in-place surgery remains the
+# mechanism and this section is inert, so the frozen references rebuild
+# byte-identically.
+#
+# Mechanism (docs/atlas/select_screen.md, measured 14z-61, gate
+# tests/test_select_arrays.sh): three UI pieces each ride a 32-row x 4-byte
+# record-pointer array per player (P2 array = P1 + 0x80), indexed by the
+# cursor CELL/ID with NO 4-bit fold. Rows 0x10-0x1F alias 0x00-0x0F in
+# vanilla, and no legacy gameplay path writes a variant-half id
+# (tests/audit_id_writers.sh) — so repointing the tenant's two rows per piece
+# touches nothing legacy content can reach, BY CONSTRUCTION.
+#
+# Per row the generator: asserts the vanilla anchors below; reads the vs2
+# source records (vs2's own arrays, same 32-row/+0x80 model, row = src_char);
+# remaps entry tile codes through select_port.PLACEMENTS; copies each coord
+# list; allocates list+body via the space model; pokes the two vj rows.
+# Composed records keep VS2'S OWN budget words — the rows are unreachable by
+# legacy ids, so the budget only debits frames that draw the tenant, which
+# are new-character content by definition.
+#
+# allow_placeholder_tiles: entries whose (tile,block) has no placement keep
+# their vs2 tile codes — same interim policy the maintainer ratified for the
+# wheel medallions ("imperfect medallion art is acceptable, mechanical
+# soundness is not"). They render correctly once the gfx half places select
+# art in WIDE group C. The portrait must NOT need placeholders (all its
+# blocks have had placements since M2b) — declaring false makes a placement
+# regression loud.
+[[select_records]]
+stage = 6
+name = "portrait"
+hole = "wide_ext"
+allow_placeholder_tiles = false
+vj_p1 = 0x26742A            # P1 array base (row 0 of 32)
+vj_p2 = 0x2674AA            # = vj_p1 + 0x80
+vs2_p1 = 0x2A0762           # vs2's arrays, same model (found via the known
+vs2_p2 = 0x2A07E2           #   Donovan record 0x2A63F0 = row 0x13, verified
+                            #   by row-shape on both halves)
+expect_vs2_p1 = 0x2A63F0    # vs2 row src_char (Donovan's records)
+expect_vs2_p2 = 0x2A6416
+expect_vj_alias_p1 = 0x2719DA   # vanilla vj row (tid & 0x0F) — the Victor
+expect_vj_alias_p2 = 0x271DEC   #   records the variant rows alias today
+
+[[select_records]]
+stage = 6
+name = "name_banner"
+hole = "wide_ext"
+allow_placeholder_tiles = true   # P2 tag tiles B22C/B2A5 unplaced until gfx half
+vj_p1 = 0x2675AA
+vj_p2 = 0x26762A
+vs2_p1 = 0x2A08E2
+vs2_p2 = 0x2A0962
+expect_vs2_p1 = 0x2A657E
+expect_vs2_p2 = 0x2A76A4
+expect_vj_alias_p1 = 0x272172
+expect_vj_alias_p2 = 0x273080
+
+[[select_records]]
+stage = 6
+name = "highlight"
+hole = "wide_ext"
+allow_placeholder_tiles = true   # lit-label tiles B000/B129 unplaced until gfx half
+vj_p1 = 0x268A02
+vj_p2 = 0x268A82
+vs2_p1 = 0x2A18FE
+vs2_p2 = 0x2A197E
+expect_vs2_p1 = 0x2A6750
+expect_vs2_p2 = 0x2A6F00
+expect_vj_alias_p1 = 0x272594
+expect_vj_alias_p2 = 0x2727C0

@@ -1020,3 +1020,57 @@ assets, all art/data byte detail):
   entry 200,32,0x3DC8,0x112A; name 144,40,0xBE8C,0x0202);
   test_don_colors select section + row-14 freeze, wheel-record-intact
   and Gallon-cell-intact (264,64,0xB4E3,0x2207) assertions.
+
+Session 14z-62 (M3a select-records half — the tenant's OWN select records
+at a variant id; generator section `select_records`, byte detail from the
+scratch build `build/m3a_selrec`, fingerprint dd88f343 — addresses of the
+allocations are the SPACE MODEL's output and may move with unrelated
+manifest changes; the six ARRAY ROW addresses are fixed by the id):
+- Emitted ONLY when the tenant id is variant-half (>= 0x10); at slot 0x0F
+  the section is inert and select_port.py remains the mechanism — frozen
+  references verified rebuilding bit-identical after the change
+  (stock `ae701ffb`, WIDE `9bac6ee3`).
+- Six poke32s, the whole program-side mechanism (arrays measured 14z-61,
+  P2 = P1 + 0x80, row = base + 4*id):
+    0x267476 <- portrait/p1 record   (was 0x2719DA, Victor alias)
+    0x2674F6 <- portrait/p2 record   (was 0x271DEC)
+    0x2675F6 <- name_banner/p1       (was 0x272172)
+    0x267676 <- name_banner/p2       (was 0x273080)
+    0x268A4E <- highlight/p1         (was 0x272594)
+    0x268ACE <- highlight/p2         (was 0x2727C0)
+- Twelve data ops (six records + six coord lists), composed independently
+  from vs2's OWN arrays (P1 0x2A0762 / 0x2A08E2 / 0x2A18FE, +0x80 for P2;
+  row 0x13 = 0x2A63F0/0x2A6416, 0x2A657E/0x2A76A4, 0x2A6750/0x2A6F00):
+  vs2 fmt/budget/count kept (budgets 0x5B/0x5B/0xA/0x3/0x5/0x2 — vs2's
+  own, NOT the host's: variant rows are unreachable by legacy ids, so the
+  budget debits only tenant-drawn frames), coord-list bytes copied
+  verbatim, entry tiles remapped via select_port.PLACEMENTS. On the
+  scratch build the allocator placed them at 0x400230-0x40034E (wide_ext)
+  plus one 4-byte gap-fit at 0x0CF360 (hole_a dead space; data raw inside
+  the encryption window, the stage-1 precedent).
+- PLACEHOLDER tile codes kept (no placement exists): name_banner/p2
+  0xB22C+0xB2A5, highlight/p1 0xB000 (the lit name label), highlight/p2
+  0xB129. The ratified medallion policy; they render as wrong pixels until
+  the gfx half places select art in WIDE group C.
+- select_tiles.json now comes FROM THE GENERATOR on variant-id builds
+  (101 pairs — only the composed records' art: portrait both sides + name
+  p1). The slot-0x0F splash/win-quote placement families are NOT written,
+  so that host art returns to pristine on this track.
+- Host program bytes VANILLA again (checked byte-for-byte by the gate):
+  record block PRG:0x271900-0x274700, select-palette grid column char 0x0F
+  (11 variants at 0x3AC000), shared name-banner coord list 0x32A196.
+- MEASURED interim state (scratch build, snapshots in session artifacts):
+  tenant cell 0x13 hover shows Donovan portrait + name; pick reaches the
+  speed menu; legacy hover (Demitri) vanilla. Host (Jedah) select ART
+  still garbles: 89/92 of his portrait tiles sit INSIDE the tenant-placed
+  fighter band [0xAD8F,0xEA3F] (his select art lives in his own bank-2
+  band, not the select bank) — resolves when the gfx half moves the
+  tenant's band to group C. His name banner happens to fall in placement
+  gaps and renders correctly.
+- Refusals added: tenant ids 0x12 (Gallon select variant) and 0x18 (Oboro)
+  now refused in normalise_tenants (docs/atlas/id_space.md reservations).
+- Gate: tests/test_tenant_select_records.sh (static composition re-derived
+  independently + 3 negative controls incl. verdict-logic tests + the
+  engine's own row-fetch sequence onto cell 0x13 via replay
+  36_pick_tenant_cell.rpl, all three pieces). Wired into
+  tests/run_battery_m2.sh with test_tenant_id.sh.

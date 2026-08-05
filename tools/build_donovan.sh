@@ -70,12 +70,24 @@ python3 tools/gen_donovan_patch.py "$OUTBASE/extract" "$OUTBASE/patch" \
 python3 tools/patch_prg.py "$ROMDIR/vsavj.zip" "$OUTBASE/prg" \
     --patch "$OUTBASE/patch/patch.json" | tail -3
 
-# Stage 6+: select-screen portrait/name/highlight — in-place record
-# surgery on Jedah's three wheel records (both sides alias them) +
-# bank-1 tile placement map (docs/engine_internals.md phase 2).
+# Stage 6+: select-screen portrait/name/highlight. Two mechanisms, chosen
+# by the tenant's id (patch/tenant.json, written by the generator):
+#   base-half id (the substituted slot 0x0F): tools/select_port.py in-place
+#     record surgery on the host's records — the frozen-reference mechanism.
+#   variant-half id (M3a de-substitution): the records were COMPOSED BY THE
+#     GENERATOR into space-model allocations and the six array rows poked in
+#     patch.json; select_port must NOT run — the host's records stay
+#     vanilla. The generator also emitted the matching tile-placement map.
+TEN_ID="$(python3 -c "import json;print(json.load(open('$OUTBASE/patch/tenant.json'))['id'])")"
 if [ "$STAGE" -ge 6 ]; then
-    python3 tools/select_port.py "$OUTBASE/prg" --vs2 "$ROMDIR/vsav2.zip" \
-        --tiles-out "$OUTBASE/select_tiles.json" | tail -5
+    if [ "$TEN_ID" -lt 16 ]; then
+        python3 tools/select_port.py "$OUTBASE/prg" --vs2 "$ROMDIR/vsav2.zip" \
+            --tiles-out "$OUTBASE/select_tiles.json" | tail -5
+    else
+        echo "select: tenant at variant id $TEN_ID — records generated" \
+             "(select_port skipped; the host's select records stay vanilla)"
+        cp "$OUTBASE/patch/select_tiles.json" "$OUTBASE/select_tiles.json"
+    fi
 fi
 
 rm -rf "$OUTBASE/rompath"

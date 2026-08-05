@@ -1,0 +1,16 @@
+# 36: walk the cursor onto the APPENDED wheel cell 0x13 (the tenant's native
+# vs2 id) and pick it. Path from the default Demitri cell: L -> 0x05, L ->
+# 0x0A, D -> 0x09 (Aulbath), D -> 0x13 via the 14z-60s wheel extension's
+# inbound edge, hover, confirm, run past match start.
+# BUILD-ONLY replay: on vanilla vsavj the final D lands on 0x0B (random) —
+# this script is meaningful only on a build carrying the extended wheel AND
+# a tenant at id 0x13 (the M3a select-records gate,
+# tests/test_tenant_select_records.sh).
+300-305 sys=C1
+800-803 sys=S1
+1000-1002 p1=L
+1040-1042 p1=L
+1080-1082 p1=D
+1120-1122 p1=D
+1700-1702 p1=1
+3600 wait
