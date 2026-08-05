@@ -25,4 +25,5 @@ and MAME (verification target), with a MiSTer CPS-2 core patch as a stretch goal
 
 No ROM content is committed or distributed, ever. Deliverables are patches
 against named commercial dumps, tools, and documentation. Contributors supply
-their own reference sets. The repo documents findings, never extracted assets.
+their own reference sets. The repo documents findings, never extracted assets 
+that could be used without the original code.
