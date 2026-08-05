@@ -102,7 +102,25 @@ legacy behavior is a failed change.
   Note this class is STRICTER than the frozen first-divergence constant
   above, which never re-converges at all — it is a narrower licence for one
   screen, not a loosening. Checker `tools/compare_window.py`, ground-truthed
-  by `tests/test_compare_window.sh`. Every non-exact class must be
+  by `tests/test_compare_window.sh`. **Added v4 2026-08-06
+  (maintainer-ratified): composite** — the strict CONJUNCTION of
+  flicker-tolerated and bounded re-convergent window, for replays that
+  exhibit both. It adds NO tolerance: every divergent run must be accounted
+  for by name, the flicker set must match its frozen inventory exactly, the
+  window list must match exactly, and the run must fully re-converge; it
+  therefore permits nothing that either component permits alone, and a
+  bit-identical pair FAILS it. Introduced because on a build carrying BOTH
+  engine hooks and the extended select wheel, every select-reaching legacy
+  replay measures as "the frozen hook-flicker inventory + one bounded
+  window per select-screen ENTRY". Measured over seven replays before
+  ratification (14z-61): every flicker frame matched the frozen `donovan-
+  m2c` inventory with **none added and none missing**, and the windows were
+  attributable one-to-one to select entries — including a replay with TWO
+  windows (the challenger join re-enters the screen) and one whose onset is
+  3190 rather than 890 (it starts mid-attract). Checker
+  `tools/compare_composite.py`, ground-truthed by
+  `tests/test_compare_composite.sh` (seven cases plus a no-loophole check).
+  Every non-exact class must be
   mechanism-attributed and its expectation frozen; a replay may not be
   reclassified to a looser class without a new measured mechanism and
   maintainer sign-off. **Standing watch (maintainer, 2026-07-27): if

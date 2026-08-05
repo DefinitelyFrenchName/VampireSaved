@@ -185,14 +185,20 @@ what the mechanism predicts, which is the point of writing predictions
 down.
 
 §4 says a replay may not be reclassified without a new measured mechanism
-AND maintainer sign-off, so those seven are **NOT frozen**. They carry
-`.pending` expectations — a new expectation kind that reports
-`PENDING — not validated`, prints the measured shape and the proposed spec,
-and **fails the suite**. An unvalidated replay must never read as green;
-`.skip` would have been the comfortable lie.
+AND maintainer sign-off, so those seven were first frozen as `.pending` —
+a new expectation kind that reports `PENDING — not validated`, prints the
+measured shape and the proposed spec, and **fails the suite**. An
+unvalidated replay must never read as green; `.skip` would have been the
+comfortable lie.
 
-So `run_suite.sh` on the WIDE reference is RED by exactly seven replays,
-each red for a stated, measured reason. Everything else is frozen and green.
+**RATIFIED the same day** (maintainer: "Your proposal is ratified"). The
+`composite` class is now CLAUDE.md §4 v4, the seven `.pending` files became
+`.masked` `composite` specs carrying exactly the shapes they had printed,
+and the freeze is complete: **`run_suite.sh` on `donovan-m5w` is GREEN** —
+47 validated (33 self-frozen, 3 `diverge`, 4 `window`, 7 `composite`) and
+16 explicitly skipped, out of 63 replays. `.pending` stays in the runner as
+the correct way to record "measured but not yet ratified" without ever
+reading as green.
 
 Also wired: the ratified §4 v3 `window` class is now a `.masked` class in
 `run_suite.sh` (it existed as a checker with ground truth, but nothing in
@@ -5432,8 +5438,17 @@ window per measured slot, never pre-widen.
 
 ## Decisions pending (human)
 
-- **RATIFY A COMPOSITE §4 CLASS? (14z-61) — blocks 7 replays of the WIDE
-  reference freeze.** Seven legacy replays measure as the frozen
+- ~~**RATIFY A COMPOSITE §4 CLASS? (14z-61)**~~ **RATIFIED 2026-08-06
+  (maintainer: "Your proposal is ratified").** CLAUDE.md §4 amended: the
+  `composite` class is the strict CONJUNCTION of flicker-tolerated and
+  bounded re-convergent window, adding no tolerance to either. The seven
+  `.pending` expectations became `.masked` `composite` specs carrying the
+  shapes they had already printed, and the WIDE reference freeze is
+  complete — `run_suite.sh` on `donovan-m5w` is GREEN, all 63 replays
+  validated or explicitly skipped. Original entry below.
+
+- **RATIFY A COMPOSITE §4 CLASS? (14z-61) — the analysis behind the
+  decision above.** Seven legacy replays measure as the frozen
   hook-flicker inventory PLUS one bounded re-convergent window per
   select-screen ENTRY (table in 14z-61). Both halves are already ratified —
   `flicker` (§4 v2) and `window` (§4 v3) — but no single class expresses

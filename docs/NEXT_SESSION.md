@@ -54,38 +54,37 @@ tools/run_wide.sh build/m5_wide fbneo     # NOT build/m5w — that is the known-
 Still open and still unrelated: the minor win-screen palette items from the
 original playtest.
 
-## The WIDE reference is FROZEN — with seven replays deliberately left red
+## The WIDE reference is FROZEN and the suite is GREEN
 
 `9bac6ee3 -> donovan-m5w` is registered; the known-bad `ac52eeff` row is
 commented out on purpose so that build fails as UNREGISTERED rather than
-validating against this set. Expectation set: 33 self-frozen `.sha1`, 7
-authored `.masked`, 16 `.skip`, **7 `.pending`**.
+validating against this set.
 
 ```sh
 MAME_BIN=~/.cache/vampire-saved/mame/cps2 \
 MAME_ROMPATH="$PWD/build/m5_wide/rompath;$ROMDIR" tests/run_suite.sh vsavjw
 ```
 
-**It reports SUITE RED, by exactly seven replays, on purpose.** Those seven
-measure as the frozen hook-flicker inventory PLUS one bounded window per
-select-screen entry — a conjunction of two ratified §4 classes that no
-single class can express. §4 forbids reclassifying without maintainer
-sign-off, so they are `.pending`: the runner prints the measured shape and
-the proposed spec and FAILS. `.skip` would have been the comfortable lie.
+All 63 replays accounted for: 33 self-frozen `.sha1` + full logs, 14
+authored `.masked` (3 `diverge`, 4 §4 v3 `window`, 7 §4 v4 `composite`), 16
+`.skip`. **CLAUDE.md §4 gained the `composite` class** (maintainer-ratified
+2026-08-06) — the strict conjunction of `flicker` and `window`, adding no
+tolerance to either: every divergent run accounted for by name, both frozen
+lists matched exactly, full re-convergence, and a bit-identical pair FAILS.
+Checker `tools/compare_composite.py`, ground truth
+`tests/test_compare_composite.sh`.
 
-**The decision is in STATE "Decisions pending"** and costs one word: ratify
-`composite` (implemented as `tools/compare_composite.py`, ground-truthed by
-`tests/test_compare_composite.sh` — 7 cases + a no-loophole check), and each
-`.pending` becomes the `.masked` spec it already prints. Recommended; the
-alternatives are hiding a real comparison behind `skip` or loosening
-`flicker` enough to swallow a 900-frame run.
+The `.pending` expectation kind stays in the runner. It is the right way to
+say "measured, mechanism attributed, not yet ratified" without ever reading
+as green — reach for it instead of `.skip` the next time a shape outruns
+the vocabulary.
 
 ## Ship state
 
 | Track | Fingerprint | Packs as | Status |
 |---|---|---|---|
 | **stock** | `ae701ffb` (`build/m5_stock`) | `vsavj.zip` | playtested clean to round 65; rebuild reproduces the fingerprint exactly |
-| **WIDE** | `9bac6ee3` (`build/m5_wide`) | `vsavjw.zip` | garble FIXED, gated, playtest-confirmed, **FROZEN as `donovan-m5w`** (7 replays `.pending` a §4 ratification) |
+| **WIDE** | `9bac6ee3` (`build/m5_wide`) | `vsavjw.zip` | garble FIXED, gated, playtest-confirmed, **FROZEN as `donovan-m5w`**, suite GREEN |
 | ~~WIDE~~ | `ac52eeff` (`build/m5w`) | — | KNOWN-BAD, kept as evidence. Do not run |
 
 ## Queued (the roster work the bug was blocking)
