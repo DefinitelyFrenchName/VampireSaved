@@ -388,6 +388,42 @@ rightmost) — measured in the table and confirmed in-emulator by the
 128-transition walk. Nothing in this change touches those cells, so the
 behaviours coexist.
 
+## Drawing the new medallions — the record, and why it cannot grow in place
+
+TABLE B only decides where the cursor GOES. The medallions themselves come
+from one OBJ record:
+
+```
+wheel record @ PRG:0x272A68   format=0002  budget=0x55(85)  count=0x11(17)
+                              cptr -> PRG:0x32A50A
+  18 entries (tile.w, attr.w) at +10, spanning 0x272A72..0x272ABA
+  entry 8 is the 3x3 cell (tile b4e3, pal 07 — Gallon); entries 4 and 5 are
+  the two 1x1 decorations
+```
+
+Adding three cells means 21 entries (+12 bytes) and 21 coordinate pairs
+(+12 bytes). **Neither can grow in place:**
+
+- another record begins immediately at `0x272ABA` (`format=0000,
+  count=0004, cptr=0x3187E6`);
+- the coordinate list ends at `0x32A552` and is immediately followed by
+  more coordinate data — the shared global X/Y pool, whose lists nest
+  inside one another (GOTCHAS).
+
+So both must be **relocated**, which is mechanically cheap: the record has
+exactly **one** referrer, a longword at `PRG:0x2689FE` sitting in a run of
+record pointers. Copy record and list into profile-gated space, widen them,
+repoint that one longword.
+
+**What is NOT cheap is the RAM consequence** — see the decision entry in
+STATE. The `count` word changes (17 → 20) and the `budget` word is debited
+from the OBJ emitter's shared per-frame budget, which GOTCHAS records as
+having flipped a borderline skip decision and produced a one-byte work-RAM
+divergence once already. Three additional sprites also render. The M2b
+select work avoided all of this by strict in-place replacement with the
+host's budget word preserved; **adding cells makes that impossible by
+construction.**
+
 ## Re-measuring
 
 ```sh

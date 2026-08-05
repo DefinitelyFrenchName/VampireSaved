@@ -5138,6 +5138,46 @@ window per measured slot, never pre-widen.
 
 ## Decisions pending (human)
 
+- **THE SELECT SCREEN AND THE SUPERSET INVARIANT (14z-60r).** Drawing three
+  new medallions requires the wheel OBJ record to grow from 18 to 21
+  entries and its coordinate list likewise. Measured: neither can grow in
+  place (another record starts immediately at `0x272ABA`; the coord list is
+  immediately followed by the shared global pool), so both must relocate —
+  cheap, one referrer at `PRG:0x2689FE`. **The problem is not placement, it
+  is the invariant.**
+
+  The record's `count` word changes and its `budget` word is debited from
+  the OBJ emitter's shared per-frame budget — GOTCHAS records that exact
+  coupling flipping a borderline skip decision into a one-byte work-RAM
+  divergence. Three more sprites also render. **So any legacy replay that
+  reaches the select screen will diverge in RAM.** M2b's select work avoided
+  this by strict in-place replacement preserving the host's budget word;
+  adding CELLS makes that impossible by construction.
+
+  CLAUDE.md §1 covers "any match, **menu path**, or attract sequence", so
+  this needs an explicit ruling rather than an assumption:
+
+  **A — a bounded select-screen carve-out (recommended).** Legacy replays
+  are compared as today up to select entry, and the select-screen
+  divergence is MEASURED, mechanism-attributed and frozen per replay, in
+  the same style as the existing `diverge` constants and masked windows.
+  Rationale: the invariant's purpose is that vanilla *gameplay* is
+  untouched, and a select screen that offers three more characters is by
+  definition content that involves them. Condition: the divergence is
+  measured and frozen BEFORE acceptance, never accepted blind, and must not
+  extend past the select screen into match state.
+
+  **B — keep the wheel vanilla**, reach the newcomers by another mechanism
+  (the option-2 hold-Start alternates the maintainer already ranked lower).
+  Preserves the invariant literally; costs the decided roster UX.
+
+  **C — attempt a RAM-neutral extension.** Not viable: the budget word must
+  cover the entries actually emitted, and three extra sprites change OBJ RAM
+  regardless. Recorded so it is not re-proposed.
+
+  **Recommendation: A**, with the measurement done first so the ruling is
+  made on a number rather than on a prediction.
+
 - ~~**THE `0x360+id` ANIM BLOCK (14z-60)**~~ **DECIDED 2026-08-05
   (maintainer): option A, INHERIT — "since we can. If it fails, we'll
   fall back to option B (relocation)."** So a newcomer at `0x13` plays
