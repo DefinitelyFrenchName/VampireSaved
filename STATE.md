@@ -5035,6 +5035,38 @@ opcode-space dump oracle (`tests/test_decrypt_oracle.sh`). Both directions
   files are LE-word storage; all derived images are 68k logical (BE) order.
   See docs/GOTCHAS.md first entry.
 
+## STANDING PRINCIPLE (maintainer, 2026-08-05): vanilla wins ties
+
+"vsav vanilla is always better when we can." **When a console port and
+arcade vsav differ and both would work, take vanilla.** A console port's
+choice is not evidence that vanilla is wrong; it is evidence of what that
+port's designers preferred.
+
+This is a general rule, not a one-off: the PS1 capture is a reference for
+what is POSSIBLE and for data we cannot otherwise obtain (cell placement,
+the adjacency of NEW cells), not a style guide for content vsav already
+defines. Paired with the maintainer's other statement — "as long as we can
+select characters it's good" — the test is: does keeping vanilla still let
+the feature work? If yes, keep vanilla.
+
+Applied immediately, twice:
+- **`Bishamon DL` and `Aulbath DR` stay vanilla** (Anakaris / Sasquatch).
+  PS1 sets both to "no move"; neither is needed for reachability, so
+  vanilla stands.
+- **Horizontal wrap stays vanilla.** Vsav wraps left/right (cell `0x01`
+  Left goes to `0x05`, measured and confirmed in-emulator); the PS1 report
+  of "no wrapping" reflects untested extremes. We touch none of those
+  cells, so nothing to decide.
+
+Judgment applied under the same rule, open to veto: the three inbound edges
+from `0x0B` (`D`/`DL`/`DR` into the new row) DO diverge from vanilla, and
+strictly they are not required — Phobos and Donovan are already reachable
+via `Bishamon D` and `Aulbath D`, and Pyron through them. They are kept
+because without them, pressing Down on the cell directly above the new row
+does nothing while three medallions are visible below it, which is the UX
+failure "as long as we can select characters" is meant to exclude. Dropping
+them would reduce the legacy footprint from 5 bytes to 2.
+
 ## Decision made (maintainer, 2026-08-05): new cells SNAP to vsav's lattice
 
 "It feels safer to conform to arcade vsav and snap to it. As long as the UX

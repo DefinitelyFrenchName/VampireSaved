@@ -368,13 +368,15 @@ Inbound edges (the only changes to EXISTING cells): `0x08 D -> 0x10`,
 legacy footprint that still makes the three cells reachable. Layout:
 `build/manifest/wheel_layout_proposed.json`.
 
-### Two PS1 changes deliberately NOT adopted
+### Two PS1 changes deliberately NOT adopted — RATIFIED
 
 PS1 also sets `Bishamon DL` and `Aulbath DR` to "no move", where vanilla
 sends them to Anakaris and Sasquatch. Neither is needed for reachability,
-and each would change how the wheel behaves for players who never touch the
-new characters. They are left at vanilla; adopting them is a feel decision,
-not a correctness one.
+so both stay vanilla. **Maintainer, 2026-08-05: "vsav vanilla is always
+better when we can"** — now a standing principle (STATE): when a console
+port and arcade vsav differ and both work, take vanilla. The capture is a
+reference for what is possible and for data vsav does not contain, not a
+style guide for content vsav already defines.
 
 ### A note on wrapping
 
