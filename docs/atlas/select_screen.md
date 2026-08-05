@@ -253,6 +253,40 @@ and it makes `0x12` **reserved**: no tenant may take it
 "Dark Talbain rides a different mechanism" open item in
 `character_tables.md`.
 
+## Consuming a console capture: `tools/wheel_layout.py`
+
+The console ports' select screen is the reference for where three new cells
+go. Two modes:
+
+```sh
+# 1. map capture pixel coords into the arcade frame
+tools/wheel_layout.py fit --refs refs.json
+
+# 2. draft + validate a layout, and print the exact byte diff
+tools/wheel_layout.py propose --data build/out/vsavj_data.bin --layout layout.json
+```
+
+**`fit` is why capture geometry barely matters.** It least-squares an
+affine map from the capture's pixels to the arcade frame using the 16 cells
+whose arcade positions are already measured. Independent horizontal and
+vertical scale means non-square pixels, an arbitrary crop, and **a
+field-only deinterlace that halves vertical resolution** are all just
+coefficients — nothing to correct beforehand. Ground-truthed on a simulated
+512×448 capture with halved vertical resolution and ±1px measurement noise:
+the three unknown cells came back within **0.3 arcade px**, RMS residual
+0.65. The tool prints the residual, so a bad reference set is visible
+rather than silent.
+
+**`propose` drafts adjacency but does not trust it.** The draft uses the
+geometric model (wrap 184, ±65° sectors) that reaches only 100/128 against
+Capcom's own table, and every drafted direction is labelled `DRAFT` so a
+human corrects it. What the tool *does* enforce: every target is a live
+cell, each new cell is reachable from the default cell `0x01` (not merely
+the target of something — three new cells pointing only at each other form
+an island, and that is caught), and no **reserved** id is used
+(`docs/atlas/id_space.md`: `0x12`, `0x18`). Output is the byte diff against
+vanilla TABLE B, ready to become a manifest row.
+
 ## Re-measuring
 
 ```sh
