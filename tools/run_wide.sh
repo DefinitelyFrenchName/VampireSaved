@@ -42,9 +42,28 @@ fbneo)
     strings -a "$BIN" 2>/dev/null | grep -q "CPS-2 WIDE v1" || {
         echo "$BIN does not carry the CPS-2 WIDE profile." >&2
         echo "Build the patched binary: tools/setup_fbneo.sh" >&2; exit 1; }
+    # FBNeo's SDL frontend has NO -rompath option (verified in
+    # src/burner/sdl: paths live in szAppRomPaths, defaulting to
+    # "/usr/local/share/roms/" and "roms/" RELATIVE TO CWD). Passing
+    # -rompath, as this script used to, is silently ignored and FBNeo then
+    # looks somewhere with no vsavjw.zip — which is exactly the "I cannot
+    # launch it" failure. Build the overlay directory the replay runner
+    # uses and run from it: reference zips first, the build's zips win.
+    PLAY="${FBNEO_PLAY_DIR:-$HOME/.cache/vampire-saved/fbneo-play}"
+    mkdir -p "$PLAY/roms"
+    rm -f "$PLAY/roms"/*.zip
+    for z in "$ROMDIR"/*.zip;  do ln -sf "$z" "$PLAY/roms/$(basename "$z")"; done
+    for z in "$RP"/*.zip;      do ln -sf "$z" "$PLAY/roms/$(basename "$z")"; done
     echo "FBNeo: $BIN"
-    echo "set vsavjw, rompath $RP"
-    exec "$BIN" vsavjw -rompath "$RP;$ROMDIR" "$@"
+    echo "set vsavjw, roms dir $PLAY/roms (build overlays \$ROMDIR)"
+    # HOME is pinned to a STABLE dir (not a fresh temp one) so anything
+    # that honours it persists between playtests. NOTE, measured: on macOS
+    # FBNeo ignores it for support paths and still writes config/savestates
+    # under ~/Library/Application Support/fbneo — the documented gotcha
+    # that "$HOME overrides do NOT sandbox FBNeo on macOS". That is FINE
+    # for playtesting (your controls persist naturally); it is only a
+    # problem for determinism harnesses, which use their own sandbox.
+    cd "$PLAY" && exec env HOME="$PLAY" "$BIN" vsavjw "$@"
     ;;
 mame)
     BIN="${MAME_BIN:-$HOME/.cache/vampire-saved/mame/cps2}"

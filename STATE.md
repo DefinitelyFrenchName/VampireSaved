@@ -5035,6 +5035,16 @@ opcode-space dump oracle (`tests/test_decrypt_oracle.sh`). Both directions
   files are LE-word storage; all derived images are 68k logical (BE) order.
   See docs/GOTCHAS.md first entry.
 
+## Decision made (maintainer, 2026-08-05): 0x360+id anim block = INHERIT
+
+Option A: the newcomers inherit their base character's animation from the
+shared 16-wide block `0x360-0x36F` (a tenant at `0x13` plays `0x363`),
+exactly as vsav2 ships — Capcom left both those folds in place. Sites
+`PRG:0x003E40` / `PRG:0x004082` therefore stay folded, recorded as
+`inherit` in `docs/tenant_manifest.md`. **Fallback, if a playtest shows the
+inherited animation is wrong for a newcomer: option B**, relocate the block
+to a free 32-wide anim-number range and widen both masks.
+
 ## Decision made (maintainer, 2026-08-04): M5 voice samples = A then B
 
 "A then B, gates stay strict, option C is rejected." Ship the unfaithful
@@ -5072,7 +5082,18 @@ window per measured slot, never pre-widen.
 
 ## Decisions pending (human)
 
-- **THE `0x360+id` ANIM BLOCK (14z-60)** — of the seven sites that fold the
+- ~~**THE `0x360+id` ANIM BLOCK (14z-60)**~~ **DECIDED 2026-08-05
+  (maintainer): option A, INHERIT — "since we can. If it fails, we'll
+  fall back to option B (relocation)."** So a newcomer at `0x13` plays
+  anim `0x363` from the shared `0x360-0x36F` block, exactly as vsav2
+  ships; sites `PRG:0x003E40` and `PRG:0x004082` stay folded and are
+  recorded as `inherit` in the tenant manifest. Fallback if playtest shows
+  the inherited animation is wrong for a newcomer: relocate the block to a
+  free 32-wide anim-number range and widen both masks. Original write-up
+  kept below.
+
+- **THE `0x360+id` ANIM BLOCK (14z-60) — the analysis behind the decision
+  above** — of the seven sites that fold the
   character id to 4 bits, five are ordinary porting work; two
   (`PRG:0x003E40`, `PRG:0x004082`) compute a per-character anim number in a
   block that is genuinely 16 wide (`0x360-0x36F`, with `0x370+` already
