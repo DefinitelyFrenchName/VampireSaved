@@ -124,15 +124,51 @@ rendering change. Ground truth: `tests/test_replay_video_selfcheck.sh`.
 export ROMDIR=/path/to/reference/sets
 tools/run_wide.sh build/m5w fbneo      # or: ... mame
 ```
-Three things must agree — the PATCHED binary (the `vsavjw` driver exists
-only there), the set name `vsavjw`, and a rompath fronting the build over
-`$ROMDIR`. `run_wide.sh` asserts all three and says which is wrong.
 
-**Stock MAME reports "unknown system" and that is an EMULATOR problem, not
-a ROM problem. Never rename `vsavjw.zip` to `vsavj.zip` to force it** — it
+Three things must agree and `run_wide.sh` asserts all three, naming the one
+that is wrong: the **patched binary** (the `vsavjw` driver exists only
+there), the **set name** `vsavjw`, and a **rom search path** that fronts the
+build over `$ROMDIR`.
+
+**The two emulators take that third one completely differently**, which is
+what made this fail confusingly:
+
+| | how it finds roms |
+|---|---|
+| **MAME** | `-rompath "<build>/rompath;$ROMDIR"` — supported, works |
+| **FBNeo** | **no `-rompath` option exists.** `szAppRomPaths[]` defaults to `/usr/local/share/roms/` and **`roms/` relative to cwd** (`src/burner/sdl/drv.cpp:6`) |
+
+So for FBNeo the script builds an overlay dir (reference zips first, the
+build's zips win) and runs the emulator from it. Passing `-rompath` to
+FBNeo is silently ignored — it does not error, it just looks in the wrong
+place and reports the set as missing.
+
+### If it still will not start, in order
+
+1. **Is there a WIDE build to run?**
+   `ls build/m5w/rompath/vsavjw.zip`. If instead you have `vsavj.zip`, that
+   build was made without `--profile cps2-wide-v1` and there is nothing
+   WIDE to launch — rebuild:
+   `KEY_SET=vsavj GEN_FLAGS="--allow-plausible --tripwire-open --profile cps2-wide-v1" tools/build_donovan.sh 6 build/m5w`
+2. **Does the binary carry the profile?**
+   FBNeo: `strings -a emu/fbneo/fbneo | grep "CPS-2 WIDE v1"` (plain
+   `grep -q` on the binary is unreliable — GOTCHAS).
+   MAME: `~/.cache/vampire-saved/mame/cps2 -listfull vsavjw`.
+   Either silent → build it: `tools/setup_fbneo.sh` / `tools/setup_mame.sh`.
+3. **Is `ROMDIR` exported and clean?** `python3 tools/audit_roms.py "$ROMDIR"`.
+4. **Read the emulator's own load log.** A healthy FBNeo start prints
+   `CPS-2 WIDE v1 profile active`, `68K ROM size: 0x00600000`,
+   `Graphics data: 0x03000000`, `QSound data: 0x01000000`, then
+   `Loading program (vsw.41)... (OK)` through `vsw.44`. **31 members load
+   OK.** A member reading `(OK)` is not proof by itself — FBNeo substitutes
+   0xFF fill on a CRC mismatch while still printing `(OK)` (GOTCHAS) — but
+   a *missing* line or a wrong region size localises the problem fast.
+
+**"Unknown system: vsavjw" is an EMULATOR problem, not a ROM problem, and
+renaming `vsavjw.zip` to `vsavj.zip` to force it is actively harmful** — it
 boots under the stock 4MB descriptor with the sfx helper live and the sound
 pointer aimed at the CPS2 register window, re-creating the music bug while
-looking fine (docs/GOTCHAS.md).
+looking fine. See GOTCHAS.
 
 ## Platform / migration notes (14z-59d)
 

@@ -1493,3 +1493,25 @@ as `imm < 0x10` miscounted vsav2's `andi.b #$01,$382(a4)`, which is a
 2-value toggle over ids 0/1 on a second cycling path, not a fold. A mask
 folds the variant half only if it keeps the low nibble whole and clears bit
 4 — i.e. exactly `#$0f`.
+
+## FBNeo's SDL frontend has NO `-rompath` — the flag is silently ignored
+(paid: 2026-08-05, 14z-60m — cost the maintainer several failed launches)
+`tools/run_wide.sh` launched FBNeo as
+`fbneo vsavjw -rompath "<build>;$ROMDIR"`. MAME supports `-rompath`; **FBNeo
+does not**. Rom paths live in `szAppRomPaths[]`, defaulting to
+`/usr/local/share/roms/` and **`roms/` relative to the CWD**
+(`src/burner/sdl/drv.cpp:6`), and are otherwise set from the config file.
+An unknown option is not rejected — FBNeo simply searches its configured
+paths, finds no `vsavjw.zip`, and reports the set as unavailable. The
+symptom therefore reads as "my romset is wrong" when the romset is fine.
+
+The working pattern was already in the tree: `run_replay_fbneo.sh` builds a
+`roms/` directory of symlinks (reference zips first, the build's zips
+overlaying them) and runs FBNeo from that directory. `run_wide.sh` now does
+the same.
+
+Two general lessons: **a launcher that wraps two emulators must not assume
+they share a CLI** — the same conceptual argument was supported by one and
+silently dropped by the other; and **assert on the emulator's own load
+output**, not on the process starting. A healthy WIDE start prints
+`CPS-2 WIDE v1 profile active` and 31 `(OK)` member lines.
