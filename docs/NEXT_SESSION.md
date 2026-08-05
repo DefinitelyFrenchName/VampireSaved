@@ -1,134 +1,124 @@
-# NEXT SESSION — orientation (session 14z-61, 2026-08-05)
+# NEXT SESSION — orientation (written at the close of 14z-61, 2026-08-06)
 
-Read STATE.md **14z-61 first** (the bug that blocked everything is closed),
-then `14z-60..60z` for the roster work it was blocking. The maintainer tests
-frequently and reports precisely — their reports are the project's best
-instrument, and this bug is the proof: no automated gate saw it.
+**Start here: M3a has two halves left, both content PLACEMENT.** Everything
+else is green — read this page, then STATE.md `14z-61` for the detail. The
+maintainer tests frequently and reports precisely; their reports are the
+project's best instrument, and 14z-61 is the proof (no automated gate saw
+the bug they found).
 
-## THE OPEN BUG IS CLOSED — and it was not what it looked like
+## Where to start, concretely
 
-**WIDE rendered Donovan and Anita with vanilla art** because the shipped
-WIDE romset carried gfx group C as **byte copies of the stock group B**
-(the B4 canary shape, which the documented build recipe passed to every
-content build). Copies carry the originals' CRCs, and **both emulators
-resolve a ROM entry by HASH before falling back to its NAME** — so group
-B's declared CRC matched those copies and the loader served PRISTINE tiles
-for the members the build had patched. Right geometry, wrong pixels, no
-error, no `0xFF` fill, every RAM gate green.
-
-Not the emulator. The OBJ records are bit-identical between the two tracks
-(2,277 live entries, zero differences), y-word bit 12 is never set on this
-content, and the drawn Y is masked to `0x03FF` so bit 12 was never a
-coordinate bit either. The 14z-60y measurement that "cleared" the tile data
-was taken at tile `0xAD8F` — the sprite's code word **without its bank
-bits**; the real address is `0x2AD8F`.
-
-Fixed in the pipeline, not in a file:
-
-- `build/wide0/rompath` = shippable overlay (group C zero fill);
-  `build/wide_canary/rompath` = the canary. The profile gates read
-  `CANARY_ROMPATH` so the split costs no coverage.
-- `tools/audit_romset_identity.py` — no member may carry the pristine bytes
-  of a member the build patched. Wired into `build_donovan.sh` (hard fail)
-  and `pack_build.sh`. Ground truth: `tests/test_romset_identity.sh`.
-- `tests/test_wide_render_content.sh` — the missing rendering gate: pixel
-  A/B of a Donovan replay, stock track vs WIDE, **3,721/3,721 frames
-  identical**, plus a positive control that poisons a set back into the
-  failing shape (it diverges on 2,542 frames) and a tile-band check with a
-  pristine negative control. ~60 s.
-
-## Playtest CONFIRMED — the WIDE track is unblocked
-
-Maintainer, 2026-08-05, on `build/m5_wide` (`9bac6ee3`): *"Initial tests with
-and without Donovan look good. No obvious regression, all graphics look good,
-gameplay feels genuine, all present sounds are good."* That covers both the
-ported content and the legacy path, and it also puts the 14z-60 select-wheel
-extension (`PRG:0x2689FE`, `PRG:0x021227`, 148 bytes in the extension member,
-absent from `m5w`) in a human's hands for the first time.
+**Do the select records first.** It is the smaller half, it is independently
+testable against a gate that already exists, and it makes Jedah's select
+screen vanilla again — half of de-substitution, visible immediately.
 
 ```sh
 export ROMDIR=/Users/koneko/Developer/Vampire_Saved/ROMS
-tools/run_wide.sh build/m5_wide fbneo     # NOT build/m5w — that is the known-bad artifact
+tests/test_select_arrays.sh          # ~13s — the measured model you are building on
+KEY_SET=vsavj GEN_FLAGS="--allow-plausible --tripwire-open \
+    --profile cps2-wide-v1 --tenant-id 0x13" tools/build_donovan.sh 6 build/m3a
 ```
 
-Still open and still unrelated: the minor win-screen palette items from the
-original playtest.
+The mechanism is measured and frozen (`docs/atlas/select_screen.md`): the
+tenant at `0x13` owns **six longs**, two per UI piece —
 
-## The WIDE reference is FROZEN and the suite is GREEN
+| piece | P1 | P2 |
+|---|---|---|
+| big portrait | `PRG:0x267476` | `PRG:0x2674F6` |
+| name banner | `PRG:0x2675F6` | `PRG:0x267676` |
+| cursor highlight | `PRG:0x268A4E` | `PRG:0x268ACE` |
 
-`9bac6ee3 -> donovan-m5w` is registered; the known-bad `ac52eeff` row is
-commented out on purpose so that build fails as UNREGISTERED rather than
-validating against this set.
+— all currently Victor aliases, all in the variant half no legacy id can
+index. **The pointer math is not the work.** The work is that
+`tools/select_port.py` writes the tenant's record BYTES over Jedah's records
+in place, and at `0x13` those bytes need their own home. Picking an address
+by hand is the "never write an unverified gap" trap (GOTCHAS). It has to
+come from the generator's space model — and `gen_donovan_patch.py` runs
+BEFORE `select_port.py` in `tools/build_donovan.sh`, so either the
+allocation is emitted for `select_port` to consume (check what the `image`
+block in `patch/patch.json` already records), or the records move into the
+generator. **That ordering decision is the first thing to settle.**
 
-```sh
-MAME_BIN=~/.cache/vampire-saved/mame/cps2 \
-MAME_ROMPATH="$PWD/build/m5_wide/rompath;$ROMDIR" tests/run_suite.sh vsavjw
-```
+**Then the gfx half — treat it as its own session.** The tenant's tiles
+still sit in Jedah's band, so at `0x13` the tenant renders correctly and
+**Jedah renders as the tenant**. Moving them into group C means:
 
-All 63 replays accounted for: 33 self-frozen `.sha1` + full logs, 14
-authored `.masked` (3 `diverge`, 4 §4 v3 `window`, 7 §4 v4 `composite`), 16
-`.skip`. **CLAUDE.md §4 gained the `composite` class** (maintainer-ratified
-2026-08-06) — the strict conjunction of `flicker` and `window`, adding no
-tolerance to either: every divergent run accounted for by name, both frozen
-lists matched exactly, full re-convergence, and a bit-identical pair FAILS.
-Checker `tools/compare_composite.py`, ground truth
-`tests/test_compare_composite.sh`.
+- the WIDE bank encoding, which is **not** `bank << 13`: bank 4 = y-word
+  `0x1000`, bank 5 = `0x3000` (bit 12 promoted after the list terminator —
+  `docs/cps2_wide.md`);
+- writing `vsw.31m/33m/35m/37m` (today zero fill from
+  `build_wide_romset.py`) instead of vsav's group B, and getting them into
+  `vsavjw.zip` rather than the patched `vsav.zip`;
+- **and it makes queue item 4 below MANDATORY, not optional.** The
+  descriptor still declares group C with the PRISTINE group B CRCs. Ship
+  real content there and a user running against a pristine `vsav.zip`
+  parent gets `vsw.31m` resolved BY HASH to pristine group B — the
+  14z-60z bug class again, on the distributed artifact. Fix the descriptor
+  CRCs in the same change: two emulator rebuilds, `test_mame_parity.sh`,
+  and both profile gates.
 
-The `.pending` expectation kind stays in the runner. It is the right way to
-say "measured, mechanism attributed, not yet ratified" without ever reading
-as green — reach for it instead of `.skip` the next time a shape outruns
-the vocabulary.
+Acceptance for M3a, unchanged: **legacy Jedah replays return to
+bit-identical vanilla.** Not claimable until both halves land.
+`build/m3a` (`f4769b55`) is a scratch build proving the program half only.
+
+## What is already done (do not redo)
+
+- **Program half of M3a.** The id is a build input (`--tenant-id`); all 31
+  slot-indexed table rows move to `0x13`; the 30 `0x1F` mirror pokes are
+  gone (Victor's `0x03` untouched by construction); a variant-id tenant
+  without a profile is refused. Gate: `tests/test_tenant_id.sh`.
+- **The frozen references still rebuild EXACTLY** — WIDE `9bac6ee3`, stock
+  `ae701ffb` — which is why the manifest does not yet declare
+  `id_by_profile`. Declare it in the same change that finishes M3a and
+  re-freezes; `tests/test_tenant_id.sh` guards that and tells you so.
+- **The WIDE sprite garble is fixed, playtested and gated** (a romset
+  member shadowing a patched one; both emulators resolve by hash before
+  name). `tests/test_wide_render_content.sh` is the rendering gate that was
+  missing, `tools/audit_romset_identity.py` runs inside the build.
+- **The WIDE reference is frozen and its suite is GREEN**: `9bac6ee3 ->
+  donovan-m5w`, all 63 replays accounted for, CLAUDE.md §4 gained the
+  ratified `composite` class.
 
 ## Ship state
 
 | Track | Fingerprint | Packs as | Status |
 |---|---|---|---|
-| **stock** | `ae701ffb` (`build/m5_stock`) | `vsavj.zip` | playtested clean to round 65; rebuild reproduces the fingerprint exactly |
-| **WIDE** | `9bac6ee3` (`build/m5_wide`) | `vsavjw.zip` | garble FIXED, gated, playtest-confirmed, **FROZEN as `donovan-m5w`**, suite GREEN |
-| ~~WIDE~~ | `ac52eeff` (`build/m5w`) | — | KNOWN-BAD, kept as evidence. Do not run |
+| **WIDE** | `9bac6ee3` (`build/m5_wide`) | `vsavjw.zip` | frozen `donovan-m5w`, playtest-confirmed, suite GREEN |
+| **stock** | `ae701ffb` (`build/m5_stock`) | `vsavj.zip` | frozen compatibility artifact; rebuilds exactly |
+| ~~WIDE~~ | `ac52eeff` (`build/m5w`) | — | KNOWN-BAD (the garble), kept as evidence. Do not run |
 
-## Queued (the roster work the bug was blocking)
+```sh
+tools/run_wide.sh build/m5_wide fbneo     # NOT build/m5w
+MAME_BIN=~/.cache/vampire-saved/mame/cps2 \
+MAME_ROMPATH="$PWD/build/m5_wide/rompath;$ROMDIR" tests/run_suite.sh vsavjw
+```
 
-1. **M3a de-substitution**: tenant `0x0F` → `0x13`. **The program half is
-   DONE** (14z-61): the id is a build input (`--tenant-id`), all 31
-   slot-indexed table rows move to `0x13`, the `0x1F` mirror pokes are gone,
-   and a variant-id tenant without a profile is refused. Both frozen
-   references still rebuild exactly (`9bac6ee3` / `ae701ffb`).
-   **Two content halves remain, both placement:**
-   - **select records** — `select_port.py` still does in-place surgery on
-     Jedah's records. The mechanism is measured (six longs, see
-     `docs/atlas/select_screen.md`), but the tenant's record BYTES need a
-     home, and that has to go through the generator's allocator — which
-     runs BEFORE `select_port` in `build_donovan.sh`. **That ordering is
-     the work**, not the pointer math.
-   - **gfx** — the tiles still sit in Jedah's band, so at `0x13` the tenant
-     renders right and JEDAH renders as the tenant. Moving them means
-     writing group C with the WIDE bank encoding (**bank 4 = y-word
-     `0x1000`, bank 5 = `0x3000` — NOT `bank << 13`**) and makes the group C
-     descriptor CRCs load-bearing (queue item 5 below stops being optional).
-   `build/m3a` (`f4769b55`) is a scratch build proving the program move, not
-   a candidate. Acceptance: legacy Jedah replays return to **bit-identical
-   vanilla** — not claimable until both halves land.
-2. Fightability: the arcade opponent list (`a5-0x61B8`, length `$138(a5)`).
-3. Huitzil `0x10` and Pyron `0x11`.
-4. Medallion art (deferred deliberately until after de-substitution).
-5. Optional hygiene, now that the descriptor is provably load-bearing: the
-   WIDE driver descriptors still declare group C with the PRISTINE group B
-   CRCs while we ship zero fill. Harmless today (nothing addresses group C)
-   but it is the same ambiguity class — declare what we ship. Costs two
-   emulator rebuilds plus `test_mame_parity.sh` and both profile gates.
+## Queue after M3a
 
-## Gotchas most likely to bite next session
+1. Fightability: the arcade opponent list (`a5-0x61B8`, length `$138(a5)`).
+   Selectable is not fightable.
+2. Huitzil `0x10` and Pyron `0x11` (multi-tenant manifests are refused until
+   M3 Phase 3 — one tenant at a time, by design).
+3. Medallion art (deferred deliberately until after de-substitution).
+4. Group C descriptor CRCs — see above; **stops being optional the moment
+   group C carries content.**
+5. Minor win-screen palette items from the round-66 playtest. Unrelated.
+
+## Gotchas most likely to bite
 
 - **Compose the bank bits before dumping a tile band** — `tile = code |
   ((y & 0x6000) << 3)`. A dump at the wrong address returns a clean null
-  that reads as exoneration.
+  that reads as exoneration. This cost two sessions.
 - **A null result needs a negative control**, exactly as much as a positive
   one does.
-- Audit manifests, not just code: `donovan.toml` carries hand-authored
-  machine code in `thunk_hex`; a slot id hid there as `000f`.
-- A generator and its validator written by the same hand share a blind spot.
-- `run_replay_fbneo.sh` needs an **absolute** sandbox path (it `cd`s there).
-- FBNeo has **no `-rompath`**; it reads `roms/` relative to cwd.
-- MAME write taps must be word-aligned; MAME can segfault in teardown AFTER
-  writing a complete log, so assert on the `END` line, never the exit code.
+- **A member carrying another member's pristine bytes shadows it** — both
+  emulators resolve by HASH before NAME (`bzip.cpp:158`).
+- Regenerate any rompath overlay built before the repo path lost its space;
+  the symlinks in it are absolute and dangling.
+- Audit manifests, not just code: `donovan.toml` carries hand-authored 68k
+  in `thunk_hex`; a slot id hid there as `000f`.
+- `run_replay_fbneo.sh` needs an **absolute** sandbox path; FBNeo has no
+  `-rompath` and reads `roms/` relative to cwd.
+- MAME write taps must be word-aligned, and MAME can segfault in teardown
+  AFTER writing a complete log — assert on the `END` line, never the exit
+  code.

@@ -1,12 +1,15 @@
 # STATE — living progress log
 
-Updated: 2026-08-05 (session 14z-61 — **the WIDE sprite garble is ROOT-CAUSED,
+Updated: 2026-08-06 (session 14z-61 — **the WIDE sprite garble is ROOT-CAUSED,
 FIXED and PLAYTEST-CONFIRMED**: it was never a rendering defect, it was a
 romset member the loader silently preferred over the patched one. The WIDE
 track is unblocked; the roster queue resumes at M3a. Read 14z-61 first. Earlier
 this day, 14z-60..60z: select wheel EXTENDED, id space ANSWERED, `[[tenant]]`
 schema and CLAUDE.md §4 class v3 RATIFIED. Repo path changed:
-`Vampire Saved` -> `Vampire_Saved`)
+`Vampire Saved` -> `Vampire_Saved`. **Session closed at a deliberate
+boundary**: M3a's program half is done and both frozen references still
+rebuild exactly; its two remaining halves are content PLACEMENT and are
+specified in docs/NEXT_SESSION.md, which is the first read.)
 
 ## Session 14z-61 (WIDE GARBLE FIXED — a shadowed ROM member, not the
 ## emulator; and the rendering gate that should have caught it)
