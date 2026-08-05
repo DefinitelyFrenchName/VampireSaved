@@ -338,6 +338,54 @@ What would settle it, in order of value:
 2. A lossless PNG rather than JPEG, so medallion borders survive and blob
    detection works without hand-seeded points.
 
+## The measured extension (PS1 video, 2026-08-05)
+
+Adjacency for the three appended cells, and the inbound edges, **measured
+from the console port** — the maintainer probed each cell direction by
+direction on video and supplied the readings; the landing cells were
+independently confirmed frame-by-frame from the recording.
+
+**Mutual validation before use.** Where the report overlaps vsav's own
+table it agrees: Lei-Lei's whole row is unchanged, and 5 of 11 probes on
+the existing cells reproduce vanilla exactly (`Bishamon R`, `Bishamon DR`,
+`Aulbath L`, `Aulbath DL`, plus all of Lei-Lei). Two independent sources —
+a console recording and a table measured out of the arcade ROM — agreeing
+is what licenses using the rest.
+
+Translated BY POSITION, because PS1 puts Pyron in vsav's random cell and
+random at the very bottom, while we keep random at `0x0B`:
+
+| our cell | id | row (R L D U DR DL UR UL) |
+|---|---|---|
+| Phobos | `0x10` | `11 06 11 08 11 10 0B 06` |
+| Donovan | `0x13` | `09 11 11 09 13 11 09 0B` |
+| Pyron | `0x11` | `13 10 11 0B 13 10 13 10` |
+
+Inbound edges (the only changes to EXISTING cells): `0x08 D -> 0x10`,
+`0x09 D -> 0x13`, `0x0B D -> 0x11`, `0x0B DL -> 0x10`, `0x0B DR -> 0x13`.
+
+**28 bytes total, of which only 5 touch a pre-existing row** — the minimum
+legacy footprint that still makes the three cells reachable. Layout:
+`build/manifest/wheel_layout_proposed.json`.
+
+### Two PS1 changes deliberately NOT adopted
+
+PS1 also sets `Bishamon DL` and `Aulbath DR` to "no move", where vanilla
+sends them to Anakaris and Sasquatch. Neither is needed for reachability,
+and each would change how the wheel behaves for players who never touch the
+new characters. They are left at vanilla; adopting them is a feel decision,
+not a correctness one.
+
+### A note on wrapping
+
+The maintainer reports the PS1 grid does not wrap at any edge. Vertically
+that matches vanilla exactly (`0x0B` Down and `0x0F` Up both self-reference,
+and the new bottom cell `0x11` Down does the same). **Horizontally, vanilla
+vsav DOES wrap**: cell `0x01` (x=160, leftmost) Left goes to `0x05` (x=336,
+rightmost) — measured in the table and confirmed in-emulator by the
+128-transition walk. Nothing in this change touches those cells, so the
+behaviours coexist.
+
 ## Re-measuring
 
 ```sh

@@ -230,6 +230,7 @@ def main():
 
     print("proposing %d new cells: %s\n"
           % (len(new_cells), " ".join("%02X" % c for c in new_cells)))
+    n_draft = n_given = 0
     before = [r[:] for r in rows]
     for k, spec in lay["cells"].items():
         c = int(k, 16)
@@ -238,9 +239,9 @@ def main():
         row = []
         for i, d in enumerate(DIR_ORDER):
             if d in given:
-                row.append(given[d]); src = "given"
+                row.append(given[d]); src = "given"; n_given += 1
             elif drafted[d] is not None:
-                row.append(drafted[d]); src = "DRAFT"
+                row.append(drafted[d]); src = "DRAFT"; n_draft += 1
             else:
                 row.append(0xFF); src = "none"
             print("  cell %02X %-2s -> %s   (%s)"
@@ -273,8 +274,12 @@ def main():
         return 1
     print("\nOK: every target is live, the new cells are reachable from the "
           "default cell, and no reserved id is used")
-    print("NOTE: 'DRAFT' rows are a geometric guess (the real table is "
-          "hand-tuned, 100/128) — review them before building.")
+    if n_draft:
+        print("NOTE: %d entries are geometric DRAFTS (the real table is "
+              "hand-tuned, 100/128) — review them before building." % n_draft)
+    else:
+        print("All %d entries were given explicitly; nothing was drafted."
+              % n_given)
     return 0
 
 

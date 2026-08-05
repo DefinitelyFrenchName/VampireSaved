@@ -1,15 +1,21 @@
 {
-  "_comment": "PROPOSED snapped wheel extension (14z-60o). Geometry mirrors vsav's own hexagon bottom (pair at +16, single at +8) and matches the PS1 port's SHAPE; only the id assignment differs, per the maintainer's amendment: random STAYS at 0x0B (248,152) and Pyron goes to the very bottom. ADJACENCY BELOW IS A GEOMETRIC DRAFT - pending the cursor-movement video.",
+  "_comment": "Wheel extension, adjacency MEASURED from the PS1 console port (maintainer video, 2026-08-05) and translated BY POSITION: PS1 puts Pyron in vsav's random cell and random at the very bottom; we keep random at 0x0B and put Pyron at the bottom, so those two rows swap. Positions snapped to vsav's own lattice (14z-60o).",
   "cells": {
-    "10": {"pos": [224, 168], "_who": "Huitzil/Phobos"},
-    "13": {"pos": [272, 168], "_who": "Donovan"},
-    "11": {"pos": [248, 176], "_who": "Pyron"}
+    "10": {"pos": [224, 168], "_who": "Huitzil/Phobos",
+           "adjacency": {"R":"0x11","L":"0x06","D":"0x11","U":"0x08",
+                         "DR":"0x11","DL":"0x10","UR":"0x0B","UL":"0x06"}},
+    "13": {"pos": [272, 168], "_who": "Donovan",
+           "adjacency": {"R":"0x09","L":"0x11","D":"0x11","U":"0x09",
+                         "DR":"0x13","DL":"0x11","UR":"0x09","UL":"0x0B"}},
+    "11": {"pos": [248, 176], "_who": "Pyron",
+           "adjacency": {"R":"0x13","L":"0x10","D":"0x11","U":"0x0B",
+                         "DR":"0x13","DL":"0x10","UR":"0x13","UL":"0x10"}}
   },
   "edges_in": [
-    {"from": "0x0B", "dir": "DL", "to": "0x10"},
-    {"from": "0x0B", "dir": "DR", "to": "0x13"},
-    {"from": "0x0B", "dir": "D",  "to": "0x11"},
     {"from": "0x08", "dir": "D",  "to": "0x10"},
-    {"from": "0x09", "dir": "D",  "to": "0x13"}
+    {"from": "0x09", "dir": "D",  "to": "0x13"},
+    {"from": "0x0B", "dir": "D",  "to": "0x11"},
+    {"from": "0x0B", "dir": "DL", "to": "0x10"},
+    {"from": "0x0B", "dir": "DR", "to": "0x13"}
   ]
 }
