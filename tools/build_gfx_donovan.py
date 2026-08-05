@@ -38,7 +38,12 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from gfx_tiles import GROUP_A, GROUP_B, tile_bytes, write_tile  # noqa: E402
 
 SRC_BANK = 3          # Donovan's bank in vsav2
-DST_BANK = 2          # Jedah's bank in vsav (slot-0x0F table row = 0x4000)
+# DST_BANK is the gfx bank the tenant's tiles occupy. It WAS hard-coded to 2
+# ("Jedah's bank", slot-0x0F table row 0x4000), which made the gfx half
+# silently independent of the port's target id. It is now supplied by the
+# tenant (--tenant tenant.json, written by gen_donovan_patch.py) and this
+# constant is only the fallback for a manifest that does not declare one.
+DST_BANK = 2
 DELTA = 0x2750        # 16-aligned code delta, decided session 14
 BAND_LO, BAND_HI = 0x863F, 0xC2EF          # Donovan main band (measured)
 SAFE_LO, SAFE_HI = 0xAD80, 0xEEBB          # writable window in Jedah band
@@ -73,8 +78,21 @@ def main():
                     help="overlay_tiles.json from overlay_port.py: [src,dst] "
                          "BANK-1 pairs (companion-overlay art at dead-Jedah "
                          "+ padding positions; session 14q)")
+    ap.add_argument("--tenant",
+                    help="tenant.json from gen_donovan_patch.py. Supplies the "
+                         "destination gfx bank, so this half cannot drift "
+                         "from the port's target id — it used to be the "
+                         "constant DST_BANK=2 and a build with the tenant "
+                         "moved elsewhere still placed Jedah's bank row")
     args = ap.parse_args()
     os.makedirs(args.outdir, exist_ok=True)
+
+    global DST_BANK
+    if args.tenant:
+        _t = json.load(open(args.tenant))
+        DST_BANK = int(_t.get("gfx_bank", DST_BANK))
+        print("  tenant %s id %#04x -> gfx bank %d (bank word %#06x)"
+              % (_t.get("name"), _t["id"], DST_BANK, DST_BANK << 13))
 
     inv = json.load(open(args.tiles))
     band = sorted(t for t in inv if BAND_LO <= t <= BAND_HI)

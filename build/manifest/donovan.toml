@@ -17,6 +17,13 @@ name = "donovan"
 src_set = "vsav2"
 src_char = 0x13
 id = 0x0F
+# Destination gfx bank for this tenant's tiles. 2 is JEDAH'S bank, which is
+# only correct while the tenant occupies Jedah's slot — it moves to an
+# extended WIDE bank when the tenant moves to 0x13. Declared here so the gfx
+# half and the program half answer to one row: build_gfx_donovan.py and
+# verify_gfx_build.py both used to hard-code slot 0x0F / bank 2 and were
+# silently independent of the port's target.
+gfx_bank = 2
 alloc_wrap = "0x15702,0x1572e"
 near_map = "x0905ae=x088512"
 hole_b_regions = "aux0_4,hitbox"

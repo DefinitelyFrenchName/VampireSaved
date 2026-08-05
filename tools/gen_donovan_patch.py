@@ -98,7 +98,7 @@ def normalise_tenants(port):
     p["src_char"] = t["src_char"]
     p["dst_slot"] = t["id"]
     p["mirror_variant"] = t.get("mirror_variant", tid < 0x10)
-    for k in ("alloc_wrap", "near_map", "hole_b_regions"):
+    for k in ("alloc_wrap", "near_map", "hole_b_regions", "gfx_bank", "name"):
         if k in t:
             p[k] = t[k]
     port = dict(port)
@@ -684,11 +684,33 @@ def main():
             # write the documented row values at the table offset.
             if (tf and tf["region"] == name
                     and args.stage >= _int(tf.get("stage", 0))):
-                rows = bytes.fromhex(tf["rows_hex"])
+                rows = bytearray(bytes.fromhex(tf["rows_hex"]))
                 toff = _int(tf["table_off"])
                 if len(blob) < r["len"]:
                     blob.extend(b"\x00" * (r["len"] - len(blob)))
-                blob[toff:toff + len(rows)] = rows
+                # The rows above are the VANILLA vsavj table. The tenant's own
+                # row is then written explicitly from its declared gfx bank.
+                # Until now nothing wrote a tenant row at all: the build
+                # worked only because the tenant sat in Jedah's slot, whose
+                # vanilla row (0x0F = 0x4000) already names the bank the tiles
+                # were placed in. That coincidence dies the moment the tenant
+                # moves — row 0x13's vanilla value is 0x2000 — so make it
+                # explicit rather than inherited.
+                _tid = _int(port["port"]["dst_slot"])
+                _tbank = _int(port["port"].get("gfx_bank", 2))
+                if (_tid + 1) * 2 <= len(rows):
+                    _was = int.from_bytes(rows[_tid * 2:_tid * 2 + 2], "big")
+                    rows[_tid * 2:_tid * 2 + 2] = (_tbank << 13).to_bytes(2, "big")
+                    notes.append(f"# {name}+{toff + _tid * 2:#x}: bank table "
+                                 f"row {_tid:#04x} <- {_tbank << 13:#06x} "
+                                 f"(bank {_tbank}; vanilla row was "
+                                 f"{_was:#06x}) — tenant-driven")
+                else:
+                    fail.append(f"table_fix: tenant id {_tid:#04x} is beyond "
+                                f"the {len(rows) // 2}-row bank table; the "
+                                f"table must be widened before a tenant can "
+                                f"live there")
+                blob[toff:toff + len(rows)] = bytes(rows)
                 notes.append(f"# {name}+{toff:#x}: table_fix {len(rows)} "
                              f"bytes ({tf['note']})")
             # [[region_fix]] (14z-27): guarded byte patches inside an
@@ -2198,6 +2220,22 @@ def main():
                   for name in placed}
     (out / "placements.json").write_text(json.dumps(
         {"stage": args.stage, "regions": placements}, indent=1))
+    # ── tenant.json: the id the GFX half must agree with ────────────────────
+    # build_gfx_donovan.py and verify_gfx_build.py used to hard-code slot
+    # 0x0F ("Jedah's bank"), so they were silently independent of the port's
+    # target — a build with the tenant moved elsewhere still placed bank
+    # table row 0x0F. Emitting the tenant here makes one manifest row drive
+    # BOTH halves, and lets the gfx verifier assert against the same id the
+    # program half used rather than a constant.
+    _tp = port.get("port", {})
+    (out / "tenant.json").write_text(json.dumps(
+        {"name": _tp.get("name", "donovan"),
+         "id": _int(_tp["dst_slot"]),
+         "mirror_variant": bool(_tp.get("mirror_variant", False)),
+         "src_set": _tp.get("src_set"),
+         "src_char": _int(_tp["src_char"]) if "src_char" in _tp else None,
+         "gfx_bank": _int(_tp["gfx_bank"]) if "gfx_bank" in _tp else 2},
+        indent=1))
     # ── program-image extension (Phase C step 2) ─────────────────────────────
     # If any op lands beyond the base 4MB image, the patcher must GROW the
     # image and emit the appended ROM members. The generator is what knows the

@@ -113,7 +113,8 @@ if [ "$STAGE" -ge 6 ]; then
         --tiles "$OUTBASE/donovan_tiles.json" \
         --effects "$OUTBASE/patch/effect_map.json" \
         --select-tiles "$OUTBASE/select_tiles.json" \
-        --effect-tail build/manifest/effect_tail.json $OVERLAY_TILES | tail -10
+        --effect-tail build/manifest/effect_tail.json $OVERLAY_TILES \
+        --tenant "$OUTBASE/patch/tenant.json" | tail -10
     GFXSTAGE="$(mktemp -d)"
     unzip -q -o "$ROMDIR/vsav.zip" -d "$GFXSTAGE"
     cp "$OUTBASE/gfx"/vm3.*m "$GFXSTAGE"/

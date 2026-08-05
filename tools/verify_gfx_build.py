@@ -107,14 +107,26 @@ def main():
               f"[0x{lo:04X},0x{hi:04X}]")
     opimg = open(op_path, "rb").read()
     x26 = pl["regions"]["x026142"]["dst"]
-    row0f = int.from_bytes(opimg[x26 + 0x13EE + 0x1E:
-                                 x26 + 0x13EE + 0x20], "big")
-    if row0f != 0x4000:
-        print(f"FAIL: placed bank table row 0x0F = {row0f:#06x} "
-              f"(want 0x4000)")
+    # The tenant's id and gfx bank, not constants. This check used to assert
+    # row 0x0F == 0x4000 outright, so it agreed with the port only by
+    # coincidence: a build whose tenant had moved still asserted Jedah's row
+    # and passed. Reading tenant.json makes the program half and the gfx half
+    # answer to one manifest row. Falls back to the historical constants when
+    # a build predates tenant.json.
+    tj = f"{outbase}/patch/tenant.json"
+    slot, want = 0x0F, 0x4000
+    if os.path.isfile(tj):
+        t = json.load(open(tj))
+        slot = int(t["id"])
+        want = int(t.get("gfx_bank", 2)) << 13
+    off = x26 + 0x13EE + slot * 2
+    row = int.from_bytes(opimg[off:off + 2], "big")
+    if row != want:
+        print(f"FAIL: placed bank table row {slot:#04x} = {row:#06x} "
+              f"(want {want:#06x})")
         fail = 1
     else:
-        print("  ok: placed bank table row 0x0F = 0x4000")
+        print(f"  ok: placed bank table row {slot:#04x} = {want:#06x}")
     print("PASS: gfx build output verification" if not fail
           else "FAIL: gfx build output verification")
     sys.exit(fail)
