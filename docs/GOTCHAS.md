@@ -1544,3 +1544,42 @@ General form, and the third time this project has paid it: **a generator and
 its validator written by the same hand share the same blind spot.** The
 validator must encode what the ENGINE does with the data, not what the
 generator intended to produce.
+
+## A slot id baked into hand-authored MACHINE CODE is invisible to a
+## source-level audit — and fails silently, not loudly
+(paid: 2026-08-05, 14z-60w, while preparing the tenant move)
+Auditing "what still assumes slot 0x0F" by grepping `tools/` for `0x0f` and
+`jedah` found 19 executable assumptions and felt thorough. It missed the
+worst class entirely: **`build/manifest/donovan.toml` carries `thunk_hex`
+blobs of hand-authored 68k**, two of which embed the character id as a raw
+byte —
+
+    0c39 000f 00ff8782      cmpi.b #$0F,$FF8782
+    0c39 000f 00ff8b82      cmpi.b #$0F,$FF8B82
+
+The grep could not see it: the literal is `000f` inside a hex string, not
+`0x0f`, and it lives in a DATA file, not in `tools/`.
+
+**Why it matters more than an ordinary stale constant.** These thunks gate
+"use the ported tables or the vanilla ones" on the char id. Move the tenant
+to 0x13 and leave the byte at 0x0F, and the tenant takes the VANILLA path
+while whoever now occupies 0x0F takes the PORTED one. Nothing crashes,
+nothing is out of bounds, and both characters render plausible-but-wrong
+content — the failure mode this project keeps paying for.
+
+Fixes now in place:
+- `TT` in a `thunk_hex` is substituted with the tenant id, so it tracks.
+- A LITERAL id compared against `$FF8782`/`$FF8B82` that does not match the
+  tenant FAILS the build, naming the hex offset. Deliberately a failure and
+  not an automatic rewrite: silently editing authored machine code could
+  mask a thunk that compares against another character on purpose.
+
+Rules that generalise:
+- **Audit the manifests, not just the code.** Authored machine code lives in
+  data files here, and `patch_prg.py` `code`/`data` ops mean any hex string
+  may be executable.
+- **Grep for the ENCODED form as well as the source form** when hunting a
+  constant: `0x0f`, `000f`, `#$0f`, and `15` are all the same slot.
+- The control that caught it was cheap: change the tenant id, regenerate,
+  and grep the emitted patch for the old byte. Do that for any constant a
+  move is supposed to carry.

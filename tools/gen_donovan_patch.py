@@ -2062,7 +2062,38 @@ def main():
                 fail.append(f"site_thunk {nm}: vanilla bytes at {site:#x} != "
                             f"old_hex ({opc_img_st[site:site+6].hex()})")
                 continue
-            body = bytes.fromhex(st["thunk_hex"])
+            # A site_thunk's body is HAND-AUTHORED machine code, and some of
+            # it compares against the tenant's character id
+            # (`cmpi.b #<id>,$FF8782` / `$FF8B82`). That id was written as a
+            # literal byte inside the hex string, where a tenant move would
+            # be silently wrong rather than loud: the thunk would keep
+            # gating on 0x0F, so the tenant would take the vanilla path and
+            # the OLD occupant of 0x0F would take the ported one, with
+            # nothing to crash.
+            #
+            # `TT` in the hex is substituted with the tenant id and tracks it
+            # forever. A stale LITERAL is a hard failure rather than an
+            # automatic rewrite — silently editing authored code could mask a
+            # thunk that compares against some other character on purpose.
+            _hx = st["thunk_hex"].lower()
+            _tid = _int(port["port"]["dst_slot"]) & 0xFF
+            _hx = _hx.replace("tt", "%02x" % _tid)
+            for _fld in ("00ff8782", "00ff8b82"):
+                _i = 0
+                while True:
+                    _i = _hx.find("0c3900", _i)
+                    if _i < 0:
+                        break
+                    if _hx[_i + 8:_i + 16] == _fld:
+                        _got = int(_hx[_i + 6:_i + 8], 16)
+                        if _got != _tid:
+                            fail.append(
+                                f"site_thunk {st['name']}: body compares the "
+                                f"char id against {_got:#04x} at hex offset "
+                                f"{_i + 6}, but the tenant is {_tid:#04x}. "
+                                f"Write 'TT' there so it tracks the tenant.")
+                    _i += 6
+            body = bytes.fromhex(_hx)
             # hole "b" is REQUIRED for thunks carrying embedded data read
             # via data loads: hole "a" lies inside the CPS-2 crypt range,
             # where placed bytes are stored re-encrypted for opcode
@@ -2189,9 +2220,16 @@ def main():
                     int(pk["old"], 16).to_bytes(4, "big")
                 thunk += bytes.fromhex("0cb90004000000ff8004")   # match?
                 thunk += bytes.fromhex("661a")                    # no -> rts
-                thunk += bytes.fromhex("0c39000f00ff8782")        # P1 0x0F?
+                # cmpi.b #<tenant id>,$FF8782 / $FF8B82. The id was hardcoded
+                # as 000f here, INSIDE hand-authored machine code — the one
+                # place a tenant move would be silently wrong rather than
+                # loud: the thunk would gate on 0x0F, so the tenant would get
+                # the VANILLA tables and Jedah would get the ported ones, with
+                # nothing to crash. Built from the tenant id instead.
+                _tid8 = "%02x" % (_int(port["port"]["dst_slot"]) & 0xFF)
+                thunk += bytes.fromhex("0c3900" + _tid8 + "00ff8782")
                 thunk += bytes.fromhex("670a")                    # yes -> ported
-                thunk += bytes.fromhex("0c39000f00ff8b82")        # P2 0x0F?
+                thunk += bytes.fromhex("0c3900" + _tid8 + "00ff8b82")
                 thunk += bytes.fromhex("6606")                    # no -> rts
                 thunk += bytes.fromhex("207c") + \
                     int(pk["new"], 16).to_bytes(4, "big")
