@@ -37,30 +37,32 @@ Fixed in the pipeline, not in a file:
   failing shape (it diverges on 2,542 frames) and a tile-band check with a
   pristine negative control. ~60 s.
 
-## What is owed before the WIDE track is trusted again
+## Playtest CONFIRMED — the WIDE track is unblocked
 
-**A maintainer playtest of `build/m5_wide` (`9bac6ee3`).** The gates say the
-WIDE track renders pixel-identically to the stock track, which is the
-strongest headless statement available — but the original report came from
-a human looking at the screen, and the win-screen palette items from that
-same playtest are still open and still unrelated.
+Maintainer, 2026-08-05, on `build/m5_wide` (`9bac6ee3`): *"Initial tests with
+and without Donovan look good. No obvious regression, all graphics look good,
+gameplay feels genuine, all present sounds are good."* That covers both the
+ported content and the legacy path, and it also puts the 14z-60 select-wheel
+extension (`PRG:0x2689FE`, `PRG:0x021227`, 148 bytes in the extension member,
+absent from `m5w`) in a human's hands for the first time.
 
 ```sh
 export ROMDIR=/Users/koneko/Developer/Vampire_Saved/ROMS
 tools/run_wide.sh build/m5_wide fbneo     # NOT build/m5w — that is the known-bad artifact
 ```
 
-Note the rebuilt WIDE build also carries the 14z-60 select-wheel extension
-(`PRG:0x2689FE`, `PRG:0x021227`, 148 bytes in the extension member), which
-`m5w` predated — so the select screen is not byte-for-byte what was
-playtested before.
+Still open and still unrelated: the minor win-screen palette items from the
+original playtest. **One decision waiting** in STATE "Decisions pending":
+whether to freeze/register `9bac6ee3` as the WIDE reference before M3a
+churns the tenant's records (recommended — M3a would otherwise have nothing
+to bisect against on this track).
 
 ## Ship state
 
 | Track | Fingerprint | Packs as | Status |
 |---|---|---|---|
 | **stock** | `ae701ffb` (`build/m5_stock`) | `vsavj.zip` | playtested clean to round 65; rebuild reproduces the fingerprint exactly |
-| **WIDE** | `9bac6ee3` (`build/m5_wide`) | `vsavjw.zip` | garble FIXED and gated; **playtest owed** |
+| **WIDE** | `9bac6ee3` (`build/m5_wide`) | `vsavjw.zip` | garble FIXED, gated, and **playtest-confirmed**; freeze/register pending |
 | ~~WIDE~~ | `ac52eeff` (`build/m5w`) | — | KNOWN-BAD, kept as evidence. Do not run |
 
 ## Queued (the roster work the bug was blocking)

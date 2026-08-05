@@ -1,8 +1,9 @@
 # STATE — living progress log
 
-Updated: 2026-08-05 (session 14z-61 — **the WIDE sprite garble is ROOT-CAUSED
-and FIXED**: it was never a rendering defect, it was a romset member the
-loader silently preferred over the patched one. Read 14z-61 first. Earlier
+Updated: 2026-08-05 (session 14z-61 — **the WIDE sprite garble is ROOT-CAUSED,
+FIXED and PLAYTEST-CONFIRMED**: it was never a rendering defect, it was a
+romset member the loader silently preferred over the patched one. The WIDE
+track is unblocked; the roster queue resumes at M3a. Read 14z-61 first. Earlier
 this day, 14z-60..60z: select wheel EXTENDED, id space ANSWERED, `[[tenant]]`
 schema and CLAUDE.md §4 class v3 RATIFIED. Repo path changed:
 `Vampire Saved` -> `Vampire_Saved`)
@@ -118,6 +119,22 @@ FAIL naming both members, benign placeholders PASS, nothing-patched PASS.
 Both are wired into `tests/run_battery_m2.sh` — the identity check as a
 build-independent rule lock, the rendering gate on WIDE builds that have a
 stock twin to compare against.
+
+### MAINTAINER PLAYTEST — CONFIRMED (2026-08-05, on `build/m5_wide` `9bac6ee3`)
+
+> "Initial tests with and without Donovan look good. No obvious regression,
+> all graphics look good, gameplay feels genuine, all present sounds are
+> good."
+
+Both halves matter: **with** Donovan (the ported content that was garbled)
+and **without** (the legacy path the superset invariant protects). The
+rebuilt WIDE build also carries the 14z-60 select-wheel extension that
+`m5w` predated, so this is a confirmation of the wheel work in a human's
+hands too, not only of the tile fix.
+
+"All PRESENT sounds are good" is consistent with the M5 decision of
+2026-08-04 (option A: the unfaithful voice lines ship silent) — not a gap
+found, a gap already chosen.
 
 ### Gates re-run after the change (§6)
 
@@ -5353,6 +5370,21 @@ window per measured slot, never pre-widen.
 
 ## Decisions pending (human)
 
+- **FREEZE THE WIDE TRACK? (14z-61).** `build/m5_wide` (`9bac6ee3`) is now
+  playtest-confirmed with and without Donovan, both WIDE profile gates are
+  green, and the new rendering + member-identity gates are green. The
+  registry convention is that rows are added at FREEZE time as a STATE.md
+  decision, so this is not mine to do.
+  **Recommendation: freeze and register it** as the WIDE reference
+  (`donovan-m5w` alongside `donovan-m2c`), for one specific reason beyond
+  bookkeeping: M3a moves the tenant from `0x0F` to `0x13` and will churn
+  the select records, the thunk id and the bank-table row at once. Without
+  a registered WIDE reference, a regression during that work has nothing to
+  bisect against on this track — which is exactly the position that made
+  the sprite garble expensive.
+  Cost if we skip it: none today; the risk is only felt later, and by then
+  the build may not be reproducible from the tree.
+
 - **THE SELECT SCREEN AND THE SUPERSET INVARIANT (14z-60r).** Drawing three
   new medallions requires the wheel OBJ record to grow from 18 to 21
   entries and its coordinate list likewise. Measured: neither can grow in
@@ -5510,10 +5542,9 @@ window per measured slot, never pre-widen.
   stock-track controls, and gated by `tests/test_wide_render_content.sh`
   (pixel A/B vs the stock track + a positive control) and
   `tests/test_romset_identity.sh`. Full write-up: session 14z-61.
-  **Still owed: a maintainer playtest of the rebuilt WIDE build** — the
-  gates say the pixels match the stock track, which is the strongest
-  statement available headlessly, but the original report came from a human
-  looking at the screen.
+  **CLOSED — maintainer playtest of `build/m5_wide` (`9bac6ee3`) confirms
+  it**, with and without Donovan: no regression, graphics good, gameplay
+  genuine, sounds good.
 - Minor win-screen palette issues, same playtest. Lower priority, and
   probably unrelated — keep them separate until one is root-caused.
 
