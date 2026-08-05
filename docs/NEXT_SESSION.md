@@ -55,6 +55,27 @@ tools/run_replay_fbneo.sh vsavjw tests/replays/11_pick_donovan.rpl \
 If confirmed it is a defect in **our emulator profile**, not the port —
 Rule 1 territory, and it blocks the WIDE track.
 
+### And once it is green: build the gate that should have caught it
+
+Worth stating bluntly, because it is the real lesson of this bug. **Every
+automated gate was GREEN while Donovan rendered as garbage.** The RAM gates
+are structurally blind to rendering (14z-55), the pixel gate
+`tests/test_gfx_menus.sh` covers MENUS on the stock track, and the WIDE
+track has no rendering gate at all — so a human playtest was the only
+detector. That is a coverage failure, not a testing-cadence one.
+
+Both instruments already exist: `FBNEO_HVIDEO` and MAME's `VIDEO_OUT` give
+per-frame framebuffer checksums, and the B4 canary already A/Bs framebuffers
+between emulator binaries. The missing gate is the same idea applied to
+CONTENT: a Donovan replay whose framebuffer is compared stock-vs-WIDE at
+sync anchors, so "the port renders differently on the WIDE track" fails a
+gate instead of waiting for someone to look at it.
+
+Mind the known trap when building it: the two tracks are different drivers
+and skew by a frame or two, so compare at anchors (or by displayed record),
+never by raw frame index — see the cross-emulator and cross-game alignment
+entries in GOTCHAS.
+
 ## THE PATH CHANGED — `Vampire Saved` → `Vampire_Saved`
 
 The repo now lives at `/Users/koneko/Developer/Vampire_Saved/VampireSaved`
