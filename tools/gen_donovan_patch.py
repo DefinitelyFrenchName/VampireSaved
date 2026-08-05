@@ -68,6 +68,44 @@ def load_vsavj(zpath):
     return bytes(cps.words_to_logical_bytes(words))
 
 
+def normalise_tenants(port):
+    """`[[tenant]]` supersedes `[port]`.
+
+    A tenant is one ported character occupying one character id. Rather than
+    rewrite the six places that read `port["port"]`, a tenant row is
+    NORMALISED into the `[port]` shape the generator already understands —
+    so a manifest carrying a single tenant at the old slot must produce a
+    BYTE-IDENTICAL image, which is how this refactor is verified (the Phase
+    C discipline: a refactor that moves zero bytes).
+
+    The one semantic change is `mirror_variant`. It exists because a
+    BASE-half slot's variant row aliases it in vanilla (slot 0x0F and its
+    mirror 0x1F). A tenant that IS a variant id has no mirror, and one at
+    0x13 must never touch 0x03 (Victor) — so the default is now derived
+    from the id rather than assumed true.
+    """
+    tenants = port.get("tenant", [])
+    if not tenants:
+        return port                      # legacy [port] manifest, untouched
+    if len(tenants) > 1:
+        raise SystemExit("gen_donovan_patch: %d tenants declared; multi-tenant "
+                         "builds are not implemented yet (M3 Phase 3). Land "
+                         "one tenant at a time." % len(tenants))
+    t = tenants[0]
+    tid = _int(t["id"])
+    p = dict(port.get("port", {}))
+    p["src_set"] = t["src_set"]
+    p["src_char"] = t["src_char"]
+    p["dst_slot"] = t["id"]
+    p["mirror_variant"] = t.get("mirror_variant", tid < 0x10)
+    for k in ("alloc_wrap", "near_map", "hole_b_regions"):
+        if k in t:
+            p[k] = t[k]
+    port = dict(port)
+    port["port"] = p
+    return port
+
+
 def load_bank_map(path):
     doc = toml_loads(Path(path).read_text())
     return {t["name"]: t for t in doc["table"]}
@@ -104,6 +142,7 @@ def main():
 
     man = json.loads((args.extract_dir / "regions.json").read_text())
     port = toml_loads(args.port.read_text())
+    port = normalise_tenants(port)
     bank = load_bank_map(args.bank_map)
     vj = load_vsavj(args.vsavj)
     recon = {}

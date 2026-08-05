@@ -1,6 +1,26 @@
 # donovan.toml — port configuration for the donovan-m2 patch
 # (consumed by tools/gen_donovan_patch.py; see docs/patch_index.md)
 
+# ── TENANT (14z-60t) — supersedes [port] below ──────────────────────────────
+# A tenant is one ported character occupying one character id. This row is
+# normalised into the [port] shape by tools/gen_donovan_patch.py, so landing
+# it changes NOTHING: the id below is still 0x0F and the built image must be
+# byte-identical (ae701ffb stock / the WIDE fingerprint). Moving the tenant
+# to its real id 0x13 is a SEPARATE change with its own battery and playtest
+# — see docs/tenant_manifest.md and the M3 roadmap.
+#
+# mirror_variant is deliberately absent: it now DEFAULTS from the id. A
+# base-half slot has a variant mirror (0x0F -> 0x1F); a variant id has none,
+# and a tenant at 0x13 must never touch 0x03 (Victor).
+[[tenant]]
+name = "donovan"
+src_set = "vsav2"
+src_char = 0x13
+id = 0x0F
+alloc_wrap = "0x15702,0x1572e"
+near_map = "x0905ae=x088512"
+hole_b_regions = "aux0_4,hitbox"
+
 [port]
 src_set = "vsav2"
 src_char = 0x13
