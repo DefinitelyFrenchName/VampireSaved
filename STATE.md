@@ -5035,6 +5035,45 @@ opcode-space dump oracle (`tests/test_decrypt_oracle.sh`). Both directions
   files are LE-word storage; all derived images are 68k logical (BE) order.
   See docs/GOTCHAS.md first entry.
 
+## OPEN BUG (14z-60y): WIDE renders Donovan/Anita with WRONG TILES
+
+Playtest of `build/m5w` (the M5-sound WIDE build `ac52eeff`, built Aug 4 —
+NOT anything from session 14z-60): mechanically sound, no gameplay issue,
+but **Donovan's and Anita's sprites are garbled from character select
+through the match** — wrong art, while shapes, specials and hit/hurtboxes
+all align. Minor palette issues on some win screens, tracked separately.
+`run_wide.sh` only launches, so nothing was rebuilt for the test.
+
+**The load hypothesis is DEAD, measured.** `FBNEO_HGFX` dumped the decoded
+tile buffer at Donovan's band (tile `0xAD8F` -> byte `0x56C780`) from the
+WIDE build and from the known-good stock build `donovan6`:
+
+    WIDE  sha1 f3cb6aa95b294b9506206d93e335f8a09f43347e, 0 bytes of 0xFF
+    STOCK sha1 f3cb6aa95b294b9506206d93e335f8a09f43347e, 0 bytes of 0xFF
+
+Byte-identical, no 0xFF fill — so the FBNeo CRC trap did NOT fire and the
+tiles load correctly on both tracks. ROM and loader are fine.
+
+**Therefore the fault is in tile ADDRESSING at draw time**, which is exactly
+what the WIDE profile changes: its single removed line in `cps_obj.cpp` is
+the sprite tile-code composition for 19-bit addressing. That matches the
+symptom (record geometry right, only the fetch displaced) and matches its
+being identical on FBNeo and MAME, which carry the same profile patch.
+
+**Named suspect, not yet confirmed:** `docs/GOTCHAS.md` records the free
+tile-address bit as **y-word bit 12**, on the CPS-2 Turbo precedent. Bit 12
+is also a legitimate Y-COORDINATE bit. A sprite drawn at a Y with that bit
+set would have its tile address shifted by a 64K page under WIDE — wrong
+art, right shape. It would also explain why the B4 canary passed: that
+proved LEGACY replays pixel-identical, and legacy content may never place a
+sprite at such a Y.
+
+Next measurement: dump OBJ RAM for a Donovan sprite on the WIDE build,
+check his entries' y-words for bit 12, then A/B the same frame's
+framebuffer against stock. If confirmed this is a defect in OUR emulator
+profile (Rule 1 territory), not in the port — and it would block the WIDE
+track until fixed.
+
 ## Decisions made (maintainer, 2026-08-05): two ratifications
 
 **1. CLAUDE.md §4 comparison class v3 — "bounded re-convergent window".**
