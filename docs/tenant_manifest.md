@@ -45,6 +45,23 @@ id          = 0x13          # the character id it OCCUPIES in the output.
                             # 5-bit. No mirror: a variant id has none, and
                             # a base id's mirror is a separate tenant's
                             # business or nobody's.
+id_by_profile = "cps2-wide-v1=0x13"
+                            # IMPLEMENTED 14z-61, and the wrinkle is worth
+                            # copying for the next tenant: while a
+                            # de-substitution is IN PROGRESS the manifest
+                            # keeps the id the FROZEN REFERENCE was built
+                            # with, and the move is driven by an explicit
+                            # `--tenant-id` flag. Declaring it here makes it
+                            # the default for that profile, which breaks the
+                            # reference's reproducibility — so this line
+                            # lands in the same change that finishes the
+                            # move and re-freezes. Guarded by
+                            # tests/test_tenant_id.sh.
+                            # A variant id also REQUIRES a build profile:
+                            # its tiles cannot share the host character's
+                            # gfx band, and a stock build has nowhere else
+                            # to put them (the dual-track ruling, as a build
+                            # error rather than a convention).
 
   # ── select wheel (docs/atlas/select_screen.md) ──────────────────────────
   [tenant.wheel]

@@ -89,12 +89,26 @@ the vocabulary.
 
 ## Queued (the roster work the bug was blocking)
 
-1. **M3a de-substitution**: tenant `0x0F` → `0x13`. Prep is done — the 19
-   executable slot assumptions are enumerated (14z-60w), the thunk id is
-   tenant-driven, the bank-table row explicit. Remaining unknown:
-   `select_port.py` replaces Jedah's select records IN PLACE, so at `0x13`
-   the tenant needs its OWN records — that mechanism changes shape.
-   Acceptance: legacy Jedah replays return to **bit-identical vanilla**.
+1. **M3a de-substitution**: tenant `0x0F` → `0x13`. **The program half is
+   DONE** (14z-61): the id is a build input (`--tenant-id`), all 31
+   slot-indexed table rows move to `0x13`, the `0x1F` mirror pokes are gone,
+   and a variant-id tenant without a profile is refused. Both frozen
+   references still rebuild exactly (`9bac6ee3` / `ae701ffb`).
+   **Two content halves remain, both placement:**
+   - **select records** — `select_port.py` still does in-place surgery on
+     Jedah's records. The mechanism is measured (six longs, see
+     `docs/atlas/select_screen.md`), but the tenant's record BYTES need a
+     home, and that has to go through the generator's allocator — which
+     runs BEFORE `select_port` in `build_donovan.sh`. **That ordering is
+     the work**, not the pointer math.
+   - **gfx** — the tiles still sit in Jedah's band, so at `0x13` the tenant
+     renders right and JEDAH renders as the tenant. Moving them means
+     writing group C with the WIDE bank encoding (**bank 4 = y-word
+     `0x1000`, bank 5 = `0x3000` — NOT `bank << 13`**) and makes the group C
+     descriptor CRCs load-bearing (queue item 5 below stops being optional).
+   `build/m3a` (`f4769b55`) is a scratch build proving the program move, not
+   a candidate. Acceptance: legacy Jedah replays return to **bit-identical
+   vanilla** — not claimable until both halves land.
 2. Fightability: the arcade opponent list (`a5-0x61B8`, length `$138(a5)`).
 3. Huitzil `0x10` and Pyron `0x11`.
 4. Medallion art (deferred deliberately until after de-substitution).
