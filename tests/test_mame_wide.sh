@@ -147,7 +147,15 @@ for rp in $CORPUS; do
 done
 
 # ── 3. B4 canary ────────────────────────────────────────────────────────
-if python3 - "$WIDE_ROMPATH" <<'PYEOF'
+# The canary needs group C to be a byte COPY of group B, which is a shape
+# that must never ship: it carries group B's CRCs, and both emulators
+# resolve a ROM entry by hash before name, so in a set whose group B is
+# PATCHED the loader serves pristine tiles for it (14z-60z — that is how
+# the WIDE build rendered Donovan with vanilla art). So the canary romset
+# now lives in its OWN directory and the shippable overlay ($WIDE_ROMPATH)
+# is zero-filled; this section reads CANARY_ROMPATH, never the shippable set.
+CANARY_ROMPATH="${CANARY_ROMPATH:-$REPO/build/wide_canary/rompath}"
+if python3 - "$CANARY_ROMPATH" <<'PYEOF'
 import sys, zipfile, hashlib, os
 z = zipfile.ZipFile(os.path.join(sys.argv[1], "vsavjw.zip"))
 p = zipfile.ZipFile(os.path.join(os.environ["ROMDIR"], "vsav.zip"))
@@ -161,13 +169,15 @@ then
     echo "== 3. B4 canary: sprites served from the appended gfx banks =="
     for rp in $CORPUS; do
         go "cs_$rp" "$WIDE_BIN" vsavj  "$ROMDIR" "$rp"
-        go "cw_$rp" "$WIDE_BIN" vsavjw "$WIDE_ROMPATH;$ROMDIR" "$rp" canary
+        go "cw_$rp" "$WIDE_BIN" vsavjw "$CANARY_ROMPATH;$ROMDIR" "$rp" canary
         both "cs_$rp" "cw_$rp" "$rp identical with sprites fetched from banks 4/5" \
              "$rp — the appended banks do not render correctly"
     done
 else
-    echo "== 3. B4 canary: SKIPPED (romset lacks the group-B copy;"
-    echo "     rebuild with tools/build_wide_romset.py ... --gfx-copy-group-b) =="
+    echo "== 3. B4 canary: SKIPPED (no canary romset at $CANARY_ROMPATH;"
+    echo "     build it there — NEVER over the shippable overlay —  with"
+    echo "     tools/build_wide_romset.py \"\$ROMDIR\" build/wide_canary/rompath \\"
+    echo "         --qsound 2 --gfx 4 --prg 4 --gfx-copy-group-b) =="
     fail_skipped="$fail_skipped b4-canary"
 fi
 

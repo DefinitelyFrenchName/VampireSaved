@@ -114,7 +114,14 @@ fi
 # banks 4/5 at draw time, and the romset must carry group C as a byte copy
 # of group B (build with --gfx-copy-group-b). Stock ROM both sides, so RAM
 # is identical by construction and only pixels can move.
-if python3 - "$WIDE_ROMPATH" <<'PYEOF'
+#
+# That copy shape must NEVER ship: it carries group B's CRCs, and both
+# emulators resolve a ROM entry by hash before name, so in a set whose
+# group B is PATCHED the loader serves pristine tiles for it (14z-60z —
+# how the WIDE build rendered Donovan with vanilla art). The canary romset
+# therefore lives in its own directory; the shippable overlay is zero-filled.
+CANARY_ROMPATH="${CANARY_ROMPATH:-$REPO/build/wide_canary/rompath}"
+if python3 - "$CANARY_ROMPATH" <<'PYEOF'
 import sys, zipfile, hashlib, os
 z = zipfile.ZipFile(os.path.join(sys.argv[1], "vsavjw.zip"))
 p = zipfile.ZipFile(os.path.join(os.environ["ROMDIR"], "vsav.zip"))
@@ -129,7 +136,7 @@ then
     for rp in $CORPUS; do
         FBNEO_HVIDEO="$WORK/cs_$rp.vid" tools/run_replay_fbneo.sh vsavj \
             "$REPO/tests/replays/$rp.rpl" "$WORK/cs_$rp.log" "$WORK/csb_$rp" >/dev/null 2>&1
-        CPS2_WIDE_CANARY=1 FBNEO_HVIDEO="$WORK/cw_$rp.vid" FBNEO_ROMPATH="$WIDE_ROMPATH" \
+        CPS2_WIDE_CANARY=1 FBNEO_HVIDEO="$WORK/cw_$rp.vid" FBNEO_ROMPATH="$CANARY_ROMPATH" \
             tools/run_replay_fbneo.sh vsavjw \
             "$REPO/tests/replays/$rp.rpl" "$WORK/cw_$rp.log" "$WORK/cwb_$rp" >/dev/null 2>&1
         if cmp -s "$WORK/cs_$rp.log" "$WORK/cw_$rp.log" \
@@ -141,8 +148,10 @@ then
         fi
     done
 else
-    echo "== 3. B4 canary: SKIPPED (romset lacks the group-B copy;"
-    echo "     rebuild with tools/build_wide_romset.py ... --gfx-copy-group-b) =="
+    echo "== 3. B4 canary: SKIPPED (no canary romset at $CANARY_ROMPATH;"
+    echo "     build it THERE — never over the shippable overlay — with"
+    echo "     tools/build_wide_romset.py \"\$ROMDIR\" build/wide_canary/rompath \\"
+    echo "         --qsound 2 --gfx 4 --prg 4 --gfx-copy-group-b) =="
 fi
 
 [ "$fail" = 0 ] || { echo "FAIL: CPS-2 WIDE profile gate"; exit 1; }

@@ -1084,6 +1084,14 @@ Rules that follow:
 - Diagnostic shortcut: 0xFF in a region that should hold data means "not
   loaded"; 0x00 means "loaded but empty/never written" (the buffer is
   memset to 0 at allocation).
+- **Refined 14z-61, and the refinement is the dangerous half.** A CRC
+  mismatch does not by itself produce 0xFF fill: `bzip.cpp:158` searches by
+  CRC *first* and falls back to the NAME, which is why every patched
+  program and gfx member in this project loads at all. 0xFF fill is what
+  you get when NEITHER matches. The failure mode to fear is the other one:
+  when some OTHER file in the set matches the declared CRC, it is loaded
+  INSTEAD, silently and successfully. See "A member carrying another
+  member's PRISTINE bytes SHADOWS it" at the end of this file.
 
 ## A relocation test with no negative control proves nothing
 The CPS-2 WIDE PRG canary relocated one character's sound table into the
@@ -1610,3 +1618,96 @@ Rules:
 - A fresh worktree branches from `origin/<default>`, which here trails local
   `main` badly; `git reset --hard main` immediately after creating it (see
   the stale-origin entry above — this is the second time it applied).
+- **Every generated rompath overlay is a directory of ABSOLUTE symlinks into
+  `$ROMDIR`, and the rename dangled all of them** (found 14z-61). The
+  failure does not look like "file not found": `run_replay_fbneo.sh` copies
+  the overlay's links OVER the good reference ones, so a whole romset goes
+  unreadable and the gate reports the emulator behaving wrongly. It cost a
+  false FAIL of the B4 canary section. Regenerate any overlay built before
+  the move (`tools/build_wide_romset.py "$ROMDIR" <dir> ...`) and suspect
+  this first when a set that used to load stops loading.
+
+## A member carrying another member's PRISTINE bytes SHADOWS it — both
+## emulators resolve a ROM entry by HASH before NAME
+(paid: 2026-08-05, 14z-60z — cost two sessions and a wrong root-cause
+hypothesis; the bug reached a maintainer playtest)
+Donovan and Anita rendered with vanilla art on the WIDE track — right
+geometry, wrong pixels — while every automated gate stayed green.
+
+The WIDE romset's appended gfx group C (`vsw.31m/33m/35m/37m`) was built
+with `--gfx-copy-group-b`, the **B4 canary** shape: byte copies of the
+stock group B members. Copies carry the ORIGINAL CRCs. The content build
+patches group B (`vm3.14m/16m/18m/20m` — that is where Donovan's tiles
+live), so at load time the descriptor's declared CRC for `vm3.14m` matched
+the *canary copy* sitting in the same set, and the loader served **pristine
+tiles** for the member the build had patched.
+
+Measured, both emulators, with pristine and stock-track controls
+(`tests/lua/gfx_region_dump.lua`, tile `0x2AD8F`):
+
+| set | decoded tiles at the ported band |
+|---|---|
+| WIDE build (garbled) | == PRISTINE vsavj |
+| WIDE build, group C zero-filled | == stock track (the patched art) |
+
+MAME says it out loud if you know to look: on the stock track all eight gfx
+members report `WRONG CHECKSUMS` (the patched art loading by name); on the
+WIDE track `vm3.14m/16m/18m/20m` are **silent**, because a hash match was
+found — for the wrong file.
+
+FBNeo states the rule in its own comment, `src/burner/sdl/bzip.cpp:158`:
+
+```c
+if (ri.nCrc) {                      // Search by crc first
+    nRet = FindRomByCrc(ri.nCrc);
+    if (nRet >= 0) return nRet;
+}
+for (int nAka = 0; ...) {           // Failing that, search for possible names
+```
+
+So the name is the FALLBACK in both emulators, not the identity. A member's
+identity in a set is its HASH, and two files with the same bytes are the
+same member as far as the loader is concerned.
+
+Rules:
+- **No member of a set may carry the pristine bytes of a member that build
+  patched.** `tools/audit_romset_identity.py` enforces exactly this and
+  runs inside `tools/build_donovan.sh` and `tools/pack_build.sh`; ground
+  truth `tests/test_romset_identity.sh`.
+- **A canary romset is not a shippable romset.** The copy shape belongs in
+  `build/wide_canary/rompath` and is never passed to `pack_build.sh
+  --merge`. `build/wide0/rompath` (zero fill) is the shippable overlay.
+- Byte-identical PLACEHOLDER members (several zero-filled 4 MB units) are
+  harmless — they can shadow nothing, because no patched member has those
+  bytes. The audit reports them without failing.
+- This refines the "CRC mismatch loads 0xFF fill" entry above: 0xFF fill is
+  what happens when NOTHING matches. When something else in the set matches
+  the hash, you get that file's bytes instead — silently, and it looks
+  exactly like a working load.
+
+## Dump a tile band WITH its bank bits, or you will exonerate the guilty
+(paid: 2026-08-05, 14z-60y/60z — one session spent on the wrong hypothesis)
+The sprite record's code word for Donovan's select portrait is `0xAD8F`,
+but its y-word selects bank 2, so the tile the hardware fetches is
+
+    tile = code | ((y & 0x6000) << 3)   =   0x2AD8F        (byte 0x156C780)
+
+The 14z-60y investigation dumped byte `0x56C780` — tile `0xAD8F`, no bank
+bits — found it byte-identical between the WIDE and stock builds, and
+concluded "the tiles load correctly on both tracks, so the fault is in
+tile ADDRESSING at draw time". Both halves of that were wrong: the band
+compared was unrelated vanilla data (identical on every build by
+construction), and the real band differed. The next session then hunted an
+emulator rendering defect (y-word bit 12) that measurement later showed is
+never even set — `objy_bits.lua` over the whole replay: `bit12=0`,
+`max19 == max18`.
+
+Rules:
+- Compose the address the way the hardware does before dumping, and print
+  the composition in the log (`obj_records_dump.lua` prints `a18`/`a19`
+  per entry for this reason).
+- A null result from a dump is only as good as the address that produced
+  it. Give the instrument a NEGATIVE CONTROL — a band that MUST differ
+  (pristine vs patched) — or it can prove nothing. `test_wide_render_
+  content.sh` section 4 does this, and it caught a field-index slip in its
+  own checker on the first run.

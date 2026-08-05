@@ -64,6 +64,8 @@
 | `PRG:0x3B2AC0` | 0xA0 | VS2 | data_port win_pal_slot0f_c7 (vsav2 0x3c851c) |
 | `PRG:0x3A3A80` | 0x20 | VS2 | data_port med_pal_row14_a (vsav2 0x3bafdc) |
 | `PRG:0x400010` | 0x160 | VS2 | sound_table don_sfx_records (vsav2 0xcb01a, id-allowlisted) |
+| `PRG:0x4001D0` | 0x5E | NEW | select_wheel roster21 record (21 cells) |
+| `PRG:0x400170` | 0x54 | NEW | select_wheel roster21 coord list |
 | `PRG:0x3FFCB0` | 0x62 | GEN | site_thunk fixture_row0f_override_bank0 |
 | `PRG:0x01C586` | 0x6 | GEN | site_thunk fixture_row0f_override_bank0 engine site |
 | `PRG:0x3FFD20` | 0x62 | GEN | site_thunk fixture_row0f_override_bank1 |

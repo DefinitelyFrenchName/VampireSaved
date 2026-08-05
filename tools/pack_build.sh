@@ -54,3 +54,20 @@ fi
 ( cd "$STAGE" && rm -f "$SET.zip" && zip -q -X "$SET.zip" * )
 cp "$STAGE/$SET.zip" "$OUT/$SET.zip"
 echo "packed $OUT/$SET.zip"
+
+# MEMBER-IDENTITY AUDIT (14z-60z). Both emulators resolve a ROM entry by
+# HASH before falling back to its NAME, so a member carrying the PRISTINE
+# bytes of a member this build patched can shadow it: the patch reverts
+# silently, with no error and no 0xFF-fill tell. That is exactly how the
+# WIDE romset shipped Donovan with vanilla tiles for two sessions — the
+# merged group C was a byte copy of group B (the B4 canary shape).
+# Runs on --merge builds, where the hazard is introduced. Non-fatal here
+# only because the gfx half of a build lands after this script; the gate
+# tests/test_romset_identity.sh and build_donovan.sh fail hard on it.
+if [ -n "$MERGE" ]; then
+    REPO_DIR="$(cd "$(dirname "$0")/.." && pwd)"
+    python3 "$REPO_DIR/tools/audit_romset_identity.py" "$OUT" --quiet || {
+        echo "pack_build.sh: MEMBER-IDENTITY AUDIT FAILED (see above)" >&2
+        exit 1
+    }
+fi

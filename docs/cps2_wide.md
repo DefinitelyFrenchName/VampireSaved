@@ -113,6 +113,27 @@ Build the overlay with `tools/build_wide_romset.py <romdir> <outdir>
 --qsound 2 --gfx 4` (symlinks the reference zips, writes one clone zip;
 ROMDIR is never modified).
 
+**The canary romset is NOT the shippable romset (14z-60z, paid for with
+two sessions).** `--gfx-copy-group-b` fills group C with byte COPIES of the
+stock group B members, so those copies carry group B's CRCs. Both emulators
+resolve a ROM entry by hash before falling back to its name, so in a
+CONTENT build — whose group B holds the ported tiles — the loader matches
+group B's declared CRC against the copies and serves **pristine** tiles for
+the patched member. That shipped: Donovan and Anita rendered with vanilla
+art from character select through the match, on both emulators, while every
+RAM gate stayed green.
+
+So the two romsets live in separate directories and always have:
+
+| directory | group C | used by |
+|---|---|---|
+| `build/wide0/rompath` | zero fill | content builds (`pack_build.sh --merge`), profile inertness |
+| `build/wide_canary/rompath` | byte copy of group B | the B4 canary section ONLY (`CANARY_ROMPATH`) |
+
+`tools/audit_romset_identity.py` enforces the invariant that made the
+difference — no member may carry the pristine bytes of a member the build
+patched — and runs inside `tools/build_donovan.sh`.
+
 ## Emulator change budget (measured, not estimated)
 
 | Change | FBNeo | Class |

@@ -50,6 +50,7 @@ data_file 0x3fa790 +0x25c2  donovan hitbox (from vsav2 0x0C8BB8)
 # hitbox_proj+0x331: region_fix 50 -> 0f (extended record type 0x50 -> 0x0F (vs2 dispatch alias: entry 0x50 word 0x16E == entry 0x0F's; same wild-jump class past vsavj's 0x4F table end))
 # hitbox_proj+0x351: region_fix 50 -> 0f (extended record type 0x50 -> 0x0F (vs2 dispatch alias: entry 0x50 word 0x16E == entry 0x0F's; same wild-jump class past vsavj's 0x4F table end))
 data_file 0x0ca7e0 +0x1000  donovan hitbox_proj (from vsav2 0x0D0CA8)
+# x026142+0x140c: bank table row 0x0f <- 0x4000 (bank 2; vanilla row was 0x4000) — tenant-driven
 # x026142+0x13ee: table_fix 48 bytes (ported per-char OBJ bank table -> vanilla vsavj values (0x282D4))
 # bank_ref 0xd7a18 -> 0xbd87a (delta rule, 16B byte-identical)
 # bank_ref 0xd8358 -> 0xbe1ba (delta rule, 16B byte-identical)
@@ -329,6 +330,10 @@ data   0x3b2ac0 +0xa0  data_port win_pal_slot0f_c7 <- vsav2 0x3c851c (0 fixes)
 data   0x3a3a80 +0x20  data_port med_pal_row14_a <- vsav2 0x3bafdc (0 fixes)
 data   0x400010 +0x160  sound_table don_sfx_records <- vsav2 0x0cb01a (44 entries; kept ['0x110@1', '0x111@2', '0x112@3', '0x152@21', '0x119@22']; zeroed 38 unplayable ids)
 poke32 0x0bf456 <- 0x400010  sound_table don_sfx_records per-char ptr row 0x0f (was 0xb3220)
+data   0x0211e4        select_wheel roster21: TABLE B in place, 28 bytes over 3 new rows + 5 inbound edges
+data   0x400170 +0x54  select_wheel roster21 coord list (18 vanilla + 3 new)
+data   0x4001d0 +0x5e  select_wheel roster21 record (count 17->20, budget 0x55 CARRIED OVER, cptr -> 0x400170)
+poke32 0x2689fe <- 0x4001d0  select_wheel roster21 record ptr (was 0x272a68; the record's ONLY referrer — vanilla record and list are untouched)
 code   0x3ffcb0 +0x62  site_thunk fixture_row0f_override_bank0; site 0x01c586 jsr-routed
 code   0x3ffd20 +0x62  site_thunk fixture_row0f_override_bank1; site 0x01c59a jsr-routed
 code   0x0fff40 +0x18  site_thunk select_companion_tbl_a; site 0x0845ec jsr-routed

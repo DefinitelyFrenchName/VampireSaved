@@ -50,6 +50,7 @@ data_file 0x3fa790 +0x25c2  donovan hitbox (from vsav2 0x0C8BB8)
 # hitbox_proj+0x331: region_fix 50 -> 0f (extended record type 0x50 -> 0x0F (vs2 dispatch alias: entry 0x50 word 0x16E == entry 0x0F's; same wild-jump class past vsavj's 0x4F table end))
 # hitbox_proj+0x351: region_fix 50 -> 0f (extended record type 0x50 -> 0x0F (vs2 dispatch alias: entry 0x50 word 0x16E == entry 0x0F's; same wild-jump class past vsavj's 0x4F table end))
 data_file 0x0ca7e0 +0x1000  donovan hitbox_proj (from vsav2 0x0D0CA8)
+# x026142+0x140c: bank table row 0x0f <- 0x4000 (bank 2; vanilla row was 0x4000) — tenant-driven
 # x026142+0x13ee: table_fix 48 bytes (ported per-char OBJ bank table -> vanilla vsavj values (0x282D4))
 # bank_ref 0xd7a18 -> 0xbd87a (delta rule, 16B byte-identical)
 # bank_ref 0xd8358 -> 0xbe1ba (delta rule, 16B byte-identical)

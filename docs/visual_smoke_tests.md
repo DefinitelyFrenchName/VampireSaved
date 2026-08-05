@@ -6,11 +6,25 @@ monitoring is green and only the *standard output* shows the fault. Their
 case: the data loaded was correct, but loaded in a wrong MANNER, so the
 visuals were corrupt while every internal check passed.
 
-**The WIDE sprite garble (14z-60y) is a fresh instance of exactly that.**
-The decoded tile buffer was byte-identical to the known-good stock build,
-zero `0xFF` fill — internal state perfect — while Donovan rendered as
-garbage, because the tile ADDRESS composition at draw time was wrong. The
-buffer is internal state; the screen is the output.
+**The WIDE sprite garble (14z-60y) is a fresh instance of exactly that** —
+though not for the reason first written here. **Corrected 14z-61 after
+root-causing it:** the tile data was NOT fine. The romset carried a member
+holding the pristine bytes of a member the build had patched, and the
+loader — which resolves a ROM entry by hash before name — served the
+pristine tiles. Donovan drew with vanilla art.
+
+The dump that "proved the data fine" had been taken at the wrong address
+(the sprite's code word without its bank bits), so it read an unrelated
+band that is vanilla on every build. That is the sharper version of the
+maintainer's point: **internal monitoring was not merely green, it was
+green because it was pointed at the wrong place, and a clean null was
+trusted without a negative control.** The screen was right the whole time;
+nobody was looking at it.
+
+Implemented as of 14z-61: `tests/test_wide_render_content.sh` — per-frame
+framebuffer A/B of a Donovan replay, stock track vs WIDE track, with a
+positive control that poisons the set back into the failing shape. It is
+item 2 of the inventory below, and the pattern the other six should copy.
 
 We cannot cover everything. The proposal is narrower and achievable: **a few
 smoke tests over visuals that have broken BEFORE and whose check we already
@@ -22,7 +36,7 @@ this repo documents every one of them.
 | # | Visual | Broke as | Where the repro is |
 |---|---|---|---|
 | 1 | Menus / select screen tiles | overlay placement corrupted title, select and speed menus while the full masked battery stayed green, twice | `tests/test_gfx_menus.sh` (exists — the model for the rest) |
-| 2 | **New-character in-match sprites** | the current WIDE garble; also the round-25 spark-bank regression that passed the whole battery | replay 17 frames 3477-3481 (the ready-made spark probe) |
+| 2 | **New-character in-match sprites** | the WIDE garble (a shadowed ROM member, 14z-60z); also the round-25 spark-bank regression that passed the whole battery | **`tests/test_wide_render_content.sh` (EXISTS, 14z-61)**; spark probe: replay 17 frames 3477-3481 |
 | 3 | Companion overlay (sword / statue) | Jedah's overlay animating where Donovan's sword and statue belong | the sword gate's anim node; playtest rounds 8-11 |
 | 4 | Anita's feet strip (bank-2 records) | solid green, then +0x47 garble, from bank misattribution | `tests/lua/obj_record_bank_trace.lua`, rounds 10-13 |
 | 5 | Electric-hit darken / VS-fade curtain | stale OBJ buckets rendered as garble; the fix once REMOVED the darken entirely | ~10-frame window, **odd-frame sampling required** (even-frame sampling missed it for three sessions) |
@@ -49,11 +63,24 @@ this repo documents every one of them.
   session.
 - **Never run pixel probes in parallel with a battery** — three concurrent
   MAME instances flaked a replay into a different attract phase.
+- **A NULL result needs a negative control too** (added 14z-61). "The tiles
+  are identical, so the data is fine" was the wrong turn in this very bug:
+  the dump was pointed at the wrong address and its clean answer was
+  trusted. Every comparison in `test_wide_render_content.sh` is paired with
+  something that MUST differ — and that pairing caught a field-index slip
+  in the gate's own checker on its first run.
+- **Snapshots are available headlessly.** MAME renders its bitmap
+  internally even under `-video none` + `SDL_VIDEODRIVER=dummy`, so
+  `manager.machine.video:snapshot()` writes real PNGs
+  (`tests/lua/snapshot_frames.lua`). Cheap enough that "look at the screen"
+  is now a scripted step, not a manual one.
 
 ## Priority
 
-Row 2 first, as part of closing the open bug: a Donovan replay compared
-stock-vs-WIDE at sync anchors would have caught it automatically, and the
-instruments already exist. Rows 1 and 7 are cheap extensions of the existing
-menu pixel gate. Rows 3-6 are worth adding as their subsystems are next
-touched, rather than all at once.
+Row 2 is **DONE** (14z-61, `tests/test_wide_render_content.sh`). Measured
+while building it: the two tracks do not skew at all on the Donovan pick
+replay (3,721/3,721 frames pixel-identical), so that comparison is exact
+rather than anchored — the anchor rule above still governs cross-EMULATOR
+and cross-GAME comparisons, where the skew is real. Rows 1 and 7 are cheap
+extensions of the existing menu pixel gate. Rows 3-6 are worth adding as
+their subsystems are next touched, rather than all at once.

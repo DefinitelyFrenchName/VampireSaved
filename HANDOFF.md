@@ -45,11 +45,25 @@ negative control — sprites render pixel-perfect from the appended banks
 ```sh
 WIDE=0 tools/setup_fbneo.sh && cp emu/fbneo/fbneo /somewhere/fbneo_ref  # reference binary
 tools/setup_fbneo.sh                                                    # the WIDE binary
+# THE SHIPPABLE overlay (group C zero-filled). This is what content builds merge.
 python3 tools/build_wide_romset.py "$ROMDIR" build/wide0/rompath \
-        --qsound 2 --gfx 4 --prg 4 --gfx-copy-group-b                   # prints the descriptor
+        --qsound 2 --gfx 4 --prg 4                                      # prints the descriptor
                                                                         # rows incl. CRCs - paste them in
+# THE B4 CANARY romset, separate directory, NEVER merged into a build:
+python3 tools/build_wide_romset.py "$ROMDIR" build/wide_canary/rompath \
+        --qsound 2 --gfx 4 --prg 4 --gfx-copy-group-b
 ROMDIR=... FBNEO_REF=/somewhere/fbneo_ref tests/test_wide_profile.sh    # 36 checks, 3 sections
 ```
+
+**The two romsets must stay separate (14z-60z/61, cost two sessions).**
+`--gfx-copy-group-b` writes byte copies of the stock group B members, so
+they carry group B's CRCs. Both emulators resolve a ROM entry by HASH
+before falling back to its NAME, so in a content build — whose group B
+holds the ported tiles — the loader matches group B's declared CRC against
+those copies and serves **pristine** tiles instead. That is exactly how the
+WIDE track rendered Donovan and Anita with vanilla art while every gate
+stayed green. `tools/audit_romset_identity.py` now fails any build that
+carries the shape; it runs inside `build_donovan.sh`.
 The reference binary MUST differ from the build under test by ONLY patch
 0002 — build it from the same tree state or the comparison measures noise.
 **Rebuild the reference whenever the harness changes**, and always in the
@@ -122,7 +136,19 @@ rendering change. Ground truth: `tests/test_replay_video_selfcheck.sh`.
 
 ```sh
 export ROMDIR=/path/to/reference/sets
-tools/run_wide.sh build/m5w fbneo      # or: ... mame
+tools/run_wide.sh build/m5_wide fbneo      # or: ... mame
+```
+
+**`build/m5_wide` (fingerprint `9bac6ee3`) is the current WIDE build.**
+`build/m5w` (`ac52eeff`) is the KNOWN-BAD artifact of the 14z-60y sprite
+garble, kept as evidence — do not playtest it. `tools/audit_romset_identity.py
+build/m5w/rompath` names its four shadowed members in a second. Rebuild the
+pair with:
+
+```sh
+GEN_FLAGS="--allow-plausible --tripwire-open" tools/build_donovan.sh 6 build/m5_stock
+KEY_SET=vsavj GEN_FLAGS="--allow-plausible --tripwire-open --profile cps2-wide-v1" \
+    tools/build_donovan.sh 6 build/m5_wide
 ```
 
 Three things must agree and `run_wide.sh` asserts all three, naming the one
@@ -328,7 +354,28 @@ tests/audit_id_writers.sh             # on-demand (22 MAME runs): every characte
                                       # on a variant id superset-safe by construction
 tests/audit_mask_window_ff4182.sh     # on-demand: proves the masked palette-staging
                                       # window hides the designed diff and nothing else
+tests/test_romset_identity.sh         # ground truth for tools/audit_romset_identity.py:
+                                      # no member may carry the PRISTINE bytes of a member
+                                      # the build patched (both emulators resolve a ROM
+                                      # entry by hash before name, so such a member
+                                      # silently reverts the patch — 14z-60z). 4 synthetic
+                                      # sets, no emulator, ~1s
+tests/test_wide_render_content.sh     # the WIDE track must RENDER ported content exactly
+                                      # as the stock track does: member identity + per-frame
+                                      # framebuffer A/B on a Donovan replay + a POSITIVE
+                                      # CONTROL (a set poisoned back into the 14z-60z shape
+                                      # must fail) + the decoded tile band with a pristine
+                                      # negative control. ~60s. This is the gate whose
+                                      # absence let the sprite garble reach a playtest
 ```
+
+Diagnostic instruments added with that gate (MAME Lua, all rerunnable):
+`tests/lua/snapshot_frames.lua` (real PNG snapshots headlessly — MAME
+renders its bitmap internally even under `-video none`, so `video:snapshot()`
+works and the screen can be LOOKED at in-loop), `tests/lua/obj_records_dump.lua`
+(the live sprite list with the composed 18/19-bit tile address per entry),
+`tests/lua/gfx_region_dump.lua` (decoded tile bytes at a TILE index —
+compose the bank bits first, see GOTCHAS).
 
 All tests are self-contained, take state only via env/args, print PASS/FAIL,
 and exit nonzero on failure. Every dev-time in-emulator probe must land here
@@ -338,6 +385,8 @@ before session end (persistent suite doctrine, CLAUDE.md §4).
 
 | Build | SHA-1 (zip) | Notes |
 |---|---|---|
+| **m5_wide / m5_stock (current pair, 2026-08-05, 14z-61)** | fingerprints `9bac6ee378e1a5ce0674423279c357a4d2a076ec` (WIDE) / `ae701ffb06d0cbf3462cad1a9faa47534a3c00e4` (stock) | rebuilt through the fixed romset pipeline (group C zero-filled; `audit_romset_identity.py` clean). The stock rebuild reproduces its registered fingerprint exactly. Gates: `tests/test_wide_render_content.sh` PASS — 3,721/3,721 frames pixel-identical across the two tracks on `11_pick_donovan`, with a positive control. NOT frozen/registered: no maintainer playtest yet |
+| ~~m5w~~ **KNOWN-BAD, kept as evidence** | `ac52eeff` | the 14z-60y sprite garble: its `vsavjw.zip` carries group C as byte copies of group B, so the loader served pristine tiles for the patched group B. Do not playtest. `python3 tools/audit_romset_identity.py build/m5w/rompath` names all four shadows |
 | null vsavj | `12fbb0e1a137a1420824856d3efb0af8fff57be6` | == reference members; zip repacked deterministically |
 | **donovan-m2c (M2b+ASSETS FROZEN 2026-08-02)** | fingerprint `b91647c7da14ded6316cee8dc057c8daf1c3fb1e` | `tools/build_donovan.sh 6 build/donovan6`; REGISTERED `-> donovan-m2c`; the 14z-42..49 arc on top of M2b-CORE: LS hit-freeze thunks, full ES chain + meter decode, win screen, deity seq-states, accent owner-link fallback, HC motion farm_ports, HUD mugshot/name, select medallion; masked legacy basis = THREE windows (palette staging slot $FF4182-$FF41A1 ratified round 64; audit `tests/audit_mask_window_ff4182.sh`); gates: full battery GREEN (battery_49b) + `run_suite.sh` GREEN by fingerprint auto-detection; maintainer-confirmed rounds 52-64; gfx member sha1s in registry note |
 | **donovan-m2b-core (M2b-CORE FROZEN 2026-07-28)** | fingerprint `71601263474dfd7e4afd0741dae696cde22eda4e` | `tools/build_donovan.sh 6 build/donovan6`; REGISTERED `-> donovan-m2b`; sprites/palettes/effects in Jedah's gfx space; rompath carries patched vsav.zip (gfx sha1s in registry note); gates: tests/test_m2b_stage6.sh + oracle/xemu/flavor + tests/test_m2b_scroll3.sh — ALL PASS; select portrait/name/mugshot + attract palette remain (docs/engine_internals.md) |

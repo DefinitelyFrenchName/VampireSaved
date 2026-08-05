@@ -48,3 +48,10 @@ re/ghidra/*
 # ── Exceptions: savestates/replays that tests depend on are force-added ──────
 # (git add -f, per CLAUDE.md savestate hygiene; no blanket un-ignore here)
 build/donovan/
+
+# Generated CPS-2 WIDE romset overlays: directories of ABSOLUTE symlinks into
+# $ROMDIR plus one clone zip, rebuilt in one command (HANDOFF). Tracking them
+# put a stale absolute symlink in git, which dangled the moment the repo path
+# changed and produced a false gate FAIL (14z-61, docs/GOTCHAS.md).
+build/wide0/rompath/
+build/wide_canary/rompath/

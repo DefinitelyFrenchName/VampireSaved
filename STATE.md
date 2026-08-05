@@ -1,10 +1,161 @@
 # STATE — living progress log
 
-Updated: 2026-08-05 (session 14z-60..60y — the select wheel EXTENDED and
-measured, the id space ANSWERED, the `[[tenant]]` schema and CLAUDE.md §4
-class v3 RATIFIED. **Ends on an OPEN BUG: WIDE renders Donovan/Anita with
-wrong tiles** — read 14z-60y first; §6 makes it the only task. Repo path
-changed: `Vampire Saved` -> `Vampire_Saved`)
+Updated: 2026-08-05 (session 14z-61 — **the WIDE sprite garble is ROOT-CAUSED
+and FIXED**: it was never a rendering defect, it was a romset member the
+loader silently preferred over the patched one. Read 14z-61 first. Earlier
+this day, 14z-60..60z: select wheel EXTENDED, id space ANSWERED, `[[tenant]]`
+schema and CLAUDE.md §4 class v3 RATIFIED. Repo path changed:
+`Vampire Saved` -> `Vampire_Saved`)
+
+## Session 14z-61 (WIDE GARBLE FIXED — a shadowed ROM member, not the
+## emulator; and the rendering gate that should have caught it)
+
+The open bug is closed. Both hypotheses the previous session left standing
+were wrong, and the previous session's own exculpatory measurement was
+taken at the wrong address.
+
+### The fault: a member that carried another member's pristine bytes
+
+`tools/build_wide_romset.py --gfx-copy-group-b` fills the appended gfx
+group C with **byte copies of the stock group B members** — the B4 canary
+shape. Copies carry the originals' CRCs. Content builds patch group B
+(`vm3.14m/16m/18m/20m` — where Donovan's tiles live) and merge that canary
+romset in (`build_donovan.sh` -> `pack_build.sh --merge`, the recipe
+HANDOFF documented). **Both emulators resolve a ROM entry by HASH before
+falling back to its NAME**, so group B's declared CRC matched the canary
+copies sitting in the same set and the loader served PRISTINE tiles for the
+members the build had patched. Donovan and Anita drew with vanilla art:
+right geometry, wrong pixels, no error, no `0xFF` fill, every RAM gate
+green.
+
+MAME says it in its own log if you know what to read — on the stock track
+all eight gfx members report `WRONG CHECKSUMS` (the patched art loading by
+name); on the WIDE track `vm3.14m/16m/18m/20m` are **silent**, because a
+hash match was found for the wrong file. FBNeo says it in its own source,
+`src/burner/sdl/bzip.cpp:158`: `// Search by crc first`, then
+`// Failing that, search for possible names`. **The name is the fallback,
+not the identity** — two files with the same bytes are the same member as
+far as either loader is concerned.
+
+### Measured, with controls, on both emulators
+
+Decoded tile band at Donovan's select portrait, tile `0x2AD8F`
+(`tests/lua/gfx_region_dump.lua` under MAME, `FBNEO_HGFX` under FBNeo):
+
+| set | tiles at the ported band |
+|---|---|
+| WIDE build `m5w` (garbled) | **== PRISTINE vsavj** |
+| WIDE build, group C zero-filled | == stock track (the patched art) |
+| stock build `m5_stock` (renders fine) | the patched art |
+| pristine reference | pristine |
+
+FBNeo four-way, same conclusion: `m5w` `4dd0db77…` == pristine; `m5w_fix`
+and `m5_stock` both `5189ccca…`. Two unrelated loaders, one behaviour.
+
+### Two dead hypotheses, and why they looked alive
+
+- **"The tiles load fine, so the fault is tile ADDRESSING at draw time"**
+  (14z-60y). The dump behind it read byte `0x56C780` = tile `0xAD8F` —
+  the sprite's code word **without its bank bits**. The address the
+  hardware composes is `code | ((y & 0x6000) << 3)` = `0x2AD8F`, byte
+  `0x156C780`. The band compared was unrelated vanilla data, identical on
+  every build by construction. GOTCHAS entry added.
+- **"y-word bit 12 is both the promoted address bit and a legitimate Y
+  bit"** — false twice over. `objy_bits.lua` over the whole Donovan
+  replay: `bit12=0`, `max19 == max18 = 0x33812`, so the WIDE promote line
+  never fires on this content; and in `cps_obj.cpp` the drawn Y is masked
+  to `0x03FF`, so bit 12 is not a coordinate bit either.
+- Positive proof it is not the emulator at all: **the OBJ records are
+  bit-identical between the two tracks** — 2,277 live entries at the
+  select-screen and in-match frames, zero differences
+  (`tests/lua/obj_records_dump.lua`). Same records, different pixels =
+  the difference is in what the loader put in memory, not in how the
+  draw path read it.
+
+### The fix, in the pipeline rather than in a file
+
+1. `build/wide0/rompath` is the **shippable** overlay again (group C zero
+   fill); the canary shape lives only in `build/wide_canary/rompath`.
+   `tests/test_wide_profile.sh` and `tests/test_mame_wide.sh` now read
+   `CANARY_ROMPATH` for their B4 section, so the split does not silently
+   cost that coverage.
+2. `tools/audit_romset_identity.py` — **no member of a set may carry the
+   pristine bytes of a member that build patched.** Byte-identical
+   placeholders (the zero-filled 4 MB units) are reported, not failed:
+   they can shadow nothing. Wired into `build_donovan.sh` (hard fail,
+   after the gfx stage so it sees the whole set) and `pack_build.sh`.
+   Run against the garbled build it names all four shadows.
+3. `--gfx-copy-group-b` now prints a NOT-SHIPPABLE warning explaining the
+   shadowing.
+
+Rebuilt through the fixed pipeline: WIDE `9bac6ee3`, stock `ae701ffb`
+(the stock rebuild reproduces the registered fingerprint exactly — a free
+reproducibility check). Donovan renders correctly on both emulators;
+snapshots in the session artifacts.
+
+The WIDE rebuild also picks up the 14z-60 wheel work absent from `m5w`:
+`PRG:0x2689FE` (the wheel-record referrer), `PRG:0x021227` (TABLE B), and
+148 bytes in the extension member — attributed, not mysterious.
+
+### The gate that should have caught it (and now does)
+
+`tests/test_wide_render_content.sh`, ~60 s, four sections:
+
+1. member identity on both tracks (static, no emulator);
+2. **pixel A/B**: per-frame framebuffer checksums of a Donovan replay on
+   stock vs WIDE must be identical — measured **3,721/3,721 frames
+   identical**, so the tracks do not skew and this is an exact comparison,
+   not an anchor comparison;
+3. **positive control**: a set poisoned back into the 14z-60z shape must
+   fail both — it does, diverging on 2,542 frames;
+4. the decoded tile band is the build's, not pristine, with a pristine
+   negative control — which caught a field-index slip in the gate's own
+   checker on its first run.
+
+`tests/test_romset_identity.sh` ground-truths the audit over four
+synthetic sets (~1 s, no emulator, no build): patched-clean PASS, shadowed
+FAIL naming both members, benign placeholders PASS, nothing-patched PASS.
+Both are wired into `tests/run_battery_m2.sh` — the identity check as a
+build-independent rule lock, the rendering gate on WIDE builds that have a
+stock twin to compare against.
+
+### Gates re-run after the change (§6)
+
+| gate | result |
+|---|---|
+| `tests/test_wide_profile.sh` (FBNeo) | **PASS** — superset invariant + inertness + B4 canary, 12 replays, RAM and framebuffer |
+| `tests/test_mame_wide.sh` | **PASS** — the same three sections on the MAME side |
+| `tests/test_wide_render_content.sh` | **PASS** — new |
+| `tests/test_romset_identity.sh` | **PASS** — new |
+| stock rebuild | fingerprint `ae701ffb` reproduced exactly, so the build-pipeline edits are inert |
+
+**One false FAIL on the way, worth knowing about:** the B4 canary section
+failed on all 12 replays the first time it ran from its new home, because
+`build/wide_canary/rompath` had been generated BEFORE the repo path lost
+its space and its symlinks into `$ROMDIR` were all dangling. The overlay
+builder in `run_replay_fbneo.sh` copies the overlay's links over the good
+reference ones, so the whole set goes unreadable and it reads as "the
+emulator renders the appended banks wrongly". Regenerating the romset fixed
+it. GOTCHAS entry added — every generated rompath overlay built before the
+rename needs the same treatment.
+
+New instruments, all rerunnable: `tests/lua/snapshot_frames.lua` (MAME
+renders its bitmap internally even under `-video none`, so
+`video:snapshot()` gives real PNGs headlessly — this is how the bug was
+first SEEN in-loop), `tests/lua/obj_records_dump.lua`,
+`tests/lua/gfx_region_dump.lua`.
+
+### What this says about the testing posture
+
+The previous session called this "a coverage failure, not a
+testing-cadence one" and was right. Worth adding: the failing component
+was not the emulator, the ROM builder, or the port — it was the
+**romset assembly step**, which no gate looked at, sitting between two
+that were heavily gated. And the one instrument that could have seen it
+(a gfx-band dump) was pointed at the wrong address by a hand-composed
+tile number, then trusted because it returned a clean null. A null result
+needs a negative control exactly as much as a positive one does.
+
 ## Session 14z-60 (select cursor MEASURED; the id space is CONVENTIONAL)
 
 Two queued items closed, in the order the maintainer set: re-verify and
@@ -5349,15 +5500,20 @@ window per measured slot, never pre-widen.
 
 ## Open bugs
 
-- **WIDE sprite garble (14z-60y) — BLOCKS THE WIDE TRACK.** Donovan and
-  Anita render with wrong tiles from character select through the match on
-  `build/m5w` (`ac52eeff`); mechanics, hitboxes and hurtboxes are correct.
-  Tile DATA is proven fine (decoded-buffer dumps byte-identical to the
-  known-good stock build, no 0xFF fill), so the fault is tile ADDRESSING at
-  draw time — i.e. the WIDE profile's 19-bit tile-code composition in
-  `cps_obj.cpp`. Suspect: y-word bit 12 is both the promoted address bit and
-  a legitimate Y coordinate bit. Full write-up and the next measurement are
-  in session 14z-60y. CLAUDE.md §6: this is the only task until green.
+- ~~**WIDE sprite garble (14z-60y)**~~ **FIXED 2026-08-05 (14z-61).** Not a
+  rendering defect: the shipped WIDE romset carried group C as byte copies
+  of the stock group B, so those copies held group B's CRCs and the loader
+  — which resolves by hash before name — served PRISTINE tiles for the
+  members the build had patched. Fixed in the pipeline (shippable overlay
+  zero-filled, canary romset separated, `tools/audit_romset_identity.py`
+  wired into the build), verified on both emulators with pristine and
+  stock-track controls, and gated by `tests/test_wide_render_content.sh`
+  (pixel A/B vs the stock track + a positive control) and
+  `tests/test_romset_identity.sh`. Full write-up: session 14z-61.
+  **Still owed: a maintainer playtest of the rebuilt WIDE build** — the
+  gates say the pixels match the stock track, which is the strongest
+  statement available headlessly, but the original report came from a human
+  looking at the screen.
 - Minor win-screen palette issues, same playtest. Lower priority, and
   probably unrelated — keep them separate until one is root-caused.
 

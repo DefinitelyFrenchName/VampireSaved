@@ -42,8 +42,16 @@ python3 tools/audit_roms.py "$ROMDIR" > /dev/null || {
 # the character-id space, both of which the roster work builds on.
 tests/test_id_space.sh
 tests/test_select_wheel.sh
+# Romset assembly is the one step between the ROM builder and the emulator
+# that nothing used to check, and it is where the 14z-60z sprite garble
+# lived: a merged member carrying the pristine bytes of a patched member,
+# which both emulators prefer by hash. Cheap, build-independent, no emulator.
+tests/test_romset_identity.sh
 
 tests/test_m2b_stage6.sh "$OUTBASE"
+# The set under test must itself be free of that shadowing.
+python3 tools/audit_romset_identity.py "$OUTBASE/rompath" || {
+    echo "BATTERY STOP: a member of $OUTBASE/rompath shadows a patched member"; exit 1; }
 tests/test_don_sword.sh "$OUTBASE/rompath"
 tests/test_don_accent.sh "$OUTBASE/rompath"
 tests/test_don_colors.sh "$OUTBASE/rompath"
@@ -53,4 +61,16 @@ tests/test_don_sound.sh "$OUTBASE/rompath"
 tests/test_m2a_stage4_oracle.sh "$OUTBASE/rompath"
 tests/test_m2a_stage4_xemu.sh "$OUTBASE/rompath"
 tests/test_m2a_flavor_selector.sh "$OUTBASE/rompath"
+
+# WIDE-track builds get the rendering gate as well: every gate above is
+# RAM-basis and structurally blind to what reaches the screen, which is how
+# Donovan shipped rendering as garbage with a green battery (14z-60z).
+# Needs the stock-track twin as its reference, so it runs only when both
+# tracks are present.
+if [ -f "$OUTBASE/rompath/vsavjw.zip" ] && [ -f "$REPO/build/m5_stock/rompath/vsavj.zip" ]; then
+    tests/test_wide_render_content.sh "$REPO/build/m5_stock/rompath" "$OUTBASE/rompath"
+else
+    echo "note: WIDE rendering gate skipped (not a WIDE build, or no stock twin"
+    echo "      at build/m5_stock — tests/test_wide_render_content.sh)"
+fi
 echo "BATTERY GREEN"

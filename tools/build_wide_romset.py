@@ -36,9 +36,11 @@ def main():
     ap.add_argument("--prg", type=int, default=0,
                     help="appended 512KB program members (4 => 4MB->6MB)")
     ap.add_argument("--gfx-copy-group-b", action="store_true",
-                    help="fill the appended GFX group with a byte copy of the "
-                         "stock group B instead of zeros, so WIDE banks 4/5 "
-                         "mirror banks 2/3 (the B4 canary)")
+                    help="CANARY ROMSETS ONLY — fill the appended GFX group "
+                         "with a byte copy of the stock group B, so WIDE "
+                         "banks 4/5 mirror banks 2/3 (the B4 canary). NEVER "
+                         "merge the result into a content build: see the "
+                         "warning this prints")
     a = ap.parse_args()
     if a.gfx % 4:
         raise SystemExit("--gfx must be a multiple of 4 (the loader consumes "
@@ -80,6 +82,18 @@ def main():
     print("  NOTE: descriptor sizes in FBNeo's VsavjwRomDesc[] must match "
           "these members exactly — a member LARGER than its declared length "
           "is silently truncated at load (load.cpp), with no diagnostic.")
+    if a.gfx_copy_group_b:
+        print()
+        print("  *** CANARY ROMSET — NOT SHIPPABLE (14z-60z) ***")
+        print("  Group C now holds byte copies of the stock group B members,")
+        print("  so it carries THEIR CRCs. Both emulators resolve a ROM entry")
+        print("  by hash before name, so in a set whose group B is PATCHED the")
+        print("  loader matches group B's declared CRC against these copies and")
+        print("  loads pristine tiles instead — the patch reverts silently.")
+        print("  Build content overlays WITHOUT this flag; keep the canary in")
+        print("  its own directory (build/wide_canary/rompath) and never pass")
+        print("  it to pack_build.sh --merge. tools/audit_romset_identity.py")
+        print("  fails any build that does.")
 
 
 if __name__ == "__main__":

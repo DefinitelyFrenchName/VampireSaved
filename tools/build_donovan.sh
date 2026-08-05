@@ -128,6 +128,21 @@ if [ "$STAGE" -ge 6 ]; then
     python3 tools/verify_gfx_build.py "$OUTBASE"
 fi
 
+# MEMBER-IDENTITY AUDIT (14z-60z) — the LAST thing before fingerprinting,
+# because it must see the whole set: the patched program members AND the
+# patched vsav.zip the gfx stage writes above. Both emulators resolve a ROM
+# entry by hash before name, so any member carrying the pristine bytes of a
+# patched member silently reverts that patch at load time. The WIDE romset
+# did exactly this for two sessions (merged group C was a byte copy of
+# group B), shipping Donovan with vanilla tiles while every RAM gate stayed
+# green. A build that fails this must never reach a playtest.
+python3 tools/audit_romset_identity.py "$OUTBASE/rompath" || {
+    echo "BUILD REJECTED: member-identity audit failed (above)." >&2
+    echo "  A merged member shadows a patched one; the patch would revert" >&2
+    echo "  silently at load. Do not playtest this build." >&2
+    exit 1
+}
+
 # Fingerprint the SET WE PACKED. Omitting --set defaulted to vsavj, so a
 # WIDE build (packed as vsavjw) found no vsavj.zip in its own rompath and
 # silently fell through to the PRISTINE reference in $ROMDIR — reporting the
