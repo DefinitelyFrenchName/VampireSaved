@@ -287,6 +287,57 @@ an island, and that is caught), and no **reserved** id is used
 (`docs/atlas/id_space.md`: `0x12`, `0x18`). Output is the byte diff against
 vanilla TABLE B, ready to become a manifest row.
 
+## The PS1 console-port reference (captures, 2026-08-05)
+
+Three JPEG captures supplied by the maintainer (kept OUTSIDE the repo — they
+show copyrighted art). The cursor is a **colour-cycling outline** around the
+selected medallion, and the filenames say which character each player is on,
+so correspondence comes from the cursor, not from identifying faces.
+
+**ESTABLISHED — the topology.** The PS1 port did **not** rearrange vsav's
+wheel; it kept the 16-cell hexagon (rows 1-2-3-4-3-2-1) and extended it
+downward. An affine fit of six perimeter cells maps the capture onto the
+arcade frame with **RMS 1.28 arcade px**, which is what "not rearranged"
+means quantitatively. Its layout:
+
+```
+        ...the vsav hexagon, unchanged...
+                 Pyron              <- takes the bottom-centre cell where
+            Phobos   Donovan           vsav has RANDOM (0x0B)
+                  ?                 <- random pushed to a new bottom row
+```
+
+**MAINTAINER'S AMENDMENT:** vsav's wheel is to be preserved exactly, so
+**random stays at `0x0B` (248,152) and Pyron goes to the very bottom** —
+i.e. swap Pyron and `?` relative to the PS1 arrangement. No image editing
+needed; this is just which coordinate each id gets.
+
+**PROVISIONAL — the coordinates.** Fitted arcade positions:
+
+| cell | fitted arcade | confidence |
+|---|---|---|
+| Pyron (PS1 slot) | (240, 158) | ±10 |
+| Phobos | (212, 179) | ±10 |
+| Donovan | (271, 182) | ±10 |
+| `?` (PS1 slot) | (238, 189) | ±10 |
+
+**Do not build from these yet.** Held-out validation exposes the problem:
+cells excluded from the fit (`0x08`, `0x06`) predict ~11 arcade px off,
+because in the dense interior the medallions touch and a centroid read
+drifts toward a brighter neighbour. The perimeter fit is trustworthy; the
+interior reads that anchor the *downward* extrapolation are not. Two
+symptoms of the same thing: the four new cells all land ~7-10px left of the
+wheel's centre line (`x=248`), which the geometry says they should
+straddle.
+
+What would settle it, in order of value:
+1. **A video capture of the cursor moving** — the outline is unambiguous, so
+   every cell it visits yields an exact centre, AND the sequence gives the
+   **adjacency**, which no still can provide and which is 22% unpredictable
+   from geometry (see above).
+2. A lossless PNG rather than JPEG, so medallion borders survive and blob
+   detection works without hand-seeded points.
+
 ## Re-measuring
 
 ```sh
