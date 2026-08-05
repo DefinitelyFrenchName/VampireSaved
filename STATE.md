@@ -5178,6 +5178,32 @@ window per measured slot, never pre-widen.
   **Recommendation: A**, with the measurement done first so the ruling is
   made on a number rather than on a prediction.
 
+  **MEASURED 2026-08-05 (14z-60s), and the number is good.** Built
+  (`select_wheel roster21`) and compared against the previous WIDE build on
+  the masked basis, so the wheel change is the only variable:
+
+  | replay | frames | divergent | window | after |
+  |---|---|---|---|---|
+  | `04_select_fuzz` | 3520 | 162 | 890-1051 | 2469 identical |
+  | `02_demitri_vs_cpu` | 5520 | 733 | 890-1622 | 3898 identical |
+  | `03_two_player_vs` | 5320 | 913 | 890-1802 | 3518 identical |
+  | `09_mirror_pick` | 4720 | 993 | 890-1882 | 2838 identical |
+  | `05_timeout_idle` | 12120 | 733 | 890-1622 | 10498 identical |
+
+  Every replay: **onset at frame 890 — select-screen entry — exactly ONE
+  contiguous run, and FULL RE-CONVERGENCE.** Match state is bit-identical
+  in all five, including a complete timeout match (10,498 identical frames
+  after the window closes). The divergence is confined to the screen we
+  deliberately changed and reaches nothing else.
+
+  That is a **stronger** guarantee than the existing frozen-`diverge`
+  class, which never re-converges at all. The proposal for ratification is
+  therefore a new comparison class: **"bounded select-screen window,
+  re-convergent"** — onset frame, window end and run-count frozen per
+  replay, with re-convergence and match-state identity as the assertions.
+  Mechanism: select-screen init caches the record pointer we repointed
+  (`GOTCHAS` class 4), which is why onset is identical across replays.
+
 - ~~**THE `0x360+id` ANIM BLOCK (14z-60)**~~ **DECIDED 2026-08-05
   (maintainer): option A, INHERIT — "since we can. If it fails, we'll
   fall back to option B (relocation)."** So a newcomer at `0x13` plays
