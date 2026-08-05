@@ -1,9 +1,17 @@
 # Per-tenant manifests — proposed schema
 
-**Status: PROPOSAL, not implemented.** Written 2026-08-05 (14z-60h) now that
-the id-space question is answered and the shape of the work is measured.
-Nothing in the build pipeline consumes this yet. It is here to be argued
-with before code is written against it.
+**Status: RATIFIED by the maintainer 2026-08-05, and IMPLEMENTED for a
+single tenant.** `[[tenant]]` is consumed by `tools/gen_donovan_patch.py`
+(normalised into the legacy `[port]` shape, so the six existing consumers
+are untouched) and drives the gfx half through `patch/tenant.json`. Landing
+it was byte-identical on both tracks with the tenant still at `0x0F`
+(14z-60t/u). Multi-tenant manifests are refused with a clear message until
+M3 Phase 3.
+
+Still PROPOSAL-only below: the `[tenant.wheel]`, `[tenant.ladder]` and
+`[tenant.folds]` sub-tables. They describe work not yet done — the wheel
+data currently lives in `build/manifest/wheel_layout_proposed.json` — and
+marking them ratified would overstate what exists.
 
 ## Why this shape
 

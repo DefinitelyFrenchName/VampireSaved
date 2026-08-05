@@ -5035,6 +5035,32 @@ opcode-space dump oracle (`tests/test_decrypt_oracle.sh`). Both directions
   files are LE-word storage; all derived images are 68k logical (BE) order.
   See docs/GOTCHAS.md first entry.
 
+## Decisions made (maintainer, 2026-08-05): two ratifications
+
+**1. CLAUDE.md §4 comparison class v3 — "bounded re-convergent window".**
+Ratified for the select screen, which the roster deliberately alters. A
+replay qualifies only when all four hold, frozen per replay: a single
+CONTIGUOUS run, a fixed ONSET frame, full RE-CONVERGENCE, and match state
+UNTOUCHED. Measured over five replays before the ruling (onset 890 in every
+one, one run each, 2469-10498 identical frames afterwards including a full
+timeout match). It is STRICTER than the frozen first-divergence constant it
+sits beside, which never re-converges at all — a narrower licence for one
+screen, not a loosening. §4 amended; checker `tools/compare_window.py`,
+ground-truthed both directions by `tests/test_compare_window.sh` including
+that a bit-identical pair is NOT a silent pass (the expectation asserts the
+divergence exists).
+
+**2. The `[[tenant]]` schema.** Ratified, and already implemented for a
+single tenant (14z-60t/u) byte-identically on both tracks with the tenant
+still at `0x0F`. `docs/tenant_manifest.md` moves PROPOSAL -> RATIFIED; its
+wheel/ladder/folds sub-tables stay proposal-only because that work is not
+done.
+
+Maintainer: "I validate the two items, I don't need testing to see that they
+hold on principle." The measurements above were taken before the ruling
+regardless — the class's four clauses are what was measured, not what was
+hoped for.
+
 ## STANDING PRINCIPLE (maintainer, 2026-08-05): vanilla wins ties
 
 "vsav vanilla is always better when we can." **When a console port and

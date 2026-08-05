@@ -88,7 +88,21 @@ legacy behavior is a failed change.
   ground-truth tested — the input-accept/spawn-boundary phase artifact);
   **frozen first-divergence constant** where a masked byte's phase
   provably propagates into live state on a path with no gameplay surface
-  (test mode reading the sound latch). Every non-exact class must be
+  (test mode reading the sound latch); and, **added v3 2026-08-05
+  (maintainer-approved), bounded re-convergent window** — for a screen the
+  roster work deliberately alters. A replay may sit in this class only when
+  all four hold, each frozen per replay: a single CONTIGUOUS divergent run;
+  a fixed ONSET frame; full RE-CONVERGENCE to bit-identical; and **match
+  state untouched**. Introduced for the select screen, whose wheel must gain
+  three cells for the roster (option 1) — measured over five replays before
+  ratification: onset frame 890 in every one, one run each, windows ending
+  1051/1622/1802/1882/1622, and 2469-10498 bit-identical frames afterwards
+  including a full timeout match. Mechanism: select-screen init caches the
+  record pointer the wheel extension repoints (docs/GOTCHAS.md class 4).
+  Note this class is STRICTER than the frozen first-divergence constant
+  above, which never re-converges at all — it is a narrower licence for one
+  screen, not a loosening. Checker `tools/compare_window.py`, ground-truthed
+  by `tests/test_compare_window.sh`. Every non-exact class must be
   mechanism-attributed and its expectation frozen; a replay may not be
   reclassified to a looser class without a new measured mechanism and
   maintainer sign-off. **Standing watch (maintainer, 2026-07-27): if

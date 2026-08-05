@@ -290,6 +290,12 @@ tests/test_input_integrity.sh         # ground truth for the input-integrity che
                                       # un-scripted press at the right frame. MAME's
                                       # window takes focus even under -video none,
                                       # so host keys reach the emulated controls
+tests/test_compare_window.sh          # ground truth for the §4 v3 "bounded
+                                      # re-convergent window" class: accepts the
+                                      # select-screen shape; rejects flicker, a
+                                      # drifting onset, a run that never
+                                      # re-converges, and a silently-identical
+                                      # pair. No emulator needed
 tests/test_select_wheel.sh            # the select cursor, 4 sections: tables decoded
                                       # from the ROM; a generated walk over all 128
                                       # (cell,direction) pairs measured in MAME; four

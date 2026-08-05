@@ -1583,3 +1583,30 @@ Rules that generalise:
 - The control that caught it was cheap: change the tenant id, regenerate,
   and grep the emitted patch for the old byte. Do that for any constant a
   move is supposed to carry.
+
+## Renaming the project directory silently invalidates a worktree session
+(paid: 2026-08-05, 14z-60x — cost one turn of uncommitted work)
+The repo moved from `.../Vampire Saved/...` to `.../Vampire_Saved/...`
+(removing the space — sensible, since MAME's GENie cannot handle one). The
+rename is harmless to git: `main` and every branch survived intact. But an
+in-flight worktree session was pinned to the OLD absolute path, so the next
+command reported the working directory "deleted", and the uncommitted edits
+in that worktree were unreachable through the session's own tooling.
+
+What actually happened, in order: `.claude/worktrees/` vanished with the old
+path; `git worktree list` still advertised the stale entry as `locked`; and
+the session's isolation guard refused every git command aimed anywhere else,
+so the state could not even be INSPECTED from inside the session.
+
+Recovery: `ExitWorktree` (keep) -> `git worktree prune` from the renamed
+checkout -> `EnterWorktree` afresh. Nothing committed was lost; only the
+current turn's edits, which had to be redone from context.
+
+Rules:
+- **Commit before anything that moves the tree**, including a rename you did
+  not initiate. An uncommitted edit in a worktree is one `mv` from gone.
+- After a path change, `git worktree prune` — a stale locked entry survives
+  the directory it names.
+- A fresh worktree branches from `origin/<default>`, which here trails local
+  `main` badly; `git reset --hard main` immediately after creating it (see
+  the stale-origin entry above — this is the second time it applied).
