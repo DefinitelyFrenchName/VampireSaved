@@ -68,7 +68,7 @@ def load_vsavj(zpath):
     return bytes(cps.words_to_logical_bytes(words))
 
 
-def normalise_tenants(port):
+def normalise_tenants(port, profile=None, override=None):
     """`[[tenant]]` supersedes `[port]`.
 
     A tenant is one ported character occupying one character id. Rather than
@@ -92,11 +92,34 @@ def normalise_tenants(port):
                          "builds are not implemented yet (M3 Phase 3). Land "
                          "one tenant at a time." % len(tenants))
     t = tenants[0]
-    tid = _int(t["id"])
+    # PROFILE-GATED ID (M3a, 14z-61). De-substitution — moving the tenant off
+    # a legacy character's slot onto its own variant id — is ROSTER work, and
+    # the dual-track ruling (14z-59g) puts roster work on the WIDE track: the
+    # stock build stays the frozen compatibility artifact. It has no choice in
+    # the matter either, since a tenant at a variant id needs its tiles OUT of
+    # the host character's gfx band, and only the extension has that room.
+    # So one manifest still produces both tracks, with the id per profile.
+    # "profile=id[,profile=id...]" — the manifest parser is minimal, so this
+    # follows near_map's k=v string shape rather than a TOML sub-table.
+    by_profile = {}
+    for kv in str(t.get("id_by_profile", "")).split(","):
+        if kv.strip():
+            k, _, v = kv.partition("=")
+            by_profile[k.strip()] = _int(v.strip())
+    tid = by_profile.get(profile, _int(t["id"]))
+    if override is not None:
+        tid = override
+    if tid >= 0x10 and not profile:
+        raise SystemExit(
+            f"gen_donovan_patch: tenant id {tid:#04x} is a VARIANT id, which "
+            f"requires a build profile — its tiles cannot share the host "
+            f"character's gfx band, and a stock build has nowhere else to put "
+            f"them. Build with --profile, or declare a base-half id for the "
+            f"stock track via [tenant.id_by_profile].")
     p = dict(port.get("port", {}))
     p["src_set"] = t["src_set"]
     p["src_char"] = t["src_char"]
-    p["dst_slot"] = t["id"]
+    p["dst_slot"] = tid
     p["mirror_variant"] = t.get("mirror_variant", tid < 0x10)
     for k in ("alloc_wrap", "near_map", "hole_b_regions", "gfx_bank", "name"):
         if k in t:
@@ -126,6 +149,12 @@ def main():
     ap.add_argument("--allow-plausible", action="store_true",
                     help="use reconciliation rows with status=plausible "
                          "(experiment builds; behavior gates arbitrate)")
+    ap.add_argument("--tenant-id", type=lambda v: int(v, 0), default=None,
+                    help="override the tenant's character id for this build. "
+                         "Used while a de-substitution is IN PROGRESS: the "
+                         "manifest keeps the id the frozen reference was built "
+                         "with, so that reference stays reproducible, and the "
+                         "move is explicit on the command line until it lands.")
     ap.add_argument("--profile", default=None,
                     help="build profile name; enables address spaces gated on "
                          "it (e.g. cps2-wide-v1). Without it, profile-gated "
@@ -142,7 +171,7 @@ def main():
 
     man = json.loads((args.extract_dir / "regions.json").read_text())
     port = toml_loads(args.port.read_text())
-    port = normalise_tenants(port)
+    port = normalise_tenants(port, args.profile, args.tenant_id)
     bank = load_bank_map(args.bank_map)
     vj = load_vsavj(args.vsavj)
     recon = {}

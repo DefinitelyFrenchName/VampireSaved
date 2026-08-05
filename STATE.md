@@ -198,11 +198,51 @@ relocate the wheel) sits **immediately before** the highlight array's row
 which is what the interleaved constant in the highlight tap was. The region
 is packed end to end — more evidence for "relocate, never grow in place".
 
-**What is still owed before M3a can be built:** the tenant's record BYTES
-need a home. In-place surgery fits them inside Jedah's records today; at
-`0x13` they must be placed (Jedah's freed space or the WIDE extension).
-That is a placement question, not a mechanism one — and the mechanism is
-now fully measured.
+### M3a IN PROGRESS: the program half MOVES; the two content halves do not
+
+**Landed and verified.**
+
+- **The tenant id is now a build input, not a constant.** `--tenant-id`
+  overrides the manifest for one build; `[[tenant]] id_by_profile` exists
+  in the generator for when the move lands as the WIDE default. It is
+  deliberately NOT in the manifest yet: the moment the WIDE profile maps to
+  `0x13`, the frozen reference `donovan-m5w` (`9bac6ee3`) stops being
+  reproducible from the tree, and a reference that cannot be rebuilt is not
+  a reference. Verified both ways after the change — WIDE rebuilds to
+  `9bac6ee3` exactly, and `--tenant-id 0x13` moves the tenant.
+- **The program half moves correctly and by construction.** Built at
+  `0x13`: **all 31 slot-indexed table rows land exactly `+0x10` from their
+  `0x0F` addresses** (four slots x 4-byte stride) and the 30 `0x1F` mirror
+  pokes are GONE — a variant-id tenant has no mirror, so Victor's `0x03`
+  is never touched. The 14z-60w preparation paid: the thunk ids substitute,
+  the bank-table row is written at `0x13` (`= 0x4000`), and nothing had to
+  be hand-chased.
+- A variant-id tenant without a profile is now REFUSED with the reason
+  (its tiles cannot share the host's gfx band, and a stock build has
+  nowhere else to put them).
+
+**What is NOT done, stated plainly.** Both remaining halves are CONTENT
+placement, and both would be plausible-but-wrong if rushed:
+
+1. **Select records.** `select_port.py` still does in-place surgery on
+   Jedah's records, so the `0x13` build regresses Jedah's select screen and
+   the tenant shows Victor's (aliased) records. The mechanism is measured
+   (six longs, table above) but the tenant's record BYTES need a home, and
+   picking one by hand is the "never write an unverified gap" trap — it has
+   to go through the generator's allocator, which runs BEFORE select_port
+   in the pipeline. That ordering is the real work.
+2. **Gfx.** The tenant's tiles still occupy Jedah's band, so at `0x13` the
+   tenant renders correctly and **Jedah renders as the tenant**. Moving
+   them means writing group C (WIDE banks 4/5, currently zero fill) instead
+   of vsav's group B, with the WIDE bank encoding (`bank 4 = y-word 0x1000`,
+   `bank 5 = 0x3000` — NOT `bank << 13`), and it makes the group C
+   descriptor CRCs load-bearing, which is the hygiene item already queued.
+
+So `build/m3a` (`f4769b55`) is a scratch build, not a candidate: its
+program half is de-substituted and its content halves are not. It is kept
+only as the evidence that the program move works. **The acceptance
+criterion — legacy Jedah replays return to bit-identical vanilla — cannot
+be claimed until both halves land**, and I have not claimed it.
 
 ### THE WIDE REFERENCE FROZEN (maintainer: "freeze and register as wide
 ### reference first, then we resume")
