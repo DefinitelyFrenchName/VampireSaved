@@ -246,6 +246,17 @@ replay) settle it:
   (name), [0x268A3E] = 0x2724A2 (highlight). P2 arrays are +0x40 copies
   POINTING AT THE SAME RECORDS — replacing record CONTENT fixes both
   sides with zero pokes.
+  **CORRECTED 14z-61 (docs/atlas/select_screen.md, measured):** that
+  `+0x40` block is the **VARIANT HALF** (rows 0x10-0x1F, byte-identical
+  aliases of 0x00-0x0F), not the P2 array. It looks like P2 from a
+  differential dump precisely because it aliases. The real player offset is
+  **+0x80**, confirmed both in the consumer code (`d1 = 0x80` at
+  `PRG:0x06C0E0`) and in-emulator (P2's object fetches its own record from
+  the +0x80 block). The in-place conclusion still holds for slot 0x0F — the
+  two players' rows point at the same records there — but the reason
+  matters for M3a: at a variant id the tenant has its OWN rows in both
+  blocks, so the mechanism becomes a two-long repoint instead of content
+  surgery.
 - Donovan's equivalents (live dump on real vsav2, oracle replay, cursor
   on him): records 0x2A63F0 (7 entries, 38B) / 0x2A657E (14B) /
   0x2A6750 (14B) — ALL SMALLER than Jedah's → in-place replacement

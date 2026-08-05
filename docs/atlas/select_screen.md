@@ -424,10 +424,63 @@ select work avoided all of this by strict in-place replacement with the
 host's budget word preserved; **adding cells makes that impossible by
 construction.**
 
+## The RECORD-POINTER array — what the hovered cell displays (14z-61)
+
+Measured for M3a, to answer "the tenant needs its own select records at
+`0x13`, and that mechanism changes shape". It changes shape by getting
+**simpler**: at a variant id the whole mechanism is two longs.
+
+```
+P1 array   PRG:0x26742A    stride 4    rows 0x00-0x1F
+P2 array   PRG:0x2674AA    = P1 + 0x80, same shape
+index      the CELL/ID, and the consumer masks to EIGHT bits, not four
+rows 0x10-0x1F   byte-identical aliases of 0x00-0x0F — the VARIANT HALF
+```
+
+Chain: the consumers at `PRG:0x05F328` and `PRG:0x06C0E0` do
+`movea.l #$2672AA,a0` + `lea $FC(a0,d0.w),a0` (the second adds `d1 = 0x80`
+for P2) and store the CELL pointer at `$1C(a6)`. The record is the long at
+**cell+4**, walked by the format dispatcher at `PRG:0x01AFA6`
+(`movea.l $1C(a6),a0; movea.l $4(a0),a0; move.w (a0)+,d0`).
+
+**Measured in-emulator, not inferred.** A read tap over the array during
+`11_pick_donovan` (cursor: default → U → U → R → Jedah) fetches
+`0x27195E, 0x2719DA, 0x271B0E, 0x271CE8` — exactly the records the model
+places at rows `0x01, 0x03, 0x07, 0x0F`. Four points over-determine base,
+stride and index. A 2P replay pins the player offset: P2's object
+(`$FFBB80`) fetches `0x271E48`, which is P2 row `0x05` — P2's default cell,
+mirrored from P1's `0x01` — i.e. `+0x80`, agreeing with `d1` in the code.
+
+**This corrects an earlier reading.** `docs/engine_internals.md` recorded
+the P2 arrays as "+0x40 copies pointing at the same records", from a
+differential cursor dump. `+0x40` is the **variant half** (16 rows × 4
+bytes), which aliases the base half and therefore looks identical from a P2
+dump. The real player offset is `+0x80`, and the two halves are different
+things.
+
+**Consequence for the tenant move:** id `0x13` owns `PRG:0x267476` (P1) and
+`PRG:0x2674F6` (P2), today aliasing Victor's records. Repointing those two
+longs gives the tenant its own select records — no widening, no fold to
+defeat, and no legacy row touched, since no legacy id can index the variant
+half (`tests/audit_id_writers.sh`). What the tenant still needs is a HOME
+for the record BYTES: in-place surgery fits them inside Jedah's records
+today, and at `0x13` they must be placed (Jedah's freed space or the WIDE
+extension) — a placement question, not a mechanism one.
+
+Frozen by `tests/test_select_arrays.sh` (static model + a one-byte
+corruption control + the engine's own row sequence, ~10 s).
+
+**Not yet measured: the sibling arrays.** This is the piece reached through
+`$1C(a6)`. The name banner and cursor highlight ride their own arrays; the
+recipe above (tap the region, walk the cursor, compare against the row
+arithmetic) transfers directly, and should be run before the port relies on
+them.
+
 ## Re-measuring
 
 ```sh
 export ROMDIR=/path/to/reference/sets
+tests/test_select_arrays.sh           # the record-pointer array, 3 sections
 tests/test_select_wheel.sh            # static + measured, 9 checks
 # or by hand:
 python3 tools/select_wheel.py build/out/vsavj_data.bin --set vsavj \

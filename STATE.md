@@ -136,6 +136,55 @@ hands too, not only of the tile fix.
 2026-08-04 (option A: the unfaithful voice lines ship silent) — not a gap
 found, a gap already chosen.
 
+### M3a RESUMED: the select-record mechanism at `0x13`, measured — it gets
+### SIMPLER, not harder
+
+The queued unknown was: "`select_port.py` replaces Jedah's select records
+IN PLACE, so at `0x13` the tenant needs its OWN records — that mechanism
+changes shape." Measured answer: **at a variant id the whole mechanism is
+two longs.**
+
+```
+P1 array   PRG:0x26742A    stride 4    rows 0x00-0x1F
+P2 array   PRG:0x2674AA    = P1 + 0x80
+index      the CELL/ID — the consumer masks to EIGHT bits, not four
+rows 0x10-0x1F  byte-identical aliases of 0x00-0x0F (the variant half)
+```
+
+So id `0x13` owns `PRG:0x267476` (P1) and `PRG:0x2674F6` (P2), today
+aliasing Victor's records. Repointing them gives the tenant its own select
+records: **no widening, no fold to defeat, no legacy row touched** — no
+legacy id can index the variant half (`audit_id_writers.sh`). This is the
+14z-60 prediction paying out: moving to a variant id makes the superset
+invariant EASIER, by construction, than the in-place surgery slot `0x0F`
+demands.
+
+**Measured, not inferred, and over-determined.** A read tap over the array
+during `11_pick_donovan` (default → U → U → R → Jedah) fetches
+`0x27195E, 0x2719DA, 0x271B0E, 0x271CE8` — exactly the records the model
+puts at rows `0x01, 0x03, 0x07, 0x0F`. Four points fix base, stride and
+index. A 2P replay pins the player offset: P2's object fetches its own
+record from `+0x80`, agreeing with `d1 = 0x80` in the consumer at
+`PRG:0x06C0E0`.
+
+**And it corrected a recorded claim.** `engine_internals.md` had the P2
+arrays as "+0x40 copies pointing at the same records" (from a differential
+cursor dump). `+0x40` is the VARIANT HALF, which aliases the base half and
+therefore looks exactly like a P2 copy from that angle. Both documents now
+say so. The old conclusion still holds at slot `0x0F` — it just holds for a
+different reason, and the difference is the whole M3a mechanism.
+
+New: `tools/select_arrays.py`, `tests/test_select_arrays.sh` (static model
++ a one-byte corruption control + the engine's own row sequence, ~10 s),
+`docs/atlas/select_screen.md` section.
+
+**What is still owed before M3a can be built:** the sibling arrays (name
+banner, cursor highlight) have not been measured the same way — the recipe
+transfers directly and is cheap. And the tenant's record BYTES need a home:
+in-place surgery fits them inside Jedah's records today; at `0x13` they
+must be placed (Jedah's freed space or the WIDE extension). That is a
+placement question, not a mechanism one.
+
 ### THE WIDE REFERENCE FROZEN (maintainer: "freeze and register as wide
 ### reference first, then we resume")
 
