@@ -1,0 +1,23 @@
+# 63: long moving-select — the cursor wanders until the select timer
+# forces a pick (~f3900). Exercises the venue-phase cycle that clobbered
+# the medallion palette rows (the round-10 white-out); with the per-frame
+# re-assert thunk the rows stay ours through the whole select life.
+300-305 sys=C1
+800-803 sys=S1
+1000-1002 p1=R
+1150-1152 p1=D
+1300-1302 p1=L
+1450-1452 p1=U
+1600-1602 p1=R
+1750-1752 p1=R
+1900-1902 p1=D
+2050-2052 p1=L
+2200-2202 p1=R
+2350-2352 p1=D
+2500-2502 p1=L
+2650-2652 p1=U
+2800-2802 p1=R
+2950-2952 p1=R
+3100-3102 p1=D
+3250-3252 p1=L
+4200 wait

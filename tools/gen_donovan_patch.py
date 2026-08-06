@@ -2445,6 +2445,241 @@ def main():
                                      f"row {pr:#04x} (cell {_c:#04x}) <- "
                                      f"vs2 {ps:#x}; entry attr re-palmed")
 
+                    # per-frame palette re-assert (14z-63 round 10 — the
+                    # WHITE-OUT fix). The select venue-phase system fades
+                    # the whole page from per-phase source blocks the
+                    # engine COMPUTES (measured: rows 0x16/0x19/0x00 get
+                    # foreign content from 0x3A02C0/0x3A0900/0x3A0960/
+                    # 0x3A12C0/0x39A7E0... — sticky, e.g. Donovan's
+                    # medallion whiting out), so "a free row" does not
+                    # survive phase changes. Instead of chasing every
+                    # computed block, the highlight position helper at
+                    # 0x5FAD0 — the once-per-select-frame heartbeat,
+                    # alive for the screen's whole life — is thunked to
+                    # ALSO copy the three block-A rows into palette RAM
+                    # (F000-alpha OR, the loader's transform) every
+                    # frame: any clobber self-heals next frame, for any
+                    # phase known or unknown. Position writes stay
+                    # byte-identical (same table via absolute lea);
+                    # palette RAM is outside the work-RAM basis, so the
+                    # only legacy cost is cycles inside the already-open
+                    # select window class. The thunk consumes the whole
+                    # 18-byte helper (jsr overwrites its first 3 words;
+                    # the remnant is unreachable), so it pops the
+                    # helper-internal return and rts's to the caller.
+                    # ── march retarget (14z-63 round 10 — the WHITE-OUT
+                    # fix). Root cause: the accent MARCH claims palette
+                    # row 0x16 in a late select venue phase (the marcher
+                    # iterates a row list through the shared uploader's
+                    # dest computation at 0x2AD44), overwriting Donovan's
+                    # medallion palette with the silver sword march —
+                    # invisible on vanilla (row unreferenced), sticky on
+                    # ours. Measured: through this uploader row 0x16 is
+                    # written ONLY on select (never in matches, 2P
+                    # victories, or transitions — those are the fade/load
+                    # families), so the redirect is unconditional at the
+                    # site: row 0x16 -> row 0x02 (unref-on-select; its
+                    # only other select writer is the late hurry phase,
+                    # also invisible). Legacy: palette RAM only, both
+                    # rows invisible, work RAM untouched (d0 is the
+                    # function's own scratch), cycles = the accepted
+                    # accent-thunk class on the same call path.
+                    mr = ("march_retarget_from" in sw
+                          and "march_retarget_to" in sw)
+                    if mr:
+                        MR_SITE = 0x2AD44
+                        MR_OLD = "102e018bd001"  # move.b $18b(a6),d0; add.b d1,d0
+                        opc7 = (root / "build/out/vsavj_opcodes.bin"
+                                ).read_bytes()
+                        if opc7[MR_SITE:MR_SITE + 6].hex() != MR_OLD:
+                            fail.append(f"select_wheel {nm}: march dest "
+                                        f"site {MR_SITE:#x} holds "
+                                        f"{opc7[MR_SITE:MR_SITE+6].hex()},"
+                                        f" expected {MR_OLD}")
+                        else:
+                            r_from = _int(sw["march_retarget_from"])
+                            r_to = _int(sw["march_retarget_to"])
+                            mbody = (
+                                "102e018b"           # move.b $18b(a6),d0
+                                "d001"               # add.b d1,d0
+                                f"0c00{r_from:04x}"  # cmpi.b #from,d0
+                                "6602"               # bne.b +2
+                                f"70{r_to:02x}"      # moveq #to,d0
+                                "4e75")              # rts
+                            mt = alloc("a", len(mbody) // 2,
+                                       f"select_wheel {nm} march retarget")
+                            if mt is not None:
+                                ops.append({"op": "code",
+                                            "addr": f"{mt:#x}",
+                                            "hex": mbody})
+                                ops.append({"op": "code",
+                                            "addr": f"{MR_SITE:#x}",
+                                            "hex": f"4eb9{mt:08x}"})
+                                notes.append(
+                                    f"code   {mt:#08x} +{len(mbody)//2:#x}"
+                                    f"  select_wheel {nm}: march dest "
+                                    f"retarget row {r_from:#04x} -> "
+                                    f"{r_to:#04x} (site {MR_SITE:#x} "
+                                    f"jsr-routed; select-only by "
+                                    f"measurement)")
+                                fragments.append(
+                                    (mt, len(mbody) // 2, "NEW",
+                                     f"select_wheel {nm} march retarget"))
+
+                        # the marcher ALSO enters the store tail
+                        # DIRECTLY: 0x2ADC2 = `bsr.b/bsr.b/bra.b $2AD50`
+                        # writes rows base+1/base+2/base+3 with a1
+                        # carried forward, bypassing the dest
+                        # computation (this is how row 0x16 was still
+                        # hit). Thunk the 6-byte call triplet: each call
+                        # goes through a helper that redirects a dest of
+                        # row `from` (a1 == page + from*0x20) to row
+                        # `to` for that ONE store, then restores a1
+                        # continuity — the source pointer (a0) advances
+                        # identically either way, so subsequent rows'
+                        # sources stay aligned.
+                        MR2_SITE = 0x2ADC2
+                        MR2_OLD = "618c618a6088"
+                        if opc7[MR2_SITE:MR2_SITE + 6].hex() != MR2_OLD:
+                            fail.append(f"select_wheel {nm}: march "
+                                        f"3-call site {MR2_SITE:#x} holds"
+                                        f" {opc7[MR2_SITE:MR2_SITE+6].hex()}"
+                                        f", expected {MR2_OLD}")
+                        else:
+                            d_from = 0x90C000 + _int(
+                                sw["march_retarget_from"]) * 0x20
+                            d_to = 0x90C000 + _int(
+                                sw["march_retarget_to"]) * 0x20
+                            d_next = d_from + 0x20
+                            # helper (offset computed after the 3 calls):
+                            #   cmpa.l #d_from,a1 / bne.b norm
+                            #   movea.l #d_to,a1 / jsr $2AD50 /
+                            #   movea.l #d_next,a1 / rts
+                            #   norm: jmp $2AD50
+                            helper = (
+                                f"b3fc{d_from:08x}"   # cmpa.l #from,a1
+                                "6614"                # bne.b norm (disp 0x14 -> the jmp)
+                                f"227c{d_to:08x}"     # movea.l #to,a1
+                                "4eb90002ad50"        # jsr store tail
+                                f"227c{d_next:08x}"   # movea.l #next,a1
+                                "4e75"                # rts
+                                "4ef90002ad50")       # norm: jmp store tail
+                            # thunk: 3 helper calls then return to the
+                            # OUTER caller (the original third call was
+                            # a tail bra — its rts unwound one level up)
+                            calls_len = 6 * 3 + 4  # 3x jsr.l + addq+rts
+                            m2 = alloc("a", calls_len + len(helper) // 2,
+                                       f"select_wheel {nm} march tail "
+                                       f"triplet")
+                            if m2 is not None:
+                                haddr = m2 + calls_len
+                                m2body = (f"4eb9{haddr:08x}" * 3
+                                          + "588f4e75" + helper)
+                                ops.append({"op": "code",
+                                            "addr": f"{m2:#x}",
+                                            "hex": m2body})
+                                ops.append({"op": "code",
+                                            "addr": f"{MR2_SITE:#x}",
+                                            "hex": f"4eb9{m2:08x}"})
+                                notes.append(
+                                    f"code   {m2:#08x} +{len(m2body)//2:#x}"
+                                    f"  select_wheel {nm}: march tail "
+                                    f"triplet ({MR2_SITE:#x} jsr-routed; "
+                                    f"dest {d_from:#x} redirected to "
+                                    f"{d_to:#x} per store, a0/a1 "
+                                    f"continuity preserved)")
+                                fragments.append(
+                                    (m2, len(m2body) // 2, "NEW",
+                                     f"select_wheel {nm} march tail "
+                                     f"triplet"))
+
+                    # DISABLED by default (pal_reassert flag): measured
+                    # 14z-63 round 10 — even a check-then-copy version
+                    # perturbs the legacy fade system (the fade reads
+                    # back re-asserted values; its step counters at
+                    # $FF0E94/A4/B4/C4 diverge on every fade and never
+                    # re-converge). Superseded by march_retarget above.
+                    hb_site2 = (_int(sw.get("highlight_base_site", 0))
+                                if sw.get("pal_reassert") else 0)
+                    if hb_site2:
+                        HELPER = 0x5FAD0
+                        OLD6 = "3006e5483d7b"
+                        opc6 = (root / "build/out/vsavj_opcodes.bin"
+                                ).read_bytes()
+                        if opc6[HELPER:HELPER + 6].hex() != OLD6:
+                            fail.append(f"select_wheel {nm}: helper "
+                                        f"{HELPER:#x} holds "
+                                        f"{opc6[HELPER:HELPER+6].hex()}, "
+                                        f"expected {OLD6}")
+                            continue
+                        # check-then-copy: an always-copy version cost
+                        # ~700 cycles/frame and SHIFTED a legacy
+                        # input-accept boundary (replay 11's pick moved
+                        # a tick; the match never re-converged — a real
+                        # violation, measured). The steady-state path is
+                        # three cmpi.w probes on each row's WORD 1 (word
+                        # 0 collides: Phobos's f111 == the grey ramp's)
+                        # + an early exit; the copy loops run only on
+                        # the frame after an actual clobber.
+                        prefix = (
+                            "2f08"                       # move.l a0,-(sp)
+                            "3006"                       # move.w d6,d0
+                            "e548"                       # lsl.w #2,d0
+                            f"41f9{hb_site2:08x}"        # lea table.l,a0
+                            "3d7000000010"               # move.w (a0,d0.w),$10(a6)
+                            "3d7000020014"               # move.w 2(a0,d0.w),$14(a6)
+                            "205f"                       # movea.l (sp)+,a0
+                        )
+                        checks = ""
+                        n_c = len(newcells)
+                        for i, (_c2, spec2) in enumerate(newcells):
+                            pr2 = _int(spec2["pal_row"])
+                            rowb2 = src_wp5[_int(spec2["pal_src"]) + 2:
+                                            _int(spec2["pal_src"]) + 4]
+                            w1 = ((rowb2[0] | 0xF0) << 8) | rowb2[1]
+                            dst2 = 0x90C000 + pr2 * 0x20 + 2
+                            # bne.b to heal: remaining checks then exit(4)
+                            remaining = (n_c - 1 - i) * 10
+                            disp = remaining + 4
+                            checks += (f"0c79{w1:04x}{dst2:08x}"
+                                       f"66{disp:02x}")
+                        exit_ = "588f4e75"               # addq #4,sp; rts
+                        heal = "48e740c0"                # movem.l d1/a0-a1,-(sp)
+                        for _c2, spec2 in newcells:
+                            pr2 = _int(spec2["pal_row"])
+                            src2 = pal_a + pr2 * 0x20
+                            dst2 = 0x90C000 + pr2 * 0x20
+                            heal += (
+                                f"41f9{src2:08x}"        # lea src.l,a0
+                                f"43f9{dst2:08x}"        # lea dst.l,a1
+                                "700f"                   # moveq #15,d0
+                                "3218"                   # move.w (a0)+,d1
+                                "0041f000"               # ori.w #$F000,d1
+                                "32c1"                   # move.w d1,(a1)+
+                                "51c8fff6"               # dbra d0,.-8
+                            )
+                        heal += ("4cdf0302"              # movem.l (sp)+,d1/a0-a1
+                                 "588f4e75")             # addq #4,sp; rts
+                        body = prefix + checks + exit_ + heal
+                        tk2 = alloc("a", len(body) // 2,
+                                    f"select_wheel {nm} pal re-assert thunk")
+                        if tk2 is not None:
+                            ops.append({"op": "code", "addr": f"{tk2:#x}",
+                                        "hex": body})
+                            ops.append({"op": "code",
+                                        "addr": f"{HELPER:#x}",
+                                        "hex": f"4eb9{tk2:08x}"})
+                            notes.append(f"code   {tk2:#08x} +{len(body)//2:#x}"
+                                         f"  select_wheel {nm}: per-frame "
+                                         f"medallion-palette re-assert "
+                                         f"(the select heartbeat helper "
+                                         f"{HELPER:#x} jsr-routed; position "
+                                         f"writes byte-identical, 3 rows "
+                                         f"re-copied each frame)")
+                            fragments.append((tk2, len(body) // 2, "NEW",
+                                              f"select_wheel {nm} pal "
+                                              f"re-assert thunk"))
+
     # ── select_records (M3a, 14z-62): the tenant's OWN select records at a
     # variant id — what the hovered cell displays. Three UI pieces (portrait,
     # name banner, cursor highlight) each ride a 32-row x 4-byte

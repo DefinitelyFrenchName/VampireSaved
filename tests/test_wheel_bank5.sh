@@ -164,6 +164,46 @@ PY
         sed 's/^/        /' "$WORK/trace.txt"
         fail=1
     fi
+
+    # 3b. medallion palette stability (14z-63 round 10). Rows 0x00
+    # (Pyron) and 0x19 (Phobos, 1P) must hold the vs2 palettes through
+    # the MAXIMAL select (timer-forced pick ~f3900). Row 0x16 (Donovan)
+    # is asserted at f1200 only: a late venue phase (~15 s in) marches
+    # the P1 figure family {0x15,0x16,0x17} through ~30 store-tail
+    # entry points and whites it out — the KNOWN COSMETIC parked in
+    # STATE 14z-63 round 10 (fix = the marcher's job-data origin).
+    # When that fix lands, extend the 0x16 assertion to all frames.
+    mkdir -p "$WORK/stab"
+    DUMPS="1200:90c000-90c33f;1900:90c000-90c33f;2800:90c000-90c33f;3600:90c000-90c33f" \
+    CHECKSUM_OUT="$WORK/stab/cks.log" FRAMES=3650 \
+    REPLAY="$REPO/tests/replays/63_idle_select.rpl" \
+    MAME_SANDBOX="$WORK/sbx_stab" MAME_BIN="$WIDE_BIN" \
+    MAME_ROMPATH="$OUTBASE/rompath;$ROMDIR" \
+        tools/run_mame.sh vsavjw \
+        -autoboot_script tests/lua/replay.lua > /dev/null 2>&1 || true
+    python3 - "$WORK/stab" <<'PY' || fail=1
+import sys, glob
+vs2 = open("build/out/vsav2_data.bin", "rb").read()
+def alpha(b):
+    return bytes(((b[i] | 0xF0) if i % 2 == 0 else b[i])
+                 for i in range(len(b)))
+WANT = {0x16: alpha(vs2[0x3BAFDC:0x3BAFDC + 0x20]),
+        0x19: alpha(vs2[0x3BB19C:0x3BB19C + 0x20]),
+        0x00: alpha(vs2[0x3BB15C:0x3BB15C + 0x20])}
+files = sorted(glob.glob(sys.argv[1] + "/dump_*.bin"))
+assert len(files) == 4, f"expected 4 dumps, got {len(files)}"
+for f in files:
+    fr = int(f.split("_")[-2])
+    d = open(f, "rb").read()
+    for row, want in WANT.items():
+        if row == 0x16 and fr > 1200:
+            continue   # known-cosmetic white-out, parked (see header)
+        got = d[row * 0x20:(row + 1) * 0x20]
+        assert got == want, (f"f{fr} row {row:#04x} lost the vs2 palette "
+                             f"(head {got[:8].hex()})")
+print("  ok: rows 0x00/0x19 hold through the maximal select; row 0x16 "
+      "held at f1200 (late-phase white-out = the parked known-cosmetic)")
+PY
 fi
 
 if [ "$fail" -ne 0 ]; then

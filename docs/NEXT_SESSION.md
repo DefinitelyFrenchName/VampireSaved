@@ -9,7 +9,7 @@ the tenant's OWN mugshot and name plate ("Donovan" under the bar,
 measured), and the 2P victory screen serves his OWN vs2 win palette
 (both thunk paths measured).** Remaining: the palette-block colours ($130(a5) fold), the accent
 audit, and the re-freeze bundle (maintainer sign-off). Evidence build
-`build/m3a_wheel` = `a8108e0e`. Read STATE.md `14z-63`, then
+`build/m3a_wheel` = `b9c6ca23`. Read STATE.md `14z-63`, then
 docs/patch_notes.md's 14z-63 sections for byte detail.
 
 ## What 14z-63 landed (do not re-derive)
@@ -41,6 +41,19 @@ docs/patch_notes.md's 14z-63 sections for byte detail.
   hover-draw RINGS (per-cell pal-0x1E records, all-different codes).
 
 ## Work list (in order)
+
+0. **The medallion WHITE-OUT (round 10, parked with full mechanism)**:
+   the accent march claims the figure-family rows {0x15,0x16,0x17} in
+   a late select venue phase (select-timer trigger, ~15 s onset) —
+   row 0x16 = Donovan's medallion palette. Fix at the marcher's
+   JOB-DATA origin (the 14z-15 venue script family: find the select
+   venue's row-list datum naming the family base, retarget/duplicate);
+   relocate row 0x19 (Phobos) too — it is P2's figure-family middle
+   row, same latent 2P risk. THREE rejected designs + the 30-entry
+   store-tail enumeration are in GOTCHAS ("no free palette row") and
+   patch_notes addendum 7 — do not re-walk them. Instruments ready:
+   replay 63 (deterministic repro), gate 3b (extend the 0x16 assertion
+   to all frames when fixed).
 
 1. ~~Hover content~~ **RATIFIED + DONE in 14z-63 (round 7): ring
    reuse.** All three extended cells (P1+P2+mirror, 9 pokes) point at

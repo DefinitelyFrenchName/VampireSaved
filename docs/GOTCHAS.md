@@ -1850,3 +1850,30 @@ Rules:
   frame N contains, believe the tap — its frames are emulated frames.
 - Cross-check any stop-based finding against a screen-identifying fact
   (an init PC, a known object base) before attributing it to a screen.
+
+## There is no such thing as a free palette row on a venue screen (14z-63)
+
+Three progressively-wrong "free row" proofs, each paid for:
+1. "No OBJ references it" (sweeps over 3 replays) — missed that the
+   select VENUE PHASES write rows on a ~15 s timer: the accent march
+   claims the figure-family rows {0x15,0x16,0x17} (and P2's
+   {0x18,0x19,0x1A}) mid-screen. A row that held only a grey ramp all
+   session was being rewritten grey-over-grey — invisible to content
+   sampling AND to a single-frame poke-probe.
+2. Per-frame re-assertion of stolen rows measured CLEAN on stress
+   replays but broke the legacy oracle in a subtle way: the fade system
+   READS BACK palette RAM to compute steps, so re-asserted values
+   diverge its step counters ($FF0E94/A4/B4/C4) on every transition —
+   permanently, invisibly, in work RAM.
+3. Retargeting the writer at "the" dest computation missed: the store
+   tail (0x2AD50) has ~30 ENUMERATED entry points, many with
+   precomputed dests (bsr triplets writing base+1..3 with a1 carried).
+   Enumerate ALL branches into a routine before claiming a choke point.
+Rules:
+- Prove a row free against the SCREEN'S WHOLE LIFETIME (the timer-forced
+  maximum), with a WRITE TAP, in every player configuration — content
+  stability over samples proves nothing when writers rewrite same-values.
+- Palette RAM is not write-only to the engine: fades read it back.
+  Anything that rewrites it behind the engine's back perturbs work RAM.
+- The clean lever for venue-written rows is the VENUE JOB DATA (the
+  14z-15 script family), not the shared uploader code.

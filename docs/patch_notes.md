@@ -1606,3 +1606,33 @@ CLOSED; round 8 all clean):
 - PHASE 3 IS COMPLETE (items 1-6). Remaining before the M3a close:
   the select/VS palette-block colours (the real $130(a5) fold work,
   venue_assets.md §2) and the RE-FREEZE bundle (maintainer sign-off).
+
+Session 14z-63 addendum 7 (round 10: Phobos nudge; the medallion
+WHITE-OUT root-caused and PARKED; build b9c6ca23):
+- Phobos 2px further left per maintainer (pos 216->214, ring-fit over
+  lattice-fit — ratified trade); highlight base moved with it.
+- WHITE-OUT root cause (the maintainer's "shades of white" report):
+  Donovan's medallion row 0x16 belongs to the P1 FIGURE FAMILY
+  {0x15,0x16,0x17} which the accent march claims in a late select
+  venue phase (~15 s in; the pulsing silver sword ramp — invisible on
+  vanilla because nothing references the row there). The trigger is
+  the select timer, which is why it seemed random. Reproduced
+  deterministically on a long moving-select (replay 63, onset ~f1750).
+- THREE fix designs measured, all rejected on legacy grounds (detail
+  in GOTCHAS "no such thing as a free palette row"): (1) per-frame
+  re-assert — the fades read back palette RAM, step counters at
+  $FF0E94-family diverge permanently; (2) dest-computation retarget at
+  0x2AD44 — bypassed by direct store-tail entries; (3) the 3-call
+  triplet thunk — the tail has ~30 enumerated entry points; covering
+  all (or thunking the hot tail, which serves matches too) risks the
+  frozen flicker inventory. The correct fix is the marcher's JOB-DATA
+  origin (the venue row-list datum, 14z-15 script family) — QUEUED.
+- Parked state: rows 0x00 (Pyron) and 0x19 (Phobos) hold through the
+  maximal select (gate-frozen); row 0x16 whites out after ~15 s on
+  select, resets on screen re-entry — select-scoped known cosmetic.
+  ALSO flagged: row 0x19 is P2's figure-family middle row — the same
+  mechanism may claim it in long 2P selects (unmeasured; the job-data
+  fix should relocate all three rows' ownership properly).
+- Gates: wheel gate section 3b freezes the honest state (0x00/0x19
+  full-life, 0x16 at f1200 + parked-note); all tenant gates PASS;
+  stock reproduces ae701ffb.

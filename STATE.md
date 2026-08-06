@@ -176,6 +176,23 @@ abstract vortex — NO character surface; 2P continue is HUD text only.
 Gate: tests/test_accent_census.sh (frozen census + 4/4 routing +
 negative control), in the battery. PHASE 3 COMPLETE.
 
+**Round 10 (maintainer): Phobos 2px further left (ratified ring-fit
+trade); the medallion WHITE-OUT root-caused and PARKED.** The report
+("Donovan's medallion becomes shades of white, sticky, no clear
+trigger") is the accent march claiming the P1 figure family
+{0x15,0x16,0x17} in a late select venue phase (~15 s in — the trigger
+is the select TIMER); row 0x16 carries Donovan's medallion palette.
+Reproduced deterministically (replay 63, onset ~f1750). Three fix
+designs measured and REJECTED on legacy grounds (per-frame re-assert
+diverges the fade step counters $FF0E94-family — fades READ BACK
+palette RAM; two writer-retarget shapes bypassed — the store tail has
+~30 enumerated entries; full detail in GOTCHAS "no free palette row").
+The correct fix = the marcher's JOB-DATA origin (14z-15 venue script
+family), QUEUED for a focused session; it should also relocate row
+0x19 (Phobos — P2's figure-family middle row, same latent 2P risk).
+Interim: white-out is select-scoped, ~15 s onset, resets on re-entry;
+gate 3b freezes the honest state. Evidence build `b9c6ca23`.
+
 **Semantic correction that reframes the hover decision**: the composed
 vs2 highlight record (b000 5x1, "his lit-label") is actually vs2's
 POST-CONFIRM NAME BAR — measured: vs2 never draws it at hover, only at
