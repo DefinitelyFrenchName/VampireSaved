@@ -52,8 +52,8 @@ PIECES = [
     ("portrait",    0x26742A, 0x2A0762, ("p1", "p2"), "native"),
     ("name_banner", 0x2675AA, 0x2A08E2, ("p1", "p2"), "native"),
     ("highlight",   0x268A02, 0x2A18FE, ("p1", "p2"), "placed"),
-    ("splash_p1",   0x2672AA, 0x2A05E2, ("p1",), "placed"),
-    ("splash_p2",   0x26732A, 0x2A0662, ("p1",), "placed"),
+    ("splash_p1",   0x2672AA, 0x2A05E2, ("p1",), "native"),
+    ("splash_p2",   0x26732A, 0x2A0662, ("p1",), "native"),
     ("win_quote",   0x2673AA, 0x2A06E2, ("p1",), "placed"),
 ]
 WHEELPTR = 0x2689FE

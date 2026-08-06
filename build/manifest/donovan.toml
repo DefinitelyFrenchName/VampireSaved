@@ -1634,6 +1634,20 @@ site = 0x05FCE0
 old_hex = "207c002675aa"
 thunk_hex = "207c002675aa0c2c00tt038266083d7c300000184e753d7c200000184e75"
 
+# ── 14z-62j phase 2: VS-SPLASH drawer bank gate ─────────────────────────────
+# The VS-screen bust consumer (PRG:0x6C0E0; the atlas's second shared
+# consumer): the object caches the char id at $A(a6), computes d0=id*4
+# (+0x80 for P2 via d1) and refetches $1C. The thunk displaces the movea
+# and gates the bank on $A(a6): tenant -> 0x3000 (bank 5, native splash
+# art), else the same-value 0x2000 restore. Flags dead (add/lea follow).
+[[site_thunk]]
+stage = 6
+name = "splash_bank_variant_id"
+only_variant_slot = true
+site = 0x06C0E0
+old_hex = "207c002672aa"
+thunk_hex = "207c002672aa0c2e00tt000a66083d7c300000184e753d7c200000184e75"
+
 # ── 14z-62e: SELECT-PORTRAIT PALETTES at a variant id ──────────────────────
 # The uploader (PRG:0x5F136 family) computes grid row (variant*16 + id)
 # with the id UNMASKED, so id 0x13 reads Victor's variant-1 slot (measured:
@@ -1822,6 +1836,7 @@ expect_vj_alias_p2 = 0x273080
 stage = 6
 name = "splash_p1"
 hole = "wide_ext"
+art = "native_c5"
 allow_placeholder_tiles = false
 vj_p1 = 0x2672AA
 vs2_p1 = 0x2A05E2
@@ -1832,6 +1847,7 @@ expect_vj_alias_p1 = 0x2734E8
 stage = 6
 name = "splash_p2"
 hole = "wide_ext"
+art = "native_c5"
 allow_placeholder_tiles = false
 vj_p1 = 0x26732A
 vs2_p1 = 0x2A0662
