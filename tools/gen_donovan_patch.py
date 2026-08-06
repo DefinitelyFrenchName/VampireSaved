@@ -2420,7 +2420,7 @@ def main():
                     pal_a = _int(sw.get("pal_block_a", 0))
                     src_wp5 = (root / f"build/out/{man['src_set']}"
                                "_data.bin").read_bytes()
-                    RESERVED_PAL = {0x14, 0x15, 0x17, 0x18, 0x1A, 0x1E}
+                    RESERVED_PAL = {0x14, 0x15, 0x17, 0x18, 0x1E}
                     for _c, spec in newcells:
                         pr = spec.get("pal_row")
                         ps = spec.get("pal_src")
@@ -2491,16 +2491,26 @@ def main():
                         # d1-carry family) and 0x2B598 (+1, the per-hover
                         # figure-family writer measured via d0=0xC0 at the
                         # tail). Both are thunked with the same redirect.
-                        # ALL THREE dest computations in the uploader
-                        # region (enumerated by the add+lsl#5 idiom —
-                        # exactly three exist):
+                        # Of the THREE dest computations in the
+                        # uploader region (add+lsl#5 idiom census), only
+                        # TWO are thunked: 0x2AD44 ($18B+d1) is the
+                        # IN-MATCH accent path (all four accent sites
+                        # funnel through it) — thunking it shifted a
+                        # frame-boundary parity permanently (replay 04
+                        # f2009 / 05 f9126, the $FF8094 phase flip,
+                        # measured 14z-64) AND it never computes the mid
+                        # rows on select (the v2 build with it alone
+                        # still whited out). The measured select mid-row
+                        # writers are the other two. Each thunk also
+                        # gates on the select screen being live
+                        # ($FFB818 == 0x3000, the wheel drawer's bank
+                        # word — set at select entry, cleared by the VS
+                        # re-init) as insurance for unmeasured flows.
                         MR_SITES = [
-                            (0x2AD44, "102e018bd001"),  # $18B + d1
-                            (0x2B598, "102e018b5200"),  # $18B + 1
-                            (0x2B7D8, "102e000fd001"),  # $F   + d1 (the
-                                                        # per-char hover
-                                                        # writer, jump
-                                                        # table 0x2B640)
+                            (0x2B598, "102e018b5200"),  # $18B + 1 (phase)
+                            (0x2B7D8, "102e000fd001"),  # $F + d1 (hover,
+                                                        # jump table
+                                                        # 0x2B640)
                         ]
                         opc7 = (root / "build/out/vsavj_opcodes.bin"
                                 ).read_bytes()
@@ -2512,14 +2522,20 @@ def main():
                                             f", expected {MR_OLD}")
                                 continue
                             mbody = (
-                                MR_OLD       # the displaced load+add
-                                + "0c000016" # cmpi.b #$16,d0
-                                "6708"       # beq.b redirect
-                                "0c000019"   # cmpi.b #$19,d0
-                                "6702"       # beq.b redirect
-                                "4e75"       # rts
-                                "7002"       # redirect: moveq #2,d0
-                                "4e75")      # rts
+                                MR_OLD        # the displaced load+add
+                                + "0c000016"  # cmpi.b #$16,d0
+                                "670e"        # beq.b maybe
+                                "0c000019"    # cmpi.b #$19,d0
+                                "6708"        # beq.b maybe
+                                "0c00001a"    # cmpi.b #$1A,d0
+                                "6702"        # beq.b maybe
+                                "4e75"        # rts
+                                # maybe: redirect only while the select
+                                # screen is live (wheel drawer bank word)
+                                "0c79300000ffb818"  # cmpi.w #$3000,$FFB818
+                                "6602"        # bne.b rts
+                                "7002"        # moveq #2,d0
+                                "4e75")       # rts
                             mt = alloc("a", len(mbody) // 2,
                                        f"select_wheel {nm} march mid-row "
                                        f"retarget {MR_SITE:#x}")

@@ -222,6 +222,14 @@ echo "== 4. de-substitution acceptance: picking the HOST re-converges =="
 # Replay 11 picks slot 0x0F. On slot-substituted builds that loads the
 # tenant and diverges from vanilla forever (class `diverge 890`). On a
 # variant-id build the host is HIMSELF again, so the same replay must
+# NOTE (14z-64): compared on the V2 masked basis — the round-64 mask
+# plus the medallion rows' palette staging slots ($FF41C2-E1 row 0x16,
+# $FF4222-41 row 0x19, $FF4242-61 row 0x1A; the staging area is
+# $FF3F02 + row*0x20 and the ratified $FF4182 window is row 0x14's
+# slot — same mechanism, sibling slots, part of the bundle
+# ratification). The vanilla logs under this basis live in
+# tests/expected/vsavj/masked-v2/ (regenerated deterministically from
+# the frozen vanilla oracle).
 # measure as the §4 v3 BOUNDED WINDOW (PENDING RATIFICATION in the
 # re-freeze bundle). History: 14z-62c measured window 890-2362 ($FF06D1
 # menu counter tail); 14z-63 wheel bank-5 moved it to 889-2415 (onset =
@@ -238,14 +246,14 @@ echo "== 4. de-substitution acceptance: picking the HOST re-converges =="
 if [ "${SKIP_RUNTIME:-0}" = 1 ]; then
     echo "  SKIPPED (SKIP_RUNTIME=1)"
 else
-    MASK_RANGES="043c-043d,4182-41a2,7f00-8000" MAME_BIN="$WIDE_BIN" \
+    MASK_RANGES="043c-043d,4182-41a2,41c2-41e2,4222-4262,7f00-8000" MAME_BIN="$WIDE_BIN" \
     MAME_ROMPATH="$OUTBASE/rompath;$ROMDIR" \
         tools/run_replay_mame.sh vsavjw tests/replays/11_pick_donovan.rpl \
         "$WORK/11_legacy.log" > "$WORK/11_legacy.out" 2>&1 || {
         echo "  FAIL: replay 11 did not complete"; fail=1; }
     if [ -f "$WORK/11_legacy.log" ]; then
         if python3 tools/compare_window.py \
-                tests/expected/vsavj/masked/logs/11_pick_donovan.log \
+                tests/expected/vsavj/masked-v2/logs/11_pick_donovan.log \
                 "$WORK/11_legacy.log" --onset 889 --end 2415 \
                 > "$WORK/11_legacy.cmp" 2>&1; then
             echo "  ok: host pick = bounded window 889-2415, fully re-convergent"

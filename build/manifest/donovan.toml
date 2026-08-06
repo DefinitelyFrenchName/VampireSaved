@@ -22,6 +22,11 @@ src_char = 0x13
 # the roster build, gives the tenant its NATIVE vs2 id, so every ported bank
 # row lands at its own index and Jedah goes back to being Jedah.
 id = 0x0F
+# 14z-64 (the M3a re-freeze bundle): the WIDE track's default id is now
+# the native 0x13 — a profile build needs no --tenant-id flag, and the
+# stock track keeps 0x0F. This is the declaration the whole M3a arc
+# worked toward (gated behind the re-freeze per tests/test_tenant_id.sh).
+id_by_profile = "cps2-wide-v1=0x13"
 # Destination gfx bank for this tenant's tiles. 2 is JEDAH'S bank, which is
 # only correct while the tenant occupies Jedah's slot — it moves to an
 # extended WIDE bank when the tenant moves to 0x13. Declared here so the gfx
@@ -718,6 +723,14 @@ dst_old_head = "004001d80370050806a0083809d00b68"
 # placed by the space model and the TENANT's row is repointed.
 slot_ptr_table = 0xBE27A
 hole = "wide_ext"
+# 14z-64 (the 14z-2 mirror-victim fix, parked since 14z-62c): victim
+# entry [0x0F] inside the blob — Jedah-victim block 0x0B30 -> the
+# Donovan-victim block 0x0D88 (in the mirror flavor victim id 0x0F IS
+# Donovan). Base-slot track only by construction (on variant builds the
+# fix is inert for the host: his block stays vanilla; the placed tenant
+# blob carries the fix harmlessly — its [0x0F] entry is never a tenant
+# victim there).
+fixes = "0x1E:0b30:0d88"
 
 # ~~[[data_port.fix]] off=0x1E 0b30->0d88~~ NEVER APPLIED (14z-62c
 # discovery): the nested [[data_port.fix]] shape parses only on tomllib
@@ -734,9 +747,9 @@ hole = "wide_ext"
 #   still mis-indexes Jedah-victim keyframes — the defect 14z-2 meant to
 #   fix, shipped in ae701ffb/9bac6ee3/b91647c7. Applying it changes
 #   frozen bytes, so it waits for the maintainer-approved M3a RE-FREEZE:
-#   uncomment then, and add a mirror-flavor throw replay.
-#     fixes = "0x1E:0b30:0d88"   # mirror-match victim entry [0x0F]:
-#                                # Jedah-victim -> Donovan-victim block
+#   APPLIED 14z-64 as part of the maintainer-approved M3a re-freeze
+#   bundle (the fixes= line now lives on the throw_victim_keyframes row
+#   below; mirror-flavor throw replay 65 added).
 
 # Armed-normal sword-swing effects (session 14z-3, the round-24 BLOCKER).
 # Donovan's sword swings on armed normals are drawn as type-3 effect

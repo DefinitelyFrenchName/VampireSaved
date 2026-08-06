@@ -87,6 +87,10 @@ tests/test_don_colors.sh "$OUTBASE/rompath"
 tests/test_don_reactions.sh "$OUTBASE/rompath"
 tests/test_don_column.sh "$OUTBASE/rompath"
 tests/test_don_sound.sh "$OUTBASE/rompath"
+# The 14z-2 mirror-victim fix (applied 14z-64 in the re-freeze bundle):
+# base-slot mirror throws use the Donovan-victim block. SKIPs on
+# variant-id builds (correct by construction there).
+tests/test_don_throw_mirror.sh "$OUTBASE"
 tests/test_m2a_stage4_oracle.sh "$OUTBASE/rompath"
 tests/test_m2a_stage4_xemu.sh "$OUTBASE/rompath"
 tests/test_m2a_flavor_selector.sh "$OUTBASE/rompath"

@@ -1,5 +1,39 @@
 # STATE — living progress log
 
+## Session 14z-64 (phase-3 aftermath closed; the RE-FREEZE BUNDLE
+## prepared — RATIFICATION PACKAGE below awaits the maintainer)
+
+**THE RATIFICATION PACKAGE (one decision, per the 62c plan).** The
+bundle's mechanics are applied and measured; the maintainer ratifies:
+1. THE MIRROR-VICTIM FIX (14z-2): stock candidate = frozen ae701ffb +
+   EXACTLY 2 bytes (PRG:0x0B1A16, 0b30->0d88); behavior proven by a
+   matched control pair (206/0 vs 0/206 block reads) on new replay 65;
+   gate test_don_throw_mirror.sh; the STOCK BATTERY IS GREEN on the
+   candidate with the frozen flicker inventories intact.
+2. id_by_profile = "cps2-wide-v1=0x13": the WIDE track's default is the
+   native id (no flag); test_tenant_id flipped per its design note.
+3. THE V2 MASKED BASIS: the round-64 staging-slot window generalized —
+   the staging area is $FF3F02+row*0x20 (the ratified $FF4182 window IS
+   row 0x14's slot); v2 adds the medallion rows' slots (0x16/0x19/
+   0x1A). Vanilla masked logs regenerated deterministically under v2
+   (tests/expected/vsavj/masked-v2/); per-set masks in run_suite; the
+   stock track keeps the round-64 basis untouched.
+4. THE WIDE CANDIDATE's masked classes — the FINAL v2-basis sweep,
+   all 14 replays MEASURED CLEAN: 01 attract EXACT (0 divergent);
+   06 diverge-700 (the frozen class); 02/05/07/30 = single windows
+   (889-1675/2015; replay 05's 12k-frame run has a 10446-frame
+   identical tail); 11 = window 889-2415; 03/04/08/09/10/16/29 =
+   composites whose flicker inventory matches donovan-m5w TO THE
+   FRAME (829, 1525/2009/2195, 2093, 2436, 3007/3129, 3507) with
+   per-flow window ends; 08 carries two windows (two select entries).
+   Candidate fingerprints: WIDE 4b7d0dc7, stock 6c93cfa8.
+5. KNOWN RESIDUALS, documented: Pyron's placeholder medallion recolors
+   after a 2P Donovan-hover (row 0x1A doubles as the P2 sword row);
+   the deep-arcade ENDING flow is unmeasured (the $130(a5) fold audit's
+   only gap).
+On approval: freeze the two expectation sets + registry rows, replacing
+ae701ffb/9bac6ee3 as the reference pair.
+
 ## Session 14z-64 (the white-out RETIRED; palette-block fold audit)
 
 **Item 0 DONE**: the medallion white-out is properly fixed — the

@@ -169,10 +169,14 @@ PY
     # THREE medallion rows must hold the vs2 palettes through BOTH
     # stress protocols: the maximal select (timer/venue-phase trigger)
     # and the maintainer's mash-right repro (per-hover trigger). The
-    # marchers' vestigial MID-ROW writes (rows 0x16/0x19 — referenced
-    # by nothing in vanilla) are redirected to the scratch row 0x02 at
-    # the three enumerated dest computations (0x2AD44/0x2B598/0x2B7D8
-    # — the add+lsl#5 idiom census; a fourth appearing = re-audit).
+    # marchers' vestigial MID-ROW writes (rows 0x16/0x19/0x1A —
+    # referenced by nothing in vanilla) are redirected to the scratch
+    # row 0x02 at the two select-side dest computations (0x2B598/
+    # 0x2B7D8, select-gated on $FFB818==0x3000; 0x2AD44 is the
+    # in-match funnel and must NEVER be thunked — the $FF8094 parity
+    # lesson). KNOWN RESIDUAL: 0x1A is also the P2 sword-accent row —
+    # a 2P Donovan-hover recolors Pyron's placeholder medallion until
+    # screen re-entry (documented trade).
     run_stab() {  # run_stab <tag> <replay> <dumpspec> <frames>
         mkdir -p "$WORK/$1"
         DUMPS="$3" CHECKSUM_OUT="$WORK/$1/cks.log" FRAMES="$4" \
@@ -183,18 +187,18 @@ PY
             -autoboot_script tests/lua/replay.lua > /dev/null 2>&1 || true
     }
     run_stab stab 63_idle_select.rpl \
-        "1900:90c000-90c33f;2800:90c000-90c33f;3600:90c000-90c33f" 3650
+        "1900:90c000-90c35f;2800:90c000-90c35f;3600:90c000-90c35f" 3650
     run_stab mash 64_select_mashright.rpl \
-        "1400:90c000-90c33f;2300:90c000-90c33f" 2350
+        "1400:90c000-90c35f;2300:90c000-90c35f" 2350
     python3 - "$WORK/stab" "$WORK/mash" <<'PY' || fail=1
 import sys, glob
 vs2 = open("build/out/vsav2_data.bin", "rb").read()
 def alpha(b):
     return bytes(((b[i] | 0xF0) if i % 2 == 0 else b[i])
                  for i in range(len(b)))
-WANT = {0x00: alpha(vs2[0x3BAFDC:0x3BAFDC + 0x20]),   # Donovan
-        0x19: alpha(vs2[0x3BB15C:0x3BB15C + 0x20]),   # Pyron
-        0x16: alpha(vs2[0x3BB19C:0x3BB19C + 0x20])}   # Phobos
+WANT = {0x16: alpha(vs2[0x3BAFDC:0x3BAFDC + 0x20]),   # Donovan
+        0x1A: alpha(vs2[0x3BB15C:0x3BB15C + 0x20]),   # Pyron
+        0x19: alpha(vs2[0x3BB19C:0x3BB19C + 0x20])}   # Phobos
 n = 0
 for d_dir in sys.argv[1:]:
     files = sorted(glob.glob(d_dir + "/dump_*.bin"))

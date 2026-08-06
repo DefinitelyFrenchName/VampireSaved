@@ -94,3 +94,27 @@ IDs are 5-bit: low 4 bits = character slot (16 slots), bit 4 = hidden/alt
 variant. vsavj: variant space differs only at slot 0x08 (Bishamon → Oboro
 Bishamon); all other alt slots alias the base table. Slot→name map:
 docs/atlas/character_tables.md.
+
+## The palette staging area — $FF3F02 + row*0x20 (14z-64)
+
+The round-64 masked window `$FF4182-$FF41A1` was ratified as "the
+palette-fade staging slot" for the 14z-49 row-0x14 port. 14z-64
+identified the WHOLE structure: the engine stages palette-block rows
+into per-row work-RAM slots at
+
+    slot(row) = $FF3F02 + row * 0x20     (row 0x00 -> $FF3F02,
+                row 0x14 -> $FF4182 = the ratified window,
+                row 0x16 -> $FF41C2, 0x19 -> $FF4222, 0x1A -> $FF4242)
+
+Venue events (screen transitions, the game-over sequence at ~f9126 of
+replay 05, fades) stage block-A rows here and the copies PERSIST until
+the slot is next reused — so any ROM edit to a block-A row shows a
+sticky designed diff in its slot on the masked live-RAM basis. The V2
+basis (14z-64, pending bundle ratification) masks the slots of the
+three medallion rows the WIDE track edits (0x16/0x19/0x1A), exactly as
+round 64 masked row 0x14's. Two measured hazards recorded with it:
+- block-A row 0x00 is NOT select-private: the game-over starfield
+  renders from it (a row-0 edit leaked visible pixels — reverted);
+- the slots are the DETECTOR for such leaks: a slot diff plus a pixel
+  diff means a shared row; a slot diff alone is the ratified-invisible
+  class.

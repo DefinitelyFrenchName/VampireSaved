@@ -398,6 +398,11 @@ tests/test_tenant_winpal.sh    [ob]   # variant-id win-screen palette (14z-63): 
                                       # sparse block + TT thunk at 0x5F1B6; BOTH
                                       # thunk paths measured on real 2P victories
                                       # (replays 61/62). Self-builds at 0x13 unless
+tests/test_don_throw_mirror.sh [ob]   # the 14z-2 mirror-victim fix (applied 14z-64):
+                                      # base-slot mirror throws use the Donovan-victim
+                                      # block — static 2-byte assertion + a matched
+                                      # runtime control pair on replay 65. SKIPs on
+                                      # variant-id builds (correct by construction)
 tests/test_accent_census.sh    [ob]   # accent/march census (14z-63): 4 frozen
                                       # family-base sites (0 direct T0/T1 refs),
                                       # all jsr-routed on variant builds. Static

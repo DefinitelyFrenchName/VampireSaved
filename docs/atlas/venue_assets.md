@@ -137,3 +137,28 @@ mugshot still staging from the vanilla 0x3Dxx page. Gate:
 family in section 2 (Donovan's wrong COLOURS there), and its two
 unmasked 0x021C64/0x021C8E siblings. That work is separate and still
 open — see section 2's consequence paragraph.
+
+## §2 addendum (14z-64): the fold path is DORMANT in every measured flow
+
+The concern above presupposed the `0x00A43E` fold executing on tenant
+surfaces. Audited (14z-64), it does not:
+
+- **Dynamic**: write-taps on `$FF8130` across seven flows — boot,
+  attract, 1P select, 2P select, VS, match, KO, bonus tally, 2P victory
+  screen, arcade win-quote — the fold write NEVER fires. The field's
+  live writers are the screen init (0, PC 0x2033E) and the cursor
+  commit (1, PC 0x20AE8): in these flows `$130(a5)` is a context flag,
+  not an id.
+- **Static**: ZERO jsr/bsr/jmp/table references to `0x00A43E` in the
+  whole first MB — it is fall-through-interior code of a routine whose
+  trigger lies outside every measured flow (plausibly ending/gallery
+  content).
+- Twelve maintainer playtest rounds surfaced no color fault on any
+  tenant screen.
+
+**Verdict: no tenant-visible surface reads a folded block today; no
+widening or block placement is needed.** RESIDUAL: the deep-arcade
+ENDING flow (finishing the game with the tenant) is unmeasured — if it
+ever shows Victor-colored elements, re-run this audit's taps on that
+flow; the fix pattern (win_pal-style sparse block + TT thunks at the
+consumers) is established.

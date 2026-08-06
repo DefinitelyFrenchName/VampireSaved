@@ -62,10 +62,22 @@ check_diverge() {
 }
 
 # The masked windows of the amended legacy basis (docs/atlas/ram.md:
-# dead stack $FF7F00-$FF7FFF + QSound latch $FF043C + the 14z-49 palette
-# staging slot $FF4182-$FF41A1, ratified round 64). Must stay in sync
-# with M2A_MASK in tests/lib/m2a_common.sh.
+# dead stack $FF7F00-$FF7FFF + QSound latch $FF043C + the palette
+# staging slots of the rows this project's palette ports edit — the
+# staging area is $FF3F02 + row*0x20; row 0x14's slot $FF4182-$FF41A1
+# was ratified round 64 for the 14z-49 port, and 14z-64 adds the
+# sibling slots for the medallion rows 0x16/0x19/0x1A, same mechanism,
+# PENDING the bundle ratification). Must stay in sync with M2A_MASK in
+# tests/lib/m2a_common.sh. PER-SET OVERRIDE (14z-64): an expectation
+# set frozen under a different basis ships tests/expected/<set>/mask
+# with its MASK_RANGES string — sets without one use the round-64
+# default below (the stock-track sets). The WIDE v2 sets add the
+# medallion rows' staging slots.
 MASK="043c-043d,4182-41a2,7f00-8000"
+if [ -f "$EXPDIR/mask" ]; then
+    MASK="$(cat "$EXPDIR/mask")"
+    echo "per-set mask: $MASK"
+fi
 
 fail=0
 for rpl in "$REPO"/tests/replays/*.rpl; do

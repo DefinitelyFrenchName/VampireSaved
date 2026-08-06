@@ -1688,3 +1688,61 @@ retarget, complete by census; build 210d2b75):
 - Gates: wheel 3b asserts all three rows across both protocols (a
   fourth census site appearing fails the build); full tenant sweep
   PASS; stock reproduces ae701ffb.
+
+Session 14z-64 (continued): the RE-FREEZE BUNDLE prep — mechanics
+applied, awaiting maintainer ratification:
+- MIRROR-VICTIM FIX (the 14z-2 defect, parked since 62c) APPLIED:
+  data_port throw_victim_keyframes gains `fixes = "0x1E:0b30:0d88"`.
+  Byte-attributed: the stock candidate differs from frozen ae701ffb by
+  EXACTLY the two bytes PRG:0x0B1A16 (0b30 -> 0d88). Behavior-
+  attributed with a matched control pair on NEW permanent replay
+  65_don_mirror_throw (both players slot 0x0F — P2's path is U,U,U
+  from ITS default cell 0x05, BFS-derived from TABLE B; P2's default
+  is NOT P1's): candidate reads the Donovan-victim block 206/0, the
+  frozen build 0/206. NEW gate tests/test_don_throw_mirror.sh (static
+  word + the control pair; SKIPs on variant builds — correct by
+  construction there), in the battery.
+- id_by_profile = "cps2-wide-v1=0x13" DECLARED: profile builds now
+  default to the native id with no flag; tests/test_tenant_id.sh check
+  2 flipped per its own design note (now guards the DECLARATION —
+  losing it would silently rebuild the WIDE track at 0x0F).
+- MID-ROW RETARGET v3 (the 14z-64 defect found by the bundle's own
+  measurement sweep): the v2 thunk on 0x2AD44 sat on the in-match
+  accent funnel and PERMANENTLY flipped a frame-boundary parity
+  (replays 04/05 diverged to EOF as one stuck byte, $FF8094 — GOTCHAS
+  "flicker's evil twin"). v3 thunks ONLY the two measured select
+  mid-row writers (0x2B598, 0x2B7D8) and gates the redirect on the
+  select screen being live ($FFB818 == 0x3000, the wheel drawer's
+  bank word). Measured: medallions still 15/15 stable on both stress
+  protocols AND replay 04 back to its EXACT original composite shape
+  (flickers 1525/2009/2195, window 889-1104).
+
+Session 14z-64 (continued 2): the medallion FINAL ROW ALLOCATION and the
+V2 masked basis (build 4b7d0dc7):
+- The bundle's own measurement sweep found TWO more medallion-row
+  defects, both fixed:
+  * Row 0x00 LEAKS: block-A row 0 feeds the GAME-OVER starfield
+    (measured: 1210 candidate-vs-vanilla pixels on the f11800 game-over
+    screen of replay 05 — a legacy pixel violation). Reverted.
+  * The palette STAGING AREA identified (docs/atlas/ram.md): slots at
+    $FF3F02 + row*0x20; the ratified $FF4182 window IS row 0x14's slot
+    from the 14z-49 port. Any edited block-A row leaves a sticky
+    designed diff in its slot (replay 05's f9126+ tail anomaly).
+- FINAL ALLOCATION: all three medallions on thunk-protected vestigial
+  figure-family MID ROWS — Donovan 0x16, Phobos 0x19, Pyron 0x1A. The
+  two select-side dest thunks redirect marcher writes to all three
+  (select-gated). KNOWN RESIDUAL (documented trade): row 0x1A doubles
+  as the P2 sword-accent row — a 2P Donovan-hover recolors Pyron's
+  PLACEHOLDER medallion until screen re-entry.
+- V2 MASKED BASIS (pending the bundle ratification, the round-64
+  window's siblings): masks the three medallion rows' staging slots
+  ($FF41C2-E1 / $FF4222-41 / $FF4242-61). The vanilla masked logs are
+  REGENERATED deterministically from the frozen vanilla oracle under
+  the v2 basis into tests/expected/vsavj/masked-v2/; run_suite gains
+  per-expectation-set masks (old sets keep the round-64 basis — the
+  stock track needs no change, verified: its battery ran green with
+  the frozen inventories under the old basis).
+- Measured on the final candidate: all three medallions stable through
+  both stress protocols (15/15); the game-over screen pixel-identical
+  to vanilla; the 14-replay sweep clean except the staging slots (v2
+  masks them by design).

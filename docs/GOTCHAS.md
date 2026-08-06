@@ -1877,3 +1877,26 @@ Rules:
   Anything that rewrites it behind the engine's back perturbs work RAM.
 - The clean lever for venue-written rows is the VENUE JOB DATA (the
   14z-15 script family), not the shared uploader code.
+
+## A hook on a hot shared path can flip a frame-boundary parity
+## PERMANENTLY — flicker's evil twin (14z-64)
+
+The mid-row retarget thunk was placed on the uploader dest computation
+at 0x2AD44 — which turned out to be the funnel for EVERY in-match
+accent upload (all four accent-site entries bra into it). Its ~60
+cycles per upload did not add a flicker; it shifted the phase of a
+same-frame multi-writer field ($FF8094: three PCs write it every
+frame, the end-of-frame sample sees the last) across a frame boundary
+PERMANENTLY — replay 04 diverged from f2009 to EOF, replay 05 from
+f9126, both as a single stuck byte. The old build showed a one-frame
+flicker at exactly 2009: the boundary was ALREADY marginal; the added
+cycles locked it to the other side.
+Rules:
+- Before thunking a site, know its CALLER SET across all screens (the
+  bra/bsr census) — a site that looks venue-specific can be the hot
+  funnel for everything.
+- Cycle-cost review must look at LATE-REPLAY TAILS (identical_tail per
+  replay), not just the known divergence windows: a permanent parity
+  flip hides where nobody samples.
+- A one-frame flicker in the frozen inventory marks a MARGINAL
+  boundary; treat its frame as a tripwire when adding cycles anywhere.
