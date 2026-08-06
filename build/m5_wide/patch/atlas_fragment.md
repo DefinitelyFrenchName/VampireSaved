@@ -48,52 +48,68 @@
 | `PRG:0x0CC030` | 0x32 | GEN | reaction_hook thunk |
 | `PRG:0x018458` | 0x6 | GEN | reaction_hook engine site |
 | `PRG:0x0CF310` | 0x44 | GEN | pool-seed + flavor(+Start-hold) init shim |
-| `PRG:0x0B19F8` | 0xE50 | VS2 | data_port throw_victim_keyframes (vsav2 0xca1ca) |
-| `PRG:0x39FBE0` | 0x20 | VS2 | data_port weapon_accent_t0 (vsav2 0x39cbdc) |
-| `PRG:0x39FC00` | 0x20 | VS2 | data_port weapon_accent_t1 (vsav2 0x39cbdc) |
-| `PRG:0x39FC20` | 0x20 | VS2 | data_port weapon_accent_rowd_slot (vsav2 0x39cbfc) |
+| `PRG:0x400010` | 0xE50 | VS2 | data_port throw_victim_keyframes placed block (vsav2 0xca1ca) |
 | `PRG:0x028D50` | 0x4 | VS2 | data_port hit_class_props_ext_hi (vsav2 0x28028) |
 | `PRG:0x028D4E` | 0x2 | VS2 | data_port hit_class_props_ext_lo (vsav2 0x28026) |
-| `PRG:0x3AE060` | 0xA0 | VS2 | data_port win_pal_slot0f_c0 (vsav2 0x3c365c) |
-| `PRG:0x3AEB00` | 0xA0 | VS2 | data_port win_pal_slot0f_c1 (vsav2 0x3c419c) |
-| `PRG:0x3AF5A0` | 0xA0 | VS2 | data_port win_pal_slot0f_c2 (vsav2 0x3c4cdc) |
-| `PRG:0x3B0040` | 0xA0 | VS2 | data_port win_pal_slot0f_c3 (vsav2 0x3c581c) |
-| `PRG:0x3B0AE0` | 0xA0 | VS2 | data_port win_pal_slot0f_c4 (vsav2 0x3c635c) |
-| `PRG:0x3B1580` | 0xA0 | VS2 | data_port win_pal_slot0f_c5 (vsav2 0x3c6e9c) |
-| `PRG:0x3B2020` | 0xA0 | VS2 | data_port win_pal_slot0f_c6 (vsav2 0x3c79dc) |
-| `PRG:0x3B2AC0` | 0xA0 | VS2 | data_port win_pal_slot0f_c7 (vsav2 0x3c851c) |
-| `PRG:0x3A3A80` | 0x20 | VS2 | data_port med_pal_row14_a (vsav2 0x3bafdc) |
-| `PRG:0x400010` | 0x160 | VS2 | sound_table don_sfx_records (vsav2 0xcb01a, id-allowlisted) |
-| `PRG:0x4001D0` | 0x5E | NEW | select_wheel roster21 record (21 cells) |
-| `PRG:0x400170` | 0x54 | NEW | select_wheel roster21 coord list |
+| `PRG:0x400E60` | 0x160 | VS2 | sound_table don_sfx_records (vsav2 0xcb01a, id-allowlisted) |
+| `PRG:0x401020` | 0x5E | NEW | select_wheel roster21 record (21 cells) |
+| `PRG:0x400FC0` | 0x54 | NEW | select_wheel roster21 coord list |
+| `PRG:0x0FFF40` | 0x28 | NEW | select_wheel roster21 march mid-row retarget 0x2b598 |
+| `PRG:0x0FFF70` | 0x28 | NEW | select_wheel roster21 march mid-row retarget 0x2b7d8 |
+| `PRG:0x401080` | 0x1C | VS2 | select_records portrait/p1 coord list |
+| `PRG:0x4010A0` | 0x26 | VS2 | select_records portrait/p1 record |
+| `PRG:0x4010D0` | 0x1C | VS2 | select_records portrait/p2 coord list |
+| `PRG:0x4010F0` | 0x26 | VS2 | select_records portrait/p2 record |
+| `PRG:0x0CF360` | 0x4 | VS2 | select_records name_banner/p1 coord list |
+| `PRG:0x401120` | 0xE | VS2 | select_records name_banner/p1 record |
+| `PRG:0x401130` | 0x8 | VS2 | select_records name_banner/p2 coord list |
+| `PRG:0x401140` | 0x12 | VS2 | select_records name_banner/p2 record |
+| `PRG:0x401160` | 0x14 | VS2 | select_records splash_p1/p1 coord list |
+| `PRG:0x401180` | 0x1E | VS2 | select_records splash_p1/p1 record |
+| `PRG:0x4011A0` | 0x14 | VS2 | select_records splash_p2/p1 coord list |
+| `PRG:0x4011C0` | 0x1E | VS2 | select_records splash_p2/p1 record |
+| `PRG:0x4011E0` | 0x8C | VS2 | select_records win_quote/p1 coord list |
+| `PRG:0x401270` | 0x96 | VS2 | select_records win_quote/p1 record |
+| `PRG:0x401310` | 0x4B00 | VS2 | win_pal_variant don_win_pal sparse block |
+| `PRG:0x0FFFA0` | 0x16 | NEW | win_pal_variant don_win_pal thunk |
 | `PRG:0x3FFCB0` | 0x62 | GEN | site_thunk fixture_row0f_override_bank0 |
 | `PRG:0x01C586` | 0x6 | GEN | site_thunk fixture_row0f_override_bank0 engine site |
 | `PRG:0x3FFD20` | 0x62 | GEN | site_thunk fixture_row0f_override_bank1 |
 | `PRG:0x01C59A` | 0x6 | GEN | site_thunk fixture_row0f_override_bank1 engine site |
-| `PRG:0x0FFF40` | 0x18 | GEN | site_thunk select_companion_tbl_a |
+| `PRG:0x0FFFC0` | 0x18 | GEN | site_thunk select_companion_tbl_a |
 | `PRG:0x0845EC` | 0x6 | GEN | site_thunk select_companion_tbl_a engine site |
-| `PRG:0x0FFF60` | 0x18 | GEN | site_thunk select_companion_tbl_b |
+| `PRG:0x0FFFE0` | 0x18 | GEN | site_thunk select_companion_tbl_b |
 | `PRG:0x0845F8` | 0x6 | GEN | site_thunk select_companion_tbl_b engine site |
-| `PRG:0x0FFF80` | 0x22 | GEN | site_thunk select_companion_resolve_s1 |
+| `PRG:0x3FFD90` | 0x22 | GEN | site_thunk select_companion_resolve_s1 |
 | `PRG:0x084602` | 0x6 | GEN | site_thunk select_companion_resolve_s1 engine site |
-| `PRG:0x0FFFB0` | 0x22 | GEN | site_thunk select_companion_resolve_s2 |
+| `PRG:0x3FFDC0` | 0x22 | GEN | site_thunk select_companion_resolve_s2 |
 | `PRG:0x084624` | 0x6 | GEN | site_thunk select_companion_resolve_s2 engine site |
-| `PRG:0x3FFD90` | 0x3C | GEN | site_thunk accent_color_aware_0 |
+| `PRG:0x3FFDF0` | 0x3C | GEN | site_thunk accent_color_aware_0 |
 | `PRG:0x02AD82` | 0x6 | GEN | site_thunk accent_color_aware_0 engine site |
-| `PRG:0x3FFDD0` | 0x3C | GEN | site_thunk accent_color_aware_1 |
+| `PRG:0x3FFE30` | 0x3C | GEN | site_thunk accent_color_aware_1 |
 | `PRG:0x02AD94` | 0x6 | GEN | site_thunk accent_color_aware_1 engine site |
-| `PRG:0x3FFE10` | 0x3C | GEN | site_thunk accent_color_aware_2 |
+| `PRG:0x3FFE70` | 0x3C | GEN | site_thunk accent_color_aware_2 |
 | `PRG:0x02B342` | 0x6 | GEN | site_thunk accent_color_aware_2 engine site |
-| `PRG:0x3FFE50` | 0x3C | GEN | site_thunk accent_color_aware_3 |
+| `PRG:0x3FFEB0` | 0x3C | GEN | site_thunk accent_color_aware_3 |
 | `PRG:0x02B7E8` | 0x6 | GEN | site_thunk accent_color_aware_3 engine site |
-| `PRG:0x3FFE90` | 0x2A | GEN | site_thunk ls_freeze_vs2_victim |
+| `PRG:0x3FFEF0` | 0x2A | GEN | site_thunk ls_freeze_vs2_victim |
 | `PRG:0x023AD8` | 0x6 | GEN | site_thunk ls_freeze_vs2_victim engine site |
-| `PRG:0x3FFEC0` | 0x24 | GEN | site_thunk ls_freeze_vs2_attacker |
+| `PRG:0x3FFF20` | 0x24 | GEN | site_thunk ls_freeze_vs2_attacker |
 | `PRG:0x023ADE` | 0x6 | GEN | site_thunk ls_freeze_vs2_attacker engine site |
-| `PRG:0x0FFFE0` | 0x16 | GEN | site_thunk es_type51_dispatch |
+| `PRG:0x3FFF50` | 0x16 | GEN | site_thunk es_type51_dispatch |
 | `PRG:0x0185CA` | 0x6 | GEN | site_thunk es_type51_dispatch engine site |
-| `PRG:0x084594` | 0x2 | GEN | code_word select_companion_entry_0f |
-| `PRG:0x05F23C` | 0x2 | GEN | code_word win_pos_x_slot0f |
-| `PRG:0x05F23E` | 0x2 | GEN | code_word win_pos_y_slot0f |
-| `PRG:0x05F27C` | 0x2 | GEN | code_word win_pos_x_slot1f |
-| `PRG:0x05F27E` | 0x2 | GEN | code_word win_pos_y_slot1f |
+| `PRG:0x3FFF70` | 0x1E | GEN | site_thunk name_bank_variant_id |
+| `PRG:0x05FCE0` | 0x6 | GEN | site_thunk name_bank_variant_id engine site |
+| `PRG:0x3FFF90` | 0x1E | GEN | site_thunk splash_bank_variant_id |
+| `PRG:0x06C0E0` | 0x6 | GEN | site_thunk splash_bank_variant_id engine site |
+| `PRG:0x3FFFB0` | 0x16 | GEN | site_thunk winquote_bank_variant_id |
+| `PRG:0x05F328` | 0x6 | GEN | site_thunk winquote_bank_variant_id engine site |
+| `PRG:0x405E10` | 0x7E | GEN | site_thunk select_sword_pal_variant_id |
+| `PRG:0x05F9D0` | 0x6 | GEN | site_thunk select_sword_pal_variant_id engine site |
+| `PRG:0x405E90` | 0x140 | VS2 | site_thunk select_pal_variant_id data block |
+| `PRG:0x405FD0` | 0x38 | GEN | site_thunk select_pal_variant_id |
+| `PRG:0x05F146` | 0x6 | GEN | site_thunk select_pal_variant_id engine site |
+| `PRG:0x08459C` | 0x2 | GEN | code_word select_companion_entry_0f |
+| `PRG:0x0282FA` | 0x2 | GEN | code_word obj_bank_word_slot |
+| `PRG:0x05F24C` | 0x2 | GEN | code_word win_pos_x_slot |
+| `PRG:0x05F24E` | 0x2 | GEN | code_word win_pos_y_slot |

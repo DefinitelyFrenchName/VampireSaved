@@ -11,6 +11,15 @@ donovan-m3a with the 14-replay measured classes; registry row added.
 Both canonical dirs (build/m5_wide, build/m5_stock) rebuild bit-exact.
 Read 14z-64 below, then docs/NEXT_SESSION.md.)
 
+## Session 14z-64 SESSION CLOSE (2026-08-07)
+
+M3a frozen and validated (SUITE GREEN, commit cef3238). Scratch/evidence
+build dirs (build/m3a_wheel, build/m3a_selrec, build/chk_*) are
+UNTRACKED leftovers of the 14z-63/64 arc — safe to delete; the canonical
+references are build/m5_wide (4b7d0dc7) and build/m5_stock (6c93cfa8),
+both committed with their regenerated patch fragments. Next session:
+docs/NEXT_SESSION.md (the second tenant / M5 sounds).
+
 ## Session 14z-64 FREEZE RECORD (maintainer: "freeze", 2026-08-06)
 
 - Registry: `4b7d0dc7... -> donovan-m3a` (supersedes donovan-m5w/

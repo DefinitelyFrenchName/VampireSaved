@@ -90,7 +90,9 @@
 | `PRG:0x0FFFE0` | 0x16 | GEN | site_thunk es_type51_dispatch |
 | `PRG:0x0185CA` | 0x6 | GEN | site_thunk es_type51_dispatch engine site |
 | `PRG:0x084594` | 0x2 | GEN | code_word select_companion_entry_0f |
-| `PRG:0x05F23C` | 0x2 | GEN | code_word win_pos_x_slot0f |
-| `PRG:0x05F23E` | 0x2 | GEN | code_word win_pos_y_slot0f |
-| `PRG:0x05F27C` | 0x2 | GEN | code_word win_pos_x_slot1f |
-| `PRG:0x05F27E` | 0x2 | GEN | code_word win_pos_y_slot1f |
+| `PRG:0x0282F2` | 0x2 | GEN | code_word obj_bank_word_slot |
+| `PRG:0x028312` | 0x2 | GEN | code_word obj_bank_word_slot |
+| `PRG:0x05F23C` | 0x2 | GEN | code_word win_pos_x_slot |
+| `PRG:0x05F27C` | 0x2 | GEN | code_word win_pos_x_slot |
+| `PRG:0x05F23E` | 0x2 | GEN | code_word win_pos_y_slot |
+| `PRG:0x05F27E` | 0x2 | GEN | code_word win_pos_y_slot |

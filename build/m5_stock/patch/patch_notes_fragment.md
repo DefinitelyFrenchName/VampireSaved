@@ -50,7 +50,7 @@ data_file 0x3fa790 +0x25c2  donovan hitbox (from vsav2 0x0C8BB8)
 # hitbox_proj+0x331: region_fix 50 -> 0f (extended record type 0x50 -> 0x0F (vs2 dispatch alias: entry 0x50 word 0x16E == entry 0x0F's; same wild-jump class past vsavj's 0x4F table end))
 # hitbox_proj+0x351: region_fix 50 -> 0f (extended record type 0x50 -> 0x0F (vs2 dispatch alias: entry 0x50 word 0x16E == entry 0x0F's; same wild-jump class past vsavj's 0x4F table end))
 data_file 0x0ca7e0 +0x1000  donovan hitbox_proj (from vsav2 0x0D0CA8)
-# x026142+0x140c: bank table row 0x0f <- 0x4000 (bank 2; vanilla row was 0x4000) — tenant-driven
+# x026142+0x140c: bank table row 0x0f <- 0x4000 (bank 2, WIDE encoding; vanilla row was 0x4000) — tenant-driven
 # x026142+0x13ee: table_fix 48 bytes (ported per-char OBJ bank table -> vanilla vsavj values (0x282D4))
 # bank_ref 0xd7a18 -> 0xbd87a (delta rule, 16B byte-identical)
 # bank_ref 0xd8358 -> 0xbe1ba (delta rule, 16B byte-identical)
@@ -102,9 +102,9 @@ code   0x0cb930 ILLEGAL  TRIPWIRE for unresolved 0x17f176
 # x05c800+0x3034: unresolved 0x17f176 -> tripwire 0xcb930
 code   0x0cb940 ILLEGAL  TRIPWIRE for unresolved 0x181592
 # x05c800+0x3072: unresolved 0x181592 -> tripwire 0xcb940
-# x05c800+0x738: port_patch 3d7c60000018 -> 3d7c40000018 (OBJ bank setter: vs2 bank 3 -> vsav bank 2 (Jedah band))
-# x05c800+0x58d4: port_patch 397c60000018 -> 397c40000018 (OBJ bank setter (a4 form): vs2 bank 3 -> vsav bank 2)
-# x05c800+0x5994: port_patch 397c60000018 -> 397c40000018 (OBJ bank setter (a4 form): vs2 bank 3 -> vsav bank 2)
+# x05c800+0x738: port_patch 3d7c60000018 -> 3d7c40000018 (OBJ bank setter: vs2 bank 3 -> vsav bank 2 (Jedah band) / WIDE bank 4)
+# x05c800+0x58d4: port_patch 397c60000018 -> 397c40000018 (OBJ bank setter (a4 form): vs2 bank 3 -> vsav bank 2 / WIDE bank 4)
+# x05c800+0x5994: port_patch 397c60000018 -> 397c40000018 (OBJ bank setter (a4 form): vs2 bank 3 -> vsav bank 2 / WIDE bank 4)
 code_file 0x0c2a10 +0x6a00  donovan x05c800 (from vsav2 0x05C800)
 code_file 0x0cbb62 +0x2d0  donovan x065952 (from vsav2 0x065952)
 code_file 0x0cbe32 +0x100  donovan x065c22 (from vsav2 0x065C22)
@@ -154,9 +154,9 @@ code   0x0cb9d0 ILLEGAL  TRIPWIRE for unresolved 0x2695d0
 code   0x0cead0 ILLEGAL  shared pcrel TRIPWIRE for x088512
 # x088512: 9 pcrel escape entries rewritten (tripwire at 0xcead0)
 # x088512+0x2be6: port_patch 000e -> 000c (companion queue class 7 (vs2-only) -> vsavj class 6)
-# x088512+0x22c: port_patch 3d7c60000018 -> 3d7c40000018 (OBJ bank setter: vs2 bank 3 -> vsav bank 2)
-# x088512+0x1814: port_patch 3d7c60000018 -> 3d7c40000018 (OBJ bank setter: vs2 bank 3 -> vsav bank 2)
-# x088512+0x2bee: port_patch 3d7c60000018 -> 3d7c40000018 (OBJ bank setter: vs2 bank 3 -> vsav bank 2)
+# x088512+0x22c: port_patch 3d7c60000018 -> 3d7c40000018 (OBJ bank setter: vs2 bank 3 -> vsav bank 2 / WIDE bank 4)
+# x088512+0x1814: port_patch 3d7c60000018 -> 3d7c40000018 (OBJ bank setter: vs2 bank 3 -> vsav bank 2 / WIDE bank 4)
+# x088512+0x2bee: port_patch 3d7c60000018 -> 3d7c40000018 (OBJ bank setter: vs2 bank 3 -> vsav bank 2 / WIDE bank 4)
 code_file 0x0d0170 +0x2f00  donovan x088512 (from vsav2 0x088512)
 code   0x0ceae0 ILLEGAL  shared pcrel TRIPWIRE for x0905ae
 # x0905ae: 2 pcrel escape entries rewritten (tripwire at 0xceae0)
@@ -313,7 +313,10 @@ poke32 0x0bf656 <- 0x000c1106  dispatch_19[0xf] donovan handler
 poke32 0x0bf696 <- 0x000c1106  dispatch_19[0x1f] variant mirror
 poke32 0x08993c <- 0x868c0202  aux hud_name_entry_0f_hi
 poke32 0x089940 <- 0xffe80003  aux hud_name_entry_0f_lo
-data   0x0b19f8 +0xe50  data_port throw_victim_keyframes <- vsav2 0x0ca1ca (0 fixes)
+# aux hud_mug_entry_13: SKIPPED (variant-half row; tenant is at base slot 0x0f)
+# aux hud_name_entry_13_hi: SKIPPED (variant-half row; tenant is at base slot 0x0f)
+# aux hud_name_entry_13_lo: SKIPPED (variant-half row; tenant is at base slot 0x0f)
+data   0x0b19f8 +0xe50  data_port throw_victim_keyframes <- vsav2 0x0ca1ca (1 fixes)
 data   0x39fbe0 +0x20  data_port weapon_accent_t0 <- vsav2 0x39cbdc (0 fixes)
 data   0x39fc00 +0x20  data_port weapon_accent_t1 <- vsav2 0x39cbdc (0 fixes)
 data   0x39fc20 +0x20  data_port weapon_accent_rowd_slot <- vsav2 0x39cbfc (0 fixes)
@@ -341,8 +344,15 @@ code   0x3ffe50 +0x3c  site_thunk accent_color_aware_3; site 0x02b7e8 jsr-routed
 code   0x3ffe90 +0x2a  site_thunk ls_freeze_vs2_victim; site 0x023ad8 jsr-routed
 code   0x3ffec0 +0x24  site_thunk ls_freeze_vs2_attacker; site 0x023ade jsr-routed
 code   0x0fffe0 +0x16  site_thunk es_type51_dispatch; site 0x0185ca jsr-routed
-code   0x084594 +0x2  code_word select_companion_entry_0f (0040 -> 0046)
-code   0x05f23c +0x2  code_word win_pos_x_slot0f (0070 -> 00f0)
-code   0x05f23e +0x2  code_word win_pos_y_slot0f (0080 -> 0098)
-code   0x05f27c +0x2  code_word win_pos_x_slot1f (0070 -> 00f0)
-code   0x05f27e +0x2  code_word win_pos_y_slot1f (0080 -> 0098)
+# site_thunk name_bank_variant_id: SKIPPED (variant-id-only; tenant is at 0x0f)
+# site_thunk splash_bank_variant_id: SKIPPED (variant-id-only; tenant is at 0x0f)
+# site_thunk winquote_bank_variant_id: SKIPPED (variant-id-only; tenant is at 0x0f)
+# site_thunk select_sword_pal_variant_id: SKIPPED (variant-id-only; tenant is at 0x0f)
+# site_thunk select_pal_variant_id: SKIPPED (variant-id-only; tenant is at 0x0f)
+code   0x084594 +0x2  code_word select_companion_entry_0f (slot entry -> 0046)
+code   0x0282f2 +0x2  code_word obj_bank_word_slot (slot entry -> 4000)
+code   0x028312 +0x2  code_word obj_bank_word_slot (slot entry mirror -> 4000)
+code   0x05f23c +0x2  code_word win_pos_x_slot (slot entry -> 00f0)
+code   0x05f27c +0x2  code_word win_pos_x_slot (slot entry mirror -> 00f0)
+code   0x05f23e +0x2  code_word win_pos_y_slot (slot entry -> 0098)
+code   0x05f27e +0x2  code_word win_pos_y_slot (slot entry mirror -> 0098)
