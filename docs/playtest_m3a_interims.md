@@ -1,4 +1,4 @@
-# Playtest guide — build `39597268` (tenant at 0x13): expected interims vs real bugs
+# Playtest guide — build `1464942a` (tenant at 0x13, option A phases 1-2): expected interims vs real bugs
 
 For the 14z-62f playtest of `build/m3a_selrec`. Everything in the first
 table is a DOCUMENTED interim with a known mechanism and a queued fix —
@@ -18,11 +18,11 @@ tools/run_wide.sh build/m3a_selrec fbneo
 
 | What you will see | Where | Why (mechanism + fix queue) |
 |---|---|---|
-| A garbled RED/ORANGE BAR left of the wheel while hovering Donovan's cell (and through the speed menu) | select screen | The "lit name label" (his highlight piece) keeps its vs2 tile codes as PLACEHOLDERS — the four label tiles (0xB000/0xB129/0xB22C/0xB2A5) have no art home until the option-A select-art move. The ratified medallion policy. |
-| The three BOTTOM-ROW medallions (Phobos/Pyron/Donovan cells) show wrong/garbage-ish art in off colors | select screen | The wheel-extension entries carry vs2-native tile codes as placeholders ("imperfect medallion art is acceptable" — your 14z-60s ruling). Rides the option-A move. |
-| JEDAH's select-screen BODY figure garbles below his (correct) face while hovering his cell | select screen | The tenant's select-art subset still occupies Jedah's bank-1 hover-figure anchors. THE thing option A fixes. His face, name banner, and all his MATCH art are already back (his match measured pixel-identical to vanilla). |
+| A small MISPLACED garbled strip near the portrait while hovering Donovan's cell | select screen | His highlight record (the vs2 "lit label") draws at a stale base — the ring drawer's per-cell position source doesn't know the appended cells. Phase 3 (with the ring-vs-label content decision). |
+| The three BOTTOM-ROW medallions show placeholder-quality art | select screen | Real medallion art rides phase 3 (the wheel drawer is single-bank; the whole wheel moves to group C). |
+| ~~Jedah select body garble~~ FIXED (62j) | — | The select-art subset no longer touches group A at all; his select screen, VS, match and win art are all vanilla-correct (verified by snapshot on a no-fallback rompath). |
 | Donovan's HUD name plate reads "VICTOR" in-match | match HUD | The HUD name table is 16-wide and its consumer folds the id (0x13 -> 0x03). Queued with the 0x00A43E fold work. His select-screen name banner correctly reads "Donovan". |
-| Donovan's WIN-SCREEN portrait/palette off-colored | win screen | The win-pal block is (color*17+id)-indexed; id 0x13 lands in a neighboring color block. The sparse-block fix is designed (STATE 14z-62c), queued behind option A. |
+| Donovan's WIN-SCREEN portrait/palette off-colored | win screen | The win-pal block is (color*17+id)-indexed; id 0x13 lands in a neighboring color block. The sparse-block fix is designed (STATE 14z-62c). His win QUOTE art now rides bank 5 (62j). Jedah's win screen is fully vanilla now. |
 | Donovan's HUD mugshot possibly odd | match HUD | Mugshot art was placed into Jedah's cells for the 0x0F track; the venue family folds at 0x13. Same queue as the name plate. |
 | Sounds: some Donovan voice lines silent | anywhere | Your M5 "A then B" decision — unfaithful lines ship silent. Unchanged. |
 

@@ -2438,6 +2438,11 @@ def main():
             # thunk that compares against some other character on purpose.
             _hx = st["thunk_hex"].lower()
             _tid = _int(port["port"]["dst_slot"]) & 0xFF
+            # TU (14z-62j): the tenant id under the WIN-QUOTE consumer bias
+            # (+0x40 rows — the shared consumer at 0x5F328 receives d0
+            # pre-biased per piece). Replaced before TT ("tu" contains no
+            # "tt").
+            _hx = _hx.replace("tu", "%02x" % ((_tid + 0x40) & 0xFF))
             _hx = _hx.replace("tt", "%02x" % _tid)
             # row_subst (14z-62c): a thunk body may embed the ADDRESS of a
             # per-char table row (e.g. the accent thunks read the sprite

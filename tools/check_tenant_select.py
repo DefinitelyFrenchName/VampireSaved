@@ -54,7 +54,7 @@ PIECES = [
     ("highlight",   0x268A02, 0x2A18FE, ("p1", "p2"), "placed"),
     ("splash_p1",   0x2672AA, 0x2A05E2, ("p1",), "native"),
     ("splash_p2",   0x26732A, 0x2A0662, ("p1",), "native"),
-    ("win_quote",   0x2673AA, 0x2A06E2, ("p1",), "placed"),
+    ("win_quote",   0x2673AA, 0x2A06E2, ("p1",), "native"),
 ]
 WHEELPTR = 0x2689FE
 JEDAH_BLOCK = (0x271900, 0x274700)   # every record select_port ever surgered

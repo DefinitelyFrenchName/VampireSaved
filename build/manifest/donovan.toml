@@ -1648,6 +1648,24 @@ site = 0x06C0E0
 old_hex = "207c002672aa"
 thunk_hex = "207c002672aa0c2e00tt000a66083d7c300000184e753d7c200000184e75"
 
+# ── 14z-62j phase 2: WIN-QUOTE drawer bank gate ─────────────────────────────
+# The win drawer ($FFB800) sets its record via the SHARED consumer
+# 0x5F328 with d0 = winner id + 0x40 (the win-quote row bias; measured:
+# $1C written by PC 0x5F338 at the win transition, cell 0x2673E2 for the
+# Jedah win). Its $A cache is NOT the id (measured 0x00), so the gate
+# keys on the biased d0 via the TU substitution (tenant+0x40). TENANT
+# WIN ONLY writes the bank (0x3000); everything else falls through
+# untouched — the object re-inits 0x2000 per win screen, so no restore
+# is needed and legacy RAM is byte-identical (cycles only). Flags dead
+# (andi.w follows the site).
+[[site_thunk]]
+stage = 6
+name = "winquote_bank_variant_id"
+only_variant_slot = true
+site = 0x05F328
+old_hex = "207c002672aa"
+thunk_hex = "207c002672aa0c0000tu66083d7c300000184e754e75"
+
 # ── 14z-62e: SELECT-PORTRAIT PALETTES at a variant id ──────────────────────
 # The uploader (PRG:0x5F136 family) computes grid row (variant*16 + id)
 # with the id UNMASKED, so id 0x13 reads Victor's variant-1 slot (measured:
@@ -1858,6 +1876,7 @@ expect_vj_alias_p1 = 0x27382E
 stage = 6
 name = "win_quote"
 hole = "wide_ext"
+art = "native_c5"
 allow_placeholder_tiles = false
 vj_p1 = 0x2673AA
 vs2_p1 = 0x2A06E2

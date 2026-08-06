@@ -1313,3 +1313,32 @@ any build, ever; fixed. Scratch build 7f2b9d5a):
   at (152,88) instead of the cell). Queued with the option-A select-art
   session: find the drawer's position source + decide ring-vs-label
   content for the newcomer cells (a look-and-feel choice).
+
+Session 14z-62j (option A phases 1-2 COMPLETE — the whole select family
+serves from WIDE group C bank 5; scratch build 1464942a):
+- All FOUR pieces native (portrait, name banner, VS splash, win quote):
+  records keep vs2 codes, art copied vs2 -> group C upper bank at
+  0x10000+code (146 tiles), select_tiles.json = ZERO group-A placements.
+  The placeholder class is DEAD for these pieces (B22C/B2A5 etc. now
+  real art in bank 5).
+- Drawer bank gates, each measured before authoring:
+  * portrait objects (FFB980/FFBB80): the select_pal thunk v2 (62j-1).
+  * name objects (FFB900/FFBB00): thunk at the per-hover refetch
+    0x5FCE0; v1 gated on d0 and NEVER FIRED (d0 is id*4 there —
+    measured by bank tap), v2 gates via the live owner ptr
+    (cmpi.b #TT,$382(a4)).
+  * VS-splash consumer 0x6C0E0: gate on the object-cached id $A(a6).
+  * win drawer (FFB800) rides the SHARED consumer 0x5F328 with
+    d0 = winner+0x40 (measured at the win transition; its $A is NOT the
+    id — measured 0). New TU substitution (tenant+0x40); the thunk
+    writes ONLY on a tenant win (the object re-inits 0x2000 per screen;
+    zero legacy RAM effect).
+- MEASURED RESULTS (honest no-fallback rompath): Donovan — select bust,
+  banner, VS splash all his real art in his colors from bank 5
+  (a19=5xxxx verified per piece). JEDAH — select portrait COMPLETELY
+  clean (the mid-face band gone), VS/match/win art all vanilla-correct
+  (win screen: proper victory pose + quote). Group B pristine; group A
+  now ADDITIVE-ONLY (the effect-tail engine-page families at verified
+  free anchors — full-pristine vsav.zip needs the effect-band move,
+  queued). All gates PASS incl. the 890-2362 acceptance window; stock
+  reproduces ae701ffb throughout.
