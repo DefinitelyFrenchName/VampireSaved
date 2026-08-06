@@ -1342,3 +1342,17 @@ serves from WIDE group C bank 5; scratch build 1464942a):
   free anchors — full-pristine vsav.zip needs the effect-band move,
   queued). All gates PASS incl. the 890-2362 acceptance window; stock
   reproduces ae701ffb throughout.
+
+Maintainer round 4 (build 1464942a): JEDAH CONFIRMED INDISTINGUISHABLE
+FROM VANILLA by human playtest — the visual half of the M3a acceptance.
+One NEW finding, correctly outside the expected list: Donovan's
+PRE-CONFIRM select sword in a wrong palette (11/12 dark grey, 1/12 deep
+red — his real accent). Mechanism identified: the select sword's colors
+ride the row-0x0C accent march; at 0x0F the in-place accent-slot
+overwrites (weapon_accent_t0/t1) made EVERY march path show his colors,
+masking that the pre-confirm marching object does not resolve an owner
+link to the hovered id — so the accent thunk's tenant branch never
+fires there. At 0x13 the slots are correctly vanilla (62c gating), so
+the un-thunked path shows through as Jedah-grey. In-fight/post-confirm
+correct (the thunked paths). Fix queued with phase 3: tap the
+pre-confirm marcher's owner resolution, extend the 14z-31/47 fallback.

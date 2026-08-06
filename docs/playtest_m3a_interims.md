@@ -25,6 +25,7 @@ tools/run_wide.sh build/m3a_selrec fbneo
 | Donovan's WIN-SCREEN portrait/palette off-colored | win screen | The win-pal block is (color*17+id)-indexed; id 0x13 lands in a neighboring color block. The sparse-block fix is designed (STATE 14z-62c). His win QUOTE art now rides bank 5 (62j). Jedah's win screen is fully vanilla now. |
 | Donovan's HUD mugshot possibly odd | match HUD | Mugshot art was placed into Jedah's cells for the 0x0F track; the venue family folds at 0x13. Same queue as the name plate. |
 | Sounds: some Donovan voice lines silent | anywhere | Your M5 "A then B" decision — unfaithful lines ship silent. Unchanged. |
+| Donovan's SELECT-SCREEN sword in a wrong palette (dark grey; occasionally deep red) | select screen, pre-confirm hover | Maintainer round 4 finding. The sword's colors ride the accent MARCH (row 0x0C); at slot 0x0F the marched slots (0x39FBE0/0x39FC00) were overwritten in place with his rows, so even march paths that never reach the accent thunk showed his colors. At 0x13 those slots are correctly vanilla again, and the pre-confirm marching object evidently does not resolve an owner link to the hovered id, so the thunk's tenant branch never fires (the one deep-red run = a phase that did reach it). In-fight and post-confirm are correct (the thunked paths). Fix: measure the pre-confirm marcher's owner resolution, extend the accent thunk's fallback — queued with phase 3. |
 
 ## REAL BUG — report immediately
 
