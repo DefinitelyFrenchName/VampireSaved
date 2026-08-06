@@ -40,14 +40,19 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import cps2_decrypt as cps  # noqa: E402
 import select_port as sp    # noqa: E402  (PLACEMENTS is the single map)
 
-# Measured 14z-61 (docs/atlas/select_screen.md), frozen by
-# tests/test_select_arrays.sh: P1 array base per piece; P2 = P1 + 0x80.
-ARRAYS = {"portrait": 0x26742A, "name_banner": 0x2675AA,
-          "highlight": 0x268A02}
-# vs2's own arrays, same 32-row model (14z-62): found via the known Donovan
-# records and shape-verified on both halves.
-VS2_ARRAYS = {"portrait": 0x2A0762, "name_banner": 0x2A08E2,
-              "highlight": 0x2A18FE}
+# Measured 14z-61/62e (docs/atlas/select_screen.md, frozen by
+# tests/test_select_arrays.sh): (name, vj_base, vs2_base, sides). Paired
+# pieces have a P2 array at +0x80 in BOTH engines; splash P1/P2 and the
+# win quote are single arrays (the win quote has no P2 twin at all — the
+# portrait array follows it immediately).
+PIECES = [
+    ("portrait",    0x26742A, 0x2A0762, ("p1", "p2")),
+    ("name_banner", 0x2675AA, 0x2A08E2, ("p1", "p2")),
+    ("highlight",   0x268A02, 0x2A18FE, ("p1", "p2")),
+    ("splash_p1",   0x2672AA, 0x2A05E2, ("p1",)),
+    ("splash_p2",   0x26732A, 0x2A0662, ("p1",)),
+    ("win_quote",   0x2673AA, 0x2A06E2, ("p1",)),
+]
 WHEELPTR = 0x2689FE
 JEDAH_BLOCK = (0x271900, 0x274700)   # every record select_port ever surgered
 PAL_GRID, PAL_CHAR, PAL_VARS = 0x3AC000, 0x0F, 11
@@ -98,9 +103,10 @@ def main():
             fails.append(msg)
             print(f"FAIL: {msg}")
 
-    for nm, p1 in ARRAYS.items():
-        for side, base, vbase in (("p1", p1, VS2_ARRAYS[nm]),
-                                  ("p2", p1 + 0x80, VS2_ARRAYS[nm] + 0x80)):
+    for nm, p1, vs2p1, sides in PIECES:
+        for side in sides:
+            base = p1 if side == "p1" else p1 + 0x80
+            vbase = vs2p1 if side == "p1" else vs2p1 + 0x80
             row = base + 4 * tid
             dst = u32(img, row)
             chk(dst != u32(van, row),
@@ -148,7 +154,7 @@ def main():
         print(f"FAIL: {len(fails)} violation(s)")
         sys.exit(1)
     print(f"OK: tenant {tid:#04x} select records verified "
-          f"(6 rows, 6 composed records, host bytes vanilla)")
+          f"(9 rows, 9 composed records, host bytes vanilla)")
 
 
 if __name__ == "__main__":

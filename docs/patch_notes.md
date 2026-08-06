@@ -1188,3 +1188,23 @@ of vs2's OWN mechanism (its uploader special-cases `cmpi #$13` at
 0x6B1A0): one tenant-gated site_thunk at the row computation + a
 data_port placing Donovan's 10 variant rows (vs2 0x3C117C+0xC6*0x20,
 0x140 bytes) in wide_ext. Queued behind the select-art decision.
+
+Session 14z-62e (SPLASH + WIN-QUOTE join the select-records mechanism —
+the select-family program side is COMPLETE; scratch build 45730d0f):
+- The VS-splash and win-quote records ride the SAME 32-row id-indexed
+  array model, in the same region: splash_p1 0x2672AA, splash_p2
+  0x26732A (separate pieces, not a +0x80 pair), win_quote 0x2673AA (no
+  P2 twin — the portrait array follows immediately). Variant halves
+  alias; vs2 carries Donovan's own rows at 0x13 (bases 0x2A05E2 /
+  0x2A0662 / 0x2A06E2 -> records 0x2A7F68 / 0x2A7F86 / 0x2A8CF8).
+- Three [[select_records]] rows + single-sided support in the generator;
+  the checker now verifies NINE rows/records. Composed: splash 5 entries
+  each (tiles all in the 14g placement family), win quote 35 entries
+  (the 14h family), budgets vs2's own.
+- MEASURED at the VS screen (tap, replay 36, frames 2599+): the engine
+  interleaves the CPU opponent's VANILLA splash_p2 row (0x06) with THE
+  TENANT'S COMPOSED splash_p1 record — frozen into the gate as the
+  `splash` runtime section (RT_FRAMES=2800). Win-quote fires only at a
+  match win; statics + alias anchors cover it until a 0x13 win replay.
+- Stock rebuilds ae701ffb exactly. Both emulator WIDE gates PASS against
+  the sentinel descriptors (FBNeo earlier; MAME confirmed this session).

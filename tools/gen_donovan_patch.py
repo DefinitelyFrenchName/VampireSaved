@@ -2265,6 +2265,11 @@ def main():
                 continue
             nm = sr["name"]
             for side in ("p1", "p2"):
+                # single-sided pieces (14z-62e: splash P1/P2 and the win
+                # quote are each ONE array, not a +0x80 pair) declare only
+                # the keys they have
+                if f"vj_{side}" not in sr:
+                    continue
                 vj_base = _int(sr[f"vj_{side}"])
                 vj_row = vj_base + 4 * dst_slot
                 vj_alias = vj_base + 4 * (dst_slot & 0x0F)

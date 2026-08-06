@@ -1755,6 +1755,44 @@ expect_vs2_p2 = 0x2A76A4
 expect_vj_alias_p1 = 0x272172
 expect_vj_alias_p2 = 0x273080
 
+# 14z-62e: the VS-SPLASH and WIN-QUOTE records ride the SAME 32-row
+# id-indexed model, in the same array region (single arrays — splash P1
+# and P2 are separate pieces, the win quote has no P2 twin: the portrait
+# array follows it immediately). vs2 carries Donovan's own records at row
+# 0x13; every entry tile is already in the placement map (the 14g splash
+# and 14h win-quote families). The win quote fires only at a match win —
+# runtime verification rides a future win replay; statics + the alias
+# anchors + the splash tap cover the mechanism.
+[[select_records]]
+stage = 6
+name = "splash_p1"
+hole = "wide_ext"
+allow_placeholder_tiles = false
+vj_p1 = 0x2672AA
+vs2_p1 = 0x2A05E2
+expect_vs2_p1 = 0x2A7F68
+expect_vj_alias_p1 = 0x2734E8
+
+[[select_records]]
+stage = 6
+name = "splash_p2"
+hole = "wide_ext"
+allow_placeholder_tiles = false
+vj_p1 = 0x26732A
+vs2_p1 = 0x2A0662
+expect_vs2_p1 = 0x2A7F86
+expect_vj_alias_p1 = 0x27382E
+
+[[select_records]]
+stage = 6
+name = "win_quote"
+hole = "wide_ext"
+allow_placeholder_tiles = false
+vj_p1 = 0x2673AA
+vs2_p1 = 0x2A06E2
+expect_vs2_p1 = 0x2A8CF8
+expect_vj_alias_p1 = 0x273D3C
+
 [[select_records]]
 stage = 6
 name = "highlight"

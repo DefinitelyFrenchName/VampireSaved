@@ -3,10 +3,11 @@
 # variant-half tenant id the build must carry the tenant's OWN select
 # records and the host's records must return to VANILLA bytes.
 #
-# WHY (14z-62). The slot-0x0F port displays the tenant's select UI by
+# WHY (14z-62/62e). The slot-0x0F port displays the tenant's select UI by
 # in-place surgery on Jedah's records (tools/select_port.py). De-substituting
-# the tenant to id 0x13 replaces that mechanism with six repointed
-# variant-half array rows + generator-composed records
+# the tenant to id 0x13 replaces that mechanism with NINE repointed
+# variant-half array rows (portrait/name/highlight x P1+P2, splash P1/P2,
+# win quote) + generator-composed records
 # (docs/atlas/select_screen.md; the vanilla-side model gate is
 # tests/test_select_arrays.sh). This gate freezes the new mechanism:
 #
@@ -62,7 +63,7 @@ python3 tools/cps2_decrypt.py "$ROMDIR/vsav2.zip" "$WORK/vsav2_op.bin" \
 echo "== 1. static: composition + host de-substitution =="
 if python3 tools/check_tenant_select.py "$OUTBASE/prg" "$VAN" "$VS2" \
         --id 0x13 > "$WORK/static.txt" 2>&1; then
-    echo "  ok: 6 rows, 6 composed records, host bytes vanilla"
+    echo "  ok: 9 rows, 9 composed records, host bytes vanilla"
 else
     echo "  FAIL: static check (below)"
     grep "FAIL" "$WORK/static.txt" | head | sed 's/^/        /'
@@ -123,7 +124,7 @@ else
         | sed 's/0x/00/'; }
     WHEEL="$(awk '$1=="WHEELPTR"{print $2}' "$WORK/static.txt" | sed 's/0x/00/')"
     runtime() {  # runtime <tag> <replay> <watch> <expected sequence> [filter]
-        WATCH="$3" TRACE_OUT="$WORK/$1.txt" FRAMES=1400 \
+        WATCH="$3" TRACE_OUT="$WORK/$1.txt" FRAMES="${RT_FRAMES:-1400}" \
         REPLAY="$REPO/tests/replays/$2" \
         MAME_SANDBOX="$WORK/sbx_$1" MAME_BIN="$WIDE_BIN" \
         MAME_ROMPATH="$OUTBASE/rompath;$ROMDIR" \
@@ -180,6 +181,14 @@ else
     runtime p2_name_via_p1 37_p2_pick_tenant.rpl "2675a0,100,r" \
         "00272156 0027218e 002721d4 002721c6 $(rowval name_banner p1) " \
         "" first
+    # VS SPLASH (14z-62e; fires at the versus screen, ~frame 2599 on this
+    # replay): the CPU opponent's VANILLA splash_p2 row (0x06 for this
+    # replay's ladder draw) interleaves with the TENANT's composed
+    # splash_p1 record — the engine serving the tenant's own splash.
+    # (The win-quote piece fires only at a match win; statics + alias
+    # anchors cover it until a 0x13 win replay exists.)
+    RT_FRAMES=2800 runtime splash 36_pick_tenant_cell.rpl "2672aa,100,r" \
+        "002738b8 $(rowval splash_p1 p1) " "" first
     # ...and the +0x80 name structure has NO consumer on any measured path
     # (0 reads through 2P select, confirm, splash, match start). The
     # composed row is kept for safety; this asserts the measured negative
