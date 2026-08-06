@@ -18,6 +18,14 @@ REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"
 mkdir -p "$OUTBASE"
 
+# Tenant selection (14z-65, M3b): the driver serves any single-tenant
+# manifest. Defaults preserve the Donovan behavior byte-for-byte
+# (tests/test_m3a_reproducible.sh arbitrates). TENANT_CHAR must match the
+# manifest's src_char — extract_char anchors on it and the generator
+# rewrites its id immediates.
+TENANT_MANIFEST="${TENANT_MANIFEST:-build/manifest/donovan.toml}"
+TENANT_CHAR="${TENANT_CHAR:-0x13}"
+
 python3 tools/audit_roms.py "$ROMDIR" > /dev/null || {
     echo "ROM audit FAILED — stop (CLAUDE.md §3)"; exit 1; }
 
@@ -56,16 +64,31 @@ DEFAULT_ROOTS="$DEFAULT_ROOTS,0x65952:0x2d0:t0x65986,0x65c22:0x238:t0x65c56,0x65
 # The "59-62 only" assumption is measured-wrong for 63; handler ported
 # with the standard +0x34 twin. 64-75 remain tripwired (still unseen).
 DEFAULT_ROOTS="$DEFAULT_ROOTS,0x6717c:0x154:t0x671b0"
+# DEFAULT_ROOTS is DONOVAN'S measured root census — it applies only to his
+# char. Another tenant's census accumulates here as its R1 loop finds
+# roots (EXTRA_ROOTS overrides for census experiments).
+case "$TENANT_CHAR" in
+    0x13) : ;;   # Donovan's census above
+    0x10)
+        # Huitzil census (14z-65, ladder): 0x55478 = his tail_code_ptr
+        # row's engine-consumed routine — appended newcomer-support code
+        # BELOW the 0x57000 window (the appended zone reaches 0x054xxx,
+        # measured; docs/atlas/character_tables.md piecewise section)
+        DEFAULT_ROOTS="0x55478"
+        ;;
+    *)  DEFAULT_ROOTS="" ;;
+esac
 python3 tools/extract_char.py "$ROMDIR/vsav2.zip" "$OUTBASE/extract" \
-    --char 0x13 --oracle "$ROMDIR/vhunt2.zip" \
-    --extra-roots "${EXTRA_ROOTS:-$DEFAULT_ROOTS}" > "$OUTBASE/extract.log" 2>&1 \
+    --char "$TENANT_CHAR" --oracle "$ROMDIR/vhunt2.zip" \
+    --extra-roots "${EXTRA_ROOTS-$DEFAULT_ROOTS}" > "$OUTBASE/extract.log" 2>&1 \
     || { tail -20 "$OUTBASE/extract.log"; exit 1; }
 
 # GEN_FLAGS: extra generator flags (e.g. "--allow-plausible --tripwire-open"
 # for stage-4 experiment builds while the R1 map converges)
 # shellcheck disable=SC2086
 python3 tools/gen_donovan_patch.py "$OUTBASE/extract" "$OUTBASE/patch" \
-    --vsavj "$ROMDIR/vsavj.zip" --stage "$STAGE" ${GEN_FLAGS:-}
+    --vsavj "$ROMDIR/vsavj.zip" --stage "$STAGE" \
+    --port "$TENANT_MANIFEST" ${GEN_FLAGS:-}
 
 python3 tools/patch_prg.py "$ROMDIR/vsavj.zip" "$OUTBASE/prg" \
     --patch "$OUTBASE/patch/patch.json" | tail -3
@@ -78,6 +101,15 @@ python3 tools/patch_prg.py "$ROMDIR/vsavj.zip" "$OUTBASE/prg" \
 #     GENERATOR into space-model allocations and the six array rows poked in
 #     patch.json; select_port must NOT run — the host's records stay
 #     vanilla. The generator also emitted the matching tile-placement map.
+# The stage-6 gfx/select pipeline is still Donovan-specific (the
+# obj_records anim span, select art, effect_tail anchors are his) — refuse
+# loudly rather than build another tenant's gfx with his constants.
+if [ "$STAGE" -ge 6 ] && [ "$TENANT_CHAR" != "0x13" ]; then
+    echo "build_donovan.sh: stage >= 6 is Donovan-specific for now" >&2
+    echo "  (obj_records span, select art, effect anchors — M3b Phase 3/4" >&2
+    echo "  generalizes them). Build this tenant at stage <= 5." >&2
+    exit 1
+fi
 TEN_ID="$(python3 -c "import json;print(json.load(open('$OUTBASE/patch/tenant.json'))['id'])")"
 if [ "$STAGE" -ge 6 ]; then
     if [ "$TEN_ID" -lt 16 ]; then

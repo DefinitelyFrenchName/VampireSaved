@@ -411,8 +411,18 @@ def main():
         delta = dst - jh_start
         poke_bytes(dst, vj[jh_start:jh_start + jh_len], "jedah hitbox copy (null reloc)")
         fragments.append((dst, jh_len, "VSAV", "stage1 jedah hitbox copy"))
-        repoint("hitbox_base", seeds[0] + delta, "null reloc")
-        repoint("hitbox_comp", seeds[1] + delta, "null reloc")
+        # OWNERSHIP (14z-65): at stage >= 2 the passive-data pass repoints
+        # these same rows to the real ported data — the scaffold repoints
+        # emitted anyway and relied on last-write-wins (the op-overlap
+        # assertion now forbids that). The COPY still emits so stage-2/3
+        # ladder builds keep their allocator layout (and their bytes,
+        # since the final row values were identical either way).
+        if args.stage == 1:
+            repoint("hitbox_base", seeds[0] + delta, "null reloc")
+            repoint("hitbox_comp", seeds[1] + delta, "null reloc")
+        else:
+            notes.append("# stage-1 scaffold repoints skipped: the stage-2+ "
+                         "passive-data pass owns the hitbox rows (14z-65)")
 
     # trampolines: dispatch_00 via hole A (re-encrypted), dispatch_01 via
     # hole B (outside the encrypted range -> stored raw)

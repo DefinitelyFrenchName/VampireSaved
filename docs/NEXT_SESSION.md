@@ -1,68 +1,78 @@
-# NEXT SESSION — orientation (written at the close of 14z-64, 2026-08-06)
+# NEXT SESSION — orientation (written at the close of 14z-65, 2026-08-07)
 
-**Start here: M3a IS COMPLETE AND FROZEN (maintainer-ratified).** The
-WIDE reference is **donovan-m3a = `4b7d0dc7`** (`build/m5_wide`,
-rebuilds bit-exact): Donovan lives at his native id 0x13 by default
-(`--profile cps2-wide-v1`, no id flag), Jedah is fully restored, the
-select family + wheel serve from WIDE group C bank 5 with real
-medallion art and palettes, ring-reuse hover, variant-id HUD and
-win-screen palettes, and the 14z-2 mirror-victim fix. Stock twin
-**`6c93cfa8`** (`build/m5_stock`) = the former ae701ffb + exactly the
-2-byte fix. Masked basis V2 (per-set `mask` files; the staging-slot
-windows). Read STATE.md `14z-64` (the freeze record + the ratified
-package), then docs/patch_notes.md's 14z-64 sections.
+**Start here: M3b IS OPEN (the roster tenants) — plan in
+`docs/M3b_plan.md`, three maintainer decisions pending (STATE.md 14z-65
+"Decisions pending": D1 Huitzil default flavor, D2 Pyron source version,
+D3 arcade-ladder membership).** The frozen references are unchanged:
+donovan-m3a `4b7d0dc7` / m5_stock `6c93cfa8`, and
+`tests/test_m3a_reproducible.sh` must stay green after EVERY M3b
+machinery commit.
 
-## Build / validate / playtest
+## What 14z-65 delivered (all gates green, all committed)
+
+1. **Phase 0 rails**: `patch_prg.py` hard-fails op overlaps (it caught a
+   real latent collision in the frozen build — tail_data_ptr vs the
+   sound_table row, correct only by emission order — and then caught the
+   M2a scaffold double-repoint on Huitzil's first stage-2 build); the
+   reproducibility gate.
+2. **Phase 1**: extraction de-Donovanized — per-char anchors, charid scan
+   on src_char, and the piecewise-shift/dead-filler/sibling-insertion
+   model of the appended code window (atlas: character_tables.md
+   "piecewise" section). Both new tenants EXTRACT oracle-validated
+   (`tests/test_extract_hp.sh`).
+3. **The Huitzil ladder is open**: `build/manifest/huitzil.toml` (native
+   0x10, variant-id only), driver TENANT_MANIFEST/TENANT_CHAR, stages
+   1-3 GREEN with THE OP INVARIANT (every op = free space or variant
+   row) and a legacy replay BIT-IDENTICAL to vanilla
+   (`tests/test_hui_ladder.sh`).
+
+## Build / validate
 
 ```sh
 export ROMDIR=/Users/koneko/Developer/Vampire_Saved/ROMS
-KEY_SET=vsavj GEN_FLAGS="--allow-plausible --tripwire-open \
-    --profile cps2-wide-v1" tools/build_donovan.sh 6 build/m5_wide
-MAME_BIN=~/.cache/vampire-saved/mame/cps2 \
-    MAME_ROMPATH="$PWD/build/m5_wide/rompath;$ROMDIR" \
-    tests/run_suite.sh vsavjw          # the frozen donovan-m3a set
-tests/run_battery_m2.sh build/m5_stock # the stock battery
-tools/run_wide.sh build/m5_wide fbneo  # playtest
+tests/test_m3a_reproducible.sh          # after every machinery change
+tests/test_extract_hp.sh                # H/P extraction shapes
+tests/test_hui_ladder.sh                # the Huitzil ladder
+# a Huitzil ladder build by hand:
+TENANT_MANIFEST=build/manifest/huitzil.toml TENANT_CHAR=0x10 \
+GEN_FLAGS="--profile cps2-wide-v1" tools/build_donovan.sh 3 build/hui3
 ```
 
-## What comes after M3a (the roster road)
+## The road (docs/M3b_plan.md; sequencing adjusted 14z-65)
 
-1. **The next tenants: Huitzil/Phobos (0x10) and Pyron (0x11).** The
-   whole M3a machinery is id-parameterized — the second tenant is
-   mostly manifest work (a new [[tenant]] with its own extraction) +
-   the same gates. Their wheel cells, TABLE B rows, medallion art and
-   palette rows (0x19/0x1A) are ALREADY in place as placeholders.
-   Multi-tenant coexistence in one build is the new mechanism to
-   design (the space model + per-tenant holes).
-2. **M5 sounds for Donovan**: 25 stubbed sfx rows await the WIDE
-   QSound space; the maintainer can now ear-identify missing sfx
-   (playtest acceptance is real). The 9bac-era sound work (14z-59i)
-   is the prior art.
-3. **Small parked items**: the Pyron-medallion 2P residual (row 0x1A
-   doubles as the P2 sword row — resolves naturally if a future
-   palette-row design lands); the deep-arcade ending flow audit gap
-   ($130(a5) fold — re-run the venue taps if endings ever show wrong
-   colors); per-cell authored hover rings (supersede ring-reuse by
-   repointing the same rows).
+1. **Huitzil stage 4 (code + engine hooks) — the R1 loop in earnest.**
+   His census starts at `0x55478` (driver DEFAULT_ROOTS for 0x10);
+   expect: more engine-consumed dispatch routines below 0x57000 (the
+   appended zone reaches 0x054xxx), his types among the tripwired
+   secondary handlers 64-75 + companion 121-123 (vs2 addresses recorded
+   in build/m5_wide/patch/patch_notes_fragment.md:213-244), the state
+   stubs 0xBC-0xC8 he writes, his reaction ids, and the UNDECODED
+   vs2-only `jsr $8ACD8` at his handler head (decode it — candidate
+   flavor/aux init). Flavor wiring needs decision D1.
+2. **Phase 2 — the multi-tenant merge** (docs/M3b_plan.md Phase 2):
+   unify two WORKING single-tenant builds in one generator process.
+   Known hazards on record: shared-span region dedup (H's +0x30 region
+   overlaps P's and D's zones), charid rewrites on shared spans need
+   tenant attribution, engine hooks emit once as unions, site_thunk
+   gates become id-dispatched.
+3. **Phase 3 — group C bank-4 coexistence** (measure H/P native tile
+   ranges first), then Pyron's ladder, then the shared registries
+   (arcade ladder D3, fold audit).
 
 ## Standing facts (do not re-derive)
 
-- WIDE builds: `--profile cps2-wide-v1` (id_by_profile gives 0x13; the
-  stock track keeps slot 0x0F). Group C: bank 4 = fighter band+shelf,
-  bank 5 = select family + wheel at 0x10000+code; `gfx_tiles.bank_word`
-  is the only encoding. Sentinel CRCs 0xdec0de31..37 stay sentinels.
-- The masked basis is PER-EXPECTATION-SET (`tests/expected/<set>/mask`);
-  the V2 basis adds the palette staging slots of edited block-A rows
-  (the staging area is $FF3F02 + row*0x20 — docs/atlas/ram.md). The
-  round-64 window is row 0x14's slot.
-- Palette rows on select: NOTHING is free (GOTCHAS "no free palette
-  row") — the medallions ride thunk-protected vestigial mid rows
-  0x16/0x19/0x1A; 0x2AD44 is the in-match funnel and must NEVER be
-  thunked (the $FF8094 parity lesson); block-A row 0 feeds the
-  game-over starfield.
-- The accent-march census (4 family-base sites) and the mid-row census
-  (3 dest computations) are gate-frozen; a new site appearing anywhere
-  fails loudly.
-- Measure, don't assume: every select object caches differently; an
-  emulator over a chained rompath is not a member-identity instrument;
-  breakpoint-heavy traces desync replay input.
+- The appended newcomer code window has PIECEWISE sibling shifts
+  (+0x36/+0x30/+0x34), dead junk filler, and at least one vs2-only
+  insertion — atlas character_tables.md + GOTCHAS 14z-65. Never probe
+  alignment with a lax classifier (opcode-word match + zero unexplained).
+- A variant-id tenant's ladder gate is TOTAL bit-identity on legacy
+  replays (no divergence-frame pinning needed — rows 0x10-0x1F are
+  legacy-unreachable, and the op invariant checks it per op).
+- Ownership rule: a manifest section that pokes a row itself suppresses
+  the generic repoint (sound_table claims; scaffold repoints stage-1
+  only). Two ops on one word = build error, never reorder.
+- Stage >= 6 for a non-Donovan tenant is refused by the driver (his gfx
+  constants); Phase 3/4 generalizes the gfx half.
+- QSound sizing (three voice banks vs the added 8 MB, 16 MB MAME
+  ceiling) should be measured BEFORE any sound work commits (M5/M3b
+  shared watch item).

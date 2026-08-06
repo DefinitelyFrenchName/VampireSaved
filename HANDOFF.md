@@ -412,6 +412,12 @@ tests/test_compare_composite.sh       # ground truth for the §4 v4 composite cl
                                       # windows, RATIFIED 2026-08-06): 7 synthetic
                                       # cases + a no-loophole check. No emulator.
                                       # donovan-m5w freezes 7 replays in this class
+tests/test_hui_ladder.sh              # Huitzil stage 1-3 ladder gate (14z-65):
+                                      # builds from huitzil.toml + THE OP
+                                      # INVARIANT (every op = free space or a
+                                      # variant row) + legacy replay bit-identity.
+                                      # Build any tenant: TENANT_MANIFEST=...
+                                      # TENANT_CHAR=0x10 tools/build_donovan.sh
 tests/test_extract_hp.sh              # Huitzil/Pyron extraction gate (14z-65):
                                       # frozen region shapes (piecewise shifts,
                                       # dead filler, the H insertion sliver) +

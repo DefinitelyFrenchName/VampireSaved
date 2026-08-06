@@ -1,0 +1,52 @@
+# huitzil.toml — port configuration for the Huitzil/Phobos tenant (M3b
+# Phase 4 ladder, opened 14z-65). Consumed by tools/gen_donovan_patch.py via
+# --port (driver: TENANT_MANIFEST/TENANT_CHAR on tools/build_donovan.sh).
+#
+# MINIMAL BY DESIGN: this starts as the stage 1-3 ladder manifest (null
+# relocation -> passive data -> anim/sub-tables), the same falsifiable
+# ladder Donovan's M2a climbed. Stage 4+ rows (engine hooks, extra roots,
+# aux pokes, palettes, thunks) are added ONLY as their mechanisms are
+# measured for THIS character — donovan.toml is the reference for the
+# shapes, not a template to copy blind.
+#
+# Huitzil has NO stock-track id: he is a variant-id tenant only (0x10 —
+# Bulleta's variant row, measured-free, docs/atlas/id_space.md), so every
+# build of this manifest requires --profile cps2-wide-v1 (the generator
+# enforces this; a stage 1-3 build still packs as a stock-shaped vsavj zip
+# because nothing allocates in wide_ext yet).
+#
+# The VS2/VH2 flavor fork exists for Huitzil (community-confirmed; the
+# Donovan [init_shim] wiring is the template) — flavor rows land at his
+# stage 4-5 with maintainer decision D1 (STATE.md 14z-65).
+
+[[tenant]]
+name = "huitzil"
+src_set = "vsav2"
+src_char = 0x10
+id = 0x10
+
+# ── ADDRESS-SPACE MODEL — same shape as donovan.toml's; duplicated for the
+# single-tenant ladder. The M3b Phase 2 multi-tenant merge hoists this into
+# a SHARED manifest (one image, one allocator) — until then the two
+# manifests' single-tenant builds each start from pristine vsavj and may
+# not be naively merged (the 14z-65 op-overlap assertion would catch it).
+[[space]]
+name = "hole_a"
+start = 0x0BF6A0
+end = 0x100000
+class = "crypt"
+fallback = "hole_b"
+
+[[space]]
+name = "hole_b"
+start = 0x3EC720
+end = 0x400000
+class = "raw"
+fallback = "wide_ext"
+
+[[space]]
+name = "wide_ext"
+start = 0x400010
+end = 0x600000
+class = "raw"
+profile = "cps2-wide-v1"

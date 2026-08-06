@@ -117,6 +117,45 @@ reproducibility gate), then extractor de-Donovanization.)
   64-75/121-123) — that is build-out work, queued behind the Phase 2
   generator loop.
 
+### 14z-65 — THE HUITZIL LADDER OPENS (stages 1-3 GREEN, superset
+### bit-identical)
+
+Sequencing adjustment (recorded): before the Phase 2 multi-tenant merge,
+Huitzil climbs the SAME falsifiable single-tenant ladder Donovan's M2a
+did — the merge refactor then unifies two WORKING single-tenant builds
+instead of one working and one hypothetical. The machinery generalized
+with Donovan defaults byte-preserved:
+
+- `build/manifest/huitzil.toml` (minimal: tenant at native 0x10,
+  variant-id only, three-space model); driver TENANT_MANIFEST/
+  TENANT_CHAR selection; per-char DEFAULT_ROOTS; stage>=6 refused for
+  non-Donovan tenants (his gfx constants — Phase 3/4 generalizes).
+- His root census OPENED: 0x55478 (tail_code_ptr row's routine —
+  appended newcomer-support code BELOW the 0x57000 window; the appended
+  zone reaches 0x054xxx, measured, atlas updated).
+- The Phase-0 overlap assertion caught its first real prey ON THE FIRST
+  new-tenant build: the stage-1 scaffold and the stage-2 passive pass
+  both repoint hitbox rows (M2a-era by-design last-write-wins). Fixed
+  by ownership (scaffold repoints emit only at stage 1; the copy still
+  emits so stage-2/3 bytes are unchanged).
+- Gates: NEW tests/test_hui_ladder.sh GREEN — stages 1-3 build
+  (05edf96f / ba516bd1 / c0910a0e), THE OP INVARIANT (every op writes
+  free space or a variant row 0x10-0x1F — the superset invariant at op
+  level) holds per stage, and a legacy replay on stage 3 is
+  BIT-IDENTICAL to the frozen vanilla expectation (whole-RAM,
+  unmasked; measured, not argued).
+- Donovan post-change verification GREEN: m3a reproducibility PASS
+  (both frozen fingerprints bit-exact) AND his stage 1/2/3 gates PASS
+  with their pinned divergence frames intact (2886 / 1080) — the
+  scaffold-ownership change is behavior-invariant on his ladder too,
+  by measurement.
+
+Next on the ladder: stage 4 (code + engine hooks) needs Huitzil's R1
+loop in earnest — his engine-consumed dispatch routines (0x55478-class),
+his types among 64-75/121-123, the state stubs 0xBC-0xC8 he writes, and
+the reaction ids he inflicts. Then flavor wiring (decision D1), then the
+Phase 2 merge with Donovan.
+
 Updated: 2026-08-06 (session 14z-64 — M3a COMPLETE AND FROZEN. The
 maintainer ratified the re-freeze bundle ("freeze"): the WIDE reference
 is now donovan-m3a = 4b7d0dc7 (tenant at native 0x13 by default, Jedah

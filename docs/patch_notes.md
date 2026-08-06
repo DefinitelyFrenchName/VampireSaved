@@ -2,6 +2,37 @@
 
 Newest first.
 
+## 14z-65 (3) — the Huitzil stage 1-3 ladder opens (2026-08-07)
+
+The single-tenant machinery now serves any tenant manifest; Huitzil climbs
+the same falsifiable ladder Donovan's M2a did, at his native variant id.
+
+- `build/manifest/huitzil.toml` (NEW): minimal by design — [[tenant]]
+  (huitzil, vsav2 0x10, id 0x10 — variant-id only, every build requires
+  --profile) + the three-space model. Stage 4+ rows land only as measured
+  for HIS mechanisms; donovan.toml is reference, not template.
+- `tools/build_donovan.sh`: TENANT_MANIFEST/TENANT_CHAR selection
+  (defaults = Donovan, byte-for-byte); DEFAULT_ROOTS is per-char (his
+  census applies only to 0x13; Huitzil's census OPENS with 0x55478 — his
+  tail_code_ptr row's engine-consumed routine, appended newcomer-support
+  code BELOW the 0x57000 window: the appended zone reaches 0x054xxx,
+  measured); `${EXTRA_ROOTS-...}` (unset-only default) so an explicit
+  empty means "no roots"; stage >= 6 for a non-Donovan tenant is refused
+  loudly (his gfx constants).
+- `tools/gen_donovan_patch.py`: the stage-1 scaffold's hitbox repoints
+  emit ONLY at stage 1 — at stage >= 2 the passive-data pass owns those
+  rows. The overlap assertion caught this on Huitzil's first stage-2
+  build (scaffold + real repoint on hitbox_base[0x10], by-design
+  last-write-wins in the M2a era). The scaffold COPY still emits at
+  stages 2-3, so their allocator layout and final bytes are unchanged
+  (the removed pokes were overwritten by identical-final-value ops).
+- Ladder measured green (`tests/test_hui_ladder.sh`, NEW): stages 1-3
+  build (05edf96f/ba516bd1/c0910a0e); THE OP INVARIANT — every op writes
+  free space or a variant row (0x10-0x1F) of a bank-map table, i.e. the
+  superset invariant checked per op — holds at all three stages; a
+  legacy replay on stage 3 is BIT-IDENTICAL to the frozen vanilla
+  expectation (whole-RAM, unmasked).
+
 ## 14z-65 (2) — M3b Phase 1: extraction de-Donovanized (2026-08-07)
 
 ZERO byte drift again (`test_m3a_reproducible.sh` PASS after every edit).
