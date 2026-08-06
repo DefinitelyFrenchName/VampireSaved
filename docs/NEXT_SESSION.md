@@ -9,7 +9,7 @@ the tenant's OWN mugshot and name plate ("Donovan" under the bar,
 measured), and the 2P victory screen serves his OWN vs2 win palette
 (both thunk paths measured).** Remaining: the palette-block colours ($130(a5) fold), the accent
 audit, and the re-freeze bundle (maintainer sign-off). Evidence build
-`build/m3a_wheel` = `96a6e737`. Read STATE.md `14z-63`, then
+`build/m3a_wheel` = `a8108e0e`. Read STATE.md `14z-63`, then
 docs/patch_notes.md's 14z-63 sections for byte detail.
 
 ## What 14z-63 landed (do not re-derive)

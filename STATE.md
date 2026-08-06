@@ -159,12 +159,12 @@ Evidence build: `96a6e737`.
 
 **Maintainer round 8 (build 96a6e737): ALL CLEAN — rings on all three
 cells confirmed, mirror rings both sides confirmed, "Donovan is looking
-really good." KNOWN-COSMETIC (maintainer: "polish can wait, possibly
-forever"): Phobos's and Pyron's medallions sit a few px too far RIGHT.
-Mechanism if ever wanted: the layout's per-cell `pos` values
-(build/manifest/wheel_layout_proposed.json cells 10/11) — nudge pos_x
-by the desired amount; the generator derives the coord pair and the
-highlight base from pos, so one edit moves both coherently.**
+really good." The medallion x-offset the maintainer flagged
+was then FIXED on request (round 9): Phobos 8px left (pos 224->216),
+Pyron 4px left (248->244), highlight bases moved with them (base_x =
+pos_x-56) so the hover rings stay centred. OBJ-verified exact
+((204,161)/(232,169); Donovan untouched (260,161)); gates + stock
+green. Evidence build a8108e0e.**
 
 **Item 6 (the accent/march audit) — CLOSED.** Static census: the
 vanilla image holds EXACTLY the four thunked accent family-base sites
