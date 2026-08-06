@@ -1,6 +1,12 @@
 # STATE — living progress log
 
-Updated: 2026-08-06 (session 14z-63 — PHASE 3 ITEMS 1 AND 2 DONE. Item
+Updated: 2026-08-06 (session 14z-63 — PHASE 3 ITEMS 1, 2 AND 4 DONE
+(item 3 = the hover decision is the maintainer's, reframed below; item
+4 landed while awaiting playtest: the variant-id HUD — attribution
+CORRECTED to unmasked consumers over 32-row-aliased tables, NOT the
+$130(a5) fold; row-0x13 pokes + free-pool mugshot art; "Donovan" under
+the P1 bar measured in-match; new gate tests/test_tenant_hud.sh; stock
+still ae701ffb; evidence build f7210898). Item
 1: the wheel bank-5 move — REAL MEDALLION ART for the three appended
 cells (native vs2 busts), vanilla medallions byte-copied into group C
 and measured pixel-identical. Item 2: the ring/highlight POSITION
@@ -72,6 +78,21 @@ OBJ_y = 224-(base_y+coord_y). Bases live in the layout as
 his cell; the P1/P2/MIRROR highlight blocks are all 32-row aliased
 tables (a tenant mirror-hover fetches a safe alias — relevant to the
 parked mirror-victim fix). Evidence build: `e9f3286c`.
+
+**Item 4 (same session, while awaiting the playtest): the variant-id
+HUD — fixed, and the attribution corrected.** The "VICTOR"/wrong-mugshot
+symptom was carried as the $130(a5)/0x00A43E fold; measured, it is NOT:
+both HUD consumers index UNMASKED (mugshot 0x8937C by $782/$b82(a5);
+name 0x89684 by $382(a4)) over 32-ROW ALIASED tables (0x89884 word/char
++0x3800 base; 0x898C4 8B/char) — id 0x13 read row 0x03's alias. Fix =
+three only_variant_slot aux_pokes filling row 0x13 + effect_tail
+place_variant_slot ('0x4D62,2,2' -> 0xBE90, a verified-free pool
+anchor; name art = the existing 0xBE8C). Jedah's own 0x3DC8 cells stay
+pristine (gated + checked). Live-verified in-match: mugshot 0xBE90 +
+name 0xBE8C staged at the exact 14z-49 shape, opponent vanilla.
+New gate tests/test_tenant_hud.sh (in the battery). The $130(a5) fold
+still owns the select/VS palette-block COLOURS (open, venue_assets.md
+§2). Evidence build: `f7210898`.
 
 **Semantic correction that reframes the hover decision**: the composed
 vs2 highlight record (b000 5x1, "his lit-label") is actually vs2's

@@ -1,12 +1,14 @@
 # NEXT SESSION — orientation (written at the close of 14z-63, 2026-08-06)
 
-**Start here: PHASE 3 ITEMS 1 AND 2 ARE DONE — the wheel serves REAL
+**Start here: PHASE 3 ITEMS 1, 2 AND 4 ARE DONE — the wheel serves REAL
 MEDALLION ART from group C bank 5 (vanilla cells measured
-pixel-identical), and the ring/highlight POSITION SOURCE is found and
-fixed in place (the tenant's highlight draws AT his cell).** One
-maintainer decision is now unblocked and reframed (hover content — see
-below), then the venue folds and the re-freeze bundle. Evidence build
-`build/m3a_wheel` = `e9f3286c`. Read STATE.md `14z-63`, then
+pixel-identical), the ring/highlight POSITION SOURCE is fixed in place
+(the tenant's highlight draws AT his cell), and the in-match HUD shows
+the tenant's OWN mugshot and name plate ("Donovan" under the bar,
+measured).** One maintainer decision is now unblocked and reframed
+(hover content — see below), then the palette-block colours, win-pal,
+the accent audit, and the re-freeze bundle. Evidence build
+`build/m3a_wheel` = `f7210898`. Read STATE.md `14z-63`, then
 docs/patch_notes.md's 14z-63 sections for byte detail.
 
 ## What 14z-63 landed (do not re-derive)
@@ -45,9 +47,13 @@ docs/patch_notes.md's 14z-63 sections for byte detail.
    expectations, and consider mirror rows 0x50/0x51/0x53 with the
    parked mirror-victim fix (all three highlight blocks are 32-row
    aliased tables — safe aliases today).
-2. **The folded venue family**: HUD name plate + mugshot at a variant
-   id (the 16-wide tables + the $130(a5) fold — docs/atlas/id_space.md
-   0x00A43E). Donovan shows "VICTOR"/wrong mugshot in-match until then.
+2. ~~The folded venue family (HUD name/mugshot)~~ **DONE in 14z-63**
+   (attribution corrected: unmasked consumers over 32-row-aliased
+   tables, not the $130(a5) fold; gate tests/test_tenant_hud.sh). What
+   the fold STILL owns: the select/VS palette-block COLOURS
+   (venue_assets.md §2 — widen 0x1BF98-family masks + place blocks at
+   pool index 0x13 AFTER confirming what occupies it; the two unmasked
+   sites 0x021C64/0x021C8E read past 16 blocks today).
 3. **Win-pal sparse block** (design in STATE 14z-62c: placed sparse
    block + one thunk at the base load 0x5F1B6).
 4. **The accent/march audit** (the 62k class: any march path still
@@ -84,6 +90,7 @@ KEY_SET=vsavj GEN_FLAGS="--allow-plausible --tripwire-open \
     --profile cps2-wide-v1 --tenant-id 0x13" \
     tools/build_donovan.sh 6 build/m3a_wheel
 tests/test_wheel_bank5.sh build/m3a_wheel
+tests/test_tenant_hud.sh build/m3a_wheel
 tests/test_tenant_select_records.sh build/m3a_wheel
 tools/run_wide.sh build/m3a_wheel fbneo     # playtest
 ```

@@ -1884,6 +1884,14 @@ def main():
                 notes.append(f"# aux {p['name']}: SKIPPED (host-slot content; "
                              f"tenant is at variant id {dst_slot:#04x})")
                 continue
+            # only_variant_slot (14z-63): the row writes a VARIANT-half
+            # table row (e.g. HUD tables' aliased row 0x13) — meaningful
+            # only when the tenant IS at a variant id; on the base-slot
+            # track the variant half must stay the vanilla alias.
+            if p.get("only_variant_slot") and dst_slot < 0x10:
+                notes.append(f"# aux {p['name']}: SKIPPED (variant-half row; "
+                             f"tenant is at base slot {dst_slot:#04x})")
+                continue
             ops.append({"op": p["op"], "addr": f"{_int(p['addr']):#x}",
                         "val": f"{_int(p['val']):#x}"})
             notes.append(f"{p['op']} {_int(p['addr']):#08x} <- {_int(p['val']):#x} "

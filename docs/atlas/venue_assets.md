@@ -99,3 +99,41 @@ python3 build/scratch/palptr.py build/out/vsavj_data.bin      # the 32-row table
 
 (Scratch analysis scripts, not build tools — regenerate them from this page
 if `build/` has been cleaned.)
+
+## 3. HUD mugshot + name plate — NOT folded; 32-row aliased tables (14z-63)
+
+The in-match "VICTOR"/wrong-mugshot symptom at a variant id was attributed
+to the `$130(a5)` fold on this page's earlier reading. Measured: **wrong
+family.** Neither HUD consumer reads `$130(a5)` at all:
+
+```
+mugshot stager  PRG:0x8937C..  move.b $782(a5)/$b82(a5),d0 ; add.b d0,d0
+                               move.w (a0,d0.w),(a1)+      ; a0 = 0x89884
+name stager     PRG:0x89684    move.b $382(a4),d0 ; ext.w ; lsl #3
+                               lea $898C4(pc),a0 ; lea (a0,d0.w),a0
+```
+
+Both index UNMASKED, and both tables are **32-row aliased** (rows
+0x10-0x1F byte-copies — the engine convention, verified in the data
+image): mugshot `PRG:0x89884` (word/char, +0x3800 stager base), name
+`PRG:0x898C4` (8B/char). So id 0x13 read row 0x03's alias — Victor —
+and the fix is pure row work, no mask widening:
+
+- `hud_mug_entry_13` poke16 `0x898AA <- 0x8690` (= 0xBE90 - 0x3800);
+- `hud_name_entry_13_hi/lo` poke32 `0x8995C/0x89960 <- 0x868C0202 /
+  0xFFE80003` (same vs2-derived row shape as the 0x0F fix);
+- mugshot art: effect_tail `place_variant_slot` `0x4D62,2,2 -> 0xBE90`
+  (free pool: blank + unprotected, verified in vanilla AND built
+  members) — variant builds only, so Jedah's own 0x3DC8 cells stay
+  pristine. Name art is the unconditional 0xBE8C placement.
+
+All three pokes are `only_variant_slot` (the inverse of the 62c gate).
+Live-verified in-match (replay 36 f3100): mugshot code 0xBE90 2x2 attr
+0x112A at (200,32), name 0xBE8C 3x1 attr 0x0202 at (144,40), opponent
+mugshot still staging from the vanilla 0x3Dxx page. Gate:
+`tests/test_tenant_hud.sh`.
+
+**What the `$130(a5)` fold still owns:** the select/VS palette-block
+family in section 2 (Donovan's wrong COLOURS there), and its two
+unmasked 0x021C64/0x021C8E siblings. That work is separate and still
+open — see section 2's consequence paragraph.

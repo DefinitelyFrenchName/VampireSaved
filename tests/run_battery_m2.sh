@@ -63,6 +63,9 @@ if [ -x "${MAME_WIDE_BIN:-$HOME/.cache/vampire-saved/mame/cps2}" ]; then
     # bank 5 — vanilla medallions byte-copied, real vs2 art for the
     # appended cells. Self-builds a 0x13 scratch build like the gate above.
     tests/test_wheel_bank5.sh
+    # The variant-id HUD (14z-63): row 0x13 of the 32-row-aliased HUD
+    # tables + free-pool mugshot art; host cells pristine.
+    tests/test_tenant_hud.sh
 else
     echo "note: tenant select-records gate skipped (no WIDE MAME binary —"
     echo "      tools/setup_mame.sh; gate: tests/test_tenant_select_records.sh)"

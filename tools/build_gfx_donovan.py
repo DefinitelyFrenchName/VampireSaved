@@ -287,6 +287,14 @@ def main():
         else:
             print(f"effect-tail: {len(et.get('place_host_slot', {}))} "
                   f"host-slot place(s) SKIPPED (variant-id tenant)")
+            # place_variant_slot (14z-63): art whose HOST-slot home was the
+            # host's own cells (HUD mugshot) gets a free-pool anchor
+            # instead — only on variant-id builds, so the frozen stock
+            # track's members are untouched.
+            places.update(et.get("place_variant_slot", {}))
+            if et.get("place_variant_slot"):
+                print(f"effect-tail: {len(et['place_variant_slot'])} "
+                      f"variant-slot place(s) added (free-pool anchors)")
         for k, v in places.items():
             tt, bx, by = k.split(",")
             t = int(tt, 16); anchor = int(v, 16)

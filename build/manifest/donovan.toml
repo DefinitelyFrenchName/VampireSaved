@@ -316,6 +316,38 @@ op = "poke32"
 val = 0xFFE80003
 only_base_slot = true
 
+# 14z-63 (variant-id HUD): both HUD consumers are UNMASKED — the mugshot
+# stager (0x8937C..) indexes table 0x89884 by $782/$b82(a5) with no fold,
+# the name stager (0x89684) indexes 0x898C4 by $382(a4) with no fold —
+# and BOTH tables are 32-row ALIASED (rows 0x10-0x1F byte-copies of
+# 0x00-0x0F; the engine convention). So a tenant at 0x13 reads the row
+# 0x03 alias (Victor — the reported symptom) and the fix is pure row
+# work: fill row 0x13. The $130(a5)/0x00A43E fold is a DIFFERENT family
+# (select/VS palette blocks) and is untouched here. Name-plate art is
+# the unconditional 0xBE8C placement (shared with the 0x0F track);
+# mugshot art rides effect_tail place_variant_slot -> 0xBE90 (free pool,
+# variant builds only — Jedah's 0x3DC8 cells stay pristine).
+[[aux_poke]]
+name = "hud_mug_entry_13"
+addr = 0x0898AA          # mugshot table 0x89884 + 2*0x13
+op = "poke16"
+val = 0x8690             # 0xBE90 - the vsavj +0x3800 stager base
+only_variant_slot = true
+
+[[aux_poke]]
+name = "hud_name_entry_13_hi"
+addr = 0x08995C          # name table 0x898C4 + 8*0x13
+op = "poke32"
+val = 0x868C0202         # code 0x868C = 0xBE8C - 0x3800; attr/pal from vs2's row shape
+only_variant_slot = true
+
+[[aux_poke]]
+name = "hud_name_entry_13_lo"
+addr = 0x089960
+op = "poke32"
+val = 0xFFE80003
+only_variant_slot = true
+
 # Anita's ALTERNATE anim table (companion tail branch `tst.b $3(a6); bne ->
 # movea.l #$36784A`, taken only when the spawn-record sub byte != 0 —
 # Donovan's hook always writes sub=0, branch proven unreached through the

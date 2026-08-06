@@ -255,5 +255,9 @@
   "0x4D62,2,2": "0x3DC8",
   "0xB10B,3,2": "0xB526"
  },
- "_host_slot_note": "14z-62h (maintainer playtest): these two write TENANT art over the HOST's OWN cells \u2014 the HUD mugshot into Jedah's mugshot cells (0x3DC8) and the medallion onto Jedah's wheel-cell art (0xB526). Applied only while the tenant OCCUPIES the base slot; at a variant id Jedah's mugshot/medallion stay pristine (the report: 'his portrait under the health bar seems to be Donovan's'). The name-plate place (0x4D55->0xBE8C) stays unconditional: its anchor is free pool tail, additive, referenced only by the gated hud_name pokes."
+ "_host_slot_note": "14z-62h (maintainer playtest): these two write TENANT art over the HOST's OWN cells \u2014 the HUD mugshot into Jedah's mugshot cells (0x3DC8) and the medallion onto Jedah's wheel-cell art (0xB526). Applied only while the tenant OCCUPIES the base slot; at a variant id Jedah's mugshot/medallion stay pristine (the report: 'his portrait under the health bar seems to be Donovan's'). The name-plate place (0x4D55->0xBE8C) stays unconditional: its anchor is free pool tail, additive, referenced only by the gated hud_name pokes.",
+ "place_variant_slot": {
+  "0x4D62,2,2": "0xBE90"
+ },
+ "_variant_slot_note": "14z-63: Donovan's HUD mugshot art for VARIANT-id builds \u2014 at 0x13 Jedah's own mugshot cells (0x3DC8) stay pristine, so the vs2 2x2 (0x4D62) is placed at the bank-1 pool tail anchor 0xBE90 (covers BE90/BE91/BEA0/BEA1 \u2014 blank + absent from protected_tiles.json in vanilla AND in the built members; the name plate at BE8C-8E is the pool neighbour). Applied ONLY when the tenant is at a variant id (DST_BANK >= 4); the mugshot-table row 0x13 poke (hud_mug_entry_13, only_variant_slot) points at it (0x8690 = 0xBE90 - vsavj's 0x3800 stager base)."
 }

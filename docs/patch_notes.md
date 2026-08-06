@@ -1450,3 +1450,28 @@ SOURCE — found, and fixed in place; build e9f3286c):
   + per-row code ops + the reserved-row negative); tenant gate PASS
   (window 889-2415 unchanged — the rows are ROM, and legacy replays
   never hover extended cells); stock reproduces ae701ffb.
+
+Session 14z-63 addendum 2 (phase 3 item 4: the variant-id HUD —
+mugshot + name plate; build f7210898):
+- ATTRIBUTION CORRECTED: the "VICTOR"/wrong-mugshot symptom was carried
+  as the $130(a5)/0x00A43E fold (docs/atlas/id_space.md). Measured:
+  neither HUD consumer reads $130(a5). The mugshot stager (0x8937C..)
+  indexes table 0x89884 by $782/$b82(a5) UNMASKED; the name stager
+  (0x89684) indexes 0x898C4 by $382(a4) UNMASKED — and both tables are
+  32-ROW ALIASED, so id 0x13 read row 0x03's alias (Victor). The fold
+  still owns the select/VS palette-block family (colours; still open).
+- Fix (all variant-gated; stock byte-identical, ae701ffb verified):
+  three aux_pokes (new only_variant_slot flag) fill row 0x13 of both
+  tables — mugshot word 0x898AA <- 0x8690, name 8B 0x8995C/0x89960 <-
+  0x868C0202/0xFFE80003 — and effect_tail gains place_variant_slot
+  ('0x4D62,2,2' -> '0xBE90': the vs2 mugshot at a free-pool anchor,
+  blank+unprotected verified in vanilla and built members; name art =
+  the existing unconditional 0xBE8C placement). Jedah's own 0x3DC8
+  mugshot cells stay pristine (checked by the gate).
+- Live-verified in-match (replay 36, f3100): mugshot 0xBE90 2x2 attr
+  0x112A at (200,32) + name 0xBE8C 3x1 attr 0x0202 at (144,40) — the
+  exact 14z-49 measurement shape — with the opponent's mugshot still
+  staging from the vanilla 0x3Dxx page; snapshot shows "Donovan" under
+  the P1 bar.
+- Gate: tests/test_tenant_hud.sh NEW (static re-derivation + host-cell
+  pristineness + negative control + in-match staging), in the battery.
