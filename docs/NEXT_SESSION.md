@@ -1,167 +1,87 @@
-# NEXT SESSION — orientation (written at the close of 14z-62f, 2026-08-06)
+# NEXT SESSION — orientation (written at the close of 14z-62k, 2026-08-06)
 
-**Start here: the M3a program side is DONE — now including splash,
-win-quote and the select-portrait palettes — and the GFX HALF'S CORE is
-LANDED. What remains: the select-art decision (STATE, maintainer),
-then the re-freeze ritual.** Late arcs 62e/62f: splash + win-quote ride
-the same select-records mechanism (NINE composed records now; the VS
-screen measurably fetches the tenant's own splash), and the
-select-portrait palettes upload from the tenant's own placed rows via an
-uploader thunk that extends vsavj's OWN variant-id pattern (it already
-special-cases 0x12/0x18 in that window). Donovan's portrait renders in
-his own colors; all frozen window classes unchanged. The day's four arcs: select records composed at the variant id
-(62); P2-side measured, the name piece asymmetric (62b); the slot-row
-audit — every row-0x0F dependency follows the tenant or is gated off, and
-the de-substitution acceptance is measured (62c); and the band move (62d):
-the tenant's fighter band + effect shelf serve from WIDE GROUP C (bank 4,
-records byte-unchanged — only the bank words moved) while the host's
-group B is PRISTINE. Measured on `build/m3a_selrec` (`464eaf1f`):
-Donovan renders in-match from bank 4 with his own colors, and **Jedah's
-match is pixel-identical to vanilla** (raw snapshots; RAM window 890-2362;
-OBJ lists entry-identical). Gate: `tests/test_tenant_select_records.sh`
-(4 sections) — PASS. Frozen refs rebuild exactly throughout.
-Read STATE.md `14z-62..62d`.
+**Start here: OPTION A PHASES 1-2 ARE LANDED AND PLAYTEST-VALIDATED —
+begin PHASE 3.** The whole select family (portrait bust, name banner, VS
+splash, win quote) serves from WIDE group C BANK 5 at native vs2 codes,
+with four measured drawer bank gates; group-A select placements are ZERO;
+JEDAH IS CONFIRMED INDISTINGUISHABLE FROM VANILLA by five maintainer
+playtest rounds (which also caught and validated fixes for the stale
+group-B repack, the never-rendered medallions, and the select-sword grey
+palette). Evidence build `build/m3a_selrec` = `048521c2`. Read STATE.md
+`14z-62j/62k`, then docs/patch_notes.md's 62j/62k sections for the byte
+detail.
 
-**Descriptor group-C CRCs are SENTINELS** (0xdec0de31..37): content
-resolves by NAME, because any real CRC shadows (pristine-B = the 60z bug;
-the zero-fill CRC hash-collided with the zero QSound members — the B4
-canary went dark, measured). Both emulator patches changed, both
-emulators rebuilt; FBNeo profile gate PASS; re-run the MAME twin if its
-background run was interrupted:
-`CANARY_ROMPATH=$PWD/build/wide_canary/rompath tests/test_mame_wide.sh`.
+## Phase 3 work list (in order)
 
-## Next, in order
+1. **Real medallion art — the wheel bank move.** The wheel record is ONE
+   object (one bank), so per-entry banks are impossible; the move that
+   works: copy the 18 vanilla medallion tiles BYTE-IDENTICAL into group C
+   (same in-group indices) + the three newcomers' real vs2 medallion art
+   (their native codes b108/b0f5/b10b), then flip the wheel drawer's bank
+   word — vanilla-cell pixels identical by construction, real art for the
+   new cells. Find the wheel drawer object + its bank write first (the
+   tap method; its $1C rides the relocated record at wide_ext — the
+   drawer is whatever walks the 21-entry record, likely inited by the
+   0x07C428 family).
+2. **The ring/label position source.** The highlight piece IS the cursor
+   ring (measured: each cell's pal-0x1E ring art is its highlight
+   record). On the appended cells the composed vs2 label draws at a STALE
+   base — the ring drawer's per-cell position source does not know the
+   new cells (label seen at (152,88) instead of the cell). Find that
+   source (tap the drawer's position fields at a hover change), extend it
+   for cells 0x10/0x11/0x13.
+3. **MAINTAINER DECISION for the newcomer cells' hover content**: a
+   vanilla-consistent RING (needs authored/cloned ring art per cell — the
+   rings are per-cell shaped) vs vs2's LIT LABEL (his native look, works
+   once the position source is fixed) vs placeholder-until-real-art.
+4. **The folded venue family**: HUD name plate + mugshot at a variant id
+   (the 16-wide tables + the $130(a5) fold — docs/atlas/id_space.md
+   0x00A43E). Donovan shows "VICTOR"/wrong mugshot in-match until then.
+5. **Win-pal sparse block** (his win-screen palette): the design is in
+   STATE 14z-62c — a placed sparse block + one thunk at the base load
+   0x5F1B6, same TT pattern as the rest.
+6. **The accent/march audit**: 62k fixed the select-venue sword row; audit
+   the remaining march phases/venues for other slot-gated palette paths
+   at a variant id (the T0/T1 slots are correctly vanilla now — anything
+   still reading them for the TENANT is a bug of the 62k class).
 
-1. **The select-art move (the last gfx piece) — MEASURED, ready to
-   build.** Two P1-side select objects (tap at `$FFB898`, replay 36):
-   - the FIGURE object's bank FOLLOWS THE HOVER already — `PRG:0x05F9EC`
-     does `jsr 0x282C8` (the engine bank helper, unmasked id) and stores
-     d0 to `+0x18`; hovering the tenant writes 0x1000 (the poked row),
-     which is why Donovan's standing figure ALREADY renders from group C.
-   - the PORTRAIT-RECORD object gets a FIXED bank once at venue init
-     (writer `PRG:0x07C428`, value 0x2000 = bank 1) — that is why the
-     composed records' art must sit in bank-1 anchors today.
-   The fix: ONE tenant-gated site_thunk at the portrait object's bank
-   init (hovered id == TT -> 0x1000, else the byte-equivalent #$2000 —
-   legacy portraits keep bank 1, where ALL their art lives). Then move
-   the select subset + the four placeholder label tiles
-   (0xB22C/0xB2A5/0xB000/0xB129) + the medallion art into group C at
-   their vs2-native codes, drop the group-A placements, and vsav.zip
-   leaves the rompath entirely pristine. Locate the exact init site
-   around 0x07C428 first (old-hex verify), and re-measure the P2-side
-   twin objects.
-2. **The interims** (shrunk by 62e/62f): HUD name plate (folded 16-wide
-   venue table — the 0x00A43E fold work) and the win-pal block at a
-   variant id (the (color*17+id)*0xA0 table — the sparse-block thunk
-   design in STATE 14z-62c). Splash, win-quote and select palettes are
-   DONE.
-3. **The M3a re-freeze ritual, one change**: apply the parked
-   mirror-victim fix (donovan.toml, flat `fixes=` comment), declare
-   `id_by_profile = "cps2-wide-v1=0x13"`, re-freeze the WIDE reference,
-   add a mirror-flavor throw replay, update `test_tenant_id.sh` check 2 —
-   maintainer sign-off required (it changes frozen bytes).
+## Then: the RE-FREEZE bundle (maintainer sign-off, one change)
 
-## The gfx half — what it is and what 14z-62 added to it
+Apply the parked mirror-victim fix (donovan.toml flat `fixes=` comment);
+declare `id_by_profile = "cps2-wide-v1=0x13"`; re-freeze the WIDE
+reference (9bac6ee3 is already non-rebuildable since the 62i coordinate
+fix — expected); re-measure and ratify the masked classes; add a
+mirror-flavor throw replay; update `test_tenant_id.sh` check 2.
 
-The tenant's tiles still occupy Jedah's bank-2 fighter band, so at `0x13`
-the tenant renders correctly and **Jedah renders as the tenant** — and
-14z-62 measured that this covers the SELECT SCREEN too: 89/92 of Jedah's
-select-portrait tiles sit inside the placed band `[0xAD8F,0xEA3F]` (his
-select art is bank-2 band art, not select-bank art). So visual
-de-substitution everywhere hinges on the one move. It means:
+## Standing facts (do not re-derive)
 
-- the WIDE bank encoding, which is **not** `bank << 13`: bank 4 = y-word
-  `0x1000`, bank 5 = `0x3000` (bit 12 promoted after the list terminator —
-  `docs/cps2_wide.md`);
-- writing `vsw.31m/33m/35m/37m` (today zero fill from
-  `build_wide_romset.py`) instead of vsav's group B, and getting them into
-  `vsavjw.zip` rather than the patched `vsav.zip`;
-- **group C descriptor CRCs become load-bearing** (queue item, now
-  MANDATORY with content in group C): today the descriptor declares group C
-  with pristine group B CRCs, so a user with a pristine `vsav.zip` parent
-  would get `vsw.31m` resolved BY HASH to pristine group B — the 14z-60z
-  bug class on the distributed artifact. Fix in the same change: two
-  emulator rebuilds, `test_mame_parity.sh`, both profile gates;
-- the four select placeholder tiles (name/p2 `0xB22C+0xB2A5`, highlight
-  `0xB000`/`0xB129` — the lit name label) get real homes in group C, and
-  `select_tiles.json` placements move off Jedah's bank-1 anchors.
+- Group C layout: bank 4 = the fighter band+shelf at code+0x2750 (records
+  unchanged from the 0x0F layout); bank 5 = the select family at native
+  codes (0x10000+code in-group). `gfx_tiles.bank_word` is the ONLY bank
+  encoding (4 -> 0x1000, 5 -> 0x3000 — never bank<<13).
+- Sentinel descriptor CRCs for group C (0xdec0de31..37): members resolve
+  by NAME; never "fix" them to real CRCs (two measured shadow classes).
+- The select-venue objects: P1 figure/name/portrait = FFB880/FFB900/
+  FFB980, P2 = +0x200; win drawer = FFB800; each caches things
+  differently (measure, don't assume — the name thunk's v1 lesson).
+- An emulator over a chained rompath is NOT a member-identity instrument;
+  verify zips statically and snapshot on the no-fallback overlay
+  (scratchpad honest_rompath pattern).
+- Gates: tests/test_tenant_select_records.sh (4 sections) is the
+  mechanism gate; tests/test_tenant_id.sh the reproducibility guard;
+  the battery includes both.
 
-Acceptance for M3a, unchanged: **legacy Jedah replays return to
-bit-identical vanilla.** Then declare `id_by_profile = "cps2-wide-v1=0x13"`
-in the manifest and RE-FREEZE the WIDE reference in the same change —
-`tests/test_tenant_id.sh` guards exactly this and tells you so.
-
-## Also open on the select screen at a variant id (measure BEFORE building)
-
-- **Splash (VS screen), win-quote, select-palette mechanisms at 0x13.**
-  The slot-0x0F in-place families are simply not applied on variant-id
-  builds; those paths currently resolve 0x13 natively (folds → Victor-ish
-  content — Donovan's portrait draws in Victor's colors). vs2 special-cases
-  some (`cmpi #$13` in its palette uploader at `0x6B1A0`). Find the vsavj
-  consumers first; some may need site thunks (engine-hook class).
-- ~~P2-side runtime measurement~~ DONE (14z-62b, replay 37): portrait and
-  highlight `+0x80` arrays are live; the NAME piece is asymmetric — both
-  players read the P1 array, and the `+0x80` name structure has no
-  consumer on any measured path (the gate asserts the negative).
-
-## What is already done (do not redo)
-
-- **Select records + slot-row audit + the band move** (14z-62..62d — see
-  above). Checker: `tools/check_tenant_select.py`. Scratch build
-  `build/m3a_selrec` (`464eaf1f`); NOT a candidate.
-- **Program half of M3a** (14z-61): `--tenant-id` build input, 31 table
-  rows at 0x13, no mirror pokes, variant-id-without-profile refused; now
-  also 0x12/0x18 refused (reserved).
-- **The WIDE reference is frozen and its suite is GREEN**: `9bac6ee3 ->
-  donovan-m5w`, all 63 replays accounted for, §4 v4 `composite` ratified.
-- **The WIDE sprite garble class is fixed and gated**
-  (`test_wide_render_content.sh`, `audit_romset_identity.py` in the build).
-
-## Ship state
-
-| Track | Fingerprint | Packs as | Status |
-|---|---|---|---|
-| **WIDE** | `9bac6ee3` (`build/m5_wide`) | `vsavjw.zip` | frozen `donovan-m5w`, playtest-confirmed, suite GREEN |
-| **stock** | `ae701ffb` (`build/m5_stock`) | `vsavj.zip` | frozen compatibility artifact; rebuilds exactly |
-| scratch | `39597268` (`build/m3a_selrec`) | `vsavjw.zip` | 14z-62d evidence build (tenant at 0x13 served from group C, host group B pristine); do not ship |
-| ~~WIDE~~ | `ac52eeff` (`build/m5w`) | — | KNOWN-BAD (the garble), kept as evidence. Do not run |
+## Build / test
 
 ```sh
-tools/run_wide.sh build/m5_wide fbneo     # the frozen reference
-MAME_BIN=~/.cache/vampire-saved/mame/cps2 \
-MAME_ROMPATH="$PWD/build/m5_wide/rompath;$ROMDIR" tests/run_suite.sh vsavjw
-# the M3a gates:
 export ROMDIR=/Users/koneko/Developer/Vampire_Saved/ROMS
-tests/test_tenant_id.sh
-tests/test_tenant_select_records.sh build/m3a_selrec   # or no arg = fresh build
+KEY_SET=vsavj GEN_FLAGS="--allow-plausible --tripwire-open \
+    --profile cps2-wide-v1 --tenant-id 0x13" \
+    tools/build_donovan.sh 6 build/m3a_selrec
+tests/test_tenant_select_records.sh build/m3a_selrec
+tools/run_wide.sh build/m3a_selrec fbneo     # playtest
 ```
 
-## Queue after M3a
-
-1. Fightability: the arcade opponent list (`a5-0x61B8`, length `$138(a5)`).
-   Selectable is not fightable.
-2. Huitzil `0x10` and Pyron `0x11` (multi-tenant manifests are refused until
-   M3 Phase 3 — one tenant at a time, by design).
-3. Medallion art (deferred deliberately until after de-substitution).
-4. Minor win-screen palette items from the round-66 playtest. Unrelated.
-
-## Gotchas most likely to bite
-
-- **"Inside the placed band window" means min/max bounds, not "overwritten"**
-  — the band placement is sparse; intersect with the actual placed tiles
-  before concluding (Jedah's name renders, his portrait doesn't: same
-  window).
-- **Compose the bank bits before dumping a tile band** — `tile = code |
-  ((y & 0x6000) << 3)`. A clean null at the wrong address reads as
-  exoneration. This cost two sessions.
-- **A null result needs a negative control**, exactly as much as a positive
-  one does.
-- **A member carrying another member's pristine bytes shadows it** — both
-  emulators resolve by HASH before NAME (`bzip.cpp:158`).
-- Regenerate any rompath overlay built before the repo path lost its space;
-  the symlinks in it are absolute and dangling.
-- `run_replay_fbneo.sh` needs an **absolute** sandbox path; FBNeo has no
-  `-rompath` and reads `roms/` relative to cwd.
-- MAME write taps must be word-aligned, and MAME can segfault in teardown
-  AFTER writing a complete log — assert on the `END` line, never the exit
-  code.
+Frozen refs: stock `ae701ffb` MUST keep reproducing (every change so far
+verified); WIDE `9bac6ee3` non-rebuildable pending re-freeze (zips remain
+valid). Playtest classification: docs/playtest_m3a_interims.md.

@@ -1,17 +1,62 @@
 # STATE — living progress log
 
-Updated: 2026-08-06 (sessions 14z-62..62d — **the M3a PROGRAM SIDE is
-DONE and the GFX HALF'S CORE LANDED**: select records composed at the
-variant id (62), the slot-row audit closed every row-0x0F dependency and
-measured the de-substitution acceptance (62c), and the tenant's fighter
-band now serves from WIDE GROUP C with the host's group B PRISTINE (62d)
-— Donovan renders in-match from bank 4, and Jedah's match is
-PIXEL-IDENTICAL TO VANILLA. Descriptor group-C CRCs are SENTINELS now
-(two measured shadow classes on the way — GOTCHAS). Both frozen
-references rebuild bit-identically throughout. Remaining: the bank-1
-select-art move (needs the select-object bank measurement), cosmetic
-interims, the parked mirror-victim fix, and the re-freeze. Read
-14z-62..62d, then docs/NEXT_SESSION.md.)
+Updated: 2026-08-06 (sessions 14z-62..62k — the M3a program side DONE,
+the gfx core LANDED (the band serves from group C), OPTION A PHASES 1-2
+LANDED (the select family from bank 5, zero group-A placements), and
+FIVE maintainer playtest rounds: two real packaging/coordinate bugs
+caught and fixed (the stale group-B repack; the medallions off-screen
+since birth), JEDAH CONFIRMED INDISTINGUISHABLE FROM VANILLA, and the
+select-sword palette found, root-caused and fix-validated. Evidence
+build 048521c2. Remaining: phase 3 (wheel/medallions + ring source),
+cosmetic folds, the re-freeze bundle. Read 14z-62j/62k, then
+docs/NEXT_SESSION.md.)
+
+## Sessions 14z-62j/62k (same day — OPTION A PHASES 1-2 LANDED and
+## PLAYTEST-VALIDATED: the select family serves from group C bank 5;
+## Jedah confirmed indistinguishable from vanilla by human playtest)
+
+Full detail in docs/patch_notes.md (62j/62k); the shape:
+
+- **All four select-family pieces** (portrait bust, name banner, VS
+  splash, win quote) keep NATIVE vs2 tile codes at the variant id; the
+  art (146 tiles) is copied vs2 -> WIDE group C BANK 5 at 0x10000+code
+  (bank 4 is the fighter band — native bank-1-family codes would collide
+  inside its window). select_tiles.json = ZERO group-A placements; the
+  placeholder class is dead for these pieces.
+- **Four drawer-object bank gates**, each measured before authoring, two
+  corrected mid-flight by taps: portrait (palette thunk v2), name
+  (per-hover refetch 0x5FCE0 — v1 compared d0 and NEVER FIRED: d0 is
+  id*4 there; v2 gates via the live owner ptr), VS splash (0x6C0E0 on
+  the object-cached id $A(a6)), win quote (the shared consumer 0x5F328
+  with d0 = winner+0x40 — the new TU substitution; tenant-win-only
+  write, zero legacy RAM effect).
+- **Maintainer rounds 3-5**: JEDAH INDISTINGUISHABLE FROM VANILLA
+  (select incl. the former mid-face band, VS, match, win screen with
+  proper art and quote); Donovan's bust/banner/splash in his real art
+  and colors. Group B pristine; group A additive-only (the effect-tail
+  engine-page families at verified-free anchors — full-pristine
+  vsav.zip needs that band moved, queued).
+- **62k**: the pre-confirm select SWORD drew the palette-RAM INIT GREY
+  RAMP (measured verbatim: f111 f222 ...) — the figure upload covers
+  only pal base+0, the sword rides base+2, and the 0x0F in-place accent
+  slots had masked the gap. Thunk at the dest lea copies the tenant's
+  block+0x40 accent row (per color, both sides, F000 alpha). Round-5
+  playtest VALIDATES, no regression.
+
+All gates green throughout; stock reproduces `ae701ffb` after every
+change; the WIDE reference 9bac6ee3 remains non-rebuildable since the
+62i medallion-coordinate fix (known; folds into the re-freeze).
+Evidence build: `build/m3a_selrec` = `048521c2`.
+
+**PHASE 3 (next session), specified**: real medallion art via the wheel
+bank move (the wheel object is single-bank: copy the 18 vanilla
+medallion tiles byte-identical into group C + the newcomers' real vs2
+medallions, flip the wheel drawer's bank — vanilla-cell pixels identical
+by construction); the ring drawer's per-cell position source (stale base
+at appended cells — the misplaced-label interim); the ring-vs-label
+content decision (maintainer); then the folded venue family (HUD
+name/mugshot), the win-pal sparse block, and the RE-FREEZE bundle
+(mirror-victim fix + id_by_profile + new masked classes + registry).
 
 ## Session 14z-62d (same day — THE GFX HALF LANDS ITS CORE: the tenant's
 ## band serves from WIDE group C, and the host's group B is PRISTINE)
