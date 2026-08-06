@@ -1,6 +1,7 @@
 # STATE — living progress log
 
-Updated: 2026-08-06 (session 14z-63 — PHASE 3 ITEMS 1, 2, 4 AND 5 DONE
+Updated: 2026-08-06 (session 14z-63 — PHASE 3 ITEMS 1, 2, 4, 5 DONE + the
+round-6 medallion-palette fix
 (item 3 = the hover decision is the maintainer's, reframed below; item
 4 landed while awaiting playtest: the variant-id HUD — attribution
 CORRECTED to unmasked consumers over 32-row-aliased tables, NOT the
@@ -109,6 +110,27 @@ victories do, and victory-screen inputs SKIP the screen (a mashing
 replay measures a blank). Two permanent replays added (61_tenant_2pwin,
 62_tenant_2plose) + gate tests/test_tenant_winpal.sh (in the battery).
 Evidence build: `e82e0bd3`.
+
+**Round-6 playtest fix (same session): REAL vs2 palettes for the
+newcomer medallions.** The maintainer's report (only Donovan legible;
+Phobos/Pyron noise) root-caused: the vs2 attr pal rows are SHARED
+vanilla medallion rows here. Fix: three measured-FREE select rows
+(OBJ-sweeps over wheel-on-screen frames across 3 replays + a live
+poke-probe that changed zero pixels; 0x1A/0x18/0x1C excluded) carry
+vs2's real medallion palettes (sources found by matching vs2's LIVE
+select palette RAM into its ROM — which retroactively explains the
+med_pal_row14 source address) via select block A (0x3A3800, rows
+verified to load 1:1; row 0x02 rejected — its live copy comes from
+0x3B5940). Entries re-palmed in the bank5 branch; layout carries
+pal_row/pal_src. Measured: live rows == alpha(vs2 src); all three
+busts native-colored. Legacy: ONE transient frame (2836, 8 bytes at
+$FF406A — the fade-staging family, $FF4182's sibling slot) makes
+replay 11 the §4 v4 COMPOSITE (window 889-2415 + flicker {2836}) —
+frozen in the gate, RATIFICATION pending in the re-freeze bundle.
+Maintainer round 6 also CONFIRMED: items 1/2/4 all good in playtest
+(rings at cells incl. the alias interims, no vanilla regressions,
+mirror-tenant safe with one Anita — verified native vs2 behavior),
+HUD name/mugshot good. Evidence build: `f86fb1a0`.
 
 **Semantic correction that reframes the hover decision**: the composed
 vs2 highlight record (b000 5x1, "his lit-label") is actually vs2's

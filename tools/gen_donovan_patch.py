@@ -2189,8 +2189,23 @@ def main():
                          f"{len(lay.get('edges_in', []))} inbound edges")
 
             # --- 2. coord list: copy + append ------------------------------
-            newcells = [(_cell(k), v) for k, v in lay["cells"].items()]
+            newcells = [(_cell(k), dict(v)) for k, v in lay["cells"].items()]
             newcells.sort(key=lambda kv: kv[0])
+            # bank5 palette rows (14z-63, maintainer round): the layout's
+            # vs2 attr pal rows are SHARED vanilla medallion rows here, so
+            # real art rendered under wrong palettes (Phobos/Pyron read as
+            # noise). On group-C builds each cell's entry is re-palmed to
+            # its declared FREE row (measured: OBJ-unreferenced on select
+            # across 3 replays + a live poke-probe changed zero pixels)
+            # and the vs2 palette bytes are written into select block A
+            # (the wheel view's live copy) in the bank5 branch below.
+            bank5_active = (sw.get("bank5")
+                            and _int(port["port"].get("gfx_bank", 2)) >= 4)
+            if bank5_active:
+                for _c, spec in newcells:
+                    if "pal_row" in spec:
+                        spec["attr"] = ((_int(spec["attr"]) & ~0x1F)
+                                        | _int(spec["pal_row"]))
             cl = bytearray(vj[clist:clist + nvan * 4])
             # The list's pairs are RELATIVE to the drawer object's base
             # (measured (256,176) — see the layout's _coord_note); 'pos'
@@ -2353,6 +2368,37 @@ def main():
                                  f"+ {len(new_t)} vs2 tiles -> "
                                  f"wheel_bank5.json (group C upper bank, "
                                  f"placed by build_gfx --wheel-bank5)")
+                    # medallion palettes (14z-63): the vs2 rows into the
+                    # select block A's free rows. RESERVED rows refused:
+                    # figure bases/swords/ring/host-medallion (measured
+                    # select row map).
+                    pal_a = _int(sw.get("pal_block_a", 0))
+                    src_wp5 = (root / f"build/out/{man['src_set']}"
+                               "_data.bin").read_bytes()
+                    RESERVED_PAL = {0x14, 0x15, 0x17, 0x18, 0x1A, 0x1E}
+                    for _c, spec in newcells:
+                        pr = spec.get("pal_row")
+                        ps = spec.get("pal_src")
+                        if pr is None or ps is None or not pal_a:
+                            fail.append(f"select_wheel {nm}: bank5 cell "
+                                        f"{_c:#04x} lacks pal_row/pal_src "
+                                        f"(or no pal_block_a) — real art "
+                                        f"needs its real palette")
+                            continue
+                        pr, ps = _int(pr), _int(ps)
+                        if pr >= 0x20 or pr in RESERVED_PAL:
+                            fail.append(f"select_wheel {nm}: pal_row "
+                                        f"{pr:#04x} for cell {_c:#04x} is "
+                                        f"reserved or out of range")
+                            continue
+                        rowb = src_wp5[ps:ps + 0x20]
+                        dstp = pal_a + pr * 0x20
+                        ops.append({"op": "data", "addr": f"{dstp:#x}",
+                                    "hex": rowb.hex()})
+                        notes.append(f"data   {dstp:#08x} +0x20  "
+                                     f"select_wheel {nm}: medallion pal "
+                                     f"row {pr:#04x} (cell {_c:#04x}) <- "
+                                     f"vs2 {ps:#x}; entry attr re-palmed")
 
     # ── select_records (M3a, 14z-62): the tenant's OWN select records at a
     # variant id — what the hovered cell displays. Three UI pieces (portrait,

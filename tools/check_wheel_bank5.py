@@ -144,6 +144,44 @@ def main():
             f"vs2 {len(built['vs2'])}/{len(vs2)}")
     print(f"TILES host {len(host)} vs2 {len(vs2)}")
 
+    # 2b. the medallion palettes (14z-63 maintainer round): each appended
+    # cell's record entry must be re-palmed to its declared free row, and
+    # the build must write the vs2 palette row bytes into select block A
+    # at that row. Sources re-read from the vs2 image, never from the
+    # build's own intermediates.
+    PAL_A = 0x3A3800
+    # locate the built record: the repoint op names it
+    rp = [o for o in ops if o.get("op") == "poke32"
+          and int(o.get("addr"), 16) == 0x2689FE]
+    if len(rp) != 1:
+        die(f"wheel repoint op: {rp}")
+    rec_dst = int(str(rp[0]["val"]), 16)
+    body = [o for o in ops if o.get("op") == "data"
+            and int(o.get("addr"), 16) == rec_dst]
+    if len(body) != 1:
+        die(f"wheel record data op at {rec_dst:#x}: {len(body)} found")
+    bb = bytes.fromhex(body[0]["hex"])
+    nvan = cm1 + 1
+    if not Path("build/out/vsav2_data.bin").exists():
+        die("build/out/vsav2_data.bin missing (run the build first)")
+    vs2_data = Path("build/out/vsav2_data.bin").read_bytes()
+    cells = sorted((int(str(k), 16), v) for k, v in lay["cells"].items())
+    for i, (c, spec) in enumerate(cells):
+        at = int.from_bytes(bb[10 + 4 * (nvan + i) + 2:
+                               10 + 4 * (nvan + i) + 4], "big")
+        pr = int(str(spec["pal_row"]))
+        ps = int(str(spec["pal_src"]))
+        if (at & 0x1F) != pr:
+            die(f"cell {c:#04x}: record entry pal {at & 0x1F:#04x} != "
+                f"declared pal_row {pr:#04x}")
+        want = vs2_data[ps:ps + 0x20].hex()
+        hit = [o for o in ops if o.get("op") == "data"
+               and int(o.get("addr"), 16) == PAL_A + pr * 0x20]
+        if len(hit) != 1 or hit[0]["hex"] != want:
+            die(f"cell {c:#04x}: block A row {pr:#04x} palette op wrong "
+                f"or missing")
+    print(f"PALROWS {len(cells)}")
+
     # 3. the built group C members vs the sources, straight from the zips
     zw = zipfile.ZipFile(out / "rompath" / "vsavjw.zip")
     gc = load_group_quiet(zw, "vsw", GROUP_C)

@@ -1509,3 +1509,45 @@ e82e0bd3):
 - Gate: tests/test_tenant_winpal.sh NEW (site/thunk/sparse-block
   re-derivation + negative control + both runtime paths), in the
   battery.
+
+Session 14z-63 addendum 4 (maintainer round 6: Phobos/Pyron medallions
+unreadable — REAL vs2 PALETTES for the newcomer medallions; build
+f86fb1a0):
+- Diagnosis: the appended entries' vs2 attr pal rows (0x13/0x11/0x05)
+  are SHARED vanilla medallion rows on vsavj's select screen — the real
+  art rendered under wrong palettes (Donovan legible by luck, the other
+  two noise). Shared rows cannot be overwritten (vanilla medallions ride
+  them), so the fix needs FREE rows.
+- Free rows MEASURED two ways: OBJ pal-reference sweeps over select
+  frames (3 replays: legacy pick, 2P, challenger join — restricted to
+  frames where the wheel is actually on screen; an unrestricted sweep
+  conflates screens) left {0x00,0x02,0x16,0x19}; a live poke-probe
+  (rows forced to loud solids mid-select, snapshot pixel-diff vs
+  baseline) changed ZERO pixels — decisive against scroll-layer
+  sharing. 0x1A excluded (the P2-tenant sword row, 62k); 0x18/0x1C
+  excluded (P2 figure / 2P-referenced).
+- Sources: vs2's REAL medallion palettes found by matching vs2's live
+  select palette RAM (f1250, de-alpha'd) into its ROM — Donovan
+  0x3BAFDC (= the med_pal_row14 source, which retroactively explains
+  that row: vs2 block base 0x3BAF3C + pal_row*0x20), Pyron 0x3BB15C,
+  Phobos 0x3BB19C. Destination: vsavj select block A (base 0x3A3800,
+  the wheel view's live copy) — rows 0x16/0x19/0x00 verified to load
+  1:1 into palette RAM; row 0x02 does NOT (its live copy comes from
+  0x3B5940) and was rejected.
+- Fix (bank5/group-C builds only; layout pal_row/pal_src per cell,
+  rule-5 table): the generator re-palms the appended entries' attr pal
+  bits (Donovan->0x16, Phobos->0x19, Pyron->0x00) and emits three 0x20-
+  byte data ports vs2 -> block A. Measured: live rows == alpha(vs2
+  src) byte-for-byte at select; snapshot shows all three busts in
+  native colors.
+- LEGACY CONSEQUENCE, mechanism-attributed: replay 11 gains ONE
+  transient divergent frame at 2836 — 8 bytes at RAM:$FF406A-$FF4071,
+  the palette-FADE STAGING area (same family as the ratified $FF4182
+  mask window, different slot): the transition fade stages the changed
+  block-A rows through it for exactly one frame; byte-diff clean at
+  2835/2837, 884 identical frames after, match untouched. The gate's
+  section 4 becomes the measured §4 v4 COMPOSITE (window 889-2415 +
+  flicker {2836}, compare_composite) — PENDING RATIFICATION in the
+  re-freeze bundle alongside the window bounds.
+- Gates: checker gained PALROWS (re-palmed entries + block A rows vs
+  the vs2 image); all tenant gates PASS; stock reproduces ae701ffb.

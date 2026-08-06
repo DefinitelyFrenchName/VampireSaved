@@ -1867,6 +1867,11 @@ bank_site_old = "3d7c20000018"
 # pairs (row 0x12 stays the alias — reserved id). Applies to ANY extended-
 # wheel build (the misplaced-hover fix needs no group C).
 highlight_base_site = 0x5FAE2
+# 14z-63: the select wheel view's palette block A — the ROM block whose
+# rows load 1:1 into select palette RAM page rows (row-14 = the med_pal
+# precedent; rows 0x16/0x19/0x00 verified). The bank5 branch writes the
+# newcomers' vs2 medallion palette rows here (layout pal_row/pal_src).
+pal_block_a = 0x3A3800
 
 # ── SELECT RECORDS at a variant id (M3a select-records half, 14z-62) ─────────
 # The tenant's OWN select records: what the hovered cell displays. Emitted

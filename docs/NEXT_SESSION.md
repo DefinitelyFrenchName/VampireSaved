@@ -9,7 +9,7 @@ measured), and the 2P victory screen serves his OWN vs2 win palette
 (both thunk paths measured).** One maintainer decision is now unblocked and reframed
 (hover content — see below), then the palette-block colours, the
 accent audit, and the re-freeze bundle. Evidence build
-`build/m3a_wheel` = `e82e0bd3`. Read STATE.md `14z-63`, then
+`build/m3a_wheel` = `f86fb1a0`. Read STATE.md `14z-63`, then
 docs/patch_notes.md's 14z-63 sections for byte detail.
 
 ## What 14z-63 landed (do not re-derive)
@@ -27,9 +27,15 @@ docs/patch_notes.md's 14z-63 sections for byte detail.
   `highlight_base` (derivation note in the layout file). Transform:
   OBJ_x = base+coord+64, OBJ_y = 224-(base+coord) — measured, incl.
   one exact prediction.
-- **Legacy window re-frozen**: host-pick bounded window is 889-2415
-  (bank word write at the select init; re-init 0x5FD02 re-converges).
-  Ratification folds into the re-freeze bundle.
+- **Legacy expectation re-frozen**: the host pick is now the §4 v4
+  COMPOSITE — window 889-2415 (bank word at the select init; 0x5FD02
+  re-converges) + ONE flicker frame 2836 (8 bytes at $FF406A, the
+  fade-staging family staging the changed medallion palette rows for
+  one frame). Ratification folds into the re-freeze bundle.
+- **Medallion palettes (round 6)**: the newcomers' entries are
+  re-palmed to measured-free rows 0x16/0x19/0x00 carrying vs2's real
+  palettes via select block A (0x3A3800). Row 0x02 is NOT block-A
+  served (live copy from 0x3B5940); 0x1A is the P2-tenant sword row.
 - **Semantic correction**: the composed vs2 highlight record (b000
   bar) is vs2's POST-CONFIRM NAME BAR, not a hover label. Both engines
   hover-draw RINGS (per-cell pal-0x1E records, all-different codes).

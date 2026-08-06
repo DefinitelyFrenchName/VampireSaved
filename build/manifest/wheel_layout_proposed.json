@@ -20,7 +20,12 @@
    "tile": "0xb108",
    "attr": "0x1213",
    "_src": "vsav2 wheel entry 21 (Huitzil/Phobos), 3x2 pal 0x13",
-   "highlight_base": [168, 80]
+   "highlight_base": [
+    168,
+    80
+   ],
+   "pal_row": 25,
+   "pal_src": 3912092
   },
   "13": {
    "pos": [
@@ -41,7 +46,12 @@
    "tile": "0xb10b",
    "attr": "0x1205",
    "_src": "vsav2 wheel entry 23 (Donovan), 3x2 pal 0x05",
-   "highlight_base": [216, 80]
+   "highlight_base": [
+    216,
+    80
+   ],
+   "pal_row": 22,
+   "pal_src": 3911644
   },
   "11": {
    "pos": [
@@ -62,7 +72,12 @@
    "tile": "0xb0f5",
    "attr": "0x1211",
    "_src": "vsav2 wheel entry 22 (Pyron), 3x2 pal 0x11",
-   "highlight_base": [192, 72]
+   "highlight_base": [
+    192,
+    72
+   ],
+   "pal_row": 0,
+   "pal_src": 3912028
   }
  },
  "edges_in": [
@@ -102,5 +117,6 @@
   -12,
   -7
  ],
- "_highlight_base_note": "14z-63: the ring/highlight drawer ($FFBA00) takes its per-cell base from the 32-row pc-relative word-pair table at PRG:0x5FAE2 (variant half a byte-identical alias of the base half in vsav, exactly like TABLE B; vs2's own variant half is UN-aliased with its newcomers' bases — this fix replicates Capcom's move). Transform, measured on two independent cases (the misplaced b000 bar; Jedah's row-0x0F ring): OBJ_x = base_x + record_coord_x + 64, OBJ_y = 224 - (base_y + record_coord_y). Bases here derive from the row-0x0F reference (base (192,184), measured ring centre (248,64)): base = (pos_x - 56, 248 - pos_y) — i.e. a record positioned like Jedah's ring lands centred on this cell's ring-centre 'pos'. The interim composed b000 bar (5x1, coord (-40,-16)) draws ~8px right of centre with these bases; exact bar-centring would use pos_x - 64. Decision pending (maintainer): ring reuse vs bar vs authored art."
+ "_highlight_base_note": "14z-63: the ring/highlight drawer ($FFBA00) takes its per-cell base from the 32-row pc-relative word-pair table at PRG:0x5FAE2 (variant half a byte-identical alias of the base half in vsav, exactly like TABLE B; vs2's own variant half is UN-aliased with its newcomers' bases \u2014 this fix replicates Capcom's move). Transform, measured on two independent cases (the misplaced b000 bar; Jedah's row-0x0F ring): OBJ_x = base_x + record_coord_x + 64, OBJ_y = 224 - (base_y + record_coord_y). Bases here derive from the row-0x0F reference (base (192,184), measured ring centre (248,64)): base = (pos_x - 56, 248 - pos_y) \u2014 i.e. a record positioned like Jedah's ring lands centred on this cell's ring-centre 'pos'. The interim composed b000 bar (5x1, coord (-40,-16)) draws ~8px right of centre with these bases; exact bar-centring would use pos_x - 64. Decision pending (maintainer): ring reuse vs bar vs authored art.",
+ "_pal_note": "14z-63 (maintainer round: Phobos/Pyron medallions unreadable): the appended entries' vs2 attr pal rows (0x13/0x11/0x05) are SHARED vanilla medallion rows on vsavj's select screen, so the art rendered under wrong palettes. Fix (bank5/group-C builds only): each cell declares pal_row (a select-screen palette row measured FREE: unreferenced by any OBJ on select frames across 3 replays incl. 2P + challenger-join, AND a live poke-probe of rows 0x00/0x02/0x16/0x19 to loud solids changed ZERO pixels) and pal_src (the vs2 ROM row holding that character's REAL medallion palette, found by matching vs2's live select palette RAM at f1250 de-alpha'd: Donovan 0x3BAFDC = the med_pal_row14 source, Pyron 0x3BB15C, Phobos 0x3BB19C \u2014 vs2 block base 0x3BAF3C + row*0x20). The generator rewrites the record entries' pal bits and writes the vs2 rows into vsavj select block A (base 0x3A3800, the wheel view's live copy \u2014 rows 0x16/0x19/0x00 verified to load 1:1 into palette RAM; row 0x02 does NOT, its live copy comes from 0x3B5940, hence not used). Row 0x1A avoided: it is the P2-tenant sword row (62k)."
 }
