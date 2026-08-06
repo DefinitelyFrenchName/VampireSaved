@@ -158,3 +158,35 @@ cursors visit Jedah's cell and legacy code reads his records.
 
 That is the strongest argument for the move, and it is exactly why it must
 be measured rather than assumed before step 2 is attempted.
+
+## The slot-row vocabulary (14z-62c — how a row states its tenant behavior)
+
+Step 2 (the move to `0x13`) surfaced a class the schema had no words for:
+manifest rows carrying the SLOT baked into an address, a table row index,
+or a hand-authored thunk body. Each was silently wrong at a variant id —
+either still aimed at row `0x0F` (repointing the HOST's data: the sprite
+palette table, the sfx pointer row) or still gating on `#$0F` (the
+An-relative id compares the TT guard could not see). The vocabulary that
+fixed it, all byte-inert at the base slot:
+
+| key | on | meaning |
+|---|---|---|
+| *(default)* `[[palette]]` row / `[[sound_table]]` ptr row | — | ALWAYS the tenant's row now (`dst_slot`); declaring a fixed `row`/`ptr_row` is a hard failure. Variant rows are anchored on aliasing their base-half counterpart |
+| `only_base_slot = true` | `aux_poke`, `data_port` | in-place HOST-slot content: emitted only while the tenant occupies a base-half slot; skipped (with a note) at variant ids |
+| `slot_ptr_table = <addr>` | `data_port` | dst is the host block behind a per-char pointer table: in place at base slots; PLACED + tenant row repointed at variant ids |
+| `slot_table/slot_stride/slot_off` | `code_word` | the word is a per-char table entry; addr follows the tenant. `slot_mirror = true` adds the `0x1F` twin on base-half builds only |
+| `TT` in `thunk_hex` | `site_thunk` | tenant id byte (existing). The stale-literal guard now also catches `cmpi.b #imm,(d16,An)` forms against `$382`/`$A` |
+| `row_subst = "ph=<table>"` | `site_thunk` | placeholder in the body becomes `<table> + 4*tenant` — for thunks that embed a per-char row ADDRESS |
+| `fixes = "off:old:new,..."` | `data_port` | in-blob fixes, FLAT. `[[data_port.fix]]` is banned: it parses differently per host python (tomllib nests, the subset parser orphans it) — the 14z-2 fix was silently dropped on this machine, frozen references included |
+
+Two traps this codified (both paid for):
+
+- **"The substitution landed for free."** The engine's OBJ bank-word table
+  (`PRG:0x282D4`) never needed a poke at slot `0x0F` — Jedah's row was
+  already the band the port occupies — so nothing recorded that the row
+  mattered, and the first `0x13` match drew Victor's alias bank under
+  Donovan's codes. Any value the host slot happened to share with the
+  port's needs is an invisible dependency until the tenant moves.
+- **A manifest row that PARSES differently per host is a reproducibility
+  bug**, even when today's bytes are right. Dotted table names are now a
+  generator hard-failure.

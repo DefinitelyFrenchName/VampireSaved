@@ -1,13 +1,26 @@
-# NEXT SESSION — orientation (written at the close of 14z-62, 2026-08-06)
+# NEXT SESSION — orientation (written at the close of 14z-62c, 2026-08-06)
 
-**Start here: M3a has ONE half left — the GFX half.** The select-records
-half landed this session: at `--tenant-id 0x13` the generator composes the
-tenant's own six select records, the six variant-half array rows are poked,
-select_port does not run, and the host's select-family PROGRAM bytes are
-vanilla again. Gated (`tests/test_tenant_select_records.sh`, in the
-battery), measured in-emulator (the engine fetches the tenant's records on
-cell 0x13), and both frozen references still rebuild exactly
-(`ae701ffb` / `9bac6ee3`). Read STATE.md `14z-62` for the detail.
+**Start here: the M3a PROGRAM SIDE is done and MEASURED; the GFX half
+remains.** Two arcs this day: the select-records half (six composed
+records, six rows, host records vanilla — 14z-62), then the SLOT-ROW
+AUDIT (14z-62c) after the first host-pick measurement diverged into the
+match: every remaining row-0x0F dependency now follows the tenant or is
+gated off (docs/tenant_manifest.md "slot-row vocabulary"). The
+acceptance is measured on the 0x13 build: legacy replays reproduce the
+frozen donovan-m5w classes EXACTLY, and replay 11 (pick Jedah — divergent
+forever on substituted builds) is a single re-convergent window 890-2362
+through a full Jedah match. Donovan renders in-match at 0x13 with his own
+art and colors. Gate: `tests/test_tenant_select_records.sh` (4 sections,
+in the battery). Frozen refs rebuild exactly throughout. Read STATE.md
+`14z-62`/`62c`.
+
+**A discovery that owes the maintainer a decision at re-freeze time:**
+`[[data_port.fix]]` (the 14z-2 mirror-victim throw fix) NEVER PARSED on
+this machine — the frozen references ship without it, and a python-3.11
+host would have built different bytes from the same tree. Dotted manifest
+tables are now banned (generator hard-fails). The fix is parked as a flat
+`fixes=` comment in donovan.toml — apply it at the M3a RE-FREEZE and add
+a mirror-flavor throw replay.
 
 ## The gfx half — what it is and what 14z-62 added to it
 
@@ -47,14 +60,17 @@ in the manifest and RE-FREEZE the WIDE reference in the same change —
   content — Donovan's portrait draws in Victor's colors). vs2 special-cases
   some (`cmpi #$13` in its palette uploader at `0x6B1A0`). Find the vsavj
   consumers first; some may need site thunks (engine-hook class).
-- **P2-side runtime measurement**: the gate drives the P1 cursor only; a
-  2P replay onto cell 0x13 would close the loop (statics already verify P2).
+- ~~P2-side runtime measurement~~ DONE (14z-62b, replay 37): portrait and
+  highlight `+0x80` arrays are live; the NAME piece is asymmetric — both
+  players read the P1 array, and the `+0x80` name structure has no
+  consumer on any measured path (the gate asserts the negative).
 
 ## What is already done (do not redo)
 
-- **Select records at 0x13** (this session — see above). Checker:
-  `tools/check_tenant_select.py`. Scratch build `build/m3a_selrec`
-  (`dd88f343`) — program+records halves proven; NOT a candidate.
+- **Select records at 0x13 + the slot-row audit** (14z-62..62c — see
+  above). Checker: `tools/check_tenant_select.py`. Scratch build
+  `build/m3a_selrec` (`db0c984d`) — the whole program side proven; NOT a
+  candidate.
 - **Program half of M3a** (14z-61): `--tenant-id` build input, 31 table
   rows at 0x13, no mirror pokes, variant-id-without-profile refused; now
   also 0x12/0x18 refused (reserved).
@@ -69,7 +85,7 @@ in the manifest and RE-FREEZE the WIDE reference in the same change —
 |---|---|---|---|
 | **WIDE** | `9bac6ee3` (`build/m5_wide`) | `vsavjw.zip` | frozen `donovan-m5w`, playtest-confirmed, suite GREEN |
 | **stock** | `ae701ffb` (`build/m5_stock`) | `vsavj.zip` | frozen compatibility artifact; rebuilds exactly |
-| scratch | `dd88f343` (`build/m3a_selrec`) | `vsavjw.zip` | 14z-62 select-records evidence build (tenant at 0x13); do not ship |
+| scratch | `db0c984d` (`build/m3a_selrec`) | `vsavjw.zip` | 14z-62c program-side evidence build (tenant at 0x13, acceptance measured); do not ship |
 | ~~WIDE~~ | `ac52eeff` (`build/m5w`) | — | KNOWN-BAD (the garble), kept as evidence. Do not run |
 
 ```sh

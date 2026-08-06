@@ -1074,3 +1074,50 @@ manifest changes; the six ARRAY ROW addresses are fixed by the id):
   engine's own row-fetch sequence onto cell 0x13 via replay
   36_pick_tenant_cell.rpl, all three pieces). Wired into
   tests/run_battery_m2.sh with test_tenant_id.sh.
+
+Session 14z-62c (the SLOT-ROW AUDIT — every remaining row-0x0F dependency
+follows the tenant or is gated off; the de-substitution acceptance is
+MEASURED. Scratch build db0c984d; both frozen references verified
+byte-identical after every change):
+- Found by the measure-diff loop: replay 11 (pick Jedah) on the 0x13
+  build vs frozen vanilla masked logs diverged INTO THE MATCH; work-RAM
+  dumps at the divergence named each subsystem in turn.
+- Generator/manifest mechanics (docs/tenant_manifest.md "slot-row
+  vocabulary"): [[palette]]/[[sound_table]] rows always the tenant's
+  (fixed row keys are refused); only_base_slot gates on aux_poke +
+  data_port; slot_ptr_table place+repoint mode; code_word
+  slot_table/slot_stride/slot_off/slot_mirror; site_thunk row_subst +
+  the An-relative stale-id guard; flat fixes= syntax + dotted-table ban.
+- Rows moved to the tenant at variant ids: sprite palette (0x38C198 row
+  -> 0x38C1E4, block 0xCEAF0), effect palette (0x38C218 row -> 0x38C264;
+  the "extra table" 0x38C258 is that table's 0x1F MIRROR — base-half
+  only), sfx ptr (0x0BF41A row -> 0x0BF466, array in wide_ext), throw
+  victim-keyframe block (PLACED 0x400010, ptr table 0xBE27A row 0x13),
+  win pos entries (0x5F24C/E), select-companion entry (0x8459C), and the
+  ENGINE OBJ bank-word table row (0x282FA -> 0x4000; at slot 0x0F this
+  row writes IDENTICAL bytes — Jedah's row already carried the band, the
+  "landed for free" gotcha).
+- Rows gated off at variant ids (host content returns to vanilla): the
+  weapon-accent slots x3, win-pal slices x8, medallion palette row,
+  HUD name-plate entry x2 (16-wide folded table — no entry 0x13 exists).
+- Thunk bodies now track the tenant: accent_color_aware x4 (TT x2 forms
+  + row_subst for the embedded palette row addr), select_companion x4
+  (owner-id TT), ls_freeze x2 (a4-relative TT), spark x2 (stage 99,
+  hygiene).
+- DISCOVERY: [[data_port.fix]] (the 14z-2 mirror-victim fix) never
+  parsed on this host — see GOTCHAS; the fix is parked as a flat-syntax
+  comment awaiting the M3a re-freeze (applying it changes frozen bytes).
+- MEASURED ACCEPTANCE on the 0x13 build (masked basis, vs frozen vanilla
+  logs): replay 02 = window 890-1622 +3898 identical; 05 = window
+  890-1622 +10498 identical (both EXACTLY the frozen donovan-m5w
+  classes); 04 = composite, window 890-1051 + flickers 1525/2009/2195 —
+  the frozen inventory to the frame; replay 11 (the host pick, formerly
+  `diverge 890` forever) = single window 890-2362, fully re-convergent
+  through a complete Jedah-vs-CPU match (tail 1963-2362 is ONE byte,
+  $FF06D1, a menu-scoped counter phase reset at match start). Frozen
+  into the gate as section 4.
+- In-match tenant verified by snapshot: Donovan renders with his own art
+  and colors at 0x13 (vs Q-Bee, frame 3300). Known interim: HUD name
+  plate shows Victor's (folded 16-wide venue table), win-screen/palette-
+  grid/splash colors unported at variant ids, select art still in the
+  host band until the gfx half.

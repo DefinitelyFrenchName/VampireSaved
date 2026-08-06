@@ -1727,3 +1727,39 @@ ACTUAL placed tile set (expand the placement pairs/records), or measure
 the pixels (`test_wide_render_content.sh`-style). The window is a bound,
 useful only for a fast "cannot be affected" exoneration when the
 intersection is EMPTY.
+
+## Dotted TOML table names parse DIFFERENTLY per host (14z-62c)
+
+`_minitoml` delegates to `tomllib` when the host python has it (>= 3.11)
+and falls back to a subset parser otherwise. The subset parser treats
+`[[data_port.fix]]` as a TOP-LEVEL array literally named "data_port.fix"
+— it never attaches to the data_port row — while tomllib nests it
+properly. Consequence: the 14z-2 mirror-victim fix row NEVER APPLIED on
+this machine (every build, both frozen references), and a python-3.11
+host building the same tree would have produced DIFFERENT bytes. A
+manifest feature that resolves per host makes fingerprints
+host-dependent, which no gate can catch on a single machine.
+
+Rules:
+- Dotted table names are BANNED in build manifests; the generator
+  hard-fails on any orphan dotted key (both host shapes).
+- Nested structure in a minitoml manifest must be encoded FLAT (the
+  `fixes = "off:old:new,..."` shape).
+
+## "The substitution landed for free" — invisible slot dependencies (14z-62c)
+
+The slot-0x0F port never poked the engine's OBJ bank-word table
+(`PRG:0x282D4`, PC-relative, unmasked id) because Jedah's row was ALREADY
+`0x4000` — the very band the port placed Donovan's tiles in. Nothing
+recorded that the row mattered, no gate exercised it, and the first
+`0x13` match drew grey blocks: Donovan's remapped codes composed with
+row 0x13's Victor alias (`0x2000`, the wrong band). Found only by the
+measure-diff loop (snapshot -> OBJ dump -> write tap at `$FF8418` ->
+writer PC `0x282C0` -> hand-decode).
+
+Rule: when content substitutes a slot IN PLACE, every per-slot value the
+host already had RIGHT is an invisible dependency. Moving the tenant off
+the slot converts each one into a defect. The de-substitution acceptance
+(pick the host, require the bounded re-convergent window — gate section
+4) is the behavioral net for the class; the RAM-diff-at-frame method
+names each culprit's subsystem in one measurement.

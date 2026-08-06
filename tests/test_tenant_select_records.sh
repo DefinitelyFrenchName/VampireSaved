@@ -209,6 +209,40 @@ else
     fi
 fi
 
+echo "== 4. de-substitution acceptance: picking the HOST re-converges =="
+# Replay 11 picks slot 0x0F. On slot-substituted builds that loads the
+# tenant and diverges from vanilla forever (class `diverge 890`). On a
+# variant-id build the host is HIMSELF again, so the same replay must
+# measure as the ratified §4 v3 bounded window: onset 890 (select entry,
+# the wheel extension), frozen end, single contiguous run, full
+# re-convergence through the host's own match. Measured 14z-62c: window
+# 890-2362; the 1963+ tail is ONE byte ($FF06D1, a menu-scoped counter
+# phase that match start resets). This section is the reason the whole
+# slot-row audit exists — it caught the palette/sfx/fixture rows still
+# aimed at row 0x0F.
+if [ "${SKIP_RUNTIME:-0}" = 1 ]; then
+    echo "  SKIPPED (SKIP_RUNTIME=1)"
+else
+    MASK_RANGES="043c-043d,4182-41a2,7f00-8000" MAME_BIN="$WIDE_BIN" \
+    MAME_ROMPATH="$OUTBASE/rompath;$ROMDIR" \
+        tools/run_replay_mame.sh vsavjw tests/replays/11_pick_donovan.rpl \
+        "$WORK/11_legacy.log" > "$WORK/11_legacy.out" 2>&1 || {
+        echo "  FAIL: replay 11 did not complete"; fail=1; }
+    if [ -f "$WORK/11_legacy.log" ]; then
+        if python3 tools/compare_window.py \
+                tests/expected/vsavj/masked/logs/11_pick_donovan.log \
+                "$WORK/11_legacy.log" --onset 890 --end 2362 \
+                > "$WORK/11_legacy.cmp" 2>&1; then
+            echo "  ok: host pick = bounded window 890-2362, fully re-convergent"
+        else
+            echo "  FAIL: the host pick does not re-converge as frozen:"
+            sed 's/^/        /' "$WORK/11_legacy.cmp" | tail -5
+            fail=1
+        fi
+    fi
+fi
+
 [ "$fail" = 0 ] || { echo "FAIL: tenant select-records gate"; exit 1; }
 echo "PASS: tenant select-records gate (static composition + negative"
-echo "      controls + the engine's own row sequence onto cell 0x13)"
+echo "      controls + the engine's own row sequence onto cell 0x13 +"
+echo "      the host-pick re-convergence window)"

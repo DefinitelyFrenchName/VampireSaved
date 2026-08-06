@@ -176,6 +176,16 @@ def main():
 
     man = json.loads((args.extract_dir / "regions.json").read_text())
     port = toml_loads(args.port.read_text())
+    # Dotted table names are BANNED in this manifest (14z-62c): tomllib
+    # nests them, the subset parser detaches them as orphan top-level keys
+    # — the same manifest builds DIFFERENT bytes per host python. The
+    # 14z-2 [[data_port.fix]] row was silently dropped this way on every
+    # build from this machine, frozen references included.
+    _dotted = [k for k in port if "." in k]
+    if _dotted:
+        raise SystemExit(f"gen_donovan_patch: dotted table name(s) in the "
+                         f"manifest: {_dotted} — banned (host-dependent "
+                         f"parse, 14z-62c). Use the flat equivalents.")
     port = normalise_tenants(port, args.profile, args.tenant_id)
     bank = load_bank_map(args.bank_map)
     vj = load_vsavj(args.vsavj)
@@ -1288,17 +1298,39 @@ def main():
             (out / fn).write_bytes(pblock)
             ops.append({"op": "data_file", "addr": f"{pa:#x}", "path": fn})
             fragments.append((pa, plen, "VS2", f"{pname} palette block"))
-            tables = [_int(pal["table"])] + [
-                _int(x) for x in
-                str(pal.get("extra_tables", "")).split(",") if x]
+            # The row FOLLOWS THE TENANT (14z-62c — the manifest used to
+            # hardcode row 0x0F, so a variant-id build silently repointed
+            # JEDAH's palette row: replay-11 RAM diff caught his cached
+            # block pointer at $FFB8C1 holding the ported address, and his
+            # match palettes/fades diverging from vanilla). extra_tables is
+            # the hand-rolled 0x1F MIRROR (0x38C258 == 0x38C218 + 0x40 —
+            # measured, NOT a separate table); a variant-id tenant has no
+            # mirror, so extras are emitted only on the base half.
+            if "row" in pal:
+                fail.append(f"palette {pname}: the manifest declares a fixed "
+                            f"'row' — the row follows the tenant now "
+                            f"(14z-62c); delete the key")
+                continue
+            prow = dst_slot
+            if prow >= 0x10:
+                ta = _int(pal["table"]) + 4 * prow
+                aa = _int(pal["table"]) + 4 * (prow & 0x0F)
+                if vj_u32(ta) != vj_u32(aa):
+                    fail.append(f"palette {pname}: variant row {ta:#x} does "
+                                f"not alias its base-half counterpart — "
+                                f"table shape moved")
+                    continue
+            tables = [_int(pal["table"])]
+            if prow < 0x10:
+                tables += [_int(x) for x in
+                           str(pal.get("extra_tables", "")).split(",") if x]
             for tb in tables:
-                ta = tb + 4 * _int(pal["row"])
+                ta = tb + 4 * prow
                 ops.append({"op": "poke32", "addr": f"{ta:#x}",
                             "val": f"{pa:#010x}"})
                 notes.append(f"data     {pa:#08x} +{plen:#x}  {pname} "
                              f"palette block (vsav2 0x{psrc:06X}); poke32 "
-                             f"{ta:#08x} (table {tb:#x} row "
-                             f"{_int(pal['row']):#x})")
+                             f"{ta:#08x} (table {tb:#x} row {prow:#x})")
 
         # per-char value rows -> vsavj slot 0x0F rows
         # param32_a/b (movement velocity pairs) are NOT ported (session
@@ -1828,6 +1860,16 @@ def main():
 
     if args.stage >= 5:
         for p in port.get("aux_poke", []):
+            # only_base_slot (14z-62c): the row writes TENANT CONTENT over
+            # the HOST slot's own bytes in place — legitimate only while the
+            # tenant OCCUPIES that slot. On a variant-id build the host is a
+            # live legacy character again and the write would corrupt him;
+            # the row is skipped and the tenant-side equivalent (if any) is
+            # a separate, mechanism-measured row.
+            if p.get("only_base_slot") and dst_slot >= 0x10:
+                notes.append(f"# aux {p['name']}: SKIPPED (host-slot content; "
+                             f"tenant is at variant id {dst_slot:#04x})")
+                continue
             ops.append({"op": p["op"], "addr": f"{_int(p['addr']):#x}",
                         "val": f"{_int(p['val']):#x}"})
             notes.append(f"{p['op']} {_int(p['addr']):#08x} <- {_int(p['val']):#x} "
@@ -1843,6 +1885,14 @@ def main():
             if args.stage < _int(dp.get("stage", 0)):
                 continue
             nm = dp["name"]
+            # only_base_slot (14z-62c): in-place tenant content over the
+            # HOST slot's bytes — skipped on variant-id builds, where the
+            # host is a live legacy character again (same rationale as the
+            # aux_poke gate above).
+            if dp.get("only_base_slot") and dst_slot >= 0x10:
+                notes.append(f"# data_port {nm}: SKIPPED (host-slot content; "
+                             f"tenant is at variant id {dst_slot:#04x})")
+                continue
             src, dst, ln = _int(dp["src"]), _int(dp["dst"]), _int(dp["len"])
             _img = dp.get("src_image", man["src_set"])
             sdat = (root / f"build/out/{_img}_data.bin").read_bytes()
@@ -1858,34 +1908,97 @@ def main():
                     fail.append(f"data_port {nm}: sibling twin at {tw:#x} "
                                 f"differs — misbounded or wrong address")
                     continue
-            if dst + ln > _int(dp["dst_end"]):
-                fail.append(f"data_port {nm}: {ln:#x} bytes overrun dst_end "
-                            f"{_int(dp['dst_end']):#x}")
-                continue
-            vdat = (root / "build/out/vsavj_data.bin").read_bytes()
-            oh = bytes.fromhex(dp["dst_old_head"])
-            if vdat[dst:dst + len(oh)] != oh:
-                fail.append(f"data_port {nm}: dest old-content mismatch at "
-                            f"{dst:#x} ({vdat[dst:dst+len(oh)].hex()})")
+            # slot_ptr_table (14z-62c): the destination span is the HOST
+            # slot's block, reached through a per-char POINTER TABLE row. On
+            # a base-half build the block is replaced in place exactly as
+            # before. On a variant-id build the host's block must stay
+            # vanilla, so the (fixed) blob is placed by the space model and
+            # the TENANT's table row is repointed instead — the same
+            # place+repoint shape as sound_table, after asserting the
+            # variant row is a vanilla alias of its base-half counterpart.
+            spt = _int(dp["slot_ptr_table"]) if "slot_ptr_table" in dp else None
+            if spt is None or dst_slot < 0x10:
+                if dst + ln > _int(dp["dst_end"]):
+                    fail.append(f"data_port {nm}: {ln:#x} bytes overrun "
+                                f"dst_end {_int(dp['dst_end']):#x}")
+                    continue
+                vdat = (root / "build/out/vsavj_data.bin").read_bytes()
+                oh = bytes.fromhex(dp["dst_old_head"])
+                if vdat[dst:dst + len(oh)] != oh:
+                    fail.append(f"data_port {nm}: dest old-content mismatch "
+                                f"at {dst:#x} ({vdat[dst:dst+len(oh)].hex()})")
+                    continue
+            # In-blob fixes ride a FLAT `fixes = "off:old:new[,...]"` string
+            # (14z-62c). The nested `[[data_port.fix]]` shape is BANNED: the
+            # subset parser (no-tomllib hosts) silently detached it as an
+            # orphan top-level key, so the 14z-2 mirror-victim fix never
+            # applied on this machine — including in both FROZEN references
+            # — while a tomllib host would have applied it. A manifest
+            # feature that parses differently per host makes fingerprints
+            # host-dependent; hard-fail both shapes.
+            if "fix" in dp:
+                fail.append(f"data_port {nm}: nested [[data_port.fix]] is "
+                            f"banned (host-dependent parse, 14z-62c) — use "
+                            f"the flat fixes=\"off:old:new,...\" key")
                 continue
             ok = True
-            for fx in dp.get("fix", []):
-                off = _int(fx["off"])
-                old = bytes.fromhex(fx["old_hex"])
-                new = bytes.fromhex(fx["new_hex"])
+            nfix = 0
+            for _fx in str(dp.get("fixes", "")).split(","):
+                if not _fx.strip():
+                    continue
+                _off_s, _old_s, _new_s = _fx.strip().split(":")
+                off = _int(_off_s)
+                old = bytes.fromhex(_old_s)
+                new = bytes.fromhex(_new_s)
                 if bytes(blob[off:off + len(old)]) != old:
                     fail.append(f"data_port {nm}: fix@{off:#x} old bytes "
                                 f"mismatch ({bytes(blob[off:off+len(old)]).hex()})")
                     ok = False
                     break
                 blob[off:off + len(new)] = new
+                nfix += 1
             if not ok:
+                continue
+            if spt is not None and dst_slot >= 0x10:
+                row_at = spt + 4 * dst_slot
+                alias_at = spt + 4 * (dst_slot & 0x0F)
+                if vj_u32(row_at) != vj_u32(alias_at):
+                    fail.append(f"data_port {nm}: variant row {row_at:#x} "
+                                f"({vj_u32(row_at):#x}) does not alias its "
+                                f"base-half counterpart "
+                                f"({vj_u32(alias_at):#x}) — table shape moved")
+                    continue
+                # the declared dst documents the BASE-HALF slot's block the
+                # in-place mode overwrites; anchor that this table is the
+                # one that points at it (any base-half row — the manifest's
+                # dst belonged to the ORIGINAL slot, not the tenant's alias)
+                if dst not in [vj_u32(spt + 4 * i) for i in range(16)]:
+                    fail.append(f"data_port {nm}: no base-half row of "
+                                f"slot_ptr_table {spt:#x} points at the "
+                                f"declared dst {dst:#x} — wrong table?")
+                    continue
+                pdst = alloc(dp.get("hole", "b"), ln, f"data_port {nm} block")
+                if pdst is None:
+                    continue
+                ops.append({"op": "data", "addr": f"{pdst:#x}",
+                            "hex": bytes(blob).hex()})
+                ops.append({"op": "poke32", "addr": f"{row_at:#x}",
+                            "val": f"{pdst:#x}"})
+                notes.append(f"data   {pdst:#08x} +{ln:#x}  data_port {nm} "
+                             f"PLACED (tenant at {dst_slot:#04x}; host block "
+                             f"{dst:#x} untouched) <- {man['src_set']} "
+                             f"{src:#08x} ({nfix} fixes)")
+                notes.append(f"poke32 {row_at:#08x} <- {pdst:#x}  data_port "
+                             f"{nm} ptr-table {spt:#x} row {dst_slot:#04x}")
+                fragments.append((pdst, ln, "VS2",
+                                  f"data_port {nm} placed block "
+                                  f"({man['src_set']} {src:#06x})"))
                 continue
             ops.append({"op": "data", "addr": f"{dst:#x}",
                         "hex": bytes(blob).hex()})
             notes.append(f"data   {dst:#08x} +{ln:#x}  data_port {nm} <- "
                          f"{man['src_set']} {src:#08x} "
-                         f"({len(dp.get('fix', []))} fixes)")
+                         f"({nfix} fixes)")
             fragments.append((dst, ln, "VS2",
                               f"data_port {nm} ({man['src_set']} {src:#06x})"))
 
@@ -1930,9 +2043,28 @@ def main():
             dst = alloc(st.get("hole", "a"), len(blob), f"sound_table {nm}")
             if dst is None:
                 continue
-            ptr_at = _int(st["ptr_table"]) + _int(st["ptr_row"]) * 4
+            # The row FOLLOWS THE TENANT (14z-62c; ptr_row used to be a
+            # manifest constant 0x0F, so a variant-id build repointed
+            # JEDAH's sfx array at Donovan's). ptr_old documents the
+            # base-half slot's vanilla pointer; a variant row is instead
+            # anchored on being a vanilla ALIAS of its base-half
+            # counterpart.
+            if "ptr_row" in st:
+                fail.append(f"sound_table {nm}: the manifest declares a "
+                            f"fixed 'ptr_row' — the row follows the tenant "
+                            f"now (14z-62c); delete the key")
+                continue
+            ptr_row = dst_slot
+            ptr_at = _int(st["ptr_table"]) + ptr_row * 4
             old_ptr = vj_u32(ptr_at)
-            if "ptr_old" in st and old_ptr != _int(st["ptr_old"]):
+            if ptr_row >= 0x10:
+                alias = vj_u32(_int(st["ptr_table"]) + (ptr_row & 0x0F) * 4)
+                if old_ptr != alias:
+                    fail.append(f"sound_table {nm}: variant ptr row holds "
+                                f"{old_ptr:#x}, not the base-half alias "
+                                f"{alias:#x} — table shape moved")
+                    continue
+            elif "ptr_old" in st and old_ptr != _int(st["ptr_old"]):
                 fail.append(f"sound_table {nm}: ptr row holds {old_ptr:#x}, "
                             f"manifest expects {_int(st['ptr_old']):#x}")
                 continue
@@ -1947,7 +2079,7 @@ def main():
                          f"kept {kept}; zeroed {len(zeroed)} unplayable ids)")
             notes.append(f"poke32 {ptr_at:#08x} <- {dst:#x}  "
                          f"sound_table {nm} per-char ptr row "
-                         f"{_int(st['ptr_row']):#04x} (was {old_ptr:#x})")
+                         f"{ptr_row:#04x} (was {old_ptr:#x})")
             fragments.append((dst, len(blob), "VS2",
                               f"sound_table {nm} ({man['src_set']} {src:#06x}, "
                               f"id-allowlisted)"))
@@ -2252,6 +2384,23 @@ def main():
             _hx = st["thunk_hex"].lower()
             _tid = _int(port["port"]["dst_slot"]) & 0xFF
             _hx = _hx.replace("tt", "%02x" % _tid)
+            # row_subst (14z-62c): a thunk body may embed the ADDRESS of a
+            # per-char table row (e.g. the accent thunks read the sprite
+            # palette table's tenant row). Hardcoding it froze row 0x0F into
+            # the body exactly like the id literal did. The manifest names a
+            # non-hex placeholder and the table base; the substituted value
+            # is base + 4*tenant, so the body tracks the tenant forever.
+            for _kv in str(st.get("row_subst", "")).split(","):
+                if not _kv.strip():
+                    continue
+                _ph, _, _tb = _kv.partition("=")
+                _ph = _ph.strip().lower()
+                if _ph not in _hx:
+                    fail.append(f"site_thunk {st['name']}: row_subst "
+                                f"placeholder '{_ph}' not present in "
+                                f"thunk_hex")
+                _hx = _hx.replace(
+                    _ph, "%08x" % (_int(_tb.strip()) + 4 * _tid))
             for _fld in ("00ff8782", "00ff8b82"):
                 _i = 0
                 while True:
@@ -2267,6 +2416,26 @@ def main():
                                 f"{_i + 6}, but the tenant is {_tid:#04x}. "
                                 f"Write 'TT' there so it tracks the tenant.")
                     _i += 6
+            # The same trap in ADDRESS-REGISTER-RELATIVE form (14z-62c —
+            # this is how four accent thunks and the companion/LS thunks
+            # kept gating on 0x0F after the tenant moved: the original
+            # guard only knew the absolute `cmpi.b #id,$FF8x82.l` shape).
+            # cmpi.b #imm,(d16,An) = 0C28+n; the id lives at displacement
+            # $382 (the char-id field) or $A (the select keeper's cached
+            # owner id). Word-aligned scan; a mismatch is a hard failure.
+            import re as _re
+            for _m in _re.finditer(r"0c2[89abcdef]00([0-9a-f]{2})(0382|000a)",
+                                   _hx):
+                if _m.start() % 4:
+                    continue        # not instruction-aligned — embedded data
+                _got = int(_m.group(1), 16)
+                if _got != _tid:
+                    fail.append(
+                        f"site_thunk {st['name']}: body compares a char/owner "
+                        f"id field against {_got:#04x} at hex offset "
+                        f"{_m.start() + 6} (An-relative form), but the tenant "
+                        f"is {_tid:#04x}. Write 'TT' there so it tracks the "
+                        f"tenant.")
             body = bytes.fromhex(_hx)
             # hole "b" is REQUIRED for thunks carrying embedded data read
             # via data loads: hole "a" lies inside the CPS-2 crypt range,
@@ -2297,7 +2466,6 @@ def main():
             if args.stage < _int(cw.get("stage", 0)):
                 continue
             nm = cw["name"]
-            addr = _int(cw["addr"])
             old = bytes.fromhex(cw["old_hex"])
             new = bytes.fromhex(cw["new_hex"])
             if len(old) != 2 or len(new) != 2:
@@ -2305,6 +2473,41 @@ def main():
                 continue
             if opc_img_cw is None:
                 opc_img_cw = (root / "build/out/vsavj_opcodes.bin").read_bytes()
+            # slot_table/slot_stride/slot_off (14z-62c): the word is a
+            # per-char TABLE ENTRY and follows the tenant. `slot_mirror`
+            # additionally pokes the 0x1F twin on base-half builds (the
+            # mirror-variant doctrine); a variant-id tenant has no mirror.
+            # old_hex documents the BASE-HALF slot's vanilla word; a
+            # variant entry is anchored on being a vanilla alias of its
+            # base-half counterpart instead.
+            if "slot_table" in cw:
+                stb = _int(cw["slot_table"])
+                sst = _int(cw.get("slot_stride", 4))
+                sof = _int(cw.get("slot_off", 0))
+                addr = stb + sst * dst_slot + sof
+                if dst_slot >= 0x10:
+                    alias = stb + sst * (dst_slot & 0x0F) + sof
+                    if opc_img_cw[addr:addr + 2] != opc_img_cw[alias:alias + 2]:
+                        fail.append(f"code_word {nm}: variant entry at "
+                                    f"{addr:#x} does not alias its base-half "
+                                    f"counterpart — table shape moved")
+                        continue
+                elif opc_img_cw[addr:addr + 2] != old:
+                    fail.append(f"code_word {nm}: vanilla bytes at {addr:#x} "
+                                f"!= old_hex ({opc_img_cw[addr:addr+2].hex()})")
+                    continue
+                targets = [addr]
+                if cw.get("slot_mirror") and dst_slot < 0x10:
+                    targets.append(stb + sst * (dst_slot | 0x10) + sof)
+                for a2 in targets:
+                    ops.append({"op": "code", "addr": f"{a2:#x}",
+                                "hex": new.hex()})
+                    notes.append(f"code   {a2:#08x} +0x2  code_word {nm} "
+                                 f"(slot entry {'mirror ' if a2 != addr else ''}"
+                                 f"-> {new.hex()})")
+                    fragments.append((a2, 2, "GEN", f"code_word {nm}"))
+                continue
+            addr = _int(cw["addr"])
             if opc_img_cw[addr:addr + 2] != old:
                 fail.append(f"code_word {nm}: vanilla bytes at {addr:#x} != "
                             f"old_hex ({opc_img_cw[addr:addr+2].hex()})")

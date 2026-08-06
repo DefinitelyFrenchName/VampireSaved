@@ -1,14 +1,21 @@
 # STATE — living progress log
 
-Updated: 2026-08-06 (session 14z-62 — **the M3a select-records half is DONE
-and GATED**: at a variant tenant id the generator composes the tenant's own
-six select records (three UI pieces × P1/P2) into space-model allocations
-and pokes the six variant-half array rows; select_port does not run and the
-host's select-family program bytes return to VANILLA. Both frozen
-references still rebuild bit-identically. What remains of M3a is the GFX
-half — and 14z-62 measured that it gates the select screen's VISUALS too:
-the host's select art lives in his own fighter band. Read 14z-62, then
-docs/NEXT_SESSION.md.)
+Updated: 2026-08-06 (sessions 14z-62..62c — **the M3a PROGRAM SIDE is
+DONE, GATED and MEASURED**: the select-records half landed (six composed
+records, six rows, host program bytes vanilla), then the slot-row audit
+14z-62c chased every remaining row-0x0F dependency the first host-pick
+measurement exposed — palette/sfx rows, An-relative thunk literals, eleven
+host-content writes, the throw block, and the engine OBJ bank-word table
+whose slot-0x0F value had matched by luck. The ACCEPTANCE is measured:
+legacy replays on the 0x13 build reproduce the frozen donovan-m5w classes
+exactly, and the host pick — divergent forever on every substituted
+build — is a single re-convergent window through a full Jedah match.
+Donovan renders in-match at 0x13 with his own art and colors. Both frozen
+references rebuild bit-identically throughout. Remaining for M3a: the GFX
+half (band to group C) + the enumerated cosmetic interims. ALSO: dotted
+manifest tables parse per-host (the 14z-2 fix never applied on this
+machine — frozen refs included); banned now, re-apply at re-freeze. Read
+14z-62/62c, then docs/NEXT_SESSION.md.)
 
 ## Session 14z-62 (M3a select records LANDED — composition moved into the
 ## generator; the host's records are vanilla again at 0x13)
@@ -136,6 +143,68 @@ is one of the unmeasured mechanisms below.)
   negative so a consumer appearing is loud.
 - The four placeholder tile blocks render as wrong pixels until the gfx
   half (documented, ratified policy).
+
+## Session 14z-62c (same day — the SLOT-ROW AUDIT: the de-substitution
+## acceptance is MEASURED, after the audit it demanded)
+
+Continuing 14z-62: the first masked comparison of replay 11 (pick Jedah)
+on the 0x13 build diverged INTO THE MATCH — the select-records half was
+correct but the build still carried a family of row-0x0F dependencies no
+gate had ever exercised, because no legacy replay could PICK the host on
+a substituted build. The measure-diff loop (masked compare -> work-RAM
+dump at the divergent frame -> the differing bytes name the subsystem)
+found them one class at a time:
+
+- the [[palette]]/[[sound_table]] rows hardcoded `row = 0x0F` in the
+  manifest — JEDAH's sprite-palette and sfx pointers were repointed at
+  Donovan's data (his cached block ptr at $FFB8C1 = the ported address);
+- four accent thunks + four companion thunks + two LS-freeze thunks
+  gated on `#$0F` in An-RELATIVE compare forms the TT guard could not
+  see, one of them also embedding the palette-table ROW ADDRESS;
+- eleven in-place host-content writes (accent slots, win-pal slices,
+  medallion palette, HUD name plate) that must simply not happen when
+  the host is himself again;
+- the throw victim-keyframe block (host block in place -> now PLACED with
+  the tenant's 0xBE27A row repointed);
+- and, found only when the first 0x13 match rendered grey blocks: the
+  ENGINE's per-char OBJ BANK-WORD table (PRG:0x282D4, PC-relative,
+  unmasked id, writer PC 0x282C0 -> $18(a6)). Slot 0x0F never needed a
+  poke — Jedah's row was ALREADY the band the port occupies, the
+  substitution landing for free — so row 0x13 served Victor's alias
+  (0x2000) under Donovan's codes. Right codes, wrong band.
+
+All of it is now declarative (docs/tenant_manifest.md "slot-row
+vocabulary": only_base_slot, slot_ptr_table, slot_table/stride/off/
+mirror, TT An-relative guard, row_subst, flat fixes=). Byte-inert at the
+base slot — both frozen references verified reproducing after every step.
+
+**DISCOVERY with its own blast radius:** `[[data_port.fix]]` parses ONLY
+on tomllib hosts; this machine's subset parser orphans it, so the 14z-2
+mirror-victim fix NEVER APPLIED here — frozen references included — while
+a python-3.11 host would have applied it: same manifest, different bytes.
+Dotted tables are now a generator hard-failure; the fix is parked as a
+flat-syntax comment to be applied at the M3a RE-FREEZE (it changes frozen
+bytes; maintainer decision), with a mirror-flavor throw replay owed.
+
+**THE ACCEPTANCE, MEASURED** (0x13 build db0c984d, masked basis, vs the
+frozen vanilla logs): 02 = window 890-1622 +3,898 identical; 05 = window
+890-1622 +10,498 identical — both EXACTLY the frozen donovan-m5w classes;
+04 = composite with the frozen flicker inventory to the frame
+(1525/2009/2195) + window 890-1051; and replay 11 — the host pick,
+`diverge 890` forever on every substituted build — is now a SINGLE
+bounded window 890-2362, fully re-convergent through a complete
+Jedah-vs-CPU match (the 1963+ tail is ONE byte, $FF06D1, a menu-scoped
+counter phase that match start resets). Frozen into the gate as section
+4 ("de-substitution acceptance"). In-match snapshot: Donovan at 0x13
+renders with his own art and colors.
+
+**What still stands between here and claiming M3a** (all measured,
+none blocking the program side): the gfx half (tiles to group C — the
+host's select/mugshot/medallion ART is still substituted where it falls
+inside the tenant-occupied band); the folded 16-wide venue family (HUD
+name plate shows Victor's at 0x13); win-screen palettes / palette grid /
+splash at variant ids (unported, Victor-ish colors, mechanisms
+enumerated); the parked mirror-victim fix.
 
 ## Session 14z-61 (WIDE GARBLE FIXED — a shadowed ROM member, not the
 ## emulator; and the rendering gate that should have caught it)

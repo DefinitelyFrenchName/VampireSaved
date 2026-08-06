@@ -303,12 +303,18 @@ name = "hud_name_entry_0f_hi"
 addr = 0x08993C
 op = "poke32"
 val = 0x868C0202
+# 14z-62c: entry 0x0F of a 16-WIDE table (the venue-asset family folds the
+# id — docs/atlas/id_space.md 0x00A43E), so there is no entry 0x13 to move
+# to. On variant-id builds the host keeps his vanilla plate and the tenant
+# reads the folded entry (base-half counterpart) until the fold work lands.
+only_base_slot = true
 
 [[aux_poke]]
 name = "hud_name_entry_0f_lo"
 addr = 0x089940
 op = "poke32"
 val = 0xFFE80003
+only_base_slot = true
 
 # Anita's ALTERNATE anim table (companion tail branch `tst.b $3(a6); bne ->
 # movea.l #$36784A`, taken only when the spawn-record sub byte != 0 —
@@ -444,7 +450,6 @@ src = 0x39CB9C
 len = 0x500
 src_head_hex = "00000FFF0EB80D97"
 table = 0x38C198
-row = 0x0F
 
 # ── Effect/flash palette block (session 14z-12; round-32 captures: the
 # electrocute X-ray rendered grey with purple electricity = JEDAH'S
@@ -462,7 +467,6 @@ src = 0x3ADFDC
 len = 0xDC0
 src_head_hex = "00000cde0aae088b"
 table = 0x38C218
-row = 0x0F
 hole = "a"
 # 14z-14 (round-33 sword blink): the THIRD per-char palette table
 # (0x38C258) shares Jedah's block with 0x38C218 in vanilla (both ->
@@ -644,12 +648,31 @@ orc = 0x0C9A5C
 dst = 0x0B19F8
 dst_end = 0x0B3220
 dst_old_head = "004001d80370050806a0083809d00b68"
+# 14z-62c: dst is the HOST slot's block, reached via the per-THROWER
+# pointer table 0xBE27A (32 rows, variant half aliases — measured). On a
+# variant-id build the host's block stays vanilla; the fixed blob is
+# placed by the space model and the TENANT's row is repointed.
+slot_ptr_table = 0xBE27A
+hole = "wide_ext"
 
-[[data_port.fix]]
-off = 0x1E
-old_hex = "0b30"
-new_hex = "0d88"
-note = "mirror-match victim entry: Jedah-victim -> Donovan-victim block"
+# ~~[[data_port.fix]] off=0x1E 0b30->0d88~~ NEVER APPLIED (14z-62c
+# discovery): the nested [[data_port.fix]] shape parses only on tomllib
+# hosts; this machine's subset parser detached it as an orphan key, so
+# EVERY build from here — the frozen references included — shipped the
+# blob UNFIXED, while a python>=3.11 host would have fixed it: the same
+# manifest, different bytes. Dotted tables are now banned (generator
+# hard-fails) and fixes are flat.
+#   At a VARIANT tenant id the fix is unnecessary by construction: vs2's
+#   table is indexed by native ids, so victim-entry [0x13] already points
+#   at the Donovan-victim block and [0x0F] correctly serves a Jedah
+#   victim.
+#   At the BASE slot 0x0F the mirror-flavor (Donovan vs Donovan) victim
+#   still mis-indexes Jedah-victim keyframes — the defect 14z-2 meant to
+#   fix, shipped in ae701ffb/9bac6ee3/b91647c7. Applying it changes
+#   frozen bytes, so it waits for the maintainer-approved M3a RE-FREEZE:
+#   uncomment then, and add a mirror-flavor throw replay.
+#     fixes = "0x1E:0b30:0d88"   # mirror-match victim entry [0x0F]:
+#                                # Jedah-victim -> Donovan-victim block
 
 # Armed-normal sword-swing effects (session 14z-3, the round-24 BLOCKER).
 # Donovan's sword swings on armed normals are drawn as type-3 effect
@@ -690,7 +713,7 @@ stage = 99
 name = "spark_spawn_mark"
 site = 0x018F2E
 old_hex = "4eb900016fba"
-thunk_hex = "4eb900016fba670000120c2e000f038266000008197c000f009a4e75"
+thunk_hex = "4eb900016fba670000120c2e00TT038266000008197c000f009a4e75"
 
 # ROUND-25 REGRESSION + ROLLBACK (session 14z-4): bank_swap alone GARBLES
 # Donovan's hit sparks — marked sparks draw with bank 0x4000 while still
@@ -706,7 +729,7 @@ stage = 99
 name = "spark_bank_swap"
 site = 0x05E7C6
 old_hex = "3d7c00000018"
-thunk_hex = "0c2e000f009a6600000a3d7c400000184e753d7c000000184e75"
+thunk_hex = "0c2e00TT009a6600000a3d7c400000184e753d7c000000184e75"
 
 # Sword red blink (sessions 14z-13..19, rounds 16..35 — THE oldest
 # standing cosmetic). CORRECTED mechanism (fully measured, 14z-19):
@@ -726,6 +749,10 @@ thunk_hex = "0c2e000f009a6600000a3d7c400000184e753d7c000000184e75"
 [[data_port]]
 stage = 6
 name = "weapon_accent_t0"
+# 14z-62c: the HOST slot's accent slots — vanilla-read whenever the host
+# plays. Only writable while the tenant occupies the slot; on variant-id
+# builds the tenant's accent rides the color-aware thunks (tenant row).
+only_base_slot = true
 src = 0x39CBDC
 len = 0x20
 dst = 0x39FBE0
@@ -735,6 +762,10 @@ dst_old_head = "01110d000b020902"
 [[data_port]]
 stage = 6
 name = "weapon_accent_t1"
+# 14z-62c: the HOST slot's accent slots — vanilla-read whenever the host
+# plays. Only writable while the tenant occupies the slot; on variant-id
+# builds the tenant's accent rides the color-aware thunks (tenant row).
+only_base_slot = true
 src = 0x39CBDC
 len = 0x20
 dst = 0x39FC00
@@ -749,6 +780,10 @@ dst_old_head = "01110f980f760f53"
 [[data_port]]
 stage = 6
 name = "weapon_accent_rowd_slot"
+# 14z-62c: the HOST slot's accent slots — vanilla-read whenever the host
+# plays. Only writable while the tenant occupies the slot; on variant-id
+# builds the tenant's accent rides the color-aware thunks (tenant row).
+only_base_slot = true
 src = 0x39CBFC
 len = 0x20
 dst = 0x39FC20
@@ -834,12 +869,39 @@ thunk_hex = "0c3900TT00ff878267120c3900TT00ff8b82670841f9003b59404e7541fa00044e7
 # sprite; measured: second-page OBJ entries carry raw 0x97xx body
 # codes of a different anim frame). Re-enable to stage 6 after the
 # walk-gap fix (STATE 14z-22).
+# 14z-62c: slot-following — the keeper dispatches the hovered id through
+# the 32-entry table, so the tenant's own entry gets the handler and the
+# host's entry 0x0F returns to vanilla deactivate on variant-id builds.
 [[code_word]]
 stage = 6
 name = "select_companion_entry_0f"
-addr = 0x084594
+slot_table = 0x084576
+slot_stride = 2
 old_hex = "0040"
 new_hex = "0046"
+
+# 14z-62c: the ENGINE's per-char OBJ BANK-WORD table (PRG:0x282D4, read
+# PC-relative at 0x282C0 with the UNMASKED id: `move.b $382(a6),d0;
+# add.w d0,d0; move.w $12(pc,d0),$18(a6)` — the match-load write that
+# puts the body band's bank word in the object). 32 rows, variant half
+# aliases base. At slot 0x0F this never needed a poke — Jedah's row was
+# ALREADY 0x4000 (bank 2, the band the port occupies), the substitution
+# landing for free, which is exactly why it went unnoticed until the
+# first 0x13 match rendered with Victor's alias (0x2000, bank 1): right
+# codes, wrong band, grey-block garble (measured: tap at $FF8418, writer
+# PC 0x282C0, value 0x2000). At the base slot this row writes IDENTICAL
+# bytes (old == new), so the frozen references are untouched; at a
+# variant id it gives the tenant's row the band its tiles occupy. NOTE
+# for the gfx half: when the tenant's tiles move to WIDE group C, this
+# value becomes the WIDE bank word (bank 4 = 0x1000), not 0x4000.
+[[code_word]]
+stage = 6
+name = "obj_bank_word_slot"
+slot_table = 0x0282D4
+slot_stride = 2
+slot_mirror = true
+old_hex = "4000"
+new_hex = "4000"
 
 # Handler table sites: 0x845EC (lea 0x2083BC; next op tst — flags
 # dead) and 0x845F8 (lea 0x2087CA; next op move.l — sets flags before
@@ -857,14 +919,14 @@ stage = 6
 name = "select_companion_tbl_a"
 site = 0x0845EC
 old_hex = "207c002083bc"
-thunk_hex = "0c2e000f000a6708207c002083bc4e75207c000dda1e4e75"
+thunk_hex = "0c2e00TT000a6708207c002083bc4e75207c000dda1e4e75"
 
 [[site_thunk]]
 stage = 6
 name = "select_companion_tbl_b"
 site = 0x0845F8
 old_hex = "207c002087ca"
-thunk_hex = "0c2e000f000a6708207c002087ca4e75207c000dda1e4e75"
+thunk_hex = "0c2e00TT000a6708207c002087ca4e75207c000dda1e4e75"
 
 # Resolver call sites in the same handler: 0x84602 (state 1; next op
 # moveq — flags dead) and 0x84624 (state-2 re-resolve from the saved
@@ -885,14 +947,14 @@ stage = 6
 name = "select_companion_resolve_s1"
 site = 0x084602
 old_hex = "4eb900015084"
-thunk_hex = "0c2e000f000a67064ef900015084326e0030137c0008003c303c010b4ef900015088"
+thunk_hex = "0c2e00TT000a67064ef900015084326e0030137c0008003c303c010b4ef900015088"
 
 [[site_thunk]]
 stage = 6
 name = "select_companion_resolve_s2"
 site = 0x084624
 old_hex = "4eb900015084"
-thunk_hex = "0c2e000f000a67064ef900015084326e0030137c0008003c303c010b4ef900015088"
+thunk_hex = "0c2e00TT000a67064ef900015084326e0030137c0008003c303c010b4ef900015088"
 
 # 14z-26: HIT-CLASS PROPERTY TABLE EXTENSION (round-39 report: Change
 # Immortal 421P killing blow leaves the victim standing in neutral at
@@ -986,30 +1048,34 @@ dst_old_head = "0000"
 [[site_thunk]]
 stage = 6
 name = "accent_color_aware_0"
+row_subst = "qqqqqqqq=0x38C198"
 site = 0x02AD82
 old_hex = "207c0039a900"
-thunk_hex = "0c2e000f0382660c202e03a46726204070024e75306e00300c28000f038266147000102803aeef4820790038c1d4d0c070024e75207c0039a9004e75"
+thunk_hex = "0c2e00TT0382660c202e03a46726204070024e75306e00300c2800TT038266147000102803aeef482079qqqqqqqqd0c070024e75207c0039a9004e75"
 
 [[site_thunk]]
 stage = 6
 name = "accent_color_aware_1"
+row_subst = "qqqqqqqq=0x38C198"
 site = 0x02AD94
 old_hex = "207c0039a900"
-thunk_hex = "0c2e000f0382660c202e03a46726204070024e75306e00300c28000f038266147000102803aeef4820790038c1d4d0c070024e75207c0039a9004e75"
+thunk_hex = "0c2e00TT0382660c202e03a46726204070024e75306e00300c2800TT038266147000102803aeef482079qqqqqqqqd0c070024e75207c0039a9004e75"
 
 [[site_thunk]]
 stage = 6
 name = "accent_color_aware_2"
+row_subst = "qqqqqqqq=0x38C198"
 site = 0x02B342
 old_hex = "207c0039a900"
-thunk_hex = "0c2e000f0382660c202e03a46726204070024e75306e00300c28000f038266147000102803aeef4820790038c1d4d0c070024e75207c0039a9004e75"
+thunk_hex = "0c2e00TT0382660c202e03a46726204070024e75306e00300c2800TT038266147000102803aeef482079qqqqqqqqd0c070024e75207c0039a9004e75"
 
 [[site_thunk]]
 stage = 6
 name = "accent_color_aware_3"
+row_subst = "qqqqqqqq=0x38C198"
 site = 0x02B7E8
 old_hex = "207c0039a900"
-thunk_hex = "0c2e000f0382660c202e03a46726204070024e75306e00300c28000f038266147000102803aeef4820790038c1d4d0c070024e75207c0039a9004e75"
+thunk_hex = "0c2e00TT0382660c202e03a46726204070024e75306e00300c2800TT038266147000102803aeef482079qqqqqqqqd0c070024e75207c0039a9004e75"
 
 
 # 14z-42: LIGHTNING SWORD HIT-FREEZE (the mash/cadence divergence,
@@ -1045,14 +1111,14 @@ stage = 6
 name = "ls_freeze_vs2_victim"
 site = 0x023AD8
 old_hex = "1d7c0018005c"
-thunk_hex = "b8fc84006706b8fc880066160c2c000f0382660e1d7c000c005c1d7c000c01474e751d7c0018005c4e75"
+thunk_hex = "b8fc84006706b8fc880066160c2c00TT0382660e1d7c000c005c1d7c000c01474e751d7c0018005c4e75"
 
 [[site_thunk]]
 stage = 6
 name = "ls_freeze_vs2_attacker"
 site = 0x023ADE
 old_hex = "197c000b005c"
-thunk_hex = "b8fc84006706b8fc880066100c2c000f03826608197c0004005c4e75197c000b005c4e75"
+thunk_hex = "b8fc84006706b8fc880066100c2c00TT03826608197c0004005c4e75197c000b005c4e75"
 
 # 14z-43: ES CHANGE IMMORTAL class-0x51 port (round-51 upgrade: ES
 # base 8 vs native 9 + no mash extension = the 14z-35 interim's
@@ -1400,37 +1466,35 @@ note = "ES-variant deity record type 0x4E -> 0x06 (14z-44; vs2-alias-proven, the
 #     it no longer fits (watermark 0x3FFE10); in-place slot-content
 #     replacement is also the cleaner class. Provenance: VS2 (table
 #     region now mixed VSAV/VS2 — atlas updated).
+# 14z-62c: the four fixed-address rows (0x0F + its 0x1F mirror, x and y)
+# became two SLOT-FOLLOWING rows: entry = 0x5F200 + 4*tenant (+2 for y),
+# with the 0x1F mirror emitted only on base-half builds. Byte-identical at
+# slot 0x0F; at a variant id the host entries stay vanilla and the
+# tenant's own (aliased, legacy-unreachable) entry carries vs2's values.
 [[code_word]]
 stage = 6
-name = "win_pos_x_slot0f"
-addr = 0x05F23C
+name = "win_pos_x_slot"
+slot_table = 0x05F200
+slot_stride = 4
+slot_off = 0
+slot_mirror = true
 old_hex = "0070"
 new_hex = "00f0"
 
 [[code_word]]
 stage = 6
-name = "win_pos_y_slot0f"
-addr = 0x05F23E
-old_hex = "0080"
-new_hex = "0098"
-
-[[code_word]]
-stage = 6
-name = "win_pos_x_slot1f"
-addr = 0x05F27C
-old_hex = "0070"
-new_hex = "00f0"
-
-[[code_word]]
-stage = 6
-name = "win_pos_y_slot1f"
-addr = 0x05F27E
+name = "win_pos_y_slot"
+slot_table = 0x05F200
+slot_stride = 4
+slot_off = 2
+slot_mirror = true
 old_hex = "0080"
 new_hex = "0098"
 
 [[data_port]]
 stage = 6
 name = "win_pal_slot0f_c0"
+only_base_slot = true
 src = 0x3c365c
 len = 0xa0
 dst = 0x3ae060
@@ -1440,6 +1504,7 @@ dst_old_head = "02130326"
 [[data_port]]
 stage = 6
 name = "win_pal_slot0f_c1"
+only_base_slot = true
 src = 0x3c419c
 len = 0xa0
 dst = 0x3aeb00
@@ -1449,6 +1514,7 @@ dst_old_head = "02130704"
 [[data_port]]
 stage = 6
 name = "win_pal_slot0f_c2"
+only_base_slot = true
 src = 0x3c4cdc
 len = 0xa0
 dst = 0x3af5a0
@@ -1458,6 +1524,7 @@ dst_old_head = "02220333"
 [[data_port]]
 stage = 6
 name = "win_pal_slot0f_c3"
+only_base_slot = true
 src = 0x3c581c
 len = 0xa0
 dst = 0x3b0040
@@ -1467,6 +1534,7 @@ dst_old_head = "01110222"
 [[data_port]]
 stage = 6
 name = "win_pal_slot0f_c4"
+only_base_slot = true
 src = 0x3c635c
 len = 0xa0
 dst = 0x3b0ae0
@@ -1476,6 +1544,7 @@ dst_old_head = "01110313"
 [[data_port]]
 stage = 6
 name = "win_pal_slot0f_c5"
+only_base_slot = true
 src = 0x3c6e9c
 len = 0xa0
 dst = 0x3b1580
@@ -1485,6 +1554,7 @@ dst_old_head = "01110123"
 [[data_port]]
 stage = 6
 name = "win_pal_slot0f_c6"
+only_base_slot = true
 src = 0x3c79dc
 len = 0xa0
 dst = 0x3b2020
@@ -1494,6 +1564,7 @@ dst_old_head = "01110530"
 [[data_port]]
 stage = 6
 name = "win_pal_slot0f_c7"
+only_base_slot = true
 src = 0x3c851c
 len = 0xa0
 dst = 0x3b2ac0
@@ -1525,6 +1596,10 @@ note = "sworded deity hit 7/7: type 0x4E -> 0x06 (vs2 dispatch alias — class-8
 [[data_port]]
 stage = 6
 name = "med_pal_row14_a"
+# 14z-62c: the HOST cell's medallion palette row. Variant-id builds keep
+# it vanilla; the tenant's medallion colors ride its own wheel-cell attr
+# (known-imperfect until the palette work — the ratified interim).
+only_base_slot = true
 src = 0x3BAFDC
 len = 0x20
 dst = 0x3A3A80
@@ -1568,7 +1643,6 @@ hole = "wide_ext"   # 2MB free; hole_a is full and hole_b has 0x110 left
 src = 0x0CB01A
 entries = 44
 ptr_table = 0x0BF41A
-ptr_row = 0x0F
 ptr_old = 0x000B3220
 keep_ids = "0x110,0x111,0x112,0x119,0x152,0x202"
 # Un-stub the per-node sfx helper (vs2 0x005122 -> vsavj twin 0x004CE2, the
