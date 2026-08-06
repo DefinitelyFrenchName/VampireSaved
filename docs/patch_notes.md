@@ -1176,3 +1176,15 @@ piece's unlock, tap at $FFB898 over replay 36):
   from group C TODAY; only the portrait object's fixed init needs a
   tenant-gated thunk (hovered==TT -> 0x1000 else #$2000) before the
   select art can move off Jedah's bank-1 anchors.
+
+Addendum 14z-62e (the select-palette resolution at a variant id, MEASURED
+— read tap over the grid 0x3AC000+0x1600, replay 36): the uploader (PC
+0x1C3AE/0x1C3C2 family, dest palette RAM 0x90C360) reads grid row
+(variant*16 + id) with the id UNMASKED — per hover it read rows
+0x01/0x05/0x0A/0x09 and then, on cell 0x13, row 0x13 = 0x3AC260 =
+VICTOR's variant-1 slot (the overflow, not a fold). So the tenant's
+portrait colors are Victor-v1's by arithmetic. The fix is the ported twin
+of vs2's OWN mechanism (its uploader special-cases `cmpi #$13` at
+0x6B1A0): one tenant-gated site_thunk at the row computation + a
+data_port placing Donovan's 10 variant rows (vs2 0x3C117C+0xC6*0x20,
+0x140 bytes) in wide_ext. Queued behind the select-art decision.
