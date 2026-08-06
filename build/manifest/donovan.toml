@@ -1666,6 +1666,27 @@ site = 0x05F328
 old_hex = "207c002672aa"
 thunk_hex = "207c002672aa0c0000tu66083d7c300000184e754e75"
 
+# ── 14z-62k: SELECT-FIGURE SWORD palette at a variant id ────────────────────
+# Maintainer round 4: the pre-confirm select sword drew a flat grey ramp.
+# Measured (palette RAM dump at hover-0x13): the figure upload at
+# 0x5F9B4+ reads the SPRITE PALETTE TABLE row [hovered id] (unmasked —
+# the 62c poke already feeds it the tenant's block) but uploads ONE row
+# (pal base 0x15 / P2 0x18); the sword sprites ride pal base+2, whose
+# row held the init grey ramp (f111 f222 ...). At slot 0x0F the in-place
+# accent-slot overwrites masked this. The thunk displaces the dest lea
+# (PRG:0x5F9D0) and, on the tenant's hover, ALSO copies block+0x40 (the
+# color-correct steady accent row, per-color via the cached block+color
+# ptr at $40(a6)) into base+2's row with the copier's F000 alpha OR —
+# P1 -> 0x90C2E0, P2 -> 0x90C340 ($381(a4) selects). Registers saved;
+# flags dead (tst.b follows the site).
+[[site_thunk]]
+stage = 6
+name = "select_sword_pal_variant_id"
+only_variant_slot = true
+site = 0x05F9D0
+old_hex = "43f90090c2a0"
+thunk_hex = "43f90090c2a00c2e00tt000a666e2f082f09206e0040d0fc0040d2fc00404a2c03816704d2fc006020180080f000f00022c020180080f000f00022c020180080f000f00022c020180080f000f00022c020180080f000f00022c020180080f000f00022c020180080f000f00022c020180080f000f00022c0225f205f4e75"
+
 # ── 14z-62e: SELECT-PORTRAIT PALETTES at a variant id ──────────────────────
 # The uploader (PRG:0x5F136 family) computes grid row (variant*16 + id)
 # with the id UNMASKED, so id 0x13 reads Victor's variant-1 slot (measured:

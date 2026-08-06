@@ -1356,3 +1356,19 @@ fires there. At 0x13 the slots are correctly vanilla (62c gating), so
 the un-thunked path shows through as Jedah-grey. In-fight/post-confirm
 correct (the thunked paths). Fix queued with phase 3: tap the
 pre-confirm marcher's owner resolution, extend the 14z-31/47 fallback.
+
+Session 14z-62k (the select-sword palette — maintainer round 4's finding,
+fixed; scratch build 048521c2):
+- Measured end to end: the figure upload (0x5F9B4+) reads the sprite
+  palette table row [hovered id] UNMASKED (the 62c poke already feeds it
+  the tenant's block) but uploads ONE row — pal base 0x15/P2 0x18 — and
+  the sword sprites ride base+2, whose palette RAM held the INIT GREY
+  RAMP (f111 f222 f333 ... — the maintainer's "very dark flat grey",
+  measured verbatim in the RAM dump). At slot 0x0F the in-place accent
+  slots masked the gap.
+- Fix: select_sword_pal_variant_id thunk at the dest lea (0x5F9D0) —
+  tenant hover also copies block+0x40 (the color-correct steady accent
+  row, via the cached block+color ptr $40(a6)) into base+2's row with
+  the copier's F000 alpha OR; P1/P2 dests by $381(a4). Verified: row
+  0x17 = his accent row in palette RAM; sword renders colored; full
+  gate PASS incl. the acceptance window; stock ae701ffb.
