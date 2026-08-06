@@ -5601,6 +5601,48 @@ window per measured slot, never pre-widen.
 
 ## Decisions pending (human)
 
+- **HOW THE TENANT'S SELECT ART LEAVES JEDAH'S ANCHORS (14z-62e).** The
+  last visual-de-substitution piece: the tenant's select-art subset (101
+  bank-1 tiles + 4 placeholder label tiles + the 6-tile medallion) still
+  overwrites Jedah's bank-1 select-figure art, garbling his select-screen
+  BODY (face/name/match art are all back). Two measured options:
+
+  **A — a per-hover bank thunk + group C (recommended).** The select
+  FIGURE object's bank already follows the hovered char through the
+  engine table (measured: `PRG:0x05F9EC` jsr's the bank helper; hovering
+  the tenant writes 0x1000 and his standing figure draws from group C
+  TODAY). The PORTRAIT-record object instead gets bank 1 ONCE at venue
+  init (`PRG:0x07C428`). Option A thunks the per-hover record-pointer
+  consumers (`PRG:0x05F328`/`0x06C0E0`) to also set that object's bank:
+  hovered==tenant -> 0x1000, else -> 0x2000 (the value it already holds,
+  so pure-legacy RAM is byte-identical; after a tenant visit the restore
+  re-converges). Select art then lives in group C at native codes — NO
+  fit problem — and `vsav.zip` leaves the rompath ENTIRELY PRISTINE.
+  Cost: a new engine hook on the select path (cycle-only for legacy; the
+  ratified hook class, but the re-freeze's flicker/window inventory must
+  be re-measured with it in — the standing watch applies). The name/
+  highlight-piece objects' banks need the same treatment (their sites
+  are one measurement away, same method).
+
+  **B — relocate into blank bank-1 space, no hooks.** Vanilla bank 1 has
+  2,917 blank tiles (largest runs: 881 at 0xBE90-0xC200, 460 at 0x3634,
+  357 at 0x6C9C — measured). Placing the ~117 tiles there needs a NEW
+  greedy fit (block-geometry aware), a reference-exclusivity proof for
+  the chosen ranges (blank != unreferenced: a legacy record could use
+  blank tiles as transparent filler, and art there would APPEAR — the
+  proof method is the medallion's whole-image scan), and `vsav.zip`
+  stays patched-but-additive (nothing of Jedah's overwritten). Zero
+  engine hooks, zero legacy cycle cost.
+
+  **Recommendation: A.** It finishes the artifact story (pristine
+  vsav.zip — the strongest possible provenance), reuses the established
+  thunk pattern and the already-poked bank table, and avoids a new fit +
+  exclusivity-proof toolchain for a one-off. The hook's legacy cost is
+  cycles only, in the class the basis already tolerates; it will be
+  measured before the re-freeze ratifies anything. B stays the fallback
+  if the measured hook cost violates the standing watch.
+
+
 - ~~**RATIFY A COMPOSITE §4 CLASS? (14z-61)**~~ **RATIFIED 2026-08-06
   (maintainer: "Your proposal is ratified").** CLAUDE.md §4 amended: the
   `composite` class is the strict CONJUNCTION of flicker-tolerated and
