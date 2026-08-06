@@ -1,8 +1,15 @@
-# NEXT SESSION — orientation (written at the close of 14z-62d, 2026-08-06)
+# NEXT SESSION — orientation (written at the close of 14z-62f, 2026-08-06)
 
-**Start here: the M3a program side is DONE, and the GFX HALF'S CORE is
-LANDED — what remains is the bank-1 select-art move plus the re-freeze
-ritual.** The day's four arcs: select records composed at the variant id
+**Start here: the M3a program side is DONE — now including splash,
+win-quote and the select-portrait palettes — and the GFX HALF'S CORE is
+LANDED. What remains: the select-art decision (STATE, maintainer),
+then the re-freeze ritual.** Late arcs 62e/62f: splash + win-quote ride
+the same select-records mechanism (NINE composed records now; the VS
+screen measurably fetches the tenant's own splash), and the
+select-portrait palettes upload from the tenant's own placed rows via an
+uploader thunk that extends vsavj's OWN variant-id pattern (it already
+special-cases 0x12/0x18 in that window). Donovan's portrait renders in
+his own colors; all frozen window classes unchanged. The day's four arcs: select records composed at the variant id
 (62); P2-side measured, the name piece asymmetric (62b); the slot-row
 audit — every row-0x0F dependency follows the tenant or is gated off, and
 the de-substitution acceptance is measured (62c); and the band move (62d):
@@ -43,9 +50,11 @@ background run was interrupted:
    leaves the rompath entirely pristine. Locate the exact init site
    around 0x07C428 first (old-hex verify), and re-measure the P2-side
    twin objects.
-2. **The interims** (all enumerated, none load-bearing): HUD name plate
-   (folded 16-wide venue table — the 0x00A43E fold work), select-palette
-   grid / win-pal / splash mechanisms at a variant id (Victor-ish colors).
+2. **The interims** (shrunk by 62e/62f): HUD name plate (folded 16-wide
+   venue table — the 0x00A43E fold work) and the win-pal block at a
+   variant id (the (color*17+id)*0xA0 table — the sparse-block thunk
+   design in STATE 14z-62c). Splash, win-quote and select palettes are
+   DONE.
 3. **The M3a re-freeze ritual, one change**: apply the parked
    mirror-victim fix (donovan.toml, flat `fixes=` comment), declare
    `id_by_profile = "cps2-wide-v1=0x13"`, re-freeze the WIDE reference,
@@ -114,7 +123,7 @@ in the manifest and RE-FREEZE the WIDE reference in the same change —
 |---|---|---|---|
 | **WIDE** | `9bac6ee3` (`build/m5_wide`) | `vsavjw.zip` | frozen `donovan-m5w`, playtest-confirmed, suite GREEN |
 | **stock** | `ae701ffb` (`build/m5_stock`) | `vsavj.zip` | frozen compatibility artifact; rebuilds exactly |
-| scratch | `464eaf1f` (`build/m3a_selrec`) | `vsavjw.zip` | 14z-62d evidence build (tenant at 0x13 served from group C, host group B pristine); do not ship |
+| scratch | `39597268` (`build/m3a_selrec`) | `vsavjw.zip` | 14z-62d evidence build (tenant at 0x13 served from group C, host group B pristine); do not ship |
 | ~~WIDE~~ | `ac52eeff` (`build/m5w`) | — | KNOWN-BAD (the garble), kept as evidence. Do not run |
 
 ```sh
