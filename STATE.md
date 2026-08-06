@@ -83,6 +83,40 @@ reproducibility gate), then extractor de-Donovanization.)
   (de-Donovanize extraction — the 0x0013 immediate scan, per-char
   anchors, the H/P code-region scan failures).
 
+### 14z-65 Phase 1 DONE — extraction de-Donovanized; H AND P EXTRACT
+
+- **Both new tenants extract, oracle-validated** (0 UNRESOLVED, the
+  full closure/classification pass green). Frozen by NEW gate
+  tests/test_extract_hp.sh (shapes + unanchored-char refusal control).
+- The failures were STRUCTURE, not tuning (measured; atlas
+  character_tables.md "piecewise" section + GOTCHAS 14z-65):
+  - The appended window's sibling shift is PIECEWISE (+0x36 Huitzil
+    zone / +0x30 long middle incl. Pyron+Donovan / +0x34 tail). Fix:
+    group dispatch targets by their own pair delta (free ground truth),
+    one region per group ("code" = dispatch_00's group — Donovan
+    degenerates to the old behavior byte-identically).
+  - Dead inter-routine filler differs between the siblings (Pyron: 12
+    junk bytes at PRG:0x0576F4 after two jmps). Fix: flow-out-gated
+    filler tolerance recording "dead" zones, refs never classified
+    inside them.
+  - vs2 carries a 6-byte INSERTION with no vh2 twin: Huitzil's handler
+    head `jsr $8ACD8` (= the +0x36->+0x30 boundary). Fix: strict
+    boundary probe (opcode-word match + zero unexplained; the lax probe
+    misplaced the boundary by 6 bytes); the sliver ports as source-only
+    "ins" bytes, its jsr an ordinary R1 item. PURPOSE UNDECODED —
+    decode during the Huitzil port.
+  - charid scan + anchors de-hardcoded (CHAR_ANCHORS rows measured for
+    all three; extraction without an anchor row is refused).
+- Phase 2 hazard put on the record: H's +0x30 region overlaps P's and
+  D's zones (shared stubs) and carries a `cmpi #$10` site in the SHARED
+  stretch — region dedup must key by source span, and per-tenant id
+  rewrites on shared spans need tenant attribution.
+- Reproducibility gate PASS after every machinery edit (both frozen
+  fingerprints intact). Remaining Phase 1 item: the per-tenant R1 root
+  census (extra roots for H/P support zones + their handler types among
+  64-75/121-123) — that is build-out work, queued behind the Phase 2
+  generator loop.
+
 Updated: 2026-08-06 (session 14z-64 — M3a COMPLETE AND FROZEN. The
 maintainer ratified the re-freeze bundle ("freeze"): the WIDE reference
 is now donovan-m3a = 4b7d0dc7 (tenant at native 0x13 by default, Jedah

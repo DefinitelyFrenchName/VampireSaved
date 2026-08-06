@@ -1928,3 +1928,26 @@ Rules:
   cover vs2's row value; the 14z-52 measurement (per-node sfx path)
   is the real consumer. When a measured section contradicts a triage
   tag, the measured section owns the row.
+
+## A single-shift sibling scan dies at the newcomer window's hidden
+## structure — and junk filler decodes as pointers (14z-65)
+
+The vs2→vh2 shift over the appended newcomer code window is PIECEWISE
+(+0x36/+0x30/+0x34), routines are separated by junk filler differing in
+content AND length between the builds, and vs2 carries at least one
+6-byte insertion with no vh2 twin (Huitzil's handler-head `jsr $8ACD8`).
+Consequences that cost time:
+- `oracle_extend` with one shift stops at the first stretch boundary or
+  filler run — looking exactly like "misbounded region" when the region
+  is fine. Group dispatch targets by their OWN pair delta first (free
+  ground truth); only then scan.
+- Filler junk decodes as plausible pointer fields (bare-long masquerade
+  again) — never classify refs inside a tolerated filler run.
+- A lax "does this alignment explain the chunk" probe ACCEPTS wrong
+  alignments: allow_engine's envelope plus pcrel16 tolerance can explain
+  ~everything in a 0x40 window to within 2 bytes. A boundary probe must
+  also require the instruction-start opcode word to MATCH (measured: the
+  lax probe placed Huitzil's boundary 6 bytes early, swallowing the
+  insertion into the wrong region).
+Full mechanism + frozen shapes: docs/atlas/character_tables.md "The
+appended window's sibling shift is PIECEWISE".

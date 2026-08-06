@@ -70,8 +70,11 @@ def _classify(target, base, length):
     return "other"
 
 
-def scan(blob, base):
-    """Return candidate reference sites, most-confident label per offset."""
+def scan(blob, base, charid=0x13):
+    """Return candidate reference sites, most-confident label per offset.
+    charid: the source char's id — pass 3 matches ITS immediate word (was a
+    hardcoded 0x0013, so any non-Donovan tenant's id sites were silently
+    missed; 14z-65)."""
     n = len(blob)
     refs = {}
 
@@ -100,13 +103,13 @@ def scan(blob, base):
             refs[i] = {"off": i, "width": 32, "target": v, "how": "bare_long",
                        "class": _classify(v, base, n)}
 
-    # pass 3: char-id 0x13 immediates after cmpi.b/cmpi.w on any EA
+    # pass 3: char-id immediates after cmpi.b/cmpi.w on any EA
     out = sorted(refs.values(), key=lambda r: r["off"])
     for i in range(0, n - 3, 2):
         op = word(i)
         if (op & 0xFF00) == 0x0C00 and (op & 0x00C0) in (0x0000, 0x0040):
-            if word(i + 2) == 0x0013:
-                out.append({"off": i + 2, "width": 16, "target": 0x13,
+            if word(i + 2) == charid:
+                out.append({"off": i + 2, "width": 16, "target": charid,
                             "how": "charid_imm", "class": "charid"})
     return sorted(out, key=lambda r: r["off"])
 

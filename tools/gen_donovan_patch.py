@@ -796,12 +796,15 @@ def main():
                 span = ref["width"] // 8
                 blob[ref["off"]:ref["off"] + span] = newt.to_bytes(span, "big")
             # ported code carries the source game's char id in immediates —
-            # Donovan is 0x13 there, dst_slot here (scan-confirmed sites only)
+            # src_char there, dst_slot here (scan-confirmed sites only; the
+            # literal was 0x13 until 14z-65, silently missing any other
+            # tenant's sites)
+            src_id = _int(port["port"]["src_char"])
             for off in r.get("charid_sites", []):
-                if blob[off:off + 2] == b"\x00\x13":
+                if blob[off:off + 2] == bytes([0x00, src_id]):
                     blob[off:off + 2] = bytes([0x00, dst_slot])
-                    notes.append(f"# {name}+{off:#x}: char-id imm 0x13 -> "
-                                 f"{dst_slot:#x}")
+                    notes.append(f"# {name}+{off:#x}: char-id imm "
+                                 f"{src_id:#x} -> {dst_slot:#x}")
             # PC-relative escapes (word-table entries / direct d16) from
             # source-only regions: rewrite each displacement against actual
             # placement; unresolved targets -> a shared per-region tripwire

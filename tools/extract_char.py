@@ -58,9 +58,18 @@ SIM_THRESHOLD = 0.90
 ANIM_CAP = 0x30000
 CODE_CAP = 0x8000
 
-# hard anchors (docs/atlas/character_tables.md) — asserted when char=0x13
-DONOVAN_ANCHORS = {"dispatch_00": 0x05AE20, "hitbox_base": 0x0C8DF8,
-                   "anim_index_a": 0x27F548}
+# hard anchors (docs/atlas/character_tables.md; measured 14z-65) — asserted
+# per (src_set, char). An extraction for a char with NO anchor row hard-fails:
+# unanchored extraction is silent-drift territory (the DONOVAN_ANCHORS gap —
+# every other char used to run with no assertion at all).
+CHAR_ANCHORS = {
+    ("vsav2", 0x10): {"dispatch_00": 0x057450, "hitbox_base": 0x0C4370,
+                      "anim_index_a": 0x245872},
+    ("vsav2", 0x11): {"dispatch_00": 0x059424, "hitbox_base": 0x0C75FE,
+                      "anim_index_a": 0x264086},
+    ("vsav2", 0x13): {"dispatch_00": 0x05AE20, "hitbox_base": 0x0C8DF8,
+                      "anim_index_a": 0x27F548},
+}
 
 
 class SetImage:
@@ -237,13 +246,47 @@ def segmented_data_refs(a_img, b_img, a0, b0, length, sname, shifts):
     return refs, segments, dead
 
 
+FILLER_MAX = 0x20  # dead inter-routine debris never measured larger
+
+
+def _ends_flow_out(buf, pos):
+    """True when the bytes before pos end an unconditional flow-out — the
+    only place dead inter-routine filler can legally start. Checked in BOTH
+    images before tolerating a filler run (14z-65)."""
+    if pos >= 6 and buf[pos - 6:pos - 4] == b"\x4e\xf9":      # jmp abs.l
+        return True
+    if pos >= 4 and buf[pos - 4:pos - 2] == b"\x60\x00":      # bra.w
+        return True
+    if pos >= 2:
+        w = buf[pos - 2:pos]
+        if w in (b"\x4e\x75", b"\x4e\x73"):                   # rts / rte
+            return True
+        if w[0] == 0x60 and w[1] != 0x00:                     # bra.s
+            return True
+        if w[0] == 0x4e and 0xD0 <= w[1] <= 0xD7:             # jmp (An)
+            return True
+    return False
+
+
 def oracle_extend(a_img, a_start, b_img, b_start, cap, shifts, allow_engine,
-                  selfptr=None):
+                  selfptr=None, filler_dead=None):
     """Region length by oracle coverage: extend chunk-by-chunk while the diff
     classifier explains (almost) every differing byte — shared character
     data stays explainable under the known shifts even where pointer-dense
     (anim scripts); the two games' unrelated surroundings do not. Trims
-    trailing uniform padding."""
+    trailing uniform padding.
+
+    filler_dead (code regions only, 14z-65): pass a list to enable DEAD
+    INTER-ROUTINE FILLER tolerance. The sibling builds carry junk debris
+    between routines that differs in content (Pyron: 12 bytes at
+    PRG:0x0576F4 after two jmps, code resuming byte-identical) — each such
+    run aborted the scan. A failing chunk is tolerated ONLY when its
+    unexplained bytes form one short run (<= FILLER_MAX) that starts right
+    after an unconditional flow-out in BOTH images AND the chunk re-diffs
+    clean with the run masked (so a misalignment wall — the piecewise-shift
+    boundary — still stops the scan at the chunk floor, exactly as before:
+    the frozen Donovan extraction is bit-identical by construction). Runs
+    are appended to filler_dead as (start, end) region-relative offsets."""
     length = 0
     MARGIN = 8  # so pointer fields spanning a chunk edge classify correctly
     while length < cap:
@@ -257,7 +300,22 @@ def oracle_extend(a_img, a_start, b_img, b_start, cap, shifts, allow_engine,
         core = [i for i in unexplained
                 if (length - lo) <= i < (length - lo) + SIM_CHUNK]
         if len(core) > SIM_CHUNK // 50:  # >2% unexplained -> out of region
-            break
+            if filler_dead is None:
+                break
+            rs, re_ = core[0], core[-1] + 1
+            if (re_ - rs > FILLER_MAX
+                    or not _ends_flow_out(ca, rs)
+                    or not _ends_flow_out(cb, rs)):
+                break
+            cb2 = bytearray(cb)
+            cb2[rs:re_] = ca[rs:re_]  # mask the run; re-verify the rest
+            _, unex2 = diff_refs(ca, bytes(cb2), shifts, allow_engine,
+                                 selfptr)
+            core2 = [i for i in unex2
+                     if (length - lo) <= i < (length - lo) + SIM_CHUNK]
+            if len(core2) > SIM_CHUNK // 50:
+                break  # misalignment wall, not filler
+            filler_dead.append((lo + rs, lo + re_))
         length += SIM_CHUNK
     blob = a_img[a_start:a_start + length]
     while length > 0x10 and blob[length - 0x10:length] in (b"\xff" * 0x10, b"\x00" * 0x10):
@@ -320,11 +378,17 @@ def main():
                   + ", ".join(f"{k}={v:+#x}" for k, v in shifts.items()))
 
     # ── anchors ──────────────────────────────────────────────────────────────
-    if char == 0x13 and src_name == "vsav2":
-        for tname, want in DONOVAN_ANCHORS.items():
+    anchors = CHAR_ANCHORS.get((src_name, char))
+    if anchors is None:
+        fail.append(f"no anchor row for ({src_name}, {char:#x}) — measure "
+                    f"dispatch_00/hitbox_base/anim_index_a and add it to "
+                    f"CHAR_ANCHORS (unanchored extraction is not allowed)")
+    else:
+        for tname, want in anchors.items():
             got = src.u32(table_addr(tab[tname], origins, src_name) + char * 4)
             if got != want:
-                fail.append(f"ANCHOR {tname}[0x13] = {got:#x}, expected {want:#x}")
+                fail.append(f"ANCHOR {tname}[{char:#x}] = {got:#x}, "
+                            f"expected {want:#x}")
     if fail:
         for f in fail:
             print(f"FAIL: {f}")
@@ -371,6 +435,19 @@ def main():
     # code: span of in-window dispatch targets, similarity-extended (plaintext)
     # (every code_ptr dispatch table in the bank map — was a hardcoded
     # range(14) until dispatch_14 was resolved from gap_bd7fa, 2026-07-27)
+    #
+    # 14z-65: the appended window's sibling shift is PIECEWISE (measured
+    # +0x36 / +0x30 / +0x34 stretches — routines separated by junk filler
+    # whose LENGTH drifts between the builds), so a single-shift scan dies
+    # at the first stretch boundary (Huitzil) and a filler run aborts it
+    # outright (Pyron). Targets are grouped by their own dispatch-pair local
+    # shift (v_o - v_s: free per-target ground truth). The group containing
+    # dispatch_00 is THE "code" region — for a single-group char (Donovan)
+    # this degenerates to exactly the old behavior, byte-identical. Every
+    # other group becomes an extra-root-style region x<start> with its own
+    # shift name; cross-group refs then classify against those regions with
+    # the existing hosts machinery, and a manifest layout_group preserves
+    # their source-relative spacing at placement.
     disp = []
     for tn in sorted(n for n in tab if n.startswith("dispatch_")):
         v_s = src.u32(table_addr(tab[tn], origins, src_name) + char * 4)
@@ -382,19 +459,113 @@ def main():
                                     "orc_target": v_o, "delta": v_o - v_s})
     if not disp:
         fail.append("no dispatch targets in the newcomer code window")
-        cs_s = cs_o = clen = 0
+        regions["code"] = {"src": 0, "orc": 0, "len": 0, "grow": CODE_CAP,
+                           "kind": "code", "shift": "code"}
     else:
-        cs_s = min(v for _, v, _o in disp) & ~0xF
-        cs_o = cs_s + shifts["code"]
-        pt_s = src.plaintext(cs_s, min(cs_s + CODE_CAP, 0x100000))
-        pt_o = orc.plaintext(cs_o, min(cs_o + CODE_CAP, 0x100000))
-        clen = oracle_extend(pt_s, 0, pt_o, 0, CODE_CAP, shifts, True)
-        span_need = max(v for _, v, _o in disp) - cs_s
-        if clen <= span_need:
-            fail.append(f"code similarity scan ended at +{clen:#x}, before the "
-                        f"last dispatch target (+{span_need:#x})")
-    regions["code"] = {"src": cs_s, "orc": cs_o, "len": clen, "grow": CODE_CAP,
-                       "kind": "code", "shift": "code"}
+        groups = {}
+        for tn, v_s, v_o in disp:
+            groups.setdefault(v_o - v_s, []).append((tn, v_s))
+        spans = sorted((min(v for _, v in g), max(v for _, v in g), d)
+                       for d, g in groups.items())
+        for (s1, e1, d1), (s2, e2, d2) in zip(spans, spans[1:]):
+            if e1 >= s2:
+                fail.append(f"dispatch shift groups interleave: "
+                            f"[{s1:#x},{e1:#x}]{d1:+#x} vs "
+                            f"[{s2:#x},{e2:#x}]{d2:+#x} — window model wrong")
+        start_override = None
+        for idx, (gstart, gend, gdelta) in enumerate(spans):
+            is_primary = any(tn == "dispatch_00" for tn, _ in groups[gdelta])
+            if start_override is not None:
+                start = start_override
+                start_override = None
+            else:
+                start = (gstart & ~0xF) if is_primary else gstart
+            twin = start + gdelta
+            rname = "code" if is_primary else f"x{start:06x}"
+            shname = "code" if is_primary else rname
+            if not is_primary:
+                shifts[shname] = gdelta
+            nxt = spans[idx + 1] if idx + 1 < len(spans) else None
+            cap = min(CODE_CAP, nxt[0] - start) if nxt else CODE_CAP
+            dead = []
+            ins = []
+            pt_s = src.plaintext(start, min(start + cap + 0x300, 0x100000))
+            pt_o = orc.plaintext(twin, min(twin + cap + 0x300, 0x100000))
+            clen = oracle_extend(pt_s, 0, pt_o, 0, cap, shifts, True,
+                                 filler_dead=dead)
+            span_need = gend - start
+            if clen <= span_need or (nxt and clen < nxt[0] - start):
+                # The floor scan stopped short — find the true wall (first
+                # genuinely unexplained byte), then resolve what it is.
+                win = min(max(span_need, clen) + 0x300, len(pt_s), len(pt_o))
+                _, unex = diff_refs(pt_s[:win], pt_o[:win], shifts, True)
+                wall = next((u for u in unex if u >= clen
+                             and not any(a0 <= u < b0 for a0, b0 in dead)),
+                            None)
+                if wall is not None and nxt is not None:
+                    # SIBLING-INSERTION BOUNDARY (14z-65, measured on
+                    # Huitzil: vs2's handler head carries a 6-byte
+                    # jsr $8ACD8 its vh2 twin lacks — the +0x36 -> +0x30
+                    # transition). Walk forward from the wall probing the
+                    # NEXT group's delta; the first position that
+                    # classifies clean under it starts that group's
+                    # region, and the un-twinned sliver [wall, p) stays in
+                    # THIS region as source-only insertion bytes (their
+                    # refs ride the operand scanner / same-value merge).
+                    nd = nxt[2]
+                    p_found = None
+                    for p in range(wall & ~1, min(nxt[0] - start,
+                                                  wall + 0x100), 2):
+                        ob = orc.plaintext(start + p + nd,
+                                           start + p + nd + 0x48)
+                        # strict: p is an instruction START in both builds
+                        # (same opcode word) and every diff in the probe
+                        # window classifies — a lax probe accepted the wall
+                        # itself via spurious engine/pcrel decodes
+                        if pt_s[p:p + 2] != ob[:2]:
+                            continue
+                        _, u2 = diff_refs(pt_s[p:p + 0x40], ob[:0x40],
+                                          {**shifts, "_next": nd}, True)
+                        if not u2:
+                            p_found = p
+                            break
+                    if p_found is not None:
+                        ins.append((wall, p_found))
+                        report.append(
+                            f"  {rname}: sibling-insertion boundary at "
+                            f"+{wall:#x} — {p_found - wall} source-only "
+                            f"bytes, next group starts {start + p_found:#x} "
+                            f"(delta {nd:+#x})")
+                        clen = p_found
+                        start_override = start + p_found
+                elif wall is not None and wall > span_need:
+                    # wall-precise tail (no next group): take the region to
+                    # the true wall. Fires only when the floor result fails
+                    # coverage, so Donovan is byte-identical by construction.
+                    report.append(f"  {rname}: wall-precise tail "
+                                  f"+{clen:#x} -> +{wall & ~1:#x}")
+                    clen = wall & ~1
+            if clen <= span_need:
+                fail.append(f"{rname}: code similarity scan ended at "
+                            f"+{clen:#x}, before the group's last dispatch "
+                            f"target (+{span_need:#x})")
+            regions[rname] = {"src": start, "orc": twin, "len": clen,
+                              "grow": cap, "kind": "code", "shift": shname,
+                              "dead": dead, "ins": ins}
+            if dead:
+                report.append(f"  {rname}: {len(dead)} dead filler zone(s), "
+                              f"{sum(b0 - a0 for a0, b0 in dead):#x} bytes "
+                              f"({', '.join(f'+{a0:#x}' for a0, b0 in dead)})")
+            if not is_primary:
+                report.append(f"  code shift group {shname}: "
+                              f"{len(groups[gdelta])} dispatch targets, "
+                              f"local shift {gdelta:+#x}")
+        if "code" not in regions:
+            fail.append("dispatch_00's shift group missing — no primary "
+                        "code region (bank map / window model wrong)")
+            regions["code"] = {"src": 0, "orc": 0, "len": 0,
+                               "grow": CODE_CAP, "kind": "code",
+                               "shift": "code"}
 
     # extra code roots: absent-in-vsavj support routines. Spec per root:
     #   addr           twin by masked pattern search, oracle-bounded
@@ -444,7 +615,7 @@ def main():
             continue
         pat = src.plaintext(root, root + 0x40)
         mask = bytearray(b"\x01" * len(pat))
-        for ref in scan_code_refs.scan(pat, root):
+        for ref in scan_code_refs.scan(pat, root, charid=char):
             for i in range(ref["off"],
                            min(ref["off"] + ref["width"] // 8, len(mask))):
                 mask[i] = 0
@@ -527,6 +698,23 @@ def main():
                 sp = (r["shift"], r["src"], r["src"] + g,
                       r["orc"], r["orc"] + g)
             refs, unexplained = diff_refs(a, b, shifts, r["kind"] == "code", sp)
+            # dead filler zones (14z-65): junk debris between routines,
+            # identified at bounding time under the flow-out rule. Refs
+            # decoded from junk bytes are fake pointers (the bare-long
+            # masquerade class) and unexplained junk is not a flavor site.
+            dz = r.get("dead") or []
+            # insertion slivers (14z-65): source-only bytes with no oracle
+            # twin — diff-derived "refs" inside them are spurious decodes;
+            # their REAL refs come from the operand scanner + same-value
+            # merge. Their diff bytes stay out of the variant-site report
+            # too (they are already reported as insertions).
+            iz = r.get("ins") or []
+            if dz or iz:
+                refs = [ref for ref in refs
+                        if not any(a0 <= ref["off"] < b0
+                                   for a0, b0 in dz + iz)]
+                unexplained = [i for i in unexplained
+                               if not any(a0 <= i < b0 for a0, b0 in dz + iz)]
             fwd = [ref["target"] for ref in refs
                    if ref["shift"] == r["shift"]
                    and ref["target"] >= r["src"] + r["len"]
@@ -684,7 +872,7 @@ def main():
     # ── code triage scan (semantic labels + same-value refs + charid sites) ──
     for name, r in regions.items():
         if r["kind"] == "code" and r["len"] > 0 and name in blobs:
-            sc = scan_code_refs.scan(blobs[name], r["src"])
+            sc = scan_code_refs.scan(blobs[name], r["src"], charid=char)
             r["scan"] = sc
             r["charid_sites"] = [c["off"] for c in sc if c["class"] == "charid"]
             if not r.get("source_only") and not r.get("pre_classified"):
@@ -718,8 +906,8 @@ def main():
                                   f"coincident operands)")
             if r["charid_sites"]:
                 report.append(f"  {name}: {len(r['charid_sites'])} char-id "
-                              f"0x13 immediates (rewritten to the dst slot "
-                              f"at generation)")
+                              f"{char:#x} immediates (rewritten to the dst "
+                              f"slot at generation)")
             if r.get("source_only"):
                 # PC-relative escapes: brief-format word-table dispatches
                 # (jsr/jmp (d8,PC,Xn)) and direct (d16,PC) control flow whose
@@ -974,8 +1162,8 @@ def main():
         n_rom = sum(1 for cr in code_refs if cr["class"] == "rom")
         n_id = sum(1 for cr in code_refs if cr["class"] == "charid")
         report.append(f"  code scan: {len(code_refs)} candidates, {n_rom} "
-                      f"engine/ROM refs (R1 surface), {n_id} char-id 0x13 "
-                      f"immediates")
+                      f"engine/ROM refs (R1 surface), {n_id} char-id "
+                      f"{char:#x} immediates")
 
     # ── per-table walk: values, pointers, autos ──────────────────────────────
     for t in tables:

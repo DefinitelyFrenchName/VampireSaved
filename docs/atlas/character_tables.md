@@ -179,6 +179,44 @@ Veteran handlers sit in `PRG:0x02Fxxx-0x04Axxx`; the newcomers' code was
 appended at `PRG:0x057xxx-0x05Cxxx` (vsav2/vhunt2 differ by a small
 constant shift ≈0x30 — sibling builds).
 
+### The appended window's sibling shift is PIECEWISE (measured 14z-65)
+
+The vsav2→vhunt2 shift across `PRG:0x057000-0x05D000` is **not one
+constant**: exact-match profiling measures three stretches — **+0x36**
+(Huitzil's zone, to `0x057456`), **+0x30** (the long middle: Pyron's and
+Donovan's handlers plus the shared stubs, to ~`0x05C5xx`), **+0x34** (the
+tail from ~`0x05C7C0`). Every dispatch-table row carries its own `(vs2,
+vh2)` pair, so each target's LOCAL shift is free ground truth — the
+extractor groups targets by that delta (`tools/extract_char.py`,
+per-shift-group code regions).
+
+Two sibling-divergence classes live inside the window, both handled and
+gate-frozen (`tests/test_extract_hp.sh`):
+- **Dead inter-routine filler**: junk debris between routines differing
+  in CONTENT (Pyron: 12 bytes at `PRG:0x0576F4` after two `jmp`s, code
+  resuming byte-identical at `PRG:0x057700`) or in LENGTH (which is what
+  moves the shift between stretches). Content-junk runs are tolerated by
+  the flow-out-gated filler rule and recorded as region `dead` zones —
+  their bytes are ported verbatim but excluded from ref classification
+  (junk decodes as plausible pointers: the bare-long masquerade class).
+- **Sibling insertion**: vs2-only instructions with NO vhunt2 twin.
+  Measured case: **Huitzil's handler head carries a 6-byte
+  `jsr $8ACD8` that vhunt2 lacks** (`PRG:0x057450-0x057456` — it IS the
+  +0x36→+0x30 boundary). The sliver stays in the region as source-only
+  bytes (`ins` zones); its refs ride the operand scanner + same-value
+  merge, so `jsr $8ACD8`'s target is an ordinary R1 item. The jsr's
+  purpose is UNDECODED (candidate: his flavor/aux init — vs2-only) —
+  decode it during the Huitzil port (M3b Phase 4).
+
+Extraction shapes (frozen): Huitzil = `code` `0x057020+0x436` (+0x36,
+ins `+0x430..0x436`) + `x057456` `0x057456+0x5200` (+0x30, one dead
+zone); Pyron = `code` `0x0574C0+0x5200` (+0x30, dead zone `+0x234`).
+The +0x30 regions of H/P/D overlap each other's zones (shared stubs) —
+multi-tenant dedup must key regions by source span (M3b Phase 2), and
+note H's extraction found a `cmpi #$10` charid site INSIDE the shared
+stretch: per-tenant id rewrites on shared spans need tenant attribution
+when tenants coexist.
+
 ## Slot→character map, vsavj (COMPLETE; select-name/HUD verified picks)
 
 | Slot | Character | | Slot | Character |

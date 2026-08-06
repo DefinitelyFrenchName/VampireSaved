@@ -2,6 +2,36 @@
 
 Newest first.
 
+## 14z-65 (2) — M3b Phase 1: extraction de-Donovanized (2026-08-07)
+
+ZERO byte drift again (`test_m3a_reproducible.sh` PASS after every edit).
+Both new tenants now EXTRACT, oracle-validated (`tests/test_extract_hp.sh`
+freezes the shapes). Tool changes:
+
+- `tools/extract_char.py`: per-(src_set,char) `CHAR_ANCHORS` (measured
+  rows for 0x10/0x11/0x13; a char with NO row is refused — unanchored
+  extraction was a silent-drift hole); code-region bounding groups
+  dispatch targets by their own pair delta (piecewise window shifts,
+  see the atlas section); `oracle_extend` gains the flow-out-gated dead
+  filler rule (`filler_dead`, code regions only — a failing chunk is
+  tolerated ONLY as one short run after an unconditional flow-out in
+  both images that re-diffs clean when masked); sibling-insertion
+  boundary resolution (strict probe: matching opcode word + zero
+  unexplained) with `ins` zones excluded from diff-ref classification;
+  wall-precise tail for coverage-failing floor scans. Donovan's single
+  group degenerates to the old behavior byte-identically (proven by the
+  gate, not just argued).
+- `tools/scan_code_refs.py`: charid immediate scan parameterized on the
+  source char (was literal 0x0013 — any other tenant's id sites were
+  silently missed); `tools/gen_donovan_patch.py` rewrite side follows
+  `src_char`.
+
+Measured facts of record: Huitzil's vs2 handler head carries a 6-byte
+`jsr $8ACD8` ABSENT in vhunt2 (undecoded; decode at his port); Pyron's
+window is uniform +0x30 with one 12-byte junk-filler run at
+`PRG:0x0576F4`; H's +0x30 region contains a `cmpi #$10` charid site in
+the SHARED stretch (Phase 2 tenant-attribution hazard, atlas note).
+
 ## 14z-65 — M3b Phase 0: op-overlap assertion + tail_data_ptr ownership (2026-08-07)
 
 ZERO byte drift — both frozen references rebuild bit-exact

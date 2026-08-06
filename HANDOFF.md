@@ -412,6 +412,10 @@ tests/test_compare_composite.sh       # ground truth for the §4 v4 composite cl
                                       # windows, RATIFIED 2026-08-06): 7 synthetic
                                       # cases + a no-loophole check. No emulator.
                                       # donovan-m5w freezes 7 replays in this class
+tests/test_extract_hp.sh              # Huitzil/Pyron extraction gate (14z-65):
+                                      # frozen region shapes (piecewise shifts,
+                                      # dead filler, the H insertion sliver) +
+                                      # unanchored-char refusal control. ~2min
 tests/test_patch_overlap.sh           # ground truth for the patch_prg op-overlap
                                       # assertion (14z-65): two ops writing one word
                                       # is a NAMED build error; disjoint and
