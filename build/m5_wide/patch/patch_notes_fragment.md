@@ -209,7 +209,7 @@ data   0x0be88c +0x2  byte15b[0x13] value
 data   0x0bead4 +0x1e  byte2d_a[0x13] value
 data   0x0bee94 +0x1e  byte2d_b[0x13] value
 poke32 0x0bf2e6 <- 0x000bfcec  tail_code_ptr[0x13] donovan code
-poke32 0x0bf466 <- 0x003fcbf2  tail_data_ptr[0x13] donovan hitbox
+# tail_data_ptr: ptr row owned by sound_table don_sfx_records — generic repoint suppressed (14z-65)
 code   0x0cba90 ILLEGAL  TRIPWIRE for unresolved 0x672d0
 # obj_hook@0x54470 type 64: unresolved 0x672d0 -> tripwire 0xcba90
 code   0x0cbaa0 ILLEGAL  TRIPWIRE for unresolved 0x67550

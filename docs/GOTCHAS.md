@@ -1900,3 +1900,31 @@ Rules:
   flip hides where nobody samples.
 - A one-frame flicker in the frozen inventory marks a MARGINAL
   boundary; treat its frame as a tripwire when adding cycles anywhere.
+
+## Two generator sections silently owned one table row — last-write-wins
+## decided the shipped bytes (14z-65)
+
+`patch_prg.py` applied ops in order with NO overlap detection. The 14z-65
+audit of the frozen donovan-m3a patch found exactly one collision: the
+generic value-row repoint wrote `tail_data_ptr[0x13]` (PRG:0x0BF466) as a
+pointer into the relocated hitbox closure — vs2's RAW sfx records with
+music-range ids, relocated whole — and the measured `[[sound_table]]` port
+then wrote the same row with the id-allowlisted array. The build was
+CORRECT only because the sound op was emitted later. Any refactor that
+reordered emission would have aimed the sfx walker at unfiltered vs2
+records (the exact class test_don_sound.sh exists for), with every gate
+green until the sound gate ran.
+Rules:
+- Ops must have exactly one writer per word: `patch_prg.py` now hard-fails
+  on overlap, naming both ops (`tests/test_patch_overlap.sh`).
+- A manifest section that pokes a table row ITSELF must suppress the
+  generic repoint for that table (explicit ownership — the sound_table
+  claim in the generator), not rely on being emitted later.
+- Overlap granularity is the WORD, deliberately: odd-aligned byte pokes
+  merge PRISTINE neighbor bytes into their word, so a second op sharing
+  the word resurrects vanilla bytes over the first op's write.
+- A bank_map region tag is session-4 TRIAGE, not a consumer decode:
+  `tail_data_ptr`'s `region = "hitbox"` was a guess that happened to
+  cover vs2's row value; the 14z-52 measurement (per-node sfx path)
+  is the real consumer. When a measured section contradicts a triage
+  tag, the measured section owns the row.

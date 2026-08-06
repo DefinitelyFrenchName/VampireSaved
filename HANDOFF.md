@@ -412,6 +412,14 @@ tests/test_compare_composite.sh       # ground truth for the §4 v4 composite cl
                                       # windows, RATIFIED 2026-08-06): 7 synthetic
                                       # cases + a no-loophole check. No emulator.
                                       # donovan-m5w freezes 7 replays in this class
+tests/test_patch_overlap.sh           # ground truth for the patch_prg op-overlap
+                                      # assertion (14z-65): two ops writing one word
+                                      # is a NAMED build error; disjoint and
+                                      # word-adjacent ops stay clean. ~2s, no emulator
+tests/test_m3a_reproducible.sh        # M3b Phase 0 gate: the frozen reference pair
+                                      # (donovan-m3a 4b7d0dc7 / m5_stock 6c93cfa8)
+                                      # rebuilds bit-exact from the tree (scratch
+                                      # dirs). Run after EVERY M3b machinery commit
 tests/test_romset_identity.sh         # ground truth for tools/audit_romset_identity.py:
                                       # no member may carry the PRISTINE bytes of a member
                                       # the build patched (both emulators resolve a ROM

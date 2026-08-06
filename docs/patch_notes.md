@@ -2,6 +2,34 @@
 
 Newest first.
 
+## 14z-65 — M3b Phase 0: op-overlap assertion + tail_data_ptr ownership (2026-08-07)
+
+ZERO byte drift — both frozen references rebuild bit-exact
+(`tests/test_m3a_reproducible.sh`: WIDE 4b7d0dc7, stock 6c93cfa8). Two
+machinery changes and one emitted-patch change:
+
+- `tools/patch_prg.py`: ops now hard-fail when two write one word, naming
+  both ops and the clash address. Word granularity is deliberate — the
+  generator's odd-aligned byte pokes merge PRISTINE neighbor bytes, so a
+  shared word means the later op resurrects vanilla bytes over the
+  earlier write. Ground truth `tests/test_patch_overlap.sh` (2 accepts,
+  2 named rejects).
+- `tools/gen_donovan_patch.py`: explicit-ownership claims — a
+  `[[sound_table]]` row that WILL emit (same stage/profile gating as its
+  section) suppresses the generic value-row repoint for its `ptr_table`.
+  On WIDE builds both wrote PRG:0x0BF466 (`tail_data_ptr[0x13]`): the
+  generic pass pointed it into the relocated hitbox closure (vs2's raw
+  sfx records, music ids included), the sound section then overwrote it
+  with the id-allowlisted array at 0x400E60 — correct shipped bytes by
+  emission order alone (docs/GOTCHAS.md 14z-65). The WIDE patch now
+  emits 243 ops (was 244; the dropped poke32 was always overwritten).
+  Stock builds are untouched: sound_table is profile-gated off there, so
+  the generic repoint still serves rows 0x0F/0x1F.
+- `tests/test_m3a_reproducible.sh`: the M3b Phase 0 gate — the frozen
+  reference pair must rebuild bit-exact from the tree after every
+  machinery commit of the milestone (scratch builds; canonical dirs
+  untouched).
+
 ## donovan-m2 stage 5 — the last two music triggers: engine_data masquerade rows (2026-07-28, playtest round 2)
 
 Fingerprint a02aeeff… (supersedes eda50a18). Playtest: 214P/214K still

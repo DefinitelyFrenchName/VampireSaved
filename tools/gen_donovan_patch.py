@@ -1356,6 +1356,20 @@ def main():
         # addressing fix (rec8 pairs) stays — it is what protects
         # FELICIA's walk-back from the old mis-stride write.
         VALUE_SKIP = {"param32_a", "param32_b"}
+        # Explicit-ownership claims (14z-65): a [[sound_table]] row that WILL
+        # emit repoints its ptr_table row ITSELF (the measured, id-allowlisted
+        # port). The generic value-row repoint below must not also write that
+        # row: on WIDE builds both wrote tail_data_ptr[tenant] (0x0BF466) and
+        # the shipped bytes were correct only because the sound op was emitted
+        # later — silent last-write-wins, found by the 14z-65 overlap audit.
+        # Claims use the sound_table section's EXACT gating, so a stock build
+        # (sound_table skipped there) keeps the generic repoint unchanged.
+        claimed_ptr_tables = {
+            _int(st["ptr_table"]): f"sound_table {st['name']}"
+            for st in (port.get("sound_table", []) if args.stage >= 6 else [])
+            if args.stage >= _int(st.get("stage", 0))
+            and not (st.get("profile") and st["profile"] != args.profile)
+        }
         for v in man["values"]:
             if v["table"] in VALUE_SKIP:
                 notes.append(f"# {v['table']}: velocity pair NOT ported "
@@ -1364,6 +1378,11 @@ def main():
             t = bank[v["table"]]
             a, es = table_entry_addr(v["table"], dst_slot)
             if v["kind"] in ("data_ptr", "code_ptr"):
+                owner = claimed_ptr_tables.get(_int(t["vsavj"]))
+                if owner:
+                    notes.append(f"# {v['table']}: ptr row owned by {owner} "
+                                 f"— generic repoint suppressed (14z-65)")
+                    continue
                 ptr = _int(v["ptr"])
                 host = region_of(ptr)
                 if host is None:

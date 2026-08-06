@@ -416,11 +416,6 @@
    "val": "0x000bfcec"
   },
   {
-   "op": "poke32",
-   "addr": "0xbf466",
-   "val": "0x003fcbf2"
-  },
-  {
    "op": "code",
    "addr": "0xcba90",
    "hex": "4afc"

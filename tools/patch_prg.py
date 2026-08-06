@@ -82,22 +82,51 @@ def set_words(words, byte_addr, vals):
 
 def apply_ops(words, keybytes, ops, patchdir):
     cipher = cps.Cipher(keybytes)
-    for op in ops:
+    # OP-OVERLAP ASSERTION (14z-65, M3b Phase 0): two ops writing one word is
+    # always a generator bug — application order decides the bytes silently
+    # (found live: tail_data_ptr[tenant] vs the sound_table ptr row, both at
+    # 0x0BF466 on WIDE builds). Word granularity is deliberate: odd-aligned
+    # byte pokes are merged with PRISTINE neighbor bytes by the generator, so
+    # a second op sharing the word would resurrect vanilla bytes over the
+    # first op's write — a real corruption class, not a false positive.
+    writer = {}
+
+    def _desc(i):
+        o = ops[i]
+        d = f"op[{i}] {o['op']}@{o['addr']}"
+        if "path" in o:
+            d += f" ({o['path']})"
+        return d
+
+    def claim(i, byte_addr, nwords):
+        wi = byte_addr // 2
+        for w in range(wi, wi + nwords):
+            j = writer.get(w)
+            if j is not None:
+                raise SystemExit(
+                    f"OP OVERLAP at 0x{w*2:06X}: {_desc(j)} then {_desc(i)} — "
+                    f"two ops write the same word and the later silently "
+                    f"wins. Fix the generator (explicit ownership); do not "
+                    f"reorder ops.")
+            writer[w] = i
+
+    for i, op in enumerate(ops):
         kind, addr = op["op"], _int(op["addr"])
         if kind == "poke16":
-            set_words(words, addr, [_int(op["val"]) & 0xFFFF])
+            vals = [_int(op["val"]) & 0xFFFF]
         elif kind == "poke32":
             v = _int(op["val"]) & 0xFFFFFFFF
-            set_words(words, addr, [(v >> 16) & 0xFFFF, v & 0xFFFF])
+            vals = [(v >> 16) & 0xFFFF, v & 0xFFFF]
         elif kind in ("data", "data_file"):
             raw = bytes.fromhex(op["hex"]) if kind == "data" else (patchdir / op["path"]).read_bytes()
-            set_words(words, addr, _raw_words_be(raw))
+            vals = _raw_words_be(raw)
         elif kind in ("code", "code_file"):
             raw = bytes.fromhex(op["hex"]) if kind == "code" else (patchdir / op["path"]).read_bytes()
-            enc = cipher.crypt_words_at(_raw_words_be(raw), addr // 2, decrypt=False)
-            set_words(words, addr, enc)
+            vals = cipher.crypt_words_at(_raw_words_be(raw), addr // 2, decrypt=False)
         else:
             raise SystemExit(f"unknown op {kind}")
+        claim(i, addr, len(vals))
+        set_words(words, addr, vals)
 
 
 def main():

@@ -1,5 +1,88 @@
 # STATE — living progress log
 
+Updated: 2026-08-07 (session 14z-65 — M3b OPENED: multi-tenant machinery
++ Huitzil/Phobos 0x10 + Pyron 0x11. Recon complete (3-way sweep:
+generator internals, docs corpus, STATE history + two baseline
+extraction dry-runs); the plan is **docs/M3b_plan.md**. Design verdict:
+N [[tenant]] rows in ONE generator process (post-hoc patch merge proven
+unsound: pristine-ROM alloc check, silent op overlap, replacement-shaped
+hooks). Three decisions registered for the maintainer below. Work
+begins with Phase 0 safety rails (op-overlap assertion + m3a
+reproducibility gate), then extractor de-Donovanization.)
+
+## Session 14z-65 (M3b OPENED 2026-08-07 — plan + decisions register)
+
+- **Plan: docs/M3b_plan.md** (mission, 6 phases, gates, watch items).
+  Milestone deliverable: three tenants in one WIDE build; the
+  single-tenant degenerate case must reproduce donovan-m3a 4b7d0dc7
+  bit-exact at every intermediate commit.
+- Recon findings of record (details + citations in the plan):
+  - Baseline extraction FAILS for both new chars (measured): the
+    code-region similarity scan ends early (H: +0x400 vs dispatch
+    targets +0x46a; P: +0x200 vs +0x1fa2), and P's region seed lands at
+    0x0574C0 — in the H-adjacent appended zone, far from his 0x059424
+    handler. H/P code interleaves with the shared newcomer stubs
+    Donovan already ports → shared-span placement is load-bearing.
+  - Extractor is Donovan-tuned in 3 places: literal 0x0013 char-id
+    scan, DONOVAN_ANCHORS (no anchors for other chars), the scan above.
+  - Space: hole_a full, hole_b 272 B free — H/P go entirely to
+    wide_ext (2 MB, ~24 KiB used). Program space is a non-issue; group
+    C bank-4 tile-code coexistence is the undesigned mechanism
+    (Donovan ~16.7K codes of 64K; three tenants ~50K — packing looks
+    feasible, measure first), and QSound is the resource to size early
+    (16 MB profile ceiling = MAME's hard max).
+  - obj_hook's extended table is already union-shaped; types 64-75 +
+    companion 121-123 (vs2 addresses recorded in the m5_wide patch
+    notes fragment) resolve when H/P roots are extracted. state_hook's
+    5 no-op stubs (0xBC-0xC8) + reaction_hook widen by union at their
+    single sites.
+  - patch_prg.py has NO op-overlap detection — every collision class in
+    this milestone is currently silent. Phase 0 fixes this first.
+  - Huitzil has the VS2/VH2 Start-hold fork (community-confirmed;
+    Donovan wiring is the template); Pyron has none.
+  - "Selectable is not fightable": the arcade ladder + VS-pool palette
+    entries (0x3A3CA0 + id*32) support NO tenant yet, Donovan included.
+
+### Decisions pending (human) — M3b
+
+- **D1 — Huitzil default flavor (VS2 vs VH2).** The Start-hold selector
+  offers the other at match load either way. RECOMMENDATION: VS2
+  default (flavor_default=0x01), identical to the ratified Donovan
+  precedent (2026-07-27) and SPEC §3.
+- **D2 — Pyron source version** — only becomes a real decision if the
+  Phase 1 measurement shows vs2↔vh2 behavioral divergence in his code
+  (no Start-hold fork exists for him, so the shipped version is the
+  only version). RECOMMENDATION: VS2 base per SPEC §3 unless the
+  measured delta list shows VH2 fixed something.
+- **D3 — arcade-ladder membership**: do the tenants (Donovan included)
+  join the CPU opponent pool, and with what placement/weighting?
+  RECOMMENDATION: yes, uniformly, once the ladder mechanism is REd;
+  order/weighting stays yours. Work is plan Phase 6.
+
+### 14z-65 Phase 0 DONE — op-overlap assertion + reproducibility gate
+
+- The overlap audit of the frozen WIDE patch found ONE real collision:
+  the generic value-row repoint and the [[sound_table]] port both wrote
+  tail_data_ptr[0x13] (PRG:0x0BF466); the shipped bytes were correct by
+  emission order alone — the sound op (id-allowlisted array) was
+  emitted later and won over the raw relocated-hitbox pointer (which
+  carried vs2's unfiltered sfx records, music ids included). GOTCHAS
+  14z-65 has the full anatomy; patch_notes 14z-65 the byte detail.
+- Fixes: patch_prg.py hard-fails on any two ops writing one word
+  (named, word-granularity — deliberate: odd-aligned pokes merge
+  PRISTINE neighbor bytes, so a shared word resurrects vanilla bytes);
+  the generator's sound_table claims now suppress the generic repoint
+  for their ptr_table (exact same stage/profile gating, so stock
+  builds keep the repoint).
+- Gates: NEW tests/test_patch_overlap.sh (2 accepts, 2 named rejects)
+  and NEW tests/test_m3a_reproducible.sh (scratch-rebuild both frozen
+  references, compare fingerprints) — both PASS; canonical dirs
+  regenerated (WIDE 4b7d0dc7 @ 243 ops, was 244; stock 6c93cfa8
+  unchanged at 226).
+- ZERO byte drift by construction and by measurement. Next: Phase 1
+  (de-Donovanize extraction — the 0x0013 immediate scan, per-char
+  anchors, the H/P code-region scan failures).
+
 Updated: 2026-08-06 (session 14z-64 — M3a COMPLETE AND FROZEN. The
 maintainer ratified the re-freeze bundle ("freeze"): the WIDE reference
 is now donovan-m3a = 4b7d0dc7 (tenant at native 0x13 by default, Jedah
