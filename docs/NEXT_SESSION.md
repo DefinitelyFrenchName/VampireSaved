@@ -1,15 +1,15 @@
 # NEXT SESSION — orientation (written at the close of 14z-63, 2026-08-06)
 
-**Start here: PHASE 3 ITEMS 1, 2, 4 AND 5 ARE DONE — the wheel serves REAL
+**Start here: PHASE 3 ITEMS 1-5 ARE ALL DONE (the hover decision
+ratified round 7: RING REUSE, implemented) — the wheel serves REAL
 MEDALLION ART from group C bank 5 (vanilla cells measured
 pixel-identical), the ring/highlight POSITION SOURCE is fixed in place
 (the tenant's highlight draws AT his cell), the in-match HUD shows
 the tenant's OWN mugshot and name plate ("Donovan" under the bar,
 measured), and the 2P victory screen serves his OWN vs2 win palette
-(both thunk paths measured).** One maintainer decision is now unblocked and reframed
-(hover content — see below), then the palette-block colours, the
-accent audit, and the re-freeze bundle. Evidence build
-`build/m3a_wheel` = `f86fb1a0`. Read STATE.md `14z-63`, then
+(both thunk paths measured).** Remaining: the palette-block colours ($130(a5) fold), the accent
+audit, and the re-freeze bundle (maintainer sign-off). Evidence build
+`build/m3a_wheel` = `96a6e737`. Read STATE.md `14z-63`, then
 docs/patch_notes.md's 14z-63 sections for byte detail.
 
 ## What 14z-63 landed (do not re-derive)
@@ -42,18 +42,11 @@ docs/patch_notes.md's 14z-63 sections for byte detail.
 
 ## Work list (in order)
 
-1. **MAINTAINER DECISION — newcomer hover content (reframed)**:
-   (a) RING REUSE: point highlight rows 0x10/0x11/0x13 (P1 0x268A42/
-       0x268A46/0x268A4E, P2 +0x80) at row 0x0F's ring record
-       verbatim — zero new art, real ring behavior, Jedah's 3x2
-       outline. RECOMMENDED; per-cell authored rings can supersede.
-   (b) keep the bar-at-cell interim (current build).
-   (c) authored per-cell ring art now.
-   If (a): drop the highlight [[select_records]] composition (it
-   builds the wrong piece), update the tenant gate's highlight
-   expectations, and consider mirror rows 0x50/0x51/0x53 with the
-   parked mirror-victim fix (all three highlight blocks are 32-row
-   aliased tables — safe aliases today).
+1. ~~Hover content~~ **RATIFIED + DONE in 14z-63 (round 7): ring
+   reuse.** All three extended cells (P1+P2+mirror, 9 pokes) point at
+   the host's row-0x0F ring records verbatim; the highlight
+   [[select_records]] composition became art="host_ring"; checker
+   re-modeled. Per-cell authored rings can supersede later.
 2. ~~The folded venue family (HUD name/mugshot)~~ **DONE in 14z-63**
    (attribution corrected: unmasked consumers over 32-row-aliased
    tables, not the $130(a5) fold; gate tests/test_tenant_hud.sh). What

@@ -669,3 +669,25 @@ record; the vanilla-consistent option is a ring record (e.g. reuse row
 0x0F's record verbatim for the three 3x2 cells — the record encodes no
 cell identity, the base table does the placement), and the composed
 bar-at-cell is the shipped interim.
+
+## Ring reuse IMPLEMENTED (14z-63, maintainer-ratified round 7)
+
+The extended cells' hover highlight is the HOST's row-0x0F ring record,
+per half, verbatim — no bytes copied, the array rows simply point at it
+(records encode no cell identity; the extended 0x5FAE2 base rows place
+each draw on its cell):
+
+| half | array base | ref record (row 0x0F) |
+|---|---|---|
+| P1 | `0x268A02` | `0x2724A2` (fmt 2, 9 entries) |
+| P2 | `0x268A82` | `0x2726CE` (fmt 2, 9 entries) |
+| mirror | `0x268B02` | `0x2728E6` (fmt 2, 4 entries) |
+
+Nine pokes: rows 0x10/0x11/0x13 in all three halves (the tenant's P1/P2
+pair emitted by `[[select_records]] art="host_ring"`, the rest by the
+wheel section's `ring_rows`; each half's 32-row aliasing is verified
+before poking). The composed vs2 highlight record is DEAD — it was
+vs2's post-confirm name bar, the wrong piece for this slot. Frozen by
+`check_tenant_select.py`'s host_ring model (extended rows == ref, all
+other rows vanilla, mirror block included). Per-cell authored rings can
+supersede this by repointing the same rows at new records.

@@ -51,11 +51,19 @@ import select_port as sp    # noqa: E402  (PLACEMENTS is the single map)
 PIECES = [
     ("portrait",    0x26742A, 0x2A0762, ("p1", "p2"), "native"),
     ("name_banner", 0x2675AA, 0x2A08E2, ("p1", "p2"), "native"),
-    ("highlight",   0x268A02, 0x2A18FE, ("p1", "p2"), "placed"),
+    # host_ring (14z-63, maintainer-ratified): the vs2 record here is
+    # vs2's POST-CONFIRM NAME BAR (wrong piece for vsavj's hover-ring
+    # slot), so the extended cells' rows point at the HOST's row-0x0F
+    # ring records verbatim — P1/P2 for all extended cells (the wheel
+    # section covers the non-tenant cells) and the MIRROR block
+    # (+0x100) for all of them.
+    ("highlight",   0x268A02, 0x2A18FE, ("p1", "p2"), "host_ring"),
     ("splash_p1",   0x2672AA, 0x2A05E2, ("p1",), "native"),
     ("splash_p2",   0x26732A, 0x2A0662, ("p1",), "native"),
     ("win_quote",   0x2673AA, 0x2A06E2, ("p1",), "native"),
 ]
+HOST_RING_REF = 0x0F
+RING_SIBLINGS = (0x10, 0x11)   # the wheel's other extended cells
 WHEELPTR = 0x2689FE
 JEDAH_BLOCK = (0x271900, 0x274700)   # every record select_port ever surgered
 PAL_GRID, PAL_CHAR, PAL_VARS = 0x3AC000, 0x0F, 11
@@ -107,6 +115,25 @@ def main():
             print(f"FAIL: {msg}")
 
     for nm, p1, vs2p1, sides, art in PIECES:
+        if art == "host_ring":
+            ring_cells = sorted(set(RING_SIBLINGS) | {tid})
+            for off, half in ((0x00, "p1"), (0x80, "p2"), (0x100, "mirror")):
+                base = p1 + off
+                ref = u32(van, base + 4 * HOST_RING_REF)
+                for c in ring_cells:
+                    row = base + 4 * c
+                    dst = u32(img, row)
+                    chk(dst == ref,
+                        f"{nm}/{half} row {c:#04x} at {row:#x} holds "
+                        f"{dst:#x}, expected the host ring {ref:#x}")
+                    if c == tid and half != "mirror":
+                        print(f"ROW {nm} {half} {row:#x} -> {dst:#x}")
+                chk(all(img[base + 4 * i:base + 4 * i + 4]
+                        == van[base + 4 * i:base + 4 * i + 4]
+                        for i in range(32) if i not in ring_cells),
+                    f"{nm}/{half}: a row outside the extended cells "
+                    f"differs from vanilla")
+            continue
         for side in sides:
             base = p1 if side == "p1" else p1 + 0x80
             vbase = vs2p1 if side == "p1" else vs2p1 + 0x80

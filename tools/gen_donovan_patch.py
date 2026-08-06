@@ -2296,6 +2296,51 @@ def main():
                              f"precedent — its variant half is un-aliased "
                              f"for its newcomers)")
 
+            # ── ring_rows (14z-63, maintainer-ratified round 7): the
+            # extended cells' hover highlight = the host's ring_ref_cell
+            # ring records verbatim (records encode no cell identity; the
+            # extended base table above does the placement). P1+P2 rows
+            # for cells NOT owned by the tenant (the tenant's own rows
+            # ride [[select_records]] art="host_ring"), MIRROR rows
+            # (array +0x100) for ALL new cells.
+            if sw.get("ring_rows"):
+                hl = _int(sw["highlight_array"])
+                ref_c = _int(sw["ring_ref_cell"])
+                nring = 0
+                for off, halves in ((0x00, "p1"), (0x80, "p2"),
+                                    (0x100, "mirror")):
+                    lo = vj[hl + off:hl + off + 0x40]
+                    hi = vj[hl + off + 0x40:hl + off + 0x80]
+                    if lo != hi:
+                        fail.append(f"select_wheel {nm}: highlight "
+                                    f"{halves} half at {hl + off:#x} is "
+                                    f"not 32-row aliased")
+                        continue
+                    ref_rec = vj_u32(hl + off + 4 * ref_c)
+                    ref_fmt = int.from_bytes(vj[ref_rec:ref_rec + 2],
+                                             "big")
+                    if ref_fmt not in (0, 2):
+                        fail.append(f"select_wheel {nm}: {halves} ring "
+                                    f"ref {ref_rec:#x} fmt {ref_fmt:#x} "
+                                    f"not a record")
+                        continue
+                    for _c, spec in newcells:
+                        if halves != "mirror" and _c == dst_slot:
+                            continue   # the tenant's P1/P2 rows are
+                                       # select_records host_ring's
+                        row = hl + off + 4 * _c
+                        ops.append({"op": "poke32", "addr": f"{row:#x}",
+                                    "val": f"{ref_rec:#x}"})
+                        nring += 1
+                        notes.append(f"poke32 {row:#08x} <- {ref_rec:#x}"
+                                     f"  select_wheel {nm}: {halves} "
+                                     f"highlight row {_c:#04x} = host "
+                                     f"row {ref_c:#04x} ring (ring_rows)")
+                notes.append(f"# select_wheel {nm}: {nring} ring rows "
+                             f"poked (host row {ref_c:#04x} records "
+                             f"verbatim; P1/P2 for non-tenant cells + "
+                             f"mirror for all)")
+
             # ── bank5 (14z-63, phase 3): serve the WHOLE wheel from WIDE
             # group C bank 5 — real medallion art for the appended cells,
             # vanilla-cell pixels identical BY CONSTRUCTION (byte-copied
@@ -2451,7 +2496,13 @@ def main():
             # at 0x10000+code — no placement map, no placeholders. The
             # piece's drawer object must be bank-gated on the tenant
             # (the palette thunk does the portrait's).
+            # art = "host_ring" (14z-63, maintainer-ratified): the piece's
+            # vs2 record is the WRONG UI piece for this slot (vs2's
+            # post-confirm name bar vs vsavj's hover ring), so the
+            # tenant's rows point at the HOST's ring_ref_cell record
+            # VERBATIM — no composition, no allocation, no vs2 read.
             _native = sr.get("art") == "native_c5"
+            _host_ring = sr.get("art") == "host_ring"
             for side in ("p1", "p2"):
                 # single-sided pieces (14z-62e: splash P1/P2 and the win
                 # quote are each ONE array, not a +0x80 pair) declare only
@@ -2477,6 +2528,23 @@ def main():
                 if bad:
                     fail.append(f"select_records {nm}/{side}: vanilla anchors "
                                 "moved: " + "; ".join(bad))
+                    continue
+                if _host_ring:
+                    ref_c = _int(sr["ring_ref_cell"])
+                    ref_rec = vj_u32(vj_base + 4 * ref_c)
+                    ref_fmt = int.from_bytes(vj[ref_rec:ref_rec + 2], "big")
+                    if ref_fmt not in (0, 2):
+                        fail.append(f"select_records {nm}/{side}: ring ref "
+                                    f"row {ref_c:#04x} record {ref_rec:#x} "
+                                    f"fmt {ref_fmt:#x} not a record")
+                        continue
+                    ops.append({"op": "poke32", "addr": f"{vj_row:#x}",
+                                "val": f"{ref_rec:#x}"})
+                    notes.append(f"poke32 {vj_row:#08x} <- {ref_rec:#x}  "
+                                 f"select_records {nm}/{side} array row "
+                                 f"{dst_slot:#04x} = the HOST row "
+                                 f"{ref_c:#04x} ring record VERBATIM "
+                                 f"(host_ring; was {exp_alias:#x})")
                     continue
                 fmt, bud, cm1 = struct.unpack(">HHH", src_data[vsrc:vsrc + 6])
                 cnt = cm1 + 1

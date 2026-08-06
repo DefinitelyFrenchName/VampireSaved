@@ -1,6 +1,7 @@
 # STATE — living progress log
 
-Updated: 2026-08-06 (session 14z-63 — PHASE 3 ITEMS 1, 2, 4, 5 DONE + the
+Updated: 2026-08-06 (session 14z-63 — PHASE 3 ITEMS 1-5 ALL DONE (the
+hover decision RATIFIED round 7: ring reuse, implemented) + the
 round-6 medallion-palette fix
 (item 3 = the hover decision is the maintainer's, reframed below; item
 4 landed while awaiting playtest: the variant-id HUD — attribution
@@ -132,27 +133,40 @@ Maintainer round 6 also CONFIRMED: items 1/2/4 all good in playtest
 mirror-tenant safe with one Anita — verified native vs2 behavior),
 HUD name/mugshot good. Evidence build: `f86fb1a0`.
 
+**Maintainer round 7 (build f86fb1a0): ALL CLEAN.** Medallions in
+native vs2 palettes confirmed ("all good" — art question closed); 2P
+victory screens correct both directions (as-Donovan and against-
+Donovan); no regressions anywhere on the prior checklist. NOTE for the
+M5 sound session: the maintainer has now heard vs2 Donovan enough to
+EAR-IDENTIFY some of the missing sfx (the known 25-stubbed-rows
+interim) — playtest acceptance for M5 can lean on that.
+
+**Round 7 + the hover decision (phase 3 item 3) — RATIFIED AND
+IMPLEMENTED: RING REUSE.** Round 7 on f86fb1a0: all clean (medallion
+palettes "all good", 2P win screens both directions, no regressions;
+noted: the maintainer can now ear-identify some missing Donovan sfx —
+useful for M5 acceptance). The maintainer then ratified ring reuse:
+all three extended cells' hover highlight = the host's row-0x0F ring
+records verbatim (P1 0x2724A2 / P2 0x2726CE / mirror 0x2728E6).
+Implemented as [[select_records]] highlight art="host_ring" (the
+composed vs2 name-bar record dropped — 2 pokes) + wheel-section
+ring_rows (P1+P2 for cells 0x10/0x11 + mirror rows for all three; 9
+pokes total, zero new bytes). Checker re-modeled; all gates PASS;
+stock ae701ffb. The tenant hover now draws a real vanilla-class ring.
+Evidence build: `96a6e737`.
+
 **Semantic correction that reframes the hover decision**: the composed
 vs2 highlight record (b000 5x1, "his lit-label") is actually vs2's
 POST-CONFIRM NAME BAR — measured: vs2 never draws it at hover, only at
 the top corner after confirm; vs2's own hover highlight is a RING
 (pal-1e tiles measured around his cell), like vsavj's.
 
-**Decisions pending (maintainer)** — unchanged from 62k plus the
-REFRAMED hover content (phase 3 item 3), the position half now done:
-  (a) RING REUSE — point highlight rows 0x10/0x11/0x13 (P1+P2) at row
-      0x0F's ring record VERBATIM (records encode no cell identity;
-      the fixed base table does the placement). Zero new art, real
-      vanilla ring behavior/palette; the outline is Jedah's 3x2 shape
-      on all three cells. RECOMMENDED as the vanilla-consistent
-      option; per-cell AUTHORED rings can supersede it later.
-  (b) KEEP THE BAR (current interim) — the composed vs2 name bar now
-      draws centred on the cell (~8px right; exact centring = base_x
-      pos_x-64). Art is the unplaced b000 placeholder.
-  (c) Authored per-cell ring art now (most work).
-Also still pending: the medallion palettes ride the vanilla attr words
-(vs2 rows 0x13/0x11/0x05) — they read plausibly on the snapshot (Pyron
-flame-orange, Huitzil gold) but are a look-and-feel call.
+**Decisions pending (maintainer)** — the hover content (a: ring reuse)
+was RATIFIED round 7 and is implemented; the medallion palettes were
+fixed with vs2's real rows (round 6) and confirmed round 7. Remaining
+open decisions are unchanged from 62k (none new this session); the
+next maintainer action is the RE-FREEZE bundle sign-off (which now
+also ratifies the replay-11 composite class and the 889-2415 window).
 
 ## Sessions 14z-62j/62k (same day — OPTION A PHASES 1-2 LANDED and
 ## PLAYTEST-VALIDATED: the select family serves from group C bank 5;

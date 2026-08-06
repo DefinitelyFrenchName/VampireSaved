@@ -1872,6 +1872,15 @@ highlight_base_site = 0x5FAE2
 # precedent; rows 0x16/0x19/0x00 verified). The bank5 branch writes the
 # newcomers' vs2 medallion palette rows here (layout pal_row/pal_src).
 pal_block_a = 0x3A3800
+# ring_rows (14z-63, maintainer-ratified round 7): the extended cells'
+# hover highlight = the host's row-0x0F ring records verbatim. The wheel
+# section pokes P1+P2 rows for new cells NOT owned by the tenant (the
+# tenant's own rows ride [[select_records]] art="host_ring"), and the
+# MIRROR-block rows (0x268B02 + 4*cell) for ALL new cells (the mirror
+# element = cell+0x40; all three highlight blocks are 32-row aliased).
+ring_rows = true
+ring_ref_cell = 0x0F
+highlight_array = 0x268A02
 
 # ── SELECT RECORDS at a variant id (M3a select-records half, 14z-62) ─────────
 # The tenant's OWN select records: what the hovered cell displays. Emitted
@@ -1987,7 +1996,16 @@ expect_vj_alias_p1 = 0x273D3C
 stage = 6
 name = "highlight"
 hole = "wide_ext"
-allow_placeholder_tiles = true   # lit-label tiles B000/B129 unplaced until gfx half
+# art = host_ring (14z-63, MAINTAINER-RATIFIED round 7): the vs2 record
+# this piece would compose is vs2's POST-CONFIRM NAME BAR (measured —
+# vs2 never draws it at hover), while vsavj draws the array row at hover
+# as the CURSOR RING. So the tenant's rows point at the HOST's row-0x0F
+# ring records VERBATIM (records encode no cell identity; the extended
+# 0x5FAE2 base table does the placement): P1 0x2724A2, P2 0x2726CE. The
+# wheel section's ring_rows handles the sibling cells 0x10/0x11 and the
+# MIRROR block. Per-cell authored rings can supersede later.
+art = "host_ring"
+ring_ref_cell = 0x0F
 vj_p1 = 0x268A02
 vj_p2 = 0x268A82
 vs2_p1 = 0x2A18FE

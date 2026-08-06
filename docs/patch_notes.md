@@ -1551,3 +1551,30 @@ f86fb1a0):
   re-freeze bundle alongside the window bounds.
 - Gates: checker gained PALROWS (re-palmed entries + block A rows vs
   the vs2 image); all tenant gates PASS; stock reproduces ae701ffb.
+
+Session 14z-63 addendum 5 (round 7: ALL CLEAN + the hover decision
+RATIFIED and implemented — ring reuse; build 96a6e737):
+- Maintainer round 7 (f86fb1a0): medallion palettes confirmed ("all
+  good"), 2P victory screens correct both directions, no regressions.
+  Noted for M5: the maintainer can now ear-identify some of Donovan's
+  missing sfx (the known 25-stubbed-rows interim).
+- HOVER DECISION (phase 3 item 3) ratified: RING REUSE. All three
+  extended cells' hover highlight = the host's row-0x0F ring records
+  VERBATIM (records encode no cell identity; the 0x5FAE2 base rows do
+  the placement). Per-half refs: P1 0x2724A2, P2 0x2726CE, mirror
+  0x2728E6 (all fmt-2, read from the vanilla arrays, never copied).
+- Implementation: [[select_records]] highlight becomes art="host_ring"
+  (the composed vs2 record was vs2's post-confirm NAME BAR — the wrong
+  piece; composition dropped, 2 pokes instead), and the wheel section
+  gains ring_rows (P1+P2 rows for the non-tenant cells 0x10/0x11 +
+  MIRROR rows for all three; each half's 32-row aliasing verified
+  before poking). 9 poke32 total, zero new bytes placed.
+- check_tenant_select.py: highlight piece re-modeled (host_ring branch:
+  extended-cell rows == the per-half ref, all other rows vanilla,
+  mirror block included); the gate's runtime highlight sequence follows
+  the checker's ROW value automatically and PASSES — the engine
+  fetches 0x2724A2 on cell 0x13.
+- Snapshot: the tenant hover now draws a real vanilla-class cursor
+  ring around his medallion (Jedah's 3x2 outline — per-cell authored
+  rings can supersede later without rework). All tenant gates PASS;
+  stock reproduces ae701ffb.
