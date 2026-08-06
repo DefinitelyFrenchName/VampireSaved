@@ -2376,6 +2376,14 @@ def main():
             if args.stage < _int(st.get("stage", 0)):
                 continue
             nm = st["name"]
+            # only_variant_slot (14z-62e): a thunk that exists only for the
+            # de-substituted tenant (e.g. the select-palette redirect, whose
+            # block lives in profile-gated space). Skipped at base-half
+            # slots, where the in-place mechanisms serve.
+            if st.get("only_variant_slot") and dst_slot < 0x10:
+                notes.append(f"# site_thunk {nm}: SKIPPED (variant-id-only; "
+                             f"tenant is at {dst_slot:#04x})")
+                continue
             site = _int(st["site"])
             old = bytes.fromhex(st["old_hex"])
             if len(old) != 6:
@@ -2420,6 +2428,40 @@ def main():
                                 f"thunk_hex")
                 _hx = _hx.replace(
                     _ph, "%08x" % (_int(_tb.strip()) + 4 * _tid))
+            # data_subst (14z-62e): "placeholder=src:len:hole" — the thunk
+            # embeds the address of a SOURCE-SET data block; the generator
+            # reads it, places it via the space model, emits the data op,
+            # and substitutes the allocated address into the body.
+            for _kv in str(st.get("data_subst", "")).split(","):
+                if not _kv.strip():
+                    continue
+                _ph, _, _spec = _kv.partition("=")
+                _ph = _ph.strip().lower()
+                _srcs, _lens, _hole = _spec.strip().split(":")
+                _dsrc, _dlen = _int(_srcs), _int(_lens)
+                _sdat = (root / f"build/out/{man['src_set']}_data.bin"
+                         ).read_bytes()
+                _blob = _sdat[_dsrc:_dsrc + _dlen]
+                if len(_blob) != _dlen:
+                    fail.append(f"site_thunk {st['name']}: data_subst src "
+                                f"read short")
+                    continue
+                _da = alloc(_hole, _dlen,
+                            f"site_thunk {st['name']} data block")
+                if _da is None:
+                    continue
+                ops.append({"op": "data", "addr": f"{_da:#x}",
+                            "hex": _blob.hex()})
+                notes.append(f"data   {_da:#08x} +{_dlen:#x}  site_thunk "
+                             f"{st['name']} data block <- {man['src_set']} "
+                             f"{_dsrc:#08x}")
+                fragments.append((_da, _dlen, "VS2",
+                                  f"site_thunk {st['name']} data block"))
+                if _ph not in _hx:
+                    fail.append(f"site_thunk {st['name']}: data_subst "
+                                f"placeholder '{_ph}' not present in "
+                                f"thunk_hex")
+                _hx = _hx.replace(_ph, "%08x" % _da)
             for _fld in ("00ff8782", "00ff8b82"):
                 _i = 0
                 while True:

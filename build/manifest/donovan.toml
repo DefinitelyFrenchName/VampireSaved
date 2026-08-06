@@ -1616,6 +1616,28 @@ dst = 0x3A3A80
 dst_end = 0x3A3AA0
 dst_old_head = "0ffc0dc80b9609730cff0bcf0a9d097a"
 
+# ── 14z-62e: SELECT-PORTRAIT PALETTES at a variant id ──────────────────────
+# The uploader (PRG:0x5F136 family) computes grid row (variant*16 + id)
+# with the id UNMASKED, so id 0x13 reads Victor's variant-1 slot (measured:
+# grid tap, row 0x3AC260 on tenant hover). vsavj ITSELF already
+# special-cases two variant ids in this exact window — `cmpi.b #$12,d6 ->
+# +0xB6` (the Gallon select variant) and `#$18 -> +0xB0` (Oboro) — so the
+# tenant's redirect is Capcom's own pattern extended (vs2 ships the same
+# idea as `cmpi #$13` at its 0x6B1A0). The thunk displaces the 0x12
+# compare pair at 0x5F146: tenant id -> a0 = the PLACED Donovan block
+# (vs2's 10 variant rows, data_subst below), d0 = min(variant, 9), rejoin
+# at the shared row math 0x5F162; the 0x12 fall-through and the not-0x12
+# path (jmp 0x5F152) are reproduced byte-faithfully for everyone else.
+# Variant-id-only: at slot 0x0F the in-place grid surgery serves instead.
+[[site_thunk]]
+stage = 6
+name = "select_pal_variant_id"
+only_variant_slot = true
+site = 0x05F146
+old_hex = "0c0600126606"
+thunk_hex = "0c0600tt6616207cpppppppp0c40000963027009588f4ef90005f1620c06001266024e75588f4ef90005f152"
+data_subst = "pppppppp=0x3C2A3C:0x140:wide_ext"
+
 # ── 14z-52 M5: Donovan's per-char QSound record array ─────────────────────
 # The walker's per-node sfx path (ported dispatcher, built at ~0xCE3B8)
 # reads `lea 0xBF41A,a0; movea.l (a0,charid*4),a0; move.w (a0,idx*8),d1`

@@ -1208,3 +1208,22 @@ the select-family program side is COMPLETE; scratch build 45730d0f):
   match win; statics + alias anchors cover it until a 0x13 win replay.
 - Stock rebuilds ae701ffb exactly. Both emulator WIDE gates PASS against
   the sentinel descriptors (FBNeo earlier; MAME confirmed this session).
+
+Session 14z-62f (SELECT-PORTRAIT PALETTES at the variant id — the thunk
+is Capcom's own pattern extended; scratch build 39597268):
+- vsavj's uploader ALREADY special-cases two variant ids in the exact
+  window we hook: `cmpi.b #$12,d6 -> row +0xB6` (Gallon variant) and
+  `#$18 -> +0xB0` (Oboro) — dedicated row blocks past the 11x16 grid.
+  The thunk displaces the 0x12 compare pair at PRG:0x5F146: tenant id ->
+  a0 = the placed Donovan block (vs2 0x3C2A3C, 10 variant rows, 0x140B in
+  wide_ext via the new site_thunk `data_subst`), d0 = min(variant,9),
+  tail-rejoin at the shared row math 0x5F162; both original outcomes
+  (the ==0x12 fall-through and the jmp 0x5F152 path) reproduced
+  byte-faithfully. `only_variant_slot = true` — at slot 0x0F the thunk
+  does not exist and the frozen references rebuild exactly (verified,
+  ae701ffb).
+- MEASURED: Donovan's select portrait renders in HIS OWN COLORS at 0x13
+  (snapshot); replay 02's frozen window class is unchanged (890-1622,
+  3,898 identical after) and the full tenant gate passes including the
+  890-2362 acceptance window — the hook's cycle cost is invisible on the
+  masked basis for the measured corpus.
