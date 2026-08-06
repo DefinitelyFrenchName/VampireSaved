@@ -1616,6 +1616,24 @@ dst = 0x3A3A80
 dst_end = 0x3A3AA0
 dst_old_head = "0ffc0dc80b9609730cff0bcf0a9d097a"
 
+# ── 14z-62j phase 2: NAME-BANNER drawer bank gate ───────────────────────────
+# The name objects ($FFB900 P1-side, $FFBB00 P2-side — both run this code)
+# refetch their record pointer PER HOVER at PRG:0x5FCD6+: owner id -> d0,
+# `movea.l #$2675AA,a0; lea -4(a0,d0.w),a0; move.l a0,$1C(a6)`. Their bank
+# is written 0x2000 once at select entry (0x5FCC0). The thunk displaces
+# the movea and gates the bank on the OWNER's id via a4 (still live from
+# `movea.w $30(a6),a4` two instructions earlier — d0 is already id*4 at
+# this site, measured: the first body compared d0.b and never fired):
+# tenant -> 0x3000 (group C bank 5, where the name art now lives), else
+# the same-value 0x2000 restore. Flags dead after the site (lea follows).
+[[site_thunk]]
+stage = 6
+name = "name_bank_variant_id"
+only_variant_slot = true
+site = 0x05FCE0
+old_hex = "207c002675aa"
+thunk_hex = "207c002675aa0c2c00tt038266083d7c300000184e753d7c200000184e75"
+
 # ── 14z-62e: SELECT-PORTRAIT PALETTES at a variant id ──────────────────────
 # The uploader (PRG:0x5F136 family) computes grid row (variant*16 + id)
 # with the id UNMASKED, so id 0x13 reads Victor's variant-1 slot (measured:
@@ -1778,7 +1796,11 @@ expect_vj_alias_p2 = 0x271DEC   #   records the variant rows alias today
 stage = 6
 name = "name_banner"
 hole = "wide_ext"
-allow_placeholder_tiles = true   # P2 tag tiles B22C/B2A5 unplaced until gfx half
+# 14z-62j phase 2: native codes, art in group C bank 5 (includes the
+# previously-unplaceable P2 tag tiles B22C/B2A5 — the placeholder class
+# ends for this piece). Drawer bank gated by name_bank_variant_id below.
+art = "native_c5"
+allow_placeholder_tiles = false
 vj_p1 = 0x2675AA
 vj_p2 = 0x26762A
 vs2_p1 = 0x2A08E2
