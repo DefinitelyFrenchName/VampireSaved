@@ -165,17 +165,14 @@ PY
         fail=1
     fi
 
-    # 3b. medallion palette stability (14z-63 rounds 10-11). Row 0x00
-    # (DONOVAN — the one row proven stable against hovers, phases,
-    # fades) and row 0x19 (Pyron, 1P) must hold the vs2 palettes
-    # through BOTH stress protocols: the maximal select (timer-forced
-    # pick ~f3900, the venue-phase trigger) and the maintainer's
-    # mash-right repro (the per-hover figure-family trigger — hovering
-    # a 0xEF92EF96-class character rewrites rows {0x15,0x16,0x17}).
-    # Row 0x16 (Phobos, placeholder cell) is NOT asserted: it is OWNED
-    # by those writers — the parked known-cosmetic (STATE 14z-63; fix
-    # = the marcher's job-data origin, NEXT_SESSION item 0). When that
-    # lands, add row 0x16 to WANT with the Phobos source.
+    # 3b. medallion palette stability (14z-63 r10-11 / 14z-64). ALL
+    # THREE medallion rows must hold the vs2 palettes through BOTH
+    # stress protocols: the maximal select (timer/venue-phase trigger)
+    # and the maintainer's mash-right repro (per-hover trigger). The
+    # marchers' vestigial MID-ROW writes (rows 0x16/0x19 — referenced
+    # by nothing in vanilla) are redirected to the scratch row 0x02 at
+    # the three enumerated dest computations (0x2AD44/0x2B598/0x2B7D8
+    # — the add+lsl#5 idiom census; a fourth appearing = re-audit).
     run_stab() {  # run_stab <tag> <replay> <dumpspec> <frames>
         mkdir -p "$WORK/$1"
         DUMPS="$3" CHECKSUM_OUT="$WORK/$1/cks.log" FRAMES="$4" \
@@ -196,7 +193,8 @@ def alpha(b):
     return bytes(((b[i] | 0xF0) if i % 2 == 0 else b[i])
                  for i in range(len(b)))
 WANT = {0x00: alpha(vs2[0x3BAFDC:0x3BAFDC + 0x20]),   # Donovan
-        0x19: alpha(vs2[0x3BB15C:0x3BB15C + 0x20])}   # Pyron
+        0x19: alpha(vs2[0x3BB15C:0x3BB15C + 0x20]),   # Pyron
+        0x16: alpha(vs2[0x3BB19C:0x3BB19C + 0x20])}   # Phobos
 n = 0
 for d_dir in sys.argv[1:]:
     files = sorted(glob.glob(d_dir + "/dump_*.bin"))
@@ -210,9 +208,8 @@ for d_dir in sys.argv[1:]:
                                  f"{row:#04x} lost the vs2 palette "
                                  f"(head {got[:8].hex()})")
             n += 1
-print(f"  ok: Donovan (0x00) + Pyron (0x19) hold across both stress "
-      f"protocols ({n} samples); Phobos (0x16) = the parked "
-      f"known-cosmetic")
+print(f"  ok: all three medallion rows hold across both stress "
+      f"protocols ({n} samples) — the white-out is retired")
 PY
 fi
 

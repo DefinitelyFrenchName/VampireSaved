@@ -1,5 +1,19 @@
 # STATE — living progress log
 
+## Session 14z-64 (the white-out RETIRED; palette-block fold audit)
+
+**Item 0 DONE**: the medallion white-out is properly fixed — the
+marchers' vestigial mid-row writes (rows 0x16/0x19, referenced by
+nothing in vanilla) are redirected to the scratch row 0x02 at ALL
+THREE dest computations (0x2AD44/0x2B598/0x2B7D8 — complete by the
+add+lsl#5 idiom census; the third found by an execution trace
+triggered on the live clobber). All three medallions hold through
+both maintainer stress protocols (15/15 gate samples). Side effect:
+the 2836 fade-staging flicker vanished — replay 11 reverts to the
+plain §4 v3 bounded window 889-2415 (re-frozen; simplifies the
+re-freeze ratification). Detail: patch_notes 14z-64. Build 210d2b75.
+
+
 Updated: 2026-08-06 (session 14z-63 — PHASE 3 COMPLETE, ITEMS 1-6 (the
 hover decision RATIFIED round 7: ring reuse; the accent/march audit
 CLOSED: 4/4 family-base sites thunked, zero direct slot refs, venue

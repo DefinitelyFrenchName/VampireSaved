@@ -1881,15 +1881,14 @@ pal_block_a = 0x3A3800
 ring_rows = true
 ring_ref_cell = 0x0F
 highlight_array = 0x268A02
-# march_retarget: REMOVED after measurement (14z-63 round 10). The
-# white-out writer reaches the store tail through ~30 enumerated entry
-# points (many with precomputed dests, bypassing both thunked sites);
-# covering them all or thunking the hot tail (which also runs in-match)
-# is the wrong shape. The fix wants the marcher's JOB-DATA origin (the
-# venue row-list datum) — queued, with the full mechanism in STATE
-# 14z-63 round 10. Until then row 0x16 (Donovan's medallion) whites out
-# when a select sits ~15s+ (known cosmetic, select-scoped, resets on
-# screen re-entry).
+# march_retarget (14z-64): the family MID-ROW writes (rows 0x16/0x19 —
+# written per-hover and per-phase, referenced by NOTHING in vanilla:
+# vestigial) are redirected to the scratch row 0x02 at the shared dest
+# computation 0x2AD44 (d0 = $18B(a6) + d1 — covers every d1-carrying
+# and direct-computation entry; measured: the HOVER writer flows here
+# with a6=figure-object, d1=1). Entries that bypass this computation
+# (precomputed dests) are handled per-site as measured.
+march_retarget_mid = true
 
 # ── SELECT RECORDS at a variant id (M3a select-records half, 14z-62) ─────────
 # The tenant's OWN select records: what the hovered cell displays. Emitted

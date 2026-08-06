@@ -2484,114 +2484,61 @@ def main():
                     # rows invisible, work RAM untouched (d0 is the
                     # function's own scratch), cycles = the accepted
                     # accent-thunk class on the same call path.
-                    mr = ("march_retarget_from" in sw
-                          and "march_retarget_to" in sw)
+                    mr = sw.get("march_retarget_mid")
                     if mr:
-                        MR_SITE = 0x2AD44
-                        MR_OLD = "102e018bd001"  # move.b $18b(a6),d0; add.b d1,d0
+                        # two mid-row dest computations exist (of the four
+                        # `move.b $18b(a6),d0` sites): 0x2AD44 (+d1, the
+                        # d1-carry family) and 0x2B598 (+1, the per-hover
+                        # figure-family writer measured via d0=0xC0 at the
+                        # tail). Both are thunked with the same redirect.
+                        # ALL THREE dest computations in the uploader
+                        # region (enumerated by the add+lsl#5 idiom —
+                        # exactly three exist):
+                        MR_SITES = [
+                            (0x2AD44, "102e018bd001"),  # $18B + d1
+                            (0x2B598, "102e018b5200"),  # $18B + 1
+                            (0x2B7D8, "102e000fd001"),  # $F   + d1 (the
+                                                        # per-char hover
+                                                        # writer, jump
+                                                        # table 0x2B640)
+                        ]
                         opc7 = (root / "build/out/vsavj_opcodes.bin"
                                 ).read_bytes()
-                        if opc7[MR_SITE:MR_SITE + 6].hex() != MR_OLD:
-                            fail.append(f"select_wheel {nm}: march dest "
-                                        f"site {MR_SITE:#x} holds "
-                                        f"{opc7[MR_SITE:MR_SITE+6].hex()},"
-                                        f" expected {MR_OLD}")
-                        else:
-                            r_from = _int(sw["march_retarget_from"])
-                            r_to = _int(sw["march_retarget_to"])
+                        for MR_SITE, MR_OLD in MR_SITES:
+                            if opc7[MR_SITE:MR_SITE + 6].hex() != MR_OLD:
+                                fail.append(f"select_wheel {nm}: march "
+                                            f"dest site {MR_SITE:#x} holds"
+                                            f" {opc7[MR_SITE:MR_SITE+6].hex()}"
+                                            f", expected {MR_OLD}")
+                                continue
                             mbody = (
-                                "102e018b"           # move.b $18b(a6),d0
-                                "d001"               # add.b d1,d0
-                                f"0c00{r_from:04x}"  # cmpi.b #from,d0
-                                "6602"               # bne.b +2
-                                f"70{r_to:02x}"      # moveq #to,d0
-                                "4e75")              # rts
+                                MR_OLD       # the displaced load+add
+                                + "0c000016" # cmpi.b #$16,d0
+                                "6708"       # beq.b redirect
+                                "0c000019"   # cmpi.b #$19,d0
+                                "6702"       # beq.b redirect
+                                "4e75"       # rts
+                                "7002"       # redirect: moveq #2,d0
+                                "4e75")      # rts
                             mt = alloc("a", len(mbody) // 2,
-                                       f"select_wheel {nm} march retarget")
-                            if mt is not None:
-                                ops.append({"op": "code",
-                                            "addr": f"{mt:#x}",
-                                            "hex": mbody})
-                                ops.append({"op": "code",
-                                            "addr": f"{MR_SITE:#x}",
-                                            "hex": f"4eb9{mt:08x}"})
-                                notes.append(
-                                    f"code   {mt:#08x} +{len(mbody)//2:#x}"
-                                    f"  select_wheel {nm}: march dest "
-                                    f"retarget row {r_from:#04x} -> "
-                                    f"{r_to:#04x} (site {MR_SITE:#x} "
-                                    f"jsr-routed; select-only by "
-                                    f"measurement)")
-                                fragments.append(
-                                    (mt, len(mbody) // 2, "NEW",
-                                     f"select_wheel {nm} march retarget"))
-
-                        # the marcher ALSO enters the store tail
-                        # DIRECTLY: 0x2ADC2 = `bsr.b/bsr.b/bra.b $2AD50`
-                        # writes rows base+1/base+2/base+3 with a1
-                        # carried forward, bypassing the dest
-                        # computation (this is how row 0x16 was still
-                        # hit). Thunk the 6-byte call triplet: each call
-                        # goes through a helper that redirects a dest of
-                        # row `from` (a1 == page + from*0x20) to row
-                        # `to` for that ONE store, then restores a1
-                        # continuity — the source pointer (a0) advances
-                        # identically either way, so subsequent rows'
-                        # sources stay aligned.
-                        MR2_SITE = 0x2ADC2
-                        MR2_OLD = "618c618a6088"
-                        if opc7[MR2_SITE:MR2_SITE + 6].hex() != MR2_OLD:
-                            fail.append(f"select_wheel {nm}: march "
-                                        f"3-call site {MR2_SITE:#x} holds"
-                                        f" {opc7[MR2_SITE:MR2_SITE+6].hex()}"
-                                        f", expected {MR2_OLD}")
-                        else:
-                            d_from = 0x90C000 + _int(
-                                sw["march_retarget_from"]) * 0x20
-                            d_to = 0x90C000 + _int(
-                                sw["march_retarget_to"]) * 0x20
-                            d_next = d_from + 0x20
-                            # helper (offset computed after the 3 calls):
-                            #   cmpa.l #d_from,a1 / bne.b norm
-                            #   movea.l #d_to,a1 / jsr $2AD50 /
-                            #   movea.l #d_next,a1 / rts
-                            #   norm: jmp $2AD50
-                            helper = (
-                                f"b3fc{d_from:08x}"   # cmpa.l #from,a1
-                                "6614"                # bne.b norm (disp 0x14 -> the jmp)
-                                f"227c{d_to:08x}"     # movea.l #to,a1
-                                "4eb90002ad50"        # jsr store tail
-                                f"227c{d_next:08x}"   # movea.l #next,a1
-                                "4e75"                # rts
-                                "4ef90002ad50")       # norm: jmp store tail
-                            # thunk: 3 helper calls then return to the
-                            # OUTER caller (the original third call was
-                            # a tail bra — its rts unwound one level up)
-                            calls_len = 6 * 3 + 4  # 3x jsr.l + addq+rts
-                            m2 = alloc("a", calls_len + len(helper) // 2,
-                                       f"select_wheel {nm} march tail "
-                                       f"triplet")
-                            if m2 is not None:
-                                haddr = m2 + calls_len
-                                m2body = (f"4eb9{haddr:08x}" * 3
-                                          + "588f4e75" + helper)
-                                ops.append({"op": "code",
-                                            "addr": f"{m2:#x}",
-                                            "hex": m2body})
-                                ops.append({"op": "code",
-                                            "addr": f"{MR2_SITE:#x}",
-                                            "hex": f"4eb9{m2:08x}"})
-                                notes.append(
-                                    f"code   {m2:#08x} +{len(m2body)//2:#x}"
-                                    f"  select_wheel {nm}: march tail "
-                                    f"triplet ({MR2_SITE:#x} jsr-routed; "
-                                    f"dest {d_from:#x} redirected to "
-                                    f"{d_to:#x} per store, a0/a1 "
-                                    f"continuity preserved)")
-                                fragments.append(
-                                    (m2, len(m2body) // 2, "NEW",
-                                     f"select_wheel {nm} march tail "
-                                     f"triplet"))
+                                       f"select_wheel {nm} march mid-row "
+                                       f"retarget {MR_SITE:#x}")
+                            if mt is None:
+                                continue
+                            ops.append({"op": "code", "addr": f"{mt:#x}",
+                                        "hex": mbody})
+                            ops.append({"op": "code",
+                                        "addr": f"{MR_SITE:#x}",
+                                        "hex": f"4eb9{mt:08x}"})
+                            notes.append(
+                                f"code   {mt:#08x} +{len(mbody)//2:#x}"
+                                f"  select_wheel {nm}: march mid-row "
+                                f"retarget 0x16/0x19 -> 0x02 (dest "
+                                f"computation {MR_SITE:#x} jsr-routed)")
+                            fragments.append(
+                                (mt, len(mbody) // 2, "NEW",
+                                 f"select_wheel {nm} march mid-row "
+                                 f"retarget {MR_SITE:#x}"))
 
                     # DISABLED by default (pal_reassert flag): measured
                     # 14z-63 round 10 — even a check-then-copy version

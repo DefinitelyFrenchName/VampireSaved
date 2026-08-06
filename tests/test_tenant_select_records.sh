@@ -222,21 +222,19 @@ echo "== 4. de-substitution acceptance: picking the HOST re-converges =="
 # Replay 11 picks slot 0x0F. On slot-substituted builds that loads the
 # tenant and diverges from vanilla forever (class `diverge 890`). On a
 # variant-id build the host is HIMSELF again, so the same replay must
-# measure as a §4 v4 COMPOSITE (PENDING RATIFICATION in the re-freeze
-# bundle): one bounded window + one mechanism-attributed flicker frame,
-# each frozen. History: 14z-62c measured window 890-2362 ($FF06D1 menu
-# counter tail); 14z-63 wheel bank-5 moved it to 889-2415 (onset = the
-# drawer bank word $FFB818 <- #$3000 written by the select init one
+# measure as the §4 v3 BOUNDED WINDOW (PENDING RATIFICATION in the
+# re-freeze bundle). History: 14z-62c measured window 890-2362 ($FF06D1
+# menu counter tail); 14z-63 wheel bank-5 moved it to 889-2415 (onset =
+# the drawer bank word $FFB818 <- #$3000 written by the select init one
 # frame before the old record-pointer-cache onset; end = the VS-phase
-# re-init 0x5FD02 rewriting it); 14z-63 medallion palettes added ONE
-# transient frame at 2836 — 8 bytes at RAM:$FF406A-$FF4071, the
-# palette-FADE STAGING area (the same family as the ratified $FF4182
-# mask window, a different slot): the fade stages the three changed
-# block-A rows through it for exactly one frame at the screen
-# transition; byte-diff clean at 2835 and 2837, 884 identical frames
-# after, match untouched. This section is the reason the whole
-# slot-row audit exists — it caught the palette/sfx/fixture rows still
-# aimed at row 0x0F.
+# re-init 0x5FD02 rewriting it); 14z-63 medallion palettes transiently
+# added a fade-staging flicker at 2836 ($FF406A, one frame); 14z-64's
+# mid-row march retarget REMOVED it again (the marchers no longer write
+# rows 0x16/0x19 on select, so the transition fade never stages the
+# changed rows) — measured: the flicker inventory is EMPTY and the
+# window is unchanged, so the class reverts to the plain bounded
+# window. This section is the reason the whole slot-row audit exists —
+# it caught the palette/sfx/fixture rows still aimed at row 0x0F.
 if [ "${SKIP_RUNTIME:-0}" = 1 ]; then
     echo "  SKIPPED (SKIP_RUNTIME=1)"
 else
@@ -246,11 +244,11 @@ else
         "$WORK/11_legacy.log" > "$WORK/11_legacy.out" 2>&1 || {
         echo "  FAIL: replay 11 did not complete"; fail=1; }
     if [ -f "$WORK/11_legacy.log" ]; then
-        if python3 tools/compare_composite.py \
+        if python3 tools/compare_window.py \
                 tests/expected/vsavj/masked/logs/11_pick_donovan.log \
-                "$WORK/11_legacy.log" --windows 889-2415 --flicker 2836 \
+                "$WORK/11_legacy.log" --onset 889 --end 2415 \
                 > "$WORK/11_legacy.cmp" 2>&1; then
-            echo "  ok: host pick = composite (window 889-2415 + fade-staging flicker 2836)"
+            echo "  ok: host pick = bounded window 889-2415, fully re-convergent"
         else
             echo "  FAIL: the host pick does not re-converge as frozen:"
             sed 's/^/        /' "$WORK/11_legacy.cmp" | tail -5

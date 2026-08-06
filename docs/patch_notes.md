@@ -1658,3 +1658,33 @@ bd7772c9):
 - Gate 3b re-frozen: both stress protocols (maximal select + mash
   right), rows 0x00/0x19 asserted across all samples, row 0x16
   documented-unowned pending item 0. Stock reproduces ae701ffb.
+
+Session 14z-64 (item 0: the WHITE-OUT RETIRED — the mid-row march
+retarget, complete by census; build 210d2b75):
+- The final mechanism: the marchers write the figure-family MID ROWS
+  (0x16 P1 / 0x19 P2 — referenced by NOTHING in vanilla, pure
+  vestigial writes) through exactly THREE dest computations, found by
+  the add+lsl#5 idiom census over the uploader region:
+    0x2AD44  d0 = $18B(a6) + d1   (the d1-carry family)
+    0x2B598  d0 = $18B(a6) + 1    (the venue-phase writer)
+    0x2B7D8  d0 = $F(a6)   + d1   (the per-hover writer — per-char
+             jump table 0x2B640 keyed on $382(a4); found by an
+             execution trace triggered on the live clobber after two
+             static guesses missed: the tail's d0=0xC0 remnant proved
+             a sibling computation)
+  Each is a 6-byte site (load+add) jsr-routed to a thunk that
+  redirects d0==0x16/0x19 to the scratch row 0x02 (invisible on
+  select, like the mid rows themselves). No work-RAM state, pixels
+  unchanged on legacy (unreferenced rows either way), cycles on the
+  already-hooked march path only.
+- MEASURED: all three medallion rows hold the vs2 palettes through
+  BOTH stress protocols (maximal select + mash-right), 15/15 samples
+  in the gate; the Phobos interim is retired.
+- LEGACY BONUS: the fade-staging flicker at 2836 VANISHED (the
+  marchers no longer write the changed rows on select, so the
+  transition fade never stages them) — replay 11 reverts to the plain
+  §4 v3 bounded window 889-2415, re-frozen in the gate; one less
+  class for the re-freeze ratification.
+- Gates: wheel 3b asserts all three rows across both protocols (a
+  fourth census site appearing fails the build); full tenant sweep
+  PASS; stock reproduces ae701ffb.
