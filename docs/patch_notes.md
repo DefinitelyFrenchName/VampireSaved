@@ -1227,3 +1227,29 @@ is Capcom's own pattern extended; scratch build 39597268):
   3,898 identical after) and the full tenant gate passes including the
   890-2362 acceptance window — the hook's cycle cost is invisible on the
   masked basis for the measured corpus.
+
+Addendum 14z-62g (option A DECIDED; the select-screen object census
+completed — implementation spec, held for the maintainer's playtest):
+- The PORTRAIT-RECORD object is $FFB980 (P1): bank written 0x2000 once by
+  the shared venue init (PC 0x07C428, frame 468) and again at select
+  entry proper by PC 0x05F0C2 (`move.w #$2000,$18(a6)`, exactly 6 bytes)
+  — never per hover, which is why its art must sit in bank 1 today.
+- THE KEY SIMPLIFICATION: the landed select_pal_variant_id thunk already
+  runs INSIDE this object's per-hover routine (0x5F106+: owner link ->
+  d6 = hovered id -> record fetch bsr 0x5F326 -> palette upload) with
+  a6 = the portrait object. The bank gate is an EXTENSION of that thunk
+  (tenant -> also $18(a6)=0x1000; else -> 0x2000 restore), not a new
+  site. P2's twin object runs the same routine — covered a6-relatively.
+- Remaining census for the full option-A build-out: the name-banner and
+  label drawer objects' banks (same tap method), the SPLASH-screen and
+  WIN-screen drawer objects (each screen has its own bank context), then:
+  select/splash/quote art into group C at VS2-NATIVE codes (the
+  composed records drop the PLACEMENTS remap entirely — the placeholder
+  class vanishes), drop the group-A placements, drop vsav.zip from the
+  rompath (fully pristine parent).
+- NUANCE, flagged for the maintainer at implementation: the WHEEL
+  MEDALLIONS cannot ride group C — the wheel record is one object (one
+  bank) whose 16 vanilla entries are bank-1 art, so per-entry banks are
+  impossible. The three newcomer medallions need bank-1 homes from the
+  measured blank pool (a mini option-B for ~18 tiles) or stay
+  placeholders until then.
