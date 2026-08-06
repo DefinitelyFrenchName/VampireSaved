@@ -25,15 +25,24 @@ background run was interrupted:
 
 ## Next, in order
 
-1. **The select-art move (the last gfx piece).** The tenant's select-art
-   subset (101 bank-1 pairs) still occupies Jedah's bank-1 hover-figure
-   anchors, so the host's select BODY figure garbles (face, name, match
-   art all back). MEASURE FIRST: the select-venue objects' bank fields —
-   what writes their `+0x18`, and can a select record draw from bank 4?
-   If yes: move the subset + the four placeholder label tiles
-   (0xB22C/0xB2A5/0xB000/0xB129) + the medallion art into group C and
-   drop the group-A placements entirely — vsav.zip leaves the rompath
-   pristine. If no: an engine-hook decision for the maintainer.
+1. **The select-art move (the last gfx piece) — MEASURED, ready to
+   build.** Two P1-side select objects (tap at `$FFB898`, replay 36):
+   - the FIGURE object's bank FOLLOWS THE HOVER already — `PRG:0x05F9EC`
+     does `jsr 0x282C8` (the engine bank helper, unmasked id) and stores
+     d0 to `+0x18`; hovering the tenant writes 0x1000 (the poked row),
+     which is why Donovan's standing figure ALREADY renders from group C.
+   - the PORTRAIT-RECORD object gets a FIXED bank once at venue init
+     (writer `PRG:0x07C428`, value 0x2000 = bank 1) — that is why the
+     composed records' art must sit in bank-1 anchors today.
+   The fix: ONE tenant-gated site_thunk at the portrait object's bank
+   init (hovered id == TT -> 0x1000, else the byte-equivalent #$2000 —
+   legacy portraits keep bank 1, where ALL their art lives). Then move
+   the select subset + the four placeholder label tiles
+   (0xB22C/0xB2A5/0xB000/0xB129) + the medallion art into group C at
+   their vs2-native codes, drop the group-A placements, and vsav.zip
+   leaves the rompath entirely pristine. Locate the exact init site
+   around 0x07C428 first (old-hex verify), and re-measure the P2-side
+   twin objects.
 2. **The interims** (all enumerated, none load-bearing): HUD name plate
    (folded 16-wide venue table — the 0x00A43E fold work), select-palette
    grid / win-pal / splash mechanisms at a variant id (Victor-ish colors).

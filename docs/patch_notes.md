@@ -1164,3 +1164,15 @@ serves from WIDE group C; the host's group B is PRISTINE. Scratch build
   all match art are back). Moving select art to group C needs the
   select-OBJECT bank mechanism measured first (can a select record draw
   from bank 4?) — queued. HUD-plate/palette interims unchanged.
+
+Addendum 14z-62d (the select-object bank MEASUREMENT — the last gfx
+piece's unlock, tap at $FFB898 over replay 36):
+- venue init frame 468: PC 0x07C428 writes 0x2000 (fixed, bank 1) — the
+  PORTRAIT-RECORD object; per-hover frames 889/999/1039/1079/1119: PC
+  0x05F9F2 (the `jsr 0x282C8; move.w d0,$18(a6)` at 0x05F9EC) writes the
+  HOVERED char's engine-table bank word — 0x6000/0x0000/0x4000/0x6000
+  then 0x1000 on cell 0x13, i.e. the obj_bank_word_slot poke already
+  feeds the select venue. The figure object therefore draws the tenant
+  from group C TODAY; only the portrait object's fixed init needs a
+  tenant-gated thunk (hovered==TT -> 0x1000 else #$2000) before the
+  select art can move off Jedah's bank-1 anchors.
