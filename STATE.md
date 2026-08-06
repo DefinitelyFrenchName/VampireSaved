@@ -206,6 +206,13 @@ on the maintainer's own protocol (permanent replay
 64_select_mashright): Donovan/Pyron hold every sample. Gate 3b runs
 BOTH stress protocols. Evidence build `bd7772c9`.
 
+**Round 12 (build bd7772c9): the row-swap interim CONFIRMED — Donovan
+always stable under the mash-right protocol; the white-out/shimmer
+moved to Phobos's placeholder cell exactly as designed.** The select
+wheel's shipped state: Donovan fully correct on every measured and
+playtested surface; the one open cosmetic lives on a placeholder cell
+and is item 0 of the next session (the marcher job-data fix).
+
 **Semantic correction that reframes the hover decision**: the composed
 vs2 highlight record (b000 5x1, "his lit-label") is actually vs2's
 POST-CONFIRM NAME BAR — measured: vs2 never draws it at hover, only at

@@ -1,4 +1,5 @@
-# NEXT SESSION — orientation (written at the close of 14z-63, 2026-08-06)
+# NEXT SESSION — orientation (written at the close of 14z-63, 2026-08-06;
+# twelve maintainer rounds, all findings closed or parked-with-mechanism)
 
 **Start here: PHASE 3 IS COMPLETE (all six items; rounds 7-8 all
 clean; the accent census gate freezes the audit) — the wheel serves REAL
