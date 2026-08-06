@@ -1,0 +1,20 @@
+# 37: 2P join, then P2 walks its cursor onto the APPENDED wheel cell 0x13
+# and picks it — the P2 twin of replay 36 (P1 stays on its default and takes
+# Demitri). P2 path from its default 0x05: L -> 0x0A, D -> 0x09, D -> 0x13
+# via the 14z-60s extension's inbound edge.
+# Authoring follows 16_xemu_2p's transition-safety rules: menu presses well
+# clear of screen transitions, 3-frame cursor taps on a stable screen.
+# BUILD-ONLY replay: meaningful only on a build carrying the extended wheel
+# AND a tenant at id 0x13 (tests/test_tenant_select_records.sh, P2 section).
+300-305 sys=C1
+420-425 sys=C2
+800-803 sys=S1
+940-943 sys=S2
+# both on select screen, stable
+1100-1102 p2=L
+1140-1142 p2=D
+1180-1182 p2=D
+# hover, then both confirm; speed menus time out; 2P match runs
+1400-1402 p1=1
+1460-1462 p2=1
+4200 wait

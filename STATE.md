@@ -121,9 +121,19 @@ is one of the unmeasured mechanisms below.)
   Mechanisms unmeasured; vs2 special-cases some of them (its palette
   uploader has a literal `cmpi #$13` redirect at `0x6B1A0`). Measure the
   vsavj consumers before porting.
-- **P2-side runtime measurement**: the gate's runtime section drives the
-  P1 cursor; P2 rows/records are verified statically. A 2P replay onto
-  cell 0x13 would close that (the mechanism is identical).
+- ~~**P2-side runtime measurement**~~ **DONE same session (14z-62b).**
+  Replay `37_p2_pick_tenant.rpl` (P2 joins, walks L,D,D onto 0x13); the
+  gate gained three P2 runtime sections. Measured: the portrait and
+  highlight `+0x80` arrays are LIVE (P2 fetches its default row 0x05,
+  then 0x0A, 0x09, then the TENANT's P2 records). **The name piece is
+  asymmetric**: both players' name banners read the P1 ARRAY (each by its
+  own cell — P2 landing on 0x13 fetches the tenant's P1 name record), and
+  the `+0x80` name structure has NO consumer on any measured path (zero
+  reads through 3,800 frames incl. VS splash and match start). This
+  CORRECTS the 14z-61 "all three pieces share the model" reading for the
+  name piece; atlas updated. The composed `+0x80` name row is kept (zero
+  risk, covers unmeasured paths) and the gate asserts the measured
+  negative so a consumer appearing is loud.
 - The four placeholder tile blocks render as wrong pixels until the gfx
   half (documented, ratified policy).
 

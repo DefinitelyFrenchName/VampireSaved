@@ -122,9 +122,9 @@ else
         '$1=="ROW" && $2==p && $3==s {print $NF}' "$WORK/static.txt" \
         | sed 's/0x/00/'; }
     WHEEL="$(awk '$1=="WHEELPTR"{print $2}' "$WORK/static.txt" | sed 's/0x/00/')"
-    runtime() {  # runtime <tag> <watch> <expected sequence> [filter]
-        WATCH="$2" TRACE_OUT="$WORK/$1.txt" FRAMES=1400 \
-        REPLAY="$REPO/tests/replays/36_pick_tenant_cell.rpl" \
+    runtime() {  # runtime <tag> <replay> <watch> <expected sequence> [filter]
+        WATCH="$3" TRACE_OUT="$WORK/$1.txt" FRAMES=1400 \
+        REPLAY="$REPO/tests/replays/$2" \
         MAME_SANDBOX="$WORK/sbx_$1" MAME_BIN="$WIDE_BIN" \
         MAME_ROMPATH="$OUTBASE/rompath;$ROMDIR" \
             tools/run_mame.sh vsavjw -debug -debugger none \
@@ -132,29 +132,81 @@ else
             > "$WORK/$1.log" 2>&1 || {
             echo "  FAIL: the $1 tap run did not complete"
             tail -5 "$WORK/$1.log"; fail=1; return; }
-        got=$(awk -v skip="${4:-}" '
-            {for(i=1;i<=NF;i++) if($i=="A0") a0=$(i+1)}
-            $1=="frame" && a0!="00000000" && a0!=skip && a0!=prev {
-                printf "%s ", a0; prev=a0 }' "$WORK/$1.txt")
-        if [ "$got" = "$3" ]; then
-            echo "  ok: $1 — rows 0x01,0x05,0x0A,0x09 then the tenant's record"
+        # dedupe mode: consecutive (default) for single-cursor windows;
+        # "first" for windows both cursors interleave (order of FIRST
+        # appearance, which is deterministic: join, then each press).
+        if [ "${6:-}" = first ]; then
+            got=$(awk -v skip="${5:-}" '
+                {for(i=1;i<=NF;i++) if($i=="A0") a0=$(i+1)}
+                $1=="frame" && a0!="00000000" && a0!=skip && !seen[a0]++ {
+                    printf "%s ", a0 }' "$WORK/$1.txt")
+        else
+            got=$(awk -v skip="${5:-}" '
+                {for(i=1;i<=NF;i++) if($i=="A0") a0=$(i+1)}
+                $1=="frame" && a0!="00000000" && a0!=skip && a0!=prev {
+                    printf "%s ", a0; prev=a0 }' "$WORK/$1.txt")
+        fi
+        if [ "$got" = "$4" ]; then
+            echo "  ok: $1 — vanilla rows then the tenant's record"
         else
             echo "  FAIL: $1 — the engine fetched a different sequence"
             echo "        got:  $got"
-            echo "        want: $3"
+            echo "        want: $4"
             fail=1
         fi
     }
-    runtime big_portrait "267380,140,r" \
+    # P1 cursor (replay 36): rows 0x01 -> 0x05 -> 0x0A -> 0x09 -> 0x13
+    runtime big_portrait 36_pick_tenant_cell.rpl "267380,140,r" \
         "0027195e 00271a36 00271bc0 00271b8a $(rowval portrait p1) "
-    runtime name_banner "2675a0,100,r" \
+    runtime name_banner 36_pick_tenant_cell.rpl "2675a0,100,r" \
         "00272156 0027218e 002721d4 002721c6 $(rowval name_banner p1) "
     # the wheel record pointer PRG:0x2689FE sits immediately before the
     # highlight array; on this build it holds the RELOCATED wheel record —
     # filter that constant, exactly as the vanilla gate does for 0x272A68.
-    runtime highlight "268a00,120,r" \
+    runtime highlight 36_pick_tenant_cell.rpl "268a00,120,r" \
         "002725dc 002726ac 0027268a 00272642 $(rowval highlight p1) " \
         "$WHEEL"
+    # P2 cursor (replay 37, +0x80 arrays): join fetches the P2 default row
+    # 0x05, then L -> 0x0A, D -> 0x09, D -> 0x13.
+    runtime p2_portrait 37_p2_pick_tenant.rpl "2674aa,80,r" \
+        "00271e48 00271fd2 00271f9c $(rowval portrait p2) "
+    runtime p2_highlight 37_p2_pick_tenant.rpl "268a82,80,r" \
+        "002728c8 002728a6 00272866 $(rowval highlight p2) "
+    # The NAME piece is asymmetric (measured 14z-62): BOTH players' name
+    # banners read the P1 ARRAY (each indexed by its own cell), so on the 2P
+    # replay the P1 name array serves P1's row 0x01 and P2's row sequence,
+    # ending on the tenant's P1 name record. First-appearance order is
+    # deterministic (join, then each P2 press).
+    runtime p2_name_via_p1 37_p2_pick_tenant.rpl "2675a0,100,r" \
+        "00272156 0027218e 002721d4 002721c6 $(rowval name_banner p1) " \
+        "" first
+    # ...and the +0x80 name structure has NO consumer on any measured path
+    # (0 reads through 2P select, confirm, splash, match start). The
+    # composed row is kept for safety; this asserts the measured negative
+    # so the gate speaks up if some path DOES start reading it.
+    WATCH="26762a,80,r" TRACE_OUT="$WORK/p2name_neg.txt" FRAMES=1400 \
+    REPLAY="$REPO/tests/replays/37_p2_pick_tenant.rpl" \
+    MAME_SANDBOX="$WORK/sbx_p2name_neg" MAME_BIN="$WIDE_BIN" \
+    MAME_ROMPATH="$OUTBASE/rompath;$ROMDIR" \
+        tools/run_mame.sh vsavjw -debug -debugger none \
+        -autoboot_script "$REPO/tests/lua/trace_writes.lua" \
+        > "$WORK/p2name_neg.log" 2>&1 || {
+        echo "  FAIL: the p2-name negative tap run did not complete"
+        tail -5 "$WORK/p2name_neg.log"; fail=1; }
+    # (a frame-1 boot-scan hit with A0=00000000 is expected — the same
+    # boot-time artefact class the vanilla gate notes; a REAL consumer
+    # carries the record pointer in A0)
+    nreads=$(awk '{for(i=1;i<=NF;i++) if($i=="A0") a0=$(i+1)}
+                  $1=="frame" && a0!="00000000" {n++} END {print n+0}' \
+             "$WORK/p2name_neg.txt")
+    if grep -q "^END" "$WORK/p2name_neg.txt" && [ "$nreads" = 0 ]; then
+        echo "  ok: p2 name array (+0x80) unconsumed, as measured"
+    else
+        echo "  FAIL: the +0x80 name array WAS read ($nreads hits, or no END"
+        echo "        line) — the 14z-62 'no consumer' finding no longer"
+        echo "        holds; re-measure before trusting the name model"
+        fail=1
+    fi
 fi
 
 [ "$fail" = 0 ] || { echo "FAIL: tenant select-records gate"; exit 1; }

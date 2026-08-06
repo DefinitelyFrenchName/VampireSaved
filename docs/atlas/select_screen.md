@@ -524,6 +524,19 @@ block; the P2 name is a small 1-2 entry tag (budget 0x3, at (-24,-8), attr
 `0215`) in both engines — P1 and P2 really are different record sets, not
 copies (the corrected +0x80 model).
 
+**The NAME piece is asymmetric (measured 14z-62, 2P replay 37):** BOTH
+players' name banners read the **P1 array**, each indexed by its own cell
+— on a 2P walk the P1 name array serves P1's row `0x01` interleaved with
+P2's row sequence, ending on the tenant's P1 record when P2 lands on
+`0x13`. The `+0x80` name structure (`PRG:0x26762A`) exists in both
+engines and holds plausible per-char tag records, but has **no consumer on
+any measured path** — zero reads through 3,800 frames of 2P select,
+confirms, VS splash and match start. The portrait and highlight `+0x80`
+arrays ARE live (P2 fetches measured). The tenant's `+0x80` name row is
+composed and poked anyway (zero risk — no consumer AND no legacy id can
+index it; covers any unmeasured path), and the gate asserts the measured
+negative so growth is loud.
+
 **A coupling to know before expecting visual de-substitution:** the host's
 select ART mostly lives in his own bank-2 FIGHTER band, not in the select
 bank — measured: 89 of Jedah's 92 portrait tiles sit inside the
