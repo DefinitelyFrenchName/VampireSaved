@@ -1,7 +1,7 @@
 # NEXT SESSION — orientation (written at the close of 14z-63, 2026-08-06)
 
-**Start here: PHASE 3 ITEMS 1-5 ARE ALL DONE (the hover decision
-ratified round 7: RING REUSE, implemented) — the wheel serves REAL
+**Start here: PHASE 3 IS COMPLETE (all six items; rounds 7-8 all
+clean; the accent census gate freezes the audit) — the wheel serves REAL
 MEDALLION ART from group C bank 5 (vanilla cells measured
 pixel-identical), the ring/highlight POSITION SOURCE is fixed in place
 (the tenant's highlight draws AT his cell), the in-match HUD shows
@@ -58,8 +58,10 @@ docs/patch_notes.md's 14z-63 sections for byte detail.
    measured on real 2P victories; gate tests/test_tenant_winpal.sh;
    scoping fact: the arcade win-quote screen never runs 0x5F1B6 —
    only 2P victories do).
-4. **The accent/march audit** (the 62k class: any march path still
-   reading the T0/T1 slots for the TENANT is a bug).
+4. ~~The accent/march audit~~ **CLOSED in 14z-63**: 4/4 family-base
+   sites thunked (frozen census gate tests/test_accent_census.sh),
+   zero direct T0/T1 refs, venue sweep complete (the continue screen
+   has NO character surface — measured).
 5. **The RE-FREEZE bundle** (maintainer sign-off, one change): parked
    mirror-victim fix; `id_by_profile = "cps2-wide-v1=0x13"`; re-freeze
    the WIDE reference; re-measure/ratify the masked classes (incl. the

@@ -1578,3 +1578,31 @@ RATIFIED and implemented — ring reuse; build 96a6e737):
   ring around his medallion (Jedah's 3x2 outline — per-cell authored
   rings can supersede later without rework). All tenant gates PASS;
   stock reproduces ae701ffb.
+
+Session 14z-63 addendum 6 (phase 3 item 6: the accent/march audit —
+CLOSED; round 8 all clean):
+- Maintainer round 8 (96a6e737): rings on all three cells + mirror
+  rings both sides confirmed, "Donovan is looking really good."
+  KNOWN-COSMETIC, deliberately parked (maintainer: polish can wait,
+  possibly forever): Phobos/Pyron medallions sit a few px right —
+  fixable by nudging the layout cells' `pos` x (one edit moves the
+  medallion and its highlight base coherently).
+- STATIC CENSUS: the vanilla opcode image holds EXACTLY FOUR accent
+  family-base (0x39A900) operand references — 0x2AD82/0x2AD94/0x2B342/
+  0x2B7E8, the four accent_color_aware sites, all jsr-routed on
+  variant builds — and ZERO direct references to the T0/T1 slots
+  (0x39FBE0/0x39FC00). No un-thunked family consumer exists.
+- VENUE SWEEP: every tenant-visible accent surface is measured or
+  playtest-confirmed (rounds 3-8) — select pre-confirm (62k thunk),
+  post-confirm march (14z-47 owner-link fallback), VS splash (62j),
+  in-match (own block row), 2P victory (item 5), arcade win-quote
+  (62j family), HUD (item 4). The solo CONTINUE screen was chased to
+  frame 13100 (idle tenant loses to the CPU): it is the abstract
+  vortex + countdown — NO character surface exists there, so nothing
+  to port. The 2P continue is a HUD text countdown only.
+- Gate: tests/test_accent_census.sh NEW (frozen 4-site census + 0
+  slot refs + 4/4 routing + negative control), in the battery. A
+  fifth family-base site appearing in a future image fails loudly.
+- PHASE 3 IS COMPLETE (items 1-6). Remaining before the M3a close:
+  the select/VS palette-block colours (the real $130(a5) fold work,
+  venue_assets.md §2) and the RE-FREEZE bundle (maintainer sign-off).

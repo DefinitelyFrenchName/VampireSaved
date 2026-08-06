@@ -1,7 +1,9 @@
 # STATE — living progress log
 
-Updated: 2026-08-06 (session 14z-63 — PHASE 3 ITEMS 1-5 ALL DONE (the
-hover decision RATIFIED round 7: ring reuse, implemented) + the
+Updated: 2026-08-06 (session 14z-63 — PHASE 3 COMPLETE, ITEMS 1-6 (the
+hover decision RATIFIED round 7: ring reuse; the accent/march audit
+CLOSED: 4/4 family-base sites thunked, zero direct slot refs, venue
+sweep complete incl. the no-character-surface continue screen) + the
 round-6 medallion-palette fix
 (item 3 = the hover decision is the maintainer's, reframed below; item
 4 landed while awaiting playtest: the variant-id HUD — attribution
@@ -154,6 +156,25 @@ ring_rows (P1+P2 for cells 0x10/0x11 + mirror rows for all three; 9
 pokes total, zero new bytes). Checker re-modeled; all gates PASS;
 stock ae701ffb. The tenant hover now draws a real vanilla-class ring.
 Evidence build: `96a6e737`.
+
+**Maintainer round 8 (build 96a6e737): ALL CLEAN — rings on all three
+cells confirmed, mirror rings both sides confirmed, "Donovan is looking
+really good." KNOWN-COSMETIC (maintainer: "polish can wait, possibly
+forever"): Phobos's and Pyron's medallions sit a few px too far RIGHT.
+Mechanism if ever wanted: the layout's per-cell `pos` values
+(build/manifest/wheel_layout_proposed.json cells 10/11) — nudge pos_x
+by the desired amount; the generator derives the coord pair and the
+highlight base from pos, so one edit moves both coherently.**
+
+**Item 6 (the accent/march audit) — CLOSED.** Static census: the
+vanilla image holds EXACTLY the four thunked accent family-base sites
+(0x2AD82/94, 0x2B342, 0x2B7E8) and zero direct T0/T1 slot references —
+no un-thunked family consumer exists. Venue sweep: every tenant accent
+surface measured or playtest-confirmed rounds 3-8; the solo CONTINUE
+screen (chased to f13100, idle tenant losing to the CPU) is the
+abstract vortex — NO character surface; 2P continue is HUD text only.
+Gate: tests/test_accent_census.sh (frozen census + 4/4 routing +
+negative control), in the battery. PHASE 3 COMPLETE.
 
 **Semantic correction that reframes the hover decision**: the composed
 vs2 highlight record (b000 5x1, "his lit-label") is actually vs2's

@@ -398,6 +398,10 @@ tests/test_tenant_winpal.sh    [ob]   # variant-id win-screen palette (14z-63): 
                                       # sparse block + TT thunk at 0x5F1B6; BOTH
                                       # thunk paths measured on real 2P victories
                                       # (replays 61/62). Self-builds at 0x13 unless
+tests/test_accent_census.sh    [ob]   # accent/march census (14z-63): 4 frozen
+                                      # family-base sites (0 direct T0/T1 refs),
+                                      # all jsr-routed on variant builds. Static
+                                      # + negative control, ~30s (self-builds)
 tests/test_compare_composite.sh       # ground truth for the §4 v4 composite class
                                       # (frozen flicker inventory + frozen bounded
                                       # windows, RATIFIED 2026-08-06): 7 synthetic

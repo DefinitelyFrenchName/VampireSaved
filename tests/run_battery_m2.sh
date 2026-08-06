@@ -69,6 +69,9 @@ if [ -x "${MAME_WIDE_BIN:-$HOME/.cache/vampire-saved/mame/cps2}" ]; then
     # The variant-id win-screen palette (14z-63): sparse block + thunk,
     # both paths measured on real 2P victories (replays 61/62).
     tests/test_tenant_winpal.sh
+    # The accent/march census (14z-63): 4 frozen family-base sites, all
+    # jsr-routed on variant builds; a fifth appearing fails loudly.
+    tests/test_accent_census.sh
 else
     echo "note: tenant select-records gate skipped (no WIDE MAME binary —"
     echo "      tools/setup_mame.sh; gate: tests/test_tenant_select_records.sh)"
