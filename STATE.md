@@ -1,7 +1,35 @@
 # STATE — living progress log
 
-## Session 14z-64 (phase-3 aftermath closed; the RE-FREEZE BUNDLE
-## prepared — RATIFICATION PACKAGE below awaits the maintainer)
+Updated: 2026-08-06 (session 14z-64 — M3a COMPLETE AND FROZEN. The
+maintainer ratified the re-freeze bundle ("freeze"): the WIDE reference
+is now donovan-m3a = 4b7d0dc7 (tenant at native 0x13 by default, Jedah
+restored, the whole select/wheel family from group C, real medallion
+art/palettes, ring reuse, variant HUD/win-pal, the 14z-2 mirror fix),
+stock twin 6c93cfa8 (= old ae701ffb + exactly the 2-byte fix). Masked
+basis V2 (staging-slot windows); expectation set tests/expected/
+donovan-m3a with the 14-replay measured classes; registry row added.
+Both canonical dirs (build/m5_wide, build/m5_stock) rebuild bit-exact.
+Read 14z-64 below, then docs/NEXT_SESSION.md.)
+
+## Session 14z-64 FREEZE RECORD (maintainer: "freeze", 2026-08-06)
+
+- Registry: `4b7d0dc7... -> donovan-m3a` (supersedes donovan-m5w/
+  9bac6ee3, whose row and zips remain valid history).
+- Expectation set: 14 authored .masked (1 exact, 5 window, 7 composite,
+  1 diverge — the measured v2 inventory, flickers matching donovan-m5w
+  to the frame), 16 .skip carried over, per-set `mask` file (V2),
+  self-frozen sha1+logs for the rest (the --freeze run, double-run
+  determinism per replay).
+- Vanilla masked-v2 logs: regenerated deterministically from the frozen
+  vanilla oracle (14 logs, committed).
+- Stock twin re-frozen 6c93cfa8; full battery GREEN at freeze; the
+  render-gate reference refreshed (build/m5_stock).
+- Known residuals carried on the record: Pyron placeholder medallion
+  recolors after a 2P Donovan-hover (row 0x1A = P2 sword row); the
+  deep-arcade ending flow unmeasured (fold-audit gap).
+
+
+## Session 14z-64 (the bundle prep — RATIFIED above; package kept for the record)
 
 **THE RATIFICATION PACKAGE (one decision, per the 62c plan).** The
 bundle's mechanics are applied and measured; the maintainer ratifies:
