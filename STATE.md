@@ -5599,9 +5599,24 @@ detailed documentation + a standing confirmation path
 Extension policy stands: future palette-block ports extend the
 window per measured slot, never pre-widen.
 
+## Decision made (maintainer, 2026-08-06): select art = option A
+
+Option A of the 14z-62e write-up: the per-hover bank thunk for the
+portrait-record object + the tenant's select art in WIDE group C at
+native codes; `vsav.zip` leaves the rompath entirely pristine. Blank-pool
+relocation (option B) remains the fallback if the measured hook cost
+violates the standing flicker watch. Maintainer also flagged suspected
+graphical corruption in the session captures — playtest of `39597268`
+in progress; the expected-interim inventory is in
+docs/playtest_m3a_interims.md so the report can classify against it.
+Original write-up kept below.
+
 ## Decisions pending (human)
 
-- **HOW THE TENANT'S SELECT ART LEAVES JEDAH'S ANCHORS (14z-62e).** The
+- ~~**HOW THE TENANT'S SELECT ART LEAVES JEDAH'S ANCHORS (14z-62e)**~~
+  **DECIDED 2026-08-06 (maintainer): option A.** Analysis kept below.
+
+- **THE 14z-62e SELECT-ART ANALYSIS (decided above).** The
   last visual-de-substitution piece: the tenant's select-art subset (101
   bank-1 tiles + 4 placeholder label tiles + the 6-tile medallion) still
   overwrites Jedah's bank-1 select-figure art, garbling his select-screen
