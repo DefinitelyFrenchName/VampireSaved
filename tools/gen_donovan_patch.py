@@ -2184,9 +2184,17 @@ def main():
             newcells = [(_cell(k), v) for k, v in lay["cells"].items()]
             newcells.sort(key=lambda kv: kv[0])
             cl = bytearray(vj[clist:clist + nvan * 4])
+            # The list's pairs are RELATIVE to the drawer object's base
+            # (measured (256,176) — see the layout's _coord_note); 'pos'
+            # is a ring-centre, corner_offset the sprite-corner shift.
+            # Appending pos verbatim put the three entries at OBJ
+            # x=480+/y=344+ — emitted, never on screen (14z-62i).
+            _bx, _by = lay.get("obj_base", (0, 0))
+            _cx, _cy = lay.get("corner_offset", (0, 0))
             for _c, spec in newcells:
                 x, y = spec["pos"]
-                cl += struct.pack(">hh", int(x), int(y))
+                cl += struct.pack(">hh", int(x) + int(_cx) - int(_bx),
+                                  int(y) + int(_cy) - int(_by))
             cl_dst = alloc(sw.get("hole", "a"), len(cl),
                            f"select_wheel {nm} coords")
             if cl_dst is None:

@@ -1278,3 +1278,38 @@ fixed; program fingerprint UNCHANGED 39597268, gfx members corrected):
   medallions invisible + the cursor ring disappearing on Donovan's cell
   (MAME shows placeholder art + ring; may have been stale-collateral, or
   an FBNeo-side new-cell question — the report will arbitrate).
+
+Session 14z-62i (maintainer round 2 — THE MEDALLIONS NEVER RENDERED, on
+any build, ever; fixed. Scratch build 7f2b9d5a):
+- The report ("not even as random pixels — the grid is vsav vanilla, SAME
+  ON BOTH EMULATORS") was exactly right, and my earlier "placeholder
+  medallions visible" claim had misattributed VANILLA bottom cells (the
+  random '?' and Q-Bee's medallion). OBJ dump: the three entries WERE
+  emitted every frame — at x=480-528, y=344-352, outside the 384x224
+  screen. The select_wheel generator appended the layout's ring-centre
+  positions VERBATIM into the coordinate list, whose pairs are RELATIVE
+  to the wheel drawer object's base — measured (256,176), back-computed
+  from Jedah's medallion pair (-20,-119) -> OBJ (236,57) and confirmed on
+  Gallon's 3x3. Off-screen sprites are invisible to every RAM-basis gate
+  and appear in OBJ RAM (so the frozen select-window divergences were
+  REAL) — only a human looking at the screen could catch it.
+- Fix: layout gains measured `obj_base` + `corner_offset` (-12,-7 =
+  Jedah's empirical 3x2 corner shift); the generator converts pair =
+  pos + corner_offset - obj_base. Verified: entries at (212,161) /
+  (236,169) / (260,161), medallions render (placeholder art, the
+  ratified interim).
+- CONSEQUENCE, for the re-freeze bundle: the fix corrects the ratified
+  wheel extension's bytes, so the frozen WIDE reference `9bac6ee3` no
+  longer rebuilds from the tree (its zips remain valid artifacts; stock
+  `ae701ffb` reproduces — no wheel there). Folds into the M3a re-freeze
+  with the mirror-victim fix, per the maintainer's plan.
+- THE "CURSOR DISAPPEARS" FINDING, now fully characterized: the
+  highlight piece IS the cursor ring (the per-cell pal-0x1E ring art =
+  the highlight records; measured — Demitri's ring tiles are his
+  highlight record's entries). On the tenant cell the engine draws the
+  COMPOSED vs2 record (his lit-label, b000) — visible but misplaced: the
+  ring drawer's base tracks the hovered CELL through its own per-cell
+  position source, which does not know the appended cells (label drawn
+  at (152,88) instead of the cell). Queued with the option-A select-art
+  session: find the drawer's position source + decide ring-vs-label
+  content for the newcomer cells (a look-and-feel choice).

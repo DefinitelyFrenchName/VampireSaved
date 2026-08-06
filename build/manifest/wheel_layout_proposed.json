@@ -89,5 +89,14 @@
    "to": "0x13"
   }
  ],
- "_art_note": "tile/attr copied from vsav2's own newcomer wheel record (PRG:0x2A6E52, entries 21-23). The tile CODES are placeholders until the art is placed in our gfx; the palette rows (0x13/0x11/0x05) are vs2 rows that vsavj uses for other characters, so colours will be off until the palette work lands. Maintainer: imperfect medallion art is acceptable, mechanical soundness is not."
+ "_art_note": "tile/attr copied from vsav2's own newcomer wheel record (PRG:0x2A6E52, entries 21-23). The tile CODES are placeholders until the art is placed in our gfx; the palette rows (0x13/0x11/0x05) are vs2 rows that vsavj uses for other characters, so colours will be off until the palette work lands. Maintainer: imperfect medallion art is acceptable, mechanical soundness is not.",
+ "_coord_note": "14z-62i (maintainer round 2: 'the three medallions don't show at all', both emulators): the record's coordinate pairs are RELATIVE to the wheel drawer object's base, measured (256,176) \u2014 back-computed from Jedah's medallion (pair (-20,-119), OBJ (236,57)) and confirmed on Gallon's 3x3 (pair (8,-112), OBJ (264,64)). The cells' 'pos' values are RING-CENTRE coordinates; the sprite-corner offset for a 3x2 medallion is (-12,-7) (Jedah's empirical). The generator converts: pair = pos + corner_offset - obj_base. The raw positions had been appended verbatim, landing the three entries at OBJ x=480-528/y=344-352 \u2014 emitted every frame, never on screen, invisible to every RAM-basis gate.",
+ "obj_base": [
+  256,
+  176
+ ],
+ "corner_offset": [
+  -12,
+  -7
+ ]
 }
