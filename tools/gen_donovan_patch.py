@@ -2227,6 +2227,125 @@ def main():
             fragments.append((cl_dst, len(cl), "NEW",
                               f"select_wheel {nm} coord list"))
 
+            # ── highlight base rows (14z-63, phase 3 item 2): the ring/
+            # highlight drawer ($FFBA00) positions per hovered cell via a
+            # 32-row pc-relative word-pair table at the site below —
+            # variant half a byte-identical ALIAS in vsav (the TABLE B
+            # convention), UN-aliased in vs2 where Capcom wrote its
+            # newcomers' bases. Without this, hovering an appended cell
+            # draws the highlight at the aliased row's base (the
+            # misplaced-label report, 14z-62i). In-place overwrite of
+            # rows 0x10/0x11/0x13 with the layout's highlight_base pairs;
+            # row 0x12 keeps the alias (reserved id). PC-relative reads
+            # assert the PROGRAM function code, so the stored bytes are
+            # ENCRYPTED — these are code ops, not data ops. Independent
+            # of bank5/group C: any extended-wheel build needs it.
+            if sw.get("highlight_base_site"):
+                hb_site = _int(sw["highlight_base_site"])
+                opc_hb = (root / "build/out/vsavj_opcodes.bin").read_bytes()
+                lo_half = opc_hb[hb_site:hb_site + 0x40]
+                hi_half = opc_hb[hb_site + 0x40:hb_site + 0x80]
+                if lo_half != hi_half:
+                    fail.append(f"select_wheel {nm}: highlight base table "
+                                f"at {hb_site:#x} variant half is NOT an "
+                                f"alias of the base half — wrong site or "
+                                f"moved table")
+                    continue
+                nrows = 0
+                for _c, spec in newcells:
+                    hb = spec.get("highlight_base")
+                    if hb is None:
+                        fail.append(f"select_wheel {nm}: cell {_c:#04x} "
+                                    f"has no highlight_base in the layout")
+                        continue
+                    row = hb_site + 4 * _c
+                    ops.append({"op": "code", "addr": f"{row:#x}",
+                                "hex": struct.pack(">HH", int(hb[0]),
+                                                   int(hb[1])).hex()})
+                    nrows += 1
+                    notes.append(f"code   {row:#08x} +4     select_wheel "
+                                 f"{nm}: highlight base row {_c:#04x} <- "
+                                 f"({hb[0]},{hb[1]}) (was the row "
+                                 f"{_c & 0x0F:#04x} alias)")
+                notes.append(f"# select_wheel {nm}: {nrows} highlight base "
+                             f"rows written in place (32-row aliased "
+                             f"pc-rel table {hb_site:#x}; the vs2 "
+                             f"precedent — its variant half is un-aliased "
+                             f"for its newcomers)")
+
+            # ── bank5 (14z-63, phase 3): serve the WHOLE wheel from WIDE
+            # group C bank 5 — real medallion art for the appended cells,
+            # vanilla-cell pixels identical BY CONSTRUCTION (byte-copied
+            # tiles). The wheel drawer is ONE object (one bank word), so
+            # per-entry banks are impossible; the measured mechanism:
+            #   * select entry inits the drawer ($FFB800) at PRG:0x5F8B2
+            #     `move.w #$2000,$18(a6)` — a per-object init that writes
+            #     ONLY this object's bank word (family-wide tap, 14z-63),
+            #     unlike the shared attract loop at 0x07C428 (stride-0x80
+            #     over every menu object — NEVER patch that one).
+            #   * on select the drawer's anim chain is a single FF-entry
+            #     (0x2689FA -> the wheel record, stop-flagged), so the
+            #     flip affects exactly the wheel record's tiles.
+            #   * the VS-phase re-init (0x5FD02) rewrites the field, so
+            #     the RAM divergence re-converges (§4 v3 window; end
+            #     moves ~2362 -> ~2415 on the pick replays).
+            # Tile inventory (emitted for build_gfx_donovan --wheel-bank5):
+            # every tile of every vanilla entry, host art byte-identical
+            # vsav group A -> group C 0x10000+code; the appended entries'
+            # native vs2 codes, art from vs2 group A. Gated on a group-C
+            # tenant: with the band in banks 2-3 there is no group C to
+            # hold the art, and the flip would serve zeros (the m5_wide
+            # 0x0F+WIDE shape keeps its placeholder medallions).
+            if sw.get("bank5"):
+                from gfx_tiles import bank_word as _bw5
+                if _int(port["port"].get("gfx_bank", 2)) < 4:
+                    notes.append(f"# select_wheel {nm}: bank5 SKIPPED — "
+                                 f"tenant gfx bank < 4 (no group C); "
+                                 f"placeholder medallions retained")
+                else:
+                    site = _int(sw["bank_site"])
+                    old = bytes.fromhex(sw["bank_site_old"])
+                    opc5 = (root / "build/out/vsavj_opcodes.bin").read_bytes()
+                    if opc5[site:site + 6] != old:
+                        fail.append(f"select_wheel {nm}: bank site "
+                                    f"{site:#x} holds "
+                                    f"{opc5[site:site+6].hex()}, expected "
+                                    f"{old.hex()} (move.w #$2000,$18(a6))")
+                        continue
+                    newhex = old[:2].hex() + f"{_bw5(5):04x}" + old[4:].hex()
+                    ops.append({"op": "code", "addr": f"{site:#x}",
+                                "hex": newhex})
+
+                    def _blk(t, at, into):
+                        bx = ((at >> 8) & 15) + 1
+                        by = ((at >> 12) & 15) + 1
+                        for dy in range(by):
+                            for dx in range(bx):
+                                into.add((t & ~0xF) + (dy << 4)
+                                         + ((t + dx) & 0xF))
+                    host_t, new_t = set(), set()
+                    for k in range(nvan):
+                        t5, at5 = struct.unpack(
+                            ">HH", vj[rec + 10 + 4 * k:rec + 14 + 4 * k])
+                        _blk(t5, at5, host_t)
+                    for _c, spec in newcells:
+                        _blk(_int(spec["tile"]), _int(spec["attr"]), new_t)
+                    both = host_t & new_t
+                    if both:
+                        fail.append(f"select_wheel {nm}: host/new tile "
+                                    f"overlap {sorted(hex(x) for x in both)}")
+                        continue
+                    (out / "wheel_bank5.json").write_text(json.dumps(
+                        {"host": sorted(host_t), "vs2": sorted(new_t)}))
+                    notes.append(f"code   {site:#08x} +6     select_wheel "
+                                 f"{nm}: drawer bank word #$2000 -> "
+                                 f"#${_bw5(5):04x} (bank 5) in the select "
+                                 f"init — writes ONLY $FFB818 (measured)")
+                    notes.append(f"# select_wheel {nm}: {len(host_t)} host "
+                                 f"+ {len(new_t)} vs2 tiles -> "
+                                 f"wheel_bank5.json (group C upper bank, "
+                                 f"placed by build_gfx --wheel-bank5)")
+
     # ── select_records (M3a, 14z-62): the tenant's OWN select records at a
     # variant id — what the hovered cell displays. Three UI pieces (portrait,
     # name banner, cursor highlight) each ride a 32-row x 4-byte

@@ -222,13 +222,19 @@ echo "== 4. de-substitution acceptance: picking the HOST re-converges =="
 # Replay 11 picks slot 0x0F. On slot-substituted builds that loads the
 # tenant and diverges from vanilla forever (class `diverge 890`). On a
 # variant-id build the host is HIMSELF again, so the same replay must
-# measure as the ratified §4 v3 bounded window: onset 890 (select entry,
-# the wheel extension), frozen end, single contiguous run, full
-# re-convergence through the host's own match. Measured 14z-62c: window
-# 890-2362; the 1963+ tail is ONE byte ($FF06D1, a menu-scoped counter
-# phase that match start resets). This section is the reason the whole
-# slot-row audit exists — it caught the palette/sfx/fixture rows still
-# aimed at row 0x0F.
+# measure as the ratified §4 v3 bounded window: onset 889 (select entry),
+# frozen end, single contiguous run, full re-convergence through the
+# host's own match. Measured 14z-62c: window 890-2362; the 1963+ tail is
+# ONE byte ($FF06D1, a menu-scoped counter phase that match start
+# resets). Re-measured 14z-63 for the wheel bank-5 move: 889-2415.
+# Mechanism, both bounds: the select init (PRG:0x5F8B2 block) now writes
+# the drawer's bank word $FFB818 = #$3000, which surfaces at the frame-
+# 889 sample — one frame BEFORE the record-pointer caches that defined
+# the old onset; the byte stays divergent until the VS-phase re-init
+# (PRG:0x5FD02, `move.w #$2000,$18(a6)`) rewrites it at 2415. Single
+# run, 1305 identical frames after, match untouched. This section is
+# the reason the whole slot-row audit exists — it caught the
+# palette/sfx/fixture rows still aimed at row 0x0F.
 if [ "${SKIP_RUNTIME:-0}" = 1 ]; then
     echo "  SKIPPED (SKIP_RUNTIME=1)"
 else
@@ -240,9 +246,9 @@ else
     if [ -f "$WORK/11_legacy.log" ]; then
         if python3 tools/compare_window.py \
                 tests/expected/vsavj/masked/logs/11_pick_donovan.log \
-                "$WORK/11_legacy.log" --onset 890 --end 2362 \
+                "$WORK/11_legacy.log" --onset 889 --end 2415 \
                 > "$WORK/11_legacy.cmp" 2>&1; then
-            echo "  ok: host pick = bounded window 890-2362, fully re-convergent"
+            echo "  ok: host pick = bounded window 889-2415, fully re-convergent"
         else
             echo "  FAIL: the host pick does not re-converge as frozen:"
             sed 's/^/        /' "$WORK/11_legacy.cmp" | tail -5

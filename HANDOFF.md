@@ -384,6 +384,11 @@ tests/test_tenant_select_records.sh   # M3a select-records mechanism (14z-62): a
                                       # + verdict-logic negative controls + the engine's
                                       # own row fetch onto cell 0x13 (replay 36, WIDE
                                       # MAME). Self-builds at 0x13 unless given a build
+tests/test_wheel_bank5.sh      [ob]   # the select-wheel bank-5 move (14z-63): site +
+                                      # re-derived tile inventory + group C member
+                                      # identity straight from the zips + negative
+                                      # controls + the engine's own bank-5 walk.
+                                      # Self-builds at 0x13 unless given a build
 tests/test_compare_composite.sh       # ground truth for the §4 v4 composite class
                                       # (frozen flicker inventory + frozen bounded
                                       # windows, RATIFIED 2026-08-06): 7 synthetic

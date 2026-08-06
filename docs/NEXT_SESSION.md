@@ -1,75 +1,80 @@
-# NEXT SESSION — orientation (written at the close of 14z-62k, 2026-08-06)
+# NEXT SESSION — orientation (written at the close of 14z-63, 2026-08-06)
 
-**Start here: OPTION A PHASES 1-2 ARE LANDED AND PLAYTEST-VALIDATED —
-begin PHASE 3.** The whole select family (portrait bust, name banner, VS
-splash, win quote) serves from WIDE group C BANK 5 at native vs2 codes,
-with four measured drawer bank gates; group-A select placements are ZERO;
-JEDAH IS CONFIRMED INDISTINGUISHABLE FROM VANILLA by five maintainer
-playtest rounds (which also caught and validated fixes for the stale
-group-B repack, the never-rendered medallions, and the select-sword grey
-palette). Evidence build `build/m3a_selrec` = `048521c2`. Read STATE.md
-`14z-62j/62k`, then docs/patch_notes.md's 62j/62k sections for the byte
-detail.
+**Start here: PHASE 3 ITEMS 1 AND 2 ARE DONE — the wheel serves REAL
+MEDALLION ART from group C bank 5 (vanilla cells measured
+pixel-identical), and the ring/highlight POSITION SOURCE is found and
+fixed in place (the tenant's highlight draws AT his cell).** One
+maintainer decision is now unblocked and reframed (hover content — see
+below), then the venue folds and the re-freeze bundle. Evidence build
+`build/m3a_wheel` = `e9f3286c`. Read STATE.md `14z-63`, then
+docs/patch_notes.md's 14z-63 sections for byte detail.
 
-## Phase 3 work list (in order)
+## What 14z-63 landed (do not re-derive)
 
-1. **Real medallion art — the wheel bank move.** The wheel record is ONE
-   object (one bank), so per-entry banks are impossible; the move that
-   works: copy the 18 vanilla medallion tiles BYTE-IDENTICAL into group C
-   (same in-group indices) + the three newcomers' real vs2 medallion art
-   (their native codes b108/b0f5/b10b), then flip the wheel drawer's bank
-   word — vanilla-cell pixels identical by construction, real art for the
-   new cells. Find the wheel drawer object + its bank write first (the
-   tap method; its $1C rides the relocated record at wide_ext — the
-   drawer is whatever walks the 21-entry record, likely inited by the
-   0x07C428 family).
-2. **The ring/label position source.** The highlight piece IS the cursor
-   ring (measured: each cell's pal-0x1E ring art is its highlight
-   record). On the appended cells the composed vs2 label draws at a STALE
-   base — the ring drawer's per-cell position source does not know the
-   new cells (label seen at (152,88) instead of the cell). Find that
-   source (tap the drawer's position fields at a hover change), extend it
-   for cells 0x10/0x11/0x13.
-3. **MAINTAINER DECISION for the newcomer cells' hover content**: a
-   vanilla-consistent RING (needs authored/cloned ring art per cell — the
-   rings are per-cell shaped) vs vs2's LIT LABEL (his native look, works
-   once the position source is fixed) vs placeholder-until-real-art.
-4. **The folded venue family**: HUD name plate + mugshot at a variant id
-   (the 16-wide tables + the $130(a5) fold — docs/atlas/id_space.md
+- **Wheel bank-5 move**: drawer $FFB800's select-init bank immediate
+  (0x5F8B2) flipped to 0x3000; 85 host tiles byte-identical vsav group
+  A -> group C 0x10000+code + 18 vs2 medallion tiles at native codes.
+  Gate: `tests/test_wheel_bank5.sh` (in the battery). The shared
+  attract init loop 0x07C428 must NEVER be patched (stride-0x80 over
+  every menu object).
+- **Highlight base rows**: the 32-row pc-rel table at 0x5FAE2 (variant
+  half aliased in vsav, un-aliased in vs2 — Capcom's own extension
+  move) gained rows 0x10/0x11/0x13 in place as CODE ops (pc-relative
+  reads are program-FC = encrypted storage). Bases in the layout's
+  `highlight_base` (derivation note in the layout file). Transform:
+  OBJ_x = base+coord+64, OBJ_y = 224-(base+coord) — measured, incl.
+  one exact prediction.
+- **Legacy window re-frozen**: host-pick bounded window is 889-2415
+  (bank word write at the select init; re-init 0x5FD02 re-converges).
+  Ratification folds into the re-freeze bundle.
+- **Semantic correction**: the composed vs2 highlight record (b000
+  bar) is vs2's POST-CONFIRM NAME BAR, not a hover label. Both engines
+  hover-draw RINGS (per-cell pal-0x1E records, all-different codes).
+
+## Work list (in order)
+
+1. **MAINTAINER DECISION — newcomer hover content (reframed)**:
+   (a) RING REUSE: point highlight rows 0x10/0x11/0x13 (P1 0x268A42/
+       0x268A46/0x268A4E, P2 +0x80) at row 0x0F's ring record
+       verbatim — zero new art, real ring behavior, Jedah's 3x2
+       outline. RECOMMENDED; per-cell authored rings can supersede.
+   (b) keep the bar-at-cell interim (current build).
+   (c) authored per-cell ring art now.
+   If (a): drop the highlight [[select_records]] composition (it
+   builds the wrong piece), update the tenant gate's highlight
+   expectations, and consider mirror rows 0x50/0x51/0x53 with the
+   parked mirror-victim fix (all three highlight blocks are 32-row
+   aliased tables — safe aliases today).
+2. **The folded venue family**: HUD name plate + mugshot at a variant
+   id (the 16-wide tables + the $130(a5) fold — docs/atlas/id_space.md
    0x00A43E). Donovan shows "VICTOR"/wrong mugshot in-match until then.
-5. **Win-pal sparse block** (his win-screen palette): the design is in
-   STATE 14z-62c — a placed sparse block + one thunk at the base load
-   0x5F1B6, same TT pattern as the rest.
-6. **The accent/march audit**: 62k fixed the select-venue sword row; audit
-   the remaining march phases/venues for other slot-gated palette paths
-   at a variant id (the T0/T1 slots are correctly vanilla now — anything
-   still reading them for the TENANT is a bug of the 62k class).
-
-## Then: the RE-FREEZE bundle (maintainer sign-off, one change)
-
-Apply the parked mirror-victim fix (donovan.toml flat `fixes=` comment);
-declare `id_by_profile = "cps2-wide-v1=0x13"`; re-freeze the WIDE
-reference (9bac6ee3 is already non-rebuildable since the 62i coordinate
-fix — expected); re-measure and ratify the masked classes; add a
-mirror-flavor throw replay; update `test_tenant_id.sh` check 2.
+3. **Win-pal sparse block** (design in STATE 14z-62c: placed sparse
+   block + one thunk at the base load 0x5F1B6).
+4. **The accent/march audit** (the 62k class: any march path still
+   reading the T0/T1 slots for the TENANT is a bug).
+5. **The RE-FREEZE bundle** (maintainer sign-off, one change): parked
+   mirror-victim fix; `id_by_profile = "cps2-wide-v1=0x13"`; re-freeze
+   the WIDE reference; re-measure/ratify the masked classes (incl. the
+   889-2415 window); mirror-flavor throw replay; test_tenant_id.sh
+   check 2.
 
 ## Standing facts (do not re-derive)
 
-- Group C layout: bank 4 = the fighter band+shelf at code+0x2750 (records
-  unchanged from the 0x0F layout); bank 5 = the select family at native
-  codes (0x10000+code in-group). `gfx_tiles.bank_word` is the ONLY bank
-  encoding (4 -> 0x1000, 5 -> 0x3000 — never bank<<13).
-- Sentinel descriptor CRCs for group C (0xdec0de31..37): members resolve
-  by NAME; never "fix" them to real CRCs (two measured shadow classes).
-- The select-venue objects: P1 figure/name/portrait = FFB880/FFB900/
-  FFB980, P2 = +0x200; win drawer = FFB800; each caches things
-  differently (measure, don't assume — the name thunk's v1 lesson).
-- An emulator over a chained rompath is NOT a member-identity instrument;
-  verify zips statically and snapshot on the no-fallback overlay
-  (scratchpad honest_rompath pattern).
-- Gates: tests/test_tenant_select_records.sh (4 sections) is the
-  mechanism gate; tests/test_tenant_id.sh the reproducibility guard;
-  the battery includes both.
+- Group C: bank 4 = fighter band+shelf; bank 5 = select family AND the
+  whole wheel at 0x10000+code. `gfx_tiles.bank_word` is the only bank
+  encoding (4 -> 0x1000, 5 -> 0x3000).
+- Sentinel descriptor CRCs for group C (0xdec0de31..37): never "fix"
+  them to real CRCs.
+- Select objects: P1 figure/name/portrait = FFB880/FFB900/FFB980, P2 =
+  +0x200; FFB800 = wheel drawer on select, win drawer at win; FFBA00 =
+  P1 ring/highlight. Each caches differently — measure, don't assume.
+- GOTCHA (new, 14z-63): unconditioned breakpoints on hot handlers
+  DESYNC replay input — the frame counter keeps counting UI frames
+  while the CPU is stopped, so the trace measures a screen the replay
+  never left. Condition breakpoints to a handful of stops, or use
+  write taps.
+- An emulator over a chained rompath is NOT a member-identity
+  instrument; verify zips statically.
 
 ## Build / test
 
@@ -77,11 +82,13 @@ mirror-flavor throw replay; update `test_tenant_id.sh` check 2.
 export ROMDIR=/Users/koneko/Developer/Vampire_Saved/ROMS
 KEY_SET=vsavj GEN_FLAGS="--allow-plausible --tripwire-open \
     --profile cps2-wide-v1 --tenant-id 0x13" \
-    tools/build_donovan.sh 6 build/m3a_selrec
-tests/test_tenant_select_records.sh build/m3a_selrec
-tools/run_wide.sh build/m3a_selrec fbneo     # playtest
+    tools/build_donovan.sh 6 build/m3a_wheel
+tests/test_wheel_bank5.sh build/m3a_wheel
+tests/test_tenant_select_records.sh build/m3a_wheel
+tools/run_wide.sh build/m3a_wheel fbneo     # playtest
 ```
 
-Frozen refs: stock `ae701ffb` MUST keep reproducing (every change so far
-verified); WIDE `9bac6ee3` non-rebuildable pending re-freeze (zips remain
-valid). Playtest classification: docs/playtest_m3a_interims.md.
+Frozen refs: stock `ae701ffb` MUST keep reproducing (verified after
+every 14z-63 change); WIDE `9bac6ee3` non-rebuildable pending re-freeze
+(zips remain valid). Playtest classification:
+docs/playtest_m3a_interims.md.

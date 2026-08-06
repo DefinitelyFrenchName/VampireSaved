@@ -19,7 +19,8 @@
    },
    "tile": "0xb108",
    "attr": "0x1213",
-   "_src": "vsav2 wheel entry 21 (Huitzil/Phobos), 3x2 pal 0x13"
+   "_src": "vsav2 wheel entry 21 (Huitzil/Phobos), 3x2 pal 0x13",
+   "highlight_base": [168, 80]
   },
   "13": {
    "pos": [
@@ -39,7 +40,8 @@
    },
    "tile": "0xb10b",
    "attr": "0x1205",
-   "_src": "vsav2 wheel entry 23 (Donovan), 3x2 pal 0x05"
+   "_src": "vsav2 wheel entry 23 (Donovan), 3x2 pal 0x05",
+   "highlight_base": [216, 80]
   },
   "11": {
    "pos": [
@@ -59,7 +61,8 @@
    },
    "tile": "0xb0f5",
    "attr": "0x1211",
-   "_src": "vsav2 wheel entry 22 (Pyron), 3x2 pal 0x11"
+   "_src": "vsav2 wheel entry 22 (Pyron), 3x2 pal 0x11",
+   "highlight_base": [192, 72]
   }
  },
  "edges_in": [
@@ -98,5 +101,6 @@
  "corner_offset": [
   -12,
   -7
- ]
+ ],
+ "_highlight_base_note": "14z-63: the ring/highlight drawer ($FFBA00) takes its per-cell base from the 32-row pc-relative word-pair table at PRG:0x5FAE2 (variant half a byte-identical alias of the base half in vsav, exactly like TABLE B; vs2's own variant half is UN-aliased with its newcomers' bases — this fix replicates Capcom's move). Transform, measured on two independent cases (the misplaced b000 bar; Jedah's row-0x0F ring): OBJ_x = base_x + record_coord_x + 64, OBJ_y = 224 - (base_y + record_coord_y). Bases here derive from the row-0x0F reference (base (192,184), measured ring centre (248,64)): base = (pos_x - 56, 248 - pos_y) — i.e. a record positioned like Jedah's ring lands centred on this cell's ring-centre 'pos'. The interim composed b000 bar (5x1, coord (-40,-16)) draws ~8px right of centre with these bases; exact bar-centring would use pos_x - 64. Decision pending (maintainer): ring reuse vs bar vs authored art."
 }

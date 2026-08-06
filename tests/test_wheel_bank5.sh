@@ -1,0 +1,175 @@
+#!/bin/sh
+# test_wheel_bank5.sh — the select-wheel bank-5 move (14z-63, phase 3):
+# real medallion art for the appended cells, vanilla cells byte-copied.
+#
+# MECHANISM (measured 14z-63; docs/atlas/select_screen.md). The wheel is
+# ONE record drawn by ONE object ($FFB800) whose select-screen anim chain
+# is a single stop-flagged entry (0x2689FA -> the record) — so per-entry
+# banks are impossible and the whole record moves banks together. The
+# select init writes the drawer's bank word at PRG:0x5F8B2
+# (`move.w #$2000,$18(a6)`, writes ONLY $FFB818 — measured family-wide);
+# the build flips that immediate to #$3000 (bank 5) and places every
+# referenced tile in group C at 0x10000+code: host entries byte-identical
+# from vsav group A (pixels identical by construction), appended entries'
+# native vs2 codes from vsav2 group A. The shared attract-screen init
+# loop at 0x07C428 (stride 0x80 over every menu object) is NOT patched.
+#
+#   1. STATIC — tools/check_wheel_bank5.py re-derives the whole move
+#      independently (site bytes, code op, tile enumeration from the ROM
+#      record + layout, and the built group C members' bytes against both
+#      source zips, decoded straight from the zips).
+#   2. NEGATIVE CONTROLS — the verdict logic is itself tested: one
+#      corrupted tile byte in the built group C member FAILS; a patch
+#      stripped of the code op FAILS.
+#   3. RUNTIME — the engine walks the wheel record from bank 5: the
+#      fmt-2 handler sees OBJ $FFB800 with bank word 0x3000 and A0 at
+#      the relocated record (obj_record_bank_trace, replay 36).
+#
+# Usage: ROMDIR=... tests/test_wheel_bank5.sh [outbase]
+#   outbase: an existing variant-id WIDE build (default: builds fresh at
+#   --tenant-id 0x13 --profile cps2-wide-v1).
+# Env: MAME_WIDE_BIN overrides the WIDE MAME binary
+#      (default ~/.cache/vampire-saved/mame/cps2). SKIP_RUNTIME=1 skips
+#      section 3.
+set -eu
+ROMDIR="${ROMDIR:?set ROMDIR}"
+REPO="$(cd "$(dirname "$0")/.." && pwd)"
+cd "$REPO"
+WORK="$(mktemp -d)"
+trap 'rm -rf "$WORK"' EXIT
+fail=0
+
+OUTBASE="${1:-}"
+if [ -z "$OUTBASE" ]; then
+    OUTBASE="$WORK/build"
+    echo "== 0. building at --tenant-id 0x13 (fresh) =="
+    KEY_SET=vsavj GEN_FLAGS="--allow-plausible --tripwire-open \
+--profile cps2-wide-v1 --tenant-id 0x13" \
+        tools/build_donovan.sh 6 "$OUTBASE" > "$WORK/build.log" 2>&1 || {
+        echo "FAIL: build did not complete"; tail -20 "$WORK/build.log"
+        exit 1; }
+    tail -2 "$WORK/build.log" | sed 's/^/  /'
+fi
+[ -f "$OUTBASE/patch/wheel_bank5.json" ] || {
+    echo "FAIL: $OUTBASE/patch/wheel_bank5.json missing — not a bank5 build"
+    exit 1; }
+
+OPC="$WORK/vsavj_op.bin"
+VAN="$WORK/vsavj_data.bin"
+python3 tools/cps2_decrypt.py "$ROMDIR/vsavj.zip" "$OPC" \
+    --data-out "$VAN" > /dev/null
+LAYOUT="build/manifest/wheel_layout_proposed.json"
+
+echo "== 1. static: site + inventory + group C member bytes =="
+python3 tools/check_wheel_bank5.py "$OUTBASE" "$OPC" "$VAN" "$ROMDIR" \
+    "$LAYOUT" > "$WORK/static.txt" || {
+    echo "FAIL: static check:"; sed 's/^/  /' "$WORK/static.txt"; exit 1; }
+sed 's/^/  ok: /' "$WORK/static.txt"
+
+echo "== 2. negative controls: the verdict logic is itself tested =="
+# 2a. one corrupted tile byte in the built group C member must FAIL
+mkdir -p "$WORK/neg/rompath" "$WORK/neg/patch"
+cp "$OUTBASE"/patch/patch.json "$OUTBASE"/patch/wheel_bank5.json \
+    "$WORK/neg/patch/"
+python3 - "$OUTBASE" "$WORK/neg" <<'PY'
+import json, sys, zipfile, zlib
+src, dst = sys.argv[1], sys.argv[2]
+zin = zipfile.ZipFile(src + "/rompath/vsavjw.zip")
+codes = json.load(open(src + "/patch/wheel_bank5.json"))["host"]
+with zipfile.ZipFile(dst + "/rompath/vsavjw.zip", "w",
+                     zipfile.ZIP_DEFLATED) as zout:
+    for n in zin.namelist():
+        d = zin.read(n)
+        if n == "vsw.31m":
+            d = bytearray(d)
+            # flip one byte inside the first host tile's contribution
+            import importlib.util, pathlib
+            spec = importlib.util.spec_from_file_location(
+                "gfx_tiles", pathlib.Path("tools/gfx_tiles.py"))
+            gt = importlib.util.module_from_spec(spec)
+            spec.loader.exec_module(gt)
+            t2 = 0x10000 + codes[0]
+            b = (128 * t2) // 0x200000
+            base = (b * 0x80000 + 64 * ((128 * t2 % 0x100000) // 128)
+                    + 2 * (((128 * t2) % 0x200000) // 0x100000))
+            d[base] ^= 0xFF
+            d = bytes(d)
+        zout.writestr(n, d)
+PY
+if python3 tools/check_wheel_bank5.py "$WORK/neg" "$OPC" "$VAN" "$ROMDIR" \
+        "$LAYOUT" > /dev/null 2>&1; then
+    echo "  FAIL: a corrupted group C tile PASSED the checker"
+    fail=1
+else
+    echo "  ok: one corrupted tile byte is caught"
+fi
+# 2b. a patch stripped of the code op must FAIL
+mkdir -p "$WORK/neg2/patch"
+cp "$OUTBASE"/patch/wheel_bank5.json "$WORK/neg2/patch/"
+ln -s "$(cd "$OUTBASE" && pwd)/rompath" "$WORK/neg2/rompath"
+python3 - "$OUTBASE" "$WORK/neg2" <<'PY'
+import json, sys
+p = json.load(open(sys.argv[1] + "/patch/patch.json"))
+ops = p["ops"] if isinstance(p, dict) and "ops" in p else p
+kept = [o for o in ops
+        if not (o.get("op") == "code" and o.get("addr") == "0x5f8b2")]
+if isinstance(p, dict) and "ops" in p:
+    p["ops"] = kept
+else:
+    p = kept
+json.dump(p, open(sys.argv[2] + "/patch/patch.json", "w"))
+PY
+if python3 tools/check_wheel_bank5.py "$WORK/neg2" "$OPC" "$VAN" "$ROMDIR" \
+        "$LAYOUT" > /dev/null 2>&1; then
+    echo "  FAIL: a patch without the bank flip PASSED the checker"
+    fail=1
+else
+    echo "  ok: a stripped code op is caught"
+fi
+
+echo "== 3. runtime: the wheel record is walked from bank 5 =="
+if [ "${SKIP_RUNTIME:-0}" = 1 ]; then
+    echo "  SKIPPED (SKIP_RUNTIME=1)"
+else
+    WIDE_BIN="${MAME_WIDE_BIN:-$HOME/.cache/vampire-saved/mame/cps2}"
+    "$WIDE_BIN" -listfull vsavjw > /dev/null 2>&1 || {
+        echo "FAIL: $WIDE_BIN does not know vsavjw (tools/setup_mame.sh)"
+        exit 1; }
+    # the relocated record's address, from the build's own repoint op
+    REC="$(python3 - "$OUTBASE" <<'PY'
+import json, sys
+p = json.load(open(sys.argv[1] + "/patch/patch.json"))
+ops = p["ops"] if isinstance(p, dict) and "ops" in p else p
+for o in ops:
+    if o.get("op") == "poke32" and int(o.get("addr"), 16) == 0x2689FE:
+        print(f"{int(str(o['val']), 16):x}")
+        break
+PY
+)"
+    [ -n "$REC" ] || { echo "FAIL: no wheel repoint op in patch.json"; exit 1; }
+    REPLAY="$REPO/tests/replays/36_pick_tenant_cell.rpl" FRAMES=1000 \
+    REC_LO="$REC" REC_HI="$(printf '%x' $((0x$REC + 0x10)))" \
+    TRACE_OUT="$WORK/trace.txt" \
+    MAME_SANDBOX="$WORK/sbx" MAME_BIN="$WIDE_BIN" \
+    MAME_ROMPATH="$OUTBASE/rompath;$ROMDIR" \
+        tools/run_mame.sh vsavjw -debug -debugger none \
+        -autoboot_script tests/lua/obj_record_bank_trace.lua \
+        > /dev/null 2>&1 || true
+    # the fmt-2 handler's A0 is record+2 (past the format word)
+    REC2="$(printf '%06x' $((0x$REC + 2)))"
+    if grep -q "REC ${REC2} BANK 3000 OBJ ffb800" "$WORK/trace.txt"; then
+        echo "  ok: \$FFB800 walks the relocated record ($REC) with bank 0x3000"
+    else
+        echo "  FAIL: expected REC ${REC2} BANK 3000 OBJ ffb800; trace:"
+        sed 's/^/        /' "$WORK/trace.txt"
+        fail=1
+    fi
+fi
+
+if [ "$fail" -ne 0 ]; then
+    echo "FAIL: wheel bank-5 gate"
+    exit 1
+fi
+echo "PASS: wheel bank-5 gate (site + re-derived inventory + group C"
+echo "      member identity + negative controls + the engine's own walk"
+echo "      from bank 5)"

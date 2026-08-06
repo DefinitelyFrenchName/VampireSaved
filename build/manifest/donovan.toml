@@ -1793,6 +1793,22 @@ coord_list = 0x32A50A       # vanilla coord list (copied, never modified)
 expect_count = 17
 expect_budget = 0x55
 expect_cptr = 0x32A50A
+# bank5 (14z-63): serve the whole wheel from WIDE group C bank 5 — real
+# medallion art for the appended cells, vanilla cells byte-copied (pixels
+# identical by construction). bank_site = the select-screen drawer init
+# `move.w #$2000,$18(a6)` (writes ONLY $FFB818 — measured; the shared
+# attract loop at 0x07C428 must never be patched). Effective only when the
+# tenant's gfx bank is >= 4 (group C exists to hold the art).
+bank5 = true
+bank_site = 0x5F8B2
+bank_site_old = "3d7c20000018"
+# highlight base rows (14z-63): the ring/highlight drawer's per-cell base
+# table at PRG:0x5FAE2 is 32 rows pc-relative (program-space -> stored
+# encrypted -> code op), variant half aliased in vsav, UN-aliased in vs2
+# for its newcomers. Rows 0x10/0x11/0x13 get the layout's highlight_base
+# pairs (row 0x12 stays the alias — reserved id). Applies to ANY extended-
+# wheel build (the misplaced-hover fix needs no group C).
+highlight_base_site = 0x5FAE2
 
 # ── SELECT RECORDS at a variant id (M3a select-records half, 14z-62) ─────────
 # The tenant's OWN select records: what the hovered cell displays. Emitted

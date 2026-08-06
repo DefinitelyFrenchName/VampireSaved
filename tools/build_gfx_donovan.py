@@ -85,6 +85,16 @@ def main():
                          "group C BANK 5 (in-group 0x10000+code). Group-C "
                          "mode only; the piece's drawer object is "
                          "bank-gated per hover on the program side")
+    ap.add_argument("--wheel-bank5",
+                    help="wheel_bank5.json from the generator: the select "
+                         "wheel's tile inventory for the bank-5 move — "
+                         "'host' codes copied BYTE-IDENTICAL from vsav "
+                         "group A (vanilla medallion pixels preserved by "
+                         "construction), 'vs2' codes (the appended cells' "
+                         "native medallions) from vs2 group A; both to "
+                         "group C 0x10000+code. Group-C mode only; the "
+                         "drawer's select-init bank word is flipped on "
+                         "the program side")
     ap.add_argument("--tenant",
                     help="tenant.json from gen_donovan_patch.py. Supplies the "
                          "destination gfx bank, so this half cannot drift "
@@ -164,6 +174,7 @@ def main():
     # into group C's upper bank, disjoint from the band/shelf by
     # construction (band in-group indices are < 0x10000).
     b5 = []
+    srcA5 = None
     if args.select_bank5 and group_c:
         b5 = json.load(open(args.select_bank5))
         srcA5 = load_group(z2, "vs2", GROUP_A)
@@ -178,6 +189,35 @@ def main():
         b5j = json.load(open(args.select_bank5))
         assert not b5j, ("select_bank5.json has tiles but the build is not "
                         "group-C mode — the drawer gate would dangle")
+
+    # wheel bank-5 (14z-63): the select wheel's whole tile set into group
+    # C's upper bank — host entries byte-identical from vsav's own group A
+    # (vanilla medallions render pixel-identical by construction), the
+    # appended cells' native codes from vs2 group A.
+    wb5 = {"host": [], "vs2": []}
+    if args.wheel_bank5 and group_c:
+        wb5 = json.load(open(args.wheel_bank5))
+        srcA_host = load_group(za, "vm3", GROUP_A)
+        if srcA5 is None and wb5["vs2"]:
+            srcA5 = load_group(z2, "vs2", GROUP_A)
+        for c in wb5["host"]:
+            d5 = 0x10000 + c
+            assert d5 not in written, f"wheel host dst 0x{d5:05X} collides"
+            write_tile(dst, d5, tile_bytes(srcA_host, 0x10000 + c))
+            written.add(d5)
+        for c in wb5["vs2"]:
+            d5 = 0x10000 + c
+            assert d5 not in written, f"wheel vs2 dst 0x{d5:05X} collides"
+            write_tile(dst, d5, tile_bytes(srcA5, 0x10000 + c))
+            written.add(d5)
+        print(f"wheel bank-5: {len(wb5['host'])} host tiles (byte-identical "
+              f"vsav group A) + {len(wb5['vs2'])} vs2 medallion tiles "
+              f"copied to group C upper bank")
+    elif args.wheel_bank5:
+        wj = json.load(open(args.wheel_bank5))
+        assert not (wj["host"] or wj["vs2"]), (
+            "wheel_bank5.json has tiles but the build is not group-C mode "
+            "— the drawer bank flip would serve zeros")
 
     # verification 1: every written position reads back as the source tile
     # (14z-10: exception-relocated srcs are NOT at delta positions — their
@@ -195,6 +235,14 @@ def main():
         assert tile_bytes(dst, 0x10000 + c) == \
             tile_bytes(srcA5, 0x10000 + c), \
             f"bank-5 readback mismatch at 0x{c:04X}"
+    for c in wb5["host"]:
+        assert tile_bytes(dst, 0x10000 + c) == \
+            tile_bytes(srcA_host, 0x10000 + c), \
+            f"wheel host readback mismatch at 0x{c:04X}"
+    for c in wb5["vs2"]:
+        assert tile_bytes(dst, 0x10000 + c) == \
+            tile_bytes(srcA5, 0x10000 + c), \
+            f"wheel vs2 readback mismatch at 0x{c:04X}"
     # verification 2: untouched positions byte-identical to input
     dirty = 0
     for t2 in range(0, 0x20000):

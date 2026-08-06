@@ -59,6 +59,10 @@ tests/test_tenant_id.sh
 # it needs the WIDE emulator; skipped with a note where that is absent.
 if [ -x "${MAME_WIDE_BIN:-$HOME/.cache/vampire-saved/mame/cps2}" ]; then
     tests/test_tenant_select_records.sh
+    # The wheel bank-5 move (14z-63): the select wheel serves from group C
+    # bank 5 — vanilla medallions byte-copied, real vs2 art for the
+    # appended cells. Self-builds a 0x13 scratch build like the gate above.
+    tests/test_wheel_bank5.sh
 else
     echo "note: tenant select-records gate skipped (no WIDE MAME binary —"
     echo "      tools/setup_mame.sh; gate: tests/test_tenant_select_records.sh)"

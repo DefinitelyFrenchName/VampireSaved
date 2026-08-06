@@ -1,15 +1,99 @@
 # STATE — living progress log
 
-Updated: 2026-08-06 (sessions 14z-62..62k — the M3a program side DONE,
-the gfx core LANDED (the band serves from group C), OPTION A PHASES 1-2
-LANDED (the select family from bank 5, zero group-A placements), and
-FIVE maintainer playtest rounds: two real packaging/coordinate bugs
-caught and fixed (the stale group-B repack; the medallions off-screen
-since birth), JEDAH CONFIRMED INDISTINGUISHABLE FROM VANILLA, and the
-select-sword palette found, root-caused and fix-validated. Evidence
-build 048521c2. Remaining: phase 3 (wheel/medallions + ring source),
-cosmetic folds, the re-freeze bundle. Read 14z-62j/62k, then
+Updated: 2026-08-06 (session 14z-63 — PHASE 3 ITEMS 1 AND 2 DONE. Item
+1: the wheel bank-5 move — REAL MEDALLION ART for the three appended
+cells (native vs2 busts), vanilla medallions byte-copied into group C
+and measured pixel-identical. Item 2: the ring/highlight POSITION
+SOURCE found (32-row aliased pc-rel base table at 0x5FAE2 — vs2's own
+variant half is un-aliased, so the fix replicates Capcom's move) and
+fixed in place (3 code ops); the tenant's highlight now draws AT his
+cell (predicted exactly by the measured transform). PLUS a semantic
+correction that reframes the pending hover decision: the composed vs2
+"label" is really vs2's POST-CONFIRM NAME BAR; both engines hover-draw
+RINGS. New gate tests/test_wheel_bank5.sh; legacy window re-frozen
+889-2415; stock reproduces ae701ffb. Evidence build e9f3286c.
+Remaining: phase 3 items 3+ (hover-content decision, venue folds,
+win-pal, accent audit), the re-freeze bundle. Read 14z-63, then
 docs/NEXT_SESSION.md.)
+
+## Session 14z-63 (phase 3 item 1: the wheel bank-5 move — REAL
+## MEDALLION ART, vanilla cells pixel-identical by construction)
+
+Byte detail in docs/patch_notes.md 14z-63; mechanism in
+docs/atlas/select_screen.md "The wheel DRAWER". The shape:
+
+- **Measured before authoring** (the tap method, as planned): the wheel
+  drawer is $FFB800; its select anim chain is a SINGLE stop-flagged
+  entry at 0x2689FA (so the "single referrer" is just that entry's
+  payload, and on select the object draws the wheel and nothing else);
+  its bank word $FFB818 is written only by the per-object select init
+  0x5F8B2 (`move.w #$2000,$18(a6)` — family-wide tap proves no other
+  object rides that PC), while 0x07C428 is the SHARED attract init loop
+  (stride 0x80, never patch) and 0x5FD02 re-purposes the object at the
+  VS phase (which is what re-converges the flip's RAM divergence).
+- **The move**: flip the init immediate to bank_word(5)=0x3000 (one
+  code op, profile+group-C-gated) + copy 85 host tiles (every vanilla
+  entry, byte-identical vsav group A -> group C 0x10000+code; 85 = the
+  record's budget word) + 18 vs2 medallion tiles at native codes. Zero
+  collisions with the 271 bank-5 select-family tiles.
+- **Measured after**: fmt-2 handler walks the relocated record with OBJ
+  ffb800 BANK 3000; snapshot A/B vs 048521c2 (replay 36, frames
+  950/1150/1300): every changed pixel inside rows 145-184 x cols
+  148-243 = exactly the three appended cells — vanilla cells
+  pixel-identical, real vs2 busts on the new cells.
+- **Legacy re-freeze (interim)**: the §4 v3 host-pick window becomes
+  889-2415 (was 890-2362) — onset: the bank write surfaces one frame
+  before the old record-pointer-cache onset; end: the 0x5FD02 rewrite.
+  Single run, 1305 identical frames after, match untouched. Frozen in
+  test_tenant_select_records.sh §4 with the mechanism; RATIFICATION
+  folds into the pending re-freeze bundle (maintainer).
+- **Gates**: NEW tests/test_wheel_bank5.sh (static re-derivation, group
+  C member identity straight from the zips, 2 negative controls, the
+  engine's bank-5 walk) — in the battery; tenant select-records +
+  tenant-id PASS; stock rebuild reproduces ae701ffb. GOTCHAS gained the
+  unconditioned-breakpoint replay-desync trap (a stop-heavy trace
+  measured ATTRACT while its frame counter said "select").
+- Evidence build (item 1): `build/m3a_wheel` = `2c02213d`;
+  build/m3a_selrec (048521c2) kept as the A/B reference for this
+  session's snapshots.
+
+**Item 2 (same session): the ring/highlight position source — found
+and fixed in place.** Full detail in patch_notes 14z-63 addendum and
+the atlas "position source" section. The shape: the highlight drawer
+($FFBA00) bases per cell via a 32-ROW pc-relative table at 0x5FAE2
+whose variant half is a byte-identical ALIAS (TABLE B convention) —
+and vs2's OWN twin table is UN-aliased with its newcomers' bases, so
+overwriting rows 0x10/0x11/0x13 in place is Capcom's own move. Three
+4-byte CODE ops (pc-relative reads assert the program FC — the table
+is stored encrypted; a data op would corrupt it). Transform measured
+on three cases incl. one exact prediction: OBJ_x = base_x+coord_x+64,
+OBJ_y = 224-(base_y+coord_y). Bases live in the layout as
+`highlight_base` (rule-5 table). The tenant's highlight now draws AT
+his cell; the P1/P2/MIRROR highlight blocks are all 32-row aliased
+tables (a tenant mirror-hover fetches a safe alias — relevant to the
+parked mirror-victim fix). Evidence build: `e9f3286c`.
+
+**Semantic correction that reframes the hover decision**: the composed
+vs2 highlight record (b000 5x1, "his lit-label") is actually vs2's
+POST-CONFIRM NAME BAR — measured: vs2 never draws it at hover, only at
+the top corner after confirm; vs2's own hover highlight is a RING
+(pal-1e tiles measured around his cell), like vsavj's.
+
+**Decisions pending (maintainer)** — unchanged from 62k plus the
+REFRAMED hover content (phase 3 item 3), the position half now done:
+  (a) RING REUSE — point highlight rows 0x10/0x11/0x13 (P1+P2) at row
+      0x0F's ring record VERBATIM (records encode no cell identity;
+      the fixed base table does the placement). Zero new art, real
+      vanilla ring behavior/palette; the outline is Jedah's 3x2 shape
+      on all three cells. RECOMMENDED as the vanilla-consistent
+      option; per-cell AUTHORED rings can supersede it later.
+  (b) KEEP THE BAR (current interim) — the composed vs2 name bar now
+      draws centred on the cell (~8px right; exact centring = base_x
+      pos_x-64). Art is the unplaced b000 placeholder.
+  (c) Authored per-cell ring art now (most work).
+Also still pending: the medallion palettes ride the vanilla attr words
+(vs2 rows 0x13/0x11/0x05) — they read plausibly on the snapshot (Pyron
+flame-orange, Huitzil gold) but are a look-and-feel call.
 
 ## Sessions 14z-62j/62k (same day — OPTION A PHASES 1-2 LANDED and
 ## PLAYTEST-VALIDATED: the select family serves from group C bank 5;

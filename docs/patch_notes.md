@@ -1372,3 +1372,81 @@ fixed; scratch build 048521c2):
   the copier's F000 alpha OR; P1/P2 dests by $381(a4). Verified: row
   0x17 = his accent row in palette RAM; sword renders colored; full
   gate PASS incl. the acceptance window; stock ae701ffb.
+
+Session 14z-63 (phase 3 item 1: REAL MEDALLION ART — the wheel bank-5
+move; evidence build 2c02213d):
+- Mechanism measured first (tap + conditioned bank trace + chain decode;
+  docs/atlas/select_screen.md "The wheel DRAWER"): the wheel drawer is
+  $FFB800, its select anim chain is a single stop-flagged entry
+  (0x2689FA), its bank word $FFB818 is written ONLY by the select init
+  at 0x5F8B2 (`move.w #$2000,$18(a6)` — per-object; the shared attract
+  loop 0x07C428 untouched), and the VS-phase re-init 0x5FD02 rewrites
+  the field afterwards.
+- Bytes: ONE code op — 0x5F8B2: 3d7c 2000 0018 -> 3d7c 3000 0018 (the
+  immediate becomes bank_word(5)=0x3000; profile+group-C-gated via
+  `[[select_wheel]] bank5=true`, skipped with a note when the tenant's
+  gfx bank < 4, so the m5_wide 0x0F+WIDE shape keeps its placeholder
+  medallions and rebuilds unchanged).
+- Tiles: 103 into group C upper bank at 0x10000+code — 85 host tiles
+  (every tile of every vanilla wheel entry, byte-identical from vsav
+  group A; 85 = the record's budget word) + 18 vs2 medallion tiles (the
+  appended cells' native codes b0f5/b108/b10b, 3x2 each). Zero
+  collisions with the 271 existing bank-5 select-family tiles.
+  Generator emits wheel_bank5.json; build_gfx_donovan --wheel-bank5
+  places + readback-verifies both halves.
+- Measured on build 2c02213d: the fmt-2 handler walks the relocated
+  record with OBJ ffb800 BANK 3000; snapshot A/B vs build 048521c2 on
+  replay 36 (frames 950/1150/1300): every changed pixel inside the three
+  appended cells' box (rows 145-184, cols 148-243) — vanilla cells
+  pixel-identical; the new cells show the real vs2 busts.
+- Legacy consequence, mechanism-attributed: the §4 v3 bounded window on
+  the host pick becomes 889-2415 (was 890-2362) — the bank-word write
+  surfaces at the frame-889 sample, one frame before the old onset's
+  record-pointer caches; divergence ends when 0x5FD02 rewrites $FFB818.
+  Single run, 1305 identical frames after, match untouched. Frozen in
+  test_tenant_select_records.sh §4; ratification folds into the pending
+  re-freeze bundle.
+- Gates: tests/test_wheel_bank5.sh NEW (static re-derivation incl. group
+  C member identity straight from the zips, two negative controls, the
+  engine's own bank-5 walk); tenant select-records + tenant-id PASS;
+  stock rebuild reproduces ae701ffb.
+
+Session 14z-63 addendum (phase 3 item 2: THE RING/HIGHLIGHT POSITION
+SOURCE — found, and fixed in place; build e9f3286c):
+- The source: the ring/highlight drawer ($FFBA00 — identified by walking
+  the tenant's composed record) takes its per-cell base from a 32-row
+  pc-relative word-pair table at PRG:0x5FAE2 (helper 0x5FAD0,
+  `move.w d6,d0; lsl #2; move.w $5FAE2(pc,d0.w),$10(a6); ...$14(a6)`),
+  indexed by the hovered cell UNMASKED. The variant half (rows
+  0x10-0x1F) is a byte-identical ALIAS of the base half in vsav — the
+  TABLE B convention — and vs2's own variant half is UN-ALIASED with
+  its newcomers' bases (twin helper 0x6BC66, table 0x6BC78: rows 0x10
+  (224,136), 0x11 (192,152), 0x13 (160,136)). So the misplaced-hover
+  bug is an alias read, and the fix is Capcom's own move: overwrite
+  rows 0x10/0x11/0x13 in place. 12 bytes, THREE code ops (pc-relative
+  reads assert the PROGRAM function code — the stored bytes are
+  encrypted, so data ops would corrupt them); row 0x12 stays reserved.
+- The transform, measured on three independent cases (the misplaced
+  bar, Jedah's row-0x0F ring, and the post-fix prediction confirmed
+  exact): OBJ_x = base_x + coord_x + 64; OBJ_y = 224 - (base_y +
+  coord_y). Bases in the layout (`highlight_base`, rule-5 table):
+  derived from the row-0x0F reference so a ring-like record lands
+  centred on the cell: base = (pos_x - 56, 248 - pos_y) -> 0x10
+  (168,80), 0x11 (192,72), 0x13 (216,80).
+- SEMANTIC CORRECTION for the pending hover decision: vs2's highlight
+  ARRAY row 0x13 (the composed b000 5x1 record) is vs2's POST-CONFIRM
+  NAME BAR (measured: drawn at the top corner at F1320+, never at
+  hover), NOT a hover label. vsavj draws the array row at HOVER as the
+  cursor ring (per-cell pal-0x1E ring records, all different codes).
+  vs2's own hover highlight is ALSO a ring (pal-1e tiles measured
+  around his cell). The three mirror/P2/P1 highlight blocks are ALL
+  32-row aliased tables (mirror rows 0x50/0x53 alias safely — no
+  crash path for a tenant mirror-hover).
+- Interim shipped: the composed bar now draws AT the tenant's cell
+  (measured OBJ (240,160), predicted exactly); cells 0x10/0x11 draw
+  their alias rings at their own cells. The record CHOICE is the
+  maintainer's (STATE decisions pending, with recommendation).
+- Gates: checker gained the HBROWS section (aliased-site verification
+  + per-row code ops + the reserved-row negative); tenant gate PASS
+  (window 889-2415 unchanged — the rows are ROM, and legacy replays
+  never hover extended cells); stock reproduces ae701ffb.

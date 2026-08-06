@@ -568,3 +568,104 @@ feeding it the old `0x020A84` address, which must fail.
 
 Tap ranges must be word-aligned (`ff8402,2`, not `ff8403,1`) or MAME
 refuses to install the tap.
+
+## The wheel DRAWER — object, bank word, and the bank-5 move (14z-63)
+
+Measured end to end for phase 3 item 1 (real medallion art):
+
+```
+drawer object     RAM:$FFB800 (the select screen's element 0)
+anim chain        offset table PRG:0x2671C6 (element id 0 -> +0x1834)
+                  = ONE 8-byte entry @ PRG:0x2689FA: ff400000 00272A68
+                  (draw the wheel record, stop-flagged) — so on select
+                  this object draws the wheel record and NOTHING else,
+                  and the record's "single referrer" 0x2689FE is simply
+                  that entry's payload long
+bank word         RAM:$FFB818 ($18(a6), OBJ y-word bank bits)
+select init       PRG:0x5F8B2 `move.w #$2000,$18(a6)` — a PER-OBJECT
+                  init block (0x5F89A..) that writes ONLY $FFB818
+                  (family-wide tap over $FFB800-$FFBE00); also sets
+                  $1A=#$E000, pos $10=#$C0/$14=#$50, then
+                  `movea.l #$2671C6,a0; jmp $15084`
+attract init      PRG:0x07C428 — the SHARED screen-init loop, stride
+                  0x80 over every menu object (writes $18=#$2000,
+                  $1A=#$E000 for each). NEVER patch this one; on
+                  attract $FFB800 runs a different chain (CUR
+                  0x26810E, REC 0x269032)
+VS-phase re-init  PRG:0x5FD02 `move.w #$2000,$18(a6)` — re-purposes
+                  $FFB800 as element 0x9=0xA (own position table at
+                  0x6045E); the wheel is never drawn again after it,
+                  and it is what re-converges the RAM divergence of
+                  the bank flip (replay 11: write at tap-frame 2415)
+```
+
+**The bank-5 move.** The wheel is ONE record drawn by ONE object — one
+bank word — so per-entry banks are impossible. The move that ships:
+every tile of every vanilla entry (85 tiles = the record's own budget
+word, a consistency check) copied BYTE-IDENTICAL from vsav group A into
+WIDE group C at the same in-group index (0x10000+code); the appended
+cells' native vs2 codes (18 tiles, b0f5/b108/b10b 3x2 blocks) from vs2
+group A; and the select-init immediate flipped #$2000 -> #$3000 (bank
+5). Vanilla-cell pixels are identical by construction AND measured: the
+snapshot diff on replay 36 confines every changed pixel to the three
+appended cells' bounding box (rows 145-184, cols 148-243). Authoring:
+`[[select_wheel]] bank5/bank_site/bank_site_old` in the manifest ->
+`wheel_bank5.json` + one code op; gfx `--wheel-bank5`. Gate:
+`tests/test_wheel_bank5.sh` (site + re-derived inventory + group C
+member identity + negative controls + the engine's own bank-5 walk).
+Legacy window consequence: onset 890 -> 889, end 2362 -> 2415 on the
+pick replays (the init writes the bank word one frame before the old
+onset's cache divergence; 0x5FD02 re-converges it) — re-frozen in
+`test_tenant_select_records.sh` §4, folds into the pending re-freeze.
+
+## The ring/highlight POSITION source — the 32-row base table (14z-63)
+
+The highlight drawer ($FFBA00 for P1) positions per hovered cell through
+a pc-relative word-pair table, and its chain comes from the same element
+machinery as everything else on this screen:
+
+```
+helper            PRG:0x5FAD0  (move.w d6,d0; lsl #2;
+                  move.w $5FAE2(pc,d0.w),$10(a6);
+                  move.w $5FAE4(pc,d0.w),$14(a6))   d6 = hovered cell
+base table        PRG:0x5FAE2  32 rows x (x.w, y.w), indexed cell*4,
+                  UNMASKED. Variant half = byte-identical ALIAS of the
+                  base half (the TABLE B convention). vs2's twin
+                  (helper 0x6BC66, table 0x6BC78) is UN-aliased: rows
+                  0x10 (224,136) / 0x11 (192,152) / 0x13 (160,136) are
+                  its newcomers' real bases — Capcom's own extension
+                  move, which ours replicates
+encryption        the table is read PC-RELATIVE -> PROGRAM function
+                  code -> stored bytes are ENCRYPTED. Patching rows is
+                  a CODE op; a data op would write plaintext into
+                  cipher space and serve garbage
+chain fetch       PRG:0x5FA96: element = cell, +0x20 for P2, +0x40 for
+                  the MIRROR case (both players on one cell); $1C(a6)
+                  = 0x2689FE + 4*element, record = [$1C]+4 — i.e. the
+                  highlight ARRAY rows, and ALL THREE blocks (P1/P2/
+                  mirror, base 0x268A02 +0x00/+0x80/+0x100) are 32-row
+                  aliased tables (verified) — a tenant mirror-hover
+                  fetches a safe alias today
+transform         OBJ_x = base_x + record_coord_x + 64
+                  OBJ_y = 224 - (base_y + record_coord_y)
+                  (measured on three independent cases, incl. one
+                  exact post-fix prediction)
+```
+
+**The fix (14z-63):** rows 0x10/0x11/0x13 overwritten in place with the
+layout's `highlight_base` pairs (row 0x12 reserved, untouched); three
+4-byte code ops emitted by the select_wheel section for ANY
+extended-wheel build. Bases derive from the row-0x0F reference (base
+(192,184), ring centre (248,64)): `base = (pos_x - 56, 248 - pos_y)`.
+
+**Semantic caution for the hover-content decision:** the vs2 highlight
+ARRAY records are vs2's POST-CONFIRM NAME BARS (the b000 5x1 draws at
+the top corner after confirm, never at hover — measured), while vsavj
+draws the array row at hover as the CURSOR RING (per-cell pal-0x1E
+records: row 0x01 = 6 entries b482-b48a, row 0x0F = 9 entries
+b436-b43e — genuinely per-cell shaped). vs2's own hover highlight is
+also a ring. So "vs2's lit label" was a misreading of the composed
+record; the vanilla-consistent option is a ring record (e.g. reuse row
+0x0F's record verbatim for the three 3x2 cells — the record encodes no
+cell identity, the base table does the placement), and the composed
+bar-at-cell is the shipped interim.

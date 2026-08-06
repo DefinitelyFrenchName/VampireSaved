@@ -134,6 +134,8 @@ if [ "$STAGE" -ge 6 ]; then
         --select-tiles "$OUTBASE/select_tiles.json" \
         $( [ -f "$OUTBASE/patch/select_bank5.json" ] && \
            echo "--select-bank5 $OUTBASE/patch/select_bank5.json" ) \
+        $( [ -f "$OUTBASE/patch/wheel_bank5.json" ] && \
+           echo "--wheel-bank5 $OUTBASE/patch/wheel_bank5.json" ) \
         --effect-tail build/manifest/effect_tail.json $OVERLAY_TILES \
         --tenant "$OUTBASE/patch/tenant.json" | tail -10
     GFXSTAGE="$(mktemp -d)"

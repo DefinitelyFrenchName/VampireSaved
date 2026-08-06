@@ -1827,3 +1827,26 @@ Rules:
 - When FBNeo and MAME disagree visually, suspect ROM RESOLUTION before
   emulation — this is the third member-resolution trap (60z, the zero-CRC
   collision, now this).
+
+## Unconditioned breakpoints DESYNC replay input — the trace measures a
+## screen the replay never left (14z-63)
+
+`obj_record_full_trace.lua` with breakpoints on the hot OBJ format
+handlers (thousands of stops per second) produced a trace whose frame
+counter said "select screen" while the machine was still in ATTRACT: the
+frame counter advances on `frame_done`, which keeps firing for UI frames
+while the CPU sits stopped, so scripted inputs land at the wrong EMULATED
+time and the replay silently never progresses. The symptom is coherent
+and misleading: a stable set of records cycling "at select frames" that
+are really the attract screen's menu objects ($FFB800 CUR 0x26810E, REC
+0x269032 — the 0x07C428-inited attract chain). The conditioned
+`obj_record_bank_trace` run (2 stops total) in the same session showed
+the true select-entry facts.
+Rules:
+- A breakpoint instrument driving replay input is only trustworthy when
+  stops are RARE — condition the breakpoint (a0/a6 windows) so it fires
+  a handful of times per run, or drive state via write taps (no stops).
+- When a stop-based trace and a tap-based trace disagree about what
+  frame N contains, believe the tap — its frames are emulated frames.
+- Cross-check any stop-based finding against a screen-identifying fact
+  (an init PC, a known object base) before attributing it to a screen.
