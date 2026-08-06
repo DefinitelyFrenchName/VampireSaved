@@ -1,210 +1,67 @@
 # STATE — living progress log
 
-Updated: 2026-08-06 (sessions 14z-62..62c — **the M3a PROGRAM SIDE is
-DONE, GATED and MEASURED**: the select-records half landed (six composed
-records, six rows, host program bytes vanilla), then the slot-row audit
-14z-62c chased every remaining row-0x0F dependency the first host-pick
-measurement exposed — palette/sfx rows, An-relative thunk literals, eleven
-host-content writes, the throw block, and the engine OBJ bank-word table
-whose slot-0x0F value had matched by luck. The ACCEPTANCE is measured:
-legacy replays on the 0x13 build reproduce the frozen donovan-m5w classes
-exactly, and the host pick — divergent forever on every substituted
-build — is a single re-convergent window through a full Jedah match.
-Donovan renders in-match at 0x13 with his own art and colors. Both frozen
-references rebuild bit-identically throughout. Remaining for M3a: the GFX
-half (band to group C) + the enumerated cosmetic interims. ALSO: dotted
-manifest tables parse per-host (the 14z-2 fix never applied on this
-machine — frozen refs included); banned now, re-apply at re-freeze. Read
-14z-62/62c, then docs/NEXT_SESSION.md.)
+Updated: 2026-08-06 (sessions 14z-62..62d — **the M3a PROGRAM SIDE is
+DONE and the GFX HALF'S CORE LANDED**: select records composed at the
+variant id (62), the slot-row audit closed every row-0x0F dependency and
+measured the de-substitution acceptance (62c), and the tenant's fighter
+band now serves from WIDE GROUP C with the host's group B PRISTINE (62d)
+— Donovan renders in-match from bank 4, and Jedah's match is
+PIXEL-IDENTICAL TO VANILLA. Descriptor group-C CRCs are SENTINELS now
+(two measured shadow classes on the way — GOTCHAS). Both frozen
+references rebuild bit-identically throughout. Remaining: the bank-1
+select-art move (needs the select-object bank measurement), cosmetic
+interims, the parked mirror-victim fix, and the re-freeze. Read
+14z-62..62d, then docs/NEXT_SESSION.md.)
 
-## Session 14z-62 (M3a select records LANDED — composition moved into the
-## generator; the host's records are vanilla again at 0x13)
+## Session 14z-62d (same day — THE GFX HALF LANDS ITS CORE: the tenant's
+## band serves from WIDE group C, and the host's group B is PRISTINE)
 
-The smaller half of M3a, exactly as queued by 14z-61. The ordering
-question NEXT_SESSION flagged is settled, the mechanism is implemented,
-gated, and measured end-to-end in the emulator.
+The minimal-change design that made it tractable: **keep every record
+code word, flip only the bank words, move the tile data.** The band
+(codes 0xAD8F-0xEA3F) and the effect shelf (to 0xEEBB) keep their exact
+in-group tile indices — so not one record byte changes — but the data is
+written into the four appended vsw simms (group C, bank 4 = y-word
+0x1000, the bit-12 Turbo promote) and every bank-word source follows the
+tenant: the six OBJ bank setters (`new_hex_variant`), the engine table
+row (`obj_bank_word_slot`), the ported table row (bank_word(4) — NOT
+`4 << 13`, which is the sprite-list TERMINATOR bit; `gfx_tiles.bank_word`
+is now the single encoding), and `normalise_tenants` defaults a variant
+tenant's gfx bank to 4.
 
-### The ordering decision: composition moved INTO the generator
+**The descriptor CRC question got measured twice before it got right.**
+Group C content varies per build, so a fixed CRC can never match it —
+and any REAL value shadows: the pristine-B CRCs were the 14z-60z bug,
+and the "obvious" zero-fill CRC hash-collides with the ZERO QSOUND
+members in the same zip (measured: vsw.31m resolved to vsw.21m, the
+whole B4 canary went dark while the zero-build sections stayed green).
+The answer is SENTINEL CRCs (0xdec0de31..37) that match nothing, so the
+members always resolve BY NAME — which both loaders demonstrably do for
+every patched vm3 member already. Both emulator patches updated, both
+emulators rebuilt, FBNeo profile gate PASS (superset + inertness +
+canary); the MAME twin re-run against the sentinel build.
 
-The question was: `gen_donovan_patch.py` (which owns the space model) runs
-BEFORE `select_port.py` (which composed the record bytes) — so either the
-generator emits an allocation for select_port to consume, or the records
-move into the generator. **The records moved into the generator**, as a
-declarative `[[select_records]]` section (one row per UI piece,
-`build/manifest/donovan.toml`), for four reasons:
+**Measured, on build `464eaf1f`:**
+- Donovan renders IN-MATCH from group C — the 19-bit path carrying real
+  roster content in a real match, pixel-correct, his own colors.
+- **Jedah's match is PIXEL-IDENTICAL TO VANILLA** — raw-decoded MAME
+  snapshots at four frames, work RAM bit-identical (window 890-2362
+  unchanged), OBJ lists entry-identical. Two false scares on the way,
+  both instrument lessons (GOTCHAS): his ES super's shred-ribbon art
+  read as "garble" until compared against vanilla's own frame, and MAME
+  VIDEO_OUT across DIFFERENT machine configs flags thousands of
+  pixel-identical frames as divergent — cross-driver pixel comparison
+  must use FBNeo HVIDEO or raw snapshots.
+- The tenant gate passes all four sections unchanged.
 
-1. every program-image write flows through patch.json — allocator 0xFF-fill
-   checks, profile gating, provenance fragments, the image-extension block;
-   a select_port writing into generator-owned space would need an address
-   side-channel AND would bypass all of that;
-2. the `select_wheel` section is the proven template (vanilla-anchor
-   assertions, copy into profile-gated space, repoint, notes);
-3. inertness at `0x0F` is by construction — the section is gated on a
-   variant-half tenant id, so the frozen references rebuild untouched and
-   select_port's code is not modified at all;
-4. one brain: the generator also emits the tile-pair map its composed
-   records imply (importing `select_port.PLACEMENTS`, the single placement
-   table), so records and art cannot disagree.
-
-`build_donovan.sh` picks the mechanism by tenant id (from
-`patch/tenant.json`): base-half id → select_port surgery as always;
-variant-half id → select_port is NOT run and the generator's
-`select_tiles.json` feeds the gfx stage. The two mechanisms are recorded
-as mutually exclusive in `docs/patch_index.md`.
-
-### Measured on the way in (all static, from the decrypted data images)
-
-- **vs2 carries the same three arrays, same 32-row × 4-byte model with
-  P2 = P1 + 0x80**: portrait `PRG:0x2A0762`, name `PRG:0x2A08E2`,
-  highlight `PRG:0x2A18FE`. Found via the single referrer to the known
-  Donovan portrait record `0x2A63F0` (= row 0x13), shape-verified on both
-  halves. vs2's variant half is NOT an alias bank: rows 0x10/0x11/0x13
-  hold the newcomers' own records, 0x12 aliases Gallon (dark Talbain).
-- **The six Donovan source records** (P1/P2 × portrait/name/highlight):
-  `0x2A63F0/0x2A6416`, `0x2A657E/0x2A76A4`, `0x2A6750/0x2A6F00`.
-- **The highlight piece is the LIT NAME LABEL** — vs2's P1 name banner and
-  P1 highlight share one coordinate list (`0x303734`), same 5-wide block
-  at (-40,-16). That is what M2b's "displaced label" note was seeing, and
-  why highlight records are per-character art, not a generic ring.
-- select_port's `RECORDS` list contains the P2 portrait record mislabeled
-  "pal P1" (`0x2720FA` = P2 row 0x0F; source `0x2A6416` = vs2's P2
-  portrait) — correctly wired under a wrong name, a relic of the corrected
-  +0x40 model. Recorded here; the 0x0F track is frozen so the label stays.
-
-### What landed
-
-- `[[select_records]]` × 3 in the manifest (frozen vanilla anchors: the
-  six vj alias values AND the six vs2 row values), generator section that
-  composes each record with **vs2's own budget words** (variant rows are
-  unreachable by legacy ids — audit_id_writers — so the budget debits only
-  tenant-drawn frames), coord lists copied verbatim, tiles remapped via
-  PLACEMENTS, and four PLACEHOLDER codes kept where no placement exists
-  (name/p2 0xB22C+0xB2A5, highlight/p1 0xB000, highlight/p2 0xB129 — the
-  ratified medallion policy, until the gfx half).
-- Six poke32s: `0x267476/0x2674F6`, `0x2675F6/0x267676`,
-  `0x268A4E/0x268ACE` ← the composed records (byte detail in
-  docs/patch_notes.md 14z-62).
-- Host program bytes VANILLA at 0x13: the record block
-  `PRG:0x271900-0x274700`, the select-palette grid column for char 0x0F,
-  the shared name-banner coord list. One fewer program member is patched.
-- Reserved-id refusals in `normalise_tenants`: 0x12 and 0x18.
-- **Gate `tests/test_tenant_select_records.sh`** (in the battery, with
-  `test_tenant_id.sh`): static composition RE-DERIVED independently
-  (tools/check_tenant_select.py, prints the poked rows for the runtime
-  section); three negative controls (pristine image, flipped composed
-  byte, flipped host byte — the verdict logic is itself tested); and the
-  engine's own row sequence walking onto cell 0x13 (new replay
-  `36_pick_tenant_cell.rpl`: L,L,D,D from default = 0x01→0x05→0x0A→0x09→
-  0x13) — all three pieces fetch rows 0x01,0x05,0x0A,0x09 then the
-  TENANT's composed record. All sections PASS.
-- **Frozen references verified**: stock rebuilds to `ae701ffb`, WIDE to
-  `9bac6ee3`, both exact, after every change.
-- Scratch build `build/m3a_selrec` (`dd88f343`): snapshots confirm the
-  tenant cell shows Donovan's portrait + name, the pick reaches the speed
-  menu, and legacy hover (Demitri) is vanilla.
-
-### The finding that shapes the gfx half: the host's select ART lives in
-### his own FIGHTER band
-
-With Jedah's records vanilla again, his select portrait still garbles on
-the 0x13 build. Measured: **89 of his 92 portrait tiles sit inside the
-tenant-placed fighter band `[0xAD8F,0xEA3F]`** — the select portrait art
-is bank-2 (his own band), not select-bank art. His name banner happens to
-fall in placement gaps and renders correctly. So visual de-substitution of
-the select screen is NOT a records problem — it completes when the gfx
-half moves the tenant's band to WIDE group C, at which point the host band
-returns to pristine wholesale. (Also interim and expected: Donovan's
-portrait shows in Victor-ish colors — the select-palette uploader resolves
-id 0x13 into Victor's grid neighborhood; the palette route at a variant id
-is one of the unmeasured mechanisms below.)
-
-### Still open on the select screen at a variant id (measure before build)
-
-- **Splash (VS screen), win-quote, and select-palette mechanisms at
-  0x13.** select_port's other families (splash P1/P2, pal, win quote,
-  palette grid) are slot-0x0F-only in-place edits and are now simply NOT
-  applied on variant-id builds — those paths resolve id 0x13 through
-  whatever the engine does natively (folds → Victor-ish content).
-  Mechanisms unmeasured; vs2 special-cases some of them (its palette
-  uploader has a literal `cmpi #$13` redirect at `0x6B1A0`). Measure the
-  vsavj consumers before porting.
-- ~~**P2-side runtime measurement**~~ **DONE same session (14z-62b).**
-  Replay `37_p2_pick_tenant.rpl` (P2 joins, walks L,D,D onto 0x13); the
-  gate gained three P2 runtime sections. Measured: the portrait and
-  highlight `+0x80` arrays are LIVE (P2 fetches its default row 0x05,
-  then 0x0A, 0x09, then the TENANT's P2 records). **The name piece is
-  asymmetric**: both players' name banners read the P1 ARRAY (each by its
-  own cell — P2 landing on 0x13 fetches the tenant's P1 name record), and
-  the `+0x80` name structure has NO consumer on any measured path (zero
-  reads through 3,800 frames incl. VS splash and match start). This
-  CORRECTS the 14z-61 "all three pieces share the model" reading for the
-  name piece; atlas updated. The composed `+0x80` name row is kept (zero
-  risk, covers unmeasured paths) and the gate asserts the measured
-  negative so a consumer appearing is loud.
-- The four placeholder tile blocks render as wrong pixels until the gfx
-  half (documented, ratified policy).
-
-## Session 14z-62c (same day — the SLOT-ROW AUDIT: the de-substitution
-## acceptance is MEASURED, after the audit it demanded)
-
-Continuing 14z-62: the first masked comparison of replay 11 (pick Jedah)
-on the 0x13 build diverged INTO THE MATCH — the select-records half was
-correct but the build still carried a family of row-0x0F dependencies no
-gate had ever exercised, because no legacy replay could PICK the host on
-a substituted build. The measure-diff loop (masked compare -> work-RAM
-dump at the divergent frame -> the differing bytes name the subsystem)
-found them one class at a time:
-
-- the [[palette]]/[[sound_table]] rows hardcoded `row = 0x0F` in the
-  manifest — JEDAH's sprite-palette and sfx pointers were repointed at
-  Donovan's data (his cached block ptr at $FFB8C1 = the ported address);
-- four accent thunks + four companion thunks + two LS-freeze thunks
-  gated on `#$0F` in An-RELATIVE compare forms the TT guard could not
-  see, one of them also embedding the palette-table ROW ADDRESS;
-- eleven in-place host-content writes (accent slots, win-pal slices,
-  medallion palette, HUD name plate) that must simply not happen when
-  the host is himself again;
-- the throw victim-keyframe block (host block in place -> now PLACED with
-  the tenant's 0xBE27A row repointed);
-- and, found only when the first 0x13 match rendered grey blocks: the
-  ENGINE's per-char OBJ BANK-WORD table (PRG:0x282D4, PC-relative,
-  unmasked id, writer PC 0x282C0 -> $18(a6)). Slot 0x0F never needed a
-  poke — Jedah's row was ALREADY the band the port occupies, the
-  substitution landing for free — so row 0x13 served Victor's alias
-  (0x2000) under Donovan's codes. Right codes, wrong band.
-
-All of it is now declarative (docs/tenant_manifest.md "slot-row
-vocabulary": only_base_slot, slot_ptr_table, slot_table/stride/off/
-mirror, TT An-relative guard, row_subst, flat fixes=). Byte-inert at the
-base slot — both frozen references verified reproducing after every step.
-
-**DISCOVERY with its own blast radius:** `[[data_port.fix]]` parses ONLY
-on tomllib hosts; this machine's subset parser orphans it, so the 14z-2
-mirror-victim fix NEVER APPLIED here — frozen references included — while
-a python-3.11 host would have applied it: same manifest, different bytes.
-Dotted tables are now a generator hard-failure; the fix is parked as a
-flat-syntax comment to be applied at the M3a RE-FREEZE (it changes frozen
-bytes; maintainer decision), with a mirror-flavor throw replay owed.
-
-**THE ACCEPTANCE, MEASURED** (0x13 build db0c984d, masked basis, vs the
-frozen vanilla logs): 02 = window 890-1622 +3,898 identical; 05 = window
-890-1622 +10,498 identical — both EXACTLY the frozen donovan-m5w classes;
-04 = composite with the frozen flicker inventory to the frame
-(1525/2009/2195) + window 890-1051; and replay 11 — the host pick,
-`diverge 890` forever on every substituted build — is now a SINGLE
-bounded window 890-2362, fully re-convergent through a complete
-Jedah-vs-CPU match (the 1963+ tail is ONE byte, $FF06D1, a menu-scoped
-counter phase that match start resets). Frozen into the gate as section
-4 ("de-substitution acceptance"). In-match snapshot: Donovan at 0x13
-renders with his own art and colors.
-
-**What still stands between here and claiming M3a** (all measured,
-none blocking the program side): the gfx half (tiles to group C — the
-host's select/mugshot/medallion ART is still substituted where it falls
-inside the tenant-occupied band); the folded 16-wide venue family (HUD
-name plate shows Victor's at 0x13); win-screen palettes / palette grid /
-splash at variant ids (unported, Victor-ish colors, mechanisms
-enumerated); the parked mirror-victim fix.
+**What remains of the gfx half** (bank-1/group-A, mechanism understood):
+the tenant's select-art subset still occupies Jedah's bank-1
+hover-figure anchors, so the host's select-screen BODY figure garbles —
+his face, name banner, and all match art are back. Moving select art to
+group C needs one measurement first: the select-venue OBJECTS' bank
+fields (can a select record be drawn from bank 4, and what sets those
+objects' +0x18?). Then the four placeholder label tiles and the
+medallion art ride the same move. HUD plate / palette-grid / win-pal
+interims unchanged from 14z-62c.
 
 ## Session 14z-61 (WIDE GARBLE FIXED — a shadowed ROM member, not the
 ## emulator; and the rendering gate that should have caught it)

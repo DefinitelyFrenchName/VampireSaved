@@ -43,7 +43,23 @@ import zipfile
 
 GROUP_A = (13, 15, 17, 19)
 GROUP_B = (14, 16, 18, 20)
+# CPS-2 WIDE v1 group C (vsw simms, appended by the profile): tiles
+# 0x40000-0x5FFFF, banks 4-5. Same interleave, same member size (4MB).
+GROUP_C = (31, 33, 35, 37)
 TILES_PER_GROUP = 0x20000
+
+
+def bank_word(bank):
+    """The OBJ y-word bank bits for a gfx bank — NOT `bank << 13`.
+
+    Stock banks ride y bits 13-14. The WIDE profile's 19th tile-address
+    bit is y BIT 12, promoted after the terminator check (the CPS-2 Turbo
+    rule, docs/cps2_wide.md): bit 15 is the sprite-list TERMINATOR, so
+    bank 4 = 0x1000 and bank 5 = 0x3000. `4 << 13` would be 0x8000 — a
+    terminator, ending the sprite list at the first tenant sprite.
+    """
+    return {0: 0x0000, 1: 0x2000, 2: 0x4000, 3: 0x6000,
+            4: 0x1000, 5: 0x3000}[bank]
 BLANK = {hashlib.sha1(b"\x00" * 128).digest(),
          hashlib.sha1(b"\xff" * 128).digest()}
 SEP = [sum(((b >> i) & 1) << (4 * i) for i in range(8)) for b in range(256)]

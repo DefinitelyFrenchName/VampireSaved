@@ -123,10 +123,10 @@ index 6931097..1aa72c4 100644
 +	// whole groups of FOUR, all the same size: Cps2LoadTiles consumes
 +	// four at a time and advances by nGfxMaxSize*4, and a short member
 +	// silently poisons nGfxMaxSize (~0U) and the entire load map.
-+	{ "vsw.31m",       0x400000, 0xc1a28e6c, CPS2_GFX | BRF_GRA },   // WIDE v1 (canary: copy of group B)
-+	{ "vsw.33m",       0x400000, 0x194a7304, CPS2_GFX | BRF_GRA },   // WIDE v1 (canary: copy of group B)
-+	{ "vsw.35m",       0x400000, 0xdf9a9f47, CPS2_GFX | BRF_GRA },   // WIDE v1 (canary: copy of group B)
-+	{ "vsw.37m",       0x400000, 0xc22fc3d9, CPS2_GFX | BRF_GRA },   // WIDE v1 (canary: copy of group B)
++	{ "vsw.31m",       0x400000, 0xdec0de31, CPS2_GFX | BRF_GRA },   // WIDE v1 SENTINEL CRC: matches NOTHING, so the member ALWAYS resolves by NAME (a real CRC hash-shadows: group-B copies did at 14z-60z, and a zero-fill CRC collides with the zero QSound members — measured 14z-62d)
++	{ "vsw.33m",       0x400000, 0xdec0de33, CPS2_GFX | BRF_GRA },   // WIDE v1 SENTINEL CRC: matches NOTHING, so the member ALWAYS resolves by NAME (a real CRC hash-shadows: group-B copies did at 14z-60z, and a zero-fill CRC collides with the zero QSound members — measured 14z-62d)
++	{ "vsw.35m",       0x400000, 0xdec0de35, CPS2_GFX | BRF_GRA },   // WIDE v1 SENTINEL CRC: matches NOTHING, so the member ALWAYS resolves by NAME (a real CRC hash-shadows: group-B copies did at 14z-60z, and a zero-fill CRC collides with the zero QSound members — measured 14z-62d)
++	{ "vsw.37m",       0x400000, 0xdec0de37, CPS2_GFX | BRF_GRA },   // WIDE v1 SENTINEL CRC: matches NOTHING, so the member ALWAYS resolves by NAME (a real CRC hash-shadows: group-B copies did at 14z-60z, and a zero-fill CRC collides with the zero QSound members — measured 14z-62d)
 +
 +	{ "vm3.01",        0x020000, 0xf778769b, CPS2_PRG_Z80 | BRF_ESS | BRF_PRG },
 +	{ "vm3.02",        0x020000, 0xcc09faa1, CPS2_PRG_Z80 | BRF_ESS | BRF_PRG },

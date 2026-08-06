@@ -355,7 +355,8 @@ region = "x05c800"
 src_addr = 0x05CF38
 old_hex = "3d7c60000018"
 new_hex = "3d7c40000018"
-note = "OBJ bank setter: vs2 bank 3 -> vsav bank 2 (Jedah band)"
+new_hex_variant = "3d7c10000018"   # variant id: WIDE group C bank 4 (0x1000)
+note = "OBJ bank setter: vs2 bank 3 -> vsav bank 2 (Jedah band) / WIDE bank 4"
 
 [[port_patch]]
 stage = 6
@@ -363,7 +364,8 @@ region = "x05c800"
 src_addr = 0x0620D4
 old_hex = "397c60000018"
 new_hex = "397c40000018"
-note = "OBJ bank setter (a4 form): vs2 bank 3 -> vsav bank 2"
+new_hex_variant = "397c10000018"   # variant id: WIDE group C bank 4 (0x1000)
+note = "OBJ bank setter (a4 form): vs2 bank 3 -> vsav bank 2 / WIDE bank 4"
 
 [[port_patch]]
 stage = 6
@@ -371,7 +373,8 @@ region = "x05c800"
 src_addr = 0x062194
 old_hex = "397c60000018"
 new_hex = "397c40000018"
-note = "OBJ bank setter (a4 form): vs2 bank 3 -> vsav bank 2"
+new_hex_variant = "397c10000018"   # variant id: WIDE group C bank 4 (0x1000)
+note = "OBJ bank setter (a4 form): vs2 bank 3 -> vsav bank 2 / WIDE bank 4"
 
 [[port_patch]]
 stage = 6
@@ -379,7 +382,8 @@ region = "x088512"
 src_addr = 0x08873E
 old_hex = "3d7c60000018"
 new_hex = "3d7c40000018"
-note = "OBJ bank setter: vs2 bank 3 -> vsav bank 2"
+new_hex_variant = "3d7c10000018"   # variant id: WIDE group C bank 4 (0x1000)
+note = "OBJ bank setter: vs2 bank 3 -> vsav bank 2 / WIDE bank 4"
 
 [[port_patch]]
 stage = 6
@@ -387,7 +391,8 @@ region = "x088512"
 src_addr = 0x089D26
 old_hex = "3d7c60000018"
 new_hex = "3d7c40000018"
-note = "OBJ bank setter: vs2 bank 3 -> vsav bank 2"
+new_hex_variant = "3d7c10000018"   # variant id: WIDE group C bank 4 (0x1000)
+note = "OBJ bank setter: vs2 bank 3 -> vsav bank 2 / WIDE bank 4"
 
 [[port_patch]]
 stage = 6
@@ -395,7 +400,8 @@ region = "x088512"
 src_addr = 0x08B100
 old_hex = "3d7c60000018"
 new_hex = "3d7c40000018"
-note = "OBJ bank setter: vs2 bank 3 -> vsav bank 2"
+new_hex_variant = "3d7c10000018"   # variant id: WIDE group C bank 4 (0x1000)
+note = "OBJ bank setter: vs2 bank 3 -> vsav bank 2 / WIDE bank 4"
 
 # The ported x026142 blob carries a COPY of the per-char OBJ bank table
 # (vs2 0x27530, read PC-relative by the ported setter 0x2751C and helper
@@ -902,6 +908,10 @@ slot_stride = 2
 slot_mirror = true
 old_hex = "4000"
 new_hex = "4000"
+# variant id -> the tenant's tiles live in WIDE group C bank 4; the bank
+# word is 0x1000 (bit 12, the Turbo promote — NOT 4<<13, which is the
+# sprite-list terminator bit).
+new_hex_variant = "1000"
 
 # Handler table sites: 0x845EC (lea 0x2083BC; next op tst — flags
 # dead) and 0x845F8 (lea 0x2087CA; next op move.l — sets flags before

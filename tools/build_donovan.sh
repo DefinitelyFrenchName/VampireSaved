@@ -134,6 +134,15 @@ if [ "$STAGE" -ge 6 ]; then
     cp "$GFXSTAGE/vsav.zip" "$OUTBASE/rompath/vsav.zip"
     rm -rf "$GFXSTAGE"
     echo "gfx: patched vsav.zip in rompath (ROMDIR untouched)"
+    # Group C mode (variant-id tenant): the band+shelf tiles were written
+    # as vsw simms; replace the zero-fill members inside the packed
+    # vsavjw.zip. The host's group B stays pristine (build_gfx_donovan did
+    # not write it), which is the visual half of de-substitution.
+    if ls "$OUTBASE/gfx"/vsw.*m > /dev/null 2>&1; then
+        RPZIP="$(cd "$OUTBASE/rompath" && pwd)/vsavjw.zip"
+        ( cd "$OUTBASE/gfx" && zip -q -X "$RPZIP" vsw.*m )
+        echo "gfx: group C members injected into vsavjw.zip (host group B pristine)"
+    fi
     # static output verification (record parity + code containment +
     # placed bank table) — the check that caught the fmt-0 count
     # corruption; a failed build must not reach a playtest

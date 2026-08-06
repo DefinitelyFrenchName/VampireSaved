@@ -79,6 +79,10 @@ def main():
     print(f"  wrote {out_path}: vsavj members + {a.qsound} QSound + {a.gfx} GFX "
           f"+ {a.prg} PRG appended "
           f"({(MEMBER*(a.qsound+a.gfx) + 0x80000*a.prg)//(1024*1024)} MB of zero fill)")
+    print("  NOTE: group C descriptor CRCs are SENTINELS (0xdec0de31..37), "
+          "never member CRCs — any real value hash-shadows (pristine-B was "
+          "14z-60z; the zero-fill CRC collides with the zero QSound members, "
+          "14z-62d). Do not 'fix' them to match these files.")
     print("  NOTE: descriptor sizes in FBNeo's VsavjwRomDesc[] must match "
           "these members exactly — a member LARGER than its declared length "
           "is silently truncated at load (load.cpp), with no diagnostic.")

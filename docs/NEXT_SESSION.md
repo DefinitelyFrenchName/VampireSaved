@@ -1,26 +1,47 @@
-# NEXT SESSION — orientation (written at the close of 14z-62c, 2026-08-06)
+# NEXT SESSION — orientation (written at the close of 14z-62d, 2026-08-06)
 
-**Start here: the M3a PROGRAM SIDE is done and MEASURED; the GFX half
-remains.** Two arcs this day: the select-records half (six composed
-records, six rows, host records vanilla — 14z-62), then the SLOT-ROW
-AUDIT (14z-62c) after the first host-pick measurement diverged into the
-match: every remaining row-0x0F dependency now follows the tenant or is
-gated off (docs/tenant_manifest.md "slot-row vocabulary"). The
-acceptance is measured on the 0x13 build: legacy replays reproduce the
-frozen donovan-m5w classes EXACTLY, and replay 11 (pick Jedah — divergent
-forever on substituted builds) is a single re-convergent window 890-2362
-through a full Jedah match. Donovan renders in-match at 0x13 with his own
-art and colors. Gate: `tests/test_tenant_select_records.sh` (4 sections,
-in the battery). Frozen refs rebuild exactly throughout. Read STATE.md
-`14z-62`/`62c`.
+**Start here: the M3a program side is DONE, and the GFX HALF'S CORE is
+LANDED — what remains is the bank-1 select-art move plus the re-freeze
+ritual.** The day's four arcs: select records composed at the variant id
+(62); P2-side measured, the name piece asymmetric (62b); the slot-row
+audit — every row-0x0F dependency follows the tenant or is gated off, and
+the de-substitution acceptance is measured (62c); and the band move (62d):
+the tenant's fighter band + effect shelf serve from WIDE GROUP C (bank 4,
+records byte-unchanged — only the bank words moved) while the host's
+group B is PRISTINE. Measured on `build/m3a_selrec` (`464eaf1f`):
+Donovan renders in-match from bank 4 with his own colors, and **Jedah's
+match is pixel-identical to vanilla** (raw snapshots; RAM window 890-2362;
+OBJ lists entry-identical). Gate: `tests/test_tenant_select_records.sh`
+(4 sections) — PASS. Frozen refs rebuild exactly throughout.
+Read STATE.md `14z-62..62d`.
 
-**A discovery that owes the maintainer a decision at re-freeze time:**
-`[[data_port.fix]]` (the 14z-2 mirror-victim throw fix) NEVER PARSED on
-this machine — the frozen references ship without it, and a python-3.11
-host would have built different bytes from the same tree. Dotted manifest
-tables are now banned (generator hard-fails). The fix is parked as a flat
-`fixes=` comment in donovan.toml — apply it at the M3a RE-FREEZE and add
-a mirror-flavor throw replay.
+**Descriptor group-C CRCs are SENTINELS** (0xdec0de31..37): content
+resolves by NAME, because any real CRC shadows (pristine-B = the 60z bug;
+the zero-fill CRC hash-collided with the zero QSound members — the B4
+canary went dark, measured). Both emulator patches changed, both
+emulators rebuilt; FBNeo profile gate PASS; re-run the MAME twin if its
+background run was interrupted:
+`CANARY_ROMPATH=$PWD/build/wide_canary/rompath tests/test_mame_wide.sh`.
+
+## Next, in order
+
+1. **The select-art move (the last gfx piece).** The tenant's select-art
+   subset (101 bank-1 pairs) still occupies Jedah's bank-1 hover-figure
+   anchors, so the host's select BODY figure garbles (face, name, match
+   art all back). MEASURE FIRST: the select-venue objects' bank fields —
+   what writes their `+0x18`, and can a select record draw from bank 4?
+   If yes: move the subset + the four placeholder label tiles
+   (0xB22C/0xB2A5/0xB000/0xB129) + the medallion art into group C and
+   drop the group-A placements entirely — vsav.zip leaves the rompath
+   pristine. If no: an engine-hook decision for the maintainer.
+2. **The interims** (all enumerated, none load-bearing): HUD name plate
+   (folded 16-wide venue table — the 0x00A43E fold work), select-palette
+   grid / win-pal / splash mechanisms at a variant id (Victor-ish colors).
+3. **The M3a re-freeze ritual, one change**: apply the parked
+   mirror-victim fix (donovan.toml, flat `fixes=` comment), declare
+   `id_by_profile = "cps2-wide-v1=0x13"`, re-freeze the WIDE reference,
+   add a mirror-flavor throw replay, update `test_tenant_id.sh` check 2 —
+   maintainer sign-off required (it changes frozen bytes).
 
 ## The gfx half — what it is and what 14z-62 added to it
 
@@ -67,10 +88,9 @@ in the manifest and RE-FREEZE the WIDE reference in the same change —
 
 ## What is already done (do not redo)
 
-- **Select records at 0x13 + the slot-row audit** (14z-62..62c — see
+- **Select records + slot-row audit + the band move** (14z-62..62d — see
   above). Checker: `tools/check_tenant_select.py`. Scratch build
-  `build/m3a_selrec` (`db0c984d`) — the whole program side proven; NOT a
-  candidate.
+  `build/m3a_selrec` (`464eaf1f`); NOT a candidate.
 - **Program half of M3a** (14z-61): `--tenant-id` build input, 31 table
   rows at 0x13, no mirror pokes, variant-id-without-profile refused; now
   also 0x12/0x18 refused (reserved).
@@ -85,7 +105,7 @@ in the manifest and RE-FREEZE the WIDE reference in the same change —
 |---|---|---|---|
 | **WIDE** | `9bac6ee3` (`build/m5_wide`) | `vsavjw.zip` | frozen `donovan-m5w`, playtest-confirmed, suite GREEN |
 | **stock** | `ae701ffb` (`build/m5_stock`) | `vsavj.zip` | frozen compatibility artifact; rebuilds exactly |
-| scratch | `db0c984d` (`build/m3a_selrec`) | `vsavjw.zip` | 14z-62c program-side evidence build (tenant at 0x13, acceptance measured); do not ship |
+| scratch | `464eaf1f` (`build/m3a_selrec`) | `vsavjw.zip` | 14z-62d evidence build (tenant at 0x13 served from group C, host group B pristine); do not ship |
 | ~~WIDE~~ | `ac52eeff` (`build/m5w`) | — | KNOWN-BAD (the garble), kept as evidence. Do not run |
 
 ```sh

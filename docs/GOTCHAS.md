@@ -1763,3 +1763,37 @@ the slot converts each one into a defect. The de-substitution acceptance
 (pick the host, require the bounded re-convergent window — gate section
 4) is the behavioral net for the class; the RAM-diff-at-frame method
 names each culprit's subsystem in one measurement.
+
+## Descriptor CRCs for variable-content members: use SENTINELS (14z-62d)
+
+Group C carries per-build content, so its descriptor CRC can never match.
+Two wrong answers were paid for before the right one:
+- **A real member's CRC** (the pristine group-B copies): resolves BY HASH
+  onto any pristine parent in the path — the 14z-60z shadow.
+- **The fill member's CRC** (4MB zeros = 0x1147406a): collides with the
+  ZERO QSOUND MEMBERS in the same zip — vsw.31m resolved by hash to
+  vsw.21m and group C loaded silent zeros. Measured: the whole B4 canary
+  section failed at once; sections 1-2 stayed green because zero==zero.
+Any CRC that ANYTHING in the search path carries is a latent shadow. The
+answer is a SENTINEL that matches nothing (0xdec0de31/33/35/37 + sha1s of
+sentinel strings), so the member ALWAYS resolves by NAME — the loaders'
+name-fallback demonstrably loads CRC-mismatched members on both emulators
+(every patched vm3 member ships that way). -verifyroms reports them bad;
+that is the cost, and it is honest.
+
+## MAME cross-driver VIDEO_OUT checksums are NOT comparable (14z-62d)
+
+Comparing replay.lua VIDEO_OUT streams between the `vsav`/`vsavj` machine
+and the `vsavjw` (cps2wide) machine flags THOUSANDS of "divergent" frames
+whose actual bitmaps are pixel-identical — verified by decoding
+`video:snapshot()` PNGs at four frames inside "divergent" runs (raw
+IDAT equal) while work RAM was bit-identical and the OBJ lists matched
+entry-for-entry. The checksum evidently samples something the machine
+config perturbs (timing/sampling nuance), not the final picture. Rules:
+- VIDEO_OUT is valid WITHIN one machine config (its self-check, the
+  determinism gates, stock-vs-stock comparisons).
+- For cross-driver pixel comparison use FBNeo FBNEO_HVIDEO (proven exact
+  across vsavj/vsavjw in test_wide_render_content.sh) or pixel-compare
+  MAME snapshots directly.
+- A "divergent framebuffer" claim about a WIDE build measured with MAME
+  VIDEO_OUT against stock is UNTRUSTWORTHY until snapshot-verified.

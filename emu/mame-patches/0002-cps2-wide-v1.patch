@@ -193,10 +193,10 @@ index 8602b6ca..bbde2ac1 100644
 +	// all the same size — a structural requirement of both loaders, not a
 +	// style choice. Reached via the 19-bit tile address above.
 +	// Currently a byte copy of group B: that is the B4 canary payload.
-+	ROM_LOAD64_WORD( "vsw.31m",   0x2000000, 0x400000, CRC(c1a28e6c) SHA1(012803af33174c0602649d2a2d84f6ee79f54ad2) )
-+	ROM_LOAD64_WORD( "vsw.33m",   0x2000002, 0x400000, CRC(194a7304) SHA1(a19a9a6fb829953b054dc5c3b0dc017f60d37928) )
-+	ROM_LOAD64_WORD( "vsw.35m",   0x2000004, 0x400000, CRC(df9a9f47) SHA1(ce29ff00cf4b6fdd9b3b1ed87823534f1d364eab) )
-+	ROM_LOAD64_WORD( "vsw.37m",   0x2000006, 0x400000, CRC(c22fc3d9) SHA1(df7538c05b03a4ad94d369f8083799979e6fac42) )
++	ROM_LOAD64_WORD( "vsw.31m",   0x2000000, 0x400000, CRC(dec0de31) SHA1(af06d6963bec3672eb3a591eec98e3833ccb5120) )
++	ROM_LOAD64_WORD( "vsw.33m",   0x2000002, 0x400000, CRC(dec0de33) SHA1(facbd8fa45c17680f4c76e308b4f383a2cbc3743) )
++	ROM_LOAD64_WORD( "vsw.35m",   0x2000004, 0x400000, CRC(dec0de35) SHA1(f813580566e7a41bcb5df8704a3e48a623d94540) )
++	ROM_LOAD64_WORD( "vsw.37m",   0x2000006, 0x400000, CRC(dec0de37) SHA1(0444481dc5526fcc96defbe153562778967b8374) )
 +
 +	ROM_REGION( QSOUND_SIZE, "audiocpu", 0 ) // 64k for the audio CPU (+banks)
 +	ROM_LOAD( "vm3.01",   0x00000, 0x08000, CRC(f778769b) SHA1(788ce1ad8a322179f634df9e62a31ad776b96762) )

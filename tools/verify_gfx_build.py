@@ -114,11 +114,14 @@ def main():
     # answer to one manifest row. Falls back to the historical constants when
     # a build predates tenant.json.
     tj = f"{outbase}/patch/tenant.json"
+    from gfx_tiles import bank_word
     slot, want = 0x0F, 0x4000
     if os.path.isfile(tj):
         t = json.load(open(tj))
         slot = int(t["id"])
-        want = int(t.get("gfx_bank", 2)) << 13
+        # WIDE encoding, NOT gfx_bank << 13 (bank 4 = 0x1000, the bit-12
+        # promote; 4 << 13 would be the sprite-list terminator)
+        want = bank_word(int(t.get("gfx_bank", 2)))
     off = x26 + 0x13EE + slot * 2
     row = int.from_bytes(opimg[off:off + 2], "big")
     if row != want:

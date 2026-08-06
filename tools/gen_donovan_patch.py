@@ -129,6 +129,12 @@ def normalise_tenants(port, profile=None, override=None):
     for k in ("alloc_wrap", "near_map", "hole_b_regions", "gfx_bank", "name"):
         if k in t:
             p[k] = t[k]
+    # A variant-id tenant's tiles live in the WIDE extension (that is WHY
+    # a variant id requires a profile), so its gfx bank defaults to the
+    # first group-C bank rather than the manifest's base-slot bank. The
+    # base-slot bank (the host's band) stays whatever the manifest says.
+    if tid >= 0x10:
+        p["gfx_bank"] = _int(t.get("gfx_bank_variant", 4))
     port = dict(port)
     port["port"] = p
     return port
@@ -742,13 +748,14 @@ def main():
                 # explicit rather than inherited.
                 _tid = _int(port["port"]["dst_slot"])
                 _tbank = _int(port["port"].get("gfx_bank", 2))
+                from gfx_tiles import bank_word as _bw
                 if (_tid + 1) * 2 <= len(rows):
                     _was = int.from_bytes(rows[_tid * 2:_tid * 2 + 2], "big")
-                    rows[_tid * 2:_tid * 2 + 2] = (_tbank << 13).to_bytes(2, "big")
+                    rows[_tid * 2:_tid * 2 + 2] = _bw(_tbank).to_bytes(2, "big")
                     notes.append(f"# {name}+{toff + _tid * 2:#x}: bank table "
-                                 f"row {_tid:#04x} <- {_tbank << 13:#06x} "
-                                 f"(bank {_tbank}; vanilla row was "
-                                 f"{_was:#06x}) — tenant-driven")
+                                 f"row {_tid:#04x} <- {_bw(_tbank):#06x} "
+                                 f"(bank {_tbank}, WIDE encoding; vanilla row "
+                                 f"was {_was:#06x}) — tenant-driven")
                 else:
                     fail.append(f"table_fix: tenant id {_tid:#04x} is beyond "
                                 f"the {len(rows) // 2}-row bank table; the "
@@ -885,14 +892,21 @@ def main():
                     continue
                 off = _int(pp["src_addr"]) - r["src"]
                 old = bytes.fromhex(pp["old_hex"])
-                new = bytes.fromhex(pp["new_hex"])
+                # new_hex_variant (14z-62d): a row whose replacement value
+                # depends on WHERE the tenant lives — the OBJ bank setters
+                # write the host band's word at a base-half slot and the
+                # WIDE group-C word at a variant id.
+                _nh = pp["new_hex"]
+                if dst_slot >= 0x10 and "new_hex_variant" in pp:
+                    _nh = pp["new_hex_variant"]
+                new = bytes.fromhex(_nh)
                 if not (0 <= off < r["len"]) or blob[off:off + len(old)] != old:
                     fail.append(f"port_patch {pp['note']}: bytes at "
                                 f"{name}+{off:#x} != {pp['old_hex']}")
                     continue
                 blob[off:off + len(new)] = new
                 notes.append(f"# {name}+{off:#x}: port_patch {pp['old_hex']} "
-                             f"-> {pp['new_hex']} ({pp['note']})")
+                             f"-> {_nh} ({pp['note']})")
 
             # M2b gfx remap (donovan.toml [gfx_remap], stage-gated): walk
             # the OBJ records in this region (tools/obj_records.py format,
@@ -2467,7 +2481,12 @@ def main():
                 continue
             nm = cw["name"]
             old = bytes.fromhex(cw["old_hex"])
-            new = bytes.fromhex(cw["new_hex"])
+            # new_hex_variant (14z-62d): value differs by where the tenant
+            # lives (e.g. the OBJ bank word: host band vs WIDE group C).
+            _nh = cw["new_hex"]
+            if dst_slot >= 0x10 and "new_hex_variant" in cw:
+                _nh = cw["new_hex_variant"]
+            new = bytes.fromhex(_nh)
             if len(old) != 2 or len(new) != 2:
                 fail.append(f"code_word {nm}: old/new must be exactly 2 bytes")
                 continue

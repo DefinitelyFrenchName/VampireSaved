@@ -1121,3 +1121,46 @@ byte-identical after every change):
   plate shows Victor's (folded 16-wide venue table), win-screen/palette-
   grid/splash colors unported at variant ids, select art still in the
   host band until the gfx half.
+
+Session 14z-62d (THE GFX HALF, first landing: the tenant's FIGHTER BAND
+serves from WIDE group C; the host's group B is PRISTINE. Scratch build
+464eaf1f; frozen references verified byte-identical throughout):
+- Design: keep every record CODE WORD exactly as the 0x0F layout (band
+  codes 0xAD8F-0xEA3F + shelf to 0xEEBB), flip only the BANK words
+  (0x4000 -> 0x1000, WIDE bank 4 = the bit-12 Turbo promote), and write
+  the tile DATA at the same in-group indices into the four vsw simms.
+  Records unchanged; mixed records stay coherent because the band and the
+  effect shelf move together.
+- gfx_tiles.py: GROUP_C (31,33,35,37) + bank_word() — the WIDE encoding
+  is NOT bank<<13 (4<<13 is the sprite-list terminator bit). Three
+  callers fixed to use it (build_gfx spec/print, verify_gfx want,
+  generator table_fix row).
+- Bank-word followers at a variant id: the six port_patch OBJ bank
+  setters gain new_hex_variant (0x1000 forms), obj_bank_word_slot gains
+  new_hex_variant, the ported bank table row writes bank_word(4), and
+  normalise_tenants defaults a variant tenant's gfx_bank to 4
+  (gfx_bank_variant overrides).
+- build_gfx_donovan group-C mode (DST_BANK >= 4): band+effect tiles into
+  four zero-based 4MB vsw simms (same interleave, same in-group
+  arithmetic), verification "untouched == zero", vsav group B NOT
+  written. build_donovan.sh injects the vsw members into the packed
+  vsavjw.zip.
+- DESCRIPTOR CRCs (both emulator patches, rebuilt + gates green): group C
+  rows now carry SENTINEL CRCs 0xdec0de31/33/35/37 (+ sentinel-string
+  SHA1s) so the members ALWAYS resolve by name. Two measured wrong
+  answers on the way — pristine-B CRCs (the 60z shadow) and the zero-fill
+  CRC (hash-collides with the zero QSound members; the B4 canary failed
+  whole) — see GOTCHAS. FBNeo profile gate PASS (superset + inertness +
+  canary) after the sentinel rebuild.
+- MEASURED RESULTS (build 464eaf1f): Donovan renders in-match from group
+  C (bank 4) pixel-correct; Jedah's MATCH is PIXEL-IDENTICAL TO VANILLA
+  (raw-decoded snapshots at 4 frames; the earlier "garble" was his ES
+  super's shred-ribbon art, and the MAME cross-driver VIDEO_OUT
+  divergence is an instrument artifact — GOTCHAS); replay-11 RAM window
+  890-2362 unchanged; the tenant gate PASSES all four sections.
+- REMAINING interim (all bank-1/group-A, mechanism understood): the
+  tenant's select-art subset still sits in Jedah's bank-1 hover-figure
+  anchors, so Jedah's select-screen BODY figure garbles (face, name, and
+  all match art are back). Moving select art to group C needs the
+  select-OBJECT bank mechanism measured first (can a select record draw
+  from bank 4?) — queued. HUD-plate/palette interims unchanged.

@@ -55,6 +55,14 @@ python3 tools/build_wide_romset.py "$ROMDIR" build/wide_canary/rompath \
 ROMDIR=... FBNEO_REF=/somewhere/fbneo_ref tests/test_wide_profile.sh    # 36 checks, 3 sections
 ```
 
+**Group C descriptor CRCs are SENTINELS (14z-62d):** 0xdec0de31..37 —
+content members resolve by NAME on both emulators. Never set them to a
+real member's CRC (hash-shadowing: pristine-B was the 60z garble, and the
+zero-fill CRC collides with the zero QSound members in the same zip).
+On variant-id builds `build_gfx_donovan` writes the band+shelf into
+`vsw.31m/33m/35m/37m` (injected into `vsavjw.zip`) and vsav's group B
+stays PRISTINE — the visual core of de-substitution.
+
 **The two romsets must stay separate (14z-60z/61, cost two sessions).**
 `--gfx-copy-group-b` writes byte copies of the stock group B members, so
 they carry group B's CRCs. Both emulators resolve a ROM entry by HASH
@@ -76,8 +84,10 @@ this cannot recur silently.
 
 Authoring into the extension: raw (no encryption above `PRG:0x0FFFFF`),
 FILE byte order (`words_to_file_bytes(words_from_logical_bytes(...))`),
-the member's REAL CRC in the descriptor, and `$400000-$40000F` reserved
-(CpsFrg registers, now read-shadowed by ROM).
+and `$400000-$40000F` reserved (CpsFrg registers, read-shadowed by ROM).
+Descriptor CRCs: PRG/QSound extension rows carry the FILL members' real
+CRCs (fixed content); gfx group C rows carry SENTINELS (variable
+content — see above).
 
 ## MAME from source (B5, 2026-08-03) — the oracle now follows the profile
 

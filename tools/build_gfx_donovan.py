@@ -35,7 +35,8 @@ import sys
 import zipfile
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from gfx_tiles import GROUP_A, GROUP_B, tile_bytes, write_tile  # noqa: E402
+from gfx_tiles import GROUP_A, GROUP_B, GROUP_C, bank_word, \
+    tile_bytes, write_tile  # noqa: E402
 
 SRC_BANK = 3          # Donovan's bank in vsav2
 # DST_BANK is the gfx bank the tenant's tiles occupy. It WAS hard-coded to 2
@@ -92,7 +93,13 @@ def main():
         _t = json.load(open(args.tenant))
         DST_BANK = int(_t.get("gfx_bank", DST_BANK))
         print("  tenant %s id %#04x -> gfx bank %d (bank word %#06x)"
-              % (_t.get("name"), _t["id"], DST_BANK, DST_BANK << 13))
+              % (_t.get("name"), _t["id"], DST_BANK, bank_word(DST_BANK)))
+    # WIDE group C (banks 4-5): the tenant's band+shelf keep their in-group
+    # tile indices (code+DELTA, unchanged from the host-band layout, so the
+    # RECORDS need no rewrite at all) but the tile DATA goes into the four
+    # appended vsw simms instead of vsav's group B, which therefore stays
+    # PRISTINE — the host's fighter/select-portrait art comes back wholesale.
+    group_c = DST_BANK >= 4
 
     inv = json.load(open(args.tiles))
     band = sorted(t for t in inv if BAND_LO <= t <= BAND_HI)
@@ -108,7 +115,12 @@ def main():
     z2 = zipfile.ZipFile(os.path.join(args.romdir, "vsav2.zip"))
     za = zipfile.ZipFile(os.path.join(args.romdir, "vsav.zip"))
     src = load_group(z2, "vs2", GROUP_B)      # bank 3 = group B (>=0x20000)
-    dst_orig = load_group(za, "vm3", GROUP_B)  # bank 2 = group B too
+    if group_c:
+        # fresh zero simms — group C ships zero-filled from
+        # build_wide_romset.py, so "untouched == zero" is the invariant
+        dst_orig = [bytes(0x400000) for _ in GROUP_C]
+    else:
+        dst_orig = load_group(za, "vm3", GROUP_B)  # bank 2 = group B too
     dst = [bytearray(s) for s in dst_orig]
 
     # src bank 3 -> group-B index = 0x10000 + code
@@ -168,10 +180,20 @@ def main():
           f"0x{lo_dst:04X}-0x{hi_dst:04X} (bank {DST_BANK}); "
           f"all other tiles byte-identical")
 
-    for n, buf in zip(GROUP_B, dst):
-        path = os.path.join(args.outdir, f"vm3.{n}m")
-        open(path, "wb").write(buf)
-        print(f"  wrote vm3.{n}m sha1 {hashlib.sha1(bytes(buf)).hexdigest()}")
+    if group_c:
+        for n, buf in zip(GROUP_C, dst):
+            path = os.path.join(args.outdir, f"vsw.{n}m")
+            open(path, "wb").write(buf)
+            print(f"  wrote vsw.{n}m sha1 "
+                  f"{hashlib.sha1(bytes(buf)).hexdigest()}")
+        print("group C mode: vsav group B NOT written — the host band "
+              "stays pristine")
+    else:
+        for n, buf in zip(GROUP_B, dst):
+            path = os.path.join(args.outdir, f"vm3.{n}m")
+            open(path, "wb").write(buf)
+            print(f"  wrote vm3.{n}m sha1 "
+                  f"{hashlib.sha1(bytes(buf)).hexdigest()}")
 
     # effect-tail art: vs2 bank-1 blocks placed at vsav bank-1 anchors
     if args.effect_tail:
@@ -250,8 +272,8 @@ def main():
                   f"{hashlib.sha1(bytes(buf)).hexdigest()}")
 
     spec = {"delta": DELTA, "band_lo": BAND_LO, "band_hi": BAND_HI,
-            "dst_bank_word": DST_BANK << 13,
-            "src_bank_word": SRC_BANK << 13,
+            "dst_bank_word": bank_word(DST_BANK),
+            "src_bank_word": bank_word(SRC_BANK),
             "placed": [lo_dst, hi_dst]}
     json.dump(spec, open(os.path.join(args.outdir, "remap_spec.json"), "w"),
               indent=1)
