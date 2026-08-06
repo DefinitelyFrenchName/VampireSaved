@@ -113,6 +113,13 @@ fi
 # the pristine ROMDIR copy. Program-side remap is stage-6 generator work
 # (donovan.toml [gfx_remap] + stage-gated port_patch rows).
 if [ "$STAGE" -ge 6 ]; then
+    # STALE-OUTPUT GUARD (14z-62h, found by the maintainer's playtest):
+    # build_gfx writes ONLY the members the current mode produces, but the
+    # pack step globs the OUTPUT DIR — group-B members left over from a
+    # previous (pre-group-C) build were re-packed into vsav.zip, so FBNeo
+    # served Donovan's band as Jedah's while MAME silently hash-matched to
+    # the pristine ROMDIR copy and hid it. Clean before generating.
+    rm -f "$OUTBASE/gfx"/vm3.*m "$OUTBASE/gfx"/vsw.*m
     python3 tools/obj_records.py "$OUTBASE/extract/region_anim.bin" \
         --base 0x27F548 --start 0x27F548 --end 0x2A0448 \
         --cptr-lo 0x300000 --cptr-hi 0x361000 \
@@ -142,6 +149,24 @@ if [ "$STAGE" -ge 6 ]; then
         RPZIP="$(cd "$OUTBASE/rompath" && pwd)/vsavjw.zip"
         ( cd "$OUTBASE/gfx" && zip -q -X "$RPZIP" vsw.*m )
         echo "gfx: group C members injected into vsavjw.zip (host group B pristine)"
+        # ...and ASSERT it, in the zip itself. An emulator over a chained
+        # rompath is NOT a member-identity instrument (MAME may hash-match
+        # a pristine copy elsewhere in the path — exactly how the stale-
+        # member bug stayed invisible to every MAME-side measurement).
+        if ! python3 - "$OUTBASE/rompath/vsav.zip" "$ROMDIR/vsav.zip" <<'PY'
+import sys, zipfile
+b, p = (zipfile.ZipFile(a) for a in sys.argv[1:3])
+bad = [n for n in ("vm3.14m", "vm3.16m", "vm3.18m", "vm3.20m")
+       if b.getinfo(n).CRC != p.getinfo(n).CRC]
+if bad:
+    print("group B members differ from pristine:", bad)
+    sys.exit(1)
+print("  verified: group B members pristine in the packed vsav.zip")
+PY
+        then
+            echo "BUILD REJECTED: group B not pristine in the packed vsav.zip" >&2
+            exit 1
+        fi
     fi
     # static output verification (record parity + code containment +
     # placed bank table) — the check that caught the fmt-0 count

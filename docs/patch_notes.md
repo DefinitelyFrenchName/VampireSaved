@@ -1253,3 +1253,28 @@ completed — implementation spec, held for the maintainer's playtest):
   impossible. The three newcomer medallions need bank-1 homes from the
   measured blank pool (a mini option-B for ~18 tiles) or stay
   placeholders until then.
+
+Session 14z-62h (maintainer playtest round 1 — two real bugs found and
+fixed; program fingerprint UNCHANGED 39597268, gfx members corrected):
+- STALE GROUP B RE-PACKED (the "Jedah completely garbled everywhere"
+  report): pre-group-C group-B members left in build/<out>/gfx/ were
+  globbed into vsav.zip; FBNeo served them, MAME hash-fell-back to
+  ROMDIR-pristine and masked it (GOTCHAS x2). Fix: clean gfx outputs per
+  build + a group-C-mode assertion that packed group B == pristine.
+  Verified on a RESTRICTED rompath (no pristine reachable): Jedah select
+  figure, match art (his ES super was the "white-red garble"), medallion
+  and win art all restored.
+- HOST-SLOT EFFECT-TAIL PLACES ("his portrait under the health bar seems
+  to be Donovan's"): the HUD-mugshot (0x4D62->0x3DC8, Jedah's cells) and
+  medallion (0xB10B->0xB526, Jedah's wheel-cell art) placements ran
+  ungated at variant ids. Moved to effect_tail.json "place_host_slot",
+  applied only at base-half tenants. Jedah's mugshot/medallion pristine
+  at 0x13; frozen refs verified reproducing (ae701ffb / 9bac6ee3).
+- Remaining KNOWN on Jedah at 0x13 (both die with option A): the
+  mid-face horizontal band on his select portrait (group-A select-subset
+  anchors clipping his face art — the maintainer's "wrong or shifted"
+  band, confirmed on the honest path) and the tenant label placeholders.
+- OPEN from the report, needs FBNeo re-test: the three new-cell
+  medallions invisible + the cursor ring disappearing on Donovan's cell
+  (MAME shows placeholder art + ring; may have been stale-collateral, or
+  an FBNeo-side new-cell question — the report will arbitrate).

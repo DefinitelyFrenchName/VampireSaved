@@ -1797,3 +1797,33 @@ config perturbs (timing/sampling nuance), not the final picture. Rules:
   MAME snapshots directly.
 - A "divergent framebuffer" claim about a WIDE build measured with MAME
   VIDEO_OUT against stock is UNTRUSTWORTHY until snapshot-verified.
+
+## Stale build-output members get re-packed (14z-62h, maintainer-caught)
+
+`build_gfx_donovan` writes only the members the current MODE produces, but
+`build_donovan.sh` packs by GLOBBING the output dir — so when group-C mode
+stopped writing group-B members, the group-B files from the PREVIOUS build
+stayed in `build/<out>/gfx/` and were re-packed into vsav.zip every build.
+Jedah drew Donovan's band. Caught only by the maintainer's FBNeo playtest.
+Fix: the build cleans `gfx/vm3.*m vsw.*m` before generating, and group-C
+mode ASSERTS group B pristine in the packed zip. Rule: an output dir that
+different modes populate differently must be cleaned per build — "the file
+exists" says nothing about WHICH build wrote it (the pipefail lesson's
+sibling).
+
+## A chained rompath makes MAME a LIAR about member identity (14z-62h)
+
+The same bug was invisible to every MAME-side measurement: with
+`MAME_ROMPATH="<build>;$ROMDIR"`, MAME resolved the stale (CRC-mismatched)
+group-B members by HASH to the PRISTINE copies in ROMDIR's vsav.zip and
+rendered Jedah perfectly — while FBNeo (name-resolution inside its overlay,
+where the build's vsav.zip replaces the reference by filename) loaded the
+stale bytes. The two instruments disagreed about WHICH ROM was running.
+Rules:
+- Member identity is asserted ON THE ZIP (CRC compare vs pristine), never
+  via rendering through a chained rompath.
+- For honest MAME visuals of a patched set, use a RESTRICTED rompath
+  (build zips + qsound_hle only) so no pristine twin is reachable.
+- When FBNeo and MAME disagree visually, suspect ROM RESOLUTION before
+  emulation — this is the third member-resolution trap (60z, the zero-CRC
+  collision, now this).

@@ -201,7 +201,16 @@ def main():
         srcA0 = load_group(z2, "vs2", GROUP_A)
         dstA0 = [bytearray(s) for s in load_group(za, "vm3", GROUP_A)]
         n = 0
-        for k, v in et["place"].items():
+        # place_host_slot (14z-62h): entries that overwrite the HOST's own
+        # cells (HUD mugshot, wheel medallion) — only while the tenant
+        # occupies the base slot. At a variant id the host keeps his art.
+        places = dict(et["place"])
+        if DST_BANK < 4:
+            places.update(et.get("place_host_slot", {}))
+        else:
+            print(f"effect-tail: {len(et.get('place_host_slot', {}))} "
+                  f"host-slot place(s) SKIPPED (variant-id tenant)")
+        for k, v in places.items():
             tt, bx, by = k.split(",")
             t = int(tt, 16); anchor = int(v, 16)
             for dy in range(int(by)):
@@ -211,7 +220,7 @@ def main():
                     write_tile(dstA0, 0x10000 + d_,
                                tile_bytes(srcA0, 0x10000 + s_))
                     n += 1
-        for k, v in et["place"].items():
+        for k, v in places.items():
             tt, bx, by = k.split(",")
             t = int(tt, 16); anchor = int(v, 16)
             for dy in range(int(by)):
