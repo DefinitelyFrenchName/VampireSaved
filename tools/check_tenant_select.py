@@ -45,13 +45,16 @@ import select_port as sp    # noqa: E402  (PLACEMENTS is the single map)
 # pieces have a P2 array at +0x80 in BOTH engines; splash P1/P2 and the
 # win quote are single arrays (the win quote has no P2 twin at all — the
 # portrait array follows it immediately).
+# The 5th field: entry-tile expectation — "placed" pieces remap through
+# select_port.PLACEMENTS; "native" pieces (option A) keep vs2 codes, the
+# art riding group C bank 5 with the drawer bank-gated per hover.
 PIECES = [
-    ("portrait",    0x26742A, 0x2A0762, ("p1", "p2")),
-    ("name_banner", 0x2675AA, 0x2A08E2, ("p1", "p2")),
-    ("highlight",   0x268A02, 0x2A18FE, ("p1", "p2")),
-    ("splash_p1",   0x2672AA, 0x2A05E2, ("p1",)),
-    ("splash_p2",   0x26732A, 0x2A0662, ("p1",)),
-    ("win_quote",   0x2673AA, 0x2A06E2, ("p1",)),
+    ("portrait",    0x26742A, 0x2A0762, ("p1", "p2"), "native"),
+    ("name_banner", 0x2675AA, 0x2A08E2, ("p1", "p2"), "placed"),
+    ("highlight",   0x268A02, 0x2A18FE, ("p1", "p2"), "placed"),
+    ("splash_p1",   0x2672AA, 0x2A05E2, ("p1",), "placed"),
+    ("splash_p2",   0x26732A, 0x2A0662, ("p1",), "placed"),
+    ("win_quote",   0x2673AA, 0x2A06E2, ("p1",), "placed"),
 ]
 WHEELPTR = 0x2689FE
 JEDAH_BLOCK = (0x271900, 0x274700)   # every record select_port ever surgered
@@ -103,7 +106,7 @@ def main():
             fails.append(msg)
             print(f"FAIL: {msg}")
 
-    for nm, p1, vs2p1, sides in PIECES:
+    for nm, p1, vs2p1, sides, art in PIECES:
         for side in sides:
             base = p1 if side == "p1" else p1 + 0x80
             vbase = vs2p1 if side == "p1" else vs2p1 + 0x80
@@ -130,7 +133,8 @@ def main():
             for k in range(cnt):
                 t, at = u16(v2, vrec + 10 + 4 * k), u16(v2, vrec + 12 + 4 * k)
                 bx, by = ((at >> 8) & 15) + 1, ((at >> 12) & 15) + 1
-                want = sp.PLACEMENTS.get((t, bx, by), t)
+                want = (t if art == "native"
+                        else sp.PLACEMENTS.get((t, bx, by), t))
                 got = (u16(img, dst + 10 + 4 * k), u16(img, dst + 12 + 4 * k))
                 chk(got == (want, at),
                     f"{nm}/{side} entry {k}: {got[0]:04X}/{got[1]:04X} != "

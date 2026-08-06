@@ -2268,10 +2268,17 @@ def main():
             return int.from_bytes(b[o:o + 4], "big")
 
         sel_pairs = {}
+        sel_bank5 = set()
         for sr in port["select_records"]:
             if args.stage < _int(sr.get("stage", 0)):
                 continue
             nm = sr["name"]
+            # art = "native_c5" (14z-62j, option A): the record keeps its
+            # NATIVE vs2 tile codes and the art rides WIDE group C bank 5
+            # at 0x10000+code — no placement map, no placeholders. The
+            # piece's drawer object must be bank-gated on the tenant
+            # (the palette thunk does the portrait's).
+            _native = sr.get("art") == "native_c5"
             for side in ("p1", "p2"):
                 # single-sided pieces (14z-62e: splash P1/P2 and the win
                 # quote are each ONE array, not a +0x80 pair) declare only
@@ -2307,6 +2314,13 @@ def main():
                 for t, at in ents:
                     bx = ((at >> 8) & 15) + 1
                     by = ((at >> 12) & 15) + 1
+                    if _native:
+                        new_ents.append((t, at))
+                        for dy in range(by):
+                            for dx in range(bx):
+                                sel_bank5.add((t & ~0xF) + (dy << 4)
+                                              + ((t + dx) & 0xF))
+                        continue
                     anchor = _selp.PLACEMENTS.get((t, bx, by))
                     if anchor is None:
                         if not sr.get("allow_placeholder_tiles", False):
@@ -2371,6 +2385,12 @@ def main():
                      f"-> select_tiles.json (only the composed records' art; "
                      f"the slot-0x0F splash/win-quote families are NOT "
                      f"placed, so that Jedah art stays vanilla)")
+        (out / "select_bank5.json").write_text(
+            json.dumps(sorted(sel_bank5)))
+        notes.append(f"# select_records: {len(sel_bank5)} native bank-1 "
+                     f"tiles -> select_bank5.json (copied vs2 -> group C "
+                     f"bank 5 by build_gfx; the drawer's bank is thunk-"
+                     f"gated per hover)")
 
     # ── site_thunk: generic 6-byte engine-site -> jsr thunk (14q pattern) ───
     # The thunk body is authored hex (must preserve the displaced

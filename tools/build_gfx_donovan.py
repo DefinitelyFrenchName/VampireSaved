@@ -79,6 +79,12 @@ def main():
                     help="overlay_tiles.json from overlay_port.py: [src,dst] "
                          "BANK-1 pairs (companion-overlay art at dead-Jedah "
                          "+ padding positions; session 14q)")
+    ap.add_argument("--select-bank5",
+                    help="select_bank5.json from the generator: native "
+                         "bank-1 tile codes whose art is copied vs2 -> "
+                         "group C BANK 5 (in-group 0x10000+code). Group-C "
+                         "mode only; the piece's drawer object is "
+                         "bank-gated per hover on the program side")
     ap.add_argument("--tenant",
                     help="tenant.json from gen_donovan_patch.py. Supplies the "
                          "destination gfx bank, so this half cannot drift "
@@ -154,6 +160,25 @@ def main():
             written.add(t)
         print(f"effects: {len(eff_pairs)} tiles placed from effect_map")
 
+    # bank-5 select art (option A, 14z-62j): NATIVE bank-1 codes copied
+    # into group C's upper bank, disjoint from the band/shelf by
+    # construction (band in-group indices are < 0x10000).
+    b5 = []
+    if args.select_bank5 and group_c:
+        b5 = json.load(open(args.select_bank5))
+        srcA5 = load_group(z2, "vs2", GROUP_A)
+        for c in b5:
+            d5 = 0x10000 + c
+            assert d5 not in written, f"bank-5 dst 0x{d5:05X} collides"
+            write_tile(dst, d5, tile_bytes(srcA5, 0x10000 + c))
+            written.add(d5)
+        print(f"select bank-5: {len(b5)} native tiles copied to group C "
+              f"upper bank")
+    elif args.select_bank5:
+        b5j = json.load(open(args.select_bank5))
+        assert not b5j, ("select_bank5.json has tiles but the build is not "
+                        "group-C mode — the drawer gate would dangle")
+
     # verification 1: every written position reads back as the source tile
     # (14z-10: exception-relocated srcs are NOT at delta positions — their
     # readback happens via eff_pairs below)
@@ -166,6 +191,10 @@ def main():
     for s, t in eff_pairs:
         assert tile_bytes(dst, t) == tile_bytes(src, 0x10000 + s), \
             f"effect readback mismatch at 0x{t:04X}"
+    for c in b5:
+        assert tile_bytes(dst, 0x10000 + c) == \
+            tile_bytes(srcA5, 0x10000 + c), \
+            f"bank-5 readback mismatch at 0x{c:04X}"
     # verification 2: untouched positions byte-identical to input
     dirty = 0
     for t2 in range(0, 0x20000):

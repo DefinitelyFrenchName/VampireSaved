@@ -1635,7 +1635,12 @@ name = "select_pal_variant_id"
 only_variant_slot = true
 site = 0x05F146
 old_hex = "0c0600126606"
-thunk_hex = "0c0600tt6616207cpppppppp0c40000963027009588f4ef90005f1620c06001266024e75588f4ef90005f152"
+# body v2 (option A phase 1): also gates the PORTRAIT OBJECT'S BANK —
+# tenant hover -> $18(a6) = 0x3000 (group C bank 5, where his select art
+# now lives); every other hover -> 0x2000 (the value legacy always has:
+# a same-value write, RAM-identical on pure-legacy runs, and the restore
+# that re-converges after a tenant visit).
+thunk_hex = "0c0600tt661c3d7c30000018207cpppppppp0c40000963027009588f4ef90005f1623d7c200000180c06001266024e75588f4ef90005f152"
 data_subst = "pppppppp=0x3C2A3C:0x140:wide_ext"
 
 # ── 14z-52 M5: Donovan's per-char QSound record array ─────────────────────
@@ -1753,6 +1758,12 @@ stage = 6
 name = "portrait"
 hole = "wide_ext"
 allow_placeholder_tiles = false
+# 14z-62j (option A phase 1): the record keeps NATIVE vs2 tile codes and
+# the art is copied vs2 -> WIDE group C BANK 5 at 0x10000+code (bank 4
+# holds the fighter band — native bank-1-family codes would collide
+# inside its window). The portrait drawer's bank is gated per hover by
+# the select_pal_variant_id thunk (tenant -> 0x3000, else 0x2000).
+art = "native_c5"
 vj_p1 = 0x26742A            # P1 array base (row 0 of 32)
 vj_p2 = 0x2674AA            # = vj_p1 + 0x80
 vs2_p1 = 0x2A0762           # vs2's arrays, same model (found via the known
