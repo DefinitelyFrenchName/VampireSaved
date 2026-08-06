@@ -9,7 +9,7 @@ the tenant's OWN mugshot and name plate ("Donovan" under the bar,
 measured), and the 2P victory screen serves his OWN vs2 win palette
 (both thunk paths measured).** Remaining: the palette-block colours ($130(a5) fold), the accent
 audit, and the re-freeze bundle (maintainer sign-off). Evidence build
-`build/m3a_wheel` = `b9c6ca23`. Read STATE.md `14z-63`, then
+`build/m3a_wheel` = `bd7772c9`. Read STATE.md `14z-63`, then
 docs/patch_notes.md's 14z-63 sections for byte detail.
 
 ## What 14z-63 landed (do not re-derive)
@@ -42,10 +42,14 @@ docs/patch_notes.md's 14z-63 sections for byte detail.
 
 ## Work list (in order)
 
-0. **The medallion WHITE-OUT (round 10, parked with full mechanism)**:
-   the accent march claims the figure-family rows {0x15,0x16,0x17} in
-   a late select venue phase (select-timer trigger, ~15 s onset) —
-   row 0x16 = Donovan's medallion palette. Fix at the marcher's
+0. **The medallion WHITE-OUT (rounds 10-11, parked with full
+   mechanism)**: the accent march claims the figure-family rows
+   {0x15,0x16,0x17} BOTH per-hover (the 0xEF92EF96 char-class triplet
+   — half the roster's hovers rewrite them; the maintainer's
+   mash-right repro, permanent replay 64) and in the ~15 s venue
+   phase. INTERIM SHIPPED round 11: Donovan rides the bulletproof row
+   0x00; the white-out now affects only Phobos's PLACEHOLDER cell
+   (row 0x16). Fix at the marcher's
    JOB-DATA origin (the 14z-15 venue script family: find the select
    venue's row-list datum naming the family base, retarget/duplicate);
    relocate row 0x19 (Phobos) too — it is P2's figure-family middle

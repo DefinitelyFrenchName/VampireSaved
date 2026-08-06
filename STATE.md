@@ -193,6 +193,19 @@ family), QUEUED for a focused session; it should also relocate row
 Interim: white-out is select-scoped, ~15 s onset, resets on re-entry;
 gate 3b freezes the honest state. Evidence build `b9c6ca23`.
 
+**Round 11 (maintainer repro: mash-right): the white-out mechanism is
+COMPLETE, and Donovan is moved to the bulletproof row.** The mash-right
+protocol exposed the marcher's PER-HOVER path (the 0xEF92EF96
+char-class triplet at 0x2ADB8: hovering half the roster rewrites the
+figure family {0x15,0x16,0x17} — the "shimmer" is those rewrites), on
+top of the periodic venue-phase writer. Row 0x16 is thoroughly owned.
+Interim shipped: Donovan -> row 0x00 (the one row proven stable
+against everything), Pyron -> 0x19, Phobos (placeholder cell) -> 0x16
+and inherits the white-out until the job-data fix (item 0). Measured
+on the maintainer's own protocol (permanent replay
+64_select_mashright): Donovan/Pyron hold every sample. Gate 3b runs
+BOTH stress protocols. Evidence build `bd7772c9`.
+
 **Semantic correction that reframes the hover decision**: the composed
 vs2 highlight record (b000 5x1, "his lit-label") is actually vs2's
 POST-CONFIRM NAME BAR — measured: vs2 never draws it at hover, only at

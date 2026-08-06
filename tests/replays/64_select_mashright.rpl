@@ -1,0 +1,22 @@
+# 64: the maintainer's white-out repro (round 11) — 1P start, then
+# mash RIGHT on the select grid. Hovering a triplet-class character
+# (the 0xEF92EF96 mask) rewrites the figure family {0x15,0x16,0x17}
+# per hover; 4-5 inputs sufficed on the round-10 build. Gate 3b runs
+# this to prove Donovan's medallion row (0x00) survives it.
+300-305 sys=C1
+800-803 sys=S1
+950-952 p1=R
+972-974 p1=R
+994-996 p1=R
+1016-1018 p1=R
+1038-1040 p1=R
+1060-1062 p1=R
+1082-1084 p1=R
+1104-1106 p1=R
+1126-1128 p1=R
+1148-1150 p1=R
+1170-1172 p1=R
+1192-1194 p1=R
+1214-1216 p1=R
+1236-1238 p1=R
+2400 wait

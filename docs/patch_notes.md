@@ -1636,3 +1636,25 @@ WHITE-OUT root-caused and PARKED; build b9c6ca23):
 - Gates: wheel gate section 3b freezes the honest state (0x00/0x19
   full-life, 0x16 at f1200 + parked-note); all tenant gates PASS;
   stock reproduces ae701ffb.
+
+Session 14z-63 addendum 8 (round 11: the mash-right repro COMPLETES the
+white-out mechanism; Donovan moved to the bulletproof row; build
+bd7772c9):
+- Maintainer protocol (mash RIGHT on the grid, white after 4-5 inputs,
+  plus per-input "shimmer") identified the SECOND writer: the marcher's
+  per-hover path — the 0xEF92EF96 char-class test at 0x2ADB8 sends
+  roughly half the roster's hovers through the family triplet, which
+  rewrites rows {0x15,0x16,0x17} on EVERY such hover (the shimmer =
+  those rewrites). So row 0x16 has BOTH a periodic venue-phase writer
+  and a per-hover writer: it is thoroughly owned, and no hover-time
+  hook can hold it (the phase writer re-pulses continuously).
+- Interim (rows reassigned in the layout): DONOVAN -> row 0x00, the
+  single row proven stable against hovers, phases, fades, and the
+  maximal select; Pyron (placeholder) -> 0x19; Phobos (placeholder) ->
+  0x16, inheriting the white-out until the job-data fix. Measured on
+  the maintainer's own protocol (new permanent replay
+  64_select_mashright): Donovan + Pyron hold every sample; Phobos
+  whites by f1100 as predicted.
+- Gate 3b re-frozen: both stress protocols (maximal select + mash
+  right), rows 0x00/0x19 asserted across all samples, row 0x16
+  documented-unowned pending item 0. Stock reproduces ae701ffb.
