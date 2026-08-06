@@ -1475,3 +1475,37 @@ mugshot + name plate; build f7210898):
   the P1 bar.
 - Gate: tests/test_tenant_hud.sh NEW (static re-derivation + host-cell
   pristineness + negative control + in-match staging), in the battery.
+
+Session 14z-63 addendum 3 (phase 3 item 5: the variant-id WIN-SCREEN
+palette — the sparse-block design built and both paths measured; build
+e82e0bd3):
+- The consumer (0x5F196..0x5F1F6, full disasm now on record): winner id
+  UNMASKED in d6 ($382(a4) of the winner object); ids 0x12/0x18 take
+  their OWN branches (color*5 + 0x352/0x35C — the reserved pair
+  corroborated a third time); normal path = pool 0x3AD700 +
+  (color*17 + id)*0xA0 -> 5 rows (0x15-0x19) via uploader 0x1C3A4,
+  which ORs F000 alpha into every entry (measured against the 14z-45
+  frozen hex). At 0x13 the index lands in the wrong color's slices.
+- IMPORTANT SCOPING FACT (measured the hard way): the ARCADE win-quote
+  screen (vs-CPU progression) NEVER runs this site — a conditioned
+  breakpoint on the thunk saw zero hits through a full arcade match win;
+  that screen is the 62j family and already renders the tenant
+  correctly. Only 2P victories reach 0x5F1B6 — hence the two new
+  permanent replays (61_tenant_2pwin / 62_tenant_2plose, P1-vs-P2 with
+  one side idle; ~5.5k frames each). Also: victory-screen inputs SKIP
+  the screen — a replay that mashes through it measures a blank.
+- Fix ([[win_pal_variant]], variant-id builds only): a wide_ext sparse
+  block laid out at the VANILLA color stride (8 sets of 0xA0 at
+  0xAA0 apart; vs2 srcs 0x3C365C + color*0xB40, the 14z-45 verified
+  addresses) + a 22-byte hole-a thunk at the base load: d6==TT ->
+  a0 = block - TT*0xA0 (the vanilla arithmetic then lands each color
+  on the tenant's set); else the displaced movea re-executes. CCR safe
+  (movea sets no flags; the fall-through defines its own).
+- MEASURED, both paths: tenant 2P win -> palette rows 0x15-0x19 ==
+  vs2's Donovan color-0 set (F000-alpha) byte-for-byte at f5500+f5700;
+  Victor 2P win over the tenant -> rows == the UNTOUCHED vanilla pool
+  slice (color 0, id 3) at f5300. Stock reproduces ae701ffb; all other
+  tenant gates PASS.
+- Gate: tests/test_tenant_winpal.sh NEW (site/thunk/sparse-block
+  re-derivation + negative control + both runtime paths), in the
+  battery.

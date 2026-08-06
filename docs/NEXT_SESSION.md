@@ -1,14 +1,15 @@
 # NEXT SESSION — orientation (written at the close of 14z-63, 2026-08-06)
 
-**Start here: PHASE 3 ITEMS 1, 2 AND 4 ARE DONE — the wheel serves REAL
+**Start here: PHASE 3 ITEMS 1, 2, 4 AND 5 ARE DONE — the wheel serves REAL
 MEDALLION ART from group C bank 5 (vanilla cells measured
 pixel-identical), the ring/highlight POSITION SOURCE is fixed in place
-(the tenant's highlight draws AT his cell), and the in-match HUD shows
+(the tenant's highlight draws AT his cell), the in-match HUD shows
 the tenant's OWN mugshot and name plate ("Donovan" under the bar,
-measured).** One maintainer decision is now unblocked and reframed
-(hover content — see below), then the palette-block colours, win-pal,
-the accent audit, and the re-freeze bundle. Evidence build
-`build/m3a_wheel` = `f7210898`. Read STATE.md `14z-63`, then
+measured), and the 2P victory screen serves his OWN vs2 win palette
+(both thunk paths measured).** One maintainer decision is now unblocked and reframed
+(hover content — see below), then the palette-block colours, the
+accent audit, and the re-freeze bundle. Evidence build
+`build/m3a_wheel` = `e82e0bd3`. Read STATE.md `14z-63`, then
 docs/patch_notes.md's 14z-63 sections for byte detail.
 
 ## What 14z-63 landed (do not re-derive)
@@ -54,8 +55,10 @@ docs/patch_notes.md's 14z-63 sections for byte detail.
    (venue_assets.md §2 — widen 0x1BF98-family masks + place blocks at
    pool index 0x13 AFTER confirming what occupies it; the two unmasked
    sites 0x021C64/0x021C8E read past 16 blocks today).
-3. **Win-pal sparse block** (design in STATE 14z-62c: placed sparse
-   block + one thunk at the base load 0x5F1B6).
+3. ~~Win-pal sparse block~~ **DONE in 14z-63** (both thunk paths
+   measured on real 2P victories; gate tests/test_tenant_winpal.sh;
+   scoping fact: the arcade win-quote screen never runs 0x5F1B6 —
+   only 2P victories do).
 4. **The accent/march audit** (the 62k class: any march path still
    reading the T0/T1 slots for the TENANT is a bug).
 5. **The RE-FREEZE bundle** (maintainer sign-off, one change): parked
@@ -91,6 +94,7 @@ KEY_SET=vsavj GEN_FLAGS="--allow-plausible --tripwire-open \
     tools/build_donovan.sh 6 build/m3a_wheel
 tests/test_wheel_bank5.sh build/m3a_wheel
 tests/test_tenant_hud.sh build/m3a_wheel
+tests/test_tenant_winpal.sh build/m3a_wheel
 tests/test_tenant_select_records.sh build/m3a_wheel
 tools/run_wide.sh build/m3a_wheel fbneo     # playtest
 ```

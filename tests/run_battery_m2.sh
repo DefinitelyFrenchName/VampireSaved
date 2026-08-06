@@ -66,6 +66,9 @@ if [ -x "${MAME_WIDE_BIN:-$HOME/.cache/vampire-saved/mame/cps2}" ]; then
     # The variant-id HUD (14z-63): row 0x13 of the 32-row-aliased HUD
     # tables + free-pool mugshot art; host cells pristine.
     tests/test_tenant_hud.sh
+    # The variant-id win-screen palette (14z-63): sparse block + thunk,
+    # both paths measured on real 2P victories (replays 61/62).
+    tests/test_tenant_winpal.sh
 else
     echo "note: tenant select-records gate skipped (no WIDE MAME binary —"
     echo "      tools/setup_mame.sh; gate: tests/test_tenant_select_records.sh)"

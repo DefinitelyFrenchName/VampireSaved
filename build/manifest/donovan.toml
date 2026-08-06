@@ -348,6 +348,32 @@ op = "poke32"
 val = 0xFFE80003
 only_variant_slot = true
 
+# 14z-63 (phase 3 item 5): the tenant's WIN-SCREEN palette at a variant
+# id. The win drawer computes pool_base + (color*17 + winner_id)*0xA0
+# (site 0x5F1B6 loads the base; winner id UNMASKED in d6, ids 0x12/0x18
+# have their own branches — the reserved pair again). At 0x13 the index
+# lands in the wrong color's slices (and past the pool for high colors).
+# Fix = the SPARSE BLOCK design (62c): a wide_ext block laid out with
+# the VANILLA color stride (0xAA0) carrying ONLY the tenant's 8 five-row
+# sets at + color*0xAA0, and a thunk at the base load that rebases
+# a0 = block - TT*0xA0 when d6 == TT — the vanilla arithmetic then lands
+# each color exactly on the tenant's set. Vanilla winners keep the
+# vanilla base (the thunk's else-path re-executes the displaced movea).
+# vs2 sources: Donovan's sets at 0x3C365C + color*0xB40 (the 14z-45
+# verified addresses; row-for-row against native win-screen palette RAM).
+[[win_pal_variant]]
+stage = 6
+name = "don_win_pal"
+site = 0x5F1B6
+site_old = "207c003ad700"       # movea.l #$3AD700,a0
+pool_base = 0x3AD700
+pool_color_stride = 0xAA0       # 17 chars x 0xA0
+unit = 0xA0                     # 5 rows x 0x20 bytes
+colors = 8
+vs2_src = 0x3C365C
+vs2_color_stride = 0xB40        # 18 chars x 0xA0
+hole = "wide_ext"
+
 # Anita's ALTERNATE anim table (companion tail branch `tst.b $3(a6); bne ->
 # movea.l #$36784A`, taken only when the spawn-record sub byte != 0 —
 # Donovan's hook always writes sub=0, branch proven unreached through the

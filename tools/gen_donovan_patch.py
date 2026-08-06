@@ -2519,6 +2519,89 @@ def main():
                      f"bank 5 by build_gfx; the drawer's bank is thunk-"
                      f"gated per hover)")
 
+    # ── win_pal_variant (14z-63, phase 3 item 5): the tenant's win-screen
+    # palette at a variant id. The sparse-block design: a block laid out
+    # with the VANILLA pool's color stride, only the tenant's sets
+    # populated, and a thunk at the pool-base load that rebases
+    # a0 = block - TT*unit when the winner is the tenant — the vanilla
+    # (color*17 + id)*unit arithmetic then lands each color on the
+    # tenant's set. Variant-id builds only; the 0x0F track keeps its
+    # in-place slice replacement (win_pal_slot0f_c0..c7).
+    if args.stage >= 6 and dst_slot >= 0x10:
+        for wp in port.get("win_pal_variant", []):
+            if args.stage < _int(wp.get("stage", 0)):
+                continue
+            nm = wp["name"]
+            site = _int(wp["site"])
+            old = bytes.fromhex(wp["site_old"])
+            opc_wp = (root / "build/out/vsavj_opcodes.bin").read_bytes()
+            if opc_wp[site:site + 6] != old:
+                fail.append(f"win_pal_variant {nm}: site {site:#x} holds "
+                            f"{opc_wp[site:site+6].hex()}, expected "
+                            f"{old.hex()}")
+                continue
+            pool = _int(wp["pool_base"])
+            if old[2:6] != pool.to_bytes(4, "big"):
+                fail.append(f"win_pal_variant {nm}: site_old operand != "
+                            f"pool_base {pool:#x}")
+                continue
+            cstride = _int(wp["pool_color_stride"])
+            unit = _int(wp["unit"])
+            ncol = _int(wp["colors"])
+            vsrc = _int(wp["vs2_src"])
+            vstride = _int(wp["vs2_color_stride"])
+            src_data = (root / f"build/out/{man['src_set']}_data.bin"
+                        ).read_bytes()
+            blk_len = (ncol - 1) * cstride + unit
+            blk = alloc(wp.get("hole", "a"), blk_len,
+                        f"win_pal_variant {nm} sparse block")
+            if blk is None:
+                continue
+            for c in range(ncol):
+                sl = src_data[vsrc + c * vstride:vsrc + c * vstride + unit]
+                if len(sl) != unit:
+                    fail.append(f"win_pal_variant {nm}: vs2 slice {c} "
+                                f"read short")
+                    break
+                ops.append({"op": "data",
+                            "addr": f"{blk + c * cstride:#x}",
+                            "hex": sl.hex()})
+            else:
+                # thunk: cmpi.b #TT,d6 / bne.b vanilla / movea.l #rebase,a0
+                # / rts / vanilla: movea.l #pool,a0 / rts.  d6 holds the
+                # winner id at the site; movea sets no flags and the
+                # fall-through (moveq #0,d0) defines its own, so the
+                # thunk's CCR clobber is safe.
+                rebase = blk - dst_slot * unit
+                body = (f"0c06{dst_slot:04x}"      # cmpi.b #TT,d6
+                        f"6608"                    # bne.b +8 -> vanilla
+                        f"207c{rebase:08x}"        # movea.l #rebase,a0
+                        f"4e75"                    # rts
+                        f"207c{pool:08x}"          # movea.l #pool,a0
+                        f"4e75")                   # rts
+                tk = alloc("a", len(body) // 2,
+                           f"win_pal_variant {nm} thunk")
+                if tk is None:
+                    continue
+                ops.append({"op": "code", "addr": f"{tk:#x}", "hex": body})
+                ops.append({"op": "code", "addr": f"{site:#x}",
+                            "hex": f"4eb9{tk:08x}"})
+                notes.append(f"data   {blk:#08x} +{blk_len:#x}  "
+                             f"win_pal_variant {nm}: sparse block, "
+                             f"{ncol} sets of {unit:#x} at stride "
+                             f"{cstride:#x} (vs2 {vsrc:#x} "
+                             f"stride {vstride:#x})")
+                notes.append(f"code   {tk:#08x} +{len(body)//2:#x}  "
+                             f"win_pal_variant {nm} thunk (d6==TT -> "
+                             f"a0 = {rebase:#x}; else vanilla pool "
+                             f"{pool:#x})")
+                notes.append(f"code   {site:#08x} +6     win_pal_variant "
+                             f"{nm}: movea.l #pool -> jsr {tk:#x}")
+                fragments.append((blk, blk_len, "VS2",
+                                  f"win_pal_variant {nm} sparse block"))
+                fragments.append((tk, len(body) // 2, "NEW",
+                                  f"win_pal_variant {nm} thunk"))
+
     # ── site_thunk: generic 6-byte engine-site -> jsr thunk (14q pattern) ───
     # The thunk body is authored hex (must preserve the displaced
     # instruction's semantics on its vanilla path, including flags where

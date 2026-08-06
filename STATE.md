@@ -1,6 +1,6 @@
 # STATE — living progress log
 
-Updated: 2026-08-06 (session 14z-63 — PHASE 3 ITEMS 1, 2 AND 4 DONE
+Updated: 2026-08-06 (session 14z-63 — PHASE 3 ITEMS 1, 2, 4 AND 5 DONE
 (item 3 = the hover decision is the maintainer's, reframed below; item
 4 landed while awaiting playtest: the variant-id HUD — attribution
 CORRECTED to unmasked consumers over 32-row-aliased tables, NOT the
@@ -93,6 +93,22 @@ name 0xBE8C staged at the exact 14z-49 shape, opponent vanilla.
 New gate tests/test_tenant_hud.sh (in the battery). The $130(a5) fold
 still owns the select/VS palette-block COLOURS (open, venue_assets.md
 §2). Evidence build: `f7210898`.
+
+**Item 5 (same session): the variant-id WIN-SCREEN palette — the
+sparse-block design built and BOTH thunk paths measured.** The 2P
+victory screen's palette load (0x5F1B6: pool + (color*17+winner)*0xA0,
+winner UNMASKED in d6; 0x12/0x18 have own branches — the reserved pair
+again) gets a wide_ext sparse block at the VANILLA color stride (only
+the tenant's 8 vs2 sets populated) + a 22-byte thunk (d6==TT -> rebase;
+else the displaced movea re-executes). Measured: tenant 2P win -> rows
+0x15-0x19 == vs2's set byte-for-byte (F000-alpha); Victor 2P win ->
+the untouched vanilla pool slice. SCOPING FACT paid for: the arcade
+win-quote screen NEVER runs this site (zero thunk hits through a full
+arcade win — it is the 62j family and already correct); only 2P
+victories do, and victory-screen inputs SKIP the screen (a mashing
+replay measures a blank). Two permanent replays added (61_tenant_2pwin,
+62_tenant_2plose) + gate tests/test_tenant_winpal.sh (in the battery).
+Evidence build: `e82e0bd3`.
 
 **Semantic correction that reframes the hover decision**: the composed
 vs2 highlight record (b000 5x1, "his lit-label") is actually vs2's

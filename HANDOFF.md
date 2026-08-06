@@ -394,6 +394,10 @@ tests/test_tenant_hud.sh       [ob]   # variant-id HUD (14z-63): the tenant's ow
                                       # 32-row-aliased HUD tables + free-pool art;
                                       # host cells pristine; staged codes measured
                                       # in-match. Self-builds at 0x13 unless given
+tests/test_tenant_winpal.sh    [ob]   # variant-id win-screen palette (14z-63): the
+                                      # sparse block + TT thunk at 0x5F1B6; BOTH
+                                      # thunk paths measured on real 2P victories
+                                      # (replays 61/62). Self-builds at 0x13 unless
 tests/test_compare_composite.sh       # ground truth for the §4 v4 composite class
                                       # (frozen flicker inventory + frozen bounded
                                       # windows, RATIFIED 2026-08-06): 7 synthetic
