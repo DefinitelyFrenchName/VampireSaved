@@ -263,6 +263,32 @@ the matcher reads (his +0x3xx input ring — if the recorder dispatch
 row feeding it is another wrong alias, the matcher sees an empty
 ring). Builds: acda6946 current ladder; all gates green.
 
+### 14z-65 — the specials frontier NARROWED to his per-frame handler
+### interior (bracketed by controls)
+
+The state-byte discriminator was OVERTURNED by its own control: vanilla
+vsavj chars write the same 0x16/0x06 states in similar volume (238/191
+over the soak — they are movement-class states, not launch markers).
+The REAL symptom is broader: H's object writes NO brief states at all.
+Bracketing instruments (all on record in scratch logs):
+- The vs2 0x25EBA/0x25EE8 helper pair (called from ~25 sites across his
+  handlers) is CORRECTLY R1-mapped (0x26D36/0x26D64, byte-verified
+  twins; only internal bsr drift differs).
+- The helpers' head guard flags ($17B/$38/$190(a6)) are CLEAN on his
+  object (dumped, ours == native at f4000).
+- P1-conditional probe on 0x26D36, same build, same soak: vanilla char
+  05 calls it 132 times; HUITZIL CALLS IT ZERO TIMES.
+So: his per-frame dispatched handlers run (boot gate proves dispatch),
+his command walk runs (predicate parity 401=401), but the ordinary
+per-frame path through his OWN handler code never reaches the engine
+state layer. NEXT (surgical): probe each of his dispatch_NN handler
+ENTRIES P1-conditionally over the soak to map which run per-frame,
+take the per-frame one that should reach 0x26D36 (the ~25 call sites
+are in code/x057456 — offsets in the 14z-65 ref audit), and bisect
+inside it with GUARD_PROBE at successive branch points; the first
+branch that always takes the early-out names the wrong field/flag —
+then compare that field against native at the same frame.
+
 ### 14z-65 — HUITZIL BOOTS (first match on the vsavj engine)
 
 Build 9252ce62 (ladder, not frozen). Probe verdict: HIS hitbox base
