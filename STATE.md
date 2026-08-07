@@ -236,6 +236,33 @@ commit->load window; verdicts: id-hold / load / guard):
     whose vsavj twin has different completion semantics; the sound-farm
     five if init enqueues a sound; a companion/pool spawn deeper in.
 
+### 14z-65 — THE SPECIALS HUNT (after the boot): frontier bounded to
+### the predicate-match interior
+
+Native ground truth first: vs2 + the same forced-pick probe = NATIVE
+PHOBOS FIRING PLASMA BEAMS on our exact soak inputs (snapshot on
+record) — so the port's silent soak meant "specials never trigger",
+not "all good". Links fixed, each measured (patch_notes 14z-65 (6)):
+NEWCOMER_CODE widened to 0x54000 (13 dispatch rows were unrepointed
+Bulleta aliases — his handler zone lives at 0x54C9C+; Donovan-inert,
+measured; shapes re-frozen), 18 farm rows content-verified at 8-BYTE
+record granularity via the DATA view (two audit traps documented), and
+the NEW engine-alias generator rule (dispatch_07 is per-char IN ENGINE
+SPACE — Bulleta 0x2D68E vs his 0x23AFE; repointed to the hand-verified
+vsavj twin 0x24EA4). FRONTIER, precisely bounded by parity
+instruments: predicate consultation is EXACTLY equal (401 hits native
+= 401 ours, same entry, same soak) yet the port writes NO nonzero
+brief states where native writes 0x06/0x16. The divergence is INSIDE
+or AFTER the predicate match. NEXT instruments, in order: (1) identify
+WHAT natively writes 0x06/0x16 (special launch vs hit-reaction — tap
+with REGLOG on native, read the writer PCs' context); (2) the
+predicate common's VERDICT path (probe the taken/not-taken branch at
+the first command-check site on both games — the ABI is readable from
+his command processor at x057456+0x554); (3) the INPUT-HISTORY feed
+the matcher reads (his +0x3xx input ring — if the recorder dispatch
+row feeding it is another wrong alias, the matcher sees an empty
+ring). Builds: acda6946 current ladder; all gates green.
+
 ### 14z-65 — HUITZIL BOOTS (first match on the vsavj engine)
 
 Build 9252ce62 (ladder, not frozen). Probe verdict: HIS hitbox base
