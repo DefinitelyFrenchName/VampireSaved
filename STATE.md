@@ -62,6 +62,48 @@ Maintainer note for round 2: fwd walk is now FASTER than round 1
 (3.125 vs 3.0), param32_b-mode movement slower (1.625/-2.25 vs
 2.0/-2.75) — both native-accurate.
 
+### Item 3 OPEN — float/air-dash census: the float is a vs2 ENGINE
+### jump-seq EXTENSION (state-hook class, not a data row)
+
+The native census (replay 75 probe, tap instruments; all logs
+described in scratch, mechanisms verified by disasm):
+- Native hold-8 float, measured: engine 0x264FE starts jump seq
+  0x02000600; two frames later engine **0x25948** converts it to the
+  FLOAT: `addq.b #2,$7(a6)` (sub-state +2 via the 0x2592A jump-table
+  indexed by +0x07), clears +0x121/+0x1C2, arms **+0x1C0 = 0x78**
+  (120f float duration), and reads **+0x3C2 (the VS2/VH2 flavor
+  byte)** — float behavior is FLAVOR-FORKED. Gate at 0x25940:
+  `tst.b $21(a6); bpl -> exit` (bit 7 of +0x21 = the license; its
+  writer not yet caught — first open probe). During the hover the
+  mover is NOT called at all (no +0x14/+0x44 writes, tap-proven);
+  rise decelerates to yv 0xffffc000 at apex then the state holds.
+  Hover anim loop vs2 0x24618A/0x2461A2/0x2461BA (D1=0x18).
+- vsavj's engine jump handler has NO such extension -> the fix class
+  is the ENGINE HOOK / state_hook machinery from Donovan's seq-state
+  arc (14z-46), NOT a table row. Applies to the air dash too
+  (untested but same family; GROUND dash works on ours — measured,
+  both games dash, ours ~7px/f vs native ~8.2px/f).
+- EXONERATED by measurement: his command evaluator (vs2 0x5522E) IS
+  live on ours (A0=0xBFC3E in mover context); all 7 R1-mapped motion
+  helpers have byte-identical step tables + same dispatcher family;
+  the 0x2A606 hold-up check + the 0xBFF22 float-start branch are
+  statically perfect but 0-hit (that path is a DIFFERENT command —
+  +0x179=0x10 both sides, +0x1AC writes all-zero both sides during
+  hold-up; the 0x55512 route is NOT the float).
+- SECOND DEFICIT found on the way: ours jumps with ALIAS-row jump
+  physics (initial yv 0x67000 / gravity step 0x5000 vs native
+  0x7a000 / 0x6000) — the 14w "jump-physics parameter gap tables",
+  still unported for want of a decoded consumer; the mover context
+  is now half the decode. Queue behind the float hook.
+- NEXT, in order: (1) catch the +0x21 bit-7 writer on native (widen
+  the tap; it is the per-char float license); (2) census the air
+  dash the same way (66 while airborne, seq/sub-state writes); (3)
+  design the state hook: extend vsavj's jump-seq sub-state dispatch
+  for tenant objects with his float conversion + float sub-state
+  handler + the 0x78 timer + flavor fork (D1 wiring exists);
+  manifest-opt-in like state_hook. Replay 75 + the dump/tap recipes
+  are the instruments.
+
 ### Item 2 measurements (the mechanism record)
 
 Measured this session (the 14w-b hazard re-exam, first half):

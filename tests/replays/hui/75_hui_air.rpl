@@ -1,0 +1,22 @@
+# hui air-movement probe (14z-66, playtest round-1 item 3: air dash +
+# float dead). Forced-pick flow (POKES id 0x10 — same field on vs2, so
+# this replay runs UNCHANGED on native vsav2 as the ground-truth leg).
+# NOTE: inputs before ~f3050 are eaten on BOTH games (pre-actionable;
+# measured — the first U press of probe v1 jumped on neither).
+# Sequence: jump + 66 air dash; jump + hold-9; ground hold-8 float.
+# Ground truth measured (native, probe v1): hold-8 float = rise to
+# Y=121.12 then HOVER CONSTANT while held; ours bounces in normal
+# jump arcs instead.
+300-305 sys=C1
+800-803 sys=S1
+1700-1702 p1=1
+# jump (actionable window), then 66 while airborne
+3060-3062 p1=U
+3075-3077 p1=R
+3081-3083 p1=R
+# jump, then hold up-forward
+3160-3162 p1=U
+3170-3240 p1=UR
+# ground float attempt: plain up held long
+3300-3380 p1=U
+3500 wait
