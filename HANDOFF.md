@@ -422,6 +422,11 @@ tests/test_hui_ladder.sh              # Huitzil stage 1-3 ladder gate (14z-65):
                                       # variant row) + legacy replay bit-identity.
                                       # Build any tenant: TENANT_MANIFEST=...
                                       # TENANT_CHAR=0x10 tools/build_donovan.sh
+tests/test_hui_grab.sh         [bd]   # Circuit Scrapper gate (14z-66): the 2P-dummy
+                                      # grab connects with the NATIVE damage datum
+                                      # (frame-identical A/B of record). Early-window
+                                      # 2P pokes only — see the replay 80 header.
+                                      # Self-builds stage 4 unless given a build
 tests/test_hui_air.sh          [bd]   # Huitzil air-movement gate (14z-66): the
                                       # float hovers (Y pinned) and the air dash
                                       # engages (seq 0x14, flat advance) — mode

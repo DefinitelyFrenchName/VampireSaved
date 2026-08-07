@@ -15,6 +15,23 @@ engine-site thunk live. build/hui4 at 44be1266 = ping #3 with items
 
 ## Session 14z-66 (playtest round-1 worklist)
 
+### ROUND 5 (maintainer): ITEM 3 CONFIRMED — "normal select is VS2,
+### hold start is VH2 and the float and dash are indeed there."
+### Ping #5 = 2898c495 confirmed; the flavor selector verified BOTH
+### ways in play for the first time.
+
+D1 DELIVERABLE (the flavor differences to hunt for, decoded from the
+float body 0x2598A — the fork is its FIRST instruction):
+- VS2 flavor (+0x3C2 = 0, the default): float engages only while
+  falling, only ABOVE min height 0x40, only with EXACTLY straight up
+  held (dir nibble == 8 — diagonals drop), and the hover is
+  TIMER-LIMITED (0x78 = ~2s per float).
+- VH2 flavor (+0x3C2 = 1, Start-hold): any-up hold (mask & 4 — 7/8/9
+  all sustain) PINS the timer — hover indefinitely while held; no
+  min-height test on the hold path.
+So: VH2 floats looser and longer; VS2 is the stricter, committal
+float. These are the felt differences for the D1 final call.
+
 ### ROUND 4 (maintainer): "FG properly resolves" — item 1 CLOSED FOR
 ### GOOD (all three sites: voice-cue tripwire, shadow-seq clamp,
 ### data_in_code reroutes). Ping #4 = 4317353c confirmed.
@@ -287,8 +304,24 @@ described in scratch, mechanisms verified by disasm):
   0xBE23A over-indexing for id 0x10 (benign threshold read,
   measured non-fatal; tighten with the physics pass).
 
-### Item 4 OPENED — Circuit Scrapper: recognition WORKS, the break is
-### at/after move-start (collapse class RULED OUT)
+### Item 4 CLOSED — Circuit Scrapper: fixed BY the x026142 escape
+### trampolines (the grab's move-start was dying on the same latent
+### pcrel escapes); native-matched on a 2P dummy
+
+The retest after the item-3 escape fixes: the grab CONNECTS. The
+clean instrument (the 2P dummy, unblocked by the POKE-WINDOW finding:
+commit pokes must end by ~1500 in the 2P flow — later pokes leak into
+the 2P load and turn P2 into a variant id; measured with a no-poke
+control) shows FRAME-IDENTICAL native parity: P1 sub-states
+0e04->0e08->0e0a->0e0c at the same frames, victim damage 0x13
+identical (hp 0x120->0x10D), same recovery frame. Only the victim
+THROW-ARC HEIGHT differs (native launches higher — the alias-physics
+class on the thrown velocity; queued with the physics pass). Gate:
+NEW tests/test_hui_grab.sh (replay 80; seq-0x0E + native-damage
+signature). No build change — ping #5 (2898c495) already carries it.
+
+### Item 4 history — recognition WORKS, the break was at/after
+### move-start (collapse class RULED OUT)
 
 - His 63214 predicate table (vs2 0x299E6 via the farm-port stub at
   0xF85B0, param 0xF8590) is BYTE-CORRECT on the build, terminator
