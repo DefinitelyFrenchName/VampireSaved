@@ -298,6 +298,37 @@ TRIAGE + first measurements (14z-67 continuation 3):
   EXACT, ex/air/grab); VISUAL verification against its own symptom
   (grab electricity) still pending — the ray is measured NOT to be
   this class.
+- MAINTAINER CAPTURES (win screens ours-vs-native, native DF, native
+  grab lightning) + SECOND MEASUREMENT ROUND (replay 80 A/B obj dumps
+  + record diffs) sharpened the picture:
+  - THE C5 RECORD FIX IS CORRECT AND HUI6'S REMAP WAS WRONG (record
+    diff at x2b7ef4+0x900C: hui6 shipped effect_tail-anchor tile
+    words 0x0FE7+; hui7 keeps native 0x0FA0+, coord fixups intact).
+  - BUT THE LIGHTNING STILL NEVER STAGES on hui7 (obj dumps through
+    f3315): the pieces reading the 0x2C0F00-family records are never
+    SPAWNED — the same silent spawn-failure class as the 236P ray
+    (which natively runs bank-3 codes 0x0FA0-0x0FBA: THE SAME ART
+    FAMILY — beam and lightning share the electric band).
+  - Second symptom, same window: ours spawns F8FC/F90A/F15x-family
+    pieces WITH BANK WORD 0 (y=00d0) that native NEVER stages —
+    pieces created through a path that leaves +0x18 unset/zeroed.
+  - The hit-spark spawner (0x18EFC/0x178C2) is EXONERATED: one call,
+    identical registers, both games (the throw-release spark).
+  - NEXT ARC (the one root): trace the native piece spawn during the
+    lightning (watch a piece slot's +0x1C install -> spawner PC ->
+    our twin -> why it bails / zeroes the bank). Fixing the spawn
+    likely covers ray + lightning + explosion + the grab-anim
+    sameness (the electricity IS the difference between the grabs).
+  - Win screen (captures): native = GOLD (his normal family); ours =
+    pink/lavender + GARBLED BLUE-GREY RECTANGLES on eye/thigh/foot —
+    TWO defects: the palette (my source wrong) AND a few wrong art
+    blocks (likely tiles outside the walked inventory — the win pose
+    may reference codes the anim walk missed).
+  - DF (capture): native applies NO palette change and NO afterimages
+    to him — the fix SUPPRESSES the host DF style for his id (find
+    the per-char DF style selection; give row 0x10 the null style).
+  - ES collision: maintainer will retest side-by-side (may be less
+    severe than first reported) — deprioritized pending their result.
 - Item 4 (EX speed/ES collision) = the behavior-measurement arc:
   2P-dummy native A/B per move (the m2a rig), post-capture FG pacing
   vs native, ES hitbox/phase measurement at varied ranges.
