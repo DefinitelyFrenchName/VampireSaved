@@ -126,7 +126,8 @@ def normalise_tenants(port, profile=None, override=None):
     p["src_char"] = t["src_char"]
     p["dst_slot"] = tid
     p["mirror_variant"] = t.get("mirror_variant", tid < 0x10)
-    for k in ("alloc_wrap", "near_map", "hole_b_regions", "gfx_bank", "name"):
+    for k in ("alloc_wrap", "near_map", "hole_b_regions", "gfx_bank", "name",
+              "port_param32"):
         if k in t:
             p[k] = t[k]
     # A variant-id tenant's tiles live in the WIDE extension (that is WHY
@@ -1437,15 +1438,22 @@ def main():
                              f"{ta:#08x} (table {tb:#x} row {prow:#x})")
 
         # per-char value rows -> vsavj slot 0x0F rows
-        # param32_a/b (movement velocity pairs) are NOT ported (session
-        # 14w-b): with Donovan's true vs2 velocities his 21_don_mash
-        # soak crashes at ~10050 (correct movement reaches a state with
-        # a broken pointer — return address into anim data; separate
-        # landmine, queued). He has played every clean round at Jedah's
-        # speeds; keep that until the crash path is decoded. The
+        # param32_a/b (movement velocity pairs) are NOT ported BY DEFAULT
+        # (session 14w-b): with Donovan's true vs2 velocities his
+        # 21_don_mash soak crashes at ~10050 (correct movement reaches a
+        # state with a broken pointer — return address into anim data;
+        # separate landmine, queued). He has played every clean round at
+        # Jedah's speeds; keep that until the crash path is decoded. The
         # addressing fix (rec8 pairs) stays — it is what protects
         # FELICIA's walk-back from the old mis-stride write.
-        VALUE_SKIP = {"param32_a", "param32_b"}
+        # 14z-66: the skip became a PER-TENANT default (port_param32 in
+        # [[tenant]]): the 14w-b crash is a Donovan-port landmine, not a
+        # property of velocity porting — Huitzil opts in after his own
+        # soak battery re-examined the hazard (playtest round-1 item 2:
+        # he moved at the row-0x10 ALIAS content = Bulleta's speeds).
+        # Donovan's manifest carries no flag -> his bytes are unchanged.
+        VALUE_SKIP = set() if port["port"].get("port_param32", False) \
+            else {"param32_a", "param32_b"}
         # Explicit-ownership claims (14z-65): a [[sound_table]] row that WILL
         # emit repoints its ptr_table row ITSELF (the measured, id-allowlisted
         # port). The generic value-row repoint below must not also write that

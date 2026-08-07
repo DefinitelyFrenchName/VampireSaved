@@ -1932,3 +1932,72 @@ V2 masked basis (build 4b7d0dc7):
   both stress protocols (15/15); the game-over screen pixel-identical
   to vanilla; the 14-replay sweep clean except the staging slots (v2
   masks them by design).
+
+## Session 14z-66 — EX-move crash-reset fix: three farm-voice stubs
+## (playtest round-1 item 1; manifest-data only, no machinery)
+
+Change: THREE `[[map]]` rows appended to
+build/manifest/reconciliation_huitzil.toml (H overlay; the shared map
+untouched, Donovan's builds unaffected by construction):
+  vsav2 0x004efa -> vsavj 0x02a7e0  stubbed_sound  (sfx id 0x748)
+  vsav2 0x004fb0 -> vsavj 0x02a7e0  stubbed_sound  (sfx id 0x729)
+  vsav2 0x004fca -> vsavj 0x02a7e0  stubbed_sound  (sfx id 0x72e)
+Ids disasm-verified from the farm stanzas (jsr 0x330E; move.l #id,D1;
+bsr 0x5122; jmp 0x3306) in vsav2 opcodes view. All 0x7xx newcomer
+voice range = the established stub class (six precedent rows).
+
+Byte effect on the stage-4 build (117 -> 114 ops): the three ILLEGAL
+tripwire words at hole_a 0xf8720/0xf8730/0xf8740 are no longer
+emitted, and the three referencing jsr operands now carry 0x02A7E0
+(engine rts) instead of tripwire addresses:
+  x067846+0xd2  (was -> 0xf8720)   [family sweep; never seen to fire]
+  x067846+0xec  (was -> 0xf8730)   [family sweep; never seen to fire]
+  x0689cc+0xec  (was -> 0xf8740)   [the shared one-shot voice cue:
+                                    tst.b $23(a6); clr.b; jsr]
+Fingerprints: pre-fix e8d95a5c (crashes: ES f3513, FG-connect f3364,
+both vec4 at 0xf8740), post-fix 01f6f907 (both EX moves fire to
+completion repeatedly; stock 9->6 on the FG-connect replay).
+
+Repro/validation artifacts: replays tests/replays/hui/71_hui_ex_fg.rpl
+(mid-range control — clean even pre-fix: a whiffing FG never reaches
+the cue), 72_hui_ex_es.rpl, 73_hui_ex_fg_close.rpl; gate
+tests/test_hui_ex.sh (guard-clean AND stock-decrement so the coverage
+cannot silently evaporate — the 14z-44 lesson).
+
+## Session 14z-66 — velocity port (playtest round-1 item 2): param32
+## rows 0x10 + the per-tenant VALUE_SKIP default
+
+Mechanism (measured before any change): both vsavj param32 tables are
+32-ROW — rows 0x10-0x1F byte-identical aliases of 0x00-0x0F
+(param32_a 0x0BD87A, param32_b 0x0BE2FA, rec8) — and all three
+consumers (0x228e2/0x271a8 read a, 0x26484 reads b) index the RAW
++0x382 id via ext.w/lsl #3 with NO fold. Tenant 0x10 therefore read
+the alias CONTENT = Bulleta's row 0 — the measured mechanism behind
+"feels a bit slower". A write at row 0x10 is a variant row: legal
+under the op invariant, zero consumer work.
+
+Changes:
+- tools/gen_donovan_patch.py: VALUE_SKIP (the 14w-b crash guard)
+  became a per-tenant DEFAULT — [[tenant]] port_param32 = true opts a
+  tenant in; absent flag keeps the skip (Donovan's manifest carries no
+  flag, so his bytes are unchanged — m3a reproducibility gate PASS).
+  normalise_tenants passes the key through.
+- build/manifest/huitzil.toml: port_param32 = true.
+
+Byte effect (fingerprint 3a172c52, 114 -> 116 ops): two data ops,
+  0x0BD8FA +0x8 = 00032000 fffd4000  (param32_a[0x10] — his true pair:
+                                      fwd 3.125 vs alias 3.0, back equal)
+  0x0BE37A +0x8 = 0001a000 fffdc000  (param32_b[0x10] — fwd 1.625 vs
+                                      alias 2.0, back -2.25 vs -2.75)
+Vanilla rows 0x00-0x0F untouched (verified from the built zip's data
+view).
+
+Verification: NEW gate tests/test_hui_walk.sh — static rows + the
+walk-speed replay 74 (16.16 X deltas over two 15-frame windows before
+push-box contact: frozen 0x1C2000/0x384000; the alias build measures
+0x1B0000/0x360000 — both windows scale by exactly 25/24 = his fwd /
+alias fwd; the walk anim runs a 0.6x/1.2x phase profile, hence the
+window asymmetry). The 14w-b hazard RE-EXAMINED for H, second half:
+full battery GREEN on the ported tree including the 11k chaos soak
+(Donovan's 14w-b crash was at soak f10050 — H shows no analog) + EX
+gate + boot masked-v2 EXACT + m3a-reproducible.

@@ -32,6 +32,14 @@ alloc_wrap = "0x15702,0x1572e"
 # 14z-65: his rows live in the overlay — the shared map is frozen for
 # Donovan's reproducibility (see reconciliation_huitzil.toml header).
 recon_overlay = "build/manifest/reconciliation_huitzil.toml"
+# 14z-66 (playtest round-1 item 2, "feels a bit slower"): port his true
+# param32_a/b velocity pairs into variant rows 0x10 — both vsavj tables
+# are 32-row with 0x10-0x1F as byte aliases of 0x00-0x0F (measured), and
+# all three consumers index the RAW id (no fold), so he was moving at
+# Bulleta's row-0 content via the alias. The 14w-b VALUE_SKIP stays the
+# generator DEFAULT (Donovan's landmine, undecoded); this opt-in is
+# gated on H's own full soak battery (the hazard re-exam).
+port_param32 = true
 
 # ── Pool-seeding init shim + flavor latch (14z-65, the watchdog-reboot
 # hunt). Vanilla vsavj never seeds the secondary-object pools during a

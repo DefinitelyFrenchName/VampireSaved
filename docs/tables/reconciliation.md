@@ -530,3 +530,31 @@ Open Huitzil rows (18 tripwired targets remain in his stage-4 build):
 the companion family (0x2b7ef4/0x2b8060/0x36784a — guarded soaks
 decide), engine subs 0x4223c/0x42cee/0x448d4/0x3844e, and mid-ROM data
 refs — the per-target grind continues at the next crash/soak frontier.
+
+## 14z-66 — the EX-move crash-reset: three more farm stubs (playtest item 1)
+
+Maintainer playtest round 1 reported BOTH EX moves (Final Guardian
+623+2K, Erasing Sphere 421+2K) running most of their animation then
+crash-resetting (watchdog signature). Scripted repro (replays
+tests/replays/hui/71-73, stock poked via ff8509 per the 14z-44 recipe)
+caught it in the guard timeline: **one shared one-shot voice cue**, the
+`tst.b $23(a6) / clr.b / jsr 0x4EFA` sequence at support zone
+x0689cc+0xec, reached the open tripwire for farm row vs2 0x4EFA — vec4
+at f3513 (ES, ~97 frames into the move) and f3364 (FG at connect range,
+~98 frames in). In a plain run the ILLEGAL lands in a garbage vector =
+the watchdog reset the maintainer saw. A whiffing FG never reaches the
+cue (replay 71 ran clean mid-range) — connect range was load-bearing
+for the repro.
+
+**Three `stubbed_sound` rows added** (vs2 0x4efa/0x4fb0/0x4fca, ids
+0x748/0x729/0x72e, disasm-verified): all newcomer voice-bank range
+(0x7xx), the established stub-on-sight class — same shape as the
+existing six. RESTORE AT M5. With them the ES fires repeatedly to
+completion at both ranges (stock 9->6 across three attempts, guard
+clean end-to-end). Gate: tests/test_hui_ex.sh (guard-clean AND
+stock-consumed — the anti-coverage-loss shape); its negative control is
+measured, not synthetic: both replays CRASH deterministically on the
+pre-fix build.
+
+Open Huitzil rows after this: 15 tripwired targets (the three farm rows
+resolved out of the 18 above).

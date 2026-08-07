@@ -422,6 +422,14 @@ tests/test_hui_ladder.sh              # Huitzil stage 1-3 ladder gate (14z-65):
                                       # variant row) + legacy replay bit-identity.
                                       # Build any tenant: TENANT_MANIFEST=...
                                       # TENANT_CHAR=0x10 tools/build_donovan.sh
+tests/test_hui_ex.sh           [bd]   # Huitzil EX-move gate (14z-66): both EX
+                                      # moves fire to completion guarded, AND the
+                                      # stock decrements (anti-coverage-loss).
+                                      # Self-builds stage 4 unless given a build
+tests/test_hui_walk.sh         [bd]   # Huitzil velocity-port gate (14z-66):
+                                      # param32 rows 0x10 static + measured
+                                      # walk-speed deltas (16.16-exact).
+                                      # Self-builds stage 4 unless given a build
 tests/test_extract_hp.sh              # Huitzil/Pyron extraction gate (14z-65):
                                       # frozen region shapes (piecewise shifts,
                                       # dead filler, the H insertion sliver) +

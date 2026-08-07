@@ -1,0 +1,13 @@
+# hui walk-speed measure (14z-66, playtest round-1 item 2). Forced-pick
+# flow, then a short steady FORWARD walk measured early — before P1
+# reaches the opponent's push box (~150px away; contact would compress
+# the delta). The harness dumps P1 X as 16.16 fixed point (ff8410-ff8414)
+# at f3060/f3075/f3090: each 15-frame window's exact delta = 15 * the
+# param32_a forward velocity (alias row 0x30000 -> 0x2D0000; his true
+# 0x32000 -> 0x2EE000). Only the forward half discriminates: his back
+# velocity equals the alias content (both 0xfffd4000, measured).
+300-305 sys=C1
+800-803 sys=S1
+1700-1702 p1=1
+3050-3200 p1=R
+4000 wait

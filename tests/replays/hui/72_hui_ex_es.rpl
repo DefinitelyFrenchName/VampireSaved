@@ -1,0 +1,18 @@
+# hui EX repro: Erasing Sphere 421+2K (14z-66, playtest round-1 item 1).
+# Forced-pick flow (POKES supply id 0x10 across commit->load, and stock
+# count $FF8509 at f3000 — the documented ES scripting method, 14z-44).
+# Three reverse-DP+2K attempts spaced 400 frames; stock decrement = ES
+# fired. P1 starts left side facing right, so back = L.
+300-305 sys=C1
+800-803 sys=S1
+1700-1702 p1=1
+3010-3012 p1=L
+3013-3015 p1=D
+3016-3019 p1=DL45
+3410-3412 p1=L
+3413-3415 p1=D
+3416-3419 p1=DL45
+3810-3812 p1=L
+3813-3815 p1=D
+3816-3819 p1=DL45
+4500 wait

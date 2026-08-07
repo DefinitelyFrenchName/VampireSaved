@@ -1,0 +1,19 @@
+# hui EX repro: Final Guardian 623+2K at CONNECT range (14z-66, playtest
+# round-1 item 1). The mid-range FG (replay 71) completed clean in the
+# guard timeline; this variant walks P1 into the opponent first so the
+# summon's beams CONNECT — the hit path (spark/voice/reaction) is the
+# suspect for the maintainer's crash-reset. Stock poked at f3000.
+300-305 sys=C1
+800-803 sys=S1
+1700-1702 p1=1
+3005-3255 p1=R
+3260-3262 p1=R
+3263-3265 p1=D
+3266-3269 p1=DR45
+3700-3702 p1=R
+3703-3705 p1=D
+3706-3709 p1=DR45
+4100-4102 p1=R
+4103-4105 p1=D
+4106-4109 p1=DR45
+4700 wait

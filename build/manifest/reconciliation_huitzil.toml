@@ -48,6 +48,27 @@ status = "verified"
 note = "H KEPT SILENT (14z-65): sfx id 0x735 — vsavj same-id keys DIFFERENT content (keyons, measured). Named by the round-2 soak (scanner-merge ref, invisible to the diff-ref sweep). Revisit with the M5 voice-bank port."
 
 [[map]]
+vsav2 = 0x004efa
+vsavj = 0x02a7e0
+kind = "stubbed_sound"
+status = "verified"
+note = "H KEPT SILENT (14z-66): sfx id 0x748 — newcomer voice-bank range (0x7xx), the established stub class. Named by the ES crash repro (replay 72: x0689cc+0xec one-shot voice cue in the Erasing Sphere flow reached its tripwire, vec4 f3513). Revisit with the M5 voice-bank port."
+
+[[map]]
+vsav2 = 0x004fb0
+vsavj = 0x02a7e0
+kind = "stubbed_sound"
+status = "verified"
+note = "H KEPT SILENT (14z-66): sfx id 0x729 — newcomer voice-bank range (0x7xx), the established stub class. Stubbed with 0x4efa (same farm family, disasm-verified id). Revisit with the M5 voice-bank port."
+
+[[map]]
+vsav2 = 0x004fca
+vsavj = 0x02a7e0
+kind = "stubbed_sound"
+status = "verified"
+note = "H KEPT SILENT (14z-66): sfx id 0x72e — newcomer voice-bank range (0x7xx), the established stub class. Stubbed with 0x4efa (same farm family, disasm-verified id). Revisit with the M5 voice-bank port."
+
+[[map]]
 vsav2 = 0x2bc3ec
 vsavj = 0x000000
 kind = "engine_data"

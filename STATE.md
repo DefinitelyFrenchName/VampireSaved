@@ -1,6 +1,89 @@
 # STATE — living progress log
 
-Updated: 2026-08-07 (session 14z-65 — M3b OPENED: multi-tenant machinery
+Updated: 2026-08-07 (session 14z-66 — playtest round-1 worklist: item 1
+CLOSED — both EX-move crash-resets were ONE open sound-farm tripwire
+(the shared one-shot voice cue at x0689cc+0xec -> vs2 0x4EFA); three
+stubbed_sound overlay rows fix both moves. Gate tests/test_hui_ex.sh;
+Item 2 CLOSED — param32 tables measured 32-row/no-fold; his true
+velocity pairs serve from variant rows 0x10 (port_param32 opt-in;
+gate test_hui_walk.sh; 11k-soak hazard re-exam clean). build/hui4 at
+3a172c52 = ping #2 with items 1+2. Read 14z-66 below.)
+
+## Session 14z-66 (playtest round-1 worklist)
+
+### Item 1 CLOSED — EX-move crash-reset: one voice-cue tripwire, both moves
+
+Scripted repro per the plan (stock poke ff8509=9, the 14z-44 recipe;
+replays tests/replays/hui/71_hui_ex_fg / 72_hui_ex_es /
+73_hui_ex_fg_close):
+- ES 421+2K: deterministic vec4 f3513 at PC 0xF8740 ~97 frames into
+  the move = the TRIPWIRE for unresolved vs2 0x4EFA — a sound-farm
+  row enqueueing sfx id 0x748 (newcomer voice range), called from the
+  one-shot voice cue at shared zone x0689cc+0xec
+  (tst.b $23(a6)/clr.b/jsr). In a plain run the ILLEGAL lands in a
+  garbage vector = the watchdog reset the maintainer saw.
+- FG 623+2K: clean at mid-range (a whiffing FG never reaches the cue)
+  but at CONNECT range hits the SAME tripwire (vec4 f3364, ~98 frames
+  in) — one root for both playtest crashes. Connect range was
+  load-bearing for the repro.
+- FIX: three stubbed_sound rows in the H overlay (vs2
+  0x4efa/0x4fb0/0x4fca, ids 0x748/0x729/0x72e disasm-verified, all
+  0x7xx = the established stub class; x067846+0xd2/+0xec swept along,
+  never seen to fire). Tripwire frontier 18 -> 15.
+- MEASURED FIXED (fingerprint 01f6f907): ES fires repeatedly to
+  completion; FG-connect fires 3x (stock 9->6), guard clean
+  end-to-end both replays.
+- Gates: NEW tests/test_hui_ex.sh — guard-clean AND stock-decrement
+  (the 14z-44 anti-coverage-loss shape); negative control is measured
+  (both replays CRASH on the pre-fix build e8d95a5c). Full battery
+  GREEN after the change: extract/ladder/boot (masked-v2 EXACT)/
+  soak (pods live)/m3a-reproducible (both frozen refs bit-exact).
+- build/hui4 REBUILT at 01f6f907 (run_hui_behavior.sh only builds if
+  missing — the maintainer's dir was still pre-fix). Ping #2 ready.
+- Docs: patch_notes 14z-66 (byte detail), tables/reconciliation.md
+  14z-66 (the three rows + repro anatomy).
+
+### Item 2 CLOSED — speed: his true velocity pairs serve from variant
+### rows 0x10 (14w-b hazard re-examined, does not manifest for H)
+
+Landed on top of the measurements below: port_param32 opt-in
+(generator per-tenant default + huitzil.toml), fingerprint 3a172c52
+(116 ops: + the two row-0x10 data ops). Verified static (rows 0x10
+carry his pairs, vanilla rows pristine, from the built zip) and
+dynamic (walk replay 74: 15-frame 16.16 deltas 0x1C2000/0x384000 =
+exactly 25/24 x the alias build's 0x1B0000/0x360000 — the consumer
+serves his row; the walk anim runs a 0.6x/1.2x phase profile). NEW
+gate tests/test_hui_walk.sh. THE HAZARD RE-EXAM: full battery GREEN
+on the ported tree incl. the 11k chaos soak (Donovan's 14w-b crash
+was at soak f10050; H shows no analog), EX gate, boot masked-v2
+EXACT, m3a-reproducible (Donovan flagless -> bytes unchanged).
+build/hui4 re-refreshed at 3a172c52 (ping #2 carries items 1+2).
+Maintainer note for round 2: fwd walk is now FASTER than round 1
+(3.125 vs 3.0), param32_b-mode movement slower (1.625/-2.25 vs
+2.0/-2.75) — both native-accurate.
+
+### Item 2 measurements (the mechanism record)
+
+Measured this session (the 14w-b hazard re-exam, first half):
+- BOTH vsavj param32 tables are 32-ROW: rows 0x10-0x1F are
+  byte-identical aliases of 0x00-0x0F (dumped). All THREE consumers
+  (0x228e2/0x271a8 table a, 0x26484 table b) index the RAW +0x382 id
+  (ext.w/lsl #3, NO fold) — so H at 0x10 read the ALIAS CONTENT
+  (Bulleta's rows), the measured mechanism behind "feels a bit
+  slower", and a variant-row write at 0x10 is superset-safe by the op
+  invariant with no consumer work.
+- His extracted true pairs: param32_a 00032000/fffd4000 (fwd 3.125
+  vs alias 3.0; back equal), param32_b 0001a000/fffdc000 (both
+  slower than alias 2.0/-2.75).
+- CHANGE: VALUE_SKIP is now a per-tenant default — [[tenant]]
+  port_param32 = true opts in (huitzil.toml only; Donovan carries no
+  flag -> bytes unchanged, the 14w-b guard intact for him).
+- Verify plan: static row-0x10 check on the built zip + walk-speed
+  replay 74_hui_walk (16.16 X deltas over 15-frame windows, measured
+  BEFORE push-box contact; only the fwd half discriminates — his back
+  velocity equals the alias content) + the FULL battery incl. 11k
+  soak + EX gate (the hazard re-exam, second half: Donovan's 14w-b
+  crash was at soak f10050).
 + Huitzil/Phobos 0x10 + Pyron 0x11. Recon complete (3-way sweep:
 generator internals, docs corpus, STATE history + two baseline
 extraction dry-runs); the plan is **docs/M3b_plan.md**. Design verdict:
