@@ -15,6 +15,13 @@ engine-site thunk live. build/hui4 at 44be1266 = ping #3 with items
 
 ## Session 14z-66 (playtest round-1 worklist)
 
+### ROUND 6 (maintainer): ITEM 4 CONFIRMED ("Circuit scrapper
+### confirmed") and D1 RATIFIED — "VS2 flavor confirmed as the
+### default selection in the current build AND the default selection
+### in the target." All four fix items of the round-1 worklist are
+### now maintainer-confirmed closed; item 5 (coverage replays +
+### oracle battery) is the remainder.
+
 ### ROUND 5 (maintainer): ITEM 3 CONFIRMED — "normal select is VS2,
 ### hold start is VH2 and the float and dash are indeed there."
 ### Ping #5 = 2898c495 confirmed; the flavor selector verified BOTH
@@ -409,18 +416,18 @@ reproducibility gate), then extractor de-Donovanization.)
 
 ### Decisions pending (human) — M3b
 
-- **D1 — Huitzil default flavor (VS2 vs VH2).** The Start-hold selector
-  offers the other at match load either way. RECOMMENDATION: VS2
-  default (flavor_default=0x01), identical to the ratified Donovan
-  precedent (2026-07-27) and SPEC §3.
-  **PROVISIONALLY SETTLED (maintainer, 2026-08-07): VS2 default** — "it
-  should be VS2 by default", matching the native games (in VS2 itself:
-  VS2 mode default, VH2 on Start-hold, like Donovan). FINAL ratification
-  after (1) the maintainer learns the flavor differences to hunt for
-  (deliverable: when stage 4 pins Huitzil's +0x3C2 fork consumers,
-  write up WHAT visibly changes per flavor — the Donovan precedent
-  pinned the fork to the exact QCB+LK frame) and (2) a playtestable
-  Huitzil build exists. Wiring may land with flavor_default=0x01.
+- **D1 — Huitzil default flavor: RATIFIED (maintainer, 2026-08-07,
+  round 6): VS2 DEFAULT** — "VS2 flavor confirmed as the default
+  selection in the current build AND the default selection in the
+  target." Both ratification preconditions were met: the flavor
+  differences writeup was delivered (STATE 14z-66 round-5 record:
+  VS2 = the stricter float — falling-only, min height, exact-up,
+  ~2s timer; VH2 = any-up pins the hover indefinitely) and the
+  selector was play-verified both ways on ping #5. NOTE the wiring
+  detail: for H the VS2 flavor is +0x3C2 = 0x00 (MEASURED on native
+  — the Donovan 0x01 convention was the wrong polarity for him);
+  flavor_default=0x00 / flavor_held=0x01 in huitzil.toml is the
+  ratified configuration.
 - **D2 — Pyron source version** — only becomes a real decision if the
   Phase 1 measurement shows vs2↔vh2 behavioral divergence in his code
   (no Start-hold fork exists for him, so the shipped version is the
