@@ -298,6 +298,7 @@ def main():
         return int.from_bytes(vj[addr:addr + 4], "big")
 
     gap_free = []  # (start, end) inside already-claimed group spans
+    pcrel_far_tramps = {}  # resolved target -> near jmp trampoline (14z-65)
 
     def alloc(hole, size, what, fallback=True):
         """Place `size` bytes, returning the destination address.
@@ -876,10 +877,49 @@ def main():
                 pc_base = placed[name] + ref["base_off"]
                 disp = resolved - pc_base
                 if not (-0x8000 <= disp < 0x8000):
-                    fail.append(f"{name}+{ref['off']:#x}: pcrel rewrite "
-                                f"out of d16 range ({disp:#x}) — place "
-                                f"target slice nearer")
-                    continue
+                    # NEAR JMP TRAMPOLINE (14z-65): a pcrel word-table entry
+                    # resolving beyond d16 reach (Huitzil's copy of the
+                    # per-game x088512 zone dispatches into vsavj engine
+                    # code) bounces through a 6-byte jmp abs.l within reach.
+                    # Only valid for CODE targets — these entries are
+                    # dispatch tables; a far pcrel DATA read would need its
+                    # data copied near instead (no such case yet; the
+                    # trampoline jmp would fault loudly, not read wrong
+                    # data). Donovan-inert: this branch was a hard fail
+                    # before, so no frozen build ever reached it.
+                    tr = pcrel_far_tramps.get(resolved)
+                    if tr is None:
+                        want = placed[name]
+                        best = None
+                        for gi, (gs, ge) in enumerate(gap_free):
+                            if ge - gs >= 6 and abs(gs - want) < 0x7000:
+                                if best is None or abs(gs - want) < \
+                                        abs(gap_free[best][0] - want):
+                                    best = gi
+                        if best is not None:
+                            gs, ge = gap_free[best]
+                            tr = gs
+                            gap_free[best] = ((gs + 6 + 0xF) & ~0xF, ge)
+                        else:
+                            tr = alloc("a", 6, f"pcrel far trampoline {name}")
+                        if tr is None:
+                            fail.append(f"{name}+{ref['off']:#x}: no room "
+                                        f"for a pcrel far trampoline")
+                            continue
+                        ops.append({"op": "code", "addr": f"{tr:#x}",
+                                    "hex": "4ef9" + f"{resolved:08x}"})
+                        notes.append(f"code   {tr:#08x} jmp {resolved:#08x}"
+                                     f"  pcrel far trampoline ({name})")
+                        fragments.append((tr, 6, "GEN",
+                                          f"pcrel far trampoline ({name} -> "
+                                          f"{resolved:#x})"))
+                        pcrel_far_tramps[resolved] = tr
+                    disp = tr - pc_base
+                    if not (-0x8000 <= disp < 0x8000):
+                        fail.append(f"{name}+{ref['off']:#x}: pcrel far "
+                                    f"trampoline still out of d16 range "
+                                    f"({disp:#x})")
+                        continue
                 blob[ref["off"]:ref["off"] + 2] = \
                     (disp & 0xFFFF).to_bytes(2, "big")
             n_pr = len(r.get("pcrel_refs", []))

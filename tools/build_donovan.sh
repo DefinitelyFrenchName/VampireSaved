@@ -79,6 +79,17 @@ case "$TENANT_CHAR" in
         # vs2-only bank data (the vsavj delta candidate is zeros);
         # structure-bounded, sibling-identical, twin at -0x76e.
         DEFAULT_ROOTS="0x55478,0xd143e:0x900:t0xd0cd0:d"
+        # The SHARED newcomer-support zones from Donovan's census — H's
+        # code references the same zones (measured 14z-65: 0x5DF74 sits in
+        # x05c800, his handler-head jsr 0x8ACD8 and 0x8A5A8 sit in the
+        # source-only x088512 zone, plus x026142/x028122 directly). Ported
+        # per-tenant for the single-tenant ladder; Phase 2 dedups by span.
+        # x088512 is 0x3B40 here, not Donovan's 0x2f00: H's copy of the
+        # zone chains dispatch tables past the 0x2f00 bound — transitive
+        # closure of its pcrel escapes converges at +0x3B3E (measured
+        # 14z-65, 6 rounds). Donovan's bound was HIS census, not the
+        # zone's true extent.
+        DEFAULT_ROOTS="$DEFAULT_ROOTS,0x5c800:0xd100,0x26142:0x1400,0x28122:0xe00,0x88512:0x3b40:s"
         ;;
     *)  DEFAULT_ROOTS="" ;;
 esac

@@ -3,25 +3,186 @@
 # Twin doc: docs/tables/reconciliation.md (same-commit rule).
 
 [[map]]
-vsav2 = 0x004df6
+vsav2 = 0x000210
+vsavj = 0x000210
+kind = "engine_data"
+status = "verified"
+note = "pattern-1.00-unique-w0x40; refs: bare_long"
+
+[[map]]
+vsav2 = 0x003306
+vsavj = 0x003306
+kind = "engine_sub"
+status = "verified"
+note = "same-value ref; 24B byte-identical at target (kernel/service band)"
+
+[[map]]
+vsav2 = 0x00330e
+vsavj = 0x00330e
+kind = "engine_sub"
+status = "verified"
+note = "same-value ref; 24B byte-identical at target (kernel/service band)"
+
+[[map]]
+vsav2 = 0x003972
+vsavj = 0x00393c
+kind = "engine_sub"
+status = "verified"
+note = "sound-farm entry sfx 0x10a; save+id+next-opword signature (dual-entry disambiguated)"
+
+[[map]]
+vsav2 = 0x003a0c
+vsavj = 0x0039d6
+kind = "engine_sub"
+status = "verified"
+note = "sound-farm entry sfx 0x115; unique save+id signature match"
+
+[[map]]
+vsav2 = 0x003ac4
+vsavj = 0x003a8e
+kind = "sound_farm"
+status = "verified"
+note = "M5 RESTORED (14z-52): sfx id 0x137 -> vsavj same-id farm entry 0x03a8e. Sample content verified IDENTICAL across sets (QSound key-on probe: same bank/start after relocation, docs/m5/). The session-9 stub and the session-5 same-id-means-music theory were both wrong for this id."
+
+[[map]]
+vsav2 = 0x003b2c
+vsavj = 0x003af6
+kind = "engine_sub"
+status = "verified"
+note = "sound-farm entry sfx 0x172 (stock chime); unique body match; farms drift +/-0x36"
+
+[[map]]
+vsav2 = 0x003f46
+vsavj = 0x003f10
+kind = "sound_farm"
+status = "verified"
+note = "M5 RESTORED (14z-52): sfx id 0x136 -> vsavj same-id farm entry 0x03f10. Sample content verified IDENTICAL across sets (QSound key-on probe: same bank/start after relocation, docs/m5/). The session-9 stub and the session-5 same-id-means-music theory were both wrong for this id."
+
+[[map]]
+vsav2 = 0x003fae
+vsavj = 0x003f78
+kind = "sound_farm"
+status = "verified"
+note = "M5 RESTORED (14z-52): sfx id 0x13d -> vsavj same-id farm entry 0x03f78. Sample content verified IDENTICAL across sets (QSound key-on probe: same bank/start after relocation, docs/m5/). The session-9 stub and the session-5 same-id-means-music theory were both wrong for this id."
+
+[[map]]
+vsav2 = 0x003fc8
+vsavj = 0x003f92
+kind = "engine_sub"
+status = "verified"
+note = "sound-farm entry sfx 0x1d5; unique save+id signature match"
+
+[[map]]
+vsav2 = 0x0040ae
+vsavj = 0x02a7e0
+kind = "stubbed_sound"
+status = "verified"
+note = "M5 KEPT SILENT (14z-52): sfx id 0x14a — sample ABSENT from vsav's (full) sample ROMs. Measured, docs/m5/don_id_plan.json; restoring it would play the wrong sound. Revisit only with ported samples (STATE decision: voice samples)."
+
+[[map]]
+vsav2 = 0x0042d0
+vsavj = 0x004234
+kind = "sound_farm"
+status = "verified"
+note = "M5 RESTORED (14z-52): sfx id 0x18b -> vsavj same-id farm entry 0x04234. Sample content verified IDENTICAL across sets (QSound key-on probe: same bank/start after relocation, docs/m5/). The session-9 stub and the session-5 same-id-means-music theory were both wrong for this id."
+
+[[map]]
+vsav2 = 0x0042ea
+vsavj = 0x00424e
+kind = "sound_farm"
+status = "verified"
+note = "M5 RESTORED (14z-52): sfx id 0x18d -> vsavj same-id farm entry 0x0424e. Sample content verified IDENTICAL across sets (QSound key-on probe: same bank/start after relocation, docs/m5/). The session-9 stub and the session-5 same-id-means-music theory were both wrong for this id."
+
+[[map]]
+vsav2 = 0x0043b2
+vsavj = 0x02a7e0
+kind = "stubbed_sound"
+status = "verified"
+note = "M5 KEPT SILENT (14z-52): sfx id 0x173 — vsavj same-id keys DIFFERENT sample content. Measured, docs/m5/don_id_plan.json; restoring it would play the wrong sound. Revisit only with ported samples (STATE decision: voice samples)."
+
+[[map]]
+vsav2 = 0x0046a0
+vsavj = 0x0045c6
+kind = "sound_farm"
+status = "verified"
+note = "M5 RESTORED (14z-52): sfx id 0x299 -> vsavj same-id farm entry 0x045c6. Sample content verified IDENTICAL across sets (QSound key-on probe: same bank/start after relocation, docs/m5/). The session-9 stub and the session-5 same-id-means-music theory were both wrong for this id."
+
+[[map]]
+vsav2 = 0x0046e2
+vsavj = 0x004608
+kind = "sound_farm"
+status = "verified"
+note = "M5 RESTORED (14z-52): sfx id 0x156 -> vsavj same-id farm entry 0x04608. Sample content verified IDENTICAL across sets (QSound key-on probe: same bank/start after relocation, docs/m5/). The session-9 stub and the session-5 same-id-means-music theory were both wrong for this id."
+
+[[map]]
+vsav2 = 0x0046fc
+vsavj = 0x004622
+kind = "sound_farm"
+status = "verified"
+note = "M5 RESTORED (14z-52): sfx id 0x157 -> vsavj same-id farm entry 0x04622. Sample content verified IDENTICAL across sets (QSound key-on probe: same bank/start after relocation, docs/m5/). The session-9 stub and the session-5 same-id-means-music theory were both wrong for this id."
+
+[[map]]
+vsav2 = 0x004716
+vsavj = 0x00463c
+kind = "sound_farm"
+status = "verified"
+note = "M5 RESTORED (14z-52): sfx id 0x158 -> vsavj same-id farm entry 0x0463c. Sample content verified IDENTICAL across sets (QSound key-on probe: same bank/start after relocation, docs/m5/). The session-9 stub and the session-5 same-id-means-music theory were both wrong for this id."
+
+[[map]]
+vsav2 = 0x004730
+vsavj = 0x004656
+kind = "sound_farm"
+status = "verified"
+note = "M5 RESTORED (14z-52): sfx id 0x15a -> vsavj same-id farm entry 0x04656. Sample content verified IDENTICAL across sets (QSound key-on probe: same bank/start after relocation, docs/m5/). The session-9 stub and the session-5 same-id-means-music theory were both wrong for this id."
+
+[[map]]
+vsav2 = 0x0048be
+vsavj = 0x0047e4
+kind = "sound_farm"
+status = "verified"
+note = "M5 RESTORED (14z-52): sfx id 0x146 -> vsavj same-id farm entry 0x047e4. Sample content verified IDENTICAL across sets (QSound key-on probe: same bank/start after relocation, docs/m5/). The session-9 stub and the session-5 same-id-means-music theory were both wrong for this id."
+
+[[map]]
+vsav2 = 0x0048d8
+vsavj = 0x0047fe
+kind = "sound_farm"
+status = "verified"
+note = "M5 RESTORED (14z-52): sfx id 0x142 -> vsavj same-id farm entry 0x047fe. Sample content verified IDENTICAL across sets (QSound key-on probe: same bank/start after relocation, docs/m5/). The session-9 stub and the session-5 same-id-means-music theory were both wrong for this id."
+
+[[map]]
+vsav2 = 0x004ddc
 vsavj = 0x000000
 kind = "engine_data"
 status = "open"
 note = "-; refs: bare_long"
+
+[[map]]
+vsav2 = 0x004df6
+vsavj = 0x02a7e0
+kind = "stubbed_sound"
+status = "verified"
+note = "M5 KEPT SILENT (14z-52): sfx id 0x73e — sample ABSENT from vsav's (full) sample ROMs. Measured, docs/m5/don_id_plan.json; restoring it would play the wrong sound. Revisit only with ported samples (STATE decision: voice samples)."
 
 [[map]]
 vsav2 = 0x004e2a
-vsavj = 0x000000
-kind = "engine_data"
-status = "open"
-note = "-; refs: bare_long"
+vsavj = 0x02a7e0
+kind = "stubbed_sound"
+status = "verified"
+note = "M5 KEPT SILENT (14z-52): sfx id 0x747 — sample ABSENT from vsav's (full) sample ROMs. Measured, docs/m5/don_id_plan.json; restoring it would play the wrong sound. Revisit only with ported samples (STATE decision: voice samples)."
 
 [[map]]
-vsav2 = 0x004efa
+vsav2 = 0x004e5e
 vsavj = 0x000000
-kind = "engine_data"
+kind = "engine_sub"
 status = "open"
-note = "-; refs: bare_long"
+note = "-; refs: jmp"
+
+[[map]]
+vsav2 = 0x004e78
+vsavj = 0x000000
+kind = "engine_sub"
+status = "open"
+note = "-; refs: jmp"
 
 [[map]]
 vsav2 = 0x004f14
@@ -31,14 +192,7 @@ status = "verified"
 note = "M5 RESTORED (14z-52): sfx id 0x2d4 -> vsavj same-id farm entry 0x04a5e. Sample content verified IDENTICAL across sets (QSound key-on probe: same bank/start after relocation, docs/m5/). The session-9 stub and the session-5 same-id-means-music theory were both wrong for this id."
 
 [[map]]
-vsav2 = 0x004f2e
-vsavj = 0x000000
-kind = "engine_data"
-status = "open"
-note = "-; refs: bare_long"
-
-[[map]]
-vsav2 = 0x004f62
+vsav2 = 0x004f48
 vsavj = 0x000000
 kind = "engine_data"
 status = "open"
@@ -52,71 +206,71 @@ status = "open"
 note = "-; refs: bare_long"
 
 [[map]]
-vsav2 = 0x004fb0
-vsavj = 0x000000
+vsav2 = 0x004fe4
+vsavj = 0x00362a
 kind = "engine_data"
-status = "open"
-note = "-; refs: bare_long"
+status = "verified"
+note = "pattern-1.00-unique-w0x30; refs: bare_long"
 
 [[map]]
-vsav2 = 0x004fca
-vsavj = 0x000000
+vsav2 = 0x005004
+vsavj = 0x004bd6
 kind = "engine_data"
-status = "open"
-note = "-; refs: bare_long"
+status = "verified"
+note = "pattern-1.00-unique-w0x40; refs: bare_long"
+
+[[map]]
+vsav2 = 0x00501e
+vsavj = 0x004bf0
+kind = "engine_data"
+status = "verified"
+note = "pattern-1.00-unique-w0x40; refs: bare_long"
+
+[[map]]
+vsav2 = 0x005038
+vsavj = 0x004c0a
+kind = "engine_data"
+status = "verified"
+note = "pattern-1.00-unique-w0x40; refs: bare_long"
 
 [[map]]
 vsav2 = 0x005052
-vsavj = 0x02A7E0
+vsavj = 0x02a7e0
 kind = "stubbed_sound"
 status = "verified"
 note = "M5 KEPT SILENT (14z-52): sfx id 0x173 — vsavj same-id keys DIFFERENT sample content. Measured, docs/m5/don_id_plan.json; restoring it would play the wrong sound. Revisit only with ported samples (STATE decision: voice samples)."
 
 [[map]]
-vsav2 = 0x00506c
-vsavj = 0x000000
-kind = "engine_data"
-status = "open"
-note = "-; refs: bare_long"
-
-[[map]]
-vsav2 = 0x005086
-vsavj = 0x000000
-kind = "engine_data"
-status = "open"
-note = "-; refs: bare_long"
-
-[[map]]
 vsav2 = 0x0050a0
-vsavj = 0x000000
-kind = "engine_data"
-status = "open"
-note = "-; refs: bare_long"
+vsavj = 0x02a7e0
+kind = "stubbed_sound"
+status = "verified"
+note = "M5 KEPT SILENT (14z-52): sfx id 0x753 — vsavj id is a MUSIC TRACK (multi-voice, sustained — measured). Measured, docs/m5/don_id_plan.json; restoring it would play the wrong sound. Revisit only with ported samples (STATE decision: voice samples)."
 
 [[map]]
 vsav2 = 0x0050ba
-vsavj = 0x000000
-kind = "engine_data"
-status = "open"
-note = "-; refs: bare_long"
+vsavj = 0x02a7e0
+kind = "stubbed_sound"
+status = "verified"
+note = "M5 KEPT SILENT (14z-52): sfx id 0x754 — vsavj id is a MUSIC TRACK (multi-voice, sustained — measured). Measured, docs/m5/don_id_plan.json; restoring it would play the wrong sound. Revisit only with ported samples (STATE decision: voice samples)."
 
 [[map]]
 vsav2 = 0x0050d4
-vsavj = 0x000000
-kind = "engine_data"
-status = "open"
-note = "-; refs: bare_long"
+vsavj = 0x02a7e0
+kind = "stubbed_sound"
+status = "verified"
+note = "M5 KEPT SILENT (14z-52): sfx id 0x755 — vsavj id is a MUSIC TRACK (multi-voice, sustained — measured). Measured, docs/m5/don_id_plan.json; restoring it would play the wrong sound. Revisit only with ported samples (STATE decision: voice samples)."
 
 [[map]]
 vsav2 = 0x0050ee
-vsavj = 0x000000
-kind = "engine_data"
-status = "open"
-note = "-; refs: bare_long"
+vsavj = 0x02a7e0
+kind = "stubbed_sound"
+status = "verified"
+note = "M5 KEPT SILENT (14z-52): sfx id 0x756 — vsavj id is a MUSIC TRACK (multi-voice, sustained — measured). Measured, docs/m5/don_id_plan.json; restoring it would play the wrong sound. Revisit only with ported samples (STATE decision: voice samples)."
 
 [[map]]
 vsav2 = 0x005122
-vsavj = 0x02A7E0
+vsavj = 0x02a7e0
 kind = "stubbed_sound"
 status = "verified"
 note = "STILL STUBBED, now for a MEASURED reason (14z-52). This is the per-node sfx helper (vsavj twin 0x4CE2) and it carries ~400 calls per match — it is where ALL of Donovan s move sound lives. It cannot be enabled alone: the ported dispatcher resolves slot 0x0F to JEDAH s record array, which is ~40 entries while Donovan s scripts index up to 43 (measured, replays 12/25/56) — so it would read past the array AND play Jedah s sounds. The fix is the [[sound_table]] don_sfx_records row in donovan.toml (written, id-allowlisted, generator kind implemented) which is BLOCKED ON ROM SPACE: both holes are full. See STATE 14z-52."
@@ -178,6 +332,34 @@ status = "verified"
 note = "pattern-1.00-unique-w0x30; refs: bare_long"
 
 [[map]]
+vsav2 = 0x012c5a
+vsavj = 0x0145ae
+kind = "engine_data"
+status = "verified"
+note = "codebytes-unique-w0x18; refs: bare_long"
+
+[[map]]
+vsav2 = 0x012d0e
+vsavj = 0x014662
+kind = "engine_data"
+status = "verified"
+note = "codebytes-unique-w0x18; refs: bare_long"
+
+[[map]]
+vsav2 = 0x012d56
+vsavj = 0x014686
+kind = "engine_data"
+status = "verified"
+note = "codebytes-unique-w0x18; refs: bare_long"
+
+[[map]]
+vsav2 = 0x012d9e
+vsavj = 0x0146ce
+kind = "engine_data"
+status = "verified"
+note = "callsite-anchored-x1; refs: bare_long"
+
+[[map]]
 vsav2 = 0x01357e
 vsavj = 0x014e8a
 kind = "engine_sub"
@@ -234,6 +416,13 @@ status = "verified"
 note = "pattern-1.00-unique-w0x40; refs: bare_long"
 
 [[map]]
+vsav2 = 0x013bc0
+vsavj = 0x0154cc
+kind = "engine_data"
+status = "verified"
+note = "callsite-anchored-x2; refs: bare_long"
+
+[[map]]
 vsav2 = 0x013bf2
 vsavj = 0x0154fe
 kind = "engine_data"
@@ -267,6 +456,13 @@ vsavj = 0x01559e
 kind = "engine_data"
 status = "verified"
 note = "pattern-1.00-unique-w0x20; refs: bare_long"
+
+[[map]]
+vsav2 = 0x013d9c
+vsavj = 0x015696
+kind = "engine_data"
+status = "verified"
+note = "callsite-anchored-x3; refs: bare_long"
 
 [[map]]
 vsav2 = 0x013df2
@@ -311,6 +507,13 @@ status = "verified"
 note = "hand: secondary-object pool-2 allocator. vsav2 family 0x156D6+k*0x16 (count A5+0x7A42+k, list A5+0x79E6+4k) maps to vsavj family 0x016F8E+k*0x16 (count A5+0x79BE+k, list A5+0x7966+4k); pool index 2 both. MUST be mapped, never ported: it reads the game's own RAM allocator bookkeeping."
 
 [[map]]
+vsav2 = 0x015718
+vsavj = 0x016fd0
+kind = "engine_data"
+status = "verified"
+note = "callsite-anchored-x5; refs: bare_long"
+
+[[map]]
 vsav2 = 0x01572e
 vsavj = 0x016fe6
 kind = "engine_sub"
@@ -319,10 +522,10 @@ note = "hand: pool-4 allocator of the same family (vsav2 0x156D6+k*0x16 <-> vsav
 
 [[map]]
 vsav2 = 0x015744
-vsavj = 0x000000
-kind = "engine_data"
-status = "open"
-note = "-; refs: bare_long"
+vsavj = 0x016ffc
+kind = "engine_sub"
+status = "verified"
+note = "pool-family helper; skeleton-match at family delta +0x18B8"
 
 [[map]]
 vsav2 = 0x015770
@@ -337,6 +540,13 @@ vsavj = 0x01707a
 kind = "engine_data"
 status = "verified"
 note = "callsite-anchored-x2; refs: bare_long"
+
+[[map]]
+vsav2 = 0x0157ee
+vsavj = 0x0170a6
+kind = "engine_data"
+status = "verified"
+note = "callsite-anchored-x1; refs: bare_long"
 
 [[map]]
 vsav2 = 0x017178
@@ -375,17 +585,17 @@ note = "pattern-1.00-unique-w0x20; refs: bare_long"
 
 [[map]]
 vsav2 = 0x017422
-vsavj = 0x000000
-kind = "engine_data"
-status = "open"
-note = "-; refs: bare_long"
+vsavj = 0x018ab0
+kind = "engine_sub"
+status = "verified"
+note = "damage post-process; callsite-anchored in the damage wrapper"
 
 [[map]]
 vsav2 = 0x017522
-vsavj = 0x000000
-kind = "engine_data"
-status = "open"
-note = "-; refs: bare_long"
+vsavj = 0x018b8c
+kind = "engine_sub"
+status = "verified"
+note = "per-char defense-scaling calc; callsite-anchored x2 in the damage wrapper"
 
 [[map]]
 vsav2 = 0x017a48
@@ -396,10 +606,10 @@ note = "callsite-anchored-x1; refs: bare_long"
 
 [[map]]
 vsav2 = 0x017b22
-vsavj = 0x000000
-kind = "engine_data"
-status = "open"
-note = "-; refs: bare_long"
+vsavj = 0x019128
+kind = "engine_sub"
+status = "verified"
+note = "KO handler; callsite-anchored in the wrapper's KO path"
 
 [[map]]
 vsav2 = 0x017b74
@@ -423,6 +633,13 @@ status = "verified"
 note = "pattern-1.00-unique-w0x20; refs: bare_long"
 
 [[map]]
+vsav2 = 0x01ae14
+vsavj = 0x01c3a4
+kind = "engine_data"
+status = "verified"
+note = "pattern-1.00-unique-w0x40; refs: bare_long"
+
+[[map]]
 vsav2 = 0x01dbb6
 vsavj = 0x01f034
 kind = "engine_data"
@@ -435,6 +652,13 @@ vsavj = 0x01f458
 kind = "engine_data"
 status = "verified"
 note = "pattern-1.00-unique-w0x40; refs: bare_long"
+
+[[map]]
+vsav2 = 0x01e3a8
+vsavj = 0x01f856
+kind = "engine_data"
+status = "verified"
+note = "pattern-1.00-unique-w0x20; refs: bare_long"
 
 [[map]]
 vsav2 = 0x0209e4
@@ -514,6 +738,27 @@ status = "verified"
 note = "pattern-1.00-unique-w0x40; refs: jsr"
 
 [[map]]
+vsav2 = 0x028546
+vsavj = 0x02924c
+kind = "engine_data"
+status = "verified"
+note = "pattern-1.00-unique-w0x40; refs: bare_long"
+
+[[map]]
+vsav2 = 0x028684
+vsavj = 0x02938a
+kind = "engine_data"
+status = "verified"
+note = "callsite-anchored-x3; refs: bare_long"
+
+[[map]]
+vsav2 = 0x0286c0
+vsavj = 0x0293be
+kind = "engine_data"
+status = "verified"
+note = "pattern-1.00-unique-w0x40; refs: bare_long"
+
+[[map]]
 vsav2 = 0x028708
 vsavj = 0x029406
 kind = "engine_sub"
@@ -526,6 +771,20 @@ vsavj = 0x02947e
 kind = "engine_sub"
 status = "plausible"
 note = "pattern-0.98-w0x40; refs: jsr"
+
+[[map]]
+vsav2 = 0x0287d2
+vsavj = 0x0294d8
+kind = "engine_data"
+status = "verified"
+note = "pattern-1.00-unique-w0x20; refs: bare_long"
+
+[[map]]
+vsav2 = 0x028992
+vsavj = 0x000000
+kind = "engine_data"
+status = "open"
+note = "-; refs: bare_long"
 
 [[map]]
 vsav2 = 0x0289be
@@ -584,6 +843,13 @@ status = "verified"
 note = "pattern-1.00-unique-w0x40; refs: jsr"
 
 [[map]]
+vsav2 = 0x029104
+vsavj = 0x029dca
+kind = "engine_data"
+status = "verified"
+note = "farm-helper-match; refs: bare_long"
+
+[[map]]
 vsav2 = 0x029114
 vsavj = 0x029dda
 kind = "engine_sub"
@@ -610,6 +876,13 @@ vsavj = 0x029df2
 kind = "engine_sub"
 status = "verified"
 note = "farm-helper-match; refs: jsr"
+
+[[map]]
+vsav2 = 0x029134
+vsavj = 0x029dfa
+kind = "engine_data"
+status = "verified"
+note = "farm-helper-match; refs: bare_long"
 
 [[map]]
 vsav2 = 0x029154
@@ -725,6 +998,517 @@ vsavj = 0x02d62a
 kind = "engine_data"
 status = "verified"
 note = "callsite-anchored-x4; refs: bare_long"
+
+[[map]]
+vsav2 = 0x02e44e
+vsavj = 0x02eb6a
+kind = "engine_data"
+status = "plausible"
+note = "pattern-0.94-w0x40; refs: bare_long"
+
+[[map]]
+vsav2 = 0x03844e
+vsavj = 0x000000
+kind = "engine_data"
+status = "open"
+note = "-; refs: bare_long"
+
+[[map]]
+vsav2 = 0x05c750
+vsavj = 0x054570
+kind = "engine_data"
+status = "verified"
+note = "callsite-anchored-x14; refs: bare_long"
+
+[[map]]
+vsav2 = 0x05c77a
+vsavj = 0x05459a
+kind = "engine_data"
+status = "verified"
+note = "callsite-anchored-x14; refs: bare_long"
+
+[[map]]
+vsav2 = 0x05c79e
+vsavj = 0x0545be
+kind = "engine_data"
+status = "verified"
+note = "pattern-1.00-unique-w0x40; refs: bare_long"
+
+[[map]]
+vsav2 = 0x05c7be
+vsavj = 0x0545de
+kind = "engine_sub"
+status = "verified"
+note = "pattern-1.00-unique-w0x40; refs: jmp,jsr"
+
+[[map]]
+vsav2 = 0x06a9be
+vsavj = 0x05e9b4
+kind = "engine_data"
+status = "verified"
+note = "pattern-1.00-unique-w0x20; refs: bare_long"
+
+[[map]]
+vsav2 = 0x06d9d4
+vsavj = 0x061588
+kind = "engine_data"
+status = "verified"
+note = "pattern-1.00-unique-w0x40; refs: bare_long"
+
+[[map]]
+vsav2 = 0x06e4a6
+vsavj = 0x061ed4
+kind = "engine_sub"
+status = "verified"
+note = "pattern-1.00-unique-w0x30; refs: jmp,jsr"
+
+[[map]]
+vsav2 = 0x080a1e
+vsavj = 0x0752b2
+kind = "engine_data"
+status = "verified"
+note = "pattern-1.00-unique-w0x40; refs: bare_long"
+
+[[map]]
+vsav2 = 0x080b46
+vsavj = 0x0753da
+kind = "engine_data"
+status = "verified"
+note = "pattern-1.00-unique-w0x40; refs: bare_long"
+
+[[map]]
+vsav2 = 0x082ae2
+vsavj = 0x077376
+kind = "engine_data"
+status = "verified"
+note = "pattern-1.00-unique-w0x40; refs: bare_long"
+
+[[map]]
+vsav2 = 0x08a5a8
+vsavj = 0x000000
+kind = "engine_sub"
+status = "open"
+note = "-; refs: jsr"
+
+[[map]]
+vsav2 = 0x08acd8
+vsavj = 0x000000
+kind = "engine_sub"
+status = "open"
+note = "-; refs: jsr"
+
+[[map]]
+vsav2 = 0x09c4d6
+vsavj = 0x09190a
+kind = "engine_data"
+status = "verified"
+note = "pattern-1.00-unique-w0x30; refs: bare_long"
+
+[[map]]
+vsav2 = 0x09c4f6
+vsavj = 0x09192a
+kind = "engine_data"
+status = "verified"
+note = "callsite-anchored-x5; refs: bare_long"
+
+[[map]]
+vsav2 = 0x12f484
+vsavj = 0x000000
+kind = "engine_data"
+status = "open"
+note = "-; refs: bare_long"
+
+[[map]]
+vsav2 = 0x1373c6
+vsavj = 0x14492c
+kind = "engine_data"
+status = "verified"
+note = "pattern-1.00-unique-w0x40; refs: bare_long"
+
+[[map]]
+vsav2 = 0x167bf4
+vsavj = 0x000000
+kind = "engine_data"
+status = "open"
+note = "-; refs: bare_long"
+
+[[map]]
+vsav2 = 0x16c0ec
+vsavj = 0x181560
+kind = "engine_data"
+status = "verified"
+note = "pattern-1.00-unique-w0x40; refs: bare_long"
+
+[[map]]
+vsav2 = 0x174610
+vsavj = 0x214d1c
+kind = "engine_data"
+status = "verified"
+note = "codebytes-unique-w0x8; refs: bare_long"
+
+[[map]]
+vsav2 = 0x17f176
+vsavj = 0x000000
+kind = "engine_data"
+status = "open"
+note = "-; refs: bare_long"
+
+[[map]]
+vsav2 = 0x181592
+vsavj = 0x000000
+kind = "engine_data"
+status = "open"
+note = "-; refs: bare_long"
+
+[[map]]
+vsav2 = 0x1ae64e
+vsavj = 0x000000
+kind = "engine_data"
+status = "open"
+note = "-; refs: bare_long"
+
+[[map]]
+vsav2 = 0x1bab42
+vsavj = 0x145212
+kind = "engine_data"
+status = "verified"
+note = "codebytes-unique-w0x8; refs: bare_long"
+
+[[map]]
+vsav2 = 0x1cd326
+vsavj = 0x1e0064
+kind = "engine_data"
+status = "verified"
+note = "pattern-1.00-unique-w0x40; refs: bare_long"
+
+[[map]]
+vsav2 = 0x1d7428
+vsavj = 0x1f3fd2
+kind = "engine_data"
+status = "verified"
+note = "shared effect anim word table; 24-byte content match, unique in vsavj"
+
+[[map]]
+vsav2 = 0x1e744e
+vsavj = 0x000000
+kind = "engine_data"
+status = "open"
+note = "-; refs: bare_long"
+
+[[map]]
+vsav2 = 0x2695d0
+vsavj = 0x000000
+kind = "engine_data"
+status = "open"
+note = "-; refs: bare_long"
+
+[[map]]
+vsav2 = 0x281696
+vsavj = 0x000000
+kind = "engine_data"
+status = "open"
+note = "-; refs: bare_long"
+
+[[map]]
+vsav2 = 0x289b14
+vsavj = 0x000000
+kind = "engine_data"
+status = "open"
+note = "-; refs: bare_long"
+
+[[map]]
+vsav2 = 0x28ed08
+vsavj = 0x000000
+kind = "engine_data"
+status = "open"
+note = "-; refs: bare_long"
+
+[[map]]
+vsav2 = 0x2abd58
+vsavj = 0x000000
+kind = "engine_data"
+status = "open"
+note = "-; refs: bare_long"
+
+[[map]]
+vsav2 = 0x2b7ef4
+vsavj = 0x000000
+kind = "engine_data"
+status = "open"
+note = "-; refs: bare_long"
+
+[[map]]
+vsav2 = 0x2b8060
+vsavj = 0x000000
+kind = "engine_data"
+status = "open"
+note = "-; refs: bare_long"
+
+[[map]]
+vsav2 = 0x36784a
+vsavj = 0x000000
+kind = "engine_data"
+status = "open"
+note = "-; refs: bare_long"
+
+[[map]]
+vsav2 = 0x396c94
+vsavj = 0x38c298
+kind = "engine_data"
+status = "verified"
+note = "pattern-1.00-unique-w0x40; refs: bare_long"
+
+[[map]]
+vsav2 = 0x026142
+vsavj = 0x000000
+kind = "engine_data"
+status = "open"
+note = "-; refs: bare_long"
+
+[[map]]
+vsav2 = 0x02622a
+vsavj = 0x027008
+kind = "engine_data"
+status = "verified"
+note = "codebytes-unique-w0x18; refs: bare_long"
+
+[[map]]
+vsav2 = 0x026282
+vsavj = 0x0270b6
+kind = "engine_data"
+status = "verified"
+note = "pattern-1.00-unique-w0x20; refs: bare_long"
+
+[[map]]
+vsav2 = 0x0262a8
+vsavj = 0x0270dc
+kind = "engine_data"
+status = "verified"
+note = "callsite-anchored-x6; refs: bare_long"
+
+[[map]]
+vsav2 = 0x0265cc
+vsavj = 0x0273e2
+kind = "engine_sub"
+status = "verified"
+note = "pattern-1.00-unique-w0x40; refs: bare_long,jsr"
+
+[[map]]
+vsav2 = 0x0265fc
+vsavj = 0x027412
+kind = "engine_data"
+status = "verified"
+note = "pattern-1.00-unique-w0x40; refs: bare_long"
+
+[[map]]
+vsav2 = 0x0266a4
+vsavj = 0x0274ba
+kind = "engine_data"
+status = "verified"
+note = "pattern-1.00-unique-w0x40; refs: bare_long"
+
+[[map]]
+vsav2 = 0x026760
+vsavj = 0x027576
+kind = "engine_data"
+status = "verified"
+note = "pattern-1.00-unique-w0x40; refs: bare_long"
+
+[[map]]
+vsav2 = 0x0270da
+vsavj = 0x027e86
+kind = "engine_data"
+status = "verified"
+note = "pattern-1.00-unique-w0x40; refs: bare_long"
+
+[[map]]
+vsav2 = 0x02710c
+vsavj = 0x027eb8
+kind = "engine_data"
+status = "verified"
+note = "pattern-1.00-unique-w0x40; refs: bare_long"
+
+[[map]]
+vsav2 = 0x027114
+vsavj = 0x027ec0
+kind = "engine_data"
+status = "verified"
+note = "pattern-1.00-unique-w0x40; refs: bare_long"
+
+[[map]]
+vsav2 = 0x02711c
+vsavj = 0x027ec8
+kind = "engine_sub"
+status = "verified"
+note = "pattern-1.00-unique-w0x40; refs: bare_long,jmp"
+
+[[map]]
+vsav2 = 0x0271c4
+vsavj = 0x027f70
+kind = "engine_sub"
+status = "verified"
+note = "pattern-1.00-unique-w0x40; refs: bare_long,jmp"
+
+[[map]]
+vsav2 = 0x0271fe
+vsavj = 0x027faa
+kind = "engine_data"
+status = "verified"
+note = "pattern-1.00-unique-w0x40; refs: bare_long"
+
+[[map]]
+vsav2 = 0x027252
+vsavj = 0x027ffe
+kind = "engine_data"
+status = "verified"
+note = "pattern-1.00-unique-w0x40; refs: bare_long"
+
+[[map]]
+vsav2 = 0x027282
+vsavj = 0x02802e
+kind = "engine_data"
+status = "verified"
+note = "pattern-1.00-unique-w0x40; refs: bare_long"
+
+[[map]]
+vsav2 = 0x05c9d6
+vsavj = 0x054776
+kind = "engine_data"
+status = "verified"
+note = "pattern-1.00-unique-w0x40; refs: bare_long"
+
+[[map]]
+vsav2 = 0x05ce64
+vsavj = 0x054c04
+kind = "engine_data"
+status = "verified"
+note = "pattern-1.00-unique-w0x40; refs: bare_long"
+
+[[map]]
+vsav2 = 0x05cf68
+vsavj = 0x054d08
+kind = "engine_data"
+status = "verified"
+note = "pattern-1.00-unique-w0x40; refs: bare_long"
+
+[[map]]
+vsav2 = 0x05d26c
+vsavj = 0x05500c
+kind = "engine_data"
+status = "verified"
+note = "pattern-1.00-unique-w0x40; refs: bare_long"
+
+[[map]]
+vsav2 = 0x05d322
+vsavj = 0x0550c2
+kind = "engine_data"
+status = "plausible"
+note = "pattern-0.97-w0x40; refs: bare_long"
+
+[[map]]
+vsav2 = 0x05d6ee
+vsavj = 0x055482
+kind = "engine_data"
+status = "verified"
+note = "pattern-1.00-unique-w0x40; refs: bare_long"
+
+[[map]]
+vsav2 = 0x05d936
+vsavj = 0x0556ca
+kind = "engine_data"
+status = "verified"
+note = "pattern-1.00-unique-w0x40; refs: bare_long"
+
+[[map]]
+vsav2 = 0x05dc74
+vsavj = 0x055a08
+kind = "engine_data"
+status = "verified"
+note = "pattern-1.00-unique-w0x40; refs: bare_long"
+
+[[map]]
+vsav2 = 0x05df74
+vsavj = 0x000000
+kind = "engine_data"
+status = "open"
+note = "-; refs: bare_long"
+
+[[map]]
+vsav2 = 0x05e0ec
+vsavj = 0x055e6c
+kind = "engine_data"
+status = "verified"
+note = "pattern-1.00-unique-w0x40; refs: bare_long"
+
+[[map]]
+vsav2 = 0x05e194
+vsavj = 0x055f14
+kind = "engine_data"
+status = "verified"
+note = "pattern-1.00-unique-w0x40; refs: bare_long"
+
+[[map]]
+vsav2 = 0x05e256
+vsavj = 0x055fd6
+kind = "engine_data"
+status = "plausible"
+note = "pattern-0.95-w0x40; refs: bare_long"
+
+[[map]]
+vsav2 = 0x05e504
+vsavj = 0x05627e
+kind = "engine_data"
+status = "plausible"
+note = "pattern-0.95-w0x40; refs: bare_long"
+
+[[map]]
+vsav2 = 0x004efa
+vsavj = 0x000000
+kind = "engine_data"
+status = "open"
+note = "-; refs: bare_long"
+
+[[map]]
+vsav2 = 0x004f2e
+vsavj = 0x000000
+kind = "engine_data"
+status = "open"
+note = "-; refs: bare_long"
+
+[[map]]
+vsav2 = 0x004f62
+vsavj = 0x000000
+kind = "engine_data"
+status = "open"
+note = "-; refs: bare_long"
+
+[[map]]
+vsav2 = 0x004fb0
+vsavj = 0x000000
+kind = "engine_data"
+status = "open"
+note = "-; refs: bare_long"
+
+[[map]]
+vsav2 = 0x004fca
+vsavj = 0x000000
+kind = "engine_data"
+status = "open"
+note = "-; refs: bare_long"
+
+[[map]]
+vsav2 = 0x00506c
+vsavj = 0x02a7e0
+kind = "stubbed_sound"
+status = "verified"
+note = "M5 KEPT SILENT (14z-52): sfx id 0x112 — restorable id but vsavj has NO farm entry loading it — needs a ported clone (M5 phase 2). Measured, docs/m5/don_id_plan.json; restoring it would play the wrong sound. Revisit only with ported samples (STATE decision: voice samples)."
+
+[[map]]
+vsav2 = 0x005086
+vsavj = 0x02a7e0
+kind = "stubbed_sound"
+status = "verified"
+note = "M5 KEPT SILENT (14z-52): sfx id 0x71d — vsavj id is a MUSIC TRACK (multi-voice, sustained — measured). Measured, docs/m5/don_id_plan.json; restoring it would play the wrong sound. Revisit only with ported samples (STATE decision: voice samples)."
 
 [[map]]
 vsav2 = 0x04223c
@@ -853,173 +1637,15 @@ status = "verified"
 note = "callsite-anchored-x5; refs: bare_long"
 
 [[map]]
-vsav2 = 0x05c750
-vsavj = 0x054570
-kind = "engine_data"
-status = "verified"
-note = "callsite-anchored-x14; refs: bare_long"
-
-[[map]]
-vsav2 = 0x05c77a
-vsavj = 0x05459a
-kind = "engine_data"
-status = "verified"
-note = "callsite-anchored-x14; refs: bare_long"
-
-# Session 14z-5 (round-26 sword-swing root cause): vs2 0x5C77E is the
-# UNMASKED set-anim-by-number entry — vs2 hoisted `andi.w #$ff,d0` to a
-# pre-entry at 0x5C77A so extended anim numbers (Donovan sword poses
-# 0x101-0x1DE -> numbers 0x124-0x201) can skip it. vsavj's twin embeds
-# the mask mid-routine (0x545B0) with NO unmasked entry, so the old
-# codebytes-match row was a FALSE equivalence: every ported call
-# truncated (0x127 -> 0x27) and resolved a wrong-but-valid node in
-# Donovan's own repointed number table (0xBD07A row 0x0F) — the sword
-# played idle-family anims instead of swings. patched_clone = vanilla
-# 0x5459A bytes minus the andi, placed in hole a; ONLY ported refs
-# route there (vanilla callers keep the masked original untouched).
-[[map]]
 vsav2 = 0x05c77e
 vsavj = 0x05459a
 kind = "patched_clone"
 status = "verified"
 clone_src = 0x05459a
-clone_len = 0x44
+clone_len = 0x000044
 patch_old = "024000ff"
 patch_new = ""
 note = "unmasked set-anim entry; false byte-match to the masked vsavj twin"
-
-[[map]]
-vsav2 = 0x05c79e
-vsavj = 0x0545be
-kind = "engine_data"
-status = "verified"
-note = "pattern-1.00-unique-w0x40; refs: bare_long"
-
-[[map]]
-vsav2 = 0x05c7be
-vsavj = 0x0545de
-kind = "engine_sub"
-status = "verified"
-note = "pattern-1.00-unique-w0x40; refs: jmp,jsr"
-
-[[map]]
-vsav2 = 0x06a9be
-vsavj = 0x05e9b4
-kind = "engine_data"
-status = "verified"
-note = "pattern-1.00-unique-w0x20; refs: bare_long"
-
-[[map]]
-vsav2 = 0x06d9d4
-vsavj = 0x061588
-kind = "engine_data"
-status = "verified"
-note = "pattern-1.00-unique-w0x40; refs: bare_long"
-
-[[map]]
-vsav2 = 0x06e4a6
-vsavj = 0x061ed4
-kind = "engine_sub"
-status = "verified"
-note = "pattern-1.00-unique-w0x30; refs: jmp,jsr"
-
-[[map]]
-vsav2 = 0x080a1e
-vsavj = 0x0752b2
-kind = "engine_data"
-status = "verified"
-note = "pattern-1.00-unique-w0x40; refs: bare_long"
-
-[[map]]
-vsav2 = 0x080b46
-vsavj = 0x0753da
-kind = "engine_data"
-status = "verified"
-note = "pattern-1.00-unique-w0x40; refs: bare_long"
-
-[[map]]
-vsav2 = 0x082ae2
-vsavj = 0x077376
-kind = "engine_data"
-status = "verified"
-note = "pattern-1.00-unique-w0x40; refs: bare_long"
-
-[[map]]
-vsav2 = 0x08a5a8
-vsavj = 0x000000
-kind = "engine_sub"
-status = "open"
-note = "-; refs: jsr"
-
-[[map]]
-vsav2 = 0x12f484
-vsavj = 0x000000
-kind = "engine_data"
-status = "open"
-note = "-; refs: bare_long"
-
-[[map]]
-vsav2 = 0x1373c6
-vsavj = 0x14492c
-kind = "engine_data"
-status = "verified"
-note = "pattern-1.00-unique-w0x40; refs: bare_long"
-
-[[map]]
-vsav2 = 0x167bf4
-vsavj = 0x000000
-kind = "engine_data"
-status = "open"
-note = "-; refs: bare_long"
-
-[[map]]
-vsav2 = 0x16c0ec
-vsavj = 0x181560
-kind = "engine_data"
-status = "verified"
-note = "pattern-1.00-unique-w0x40; refs: bare_long"
-
-[[map]]
-vsav2 = 0x17f176
-vsavj = 0x000000
-kind = "engine_data"
-status = "open"
-note = "-; refs: bare_long"
-
-[[map]]
-vsav2 = 0x181592
-vsavj = 0x000000
-kind = "engine_data"
-status = "open"
-note = "-; refs: bare_long"
-
-[[map]]
-vsav2 = 0x1bab42
-vsavj = 0x145212
-kind = "engine_data"
-status = "verified"
-note = "codebytes-unique-w0x8; refs: bare_long"
-
-[[map]]
-vsav2 = 0x1cd326
-vsavj = 0x1e0064
-kind = "engine_data"
-status = "verified"
-note = "pattern-1.00-unique-w0x40; refs: bare_long"
-
-[[map]]
-vsav2 = 0x1d7428
-vsavj = 0x1f3fd2
-kind = "engine_data"
-status = "verified"
-note = "pattern-1.00-unique-w0x40; refs: bare_long"
-
-[[map]]
-vsav2 = 0x2b7ef4
-vsavj = 0x000000
-kind = "engine_data"
-status = "open"
-note = "-; refs: bare_long"
 
 [[map]]
 vsav2 = 0x0d609e
@@ -1056,278 +1682,9 @@ kind = "bank_ref"
 status = "verified"
 note = "hand: gap_be27a pointer TABLE base; delta rule; slot 0x0F row repointed by the generator"
 
-# ── Sound farm (session 9 stubs; 14z-52 M5 phase 1 partial restore) ────────
-# 14z-52: the QSound id space was MEASURED on both sets (sweep instrument
-# tests/lua/qs_sweep.lua; maps in docs/m5/). Result: shared sfx keep
-# IDENTICAL ids across the family, so 13 of these rows restore by pointing
-# at the vsavj SAME-ID farm entry (content-verified). The rest stay silent
-# with a per-row measured reason — crucially, vsavj's 0x700-0x7FF range
-# holds MUSIC TRACKS where vs2 put Donovan's voice bank: that (not "same
-# ids mean different things") is the real mechanism behind the round-2
-# music-on-214P bug.
-# ── original session-9 note ────────────────────────────────────────────────
-# Donovan's move code calls vs2 sound-farm entries (jsr 0x330E; move.l
-# #sfx,D1; bsr 0x5122; jmp 0x3306). The sfx ids reference VS2's QSound
-# sample set — sample migration is M5. Until then: stub to a known engine
-# rts (vsavj 0x2A7E0) so ported moves play SILENTLY. RESTORE AT M5 —
-# the vs2 sfx ids are recorded per row.
 [[map]]
-vsav2 = 0x004DF6
-vsavj = 0x02A7E0
-kind = "stubbed_sound"
-status = "verified"
-note = "M5 KEPT SILENT (14z-52): sfx id 0x73e — sample ABSENT from vsav's (full) sample ROMs. Measured, docs/m5/don_id_plan.json; restoring it would play the wrong sound. Revisit only with ported samples (STATE decision: voice samples)."
-
-[[map]]
-vsav2 = 0x004E2A
-vsavj = 0x02A7E0
-kind = "stubbed_sound"
-status = "verified"
-note = "M5 KEPT SILENT (14z-52): sfx id 0x747 — sample ABSENT from vsav's (full) sample ROMs. Measured, docs/m5/don_id_plan.json; restoring it would play the wrong sound. Revisit only with ported samples (STATE decision: voice samples)."
-
-[[map]]
-vsav2 = 0x00506C
-vsavj = 0x02A7E0
-kind = "stubbed_sound"
-status = "verified"
-note = "M5 KEPT SILENT (14z-52): sfx id 0x112 — restorable id but vsavj has NO farm entry loading it — needs a ported clone (M5 phase 2). Measured, docs/m5/don_id_plan.json; restoring it would play the wrong sound. Revisit only with ported samples (STATE decision: voice samples)."
-
-[[map]]
-vsav2 = 0x005086
-vsavj = 0x02A7E0
-kind = "stubbed_sound"
-status = "verified"
-note = "M5 KEPT SILENT (14z-52): sfx id 0x71d — vsavj id is a MUSIC TRACK (multi-voice, sustained — measured). Measured, docs/m5/don_id_plan.json; restoring it would play the wrong sound. Revisit only with ported samples (STATE decision: voice samples)."
-
-[[map]]
-vsav2 = 0x0050A0
-vsavj = 0x02A7E0
-kind = "stubbed_sound"
-status = "verified"
-note = "M5 KEPT SILENT (14z-52): sfx id 0x753 — vsavj id is a MUSIC TRACK (multi-voice, sustained — measured). Measured, docs/m5/don_id_plan.json; restoring it would play the wrong sound. Revisit only with ported samples (STATE decision: voice samples)."
-
-[[map]]
-vsav2 = 0x0050BA
-vsavj = 0x02A7E0
-kind = "stubbed_sound"
-status = "verified"
-note = "M5 KEPT SILENT (14z-52): sfx id 0x754 — vsavj id is a MUSIC TRACK (multi-voice, sustained — measured). Measured, docs/m5/don_id_plan.json; restoring it would play the wrong sound. Revisit only with ported samples (STATE decision: voice samples)."
-
-[[map]]
-vsav2 = 0x0050D4
-vsavj = 0x02A7E0
-kind = "stubbed_sound"
-status = "verified"
-note = "M5 KEPT SILENT (14z-52): sfx id 0x755 — vsavj id is a MUSIC TRACK (multi-voice, sustained — measured). Measured, docs/m5/don_id_plan.json; restoring it would play the wrong sound. Revisit only with ported samples (STATE decision: voice samples)."
-
-[[map]]
-vsav2 = 0x0050EE
-vsavj = 0x02A7E0
-kind = "stubbed_sound"
-status = "verified"
-note = "M5 KEPT SILENT (14z-52): sfx id 0x756 — vsavj id is a MUSIC TRACK (multi-voice, sustained — measured). Measured, docs/m5/don_id_plan.json; restoring it would play the wrong sound. Revisit only with ported samples (STATE decision: voice samples)."
-
-# ── Pool-family helpers, session 9: structural-match at the family delta
-# (+0x18B8), 14-mnemonic skeleton identical ────────────────────────────────
-[[map]]
-vsav2 = 0x015744
-vsavj = 0x016FFC
+vsav2 = 0x01581a
+vsavj = 0x0170d2
 kind = "engine_sub"
 status = "verified"
 note = "pool-family helper; skeleton-match at family delta +0x18B8"
-
-[[map]]
-vsav2 = 0x01581A
-vsavj = 0x0170D2
-kind = "engine_sub"
-status = "verified"
-note = "pool-family helper; skeleton-match at family delta +0x18B8"
-
-# ── Damage-pipeline trio, session 10: callsite-anchored in the byte-parallel
-# damage wrapper (vs2 0x17330-0x17420 ↔ vsavj 0x189BA-0x18AAE — instruction-
-# for-instruction identical incl. the KO path; every bsr position votes) ────
-[[map]]
-vsav2 = 0x017522
-vsavj = 0x018B8C
-kind = "engine_sub"
-status = "verified"
-note = "per-char defense-scaling calc; callsite-anchored x2 in the damage wrapper"
-
-[[map]]
-vsav2 = 0x017422
-vsavj = 0x018AB0
-kind = "engine_sub"
-status = "verified"
-note = "damage post-process; callsite-anchored in the damage wrapper"
-
-[[map]]
-vsav2 = 0x017B22
-vsavj = 0x019128
-kind = "engine_sub"
-status = "verified"
-note = "KO handler; callsite-anchored in the wrapper's KO path"
-
-# ── Engine-shared data tables reached from ported movea.l immediates
-# (session 11 mash-soak crash: type-114 effect's set-anim table) ────────────
-[[map]]
-vsav2 = 0x1D7428
-vsavj = 0x1F3FD2
-kind = "engine_data"
-status = "verified"
-note = "shared effect anim word table; 24-byte content match, unique in vsavj"
-
-# ── Same-value engine refs (session 12: the mash-wedge root cause) ──────────
-# vs2 and vhunt2 farms are layout-identical, so sibling-diff extraction
-# never surfaces these operands; vsavj's farm drifted and the coincident
-# address is a DIFFERENT entry (vsavj 0x3B2C = an unpaired tail entry that
-# restores stale registers — the infinite meter loop). Verified by unique
-# body match (save + read +0x70 + sfx 0x172 + jsr pan-helper + restore).
-[[map]]
-vsav2 = 0x003B2C
-vsavj = 0x003AF6
-kind = "engine_sub"
-status = "verified"
-note = "sound-farm entry sfx 0x172 (stock chime); unique body match; farms drift +/-0x36"
-
-# ── Same-value engine refs, byte-verified identical at target (session 12 audit: 24B plaintext match vs2==vsavj) ──
-[[map]]
-vsav2 = 0x003306
-vsavj = 0x003306
-kind = "engine_sub"
-status = "verified"
-note = "same-value ref; 24B byte-identical at target (kernel/service band)"
-
-[[map]]
-vsav2 = 0x00330e
-vsavj = 0x00330e
-kind = "engine_sub"
-status = "verified"
-note = "same-value ref; 24B byte-identical at target (kernel/service band)"
-
-
-# ── Sound-farm same-value refs resolved by unique whole-entry byte
-# match in vsavj (session 12 batch; entry = bytes to the jmp-0x3306
-# terminator; farms drift so coincident addresses are WRONG entries) ──
-
-# ── Sound-farm same-value refs, matched by save+sfx-id signature
-# (session 12 batch 2; whole-entry match fails on positional bsr
-# displacements — the sfx id immediate is the semantic key) ──
-[[map]]
-vsav2 = 0x003a0c
-vsavj = 0x0039d6
-kind = "engine_sub"
-status = "verified"
-note = "sound-farm entry sfx 0x115; unique save+id signature match"
-
-[[map]]
-vsav2 = 0x003ac4
-vsavj = 0x003a8e
-kind = "sound_farm"
-status = "verified"
-note = "M5 RESTORED (14z-52): sfx id 0x137 -> vsavj same-id farm entry 0x03a8e. Sample content verified IDENTICAL across sets (QSound key-on probe: same bank/start after relocation, docs/m5/). The session-9 stub and the session-5 same-id-means-music theory were both wrong for this id."
-
-[[map]]
-vsav2 = 0x003f46
-vsavj = 0x003f10
-kind = "sound_farm"
-status = "verified"
-note = "M5 RESTORED (14z-52): sfx id 0x136 -> vsavj same-id farm entry 0x03f10. Sample content verified IDENTICAL across sets (QSound key-on probe: same bank/start after relocation, docs/m5/). The session-9 stub and the session-5 same-id-means-music theory were both wrong for this id."
-
-[[map]]
-vsav2 = 0x003fae
-vsavj = 0x003f78
-kind = "sound_farm"
-status = "verified"
-note = "M5 RESTORED (14z-52): sfx id 0x13d -> vsavj same-id farm entry 0x03f78. Sample content verified IDENTICAL across sets (QSound key-on probe: same bank/start after relocation, docs/m5/). The session-9 stub and the session-5 same-id-means-music theory were both wrong for this id."
-
-[[map]]
-vsav2 = 0x003fc8
-vsavj = 0x003f92
-kind = "engine_sub"
-status = "verified"
-note = "sound-farm entry sfx 0x1d5; unique save+id signature match"
-
-[[map]]
-vsav2 = 0x0040ae
-vsavj = 0x02A7E0
-kind = "stubbed_sound"
-status = "verified"
-note = "M5 KEPT SILENT (14z-52): sfx id 0x14a — sample ABSENT from vsav's (full) sample ROMs. Measured, docs/m5/don_id_plan.json; restoring it would play the wrong sound. Revisit only with ported samples (STATE decision: voice samples)."
-
-[[map]]
-vsav2 = 0x0042d0
-vsavj = 0x004234
-kind = "sound_farm"
-status = "verified"
-note = "M5 RESTORED (14z-52): sfx id 0x18b -> vsavj same-id farm entry 0x04234. Sample content verified IDENTICAL across sets (QSound key-on probe: same bank/start after relocation, docs/m5/). The session-9 stub and the session-5 same-id-means-music theory were both wrong for this id."
-
-[[map]]
-vsav2 = 0x0042ea
-vsavj = 0x00424e
-kind = "sound_farm"
-status = "verified"
-note = "M5 RESTORED (14z-52): sfx id 0x18d -> vsavj same-id farm entry 0x0424e. Sample content verified IDENTICAL across sets (QSound key-on probe: same bank/start after relocation, docs/m5/). The session-9 stub and the session-5 same-id-means-music theory were both wrong for this id."
-
-[[map]]
-vsav2 = 0x0043b2
-vsavj = 0x02A7E0
-kind = "stubbed_sound"
-status = "verified"
-note = "M5 KEPT SILENT (14z-52): sfx id 0x173 — vsavj same-id keys DIFFERENT sample content. Measured, docs/m5/don_id_plan.json; restoring it would play the wrong sound. Revisit only with ported samples (STATE decision: voice samples)."
-
-[[map]]
-vsav2 = 0x0046a0
-vsavj = 0x0045c6
-kind = "sound_farm"
-status = "verified"
-note = "M5 RESTORED (14z-52): sfx id 0x299 -> vsavj same-id farm entry 0x045c6. Sample content verified IDENTICAL across sets (QSound key-on probe: same bank/start after relocation, docs/m5/). The session-9 stub and the session-5 same-id-means-music theory were both wrong for this id."
-
-[[map]]
-vsav2 = 0x0046e2
-vsavj = 0x004608
-kind = "sound_farm"
-status = "verified"
-note = "M5 RESTORED (14z-52): sfx id 0x156 -> vsavj same-id farm entry 0x04608. Sample content verified IDENTICAL across sets (QSound key-on probe: same bank/start after relocation, docs/m5/). The session-9 stub and the session-5 same-id-means-music theory were both wrong for this id."
-
-[[map]]
-vsav2 = 0x0046fc
-vsavj = 0x004622
-kind = "sound_farm"
-status = "verified"
-note = "M5 RESTORED (14z-52): sfx id 0x157 -> vsavj same-id farm entry 0x04622. Sample content verified IDENTICAL across sets (QSound key-on probe: same bank/start after relocation, docs/m5/). The session-9 stub and the session-5 same-id-means-music theory were both wrong for this id."
-
-[[map]]
-vsav2 = 0x004716
-vsavj = 0x00463c
-kind = "sound_farm"
-status = "verified"
-note = "M5 RESTORED (14z-52): sfx id 0x158 -> vsavj same-id farm entry 0x0463c. Sample content verified IDENTICAL across sets (QSound key-on probe: same bank/start after relocation, docs/m5/). The session-9 stub and the session-5 same-id-means-music theory were both wrong for this id."
-
-[[map]]
-vsav2 = 0x004730
-vsavj = 0x004656
-kind = "sound_farm"
-status = "verified"
-note = "M5 RESTORED (14z-52): sfx id 0x15a -> vsavj same-id farm entry 0x04656. Sample content verified IDENTICAL across sets (QSound key-on probe: same bank/start after relocation, docs/m5/). The session-9 stub and the session-5 same-id-means-music theory were both wrong for this id."
-
-[[map]]
-vsav2 = 0x003972
-vsavj = 0x00393c
-kind = "engine_sub"
-status = "verified"
-note = "sound-farm entry sfx 0x10a; save+id+next-opword signature (dual-entry disambiguated)"
-
-[[map]]
-vsav2 = 0x0048be
-vsavj = 0x0047e4
-kind = "sound_farm"
-status = "verified"
-note = "M5 RESTORED (14z-52): sfx id 0x146 -> vsavj same-id farm entry 0x047e4. Sample content verified IDENTICAL across sets (QSound key-on probe: same bank/start after relocation, docs/m5/). The session-9 stub and the session-5 same-id-means-music theory were both wrong for this id."
-
-[[map]]
-vsav2 = 0x0048d8
-vsavj = 0x0047fe
-kind = "sound_farm"
-status = "verified"
-note = "M5 RESTORED (14z-52): sfx id 0x142 -> vsavj same-id farm entry 0x047fe. Sample content verified IDENTICAL across sets (QSound key-on probe: same bank/start after relocation, docs/m5/). The session-9 stub and the session-5 same-id-means-music theory were both wrong for this id."
-

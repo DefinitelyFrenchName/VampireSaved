@@ -2,6 +2,44 @@
 
 Newest first.
 
+## 14z-65 (4) — Huitzil stage 4 BUILDS; the R1 frontier enumerated (2026-08-07)
+
+Stage 4 (code + engine hooks) builds clean at fingerprint 94f89571 with
+the remaining surface fully enumerated. The arc, each step measured:
+
+- pcrel16 both sides fixed (see the 14z-65 (4) commit before this one):
+  classifier requires a real PC-relative opcode; generator rewrites true
+  displacements against placement.
+- Huitzil roots (driver census, 14z-65): 0x55478 (engine-consumed
+  routine below the window); the 18-ring velocity-vector family
+  0xd143e+0x900 (vs2-only bank data, structure-bounded — radius-indexed
+  sin/cos rings, 0x80 B each); the SHARED newcomer-support zones from
+  Donovan's census (0x5c800/0x26142/0x28122/0x88512) — his handler-head
+  `jsr $8ACD8` resolves INTO the shared source-only zone (mystery
+  closed: his aux init lives there).
+- x088512 is 0x3B40 for H, not Donovan's 0x2f00: his copy chains
+  dispatch tables past the old bound; the transitive closure of the
+  zone's pcrel escapes converges at +0x3B3E (6 rounds, measured with
+  the extractor's own table-walk rules).
+- NEW generator mechanism: pcrel FAR TRAMPOLINE (a pcrel word-table
+  entry resolving beyond d16 reach bounces through a near jmp abs.l;
+  cached per target; Donovan-inert — the branch was a hard fail before).
+  Ended up UNUSED for H once the zone extent was fixed, but it is the
+  correct fallback and stays.
+- R1 rounds: reconcile_batch x2 into the global map — 50 of H's first
+  101 engine targets were ALREADY mapped from the Donovan era; now 219
+  rows kept, +49 verified for H across both rounds. Tripwires: 57 ->
+  17 -> 36 (zone growth) -> 23.
+- The 23 remaining tripwired targets classify into: the companion
+  family (0x2b7ef4/0x2b8060/0x36784a — leave tripwired until guarded
+  runs prove H's flows reach them), the sound-farm neighborhood
+  (0x4ddc/0x4e5e/0x4e78/0x4f48/0x4f96 — needs the M5-style farm triage,
+  NEVER blind-resolved), and 15 per-target R1 items (engine subs
+  0x4223c/0x42cee/0x448d4/0x3844e + mid-ROM data refs).
+- All gates green after every step: extract_hp, hui_ladder,
+  m3a_reproducible (Donovan bit-exact throughout, including through two
+  global-map rewrites).
+
 ## 14z-65 (3) — the Huitzil stage 1-3 ladder opens (2026-08-07)
 
 The single-tenant machinery now serves any tenant manifest; Huitzil climbs

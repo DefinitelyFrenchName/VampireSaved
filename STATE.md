@@ -49,6 +49,14 @@ reproducibility gate), then extractor de-Donovanization.)
   offers the other at match load either way. RECOMMENDATION: VS2
   default (flavor_default=0x01), identical to the ratified Donovan
   precedent (2026-07-27) and SPEC §3.
+  **PROVISIONALLY SETTLED (maintainer, 2026-08-07): VS2 default** — "it
+  should be VS2 by default", matching the native games (in VS2 itself:
+  VS2 mode default, VH2 on Start-hold, like Donovan). FINAL ratification
+  after (1) the maintainer learns the flavor differences to hunt for
+  (deliverable: when stage 4 pins Huitzil's +0x3C2 fork consumers,
+  write up WHAT visibly changes per flavor — the Donovan precedent
+  pinned the fork to the exact QCB+LK frame) and (2) a playtestable
+  Huitzil build exists. Wiring may land with flavor_default=0x01.
 - **D2 — Pyron source version** — only becomes a real decision if the
   Phase 1 measurement shows vs2↔vh2 behavioral divergence in his code
   (no Start-hold fork exists for him, so the shipped version is the
@@ -155,6 +163,32 @@ loop in earnest — his engine-consumed dispatch routines (0x55478-class),
 his types among 64-75/121-123, the state stubs 0xBC-0xC8 he writes, and
 the reaction ids he inflicts. Then flavor wiring (decision D1), then the
 Phase 2 merge with Donovan.
+
+### 14z-65 — HUITZIL STAGE 4 BUILDS (94f89571); frontier = 23 named
+### targets
+
+The R1 loop ran two rounds (byte detail: patch_notes 14z-65 (4)):
+- His census: 0x55478 + the 18-ring velocity family 0xd143e+0x900
+  (vs2-only bank data) + the SHARED support zones from Donovan's list.
+  The 0x8ACD8 mystery is CLOSED: it resolves into the shared
+  source-only zone (his aux init) — x088512 is 0x3B40 for him (pcrel
+  escape closure, 6 rounds), not Donovan's 0x2f00 census bound.
+- reconcile_batch x2 into the GLOBAL map: 50/101 of his first engine
+  surface was already Donovan-mapped; 219 rows kept + ~49 new verified.
+  Donovan stayed bit-exact through both map rewrites (gate-proven).
+- Generator gained the pcrel far trampoline (near jmp bounce for
+  out-of-d16 word-table entries; unused after the zone-extent fix but
+  correct and kept; Donovan-inert — was a hard fail).
+- Tripwire frontier 57 -> 23, all classified: companion family
+  (0x2b7ef4/0x2b8060/0x36784a — guarded runs decide), the SOUND-FARM
+  five (0x4ddc-0x4f96 — M5-style triage required, never blind-resolve),
+  and 15 per-target R1 items (0x4223c/0x42cee/0x448d4/0x3844e engine
+  subs + mid-ROM data).
+- NEXT (the stage-4 proof arc): guarded in-match boot of Huitzil
+  (forced id 0x10 via the pick-probe poke path — no select wheel needed
+  on the ladder), which fires whichever tripwires his real flows reach
+  and turns the 23 into a measured worklist; then the farm triage; then
+  stage gates + flavor wiring (D1 provisionally VS2).
 
 Updated: 2026-08-06 (session 14z-64 — M3a COMPLETE AND FROZEN. The
 maintainer ratified the re-freeze bundle ("freeze"): the WIDE reference
