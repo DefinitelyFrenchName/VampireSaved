@@ -58,11 +58,18 @@ GEN_FLAGS="--profile cps2-wide-v1" tools/build_donovan.sh 3 build/hui3
    shows stage 4's ported INIT PATH HANGS at id 0x10 and the machine
    WATCHDOG-REBOOTS (snapshots: select -> black garble -> QSound
    splash; GOTCHAS 14z-65 — a reboot masquerades as a clean non-load).
-   Hang-hunt next: GUARD_BREAK on his placed dispatch_00 handler, then
-   GUARD_PC_LOG over f2300-2900, then GUARD_PROBE down the init chain.
-   Prime suspects: the aux-init path through the shared zone (0x8ACD8
-   family) and a missing [init_shim] analog (Donovan's init NEEDED the
-   pool-seeding shim; huitzil.toml has none yet). Then: the sound-farm
+   THE BOOT LANDED same-session (three fixes: fall-through layout
+   group, [init_shim], five measured sound stubs — gate
+   tests/test_hui_boot.sh) and the specials hunt then ran a full
+   instrument chain: window widened (13 dispatch rows), 18 farm rows
+   content-verified, the engine-alias generator rule (dispatch_07).
+   CURRENT FRONTIER (STATE 14z-65, last section): his object never
+   reaches the engine state layer — 0x26D36 is a DISPATCHED update-fn
+   installed by state transitions, and the prime suspect is his ported
+   code's update-fn INSTALLS being 16-bit word stores the 32-bit ref
+   relocation never touched. Resume at the numbered NEXT list there
+   (decode the $FF02DC loop fetch; diff installed update-fns vanilla
+   vs H; then the word-store relocation rule). Then: the sound-farm
    five (M5-style triage, never blind-resolve), companion family by
    guarded runs, flavor wiring (D1 = VS2 provisionally, maintainer
    2026-08-07; final after a playtestable build + a written "flavor

@@ -281,13 +281,23 @@ Bracketing instruments (all on record in scratch logs):
 So: his per-frame dispatched handlers run (boot gate proves dispatch),
 his command walk runs (predicate parity 401=401), but the ordinary
 per-frame path through his OWN handler code never reaches the engine
-state layer. NEXT (surgical): probe each of his dispatch_NN handler
-ENTRIES P1-conditionally over the soak to map which run per-frame,
-take the per-frame one that should reach 0x26D36 (the ~25 call sites
-are in code/x057456 — offsets in the 14z-65 ref audit), and bisect
-inside it with GUARD_PROBE at successive branch points; the first
-branch that always takes the early-out names the wrong field/flag —
-then compare that field against native at the same frame.
+state layer. SHARPENED (last measurement of the session): all 132
+vanilla calls to 0x26D36 RETURN TO $FF02DC — the helper is not called
+FROM handlers, it IS a dispatched per-frame handler: state transitions
+INSTALL it as the object's update-fn, and the RAM loop at $FF02DC
+dispatches it. So the suspect is the INSTALLATION path: H's ported
+code installs vs2 0x25EBA-family addresses into the object's update-fn
+field — and if that field is stored as a 16-BIT WORD (the engine's
+word-offset convention; note `move.w a4,$2A(a6)` in his init), the
+32-bit ref relocation NEVER APPLIED to the stores: vs2 word values
+silently aim the dispatch loop at the wrong vsavj code. NEXT, in
+order: (1) decode the $FF02DC RAM loop's handler FETCH (dump RAM
+$FF02C0-$FF0300 once — which struct field, what width, what base);
+(2) dump H's installed update-fn field vs vanilla-05's on the same
+build at the same frames; (3) if it is the word-offset class, the fix
+is a new relocation rule for update-fn word stores (measure the base,
+rewrite the words per placement) — a generator mechanism, not a
+manifest row.
 
 ### 14z-65 — HUITZIL BOOTS (first match on the vsavj engine)
 
