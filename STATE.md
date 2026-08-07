@@ -314,11 +314,20 @@ TRIAGE + first measurements (14z-67 continuation 3):
     pieces created through a path that leaves +0x18 unset/zeroed.
   - The hit-spark spawner (0x18EFC/0x178C2) is EXONERATED: one call,
     identical registers, both games (the throw-release spark).
-  - NEXT ARC (the one root): trace the native piece spawn during the
-    lightning (watch a piece slot's +0x1C install -> spawner PC ->
-    our twin -> why it bails / zeroes the bank). Fixing the spawn
-    likely covers ray + lightning + explosion + the grab-anim
-    sameness (the electricity IS the difference between the grabs).
+  - NEXT ARC (the one root), NOW WITH A PRECISE ENTRY POINT (third
+    measurement round): the record installer is the GENERIC ANIM
+    STEPPER (native PC 0x1378A writes +0x1C per tick from the piece's
+    anim node chain — FBNeo tap on the 2P replay, non-perturbing:
+    2P-dummy replays REPRODUCE cross-emulator, the vs-CPU rule does
+    not apply to them). Native during the lightning: slot $FFB980
+    alive, +0x1C chaining x2b7ef4 heads (0x2B8470+ marching per
+    frame). OURS at the same phase: $FFB980 DEAD with stale vanilla
+    residue (+0x1C=0x15A30E), only TWO pieces alive ($FFB800 chain
+    0xE1D76, $FFB880 chain 0x40223C = the placed x2b7ef4 head) vs
+    native's many — THE GRAB'S MASS PIECE SPAWN BAILS EARLY on ours.
+    Entry point: find what spawns the $FFBxxx piece fleet in the
+    native grab flow (his handler -> allocator loop) and where ours
+    stops after two.
   - Win screen (captures): native = GOLD (his normal family); ours =
     pink/lavender + GARBLED BLUE-GREY RECTANGLES on eye/thigh/foot —
     TWO defects: the palette (my source wrong) AND a few wrong art
