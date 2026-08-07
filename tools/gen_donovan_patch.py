@@ -793,12 +793,36 @@ def main():
                 notes.append(f"# {name}+{roff:#x}: region_fix "
                              f"{rold.hex()} -> {rnew.hex()} ({rf.get('note','')})")
             for ref in r.get("refs", []):
-                if ref["width"] == 16:  # pcrel16: displacement rewrite TBD
-                    newt = relocate_target(ref, f"{name}+{ref['off']:#x}")
-                    if newt is None:
+                if ref["width"] == 16:
+                    # pcrel16 (14z-65): a PC-relative word displacement whose
+                    # target drifted between the siblings — it reaches
+                    # OUTSIDE its co-moving span (measured: x055478's
+                    # `jmp (d16,PC)` into x057456, the regions' separation
+                    # differs by the 6-byte sibling insertion). The 68k base
+                    # is the extension word's own address. Rewrite the
+                    # displacement against actual placement.
+                    site_src = r["src"] + ref["off"]
+                    disp_src = (ref["target"] ^ 0x8000) - 0x8000
+                    tgt_abs = (site_src + disp_src) & 0xFFFFFF
+                    host = region_of(tgt_abs)
+                    if host is None or host not in placed:
+                        fail.append(f"{name}+{ref['off']:#x}: pcrel16 target "
+                                    f"{tgt_abs:#x} not in a placed region")
                         continue
-                    fail.append(f"{name}+{ref['off']:#x}: pcrel16 rewrite not "
-                                f"implemented (target {ref['target']:#x})")
+                    new_tgt = tgt_abs + (placed[host] - regions[host]["src"])
+                    new_site = placed[name] + ref["off"]
+                    disp = new_tgt - new_site
+                    if not (-0x8000 <= disp <= 0x7FFF):
+                        fail.append(f"{name}+{ref['off']:#x}: pcrel16 "
+                                    f"displacement {disp:#x} out of i16 range "
+                                    f"— bring the regions closer "
+                                    f"(layout_group/near_map)")
+                        continue
+                    blob[ref["off"]:ref["off"] + 2] = \
+                        (disp & 0xFFFF).to_bytes(2, "big")
+                    notes.append(f"# {name}+{ref['off']:#x}: pcrel16 -> "
+                                 f"{host}@{tgt_abs:#x} (disp {disp_src:#x} -> "
+                                 f"{disp & 0xFFFF:#x} after placement)")
                     continue
                 newt = relocate_target(ref, f"{name}+{ref['off']:#x}")
                 if newt is None:

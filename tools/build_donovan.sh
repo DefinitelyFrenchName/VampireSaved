@@ -73,8 +73,12 @@ case "$TENANT_CHAR" in
         # Huitzil census (14z-65, ladder): 0x55478 = his tail_code_ptr
         # row's engine-consumed routine — appended newcomer-support code
         # BELOW the 0x57000 window (the appended zone reaches 0x054xxx,
-        # measured; docs/atlas/character_tables.md piecewise section)
-        DEFAULT_ROOTS="0x55478"
+        # measured; docs/atlas/character_tables.md piecewise section).
+        # 0xd143e = the 18-ring velocity-vector family (0x80 B/ring,
+        # radius-indexed sin/cos pairs) his code bases at 0xd15be —
+        # vs2-only bank data (the vsavj delta candidate is zeros);
+        # structure-bounded, sibling-identical, twin at -0x76e.
+        DEFAULT_ROOTS="0x55478,0xd143e:0x900:t0xd0cd0:d"
         ;;
     *)  DEFAULT_ROOTS="" ;;
 esac

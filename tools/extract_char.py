@@ -180,8 +180,22 @@ def diff_refs(a_blob, b_blob, shifts, allow_engine, selfptr=None):
                     break
         if site is None and allow_engine:
             # real PC-relative displacement drift between sibling builds is
-            # tiny — a tight envelope avoids classifying data words as pcrel
+            # tiny — a tight envelope avoids classifying data words as pcrel.
+            # 14z-65: the word must also FOLLOW an opcode that actually uses
+            # a PC-relative EA — (d16,PC) mode (low 6 EA bits 111010) or a
+            # bra/bsr/bcc.w — in BOTH images. Without the opcode gate the
+            # class swallowed sibling STRUCT-OFFSET drift (Huitzil: three
+            # `lea (d16,A6)` sites where vh2 moved fields by 2/4/6 bytes —
+            # genuine variant sites, not displacements).
+            def _pcrel_op(buf, off):
+                if off < 2 or off % 2:
+                    return False
+                op = (buf[off - 2] << 8) | buf[off - 1]
+                return (op & 0x3F) == 0x3A or \
+                    ((op & 0xF000) == 0x6000 and (op & 0xFF) == 0)
             for off in range(max(0, i - 1), min(i, len(a_blob) - 2) + 1):
+                if not (_pcrel_op(a_blob, off) and _pcrel_op(b_blob, off)):
+                    continue
                 va = int.from_bytes(a_blob[off:off + 2], "big")
                 vb = int.from_bytes(b_blob[off:off + 2], "big")
                 da = (vb - va + 0x8000) % 0x10000 - 0x8000
