@@ -1,17 +1,25 @@
 # NEXT SESSION — orientation (updated mid-14z-66, 2026-08-07)
 
 **Start here: playtest round-1 worklist in progress — items 1+2 CLOSED
-and committed, build/hui4 = 3a172c52 is PING #2 (EX crash fix + his
-true walk speeds). Items 3+4 are measured to root-cause class; STATE.md
-14z-66 sections are the worklist.** Frozen references unchanged
-(donovan-m3a 4b7d0dc7 / m5_stock 6c93cfa8, m3a-reproducible PASS on
-every commit this session).
+and committed, build/hui4 = 44be1266 is PING #3 (EX crash fixes — BOTH
+FG crash sites — + his true walk speeds). Round-2 maintainer report:
+speed + ES confirmed; the second FG crash root-caused and fixed same
+session. Items 3+4 are measured to root-cause class; STATE.md 14z-66
+sections are the worklist.** Frozen references unchanged (donovan-m3a
+4b7d0dc7 / m5_stock 6c93cfa8, m3a-reproducible PASS on every commit
+this session).
 
 ## Where each worklist item stands
 
-1. EX crash-reset — CLOSED (both crashes). Voice-cue tripwire (->
-   vs2 0x4EFA) explained BOTH moves; three stubbed_sound overlay rows;
-   gate tests/test_hui_ex.sh (guard-clean AND stock-decrement).
+1. EX crash-reset — CLOSED (both crashes). (a) Voice-cue tripwire (->
+   vs2 0x4EFA farm row) explained the shared first crash; three
+   stubbed_sound overlay rows. (b) The round-2 FG crash was the
+   capture-anim shadow over-index — victim's shadow servant walks the
+   shared table with his vs2 seq 0x488; fixed by the shadow_seq_guard
+   site thunk (ungated range clamp at 0x8245C, patch="jmp"); boot gate
+   masked-v2 EXACT with the thunk live. Gate tests/test_hui_ex.sh (3
+   sections: guard-clean AND stock-decrement; replay 77 = the
+   full-sequence FG).
 2. Speed — CLOSED. param32 tables are 32-row/no-fold; his true pairs
    serve from variant rows 0x10 (port_param32 opt-in; Donovan
    flagless). Gate tests/test_hui_walk.sh; 11k-soak hazard re-exam
