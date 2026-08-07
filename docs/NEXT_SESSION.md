@@ -26,9 +26,15 @@ m5_stock 6c93cfa8; m3a-reproducible PASS on every commit).
    native-matched on the 2P dummy (frame-identical, damage-identical).
 5. Coverage replays 80/81/82 (grab, RW GC, DF) — all native-A/B'd.
 
-## DONE SAME SESSION: the oracle battery (landed; see below). THE
-## OPENER IS NOW: the alias-physics port (the one family behind every
-## remaining feel delta), then M3b Phase 2 (Pyron) / gfx.
+## DONE SAME SESSION: the oracle battery AND the alias-physics family
+## (jump_params ported — float ceiling native-exact; dash exonerated).
+## THE OPENER IS NOW (D4, maintainer-ratified): THE PHOBOS GFX VERTICAL
+## — (1) measure 3-tenant tile budgets + fix the group-C layout FIRST
+## (reserve Pyron's share; flip condition: doesn't fit -> stop), (2)
+## Pyron region censuses as early warning, (3) the H gfx rung
+## (de-Donovanize the stage>=6 machinery), then FREEZE H. Sounds stay
+## stubbed until M5 (maintainer-stated scope). The Pyron merge comes
+## AFTER, against two frozen verticals. Details: STATE D4.
 
 ## the oracle battery analog (item 5's remainder) — LANDED
 

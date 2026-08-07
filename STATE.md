@@ -482,6 +482,31 @@ reproducibility gate), then extractor de-Donovanization.)
 
 ### Decisions pending (human) — M3b
 
+- **D4 — M3b sequencing after the behavior polish: RATIFIED
+  (maintainer, 2026-08-07): PHOBOS VERTICAL FIRST** — gfx rung ->
+  freeze (registry row + expectation set), THEN the Phase-2 Pyron
+  merge against TWO frozen verticals. Rationale (assessed + agreed):
+  the gfx-first risks are boundable (Pyron's tile budget is
+  measurable from vs2 gfx data without porting him — design the
+  3-tenant group-C layout and reserve his share BEFORE placing any H
+  tile), while merge-first churns the ground gfx would build on; a
+  frozen H vertical gives the merge bit-exact reproduction targets
+  (the strongest gate class); the maintainer playtest channel — the
+  session's best verifier — returns to full strength with real
+  sprites. SCOPE EXCEPTION (maintainer-stated): sounds stay
+  stubbed-silent through the vertical, like Donovan — the voice
+  samples are vs2-only content requiring the QSound image growth
+  (WIDE 16MB = the MAME ceiling) = the M5 voice-bank port, its own
+  cross-tenant arc; every stub row carries RESTORE AT M5.
+  NEXT-SESSION OPENERS, in order: (1) measure all three tenants'
+  tile-code budgets + fix the group-C 3-tenant layout; (2) run the
+  pcrel-escape and data-in-code censuses over Pyron's extracted
+  regions (early structural warning, no port needed); (3) the H gfx
+  rung on the Donovan machinery (de-Donovanize the stage>=6 gfx
+  constants). FLIP CONDITION: if the budget measurement shows three
+  tenants cannot fit group C, stop and redesign the layout/profile
+  before any placement.
+
 - **D1 — Huitzil default flavor: RATIFIED (maintainer, 2026-08-07,
   round 6): VS2 DEFAULT** — "VS2 flavor confirmed as the default
   selection in the current build AND the default selection in the
