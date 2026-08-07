@@ -1,0 +1,27 @@
+# hui Circuit Scrapper repro (14z-66, playtest round-1 item 4): walk in,
+# then 63214+MP (half-circle back from forward) three times. His 63214
+# step table (vs2 0x299E6 via farm-port stub) is byte-correct on the
+# build (measured) — this replay probes the runtime: the match branch
+# (vs2 0x55388 -> placed 0xBFD98) either fires or the tracker never
+# completes. Forced-pick flow; runs unchanged on native vs2 for the
+# ground-truth leg.
+300-305 sys=C1
+800-803 sys=S1
+1700-1702 p1=1
+3050-3110 p1=R
+3120-3122 p1=R
+3123-3125 p1=DR
+3126-3128 p1=D
+3129-3131 p1=DL
+3132-3135 p1=L2
+3320-3322 p1=R
+3323-3325 p1=DR
+3326-3328 p1=D
+3329-3331 p1=DL
+3332-3335 p1=L2
+3520-3522 p1=R
+3523-3525 p1=DR
+3526-3528 p1=D
+3529-3531 p1=DL
+3532-3535 p1=L2
+3700 wait

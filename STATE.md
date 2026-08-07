@@ -104,6 +104,29 @@ described in scratch, mechanisms verified by disasm):
   manifest-opt-in like state_hook. Replay 75 + the dump/tap recipes
   are the instruments.
 
+### Item 4 OPENED — Circuit Scrapper: recognition WORKS, the break is
+### at/after move-start (collapse class RULED OUT)
+
+- His 63214 predicate table (vs2 0x299E6 via the farm-port stub at
+  0xF85B0, param 0xF8590) is BYTE-CORRECT on the build, terminator
+  included; all three farm-port helper tables verified against vs2
+  (the 14z-48 collapse class does NOT apply). The stub correctly
+  aims the vsavj motion dispatcher 0x29F4A.
+- RUNTIME (replay 76, GUARD_PROBE at the match branch vs2 0x55388 ->
+  placed 0xBFD98): the branch FIRES on our build, exactly on the
+  button frames (3132/3332) — command recognition is END-TO-END
+  ALIVE. Attempt 3 (3532) did not fire (P1 was in a state by then).
+- The A/B after the match is CPU-NOISED (ours got hit around
+  attempt 2; different CPU behavior per game) but attempt 1 shows
+  ours reaching the grab-attempt anim family (0xD83F0 = vs2 0x247FF2
+  under the anim relocation delta 0x16FC02) ~15 frames later than
+  native, preceded by a dash-family anim native does not show.
+- NEXT: author the 2P dummy repro (P2 idle at fixed spacing — the
+  16_xemu template pattern) and A/B the move-start chain from the
+  match branch: what native runs after 0x55388 (throw-box check,
+  grab connect/whiff fork) vs ours; then the fix per class. Replays
+  76 + probe recipe are the instruments.
+
 ### Item 2 measurements (the mechanism record)
 
 Measured this session (the 14w-b hazard re-exam, first half):
