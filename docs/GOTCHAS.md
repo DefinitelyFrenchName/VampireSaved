@@ -1951,3 +1951,21 @@ Consequences that cost time:
   insertion into the wrong region).
 Full mechanism + frozen shapes: docs/atlas/character_tables.md "The
 appended window's sibling shift is PIECEWISE".
+
+## A WATCHDOG REBOOT masquerades as a clean "nothing happened" (14z-65)
+
+The forced-boot probe at id 0x10 on the stage-4 ladder build reported:
+guard clean, no tripwire, P1 struct zeroed at f3600 — reading like the
+char-load path politely declining. The SNAPSHOTS say otherwise: f2200
+select screen, f2900 black garbled transition, f3400 THE QSOUND BOOT
+SPLASH. The init path HANGS (no exception — nothing for the guard),
+the game stops kicking the CPS-2 watchdog, and the MACHINE RESETS; the
+"zeroed struct" is fresh-boot state.
+Rules:
+- Zeroed work-RAM structs + a clean guard at late frames is NOT a
+  non-load verdict until a snapshot rules out the boot screen.
+- The crash guard catches exceptions and tripwires, not hangs; hang
+  hunting needs GUARD_PC_LOG over the ONSET window (before the reboot),
+  GUARD_BREAK on the handler entry, or GUARD_TRACE under -debug.
+- The probe's "load ZEROS" verdict has been renamed accordingly
+  (WEDGED-or-REBOOTED); force_pick_probe now also snapshots.

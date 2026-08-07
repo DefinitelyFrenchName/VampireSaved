@@ -203,15 +203,31 @@ commit->load window; verdicts: id-hold / load / guard):
 - POSITIVE CONTROL (verdict-logic doctrine): the same probe with
   vanilla id 0x05 LOADS that character ($FF8460 = 0x9EFE6) — the
   instrument is sound; the wedge is REAL and variant-id-specific.
-- NEXT SESSION, in order: (1) ARCHAEOLOGY FIRST — donovan-m3a boots id
-  0x13, so the wedge-freeing piece exists among his variant-id rows;
-  diff donovan.toml's stage-5/6 variant machinery (code_word slot rows,
-  aux_pokes, the id_space fixes) against what hui4 lacks, and probe
-  0x13 on the m3a build / 0x10 on it as cross-checks. (2) Only if
-  archaeology fails: GUARD_PC_LOG diff (control vs 0x10) over the
-  f2600-3600 load window to find the wedge site. (3) The wedge site
-  likely IS one of the seven id-fold sites or a 16-wide table read —
-  the fold census (id_space.md) is the suspect list.
+- CROSS-CHECKS RUN (same session): the archaeology hypothesis is DEAD
+  and the diagnosis is sharper —
+  - m3a + forced 0x13: LOADS (0x3FA9D0, his placed hitbox) ✓.
+  - m3a + forced 0x10: LOADS Bulleta (0x91F98 — the vanilla row-0
+    alias). PRISTINE vsavj + 0x10: same. The engine load path is
+    variant-id-TOLERANT with no machinery at all.
+  - hui3 (stage 3) + 0x10: LOADS HUITZIL'S OWN placed hitbox
+    (0xEE3E0) — the passive-data rungs are LIVE-verified (his data +
+    Bulleta's code via the trampolines). Unplanned bonus proof.
+  - hui4 (stage 4) + 0x10: the snapshots reveal the truth — f2200
+    select, f2900 black garble, f3400 THE QSOUND BOOT SPLASH: his
+    ported init path HANGS (no exception), the watchdog fires, THE
+    MACHINE REBOOTS. "Zeroed struct + clean guard" was fresh-boot
+    state (GOTCHAS 14z-65: a watchdog reboot masquerades as a clean
+    non-load; the probe now snapshots and names the ambiguity).
+- NEXT SESSION: hang-hunt in HIS stage-4 code — GUARD_BREAK on the
+  placed dispatch_00 handler (entry proof), then GUARD_PC_LOG over the
+  ONSET window (2300-2900, before the reboot), then GUARD_PROBE walks
+  down the init chain. Prime suspects: the aux-init path through the
+  shared zone (the 0x8ACD8 family — Donovan's init needed the
+  pool-seeding shim + queue-class remap; H's manifest has NO
+  [init_shim] yet), and the sound-farm five (an unresolved farm call
+  in init would hang exactly like this). Donovan's [init_shim]
+  mechanism is likely REQUIRED for H too — port the row with his
+  measured parameters, not blind-copied.
 
 Updated: 2026-08-06 (session 14z-64 — M3a COMPLETE AND FROZEN. The
 maintainer ratified the re-freeze bundle ("freeze"): the WIDE reference

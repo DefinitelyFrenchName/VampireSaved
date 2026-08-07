@@ -7,6 +7,8 @@
 #
 # Usage: ROMDIR=... tools/force_pick_probe.sh <rompath> <id-hex> <outdir>
 #   e.g. tools/force_pick_probe.sh build/hui4/rompath 10 /tmp/probe
+# SET=vsavjw (default vsavj) selects the romset; with vsavjw also set
+# MAME_BIN=~/.cache/vampire-saved/mame/cps2 (the WIDE-patched binary).
 #
 # Prints three verdicts:
 #   id-hold   the poked id is still in $FF8782 mid-VS (frame 2600)
@@ -32,8 +34,9 @@ RPL
 
 if POKES="1704:ff8782:$ID;1760:ff8782:$ID;1900:ff8782:$ID;2100:ff8782:$ID;2400:ff8782:$ID" \
    DUMPS="2600:ff8780-ff8788;3600:ff8460-ff8468" \
+   SNAP_FRAMES="2900,3400" \
    MAME_ROMPATH="$(cd "$RP" && pwd);$ROMDIR" \
-   "$REPO/tools/run_replay_guarded.sh" vsavj "$OUT/pick.rpl" \
+   "$REPO/tools/run_replay_guarded.sh" "${SET:-vsavj}" "$OUT/pick.rpl" \
        "$OUT/out.log" "$OUT/box" > "$OUT/run.out" 2>&1; then
     GUARD="clean"
 else
@@ -44,7 +47,10 @@ MID="$(xxd -p "$OUT/dump_2600_ff8780.bin" 2>/dev/null | cut -c5-6 || echo '??')"
 BASE="$(xxd -p "$OUT/dump_3600_ff8460.bin" 2>/dev/null | cut -c1-8 || echo '????????')"
 echo "id-hold @2600: \$FF8782 = 0x$MID (wanted 0x$ID)"
 if [ "$BASE" = "00000000" ]; then
-    echo "load    @3600: hitbox base ZEROS — char-load WEDGED at id 0x$ID"
+    echo "load    @3600: hitbox base ZEROS — WEDGED or WATCHDOG-REBOOTED"
+    echo "               (zeros can be fresh-boot state — CHECK THE"
+    echo "               SNAPSHOTS in $OUT/box/snap/ before concluding;"
+    echo "               a QSound splash = the machine reset. GOTCHAS 14z-65)"
 else
     echo "load    @3600: hitbox base 0x$BASE — char LOADED"
 fi

@@ -45,11 +45,17 @@ GEN_FLAGS="--profile cps2-wide-v1" tools/build_donovan.sh 3 build/hui3
    rings 0xd143e+0x900, the shared zones with x088512 at its TRUE
    0x3B40 extent; 0x8ACD8 = his aux init in the shared zone, mystery
    closed; 23 classified tripwires remain — STATE 14z-65). The
-   forced-boot probe (`tools/force_pick_probe.sh`, VALIDATED with a
-   vanilla-id control) shows the char-load path WEDGES silently at id
-   0x10 on the ladder build. ARCHAEOLOGY FIRST: donovan-m3a boots 0x13,
-   so diff his variant-id manifest rows against hui4 before any PC
-   tracing; the id-fold census is the suspect list. Then: the sound-farm
+   forced-boot probe (`tools/force_pick_probe.sh`, validated both ways:
+   vanilla ids load everywhere, and stage-3 + forced 0x10 loads
+   HUITZIL'S OWN placed data — the passive rungs are live-verified)
+   shows stage 4's ported INIT PATH HANGS at id 0x10 and the machine
+   WATCHDOG-REBOOTS (snapshots: select -> black garble -> QSound
+   splash; GOTCHAS 14z-65 — a reboot masquerades as a clean non-load).
+   Hang-hunt next: GUARD_BREAK on his placed dispatch_00 handler, then
+   GUARD_PC_LOG over f2300-2900, then GUARD_PROBE down the init chain.
+   Prime suspects: the aux-init path through the shared zone (0x8ACD8
+   family) and a missing [init_shim] analog (Donovan's init NEEDED the
+   pool-seeding shim; huitzil.toml has none yet). Then: the sound-farm
    five (M5-style triage, never blind-resolve), companion family by
    guarded runs, flavor wiring (D1 = VS2 provisionally, maintainer
    2026-08-07; final after a playtestable build + a written "flavor
