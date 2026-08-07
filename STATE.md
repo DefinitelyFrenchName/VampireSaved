@@ -53,6 +53,45 @@ every commit. Read the 14z-66 sections below, then docs/NEXT_SESSION.)
   bound, shared-code counts). Docs: engine_internals inventories,
   cps2_wide.md layout section.
 
+### D4 opener 2 DONE — the censuses promoted to a tool and run over
+### Pyron: HIS CODE REGION IS CLEAN; one NEW real find on H (x05c800
+### latent escapes)
+
+- The 14z-66 session-log census scans are now `tools/census_regions.py`
+  (the promotion the 14z-66 watch item required before the Donovan
+  re-freeze run): both shapes exactly as the generator's passes define
+  them — data_in_code = `lea (d16,pc),An + read (An,Xn.w)` with the
+  table inside a code region; escapes = word-form pcrel branches
+  leaving their region. `--manifest` marks findings covered by rows.
+- INSTRUMENT GROUND-TRUTHED on H before trusting any P number (NEW
+  gate tests/test_census_regions.sh, self-builds stage 4): exactly the
+  5 known data_in_code sites, zero false positives; x02592a 89->35 and
+  x026142 9->6 match the generator's own emitted counts EXACTLY (the
+  "7 targets" in the 14z-66 prose was the authoring-time count; the
+  generator note says 9->6 and the census agrees).
+- PYRON (the D4 early warning): his current code region
+  (0x574C0+0x5200) censuses CLEAN — 0 data_in_code, 0 escapes. No
+  structural hazard in his core code. His support-zone roots are not
+  extracted yet; the gate locks the region count so growth fails
+  loudly -> rerun over the new regions.
+- Census triage on H produced THREE new facts (all frozen in the
+  gate):
+  1. code->x057456: 20 escape sites are SAFE BY CONSTRUCTION — the
+     pair is placed contiguously at one delta, so cross-boundary
+     pcrel displacements are preserved (asserted from
+     placements.json, both conditions).
+  2. x068c78+0x1CA and x028122+0x112 are OPERAND FALSE POSITIVES
+     (matched words are the immediates of move.l #$26000/move.w
+     #$6600) — the census is a pattern scan; hits need triage,
+     silence is meaningful.
+  3. **x05c800 carries 2 REAL latent escapes** (0x631D0/0x631D8:
+     `tst.b $18E(a4) / bne.w 0x635FC` pairs at the region tail,
+     target unplaced) — the x026142 disease again, on the SHIPPED H
+     build. Never bitten in battery/playtests, exactly like x026142
+     before the air dash died on it. QUEUED: [[pcrel_escape_fix]]
+     row for x05c800 with the H gfx-rung rebuild (target 0x635FC
+     needs recon resolution or a tripwire).
+
 ## Session 14z-66 (playtest round-1 worklist)
 
 ### The alias-physics port OPENED — jump_params row landed (float

@@ -450,6 +450,13 @@ tests/test_hui_walk.sh         [bd]   # Huitzil velocity-port gate (14z-66):
                                       # param32 rows 0x10 static + measured
                                       # walk-speed deltas (16.16-exact).
                                       # Self-builds stage 4 unless given a build
+tests/test_census_regions.sh [bd]     # ground truth for tools/census_regions.py
+                                      # (14z-67): the data_in_code + pcrel-escape
+                                      # censuses — H's frozen inventory (5 sites,
+                                      # 89/35 + 9/6 escapes, adjacency-safe class,
+                                      # 2 known false positives, the x05c800
+                                      # KNOWN-OPEN latent pair) + Pyron clean.
+                                      # Self-builds stage 4 unless given a build
 tests/test_gfx_layout3.sh             # the 3-tenant group-C layout fact-locks
                                       # (14z-67, D4): one-source-bank premise,
                                       # frozen H/P/D tile inventories, H/P
