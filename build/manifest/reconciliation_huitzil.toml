@@ -475,3 +475,10 @@ vsavj = 0x0282ee
 kind = "engine_sub"
 status = "verified"
 note = "x026142 escape twin (14z-66 site-twin method)"
+
+[[map]]
+vsav2 = 0x0635fc
+vsavj = 0x05b25c
+kind = "engine_sub"
+status = "verified"
+note = "x05c800 tail-escape twin (14z-67 census find): subq.b #1,$149(a4) + jmp engine — UNIQUE vsavj pattern match, jmp targets twin-verified (vs2 0x15770 / vsavj 0x17028, 60/64 bytes, diffs = A5-operand drift)"

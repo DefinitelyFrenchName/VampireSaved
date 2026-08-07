@@ -1413,7 +1413,14 @@ def main():
                 # 14k-b): drawn by #\$4000-patched objects — their entries
                 # use the BAND-TAIL placements (vs2 bank-3 content), not
                 # the bank-1 maps. Keyed by SOURCE record address.
-                b2_recs = {int(x, 16) for x in et.get("bank2_recs", [])}
+                # 14z-67: band-tail placements exist only for a tenant
+                # with a [gfx_remap] band (Donovan). A delta-0 tenant
+                # (H/P) has no band tail and never draws these records
+                # (they are the DONOVAN companions' art riding in the
+                # shared region) — skip the b2 rewrite so no effect_map
+                # is fabricated for a build that places no shelf.
+                b2_recs = ({int(x, 16) for x in et.get("bank2_recs", [])}
+                           if port.get("gfx_remap") else set())
                 b2map = {}
                 for k, v_ in et.get("bank2_place", {}).items():
                     tt, bx, by = k.split(",")
@@ -1505,6 +1512,8 @@ def main():
                             blob[i:i + 4] = (la + (vv & 0xFFFFFF)).to_bytes(
                                 4, "big")
                 if b2_pairs:
+                    # only reachable with [gfx_remap] present (b2_recs
+                    # gating above), whose pass wrote effect_map.json
                     emj = json.loads((out / "effect_map.json").read_text())
                     known = {tuple(p) for p in emj}
                     for p in b2_pairs:
@@ -1520,7 +1529,7 @@ def main():
                     fail.append(f"effect_tail: {n_et} tile words / "
                                 f"{n_cfix + n_cport} coord lists — "
                                 f"below expectation, walker drifted")
-                if n_rw < 10000:
+                if port.get("gfx_remap") and n_rw < 10000:
                     fail.append(f"gfx_remap: only {n_rw} tile words rewritten "
                                 f"(expected ~14k) — walker or band drifted")
             d = placed[name]
@@ -3384,16 +3393,32 @@ def main():
             # embeds the address of a SOURCE-SET data block; the generator
             # reads it, places it via the space model, emits the data op,
             # and substitutes the allocated address into the body.
+            # GATHER form (14z-67): "placeholder=src:len:hole:xN@STRIDE" —
+            # N chunks of len bytes at STRIDE intervals, concatenated into
+            # one contiguous placed block (a strided GRID COLUMN, e.g.
+            # Huitzil's select-portrait palette rows: the vs2 uploader
+            # remaps him INTO the grid at column 0x0B rather than giving
+            # him a dedicated block like Donovan's).
             for _kv in str(st.get("data_subst", "")).split(","):
                 if not _kv.strip():
                     continue
                 _ph, _, _spec = _kv.partition("=")
                 _ph = _ph.strip().lower()
-                _srcs, _lens, _hole = _spec.strip().split(":")
+                _parts = _spec.strip().split(":")
+                _srcs, _lens, _hole = _parts[0], _parts[1], _parts[2]
                 _dsrc, _dlen = _int(_srcs), _int(_lens)
                 _sdat = (root / f"build/out/{man['src_set']}_data.bin"
                          ).read_bytes()
-                _blob = _sdat[_dsrc:_dsrc + _dlen]
+                if len(_parts) > 3 and _parts[3].startswith("x"):
+                    _n, _stride = _parts[3][1:].split("@")
+                    _n, _stride = int(_n, 0), int(_stride, 0)
+                    _blob = b"".join(
+                        _sdat[_dsrc + _k * _stride:
+                              _dsrc + _k * _stride + _dlen]
+                        for _k in range(_n))
+                    _dlen = _dlen * _n
+                else:
+                    _blob = _sdat[_dsrc:_dsrc + _dlen]
                 if len(_blob) != _dlen:
                     fail.append(f"site_thunk {st['name']}: data_subst src "
                                 f"read short")

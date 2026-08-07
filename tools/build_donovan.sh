@@ -136,13 +136,15 @@ python3 tools/patch_prg.py "$ROMDIR/vsavj.zip" "$OUTBASE/prg" \
 #     GENERATOR into space-model allocations and the six array rows poked in
 #     patch.json; select_port must NOT run — the host's records stay
 #     vanilla. The generator also emitted the matching tile-placement map.
-# The stage-6 gfx/select pipeline is still Donovan-specific (the
-# obj_records anim span, select art, effect_tail anchors are his) — refuse
-# loudly rather than build another tenant's gfx with his constants.
-if [ "$STAGE" -ge 6 ] && [ "$TENANT_CHAR" != "0x13" ]; then
-    echo "build_donovan.sh: stage >= 6 is Donovan-specific for now" >&2
-    echo "  (obj_records span, select art, effect anchors — M3b Phase 3/4" >&2
-    echo "  generalizes them). Build this tenant at stage <= 5." >&2
+# Stage-6 gfx is per-tenant via the ratified 3-tenant layout manifest
+# (14z-67, build/manifest/gfx_layout3.toml): obj_records span and
+# band/delta resolve from the tenant's row. Pyron's row is a RESERVATION
+# — his stage-6 manifest sections (bank plumbing, select rows) do not
+# exist yet, so refuse his gfx loudly rather than build it half-wired.
+if [ "$STAGE" -ge 6 ] && [ "$TENANT_CHAR" != "0x13" ] && [ "$TENANT_CHAR" != "0x10" ]; then
+    echo "build_donovan.sh: stage >= 6 supports tenants 0x13/0x10 today" >&2
+    echo "  (Pyron's layout share is reserved but his stage-6 manifest" >&2
+    echo "  sections are M3b Phase 5). Build this tenant at stage <= 5." >&2
     exit 1
 fi
 TEN_ID="$(python3 -c "import json;print(json.load(open('$OUTBASE/patch/tenant.json'))['id'])")"
@@ -187,17 +189,39 @@ if [ "$STAGE" -ge 6 ]; then
     # served Donovan's band as Jedah's while MAME silently hash-matched to
     # the pristine ROMDIR copy and hid it. Clean before generating.
     rm -f "$OUTBASE/gfx"/vm3.*m "$OUTBASE/gfx"/vsw.*m
+    # the tenant's anim span + cptr window from its layout row (14z-67;
+    # the cptr window 0x300000-0x361000 covers all three tenants'
+    # coordinate lists — measured, tests/test_gfx_layout3.sh premise)
+    OBJ_SPAN="$(python3 - "$TENANT_CHAR" <<'PY'
+import sys
+sys.path.insert(0, "tools")
+from _minitoml import loads
+lay = loads(open("build/manifest/gfx_layout3.toml").read())
+row = {r["id"]: r for r in lay["tenant"]}[int(sys.argv[1], 16)]
+print(f"{row['anim_base']:#x} {row['anim_base'] + row['anim_len']:#x} "
+      f"{row['sweep_lo']:#x} {row['sweep_hi']:#x}")
+PY
+)"
+    # shellcheck disable=SC2086
+    set -- $OBJ_SPAN
+    OBJ_BASE="$1"; OBJ_END="$2"; SWEEP_LO="$3"; SWEEP_HI="$4"
     python3 tools/obj_records.py "$OUTBASE/extract/region_anim.bin" \
-        --base 0x27F548 --start 0x27F548 --end 0x2A0448 \
+        --base "$OBJ_BASE" --start "$OBJ_BASE" --end "$OBJ_END" \
         --cptr-lo 0x300000 --cptr-hi 0x361000 \
+        --sweep-lo "$SWEEP_LO" --sweep-hi "$SWEEP_HI" \
         --json "$OUTBASE/donovan_tiles.json" > /dev/null
     OVERLAY_TILES=""
-    [ -f build/manifest/overlay/overlay_tiles.json ] && \
+    [ -f build/manifest/overlay/overlay_tiles.json ] && [ "$TENANT_CHAR" = "0x13" ] && \
         OVERLAY_TILES="--overlay-tiles build/manifest/overlay/overlay_tiles.json"
+    # effect_map exists only for delta-shifted tenants (Donovan); a
+    # delta-0 tenant's tiles never move, so there is nothing to remap
+    EFFECTS=""
+    [ -f "$OUTBASE/patch/effect_map.json" ] && \
+        EFFECTS="--effects $OUTBASE/patch/effect_map.json"
     # shellcheck disable=SC2086
     python3 tools/build_gfx_donovan.py "$ROMDIR" "$OUTBASE/gfx" \
         --tiles "$OUTBASE/donovan_tiles.json" \
-        --effects "$OUTBASE/patch/effect_map.json" \
+        $EFFECTS \
         --select-tiles "$OUTBASE/select_tiles.json" \
         $( [ -f "$OUTBASE/patch/select_bank5.json" ] && \
            echo "--select-bank5 $OUTBASE/patch/select_bank5.json" ) \

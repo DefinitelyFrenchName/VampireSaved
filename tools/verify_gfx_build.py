@@ -26,11 +26,7 @@ import sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from obj_records import walk  # noqa: E402
-
-AUX_SRC = [(0x334B80, 0x335A90), (0x337460, 0x3375F0),
-           (0x33CCF0, 0x33CE90), (0x34CB60, 0x34CCF0),
-           (0x352120, 0x360190)]
-SRC_BASE, SRC_END = 0x27F548, 0x2A0448
+from _minitoml import loads as toml_loads  # noqa: E402
 
 
 def main():
@@ -38,9 +34,27 @@ def main():
     pl = json.load(open(f"{outbase}/patch/placements.json"))
     anim = pl["regions"]["anim"]
     spec = json.load(open(f"{outbase}/gfx/remap_spec.json"))
-    eff = json.load(open(f"{outbase}/patch/effect_map.json"))
+    # effect_map exists only for delta-shifted tenants (Donovan); a
+    # delta-0 tenant places everything at native codes (14z-67)
+    _ep = f"{outbase}/patch/effect_map.json"
+    eff = json.load(open(_ep)) if os.path.exists(_ep) else []
     lo = spec["placed"][0]
     hi = max([spec["placed"][1]] + [t for _, t in eff])
+
+    # per-tenant source facts (14z-67, de-Donovanized): the anim span
+    # from the tenant's layout row, the aux cptr windows from the
+    # extraction itself (they were module constants — Donovan's values)
+    rj = json.load(open(f"{outbase}/extract/regions.json"))
+    aux_src = [(v["src"], v["src"] + v["len"])
+               for n, v in rj["regions"].items() if n.startswith("aux")]
+    _root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    _lay = toml_loads(open(os.path.join(
+        _root, "build/manifest/gfx_layout3.toml")).read())
+    _tj = json.load(open(f"{outbase}/patch/tenant.json"))
+    _row = {r["name"]: r for r in _lay["tenant"]}[_tj["name"]]
+    src_base = _row["anim_base"]
+    src_end = _row["anim_base"] + _row["anim_len"]
+    sweep_lo, sweep_hi = _row["sweep_lo"], _row["sweep_hi"]
 
     op_path = f"{outbase}/verify_op.bin"
     data_path = f"{outbase}/verify_data.bin"
@@ -60,15 +74,17 @@ def main():
 
     src = open(f"{outbase}/extract/region_anim.bin", "rb").read()
     _, s_entries, s_records = walk(
-        src, SRC_BASE, SRC_BASE, SRC_END,
-        lambda c: any(a <= c < b for a, b in AUX_SRC))
+        src, src_base, src_base, src_end,
+        lambda c: any(a <= c < b for a, b in aux_src),
+        sweep_lo, sweep_hi)
 
     out = open(data_path, "rb").read()
     aux_dst = [(r["dst"], r["dst"] + r["len"])
                for n, r in pl["regions"].items() if n.startswith("aux")]
     tiles, o_entries, o_records = walk(
         out, 0, anim["dst"], anim["dst"] + anim["len"],
-        lambda c: any(a <= c < b for a, b in aux_dst))
+        lambda c: any(a <= c < b for a, b in aux_dst),
+        sweep_lo, sweep_hi)
 
     fail = 0
     if (s_records, s_entries) != (o_records, o_entries):

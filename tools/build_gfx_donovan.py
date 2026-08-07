@@ -37,6 +37,7 @@ import zipfile
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from gfx_tiles import GROUP_A, GROUP_B, GROUP_C, bank_word, \
     tile_bytes, write_tile  # noqa: E402
+from _minitoml import loads as toml_loads  # noqa: E402
 
 SRC_BANK = 3          # Donovan's bank in vsav2
 # DST_BANK is the gfx bank the tenant's tiles occupy. It WAS hard-coded to 2
@@ -48,6 +49,15 @@ DST_BANK = 2
 DELTA = 0x2750        # 16-aligned code delta, decided session 14
 BAND_LO, BAND_HI = 0x863F, 0xC2EF          # Donovan main band (measured)
 SAFE_LO, SAFE_HI = 0xAD80, 0xEEBB          # writable window in Jedah band
+# 14z-67 (D4): the constants above are DONOVAN'S rows of the ratified
+# 3-tenant layout (build/manifest/gfx_layout3.toml) and are now only the
+# fallback for a build run without --layout/--tenant. Any other tenant
+# MUST resolve its band/delta through the layout manifest — and a
+# delta-0 tenant (H/P: native codes) takes the delta0 placement path:
+# ALL inventory tiles placed at native codes (band + scatter; there is
+# no effect map because nothing moves), writes asserted strictly below
+# Donovan's frozen SAFE_LO ceiling (disjointness by interval, the
+# tests/test_gfx_layout3.sh invariant).
 
 
 def load_group(z, prefix, group):
@@ -101,15 +111,50 @@ def main():
                          "from the port's target id — it used to be the "
                          "constant DST_BANK=2 and a build with the tenant "
                          "moved elsewhere still placed Jedah's bank row")
+    ap.add_argument("--layout",
+                    default=os.path.join(os.path.dirname(
+                        os.path.dirname(os.path.abspath(__file__))),
+                        "build/manifest/gfx_layout3.toml"),
+                    help="the ratified 3-tenant group-C layout manifest; "
+                         "the tenant's band/delta resolve from its row "
+                         "(keyed by tenant.json's id)")
     args = ap.parse_args()
     os.makedirs(args.outdir, exist_ok=True)
 
-    global DST_BANK
+    global DST_BANK, DELTA, BAND_LO, BAND_HI, SRC_BANK
+    layout_row = None
+    frozen_ceiling = SAFE_LO   # Donovan's safe window floor: the delta-0
+    #                            write ceiling (disjointness by interval)
     if args.tenant:
         _t = json.load(open(args.tenant))
         DST_BANK = int(_t.get("gfx_bank", DST_BANK))
         print("  tenant %s id %#04x -> gfx bank %d (bank word %#06x)"
               % (_t.get("name"), _t["id"], DST_BANK, bank_word(DST_BANK)))
+        lay = toml_loads(open(args.layout).read())
+        rows = {r["name"]: r for r in lay["tenant"]}
+        frozen_ceiling = rows["donovan"]["safe_lo"]
+        # resolve by NAME: band/delta are per-CHARACTER facts; the id
+        # differs per track (Donovan is 0x0F on stock, 0x13 on WIDE)
+        layout_row = rows.get(_t.get("name"))
+        if layout_row is None:
+            sys.exit(f"build_gfx: tenant {_t.get('name')!r} has no row in "
+                     f"{args.layout} — the 3-tenant layout must be "
+                     f"extended (and re-measured) before its gfx can build")
+        SRC_BANK = int(layout_row["src_bank"])
+        assert SRC_BANK == 3, \
+            "source reads index vs2 group B at bank 3's in-group offset " \
+            "(0x10000+code); a non-bank-3 tenant needs that generalized " \
+            "deliberately, not silently"
+        DELTA = int(layout_row["delta"])
+        BAND_LO, BAND_HI = int(layout_row["band_lo"]), int(layout_row["band_hi"])
+        print("  layout row %s: band %#06x-%#06x delta %+#x src bank %d"
+              % (layout_row["name"], BAND_LO, BAND_HI, DELTA, SRC_BANK))
+        # Donovan's row must equal the frozen constants — the m3a/stock
+        # references are only reproducible if this resolution is a no-op
+        # for him, on both tracks. Assert rather than trust.
+        if _t.get("name") == "donovan":
+            assert (DELTA, BAND_LO, BAND_HI) == (0x2750, 0x863F, 0xC2EF), \
+                "layout donovan row drifted from the frozen constants"
     # WIDE group C (banks 4-5): the tenant's band+shelf keep their in-group
     # tile indices (code+DELTA, unchanged from the host-band layout, so the
     # RECORDS need no rewrite at all) but the tile DATA goes into the four
@@ -118,14 +163,31 @@ def main():
     group_c = DST_BANK >= 4
 
     inv = json.load(open(args.tiles))
-    band = sorted(t for t in inv if BAND_LO <= t <= BAND_HI)
-    skipped = len(inv) - len(band)
-    print(f"inventory: {len(inv)} tiles, {len(band)} in main band "
-          f"({skipped} effect/low tiles handled by the per-record map, "
-          f"not this tool)")
+    if DELTA == 0:
+        # delta-0 tenant (14z-67 layout): EVERY inventoried tile places at
+        # its native code — band and scatter alike; no per-record effect
+        # map exists because no code moves. The one placement constraint
+        # is the interval disjointness the layout rests on: strictly
+        # below Donovan's frozen safe window.
+        band = sorted(inv)
+        print(f"inventory: {len(inv)} tiles, all placed at native codes "
+              f"(delta-0 tenant)")
+        assert not args.effects, \
+            "delta-0 tenant: an effect map must not exist (nothing moves)"
+    else:
+        band = sorted(t for t in inv if BAND_LO <= t <= BAND_HI)
+        skipped = len(inv) - len(band)
+        print(f"inventory: {len(inv)} tiles, {len(band)} in main band "
+              f"({skipped} effect/low tiles handled by the per-record map, "
+              f"not this tool)")
     lo_dst, hi_dst = band[0] + DELTA, band[-1] + DELTA
-    assert SAFE_LO <= lo_dst and hi_dst <= SAFE_HI, \
-        f"placement 0x{lo_dst:04X}-0x{hi_dst:04X} outside safe window"
+    if DELTA == 0:
+        assert hi_dst < frozen_ceiling, \
+            f"delta-0 placement reaches 0x{hi_dst:04X} >= frozen ceiling " \
+            f"0x{frozen_ceiling:04X} (Donovan's SAFE_LO) — layout violated"
+    else:
+        assert SAFE_LO <= lo_dst and hi_dst <= SAFE_HI, \
+            f"placement 0x{lo_dst:04X}-0x{hi_dst:04X} outside safe window"
     assert DELTA % 16 == 0, "delta must be 16-aligned (block row-wrap)"
 
     z2 = zipfile.ZipFile(os.path.join(args.romdir, "vsav2.zip"))
@@ -295,6 +357,15 @@ def main():
             if et.get("place_variant_slot"):
                 print(f"effect-tail: {len(et['place_variant_slot'])} "
                       f"variant-slot place(s) added (free-pool anchors)")
+            # per-tenant variant-slot art (14z-67): a tenant's OWN HUD
+            # art rides place_variant_slot_<name>, scoped so another
+            # tenant's build (and the frozen m3a reference) is untouched
+            if layout_row is not None:
+                _tk = "place_variant_slot_" + layout_row["name"]
+                places.update(et.get(_tk, {}))
+                if et.get(_tk):
+                    print(f"effect-tail: {len(et[_tk])} {_tk} place(s) "
+                          f"added")
         for k, v in places.items():
             tt, bx, by = k.split(",")
             t = int(tt, 16); anchor = int(v, 16)

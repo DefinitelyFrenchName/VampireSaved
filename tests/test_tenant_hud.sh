@@ -55,14 +55,27 @@ python3 tools/check_tenant_hud.py "$OUTBASE" "$VAN" "$ROMDIR" \
 sed 's/^/  ok: /' "$WORK/static.txt"
 
 echo "== 2. negative control: the verdict logic is itself tested =="
+# per-tenant facts (14z-67): the mug poke address, pick replay, and
+# staged codes follow the build's own tenant.json
+TEN_ID="$(python3 -c "import json;print(json.load(open('$OUTBASE/patch/tenant.json'))['id'])")"
+case "$TEN_ID" in
+    19) PICK_RPL="36_pick_tenant_cell.rpl"
+        MUG_GREP="code=be90 attr=112a"; NAME_GREP="code=be8c attr=0202" ;;
+    16) PICK_RPL="37_pick_huitzil_cell.rpl"
+        MUG_GREP="code=be9a attr=112a"; NAME_GREP="code=be92 attr=0102" ;;
+    *)  echo "FAIL: no HUD runtime facts for tenant id $TEN_ID"; exit 1 ;;
+esac
+MUG_POKE_ADDR="$(printf '0x%x' $((0x89884 + 2 * TEN_ID)))"
 mkdir -p "$WORK/neg/patch"
 ln -s "$(cd "$OUTBASE" && pwd)/gfx" "$WORK/neg/gfx"
-python3 - "$OUTBASE" "$WORK/neg" <<'PY'
+cp "$OUTBASE/patch/tenant.json" "$WORK/neg/patch/tenant.json"
+python3 - "$OUTBASE" "$WORK/neg" "$MUG_POKE_ADDR" <<'PY'
 import json, sys
 p = json.load(open(sys.argv[1] + "/patch/patch.json"))
 ops = p["ops"] if isinstance(p, dict) and "ops" in p else p
 kept = [o for o in ops
-        if not (o.get("op") == "poke16" and o.get("addr") == "0x898aa")]
+        if not (o.get("op") == "poke16" and o.get("addr") == sys.argv[3])]
+assert len(kept) < len(ops), "negative control stripped nothing"
 if isinstance(p, dict) and "ops" in p:
     p["ops"] = kept
 else:
@@ -85,7 +98,7 @@ else
     "$WIDE_BIN" -listfull vsavjw > /dev/null 2>&1 || {
         echo "FAIL: $WIDE_BIN does not know vsavjw (tools/setup_mame.sh)"
         exit 1; }
-    REPLAY="$REPO/tests/replays/36_pick_tenant_cell.rpl" \
+    REPLAY="$REPO/tests/replays/$PICK_RPL" \
     DUMP_FRAMES=3100 FRAMES=3110 TRACE_OUT="$WORK/obj.txt" \
     MAME_SANDBOX="$WORK/sbx" MAME_BIN="$WIDE_BIN" \
     MAME_ROMPATH="$OUTBASE/rompath;$ROMDIR" \
@@ -93,17 +106,17 @@ else
         -autoboot_script tests/lua/obj_records_dump.lua > /dev/null 2>&1 \
         || true
     ok=1
-    grep -q "code=be90 attr=112a" "$WORK/obj.txt" || {
-        echo "  FAIL: tenant mugshot (code be90, attr 112a) not staged"
+    grep -q "$MUG_GREP" "$WORK/obj.txt" || {
+        echo "  FAIL: tenant mugshot ($MUG_GREP) not staged"
         ok=0; }
-    grep -q "code=be8c attr=0202" "$WORK/obj.txt" || {
-        echo "  FAIL: tenant name plate (code be8c, attr 0202) not staged"
+    grep -q "$NAME_GREP" "$WORK/obj.txt" || {
+        echo "  FAIL: tenant name plate ($NAME_GREP) not staged"
         ok=0; }
     grep -qE "code=3d[0-9a-f]{2} attr=1110" "$WORK/obj.txt" || {
         echo "  FAIL: opponent mugshot (vanilla 0x3Dxx page) not staged"
         ok=0; }
     if [ "$ok" = 1 ]; then
-        echo "  ok: mugshot be90 + name be8c staged; opponent vanilla 3Dxx"
+        echo "  ok: tenant mugshot + name staged ($MUG_GREP); opponent vanilla 3Dxx"
     else
         fail=1
     fi

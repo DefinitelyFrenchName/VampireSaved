@@ -8,8 +8,9 @@
 # vs2 data image):
 #   1. All three tenants read vs2 BANK 3 (bank-table rows 0x10/0x11/0x13
 #      at PRG:0x27530 all 0x6000) — the one-source-bank premise.
-#   2. Frozen tile inventories: H 14,895 unique / band 0x0AF6-0x4EFC;
-#      P 14,089 / band 0x4ED5-0x8647; D 15,612 / band 0x863F-0xC2EF.
+#   2. Frozen tile inventories: H 15,034 unique / band 0x0AF6-0x4EFC;
+#      P 14,225 / band 0x4ED5-0x8647; D 15,612 / band 0x863F-0xC2EF.
+#      (Re-frozen 14z-67b: walker entry-bounds fix + per-tenant sweep.)
 #   3. THE LAYOUT INVARIANT: max(H∪P native code) < 0xAD80 (Donovan's
 #      SAFE_LO) — delta-0 placement for H/P is disjoint from Donovan's
 #      frozen band+shelf by interval, no enumeration needed.
@@ -57,9 +58,13 @@ check(all(v == 0x6000 for v in rows.values()),
 # 2. inventories re-derived from the data image (obj_records walk over
 #    the ratified spans). EXPECT rows: (unique, band_lo, band_hi, n_band).
 import subprocess
+# counts re-frozen 14z-67b after the walker refinement (entry-bounds
+# check + per-tenant sweep windows — H/P sweep = their own bands, so
+# their offset-computed overlay records now inventory; Donovan keeps
+# the historical window and is UNCHANGED, bit-exactness preserved)
 EXPECT = {
-    "huitzil": (14895, 0x0AF6, 0x4EFC, 14870),
-    "pyron":   (14089, 0x4ED5, 0x8647, 14037),
+    "huitzil": (15034, 0x0AF6, 0x4EFC, 15010),
+    "pyron":   (14225, 0x4ED5, 0x8647, 14171),
     "donovan": (15612, 0x863F, 0xC2EF, 15498),
 }
 tiles = {}
@@ -73,6 +78,7 @@ for name, (uniq, blo, bhi, nband) in EXPECT.items():
         os.path.join(repo, "tools/obj_records.py"), img,
         "--base", hex(base), "--start", hex(base), "--end", hex(base + ln),
         "--cptr-lo", "0x300000", "--cptr-hi", "0x361000",
+        "--sweep-lo", hex(t["sweep_lo"]), "--sweep-hi", hex(t["sweep_hi"]),
         "--json", out], check=True, stdout=subprocess.DEVNULL)
     tv = set(json.load(open(out)))
     tiles[name] = tv

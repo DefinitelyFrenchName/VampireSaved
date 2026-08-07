@@ -259,5 +259,9 @@
  "place_variant_slot": {
   "0x4D62,2,2": "0xBE90"
  },
- "_variant_slot_note": "14z-63: Donovan's HUD mugshot art for VARIANT-id builds \u2014 at 0x13 Jedah's own mugshot cells (0x3DC8) stay pristine, so the vs2 2x2 (0x4D62) is placed at the bank-1 pool tail anchor 0xBE90 (covers BE90/BE91/BEA0/BEA1 \u2014 blank + absent from protected_tiles.json in vanilla AND in the built members; the name plate at BE8C-8E is the pool neighbour). Applied ONLY when the tenant is at a variant id (DST_BANK >= 4); the mugshot-table row 0x13 poke (hud_mug_entry_13, only_variant_slot) points at it (0x8690 = 0xBE90 - vsavj's 0x3800 stager base)."
+ "_variant_slot_note": "14z-63: Donovan's HUD mugshot art for VARIANT-id builds \u2014 at 0x13 Jedah's own mugshot cells (0x3DC8) stay pristine, so the vs2 2x2 (0x4D62) is placed at the bank-1 pool tail anchor 0xBE90 (covers BE90/BE91/BEA0/BEA1 \u2014 blank + absent from protected_tiles.json in vanilla AND in the built members; the name plate at BE8C-8E is the pool neighbour). Applied ONLY when the tenant is at a variant id (DST_BANK >= 4); the mugshot-table row 0x13 poke (hud_mug_entry_13, only_variant_slot) points at it (0x8690 = 0xBE90 - vsavj's 0x3800 stager base). | 14z-67: per-tenant keys place_variant_slot_<name> scope a tenant's HUD art to ITS builds only (m3a bit-exactness); H: 0x46AB 2x1 -> 0xBE92 plate, 0x47A0 2x2 -> 0xBE9A mugshot",
+ "place_variant_slot_huitzil": {
+  "0x46AB,2,1": "0xBE92",
+  "0x47A0,2,2": "0xBE9A"
+ }
 }

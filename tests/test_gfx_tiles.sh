@@ -40,14 +40,20 @@ fi
 #    format/budget/count/cptr header, (tile,attr) entries, block cells
 #    n&~0xF + dy<<4 + (n+dx)&0xF). Numbers measured on the reference
 #    images; drift means either the walker or the understanding broke.
+#    LOCK HISTORY: 17763/16669 was the pre-sweep walker; the 14z-11
+#    sweep pass (offset-computed records, commit 818bae7) moved it and
+#    this lock went STALE UNNOTICED until 14z-67 (the gate was not in
+#    the battery). Re-frozen 18094/16707 with the drift attributed by
+#    measurement (818bae7^ reproduces 17763 exactly; the walker's
+#    14z-67 entry-bounds fix changes NOTHING on this call).
 python3 tools/cps2_decrypt.py "$ROMDIR/vsavj.zip" "$W/vsavj_op.bin" \
     --data-out "$W/vsavj_data.bin" > /dev/null 2>&1 || true
 JIMG="$W/vsavj_data.bin"; [ -f "$JIMG" ] || JIMG="$REPO/build/out/vsavj_data.bin"
 jout=$(python3 "$REPO/tools/obj_records.py" "$JIMG" --base 0 \
     --start 0x248B88 --end 0x26AB88)
-echo "$jout" | grep -q "unique expanded tiles 17763" \
-    && echo "$jout" | grep -q "band 0xAD3D-0xEEBB: 16669 tiles" \
-    && echo "  ok: Jedah OBJ inventory locked (17763 tiles; main band 0xAD3D-0xEEBB)" \
+echo "$jout" | grep -q "unique expanded tiles 18094" \
+    && echo "$jout" | grep -q "band 0xAD3D-0xEEBB: 16707 tiles" \
+    && echo "  ok: Jedah OBJ inventory locked (18094 tiles; main band 0xAD3D-0xEEBB)" \
     || { echo "FAIL: Jedah OBJ inventory drifted:"; echo "$jout" | head -3; fail=1; }
 
 [ "$fail" = 0 ] && echo "PASS: gfx tile layout fact-locks" || echo "FAIL: gfx tile layout fact-locks"

@@ -1,0 +1,14 @@
+# 37: walk the cursor onto the APPENDED wheel cell 0x10 (Huitzil/Phobos's
+# native vs2 id) and pick it. Path from the default Demitri cell 0x01:
+# D -> 0x06, D -> 0x08, D -> 0x10 via the wheel extension's inbound edge
+# (edges_in: 0x08 D -> 0x10). The cell-0x13 twin is replay 36.
+# BUILD-ONLY replay: on vanilla vsavj the final D lands on 0x0B — this
+# script is meaningful only on a build carrying the extended wheel AND a
+# tenant at id 0x10 (the H gfx rung, 14z-67).
+300-305 sys=C1
+800-803 sys=S1
+1000-1002 p1=D
+1040-1042 p1=D
+1080-1082 p1=D
+1700-1702 p1=1
+3600 wait

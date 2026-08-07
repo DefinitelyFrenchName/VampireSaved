@@ -45,9 +45,11 @@ import json
 import sys
 
 
-def walk(dat, base, start, end, cptr_ok):
+def walk(dat, base, start, end, cptr_ok, sweep_lo=0x8000, sweep_hi=0xEEBB):
     """dat indexed by ROM address - base. Returns (tiles set, n_entries,
-    n_records)."""
+    n_records). sweep_lo/hi: the band-coherence window of the SWEEP pass
+    (offset-computed records) — historically the Donovan/Jedah band; a
+    tenant's own band for anyone else (14z-67 de-Donovanization)."""
     tiles, entries, records = set(), 0, 0
     seen = set()
     for a in range(start, end - 4, 2):
@@ -65,12 +67,20 @@ def walk(dat, base, start, end, cptr_ok):
             attr = int.from_bytes(dat[o + 4:o + 6], "big")
             if not (0 < count <= 0x100):
                 continue
+            # 14z-67: a real record's entries lie INSIDE the region — a
+            # shape-matching tail pointer otherwise reads past the end
+            # (zeros in a source image; NEIGHBORING PLACED CONTENT in a
+            # built one — the H verify false-record)
+            if o + 10 + 2 * count > end - base:
+                continue
             ent = [(int.from_bytes(dat[o + 10 + 2*k:o + 12 + 2*k], "big"),
                     attr) for k in range(count)]
         else:
             budget = int.from_bytes(dat[o + 2:o + 4], "big")
             count = int.from_bytes(dat[o + 4:o + 6], "big")
             if not (0 < count + 1 <= budget <= 0x100):
+                continue
+            if o + 10 + 4 * (count + 1) > end - base:
                 continue
             ent = [(int.from_bytes(dat[o + 10 + 4*k:o + 12 + 4*k], "big"),
                     int.from_bytes(dat[o + 12 + 4*k:o + 14 + 4*k], "big"))
@@ -104,12 +114,16 @@ def walk(dat, base, start, end, cptr_ok):
             attr = int.from_bytes(dat[o + 4:o + 6], "big")
             if not (0 < count <= 0x100):
                 continue
+            if o + 10 + 2 * count > end - base:
+                continue
             ent = [(int.from_bytes(dat[o + 10 + 2*k:o + 12 + 2*k], "big"),
                     attr) for k in range(count)]
         else:
             budget = int.from_bytes(dat[o + 2:o + 4], "big")
             count = int.from_bytes(dat[o + 4:o + 6], "big")
             if not (0 < count + 1 <= budget <= 0x100):
+                continue
+            if o + 10 + 4 * (count + 1) > end - base:
                 continue
             ent = [(int.from_bytes(dat[o + 10 + 4*k:o + 12 + 4*k], "big"),
                     int.from_bytes(dat[o + 12 + 4*k:o + 14 + 4*k], "big"))
@@ -121,7 +135,7 @@ def walk(dat, base, start, end, cptr_ok):
                 continue
         if not ent:
             continue
-        _band = sum(1 for _t, _ in ent if 0x8000 <= _t <= 0xEEBB)
+        _band = sum(1 for _t, _ in ent if sweep_lo <= _t <= sweep_hi)
         if _band * 2 < len(ent):
             continue
         if any(((_a >> 8) & 15) + 1 > 8 or ((_a >> 12) & 15) + 1 > 8
@@ -160,6 +174,11 @@ def main():
     ap.add_argument("--end", type=lambda x: int(x, 0), required=True)
     ap.add_argument("--cptr-lo", type=lambda x: int(x, 0), default=0x100000)
     ap.add_argument("--cptr-hi", type=lambda x: int(x, 0), default=0x400000)
+    ap.add_argument("--sweep-lo", type=lambda x: int(x, 0), default=0x8000,
+                    help="sweep-pass band-coherence window (default = the "
+                         "historical Donovan/Jedah band; pass the tenant's "
+                         "own band for anyone else, 14z-67)")
+    ap.add_argument("--sweep-hi", type=lambda x: int(x, 0), default=0xEEBB)
     ap.add_argument("--json")
     args = ap.parse_args()
 
@@ -171,7 +190,7 @@ def main():
                 and not (inreg[0] <= p < inreg[1]))
 
     tiles, entries, records = walk(dat, args.base, args.start, args.end,
-                                   cptr_ok)
+                                   cptr_ok, args.sweep_lo, args.sweep_hi)
     print(f"records {records}, entries {entries}, "
           f"unique expanded tiles {len(tiles)}")
     for lo, hi in clusters(tiles):

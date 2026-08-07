@@ -36,17 +36,20 @@ from gfx_tiles import GROUP_A, tile_bytes, BLANK  # noqa: E402
 MUG_TABLE = 0x89884          # word per char, 32 rows
 NAME_TABLE = 0x898C4         # 8 bytes per char, 32 rows
 STAGER_BASE = 0x3800
-TENANT = 0x13
-MUG_ANCHOR = 0xBE90          # free-pool 2x2 (variant builds)
-NAME_ANCHOR = 0xBE8C         # pool-tail 3x1 (shared with the 0x0F track)
-MUG_SRC = 0x4D62             # vs2 bank-1 2x2
-NAME_SRC = 0x4D55            # vs2 bank-1 3x1
 JEDAH_MUG = 0x3DC8           # the host's own cells — must stay pristine
 
-EXPECTED_POKES = {
-    MUG_TABLE + 2 * TENANT: ("poke16", MUG_ANCHOR - STAGER_BASE),
-    NAME_TABLE + 8 * TENANT: ("poke32", 0x868C0202),
-    NAME_TABLE + 8 * TENANT + 4: ("poke32", 0xFFE80003),
+# Per-tenant HUD facts (14z-67, de-Donovanized): an INDEPENDENT
+# re-derivation table — values measured from vs2's DATA-view HUD tables
+# (name entry = code/attr/xoff/advance; art code = entry + 0x4200, the
+# vs2 stager bias) and the chosen free-pool anchors. Keyed by tenant id
+# from the build's own tenant.json.
+TENANTS = {
+    0x13: dict(mug_anchor=0xBE90, name_anchor=0xBE8C,
+               mug_src=0x4D62, name_src=0x4D55, name_bx=3,
+               name_hi=0x868C0202, name_lo=0xFFE80003),
+    0x10: dict(mug_anchor=0xBE9A, name_anchor=0xBE92,
+               mug_src=0x47A0, name_src=0x46AB, name_bx=2,
+               name_hi=0x86920102, name_lo=0xFFE80002),
 }
 
 
@@ -65,6 +68,20 @@ def main():
     outbase, data_path, romdir = sys.argv[1:4]
     out = Path(outbase)
     vj = Path(data_path).read_bytes()
+
+    tj = json.loads((out / "patch" / "tenant.json").read_text())
+    TENANT = int(tj["id"])
+    if TENANT not in TENANTS:
+        die(f"no HUD fact row for tenant id {TENANT:#04x} — measure and "
+            f"add it to TENANTS before this build's HUD can be verified")
+    T = TENANTS[TENANT]
+    MUG_ANCHOR, NAME_ANCHOR = T["mug_anchor"], T["name_anchor"]
+    MUG_SRC, NAME_SRC = T["mug_src"], T["name_src"]
+    EXPECTED_POKES = {
+        MUG_TABLE + 2 * TENANT: ("poke16", MUG_ANCHOR - STAGER_BASE),
+        NAME_TABLE + 8 * TENANT: ("poke32", T["name_hi"]),
+        NAME_TABLE + 8 * TENANT + 4: ("poke32", T["name_lo"]),
+    }
 
     # 1. vanilla table shapes
     for base, w, name in ((MUG_TABLE, 2, "mugshot"), (NAME_TABLE, 8, "name")):
@@ -91,7 +108,8 @@ def main():
     gp = [za.read(f"vm3.{n}m") for n in GROUP_A]
     nonblank = 0
     for (src, dst, bx, by, nm) in ((MUG_SRC, MUG_ANCHOR, 2, 2, "mugshot"),
-                                   (NAME_SRC, NAME_ANCHOR, 3, 1, "name")):
+                                   (NAME_SRC, NAME_ANCHOR,
+                                    T["name_bx"], 1, "name")):
         for s, d in zip(block(src, bx, by), block(dst, bx, by)):
             want = tile_bytes(g2, 0x10000 + s)
             got = tile_bytes(ga_built, 0x10000 + d)
