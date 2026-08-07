@@ -611,3 +611,42 @@ asserts after porting.
 tile fetch: a build with 15 rows remapped diverges in work RAM at frame
 890 under MAME, which has no extended-bank support at all (14z-56
 measurement, GOTCHAS). Treat the row as behaviour-bearing.
+
+## The class-02 sequence system, per-char jump handlers, and the air
+## system (session 14z-66, measured on the Huitzil port)
+
+- **Class-02 seq dispatch:** the per-frame stepper (vsavj 0x225C4 /
+  vs2 0x20FA8) dispatches on the seq byte +0x06 via a word table
+  (vsavj 0x225EE / vs2 0x20FD2 — first four entries identical across
+  the generations, drift after). Seq 06 = the jump.
+- **Per-char jump handlers:** the jump handler HEAD routes BY CHAR ID
+  — vsavj 0x22A0E: `cmpi #6 -> 0x2678C` (Anakaris's private family,
+  including a byte-identical COPY of the generic head at 0x26A58 — the
+  content-twin trap); vs2 0x213F2 adds `cmpi #$10 -> 0x2592A` (PHOBOS's
+  own handler: five sub-states — 0 = rise/conversion, 1 = the
+  flavor-forked FLOAT, 3 = the +0x23-gated air action, 4 = the jump
+  restart). The port clones 0x2592A whole (region x02592a) and
+  reproduces vs2's id routing with a thunk at the vsavj head.
+- **The float:** licensed by anim-node header bit 7 (+0x21), converts
+  sub-state +2, arms +0x1C0 = 0x78, and forks on the flavor byte
+  +0x3C2 in its FIRST instruction — flavor 0 (VS2 default): falling-
+  only, min height 0x40, EXACTLY straight up, timer-limited; flavor 1
+  (VH2): any-up pins the hover indefinitely. During the hover the
+  mover is not called at all.
+- **Jump physics:** per-char rows at the jump_params table (see the
+  RAM atlas addendum) installed by the routine every seq-0600 starter
+  calls. Air/ground dash physics are NOT table rows — they live in the
+  character's own handler code (H: ground dash xv 6.0 at his 0x56DEA,
+  air dash at his 0x586F0 family; seq 0x14 = the air dash).
+- **Shadow/reflection servants:** each player gets a class-0x0C trio
+  (spawner 0x489DE) that MIRRORS a linked object's animation by
+  reading each anim node's +0xC word (low 13 bits = a seq into the
+  SHARED shadow tables 0x2083BC/0x2087CA — NOT per-char; row space
+  0x40E). Capture supers make the VICTIM play attacker-supplied nodes,
+  so out-of-range shadow seqs surface on the victim's servant (the
+  shadow_seq_guard clamp).
+- **Capture-pose system:** capture supers select the victim's held
+  pose via per-VICTIM tables (0xBCE7A family) indexed by a seq id from
+  the ATTACKER's code — H's FG draws it RANDOMLY (table16[rand&15],
+  ids 1/3/5) per barrage hit. The intro-variant at +0x0A is likewise
+  RNG-drawn at char load.

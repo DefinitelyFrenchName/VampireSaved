@@ -2036,3 +2036,45 @@ states the port never writes).
   tenants' rows live in a per-tenant recon_overlay
   (build/manifest/reconciliation_huitzil.toml; manifest key
   recon_overlay) until the Phase 2 merge scopes rows properly.
+
+## The content-twin trap: vsavj keeps byte-identical copies of engine
+## code inside per-char families — hook the LIVE one, found by tracing
+Searching vsavj for the byte-for-byte twin of vs2's generic jump-seq
+head found 0x26A58 — which hooked cleanly and did NOTHING (0 probe
+hits): it is ANAKARIS's private copy of the handler, id-routed at
+0x22A0E (`cmpi.b #6` at the head). The LIVE generic handler is reached
+through the class-02 stepper 0x225C4 (table 0x225EE, seq06 -> +0x420).
+Find live engine handlers by TRACING the actual dispatch (GUARD_TRACE
+on the acting frames), never by byte search alone — the engine
+duplicates handler code per character and the copies diff identical.
+
+## PC-relative escapes in engine-style regions are INVISIBLE to the
+## sibling oracle — and unrewritable in place
+A cloned engine region's bra/bsr/Bcc.w branches out of the region keep
+their displacements through extraction: both sibling games preserve
+spacing, so the displacement bytes diff CLEAN and no ref is flagged.
+Placed, they branch into unrelated bytes — sometimes crashing
+(air-dash: mid-instruction vec4), sometimes wandering BENIGNLY for
+sessions (x026142 carried them from 14z-65; the Circuit Scrapper's
+"does not come out" was one). No Bcc abs.l exists, so in-place rewrite
+is impossible — [[pcrel_escape_fix]] reserves an ADJACENT trampoline
+pad and rewrites each escape to a `jmp <twin>.l` bounce. Run its
+census on EVERY engine-style region (clones, shared zones); newcomer
+authored code is mostly immune (it calls engine subs via jsr abs.l).
+
+## 2P forced-pick pokes must end by ~frame 1500 — later pokes leak
+## into the SECOND player's load
+Holding the P1 commit poke ($FF8782) through frames 1700-2400 works in
+the 1P flow but in the 2P flow turns P2 into the poked id (measured:
+a "victim sweep" where every P2 loaded as 0x10 — crash signatures that
+looked per-victim were per-garbage). Early window 1400-1500 only; a
+no-poke control run verifies the flow (p2_id stays vanilla).
+
+## Physics ports move probe windows — retune frame-pinned gates
+The jump_params port changed the float rise speed; the air gate's
+hover samples (tuned to the alias-physics climb reaching 109.4 by
+~f3320) then caught the native-speed rise MID-CLIMB and reported "no
+hover" while the hover was perfect at 121.1 from f3345. When a gate
+pins absolute frames around a physics-dependent event, re-derive the
+frames after any physics change — or anchor on the event, not the
+clock.

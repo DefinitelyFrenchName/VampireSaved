@@ -558,3 +558,19 @@ pre-fix build.
 
 Open Huitzil rows after this: 15 tripwired targets (the three farm rows
 resolved out of the 18 above).
+
+## 14z-66 addendum — the air-system twin rows and the two new methods
+
+Thirty-five overlay rows landed for the x02592a jump-handler clone and
+x026142's own escapes, resolved by two methods now proven:
+- **Generic-handler alignment**: instruction-stream diff of the two
+  games' GENERIC handlers with operand masking — 28 jump-family twins,
+  validated by all five previously-known pairs reproducing exactly.
+- **Site-twin interpolation**: for content-drifted targets, compute
+  each escape SITE's twin position by bracketing known pairs and read
+  vsavj's own branch AT that site — 7 x026142 escape twins, two
+  confirmed by TWO independent sites each; 0x24CBA (the neutral-reset
+  family) by unique wildcarded match -> 0x26058. One row open:
+  0x269AC (operand-heavy float-body helper, tripwired).
+These rows are consumed by [[pcrel_escape_fix]] trampolines, not
+operand rewrites — see docs/GOTCHAS.md on oracle-invisible escapes.

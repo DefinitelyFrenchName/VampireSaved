@@ -1,17 +1,21 @@
 # STATE — living progress log
 
-Updated: 2026-08-07 (session 14z-66 — playtest round-1 worklist: item 1
-CLOSED — both EX-move crash-resets were ONE open sound-farm tripwire
-(the shared one-shot voice cue at x0689cc+0xec -> vs2 0x4EFA); three
-stubbed_sound overlay rows fix both moves. Gate tests/test_hui_ex.sh;
-Item 2 CLOSED — param32 tables measured 32-row/no-fold; his true
-velocity pairs serve from variant rows 0x10 (port_param32 opt-in;
-gate test_hui_walk.sh; 11k-soak hazard re-exam clean). ROUND 2:
-speed + ES confirmed by maintainer; the SECOND FG crash (capture-anim
-shadow over-index) root-caused and FIXED with the shadow_seq_guard
-site thunk — full battery green incl. boot masked-v2 EXACT with the
-engine-site thunk live. build/hui4 at 44be1266 = ping #3 with items
-1(complete)+2. Read 14z-66 below.)
+Updated: 2026-08-07 (session 14z-66 CLOSED — THE ROUND-1 PLAYTEST
+WORKLIST IS COMPLETE, all five items + the oracle battery + the
+alias-physics family, maintainer-confirmed through SEVEN playtest
+rounds. Headlines: three EX crash sites fixed (farm-voice stubs, the
+shadow_seq_guard thunk, [[data_in_code]] + census); his true
+velocities AND jump physics serve from variant rows (port_param32;
+float ceiling native-exact 121.1); float + air dash LIVE via the
+per-char jump-handler clone x02592a + tenant_jump_seq thunk + the NEW
+[[pcrel_escape_fix]] mechanism (which also healed Circuit Scrapper);
+RW guard-cancel + Dark Force replays native-matched; the 17/18-style
+oracle gate passes all four locks (H diverges LESS cross-game than a
+vanilla veteran). D1 RATIFIED (VS2 default flavor, polarity fixed by
+measurement) and D4 RATIFIED (Phobos gfx vertical first -> freeze ->
+Pyron merge; sounds stay stubbed until M5). build/hui4 = 8bea919e
+(ping #6, feel-confirmed round 7). Ten gates green; m3a bit-exact on
+every commit. Read the 14z-66 sections below, then docs/NEXT_SESSION.)
 
 ## Session 14z-66 (playtest round-1 worklist)
 

@@ -118,3 +118,26 @@ round 64 masked row 0x14's. Two measured hazards recorded with it:
 - the slots are the DETECTOR for such leaks: a slot diff plus a pixel
   diff means a shared row; a slot diff alone is the ratified-invisible
   class.
+
+## 14z-66 additions — object physics, air system, servants [D: measured]
+
+| Field | Meaning | Evidence |
+|---|---|---|
+| +0x0A (pre-engage) | INTRO-ANIMATION VARIANT, RNG-drawn at char load (table16[rand&15] in the per-char init; per-opponent downgrade branch). Becomes the attack id once play starts | [D: oracle gate] |
+| +0x40.l / +0x44.l | X velocity / Y velocity (16.16) | [D: mover disasm] |
+| +0x48.l / +0x4C.l | X accel / Y accel (gravity) — the mover 0x27E-family integrates +0x48->+0x40->+0x10 and +0x4C->+0x44->+0x14 | [D] |
+| +0x06/+0x07 (of +0x04.l) | seq id byte / sub-state byte (class-02 seqs: stepper 0x225C4, table 0x225EE; jump = seq 06 -> handler 0x22A0E; air dash = seq 0x14) | [D] |
+| +0x20/+0x21 | anim node timer / node header flags — bit 7 of +0x21 = the FLOAT LICENSE, installed per node from the header long (node stride 0x18; +0xC low 13 bits = shadow-seq id) | [D] |
+| +0x1C0.w | float duration timer (armed 0x78 by the float conversion) | [D] |
+| +0x179 | air-action resource counter (0x10 at load; float start decrements) | [D] |
+| $FF80D4/D5 | the engine RNG state (routine vsavj 0x14E8A) — poke to determinize cross-game comparisons | [D: oracle gate] |
+| +0x2A/+0x2C (extended block) | registered SHADOW/REFLECTION servant slots (the class-0x0C trio per player; installer 0x8237E) — shared shadow tables 0x2083BC/0x2087CA (row space 0x40E each, hardcoded at 0x823E2/0x823F2), sequence data from 0x208BD8 | [D: 14z-66 FG arc] |
+
+Per-char tables decoded (bank scheme: vs2 = vsavj + (0xD7298-0xBD0FA)):
+`PRG:0x0BDB7A` jump_params — id*0x30, THREE 0x10 rows (neutral/fwd/back
+jump) of (xv,xacc,yv,gravity); RAW id, no fold; 32-row with 0x10-0x1F
+byte-aliasing 0x00-0x0F; consumer = the installer every seq-0600
+starter bsr's (vsavj 0x27A34 / vs2 0x26C86). Capture-pose per-victim
+sets at `PRG:0x0BCE7A/0x0BCEFA/0x0BCF7A/0x0BCFFA` (the Midnight-Bliss
+family; 32 rows x 4 bytes each), read by the capture-victim installer
+(indexed by VICTIM id, seq id from the ATTACKER's code).

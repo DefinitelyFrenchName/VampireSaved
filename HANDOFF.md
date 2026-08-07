@@ -441,9 +441,10 @@ tests/test_hui_air.sh          [bd]   # Huitzil air-movement gate (14z-66): the
                                       # engages (seq 0x14, flat advance) — mode
                                       # signatures, not just no-crash.
                                       # Self-builds stage 4 unless given a build
-tests/test_hui_ex.sh           [bd]   # Huitzil EX-move gate (14z-66): both EX
-                                      # moves fire to completion guarded, AND the
-                                      # stock decrements (anti-coverage-loss).
+tests/test_hui_ex.sh           [bd]   # Huitzil EX-move gate (14z-66): FOUR
+                                      # sections (ES, FG-connect, FG-full-seq,
+                                      # FG+aftermath chaos) — each fires with the
+                                      # stock decrementing (anti-coverage-loss).
                                       # Self-builds stage 4 unless given a build
 tests/test_hui_walk.sh         [bd]   # Huitzil velocity-port gate (14z-66):
                                       # param32 rows 0x10 static + measured
