@@ -2090,3 +2090,38 @@ Measured: replay 78 clean in BOTH timelines; full battery GREEN
 (boot masked-v2 EXACT — the reroutes are tenant-code-only; m3a
 bit-exact — the mechanism is manifest-driven, Donovan has no rows).
 Gate: test_hui_ex.sh section 4 (replay 78 + stock assertion).
+
+## Session 14z-66 — AIR MOVEMENT LIVE (item 3): the per-char jump
+## handler clone + the x026142 escape fix
+
+Continuation of the float arc (see the previous entry + STATE 14z-66).
+After the float landed, the air dash (66 during the float) dispatched
+into his own air-dash physics setter (vs2 0x586F0: xv/yv/gravity
+installs, byte-faithful in the x057456 copy) but crashed vec4 at a
+mid-instruction address. The trace showed the REAL fault one level up:
+the air-dash SEQ STARTER (vs2 0x26E14, inside the x026142 shared-zone
+copy) ends with `bra.w` back to the engine stepper — an
+oracle-invisible pcrel escape THE x026142 REGION HAS CARRIED SINCE
+14z-65. Its other escapes were never reached (or wandered benignly);
+the air-dash flow was the first to die on one.
+
+Fix: [[pcrel_escape_fix]] extended to x026142 (7 unique escape
+targets, 9 sites -> 6 trampolines + pad 0x60). Targets resolved by the
+SITE-TWIN method (per-site interpolation between bracketing known
+pairs, reading vsavj's own branch at the twin site): 0x210C0->0x226DC,
+0x219C4->0x22FC0 (two sites agree), 0x21C64->0x23244 (two sites
+agree), 0x22008->0x23500, 0x25F9A->0x26E16 (unique exact-16),
+0x27542->0x282EE (the region-end fall-through), and 0x24CBA->0x26058
+(unique wildcarded match; the neutral-reset family). Rows in the H
+overlay.
+
+Measured (build 2898c495): jump -> float hover at 109.4 -> 66 -> seq
+0x1400 with X +119.6px over 15f at dy=0 (the flat accelerated air
+dash) -> dash end -> gravity fall with carry -> landing sub-state ->
+grounded. NEW gate tests/test_hui_air.sh (float: Y pinned >= 100px;
+air dash: seq byte 0x14 at +0x06 + >=30px flat advance — mode
+signatures, not just no-crash). Full battery GREEN incl. boot
+masked-v2 EXACT and m3a bit-exact. build/hui4 = 2898c495 (ping #5:
+float + air dash + all prior fixes; flavor default now VS2-correct
+per measurement — Start-hold selects the other flavor, so D1 is
+playtestable for the first time).

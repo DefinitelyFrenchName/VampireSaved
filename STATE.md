@@ -263,16 +263,29 @@ described in scratch, mechanisms verified by disasm):
     with +0x3C2 = 0x00 (the tst/beq branch = VS2-default). The
     Donovan-convention 0x01 default selected the WRONG branch;
     huitzil.toml now flavor_default=0x00, flavor_held=0x01.
-- NEXT FRONTIER (air dash): 66 DURING THE FLOAT now dispatches into
-  his own air-dash physics setter (vs2 0x586F0: xv/yv/gravity
-  installs — code byte-faithful in the copy) but lands MID-
-  INSTRUCTION (vec4 at 0xC3112 = source 0x58702+2 skew) — the
-  word-jump-table misalignment class (14z-65 even_only family).
-  Find the dispatching table entry, fix its relocation, and the
-  air dash should live. Then: air-dash-from-jump variants, the
-  VH2-flavor float A/B (the D1 deliverable), the float-ceiling
-  physics (alias jump rows), and promoting replays 75/79 into a
-  movement gate.
+- AIR DASH LANDED TOO (build 2898c495; the "mid-instruction skew"
+  hypothesis was WRONG — the trace showed the air-dash seq starter
+  (vs2 0x26E14, in the x026142 copy) ending with an
+  oracle-invisible pcrel `bra.w` back to the engine stepper:
+  x026142 HAS CARRIED UNREWRITTEN ESCAPES SINCE 14z-65, and the
+  air-dash flow was the first to die on one. pcrel_escape_fix
+  extended to x026142 (7 targets, site-twin resolved — two targets
+  confirmed by two independent sites each; 0x24CBA = the
+  neutral-reset family -> 0x26058 by unique wildcard). Measured:
+  float hover -> seq 0x1400, +119.6px over 15f at dy=0 (the flat
+  accelerated dash) -> fall with carry -> landing. NEW gate
+  tests/test_hui_air.sh (mode signatures: Y-pinned hover; seq 0x14
+  + flat advance). Full battery GREEN (boot masked-v2 EXACT, soak,
+  m3a bit-exact). build/hui4 = 2898c495 = PING #5 — and with the
+  flavor polarity fixed, D1 is PLAYTESTABLE for the first time
+  (default = VS2 per measurement; Start-hold = the other flavor).
+- Item-3 tails (open, none blocking): the 44 back-air-dash variant
+  (replay 79 runs it clean; no signature assertion yet), the
+  VH2-flavor float A/B writeup (the D1 deliverable), the float
+  ceiling (alias jump physics: ours 109.4 vs native 121.1 — the
+  14w gap-table port), and the per-victim min-height table read at
+  0xBE23A over-indexing for id 0x10 (benign threshold read,
+  measured non-fatal; tighten with the physics pass).
 
 ### Item 4 OPENED — Circuit Scrapper: recognition WORKS, the break is
 ### at/after move-start (collapse class RULED OUT)

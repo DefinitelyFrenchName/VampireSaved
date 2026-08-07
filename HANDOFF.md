@@ -422,6 +422,11 @@ tests/test_hui_ladder.sh              # Huitzil stage 1-3 ladder gate (14z-65):
                                       # variant row) + legacy replay bit-identity.
                                       # Build any tenant: TENANT_MANIFEST=...
                                       # TENANT_CHAR=0x10 tools/build_donovan.sh
+tests/test_hui_air.sh          [bd]   # Huitzil air-movement gate (14z-66): the
+                                      # float hovers (Y pinned) and the air dash
+                                      # engages (seq 0x14, flat advance) — mode
+                                      # signatures, not just no-crash.
+                                      # Self-builds stage 4 unless given a build
 tests/test_hui_ex.sh           [bd]   # Huitzil EX-move gate (14z-66): both EX
                                       # moves fire to completion guarded, AND the
                                       # stock decrements (anti-coverage-loss).

@@ -256,6 +256,16 @@ stage = 4
 region = "x02592a"
 pad = 0x120
 
+# x026142 has the same disease (14z-66, found via the air-dash seq
+# starter's tail bra): 7 unique escape targets, all resolved in the
+# overlay (site-twin method). The region's copy has been live since
+# 14z-65 — its other escapes were never reached (or wandered benignly);
+# now every one is rewritten or would tripwire loudly.
+[[pcrel_escape_fix]]
+stage = 4
+region = "x026142"
+pad = 0x60
+
 [[site_thunk]]
 stage = 4
 name = "tenant_jump_seq"

@@ -418,3 +418,60 @@ vsavj = 0x000000
 kind = "engine_sub"
 status = "open"
 note = "float-body helper selecting vs2 data 0xD8358/0xD8398 by +0x115 — operand-heavy, no pattern match; tripwired until a float flow reaches it (14z-66)"
+
+# ── 14z-66 item 3 (air dash): x026142's OWN escape targets — the
+# region has carried oracle-invisible pcrel escapes since 14z-65;
+# the air-dash seq starter's tail bra was the first flow to die on
+# one (mid-instruction vec4 at the x057456 copy). Resolved by the
+# SITE-TWIN method (bracketing known pairs; two targets confirmed
+# by TWO independent sites each) + a unique wildcarded match for
+# 0x24CBA (the neutral-reset family -> vsavj 0x26058).
+
+[[map]]
+vsav2 = 0x0210c0
+vsavj = 0x0226dc
+kind = "engine_sub"
+status = "verified"
+note = "x026142 escape twin (14z-66 site-twin method)"
+
+[[map]]
+vsav2 = 0x0219c4
+vsavj = 0x022fc0
+kind = "engine_sub"
+status = "verified"
+note = "x026142 escape twin (14z-66 site-twin method)"
+
+[[map]]
+vsav2 = 0x021c64
+vsavj = 0x023244
+kind = "engine_sub"
+status = "verified"
+note = "x026142 escape twin (14z-66 site-twin method)"
+
+[[map]]
+vsav2 = 0x022008
+vsavj = 0x023500
+kind = "engine_sub"
+status = "verified"
+note = "x026142 escape twin (14z-66 site-twin method)"
+
+[[map]]
+vsav2 = 0x024cba
+vsavj = 0x026058
+kind = "engine_sub"
+status = "verified"
+note = "x026142 escape twin (14z-66 site-twin method)"
+
+[[map]]
+vsav2 = 0x025f9a
+vsavj = 0x026e16
+kind = "engine_sub"
+status = "verified"
+note = "x026142 escape twin (14z-66 site-twin method)"
+
+[[map]]
+vsav2 = 0x027542
+vsavj = 0x0282ee
+kind = "engine_sub"
+status = "verified"
+note = "x026142 escape twin (14z-66 site-twin method)"
