@@ -479,6 +479,7 @@ before session end (persistent suite doctrine, CLAUDE.md §4).
 | Legacy suite (10 replays, frozen) | `tests/run_suite.sh`, `tests/expected/vsavj/` |
 | Watchpoint write-tracer | `tests/lua/trace_writes.lua` (needs `-debug -debugger none`) |
 | Pick probe (slot mapping) | `tools/pick_probe.sh` |
+| Forced-id boot probe (14z-65) | `tools/force_pick_probe.sh <rompath> <id> <out>` — pokes the commit field across commit->load; verdicts id-hold/load/guard. Validated: vanilla ids load, variant 0x10 wedges on the stage-4 ladder |
 | Structural diff | `tools/diff_sets.py` (`--mask-pointers`) |
 | Character tables atlas | `docs/atlas/character_tables.md` (3-set anchor, slot maps, D/H/P located, pipelines) |
 | RAM atlas | `docs/atlas/ram.md` |

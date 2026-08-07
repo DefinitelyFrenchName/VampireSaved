@@ -190,6 +190,29 @@ The R1 loop ran two rounds (byte detail: patch_notes 14z-65 (4)):
   and turns the 23 into a measured worklist; then the farm triage; then
   stage gates + flavor wiring (D1 provisionally VS2).
 
+### 14z-65 — the forced-boot probe: variant-id char-load WEDGES (measured,
+### instrument validated)
+
+NEW instrument `tools/force_pick_probe.sh` (vanilla select flow, confirm
+at default cell, POKE $FF8782 — the commit field — across the
+commit->load window; verdicts: id-hold / load / guard):
+- id 0x10 on the hui4 stage-4 build: the poke HOLDS through the VS
+  window ($FF8782 = 0x10 at f2000+f2600), but by f3600 P1's struct is
+  ZEROED — the char-load path WEDGES silently (no crash, guard clean,
+  no tripwire fired: the load never reaches ported code).
+- POSITIVE CONTROL (verdict-logic doctrine): the same probe with
+  vanilla id 0x05 LOADS that character ($FF8460 = 0x9EFE6) — the
+  instrument is sound; the wedge is REAL and variant-id-specific.
+- NEXT SESSION, in order: (1) ARCHAEOLOGY FIRST — donovan-m3a boots id
+  0x13, so the wedge-freeing piece exists among his variant-id rows;
+  diff donovan.toml's stage-5/6 variant machinery (code_word slot rows,
+  aux_pokes, the id_space fixes) against what hui4 lacks, and probe
+  0x13 on the m3a build / 0x10 on it as cross-checks. (2) Only if
+  archaeology fails: GUARD_PC_LOG diff (control vs 0x10) over the
+  f2600-3600 load window to find the wedge site. (3) The wedge site
+  likely IS one of the seven id-fold sites or a 16-wide table read —
+  the fold census (id_space.md) is the suspect list.
+
 Updated: 2026-08-06 (session 14z-64 — M3a COMPLETE AND FROZEN. The
 maintainer ratified the re-freeze bundle ("freeze"): the WIDE reference
 is now donovan-m3a = 4b7d0dc7 (tenant at native 0x13 by default, Jedah

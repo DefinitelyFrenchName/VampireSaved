@@ -40,15 +40,20 @@ GEN_FLAGS="--profile cps2-wide-v1" tools/build_donovan.sh 3 build/hui3
 
 ## The road (docs/M3b_plan.md; sequencing adjusted 14z-65)
 
-1. **Huitzil stage 4 (code + engine hooks) — the R1 loop in earnest.**
-   His census starts at `0x55478` (driver DEFAULT_ROOTS for 0x10);
-   expect: more engine-consumed dispatch routines below 0x57000 (the
-   appended zone reaches 0x054xxx), his types among the tripwired
-   secondary handlers 64-75 + companion 121-123 (vs2 addresses recorded
-   in build/m5_wide/patch/patch_notes_fragment.md:213-244), the state
-   stubs 0xBC-0xC8 he writes, his reaction ids, and the UNDECODED
-   vs2-only `jsr $8ACD8` at his handler head (decode it — candidate
-   flavor/aux init). Flavor wiring needs decision D1.
+1. **Huitzil stage 4 BUILDS (94f89571) — next: free the variant-id
+   char-load wedge.** The R1 loop ran (census: 0x55478, the velocity
+   rings 0xd143e+0x900, the shared zones with x088512 at its TRUE
+   0x3B40 extent; 0x8ACD8 = his aux init in the shared zone, mystery
+   closed; 23 classified tripwires remain — STATE 14z-65). The
+   forced-boot probe (`tools/force_pick_probe.sh`, VALIDATED with a
+   vanilla-id control) shows the char-load path WEDGES silently at id
+   0x10 on the ladder build. ARCHAEOLOGY FIRST: donovan-m3a boots 0x13,
+   so diff his variant-id manifest rows against hui4 before any PC
+   tracing; the id-fold census is the suspect list. Then: the sound-farm
+   five (M5-style triage, never blind-resolve), companion family by
+   guarded runs, flavor wiring (D1 = VS2 provisionally, maintainer
+   2026-08-07; final after a playtestable build + a written "flavor
+   differences to hunt for" note from the fork-consumer measurement).
 2. **Phase 2 — the multi-tenant merge** (docs/M3b_plan.md Phase 2):
    unify two WORKING single-tenant builds in one generator process.
    Known hazards on record: shared-span region dedup (H's +0x30 region
