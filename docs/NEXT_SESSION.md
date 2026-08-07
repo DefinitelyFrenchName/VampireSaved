@@ -56,6 +56,7 @@ tests/test_hui_walk.sh  [build]         # velocity port
 tests/test_hui_air.sh   [build]         # float + air dash signatures
 tests/test_hui_grab.sh  [build]         # Circuit Scrapper native datum
 tests/test_hui_pairs.sh [build]         # RW GC + Dark Force
+tests/test_hui_oracle.sh [rompath]      # THE oracle battery (4 locks, ~10 min)
 tools/run_hui_behavior.sh               # interactive (build/hui4)
 ```
 
