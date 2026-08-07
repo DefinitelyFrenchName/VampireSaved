@@ -70,15 +70,14 @@ DEFAULT_ROOTS="$DEFAULT_ROOTS,0x6717c:0x154:t0x671b0"
 case "$TENANT_CHAR" in
     0x13) : ;;   # Donovan's census above
     0x10)
-        # Huitzil census (14z-65, ladder): 0x55478 = his tail_code_ptr
-        # row's engine-consumed routine — appended newcomer-support code
-        # BELOW the 0x57000 window (the appended zone reaches 0x054xxx,
-        # measured; docs/atlas/character_tables.md piecewise section).
+        # Huitzil census (14z-65, ladder): the widened NEWCOMER_CODE
+        # window (0x54000+) absorbs his low handler zone incl. the old
+        # 0x55478 root — his "code" region now spans it natively.
         # 0xd143e = the 18-ring velocity-vector family (0x80 B/ring,
         # radius-indexed sin/cos pairs) his code bases at 0xd15be —
         # vs2-only bank data (the vsavj delta candidate is zeros);
         # structure-bounded, sibling-identical, twin at -0x76e.
-        DEFAULT_ROOTS="0x55478,0xd143e:0x900:t0xd0cd0:d"
+        DEFAULT_ROOTS="0xd143e:0x900:t0xd0cd0:d"
         # The SHARED newcomer-support zones from Donovan's census — H's
         # code references the same zones (measured 14z-65: 0x5DF74 sits in
         # x05c800, his handler-head jsr 0x8ACD8 and 0x8A5A8 sit in the

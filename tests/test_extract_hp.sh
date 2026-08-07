@@ -31,15 +31,23 @@ import json, sys
 m = json.load(open(sys.argv[1]))
 r = m["regions"]
 c = r["code"]
-assert (c["src"], c["len"]) == (0x57020, 0x436), f"code region moved: {c}"
-assert c["ins"] == [[0x430, 0x436]], f"insertion sliver moved: {c['ins']}"
+# re-frozen 14z-65 after the NEWCOMER_CODE widening (0x54000+): the code
+# region now covers his full low handler zone (13 dispatch rows live
+# there); the 6-byte insertion sliver is at its END (his dispatch_00
+# handler head), and two 0x20-byte dead filler zones ride inside.
+assert (c["src"], c["len"]) == (0x54C90, 0x27C6), f"code region moved: {c}"
+assert c["ins"] == [[0x27C0, 0x27C6]], f"insertion sliver moved: {c['ins']}"
+assert len(c["dead"]) == 2, f"dead zones changed: {c['dead']}"
 assert m["shifts"]["code"] == 0x36, m["shifts"]
 s = r["x057456"]
 assert (s["src"], s["len"]) == (0x57456, 0x5200), f"x057456 moved: {s}"
 assert m["shifts"]["x057456"] == 0x30, m["shifts"]
 assert len(s["dead"]) == 1 and s["dead"][0][1] - s["dead"][0][0] == 0xC, s["dead"]
 assert len(s["charid_sites"]) == 1, s["charid_sites"]
-print("  ok: Huitzil shapes frozen (insertion sliver, +0x30 group, charid site)")
+d = {e["table"]: e["src_target"] for e in m["dispatch"]}
+assert d.get("dispatch_07") is None, "dispatch_07 must stay out-of-window (engine-space per-char row, alias-rule territory)"
+assert len(d) == 19, f"in-window dispatch rows: {len(d)} (want 19)"
+print("  ok: Huitzil shapes re-frozen (wide window, 19 in-window rows, sliver at end)")
 PY
 
 echo "== 0x11 Pyron extraction"

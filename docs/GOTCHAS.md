@@ -1969,3 +1969,24 @@ Rules:
   GUARD_BREAK on the handler entry, or GUARD_TRACE under -debug.
 - The probe's "load ZEROS" verdict has been renamed accordingly
   (WEDGED-or-REBOOTED); force_pick_probe now also snapshots.
+
+## The vanilla-alias assumption fails where per-char rows hide in engine
+## space — and a window constant is a census, not a fact (14z-65)
+
+Two traps from the Huitzil specials hunt, both silent-by-nature:
+- NEWCOMER_CODE (0x057000+) was Donovan-era triage. Huitzil's handler
+  zone starts at 0x054C9C — with the narrow window, 13 of his dispatch
+  rows classified as "veteran rows" (engine_dispatch), were never
+  repointed, and vanilla's row-0x10 aliases served BULLETA's handlers
+  for his special-move dispatches: no crash, no divergence, just moves
+  that never come out. A window constant must be re-derived per tenant.
+- dispatch_07 is PER-CHARACTER even though every row targets engine
+  space (Bulleta 0x2D68E, Demitri 0x30B9A, Huitzil 0x23AFE): "target is
+  in shared engine code" does NOT imply "the alias row is correct". The
+  generator now compares the SOURCE game's row against its alias-char
+  row and repoints through the R1 map when they differ (Donovan-inert,
+  measured).
+Verification style that found both: parity instruments, not reading —
+the same probe on native vs2 and the port (predicate consultations
+matched 401=401 exactly; the state-byte tap showed native writing
+states the port never writes).

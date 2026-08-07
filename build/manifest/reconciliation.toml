@@ -151,10 +151,10 @@ note = "M5 RESTORED (14z-52): sfx id 0x142 -> vsavj same-id farm entry 0x047fe. 
 
 [[map]]
 vsav2 = 0x004ddc
-vsavj = 0x000000
-kind = "engine_data"
-status = "open"
-note = "-; refs: bare_long"
+vsavj = 0x02a7e0
+kind = "stubbed_sound"
+status = "verified"
+note = "H KEPT SILENT (14z-65): sfx id 0x73c (Huitzil voice-bank range) — vsavj same-id keys DIFFERENT multi-voice music-class content (keyons_vsavj vs keyons_vs2, measured). Restoring needs ported samples (M5 voice-bank decision). Fired at his init f2887."
 
 [[map]]
 vsav2 = 0x004df6
@@ -162,6 +162,13 @@ vsavj = 0x02a7e0
 kind = "stubbed_sound"
 status = "verified"
 note = "M5 KEPT SILENT (14z-52): sfx id 0x73e — sample ABSENT from vsav's (full) sample ROMs. Measured, docs/m5/don_id_plan.json; restoring it would play the wrong sound. Revisit only with ported samples (STATE decision: voice samples)."
+
+[[map]]
+vsav2 = 0x004e10
+vsavj = 0x000000
+kind = "engine_sub"
+status = "open"
+note = "-; refs: jsr"
 
 [[map]]
 vsav2 = 0x004e2a
@@ -172,17 +179,31 @@ note = "M5 KEPT SILENT (14z-52): sfx id 0x747 — sample ABSENT from vsav's (ful
 
 [[map]]
 vsav2 = 0x004e5e
-vsavj = 0x000000
-kind = "engine_sub"
-status = "open"
-note = "-; refs: jmp"
+vsavj = 0x02a7e0
+kind = "stubbed_sound"
+status = "verified"
+note = "H KEPT SILENT (14z-65): sfx id 0x749 — vsavj same-id keys DIFFERENT multi-voice content (measured). Revisit with ported samples."
 
 [[map]]
 vsav2 = 0x004e78
+vsavj = 0x02a7e0
+kind = "stubbed_sound"
+status = "verified"
+note = "H KEPT SILENT (14z-65): sfx id 0x74a — vsavj same-id keys DIFFERENT multi-voice content (measured). The FIRST tripwire his init hit (f2887)."
+
+[[map]]
+vsav2 = 0x004e92
 vsavj = 0x000000
 kind = "engine_sub"
 status = "open"
-note = "-; refs: jmp"
+note = "-; refs: jsr"
+
+[[map]]
+vsav2 = 0x004ec6
+vsavj = 0x000000
+kind = "engine_sub"
+status = "open"
+note = "-; refs: jsr"
 
 [[map]]
 vsav2 = 0x004f14
@@ -193,17 +214,24 @@ note = "M5 RESTORED (14z-52): sfx id 0x2d4 -> vsavj same-id farm entry 0x04a5e. 
 
 [[map]]
 vsav2 = 0x004f48
+vsavj = 0x02a7e0
+kind = "stubbed_sound"
+status = "verified"
+note = "H KEPT SILENT (14z-65): sfx id 0x743 — vsavj same-id keys DIFFERENT multi-voice content (measured). Revisit with ported samples."
+
+[[map]]
+vsav2 = 0x004f7c
 vsavj = 0x000000
-kind = "engine_data"
+kind = "engine_sub"
 status = "open"
-note = "-; refs: bare_long"
+note = "-; refs: jsr"
 
 [[map]]
 vsav2 = 0x004f96
-vsavj = 0x000000
-kind = "engine_data"
-status = "open"
-note = "-; refs: bare_long"
+vsavj = 0x02a7e0
+kind = "stubbed_sound"
+status = "verified"
+note = "H KEPT SILENT (14z-65): sfx id 0x72a — vsavj same-id keys DIFFERENT multi-voice content (measured). Revisit with ported samples."
 
 [[map]]
 vsav2 = 0x004fe4
@@ -850,6 +878,13 @@ status = "verified"
 note = "farm-helper-match; refs: bare_long"
 
 [[map]]
+vsav2 = 0x02910c
+vsavj = 0x029dd2
+kind = "engine_sub"
+status = "verified"
+note = "farm-helper-match; refs: jsr"
+
+[[map]]
 vsav2 = 0x029114
 vsavj = 0x029dda
 kind = "engine_sub"
@@ -1042,6 +1077,34 @@ status = "verified"
 note = "pattern-1.00-unique-w0x40; refs: jmp,jsr"
 
 [[map]]
+vsav2 = 0x05fa4e
+vsavj = 0x057792
+kind = "engine_data"
+status = "verified"
+note = "pattern-1.00-unique-w0x40; refs: bare_long"
+
+[[map]]
+vsav2 = 0x06764e
+vsavj = 0x000000
+kind = "engine_data"
+status = "open"
+note = "-; refs: bare_long"
+
+[[map]]
+vsav2 = 0x068e4a
+vsavj = 0x000000
+kind = "engine_data"
+status = "open"
+note = "-; refs: bare_long"
+
+[[map]]
+vsav2 = 0x06a832
+vsavj = 0x05e83c
+kind = "engine_sub"
+status = "verified"
+note = "callsite-anchored-x2; refs: jsr"
+
+[[map]]
 vsav2 = 0x06a9be
 vsavj = 0x05e9b4
 kind = "engine_data"
@@ -1061,6 +1124,13 @@ vsavj = 0x061ed4
 kind = "engine_sub"
 status = "verified"
 note = "pattern-1.00-unique-w0x30; refs: jmp,jsr"
+
+[[map]]
+vsav2 = 0x074270
+vsavj = 0x000000
+kind = "engine_data"
+status = "open"
+note = "-; refs: bare_long"
 
 [[map]]
 vsav2 = 0x080a1e
@@ -1098,6 +1168,13 @@ status = "open"
 note = "-; refs: jsr"
 
 [[map]]
+vsav2 = 0x09264e
+vsavj = 0x083d08
+kind = "engine_data"
+status = "verified"
+note = "pattern-1.00-unique-w0x40; refs: bare_long"
+
+[[map]]
 vsav2 = 0x09c4d6
 vsavj = 0x09190a
 kind = "engine_data"
@@ -1112,6 +1189,34 @@ status = "verified"
 note = "callsite-anchored-x5; refs: bare_long"
 
 [[map]]
+vsav2 = 0x0dac4e
+vsavj = 0x101412
+kind = "engine_data"
+status = "verified"
+note = "databytes-unique; refs: bare_long"
+
+[[map]]
+vsav2 = 0x0dec54
+vsavj = 0x000000
+kind = "engine_data"
+status = "open"
+note = "-; refs: bare_long"
+
+[[map]]
+vsav2 = 0x0dfa4e
+vsavj = 0x106206
+kind = "engine_data"
+status = "verified"
+note = "databytes-unique; refs: bare_long"
+
+[[map]]
+vsav2 = 0x0f404e
+vsavj = 0x000000
+kind = "engine_data"
+status = "open"
+note = "-; refs: bare_long"
+
+[[map]]
 vsav2 = 0x12f484
 vsavj = 0x000000
 kind = "engine_data"
@@ -1119,11 +1224,25 @@ status = "open"
 note = "-; refs: bare_long"
 
 [[map]]
+vsav2 = 0x130610
+vsavj = 0x13dc36
+kind = "engine_data"
+status = "plausible"
+note = "pattern-1.00-w0x40; refs: bare_long"
+
+[[map]]
 vsav2 = 0x1373c6
 vsavj = 0x14492c
 kind = "engine_data"
 status = "verified"
 note = "pattern-1.00-unique-w0x40; refs: bare_long"
+
+[[map]]
+vsav2 = 0x13f64e
+vsavj = 0x151fd8
+kind = "engine_data"
+status = "plausible"
+note = "pattern-1.00-w0x40; refs: bare_long"
 
 [[map]]
 vsav2 = 0x167bf4
@@ -1196,7 +1315,35 @@ status = "open"
 note = "-; refs: bare_long"
 
 [[map]]
+vsav2 = 0x26824e
+vsavj = 0x1158a0
+kind = "engine_data"
+status = "plausible"
+note = "pattern-0.93-w0x40; refs: bare_long"
+
+[[map]]
 vsav2 = 0x2695d0
+vsavj = 0x000000
+kind = "engine_data"
+status = "open"
+note = "-; refs: bare_long"
+
+[[map]]
+vsav2 = 0x26cc4e
+vsavj = 0x000000
+kind = "engine_data"
+status = "open"
+note = "-; refs: bare_long"
+
+[[map]]
+vsav2 = 0x271e4e
+vsavj = 0x000000
+kind = "engine_data"
+status = "open"
+note = "-; refs: bare_long"
+
+[[map]]
+vsav2 = 0x27844e
 vsavj = 0x000000
 kind = "engine_data"
 status = "open"
@@ -1690,36 +1837,8 @@ status = "verified"
 note = "pool-family helper; skeleton-match at family delta +0x18B8"
 
 [[map]]
-vsav2 = 0x004ddc
-vsavj = 0x02a7e0
-kind = "stubbed_sound"
+vsav2 = 0x023afe
+vsavj = 0x024ea4
+kind = "engine_sub"
 status = "verified"
-note = "H KEPT SILENT (14z-65): sfx id 0x73c (Huitzil voice-bank range) — vsavj same-id keys DIFFERENT multi-voice music-class content (keyons_vsavj vs keyons_vs2, measured). Restoring needs ported samples (M5 voice-bank decision). Fired at his init f2887."
-
-[[map]]
-vsav2 = 0x004e5e
-vsavj = 0x02a7e0
-kind = "stubbed_sound"
-status = "verified"
-note = "H KEPT SILENT (14z-65): sfx id 0x749 — vsavj same-id keys DIFFERENT multi-voice content (measured). Revisit with ported samples."
-
-[[map]]
-vsav2 = 0x004e78
-vsavj = 0x02a7e0
-kind = "stubbed_sound"
-status = "verified"
-note = "H KEPT SILENT (14z-65): sfx id 0x74a — vsavj same-id keys DIFFERENT multi-voice content (measured). The FIRST tripwire his init hit (f2887)."
-
-[[map]]
-vsav2 = 0x004f48
-vsavj = 0x02a7e0
-kind = "stubbed_sound"
-status = "verified"
-note = "H KEPT SILENT (14z-65): sfx id 0x743 — vsavj same-id keys DIFFERENT multi-voice content (measured). Revisit with ported samples."
-
-[[map]]
-vsav2 = 0x004f96
-vsavj = 0x02a7e0
-kind = "stubbed_sound"
-status = "verified"
-note = "H KEPT SILENT (14z-65): sfx id 0x72a — vsavj same-id keys DIFFERENT multi-voice content (measured). Revisit with ported samples."
+note = "hand (14z-65): Huitzil's dispatch_07 row target — a per-char SUBSTATE dispatcher in engine space (per-char rows even there: Bulleta 0x2D68E, Demitri 0x30B9A). find_equiv 0.95 unique; the 8 diff bytes are four pc-rel words drifting uniformly (sibling operand drift). The vanilla row-0x10 alias served BULLETA's dispatcher — part of the specials-never-trigger chain."

@@ -52,7 +52,13 @@ import scan_code_refs  # noqa: E402
 from _minitoml import loads as toml_loads  # noqa: E402
 
 VSAVJ_ORIGIN = 0x0BD0FA
-NEWCOMER_CODE = (0x057000, 0x05D000)  # appended newcomer handler window
+# The appended newcomer handler window. 0x057000 was Donovan-era triage:
+# HUITZIL'S handler zone starts at 0x054xxx (13 of his dispatch rows target
+# 0x54C9C-0x56D84, all +0x36 — measured 14z-65; with the narrow window they
+# classified as veteran rows, were never repointed, and Bulleta's aliases
+# served his specials: silent no-trigger). Donovan has NO targets in
+# [0x54000,0x57000) (measured), so widening is inert for his extraction.
+NEWCOMER_CODE = (0x054000, 0x05D000)
 SIM_CHUNK = 0x100
 SIM_THRESHOLD = 0.90
 ANIM_CAP = 0x30000

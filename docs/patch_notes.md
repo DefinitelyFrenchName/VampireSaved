@@ -2,6 +2,35 @@
 
 Newest first.
 
+## 14z-65 (6) — the specials hunt: window widened, alias rule, farm verified (2026-08-07)
+
+Build acda6946 (ladder). Native ground truth (vs2 + the same forced-pick
+probe = native Phobos firing Plasma Beams on our exact soak inputs)
+proved the port's specials never trigger. The chain so far, each link
+measured:
+- NEWCOMER_CODE widened to 0x054000 (Donovan-inert, measured): 13 of
+  his dispatch rows lived below the old window as unrepointed "veteran"
+  rows — Bulleta's aliases served his special dispatches. His code
+  region is now 0x54C90+0x27C6 (re-frozen in test_extract_hp.sh; the
+  old x055478 root absorbed; layout group now "code,x057456").
+- 18 farm rows content-verified at the correct 8-byte record
+  granularity (the 16-byte compare crossed into neighbor records — a
+  false MISMATCH; and params must be read via the DATA view, the
+  opcode view shows decrypt-garble). One new row 0x2910c -> 0x29dd2.
+- dispatch_07 alias rule (NEW generator pass): per-char rows exist in
+  ENGINE space; when the source game's row differs from its alias-char
+  row, repoint via the R1 map. Huitzil: 0x23AFE -> vsavj 0x24EA4
+  (hand-verified twin, GOTCHAS).
+- FRONTIER, precisely bounded: predicate consultation parity is EXACT
+  (401 hits native = 401 ours on the same entry over the same soak);
+  the state-byte tap still shows the port writing NO nonzero states
+  while native writes 0x06/0x16. The divergence is INSIDE or AFTER the
+  predicate match: next instruments are the predicate common's verdict
+  path and the input-history feed the matcher reads — and first,
+  verify WHAT native writes those states (special launch vs reaction).
+All gates green (m3a reproducible, ladder, boot, extraction shapes
+re-frozen).
+
 ## 14z-65 (5) — HUITZIL BOOTS: first match on the vsavj engine (2026-08-07)
 
 Fingerprint 9252ce62 (stage-4 ladder build; not a frozen reference). The

@@ -55,7 +55,7 @@ flavor_hold_flag = 0xFF8060
 # x055478 rides along: its tail routines end near its bound and its jmp
 # into x057456 then keeps its source displacement.
 [[layout_group]]
-regions = "x055478,code,x057456"
+regions = "code,x057456"
 
 # ── ADDRESS-SPACE MODEL — same shape as donovan.toml's; duplicated for the
 # single-tenant ladder. The M3b Phase 2 multi-tenant merge hoists this into

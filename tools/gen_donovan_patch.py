@@ -1526,6 +1526,42 @@ def main():
                 av, _ = table_entry_addr(a_t["table"], var_slot)
                 poke_bytes(av, data, f"{a_t['table']}[{var_slot:#x}] mirror")
 
+    # ── engine_dispatch rows (14z-65): out-of-window dispatch rows were
+    # assumed vanilla-alias-correct — measured WRONG for Huitzil:
+    # dispatch_07 is per-char even in engine space (his 0x23AFE vs
+    # Bulleta's 0x2D68E), so the vanilla row-0x10 alias served BULLETA's
+    # substate dispatcher — one link of the specials-never-trigger chain.
+    # Rule: when the SOURCE game's row for src_char differs from its row
+    # for the alias char (dst_slot & 0x0F), the alias is wrong — repoint
+    # the tenant's row at the recon-verified vsavj twin. Donovan-inert
+    # (measured: all his engine_dispatch rows equal their alias rows).
+    if args.stage >= 4:
+        def _src_u32(a):
+            return int.from_bytes(src_data_img[a:a + 4], "big")
+        for e in man.get("engine_dispatch", []):
+            tn = e["table"]
+            t = bank[tn]
+            es = (t["span"] // 32) if t["kind"] == "byte2d" else (t["stride"] // 32)
+            base_src = src_bank_origin + (_int(t["vsavj"]) - VSAVJ_ORIGIN)
+            own = _src_u32(base_src + _int(port["port"]["src_char"]) * es)
+            alias = _src_u32(base_src + (dst_slot & 0x0F) * es)
+            if own == alias:
+                continue
+            m_ = recon.get(own)
+            ok = m_ and (m_.get("status") == "verified"
+                         or (args.allow_plausible
+                             and m_.get("status") == "plausible"))
+            if not ok:
+                fail.append(f"engine_dispatch {tn}: the tenant's row "
+                            f"{own:#x} differs from the alias char's "
+                            f"{alias:#x} — needs a verified reconciliation "
+                            f"row (the vanilla alias serves the WRONG "
+                            f"handler)")
+                continue
+            repoint(tn, _int(m_["vsavj"]),
+                    f"engine twin of {own:#x} (alias char row {alias:#x} "
+                    f"differs)")
+
     for ph in (port.get("obj_hook", []) if args.stage >= 4 else []):
         site = _int(ph["site"])
         vtab = _int(ph["vanilla_table"])
