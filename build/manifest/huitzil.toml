@@ -161,6 +161,66 @@ src_entries = 124
 # RESTORE AT THE GFX/NATIVE-SHADOW PASS: the same site redirects
 # out-of-range seqs to an EXTENDED table (vs2 rows ported) instead of
 # clamping.
+# ── FG capture-pose table reroute (14z-66, THE third FG crash — the
+# maintainer's "a bit later after the capture"): his FG picks each
+# barrage hit's victim capture pose RANDOMLY — seq = table16[rand&15],
+# the 16-byte table embedded IN HIS CODE at vs2 0x56074 and read as
+# DATA (`lea (0x26,pc),a1; move.b (a1,d0.w),d0`). The code region sits
+# in the crypt hole, where placed bytes are stored re-encrypted for
+# opcode fetches — the runtime DATA read saw garbage (0xFF drawn where
+# native reads 01/03/05), and the garbage seq over-ran the VICTIM's
+# per-char capture table (vanilla sets at 0xBCE7A+, the Midnight-Bliss
+# family) -> vec3 with per-victim/per-draw signatures. Random draw =
+# why casts sometimes survived. data_in_code relocates the DATA-view
+# bytes to a raw hole and reroutes the reader (ghost-clean jsr+nop).
+[[data_in_code]]
+region = "code"
+table = 0x056074
+table_len = 16
+reader = 0x05604C
+reader_old_hex = "43fa002610310000"
+note = "FG capture-pose random table (native draws seqs 1/3/5)"
+
+# The census (14z-66: scan of all crypt-placed regions for the
+# lea(pc)+read-(An,Xn) shape with an in-region target) found FOUR more
+# instances of the same class — rerouted preemptively before any
+# playtest finds them. The two 0x56/0x59 tables are the FG family's
+# second pose set; 0x564AC duplicates the 01/03/05 content; the
+# x088512 one is a word offset/record table the POD code both indexes
+# AND re-derives a pointer from (self-relative offsets reach +0x78+,
+# hence the generous copy span).
+[[data_in_code]]
+region = "code"
+table = 0x056064
+table_len = 16
+reader = 0x056020
+reader_old_hex = "43fa004210310000"
+note = "FG capture-pose table 2 (seqs 0x56-0x59)"
+
+[[data_in_code]]
+region = "code"
+table = 0x05649C
+table_len = 16
+reader = 0x056458
+reader_old_hex = "43fa004210310000"
+note = "capture-pose table 3 (seqs 0x56-0x59 twin)"
+
+[[data_in_code]]
+region = "code"
+table = 0x0564AC
+table_len = 16
+reader = 0x056484
+reader_old_hex = "43fa002610310000"
+note = "capture-pose table 4 (01/03/05 twin)"
+
+[[data_in_code]]
+region = "x088512"
+table = 0x08C042
+table_len = 0x100
+reader = 0x08BFF6
+reader_old_hex = "47fa004a30330000"
+note = "pod-zone word offset/record table (a3 re-derived from it; self-relative)"
+
 [[site_thunk]]
 stage = 4
 name = "shadow_seq_guard"

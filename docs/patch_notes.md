@@ -2048,3 +2048,45 @@ Measured fixed: replay 77 (whiff/mid FG) guard-clean END 4720, stock
 9->8, snapshots show the full native sequence (FIRST ATTACK -> the
 7-HIT barrage, matching native's hit count). test_hui_ex.sh gained
 replay 77 as section 3.
+
+## Session 14z-66 — the THIRD FG crash: embedded data tables in
+## crypt-placed code (data_in_code mechanism + census)
+
+Maintainer round 3: FG "still crash-resets, a bit later after the
+capture" on 44be1266 (the shadow guard held — this was a THIRD site).
+Repro (after plain/kill/victim variants stayed clean): FG + a
+deterministic post-capture chaos block (replay 78) — vec3 f3892 at PC
+0xC8156, inside the ported x026142 copy: the capture-victim anim
+installer walking a VANILLA per-victim capture table (the 0xBCE7A+
+Midnight-Bliss-family sets) with seq D0=0xFF.
+
+Root (trace-caught, the whole chain): his FG picks each barrage hit's
+victim pose RANDOMLY — seq = table16[rand&15] via engine RNG 0x14E8A —
+from a 16-byte DATA table EMBEDDED IN HIS CODE (vs2 0x56074, read
+`lea (0x26,pc),a1; move.b (a1,d0.w),d0`). The code region sits in the
+crypt hole: placed bytes are stored re-encrypted for opcode fetches,
+so the runtime DATA read saw garbage — 0xFF drawn where native reads
+01/03/05 (vs2 data view: 01050305050305010305010505010503). Garbage
+seqs over-ran the victims' capture tables with per-victim/per-draw
+crash signatures; safe draws = clean casts. THE RANDOM DRAW is why
+three repro campaigns produced three different-looking crashes and
+several clean runs.
+
+Fix: NEW generator mechanism [[data_in_code]] (generalized 14z-20
+class, region form): relocates the table's SOURCE-DATA-VIEW bytes to a
+raw hole and reroutes the placed reader through a 12-byte helper
+(lea abs,An + the verbatim read op + rts; site = jsr helper + nop —
+ghost-clean, the read op sets NZ identically). Supported shape:
+lea(d16,pc),An + any move.b/w/l via (An,Xn.w).
+
+CENSUS (the class had bitten three times, so: scan of ALL crypt-placed
+region bytes for the shape with in-region targets): FIVE instances —
+the FG table + 0x56064/0x5649C (the 0x56-0x59 pose set), 0x564AC
+(01/03/05 twin), and x088512's 0x8C042 (a word offset/record table the
+POD code re-derives a3 from; self-relative, copied 0x100). All five
+rerouted in one build. Fingerprint 4317353c; helpers/tables in hole_b.
+
+Measured: replay 78 clean in BOTH timelines; full battery GREEN
+(boot masked-v2 EXACT — the reroutes are tenant-code-only; m3a
+bit-exact — the mechanism is manifest-driven, Donovan has no rows).
+Gate: test_hui_ex.sh section 4 (replay 78 + stock assertion).

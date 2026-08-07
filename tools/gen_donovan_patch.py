@@ -999,6 +999,75 @@ def main():
                 notes.append(f"# {name}+{off:#x}: port_patch {pp['old_hex']} "
                              f"-> {_nh} ({pp['note']})")
 
+            # data_in_code (14z-66): a small DATA table embedded in a CODE
+            # region placed in the crypt hole is stored re-encrypted, so
+            # opcode fetches through it decrypt fine but runtime DATA READS
+            # see garbage (the 14z-20 class in region form — found via the
+            # FG capture-pose random table: draws like 0xFF over-ran every
+            # victim's capture table). Each row relocates the table's
+            # SOURCE-DATA-VIEW bytes to a RAW hole and reroutes the
+            # region's reader through a 12-byte helper there. The only
+            # supported reader shape is `lea (d16,pc),a1 + move.b
+            # (a1,d0.w),d0` (8 bytes -> jsr helper + nop): lea sets no
+            # flags and the helper's move.b sets NZ exactly like the
+            # displaced one, so the reroute is ghost-clean.
+            for dc in port.get("data_in_code", []):
+                if dc["region"] != name:
+                    continue
+                if args.stage < _int(dc.get("stage", 4)):
+                    continue
+                t_src, t_len = _int(dc["table"]), _int(dc["table_len"])
+                rd_src = _int(dc["reader"])
+                rd_off = rd_src - r["src"]
+                dold = bytes.fromhex(dc["reader_old_hex"])
+                _lw = int.from_bytes(dold[0:2], "big") if len(dold) == 8 else 0
+                _rw = int.from_bytes(dold[4:6], "big") if len(dold) == 8 else 0
+                _an = (_lw >> 9) & 7
+                # shape: lea (d16,pc),An then a read whose EA is (An,Xn.w)
+                # (mode 6, reg An) — the read op + its brief extension word
+                # are copied verbatim into the helper, so any size/index
+                # register works as long as it consumes the lea'd An.
+                if (len(dold) != 8 or (_lw & 0xF1FF) != 0x41FA
+                        or (_rw & 0x0038) != 0x0030 or (_rw & 7) != _an
+                        or (_rw >> 12) not in (1, 2, 3)):
+                    fail.append(f"data_in_code {dc['note']}: reader_old_hex "
+                                f"must be lea(d16,pc),An + a move read via "
+                                f"(An,Xn.w)")
+                    continue
+                if not (0 <= rd_off < r["len"]) or blob[rd_off:rd_off + 8] != dold:
+                    fail.append(f"data_in_code {dc['note']}: bytes at "
+                                f"{name}+{rd_off:#x} != reader_old_hex")
+                    continue
+                disp = int.from_bytes(dold[2:4], "big", signed=True)
+                if rd_src + 2 + disp != t_src:
+                    fail.append(f"data_in_code {dc['note']}: lea targets "
+                                f"{rd_src + 2 + disp:#x}, row says {t_src:#x}")
+                    continue
+                tbl_bytes = src_data_img[t_src:t_src + t_len]
+                dc_hole = dc.get("hole", "b")
+                ta = alloc(dc_hole, t_len, f"data_in_code table")
+                ha = alloc(dc_hole, 12, f"data_in_code helper")
+                if ta is None or ha is None:
+                    continue
+                ops.append({"op": "data", "addr": f"{ta:#x}",
+                            "hex": tbl_bytes.hex()})
+                helper = ((0x41F9 | (_an << 9)).to_bytes(2, "big")
+                          + ta.to_bytes(4, "big")
+                          + dold[4:8] + bytes.fromhex("4e75"))
+                ops.append({"op": "code", "addr": f"{ha:#x}",
+                            "hex": helper.hex()})
+                blob[rd_off:rd_off + 8] = (bytes.fromhex("4eb9")
+                                           + ha.to_bytes(4, "big")
+                                           + bytes.fromhex("4e71"))
+                notes.append(f"# {name}+{rd_off:#x}: data_in_code reroute -> "
+                             f"helper {ha:#08x}, table {ta:#08x} (DATA view "
+                             f"of {man['src_set']} {t_src:#08x}; "
+                             f"{dc['note']})")
+                fragments.append((ta, t_len, "VS2",
+                                  f"data_in_code table ({dc['note']})"))
+                fragments.append((ha, 12, "GEN",
+                                  f"data_in_code helper ({dc['note']})"))
+
             # M2b gfx remap (donovan.toml [gfx_remap], stage-gated): walk
             # the OBJ records in this region (tools/obj_records.py format,
             # decoded session 14) and shift main-band tile words by the

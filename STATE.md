@@ -15,6 +15,41 @@ engine-site thunk live. build/hui4 at 44be1266 = ping #3 with items
 
 ## Session 14z-66 (playtest round-1 worklist)
 
+### ROUND 3: the THIRD FG crash — embedded data-in-code tables; the
+### class censused and closed (5 reroutes, one mechanism)
+
+Maintainer: FG still crash-reset "a bit later after the capture" on
+44be1266. The hunt (variants: plain/kill/CPU-victim sweeps clean; a 2P
+victim sweep was INVALID — select-window pokes leak into the 2P flow's
+commit handling, noted for replay authoring) landed with the
+post-capture CHAOS replay: his FG draws each barrage hit's victim
+capture pose RANDOMLY from a 16-byte table EMBEDDED IN HIS CODE — and
+crypt-hole placement stores code re-encrypted, so runtime DATA reads
+of the table saw garbage (native draws 01/03/05; ours drew 0xFF...).
+Garbage seq -> the victim's vanilla capture table (0xBCE7A+ sets,
+Midnight-Bliss family) over-runs -> per-victim/per-draw vec3s. THE
+RANDOMNESS explains every confusing symptom: clean casts, drifting
+crash frames, three different-looking crash signatures.
+
+- NEW mechanism [[data_in_code]] (the 14z-20 gotcha in region form,
+  now handled generically): relocate the table's SOURCE-DATA-VIEW
+  bytes to a raw hole, reroute the reader via a ghost-clean 12-byte
+  helper (jsr+nop over the 8-byte lea(pc)+read pair). Shape-checked;
+  any (An,Xn.w) read size.
+- CENSUS: the class had bitten 3x (pod first-tick, farm params, FG),
+  so all crypt-placed region bytes were scanned for the shape — FIVE
+  instances, ALL rerouted preemptively (the FG table, its 3 pose-set
+  siblings in "code", and x088512's pod offset/record word table).
+- Build 4317353c: replay 78 (FG + post-capture chaos) clean in BOTH
+  timelines; full battery GREEN (boot masked-v2 EXACT; m3a bit-exact
+  — mechanism is manifest-driven, Donovan rowless). Gate:
+  test_hui_ex.sh section 4. build/hui4 refreshed (ping #4).
+- WATCH ITEM: the same census should run for DONOVAN's regions at his
+  next re-freeze (his crypt-placed code may embed tables the same way
+  — his playtests never crashed there, but "never crashed" was H's
+  state too until the FG). The census scan is in the session log;
+  promote to a tools/ script when it runs for Donovan.
+
 ### ROUND 2 (maintainer): speed CONFIRMED better; ES CONFIRMED fixed;
 ### FG STILL CRASHES — second site found and characterized
 

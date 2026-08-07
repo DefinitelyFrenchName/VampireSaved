@@ -82,4 +82,26 @@ run_ex 73_hui_ex_fg_close.rpl fg 4600
 echo "== Final Guardian 623+2K, mid range / full sequence (replay 77)"
 run_ex 77_hui_fg_whiff.rpl fgw 4400
 
-echo "PASS: Huitzil EX moves (all three fire, guard clean)"
+# The round-3 hole (14z-66): the FG capture-pose tables are DATA
+# embedded in crypt-placed code — reads drew garbage seqs (random per
+# draw, so single casts sometimes survived). The data_in_code reroutes
+# are the fix; this section soaks the FG + post-capture aftermath.
+echo "== Final Guardian + post-capture chaos (replay 78)"
+dir="$WORK/fgc"; mkdir -p "$dir"
+( cd "$dir" && \
+  POKES="1704:ff8782:10;1760:ff8782:10;1900:ff8782:10;2100:ff8782:10;2400:ff8782:10;3000:ff8509:09;4000:ff8509:09" \
+  DUMPS="3200:ff8500-ff8510;3900:ff8500-ff8510" \
+  MAME_ROMPATH="$BUILD/rompath;$ROMDIR" \
+  "$REPO/tools/run_replay_guarded.sh" vsavjw "$REPO/tests/replays/hui/78_hui_fg_chaos.rpl" \
+      "$dir/g.log" "$dir/box" > "$dir/g.out" 2>&1 ) || {
+    echo "FAIL: fg-chaos guard tripped:"
+    grep -m2 -E "CRASH|REGS" "$dir/g.log" || tail -5 "$dir/g.out"
+    exit 1
+}
+pre="$(xxd -p -s 9 -l 1 "$dir/dump_3200_ff8500.bin")"
+post="$(xxd -p -s 9 -l 1 "$dir/dump_3900_ff8500.bin")"
+[ "$pre" = "09" ] || { echo "FAIL: fg-chaos stock poke missing (pre=$pre)"; exit 1; }
+[ "$post" != "09" ] || { echo "FAIL: fg-chaos no stock consumed — FG never fired"; exit 1; }
+echo "  ok: fg-chaos guard clean through the aftermath (stock 09 -> $post)"
+
+echo "PASS: Huitzil EX moves (all fire, guard clean incl. capture aftermath)"
