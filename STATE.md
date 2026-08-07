@@ -263,6 +263,33 @@ the matcher reads (his +0x3xx input ring — if the recorder dispatch
 row feeding it is another wrong alias, the matcher sees an empty
 ring). Builds: acda6946 current ladder; all gates green.
 
+### 14z-65 — f4983 SOLVED: the un-hooked type dispatch (trace-caught);
+### frontier moves to the spark/effect remap at his pod's first tick
+
+THE TRACE (GUARD_TRACE in the same -debug timeline as the crash — the
+lesson: plain-vs-guard timelines DIVERGE, tap evidence across them is
+apples/oranges) caught the fatal jump verbatim: the object walker at
+0x5E534 read the spawned pod's TYPE byte (+0x02 = 0x73 = type 115;
++0x03 = owner id 0x10), indexed the VANILLA 114-entry companion type
+table at the UN-HOOKED site 0x5E542 (`movea.l ($12,PC,D0.w),A0`), and
+fetched CODE BYTES past the table (the 0x323B0006 "address" = a
+dispatcher opcode). huitzil.toml simply lacked the [[obj_hook]] rows —
+they lived in donovan.toml. Both rows added; vs2's table2 extras
+114-120 ALL resolve inside the ported x088512 zone (his pod handler
+0x897CC included ✓); 121-123 tripwire (other newcomers). The
+[[dispatch_keeper]] row REMOVED from his manifest: the f4983 spawn
+proved vs2-H has his OWN built-in keeper (the mechanism stays in the
+generator for tenants that need it). Also: the earlier "+0x02 handler
+word" readings of the FF02A0 records were WRONG — +0x02/+0x03 are
+TYPE/OWNER bytes; correct the mental model.
+NEW FRONTIER (execution now reaches deeper): vec3 at f2886 (init), PC
+0x1AFAC = the shared spark-spawner family reading odd 0xFCA3D — his
+pod's first-tick enqueues an effect whose id over-indexes a vanilla
+remap table (the 0x1A610 spark-remap family; Donovan's 14z-3 spark
+arc is the precedent). NEXT: decode the faulting read at 0x1AFAC
+(which table, what stride), find his effect id, extend/port per the
+Donovan effect-map pattern.
+
 ### 14z-65 — the Anita archaeology + the keeper mechanism; f4983 still
 ### standing after six instruments (fresh-instrument list for resume)
 
