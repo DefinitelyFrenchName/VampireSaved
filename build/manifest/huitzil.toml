@@ -60,9 +60,16 @@ latch_disp = 0x7966
 # head latch re-seeds LIVE pools at round-2 re-init (the f4890 wipe).
 latch_mode = "phase"
 objram_clear = false
+# 14z-66 FLAVOR POLARITY (measured, not assumed): NATIVE vs2 runs H
+# with +0x3C2 = 0x00 — his float body's `tst.b $3c2; beq` branch at
+# 0x259D4 is the VS2-DEFAULT behavior, the nonzero branch the OTHER
+# flavor. The original wiring copied Donovan's 0x01=VS2 convention and
+# selected the wrong branch (caught when the float landed: ours read
+# 0x01 where native reads 0x00). D1 (VS2 default) therefore means
+# flavor_default = 0x00 for H; Start-hold writes 0x01.
 flavor_disp = 0x3C2
-flavor_default = 0x01
-flavor_held = 0x00
+flavor_default = 0x00
+flavor_held = 0x01
 flavor_hold_flag = 0xFF8060
 
 # ── Layout group (14z-65, THE watchdog-reboot fix): the sibling-insertion
@@ -220,6 +227,45 @@ table_len = 0x100
 reader = 0x08BFF6
 reader_old_hex = "47fa004a30330000"
 note = "pod-zone word offset/record table (a3 re-derived from it; self-relative)"
+
+# ── Tenant jump-seq dispatch (14z-66, item 3 — float/air dash): vs2's
+# OWN engine head for the class-02 jump seq (vs2 0x213F2) routes by
+# char id — `cmpi #6 -> Anakaris's family; cmpi #$10 -> 0x2592A` — the
+# 0x2592A dispatcher IS Phobos's per-char jump handler (five
+# sub-states: 1 = the flavor-forked float/hover with the 0x78-frame
+# timer at +0x1C0, 3 = the +0x23-gated air action, 4 = the jump
+# restart). The x02592a region is that handler cloned whole (root in
+# build_donovan.sh). vsavj's twin head 0x22A0E carries only the
+# Anakaris test; this thunk displaces that 6-byte cmpi and reproduces
+# vs2's routing: tenant -> jmp the clone's dispatcher (region_subst,
+# +0); everyone else -> re-execute the Anakaris cmpi (allowlisted id
+# literal — a re-executed VANILLA compare, not a tenant gate) and jmp
+# back to the INTACT beq.w at 0x22A14, whose flags come from that
+# cmpi exactly as vanilla. jmp_ok: both paths re-enter by jmp only.
+# (First attempt hooked 0x26A76 = ANAKARIS's handler — the
+# content-twin trap: vsavj keeps a byte-identical copy of the generic
+# head inside his per-char family; the live generic handler is
+# 0x22A0E via the class-02 stepper 0x225C4. Measured: 0 thunk hits,
+# timer never armed.)
+# The clone's word-form pcrel escapes (35 unique targets, censused) get
+# trampolines in an adjacent pad; targets resolved by the jump-family
+# alignment rows in the overlay (+ x026142 via placement). 0x269ac stays
+# open/tripwired (operand-heavy helper, no pattern match yet).
+[[pcrel_escape_fix]]
+stage = 4
+region = "x02592a"
+pad = 0x120
+
+[[site_thunk]]
+stage = 4
+name = "tenant_jump_seq"
+site = 0x022A0E
+old_hex = "0c2e00060382"
+patch = "jmp"
+jmp_ok = true
+id_literal_ok = "0x06"
+region_subst = "jjjjjjjj=x02592a:0x0"
+thunk_hex = "0c2e00TT0382670c0c2e000603824ef900022a144ef9jjjjjjjj"
 
 [[site_thunk]]
 stage = 4

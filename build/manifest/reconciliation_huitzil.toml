@@ -207,3 +207,214 @@ vsavj = 0x000000
 kind = "engine_data"
 status = "open"
 note = "-; refs: bare_long"
+
+# ── 14z-66 item 3: the jump-handler family twins (x02592a escape
+# targets). Resolved by GENERIC-HANDLER ALIGNMENT (vs2 0x213F2-family
+# vs vsavj 0x22A0E-family, instruction-stream diff with operand
+# masking): all five previously-known pairs in the family reproduce
+# EXACTLY (0x25EBA/0x25EE8/0x2711C/0x271C4/0x265CC), and 0x273E6 was
+# content-verified by parallel disassembly (0x28192). Consumed by the
+# pcrel escape trampolines of region x02592a.
+
+[[map]]
+vsav2 = 0x026252
+vsavj = 0x02706e
+kind = "engine_sub"
+status = "verified"
+note = "jump-family twin (14z-66 alignment; x02592a escapes)"
+
+[[map]]
+vsav2 = 0x026270
+vsavj = 0x0270a4
+kind = "engine_sub"
+status = "verified"
+note = "jump-family twin (14z-66 alignment; x02592a escapes)"
+
+[[map]]
+vsav2 = 0x0262a8
+vsavj = 0x0270dc
+kind = "engine_sub"
+status = "verified"
+note = "jump-family twin (14z-66 alignment; x02592a escapes)"
+
+[[map]]
+vsav2 = 0x0262c8
+vsavj = 0x0270fc
+kind = "engine_sub"
+status = "verified"
+note = "jump-family twin (14z-66 alignment; x02592a escapes)"
+
+[[map]]
+vsav2 = 0x0262ee
+vsavj = 0x027122
+kind = "engine_sub"
+status = "verified"
+note = "jump-family twin (14z-66 alignment; x02592a escapes)"
+
+[[map]]
+vsav2 = 0x0262fc
+vsavj = 0x027130
+kind = "engine_sub"
+status = "verified"
+note = "jump-family twin (14z-66 alignment; x02592a escapes)"
+
+[[map]]
+vsav2 = 0x0264bc
+vsavj = 0x0272d2
+kind = "engine_sub"
+status = "verified"
+note = "jump-family twin (14z-66 alignment; x02592a escapes)"
+
+[[map]]
+vsav2 = 0x0264fe
+vsavj = 0x027314
+kind = "engine_sub"
+status = "verified"
+note = "jump-family twin (14z-66 alignment; x02592a escapes)"
+
+[[map]]
+vsav2 = 0x026630
+vsavj = 0x027446
+kind = "engine_sub"
+status = "verified"
+note = "jump-family twin (14z-66 alignment; x02592a escapes)"
+
+[[map]]
+vsav2 = 0x026650
+vsavj = 0x027466
+kind = "engine_sub"
+status = "verified"
+note = "jump-family twin (14z-66 alignment; x02592a escapes)"
+
+[[map]]
+vsav2 = 0x026686
+vsavj = 0x02749c
+kind = "engine_sub"
+status = "verified"
+note = "jump-family twin (14z-66 alignment; x02592a escapes)"
+
+[[map]]
+vsav2 = 0x0266a4
+vsavj = 0x0274ba
+kind = "engine_sub"
+status = "verified"
+note = "jump-family twin (14z-66 alignment; x02592a escapes)"
+
+[[map]]
+vsav2 = 0x0266b8
+vsavj = 0x0274ce
+kind = "engine_sub"
+status = "verified"
+note = "jump-family twin (14z-66 alignment; x02592a escapes)"
+
+[[map]]
+vsav2 = 0x02686a
+vsavj = 0x027694
+kind = "engine_sub"
+status = "verified"
+note = "jump-family twin (14z-66 alignment; x02592a escapes)"
+
+[[map]]
+vsav2 = 0x02694a
+vsavj = 0x027774
+kind = "engine_sub"
+status = "verified"
+note = "jump-family twin (14z-66 alignment; x02592a escapes)"
+
+[[map]]
+vsav2 = 0x026978
+vsavj = 0x0277a2
+kind = "engine_sub"
+status = "verified"
+note = "jump-family twin (14z-66 alignment; x02592a escapes)"
+
+[[map]]
+vsav2 = 0x026a3e
+vsavj = 0x0277f8
+kind = "engine_sub"
+status = "verified"
+note = "jump-family twin (14z-66 alignment; x02592a escapes)"
+
+[[map]]
+vsav2 = 0x026a58
+vsavj = 0x027812
+kind = "engine_sub"
+status = "verified"
+note = "jump-family twin (14z-66 alignment; x02592a escapes)"
+
+[[map]]
+vsav2 = 0x026ab0
+vsavj = 0x02786a
+kind = "engine_sub"
+status = "verified"
+note = "jump-family twin (14z-66 alignment; x02592a escapes)"
+
+[[map]]
+vsav2 = 0x026b50
+vsavj = 0x02790a
+kind = "engine_sub"
+status = "verified"
+note = "jump-family twin (14z-66 alignment; x02592a escapes)"
+
+[[map]]
+vsav2 = 0x026bd4
+vsavj = 0x027982
+kind = "engine_sub"
+status = "verified"
+note = "jump-family twin (14z-66 alignment; x02592a escapes)"
+
+[[map]]
+vsav2 = 0x026c86
+vsavj = 0x027a34
+kind = "engine_sub"
+status = "verified"
+note = "jump-family twin (14z-66 alignment; x02592a escapes)"
+
+[[map]]
+vsav2 = 0x026cf0
+vsavj = 0x027a9e
+kind = "engine_sub"
+status = "verified"
+note = "jump-family twin (14z-66 alignment; x02592a escapes)"
+
+[[map]]
+vsav2 = 0x026cfa
+vsavj = 0x027aa8
+kind = "engine_sub"
+status = "verified"
+note = "jump-family twin (14z-66 alignment; x02592a escapes)"
+
+[[map]]
+vsav2 = 0x026dd2
+vsavj = 0x027b80
+kind = "engine_sub"
+status = "verified"
+note = "jump-family twin (14z-66 alignment; x02592a escapes)"
+
+[[map]]
+vsav2 = 0x026e14
+vsavj = 0x027bc2
+kind = "engine_sub"
+status = "verified"
+note = "jump-family twin (14z-66 alignment; x02592a escapes)"
+
+[[map]]
+vsav2 = 0x026e92
+vsavj = 0x027c40
+kind = "engine_sub"
+status = "verified"
+note = "jump-family twin (14z-66 alignment; x02592a escapes)"
+
+[[map]]
+vsav2 = 0x0273e6
+vsavj = 0x028192
+kind = "engine_sub"
+status = "verified"
+note = "jump-family twin (14z-66 alignment; x02592a escapes)"
+
+[[map]]
+vsav2 = 0x0269ac
+vsavj = 0x000000
+kind = "engine_sub"
+status = "open"
+note = "float-body helper selecting vs2 data 0xD8358/0xD8398 by +0x115 — operand-heavy, no pattern match; tripwired until a float flow reaches it (14z-66)"

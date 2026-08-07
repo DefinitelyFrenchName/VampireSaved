@@ -223,15 +223,56 @@ described in scratch, mechanisms verified by disasm):
     pushback (native P1 was in blockstun at the tap frame) — the
     native-side probes must fire in the pre-CPU-contact window or
     use farther spacing.
-- NEXT (the fix arc, design now concrete): port vs2's jump-handler
-  extension 0x2590C-0x25A0x as a PATCHED CLONE (the machinery
-  exists: patched_clone_for — engine code with R1-mapped callees),
-  and hook vsavj's jump-seq sub-state dispatcher (find the vsavj
-  twin of vs2 0x2592A/table 0x25936) for TENANT owners to run the
-  clone: float conversion (node bit 7 -> sub-state +2, clears
-  +0x121/+0x1C2, timer +0x1C0=0x78, flavor fork +0x3C2) + the float
-  sub-state per-frame handler. Manifest-opt-in; legacy owners take
-  the vanilla path byte-identically (the shadow_seq_guard pattern).
+- THE HOOK LANDED (14z-66 late; build f0916ef1): **THE FLOAT WORKS**
+  — rise to a ceiling and HOLD (measured: Y pinned at 109.4 through
+  the hold window; native pins 121.1 — the delta is the alias-row
+  JUMP PHYSICS feeding takeoff, the known queued deficit). The
+  architecture that landed, each piece measured:
+  - vs2 routes the class-02 jump seq BY CHAR ID at the engine head
+    (0x213F2: cmpi #6 -> Anakaris family; cmpi #$10 -> 0x2592A =
+    PHOBOS'S OWN per-char jump handler). The 0x2592A dispatcher +
+    five bodies (float/air-action/restart) = region x02592a
+    (root 0x2592a:0x456:t0x25958, sibling-diff 7/1110).
+  - vsavj's live twin head = 0x22A0E (via the class-02 stepper
+    0x225C4, table 0x225EE, seq06 -> +0x420). site_thunk
+    tenant_jump_seq displaces its Anakaris cmpi: tenant -> the
+    clone's dispatcher; others re-run the cmpi and re-enter the
+    INTACT beq.w with vanilla flags. NEW emitter options: jmp_ok,
+    id_literal_ok, region_subst.
+  - CONTENT-TWIN TRAP paid: vsavj keeps a byte-identical copy of
+    the generic head at 0x26A58 — it is ANAKARIS's handler; hooking
+    it did nothing (0 probe hits). The live handler was found by
+    tracing the actual dispatch (0x225C4).
+  - NEW mechanism [[pcrel_escape_fix]]: engine-style clones carry
+    pcrel word-form branches escaping the region — oracle-invisible
+    (siblings preserve spacing) and unrewritable in place. The pass
+    reserves an adjacent trampoline pad and rewrites each escape to
+    a jmp trampoline; targets resolve via placed regions first
+    (x026142's copy spans 0x26142-0x27542 and CONTAINS the
+    walker/mover family — H's code already uses the copy), then
+    verified recon rows. 89 escapes -> 35 trampolines on x02592a.
+    (Bug paid on the way: the trampoline cursor didn't increment —
+    all 35 aliased pad+0, every escape jumped to the seq epilogue,
+    anim froze. One line.)
+  - 28 jump-family twin rows added to the overlay by GENERIC-HANDLER
+    ALIGNMENT (instruction-stream diff of vs2 0x213F2-family vs
+    vsavj 0x22A0E-family with operand masking) — all five
+    previously-known pairs reproduce exactly; 0x273E6 content-
+    verified -> 0x28192; 0x269AC left open/tripwired.
+  - FLAVOR POLARITY corrected BY MEASUREMENT: native vs2 runs H
+    with +0x3C2 = 0x00 (the tst/beq branch = VS2-default). The
+    Donovan-convention 0x01 default selected the WRONG branch;
+    huitzil.toml now flavor_default=0x00, flavor_held=0x01.
+- NEXT FRONTIER (air dash): 66 DURING THE FLOAT now dispatches into
+  his own air-dash physics setter (vs2 0x586F0: xv/yv/gravity
+  installs — code byte-faithful in the copy) but lands MID-
+  INSTRUCTION (vec4 at 0xC3112 = source 0x58702+2 skew) — the
+  word-jump-table misalignment class (14z-65 even_only family).
+  Find the dispatching table entry, fix its relocation, and the
+  air dash should live. Then: air-dash-from-jump variants, the
+  VH2-flavor float A/B (the D1 deliverable), the float-ceiling
+  physics (alias jump rows), and promoting replays 75/79 into a
+  movement gate.
 
 ### Item 4 OPENED — Circuit Scrapper: recognition WORKS, the break is
 ### at/after move-start (collapse class RULED OUT)

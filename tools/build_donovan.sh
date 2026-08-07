@@ -99,6 +99,17 @@ case "$TENANT_CHAR" in
         # twelve rooted pre-emptively (caps = inter-handler gaps, twins
         # +0x34 — the zone convention; the oracle bound validates each).
         DEFAULT_ROOTS="$DEFAULT_ROOTS,0x672d0:0x280:t0x67304,0x67550:0x2f6:t0x67584,0x67846:0x1ba:t0x6787a,0x67a00:0x60c:t0x67a34,0x6800c:0x44c:t0x68040,0x68458:0x310:t0x6848c,0x68768:0x264:t0x6879c,0x689cc:0x2ac:t0x68a00,0x68c78:0x3ce:t0x68cac,0x69046:0x2b0:t0x6907a,0x692f6:0x368:t0x6932a,0x6965e:0x400:t0x69692"
+        # 14z-66 item 3: the vs2 JUMP-SEQ HANDLER BODY (sub-state
+        # dispatcher 0x2592A + table 0x25936 + all five bodies, ends
+        # before the 0x25D80 handler). vs2 rewrote the bodies into the
+        # newcomer air system: sub-state 1 = the flavor-forked FLOAT
+        # (rise/hover, +0x1C0 timer), 3 = the +0x23-gated air action, 4 =
+        # the jump restart. vsavj's twin (0x26A58 family) shares the
+        # architecture (incl. the node-bit-7 conversion) but its bodies
+        # are the plain vanilla arcs. Cloned whole; the tenant_jump_seq
+        # site_thunk dispatches tenant owners into the clone's table.
+        # vh2 twin +0x2E, 7/1110 sibling-diff bytes (oracle-clean).
+        DEFAULT_ROOTS="$DEFAULT_ROOTS,0x2592a:0x456:t0x25958"
         ;;
     *)  DEFAULT_ROOTS="" ;;
 esac

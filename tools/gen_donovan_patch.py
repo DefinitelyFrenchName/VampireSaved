@@ -483,6 +483,25 @@ def main():
                              f"{tfr['len']:#x} -> {_int(tf['pad_len']):#x} "
                              f"({tf['note']})")
                 tfr["len"] = _int(tf["pad_len"])
+        # [[pcrel_escape_fix]] (14z-66): engine-style cloned regions carry
+        # PC-RELATIVE word-form branches (bra/bsr/Bcc.w) escaping the
+        # region — INVISIBLE to the sibling oracle (both games preserve
+        # spacing, so the displacement bytes diff clean) and unrewritable
+        # in place (no Bcc abs.l exists). Found when the x02592a jump-clone
+        # froze mid-anim: its `bpl.w 0x271C4` kept the vs2 displacement and
+        # branched into unrelated placed bytes. Reserve a trampoline pad
+        # ADJACENT to the region (the branch must reach it with a word
+        # displacement); the blob pass rewrites each escape to a
+        # `jmp <resolved>.l` trampoline in the pad. Must run before
+        # allocation so placement reserves the pad.
+        pcrel_fixes = {}
+        for pf in port.get("pcrel_escape_fix", []):
+            if args.stage < _int(pf.get("stage", 4)):
+                continue
+            pfr = regions.get(pf["region"])
+            if pfr:
+                pcrel_fixes[pf["region"]] = pfr["len"]
+                pfr["len"] += _int(pf.get("pad", 0x120))
 
         # allocate every wanted region first (deterministic order: code
         # first so it stays in the encrypted hole, then data)
@@ -1067,6 +1086,74 @@ def main():
                                   f"data_in_code table ({dc['note']})"))
                 fragments.append((ha, 12, "GEN",
                                   f"data_in_code helper ({dc['note']})"))
+
+            # pcrel_escape_fix blob pass (14z-66; see the pre-allocation
+            # comment). Rewrites every word-form pcrel branch escaping the
+            # ORIGINAL span to a trampoline in the pad: resolved targets
+            # (another placed region, or a verified recon row) get
+            # `jmp <resolved>.l`; unresolved ones get an ILLEGAL trampoline
+            # under --tripwire-open (loud, attributable) and a hard fail
+            # without it. Trampolines dedup per resolved target.
+            if name in pcrel_fixes:
+                orig_len = pcrel_fixes[name]
+                if len(blob) < r["len"]:
+                    blob.extend(b"\x00" * (r["len"] - len(blob)))
+                tramp_off = orig_len
+                tramp_of = {}
+                n_esc = n_trip = 0
+                i = 0
+                while i + 4 <= orig_len:
+                    w = int.from_bytes(blob[i:i + 2], "big")
+                    if (w & 0xF000) == 0x6000 and (w & 0xFF) == 0:
+                        disp = int.from_bytes(blob[i + 2:i + 4], "big")
+                        if disp >= 0x8000:
+                            disp -= 0x10000
+                        tgt = r["src"] + i + 2 + disp
+                        if not (r["src"] <= tgt < r["src"] + orig_len):
+                            res = None
+                            host = region_of(tgt)
+                            if host and host in placed:
+                                res = tgt + (placed[host]
+                                             - regions[host]["src"])
+                            else:
+                                row = recon.get(tgt)
+                                if (row and row.get("status") == "verified"
+                                        and _int(row.get("vsavj", 0))):
+                                    res = _int(row["vsavj"])
+                            key = res if res is not None else ("trip", tgt)
+                            ta = tramp_of.get(key)
+                            if ta is None:
+                                if tramp_off + 6 > r["len"]:
+                                    fail.append(f"pcrel_escape_fix {name}: "
+                                                f"trampoline pad overflow")
+                                    break
+                                ta = tramp_off
+                                if res is not None:
+                                    blob[ta:ta + 6] = (b"\x4e\xf9"
+                                                       + res.to_bytes(4, "big"))
+                                elif args.tripwire_open:
+                                    blob[ta:ta + 6] = b"\x4a\xfc" * 3
+                                    notes.append(
+                                        f"# {name}+{ta:#x}: ESCAPE TRIPWIRE "
+                                        f"for unresolved pcrel target "
+                                        f"{tgt:#x}")
+                                    n_trip += 1
+                                else:
+                                    fail.append(f"pcrel_escape_fix {name}: "
+                                                f"unresolved escape target "
+                                                f"{tgt:#x} at +{i:#x}")
+                                    break
+                                tramp_of[key] = ta
+                                tramp_off += 6
+                            ndisp = ta - (i + 2)
+                            blob[i + 2:i + 4] = (ndisp & 0xFFFF).to_bytes(2, "big")
+                            n_esc += 1
+                        i += 4
+                        continue
+                    i += 2
+                notes.append(f"# pcrel_escape_fix {name}: {n_esc} escapes -> "
+                             f"{len(tramp_of)} trampolines ({n_trip} "
+                             f"tripwired), pad {orig_len:#x}..{r['len']:#x}")
 
             # M2b gfx remap (donovan.toml [gfx_remap], stage-gated): walk
             # the OBJ records in this region (tools/obj_records.py format,
@@ -3272,6 +3359,27 @@ def main():
                                 f"thunk_hex")
                 _hx = _hx.replace(
                     _ph, "%08x" % (_int(_tb.strip()) + 4 * _tid))
+            # region_subst (14z-66): "placeholder=region:offset" — the thunk
+            # embeds the PLACED address of an extracted region (+offset),
+            # e.g. the tenant_jump_seq thunk aims the clone's sub-state
+            # table. Resolved from the placement map, so the body tracks
+            # wherever the allocator puts the region.
+            for _kv in str(st.get("region_subst", "")).split(","):
+                if not _kv.strip():
+                    continue
+                _ph, _, _spec = _kv.partition("=")
+                _ph = _ph.strip().lower()
+                _rn, _, _ro = _spec.strip().partition(":")
+                if _rn not in placed:
+                    fail.append(f"site_thunk {st['name']}: region_subst "
+                                f"region '{_rn}' not placed at this stage")
+                    continue
+                if _ph not in _hx:
+                    fail.append(f"site_thunk {st['name']}: region_subst "
+                                f"placeholder '{_ph}' not present in "
+                                f"thunk_hex")
+                _hx = _hx.replace(
+                    _ph, "%08x" % (placed[_rn] + _int(_ro or "0")))
             # data_subst (14z-62e): "placeholder=src:len:hole" — the thunk
             # embeds the address of a SOURCE-SET data block; the generator
             # reads it, places it via the space model, emits the data op,
@@ -3329,11 +3437,20 @@ def main():
             # $382 (the char-id field) or $A (the select keeper's cached
             # owner id). Word-aligned scan; a mismatch is a hard failure.
             import re as _re
+            # id_literal_ok (14z-66): ids a thunk COMPARES ON PURPOSE that
+            # are not the tenant — e.g. a displaced VANILLA id test the
+            # thunk re-executes verbatim (the tenant_jump_seq thunk
+            # re-runs the engine's own Anakaris cmpi). Listed explicitly
+            # so the stale-literal guard stays loud for everything else.
+            _ok_ids = {_int(x) for x in
+                       str(st.get("id_literal_ok", "")).split(",") if x.strip()}
             for _m in _re.finditer(r"0c2[89abcdef]00([0-9a-f]{2})(0382|000a)",
                                    _hx):
                 if _m.start() % 4:
                     continue        # not instruction-aligned — embedded data
                 _got = int(_m.group(1), 16)
+                if _got in _ok_ids:
+                    continue
                 if _got != _tid:
                     fail.append(
                         f"site_thunk {st['name']}: body compares a char/owner "
@@ -3353,10 +3470,14 @@ def main():
                 fail.append(f"site_thunk {nm}: no room in hole {hole_sel}")
                 continue
             patch_kind = st.get("patch", "jsr")
-            if patch_kind == "jmp" and not st["old_hex"].lower().startswith("4ef9"):
-                fail.append(f"site_thunk {nm}: patch='jmp' requires the "
-                            f"displaced instruction to be a jmp (old_hex "
-                            f"starts {st['old_hex'][:4]})")
+            if (patch_kind == "jmp"
+                    and not st["old_hex"].lower().startswith("4ef9")
+                    and not st.get("jmp_ok")):
+                fail.append(f"site_thunk {nm}: patch='jmp' over a non-jmp "
+                            f"site (old_hex starts {st['old_hex'][:4]}) — "
+                            f"set jmp_ok = true to assert the thunk body "
+                            f"NEVER rts's or falls through (it must re-enter "
+                            f"the original flow by jmp only)")
                 continue
             ops.append({"op": "code", "addr": f"{td:#x}", "hex": body.hex()})
             ops.append({"op": "code", "addr": f"{site:#x}",
