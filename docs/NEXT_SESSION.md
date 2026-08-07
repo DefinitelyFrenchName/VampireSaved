@@ -1,103 +1,55 @@
 # NEXT SESSION — orientation (written at the close of 14z-65, 2026-08-07)
 
-**Start here: M3b IS OPEN (the roster tenants) — plan in
-`docs/M3b_plan.md`, three maintainer decisions pending (STATE.md 14z-65
-"Decisions pending": D1 Huitzil default flavor, D2 Pyron source version,
-D3 arcade-ladder membership).** The frozen references are unchanged:
-donovan-m3a `4b7d0dc7` / m5_stock `6c93cfa8`, and
-`tests/test_m3a_reproducible.sh` must stay green after EVERY M3b
-machinery commit.
+**Start here: HUITZIL'S BEHAVIOR BUILD IS IN PLAYTEST (ping #1 delivered;
+round-1 report in STATE.md "MAINTAINER PLAYTEST ROUND 1" — that section
+IS the worklist).** The frozen references are unchanged (donovan-m3a
+4b7d0dc7 / m5_stock 6c93cfa8, gate-verified); Huitzil's stage-4 build is
+alive end-to-end: 11,000-frame guarded chaos soak green on the real
+vsavjw set, round-2 pods respawning, legacy replays masked-v2 EXACT.
 
-## What 14z-65 delivered (all gates green, all committed)
+## The worklist from playtest round 1 (priority order)
 
-1. **Phase 0 rails**: `patch_prg.py` hard-fails op overlaps (it caught a
-   real latent collision in the frozen build — tail_data_ptr vs the
-   sound_table row, correct only by emission order — and then caught the
-   M2a scaffold double-repoint on Huitzil's first stage-2 build); the
-   reproducibility gate.
-2. **Phase 1**: extraction de-Donovanized — per-char anchors, charid scan
-   on src_char, and the piecewise-shift/dead-filler/sibling-insertion
-   model of the appended code window (atlas: character_tables.md
-   "piecewise" section). Both new tenants EXTRACT oracle-validated
-   (`tests/test_extract_hp.sh`).
-3. **The Huitzil ladder is open**: `build/manifest/huitzil.toml` (native
-   0x10, variant-id only), driver TENANT_MANIFEST/TENANT_CHAR, stages
-   1-3 GREEN with THE OP INVARIANT (every op = free space or variant
-   row) and a legacy replay BIT-IDENTICAL to vanilla
-   (`tests/test_hui_ladder.sh`).
+1. EX-move crash-reset (623+2K / 421+2K): scriptable repro — extend the
+   soak replay with meter-build + the exact motions; the guard names the
+   site; expect the ES-chain/meter arc (Donovan m2c precedent).
+2. Speed: port his param32 velocity pairs (VALUE_SKIP currently serves
+   him alias-row speeds) — re-examine the 14w-b hazard first.
+3. Air dash + float dead: census the states native vs2 writes for them
+   (state-tap on native), trace ours.
+4. Circuit Scrapper (half-circle): content-verify his 63214 predicate
+   rows at 8-byte record granularity (the 14z-48 collapse class).
+5. Author the guard-cancel replay (Reflect Wall) + Dark Force pair
+   replays; then the oracle battery analog (17/18-style).
 
-## Build / validate
+## Build / validate / playtest
 
 ```sh
 export ROMDIR=/Users/koneko/Developer/Vampire_Saved/ROMS
-tests/test_m3a_reproducible.sh          # after every machinery change
-tests/test_extract_hp.sh                # H/P extraction shapes
-tests/test_hui_ladder.sh                # the Huitzil ladder
-# a Huitzil ladder build by hand:
-TENANT_MANIFEST=build/manifest/huitzil.toml TENANT_CHAR=0x10 \
-GEN_FLAGS="--profile cps2-wide-v1" tools/build_donovan.sh 3 build/hui3
+tests/test_m3a_reproducible.sh   # after every machinery change
+tests/test_hui_soak.sh           # the 11k guarded soak + round-2 pods
+tests/test_hui_boot.sh           # boot + masked-v2 EXACT legacy leg
+tests/test_hui_ladder.sh         # stages 1-3 (hook-free, bit-identity)
+tests/test_extract_hp.sh         # extraction shapes
+tools/run_hui_behavior.sh        # the interactive playtest build
 ```
 
-## The road (docs/M3b_plan.md; sequencing adjusted 14z-65)
+## Standing facts (this session's additions — do not re-derive)
 
-1. **HUITZIL BOOTS (build 9252ce62) — next: the behavioral frontier.**
-   The wedge fell to three measured fixes (fall-through layout group at
-   the 0x57456 mid-handler split, [init_shim], five stubbed_sound rows
-   — patch_notes 14z-65 (5); gate tests/test_hui_boot.sh). A live match
-   forms with HIS data, sprite-garbled until the gfx rung. NEXT:
-   in-match input soaks over his moveset (each tripwire hit = the next
-   R1 item; 18 remain), then the vsav2-as-oracle stage-4 battery
-   analog, then HUD/select rungs and Phase 2. Prior wording follows:
-   Huitzil stage 4 BUILDS — The R1 loop ran (census: 0x55478, the velocity
-   rings 0xd143e+0x900, the shared zones with x088512 at its TRUE
-   0x3B40 extent; 0x8ACD8 = his aux init in the shared zone, mystery
-   closed; 23 classified tripwires remain — STATE 14z-65). The
-   forced-boot probe (`tools/force_pick_probe.sh`, validated both ways:
-   vanilla ids load everywhere, and stage-3 + forced 0x10 loads
-   HUITZIL'S OWN placed data — the passive rungs are live-verified)
-   shows stage 4's ported INIT PATH HANGS at id 0x10 and the machine
-   WATCHDOG-REBOOTS (snapshots: select -> black garble -> QSound
-   splash; GOTCHAS 14z-65 — a reboot masquerades as a clean non-load).
-   THE BOOT LANDED same-session (three fixes: fall-through layout
-   group, [init_shim], five measured sound stubs — gate
-   tests/test_hui_boot.sh) and the specials hunt then ran a full
-   instrument chain: window widened (13 dispatch rows), 18 farm rows
-   content-verified, the engine-alias generator rule (dispatch_07).
-   CURRENT FRONTIER (STATE 14z-65, last section): his object never
-   reaches the engine state layer — 0x26D36 is a DISPATCHED update-fn
-   installed by state transitions, and the prime suspect is his ported
-   code's update-fn INSTALLS being 16-bit word stores the 32-bit ref
-   relocation never touched. Resume at the numbered NEXT list there
-   (decode the $FF02DC loop fetch; diff installed update-fns vanilla
-   vs H; then the word-store relocation rule). Then: the sound-farm
-   five (M5-style triage, never blind-resolve), companion family by
-   guarded runs, flavor wiring (D1 = VS2 provisionally, maintainer
-   2026-08-07; final after a playtestable build + a written "flavor
-   differences to hunt for" note from the fork-consumer measurement).
-2. **Phase 2 — the multi-tenant merge** (docs/M3b_plan.md Phase 2):
-   unify two WORKING single-tenant builds in one generator process.
-   Known hazards on record: shared-span region dedup (H's +0x30 region
-   overlaps P's and D's zones), charid rewrites on shared spans need
-   tenant attribution, engine hooks emit once as unions, site_thunk
-   gates become id-dispatched.
-3. **Phase 3 — group C bank-4 coexistence** (measure H/P native tile
-   ranges first), then Pyron's ladder, then the shared registries
-   (arcade ladder D3, fold audit).
-
-## Standing facts (do not re-derive)
-
-- The appended newcomer code window has PIECEWISE sibling shifts
-  (+0x36/+0x30/+0x34), dead junk filler, and at least one vs2-only
-  insertion — atlas character_tables.md + GOTCHAS 14z-65. Never probe
-  alignment with a lax classifier (opcode-word match + zero unexplained).
-- A variant-id tenant's ladder gate is TOTAL bit-identity on legacy
-  replays (no divergence-frame pinning needed — rows 0x10-0x1F are
-  legacy-unreachable, and the op invariant checks it per op).
-- Ownership rule: a manifest section that pokes a row itself suppresses
-  the generic repoint (sound_table claims; scaffold repoints stage-1
-  only). Two ops on one word = build error, never reorder.
-- Stage >= 6 for a non-Donovan tenant is refused by the driver (his gfx
-  constants); Phase 3/4 generalizes the gfx half.
-- QSound sizing (three voice banks vs the added 8 MB, 16 MB MAME
-  ceiling) should be measured BEFORE any sound work commits (M5/M3b
-  shared watch item).
+- SET-AWARENESS: a build that touches wide_ext packs as vsavjw; any
+  probe run as vsavj silently tests the PRISTINE ROM (GOTCHAS false-
+  green). All H gates derive the set from the rompath.
+- The shared R1 map is FROZEN for Donovan (open rows = his tripwires);
+  H's rows live in build/manifest/reconciliation_huitzil.toml via the
+  manifest key recon_overlay. Phase 2 replaces this with row scoping.
+- H's census (driver DEFAULT_ROOTS): the widened code window, the ring
+  family, the shared zones (x088512 at 0x3B40), x2b7ef4 companion-anim,
+  the 12 secondary handlers 64-75. obj_hook rows are IN his manifest.
+- Sound: 0x7xx newcomer-voice ids stub-on-sight; shared ids via the
+  batch/M5 method ONLY (raw keyon equality is NOT the M5 verify).
+- Timelines: plain-runner vs -debug guard runs DIVERGE mid-match; only
+  same-timeline evidence composes. GUARD_TRACE + the guard's crash-
+  instant RAM dumps (crash_<frame>_ff0000.bin) are the deep tools.
+- Debug instruments: tap_writes (POKES/REGLOG/STACKLOG), force_pick_
+  probe (SET-aware), force_id.lua (interactive).
+- M3b phases 2/3 (multi-tenant merge, gfx coexistence) queue behind the
+  behavior polish; docs/M3b_plan.md unchanged otherwise.

@@ -263,6 +263,34 @@ the matcher reads (his +0x3xx input ring — if the recorder dispatch
 row feeding it is another wrong alias, the matcher sees an empty
 ring). Builds: acda6946 current ladder; all gates green.
 
+### 14z-65 — MAINTAINER PLAYTEST ROUND 1 (the behavior build): report
+### + attributed hypotheses — THE NEXT SESSION'S WORKLIST
+
+Overall: "general feel is good", "all very promising". Findings:
+1. FEELS A BIT SLOWER — likely REAL, not the garble: the generator's
+   VALUE_SKIP (param32_a/b, the 14w-b Donovan crash guard "Jedah
+   speeds retained") skips his velocity pairs too, so H moves at the
+   VANILLA ALIAS ROW'S speeds, not his own. Fix = port HIS param32
+   rows — but the 14w-b hazard (Donovan's true velocities crashed a
+   soak; "separate landmine") must be re-examined for H, not assumed.
+2. AIR DASH (44/66 airborne) DOES NOT WORK. 3. FLOAT (hold 7/8/9)
+   DOES NOT WORK. Both = his unique MOVEMENT modes — suspects: the
+   skipped velocity family, unported movement states/dispatch paths,
+   or input-hold detection. Census the states his native air dash/
+   float write (the state-tap method on native vs2) then trace ours.
+4. BOTH EX MOVES (Final Guardian 623+2K, Erasing Sphere 421+2K) run
+   most of their animation then CRASH-RESET (the watchdog signature).
+   ES machinery = a known ported-char arc (Donovan m2c: full ES chain
+   + meter decode). Repro is scriptable: extend the soak replay with
+   meter-build + the exact motions; the guard will name the site.
+5. CIRCUIT SCRAPPER (63214+MP/HP command grab) does not come out —
+   HALF-CIRCLE = the 14z-48 farm-collapse class precedent; verify his
+   63214 predicate rows BY TABLE CONTENT at record granularity.
+6. REFLECT WALL (623+P guard-cancel) untested (needs a GC setup —
+   scriptable: a 2P replay where P2 attacks into P1 block + the GC
+   input; author it).
+7. DARK FORCE seems good; needs deeper testing (pair replays).
+
 ### 14z-65 — HUITZIL IS ALIVE END-TO-END: soak green on the real set,
 ### legacy masked-EXACT, behavior build shipped (PING #1)
 
