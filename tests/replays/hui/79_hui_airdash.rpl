@@ -1,0 +1,16 @@
+# hui air-dash probe (14z-66, item 3). Jump at f3160 (measured-good
+# accept frame; f3060 jumps are eaten on both games), then 66 while
+# airborne. Runs unchanged on native vsav2 as the ground-truth leg.
+# Native expectation: mid-air X velocity spike (the air dash);
+# ours (pre-fix): nothing — the mode never engages.
+300-305 sys=C1
+800-803 sys=S1
+1700-1702 p1=1
+3160-3162 p1=U
+3175-3177 p1=R
+3181-3183 p1=R
+# second attempt: jump + 44 (back air dash)
+3300-3302 p1=U
+3315-3317 p1=L
+3321-3323 p1=L
+3500 wait

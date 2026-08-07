@@ -15,6 +15,10 @@ engine-site thunk live. build/hui4 at 44be1266 = ping #3 with items
 
 ## Session 14z-66 (playtest round-1 worklist)
 
+### ROUND 4 (maintainer): "FG properly resolves" — item 1 CLOSED FOR
+### GOOD (all three sites: voice-cue tripwire, shadow-seq clamp,
+### data_in_code reroutes). Ping #4 = 4317353c confirmed.
+
 ### ROUND 3: the THIRD FG crash — embedded data-in-code tables; the
 ### class censused and closed (5 reroutes, one mechanism)
 
@@ -198,14 +202,36 @@ described in scratch, mechanisms verified by disasm):
   0x7a000 / 0x6000) — the 14w "jump-physics parameter gap tables",
   still unported for want of a decoded consumer; the mover context
   is now half the decode. Queue behind the float hook.
-- NEXT, in order: (1) catch the +0x21 bit-7 writer on native (widen
-  the tap; it is the per-char float license); (2) census the air
-  dash the same way (66 while airborne, seq/sub-state writes); (3)
-  design the state hook: extend vsavj's jump-seq sub-state dispatch
-  for tenant objects with his float conversion + float sub-state
-  handler + the 0x78 timer + flavor fork (D1 wiring exists);
-  manifest-opt-in like state_hook. Replay 75 + the dump/tap recipes
-  are the instruments.
+- 14z-66 LATER MEASUREMENTS (the decode advanced; instruments:
+  replay 79 + the +0x20-word tap on native):
+  - The "+0x21 license" is NOT separate machinery: the anim walker
+    installs each node's header long into +0x20/+0x21 (native tap:
+    PC 0x27140 writing values like 0x0480 — bit 7 set) — THE FLOAT
+    LICENSE IS A BIT IN HIS ANIM-NODE HEADERS, already carried by
+    the ported anim data. Ours even plays his jump/float anim family
+    (0xD65xx = native 0x2461xx under the delta). The ONLY missing
+    piece is vsavj's engine lacking the 0x2590C-0x2595x jump-seq
+    extension.
+  - Air dash on ours: cleanly re-confirmed DEAD with a properly
+    airborne 66 (replay 79: X frozen through the whole arc).
+  - NATIVE TAKEOFF IS THE FLOAT FAMILY: a bare 3-frame U tap does
+    NOT jump native Phobos (measured twice; his takeoff wants held
+    U / the rise), while ours tap-jumps like the alias row. The
+    maintainer's "float dead + air dash dead" = one system: the
+    vs2 jump-seq extension serves takeoff, hover, and air movement.
+  - Replay-authoring note: the 79 native leg desynced on CPU
+    pushback (native P1 was in blockstun at the tap frame) — the
+    native-side probes must fire in the pre-CPU-contact window or
+    use farther spacing.
+- NEXT (the fix arc, design now concrete): port vs2's jump-handler
+  extension 0x2590C-0x25A0x as a PATCHED CLONE (the machinery
+  exists: patched_clone_for — engine code with R1-mapped callees),
+  and hook vsavj's jump-seq sub-state dispatcher (find the vsavj
+  twin of vs2 0x2592A/table 0x25936) for TENANT owners to run the
+  clone: float conversion (node bit 7 -> sub-state +2, clears
+  +0x121/+0x1C2, timer +0x1C0=0x78, flavor fork +0x3C2) + the float
+  sub-state per-frame handler. Manifest-opt-in; legacy owners take
+  the vanilla path byte-identically (the shadow_seq_guard pattern).
 
 ### Item 4 OPENED — Circuit Scrapper: recognition WORKS, the break is
 ### at/after move-start (collapse class RULED OUT)
