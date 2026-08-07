@@ -263,6 +263,33 @@ the matcher reads (his +0x3xx input ring — if the recorder dispatch
 row feeding it is another wrong alias, the matcher sees an empty
 ring). Builds: acda6946 current ladder; all gates green.
 
+### 14z-65 — f4983 ROOT NAMED: no per-round char-init on vsavj; pods
+### die at the boundary and their queue node dispatches the husk
+
+The comparative that settled it: probing char-init dispatch entries —
+NATIVE vs2 runs char-init TWICE (f2886 + f8812: per-round re-init;
+that is how his pods respawn each round), while on vsavj dispatch_00
+fires ONCE (f2886) — vanilla chars need no per-round init, so the
+engine has no such call. At our round boundary the engine's pool pass
+(f4890) frees his satellites; nothing respawns them (P1 +0x2A/+0x2C
+ZERO in round 2 — a gameplay deficit even without the crash: podless
+Phobos); and a stale class-6 queue node still references the freed
+slot (0xFFB980 = a husk with class defaults; the crash address
+0x3B001E exists NOWHERE in RAM — computed through the husk's zeroed
+fields). Three hardening rows landed and KEPT (phase-gated shim latch,
+companion class-7->6 remap, alloc_wrap wrappers — each correct by
+precedent; none is THE fix). dispatch_01 identified as his PER-FRAME
+handler (the 401 cadence, starts f3093 post-engage).
+NEXT (the fix design): (1) find vsavj's per-round per-char hook —
+probe his remaining dispatch rows (02-19) across the boundary window
+f4850-4950, and/or tap the round-counter writer and walk its callees;
+(2) DONOVAN ARCHAEOLOGY: how does Anita survive the same boundary in
+the frozen build (20_don_round2 is a GREEN gate — her lifecycle
+answers the deregister-vs-respawn question); (3) then either hook the
+tenant's pod respawn onto the per-round call (a shim-class mechanism,
+manifest-opt-in) or deregister the pods' queue nodes at death so the
+crash half disappears independently of the respawn half.
+
 ### 14z-65 — the f4983 crash: characterized, hardened, OPEN
 
 Two correct-by-precedent hardening fixes landed (kept even though

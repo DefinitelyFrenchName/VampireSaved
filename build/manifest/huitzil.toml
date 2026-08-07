@@ -24,6 +24,11 @@ name = "huitzil"
 src_set = "vsav2"
 src_char = 0x10
 id = 0x10
+# 14z-65: the slot-clearing alloc wrappers (the Donovan row — his init
+# and H's both allocate satellites via vs2 0x15702/0x1572E, and vs2's
+# allocator semantics need the 0x80-clear wrapper on vsavj; without it a
+# recycled round-2 slot keeps stale bytes under the pod init).
+alloc_wrap = "0x15702,0x1572e"
 
 # ── Pool-seeding init shim + flavor latch (14z-65, the watchdog-reboot
 # hunt). Vanilla vsavj never seeds the secondary-object pools during a
