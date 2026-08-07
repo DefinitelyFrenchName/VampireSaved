@@ -357,6 +357,31 @@ TRIAGE + first measurements (14z-67 continuation 3):
        map as "engine_data" (bare_long) but 0x6D9D4 is CODE (a
        two-allocation spawner) — re-audit that row during the port
        (the pattern twin may be right; the KIND is wrong).
+    6. FIFTH ROUND — THE SMOKING TABLE (the decode is COMPLETE):
+       both games' effect machines share a BYTE-IDENTICAL entry stub
+       (vs2 0x22436/vj 0x238F6: id = +0x54, index = byteMap[id] +
+       +0x56, bra.w stage-2) and BYTE-IDENTICAL byte maps through
+       effect id 0x4A (vs2 map DATA-view 0x27FD8, vj 0x28D00 — the
+       pc-rel read is a DATA read, raw bytes; do NOT read these
+       through the opcode view). THE DIFF IS SIX ENTRIES: effect ids
+       0x4E-0x53 map to handler indexes 0F/1B/1F/19/0F/03 on vs2 and
+       to ZERO on vsavj -> newcomer effects collapse to index 0 =
+       the generic fallback. (Also id 0x5F: vs2 0x00 / vj 0xFF.)
+       Stage-2 dispatchers: vs2 0x27110 / vj 0x28EBC. vs2's newcomer
+       indexes REUSE vanilla handler slots whose vs2 SEGMENTS were
+       rewritten (the jmp-0x6D282 fleet tails; + an in-machine
+       cmpi.b #$10,$382 Huitzil case — Capcom's own precedent).
+       THE PORT ("effect_hook", the obj_hook pattern one level up):
+       route vj's byte-map ids 0x4E-0x53 to NEW indexes -> extend the
+       stage-2 dispatch with union entries -> PORTED vs2 handler
+       segments + the 0x6D282/0x6D6BC spawner family as regions
+       (R1 + escape pads); tripwire unported indexes. The byte-map
+       rows are superset-safe by construction (vanilla never emits
+       ids >= 0x4B — verify with an id-writer-style audit before
+       shipping). H's grab/ray/explosion effect-id writes are NOT
+       immediate +0x54 stores (one hit only) — the ids flow from
+       anim-node/spawn params; enumerate them at port time by
+       tapping +0x54 writes on the native replays.
   - Win screen (captures): native = GOLD (his normal family); ours =
     pink/lavender + GARBLED BLUE-GREY RECTANGLES on eye/thigh/foot —
     TWO defects: the palette (my source wrong) AND a few wrong art
