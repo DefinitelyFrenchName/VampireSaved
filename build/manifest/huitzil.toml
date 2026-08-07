@@ -736,3 +736,28 @@ addr = 0x028D52
 op = "poke16"
 val = 0x0F03
 only_variant_slot = true
+
+# ── 14z-67 THE THROW-ARC FIX (ping #7: "63214+P doesn't work" — the
+# victim must launch off the screen top). The physics-row installer
+# (vs2 0x275E4 / vsavj 0x28386, tail-unique twin pair) computes
+# row = table2[map1[2*(+0x5A) + d0] * 16] and writes the victim's
+# xv/xacc/yv/gravity (+0x40/48/44/4C). MEASURED: vs2's map1 has FIVE
+# entries past vsavj's end (indexes 0x4A-0x53 -> rows 0x32-0x36; the
+# 63214 arcs = rows 0x33/0x34, yv 16.0/20.0), and on vsavj H's index
+# reads PAST map1 into table2's bytes -> regular-arc rows = the
+# "both grabs look the same" symptom. Both vj tables are jammed in
+# place (data follows) -> full-body tail replacement (patch="jmp",
+# body ends rts to the installer's caller) reading PLACED copies of
+# vs2's FULL tables. STATIC SUPERSET PROOF: map1 prefix 0x00-0x49 and
+# table2 rows 0x00-0x31 are byte-identical across the games — vanilla
+# content reads identical values through the clone, H's indexes find
+# the five vs2 rows. The masked legacy gates arbitrate.
+[[site_thunk]]
+stage = 4
+name = "throw_arc_tables"
+patch = "jmp"
+jmp_ok = true
+site = 0x028386
+old_hex = "7200122e005a"
+thunk_hex = "7200122e005ad24141f9qqqqqqqq41f0100010300000e94841f9pppppppp41f00000201822184a2e005d6604448044812d4000402d4100482d5800442d50004c4e75"
+data_subst = "qqqqqqqq=0x279B4:0x54:wide_ext,pppppppp=0x27A08:0x370:wide_ext"

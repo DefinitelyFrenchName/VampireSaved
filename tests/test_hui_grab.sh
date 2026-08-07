@@ -4,7 +4,13 @@
 #
 # Root (measured): recognition was ALWAYS live (probe-proven); the
 # move-start died on x026142's oracle-invisible pcrel escapes — fixed
-# by pcrel_escape_fix. This gate runs the 2P-dummy connect replay and
+# by pcrel_escape_fix. 14z-67: the THROW-ARC fix (site_thunk
+# throw_arc_tables — the physics-row installer cloned with vs2's FULL
+# superset tables; map1 prefix + shared rows byte-identical, five vs2
+# rows added; measured launch yv 16.0 == native, FBNeo tap A/B).
+# Static leg below asserts the thunk + placed tables; the runtime
+# sub-state/damage legs continue to arbitrate the connect.
+# This gate runs the 2P-dummy connect replay and
 # asserts the NATIVE-MATCHED signature (frame-identical sub-state
 # progression + damage on the native A/B of record): P1 enters the
 # 0x0E grab seq and the victim takes the 0x13 damage.
@@ -28,7 +34,18 @@ case "$BUILD" in /*) ;; *) BUILD="$REPO/$BUILD" ;; esac
 [ -f "$BUILD/rompath/vsavjw.zip" ] || { echo "FAIL: no vsavjw.zip"; exit 1; }
 export MAME_BIN="${MAME_BIN:-$HOME/.cache/vampire-saved/mame/cps2}"
 
-echo "== 2P dummy grab (replay 80)"
+echo "== static: throw-arc thunk + placed superset tables"
+python3 - "$BUILD" "$ROMDIR" <<'PY2'
+import json, sys, subprocess, os
+outbase, romdir = sys.argv[1], sys.argv[2]
+notes = open(os.path.join(outbase, "patch", "patch_notes_fragment.md")).read()
+assert "throw_arc_tables" in notes, "throw_arc_tables thunk missing"
+# the two data_subst blocks: find their placed addresses in the notes
+import re
+m = re.findall(r"data\s+0x([0-9a-f]+) \+0x(54|370)\s+site_thunk throw_arc_tables", notes)
+assert len(m) == 2, f"expected 2 placed table blocks, got {m}"
+print("  ok: thunk emitted with both table blocks placed:", m)
+PY2
 d="$WORK/g"; mkdir -p "$d"
 ( cd "$d" && POKES="1400:ff8782:10;1450:ff8782:10;1500:ff8782:10" \
   DUMPS="3200:ff8400-ff8500;3230:ff8800-ff8900;3300:ff8800-ff8900" \

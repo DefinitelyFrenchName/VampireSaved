@@ -249,6 +249,38 @@ Read the 14z-67 sections below, then docs/NEXT_SESSION.)
   param32/flavor measurement (no fork expected), then his gfx rung
   through the ratified layout row.
 
+### 14z-67 continuation 5: ES EXONERATED (maintainer side-by-side);
+### THE COMMAND-GRAB THROW ARC FIXED NATIVE-EXACT (hui9 = 9e3105e0 =
+### PING #8); the beam needs the zone clone for duration/palette
+
+- Maintainer round 3: ES "confirmed clean mechanically", speed correct
+  or near — the pass-through report withdrawn; FG remains the slow
+  one. The freeze ray "still doesn't show" — they tested build/hui6
+  (the pinned ping-#7 artifact; the fix landed in hui8). Their VS2
+  beam capture shows the target: a SUSTAINED pale-green beam (~20+
+  frames, confirmed by native replay-83 snapshots); ours renders a
+  brief orange flash — the byte-map rows spawn the pieces but the
+  VANILLA segments drive duration/palette -> full fidelity rides the
+  effect-zone clone arc (also the lightning).
+- THE COMMAND-GRAB THROW ARC (their "63214+P doesn't work", marker =
+  victim leaves the screen top): DECODED AND FIXED. The physics-row
+  installer (vs2 0x275E4 / vsavj 0x28386, unique tail twins) reads
+  row = table2[map1[2*subidx + d0]*16] -> victim xv/xacc/yv/gravity.
+  vs2's map1 carries FIVE entries past vsavj's end -> rows 0x32-0x36
+  (the 63214 arcs = rows 0x33/0x34, yv 16.0/20.0); on vsavj H's index
+  read past map1 into table2 bytes -> regular-arc rows = the "grabs
+  look identical" symptom. Both vj tables jammed in place -> FULL
+  TAIL REPLACEMENT thunk (patch=jmp + jmp_ok, body rts to the
+  installer's caller) reading placed copies of vs2's full tables.
+  STATIC SUPERSET PROOF (map1 prefix + rows 0x00-0x31 byte-identical)
+  -> unconditional for all throws; boot masked-v2 EXACT confirms.
+  MEASURED FIXED: FBNeo tap A/B — hui9 installs yv 0x0010 (16.0) at
+  launch = native's exact value, decay lockstep. Gate: test_hui_grab
+  gains the static thunk+tables leg.
+- hui9 = 9e3105e0 = PING #8 (run_hui_behavior.sh default; hui6 stays
+  the ping-#7 reference). Gates: boot masked-v2 EXACT, grab/ex/walk,
+  m3a bit-exact.
+
 ### 14z-67 continuation 4: THE FREEZE RAY IS FIXED (six byte-map
 ### pokes — build hui8 = 59cf9f85); the lightning's remaining arc is
 ### fully specified (a shared-id state segment needing the zone clone)

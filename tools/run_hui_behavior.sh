@@ -1,6 +1,11 @@
 #!/bin/sh
 # run_hui_behavior.sh — the Huitzil playtest build, interactive.
-# 14z-67 (ping #7): now the STAGE-6 GFX build — his real art everywhere.
+# 14z-67 (ping #8, build/hui9): the ping-#7 fix round — 236P freeze ray
+# restored (effect byte-map rows), command-grab throw arc native-exact
+# (yv 16.0 — the victim leaves the screen top), companion-record art
+# to bank 5. STILL OPEN from ping #7: grab lightning + beam
+# duration/palette (the effect-zone clone arc), sidekick shadow,
+# win-screen palettes, DF style, FG pacing.
 # No forced id: WALK THE WHEEL to his own cell (from Demitri's default
 # cell: Down, Down, Down — the appended bottom row) and pick him there.
 #
@@ -20,7 +25,7 @@ set -eu
 ROMDIR="${ROMDIR:?set ROMDIR}"
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"
-OUTBASE="${1:-build/hui6}"
+OUTBASE="${1:-build/hui9}"
 
 if [ ! -f "$OUTBASE/rompath/vsavjw.zip" ]; then
     echo "building the stage-6 gfx build at $OUTBASE ..."
