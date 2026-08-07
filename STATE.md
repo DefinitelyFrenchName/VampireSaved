@@ -249,6 +249,30 @@ Read the 14z-67 sections below, then docs/NEXT_SESSION.)
   param32/flavor measurement (no fork expected), then his gfx rung
   through the ratified layout row.
 
+### 14z-67 continuation 4: THE FREEZE RAY IS FIXED (six byte-map
+### pokes — build hui8 = 59cf9f85); the lightning's remaining arc is
+### fully specified (a shared-id state segment needing the zone clone)
+
+- THE BYTE-MAP ROWS LANDED (huitzil.toml aux_pokes effect_map_*: ids
+  0x4E-0x53 -> vs2's indexes 0F/1B/1F/19/0F/03 at DATA 0x28D4E-53,
+  variant builds only) and THE 236P RAY RENDERS (replay 83 snapshot
+  f3170: the horizontal beam striking Q-Bee). The per-char record
+  rows needed NOTHING — bank_map's anim_index_a/a2/b rows 0x10 were
+  already repointed to his placed anim (verified on the built image).
+- THE LIGHTNING IS A DIFFERENT SUB-CLASS, measured precisely: the
+  grab writes effect id 0x0A (a SHARED id, byteMap[0x0A]=0x31
+  identical in both games; installed by the effect-spawn API vs2
+  0x17964 into pool slot +0x54, whole-pool FBNeo tap f3436). Its vs2
+  STATE SEGMENT re-derives the record through the byte map mid-flight
+  (bsr to stage-2) and TAIL-JMPS the fleet spawner 0x6D282; vanilla's
+  twin state lacks the tail -> no fleet. FIX = the zone-clone arc
+  (the x02592a pattern): clone the vs2 effect-state zone
+  (0x2245A-0x22Fxx, ~0xAC0B incl. the four fleet-jmp sites) + the
+  0x6D282/0x6D6BC spawner family, enter via an owner-gated thunk at
+  the vanilla machine's state dispatch for tenant-owned effect
+  objects. Likely also covers the 214 explosion + grab distinction.
+- hui8 gates: boot masked-v2 EXACT, ex/grab/air PASS, m3a bit-exact.
+
 ### PING #7 RESULTS (maintainer) — mostly good; EIGHT items, triaged.
 ### THE H ROUND-2 WORKLIST (open; first measurements + one mechanism
 ### landed)
