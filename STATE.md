@@ -328,6 +328,35 @@ TRIAGE + first measurements (14z-67 continuation 3):
     Entry point: find what spawns the $FFBxxx piece fleet in the
     native grab flow (his handler -> allocator loop) and where ours
     stops after two.
+  - FOURTH ROUND — THE MECHANISM FULLY DECODED (FBNeo alive-byte tap
+    -> spawner PC -> callers -> dispatch):
+    1. The fleet spawner = vs2 0x6D282 (family incl. 0x6D6BC):
+       repeated 0x15702 allocator calls, headers 0x01000800, piece
+       subtypes 0x25/0x26 to $A, +0x18 BANK INITIALIZED TO 0 (the
+       real bank is set by each subtype's first tick — why our
+       orphaned pieces stage bank-0), a cmpi.b #$11 newcomer branch
+       inside (vs2-specific content, no vanilla equivalent).
+    2. Reached via TAIL-JMPS from vs2's EFFECT-OBJECT FIRST-TICK
+       STATE MACHINE (sites 0x2275E/0x227AE/0x22AB8/0x22F1C):
+       d0 = effect id (+0x54 of the effect object), special-cases
+       0x3A/0x44/0x4C/0x51, pc-rel table lookup, then jmp 0x6D282.
+    3. vsavj has NO byte twin of the zone (context pattern search:
+       zero hits — vs2 rewrote it); our H's effect object falls into
+       the VANILLA effect machine, which doesn't know the newcomer
+       id -> the generic two-piece fallback with the bank never set.
+    4. THE FIX SHAPE (next arc, region-scale — the x02592a clone
+       precedent): port the vs2 effect-handler zone (0x22xxx family
+       around the four sites) + the spawner family (0x6D282..0x6D6BC+
+       bounds TBD) as regions with R1/escape pads; enter via an
+       owner-or-id-gated site_thunk at vsavj's effect-object dispatch
+       (find its first-tick dispatch site — the twin of vs2's entry).
+       One port covers RAY + LIGHTNING + likely the 214 explosion +
+       the grab-anim distinction, and possibly EX pacing (the effect
+       phases gate move progression).
+    5. Recon note: vs2 0x6D9D4 -> vsavj 0x61588 exists in the SHARED
+       map as "engine_data" (bare_long) but 0x6D9D4 is CODE (a
+       two-allocation spawner) — re-audit that row during the port
+       (the pattern twin may be right; the KIND is wrong).
   - Win screen (captures): native = GOLD (his normal family); ours =
     pink/lavender + GARBLED BLUE-GREY RECTANGLES on eye/thigh/foot —
     TWO defects: the palette (my source wrong) AND a few wrong art
