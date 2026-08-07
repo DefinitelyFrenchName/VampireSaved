@@ -1,0 +1,13 @@
+# hui FG whiff-range repro (14z-66 round 2): mid-range Final Guardian,
+# no walk-in — the guardian sequence runs FULL length (the connect
+# variant, replay 73, cuts it short and stays green). CRASHES on the
+# current build: vec3 f3398 PC 0x15098 (class-0x0C effect object asked
+# for seq 0x21). Promoted from the round-2 pair-matrix (all pairs
+# crash identically; 45 kept). KEEP as the FG gate case once fixed.
+300-305 sys=C1
+800-803 sys=S1
+1700-1702 p1=1
+3260-3262 p1=R
+3263-3265 p1=D
+3266-3269 p1=DR45
+4600 wait

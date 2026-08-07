@@ -11,6 +11,53 @@ gate test_hui_walk.sh; 11k-soak hazard re-exam clean). build/hui4 at
 
 ## Session 14z-66 (playtest round-1 worklist)
 
+### ROUND 2 (maintainer): speed CONFIRMED better; ES CONFIRMED fixed;
+### FG STILL CRASHES — second site found and characterized
+
+Maintainer round-2 report: speed "much better if not perfect" (wants a
+side-by-side eventually); Erasing Sphere fixed; Final Guardian still
+crash-resets; flavor question still blocked on float (item 3). Their
+build/hui4 was accidentally rebuilt — re-made at 3a172c52, audit clean.
+
+THE SECOND FG CRASH (reproduced first try once RANGE was right):
+- Repro: mid-range FG, ALL button pairs (45/46/56) — vec3 f3398, PC
+  0x15098 (the engine anim-node installer), reading ODD 0x2083DD,
+  A6=$FFD500. CLOSE-range FG completes (the connect cuts the guardian
+  sequence short — why replay 73 stayed green; my error: promoted the
+  connect variant, the whiff variant was the crasher). Scratch
+  replays $S/fgvar; promote 77 = fg_45_mid as the gate case.
+- WHAT FG IS (native snapshots, on record): Phobos TRANSFORMS into
+  the giant guardian; barrage pieces = poolB secondary objects types
+  0x75/0x77 (the obj_hook table2 extras) animating from his regions.
+  OURS: the 0x75/0x77 pieces are CORRECT (anims relocated exactly —
+  0x40223C = placed x2b7ef4 + the native offset).
+- THE CRASH VICTIM is not a piece: it is one of THREE VANILLA
+  class-0x0C per-player effect objects (+ one class-0x3E carrying the
+  char id) spawned by vsavj engine 0x489xx-0x48A32 at char-load
+  (native vs2 does not place these at $FFD5xx). It idles vanilla
+  anims (base +0x40 = 0x2083BC, loop 0xE2C/0xE34) all match, then at
+  f3397 its walk is asked for seq id 0x21 — base table word echoes
+  garbage -> odd cursor -> vec3 next frame. NATIVE never requests
+  seq 0x21 at the twin walker (probe, cond d0==0x21: zero hits).
+- The 0x21 does NOT come through the vanilla spark remap 0x1A610
+  (that table maps input 0x21 -> 0x41; nothing maps TO 0x21) — it
+  enters via the class-0x0C handler's own seq computation (sub-state
+  dispatcher vsavj 0x48A42, table at 0x48A58). Donovan's 14z-3 spark
+  arc is the CLASS precedent but his ids all stayed in vanilla range
+  (art-only defect, thunks staged 99); H's FG drives an id out of
+  range -> crash. Timeline note: the plain run survives longer (the
+  garbage walk is content-dependent) — the maintainer's interactive
+  crashes are the same mechanism on different frames.
+- NEXT (the fix arc): (1) decode the class-0x0C handler's seq-id
+  source during the FG barrage (probe 0x48A42 sub-states + the +0x07
+  writer on the crash object; find where 0x21 enters — suspect: his
+  FG attack records' effect/spark fields carrying vs2 ids); (2) then
+  either content-map his effect ids to vsavj equivalents (records
+  are ours to rewrite) or extend the class-0x0C seq table at unused
+  indices (superset-safe extension class); (3) gate = fg_45_mid
+  guard-clean + the close variant + a native field A/B; wire into
+  test_hui_ex.sh as the third section.
+
 ### Item 1 CLOSED — EX-move crash-reset: one voice-cue tripwire, both moves
 
 Scripted repro per the plan (stock poke ff8509=9, the 14z-44 recipe;
