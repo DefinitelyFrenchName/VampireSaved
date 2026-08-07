@@ -27,9 +27,21 @@ superset-safe. jump_params registered in the bank map + VALUE_SKIP
 121.1 NATIVE EXACT with the native rise curve; oracle mismatches
 1770 -> 1741; all ten gates green (air-gate samples retuned to the
 native rise timing); m3a bit-exact. build/hui4 = 8bea919e (ping #6).
-REMAINING of the family: the ground-dash params (ours ~7 vs native
-~8.2 px/f) — decode its consumer the same way (the dash-start writer
-tap on native is the instrument).
+THE FAMILY IS NOW CLOSED — the ground dash was EXONERATED by
+measurement: his dash physics are HIS OWN PORTED CODE (writer PC
+0x56DEA in his handler zone, xv 6.0 hardcoded + engine accel/drag),
+and the clean 2P-dummy A/B shows an IDENTICAL endpoint (723.8) and
+settle frame on both games; mid-dash samples differ only by the
+documented ±1-frame cross-engine action latency. The old "7 vs 8.2"
+reading was vs-CPU noise (the CPU pushed ours post-dash). Ledger of
+every known feel delta: float ceiling FIXED (native-exact), jump feel
+FIXED, dash NO-DEFICIT, throw-arc/RW-knockback = VICTIM-side
+vsavj-host physics (correct by the superset philosophy), DF walk
+drift subsumed by the oracle bound. Round-7 maintainer: "jumps and
+float feel good... doesn't feel wrong" (final feel call deferred to
+the gfx stage by their note). Bonus scheme validation en route: the
+walk consumer read A0=0xD7A18 = vs2's param32_a at EXACTLY the
+bank-origin delta.
 
 ### Item 5 — the coverage replays LANDED (RW GC + Dark Force,
 ### native-matched); the oracle battery is the remainder
