@@ -263,6 +263,37 @@ the matcher reads (his +0x3xx input ring — if the recorder dispatch
 row feeding it is another wrong alias, the matcher sees an empty
 ring). Builds: acda6946 current ladder; all gates green.
 
+### 14z-65 — THE NEUTRAL-ENGAGE CHAIN NAMED (write-stream diff; one
+### missing native write)
+
+The decisive instrument was a per-field WRITE-STREAM DIFF (tap on the
+object's $A(a6) byte, native vs2 vs ours, same replay): the streams are
+IDENTICAL for four writes (init clears at f2829/2830 by each game's
+own engine; the round-start 01 at f2885; OUR PORTED CODE faithfully
+writing 6 at f2885 from vs2 0x5707C = his init dispatcher's substate
+"post-init hold" — NOT a queue class, the earlier guess is corrected)
+— and native has ONE FIFTH WRITE ours lacks: **f3003 (the FIRST INPUT
+frame), vs2 PC 0x26056 writes 0** — the ENGINE'S NEUTRAL-RESET (a
+clear-sequence at vs2 ~0x2603x: $150/$136/$137/$A/$26/$105/$164/$142/
+$115...) that flips his object from post-init hold into live play.
+Ours never runs its equivalent, his dispatcher stays on substate 6
+forever, and the whole state layer (and specials) never engages —
+the SINGLE root behind every downstream symptom.
+- The reset routine is UNMAPPED (no R1 row; it sits in engine space
+  just below the shared x026142 zone), and it is DISPATCHED (record-
+  context stack), so the break is either (a) the vsavj TWIN exists and
+  the DISPATCHING of it fails on ours, or (b) his ported code installs
+  the reset via an unrelocated field/row.
+- NEXT (first command of the resume): find the reset's DISPATCHER on
+  native — debugger trace frames 3000-3006 on vs2 (input desync under
+  -debug tolerated: search the window for the 0x26056 write and read
+  the call chain above it), OR bisect with GUARD_PROBE on the reset's
+  routine HEAD (find it by scanning back from 0x26040 for the entry).
+  Then check the same chain on ours: the first absent link is the fix
+  site. Also find vsavj's own twin of the reset (veterans use it too —
+  vanilla-05's $A ends 0, so vsavj HAS the routine; find_equiv on the
+  clear-sequence).
+
 ### 14z-65 — the specials frontier NARROWED to his per-frame handler
 ### interior (bracketed by controls)
 
