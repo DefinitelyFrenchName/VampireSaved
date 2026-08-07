@@ -19,7 +19,7 @@
 #     the others is untested content on this build.
 # Ground truth for comparison: native Phobos on vsav2.
 #
-# Usage: ROMDIR=... tools/run_hui_behavior.sh [outbase=build/hui6]
+# Usage: ROMDIR=... tools/run_hui_behavior.sh [outbase=build/hui9]
 set -eu
 
 ROMDIR="${ROMDIR:?set ROMDIR}"
