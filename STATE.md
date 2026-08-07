@@ -263,6 +263,24 @@ the matcher reads (his +0x3xx input ring — if the recorder dispatch
 row feeding it is another wrong alias, the matcher sees an empty
 ring). Builds: acda6946 current ladder; all gates green.
 
+### 14z-65 — the pod first-tick frontier (resume point)
+
+The init-time vec3 decoded: engine 0x1AFAA `movea.l $4(a0),a0` faults
+because THE POD'S ANIM CURSOR ($1C of the pod struct) holds 0xFCA39 —
+ODD and inside NO placed region = garbage from an incomplete first-tick
+init, not a bad relocation. His pod handler (type 115 -> the ported
+x088512 copy at 0x897CC-equivalent) runs its first tick and fails to
+set the cursor — its anim-record source is one of the still-open
+targets (0x2ABD58 / the 0x2B7EF4-family companion-anim class are the
+suspects; for Donovan the analogous data was the x2b7ef4 Anita zone his
+manifest roots carried). RESUME: (1) probe the placed pod handler's
+first-tick in the GUARD timeline; (2) tap the pod struct's $1C writes
+at init (round-1 pod = $FFD580, so tap ffd59c) with REGLOG — the
+writer PC + source register names the table; (3) root/port the pod
+anim data per the x2b7ef4 precedent (its own extra data root with
+oracle twin), re-soak. The effect/spark remap class (Donovan 14z-3)
+likely follows right after.
+
 ### 14z-65 — f4983 SOLVED: the un-hooked type dispatch (trace-caught);
 ### frontier moves to the spark/effect remap at his pod's first tick
 
