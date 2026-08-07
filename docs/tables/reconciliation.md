@@ -508,3 +508,25 @@ value. Next: watch the writer of the index byte (trace back from
 0x0D2092's `cmpi.w #$80,D0` path) and compare against native vsav2 at the
 same anchor; likely another VS2-vs-vsavj state-space delta of the same
 family as the class-7 remap.
+
+## 14z-65 — Huitzil's R1 arc (M3b): batch rounds + the five sound stubs
+
+The map is now MULTI-TENANT in content: two `reconcile_batch` rounds over
+Huitzil's stage-4 extraction merged into this file (50/101 of his first
+engine surface was already Donovan-mapped — shared consumers; ~49 new
+verified rows; Donovan's builds proven bit-exact through both rewrites).
+
+**Five `stubbed_sound` rows added BY MEASUREMENT** (ids 0x72a / 0x73c /
+0x743 / 0x749 / 0x74a at vsav2 0x4ddc/0x4e5e/0x4e78/0x4f48/0x4f96 -> the
+engine rts 0x2A7E0): the ids sit BETWEEN the documented vsavj music
+ranges, so "music" was not assumable — the QSound key-on records
+(docs/m5/keyons_*.json) show vsavj's same-id entries key DIFFERENT
+multi-voice music-class content vs vs2's single-voice samples for all
+five. Same-id mapping would play wrong sounds mid-match; silenced until
+the M5 voice-bank port. 0x4e78 was the FIRST tripwire Huitzil's init hit
+(f2887) once the fall-through layout group let his handler body run.
+
+Open Huitzil rows (18 tripwired targets remain in his stage-4 build):
+the companion family (0x2b7ef4/0x2b8060/0x36784a — guarded soaks
+decide), engine subs 0x4223c/0x42cee/0x448d4/0x3844e, and mid-ROM data
+refs — the per-target grind continues at the next crash/soak frontier.

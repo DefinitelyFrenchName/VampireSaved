@@ -236,6 +236,31 @@ commit->load window; verdicts: id-hold / load / guard):
     whose vsavj twin has different completion semantics; the sound-farm
     five if init enqueues a sound; a companion/pool spawn deeper in.
 
+### 14z-65 — HUITZIL BOOTS (first match on the vsavj engine)
+
+Build 9252ce62 (ladder, not frozen). Probe verdict: HIS hitbox base
+0x3EC840 loaded, guard CLEAN full-run, live match vs a CPU opponent
+(sprite-garbled body = correct pre-gfx rung; HUD shows the row-alias
+name = later rung), legacy replay bit-identical. The reboot's root
+cause + two more fixes, each measured (patch_notes 14z-65 (5)):
+1. FALL-THROUGH LAYOUT GROUP: the 0x57456 insertion boundary splits
+   his handler mid-routine; placed apart, the post-jsr fall-through
+   executed padding + foreign region bytes -> wander -> watchdog.
+   [[layout_group]] "x055478,code,x057456" in huitzil.toml.
+2. [init_shim] (necessary by design, insufficient alone).
+3. FIVE stubbed_sound rows (ids 0x72a-0x74a -> rts 0x2A7E0): his init
+   enqueues voice sfx whose vsavj same-id entries key DIFFERENT
+   music-class content — MEASURED via the keyons records (the ids sit
+   BETWEEN the documented music ranges; assumption would have been
+   wrong either way). Twin doc updated same-commit.
+NEW gate tests/test_hui_boot.sh GREEN (+ ladder/extract/m3a gates).
+NEXT: the behavioral frontier — in-match input soaks (his moveset via
+scripted inputs; each new tripwire hit = the next R1 item), the
+vsav2-as-oracle stage-4 battery analog (test_m2a_stage4_oracle
+pattern), the remaining 18 targets, then HUD/select rungs and the
+Phase 2 merge. The maintainer-playtest milestone is after gfx (his
+art in a WIDE band) — sprite garble until then.
+
 Updated: 2026-08-06 (session 14z-64 — M3a COMPLETE AND FROZEN. The
 maintainer ratified the re-freeze bundle ("freeze"): the WIDE reference
 is now donovan-m3a = 4b7d0dc7 (tenant at native 0x13 by default, Jedah

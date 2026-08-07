@@ -1688,3 +1688,38 @@ vsavj = 0x0170d2
 kind = "engine_sub"
 status = "verified"
 note = "pool-family helper; skeleton-match at family delta +0x18B8"
+
+[[map]]
+vsav2 = 0x004ddc
+vsavj = 0x02a7e0
+kind = "stubbed_sound"
+status = "verified"
+note = "H KEPT SILENT (14z-65): sfx id 0x73c (Huitzil voice-bank range) — vsavj same-id keys DIFFERENT multi-voice music-class content (keyons_vsavj vs keyons_vs2, measured). Restoring needs ported samples (M5 voice-bank decision). Fired at his init f2887."
+
+[[map]]
+vsav2 = 0x004e5e
+vsavj = 0x02a7e0
+kind = "stubbed_sound"
+status = "verified"
+note = "H KEPT SILENT (14z-65): sfx id 0x749 — vsavj same-id keys DIFFERENT multi-voice content (measured). Revisit with ported samples."
+
+[[map]]
+vsav2 = 0x004e78
+vsavj = 0x02a7e0
+kind = "stubbed_sound"
+status = "verified"
+note = "H KEPT SILENT (14z-65): sfx id 0x74a — vsavj same-id keys DIFFERENT multi-voice content (measured). The FIRST tripwire his init hit (f2887)."
+
+[[map]]
+vsav2 = 0x004f48
+vsavj = 0x02a7e0
+kind = "stubbed_sound"
+status = "verified"
+note = "H KEPT SILENT (14z-65): sfx id 0x743 — vsavj same-id keys DIFFERENT multi-voice content (measured). Revisit with ported samples."
+
+[[map]]
+vsav2 = 0x004f96
+vsavj = 0x02a7e0
+kind = "stubbed_sound"
+status = "verified"
+note = "H KEPT SILENT (14z-65): sfx id 0x72a — vsavj same-id keys DIFFERENT multi-voice content (measured). Revisit with ported samples."

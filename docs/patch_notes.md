@@ -2,6 +2,36 @@
 
 Newest first.
 
+## 14z-65 (5) — HUITZIL BOOTS: first match on the vsavj engine (2026-08-07)
+
+Fingerprint 9252ce62 (stage-4 ladder build; not a frozen reference). The
+forced-pick probe loads HIS hitbox base (0x3EC840), the guard is clean
+over the full run, a live match renders (sprite-garbled body — correct
+for this rung: no gfx stage yet — vs a working CPU opponent), and the
+legacy replay stays bit-identical. Three fixes, each measured:
+
+1. THE FALL-THROUGH LAYOUT GROUP (the watchdog-reboot root cause): the
+   sibling-insertion boundary at 0x57456 splits his dispatch_00 handler
+   MID-ROUTINE — region "code" ends with the aux jsr and the handler
+   body is x057456's head. Placed apart, the post-jsr fall-through
+   executed alloc padding + the next region's bytes; the machine
+   wandered and watchdog-reset (GOTCHAS: reboot masquerades as clean
+   non-load). huitzil.toml [[layout_group]] "x055478,code,x057456"
+   restores source-relative spacing.
+2. [init_shim] (pool-seed + flavor latch, flavor_default=0x01 per
+   provisional D1) — the Donovan mechanism with engine-fact parameters.
+   Necessary by design; measured NOT sufficient alone.
+3. FIVE stubbed_sound ROWS (ids 0x72a/0x73c/0x743/0x749/0x74a -> the
+   engine rts): his init's first act is enqueueing voice sfx whose
+   vsavj same-id entries key DIFFERENT music-class content (QSound
+   key-on records — the ids sit BETWEEN the documented music ranges, so
+   this was measured, not assumed). First tripwire hit: 0x4e78 at f2887.
+
+NEW gate tests/test_hui_boot.sh (build + probe-loaded-base read from the
+build's own patch.json + guard clean + legacy bit-identity) — in the
+session's gate set with extract_hp/hui_ladder/m3a_reproducible, all
+green. 18 tripwired targets remain for the guarded-soak frontier.
+
 ## 14z-65 (4) — Huitzil stage 4 BUILDS; the R1 frontier enumerated (2026-08-07)
 
 Stage 4 (code + engine hooks) builds clean at fingerprint 94f89571 with

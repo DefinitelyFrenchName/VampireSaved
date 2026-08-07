@@ -412,6 +412,10 @@ tests/test_compare_composite.sh       # ground truth for the §4 v4 composite cl
                                       # windows, RATIFIED 2026-08-06): 7 synthetic
                                       # cases + a no-loophole check. No emulator.
                                       # donovan-m5w freezes 7 replays in this class
+tests/test_hui_boot.sh                # Huitzil stage-4 BOOT gate (14z-65): the
+                                      # forced-pick match forms with HIS data
+                                      # (base read from the build's own patch),
+                                      # guard clean, legacy bit-identical
 tests/test_hui_ladder.sh              # Huitzil stage 1-3 ladder gate (14z-65):
                                       # builds from huitzil.toml + THE OP
                                       # INVARIANT (every op = free space or a

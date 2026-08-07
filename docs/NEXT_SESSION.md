@@ -40,8 +40,15 @@ GEN_FLAGS="--profile cps2-wide-v1" tools/build_donovan.sh 3 build/hui3
 
 ## The road (docs/M3b_plan.md; sequencing adjusted 14z-65)
 
-1. **Huitzil stage 4 BUILDS (94f89571) — next: free the variant-id
-   char-load wedge.** The R1 loop ran (census: 0x55478, the velocity
+1. **HUITZIL BOOTS (build 9252ce62) — next: the behavioral frontier.**
+   The wedge fell to three measured fixes (fall-through layout group at
+   the 0x57456 mid-handler split, [init_shim], five stubbed_sound rows
+   — patch_notes 14z-65 (5); gate tests/test_hui_boot.sh). A live match
+   forms with HIS data, sprite-garbled until the gfx rung. NEXT:
+   in-match input soaks over his moveset (each tripwire hit = the next
+   R1 item; 18 remain), then the vsav2-as-oracle stage-4 battery
+   analog, then HUD/select rungs and Phase 2. Prior wording follows:
+   Huitzil stage 4 BUILDS — The R1 loop ran (census: 0x55478, the velocity
    rings 0xd143e+0x900, the shared zones with x088512 at its TRUE
    0x3B40 extent; 0x8ACD8 = his aux init in the shared zone, mystery
    closed; 23 classified tripwires remain — STATE 14z-65). The

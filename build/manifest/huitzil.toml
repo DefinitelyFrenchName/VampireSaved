@@ -46,6 +46,17 @@ flavor_default = 0x01
 flavor_held = 0x00
 flavor_hold_flag = 0xFF8060
 
+# ── Layout group (14z-65, THE watchdog-reboot fix): the sibling-insertion
+# boundary at 0x57456 splits his dispatch_00 handler MID-ROUTINE — the
+# aux jsr is region "code"'s last 6 bytes and the handler body is
+# x057456's head. Without source-relative spacing the post-jsr
+# fall-through executes alloc padding + the next region's bytes (measured:
+# probe fired at code-end with execution wandering; watchdog reboot).
+# x055478 rides along: its tail routines end near its bound and its jmp
+# into x057456 then keeps its source displacement.
+[[layout_group]]
+regions = "x055478,code,x057456"
+
 # ── ADDRESS-SPACE MODEL — same shape as donovan.toml's; duplicated for the
 # single-tenant ladder. The M3b Phase 2 multi-tenant merge hoists this into
 # a SHARED manifest (one image, one allocator) — until then the two
