@@ -75,4 +75,11 @@ run_ex 72_hui_ex_es.rpl es 4400
 echo "== Final Guardian 623+2K, connect range (replay 73)"
 run_ex 73_hui_ex_fg_close.rpl fg 4600
 
-echo "PASS: Huitzil EX moves (both fire, guard clean)"
+# The round-2 hole (14z-66): the connect variant masks the full-length
+# guardian sequence — the mid-range/whiff variant is the one that
+# reached the shadow-seq over-index (victim-side capture anims; the
+# shadow_seq_guard thunk is the fix). Both variants must stay green.
+echo "== Final Guardian 623+2K, mid range / full sequence (replay 77)"
+run_ex 77_hui_fg_whiff.rpl fgw 4400
+
+echo "PASS: Huitzil EX moves (all three fire, guard clean)"

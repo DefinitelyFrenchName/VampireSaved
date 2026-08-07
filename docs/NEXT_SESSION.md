@@ -9,7 +9,7 @@ every commit this session).
 
 ## Where each worklist item stands
 
-1. EX crash-reset — CLOSED. One voice-cue tripwire (x0689cc+0xec ->
+1. EX crash-reset — CLOSED (both crashes). Voice-cue tripwire (->
    vs2 0x4EFA) explained BOTH moves; three stubbed_sound overlay rows;
    gate tests/test_hui_ex.sh (guard-clean AND stock-decrement).
 2. Speed — CLOSED. param32 tables are 32-row/no-fold; his true pairs

@@ -3133,10 +3133,17 @@ def main():
     # the fall-through consumes them). Old bytes verified against the
     # vanilla opcode image; thunk placed in hole "a"; site patched to
     # jsr thunk (6 bytes, code-op so it re-encrypts).
-    if args.stage >= 6:
+    # 14z-66: the block gate dropped from 6 to 4 (the shadow-seq guard is
+    # a stage-4 behavior thunk) with the per-row DEFAULT stage raised to 6
+    # — every pre-existing row declares stage explicitly (6 or 99), so
+    # emission is unchanged for them at every stage (m3a gate verifies).
+    # patch = "jmp" emits a stack-neutral jmp instead of jsr, for sites
+    # whose displaced instruction is itself a jmp (the thunk must then end
+    # by continuing the flow, never rts).
+    if args.stage >= 4:
         opc_img_st = None
         for st in port.get("site_thunk", []):
-            if args.stage < _int(st.get("stage", 0)):
+            if args.stage < _int(st.get("stage", 6)):
                 continue
             nm = st["name"]
             # only_variant_slot (14z-62e): a thunk that exists only for the
@@ -3276,11 +3283,18 @@ def main():
             if td is None:
                 fail.append(f"site_thunk {nm}: no room in hole {hole_sel}")
                 continue
+            patch_kind = st.get("patch", "jsr")
+            if patch_kind == "jmp" and not st["old_hex"].lower().startswith("4ef9"):
+                fail.append(f"site_thunk {nm}: patch='jmp' requires the "
+                            f"displaced instruction to be a jmp (old_hex "
+                            f"starts {st['old_hex'][:4]})")
+                continue
             ops.append({"op": "code", "addr": f"{td:#x}", "hex": body.hex()})
             ops.append({"op": "code", "addr": f"{site:#x}",
-                        "hex": "4eb9" + f"{td:08x}"})
+                        "hex": ("4ef9" if patch_kind == "jmp" else "4eb9")
+                        + f"{td:08x}"})
             notes.append(f"code   {td:#08x} +{len(body):#x}  site_thunk {nm}; "
-                         f"site {site:#08x} jsr-routed")
+                         f"site {site:#08x} {patch_kind}-routed")
             fragments.append((td, len(body), "GEN", f"site_thunk {nm}"))
             fragments.append((site, 6, "GEN", f"site_thunk {nm} engine site"))
 

@@ -137,3 +137,36 @@ vanilla_table = 0x05E556
 vanilla_entries = 114
 src_table = 0x06A51C
 src_entries = 124
+
+# ── Shadow-seq guard (14z-66, THE second FG crash): the per-player
+# shadow/reflection servants (class-0x0C trio, vanilla spawner 0x489DE+)
+# mirror the owner's anim by reading each anim NODE's +0xC word (low 13
+# bits = a seq id) into the SHARED shadow tables at 0x2083BC/0x2087CA
+# (row space 0x40E each, hardcoded at the installer 0x823E2/0x823F2, NOT
+# per-char). H's ported nodes carry VS2 seq ids verbatim — his
+# transformation node's 0x488 over-indexes into sequence DATA, fetches a
+# garbage odd offset, vec3 at the engine installer (replay 77, f3398,
+# guard timeline). vs2's twin table (0x1E42D2) is simply larger.
+# The thunk displaces the walk jmp at 0x8245C (stack-neutral patch="jmp"):
+# seq*2 >= 0x40E -> clamp to seq 0 (the default shadow every sparse
+# vanilla row already falls back to; the +0x50 cache keeps the raw id so
+# the walk does not thrash). The clamp is deliberately UNGATED by char
+# id: FG is a CAPTURE-class super — the VICTIM (a vanilla char) plays
+# H-supplied capture anims, so it is the victim's servant that
+# over-indexes (measured: crash servant owner id 0x0C = P2; an owner==TT
+# gate missed it, build 22ea24f9). Legacy behavior is invariant by
+# construction — no vanilla content can produce an out-of-range seq
+# (it would vec3 on vanilla hardware); the boot gate's masked-v2 EXACT
+# leg verifies the cycles/skew side.
+# RESTORE AT THE GFX/NATIVE-SHADOW PASS: the same site redirects
+# out-of-range seqs to an EXTENDED table (vs2 rows ported) instead of
+# clamping.
+[[site_thunk]]
+stage = 4
+name = "shadow_seq_guard"
+site = 0x08245C
+old_hex = "4ef90001508a"
+patch = "jmp"
+# body: cmpi.w #$40e,d0; bcs.s +2 [vanilla]; moveq #0,d0;
+#       [vanilla:] jmp $1508a.l
+thunk_hex = "0c40040e650270004ef90001508a"

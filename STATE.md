@@ -6,8 +6,12 @@ CLOSED — both EX-move crash-resets were ONE open sound-farm tripwire
 stubbed_sound overlay rows fix both moves. Gate tests/test_hui_ex.sh;
 Item 2 CLOSED — param32 tables measured 32-row/no-fold; his true
 velocity pairs serve from variant rows 0x10 (port_param32 opt-in;
-gate test_hui_walk.sh; 11k-soak hazard re-exam clean). build/hui4 at
-3a172c52 = ping #2 with items 1+2. Read 14z-66 below.)
+gate test_hui_walk.sh; 11k-soak hazard re-exam clean). ROUND 2:
+speed + ES confirmed by maintainer; the SECOND FG crash (capture-anim
+shadow over-index) root-caused and FIXED with the shadow_seq_guard
+site thunk — full battery green incl. boot masked-v2 EXACT with the
+engine-site thunk live. build/hui4 at 44be1266 = ping #3 with items
+1(complete)+2. Read 14z-66 below.)
 
 ## Session 14z-66 (playtest round-1 worklist)
 
@@ -48,15 +52,32 @@ THE SECOND FG CRASH (reproduced first try once RANGE was right):
   range -> crash. Timeline note: the plain run survives longer (the
   garbage walk is content-dependent) — the maintainer's interactive
   crashes are the same mechanism on different frames.
-- NEXT (the fix arc): (1) decode the class-0x0C handler's seq-id
-  source during the FG barrage (probe 0x48A42 sub-states + the +0x07
-  writer on the crash object; find where 0x21 enters — suspect: his
-  FG attack records' effect/spark fields carrying vs2 ids); (2) then
-  either content-map his effect ids to vsavj equivalents (records
-  are ours to rewrite) or extend the class-0x0C seq table at unused
-  indices (superset-safe extension class); (3) gate = fg_45_mid
-  guard-clean + the close variant + a native field A/B; wire into
-  test_hui_ex.sh as the third section.
+- FIXED same session (build 44be1266) — the decode overturned two
+  early guesses and landed a one-thunk fix; full anatomy in
+  patch_notes 14z-66:
+  - The "0x21" was the FETCHED word, not the seq: the real seq id was
+    0x488 (cached at servant +0x50), from the +0xC word of an anim
+    NODE (nodes stride 0x18; low 13 bits = shadow-seq id).
+  - The class-0x0C trio are the per-player SHADOW/REFLECTION servants
+    (installer 0x8237E+); their tables 0x2083BC/0x2087CA are SHARED
+    engine data hardcoded at 0x823E2/0x823F2 (row space 0x40E), NOT
+    per-char. vs2's twin (0x1E42D2, via twin installer 0x90B08) is
+    larger — his nodes carry vs2 seq ids verbatim.
+  - THE VICTIM crashes, not the tenant: FG is a CAPTURE super — the
+    victim plays attacker-supplied nodes, so the victim's servant
+    over-indexes (measured: crash owner id 0x0C = P2). An owner==TT
+    gated thunk MISSED it (22ea24f9, the negative lesson).
+  - Fix: [[site_thunk]] shadow_seq_guard, UNGATED range clamp at the
+    walk site 0x8245C (seq*2 >= 0x40E -> seq 0 default shadow;
+    stack-neutral patch="jmp", a NEW emitter option; site_thunk block
+    gate 6->4 with per-row default 6 — Donovan emission unchanged,
+    m3a PASS). Legacy-invariant by construction: vanilla content
+    cannot produce an out-of-range seq (it would vec3 vanilla).
+  - Measured: replay 77 guard-clean END 4720, stock consumed,
+    snapshots show the full native sequence incl. the 7-HIT barrage
+    (native's exact hit count). Gate: test_hui_ex.sh section 3.
+  - RESTORE AT GFX: same site redirects out-of-range seqs to an
+    extended (vs2-ported) table for the native giant shadow.
 
 ### Item 1 CLOSED — EX-move crash-reset: one voice-cue tripwire, both moves
 

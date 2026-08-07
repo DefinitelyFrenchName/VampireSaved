@@ -2001,3 +2001,50 @@ window asymmetry). The 14w-b hazard RE-EXAMINED for H, second half:
 full battery GREEN on the ported tree including the 11k chaos soak
 (Donovan's 14w-b crash was at soak f10050 — H shows no analog) + EX
 gate + boot masked-v2 EXACT + m3a-reproducible.
+
+## Session 14z-66 — the second FG crash: shadow_seq_guard site thunk
+## (round-2 report; the capture-anim shadow over-index)
+
+Root chain (every link measured; instruments: replays 77 + the pair
+matrix, GUARD_TRACE 3396-3398, taps, native A/B snapshots):
+- Final Guardian is a CAPTURE-class transformation super (native: the
+  giant + 7-hit barrage; pieces = poolB secondaries types 0x75/0x77 —
+  correctly relocated on our build, cursor byte-exact).
+- The per-player SHADOW/REFLECTION servants (class-0x0C trio, spawner
+  0x489DE+, installer 0x8237E+) mirror a linked character's anim by
+  reading each anim NODE's +0xC word: low 13 bits = a seq id into the
+  SHARED shadow tables 0x2083BC/0x2087CA (row space 0x40E each,
+  hardcoded at 0x823E2/0x823F2 — NOT per-char; sequence data follows
+  at 0x208BD8). Node stride 0x18; walk site 0x8245C -> engine
+  installer 0x1508A.
+- H's ported anim nodes carry VS2 seq ids; the FG capture anims carry
+  0x488 (valid in vs2's larger table at 0x1E42D2, found via the twin
+  installer vs2 0x90B08). On vsavj, word[0x488] lands in sequence
+  DATA: fetched 0x0021 -> odd cursor -> vec3 f3398 at 0x15098.
+- THE VICTIM'S servant crashes, not H's: capture supers make the
+  victim play ATTACKER-supplied nodes (measured: crash servant owner
+  id 0x0C = P2). A first-attempt owner==tenant gate missed exactly
+  this (build 22ea24f9, kept as the negative lesson in the manifest
+  comment).
+
+Fix (build 44be1266): [[site_thunk]] shadow_seq_guard in huitzil.toml
+— site 0x8245C (old 4ef90001508a, the walk jmp) routed via a
+stack-neutral jmp (NEW patch="jmp" emitter option) to a 14-byte body:
+  cmpi.w #$40e,d0 ; bcs.s vanilla ; moveq #0,d0 ; vanilla: jmp $1508a
+Unconditional by design: no vanilla content can produce seq*2 >= 0x40E
+(it would vec3 on vanilla hardware), so legacy behavior is invariant
+by construction; the clamp serves any tenant's out-of-range ids
+(capture victims included). Clamped seq 0 = the default shadow every
+sparse vanilla row already falls back to; the +0x50 cache keeps the
+raw id so the walk does not thrash. RESTORE AT THE GFX PASS: same
+site, extended table instead of clamp.
+
+Generator changes: site_thunk block gate 6 -> 4 with per-row default
+stage raised to 6 (all existing rows declare stage explicitly — no
+emission change for Donovan at any stage; m3a gate PASS), and the
+patch="jmp" option (guarded: old_hex must be a jmp).
+
+Measured fixed: replay 77 (whiff/mid FG) guard-clean END 4720, stock
+9->8, snapshots show the full native sequence (FIRST ATTACK -> the
+7-HIT barrage, matching native's hit count). test_hui_ex.sh gained
+replay 77 as section 3.
