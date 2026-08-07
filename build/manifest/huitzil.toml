@@ -104,3 +104,18 @@ src_addr = 0x08B0F8
 old_hex = "000e"
 new_hex = "000c"
 note = "companion queue class 7 (vs2-only) -> vsavj class 6 (the Anita precedent)"
+
+# ── Satellite respawn keeper (14z-65 — the Anita pattern as a mechanism):
+# vs2 re-runs char-init every round (measured; that is how his pods
+# respawn); vsavj has no per-round char-init, so after the boundary pool
+# scrub Phobos is podless and a surviving reference dispatches the freed
+# slot (the f4983 crash). Per-frame keeper on dispatch_01: intro done
+# (idle byte $A == 0) and pod ptr word $2A == 0 -> jsr his OWN ported
+# pod-spawn tail (vs2 0x5745C = the alloc+both-pods+rts section of his
+# init handler), then the normal per-frame handler.
+[[dispatch_keeper]]
+table = "dispatch_01"
+idle_check = 0xA
+ptr_check = 0x2A
+spawn_entry = 0x5745C
+note = "pod respawn via his own init tail (vs2 round-reinit parity)"

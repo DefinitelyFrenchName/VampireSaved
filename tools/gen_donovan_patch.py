@@ -1854,6 +1854,7 @@ def main():
 
     if args.stage >= 4:
         shim_cfg = port.get("init_shim")
+        keeper_cfgs = {k["table"]: k for k in port.get("dispatch_keeper", [])}
         for d in man["dispatch"]:
             newt = None
             tgt = d["src_target"]
@@ -1862,6 +1863,47 @@ def main():
                 newt = tgt + (placed[host] - man["regions"][host]["src"])
             if newt is None:
                 fail.append(f"{d['table']}: dispatch target {tgt:#x} unplaced")
+                continue
+            kc = keeper_cfgs.get(d["table"])
+            if kc:
+                # SATELLITE RESPAWN KEEPER (14z-65, the Anita pattern made
+                # a mechanism): vs2 re-runs char-init EVERY ROUND (measured:
+                # native f2886+f8812) — that is how Huitzil's pods respawn.
+                # vsavj has no per-round char-init, so the boundary pool
+                # scrub leaves the tenant satellite-less (and a surviving
+                # reference dispatches the freed slot: the f4983 crash).
+                # Donovan's own ported code carries a per-frame companion
+                # keeper; this thunk gives a tenant the same behavior by
+                # reusing HIS OWN ported spawn code: on the per-frame row,
+                # if the intro is done (idle byte == 0) and the satellite
+                # ptr word is zero, jsr the ported spawn entry, then fall
+                # into the normal handler.
+                se = _int(kc["spawn_entry"])
+                sh = region_of(se)
+                if sh not in placed:
+                    fail.append(f"dispatch_keeper: spawn_entry {se:#x} "
+                                f"unplaced")
+                    continue
+                sp = se + (placed[sh] - man["regions"][sh]["src"])
+                kd = alloc("a", 24, "satellite respawn keeper")
+                if kd is None:
+                    continue
+                idle = _int(kc.get("idle_check", 0x0A))
+                ptrw = _int(kc.get("ptr_check", 0x2A))
+                thunk = (bytes([0x4A, 0x2E]) + idle.to_bytes(2, "big")  # tst.b (idle,A6)
+                         + bytes([0x66, 0x0C])                          # bne.s skip
+                         + bytes([0x4A, 0x6E]) + ptrw.to_bytes(2, "big")  # tst.w (ptr,A6)
+                         + bytes([0x66, 0x06])                          # bne.s skip
+                         + bytes([0x4E, 0xB9]) + sp.to_bytes(4, "big")  # jsr spawn
+                         + bytes([0x4E, 0xF9]) + newt.to_bytes(4, "big"))  # skip: jmp handler
+                assert len(thunk) == 24
+                ops.append({"op": "code", "addr": f"{kd:#x}",
+                            "hex": thunk.hex()})
+                notes.append(f"code   {kd:#08x} satellite respawn keeper "
+                             f"(idle A6+{idle:#x}==0 & ptr A6+{ptrw:#x}==0 "
+                             f"-> jsr {sp:#x}) -> handler {newt:#08x}")
+                fragments.append((kd, 24, "GEN", "satellite respawn keeper"))
+                repoint(d["table"], kd, "handler via respawn keeper")
                 continue
             if shim_cfg and d["table"] == shim_cfg["dispatch"]:
                 # synthesized pool-seeding + flavor-default init shim (see

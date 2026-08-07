@@ -263,6 +263,36 @@ the matcher reads (his +0x3xx input ring — if the recorder dispatch
 row feeding it is another wrong alias, the matcher sees an empty
 ring). Builds: acda6946 current ladder; all gates green.
 
+### 14z-65 — the Anita archaeology + the keeper mechanism; f4983 still
+### standing after six instruments (fresh-instrument list for resume)
+
+DONOVAN ARCHAEOLOGY (m3a + 20_don_round2, measured): Anita at $FFD500;
+the boundary teardown (f11800-12000 there) is CLEAN — her object AND
+Donovan's +0x28 pointer both zeroed together; his own per-frame KEEPER
+respawns her ~1000 frames later at a NEW slot ($FFD480 by f13000). The
+Anita pattern is the port's answer to vs2's per-round char-init.
+NEW GENERATOR MECHANISM [[dispatch_keeper]] (opt-in): wraps a dispatch
+row with "intro done && satellite ptr zero -> jsr the tenant's OWN
+ported spawn tail" (H: dispatch_01 + vs2 0x5745C, the alloc+pods+rts
+section of his init). Emitted, gates green — but UNPROVEN for round-2
+pods: the f4983 crash precedes the keeper's first opportunity.
+f4983 FACTS BANKED (five fix hypotheses failed to move it; crash is
+byte-stable): B980 sits properly in a FREE LIST at f4982 (the single
+reference: free-list node $FF2FF8); NO writes touch B980 during
+f4983-84 (tap-proven) yet the crash context has A6=B980; the husk's +0
+flags are 0000 (walkers should skip); GUARD_BREAK at 0x3B001E did not
+fire before the vec4. Crash-stack extras: A5 work vars $FF8030/$FF8034
+hold placed-code addresses (0xF270E hole_a / 0x3F7080 hole_b) — stored
+handler/continuation pointers; a NEIGHBORING stale work var read as a
+pointer is an open suspect (the Donovan A5-displacement class).
+RESUME INSTRUMENTS, in order: (1) vanilla-05 comparative at ITS round
+boundary — how free slots are walked safely and which +0 flag
+discriminates (is the husk's flag wrong?); (2) per-frame B980 flag
+dumps 4890->4983 (watch the husk's lifecycle byte-by-byte); (3) the
+A5 work-var audit around $FF8030-family for vs2-layout displacements
+in his ported code (the -0x52-family shift class); (4) if all else
+fails, interactive MAME -debug at the boundary.
+
 ### 14z-65 — f4983 ROOT NAMED: no per-round char-init on vsavj; pods
 ### die at the boundary and their queue node dispatches the husk
 
