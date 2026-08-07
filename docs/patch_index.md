@@ -57,3 +57,21 @@ ground-truth tested (`tests/test_crash_guard.sh`,
 per the CLAUDE.md §4 doctrine. Patched-build suite runs:
 `MAME_ROMPATH="<packed>;$ROMDIR" tests/run_suite.sh` — needs a registry row
 (frozen expectation set) for the build's program-image fingerprint.
+
+## STALENESS NOTICE (2026-08-07, 14z-66 close — found in a doc audit)
+
+This registry was never grown past M1: everything from the M2a Donovan
+port through the 14z-66 Huitzil arc is MISSING here. The authoritative
+per-change records are docs/patch_notes.md (newest first, byte detail),
+the manifests (build/manifest/donovan.toml, huitzil.toml,
+reconciliation*.toml, bank_map.toml — every mechanism row carries its
+session tag and rationale inline), and the per-session STATE.md
+records. Current mechanism inventory lives in the generator
+(tools/gen_donovan_patch.py section comments): regions/layout_group,
+port_patch, site_thunk (+jmp/jmp_ok/id_literal_ok/region_subst/
+data_subst/row_subst), obj_hook, state_hook, init_shim, alloc_wrap,
+sound_table/stubbed_sound, data_in_code, pcrel_escape_fix, table_fix,
+gfx_remap, dispatch_keeper, values/VALUE_SKIP(port_param32).
+BACKFILL TASK (queued in NEXT_SESSION): rebuild this page as the
+one-page status/dependency/exclusivity registry the taxonomy intends,
+from patch_notes + the manifests — a documentation pass, no code.

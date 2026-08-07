@@ -66,6 +66,12 @@ tests/test_hui_oracle.sh [rompath]      # THE oracle battery (4 locks, ~10 min)
 tools/run_hui_behavior.sh               # interactive (build/hui4)
 ```
 
+## Queued documentation task (found in the 14z-66 close audit)
+
+docs/patch_index.md was never grown past M1 — the one-page patch
+registry needs a backfill pass from patch_notes.md + the manifests
+(a staleness notice + mechanism inventory pointer is in place).
+
 ## Standing facts (14z-66 additions; do not re-derive)
 
 - 2P forced-pick pokes: frames 1400-1500 ONLY (late pokes leak into
