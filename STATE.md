@@ -263,6 +263,31 @@ the matcher reads (his +0x3xx input ring — if the recorder dispatch
 row feeding it is another wrong alias, the matcher sees an empty
 ring). Builds: acda6946 current ladder; all gates green.
 
+### 14z-65 — the f4983 crash: characterized, hardened, OPEN
+
+Two correct-by-precedent hardening fixes landed (kept even though
+neither is THE fix — the crash is byte-identical with both):
+[init_shim] latch_mode="phase" (seed only when $FF800C.l == 0x40000 =
+the char-load phase; measured discriminator) and the companion
+queue-class 7->6 port_patch on H's copy of x088512 (the Anita
+precedent row donovan.toml carries).
+The crash, precisely: deterministic f4983 (round-2 boundary + ~93
+frames), vec4 at PC 0x3B001E (palette space), A6 = 0xFFB980 — a slot
+the round-boundary seeder walk (f4890, PCs 0x16C7A-0x16F44) left with
+class defaults + zeros; the update queues are NODE CHAINS in the
+0xFF31xx arena (heads at $FFF990: 0xFF319E/31DE/... stride 0x40) and
+some node still references the dead slot. Round 1 is CLEAN through
+2000+ frames of live fighting (states, moves, sounds censused).
+NEXT on this thread: (1) native-vs-ours comparative at f4982 — what
+does a healthy 0xFFB980 hold on vs2, and which arena node references
+B980 on each side (dump 0xFF3180-0xFF3400 both, diff node chains);
+(2) identify the f4983-adjacent replay event (the chaos cycle puts a
+QCF+LP there — but round-1 beams were clean, so suspect the ROUND-2
+transition leaving H's spawned satellites (0xFFD580/D600 from init)
+stale while vanilla chars' equivalents re-init; (3) the seeder walk at
+round boundaries may be NORMAL vsavj flow (verify with the vanilla-05
+control tap before trusting any wipe theory again).
+
 ### 14z-65 — ENGAGE FIXED: states alive, moves execute; two new
 ### findings banked (odd-ref classifier bug; shim re-seed fragility)
 

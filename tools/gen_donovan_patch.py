@@ -1875,8 +1875,10 @@ def main():
                 #   move.l A5,-(SP); lea $FF8000.l,A5; tst.l (latch,A5)
                 #   bne.s +6; jsr seed_entry; movea.l (SP)+,A5
                 #   move.b #flavor_default,(flavor_disp,A6); jmp handler
-                sd = alloc("a", 76 if shim_cfg.get("objram_clear") else 68,
-                           "init seed shim")
+                _shimlen = 76 if shim_cfg.get("objram_clear") else 68
+                if shim_cfg.get("latch_mode") == "phase":
+                    _shimlen += 12
+                sd = alloc("a", _shimlen, "init seed shim")
                 if sd is None:
                     continue
                 latch = _int(shim_cfg["latch_disp"])
@@ -1911,8 +1913,24 @@ def main():
                 objclr = b""
                 if shim_cfg.get("objram_clear"):
                     objclr = bytes.fromhex("13fc005000ff7f00")  # move.b #$50,$ff7f00.l (countdown)
+                # PHASE-GATED LATCH (14z-65, manifest opt-in latch_mode =
+                # "phase"): the pool-head latch alone is FALSE mid-match —
+                # a tenant whose ecosystem drains pool 0 makes the round-2
+                # char re-init re-run the seeder over LIVE pools (measured:
+                # f4890 wipe, orphaned queues, a freed slot dispatched into
+                # palette space). $FF800C.l == 0x00040000 EXACTLY at the
+                # char-load phase (measured: 0x40000 at first init, 0x60000
+                # mid-round, 0 at the round-2 scrub) — seed only then.
+                # ABSENT for Donovan's manifest: his frozen shim bytes are
+                # unchanged until his own re-freeze adopts the mode.
+                phase_gate = b""
+                if shim_cfg.get("latch_mode") == "phase":
+                    phase_gate = (bytes([0x0C, 0xB9, 0x00, 0x04, 0x00, 0x00,
+                                         0x00, 0xFF, 0x80, 0x0C])  # cmpi.l #$40000,$FF800C.l
+                                  + bytes([0x66, 0x0C]))           # bne.s past tst/bne/jsr
                 shim = (bytes([0x2F, 0x0D])                       # move.l A5,-(SP)
                         + bytes([0x4B, 0xF9, 0x00, 0xFF, 0x80, 0x00])  # lea $FF8000.l,A5
+                        + phase_gate
                         + bytes([0x4A, 0xAD]) + latch.to_bytes(2, "big")  # tst.l (latch,A5)
                         + bytes([0x66, 0x06])                     # bne.s skip seed
                         + bytes([0x4E, 0xB9])
@@ -1932,7 +1950,7 @@ def main():
                         + bytes([0x1D, 0x7C, 0x00, flav_h])       # move.b #held,
                         + flav_d.to_bytes(2, "big")               #   (flavor,A6)
                         + bytes([0x4E, 0xF9]) + newt.to_bytes(4, "big"))  # skip: jmp
-                assert len(shim) == 68 + len(objclr), len(shim)
+                assert len(shim) == 68 + len(objclr) + len(phase_gate), len(shim)
                 ops.append({"op": "code", "addr": f"{sd:#x}", "hex": shim.hex()})
                 notes.append(f"code   {sd:#08x} init shim (pool latch A5+"
                              f"{latch:#x}, seeder "

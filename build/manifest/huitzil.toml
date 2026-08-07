@@ -40,6 +40,9 @@ id = 0x10
 dispatch = "dispatch_00"
 seed_entry = 0x016C64
 latch_disp = 0x7966
+# 14z-65: phase-gated latch — H's ecosystem drains pool 0, so the bare
+# head latch re-seeds LIVE pools at round-2 re-init (the f4890 wipe).
+latch_mode = "phase"
 objram_clear = false
 flavor_disp = 0x3C2
 flavor_default = 0x01
@@ -82,3 +85,17 @@ start = 0x400010
 end = 0x600000
 class = "raw"
 profile = "cps2-wide-v1"
+
+# ── Companion queue-class remap (14z-65 — the Donovan/Anita precedent,
+# donovan.toml's identical row): the shared x088512 zone registers
+# companion-class objects in vs2's update-queue class 7, which does not
+# exist on vsavj (7 classes, 0-6). Unremapped, the registration leaves a
+# stale vs2-encoded queue node; after the round-2 pool re-seed the node
+# dispatches a freed slot (measured: the f4983 crash, PC in palette
+# space). Same remap: class 7 -> vsavj's last class 6.
+[[port_patch]]
+region = "x088512"
+src_addr = 0x08B0F8
+old_hex = "000e"
+new_hex = "000c"
+note = "companion queue class 7 (vs2-only) -> vsavj class 6 (the Anita precedent)"
