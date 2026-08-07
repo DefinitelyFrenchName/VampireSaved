@@ -89,6 +89,13 @@ def main():
                     help="overlay_tiles.json from overlay_port.py: [src,dst] "
                          "BANK-1 pairs (companion-overlay art at dead-Jedah "
                          "+ padding positions; session 14q)")
+    ap.add_argument("--effect-c5",
+                    help="effect_c5.json from the generator (14z-67): the "
+                         "companion-effect records' full bank-1 code list, "
+                         "kept NATIVE — art copied vs2 group A -> group C "
+                         "BANK 5 at 0x10000+code; the ported piece "
+                         "spawners' bank setters flip to #$3000 on the "
+                         "program side. Group-C mode only")
     ap.add_argument("--select-bank5",
                     help="select_bank5.json from the generator: native "
                          "bank-1 tile codes whose art is copied vs2 -> "
@@ -232,17 +239,43 @@ def main():
             written.add(t)
         print(f"effects: {len(eff_pairs)} tiles placed from effect_map")
 
+    # companion-effect art in bank 5 (14z-67, the ping-#7 fuchsia class):
+    # the records' NATIVE bank-1 codes, art from vs2 group A. Placed
+    # FIRST among the bank-5 passes; a later pass colliding on a code
+    # asserts loudly unless the bytes agree (same-source rule).
+    eff5 = []
+    srcA5 = None
+    if args.effect_c5 and group_c:
+        eff5 = json.load(open(args.effect_c5))
+        srcA5 = load_group(z2, "vs2", GROUP_A)
+        for c in eff5:
+            d5 = 0x10000 + c
+            assert d5 not in written, f"effect-c5 dst 0x{d5:05X} collides"
+            write_tile(dst, d5, tile_bytes(srcA5, 0x10000 + c))
+            written.add(d5)
+        print(f"effect-c5: {len(eff5)} native bank-1 tiles copied to "
+              f"group C upper bank")
+    elif args.effect_c5:
+        e5j = json.load(open(args.effect_c5))
+        assert not e5j, ("effect_c5.json has tiles but the build is not "
+                        "group-C mode — the spawner bank flip would dangle")
+
     # bank-5 select art (option A, 14z-62j): NATIVE bank-1 codes copied
     # into group C's upper bank, disjoint from the band/shelf by
     # construction (band in-group indices are < 0x10000).
     b5 = []
-    srcA5 = None
     if args.select_bank5 and group_c:
         b5 = json.load(open(args.select_bank5))
-        srcA5 = load_group(z2, "vs2", GROUP_A)
+        if srcA5 is None:
+            srcA5 = load_group(z2, "vs2", GROUP_A)
         for c in b5:
             d5 = 0x10000 + c
-            assert d5 not in written, f"bank-5 dst 0x{d5:05X} collides"
+            if d5 in written:
+                # same-source rule: an effect-c5 tile already placed this
+                # code from the SAME vs2 group A — byte-identical is benign
+                assert tile_bytes(dst, d5) == tile_bytes(srcA5, 0x10000 + c), \
+                    f"bank-5 dst 0x{d5:05X} collides with DIFFERENT bytes"
+                continue
             write_tile(dst, d5, tile_bytes(srcA5, 0x10000 + c))
             written.add(d5)
         print(f"select bank-5: {len(b5)} native tiles copied to group C "
@@ -269,7 +302,11 @@ def main():
             written.add(d5)
         for c in wb5["vs2"]:
             d5 = 0x10000 + c
-            assert d5 not in written, f"wheel vs2 dst 0x{d5:05X} collides"
+            if d5 in written:
+                assert tile_bytes(dst, d5) == \
+                    tile_bytes(srcA5, 0x10000 + c), \
+                    f"wheel vs2 dst 0x{d5:05X} collides with DIFFERENT bytes"
+                continue
             write_tile(dst, d5, tile_bytes(srcA5, 0x10000 + c))
             written.add(d5)
         print(f"wheel bank-5: {len(wb5['host'])} host tiles (byte-identical "
@@ -297,6 +334,10 @@ def main():
         assert tile_bytes(dst, 0x10000 + c) == \
             tile_bytes(srcA5, 0x10000 + c), \
             f"bank-5 readback mismatch at 0x{c:04X}"
+    for c in eff5:
+        assert tile_bytes(dst, 0x10000 + c) == \
+            tile_bytes(srcA5, 0x10000 + c), \
+            f"effect-c5 readback mismatch at 0x{c:04X}"
     for c in wb5["host"]:
         assert tile_bytes(dst, 0x10000 + c) == \
             tile_bytes(srcA_host, 0x10000 + c), \

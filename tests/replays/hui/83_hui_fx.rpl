@@ -1,0 +1,13 @@
+# hui effect-piece showcase (14z-67, the ping-#7 fuchsia class): clean
+# 236LP (freeze ray) at round start, then 214MP (arcing projectile ->
+# ground explosion at range). Forced-pick flow (POKES supply id 0x10).
+300-305 sys=C1
+800-803 sys=S1
+1700-1702 p1=1
+3150-3152 p1=D
+3153-3155 p1=DR
+3156-3158 p1=R1
+3380-3382 p1=D
+3383-3385 p1=DL
+3386-3388 p1=L2
+3700 wait

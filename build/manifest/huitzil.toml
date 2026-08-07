@@ -668,3 +668,39 @@ ring_rows = true
 ring_ref_cell = 0x0F
 highlight_array = 0x268A02
 march_retarget_mid = true
+
+# ── 14z-67 ping #7 items 1/3/8-electricity (the fuchsia class): the
+# companion-effect records reference 5,714 bank-1 tiles of which 2,007
+# are NOT byte-identical in vsav's effect page (freeze ray, ground
+# explosion, grab electricity live there); effect_tail's Donovan-era
+# maps covered only 385. Fix (group-C tenants): keep the record words
+# NATIVE (generator c5 mode; art placed at native codes in group C
+# bank 5 via effect_c5.json) and flip the PORTED piece spawners' bank
+# setters #$2000 -> #$3000. Only ported content reaches these spawners
+# — tenant-only by construction.
+[[port_patch]]
+stage = 6
+region = "x088512"
+src_addr = 0x08B224
+old_hex = "3d7c20000018"
+new_hex = "3d7c20000018"
+new_hex_variant = "3d7c30000018"
+note = "companion-piece bank setter: effect page bank 1 -> WIDE bank 5 (native codes)"
+
+[[port_patch]]
+stage = 6
+region = "x088512"
+src_addr = 0x08BF14
+old_hex = "397c20000018"
+new_hex = "397c20000018"
+new_hex_variant = "397c30000018"
+note = "companion-piece bank setter: effect page bank 1 -> WIDE bank 5 (native codes)"
+
+[[port_patch]]
+stage = 6
+region = "x088512"
+src_addr = 0x08BF52
+old_hex = "397c20000018"
+new_hex = "397c20000018"
+new_hex_variant = "397c30000018"
+note = "companion-piece bank setter: effect page bank 1 -> WIDE bank 5 (native codes)"

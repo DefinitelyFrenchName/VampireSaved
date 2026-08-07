@@ -1421,6 +1421,21 @@ def main():
                 # is fabricated for a build that places no shelf.
                 b2_recs = ({int(x, 16) for x in et.get("bank2_recs", [])}
                            if port.get("gfx_remap") else set())
+                # 14z-67 (ping #7: the fuchsia-explosion / missing-ray /
+                # missing-electricity class): 2,007 of the 5,714 bank-1
+                # tiles these records reference are NOT byte-identical in
+                # vsav's effect page, and effect_tail's Donovan-era maps
+                # cover only 385 of them. On a delta-0 GROUP-C tenant the
+                # clean fix is bank 5: keep every tile word NATIVE (skip
+                # the bmap rewrite entirely), emit the full referenced
+                # bank-1 code list as effect_c5.json (build_gfx places
+                # the art at native codes in group C's upper bank), and
+                # flip the ported piece-spawner setters #$2000 -> #$3000
+                # (manifest port_patch rows — tenant-only by
+                # construction: only ported content reaches them).
+                c5_mode = (not port.get("gfx_remap")
+                           and _int(port["port"].get("gfx_bank", 2)) >= 4)
+                c5_tiles = set()
                 b2map = {}
                 for k, v_ in et.get("bank2_place", {}).items():
                     tt, bx, by = k.split(",")
@@ -1493,6 +1508,16 @@ def main():
                                             (nt & ~0xF) + (dy << 4)
                                             + ((nt + dx) & 0xF)])
                             continue
+                        if c5_mode:
+                            # native codes kept; art follows to bank 5
+                            if t < 0x10000:
+                                bx5, by5 = key[1], key[2]
+                                for dy in range(by5):
+                                    for dx in range(bx5):
+                                        c5_tiles.add(
+                                            (t & ~0xF) + (dy << 4)
+                                            + ((t + dx) & 0xF))
+                            continue
                         nt = bmap.get(key)
                         if nt is not None:
                             blob[toff:toff + 2] = nt.to_bytes(2, "big")
@@ -1521,14 +1546,28 @@ def main():
                             emj.append(p)
                             known.add((p[0], p[1]))
                     (out / "effect_map.json").write_text(json.dumps(emj))
-                notes.append(f"# {name}: effect_tail — {n_et} bank-1 words, "
-                             f"{n_b2} bank-2 words (tail placements), "
-                             f"{n_cfix} coord lists matched, {n_cport} "
-                             f"ported ({len(extra_lists)}B fragment)")
-                if n_et < 100 or (n_cfix + n_cport) < 100:
-                    fail.append(f"effect_tail: {n_et} tile words / "
-                                f"{n_cfix + n_cport} coord lists — "
-                                f"below expectation, walker drifted")
+                if c5_mode:
+                    (out / "effect_c5.json").write_text(
+                        json.dumps(sorted(c5_tiles)))
+                    notes.append(f"# {name}: effect-c5 — {len(c5_tiles)} "
+                                 f"bank-1 codes kept NATIVE (art -> group C "
+                                 f"bank 5); {n_cfix} coord lists matched, "
+                                 f"{n_cport} ported "
+                                 f"({len(extra_lists)}B fragment)")
+                    if len(c5_tiles) < 1000 or (n_cfix + n_cport) < 100:
+                        fail.append(f"effect-c5: {len(c5_tiles)} codes / "
+                                    f"{n_cfix + n_cport} coord lists — "
+                                    f"below expectation, walker drifted")
+                else:
+                    notes.append(f"# {name}: effect_tail — {n_et} bank-1 "
+                                 f"words, {n_b2} bank-2 words (tail "
+                                 f"placements), {n_cfix} coord lists "
+                                 f"matched, {n_cport} ported "
+                                 f"({len(extra_lists)}B fragment)")
+                    if n_et < 100 or (n_cfix + n_cport) < 100:
+                        fail.append(f"effect_tail: {n_et} tile words / "
+                                    f"{n_cfix + n_cport} coord lists — "
+                                    f"below expectation, walker drifted")
                 if port.get("gfx_remap") and n_rw < 10000:
                     fail.append(f"gfx_remap: only {n_rw} tile words rewritten "
                                 f"(expected ~14k) — walker or band drifted")

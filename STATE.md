@@ -249,6 +249,60 @@ Read the 14z-67 sections below, then docs/NEXT_SESSION.)
   param32/flavor measurement (no fork expected), then his gfx rung
   through the ratified layout row.
 
+### PING #7 RESULTS (maintainer) — mostly good; EIGHT items, triaged.
+### THE H ROUND-2 WORKLIST (open; first measurements + one mechanism
+### landed)
+
+Maintainer report on b99b7359: select/wheel/splash/HUD/sprites all
+good; issues: (1) 236P freeze ray sprite missing (freeze itself
+works); (2) sidekick shadow rectangular not round; (3) 214P ground
+explosion = fuchsia tiles at range; (4) both EX moves feel slow vs
+VS2 (FG post-capture especially; EX projectiles too) and ES sometimes
+passes through/no damage (Morrigan, mid-screen); (5) win screen wrong
+palettes; (6) cell 0x13 gives Victor — EXPECTED (single-tenant build,
+unbacked cells; the Phase-2 merge backs all three); (7) Dark Force
+shows inverted colors + after-images unlike VS2; (8) both grabs share
+one animation and lack the electricity arcs.
+
+TRIAGE + first measurements (14z-67 continuation 3):
+- Item 2 = the documented RESTORE-AT-GFX shadow item (14z-66): the
+  shadow_seq_guard clamps out-of-range seqs to the default shadow;
+  the fix is the extended vs2-ported shadow table at the same site.
+- Item 5 = my win-pal source derivation is WRONG (the color0==color1
+  read was flagged suspicious at authoring; now confirmed). Measure
+  vs2's win drawer for a newcomer special-case (like the select-pal
+  compare chain at 0x6B1A6).
+- Item 7 = DF STYLE, not DF mechanics (pods native-verified replay
+  82): the inverted+afterimage look is the HOST engine's per-char DF
+  effect style with his row aliasing a vanilla char. Decode the DF
+  style table.
+- Items 1/3 MEASURED (replay 83 + obj dumps, ours vs native vs2 with
+  identical poke flow): THE RAY PIECES RUN H'S OWN BANK NATIVELY
+  (bank 3, codes 0x0FA0-0x1088 — INSIDE his placed band, so the art
+  EXISTS on our build) and on ours the beam pieces NEVER STAGE — a
+  SILENT SPAWN FAILURE (freeze still connects; no crash; suspect the
+  piece pool/spawn path, NOT art). The 214 pieces are also
+  his-bank/his-band natively (0x02xx/0x0Fxx at f3440) — fuchsia =
+  likely a wrong BANK WORD on the staged pieces, not missing art.
+  Replay 83 (tests/replays/hui/83_hui_fx.rpl) is the repro rig.
+- Items 1/3/8 first hypothesis (the x2b7ef4 bank-1 class) built
+  ANYWAY as reusable machinery — c5 mode (14z-67): for delta-0
+  group-C tenants the generator keeps companion-record bank-1 words
+  NATIVE and emits effect_c5.json (5,714 codes); build_gfx places
+  the art at native codes in group C bank 5; three ported spawner
+  setters flip #$2000 -> #$3000 (huitzil.toml rows). Rationale: 2,007
+  of those tiles are NOT byte-identical in vsav's effect page and
+  effect_tail's Donovan maps covered only 385 — whatever pieces draw
+  through those records were wrong-art on hui6. Landed in
+  build/hui7 = 93c9aa44; behavior gates all PASS (boot masked-v2
+  EXACT, ex/air/grab); VISUAL verification against its own symptom
+  (grab electricity) still pending — the ray is measured NOT to be
+  this class.
+- Item 4 (EX speed/ES collision) = the behavior-measurement arc:
+  2P-dummy native A/B per move (the m2a rig), post-capture FG pacing
+  vs native, ES hitbox/phase measurement at varied ranges.
+- build/hui6 stays the pinned ping-#7 artifact; hui7+ carry fixes.
+
 ## Session 14z-66 (playtest round-1 worklist)
 
 ### The alias-physics port OPENED — jump_params row landed (float

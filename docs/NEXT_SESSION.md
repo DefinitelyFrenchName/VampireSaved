@@ -1,6 +1,19 @@
 # NEXT SESSION — orientation (written at the close of 14z-67, 2026-08-07)
 
-**Start here: THE D4 PHOBOS GFX VERTICAL IS BUILT AND FULLY GATED —
+**PING #7 RESULTS ARE IN (mostly good; 8 items) — THE H ROUND-2
+WORKLIST IS THE OPENER. STATE "PING #7 RESULTS" has the full triage +
+first measurements: the 236P ray is a SILENT SPAWN FAILURE (art
+exists in his band; pieces never stage — replay 83 + obj dumps ours
+vs native), the 214 fuchsia is likely a wrong staged BANK WORD, the
+shadow is the documented clamp-restore item, the win-pal source
+derivation is confirmed wrong (re-measure vs2's win drawer), the DF
+look is a style-table alias, EX-speed/ES-collision needs the 2P-dummy
+native A/B arc. The c5 bank-5 effect machinery landed (hui7 =
+93c9aa44, gates green, visual verify pending). Cell-0x13-shows-Victor
+is EXPECTED single-tenant behavior. build/hui6 stays the pinned
+ping-#7 artifact.**
+
+Prior state: THE D4 PHOBOS GFX VERTICAL IS BUILT AND FULLY GATED —
 Huitzil renders his real art everywhere and his wheel cell 0x10 is
 hand-pickable. build/hui6 = b99b7359 is PING #7, awaiting the
 maintainer playtest, and is PINNED (PING7_DO_NOT_REBUILD.md — never
