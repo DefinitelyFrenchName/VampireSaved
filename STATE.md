@@ -17,6 +17,42 @@ Pyron merge; sounds stay stubbed until M5). build/hui4 = 8bea919e
 (ping #6, feel-confirmed round 7). Ten gates green; m3a bit-exact on
 every commit. Read the 14z-66 sections below, then docs/NEXT_SESSION.)
 
+## Session 14z-67 (D4: the Phobos gfx vertical)
+
+### D4 opener 1 DONE — 3-tenant tile budgets measured; group-C layout
+### RATIFIED (flip condition does NOT trigger)
+
+- Instrument: tools/obj_records.py over the three ratified extraction
+  anim spans (H 0x245872+0x1E800 from the hui4 extraction; P
+  0x264086+0x1B500 from a fresh 14z-67 extraction, oracle-clean, 0
+  variant-site bytes; D 0x27F548+0x20F00). Both H/P region_anim.bin
+  files verified VERBATIM slices of the vs2 data image, so the lock
+  gate re-derives everything from the reference zips alone.
+- THE DECISIVE FACT: all three tenants' art lives in vs2 BANK 3
+  (bank-table rows 0x10/0x11/0x13 all 0x6000) at mutually compatible
+  native codes — H band 0x0AF6-0x4EFC (14,870 tiles), P band
+  0x4ED5-0x8647 (14,037), D band 0x863F-0xC2EF (15,498), nearly
+  back-to-back; boundary overlaps (H∩P 39 / P∩D 33 / H∩D 82) are
+  SHARED tiles. They shipped coexisting in one 64K bank.
+- THE LAYOUT (no gameplay surface — placement only): H and P place
+  into group C bank 4 at DELTA 0 — native codes, so their records
+  need NO remap at all (nothing to rewrite is nothing to get wrong).
+  Donovan keeps his frozen +0x2750 (m3a reproducibility untouched).
+  Disjointness proven by interval: max(H∪P)=0xA42C < SAFE_LO 0xAD80.
+  Pyron's share is RESERVED by manifest row before any H tile lands
+  (the D4 ordering requirement).
+- FLIP CONDITION: does not trigger. Occupancy 68.1% (44,607/65,536);
+  worst-case bound 45,645; free pools 0x8648-0xA42B (7,652),
+  0xA42D-0xAD7F (2,387), 0xEE74-0xFFFF (4,492). Plan A ratified;
+  no profile growth, no version bump.
+- Artifacts: build/manifest/gfx_layout3.toml (the ledger the Phase-3
+  multi-tenant gfx pass will consume; collision rule
+  "same-source-or-fail"), NEW gate tests/test_gfx_layout3.sh (12
+  locks: one-source-bank, three frozen inventories, manifest
+  agreement, delta rows, interval disjointness, the flip-condition
+  bound, shared-code counts). Docs: engine_internals inventories,
+  cps2_wide.md layout section.
+
 ## Session 14z-66 (playtest round-1 worklist)
 
 ### The alias-physics port OPENED — jump_params row landed (float

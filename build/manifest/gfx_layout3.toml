@@ -1,0 +1,101 @@
+# gfx_layout3.toml — the ratified 3-tenant group-C tile layout (14z-67).
+#
+# THE MEASUREMENT THIS RESTS ON (D4 opener step 1, 2026-08-07; instrument
+# tools/obj_records.py over the ratified extraction anim spans, locked by
+# tests/test_gfx_layout3.sh):
+#
+#   All three tenants' art lives in vs2 BANK 3 — the appended-newcomer
+#   bank — at MUTUALLY COMPATIBLE native codes (they shipped coexisting
+#   in one 64K bank on real hardware):
+#
+#     Huitzil  0x10: main band 0x0AF6-0x4EFC (14,870 tiles) + 25 low
+#     Pyron    0x11: main band 0x4ED5-0x8647 (14,037 tiles) + 51 scatter
+#     Donovan  0x13: main band 0x863F-0xC2EF (15,498 tiles) + 112 low
+#
+#   Boundary overlaps (H∩P 39, P∩D 33, H∩D 82 codes) are SHARED tiles —
+#   same bank, same code, one source image — identical by construction.
+#
+# THE LAYOUT DECISION (no gameplay surface — placement only):
+#
+#   Huitzil and Pyron place at DELTA 0: their records' native tile words
+#   are already correct for group C bank 4, so their anim regions need
+#   NO record remap at all (the strongest possible correctness class —
+#   nothing to rewrite is nothing to get wrong). Donovan KEEPS his
+#   frozen delta +0x2750 (donovan-m3a 4b7d0dc7 must stay reproducible).
+#
+#   Disjointness is proven by intervals, not by enumeration:
+#   max(H∪P native code) = 0xA42C < 0xAD80 = Donovan's SAFE_LO, and
+#   build_gfx asserts every Donovan write inside [SAFE_LO, SAFE_HI].
+#
+# FLIP CONDITION (D4): does NOT trigger. Bank-4 occupancy with all
+# three tenants ~44.6K/65,536 codes (68.1%); worst-case bound
+# (H∪P exact + Donovan's whole safe window) 45,645 — ~20K codes free.
+# No profile growth needed; plan A (packing) ratified by measurement.
+
+[profile]
+name = "cps2-wide-v1"
+group = "C"                 # banks 4-5, members vsw.31m/33m/35m/37m
+bank4_word = 0x1000         # OBJ y-word: bit-12 promote + bank bits 00
+bank5_word = 0x3000         # bit-12 promote + bank bits 01
+
+# Cross-tenant collision rule for the multi-tenant gfx pass (Phase 3
+# machinery): two tenants may write the same bank-4 dst code ONLY if the
+# source bytes are identical (delta-0 tenants sharing a native code
+# satisfy this by construction; anything else is a build error).
+collision_rule = "same-source-or-fail"
+
+[[tenant]]
+name = "huitzil"
+id = 0x10
+src_bank = 3                # vs2 bank-table row 0x10 = 0x6000
+anim_base = 0x245872        # ratified extraction span (14z-65/66)
+anim_len  = 0x1E800
+band_lo = 0x0AF6
+band_hi = 0x4EFC
+delta = 0                   # native codes — no record remap
+scatter_lo = 0x0000         # 25 low shared-effect tiles, native codes
+scatter_hi = 0x06D8
+
+[[tenant]]
+name = "pyron"
+id = 0x11
+src_bank = 3                # vs2 bank-table row 0x11 = 0x6000
+anim_base = 0x264086        # ratified extraction span (14z-67 run,
+anim_len  = 0x1B500         # oracle-clean, 0 variant-site bytes)
+band_lo = 0x4ED5
+band_hi = 0x8647
+delta = 0                   # native codes — no record remap
+scatter_lo = 0x003F         # 51 scattered tiles incl. 0xA42C (the
+scatter_hi = 0xA42C         # highest H∪P native code)
+
+[[tenant]]
+name = "donovan"
+id = 0x13
+src_bank = 3                # vs2 bank-table row 0x13 = 0x6000
+anim_base = 0x27F548
+anim_len  = 0x20F00
+band_lo = 0x863F
+band_hi = 0xC2EF
+delta = 0x2750              # FROZEN — donovan-m3a (4b7d0dc7) placement
+safe_lo = 0xAD80            # every Donovan bank-4 write (band + effect
+safe_hi = 0xEEBB            # shelf) is builder-asserted inside this
+
+# Free pools in bank 4 after all three tenants (measured 14z-67).
+# H/P effect-shelf or future needs draw from here; a draw updates this
+# ledger in the same commit.
+[[free_pool]]
+lo = 0x8648
+hi = 0xA42B                 # 7,652 codes (largest run)
+[[free_pool]]
+lo = 0xA42D
+hi = 0xAD7F                 # 2,387 codes
+[[free_pool]]
+lo = 0xEE74                 # above Donovan's highest placed effect dst
+hi = 0xFFFF                 # 4,492 codes (0xEE74-0xEEBB nominally inside
+                            # his safe window — check remap_spec at draw)
+
+# Bank 5 (in-group 0x10000+code): select/wheel art at native bank-1
+# codes. Occupancy as of donovan-m3a: 271 select + 85 host-wheel + 18
+# vs2-medallion = 374 codes. H/P select/HUD art adds at their native
+# bank-1 codes at port time; the builder's written-set assert is the
+# collision gate. Not a budget constraint (>64K free).

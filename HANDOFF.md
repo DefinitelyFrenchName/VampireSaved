@@ -450,6 +450,13 @@ tests/test_hui_walk.sh         [bd]   # Huitzil velocity-port gate (14z-66):
                                       # param32 rows 0x10 static + measured
                                       # walk-speed deltas (16.16-exact).
                                       # Self-builds stage 4 unless given a build
+tests/test_gfx_layout3.sh             # the 3-tenant group-C layout fact-locks
+                                      # (14z-67, D4): one-source-bank premise,
+                                      # frozen H/P/D tile inventories, H/P
+                                      # delta-0 disjoint from D's frozen band
+                                      # by interval, the flip-condition bound.
+                                      # Static, ~90s. Ledger:
+                                      # build/manifest/gfx_layout3.toml
 tests/test_extract_hp.sh              # Huitzil/Pyron extraction gate (14z-65):
                                       # frozen region shapes (piecewise shifts,
                                       # dead filler, the H insertion sliver) +

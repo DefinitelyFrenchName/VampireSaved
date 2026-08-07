@@ -375,6 +375,36 @@ believed: the 19-bit tile address is entirely a rendering change, and a
 RAM-only gate reports it green without executing the modified line. This is
 the same blind spot 14z-55 found on the FBNeo side, in the other emulator.
 
+## Group C 3-tenant layout (measured + ratified 14z-67, D4 opener)
+
+The D4 flip condition ("three tenants cannot fit group C → stop and
+redesign") was tested by measurement and does NOT trigger. Instrument:
+`tools/obj_records.py` over the three ratified extraction anim spans;
+locks: `tests/test_gfx_layout3.sh`; ledger:
+`build/manifest/gfx_layout3.toml`.
+
+The decisive fact: **vs2 ships all three newcomers' art in one 64K bank
+(bank 3) at mutually compatible codes** — so group C bank 4 can hold all
+three with H and P at **delta 0** (native codes → no record remap) and
+Donovan at his frozen +0x2750:
+
+| in-group codes | tenant | tiles |
+|---|---|---|
+| 0x0000-0x06D8 | H low shared-effect (native) | 25 |
+| 0x003F-0x3615 + scatter | P scattered (native) | 51 |
+| 0x0AF6-0x4EFC | **Huitzil main band** (delta 0) | 14,870 |
+| 0x4ED5-0x8647 | **Pyron main band** (delta 0, share RESERVED) | 14,037 |
+| 0x8648-0xA42B | free pool | 7,652 codes |
+| 0xA42D-0xAD7F | free pool | 2,387 codes |
+| 0xAD80-0xEE73 | **Donovan band+shelf** (FROZEN m3a, +0x2750) | 15,662 |
+| 0xEE74-0xFFFF | free pool | 4,492 codes |
+
+Occupancy 68.1%; worst-case bound (H∪P exact + Donovan's whole safe
+window) 45,645/65,536. Boundary overlaps between tenants are shared
+tiles (same bank, same code) — the multi-tenant gfx pass's collision
+rule is "same-source-or-fail". Bank 5 holds select/wheel art at native
+bank-1 codes (374 codes as of m3a) — not a constraint.
+
 ## Known limits, stated up front
 
 - **MiSTer**: ~70 MB of ROM is out of reach for 32 MB configurations. WIDE

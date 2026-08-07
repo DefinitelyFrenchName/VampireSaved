@@ -68,6 +68,21 @@ tests/test_gfx_tiles.sh):
 - Jedah (vsavj, bank 2 = slot-0x0F table value 0x4000): main band
   0xAD3D-0xEEBB, 16,658 tiles (2.1MB), extent 0x417F; secondary band
   0xA0A0-0xA51D (1,036 tiles).
+- Huitzil (vs2, bank 3 = table row 0x10 value 0x6000): main band
+  0x0AF6-0x4EFC, 14,870 tiles (1.86MB), extent 0x4407; +25 low
+  shared-effect tiles 0x0000-0x06D8. 14,895 unique total (14z-67).
+- Pyron (vs2, bank 3 = table row 0x11 value 0x6000): main band
+  0x4ED5-0x8647, 14,037 tiles (1.75MB), extent 0x3773; +51 scattered
+  (0x003F-0x3615, 0x40AF, 0x47C3, 0xA42C). 14,089 unique total (14z-67).
+
+**The three tenants natively coexist in ONE bank (14z-67, the D4
+budget measurement, locked by tests/test_gfx_layout3.sh):** vs2 packs
+all newcomer art into bank 3 at mutually compatible codes — H, P, D
+bands nearly back-to-back, boundary overlaps (H∩P 39 / P∩D 33 / H∩D 82
+codes) being SHARED tiles. Consequence: H and P place into WIDE group C
+bank 4 at DELTA 0 (native codes, no record remap at all), disjoint from
+Donovan's frozen +0x2750 band+shelf by interval (max H∪P code 0xA42C <
+his SAFE_LO 0xAD80). Layout ledger: build/manifest/gfx_layout3.toml.
 
 **M2b consequence: DONOVAN FITS IN JEDAH'S MAIN BAND** (extent 0x3CB1 <=
 0x417F, 15,171 <= 16,658) — no gfx ROM expansion needed for him. Port
