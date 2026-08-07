@@ -1609,7 +1609,7 @@ def main():
         # he moved at the row-0x10 ALIAS content = Bulleta's speeds).
         # Donovan's manifest carries no flag -> his bytes are unchanged.
         VALUE_SKIP = set() if port["port"].get("port_param32", False) \
-            else {"param32_a", "param32_b"}
+            else {"param32_a", "param32_b", "jump_params"}
         # Explicit-ownership claims (14z-65): a [[sound_table]] row that WILL
         # emit repoints its ptr_table row ITSELF (the measured, id-allowlisted
         # port). The generic value-row repoint below must not also write that

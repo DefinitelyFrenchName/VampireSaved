@@ -12,10 +12,12 @@
 # Sections (replay 75 float probe, replay 79 air-dash probe), each with
 # an anti-coverage-loss assertion — the measured mode signature, not
 # just "no crash":
-#   1. FLOAT — hold-8 rises then HOVERS: Y at f3330..f3350 pinned to one
-#      value >= 100px (the mover-bypass hold; alias-physics ceiling
-#      109.4 today — the assertion is Y-CONSTANT + airborne, not the
-#      exact ceiling, so the queued jump-physics port won't break it).
+#   1. FLOAT — hold-8 rises then HOVERS: Y at f3350..f3370 pinned to one
+#      value >= 100px (the mover-bypass hold). Sample frames sit AFTER
+#      the rise completes: with the jump_params port the native-speed
+#      rise reaches the 121.1 ceiling at ~f3345 (the alias-physics
+#      build reached 109.4 by ~f3320 — the original 3330-frame samples
+#      were tuned to THAT rise and caught the new one mid-climb).
 #   2. AIR DASH — 66 during the float: the air-dash seq byte 0x14
 #      appears at +0x05 with X advancing >= 30px across f3185..f3200 at
 #      near-constant height.
@@ -49,7 +51,7 @@ PK="1704:ff8782:10;1760:ff8782:10;1900:ff8782:10;2100:ff8782:10;2400:ff8782:10"
 echo "== float (replay 75)"
 d="$WORK/float"; mkdir -p "$d"
 ( cd "$d" && POKES="$PK" \
-  DUMPS="3330:ff8400-ff8420;3340:ff8400-ff8420;3350:ff8400-ff8420" \
+  DUMPS="3350:ff8400-ff8420;3360:ff8400-ff8420;3370:ff8400-ff8420" \
   MAME_ROMPATH="$BUILD/rompath;$ROMDIR" \
   "$REPO/tools/run_replay_guarded.sh" vsavjw "$REPO/tests/replays/hui/75_hui_air.rpl" \
       "$d/g.log" "$d/box" > "$d/g.out" 2>&1 ) || {
@@ -61,7 +63,7 @@ python3 - "$d" <<'EOF'
 import struct, sys
 d = sys.argv[1]
 ys = []
-for f in (3330, 3340, 3350):
+for f in (3350, 3360, 3370):
     b = open("%s/dump_%d_ff8400.bin" % (d, f), 'rb').read()
     ys.append(struct.unpack('>i', b[0x14:0x18])[0])
 same = ys[0] == ys[1] == ys[2]

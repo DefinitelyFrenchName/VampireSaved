@@ -186,6 +186,22 @@ vsavj = 0x0BD87A
 kind = "rec8"
 stride = 0x100
 
+# jump_params (14z-66, the alias-physics port): per-char JUMP PHYSICS —
+# 0x30 bytes/char = THREE 0x10 rows (neutral/forward/back jump), each
+# (xv.l, xaccel.l, yv.l, gravity.l). Consumer = the jump-param installer
+# every seq-0600 starter bsr's (vsavj 0x27A34, vs2 0x26C86): id*0x30 +
+# variant offset (d1 = 0/0x10/0x20), movea table, RAW id — NO FOLD; the
+# vsavj table is 32-row with 0x10-0x1F byte-aliasing 0x00-0x0F (dumped),
+# ending exactly at the known 0x0BE17A table. In VALUE_SKIP by default
+# (the 14w-b physics caution class); port_param32 tenants port their
+# row — H's native row carries yv 8.0 / gravity -0.375 (vs the alias's
+# 6.75/-0.4375), the float-ceiling and jump-feel delta.
+[[table]]
+name = "jump_params"
+vsavj = 0x0BDB7A
+kind = "rec8"
+stride = 0x600
+
 [[table]]
 name = "gap_bd8fa"
 vsavj = 0x0BD8FA

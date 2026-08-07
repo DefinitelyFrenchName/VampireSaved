@@ -15,6 +15,22 @@ engine-site thunk live. build/hui4 at 44be1266 = ping #3 with items
 
 ## Session 14z-66 (playtest round-1 worklist)
 
+### The alias-physics port OPENED — jump_params row landed (float
+### ceiling NATIVE-EXACT); ground dash = the next row
+
+Consumer decoded and ported same-session (patch_notes has the bytes):
+the jump-param installer (vsavj 0x27A34 / vs2 0x26C86) reads id*0x30
+rows (xv/xacc/yv/gravity x neutral/fwd/back) from the 32-row-aliased
+table at 0x0BDB7A — the param32 pattern exactly, variant row 0x10
+superset-safe. jump_params registered in the bank map + VALUE_SKIP
+(port_param32 tenants only). Build 8bea919e: float ceiling 109.4 ->
+121.1 NATIVE EXACT with the native rise curve; oracle mismatches
+1770 -> 1741; all ten gates green (air-gate samples retuned to the
+native rise timing); m3a bit-exact. build/hui4 = 8bea919e (ping #6).
+REMAINING of the family: the ground-dash params (ours ~7 vs native
+~8.2 px/f) — decode its consumer the same way (the dash-start writer
+tap on native is the instrument).
+
 ### Item 5 — the coverage replays LANDED (RW GC + Dark Force,
 ### native-matched); the oracle battery is the remainder
 

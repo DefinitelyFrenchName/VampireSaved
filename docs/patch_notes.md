@@ -2125,3 +2125,29 @@ masked-v2 EXACT and m3a bit-exact. build/hui4 = 2898c495 (ping #5:
 float + air dash + all prior fixes; flavor default now VS2-correct
 per measurement — Start-hold selects the other flavor, so D1 is
 playtestable for the first time).
+
+## Session 14z-66 — the alias-physics port, first row: jump_params
+## (the float ceiling + jump feel)
+
+The one family behind the remaining feel deltas, first consumer
+decoded and ported. The JUMP-PARAM INSTALLER (vsavj 0x27A34, vs2
+0x26C86 — the routine every seq-0600 starter bsr's) computes id*0x30 +
+variant offset (0/0x10/0x20 = neutral/forward/back) into the per-char
+jump table (vsavj 0x0BDB7A, vs2 0xD7D18 — EXACTLY the bank-origin
+delta, validating the bank scheme), RAW id, no fold. Rows = (xv.l,
+xacc.l, yv.l, gravity.l). The vsavj table is 32-row with 0x10-0x1F
+byte-aliasing 0x00-0x0F (dumped; ends exactly at the known 0x0BE17A
+table), so H's row 0x10 is a superset-safe variant write.
+
+Change: bank_map [[table]] jump_params (rec8, stride 0x600) +
+VALUE_SKIP gains "jump_params" (the 14w-b physics caution class;
+port_param32 tenants port it — Donovan flagless, bytes unchanged,
+m3a PASS). Build 8bea919e emits ONE op: data 0x0BDE7A +0x30 (his
+three rows: neutral yv 8.0/grav -0.375 vs the alias 6.75/-0.4375).
+
+Measured: the float ceiling moved 109.4 -> 121.1 = NATIVE EXACT, with
+the native rise curve; oracle-battery mismatches dropped 1770 -> 1741;
+every gate green (air-gate sample frames retuned to the native rise —
+the old frames were calibrated to the alias climb). Residual known
+delta: the GROUND dash (ours ~7 vs native ~8.2 px/f) — its per-char
+param consumer is not yet decoded; next row of the same family.
