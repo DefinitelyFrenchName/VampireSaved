@@ -761,3 +761,40 @@ site = 0x028386
 old_hex = "7200122e005a"
 thunk_hex = "7200122e005ad24141f9qqqqqqqq41f0100010300000e94841f9pppppppp41f00000201822184a2e005d6604448044812d4000402d4100482d5800442d50004c4e75"
 data_subst = "qqqqqqqq=0x279B4:0x54:wide_ext,pppppppp=0x27A08:0x370:wide_ext"
+
+# ── 14z-67 THE EFFECT-ZONE CLONE (ping #8: sustained beam, grab
+# lightning, ES big beam, 214 explosion). The zone + fleet spawners
+# port cleanly (regions x022400/x06d240, escapes resolved). THE ENTRY
+# BELOW IS ON A COLD STUB (probed 0 hits — the content-twin trap paid
+# AGAIN: both games carry TWO stub copies and neither vj copy executes;
+# harmless but inert). MEASURED (14z-67 close): the machine is invoked
+# per-frame with A6 = THE FIGHTER (not an effect object), d0 = effect
+# selector, via the RAM dispatch pump (RET $FF02DC) — the callback is
+# installed by the MOVE state, not the type tables (no type row routes
+# there; not in his data as a bare long). NEXT TRACE: where the ray
+# move's state installs the per-frame callback — prime suspect: his
+# values rows' "engine dispatch entries: 1" (extraction summary). Then
+# re-aim this gate at that install site.
+[[site_thunk]]
+stage = 4
+name = "effect_machine"
+site = 0x0238FC
+old_hex = "422e01401d7c"
+patch = "jmp"
+jmp_ok = true
+region_subst = "jjjjjjjj=x022400:0x36"
+# a6 = the EFFECT OBJECT (small slot): the owner id is reached through
+# the +0x30 owner link (the spawner stores the parent there — measured
+# in the fleet-spawner fragment `move.w a6,$30(a4)`), never via
+# $382(a6) which reads a neighboring slot.
+thunk_hex = "2f08306e00300c2800TT0382205f66064ef9jjjjjjjj422e01401d7c4ef900023902"
+
+[[pcrel_escape_fix]]
+stage = 4
+region = "x022400"
+pad = 0x180
+
+[[pcrel_escape_fix]]
+stage = 4
+region = "x06d240"
+pad = 0x60

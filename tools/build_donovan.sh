@@ -110,6 +110,14 @@ case "$TENANT_CHAR" in
         # site_thunk dispatches tenant owners into the clone's table.
         # vh2 twin +0x2E, 7/1110 sibling-diff bytes (oracle-clean).
         DEFAULT_ROOTS="$DEFAULT_ROOTS,0x2592a:0x456:t0x25958"
+        # 14z-67 (ping #8): THE EFFECT-ZONE CLONE — vs2's effect-object
+        # state machine (50 per-state handler sites, the sustained-beam/
+        # lightning/explosion segments incl. the four fleet-jmp tails)
+        # + the fleet-spawner family. Twins: zone +0x2E (the engine-
+        # clone convention), spawners +0x174 (measured, 61-64/64
+        # agreement 0x6D240-0x6D73F). Entered via the owner-gated
+        # effect_machine site_thunk (huitzil.toml).
+        DEFAULT_ROOTS="$DEFAULT_ROOTS,0x22400:0x1600:t0x2242e,0x6d240:0x500:t0x6d3b4"
         ;;
     0x11)
         # Pyron census (14z-67, moveset arc open). Measured from his

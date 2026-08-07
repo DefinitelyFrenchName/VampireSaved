@@ -482,3 +482,51 @@ vsavj = 0x05b25c
 kind = "engine_sub"
 status = "verified"
 note = "x05c800 tail-escape twin (14z-67 census find): subq.b #1,$149(a4) + jmp engine — UNIQUE vsavj pattern match, jmp targets twin-verified (vs2 0x15770 / vsavj 0x17028, 60/64 bytes, diffs = A5-operand drift)"
+
+# ── The effect-zone clone's escape targets (14z-67, the ping-#8 arc):
+# the zone bsr's into the three stage-2 record-installer entries (each
+# a movea.l #table head; the vsavj twins verified against the bank_map
+# session-9 pairing) and pc-rel-reads the effect byte map (DATA view;
+# vj's copy carries our six poked rows — resolving there makes the
+# clone read the EXTENDED map).
+[[map]]
+vsav2 = 0x02710c
+vsavj = 0x027eb4
+kind = "engine_sub"
+status = "verified"
+note = "stage-2 record installer entry B (movea #D7098 <-> #BCEFA; bank_map 14z-9 pairing)"
+
+[[map]]
+vsav2 = 0x027114
+vsavj = 0x027ebc
+kind = "engine_sub"
+status = "verified"
+note = "stage-2 record installer entry C (movea #D7118 <-> #BCF7A)"
+
+[[map]]
+vsav2 = 0x02711c
+vsavj = 0x027ec4
+kind = "engine_sub"
+status = "verified"
+note = "stage-2 record installer entry A (movea #D7018 <-> #BCE7A)"
+
+[[map]]
+vsav2 = 0x027fd8
+vsavj = 0x028d00
+kind = "engine_data"
+status = "verified"
+note = "the effect id->index byte map (DATA view; vj copy carries the 14z-67 poked rows 0x4E-0x53)"
+
+[[map]]
+vsav2 = 0x027fda
+vsavj = 0x028d02
+kind = "engine_data"
+status = "verified"
+note = "byte map +2 (the fleet sites' lea reads the map at an offset)"
+
+[[map]]
+vsav2 = 0x0d96b8
+vsavj = 0x0bf51a
+kind = "engine_data"
+status = "verified"
+note = "per-char effect-handler pointer table (id-indexed longs, zero = skip; PER-GAME pointer content so byte-identity cannot apply — shape-matched: same zero/nonzero row pattern, rows 1/6/7 live). H's row 0x10 zero on both."

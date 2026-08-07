@@ -249,6 +249,41 @@ Read the 14z-67 sections below, then docs/NEXT_SESSION.)
   param32/flavor measurement (no fork expected), then his gfx rung
   through the ratified layout row.
 
+### 14z-67 continuation 6: ping #8 maintainer round — command grab
+### CONFIRMED mechanically fixed; the beam arc's true architecture
+### found (fighter-context callback, not an object machine); zone +
+### spawners ported, entry re-aim = the one remaining trace
+
+- Maintainer on hui9: 63214 command grab mechanically fixed ✓ (still
+  lacks lightning); the 236P beam still invisible (too brief), AND
+  the ES BIG-BEAM version also missing — all one family.
+- THE ZONE CLONE LANDED AS REGIONS (x022400 = vs2 0x22400+0x1600 twin
+  +0x2E — covers BOTH stub copies and all 50 handler sites;
+  x06d240 = the fleet-spawner family +0x174, bounds measured
+  61-64/64) with escapes resolved: three stage-2 record-installer
+  entry twins (0x2710C/14/1C -> 0x27EB4/BC/C4, matching the bank_map
+  14z-9 pairing), the byte-map data rows (-> vj 0x28D00 WITH the
+  poked extension!), and the per-char effect-handler pointer table
+  0xD96B8 -> 0xBF51A (per-game pointer content — byte-identity
+  cannot apply; shape-matched). Builds clean.
+- THE ENTRY HUNT (four probes + two taps, all attributed):
+  1. The thunked vj stub copy: 0 hits. The OTHER copy: 0 hits. BOTH
+     games have TWO copies (content-twin trap, paid again).
+  2. Native the live stub = 0x22430 (3 hits) — and the probe regs
+     reveal THE ARCHITECTURE: A6 = THE FIGHTER ($FF8400), d0 =
+     effect selector, RET = $FF02DC (the RAM dispatch pump) — the
+     "machine" is a per-frame FIGHTER-CONTEXT callback, NOT an
+     object-class handler.
+  3. The ray's effect id is 0x01 on BOTH games (pool taps; different
+     installer PCs: native the API 0x17964, ours vanilla 0x67DBA/
+     0x67F2A) and OUR object ticks in vsavj's OLD 0x67Exx machine.
+  4. NOT routed via the obj_hook type tables (no row points into the
+     zone) and NOT a bare long in his data regions.
+  NEXT (one trace): where the move state installs the per-frame
+  callback — prime suspect: the values rows' "engine dispatch
+  entries: 1"; then re-aim the entry gate at that install site. The
+  inert cold-stub thunk stays (harmless) until then.
+
 ### 14z-67 continuation 5: ES EXONERATED (maintainer side-by-side);
 ### THE COMMAND-GRAB THROW ARC FIXED NATIVE-EXACT (hui9 = 9e3105e0 =
 ### PING #8); the beam needs the zone clone for duration/palette
