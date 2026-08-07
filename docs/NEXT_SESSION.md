@@ -3,8 +3,16 @@
 **Start here: THE D4 PHOBOS GFX VERTICAL IS BUILT AND FULLY GATED —
 Huitzil renders his real art everywhere and his wheel cell 0x10 is
 hand-pickable. build/hui6 = b99b7359 is PING #7, awaiting the
-maintainer playtest. THE NEXT ACTION IS THE H FREEZE once confirmed
-(registry row + expectation set), then the Pyron vertical.** Frozen
+maintainer playtest, and is PINNED (PING7_DO_NOT_REBUILD.md — never
+rebuild into that dir; experiments go to hui7+/scratch, so any bug
+report stays attributable to the played version). THE H FREEZE comes
+after confirmation. MEANWHILE (maintainer testing deferred): the
+patch_index backfill landed and THE PYRON LADDER IS OPEN — stages 1-4
+green (tests/test_pyron_ladder.sh: builds, op invariant with the four
+named hook-site exemptions, boot probe id-hold/load/guard-clean,
+stage-3 unmasked bit-identity + stage-4 masked-v2 EXACT). His next
+arc = the moveset R1 loop (support-zone roots, sound-farm sweep,
+obj_hook types, probe cycles — the H 14z-65/66 template).** Frozen
 references unchanged (donovan-m3a 4b7d0dc7 / m5_stock 6c93cfa8;
 m3a-reproducible PASS on every commit of the session).
 

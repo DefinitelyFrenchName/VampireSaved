@@ -157,6 +157,46 @@ Read the 14z-67 sections below, then docs/NEXT_SESSION.)
   NEXT: maintainer playtest -> H freeze (registry row + expectation
   set), then the Pyron vertical (D4 order).
 
+### 14z-67 continuation (maintainer testing deferred): ping #7 PINNED;
+### patch_index backfilled; THE PYRON LADDER OPENS — green through
+### stage 4 on the first pass
+
+- The maintainer could not test immediately; work continued on
+  playtest-independent tracks. **build/hui6 is PINNED as the ping #7
+  artifact** (marker file PING7_DO_NOT_REBUILD.md; fingerprint
+  re-verified b99b7359; run_hui_behavior.sh only builds if missing,
+  so the maintainer's launch uses these exact zips). Rebuild
+  experiments go to hui7+/scratch — bug reports stay attributable.
+- **patch_index.md BACKFILLED** (the 14z-66 queued task): rebuilt as
+  the one-page registry — both frozen Donovan tracks, the H ladder +
+  gfx rung, Pyron's reservation, the WIDE overlay, emulator patches,
+  and a 17-mechanism inventory table with introduction sessions.
+- **THE PYRON LADDER (M3b Phase 5) OPENS — stages 1-4 green same
+  session**, the H template through the generalized machinery:
+  - build/manifest/pyron.toml (minimal by design: tenant row + spaces
+    + empty recon overlay; NO flavor fork — he has none) +
+    reconciliation_pyron.toml + the 0x11 DEFAULT_ROOTS case.
+  - Stage 4 named exactly ONE missing structure: the 18-ring
+    velocity-vector family 0xd143e (based at 0xd15be by his code —
+    the SAME vs2-only bank data H's census ported). One root row
+    fixed it; stage 4 builds with everything else tripwired.
+  - Boot probe: id 0x11 holds, HIS hitbox base loads, guard clean —
+    no init-shim/layout-group hunt needed for the boot rung (unlike
+    H's watchdog-reboot arc; his ecosystem pressure presumably
+    arrives with the moveset work).
+  - MEASURED gate fact: the generator emits the FOUR engine-hook
+    sites unconditionally at stage 4 (obj 0x54470/0x5E542, state
+    0x2A7C8, reaction 0x18458) — so the stage-4 op invariant carries
+    exactly those named exemptions and its legacy leg runs masked-v2
+    (EXACT, like H's).
+  - NEW gate tests/test_pyron_ladder.sh: stages 1-4 build, per-stage
+    op invariant, boot probe, stage-3 legacy UNMASKED bit-identity +
+    stage-4 masked-v2 EXACT.
+  - NOT YET: his moveset R1 loop (support-zone roots, sound-farm
+    sweep, obj_hook types, probes) = the next behavior arc; his gfx
+    rung after that (layout share reserved; select palettes = a
+    dedicated +0xBC block, easier than H's grid column).
+
 ## Session 14z-66 (playtest round-1 worklist)
 
 ### The alias-physics port OPENED — jump_params row landed (float

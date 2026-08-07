@@ -1,0 +1,11 @@
+# reconciliation_pyron.toml — PER-TENANT OVERLAY (14z-67, the
+# reconciliation_huitzil.toml precedent). Rows here OVERRIDE the shared
+# map, applied only when a tenant manifest declares recon_overlay.
+# Exists because the shared map's rows are FROZEN for Donovan's
+# reproducibility (his build consumes open rows as tripwires — resolving
+# them changes his bytes). The Phase 2 merge unifies this properly.
+#
+# Empty at ladder open: Pyron's R1 loop (stage-4 prep) populates it.
+# His code carries 769 engine refs; unresolved ones tripwire loudly
+# under --tripwire-open until each is resolved with the established
+# methods (pattern ladder, site-twin bracketing, stub-deref).

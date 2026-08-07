@@ -111,6 +111,16 @@ case "$TENANT_CHAR" in
         # vh2 twin +0x2E, 7/1110 sibling-diff bytes (oracle-clean).
         DEFAULT_ROOTS="$DEFAULT_ROOTS,0x2592a:0x456:t0x25958"
         ;;
+    0x11)
+        # Pyron ladder open (14z-67): NEAR-BARE roots — his core regions
+        # (code/anim/hitbox/aux) extract oracle-clean with no extras.
+        # His stage-4 generation names exactly ONE missing structure:
+        # the 18-ring velocity-vector family 0xd143e (based at 0xd15be
+        # by his code at +0x2e88/+0x2eb2 — the SAME vs2-only bank data
+        # H's census ported; structure-bounded, sibling-identical, twin
+        # at -0x76e). The shared support-zone roots join as his R1 loop
+        # opens (accumulate his census here exactly as H's above).
+        DEFAULT_ROOTS="0xd143e:0x900:t0xd0cd0:d" ;;
     *)  DEFAULT_ROOTS="" ;;
 esac
 python3 tools/extract_char.py "$ROMDIR/vsav2.zip" "$OUTBASE/extract" \
