@@ -34,10 +34,24 @@ engine-site thunk live. build/hui4 at 44be1266 = ping #3 with items
 - NEW gate tests/test_hui_pairs.sh (both signatures asserted).
 - The 2P-dummy instrument (early-window pokes) is now the standard
   clean-room rig — replays 80/81/82 all use it.
-- REMAINING for item 5: the 17/18-style ORACLE BATTERY analog (field
-  comparison at anchors over a long native-vs-ported input script —
-  the test_m2a_stage4_oracle.sh pattern; fields TSV + compare_fields
-  machinery exist). THE NEXT SESSION'S OPENER.
+- THE ORACLE BATTERY LANDED (same session): replay 90 (ONE file for
+  both legs — the forced-pick pokes work identically on vsav2 and
+  vsavjw, so no per-game cursor fork; battery = jab, QCF+P, QCB+K,
+  DP+HP, jump+air dash, float, walk-in grab, 421+2K ES) + gate
+  tests/test_hui_oracle.sh (the m2a template's four locks verbatim).
+  ALL FOUR LOCKS PASS: anchors equal (2363 — the same anchor as the
+  Donovan pair), neutral window EXACT (210 frames, every mapped
+  field), P2 HP-change sequences identical
+  (288,278,259,257,255,254,253,252,251,250), comparative bound
+  1770 <= 2529 (ported H diverges LESS cross-game than a vanilla
+  veteran). One mechanism finding en route: +0x0A pre-engage = an
+  RNG-DRAWN INTRO VARIANT (his init: table16[rand&15] at vs2
+  0x57050-0x5707C, with a per-opponent downgrade branch) — the two
+  GAMES tick the RNG differently through their menus, so the gate
+  DETERMINIZES the RNG ($FF80D4/D5 poked on both legs just before
+  the draw), keeping the neutral lock strong instead of skipping
+  the field. ITEM 5 COMPLETE — the round-1 worklist is fully done,
+  oracle-proven end to end.
 
 ### ROUND 6 (maintainer): ITEM 4 CONFIRMED ("Circuit scrapper
 ### confirmed") and D1 RATIFIED — "VS2 flavor confirmed as the

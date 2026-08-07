@@ -26,7 +26,11 @@ m5_stock 6c93cfa8; m3a-reproducible PASS on every commit).
    native-matched on the 2P dummy (frame-identical, damage-identical).
 5. Coverage replays 80/81/82 (grab, RW GC, DF) — all native-A/B'd.
 
-## THE OPENER: the oracle battery analog (item 5's remainder)
+## DONE SAME SESSION: the oracle battery (landed; see below). THE
+## OPENER IS NOW: the alias-physics port (the one family behind every
+## remaining feel delta), then M3b Phase 2 (Pyron) / gfx.
+
+## the oracle battery analog (item 5's remainder) — LANDED
 
 The 17/18-style native-vs-ported field comparison: a long input
 script run on native vs2 AND ours, compared at anchors

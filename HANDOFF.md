@@ -422,6 +422,11 @@ tests/test_hui_ladder.sh              # Huitzil stage 1-3 ladder gate (14z-65):
                                       # variant row) + legacy replay bit-identity.
                                       # Build any tenant: TENANT_MANIFEST=...
                                       # TENANT_CHAR=0x10 tools/build_donovan.sh
+tests/test_hui_oracle.sh [rp]         # THE vsav2-as-oracle battery (14z-66): the
+                                      # m2a template's 4 locks on H's full moveset
+                                      # (anchors/neutral-exact/HP-trajectory/
+                                      # comparative bound); RNG determinized on
+                                      # both legs. ~10 min, 8 MAME runs
 tests/test_hui_pairs.sh        [bd]   # Reflect Wall GC + Dark Force gate (14z-66):
                                       # both native-matched signatures (GC seq 0x0E +
                                       # blowback; DF 0x0A at both activations).
