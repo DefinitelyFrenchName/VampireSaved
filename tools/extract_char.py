@@ -138,6 +138,12 @@ def diff_refs(a_blob, b_blob, shifts, allow_engine, selfptr=None):
         (PC-relative displacement to a target outside the region)
     Returns (refs, unexplained_byte_offsets)."""
     assert len(a_blob) == len(b_blob)
+    # 14z-65: in CODE (allow_engine), operand fields are word-aligned — an
+    # odd-offset window is a classifier misfire across an instruction
+    # boundary (measured: an odd 32-bit "engine ref" spanning a bmi operand
+    # and the following jsr OPCODE got rewritten and destroyed the jsr —
+    # Huitzil's frozen anim cursor). Data regions keep byte-packed freedom.
+    even_only = allow_engine
     diffs = [i for i in range(len(a_blob)) if a_blob[i] != b_blob[i]]
     refs, unexplained = [], []
     covered = set()
@@ -147,6 +153,8 @@ def diff_refs(a_blob, b_blob, shifts, allow_engine, selfptr=None):
         site = None
         for width, span in ((32, 4), (24, 3)):
             for off in range(max(0, i - span + 1), min(i, len(a_blob) - span) + 1):
+                if even_only and off % 2:
+                    continue
                 va = int.from_bytes(a_blob[off:off + span], "big")
                 vb = int.from_bytes(b_blob[off:off + span], "big")
                 delta = vb - va
@@ -177,6 +185,8 @@ def diff_refs(a_blob, b_blob, shifts, allow_engine, selfptr=None):
                     break
         if site is None and allow_engine:
             for off in range(max(0, i - 3), min(i, len(a_blob) - 4) + 1):
+                if even_only and off % 2:
+                    continue
                 va = int.from_bytes(a_blob[off:off + 4], "big")
                 vb = int.from_bytes(b_blob[off:off + 4], "big")
                 if (va != vb and va < 0x400000 and vb < 0x400000

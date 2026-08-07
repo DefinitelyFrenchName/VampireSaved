@@ -1842,3 +1842,31 @@ vsavj = 0x024ea4
 kind = "engine_sub"
 status = "verified"
 note = "hand (14z-65): Huitzil's dispatch_07 row target — a per-char SUBSTATE dispatcher in engine space (per-char rows even there: Bulleta 0x2D68E, Demitri 0x30B9A). find_equiv 0.95 unique; the 8 diff bytes are four pc-rel words drifting uniformly (sibling operand drift). The vanilla row-0x10 alias served BULLETA's dispatcher — part of the specials-never-trigger chain."
+
+[[map]]
+vsav2 = 0x004e10
+vsavj = 0x02a7e0
+kind = "stubbed_sound"
+status = "verified"
+note = "H KEPT SILENT (14z-65 sweep): sfx id 0x73d — vsavj same-id keys DIFFERENT content (keyons records, measured). Revisit with the M5 voice-bank port."
+
+[[map]]
+vsav2 = 0x004e92
+vsavj = 0x02a7e0
+kind = "stubbed_sound"
+status = "verified"
+note = "H KEPT SILENT (14z-65 sweep): sfx id 0x74b — vsavj same-id keys DIFFERENT content (keyons records, measured). Revisit with the M5 voice-bank port."
+
+[[map]]
+vsav2 = 0x004ec6
+vsavj = 0x02a7e0
+kind = "stubbed_sound"
+status = "verified"
+note = "H KEPT SILENT (14z-65 sweep): sfx id 0x74d — vsavj same-id keys DIFFERENT content (keyons records, measured). Revisit with the M5 voice-bank port."
+
+[[map]]
+vsav2 = 0x004f7c
+vsavj = 0x02a7e0
+kind = "stubbed_sound"
+status = "verified"
+note = "H KEPT SILENT (14z-65 sweep): sfx id 0x3ea — vsavj same-id keys DIFFERENT content (keyons records, measured). Revisit with the M5 voice-bank port."

@@ -263,6 +263,49 @@ the matcher reads (his +0x3xx input ring — if the recorder dispatch
 row feeding it is another wrong alias, the matcher sees an empty
 ring). Builds: acda6946 current ladder; all gates green.
 
+### 14z-65 — ENGAGE FIXED: states alive, moves execute; two new
+### findings banked (odd-ref classifier bug; shim re-seed fragility)
+
+THE ROOT OF THE FROZEN ANIM CURSOR (and thus the whole engage chain):
+a diff-classifier misfire produced a 32-bit "engine ref" at an ODD
+OFFSET (code+0x249B) spanning the bmi operand + the following jsr
+OPCODE — its rewrite DESTROYED the jsr to the anim stepper (placed
+bytes read 30F9..., a move.w where the jsr was). FIX: code-region ref
+fields must be word-aligned (even_only in diff_refs, gated on
+allow_engine; Donovan has ZERO odd refs in his frozen extraction —
+measured inert). With the jsr restored: the anim cursor WALKS, the
+intro completes, the engine neutral-engage fires, and the state tap
+shows LIVE brief states (48 x 0x16). Verified working: his moves now
+execute deep enough to enqueue their sfx.
+- Sound census SWEPT pre-emptively: enumerated EVERY farm entry his
+  regions reference (42), keyon-checked each id, stubbed the 4
+  remaining DIFFERS entries (0x73d/0x74b/0x74d/0x3ea) — plus 0x74d
+  found live by the soak first.
+- Notes on the call chain: refs to vs2 0x2711C/0x271C4 classify
+  INTERNAL to the x026142 shared-zone copy (the zone spans them) — the
+  COPY is functional (its own embedded table refs relocate to the
+  vsavj tables; same machinery Donovan uses), so this is correct-by-
+  relocation, just surprising: the anim stepper his code calls IS the
+  ported copy, not the engine twin.
+- NEW FRONTIER (soak at f4983, deterministic): the ROUND-2 RE-SEED.
+  The [init_shim]'s pool-head latch (A5+0x7966 == 0 => seed) re-fired
+  at his round-2 char re-init — his ecosystem drains pool 0, the latch
+  reads 0 mid-match, the seeder REINITIALIZES LIVE POOLS (measured:
+  f4890, seeder PCs 0x16C7A-0x16F44 walking every pool), queued
+  objects orphan, and a freed slot (0xFFB980, class defaults only,
+  otherwise zeros) gets dispatched ~90 frames later -> PC in palette
+  space. LIKELY LATENT FOR DONOVAN TOO (same latch; his soaks never
+  drained pool 0). Fix design: a robust one-shot latch for the shim —
+  measure the game-phase field ($FF8004 family) at first-init vs
+  round-2 re-init and gate the seed on the load phase, OR a dedicated
+  flag byte; MUST be manifest-opt-in (latch_mode) so Donovan's frozen
+  shim bytes stay identical until his own re-freeze adopts it.
+- Gates at this checkpoint: boot PASS, extraction gates PASS (shapes
+  re-frozen for the even-only classifier — hui4 fingerprint 62cc5aed);
+  the mash soak reaches f4983 (round 2) before the re-seed crash; the
+  m3a reproducibility gate MUST be re-run before the next commit
+  (even-only touched the classifier).
+
 ### 14z-65 — THE NEUTRAL-ENGAGE CHAIN NAMED (write-stream diff; one
 ### missing native write)
 

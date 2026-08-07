@@ -1990,3 +1990,25 @@ Verification style that found both: parity instruments, not reading —
 the same probe on native vs2 and the port (predicate consultations
 matched 401=401 exactly; the state-byte tap showed native writing
 states the port never writes).
+
+## An odd-offset "engine ref" ate a jsr opcode — and a pool-head latch
+## re-seeds live pools at round 2 (14z-65)
+
+- The sibling-diff classifier accepted a 32-bit engine-ref window at an
+  ODD offset spanning an instruction boundary (bmi operand + jsr
+  OPCODE); the rewrite replaced the jsr with a move.w and Huitzil's anim
+  stepper was simply never called — cursor frozen at its first byte,
+  intro never completed, the whole state layer silent. CODE-region ref
+  fields are word-aligned by ISA; the classifier now enforces even
+  offsets under allow_engine (Donovan: zero odd refs, measured inert).
+  Symptom signature for the future: a blob byte sequence that decodes as
+  HALF an instruction plus an address = a ref wrote over code.
+- The [init_shim]'s idempotence latch is the pool-0 FREE-LIST HEAD —
+  "zero means never seeded". False mid-match: a character whose
+  ecosystem drains pool 0 makes the round-2 char re-init re-run the
+  seeder over LIVE pools (measured f4890: every pool re-walked, queued
+  objects orphaned, a freed slot dispatched into palette space 93
+  frames later). Latent for ANY shim user in a long enough match. A
+  robust latch must be phase-gated or a dedicated one-shot byte — and
+  manifest-opt-in, because Donovan's frozen build carries the old shim
+  bytes.
