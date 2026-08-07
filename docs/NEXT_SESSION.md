@@ -1,94 +1,94 @@
-# NEXT SESSION — orientation (written at the close of 14z-66, 2026-08-07)
+# NEXT SESSION — orientation (written at the close of 14z-67, 2026-08-07)
 
-**Start here: THE ROUND-1 PLAYTEST WORKLIST IS CLOSED — all four fix
-items maintainer-confirmed in play (rounds 2-6), D1 RATIFIED (VS2
-default), and the coverage replays (Reflect Wall GC + Dark Force)
-landed native-matched. build/hui4 = 2898c495 (ping #5, confirmed) is
-current.** Frozen references unchanged (donovan-m3a 4b7d0dc7 /
-m5_stock 6c93cfa8; m3a-reproducible PASS on every commit).
+**Start here: THE D4 PHOBOS GFX VERTICAL IS BUILT AND FULLY GATED —
+Huitzil renders his real art everywhere and his wheel cell 0x10 is
+hand-pickable. build/hui6 = b99b7359 is PING #7, awaiting the
+maintainer playtest. THE NEXT ACTION IS THE H FREEZE once confirmed
+(registry row + expectation set), then the Pyron vertical.** Frozen
+references unchanged (donovan-m3a 4b7d0dc7 / m5_stock 6c93cfa8;
+m3a-reproducible PASS on every commit of the session).
 
-## What 14z-66 closed (details: STATE 14z-66; bytes: patch_notes)
+## What 14z-67 closed (details: STATE 14z-67; bytes: patch_notes)
 
-1. EX crash-resets — three distinct sites (farm-voice tripwire,
-   shadow-seq over-index on capture victims, the capture-pose
-   data-in-code garble). Mechanisms added: [[data_in_code]] +
-   crypt-region census (5 reroutes), the shadow_seq_guard thunk.
-2. Speed — param32 rows 0x10 (32-row/no-fold tables measured);
-   port_param32 opt-in.
-3. Float + air dash — THE BIG ONE: vs2 routes the jump seq BY CHAR ID
-   to a per-char handler (0x2592A); cloned (x02592a), thunk-routed at
-   vsavj's live twin head 0x22A0E. NEW mechanism [[pcrel_escape_fix]]
-   (engine-style regions carry oracle-invisible pcrel escapes —
-   x026142 had them SINCE 14z-65; fixing them ALSO healed item 4 and
-   several would-be future mysteries). Flavor polarity corrected by
-   measurement (H's VS2 = +0x3C2 0x00).
-4. Circuit Scrapper — healed by the x026142 escape fix;
-   native-matched on the 2P dummy (frame-identical, damage-identical).
-5. Coverage replays 80/81/82 (grab, RW GC, DF) — all native-A/B'd.
+1. **D4 opener 1 — budgets + layout RATIFIED.** All three tenants
+   natively share vs2 bank 3; H/P place at DELTA 0 (no record remap),
+   Donovan frozen at +0x2750; disjoint by interval; flip condition
+   does NOT trigger (~20K codes free). Ledger
+   build/manifest/gfx_layout3.toml; gate tests/test_gfx_layout3.sh.
+2. **D4 opener 2 — censuses promoted + Pyron CLEAN.**
+   tools/census_regions.py (ground-truthed on H: exact generator
+   agreement); P's code region: 0 data_in_code, 0 escapes. One real
+   find: x05c800's latent tail escapes — fixed same session
+   (recon 0x635FC -> 0x5B25C, double-site verified).
+3. **D4 opener 3 — THE H GFX RUNG.** Machinery de-Donovanized
+   (per-tenant layout rows, delta-0 path, data_subst gather,
+   per-tenant effect_tail keys, walker bounds+sweep fixes) with m3a
+   bit-exact throughout; H's full stage-6 manifest authored (12 bank
+   setters, table_fix, palettes, 7 select_records, drawer thunks,
+   grid-column select palettes, HUD rows, win-pal, wheel roster21).
+   Every gate green, incl. the behavior battery ON the stage-6 build
+   and the oracle battery (1741 = the stage-4 number exactly).
 
-## DONE SAME SESSION: the oracle battery AND the alias-physics family
-## (jump_params ported — float ceiling native-exact; dash exonerated).
-## THE OPENER IS NOW (D4, maintainer-ratified): THE PHOBOS GFX VERTICAL
-## — (1) measure 3-tenant tile budgets + fix the group-C layout FIRST
-## (reserve Pyron's share; flip condition: doesn't fit -> stop), (2)
-## Pyron region censuses as early warning, (3) the H gfx rung
-## (de-Donovanize the stage>=6 machinery), then FREEZE H. Sounds stay
-## stubbed until M5 (maintainer-stated scope). The Pyron merge comes
-## AFTER, against two frozen verticals. Details: STATE D4.
+## The playtest ping (#7)
 
-## the oracle battery analog (item 5's remainder) — LANDED
+```sh
+export ROMDIR=/Users/koneko/Developer/Vampire_Saved/ROMS
+tools/run_hui_behavior.sh          # build/hui6; NO forced id —
+                                   # walk D,D,D from default to his cell
+```
+Things to look at: his art/colors everywhere (select, VS splash, HUD
+mug + name plate, win screen after a victory), the three new wheel
+medallions, VS2-vs-VH2 float flavors (Start-hold). Sounds silent (M5
+scope). Cells 0x11/0x13 exist but are UNBACKED on this single-tenant
+build.
 
-The 17/18-style native-vs-ported field comparison: a long input
-script run on native vs2 AND ours, compared at anchors
-(tools/compare_fields.py + tests/fields_m2a.tsv are the template;
-tests/test_m2a_stage4_oracle.sh the pattern). The 2P-dummy rig
-(replays 80-82: EARLY-WINDOW pokes 1400-1500 ONLY — later 2P pokes
-leak into P2's load, measured) is the clean-room. Known deltas it
-should quantify (all one family — ALIAS-ROW PHYSICS, the 14w gap
-tables): float ceiling 109.4 vs 121.1, grab throw-arc height, RW
-knockback 474 vs 487, the ~15px DF-walk drift, ground-dash length.
-Decoding the jump/knockback physics consumers (the mover context is
-half-decoded — STATE) turns all five into one port.
+## AFTER maintainer confirmation: the H freeze
+
+Registry row (b99b7359 -> huitzil-m4?) + expectation set
+(tests/expected/<name>/) + re-freeze note in HANDOFF. Then the
+PYRON VERTICAL (D4 order): his R1 root census (support-zone extra
+roots — census_regions reruns as they land; the region-count lock in
+test_census_regions.sh will fail loudly and guide re-freezing), his
+ladder stages 1-4 (the H template), then his gfx rung through the SAME
+generalized machinery (his layout row is already reserved; his
+manifest needs the H-style stage-6 sections — the grid column for his
+select palettes is column-free: vs2 gives him a dedicated +0xBC row
+block, measured 14z-67 at vs2 0x6B1A6 area).
+
+## Standing facts (14z-67 additions; do not re-derive)
+
+- Forced-pick pokes do NOT populate the HUD index field — verify HUD
+  rows with the real-pick replays only (36 = cell 0x13, 37 = cell
+  0x10). GOTCHAS has the anatomy.
+- Stale-gate class: a gate not in the battery can sit failing across
+  sessions (two found red 14z-67, both attributed + re-frozen). When
+  a freeze changes design semantics, run every gate touching that
+  surface before closing.
+- vs2 select-portrait palette dispatch (uploader compare chain at vs2
+  0x6B1A6): id 0x10 -> grid column 0x0B (moveq), id 0x11 -> +0xBC
+  dedicated block, id 0x13 -> +0xC6 dedicated block. Grid base
+  0x3C117C, row stride 0x20, (variant*16+id) indexing.
+- vs2 HUD stager bias is +0x4200 (vsavj's is +0x3800); both tables
+  DATA-view. H entries: name 04AB0102/FFE8/0002, mug 05A0.
+- The queued docs/patch_index.md backfill (from 14z-66) is STILL
+  OPEN.
 
 ## Gates (all green at close; run before ANY commit)
 
 ```sh
 export ROMDIR=/Users/koneko/Developer/Vampire_Saved/ROMS
 tests/test_m3a_reproducible.sh          # after machinery changes
+tests/test_gfx_layout3.sh               # the 3-tenant layout locks
+tests/test_census_regions.sh [build]    # both censuses, H + P
 tests/test_hui_boot.sh                  # masked-v2 EXACT legacy leg
 tests/test_hui_soak.sh                  # 11k chaos + round-2 pods
-tests/test_hui_ex.sh    [build]         # 4 sections incl. FG aftermath
-tests/test_hui_walk.sh  [build]         # velocity port
-tests/test_hui_air.sh   [build]         # float + air dash signatures
-tests/test_hui_grab.sh  [build]         # Circuit Scrapper native datum
-tests/test_hui_pairs.sh [build]         # RW GC + Dark Force
-tests/test_hui_oracle.sh [rompath]      # THE oracle battery (4 locks, ~10 min)
-tools/run_hui_behavior.sh               # interactive (build/hui4)
+tests/test_hui_ex.sh    build/hui6      # 4 sections incl. FG aftermath
+tests/test_hui_walk.sh  build/hui6
+tests/test_hui_air.sh   build/hui6
+tests/test_hui_grab.sh  build/hui6
+tests/test_hui_pairs.sh build/hui6
+tests/test_hui_oracle.sh build/hui6/rompath   # ~10 min
+tests/test_tenant_hud.sh build/hui6     # per-tenant (also m5_wide)
+tests/test_wide_render_content.sh       # re-shaped m3a semantics
+tools/run_hui_behavior.sh               # interactive (build/hui6)
 ```
-
-## Queued documentation task (found in the 14z-66 close audit)
-
-docs/patch_index.md was never grown past M1 — the one-page patch
-registry needs a backfill pass from patch_notes.md + the manifests
-(a staleness notice + mechanism inventory pointer is in place).
-
-## Standing facts (14z-66 additions; do not re-derive)
-
-- 2P forced-pick pokes: frames 1400-1500 ONLY (late pokes leak into
-  P2's load and make P2 a variant id — the invalidated victim sweep).
-- The content-twin trap: vsavj keeps byte-identical copies of engine
-  code inside per-char families (0x26A58 = ANAKARIS's jump handler,
-  not the live generic one at 0x22A0E via stepper 0x225C4) — find
-  live handlers by TRACING the dispatch, never by byte search alone.
-- Engine-style regions (clones/shared zones) need [[pcrel_escape_fix]]
-  — pcrel escapes are invisible to the sibling oracle. The census
-  scan for crypt-region data tables is in the session log; run BOTH
-  censuses for Pyron's regions and at Donovan's next re-freeze.
-- Site-twin resolution (bracketing known pairs, reading vsavj's own
-  branch at the interpolated site) beats pattern search for
-  drifted engine subs; double-site agreement = the verification.
-- Anim node headers carry the float license (bit 7 of +0x21's word);
-  node stride 0x18; shadow-seq id = low 13 bits of node +0xC.
-- After the behavior polish: M3b Phase 2 (multi-tenant merge with
-  Pyron) + Phase 3/4 (gfx — H's art, the garble's end) per
-  docs/M3b_plan.md.

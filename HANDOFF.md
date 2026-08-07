@@ -482,13 +482,18 @@ tests/test_romset_identity.sh         # ground truth for tools/audit_romset_iden
                                       # entry by hash before name, so such a member
                                       # silently reverts the patch — 14z-60z). 4 synthetic
                                       # sets, no emulator, ~1s
-tests/test_wide_render_content.sh     # the WIDE track must RENDER ported content exactly
-                                      # as the stock track does: member identity + per-frame
-                                      # framebuffer A/B on a Donovan replay + a POSITIVE
-                                      # CONTROL (a set poisoned back into the 14z-60z shape
-                                      # must fail) + the decoded tile band with a pristine
-                                      # negative control. ~60s. This is the gate whose
-                                      # absence let the sprite garble reach a playtest
+tests/test_wide_render_content.sh     # the WIDE track must SERVE the ported content's
+                                      # tiles (RE-SHAPED 14z-67 for m3a semantics —
+                                      # cross-track pixel identity ended BY DESIGN):
+                                      # member identity + decoded band equivalence at
+                                      # the correct banks (WIDE 0x4AD8F == stock
+                                      # 0x2AD8F; WIDE 0x2AD8F == PRISTINE, the
+                                      # de-substitution invariant) + a true-shadow
+                                      # audit control + liveness (replay 36). This is
+                                      # the gate whose absence let the sprite garble
+                                      # reach a playtest — AND the gate that sat
+                                      # stale-red from 14z-64 to 14z-67 (GOTCHAS:
+                                      # the not-in-the-battery class)
 ```
 
 Diagnostic instruments added with that gate (MAME Lua, all rerunnable):
@@ -507,6 +512,7 @@ before session end (persistent suite doctrine, CLAUDE.md §4).
 
 | Build | SHA-1 (zip) | Notes |
 |---|---|---|
+| **hui6 — THE H GFX BUILD (14z-67, ping #7, NOT yet frozen)** | fingerprint `b99b73597b7ab09761e0da58e81527db8747c7e5` | `build/hui6`; rebuild: `TENANT_MANIFEST=build/manifest/huitzil.toml TENANT_CHAR=0x10 GEN_FLAGS="--profile cps2-wide-v1 --allow-plausible --tripwire-open" tools/build_donovan.sh 6 build/hui6`. Huitzil at native 0x10 with HIS REAL ART end to end: fighter band at delta 0 in group C bank 4 (native codes, no record remap), select figure/portrait/name, 21-cell wheel, VS splash, HUD mug/plate (pool 0xBE9A/0xBE92), sprite+effect+win palettes, x05c800 escape fix. Cell 0x10 hand-pickable (replay 37: D,D,D from default). Every gate green incl. behavior battery ON this build + oracle (1741). Playtest: `tools/run_hui_behavior.sh`. FREEZE after maintainer confirmation (registry row + expectation set) |
 | **donovan-m3a — THE WIDE REFERENCE (FROZEN 2026-08-06, 14z-64, maintainer-ratified)** | fingerprint `4b7d0dc7319ed6cf94a02b22938cdb18946dfddd` | `build/m5_wide` (rebuilds bit-exact from the tree); REGISTERED `-> donovan-m3a`. The M3a de-substitution complete: tenant at native 0x13 via `id_by_profile` (build with `--profile cps2-wide-v1`, no id flag), Jedah fully restored, select family + wheel from group C bank 5 with real medallion art/palettes, ring reuse, variant-id HUD/win-pal, the 14z-2 mirror-victim fix. Masked basis V2 (per-set `mask` file; staging-slot windows for rows 0x16/0x19/0x1A; vanilla logs `tests/expected/vsavj/masked-v2`). Stock twin **6c93cfa8** at `build/m5_stock` (= old ae701ffb + exactly the 2-byte mirror fix). Validate: `ROMDIR=... MAME_BIN=~/.cache/vampire-saved/mame/cps2 MAME_ROMPATH="build/m5_wide/rompath;$ROMDIR" tests/run_suite.sh vsavjw` |
 | donovan-m5w — superseded by donovan-m3a | fingerprint `9bac6ee378e1a5ce0674423279c357a4d2a076ec` | `build/m5_wide`; REGISTERED `-> donovan-m5w`. Rebuilt through the fixed romset pipeline (group C zero-filled; `audit_romset_identity.py` clean) + the 14z-60 select-wheel extension. Maintainer playtest confirmed with and without Donovan. Gates: `test_wide_profile.sh`, `test_mame_wide.sh`, `test_wide_render_content.sh` (3,721/3,721 frames pixel-identical to the stock track), `test_romset_identity.sh` — all PASS. Expectation set `tests/expected/donovan-m5w/`: 33 self-frozen `.sha1` + full logs, 14 authored `.masked` (`diverge` ×3, §4 v3 `window` ×4, §4 v4 `composite` ×7), 16 `.skip` — all 63 replays accounted for and **`run_suite.sh` GREEN**. Validate any WIDE build with `ROMDIR=... MAME_BIN=~/.cache/vampire-saved/mame/cps2 MAME_ROMPATH="<rompath>;$ROMDIR" tests/run_suite.sh vsavjw` |
 | **m5_stock (the stock twin, re-frozen 2026-08-06)** | fingerprint `6c93cfa8a8a80ae2303d3acaf8c7bff487f369c5` | `build/m5_stock`; rebuilds bit-exact. = the former ae701ffb + EXACTLY the 2-byte mirror-victim fix (PRG:0x0B1A16, byte-attributed). Not registered — the dual-track partner and the rendering gate's reference. Full battery GREEN at freeze |

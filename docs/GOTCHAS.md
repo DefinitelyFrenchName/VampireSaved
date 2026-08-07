@@ -2078,3 +2078,37 @@ hover" while the hover was perfect at 121.1 from f3345. When a gate
 pins absolute frames around a physics-dependent event, re-derive the
 frames after any physics change — or anchor on the event, not the
 clock.
+
+## Forced-pick pokes do NOT populate the HUD index field — HUD
+## verification needs a REAL wheel pick (14z-67)
+
+The forced-pick rig (poking the commit field $FF8782) loads the tenant
+fine, but the in-match HUD stagers index their 32-row tables through a
+SEPARATE field the real pick flow writes and the poke path does not.
+Measured: a forced-pick H match staged mugshot row 0x01/0x11 (the
+alias) while a REAL cursor pick of cell 0x10 (replay 37) staged his
+poked row 0x10 (code be9a) exactly. Symptom pattern: the table pokes
+and art are verifiably correct in the built image, yet the staged
+codes read an alias row. Instrument, not mechanism — verify HUD rows
+with the real-pick replays (36 = cell 0x13, 37 = cell 0x10), never
+with the poke rig.
+
+## A gate that is not in the battery can sit FAILING for sessions —
+## sweep gates when a design changes (14z-67, paid twice in one day)
+
+Two gates were discovered stale-red in the 14z-67 sweep, both outside
+`run_battery_m2.sh`/`run_suite.sh`:
+- `test_gfx_tiles.sh`'s Jedah inventory lock (17763) had been failing
+  since 14z-11 added the walker's sweep pass (818bae7 moved the number
+  to 18094; the commit updated no lock). Attributed by running 818bae7^
+  — it reproduces 17763 exactly — then re-frozen.
+- `test_wide_render_content.sh` had been failing since the 14z-64 m3a
+  freeze: the de-substitution moved Donovan's band to bank 4 (0x4AD8F)
+  and restored Jedah in group B, so the gate's cross-track pixel A/B
+  (replay 11 renders JEDAH on WIDE now) and its stock-bank band dump
+  were both wrong BY DESIGN. Re-shaped to m3a semantics (band
+  equivalence incl. the de-substitution invariant as an assertion).
+The class: a design change invalidates a gate nobody runs, and the red
+gate then reads as "regression" to whoever finally runs it. When a
+freeze changes design semantics, grep tests/ for every gate touching
+the changed surface and run them BEFORE closing the session.

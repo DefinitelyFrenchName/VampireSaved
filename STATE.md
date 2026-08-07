@@ -1,21 +1,26 @@
 # STATE — living progress log
 
-Updated: 2026-08-07 (session 14z-66 CLOSED — THE ROUND-1 PLAYTEST
-WORKLIST IS COMPLETE, all five items + the oracle battery + the
-alias-physics family, maintainer-confirmed through SEVEN playtest
-rounds. Headlines: three EX crash sites fixed (farm-voice stubs, the
-shadow_seq_guard thunk, [[data_in_code]] + census); his true
-velocities AND jump physics serve from variant rows (port_param32;
-float ceiling native-exact 121.1); float + air dash LIVE via the
-per-char jump-handler clone x02592a + tenant_jump_seq thunk + the NEW
-[[pcrel_escape_fix]] mechanism (which also healed Circuit Scrapper);
-RW guard-cancel + Dark Force replays native-matched; the 17/18-style
-oracle gate passes all four locks (H diverges LESS cross-game than a
-vanilla veteran). D1 RATIFIED (VS2 default flavor, polarity fixed by
-measurement) and D4 RATIFIED (Phobos gfx vertical first -> freeze ->
-Pyron merge; sounds stay stubbed until M5). build/hui4 = 8bea919e
-(ping #6, feel-confirmed round 7). Ten gates green; m3a bit-exact on
-every commit. Read the 14z-66 sections below, then docs/NEXT_SESSION.)
+Updated: 2026-08-07 (session 14z-67 — THE D4 PHOBOS GFX VERTICAL: all
+three openers done. (1) 3-tenant tile budgets MEASURED and the group-C
+layout RATIFIED — all three tenants natively share vs2 bank 3, H/P
+place at DELTA 0, Donovan frozen at +0x2750, disjoint by interval,
+flip condition does NOT trigger (~20K codes free; ledger
+build/manifest/gfx_layout3.toml, gate tests/test_gfx_layout3.sh).
+(2) The censuses promoted to tools/census_regions.py, ground-truthed
+on H (exact generator-count agreement), Pyron's code region CLEAN;
+one real find — x05c800's latent tail escapes — fixed same-session
+([[pcrel_escape_fix]] + recon 0x635FC->0x5B25C). (3) THE H GFX RUNG
+LANDS: machinery de-Donovanized (per-tenant layout rows, delta-0
+path, gather data_subst, per-tenant effect_tail keys; m3a bit-exact
+throughout), H's full stage-6 manifest authored, and Huitzil renders
+HIS REAL ART everywhere — fighter, select figure/portrait/name, the
+21-cell wheel, VS splash, HUD mug/plate, palettes — with his cell
+0x10 hand-pickable (NEW replay 37). Build hui6 = b99b7359; EVERY gate
+green incl. the full behavior battery ON the stage-6 build and the
+oracle battery (1741 = stage-4 exact). Two stale-red gates found and
+re-frozen with attribution (GOTCHAS: the not-in-the-battery class).
+PING #7 READY -> maintainer playtest -> H FREEZE, then Pyron.
+Read the 14z-67 sections below, then docs/NEXT_SESSION.)
 
 ## Session 14z-67 (D4: the Phobos gfx vertical)
 
@@ -91,6 +96,66 @@ every commit. Read the 14z-66 sections below, then docs/NEXT_SESSION.)
      before the air dash died on it. QUEUED: [[pcrel_escape_fix]]
      row for x05c800 with the H gfx-rung rebuild (target 0x635FC
      needs recon resolution or a tripwire).
+
+### D4 opener 3 — THE H GFX RUNG LANDS (build hui6 b99b7359, ping #7
+### ready): Huitzil renders his REAL ART everywhere; wheel cell 0x10
+### hand-pickable; every gate green
+
+- MACHINERY de-Donovanized with the frozen references bit-exact at
+  every step (m3a-reproducible run 4x through the arc): build_gfx /
+  build_donovan / verify_gfx resolve band/delta/anim-span/sweep from
+  the tenant's gfx_layout3 row (Donovan's row asserted == his frozen
+  constants); NEW delta-0 placement path (every inventoried tile at
+  its native code — no record remap, no effect map; writes asserted
+  under Donovan's SAFE_LO ceiling); per-tenant effect_tail keys
+  (place_variant_slot_<name>) so one tenant's HUD art cannot leak
+  into another's build; data_subst GATHER form (xN@STRIDE) for
+  strided grid columns; obj_records walker gained an entry-bounds
+  check (a tail false-record read past the region into neighboring
+  placed content) and per-tenant sweep windows (H/P's offset-computed
+  overlay records now inventory: H 15,034 / P 14,225 re-frozen).
+- H's stage-6 manifest content (huitzil.toml; bytes in the build's
+  patch_notes_fragment): 12 OBJ bank setters (fresh scan; Donovan's 6
+  shared-zone rows reproduced as the subset — scan validated),
+  table_fix rows with 0x10=0x1000, code_word slot row, sprite+effect
+  palettes (vs2 0x39BC9C/0x3AB69C, strides verified across rows),
+  seven select_records (anchors read from both games' arrays; vs2
+  newcomer highlight rows are non-pointer sentinels 0x5000000/
+  0x4000000), the three drawer bank thunks verbatim (tt/tu
+  substitution), select_pal_variant_id with H's GRID-COLUMN palette
+  block (vs2's own uploader remaps him INTO the grid at column 0x0B —
+  `cmpi #$10 -> moveq #$B,d6` at vs2 0x6B1A6 — unlike Donovan's
+  dedicated block; hence the gather form), HUD rows (vs2 entries
+  04AB0102/05A0, stager bias +0x4200, art 0x46AB 2x1 / 0x47A0 2x2 ->
+  free-pool 0xBE92/0xBE9A), win_pal (vs2 0x3C347C = pool+0x10*0xA0,
+  head matches his 0x0111 palette family), the select wheel roster21
+  verbatim (tenant-independent), and the x05c800 pcrel escape fix
+  (0x635FC -> vsavj 0x5B25C, unique pattern + jmp-target twin 60/64).
+- MEASURED (snapshots + obj dumps, build b99b7359): select figure,
+  portrait, name banner, 21-cell wheel with the three medallions, VS
+  splash, in-match sprites and palettes ALL render as native H; a
+  real cursor pick of cell 0x10 (NEW replay 37: D,D,D from default)
+  stages HUD mug be9a + plate be92 with the opponent vanilla.
+  GOTCHA paid: the forced-pick rig does NOT populate the HUD index
+  field — HUD verification needs the real-pick replays.
+- GATES (all green): boot (masked-v2 EXACT legacy leg with the escape
+  fix in), ex/walk/air/grab/pairs ON THE STAGE-6 BUILD, soak, ladder,
+  oracle battery (1741 mismatches — identical to stage 4: gfx
+  perturbed no behavior), tenant_hud parameterized per tenant (PASS
+  on hui6 AND m5_wide + negative control), select_records/wheel_bank5/
+  winpal on m5_wide, extract_hp, patch_overlap, census (x05c800 now
+  covered), gfx_layout3, m3a-reproducible.
+- TWO STALE GATES found red and fixed (GOTCHAS "not in the battery"):
+  test_gfx_tiles' Jedah lock (stale since the 14z-11 sweep pass;
+  818bae7^ reproduces the old number; re-frozen 18094/16707) and
+  test_wide_render_content (stale since the m3a freeze — cross-track
+  pixel identity ended BY DESIGN; re-shaped to band equivalence at
+  the correct banks + the de-substitution invariant as an assertion
+  + a true-shadow audit control + liveness via replay 36).
+- tools/run_hui_behavior.sh -> the stage-6 build (build/hui6), no
+  forced id: the maintainer picks H's own cell. PING #7 READY.
+  NEXT: maintainer playtest -> H freeze (registry row + expectation
+  set), then the Pyron vertical (D4 order).
 
 ## Session 14z-66 (playtest round-1 worklist)
 

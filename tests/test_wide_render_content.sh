@@ -1,41 +1,45 @@
 #!/bin/sh
-# test_wide_render_content.sh — the WIDE track must RENDER the ported
-# content exactly as the stock track does.
+# test_wide_render_content.sh — the WIDE track must SERVE the ported
+# content's tiles (and only where designed), measured in the emulator's
+# own decoded gfx memory.
 #
 # WHY THIS EXISTS (14z-60z). Donovan and Anita rendered as garbage on the
 # WIDE track for two sessions while EVERY automated gate stayed green: the
-# RAM gates are structurally blind to the video path (14z-55), the pixel
-# gate test_gfx_menus.sh covers MENUS on the stock track, and the WIDE
-# profile gate proves the profile inert on LEGACY content. Nothing looked
-# at ported content on the WIDE track, so a human playtest was the only
-# detector. This is that missing gate.
+# RAM gates are structurally blind to the video path (14z-55) and nothing
+# looked at ported content on the WIDE track, so a human playtest was the
+# only detector. This is that missing gate.
 #
-# The bug it was written against: the WIDE romset's appended group C was a
-# byte copy of the stock group B (the B4 canary shape), so it carried group
-# B's CRCs. Both emulators resolve a ROM entry by HASH before falling back
-# to its NAME, so group B's declared CRC matched the canary copies and the
-# loader served PRISTINE tiles for the members the build had patched.
-# Donovan drew with vanilla art: right geometry, wrong pixels, silent.
+# RE-SHAPED 14z-67 for the m3a de-substitution (the original gate went
+# STALE at the 14z-64 freeze and sat failing, undetected, because it is
+# not in the battery — found in the 14z-67 sweep). The original compared
+# cross-track PIXELS on a slot-0x0F replay and dumped the band at the
+# stock bank address for both tracks. Post-m3a both are wrong BY DESIGN:
+# the WIDE track restores Jedah at slot 0x0F (replay 11 renders JEDAH
+# there) and serves Donovan from group C bank 4 (0x4AD8F, not 0x2AD8F).
+# Cross-track pixel identity is gone by design; the content proof is the
+# emulator's decoded tile memory, which is exactly what its renderer
+# composes from (B4/B5 proved the path from there to pixels on both
+# emulators, work RAM AND framebuffer).
 #
-# Three sections:
-#   1. MEMBER IDENTITY (static, no emulator) — no member of either set may
-#      carry the pristine bytes of a member that build patched.
-#   2. PIXEL A/B — per-frame framebuffer checksums of a Donovan replay on
-#      both tracks must be IDENTICAL. Measured 14z-60z: the tracks do not
-#      skew at all on this pair (3,720/3,720 frames identical), so this is
-#      an exact comparison, not an anchor comparison. If a future change
-#      makes the tracks skew, fix the skew or move to anchors deliberately
-#      — do not relax this to "close enough".
-#      NOTE: work RAM is deliberately NOT compared here. Donovan replays
-#      legitimately diverge in RAM between tracks (the sfx helper is live
-#      on WIDE, stubbed on stock — tests/test_dualtrack.sh owns that).
-#   3. POSITIVE CONTROL — a WIDE set poisoned back into the 14z-60z shape
-#      must FAIL both section 1 and section 2. A gate that has never been
-#      shown to fail is not evidence (CLAUDE.md §4: verdict logic is itself
-#      tested).
+# Sections:
+#   1. MEMBER IDENTITY (static) — no member of either set carries the
+#      pristine bytes of a member that build patched.
+#   2. BAND EQUIVALENCE (the content check, in-emulator) — the decoded
+#      tiles at Donovan's band:
+#        WIDE @ bank 4 (0x4AD8F)  == stock @ bank 2 (0x2AD8F)   [his art]
+#        WIDE @ bank 2 (0x2AD8F)  == PRISTINE                   [Jedah
+#          restored — THE DE-SUBSTITUTION INVARIANT, asserted]
+#        stock @ bank 2           != PRISTINE                   [dump not
+#          blind]
+#   3. POSITIVE CONTROL — group C zero-poisoned: the member audit must
+#      reject it (a pristine-zero revert of patched members) AND the
+#      WIDE band dump must change. A gate never shown to fail is not
+#      evidence.
+#   4. LIVENESS — replay 36 (the real cell-0x13 pick) completes on the
+#      WIDE build with a live framebuffer stream (the render path is
+#      exercised end to end, not just the tile memory).
 #
 # Usage: ROMDIR=... tests/test_wide_render_content.sh [stock_rompath] [wide_rompath]
-#   env REPLAYS      replays to compare (default 11_pick_donovan)
 #   env MAME_WIDE_BIN  WIDE-patched MAME (default ~/.cache/vampire-saved/mame/cps2)
 set -eu
 ROMDIR="${ROMDIR:?set ROMDIR}"
@@ -44,7 +48,6 @@ cd "$REPO"
 
 STOCK="${1:-$REPO/build/m5_stock/rompath}"
 WIDE="${2:-$REPO/build/m5_wide/rompath}"
-REPLAYS="${REPLAYS:-11_pick_donovan}"
 MAME_WIDE_BIN="${MAME_WIDE_BIN:-$HOME/.cache/vampire-saved/mame/cps2}"
 
 [ -f "$STOCK/vsavj.zip" ]  || { echo "no stock build at $STOCK (tools/build_donovan.sh 6 build/m5_stock)"; exit 1; }
@@ -57,16 +60,6 @@ WORK="$(mktemp -d)"
 trap 'rm -rf "$WORK"' EXIT
 fail=0
 
-# per-frame framebuffer checksums for one (set, rompath, replay)
-video() {  # video <tag> <set> <rompath> <replay>
-    MAME_BIN="$MAME_WIDE_BIN" MAME_ROMPATH="$3;$ROMDIR" \
-    MAME_SANDBOX="$WORK/sbx_$1" REPLAY="$REPO/tests/replays/$4.rpl" \
-    CHECKSUM_OUT="$WORK/$1.ram" VIDEO_OUT="$WORK/$1.vid" \
-        tools/run_mame.sh "$2" -autoboot_script "$REPO/tests/lua/replay.lua" \
-        > "$WORK/$1.run" 2>&1
-    grep -q "^END " "$WORK/$1.vid" || { echo "  run $1 produced no END line"; cat "$WORK/$1.run"; return 1; }
-}
-
 echo "== 1. member identity: nothing shadows a patched member =="
 for rp in "$STOCK" "$WIDE"; do
     if python3 tools/audit_romset_identity.py "$rp" --quiet; then
@@ -77,99 +70,95 @@ for rp in "$STOCK" "$WIDE"; do
     fi
 done
 
-echo "== 2. pixel A/B: the WIDE track renders ported content like stock =="
-for rp in $REPLAYS; do
-    video "s_$rp" vsavj  "$STOCK" "$rp" || { fail=1; continue; }
-    video "w_$rp" vsavjw "$WIDE"  "$rp" || { fail=1; continue; }
-    if cmp -s "$WORK/s_$rp.vid" "$WORK/w_$rp.vid"; then
-        echo "  ok: $rp — $(grep -c . "$WORK/s_$rp.vid") frames pixel-identical across tracks"
-    else
-        first="$(diff "$WORK/s_$rp.vid" "$WORK/w_$rp.vid" | grep '^<' | head -1 | awk '{print $1}' | tr -d '<' )"
-        echo "  FAIL: $rp — framebuffer differs from the stock track (first divergent frame:$first)"
-        echo "        Snapshot it: tests/lua/snapshot_frames.lua with SNAP_FRAMES=$first"
-        fail=1
-    fi
-done
-
-echo "== 3. positive control: the 14z-60z shape must FAIL both checks =="
-# Rebuild the poisoned set: group C = byte copies of the stock group B, which
-# is exactly what --gfx-copy-group-b writes and what shipped by accident.
-mkdir -p "$WORK/poison"
-cp "$WIDE"/*.zip "$WORK/poison/" 2>/dev/null || true
-python3 - "$WORK/poison/vsavjw.zip" "$ROMDIR/vsav.zip" <<'PYEOF'
-import shutil, sys, zipfile
-target, parent = sys.argv[1], sys.argv[2]
-pz = zipfile.ZipFile(parent)
-copy = dict(zip(("vsw.31m", "vsw.33m", "vsw.35m", "vsw.37m"),
-                ("vm3.14m", "vm3.16m", "vm3.18m", "vm3.20m")))
-# read from a copy: rewriting `target` in place while it is open truncates it
-shutil.copyfile(target, target + ".orig")
-src = zipfile.ZipFile(target + ".orig")
-names = src.namelist()
-with zipfile.ZipFile(target, "w", zipfile.ZIP_DEFLATED) as out:
-    for n in names:
-        out.writestr(n, pz.read(copy[n]) if n in copy else src.read(n))
-PYEOF
-
-if python3 tools/audit_romset_identity.py "$WORK/poison" --quiet >/dev/null 2>&1; then
-    echo "  FAIL: the audit PASSED a poisoned set — it cannot see the bug it exists for"
-    fail=1
-else
-    echo "  ok: the member-identity audit rejects the poisoned set"
-fi
-
-ctl_rp="$(echo $REPLAYS | awk '{print $1}')"
-if video "p_$ctl_rp" vsavjw "$WORK/poison" "$ctl_rp"; then
-    if cmp -s "$WORK/s_$ctl_rp.vid" "$WORK/p_$ctl_rp.vid"; then
-        echo "  FAIL: the poisoned set rendered IDENTICALLY to stock — the pixel"
-        echo "        comparison is blind (wrong replay, or the tiles are not reached)"
-        fail=1
-    else
-        n="$(diff "$WORK/s_$ctl_rp.vid" "$WORK/p_$ctl_rp.vid" | grep -c '^<')"
-        echo "  ok: the poisoned set diverges from stock on $n frames — the gate sees it"
-    fi
-else
-    echo "  FAIL: the poisoned control run did not complete"
-    fail=1
-fi
-
-echo "== 4. the decoded tiles at the ported band are the BUILD's, not pristine =="
-# Sharper than pixels and independent of them: read the tile bytes the
-# emulator actually holds at the address Donovan's select sprite composes.
-# MIND THE BANK BITS. The sprite record's code word is 0xAD8F but its y-word
-# selects bank 2, so the address is 0x2AD8F:
-#     tile = code | ((y & 0x6000) << 3)
-# Dumping tile 0xAD8F instead reads an unrelated band that is vanilla on
-# every build — which is exactly how the load hypothesis was first declared
-# dead (14z-60y) while it was in fact the cause.
-BAND="2ad8f:16"
-band() {  # band <tag> <set> <rompath>
+echo "== 2. band equivalence: the emulator's decoded tiles at Donovan's band =="
+# MIND THE BANK BITS (the 14z-60y lesson): the sprite record's code word
+# is 0xAD8F; the composed address = code | bank<<16. Stock = bank 2
+# (y-word 0x4000) -> 0x2AD8F. WIDE (m3a, variant id) = bank 4 (y-word
+# 0x1000, the bit-12 promote) -> 0x4AD8F.
+band() {  # band <tag> <set> <rompath> <window>
     MAME_BIN="$MAME_WIDE_BIN" MAME_ROMPATH="$3;$ROMDIR" MAME_SANDBOX="$WORK/gsb_$1" \
-    GFX_WINDOWS="$BAND" TRACE_OUT="$WORK/$1.gfx" \
+    GFX_WINDOWS="$4" TRACE_OUT="$WORK/$1.gfx" \
         tools/run_mame.sh "$2" -autoboot_script "$REPO/tests/lua/gfx_region_dump.lua" \
         > "$WORK/$1.gfxrun" 2>&1
     grep -q "^GFXDUMPSUMMARY" "$WORK/$1.gfx" || { echo "  dump $1 did not complete"; return 1; }
     awk '/^GFX /{print $5}' "$WORK/$1.gfx"      # the fnv=<hash> field
 }
-b_stock="$(band bstock vsavj  "$STOCK")"   || fail=1
-b_wide="$(band bwide  vsavjw "$WIDE")"     || fail=1
-b_pristine="$(band bpri vsavj "$ROMDIR")"  || fail=1
+b_stock="$(band bstock vsavj  "$STOCK"  2ad8f:16)"  || fail=1
+b_wide4="$(band bwide4 vsavjw "$WIDE"   4ad8f:16)"  || fail=1
+b_wide2="$(band bwide2 vsavjw "$WIDE"   2ad8f:16)"  || fail=1
+b_prist="$(band bpri   vsavj  "$ROMDIR" 2ad8f:16)"  || fail=1
 
-if [ "$b_wide" = "$b_stock" ] && [ -n "$b_wide" ]; then
-    echo "  ok: WIDE serves the same tiles as the stock track ($b_wide)"
+if [ -n "$b_wide4" ] && [ "$b_wide4" = "$b_stock" ]; then
+    echo "  ok: WIDE bank 4 serves the same Donovan tiles as stock bank 2 ($b_wide4)"
 else
-    echo "  FAIL: WIDE tiles $b_wide != stock tiles $b_stock at the ported band"
+    echo "  FAIL: WIDE bank-4 band $b_wide4 != stock bank-2 band $b_stock"
     fail=1
 fi
-if [ "$b_stock" != "$b_pristine" ] && [ -n "$b_pristine" ]; then
-    echo "  ok: and both differ from PRISTINE ($b_pristine) — the dump is not blind"
+if [ -n "$b_wide2" ] && [ "$b_wide2" = "$b_prist" ]; then
+    echo "  ok: WIDE bank 2 reads PRISTINE — Jedah restored (the de-substitution invariant)"
 else
-    echo "  FAIL: the ported band reads pristine on the stock track too — wrong band,"
-    echo "        or this build does not patch it (the instrument proves nothing)"
+    echo "  FAIL: WIDE bank-2 band $b_wide2 != pristine $b_prist — group B not pristine"
+    fail=1
+fi
+if [ -n "$b_stock" ] && [ "$b_stock" != "$b_prist" ]; then
+    echo "  ok: stock band differs from pristine — the dump is not blind"
+else
+    echo "  FAIL: the stock band reads pristine — wrong band or the build does not patch it"
+    fail=1
+fi
+
+echo "== 3. positive control: a poisoned set must FAIL both instruments =="
+# TWO poisons in one set, one per instrument's contract:
+#   - group C zeroed (a reverted band) -> the BAND DUMP must change;
+#   - vsw.21m := pristine vm3.13m bytes (a true SHADOW: a patched
+#     member's pristine bytes under another name — the audit's class,
+#     exactly the 14z-60z loader hazard).
+mkdir -p "$WORK/poison"
+cp "$WIDE"/*.zip "$WORK/poison/" 2>/dev/null || true
+python3 - "$WORK/poison/vsavjw.zip" "$ROMDIR/vsav.zip" <<'PYEOF'
+import shutil, sys, zipfile
+target, refzip = sys.argv[1], sys.argv[2]
+zero = {f"vsw.{n}m": bytes(0x400000) for n in (31, 33, 35, 37)}
+shadow = {"vsw.21m": zipfile.ZipFile(refzip).read("vm3.13m")}
+shutil.copyfile(target, target + ".orig")
+src = zipfile.ZipFile(target + ".orig")
+with zipfile.ZipFile(target, "w", zipfile.ZIP_DEFLATED) as out:
+    for n in src.namelist():
+        out.writestr(n, zero.get(n) or shadow.get(n) or src.read(n))
+PYEOF
+if python3 tools/audit_romset_identity.py "$WORK/poison" --quiet >/dev/null 2>&1; then
+    echo "  FAIL: the audit PASSED a set with a pristine-shadow member"
+    fail=1
+else
+    echo "  ok: the member-identity audit rejects the shadow (the 14z-60z class)"
+fi
+b_poison="$(band bpoi vsavjw "$WORK/poison" 4ad8f:16)" || true
+if [ -n "$b_poison" ] && [ "$b_poison" != "$b_wide4" ]; then
+    echo "  ok: the poisoned band dump differs ($b_poison) — the instrument sees it"
+else
+    echo "  FAIL: the poisoned set dumps the same band — the instrument is blind"
+    fail=1
+fi
+
+echo "== 4. liveness: the real cell-0x13 pick renders on the WIDE build =="
+MAME_BIN="$MAME_WIDE_BIN" MAME_ROMPATH="$WIDE;$ROMDIR" \
+MAME_SANDBOX="$WORK/sbx_live" REPLAY="$REPO/tests/replays/36_pick_tenant_cell.rpl" \
+CHECKSUM_OUT="$WORK/live.ram" VIDEO_OUT="$WORK/live.vid" \
+    tools/run_mame.sh vsavjw -autoboot_script "$REPO/tests/lua/replay.lua" \
+    > "$WORK/live.run" 2>&1 || true
+if grep -q "^END " "$WORK/live.vid" 2>/dev/null; then
+    dis="$(awk '{print $2}' "$WORK/live.vid" | sort -u | wc -l | tr -d ' ')"
+    if [ "$dis" -gt 100 ]; then
+        echo "  ok: replay 36 completed with a live framebuffer ($dis distinct frames)"
+    else
+        echo "  FAIL: framebuffer stream degenerate ($dis distinct checksums)"
+        fail=1
+    fi
+else
+    echo "  FAIL: the replay-36 run did not complete"
     fail=1
 fi
 
 [ "$fail" = 0 ] || { echo "FAIL: WIDE content-rendering gate"; exit 1; }
-echo "PASS: WIDE content-rendering gate (member identity + pixel A/B vs stock"
-echo "      + a positive control that the comparison actually detects the fault"
-echo "      + the decoded tile band, with a pristine negative control)"
+echo "PASS: WIDE content-rendering gate (member identity + band equivalence"
+echo "      incl. the de-substitution invariant + a positive control + liveness)"

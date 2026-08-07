@@ -14,10 +14,9 @@
 #     (same delta, contiguous => pcrel-safe by construction, asserted
 #     from placements.json); x068c78 1 + x028122 1 = known operand
 #     false positives (matched words are move.l/move.w immediates);
-#     x05c800 2 sites -> 0x635FC = the KNOWN-OPEN latent escape found
-#     by this census (14z-67) — QUEUED for the H gfx-rung rebuild.
-#     When its [[pcrel_escape_fix]] row lands this expectation flips
-#     to covered (update in the same commit).
+#     x05c800 2 sites -> 0x635FC = the latent escape THIS CENSUS found
+#     (14z-67), fixed the same session by a [[pcrel_escape_fix]] row +
+#     the 0x635FC -> 0x5B25C recon twin — now asserted covered.
 #   Growth in ANY census number = stop and root-cause (the x026142
 #   lesson: latent escapes bite later, not never).
 #
@@ -65,7 +64,7 @@ EXPECT = {  # region: (count, n_unique, covered)
     "x02592a": (89, 35, True),
     "x026142": (9, 6, True),
     "code":    (20, 4, False),
-    "x05c800": (2, 1, False),
+    "x05c800": (2, 1, True),   # covered 14z-67: the gfx-rung fix landed
     "x068c78": (1, 1, False),
     "x028122": (1, 1, False),
 }
@@ -87,8 +86,8 @@ assert all(lo <= t < hi for t in e["code"]["unique_targets"]), \
 print("  ok: code->x057456 escapes adjacency-safe (same delta, contiguous)")
 
 assert e["x05c800"]["unique_targets"] == [0x635FC], "x05c800 target moved"
-print("  ok: x05c800 KNOWN-OPEN latent escape visible (0x635FC, queued "
-      "for the H gfx-rung rebuild)")
+print("  ok: x05c800 escape pair covered (0x635FC -> 0x5B25C recon row, "
+      "the 14z-67 pcrel_escape_fix)")
 PY
 
 echo "== section 2: Pyron early warning"

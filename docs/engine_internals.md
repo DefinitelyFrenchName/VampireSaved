@@ -69,11 +69,13 @@ tests/test_gfx_tiles.sh):
   0xAD3D-0xEEBB, 16,658 tiles (2.1MB), extent 0x417F; secondary band
   0xA0A0-0xA51D (1,036 tiles).
 - Huitzil (vs2, bank 3 = table row 0x10 value 0x6000): main band
-  0x0AF6-0x4EFC, 14,870 tiles (1.86MB), extent 0x4407; +25 low
-  shared-effect tiles 0x0000-0x06D8. 14,895 unique total (14z-67).
+  0x0AF6-0x4EFC, 15,010 tiles (1.88MB), extent 0x4407; +24 low
+  shared-effect tiles 0x0057-0x06D8. 15,034 unique total (14z-67b:
+  walker entry-bounds fix + per-tenant sweep window).
 - Pyron (vs2, bank 3 = table row 0x11 value 0x6000): main band
-  0x4ED5-0x8647, 14,037 tiles (1.75MB), extent 0x3773; +51 scattered
-  (0x003F-0x3615, 0x40AF, 0x47C3, 0xA42C). 14,089 unique total (14z-67).
+  0x4ED5-0x8647, 14,171 tiles (1.77MB), extent 0x3773; +54 scattered
+  (0x003F-0x3615, 0x40AF, 0x462A-0x47C3, 0xA42C). 14,225 unique total
+  (14z-67b).
 
 **The three tenants natively coexist in ONE bank (14z-67, the D4
 budget measurement, locked by tests/test_gfx_layout3.sh):** vs2 packs
@@ -665,3 +667,25 @@ measurement, GOTCHAS). Treat the row as behaviour-bearing.
   the ATTACKER's code — H's FG draws it RANDOMLY (table16[rand&15],
   ids 1/3/5) per barrage hit. The intro-variant at +0x0A is likewise
   RNG-drawn at char load.
+
+## Select-portrait palette dispatch + HUD stager biases (14z-67,
+## measured on the H gfx rung)
+
+vs2's select-portrait palette uploader (compare chain at vs2 0x6B1A6,
+the twin of vsavj's 0x5F146 window) special-cases the newcomers THREE
+DIFFERENT WAYS — the per-tenant fact that decides each port's
+mechanism:
+- id 0x10 Huitzil: `moveq #$B,d6` — remapped INTO the shared grid at
+  column 0x0B (grid base 0x3C117C, row = (variant*16+id)*0x20). His
+  10 variant rows are STRIDED (0x3C12DC + v*0x200) — ported via the
+  data_subst gather form.
+- id 0x11 Pyron: `addi.w #$BC,d0` — a dedicated row block past the
+  grid (contiguous; ports like Donovan's).
+- id 0x13 Donovan: `addi.w #$C6,d0` — his dedicated block (0x3C2A3C).
+
+HUD per-char tables (both DATA-view, both 32-row aliased): the staged
+OBJ code = table entry + the game's STAGER BIAS — vsavj +0x3800, vs2
++0x4200. vs2 entries row 0x10 (H): name 04AB 0102 FFE8 0002 (2x1
+plate), mug 05A0 (2x2). The HUD index field is populated by the REAL
+pick flow only — forced-pick pokes load the character but leave the
+HUD reading the alias row (GOTCHAS).

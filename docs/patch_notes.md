@@ -2151,3 +2151,68 @@ every gate green (air-gate sample frames retuned to the native rise —
 the old frames were calibrated to the alias climb). Residual known
 delta: the GROUND dash (ours ~7 vs native ~8.2 px/f) — its per-char
 param consumer is not yet decoded; next row of the same family.
+
+## Session 14z-67 — the H gfx rung (D4 opener 3): every byte class, and
+## where the detail lives
+
+Build hui6 = b99b7359 (stage 6, 0x10, profile cps2-wide-v1). Per-op
+byte detail: `build/hui6/patch/patch_notes_fragment.md` (generated,
+op-exact). The manifest-level record:
+
+- **12 OBJ bank setters** (`[[port_patch]]`, huitzil.toml): every
+  `move.w #$6000,$18(aN)` in H's ported regions -> `#$1000` (WIDE bank
+  4) on the variant build. Sites from a fresh scan (opcode
+  `(w & 0xF1FF) == 0x317C`, imm 0x6000, disp 0x0018): x057456 0x5938C;
+  x05c800 0x5CF38/0x620D4/0x62194; x088512 0x8873E/0x89D26/0x8B100;
+  x06800c 0x68360/0x683A2/0x683EA/0x6842E; x0692f6 0x69490. Donovan's
+  six shared-zone rows reproduce as the exact subset (scan validation).
+  One near-miss triaged: 0x8BF1A writes #$6000 to +0x1A (the X word),
+  not a bank — left alone.
+- **[table_fix]** x026142+0x13EE: vanilla vsavj rows EXCEPT row 0x10 =
+  0x1000. **[[code_word]]** obj_bank_word_slot: vsavj 0x282D4 row 0x10
+  (variant-alias anchored) -> 0x1000.
+- **[[palette]] x2**: sprite block vs2 0x39BC9C len 0x500 (head
+  0111 0630 0a40 0c60), effect block vs2 0x3AB69C len 0xDC0 (head
+  0503 0704 0815 0947), tables 0x38C198/0x38C218 + extra 0x38C258 —
+  the Donovan template with H's blocks (pointer-table rows 0x10,
+  strides 0x500/0xDC0 verified across rows 0x0F-0x13).
+- **Seven [[select_records]]**: same array bases as Donovan's (the
+  arrays are engine-global; the generator indexes row = tenant id).
+  H's vs2 rows: portrait 0x2A5E4A/0x2A625A, name 0x2A64D6/0x2A7506,
+  splash 0x2A7B06/0x2A7E36, win_quote 0x2A881E; vj alias rows = row
+  0x00's records (verified equal). Highlight = host_ring; vs2's
+  newcomer highlight rows hold sentinels 0x5000000/0x4000000.
+- **Drawer bank thunks**: name/splash/winquote rows verbatim (tt/tu
+  substitution follows the manifest's tenant).
+  **select_pal_variant_id**: H has NO dedicated palette block — vs2's
+  uploader remaps id 0x10 INTO the shared grid at column 0x0B
+  (`cmpi #$10 -> moveq #$B,d6`, vs2 0x6B1A6; grid base 0x3C117C, row
+  = (variant*16+id)*0x20). His 10 rows = 0x3C12DC + v*0x200, gathered
+  contiguous by the NEW data_subst form `x10@0x200`.
+- **HUD rows**: vs2 DATA-view entries (name 0x9910E row 0x10 =
+  04AB 0102 FFE8 0002; mug 0x990CE row 0x10 = 05A0; vs2 stager bias
+  +0x4200 -> art 0x46AB 2x1 / 0x47A0 2x2, non-blank verified). Pool
+  anchors 0xBE92 (plate) / 0xBE9A (mug; bottom row 0xBEAA-AB). Pokes:
+  0x898A4=0x869A, 0x89944=0x86920102, 0x89948=0xFFE80002 (vsavj bias
+  -0x3800). Art rides effect_tail `place_variant_slot_huitzil` (the
+  NEW per-tenant key — the generic key would leak H's art into
+  Donovan's builds and break m3a bit-exactness).
+- **[[win_pal_variant]]** hui_win_pal: vs2_src 0x3C347C (= vs2 pool
+  0x3C2A7C + 0x10*0xA0; head 0x0111... = his palette family), same
+  site/pool/strides as Donovan's row.
+- **[[select_wheel]] roster21**: verbatim — the 21-cell extension is
+  tenant-independent (cells 0x10/0x11/0x13 from the layout json).
+- **[[pcrel_escape_fix]] x05c800** (stage 4, pad 0x20): the census
+  find. Sites 0x631D0/0x631D8 (`tst.b $18E/$134(a4); bne.w 0x635FC`);
+  target does `subq.b #1,$149(a4); jmp <engine>`. Resolution: vsavj
+  0x5B25C — UNIQUE pattern match, jmp targets twin-verified (vs2
+  0x15770 / vsavj 0x17028, 60/64 bytes, diffs = A5-operand drift).
+  Recon row in reconciliation_huitzil.toml.
+
+Machinery (all Donovan-bit-exact, m3a-reproducible run at every step):
+per-tenant layout resolution (gfx_layout3.toml rows by tenant NAME —
+the id differs per track), the delta-0 placement path, per-tenant
+effect_tail keys, the data_subst gather form, verify_gfx_build
+de-Donovanized (span/aux/sweep per tenant), obj_records entry-bounds
+check + per-tenant sweep windows (inventories re-frozen H 15,034 /
+P 14,225; Donovan unchanged 15,612).
