@@ -239,11 +239,15 @@ Read the 14z-67 sections below, then docs/NEXT_SESSION.)
   same two operand false positives); m3a-reproducible PASS.
 - Fingerprint at arc close: 60fd8afa (scratch builds only —
   build/hui6 = ping #7 remains untouched, re-verified).
-- NEXT for P: the moveset-specific work — his sound-farm sweep (the
-  0x4F96-0x5038 helper family refs are still tripwired; voice cues
-  will fire them as moves connect — the H ES-crash class), per-move
-  native A/B replays, param32/flavor measurement (no fork expected),
-  then his gfx rung through the ratified layout row.
+- THE SOUND-FARM SWEEP LANDED same arc (pre-emptive, before any
+  connect-range crash could name it): all six farm rows P references
+  are the same jsr-0x330E shape with directly readable ids — five
+  verdicts copied from H's verified rows (shared bytes, same ids),
+  one NEW row 0x4F62 = id 0x735 (the 0x7xx stub class). Frontier
+  37 -> 31 tripwires; soak re-verified clean (fingerprint 33164e64).
+- NEXT for P: per-move native A/B replays (the m2a oracle template),
+  param32/flavor measurement (no fork expected), then his gfx rung
+  through the ratified layout row.
 
 ## Session 14z-66 (playtest round-1 worklist)
 

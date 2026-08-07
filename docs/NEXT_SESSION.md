@@ -14,10 +14,10 @@ stage-3 unmasked bit-identity + stage-4 masked-v2 EXACT). AND the
 moveset arc is OPEN: the chaos soak runs CLEAN (11k frames, satellite
 live across rounds — tests/test_pyron_soak.sh) after three
 mechanism-attributed fixes, all shared-zone row classes (GOTCHAS: copy
-a shared region's rows up front). Remaining for P: the sound-farm
-sweep (the 0x4F96-0x5038 helper refs are still tripwired — voice cues
-will fire them as moves connect, the H ES-crash class), per-move
-native A/B replays, then his gfx rung.** Frozen
+a shared region's rows up front). The sound-farm sweep ALSO landed
+(six stub rows, one new id 0x735; frontier 37 -> 31 tripwires).
+Remaining for P: per-move native A/B replays (the m2a oracle
+template), params/flavor measurement, then his gfx rung.** Frozen
 references unchanged (donovan-m3a 4b7d0dc7 / m5_stock 6c93cfa8;
 m3a-reproducible PASS on every commit of the session).
 

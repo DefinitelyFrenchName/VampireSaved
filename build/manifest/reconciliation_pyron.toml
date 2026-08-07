@@ -71,3 +71,53 @@ vsavj = 0x05b25c
 kind = "engine_sub"
 status = "verified"
 note = "x05c800 tail-escape twin (14z-67 census find; shared-zone copy — subq+jmp engine, double-site verified)"
+
+# ── Sound-farm stubs (14z-67 pre-emptive sweep — the H ES-crash class,
+# swept BEFORE a connect-range crash could name them): all six farm
+# rows P's content references are the same shape (jsr 0x330E +
+# move.l #id,d1, ids read from the opcode bytes). Five verdicts copy
+# from H's verified rows (shared farm bytes, same ids); 0x4F62 is new
+# to the frontier — id 0x735, the newcomer 0x7xx voice range, the
+# established stub class. P KEPT SILENT until the M5 voice-bank port.
+
+[[map]]
+vsav2 = 0x003ffc
+vsavj = 0x02a7e0
+kind = "stubbed_sound"
+status = "verified"
+note = "P KEPT SILENT: sfx id 0x1d4 — vsavj same-id keys DIFFERENT content (H-measured, shared row). Revisit at M5."
+
+[[map]]
+vsav2 = 0x004efa
+vsavj = 0x02a7e0
+kind = "stubbed_sound"
+status = "verified"
+note = "P KEPT SILENT: sfx id 0x748 — newcomer voice range (shared farm row, H-verified id). Revisit at M5."
+
+[[map]]
+vsav2 = 0x004f2e
+vsavj = 0x02a7e0
+kind = "stubbed_sound"
+status = "verified"
+note = "P KEPT SILENT: sfx id 0x73a — newcomer voice range (shared farm row, H-verified id). Revisit at M5."
+
+[[map]]
+vsav2 = 0x004f62
+vsavj = 0x02a7e0
+kind = "stubbed_sound"
+status = "verified"
+note = "P KEPT SILENT (14z-67 NEW row): sfx id 0x735 — newcomer voice range, id read from the farm bytes (same jsr 0x330E shape). Revisit at M5."
+
+[[map]]
+vsav2 = 0x004fb0
+vsavj = 0x02a7e0
+kind = "stubbed_sound"
+status = "verified"
+note = "P KEPT SILENT: sfx id 0x729 — newcomer voice range (shared farm row, H-verified id). Revisit at M5."
+
+[[map]]
+vsav2 = 0x004fca
+vsavj = 0x02a7e0
+kind = "stubbed_sound"
+status = "verified"
+note = "P KEPT SILENT: sfx id 0x72e — newcomer voice range (shared farm row, H-verified id). Revisit at M5."
