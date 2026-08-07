@@ -1,0 +1,188 @@
+# reconciliation_huitzil.toml — PER-TENANT OVERLAY (14z-65).
+# Rows here OVERRIDE the shared map, applied only when a tenant
+# manifest declares recon_overlay. Exists because the shared map's
+# rows are FROZEN for Donovan's reproducibility (his build consumes
+# open rows as tripwires — resolving them changes his bytes). The
+# Phase 2 merge unifies this properly (per-tenant row scoping).
+
+[[map]]
+vsav2 = 0x003ffc
+vsavj = 0x02a7e0
+kind = "stubbed_sound"
+status = "verified"
+note = "H KEPT SILENT (14z-65 sweep 2, handler regions): sfx id 0x1d4 — vsavj same-id keys DIFFERENT content (keyons, measured). Revisit with the M5 voice-bank port."
+
+[[map]]
+vsav2 = 0x004e44
+vsavj = 0x02a7e0
+kind = "stubbed_sound"
+status = "verified"
+note = "H KEPT SILENT (14z-65): sfx id 0x748 — newcomer voice-bank range (0x7xx), the established stub class. Revisit with the M5 voice-bank port."
+
+[[map]]
+vsav2 = 0x004eac
+vsavj = 0x02a7e0
+kind = "stubbed_sound"
+status = "verified"
+note = "H KEPT SILENT (14z-65): sfx id 0x74c — newcomer voice-bank range (0x7xx), the established stub class. Revisit with the M5 voice-bank port."
+
+[[map]]
+vsav2 = 0x004ee0
+vsavj = 0x02a7e0
+kind = "stubbed_sound"
+status = "verified"
+note = "H KEPT SILENT (14z-65): sfx id 0x74f — newcomer voice-bank range (0x7xx), the established stub class. Revisit with the M5 voice-bank port."
+
+[[map]]
+vsav2 = 0x004f2e
+vsavj = 0x02a7e0
+kind = "stubbed_sound"
+status = "verified"
+note = "H KEPT SILENT (14z-65): sfx id 0x73a — newcomer voice-bank range. Named by the round-2 soak. Revisit with the M5 voice-bank port."
+
+[[map]]
+vsav2 = 0x004f62
+vsavj = 0x02a7e0
+kind = "stubbed_sound"
+status = "verified"
+note = "H KEPT SILENT (14z-65): sfx id 0x735 — vsavj same-id keys DIFFERENT content (keyons, measured). Named by the round-2 soak (scanner-merge ref, invisible to the diff-ref sweep). Revisit with the M5 voice-bank port."
+
+[[map]]
+vsav2 = 0x2bc3ec
+vsavj = 0x000000
+kind = "engine_data"
+status = "open"
+note = "-; refs: bare_long"
+
+[[map]]
+vsav2 = 0x2bc46e
+vsavj = 0x000000
+kind = "engine_data"
+status = "open"
+note = "-; refs: bare_long"
+
+[[map]]
+vsav2 = 0x2bc8f8
+vsavj = 0x1c1268
+kind = "engine_data"
+status = "verified"
+note = "codebytes-unique-w0x8; refs: bare_long"
+
+[[map]]
+vsav2 = 0x2bd7de
+vsavj = 0x000000
+kind = "engine_data"
+status = "open"
+note = "-; refs: bare_long"
+
+[[map]]
+vsav2 = 0x2bd810
+vsavj = 0x000000
+kind = "engine_data"
+status = "open"
+note = "-; refs: bare_long"
+
+[[map]]
+vsav2 = 0x2bd842
+vsavj = 0x000000
+kind = "engine_data"
+status = "open"
+note = "-; refs: bare_long"
+
+[[map]]
+vsav2 = 0x2bd92e
+vsavj = 0x000000
+kind = "engine_data"
+status = "open"
+note = "-; refs: bare_long"
+
+[[map]]
+vsav2 = 0x2bd960
+vsavj = 0x19f432
+kind = "engine_data"
+status = "verified"
+note = "codebytes-unique-w0x8; refs: bare_long"
+
+[[map]]
+vsav2 = 0x2bd996
+vsavj = 0x000000
+kind = "engine_data"
+status = "open"
+note = "-; refs: bare_long"
+
+[[map]]
+vsav2 = 0x2c3136
+vsavj = 0x1e6462
+kind = "engine_data"
+status = "verified"
+note = "codebytes-unique-w0x8; refs: bare_long"
+
+[[map]]
+vsav2 = 0x2c3170
+vsavj = 0x1e6cd8
+kind = "engine_data"
+status = "verified"
+note = "codebytes-unique-w0x8; refs: bare_long"
+
+[[map]]
+vsav2 = 0x2c31aa
+vsavj = 0x000000
+kind = "engine_data"
+status = "open"
+note = "-; refs: bare_long"
+
+[[map]]
+vsav2 = 0x2c31e4
+vsavj = 0x000000
+kind = "engine_data"
+status = "open"
+note = "-; refs: bare_long"
+
+[[map]]
+vsav2 = 0x2c3236
+vsavj = 0x000000
+kind = "engine_data"
+status = "open"
+note = "-; refs: bare_long"
+
+[[map]]
+vsav2 = 0x2c325c
+vsavj = 0x000000
+kind = "engine_data"
+status = "open"
+note = "-; refs: bare_long"
+
+[[map]]
+vsav2 = 0x2c3272
+vsavj = 0x000000
+kind = "engine_data"
+status = "open"
+note = "-; refs: bare_long"
+
+[[map]]
+vsav2 = 0x2c3280
+vsavj = 0x000000
+kind = "engine_data"
+status = "open"
+note = "-; refs: bare_long"
+
+[[map]]
+vsav2 = 0x2c3296
+vsavj = 0x000000
+kind = "engine_data"
+status = "open"
+note = "-; refs: bare_long"
+
+[[map]]
+vsav2 = 0x2c32a4
+vsavj = 0x000000
+kind = "engine_data"
+status = "open"
+note = "-; refs: bare_long"
+
+[[map]]
+vsav2 = 0x2c32b2
+vsavj = 0x000000
+kind = "engine_data"
+status = "open"
+note = "-; refs: bare_long"

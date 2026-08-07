@@ -199,6 +199,19 @@ def main():
     if args.recon.is_file():
         for m in toml_loads(args.recon.read_text()).get("map", []):
             recon[_int(m["vsav2"])] = m
+    # PER-TENANT RECON OVERLAY (14z-65): the shared map's rows are frozen
+    # for the reference tenant's reproducibility — his build consumes OPEN
+    # rows as tripwires, so resolving a row he references changes HIS
+    # bytes. A tenant manifest may declare recon_overlay = "<toml>" whose
+    # rows override the shared map for THAT tenant's builds only. The
+    # Phase 2 merge replaces this with proper per-tenant row scoping.
+    _ov = port.get("recon_overlay") or (port.get("tenant") or [{}])[0].get("recon_overlay")
+    if _ov:
+        _ovp = root / _ov
+        if not _ovp.is_file():
+            raise SystemExit(f"recon_overlay {_ov} not found")
+        for m in toml_loads(_ovp.read_text()).get("map", []):
+            recon[_int(m["vsav2"])] = m
 
     # ── M5: the per-node sfx helper goes live ONLY with the record array ─────
     # 14z-52 measured exactly why this coupling has to be structural. The

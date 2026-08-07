@@ -88,7 +88,17 @@ case "$TENANT_CHAR" in
         # closure of its pcrel escapes converges at +0x3B3E (measured
         # 14z-65, 6 rounds). Donovan's bound was HIS census, not the
         # zone's true extent.
-        DEFAULT_ROOTS="$DEFAULT_ROOTS,0x5c800:0xd100,0x26142:0x1400,0x28122:0xe00,0x88512:0x3b40:s"
+        # x2b7ef4 (14z-65): the companion-anim zone — HIS PODS use it too
+        # (measured: the pod-node setup at vs2 0x8B156 reads the table at
+        # 0x2B8060; unrooted, the operand resolved to a CODE TRIPWIRE and
+        # the "table" read returned ILLEGAL-opcode bytes as node offsets).
+        # Donovan's root verbatim (newcomer-shared data, same oracle twin).
+        DEFAULT_ROOTS="$DEFAULT_ROOTS,0x5c800:0xd100,0x26142:0x1400,0x28122:0xe00,0x88512:0x3b40:s,0x2b7ef4:0xb20c:t0x2a4398:d"
+        # The secondary-object handler family 64-75 (14z-65): H's moves
+        # spawn these (type 72 named by the round-2 soak tripwire); all
+        # twelve rooted pre-emptively (caps = inter-handler gaps, twins
+        # +0x34 — the zone convention; the oracle bound validates each).
+        DEFAULT_ROOTS="$DEFAULT_ROOTS,0x672d0:0x280:t0x67304,0x67550:0x2f6:t0x67584,0x67846:0x1ba:t0x6787a,0x67a00:0x60c:t0x67a34,0x6800c:0x44c:t0x68040,0x68458:0x310:t0x6848c,0x68768:0x264:t0x6879c,0x689cc:0x2ac:t0x68a00,0x68c78:0x3ce:t0x68cac,0x69046:0x2b0:t0x6907a,0x692f6:0x368:t0x6932a,0x6965e:0x400:t0x69692"
         ;;
     *)  DEFAULT_ROOTS="" ;;
 esac

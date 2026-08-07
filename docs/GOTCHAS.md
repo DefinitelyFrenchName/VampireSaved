@@ -2012,3 +2012,27 @@ states the port never writes).
   robust latch must be phase-gated or a dedicated one-shot byte — and
   manifest-opt-in, because Donovan's frozen build carries the old shim
   bytes.
+
+## Three lessons from the day Huitzil came alive (14z-65)
+
+- A SET-NAME MISMATCH IS A FALSE GREEN, silently: when a build's first
+  wide_ext allocation flips the pack to vsavjw, every probe still run
+  with SET=vsavj falls back to the PRISTINE ROM in $ROMDIR — boots,
+  plays, soaks "clean", and tests nothing (an 11,000-frame attract-mode
+  "soak" passed this way). Every H gate now derives the set from the
+  rompath contents. Corollary: a "suspiciously clean" result after a
+  build-shape change is a prompt to verify WHAT ROM actually ran
+  (the loaded hitbox base names the character; the snapshot names the
+  screen).
+- RAW KEYON-LIST EQUALITY IS NOT THE M5 VERIFY: it flagged id 0x2D4 as
+  "different" when the Donovan arc PROVED it identical (same bank/start
+  after relocation). A blanket keyon!=equal sweep condemned 127 shared
+  sfx before the contradiction surfaced. The 0x7xx newcomer-voice range
+  is the only stub-on-sight class; shared ids go through the batch
+  resolver / the real M5 method.
+- THE SHARED R1 MAP IS FROZEN FOR THE REFERENCE TENANT: his build
+  consumes OPEN rows as tripwires, so resolving any row his extraction
+  references CHANGES HIS BYTES (m3a reproducibility caught it). New
+  tenants' rows live in a per-tenant recon_overlay
+  (build/manifest/reconciliation_huitzil.toml; manifest key
+  recon_overlay) until the Phase 2 merge scopes rows properly.

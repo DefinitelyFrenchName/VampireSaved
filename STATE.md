@@ -263,6 +263,37 @@ the matcher reads (his +0x3xx input ring — if the recorder dispatch
 row feeding it is another wrong alias, the matcher sees an empty
 ring). Builds: acda6946 current ladder; all gates green.
 
+### 14z-65 — HUITZIL IS ALIVE END-TO-END: soak green on the real set,
+### legacy masked-EXACT, behavior build shipped (PING #1)
+
+The full chain on the REAL vsavjw set (after the false-green lesson —
+GOTCHAS): boot loads HIS data; intro/engage/states/moves live; the
+companion-anim root (x2b7ef4, Donovan's row verbatim) fixed the pod
+first-tick; the 12 secondary handlers 64-75 rooted (type 72 = his live
+sub-object, 401 per-frame executions measured); the farm census closed
+for everything his flows reach (voice-range stubs only — the keyon
+over-sweep was caught and reverted, GOTCHAS); round-2 pods respawn via
+HIS OWN built-in keeper (satellites d400/d480 alive at f6000).
+- GATES: NEW tests/test_hui_soak.sh (build + guarded 11,000-frame
+  chaos soak on the packed set + round-2 satellite check) GREEN;
+  tests/test_hui_boot.sh set-aware with the legacy leg FROZEN as
+  masked-v2 EXACT (measured — cleaner than Donovan's builds: no
+  flicker inventory needed yet; any future flicker is measure-and-
+  ratify); ladder/extraction gates green; m3a bit-exact (after the
+  recon-overlay split — the shared map is FROZEN for Donovan, H's rows
+  live in build/manifest/reconciliation_huitzil.toml via the new
+  manifest key recon_overlay).
+- SHIPPED FOR THE MAINTAINER (ping #1): tools/run_hui_behavior.sh —
+  interactive windowed WIDE MAME; pick anyone as P1, get Phobos
+  (tests/lua/force_id.lua). Expectations documented in the script
+  header (garbled body, silent voices, attract oddities reportable).
+- Replay captured: tests/replays/hui/70_hui_mash.rpl (subdir escapes
+  the suite glob until H's expectation set exists).
+NEXT after playtest feedback: the oracle battery analog (17/18-style
+native-vs-ported field comparison), more soak variants (2P, throws,
+timeout, arcade flows), then the gfx rung (his art in a WIDE band) and
+the select-wheel cell activation.
+
 ### 14z-65 — the pod first-tick frontier (resume point)
 
 The init-time vec3 decoded: engine 0x1AFAA `movea.l $4(a0),a0` faults

@@ -41,6 +41,12 @@ PY
 [ -n "$EXPECT_BASE" ] || { echo "FAIL: no hitbox_base[0x10] op in the patch"; exit 1; }
 
 echo "== forced-pick boot (id 0x10)"
+# the build packs as vsavjw when any allocation reaches wide_ext — run
+# the set that was actually packed (14z-65: a vsavj-set probe against a
+# vsavjw rompath silently falls back to the PRISTINE ROM: false greens)
+if [ -f "$WORK/hui4/rompath/vsavjw.zip" ]; then
+    export SET=vsavjw MAME_BIN="$HOME/.cache/vampire-saved/mame/cps2"
+fi
 tools/force_pick_probe.sh "$WORK/hui4/rompath" 10 "$WORK/probe" > "$WORK/probe.txt"
 cat "$WORK/probe.txt" | sed 's/^/  /'
 grep -q "hitbox base 0x$EXPECT_BASE — char LOADED" "$WORK/probe.txt" \
@@ -48,14 +54,19 @@ grep -q "hitbox base 0x$EXPECT_BASE — char LOADED" "$WORK/probe.txt" \
 grep -q "guard        : clean" "$WORK/probe.txt" \
     || { echo "FAIL: guard not clean"; exit 1; }
 
-echo "== legacy replay bit-identity on the same build"
-MAME_ROMPATH="$WORK/hui4/rompath;$ROMDIR" \
-    tools/run_replay_mame.sh vsavj tests/replays/02_demitri_vs_cpu.rpl \
+echo "== legacy replay under the v2 masked basis (hooked build)"
+# stage 4 carries the obj_hook engine thunks, so the whole-RAM bit-identity
+# of the ladder gate no longer applies (CLAUDE.md §4 hooked-build basis).
+# Measured 14z-65: EXACT under the v2 mask — frozen as EXACT; any future
+# flicker must be measured and ratified per doctrine, never tolerated here.
+MASK_RANGES="$(cat "$REPO/tests/expected/donovan-m3a/mask")" \
+MAME_ROMPATH="$WORK/hui4/rompath;$ROMDIR" MAME_BIN="${MAME_BIN:-mame}" \
+    tools/run_replay_mame.sh "${SET:-vsavj}" tests/replays/02_demitri_vs_cpu.rpl \
     "$WORK/r02.log" "$WORK/r02box" > /dev/null 2>&1
-sha=$(shasum "$WORK/r02.log" | cut -d' ' -f1)
-exp=$(cat "$REPO/tests/expected/vsavj/02_demitri_vs_cpu.sha1")
-[ "$sha" = "$exp" ] \
-    || { echo "FAIL: legacy replay diverged ($sha != $exp)"; exit 1; }
-echo "  ok: bit-identical to the frozen vanilla expectation"
+python3 "$REPO/tools/compare_flicker.py" "$WORK/r02.log" \
+    "$REPO/tests/expected/vsavj/masked-v2/logs/02_demitri_vs_cpu.log" \
+    | grep -q "^EXACT" \
+    || { echo "FAIL: legacy replay not masked-EXACT"; exit 1; }
+echo "  ok: masked-v2 EXACT vs the frozen vanilla log"
 
 echo "PASS: Huitzil stage-4 boot (his data loads, guard clean, legacy intact)"

@@ -29,6 +29,9 @@ id = 0x10
 # allocator semantics need the 0x80-clear wrapper on vsavj; without it a
 # recycled round-2 slot keeps stale bytes under the pod init).
 alloc_wrap = "0x15702,0x1572e"
+# 14z-65: his rows live in the overlay — the shared map is frozen for
+# Donovan's reproducibility (see reconciliation_huitzil.toml header).
+recon_overlay = "build/manifest/reconciliation_huitzil.toml"
 
 # ── Pool-seeding init shim + flavor latch (14z-65, the watchdog-reboot
 # hunt). Vanilla vsavj never seeds the secondary-object pools during a
