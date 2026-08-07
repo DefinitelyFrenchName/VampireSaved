@@ -15,6 +15,30 @@ engine-site thunk live. build/hui4 at 44be1266 = ping #3 with items
 
 ## Session 14z-66 (playtest round-1 worklist)
 
+### Item 5 — the coverage replays LANDED (RW GC + Dark Force,
+### native-matched); the oracle battery is the remainder
+
+- REFLECT WALL GUARD CANCEL (replay 81 + native A/B): P1 blocks the
+  dummy's point-blank jab, 623+P during blockstun — the seq-0x0E
+  progression is frame-identical to native on BOTH attempts and the
+  attacker is blown back across the screen (native x 322->487, ours
+  322->474; the knockback magnitude delta = the alias-physics class,
+  queued with the throw-arc/float-ceiling family).
+- DARK FORCE (replay 82 + native A/B): activation seq 0x0A at f3110
+  AND at f4210 on both games — activation, expiry, and re-activation
+  all proven; the DF summon pieces (types 0x75/0x77) present in poolB
+  on both at the f3250 sample, same coordinates. Open observations
+  (single-frame, unattributed — queued for the oracle battery): ~15px
+  X drift over the DF walk (speed modifier vs recoil) and a pod anim
+  phase difference at the sample frame.
+- NEW gate tests/test_hui_pairs.sh (both signatures asserted).
+- The 2P-dummy instrument (early-window pokes) is now the standard
+  clean-room rig — replays 80/81/82 all use it.
+- REMAINING for item 5: the 17/18-style ORACLE BATTERY analog (field
+  comparison at anchors over a long native-vs-ported input script —
+  the test_m2a_stage4_oracle.sh pattern; fields TSV + compare_fields
+  machinery exist). THE NEXT SESSION'S OPENER.
+
 ### ROUND 6 (maintainer): ITEM 4 CONFIRMED ("Circuit scrapper
 ### confirmed") and D1 RATIFIED — "VS2 flavor confirmed as the
 ### default selection in the current build AND the default selection
