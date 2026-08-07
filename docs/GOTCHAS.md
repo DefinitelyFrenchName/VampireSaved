@@ -2112,3 +2112,20 @@ The class: a design change invalidates a gate nobody runs, and the red
 gate then reads as "regression" to whoever finally runs it. When a
 freeze changes design semantics, grep tests/ for every gate touching
 the changed surface and run them BEFORE closing the session.
+
+## A tenant porting SHARED regions inherits every region-scoped
+## mechanism row those regions carry — copy them ALL, up front (14z-67)
+
+Pyron's first mash soak crashed three ways, and every fix was a row H
+already carried for the same shared zones: the x088512 pod-table
+data_in_code reroute (the class's FOURTH bite), the queue class-7
+remap, both obj_hook union sites, the x026142/x05c800 escape pads +
+twin rows, and the satellite handler family roots (types 64-75 —
+"H's farm zones" turned out to be the SHARED newcomer-satellite
+handlers, proven when P's first spawn tripped type 64's tripwire).
+The rows are properties of the SHARED SOURCE BYTES, not of the tenant.
+When a new tenant's roots pull in a shared region, diff the other
+tenants' manifests for every row scoped to that region and copy them
+BEFORE the first probe run — the crashes are pre-paid knowledge, not
+new information. (The Phase-2 merge dedups these by span; until then
+the duplication is the mechanism.)

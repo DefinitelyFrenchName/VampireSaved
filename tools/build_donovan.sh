@@ -112,15 +112,31 @@ case "$TENANT_CHAR" in
         DEFAULT_ROOTS="$DEFAULT_ROOTS,0x2592a:0x456:t0x25958"
         ;;
     0x11)
-        # Pyron ladder open (14z-67): NEAR-BARE roots — his core regions
-        # (code/anim/hitbox/aux) extract oracle-clean with no extras.
-        # His stage-4 generation names exactly ONE missing structure:
-        # the 18-ring velocity-vector family 0xd143e (based at 0xd15be
-        # by his code at +0x2e88/+0x2eb2 — the SAME vs2-only bank data
-        # H's census ported; structure-bounded, sibling-identical, twin
-        # at -0x76e). The shared support-zone roots join as his R1 loop
-        # opens (accumulate his census here exactly as H's above).
-        DEFAULT_ROOTS="0xd143e:0x900:t0xd0cd0:d" ;;
+        # Pyron census (14z-67, moveset arc open). Measured from his
+        # code region's 131 unique engine-ref targets:
+        # - 0xd143e = the 18-ring velocity-vector family (based at
+        #   0xd15be — the SAME vs2-only bank data H's census ports;
+        #   structure-bounded, sibling-identical, twin at -0x76e).
+        # - The SHARED newcomer-support zones his code references
+        #   directly (40 targets in x05c800, 19 in x028122, 15 in
+        #   x026142, 1 in x088512 — the H bounds: x088512's true
+        #   extent is 0x3B40, measured 14z-65). 0x905ae is NOT
+        #   referenced by his code — omitted (minimal census; add it
+        #   the moment a tripwire names it).
+        # - x2b7ef4 (companion-effect records, data) rides along: the
+        #   x088512 zone's spawners reference it (the Donovan/H
+        #   precedent) and his secondary types resolve through it.
+        # 55 unresolved engine targets remain TRIPWIRED (families:
+        # alloc pair 0x15702/2E, sound helpers 0x4F96-0x5038, engine
+        # subs 0x28FA0-0x29950 + 0x4223C-0x448D4) — the R1 loop
+        # resolves them as probes fire.
+        DEFAULT_ROOTS="0xd143e:0x900:t0xd0cd0:d"
+        DEFAULT_ROOTS="$DEFAULT_ROOTS,0x5c800:0xd100,0x26142:0x1400,0x28122:0xe00,0x88512:0x3b40:s,0x2b7ef4:0xb20c:t0x2a4398:d"
+        # The newcomer-satellite handler family (types 64-75; the same
+        # 12 regions H's census ports — SHARED engine-side handlers,
+        # proven by P's first satellite spawn tripping obj_hook type 64
+        # -> unresolved 0x672d0). Bounds/twins = the measured H rows.
+        DEFAULT_ROOTS="$DEFAULT_ROOTS,0x672d0:0x280:t0x67304,0x67550:0x2f6:t0x67584,0x67846:0x1ba:t0x6787a,0x67a00:0x60c:t0x67a34,0x6800c:0x44c:t0x68040,0x68458:0x310:t0x6848c,0x68768:0x264:t0x6879c,0x689cc:0x2ac:t0x68a00,0x68c78:0x3ce:t0x68cac,0x69046:0x2b0:t0x6907a,0x692f6:0x368:t0x6932a,0x6965e:0x400:t0x69692" ;;
     *)  DEFAULT_ROOTS="" ;;
 esac
 python3 tools/extract_char.py "$ROMDIR/vsav2.zip" "$OUTBASE/extract" \

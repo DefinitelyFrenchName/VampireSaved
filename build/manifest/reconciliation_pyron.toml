@@ -9,3 +9,65 @@
 # His code carries 769 engine refs; unresolved ones tripwire loudly
 # under --tripwire-open until each is resolved with the established
 # methods (pattern ladder, site-twin bracketing, stub-deref).
+
+# ── Shared-zone rows (14z-67, the P moveset arc): P ports the SAME
+# shared regions H does (x026142/x05c800/x088512...), so their known
+# escape-twin resolutions apply verbatim — the targets are properties
+# of the SHARED SOURCE BYTES, not of the tenant. Copied from
+# reconciliation_huitzil.toml; the Phase-2 merge dedups by span.
+
+[[map]]
+vsav2 = 0x0210c0
+vsavj = 0x0226dc
+kind = "engine_sub"
+status = "verified"
+note = "x026142 escape twin (14z-66 site-twin method; shared-zone copy)"
+
+[[map]]
+vsav2 = 0x0219c4
+vsavj = 0x022fc0
+kind = "engine_sub"
+status = "verified"
+note = "x026142 escape twin (14z-66 site-twin method; shared-zone copy)"
+
+[[map]]
+vsav2 = 0x021c64
+vsavj = 0x023244
+kind = "engine_sub"
+status = "verified"
+note = "x026142 escape twin (14z-66 site-twin method; shared-zone copy)"
+
+[[map]]
+vsav2 = 0x022008
+vsavj = 0x023500
+kind = "engine_sub"
+status = "verified"
+note = "x026142 escape twin (14z-66 site-twin method; shared-zone copy)"
+
+[[map]]
+vsav2 = 0x024cba
+vsavj = 0x026058
+kind = "engine_sub"
+status = "verified"
+note = "x026142 escape twin (14z-66 site-twin method; shared-zone copy)"
+
+[[map]]
+vsav2 = 0x025f9a
+vsavj = 0x026e16
+kind = "engine_sub"
+status = "verified"
+note = "x026142 escape twin (14z-66 site-twin method; shared-zone copy)"
+
+[[map]]
+vsav2 = 0x027542
+vsavj = 0x0282ee
+kind = "engine_sub"
+status = "verified"
+note = "x026142 escape twin (14z-66 site-twin method; shared-zone copy)"
+
+[[map]]
+vsav2 = 0x0635fc
+vsavj = 0x05b25c
+kind = "engine_sub"
+status = "verified"
+note = "x05c800 tail-escape twin (14z-67 census find; shared-zone copy — subq+jmp engine, double-site verified)"

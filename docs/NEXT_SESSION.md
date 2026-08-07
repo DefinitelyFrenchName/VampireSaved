@@ -10,9 +10,14 @@ after confirmation. MEANWHILE (maintainer testing deferred): the
 patch_index backfill landed and THE PYRON LADDER IS OPEN — stages 1-4
 green (tests/test_pyron_ladder.sh: builds, op invariant with the four
 named hook-site exemptions, boot probe id-hold/load/guard-clean,
-stage-3 unmasked bit-identity + stage-4 masked-v2 EXACT). His next
-arc = the moveset R1 loop (support-zone roots, sound-farm sweep,
-obj_hook types, probe cycles — the H 14z-65/66 template).** Frozen
+stage-3 unmasked bit-identity + stage-4 masked-v2 EXACT). AND the
+moveset arc is OPEN: the chaos soak runs CLEAN (11k frames, satellite
+live across rounds — tests/test_pyron_soak.sh) after three
+mechanism-attributed fixes, all shared-zone row classes (GOTCHAS: copy
+a shared region's rows up front). Remaining for P: the sound-farm
+sweep (the 0x4F96-0x5038 helper refs are still tripwired — voice cues
+will fire them as moves connect, the H ES-crash class), per-move
+native A/B replays, then his gfx rung.** Frozen
 references unchanged (donovan-m3a 4b7d0dc7 / m5_stock 6c93cfa8;
 m3a-reproducible PASS on every commit of the session).
 
@@ -53,15 +58,12 @@ build.
 ## AFTER maintainer confirmation: the H freeze
 
 Registry row (b99b7359 -> huitzil-m4?) + expectation set
-(tests/expected/<name>/) + re-freeze note in HANDOFF. Then the
-PYRON VERTICAL (D4 order): his R1 root census (support-zone extra
-roots — census_regions reruns as they land; the region-count lock in
-test_census_regions.sh will fail loudly and guide re-freezing), his
-ladder stages 1-4 (the H template), then his gfx rung through the SAME
-generalized machinery (his layout row is already reserved; his
-manifest needs the H-style stage-6 sections — the grid column for his
-select palettes is column-free: vs2 gives him a dedicated +0xBC row
-block, measured 14z-67 at vs2 0x6B1A6 area).
+(tests/expected/<name>/) + re-freeze note in HANDOFF. The PYRON
+VERTICAL is ALREADY UNDERWAY (ladder 1-4 + soak green): remaining is
+the sound-farm sweep, per-move native A/B replays (the m2a oracle
+template), then his gfx rung through the generalized machinery (his
+layout row is reserved; his select palettes are a dedicated +0xBC
+block — vs2 0x6B1A6, easier than H's grid column).
 
 ## Standing facts (14z-67 additions; do not re-derive)
 
@@ -78,8 +80,8 @@ block, measured 14z-67 at vs2 0x6B1A6 area).
   0x3C117C, row stride 0x20, (variant*16+id) indexing.
 - vs2 HUD stager bias is +0x4200 (vsavj's is +0x3800); both tables
   DATA-view. H entries: name 04AB0102/FFE8/0002, mug 05A0.
-- The queued docs/patch_index.md backfill (from 14z-66) is STILL
-  OPEN.
+- patch_index.md is BACKFILLED (14z-67 continuation) — keep it
+  updated in the same commit as any patch change, per the taxonomy.
 
 ## Gates (all green at close; run before ANY commit)
 
@@ -98,5 +100,7 @@ tests/test_hui_pairs.sh build/hui6
 tests/test_hui_oracle.sh build/hui6/rompath   # ~10 min
 tests/test_tenant_hud.sh build/hui6     # per-tenant (also m5_wide)
 tests/test_wide_render_content.sh       # re-shaped m3a semantics
+tests/test_pyron_ladder.sh              # P stages 1-4 + boot + legacy
+tests/test_pyron_soak.sh                # P 11k chaos + satellite lock
 tools/run_hui_behavior.sh               # interactive (build/hui6)
 ```

@@ -34,6 +34,12 @@ name = "pyron"
 src_set = "vsav2"
 src_char = 0x11
 id = 0x11
+# 14z-67 (first mash-soak crash, vec3 f3383 in the OBJ emitter): a
+# recycled effect slot ($FF9500) carried stale bytes under his
+# satellite init — the alloc_wrap class exactly (his code calls the
+# vs2 allocator pair like H's and Donovan's; vs2's allocator semantics
+# need the 0x80-clear wrapper on vsavj). Same row as theirs.
+alloc_wrap = "0x15702,0x1572e"
 # His rows live in a per-tenant overlay — the shared map is frozen for
 # Donovan's reproducibility (the reconciliation_huitzil.toml precedent).
 recon_overlay = "build/manifest/reconciliation_pyron.toml"
@@ -63,3 +69,60 @@ start = 0x400010
 end = 0x600000
 class = "raw"
 profile = "cps2-wide-v1"
+
+# ══ 14z-67 moveset arc: SHARED-ZONE rows — P ports the same shared
+# regions H does, so every region-scoped mechanism row H carries for
+# them applies to P's copies verbatim (the rows are properties of the
+# SHARED SOURCE BYTES; the Phase-2 merge dedups by span). First soak
+# crash (vec3 f3383, OBJ emitter, +0x1C NULL chain -> the data-view
+# [0x4] read) = the pod-zone data_in_code class biting its FOURTH time:
+# x088512 is crypt-placed and its embedded offset/record table read
+# garbage under re-encryption, so his satellite's record never
+# installed.
+
+# Companion queue-class remap (vs2 class 7 -> vsavj class 6).
+[[port_patch]]
+region = "x088512"
+src_addr = 0x08B0F8
+old_hex = "000e"
+new_hex = "000c"
+note = "companion queue class 7 (vs2-only) -> vsavj class 6 (the Anita/H precedent)"
+
+# Secondary/companion type-dispatch union (both engine sites — the
+# vanilla tables over-index for newcomer types otherwise; the H f4983
+# class). Unresolved extras tripwire loudly.
+[[obj_hook]]
+site = 0x054470
+vanilla_table = 0x054484
+vanilla_entries = 59
+src_table = 0x05C620
+src_entries = 76
+
+[[obj_hook]]
+site = 0x05E542
+vanilla_table = 0x05E556
+vanilla_entries = 114
+src_table = 0x06A51C
+src_entries = 124
+
+# The pod-zone embedded offset/record word table (x088512+0x3AE4 reader
+# — the 14z-66 data_in_code census row, shared bytes).
+[[data_in_code]]
+region = "x088512"
+table = 0x08C042
+table_len = 0x100
+reader = 0x08BFF6
+reader_old_hex = "47fa004a30330000"
+note = "pod-zone word offset/record table (a3 re-derived from it; self-relative; shared-zone copy)"
+
+# The shared zones' pcrel escapes (oracle-invisible; targets resolved
+# in the overlay — the same twin rows as H's).
+[[pcrel_escape_fix]]
+stage = 4
+region = "x026142"
+pad = 0x60
+
+[[pcrel_escape_fix]]
+stage = 4
+region = "x05c800"
+pad = 0x20

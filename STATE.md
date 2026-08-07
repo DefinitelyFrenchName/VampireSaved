@@ -197,6 +197,54 @@ Read the 14z-67 sections below, then docs/NEXT_SESSION.)
     rung after that (layout share reserved; select palettes = a
     dedicated +0xBC block, easier than H's grid column).
 
+### 14z-67 continuation 2: THE PYRON MOVESET ARC OPENS — the chaos
+### soak runs CLEAN (11k frames, satellite live across rounds) after
+### three mechanism-attributed fixes, all shared-zone row classes
+
+- The probe loop (the sessions-4-6 doctrine) on the new mash replay
+  (tests/replays/pyron/70_pyron_mash.rpl = the generic input-chaos
+  body, id via pokes). THREE crashes, each fully attributed, NONE
+  needing fresh decoding — all were KNOWN row classes riding the
+  shared zones P now ports:
+  1. vec3 f3383 in the OBJ emitter: satellite +0x1C NULL -> the
+     emitter read the data-view long at [0x4] (= 0x2CE87A67, the
+     crash ADDR exactly). Root cause: THE POD-ZONE data_in_code
+     TABLE, biting its FOURTH time — x088512 is crypt-placed and its
+     embedded offset/record table read garbage under re-encryption,
+     so the satellite's record never installed. (The alloc_wrap
+     hypothesis was tried first and REFUTED by an identical crash.)
+  2. Fix bundle: every region-scoped mechanism row H carries for the
+     shared zones, copied verbatim (they are properties of the SHARED
+     SOURCE BYTES): the x088512 pod-table data_in_code row + queue
+     class-7 remap + both obj_hook union sites; pcrel_escape_fix
+     x026142/x05c800 + the 8 twin rows into reconciliation_pyron.
+  3. vec4 f3382 = obj_hook type 64 TRIPWIRE (unresolved 0x672d0) —
+     P's first satellite spawn PROVED the "H farm zones" are the
+     SHARED newcomer-satellite handler family (types 64-75). The 12
+     regions added to his roots (H's measured bounds/twins verbatim);
+     soak CLEAN end-to-end after (11,017 frames, 0 PC weeds,
+     round-2 satellite linked at +0x2A = $D400 — he links ONE where
+     H links two pods).
+- Debug-timeline gotcha re-paid: the -debug write tracer did not even
+  crash by f3390 (skewed inputs), and FBNeo could not reproduce (the
+  vs-CPU divergent-content rule) — the working instrument was
+  GUARD_PROBE at the emitter (non-debug... -debug but minimal skew:
+  crash at 3384 vs 3383) reading the head register directly.
+- Gates: NEW tests/test_pyron_soak.sh (build + 11k guarded chaos +
+  the measured satellite-liveness lock); test_pyron_ladder.sh still
+  green on the grown manifest (stage-3 legacy still UNMASKED
+  bit-identical; stage-4 masked-v2 EXACT); census section 2 RE-FROZEN
+  over his 17-region set (the designed region-count-lock flow: his
+  shared-zone findings mirror H's inventory exactly, all covered,
+  same two operand false positives); m3a-reproducible PASS.
+- Fingerprint at arc close: 60fd8afa (scratch builds only —
+  build/hui6 = ping #7 remains untouched, re-verified).
+- NEXT for P: the moveset-specific work — his sound-farm sweep (the
+  0x4F96-0x5038 helper family refs are still tripwired; voice cues
+  will fire them as moves connect — the H ES-crash class), per-move
+  native A/B replays, param32/flavor measurement (no fork expected),
+  then his gfx rung through the ratified layout row.
+
 ## Session 14z-66 (playtest round-1 worklist)
 
 ### The alias-physics port OPENED — jump_params row landed (float

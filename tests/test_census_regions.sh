@@ -20,10 +20,13 @@
 #   Growth in ANY census number = stop and root-cause (the x026142
 #   lesson: latent escapes bite later, not never).
 #
-# Section 2 — PYRON EARLY WARNING (D4 step 2): his current single code
-# region censuses CLEAN (0 data_in_code, 0 escapes). His support-zone
-# roots are not extracted yet; when his R1 census grows the region set,
-# the region-count lock fails loudly -> rerun and re-freeze.
+# Section 2 — PYRON (re-frozen 14z-67 moveset arc: his roots now pull
+# the shared zones + the satellite handler family, 17 code regions).
+# His OWN code region stays clean; the shared-zone findings mirror H's
+# inventory exactly and are covered by his manifest rows (x026142 9->6,
+# x05c800 2->1, the x088512 pod table) — plus the SAME two operand
+# false positives (x028122 0x2CC64, x068c78 0x6B644). Growth beyond
+# this = stop and root-cause.
 #
 # Usage: ROMDIR=... tests/test_census_regions.sh [hui_build_dir]
 #   hui_build_dir: an existing tenant build (needs extract/ + patch/);
@@ -90,20 +93,28 @@ print("  ok: x05c800 escape pair covered (0x635FC -> 0x5B25C recon row, "
       "the 14z-67 pcrel_escape_fix)")
 PY
 
-echo "== section 2: Pyron early warning"
-python3 tools/extract_char.py "$ROMDIR/vsav2.zip" "$W/p" \
-    --char 0x11 --oracle "$ROMDIR/vhunt2.zip" > "$W/p.log" 2>&1 \
-    || { tail -10 "$W/p.log"; echo "FAIL: 0x11 extraction errored"; exit 1; }
-python3 tools/census_regions.py "$W/p" --json "$W/pc.json" > "$W/pc.txt"
+echo "== section 2: Pyron (full-roots extraction via a stage-1 build)"
+TENANT_MANIFEST=build/manifest/pyron.toml TENANT_CHAR=0x11 \
+    GEN_FLAGS="--profile cps2-wide-v1" \
+    tools/build_donovan.sh 1 "$W/pb" > "$W/pb.log" 2>&1 \
+    || { tail -10 "$W/pb.log"; echo "FAIL: P stage-1 build errored"; exit 1; }
+python3 tools/census_regions.py "$W/pb/extract" \
+    --manifest build/manifest/pyron.toml --json "$W/pc.json" > "$W/pc.txt"
 python3 - "$W/pc.json" <<'PY'
 import json, sys
 c = json.load(open(sys.argv[1]))
-assert c["code_regions"] == ["code"], \
-    f"Pyron code-region set grew: {c['code_regions']} — rerun the census " \
-    "over the new regions and re-freeze"
-assert not c["data_in_code"] and not c["escapes"], \
-    f"Pyron census no longer clean: {c}"
-print("  ok: Pyron's code region censuses CLEAN (0 data_in_code, 0 escapes)")
+assert len(c["code_regions"]) == 17, \
+    f"Pyron code-region count {len(c['code_regions'])} != 17 — roots " \
+    "changed; rerun the census and re-freeze"
+dc = {h["reader"]: h["covered"] for h in c["data_in_code"]}
+assert dc == {0x08BFF6: True}, f"data_in_code drifted: {dc}"
+e = {k: (v["count"], len(v["unique_targets"]), v["covered"])
+     for k, v in c["escapes"].items()}
+assert e == {"x026142": (9, 6, True), "x05c800": (2, 1, True),
+             "x028122": (1, 1, False), "x068c78": (1, 1, False)}, \
+    f"escape inventory drifted: {e}"
+print("  ok: Pyron census frozen (own code clean; shared-zone findings "
+      "covered; the two known operand false positives)")
 PY
 
 echo "PASS: region censuses ground-truthed (H inventory frozen; P clean)"
