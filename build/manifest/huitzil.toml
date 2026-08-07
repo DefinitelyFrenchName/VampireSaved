@@ -25,6 +25,27 @@ src_set = "vsav2"
 src_char = 0x10
 id = 0x10
 
+# ── Pool-seeding init shim + flavor latch (14z-65, the watchdog-reboot
+# hunt). Vanilla vsavj never seeds the secondary-object pools during a
+# normal match; vsav2 always does, and the newcomers' ecosystems allocate
+# from them (the Donovan lesson — his shim exists for exactly this). An
+# allocator on an unseeded pool hangs without an exception: the measured
+# symptom (handler entered at f2886, no fault, watchdog reboot).
+# seed_entry/latch_disp are ENGINE facts (vsavj's own seeder aggregator,
+# pool-0 free-list head), not Donovan-specific. Huitzil HAS the VS2/VH2
+# Start-hold fork (community-confirmed, Donovan+Huitzil only);
+# flavor_default 0x01 = VS2 per decision D1 (maintainer, PROVISIONAL
+# 2026-08-07 — flip this one value if the final call differs).
+[init_shim]
+dispatch = "dispatch_00"
+seed_entry = 0x016C64
+latch_disp = 0x7966
+objram_clear = false
+flavor_disp = 0x3C2
+flavor_default = 0x01
+flavor_held = 0x00
+flavor_hold_flag = 0xFF8060
+
 # ── ADDRESS-SPACE MODEL — same shape as donovan.toml's; duplicated for the
 # single-tenant ladder. The M3b Phase 2 multi-tenant merge hoists this into
 # a SHARED manifest (one image, one allocator) — until then the two

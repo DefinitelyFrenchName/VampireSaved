@@ -218,16 +218,23 @@ commit->load window; verdicts: id-hold / load / guard):
     MACHINE REBOOTS. "Zeroed struct + clean guard" was fresh-boot
     state (GOTCHAS 14z-65: a watchdog reboot masquerades as a clean
     non-load; the probe now snapshots and names the ambiguity).
-- NEXT SESSION: hang-hunt in HIS stage-4 code — GUARD_BREAK on the
-  placed dispatch_00 handler (entry proof), then GUARD_PC_LOG over the
-  ONSET window (2300-2900, before the reboot), then GUARD_PROBE walks
-  down the init chain. Prime suspects: the aux-init path through the
-  shared zone (the 0x8ACD8 family — Donovan's init needed the
-  pool-seeding shim + queue-class remap; H's manifest has NO
-  [init_shim] yet), and the sound-farm five (an unresolved farm call
-  in init would hang exactly like this). Donovan's [init_shim]
-  mechanism is likely REQUIRED for H too — port the row with his
-  measured parameters, not blind-copied.
+- HANG-HUNT OPENED (same session, GUARD_PROBE bisection):
+  - His handler IS dispatched: probe at the placed dispatch_00 target
+    fires ONCE at f2886 (the canonical char-load frame; A6 = P1 struct).
+  - [init_shim] added to huitzil.toml (pool-seed + flavor latch,
+    flavor_default 0x01 per provisional D1; engine facts reused, not
+    Donovan-copied) — mechanism-correct and kept, but NOT sufficient:
+    still reboots (fingerprint aec4d319).
+  - The handler-head aux call (0x8ACD8 -> placed shared zone) is
+    entered AND RETURNS (post-call probe at handler+6 fires, registers
+    moved on). THE HANG IS PAST +6 — bisection cursor for next
+    session: walk the init chain jsr-by-jsr with GUARD_PROBE (the
+    chain from the handler dump: move.b #4,$3C(a6); jsr 0x1572E-equiv
+    [R1-mapped]; beq; move.l #$1001000,(a4); ... — each mapped call
+    and each (a4)-family write is a candidate).
+  - Remaining suspects, ordered: an R1-mapped engine call in the chain
+    whose vsavj twin has different completion semantics; the sound-farm
+    five if init enqueues a sound; a companion/pool spawn deeper in.
 
 Updated: 2026-08-06 (session 14z-64 — M3a COMPLETE AND FROZEN. The
 maintainer ratified the re-freeze bundle ("freeze"): the WIDE reference
