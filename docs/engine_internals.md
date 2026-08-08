@@ -19,18 +19,16 @@ part of that work — the marginal cost is small while the analysis is
 fresh in the session, and it is the difference between "documented"
 and "findable". Delete the line when the section exists.
 
-Audited absent (grep count in this file vs STATE.md):
+**STATUS 14z-68n: the audited backlog is now CLEARED** — all eight
+subsystems below were written the same session the gap was found
+(object type dispatch + pool walker, allocator wrappers, pool seeding
+/ init_shim, update-queue classes, throw/physics arcs, shadow
+servants, Dark Force, companion/pod family). The table is kept as the
+FORM to use next time: when you find a subsystem living only in
+STATE, add a row, then delete it by writing the section.
 
 | Subsystem | Where the analysis currently lives | Why it will bite |
 |---|---|---|
-| Object TYPE dispatch + the pool walker (`0x5E540`, type table `0x5E556`, obj_hook union tables, walker reads type from +0x02, index type*4) | STATE 14z-65 / 14z-68d | every tenant's companions and effects route through it; 0 mentions here |
-| Pool seeding + `init_shim` (vsavj never seeds secondary pools in a normal match; vs2 always does — the watchdog-reboot class) | STATE 14z-65 | the FIRST thing a new tenant's ecosystem trips; 0 mentions |
-| Update-queue classes (vs2 class 7 vs vsavj's 0-6; the companion remap) | STATE 14z-65 | silent round-2 crashes; 0 mentions |
-| Dark Force system + per-char DF style selection | STATE 14z-67 (open item) | an open ping item with no written mechanism |
-| Throw / physics-arc tables (installer vj `0x28386` / vs2 `0x275E4`, 16-byte rows via `map1[2*subidx+d0]`, fighter +0x40/44/48/4C) | STATE 14z-67 | solved once for H; Pyron will need it verbatim |
-| Shadow / reflection servants (class-0x0C, tables `0x2083BC`/`0x2087CA`, installer `0x823E2`, the seq clamp) | STATE 14z-66 + manifest comments | an open item whose documented premise was WRONG (14z-68f) |
-| Companion/pod object family (secondary types 0x73-0x77, the x088512 zone, satellite handlers 64-75) | STATE 14z-65 / 14z-67 | shared by every newcomer |
-| Allocator wrappers + slot recycling (`0x15702`/`0x1572E`, the 0x80-clear) | STATE 14z-65 | stale-byte bugs across rounds |
 
 Adjacent docs that ARE current and should be linked rather than
 duplicated: `docs/cps2_wide.md` (the WIDE profile), `docs/atlas/`
@@ -840,3 +838,239 @@ repoint the wrong entry.
    (14z-68: palette RAM matched vs2 and all 134 tiles matched vs2,
    and the screen was still Donovan-coloured, because "matches vs2"
    was matching the WRONG vs2 row).
+
+## Object TYPE dispatch and the pool walker (decoded 14z-65, fully
+## measured 14z-68d on the Huitzil effect arc)
+
+Every secondary object — companions, pods, effect pieces, the victory
+portrait drawer — is ticked from a per-frame walker that dispatches on
+a TYPE byte. This is the single most load-bearing shared mechanism for
+a ported character, and the one most likely to route a tenant's object
+into host code.
+
+**The walker** (vsavj `0x5E52A`): iterates 0x80-stride slots, and for
+each live slot
+```
+move.b $2(a6),d0      ; TYPE is at slot +0x02
+add.w  d0,d0
+add.w  d0,d0           ; index = type*4
+movea.l $5E556(pc,d0.w),a0
+jsr (a0)
+```
+so the per-type table is at **vsavj `0x5E556`** (vs2 **`0x6A51C`**),
+LONG entries, and a type >= the vanilla entry count is unreachable for
+vanilla objects **by construction** — which is what makes an authored
+tenant type safe.
+There is a second, smaller dispatch of the same shape at vsavj
+`0x54470` / table `0x54484` (vs2 `0x5C620`).
+
+**Table sizes** (the `[[obj_hook]]` rows): vanilla 114 entries at
+`0x5E556`, vs2 124 at `0x6A51C` — rows 114-120 are vs2's newcomer
+types (the `0x88512` pod-zone family). Vanilla 59 / vs2 76 at the
+other site. The generator builds a UNION table: vanilla rows verbatim,
+then the source's extras resolved (placed region first, then recon,
+else a tripwire so an unported type is LOUD).
+
+**Reading the tables:** they are consumed pc-relatively from program
+space, so decode them from the **OPCODE view**. The data view yields
+garbage (this is the same class as the win-screen remap table).
+
+### The shared-type trap, and `[[obj_hook_extra]]`
+Row 8 of the big table is the COMPANION machine — vsavj `0x606AC`,
+vs2 `0x6CAC0` — and **vs2 rewrote its own row 8**. So a tenant's
+companion/effect object, which carries type 0x08 on both games, is
+ticked by vsavj's machine and resolves vsavj's records. Symptom
+(14z-68): the object exists with correct fields and the right record
+offset, but plays host content.
+
+Row 8 is SHARED, so it must stay vanilla. The mechanism for reaching a
+rewritten machine is `[[obj_hook_extra]]` (14z-68): an AUTHORED union
+row `{site, index, src}` appended after the ported extras, resolved
+like them, with a no-gap assertion (the engine indexes by type*4, so a
+hole dispatches into whatever the allocator left). Give the tenant's
+instances a NEW type >= the vanilla count and point its row at the
+ported machine.
+
+**Two hazards, both paid:**
+1. **Scope the stamp per EFFECT, not per character.** Stamping the
+   type at a victim-spawn site routed EVERY hit of that class from the
+   tenant into the ported machine, and Dark Force crashed on it
+   (vec3, an index underflowing the placed region). One character
+   reaches a shared site through several different moves.
+2. **Base, stream, count and updater are ONE unit.** Swapping only a
+   record base while the caller still supplies vanilla-relative
+   offsets produces odd/negative indices and an address error. Port
+   the region, or leave it alone.
+
+## Allocator wrappers and slot recycling (14z-65)
+
+vs2's allocators `0x15702` / `0x1572E` are wrapped (`alloc_wrap` in the
+tenant manifest) with an 0x80-byte clear: vs2's allocator semantics
+differ from vsavj's, and without the wrapper a RECYCLED slot keeps
+stale bytes under the new object's init — which surfaces as a
+round-2-only bug, after the pool has been through one cycle.
+
+## Pool seeding and the `[[init_shim]]` (14z-65 — the watchdog class)
+
+**Vanilla vsavj never seeds the secondary-object pools during a normal
+match; vs2 always does.** Every newcomer's ecosystem allocates from
+those pools, so an unseeded pool means the allocator spins on an empty
+free list — and it **hangs without an exception**: no crash, no
+tripwire, just a watchdog reboot (measured symptom: handler entered,
+no fault, reset). If a new tenant reboots the machine on its first
+special move, look here first.
+
+The shim intercepts per-char init and calls vsavj's OWN seeder
+aggregator (`seed_entry = 0x016C64`) — an ENGINE fact, not a
+Donovan-specific address. Fields: `dispatch` (which per-char dispatch
+row to intercept), `latch_disp` (pool-0 free-list head), and
+`latch_mode`:
+- `head` — plain latch;
+- `phase` — phase-gated, REQUIRED when the tenant's ecosystem drains
+  pool 0, because the bare head latch re-seeds LIVE pools at the
+  round-2 re-init and wipes them (measured on Huitzil).
+
+The shim is also where the VS2/VH2 flavor latch lives (`flavor_disp`,
+`flavor_default`, `flavor_held`, `flavor_hold_flag` — Start-held at
+confirm selects the alternate flavor). **Polarity is per character and
+must be MEASURED, not copied:** Huitzil's native vs2 default is
+`+0x3C2 = 0x00` where Donovan's convention was 0x01; copying Donovan's
+selected the wrong branch and was only caught when the float landed.
+
+## Update-queue classes (14z-65)
+
+vs2 registers companion-class objects in update-queue **class 7**,
+which does not exist on vsavj (classes 0-6). Unremapped, the
+registration leaves a stale vs2-encoded queue node; after the round-2
+pool re-seed that node dispatches a FREED slot — a crash with the PC
+in palette space, two rounds after the real mistake. Fix is a
+`[[port_patch]]` remapping 7 -> vsavj's last class 6 (for the shared
+`x088512` zone: `0x08B0F8`, `000e` -> `000c`).
+
+## Throw / physics-arc tables (14z-67, measured on the command grab)
+
+The victim's launch physics come from a per-throw ROW installed by
+vsavj `0x28386` (vs2 `0x275E4` — a unique tail twin pair):
+```
+row = table2[ map1[ 2*subidx + d0 ] * 16 ]
+```
+and the row writes the victim's **xv +0x40, yv +0x44, xacc +0x48,
+gravity +0x4C** (all 16.16 fixed point on the fighter struct).
+
+**vs2's `map1` carries FIVE entries past vsavj's end** (indexes
+0x4A-0x53 -> rows 0x32-0x36; the 63214 command-grab arcs are rows
+0x33/0x34, yv 16.0 and 20.0). On vsavj a newcomer's index reads PAST
+map1 into table2's bytes and lands on a regular-arc row — symptom:
+"both grabs look identical / the victim does not leave the screen".
+
+Both vsavj tables are jammed in place (data follows immediately), so
+the fix is a full tail-replacement `[[site_thunk]]` (patch=jmp,
+jmp_ok, body ends `rts` to the installer's caller) reading PLACED
+copies of vs2's FULL tables. **Superset proof, static:** map1's prefix
+0x00-0x49 and table2 rows 0x00-0x31 are byte-identical across the
+games, so vanilla content reads identical values through the clone and
+the thunk can be unconditional.
+
+## Shadow / reflection servants (14z-66; premise CORRECTED 14z-68f)
+
+Per-player shadow servants (class-0x0C trio, vanilla spawner
+`0x489DE`+) mirror their owner's animation by reading each anim NODE's
+`+0xC` word (low 13 bits = a seq id) into SHARED tables:
+- installer vsavj `0x823E2` / `0x823F2` -> table `0x2083BC` or
+  `0x2087CA` (chosen on `+0x38`), stored to `+0x40(a6)`;
+- the walk re-reads on seq CHANGE only (`cmp.w $50(a6),d0; beq`) and
+  jumps the walker at `0x8245C`.
+
+A ported character's nodes carry SOURCE seq ids verbatim, and an
+out-of-range id over-indexes into sequence DATA -> garbage offset ->
+vec3 at the engine installer. `shadow_seq_guard` clamps
+`seq*2 >= 0x40E` to seq 0. **The clamp is deliberately UNGATED by char
+id**, because capture supers put a VANILLA victim's servant through
+tenant-supplied seq ids.
+
+**CORRECTION (14z-68f), do not repeat the old note:** vs2's tables are
+**NOT larger** — vs2 installer `0x90B0C`, tables `0x1E42D2`/`0x1E46E0`,
+exactly `0x40E` apart, the same row space as vsavj's; the walk sites
+are structurally identical; the only content difference is a uniform
++2 (one extra index entry). So "port the bigger table" cannot fix a
+shadow item. Also measured: on a build where Huitzil's summon pieces
+are live, the installer and walk take **0 probe hits** — whatever
+draws a companion's shadow is NOT this servant path. The remaining
+child-companion shadow item is attributed instead to the bank-0 piece
+family (uniform -0x16A8 tile-code delta, bank word 0 vs 3).
+
+## Dark Force (14z-66/67 — MECHANICS verified, STYLE still open)
+
+Split the item in two; they have different answers.
+
+**DF MECHANICS are already native-correct for a ported tenant.**
+Measured on Huitzil (replay 82, native A/B of record): activation
+enters seq **0x0A** at the same frames on both games, expiry and
+re-activation both fire, and the DF summon pieces (secondary types
+**0x75 / 0x77**) are present in pool B on both at the sample frame.
+Nothing in the activation path needs porting.
+
+**DF STYLE is a HOST per-character effect and is what looks wrong.**
+The engine applies a per-char DF presentation (palette treatment plus
+afterimages) selected by char id, so a tenant on a variant row inherits
+the HOST character's style. Maintainer capture of native vs2: Huitzil
+gets **no palette change and no afterimages at all**; ours shows
+inverted colours + afterimages, i.e. the host's style.
+**Fix shape (not yet implemented):** locate the per-char DF style
+selection and give the tenant's row the NULL style. This is a
+selection-table item of the same family as the win-screen tables
+above — expect an id-indexed table with variant rows aliasing base
+rows, and expect the same view question (decode both, verify against a
+known-good row).
+Open observations queued from the same replay, unattributed: ~15px X
+drift over the DF walk (speed modifier vs recoil) and a pod anim phase
+difference at the f3250 sample.
+
+## The companion / pod object family (14z-65, generalised 14z-67 on Pyron)
+
+The newcomers' satellites (Donovan's Anita, Huitzil's pods, Pyron's
+satellite) are all secondary objects of the SHARED zone `x088512`, and
+they are the reason a new tenant inherits a long list of manifest rows
+that have nothing to do with that character.
+
+- **Types**: pods/companions are secondary types **0x73-0x77**
+  (struct: `+0x02` type, `+0x03` owner id). The newcomer-satellite
+  HANDLER family is types **64-75** — 12 regions that looked like "H's
+  farm zones" until Pyron's first satellite spawn tripped type 64's
+  tripwire and proved they are SHARED newcomer handlers.
+- **Records**: companion-effect records live in `x2b7ef4`, placed as a
+  region; consumers resolve `base + word_offset` and some index
+  NEGATIVELY relative to the base (see the WIDE note below).
+- **Art**: for delta-0 group-C tenants the generator keeps companion
+  record bank-1 words NATIVE (`c5` mode, `effect_c5.json`) and flips
+  the ported spawners' bank setters `#$2000 -> #$3000` so the art
+  serves from group C bank 5 at native codes.
+
+### THE INHERITANCE RULE (the expensive lesson, paid twice)
+**A tenant that ports a SHARED region inherits every region-scoped
+mechanism row that region carries — copy them ALL, up front.** Pyron's
+first chaos soak crashed three separate ways and every fix was a row
+Huitzil already carried for the same zones: the `x088512` pod-table
+`data_in_code` reroute, the queue class-7 remap, both `obj_hook` union
+sites, the `x026142`/`x05c800` escape pads plus twin rows, and the
+satellite handler roots. The rows are properties of the SHARED SOURCE
+BYTES, not of the tenant. Diff the other tenants' manifests for every
+row scoped to a region you are pulling in, BEFORE the first probe run.
+
+### Placement hazards specific to this family
+- **`data_in_code`**: the pod zone embeds data tables in code. Placed
+  in the crypt hole they are stored re-encrypted, so runtime DATA
+  reads see garbage while opcode fetches decode fine. This class has
+  bitten FIVE times. **Known tooling gap (14z-68):** both the census
+  and the relocator only recognise the
+  `lea (d16,pc),An + read (An,Xn.w)` shape and MISS the
+  post-increment reader `move.w (An)+`, so a region can report clean
+  and still carry a live embedded table. RAW placement does not fix
+  it either — raw storage holds one image (the opcode view, so it
+  executes), so data reads still see the wrong bytes.
+- **Negative indexing vs the WIDE extension**: these consumers index
+  their record base with SIGNED offsets that go BELOW it (measured
+  -13). Allocated at the very start of `wide_ext` (0x400010) a
+  negative index reaches the RESERVED CpsFrg window `$400000-$40000F`,
+  which the two emulators read DIFFERENTLY. Leave headroom below any
+  region whose consumers index negatively.

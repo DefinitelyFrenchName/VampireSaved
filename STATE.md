@@ -589,8 +589,8 @@ frame misled me and a reference/A-B settled it. The maintainer's
 capture cost them one screenshot and closed an item I had been
 theorising about for hours. ASK FOR THE REFERENCE EARLIER.
 
-### 14z-68n: STANDING TASK — expand engine_internals.md (maintainer
-### request; the synthesis is thin and STATE is not a lookup surface)
+### 14z-68n: THE SYNTHESIS GAP CLOSED — eight subsystems written the
+### same session the gap was found (maintainer request, done not queued)
 
 Maintainer: "engine_internals.md is rather barebones compared to all
 the analysis work you've done ... it could be expanded for little cost
@@ -601,12 +601,31 @@ ZERO mentions there — object type dispatch / the pool walker, pool
 seeding + init_shim, update-queue classes, Dark Force, and the
 throw/physics-arc tables among them.
 
-The backlog now lives AT THE TOP OF engine_internals.md itself (a
-table of missing subsystems, where the analysis currently lives, and
-why each will bite), so the gap is visible to whoever opens the file.
+DONE THE SAME SESSION (maintainer: "then do it now. Even the other
+bugfixes for Phobos may profit from this"). engine_internals.md 810 ->
+1076 lines, 13 -> 24 sections; the audited backlog is CLEARED. Written:
+object TYPE dispatch + the pool walker (incl. the shared-type trap,
+obj_hook_extra, and the two hazards that cost 14z-68d), allocator
+wrappers, pool seeding + init_shim (the watchdog class + the
+MEASURE-don't-copy flavor polarity rule), update-queue classes,
+throw/physics-arc tables (with the static superset proof), shadow
+servants (with the 14z-68f premise CORRECTION written in, so the wrong
+note cannot be followed again), Dark Force (mechanics verified vs
+style open, split explicitly), and the companion/pod family (with THE
+INHERITANCE RULE and the two placement hazards).
+The backlog TABLE is kept, empty, as the FORM for next time.
 POLICY recorded there: write a subsystem's section as PART OF the work
 that touches it — cheap while the session is fresh, and it is the
 difference between "documented" and "findable".
+
+IMMEDIATE PAYOFF, not deferred: Phobos's own open items are covered —
+the shadow section carries the corrected premise (so the dead
+"port the bigger table" theory cannot be re-attempted), the DF section
+states exactly which half is open and its fix shape, and the type
+dispatch section carries the per-EFFECT scoping rule the parked
+tenant-type work needs. Pyron's port now has init_shim, type dispatch,
+throw arcs, queue classes and the inheritance rule written down before
+he needs them.
 
 This is not a make-work item: the 14z-68 win-screen re-derivation cost
 a shipped-wrong palette and a maintainer round-trip precisely because
