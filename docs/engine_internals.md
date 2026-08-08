@@ -997,6 +997,32 @@ vec3 at the engine installer. `shadow_seq_guard` clamps
 id**, because capture supers put a VANILLA victim's servant through
 tenant-supplied seq ids.
 
+### The child-companion shadow item (14z-68g/q — measured, still open)
+Symptom (maintainer): Phobos's human child companion has a RECTANGULAR
+shadow, **all the time**. Narrowed as follows, all measured:
+- The shadow's CORE tiles are CORRECT: codes `0F8B`/`0F8C`, palette
+  0x16, at bank word **0x1000** (H's band in group C bank 4 — i.e. the
+  `table_fix` row 0x10 works for them).
+- The BAND around them is wrong, and uniformly: every piece carries
+  **bank word 0** and **code = native - 0x16A8** (12 pieces, no
+  exceptions: 0F96->F8EE, 0FB7->F90F, 0FA4->F8FC, 0FA2->F8FA,
+  0FA3->F8FB). With bank 0 they draw from VANILLA gfx space, which is
+  why they read as flat rectangles.
+- **NOT Dark-Force-specific**: the same band appears in a plain
+  projectile replay, confirming "all the time" and ruling out a DF
+  interaction.
+- So TWO different code paths stage sprites of the same palette
+  family: one honours the tenant bank table, one does not. The open
+  question is which path stages the bank-0 pieces.
+- Ruled out: a per-char tile-base table holding 0x16A8 (data scan
+  found no clean candidate). Note the OBJ list is DMA'd, so write taps
+  and debugger watchpoints on OBJ RAM see nothing — the technique that
+  worked for finding an emitter was a **work-RAM diff between a frame
+  before and during** the effect (14z-68b).
+- Related, likely the same root: the 14z-67 note "ours spawns
+  F8FC/F90A/F15x-family pieces WITH BANK WORD 0 that native NEVER
+  stages — created through a path that leaves +0x18 unset".
+
 **CORRECTION (14z-68f), do not repeat the old note:** vs2's tables are
 **NOT larger** — vs2 installer `0x90B0C`, tables `0x1E42D2`/`0x1E46E0`,
 exactly `0x40E` apart, the same row space as vsavj's; the walk sites
