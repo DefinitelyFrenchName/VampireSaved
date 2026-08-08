@@ -257,6 +257,27 @@ PY
         --cptr-lo 0x300000 --cptr-hi 0x361000 \
         --sweep-lo "$SWEEP_LO" --sweep-hi "$SWEEP_HI" \
         --json "$OUTBASE/donovan_tiles.json" > /dev/null
+    # EXTRA TILES (14z-69o): codes the OBJ-record walk above cannot reach
+    # (it follows pointers; offset-computed records are invisible to it —
+    # docs/project/gotchas.md). Without them the copy inventory has a hole
+    # and the sprites that use them resolve to an EMPTY group-C tile, which
+    # renders as a solid rectangle. Declared per tenant id, merged here so
+    # the copier sees one inventory.
+    EXTRA_TILES="build/manifest/extra_tiles/${TENANT_CHAR}.json"
+    if [ -f "$EXTRA_TILES" ]; then
+        python3 - "$OUTBASE/donovan_tiles.json" "$EXTRA_TILES" <<'PYEOF'
+import json, sys
+inv_p, extra_p = sys.argv[1], sys.argv[2]
+inv = json.load(open(inv_p))
+extra = json.load(open(extra_p))["tiles"]
+before = len(inv)
+merged = sorted(set(inv) | set(extra))
+json.dump(merged, open(inv_p, "w"))
+added = sorted(set(extra) - set(inv))
+print("  extra tiles: +%d (%s), inventory %d -> %d"
+      % (len(added), " ".join("0x%04X" % t for t in added), before, len(merged)))
+PYEOF
+    fi
     OVERLAY_TILES=""
     [ -f build/manifest/overlay/overlay_tiles.json ] && [ "$TENANT_CHAR" = "0x13" ] && \
         OVERLAY_TILES="--overlay-tiles build/manifest/overlay/overlay_tiles.json"

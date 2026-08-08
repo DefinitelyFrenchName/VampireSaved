@@ -1334,6 +1334,48 @@ Open observations queued from the same replay, unattributed: ~15px X
 drift over the DF walk (speed modifier vs recoil) and a pod anim phase
 difference at the f3250 sample.
 
+## The child companion's shadow — SOLVED (14z-69o)
+
+The reported symptom was "the human child sidekick's shadow is a
+rectangle, all the time". **The 14z-68g diagnosis had it backwards** and
+that is the lesson worth keeping.
+
+14z-68g measured, correctly, that our shadow BAND pieces carry
+`code = native - 0x16A8` with bank word 0 instead of 3, and concluded
+the band was the defect and the core ("both games draw 0F8B/0F8C/0F8B")
+was fine. Comparing the ART at those addresses inverts it:
+
+| piece | native | ours | art |
+|---|---|---|---|
+| core | `0x30F8B` bank 3 | `0x40F8B` group C bank 4 | **all zeros — EMPTY** |
+| band | `0x30F96` bank 3 | `0x0F8EE` bank 0 | byte-identical to native |
+
+The band is CORRECT: those are shared system tiles that exist in the
+stock set at `native - 0x216A8` in full address space, and the vanilla
+engine path draws them from there. The uniform delta was the sign of a
+consistent mapping, not of corruption — **a uniform delta means
+arithmetic, not garbage; check the ART before calling it wrong.**
+
+The core is the defect: the tenant gfx remap rewrites codes in
+`[0xAF6, 0x4EFC]` from bank 3 to bank 4 (`remap_spec.json`), and
+`0x0F8B`/`0x0F8C` fall inside that window — so the bank was rewritten,
+but the tiles were never COPIED into group C, because
+`tools/obj_records.py`'s pointer walk never reaches the records that
+reference them (the documented "record walks that follow POINTERS miss
+offset-computed records" trap). Bank rewritten + tile absent = a solid
+empty rectangle.
+
+**Fix (14z-69o):** a per-tenant `build/manifest/extra_tiles/<char>.json`
+merged into the copy inventory by `build_donovan.sh`. Two tiles for
+Huitzil. Program bytes unchanged — the build fingerprint is identical to
+hui12's, which is itself the evidence that this is gfx-only.
+
+**How to find these in general, cheaply:** decode every group-C sprite a
+build draws over a replay and flag any whose tile is all-zero. Over
+replay 82 that returned exactly these two and nothing else, so the
+inventory hole was provably this size. Re-run it for any new tenant —
+it is a complete check, not a sample.
+
 ## The beam / effect family — state after 14z-69j (three of four pieces
 ## are native-equivalent; EMISSION is the open one)
 

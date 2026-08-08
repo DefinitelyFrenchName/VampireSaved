@@ -1,0 +1,7 @@
+{
+  "note": "Tiles referenced by Huitzil's records that the OBJ-record walk in obj_records.py does not reach, so they never entered the group-C copy inventory and their sprites resolved to EMPTY tiles (docs/project/gotchas.md: record walks that follow POINTERS miss offset-computed records).",
+  "found_by": "14z-69o: scan every group-C sprite the build draws over replay 82 and flag those whose tile decodes to all-zero. Exactly two, both the child companion's shadow CORE; nothing else in the build draws an empty group-C tile.",
+  "symptom": "the child sidekick's shadow renders as a solid rectangle",
+  "tiles": [3979, 3980],
+  "tiles_hex": ["0x0F8B", "0x0F8C"]
+}
