@@ -1451,9 +1451,68 @@ remapped to that bank — copying alone leaves the codes pointing at
 vsav's art, and remapping alone would point at empty group C slots (the
 shadow failure mode). Both halves, or neither.
 
-Still open and NOT claimed here: which emitter computes those codes, and
-whether the pal 06 attribution covers the whole effect (pal 10 and pal 11
-bank-0 sprites sit in the same region at f3436 and were not chased).
+### 14z-70b: measured again on a COMPARABLE rig — the effect runs
+### correctly and only the tile CODES are wrong, by exactly +0xA220
+
+`tests/replays/hui/83c_hui_grenade_2p.rpl` is the 2P twin of replay 83,
+authored because 83 is unusable for this (see the warning above). BOTH
+sides are poked — P1 = H (0x10), P2 = Victor (0x03 on vsav and vsav2) —
+so the two legs run the same match on the same stage. They do: snapshots
+show Phobos vs Victor on the subway stage on both, native with a large
+orange flame pillar and ours with a small yellow burst.
+
+**The effect object is running correctly.** Position-matched across the
+window, the two legs agree frame for frame:
+
+```
+f3432  native  n=13  x 273-401  y 57-201
+f3432  ours    n=13  x 273-401  y 57-201
+```
+Same sprite counts, same screen positions, same palette (06), same bank
+(0). For comparison, in the same dump `pal 0a` (98 vs 91 codes) and
+`pal 0c` (42 vs 42) carry IDENTICAL code ranges correctly remapped bank
+3 -> bank 4, so the band machinery is fine; this effect is the exception.
+
+**Only the codes differ, and by a constant.** Ours = native **+ 0xA220**:
+
+```
+native 49EE -> ours EC0E     4A0E -> EC2E
+native 49EF -> ours EC0F     4A2A -> EC4A
+41 of 88 native codes appear in ours at +0xA220 (the rest are
+animation-phase — the legs sample different steps of the animation)
+```
+Beware: pairing these two legs by SPRITE INDEX or by position alone
+gives noise, because the animation is about one step out of phase. The
+constant only appears once you test `native_code + D in ours_codes` as
+sets. An index-paired delta histogram shows a smear of 0xA1C0-0xA262 and
+looks like "no constant" — it was read that way once this session.
+
+**And the art at the shifted index is mostly wrong**, which is the
+symptom: of the 41 matched codes, **9 have identical art and 32 differ**
+(none blank). So ours draws vsav's own effect page at native+0xA220 —
+right shape of thing, wrong picture, and never an empty tile, which is
+why `audit_empty_tiles.sh` is correctly silent.
+
+**Where +0xA220 does NOT come from — checked, so do not re-check.**
+`build/manifest/effect_tail.json` carries exactly one reloc delta,
+`+0x47` (x70), and no `place` target in 0xEC00-0xEF00. It is not the
+effect_tail map.
+
+**Prior art that the fix must be reconciled with (14z-67, huitzil.toml
+~line 753).** For the `x2b7ef4` companion-effect records the designed
+mechanism on a delta-0 group-C tenant is `c5_mode`: keep every tile word
+NATIVE (skip the bmap rewrite), emit the referenced codes as
+`effect_c5.json` so the art is placed at native codes in group C bank 5,
+and flip the ported piece spawners' bank setters `#$2000 -> #$3000`.
+This explosion is NOT going through that path — it draws bank 0 with
+non-native codes, i.e. neither half applies to it.
+
+**The open question, sharpened:** which region's records/spawner emits
+these pieces? It is not `x2b7ef4`'s c5 path and not effect_tail. Find
+that, then either route it through `c5_mode` or give it the same
+treatment (tiles into group C + bank setter). Also unchased: `pal 10`
+and `pal 11` bank-0 sprites sit in the same screen region and may belong
+to the same effect.
 
 ## The beam / effect family — state after 14z-69j (three of four pieces
 ## are native-equivalent; EMISSION is the open one)
