@@ -40,6 +40,44 @@ Full trace in docs/game/engine_internals.md (Dark Force). Summary:
   extra draws. This is not "the host's style" — it is our repoint making
   vs2's DF-form machine reachable under vsav's DF.
 
+### 14z-69d: DONOVAN DOES NOT HAVE THE BUG — and that REFRAMES the item
+
+Maintainer asked whether Donovan shows the same thing. Measured, same
+rig (replay 85, id 0x13, ours build/m5_wide vs native vsav2):
+
+| | palette row 0x0A pre-DF -> in-DF | his own draws | seq |
+|---|---|---|---|
+| Donovan (ours) | UNCHANGED | 12-16 vs native 15-18 (x0.7-1.1) | 0x16 -> back to 0x04/0x06 |
+| Huitzil (ours) | gold -> PURPLE | 28-32 vs native 6-8 (x4) | locked 0x18 for the mode |
+
+**The wiring is identical** — Donovan's build repoints dispatch_16 row
+0x13 to his placed vs2 handler exactly as H's repoints row 0x10. What
+differs is the CONTENT of each character's vs2 DF-form handler:
+- Donovan's (placed 0x0C109C): sets +0x147, saves +0x155 -> +0x350,
+  `moveq #$51,d0; jmp 0xCE35A` — benign, returns to normal states;
+- Huitzil's (placed 0x0C168A): calls **0x2A7E0**, the DF effect-channel
+  script machine, then drives seq 0x18.
+So the repoint is NOT wrong in general, and "leave it" is NOT
+"consistent with Donovan" — Donovan simply does not do this.
+
+**AND THE STATE IS COHERENT, NOT BROKEN.** Position data across the DF
+window: native stays GROUNDED (y=40) the whole mode; ours HOVERS at
+y=124-133 and still moves horizontally (x 834 -> 937 -> 1000) while
+locked in seq 0x18, for exactly the mode's duration, ending when DF
+expires. That reads as a **flight/hover mode with an afterimage
+visual** — i.e. plausibly Huitzil's ORIGINAL Vampire-Savior-style Dark
+Force, whose per-char code vs2 still carries in its tables but never
+invokes (vs2 replaced the DF system wholesale, so the old form handler
+is vestigial there). Our engine IS vsav, so it invokes it.
+
+HYPOTHESIS, NOT YET PROVEN: the afterimages may be the intended visual
+of that flight form, while the PURPLE may be a separate palette-source
+defect of the win-screen class (a row index computed from char id
+landing on a host row). Testable: find what writes palette row 0x0A at
+DF entry and whether its source is id-indexed. If it is, the fix could
+be "his DF is his flight mode, in his own colours" rather than
+suppressing the mode at all.
+
 ### DECISION PENDING (maintainer) — how should Phobos's Dark Force behave?
 
 Not mine to make (CLAUDE.md §5: anything a player can feel).
@@ -58,9 +96,15 @@ Not mine to make (CLAUDE.md §5: anything a player can feel).
 3. **Leave it.** The afterimages are cosmetic-ish but the seq-0x18 lock
    is not: he stays in the transform state for the whole mode.
 
-RECOMMENDATION: 1, measured with the gate at DF_STYLE_EXPECT=matches
-before anything is frozen. Ask the maintainer what Phobos's DF is
-SUPPOSED to do in play before choosing between 1 and 2.
+RECOMMENDATION SUPERSEDED BY 14z-69d. Do NOT reach for option 1 until
+the flight-mode reading is settled: what our build gives him is a
+coherent hovering mode, not a broken state, and option 1 would delete
+it. New preferred order: (a) find the palette-row-0x0A writer at DF
+entry and test whether the PURPLE alone is an id-indexed source defect
+(win-screen class); if it is, fixing that may leave a correct
+Vampire-Savior Dark Force for him. (b) Only if the mode itself is
+unwanted does option 1 apply. Maintainer has ruled OUT option 2
+(porting vs2's type-A DF).
 
 ## Session 14z-69b — DOCS SPLIT THREE WAYS (maintainer proposal, adopted)
 
