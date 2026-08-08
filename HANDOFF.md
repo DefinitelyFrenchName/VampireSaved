@@ -222,6 +222,12 @@ the air dash (seq 0x14) both firing. **Poke BOTH sides** when sprite
 lists are compared: the cursor path lands on different characters on
 the two wheels (P2 = 0x03 is Victor on vsav *and* vsav2).
 
+**And when the state under test is a MODE, prove it was entered.** Dark
+Force costs a banked stock; with an empty meter the P+K pair is
+downgraded to a single button and the match looks normal. Poke
+`$FF8509` and assert `$FF802E`=1 — never infer a mode flag from the
+fighter block (`+0x1F4`, `+0x1B5/+0x1B9` are set by JUMPING).
+
 This retires "the native leg is unreachable", which was inherited from
 a single 14z-68j attempt with **replay 61** — a replay whose input
 timing is authored for OUR wheel and does not transfer. Anything still
@@ -547,16 +553,18 @@ tests/test_hui_fx_flow.sh      [bd]   # the effect-flow attribution gate (14z-68
                                       # (2P dummy, 3 spaced 236LP, FBNeo taps).
                                       # Ground-truthed on hui9 + a bad-thunk negative
                                       # control. Self-builds stage 6 unless given
-tests/test_hui_df_style.sh     [bd]   # the DARK FORCE STYLE A/B (14z-69): replay 85
-                                      # on NATIVE vsav2 vs the build — rig
-                                      # non-vacuity, palette row 0x0A frame-exact
-                                      # (118 frames), and the fighter's own pal-0x0A
-                                      # draws == native's (an afterimage is a
-                                      # duplicated code). Section 2 runs the checker
-                                      # (tools/check_df_style.py) against three
-                                      # synthetic corruptions — recolour, afterimage,
-                                      # DF-never-latched — each of which MUST fail.
-                                      # Defaults to build/hui11. ~40s, 4 MAME runs
+tests/test_hui_df_style.sh     [bd]   # the DARK FORCE gate (14z-69): replay 85
+                                      # on NATIVE vsav2 vs the build. DF COSTS A
+                                      # BANKED STOCK — the replay pokes $FF8509 and
+                                      # the checker (tools/check_df_style.py) REFUSES
+                                      # to judge unless both legs show $FF802E=1 and
+                                      # a stock spent (seq 0x0A with an empty meter is
+                                      # the DOWNGRADE, not DF — it fooled three
+                                      # sessions). Freezes the OPEN defect's shape
+                                      # (--expect differs: purple row 0x0A vs native
+                                      # gold, his art drawn ~4x over); set
+                                      # DF_STYLE_EXPECT=matches when fixed. Three
+                                      # verdict controls. Defaults to build/hui11
 tests/test_wide_render_content.sh     # the WIDE track must SERVE the ported content's
                                       # tiles (RE-SHAPED 14z-67 for m3a semantics —
                                       # cross-track pixel identity ended BY DESIGN):

@@ -1,74 +1,83 @@
 # STATE — living progress log
 
 Updated: 2026-08-08 (session 14z-69 IN PROGRESS — the DF-style opener.
-THE NATIVE LEG WAS NEVER BLOCKED: the early-window poke reaches Huitzil
-on vsav2 in six seconds, and with the native control in hand the
-symptom DOES NOT REPRODUCE on hui11 — palette frame-exact over 118
-frames, sprite set equal to native, on both emulators, forced-pick and
-hand-pick. Two 14z-68u findings RETRACTED as artefacts of measuring our
-build alone. Delivered: replay 85 (runs unchanged on both games),
-tests/test_hui_df_style.sh + tools/check_df_style.py with three
-verdict-logic controls. OPEN: the maintainer's repro conditions — see
-"what to ask" below.)
+TWO PREMISES OVERTURNED: the native leg was never blocked (the poke
+reaches Huitzil on vsav2 in six seconds), and NONE OF THE DF WORK IN
+14z-66/67/68 WAS DARK FORCE — DF costs a banked stock and replay 82 has
+none, so the pair press was downgraded to a single button. With stocks
+poked in, the symptom reproduces on the FIRST try and is now measured
+against native: purple palette ramp vs native's gold, his art drawn 3-4x
+over, and a different DF TYPE entirely (transform seq 0x18 on ours,
+none on native; 1 stock vs 2). Activation site located. Delivered:
+replay 85, tests/test_hui_df_style.sh + tools/check_df_style.py with
+three verdict controls, and a corrected test_hui_pairs.sh which had been
+asserting the downgrade path under the name "Dark Force".)
 
-## Session 14z-69 (DF style — the measurement, and what it overturned)
+## Session 14z-69 (Dark Force — measured for the first time)
 
-### The blocker was a replay, not a rig
+### Two premises overturned
 
-14z-68j recorded "the early-window id poke does NOT force him on
-vsav2" and every later session inherited it, reasoning from our side
-alone and recommending a native SAVESTATE. That note came from ONE
-attempt with **replay 61**, whose input timing is authored for OUR
-wheel. The replay-80 flow (`$FF8782 = 0x10` at f1400/1450/1500, across
-commit->load) reaches him natively: on `vsav2`, `+0x382 = 0x10`, seq
-0x0A at the DF frame, seq 0x14 on the air dash. Six seconds a run.
+1. **The native leg was never blocked.** 14z-68j's "the early-window id
+   poke does NOT force him on vsav2" came from ONE attempt with replay
+   61, whose input timing is authored for OUR wheel. The replay-80 flow
+   reaches him natively: `$FF8782 = 0x10` at f1400/1450/1500 gives
+   `+0x382 = 0x10` on `vsav2`. Six seconds a run.
+2. **DF costs a banked stock, and replay 82 never had one.** `+0x109 =
+   0` throughout on BOTH games, `+0x107` = 0xFF/0xFE = the pair
+   DOWNGRADED to a single button. **seq 0x0A is that downgrade, not
+   Dark Force.** So every DF measurement from 14z-66 (the "DF mechanics
+   are already native-correct" claim, the pods in pool B) through the
+   14z-68 channel decode was taken outside the mode.
+
+I compounded it: I published a full A/B this session concluding the
+symptom "does not reproduce" — palette identical over 118 frames, sprite
+sets equal, on both emulators, forced-pick and hand-picked, with PNG
+snapshots. All of a match that was never in DF. The maintainer caught it
+from one screenshot: an ordinary stage and no TIME bar. Retracted in
+full. I also twice invented a DF flag by inspection (`+0x1B5/+0x1B9`,
+then `+0x1F4`) — both are set by JUMPING.
+
+### Dark Force, actually measured (native vsav2 vs hui11)
+
+| | native | ours |
+|---|---|---|
+| activation seq | 0x16, cleared to 0 at once | 0x16 -> **0x18** (held) |
+| stocks spent | **2** | **1** |
+| fighter fields | +0x13A/+0x13B, +0x1C3/+0x1C7/+0x1C8 | +0x110/+0x111/+0x17B, +0x189 |
+| palette row 0x0A | gold, slightly brightened | **purple ramp**, 82/82 frames |
+| his own draws | 6-8 | **28-32** (3-4 trailing copies) |
+
+Match-level DF flag **`RAM:$FF802E`** (1 for the mode, 0 before and at
+expiry, identical on both games) — derived by dumping ALL work RAM at
+five phases on both games and keeping only bytes with that shape; 18
+qualify. This is what the gate now gates on.
+
+**The tenant inherits the host's DF TYPE, not just its styling**: native
+Huitzil's DF does not enter the transform seq at all.
+
+### The activation site (FBNeo write tap on $FF8406)
+
+- seq `1600` written by **vs2 0x0261A6 <-> vj 0x027008**, stock debit
+  immediately after (vs2 0x0261C2 / vj 0x027024);
+- **native then runs 0x025EE0, which writes the seq back to 0** — a
+  per-character branch cancelling the transform. Ours never does.
+So the DF-type selection sits between those sites. NEXT: decode it —
+expect an id-indexed table with variant rows aliasing base rows, and
+decode both views before trusting a row (the standing view GOTCHA).
 
 ### Delivered
 
-- **`tests/replays/hui/85_hui_df_vs2.rpl`** — the DF-style rig, runs
-  UNCHANGED on native vsav2 and on a variant-id build. BOTH sides
-  poked (P2 = Victor, id 0x03 on both games) so the legs differ only
-  in the GAME; the cursor path would land on different characters.
-  The CONTROL IS INSIDE THE REPLAY: the same air dash before DF
-  (f3160) and twice during it (f3320, f3450), plus the replay-82 walk.
-- **`tests/test_hui_df_style.sh`** + **`tools/check_df_style.py`** —
-  section 1 is the A/B; section 2 runs the checker against three
-  synthetic corruptions (a one-frame recolour, an afterimage, a
-  de-latched DF) and requires each to FAIL. Green on hui11.
-
-### The A/B result (native vsav2 vs hui11)
-
-- Palette row 0x0A (`$90C140`): **byte-identical to native on all 118
-  sampled frames of the DF windows, and constant** across them.
-- The fighter's own pal-0x0A draws: **equal to native's** (codes,
-  sizes, no duplicated code) modulo his bank remap (native `a19=3xxxx`
-  <-> ours `4xxxx`) and a 0-2 frame skew.
-- DF state fields, seq trajectory, effect channels: agree. Native
-  populates `+0x318`-family identically — so the channels never were a
-  discriminator.
-- Same at the RENDER layer (PNG snapshots), same on **FBNeo** (palette
-  and fighter state byte-identical to MAME), same on a HAND-PICKED
-  cell-0x10 match. So: not an emulator difference, not a pick-path
-  difference.
-
-### RETRACTED (14z-68u, both artefacts of no native control)
-
-1. "afterimages ARE extra sprites, 22 -> 24-29 moving, ~72px trailing
-   groups" — **native measures 19-31 with spans to 149px** over the
-   same window. Walk animation plus pods.
-2. "the palette ALTERNATES per frame (gold/purple)" — does not survive
-   per-frame sampling of the row on either game.
-GOTCHAS entry appended; engine_internals DF section corrected in place
-so the retracted readings cannot be re-followed.
-
-### OPEN — what to ask the maintainer (this is now the blocking item)
-
-The symptom is theirs; they have seen it and the harness has not. Ask
-for: which build, 1P or 2P, stage/opponent, which round, whether it
-starts at activation or after some action, and a capture if cheap.
-Pointing the existing instrument at the right state is one command;
-guessing at shared-path discriminators is what the last two sessions
-did. Do NOT resume mechanism hunting before that answer.
+- `tests/replays/hui/85_hui_df_vs2.rpl` — runs UNCHANGED on both games;
+  both sides poked (P2 = Victor 0x03 on both) plus **three banked
+  stocks**; the same air dash before DF and twice during it.
+- `tests/test_hui_df_style.sh` + `tools/check_df_style.py` — refuses to
+  judge unless BOTH legs are verifiably in DF; freezes the defect shape
+  (`--expect differs`), flip to `matches` when fixed. Three verdict
+  controls: DF-never-active (the shape that fooled me), no-recolour,
+  no-afterimages — each must fail, and does.
+- `tests/test_hui_pairs.sh` corrected: its "Dark Force" section was
+  asserting the empty-meter downgrade. Renamed to what it measures; the
+  assertion stays as a valid regression on that path.
 
 (Previously: session 14z-68 CLOSED — THE PHOBOS WIN SCREEN
 FIXED AND MAINTAINER-CONFIRMED (palette + position; PING #10 =

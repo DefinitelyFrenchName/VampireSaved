@@ -2338,38 +2338,47 @@ not just "during the mode"; (2) a maintainer's repro steps ("move
 around, especially when air dashing") encode exactly that gating and
 are worth asking for BEFORE measuring, not after a negative result.
 
-## A difference measured on OUR build alone is not a difference — and
-## "the native leg is unreachable" is a claim to re-test, not inherit
-## (14z-69, retracts two 14z-68u readings)
+## A MODE-gated symptom needs the MODE PROVEN ENTERED — pressing the
+## input is not entering it (14z-69, cost this session twice)
 
-Two sessions of Dark Force style work rested on measurements taken
-without a native control, and neither survived one:
+Dark Force costs one banked stock. With an empty meter the P+K pair is
+DOWNGRADED to a single button and the match continues normally: the
+tells are `+0x109` (banked stock) staying 0 and `+0x107` reading
+0xFF/0xFE. **`seq 0x0A` is that downgrade.** Every DF measurement from
+14z-66 through 14z-68 was taken on replay 82, which has no stock — so
+none of them were of Dark Force, including a gate that asserted "DF
+activates, expires, re-activates" and the claim that DF mechanics are
+already native-correct.
 
-- "the afterimages ARE extra sprites — pal-0x0A count 22 stationary ->
-  24-29 moving, trailing groups spanning ~72px". Native vsav2 over the
-  same window: **19-31 sprites, x-spans to 149px.** The gain is walk
-  animation plus the pods. It was never a style.
-- "the palette ALTERNATES per frame, some frames gold, most purple".
-  Sampling the actual palette row per frame: **byte-identical to native
-  and constant on 118 consecutive frames**, both games, both emulators.
+Two sessions of mechanism hunting followed, and then a whole A/B
+concluding "the symptom does not reproduce", complete with palette
+dumps over 118 frames, sprite-set equality on two emulators, and PNG
+snapshots. All of it was of a match that was never in the mode. The
+maintainer spotted it instantly from one screenshot: **the stage was an
+ordinary stage.** DF has its own backgrounds and a cyan TIME bar under
+the health bar. Poke the stock in (`$FF8509`, docs/atlas/ram.md +0x109)
+and the same replay reproduces the defect on the first try.
 
-The reason both stood so long is the second half of this entry. A
-14z-68j note said the early-window id poke "does NOT force him on
-vsav2", and every session after it treated the native leg as blocked
-and reasoned from our side alone. That note came from ONE attempt with
-**replay 61** — a win-screen replay whose input timing is authored for
-OUR wheel. The same poke flow from replay 80 reaches him natively in
-six seconds. A negative result about a RIG belongs to the replay that
-produced it, not to the rig; before inheriting one, re-run it with a
-script whose timing is not the thing under suspicion.
+**Never infer a mode flag from the fighter block by inspection.** In
+one session I picked `+0x1B5/+0x1B9` and then `+0x1F4` as "DF active";
+both are set by JUMPING. Derive it: dump ALL of work RAM at five phases
+on BOTH games — before, during an unrelated action, twice inside the
+mode, after expiry — and keep only bytes that are off/off/on/on/off
+with identical values on both games. 18 bytes qualified; `$FF802E` is
+the one now used, and the checker refuses to judge without it.
 
-Cheap habits that would have caught both:
-1. **Never characterise a symptom without running the reference leg at
-   the same phase.** "Ours does X during the mode" is not a finding
-   until "native does not do X during the mode" is measured. Every
-   count, span and palette value here looked damning alone.
-2. **Put the control INSIDE the replay** — replay 85 performs the same
-   air dash before DF and twice during it, so the mode's contribution
-   is visible without trusting a second run to line up.
-3. When a symptom resists three mechanism hunts, suspect the
-   measurement before inventing a fourth mechanism.
+Rules that fall out of this, in the order they would have saved time:
+1. **Assert the state, not the input.** A rig that presses the button
+   proves nothing; a rig that measures the mode flag and the resource
+   it consumed cannot silently drift out of the state under test.
+2. **Take the screenshot early.** The visual signature (background,
+   TIME bar) was decisive and free, and it is exactly what the
+   "verify at the RENDER layer" entry above already told us to do.
+3. **A negative result about a symptom the maintainer has SEEN is a
+   bug in the rig until proven otherwise.** Report it as "I could not
+   reach the state", not as "it does not reproduce".
+4. A negative result about a RIG belongs to the replay that produced
+   it: "the poke does not force him on vsav2" came from replay 61,
+   whose timing is authored for OUR wheel, and it blocked the native
+   leg for two sessions. Re-run it with a script whose timing is not
+   the thing under suspicion.

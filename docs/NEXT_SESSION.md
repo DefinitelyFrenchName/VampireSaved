@@ -1,65 +1,61 @@
 # NEXT SESSION — orientation (written during 14z-69, 2026-08-08)
 
-**The DF-style opener is BLOCKED ON THE MAINTAINER, not on analysis.
-The native leg turned out to be reachable all along, and with it in
-hand the symptom does not reproduce. Do not resume mechanism hunting
-until the repro conditions come back — the questions are listed below.
-Everything else on the Phobos worklist is unchanged and unblocked.**
+**The DF-style opener is OPEN AND MEASURED. Start by decoding the
+DF-TYPE selection between vj `0x027008` and vs2 `0x0261A6`/`0x025EE0`
+(detail below). The symptom reproduces on demand now — the rig is
+`tests/test_hui_df_style.sh`.**
 
-**PING #10 = build/hui11 (5c6dbe43) is still the current build.**
-Nothing in the build changed this session; the deliverables are a
-replay, a gate, a checker and four corrected documents. Frozen
-references untouched (donovan-m3a 4b7d0dc7 / m5_stock 6c93cfa8).
+**PING #10 = build/hui11 (5c6dbe43) is still the current build.** No
+build changed this session. Frozen references untouched.
 
-## What changed, and why it matters beyond this item
+## READ THIS BEFORE ANY DARK FORCE WORK
 
-**The native leg is reachable for ANY tenant screen.** The ordinary
-early-window poke forces Huitzil on native `vsav2` in six seconds:
+**DF costs one banked stock.** With an empty meter the P+K pair is
+DOWNGRADED to a single button and play continues normally — `seq 0x0A`
+is that downgrade, NOT Dark Force. Replay 82 has no stock, so every DF
+measurement in 14z-66/67/68 (including a gate that claimed "DF
+activates, expires, re-activates" and the "DF mechanics are already
+native-correct" conclusion) was taken outside the mode. I then published
+a full A/B this session concluding the symptom "does not reproduce" —
+also outside the mode. The maintainer caught it from one screenshot: an
+ordinary stage and no TIME bar.
 
-```sh
-POKES="1400:ff8782:10;1450:ff8782:10;1500:ff8782:10"   # P2 = $FF8B82
-tools/run_replay_mame.sh vsav2 <replay> out.log
-```
+So: poke stocks (`$FF8509`), and assert the mode with **`$FF802E` = 1**
+(match-level, identical on both games, off during a jump, off at
+expiry). Do NOT infer a DF flag from the fighter block — `+0x1F4` and
+`+0x1B5/+0x1B9` both look right and are set by JUMPING.
 
-"The native leg is unreachable" came from ONE 14z-68j attempt with
-**replay 61**, whose input timing is authored for OUR wheel. Anything
-parked on "needs a native reference" — the win QUOTE set, the child
-shadow band, effect art — can now be A/B'd directly. Poke BOTH sides
-when sprite lists are compared (P2 = 0x03 is Victor on both games).
+The native leg is reachable, and always was: the replay-80 poke
+(`$FF8782 = 0x10` at f1400/1450/1500) forces Huitzil on `vsav2` in six
+seconds. "The native leg is unreachable" came from ONE attempt with
+replay 61, whose timing is authored for OUR wheel. Anything else parked
+on "needs a native reference" (win quote, child shadow, effect art) can
+be A/B'd now.
 
-## THE OPENER: ask the maintainer, then measure
+## THE OPENER: decode the DF-TYPE selection
 
-The DF-style A/B is built and green: `tests/test_hui_df_style.sh`
-(replay 85, native vsav2 vs the build). On hui11 the palette row is
-byte-identical to native across 118 frames and his sprite set matches
-native's — with no afterimages and no recolour — at the RAM layer, the
-render layer (PNGs), on FBNeo as well as MAME, and whether he is poked
-in or hand-picked on cell 0x10.
+Measured, native vsav2 vs hui11 (both verifiably in DF):
 
-So the harness has not seen what the maintainer has. **Ask:**
-1. Which build were they on when they saw it (hui11, or an earlier
-   ping)?
-2. 1P (arcade/CPU) or 2P? Which opponent and stage?
-3. Round 1 or after a round transition?
-4. Does it start at DF activation, or only after some action?
-5. A screenshot or short capture, if it is cheap for them — one
-   settled the win screen after hours of derivation.
+| | native | ours |
+|---|---|---|
+| activation seq | 0x16, cleared to 0 at once | 0x16 -> **0x18** held |
+| stocks spent | **2** | **1** |
+| palette row 0x0A | gold, brightened | **purple ramp** (82/82 frames) |
+| his own draws | 6-8 | **28-32** (3-4 trailing copies) |
 
-Then point the existing rig at that state; the instrument is the easy
-part now. **Do NOT** resume the search for a per-character style
-discriminator first: the last two sessions did that, and the readings
-that motivated it were artefacts (below).
+So the tenant inherits the host's **DF TYPE**, not merely its styling —
+native Huitzil's DF never enters the transform state.
 
-**RETRACTED this session — do not re-follow (docs/GOTCHAS.md):**
-- "the afterimages ARE extra sprites (22 -> 24-29 while moving,
-  trailing groups ~72px)" — **native does the same** (19-31, spans to
-  149px over the same window).
-- "the palette ALTERNATES per frame, gold/purple" — per-frame sampling
-  of the actual row shows it constant and native-identical on both
-  games.
-- The effect channels (`+0x318`-family) are NOT a discriminator:
-  native populates them identically. The decode itself is still good
-  documentation of the machinery — see engine_internals.
+Site, from an FBNeo write tap on `$FF8406`:
+- the seq write `1600` comes from **vs2 `0x0261A6` <-> vj `0x027008`**,
+  stock debit right after (vs2 `0x0261C2` / vj `0x027024`);
+- **native then runs `0x025EE0`, writing the seq back to 0** — the
+  per-character branch that cancels the transform. Ours never does.
+
+Decode what selects that branch. Expect the usual shape: an id-indexed
+table with variant rows aliasing base rows — and decode BOTH views
+before trusting a row (the standing view GOTCHA). Then give row 0x10
+native Huitzil's DF type.
 
 ## The rest of the Phobos worklist (unchanged)
 
@@ -86,7 +82,8 @@ that motivated it were artefacts (below).
 ```sh
 export ROMDIR=/Users/koneko/Developer/Vampire_Saved/ROMS
 tests/test_m3a_reproducible.sh          # after ANY machinery change
-tests/test_hui_df_style.sh    [build]   # NEW 14z-69 — the native A/B
+tests/test_hui_df_style.sh    [build]   # NEW 14z-69 — the DF native A/B
+                                        # (DF_STYLE_EXPECT=matches when fixed)
 tests/test_hui_boot.sh                  # masked-v2 EXACT legacy leg
 tests/test_hui_winscreen.sh   [build]
 tests/test_hui_fx_flow.sh     [build]
@@ -106,10 +103,11 @@ tools/run_hui_behavior.sh               # interactive -> build/hui11
 
 ## Method note from this session
 
-**A difference measured on our build alone is not a difference.** Every
-number in the retracted list looked damning until the reference leg was
-run at the same phase. Put the control inside the replay (85 performs
-the same air dash before and during DF) so the mode's contribution is
-visible without trusting two runs to line up — and when a symptom
-resists three mechanism hunts, suspect the measurement before inventing
-a fourth mechanism.
+**Assert the STATE, not the input.** Pressing the DF buttons is not
+entering Dark Force; the mode costs a resource and silently degrades
+without it. Three sessions of work — and one confident "does not
+reproduce" from me — were spent on a match that was never in the mode,
+while the visual signature (DF background, TIME bar) was free to check
+and decisive. A negative result about a symptom the maintainer has SEEN
+is a bug in the rig until proven otherwise: report it as "I could not
+reach the state", never as "it does not reproduce".
