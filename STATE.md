@@ -87,6 +87,79 @@ selection is the defect.
 
 Full write-up: `docs/game/engine_internals.md`, beam/effect family.
 
+## Session 14z-70f/g — THE 214+P GROUND EXPLOSION FIXED (PING #13,
+## build/hui17), and the BEAM narrowed to "the object is never created"
+
+**PING #13 = build/hui17 (program fingerprint 699de9b7, gfx-only change).
+The launcher points here. MAINTAINER-CONFIRMED: "explosion corrected, my
+tests confirm it."**
+
+### The explosion — maintainer-diagnosed rig error
+
+Every rig fired 214+**MP** from 2P start distance, so the bomb always
+REACHED the opponent: every capture, and the last three STATE entries,
+analysed the ON-CONTACT hit explosion, not the ground mushroom. The
+reported defect needs the bomb to touch nothing — **LP** (shortest arc)
+AND both fighters walked back to their corners:
+`tests/replays/hui/83d_hui_grenade_ground.rpl`.
+
+On that rig it reproduced instantly: native f3445 an orange ground
+fireball, ours a solid FUCHSIA rectangle (the ping-#7 fuchsia class).
+
+ROOT: the child-shadow class again — codes correctly remapped bank 3->4
+(identical ranges to native), tiles never copied into group C, so the
+sprites resolve to all-zero tiles and render as solid blocks.
+FIX: `extra_tiles/0x10.json` 2 -> **569 tiles**.
+
+**The first fix attempt FAILED and that is the lesson:**
+`obj_records_dump` reports a multi-tile sprite's **BASE code only**, so a
+per-drawn-tile inventory (113 tiles) missed the other 35 tiles of the 6x6
+sprite that IS the block. Corrected by taking every tile in span
+0x0A00-0x0C40 that vs2 bank 3 has art for and group C lacks.
+
+**`audit_empty_tiles.sh` HARDENED** — it passed every build through
+hui16: it sampled every 25 frames (found 10 of 113) and checked only base
+tiles. Now every frame, expands `w*h` at `base + row*0x10 + col`, and
+83d is in its defaults. Ground-truthed: FAILS hui15, PASSES hui17.
+
+Gates on hui17, all PASS: gfx_layout3, hui_boot (legacy masked-v2 EXACT),
+hui_winscreen, pairs, ex, grab, air, walk, audit_empty_tiles.
+
+### The BEAM — a DIFFERENT class, and now precisely located
+
+Maintainer confirmed the rig (83b, 236LP at 2P distance) and the defect:
+**muzzle orb and beam both missing, while the FREEZE ITSELF WORKS**
+(Victor is iced on both legs). Also confirmed for later verification:
+LP/MP/HP do not change the beam visually; **236+2P** (ES) gives a
+girthier beam and a different Phobos shape; **236+K** gives a LOW beam
+that hits crouching. Stage re-tinting between vs2 and vsav is expected —
+not a defect.
+
+Unlike the explosion this is NOT missing tiles — ours emits no sprites at
+all. Chain measured on the pool the RAM atlas already documents
+(`docs/project/tables/reconciliation.md:70` — `$FFD400/0x80/cat14`, and
+"GEOMETRIES ARE IDENTICAL in both games, pool-for-pool", which is what
+makes the address comparable across legs):
+
+| | native | ours |
+|---|---|---|
+| beam sprite-list reads | 2 (f3165/3167, PC 0x019E0E, A6=$FFD400) | 0 |
+| anim-pointer writes in f3160-3210 | 26 (PC 0x01378A, A0 = 0x24EDD4 + D0) | **0** |
+| pool-slot HEADER writes f3150-3210 | 30 (PC 0x0934B4) | **0** |
+
+**So the beam object is never CREATED** — not created-then-not-animated.
+NEXT: find the vsavj twin of the creator at vs2 `0x0934B4` (PCs do NOT
+transfer between legs — use the R1 map / `reconcile_batch.py`), and find
+why the ported code never reaches it. Verify by execution breakpoint
+BEFORE attributing anything (14z-70d).
+
+### Process change, maintainer-requested
+
+**Send the native/ours capture pair and state the interpretation BEFORE
+measuring on it**, naming the rig assumptions (button strength, spacing,
+which event should be on screen). The MP-vs-LP error cost most of this
+session and the maintainer spotted it instantly from my own screenshots.
+
 ## Session 14z-70b/c/d — the grenade explosion: a COMPARABLE rig, the
 ## symptom pinned to a +0xA220 code shift, and one wrong root cause
 
