@@ -666,13 +666,50 @@ only_variant_slot = true
 # through the DATA view (the effect-byte-map precedent; the OPCODE
 # view decodes to a plausible-looking identity ramp 00,01,02,... that
 # is garbage — docs/GOTCHAS.md "in-code pc-rel tables"). DATA view
-# gives table[0x10] = 0x59, so H's set is
-#     0x3C2BBC + 0x59*0xA0 = 0x3C635C
-# and its ramp IS gold (0ffd 0fb8 0d96 0c86 0b75 0964 ...), matching
-# the maintainer capture; the old 0x3C347C row reads
-# 0111 0844 0c87 0fba ... = the pink/lavender they photographed.
+# CORRECTED 14z-68m (maintainer side-by-side): the OPCODE view is the
+# right one after all, proven by DONOVAN's independently verified row
+# (14z-45, row-for-row against native win palette RAM): his id 0x13 ->
+# opcode table[0x13] = 0x11 -> POOL + 0x11*0xA0 = 0x3C365C = exactly
+# his frozen vs2_src. So table[0x10] = 0x0B and H's set is
+#     0x3C2BBC + 0x0B*0xA0 = 0x3C329C
+# whose ramp is BRIGHT ORANGE->YELLOW (0e90 0fb0 0fc5 0ff3 0ff7 0fff),
+# matching the native capture. SELF-CHECK: the last word of each
+# 0x20-byte row is a marker = 5*row — H's rows carry 0x37-0x3B
+# (5*0x0B) and Donovan's carry 0x55-0x59 (5*0x11). My earlier
+# 0x3C635C was Donovan's row at colour variant 4 (markers 0x55-0x59),
+# i.e. I had given Huitzil DONOVAN'S palette.
 # Colour stride stays 18*0xA0 = 0xB40 (unchanged, and now derived
 # rather than assumed).
+# ── 14z-68m WIN-PORTRAIT POSITION (maintainer: "the win screen is
+# shifted to the left, like Donovan back when we ported him" — and
+# they were right, it is the same mechanism). The drawer takes the
+# portrait's position from the pc-relative table 0x5F200 (4B/char:
+# x at +0, y at +2), read at 0x5F1A0/A6 with the winner id from
+# +0x382(a4). vsavj row 0x10 is the plain alias (0x0080,0x0098);
+# vs2's own row 0x10 is (0x00C0,0x0080) — so ours draws him 64px too
+# far LEFT and 24px too low. Same fix class as Donovan's 14z-45
+# win_pos rows: slot-following code_word (the table is pc-relative
+# PROGRAM space, so these are CODE rows — the 14z-43 gotcha).
+[[code_word]]
+stage = 6
+name = "win_pos_x_slot"
+slot_table = 0x05F200
+slot_stride = 4
+slot_off = 0
+slot_mirror = true
+old_hex = "0080"
+new_hex = "00c0"
+
+[[code_word]]
+stage = 6
+name = "win_pos_y_slot"
+slot_table = 0x05F200
+slot_stride = 4
+slot_off = 2
+slot_mirror = true
+old_hex = "0098"
+new_hex = "0080"
+
 [[win_pal_variant]]
 stage = 6
 name = "hui_win_pal"
@@ -682,7 +719,7 @@ pool_base = 0x3AD700
 pool_color_stride = 0xAA0
 unit = 0xA0
 colors = 8
-vs2_src = 0x3C635C
+vs2_src = 0x3C329C
 vs2_color_stride = 0xB40
 hole = "wide_ext"
 

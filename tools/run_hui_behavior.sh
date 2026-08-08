@@ -1,6 +1,11 @@
 #!/bin/sh
 # run_hui_behavior.sh — the Huitzil playtest build, interactive.
-# 14z-68 (PING #9, build/hui10 = 64128aa7): THE WIN-SCREEN PALETTE.
+# 14z-68m (PING #10, build/hui11 = 5c6dbe43): THE WIN SCREEN, both
+# defects the maintainer named — the palette is now HIS (I had given
+# him Donovan's) and the portrait POSITION is fixed (it was 64px too
+# far left, same mechanism as Donovan's 14z-45 win_pos rows). Details
+# + what is still wrong: build/hui11/PING10_ARTIFACT.md.
+# Previous: 14z-68 (PING #9, build/hui10 = 64128aa7): win palette v1.
 # Win a match as Phobos and check the victory portrait — it should be
 # GOLD (his normal family), where ping #8 showed pink/lavender. That
 # is the ONE thing this build is for; details + what is deliberately
@@ -24,13 +29,13 @@
 #     the others is untested content on this build.
 # Ground truth for comparison: native Phobos on vsav2.
 #
-# Usage: ROMDIR=... tools/run_hui_behavior.sh [outbase=build/hui10]
+# Usage: ROMDIR=... tools/run_hui_behavior.sh [outbase=build/hui11]
 set -eu
 
 ROMDIR="${ROMDIR:?set ROMDIR}"
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"
-OUTBASE="${1:-build/hui10}"
+OUTBASE="${1:-build/hui11}"
 
 if [ ! -f "$OUTBASE/rompath/vsavjw.zip" ]; then
     echo "building the stage-6 gfx build at $OUTBASE ..."
