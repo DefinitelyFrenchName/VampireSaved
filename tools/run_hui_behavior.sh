@@ -5,15 +5,16 @@
 # him Donovan's) and the portrait POSITION is fixed (it was 64px too
 # far left, same mechanism as Donovan's 14z-45 win_pos rows). Details
 # + what is still wrong: build/hui11/PING10_ARTIFACT.md.
-# Previous: 14z-68 (PING #9, build/hui10 = 64128aa7): win palette v1.
-# Win a match as Phobos and check the victory portrait — it should be
-# GOLD (his normal family), where ping #8 showed pink/lavender. That
-# is the ONE thing this build is for; details + what is deliberately
-# still broken: build/hui10/PING9_ARTIFACT.md.
-# STILL OPEN (do not re-report): the garbled blue-grey blocks on the
-# win pose (a SEPARATE art defect from the palette), the 236P beam +
-# ES big-beam/grab-lightning/214 family, the child companion's
-# rectangular shadow, DF style, FG pacing.
+# CONFIRMED by the maintainer: palette and position both correct on
+# the real screen, which also closed the "garbled blue-grey blocks"
+# item — those were the WRONG PALETTE, never an art defect.
+# STILL OPEN (do not re-report): the win QUOTE text (still the host's
+# line — a 3-level data port, cosmetic), the 236P beam + ES big-beam /
+# grab-lightning / 214 family, the child companion's rectangular
+# shadow, DF style (afterimages + purple recolour while MOVING), and
+# FG pacing.
+# Previous builds, kept pinned for A/B: build/hui10 (PING #9,
+# 64128aa7) and build/hui9 (PING #8, 9e3105e0).
 # Previous: 14z-67 (ping #8, build/hui9) — 236P freeze ray restored,
 # command-grab throw arc native-exact (yv 16.0), companion art bank 5.
 # No forced id: WALK THE WHEEL to his own cell (from Demitri's default
