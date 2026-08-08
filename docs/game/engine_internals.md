@@ -1279,6 +1279,34 @@ palette-seq table at vsavj `0x39ACD0`-`0x39AD4F`**. Their vs2 twins
 (`0111 0fea 0fb8 0e96 0b75 ...`) where vsavj holds PURPLE
 (`0222 0fff 0faf 0fcf 0e8f ...`).
 
+**The ids are 0x1E, 0x1F, 0x20, 0x21** — rows vsavj `0x39ACC0`,
+`0x39ACE0`, `0x39AD00`, `0x39AD20`; vs2 twins `0x3B0DFC`, `0x3B0E1C`,
+`0x3B0E3C`, `0x3B0E5C`. Cross-check that these are the right pairs:
+each row's last word is its own frame index (0000/0001/0002/0003) and
+matches across the two games. The API that resolves them is
+**`0x02AD82`**: `a0 = 0x39A900 + (d0 & 0xFFF) * 0x20`, measured taking
+152 calls during one DF with d0 cycling 0x1E-0x21. (NOTE for probes:
+`0x02AD68` sits after a `movem.l (a0)+`, so the A0 you see there is the
+row start PLUS 0x10.)
+
+**A sibling API takes the source as a POINTER instead** — `0x02ADA6` /
+`0x02ADAC` use `movea.l $3A4(a6),a0`. If the channel script can be made
+to use that variant, the fix is DATA-ONLY: point `+0x3A4` at privately
+placed copies of the four vs2 rows. Measured: H's DF takes the id-based
+entry (0x2ADA6 zero hits, 0x2ADAC zero during DF), so this is a
+candidate route, not the current one.
+
+**PARKED HERE, and why:** the trigger is not a call we own. There is no
+absolute `jsr/jmp` to `0x2AD82` anywhere in vanilla or in the built
+image — it is reached through the channel machine's program-byte
+dispatch at `0x029F4A` (`move.b (a4),d0; move.w (pc,d0.w),d1; jmp`),
+i.e. from ENGINE code driven by H's ported SCRIPT data. So the
+legacy-clean intervention is in the script, and that needs the opcode
+table decoded first — and it does NOT decode as a flat array of pc-rel
+words at one base (best single-base fit: 15/24 targets valid, the rest
+odd addresses). Decode that table before designing the fix; do not
+guess it.
+
 That is exactly the sword/statue blink of 14z-33: same seq ids,
 different global-table contents between engines, and the table is
 legacy surface so it cannot simply be edited. **The fix design already
