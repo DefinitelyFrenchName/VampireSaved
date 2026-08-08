@@ -1199,6 +1199,63 @@ thing to decode, and it is the same shape as every other per-character
 selection here: expect an id-indexed table with variant rows aliasing
 base rows, and decode both views before trusting a row.
 
+### 14z-69c: THE MECHANISM, traced end to end
+
+The two engines run DIFFERENT Dark Force systems, and the tenant is
+caught between them.
+
+| | vsavj (host engine) | vsav2 (native) |
+|---|---|---|
+| activation body | `0x027000` | `0x02619E` |
+| fields set | `+0x111`, `+0x110`, `+0x176` | `+0x1C3`, `+0x1C8`, `+0x1C4`, `+0x13A`, `+0x13B` |
+| stock cost | `subq.b #1,$109(a6)` | `subq.b #2,$109(a6)` |
+| per-char byte table | `0x02704E` | `0x02620A` |
+| tail calls | `0xD69A / 0x77376 / 0x61588` | `0xBCE6 / 0x82AE2 / 0x6D9D4` |
+
+Both write **seq 0x16** and both read a per-character byte table indexed
+by `+0x382` (value -> `+0x189`/`+0x1C7`, and value+0x1E -> `+0x188`/
+`+0x1C6`). **Those two tables are byte-identical between the games and
+give id 0x10 the same value 4** — so the table is NOT the discriminator.
+Read them through the OPCODE view (`04 04 03 04 ...`); the data view is
+noise.
+
+**What actually diverges is what happens to seq 0x16 next:**
+- **native** clears it back to 0 in the SAME frame (`0x025EE0`), and the
+  fighter returns to ordinary states for the rest of the mode — measured
+  seq 0x04/0x06/0x14 throughout, no extra draws, palette unchanged;
+- **ours** keeps it: the seq-0x16 state is per-char dispatched through
+  table **`0xBF31A` (dispatch_16)**, whose row 0x10 our builds repoint to
+  H's placed port of vs2's handler. That handler is a `+0x07`-keyed
+  sub-state machine which calls **`0x2A7E0`** — the DF effect-channel
+  script machine (the `+0x318/+0x320/+0x330` channels decoded in
+  14z-68v) — and then drives him to **seq 0x18**, where he stays for the
+  whole mode. The channels are what draw the trailing copies; the mode
+  is what recolours row 0x0A.
+
+Native has the identical handler at vs2 `0x056D70`-family and NEVER
+EXECUTES IT: vs2's activation does not set `+0x111`, and both the
+seq-0x16 path and the DF-tick dispatcher (`0xBF61A` / vs2 `0xD97B8`,
+guarded on `+0x11F` and `+0x111`) are therefore unreachable in vs2's own
+DF. Probe-measured with positive controls: native 0 hits at `0x56D70`,
+ours 1 hit at its placed twin `0x0C1780` — and that one hit is at frame
+3667, DF EXPIRY, where vs2's handler does exactly what it says
+(`moveq #0,d0; move.b d0,$17b/$111/$110/$1b5; rts` — a CANCEL body: vs2
+wrote it to switch the vsav-style DF off).
+
+**Legacy is unaffected and this is not "the host's style":** on vanilla
+vsavj a legacy character (Victor) in DF shows no recolour and no extra
+draws (11 -> 9 -> 11 pal-0x0A draws, palette row constant). The
+afterimages come from the ported handler being reachable at all.
+
+**Fix shape (gameplay decision — STATE "Decisions pending"):** the
+tenant's seq-0x16 row must not run vs2's DF-form machine under vsav's
+DF. Candidates: leave `dispatch_16` row 0x10 alone (careful: vanilla
+row 0x10 is an ALIAS of row 0x00, i.e. Bulleta's handler, not a null),
+or point it at a thunk that reproduces native's "clear the seq"
+behaviour. Porting vs2's whole type-A DF is the other end of the scale
+and is legacy-hot. Measure the candidate with the gate at
+`DF_STYLE_EXPECT=matches`.
+
 Gate: `tests/test_hui_df_style.sh` (replay 85). It refuses to judge
 unless BOTH legs are verifiably in DF, and freezes the defect's shape
 (`--expect differs`) so it goes red if the symptom changes in either

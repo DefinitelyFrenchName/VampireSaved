@@ -13,6 +13,55 @@ replay 85, tests/test_hui_df_style.sh + tools/check_df_style.py with
 three verdict controls, and a corrected test_hui_pairs.sh which had been
 asserting the downgrade path under the name "Dark Force".)
 
+## Session 14z-69c — THE DF MECHANISM TRACED (fix is a DECISION)
+
+Full trace in docs/game/engine_internals.md (Dark Force). Summary:
+
+- **vsav and vs2 run different DF systems.** Activation bodies vsavj
+  0x027000 vs vs2 0x02619E: different field sets (+0x111/+0x110/+0x176
+  vs +0x1C3/+0x1C8/+0x1C4/+0x13A/+0x13B), different stock cost (1 vs 2),
+  different tail calls. Both write seq 0x16.
+- **The per-char byte tables (vj 0x02704E / vs2 0x02620A) are
+  byte-identical and give id 0x10 the same value 4** — not the
+  discriminator. (Opcode view; the data view is noise.)
+- **The divergence is what happens to seq 0x16.** Native clears it the
+  same frame (0x025EE0) and plays on normally. Ours dispatches it
+  per-char through table **0xBF31A (dispatch_16)**, row 0x10 repointed
+  to H's placed port of vs2's handler, which calls **0x2A7E0** — the DF
+  effect-channel script machine — and locks him in **seq 0x18** for the
+  mode. Channels draw the trailing copies; the mode recolours row 0x0A.
+- **Native never executes that handler.** vs2's DF does not set +0x111,
+  so both the seq-0x16 path and the DF-tick dispatcher (0xBF61A / vs2
+  0xD97B8, guarded on +0x11F and +0x111) are unreachable there. Probed
+  with positive controls: native 0 hits at 0x56D70, ours 1 hit at its
+  placed twin 0x0C1780 — at frame 3667, DF EXPIRY, where the body is a
+  CANCEL (clears +0x17b/+0x111/+0x110/+0x1b5 and returns).
+- **Legacy is clean**: vanilla vsavj + Victor in DF = no recolour, no
+  extra draws. This is not "the host's style" — it is our repoint making
+  vs2's DF-form machine reachable under vsav's DF.
+
+### DECISION PENDING (maintainer) — how should Phobos's Dark Force behave?
+
+Not mine to make (CLAUDE.md §5: anything a player can feel).
+
+1. **Neutralise the seq-0x16 row for the tenant** so the engine clears
+   it like native does. Closest to the native LOOK (no afterimages, no
+   recolour), cheap, no legacy surface. But his DF then has no
+   per-character power — it is the generic vsav mode. CAREFUL: the
+   vanilla row 0x10 is an ALIAS of row 0x00 (Bulleta's handler), so
+   "just don't repoint it" is not the same as "null" and must be
+   measured, not assumed.
+2. **Port vs2's type-A DF system for him** (0x02619E body + the 0x82AE2
+   servant install + 0x6D9D4 tail). Native-faithful, but it is a
+   second DF system inside a legacy-hot path and the stock cost differs
+   (2 vs 1) — a rule change legacy characters do not share.
+3. **Leave it.** The afterimages are cosmetic-ish but the seq-0x18 lock
+   is not: he stays in the transform state for the whole mode.
+
+RECOMMENDATION: 1, measured with the gate at DF_STYLE_EXPECT=matches
+before anything is frozen. Ask the maintainer what Phobos's DF is
+SUPPOSED to do in play before choosing between 1 and 2.
+
 ## Session 14z-69b — DOCS SPLIT THREE WAYS (maintainer proposal, adopted)
 
 Maintainer: the SMS project split docs into game knowledge vs
