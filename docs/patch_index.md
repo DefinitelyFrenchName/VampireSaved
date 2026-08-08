@@ -49,10 +49,11 @@ Authoritative implementations + section comments:
 | port_patch | stage-gated byte patch in a ported region (old/new/new_hex_variant) | M2a |
 | site_thunk (+jmp, jmp_ok, id_literal_ok, region_subst, data_subst[+gather], row_subst) | displace a vanilla site into a ghost-clean thunk; substitutions embed placed blocks | M2a; gather 14z-67 |
 | obj_hook / state_hook / reaction_hook | union-shaped engine dispatch extensions, tripwired when unported | M2a stage 4 |
+| obj_hook_extra | AUTHORED union rows `{site,index,src}` for types in neither table — lets a tenant reach a SHARED type's rewritten machine without touching the shared row; no-gap assertion (engine indexes by type*4) | 14z-68 |
 | init_shim | per-char init interception (flavor latch etc.) | M2a stage 5 |
 | alloc_wrap | allocation-path wrappers for companion spawns | M2a |
 | sound_table / stubbed_sound | per-char sfx record arrays; stub rows keep newcomer ids silent until M5 | M2a / 14z-52 |
-| data_in_code | relocate a data table embedded in crypt-placed code + reroute its reader | 14z-66 |
+| data_in_code | relocate a data table embedded in crypt-placed code + reroute its reader. **KNOWN GAP (14z-68): only the `lea (d16,pc),a1 + move.b (a1,d0.w),d0` reader is supported; the POST-INCREMENT shape `move.w (An)+` is neither relocated nor detected by `tools/census_regions.py`** | 14z-66 |
 | pcrel_escape_fix | trampoline pad for word-form pcrel branches escaping a region | 14z-66 |
 | table_fix | pad + rewrite the ported per-char OBJ bank table | M2b |
 | gfx_remap | rewrite main-band tile words by the placement delta (delta-0 tenants skip it) | M2b; delta-0 14z-67 |

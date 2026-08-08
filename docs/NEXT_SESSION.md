@@ -1,24 +1,53 @@
 # NEXT SESSION — orientation (written at the close of 14z-68, 2026-08-08)
 
-**Start here: TEACH THE POST-INCREMENT READER SHAPE TO THE
-data_in_code CENSUS AND RELOCATOR (arc below, step "DO THIS FIRST").
-The whole union-type mechanism is BUILT and MEASURED WORKING —
-dispatch, records and art are native-equivalent for the beam object —
-but it is PARKED behind an embedded DATA table inside the ported
-machine that neither the census nor the generator can currently see,
-which is also the best candidate for why THE BEAM STILL DOES NOT
-DRAW. Blocker 1 turned out NOT to be a stamp problem.**
+**Start here: THE SHADOW ITEM, then the WIN-SCREEN PALETTE
+(maintainer direction, 2026-08-08). Both are self-contained and
+should reach a testable build far faster than the effect arc.**
 
-14z-68 also refuted the 14z-67 entry theory, exonerated the fighter
-side twice over, corrected its own first conclusion (the beam object
-is spawned, not missing), and fixed FOUR real defects along the way:
-the ported spawner region excluded its own record-base load; the
-region was rooted at the middle of vs2's row-8 machine instead of
-its entry; and two engine sites tested newcomer char ids against a
-WORD-loaded mask, reading a stale high word (undefined).
-**PING #8 = build/hui9 (9e3105e0) is still with the maintainer —
-nothing new to playtest.** Frozen references unchanged
-(donovan-m3a 4b7d0dc7 / m5_stock 6c93cfa8; m3a-reproducible PASS).
+**THE EFFECT ARC IS PARKED** — deliberately, not blocked-and-forgotten.
+It is decoded further than it looks: the union-type mechanism is BUILT
+and MEASURED WORKING (dispatch, records and art all native-equivalent
+for the beam object), and the one thing standing in front of it is a
+TOOLING gap — an embedded data table read with a POST-INCREMENT
+walk that neither the census nor the generator's data_in_code
+relocator can see. Everything needed to resume is in "THE PARKED
+EFFECT ARC" below; resume there when the quick wins are done.
+
+PING #8 = build/hui9 (9e3105e0) is with the maintainer — nothing new
+to playtest yet. Frozen references unchanged (donovan-m3a 4b7d0dc7 /
+m5_stock 6c93cfa8; m3a-reproducible PASS). Parked-state build
+ede6bf15 is all-green.
+
+## THE QUICK WINS (do these first)
+
+### 1. Sidekick shadow — round not rectangular (ping #7 item 2)
+The mechanism is already documented (14z-66): the `shadow_seq_guard`
+site_thunk at 0x8245C clamps out-of-range seq ids to the default
+shadow, which is why H's sidekick draws the fallback (rectangular)
+shape. The FIX is the extended vs2-ported shadow table at the same
+site — vs2's twin table is simply larger (vsavj 0x2083BC/0x2087CA,
+row space 0x40E each, hardcoded at the installer 0x823E2/0x823F2 and
+NOT per-char; vs2's twin is 0x1E42D2). Port the larger table, point
+the installer rows at it for the tenant, and the clamp stops firing.
+Keep the clamp as the backstop — it is deliberately UNGATED by char
+id because FG capture anims put a VANILLA victim's servant through
+H-supplied seq ids.
+
+### 2. Win-screen palette (ping #7 item 5)
+TWO defects, both measured (14z-67): (a) the palette source
+derivation is WRONG — the `win_pal` row's source was picked when the
+color0==color1 read was already flagged suspicious, and the
+maintainer capture confirms it (native = GOLD, his normal family;
+ours = pink/lavender). Re-measure vs2's WIN DRAWER for a newcomer
+special-case, the way the select-pal uploader has one at vs2 0x6B1A6
+(`cmpi #$10 -> moveq #$B,d6`, the grid-column remap). (b) GARBLED
+BLUE-GREY RECTANGLES on eye/thigh/foot — a few wrong ART blocks,
+likely tiles the anim walk missed (codes referenced by the win pose
+but outside the walked inventory); re-run the sweep with the win-pose
+records included.
+
+Both are single-screen, non-gameplay surfaces, so the masked legacy
+gates arbitrate cheaply and neither needs the effect machinery.
 
 ## Read first, do not re-derive
 
@@ -34,8 +63,8 @@ rows did this long ago). H's ray runs HIS OWN flow, tap-verified
 native-identical. Both entry thunks are parked with this written
 into the manifest. Do not re-attempt them.
 
-## THE ARC: fix the embedded data table, then re-measure the beam
-## (the dispatch/record path is already native-equivalent)
+## THE PARKED EFFECT ARC (resume here after the quick wins)
+## Step 1 is a TOOLING fix: the data_in_code post-increment shape
 
 14z-68d built the whole union-type mechanism and MEASURED it working.
 Do not re-derive any of this — un-park and continue:

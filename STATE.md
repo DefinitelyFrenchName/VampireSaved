@@ -1,9 +1,17 @@
 # STATE — living progress log
 
-Updated: 2026-08-08 (session 14z-68 IN PROGRESS — the effect-flow
-closure arc. THE 14z-67 ENTRY THEORY IS REFUTED BY MEASUREMENT and
-the TRUE root is decoded to three constants; see the 14z-68 section
-below before touching anything effect-related.)
+Updated: 2026-08-08 (session 14z-68 — the effect-flow arc, worked
+deep and then PARKED BY MAINTAINER DIRECTION in favour of the
+shadow + win-palette quick wins. The 14z-67 entry theory is REFUTED;
+the fighter side is exonerated twice over; the beam object turned out
+to be SPAWNED, not missing; the union-type mechanism is BUILT and
+MEASURED WORKING (dispatch/records/art all native-equivalent) but
+parked behind a TOOLING gap — a post-increment-read embedded data
+table that neither the census nor the data_in_code relocator can
+see. FOUR real defects shipped along the way. THE BEAM STILL DOES
+NOT DRAW. Parked-state build ede6bf15 is all-green; read the 14z-68
+sections below before touching anything effect-related, then
+docs/NEXT_SESSION for the quick-win worklist.)
 
 ## Session 14z-68 (the effect-flow closure — root cause found)
 
