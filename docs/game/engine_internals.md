@@ -1387,8 +1387,30 @@ games and an object's type byte changes frame to frame — compare the
 same object across the same frame, or you will "find" differences that
 are phase (this cost a wrong read in-session).
 
-**THE ONE SUBSTANTIVE DIFFERENCE LEFT: the type-0x75 object's
-sub-state.** Native runs it as `7506`, ours as `7502`, for the whole
+**Traced further (14z-69m), and where it now stands.** The "become the
+emitter" sequence is IDENTICAL on both games: at **f2364** slot FFB800's
+type word takes `0x7500`, at **f2365** its sub-state takes `08` then
+`06`, from twin PCs (native `0x8ACE6` / `0x8A6CA` / `0x8A6DE` <-> ours
+the placed `0x0D75E4` / `0x0D6FC8` / `0x0D6FDC`), with A6 = P1 on both
+and a single probe hit each at f2363. Between f2365 and f3170 NEITHER
+game writes that type word again.
+
+Yet by f3162 native has one 0x75 object at FFB800 with sub-state **06**,
+and ours has one at FFB900 with sub-state **02**.
+
+**One asymmetry found, not yet explained: ours writes `FFB802 <- 0000`
+at f2363 from `pc=0x0FB2F8` — a PLACED address, i.e. our own ported code
+— one frame before the re-type. Native has no such write.** That is the
+most specific lead in this arc and the place to start.
+
+CAVEAT, be careful here: a slot-accounting inconsistency turned up while
+chasing this (the stamp's tapped target slot vs the slot the frame dumps
+show as the tenant type) and was NOT resolved. Re-measure slot identity
+cleanly — one build, one run, tap and dump together — before building
+any theory on which object is which. Do not reason from the mixed data
+above.
+
+**The remaining difference: the type-0x75 object's sub-state.** Native runs it as `7506`, ours as `7502`, for the whole
 window. Both walk the same anim nodes modulo a ~4-frame phase (ours
 `0x0E43C6` + 0x16CF22 = `0x2512E8`, exactly native's f3178 node), and
 the fighter's own cursor also tracks native modulo phase. So the next
