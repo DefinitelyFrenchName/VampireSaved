@@ -1363,19 +1363,42 @@ table fix):
 - the fleet pieces are created too: `type<-080C` fifteen times on both
   (native pc 0x6D218 / ours its placed twin 0x0D4648).
 
-**And it still emits ZERO sprites.** So the residual is neither
-dispatch, records, art, tables, nor object creation — it is EMISSION.
-Two concrete leads, in order:
-1. **Find which object emits native's pal-0x0C sprites.** It has been
-   assumed to be this beam object; that is not measured. The fleet
-   pieces appear at f3216+, AFTER the beam window, so they are not it.
-   A per-object attribution (poke a slot dead, re-dump) settles it in
-   one run.
-2. **`+0x44` differs in sign**: native `ffff8000`, ours `0000a000`
-   (Y velocity, the field the mover integrates into `+0x14`). The rest
-   of the object matches, so this one is worth chasing — a piece that
-   travels the wrong way may run its emission off-screen or terminate
-   early.
+**And it still emits ZERO sprites.** Chased further (14z-69k):
+
+**The beam object is NOT the emitter** — that was an assumption, and it
+is now refuted. Its record chain resolves to sprite codes 0x48xx, not
+the beam codes. Attribution by killing a pool slot does NOT work: the
+object respawns within 3 frames (poke `+0x00` to 0 at f3174 -> the slot
+is clear at f3175 and fully back at f3178), so all four kills leave the
+beam untouched. Attribute by RECORD CHAIN instead.
+
+**The beam art is ported and correct.** The sprite lists are at vs2
+`0x2621D6` / `0x26233A`, inside the `anim` region (src 0x245872, delta
+-0x16CF22): ours' `0x0F5418` is byte-identical, and `0x0F52B4` differs
+only in one correctly relocated pointer (+0xB61C0, the aux0_1 delta).
+They are referenced from anim nodes at `0x24FCFA`-family and
+`0x251CDA`-family — so the beam is drawn by an ANIM SEQUENCE, not by a
+piece the machine spawns.
+
+**All four pool objects now correspond 1:1 to native's, at native's own
+relative record offsets** (beam +0x63C, companion +0x1E4, 0x77 +0x222C).
+CAUTION when reading these dumps: the slot ORDER differs between the
+games and an object's type byte changes frame to frame — compare the
+same object across the same frame, or you will "find" differences that
+are phase (this cost a wrong read in-session).
+
+**THE ONE SUBSTANTIVE DIFFERENCE LEFT: the type-0x75 object's
+sub-state.** Native runs it as `7506`, ours as `7502`, for the whole
+window. Both walk the same anim nodes modulo a ~4-frame phase (ours
+`0x0E43C6` + 0x16CF22 = `0x2512E8`, exactly native's f3178 node), and
+the fighter's own cursor also tracks native modulo phase. So the next
+question is precise: **what selects sub-state 6 vs 2 on that object,
+and does the sub-6 branch reach the `0x251CDA` nodes that carry the
+beam lists?** Start there, not at "emission" in general.
+
+(Also noted, unattributed: the beam object's `+0x44` — Y velocity, which
+the mover integrates into `+0x14` — is `ffff8000` native vs `0000a000`
+ours, while the other 118/128 bytes match.)
 
 Regression state of that scratch build: pairs, ex, grab, air all PASS —
 **including the Dark Force crash that parked `tenant_type_stamp` in
