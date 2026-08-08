@@ -2259,3 +2259,39 @@ discriminator at the granularity of the EFFECT, not the character.
 Corollary for gating: `test_hui_pairs` (Reflect Wall + Dark Force)
 is the gate that catches this class — run it on any change that
 routes objects, not just the gates for the move you are fixing.
+
+## The data_in_code detector misses the POST-INCREMENT reader shape;
+## and RAW placement does not fix an embedded data table (14z-68)
+
+Two related traps, paid together on vs2's row-8 machine:
+1. `tools/census_regions.py` matches data_in_code only as
+   `lea (d16,pc),An` + a read of the form `(An,Xn.w)`. vs2's fleet
+   param stream is read as `lea $6D868(pc),a3` + `move.w (a3)+` — a
+   POST-INCREMENT walk — so the census reports the region clean while
+   it carries a live embedded table. The generator's relocator has
+   the same blind spot (its only supported reader is
+   `lea (d16,pc),a1 + move.b (a1,d0.w),d0`). Add the shape to BOTH,
+   with a frozen case in tests/test_census_regions.sh.
+2. Moving the region to RAW space does NOT solve an embedded data
+   table. Raw storage holds ONE byte image, and for a code region
+   that image is the OPCODE view (so it executes) — so runtime DATA
+   reads through it still see the wrong bytes. Inside the encrypted
+   range the two views differ completely (measured at vs2 0x6D868:
+   opcode `b8020919f5c7…` vs data `0001005800000000…`). Only
+   relocating the table as data fixes it.
+
+## A ported region whose consumers index NEGATIVELY needs headroom
+## below its base — never allocate it at the start of wide_ext (14z-68)
+
+vs2's companion machine indexes its record table with signed offsets
+that go BELOW the base pointer (measured d0 = 0xFFF3 = -13; on vs2
+the base 0x2B7EF4 simply has ROM underneath). Our copy was allocated
+at 0x400010 — the very first address of wide_ext — so a negative
+index reached 0x400003, inside the RESERVED CpsFrg register window
+(`$400000-$40000F`, which HANDOFF says never to allocate near, and
+which the two emulators read DIFFERENTLY). Check a region's
+consumers for signed indexing before placing it at the bottom of a
+space, and leave headroom when they index negatively. (Fixing the
+headroom alone is not sufficient if the index itself is wrong — a
+vec3 on an ODD address is an address error, which is a much louder
+signal than "wrong data" and should be read as such.)

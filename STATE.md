@@ -293,6 +293,59 @@ Gates on ede6bf15 (the parked end state): boot masked-v2 EXACT, ex,
 grab, air, pairs, walk, fx_flow PASS; 2P legacy BIT-IDENTICAL to
 hui9; m3a-reproducible bit-exact.
 
+### 14z-68e: the DF crash chain DECODED to three stacked layers
+### (all named); nothing further shipped — the mechanism stays parked
+
+Chased blocker 1 (narrow the stamp) and found it is not a stamp
+problem at all. The discriminator hunt came up empty and then the
+crash decoded into a stack of three separate defects, each real:
+
+- **D1 is NOT a discriminator.** The spawn selector is 0x0C for the
+  ray AND for the DF case (probed on both replays), and at the spawn
+  frame the attacker/victim state bytes are IDENTICAL. Replay 82
+  activates DF FIRST and then fires the ray, so the crashing object
+  IS the ray object — being processed while DF is active. There is
+  no per-effect discriminator at that site to find.
+- **Layer 1 — the reserved register window.** The crash read is
+  `move.w (a2,d0.w),d0` at vs2 0x6D264 with d0 NEGATIVE: vs2
+  legitimately indexes BELOW its record base (base 0x2B7EF4 has ROM
+  underneath). Our base was allocated at 0x400010, the very START of
+  wide_ext, so a negative index lands in the RESERVED CpsFrg window
+  0x400000-0x40000F (HANDOFF: "never allocate there"). **Any region
+  whose consumers index negatively needs headroom below it** —
+  moving wide_ext's start to 0x400400 moved the fault address
+  accordingly, proving the mechanism.
+- **Layer 2 — vec3 is an ADDRESS ERROR, so the index is wrong too.**
+  With headroom the read was still odd (0x4003F3), and native's
+  equivalent (0x2B7EE7) would fault identically — so d0 = 0xFFF3 is
+  simply not what native reads.
+- **Layer 3 — THE PARAM STREAM IS AN EMBEDDED DATA TABLE (the
+  data_in_code class, fifth bite).** a3 is set by `lea $6D868(pc),a3`
+  and read with `move.w (a3)+` — a DATA read of a table inside a CODE
+  region. The two views differ completely at 0x6D868 (opcode
+  `b8020919f5c7...` vs data `000100580000...`), and the data view is
+  the correct one: at 0x6D878 it yields **0x0064** (even, positive,
+  sane) where the opcode view yields garbage. Placing the region in
+  RAW space does NOT fix this — raw storage holds ONE byte image
+  (the opcode view, so it executes), so data reads still see the
+  wrong bytes.
+  **NEW, and it explains why nothing caught this: the census's
+  data_in_code detector only matches `lea (d16,pc),An + read
+  (An,Xn.w)` — it does NOT match the POST-INCREMENT reader shape
+  `move.w (An)+` used here.** Neither does the generator's
+  data_in_code relocator, whose only supported reader is
+  `lea (d16,pc),a1 + move.b (a1,d0.w),d0`.
+
+So the port of vs2's row-8 machine needs its embedded param stream
+relocated as DATA with a new reader shape supported — that is the
+next concrete task, ahead of any further stamp work. Both the census
+tool and the generator need the post-increment shape added, and
+`tests/test_census_regions.sh` should gain it as a frozen case.
+
+NOTHING FURTHER SHIPPED this round: the manifest is back to the
+14z-68d parked state (verified: no live `obj_hook_extra` row, no live
+`tenant_type_stamp`), which is the all-green build ede6bf15.
+
 ### What SHIPS from 14z-68
 
 One functional change ships: the **region-boundary fix** above
