@@ -2295,3 +2295,30 @@ space, and leave headroom when they index negatively. (Fixing the
 headroom alone is not sufficient if the index itself is wrong — a
 vec3 on an ODD address is an address error, which is a much louder
 signal than "wrong data" and should be read as such.)
+
+## Re-deriving what a previous tenant already solved (14z-68m)
+
+Huitzil's win screen was analysed from scratch and got two of three
+pieces wrong — the palette landed on DONOVAN's row (shipped, and the
+maintainer caught it in a side-by-side) and the portrait's left shift
+was not even noticed until they pointed at it. Donovan's complete
+solution — position table, palette formula, verified addresses — had
+been in STATE.md since 14z-45.
+
+The failure was not missing documentation; it was documentation that
+could not be reached from the task. Session logs record what happened;
+they are not where you look when starting work. Two habits:
+1. Before porting a per-character subsystem for tenant B, read the
+   `docs/engine_internals.md` section for it and DIFF tenant A's
+   manifest rows against what you are about to write. If there is no
+   section, write one as part of the work.
+2. When a maintainer says "this looks like the thing we fixed for
+   <other tenant>", treat it as a high-confidence pointer to existing
+   analysis, not as a hypothesis to test independently — go read that
+   fix first. It was right both times it was said.
+Corollary on verification: "matches vs2" is only as good as the ROW
+you compared against. The palette RAM matched vs2 exactly and all 134
+portrait tiles matched vs2 exactly while the screen was still wrong,
+because the comparison target itself was the wrong character's row.
+Prefer a check that is self-labelling (the 5*row palette marker) over
+a check that only proves internal consistency.

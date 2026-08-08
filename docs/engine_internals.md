@@ -728,3 +728,83 @@ map1[2*(+0x5A) + d0]; vs2's map1 exceeds vsavj's by five entries
 off-screen launches yv 16.0/20.0). Ported via the throw_arc_tables
 superset-table thunk (statically proven identical for all shared
 indexes).
+
+## The WIN SCREEN subsystem (measured on Donovan 14z-45, re-measured
+## and corrected on Huitzil 14z-68m)
+
+**Read this before touching any tenant's win screen.** Donovan's win
+screen was fully solved in 14z-45; Huitzil's was then re-derived from
+scratch in 14z-68 and got TWO of three pieces wrong, because the prior
+analysis lived only in a session log. Everything a tenant needs is
+below, with both characters as worked instances.
+
+The victory screen draws from THREE independent per-winner tables, all
+indexed by the winner's char id from `+0x382(a4)`, all UNMASKED (so a
+variant id 0x10-0x1F reads its own row — which in vanilla vsavj is a
+plain ALIAS of the base row, hence "the tenant gets the host's X"):
+
+### 1. Portrait POSITION — table `0x5F200`, 4 bytes/char (x at +0, y at +2)
+Read at vsavj `0x5F1A0/0x5F1A6` (`move.w 0x5F200(pc,d0.w),$10(a6)`
+with `d0 = id<<2`). vs2's twin table is `0x6B210`.
+**This table is pc-relative PROGRAM space, so its rows are CODE words**
+— patch with `[[code_word]]`, never `data_port` (the 14z-43 gotcha).
+The manifest mechanism is slot-following: `slot_table`, `slot_stride=4`,
+`slot_off` 0 or 2, `slot_mirror`.
+| tenant | vsavj row (alias) | vs2 row (correct) | symptom if unfixed |
+|---|---|---|---|
+| Donovan 0x0F->0x13 | (0x0070,0x0080) | (0x00F0,0x0098) | portrait offset |
+| Huitzil 0x10 | (0x0080,0x0098) | (0x00C0,0x0080) | 64px too far LEFT, 24px too low |
+
+### 2. PALETTE — pool + a per-char REMAP TABLE
+Base loaded at vsavj `0x5F1B6` (`movea.l #$3AD700,a0`), then
+`offset = (colour*17 + id) * 0xA0`, 5 rows of 0x20 uploaded to palette
+RAM rows **0x15-0x19** by the uploader `0x1C3A4` (d7=4).
+vs2's twin drawer is **`0x6B29C`** (pool **`0x3C2BBC`**) and differs in
+two ways: an 18-row stride, and it remaps the id through a BYTE TABLE
+at **`0x6B2F2`** first — `offset = (colour*18 + table[id]) * 0xA0`.
+- **THE VIEW RULE (this is what I got wrong):** that byte table reads
+  through the **OPCODE view**. Its DATA view decodes to plausible
+  garbage. Do not reason about which view from the addressing mode —
+  **verify against a known-good row**: Donovan's frozen `vs2_src`
+  0x3C365C == pool + 0x11*0xA0, and opcode-view `table[0x13] = 0x11`.
+  That single check settles the view for every tenant.
+- **THE MARKER SELF-CHECK (use it every time):** the LAST WORD of each
+  0x20-byte palette row is a marker equal to **5*row**. Huitzil's rows
+  carry 0x37-0x3B (5*0x0B); Donovan's carry 0x55-0x59 (5*0x11). If the
+  block you are about to declare does not carry the marker for the row
+  you think you picked, you have the wrong block. In 14z-68 I shipped
+  a block whose markers said "Donovan" — it was labelled all along.
+| tenant | opcode `table[id]` | vs2_src = pool + row*0xA0 | colour stride |
+|---|---|---|---|
+| Donovan 0x13 | 0x11 | 0x3C365C | 0xB40 (18*0xA0) |
+| Huitzil 0x10 | 0x0B | 0x3C329C | 0xB40 |
+Mechanism: `[[win_pal_variant]]` — the SPARSE BLOCK design (a wide_ext
+block laid out with the VANILLA 0xAA0 stride carrying only the tenant's
+8 sets, plus a thunk that rebases `a0 = block - id*0xA0` when
+`d6 == tenant`, so the vanilla arithmetic lands on the tenant's set).
+
+### 3. Win QUOTE — the same big record table, with a `-4` BIAS
+Fetch helper vsavj `0x5F328`: `movea.l #$2672AA,a0; andi.w #$ff,d0;
+lsl.w #2,d0; lea -4(a0,d0.w),a0`. The caller sets `d0 = 0x60 + id`
+(P1) or `0x80 + id` (P2).
+**Because of the `-4`, the entry actually read is index `0x60+id-1`**,
+i.e. array base `0x2672AA + 4*0x5F = 0x267426` (P1) and
+`0x2674A6` (P2) indexed by id. Repointing the naive `0x60+id` row
+changes nothing and looks like "the record is right but the text is
+wrong" (14z-68m). vs2's twin table is `0x2A05E2` (bases `0x2A075E` /
+`0x2A07DE`); Huitzil's records are `0x2A5F36` (P1) / `0x2A6346` (P2).
+NOTE the same table serves the SELECT portrait at base `0x26742A`
+indexed by id WITHOUT the bias — the arrays OVERLAP (`0x26742A` row
+0x10 IS `0x2672AA` row 0x70), which is exactly what makes it easy to
+repoint the wrong entry.
+
+### Per-tenant win-screen checklist
+1. `[[code_word]]` x2 — position x/y (slot-following, CODE rows).
+2. `[[win_pal_variant]]` — palette; pick the row from the OPCODE view
+   of `0x6B2F2` and CONFIRM with the 5*row marker.
+3. Quote records at the `-4`-biased bases `0x267426` / `0x2674A6`.
+4. Snapshot the actual screen and compare against a native capture —
+   the RAM and ROM can both check out while the screen is wrong
+   (14z-68: palette RAM matched vs2 and all 134 tiles matched vs2,
+   and the screen was still Donovan-coloured, because "matches vs2"
+   was matching the WRONG vs2 row).

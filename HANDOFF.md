@@ -207,6 +207,25 @@ pointer aimed at the CPS2 register window, re-creating the music bug while
 looking fine. See GOTCHAS.
 
 
+## PRIOR ART FIRST — check the subsystem doc before re-deriving (14z-68m)
+
+Huitzil's win screen was re-derived from scratch and got two of three
+pieces wrong; Donovan's identical solution had been sitting in
+STATE.md since 14z-45. The analysis existed, it just was not
+DISCOVERABLE from "I am working on tenant X's screen Y".
+
+**Before porting any per-character screen or subsystem for a new
+tenant, read the matching section of `docs/engine_internals.md`** —
+it now carries the worked instances for BOTH tenants (win screen,
+select family, HUD, effect system, palettes). If the subsystem has no
+section there, write one as you go: a session-log entry is a record of
+what happened, not a document anyone will find later.
+
+Cheap rule that would have caught it: when a symptom on tenant B
+resembles one already fixed on tenant A, `grep -n "<subsystem>"
+docs/engine_internals.md docs/patch_index.md` and diff A's manifest
+rows against B's BEFORE measuring anything.
+
 ## Repo path changed (2026-08-05): `Vampire Saved` -> `Vampire_Saved`
 
 The project root is now `/Users/koneko/Developer/Vampire_Saved/VampireSaved`
