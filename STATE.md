@@ -394,6 +394,47 @@ open and NOTHING has been changed for it.
 The `shadow_seq_guard` thunk itself is untouched and stays — it is
 the FG-crash fix (14z-66, replay 77) and is unrelated to this item.
 
+### 14z-68g: THE CHILD-COMPANION SHADOW MEASURED AND ATTRIBUTED —
+### it is the KNOWN "bank word 0" piece family, now quantified
+
+Maintainer clarified the symptom: it is the shadow of **the human
+child companion**, rectangular **all the time**. That made the repro
+trivial (he is on screen through replay 82) and the measurement
+decisive — OBJ dumps, native vs ours, same frame:
+
+- **The shadow's CORE tiles are CORRECT.** At y=0xC8 both games draw
+  codes 0F8B / 0F8C / 0F8B (pal 0x16). Nothing wrong there.
+- **The band around it is GARBAGE, and exactly so.** At y=0xD0 every
+  pal-0x16 piece on our build carries **code = native - 0x16A8** and
+  **bank word 0 instead of bank 3** — measured over TWELVE pieces
+  with no exceptions (0F96->F8EE, 0FB7->F90F, 0FA4->F8FC,
+  0FA2->F8FA, 0FA3->F8FB), spanning both the band under the child
+  (x 0x2F-0x7F) and a second group at x 0x157-0x1B7.
+- **This is the already-documented 14z-67 symptom**, now with a
+  number on it: "ours spawns F8FC/F90A/F15x-family pieces WITH BANK
+  WORD 0 (y=00d0) that native NEVER stages — pieces created through
+  a path that leaves +0x18 unset/zeroed". Same family, same bank-0
+  signature; the uniform **-0x16A8 code delta** is new information
+  and should identify the wrong base/record the pieces read.
+- Also measured: the child's own body sprites differ completely
+  (native pal-0x0D codes 17A5/17A7/17A9/17AA/0B3F/1781 vs ours
+  252A/252C/252D, zero overlap) — worth a look, though the maintainer
+  reports the child itself as acceptable, so treat the shadow band as
+  the reported defect and the body as a separate question.
+
+**So ping-#7 item 2 is NOT a shadow-table problem at all** (see
+14z-68f: vs2's tables are the same size, and the servant path takes
+0 hits). It is the bank-0 piece family. That also means it likely
+shares a root with the effect-family work — the same "pieces created
+through a path that leaves +0x18 unset" class — so the two items may
+close together rather than separately.
+
+NEXT (concrete): find what stages the pal-0x16 band pieces, and why
+their tile word comes out -0x16A8 with bank 0. The delta is the lead:
+0x16A8 is a fixed code-space shift, so the pieces are reading their
+tile words relative to the wrong base. Nothing changed for this item
+yet.
+
 ### What SHIPS from 14z-68
 
 One functional change ships: the **region-boundary fix** above

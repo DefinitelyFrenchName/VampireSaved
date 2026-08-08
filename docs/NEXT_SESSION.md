@@ -20,22 +20,36 @@ ede6bf15 is all-green.
 
 ## THE QUICK WINS (do these first)
 
-### 1. Sidekick shadow — BLOCKED ON MAINTAINER INPUT (14z-68f)
-**Do not chase the 14z-66 explanation: it was measured WRONG.**
-vs2's shadow tables are NOT larger (vs2 installer 0x90B0C, tables
-0x1E42D2/0x1E46E0, exactly 0x40E apart = the SAME row space as vj's
-0x2083BC/0x2087CA; the walk sites are structurally identical; the
-only content difference is a uniform +2, i.e. ONE extra index entry).
-And on our build over replay 82 — where his summon pieces are live —
-the shadow path is not reached AT ALL: 0 probe hits at the installer
-0x823E2 and 0 at the walk 0x8245C. So ping-#7 item 2 was attributed
-to `shadow_seq_guard` by inference from the FG-crash work, not by
-measurement of the symptom.
-**ASK THE MAINTAINER:** which move/situation shows the rectangular
-shadow, and is it the pod companion or another servant? With a repro
-replay, a probe on whatever installs that shadow names the real
-mechanism quickly. `shadow_seq_guard` itself stays — it is the
-FG-crash fix (replay 77) and is unrelated to this item.
+### 1. Child-companion shadow — MEASURED AND ATTRIBUTED (14z-68g)
+Maintainer clarified: it is **the human child companion's** shadow,
+rectangular **all the time** — so replay 82 is a valid repro (he is
+on screen throughout).
+
+**It is NOT a shadow-table problem.** vs2's tables are the same size
+as vsavj's and the class-0x0C servant path takes 0 probe hits
+(14z-68f). Do not re-open that.
+
+**It IS the known bank-0 piece family, now quantified.** OBJ dump,
+native vs ours, same frame:
+- the shadow's CORE tiles are CORRECT (y=0xC8, codes 0F8B/0F8C/0F8B,
+  pal 0x16 — identical on both);
+- every pal-0x16 piece in the band at y=0xD0 carries **code =
+  native - 0x16A8** and **bank word 0 instead of bank 3** — twelve
+  pieces, no exceptions (0F96->F8EE, 0FB7->F90F, 0FA4->F8FC,
+  0FA2->F8FA, 0FA3->F8FB), under the child (x 0x2F-0x7F) and again
+  at x 0x157-0x1B7.
+This is the 14z-67 symptom "F8FC/F90A/F15x-family pieces with BANK
+WORD 0 that native never stages — created through a path that leaves
++0x18 unset", so it may share a root with the effect arc and the two
+could close together.
+
+**NEXT:** find what stages those band pieces and why their tile word
+is -0x16A8 with bank 0. The uniform delta is the lead — a fixed
+code-space shift means they read tile words against the wrong base.
+(Separate, lower priority: the child's BODY sprites also differ
+completely — native pal-0x0D 17A5/17A7/17A9/17AA/0B3F/1781 vs ours
+252A/252C/252D, zero overlap — but the maintainer reports the child
+itself as acceptable, so treat it as a distinct question.)
 
 ### 2. Win-screen palette (ping #7 item 5)
 TWO defects, both measured (14z-67): (a) the palette source
