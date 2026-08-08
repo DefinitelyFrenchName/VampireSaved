@@ -1623,6 +1623,63 @@ repair with no observable effect — worth keeping for the same reason the
 x06cac0 one was, but it buys no visible change and should not be
 described as fixing anything a player can see.
 
+### 14z-70g: the BEAM — the object is never CREATED, and the creator is
+### a vs2-only effect handler that was never ported
+
+Anchor method, one link at a time, both legs, replay 83b (maintainer-
+confirmed rig: 236LP, 2P distance; LP/MP/HP look identical, 236+2P is the
+girthier ES beam, 236+K is the low beam).
+
+The pool is documented already — `docs/project/tables/reconciliation.md`
+`$FFD400/0x80/cat14`, and "GEOMETRIES ARE IDENTICAL in both games,
+pool-for-pool", which is what makes the address comparable across legs:
+
+| | native | ours |
+|---|---|---|
+| beam sprite-list reads | 2 (f3165/3167, `PC:0x019E0E`, `A6=$FFD400`) | 0 |
+| anim-pointer writes f3160-3210 | 26 (`PC:0x01378A`) | **0** |
+| pool-slot HEADER writes f3150-3210 | 30 (`PC:0x0934B4`) | **0** |
+
+**The beam object is never created.** That also explains the symptom
+shape the maintainer confirmed: the FREEZE WORKS (hit logic, elsewhere)
+while the muzzle orb and the beam are both missing — they are one object
+that never exists.
+
+**The creator is vs2-only code.** `PC:0x0934B4` is the state-0 body of an
+effect-object state machine:
+
+```
+09349A clr.b 0x38(A6) / 09349E moveq #0,D0 / 0934A0 move.b 0x03(A6),D0  <- sub-state
+0934A4 move.w (0x06,pc,D0.w),D1 / 0934A8 jmp (0x02,pc,D1.w)             <- state table 0934AC
+0934B0 clr.b 0x01(A6) / 0934B4 move.b 0x382(A4),D0 ; cmp.b 0x0A(A6),D0  <- the id gate
+```
+
+Counting that id-gate signature across the images:
+
+```
+vs2 (native)   : 4 sites  0x8FAD2 0x91562 0x934B4 0x937BA
+vsavj pristine : 2 sites  0x813A8 0x82CD0
+our build      : 2 sites  (unchanged)
+```
+vs2 added two of these machines for the newcomer effects, and **0x0934B4
+is outside EVERY ported root** (the nearest, `0x0905AE+0x300`, ends at
+0x0908AE). All four sites sit ~0xC after a state-dispatch `jmp`, i.e.
+each is the state-0 body of its own machine; none is reached by an
+absolute pointer, so entry is a computed dispatch.
+
+**This is a sibling of the 14z-67 effect-zone clone, not a duplicate of
+it.** That work cloned the OTHER machine (`x06cac0`, the row-8 /
+sustained-beam family) and ported the effect byte-map rows so ids
+0x4E-0x53 stop collapsing to index 0. This machine at `0x093xxx` was
+never in scope.
+
+**Fix shape (NOT yet executed, and it is a design decision):** port the
+vs2-only handler as a new root and route the tenant's effect objects into
+it via the owner-gated `site_thunk` pattern the other machines already
+use. Open first: which TWO of the four vs2 sites are the newcomer ones
+(pair them against vsavj's two through the R1 map — raw addresses do not
+transfer), and each machine's extent.
+
 ### THE ANCHOR METHOD — how to attribute any "this effect does not draw"
 ### (14z-70, maintainer-endorsed; use this FIRST)
 
