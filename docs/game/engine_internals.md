@@ -1507,12 +1507,72 @@ and flip the ported piece spawners' bank setters `#$2000 -> #$3000`.
 This explosion is NOT going through that path — it draws bank 0 with
 non-native codes, i.e. neither half applies to it.
 
-**The open question, sharpened:** which region's records/spawner emits
-these pieces? It is not `x2b7ef4`'s c5 path and not effect_tail. Find
-that, then either route it through `c5_mode` or give it the same
-treatment (tiles into group C + bank setter). Also unchased: `pal 10`
-and `pal 11` bank-0 sprites sit in the same screen region and may belong
-to the same effect.
+### 14z-70c: ROOT FOUND — `x088512` is 0x50 bytes too SHORT, so the
+### effect machine reads the ANIM region as its parameter tables
+
+Chased the emitter down the chain, and it lands on the defect class this
+project has now paid for three times.
+
+**The chain, measured on the 83c rig.** The vanilla sprite emitter at
+`PRG:0x01B2BC` (`move.w (A0)+,D2` / `(A0)+,D3`, with `or.w 0x18(A6),D1`
+folding in the bank word — this is also the authoritative proof that
+`+0x18` IS the bank field) draws the pieces for the object at
+`RAM:$FFB980`, reading its list from **`0x288C78` — a VSAVJ address**.
+The list start `0x288C6E` is fetched at `PRG:0x01AFAE` from the vsavj
+table at `0x283C10`.
+
+**Everything ported is correct — that is what makes this diagnosable.**
+- the object's `+0x1C` is written on BOTH legs at the same frames from
+  exact twins: ours `PC:0x0D7A6E` / `A0=0x40223C`, native `PC:0x08B170`
+  / `A0=0x2BA120`, mapping through the `x088512 -> 0x0D4E10` and
+  `x2b7ef4 -> 0x400010` deltas;
+- that selection table is byte-perfect (16/16 entries relocated);
+- the placed `x2b7ef4` is 2054/2060 intra-region pointers correctly
+  relocated (the 6 exceptions are word-misaligned false positives);
+- the ported list IS present and IS referenced correctly — ours
+  `0x400760`/`0x400848 -> 0x40557A` mirrors native `0x2B8644`/`0x2B872C
+  -> 0x2BD45E`.
+
+Native, meanwhile, NEVER reads `0x2B8644` in the window (its only
+watch hit is the frame-1 arming artefact). So ours is not "using the
+host's table where native uses the ported one" — ours is arriving at a
+host address that native never visits at all.
+
+**Why: three pc-relative tables resolve past the end of their region.**
+`tools/verify_pcrel_data.py build/hui14` reports **72 checked, 72
+BROKEN**, and three of them are the effect machine's own:
+
+```
+x088512 src 088512-08c052   placed 0d4e10-0d8950   (len 0x3B40)
+  lea 08c014 -> table 08c08a   past the region end by 0x38
+  lea 08c026 -> table 08c09a   past the region end by 0x48
+  lea 08c038 -> table 08c0a2   past the region end by 0x50
+```
+The `lea`s are INSIDE the region; their targets are not. The
+displacement is copied verbatim, so each resolves to `target + delta` =
+`0x0D8988` / `0x0D8998` / `0x0D89A0` — which is **inside the anim region
+placed at `0x0D8950`**. The machine reads animation bytes as its
+parameter tables, and a garbage parameter is exactly how an object ends
+up pointed at an unrelated vsavj sprite list.
+
+**This is the x06cac0 defect again** (14z-69h/i/j): a region extracted
+shorter than the tables its own code references, because `fixed_len` is
+a CAP and `oracle_extend` stops where the sibling stops agreeing. The
+fix mechanism already exists and is proven — root spec `:f<off>` force-
+length with the forced tail EMITTED RAW (CPS-2 decrypts opcode fetches
+only, so a data read returns stored bytes), landed for x06cac0 in
+14z-69j and green there.
+
+**Recipe, not yet executed.** Force `x088512` long enough to contain the
+furthest table (starts at +0x3B90 against a declared 0x3B40, so the
+length must cover 0x3B90 + that table's extent) and split code/data at
+the FIRST table, `0x08C08A`. Per 14z-69h the split must be checked by
+disassembly rather than assumed, and landing `:f` ALONE changes shipped
+bytes — it must arrive with the raw-emit. Then rebuild and re-run the H
+gates plus the legacy masked-v2 basis.
+
+Also still unchased: `pal 10` and `pal 11` bank-0 sprites sit in the
+same screen region and may belong to the same effect.
 
 ## The beam / effect family — state after 14z-69j (three of four pieces
 ## are native-equivalent; EMISSION is the open one)
