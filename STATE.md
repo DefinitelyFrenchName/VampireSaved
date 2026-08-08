@@ -13,6 +13,57 @@ replay 85, tests/test_hui_df_style.sh + tools/check_df_style.py with
 three verdict controls, and a corrected test_hui_pairs.sh which had been
 asserting the downgrade path under the name "Dark Force".)
 
+## Session 14z-69o — THE CHILD SIDEKICK'S SHADOW FIXED, and PING #11
+## PLAYTEST CONFIRMED (build/hui13, 31d576be)
+
+**The 14z-68g diagnosis was backwards.** It had measured that our shadow
+BAND carries `code = native - 0x16A8` with bank 0 and concluded the band
+was the defect and the core was fine. Comparing the ART at those
+addresses inverts it:
+  core: native 0x30F8B bank 3 -> ours 0x40F8B group C = **ALL ZEROS**
+  band: native 0x30F96 bank 3 -> ours 0x0F8EE bank 0  = byte-identical
+The band is correct — shared system tiles the stock set holds at
+native - 0x216A8, drawn by the vanilla engine path. A uniform delta
+means a consistent MAPPING, not corruption; check the art before calling
+it wrong.
+
+The core is the defect: the tenant gfx remap rewrites codes in
+[0xAF6, 0x4EFC] from bank 3 to bank 4, and 0x0F8B/0x0F8C fall inside it,
+so the BANK was rewritten while the TILES were never copied into group C
+(obj_records.py's pointer walk never reaches the records that reference
+them — the offset-computed-records trap). Bank rewritten + tile absent =
+a solid rectangle, exactly the reported symptom.
+
+FIX: per-tenant `build/manifest/extra_tiles/<char>.json` merged into the
+copy inventory by build_donovan.sh. Two tiles. Program bytes UNCHANGED —
+hui13 shares hui12's fingerprint, which is itself the evidence that this
+is gfx-only; all four group-C members differ.
+
+Gates: gfx_layout3, hui_boot, m3a_reproducible, pairs, ex, grab, air,
+walk, winscreen, wide_render_content — all PASS.
+
+### PING #11 playtest — MAINTAINER CONFIRMED
+
+- **shadow CORRECT on the real screen.** That also validates the finding
+  METHOD: decode every group-C sprite a build draws and flag any that
+  resolve to an all-zero tile. It found this defect completely (2 hits,
+  nothing else). **Run it for Pyron's gfx rung.**
+- **DF palette still wrong** — expected, untouched. Parked at a known
+  point (seq ids 0x1E-0x21; vsavj's rows purple where vs2's are gold;
+  trigger arrives via the channel machine's program-byte dispatch, so
+  the fix is script data and needs that opcode table decoded).
+- **beam + electricity still absent** — expected, same family, now
+  narrowed to EMISSION (object created, ported machine, record at
+  native's own relative offset, tables byte-identical, 118/128 bytes
+  matching native).
+
+All three match the measured state; no new defects reported.
+
+LAUNCHER NOTE: the maintainer was playtesting hui11 because
+run_hui_behavior.sh still defaulted there. Repointed to hui13. When a
+build is promoted, repoint the launcher in the SAME commit.
+
+
 ## Session 14z-69j — THE TABLE FIX SHIPPED (build/hui12); the DF crash
 ## is gone; the beam still does not draw
 
