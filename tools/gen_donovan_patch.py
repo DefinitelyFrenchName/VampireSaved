@@ -313,6 +313,7 @@ def main():
 
     gap_free = []  # (start, end) inside already-claimed group spans
     pcrel_far_tramps = {}  # resolved target -> near jmp trampoline (14z-65)
+    dc_tables = {}         # (table src, len) -> placed DATA copy (14z-69)
 
     def alloc(hole, size, what, fallback=True):
         """Place `size` bytes, returning the destination address.
@@ -1039,21 +1040,39 @@ def main():
                 rd_src = _int(dc["reader"])
                 rd_off = rd_src - r["src"]
                 dold = bytes.fromhex(dc["reader_old_hex"])
-                _lw = int.from_bytes(dold[0:2], "big") if len(dold) == 8 else 0
+                shape = dc.get("shape", "indexed")
+                _lw = int.from_bytes(dold[0:2], "big") if len(dold) >= 2 else 0
                 _rw = int.from_bytes(dold[4:6], "big") if len(dold) == 8 else 0
                 _an = (_lw >> 9) & 7
-                # shape: lea (d16,pc),An then a read whose EA is (An,Xn.w)
-                # (mode 6, reg An) — the read op + its brief extension word
-                # are copied verbatim into the helper, so any size/index
-                # register works as long as it consumes the lea'd An.
-                if (len(dold) != 8 or (_lw & 0xF1FF) != 0x41FA
+                # shape "indexed": lea (d16,pc),An then a read whose EA is
+                # (An,Xn.w) (mode 6, reg An) — the read op + its brief
+                # extension word are copied verbatim into the helper, so any
+                # size/index register works as long as it consumes the lea'd
+                # An.
+                # shape "postinc" (14z-69): the reader is a `move (An)+`
+                # walk that may sit ARBITRARILY FAR from the lea, in another
+                # basic block (measured: 0x3E bytes away inside a bsr
+                # subroutine), so the 8-byte jsr+nop rewrite cannot reach
+                # it. Only the POINTER needs redirecting: the 4-byte lea
+                # becomes `bsr.w helper` and the helper reloads An with the
+                # relocated table address. Same ghost-clean argument — lea
+                # sets no flags, bsr/rts set none either.
+                if shape in ("pointer", "postinc", "indexed-far"):
+                    shape = "pointer"
+                    if len(dold) != 4 or (_lw & 0xF1FF) != 0x41FA:
+                        fail.append(f"data_in_code {dc['note']}: pointer "
+                                    f"reader_old_hex must be the 4-byte "
+                                    f"lea(d16,pc),An alone")
+                        continue
+                elif (len(dold) != 8 or (_lw & 0xF1FF) != 0x41FA
                         or (_rw & 0x0038) != 0x0030 or (_rw & 7) != _an
                         or (_rw >> 12) not in (1, 2, 3)):
                     fail.append(f"data_in_code {dc['note']}: reader_old_hex "
                                 f"must be lea(d16,pc),An + a move read via "
                                 f"(An,Xn.w)")
                     continue
-                if not (0 <= rd_off < r["len"]) or blob[rd_off:rd_off + 8] != dold:
+                _n = len(dold)
+                if not (0 <= rd_off < r["len"]) or blob[rd_off:rd_off + _n] != dold:
                     fail.append(f"data_in_code {dc['note']}: bytes at "
                                 f"{name}+{rd_off:#x} != reader_old_hex")
                     continue
@@ -1064,12 +1083,63 @@ def main():
                     continue
                 tbl_bytes = src_data_img[t_src:t_src + t_len]
                 dc_hole = dc.get("hole", "b")
-                ta = alloc(dc_hole, t_len, f"data_in_code table")
-                ha = alloc(dc_hole, 12, f"data_in_code helper")
-                if ta is None or ha is None:
+                # one DATA copy per (table, len): the same stream is read
+                # from several sites (x06cac0 reads 0x6D91C from three).
+                ta = dc_tables.get((t_src, t_len))
+                if ta is None:
+                    ta = alloc(dc_hole, t_len, f"data_in_code table")
+                    if ta is None:
+                        continue
+                    dc_tables[(t_src, t_len)] = ta
+                    ops.append({"op": "data", "addr": f"{ta:#x}",
+                                "hex": tbl_bytes.hex()})
+                    fragments.append((ta, t_len, "VS2",
+                                      f"data_in_code table ({dc['note']})"))
+                if shape == "pointer":
+                    # helper: lea.l #table,An ; rts  — reached by a 4-byte
+                    # bsr.w, so it must land within d16 of the SITE. Prefer
+                    # a near gap, exactly like the pcrel far trampolines.
+                    site = placed[name] + rd_off
+                    ha = None
+                    for gi, (gs, ge) in enumerate(gap_free):
+                        if ge - gs >= 8 and abs(gs - site) < 0x7000:
+                            ha = gs
+                            gap_free[gi] = ((gs + 8 + 0xF) & ~0xF, ge)
+                            break
+                    if ha is None:
+                        # the TABLE goes to a raw hole (data reads must see
+                        # it verbatim), but the HELPER is pure code and has
+                        # to be within bsr.w reach of the site — so it comes
+                        # from the CRYPT hole that holds the placed regions
+                        # themselves, not from the row's table hole (which
+                        # defaults to "b" at 0x3EC720+, ~0x32xxxx away).
+                        ha = alloc(dc.get("helper_hole", "a"), 8,
+                                   "data_in_code pointer helper")
+                    if ha is None:
+                        continue
+                    disp = ha - (site + 2)
+                    if not (-0x8000 <= disp < 0x8000):
+                        fail.append(f"data_in_code {dc['note']}: pointer "
+                                    f"helper out of bsr.w reach ({disp:#x})")
+                        continue
+                    helper = ((0x41F9 | (_an << 9)).to_bytes(2, "big")
+                              + ta.to_bytes(4, "big") + bytes.fromhex("4e75"))
+                    ops.append({"op": "code", "addr": f"{ha:#x}",
+                                "hex": helper.hex()})
+                    blob[rd_off:rd_off + 4] = (bytes.fromhex("6100")
+                                               + (disp & 0xFFFF).to_bytes(2, "big"))
+                    fragments.append((ha, 8, "GEN",
+                                      f"data_in_code pointer helper "
+                                      f"({dc['note']})"))
+                    notes.append(f"# {name}+{rd_off:#x}: data_in_code "
+                                 f"[pointer] bsr.w -> helper {ha:#08x}, "
+                                 f"table {ta:#08x} (DATA view of "
+                                 f"{man['src_set']} {t_src:#08x}; "
+                                 f"{dc['note']})")
                     continue
-                ops.append({"op": "data", "addr": f"{ta:#x}",
-                            "hex": tbl_bytes.hex()})
+                ha = alloc(dc_hole, 12, f"data_in_code helper")
+                if ha is None:
+                    continue
                 helper = ((0x41F9 | (_an << 9)).to_bytes(2, "big")
                           + ta.to_bytes(4, "big")
                           + dold[4:8] + bytes.fromhex("4e75"))
@@ -1082,8 +1152,6 @@ def main():
                              f"helper {ha:#08x}, table {ta:#08x} (DATA view "
                              f"of {man['src_set']} {t_src:#08x}; "
                              f"{dc['note']})")
-                fragments.append((ta, t_len, "VS2",
-                                  f"data_in_code table ({dc['note']})"))
                 fragments.append((ha, 12, "GEN",
                                   f"data_in_code helper ({dc['note']})"))
 

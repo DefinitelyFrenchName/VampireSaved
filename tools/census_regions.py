@@ -86,19 +86,28 @@ def _redefines_an(w, an):
     return False
 
 
-def scan_postinc_reader(blob, i, an, dead):
-    """Shape B: find a `move.{b,w,l} (An)+,<ea>` reachable from the lea at
-    `i` without An being redefined first. Returns the offset or None.
+# EA modes that read THROUGH An, i.e. uses of the lea'd table pointer
+_EA_MODES = {0x0018: "postinc", 0x0028: "indexed-far", 0x0030: "indexed-far"}
 
-    Deliberately NOT limited to the next instruction: the ground-truth
-    case reads the stream inside a bsr subroutine 0x3E bytes away.
+
+def scan_deferred_reader(blob, i, an, dead):
+    """Find the first read that uses An as a base AFTER the lea at `i`,
+    without An being redefined first. Returns (offset, shape) or None.
+
+    Deliberately NOT limited to the next instruction. Both measured
+    shapes need this: the post-increment walk sits 0x3E bytes away
+    inside a bsr subroutine, and the two indexed readers at vs2 0x6CD5E
+    / 0x6CFDC sit 2-3 instructions later (`lea; move.b $382(a4),d0;
+    lsl.w #2,d0; move.w (a0,d0.w),d1`). The original "reader immediately
+    follows the lea" rule saw none of them.
     """
     j = i + 4
     while j + 2 <= len(blob):
         w = int.from_bytes(blob[j:j + 2], "big")
-        if (w >> 12) in (1, 2, 3) and (w & 0x0038) == 0x0018 \
-                and (w & 7) == an and not in_dead(j, dead):
-            return j
+        shape = _EA_MODES.get(w & 0x0038)
+        if shape and (w >> 12) in (1, 2, 3) and (w & 7) == an \
+                and not in_dead(j, dead):
+            return j, shape
         if _redefines_an(w, an):        # the pointer is no longer our table
             return None
         j += 2
@@ -128,15 +137,15 @@ def scan_data_in_code(name, blob, src, dead, code_spans):
         if indexed:
             shape, reader_off = "indexed", i
         else:
-            j = scan_postinc_reader(blob, i, an, dead)
-            if j is None:
+            found = scan_deferred_reader(blob, i, an, dead)
+            if found is None:
                 continue
-            shape, reader_off = "postinc", j
+            reader_off, shape = found
         hit = {"reader": src + i, "table": tgt, "table_host": host,
                "reader_old_hex": blob[i:i + 8].hex(), "shape": shape}
-        if shape == "postinc":
-            # the LEA is still the site to rewrite; record where the walk
-            # actually reads so triage can see how far away it is.
+        if shape != "indexed":
+            # the LEA is still the site to rewrite; record where the read
+            # actually happens so triage can see how far away it is.
             hit["walk_reader"] = src + reader_off
             hit["walk_distance"] = reader_off - i
         hits.append(hit)

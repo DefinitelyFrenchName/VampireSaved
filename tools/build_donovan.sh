@@ -117,7 +117,7 @@ case "$TENANT_CHAR" in
         # clone convention), spawners +0x174 (measured, 61-64/64
         # agreement 0x6D240-0x6D73F). Entered via the owner-gated
         # effect_machine site_thunk (huitzil.toml).
-        # NOT YET `:f` — see STATE 14z-69h. x06cac0's own pc-rel param
+        # NOT YET `:f` — see STATE 14z-69h/i. x06cac0's own pc-rel param
         # tables (0x6D768-0x6D96C) fall PAST the sibling-oracle boundary
         # (+0xC00), so today they sit outside the region and all 7
         # pointers resolve into unrelated bytes (tools/verify_pcrel_data.py).

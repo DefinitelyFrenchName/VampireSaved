@@ -1061,3 +1061,15 @@ pad = 0x60
 # jmp_ok = true
 # region_subst = "jjjjjjjj=code:0x20D8"
 # thunk_hex = "0c2e00TT038266064ef9jjjjjjjj4a2e016967064ef9000225064ef90002250a"
+
+# ── 14z-69: x06cac0's OWN pc-relative DATA TABLES — DESIGN SETTLED, NOT
+# YET LANDED (STATE 14z-69i). The seven `lea (d16,pc),An` tables at
+# 0x6D768-0x6D96C need `:f` on the root to sit inside the region (then the
+# pointers resolve correctly — measured), and then the table bytes must be
+# emitted RAW rather than as part of the region's encrypted code op, because
+# CPS-2 decrypts OPCODE fetches only: a data read returns whatever is stored.
+# Emitting them raw needs the region's code op SPLIT around the tables
+# (overlapping ops are a named build error), which is a builder change.
+# The [[data_in_code]] pointer-reroute path exists in the generator and
+# works, but its helper must be within bsr.w of the site and hole_a's free
+# space is ~0x27000 away — so the raw-emit design is the better one.

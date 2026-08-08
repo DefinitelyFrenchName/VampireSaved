@@ -13,6 +13,50 @@ replay 85, tests/test_hui_df_style.sh + tools/check_df_style.py with
 three verdict controls, and a corrected test_hui_pairs.sh which had been
 asserting the downgrade path under the name "Dark Force".)
 
+## Session 14z-69i — the reroute BUILT, and a better design found in
+## the process (raw-emit); nothing shipped, tree rebuilds hui11 exactly
+
+Implemented the postinc reroute designed in 14z-69h, then measured it
+into a corner and out the other side.
+
+**Built and working:**
+- census 1 generalised from "reader immediately follows the lea" to a
+  deferred scan (`scan_deferred_reader`): any read through An — `(An)+`,
+  `(d16,An)`, `(d8,An,Xn)` — before An is redefined. This caught TWO
+  MORE sites the old rule missed for the same reason as the
+  post-increment one: vs2 0x6CD5E and 0x6CFDC read `(a0,d0.w)` three and
+  four instructions after their lea. **Seven tables, not five.**
+- generator `shape = "pointer"` rows: replace the 4-byte
+  `lea (d16,pc),An` with `bsr.w helper`, helper = `lea.l #table,An; rts`,
+  plus per-table dedup (0x6D91C is read from three sites).
+
+**Where it hit a wall:** the helper must be within bsr.w (+/-32K) of the
+site. The table hole "b" is ~0x32xxxx away; the crypt hole "a" holds the
+placed regions but its FREE space is ~0x27000 from the site. 68000 has
+no bsr.l. Remaining options were helpers inside the region's own pad
+(needs coordination with the pcrel_escape_fix pass, which owns it).
+
+**The better design, found while reasoning about it:** CPS-2 decrypts
+OPCODE FETCHES ONLY — a data read returns whatever is stored. The
+tables read wrong purely because the builder encrypts the whole region
+blob as code. With `:f` the pointers ALREADY resolve to the right
+addresses (measured 14z-69h), so nothing needs rerouting: the table
+bytes just have to be EMITTED RAW. That requires splitting the region's
+code op around them (overlapping ops are a named build error), which is
+a builder change — and it fixes all seven at once with no helper, no
+allocation, no reach constraint.
+
+**NOTHING SHIPPED.** `:f` is off, the seven manifest rows are removed
+(replaced by a comment recording the design), and the tree rebuilds the
+reference bit-exactly: fingerprint **5c6dbe43** and a decrypted PRG
+image with **0 differing bytes** against hui11. The tooling additions
+(deferred scan, census 3, verify_pcrel_data.py, `:f`, the pointer-shape
+reroute) are all inert until a manifest asks for them.
+test_census_regions.sh PASS, H inventory and Pyron unchanged.
+
+NEXT: implement raw-emit for dead-zone tables inside a forced region,
+then land `:f` + it together and check whether the beam finally draws.
+
 ## Session 14z-69h — THE PARKED EFFECT FAMILY: full chain, and the
 ## exact remaining step
 
