@@ -244,6 +244,55 @@ pointing at the ported machine. Two things must land with it:
   the remaining work is unchanged (tenant type + the row-8 machine
   port, now with its true entry 0x6CAC0 and extent known).
 
+### 14z-68d: THE DISPATCH/RECORD PATH IS NOW NATIVE-EQUIVALENT
+### (mechanism proven end-to-end) — but PARKED on a DF regression
+
+The union-type plan was implemented and MEASURED. Every structural
+claim it rests on is now confirmed:
+- vs2's row-8 machine (entry 0x6CAC0, len 0xEBC to row 9's target)
+  is ported whole — the root was extended from the 14z-68b
+  0x6d1e0:0x560, which was its MIDDLE, to `0x6cac0:0xebc:t0x6cc34`
+  (vh2 twin +0x174 verified at the new start). Region x06cac0.
+- NEW GENERATOR FACILITY `[[obj_hook_extra]]` (flat table, matched
+  by `site` — dotted names are banned, 14z-62c): authored union rows
+  {index, src} appended after the ported extras, resolved exactly
+  like them (placed region first, then recon, else tripwire), with a
+  no-gap assertion because the engine indexes by type*4.
+- The walker takes its type from **+0x02** (`move.b $2(a6),d0;
+  add.w d0,d0; add.w d0,d0`), so a type >= 114 is unreachable for
+  vanilla objects by construction.
+- `tenant_type_stamp` (site 0x60EE0) stamps type 124 using the
+  measured discriminator (victim +0x32 -> attacker, +0x382 == 0x10).
+- **MEASURED WORKING:** the stamp fires (+0x02 = 0x7C02); the object
+  is then ticked by the PORTED machine with every PC normalising
+  EXACTLY to native's sequence (06cadc/06cae2/06cae8/06caee/06caf4/
+  06cb5a/06cb86/06cb8e/06cb96); its record resolves to placed base
+  + 0x63C = native's own relative offset; and the record AND its
+  sub-records are BYTE-IDENTICAL to vs2's (pointers relocated by
+  exactly the region delta 0x14811C). The dispatch and record path
+  is native-equivalent.
+
+**PARKED ANYWAY, two reasons, both honest:**
+1. **The beam STILL does not draw.** With the whole path proven
+   equivalent, the residual is in how the emitter is reached or a
+   draw flag — not in dispatch, records or art.
+2. **It REGRESSES test_hui_pairs** (Dark Force): vec3 at PC
+   0x0D4696 inside the ported machine, f3220, ADDR 0x4029FF, with
+   A2 = 0x400010 (our record base) and A1 = 0x3FFEEE reading BELOW
+   it — an index underflows the placed region. Cause: the stamp is
+   not selective enough. The victim-spawn site serves EVERY hit of
+   this class from the tenant, not just the ray, and the ported
+   machine mishandles the others. **Narrow the stamp to the ray
+   effect specifically (per-effect, not per-hit) before re-enabling.**
+
+SHIPPED from this round: the region extension to the true machine
+boundary and the `obj_hook_extra` generator facility (inert with no
+manifest row declaring one). Parked: `tenant_type_stamp` +
+the `obj_hook_extra` row, both with the anatomy above.
+Gates on ede6bf15 (the parked end state): boot masked-v2 EXACT, ex,
+grab, air, pairs, walk, fx_flow PASS; 2P legacy BIT-IDENTICAL to
+hui9; m3a-reproducible bit-exact.
+
 ### What SHIPS from 14z-68
 
 One functional change ships: the **region-boundary fix** above

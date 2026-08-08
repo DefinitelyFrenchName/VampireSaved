@@ -144,6 +144,29 @@ vanilla_table = 0x05E556
 vanilla_entries = 114
 src_table = 0x06A51C
 src_entries = 124
+# 14z-68 THE TENANT TYPE for the beam/effect family. Both games'
+# row 8 is the companion machine (vj 0x606AC / vs2 0x6CAC0) and vs2
+# REWROTE its own — so H's victim-spawned effect object, which is
+# type 0x08 on both, took vsavj's machine and vsavj's records
+# (measured: chain 0x283CBC where native has 0x2B8530). Row 8 is
+# SHARED, so it must stay vanilla; instead the tenant's instances
+# get their OWN type 124, whose row points at the PORTED vs2
+# machine (region x06cac0). Inert for legacy by construction:
+# vanilla never writes a type >= 114 (walker reads +0x02, indexes
+# type*4), so no vanilla object can reach this row.
+# PARKED 14z-68d — MECHANISM PROVEN, but it REGRESSES test_hui_pairs
+# (Dark Force: vec3 at PC 0x0D4696 inside the ported machine, f3220,
+# ADDR 0x4029FF; A2 = 0x400010 our record base, A1 = 0x3FFEEE reading
+# BELOW it — an index underflows the placed region). The stamp is not
+# selective enough: the victim-spawn site serves EVERY hit of this
+# class from the tenant, not just the ray, and the ported machine
+# mishandles the others. Narrow the stamp (per-effect, not per-hit)
+# before re-enabling. Un-park TOGETHER with tenant_type_stamp.
+# [[obj_hook_extra]]
+# site = 0x05E542
+# index = 124
+# src = 0x06CAC0
+# note = "vs2 row-8 companion machine (the beam/effect family) as a tenant-only type"
 
 # ── Shadow-seq guard (14z-66, THE second FG crash): the per-player
 # shadow/reflection servants (class-0x0C trio, vanilla spawner 0x489DE+)
@@ -876,6 +899,41 @@ stage = 4
 region = "x022400"
 pad = 0x180
 
+# ── 14z-68 THE TENANT-TYPE STAMP (the companion of the obj_hook.extra
+# row above). The victim-side creator writes the object header
+# `move.l #$1000802,(a4)` — +0x02 = the TYPE the pool walker
+# dispatches on (measured: `move.b $2(a6),d0; add.w d0,d0; add.w
+# d0,d0; movea.l (pc,d0.w),a0`). Stamp type 124 instead of 8 when,
+# and only when, the hit came from the tenant.
+# THE DISCRIMINATOR (measured both games): a6 here is the VICTIM
+# ($FF8800 — probe: D0=0 D1=0x0C RET=$FF02DC, IDENTICAL on vs2 and
+# ours, so nothing in the call distinguishes it), and the victim's
+# +0x32 is the ATTACKER, whose +0x382 is the char id. vs2 uses this
+# exact `cmpi.b #$10,$382` test in-machine — Capcom's own precedent.
+# Owner-id gating CANNOT work here: the object belongs to the victim,
+# a vanilla character.
+# Legacy cost: the compare runs on every hit of this class, but the
+# stamp only changes for the tenant, and no vanilla object can carry
+# type 124. The masked boot gate arbitrates.
+# PARKED 14z-68d — see the obj_hook_extra note above. MEASURED WORKING:
+# the stamp fires (slot +0x02 = 0x7C02, our thunk PC), the object is
+# then ticked by the PORTED machine with every PC normalising EXACTLY
+# to native's sequence (06cadc/06cae2/06cae8/06caee/06caf4/06cb5a/
+# 06cb86/06cb8e/06cb96), and its record resolves to placed base +
+# 0x63C = native's own relative offset, with the record AND its
+# sub-records BYTE-IDENTICAL to vs2's. The dispatch/record path is
+# therefore native-equivalent — but the beam still does not draw, and
+# the over-broad stamp crashes the DF flow. Both remain to solve.
+# [[site_thunk]]
+# stage = 6
+# name = "tenant_type_stamp"
+# only_variant_slot = true
+# site = 0x060EE0
+# old_hex = "28bc01000802"
+# patch = "jmp"
+# jmp_ok = true
+# thunk_hex = "306e00320c2800TT0382660828bc01007c02600628bc010008024ef900060ee6"
+
 # ── 14z-68 THE NEWCOMER-ID MASK WIDENINGS (the ray/beam family; the
 # same superset-table class as the effect byte map and the throw-arc
 # tables). Two engine sites test the character id as a BIT NUMBER
@@ -916,7 +974,7 @@ thunk_hex = "223c04410448142e000a4ef90005e7de"
 
 [[pcrel_escape_fix]]
 stage = 4
-region = "x06d1e0"
+region = "x06cac0"
 pad = 0x60
 
 # ── 14z-67 SEQ-D PER-CHAR DISPATCH — **REFUTED 14z-68, PARKED

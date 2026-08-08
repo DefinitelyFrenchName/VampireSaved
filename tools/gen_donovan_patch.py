@@ -1838,6 +1838,45 @@ def main():
                                 f"{tgt:#x} not ported/placed")
                     newt = 0
             table += newt.to_bytes(4, "big")
+        # AUTHORED union rows (14z-68): types that exist in NEITHER table.
+        # The src table only carries the ids the source game itself used;
+        # a tenant that needs its own type — so a SHARED type's rewritten
+        # machine can be reached without touching the shared row — declares
+        # it here as {index, src}. `src` is a SOURCE-game address resolved
+        # exactly like a ported extra (placed region first, then recon), so
+        # an unported target tripwires instead of silently dispatching into
+        # the host. Indexes must continue the table with no gap: a row that
+        # is not the next index is a build error, because the engine indexes
+        # this table by type*4 and a hole would dispatch to whatever the
+        # allocator left there.
+        for ex in [e for e in port.get("obj_hook_extra", [])
+                   if _int(e["site"]) == site]:
+            idx = _int(ex["index"])
+            cur = len(table) // 4
+            if idx != cur:
+                fail.append(f"obj_hook@{site:#x}: extra row index {idx} is not "
+                            f"the next table index ({cur}) — no gaps allowed")
+                continue
+            tgt = _int(ex["src"])
+            host = region_of(tgt)
+            m = recon.get(tgt)
+            if host and host in placed:
+                newt = tgt + (placed[host] - regions[host]["src"])
+            elif m and (m.get("status") == "verified"
+                        or (args.allow_plausible
+                            and m.get("status") == "plausible")):
+                newt = _int(m["vsavj"])
+            else:
+                newt = tripwire_for(tgt, f"obj_hook@{site:#x} authored type {idx}") \
+                    if args.tripwire_open else None
+                if newt is None:
+                    fail.append(f"obj_hook@{site:#x}: authored type {idx} handler "
+                                f"{tgt:#x} not ported/placed")
+                    newt = 0
+            table += newt.to_bytes(4, "big")
+            notes.append(f"#   obj_hook authored type {idx} -> {newt:#08x} "
+                         f"(from {args.src_set if hasattr(args, 'src_set') else 'src'} "
+                         f"{tgt:#x}; {ex.get('note', '')})")
         tdst = alloc("a", len(table), "obj_hook ext table")
         thunk = None
         if tdst is not None:
