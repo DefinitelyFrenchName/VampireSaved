@@ -1063,6 +1063,25 @@ selection-table item of the same family as the win-screen tables
 above — expect an id-indexed table with variant rows aliasing base
 rows, and expect the same view question (decode both, verify against a
 known-good row).
+
+**Measured 14z-68s (start the next attempt from here, do not redo):**
+- The "afterimages" are NOT extra OBJ entries. Sprite counts before /
+  at / during activation are 160 / 141 / 145 and NO palette family
+  gains sprites — so whatever produces the afterimage look, it is not
+  additional sprites in the list.
+- DF DOES rewrite the fighter's palette: exactly palette RAM rows
+  **0x00-0x03** (P1's sprite rows) differ between a pre-DF and a
+  during-DF sample.
+- **There is no DF-specific palette routine.** Tapping palette RAM
+  shows the SAME writer PCs before and during (`0x08B4E8` family, the
+  per-frame uploader); no PC appears only during DF. So DF changes the
+  palette SOURCE the uploader reads, not the code that reads it.
+- Therefore the per-char DF style is a SOURCE SELECTION, and the hunt
+  is: what feeds the uploader's source pointer, and is it id-indexed?
+  Source before DF measured as `A0 = 0x3A8B92` at `0x08B4E8`.
+- NEXT STEP: capture `A0` at `0x08B4E8` DURING DF and diff it against
+  the pre-DF value. `GUARD_PROBE` alone caps at 401 hits long before
+  the DF frames — use `GUARD_PROBE_COND` or a frame-gated probe.
 Open observations queued from the same replay, unattributed: ~15px X
 drift over the DF walk (speed modifier vs recoil) and a pod anim phase
 difference at the f3250 sample.
