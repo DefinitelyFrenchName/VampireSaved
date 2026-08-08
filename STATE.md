@@ -1,6 +1,76 @@
 # STATE — living progress log
 
-Updated: 2026-08-08 (session 14z-68 CLOSED — THE PHOBOS WIN SCREEN
+Updated: 2026-08-08 (session 14z-69 IN PROGRESS — the DF-style opener.
+THE NATIVE LEG WAS NEVER BLOCKED: the early-window poke reaches Huitzil
+on vsav2 in six seconds, and with the native control in hand the
+symptom DOES NOT REPRODUCE on hui11 — palette frame-exact over 118
+frames, sprite set equal to native, on both emulators, forced-pick and
+hand-pick. Two 14z-68u findings RETRACTED as artefacts of measuring our
+build alone. Delivered: replay 85 (runs unchanged on both games),
+tests/test_hui_df_style.sh + tools/check_df_style.py with three
+verdict-logic controls. OPEN: the maintainer's repro conditions — see
+"what to ask" below.)
+
+## Session 14z-69 (DF style — the measurement, and what it overturned)
+
+### The blocker was a replay, not a rig
+
+14z-68j recorded "the early-window id poke does NOT force him on
+vsav2" and every later session inherited it, reasoning from our side
+alone and recommending a native SAVESTATE. That note came from ONE
+attempt with **replay 61**, whose input timing is authored for OUR
+wheel. The replay-80 flow (`$FF8782 = 0x10` at f1400/1450/1500, across
+commit->load) reaches him natively: on `vsav2`, `+0x382 = 0x10`, seq
+0x0A at the DF frame, seq 0x14 on the air dash. Six seconds a run.
+
+### Delivered
+
+- **`tests/replays/hui/85_hui_df_vs2.rpl`** — the DF-style rig, runs
+  UNCHANGED on native vsav2 and on a variant-id build. BOTH sides
+  poked (P2 = Victor, id 0x03 on both games) so the legs differ only
+  in the GAME; the cursor path would land on different characters.
+  The CONTROL IS INSIDE THE REPLAY: the same air dash before DF
+  (f3160) and twice during it (f3320, f3450), plus the replay-82 walk.
+- **`tests/test_hui_df_style.sh`** + **`tools/check_df_style.py`** —
+  section 1 is the A/B; section 2 runs the checker against three
+  synthetic corruptions (a one-frame recolour, an afterimage, a
+  de-latched DF) and requires each to FAIL. Green on hui11.
+
+### The A/B result (native vsav2 vs hui11)
+
+- Palette row 0x0A (`$90C140`): **byte-identical to native on all 118
+  sampled frames of the DF windows, and constant** across them.
+- The fighter's own pal-0x0A draws: **equal to native's** (codes,
+  sizes, no duplicated code) modulo his bank remap (native `a19=3xxxx`
+  <-> ours `4xxxx`) and a 0-2 frame skew.
+- DF state fields, seq trajectory, effect channels: agree. Native
+  populates `+0x318`-family identically — so the channels never were a
+  discriminator.
+- Same at the RENDER layer (PNG snapshots), same on **FBNeo** (palette
+  and fighter state byte-identical to MAME), same on a HAND-PICKED
+  cell-0x10 match. So: not an emulator difference, not a pick-path
+  difference.
+
+### RETRACTED (14z-68u, both artefacts of no native control)
+
+1. "afterimages ARE extra sprites, 22 -> 24-29 moving, ~72px trailing
+   groups" — **native measures 19-31 with spans to 149px** over the
+   same window. Walk animation plus pods.
+2. "the palette ALTERNATES per frame (gold/purple)" — does not survive
+   per-frame sampling of the row on either game.
+GOTCHAS entry appended; engine_internals DF section corrected in place
+so the retracted readings cannot be re-followed.
+
+### OPEN — what to ask the maintainer (this is now the blocking item)
+
+The symptom is theirs; they have seen it and the harness has not. Ask
+for: which build, 1P or 2P, stage/opponent, which round, whether it
+starts at activation or after some action, and a capture if cheap.
+Pointing the existing instrument at the right state is one command;
+guessing at shared-path discriminators is what the last two sessions
+did. Do NOT resume mechanism hunting before that answer.
+
+(Previously: session 14z-68 CLOSED — THE PHOBOS WIN SCREEN
 FIXED AND MAINTAINER-CONFIRMED (palette + position; PING #10 =
 build/hui11 = 5c6dbe43), the effect arc PARKED behind a named tooling
 gap, and the SYNTHESIS GAP CLOSED (engine_internals 810 -> 1076 lines,

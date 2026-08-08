@@ -1127,14 +1127,58 @@ Those channels run SCRIPTS through a small state machine:
   Huitzil, so the discriminator is per-character somewhere in the
   shared path.
 
-**RECOMMENDED NEXT STEP — do not brute-force this:** get a NATIVE vs2
-SAVESTATE with Huitzil in Dark Force while moving (the maintainer
-offered savestates and the repro is three steps: 1 stock, HP+HK,
-move/air-dash). Diffing the fighter block and palette state
-native-vs-ours at the same phase collapses this hunt to one
-comparison — the same way a maintainer capture closed the win-screen
-item after hours of derivation. Chasing it from our side alone means
-guessing which of several shared systems applies the style.
+### 14z-69: THE NATIVE LEG EXISTS, AND WITH IT THE SYMPTOM DOES NOT
+### REPRODUCE — the trail above rests on measurements taken without a
+### native control, and two of them do not survive one
+
+The recommended next step was "get a native vs2 savestate, because we
+cannot reach him natively". **That premise was false.** 14z-68j
+recorded "the early-window id poke does NOT force him on vsav2" from
+one attempt with **replay 61**, whose input timing is authored for OUR
+wheel. The replay-80 early-window poke flow reaches him natively
+without any of that: on `vsav2`, `$FF8782 = 0x10` across commit->load
+gives `+0x382 = 0x10`, seq 0x0A at the DF frame and seq 0x14 on the air
+dash. No vs2 cursor path, no savestate, no Rule 7 question.
+
+`tests/replays/hui/85_hui_df_vs2.rpl` is that rig and runs UNCHANGED on
+both games (both sides poked — P2 = Victor, id 0x03 on both, or the
+cursor path lands on different characters on the two wheels). It puts
+the SAME air dash before DF and twice during it, so the control is
+inside the replay. Gate: `tests/test_hui_df_style.sh`.
+
+**What the A/B says (native vsav2 vs hui11, DF walk + two DF air
+dashes):**
+- **Sprite palette row 0x0A (`$90C140`) is byte-identical to native on
+  every one of 118 sampled frames, and constant** across all of them.
+  There is no recolour and nothing cycling.
+- **The fighter's own pal-0x0A draws match native's exactly** (same
+  codes, same sizes, no duplicated code = no extra copy), modulo the
+  bank remap his art needs (native `a19=3xxxx` <-> ours `4xxxx`) and a
+  0-2 frame phase skew.
+- DF state fields, seq trajectory and the effect channels all agree.
+- Same result at the RENDER layer (PNG snapshots) and on **FBNeo**
+  (byte-identical palette and fighter state to MAME) — so it is not an
+  emulator-side difference, and not a pick-path difference either: a
+  HAND-PICKED cell-0x10 match behaves the same as the poked rig.
+
+**Therefore two of the 14z-68u measurements above are RETRACTED:**
+1. "The afterimages ARE extra sprites (22 stationary -> 24-29 moving,
+   trailing groups ~72px)" — **native does exactly the same thing.**
+   Measured on vs2 over the same window: 19-31 pal-0x0A sprites with
+   x-spans to 149px. That is walk animation plus the pods, not a style.
+2. "The palette ALTERNATES per frame (some gold, most purple)" — does
+   not survive per-frame sampling of the actual palette row on either
+   game. Whatever produced that reading, it was not row 0x0A.
+The channel decode (`+0x318`-family, the script machine, the writer
+PCs) stands as a description of the machinery, but it is NOT evidence
+about this symptom: **native populates those channels identically.**
+
+**So the item is not "find the per-character style discriminator".** It
+is first "under what conditions does the symptom appear at all", and
+that question belongs to the maintainer, who has seen it and we have
+not. Ask for: the build, 1P or 2P, the stage/opponent, the round, and
+a capture or a description of when it starts. The instrument is built;
+pointing it at the right state is one command.
 
 Open observations queued from the same replay, unattributed: ~15px X
 drift over the DF walk (speed modifier vs recoil) and a pod anim phase

@@ -1,0 +1,56 @@
+# hui DARK FORCE STYLE — the NATIVE-COMPARABLE rig (14z-69, the item
+# NEXT_SESSION opened on). Runs UNCHANGED on native vsav2 and on a
+# variant-id build, so ours-vs-native is one diff at the same phase.
+#
+# THE BLOCKER THAT WAS NOT ONE: 14z-68j recorded "the early-window id
+# poke does NOT force him on vsav2". That was replay 61 (a win-screen
+# replay whose input timing is authored for OUR wheel). The replay-80
+# early-window poke flow DOES reach him natively — measured this
+# session on replay 82: char id +0x382 = 0x10 and seq 0x0A at the DF
+# frame on BOTH games. No vs2 cursor path and no savestate is needed.
+#
+# BOTH SIDES ARE POKED so the two legs differ only in the GAME:
+#   P1 $FF8782 = 0x10 (Huitzil, native id on both)
+#   P2 $FF8B82 = 0x03 (Victor — id 0x03 on vsav AND vsav2, verified
+#                      by pick in docs/atlas/character_tables.md)
+# without the P2 poke the cursor path R,R lands on different
+# characters on the two wheels and the sprite lists are not comparable.
+# POKES="1400:ff8782:10;1450:ff8782:10;1500:ff8782:10;1400:ff8b82:03;1450:ff8b82:03;1500:ff8b82:03"
+#
+# WHY AIR DASH: the maintainer's repro is "1 stock, HP+HK, then move —
+# air dash shows it best". Replay 82 only WALKS, and at its walk phase
+# ours and native are equivalent (measured 14z-69: pal-0x0A counts,
+# x-spans and palette row 0x0A all track native modulo a ~2-frame
+# skew). So replay 82 cannot see this symptom; this replay adds the
+# motion that does.
+#
+# THE CONTROL IS INSIDE THE REPLAY: the SAME air dash is performed
+# before DF (f3160) and twice during it (f3320, f3450), with the 79
+# air-dash timing measured good on both games. Any DF style shows up
+# as the pre/post difference, and native-vs-ours as the cross-leg one.
+300-305 sys=C1
+420-425 sys=C2
+800-803 sys=S1
+940-943 sys=S2
+1100-1102 p2=R
+1160-1162 p2=R
+1300-1302 p1=1
+1360-1362 p2=1
+# control air dash, DF NOT yet active (replay 79 timing: jump f3160 is
+# the measured-good accept frame; f3060 jumps are eaten on both games)
+3160-3162 p1=U
+3175-3177 p1=R
+3181-3183 p1=R
+# activate Dark Force (LP+LK; same button pair as replay 82)
+3260-3263 p1=14
+# DF air dash #1
+3320-3322 p1=U
+3335-3337 p1=R
+3341-3343 p1=R
+# DF air dash #2
+3450-3452 p1=U
+3465-3467 p1=R
+3471-3473 p1=R
+# DF walk (the replay-82 phase, kept so both motions are in one rig)
+3550-3650 p1=R
+3800 wait

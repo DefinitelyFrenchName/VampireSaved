@@ -207,6 +207,29 @@ pointer aimed at the CPS2 register window, re-creating the music bug while
 looking fine. See GOTCHAS.
 
 
+## THE NATIVE LEG IS REACHABLE FOR ANY TENANT SCREEN (14z-69)
+
+Huitzil can be forced on **native vsav2** with the ordinary
+early-window poke — no vs2 cursor path, no savestate:
+
+```sh
+POKES="1400:ff8782:10;1450:ff8782:10;1500:ff8782:10"   # P1; P2 = $FF8B82
+tools/run_replay_mame.sh vsav2 <replay> out.log        # ~6 s
+```
+
+Verified by `+0x382 = 0x10` on the native leg, with DF (seq 0x0A) and
+the air dash (seq 0x14) both firing. **Poke BOTH sides** when sprite
+lists are compared: the cursor path lands on different characters on
+the two wheels (P2 = 0x03 is Victor on vsav *and* vsav2).
+
+This retires "the native leg is unreachable", which was inherited from
+a single 14z-68j attempt with **replay 61** — a replay whose input
+timing is authored for OUR wheel and does not transfer. Anything still
+parked on "needs a native reference" (the win QUOTE set, the child
+shadow, effect art) can now be A/B'd directly. Do not characterise a
+tenant symptom without this leg — 14z-69 retracted two findings that
+were artefacts of measuring our build alone (docs/GOTCHAS.md).
+
 ## PRIOR ART FIRST — check the subsystem doc before re-deriving (14z-68m)
 
 Huitzil's win screen was re-derived from scratch and got two of three
@@ -524,6 +547,16 @@ tests/test_hui_fx_flow.sh      [bd]   # the effect-flow attribution gate (14z-68
                                       # (2P dummy, 3 spaced 236LP, FBNeo taps).
                                       # Ground-truthed on hui9 + a bad-thunk negative
                                       # control. Self-builds stage 6 unless given
+tests/test_hui_df_style.sh     [bd]   # the DARK FORCE STYLE A/B (14z-69): replay 85
+                                      # on NATIVE vsav2 vs the build — rig
+                                      # non-vacuity, palette row 0x0A frame-exact
+                                      # (118 frames), and the fighter's own pal-0x0A
+                                      # draws == native's (an afterimage is a
+                                      # duplicated code). Section 2 runs the checker
+                                      # (tools/check_df_style.py) against three
+                                      # synthetic corruptions — recolour, afterimage,
+                                      # DF-never-latched — each of which MUST fail.
+                                      # Defaults to build/hui11. ~40s, 4 MAME runs
 tests/test_wide_render_content.sh     # the WIDE track must SERVE the ported content's
                                       # tiles (RE-SHAPED 14z-67 for m3a semantics —
                                       # cross-track pixel identity ended BY DESIGN):
