@@ -1,5 +1,12 @@
 #!/bin/sh
 # run_hui_behavior.sh — the Huitzil playtest build, interactive.
+# 14z-70f (PING #13, build/hui17 = 699de9b7): THE 214+P GROUND
+# EXPLOSION. The grenade's ground detonation drew a solid FUCHSIA
+# rectangle (the ping-#7 "fuchsia class"); 569 group-C tiles were
+# remapped but never copied. Fires on tests/replays/hui/83d — 214+LP
+# with both fighters walked back to their corners, the ONLY rig that
+# detonates the bomb on the ground instead of on the opponent.
+#
 # 14z-69p (PING #12, build/hui14 = c25b3824): THE DARK FORCE PALETTE
 # is fixed — he now flashes his own warm GOLD ramp instead of the
 # purple one. The afterimages REMAIN on purpose: that mode is his
@@ -40,7 +47,7 @@ set -eu
 ROMDIR="${ROMDIR:?set ROMDIR}"
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"
-OUTBASE="${1:-build/hui14}"
+OUTBASE="${1:-build/hui17}"
 
 if [ ! -f "$OUTBASE/rompath/vsavjw.zip" ]; then
     echo "building the stage-6 gfx build at $OUTBASE ..."

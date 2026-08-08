@@ -31,7 +31,7 @@ case "$BUILD" in /*) ;; *) BUILD="$REPO/$BUILD" ;; esac
 [ -f "$BUILD/rompath/vsavjw.zip" ] || { echo "FAIL: no vsavjw.zip in $BUILD"; exit 1; }
 shift || true
 REPLAYS="$*"
-[ -n "$REPLAYS" ] || REPLAYS="hui/82_hui_df_2p hui/83_hui_fx"
+[ -n "$REPLAYS" ] || REPLAYS="hui/82_hui_df_2p hui/83_hui_fx hui/83d_hui_grenade_ground"
 export MAME_BIN="${MAME_BIN:-$HOME/.cache/vampire-saved/mame/cps2}"
 W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT
 PK="${EMPTY_TILE_POKES:-1400:ff8782:10;1450:ff8782:10;1500:ff8782:10}"
@@ -41,7 +41,11 @@ for r in $REPLAYS; do
     rp="$REPO/tests/replays/$r.rpl"
     [ -f "$rp" ] || { echo "  skip $r (no such replay)"; continue; }
     d="$W/$(basename "$r")"; mkdir -p "$d/s"
-    FR=$(python3 -c "print(','.join(str(f) for f in range(3100,3600,25)))")
+    # EVERY frame, not every 25th (14z-70f). The 25-frame stride reported
+    # only 10 of the 113 missing ground-explosion tiles: an effect animation
+    # turns over faster than the sample, so a sparse sweep is "complete" over
+    # the frames it looks at and blind between them.
+    FR=$(python3 -c "print(','.join(str(f) for f in range(3100,3610)))")
     ( cd "$d" && REPLAY="$rp" POKES="$PK" DUMP_FRAMES="$FR" FRAMES=3610 \
       TRACE_OUT="$d/obj.txt" MAME_SANDBOX="$d/s" \
       MAME_ROMPATH="$BUILD/rompath;$ROMDIR" \
@@ -64,9 +68,19 @@ for line in open(objtxt):
     if not m:
         continue
     code, pal, a19 = int(m.group(2), 16), int(m.group(3), 16), int(m.group(5), 16)
+    sz = m.group(4)
     if code and 0x40000 <= a19 < 0x60000:
-        if hashlib.sha1(gt.tile_bytes(C, a19 - 0x40000)).digest() == BLANK:
-            bad[(pal, code, a19)] += 1
+        # EXPAND multi-tile sprites (14z-70f). obj_records_dump reports a
+        # sprite's BASE code only; a 6x6 sprite covers 36 tiles at
+        # base + row*0x10 + col. Checking the base alone is what let the
+        # 214+P ground explosion keep drawing a solid fuchsia block after
+        # its base tiles had been added to the inventory.
+        w, h = (int(v) for v in sz.split("x"))
+        for r in range(h):
+            for c in range(w):
+                t = (a19 - 0x40000) + r * 0x10 + c
+                if hashlib.sha1(gt.tile_bytes(C, t)).digest() == BLANK:
+                    bad[(pal, code, 0x40000 + t)] += 1
 if bad:
     print("  FAIL %s: %d sprite(s) drawn from an EMPTY group-C tile:" % (name, len(bad)))
     for (pal, code, a19), n in sorted(bad.items()):
