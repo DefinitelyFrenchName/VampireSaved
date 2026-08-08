@@ -114,7 +114,7 @@ def scan_deferred_reader(blob, i, an, dead):
     return None
 
 
-def scan_data_in_code(name, blob, src, dead, code_spans):
+def scan_data_in_code(name, blob, src, dead, code_spans, raw_from=None):
     """lea(d16,pc),An + an INDEXED read (An,Xn.w) or a POST-INCREMENT
     walk (An)+, with the lea target inside a code region."""
     hits = []
@@ -143,6 +143,12 @@ def scan_data_in_code(name, blob, src, dead, code_spans):
             reader_off, shape = found
         hit = {"reader": src + i, "table": tgt, "table_host": host,
                "reader_old_hex": blob[i:i + 8].hex(), "shape": shape}
+        # 14z-69i: a table inside its OWN region's raw-emitted tail needs no
+        # manifest row — those bytes are written unencrypted, so the data
+        # read returns them verbatim. That IS the fix, so it counts as
+        # covered (verified byte-for-byte by verify_pcrel_data.py).
+        hit["raw_emitted"] = (raw_from is not None and host == name
+                              and (tgt - src) >= raw_from)
         if shape != "indexed":
             # the LEA is still the site to rewrite; record where the read
             # actually happens so triage can see how far away it is.
@@ -258,10 +264,12 @@ def main():
         assert len(blob) == v["len"], f"{name}: bin/len mismatch"
         dead = [tuple(d) for d in v.get("dead", [])]
 
-        dc = scan_data_in_code(name, blob, lo, dead, code_spans)
+        dc = scan_data_in_code(name, blob, lo, dead, code_spans,
+                               v.get("raw_from"))
         for h in dc:
             h["region"] = name
-            h["covered"] = h["reader"] in covered_readers
+            h["covered"] = (h["reader"] in covered_readers
+                            or h.get("raw_emitted", False))
             out["data_in_code"].append(h)
             tot_dc += 1
             if not h["covered"]:
@@ -271,7 +279,8 @@ def main():
             print(f"  data_in_code[{h['shape']}] {name}+{h['reader']-lo:#06x}: "
                   f"reader {h['reader']:#08x} -> table {h['table']:#08x} "
                   f"(in {h['table_host']}){walk}"
-                  + ("  [covered]" if h["covered"] else "  [UNCOVERED]"))
+                  + ("  [covered: raw-emitted tail]" if h.get("raw_emitted")
+                     else "  [covered]" if h["covered"] else "  [UNCOVERED]"))
 
         pde = scan_pcrel_data_escapes(name, blob, lo, dead, all_spans)
         for h in pde:

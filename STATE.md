@@ -13,6 +13,64 @@ replay 85, tests/test_hui_df_style.sh + tools/check_df_style.py with
 three verdict controls, and a corrected test_hui_pairs.sh which had been
 asserting the downgrade path under the name "Dark Force".)
 
+## Session 14z-69j — THE TABLE FIX SHIPPED (build/hui12); the DF crash
+## is gone; the beam still does not draw
+
+**Raw-emit implemented and verified.** `:f<off>` on a root now forces the
+declared length AND declares where the forced tail stops being code and
+becomes raw DATA (`0x6cac0:0xebc:t0x6cc34:f0xca8` — the split is the
+FIRST TABLE, not the oracle boundary: 0x6D6C0-0x6D768 is live
+object-spawning code, checked by disassembly). The generator emits the
+region as `code_file` up to the split and `data_file` after it.
+
+ONE CORRECTION PAID FOR IN A BUILD: the tail must be written from the
+SOURCE DATA IMAGE, not from `blob`. `blob` holds the region's OPCODE-view
+(plaintext) content; an (An)-based read is a DATA-space read and returns
+the raw stored bytes, so the copy has to store vs2's raw bytes. First
+attempt wrote plaintext and all seven tables still mismatched.
+
+**Result: all seven tables read byte-identical to vs2** (checked by
+disassembling each placed lea and comparing its target's data view).
+`build/hui12`, fingerprint **31d576be**.
+
+**Gates, all green on it:** m3a-reproducible (both frozen references
+rebuild bit-exact — the tooling changes are inert on Donovan), boot
+(masked-v2 EXACT legacy), pairs, ex, grab, air, walk, fx_flow,
+winscreen, df_style, ladder, census.
+
+**The census now understands raw-emit**: a table inside its own region's
+raw-emitted tail counts as covered (no manifest row needed, and none
+wanted). Inventory re-frozen as **5 row-covered + 7 raw-emitted**; the
+7 became visible only because census 1 learned the DEFERRED reader
+shapes this session.
+
+### Two measured outcomes on the parked effect family
+
+1. **The DF crash that parked `tenant_type_stamp` is GONE.** Built a
+   scratch with the stamp + obj_hook_extra un-parked (fingerprint
+   c8587d33): `test_hui_pairs` PASSES, where 14z-68d recorded a vec3 at
+   0x0D4696 with an index underflowing the placed region. Consistent
+   with cause: the machine was walking garbage streams.
+2. **The beam still does not draw.** Measured properly this time — a
+   dense scan found native's beam window (pal-0x0C pieces at f3164-3208
+   of replay 83b, ~12-frame cadence, 3-13 pieces), and at those exact
+   frames BOTH our builds render **zero**, with and without the stamp.
+   So the residual is what 14z-68d suspected: how the emitter is reached
+   or a draw flag — not dispatch, records, art, or (now) the tables.
+
+**The stamp stays PARKED** despite the crash being fixed: it buys no
+visible change today and the maintainer is not here to playtest. Un-park
+it when the emitter question is answered.
+
+### NEW, needs triage (not new breakage)
+
+`verify_pcrel_data.py` flags **72 pcrel data pointers in OTHER regions**
+(x022400, x026142, x028122, x088512) as resolving to bytes that are not
+their source tables. These predate today — hui11 ships with them and its
+gates are green — so they are either cold paths or a latent defect of
+the class this project has been bitten by four times. Triage one by one;
+do NOT mass-"fix" them.
+
 ## Session 14z-69i — the reroute BUILT, and a better design found in
 ## the process (raw-emit); nothing shipped, tree rebuilds hui11 exactly
 

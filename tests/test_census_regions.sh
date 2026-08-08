@@ -57,10 +57,24 @@ c = json.load(open(sys.argv[1]))
 pl = json.load(open(sys.argv[2]))["regions"]
 
 dc = {h["reader"]: h for h in c["data_in_code"]}
-want = {0x056020, 0x05604C, 0x056458, 0x056484, 0x08BFF6}
-assert set(dc) == want, f"data_in_code readers drifted: {sorted(map(hex, dc))}"
-assert all(h["covered"] for h in dc.values()), "known reader lost coverage"
-print("  ok: data_in_code = exactly the 5 known covered sites")
+# the five original sites, each covered by a [[data_in_code]] manifest row
+want_rows = {0x056020, 0x05604C, 0x056458, 0x056484, 0x08BFF6}
+# 14z-69i: x06cac0's own seven pc-rel tables. They became VISIBLE when the
+# census learned the deferred-reader shapes (the post-increment walk 0x3e
+# bytes away in a bsr subroutine, and two indexed reads 3-4 instructions
+# later), and they are covered by a DIFFERENT mechanism: the region's forced
+# tail is emitted RAW, so the data reads return the bytes verbatim. No
+# manifest row, and none wanted — verify_pcrel_data.py / the build check
+# confirm all seven byte-for-byte.
+want_raw = {0x06CD5E, 0x06CFDC, 0x06D206, 0x06D542, 0x06D594, 0x06D5E0,
+            0x06D628}
+assert set(dc) == want_rows | want_raw, \
+    f"data_in_code readers drifted: {sorted(map(hex, dc))}"
+assert all(dc[r]["covered"] and not dc[r].get("raw_emitted")
+           for r in want_rows), "a manifest-row reader lost coverage"
+assert all(dc[r]["raw_emitted"] for r in want_raw), \
+    "an x06cac0 table left the raw-emitted tail"
+print("  ok: data_in_code = 5 row-covered sites + 7 raw-emitted (x06cac0)")
 
 e = c["escapes"]
 EXPECT = {  # region: (count, n_unique, covered)

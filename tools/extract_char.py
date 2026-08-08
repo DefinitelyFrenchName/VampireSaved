@@ -605,6 +605,8 @@ def main():
     #   addr:len:tX:f  FORCE len past the oracle boundary (14z-69) — for a
     #                  code region whose own pc-rel data tables sit beyond
     #                  where the sibling stops agreeing
+    #   addr:len:tX:fN FORCE len, and emit everything from +N as raw DATA
+    #                  (the tables); [boundary,N) stays encrypted code
     #   addr:len:s     SOURCE-ONLY: no oracle twin exists (per-game hook,
     #                  content diverges between siblings); length is fixed
     #                  and refs come from the operand scanner (labeled
@@ -628,7 +630,15 @@ def main():
         # 7/7 pointers resolving into unrelated bytes). Bytes past the
         # boundary are unvalidated and their pointer fields are NOT
         # classified, so force only tables of plain values.
-        force_len = len(parts) > 3 and parts[3] == "f"
+        force_len = len(parts) > 3 and parts[3].startswith("f")
+        # `f<off>` additionally declares where the forced tail stops being
+        # CODE and becomes raw DATA tables (14z-69i). The bytes between the
+        # oracle boundary and <off> are still executable code — measured at
+        # vs2 0x6D6C0-0x6D768, a live object-spawning continuation — so the
+        # split point is the FIRST TABLE, not the boundary.
+        raw_from = None
+        if force_len and len(parts[3]) > 1:
+            raw_from = int(parts[3][1:], 0)
         if len(parts) > 2 and parts[2].startswith("t"):
             forced_twin = int(parts[2][1:], 0)
         if is_data:
@@ -719,6 +729,14 @@ def main():
                             "grow": cap, "kind": "code", "shift": sh_name}
         if forced_tail:
             regions[sh_name]["dead"] = [forced_tail]
+            if raw_from is not None:
+                # emitted as raw DATA rather than inside the region's
+                # encrypted code op: CPS-2 decrypts opcode fetches only, so
+                # a data read returns whatever is stored.
+                regions[sh_name]["raw_from"] = raw_from
+                report.append(f"  {sh_name}: raw DATA tail from +{raw_from:#x} "
+                              f"({fixed_len - raw_from:#x} bytes emitted "
+                              f"unencrypted for runtime DATA reads)")
             report.append(f"  {sh_name}: forced tail "
                           f"+{forced_tail[0]:#x}..+{forced_tail[1]:#x} "
                           f"({forced_tail[1]-forced_tail[0]:#x} bytes) marked "

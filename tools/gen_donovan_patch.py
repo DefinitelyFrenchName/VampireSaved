@@ -1640,12 +1640,47 @@ def main():
                     fail.append(f"gfx_remap: only {n_rw} tile words rewritten "
                                 f"(expected ~14k) — walker or band drifted")
             d = placed[name]
-            fixed = out / f"fixed_{name}.bin"
-            fixed.write_bytes(bytes(blob))
             op = "code_file" if r["kind"] == "code" else "data_file"
-            ops.append({"op": op, "addr": f"{d:#x}", "path": fixed.name})
-            notes.append(f"{op:9s} {d:#08x} +{r['len']:#x}  donovan {name} "
-                         f"(from vsav2 0x{r['src']:06X})")
+            raw_from = r.get("raw_from")
+            if raw_from is not None and 0 < raw_from < len(blob):
+                # 14z-69i: the region's own pc-relative DATA TABLES live in
+                # the forced tail. Emitting them inside the code op stores
+                # them ENCRYPTED, and CPS-2 decrypts opcode fetches only —
+                # so the machine's runtime data reads saw garbage (measured:
+                # 7/7 pointers, x06cac0). Split the emission: code up to the
+                # first table, raw data from there. The pointers themselves
+                # need no rewriting — inside the region they already resolve
+                # to the right address.
+                head = out / f"fixed_{name}.bin"
+                head.write_bytes(bytes(blob[:raw_from]))
+                ops.append({"op": op, "addr": f"{d:#x}", "path": head.name})
+                notes.append(f"{op:9s} {d:#08x} +{raw_from:#x}  donovan "
+                             f"{name} code (from vsav2 0x{r['src']:06X})")
+                tail = out / f"fixed_{name}_tables.bin"
+                # from the SOURCE DATA IMAGE, not from `blob`: blob holds the
+                # region's OPCODE-view (plaintext) content, but an (An)-based
+                # read is a DATA-space read and returns the raw stored bytes
+                # (docs/platform/gotchas.md "PC-relative reads are
+                # PROGRAM-space; (An)-based reads are DATA-space"). To make
+                # the copy read like vs2's original, store vs2's raw bytes.
+                # Safe for this span by construction: it is the forced tail,
+                # a dead zone, so no pointer fixups were applied to it.
+                tail.write_bytes(bytes(src_data_img[r["src"] + raw_from:
+                                                    r["src"] + r["len"]]))
+                ops.append({"op": "data_file", "addr": f"{d + raw_from:#x}",
+                            "path": tail.name})
+                notes.append(f"data_file {d + raw_from:#08x} "
+                             f"+{len(blob) - raw_from:#x}  donovan {name} "
+                             f"RAW TABLES (unencrypted; vs2 "
+                             f"0x{r['src'] + raw_from:06X})")
+                fragments.append((d + raw_from, len(blob) - raw_from, "VS2",
+                                  f"{name} raw pc-rel data tables"))
+            else:
+                fixed = out / f"fixed_{name}.bin"
+                fixed.write_bytes(bytes(blob))
+                ops.append({"op": op, "addr": f"{d:#x}", "path": fixed.name})
+                notes.append(f"{op:9s} {d:#08x} +{r['len']:#x}  donovan {name} "
+                             f"(from vsav2 0x{r['src']:06X})")
 
         # [palette] (stage-gated): place the character's sprite-palette
         # block (all confirm-button variants) raw in hole B and repoint

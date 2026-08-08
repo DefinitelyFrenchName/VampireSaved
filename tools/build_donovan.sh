@@ -117,7 +117,7 @@ case "$TENANT_CHAR" in
         # clone convention), spawners +0x174 (measured, 61-64/64
         # agreement 0x6D240-0x6D73F). Entered via the owner-gated
         # effect_machine site_thunk (huitzil.toml).
-        # NOT YET `:f` — see STATE 14z-69h/i. x06cac0's own pc-rel param
+        # `:f0xca8` (14z-69i) — x06cac0's own pc-rel param
         # tables (0x6D768-0x6D96C) fall PAST the sibling-oracle boundary
         # (+0xC00), so today they sit outside the region and all 7
         # pointers resolve into unrelated bytes (tools/verify_pcrel_data.py).
@@ -130,7 +130,7 @@ case "$TENANT_CHAR" in
         # generator's reroute to learn the POST-INCREMENT shape (bsr.w to a
         # `lea.l #table,An; rts` helper — the existing jsr+nop rewrite needs
         # 8 contiguous bytes and the reader is 0x3E away).
-        DEFAULT_ROOTS="$DEFAULT_ROOTS,0x22400:0x1600:t0x2242e,0x6cac0:0xebc:t0x6cc34"
+        DEFAULT_ROOTS="$DEFAULT_ROOTS,0x22400:0x1600:t0x2242e,0x6cac0:0xebc:t0x6cc34:f0xca8"
         ;;
     0x11)
         # Pyron census (14z-67, moveset arc open). Measured from his
