@@ -602,6 +602,9 @@ def main():
     #   addr:len       same, but length capped/fixed to len
     #   addr:len:tX    forced oracle twin at X
     #   addr:len:tX:d  DATA region (raw view, An-relative reads) with twin X
+    #   addr:len:tX:f  FORCE len past the oracle boundary (14z-69) — for a
+    #                  code region whose own pc-rel data tables sit beyond
+    #                  where the sibling stops agreeing
     #   addr:len:s     SOURCE-ONLY: no oracle twin exists (per-game hook,
     #                  content diverges between siblings); length is fixed
     #                  and refs come from the operand scanner (labeled
@@ -615,6 +618,17 @@ def main():
         fixed_len = int(parts[1], 0) if len(parts) > 1 and parts[1] else None
         forced_twin = None
         is_data = len(parts) > 3 and parts[3] == "d"
+        # `:f` — FORCE the declared length (14z-69). Normally fixed_len is a
+        # CAP and the sibling oracle decides where the region ends, which is
+        # right for code: unvalidated bytes are not worth copying. It is
+        # WRONG when the routine's own pc-relative DATA TABLES sit past the
+        # boundary, because a pc-rel pointer is only correct if its target
+        # keeps its relative distance — i.e. the table must be INSIDE the
+        # region (docs/project/gotchas.md, the x06cac0 fleet param streams:
+        # 7/7 pointers resolving into unrelated bytes). Bytes past the
+        # boundary are unvalidated and their pointer fields are NOT
+        # classified, so force only tables of plain values.
+        force_len = len(parts) > 3 and parts[3] == "f"
         if len(parts) > 2 and parts[2].startswith("t"):
             forced_twin = int(parts[2][1:], 0)
         if is_data:
@@ -688,10 +702,27 @@ def main():
         xlen = oracle_extend(src.plaintext(root, root + cap + 0x100), 0,
                              orc.plaintext(twin, twin + cap + 0x100), 0,
                              cap, shifts, True)
-        if fixed_len:
+        forced_tail = None
+        if force_len:
+            # the oracle's own stopping point becomes a DEAD ZONE: those
+            # bytes are unvalidated by construction, so they must not be
+            # diffed (the tables legitimately differ between siblings —
+            # without this the region fails the variant-density check at
+            # exactly the first table) and must not yield diff-derived
+            # "refs". They are copied verbatim, which is the whole point.
+            if xlen < fixed_len:
+                forced_tail = [xlen, fixed_len]
+            xlen = fixed_len
+        elif fixed_len:
             xlen = min(xlen, fixed_len)
         regions[sh_name] = {"src": root, "orc": twin, "len": xlen,
                             "grow": cap, "kind": "code", "shift": sh_name}
+        if forced_tail:
+            regions[sh_name]["dead"] = [forced_tail]
+            report.append(f"  {sh_name}: forced tail "
+                          f"+{forced_tail[0]:#x}..+{forced_tail[1]:#x} "
+                          f"({forced_tail[1]-forced_tail[0]:#x} bytes) marked "
+                          f"dead — unvalidated, copied verbatim (`:f`)")
         report.append(f"extra region {sh_name}: twin 0x{twin:06X} "
                       f"(shift {twin - root:+#x}), len 0x{xlen:X}")
 

@@ -13,6 +13,61 @@ replay 85, tests/test_hui_df_style.sh + tools/check_df_style.py with
 three verdict controls, and a corrected test_hui_pairs.sh which had been
 asserting the downgrade path under the name "Dark Force".)
 
+## Session 14z-69h — THE PARKED EFFECT FAMILY: full chain, and the
+## exact remaining step
+
+Set out to close 14z-68's named tooling gap (the census missing the
+post-increment reader). Did that, and it led to the real root cause.
+
+**1. Post-increment detection added** (`scan_postinc_reader`): walks
+forward from the `lea` and stops only if An is redefined. Necessary
+because the ground-truth reader (vs2 0x6D206 -> 0x6D868) sits **0x3E
+bytes away inside a bsr subroutine** — "immediately after" can never
+see it. Catches that site and three more.
+
+**2. The bigger blind spot: pc-rel DATA POINTERS leaving the region.**
+`lea (d16,pc),An` is rewritten by NOTHING (census 1 wanted a code-region
+host, census 2 scans only branches, extract_char's pcrel_refs sweep only
+jsr/jmp, and the generator's far-pcrel trampoline is documented
+CODE-only). Added census 3 (report) + `tools/verify_pcrel_data.py`
+(verdict against a built image). Measured on hui11: region x06cac0 is
+**7/7 BROKEN** — `lea $6D868(pc),a3` resolves to 0x0D4C98, which holds
+code, not the fleet param stream. That IS the parked "reads garbage".
+
+**3. Why the tables are outside — CORRECTED.** Not "the declared length
+is ignored": in extract_char.py `fixed_len` is a **CAP**, and
+`oracle_extend` decides the real end. The sibling stopped agreeing at
++0xC00 (the tables legitimately differ between vs2 and vh2), so the
+region ends there by design.
+
+**4. `:f` force-length added** to the root spec, with the forced tail
+registered as a DEAD ZONE (unvalidated by construction — without that
+the region fails the variant-density check at exactly the first table).
+Measured on a scratch build (fingerprint ee9318fc): the region becomes
+0xEBC, the tables are inside it, and the pointers now resolve to the
+CORRECT relative addresses.
+
+**5. But that is only half the fix, and this is the remaining step.**
+The placed tables carry the **OPCODE image** (verified byte-identical to
+vs2's opcode view at 0x6D868) because a code region is stored to
+execute, while the engine reads them as DATA — so they still decode as
+garbage. The census now says exactly this: **5 UNCOVERED
+`data_in_code[postinc]` sites**. Each needs a `[[data_in_code]]` row so
+the generator places a DATA-view copy and reroutes the reader.
+**The generator's reroute cannot do it yet:** it replaces 8 contiguous
+bytes (`lea` + read) with `jsr helper; nop`, which requires the reader
+to follow the lea. For post-increment the fix shape is different and
+smaller — replace the 4-byte `lea (d16,pc),An` with `bsr.w helper`,
+helper = `lea.l #table,An; rts` (8 bytes, near-allocated within the
+existing d16 reach machinery).
+
+`:f` is deliberately NOT enabled in build_donovan.sh: landing it alone
+changes the shipped bytes without fixing anything (the tables would move
+but still read as opcode image). It must arrive together with the five
+rows and the postinc reroute. Recipe recorded at the root declaration.
+
+Gates: test_census_regions.sh PASS (H inventory + Pyron unchanged).
+
 ## Session 14z-69c — THE DF MECHANISM TRACED (fix is a DECISION)
 
 Full trace in docs/game/engine_internals.md (Dark Force). Summary:

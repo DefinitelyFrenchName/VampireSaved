@@ -1336,16 +1336,31 @@ image holds code (`74354cc1...`) instead of the fleet param stream
 (`0001005800000000...`). So the ported machine walks garbage — which is
 exactly the symptom the effect family has been parked on since 14z-68.
 
-**The proximate cause is a truncated region**: the root is declared
-`0x6cac0:0xebc` (ending 0x6D97C, which WOULD contain every table) but
-the extraction produced `len 0xc00`, ending 0x6D6C0 — a **0x2AC-byte
-shortfall** that leaves all four tables (0x6D768, 0x6D7E8, 0x6D868,
-0x6D91C/0x6D94C) outside. Find out why the declared length is not
-honoured before adding machinery: if the region simply CONTAINS its
-tables, the verbatim displacement is correct and no rewriting is
-needed. That is the same principle as "a ported region must contain the
-CONSTANTS its own code loads" (14z-68), generalised from literals to
-tables.
+**The proximate cause is the region ending before its tables** —
+`x06cac0` is `len 0xc00` (ends 0x6D6C0) while the tables live at
+0x6D768-0x6D96C. **CORRECTION (same session): the declared root
+`0x6cac0:0xebc` is NOT being ignored — in `extract_char.py` a root's
+`fixed_len` is a CAP, not a length:**
+
+    cap  = fixed_len if fixed_len else 0x4000
+    xlen = oracle_extend(...)        # stops where the sibling stops agreeing
+    if fixed_len: xlen = min(xlen, fixed_len)
+
+The sibling oracle stopped at 0xC00, so that is where the region ends —
+by design, since the extractor only takes bytes a twin can validate, and
+param tables legitimately differ between vs2 and vh2.
+
+So the fix is to make the region CONTAIN its tables, which is the same
+principle as "a ported region must contain the CONSTANTS its own code
+loads" (14z-68) generalised from literals to tables. Adding the table
+block as a SEPARATE root does not work: a pc-rel data pointer is only
+correct if the target keeps its relative distance, i.e. the bytes are
+inside the region or placed at the identical delta. Use the `:f`
+force-length modifier (14z-69) to take the declared length past the
+oracle boundary, and check what you are forcing in: bytes beyond the
+boundary are unvalidated and their POINTER fields are not classified,
+so this is safe for 16-bit param tables and NOT safe for anything
+holding ROM pointers.
 
 Instruments (added 14z-69):
 - `census_regions.py` census 3 REPORTS every such pointer;
