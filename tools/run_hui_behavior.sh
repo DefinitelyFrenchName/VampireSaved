@@ -1,20 +1,21 @@
 #!/bin/sh
 # run_hui_behavior.sh — the Huitzil playtest build, interactive.
-# 14z-68m (PING #10, build/hui11 = 5c6dbe43): THE WIN SCREEN, both
-# defects the maintainer named — the palette is now HIS (I had given
-# him Donovan's) and the portrait POSITION is fixed (it was 64px too
-# far left, same mechanism as Donovan's 14z-45 win_pos rows). Details
-# + what is still wrong: build/hui11/PING10_ARTIFACT.md.
-# CONFIRMED by the maintainer: palette and position both correct on
-# the real screen, which also closed the "garbled blue-grey blocks"
-# item — those were the WRONG PALETTE, never an art defect.
+# 14z-69o (PING #11, build/hui13 = 31d576be): THE CHILD SIDEKICK'S
+# SHADOW is fixed — it rendered as a solid rectangle because two tiles
+# (0x0F8B/0x0F8C) were never copied into group C while the remap had
+# already rewritten their bank, so the sprites resolved to an EMPTY
+# tile. Pixel A/B vs native confirms the tapered shadow. Also carries
+# the 14z-69j pc-relative TABLE FIX (the row-8 machine's seven param
+# tables now read byte-identical to vs2; under the hood, no visible
+# change expected). Program bytes are IDENTICAL to build/hui12 — the
+# shadow fix is gfx-only, which is why they share a fingerprint.
 # STILL OPEN (do not re-report): the win QUOTE text (still the host's
 # line — a 3-level data port, cosmetic), the 236P beam + ES big-beam /
-# grab-lightning / 214 family, the child companion's rectangular
-# shadow, DF style (afterimages + purple recolour while MOVING), and
-# FG pacing.
-# Previous builds, kept pinned for A/B: build/hui10 (PING #9,
-# 64128aa7) and build/hui9 (PING #8, 9e3105e0).
+# grab-lightning / 214 family, DF style (the purple recolour — the
+# MODE itself is his real Vampire Savior Dark Force and is mechanically
+# sound, see engine_internals), and FG pacing.
+# Previous builds, kept pinned for A/B: build/hui12 (table fix only),
+# build/hui11 (PING #10, 5c6dbe43), build/hui10 (PING #9, 64128aa7).
 # Previous: 14z-67 (ping #8, build/hui9) — 236P freeze ray restored,
 # command-grab throw arc native-exact (yv 16.0), companion art bank 5.
 # No forced id: WALK THE WHEEL to his own cell (from Demitri's default
@@ -30,13 +31,13 @@
 #     the others is untested content on this build.
 # Ground truth for comparison: native Phobos on vsav2.
 #
-# Usage: ROMDIR=... tools/run_hui_behavior.sh [outbase=build/hui11]
+# Usage: ROMDIR=... tools/run_hui_behavior.sh [outbase=build/hui13]
 set -eu
 
 ROMDIR="${ROMDIR:?set ROMDIR}"
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"
-OUTBASE="${1:-build/hui11}"
+OUTBASE="${1:-build/hui13}"
 
 if [ ! -f "$OUTBASE/rompath/vsavjw.zip" ]; then
     echo "building the stage-6 gfx build at $OUTBASE ..."
