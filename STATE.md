@@ -78,7 +78,46 @@ DF entry and whether its source is id-indexed. If it is, the fix could
 be "his DF is his flight mode, in his own colours" rather than
 suppressing the mode at all.
 
-### DECISION PENDING (maintainer) — how should Phobos's Dark Force behave?
+### 14z-69e: MAINTAINER DIRECTIVE + the colour source located — the
+### decision is effectively RESOLVED
+
+Maintainer: "keep the mechanism as it is supposed to be; if we have
+small graphical side effects we can't clear, that's fine. But it should
+be mechanically sound and either vanilla or as close as we can make it,
+even for added characters."
+
+Against that standard, measured:
+- **The mode is mechanically sound.** Entry costs ONE stock (vsav's
+  cost, not vs2's two). He hovers at y=124-133 and moves horizontally
+  while in it, descends at f3660, lands at f3670, all three mode fields
+  clear, seq returns to 0x00 idle, palette restores exactly, no residue
+  through f3900. Clean entry, clean exit, vanilla cost.
+- **It is almost certainly his ORIGINAL Vampire-Savior Dark Force** — a
+  flight form whose per-char code vs2 still carries but never invokes,
+  because vs2 replaced the DF system. Our engine is vsav, so it runs.
+  This is "as close to vanilla as we can make it" BY KEEPING IT.
+- **Donovan proves the wiring is right in general**: identical repoint,
+  no recolour, no ghosts, seq back to normal — his vs2 DF-form handler
+  is simply benign where H's enters a form.
+
+So options 1 and 3 collapse: **keep the mode** (option 3), and treat the
+colour as the only defect. Option 2 (port vs2's type-A DF) was ruled
+out by the maintainer independently.
+
+**The colour source is located and it is a KNOWN CLASS.** One writer,
+engine 0x02AD68 (the 0x2AD64-family palette-seq uploader), rewrites row
+0x0A every frame from DF entry, cycling four contiguous rows of the
+global palette-seq table at vsavj 0x39ACD0-0x39AD4F. Their vs2 twins
+(delta +0x1613C -> 0x3B0E0C) are a GOLD ramp where vsavj's are PURPLE.
+**This is the sword/statue blink of 14z-33** — same ids, different
+global-table contents, table is legacy surface. The fix design is
+already written up there: wrap the seq-TRIGGER call inside the PORTED
+handler (legacy-clean by construction), routing the tenant's ids to
+privately placed copies of the four vs2 rows (0x80 bytes) and leaving
+all other ids alone. NOT yet implemented; it is cosmetic by the
+maintainer's own standard, so it is optional and safely deferrable.
+
+### SUPERSEDED — the earlier three-way decision (kept for the record)
 
 Not mine to make (CLAUDE.md §5: anything a player can feel).
 

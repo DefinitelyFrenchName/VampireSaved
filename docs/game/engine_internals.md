@@ -1247,6 +1247,47 @@ vsavj a legacy character (Victor) in DF shows no recolour and no extra
 draws (11 -> 9 -> 11 pal-0x0A draws, palette row constant). The
 afterimages come from the ported handler being reachable at all.
 
+### 14z-69e: the mode is SOUND; only the COLOUR is wrong, and it is a
+### known class (the sword/statue blink, STATE 14z-33)
+
+**Donovan does not have this problem, with identical wiring** — his
+build repoints `dispatch_16` row 0x13 to his placed vs2 handler exactly
+as H's repoints row 0x10, and measures clean: palette row 0x0A
+unchanged by DF, draws 12-16 against native's 15-18, seq back to
+0x04/0x06. The difference is the CONTENT of each character's vs2
+DF-form handler: Donovan's is benign, Huitzil's calls the channel
+machine and enters the form.
+
+**What Huitzil's form actually is: a FLIGHT/HOVER mode.** Measured
+across the mode — native stays grounded at y=40 the whole time; ours
+rises to **y=124-133 and moves horizontally** (x 834 -> 937 -> 1000),
+holds for the mode's duration, then **descends (y=91 at f3660) and
+lands (y=40 at f3670)**, with `+0x110/+0x111/+0x17B` cleared, seq back
+to 0x00 idle, the palette restored to his gold, and no residue for the
+next 240 frames. Entry costs **one** stock — vsav's cost, not vs2's.
+That is a coherent, correctly-terminating mode, and it is almost
+certainly Huitzil's ORIGINAL Vampire-Savior Dark Force: vs2 still
+carries the per-char code in its tables but replaced the DF system, so
+the handler is vestigial THERE and live HERE. Our engine is vsav.
+
+**The purple is a separate, known-class defect.** The recolour is a
+palette-SEQUENCE animation, not a static swap: one writer, **engine
+`0x02AD68`** (the `0x2AD64`-family uploader), rewrites row 0x0A every
+frame from DF entry, cycling **four contiguous rows of the global
+palette-seq table at vsavj `0x39ACD0`-`0x39AD4F`**. Their vs2 twins
+(mapping `+0x1613C`, i.e. `0x3B0E0C`-) hold a GOLD ramp
+(`0111 0fea 0fb8 0e96 0b75 ...`) where vsavj holds PURPLE
+(`0222 0fff 0faf 0fcf 0e8f ...`).
+
+That is exactly the sword/statue blink of 14z-33: same seq ids,
+different global-table contents between engines, and the table is
+legacy surface so it cannot simply be edited. **The fix design already
+exists there** (STATE, "FIX DESIGN (state_hook precedent)"): wrap the
+seq-TRIGGER call inside the PORTED handler — legacy-clean by
+construction because the call site is our own code — routing the
+tenant's ids to privately placed copies of the vs2 rows (0x80 bytes
+here) and leaving every other id on the original path.
+
 **Fix shape (gameplay decision — STATE "Decisions pending"):** the
 tenant's seq-0x16 row must not run vs2's DF-form machine under vsav's
 DF. Candidates: leave `dispatch_16` row 0x10 alone (careful: vanilla
