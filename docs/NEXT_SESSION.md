@@ -48,24 +48,44 @@ AND its sub-records are BYTE-IDENTICAL to vs2's (pointers relocated
 by exactly the region delta 0x14811C). Dispatch, records and art are
 all native-equivalent.
 
-**Blocker 1 — the stamp is too broad (fix this first).** Un-parked,
-it regresses `test_hui_pairs`: Dark Force takes a vec3 at PC
-0x0D4696 inside the ported machine (f3220, ADDR 0x4029FF, A2 =
-0x400010 our record base, A1 = 0x3FFEEE reading BELOW it — an index
-underflows the placed region). The victim-spawn site (vj 0x60EE0)
-serves EVERY hit of this class from the tenant, not just the ray, so
-DF's objects get routed into a machine that mishandles them. Narrow
-the stamp to the RAY EFFECT specifically — per-effect, not per-hit
-(candidate discriminators: the spawn selector D1, or the victim's
-reaction/effect id) — then re-run pairs FIRST.
+**Blocker 1 is NOT a stamp problem (14z-68e settled this).** There
+is no per-effect discriminator to find at that site: the selector D1
+is 0x0C for the ray AND the DF case, and the attacker/victim state
+bytes are identical at the spawn frame. Replay 82 activates DF FIRST
+and then fires the ray, so the crashing object IS the ray object,
+processed while DF is active. The crash decoded into three stacked
+defects instead:
+1. **Headroom.** vs2 indexes its record table with SIGNED offsets
+   that go below the base (measured d0 = 0xFFF3 = -13; on vs2 the
+   base has ROM underneath). Our base was at 0x400010, the first
+   address of wide_ext, so the read hit the RESERVED CpsFrg window
+   `$400000-$40000F`. Moving wide_ext's start to 0x400400 moved the
+   fault address, proving it. **Leave headroom below any region whose
+   consumers index negatively.**
+2. **The index is wrong too.** With headroom the address is still
+   ODD, and vec3 is an ADDRESS ERROR — native's equivalent read would
+   fault identically, so d0 = 0xFFF3 is not what native reads.
+3. **THE REAL ONE — an embedded DATA table the tooling cannot see.**
+   a3 is set by `lea $6D868(pc),a3` and read with `move.w (a3)+`.
+   The two views differ completely at 0x6D868 (opcode
+   `b8020919f5c7…` vs data `0001005800000000…`) and the DATA view is
+   correct: 0x6D878 gives **0x0064**, even and sane. RAW placement
+   does NOT fix this — raw storage holds one image (the opcode view,
+   so it executes), so data reads still see the wrong bytes.
 
-**Blocker 2 — the beam still does not draw.** With dispatch, records
-and art proven equivalent, the residual is the EMITTER path or a
-draw flag, not the data. Native emits its 14 sprites right after the
-fighter's own 3; ours emits none. Next probes: what the emitter
-walks for this object (the +0x1c chain is installed once and does
-not advance on either game), and whether a visibility/priority flag
-on the object differs.
+**DO THIS FIRST, ahead of any stamp work:** teach the POST-INCREMENT
+reader shape to BOTH `tools/census_regions.py` (its detector matches
+only `lea (d16,pc),An + (An,Xn.w)`, which is why this region reported
+clean) and the generator's `data_in_code` relocator (its only
+supported reader is `lea (d16,pc),a1 + move.b (a1,d0.w),d0`), add a
+frozen case to `tests/test_census_regions.sh`, then relocate this
+stream as data and re-run `test_hui_pairs` FIRST.
+
+**Blocker 2 — the beam still does not draw.** Unchanged, and note it
+may well share root layer 3: with dispatch, records and art proven
+equivalent, an embedded table reading garbage is exactly the kind of
+thing that would leave the emitter with nothing to draw. Re-measure
+after the data_in_code fix before hunting further.
 
 **Already shipped, do not redo:** the region now covers vs2's WHOLE
 row-8 machine (`0x6cac0:0xebc:t0x6cc34`, region x06cac0 — the
