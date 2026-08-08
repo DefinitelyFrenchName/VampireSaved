@@ -488,6 +488,15 @@ tests/test_romset_identity.sh         # ground truth for tools/audit_romset_iden
                                       # entry by hash before name, so such a member
                                       # silently reverts the patch — 14z-60z). 4 synthetic
                                       # sets, no emulator, ~1s
+tests/test_hui_fx_flow.sh      [bd]   # the effect-flow attribution gate (14z-68):
+                                      # leg 1 fighter-side flow identity (H's ray runs
+                                      # HIS per-char handlers; the REFUTED 0x56D68 entry
+                                      # must stay cold); leg 2 piece-side machine
+                                      # attribution, auto-detecting pre/post-port from
+                                      # the build's own patch notes. Rig: replay 83b
+                                      # (2P dummy, 3 spaced 236LP, FBNeo taps).
+                                      # Ground-truthed on hui9 + a bad-thunk negative
+                                      # control. Self-builds stage 6 unless given
 tests/test_wide_render_content.sh     # the WIDE track must SERVE the ported content's
                                       # tiles (RE-SHAPED 14z-67 for m3a semantics —
                                       # cross-track pixel identity ended BY DESIGN):
@@ -506,7 +515,10 @@ Diagnostic instruments added with that gate (MAME Lua, all rerunnable):
 `tests/lua/snapshot_frames.lua` (real PNG snapshots headlessly — MAME
 renders its bitmap internally even under `-video none`, so `video:snapshot()`
 works and the screen can be LOOKED at in-loop), `tests/lua/obj_records_dump.lua`
-(the live sprite list with the composed 18/19-bit tile address per entry),
+(the live sprite list with the composed 18/19-bit tile address per entry;
+**both gained `POKES` in 14z-68** — replay.lua grammar, so forced-pick rigs
+can finally be photographed and OBJ-dumped; reach for these BEFORE the third
+RAM-layer iteration, docs/GOTCHAS.md "verify at the RENDER layer"),
 `tests/lua/gfx_region_dump.lua` (decoded tile bytes at a TILE index —
 compose the bank bits first, see GOTCHAS).
 

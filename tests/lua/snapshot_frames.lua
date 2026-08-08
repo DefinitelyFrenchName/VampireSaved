@@ -17,6 +17,9 @@
 --   env SNAP_FRAMES  comma-separated frame numbers to capture
 --   env TRACE_OUT    index log path (default snapshot_frames.txt)
 --   env FRAMES       hard stop (default max(SNAP_FRAMES))
+--   env POKES        "frame:addr:hexbytes;..." scheduled RAM writes
+--                    (same grammar as replay.lua — added 14z-68 so the
+--                    forced-pick rigs can be photographed)
 --
 -- Ends with a SNAPSUMMARY line for scripted assertion.
 
@@ -81,8 +84,26 @@ local frame = 0
 local taken = 0
 local prev = {}
 
+-- POKES (14z-68): same grammar and application point as replay.lua
+local cpu = machine.devices[":maincpu"]
+local program = cpu.spaces["program"]
+local pokes = {}
+for spec in (os.getenv("POKES") or ""):gmatch("[^;]+") do
+    local fr, addr, hexs = spec:match("^(%d+):(%x+):(%x+)$")
+    if fr then pokes[#pokes + 1] = { tonumber(fr), tonumber(addr, 16), hexs } end
+end
+
 emu.register_frame_done(function()
     frame = frame + 1
+    for _, pk in ipairs(pokes) do
+        if pk[1] == frame then
+            local a = pk[2]
+            for b in pk[3]:gmatch("%x%x") do
+                program:write_u8(a, tonumber(b, 16))
+                a = a + 1
+            end
+        end
+    end
     for _, fo in ipairs(prev) do fo:set_value(0) end
     prev = held[frame] or {}
     for _, fo in ipairs(prev) do fo:set_value(1) end

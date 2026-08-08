@@ -2148,3 +2148,76 @@ Two paid lessons from the effect-entry arc:
    site_thunk addition. Corollary: VERIFY a park/comment edit
    actually changed the file (a silently-missed replace left the
    thunk live and burned a bisect round on a false premise).
+
+## Twin-site identification by BYTE PATTERN alone can land on the
+## wrong subsystem — derive the pair through the DISPATCH TABLE
+## (14z-68, refutes half of the 14z-67 entry theory)
+
+The parked seq_d_dispatch thunk paired vsavj 0x22500 with vs2 0x22008
+because the surrounding bytes pattern-matched. Measurement (FBNeo tap
+on replay 83b, ours vs native): vsavj 0x22500 is a timer-decrement
+run inside the EVERY-FRAME fighter tick; the true twin of vs2 0x22008
+is vsavj 0x23500 — reachable in one step by decoding both engines'
+per-seq jump tables (vsavj 0x225EE / vs2 0x20FD2, dispatchers
+0x225C2 / 0x20FA8), which are row-for-row parallel. The cost of the
+wrong pair: the ported handler's unconditional head-clears ran every
+frame and silently killed every move, which was then mis-attributed
+to "silent dependency gaps" in the handler's deep flow. When pairing
+engine sites across the games, FIND THE CONSUMER (the jump table or
+dispatch that reaches the site) and pair through its row index —
+byte-pattern similarity between two steppers is not identity.
+Corollary that closed the arc: before porting ANY per-char handler
+entry, check whether the target table's row 0x10 is ALREADY
+repointed on the built image — the 12b/13 dispatch_1x bank_map rows
+had silently solved the whole fighter-side entry problem, and the
+"missing dispatch" being chased did not exist.
+
+## In-code pc-rel WORD JUMP TABLES read through the OPCODE view;
+## byte/data tables through the DATA view — both live inside the
+## encrypted range (14z-68)
+
+The effect byte map (vs2 0x27FD8) reads correctly ONLY from the data
+view (the standing GOTCHA). The seq-0x0E state-dispatch word table
+(vs2 0x5556C, `move.w (pc,d0.w)` consumed) reads correctly ONLY from
+the OPCODE view — its data-view bytes decode to garbage targets.
+Deciding "which view" by the read instruction's addressing mode is
+not sufficient; classify per table by DECODING BOTH VIEWS and taking
+the one whose targets land on real code/data. The extractor already
+does this right — the trap is for hand analysis, where the wrong
+view produces plausible-looking garbage that can send a whole
+session down a false trail.
+
+## An "owner-gated" thunk on a shared engine routine is NOT scoped by
+## owner alone — sibling effect families share subtypes (14z-68)
+
+The fleet_record_base thunk gated on "tenant context + the ray's
+subtype 0x0D" and still crashed the ES flow: the ES big-beam driver
+is ALSO subtype 0x0D (it is the ray's sibling), so it matched the
+gate, and its parameter STREAM — advanced by the caller through
+`lea (d16,pc),a3` — carries record OFFSETS valid only for the
+VANILLA base. Half-swapping (new base, old stream) produced odd
+offsets and an insane dbra count: vec3 inside the channel fill.
+Two rules from this: (1) base, stream, count and updater are ONE
+unit — swap them together (i.e. port the region) or not at all;
+(2) when gating a shared routine, enumerate every family of the
+tenant's OWN content that reaches the site, not just every
+character — "only my tenant gets here" is a weaker claim than it
+sounds, and the crash appears in an unrelated move.
+
+## Verify a fix at the RENDER layer before believing the RAM layer
+## (14z-68, the beam that never was)
+
+Two successive thunks measured perfectly at the RAM/tap layer — the
+piece got the right bank word and a record at exactly native's own
+relative offset — and changed the screen not at all: every iteration
+was PIXEL-IDENTICAL to the unfixed build. The OBJ dump then showed
+why in one measurement: native stages beam sprites (bank-3 codes
+0x1E2F/0x1E42/0x1E5F pal 0x0C, plus bank-1 stretch segments 0x4EC0
+at 4x1 and 16x1) and ours stages ZERO — the pieces are never
+created, so first-tick constants were downstream of a spawn that
+does not happen. Correct-looking writes on the ONE object you are
+watching say nothing about the objects that were never spawned.
+`tests/lua/obj_records_dump.lua` + `snapshot_frames.lua` (both
+POKES-capable since 14z-68) answer "is it actually on screen?"
+in a single run — reach for them BEFORE the third RAM-layer
+iteration, not after.

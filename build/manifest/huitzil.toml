@@ -789,6 +789,88 @@ data_subst = "qqqqqqqq=0x279B4:0x54:wide_ext,pppppppp=0x27A08:0x370:wide_ext"
 # region_subst = "jjjjjjjj=x022400:0x36"
 # thunk_hex = "2f08306e00300c2800TT0382205f66064ef9jjjjjjjj422e01401d7c4ef900023902"
 
+# ── 14z-68 THE POOL-PIECE PRE-BAKE (the effect-family root fix,
+# iteration 1 — STATE 14z-68). The pool-piece machine (vj 0x5E780 ↔
+# vs2 0x6A770) is row-for-row twin EXCEPT row 0 (first tick), whose
+# THREE constants vs2 changed: bank word +0x18 (#$0 -> #$6000),
+# companion-record base (#$283690 -> #$2B7EF4), param-table mask.
+# Measured (FBNeo tap, replay 83b): ours' ray piece first-ticks in
+# the vanilla row 0 -> bank 0 + vanilla chain 0x283864; native gets
+# bank 0x6000 + chain 0x2B80D8. Rows 2+ are semantically identical
+# twins (R1 addresses only), so fixing first-tick fixes the piece.
+# THIS THUNK: at the spawn API's field-copy site (vj 0x18F88, the
+# one site every pool spawn passes with a6 = THE SPAWNING OBJECT —
+# measured by GUARD_PROBE: a6=$FF8400 the fighter; a1 = the effect
+# param source, a4 = the new piece), gate on the SPAWNER's char id; for tenant spawns, perform row-0
+# semantics with OUR constants (bank #$3000 = group C bank 5, the
+# c5 value; record base 0x400010 = the placed x2b7ef4 region) and
+# pre-advance +0x04 to 2 so the vanilla row 0 never runs. Vanilla
+# param block reproduced verbatim (vanilla tables 0x5EACA/0x5EBD2/
+# 0x5ECDA, helper 0x4CE2). Legacy pieces: the gate is the only
+# added cost at a site measured COLD for legacy in replay 83b
+# (3 hits = the 3 rays); the boot masked-EXACT leg arbitrates.
+# CCR: the displaced move.b runs LAST so the following bpl sees its
+# flags; movem does not touch CCR.
+# PARKED 14z-68 — VERIFIED CORRECT BUT NOT SUFFICIENT, so it does not
+# ship (a thunk with no observable effect only complicates attribution
+# while PING #8 is out). Measured on hz15: it installs bank word and
+# record EXACTLY as designed (record 0x4001F4 = placed base + 0x1E4 =
+# native's own relative offset, tap-confirmed) and every gate stays
+# green incl. 2P legacy BIT-IDENTICAL — but the beam still does not
+# render, because the pieces that DRAW it are never staged at all
+# (OBJ dump, replay 83b: native stages beam sprites at bank-3 codes
+# 0x1E2F/0x1E42/0x1E5F pal 0x0C plus the long bank-1 stretch segments
+# code 0x4EC0 sz 4x1 and 16x1; ours stages ZERO of them). First-tick
+# constants are downstream of a spawn that never happens. Un-park this
+# as PART OF the companion-machine region port, not before it.
+# [[site_thunk]]
+# stage = 6
+# name = "piece_prebake"
+# only_variant_slot = true
+# site = 0x018F88
+# old_hex = "196900540054"
+# patch = "jmp"
+# jmp_ok = true
+# thunk_hex = "0c2e00TT0382660000880c2c000d0059667e48e7f0da2c4c542e000470003d4000241d7c0008000c1d4000093d7ce000001a3d7c10000018102e00596b3c41f90005eaca323c0448142e000a0501670641f90005ebd24a2e00546a0641f90005ecdae748720076003230000024300002363000064eb900004ce27000102e0003207c004000104eb9000150844cdf5b0f1969005400544ef900018f8e"
+
+# ── 14z-68 THE FLEET RECORD-BASE SWAP (iteration 2). The fleet
+# spawner (vj 0x60DC8 ↔ vs2 0x6D1F0-family at 0x6D200, delta
+# ~0xC42C; updater 152/160 byte-identical) is invoked via the RAM
+# pump with a6 = the DRIVER PIECE (measured: $FFBA00, D1=0xBA) and
+# loads its record base ONCE: movea.l #$283690,a2 (vs2: #$2B7EF4).
+# Channel records (+0x18 of each $40/$60 channel) resolve
+# base-relative, so the base IS the fleet's record identity. Gate:
+# the driver's +0x18 bank word == #$3000 — a value ONLY the
+# piece_prebake thunk writes (group C bank 5; vanilla banks are
+# 0/2000/6000/E000-family and stock hardware has no bank 5), the
+# same by-construction tenant marker as the c5 spawner flips.
+# Tenant fleet -> the placed x2b7ef4 base 0x400010.
+# SCOPE NOTE (14z-68, the hz10 ES vec3 lesson): the piece_prebake is
+# additionally gated on subtype +0x59 == 0x0d (the measured ray
+# family) — an unscoped tenant-context prebake double-installed
+# records on ES-flow pieces whose spawn protocol differs, corrupting
+# the param stream (fleet spawner vec3 with an insane dbra count).
+# Each further effect family gets its own measured subtype row.
+# PARKED 14z-68 (measured: the hz10/hz12 ES vec3): the a2-swap alone
+# is WRONG — the fleet's param STREAM (lea 0x6141C(pc),a3, advanced
+# per-variant by the caller) carries record OFFSETS valid only for
+# the vanilla base; the ES driver is itself subtype 0x0d (the
+# big-beam sibling of the ray), so it got the prebake mark, matched
+# this gate, and its fleet mixed placed base + vanilla stream ->
+# odd offsets, insane dbra count, vec3 in the channel fill. Base,
+# stream, count, and updater swap TOGETHER or not at all = the
+# companion-machine REGION PORT (vs2 ~0x6CA00-0x6D7A0), the next
+# arc. Do not re-enable this thunk.
+# [[site_thunk]]
+# stage = 6
+# name = "fleet_record_base"
+# only_variant_slot = true
+# site = 0x060DD4
+# old_hex = "247c00283690"
+# patch = "jmp"
+# jmp_ok = true
+# thunk_hex = "0c6e300000186608247c004000104ef900060dda247c002836904ef900060dda"
+
 [[pcrel_escape_fix]]
 stage = 4
 region = "x022400"
@@ -799,27 +881,24 @@ stage = 4
 region = "x06d240"
 pad = 0x60
 
-# ── 14z-67 SEQ-D PER-CHAR DISPATCH (the effect-arc ENTRY, finally):
-# vs2's class-02 seq-0xD handler head is a PER-CHAR JMP DISPATCH
-# (moveq; move.b $382(a6),d0; lsl #2; movea.l #$D9538,a0; jmp
-# ([a0,d0])) — row 0x10 = HIS OWN ported handler 0x56D68 (region
-# "code" +0x20D8), whose flow (bsr local; bra 0x574B0 into x057456)
-# drives the beam/lightning/explosion machinery. vsavj's seq-D head
-# (0x22500) has NO dispatch — his seq-D states ran the vanilla
-# handler, so none of his effect flow ever executed. Thunk: tenant ->
-# jmp his placed handler; everyone else re-created verbatim (the
-# displaced window contains a beq.s, so the body re-creates its
-# semantics with absolute jmps: tst.b $169(a6); zero -> 0x2250A,
-# else -> 0x22506).
-# PARKED 14z-67 (measured regression, do not enable without the
-# dependency closure): the thunk fires EVERY FRAME for both players
-# (seq 0xD = a common state, 401 probe hits/capped) and with it
-# active the ray move NO LONGER FIRES AT ALL (A/B vs hui8: no freeze)
-# — his seq-D handler's deep flow (0x56D68 -> bsr local -> bra
-# 0x574B0 -> the x057456 driver) has unmet dependencies on our build
-# that fail SILENTLY (no crash, no tripwire — the state machine
-# routes away). NEXT: enable in scratch builds + probe the 0x574B0
-# flow to closure (the R1 loop), then re-enable here.
+# ── 14z-67 SEQ-D PER-CHAR DISPATCH — **REFUTED 14z-68, PARKED
+# FOREVER, DO NOT RE-ATTEMPT** (STATE 14z-68 + docs/GOTCHAS.md
+# "twin-site identification by byte pattern"). Measured on replay
+# 83b (FBNeo tap, ours vs native): (1) native NEVER executes 0x56D68
+# — zero hits across a whole replay with three successful rays; (2)
+# the site 0x22500 is NOT the twin of vs2 0x22008 — it is a
+# timer-decrement run inside the EVERY-FRAME fighter tick (the true
+# twin is vsavj 0x23500, seq-byte 0x1A, derived through the parallel
+# per-seq tables vsavj 0x225EE / vs2 0x20FD2); (3) no seq-head thunk
+# is needed AT ALL — both engines per-char-dispatch every fighter
+# seq head, and the built image already repoints EVERY row 0x10 to
+# H's placed handlers (the 12b/13 dispatch_1x bank_map rows). The
+# fighter-side ray flow is tap-verified native-identical on hui9.
+# The kill mechanism when this thunk was live: the vs2 handler's
+# unconditional head-clears ($17b/$111/$110/$1b5) ran every frame
+# via the wrong site. The REAL remaining effect gap is the
+# POOL-PIECE MACHINE port (vj 0x5E780-family ↔ vs2 0x6A770-family;
+# STATE 14z-68).
 # [[site_thunk]]
 # stage = 4
 # name = "seq_d_dispatch"

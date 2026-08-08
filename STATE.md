@@ -1,5 +1,171 @@
 # STATE — living progress log
 
+Updated: 2026-08-08 (session 14z-68 IN PROGRESS — the effect-flow
+closure arc. THE 14z-67 ENTRY THEORY IS REFUTED BY MEASUREMENT and
+the TRUE root is decoded to three constants; see the 14z-68 section
+below before touching anything effect-related.)
+
+## Session 14z-68 (the effect-flow closure — root cause found)
+
+### The 14z-67 seq-D entry theory is REFUTED (three measurements)
+
+- Un-parked seq_d_dispatch in scratch (build/scratch/hz7 =
+  huitzil_seqd.toml, fingerprint 0f299f3b) and reproduced the kill
+  with NEW replay tests/replays/hui/83b_hui_ray_2p.rpl (2P-dummy,
+  three spaced 236LP — cross-emulator reproducible, FBNeo-tappable).
+  FBNeo tap A/B (ours vs NATIVE vs2, identical poke flow) showed:
+  1. NATIVE NEVER EXECUTES 0x56D68 — zero hits across the whole
+     replay including three successful rays. The premise "vs2
+     dispatches H's fighter into 0x56D68 every seq-D tick" is false.
+  2. The parked thunk's site vsavj 0x22500 is NOT the twin of vs2
+     0x22008 — it is a timer-decrement common path inside the
+     per-frame fighter tick (fires every frame; the vs2 handler's
+     unconditional head-clears of $17b/$111/$110/$1b5(a6) then
+     killed every move — the measured regression, now explained).
+  3. The TRUE twin of vs2 0x22008 is vsavj 0x23500 (seq-byte 0x1A =
+     jump-table entry D): the two per-seq tables (vsavj 0x225EE /
+     vs2 0x20FD2, dispatchers 0x225C2/0x20FA8) are row-for-row
+     parallel — SEQ NUMBERING IS IDENTICAL across the games.
+- BOTH engines carry per-char dispatch at every fighter seq head
+  (vsavj tables 0xBD0FA/0xBD17A/0xBD1FA/0xBD27A/0xBD2FA/0xBD37A/
+  0xBD47A/0xBD5FA/0xBF31A/0xBF39A/0xBF49A/0xBF61A ↔ vs2 0xD7298/
+  0xD7318/0xD7398/0xD7418/0xD7498/0xD7518/0xD7618/0xD7798/0xD94B8/
+  0xD9538/0xD9638/0xD97B8) — and ON OUR BUILDS EVERY ROW 0x10 IS
+  ALREADY REPOINTED to H's placed handlers (verified on the hui9
+  image; the 12b/13 dispatch_1x bank_map rows + auto-repoint did
+  this). The FIGHTER-SIDE flow needs NOTHING: hui9's ray runs the
+  native flow bit-for-bit (state 0x12 recognizer at 0x55500-twin,
+  seq-0x0E per-char handler 0x55560-twin, sub-flow 0x5682E-twin,
+  the 0x18-step beam counter at $126(a6) — tap-verified against
+  native, 1-frame skew). NO seq-head thunk is needed, ever.
+  Both parked thunks stay parked (now documented as refuted).
+- View correction recorded: in-code pc-rel WORD JUMP TABLES live in
+  the OPCODE view (the 0x5556C state table decoded garbage from the
+  data view, correct from the opcode view); the DATA-view rule
+  applies to byte/data tables like the effect byte map. Both classes
+  exist inside encrypted range; the extractor already handles this.
+
+### The TRUE remaining gap: the POOL-PIECE MACHINE (one engine
+### routine, three constants)
+
+- The ray effect object (id 0x14, spawned by the twin APIs vs2
+  0x17964 / vj 0x18F8E into the $FFBxxx pool) and its 5-slot fleet
+  (vs2 spawner 0x6D262 / vj's own old spawner 0x60E36) spawn on BOTH
+  games with identical structure and timing. The divergence is the
+  piece's FIRST TICK — the pool-piece state machine, an ENGINE
+  routine vs2 rewrote:
+    vj 0x5E780-family ↔ vs2 0x6A770-family (structural twins;
+    per-seq pc-rel jump table at vj 0x5E7A4 / vs2 0x6A798; pool
+    walker/pump at vj 0x5E540, stride 0x80, per-type pointer table
+    at 0x5E556)
+  and the ONLY differences are three constants in the subtype
+  handler: bank word +0x18 (#$6000 vs2 / #$0 vj — the measured
+  bank-0 orphan symptom), companion-record base (#$2B7EF4 vs2 /
+  #$283690 vj — ours' pieces get vanilla chain 0x283864, native
+  gets 0x2B80D8), and the subtype mask (#$4410448 vs2 / #$448 vj —
+  vs2 added subtype rows). Param tables 0x6AAE8/0x6ABF0/0x6ACF8
+  (8-byte rows, 0x108 apart).
+- Everything the pieces need already exists on hui9: the placed
+  x2b7ef4 record region (head 0x40223C), the c5 art at native codes
+  in group C bank 5 (bank word 0x3000 on our build), the effect
+  zone x022400 + fleet spawners x06d240 placed with escapes
+  resolved. THE MISSING PIECE: port vs2 0x6A770-0x6AE00 (~0x690,
+  machine + 3 param tables) as a region, constants substituted
+  (#$6000 -> #$3000, #$2B7EF4 -> placed twin; engine jsr targets are
+  known R1 pairs: 0x13778->0x15084, 0x13724->0x15030,
+  0x13c0e->0x1551a, 0x157c2->0x1707a, 0x5122->0x4ce2), entered by a
+  tenant-owner-gated thunk on the vanilla machine.
+- Ray sustain/palette, grab lightning, ES big beam, 214 explosion
+  are ALL rows of this one machine family (+ the placed 0x22xxx
+  effect-OBJECT zone whose entry has the same gating need). One
+  port covers the family; FG pacing possibly too.
+### Iterations 1-2 BUILT AND MEASURED — both PARKED; the render-level
+### fact that scopes the real port
+
+Two thunks were authored, built, and measured against native. Both
+work exactly as designed and NEITHER restores the beam, which is
+itself the finding: **first-tick constants are downstream of a spawn
+that never happens.**
+
+- `piece_prebake` (site vj 0x18F88, the spawn API's field-copy step;
+  a6 = the spawning fighter, a4 = the new piece — GUARD_PROBE
+  measured, my first two register guesses (a1, then unscoped a6)
+  were wrong and each cost a build): gated on char id + subtype
+  +0x59 == 0x0D, it performs row-0 semantics with our constants.
+  VERIFIED by tap: bank word 0x18 set, record installed at
+  0x4001F4 = placed base + 0x1E4 = **native's own relative offset**.
+  Gates all green, 2P legacy replay BIT-IDENTICAL to hui9 (the
+  thunk costs legacy nothing — the site is cold for legacy: 3 hits,
+  the 3 rays). Beam: still absent. PARKED.
+- `fleet_record_base` (site vj 0x60DD4): swapping only the fleet's
+  record base a2 CRASHED the ES flow (vec3 in the channel fill).
+  Mechanism: the ES driver is ALSO subtype 0x0D, so it matched the
+  gate, and its param STREAM (lea 0x6141C(pc),a3, advanced by the
+  caller) carries offsets valid only for the vanilla base — mixed
+  base + stream = odd offsets, insane dbra. **Base, stream, count
+  and updater swap TOGETHER or not at all.** PARKED.
+- Scope lesson (new GOTCHA): an "owner-gated" thunk on a shared
+  engine routine is NOT scoped by owner alone — sibling effect
+  families of the same tenant share subtypes and reach the same
+  site with different protocols.
+
+**THE RENDER-LEVEL FACT (OBJ dump, replay 83b, native vs hz15 at
+the same beam phase) — this is what the next arc must produce:**
+native stages the beam as pieces at **bank-3 codes 0x1E2F / 0x1E42 /
+0x1E5F, pal 0x0C** (H's own band — the art EXISTS in our group C
+bank 4 at delta 0) marching x=0x9C..0xDC, PLUS the long stretch
+segments **bank-1 code 0x4EC0 at sz 4x1 and 16x1** (effect page ->
+our group C bank 5 via c5). **Ours stages ZERO of them** — not
+wrong art, not a wrong bank: the pieces are never created. Snapshots
+confirm it at the pixel level (native draws the sustained beam;
+hui9 and every iteration are pixel-identical to each other and
+beamless, while the freeze itself connects normally).
+
+So the arc is exactly the companion-machine REGION PORT already
+scoped above (vs2 ~0x6CA00-0x6D7A0 + the piece machine 0x6A770
+family), entered so that the SPAWN happens — not a constants patch.
+The two parked thunks are its final wiring, to be un-parked as part
+of it.
+
+- **DECISION PENDING (maintainer, §4): the entry gate is
+  legacy-hot.** Every pool piece of every character runs the walker/
+  machine every frame; any tenant gate there (cmpi + bne, the
+  effect_machine thunk pattern) shifts legacy cycles, so H's boot
+  legacy leg must move from masked-v2 EXACT to the flicker/composite
+  class — the SAME ratified class family Donovan's builds live in
+  (donovan-m2c/m5w frozen flicker inventories). §4 requires a
+  measured mechanism + maintainer sign-off for any class move.
+  Recommendation: accept the class move (it is literally "the same
+  state as Donovan"); the scratch build will carry the measured
+  flicker inventory for ratification. Options if declined: none
+  found — spawn-side re-typing dead-ends on the pc-rel walker
+  table (documented in the session log).
+  NOTE: the piece_prebake measurement above shows the cost may be
+  ZERO for a sufficiently narrow site (2P legacy bit-identical),
+  so the class move may not be needed after all — measure the real
+  entry before asking.
+
+### What SHIPS from 14z-68 (the manifest is functionally unchanged)
+
+`build/manifest/huitzil.toml` is **functionally identical to HEAD**
+(verified: diff of all non-comment lines is empty; rebuild
+fingerprint df578358 = the 14z-67 round-final shape). Everything
+authored this session is documentation, measurement rigs, and one
+new gate:
+- NEW replay `tests/replays/hui/83b_hui_ray_2p.rpl` (2P-dummy,
+  three spaced 236LP — cross-emulator reproducible, tappable).
+- NEW gate `tests/test_hui_fx_flow.sh`: two legs (fighter-side flow
+  identity incl. "the refuted 0x56D68 entry stays cold"; piece-side
+  machine attribution, auto-detecting pre/post-port from the build's
+  own patch notes). Ground-truthed on hui9 (PASS) with a real
+  negative control (hz7, the bad-thunk build, fails 3 of 4 legs).
+- `tests/lua/snapshot_frames.lua` and `tests/lua/obj_records_dump.lua`
+  gained **POKES** (replay.lua grammar) — the forced-pick rigs could
+  not previously be photographed or OBJ-dumped at all.
+- Gates green at close: hui_boot (masked-v2 EXACT), fx_flow, ex,
+  grab, air, pairs, walk, m3a-reproducible (both frozen refs
+  bit-exact).
+
 Updated: 2026-08-08 (session 14z-67 CLOSED — the D4 verticals PLUS
 two maintainer ping rounds. D4: all three openers done (3-tenant
 layout RATIFIED, censuses promoted + Pyron clean, THE H GFX RUNG —
