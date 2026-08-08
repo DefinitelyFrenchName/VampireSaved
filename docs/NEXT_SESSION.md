@@ -20,18 +20,22 @@ ede6bf15 is all-green.
 
 ## THE QUICK WINS (do these first)
 
-### 1. Sidekick shadow — round not rectangular (ping #7 item 2)
-The mechanism is already documented (14z-66): the `shadow_seq_guard`
-site_thunk at 0x8245C clamps out-of-range seq ids to the default
-shadow, which is why H's sidekick draws the fallback (rectangular)
-shape. The FIX is the extended vs2-ported shadow table at the same
-site — vs2's twin table is simply larger (vsavj 0x2083BC/0x2087CA,
-row space 0x40E each, hardcoded at the installer 0x823E2/0x823F2 and
-NOT per-char; vs2's twin is 0x1E42D2). Port the larger table, point
-the installer rows at it for the tenant, and the clamp stops firing.
-Keep the clamp as the backstop — it is deliberately UNGATED by char
-id because FG capture anims put a VANILLA victim's servant through
-H-supplied seq ids.
+### 1. Sidekick shadow — BLOCKED ON MAINTAINER INPUT (14z-68f)
+**Do not chase the 14z-66 explanation: it was measured WRONG.**
+vs2's shadow tables are NOT larger (vs2 installer 0x90B0C, tables
+0x1E42D2/0x1E46E0, exactly 0x40E apart = the SAME row space as vj's
+0x2083BC/0x2087CA; the walk sites are structurally identical; the
+only content difference is a uniform +2, i.e. ONE extra index entry).
+And on our build over replay 82 — where his summon pieces are live —
+the shadow path is not reached AT ALL: 0 probe hits at the installer
+0x823E2 and 0 at the walk 0x8245C. So ping-#7 item 2 was attributed
+to `shadow_seq_guard` by inference from the FG-crash work, not by
+measurement of the symptom.
+**ASK THE MAINTAINER:** which move/situation shows the rectangular
+shadow, and is it the pod companion or another servant? With a repro
+replay, a probe on whatever installs that shadow names the real
+mechanism quickly. `shadow_seq_guard` itself stays — it is the
+FG-crash fix (replay 77) and is unrelated to this item.
 
 ### 2. Win-screen palette (ping #7 item 5)
 TWO defects, both measured (14z-67): (a) the palette source

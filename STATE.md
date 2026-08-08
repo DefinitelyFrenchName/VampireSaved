@@ -354,6 +354,46 @@ NOTHING FURTHER SHIPPED this round: the manifest is back to the
 14z-68d parked state (verified: no live `obj_hook_extra` row, no live
 `tenant_type_stamp`), which is the all-green build ede6bf15.
 
+### 14z-68f: the SHADOW item's documented premise DOES NOT HOLD
+### (two measurements) — it needs a repro from the maintainer
+
+Opened the first quick win and the premise failed immediately, which
+is worth more than a wrong fix:
+
+1. **vs2's shadow tables are NOT larger.** The 14z-66 note said the
+   fix was "the extended vs2-ported shadow table at the same site".
+   Measured: vs2's installer is 0x90B0C (twin of vj 0x823E2) with
+   tables **0x1E42D2 / 0x1E46E0**, exactly **0x40E apart** — the SAME
+   row space as vsavj's 0x2083BC / 0x2087CA. The walk sites are
+   structurally identical too (vs2 0x90B86 / vj 0x8245C: same
+   `andi.w #$1fff`, same `+0x50` change-check, same `+0x40` table
+   pointer, same doubling). The only difference between the two
+   games' table CONTENT is a consistent +2 on every entry (vs2
+   0x081E/0x0410 vs vj 0x081C/0x040E), i.e. vs2's index carries ONE
+   more entry — nowhere near enough to cover the 0x488 seq the
+   14z-66 note blamed. **So "port the bigger table" is not the fix,
+   and the item cannot be closed that way.**
+2. **The shadow system is not even reached in the replay where his
+   sidekick exists.** GUARD_PROBE on our build over replay 82 (DF,
+   which STATE 14z-66 records as having his summon pieces t=0x75/0x77
+   live in poolB at f3250): **0 hits at the installer 0x823E2 AND 0
+   hits at the walk 0x8245C.** So whatever draws the sidekick's
+   shadow, it is not this class-0x0C servant path — the 14z-66
+   attribution of ping-#7 item 2 to `shadow_seq_guard` was an
+   INFERENCE from the FG crash work (where the site genuinely does
+   fire, replay 77), not a measurement of the shadow symptom.
+
+**BLOCKED ON MAINTAINER INPUT (cheap to unblock):** to build a repro
+I need to know WHEN the rectangular shadow is visible — which move or
+situation puts the sidekick on screen with the wrong shadow (and
+whether it is the pod companion or another servant). With that, the
+repro replay + a probe on whatever actually installs its shadow will
+name the real mechanism in one session. Until then the item stays
+open and NOTHING has been changed for it.
+
+The `shadow_seq_guard` thunk itself is untouched and stays — it is
+the FG-crash fix (14z-66, replay 77) and is unrelated to this item.
+
 ### What SHIPS from 14z-68
 
 One functional change ships: the **region-boundary fix** above
