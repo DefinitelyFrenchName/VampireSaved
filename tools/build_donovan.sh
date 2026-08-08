@@ -93,7 +93,27 @@ case "$TENANT_CHAR" in
         # 0x2B8060; unrooted, the operand resolved to a CODE TRIPWIRE and
         # the "table" read returned ILLEGAL-opcode bytes as node offsets).
         # Donovan's root verbatim (newcomer-shared data, same oracle twin).
-        DEFAULT_ROOTS="$DEFAULT_ROOTS,0x5c800:0xd100,0x26142:0x1400,0x28122:0xe00,0x88512:0x3b40:s,0x2b7ef4:0xb20c:t0x2a4398:d"
+        #
+        # 14z-70 — x088512 grows 0x3B40 -> 0x3B98 with a RAW tail from
+        # +0x3B78. The zone's own effect machine ends in a three-call run
+        #     08C014 lea (0x74,pc),A0  -> 08C08A     08C018 jsr $09C4F6
+        #     08C026 lea (0x72,pc),A0  -> 08C09A     08C02A jsr $09C4F6
+        #     08C038 lea (0x68,pc),A0  -> 08C0A2     08C03C jmp $09C4F6
+        # whose three tables sat 0x38/0x48/0x50 PAST the old end, so each
+        # pc-rel pointer resolved to target+delta = 0x0D8988/98/A0 — inside
+        # the ANIM region placed immediately after (0x0D8950). The machine
+        # read animation bytes as its parameters, which is how the 214+P
+        # explosion's pieces ended up pointed at an unrelated VSAVJ sprite
+        # list (verify_pcrel_data.py: 3 BROKEN here). Same defect as
+        # x06cac0 (14z-69h/i/j), same fix.
+        # Split = the FIRST TABLE (+0x3B78), not the old end: everything
+        # already shipped as encrypted code keeps that treatment, and only
+        # the newly-pulled-in tail is raw. End = 0x08C0AA (+0x3B98) = the
+        # last table's end, where a different 0x14-stride structure with
+        # real pointers begins — do NOT swallow it. The three tables are
+        # plain word offsets (0x0020-0x00FC, no pointer fields), which is
+        # what makes forcing them safe (`:f` copies unvalidated bytes).
+        DEFAULT_ROOTS="$DEFAULT_ROOTS,0x5c800:0xd100,0x26142:0x1400,0x28122:0xe00,0x88512:0x3b98:s:f0x3b78,0x2b7ef4:0xb20c:t0x2a4398:d"
         # The secondary-object handler family 64-75 (14z-65): H's moves
         # spawn these (type 72 named by the round-2 soak tripwire); all
         # twelve rooted pre-emptively (caps = inter-handler gaps, twins

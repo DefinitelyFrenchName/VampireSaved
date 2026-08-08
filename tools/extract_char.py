@@ -663,6 +663,22 @@ def main():
             regions[sh_name] = {"src": root, "orc": root, "len": fixed_len,
                                 "kind": "code", "shift": sh_name,
                                 "source_only": True}
+            # `f<off>` on a SOURCE-ONLY root (14z-70). There is no oracle
+            # here, so the length is already fixed and `:f`'s force half is
+            # a no-op — but the RAW-DATA half still applies: a source-only
+            # code region can carry its own pc-relative data tables just as
+            # a twinned one can, and if they are emitted inside the
+            # encrypted code op the engine's DATA reads return the opcode
+            # image (x06cac0, 14z-69j). x088512's effect machine is exactly
+            # that case: three `lea (d16,pc),A0` at 0x08C014/26/38 whose
+            # tables sit at 0x08C08A/9A/A2, past the old 0x3B40 end, so
+            # they resolved into the ANIM region placed right after it.
+            if raw_from is not None:
+                regions[sh_name]["raw_from"] = raw_from
+                report.append(f"  {sh_name}: raw DATA tail from "
+                              f"+{raw_from:#x} ({fixed_len - raw_from:#x} "
+                              f"bytes emitted unencrypted for runtime DATA "
+                              f"reads)")
             source_only.append(sh_name)
             report.append(f"extra region {sh_name}: SOURCE-ONLY, "
                           f"len 0x{fixed_len:X} (per-game hook; scanner refs)")

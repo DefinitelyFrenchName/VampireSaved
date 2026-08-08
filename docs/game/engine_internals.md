@@ -1507,8 +1507,8 @@ and flip the ported piece spawners' bank setters `#$2000 -> #$3000`.
 This explosion is NOT going through that path — it draws bank 0 with
 non-native codes, i.e. neither half applies to it.
 
-### 14z-70c: ROOT FOUND — `x088512` is 0x50 bytes too SHORT, so the
-### effect machine reads the ANIM region as its parameter tables
+### 14z-70c: a REAL latent defect in `x088512` — fixed and shipped — but
+### it is NOT the explosion's root. Claim RETRACTED, see 14z-70d below.
 
 Chased the emitter down the chain, and it lands on the defect class this
 project has now paid for three times.
@@ -1573,6 +1573,64 @@ gates plus the legacy masked-v2 basis.
 
 Also still unchased: `pal 10` and `pal 11` bank-0 sprites sit in the
 same screen region and may belong to the same effect.
+
+### 14z-70d: the fix was BUILT and it does NOT fix the explosion — the
+### causal claim above is RETRACTED
+
+Executed the recipe. `build/hui15` (**699de9b7**): root
+`0x88512:0x3b98:s:f0x3b78`, plus a small `extract_char.py` change so a
+SOURCE-ONLY (`:s`) root honours `f<off>` at all — the `:s` branch
+returns early and never set `raw_from`, while the generator already
+reads it per region. Extract log confirms: *"x088512: raw DATA tail from
++0x3b78 (0x20 bytes emitted unencrypted for runtime DATA reads)"*.
+
+**The repair is real.** `verify_pcrel_data.py` drops from 72 BROKEN to
+69, with all three `x088512` rows gone — the tables now sit inside the
+region and resolve to themselves.
+
+**And it changes the explosion not at all.** Measured, not eyeballed:
+
+```
+native pal06/bank0 codes : 88
+hui14 : 84   shared with native 0   at +0xA220: 41
+hui15 : 84   shared with native 0   at +0xA220: 41
+hui15 code set == hui14 code set : True
+```
+Byte-for-byte the same sprite codes, and the snapshot at f3430 is
+unchanged. **Why: the code that reads those tables never runs.** An
+execution breakpoint at the placed twin `PRG:0x0D8912` (= `0x08C014` +
+the `x088512 -> 0x0D4E10` delta) over the whole replay fires **zero**
+times (the single logged line is the frame-1 arming artefact).
+
+**The error, named so it is not repeated: co-location is not
+causation.** The reasoning was "the effect machine lives in `x088512`;
+`x088512` has three tables resolving into the anim region; therefore
+those tables feed the effect machine." Every clause was true and the
+conclusion still did not follow — the tables are on a path this
+scenario never enters. **Before attributing a symptom to a broken
+table, put an execution breakpoint on the code that READS it.** That is
+one cheap run, and it would have preceded a whole rebuild here. Same
+family as this session's other two: measuring something real, then
+assuming it was the thing in front of us.
+
+**Status of the change: KEPT, and gates green.** It repairs a genuine
+latent defect of the class the project has already ratified a fix for
+(x06cac0, 14z-69j), it is behaviourally inert today, and it is proven
+safe: `test_m3a_reproducible.sh` PASS (both frozen references rebuild
+bit-exact, so the shared-tool edit is inert on Donovan) and
+`test_hui_boot.sh` PASS with legacy **masked-v2 EXACT**. It is a latent
+repair with no observable effect — worth keeping for the same reason the
+x06cac0 one was, but it buys no visible change and should not be
+described as fixing anything a player can see.
+
+**So the explosion's root is still OPEN**, and the eliminations now
+include: not the tiles' presence (they are absent from our set — that
+part stands), not `effect_tail`, not the `c5_mode` path, and not
+`x088512`'s pc-rel tables. What IS established and unchanged: the
+effect object runs correctly (positions/counts match native frame for
+frame), and only the tile codes differ, by exactly +0xA220. The next
+move is to attribute THAT constant — instrument the code that computes
+the code word, rather than reasoning from which region it lives in.
 
 ## The beam / effect family — state after 14z-69j (three of four pieces
 ## are native-equivalent; EMISSION is the open one)
