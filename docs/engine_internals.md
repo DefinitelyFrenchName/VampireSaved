@@ -828,6 +828,15 @@ indexed by id WITHOUT the bias — the arrays OVERLAP (`0x26742A` row
 0x10 IS `0x2672AA` row 0x70), which is exactly what makes it easy to
 repoint the wrong entry.
 
+**Scope warning (14z-68p): a quote record is a list of POINTERS TO
+TEXT.** Structure: a 12-byte header then 4-byte entries whose low 3
+bytes are a ROM address of the string/glyph run — vs2's H quote points
+into `0x1BADxx`, vsavj's records into `0x1BB2xx`. So porting a
+tenant's quote is not a repoint: it needs the SOURCE TEXT DATA ported
+too (or the glyphs re-encoded against the host font). Budget it as a
+data-port item, not a one-row fix. Cosmetic and non-gameplay — fine to
+defer behind visible defects.
+
 ### Per-tenant win-screen checklist
 1. `[[code_word]]` x2 — position x/y (slot-following, CODE rows).
 2. `[[win_pal_variant]]` — palette; pick the row from the OPCODE view
