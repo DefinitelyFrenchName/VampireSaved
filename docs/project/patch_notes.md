@@ -1,5 +1,28 @@
 # patch_notes — per-change detail: every byte, and why
 
+## 14z-69 (session close) — byte detail
+
+**`data_port df_palette_seq_rows`** — 0x80 bytes at vsavj `0x39ACC0`
+(palette-seq rows 0x1E, 0x1F, 0x20, 0x21) replaced with vs2 `0x3ABEDC`
+(vh2 twin `0x38BEB0`, byte-identical, unique). Old head at dst:
+`05310fff0e9e0ece0d7e093e064d045c` (asserted by the row). Effect: H's
+Dark Force flashes his warm gold ramp instead of a purple one. Legacy
+never requests these ids (audited, 10,504 calls, only 0x26/0x27).
+
+**`extra_tiles/0x10.json`** — tiles `0x0F8B`, `0x0F8C` added to the
+group-C copy inventory. gfx members only: `vsw.31m/33m/35m/37m` change,
+the program is byte-identical (hui12 and hui13 share fingerprint
+`31d576be`). Effect: the child sidekick's shadow core draws real art
+instead of an empty tile.
+
+**region `x06cac0` root `0x6cac0:0xebc:t0x6cc34:f0xca8`** — forced past
+the oracle boundary (0xC00) to its declared 0xEBC so the row-8 machine's
+seven pc-relative tables sit inside it, with `+0xCA8..+0xEBC` emitted as
+RAW data from the SOURCE DATA IMAGE (not from the relocated blob — an
+`(An)`-based read is a DATA-space read). All seven tables now read
+byte-identical to vs2. Behaviour unchanged so far: the beam still does
+not draw.
+
 Newest first.
 
 ## 14z-65 (6) — the specials hunt: window widened, alias rule, farm verified (2026-08-07)

@@ -579,6 +579,21 @@ tests/test_hui_df_style.sh     [bd]   # the DARK FORCE gate (14z-69): replay 85
                                       # gold, his art drawn ~4x over); set
                                       # DF_STYLE_EXPECT=matches when fixed. Three
                                       # verdict controls. Defaults to build/hui11
+tests/audit_empty_tiles.sh    [bd]     # 14z-69o: does the build DRAW any sprite whose
+                                      # group-C tile is BLANK? A remapped-but-uncopied
+                                      # tile renders as a SOLID RECTANGLE and no other
+                                      # gate can see it (records/codes/walk all correct).
+                                      # Complete, not a sample. Ground-truthed: PASSES on
+                                      # build/hui14, FAILS on build/hui12 naming both
+                                      # shadow tiles. RUN FOR EVERY NEW TENANT
+tests/audit_palette_seq_ids.sh        # 14z-69p: which palette-seq ids does LEGACY ever
+                                      # request? (uncapped probe on 0x2AD82, 8 replays).
+                                      # The DF-palette data row is legacy-inert ONLY
+                                      # because the answer is {0x26, 0x27} — and the
+                                      # palette path never transits work RAM, so this
+                                      # audit is its ONLY guard. Use GUARD_PROBE_MAX:
+                                      # the default 400-hit cap truncated it once and
+                                      # hid id 0x27
 tests/test_wide_render_content.sh     # the WIDE track must SERVE the ported content's
                                       # tiles (RE-SHAPED 14z-67 for m3a semantics —
                                       # cross-track pixel identity ended BY DESIGN):

@@ -1,113 +1,94 @@
-# NEXT SESSION — orientation (written during 14z-69, 2026-08-08)
+# NEXT SESSION — orientation (written at the close of 14z-69, 2026-08-08)
 
-**The DF-style opener is OPEN AND MEASURED. Start by decoding the
-DF-TYPE selection between vj `0x027008` and vs2 `0x0261A6`/`0x025EE0`
-(detail below). The symptom reproduces on demand now — the rig is
-`tests/test_hui_df_style.sh`.**
+**Start with the EFFECT FAMILY. It is one root — beam, grab lightning,
+ES big beam and the 214+P grenade explosion are all the same defect —
+and it is now narrowed to a single question, with three of its four
+suspected causes eliminated by measurement.**
 
-**PING #10 = build/hui11 (5c6dbe43) is still the current build.** No
-build changed this session. Frozen references untouched.
+**PING #12 = build/hui14 (c25b3824) is current and MAINTAINER-CONFIRMED**
+on all three of this session's fixes. `tools/run_hui_behavior.sh`
+points at it. Frozen references unchanged (donovan-m3a 4b7d0dc7 /
+m5_stock 6c93cfa8; m3a-reproducible PASS).
 
-## READ THIS BEFORE ANY DARK FORCE WORK
+## What shipped in 14z-69 (all playtest-confirmed)
 
-**DF costs one banked stock.** With an empty meter the P+K pair is
-DOWNGRADED to a single button and play continues normally — `seq 0x0A`
-is that downgrade, NOT Dark Force. Replay 82 has no stock, so every DF
-measurement in 14z-66/67/68 (including a gate that claimed "DF
-activates, expires, re-activates" and the "DF mechanics are already
-native-correct" conclusion) was taken outside the mode. I then published
-a full A/B this session concluding the symptom "does not reproduce" —
-also outside the mode. The maintainer caught it from one screenshot: an
-ordinary stage and no TIME bar.
+1. **The child sidekick's shadow** — two tiles (0x0F8B/0x0F8C) were
+   remapped into group C but never COPIED there, so they drew an empty
+   tile: a solid rectangle. Fixed via the new per-tenant
+   `build/manifest/extra_tiles/<char>.json`.
+2. **The Dark Force palette** — he flashes his own warm gold instead of
+   purple. One `[[data_port]]` row swaps palette-seq rows 0x1E-0x21 for
+   the sequence native's DF actually shows. The afterimages STAY by
+   design: that mode is his real Vampire Savior Dark Force, and the
+   maintainer confirmed "DF looks good as is".
+3. **The row-8 machine's pc-relative tables** — all seven now read
+   byte-identical to vs2 (they were resolving into unrelated bytes).
+   Under the hood; no visible change, and the beam still does not draw.
 
-So: poke stocks (`$FF8509`), and assert the mode with **`$FF802E` = 1**
-(match-level, identical on both games, off during a jump, off at
-expiry). Do NOT infer a DF flag from the fighter block — `+0x1F4` and
-`+0x1B5/+0x1B9` both look right and are set by JUMPING.
+## THE OPENER: the effect family, narrowed to EMISSION
 
-The native leg is reachable, and always was: the replay-80 poke
-(`$FF8782 = 0x10` at f1400/1450/1500) forces Huitzil on `vsav2` in six
-seconds. "The native leg is unreachable" came from ONE attempt with
-replay 61, whose timing is authored for OUR wheel. Anything else parked
-on "needs a native reference" (win quote, child shadow, effect art) can
-be A/B'd now.
+With the three parked thunks un-parked in a scratch build, the beam
+object is native-equivalent on every axis ever suspected: created
+(type stamped), routed to the ported machine, record at native's OWN
+relative offset (+0x63C), param tables byte-identical — **118 of 128
+bytes match native**. And it still emits nothing.
 
-## THE OPENER: decode the DF-TYPE selection
+ELIMINATED BY MEASUREMENT, do not re-open: the tables, the records, the
+art (both beam sprite lists are ported and byte-identical), object
+creation, the beam object itself (its chain resolves to 0x48xx codes,
+not the beam codes), and the pod's sub-state.
 
-Measured, native vsav2 vs hui11 (both verifiably in DF):
+**The next step:** find which object walks the anim nodes at vs2
+`0x24FCFA` / `0x251CDA` — those are what reference the beam sprite
+lists. Measure it in ONE emulator with BOTH legs, anchored on an event.
+The 214 explosion is the same arc: its pieces draw pal 05/06/08 out of
+BANK 0 (stock art) at onset f3395/f3430 of replay 83 — the "path that
+leaves +0x18 unset" class.
 
-| | native | ours |
-|---|---|---|
-| activation seq | 0x16, cleared to 0 at once | 0x16 -> **0x18** held |
-| stocks spent | **2** | **1** |
-| palette row 0x0A | gold, brightened | **purple ramp** (82/82 frames) |
-| his own draws | 6-8 | **28-32** (3-4 trailing copies) |
+## Then, in order
 
-So the tenant inherits the host's **DF TYPE**, not merely its styling —
-native Huitzil's DF never enters the transform state.
-
-Site, from an FBNeo write tap on `$FF8406`:
-- the seq write `1600` comes from **vs2 `0x0261A6` <-> vj `0x027008`**,
-  stock debit right after (vs2 `0x0261C2` / vj `0x027024`);
-- **native then runs `0x025EE0`, writing the seq back to 0** — the
-  per-character branch that cancels the transform. Ours never does.
-
-Decode what selects that branch. Expect the usual shape: an id-indexed
-table with variant rows aliasing base rows — and decode BOTH views
-before trusting a row (the standing view GOTCHA). Then give row 0x10
-native Huitzil's DF type.
-
-## The rest of the Phobos worklist (unchanged)
-
-- **Child-companion shadow** — narrowed and independent of DF. Core
-  tiles correct (bank 0x1000); the BAND is bank 0 and code =
-  native - 0x16A8 (12 pieces, no exceptions). Open: which path stages
-  the bank-0 pieces. OBJ RAM is DMA'd, so taps see nothing — use a
-  work-RAM diff before vs during. **Now also A/B-able against native.**
-- **The effect family** (beam sustain, ES big beam, grab lightning,
-  214 explosion) — parked behind a TOOLING gap: `data_in_code` (census
-  AND the generator's relocator) handles only `lea (d16,pc),An +
-  (An,Xn.w)` and misses the post-increment reader `move.w (An)+`, so
-  the ported machine carries a live embedded table reading garbage.
-  Step 1 is the tooling fix, then un-park `tenant_type_stamp` + the
-  `[[obj_hook_extra]]` row, narrowing the stamp per-EFFECT.
-- **Win quote** — deferred, cosmetic; root-caused (the fetch's `-4`
-  bias: the consumer reads index 0x60+id-1). Three-level data port.
+- **Win quote** — deferred, cosmetic. Root-caused (the fetch's `-4`
+  bias means the consumer reads index 0x60+id-1); a three-level data
+  port, not a repoint.
 - **FG pacing** — untouched.
-- Then: H freeze (registry row + expectation set, maintainer-gated),
-  then the Pyron moveset arc, then his gfx rung.
+- **H freeze** (registry row + expectation set, maintainer-gated), then
+  the Pyron moveset arc and his gfx rung. **Run
+  `tests/audit_empty_tiles.sh` on Pyron's first gfx build** — it is a
+  complete inventory check and it found the shadow defect outright.
 
-## Gates
+## Rigs you now have (do not rebuild these)
 
-```sh
-export ROMDIR=/Users/koneko/Developer/Vampire_Saved/ROMS
-tests/test_m3a_reproducible.sh          # after ANY machinery change
-tests/test_hui_df_style.sh    [build]   # NEW 14z-69 — the DF native A/B
-                                        # (DF_STYLE_EXPECT=matches when fixed)
-tests/test_hui_boot.sh                  # masked-v2 EXACT legacy leg
-tests/test_hui_winscreen.sh   [build]
-tests/test_hui_fx_flow.sh     [build]
-tests/test_hui_ex.sh          [build]
-tests/test_hui_grab.sh        [build]
-tests/test_hui_air.sh         [build]
-tests/test_hui_pairs.sh       [build]   # RUN THIS on anything that routes
-                                        # objects — it caught the DF crash
-tests/test_hui_walk.sh        [build]
-tests/test_hui_ladder.sh
-tests/test_census_regions.sh  [build]
-tests/test_gfx_layout3.sh
-tests/test_hui_oracle.sh      [rompath] # ~10 min
-tests/test_pyron_ladder.sh ; tests/test_pyron_soak.sh
-tools/run_hui_behavior.sh               # interactive -> build/hui11
-```
+- `tests/replays/hui/85_hui_df_vs2.rpl` — runs UNCHANGED on native
+  vsav2 and on a tenant build. Both sides poked; **stocks poked too**,
+  because DF costs one and without it the P+K pair is silently
+  downgraded (that mistake cost three sessions).
+- The native leg is reachable for ANY tenant screen: the early-window
+  poke forces Huitzil on vsav2 in six seconds. "The native leg is
+  unreachable" was inherited from ONE attempt with a replay whose
+  timing was authored for our wheel.
+- `tests/audit_empty_tiles.sh`, `tests/audit_palette_seq_ids.sh`,
+  `tests/test_hui_df_style.sh` (expectations: differs / colours-fixed /
+  matches), `tools/verify_pcrel_data.py`, `GUARD_PROBE_MAX`.
 
-## Method note from this session
+## Method notes from this session — read before the next beam attempt
 
-**Assert the STATE, not the input.** Pressing the DF buttons is not
-entering Dark Force; the mode costs a resource and silently degrades
-without it. Three sessions of work — and one confident "does not
-reproduce" from me — were spent on a match that was never in the mode,
-while the visual signature (DF background, TIME bar) was free to check
-and decisive. A negative result about a symptom the maintainer has SEEN
-is a bug in the rig until proven otherwise: report it as "I could not
-reach the state", never as "it does not reproduce".
+Three separate "findings" this session were measurement artefacts, and
+the pattern was always the same: comparing things that were not
+comparable.
+
+1. **Never cross-reference a MAME dump and an FBNeo tap by frame
+   index.** The emulators traverse identical states at different frame
+   indices — the fact §4 dual-emulator agreement rests on. This
+   produced a whole fake "sub-state 7506 vs 7502" finding.
+2. **Assert the STATE, not the input.** Pressing the DF buttons is not
+   entering Dark Force; the mode costs a resource and degrades
+   silently. Check the mode flag and the resource it consumed.
+3. **A uniform delta means a consistent MAPPING, not corruption** —
+   check the ART before calling a tile band wrong. The shadow diagnosis
+   was backwards for a whole session because of this.
+4. **Check that an instrument is not truncating.** The probe cap (400)
+   silently hid a palette-seq id and nearly shipped a wrong safety
+   claim; a "0 hits" reading meant a broken rig twice.
+5. **"Ported from vs2" does not mean correct.** Copying vs2's rows at
+   the same ids gave a build that was wrong in a new colour. Verify at
+   the RENDER layer.

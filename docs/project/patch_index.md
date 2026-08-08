@@ -53,7 +53,7 @@ Authoritative implementations + section comments:
 | init_shim | per-char init interception (flavor latch etc.) | M2a stage 5 |
 | alloc_wrap | allocation-path wrappers for companion spawns | M2a |
 | sound_table / stubbed_sound | per-char sfx record arrays; stub rows keep newcomer ids silent until M5 | M2a / 14z-52 |
-| data_in_code | relocate a data table embedded in crypt-placed code + reroute its reader. **KNOWN GAP (14z-68): only the `lea (d16,pc),a1 + move.b (a1,d0.w),d0` reader is supported; the POST-INCREMENT shape `move.w (An)+` is neither relocated nor detected by `tools/census_regions.py`** | 14z-66 |
+| data_in_code | relocate a data table embedded in crypt-placed code + reroute its reader. **GAP PARTLY CLOSED (14z-69): the census now detects DEFERRED readers of any shape — `(An)+`, `(d16,An)`, `(d8,An,Xn)` — at any distance (`scan_deferred_reader`), and a `shape = "pointer"` row rewrites the 4-byte lea to `bsr.w` a `lea.l #table,An; rts` helper. The generator's ORIGINAL 8-byte `jsr+nop` reroute still requires the reader to follow the lea. For a region's OWN tables the preferred fix is neither: force the region to contain them (`:f<off>` root) and emit that tail RAW** | 14z-66 |
 | pcrel_escape_fix | trampoline pad for word-form pcrel branches escaping a region | 14z-66 |
 | table_fix | pad + rewrite the ported per-char OBJ bank table | M2b |
 | gfx_remap | rewrite main-band tile words by the placement delta (delta-0 tenants skip it) | M2b; delta-0 14z-67 |
@@ -61,6 +61,19 @@ Authoritative implementations + section comments:
 | values / VALUE_SKIP (port_param32) | 32-row value-table rows for variant ids (velocities, jump params) | 14z-66 |
 | select_records / select_wheel / win_pal_variant / code_word / aux_poke / data_port / palette | the select/HUD/palette family (per-piece rows) | M2b-M3a |
 | **win-screen family** (code_word x2 + win_pal_variant + quote records) | a tenant's victory screen: position table 0x5F200 (CODE rows), palette pool 0x3C2BBC via the OPCODE-view remap table 0x6B2F2, quote records at the `-4`-BIASED bases 0x267426/0x2674A6. **Read `docs/game/engine_internals.md` "The WIN SCREEN subsystem" BEFORE authoring any of these — Donovan's solution (14z-45) was re-derived from scratch for Huitzil (14z-68) and got 2 of 3 pieces wrong.** | 14z-45 / corrected 14z-68m |
+
+## 14z-69 additions
+
+| patch / facility | what it does | since |
+|---|---|---|
+| `extra_tiles/<char>.json` | codes merged into the group-C copy inventory that the OBJ-record walk cannot reach (it follows pointers; offset-computed records are invisible). Without them the bank is remapped while the tile is absent and the sprite renders as a SOLID RECTANGLE — the child sidekick's shadow. Guarded by `tests/audit_empty_tiles.sh` | 14z-69o |
+| root spec `:f<off>` | force a region past the sibling-oracle boundary and emit from `<off>` as RAW data. For a code region whose OWN pc-relative tables sit beyond the boundary: inside the region the pointers resolve correctly, and raw emission makes the DATA reads return the stored bytes (CPS-2 decrypts opcode fetches only). Forced tail is registered as a dead zone | 14z-69i/j |
+| `data_port df_palette_seq_rows` | palette-seq rows 0x1E-0x21 (vsavj 0x39ACC0) <- the sequence native's Dark Force shows (vs2 0x3ABEDC / vh2 0x38BEB0). Legacy-inert ONLY because vanilla never requests those ids — and no RAM gate can check that, so `tests/audit_palette_seq_ids.sh` is the sole guard | 14z-69p |
+
+**Exclusivity / ordering note:** the `:f` root and the raw-emit tail are
+one mechanism — landing `:f` alone moves the tables without fixing their
+byte image. `extra_tiles` and `data_port df_palette_seq_rows` are
+independent of both and of each other.
 
 ## Tooling
 

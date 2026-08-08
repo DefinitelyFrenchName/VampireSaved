@@ -1,22 +1,46 @@
 # STATE — living progress log
 
-Updated: 2026-08-08 (session 14z-69 IN PROGRESS — the DF-style opener.
-TWO PREMISES OVERTURNED: the native leg was never blocked (the poke
-reaches Huitzil on vsav2 in six seconds), and NONE OF THE DF WORK IN
-14z-66/67/68 WAS DARK FORCE — DF costs a banked stock and replay 82 has
-none, so the pair press was downgraded to a single button. With stocks
-poked in, the symptom reproduces on the FIRST try and is now measured
-against native: purple palette ramp vs native's gold, his art drawn 3-4x
-over, and a different DF TYPE entirely (transform seq 0x18 on ours,
-none on native; 1 stock vs 2). Activation site located. Delivered:
-replay 85, tests/test_hui_df_style.sh + tools/check_df_style.py with
-three verdict controls, and a corrected test_hui_pairs.sh which had been
-asserting the downgrade path under the name "Dark Force".)
+Updated: 2026-08-08 (session 14z-69 CLOSED — THREE VISIBLE FIXES
+SHIPPED AND MAINTAINER-CONFIRMED on build/hui14 (c25b3824): the child
+sidekick's shadow, the Dark Force palette, and the row-8 machine's
+pc-relative tables. The DOCS were split three ways (game / platform /
+project) on maintainer proposal. The effect family is narrowed to
+EMISSION with three suspected causes eliminated. FIVE of my own
+findings were RETRACTED in-session after clean re-measures — each with
+the comparison error written down so it cannot be repeated. Every gate
+green at close, including two NEW audits. Read docs/NEXT_SESSION.md
+first, then the 14z-69 sections below.)
 
 ## Session 14z-69p/q — DF PALETTE FIXED (PING #12, build/hui14 =
 ## c25b3824, playtest-confirmed) and the 214 explosion TRIAGED
 
-**DF palette: FIXED and confirmed by the maintainer** ("palette is
+**DF palette: FIXED and confirmed by the maintain## Session 14z-69 CLOSE — ritual complete
+
+- **STATE** updated (this file, newest-first sections above).
+- **docs/NEXT_SESSION.md** rewritten for a fresh session: opener is the
+  effect family, with the eliminated causes listed so they are not
+  re-opened, and the five method notes from this session.
+- **HANDOFF** registry carries hui12/hui13/hui14 with fingerprints and
+  what each contains; the gate list carries the two new audits; the
+  launcher default is hui14 (it had been two builds stale — the rule
+  "repoint the launcher in the same commit as a promotion" is recorded).
+- **patch_index / patch_notes** updated with the three new facilities
+  (`extra_tiles`, root `:f<off>` + raw-emit, `data_port
+  df_palette_seq_rows`) and their byte detail.
+- **Persistent suite**: every probe from this session is a rerunnable
+  test — `test_hui_df_style.sh` (3 expectations, 4 verdict controls),
+  `audit_palette_seq_ids.sh`, `audit_empty_tiles.sh` (ground-truthed
+  BOTH directions: passes hui14, fails hui12 naming the tiles),
+  `verify_pcrel_data.py`, plus `GUARD_PROBE_MAX` on the guard.
+- **Closing sweep, all PASS**: m3a_reproducible, hui_boot,
+  census_regions, hui_df_style, audit_empty_tiles, gfx_layout3,
+  hui_winscreen, patch_overlap, romset_identity, compare_composite.
+
+OPEN (unchanged, all parked with rigs recorded): the effect family
+(beam / grab lightning / ES big beam / 214 explosion — one root), the
+win quote, FG pacing; then H's freeze, then Pyron.
+
+er** ("palette is
 clean, DF looks good as is"). One [[data_port]] row swaps palette-seq
 rows 0x1E-0x21 for the sequence native's DF actually shows (vs2
 0x3ABEDC, vh2 twin 0x38BEB0). The afterimages stay by design.
