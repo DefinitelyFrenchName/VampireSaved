@@ -2216,3 +2216,47 @@ effect_tail keys, the data_subst gather form, verify_gfx_build
 de-Donovanized (span/aux/sweep per tenant), obj_records entry-bounds
 check + per-tenant sweep windows (inventories re-frozen H 15,034 /
 P 14,225; Donovan unchanged 15,612).
+
+## Session 14z-67b — the ping-round fixes (byte detail)
+
+Builds: hui7 93c9aa44 (c5), hui8 59cf9f85 (+byte map), hui9 9e3105e0
+(+throw arc = PING #8). Per-op detail in each build's generated
+patch_notes_fragment.md.
+
+- **Effect byte-map rows** (hui8; huitzil.toml aux_pokes
+  effect_map_4e4f/5051/5253): DATA 0x28D4E..0x28D53 <- 0F1B 1F19 0F03.
+  The id->handler-index map (vj DATA 0x28D00 / vs2 0x27FD8) is
+  byte-identical through id 0x4A; vs2's six live entries at 0x4E-0x53
+  read zero on vsavj -> every newcomer effect collapsed to index 0.
+  Also divergent (not poked): id 0x5F (vs2 0x00 / vj 0xFF). The
+  per-char record rows needed nothing (bank_map anim_index_a/a2/b rows
+  0x10 already repointed; verified on the built image). Restores the
+  236P ray SPAWN (visible but brief/wrong-palette — the segment
+  behavior needs the zone flow).
+- **c5 mode** (hui7; generator + build_gfx): delta-0 group-C tenants
+  keep companion-record bank-1 words NATIVE; effect_c5.json (5,714
+  codes) places the art at native codes in group C bank 5; three
+  ported spawner setters flip #$2000 -> #$3000 (x088512 0x8B224/
+  0x8BF14/0x8BF52). Corrects hui6's wrong-art remaps (records at
+  x2b7ef4+0x900C carried effect_tail anchor words 0x0FE7+ where
+  native reads 0x0FA0+).
+- **Throw-arc superset tables** (hui9; site_thunk throw_arc_tables,
+  patch=jmp+jmp_ok at vj 0x28386): full tail replacement of the
+  physics-row installer reading PLACED copies of vs2's map1 (0x54B
+  from 0x279B4) + table2 (0x370B from 0x27A08). Statically proven
+  strict supersets (map1 prefix 0-0x49 and rows 0-0x31 byte-identical
+  across the games) -> serves ALL throws unconditionally; boot
+  masked-EXACT confirms. vs2's five extra map entries -> rows
+  0x32-0x36 (63214 arcs rows 0x33/0x34: yv 16.0/20.0, gravity
+  -0.688). Measured: launch yv 0x0010 == native, decay lockstep
+  (FBNeo tap A/B on the 2P replay).
+- **The effect zone + fleet spawners** (regions x022400 = vs2
+  0x22400+0x1600 t+0x2E, x06d240 = 0x6D240+0x500 t+0x174) with
+  escape pads (0x180/0x60) and recon rows: stage-2 installer twins
+  0x2710C/14/1C -> 0x27EB4/BC/C4; byte-map data rows 0x27FD8/DA ->
+  0x28D00/02; per-char pointer table 0xD96B8 -> 0xBF51A
+  (shape-matched; per-game pointer content). ENTRY THUNKS PARKED
+  (seq_d_dispatch: the real entry, regresses the ray pending the
+  flow's dependency closure; effect_machine: wrong entry, hot for
+  legacy). The parked bodies + anatomy live as comments in
+  huitzil.toml.

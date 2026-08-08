@@ -2129,3 +2129,22 @@ tenants' manifests for every row scoped to that region and copy them
 BEFORE the first probe run — the crashes are pre-paid knowledge, not
 new information. (The Phase-2 merge dedups these by span; until then
 the duplication is the mechanism.)
+
+## Per-char dispatch on a COMMON seq state needs the target flow's
+## FULL closure first; and "cold" sites can be legacy-hot (14z-67)
+
+Two paid lessons from the effect-entry arc:
+1. vs2's seq-D head per-char-dispatches EVERY FRAME for EVERY fighter
+   (seq D = a common state, 401 probe hits before the cap). Gating it
+   to a ported handler whose deep flow has ANY unmet dependency fails
+   SILENTLY — no crash, no tripwire; the state machine just routes
+   away and the character's moves stop firing (measured: the ray
+   vanished entirely). Scratch-enable such dispatches and close the
+   flow's dependencies BEFORE shipping the gate.
+2. A site that is cold for TENANT content can be hot for LEGACY
+   content (the effect-machine stub served vanilla casts' effects) —
+   an owner-gated thunk there costs legacy cycles and breaks
+   masked-EXACT legs. Run tests/test_hui_boot.sh after ANY
+   site_thunk addition. Corollary: VERIFY a park/comment edit
+   actually changed the file (a silently-missed replace left the
+   thunk live and burned a bisect round on a false premise).

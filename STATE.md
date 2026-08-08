@@ -1,26 +1,27 @@
 # STATE — living progress log
 
-Updated: 2026-08-07 (session 14z-67 — THE D4 PHOBOS GFX VERTICAL: all
-three openers done. (1) 3-tenant tile budgets MEASURED and the group-C
-layout RATIFIED — all three tenants natively share vs2 bank 3, H/P
-place at DELTA 0, Donovan frozen at +0x2750, disjoint by interval,
-flip condition does NOT trigger (~20K codes free; ledger
-build/manifest/gfx_layout3.toml, gate tests/test_gfx_layout3.sh).
-(2) The censuses promoted to tools/census_regions.py, ground-truthed
-on H (exact generator-count agreement), Pyron's code region CLEAN;
-one real find — x05c800's latent tail escapes — fixed same-session
-([[pcrel_escape_fix]] + recon 0x635FC->0x5B25C). (3) THE H GFX RUNG
-LANDS: machinery de-Donovanized (per-tenant layout rows, delta-0
-path, gather data_subst, per-tenant effect_tail keys; m3a bit-exact
-throughout), H's full stage-6 manifest authored, and Huitzil renders
-HIS REAL ART everywhere — fighter, select figure/portrait/name, the
-21-cell wheel, VS splash, HUD mug/plate, palettes — with his cell
-0x10 hand-pickable (NEW replay 37). Build hui6 = b99b7359; EVERY gate
-green incl. the full behavior battery ON the stage-6 build and the
-oracle battery (1741 = stage-4 exact). Two stale-red gates found and
-re-frozen with attribution (GOTCHAS: the not-in-the-battery class).
-PING #7 READY -> maintainer playtest -> H FREEZE, then Pyron.
-Read the 14z-67 sections below, then docs/NEXT_SESSION.)
+Updated: 2026-08-08 (session 14z-67 CLOSED — the D4 verticals PLUS
+two maintainer ping rounds. D4: all three openers done (3-tenant
+layout RATIFIED, censuses promoted + Pyron clean, THE H GFX RUNG —
+his real art everywhere, cell 0x10 hand-pickable). Continuations:
+ping #7 pinned (hui6 b99b7359) -> patch_index backfilled -> THE PYRON
+LADDER OPENED (stages 1-4 green + 11k soak clean + sound sweep,
+frontier 31 tripwires). Ping rounds: 236P FREEZE RAY restored (six
+effect byte-map pokes — the two games' dispatch maps differ by
+exactly those entries), THE COMMAND-GRAB THROW ARC native-exact
+(superset physics tables, yv 16.0 measured = native; hui9 = 9e3105e0
+= PING #8), c5 companion-record art to bank 5, ES exonerated by
+maintainer retest. THE REMAINING EFFECT FAMILY (beam sustain, ES big
+beam, grab lightning, 214 explosion) is ONE closed decode from done:
+vs2's seq-D head is a per-char jmp dispatch (0xD9538 row 0x10 = his
+own ported handler) that vsavj lacks; the zone + fleet-spawner
+regions are PORTED with escapes resolved; both entry thunks PARKED
+(activation regresses the ray — silent dependency gap in his
+0x56D68->0x574B0 flow; boot-gate lesson: "cold" stubs can be hot for
+legacy). Next arc exactly scoped: scratch-enable the dispatch, probe
+the flow to closure. Frozen refs bit-exact throughout; every gate
+green at close. Read the 14z-67 sections below, then
+docs/NEXT_SESSION.)
 
 ## Session 14z-67 (D4: the Phobos gfx vertical)
 

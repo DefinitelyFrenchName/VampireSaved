@@ -689,3 +689,42 @@ OBJ code = table entry + the game's STAGER BIAS — vsavj +0x3800, vs2
 plate), mug 05A0 (2x2). The HUD index field is populated by the REAL
 pick flow only — forced-pick pokes load the character but leave the
 HUD reading the alias row (GOTCHAS).
+
+## The per-char effect system (14z-67, decoded on the H ping rounds)
+
+Three coupled mechanisms drive character effects (beams, grab
+lightning, explosions):
+
+1. **The seq-D per-char driver.** The class-02 stepper's jump-table
+   entry 0xD (vs2 head 0x22008) is a PER-CHAR JMP DISPATCH:
+   `move.b $382(a6),d0; lsl #2; movea.l #$D9538,a0; jmp ([a0+d0])`.
+   Table 0xD9538 rows 0x0F-0x13 point at the newcomers' own drivers
+   (H row 0x10 -> 0x56D68 in his code region). vsavj's seq-D
+   (0x22500) has NO dispatch — a straight vanilla handler. Seq D is
+   a COMMON state (fires every frame for every fighter), so gating
+   it per-char requires the target flow's full dependency closure.
+2. **The effect-object machine.** Effect objects ($FFBxxx pool,
+   0x80 stride: +0x54 effect id, +0x56 sub-id, +0x30 owner link,
+   +0x1C record chain) run a state machine whose entry stub maps
+   id -> handler index via a BYTE MAP (vj DATA 0x28D00 / vs2
+   0x27FD8; identical through id 0x4A, vs2 adds ids 0x4E-0x53) and
+   installs records via three per-char record-table entries (movea
+   heads: vj 0x27EB4/BC/C4 reading 0xBCE7A/EFA/F7A rows — the
+   bank_map anim_index family). BOTH games carry TWO copies of the
+   machine stub (content-twin hazard); vsavj's copies serve LEGACY
+   effects — any thunk there costs legacy cycles.
+3. **The fleet spawner** (vs2 0x6D282 family, in 0x6D240+0x500;
+   vh2 twin +0x174): repeated 0x15702 allocations build multi-piece
+   effects (lightning bolts, beam segments); headers 0x01000800,
+   subtypes 0x25/0x26, +0x18 bank word deliberately 0 until each
+   subtype's first tick. Reached by tail-jmps from four zone
+   segments.
+
+Related physics: the throw-arc installer (vj 0x28386 / vs2 0x275E4,
+unique tail twins) writes victim +0x40 xv / +0x44 yv / +0x48 xacc /
++0x4C gravity (16.16) from 16-byte rows selected by
+map1[2*(+0x5A) + d0]; vs2's map1 exceeds vsavj's by five entries
+(rows 0x32-0x36 — the newcomer throw arcs, incl. the 63214
+off-screen launches yv 16.0/20.0). Ported via the throw_arc_tables
+superset-table thunk (statically proven identical for all shared
+indexes).

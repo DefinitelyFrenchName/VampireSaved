@@ -141,3 +141,27 @@ starter bsr's (vsavj 0x27A34 / vs2 0x26C86). Capture-pose per-victim
 sets at `PRG:0x0BCE7A/0x0BCEFA/0x0BCF7A/0x0BCFFA` (the Midnight-Bliss
 family; 32 rows x 4 bytes each), read by the capture-victim installer
 (indexed by VICTIM id, seq id from the ATTACKER's code).
+
+## Fighter + effect-pool fields (14z-67, measured on the H effect arc)
+
+Fighter object ($FF8400 P1 / $FF8800 P2):
+- +0x40 xv, +0x44 yv, +0x48 xacc, +0x4C gravity — 16.16 physics block
+  (written together by the physics-row installer vj 0x28386; measured
+  live on throw launches).
+- +0x54 seq-related id fields (context-dependent; the effect machine
+  reads its object's +0x54 as the EFFECT id).
+- +0x318 / +0x320 / +0x330 / +0x340 — per-fighter effect-channel
+  sub-structs (his handler passes a4 = &fighter+0x3n0 to the channel
+  subs 0x28EE6/0x29124/0x29134/0x2916C-family).
+- +0x382 char id (the per-char dispatch index — the seq-D head and
+  the effect stage-2 record installer both read it).
+
+Effect-piece pool $FFB800-$FFBFFF (0x80-stride slots):
+- +0x00 alive/header (fleet spawner writes 0x01000800),
+- +0x0A subtype (fleet pieces 0x25/0x26),
+- +0x1C record chain (head ptr; [head+4] = OBJ record — NULL until
+  the anim stepper 0x1378A-family installs it),
+- +0x18 bank word (fleet spawner inits 0; the subtype's first tick
+  sets the real bank),
+- +0x30 owner link (movea.w-compatible fighter pointer),
+- +0x54 effect id / +0x56 sub-id.
