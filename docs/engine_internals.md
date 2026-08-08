@@ -828,14 +828,20 @@ indexed by id WITHOUT the bias — the arrays OVERLAP (`0x26742A` row
 0x10 IS `0x2672AA` row 0x70), which is exactly what makes it easy to
 repoint the wrong entry.
 
-**Scope warning (14z-68p): a quote record is a list of POINTERS TO
-TEXT.** Structure: a 12-byte header then 4-byte entries whose low 3
-bytes are a ROM address of the string/glyph run — vs2's H quote points
-into `0x1BADxx`, vsavj's records into `0x1BB2xx`. So porting a
-tenant's quote is not a repoint: it needs the SOURCE TEXT DATA ported
-too (or the glyphs re-encoded against the host font). Budget it as a
-data-port item, not a one-row fix. Cosmetic and non-gameplay — fine to
-defer behind visible defects.
+**Scope warning (14z-68p/r): the quote is a THREE-LEVEL data
+structure, not a repoint.** Levels measured:
+1. the table entry -> a quote record (12-byte header, then 4-byte
+   entries whose low 3 bytes are a ROM address);
+2. those addresses point into `0x1BADxx` (vs2) / `0x1BB2xx` (vsavj) —
+   per-line entries, themselves holding 3-byte addresses;
+3. which reference glyph data at `0x1C4Cxx`.
+So porting a tenant's quote means carrying levels 2 and 3 as well (or
+re-encoding the glyphs against the host font). Mechanical but not
+small, and purely cosmetic — defer behind visible defects.
+CONFIRMED 14z-68r: on a tenant build the quote renders the HOST's line
+(Huitzil on Bulleta's row 0x10 shows her child-voice quote), because
+the `-4`-biased entry is the one the drawer reads and it is still
+vanilla.
 
 ### Per-tenant win-screen checklist
 1. `[[code_word]]` x2 — position x/y (slot-following, CODE rows).

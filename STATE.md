@@ -633,6 +633,28 @@ the prior analysis was only in a session log. Pyron's port will hit
 init_shim, type dispatch, throw arcs and DF — all currently
 undocumented in the synthesis.
 
+### 14z-68r: PING #10 CONFIRMED by the maintainer — win-screen
+### palette AND position both fixed on the real screen
+
+Maintainer on build/hui11 (5c6dbe43): "palette and position are
+fixed". Their capture shows the gold/orange portrait correctly placed,
+matching the native reference. **Ping-#7 item 5 is CLOSED** (5a
+palette + 5b the "garbled blocks", which were the wrong palette all
+along).
+
+Their reading of the remaining text is also right and now confirmed
+from the data: the quote is BULLETA's (H sits on her variant row
+0x10). The drawer reads the `-4`-biased entry, which is still vanilla;
+the entry I originally repointed (0x70) is not the one consumed.
+Deferred as a THREE-LEVEL data port (record -> per-line entries at
+0x1BADxx -> glyph data at 0x1C4Cxx), documented in engine_internals.
+
+Two of the maintainer's guesses in this round were correct ahead of my
+measurements (the Donovan parallel, and Bulleta as the placeholder
+source). Recorded because it is a pattern worth trusting: their
+pattern-matching against earlier ports has been right every time it
+has been offered this session.
+
 ### What SHIPS from 14z-68
 
 One functional change ships: the **region-boundary fix** above
