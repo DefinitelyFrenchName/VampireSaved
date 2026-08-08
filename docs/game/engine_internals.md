@@ -1396,31 +1396,42 @@ and a single probe hit each at f2363. Between f2365 and f3170 NEITHER
 game writes that type word again.
 
 Yet by f3162 native has one 0x75 object at FFB800 with sub-state **06**,
-and ours has one at FFB900 with sub-state **02**.
+and ours appeared to have one at FFB900 with sub-state **02**. THAT
+APPEARANCE WAS AN ARTEFACT — see immediately below before using it.
 
-**One asymmetry found, not yet explained: ours writes `FFB802 <- 0000`
-at f2363 from `pc=0x0FB2F8` — a PLACED address, i.e. our own ported code
-— one frame before the re-type. Native has no such write.** That is the
-most specific lead in this arc and the place to start.
+**BOTH LEADS ABOVE ARE DEAD — the clean re-measure killed them
+(14z-69n). This is the useful part of the entry.**
 
-CAVEAT, be careful here: a slot-accounting inconsistency turned up while
-chasing this (the stamp's tapped target slot vs the slot the frame dumps
-show as the tenant type) and was NOT resolved. Re-measure slot identity
-cleanly — one build, one run, tap and dump together — before building
-any theory on which object is which. Do not reason from the mixed data
-above.
+1. The `FFB802 <- 0000` at f2363 from `pc=0x0FB2F8` is **ours' own
+   documented slot-clearing alloc wrapper** (`0x0FB2E0`, "0x80 cleared,
+   +8 preserved" — the 14z-65 allocator-wrapper family) zeroing a
+   freshly allocated slot; `0x0FB2F8` is its `clr.l (a0)+` loop. Native
+   has no such write because native's allocator does not clear, which is
+   exactly why the wrapper exists. Benign.
+2. **The sub-state difference does not exist.** Measured on ONE build in
+   ONE run with tap and dumps together (hui18, FBNeo): slot FFB800 takes
+   `0x7500` at f2364, sub-state `08` then `06` at f2365, and still reads
+   **`type=7506`** at f3162 and f3186 — native's shape exactly.
 
-**The remaining difference: the type-0x75 object's sub-state.** Native runs it as `7506`, ours as `7502`, for the whole
-window. Both walk the same anim nodes modulo a ~4-frame phase (ours
-`0x0E43C6` + 0x16CF22 = `0x2512E8`, exactly native's f3178 node), and
-the fighter's own cursor also tracks native modulo phase. So the next
-question is precise: **what selects sub-state 6 vs 2 on that object,
-and does the sub-6 branch reach the `0x251CDA` nodes that carry the
-beam lists?** Start there, not at "emission" in general.
+The earlier "native 7506, ours 7502" came from comparing MAME frame
+dumps against FBNeo taps **by frame number**. The emulators traverse
+identical states at slightly different frame indices — the very fact §4
+dual-emulator agreement rests on — so f3162 is not the same moment in
+both, and neither is a slot's occupancy. **Never cross-reference a MAME
+dump and an FBNeo tap by frame index: measure both legs in one
+emulator, or anchor on an event rather than a frame number.**
 
-(Also noted, unattributed: the beam object's `+0x44` — Y velocity, which
-the mover integrates into `+0x14` — is `ffff8000` native vs `0000a000`
-ours, while the other 118/128 bytes match.)
+So the beam residual is UNATTRIBUTED again — but the eliminations are
+real and hold: not the tables, not the records, not the art, not object
+creation, not the beam object (its chain resolves to 0x48xx codes), and
+not the pod's sub-state. The honest next step is to find which object
+walks the `0x24FCFA` / `0x251CDA` anim nodes that carry the beam lists —
+measured in ONE emulator, both legs, anchored on an event.
+(Also noted, and subject to the SAME caveat since it came from the same
+cross-emulator comparison: the beam object's `+0x44` — Y velocity, which
+the mover integrates into `+0x14` — read `ffff8000` native vs `0000a000`
+ours while the other 118/128 bytes matched. Re-measure it in one
+emulator before treating it as a difference.)
 
 Regression state of that scratch build: pairs, ex, grab, air all PASS —
 **including the Dark Force crash that parked `tenant_type_stamp` in
