@@ -1,11 +1,13 @@
 # NEXT SESSION — orientation (written at the close of 14z-68, 2026-08-08)
 
-**Start here: NARROW THE TENANT-TYPE STAMP (the arc below). The
-whole union-type mechanism is BUILT and MEASURED WORKING — dispatch,
-records and art are now native-equivalent for the beam object — but
-it is PARKED because the stamp is too broad (it crashes Dark Force)
-and because, even with the path equivalent, THE BEAM STILL DOES NOT
-DRAW. Two named blockers, both with next probes.**
+**Start here: TEACH THE POST-INCREMENT READER SHAPE TO THE
+data_in_code CENSUS AND RELOCATOR (arc below, step "DO THIS FIRST").
+The whole union-type mechanism is BUILT and MEASURED WORKING —
+dispatch, records and art are native-equivalent for the beam object —
+but it is PARKED behind an embedded DATA table inside the ported
+machine that neither the census nor the generator can currently see,
+which is also the best candidate for why THE BEAM STILL DOES NOT
+DRAW. Blocker 1 turned out NOT to be a stamp problem.**
 
 14z-68 also refuted the 14z-67 entry theory, exonerated the fighter
 side twice over, corrected its own first conclusion (the beam object
@@ -32,8 +34,8 @@ rows did this long ago). H's ray runs HIS OWN flow, tap-verified
 native-identical. Both entry thunks are parked with this written
 into the manifest. Do not re-attempt them.
 
-## THE ARC: NARROW THE TENANT-TYPE STAMP, then find why the beam
-## does not draw (the dispatch/record path is already equivalent)
+## THE ARC: fix the embedded data table, then re-measure the beam
+## (the dispatch/record path is already native-equivalent)
 
 14z-68d built the whole union-type mechanism and MEASURED it working.
 Do not re-derive any of this — un-park and continue:
