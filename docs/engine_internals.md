@@ -1091,10 +1091,31 @@ Corrected measurements (replay 82, id-0x10 poke, build hui11):
   ROUTINE (same writer PCs before and during), so the recolour is a
   palette SOURCE/selection change, not different code.
 
-**Next step:** find the DF afterimage draw path (the fighter emitting
-N trailing copies) and its per-char style gate, then give the tenant
-row the null style. Native applies NEITHER the copies NOR the recolour
-to Huitzil (maintainer capture).
+### The mechanism, as far as it is decoded (14z-68v)
+DF drives the FIGHTER'S EFFECT CHANNELS — the `+0x318 / +0x320 /
++0x330 / +0x340` sub-structs documented in the effect-system section.
+Measured by diffing the fighter block pre-DF vs during-DF-moving: the
+channels go from all-zero to populated (`+0x318`=[2,2] `+0x31C`=4
+`+0x320`=[2,2] `+0x324`=5 `+0x32C`=13 `+0x330`=[2,2] `+0x334`=11,
+plus flags at `+0x395`/`+0x397`).
+
+Those channels run SCRIPTS through a small state machine:
+- per-frame CLEAR path (runs always): `0x029F60` / `0x02A57C`;
+- the DF-only writers, i.e. the channel actually doing something:
+  **`0x029F86`, `0x029F9A`, `0x029FD2`, `0x029FDA`, `0x02A528`,
+  `0x02A538`, `0x02A582`** (these PCs appear ONLY while DF is up);
+- the machine reads a script through `a3`, matches script words
+  against the fighter's `+0x12A`, and steps a channel struct via `a4`;
+- the script tables are loaded by `lea $2A768(pc),a3` /
+  `lea $2A770(pc),a3` / `lea $2A778(pc),a3`, selected by a
+  program-byte dispatch at `0x029F4A`
+  (`move.b (a4),d0; move.w (pc,d0.w),d1; jmp`).
+
+**Where the trail stops:** which channel PROGRAM gets installed at DF
+activation, and whether that selection is per-character. That is the
+gate to find; the fix is then to give the tenant row the null program.
+Native applies NEITHER the trailing copies NOR the recolour to
+Huitzil (maintainer capture).
 
 Open observations queued from the same replay, unattributed: ~15px X
 drift over the DF walk (speed modifier vs recoil) and a pod anim phase
