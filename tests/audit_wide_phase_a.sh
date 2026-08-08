@@ -10,7 +10,7 @@
 #   A3  scroll3 tile-address wrap    -> is growing the gfx region inert?
 #   A4  Z80 driver ROM free space    -> is there room for new sample rows?
 #
-# Full rationale: the approved WIDE plan + docs/cps2_wide.md.
+# Full rationale: the approved WIDE plan + docs/project/cps2_wide.md.
 # Usage: ROMDIR=... tests/audit_wide_phase_a.sh [corpus...]
 set -eu
 ROMDIR="${ROMDIR:?set ROMDIR}"

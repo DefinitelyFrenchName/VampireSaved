@@ -2,7 +2,7 @@
 # test_wheel_bank5.sh — the select-wheel bank-5 move (14z-63, phase 3):
 # real medallion art for the appended cells, vanilla cells byte-copied.
 #
-# MECHANISM (measured 14z-63; docs/atlas/select_screen.md). The wheel is
+# MECHANISM (measured 14z-63; docs/game/atlas/select_screen.md). The wheel is
 # ONE record drawn by ONE object ($FFB800) whose select-screen anim chain
 # is a single stop-flagged entry (0x2689FA -> the record) — so per-entry
 # banks are impossible and the whole record moves banks together. The

@@ -3,7 +3,7 @@
 # a tenant at 0x13 must show its OWN in-match mugshot and name plate,
 # and the host's own HUD cells must stay pristine.
 #
-# MECHANISM (measured; docs/atlas/venue_assets.md addendum). Both HUD
+# MECHANISM (measured; docs/game/atlas/venue_assets.md addendum). Both HUD
 # consumers are UNMASKED (mugshot stager 0x8937C by $782/$b82(a5); name
 # stager 0x89684 by $382(a4)) and both per-char tables (0x89884 word/char,
 # 0x898C4 8B/char) are 32-ROW ALIASED — so the tenant read row 0x03's

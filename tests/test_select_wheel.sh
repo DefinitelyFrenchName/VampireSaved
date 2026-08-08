@@ -8,7 +8,7 @@
 # wrong — with nothing in the repo able to check it. This gate re-derives
 # it from the ROM every run and then requires the EMULATOR to agree.
 #
-# WHAT IS ESTABLISHED (docs/atlas/select_screen.md):
+# WHAT IS ESTABLISHED (docs/game/atlas/select_screen.md):
 #   TABLE A PRG:0x0211D4  joystick nibble -> direction 0-7 ($ff = illegal)
 #   TABLE B PRG:0x0211E4  8-way adjacency, 8 bytes/cell, 32 rows
 #   commit  PRG:0x020A7C  move.b d0,$3(a6)     cursor cell
@@ -145,7 +145,7 @@ else
     python3 tools/wheel_positions.py --meta "$WORK/tour.json" \
         --extract "$WORK" >"$WORK/pos.txt" 2>&1 || {
         note "  FAIL  position extraction"; tail -5 "$WORK/pos.txt"; fail=1; }
-    # frozen: measured 14z-60, docs/atlas/select_screen.md
+    # frozen: measured 14z-60, docs/game/atlas/select_screen.md
     cat >"$WORK/pos.want" <<'POS'
   cell 00: (224, 112)
   cell 01: (160, 112)

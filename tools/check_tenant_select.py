@@ -5,7 +5,7 @@
 At a variant-half tenant id the generator composes the tenant's OWN select
 records (three UI pieces x P1/P2) into space-model allocations and repoints
 the six variant-half array rows; the host character's records must return
-to VANILLA bytes (docs/atlas/select_screen.md; the mechanism gate is
+to VANILLA bytes (docs/game/atlas/select_screen.md; the mechanism gate is
 tests/test_select_arrays.sh). This checker re-derives the expected
 composition INDEPENDENTLY from the vs2 image + select_port.PLACEMENTS and
 requires the built image to match, byte for byte:
@@ -40,7 +40,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import cps2_decrypt as cps  # noqa: E402
 import select_port as sp    # noqa: E402  (PLACEMENTS is the single map)
 
-# Measured 14z-61/62e (docs/atlas/select_screen.md, frozen by
+# Measured 14z-61/62e (docs/game/atlas/select_screen.md, frozen by
 # tests/test_select_arrays.sh): (name, vj_base, vs2_base, sides). Paired
 # pieces have a P2 array at +0x80 in BOTH engines; splash P1/P2 and the
 # win quote are single arrays (the win quote has no P2 twin at all — the

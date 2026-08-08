@@ -8,7 +8,7 @@ and emits a machine-readable region manifest + blobs for the patch
 generator. ROM-derived bytes go only to the (gitignored) out dir and are
 regenerated from $ROMDIR on every build (repo rule 7).
 
-THE ORACLE (the correctness instrument, docs/atlas/character_tables.md):
+THE ORACLE (the correctness instrument, docs/game/atlas/character_tables.md):
 per-slot character data is byte-identical between vsav2 and vhunt2 except
 for embedded pointer fields, which differ by constant per-region shifts
 (code +0x30, bank/hitbox -0x76E, anim -0x13B74 — computed at runtime from
@@ -64,7 +64,7 @@ SIM_THRESHOLD = 0.90
 ANIM_CAP = 0x30000
 CODE_CAP = 0x8000
 
-# hard anchors (docs/atlas/character_tables.md; measured 14z-65) — asserted
+# hard anchors (docs/game/atlas/character_tables.md; measured 14z-65) — asserted
 # per (src_set, char). An extraction for a char with NO anchor row hard-fails:
 # unanchored extraction is silent-drift territory (the DONOVAN_ANCHORS gap —
 # every other char used to run with no assertion at all).

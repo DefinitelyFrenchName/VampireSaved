@@ -90,7 +90,7 @@ perfection is not the point of M2; proving the behavior port is.
 - **R1 engine-delta reconciliation:** Donovan's code may call vsav2 engine
   subroutines at addresses that differ (or are absent) in vsavj, and contain
   absolute pointers into vsav2 layout. Each must be relocated/reconciled and
-  logged in docs/tables/reconciliation.md. This is the make-or-break risk M2
+  logged in docs/project/tables/reconciliation.md. This is the make-or-break risk M2
   exists to surface.
 - Also repoint: select-screen (portrait/name for slot 0x0F), win-quote / AI /
   versus tables keyed on char id 0x0F, and the +0x382 select id path.
@@ -103,4 +103,4 @@ perfection is not the point of M2; proving the behavior port is.
 
 ### Regression-runner follow-up
 - Enumerate the full attract demo roster so the auto-detecting runner knows
-  which builds legitimately change `01_attract_long` (see docs/atlas/ram.md).
+  which builds legitimately change `01_attract_long` (see docs/game/atlas/ram.md).

@@ -1,5 +1,5 @@
 # fields_m2a.tsv — mapped gameplay fields compared at sync anchors
-# (CLAUDE.md §4 dual-emulator protocol; sources: docs/atlas/ram.md).
+# (CLAUDE.md §4 dual-emulator protocol; sources: docs/game/atlas/ram.md).
 # Columns: name <TAB> base <TAB> addr <TAB> width <TAB> phase <TAB> note
 #   base:  abs (addr = absolute RAM address) | p1 ($FF8400 + addr) | p2 ($FF8800 + addr)
 #   width: 1 | 2 | 4 bytes, big-endian (68k logical)

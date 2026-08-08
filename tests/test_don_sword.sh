@@ -3,7 +3,7 @@
 #
 # Verifies the round-26 sword-swing fix: on 6HP the sword object
 # ($FF9500 on the ported build) must be COMMANDED into the swing anim
-# family. Mechanism under test (see docs/patch_notes.md 14z-5): the
+# family. Mechanism under test (see docs/project/patch_notes.md 14z-5): the
 # ported sword-command code resolves anim numbers 0x124-0x201 through
 # the UNMASKED set-anim clone (reconciliation kind patched_clone for
 # vs2 0x5C77E); the vanilla masked resolver would truncate them and the

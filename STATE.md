@@ -13,6 +13,47 @@ replay 85, tests/test_hui_df_style.sh + tools/check_df_style.py with
 three verdict controls, and a corrected test_hui_pairs.sh which had been
 asserting the downgrade path under the name "Dark Force".)
 
+## Session 14z-69b — DOCS SPLIT THREE WAYS (maintainer proposal, adopted)
+
+Maintainer: the SMS project split docs into game knowledge vs
+project knowledge, and doing the same here would make "do we already
+know about this?" answerable. Adopted, with a third bucket for the
+platform because we patch emulator descriptors and those facts are
+reusable by any CPS-2 work.
+
+Discriminator: **would this still be true if we abandoned the roster
+hack tomorrow?** -> `docs/game/` (Vampire Savior), `docs/platform/`
+(CPS-2, MAME, FBNeo), `docs/project/` (this port). Taxonomy and the
+full contents list: `docs/README.md`.
+
+- `docs/game/`: engine_internals.md, atlas/ (5 files), gotchas.md
+- `docs/platform/`: gotchas.md
+- `docs/project/`: patch_notes/patch_index, cps2_wide, tenant_manifest,
+  tables/, M1/M2/M3b, WSL2_SETUP, visual_smoke_tests, playtest interims,
+  m5/, gotchas.md
+- `docs/` root keeps the ENTRY POINTS on purpose: NEXT_SESSION.md
+  (session state, not knowledge), GOTCHAS.md (now the index), and
+  checksums.txt (machine-read by audit_roms.py — stable path).
+
+GOTCHAS was the doc most in need of it: 135 entries mixing "the game
+will mislead you" with "our pipeline will bite you". Split 26 game / 35
+platform / 74 project, verified content-lossless (every non-header line
+of the original is present in the union), with `docs/GOTCHAS.md` left as
+an index so the ~195 existing citations still resolve — and the index
+doubles as the topic list the split was for.
+
+**The rule the split alone would NOT have given us**, and the one that
+matters most here: **a subsystem section must name the atlas rows it
+depends on.** `atlas/ram.md` had documented since 14z-44 that `+0x109`
+is the banked stock count and `+0x107 = 0xFE` means "pair downgraded
+(no stock)" — the exact fact needed to notice DF was never activating.
+Three sessions missed it because engine_internals' Dark Force section
+never pointed at those rows. That cross-link is now written into the DF
+section, `docs/README.md` and CLAUDE.md §5.
+
+69 files had doc paths rewritten; 0 broken relative links; gates
+re-run after the move (patch_overlap, hui_winscreen, hui_df_style).
+
 ## Session 14z-69 (Dark Force — measured for the first time)
 
 ### Two premises overturned
@@ -1709,7 +1750,7 @@ Measured this session (the 14w-b hazard re-exam, first half):
   crash was at soak f10050).
 + Huitzil/Phobos 0x10 + Pyron 0x11. Recon complete (3-way sweep:
 generator internals, docs corpus, STATE history + two baseline
-extraction dry-runs); the plan is **docs/M3b_plan.md**. Design verdict:
+extraction dry-runs); the plan is **docs/project/M3b_plan.md**. Design verdict:
 N [[tenant]] rows in ONE generator process (post-hoc patch merge proven
 unsound: pristine-ROM alloc check, silent op overlap, replacement-shaped
 hooks). Three decisions registered for the maintainer below. Work
@@ -1718,7 +1759,7 @@ reproducibility gate), then extractor de-Donovanization.)
 
 ## Session 14z-65 (M3b OPENED 2026-08-07 — plan + decisions register)
 
-- **Plan: docs/M3b_plan.md** (mission, 6 phases, gates, watch items).
+- **Plan: docs/project/M3b_plan.md** (mission, 6 phases, gates, watch items).
   Milestone deliverable: three tenants in one WIDE build; the
   single-tenant degenerate case must reproduce donovan-m3a 4b7d0dc7
   bit-exact at every intermediate commit.
@@ -2429,8 +2470,8 @@ docs/NEXT_SESSION.md.)
 ## Session 14z-63 (phase 3 item 1: the wheel bank-5 move — REAL
 ## MEDALLION ART, vanilla cells pixel-identical by construction)
 
-Byte detail in docs/patch_notes.md 14z-63; mechanism in
-docs/atlas/select_screen.md "The wheel DRAWER". The shape:
+Byte detail in docs/project/patch_notes.md 14z-63; mechanism in
+docs/game/atlas/select_screen.md "The wheel DRAWER". The shape:
 
 - **Measured before authoring** (the tap method, as planned): the wheel
   drawer is $FFB800; its select anim chain is a SINGLE stop-flagged
@@ -2630,7 +2671,7 @@ also ratifies the replay-11 composite class and the 889-2415 window).
 ## PLAYTEST-VALIDATED: the select family serves from group C bank 5;
 ## Jedah confirmed indistinguishable from vanilla by human playtest)
 
-Full detail in docs/patch_notes.md (62j/62k); the shape:
+Full detail in docs/project/patch_notes.md (62j/62k); the shape:
 
 - **All four select-family pieces** (portrait bust, name banner, VS
   splash, win quote) keep NATIVE vs2 tile codes at the variant id; the
@@ -2891,7 +2932,7 @@ different reason, and the difference is the whole M3a mechanism.
 
 New: `tools/select_arrays.py`, `tests/test_select_arrays.sh` (static model
 + a one-byte corruption control + the engine's own row sequence, ~10 s),
-`docs/atlas/select_screen.md` section.
+`docs/game/atlas/select_screen.md` section.
 
 **All three UI pieces now measured** — same model, each confirmed on all
 four cursor positions:
@@ -3069,7 +3110,7 @@ needs a negative control exactly as much as a positive one does.
 Two queued items closed, in the order the maintainer set: re-verify and
 record the cursor mapping, then census the id space.
 
-New: `docs/atlas/select_screen.md`, `docs/atlas/id_space.md`,
+New: `docs/game/atlas/select_screen.md`, `docs/game/atlas/id_space.md`,
 `tests/test_select_wheel.sh` (9 checks), `tests/test_id_space.sh` (7),
 `tools/select_wheel.py`, `tools/check_wheel_walk.py`,
 `tools/audit_id_space.py`. No ROM change; no build produced.
@@ -3085,7 +3126,7 @@ check it. Re-deriving it cost half a session and **corrected it**.
 
 ### The mechanism, re-derived and measured
 
-Full detail in `docs/atlas/select_screen.md`. What changed versus the log:
+Full detail in `docs/game/atlas/select_screen.md`. What changed versus the log:
 
 - **The commit site is `PRG:0x020A7C` (cell) and `PRG:0x020A80` (char id),
   not `PRG:0x020A84`.** `0x020A84` is the `bsr.w $20C98` after them, and
@@ -3196,7 +3237,7 @@ were found later this session — 14z-60e — bringing the total to seven):
 
 ### Per-tenant manifest: schema PROPOSED (14z-60h)
 
-`docs/tenant_manifest.md`, unblocked by the id-space answer. Not
+`docs/project/tenant_manifest.md`, unblocked by the id-space answer. Not
 implemented and nothing consumes it — written to be argued with first.
 `[[tenant]]` replaces `[port]`; `mirror_variant` disappears (a tenant that
 IS a variant id has no mirror, and one at `0x13` must not touch Victor at
@@ -3480,7 +3521,7 @@ it is independent of the art, and it is what a wrong answer would make
 unplayable rather than merely ugly. Next investigative step.
 
 > **CLOSED in 14z-60 — and the record it left was partly wrong.** The
-> mechanism is now measured and lives in `docs/atlas/select_screen.md`
+> mechanism is now measured and lives in `docs/game/atlas/select_screen.md`
 > (gate `tests/test_select_wheel.sh`). The follow-up notes written into
 > `docs/NEXT_SESSION.md` after this section named `PRG:0x020A84` as the
 > commit site; the commit stores are `PRG:0x020A7C` / `PRG:0x020A80`, and
@@ -3518,7 +3559,7 @@ byte (whole work-RAM dumps from both builds at frame 4400):
   `$FF7F00-$FF7FFF` that CLAUDE.md §4 already masks (hook cycle skew, below
   resting SP; ghost bytes, not live state).
 - **3 bytes at `$FF055B-$FF055D`** — `RAM:$FF05xx` is the **sound-driver
-  work area** per docs/atlas/ram.md, i.e. precisely what a live sfx helper
+  work area** per docs/game/atlas/ram.md, i.e. precisely what a live sfx helper
   is supposed to touch.
 - **Zero bytes of gameplay state.**
 
@@ -3778,7 +3819,7 @@ space itself is settled and proven.
 A build that uses the extension **requires the `vsavjw` driver and a
 patched emulator** — today's Donovan builds run on STOCK FBNeo/MAME. For
 netplay that means peers need the same binary and the same set
-(docs/cps2_wide.md already says so). That is a shipping decision, not a
+(docs/project/cps2_wide.md already says so). That is a shipping decision, not a
 placement detail, which is why the sound_table row is profile-gated rather
 than simply switched on. **It also supersedes the M5 SOUND DATA HOME
 decision still listed below**: option C ("grow the program region via
@@ -4221,7 +4262,7 @@ Build `b91647c7da14ded6316cee8dc057c8daf1c3fb1e` (donovan6, stage 6).
   0xBE8C − 0x3800). Live-verified: mugshot entry (0x3DC8 2x2 pal 0A
   at 200,32), name plate (0xBE8C 3x1 pal 02 at 144,40), f2600
   replay 56. Gate: reactions §4 extension.
-- **SELECT WHEEL DECODED (docs/engine_internals.md):** the wheel is
+- **SELECT WHEEL DECODED (docs/game/engine_internals.md):** the wheel is
   ONE static OBJ record at data `0x272A72` — 18 (code,attr) pairs,
   coords via header pointer → list `0x32A50A` (center-relative,
   shared byte-identical with vs2's list). Cells are fixed
@@ -4421,7 +4462,7 @@ Diagnosis, in order:
   in engine_internals. Any future tile-bank repoint must expect a
   behavioural change, not a cosmetic one.
 
-**Redesigned canary (next action, spec in docs/cps2_wide.md):** change the
+**Redesigned canary (next action, spec in docs/project/cps2_wide.md):** change the
 EMULATOR under a test-only env flag instead of the ROM — OR 0x1000 into
 bank-2/3 sprites' y-words at the promote point, run the STOCK rom, and
 require both RAM (guaranteed identical, no ROM change) and framebuffer
@@ -4595,7 +4636,7 @@ equivalent audit already found the "dead" band held 358 protected codes.
    equivalence by re-deriving known findings.
 4. Phase A measurements before any growth.
 
-Profile spec drafted: **docs/cps2_wide.md** (v1 DRAFT, awaiting
+Profile spec drafted: **docs/project/cps2_wide.md** (v1 DRAFT, awaiting
 ratification after Phase B). Approved plan archived at
 ~/.claude/plans/glowing-bouncing-iverson.md.
 
@@ -4705,7 +4746,7 @@ engine_internals "Sound subsystem"). Swept ids 0x000-0x7FF on BOTH
 games in silent test mode; extracted per-id QSound key-ons
 (bank/start/end -> sample address -> content compare across images).
 
-FINDINGS (docs/m5/keyons_*.json = the measured id maps):
+FINDINGS (docs/project/m5/keyons_*.json = the measured id maps):
 - **Shared sfx keep IDENTICAL ids across the family.** All 14
   content-shared stubbed MOVE-sfx ids exist on vsavj as the same id
   keying the same (relocated) sample. NO id translation table is
@@ -4781,7 +4822,7 @@ M2b-CORE precedent (e14e591):
   stands.** Decision moved from pending to made below. Their
   condition — "document in detail what's the window we're ignoring
   ... best be prepared in case we need to confirm one day" —
-  honored three ways: the expanded docs/atlas/ram.md row (now
+  honored three ways: the expanded docs/game/atlas/ram.md row (now
   carries both expected content values + when-to-rerun triggers),
   the m2a_common.sh basis comment, and a NEW SCRIPTED AUDIT:
   `tests/audit_mask_window_ff4182.sh` — reruns the original
@@ -4828,7 +4869,7 @@ to completion the same session (rule 6 honored):
    patched (f9200 + f9400 measured)**. Display-only, no gameplay
    surface, no visible surface.
    FIX: third masked window `$FF4182-$FF41A1` (M2A_MASK
-   "4182-41a2"), narrowly the one row slot; docs/atlas/ram.md row
+   "4182-41a2"), narrowly the one row slot; docs/game/atlas/ram.md row
    added; all 14 frozen masked vanilla logs regenerated with the
    new basis (m2a_freeze_masked). Chosen over demoting 05 to a
    first-divergence constant because the mask keeps all 12,120
@@ -7525,7 +7566,7 @@ blinks/vanishes in-match; the elemental-sword specials (623P Blizzard
 ## Session 14c highlights (select-screen pipeline mapped)
 
 - Select-portrait/name pipeline fully mapped by live instrumentation
-  (docs/engine_internals.md new section): per-char 32-bit root cells
+  (docs/game/engine_internals.md new section): per-char 32-bit root cells
   enumerated by breakpoint trace (six cells for a full pick), name-table
   row located, vs2 twins located (master 0x2A0426, roots 0x2A05E2,
   name 0x2A0A4A row 0x13), Jedah's freed select art sized (~2K bank-1
@@ -7545,7 +7586,7 @@ blinks/vanishes in-match; the elemental-sword specials (623P Blizzard
 - **R2 RESOLVED STATICALLY** (was: "the hard wall"): OBJ tile codes are
   absolute 16-bit + bank bits from object field +0x18 (Y-word bits
   13-14; per-char slot-indexed init table vsavj 0x282D4). Full decode of
-  the OBJ record format + emitter chain in docs/engine_internals.md.
+  the OBJ record format + emitter chain in docs/game/engine_internals.md.
 - **Donovan FITS in Jedah's tile band**: 15,171 tiles extent 0x3CB1 vs
   Jedah's 16,658 extent 0x417F (both measured by tools/obj_records.py,
   locked in tests/test_gfx_tiles.sh). Port = tile-data re-encode into
@@ -7706,7 +7747,7 @@ blinks/vanishes in-match; the elemental-sword specials (623P Blizzard
   six legacy replays already carry at the same frame. Until signed
   off, the poke is reverted and the palettes stay Jedah's.
 
-  dispositioned (docs/tables/reconciliation.md "Session 11"): garbled
+  dispositioned (docs/project/tables/reconciliation.md "Session 11"): garbled
   sprites = M2b expected; flavor hard to eyeball = expected (QCB+K is
   the fork); 4-option select = REFUTED as port artifact (vanilla shows
   the identical menu on factory EEPROM — snapshot-proven); **DP-spam
@@ -7782,7 +7823,7 @@ blinks/vanishes in-match; the elemental-sword specials (623P Blizzard
   state dispatch (vsavj table 0x2A7E2, 89 entries) is EXTENDED in vs2
   (101 entries — 12 newcomer states); Donovan's VS2-flavor QCB+K writes
   state 0xB6 → indexes past the vanilla table → ILLEGAL → soft reset.
-  Fix design + details: docs/tables/reconciliation.md "Session 8".
+  Fix design + details: docs/project/tables/reconciliation.md "Session 8".
   HP-decrease sanity holds natively (Victor −11 ×2). NOTE: with
   dispatch_14 active the 12_donovan moveset replay also reaches the
   +0x14E states and crashes at 3815 — stage-4 gate lock 2 is KNOWN-RED
@@ -7828,7 +7869,7 @@ blinks/vanishes in-match; the elemental-sword specials (623P Blizzard
 - **Frontier**: vec3 at engine 0x015096 — the anim word table is
   byte-identical to native vsav2 (data+relocation correct) but the INDEX
   into it is wrong; a state/substate byte carries a vs2-flavored value.
-  Full detail + next probe: docs/tables/reconciliation.md "Session 6",
+  Full detail + next probe: docs/project/tables/reconciliation.md "Session 6",
   docs/NEXT_SESSION.md.
 - **GOTCHAS paid**: PC-relative reads are decrypted reads on CPS-2;
   PC-relative word tables are DATA (a fused pair of word entries was
@@ -7923,7 +7964,7 @@ blinks/vanishes in-match; the elemental-sword specials (623P Blizzard
   attract bit-identical through frame 4277, diverges at 4278 precisely where
   its CPU demo shows Jedah (char id 0x0F, verified). Attract legitimately
   involving the modified slot is correct superset behavior, not a violation.
-- Feasibility assessed (docs/M2_feasibility.md): behavior data portable via
+- Feasibility assessed (docs/project/M2_feasibility.md): behavior data portable via
   ~337KB free vsavj space + data-reads-bypass-encryption; sprite tiles are
   the R2 wall (may pull M3 forward); QSound = M5.
 - **M2a IN PROGRESS (sessions 4-7, see highlights above):** extraction,
@@ -7938,7 +7979,7 @@ blinks/vanishes in-match; the elemental-sword specials (623P Blizzard
   plumbing) and M2b graphics.
 
 ### M1 — Map. ACCEPTED (2026-07-25).
-Both SPEC §4 clauses met; full assessment in docs/M1_acceptance.md.
+Both SPEC §4 clauses met; full assessment in docs/project/M1_acceptance.md.
 Deferred sprite-bound exact addresses (tile/palette/sound) are
 proven-reachable and scoped to M3/M4/M5.
 
@@ -7962,7 +8003,7 @@ proven-reachable and scoped to M3/M4/M5.
   timer) compared at sync anchors (match start), not whole-RAM checksums.
 - RAM map: community anchor imported and verified (player structs
   $FF8400/$FF8500, hitbox ptr offsets, match-active flags), extended by
-  differential experiments + write-traces. See docs/atlas/ram.md.
+  differential experiments + write-traces. See docs/game/atlas/ram.md.
 - **Character-data plumbing CRACKED (the big one):** write-trace on
   $FF8480 → per-character loader (vsavj PRG:0x028DD8) → three 32-entry
   tables indexed by 5-bit char id → located in ALL THREE sets by
@@ -7975,7 +8016,7 @@ proven-reachable and scoped to M3/M4/M5.
   **DONOVAN/HUITZIL/PYRON LOCATED** (pick-verified on vsav2): char IDs
   0x13/0x10/0x11 — the variant half of slots 3/0/1 — with hitbox bases in
   both vsav2 and vhunt2 recorded. Base-half slot assignments are identical
-  across the whole series. Full detail: docs/atlas/character_tables.md.
+  across the whole series. Full detail: docs/game/atlas/character_tables.md.
 - Three-way diff: window/masked diff built (`tools/diff_sets.py`);
   **finding:** vsavj↔vsav2 share <10% at window level even pointer-masked —
   engines were rebuilt (shifted code, changed PC-relative displacements) and
@@ -7999,7 +8040,7 @@ opcode-space dump oracle (`tests/test_decrypt_oracle.sh`). Both directions
 
 ## Next actions
 
-1. **M2b — Donovan graphics** (docs/M2_feasibility.md: the R2 tile
+1. **M2b — Donovan graphics** (docs/project/M2_feasibility.md: the R2 tile
    wall). First step: measure — tile inventory for slot 0x0F (portrait,
    name, sprite banks), what the garbled-but-recognizable rendering
    implies about tile-index vs tile-data remapping, whether M3 (gfx
@@ -8050,7 +8091,7 @@ opcode-space dump oracle (`tests/test_decrypt_oracle.sh`). Both directions
   hooks, legacy comparison masks exactly `RAM:$FF043C` (QSound handshake
   phase latch) and `RAM:$FF7F00-$FF7FFF` (dead stack below resting SP);
   every other byte compared every frame (confinement by construction).
-  CLAUDE.md §4 amended; windows documented in docs/atlas/ram.md; masked
+  CLAUDE.md §4 amended; windows documented in docs/game/atlas/ram.md; masked
   vanilla expectations frozen under tests/expected/vsavj/masked/ (this
   session). Suite-runner masked-expectation-kind support lands with the
   stage-5 freeze. New masked windows require the same route: measured
@@ -8149,7 +8190,7 @@ divergence exists).
 
 **2. The `[[tenant]]` schema.** Ratified, and already implemented for a
 single tenant (14z-60t/u) byte-identically on both tracks with the tenant
-still at `0x0F`. `docs/tenant_manifest.md` moves PROPOSAL -> RATIFIED; its
+still at `0x0F`. `docs/project/tenant_manifest.md` moves PROPOSAL -> RATIFIED; its
 wheel/ladder/folds sub-tables stay proposal-only because that work is not
 done.
 
@@ -8220,7 +8261,7 @@ Option A: the newcomers inherit their base character's animation from the
 shared 16-wide block `0x360-0x36F` (a tenant at `0x13` plays `0x363`),
 exactly as vsav2 ships — Capcom left both those folds in place. Sites
 `PRG:0x003E40` / `PRG:0x004082` therefore stay folded, recorded as
-`inherit` in `docs/tenant_manifest.md`. **Fallback, if a playtest shows the
+`inherit` in `docs/project/tenant_manifest.md`. **Fallback, if a playtest shows the
 inherited animation is wrong for a newcomer: option B**, relocate the block
 to a free 32-wide anim-number range and widen both masks.
 
@@ -8255,7 +8296,7 @@ row 14) RATIFIED into the masked legacy basis — option A of the
 14z-49b write-up, after the recolor-necessity A/B (14z-49d) showed
 options B and C strictly worse. Condition attached and honored:
 detailed documentation + a standing confirmation path
-(`tests/audit_mask_window_ff4182.sh`; spec in docs/atlas/ram.md).
+(`tests/audit_mask_window_ff4182.sh`; spec in docs/game/atlas/ram.md).
 Extension policy stands: future palette-block ports extend the
 window per measured slot, never pre-widen.
 
@@ -8268,7 +8309,7 @@ relocation (option B) remains the fallback if the measured hook cost
 violates the standing flicker watch. Maintainer also flagged suspected
 graphical corruption in the session captures — playtest of `39597268`
 in progress; the expected-interim inventory is in
-docs/playtest_m3a_interims.md so the report can classify against it.
+docs/project/playtest_m3a_interims.md so the report can classify against it.
 Original write-up kept below.
 
 ## Decisions pending (human)
@@ -8463,7 +8504,7 @@ Original write-up kept below.
   cannot yet name. **Recommendation: A**, on the strength of vs2 being a
   shipped existence proof; revisit only if a playtest shows the inherited
   animation is wrong for a newcomer. Detail in session 14z-60 and
-  `docs/atlas/id_space.md`.
+  `docs/game/atlas/id_space.md`.
 
 - ~~**M5 SOUND NEEDS A DATA HOME (14z-52)**~~ **SETTLED 2026-08-04 by the
   dual-track decision below: it lives in `wide_ext`.** Two corrections to

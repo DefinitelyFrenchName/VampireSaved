@@ -3,7 +3,7 @@
 cursor navigation tables.
 
 Mechanism (re-derived 14z-60 from the consumer, NOT from a session log —
-docs/atlas/select_screen.md):
+docs/game/atlas/select_screen.md):
 
   vsavj PRG:0x020A58   (vs2 twin PRG:0x01F620)
     andi.w  #$f,d2           ; d2 = joystick direction nibble
@@ -115,11 +115,11 @@ BIT_NAMES = {0: "R", 1: "L", 2: "D", 3: "U"}
 # Ground truth for the labeling above (CLAUDE.md §4: a verdict's logic is
 # validated before its verdicts are trusted). Both are prior, independent
 # records: tests/replays/11_pick_donovan.rpl picks Jedah from the default
-# position, and docs/atlas/character_tables.md closed Aulbath with L,L,D.
+# position, and docs/game/atlas/character_tables.md closed Aulbath with L,L,D.
 DEFAULT_CELL = 0x01                      # Demitri, per both sources
 KNOWN_PATHS = [
     ("UUR", 0x0F, "tests/replays/11_pick_donovan.rpl (Jedah)"),
-    ("LLD", 0x09, "docs/atlas/character_tables.md (Aulbath)"),
+    ("LLD", 0x09, "docs/game/atlas/character_tables.md (Aulbath)"),
 ]
 
 

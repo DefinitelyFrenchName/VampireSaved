@@ -24,8 +24,8 @@ reference stays reproducible from the tree at every intermediate commit
 - **Placeholders are real.** Wheel cells, TABLE B rows, highlight bases,
   ring rows, medallion art (group C bank 5) and palette rows (Phobos 0x19,
   Pyron 0x1A) are shipped and maintainer-ratified in donovan-m3a
-  (`build/manifest/wheel_layout_proposed.json`; docs/atlas/select_screen.md).
-- **Locations are pinned** (docs/atlas/character_tables.md:103-104,174-175,
+  (`build/manifest/wheel_layout_proposed.json`; docs/game/atlas/select_screen.md).
+- **Locations are pinned** (docs/game/atlas/character_tables.md:103-104,174-175,
   210-211): Huitzil vsav2 handler 0x057450 / anim 0x245872 / hitbox
   0x0C4370; Pyron 0x059424 / 0x264086 / 0x0C75FE; vhunt2 twins recorded.
 - **Space:** hole_a is full, hole_b has 272 bytes; both new tenants live
@@ -68,15 +68,15 @@ reference stays reproducible from the tree at every intermediate commit
   ports (his `code` region is 0x059490+0x3200). Shared-span handling is
   load-bearing, not an edge case.
 - **Huitzil has the VS2/VH2 Start-hold flavor fork; Pyron does not**
-  (docs/atlas/character_tables.md:229-233, community-confirmed). The
+  (docs/game/atlas/character_tables.md:229-233, community-confirmed). The
   Donovan wiring (`[init_shim] flavor_disp=0x3C2`, default 0x01=VS2,
   Start-mask $FF8060) is the template.
 - **"Selectable is not fightable"**: the arcade opponent ladder (order
   list at RAM a5-0x61B8, length $138(a5)) and the VS-screen palette pool
   (PRG:0x3A3CA0 + id*32) have NO tenant support — including Donovan, whose
-  VS-pool entry is a placeholder grey ramp (docs/atlas/id_space.md:265-276).
+  VS-pool entry is a placeholder grey ramp (docs/game/atlas/id_space.md:265-276).
 - **Masked basis discipline for the new tenants is pre-written**
-  (docs/atlas/ram.md:31, STATE 2526-2531): any select palette-block change
+  (docs/game/atlas/ram.md:31, STATE 2526-2531): any select palette-block change
   surfaces in the fade-staging family ($FF3F02 + row*0x20) — EXTEND the
   window with measured slots per edited row, never pre-widen, and re-run
   `tests/audit_mask_window_ff4182.sh` first.
@@ -159,7 +159,7 @@ green (Phase 0); content lands only through the refactored machinery.
    - else → grow group C (8 members, banks 6-7): build_wide_romset --gfx 8,
      gfx_tiles GROUP/bank_word extension, BOTH emulator descriptor patches
      (member-for-member identical — the standing rule), profile version
-     bump per docs/cps2_wide.md governance.
+     bump per docs/project/cps2_wide.md governance.
    Estimate says packing fits (~50K of 64K codes for three tenants), so
    plan A unless measurement disagrees.
 2. build_gfx_donovan.py → multi-tenant: per-tenant band/delta/bank from
@@ -231,7 +231,7 @@ objects need the measured treatment Donovan's Anita got.
   16 MB ceiling is MAME's `device_rom_interface<24>`; overflow means
   exclusivity or banking, and option C is rejected and may not return).
 - **Phobos palette row 0x19 2P case**: flagged unmeasured
-  (docs/patch_notes.md:1633-1635); measure during Phase 4 select work.
+  (docs/project/patch_notes.md:1633-1635); measure during Phase 4 select work.
 - **The $130(a5) fold's deep-arcade ending gap**: still the one unmeasured
   flow; H/P venue work must not silently depend on it.
 - **Wheel record budget word**: 85 covers 21 cells; any future growth

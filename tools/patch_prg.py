@@ -3,7 +3,7 @@
 program files. Chainable (src,out) builder; the null patch is bit-identical.
 
 Everything works in 68k WORD-VALUE space (word index = logical byte addr / 2),
-so all addresses match the analysis views (docs/atlas: vsavj_opcodes.bin /
+so all addresses match the analysis views (docs/game/atlas: vsavj_opcodes.bin /
 vsavj_data.bin are 68k-logical). Byte order is converted only at the file
 boundary. The 68k sees big-endian logical words for BOTH data reads and
 (post-decryption) opcode fetches, so:

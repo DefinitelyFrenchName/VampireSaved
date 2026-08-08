@@ -363,7 +363,7 @@ after the fix the 1100-frame neutral-idle comparison agrees on every
 field. Extractor change: dispatch tables enumerated from the bank map
 (was hardcoded range(14)). Provenance: repoint = GEN pokes; the handler
 bytes were already VS2-ported. Full narrative:
-docs/tables/reconciliation.md "Session 8".
+docs/project/tables/reconciliation.md "Session 8".
 
 ## donovan-m2 stage 4 — VS2 default flavor via the init shim (2026-07-27)
 
@@ -374,7 +374,7 @@ Donovan's relocated handler. Both values are manifest tunables
 (`[init_shim] flavor_disp / flavor_default`, donovan.toml). Why: vsavj's
 engine never writes +0x3C2; Donovan's ported QCB+K handler (vsav2
 0x5A654) and its projectile (0x65FE6) read it (0x01=VS2, 0x00=VH2 —
-community-confirmed Start-hold mechanism, docs/atlas/character_tables.md);
+community-confirmed Start-hold mechanism, docs/game/atlas/character_tables.md);
 without the poke the port took the VH2 branch by accident. Maintainer
 decision 2026-07-27: default VS2. Verified: P1 $FF87C2=01 live in-match;
 the moveset replay now exercises the VS2 branch of QCB+K. Provenance:
@@ -391,7 +391,7 @@ added or removed; region sizes and placements unchanged):
   had fused into ROM-plausible pointers and were being relocated, corrupting
   the ported code. One of these (vs2 0x8A49C `moveq #0,d0`) was the entire
   session-6 crash frontier. Mechanism + new sibling-veto rules:
-  docs/GOTCHAS.md, docs/tables/reconciliation.md Session 7.
+  docs/GOTCHAS.md, docs/project/tables/reconciliation.md Session 7.
 - Real immediate table-base loads (`movea.l #imm,An`, `move.l #imm,Dn`) now
   labeled by scan_code_refs (`movea_imm`/`move_imm`) and relocated through
   the labeled path (host-region membership required).
@@ -509,7 +509,7 @@ handlers in the 0x08xxxx zone, ported source-only as region x088512).
 Allocator-family mapping corrected: vsav2 pool helpers 0x15702/0x1572E map
 to vsavj 0x016FBA/0x016FE6 (never ported — they read the game's own RAM
 bookkeeping; see reconciliation.md). Frontier: the companion spawn-node
-protocol (docs/tables/reconciliation.md OPEN FRONTIER).
+protocol (docs/project/tables/reconciliation.md OPEN FRONTIER).
 
 ### Stage 4 progress — sessions 5-6
 
@@ -1254,7 +1254,7 @@ manifest changes; the six ARRAY ROW addresses are fixed by the id):
   tenant's band to group C. His name banner happens to fall in placement
   gaps and renders correctly.
 - Refusals added: tenant ids 0x12 (Gallon select variant) and 0x18 (Oboro)
-  now refused in normalise_tenants (docs/atlas/id_space.md reservations).
+  now refused in normalise_tenants (docs/game/atlas/id_space.md reservations).
 - Gate: tests/test_tenant_select_records.sh (static composition re-derived
   independently + 3 negative controls incl. verdict-logic tests + the
   engine's own row-fetch sequence onto cell 0x13 via replay
@@ -1268,7 +1268,7 @@ byte-identical after every change):
 - Found by the measure-diff loop: replay 11 (pick Jedah) on the 0x13
   build vs frozen vanilla masked logs diverged INTO THE MATCH; work-RAM
   dumps at the divergence named each subsystem in turn.
-- Generator/manifest mechanics (docs/tenant_manifest.md "slot-row
+- Generator/manifest mechanics (docs/project/tenant_manifest.md "slot-row
   vocabulary"): [[palette]]/[[sound_table]] rows always the tenant's
   (fixed row keys are refused); only_base_slot gates on aux_poke +
   data_port; slot_ptr_table place+repoint mode; code_word
@@ -1562,7 +1562,7 @@ fixed; scratch build 048521c2):
 Session 14z-63 (phase 3 item 1: REAL MEDALLION ART — the wheel bank-5
 move; evidence build 2c02213d):
 - Mechanism measured first (tap + conditioned bank trace + chain decode;
-  docs/atlas/select_screen.md "The wheel DRAWER"): the wheel drawer is
+  docs/game/atlas/select_screen.md "The wheel DRAWER"): the wheel drawer is
   $FFB800, its select anim chain is a single stop-flagged entry
   (0x2689FA), its bank word $FFB818 is written ONLY by the select init
   at 0x5F8B2 (`move.w #$2000,$18(a6)` — per-object; the shared attract
@@ -1640,7 +1640,7 @@ SOURCE — found, and fixed in place; build e9f3286c):
 Session 14z-63 addendum 2 (phase 3 item 4: the variant-id HUD —
 mugshot + name plate; build f7210898):
 - ATTRIBUTION CORRECTED: the "VICTOR"/wrong-mugshot symptom was carried
-  as the $130(a5)/0x00A43E fold (docs/atlas/id_space.md). Measured:
+  as the $130(a5)/0x00A43E fold (docs/game/atlas/id_space.md). Measured:
   neither HUD consumer reads $130(a5). The mugshot stager (0x8937C..)
   indexes table 0x89884 by $782/$b82(a5) UNMASKED; the name stager
   (0x89684) indexes 0x898C4 by $382(a4) UNMASKED — and both tables are
@@ -1910,7 +1910,7 @@ V2 masked basis (build 4b7d0dc7):
   * Row 0x00 LEAKS: block-A row 0 feeds the GAME-OVER starfield
     (measured: 1210 candidate-vs-vanilla pixels on the f11800 game-over
     screen of replay 05 — a legacy pixel violation). Reverted.
-  * The palette STAGING AREA identified (docs/atlas/ram.md): slots at
+  * The palette STAGING AREA identified (docs/game/atlas/ram.md): slots at
     $FF3F02 + row*0x20; the ratified $FF4182 window IS row 0x14's slot
     from the 14z-49 port. Any edited block-A row leaves a sticky
     designed diff in its slot (replay 05's f9126+ tail anomaly).

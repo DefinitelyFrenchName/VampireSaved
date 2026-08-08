@@ -26,7 +26,7 @@ is mandatory (docs/GOTCHAS.md). Needs brew `sdl2`(-compat) + `sdl2_image`.
 **Why it exists:** all 18 characters do not fit a stock CPS-2 (measured
 deficit ~886 KiB program, ~6-7 MB tiles). WIDE is the named, versioned
 profile that makes the roster physically possible. Spec + all measurements:
-**`docs/cps2_wide.md`** (read it before touching any of this).
+**`docs/project/cps2_wide.md`** (read it before touching any of this).
 
 ```
 CPS-2 WIDE v1   PRG 6 MB | GFX 48 MB (19-bit tiles) | QSound 16 MB
@@ -236,6 +236,20 @@ shadow, effect art) can now be A/B'd directly. Do not characterise a
 tenant symptom without this leg — 14z-69 retracted two findings that
 were artefacts of measuring our build alone (docs/GOTCHAS.md).
 
+## DOCS ARE SPLIT THREE WAYS (14z-69) — `docs/README.md`
+
+`docs/game/` (Vampire Savior itself) | `docs/platform/` (CPS-2, MAME,
+FBNeo) | `docs/project/` (this port). The discriminator: **would this
+still be true if we abandoned the roster hack tomorrow?** File by the
+FACT, not by the task you were doing when you learned it.
+
+`docs/GOTCHAS.md` is now an INDEX of all 135 entries grouped by bucket;
+the entries live in `docs/{game,platform,project}/gotchas.md`. Every
+existing citation of `docs/GOTCHAS.md` still lands there.
+
+Looking for whether we already know something? The index is the fastest
+topic list; `docs/game/atlas/ram.md` is the fastest address lookup.
+
 ## PRIOR ART FIRST — check the subsystem doc before re-deriving (14z-68m)
 
 Huitzil's win screen was re-derived from scratch and got two of three
@@ -244,7 +258,7 @@ STATE.md since 14z-45. The analysis existed, it just was not
 DISCOVERABLE from "I am working on tenant X's screen Y".
 
 **Before porting any per-character screen or subsystem for a new
-tenant, read the matching section of `docs/engine_internals.md`** —
+tenant, read the matching section of `docs/game/engine_internals.md`** —
 it now carries the worked instances for BOTH tenants (win screen,
 select family, HUD, effect system, palettes). If the subsystem has no
 section there, write one as you go: a session-log entry is a record of
@@ -252,7 +266,7 @@ what happened, not a document anyone will find later.
 
 Cheap rule that would have caught it: when a symptom on tenant B
 resembles one already fixed on tenant A, `grep -n "<subsystem>"
-docs/engine_internals.md docs/patch_index.md` and diff A's manifest
+docs/game/engine_internals.md docs/project/patch_index.md` and diff A's manifest
 rows against B's BEFORE measuring anything.
 
 ## Repo path changed (2026-08-05): `Vampire Saved` -> `Vampire_Saved`
@@ -308,7 +322,7 @@ reason is specific rather than hopeful:
 Still: that is an argument, not a measurement. `test_mame_parity.sh` is the
 measurement, it is cheap, and it exists.
 
-**Step-by-step Windows/WSL2 (and Linux) setup: `docs/WSL2_SETUP.md`** —
+**Step-by-step Windows/WSL2 (and Linux) setup: `docs/project/WSL2_SETUP.md`** —
 written for someone who has not used WSL2, and section 7 is the acceptance
 test that decides whether a machine can be trusted.
 
@@ -608,7 +622,7 @@ before session end (persistent suite doctrine, CLAUDE.md §4).
 | ~~m5w~~ **KNOWN-BAD, kept as evidence** | `ac52eeff` | the 14z-60y sprite garble: its `vsavjw.zip` carries group C as byte copies of group B, so the loader served pristine tiles for the patched group B. Do not playtest. `python3 tools/audit_romset_identity.py build/m5w/rompath` names all four shadows |
 | null vsavj | `12fbb0e1a137a1420824856d3efb0af8fff57be6` | == reference members; zip repacked deterministically |
 | **donovan-m2c (M2b+ASSETS FROZEN 2026-08-02)** | fingerprint `b91647c7da14ded6316cee8dc057c8daf1c3fb1e` | `tools/build_donovan.sh 6 build/donovan6`; REGISTERED `-> donovan-m2c`; the 14z-42..49 arc on top of M2b-CORE: LS hit-freeze thunks, full ES chain + meter decode, win screen, deity seq-states, accent owner-link fallback, HC motion farm_ports, HUD mugshot/name, select medallion; masked legacy basis = THREE windows (palette staging slot $FF4182-$FF41A1 ratified round 64; audit `tests/audit_mask_window_ff4182.sh`); gates: full battery GREEN (battery_49b) + `run_suite.sh` GREEN by fingerprint auto-detection; maintainer-confirmed rounds 52-64; gfx member sha1s in registry note |
-| **donovan-m2b-core (M2b-CORE FROZEN 2026-07-28)** | fingerprint `71601263474dfd7e4afd0741dae696cde22eda4e` | `tools/build_donovan.sh 6 build/donovan6`; REGISTERED `-> donovan-m2b`; sprites/palettes/effects in Jedah's gfx space; rompath carries patched vsav.zip (gfx sha1s in registry note); gates: tests/test_m2b_stage6.sh + oracle/xemu/flavor + tests/test_m2b_scroll3.sh — ALL PASS; select portrait/name/mugshot + attract palette remain (docs/engine_internals.md) |
+| **donovan-m2b-core (M2b-CORE FROZEN 2026-07-28)** | fingerprint `71601263474dfd7e4afd0741dae696cde22eda4e` | `tools/build_donovan.sh 6 build/donovan6`; REGISTERED `-> donovan-m2b`; sprites/palettes/effects in Jedah's gfx space; rompath carries patched vsav.zip (gfx sha1s in registry note); gates: tests/test_m2b_stage6.sh + oracle/xemu/flavor + tests/test_m2b_scroll3.sh — ALL PASS; select portrait/name/mugshot + attract palette remain (docs/game/engine_internals.md) |
 | **donovan-m2 (M2a FROZEN 2026-07-28)** | fingerprint `a02aeefff4c7a053337b10c923c8c328573788fa` | `tools/build_donovan.sh 5 build/donovan5`; all gates green (4 guarded soaks incl. ES-DP spam, round-2, input-chaos / 13-replay masked legacy / oracle / xemu / flavor); supersedes eda50a18 (214P/214K music: engine_data-masquerade farm rows + direct helper stubbed; farm-ref audit clean — 25 stubbed / 4 live); REGISTERED: `a02aeeff… -> donovan-m2` in tests/expected/registry.tsv; validate any build with `ROMDIR=... [MAME_ROMPATH="<rompath>;$ROMDIR"] tests/run_suite.sh` (fingerprint auto-detects the expectation set; masked legacy basis applied automatically) |
 
 ## M1 additions (2026-07-25, session 2)
@@ -622,15 +636,15 @@ before session end (persistent suite doctrine, CLAUDE.md §4).
 | Pick probe (slot mapping) | `tools/pick_probe.sh` |
 | Forced-id boot probe (14z-65) | `tools/force_pick_probe.sh <rompath> <id> <out>` — pokes the commit field across commit->load; verdicts id-hold/load/guard. Validated: vanilla ids load, variant 0x10 wedges on the stage-4 ladder |
 | Structural diff | `tools/diff_sets.py` (`--mask-pointers`) |
-| Character tables atlas | `docs/atlas/character_tables.md` (3-set anchor, slot maps, D/H/P located, pipelines) |
-| RAM atlas | `docs/atlas/ram.md` |
-| M1 acceptance review | `docs/M1_acceptance.md` (both clauses met; R2 quantified) |
+| Character tables atlas | `docs/game/atlas/character_tables.md` (3-set anchor, slot maps, D/H/P located, pipelines) |
+| RAM atlas | `docs/game/atlas/ram.md` |
+| M1 acceptance review | `docs/project/M1_acceptance.md` (both clauses met; R2 quantified) |
 | Write/read tracer | `tests/lua/trace_writes.lua` (WATCH=addr,len[,r|w|rw]) |
 | Program patcher | `tools/patch_prg.py` (JSON ops, word-value space) + `tools/pack_build.sh` |
-| M2 feasibility | `docs/M2_feasibility.md` (3 domains; remaining work list) |
+| M2 feasibility | `docs/project/M2_feasibility.md` (3 domains; remaining work list) |
 | Patch-tooling test | `tests/test_patch_prg.sh` (null bit-identical, code re-encrypts) |
 | M2 repoint proof | `tests/test_m2_repoint.sh` (mechanism + superset invariant) |
-| Select wheel + id space (14z-60) | `tools/select_wheel.py` (decode/verify TABLE A+B, generate a full-coverage walk), `tools/check_wheel_walk.py` (measured vs predicted), `tools/audit_id_space.py` (id width at every consumer + the variant-row alias matrix), `tools/wheel_positions.py` (cell -> screen position, measured from the palette-0x1E cursor ring in OBJ RAM); atlas `docs/atlas/select_screen.md`, `docs/atlas/id_space.md` |
+| Select wheel + id space (14z-60) | `tools/select_wheel.py` (decode/verify TABLE A+B, generate a full-coverage walk), `tools/check_wheel_walk.py` (measured vs predicted), `tools/audit_id_space.py` (id width at every consumer + the variant-row alias matrix), `tools/wheel_positions.py` (cell -> screen position, measured from the palette-0x1E cursor ring in OBJ RAM); atlas `docs/game/atlas/select_screen.md`, `docs/game/atlas/id_space.md` |
 
 Run a patched build: `MAME_ROMPATH="<packed_dir>;$ROMDIR" tools/run_mame.sh vsavj ...`
 

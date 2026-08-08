@@ -23,7 +23,7 @@ else
     exit 1
 fi
 
-# CPS-2 WIDE profile patch (docs/cps2_wide.md). Separate file from the
+# CPS-2 WIDE profile patch (docs/project/cps2_wide.md). Separate file from the
 # harness patch on purpose: the harness is frontend-only infrastructure,
 # while this one adds a DRIVER DESCRIPTOR and is governed by Rule 1 v2.
 # Keeping the trust surfaces separable is the point.

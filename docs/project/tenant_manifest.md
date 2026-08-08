@@ -22,7 +22,7 @@ both `0x0F` and `0x1F`. That was right for proof-of-life. It does not
 survive three characters, because:
 
 - **Three tenants need three ids, and the ids are no longer a free choice.**
-  `docs/atlas/id_space.md`: the newcomers should take their **native vs2
+  `docs/game/atlas/id_space.md`: the newcomers should take their **native vs2
   ids** — Huitzil `0x10`, Pyron `0x11`, Donovan `0x13` — so every ported
   bank row lands at its own index with no renumbering, and so the wheel
   cells match what vsav2 already ships.
@@ -63,7 +63,7 @@ id_by_profile = "cps2-wide-v1=0x13"
                             # to put them (the dual-track ruling, as a build
                             # error rather than a convention).
 
-  # ── select wheel (docs/atlas/select_screen.md) ──────────────────────────
+  # ── select wheel (docs/game/atlas/select_screen.md) ──────────────────────────
   [tenant.wheel]
   cell      = 0x13          # MUST equal `id`: the commit site writes the
                             # same byte to $03(a6) and $382(a6). Declared
@@ -75,7 +75,7 @@ id_by_profile = "cps2-wide-v1=0x13"
   # the tenant is drawn but unreachable.
   reachable_from = [ { cell = 0x0C, dir = "R" }, ... ]
 
-  # ── arcade ladder (docs/atlas/id_space.md) ─────────────────────────────
+  # ── arcade ladder (docs/game/atlas/id_space.md) ─────────────────────────────
   [tenant.ladder]
   in_opponent_list = true   # append to the order list at a5-0x61b8 and
                             # bump its length at $138(a5); the already-

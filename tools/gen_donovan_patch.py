@@ -119,7 +119,7 @@ def normalise_tenants(port, profile=None, override=None):
     if tid in (0x12, 0x18):
         raise SystemExit(
             f"gen_donovan_patch: tenant id {tid:#04x} is RESERVED "
-            f"(docs/atlas/id_space.md): 0x12 is the Gallon select variant "
+            f"(docs/game/atlas/id_space.md): 0x12 is the Gallon select variant "
             f"vanilla writes as an immediate, 0x18 is Oboro Bishamon.")
     p = dict(port.get("port", {}))
     p["src_set"] = t["src_set"]
@@ -1914,7 +1914,7 @@ def main():
     sh = port.get("state_hook") if args.stage >= 4 else None
     if sh:
         # +0x14E engine state-dispatch extension (donovan.toml [state_hook];
-        # design + measured constants: docs/tables/reconciliation.md
+        # design + measured constants: docs/project/tables/reconciliation.md
         # "Session 8"). Four parts, all GEN except the records (VS2):
         #   1. 12 palette-seq records -> hole B (raw; byte-identical in
         #      vhunt2 — verified at config time, asserted here)
@@ -2191,7 +2191,7 @@ def main():
                 flav_d = _int(shim_cfg["flavor_disp"])
                 flav_v = _int(shim_cfg["flavor_default"])
                 # Start-hold flavor selector (stage 5; community-confirmed
-                # protocol, docs/atlas/character_tables.md): the byte at
+                # protocol, docs/game/atlas/character_tables.md): the byte at
                 # flavor_hold_flag is a per-player Start bitmask (bit 0 =
                 # P1, bit 1 = P2; live through match load — measured).
                 # Holding YOUR Start through match load selects the other
@@ -2485,7 +2485,7 @@ def main():
     # word is 0 (`tst.w d1; beq`), so ids that have no faithful vsavj
     # meaning are zeroed rather than translated — silence beats the wrong
     # sound, and vsavj's 0x700-0x7FF ids are MUSIC TRACKS where vs2 put
-    # the newcomer voice bank (14z-52 measurement, docs/m5/). The blob is
+    # the newcomer voice bank (14z-52 measurement, docs/project/m5/). The blob is
     # hole-allocated and the per-char pointer row is repointed, so the
     # array length is bounded by OUR measurement (max index used + 1),
     # not by the length of the slot's vanilla array.
@@ -2575,7 +2575,7 @@ def main():
     #   3. one longword repointed, the record's single referrer.
     # The vanilla record and list are left untouched where they are: measured
     # to have exactly one referrer each and no interior pointers
-    # (docs/atlas/select_screen.md), which is what makes copy-and-repoint
+    # (docs/game/atlas/select_screen.md), which is what makes copy-and-repoint
     # safe rather than a relocation that has to be prayed over.
     if args.stage >= 6:
         for sw in port.get("select_wheel", []):
@@ -2622,7 +2622,7 @@ def main():
                                 f"may never overwrite a vanilla cell")
                 if c in (0x12, 0x18):
                     fail.append(f"select_wheel {nm}: id {c:#04x} is RESERVED "
-                                f"(docs/atlas/id_space.md)")
+                                f"(docs/game/atlas/id_space.md)")
                 return c
             # --- 1. TABLE B, in place -------------------------------------
             rows = [bytearray(vj[tb + c * 8: tb + c * 8 + 8]) for c in range(32)]
@@ -3106,7 +3106,7 @@ def main():
     # cursor CELL/ID with NO 4-bit fold; rows 0x10-0x1F alias 0x00-0x0F in
     # vanilla, and no legacy gameplay path writes a variant-half id — so
     # repointing the tenant's two rows per piece touches nothing legacy
-    # content can reach, BY CONSTRUCTION (docs/atlas/select_screen.md;
+    # content can reach, BY CONSTRUCTION (docs/game/atlas/select_screen.md;
     # tests/test_select_arrays.sh, tests/audit_id_writers.sh). At the
     # substituted slot 0x0F this section is INERT: select_port.py's in-place
     # surgery remains that track's mechanism, and the frozen references
@@ -3718,7 +3718,7 @@ def main():
         # the in-match overlay (Donovan). Each site's `movea.l #T,a0`
         # (6 bytes) becomes `jsr thunk` (6 bytes); the thunk selects the
         # vanilla or ported table on the documented match-active check
-        # $FF8004.l == 0x40000 (docs/atlas/ram.md; the attract DEMO is
+        # $FF8004.l == 0x40000 (docs/game/atlas/ram.md; the attract DEMO is
         # in-match => ported, the cutscene is not => vanilla). CCR note:
         # every jump target (the strip walkers) starts with a d0 mask,
         # so the thunk's flag clobber is dead on all paths.

@@ -1,7 +1,7 @@
 #!/bin/sh
 # test_wide_profile.sh — CPS-2 WIDE profile gate (Phase B).
 #
-# Two invariants, both required by Rule 1 v2 (docs/cps2_wide.md):
+# Two invariants, both required by Rule 1 v2 (docs/project/cps2_wide.md):
 #
 #  1. EMULATOR SUPERSET INVARIANT — the patched FBNeo binary, running the
 #     STOCK unmodified vsavj set, must behave bit-identically to a

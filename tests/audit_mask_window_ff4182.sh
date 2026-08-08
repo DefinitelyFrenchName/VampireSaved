@@ -3,7 +3,7 @@
 # window (14z-49, maintainer-ratified round 64).
 #
 # THE WINDOW: RAM:$FF4182-$FF41A1, the palette-fade staging buffer's
-# slot for select palette-block-A row 14 (docs/atlas/ram.md). It is
+# slot for select palette-block-A row 14 (docs/game/atlas/ram.md). It is
 # masked out of the legacy oracle because the 14z-49 medallion recolor
 # changes that ROM row BY DESIGN, and venue fades stage block-A rows
 # through this work-RAM buffer even in legacy replays.

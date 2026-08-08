@@ -43,7 +43,7 @@ for _set in vsavj vsav2 vhunt2; do
 done
 
 # EXTRA_ROOTS: absent-in-vsavj support routines ported as extra code
-# regions (found by the stage-4 R1 loop; see docs/tables/reconciliation.md).
+# regions (found by the stage-4 R1 loop; see docs/project/tables/reconciliation.md).
 # Default = the full stage-4 set: the +0x34 newcomer-support zone, the tiny
 # VS2 helpers, the id-normalization/char-init engine pair, the source-only
 # per-game hook, and the 17 extra secondary-object handlers (types 59-75,

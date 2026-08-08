@@ -3,7 +3,7 @@
 #
 # THE TRIPWIRE THAT MATTERS: vsavj's sound-id range 0x700-0x7FF holds
 # MUSIC TRACKS, while vs2 uses that same range for Donovan's voice bank
-# (measured both sets, docs/m5/, engine_internals "Sound subsystem").
+# (measured both sets, docs/project/m5/, engine_internals "Sound subsystem").
 # Mapping any of those ids through to the vsavj sound driver is what made
 # 214P/214K play MUSIC in the round-2 playtest. This gate replays
 # Donovan's moveset and asserts that NO id in the music range is ever

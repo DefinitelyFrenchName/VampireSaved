@@ -51,7 +51,7 @@ tiles — the concrete graphics address-space ceiling behind Capcom's split.
 The M3 expansion plan must resolve how high tile bits are supplied (OBJ attr
 bits vs gfx bank) and whether frame tile#s are per-character-relative
 (easy) or absolute (hard). This is now the **top technical risk** and the
-first M3 investigation. Detail in docs/atlas/character_tables.md.
+first M3 investigation. Detail in docs/game/atlas/character_tables.md.
 
 ## Conclusion
 

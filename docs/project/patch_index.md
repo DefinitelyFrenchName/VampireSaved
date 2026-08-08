@@ -2,7 +2,7 @@
 
 Updated in the same commit as any patch change. This page is the
 REGISTRY — status, dependencies, exclusivity, deprecation — not the
-detail. Byte detail: docs/patch_notes.md (newest first) + each build's
+detail. Byte detail: docs/project/patch_notes.md (newest first) + each build's
 generated `patch/patch_notes_fragment.md`. Mechanism rationale: the
 manifests (every row carries its session tag inline). Rebuilt 14z-67
 from those sources (the page had never grown past M1; the staleness was
@@ -60,7 +60,7 @@ Authoritative implementations + section comments:
 | dispatch_keeper | keeper-routed per-char dispatch interception | 14z-6x |
 | values / VALUE_SKIP (port_param32) | 32-row value-table rows for variant ids (velocities, jump params) | 14z-66 |
 | select_records / select_wheel / win_pal_variant / code_word / aux_poke / data_port / palette | the select/HUD/palette family (per-piece rows) | M2b-M3a |
-| **win-screen family** (code_word x2 + win_pal_variant + quote records) | a tenant's victory screen: position table 0x5F200 (CODE rows), palette pool 0x3C2BBC via the OPCODE-view remap table 0x6B2F2, quote records at the `-4`-BIASED bases 0x267426/0x2674A6. **Read `docs/engine_internals.md` "The WIN SCREEN subsystem" BEFORE authoring any of these — Donovan's solution (14z-45) was re-derived from scratch for Huitzil (14z-68) and got 2 of 3 pieces wrong.** | 14z-45 / corrected 14z-68m |
+| **win-screen family** (code_word x2 + win_pal_variant + quote records) | a tenant's victory screen: position table 0x5F200 (CODE rows), palette pool 0x3C2BBC via the OPCODE-view remap table 0x6B2F2, quote records at the `-4`-BIASED bases 0x267426/0x2674A6. **Read `docs/game/engine_internals.md` "The WIN SCREEN subsystem" BEFORE authoring any of these — Donovan's solution (14z-45) was re-derived from scratch for Huitzil (14z-68) and got 2 of 3 pieces wrong.** | 14z-45 / corrected 14z-68m |
 
 ## Tooling
 

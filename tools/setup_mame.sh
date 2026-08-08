@@ -105,7 +105,7 @@ fi
 mkdir -p "$MIRROR"
 rsync -a --delete --exclude '/.git' --exclude '/build/' "$SRC/" "$MIRROR/"
 
-# CPS-2 WIDE profile patch (docs/cps2_wide.md), the MAME twin of
+# CPS-2 WIDE profile patch (docs/project/cps2_wide.md), the MAME twin of
 # emu/fbneo-patches/0002. Governed by Rule 1 v2: a new driver entry carrying
 # the profile, and one gated conditional of emulation logic.
 #

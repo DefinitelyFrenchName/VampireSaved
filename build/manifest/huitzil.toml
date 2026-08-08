@@ -10,7 +10,7 @@
 # shapes, not a template to copy blind.
 #
 # Huitzil has NO stock-track id: he is a variant-id tenant only (0x10 —
-# Bulleta's variant row, measured-free, docs/atlas/id_space.md), so every
+# Bulleta's variant row, measured-free, docs/game/atlas/id_space.md), so every
 # build of this manifest requires --profile cps2-wide-v1 (the generator
 # enforces this; a stage 1-3 build still packs as a stock-shaped vsavj zip
 # because nothing allocates in wide_ext yet).

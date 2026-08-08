@@ -1,5 +1,5 @@
 # donovan.toml — port configuration for the donovan-m2 patch
-# (consumed by tools/gen_donovan_patch.py; see docs/patch_index.md)
+# (consumed by tools/gen_donovan_patch.py; see docs/project/patch_index.md)
 
 # ── TENANT (14z-60t) — supersedes [port] below ──────────────────────────────
 # A tenant is one ported character occupying one character id. This row is
@@ -7,7 +7,7 @@
 # it changes NOTHING: the id below is still 0x0F and the built image must be
 # byte-identical (ae701ffb stock / the WIDE fingerprint). Moving the tenant
 # to its real id 0x13 is a SEPARATE change with its own battery and playtest
-# — see docs/tenant_manifest.md and the M3 roadmap.
+# — see docs/project/tenant_manifest.md and the M3 roadmap.
 #
 # mirror_variant is deliberately absent: it now DEFAULTS from the id. A
 # base-half slot has a variant mirror (0x0F -> 0x1F); a variant id has none,
@@ -77,7 +77,7 @@ class = "raw"
 fallback = "wide_ext"
 
 # CPS-2 WIDE v1 program extension: 4MB -> 6MB, proven readable by B4 on BOTH
-# emulators (docs/cps2_wide.md). Contiguous with hole_b, which ends exactly at
+# emulators (docs/project/cps2_wide.md). Contiguous with hole_b, which ends exactly at
 # $400000 — the 16-byte gap is the CpsFrg register window, reserved and never
 # allocated. Everything here is OUTSIDE the encryption window, so raw.
 #
@@ -105,7 +105,7 @@ profile = "cps2-wide-v1"
 # subcategory jump table has 8 cases, vsavj's has 7; heads $FFF992+4K,
 # counts $FFF9C9+K). Remap her to vsavj's last class (6, subcat 0xC):
 # update/draw order shifts to the end of class processing — a deliberate
-# M2a approximation recorded in docs/tables/reconciliation.md.
+# M2a approximation recorded in docs/project/tables/reconciliation.md.
 [[port_patch]]
 region = "x088512"
 src_addr = 0x08B0F8
@@ -214,7 +214,7 @@ case_a6 = "42290121137c000100544e75"
 dispatch = "dispatch_00"
 seed_entry = 0x016C64
 latch_disp = 0x7966
-# VS2/VH2 flavor latch (docs/atlas/character_tables.md "Start-hold flavor"):
+# VS2/VH2 flavor latch (docs/game/atlas/character_tables.md "Start-hold flavor"):
 # player-struct byte +0x3C2, read by Donovan's QCB+K handler + projectile.
 # vsavj never writes it; the shim seeds the source game's default, and
 # (stage 5) holding YOUR Start through match load selects the other
@@ -1525,7 +1525,7 @@ dst_old_head = "0ffc0dc80b9609730cff0bcf0a9d097a"
 # array, hole-allocated, and repoint row 0x0F.
 #
 # keep_ids = the ONLY ids of his table whose sample exists on vsavj with
-# identical content (QSound key-on probe, both sets, docs/m5/):
+# identical content (QSound key-on probe, both sets, docs/project/m5/):
 #   0x110 0x111 0x112 0x119 0x152 0x202
 # Everything else in his table is either a vsavj MUSIC TRACK (0x700-0x71F,
 # 0x750-0x757 — 30 ids) or a sample absent from vsav's (byte-full) sample
@@ -1568,7 +1568,7 @@ unstub = "0x005122=0x004CE2"
 #
 # NOTHING IS SHIFTED. Two structures must grow and neither can grow in
 # place, but both are pointer-reached with exactly ONE referrer each and no
-# interior aliasing (measured, docs/atlas/select_screen.md), so the vanilla
+# interior aliasing (measured, docs/game/atlas/select_screen.md), so the vanilla
 # bytes stay where they are and two pointers change:
 #   record     PRG:0x272A68  <- referenced only by PRG:0x2689FE
 #   coord list PRG:0x32A50A  <- referenced only by the record's own cptr

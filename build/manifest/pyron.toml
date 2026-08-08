@@ -11,7 +11,7 @@
 #
 # Pyron facts already on the record (do not re-derive):
 # - Variant-id tenant ONLY (0x11 — measured-free variant row,
-#   docs/atlas/id_space.md); every build requires --profile cps2-wide-v1.
+#   docs/game/atlas/id_space.md); every build requires --profile cps2-wide-v1.
 # - NO VS2/VH2 flavor fork (community-confirmed; D2 opens only if the
 #   Phase-1-style measurement shows real vs2<->vh2 divergence).
 # - Extraction is oracle-clean bare (14z-65 machinery, re-verified

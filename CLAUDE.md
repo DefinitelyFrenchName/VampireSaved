@@ -38,12 +38,12 @@ legacy behavior is a failed change.
    from pristine inputs at any commit.
 4. **Provenance is tracked per region.** Every byte range in the output set is
    tagged with its origin: `VSAV` (untouched), `VS2`, `VH2`, `GEN` (generated),
-   or `NEW` (authored). The provenance atlas (`docs/atlas/`) is updated in the
+   or `NEW` (authored). The provenance atlas (`docs/game/atlas/`) is updated in the
    same commit as the change that affects it.
 5. **Behavioral values live in documented tables, not in code.** Any tunable
    that defines how the ported characters play (damage, timings, meter rules,
    variant selection) must be extracted into the data-table format of
-   `docs/tables/` so the community can review and adjust without re-engineering.
+   `docs/project/tables/` so the community can review and adjust without re-engineering.
 6. **Failing regression halts forward work.** If the replay-checksum suite
    diverges, fixing that divergence becomes the only task until green.
 7. **No copyrighted ROM content in the repo or in any distributed artifact.**
@@ -78,7 +78,7 @@ legacy behavior is a failed change.
   2026-07-27, both maintainer-approved):** for builds carrying engine
   hooks (code the vanilla game executes routed through added
   instructions), the legacy oracle compares **live RAM**: all work RAM
-  except two named windows, both documented in `docs/atlas/ram.md` — the
+  except two named windows, both documented in `docs/game/atlas/ram.md` — the
   dead-stack window `RAM:$FF7F00-$FF7FFF` (below resting SP at the
   frame-done sample point) and the QSound handshake latch `RAM:$FF043C`
   (one-frame phase). On that masked basis, per-replay comparison classes
@@ -137,7 +137,7 @@ legacy behavior is a failed change.
   patched FBNeo and patched MAME and the two must agree on **mapped gameplay
   state compared at sync anchors** (match start, round transitions):
   character IDs, HP, positions, timer, meter, and the other fields in
-  `docs/atlas/ram.md` — not whole-work-RAM checksums frame-by-frame.
+  `docs/game/atlas/ram.md` — not whole-work-RAM checksums frame-by-frame.
   Rationale (measured, session 2): the emulators traverse identical states
   on slightly different frame indices after boot, so frame-exact whole-RAM
   equality is unachievable between codebases; field-level agreement at
@@ -180,21 +180,31 @@ legacy behavior is a failed change.
 - Address notation: 68k addresses as `PRG:0x0F1234` (program ROM offset) or
   `CPU:$0F1234` (address-space); tiles as `GFX:tile 0x1A2B3`; RAM as
   `RAM:$FF8000`. Never bare hex without a namespace.
-- **Documentation taxonomy (SMS-proven; respect the splits, don't merge):**
+- **Documentation taxonomy (SMS-proven; respect the splits, don't merge).**
+  `docs/` is divided by ONE question — **would this still be true if we
+  abandoned the roster hack tomorrow?** — into `docs/game/` (Vampire
+  Savior itself), `docs/platform/` (CPS-2, MAME, FBNeo) and
+  `docs/project/` (this port). Read `docs/README.md`; file by the FACT,
+  not by the task you were doing when you learned it.
   - `HANDOFF.md` — operational map: current state, build registry, how to
     build, how to test, key findings. The first read of any session after
     this file.
   - `docs/NEXT_SESSION.md` — 60-second orientation, rewritten at session end.
-  - `docs/engine_internals.md` — how the engine works, by subsystem (the
+  - `docs/game/engine_internals.md` — how the engine works, by subsystem (the
     synthesis; the document a stranger reads to understand the game).
-  - `docs/atlas/` — the verified ROM/RAM map per romset (the project bible).
+    **Every subsystem section names the `atlas/` rows it depends on** —
+    a section that does not is how 14z-69 spent three sessions measuring
+    a mode it had never entered while the cost of entering it sat
+    documented in `ram.md`.
+  - `docs/game/atlas/` — the verified ROM/RAM map per romset (the project bible).
   - `docs/annotations.md` — raw address → label/comment stream.
-  - `docs/patch_notes.md` — per-change detail: every byte, and why.
-  - `docs/patch_index.md` — one-page registry: status, dependencies,
+  - `docs/project/patch_notes.md` — per-change detail: every byte, and why.
+  - `docs/project/patch_index.md` — one-page registry: status, dependencies,
     exclusivity, deprecation candidates. Updated in the same commit as any
     patch change.
-  - `docs/GOTCHAS.md` — traps that cost real debugging time (tool quirks,
-    ordering hazards, misleading symptoms). Append the moment one is paid for.
+  - `docs/GOTCHAS.md` — the index of traps that cost real debugging time;
+    the entries live in `docs/{game,platform,project}/gotchas.md`. Append
+    the moment one is paid for, to the bucket its FACT belongs to.
   Findings land in the right document *at discovery time*, not at milestone
   end. An undocumented discovery is a discovery we will pay for twice.
 - **Anti-hyperfocus checkpoint (standing order):** deep-dive focus is the

@@ -29,7 +29,7 @@
 #      stock-vs-WIDE difference is 57 bytes and EVERY ONE is either the
 #      dead-stack window $FF7F00-$FF7FFF (a CLAUDE.md §4 masked window --
 #      hook cycle skew, not live state) or the $FF05xx sound-driver work
-#      area (docs/atlas/ram.md), which is precisely what a live sfx helper
+#      area (docs/game/atlas/ram.md), which is precisely what a live sfx helper
 #      is supposed to touch. ZERO bytes of gameplay state. Section 3 asserts
 #      that attribution rather than accepting "it differs".
 #

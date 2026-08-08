@@ -45,7 +45,7 @@ and MAME (verification target), with a MiSTer CPS-2 core patch as a stretch goal
 2. **Engine reconciliation is explicit and documented.** Wherever VS2 data
    invokes a mechanic vanilla vsav handles differently, the reconciliation
    (which rule wins, what value was chosen) is recorded per-instance in
-   `docs/tables/reconciliation.md`. Nothing is silently adapted.
+   `docs/project/tables/reconciliation.md`. Nothing is silently adapted.
 3. **VH2 variants are extracted alongside**, delta-documented against the VS2
    base, and kept buildable — ideally exposed via Capcom's own Start-hold
    convention at character select, otherwise as a build flag.

@@ -16,7 +16,7 @@ see tests/test_select_arrays.sh):
     P2 array   PRG:0x2674AA   = P1 + 0x80, same shape
     index      the CELL/ID, unmasked (the consumer masks to 8 bits, not 4)
     rows 0x10-0x1F  alias rows 0x00-0x0F byte-for-byte — the VARIANT HALF,
-                    exactly the convention docs/atlas/id_space.md found in
+                    exactly the convention docs/game/atlas/id_space.md found in
                     every other per-character table
 
 Consumers: PRG:0x05F328 and PRG:0x06C0E0 (`movea.l #$2672AA,a0` +

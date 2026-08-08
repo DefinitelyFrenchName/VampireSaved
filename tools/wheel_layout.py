@@ -3,7 +3,7 @@
 
 The select wheel's adjacency is HAND-TUNED: the best geometric model
 reproduces only 100/128 of Capcom's shipped transitions
-(docs/atlas/select_screen.md). So this tool does NOT generate a wheel and
+(docs/game/atlas/select_screen.md). So this tool does NOT generate a wheel and
 hand it to the build. It:
 
   1. maps positions from a CAPTURE's pixel frame into the arcade frame, by
@@ -47,7 +47,7 @@ DIR_ORDER = ["R", "L", "D", "U", "DR", "DL", "UR", "UL"]
 DIRV = {"R": (1, 0), "L": (-1, 0), "D": (0, 1), "U": (0, -1),
         "DR": (1, 1), "DL": (-1, 1), "UR": (1, -1), "UL": (-1, -1)}
 
-# Measured arcade-frame centres (docs/atlas/select_screen.md, gate section 4)
+# Measured arcade-frame centres (docs/game/atlas/select_screen.md, gate section 4)
 KNOWN = {
     0x00: (224, 112), 0x01: (160, 112), 0x02: (280, 80), 0x03: (192, 96),
     0x04: (304, 96), 0x05: (336, 112), 0x06: (192, 128), 0x07: (208, 80),
@@ -187,7 +187,7 @@ def validate(rows, new_cells):
                         % c)
     for c in new_cells:
         if c in (0x12, 0x18) or c < 0x10:
-            errs.append("id %02X is RESERVED (docs/atlas/id_space.md)" % c)
+            errs.append("id %02X is RESERVED (docs/game/atlas/id_space.md)" % c)
     return errs, warns
 
 

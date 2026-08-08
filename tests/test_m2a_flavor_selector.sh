@@ -1,7 +1,7 @@
 #!/bin/sh
 # test_m2a_flavor_selector.sh — the Start-hold flavor selector (stage 5).
 #
-# Community-confirmed protocol (docs/atlas/character_tables.md): holding
+# Community-confirmed protocol (docs/game/atlas/character_tables.md): holding
 # YOUR Start through select confirm and match load selects the other
 # game's flavor of Donovan (VS2 default = latch 01; held = VH2 = 00).
 # The init shim reads the per-player Start bitmask ($FF8060, bit=player,

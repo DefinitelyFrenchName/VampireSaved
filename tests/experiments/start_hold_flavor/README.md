@@ -22,7 +22,7 @@ REPLAY=...don_fight.rpl WATCH="ff87c2,1,r" TRACE_OUT=/tmp/t.txt FRAMES=4200 \
 Result (2026-07-25, vsav2 Japan 970913): exactly ONE byte differs after
 identical attack-chain sequences — RAM:$FF87C2 (the latch itself, default
 01, cleared by holding Start through match load). The byte is never read
-during play. No behavioral difference. See docs/atlas/character_tables.md
+during play. No behavioral difference. See docs/game/atlas/character_tables.md
 "Start-hold flavor: NOT REPRODUCED".
 
 ## Session 2026-07-27 follow-up: RESOLVED
@@ -43,4 +43,4 @@ pairs). Results (vsav2):
   projectile code). Both are inside regions the M2a port relocates.
 - On the ported vsavj stage-4 build the latch byte is 00 (vsavj never
   writes it) → ported Donovan takes the VH2 branch by accident. See
-  STATE.md decision + docs/atlas/character_tables.md.
+  STATE.md decision + docs/game/atlas/character_tables.md.

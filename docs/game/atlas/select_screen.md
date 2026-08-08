@@ -187,7 +187,7 @@ would be plausibly wrong in a way only playtesting would catch.
 Appending three cells needs **no indirection and no new mechanism**. It is
 what vs2 already does: give each newcomer a live TABLE B row at its own id
 and edit neighbouring rows so the three are reachable. See
-`docs/atlas/id_space.md` for which ids are actually free to take, which is
+`docs/game/atlas/id_space.md` for which ids are actually free to take, which is
 a different question and the constraint that governs.
 
 ## The confirm-path id override ($43 / $45) — decoded, and NOT the Oboro path
@@ -249,7 +249,7 @@ which of the two. Id `0x12`'s per-character data rows are byte-identical to
 
 This is the only place vanilla writes a variant-half id as an immediate,
 and it makes `0x12` **reserved**: no tenant may take it
-(`docs/atlas/id_space.md`). It is also the likely resolution of the
+(`docs/game/atlas/id_space.md`). It is also the likely resolution of the
 "Dark Talbain rides a different mechanism" open item in
 `character_tables.md`.
 
@@ -284,7 +284,7 @@ human corrects it. What the tool *does* enforce: every target is a live
 cell, each new cell is reachable from the default cell `0x01` (not merely
 the target of something — three new cells pointing only at each other form
 an island, and that is caught), and no **reserved** id is used
-(`docs/atlas/id_space.md`: `0x12`, `0x18`). Output is the byte diff against
+(`docs/game/atlas/id_space.md`: `0x12`, `0x18`). Output is the byte diff against
 vanilla TABLE B, ready to become a manifest row.
 
 ## The PS1 console-port reference (captures, 2026-08-05)
@@ -467,7 +467,7 @@ stride and index. A 2P replay pins the player offset: P2's object
 (`$FFBB80`) fetches `0x271E48`, which is P2 row `0x05` — P2's default cell,
 mirrored from P1's `0x01` — i.e. `+0x80`, agreeing with `d1` in the code.
 
-**This corrects an earlier reading.** `docs/engine_internals.md` recorded
+**This corrects an earlier reading.** `docs/game/engine_internals.md` recorded
 the P2 arrays as "+0x40 copies pointing at the same records", from a
 differential cursor dump. `+0x40` is the **variant half** (16 rows × 4
 bytes), which aliases the base half and therefore looks identical from a P2

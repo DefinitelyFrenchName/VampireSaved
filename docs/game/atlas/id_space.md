@@ -1,7 +1,7 @@
 # The character-id space — is the variant half architectural or conventional?
 
 Measured 2026-08-04 (session 14z-60). Gate: `tests/test_id_space.sh`.
-Tool: `tools/audit_id_space.py`. Companion: `docs/atlas/select_screen.md`.
+Tool: `tools/audit_id_space.py`. Companion: `docs/game/atlas/select_screen.md`.
 
 **THE ANSWER: conventional.** The id is a 5-bit value everywhere it is
 stored and in every layout-verified table; vsavj simply fills the upper 16
@@ -34,7 +34,7 @@ throughout — 64 tables packed back-to-back, each table's entry 31 ending
 exactly where the next begins. The two tables outside the bank agree: the
 OBJ bank table `PRG:0x0282D4` is 32 words ending exactly where code resumes
 at `0x028314`, and the wheel adjacency table `PRG:0x0211E4` is 32 rows
-(`docs/atlas/select_screen.md`).
+(`docs/game/atlas/select_screen.md`).
 
 The 21 `distinct` rows are **not** noise:
 
@@ -127,7 +127,7 @@ fields —
 **One such fold is now measured**, and it matters: `PRG:0x00A43E` stores
 the folded id at `$130(a5)`, and `PRG:0x01BF98` masks it to 4 bits AGAIN on
 the way into the select/VS palette-block tables
-(`docs/atlas/venue_assets.md`). So **the folding-site count on this page is
+(`docs/game/atlas/venue_assets.md`). So **the folding-site count on this page is
 PER-FIELD** — it counts folds applied to `$382(An)`, and derived fields
 carry their own. Do not read "7 sites" as "7 places in the game".
 

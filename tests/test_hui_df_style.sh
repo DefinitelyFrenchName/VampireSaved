@@ -19,8 +19,10 @@
 # not DF) and play continues normally, so the screenshots looked like
 # ordinary matches and every number agreed. The replay now pokes stocks
 # in ($FF8509) and the checker REFUSES TO JUDGE unless both legs show
-# +0x1F4 == 0x08 and a stock actually spent. Every future DF measurement
-# goes through that check.
+# the match-level DF flag $FF802E set and a stock actually spent. Every
+# future DF measurement goes through that check. (Do not substitute a
+# fighter-block byte for that flag: +0x1F4 and +0x1B5/+0x1B9 both look
+# like DF and are set by JUMPING.)
 #
 # Sections:
 #   1. THE A/B — replay 85 (control dash -> DF -> DF walk -> two DF air
@@ -59,7 +61,7 @@ export MAME_BIN
 RPL="$REPO/tests/replays/hui/85_hui_df_vs2.rpl"
 # P1 = Huitzil (native id 0x10 on both games), P2 = Victor (0x03 on both,
 # or the cursor path picks different characters on the two wheels), and
-# THREE BANKED STOCKS so the DF pair is not downgraded (docs/atlas/ram.md
+# THREE BANKED STOCKS so the DF pair is not downgraded (docs/game/atlas/ram.md
 # +0x109 — the documented ES-scripting poke).
 PK="1400:ff8782:10;1450:ff8782:10;1500:ff8782:10;1400:ff8b82:03;1450:ff8b82:03;1500:ff8b82:03;3100:ff8509:03;3120:ff8509:03"
 

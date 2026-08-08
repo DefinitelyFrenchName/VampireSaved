@@ -13,7 +13,7 @@ symptom as "does not reproduce". DF consumes one banked stock; with an
 empty meter the P+K pair is DOWNGRADED to a single button and play
 continues normally (that downgrade is seq 0x0A — it is NOT Dark Force).
 Section 0 therefore refuses to judge anything unless BOTH legs show:
-    +0x1F4 == 0x08      the shared DF-active flag (0 before, 8 during)
+    $FF802E == 1        the match-level DF-active flag (see below)
     +0x109 decremented  a stock was actually spent
 and unless the control frame shows DF *off*. A rig that cannot enter the
 mode fails here rather than passing vacuously.
@@ -55,7 +55,7 @@ import sys
 # free-pool art 0xBE9A) and is not part of the fighter's own draws.
 HUD_MUG = {0x47A0, 0xBE9A}
 
-# fighter-block offsets (docs/atlas/ram.md + measured 14z-69)
+# fighter-block offsets (docs/game/atlas/ram.md + measured 14z-69)
 OFF_SEQ = 0x006
 OFF_STOCK = 0x109    # banked stock count
 OFF_ID = 0x382

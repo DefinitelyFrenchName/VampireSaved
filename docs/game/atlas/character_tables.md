@@ -44,7 +44,7 @@ Variant half (0x10-0x1F) aliases the base half except:
   (`0x02`) and the confirm is 2-3 punches or 2-3 kicks with an input bit
   held. `0x12`'s data rows are byte-identical aliases of `0x02`, i.e. the
   same character under a different id — the shape a Dark Talbain would
-  take. Detail in `docs/atlas/id_space.md`; not yet confirmed by playing
+  take. Detail in `docs/game/atlas/id_space.md`; not yet confirmed by playing
   it.
 - **vsav2 & vhunt2: slots {0x0, 0x1, 0x3, 0x8, 0x9}** → five true alternate
   datasets. This is Capcom's own dual-flavor (Start-hold) infrastructure —
@@ -148,7 +148,7 @@ tiles — so 16 bits cannot address the whole GFX space directly. This is
 almost certainly *the* wall that forced Capcom's two-game split (SPEC §2's
 "graphics address-space ceiling"), now seen concretely. Resolution hinges
 on how the extra high bits are supplied: CPS2 OBJ `attr` high bits and/or a
-gfx bank base. **RESOLVED (session 14, docs/engine_internals.md OBJ section):** tile#s
+gfx bank base. **RESOLVED (session 14, docs/game/engine_internals.md OBJ section):** tile#s
 are ABSOLUTE 16-bit codes written raw; tile bits 16-17 ride the OBJ
 Y-word bits 13-14, OR'd from object field +0x18 (per-char init table
 vsavj `PRG:0x282D4` / vsav2 `PRG:0x27530`, slot-indexed, PC-relative =
@@ -323,7 +323,7 @@ data manifests (M1 acceptance) without blind ROM diffing.
 ## M2a extraction findings (session 4, oracle-validated)
 
 `tools/extract_char.py` (vsav2 source, vhunt2 oracle) closed Donovan's full
-program-ROM footprint — see docs/tables/donovan.md for the manifest. Atlas
+program-ROM footprint — see docs/project/tables/donovan.md for the manifest. Atlas
 facts established in the process:
 
 - **Sprite/OBJ sub-table region located** (the anim→sprite chain's next
@@ -342,7 +342,7 @@ facts established in the process:
   (0x0594xx-0x05ADxx, several tables aliasing one stub). The shared stubs
   sit below his unique handler inside one contiguous code region
   (0x059490+0x3200).
-- **Bank gap tables classified by oracle** (docs/tables/donovan.md): most
+- **Bank gap tables classified by oracle** (docs/project/tables/donovan.md): most
   are per-char value tables; `0x0BE27A`/`0x0BE2BA` are pointer tables;
   `0x0BCEFA`/`0x0BD7FA` remain unresolved (need consumer disasm).
 - **Donovan's code references the bank neighborhood** at vsav2

@@ -12,7 +12,7 @@
 #   3. Superset invariant: legacy gate green; pick divergence exactly 2886.
 # A crash here may be a WAIVED-MIXTURE artifact ONLY with crash-stack
 # evidence (Jedah handler PC reading Donovan anim data) AND stage 4 later
-# passing — otherwise it is a real relocation bug (see docs/patch_notes.md).
+# passing — otherwise it is a real relocation bug (see docs/project/patch_notes.md).
 #
 # Usage: ROMDIR=... tests/test_m2a_stage3_anim.sh
 set -eu

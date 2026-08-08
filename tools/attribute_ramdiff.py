@@ -14,7 +14,7 @@ verdict — it is the absence of one. Two builds can legitimately differ, but
 only in places somebody has identified and can justify. This turns that
 judgement into an assertion, and prints the stray addresses when it fails so
 the next question ("what lives at $FFxxxx?") is immediately askable against
-docs/atlas/ram.md.
+docs/game/atlas/ram.md.
 
 Exit 0 when every differing byte is attributed, 1 otherwise.
 """
@@ -88,7 +88,7 @@ def main():
         print(f"  FAIL: {len(stray)} byte(s) OUTSIDE every named window: {shown}"
               + (" ..." if len(stray) > 8 else ""))
         print("        Do not widen a window to make this pass. Identify what "
-              "lives there (docs/atlas/ram.md) and justify it, or treat it as "
+              "lives there (docs/game/atlas/ram.md) and justify it, or treat it as "
               "the regression it probably is (CLAUDE.md §4 standing watch).")
         return 1
     print("  ok: every differing byte is attributed to a named window")

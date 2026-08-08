@@ -1,5 +1,5 @@
 {
- "_provenance": "session 14z-10 runtime audit: OBJ-code collectors over the pure-legacy replay set (02/05/07/30/29, vanilla vsavj). 'protected' = codes drawn IN-MATCH (frames 2300+, window 0xAD80-0xEEBB) - the tile port must never write art at these positions (the round-27..29 garble class: c625 VS-curtain smoke, 0xE4xx-0xE8xx shared block, round-UI). 'observed_full_run' additionally includes boot/attract usage (the Jedah intro cutscene) - NOT enforced (pool capacity; attract-only garble accepted for now, see STATE 14z-10). Regenerate via tap_writes COLLECT mode (docs/patch_notes.md 14z-10).",
+ "_provenance": "session 14z-10 runtime audit: OBJ-code collectors over the pure-legacy replay set (02/05/07/30/29, vanilla vsavj). 'protected' = codes drawn IN-MATCH (frames 2300+, window 0xAD80-0xEEBB) - the tile port must never write art at these positions (the round-27..29 garble class: c625 VS-curtain smoke, 0xE4xx-0xE8xx shared block, round-UI). 'observed_full_run' additionally includes boot/attract usage (the Jedah intro cutscene) - NOT enforced (pool capacity; attract-only garble accepted for now, see STATE 14z-10). Regenerate via tap_writes COLLECT mode (docs/project/patch_notes.md 14z-10).",
  "protected": [
   "ae52",
   "ae5c",

@@ -1,6 +1,6 @@
 # reconciliation.toml — R1 map (vsav2 -> vsavj). Generated rows
 # by tools/reconcile_batch.py; hand-verified rows are kept as-is.
-# Twin doc: docs/tables/reconciliation.md (same-commit rule).
+# Twin doc: docs/project/tables/reconciliation.md (same-commit rule).
 
 [[map]]
 vsav2 = 0x000210
@@ -42,7 +42,7 @@ vsav2 = 0x003ac4
 vsavj = 0x003a8e
 kind = "sound_farm"
 status = "verified"
-note = "M5 RESTORED (14z-52): sfx id 0x137 -> vsavj same-id farm entry 0x03a8e. Sample content verified IDENTICAL across sets (QSound key-on probe: same bank/start after relocation, docs/m5/). The session-9 stub and the session-5 same-id-means-music theory were both wrong for this id."
+note = "M5 RESTORED (14z-52): sfx id 0x137 -> vsavj same-id farm entry 0x03a8e. Sample content verified IDENTICAL across sets (QSound key-on probe: same bank/start after relocation, docs/project/m5/). The session-9 stub and the session-5 same-id-means-music theory were both wrong for this id."
 
 [[map]]
 vsav2 = 0x003b2c
@@ -56,14 +56,14 @@ vsav2 = 0x003f46
 vsavj = 0x003f10
 kind = "sound_farm"
 status = "verified"
-note = "M5 RESTORED (14z-52): sfx id 0x136 -> vsavj same-id farm entry 0x03f10. Sample content verified IDENTICAL across sets (QSound key-on probe: same bank/start after relocation, docs/m5/). The session-9 stub and the session-5 same-id-means-music theory were both wrong for this id."
+note = "M5 RESTORED (14z-52): sfx id 0x136 -> vsavj same-id farm entry 0x03f10. Sample content verified IDENTICAL across sets (QSound key-on probe: same bank/start after relocation, docs/project/m5/). The session-9 stub and the session-5 same-id-means-music theory were both wrong for this id."
 
 [[map]]
 vsav2 = 0x003fae
 vsavj = 0x003f78
 kind = "sound_farm"
 status = "verified"
-note = "M5 RESTORED (14z-52): sfx id 0x13d -> vsavj same-id farm entry 0x03f78. Sample content verified IDENTICAL across sets (QSound key-on probe: same bank/start after relocation, docs/m5/). The session-9 stub and the session-5 same-id-means-music theory were both wrong for this id."
+note = "M5 RESTORED (14z-52): sfx id 0x13d -> vsavj same-id farm entry 0x03f78. Sample content verified IDENTICAL across sets (QSound key-on probe: same bank/start after relocation, docs/project/m5/). The session-9 stub and the session-5 same-id-means-music theory were both wrong for this id."
 
 [[map]]
 vsav2 = 0x003fc8
@@ -77,77 +77,77 @@ vsav2 = 0x0040ae
 vsavj = 0x02a7e0
 kind = "stubbed_sound"
 status = "verified"
-note = "M5 KEPT SILENT (14z-52): sfx id 0x14a — sample ABSENT from vsav's (full) sample ROMs. Measured, docs/m5/don_id_plan.json; restoring it would play the wrong sound. Revisit only with ported samples (STATE decision: voice samples)."
+note = "M5 KEPT SILENT (14z-52): sfx id 0x14a — sample ABSENT from vsav's (full) sample ROMs. Measured, docs/project/m5/don_id_plan.json; restoring it would play the wrong sound. Revisit only with ported samples (STATE decision: voice samples)."
 
 [[map]]
 vsav2 = 0x0042d0
 vsavj = 0x004234
 kind = "sound_farm"
 status = "verified"
-note = "M5 RESTORED (14z-52): sfx id 0x18b -> vsavj same-id farm entry 0x04234. Sample content verified IDENTICAL across sets (QSound key-on probe: same bank/start after relocation, docs/m5/). The session-9 stub and the session-5 same-id-means-music theory were both wrong for this id."
+note = "M5 RESTORED (14z-52): sfx id 0x18b -> vsavj same-id farm entry 0x04234. Sample content verified IDENTICAL across sets (QSound key-on probe: same bank/start after relocation, docs/project/m5/). The session-9 stub and the session-5 same-id-means-music theory were both wrong for this id."
 
 [[map]]
 vsav2 = 0x0042ea
 vsavj = 0x00424e
 kind = "sound_farm"
 status = "verified"
-note = "M5 RESTORED (14z-52): sfx id 0x18d -> vsavj same-id farm entry 0x0424e. Sample content verified IDENTICAL across sets (QSound key-on probe: same bank/start after relocation, docs/m5/). The session-9 stub and the session-5 same-id-means-music theory were both wrong for this id."
+note = "M5 RESTORED (14z-52): sfx id 0x18d -> vsavj same-id farm entry 0x0424e. Sample content verified IDENTICAL across sets (QSound key-on probe: same bank/start after relocation, docs/project/m5/). The session-9 stub and the session-5 same-id-means-music theory were both wrong for this id."
 
 [[map]]
 vsav2 = 0x0043b2
 vsavj = 0x02a7e0
 kind = "stubbed_sound"
 status = "verified"
-note = "M5 KEPT SILENT (14z-52): sfx id 0x173 — vsavj same-id keys DIFFERENT sample content. Measured, docs/m5/don_id_plan.json; restoring it would play the wrong sound. Revisit only with ported samples (STATE decision: voice samples)."
+note = "M5 KEPT SILENT (14z-52): sfx id 0x173 — vsavj same-id keys DIFFERENT sample content. Measured, docs/project/m5/don_id_plan.json; restoring it would play the wrong sound. Revisit only with ported samples (STATE decision: voice samples)."
 
 [[map]]
 vsav2 = 0x0046a0
 vsavj = 0x0045c6
 kind = "sound_farm"
 status = "verified"
-note = "M5 RESTORED (14z-52): sfx id 0x299 -> vsavj same-id farm entry 0x045c6. Sample content verified IDENTICAL across sets (QSound key-on probe: same bank/start after relocation, docs/m5/). The session-9 stub and the session-5 same-id-means-music theory were both wrong for this id."
+note = "M5 RESTORED (14z-52): sfx id 0x299 -> vsavj same-id farm entry 0x045c6. Sample content verified IDENTICAL across sets (QSound key-on probe: same bank/start after relocation, docs/project/m5/). The session-9 stub and the session-5 same-id-means-music theory were both wrong for this id."
 
 [[map]]
 vsav2 = 0x0046e2
 vsavj = 0x004608
 kind = "sound_farm"
 status = "verified"
-note = "M5 RESTORED (14z-52): sfx id 0x156 -> vsavj same-id farm entry 0x04608. Sample content verified IDENTICAL across sets (QSound key-on probe: same bank/start after relocation, docs/m5/). The session-9 stub and the session-5 same-id-means-music theory were both wrong for this id."
+note = "M5 RESTORED (14z-52): sfx id 0x156 -> vsavj same-id farm entry 0x04608. Sample content verified IDENTICAL across sets (QSound key-on probe: same bank/start after relocation, docs/project/m5/). The session-9 stub and the session-5 same-id-means-music theory were both wrong for this id."
 
 [[map]]
 vsav2 = 0x0046fc
 vsavj = 0x004622
 kind = "sound_farm"
 status = "verified"
-note = "M5 RESTORED (14z-52): sfx id 0x157 -> vsavj same-id farm entry 0x04622. Sample content verified IDENTICAL across sets (QSound key-on probe: same bank/start after relocation, docs/m5/). The session-9 stub and the session-5 same-id-means-music theory were both wrong for this id."
+note = "M5 RESTORED (14z-52): sfx id 0x157 -> vsavj same-id farm entry 0x04622. Sample content verified IDENTICAL across sets (QSound key-on probe: same bank/start after relocation, docs/project/m5/). The session-9 stub and the session-5 same-id-means-music theory were both wrong for this id."
 
 [[map]]
 vsav2 = 0x004716
 vsavj = 0x00463c
 kind = "sound_farm"
 status = "verified"
-note = "M5 RESTORED (14z-52): sfx id 0x158 -> vsavj same-id farm entry 0x0463c. Sample content verified IDENTICAL across sets (QSound key-on probe: same bank/start after relocation, docs/m5/). The session-9 stub and the session-5 same-id-means-music theory were both wrong for this id."
+note = "M5 RESTORED (14z-52): sfx id 0x158 -> vsavj same-id farm entry 0x0463c. Sample content verified IDENTICAL across sets (QSound key-on probe: same bank/start after relocation, docs/project/m5/). The session-9 stub and the session-5 same-id-means-music theory were both wrong for this id."
 
 [[map]]
 vsav2 = 0x004730
 vsavj = 0x004656
 kind = "sound_farm"
 status = "verified"
-note = "M5 RESTORED (14z-52): sfx id 0x15a -> vsavj same-id farm entry 0x04656. Sample content verified IDENTICAL across sets (QSound key-on probe: same bank/start after relocation, docs/m5/). The session-9 stub and the session-5 same-id-means-music theory were both wrong for this id."
+note = "M5 RESTORED (14z-52): sfx id 0x15a -> vsavj same-id farm entry 0x04656. Sample content verified IDENTICAL across sets (QSound key-on probe: same bank/start after relocation, docs/project/m5/). The session-9 stub and the session-5 same-id-means-music theory were both wrong for this id."
 
 [[map]]
 vsav2 = 0x0048be
 vsavj = 0x0047e4
 kind = "sound_farm"
 status = "verified"
-note = "M5 RESTORED (14z-52): sfx id 0x146 -> vsavj same-id farm entry 0x047e4. Sample content verified IDENTICAL across sets (QSound key-on probe: same bank/start after relocation, docs/m5/). The session-9 stub and the session-5 same-id-means-music theory were both wrong for this id."
+note = "M5 RESTORED (14z-52): sfx id 0x146 -> vsavj same-id farm entry 0x047e4. Sample content verified IDENTICAL across sets (QSound key-on probe: same bank/start after relocation, docs/project/m5/). The session-9 stub and the session-5 same-id-means-music theory were both wrong for this id."
 
 [[map]]
 vsav2 = 0x0048d8
 vsavj = 0x0047fe
 kind = "sound_farm"
 status = "verified"
-note = "M5 RESTORED (14z-52): sfx id 0x142 -> vsavj same-id farm entry 0x047fe. Sample content verified IDENTICAL across sets (QSound key-on probe: same bank/start after relocation, docs/m5/). The session-9 stub and the session-5 same-id-means-music theory were both wrong for this id."
+note = "M5 RESTORED (14z-52): sfx id 0x142 -> vsavj same-id farm entry 0x047fe. Sample content verified IDENTICAL across sets (QSound key-on probe: same bank/start after relocation, docs/project/m5/). The session-9 stub and the session-5 same-id-means-music theory were both wrong for this id."
 
 [[map]]
 vsav2 = 0x004ddc
@@ -161,7 +161,7 @@ vsav2 = 0x004df6
 vsavj = 0x02a7e0
 kind = "stubbed_sound"
 status = "verified"
-note = "M5 KEPT SILENT (14z-52): sfx id 0x73e — sample ABSENT from vsav's (full) sample ROMs. Measured, docs/m5/don_id_plan.json; restoring it would play the wrong sound. Revisit only with ported samples (STATE decision: voice samples)."
+note = "M5 KEPT SILENT (14z-52): sfx id 0x73e — sample ABSENT from vsav's (full) sample ROMs. Measured, docs/project/m5/don_id_plan.json; restoring it would play the wrong sound. Revisit only with ported samples (STATE decision: voice samples)."
 
 [[map]]
 vsav2 = 0x004e10
@@ -175,7 +175,7 @@ vsav2 = 0x004e2a
 vsavj = 0x02a7e0
 kind = "stubbed_sound"
 status = "verified"
-note = "M5 KEPT SILENT (14z-52): sfx id 0x747 — sample ABSENT from vsav's (full) sample ROMs. Measured, docs/m5/don_id_plan.json; restoring it would play the wrong sound. Revisit only with ported samples (STATE decision: voice samples)."
+note = "M5 KEPT SILENT (14z-52): sfx id 0x747 — sample ABSENT from vsav's (full) sample ROMs. Measured, docs/project/m5/don_id_plan.json; restoring it would play the wrong sound. Revisit only with ported samples (STATE decision: voice samples)."
 
 [[map]]
 vsav2 = 0x004e5e
@@ -210,7 +210,7 @@ vsav2 = 0x004f14
 vsavj = 0x004a5e
 kind = "sound_farm"
 status = "verified"
-note = "M5 RESTORED (14z-52): sfx id 0x2d4 -> vsavj same-id farm entry 0x04a5e. Sample content verified IDENTICAL across sets (QSound key-on probe: same bank/start after relocation, docs/m5/). The session-9 stub and the session-5 same-id-means-music theory were both wrong for this id."
+note = "M5 RESTORED (14z-52): sfx id 0x2d4 -> vsavj same-id farm entry 0x04a5e. Sample content verified IDENTICAL across sets (QSound key-on probe: same bank/start after relocation, docs/project/m5/). The session-9 stub and the session-5 same-id-means-music theory were both wrong for this id."
 
 [[map]]
 vsav2 = 0x004f48
@@ -266,35 +266,35 @@ vsav2 = 0x005052
 vsavj = 0x02a7e0
 kind = "stubbed_sound"
 status = "verified"
-note = "M5 KEPT SILENT (14z-52): sfx id 0x173 — vsavj same-id keys DIFFERENT sample content. Measured, docs/m5/don_id_plan.json; restoring it would play the wrong sound. Revisit only with ported samples (STATE decision: voice samples)."
+note = "M5 KEPT SILENT (14z-52): sfx id 0x173 — vsavj same-id keys DIFFERENT sample content. Measured, docs/project/m5/don_id_plan.json; restoring it would play the wrong sound. Revisit only with ported samples (STATE decision: voice samples)."
 
 [[map]]
 vsav2 = 0x0050a0
 vsavj = 0x02a7e0
 kind = "stubbed_sound"
 status = "verified"
-note = "M5 KEPT SILENT (14z-52): sfx id 0x753 — vsavj id is a MUSIC TRACK (multi-voice, sustained — measured). Measured, docs/m5/don_id_plan.json; restoring it would play the wrong sound. Revisit only with ported samples (STATE decision: voice samples)."
+note = "M5 KEPT SILENT (14z-52): sfx id 0x753 — vsavj id is a MUSIC TRACK (multi-voice, sustained — measured). Measured, docs/project/m5/don_id_plan.json; restoring it would play the wrong sound. Revisit only with ported samples (STATE decision: voice samples)."
 
 [[map]]
 vsav2 = 0x0050ba
 vsavj = 0x02a7e0
 kind = "stubbed_sound"
 status = "verified"
-note = "M5 KEPT SILENT (14z-52): sfx id 0x754 — vsavj id is a MUSIC TRACK (multi-voice, sustained — measured). Measured, docs/m5/don_id_plan.json; restoring it would play the wrong sound. Revisit only with ported samples (STATE decision: voice samples)."
+note = "M5 KEPT SILENT (14z-52): sfx id 0x754 — vsavj id is a MUSIC TRACK (multi-voice, sustained — measured). Measured, docs/project/m5/don_id_plan.json; restoring it would play the wrong sound. Revisit only with ported samples (STATE decision: voice samples)."
 
 [[map]]
 vsav2 = 0x0050d4
 vsavj = 0x02a7e0
 kind = "stubbed_sound"
 status = "verified"
-note = "M5 KEPT SILENT (14z-52): sfx id 0x755 — vsavj id is a MUSIC TRACK (multi-voice, sustained — measured). Measured, docs/m5/don_id_plan.json; restoring it would play the wrong sound. Revisit only with ported samples (STATE decision: voice samples)."
+note = "M5 KEPT SILENT (14z-52): sfx id 0x755 — vsavj id is a MUSIC TRACK (multi-voice, sustained — measured). Measured, docs/project/m5/don_id_plan.json; restoring it would play the wrong sound. Revisit only with ported samples (STATE decision: voice samples)."
 
 [[map]]
 vsav2 = 0x0050ee
 vsavj = 0x02a7e0
 kind = "stubbed_sound"
 status = "verified"
-note = "M5 KEPT SILENT (14z-52): sfx id 0x756 — vsavj id is a MUSIC TRACK (multi-voice, sustained — measured). Measured, docs/m5/don_id_plan.json; restoring it would play the wrong sound. Revisit only with ported samples (STATE decision: voice samples)."
+note = "M5 KEPT SILENT (14z-52): sfx id 0x756 — vsavj id is a MUSIC TRACK (multi-voice, sustained — measured). Measured, docs/project/m5/don_id_plan.json; restoring it would play the wrong sound. Revisit only with ported samples (STATE decision: voice samples)."
 
 [[map]]
 vsav2 = 0x005122
@@ -1648,14 +1648,14 @@ vsav2 = 0x00506c
 vsavj = 0x02a7e0
 kind = "stubbed_sound"
 status = "verified"
-note = "M5 KEPT SILENT (14z-52): sfx id 0x112 — restorable id but vsavj has NO farm entry loading it — needs a ported clone (M5 phase 2). Measured, docs/m5/don_id_plan.json; restoring it would play the wrong sound. Revisit only with ported samples (STATE decision: voice samples)."
+note = "M5 KEPT SILENT (14z-52): sfx id 0x112 — restorable id but vsavj has NO farm entry loading it — needs a ported clone (M5 phase 2). Measured, docs/project/m5/don_id_plan.json; restoring it would play the wrong sound. Revisit only with ported samples (STATE decision: voice samples)."
 
 [[map]]
 vsav2 = 0x005086
 vsavj = 0x02a7e0
 kind = "stubbed_sound"
 status = "verified"
-note = "M5 KEPT SILENT (14z-52): sfx id 0x71d — vsavj id is a MUSIC TRACK (multi-voice, sustained — measured). Measured, docs/m5/don_id_plan.json; restoring it would play the wrong sound. Revisit only with ported samples (STATE decision: voice samples)."
+note = "M5 KEPT SILENT (14z-52): sfx id 0x71d — vsavj id is a MUSIC TRACK (multi-voice, sustained — measured). Measured, docs/project/m5/don_id_plan.json; restoring it would play the wrong sound. Revisit only with ported samples (STATE decision: voice samples)."
 
 [[map]]
 vsav2 = 0x04223c

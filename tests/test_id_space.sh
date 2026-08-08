@@ -8,7 +8,7 @@
 # tools/audit_id_space.py; this pins the numbers so a table edit that
 # changes what an id MEANS fails here instead of in a playtest.
 #
-# The frozen facts (vsavj, measured 14z-60 — docs/atlas/id_space.md):
+# The frozen facts (vsavj, measured 14z-60 — docs/game/atlas/id_space.md):
 #   * 0 out-of-range variant rows across the layout-verified tables: every
 #     id 0x00-0x1F has real storage in all of them — including anim_pairs
 #     (PRG:0x04FFA8), whose consumer masks to 4 bits anyway, so that mask is

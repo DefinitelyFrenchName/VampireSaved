@@ -2,7 +2,7 @@
 # test_don_accent.sh — weapon-accent steadiness + Victor-accent legacy
 # guard (session 14z-19, rounds 34-35).
 #
-# Mechanism under test (docs/patch_notes.md 14z-19): the engine MARCHES
+# Mechanism under test (docs/project/patch_notes.md 14z-19): the engine MARCHES
 # palette row 0x0C (P1 weapon row) through accent slots T0 (0x39FBE0)
 # and T1 (0x39FC00) plus the sprite block; for slot 0x0F both slots
 # must hold row-C content so every phase uploads the same bytes (the

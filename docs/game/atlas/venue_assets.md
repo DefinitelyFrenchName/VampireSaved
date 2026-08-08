@@ -39,7 +39,7 @@ first-class row here, not an over-read.
 | other `0x1x` | = base row | aliases |
 
 **Independent corroboration of the reserved ids.** `0x12` and `0x18` — the
-two ids `docs/atlas/id_space.md` marks reserved, found there from hardcoded
+two ids `docs/game/atlas/id_space.md` marks reserved, found there from hardcoded
 `move.b #imm,$382(An)` writes — are exactly the two variant rows carrying
 their own palette pointer here. Two unrelated tables agreeing is why the
 reserved set is trusted.
@@ -72,7 +72,7 @@ These are the four ROM palette-source pages `character_tables.md` records
 
 Two important details:
 
-- **This fold is invisible to the `$382` census.** `docs/atlas/id_space.md`
+- **This fold is invisible to the `$382` census.** `docs/game/atlas/id_space.md`
   counts folds applied to the id FIELD; this one is applied to a *derived*
   work var. It is a concrete instance of that page's own caveat that 62
   reads forward the id elsewhere. **The folding-site count is per-field, and

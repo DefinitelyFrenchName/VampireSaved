@@ -2,7 +2,7 @@
 """select_port.py — Donovan's select-screen portrait/name/highlight via
 IN-PLACE record surgery (M2b select phase 2; chains after patch_prg).
 
-Mechanism (docs/engine_internals.md "Select-screen phase 2"): the three
+Mechanism (docs/game/engine_internals.md "Select-screen phase 2"): the three
 select UI pieces ride per-wheel-slot pointer arrays whose slot-0x0F
 cells point at Jedah's records; the P2 arrays alias the SAME records.
 Replacing the record CONTENT in place fixes both sides with zero

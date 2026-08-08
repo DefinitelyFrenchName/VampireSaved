@@ -3,7 +3,7 @@
 -- evidence, not content heuristics, for x2b7ef4 bank classification).
 --
 -- Breakpoints at the format handlers (fmt2 0x1B234, fmt0 0x1AFC6; static
--- decode session 14, docs/engine_internals.md): A0 = record pointer,
+-- decode session 14, docs/game/engine_internals.md): A0 = record pointer,
 -- A6 = object; the OBJ bank rides object field +0x18 (Y-word bits 13-14).
 -- Conditioned on A0 inside the ported windows so only Donovan-ecosystem
 -- records stop the CPU. Each unique (record, bank) pair is logged once:

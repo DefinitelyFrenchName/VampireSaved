@@ -54,7 +54,7 @@ def bank_word(bank):
 
     Stock banks ride y bits 13-14. The WIDE profile's 19th tile-address
     bit is y BIT 12, promoted after the terminator check (the CPS-2 Turbo
-    rule, docs/cps2_wide.md): bit 15 is the sprite-list TERMINATOR, so
+    rule, docs/project/cps2_wide.md): bit 15 is the sprite-list TERMINATOR, so
     bank 4 = 0x1000 and bank 5 = 0x3000. `4 << 13` would be 0x8000 — a
     terminator, ending the sprite list at the first tenant sprite.
     """

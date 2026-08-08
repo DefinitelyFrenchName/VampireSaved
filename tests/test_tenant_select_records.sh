@@ -8,7 +8,7 @@
 # the tenant to id 0x13 replaces that mechanism with NINE repointed
 # variant-half array rows (portrait/name/highlight x P1+P2, splash P1/P2,
 # win quote) + generator-composed records
-# (docs/atlas/select_screen.md; the vanilla-side model gate is
+# (docs/game/atlas/select_screen.md; the vanilla-side model gate is
 # tests/test_select_arrays.sh). This gate freezes the new mechanism:
 #
 #   1. STATIC — tools/check_tenant_select.py re-derives the expected

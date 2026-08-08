@@ -22,7 +22,7 @@
 #                      different characters on the two wheels and the
 #                      sprite lists are not comparable)
 #   P1 $FF8509 = 3 banked stocks (the documented ES-scripting poke,
-#                docs/atlas/ram.md +0x109) so the pair is not downgraded
+#                docs/game/atlas/ram.md +0x109) so the pair is not downgraded
 #
 # THE BLOCKER THAT WAS NOT ONE: 14z-68j recorded "the early-window id
 # poke does NOT force him on vsav2". That was replay 61, whose input

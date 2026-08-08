@@ -4,7 +4,7 @@ engine-class target in the extraction manifest, find the vsavj equivalent
 by wildcarded instruction-pattern search (code targets) or exact-byte
 search (data targets), and emit reconciliation.toml rows.
 
-Row status policy (recorded in docs/tables/reconciliation.md):
+Row status policy (recorded in docs/project/tables/reconciliation.md):
   verified   unique match with score 1.00 (pattern) or a unique exact-byte
              hit (data). The stage-4 behavior gates (vsav2-as-oracle field
              comparison, dual-emulator agreement, crash guard) are the
@@ -287,7 +287,7 @@ def main():
 
     lines = ["# reconciliation.toml — R1 map (vsav2 -> vsavj). Generated rows",
              "# by tools/reconcile_batch.py; hand-verified rows are kept as-is.",
-             "# Twin doc: docs/tables/reconciliation.md (same-commit rule)."]
+             "# Twin doc: docs/project/tables/reconciliation.md (same-commit rule)."]
     def _fmt(k, v):
         if isinstance(v, int):
             return f"{k} = {v:#08x}"

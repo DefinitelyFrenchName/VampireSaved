@@ -6,7 +6,7 @@
 # could add a writer of the character-id field.
 #
 # WHY IT MATTERS. The roster plan puts newcomers on ids in the variant half
-# (Huitzil 0x10, Pyron 0x11, Donovan 0x13 — docs/atlas/id_space.md). If no
+# (Huitzil 0x10, Pyron 0x11, Donovan 0x13 — docs/game/atlas/id_space.md). If no
 # legacy gameplay path can ever PRODUCE such an id, then those rows are
 # unreachable by legacy content and the superset invariant holds by
 # construction — a much stronger position than the current slot-0x0F port,
@@ -104,7 +104,7 @@ if bad:
     print("\nFAIL: a gameplay path wrote a VARIANT-HALF id: %s"
           % " ".join("%02X" % v for v in bad))
     print("  That breaks the 'variant rows are unreachable by legacy'")
-    print("  argument in docs/atlas/id_space.md — attribute it before")
+    print("  argument in docs/game/atlas/id_space.md — attribute it before")
     print("  planning any tenant on the variant half.")
     fail = 1
 if not fail:

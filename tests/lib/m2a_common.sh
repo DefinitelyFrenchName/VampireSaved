@@ -53,7 +53,7 @@ m2a_legacy_gate() {
 
 # ── Masked legacy gate (CLAUDE.md §4 amendment, 2026-07-25) ──────────────────
 # For builds carrying ENGINE HOOKS: legacy comparison is live-RAM — all work
-# RAM except the windows documented in docs/atlas/ram.md (dead stack
+# RAM except the windows documented in docs/game/atlas/ram.md (dead stack
 # $FF7F00-$FF7FFF at frame-done + QSound handshake latch $FF043C + the
 # 14z-49 window below).
 # THIRD WINDOW $FF4182-$FF41A1 (added 14z-49, MAINTAINER-RATIFIED
@@ -69,7 +69,7 @@ m2a_legacy_gate() {
 # full-length instead of demoting it to a first-divergence constant.
 # AUDIT ON SUSPICION: tests/audit_mask_window_ff4182.sh re-proves the
 # window's divergence is exactly the designed row content and nothing
-# else (full spec: docs/atlas/ram.md row + STATE 14z-49b).
+# else (full spec: docs/game/atlas/ram.md row + STATE 14z-49b).
 # Future slot ports (Huitzil/Pyron rows) must extend this window with THEIR
 # measured slots deliberately — do not pre-widen.
 # v2 semantics (maintainer-approved 2026-07-27, CLAUDE.md §4): per-replay

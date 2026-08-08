@@ -14,7 +14,7 @@
 #   <name>.skip expectation: replay not applicable to this set (e.g. it
 #     targets another romset); body = the reason, printed.
 #   <name>.masked expectation (hooked builds; CLAUDE.md §4 amended basis —
-#     both runs use MASK_RANGES matching docs/atlas/ram.md):
+#     both runs use MASK_RANGES matching docs/game/atlas/ram.md):
 #       exact <baseset>              bit-identical to the frozen masked log
 #                                    tests/expected/<baseset>/logs/<name>.log
 #       flicker <baseset> <n> <csv>  compare_flicker verdict must be exactly
@@ -61,7 +61,7 @@ check_diverge() {
     python3 "$REPO/tools/check_diverge.py" "$1" "$2" "$REPO/tests/expected"
 }
 
-# The masked windows of the amended legacy basis (docs/atlas/ram.md:
+# The masked windows of the amended legacy basis (docs/game/atlas/ram.md:
 # dead stack $FF7F00-$FF7FFF + QSound latch $FF043C + the palette
 # staging slots of the rows this project's palette ports edit — the
 # staging area is $FF3F02 + row*0x20; row 0x14's slot $FF4182-$FF41A1

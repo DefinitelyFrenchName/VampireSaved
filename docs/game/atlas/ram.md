@@ -93,7 +93,7 @@ is 0x400 bytes; combat struct at +0x000, further state above +0x100.
 IDs are 5-bit: low 4 bits = character slot (16 slots), bit 4 = hidden/alt
 variant. vsavj: variant space differs only at slot 0x08 (Bishamon → Oboro
 Bishamon); all other alt slots alias the base table. Slot→name map:
-docs/atlas/character_tables.md.
+docs/game/atlas/character_tables.md.
 
 ## The palette staging area — $FF3F02 + row*0x20 (14z-64)
 

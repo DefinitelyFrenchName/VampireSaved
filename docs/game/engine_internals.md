@@ -3,7 +3,7 @@
 The synthesis document (CLAUDE.md taxonomy): what a stranger reads to
 understand the game. Started session 14 with the gfx subsystem; other
 subsystems (object system, anim, sound farm, dispatch banks) are still
-scattered across docs/atlas/character_tables.md, docs/tables/
+scattered across docs/game/atlas/character_tables.md, docs/project/tables/
 reconciliation.md and patch_notes — fold them in as they get touched.
 
 ## NOT YET SYNTHESISED — the standing backlog (audited 14z-68m)
@@ -31,8 +31,8 @@ STATE, add a row, then delete it by writing the section.
 |---|---|---|
 
 Adjacent docs that ARE current and should be linked rather than
-duplicated: `docs/cps2_wide.md` (the WIDE profile), `docs/atlas/`
-(ROM/RAM maps, id space, select screen), `docs/patch_index.md`
+duplicated: `docs/project/cps2_wide.md` (the WIDE profile), `docs/game/atlas/`
+(ROM/RAM maps, id space, select screen), `docs/project/patch_index.md`
 (mechanism inventory).
 
 
@@ -293,7 +293,7 @@ replay) settle it:
   (name), [0x268A3E] = 0x2724A2 (highlight). P2 arrays are +0x40 copies
   POINTING AT THE SAME RECORDS — replacing record CONTENT fixes both
   sides with zero pokes.
-  **CORRECTED 14z-61 (docs/atlas/select_screen.md, measured):** that
+  **CORRECTED 14z-61 (docs/game/atlas/select_screen.md, measured):** that
   `+0x40` block is the **VARIANT HALF** (rows 0x10-0x1F, byte-identical
   aliases of 0x00-0x0F), not the P2 array. It looks like P2 from a
   differential dump precisely because it aliases. The real player offset is
@@ -532,7 +532,7 @@ the staged rows — so buffer content is display-only and transient.
 Consequence: any ROM-side select palette-block content change (the
 medallion recolor; future Huitzil/Pyron rows) surfaces in this buffer
 during fades in LEGACY replays. Handled by the third masked window
-(tests/lib/m2a_common.sh M2A_MASK + docs/atlas/ram.md; pending
+(tests/lib/m2a_common.sh M2A_MASK + docs/game/atlas/ram.md; pending
 maintainer ratification, STATE 14z-49b).
 
 ## Sound subsystem: the QSound command path (session 14z-51, measured)
@@ -564,7 +564,7 @@ Architecture (all measured live, both games):
   misattribute delayed-attack sfx — re-probe suspects with 45-frame
   spacing.
 
-### The 14z-51 id-space result (docs/m5/keyons_*.json)
+### The 14z-51 id-space result (docs/project/m5/keyons_*.json)
 
 Sweeping ids 0x000-0x7FF on both games (2048 pokes each): 1613 vsavj /
 1370 vs2 ids key voices. **For the shared sfx library the two games
@@ -1040,7 +1040,18 @@ draws a companion's shadow is NOT this servant path. The remaining
 child-companion shadow item is attributed instead to the bank-0 piece
 family (uniform -0x16A8 tile-code delta, bank word 0 vs 3).
 
-## Dark Force (14z-66/67 — MECHANICS verified, STYLE still open)
+## Dark Force (14z-66/67 — MECHANICS UNPROVEN, STYLE measured 14z-69)
+
+**Atlas rows this section depends on** (`atlas/ram.md`): `+0x109`
+banked stock count, `+0x107` resolver marker (0xFE = pair downgraded,
+no stock), `+0x006` sequence, and the match-level DF flag `$FF802E`.
+
+**READ FIRST: DF COSTS ONE BANKED STOCK.** With an empty meter the P+K
+pair is DOWNGRADED to a single button and the match continues normally
+— `seq 0x0A` is that downgrade, NOT Dark Force. Everything in the two
+subsections below was measured on replay 82, which has no stock, so it
+describes the downgrade path and ordinary movement. The DF facts start
+at the 14z-69 section.
 
 Split the item in two; they have different answers.
 

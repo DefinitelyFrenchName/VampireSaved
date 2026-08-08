@@ -9,7 +9,7 @@
 #   - snapshot at 1690 (select screen, cursor name visible)
 #   - dumps P1 hitbox-base ptr (RAM:$FF8460) at 3600 (in match)
 # The pointer identifies the character slot via the table at PRG:0x0BD97A
-# (docs/atlas/character_tables.md). This is the rerunnable form of the
+# (docs/game/atlas/character_tables.md). This is the rerunnable form of the
 # slot->character mapping experiments.
 set -eu
 

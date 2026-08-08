@@ -44,7 +44,7 @@ are the backstop for wrong mappings.
   dispatch sites exist in both games; five have equal-sized tables, two are
   extended in vsav2 (59→76 at vsavj site 0x054470, 114→124 at 0x05E542) —
   the extras are the newcomers' secondary-object handlers. Handled by the
-  extended-table engine hooks (see docs/patch_notes.md).
+  extended-table engine hooks (see docs/project/patch_notes.md).
 - **PC-relative reads are decrypted** (docs/GOTCHAS.md) — governs which
   view any engine table is read from.
 
@@ -520,7 +520,7 @@ verified rows; Donovan's builds proven bit-exact through both rewrites).
 0x743 / 0x749 / 0x74a at vsav2 0x4ddc/0x4e5e/0x4e78/0x4f48/0x4f96 -> the
 engine rts 0x2A7E0): the ids sit BETWEEN the documented vsavj music
 ranges, so "music" was not assumable — the QSound key-on records
-(docs/m5/keyons_*.json) show vsavj's same-id entries key DIFFERENT
+(docs/project/m5/keyons_*.json) show vsavj's same-id entries key DIFFERENT
 multi-voice music-class content vs vs2's single-voice samples for all
 five. Same-id mapping would play wrong sounds mid-match; silenced until
 the M5 voice-bank port. 0x4e78 was the FIRST tripwire Huitzil's init hit

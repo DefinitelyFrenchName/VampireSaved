@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """build_wide_romset.py — assemble the CPS-2 WIDE romset overlay.
 
-WIDE is an extended hardware profile (docs/cps2_wide.md). Its FBNeo driver
+WIDE is an extended hardware profile (docs/project/cps2_wide.md). Its FBNeo driver
 entry `vsavjw` is a clone of `vsav`, so the parent zip supplies gfx, Z80
 and the stock QSound members; this builds the clone zip carrying:
 

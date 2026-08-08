@@ -41,7 +41,7 @@ P2_BASE = 0xFF8800
 
 DUMP_RE = re.compile(r"(?:^|\.)dump_(\d+)_([0-9a-fA-F]{6})\.bin$")
 
-# match-start predicate fields (docs/atlas/ram.md)
+# match-start predicate fields (docs/game/atlas/ram.md)
 PRED_FLAGS = ((0xFF8004, 4, 0x40000), (0xFF8008, 4, 0x40000),
               (P1_BASE + 0x50, 2, 0x120), (P2_BASE + 0x50, 2, 0x120))
 

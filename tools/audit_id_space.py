@@ -62,7 +62,7 @@ EXTRA_TABLES = {
         ("anim_pairs", 0x04FFA8, 24, 32, "dat", "0x04FAC4 (lea (pc) + (An,Dn))"),
     ],
     "vsav2": [
-        ("obj_bank", 0x027530, 2, 32, "op", "per docs/atlas/character_tables.md"),
+        ("obj_bank", 0x027530, 2, 32, "op", "per docs/game/atlas/character_tables.md"),
         ("wheel_adjacency", 0x01588E, 8, 32, "dat", "0x01F638 (movea.l + (An,Dn))"),
     ],
 }

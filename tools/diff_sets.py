@@ -15,7 +15,7 @@ report readable (coincidental small matches in tables are noise).
 
 Output: one line per run, "0xAAAAAA-0xBBBBBB CLASS [B:0xCCCCCC delta]".
 The three-way atlas is built by running this on each pair (both the data
-views and the opcode views — see docs/atlas/README.md byte-order note).
+views and the opcode views — see docs/game/atlas/README.md byte-order note).
 Prints SHA-1 of both inputs (tools convention).
 """
 
