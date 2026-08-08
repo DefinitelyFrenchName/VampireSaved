@@ -109,7 +109,9 @@ def main():
     ap.add_argument("--obj", required=True, help="obj-dumped frames")
     ap.add_argument("--control", type=int, required=True,
                     help="a frame BEFORE Dark Force (the in-replay control)")
-    ap.add_argument("--expect", choices=("differs", "matches"), default="differs")
+    ap.add_argument("--expect",
+                    choices=("differs", "matches", "colours-fixed"),
+                    default="differs")
     ap.add_argument("--quiet", action="store_true")
     a = ap.parse_args()
     anchors = [int(x) for x in a.anchors.split()]
@@ -199,6 +201,32 @@ def main():
                             "(%d draws vs native's %d)"
                             % (f, sum(want.values()),
                                sum(nat.get(f, collections.Counter()).values())))
+    elif a.expect == "colours-fixed":
+        # 14z-69p: the RECOLOUR is fixed, the MODE is kept ON PURPOSE.
+        # Ours no longer shows the purple ramp; it shows the same warm
+        # sequence native's DF shows, one step apart in the animation
+        # (ours settles on the row whose self-index is 2, native on 3 —
+        # they are rows of ONE ported block, vs2 0x3ABEDC). The
+        # afterimages stay: that mode is his real Vampire Savior Dark
+        # Force and the maintainer asked for it kept.
+        PURPLE = "f222ffff"          # head of the pre-fix purple ramp
+        WARM = ("f222", "f333")      # the two ramp steps either game lands on
+        bad_purple = [f for f in palfr
+                      if pal(a.work, "ours", f).hex().startswith(PURPLE)]
+        if bad_purple:
+            fail.append("the PURPLE ramp is still being uploaded on %d frames "
+                        "(e.g. f%d) — the fix did not take"
+                        % (len(bad_purple), bad_purple[0]))
+        off_family = [f for f in palfr
+                      if not pal(a.work, "ours", f).hex()[:4] in WARM]
+        if off_family:
+            h = pal(a.work, "ours", off_family[0]).hex()[:16]
+            fail.append("ours' DF palette is outside the warm ramp on %d "
+                        "frames (e.g. f%d = %s) — it should be a row of the "
+                        "ported sequence" % (len(off_family), off_family[0], h))
+        if not ghosted:
+            fail.append("the afterimages are GONE — the mode itself was "
+                        "removed, which is not what this fix does")
     else:   # differs — freeze the measured shape of the open defect
         if not diff:
             fail.append("expected the DF RECOLOUR (palette row 0x0A differing "
@@ -222,6 +250,9 @@ def main():
         return 1
     if a.expect == "matches":
         print("PASS: Dark Force presentation matches native vsav2")
+    elif a.expect == "colours-fixed":
+        print("PASS: the DF recolour is FIXED (warm ramp from the ported "
+              "sequence, no purple) and the mode is intact")
     else:
         print("PASS: the open DF-style defect is present with its frozen shape "
               "(host recolour on %d/%d palette frames, %s ghosted while the "

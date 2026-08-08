@@ -33,11 +33,15 @@
 #      vacuous-pass shape that fooled the first version), the recolour
 #      absent, and the afterimages absent.
 #
-# EXPECTATION. Default --expect differs: the DEFECT IS OPEN and its shape
-# is frozen here (native gold vs our purple row 0x0A; his art drawn ~4x
-# over while native draws it once). The gate is green while that holds
-# and goes red if it changes in EITHER direction. When the fix lands,
-# flip to DF_STYLE_EXPECT=matches, which asserts native-equality instead.
+# EXPECTATION. Default --expect colours-fixed (14z-69p): the RECOLOUR is
+# fixed and the MODE is kept on purpose. Ours must no longer upload the
+# purple ramp, must land on the warm sequence native's DF also shows
+# (one animation step apart — rows of ONE ported block, vs2 0x3ABEDC),
+# and must STILL draw the afterimages, because that mode is his real
+# Vampire Savior Dark Force and the maintainer asked to keep it.
+# DF_STYLE_EXPECT=differs replays the pre-fix state; =matches asserts
+# full native equality, which is NOT the target here (the two games run
+# different DF systems, so their palettes are one ramp step apart).
 #
 # Usage: ROMDIR=... [DF_STYLE_EXPECT=differs|matches] \
 #            tests/test_hui_df_style.sh [wide-builddir]
@@ -51,7 +55,7 @@ WORK="$(mktemp -d)"
 trap 'rm -rf "$WORK"' EXIT
 
 BUILD="${1:-build/hui11}"
-EXPECT="${DF_STYLE_EXPECT:-differs}"
+EXPECT="${DF_STYLE_EXPECT:-colours-fixed}"
 case "$BUILD" in /*) ;; *) BUILD="$REPO/$BUILD" ;; esac
 [ -f "$BUILD/rompath/vsavjw.zip" ] || {
     echo "FAIL: no $BUILD/rompath/vsavjw.zip (WIDE tenant build required)"; exit 1; }
@@ -110,7 +114,7 @@ python3 - "$WORK" "$CONTROL" "$PALFR" <<'PYEOF'
 import os, shutil, sys
 work, control = sys.argv[1], int(sys.argv[2])
 palfr = [int(x) for x in sys.argv[3].split()]
-for tag in ("neg_nodf", "neg_nopal", "neg_noghost"):
+for tag in ("neg_nodf", "neg_nopal", "neg_noghost", "neg_purple"):
     d = os.path.join(work, tag)
     shutil.rmtree(d, ignore_errors=True)
     os.makedirs(d)
@@ -148,12 +152,26 @@ for line in open(p):
             continue
     out.append(line)
 open(p, "w").writelines(out)
-print("   built: neg_nodf (DF never active), neg_nopal (no recolour), "
-      "neg_noghost (no afterimages)")
+# (d) THE REGRESSION THIS FIX GUARDS AGAINST: the purple ramp is back.
+#     This is the control that matters under --expect colours-fixed;
+#     neg_nopal (ours == native) is only a corruption under "differs".
+PURPLE = bytes.fromhex("f222ffffffbfffdffe9ffb5ff86ff67e"
+                       "f76effbffa5ffe7ffc6ff95ff57df002")
+for f in palfr:
+    open(o("neg_purple", "dump_%d_90c140.bin" % f), "wb").write(PURPLE)
+print("   built: neg_nodf (DF never active), neg_nopal (ours == native), "
+      "neg_noghost (no afterimages), neg_purple (the purple ramp returns)")
 PYEOF
 
+# which synthetic states are CORRUPTIONS depends on the expectation:
+# under "colours-fixed" ours matching native is fine, but the purple
+# returning is the regression; under "differs" it is the other way round.
+case "$EXPECT" in
+    colours-fixed) NEGS="neg_nodf neg_purple neg_noghost" ;;
+    *)             NEGS="neg_nodf neg_nopal neg_noghost" ;;
+esac
 ok=1
-for neg in neg_nodf neg_nopal neg_noghost; do
+for neg in $NEGS; do
     if python3 "$REPO/tools/check_df_style.py" "$WORK/$neg" \
            --anchors "$ANCHORS" --pal "$PALFR" --obj "$OBJFR" \
            --control "$CONTROL" --expect "$EXPECT" --quiet \

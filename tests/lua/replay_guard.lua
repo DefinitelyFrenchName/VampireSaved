@@ -257,10 +257,16 @@ end
 --   PROBE <frame> D0=<v> D1=<v> A0=<v> A6=<v> RET <(SP)>
 -- and CONTINUE (unlike GUARD_BREAK, which reports and exits). Optional
 -- GUARD_PROBE_COND holds a raw debugger condition (e.g. "a0==0xe2830").
--- Capped at 400 hits (then the bp is cleared and a PROBE-CAP line written).
+-- Capped at 400 hits by default (then the bp is cleared and a PROBE-CAP
+-- line written). GUARD_PROBE_MAX raises the cap: the default silently
+-- truncates a census of a HOT site, which is how a 14z-69p audit of
+-- palette-seq ids first "proved" legacy uses exactly one id — it had
+-- only seen each replay's first 400 calls. Raise it whenever the
+-- question is "what values does this site EVER see".
 local probe_addr = tonumber(os.getenv("GUARD_PROBE") or "", 16)
 local probe_cond = os.getenv("GUARD_PROBE_COND")
-local probe_hits, PROBE_MAX = 0, 400
+local probe_hits = 0
+local PROBE_MAX = tonumber(os.getenv("GUARD_PROBE_MAX") or "") or 400
 if debugger and probe_addr then
     if probe_cond and #probe_cond > 0 then
         debugger:command(string.format("bpset 0x%x,%s", probe_addr, probe_cond))

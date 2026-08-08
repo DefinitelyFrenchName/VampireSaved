@@ -1073,3 +1073,64 @@ pad = 0x60
 # The [[data_in_code]] pointer-reroute path exists in the generator and
 # works, but its helper must be within bsr.w of the site and hole_a's free
 # space is ~0x27000 away — so the raw-emit design is the better one.
+
+# ── 14z-69p: THE DARK FORCE PALETTE (ping #7 / #11 item: "purple
+# recolour while moving"). MECHANISM, measured:
+# H's DF drives a palette-SEQUENCE animation, not a static swap. One
+# writer — the engine uploader family at 0x2AD64 (probe at 0x2AD68) —
+# rewrites sprite palette row 0x0A every frame from DF entry, cycling
+# FOUR rows of the GLOBAL palette-seq table. The resolver is 0x2AD82:
+#     a0 = 0x39A900 + (d0 & 0xFFF) * 0x20
+# and the ids H's script requests are 0x1E, 0x1F, 0x20, 0x21 (152 calls
+# in one DF, measured). vsavj's rows at those ids are a PURPLE ramp
+# (0222 0fff 0faf 0fcf 0e8f ...) where vs2's are his GOLD one
+# (0111 0fea 0fb8 0e96 0b75 ...). Same ids, different global-table
+# contents between engines — the exact class as Donovan's sword/statue
+# blink (14z-33).
+#
+# WHY A DATA ROW IS SAFE HERE, and how it was established. The trigger
+# is not a call we own (it arrives through the channel machine's
+# program-byte dispatch at 0x29F4A — only THREE opcodes, none of them
+# ours), so a wrap would have to sit on engine code that legacy runs
+# 800-3800 times per replay. Instead: legacy NEVER REQUESTS THESE IDS.
+# Audited with an uncapped probe on 0x2AD82 across ten legacy replays
+# (tests/audit_palette_seq_ids.sh): the only ids vanilla ever asks for
+# are 0x26 and 0x27. Rewriting rows 0x1E-0x21 is therefore inert for
+# legacy by construction — and the audit is committed so the claim is
+# re-checkable rather than remembered.
+# CAUTION for whoever revisits this: the palette path is INVISIBLE to
+# every RAM gate (palette ROM -> palette RAM never transits work RAM),
+# so the regression suite CANNOT catch a mistake here. The audit test
+# is the only guard. Raise GUARD_PROBE_MAX when re-running it — the
+# default 400-hit cap silently truncated the first audit and hid id
+# 0x27 entirely.
+#
+# WHICH SOURCE ROWS — the part that took two attempts. The obvious
+# choice, vs2's rows at the SAME ids (0x3B0DFC), is WRONG: vs2 never
+# runs this DF path for him, so those slots hold whatever vs2 uses them
+# for, and copying them just swapped purple for tan/blue (measured, in
+# emulator). The right source was found from the OTHER end — dump
+# native's palette row 0x0A during a real DF and look at what it
+# actually contains:
+#     f333 f840 fc40 fe70 ff90 ffa3 ffd5 fff8 ... f003
+# The trailing 0x0003 is a palette-seq row's SELF-INDEX, so native's DF
+# colour IS a seq row, the 4th of its sequence. Searching vs2 for that
+# exact content lands at 0x3ABF3C, whose sequence starts at 0x3ABEDC —
+# four rows, tails 0000/0001/0002/0003, a warm ramp. That block is the
+# source. (It sits BELOW vs2's own table base 0x3B0A3C, so native
+# reaches it by a different uploader path — irrelevant here: we only
+# need the CONTENT at the ids our build requests.)
+# Provenance: vs2 0x3ABEDC and vhunt2 0x38BEB0 hold the byte-identical
+# blob (unique occurrence in vh2), and the four rows' self-index tails
+# (0000/0001/0002/0003) match vsavj's at the destination, which is what
+# proves the window is row-aligned on rows 0x1E-0x21 and not shifted.
+[[data_port]]
+stage = 4
+name = "df_palette_seq_rows"
+src = 0x3ABEDC
+orc = 0x38BEB0
+dst = 0x39ACC0
+dst_end = 0x39AD40
+len = 0x80
+dst_old_head = "05310fff0e9e0ece0d7e093e064d045c"
+note = "DF palette-seq rows 0x1E-0x21 <- the sequence native DF actually shows (vs2 0x3ABEDC)"

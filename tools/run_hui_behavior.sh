@@ -1,6 +1,11 @@
 #!/bin/sh
 # run_hui_behavior.sh — the Huitzil playtest build, interactive.
-# 14z-69o (PING #11, build/hui13 = 31d576be): THE CHILD SIDEKICK'S
+# 14z-69p (PING #12, build/hui14 = c25b3824): THE DARK FORCE PALETTE
+# is fixed — he now flashes his own warm GOLD ramp instead of the
+# purple one. The afterimages REMAIN on purpose: that mode is his
+# real Vampire Savior Dark Force (mechanically sound, vanilla stock
+# cost, clean entry/exit) and you asked to keep the mechanism.
+# Previously (PING #11, build/hui13): THE CHILD SIDEKICK'S
 # SHADOW is fixed — it rendered as a solid rectangle because two tiles
 # (0x0F8B/0x0F8C) were never copied into group C while the remap had
 # already rewritten their bank, so the sprites resolved to an EMPTY
@@ -11,11 +16,9 @@
 # shadow fix is gfx-only, which is why they share a fingerprint.
 # STILL OPEN (do not re-report): the win QUOTE text (still the host's
 # line — a 3-level data port, cosmetic), the 236P beam + ES big-beam /
-# grab-lightning / 214 family, DF style (the purple recolour — the
-# MODE itself is his real Vampire Savior Dark Force and is mechanically
-# sound, see engine_internals), and FG pacing.
-# Previous builds, kept pinned for A/B: build/hui12 (table fix only),
-# build/hui11 (PING #10, 5c6dbe43), build/hui10 (PING #9, 64128aa7).
+# grab-lightning / 214 family, and FG pacing.
+# Previous builds, kept pinned for A/B: build/hui13 (shadow fix),
+# build/hui12 (table fix), build/hui11 (PING #10, 5c6dbe43).
 # Previous: 14z-67 (ping #8, build/hui9) — 236P freeze ray restored,
 # command-grab throw arc native-exact (yv 16.0), companion art bank 5.
 # No forced id: WALK THE WHEEL to his own cell (from Demitri's default
@@ -31,13 +34,13 @@
 #     the others is untested content on this build.
 # Ground truth for comparison: native Phobos on vsav2.
 #
-# Usage: ROMDIR=... tools/run_hui_behavior.sh [outbase=build/hui13]
+# Usage: ROMDIR=... tools/run_hui_behavior.sh [outbase=build/hui14]
 set -eu
 
 ROMDIR="${ROMDIR:?set ROMDIR}"
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"
-OUTBASE="${1:-build/hui13}"
+OUTBASE="${1:-build/hui14}"
 
 if [ ! -f "$OUTBASE/rompath/vsavjw.zip" ]; then
     echo "building the stage-6 gfx build at $OUTBASE ..."
