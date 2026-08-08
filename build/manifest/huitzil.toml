@@ -650,9 +650,29 @@ op = "poke32"
 val = 0xFFE80002         # vs2 x offset / advance verbatim
 only_variant_slot = true
 
-# ── Win-screen palette (the sparse-block design, H's sets: vs2 pool
-# 0x3C2A7C + 0x10*0xA0 = 0x3C347C, color stride 0xB40 — head 0x0111...
-# matches his sprite-palette family signature).
+# ── Win-screen palette. SOURCE RE-DERIVED 14z-68h (ping #7 item 5:
+# native = GOLD, ours = pink/lavender). The old row guessed
+# pool+0x10*0xA0 from a "0x0111 head matches his family" eyeball that
+# was flagged suspicious at authoring; it is WRONG. The real
+# derivation, decoded from vs2's win drawer (the true twin of vsavj
+# 0x5F1B6 is vs2 0x6B29C — note vs2 0x6B156 is the SELECT uploader,
+# not this one):
+#     d6 = char id; d0 = colour idx ($3AE(a4))
+#     d6 = byteTable[d6]           <- vs2 0x6B2F2, THE NEWCOMER REMAP
+#     offset = (18*d0 + d6) * 0xA0
+#     a0 = pool 0x3C2BBC + offset
+# vsavj's twin has no remap and an 17-row stride: (17*d0 + id)*0xA0.
+# byteTable is a pc-relative BYTE table embedded in code, so it reads
+# through the DATA view (the effect-byte-map precedent; the OPCODE
+# view decodes to a plausible-looking identity ramp 00,01,02,... that
+# is garbage — docs/GOTCHAS.md "in-code pc-rel tables"). DATA view
+# gives table[0x10] = 0x59, so H's set is
+#     0x3C2BBC + 0x59*0xA0 = 0x3C635C
+# and its ramp IS gold (0ffd 0fb8 0d96 0c86 0b75 0964 ...), matching
+# the maintainer capture; the old 0x3C347C row reads
+# 0111 0844 0c87 0fba ... = the pink/lavender they photographed.
+# Colour stride stays 18*0xA0 = 0xB40 (unchanged, and now derived
+# rather than assumed).
 [[win_pal_variant]]
 stage = 6
 name = "hui_win_pal"
@@ -662,7 +682,7 @@ pool_base = 0x3AD700
 pool_color_stride = 0xAA0
 unit = 0xA0
 colors = 8
-vs2_src = 0x3C347C
+vs2_src = 0x3C635C
 vs2_color_stride = 0xB40
 hole = "wide_ext"
 

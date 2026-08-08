@@ -435,6 +435,48 @@ their tile word comes out -0x16A8 with bank 0. The delta is the lead:
 tile words relative to the wrong base. Nothing changed for this item
 yet.
 
+### 14z-68h: WIN-SCREEN PALETTE FIXED (ping #7 item 5a) — source
+### re-derived from vs2's drawer, VERIFIED IN-EMULATOR
+
+The first visible fix of the session, and the derivation is now
+measured rather than eyeballed:
+
+- **The right drawer.** vsavj 0x5F1B6's true vs2 twin is **0x6B29C**
+  (pool 0x3C2BBC) — same shape and trailer (cmpi #$12 x5-form, #$19/
+  #$18, generic, `lsl.l #5; adda.l d0,a0; moveq #4,d7; jmp`). NOTE
+  vs2 0x6B156 is the SELECT uploader (it carries the famous
+  `cmpi #$10 -> moveq #$B,d6` grid remap) and is NOT this path — that
+  is the confusion the old row fell into.
+- **The newcomer special-case exists, and it is a BYTE TABLE.** vs2's
+  generic path does `move.b $6B2F2(pc,d6.w),d6` before indexing —
+  vsavj has no such remap and uses a 17-row stride where vs2 uses 18:
+      vs2  : offset = (18*colourIdx + table[id]) * 0xA0
+      vsavj: offset = (17*colourIdx + id)       * 0xA0
+- **View discipline decided it.** The table is a pc-relative BYTE
+  table embedded in code, so it reads through the **DATA view** (the
+  effect-byte-map precedent). Its OPCODE view decodes to a
+  plausible-looking identity ramp 00,01,02,... — exactly the
+  "plausible garbage" trap in docs/GOTCHAS.md — and that ramp sends
+  id 0x10 to pool row 0x0B, which is a FLAT 0x002F placeholder. The
+  DATA view gives **table[0x10] = 0x59**, i.e.
+  **0x3C2BBC + 0x59*0xA0 = 0x3C635C**, whose ramp is gold
+  (0FFD 0FB8 0D96 0C86 0B75 0964 0753 0542) — matching the maintainer
+  capture. The old row's 0x3C347C reads 0111 0844 0C87 0FBA... = the
+  pink/lavender they photographed.
+- Colour stride 0xB40 (18*0xA0) was already right and is now DERIVED
+  rather than assumed.
+
+VERIFIED THREE WAYS on build 64128aa7: statically all 8 colour sets
+byte-identical to vs2's source at the correct strides; **in-emulator**
+the win-screen palette RAM at BOTH sample frames (replay 61 with the
+early-window id-0x10 poke) reads `fffd ffb8 fd96 fc86 fb75 f964 f753
+f542` = the gold ramp under the expected F000-alpha; and the gates are
+green (boot masked-v2 EXACT, ex, grab, pairs, m3a bit-exact).
+
+STILL OPEN for the win screen: item 5b, the GARBLED BLUE-GREY BLOCKS
+on eye/thigh/foot — a separate ART defect (tiles the anim walk missed),
+untouched by this palette fix.
+
 ### What SHIPS from 14z-68
 
 One functional change ships: the **region-boundary fix** above
