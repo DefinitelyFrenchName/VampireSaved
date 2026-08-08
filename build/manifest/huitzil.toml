@@ -775,19 +775,19 @@ data_subst = "qqqqqqqq=0x279B4:0x54:wide_ext,pppppppp=0x27A08:0x370:wide_ext"
 # move's state installs the per-frame callback — prime suspect: his
 # values rows' "engine dispatch entries: 1" (extraction summary). Then
 # re-aim this gate at that install site.
-[[site_thunk]]
-stage = 4
-name = "effect_machine"
-site = 0x0238FC
-old_hex = "422e01401d7c"
-patch = "jmp"
-jmp_ok = true
-region_subst = "jjjjjjjj=x022400:0x36"
-# a6 = the EFFECT OBJECT (small slot): the owner id is reached through
-# the +0x30 owner link (the spawner stores the parent there — measured
-# in the fleet-spawner fragment `move.w a6,$30(a4)`), never via
-# $382(a6) which reads a neighboring slot.
-thunk_hex = "2f08306e00300c2800TT0382205f66064ef9jjjjjjjj422e01401d7c4ef900023902"
+# PARKED 14z-67: wrong entry (this stub is cold for H content but hot
+# for LEGACY effects — the gate's cycles broke the boot masked-EXACT
+# leg) AND its region is bisected out. The real entry is the seq-D
+# per-char dispatch (also parked pending the 0x574B0-flow closure).
+# [[site_thunk]]
+# stage = 4
+# name = "effect_machine"
+# site = 0x0238FC
+# old_hex = "422e01401d7c"
+# patch = "jmp"
+# jmp_ok = true
+# region_subst = "jjjjjjjj=x022400:0x36"
+# thunk_hex = "2f08306e00300c2800TT0382205f66064ef9jjjjjjjj422e01401d7c4ef900023902"
 
 [[pcrel_escape_fix]]
 stage = 4
@@ -798,3 +798,34 @@ pad = 0x180
 stage = 4
 region = "x06d240"
 pad = 0x60
+
+# ── 14z-67 SEQ-D PER-CHAR DISPATCH (the effect-arc ENTRY, finally):
+# vs2's class-02 seq-0xD handler head is a PER-CHAR JMP DISPATCH
+# (moveq; move.b $382(a6),d0; lsl #2; movea.l #$D9538,a0; jmp
+# ([a0,d0])) — row 0x10 = HIS OWN ported handler 0x56D68 (region
+# "code" +0x20D8), whose flow (bsr local; bra 0x574B0 into x057456)
+# drives the beam/lightning/explosion machinery. vsavj's seq-D head
+# (0x22500) has NO dispatch — his seq-D states ran the vanilla
+# handler, so none of his effect flow ever executed. Thunk: tenant ->
+# jmp his placed handler; everyone else re-created verbatim (the
+# displaced window contains a beq.s, so the body re-creates its
+# semantics with absolute jmps: tst.b $169(a6); zero -> 0x2250A,
+# else -> 0x22506).
+# PARKED 14z-67 (measured regression, do not enable without the
+# dependency closure): the thunk fires EVERY FRAME for both players
+# (seq 0xD = a common state, 401 probe hits/capped) and with it
+# active the ray move NO LONGER FIRES AT ALL (A/B vs hui8: no freeze)
+# — his seq-D handler's deep flow (0x56D68 -> bsr local -> bra
+# 0x574B0 -> the x057456 driver) has unmet dependencies on our build
+# that fail SILENTLY (no crash, no tripwire — the state machine
+# routes away). NEXT: enable in scratch builds + probe the 0x574B0
+# flow to closure (the R1 loop), then re-enable here.
+# [[site_thunk]]
+# stage = 4
+# name = "seq_d_dispatch"
+# site = 0x022500
+# old_hex = "4a2e01696704"
+# patch = "jmp"
+# jmp_ok = true
+# region_subst = "jjjjjjjj=code:0x20D8"
+# thunk_hex = "0c2e00TT038266064ef9jjjjjjjj4a2e016967064ef9000225064ef90002250a"

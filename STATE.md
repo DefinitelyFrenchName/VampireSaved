@@ -249,6 +249,43 @@ Read the 14z-67 sections below, then docs/NEXT_SESSION.)
   param32/flavor measurement (no fork expected), then his gfx rung
   through the ratified layout row.
 
+### 14z-67 continuation 7: THE ENTRY FOUND AND MEASURED (the seq-D
+### per-char dispatch) — but activating it REGRESSES the ray move
+### (dependency gap in his seq-D flow); both entry thunks PARKED with
+### the zone regions kept; all gates re-green
+
+- THE ENTRY (three more measurement rounds): vs2's class-02 seq-0xD
+  handler head (0x22008, table entry D of the stepper's own jump
+  table) is a PER-CHAR JMP DISPATCH — moveq; move.b $382(a6),d0;
+  lsl #2; movea.l #$D9538,a0; jmp ([a0+d0]) — row 0x10 = HIS OWN
+  ported handler 0x56D68 ("code"+0x20D8; head: bsr local + bra
+  0x574B0 into the x057456 driver). The jmp dispatch also explains
+  the RET-was-data mystery. vsavj's seq-D (0x22500) has NO dispatch
+  — his seq-D states ran vanilla, so NONE of his effect flow ever
+  executed (beam/lightning/ES-beam all downstream of it).
+- ACTIVATION MEASURED AND REVERTED: the seq_d_dispatch thunk fires
+  EVERY FRAME for both players (seq D = a common state; 401 probe
+  hits/capped) and with it live the ray STOPS FIRING ENTIRELY (A/B
+  vs hui8: no freeze) — his handler's deep flow has SILENT unmet
+  dependencies (no crash, no tripwire; the state machine routes
+  away). PARKED with full anatomy in the manifest comments.
+- The effect_machine cold-stub thunk was ALSO the boot-gate breaker
+  (the stub is cold for H but HOT for legacy effects — the gate's
+  cycles broke masked-EXACT; my first park had silently missed the
+  block, which confused one bisect round). Properly parked; the
+  ZONE + SPAWNER REGIONS and their pads/recon rows STAY (boot
+  masked-EXACT and m3a bit-exact re-verified with them in; behavior
+  battery green on the round-final shape df578358).
+- THE NEXT ARC IS NOW EXACTLY SCOPED: enable seq_d_dispatch in
+  scratch builds and probe the 0x56D68 -> 0x574B0 flow to closure
+  (the R1 loop: what does the flow read/call that our build lacks —
+  candidates: per-char tables the flow indexes, farm rows, or the
+  D9538-family sibling tables for other seqs). When the ray fires
+  through HIS handler with the thunk on, the zone/spawners are
+  already placed for the fleet, and beam duration/palette +
+  lightning + ES beam + 214 explosion + possibly FG pacing all
+  resolve through the same flow.
+
 ### 14z-67 continuation 6: ping #8 maintainer round — command grab
 ### CONFIRMED mechanically fixed; the beam arc's true architecture
 ### found (fighter-context callback, not an object machine); zone +
