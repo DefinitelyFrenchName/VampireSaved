@@ -51,18 +51,22 @@ completely — native pal-0x0D 17A5/17A7/17A9/17AA/0B3F/1781 vs ours
 252A/252C/252D, zero overlap — but the maintainer reports the child
 itself as acceptable, so treat it as a distinct question.)
 
-### 2. Win-screen palette (ping #7 item 5)
-TWO defects, both measured (14z-67): (a) the palette source
-derivation is WRONG — the `win_pal` row's source was picked when the
-color0==color1 read was already flagged suspicious, and the
-maintainer capture confirms it (native = GOLD, his normal family;
-ours = pink/lavender). Re-measure vs2's WIN DRAWER for a newcomer
-special-case, the way the select-pal uploader has one at vs2 0x6B1A6
-(`cmpi #$10 -> moveq #$B,d6`, the grid-column remap). (b) GARBLED
-BLUE-GREY RECTANGLES on eye/thigh/foot — a few wrong ART blocks,
-likely tiles the anim walk missed (codes referenced by the win pose
-but outside the walked inventory); re-run the sweep with the win-pose
-records included.
+### 2. Win-screen palette — DONE (14z-68h, confirmed 14z-68k)
+FIXED and shipped in hui10. Source re-derived from vs2's win drawer
+(0x6B29C; char id remapped through the byte table at 0x6B2F2 read via
+the DATA view -> row 0x59 -> 0x3C2BBC + 0x59*0xA0 = 0x3C635C, a gold
+ramp). Verified in RAM, on screen, and finally against a maintainer
+NATIVE CAPTURE.
+**Item 5b ("garbled blue-grey blocks") is CLOSED BY THE SAME FIX** —
+the native capture shows those regions are MAGENTA in the real game;
+they only looked blue-grey on hui9 because the palette was wrong.
+There was never an art defect: all 134 portrait tiles are
+byte-identical to vs2.
+ONLY REMAINING: the win QUOTE TEXT differs from native (same theme,
+different line). Awaiting the maintainer's answer on whether win
+quotes ROTATE per win — if they do, ours is likely a valid alternate
+line and the item closes. The quote rows ARE already repointed
+(table 0x2672AA rows 0x70/0x90 -> wide_ext).
 
 Both are single-screen, non-gameplay surfaces, so the masked legacy
 gates arbitrate cheaply and neither needs the effect machinery.

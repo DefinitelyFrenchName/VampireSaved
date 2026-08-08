@@ -552,6 +552,43 @@ ours-vs-native win captures in 14z-67, so this is cheap for them).
 Until one exists, further theorising about this item is exactly the
 mistake made twice already this session.
 
+### 14z-68k: MAINTAINER NATIVE CAPTURE — the win screen is
+### ESSENTIALLY CORRECT; the "garbled blocks" were the WRONG PALETTE
+### all along. Only the quote TEXT differs.
+
+The maintainer supplied a native VS2 Huitzil win-screen capture (the
+reference 14z-68j was blocked on). It resolves the item:
+
+- **Native shows the SAME figure, pose and colour scheme as hui10**:
+  brown/tan body, MAGENTA patches on shoulder and upper arm, gold
+  trim, white outlines, the green-gridded sphere at right.
+- **So the "garbled blue-grey rectangles on eye/thigh/foot"
+  (ping-#7 item 5b) were never wrong ART — they were the WRONG
+  PALETTE.** On hui9 those native-magenta regions rendered blue-grey
+  because the win palette source was wrong; with the corrected gold
+  palette (14z-68h) they render magenta, matching native. Item 5b is
+  therefore CLOSED BY THE SAME FIX as 5a, not a separate art defect.
+- This reconciles the measurements that had looked contradictory:
+  all 134 portrait tiles byte-identical to vs2 (14z-68j) and the
+  palette rows byte-matching vs2 (14z-68h) were BOTH right — the
+  screen was fine and the remaining doubt was mine.
+
+**Remaining difference: the win QUOTE TEXT.** Native reads
+「いっけない、道草くってたら／スッゲェ遅くなっちゃったっ」; ours reads
+「道に迷っちゃったの／ホ・ン・ト・よっ！」 — same theme, different
+line. OPEN QUESTION put to the maintainer: do these characters
+ROTATE through several win quotes? If the game selects among a set,
+ours may be a different valid line from his own set and there is
+nothing to fix; if ours consistently shows a line that is not his,
+the quote record needs work. Note the quote rows ARE repointed on our
+build (table 0x2672AA rows 0x70/0x90 -> 0x40B300/0x40B350), so a
+wrong-line-from-the-right-set is the more likely reading.
+
+METHOD NOTE: this is the third time this session that a rendered
+frame misled me and a reference/A-B settled it. The maintainer's
+capture cost them one screenshot and closed an item I had been
+theorising about for hours. ASK FOR THE REFERENCE EARLIER.
+
 ### What SHIPS from 14z-68
 
 One functional change ships: the **region-boundary fix** above
