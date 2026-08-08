@@ -87,6 +87,67 @@ selection is the defect.
 
 Full write-up: `docs/game/engine_internals.md`, beam/effect family.
 
+## Session 14z-70b/c/d — the grenade explosion: a COMPARABLE rig, the
+## symptom pinned to a +0xA220 code shift, and one wrong root cause
+
+**Nothing here changes what a player sees. `build/hui14` remains the
+build with the confirmed fixes and the launcher stays pointed at it.**
+
+**1. The rig was invalid, and that had to come first.** Replay 83 is
+1P-vs-CPU: vsav2 and vsavjw pick a different CPU opponent AND stage, so
+the legs were two unrelated matches (at f3436 native is at range with the
+explosion on screen; ours has Felicia point-blank and the projectile
+never travels). New `tests/replays/hui/83c_hui_grenade_2p.rpl` — 2P,
+BOTH sides poked (P1 H 0x10, P2 Victor 0x03 on both games). Snapshots
+confirm: Phobos vs Victor, subway stage, both legs.
+
+**2. On that rig the effect object is CORRECT and only the codes are
+wrong.** Position-matched the legs agree frame for frame (f3432: n=13,
+x 273-401, y 57-201 on each), same palette, same bank; and in the same
+dump pal 0a (98/91) and pal 0c (42/42) carry identical code ranges
+correctly remapped bank 3->4. Ours = native **+0xA220**, 41 of 88 codes;
+of those, 9 have identical art and 32 differ, none blank — vsav's own
+effect page, right shape, wrong picture. That is why
+`audit_empty_tiles.sh` is correctly silent.
+
+**3. A REAL latent defect found and fixed — which turned out NOT to be
+the cause.** `x088512` ran 0x088512-0x08C052 while its own effect
+machine's three `lea (d16,pc)` tables sat at 0x08C08A/9A/A2, past the
+end, resolving into the ANIM region placed right after. Fixed in
+`build/hui15` (**699de9b7**) via root `0x88512:0x3b98:s:f0x3b78` plus a
+small `extract_char.py` change so a SOURCE-ONLY root honours `f<off>`
+(the `:s` branch returned early and never set `raw_from`).
+`verify_pcrel_data.py` 72 BROKEN -> 69, all three rows gone.
+
+**And the explosion is byte-for-byte unchanged** (hui15 code set ==
+hui14 code set, snapshot identical), because **the code that reads those
+tables never executes** — an execution breakpoint at the placed twin
+`PRG:0x0D8912` fires zero times.
+
+**THE ERROR, NAMED: co-location is not causation.** "The effect machine
+lives in x088512; x088512 has tables resolving into the anim region;
+therefore those tables feed it" — every clause true, conclusion false.
+**Put an execution breakpoint on the code that READS a table before
+attributing a symptom to it.** One run; it would have preceded a whole
+rebuild. Third instance this session of measuring something real and
+assuming it was the thing in front of me.
+
+**hui15 KEPT, fully gated (10):** m3a_reproducible (both frozen
+references bit-exact — the shared-tool edit is inert on Donovan),
+hui_boot (legacy **masked-v2 EXACT**), gfx_layout3, audit_empty_tiles,
+hui_winscreen, hui_pairs, hui_ex, hui_grab, hui_air, hui_walk. It is a
+latent repair of the ratified x06cac0 class with NO observable effect.
+**Maintainer decision outstanding: keep it or revert** — it is unproven
+behaviourally by definition (nothing to prove), and the commit is
+isolated if you would rather not carry it.
+
+**Explosion root still OPEN.** Eliminated: tile presence (they ARE
+absent from our set — that stands), `effect_tail`, the `c5_mode` path,
+and x088512's pc-rel tables. Solid: the effect runs correctly and only
+the codes differ, by exactly +0xA220. NEXT: attribute that constant by
+instrumenting the code that COMPUTES the code word — not by reasoning
+from which region it lives in.
+
 ## Session 14z-69 CLOSE — ritual complete
 
 - **STATE** updated (this file, newest-first sections above).
