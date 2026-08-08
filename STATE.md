@@ -1,6 +1,12 @@
 # STATE — living progress log
 
-Updated: 2026-08-08 (session 14z-69 CLOSED — THREE VISIBLE FIXES
+Updated: 2026-08-08 (session 14z-70 IN PROGRESS — the beam residual moved
+off the draw path and onto anim-sequence SELECTION: our build never walks
+the beam anim nodes at all, measured both legs in one emulator. New gate
+`tests/test_beam_anim_walk.sh` freezes it. Read the 14z-70 section below,
+then 14z-69.)
+
+Previously: 2026-08-08 (session 14z-69 CLOSED — THREE VISIBLE FIXES
 SHIPPED AND MAINTAINER-CONFIRMED on build/hui14 (c25b3824): the child
 sidekick's shadow, the Dark Force palette, and the row-8 machine's
 pc-relative tables. The DOCS were split three ways (game / platform /
@@ -11,10 +17,77 @@ the comparison error written down so it cannot be repeated. Every gate
 green at close, including two NEW audits. Read docs/NEXT_SESSION.md
 first, then the 14z-69 sections below.)
 
-## Session 14z-69p/q — DF PALETTE FIXED (PING #12, build/hui14 =
-## c25b3824, playtest-confirmed) and the 214 explosion TRIAGED
+## Session 14z-70 — THE BEAM IS AN ANIM-SELECTION DEFECT: our build
+## never walks the beam anim nodes (measured, both legs, one emulator)
 
-**DF palette: FIXED and confirmed by the maintain## Session 14z-69 CLOSE — ritual complete
+Took the step 14z-69 named. The answer inverts where the arc was looking.
+
+**1. The nodes are correctly PORTED — one more elimination.** anim places
+vs2 `0x245872` at `PRG:0x0D8950`, delta **-0x16CF22**. Both node families
+are structurally identical to native and every differing byte is a 3-byte
+pointer relocated by exactly that delta (6 + 5 = 11/11). Static, no
+emulator.
+
+**2. Native walks them; we never do.** MAME both legs, replay 83b, the
+standard early-window pokes, `trace_writes.lua` read-watch, 3,230 frames:
+
+| leg | watch | in-window reads |
+|---|---|---|
+| native vsav2 | `0x24FCFA,2,r` | **2** (f3165, f3167) |
+| ours (hui14) | `0x0E2DD8,2,r` | **0** |
+
+So the residual is NOT a draw flag and NOT the emitter's output stage.
+**Nothing in our build ever points an object at the beam animation.**
+
+**3. The mechanism, decoded from the walker.** The access is `movea.l
+4(A0),A0` at `PRG:0x0199D8`; MAME reports `CURPC` as the FOLLOWING
+instruction (`0x0199DC`), which is worth knowing for every read-watch we
+ever do. `movea.l 0x1C(A6),A0` precedes it, so **object field `+0x1C` is
+the running anim-sequence pointer** — confirmed by the registers
+(`[A6+0x1C]=0x24FCF6`, and `4(A0)` there holds `0x002621C8` = the logged
+`A0`). The setter advances it 8 bytes per step, 37 times across the
+window, as `A0 = base 0x24EDD4 + D0`, exact on every row. The sequence is
+ENTERED by selecting base+offset, which is why no absolute pointer to the
+node exists in either image: the tight-window scan finds exactly one
+reference, an internal loop-back (`0x24FCE2 -> 0x24FC22`), itself
+correctly ported in ours (`0x0E2DC0 -> 0x0E2D00`).
+
+**4. Deliberately NOT promoted to a finding.** At fixed address `$FFD400`
+ours' `+0x1C` is last written at f2365 (to `0x0F72E4`, a placed-region
+address) and never advances, against native's 37 in-window writes. That
+compares a RAM ADDRESS across legs — the documented slot-order trap. The
+object must be identified by TYPE first. Do not promote it without that.
+
+**Method note paid for in-session: a PC logged on one leg does not name
+the same routine on the other, and SOME of them coincide anyway.** Native
+is vsav2, ours is vsavj-based (`tools/reconcile_batch.py` exists for
+exactly this). In the measuring run `0x000926`, `0x000D36`, `0x000D3C`
+and `0x000DDC` matched exactly, counts and all, while the routine under
+investigation did not (`0x01378A` 37/0; `0x015668` 8 <-> `0x016F56` 8).
+The matching ones invite you to assume the rest match. Correspondence
+comes from the R1 map or a known region delta, never from an address
+looking familiar. Only leg-independent counts transfer.
+
+Also retired a bad instrument: searching either image for absolute refs
+to the node returns 258 mostly-coincidental 4-byte matches (values near
+`0x250000` are ordinary data). The tight-window scan is the meaningful
+one.
+
+**Gate: `tests/test_beam_anim_walk.sh` — PASS.** Four sections (static
+port check / native leg / our leg / three verdict controls), default
+`BEAM_WALK_EXPECT=absent`. Set `=walks` when selection is fixed: that
+flip IS the proof of fix. The controls exist because
+`trace_writes.lua` logs one `frame 1 PC 000926` arming line with all
+registers zero on BOTH legs, and counting it reads as "ours walks the
+node once" — inverting the conclusion.
+
+**NEXT:** identify the animating object by TYPE on both legs (not by slot
+address), then find what selects base `0x24EDD4` + offset for it. That
+selection is the defect.
+
+Full write-up: `docs/game/engine_internals.md`, beam/effect family.
+
+## Session 14z-69 CLOSE — ritual complete
 
 - **STATE** updated (this file, newest-first sections above).
 - **docs/NEXT_SESSION.md** rewritten for a fresh session: opener is the
@@ -40,7 +113,11 @@ OPEN (unchanged, all parked with rigs recorded): the effect family
 (beam / grab lightning / ES big beam / 214 explosion — one root), the
 win quote, FG pacing; then H's freeze, then Pyron.
 
-er** ("palette is
+
+## Session 14z-69p/q — DF PALETTE FIXED (PING #12, build/hui14 =
+## c25b3824, playtest-confirmed) and the 214 explosion TRIAGED
+
+**DF palette: FIXED and confirmed by the maintainer** ("palette is
 clean, DF looks good as is"). One [[data_port]] row swaps palette-seq
 rows 0x1E-0x21 for the sequence native's DF actually shows (vs2
 0x3ABEDC, vh2 twin 0x38BEB0). The afterimages stay by design.

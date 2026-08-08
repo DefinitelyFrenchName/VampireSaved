@@ -1397,6 +1397,64 @@ clean 236LP then a 214MP at f3380 (arcing projectile -> ground
 explosion). Dump OBJ over f3390-3560 and compare bank words against a
 native leg — the poke flow reaches him on vsav2 unchanged.
 
+### 14z-70: the explosion's tiles LOCATED — vs2 common-bank art that was
+### never ported, drawn against vsav's unrelated art at the same indices
+
+**READ THIS FIRST — replay 83 is NOT cross-leg comparable.** It is a
+1P-vs-CPU script (`sys=C1`, `sys=S1`, no C2/S2), and the two games pick a
+DIFFERENT CPU opponent and a DIFFERENT stage: at f3436 native is on the
+village stage against one character and ours is on a different stage
+against Felicia, with no explosion on screen at all. Any "ours draws
+tiles native never draws" conclusion from a frame-matched sprite diff on
+this replay is measuring two different matches. One was computed this
+session (101 our codes vs native's, zero overlap) and DISCARDED. Identify
+the effect on ONE leg by position and timing, or author a 2P replay.
+
+**What the native leg alone shows.** The explosion is a large orange
+flame pillar (snapshot f3436, right of screen). Locating it by screen
+position rather than by palette guesswork gives a compact cluster:
+
+```
+native f3436, flame region x 210-320 y 30-190:
+  pal 06, BANK 0, codes 4a2f 4a4d 4a70 4a76 4a96 4aa0
+  across the whole window: pal 06 bank 0, ~95 codes in 0x48EA-0x4C56
+```
+
+So the explosion is drawn from **vs2's BANK 0 — its shared/common effect
+art**, not from H's own character band (bank 3 native / bank 4 ours).
+That is why the port misses it: the tenant gfx work moves his BAND, and
+this art is not in it.
+
+**The tiles are genuinely absent from our set.** Comparing vs2 against
+the stock vsav gfx at those same indices (`tools/gfx_tiles.py`, group A):
+**14 of 14 sampled tiles DIFFER, and none is blank.** Rendered sheets at
+0x4A00 confirm it by eye — vs2 holds soft organic flame/smoke texture
+there, vsav holds unrelated sharp-edged art.
+
+**This is a DIFFERENT class from the child-shadow defect, and that is why
+`audit_empty_tiles.sh` is silent on it:**
+
+| | shadow (14z-69o) | explosion (this) |
+|---|---|---|
+| code | remapped to bank 4 | NOT remapped — stays bank 0 |
+| tile present? | no — empty group C slot | yes, but it is vsav's OWN art |
+| renders as | solid rectangle | a wrong, plausible-looking picture |
+| empty-tile audit | catches it | cannot see it |
+
+A complete-inventory empty-tile check can only find art that resolves to
+nothing. Wrong-but-present art needs a source comparison, which is what
+the table above is.
+
+**Consequence for the fix:** these tiles must be COPIED into group C
+(they are vs2 content absent from our set) *and* the emitter's codes
+remapped to that bank — copying alone leaves the codes pointing at
+vsav's art, and remapping alone would point at empty group C slots (the
+shadow failure mode). Both halves, or neither.
+
+Still open and NOT claimed here: which emitter computes those codes, and
+whether the pal 06 attribution covers the whole effect (pal 10 and pal 11
+bank-0 sprites sit in the same region at f3436 and were not chased).
+
 ## The beam / effect family — state after 14z-69j (three of four pieces
 ## are native-equivalent; EMISSION is the open one)
 
@@ -1504,6 +1562,90 @@ param streams the table fix repaired).
 
 The three thunks stay PARKED in the tree: they buy no visible change
 until emission is solved, and nobody has playtested them.
+
+### 14z-70: the anim nodes are NEVER WALKED on our build, and the
+### selection mechanism is now named
+
+The step named above was taken. Measured in ONE emulator (MAME), both
+legs, replay `83b_hui_ray_2p` with the standard early-window pokes,
+`trace_writes.lua` read-watch, 3,230 frames each.
+
+**1. The nodes themselves are correctly ported — a further elimination.**
+`anim` places vs2 `0x245872` at `PRG:0x0D8950`, delta **-0x16CF22**
+(atlas fragment). Both node families are structurally identical to
+native and *every* differing byte is a 3-byte pointer relocated by
+exactly that delta — 11/11 correct, verified statically:
+
+```
+vs2 0x24FCFA -> ours 0x0E2DD8      vs2 0x251CDA -> ours 0x0E4DB8
+vs2 0x2621D6 -> ours 0x0F52B4      vs2 0x26233A -> ours 0x0F5418   (the known-good pair)
+```
+
+**2. Native walks them; we never do.**
+
+| leg | watch | reads in 3,230 frames |
+|---|---|---|
+| native vsav2 | `0x24FCFA,2,r` | **2** (f3165, f3167 — inside the documented f3164-3208 window) |
+| ours (hui14) | `0x0E2DD8,2,r` | **0** |
+
+(A `frame 1 PC 000926` line with all registers zero appears on BOTH
+legs — that is the watchpoint-arming artefact, not a hit. Count hits
+only after it.)
+
+So the residual is NOT a draw flag and NOT the emitter's output stage:
+**nothing in our build ever points an object at the beam animation.**
+
+**3. The mechanism, decoded from the walker.** At the native hit the
+accessing instruction is `movea.l 4(A0),A0` at `PRG:0x0199D8`; MAME
+reports `CURPC` as the FOLLOWING instruction (`0x0199DC`, `move.w
+(A0)+,D0`), so read the PC as "the instruction after the access":
+
+```
+0199D4  movea.l 0x1C(A6),A0     ; A6 = the animating object
+0199D8  movea.l 4(A0),A0        ; <-- the access: node+4 = sprite-list ptr
+0199DC  move.w  (A0)+,D0        ; CURPC as logged
+```
+Confirmed by the registers: `[A6+0x1C] = 0x24FCF6`, and `4(A0)` there
+holds `0x002621C8` — exactly the logged `A0`.
+
+So **object field `+0x1C` is the running anim-sequence pointer**. The
+setter (vs2 `PRG:0x01378A`) advances it 8 bytes per step, 37 times
+across the window, as `A0 = base 0x24EDD4 + D0` — exact on every row
+(`D0` 0x0F12, 0x0F1A, 0x0F22 …). The sequence is entered by SELECTING
+that base+offset, which is why no absolute pointer to `0x24FCFA` exists
+in either image: the tight-window scan finds exactly one reference, an
+internal loop-back (`0x24FCE2 -> 0x24FC22`), itself correctly ported in
+ours (`0x0E2DC0 -> 0x0E2D00`).
+
+**4. Suggestive, NOT yet a finding.** At the fixed address `$FFD400`
+ours' `+0x1C` is last written at f2365 (to `0x0F72E4`, a placed-region
+address) and never advances again, while native writes it 37 times in
+the window. This compares a fixed RAM ADDRESS across legs, which is the
+documented slot-order trap above — the object must be identified by
+TYPE before this counts. Do not promote it without that.
+
+**Method note, paid for this session: a PC logged on one leg does not
+name the same routine on the other — and SOME of them coincide anyway,
+which is what makes it dangerous.** The native leg is vsav2 and ours is
+vsavj-based: two different builds of the engine, which is the whole
+reason `tools/reconcile_batch.py` exists. In this one run:
+
+```
+0x000926 1/1   0x000D36 2/2   0x000D3C 2/2   0x000DDC 1/1   <- identical, counts and all
+0x01378A 37 native / 0 ours       0x015668 8 native <-> 0x016F56 8 ours
+```
+
+Four low addresses match exactly while the routine actually under
+investigation does not. So the rule is NOT "PCs never correspond" — it
+is that the matching ones invite you to assume the rest match too.
+Correspondence comes from the R1 map or a known region delta, never
+from an address looking familiar. Leg-independent counts (did it
+happen, how often) always transfer. Different axis from the
+frame-index trap, same bite.
+
+**NEXT:** identify the animating object by TYPE on both legs (not by
+slot address), then find what selects base `0x24EDD4` + offset for it.
+That selection is the defect.
 
 ## The companion / pod object family (14z-65, generalised 14z-67 on Pyron)
 

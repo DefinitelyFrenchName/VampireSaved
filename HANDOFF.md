@@ -594,6 +594,17 @@ tests/audit_palette_seq_ids.sh        # 14z-69p: which palette-seq ids does LEGA
                                       # audit is its ONLY guard. Use GUARD_PROBE_MAX:
                                       # the default 400-hit cap truncated it once and
                                       # hid id 0x27
+tests/test_beam_anim_walk.sh   [bd]   # 14z-70: does the build ever WALK the anim
+                                      # nodes that carry the beam sprite lists?
+                                      # Native reads 0x24FCFA twice in its beam
+                                      # window; ours reads the placed twin 0x0E2DD8
+                                      # ZERO times — the defect is anim-sequence
+                                      # SELECTION, not the draw path. 4 sections
+                                      # (static port check 11/11 relocated pointers,
+                                      # native leg, our leg, 3 verdict controls).
+                                      # BEAM_WALK_EXPECT=absent (default) | walks —
+                                      # the flip to `walks` IS the proof of fix.
+                                      # Defaults to build/hui14. ~2 min
 tests/test_wide_render_content.sh     # the WIDE track must SERVE the ported content's
                                       # tiles (RE-SHAPED 14z-67 for m3a semantics —
                                       # cross-track pixel identity ended BY DESIGN):
