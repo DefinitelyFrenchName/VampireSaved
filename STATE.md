@@ -522,6 +522,36 @@ build. The A/B was two commands and would have prevented both the
 bad ping note and the bad write-up. When a screen looks wrong, diff
 it against the last known build BEFORE theorising about mechanism.
 
+### 14z-68j: the win-pose ART DATA is EXONERATED — every tile is
+### byte-identical to vs2; the item now needs a native capture
+
+Measured, so the next session does not re-run it:
+- **All 31 portrait sprites, all 134 tiles, byte-identical to vs2's
+  group-A originals.** Expanded each sprite's WxH block from its a19
+  and compared our group-C tile against vs2's at the same index:
+  0 mismatches. So the "garbled blocks" are NOT missing tiles and NOT
+  wrong tile DATA — the earlier "tiles the anim walk missed" theory
+  is dead.
+- **The patches are in the FIXED palette rows.** They recolour
+  between builds (blue-grey on hui9 -> magenta on hui10), so they are
+  drawn through rows 0x15-0x19, which we verified match vs2 exactly.
+  Sprites in the portrait area using palettes OUTSIDE that range
+  (pal 0x00 x22, pal 0x09 x15 — background/frame) are unchanged
+  between builds, consistent with them not being the patches.
+- So the remaining candidates are the sprite->palette ASSIGNMENT
+  (attr bits per sprite) differing from native, or the pose simply
+  looking like that natively.
+
+**BLOCKED on a native reference.** I could not reach H's win screen on
+vs2 with the existing rig: the early-window id poke does NOT force him
+on vsav2 (replay 61 stays mid-match there — its input timing is
+authored for OUR wheel), so there is no ours-vs-native OBJ/pixel diff
+to run. Options: author a vs2-native replay that picks H and wins, or
+ask the maintainer for a VS2 win-screen capture (they supplied
+ours-vs-native win captures in 14z-67, so this is cheap for them).
+Until one exists, further theorising about this item is exactly the
+mistake made twice already this session.
+
 ### What SHIPS from 14z-68
 
 One functional change ships: the **region-boundary fix** above
