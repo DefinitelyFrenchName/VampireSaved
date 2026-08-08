@@ -5,9 +5,12 @@
 twice over, and then corrected its OWN first conclusion: the beam
 object is NOT missing — our build spawns it, but it is type 0x08 (a
 SHARED type), so the pool walker ticks it with the VANILLA machine
-and vanilla records. One real bug was found and FIXED along the way
-(the ported spawner region excluded its own record-base load); the
-rest of the session is documentation, rigs, and one gate.
+and vanilla records. THREE real defects were found and FIXED along
+the way — the ported spawner region excluded its own record-base
+load, and two engine sites tested newcomer char ids against a
+WORD-loaded mask, reading a stale high word (undefined). None of
+them makes the beam render; that is step 2 below, now fully
+specified. **THE BEAM STILL DOES NOT RENDER.**
 PING #8 = build/hui9 (9e3105e0) is still with the maintainer —
 nothing new to playtest.** Frozen references unchanged
 (donovan-m3a 4b7d0dc7 / m5_stock 6c93cfa8; m3a-reproducible PASS).
