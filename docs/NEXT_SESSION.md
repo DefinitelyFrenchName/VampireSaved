@@ -1,17 +1,20 @@
 # NEXT SESSION — orientation (written at the close of 14z-68, 2026-08-08)
 
-**Start here: GIVE THE BEAM OBJECT A TENANT TYPE (the arc below).
-14z-68 refuted the 14z-67 entry theory, exonerated the fighter side
-twice over, and then corrected its OWN first conclusion: the beam
-object is NOT missing — our build spawns it, but it is type 0x08 (a
-SHARED type), so the pool walker ticks it with the VANILLA machine
-and vanilla records. THREE real defects were found and FIXED along
-the way — the ported spawner region excluded its own record-base
-load, and two engine sites tested newcomer char ids against a
-WORD-loaded mask, reading a stale high word (undefined). None of
-them makes the beam render; that is step 2 below, now fully
-specified. **THE BEAM STILL DOES NOT RENDER.**
-PING #8 = build/hui9 (9e3105e0) is still with the maintainer —
+**Start here: NARROW THE TENANT-TYPE STAMP (the arc below). The
+whole union-type mechanism is BUILT and MEASURED WORKING — dispatch,
+records and art are now native-equivalent for the beam object — but
+it is PARKED because the stamp is too broad (it crashes Dark Force)
+and because, even with the path equivalent, THE BEAM STILL DOES NOT
+DRAW. Two named blockers, both with next probes.**
+
+14z-68 also refuted the 14z-67 entry theory, exonerated the fighter
+side twice over, corrected its own first conclusion (the beam object
+is spawned, not missing), and fixed FOUR real defects along the way:
+the ported spawner region excluded its own record-base load; the
+region was rooted at the middle of vs2's row-8 machine instead of
+its entry; and two engine sites tested newcomer char ids against a
+WORD-loaded mask, reading a stale high word (undefined).
+**PING #8 = build/hui9 (9e3105e0) is still with the maintainer —
 nothing new to playtest.** Frozen references unchanged
 (donovan-m3a 4b7d0dc7 / m5_stock 6c93cfa8; m3a-reproducible PASS).
 
@@ -29,74 +32,59 @@ rows did this long ago). H's ray runs HIS OWN flow, tap-verified
 native-identical. Both entry thunks are parked with this written
 into the manifest. Do not re-attempt them.
 
-## THE ARC: give the beam object a TENANT TYPE so it runs the
-## ported machine (the spawn already happens)
+## THE ARC: NARROW THE TENANT-TYPE STAMP, then find why the beam
+## does not draw (the dispatch/record path is already equivalent)
 
-**The render-level target** (OBJ dump, replay 83b): native draws the
-beam as **one object** — $FFBA00, spawned by vs2 0x6D32A, **owner =
-the VICTIM** ($FF8800), chained into the companion records at
-0x2B8530 (= base + 0x63C) — emitting 14 sprites: bank-3 codes
-0x1E2F/0x1E42/0x1E5F pal 0x0C (H's own band, art present at delta 0
-in our group C bank 4), the long stretch segments bank-1 code 0x4EC0
-at sz 4x1 and 16x1, and the impact 0x1E84 pal 0x0F.
+14z-68d built the whole union-type mechanism and MEASURED it working.
+Do not re-derive any of this — un-park and continue:
 
-**Ours already spawns that object** ($FFB880 via the VANILLA vj
-0x60EE6, same owner 0x8800, same header 0x0100/0x0802) — but it
-chains to the VANILLA record base (0x283690 + 0x62C) and is ticked
-by the VANILLA machine (vj 0x606C8/0x60746/0x60DBA). Proof the
-porting machinery itself is fine: the neighbouring persistent
-companion object carries the SAME relative offset (+0x222C) with
-the bank correctly remapped 0x6000 -> 0x1000.
+**Proven and in the manifest, PARKED together** (`tenant_type_stamp`
++ the `[[obj_hook_extra]]` row): the stamp fires (+0x02 = 0x7C02),
+the object is then ticked by the PORTED vs2 row-8 machine with every
+PC normalising EXACTLY to native's sequence (06cadc/06cae2/06cae8/
+06caee/06caf4/06cb5a/06cb86/06cb8e/06cb96), its record resolves to
+placed base + 0x63C — native's own relative offset — and the record
+AND its sub-records are BYTE-IDENTICAL to vs2's (pointers relocated
+by exactly the region delta 0x14811C). Dispatch, records and art are
+all native-equivalent.
 
-**Why it takes the vanilla path: the object is TYPE 0x08, a SHARED
-type.** The pool walker per-type table — already obj_hook'd at site
-0x5E542 (vanilla 114 entries / vs2 src 0x6A51C, 124) — dispatches
-type 8 to the vanilla machine, because vs2 rewrote its OWN row-8
-machine. So the fix is the established **union pattern one level
-down**:
-1. port vs2's row-8 machine PROPERLY: its entry is **0x6CAC0** and
-   it runs to ~0x6D97C (row 9's target), i.e. len ~0xEBC. The region
-   we currently place (0x6D1E0+0x560) is its MIDDLE — extend, do not
-   add. **0x6CA00 does NOT pattern-twin at +0x174**; 0x6D1E0 does, so
-   re-verify the twin delta at whatever start you choose;
-2. give tenant-spawned instances a NEW type (>= 114) with a union
-   row pointing at the ported machine entry;
-3. gate the type write to tenant-spawned instances. The
-   discriminator is MEASURED and clean: the victim's **+0x32 ->
-   the attacker**, whose **+0x382 == 0x10**. (Capcom's own
-   precedent: vs2 uses `cmpi.b #$10,$382` in-machine.) Note the
-   creator's register context is IDENTICAL on both games — D0=0,
-   D1=0x0C, A6=victim, RET=$FF02DC — so nothing else distinguishes
-   it;
-4. then un-park the two thunks below as the final wiring.
+**Blocker 1 — the stamp is too broad (fix this first).** Un-parked,
+it regresses `test_hui_pairs`: Dark Force takes a vec3 at PC
+0x0D4696 inside the ported machine (f3220, ADDR 0x4029FF, A2 =
+0x400010 our record base, A1 = 0x3FFEEE reading BELOW it — an index
+underflows the placed region). The victim-spawn site (vj 0x60EE0)
+serves EVERY hit of this class from the tenant, not just the ray, so
+DF's objects get routed into a machine that mishandles them. Narrow
+the stamp to the RAY EFFECT specifically — per-effect, not per-hit
+(candidate discriminators: the spawn selector D1, or the victim's
+reaction/effect id) — then re-run pairs FIRST.
 
-**ALREADY FIXED AND SHIPPED (14z-68):** the ported spawner region
-began at 0x6D240 while the routine own record base load
-`movea.l #$2B7EF4,a2` sits at **0x6D200** — 0x40 bytes below, so the
-region could never relocate its own base. Root is now
-`0x6d1e0:0x560:t0x6d354`; the base relocates to the placed 0x400010
-(one occurrence, at 0x6D202). Region renamed x06d240 -> x06d1e0.
-Build cf519de8, gates green, 2P legacy bit-identical.
+**Blocker 2 — the beam still does not draw.** With dispatch, records
+and art proven equivalent, the residual is the EMITTER path or a
+draw flag, not the data. Native emits its 14 sprites right after the
+fighter's own 3; ours emits none. Next probes: what the emitter
+walks for this object (the +0x1c chain is installed once and does
+not advance on either game), and whether a visibility/priority flag
+on the object differs.
 
-Two thunks are PARKED with full anatomy in huitzil.toml — un-park
-them WITH the port, not before:
-- `piece_prebake` (vj 0x18F88; a6 = spawning fighter, a4 = new
-  piece): installs bank + record at 0x4001F4 = placed base + 0x1E4
-  = native own relative offset. Gates green, 2P legacy
-  BIT-IDENTICAL (site is cold for legacy — 3 hits, the 3 rays).
-- `fleet_record_base` (vj 0x60DD4): base-only swap CRASHES the ES
-  flow — the ES driver shares subtype 0x0D and its param stream
-  carries vanilla-base offsets. Base + stream + count + updater are
-  ONE unit.
+**Already shipped, do not redo:** the region now covers vs2's WHOLE
+row-8 machine (`0x6cac0:0xebc:t0x6cc34`, region x06cac0 — the
+14z-68b root was its middle); the generator has `[[obj_hook_extra]]`
+for authored union rows (flat table matched by `site`; no-gap
+assertion since the engine indexes by type*4); two newcomer-id mask
+widenings; and the record-base boundary fix.
 
-Known twins/R1, already resolved: piece machine vj 0x5E780 <-> vs2
-0x6A770 (per-seq pc-rel table vj 0x5E7A4 / vs2 0x6A798; walker vj
-0x5E540 stride 0x80, type table 0x5E556; rows 2+ are 40-42/48
-byte-identical, differing only in R1 addresses). Engine pairs
-0x13778->0x15084, 0x13724->0x15030, 0x13c0e->0x1551a,
-0x157c2->0x1707a, 0x5122->0x4ce2 are all in reconciliation.toml.
-x022400 is placed at 0xC7070; x06d1e0 at 0xD3EF0.
-The fighter side is EXONERATED twice over — do not re-open it.
+Reference facts: the walker reads the type from **+0x02**
+(`move.b $2(a6),d0; add.w d0,d0; add.w d0,d0`), so any type >= 114
+is unreachable for vanilla objects by construction. The
+discriminator is the victim's **+0x32 -> attacker**, **+0x382 ==
+0x10** (vs2's own in-machine test). vs2 row 8 = 0x6CAC0, vj row 8 =
+0x606AC, vs2 rows 114-120 = the already-ported newcomer types.
+Type tables decode from the OPCODE view only.
+
+Two OLDER thunks stay parked (un-park with the port, not before):
+`piece_prebake` (vj 0x18F88) and `fleet_record_base` (vj 0x60DD4 —
+base-only swap crashes ES; base+stream+count+updater are ONE unit).
 
 Gate after EVERY iteration: `tests/test_hui_boot.sh` (masked-v2
 EXACT — the "cold stub is legacy-hot" lesson) plus ex/grab/air, and

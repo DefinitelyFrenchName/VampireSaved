@@ -2241,3 +2241,21 @@ invisible to every existing gate. Extending the root to 0x6D1E0
 delta carries) made the base relocate to the placed copy, with
 static proof: exactly one occurrence of the placed base in the
 region blob.
+
+## Routing a tenant's objects to a ported machine: the discriminator
+## must be PER-EFFECT, not per-hit (14z-68)
+
+Giving the tenant's effect object its own union type (so a SHARED
+type's rewritten machine can be reached without touching the shared
+row) works — dispatch, records and sub-records all became
+native-equivalent, verified by normalising the ticking PCs and by
+byte-comparing the records. But the stamp was applied at the
+victim-spawn site, which serves EVERY hit of that class from the
+tenant, so Dark Force's objects were routed into the ported machine
+too and it underflowed the placed region (vec3, A1 reading below the
+region base). The tenant is not a fine enough filter for a site that
+one character reaches through several different moves: pick the
+discriminator at the granularity of the EFFECT, not the character.
+Corollary for gating: `test_hui_pairs` (Reflect Wall + Dark Force)
+is the gate that catches this class — run it on any change that
+routes objects, not just the gates for the move you are fixing.
