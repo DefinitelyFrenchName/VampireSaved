@@ -51,16 +51,20 @@ type.** The pool walker per-type table — already obj_hook'd at site
 type 8 to the vanilla machine, because vs2 rewrote its OWN row-8
 machine. So the fix is the established **union pattern one level
 down**:
-1. extend the ported region DOWN over the tick machine — measured
-   native PCs 0x6CADC/0x6CAE2/0x6CAE8/0x6CAEE/0x6CAF4/0x6CB5A/
-   0x6CB86/0x6CB8E/0x6CB96 all sit below the current boundary.
-   **0x6CA00 does NOT pattern-twin at +0x174** — find the real
-   boundary (0x6D1E0 twins cleanly at +0x174, already used);
+1. port vs2's row-8 machine PROPERLY: its entry is **0x6CAC0** and
+   it runs to ~0x6D97C (row 9's target), i.e. len ~0xEBC. The region
+   we currently place (0x6D1E0+0x560) is its MIDDLE — extend, do not
+   add. **0x6CA00 does NOT pattern-twin at +0x174**; 0x6D1E0 does, so
+   re-verify the twin delta at whatever start you choose;
 2. give tenant-spawned instances a NEW type (>= 114) with a union
    row pointing at the ported machine entry;
-3. gate the type write to tenant-spawned instances — the
-   discriminator must come from the SPAWNING CALL PATH, since the
-   object owner is the victim (a vanilla character);
+3. gate the type write to tenant-spawned instances. The
+   discriminator is MEASURED and clean: the victim's **+0x32 ->
+   the attacker**, whose **+0x382 == 0x10**. (Capcom's own
+   precedent: vs2 uses `cmpi.b #$10,$382` in-machine.) Note the
+   creator's register context is IDENTICAL on both games — D0=0,
+   D1=0x0C, A6=victim, RET=$FF02DC — so nothing else distinguishes
+   it;
 4. then un-park the two thunks below as the final wiring.
 
 **ALREADY FIXED AND SHIPPED (14z-68):** the ported spawner region

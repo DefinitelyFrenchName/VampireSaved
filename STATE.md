@@ -204,6 +204,46 @@ pointing at the ported machine. Two things must land with it:
   instances only (the owner is the victim, so the discriminator has
   to come from the spawning call path, not the object's owner).
 
+### 14z-68c: the row-8 machine LOCATED, and the NEWCOMER-ID MASK
+### WIDENINGS (shipped, latent-defect class)
+
+- The per-type tables decode cleanly from the OPCODE view (data view
+  = garbage; the 14z-68 view GOTCHA again): **vs2 row 8 -> 0x6CAC0**,
+  vj row 8 -> 0x606AC, and vs2 rows 114-120 are the already-ported
+  newcomer types (0x88512 family). Note the region we extended in
+  14z-68b (0x6D1E0+0x560) sits INSIDE vs2's row-8 machine
+  (0x6CAC0-0x6D97C): we have ported its MIDDLE, not the machine.
+- The victim-side creator is reached with **register context
+  IDENTICAL on both games** (D0=0, D1=0x0C, A6=$FF8800 the VICTIM,
+  RET=$FF02DC the RAM pump) — measured by probe on each. Only the
+  code differs. So a discriminator is required, and one exists and
+  is clean: the victim's **+0x32 -> the attacker**, whose +0x382 =
+  0x10. That is Capcom's own precedent (vs2 uses `cmpi.b #$10,$382`
+  in-machine).
+- **TWO MASK-WIDENING DEFECTS FOUND AND FIXED (shipped):** two engine
+  sites test the char id as a BIT NUMBER against an immediate mask —
+  vj `move.w #$8448,d1` (victim spawn, 0x60EF0) and `move.w #$448,d1`
+  (piece subtype, 0x5E7D6) — where vs2 loads LONGS 0x84418448 /
+  0x04410448 whose HIGH words enumerate the newcomer ids (bit 0 =
+  id 0x10 = Huitzil). Loading a WORD leaves d1's high word STALE, so
+  for any id >= 16 the `btst.l` reads a leftover bit: **undefined by
+  inspection, not merely wrong.** Static superset proof: the vs2
+  masks' LOW WORDS are byte-identical to vsavj's and btst bits 0-15
+  read only the low word, so every vanilla id branches identically;
+  only ids >= 16 (variant builds only) change. Shipped as two
+  only_variant_slot site_thunks.
+  **HONEST CAVEAT: no measured behavior change on replay 83b** — the
+  stale bit happened to read 1 there, so the object already got the
+  native +0x0A=0x26. This is a LATENT-defect fix (the class that has
+  bitten this project four times: x026142/x05c800 escapes), shipped
+  because it is provably safe and the read is undefined, not because
+  it fixed a visible symptom.
+- Gates on build 4dcfd713: boot masked-v2 EXACT, ex, grab, air,
+  pairs, fx_flow all PASS; 2P legacy BIT-IDENTICAL to hui9;
+  m3a-reproducible bit-exact. **The beam still does not render** —
+  the remaining work is unchanged (tenant type + the row-8 machine
+  port, now with its true entry 0x6CAC0 and extent known).
+
 ### What SHIPS from 14z-68
 
 One functional change ships: the **region-boundary fix** above

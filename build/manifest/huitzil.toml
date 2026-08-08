@@ -876,6 +876,44 @@ stage = 4
 region = "x022400"
 pad = 0x180
 
+# ── 14z-68 THE NEWCOMER-ID MASK WIDENINGS (the ray/beam family; the
+# same superset-table class as the effect byte map and the throw-arc
+# tables). Two engine sites test the character id as a BIT NUMBER
+# against an immediate mask:
+#     vj  `move.w #$8448,d1` + `btst.l d0,d1`   (victim spawn)
+#     vs2 `move.l #$84418448,d1` + same btst
+#     vj  `move.w #$448,d1`  + `btst.l d2,d1`   (piece subtype)
+#     vs2 `move.l #$4410448,d1` + same btst
+# vsavj loads a WORD, so d1's HIGH word is stale; a newcomer id
+# (>= 16) makes btst read a leftover bit — undefined by inspection,
+# not merely wrong. vs2 loads a LONG whose HIGH word (0x8441 /
+# 0x0441) enumerates its newcomer ids 0x10/0x16/0x1A(/0x1F), bit 0
+# = id 0x10 = Huitzil.
+# SUPERSET PROOF (static, both rows): the vs2 masks' LOW WORDS are
+# byte-identical to vsavj's (0x8448 / 0x0448), and btst bit numbers
+# 0-15 read only the low word — so every vanilla id takes the
+# identical branch. Only ids >= 16, which exist solely on variant
+# builds, change; hence also only_variant_slot.
+[[site_thunk]]
+stage = 6
+name = "idmask_victim_spawn"
+only_variant_slot = true
+site = 0x060EF0
+old_hex = "323c84480101"
+patch = "jmp"
+jmp_ok = true
+thunk_hex = "223c8441844801014ef900060ef6"
+
+[[site_thunk]]
+stage = 6
+name = "idmask_piece_subtype"
+only_variant_slot = true
+site = 0x05E7D6
+old_hex = "323c0448142e"
+patch = "jmp"
+jmp_ok = true
+thunk_hex = "223c04410448142e000a4ef90005e7de"
+
 [[pcrel_escape_fix]]
 stage = 4
 region = "x06d1e0"
