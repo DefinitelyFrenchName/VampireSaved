@@ -1064,24 +1064,39 @@ above — expect an id-indexed table with variant rows aliasing base
 rows, and expect the same view question (decode both, verify against a
 known-good row).
 
-**Measured 14z-68s (start the next attempt from here, do not redo):**
-- The "afterimages" are NOT extra OBJ entries. Sprite counts before /
-  at / during activation are 160 / 141 / 145 and NO palette family
-  gains sprites — so whatever produces the afterimage look, it is not
-  additional sprites in the list.
-- DF DOES rewrite the fighter's palette: exactly palette RAM rows
-  **0x00-0x03** (P1's sprite rows) differ between a pre-DF and a
-  during-DF sample.
-- **There is no DF-specific palette routine.** Tapping palette RAM
-  shows the SAME writer PCs before and during (`0x08B4E8` family, the
-  per-frame uploader); no PC appears only during DF. So DF changes the
-  palette SOURCE the uploader reads, not the code that reads it.
-- Therefore the per-char DF style is a SOURCE SELECTION, and the hunt
-  is: what feeds the uploader's source pointer, and is it id-indexed?
-  Source before DF measured as `A0 = 0x3A8B92` at `0x08B4E8`.
-- NEXT STEP: capture `A0` at `0x08B4E8` DURING DF and diff it against
-  the pre-DF value. `GUARD_PROBE` alone caps at 401 hits long before
-  the DF frames — use `GUARD_PROBE_COND` or a frame-gated probe.
+**Measured 14z-68s/t (start the next attempt from here, do not redo).
+Note the honest negative — I could NOT reproduce the reported colour
+effect, and that is the most useful thing here:**
+- **DF genuinely activates in the repro**: fighter seq `+0x06` reads
+  **0x0A at f3115** on replay 82 with the id-0x10 poke, and returns to
+  idle after. So the rig is valid and any negative below is a real
+  negative, not a missed trigger.
+- **The afterimages are NOT extra OBJ entries.** Sprite counts
+  before / at / during activation are 160 / 141 / 145, and no palette
+  family gains sprites.
+- **They are NOT shadow servants either**: the servant installer
+  `0x823E2` and walk `0x8245C` take ZERO probe hits over this replay.
+- **His body palette does NOT change during DF on our build.** He
+  renders with **pal 0x0A** in match (measured from the sprite list);
+  comparing palette RAM rows 0x00-0x1F between a pre-DF frame and a
+  during-DF frame, row 0x0A is IDENTICAL. Rows 0x00-0x03 do differ
+  between those two samples, but sampling ACROSS the DF window
+  (f3105/3115/3130/3170/3230) shows row 0 stable throughout — so that
+  difference is unrelated match animation, not a DF effect.
+  (An earlier note here claimed "DF rewrites rows 0x00-0x03"; that was
+  the same two-sample mistake and is RETRACTED.)
+- **There is no DF-specific palette routine**: palette-RAM taps show
+  the same writer PCs (`0x08B4E8` family, the per-frame uploader)
+  before and during, none appearing only during DF.
+
+**So the reported "inverted colours + afterimages" is NOT reproduced
+by these measurements on the current build.** Before more analysis,
+get a repro: either the effect appears only in a situation replay 82
+does not cover, or it was specific to the ping-#7 build (hui6) and has
+since changed. ASK FOR A CAPTURE of ours-vs-native DF, or a savestate
+at the moment it is visible — do not resume table-hunting on the
+assumption that the symptom is live.
+
 Open observations queued from the same replay, unattributed: ~15px X
 drift over the DF walk (speed modifier vs recoil) and a pod anim phase
 difference at the f3250 sample.
