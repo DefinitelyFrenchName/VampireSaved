@@ -1623,14 +1623,59 @@ repair with no observable effect — worth keeping for the same reason the
 x06cac0 one was, but it buys no visible change and should not be
 described as fixing anything a player can see.
 
-**So the explosion's root is still OPEN**, and the eliminations now
-include: not the tiles' presence (they are absent from our set — that
-part stands), not `effect_tail`, not the `c5_mode` path, and not
-`x088512`'s pc-rel tables. What IS established and unchanged: the
-effect object runs correctly (positions/counts match native frame for
-frame), and only the tile codes differ, by exactly +0xA220. The next
-move is to attribute THAT constant — instrument the code that computes
-the code word, rather than reasoning from which region it lives in.
+### 14z-70e: THE EXPLOSION IS NOT BROKEN. Everything above about "wrong
+### art" is RETRACTED — it was an index-join error and a phase offset
+
+Maintainer proposal: diff the screen before vs during the explosion, take
+the tiles that appear, and search BOTH games for that CONTENT. Doing the
+content join instead of an index join overturns the whole entry.
+
+**1. Native's explosion tiles are already in our build.** Hashing all 88
+and searching our entire gfx (groups A/B from the patched vsav.zip, C
+from vsw): **87 of 88 present**, 84 in group A, 3 in group B.
+
+**2. The mapping is a PERMUTATION, not a constant** — `0x0EC0E` holds
+vs2 `0x495F`'s art, NOT `0x49EE`'s. So **+0xA220 was a statistical
+artefact**: two dense ~85-value clusters of similar width offset by
+~0xA220 will overlap about half the time by construction (41/88 "hits").
+It described nothing. Any "constant delta" between two dense code sets
+must be confirmed by CONTENT before it is believed.
+
+**3. Ours draws the RIGHT tiles.** Window-level content join over the
+explosion:
+```
+native 88 contents   ours 84 contents
+IDENTICAL CONTENT drawn by both: 76      native-only 12   ours-only 8
+ours drawing BLANK tiles: 0
+```
+Per-FRAME the intersection is 0 at every frame, which is what sent this
+whole entry wrong — the legs are ~2-4 frames out of phase (ours has 0
+explosion sprites at f3426 where native has 7), so a per-frame set
+intersection reads as total disagreement while the window agrees 76/84.
+
+**4. And it LOOKS right.** Snapshots at the SAME frame f3440: native and
+ours both show the large flame pillar, same shape, same white-blue base
+with orange top, same position. The earlier "native has a flame pillar,
+ours has a small yellow burst" was f3430 versus f3430 across a ~10-frame
+phase lag — ours reaches the same pose at f3440.
+
+**Where the false alarm came from.** 14z-69q's triage ("pieces draw pal
+05/06/08 out of BANK 0, the +0x18-unset class") was measured on replay
+83 — the 1P-vs-CPU rig where our leg has Felicia point-blank and the
+projectile never travels. It characterised sprites that were not the
+explosion. The original maintainer report (ping #7, the fuchsia class)
+predates the 14z-67 effect work and was most likely fixed there.
+
+**Status: the 214+P explosion is believed CORRECT and needs a playtest to
+close.** Residuals, both unexplained and neither necessarily a defect:
+the ~10-frame phase lag, and 8 ours-only / 12 native-only contents (part
+of which is sampling — the dump is every 2 frames). If the maintainer
+confirms, remove it from the effect-family worklist; the BEAM remains
+genuinely open and is a separate defect (never walks its anim nodes).
+
+**Method, promoted:** to identify what an effect draws, diff the OBJ list
+before vs during, then join the two legs by TILE CONTENT — never by tile
+index, and never per-frame across legs that can drift in phase.
 
 ## The beam / effect family — state after 14z-69j (three of four pieces
 ## are native-equivalent; EMISSION is the open one)

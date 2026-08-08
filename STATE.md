@@ -141,12 +141,34 @@ latent repair of the ratified x06cac0 class with NO observable effect.
 behaviourally by definition (nothing to prove), and the commit is
 isolated if you would rather not carry it.
 
-**Explosion root still OPEN.** Eliminated: tile presence (they ARE
-absent from our set — that stands), `effect_tail`, the `c5_mode` path,
-and x088512's pc-rel tables. Solid: the effect runs correctly and only
-the codes differ, by exactly +0xA220. NEXT: attribute that constant by
-instrumenting the code that COMPUTES the code word — not by reasoning
-from which region it lives in.
+**4. 14z-70e — THE EXPLOSION IS NOT BROKEN. Points 2-3 above are
+RETRACTED.** On the maintainer's proposal (diff the screen before vs
+during, then search BOTH games for that tile CONTENT):
+
+- native's 88 explosion tiles: **87 already present in our build** (84 in
+  group A, 3 in group B);
+- the mapping is a PERMUTATION — 0x0EC0E holds vs2 0x495F's art, not
+  0x49EE's — so **+0xA220 was a statistical artefact**: two dense
+  ~85-value clusters offset by ~0xA220 overlap ~half the time by
+  construction. It described nothing;
+- window content join: **76 of ours' 84 drawn contents are byte-identical
+  to native's**, 0 blank. Per-FRAME the intersection is 0 at every frame
+  only because the legs run ~2-4 frames out of phase;
+- and it LOOKS right: at the SAME frame f3440 both legs show the large
+  flame pillar, same shape and position. The "small yellow burst"
+  comparison was f3430 vs f3430 across a ~10-frame phase lag.
+
+14z-69q's triage was measured on the invalid replay-83 rig and
+characterised sprites that were not the explosion. **Needs a playtest to
+close.** Residuals: the phase lag and 8/12 unmatched contents (partly
+2-frame sampling).
+
+**METHOD PROMOTED:** identify what an effect draws by diffing the OBJ
+list before vs during, then join the legs by TILE CONTENT — never by
+index, never per-frame across legs that drift in phase.
+
+**The BEAM remains genuinely open** and is a separate defect (it never
+walks its anim nodes at all).
 
 ## Session 14z-69 CLOSE — ritual complete
 
