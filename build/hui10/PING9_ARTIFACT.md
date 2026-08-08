@@ -14,20 +14,22 @@ GEN_FLAGS="--profile cps2-wide-v1 --allow-plausible --tripwire-open" \
 to build/scratch or hui11+ so bug reports stay attributable to these
 exact zips — the ping-#7 lesson.
 
-## CORRECTION (post-cut, 14z-68i): DO NOT SPEND TIME ON THIS BUILD
+## CORRECTION (post-cut, 14z-68i) — the earlier correction was WRONG
 
-The maintainer's first look ("in the yellows but it's just the
-outline") led to a bigger finding: **the win-screen PORTRAIT and
-QUOTE are BULLETA's**, not Huitzil's — he sits on her variant row
-(0x10) and the win-screen record family still aliases rows
-0x10-0x1F onto 0x00-0x0F. The gold palette is being painted onto
-HER art, which is why the screen cannot be judged.
+I briefly wrote here that the win portrait was Bulleta's. **Retracted.**
+An A/B snapshot of the same replay on hui9 vs hui10 shows the SAME
+figure in both, differing only in colour (hui9 pink/lavender ->
+hui10 gold/tan). The records are already tenant-owned on this build
+(table 0x2672AA rows 0x10/0x70/0x90 all repointed into wide_ext).
 
-The palette fix itself is verified sound (palette RAM matches vs2's
-gold ramp on all five rows in the correct destination rows; the
-tiles are byte-identical to vs2's originals) — but you cannot see
-that until the portrait is his. Next build will carry the tenant
-win-screen records; test then.
+**So the palette fix DOES land, and your "it is in the yellows" was
+the fix working.**
+
+What still makes the pose hard to read: large WRONG-TILE PATCHES over
+the figure (blue-grey on hui9, magenta here — they recolour with the
+palette, so they are wrong art drawn through the correct palette).
+That is your original "garbled blocks" item, still open. The win
+QUOTE text also still renders a vanilla line; separate item.
 
 ## (original note) THE ONE THING TO CHECK: the win screen's PALETTE
 

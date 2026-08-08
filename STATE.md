@@ -477,48 +477,50 @@ STILL OPEN for the win screen: item 5b, the GARBLED BLUE-GREY BLOCKS
 on eye/thigh/foot — a separate ART defect (tiles the anim walk missed),
 untouched by this palette fix.
 
-### 14z-68i: MAINTAINER WAS RIGHT — the win PORTRAIT is the HOST's
-### (Bulleta's), so the palette cannot be judged from the screen
+### 14z-68i: RETRACTED AND CORRECTED — the portrait IS the tenant's;
+### the palette fix DOES land visibly; the residue is wrong ART blocks
+### (and the quote text)
 
-Maintainer on ping #9: "it is in the yellows but it's just the
-outline so whether the palette is correct is kind of difficult to
-say". Chasing that produced a bigger finding than the palette item.
+**I published a wrong diagnosis in this session and am retracting it.**
+On one headless snapshot of H's win screen I read the figure as
+Bulleta's and wrote up "the win portrait and quote are the HOST's,
+the records still alias rows 0x10-0x1F". That was wrong on both
+counts. Corrections, each measured:
 
-**The palette fix itself is SOUND — verified three independent ways:**
-(a) all 8 colour sets byte-identical to vs2's source at the correct
-strides; (b) the win-screen palette RAM at rows 0x15-0x19 matches
-vs2's gold ramp on ALL FIVE full rows (low-12 RGB exact), and the
-portrait sprites read pal 0x16/0x18 — inside that range; (c) the
-portrait's tiles are byte-identical to vs2's group-A originals
-(8 sampled: 0x1B9AA, 0x1B970, 0x1B98C, 0x1B9D0, 0x1B93E, 0x1854E,
-0x19FC3, 0x18ED7).
+1. **The records are NOT aliased — they are already tenant-owned.**
+   On the BUILT hui10 image, table 0x2672AA rows 0x10 (win portrait),
+   0x70 (quote P1) and 0x90 (quote P2) are all REPOINTED into
+   wide_ext (0x40B3F0 / 0x40B300 / 0x40B350); only the untouched
+   vanilla rows 0x00/0x60/0x80 still hold the stock values. The
+   existing `[[select_records]]` rows cover them — note the arrays
+   OVERLAP (vj_p1 0x26742A row 0x10 IS 0x2672AA row 0x70), which is
+   what made the two look like different tables.
+2. **The portrait is the same record on both builds.** A/B snapshots
+   of the SAME replay+poke on hui9 and hui10 show the SAME FIGURE
+   SHAPE, differing only in colour: hui9 pink/lavender, hui10
+   gold/tan. So the palette fix DOES land visibly — the maintainer's
+   "it is in the yellows" is the fix working.
+3. **What actually remains on that screen** is the ART defect they
+   originally reported: large wrong-tile PATCHES over the figure
+   (blue-grey on hui9, magenta on hui10 — they recolour with the
+   palette, so they are tiles drawn through the win palette with
+   wrong content). Those patches are what makes the pose read as
+   "just the outline". Plus the win QUOTE text still renders a
+   vanilla character's line despite its record being repointed —
+   a separate item worth its own measurement.
 
-**But the SCREEN is wrong for a different reason.** Headless snapshot
-of H's own win screen (replay 61 + the early-window id-0x10 poke;
-P1's +0x382 confirmed 0x10 at f3000 AND f5500) shows **Bulleta's win
-portrait and Bulleta's win quote** ("道に迷っちゃったの…"), with H's
-gold palette painted onto it. H occupies variant id 0x10 = BULLETA's
-row, and the win-screen portrait/quote records alias rows 0x10-0x1F
-onto 0x00-0x0F exactly like the select and HUD families did before
-they got tenant rows.
+For the record, vs2 DOES carry real distinct newcomer rows in its
+twin table 0x2A05E2 (row 0x10 = 0x2A7B06, 0x11 = 0x2A7F2C,
+0x13 = 0x2A7F68), and vsavj's rows 0x10-0x13 are plain aliases of
+0x00-0x03 — that part of the earlier note is accurate and still
+useful; it is the CONCLUSION about our build that was wrong, because
+our build already repoints them.
 
-So ping-#7 item 5 is really TWO items and neither is "a few stray
-tiles":
-- **5a palette — FIXED and verified** (shipped in hui10);
-- **5b the portrait and quote are the HOST's** — needs tenant rows
-  for the win-screen record family, the same mechanism as
-  `select_records` / the variant-id HUD rows. The "garbled blue-grey
-  blocks on eye/thigh/foot" the maintainer photographed earlier are
-  most likely Bulleta's art under H's gold palette, not missing
-  tiles — re-triage that item once the records are tenant-owned.
-
-LESSON (and my error): I asked the maintainer to verify a palette on
-a screen I had never actually LOOKED at — I had verified the palette
-in RAM and the tiles in ROM, both correct, and inferred the screen
-was therefore right. One headless snapshot of the actual win screen
-would have caught this before the ping went out. The render-layer
-GOTCHA from 14z-68 applies to SHIPPING a build for playtest too, not
-just to debugging.
+METHOD LESSON (twice in one session now): I inferred a whole
+mechanism from ONE rendered frame without an A/B against the previous
+build. The A/B was two commands and would have prevented both the
+bad ping note and the bad write-up. When a screen looks wrong, diff
+it against the last known build BEFORE theorising about mechanism.
 
 ### What SHIPS from 14z-68
 
