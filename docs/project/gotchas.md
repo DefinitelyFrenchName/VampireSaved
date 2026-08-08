@@ -1314,8 +1314,49 @@ Corollary for gating: `test_hui_pairs` (Reflect Wall + Dark Force)
 is the gate that catches this class — run it on any change that
 routes objects, not just the gates for the move you are fixing.
 
+## A ported region's pc-relative DATA POINTERS are copied VERBATIM —
+## if the table is outside the region, the pointer lands on garbage
+## (14z-69; this is the real root of the parked effect family)
+
+`lea (d16,pc),An` forms a data pointer. Nothing in the toolchain
+rewrites it: census 1 skipped it (its target is not inside a code
+region), census 2 only scans branch opcodes, and `extract_char.py`'s
+`pcrel_refs` sweep only collects `jsr/jmp (d16,PC)` and
+`jsr/jmp (d8,PC,Xn)`. `gen_donovan_patch.py`'s far-pcrel trampoline
+covers CODE targets only and even says so: *"a far pcrel DATA read
+would need its data copied near instead (no such case yet)"*. There
+was such a case; it just could not be seen.
+
+Because the displacement is copied verbatim, a relocated region
+resolves the pointer to `target + region_delta` — correct ONLY if those
+bytes travelled with the region. Measured on build/hui11, region
+`x06cac0` (vs2's row-8 machine): **7 of 7 pointers resolve into
+unrelated bytes**, e.g. `lea $6D868(pc),a3` -> `0x0D4C98`, where the
+image holds code (`74354cc1...`) instead of the fleet param stream
+(`0001005800000000...`). So the ported machine walks garbage — which is
+exactly the symptom the effect family has been parked on since 14z-68.
+
+**The proximate cause is a truncated region**: the root is declared
+`0x6cac0:0xebc` (ending 0x6D97C, which WOULD contain every table) but
+the extraction produced `len 0xc00`, ending 0x6D6C0 — a **0x2AC-byte
+shortfall** that leaves all four tables (0x6D768, 0x6D7E8, 0x6D868,
+0x6D91C/0x6D94C) outside. Find out why the declared length is not
+honoured before adding machinery: if the region simply CONTAINS its
+tables, the verbatim displacement is correct and no rewriting is
+needed. That is the same principle as "a ported region must contain the
+CONSTANTS its own code loads" (14z-68), generalised from literals to
+tables.
+
+Instruments (added 14z-69):
+- `census_regions.py` census 3 REPORTS every such pointer;
+- `tools/verify_pcrel_data.py` DECIDES, by resolving each one in a
+  built image and comparing the bytes against the source table.
+  Compare DATA views — inside the crypt range the two views differ
+  completely.
+
 ## The data_in_code detector misses the POST-INCREMENT reader shape;
-## and RAW placement does not fix an embedded data table (14z-68)
+## and RAW placement does not fix an embedded data table (14z-68;
+## post-increment detection ADDED 14z-69)
 
 Two related traps, paid together on vs2's row-8 machine:
 1. `tools/census_regions.py` matches data_in_code only as
@@ -1326,6 +1367,13 @@ Two related traps, paid together on vs2's row-8 machine:
    the same blind spot (its only supported reader is
    `lea (d16,pc),a1 + move.b (a1,d0.w),d0`). Add the shape to BOTH,
    with a frozen case in tests/test_census_regions.sh.
+   **DONE for the census (14z-69):** `scan_postinc_reader` walks
+   forward from the lea to the end of the region and stops only if An
+   is redefined, because the ground-truth reader sits 0x3E bytes away
+   inside a bsr subroutine — an "immediately after" rule can never see
+   it. Verified to catch vs2 0x6D206 -> 0x6D868. The GENERATOR side is
+   still open, but see the entry above: for this case the fix is to
+   make the region contain its tables, not to rewrite readers.
 2. Moving the region to RAW space does NOT solve an embedded data
    table. Raw storage holds ONE byte image, and for a code region
    that image is the OPCODE view (so it executes) — so runtime DATA
