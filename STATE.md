@@ -13,6 +13,35 @@ replay 85, tests/test_hui_df_style.sh + tools/check_df_style.py with
 three verdict controls, and a corrected test_hui_pairs.sh which had been
 asserting the downgrade path under the name "Dark Force".)
 
+## Session 14z-69p/q — DF PALETTE FIXED (PING #12, build/hui14 =
+## c25b3824, playtest-confirmed) and the 214 explosion TRIAGED
+
+**DF palette: FIXED and confirmed by the maintainer** ("palette is
+clean, DF looks good as is"). One [[data_port]] row swaps palette-seq
+rows 0x1E-0x21 for the sequence native's DF actually shows (vs2
+0x3ABEDC, vh2 twin 0x38BEB0). The afterimages stay by design.
+
+TWO ATTEMPTS, and the first is the lesson: copying vs2's rows at the
+SAME ids is wrong — vs2 never runs that DF path for him, so those slots
+hold something else, and the build came out tan/blue. The right source
+was found from the other end: native's in-DF palette row ends in 0x0003,
+a seq row's SELF-INDEX, so search vs2 for that exact content and take
+the four-row sequence it belongs to.
+
+Safety: legacy never requests those ids — audited uncapped over 8
+replays / 10,504 calls (only 0x26, 0x27), committed as
+tests/audit_palette_seq_ids.sh. That audit is the ONLY guard possible,
+since the palette path never transits work RAM. GUARD_PROBE_MAX was
+added to replay_guard.lua because the default 400-hit cap had silently
+truncated the first audit and hidden id 0x27.
+
+**214+P grenade explosion: TRIAGED, belongs to the effect family.** Not
+a tile-inventory defect — zero empty-tile draws across the 214MP window
+of replay 83. The pieces draw pal 05/06/08 from BANK 0 (stock art) at
+onset f3395/f3430: the "path that leaves +0x18 unset" class, same root
+as the beam. Parked with the rig recorded in engine_internals.
+
+
 ## Session 14z-69o — THE CHILD SIDEKICK'S SHADOW FIXED, and PING #11
 ## PLAYTEST CONFIRMED (build/hui13, 31d576be)
 

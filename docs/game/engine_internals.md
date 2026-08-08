@@ -1376,6 +1376,27 @@ replay 82 that returned exactly these two and nothing else, so the
 inventory hole was provably this size. Re-run it for any new tenant —
 it is a complete check, not a sample.
 
+## The 214+P grenade explosion — TRIAGED 14z-69q (effect family, NOT
+## a tile-inventory defect)
+
+Maintainer flagged the explosion's tiles as an open correction. It is
+NOT the shadow class: scanning every group-C sprite the build draws
+across the 214MP window of replay 83 (f3390-3555) returns **zero**
+empty-tile draws, so nothing is missing from the copy inventory.
+
+What it IS: at explosion onset (**f3395** and **f3430** in replay 83)
+the pieces draw with **pal 05 / 06 / 08 out of BANK 0 — stock group A/B
+art**, while everything of his around them comes from group C bank 4/5.
+That is the documented "pieces created through a path that leaves
+`+0x18` unset" class (14z-67), the same root as the beam/lightning
+work. It belongs to the effect-family arc and cannot be fixed from the
+gfx side.
+
+Rig for whoever picks it up: `tests/replays/hui/83_hui_fx.rpl` does a
+clean 236LP then a 214MP at f3380 (arcing projectile -> ground
+explosion). Dump OBJ over f3390-3560 and compare bank words against a
+native leg — the poke flow reaches him on vsav2 unchanged.
+
 ## The beam / effect family — state after 14z-69j (three of four pieces
 ## are native-equivalent; EMISSION is the open one)
 
