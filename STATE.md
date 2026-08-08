@@ -477,6 +477,49 @@ STILL OPEN for the win screen: item 5b, the GARBLED BLUE-GREY BLOCKS
 on eye/thigh/foot — a separate ART defect (tiles the anim walk missed),
 untouched by this palette fix.
 
+### 14z-68i: MAINTAINER WAS RIGHT — the win PORTRAIT is the HOST's
+### (Bulleta's), so the palette cannot be judged from the screen
+
+Maintainer on ping #9: "it is in the yellows but it's just the
+outline so whether the palette is correct is kind of difficult to
+say". Chasing that produced a bigger finding than the palette item.
+
+**The palette fix itself is SOUND — verified three independent ways:**
+(a) all 8 colour sets byte-identical to vs2's source at the correct
+strides; (b) the win-screen palette RAM at rows 0x15-0x19 matches
+vs2's gold ramp on ALL FIVE full rows (low-12 RGB exact), and the
+portrait sprites read pal 0x16/0x18 — inside that range; (c) the
+portrait's tiles are byte-identical to vs2's group-A originals
+(8 sampled: 0x1B9AA, 0x1B970, 0x1B98C, 0x1B9D0, 0x1B93E, 0x1854E,
+0x19FC3, 0x18ED7).
+
+**But the SCREEN is wrong for a different reason.** Headless snapshot
+of H's own win screen (replay 61 + the early-window id-0x10 poke;
+P1's +0x382 confirmed 0x10 at f3000 AND f5500) shows **Bulleta's win
+portrait and Bulleta's win quote** ("道に迷っちゃったの…"), with H's
+gold palette painted onto it. H occupies variant id 0x10 = BULLETA's
+row, and the win-screen portrait/quote records alias rows 0x10-0x1F
+onto 0x00-0x0F exactly like the select and HUD families did before
+they got tenant rows.
+
+So ping-#7 item 5 is really TWO items and neither is "a few stray
+tiles":
+- **5a palette — FIXED and verified** (shipped in hui10);
+- **5b the portrait and quote are the HOST's** — needs tenant rows
+  for the win-screen record family, the same mechanism as
+  `select_records` / the variant-id HUD rows. The "garbled blue-grey
+  blocks on eye/thigh/foot" the maintainer photographed earlier are
+  most likely Bulleta's art under H's gold palette, not missing
+  tiles — re-triage that item once the records are tenant-owned.
+
+LESSON (and my error): I asked the maintainer to verify a palette on
+a screen I had never actually LOOKED at — I had verified the palette
+in RAM and the tiles in ROM, both correct, and inferred the screen
+was therefore right. One headless snapshot of the actual win screen
+would have caught this before the ping went out. The render-layer
+GOTCHA from 14z-68 applies to SHIPPING a build for playtest too, not
+just to debugging.
+
 ### What SHIPS from 14z-68
 
 One functional change ships: the **region-boundary fix** above

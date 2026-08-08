@@ -14,7 +14,22 @@ GEN_FLAGS="--profile cps2-wide-v1 --allow-plausible --tripwire-open" \
 to build/scratch or hui11+ so bug reports stay attributable to these
 exact zips — the ping-#7 lesson.
 
-## THE ONE THING TO CHECK: the win screen's PALETTE
+## CORRECTION (post-cut, 14z-68i): DO NOT SPEND TIME ON THIS BUILD
+
+The maintainer's first look ("in the yellows but it's just the
+outline") led to a bigger finding: **the win-screen PORTRAIT and
+QUOTE are BULLETA's**, not Huitzil's — he sits on her variant row
+(0x10) and the win-screen record family still aliases rows
+0x10-0x1F onto 0x00-0x0F. The gold palette is being painted onto
+HER art, which is why the screen cannot be judged.
+
+The palette fix itself is verified sound (palette RAM matches vs2's
+gold ramp on all five rows in the correct destination rows; the
+tiles are byte-identical to vs2's originals) — but you cannot see
+that until the portrait is his. Next build will carry the tenant
+win-screen records; test then.
+
+## (original note) THE ONE THING TO CHECK: the win screen's PALETTE
 
 Win a match as Huitzil and look at the victory portrait.
 
