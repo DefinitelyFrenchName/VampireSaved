@@ -1,17 +1,15 @@
 # STATE — living progress log
 
-Updated: 2026-08-08 (session 14z-68 — the effect-flow arc, worked
-deep and then PARKED BY MAINTAINER DIRECTION in favour of the
-shadow + win-palette quick wins. The 14z-67 entry theory is REFUTED;
-the fighter side is exonerated twice over; the beam object turned out
-to be SPAWNED, not missing; the union-type mechanism is BUILT and
-MEASURED WORKING (dispatch/records/art all native-equivalent) but
-parked behind a TOOLING gap — a post-increment-read embedded data
-table that neither the census nor the data_in_code relocator can
-see. FOUR real defects shipped along the way. THE BEAM STILL DOES
-NOT DRAW. Parked-state build ede6bf15 is all-green; read the 14z-68
-sections below before touching anything effect-related, then
-docs/NEXT_SESSION for the quick-win worklist.)
+Updated: 2026-08-08 (session 14z-68 CLOSED — THE PHOBOS WIN SCREEN
+FIXED AND MAINTAINER-CONFIRMED (palette + position; PING #10 =
+build/hui11 = 5c6dbe43), the effect arc PARKED behind a named tooling
+gap, and the SYNTHESIS GAP CLOSED (engine_internals 810 -> 1076 lines,
+8 new subsystem sections written the same session the gap was found).
+Four defects shipped and gate-locked; five wrong conclusions of mine
+RETRACTED in-session, each with the mechanism written down so it
+cannot be re-followed. Every gate green at close, including a stale
+census caught BY the closing sweep and re-frozen with justification.
+Read docs/NEXT_SESSION first, then the 14z-68 sections below.)
 
 ## Session 14z-68 (the effect-flow closure — root cause found)
 

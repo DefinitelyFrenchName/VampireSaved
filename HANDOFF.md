@@ -507,6 +507,14 @@ tests/test_romset_identity.sh         # ground truth for tools/audit_romset_iden
                                       # entry by hash before name, so such a member
                                       # silently reverts the patch — 14z-60z). 4 synthetic
                                       # sets, no emulator, ~1s
+tests/test_hui_winscreen.sh    [bd]   # the WIN-SCREEN gate (14z-68m): palette
+                                      # SOURCE (the OPCODE-view remap table, proved
+                                      # by Donovan's frozen row), the SELF-LABELLING
+                                      # marker (last word of each palette row = 5*row
+                                      # — the check that would have caught shipping
+                                      # Donovan's palette), all 8 colour sets, and the
+                                      # portrait POSITION row. Static, seconds.
+                                      # Negative control: FAILS on build/hui10
 tests/test_hui_fx_flow.sh      [bd]   # the effect-flow attribution gate (14z-68):
                                       # leg 1 fighter-side flow identity (H's ray runs
                                       # HIS per-char handlers; the REFUTED 0x56D68 entry

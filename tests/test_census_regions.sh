@@ -64,6 +64,13 @@ print("  ok: data_in_code = exactly the 5 known covered sites")
 
 e = c["escapes"]
 EXPECT = {  # region: (count, n_unique, covered)
+    # x022400 = the 14z-67 effect-object zone clone. It entered the
+    # roots after this inventory was first frozen, so the gate went
+    # STALE-RED and was caught by the 14z-68 end-of-session sweep, not
+    # by a run at the time. Its escapes are COVERED (huitzil.toml
+    # carries a pcrel_escape_fix row for it), so adding it is a
+    # legitimate re-freeze, not a loosening.
+    "x022400": (118, 11, True),
     "x02592a": (89, 35, True),
     "x026142": (9, 6, True),
     "code":    (20, 4, False),
