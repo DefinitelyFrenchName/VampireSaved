@@ -2322,3 +2322,18 @@ portrait tiles matched vs2 exactly while the screen was still wrong,
 because the comparison target itself was the wrong character's row.
 Prefer a check that is self-labelling (the 5*row palette marker) over
 a check that only proves internal consistency.
+
+## Sampling a STATE-gated effect at the wrong moment reads as "not
+## reproduced" (14z-68u)
+
+The Dark Force afterimage/recolour was written up as "not reproduced
+on the current build" after measuring sprite counts and palette RAM
+across replay 82 at f3050-3250 — with DF verifiably ACTIVE (seq 0x0A
+confirmed). The effect is gated on the character MOVING, and that
+replay's walk is at f3300-3400. Every measurement was correct and the
+conclusion was wrong.
+Two habits: (1) when a symptom is reported for a MODE, enumerate what
+the mode gates on — active vs moving vs attacking — and sample each,
+not just "during the mode"; (2) a maintainer's repro steps ("move
+around, especially when air dashing") encode exactly that gating and
+are worth asking for BEFORE measuring, not after a negative result.
