@@ -589,6 +589,31 @@ frame misled me and a reference/A-B settled it. The maintainer's
 capture cost them one screenshot and closed an item I had been
 theorising about for hours. ASK FOR THE REFERENCE EARLIER.
 
+### 14z-68n: STANDING TASK — expand engine_internals.md (maintainer
+### request; the synthesis is thin and STATE is not a lookup surface)
+
+Maintainer: "engine_internals.md is rather barebones compared to all
+the analysis work you've done ... it could be expanded for little cost
+when we have time, which avoids either of us combing through
+state.md." AUDITED AND CONFIRMED at 14z-68m: engine_internals is 810
+lines against STATE's 8417, and several load-bearing subsystems have
+ZERO mentions there — object type dispatch / the pool walker, pool
+seeding + init_shim, update-queue classes, Dark Force, and the
+throw/physics-arc tables among them.
+
+The backlog now lives AT THE TOP OF engine_internals.md itself (a
+table of missing subsystems, where the analysis currently lives, and
+why each will bite), so the gap is visible to whoever opens the file.
+POLICY recorded there: write a subsystem's section as PART OF the work
+that touches it — cheap while the session is fresh, and it is the
+difference between "documented" and "findable".
+
+This is not a make-work item: the 14z-68 win-screen re-derivation cost
+a shipped-wrong palette and a maintainer round-trip precisely because
+the prior analysis was only in a session log. Pyron's port will hit
+init_shim, type dispatch, throw arcs and DF — all currently
+undocumented in the synthesis.
+
 ### What SHIPS from 14z-68
 
 One functional change ships: the **region-boundary fix** above

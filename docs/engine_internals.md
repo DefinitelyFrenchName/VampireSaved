@@ -6,6 +6,38 @@ subsystems (object system, anim, sound farm, dispatch banks) are still
 scattered across docs/atlas/character_tables.md, docs/tables/
 reconciliation.md and patch_notes — fold them in as they get touched.
 
+## NOT YET SYNTHESISED — the standing backlog (audited 14z-68m)
+
+**This document is thin relative to the analysis that exists.** Measured
+at 14z-68m: engine_internals 810 lines vs STATE.md 8417 lines. Most
+subsystem knowledge still lives only in session logs, which is where
+the 14z-68 win-screen re-derivation came from (Donovan's solution was
+in STATE since 14z-45; nobody could find it from the task).
+
+**Policy:** when you work on any subsystem below, write its section as
+part of that work — the marginal cost is small while the analysis is
+fresh in the session, and it is the difference between "documented"
+and "findable". Delete the line when the section exists.
+
+Audited absent (grep count in this file vs STATE.md):
+
+| Subsystem | Where the analysis currently lives | Why it will bite |
+|---|---|---|
+| Object TYPE dispatch + the pool walker (`0x5E540`, type table `0x5E556`, obj_hook union tables, walker reads type from +0x02, index type*4) | STATE 14z-65 / 14z-68d | every tenant's companions and effects route through it; 0 mentions here |
+| Pool seeding + `init_shim` (vsavj never seeds secondary pools in a normal match; vs2 always does — the watchdog-reboot class) | STATE 14z-65 | the FIRST thing a new tenant's ecosystem trips; 0 mentions |
+| Update-queue classes (vs2 class 7 vs vsavj's 0-6; the companion remap) | STATE 14z-65 | silent round-2 crashes; 0 mentions |
+| Dark Force system + per-char DF style selection | STATE 14z-67 (open item) | an open ping item with no written mechanism |
+| Throw / physics-arc tables (installer vj `0x28386` / vs2 `0x275E4`, 16-byte rows via `map1[2*subidx+d0]`, fighter +0x40/44/48/4C) | STATE 14z-67 | solved once for H; Pyron will need it verbatim |
+| Shadow / reflection servants (class-0x0C, tables `0x2083BC`/`0x2087CA`, installer `0x823E2`, the seq clamp) | STATE 14z-66 + manifest comments | an open item whose documented premise was WRONG (14z-68f) |
+| Companion/pod object family (secondary types 0x73-0x77, the x088512 zone, satellite handlers 64-75) | STATE 14z-65 / 14z-67 | shared by every newcomer |
+| Allocator wrappers + slot recycling (`0x15702`/`0x1572E`, the 0x80-clear) | STATE 14z-65 | stale-byte bugs across rounds |
+
+Adjacent docs that ARE current and should be linked rather than
+duplicated: `docs/cps2_wide.md` (the WIDE profile), `docs/atlas/`
+(ROM/RAM maps, id space, select screen), `docs/patch_index.md`
+(mechanism inventory).
+
+
 ## GFX ROM (sprite/tile) subsystem
 
 - 8 gfx simms per game (x.13m-x.20m, 4MB each) = 32MB = 0x40000
