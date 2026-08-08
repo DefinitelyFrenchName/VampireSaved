@@ -878,7 +878,7 @@ pad = 0x180
 
 [[pcrel_escape_fix]]
 stage = 4
-region = "x06d240"
+region = "x06d1e0"
 pad = 0x60
 
 # ── 14z-67 SEQ-D PER-CHAR DISPATCH — **REFUTED 14z-68, PARKED

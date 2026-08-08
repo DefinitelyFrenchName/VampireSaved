@@ -117,7 +117,7 @@ case "$TENANT_CHAR" in
         # clone convention), spawners +0x174 (measured, 61-64/64
         # agreement 0x6D240-0x6D73F). Entered via the owner-gated
         # effect_machine site_thunk (huitzil.toml).
-        DEFAULT_ROOTS="$DEFAULT_ROOTS,0x22400:0x1600:t0x2242e,0x6d240:0x500:t0x6d3b4"
+        DEFAULT_ROOTS="$DEFAULT_ROOTS,0x22400:0x1600:t0x2242e,0x6d1e0:0x560:t0x6d354"
         ;;
     0x11)
         # Pyron census (14z-67, moveset arc open). Measured from his

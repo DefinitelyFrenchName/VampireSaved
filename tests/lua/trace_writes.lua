@@ -88,9 +88,27 @@ else
     debugger:command(string.format("wpset %s,%s,%s", start_addr, len, mode))
 end
 
+-- POKES (14z-68): same grammar/application point as replay.lua, so the
+-- forced-pick rigs can be traced.
+local poke_space = cpu.spaces["program"]
+local pokes = {}
+for spec in (os.getenv("POKES") or ""):gmatch("[^;]+") do
+    local fr, addr, hexs = spec:match("^(%d+):(%x+):(%x+)$")
+    if fr then pokes[#pokes + 1] = { tonumber(fr), tonumber(addr, 16), hexs } end
+end
+
 local pressed = {}
 emu.register_frame_done(function()
     frame = frame + 1
+    for _, pk in ipairs(pokes) do
+        if pk[1] == frame then
+            local a = pk[2]
+            for b in pk[3]:gmatch("%x%x") do
+                poke_space:write_u8(a, tonumber(b, 16))
+                a = a + 1
+            end
+        end
+    end
     if FIELDS then
         local want = {}
         for _, fldo in ipairs(held[frame + 1] or {}) do want[fldo] = true end

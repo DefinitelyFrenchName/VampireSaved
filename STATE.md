@@ -145,13 +145,75 @@ of it.
   so the class move may not be needed after all — measure the real
   entry before asking.
 
-### What SHIPS from 14z-68 (the manifest is functionally unchanged)
+### CORRECTION (same session, later): "the pieces are never created"
+### was WRONG — the object IS spawned; it runs the VANILLA machine.
+### One region-boundary BUG found and FIXED (ships)
 
-`build/manifest/huitzil.toml` is **functionally identical to HEAD**
-(verified: diff of all non-comment lines is empty; rebuild
-fingerprint df578358 = the 14z-67 round-final shape). Everything
-authored this session is documentation, measurement rigs, and one
-new gate:
+Pushing past the OBJ-count finding produced a materially different
+diagnosis. Correcting the record above:
+
+1. **The beam object IS created on our build.** Native's beam is a
+   single object at $FFBA00 spawned by vs2 0x6D32A, **owner = the
+   VICTIM** ($FF8800 — P2, a vanilla character), chained into the
+   companion records at 0x2B8530 (= 0x2B7EF4 + 0x63C). Ours spawns
+   its twin at $FFB880 via the VANILLA vj 0x60EE6, same owner
+   0x8800, same header 0x0100/0x0802 — but chains to the VANILLA
+   record base (0x283690 + 0x62C = 0x283CBC). The spawn was never
+   missing; the RECORDS and the TICK MACHINE are wrong.
+2. **The machinery is proven correct by the neighbour**: the
+   persistent companion object (native $FFB880 / ours $FFB980)
+   carries the SAME relative record offset (+0x222C) with the bank
+   correctly remapped 0x6000 -> 0x1000. So placement/relocation
+   works; only the beam object takes the vanilla path.
+3. Gating cannot key on owner char id — the beam object is owned by
+   the VICTIM, not by Huitzil.
+4. The fighter side is fully exonerated a second way: at matching
+   phase our fighter's anim record is the correct placed twin,
+   **byte-identical modulo correctly relocated pointers**
+   (native 0x25B746 -> ours 0x000EDE64, exactly the anim delta),
+   and its cursor is one 0x18 node from native's — a pure frame
+   offset. Both emit 3 body sprites; the 14 beam entries come from
+   the separate object above.
+5. **REGION-BOUNDARY BUG (found, fixed, SHIPPED):** the ported
+   spawner region started at 0x6D240, but the routine's own record
+   base load `movea.l #$2B7EF4,a2` lives at **0x6D200** — 0x40 bytes
+   BELOW the boundary, so the region could never relocate its own
+   base. Root extended to `0x6d1e0:0x560:t0x6d354` (vh2 twin delta
+   +0x174 re-verified at the new start); the base literal now
+   relocates to the placed 0x400010 (static proof: exactly one
+   occurrence, at 0x6D202). Region renamed x06d240 -> x06d1e0
+   (huitzil.toml pcrel_escape_fix row follows). Gates green
+   (boot masked-v2 EXACT, ex/grab/air/fx_flow) and the 2P legacy
+   replay is BIT-IDENTICAL to hui9.
+
+**THE REMAINING BLOCKER, precisely:** the beam object is **type
+0x08 — a SHARED type**. The pool walker's per-type table (already
+obj_hook'd at site 0x5E542, vanilla 114 entries / vs2 src 0x6A51C
+124 entries) therefore dispatches it to the VANILLA tick machine.
+vs2 rewrote its own row-8 machine; vsavj's is the plain one. So the
+fix is the established **union pattern one level down**: give
+tenant-spawned instances a NEW type (>= 114) and add a union row
+pointing at the ported machine. Two things must land with it:
+- the tick machine itself is still UNPORTED — measured native PCs
+  0x6CADC/0x6CAE2/0x6CAE8/0x6CAEE/0x6CAF4/0x6CB5A/0x6CB86/0x6CB8E/
+  0x6CB96 sit BELOW the new 0x6D1E0 boundary (only 0x6D1E6 and the
+  creator 0x6D32A are in region now). Extend the root down to
+  ~0x6CAC0 — note 0x6CA00 does NOT pattern-twin at +0x174, so find
+  the real boundary first (0x6D1E0 does twin cleanly);
+- the type write at creation must be gated to tenant-spawned
+  instances only (the owner is the victim, so the discriminator has
+  to come from the spawning call path, not the object's owner).
+
+### What SHIPS from 14z-68
+
+One functional change ships: the **region-boundary fix** above
+(`tools/build_donovan.sh` root `0x6d1e0:0x560:t0x6d354` +
+the huitzil.toml region rename). It is a boundary correction with
+static proof, not a speculative mechanism, and it is the
+prerequisite for the union-type work. Build cf519de8; gates green;
+2P legacy bit-identical to hui9. Both candidate THUNKS stay parked.
+Everything else authored this session is documentation, measurement
+rigs, and one new gate:
 - NEW replay `tests/replays/hui/83b_hui_ray_2p.rpl` (2P-dummy,
   three spaced 236LP — cross-emulator reproducible, tappable).
 - NEW gate `tests/test_hui_fx_flow.sh`: two legs (fighter-side flow

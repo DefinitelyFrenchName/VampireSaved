@@ -2221,3 +2221,23 @@ watching say nothing about the objects that were never spawned.
 POKES-capable since 14z-68) answer "is it actually on screen?"
 in a single run — reach for them BEFORE the third RAM-layer
 iteration, not after.
+
+## A ported region must contain the CONSTANTS its own code loads —
+## check the boundary against the routine's literals (14z-68)
+
+The vs2 companion-spawner region was rooted at 0x6D240, and the
+routine's own record base load `movea.l #$2B7EF4,a2` sits at
+**0x6D200** — 0x40 bytes below the boundary. The region therefore
+placed and relocated cleanly, passed every gate, and could never
+relocate the base its code depends on; the ported code ran against
+a base literal that was still outside it. Symptom: ported content
+silently chained to VANILLA records and drew vanilla (or no) art,
+with nothing red anywhere. When rooting a region, disassemble
+BACKWARD from the first instruction and check for `movea.l #imm` /
+`lea` literals belonging to the same routine that fall below the
+start; a boundary that splits a routine from its own constants is
+invisible to every existing gate. Extending the root to 0x6D1E0
+(twin delta +0x174 re-verified at the NEW start — do not assume the
+delta carries) made the base relocate to the placed copy, with
+static proof: exactly one occurrence of the placed base in the
+region blob.
