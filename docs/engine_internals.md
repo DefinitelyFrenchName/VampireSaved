@@ -1111,11 +1111,30 @@ Those channels run SCRIPTS through a small state machine:
   program-byte dispatch at `0x029F4A`
   (`move.b (a4),d0; move.w (pc,d0.w),d1; jmp`).
 
-**Where the trail stops:** which channel PROGRAM gets installed at DF
-activation, and whether that selection is per-character. That is the
-gate to find; the fix is then to give the tenant row the null program.
-Native applies NEITHER the trailing copies NOR the recolour to
-Huitzil (maintainer capture).
+**Where the trail stops (14z-68w), and the cheapest way past it:**
+- The channels do NOT populate at DF activation. Tapping
+  `+0x318..+0x340` across the activation window shows the only write
+  is `+0x396` = 0x1100 (the button register, pc `0x014E58`); the first
+  non-zero channel write is at **f3150**, coinciding with the next
+  MOVE input, not with DF. So the channels are move-driven and are
+  probably not themselves the style selector.
+- Ruled out as the cause: the seq-0x0A (DF) handler is per-char
+  dispatched like every other seq head, and on a tenant build its
+  table row 0x10 IS already repointed to H's own placed handler
+  (consistent with "DF mechanics are native-correct"). The style is
+  therefore applied by something OUTSIDE his handler.
+- Native applies NEITHER the trailing copies NOR the recolour to
+  Huitzil, so the discriminator is per-character somewhere in the
+  shared path.
+
+**RECOMMENDED NEXT STEP — do not brute-force this:** get a NATIVE vs2
+SAVESTATE with Huitzil in Dark Force while moving (the maintainer
+offered savestates and the repro is three steps: 1 stock, HP+HK,
+move/air-dash). Diffing the fighter block and palette state
+native-vs-ours at the same phase collapses this hunt to one
+comparison — the same way a maintainer capture closed the win-screen
+item after hours of derivation. Chasing it from our side alone means
+guessing which of several shared systems applies the style.
 
 Open observations queued from the same replay, unattributed: ~15px X
 drift over the DF walk (speed modifier vs recoil) and a pod anim phase
