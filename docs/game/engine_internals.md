@@ -1623,6 +1623,36 @@ repair with no observable effect — worth keeping for the same reason the
 x06cac0 one was, but it buys no visible change and should not be
 described as fixing anything a player can see.
 
+### THE ANCHOR METHOD — how to attribute any "this effect does not draw"
+### (14z-70, maintainer-endorsed; use this FIRST)
+
+Do not start from object layout, pool slots, or which region the machine
+lives in. Start from the **data the effect is forced to read**, and let
+the registers hand you the object:
+
+1. Find the effect's **sprite list** in the reference set (the art is
+   usually already located, or a before/during OBJ diff names the tiles).
+2. Put a READ watchpoint on it on the NATIVE leg. The hit gives you the
+   emitter PC and, in the address registers, the object drawing it
+   (`A6`), its owner (`A4`), and the OBJ RAM target (`A2`).
+3. Put the same watchpoint on the PORTED twin address on our leg.
+4. Walk one link back at a time — sprite list -> anim node -> the object
+   field that holds it -> whoever writes that field -> whoever creates
+   the object — measuring each link on BOTH legs.
+
+Why it beats reasoning about layout: **it is self-correcting**. If the
+anchor is never read on our leg, that IS the finding, and it is
+unambiguous — no assumption about which slot or which pool was involved
+can contaminate it. It found the explosion's emitter (`PC:0x01B2BC`,
+object `$FFB980`) and the beam's (`PC:0x019E0E`, object `$FFD400`) in one
+run each, after two sessions of layout reasoning produced only retracted
+claims.
+
+Two rules that go with it: cross-leg register/PC comparisons are only
+valid where a KNOWN mapping exists (region delta, or the R1 map — raw PCs
+do not transfer), and before attributing a symptom to any code, put an
+execution breakpoint on that code and confirm it runs.
+
 ### 14z-70e: THE EXPLOSION IS NOT BROKEN. Everything above about "wrong
 ### art" is RETRACTED — it was an index-join error and a phase offset
 
