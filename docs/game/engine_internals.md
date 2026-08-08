@@ -1334,6 +1334,58 @@ Open observations queued from the same replay, unattributed: ~15px X
 drift over the DF walk (speed modifier vs recoil) and a pod anim phase
 difference at the f3250 sample.
 
+## The beam / effect family — state after 14z-69j (three of four pieces
+## are native-equivalent; EMISSION is the open one)
+
+Where the arc stands, measured on replay 83b against native vsav2.
+
+**Native's beam, so you can recognise it:** pal-0x0C sprites in H's own
+band at `a19=3xxxx` — codes 0x1DF4/0x1DB4 at the muzzle (f3164-3172),
+then 0x1E2F/0x1E42/0x1E52/0x1E5F marching x=0x95..0xEF (f3178-3208) —
+plus the long stretch segments `code=4EC0` at `a19=14ec0`, sz 4x1/6x1/
+16x1, at y=0x2074. The window is **f3164-f3208** with a ~12-frame
+cadence, 3-13 pieces per hit frame. Sample THERE; outside it native
+draws none either (a blind sample reads as "native has no beam").
+
+**What is now native-equivalent** (scratch build with `tenant_type_stamp`
++ `obj_hook_extra` + `piece_prebake` un-parked, on top of the shipped
+table fix):
+- the object is CREATED — our stamp writes type `0x7C02` at f3179 where
+  native writes `0x0802` at f3177 (tap on the pool's type word);
+- it is routed to the PORTED machine (type >= 114 by construction);
+- the machine's seven pc-relative param tables now read byte-identical
+  to vs2 (14z-69j raw-emit);
+- its record pointer is the PLACED twin at **native's own relative
+  offset**: ours `0x40064C` = placed base `0x400010` + 0x63C, native
+  `0x2B8530` = `0x2B7EF4` + 0x63C;
+- owner (`+0x30` = 0x8800, the victim) and bank word (`+0x18`) match;
+- **the whole object is 118/128 bytes identical to native's.**
+- the fleet pieces are created too: `type<-080C` fifteen times on both
+  (native pc 0x6D218 / ours its placed twin 0x0D4648).
+
+**And it still emits ZERO sprites.** So the residual is neither
+dispatch, records, art, tables, nor object creation — it is EMISSION.
+Two concrete leads, in order:
+1. **Find which object emits native's pal-0x0C sprites.** It has been
+   assumed to be this beam object; that is not measured. The fleet
+   pieces appear at f3216+, AFTER the beam window, so they are not it.
+   A per-object attribution (poke a slot dead, re-dump) settles it in
+   one run.
+2. **`+0x44` differs in sign**: native `ffff8000`, ours `0000a000`
+   (Y velocity, the field the mover integrates into `+0x14`). The rest
+   of the object matches, so this one is worth chasing — a piece that
+   travels the wrong way may run its emission off-screen or terminate
+   early.
+
+Regression state of that scratch build: pairs, ex, grab, air all PASS —
+**including the Dark Force crash that parked `tenant_type_stamp` in
+14z-68d, which is GONE** (it was a vec3 from an index underflowing the
+placed region, consistent with the machine having walked the garbage
+param streams the table fix repaired).
+
+The three thunks stay PARKED in the tree: they buy no visible change
+until emission is solved, and nobody has playtested them.
+
 ## The companion / pod object family (14z-65, generalised 14z-67 on Pyron)
 
 The newcomers' satellites (Donovan's Anita, Huitzil's pods, Pyron's
