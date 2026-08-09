@@ -596,6 +596,60 @@ old_hex = "0c0600126606"
 thunk_hex = "0c0600tt661c3d7c30000018207cpppppppp0c40000963027009588f4ef90005f1623d7c200000180c06001266024e75588f4ef90005f152"
 data_subst = "pppppppp=0x3C28FC:0x140:wide_ext"
 
+# ── WIN SCREEN (14z-74) — maintainer A/B against vs2: ours sits SHIFTED
+# LEFT (as Phobos' and Donovan's did before their fixes) and the palette is
+# partly wrong ("too much blue").
+#
+# POSITION. The per-winner table vsavj 0x5F200 (x.w,y.w per winner id) holds
+# a plain ALIAS at row 0x11 — (0x0080,0x0098), the same alias H had at row
+# 0x10. vs2's twin table is 0x6B210, found by anchoring on H's known-good
+# values and confirmed two ways: its row 0x0F equals vsavj's shared legacy
+# row (0x0070,0x0080), and its row 0x10 is exactly (0x00C0,0x0080) = the
+# values H's frozen win_pos rows already write. Pyron's row 0x11 there is
+# (0x00C0,0x0094) — so he is 64px left and 4px low, which is the reported
+# shift. Same slot-following code_word shape as H's and Donovan's.
+[[code_word]]
+stage = 6
+name = "win_pos_x_slot"
+slot_table = 0x05F200
+slot_stride = 4
+slot_off = 0
+slot_mirror = true
+old_hex = "0080"
+new_hex = "00c0"
+
+[[code_word]]
+stage = 6
+name = "win_pos_y_slot"
+slot_table = 0x05F200
+slot_stride = 4
+slot_off = 2
+slot_mirror = true
+old_hex = "0098"
+new_hex = "0094"
+
+# PALETTE. The winner's colour set is chosen by remapping the char id
+# through the byte table at vs2 0x6B2F2 read in the OPCODE view (the 14z-68m
+# lesson — reading it in the DATA view gives the wrong row and ships another
+# character's colours). Pyron: id 0x11 -> row 0x10 -> 0x3C2BBC + 0x10*0xA0 =
+# 0x3C35BC. Self-checked by the marker H's port established: each palette
+# row's last word is 5*row (+4 across the 8 colour sets) — Pyron reads
+# 0x0054 for 5*0x10 = 0x50..0x54, and the same rule re-derives H's frozen
+# 0x3C329C (0x37..0x3B), so the row indexing is anchored on a known-good
+# reference and not inferred from Pyron alone.
+[[win_pal_variant]]
+stage = 6
+name = "pyr_win_pal"
+site = 0x5F1B6
+site_old = "207c003ad700"
+pool_base = 0x3AD700
+pool_color_stride = 0xAA0
+unit = 0xA0
+colors = 8
+vs2_src = 0x3C35BC
+vs2_color_stride = 0xB40
+hole = "wide_ext"
+
 # ── The 21-cell wheel: tenant-independent, verbatim from H's row.
 [[select_wheel]]
 stage = 6
