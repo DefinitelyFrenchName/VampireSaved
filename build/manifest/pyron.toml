@@ -596,6 +596,49 @@ old_hex = "0c0600126606"
 thunk_hex = "0c0600tt661c3d7c30000018207cpppppppp0c40000963027009588f4ef90005f1623d7c200000180c06001266024e75588f4ef90005f152"
 data_subst = "pppppppp=0x3C28FC:0x140:wide_ext"
 
+# ── Variant-id HUD rows (14z-74; the 14z-63 mechanism, H's shape). The
+# maintainer sees the in-match plate reading "Demitri" with Demitri's
+# mugshot: his HUD entries are unported, so the tables fall back.
+# Values read from vs2's DATA-view tables, located by anchoring on H's
+# frozen entries and self-confirming: the name table is vs2 0x09910E (its
+# id-0x10 entry is exactly H's 04AB 0102 FFE8 0002) and the mug table sits
+# at 0x0990CE = name_base - 0x40, the same spacing vsavj has between
+# 0x898C4 and 0x89884, whose id-0x10 entry is exactly H's 0x05A0.
+#   Pyron id 0x11:  name 0B53 0102 FFF0 0002    mug 0B60
+# The CODE field is replaced by the free-pool anchor where the tenant's HUD
+# art lands (0xBE92 plate / 0xBE9A mug, as H's); the attrs and x/advance
+# come from vs2 verbatim. vsavj stager bias -0x3800 gives the poke values.
+# NOTE the lo long is FFF00002 for Pyron, not H's FFE80002 — his plate has a
+# different x offset, so this is not a copy of H's row.
+# INCOMPLETE (14z-74) — READ BEFORE JUDGING A BLANK PLATE. These three rows
+# are correct and land (verified in the patch notes), but they only repoint
+# the TABLE ENTRIES at the free-pool anchors; nothing yet PLACES Pyron's HUD
+# ART there. Measured: the in-match plate stops reading "Demitri" and renders
+# BLANK. So the remaining work is the art half — whatever puts H's plate/mug
+# tiles at 0xBE92/0xBE9A must be done for Pyron's, and the anchors may need
+# to be his own rather than reusing H's. Until then this trades a wrong name
+# for no name; revert these three rows if a wrong name is preferable.
+[[aux_poke]]
+name = "hud_mug_entry_11"
+addr = 0x0898A6          # mugshot table 0x89884 + 2*0x11
+op = "poke16"
+val = 0x869A             # 0xBE9A - 0x3800
+only_variant_slot = true
+
+[[aux_poke]]
+name = "hud_name_entry_11_hi"
+addr = 0x08994C          # name table 0x898C4 + 8*0x11
+op = "poke32"
+val = 0x86920102         # code 0x8692 = 0xBE92 - 0x3800; attrs = vs2 row
+only_variant_slot = true
+
+[[aux_poke]]
+name = "hud_name_entry_11_lo"
+addr = 0x089950
+op = "poke32"
+val = 0xFFF00002         # vs2 x offset / advance verbatim (Pyron's, not H's)
+only_variant_slot = true
+
 # ── WIN SCREEN (14z-74) — maintainer A/B against vs2: ours sits SHIFTED
 # LEFT (as Phobos' and Donovan's did before their fixes) and the palette is
 # partly wrong ("too much blue").
