@@ -206,12 +206,26 @@ Bank table now verifies clean.
     everything the suite covers. (Temporary registry row, removed after.)
   * Pyron's manifest workaround reverted; his table now declares honest
     vanilla values + row 0x11 = WIDE bank 4, and verifies.
-  **AWAITING MAINTAINER PLAYTEST before the re-freeze to huitzil-m2.**
-  TRANSIENT STATE, deliberate and short-lived: the registry still maps
-  `huitzil-m1 -> 22c016ac`, so that fingerprint NO LONGER rebuilds from the
-  tree until the re-freeze lands. Playtest focus: rows 0x01/0x0A/0x0C are
-  Demitri / Bishamon / Lord Raptor in the ported table copy, so any visible
-  effect would be their graphics in matches involving Phobos.
+  **PLAYTEST DONE (maintainer, 14z-74): hui27 clean — no regression on
+  Phobos, Demitri, Zabel or Bishamon.** One observation: brief FLASHING at
+  the end of round 1 in a Bishamon vs Phobos match, no corruption.
+  **MEASURED, and it is NOT D5:** the same replay run on hui26 vs hui27
+  with P1=Phobos/P2=Bishamon is **bit-identical across all 14,621 frames**
+  of work RAM, and palette RAM matches at every sampled round-end frame.
+  So the flashing is pre-existing or an emulator artifact — logged as an
+  open observation, not a D5 regression.
+
+  **CORRECTION (my error, retracted).** I told the maintainer the three
+  repaired rows were "Demitri / Bishamon / Lord Raptor" and the playtest
+  was aimed accordingly. The real slot map
+  (`docs/game/atlas/character_tables.md:224`) is **row 0x01 = Demitri,
+  row 0x0A = SASQUATCH, row 0x0C = Q-BEE**. Bishamon is 0x08 and Zabel is
+  0x04 — neither was touched by D5. The two genuinely-changed rows the
+  playtest therefore missed were closed by measurement instead: Phobos vs
+  **Sasquatch** and Phobos vs **Q-Bee** (and vs Demitri) are each
+  **bit-identical hui26 vs hui27 across 14,621 frames**. The ported table
+  copy's legacy rows are not read on any path these matches exercise, so
+  the repair is provably inert.
 
 - ~~**D5 — repair the pcrel-scan/table_fix collision in the generator?**~~
   (original framing, kept for the record)

@@ -1,12 +1,12 @@
 # NEXT SESSION — orientation (updated at the close of 14z-73, 2026-08-09)
 
-**Session goal: PYRON.** Phobos is FROZEN (`22c016ac -> huitzil-m1`,
+**Session goal: PYRON.** Phobos is FROZEN (`9deda080 -> huitzil-m2`,
 `run_suite.sh vsavjw` GREEN 54/17). The grab-victim teleport was fixed and
 maintainer-confirmed on both grabs in MAME + FBNeo (§1); FG pacing is
 resolved-by-observation (§3). The only Phobos item left is the cosmetic win
 quote (§2), a 3-level data port deferred per docs — it does NOT block Pyron.
 
-**Frozen build: `build/hui26` (`22c016ac -> huitzil-m1`)** — = hui25 + the
+**Frozen build: `build/hui27` (`9deda080 -> huitzil-m2`)** — = hui25 + the
 grab-hold keyframe fix. Playtest-clean (beam, ES, low beam, grab lightning,
 both grabs track native). Full H battery GREEN (15/15) + full oracle suite
 GREEN. Rebuilds bit-exact from `huitzil.toml` at `TENANT_CHAR=0x10` stage 6.
