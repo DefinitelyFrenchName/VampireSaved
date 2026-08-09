@@ -970,35 +970,40 @@ screen was unchanged). There is no separate P2 slot in evidence — the id
 is the WINNER's, and the arcade win screen (the one with the CONTINUE
 counter) always has a P1 winner.
 
-**And `0x5F328` drives the PORTRAIT, not the quote.** At the win screen
-the record it fetches (id 0x10 -> vs2 `0x2A8B7E`, base `0x2A06DE`) is the
-victory PORTRAIT (obj_records_dump: pal 15-19, tiles bank-1 `0xb7xx`).
-Repointing it to the tenant's own record is still not enough — the
-portrait's tiles are not placed in group C, so it renders as a
-PLACEHOLDER. (The earlier "Huitzil's records are `0x2A5F36`/`0x2A6346`"
-were from the `0x2A075E` select-portrait array — a different piece.)
+**The PORTRAIT already WORKS and is a DIFFERENT array from the quote.**
+The `[[select_records]]` entry misnamed `win_quote` in `huitzil.toml`
+ports Huitzil's victory PORTRAIT correctly (renders since hui16,
+maintainer-confirmed hui26): it reads array `0x2A06E2` (index id, NO `-4`
+bias) and pokes vsavj `0x2673ea` <- the placed vs2 `0x2A881E` = Huitzil's
+portrait record (tiles bank-1 `0xb7xx`, pal 15-19). Its tiles ARE placed.
+Do NOT touch it — a 14z-73 attempt to repurpose it for the quote stopped
+poking `0x2673ea` and BROKE the portrait (self-inflicted "placeholder"),
+reverted. The `d0=0x50 -> 0x2673E6` fetch measured at `0x5F328` was some
+OTHER piece; poking `0x2673E6` changed neither portrait nor quote, so it
+is not the lever for either.
 
-**The QUOTE TEXT is a SEPARATE structure (this part of 14z-68p/r stands,
-re-confirmed 14z-73).** It is rendered from the SHARED kana/kanji font
-(bank-1 tiles `0xb6xx`, pal 09 — measured on-screen via obj_records_dump)
-via Phobos-specific per-line CHARACTER-CODE data that is un-ported, so a
-tenant win shows a stray HOST line. The font is already present; only the
-record + line codes need porting. This is the real, non-KISS job — defer
-behind visible defects. **Two prior misfires to learn from:** the
-original `win_quote` manifest entry placed Pyron's record (`0x2A881E`,
-off by the `-4`) via the select-portrait array; a 14z-73 "KISS" attempt
-repointed the wrong array entirely. Neither touched the quote. Measure
-the fetch at the live screen before authoring the next attempt.
+**The QUOTE TEXT is a SEPARATE structure and is the ONLY real gap (this
+part of 14z-68p/r stands).** It is rendered from the SHARED kana/kanji
+font (bank-1 tiles `0xb6xx`, pal 09 — measured on-screen via
+obj_records_dump) via Phobos-specific per-line CHARACTER-CODE data that is
+un-ported, so a tenant win shows a stray HOST line. The font is already
+present; only the record + line codes need porting. **Its fetch was NOT
+reliably identified in 14z-73** — two attempts (repointing `0x2673E6`, and
+a wrong-array `0x267466`) changed nothing. Measure the LIVE fetch that
+drives the pal-09 text objects (reach the screen with replay 28 + forced
+pick; quote at ~f12200) before authoring the next attempt. Cosmetic —
+defer behind visible defects.
 
 ### Per-tenant win-screen checklist
 1. `[[code_word]]` x2 — position x/y (slot-following, CODE rows).
 2. `[[win_pal_variant]]` — palette; pick the row from the OPCODE view
    of `0x6B2F2` and CONFIRM with the 5*row marker.
-3. PORTRAIT record: fetch `0x5F328`, `d0 = 0x40+id`, `-4` bias → slot
-   `0x2673E6` for id 0x10 (source vs2 `0x2A8B7E`); AND place its bank-1
-   `0xb7xx` tiles in group C, or it renders as a placeholder.
-4. QUOTE text: separate multi-level structure (record → line char codes →
-   shared bank-1 `0xb6xx` font) — the un-ported part; not `0x5F328`.
+3. PORTRAIT record: array `0x2A06E2` (index id), poke vsavj `0x2673ea` <-
+   the tenant's portrait record (Huitzil = vs2 `0x2A881E`). Already done
+   and working via the (misnamed) `win_quote` select_records entry.
+4. QUOTE text: separate structure (record → line char codes → shared
+   bank-1 `0xb6xx` font, pal 09) — the un-ported part; fetch NOT yet
+   identified (measure the live pal-09 text objects first).
 5. Snapshot the actual screen and compare against a native capture —
    the RAM and ROM can both check out while the screen is wrong
    (14z-68: palette RAM matched vs2 and all 134 tiles matched vs2,

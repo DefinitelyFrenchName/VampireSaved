@@ -34,22 +34,22 @@ the bug was pure data.
 
 ## 2. Win screen — cosmetic, MEASURED, genuinely NOT KISS (does NOT block)
 
-14z-73 took a shot and REVERTED it (freeze intact). It is TWO separate
-cosmetic breaks, both measured in-emulator (reach the screen with
-`tests/replays/28_don_quotewin.rpl` + the forced-pick pokes; the quote is
-at ~f12200):
-- **Portrait** — fetch helper `0x5F328`, `d0 = 0x40 + winner id` (measured
-  `d0=0x50` for id 0x10; the old `0x60+id` note was WRONG), `-4` bias →
-  slot `0x2673E6`, source vs2 `0x2A8B7E`. But even repointed it shows a
-  PLACEHOLDER — its tiles (bank-1 `0xb7xx`) aren't placed in group C.
-- **Quote text** — a SEPARATE multi-level structure: record → per-line
-  CHARACTER CODES → the SHARED kana/kanji font (bank-1 `0xb6xx`, pal 09).
-  The font is present; the char-code data is Phobos-specific and un-ported.
-  This is the real job; `0x5F328` does NOT drive it.
+The PORTRAIT already WORKS (renders since hui16; the misnamed `win_quote`
+select_records entry pokes `0x2673ea` <- vs2 `0x2A881E`). Do NOT touch that
+entry — a 14z-73 attempt to repurpose it broke the portrait and was
+reverted (freeze intact, `22c016ac`).
 
-Full mechanism + the two prior misfires: `docs/game/engine_internals.md`
-"Win screen". Do NOT repeat the "repoint one pointer" attempts — measure
-the live fetch first. Purely cosmetic; deferred per the original guidance.
+The ONLY real gap is the **QUOTE TEXT** — a separate structure: record →
+per-line CHARACTER CODES → the SHARED kana/kanji font (bank-1 `0xb6xx`,
+pal 09). The font is present; the char-code data is Phobos-specific and
+un-ported, so a tenant win shows a stray HOST line. Its fetch was NOT
+reliably identified in 14z-73 (two attempts changed nothing). Reach the
+screen with `tests/replays/28_don_quotewin.rpl` + forced pick (quote at
+~f12200), measure the LIVE fetch driving the pal-09 text objects, THEN
+author. Full detail + misfires: `engine_internals.md` "Win screen".
+Cosmetic; deferred. ALSO CHECK Donovan's quote — it may be Jedah's (he
+sits at Jedah's id 0x13); it was only ever checked for RENDERING, not
+identity.
 
 ## 3. FG pacing — RESOLVED by observation (14z-73) ✓
 

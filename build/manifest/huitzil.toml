@@ -557,24 +557,20 @@ name = "win_quote"
 hole = "wide_ext"
 art = "native_c5"
 allow_placeholder_tiles = false
-# WIN-SCREEN KNOWN COSMETIC GAP (14z-73, MEASURED — do not "quick-fix").
-# This entry is MISCONFIGURED and frozen as-is in huitzil-m1: it reads the
-# select-portrait array (0x2A06E2), places vs2 0x2A881E (which is Pyron's
-# id-0x11 record, off by the -4 bias) and pokes 0x2673ea. Two separate
-# things are actually broken on Phobos' win screen, both cosmetic:
-#   1. PORTRAIT — drawn via fetch helper 0x5F328 with d0 = 0x40 + WINNER id
-#      (measured d0=0x50 for id 0x10; NOT 0x60+id as docs 14z-68p/r said),
-#      -4 bias -> slot 0x2673E6; correct source is vs2 0x2A8B7E (base
-#      0x2A06DE). Repointing that alone still shows a PLACEHOLDER because the
-#      portrait's own tiles (bank-1 0xb7xx) are not placed in group C.
-#   2. QUOTE TEXT — a SEPARATE multi-level structure (record -> per-line
-#      character codes -> the SHARED kana/kanji font at bank-1 tiles 0xb6xx,
-#      pal 09; measured via obj_records_dump at the win screen). The font is
-#      already present; the per-line char-code data is Phobos-specific and
-#      un-ported. This is the real (non-KISS) job the original guidance in
-#      docs/game/engine_internals.md "Win QUOTE" meant by "defer behind
-#      visible defects". Left at the ORIGINAL frozen values so huitzil-m1
-#      reproduces bit-exact (fingerprint 22c016ac).
+# THIS ENTRY PORTS THE WIN-SCREEN PORTRAIT — and it WORKS (Phobos' portrait
+# has rendered correctly since hui16; maintainer-confirmed on hui26). It is
+# only MISNAMED "win_quote". Do not touch it: a 14z-73 attempt to repurpose
+# it for the quote text broke the portrait (by no longer poking 0x2673ea)
+# and was reverted; huitzil-m1 reproduces bit-exact (22c016ac) with these
+# values. It reads array 0x2A06E2 (index id) and pokes 0x2673ea <- the
+# placed record from vs2 0x2A881E = Huitzil's portrait.
+#
+# The WIN-SCREEN QUOTE TEXT is a SEPARATE, still-un-ported structure (record
+# -> per-line character codes -> the SHARED kana/kanji font at bank-1 tiles
+# 0xb6xx, pal 09; measured on-screen). A tenant win shows a stray HOST line.
+# Its fetch was NOT reliably identified in 14z-73 (two attempts missed);
+# measure the live fetch (replay 28 + forced pick, quote at ~f12200) before
+# authoring anything. Cosmetic; deferred.
 vj_p1 = 0x2673AA
 vs2_p1 = 0x2A06E2
 expect_vs2_p1 = 0x2A881E
