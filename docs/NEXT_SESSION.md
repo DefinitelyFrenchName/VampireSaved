@@ -41,15 +41,17 @@ reverted (freeze intact, `22c016ac`).
 
 The ONLY real gap is the **QUOTE TEXT** — a separate structure: record →
 per-line CHARACTER CODES → the SHARED kana/kanji font (bank-1 `0xb6xx`,
-pal 09). The font is present; the char-code data is Phobos-specific and
-un-ported, so a tenant win shows a stray HOST line. Its fetch was NOT
-reliably identified in 14z-73 (two attempts changed nothing). Reach the
-screen with `tests/replays/28_don_quotewin.rpl` + forced pick (quote at
-~f12200), measure the LIVE fetch driving the pal-09 text objects, THEN
-author. Full detail + misfires: `engine_internals.md` "Win screen".
-Cosmetic; deferred. ALSO CHECK Donovan's quote — it may be Jedah's (he
-sits at Jedah's id 0x13); it was only ever checked for RENDERING, not
-identity.
+pal 09). It is a SHARED mechanism that mis-maps EVERY variant id, not a
+per-tenant miss: **maintainer-confirmed 14z-73 — Donovan (id 0x13) shows
+VICTOR's (0x03) quotes** (`0x13 & 0x0F = 0x03`, a base-character fold), and
+Phobos (0x10) shows a Bulleta line. So fixing the quote is ONE universal
+fix for all tenants, not three. The fetch/fold was NOT reliably identified
+in 14z-73 (two attempts changed nothing); reach the screen with
+`tests/replays/28_don_quotewin.rpl` + forced pick (quote ~f12200), measure
+the LIVE fetch of the pal-09 text objects, THEN author. Do it once Pyron
+gives a working reference (a tenant whose SHELL quote we can compare
+against). Full detail + misfires: `engine_internals.md` "Win screen".
+Cosmetic; deferred.
 
 ## 3. FG pacing — RESOLVED by observation (14z-73) ✓
 
