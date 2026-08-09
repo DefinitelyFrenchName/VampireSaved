@@ -11,11 +11,16 @@
 # were real but they never answered the question they implied: is the
 # ANIMATION that draws the beam ever entered at all?
 #
-# It is not. Native walks the node twice inside its documented beam
-# window; ours reads the placed twin ZERO times over the same 3,230
-# frames. That moves the defect off the draw path entirely and onto
-# anim-sequence SELECTION, and this gate freezes that measurement so the
-# next attempt starts from a fact instead of re-deriving it.
+# It was not (14z-70). Native walked the node twice inside its documented
+# beam window; ours read the placed twin ZERO times over the same 3,230
+# frames. That moved the defect off the draw path entirely and onto
+# anim-sequence SELECTION.
+#
+# RESOLVED 14z-71: the cause was vsav shipping effect-class row 16 as a
+# STUB where vs2/vh2 carry the beam's handler. The default expectation is
+# now `walks`; `BEAM_WALK_EXPECT=absent` still reproduces the pre-fix state
+# on an older build. The gate is kept because that flip is the cheapest
+# proof the selection path is alive.
 #
 # THE ARMING ARTEFACT. trace_writes.lua logs one "frame 1 PC 000926"
 # line with every register zero on BOTH legs — that is the watchpoint
@@ -46,14 +51,15 @@
 #      must count a real in-window hit, and must not count an
 #      out-of-window one.
 #
-# EXPECTATION. Default BEAM_WALK_EXPECT=absent — the measured 14z-70
-# state (native walks, ours does not). Set BEAM_WALK_EXPECT=walks once
-# selection is fixed; that is the flip that proves the fix, and it is the
-# whole point of freezing the shape now.
+# EXPECTATION. Default BEAM_WALK_EXPECT=walks as of 14z-71 — THE FLIP
+# HAPPENED. The defect was vsav shipping effect-class row 16 as a stub
+# where vs2/vh2 carry the beam's handler; porting it and repointing the
+# row makes the build enter the animation. BEAM_WALK_EXPECT=absent still
+# reproduces the pre-fix state on an older build (build/hui17).
 #
 # Usage: ROMDIR=... [BEAM_WALK_EXPECT=absent|walks] \
 #            tests/test_beam_anim_walk.sh [wide-builddir]
-#        (defaults to build/hui17; needs a build carrying H's real art)
+#        (defaults to build/hui25; needs a build carrying H's real art)
 set -eu
 
 ROMDIR="${ROMDIR:?set ROMDIR}"
@@ -62,16 +68,26 @@ cd "$REPO"
 WORK="$(mktemp -d)"
 trap 'rm -rf "$WORK"' EXIT
 
-BUILD="${1:-build/hui17}"
-EXPECT="${BEAM_WALK_EXPECT:-absent}"
+BUILD="${1:-build/hui25}"
+EXPECT="${BEAM_WALK_EXPECT:-walks}"
 case "$BUILD" in /*) ;; *) BUILD="$REPO/$BUILD" ;; esac
 [ -f "$BUILD/rompath/vsavjw.zip" ] || {
     echo "FAIL: no $BUILD/rompath/vsavjw.zip (WIDE tenant build required)"; exit 1; }
 
-# The anim region: vs2 0x245872 placed at PRG:0x0D8950 -> delta 0x16CF22.
-# Both beam node families, native address and placed twin.
+# The anim region: vs2 0x245872, placed wherever THIS build's allocator put
+# it. DERIVED, never hardcoded (14z-71): adding the beam-handler region moved
+# the anim placement 0x310 (hui17 0x0D89B0 -> hui18 0x0D8CC0), and a stale
+# constant here would watch an address nothing reads and report "absent"
+# forever — a false NEGATIVE on the one gate whose whole job is to flip.
+ANIM_PLACED=$(sed -n 's/^| `PRG:0x\([0-9A-Fa-f]*\)` |.*donovan anim (vsav2 0x245872).*/\1/p' \
+              "$BUILD/patch/atlas_fragment.md" | head -1)
+[ -n "$ANIM_PLACED" ] || { echo "FAIL: cannot derive the anim placement from"
+                           echo "      $BUILD/patch/atlas_fragment.md"; exit 1; }
+ANIM_DELTA=$(printf '%d' $((0x245872 - 0x$ANIM_PLACED)))
 NODE_NAT=24fcfa
-NODE_OUR=e2dd8
+NODE_OUR=$(printf '%x' $((0x24fcfa - ANIM_DELTA)))
+echo "anim placed at 0x$ANIM_PLACED (delta $(printf '0x%X' $ANIM_DELTA)); "\
+"beam node twin 0x$NODE_OUR"
 # The documented native beam window is f3164-3208 (14z-69j dense scan);
 # widened slightly so a one-frame phase shift cannot read as absence.
 WIN_LO=3150
@@ -87,10 +103,11 @@ fail=0
 
 # --- 1. the nodes are correctly ported (static, no emulator) -----------
 echo "1. the beam anim nodes are ported"
-python3 - "$BUILD" <<'PYEOF' || fail=1
+python3 - "$BUILD" "$ANIM_DELTA" <<'PYEOF' || fail=1
 import sys
 build = sys.argv[1]
-SRC_BASE, OUR_BASE, DELTA = 0x245872, 0x0D8950, 0x16CF22
+DELTA = int(sys.argv[2])
+SRC_BASE, OUR_BASE = 0x245872, 0x245872 - DELTA
 src  = open(f'{build}/extract/region_anim.bin', 'rb').read()
 ours = open(f'{build}/verify_data.bin', 'rb').read()
 bad = 0
@@ -100,19 +117,30 @@ for node in (0x24FCFA, 0x251CDA):
     if len(a) != 48 or len(b) != 48:
         print(f"  FAIL: node {node:06x} — could not read 48 bytes"); bad = 1; continue
     diffs = [i for i in range(48) if a[i] != b[i]]
-    # every differing byte must belong to a 3-byte pointer tail whose long
-    # is relocated by exactly the anim delta
-    ptrs, ok = set(), True
+    # Every differing byte must be one of exactly TWO documented classes:
+    #   1. part of a 3-byte pointer tail relocated by the anim delta, or
+    #   2. a composite list's TYPE WORD, retyped 000C -> 0006 by the 14z-71
+    #      list-type-6 takeover. Node 0x251CDA's window contains the beam
+    #      frame at 0x251CE6, so this class is reached in normal operation —
+    #      it is a real change of ours, not a tolerance.
+    ptrs, retypes, ok = set(), set(), True
     for i in diffs:
         base = i - (i % 4)
         if base + 4 > 48: ok = False; break
         na = int.from_bytes(a[base:base+4], 'big')
         nb = int.from_bytes(b[base:base+4], 'big')
-        if na - nb != DELTA: ok = False; break
-        ptrs.add(base)
+        if na - nb == DELTA:
+            ptrs.add(base); continue
+        wbase = i - (i % 2)
+        wa = int.from_bytes(a[wbase:wbase+2], 'big')
+        wb = int.from_bytes(b[wbase:wbase+2], 'big')
+        if (wa, wb) == (0x000C, 0x0006):
+            retypes.add(wbase); continue
+        ok = False; break
     if ok and diffs:
+        extra = f", {len(retypes)} composite type words 000C->0006" if retypes else ""
         print(f"  ok: node {node:06x} -> {node-DELTA:06x} — "
-              f"{len(ptrs)} pointers, all relocated by -0x{DELTA:X}")
+              f"{len(ptrs)} pointers, all relocated by -0x{DELTA:X}{extra}")
     else:
         print(f"  FAIL: node {node:06x} — a differing byte is not a "
               f"correctly relocated pointer"); bad = 1

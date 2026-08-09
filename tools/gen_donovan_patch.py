@@ -3676,14 +3676,25 @@ def main():
                 fail.append(f"site_thunk {nm}: no room in hole {hole_sel}")
                 continue
             patch_kind = st.get("patch", "jsr")
+            # rts_ok (14z-71): the site is the head of a CALLED HANDLER, not a
+            # point in a fall-through flow — the engine reaches it through a
+            # dispatch and every sibling handler exits by `rts`. There, `rts`
+            # is the CORRECT exit and jmp_ok's assertion ("the body never
+            # rts's") is simply the wrong claim to make; asserting it would
+            # be a lie in the manifest. A separate flag keeps jmp_ok's meaning
+            # intact and states this site's actual contract: the body may rts,
+            # and any path that declines the work must re-enter the displaced
+            # original by jmp.
             if (patch_kind == "jmp"
                     and not st["old_hex"].lower().startswith("4ef9")
-                    and not st.get("jmp_ok")):
+                    and not st.get("jmp_ok") and not st.get("rts_ok")):
                 fail.append(f"site_thunk {nm}: patch='jmp' over a non-jmp "
                             f"site (old_hex starts {st['old_hex'][:4]}) — "
                             f"set jmp_ok = true to assert the thunk body "
                             f"NEVER rts's or falls through (it must re-enter "
-                            f"the original flow by jmp only)")
+                            f"the original flow by jmp only), or rts_ok = true "
+                            f"if the site is a CALLED HANDLER whose siblings "
+                            f"all exit by rts")
                 continue
             ops.append({"op": "code", "addr": f"{td:#x}", "hex": body.hex()})
             ops.append({"op": "code", "addr": f"{site:#x}",
@@ -3760,6 +3771,53 @@ def main():
             notes.append(f"code   {addr:#08x} +0x2  code_word {nm} "
                          f"({old.hex()} -> {new.hex()})")
             fragments.append((addr, 2, "GEN", f"code_word {nm}"))
+
+    # ── code_ptr: a guarded single-LONG code patch aimed at a PLACED region
+    # (14z-71, the beam port) ─────────────────────────────────────────────
+    # The engine's per-pool effect-CLASS tables are rows of absolute handler
+    # pointers, indexed by an object field and read PC-relatively — i.e.
+    # through the OPCODES space, inside the crypt window — so they are
+    # patched with a `code` op, never poke32.
+    #
+    # vsav ships several of those rows as STUBS pointing at the bare `rts`
+    # that follows the table, where vs2/vh2 carry a real handler. This row
+    # hands one such dead row a ported handler, which is a strictly smaller
+    # change than an obj_hook table rebuild: no relocated table, no engine
+    # site patch, and no cycle cost on any legacy path.
+    #
+    # Superset safety rests on the row being DEAD, measured rather than
+    # argued (tests/audit_effect_class_rows.sh), plus old_hex pinning the
+    # slot to the stub so a table that ever moves fails the build loudly
+    # instead of silently patching someone else's row.
+    if args.stage >= 4:
+        opc_img_cp = None
+        for cp in port.get("code_ptr", []):
+            if args.stage < _int(cp.get("stage", 4)):
+                continue
+            nm = cp["name"]
+            addr = _int(cp["addr"])
+            old = bytes.fromhex(cp["old_hex"])
+            if len(old) != 4:
+                fail.append(f"code_ptr {nm}: old_hex must be exactly 4 bytes")
+                continue
+            if opc_img_cp is None:
+                opc_img_cp = (root / "build/out/vsavj_opcodes.bin").read_bytes()
+            if opc_img_cp[addr:addr + 4] != old:
+                fail.append(f"code_ptr {nm}: vanilla bytes at {addr:#x} != "
+                            f"old_hex ({opc_img_cp[addr:addr + 4].hex()})")
+                continue
+            _rn, _, _ro = str(cp["region"]).partition(":")
+            if _rn not in placed:
+                fail.append(f"code_ptr {nm}: region '{_rn}' not placed at "
+                            f"this stage")
+                continue
+            val = placed[_rn] + _int(_ro or "0")
+            ops.append({"op": "code", "addr": f"{addr:#x}",
+                        "hex": f"{val:08x}"})
+            notes.append(f"code   {addr:#08x} +0x4  code_ptr {nm} "
+                         f"({old.hex()} -> {val:08x} = {_rn}"
+                         f"+{_int(_ro or '0'):#x})")
+            fragments.append((addr, 4, "GEN", f"code_ptr {nm}"))
 
     # ── win/quote palette 0x60-view repoint (session 14u) ─────────────────────
     # Companion to select_port's block copies: the hardcoded

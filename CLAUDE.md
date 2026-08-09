@@ -207,6 +207,32 @@ legacy behavior is a failed change.
     the moment one is paid for, to the bucket its FACT belongs to.
   Findings land in the right document *at discovery time*, not at milestone
   end. An undocumented discovery is a discovery we will pay for twice.
+- **RETRACTION DISCIPLINE (standing order, 14z-71): when a claim changes,
+  GREP FOR THE CLAIM — not for the files you remember writing it in.**
+  A finding does not live in one place. It propagates into section
+  HEADERS, summary lines, registry rows, gate comments, the GOTCHAS index
+  and `NEXT_SESSION`, and the copies outlive the correction. Fixing "where
+  I remember writing it" is how a document ends up asserting the opposite
+  of the subsection directly beneath it — measured twice in one session:
+  `docs/game/engine_internals.md` carried "the 214+P explosion is NOT a
+  tile-inventory defect" as a HEADER above a subsection proving it was,
+  and a corrected effect-family finding survived in five other places
+  including a registry row written *after* the correction started.
+  The procedure, in order:
+  1. `grep -rn "<the old claim>" docs HANDOFF.md STATE.md tests build/manifest`
+     — search the assertion's WORDING, and its paraphrases, across the repo.
+  2. Fix the **HEADER and the summary line** first. A skimmer reads those;
+     an appended "actually, it turned out…" subsection does not reach them.
+  3. Re-grep afterwards and show the empty result. The pass is not done
+     because it feels done.
+  4. Keep the superseded analysis, marked RESOLVED/RETRACTED with what
+     replaced it — the eliminations usually stay valid even when the
+     conclusion does not. **Status headers track reality; historical
+     entries are not rewritten.**
+  A claim that cannot be found cannot be corrected, and a stale claim in a
+  header is worse than no documentation: it is confidently wrong, and it
+  is what a future session will act on.
+
 - **Anti-hyperfocus checkpoint (standing order):** deep-dive focus is the
   project's engine but also its failure mode. At natural boundaries — a
   finding confirmed, a test suite green, ~20 tool iterations on one problem —

@@ -97,3 +97,15 @@ overlay). Verification: crash guard, dual-emulator comparator,
 auto-detecting `tests/run_suite.sh` (fingerprint -> expectation set via
 `tests/expected/registry.tsv`), and the per-gate ground-truth tests
 (CLAUDE.md §4: verdict logic is itself tested).
+
+## 14z-71 — the beam (Huitzil), three mechanisms
+
+| row | kind | what it does | safety |
+|---|---|---|---|
+| `beam_effect_class16` | `[[code_ptr]]` | effect-class table row 16 (`PRG:0x080AEC`) -> the ported vs2 row-16 handler family (region `x093460`). vsav ships the row as a stub; the tenant's beam object already selected class 16. | row measured DEAD in vanilla (`tests/audit_effect_class_rows.sh` §1, 0 reads vs a 1760-hit control). Legacy masked-v2 EXACT. |
+| `beam_list_type6` | `[[site_thunk]]` (`rts_ok`) | takes over vsav's unused sprite-list TYPE 6 (`PRG:0x01B6AA`) for the type-12 composite the beam needs; body also carries a ported type-4 handler (bank 4 + vs2's code bias) and a child dispatcher. The tenant's 39 composite lists are retyped `000C -> 0006` by `[[port_patch]]` rows. | types 6/8 measured dead (0 reads vs 4329/2702/2260/321 controls); **the assumption is not load-bearing** — non-tenant lists fall through to vsav's own type-6 code and arm a tripwire that fails a gate. Zero legacy cycles; the legacy flicker inventory is IDENTICAL to baseline run-for-run. |
+| `strip_tiles/0x10.json` | gfx (`--strip-tiles`) | copies vs2 **bank-1** strip art into group C bank 4 at `code+0x1000` (span `0x4EA0-0x4FBF`). The type-4 handler composes its own bank, so this art cannot reach group C by the record path. | readback-verified in the builder; `audit_empty_tiles.sh` on the beam replays. Chosen over vsav's own bank 1, measured 160/240 occupied. |
+
+Full rationale and the porting checklist: `porting_sprite_lists.md`.
+Facts: `../game/atlas/sprite_lists.md`.
+

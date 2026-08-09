@@ -1,119 +1,113 @@
-# NEXT SESSION — orientation (written at the close of 14z-70, 2026-08-09)
+# NEXT SESSION — orientation (written at the close of 14z-71, 2026-08-09)
 
-**Start with the BEAM. It is fully scoped, the scope is measured rather
-than reasoned, and it is written up in
-`docs/project/beam_port_scope.md` — read that FIRST, then this.**
+**Session goal: finish Phobos and freeze him.** One piece of real work,
+two cosmetic. The beam arc is done and maintainer-confirmed.
 
-**PING #13 = build/hui17 (699de9b7) is current and MAINTAINER-CONFIRMED**
-("explosion corrected, my tests confirm it"). `tools/run_hui_behavior.sh`
-points at it. Frozen references unchanged (donovan-m3a 4b7d0dc7 /
-m5_stock 6c93cfa8; m3a-reproducible PASS).
+**Current build: `build/hui25` (`b0fb2f94`)** — launcher default,
+playtested clean (beam, ES, low beam, and the grab lightning). Not frozen.
+14z-71 closing sweep: **18/18 PASS**, legacy masked-v2 EXACT.
 
-## What shipped in 14z-70
+---
 
-1. **The 214+P grenade's GROUND explosion** — it drew a solid fuchsia
-   rectangle. 569 group-C tiles were remapped bank 3->4 but never copied
-   (`extra_tiles/0x10.json`, 2 -> 569). Gfx-only, so hui17 carries the
-   same program fingerprint as hui15/16.
-2. **`x088512` grown 0x3B40 -> 0x3B98** with a raw tail — three pc-rel
-   tables were resolving into the anim region. A real latent repair that
-   fixes **nothing observable**; kept on its gate sweep, not on a
-   behavioural claim.
-3. **`audit_empty_tiles.sh` hardened** — it had passed every build
-   through hui16 while this defect was live.
+## 1. THE GRAB VICTIM'S MID-ANIMATION PLACEMENT — the only real work
 
-## THE OPENER: build the beam port
+Maintainer-reported, in scope, **not a blocker**: during a grab the
+VICTIM's sprite teleports around mid-animation. Start and end are correct;
+Phobos' own sprite and all the effects are fine.
 
-Everything below is measured. The scope doc has the tables.
+**Inputs — both need the fighters TOUCHING:**
+- regular grab: **6MP** or **6HP** at contact
+- Circuit Scrapper: **63214+MP** or **HP** at contact
 
-**What is wrong:** the beam's visual object exists on both legs and is
-never DRIVEN into its beam states on ours. That is why the FREEZE WORKS
-while the muzzle orb and beam are both missing — they are one object.
+A rig that fires these at range measures nothing. **Verify
+`tests/replays/hui/80_hui_grab_2p.rpl` actually connects before reading
+anything off it** — 14z-71 sampled that replay and got grenade frames,
+which is how an entire measurement went wrong.
 
-**Where the builds part company** — most of the path already exists:
+**The shape tells you where to look.** Endpoints right, middle wrong:
+endpoints are set by discrete events (connect, release), the middle by
+PER-FRAME data. Suspect the per-frame victim-offset / capture-pose data or
+its stride — not the grab logic, whose damage and launch arc are already
+native-exact and gated.
 
-| link | native | ours |
-|---|---|---|
-| effect-type reader | `0x093080` (950 reads) | `0x0844F4` (950) — shared |
-| dispatch table | `0x093088`, 32 entries | `0x0844FC`, 32 — shared |
-| entry #2 target | `0x093442` | `0x08471A` — shared, byte-identical 0x1C bytes |
-| **the next routine** | **`0x093460`** | **absent — vs2-only** |
-| the machine | `0x0934A8` | absent — vs2-only |
+**First move, before reading any code:** per-frame A/B of the victim's
+position fields, native vs ours, across the grab window. Positions are
+mapped fields (`docs/game/atlas/ram.md`), so they compare directly; the
+first divergent frame and the size of the jump name the data.
 
-The missing routine is four instructions:
-`movea.w 0x30(A6),A4` (the OWNER -> A4, which is what lets the machine's
-id gate read `0x382(A4)`), `move.b 0x04(A6),D0`, then a `jmp` through the
-table at `0x093470` whose entry #22 is the machine.
+## 2. Win quote — cosmetic, root-caused, not built
 
-**The hook is an owner-gated diversion**, not a table edit: only objects
-whose owner is the tenant take the new path, so legacy dispatch is
-untouched by construction. There is NO dead entry to repoint — that was
-checked and disproved.
+The consumer's `lea -4(a0,d0.w)` bias means it reads index `0x60+id-1` =
+0x6F where we repointed 0x70. His records are vs2 `0x2A5F36`/`0x2A6346`
+via bases `0x267426`/`0x2674A6`.
 
-**Two premises already verified, so do not re-derive them**
-(`tests/test_beam_variants.sh`, PASS):
-- all THREE variants (236+P / 236+K / 236+2P, which is the same move as
-  236+2K) are ONE art path — pal 0x0C from the tenant band, the ES just
-  uses more tiles. One port covers all three.
-- all 147 tiles they draw are ALREADY in group C. The port is not
-  expected to need copy-inventory work.
+## 3. FG pacing — untouched
 
-**Remaining before a build:** the machine body's transitive closure
-(`extract_char.py` reports it once rooted — the only real unknown, and it
-could still make this big); exactly where the diversion goes; and the
-pcrel census on the new root before freezing its length (x088512 was
-0x50 bytes short for precisely that reason).
+## 4. Then FREEZE Phobos
 
-**The proof of fix already exists:** `tests/test_beam_anim_walk.sh` flips
-`BEAM_WALK_EXPECT=absent` -> `walks`. Then snapshot f3176 (muzzle orb)
-and f3192 (beam) against native.
+Registry row + expectation set, maintainer-gated.
 
-## Then, in order
+---
 
-- **Win quote** — deferred, cosmetic, root-caused.
-- **FG pacing** — untouched.
-- **H freeze** (registry row + expectation set, maintainer-gated), then
-  Pyron's moveset arc and his gfx rung. Run `tests/audit_empty_tiles.sh`
-  AND `tests/test_beam_variants.sh`-style tile checks on his first gfx
-  build.
+## After Phobos: Pyron
 
-## WORKING AGREEMENT with the maintainer (adopted 14z-70)
+Ladder stages 1-4 exist and are green; nothing renders yet. Three things
+from 14z-71 to carry in:
 
-1. **Send the native/ours capture pair and state the interpretation
-   BEFORE measuring on it**, naming the rig assumptions (button strength,
-   spacing, which event should be on screen). He reads a frame instantly.
-2. **When in doubt, plan and scope FIRST** — measure the extent, write it
-   up, show it, then build.
-3. **Never ask him a CODE question as if it were a gameplay judgement.**
-   "Are these one machine or several" is measurable; asking him to guess
-   wastes his expertise. Ask him what it LOOKS like; measure what it IS.
+- **Re-check `gfx_layout3.toml`'s "one-source-bank premise" BEFORE his gfx
+  rung.** It is incomplete: a tenant with a type-4 effect draws from a
+  second gfx bank. Huitzil's beam takes its muzzle and tip from his own
+  band and its stretching middle from bank 1.
+- **Read `docs/project/porting_sprite_lists.md` first** — four questions
+  to ask of any ported effect, each with its mechanism, safety argument
+  and gate. It exists so Pyron does not re-pay Huitzil's beam.
+- **A render-layer gate is the outstanding suite gap** (maintainer's
+  point): every audit we have — empty tiles, OBJ dumps, tile-content
+  hashes — lives on the DATA side. *The tiles being there and fetched does
+  not mean they are shown.* The beam and the grab lightning are
+  known-good references to seed one from.
 
-## Method notes from this session — read before the next attribution
+---
 
-1. **THE ANCHOR METHOD (use it first).** Do not reason about object
-   layout or which region a machine lives in. Anchor on the data the
-   effect must READ — its sprite list — put a read watchpoint on it on
-   both legs, and let the registers hand you the object. It is
-   self-correcting: if the anchor is never read, that IS the finding. It
-   cracked both the explosion and the beam in one run each, after two
-   sessions of layout reasoning produced only retracted claims.
-   (`docs/game/engine_internals.md`, "THE ANCHOR METHOD".)
-2. **Co-location is not causation.** "The machine lives in x088512;
-   x088512 has broken tables; therefore they feed it" — all true, and
-   false. Put an execution breakpoint on the code that READS a table
-   before attributing a symptom to it. One run, before a rebuild.
-3. **Prove the rig produces the REPORTED event.** 214+MP from start
-   distance hits the opponent; the ground mushroom needs LP and corner
-   spacing. Three sessions of analysis went to the wrong event.
-4. **A constant delta between two dense code sets is probably an
-   artefact.** "+0xA220" matched 41 of 88 codes and meant nothing: two
-   ~85-value clusters of similar width overlap about half the time.
-   Confirm by CONTENT, never by index arithmetic.
-5. **Join by content, never by index, and never per-frame across legs
-   that drift in phase.** Per-frame intersection read 0 at every frame
-   while the window agreed 76/84.
-6. **Assert the STATE, not the input.** ES consumes a meter stock and
-   degrades silently, exactly like Dark Force.
-7. **Instruments truncate.** `obj_records_dump` reports a multi-tile
-   sprite's BASE code only; `audit_empty_tiles.sh` sampled every 25
-   frames and found 10 of 113 tiles. Both now fixed — the shape recurs.
+## Read before your first attribution
+
+`docs/project/gotchas.md`, the 14z-71 entries: *a symptom grouping is a
+hypothesis*, *when a claim changes grep for the claim*, and *cross-build
+A/B beats analysis*. Plus **CLAUDE.md §5's RETRACTION DISCIPLINE**, which
+is new this session.
+
+**The four instrument failures of 14z-71, because they will recur:**
+
+1. A `wpset` watchpoint is **silently blind to pc-relative reads** — CPS-2
+   serves them from AS_OPCODES, so dispatch tables need `wposet`
+   (`WATCH=...,r,o`). It reported 0 where the truth was 598.
+2. **MAME parses a watch length as HEX.** A ten-byte window (`a`) the
+   tracer's regex rejected killed the run before it started and wrote an
+   empty trace — indistinguishable from "0 accesses". Truth was 39.
+3. **The boot RAM test writes every byte of work RAM**, so a bare write
+   count on any address returns phantom hits. Filter by PC.
+4. **An atlas parse with a hardcoded size** fell back to an empty range
+   and reported a cheerful "unarmed" — a blind instrument wearing a pass.
+
+The defence that worked on all four: **a positive control on the same
+instrument and the same leg.** A dead instrument and a real finding are
+the same shape from outside.
+
+**And the two things that beat analysis outright:** the maintainer naming
+wrong art from a screenshot, and a two-build A/B playtest settling an
+attribution that six build-dumps had got backwards. Send captures early;
+bisect the builds before analysing the code.
+
+---
+
+## What the beam was, in three lines (for context, not action)
+
+vsav ships effect-class row 16 as a **stub** where vs2/vh2 carry the
+beam's handler; its drawer has **no list-type 12** (the composite) and the
+table can neither grow nor move; and its type-4 handler biases tile codes
+**+0x3800 where vs2 uses +0x4200** — one byte — while composing its own
+gfx bank. Fixed by a ported handler on a dead class row, a takeover of the
+unused list-type 6, and a ported type-4 copy with both constants
+corrected. Zero legacy cycles. Full write-up:
+`docs/game/atlas/sprite_lists.md` and `engine_internals.md`'s
+"sprite-list DRAWER".

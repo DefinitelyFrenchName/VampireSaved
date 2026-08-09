@@ -45,7 +45,12 @@
 #
 # Usage: ROMDIR=... [DF_STYLE_EXPECT=differs|matches] \
 #            tests/test_hui_df_style.sh [wide-builddir]
-#        (defaults to build/hui11; needs a build carrying H's real art)
+#        (defaults to build/hui25. NOTE 14z-71: the default USED to be
+#        build/hui11, which PREDATES the 14z-69p palette fix that the
+#        default expectation `colours-fixed` asserts — so a bare run of
+#        this gate failed for reasons that had nothing to do with the
+#        build under test. When an expectation is flipped, move the
+#        default build with it.)
 set -eu
 
 ROMDIR="${ROMDIR:?set ROMDIR}"
@@ -54,7 +59,7 @@ cd "$REPO"
 WORK="$(mktemp -d)"
 trap 'rm -rf "$WORK"' EXIT
 
-BUILD="${1:-build/hui11}"
+BUILD="${1:-build/hui25}"
 EXPECT="${DF_STYLE_EXPECT:-colours-fixed}"
 case "$BUILD" in /*) ;; *) BUILD="$REPO/$BUILD" ;; esac
 [ -f "$BUILD/rompath/vsavjw.zip" ] || {

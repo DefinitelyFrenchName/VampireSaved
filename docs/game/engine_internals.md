@@ -19,6 +19,17 @@ part of that work — the marginal cost is small while the analysis is
 fresh in the session, and it is the difference between "documented"
 and "findable". Delete the line when the section exists.
 
+**STATUS 14z-71: swept again, at the maintainer's request.** The gap
+ratio is down from ~10:1 (14z-68m: 810 vs 8417 lines) to ~4.5:1 (2118 vs
+9643). No subsystem is now absent from the docs — but the sweep found a
+worse failure than absence: **three section HEADERS described superseded
+states**, and one of them ("the 214+P grenade explosion — NOT a
+tile-inventory defect") asserted the opposite of what was later measured.
+A skimmer reads headers. When a finding is overturned, fix the HEADER in
+the same commit, not just append a subsection under it. Two new documents
+came out of the same sweep: `atlas/sprite_lists.md` and
+`../project/porting_code_regions.md`.
+
 **STATUS 14z-68n: the audited backlog is now CLEARED** — all eight
 subsystems below were written the same session the gap was found
 (object type dispatch + pool walker, allocator wrappers, pool seeding
@@ -611,6 +622,108 @@ that is ported into our build at ~`PRG:0xCE3B8` (vanilla twin
   `addi.w #$300,d1` (the +0x300 id alias seen in the sweep maps) and
   jumps into the enqueue path.
 
+## The sprite-list DRAWER: how an object becomes sprite entries
+## (measured 14z-71 on the Huitzil beam; the layer ABOVE the OBJ entry)
+
+**Atlas rows this section depends on:** `atlas/sprite_lists.md` (the
+drawer, the handler table, all list formats, the per-game bias table),
+`atlas/ram.md` (object fields `+0x02` class, `+0x04` effect type, `+0x0B`
+facing, `+0x0F` palette, `+0x18`/`+0x1A` OBJ word bits, `+0x1C` anim node,
+`+0x30` owner), `atlas/character_tables.md` (the per-char OBJ bank table).
+
+The section below it describes the OBJ *entry* the hardware reads. This one
+describes the machinery that PRODUCES those entries — the layer where every
+"the effect does not draw" bug in this project has actually lived.
+
+### The chain, end to end
+
+```
+pool walker
+  -> object CLASS byte +0x02  ->  x4  ->  38-row handler table  ->  jsr
+       (vsavj 0x080A90 / table 0x080AAC; one such pair per object pool)
+  -> the class handler reads the effect TYPE byte +0x04 and dispatches again
+  -> some state machine sets the object's ANIM NODE at +0x1C
+  -> the DRAWER (vsavj 0x01AFA6) reads node +0x04 -> the SPRITE LIST
+  -> the list's TYPE word selects a handler (table 0x01AFBA)
+  -> the handler writes 8-byte entries through A2 into OBJ RAM
+```
+
+Four dispatches, each indexed by a different byte, each with its own table.
+When an effect does not draw, the question is always *which* of them
+stopped — and the answer has never once been the draw path itself.
+
+### The three failure modes, all paid for
+
+**1. A dead table ROW.** vsav ships rows 16/17/19/31 of the effect-class
+table as stubs pointing at the bare `rts` after the table, where vs2/vh2
+carry real handlers. Huitzil's beam object set class 16 correctly, at the
+same frames as native, and loaded the stub. Nothing upstream was wrong;
+the effect simply had nowhere to go. (14z-71. The same shape as the
+`obj_hook` type-dispatch work — a table the host built smaller.)
+
+**2. A missing list TYPE.** vsav's drawer has six list types, vs2 seven,
+and the table cannot grow or move (see the atlas — entry 0's offset IS the
+length). Type 12, the composite, does not exist in vsav at all, so a
+ported list of that type jumps off the end of the table into data.
+
+**3. A game-specific CONSTANT inside an otherwise identical handler.**
+Types 4, 6 and 8 bias every emitted tile code — vsav by `+0x3800`, vs2 by
+`+0x4200`. One byte. Ported vs2 list data run through vsav's handler
+addresses tiles 0x0A00 low and draws whatever is there. On the beam that
+was the freeze/reflection art, and the maintainer identified it from a
+screenshot faster than the analysis did.
+
+**Mode 3 is the dangerous one** because the routines look the same. A diff
+saying "255/256 bytes identical" invites the conclusion that the one
+difference is a relocated address. Here it was the entire defect, and
+dismissing it cost most of a session.
+
+### Where the BANK comes from — and why it differs per list type
+
+The gfx bank lives in the OBJ y-word (bits 13-14, plus WIDE's bit 12). Two
+handlers source it two different ways, and this decides whether a
+tenant's art can be relocated at all:
+
+| list type | bank source | relocatable by the record path? |
+|---|---|---|
+| 0, 2, 8 | the OBJECT's `+0x18` (per-char OBJ bank table) | **yes** |
+| 4 | **hardcoded** `ori.w #$2000` = bank 1 | **no** — needs a ported handler |
+
+So a character's effects can legitimately draw from **more than one gfx
+bank**: Huitzil's beam takes its muzzle and tip from his own band (bank 3)
+and its stretching middle from bank 1. Any port that assumes a character's
+art is one contiguous band will silently mis-address the type-4 pieces.
+
+This is the same family as the **sword/statue blink** (see "known class"
+below and `gotchas.md`): there, records belonging to two different banks
+were processed with one bank's semantics, and the frames that landed in
+the wrong bank went invisible at the animation rate. Same root — **bank
+attribution is per-record, and per-list-type, not per-character.**
+
+### How to attribute one of these in one run
+
+Do not reason about it. Anchor on what the effect must READ (the ANCHOR
+METHOD section below), and if the question is specifically "why is the art
+wrong rather than absent", dump the OBJ records on both legs and compare
+`code`, `pal` and the y-word BANK BITS over a WINDOW, never per frame — the
+legs drift in phase. `tests/lua/obj_records_dump.lua` prints all three, plus
+the composed tile address under both the stock and WIDE addressing rules.
+
+Two instrument rules that this subsystem enforces harder than most:
+
+- every one of these tables is read PC-relatively, so a watchpoint must use
+  the **opcodes** space (`wposet`) or it reports zero and reads as "never
+  used" (`../platform/gotchas.md`);
+- `obj_records_dump` reports a multi-tile sprite's BASE code only — expand
+  `w×h` with the row-wrap rule before concluding anything about tiles.
+
+### What a port has to supply
+
+The project-side consequences — bank sourcing, the bias, tile inventories
+as SPANS, and the group-C placement shift — are
+`../project/porting_sprite_lists.md`, with Huitzil's beam as the worked
+instance.
+
 ### OBJ sprite-list structure (measured 14z-53, WIDE Phase A)
 
 The CPS-2 sprite list is 8-byte entries `(x.w, y.w, code.w, attr.w)`, up
@@ -1040,7 +1153,17 @@ draws a companion's shadow is NOT this servant path. The remaining
 child-companion shadow item is attributed instead to the bank-0 piece
 family (uniform -0x16A8 tile-code delta, bank word 0 vs 3).
 
-## Dark Force (14z-66/67 — MECHANICS UNPROVEN, STYLE measured 14z-69)
+## Dark Force (14z-66/67 mechanics UNPROVEN; style measured 14z-69,
+## PALETTE FIXED and playtest-confirmed 14z-69p in build/hui14)
+
+> Status: the DF **palette** is fixed and shipped — one `[[data_port]]`
+> row replacing palette-seq rows 0x1E-0x21 with the sequence native's DF
+> actually shows (vs2 `0x3ABEDC`). He flashes his own warm gold instead
+> of purple. Legacy-inert because vanilla only ever requests seq ids
+> 0x26/0x27, guarded by `tests/audit_palette_seq_ids.sh` — which is the
+> ONLY guard, since the palette path never transits work RAM. The
+> afterimages remain by design, and the underlying MECHANICS are still
+> unproven; the analysis below stands.
 
 **Atlas rows this section depends on** (`atlas/ram.md`): `+0x109`
 banked stock count, `+0x107` resolver marker (0xFE = pair downgraded,
@@ -1250,6 +1373,16 @@ afterimages come from the ported handler being reachable at all.
 ### 14z-69e: the mode is SOUND; only the COLOUR is wrong, and it is a
 ### known class (the sword/statue blink, STATE 14z-33)
 
+> **The general rule this is an instance of (added 14z-71):** bank
+> attribution is **per-record and per-list-type**, never per-character.
+> The sword/statue blink came from processing records of two different
+> banks with one bank's semantics; the Huitzil beam's corrupt strip came
+> from a list type that composes its own bank word instead of taking the
+> object's. Both render *real art from the wrong place* — geometry
+> correct, content someone else's — which is the signature to recognise.
+> See "The sprite-list DRAWER" above and `atlas/sprite_lists.md` §4.
+
+
 **Donovan does not have this problem, with identical wiring** — his
 build repoints `dispatch_16` row 0x13 to his placed vs2 handler exactly
 as H's repoints row 0x10, and measures clean: palette row 0x0A
@@ -1376,10 +1509,23 @@ replay 82 that returned exactly these two and nothing else, so the
 inventory hole was provably this size. Re-run it for any new tenant —
 it is a complete check, not a sample.
 
-## The 214+P grenade explosion — TRIAGED 14z-69q (effect family, NOT
-## a tile-inventory defect)
+## The 214+P grenade explosion — FIXED 14z-70f (it WAS a tile-inventory
+## defect; the 14z-69q triage below is RETRACTED)
 
-Maintainer flagged the explosion's tiles as an open correction. It is
+> **Read this before the triage that follows.** The header used to say
+> "NOT a tile-inventory defect". It was one: **569 group-C tiles were
+> remapped bank 3 -> 4 and never copied**, and the ground detonation drew
+> a solid fuchsia rectangle. The triage was not sloppy, it was
+> MIS-RIGGED — every rig fired 214+**MP** from 2P start distance, where
+> the bomb reaches the opponent, so the capture showed the ON-CONTACT
+> explosion and never the ground mushroom. Reproduce only with
+> `tests/replays/hui/83d_hui_grenade_ground.rpl` (214+**LP**, both
+> fighters walked to their corners). The empty-tile audit also sampled
+> every 25 frames and saw 10 of 113. Both instruments are fixed; the
+> reasoning below is kept because the *elimination* steps are still
+> valid, only the conclusion was wrong.
+
+The original triage, superseded. It is
 NOT the shadow class: scanning every group-C sprite the build draws
 across the 214MP window of replay 83 (f3390-3555) returns **zero**
 empty-tile draws, so nothing is missing from the copy inventory.
@@ -1764,8 +1910,42 @@ genuinely open and is a separate defect (never walks its anim nodes).
 before vs during, then join the two legs by TILE CONTENT — never by tile
 index, and never per-frame across legs that can drift in phase.
 
-## The beam / effect family — state after 14z-69j (three of four pieces
-## are native-equivalent; EMISSION is the open one)
+## The beam / effect family — CLOSED 14z-71, all four members
+## (history kept below)
+
+> **All four are closed, and NO TWO SHARED A CAUSE.** The family was
+> grouped in 14z-69 as "one root — one port covers it". That was RIGHT for
+> three of the four, and the exception is the interesting part:
+> the **214 explosion** was an uncopied tile inventory; the **beam** and
+> the **ES big beam** were a stub effect-class row + a missing sprite-list
+> type + a per-game code bias; and the **grab lightning** shares the
+> beam's first cause — the dead effect-class row 16 (maintainer A/B:
+> hui17 none, hui18 yes, and hui18 differs by exactly that repoint). So
+> three of the four DID share a root; only the explosion stood apart.
+> Grouping by SYMPTOM
+> ("this effect does not draw") sent the search after a single root that
+> did not exist.
+
+> **RESOLVED.** The beam draws, maintainer-confirmed on all three
+> variants (`build/hui25`). It was never an emission defect. Three
+> stacked causes, all in the sprite-list layer:
+> **(1)** vsav ships effect-class table row 16 as a stub where vs2/vh2
+> carry the beam's handler — the object selected class 16 correctly and
+> was dispatched into an `rts`;
+> **(2)** the beam's sprite list is TYPE 12, a composite vsav's drawer
+> does not have, and its table can neither grow nor move;
+> **(3)** the beam's middle piece is a procedural type-4 strip whose
+> handler biases tile codes by a **game-specific constant** (vsav
+> +0x3800, vs2 +0x4200) and **composes its own gfx bank**.
+> The mechanism is documented in "The sprite-list DRAWER" above and
+> `atlas/sprite_lists.md`; the porting recipe is
+> `../project/porting_sprite_lists.md`.
+>
+> The 14z-69j state below is KEPT because its eliminations are sound and
+> they are what narrowed the search — but every "open" item in it is
+> closed, and its framing ("EMISSION is the open one") is wrong.
+
+### The 14z-69j state, superseded
 
 Where the arc stands, measured on replay 83b against native vsav2.
 

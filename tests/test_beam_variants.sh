@@ -28,12 +28,12 @@
 #   3. GFX READY — 0 of the tiles they draw are missing from group C.
 #
 # Usage: ROMDIR=... tests/test_beam_variants.sh [wide-builddir]
-#        (defaults to build/hui17)
+#        (defaults to build/hui25)
 set -eu
 ROMDIR="${ROMDIR:?set ROMDIR}"
 REPO="$(cd "$(dirname "$0")/.." && pwd)"; cd "$REPO"
 WORK="$(mktemp -d)"; trap 'rm -rf "$WORK"' EXIT
-BUILD="${1:-build/hui17}"; case "$BUILD" in /*) ;; *) BUILD="$REPO/$BUILD";; esac
+BUILD="${1:-build/hui25}"; case "$BUILD" in /*) ;; *) BUILD="$REPO/$BUILD";; esac
 [ -f "$BUILD/rompath/vsavjw.zip" ] || { echo "FAIL: no $BUILD/rompath/vsavjw.zip"; exit 1; }
 REF_BIN="${MAME_REF_BIN:-$HOME/.cache/vampire-saved/mame-ref/cps2}"
 RPL="$REPO/tests/replays/hui/86_hui_beam_variants.rpl"

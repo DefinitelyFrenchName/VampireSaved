@@ -6,7 +6,17 @@
 --   env WATCH        "ff8480,4" (start,len) or "ff8480,4,r" / "...,rw"
 --                    (watch mode; default w = writes); mode "b" sets an
 --                    EXECUTION BREAKPOINT at the address instead (len
---                    ignored) — log registers at a PC (session 14c)
+--                    ignored) — log registers at a PC (session 14c).
+--                    An optional 4th field selects the ADDRESS SPACE:
+--                    "8f216,4,r,o" watches the OPCODES space (wposet),
+--                    "…,d" the data space, default/"p" the program space.
+--                    THIS MATTERS: on CPS-2 every pc-relative read
+--                    (`move.w (d16,pc,Dn),Dm`, `movea.l (d16,pc,Dn),An` —
+--                    i.e. every jump/handler table the engine indexes) is
+--                    served by m68k_read_pcrelative_*, which goes through
+--                    m_readimm16 = AS_OPCODES. A plain wpset on such a
+--                    table is SILENTLY BLIND and reports zero hits, which
+--                    reads as "this table is never used" (14z-71).
 --   env TRACE_OUT    log path (default trace_writes.txt)
 --   env FRAMES       stop after this many frames (default 3600)
 --
@@ -76,16 +86,28 @@ if replay_path then
     end
 end
 
-local start_addr, len, mode = watch:match("^(%x+),(%d+),?(%a*)$")
-assert(start_addr, "WATCH format: hexaddr,len[,r|w|rw]")
+-- LENGTH IS HEX, and it must be matched as hex (14z-71). MAME's debugger
+-- parses `wpset addr,len,...` numbers as HEX, so a length of "a" means ten
+-- bytes and "10" means sixteen. The pattern used to demand %d+ for the
+-- length, so any hex-lettered length (a, b, c, …) failed the match, the
+-- assert killed the run BEFORE the replay started, and the trace file came
+-- out EMPTY — which reads downstream as "zero accesses, this address is
+-- never touched". That is a false negative that looks exactly like a
+-- finding; it nearly shipped one. Callers that passed decimal lengths are
+-- unaffected: MAME was already reading them as hex.
+local start_addr, len, mode, space = watch:match("^(%x+),(%x+),?(%a*),?(%a*)$")
+assert(start_addr, "WATCH format: hexaddr,hexlen[,r|w|rw][,p|d|o]")
 if mode == "" then mode = "w" end
+if space == "" then space = "p" end
+local WPCMD = { p = "wpset", d = "wpdset", o = "wposet" }
+assert(WPCMD[space], "WATCH space must be p (program), d (data) or o (opcodes)")
 
 -- register the watchpoint (or breakpoint, mode "b") on the maincpu
 debugger:command(string.format("focus 0"))
 if mode == "b" then
     debugger:command(string.format("bpset %s", start_addr))
 else
-    debugger:command(string.format("wpset %s,%s,%s", start_addr, len, mode))
+    debugger:command(string.format("%s %s,%s,%s", WPCMD[space], start_addr, len, mode))
 end
 
 -- POKES (14z-68): same grammar/application point as replay.lua, so the

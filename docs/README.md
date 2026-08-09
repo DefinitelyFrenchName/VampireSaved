@@ -18,7 +18,7 @@ Yes, about Vampire Savior -> `game/`. Yes, about CPS-2 or the emulators
 Entry points at this level, deliberately not in a bucket:
 - [`NEXT_SESSION.md`](NEXT_SESSION.md) — 60-second orientation, rewritten
   at session end. Session state, not knowledge.
-- [`GOTCHAS.md`](GOTCHAS.md) — the index of all 135 traps, grouped by
+- [`GOTCHAS.md`](GOTCHAS.md) — the index of all 143 traps, grouped by
   bucket, linking to `*/gotchas.md`. ~195 places in the repo cite
   `docs/GOTCHAS.md`; they all still land somewhere useful.
 - `checksums.txt` — machine-read by `tools/audit_roms.py`. A data
@@ -32,13 +32,21 @@ Entry points at this level, deliberately not in a bucket:
   game. **Read the relevant section before touching any subsystem.**
 - [`atlas/`](game/atlas/) — the verified ROM/RAM map per romset:
   `ram.md`, `character_tables.md`, `id_space.md`, `select_screen.md`,
-  `venue_assets.md`
+  `sprite_lists.md`, `venue_assets.md`
 - [`gotchas.md`](game/gotchas.md) — traps in the game itself
 
 **`platform/`**
 - [`gotchas.md`](platform/gotchas.md) — traps in CPS-2 and the emulators
 
 **`project/`**
+- [`porting_code_regions.md`](project/porting_code_regions.md) — how to
+  root a block of vs2/vh2 CODE so it still works after we move it:
+  bounds, pc-relative data tables, branch escapes, and crypt placement.
+  Four sessions of one mistake, as a checklist.
+- [`porting_sprite_lists.md`](project/porting_sprite_lists.md) — what a
+  tenant port must do so ported effects DRAW: the class row, the missing
+  list type, the per-game code bias, and which gfx bank the art comes
+  from. Read with `game/atlas/sprite_lists.md`.
 - `patch_notes.md` / `patch_index.md` — per-change detail; the registry
 - `cps2_wide.md` — the extended hardware profile we defined
 - `tenant_manifest.md`, `tables/` — port config; community-reviewable

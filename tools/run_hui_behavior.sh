@@ -1,6 +1,15 @@
 #!/bin/sh
 # run_hui_behavior.sh — the Huitzil playtest build, interactive.
-# 14z-70f (PING #13, build/hui17 = 699de9b7): THE 214+P GROUND
+# 14z-71 (PING #14, build/hui20 = 40cc10b1): THE BEAM DRAWS. Two
+# stacked defects, both fixed at zero legacy cost: vsav shipped
+# effect-class row 16 as a STUB where vs2/vh2 carry the beam's handler,
+# and underneath that its sprite-list drawer has no list-type 12 (the
+# composite the beam's list uses) — taken over from vsav's UNUSED
+# list-type 6. Look for: the muzzle orb at the cannon, then the beam
+# extending to the opponent on 236+P / 236+K / 236+2P. The freeze
+# already worked; it is the visuals that were missing.
+#
+# Previously (PING #13, build/hui17 = 699de9b7): THE 214+P GROUND
 # EXPLOSION. The grenade's ground detonation drew a solid FUCHSIA
 # rectangle (the ping-#7 "fuchsia class"); 569 group-C tiles were
 # remapped but never copied. Fires on tests/replays/hui/83d — 214+LP
@@ -47,19 +56,47 @@ set -eu
 ROMDIR="${ROMDIR:?set ROMDIR}"
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"
-OUTBASE="${1:-build/hui17}"
+OUTBASE="${1:-build/hui25}"
 
+# NEVER silently rebuild into a directory that already exists (14z-71).
+# The old behaviour built TODAY's manifest into whatever path you named, so
+# `run_hui_behavior.sh build/hui11` on a pruned rompath handed you a CURRENT
+# build wearing a historical name — destroying the A/B evidence you were
+# trying to look at, silently. Auto-build only into a path that does not
+# exist yet; otherwise say so and stop.
 if [ ! -f "$OUTBASE/rompath/vsavjw.zip" ]; then
+    if [ -d "$OUTBASE" ] && [ "${REBUILD:-0}" != "1" ]; then
+        echo "REFUSING to rebuild: $OUTBASE exists but has no rompath."
+        echo "  If this is a historical build, its rompath was pruned — do NOT"
+        echo "  rebuild it here: today's manifest would produce DIFFERENT bytes"
+        echo "  under an old name. Rebuild it in a fresh directory instead, or"
+        echo "  set REBUILD=1 if you really mean to overwrite this one."
+        exit 1
+    fi
     echo "building the stage-6 gfx build at $OUTBASE ..."
     TENANT_MANIFEST=build/manifest/huitzil.toml TENANT_CHAR=0x10 \
     GEN_FLAGS="--profile cps2-wide-v1 --allow-plausible --tripwire-open" \
         tools/build_donovan.sh 6 "$OUTBASE" | tail -2
 fi
 
+# Say WHAT is being launched. "Am I playing what I think I am?" has cost
+# this project more than once; the fingerprint is one line and settles it.
+_FP="$(python3 tools/build_fingerprint.py "$OUTBASE/rompath;$ROMDIR" \
+        --set vsavjw --sha-only 2>/dev/null | tail -1)"
+echo "build: $OUTBASE   ${_FP:-(fingerprint unavailable)}"
+
 MAME_BIN="${MAME_BIN:-$HOME/.cache/vampire-saved/mame/cps2}"
 [ -x "$MAME_BIN" ] || { echo "WIDE MAME missing — tools/setup_mame.sh"; exit 1; }
 
 echo "Launching. Phobos = his own wheel cell (D,D,D from default). Esc quits."
+# Keep MAME's writable state OUT of the repo and away from $ROMDIR — the
+# reference set was polluted once by an emulator run directly against it
+# (it grew cfg/nvram dirs and lost a member). Everything lands in a
+# per-build sandbox instead.
+_SBX="${MAME_SANDBOX:-$OUTBASE/play}"
+mkdir -p "$_SBX/cfg" "$_SBX/nvram" "$_SBX/snap"
 exec "$MAME_BIN" vsavjw \
     -rompath "$(cd "$OUTBASE/rompath" && pwd);$ROMDIR" \
+    -cfg_directory "$_SBX/cfg" -nvram_directory "$_SBX/nvram" \
+    -snapshot_directory "$_SBX/snap" \
     -skip_gameinfo

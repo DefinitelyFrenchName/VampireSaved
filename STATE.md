@@ -1,13 +1,20 @@
 # STATE — living progress log
 
-Updated: 2026-08-09 (session 14z-70 CLOSED — the 214+P GROUND explosion
-FIXED and maintainer-confirmed (PING #13, build/hui17); the BEAM fully
-scoped and measured, ready to build (docs/project/beam_port_scope.md);
-THE ANCHOR METHOD adopted as the first move for any non-drawing effect;
-and a working agreement with the maintainer on captures, scoping, and
-not asking him code questions as gameplay questions. FOUR of my own
-claims were retracted in-session after clean re-measures. Read
-docs/NEXT_SESSION.md first.)
+Updated: 2026-08-09 (session 14z-71 — THE BEAM DRAWS. Root cause: vsav
+ships effect-class row 16 as a STUB where vs2/vh2 carry the beam's
+handler, and underneath that its sprite-list drawer has no list-type 12.
+Both fixed in build/hui20 (40cc10b1) at ZERO legacy cost, by porting the
+handler and taking over vsav's unused list-type 6 — with the deadness
+assumption deliberately NOT load-bearing. Formerly: It was never the anim data, the emitter, the object or the
+records: vsav's effect-CLASS dispatch table ships row 16 as a STUB where
+vs2/vh2 carry the beam's handler. Porting that handler makes the beam
+ENTER its animation and the muzzle orb DRAW — and exposes a SECOND
+defect beneath it: the beam's sprite list is TYPE 12, a list format
+vsav's drawer does not have. A thunk for it works and the beam draws
+fully, but it costs a legacy replay that never re-converges, so BOTH
+rows are PARKED pending one maintainer decision. Two of my own
+measurements were retracted in-session, one of them a dead instrument
+that printed a clean zero. Read docs/NEXT_SESSION.md first.)
 
 Previously: 2026-08-08 (session 14z-70 IN PROGRESS — the beam residual moved
 off the draw path and onto anim-sequence SELECTION: our build never walks
@@ -25,6 +32,508 @@ findings were RETRACTED in-session after clean re-measures — each with
 the comparison error written down so it cannot be repeated. Every gate
 green at close, including two NEW audits. Read docs/NEXT_SESSION.md
 first, then the 14z-69 sections below.)
+
+## Session 14z-71 — THE BEAM: row 16 of the effect-class table is a
+## STUB in vsav, and underneath it vsav has no list-type 12
+
+**The whole chain, measured on both legs.** Every secondary-object pool
+runs a per-frame dispatcher that reads the object's CLASS from field
+`+0x02` and jumps through a table of handler pointers:
+
+```
+vsavj 0x080A90  move.b 0x02(a6),d0 / add.w d0,d0 / add.w d0,d0
+                movea.l (0x12,pc,d0.w),a0 / jsr (a0) / lea 0x80(a6),a6
+```
+
+The beam pool's table is 38 rows (vsavj `0x080AAC`, vs2 `0x08F1D6`, vh2
+`0x08EDE2`) and they are **index-aligned 1:1 across all three sets**.
+vsav ships rows **16/17/19/31 as STUBS** — all pointing at the bare
+`rts` immediately after the table — where vs2/vh2 fill 16/17/19.
+
+**Row 16 is the beam's, and our build was already asking for it.** Read
+watchpoint on each leg's own row-16 slot, replay 83b:
+
+| leg | reads | in the beam window | A0 loaded |
+|---|---|---|---|
+| native vsav2 | 598 | 48 | `0x093460` (the handler) |
+| ours (hui17) | 593 | 46 | `0x080B44` (**the stub**) |
+
+Same frames, same objects (`$FFD400`/`$FFD480`), same `D0=0x40` = class
+16 x 4. Nothing upstream was ever wrong — not the object, not the class,
+not the dispatch. **The single defect was one dead table row.** That
+retires the 14z-70 framing ("a vs2-only routine FOLLOWS the shared
+type-2 routine"), which was address-adjacency reasoning: `0x093460` does
+not follow anything, it is row 16's handler and a sibling of the shared
+reader at row 37.
+
+**Stage 1 — port the handler, repoint the row.** New root
+`0x93460:0x306:t0x9306c:f` (bound measured: the row-16 family exactly,
+ending on the `rts` at `0x093764` with row 17's identically-shaped head
+after it; every pc-rel table and target inside; 0 lea(pc) readers, 0
+pcrel escapes; twin = vhunt2's OWN row-16 entry). New generator facility
+`[[code_ptr]]` writes a guarded LONG into a table read through the
+opcode view. Result: **legacy masked-v2 EXACT**, and
+`test_beam_anim_walk.sh` flips `absent -> walks`. The muzzle orb DRAWS.
+
+**Stage 2 — and then it crashes.** `CRASH 3176 vec3 PC 01e9d6
+ADDR 0001e9f7`, `A6=ffffd400` (the beam object), `D0=00003a18`. The
+drawer's list-type table is **self-encoding — entry 0's own offset IS
+the table length**, because handler code begins right after it:
+
+```
+vsavj  entry0 = 0x000C -> 6 entries, types 0..10
+vs2    entry0 = 0x000E -> 7 entries, types 0..12   (vh2 agrees)
+```
+
+The beam's sprite list is **type 12**. On vsav that indexes two bytes
+past the table and jumps into an engine data table. vs2's type-12
+handler (`0x01A1FC`, 0x3A bytes) is a **composite/group list** — a count
+then N x {dx, dy, sub-list pointer}, each drawn by RECURSING into the
+drawer. vsav has no equivalent anywhere (0 occurrences of its first 0x0C
+bytes).
+
+**A thunk for it WORKS — the beam draws** (snapshots at f3192/f3200
+match native's shape; guarded replay clean to `END 4420`). Mechanism:
+displace the two instructions at `0x01AFAA`, test for type 12, and jump
+BACK to the intact vanilla dispatch at `0x01AFB0`, which needs only a0
+and d0. Body is Capcom's handler byte-for-byte except the two bsr
+displacement bytes.
+
+**But it costs legacy, and that is why it is parked:**
+
+| replay | thunk OUT | thunk IN |
+|---|---|---|
+| 02 / 07 / 09 / 30 | EXACT | FLICKER 1 (829) |
+| 29_felicia_walljump | FLICKER 1 (2436) | FLICKER 2 (829, 2436) |
+| 03_two_player_vs | FLICKER 2 (829, 2093) | unchanged |
+| 01_attract_long | EXACT | EXACT |
+| 06_test_mode | FAIL 2421 @700 | unchanged (PRE-EXISTING) |
+| **04_select_fuzz** | FLICKER 3 | **FAIL 1514 from f829, no re-convergence** |
+
+The flicker frames are the ratified hook mechanism. `04_select_fuzz` is
+not: a legacy path changes materially and never re-converges. **Making
+the hook cheaper will not help** — it adds ~42 cycles to ~2 dispatches
+per frame (~0.04% of a frame) and f829 already flickers un-hooked on
+replay 03, so ANY cycle change moves that boundary.
+
+**The zero-cost alternative, measured:** the beam's composite list is
+tiny and its children are a type vsav already has —
+`251CD2: type 000C, count 2 -> (0,0)->262306 type 2, (-0x4D,0)->262584
+type 2` — so it can be FLATTENED at build time into one type-2 list.
+No hook, no cycles, nothing to ratify. Cost: decode the type-2 format
+from its handler (`0x01B234`), write the transform, and accept that the
+flattened list is authored data the sibling oracle cannot check.
+
+## Session 14z-71 CLOSE — ritual complete
+
+- **STATE** updated (this file, newest-first above).
+- **docs/NEXT_SESSION.md** rewritten for the next session: the remaining
+  Phobos work, with the grab-victim item's first measurement specified and
+  the correct grab inputs recorded.
+- **HANDOFF** carries the hui25 registry row, the new gates, and the
+  corrected launcher notes.
+- **patch_index / patch_notes** carry all three beam mechanisms with byte
+  detail, plus 14z-70's two.
+- **New documentation** (maintainer-requested sweep):
+  `docs/game/atlas/sprite_lists.md`, the "sprite-list DRAWER" section in
+  `engine_internals.md`, `docs/project/porting_sprite_lists.md`,
+  `docs/project/porting_code_regions.md`. Three stale section HEADERS
+  corrected; `docs/README.md` indexes the new files.
+- **CLAUDE.md §5** gained the RETRACTION DISCIPLINE standing order.
+- **Persistent suite:** `tests/test_beam_list_type6.sh` (new),
+  `tests/audit_effect_class_rows.sh` (new, incl. the tripwire),
+  `trace_writes.lua` gained an address-space selector and a hex-length
+  fix, `test_beam_anim_walk.sh` flipped to `walks` and now DERIVES the
+  anim placement, four gates' default builds moved off superseded ones,
+  and `run_hui_behavior.sh` refuses to silently rebuild historical builds.
+- **Closing sweep, 18/18 PASS:** beam_list_type6, patch_overlap,
+  romset_identity, compare_composite, m3a_reproducible, gfx_layout3,
+  hui_boot (legacy masked-v2 EXACT), beam_anim_walk, beam_variants,
+  audit_empty_tiles, audit_effect_class_rows, hui_pairs, hui_ex,
+  hui_grab, hui_air, hui_walk, hui_winscreen, hui_df_style.
+
+**SHIPPED:** the beam, maintainer-confirmed clean on all three variants,
+at ZERO legacy cost (`build/hui25`, `b0fb2f94`) — plus the grab lightning,
+which came free with the same class-16 row.
+
+**Retractions this session: five, all mine.** "The beam object is never
+created" was already retired; then "a vs2-only routine FOLLOWS the shared
+one" (address adjacency), "the handlers are byte-identical, the one
+difference is a relocated address" (that byte WAS the defect), "the
+strip's tiles were never copied" (they were; the codes were wrong), and
+"the grab lightning needed nothing" — twice, the second time backed by a
+measurement of the wrong effect entirely.
+
+**Four instrument failures, one shape.** A blind watchpoint space, a
+rejected watch length that killed the run, a boot-clear counted as
+tripwire hits, and an atlas parse with a hardcoded size. Every one printed
+a confident number. The defence that worked every time was a POSITIVE
+CONTROL on the same instrument and the same leg.
+
+**What actually moved the work forward** was not analysis. The maintainer
+named the ice art from a screenshot, asked why a beam would waste ROM on
+non-repeating tiles (which sent us to the tile CONTENT and from there to
+the emitters and the one-byte bias), and settled the grab-lightning
+attribution with a two-build playtest that six build-dumps had got wrong.
+Captures early, and bisect the builds before analysing the code.
+
+## 14z-71 RETRACTION DISCIPLINE adopted into CLAUDE.md §5 (maintainer)
+
+After the effect-family claim had to be corrected in nine places across
+two passes, the maintainer asked for the fix to become work discipline
+rather than a lesson. Added to CLAUDE.md §5 as a standing order:
+
+> **When a claim changes, GREP FOR THE CLAIM — not for the files you
+> remember writing it in.** Fix the HEADER and the summary line first,
+> re-grep afterwards and show the empty result, and keep the superseded
+> analysis marked RETRACTED. Status headers track reality; historical
+> entries are not rewritten.
+
+The evidence behind it, both measured this session: `engine_internals.md`
+carried "the 214+P explosion is NOT a tile-inventory defect" as a HEADER
+directly above a subsection proving it was; and a corrected
+effect-family finding survived in five further places, including a
+build-registry row written *after* the correction began and the gotcha's
+own title and index line, which still stated the inverted lesson.
+
+Both were found by grepping the assertion's wording in one pass. Neither
+was found by re-reading the documents — which is the whole point: the fix
+is mechanical, not attentional.
+
+## 14z-71 THE EFFECT FAMILY IS CLOSED — and a NEW, separate defect:
+## the GRAB VICTIM's mid-animation placement
+
+**Maintainer playtest of `build/hui25`:** *"electricity is here, on both
+regular grab and circuit scrapper"*, Phobos' own sprite OK, effects OK.
+
+**That closes the effect family** — all four members it was ever said to
+contain: the 236P beam, the ES big beam, the 214+P ground explosion, and
+the grab lightning. Worth recording HOW they closed, because the 14z-69
+premise was RIGHT for three of the four and the correction is the
+instructive part: they were grouped as **"one root, one port covers the
+family"**, and in the end the beam, the ES beam and the grab lightning
+**did** share one — the dead effect-class row 16 — while only the 214
+explosion stood apart. The explosion was an uncopied tile inventory (14z-70f); the beam
+and ES were a stub class row + a missing list type + a per-game code bias
+(14z-71); and the **grab lightning shares the beam's cause** — the dead
+effect-class row 16. Maintainer playtest, decisive: hui17 has no
+electricity, hui18 has it, and hui18 = hui17 + exactly the region
+`x093460` and the row-16 repoint (`00080B44` -> `000D89B0`). So THREE of
+the four shared a root and only the 214 explosion stood apart. My two
+attempts to say otherwise were both wrong — the second "measured" the
+wrong thing (a pal-0x0C filter inherited from the beam, on a rig that
+never produced a grab). A shared SYMPTOM ("this effect does not draw") is a HYPOTHESIS about a
+shared mechanism, not evidence for one — it has to be tested member by
+member. Testing the cheapest member first (one playtest of the grab) would
+have CONFIRMED the shared root immediately, instead of leaving it open for
+three sessions and then being argued against twice on bad evidence.
+
+**NEW OPEN ITEM (maintainer-reported, in scope, NOT a blocker):** during a
+grab, the **VICTIM's sprite placement glitches mid-animation** — the grab
+"begins and ends correctly, but the middle of the animation has the
+grabbed character's sprite moving/teleporting around incorrectly". Both
+grabs. Phobos' own sprite and all effects are fine, so this is
+victim-side positioning only. The maintainer notes it is subtle enough
+that earlier playtests did not call it with certainty.
+
+**Why the shape matters (endpoints right, middle wrong).** Grab endpoints
+are set by discrete events (connect, release); the middle is driven by
+PER-FRAME data. So the suspect is the per-frame victim-offset/capture-pose
+data or its stride, not the grab logic — which is consistent with the
+grab's damage and launch arc already being native-exact and gated
+(`test_hui_grab.sh` passes on this build).
+
+**First measurement when this is picked up** (cheap, decisive, one run per
+leg): dump the VICTIM's position fields per frame across the grab window
+on native vsav2 and on ours, and diff. Positions are mapped fields
+(`atlas/ram.md`), so they are directly comparable; the first divergent
+frame and the size of the jump name the data. Do NOT start from the grab
+code.
+
+## 14z-71 THE DOCUMENTATION SWEEP (maintainer-requested)
+
+Asked for after the beam closed: document how the data is structured and
+drawn, game-side and project-side, including prior findings, so Pyron does
+not re-pay it and so it is useful to anyone hacking VS/VS2.
+
+**Measured first.** Gap ratio 14z-68m was 810 doc lines vs 8417 STATE
+lines (~10:1); now 2118 vs 9643 (~4.5:1). Cross-checked 28 subsystems
+against the docs: **none is entirely absent** — keyword coverage is broad.
+
+**The sweep's real finding is worse than a gap: three section HEADERS
+described superseded states.**
+- "The 214+P grenade explosion — TRIAGED 14z-69q (**NOT a tile-inventory
+  defect**)" — it WAS one, 569 uncopied tiles, fixed in 14z-70f. A 14z-70
+  subsection had been appended underneath, but the header still asserted
+  the opposite. **A skimmer reads headers.**
+- "The beam / effect family — state after 14z-69j (EMISSION is the open
+  one)" — superseded entirely.
+- "Dark Force — STYLE measured 14z-69" — the palette shipped in 14z-69p.
+
+All three now carry a RESOLVED/RETRACTED banner naming what replaced them,
+with the old analysis kept below (the eliminations are still sound; only
+the conclusions moved). **Rule adopted: when a finding is overturned, fix
+the HEADER in the same commit — appending a subsection is not enough.**
+
+**Written this sweep:**
+- `docs/game/atlas/sprite_lists.md` — the drawer, the self-encoding table
+  length, all list formats, the budget, the row-wrap rule, the per-game
+  bias table, legacy usage per type.
+- `docs/game/engine_internals.md` "The sprite-list DRAWER" — the
+  four-dispatch chain and the three failure modes; cross-linked with the
+  sword/statue blink as the same bank-attribution class.
+- `docs/project/porting_sprite_lists.md` — the four questions to ask of a
+  ported effect, with mechanism, safety argument and gate for each.
+- `docs/project/porting_code_regions.md` — the region-bound / pc-rel
+  table / escape / crypt-placement class, i.e. 14z-69h/i/j and 14z-70c as
+  a checklist. This one had NO section anywhere despite costing four
+  sessions.
+
+**Open item the sweep surfaced:** `gfx_layout3.toml`'s "one-source-bank
+premise" is incomplete — a tenant with a type-4 effect draws from a second
+gfx bank. Re-check before Pyron's gfx rung.
+
+## 14z-71 WHAT THE STRIP FIX RETROACTIVELY CHANGED (maintainer's question)
+
+Asked after the clean playtest: now that we know how the beam is drawn,
+does it challenge how we implemented it? Measured, three answers.
+
+**1. It CONFIRMS the two big choices.** The list-type-6 takeover is
+reinforced, not challenged: we now know the composite's children include a
+PROCEDURAL generator whose output depends on runtime facing, which is the
+strongest possible evidence that flattening (the competing option) was
+never viable. And the type-4 handler port is still the right shape — the
+bias could in principle have been fixed in DATA instead (shift each list's
+raw code by +0x0A00), but the hardcoded BANK cannot, so a ported handler
+was needed regardless; doing both constants in one place keeps our ported
+data byte-faithful to vs2.
+
+**2. It BREAKS one premise.** The gfx layout rests on H's art being one
+contiguous bank-3 band placed at delta 0 (`gfx_layout3.toml`, the
+"one-source-bank premise", which is a fact-lock in a test). That is
+incomplete: his effects also draw from BANK 1, by a handler that composes
+its own bank word. The premise held only because nothing had ever
+exercised that path. Re-examine it for Pyron before his gfx rung.
+
+**3. It exposes a CLASS, and this is the valuable part.** The whole port
+assumes ported vs2 list data is interpreted identically by vsav's
+handlers. That assumption is now measured FALSE. Comparing every handler
+in vsav's drawer table against vs2's:
+
+| list type | difference |
+|---|---|
+| 0, 2 | branch displacements only — semantically identical (why muzzle/tip always drew) |
+| **4** | code bias +0x3800 vs +0x4200 (`addi.l`) — the beam bug |
+| **6** | the same bias, as `addi.w` |
+| **8** | the same bias, as `addi.w` |
+
+So a future tenant whose content uses a type-6 or type-8 list will address
+tiles 0x0A00 low and render someone else's art — the identical defect,
+already diagnosed. H is clear (his composite children are only types 2 and
+4), but that census covered composite CHILDREN, not every list his anim
+nodes reach.
+
+Frozen as `tests/test_beam_list_type6.sh` section 1c, which counts the
+bias sites per handler in BOTH encodings and fails if the inventory moves.
+Writing that check immediately caught my own first version matching only
+the long form and reporting a cheerful zero for types 6 and 8 — the same
+blind-instrument shape as everything else this session.
+
+## 14z-71 THE STRIP FIXED — ONE BYTE: the two games' type-4 handlers
+## use DIFFERENT code biases (build/hui25, b0fb2f94)
+
+**vsavj biases sprite codes by +0x3800; vs2 by +0x4200.** That is the ONLY
+difference between the two games' type-4 routines — one byte at
+handler+0x7E — and it is the whole defect. Our ported vs2 list data ran
+through vsav's handler and addressed tiles **0x0A00 too low**, landing on
+the freeze/reflection art. The maintainer named that art on sight from a
+screenshot.
+
+I had compared those two handlers early and called them "byte-identical
+(255/256; the one difference is a relocated address)". **It was not a
+relocated address.** Dismissing it cost most of a session and produced
+three wrong builds.
+
+**How it was actually found — the maintainer's question, not my analysis.**
+He asked why a beam would waste ROM on non-repeating tiles. That sent me to
+look at the tile CONTENT instead of its address: vs2 bank-1 0x4EC0 is
+**horizontal stripes, every row one flat colour, uniform left to right**,
+stored as 16 identical copies. Uniform art means a repeat, a repeat means
+the strip, and from there the emitters gave up the bias in one look. The
+lesson is the one already in NEXT_SESSION five times over, in a new
+costume: I inferred, he asked for the picture, the picture settled it.
+
+**The fix (three parts, all in build/hui25):**
+- `--strip-tiles` in the gfx builder: vs2 BANK-1 tiles -> group C bank 4 at
+  code+0x1000, with readback verification. Chosen over vsav's own bank 1,
+  which is 160-of-240 OCCUPIED at those codes (measured) — writing there
+  would overwrite host art.
+- A ported type-4 handler: vsavj's 0x01B61A verbatim with exactly TWO
+  constants changed — `ori.w #$2000`->`#$1000` (its hardcoded bank; type 2
+  takes the object's, type 4 composes its own) and the bias
+  `#$38000000`->`#$52000000` (vs2's 0x4200 plus our 0x1000 shift).
+- A child dispatcher in the composite: type-4 children take our copy,
+  everything else the untouched vanilla drawer entry.
+
+The inventory is a SPAN (0x4EA0-0x4FBF), not a sample: sampling native's
+draws gave 0x4EC0-0x4F9F and missed the pal-05 strips at 0x4EB0/0x4ED0,
+which then drew from uncopied positions. The 14z-70f grenade lesson,
+re-paid.
+
+**Gates, all PASS on hui25:** hui_boot (legacy masked-v2 EXACT),
+beam_list_type6 (now covering the type-4 half and FREEZING BOTH GAMES'
+BIASES so that byte can never be dismissed again), beam_anim_walk,
+beam_variants, audit_empty_tiles on the beam replays,
+audit_effect_class_rows incl. the tripwire, m3a_reproducible, gfx_layout3,
+hui_pairs/ex/grab/air/walk/winscreen. Guarded beam replay clean to END 4420.
+
+**A fourth instrument bug, same family:** the tripwire's atlas parse
+hardcoded the body size (0x62), so when the body grew to 0x102 it fell back
+to an empty PC range and reported a cheerful "unarmed" — a blind
+instrument wearing a pass. Now size-agnostic.
+
+## 14z-71 PLAYTEST (maintainer, build/hui20): THE BEAM DRAWS, and the
+## STRIP is corrupt — its art lives in a bank we never ported
+
+Maintainer report: *"the beam starts clean and it seems like it does draw
+in its entirety on some frame but most of it is invisible on most frames
+aside from the first segment... ES version: left half of the beam
+perfect, right half there but corrupted. 236+K and 236+P have the same
+graphical issues."*
+
+That maps exactly onto the decoded anatomy: the **muzzle and tip are the
+type-2 children and draw correctly**; the broken part is the **procedural
+type-4 strip**, piece 2.
+
+**Root-caused, with two hypotheses killed by measurement first:**
+- *"vsav's type-4 handler differs from vs2's"* — REFUTED, they are
+  byte-identical (255/256; the one difference is a relocated address).
+- *"the strip's tiles were never copied"* (the child-shadow class) —
+  REFUTED, `audit_empty_tiles.sh` on the beam replays finds no empty
+  group-C tile, and tiles 0x4EC0-0x4ECF are non-blank in our group C.
+
+**The actual cause, from native's own OBJ dump.** Sprite entries at f3184
+on the native leg:
+
+| piece | list type | y-word | composed tile addr |
+|---|---|---|---|
+| muzzle / tip | 2 | `606c` = bank 3 | `31e2f` (H's own band) |
+| **strip** | **4** | **`2074` = bank 1** | **`14ec0`** |
+
+The type-4 handler **hardcodes its bank**: `ori.w #$2000,d0` at
+`PRG:0x01B654`, where the type-2 handler takes the object's own y bits
+(`or.w $18(a6),d1`). On native that is correct — **the strip's art really
+does live in gfx BANK 1, not in H's bank-3 band.** Our gfx port relocated
+only the bank-3 band into group C, so the strip's tiles were never
+ported: our group-C `0x4EC0` is vs2's *bank-3* `0x34EC0` (verified equal),
+while the strip's art is vs2's *bank-1* `0x14EC0` (verified different),
+and **0 of its 16 tiles exist anywhere in our group C**. Right geometry,
+someone else's art — which is precisely "there but corrupted", and reads
+as "invisible" wherever the wrong tile happens to be dark.
+
+**Second mechanism to carry forward:** the handler biases every code by
+`addi.l #$38000000,d1` — list code `0x16C0` emits as `0x4EC0`. Any
+inventory built from the raw list data must add 0x3800 before looking a
+tile up. (This is why a first census of the 24 strip lists reported codes
+0x0CB0-0x0D9F while the live dump showed 0x4EC0.)
+
+**Scoped fix (NOT built):** the strip's bank-1 tiles must be ported into
+group C, and the tenant's type-4 strips must address them there — which
+needs the hardcoded `#$2000` to become bank 4 for tenant strips ONLY
+(type 4 is legacy-live, 321 reads/replay, so the shared handler cannot be
+edited). The established shape: our composite already recurses through
+our own code, so it can dispatch type-4 children to a ported copy of the
+handler with `ori.w #$1000`, exactly as row 16 and list-type 6 were done.
+Open before building: finalise the tile inventory under the +0x3800 bias
+(24 strip lists, widths growing 2,4,6,8,10,12... as the beam stretches),
+and choose the group-C codes plus the base-code rewrite in our lists.
+
+## RESOLVED the same session — TAKE OVER THE DEAD LIST-TYPE 6
+## (maintainer-approved; build/hui20, fingerprint 40cc10b1)
+
+Neither flattening nor the drawer hook was needed. **vsav's drawer has two
+list types nothing uses.** Types 6 and 8 measure ZERO reads across six
+legacy replays, against same-instrument controls of 4329 / 2702 / 2260 /
+321 on types 2 / 10 / 0 / 4. Nothing else points into the type-6 handler
+(the two bytes before it are type-4's `rts` skip target), and H's own
+content uses neither.
+
+So: a 6-byte `jmp` over the dead type-6 handler head, and the type word on
+our own 39 composite lists changed `000C -> 0006`. **Capcom's composite
+code then runs verbatim — procedural type-4 children and all — with
+nothing flattened and nothing re-derived.** Zero legacy cycles, because
+nothing legacy executes changes.
+
+**The zero-cost claim is measured, not argued.** Every legacy replay
+matches its pre-takeover baseline EXACTLY — 02 and 07 EXACT, 03
+FLICKER 2 (829, 2093), 04 FLICKER 3 (1525, 2009, 2195), 09 FLICKER 1
+(829), 29 FLICKER 1 (2436) — identical run for run to the no-thunk
+control. `test_hui_boot.sh` is masked-v2 EXACT.
+
+**THE DEADNESS ASSUMPTION IS DELIBERATELY NOT LOAD-BEARING** (maintainer's
+standing instruction, and the best part of the design). "Dead" here means
+measured-by-absence, and we may simply have missed how vsav uses type 6.
+So the body does not assume it: it discriminates on an ADDRESS RANGE — is
+this list inside our own placed anim region? — and anything that is not
+ours **falls through to vsav's original type-6 code**, reproduced
+instruction-for-instruction and rejoined by `jmp` at `0x01B6B2`. If the
+measurement is wrong, vanilla still renders correctly. That same path
+bumps a counter at `$FF010C`, and `audit_effect_class_rows.sh` section 4
+asserts it stays zero, so the first legacy use of type 6 is a GATE
+FAILURE rather than something a human must notice.
+
+The scratch was audited rather than inherited: vs2's own displacements
+land in a live vsavj buffer (`$FF3578-$FF3581`, 39 accesses per match
+replay), so the slots moved to `$FF0100-$FF010D` — 36 accesses in vanilla,
+all of them the boot clear, none after frame 900, on four legacy replays
+and on our own build.
+
+**Gates at close, all PASS:** hui_boot (legacy masked-v2 EXACT),
+beam_anim_walk (`walks`, with hui17 still reading `absent` as the negative
+control), beam_list_type6, beam_variants, audit_effect_class_rows (incl.
+the tripwire), m3a_reproducible (both frozen references bit-exact),
+gfx_layout3, hui_pairs, hui_ex, hui_grab, hui_air, hui_walk,
+hui_winscreen, audit_empty_tiles. Guarded beam replay clean to END 4420.
+
+**A THIRD instrument mistake, same family as the other two.** The tripwire
+gate cried wolf on its first run — five "hits" that were the boot RAM test
+writing every byte of work RAM, `$FF010C` included. It now counts only
+writes whose PC lies inside the placed thunk body, derived from the
+build's atlas. The pattern across all three: **a "count everything"
+default is the trap; every count needs either a positive control or a
+discriminator that excludes init.**
+
+**TWO RETRACTIONS, both mine, both after clean re-measures.**
+1. *"Native never reads row 16"* — a `wpset` watchpoint is SILENTLY
+   BLIND to pc-relative reads, which on CPS-2 are served by
+   `m68k_read_pcrelative_*` -> `m_readimm16` -> **AS_OPCODES**. The
+   opcodes-space watchpoint (`wposet`) turned 0 hits into 598.
+   `trace_writes.lua` gained a space selector.
+2. *"The handler's A5 scratch window is free in vsavj"* — it is not; it
+   takes **39 accesses** per match replay. The "0" came from a DEAD
+   INSTRUMENT: the tracer matched the WATCH length with `%d+` while MAME
+   parses it as HEX, so a ten-byte window ("a") failed the pattern, the
+   assert killed the run before the replay started, and the empty trace
+   read as a clean zero. A dead instrument and a real finding are the
+   same shape from the outside; every section of the new audit now
+   carries a same-instrument positive control.
+
+**Persistent suite:** `tests/audit_effect_class_rows.sh` (row 16 dead in
+vanilla with a 1760-hit control; the scratch window IS used; list-type
+10 is NOT a spare slot — the closed shortcut, recorded so it is not
+re-proposed). `test_beam_anim_walk.sh` now DERIVES the anim placement
+from the build's own atlas instead of hardcoding it.
+
+**And that fix retro-caught a FALSE PASS.** The gate's constants were
+hui14's (anim at `0x0D8950`, delta `0x16CF22`); the anim region moved to
+`0x0D89B0` at hui15, and the gate's default build was switched to hui17
+without re-deriving them. So section 3 was watching `0x0E2DD8` — an
+address that is not the beam node in hui17 — where the expectation is
+"0 reads". A wrong address satisfies that trivially: the gate had been
+passing for reasons unrelated to its claim, and would have gone on
+reporting "absent" after a real fix. The stale-gate class again
+(docs/GOTCHAS.md), this time hidden inside a gate that was green.
+Placement constants are now derived, never written down.
 
 ## Session 14z-70 — THE BEAM IS AN ANIM-SELECTION DEFECT: our build
 ## never walks the beam anim nodes (measured, both legs, one emulator)
@@ -8625,7 +9134,25 @@ blinks/vanishes in-match; the elemental-sword specials (623P Blizzard
 
 ## Current milestone
 
-**M2 — Proof of life. IN PROGRESS.** Replaced slot = Jedah (0x0F).
+**M3b — the multi-tenant / variant-id track. IN PROGRESS (14z-71).**
+- **Donovan: FROZEN** as `donovan-m3a` (`4b7d0dc7`), de-substituted at his
+  native id 0x13; stock twin `m5_stock` (`6c93cfa8`). Both rebuild
+  bit-exact from the tree (`tests/test_m3a_reproducible.sh`).
+- **Huitzil: at his native id 0x10, feature-complete for the ping arc and
+  awaiting FREEZE.** Current build `build/hui25` (`b0fb2f94`) —
+  maintainer-confirmed clean including the beam (all three variants). Open
+  before freeze: the win QUOTE (cosmetic, root-caused), FG pacing, and the
+  registry row + expectation set.
+- **Pyron: ladder stages 1-4 exist** (`tests/test_pyron_ladder.sh`); his
+  moveset arc and gfx rung are the next tenant work. **Before his gfx
+  rung**, re-check `gfx_layout3.toml`'s one-source-bank premise — a tenant
+  with a type-4 effect draws from a second gfx bank (14z-71).
+- Standing: CPS-2 WIDE v1 is demonstrated on both emulators; the legacy
+  flicker inventory is frozen and any growth is stop-and-root-cause.
+
+### Historical — M2 (proof of life), kept for the record
+
+**M2 — Proof of life. COMPLETE.** Replaced slot = Jedah (0x0F).
 - Program-patch tooling (`tools/patch_prg.py`) DONE and MAME-verified: data
   raw, code re-encrypted, null bit-identical (`tests/test_patch_prg.sh`).
 - **Mechanism PROVEN end-to-end on trusted tooling** (`tests/test_m2_repoint.sh`):
@@ -8711,12 +9238,13 @@ opcode-space dump oracle (`tests/test_decrypt_oracle.sh`). Both directions
 
 ## Next actions
 
-1. **M2b — Donovan graphics** (docs/project/M2_feasibility.md: the R2 tile
-   wall). First step: measure — tile inventory for slot 0x0F (portrait,
-   name, sprite banks), what the garbled-but-recognizable rendering
-   implies about tile-index vs tile-data remapping, whether M3 (gfx
-   ROM extension via descriptor lines) must be pulled forward.
-2. Suite/watch duties continue: flicker inventory is frozen — any growth
+1. **Freeze Huitzil** (`build/hui25`, `b0fb2f94`): registry row +
+   expectation set, maintainer-gated. The playtest is clean.
+2. Then the two cosmetic opens: the win QUOTE (root-caused — the fetch's
+   `lea -4(a0,d0.w)` bias) and FG pacing.
+3. Then **Pyron**: moveset arc, then the gfx rung — re-checking the
+   one-source-bank premise first (14z-71).
+4. Suite/watch duties continue: flicker inventory is frozen — any growth
    or systematic divergence is stop-and-root-cause (CLAUDE.md §4
    standing watch).
 3. Parked (register per milestone): M5 sound restoration (25 stubbed
@@ -8985,8 +9513,19 @@ Original write-up kept below.
 
 ## Decisions pending (human)
 
-- ~~**HOW THE TENANT'S SELECT ART LEAVES JEDAH'S ANCHORS (14z-62e)**~~
-  **DECIDED 2026-08-06 (maintainer): option A.** Analysis kept below.
+- ~~**THE BEAM'S LIST-TYPE 12: FLATTEN, OR RATIFY THE HOOK? (14z-71)**~~
+  **DECIDED 2026-08-09 (maintainer): NEITHER — take over the dead
+  list-type 6**, with the explicit condition that the deadness assumption
+  must not be load-bearing. Built as `build/hui20`; see the 14z-71
+  RESOLVED section. The maintainer's framing, kept because it generalises:
+  *"there is almost always a chance it actually wasn't dead and we just
+  missed how it was used... if we encounter regressions in vanilla
+  assets/engine, this is one of the first places to check, and should we
+  ever encounter something that uses list-type 6 that we didn't know of,
+  we should stop, analyse and assess the situation before continuing."*
+  That is now enforced by construction (the vanilla fallback) and by a
+  gate (the `$FF010C` tripwire), not by memory. See THE DEADNESS REGISTER
+  below.
 
 - **THE 14z-62e SELECT-ART ANALYSIS (decided above).** The
   last visual-de-substitution piece: the tenant's select-art subset (101
@@ -9232,6 +9771,26 @@ Original write-up kept below.
   newcomers; hold-Start alternates are the fallback. See 14z-59l.**
 - See SPEC §7 for the rest. Nothing blocks current work.
 
+## THE DEADNESS REGISTER (opened 14z-71, maintainer's standing instruction)
+
+Every claim of the form **"legacy never reaches this, so we may reuse
+it"**. Each is measured by ABSENCE, which is the weakest kind of evidence
+we accept, so each is listed here with its guard. **These are the FIRST
+PLACES TO CHECK for any unexplained regression in vanilla assets, engine
+behaviour or rendering** — before anything else is suspected.
+
+| Reused resource | Claim | Guard | Fallback if wrong |
+|---|---|---|---|
+| palette-seq ids 0x1E-0x21 (`0x39ACC0`) | vanilla only ever requests 0x26/0x27 | `tests/audit_palette_seq_ids.sh` (10,504 sampled calls) | none — the palette path never transits work RAM, so the audit is the ONLY guard |
+| effect-class row 16 (`0x080AEC`) | vanilla never dispatches class 16 | `tests/audit_effect_class_rows.sh` §1, 0 reads vs a 1760-hit control | none needed: the row was a stub (`rts`), so a wrong claim costs at most the old no-op |
+| drawer list-type 6 (`0x01B6AA`) | vanilla has no type-6 sprite lists | `audit_effect_class_rows.sh` §1/§4 + `tests/test_beam_list_type6.sh` | **YES — non-tenant lists run vsav's original type-6 code, and arming the `$FF010C` tripwire FAILS the gate** |
+
+Rules for adding a row: the claim must be measured with a POSITIVE CONTROL
+on the same instrument and leg (a blind instrument and a real zero look
+identical — paid for three times in 14z-71); it must name its guard; and
+it must say what happens if the claim is wrong. Prefer designs where being
+wrong is *safe and loud* over designs that are merely well-measured.
+
 ## Open bugs
 
 - ~~**WIDE sprite garble (14z-60y)**~~ **FIXED 2026-08-05 (14z-61).** Not a
@@ -9247,8 +9806,12 @@ Original write-up kept below.
   **CLOSED — maintainer playtest of `build/m5_wide` (`9bac6ee3`) confirms
   it**, with and without Donovan: no regression, graphics good, gameplay
   genuine, sounds good.
-- Minor win-screen palette issues, same playtest. Lower priority, and
-  probably unrelated — keep them separate until one is root-caused.
+- ~~Minor win-screen palette issues~~ **FIXED 14z-68m** (build/hui11):
+  the palette source is the OPCODE-view remap table, and the portrait
+  position row needed vs2's own values. Gate: `tests/test_hui_winscreen.sh`.
+- **OPEN (cosmetic):** Huitzil's win QUOTE text — root-caused, not built.
+  The consumer's `lea -4(a0,d0.w)` bias means it reads index 0x60+id-1.
+- **OPEN:** FG pacing — untouched.
 
 ## Findings log
 

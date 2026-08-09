@@ -591,3 +591,74 @@ the one whose targets land on real code/data. The extractor already
 does this right — the trap is for hand analysis, where the wrong
 view produces plausible-looking garbage that can send a whole
 session down a false trail.
+
+## A `wpset` watchpoint is SILENTLY BLIND to every pc-relative read on
+## CPS-2 — jump/handler tables need the OPCODES space (14z-71)
+
+MAME's m68k serves pc-relative reads through `m68k_read_pcrelative_*`
+-> `m_readimm16` -> **AS_OPCODES**, not the program space. So a plain
+`wpset` on any table the engine indexes with `move.w (d16,pc,Dn),Dm` or
+`movea.l (d16,pc,Dn),An` — which is *most* dispatch tables in this
+engine — never fires, and the run reports **zero hits**.
+
+Zero hits reads as "nothing ever uses this table". In 14z-71 that
+inverted a finding for a whole measuring round: the effect-class row the
+beam is dispatched through measured 0 reads on the native leg, which
+would have meant the class-table route was wrong. In the OPCODES space
+the same watchpoint measured **598**.
+
+Rules:
+- Watching a TABLE the engine jumps through? Use the opcodes space —
+  `wposet`, i.e. `WATCH=<addr>,<len>,r,o` in `tests/lua/trace_writes.lua`.
+- Watching RAM, or ROM data read via an address register (`(a0,d0.w)`)?
+  Program space is correct. The discriminator is the ADDRESSING MODE of
+  the read, not whether the target is ROM.
+- Any "this is never read" conclusion needs a POSITIVE CONTROL taken
+  with the same instrument on the same leg — a known-hot row of the same
+  table. Silence and blindness are indistinguishable without one.
+
+## MAME parses a watchpoint LENGTH as HEX — and a length the harness
+## regex rejects kills the run and prints a clean-looking zero (14z-71)
+
+`wpset addr,len,type` takes `len` in HEX, so `10` is sixteen bytes and
+ten bytes is `a`. `tests/lua/trace_writes.lua` matched the WATCH length
+with `%d+`, so any hex-lettered length failed the pattern, the `assert`
+killed the run **before the replay started**, and the trace file came out
+EMPTY. Downstream that is indistinguishable from a real measurement of
+zero accesses.
+
+It produced a wrong finding in 14z-71 ("the composite handler's A5
+scratch window is free in vsavj"). With the pattern fixed to `%x+` the
+same window measures **39 accesses** per match replay — the opposite
+conclusion, and the one that decides whether a ported handler can keep
+Capcom's own displacements.
+
+Rules:
+- A dead instrument and a real finding are the same shape from the
+  outside: an empty output file. Assert that the run COMPLETED (the
+  `END <frames>` line) before reading a count as a measurement.
+- Every audit section carries a same-instrument positive control; see
+  `tests/audit_effect_class_rows.sh`, where widening the identical watch
+  from `a` to `10` bytes turns 0 into 56 and proves the zero was real.
+
+## The boot RAM test writes EVERY byte of work RAM — a bare write-count
+## on any address reports phantom hits (14z-71)
+
+vsav's POST walks all of work RAM (frames ~5-72, PCs `0x000D34`-`0x000DDC`,
+plus per-venue clears out to ~f824). So a watchpoint on any RAM address
+returns a non-zero write count on a perfectly clean run.
+
+This made the new list-type-6 tripwire gate cry wolf on its first
+execution: five "a legacy list reached the taken-over type" hits that were
+entirely the POST. The claim it guards is important enough that a false
+positive there is nearly as damaging as a false negative — it would have
+sent the next session re-opening a settled question.
+
+Rules:
+- Never assert on a raw RAM write count. Discriminate first: by PC (the
+  strongest — require the write to come from the code you care about, and
+  derive that address from the build's own atlas), or failing that by
+  frame window (weaker: it blinds the check during boot and attract).
+- This is the same family as the other two 14z-71 instrument traps: the
+  failure is always a **"count everything" default**, and the defence is
+  always a control or a discriminator, never a tuned threshold.

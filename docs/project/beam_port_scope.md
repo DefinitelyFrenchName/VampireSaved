@@ -1,7 +1,19 @@
 # SCOPE — porting the beam's effect machine (14z-70g)
 
-Status: **scoped, not built.** Written for maintainer review before any
-shipped byte changes (the standing "plan and scope first" rule).
+Status: **SUPERSEDED — the beam SHIPPED in 14z-71 (`build/hui25`,
+maintainer-confirmed clean on all three variants).** Kept as the record of
+how the port was scoped before building, and because several of its
+measurements are still the reference. **But its central premise is wrong**:
+it frames the port as needing the vs2-only routine at `0x093460` reached by
+an "owner-gated diversion". The real cause was three stacked defects in the
+sprite-list layer — a stub CLASS row, a missing LIST TYPE, and a
+game-specific code BIAS — none of which this document anticipates.
+
+**Read instead:** `../game/engine_internals.md` "The sprite-list DRAWER",
+`../game/atlas/sprite_lists.md`, and `porting_sprite_lists.md`.
+
+Original status line: *scoped, not built. Written for maintainer review
+before any shipped byte changes (the standing "plan and scope first" rule).*
 
 ## What is broken, measured
 

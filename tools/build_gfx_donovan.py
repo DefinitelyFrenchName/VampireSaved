@@ -89,6 +89,17 @@ def main():
                     help="overlay_tiles.json from overlay_port.py: [src,dst] "
                          "BANK-1 pairs (companion-overlay art at dead-Jedah "
                          "+ padding positions; session 14q)")
+    ap.add_argument("--strip-tiles",
+                    help="strip_tiles/<char>.json (14z-71): vs2 BANK-1 tiles "
+                         "copied into group C bank 4 at code+shift. The "
+                         "type-4 list handler HARDCODES its bank word "
+                         "(ori.w #$2000 = bank 1) and biases codes by "
+                         "+0x3800, so a tenant's procedural strips cannot "
+                         "reach group C through the record path at all — "
+                         "their art is fetched from a bank our port never "
+                         "populated. A ported copy of that handler supplies "
+                         "bank 4 and the shifted bias; this places the art "
+                         "it will then address.")
     ap.add_argument("--effect-c5",
                     help="effect_c5.json from the generator (14z-67): the "
                          "companion-effect records' full bank-1 code list, "
@@ -239,6 +250,32 @@ def main():
             written.add(t)
         print(f"effects: {len(eff_pairs)} tiles placed from effect_map")
 
+    # 14z-71: PROCEDURAL-STRIP art (the beam's stretching middle). Sourced
+    # from vs2 BANK 1 — not the tenant's bank-3 band — because the type-4
+    # handler composes its own bank word instead of taking the object's.
+    # Destination is code+SHIFT inside group C bank 4, and the SAME shift is
+    # baked into the ported handler's code bias, so no sprite list is edited.
+    if args.strip_tiles and group_c and json.load(open(args.strip_tiles))["tiles"]:
+        st = json.load(open(args.strip_tiles))
+        shift = int(st["shift"], 16) if isinstance(st["shift"], str) \
+            else st["shift"]
+        srcA1 = load_group(z2, "vs2", GROUP_A)
+        assert shift % 16 == 0, "strip shift must be 16-aligned (row wrap)"
+        for c in st["tiles"]:
+            d1 = c + shift
+            assert d1 < 0x10000, \
+                f"strip dst 0x{d1:05X} leaves group C bank 4"
+            assert d1 not in written, f"strip dst 0x{d1:05X} collides"
+            write_tile(dst, d1, tile_bytes(srcA1, 0x10000 + c))
+            written.add(d1)
+        print(f"strip tiles: {len(st['tiles'])} vs2 bank-1 tiles copied to "
+              f"group C bank 4 at +{shift:#06x} "
+              f"(0x{min(st['tiles'])+shift:04X}-0x{max(st['tiles'])+shift:04X})")
+    elif args.strip_tiles and json.load(open(args.strip_tiles))["tiles"]:
+        raise AssertionError("strip_tiles has tiles but the build is not "
+                             "group-C mode — the ported handler's bank 4 "
+                             "would serve zeros")
+
     # companion-effect art in bank 5 (14z-67, the ping-#7 fuchsia class):
     # the records' NATIVE bank-1 codes, art from vs2 group A. Placed
     # FIRST among the bank-5 passes; a later pass colliding on a code
@@ -346,6 +383,15 @@ def main():
         assert tile_bytes(dst, 0x10000 + c) == \
             tile_bytes(srcA5, 0x10000 + c), \
             f"wheel vs2 readback mismatch at 0x{c:04X}"
+    if args.strip_tiles and group_c and json.load(open(args.strip_tiles))["tiles"]:
+        _st = json.load(open(args.strip_tiles))
+        _sh = int(_st["shift"], 16) if isinstance(_st["shift"], str) \
+            else _st["shift"]
+        _sa = load_group(z2, "vs2", GROUP_A)
+        for c in _st["tiles"]:
+            assert tile_bytes(dst, c + _sh) == tile_bytes(_sa, 0x10000 + c), \
+                f"strip readback mismatch at 0x{c:04X}"
+
     # verification 2: untouched positions byte-identical to input
     dirty = 0
     for t2 in range(0, 0x20000):

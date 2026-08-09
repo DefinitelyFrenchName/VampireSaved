@@ -1439,3 +1439,116 @@ portrait tiles matched vs2 exactly while the screen was still wrong,
 because the comparison target itself was the wrong character's row.
 Prefer a check that is self-labelling (the 5*row palette marker) over
 a check that only proves internal consistency.
+
+## A symptom grouping is a HYPOTHESIS — test it member by member, cheapest
+## first (14z-71, the effect family — three sessions of not doing that)
+
+Four Huitzil defects were grouped in 14z-69 as "the effect family (beam /
+grab lightning / ES big beam / 214 explosion) — ONE root; one port covers
+the family". They shared a symptom: *this effect does not draw*.
+
+**The grouping turned out to be right for three of the four** — the beam,
+the ES beam and the grab lightning all needed the dead effect-class row
+16 — and wrong for the fourth (the 214 explosion was an uncopied tile
+inventory). The cost was not the grouping; it was that **nobody tested
+it**. The premise sat unexamined for three sessions while the expensive
+member was investigated, and was then argued against twice on evidence
+that turned out to be measuring a different effect entirely.
+
+| member | actual cause |
+|---|---|
+| 214+P ground explosion | 569 tiles remapped bank 3->4 and never copied |
+| beam + ES big beam | a stub effect-class row, then a missing sprite-list type, then a per-game code bias |
+| grab lightning | **the class-16 handler port** — the SAME cause as the beam. Maintainer playtest: hui17 has no electricity, hui18 has it, and hui18 = hui17 + exactly two things (region `x093460` and the row-16 repoint `00080B44` -> `000D89B0`) |
+
+The cost was not the wrong fix, it was the wrong SEARCH: sessions spent
+hunting a single shared root, and a scope document written around one.
+Two of the four were also mis-triaged along the way *because* the family
+framing implied the answer must be shared.
+
+**THE GROUPING WAS PARTLY RIGHT, AND THE CORRECTION COST MORE THAN THE
+ERROR.** Three of the four DID share a cause — the beam, the ES beam and
+the grab lightning all needed the dead effect-class row 16. Only the 214
+explosion stood apart. So the right lesson is narrower than "grouping is
+wrong": **a symptom grouping is a hypothesis that must be tested member by
+member**, and testing the cheapest member first (one playtest of the grab)
+would have confirmed the shared root immediately instead of leaving it an
+open question for three sessions.
+
+**How the correction went wrong, twice, and it is the more useful story.**
+On closing the family the lightning's cause was written up as "nothing —
+already working when someone finally looked": an INFERENCE from "nobody
+checked recently", asserted as a finding, inside the very entry warning
+against that. Challenged, it was then "measured" across six builds —
+identical sprite records, identical tile content — and the conclusion
+restated with more confidence. **That measurement was of the wrong thing**:
+it filtered on palette 0x0C (assumed from the beam, never checked for the
+lightning) and its rig never produced a grab at all — the captures sent
+alongside it showed GRENADES, which the maintainer had to point out. The
+maintainer's original claim, dismissed twice on bad evidence, was correct.
+
+Rules that follow, all paid for here:
+- **Measuring something adjacent is not measuring the thing.** Name the
+  event you must observe, then prove the rig produced THAT event before
+  reading any number off it.
+- **Never carry a filter across effects.** Palette, bank and code ranges
+  are per-effect facts; inheriting the beam's 0x0C hid the lightning.
+- **Look at a capture before sending it.** Sending unexamined frames spends
+  the other party's attention to discover your own error.
+- A/B ACROSS BUILDS is the cheapest attribution available and it needs no
+  analysis: hui17 vs hui18 settled in one playtest what six build-dumps
+  got wrong.
+
+Rules:
+- A shared symptom is a hypothesis about the mechanism, not evidence for
+  it. Write it down as "possibly one root", never as the family's name.
+- Before adopting a grouping, ask what measurement would DISTINGUISH the
+  members. If none is planned, the grouping is doing no work.
+- Check the cheap member first. The grab lightning needed ONE playtest,
+  and it would have CONFIRMED the shared root on day one — instead the
+  premise sat untested for three sessions and was then argued against
+  twice, on evidence that turned out to be measuring the wrong effect.
+
+## Cross-build A/B is the cheapest attribution we have, and it is
+## routinely skipped in favour of analysis (14z-71)
+
+Every build from hui6 onward is kept with an intact rompath, and
+`tools/run_hui_behavior.sh <build>` plays any of them. Attributing "when
+did this start/stop working" is therefore one playtest per candidate
+build, with no instrument to get wrong.
+
+It settled in minutes what analysis had got wrong twice: hui17 has no grab
+electricity, hui18 has it, hui18 = hui17 + the effect-class row-16 repoint
+— so the lightning shares the beam's cause. Before that, a six-build
+sprite-and-tile comparison had "shown" the opposite, because it filtered on
+a palette inherited from a different effect and used a rig that never
+produced a grab.
+
+Rules:
+- When the question is *when* did behaviour change, bisect the BUILDS
+  before analysing the code. The builds are the ground truth.
+- The launcher refuses to rebuild into an existing directory (14z-71): a
+  pruned rompath would otherwise be silently refilled with TODAY's
+  manifest, destroying exactly the evidence a bisect needs.
+
+## When a claim changes, GREP FOR THE CLAIM — not for the files (14z-71)
+
+Promoted to a standing order in CLAUDE.md §5; the evidence is here.
+
+A finding propagates: section headers, summary lines, build-registry rows,
+gate comments, the GOTCHAS index, NEXT_SESSION. Correcting "the places I
+remember writing it" leaves the rest asserting the old thing, and headers
+are what a skimmer reads.
+
+Measured twice in one session:
+- `engine_internals.md` carried **"the 214+P explosion — NOT a
+  tile-inventory defect"** as a HEADER, directly above a subsection
+  proving it WAS one. The subsection had been appended; the header never
+  touched.
+- A corrected effect-family finding survived in **five** further places —
+  including a build-registry row written *after* the correction began, and
+  the gotcha's own title and index line, which still stated the inverted
+  lesson.
+
+Both were found by grepping the assertion's wording across the repo, in
+one pass. Neither was found by re-reading the documents.

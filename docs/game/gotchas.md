@@ -431,3 +431,37 @@ Rules that fall out of this, in the order they would have saved time:
    whose timing is authored for OUR wheel, and it blocked the native
    leg for two sessions. Re-run it with a script whose timing is not
    the thing under suspicion.
+
+## The two games' sprite-list handlers do NOT agree: a per-handler CODE
+## BIAS differs between vsav and vs2 (14z-71)
+
+Porting a character's sprite-list DATA assumes the host's drawer
+interprets it the way the source game does. For three of vsav's six
+list-type handlers, it does not:
+
+| list type | vsav | vs2 |
+|---|---|---|
+| 0, 2 | identical (branch displacements aside) | |
+| 4 | `addi.l #$38000000,d1` | `addi.l #$42000000,d1` |
+| 6 | `addi.w #$3800,d2` | `addi.w #$4200,d2` |
+| 8 | `addi.w #$3800,d2` | `addi.w #$4200,d2` |
+
+Ported vs2 list data run through vsav's handler therefore addresses tiles
+**0x0A00 too low** and renders whatever art happens to live there. It cost
+most of a session on Huitzil's beam: the strip drew the freeze/reflection
+art, and the maintainer identified it from a screenshot faster than the
+analysis did.
+
+Worse, the difference is ONE BYTE in an otherwise byte-identical routine.
+A diff that reports "255/256 identical" invites "the one difference must
+be a relocated address". Here it was the entire defect.
+
+Rules:
+- Before porting any sprite list, check its handler's constants against
+  the host's — not just whether the routines "look the same".
+- A ported handler copy must carry the SOURCE game's bias, plus any
+  placement shift (Huitzil's: vs2's 0x4200 + a 0x1000 group-C shift).
+- Type 4 also composes its OWN bank word (`ori.w #$2000` = bank 1) where
+  type 2 takes the object's — so a tenant's procedural strips cannot reach
+  a WIDE group-C bank through the record path at all.
+- Frozen inventory: `tests/test_beam_list_type6.sh` section 1c.

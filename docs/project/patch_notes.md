@@ -1,5 +1,72 @@
 # patch_notes — per-change detail: every byte, and why
 
+## 14z-71 — the beam: byte detail
+
+**`code_ptr beam_effect_class16`** — 4 bytes at vsavj `PRG:0x080AEC`,
+emitted as a `code` op (the effect-class table is read pc-relatively, so
+through the OPCODE view). Old value `00080B44` — the bare `rts` after the
+table, i.e. vsav ships row 16 as a STUB. New value = the placed address of
+region `x093460`, the ported vs2 row-16 handler family. Effect: the beam
+object, which already selected class 16 at the same frames as native, is
+dispatched into a real handler instead of a no-op. Legacy-inert: row 16 is
+never read by vanilla (0 reads across the frozen suite vs a 1760-hit
+control on row 37).
+
+**root `0x93460:0x306:t0x9306c:f`** — the row-16 handler family, bounded
+at the family exactly (its head, its type table, the state machine that
+selects the beam anim, the helper at `0x93550` and its 196-entry
+sub-table), ending on the `rts` at `0x93764`. Twin = vhunt2's own row-16
+entry. Six bytes forced past the oracle stop (`:f`), hand-verified
+sibling-identical and pointer-free.
+
+**`site_thunk beam_list_type6`** — 6 bytes at vsavj `PRG:0x01B6AA`
+(`3a18be456500` -> `jmp <thunk>`), plus a 0x102-byte body. vsav's drawer
+has six sprite-list types, vs2 seven; the beam's list is TYPE 12, a
+composite. The table cannot grow (entry 0's offset IS its length) or move
+(`(d8,PC,Xn)`), so the port takes over vsav's UNUSED type 6.
+Body layout: a placed-region range gate; then vs2's composite handler
+(`0x01A1FC`) verbatim bar six scratch displacements and a local `bsr`;
+then a tripwire + a faithful reproduction of vsav's own type-6 head
+rejoining at `0x01B6B2`; then a child dispatcher; then a ported type-4
+handler.
+
+**the ported type-4 handler** — vsavj `0x01B61A` verbatim, 0x90 bytes,
+with exactly TWO constants changed:
+`ori.w #$2000` -> `#$1000` (it composes its own gfx bank; H's art is in
+WIDE group C bank 4) and `addi.l #$38000000` -> `#$52000000`
+(**vsav biases tile codes +0x3800 where vs2 biases +0x4200** — one byte, in
+otherwise byte-identical routines — plus our 0x1000 placement shift).
+Without the bias change the strip addressed tiles 0x0A00 low and drew the
+freeze/reflection art.
+
+**39 `port_patch` rows** — the type word of each composite list in region
+`anim`, `000C` -> `0006`. Each row names its address and asserts the
+vanilla word.
+
+**`strip_tiles/0x10.json`** — gfx only: vs2 BANK-1 tiles `0x4EA0-0x4FBF`
+copied into group C bank 4 at `+0x1000`. A SPAN, not a sample. Not placed
+into vsav's own bank 1, which is measured 160-of-240 occupied at those
+codes.
+
+Full rationale: `porting_sprite_lists.md`. Facts:
+`../game/atlas/sprite_lists.md`.
+
+## 14z-70 — byte detail
+
+**`extra_tiles/0x10.json` 2 -> 569 tiles** — the 214+P grenade's GROUND
+detonation. Codes were remapped bank 3 -> 4 but the tiles were never
+copied, so it drew a solid fuchsia rectangle. gfx members only; the
+program is unchanged from hui15/16. Reproduce only with
+`tests/replays/hui/83d_hui_grenade_ground.rpl` (214+LP, both fighters
+cornered) — every earlier rig hit the opponent and photographed the
+on-contact explosion instead.
+
+**root `x088512` 0x3B40 -> 0x3B98, `:f0x3b78`** — three pc-relative tables
+sat past the old bound and resolved into the ANIM region placed
+immediately after (`0x0D8988/98/A0`), so the machine read animation bytes
+as its parameters. A real latent repair with no observable effect today
+(the code that reads them does not run in any current scenario).
+
 ## 14z-69 (session close) — byte detail
 
 **`data_port df_palette_seq_rows`** — 0x80 bytes at vsavj `0x39ACC0`

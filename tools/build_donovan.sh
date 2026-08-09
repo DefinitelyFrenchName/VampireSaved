@@ -119,6 +119,36 @@ case "$TENANT_CHAR" in
         # twelve rooted pre-emptively (caps = inter-handler gaps, twins
         # +0x34 — the zone convention; the oracle bound validates each).
         DEFAULT_ROOTS="$DEFAULT_ROOTS,0x672d0:0x280:t0x67304,0x67550:0x2f6:t0x67584,0x67846:0x1ba:t0x6787a,0x67a00:0x60c:t0x67a34,0x6800c:0x44c:t0x68040,0x68458:0x310:t0x6848c,0x68768:0x264:t0x6879c,0x689cc:0x2ac:t0x68a00,0x68c78:0x3ce:t0x68cac,0x69046:0x2b0:t0x6907a,0x692f6:0x368:t0x6932a,0x6965e:0x400:t0x69692"
+        # 14z-71 THE BEAM: effect-CLASS 16's handler family. The per-pool
+        # effect dispatcher (`move.b 0x02(a6),d0; add.w d0,d0; add.w d0,d0;
+        # movea.l (0x12,pc,d0.w),a0; jsr (a0)` — vsavj 0x080A90) indexes a
+        # 38-row table of handler pointers by object field +0x02. vsav ships
+        # rows 16/17/19/31 as STUBS (the bare `rts` sitting right after the
+        # table); vs2 and vh2 fill 16/17/19. Row 16 is the beam's: measured
+        # on both legs, our build ALREADY sets class 16 on the same object at
+        # the same frames and loads the stub. That is the entire defect.
+        # The bound is MEASURED, not guessed: [0x93460, 0x93766) is the
+        # row-16 family exactly — its four-instruction head, its type table,
+        # the state machine that selects the beam anim (`movea.l #$24EDD4,a0`
+        # = the base 14z-70 traced), the helper at 0x93550 with its 196-entry
+        # sub-table, ending on the rts at 0x93764 with row 17's
+        # identically-shaped head immediately after. Every pc-relative table
+        # AND every one of their targets is inside the span; census: 0
+        # lea(pc) data-in-code readers, 0 pcrel escapes of either form.
+        # Twin 0x9306C is vhunt2's OWN row-16 entry, so the sibling oracle
+        # covers the whole span (its only diffs: 3 engine longs at delta
+        # -0x6, 1 anim pointer at +0x13B74).
+        # `:f` — the oracle stops at +0x300 and that stop is REAL, not
+        # granularity: its next 0x100 chunk reaches row 17's family, whose
+        # genuine sibling divergence starts at +0x397. But the family's last
+        # instruction pair straddles +0x300 (`move.w 0x14(a4),0x14(a6)` at
+        # +0x2FE, then the `rts` at +0x304), so stopping there would place a
+        # region that runs off its own end into the allocator's next bytes —
+        # the x088512 "0x50 bytes short" class, exactly. The forced tail is
+        # SIX bytes (00 14 00 14 4e 75), hand-verified byte-identical in
+        # vhunt2 at the twin and carrying no pointer field, which is the
+        # only condition under which `:f` copies unvalidated bytes safely.
+        DEFAULT_ROOTS="$DEFAULT_ROOTS,0x93460:0x306:t0x9306c:f"
         # 14z-66 item 3: the vs2 JUMP-SEQ HANDLER BODY (sub-state
         # dispatcher 0x2592A + table 0x25936 + all five bodies, ends
         # before the 0x25D80 handler). vs2 rewrote the bodies into the
@@ -318,6 +348,8 @@ PYEOF
         $( [ -f "$OUTBASE/patch/wheel_bank5.json" ] && \
            echo "--wheel-bank5 $OUTBASE/patch/wheel_bank5.json" ) \
         --effect-tail build/manifest/effect_tail.json $OVERLAY_TILES \
+        $( [ -f "build/manifest/strip_tiles/${TENANT_CHAR}.json" ] && \
+           echo "--strip-tiles build/manifest/strip_tiles/${TENANT_CHAR}.json" ) \
         --tenant "$OUTBASE/patch/tenant.json" | tail -10
     GFXSTAGE="$(mktemp -d)"
     unzip -q -o "$ROMDIR/vsav.zip" -d "$GFXSTAGE"

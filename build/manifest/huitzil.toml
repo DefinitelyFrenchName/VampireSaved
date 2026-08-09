@@ -1134,3 +1134,526 @@ dst_end = 0x39AD40
 len = 0x80
 dst_old_head = "05310fff0e9e0ece0d7e093e064d045c"
 note = "DF palette-seq rows 0x1E-0x21 <- the sequence native DF actually shows (vs2 0x3ABEDC)"
+
+# ══ 14z-71 THE BEAM: effect-CLASS row 16 ════════════════════════════════
+#
+# THE DEFECT, measured on both legs rather than reasoned about. Every
+# secondary-object pool has a per-frame dispatcher that reads the object's
+# CLASS from field +0x02 and jumps through a table of handler pointers:
+#
+#   vsavj 0x080A90   move.b 0x02(a6),d0 / add.w d0,d0 / add.w d0,d0
+#                    movea.l (0x12,pc,d0.w),a0 / jsr (a0) / lea 0x80(a6),a6
+#
+# The beam pool's table is 38 rows at vsavj 0x080AAC (vs2 0x08F1D6, vh2
+# 0x08EDE2 — index-aligned 1:1 across all three sets). vsav ships rows
+# 16/17/19/31 as STUBS pointing at the bare `rts` right after the table;
+# vs2/vh2 fill 16/17/19. **Row 16 is the beam's.**
+#
+# Our build was never missing the object, the class, or the dispatch. With
+# a read watchpoint on each leg's OWN row-16 slot, over replay 83b:
+#
+#   native vsav2   598 reads, A0 = 0x093460  (48 inside the beam window)
+#   ours  (hui17)  593 reads, A0 = 0x080B44  (46 inside it) = THE STUB
+#
+# Same frames, same objects ($FFD400/$FFD480), same D0 = 0x40 (class 16 x 4).
+# The handler is the only thing absent, which is exactly why the freeze
+# works while the muzzle orb and beam never draw: they are one object that
+# is dispatched into a no-op.
+#
+# WHY A BARE TABLE-ROW WRITE AND NOT AN obj_hook. The tables are the same
+# LENGTH in both sets, so nothing needs rebuilding or relocating; only one
+# dead row changes. That costs no engine site patch and no legacy cycles —
+# strictly less than a hook, and the standing "vanilla wins ties" principle
+# points the same way.
+#
+# WHY IT IS SUPERSET-SAFE. Row 16 is DEAD in vanilla, measured, not argued:
+# 0 reads across the whole frozen legacy suite (01-10) plus the walljump
+# and throw replays, against a 1760-hit positive control on row 37 taken
+# with the same instrument on the same leg. Committed as
+# tests/audit_effect_class_rows.sh so the claim stays re-checkable.
+# `old_hex` pins the slot to the stub, so a table that ever moves fails the
+# build loudly rather than silently repointing someone else's row.
+#
+# INSTRUMENT NOTE, paid for in-session: this table is read PC-relatively,
+# and on CPS-2 every pc-relative read is served by m68k_read_pcrelative_*
+# = AS_OPCODES. A plain `wpset` watchpoint is SILENTLY BLIND to it and
+# reports zero hits — which reads as "this row is never used" and inverts
+# the finding. Use the opcodes space (WATCH=...,r,o -> wposet).
+[[code_ptr]]
+stage = 4
+name = "beam_effect_class16"
+addr = 0x080AEC
+old_hex = "00080b44"
+region = "x093460:0x0"
+note = "effect-class row 16 -> the ported vs2 row-16 handler family (the beam)"
+
+# ── 14z-71 THE BEAM, stage 2: vsav's sprite-list drawer has no LIST TYPE 12
+#
+# Fixing the class-16 dispatch above exposed a SECOND, independent defect
+# underneath it. With the handler in place the beam object finally enters
+# its animation and the muzzle orb draws — and then the game dies with a
+# vec3 at f3176.
+#
+# THE DRAWER. Every object's sprite list is dispatched by:
+#     01AFA6  movea.l 0x1C(a6),a0     ; the object's anim node
+#     01AFAA  movea.l 0x04(a0),a0     ; -> its sprite list
+#     01AFAE  move.w  (a0)+,d0        ; the list's TYPE word
+#     01AFB0  move.w  (0x08,pc,d0.w),d0
+#     01AFB4  jmp     (0x04,pc,d0.w)  ; table at 0x01AFBA
+#
+# THE TABLE LENGTH IS SELF-ENCODING — entry 0's own offset IS the table
+# size, because handler code begins immediately after the last entry:
+#     vsavj  entry0 = 0x000C -> 6 entries, types 0..10
+#     vs2    entry0 = 0x000E -> 7 entries, types 0..12
+#     vh2    entry0 = 0x000E -> 7 entries  (the sibling agrees with vs2)
+# The beam's sprite list is TYPE 12. On vsavj that indexes two bytes PAST
+# the table, fetches 0x3A18, and jumps to 0x01E9D2 — the middle of an
+# engine data table (measured: CRASH 3176 vec3 PC 01e9d6 ADDR 0001e9f7,
+# A6=ffffd400 = the beam object, D0=00003a18 = the off-table word).
+# So the table cannot simply be extended: there is no room, by construction.
+#
+# WHAT TYPE 12 IS. vs2's handler (0x01A1FC, 0x3A bytes) is a COMPOSITE /
+# GROUP list — a count followed by N x {dx, dy, sub-list pointer}, each
+# sub-list drawn by RECURSING into the drawer, with the offsets accumulated
+# in d4 and flipped by the facing bit. Exactly the shape a multi-segment
+# beam needs. vsav has no equivalent anywhere: the handler's first 0x0C
+# bytes do not occur in the vsavj image at all.
+#
+# THE MECHANISM — why this thunk shape and not the obvious ones.
+# The dispatch is (d8,PC,Xn), so the table cannot be moved out of line (an
+# 8-bit displacement reaches nothing free), and it cannot grow in place.
+# Displacing the two instructions AT 0x01AFAA instead lets the legacy path
+# rejoin the VANILLA dispatch at 0x01AFB0, which needs nothing but a0 and
+# d0 — both of which the thunk reproduces exactly. Legacy therefore
+# executes Capcom's own instructions with two jmps added around them; no
+# table is replicated, no register is juggled, no stack trick is needed.
+#
+# LEGACY-INVARIANT BY CONSTRUCTION, and in the SAME class as the ratified
+# shadow_seq_guard: only d0 == 12 diverges, and d0 == 12 cannot occur in
+# vanilla — a legacy list of type 12 would index off the end of vanilla's
+# own table and crash on real hardware. Everything else is a byte-for-byte
+# re-entry into the untouched vanilla dispatch. Cost to legacy is cycles
+# only (two jmps per sprite-list dispatch, measured ~0.73 dispatches per
+# frame), i.e. the ratified hook class — the flicker inventory is
+# re-measured with it in, per the CLAUDE.md §4 standing watch.
+#
+# THE BODY IS A TRANSCRIPTION, not authored logic. Offsets +0x0E..+0x47 are
+# vs2's 0x01A1FC handler VERBATIM, with exactly two bytes changed: the
+# recursion `bsr.w 0x199DC` displacement F7BC -> FFD2, retargeted to this
+# body's own list entry (+0x04) so it is placement-independent. The
+# `bpl.b 6ACC` loop-back byte comes out IDENTICAL to vs2's, which is a
+# free structural check that the transcription kept its spacing.
+# tests/test_beam_list_type12.sh asserts the byte-identity so a hand edit
+# cannot drift from Capcom's code silently.
+#
+# THE A5 SCRATCH MUST BE RELOCATED — and the first answer here was WRONG.
+# The handler parks count/list/d4 at -0x4A80/-0x4A84/-0x4A88(a5) = RAM
+# $FF3580/$FF357C/$FF3578, inside a 0x200-byte vsavj buffer at $FF3502
+# that match init clears (0x016E04). Measured with a WORKING instrument:
+# vanilla makes 39 accesses to those exact ten bytes per match replay, so
+# vs2's displacements CANNOT be kept verbatim; whichever route is taken,
+# the three slots need a window audited free.
+# RETRACTED, and worth keeping as the reason: the first measurement said
+# "0 accesses" and it was an instrument artefact. trace_writes.lua matched
+# the WATCH length with %d+ while MAME parses that length as HEX, so a
+# ten-byte window ("a") failed the pattern, the assert killed the run
+# before the replay started, and the empty trace read downstream as a
+# clean zero. A dead instrument and a real finding are the same shape from
+# the outside. The tracer now matches hex and every section of
+# tests/audit_effect_class_rows.sh carries a same-instrument positive
+# control, which is what turned the zero back into 39.
+# ── 14z-71 THE BEAM, stage 2: TAKE OVER THE DEAD LIST-TYPE 6
+#
+# THE PROBLEM. vsav's sprite-list drawer has SIX list types (0..10); vs2 has
+# SEVEN (0..12). The table length is self-encoding — entry 0's own offset IS
+# the size, because handler code begins immediately after the last entry — so
+# it can neither grow in place nor move out of line (the dispatch is
+# `(d8,PC,Xn)`; nothing free is within an 8-bit displacement). The beam's
+# sprite list is TYPE 12: a COMPOSITE, a count then N x {dx, dy, child list},
+# each child drawn by recursing into the drawer. vsav has no such handler
+# (its first 0x0C bytes occur nowhere in the vsavj image).
+#
+# WHY NOT FLATTEN. The obvious fix — bake the composite into one ordinary
+# list — measures far bigger than it looks: 39 composite lists in the ported
+# anim region, 83 children, and 24 of those children are TYPE 4, a procedural
+# strip generator whose output depends on the runtime facing bit. Those cannot
+# be pre-baked into static coordinates.
+#
+# WHY NOT HOOK THE DRAWER. Measured and rejected: two extra jumps on every
+# sprite-list dispatch took 04_select_fuzz from 3 flicker frames to 1514
+# divergent frames with no re-convergence. (The cost is not magnitude —
+# ~42 cycles on ~2 dispatches/frame — so it cannot be optimised away.)
+#
+# THE MECHANISM. vsav ships TWO list types nothing uses. Types 6 and 8 measure
+# ZERO reads across six legacy replays, against same-instrument controls of
+# 4329 / 2702 / 2260 / 321 reads on types 2 / 10 / 0 / 4
+# (tests/audit_effect_class_rows.sh). Nothing else points into the type-6
+# handler, the two bytes before it are type-4's `rts` skip target (so there is
+# no fall-through into it), and H's own content uses neither type. So: write a
+# 6-byte `jmp` over the dead type-6 handler head and change the type word on
+# our own 39 composite lists from 000C to 0006 (the port_patch rows below).
+# Capcom's composite code then runs VERBATIM, procedural children and all.
+# Cost to legacy: zero cycles — nothing legacy executes changes.
+#
+# *** THE ASSUMPTION IS DELIBERATELY NOT LOAD-BEARING (maintainer, 14z-71) ***
+# "Dead" here means measured-by-absence, and absence of evidence is not
+# evidence of absence — we may simply have missed how vsav uses type 6. So the
+# body does NOT assume it. It discriminates on an ADDRESS RANGE — is this list
+# inside our own placed anim region? — which is exact and dereferences nothing
+# that could be wild. Anything that is NOT ours falls through to vsav's
+# ORIGINAL type-6 code, reproduced instruction-for-instruction and rejoined by
+# jmp at 0x01B6B2. **If the deadness measurement is wrong, vanilla still
+# renders correctly**; we merely pay a few cycles on a dispatch legacy is
+# measured never to make.
+#
+# AND IT ANNOUNCES ITSELF. That same path bumps a counter at RAM $FF010C.
+# tests/audit_effect_class_rows.sh asserts the counter stays ZERO, so the
+# first legacy use of type 6 is a GATE FAILURE — a stop-and-assess event by
+# construction, not something a human has to notice. Per the maintainer's
+# standing instruction: if that counter ever moves, or if any unexplained
+# vanilla rendering regression appears, THIS ROW IS A FIRST SUSPECT — stop,
+# analyse and re-assess before continuing.
+#
+# THE SCRATCH IS AUDITED, NOT INHERITED. vs2's own A5 displacements land in a
+# live vsavj buffer ($FF3578-$FF3581, 39 accesses per match replay), so the
+# three slots and the tripwire were moved to $FF0100-$FF010D: 36 accesses in
+# vanilla, ALL of them the boot clear, none after frame 900 — measured on four
+# legacy replays and on our own build during the beam replay.
+#
+# THE BODY IS A TRANSCRIPTION. Offsets +0x10..+0x4B are vs2's 0x01A1FC handler
+# instruction-for-instruction; the only changes are the four scratch
+# displacements, `bsr.w 0x199DC` -> `jsr 0x0001AFAE.l` (the untouched vanilla
+# "list already in A0" drawer entry), and the loop-back displacement moving
+# 0xCC -> 0xCA because that call is two bytes longer. Verified against vs2 by
+# tests/test_beam_list_type6.sh.
+[[site_thunk]]
+stage = 4
+name = "beam_list_type6"
+site = 0x01B6AA
+old_hex = "3a18be456500"
+patch = "jmp"
+rts_ok = true
+region_subst = "aaaaaaaa=anim:0x0,bbbbbbbb=anim:0x1e800"
+thunk_hex = "b1fcaaaaaaaa6542b1fcbbbbbbbb643a3b5881002b4881082b4481043018082e0000000b67024440d8404844d858484420506100002c206d810841e80008282d8104536d81006acc4e75526d810c3a18be4565064ef90001b6b24ef90001b73c0c50000466065448600000084ef90001afae3a18be45650000889e453a1822182018162e000beb0b02030060b70108030006671034010242f000e04a06420010444090424844d044024003ff004010004840080300056710340102420f00e84a06420010444090424844d044024003ff806e001a4840162e000f4a2e000e670e6a02d6010241ff600243001f824306815200000048d2000345ea000851cdff804e75"
+note = "take over vsav's unused list-type 6 for the composite lists; non-tenant lists fall through to vanilla type 6 + tripwire"
+
+# ── 14z-71: the 39 composite lists' TYPE WORD, 000C -> 0006 ───────────────
+# These are OUR OWN ported copies (region "anim"), never vsav data. Each row
+# names its address and verifies the vanilla word, so if the extraction ever
+# shifts, the build fails loudly instead of rewriting a neighbouring word.
+# Enumerated from the ROM rather than hand-listed: every list in the ported
+# anim region whose type word is 12 and whose children all resolve to
+# in-region lists of a known type. 26 are the P and ES beam frames; the other
+# 13 are single-child effect composites that would crash identically if drawn.
+
+[[port_patch]]
+stage = 4
+region = "anim"
+src_addr = 0x24A744
+old_hex = "000c"
+new_hex = "0006"
+note = "composite list 24A744: list-type 12 -> the taken-over type 6"
+
+[[port_patch]]
+stage = 4
+region = "anim"
+src_addr = 0x24ADEC
+old_hex = "000c"
+new_hex = "0006"
+note = "composite list 24ADEC: list-type 12 -> the taken-over type 6"
+
+[[port_patch]]
+stage = 4
+region = "anim"
+src_addr = 0x24AFCC
+old_hex = "000c"
+new_hex = "0006"
+note = "composite list 24AFCC: list-type 12 -> the taken-over type 6"
+
+[[port_patch]]
+stage = 4
+region = "anim"
+src_addr = 0x24B0BC
+old_hex = "000c"
+new_hex = "0006"
+note = "composite list 24B0BC: list-type 12 -> the taken-over type 6"
+
+[[port_patch]]
+stage = 4
+region = "anim"
+src_addr = 0x24E968
+old_hex = "000c"
+new_hex = "0006"
+note = "composite list 24E968: list-type 12 -> the taken-over type 6"
+
+[[port_patch]]
+stage = 4
+region = "anim"
+src_addr = 0x24E980
+old_hex = "000c"
+new_hex = "0006"
+note = "composite list 24E980: list-type 12 -> the taken-over type 6"
+
+[[port_patch]]
+stage = 4
+region = "anim"
+src_addr = 0x24E998
+old_hex = "000c"
+new_hex = "0006"
+note = "composite list 24E998: list-type 12 -> the taken-over type 6"
+
+[[port_patch]]
+stage = 4
+region = "anim"
+src_addr = 0x24E9B0
+old_hex = "000c"
+new_hex = "0006"
+note = "composite list 24E9B0: list-type 12 -> the taken-over type 6"
+
+[[port_patch]]
+stage = 4
+region = "anim"
+src_addr = 0x24E9C8
+old_hex = "000c"
+new_hex = "0006"
+note = "composite list 24E9C8: list-type 12 -> the taken-over type 6"
+
+[[port_patch]]
+stage = 4
+region = "anim"
+src_addr = 0x24E9E0
+old_hex = "000c"
+new_hex = "0006"
+note = "composite list 24E9E0: list-type 12 -> the taken-over type 6"
+
+[[port_patch]]
+stage = 4
+region = "anim"
+src_addr = 0x24E9F8
+old_hex = "000c"
+new_hex = "0006"
+note = "composite list 24E9F8: list-type 12 -> the taken-over type 6"
+
+[[port_patch]]
+stage = 4
+region = "anim"
+src_addr = 0x24EA10
+old_hex = "000c"
+new_hex = "0006"
+note = "composite list 24EA10: list-type 12 -> the taken-over type 6"
+
+[[port_patch]]
+stage = 4
+region = "anim"
+src_addr = 0x24EA28
+old_hex = "000c"
+new_hex = "0006"
+note = "composite list 24EA28: list-type 12 -> the taken-over type 6"
+
+[[port_patch]]
+stage = 4
+region = "anim"
+src_addr = 0x251CD2
+old_hex = "000c"
+new_hex = "0006"
+note = "composite list 251CD2: list-type 12 -> the taken-over type 6"
+
+[[port_patch]]
+stage = 4
+region = "anim"
+src_addr = 0x251CE6
+old_hex = "000c"
+new_hex = "0006"
+note = "composite list 251CE6: list-type 12 -> the taken-over type 6"
+
+[[port_patch]]
+stage = 4
+region = "anim"
+src_addr = 0x251D02
+old_hex = "000c"
+new_hex = "0006"
+note = "composite list 251D02: list-type 12 -> the taken-over type 6"
+
+[[port_patch]]
+stage = 4
+region = "anim"
+src_addr = 0x251D1E
+old_hex = "000c"
+new_hex = "0006"
+note = "composite list 251D1E: list-type 12 -> the taken-over type 6"
+
+[[port_patch]]
+stage = 4
+region = "anim"
+src_addr = 0x251D3A
+old_hex = "000c"
+new_hex = "0006"
+note = "composite list 251D3A: list-type 12 -> the taken-over type 6"
+
+[[port_patch]]
+stage = 4
+region = "anim"
+src_addr = 0x251D56
+old_hex = "000c"
+new_hex = "0006"
+note = "composite list 251D56: list-type 12 -> the taken-over type 6"
+
+[[port_patch]]
+stage = 4
+region = "anim"
+src_addr = 0x251D72
+old_hex = "000c"
+new_hex = "0006"
+note = "composite list 251D72: list-type 12 -> the taken-over type 6"
+
+[[port_patch]]
+stage = 4
+region = "anim"
+src_addr = 0x251D8E
+old_hex = "000c"
+new_hex = "0006"
+note = "composite list 251D8E: list-type 12 -> the taken-over type 6"
+
+[[port_patch]]
+stage = 4
+region = "anim"
+src_addr = 0x251DAA
+old_hex = "000c"
+new_hex = "0006"
+note = "composite list 251DAA: list-type 12 -> the taken-over type 6"
+
+[[port_patch]]
+stage = 4
+region = "anim"
+src_addr = 0x251DC6
+old_hex = "000c"
+new_hex = "0006"
+note = "composite list 251DC6: list-type 12 -> the taken-over type 6"
+
+[[port_patch]]
+stage = 4
+region = "anim"
+src_addr = 0x251DE2
+old_hex = "000c"
+new_hex = "0006"
+note = "composite list 251DE2: list-type 12 -> the taken-over type 6"
+
+[[port_patch]]
+stage = 4
+region = "anim"
+src_addr = 0x251DFE
+old_hex = "000c"
+new_hex = "0006"
+note = "composite list 251DFE: list-type 12 -> the taken-over type 6"
+
+[[port_patch]]
+stage = 4
+region = "anim"
+src_addr = 0x251E12
+old_hex = "000c"
+new_hex = "0006"
+note = "composite list 251E12: list-type 12 -> the taken-over type 6"
+
+[[port_patch]]
+stage = 4
+region = "anim"
+src_addr = 0x251E26
+old_hex = "000c"
+new_hex = "0006"
+note = "composite list 251E26: list-type 12 -> the taken-over type 6"
+
+[[port_patch]]
+stage = 4
+region = "anim"
+src_addr = 0x251E42
+old_hex = "000c"
+new_hex = "0006"
+note = "composite list 251E42: list-type 12 -> the taken-over type 6"
+
+[[port_patch]]
+stage = 4
+region = "anim"
+src_addr = 0x251E56
+old_hex = "000c"
+new_hex = "0006"
+note = "composite list 251E56: list-type 12 -> the taken-over type 6"
+
+[[port_patch]]
+stage = 4
+region = "anim"
+src_addr = 0x251E72
+old_hex = "000c"
+new_hex = "0006"
+note = "composite list 251E72: list-type 12 -> the taken-over type 6"
+
+[[port_patch]]
+stage = 4
+region = "anim"
+src_addr = 0x251E8E
+old_hex = "000c"
+new_hex = "0006"
+note = "composite list 251E8E: list-type 12 -> the taken-over type 6"
+
+[[port_patch]]
+stage = 4
+region = "anim"
+src_addr = 0x251EAA
+old_hex = "000c"
+new_hex = "0006"
+note = "composite list 251EAA: list-type 12 -> the taken-over type 6"
+
+[[port_patch]]
+stage = 4
+region = "anim"
+src_addr = 0x251EC6
+old_hex = "000c"
+new_hex = "0006"
+note = "composite list 251EC6: list-type 12 -> the taken-over type 6"
+
+[[port_patch]]
+stage = 4
+region = "anim"
+src_addr = 0x251EE2
+old_hex = "000c"
+new_hex = "0006"
+note = "composite list 251EE2: list-type 12 -> the taken-over type 6"
+
+[[port_patch]]
+stage = 4
+region = "anim"
+src_addr = 0x251EFE
+old_hex = "000c"
+new_hex = "0006"
+note = "composite list 251EFE: list-type 12 -> the taken-over type 6"
+
+[[port_patch]]
+stage = 4
+region = "anim"
+src_addr = 0x251F1A
+old_hex = "000c"
+new_hex = "0006"
+note = "composite list 251F1A: list-type 12 -> the taken-over type 6"
+
+[[port_patch]]
+stage = 4
+region = "anim"
+src_addr = 0x251F2E
+old_hex = "000c"
+new_hex = "0006"
+note = "composite list 251F2E: list-type 12 -> the taken-over type 6"
+
+[[port_patch]]
+stage = 4
+region = "anim"
+src_addr = 0x251F42
+old_hex = "000c"
+new_hex = "0006"
+note = "composite list 251F42: list-type 12 -> the taken-over type 6"
+
+[[port_patch]]
+stage = 4
+region = "anim"
+src_addr = 0x251F56
+old_hex = "000c"
+new_hex = "0006"
+note = "composite list 251F56: list-type 12 -> the taken-over type 6"
