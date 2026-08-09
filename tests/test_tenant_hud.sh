@@ -63,6 +63,8 @@ case "$TEN_ID" in
         MUG_GREP="code=be90 attr=112a"; NAME_GREP="code=be8c attr=0202" ;;
     16) PICK_RPL="37_pick_huitzil_cell.rpl"
         MUG_GREP="code=be9a attr=112a"; NAME_GREP="code=be92 attr=0102" ;;
+    17) PICK_RPL="40_pick_pyron_cell.rpl"
+        MUG_GREP="code=be9c attr=112a"; NAME_GREP="code=be94 attr=0102" ;;
     *)  echo "FAIL: no HUD runtime facts for tenant id $TEN_ID"; exit 1 ;;
 esac
 MUG_POKE_ADDR="$(printf '0x%x' $((0x89884 + 2 * TEN_ID)))"

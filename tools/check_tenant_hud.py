@@ -50,6 +50,14 @@ TENANTS = {
     0x10: dict(mug_anchor=0xBE9A, name_anchor=0xBE92,
                mug_src=0x47A0, name_src=0x46AB, name_bx=2,
                name_hi=0x86920102, name_lo=0xFFE80002),
+    # 0x11 Pyron (14z-75). Re-derived from vs2's own row 0x11 — mug
+    # 0x0B60, name `0B53 0102 FFF0 0002` — plus the +0x4200 bias. Note
+    # the lo long is FFF00002, not H's FFE80002: 2-tile plates in this
+    # table normally carry xoff -16 and H's -24 is the outlier, so these
+    # are vs2's values, not copies of H's row.
+    0x11: dict(mug_anchor=0xBE9C, name_anchor=0xBE94,
+               mug_src=0x4D60, name_src=0x4D53, name_bx=2,
+               name_hi=0x86940102, name_lo=0xFFF00002),
 }
 
 

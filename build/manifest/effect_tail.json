@@ -263,5 +263,10 @@
  "place_variant_slot_huitzil": {
   "0x46AB,2,1": "0xBE92",
   "0x47A0,2,2": "0xBE9A"
+ },
+ "_pyron_slot_note": "14z-75: Pyron's HUD art. His vs2 HUD row is id 0x11 of the same two tables H and D come from (mug 0x0990CE, name 0x09910E, DATA view): mug 0x0B60, name 0B53 0102 FFF0 0002. The +0x4200 vs2 stager bias makes the art codes 0x4D60 (mug 2x2) and 0x4D53 (name 2x1); rendered and read, the plate says 'Pyron' and the mug is a distinct 2x2 face with the same composition as H's confirmed one. Anchors are HIS OWN, not H's: reusing 0xBE9A/0xBE92 works in a single-tenant build but collides on the M3b merge, and the anchors are cheap. name 0xBE94 (BE94-95), mug 0xBE9C (BE9C/BE9D/BEAC/BEAD) — every one of the six blank in pristine vsav, inside protected_tiles.json's audited 'pool', absent from 'protected' and 'observed_full_run', and disjoint from D's (BE8C-8E, BE90-91, BEA0-A1) and H's (BE92-93, BE9A-9B, BEAA-AB).",
+ "place_variant_slot_pyron": {
+  "0x4D53,2,1": "0xBE94",
+  "0x4D60,2,2": "0xBE9C"
  }
 }

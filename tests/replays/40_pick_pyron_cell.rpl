@@ -1,0 +1,19 @@
+# 40: walk the cursor onto the APPENDED wheel cell 0x11 (Pyron's native
+# vs2 id) and pick it. Path from the default Demitri cell 0x01, derived
+# from vsavj's own TABLE B plus the wheel extension's inbound edges
+# (build/manifest/wheel_layout_proposed.json):
+#   D -> 0x06 , D -> 0x08 , DR -> 0x0B , D -> 0x11 (edges_in: 0x0B D -> 0x11)
+# Note the third press is DR, not D: vanilla 0x08 D reaches 0x0B, but the
+# extension REWIRES 0x08 D to Huitzil's cell 0x10, so the diagonal is the
+# route to the random cell that carries Pyron's inbound edge.
+# BUILD-ONLY replay: on vanilla vsavj the final D lands back on 0x0B —
+# this script is meaningful only on a build carrying the extended wheel
+# AND a tenant at id 0x11. The 0x10 twin is replay 37, the 0x13 twin 36.
+300-305 sys=C1
+800-803 sys=S1
+1000-1002 p1=D
+1040-1042 p1=D
+1080-1082 p1=DR
+1120-1122 p1=D
+1700-1702 p1=1
+3600 wait

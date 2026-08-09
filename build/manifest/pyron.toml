@@ -606,49 +606,44 @@ data_subst = "pppppppp=0x3C28FC:0x140:wide_ext"
 # 0x898C4 and 0x89884, whose id-0x10 entry is exactly H's 0x05A0.
 #   Pyron id 0x11:  name 0B53 0102 FFF0 0002    mug 0B60
 # The CODE field is replaced by the free-pool anchor where the tenant's HUD
-# art lands (0xBE92 plate / 0xBE9A mug, as H's); the attrs and x/advance
-# come from vs2 verbatim. vsavj stager bias -0x3800 gives the poke values.
-# NOTE the lo long is FFF00002 for Pyron, not H's FFE80002 — his plate has a
-# different x offset, so this is not a copy of H's row.
-# INCOMPLETE (14z-74) — READ BEFORE JUDGING A BLANK PLATE.
-# THE MISSING HALF IS NOW LOCATED (maintainer confirmed pyron14 shows no name
-# AND no mugshot, matching the measurement). The per-tenant HUD config lives
-# in tools/check_tenant_hud.py's TENANTS dict and has rows for 0x13 and 0x10
-# but NONE for 0x11 — it carries exactly the fields the art copy needs:
-#     0x13 Donovan: mug_anchor 0xBE90 name_anchor 0xBE8C
-#                   mug_src 0x4D62  name_src 0x4D55  name_bx 3
-#     0x10 Huitzil: mug_anchor 0xBE9A name_anchor 0xBE92
-#                   mug_src 0x47A0  name_src 0x46AB  name_bx 2
-# Pyron's values follow from the vs2 entries above plus the +0x4200 stager
-# bias, and land right next to Donovan's (adjacent rows in the vs2 table):
+# art lands; the attrs and x/advance come from vs2 verbatim. The vsavj
+# stager bias -0x3800 gives the poke values.
+# NOTE the lo long is FFF00002 for Pyron, not H's FFE80002. 2-tile plates in
+# this table normally carry xoff -16 and H's -24 is the OUTLIER, so this is
+# vs2's own value, not a copy of H's row.
+# The art codes are the vs2 entries plus the +0x4200 stager bias, landing
+# right next to Donovan's (adjacent rows in the vs2 table):
 #     0x11 PYRON:   mug_src 0x0B60+0x4200 = 0x4D60
 #                   name_src 0x0B53+0x4200 = 0x4D53
-#                   name_bx 2 (attrs 0102; H 0x01->2, D 0x02->3)
-#                   name_hi 0x86920102  name_lo 0xFFF00002 (the rows below)
-# Anchors: reusing H's (0xBE9A/0xBE92) is fine in a SINGLE-TENANT build but
-# would COLLIDE on the M3b merge — give him his own free-pool anchors then.
-# Still to find: the placer that actually copies mug_src/name_src art to the
-# anchors in group C (check_tenant_hud.py is the GATE, not the placer).
- These three rows
-# are correct and land (verified in the patch notes), but they only repoint
-# the TABLE ENTRIES at the free-pool anchors; nothing yet PLACES Pyron's HUD
-# ART there. Measured: the in-match plate stops reading "Demitri" and renders
-# BLANK. So the remaining work is the art half — whatever puts H's plate/mug
-# tiles at 0xBE92/0xBE9A must be done for Pyron's, and the anchors may need
-# to be his own rather than reusing H's. Until then this trades a wrong name
-# for no name; revert these three rows if a wrong name is preferable.
+#                   name_bx 2 (= the entry's own advance word)
+# Rendered and read at 14x (14z-75): the plate says "Pyron" and the mug is a
+# distinct 2x2 face sharing H's confirmed composition.
+# This is THE DEAD-ROW CLASS in its clearest form: vsavj rows 0x10-0x1F are
+# pure aliases of 0x00-0x0F in BOTH tables, while vs2 fills 0x10/0x11/0x13.
+# COMPLETE as of 14z-75. The missing half was the ART PLACER:
+# build/manifest/effect_tail.json key `place_variant_slot_<name>`, consumed by
+# tools/build_gfx_donovan.py (it copies vs2 bank-1 blocks to vsav bank-1
+# anchors on variant-id builds only). `place_variant_slot_pyron` now carries
+#     0x4D53,2,1 -> 0xBE94 (plate)    0x4D60,2,2 -> 0xBE9C (mug)
+# and the pokes below point at those anchors. check_tenant_hud.py was the
+# GATE, never the placer — its TENANTS dict gained the matching 0x11 row.
+# Anchors are Pyron's OWN, not H's: reusing 0xBE9A/0xBE92 works single-tenant
+# but collides on the M3b merge, and free-pool anchors are cheap. All six
+# cells are blank in pristine vsav, inside protected_tiles.json's audited
+# "pool", absent from "protected"/"observed_full_run", and disjoint from D's
+# and H's blocks.
 [[aux_poke]]
 name = "hud_mug_entry_11"
 addr = 0x0898A6          # mugshot table 0x89884 + 2*0x11
 op = "poke16"
-val = 0x869A             # 0xBE9A - 0x3800
+val = 0x869C             # 0xBE9C - 0x3800
 only_variant_slot = true
 
 [[aux_poke]]
 name = "hud_name_entry_11_hi"
 addr = 0x08994C          # name table 0x898C4 + 8*0x11
 op = "poke32"
-val = 0x86920102         # code 0x8692 = 0xBE92 - 0x3800; attrs = vs2 row
+val = 0x86940102         # code 0x8694 = 0xBE94 - 0x3800; attrs = vs2 row
 only_variant_slot = true
 
 [[aux_poke]]
