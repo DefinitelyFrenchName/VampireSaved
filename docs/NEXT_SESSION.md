@@ -96,9 +96,13 @@ now the third data point. Detail + two failed attempts:
   space + PC filter, with a control), runtime.
 - `tests/test_hui_grab_victim.sh` + `tools/check_grab_victim.py` (14z-73).
 
-## Recurring lesson worth re-reading
+## Read this before attributing anything
 
-Three defects this session and last were the SAME shape: **vsav ships a
-table row as a stub/alias where vs2 fills it** (the beam's effect-class row
-16, Pyron's Cosmo sub-state 81, the grab-hold keyframe row). When a ported
-character does something vanilla never does, suspect a dead row first.
+**THE DEAD-ROW CLASS** — `docs/game/engine_internals.md`, the section of that
+name (now the file's first subsystem section). FOUR instances so far and the
+most common defect shape in this port: vsav ships a table row as a STUB or an
+ALIAS where vs2 fills it, legacy never indexes it, and a ported character
+indexes it immediately. It carries the diagnostic recipe, including the two
+instrument traps (pc-relative reads need the OPCODES space; the boot
+ROM-checksum sweep must be filtered by PC). **When a ported character does
+something vanilla never does, suspect a dead row first.**

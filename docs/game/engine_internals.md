@@ -47,6 +47,53 @@ duplicated: `docs/project/cps2_wide.md` (the WIDE profile), `docs/game/atlas/`
 (mechanism inventory).
 
 
+## THE DEAD-ROW CLASS — vsav ships table rows as STUBS or ALIASES where
+## vs2/vh2 fill them (named 14z-74; FOUR instances and counting)
+
+**The single most common defect shape in this port.** vsav and vs2 share an
+engine, and their per-character / per-state dispatch and data tables are
+index-aligned — but **vsav leaves rows the newcomers need either as a STUB
+(pointing at an `rts`, or at a displacement inside the table itself) or as an
+ALIAS of a base-half row.** Legacy never notices, because legacy never
+indexes those rows. A ported character indexes them immediately.
+
+Recognise it by this signature: **the ported character does something vanilla
+never does, and the failure is total rather than subtly wrong** — nothing
+draws, or the game resets, or a value is wildly out of range. Nothing
+"upstream" is broken: the object, the class, the id and the dispatch are all
+correct. One dead row is the whole defect.
+
+| # | instance | vsav holds | vs2 holds | fix |
+|---|---|---|---|---|
+| 1 | effect-class row 16 (the beam) `0x080AEC` | stub -> bare `rts` | the beam's handler | `[[code_ptr]]` port + repoint (14z-71) |
+| 2 | sprite-list drawer, type 12 | table has no such type, and can neither grow (entry 0 IS the length) nor move (`(d8,PC,Xn)`) | a composite handler | takeover of the unused list-type 6 (14z-71) |
+| 3 | grab-hold keyframe ptr table `0xBE27A` row 0x10 | ALIAS of row 0x00 (char 0's block) | the tenant's own block | `[[data_port]]` + row repoint (14z-73) |
+| 4 | sub-state jump table `0x18468` entry 81 (Cosmo Disruption) | `0x0006` — a displacement pointing back INTO the table | a real handler | **one word**: repoint to `0x0224`, which already holds vs2's identical 8-byte handler (14z-74) |
+
+**Diagnostic recipe** (all four were found this way):
+1. Find the table and the index the tenant drives it with (a breakpoint on
+   the dispatcher, or the crash PC).
+2. Read the SAME row in vs2/vh2. If vs2 has a real target where vsav has a
+   stub or an alias, you are done looking.
+3. Before writing: **measure the row DEAD in vanilla** — a read watchpoint on
+   that slot across legacy replays, with a **same-instrument positive control
+   on a live row**. Two traps, both paid for: the table may be read
+   PC-relatively (use the OPCODES space — `wposet`; a plain `wpset` is
+   silently blind), and the boot ROM-checksum sweep touches every ROM byte
+   once, so **filter by PC** or a dead row looks live.
+4. Prefer the cheapest mechanism that reproduces vs2: a one-word repoint if
+   vsav already contains identical code somewhere in reach (instance 4), a
+   ported handler if not (1), a takeover of a provably unused slot with the
+   deadness NOT load-bearing (2), or a data port + row repoint (3).
+
+**Watch for the ALIAS variant specifically** (instances 3 and 4's cousin):
+32-row tables whose rows `0x10-0x1F` alias `0x00-0x0F` mean a tenant at a
+variant id silently inherits a vanilla character's data — no crash, just
+someone else's behaviour. Pyron's physics were another case: without
+`port_param32` his velocity rows folded onto a vanilla character's and he
+jumped under the wrong gravity. **Check every per-character table a new
+tenant touches for its variant-half rows.**
+
 ## GFX ROM (sprite/tile) subsystem
 
 - 8 gfx simms per game (x.13m-x.20m, 4MB each) = 32MB = 0x40000
