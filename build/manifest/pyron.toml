@@ -266,18 +266,43 @@ new_hex = "3d7c60000018"
 new_hex_variant = "3d7c10000018"
 note = "OBJ bank setter (pod/companion zone): vs2 bank 3 -> WIDE bank 4"
 
-# ── The ported per-char OBJ bank table copy (x026142 tail), same shape as
-# H's: rows = VANILLA vsavj 0x282D4 values EXCEPT the tenant's own row.
-# Here row 0x11 = 0x1000 (P's sprites fetch from WIDE bank 4 on any read
-# path that resolves through the ported copy) and row 0x10 is back to its
-# vanilla 0x6000 alias — this is P's build, not H's.
+# ── The ported per-char OBJ bank table copy (x026142 tail).
+#
+# READ THIS BEFORE EDITING rows_hex — there is a GENERATOR BUG under it
+# (14z-74, measured; registered as a maintainer decision in STATE.md).
+# The pcrel_escape_fix blob pass (gen_donovan_patch.py ~1173) scans this
+# region for `bra.w/bsr.w` (any `0x6000`-form word with a zero low byte)
+# and rewrites the FOLLOWING word to a trampoline displacement. It runs
+# AFTER table_fix and its scan range covers this table — which is DATA.
+# Every row holding 0x6000 therefore makes the generator clobber the row
+# after it. Measured consequences, both tenants:
+#   * rows 0x01/0x0A/0x0C emerge as 0x0074/0x0068/0x006A on H's build AND
+#     P's — the values are baked into both manifests as fixed points of
+#     the corruption, NOT (as an earlier revision of this comment said)
+#     "relocation-affected bytes". The raw source holds 0x4000 there.
+#   * H is otherwise unharmed only by luck: his row 0x10 = 0x1000 is not
+#     a branch form, so his tenant row 0x11 is never read as a
+#     displacement.
+#   * P at 0x11 is NOT lucky: with row 0x10 at its vanilla 0x6000, the
+#     scanner reads his tenant row as that branch's displacement and
+#     overwrites 0x1000 -> 0x0066 (caught by verify_gfx_build).
+#
+# THE FIX HERE IS THE MANIFEST-LEVEL ONE, deliberately: set row 0x10 to
+# 0x1000 so it is not a branch form, which leaves P's row 0x11 intact.
+# Repairing the generator instead is the correct long-term fix, but it
+# CHANGES THE FROZEN huitzil-m1 BUILD (measured: 22c016ac -> 9deda080, as
+# his rows 0x01/0x0A/0x0C revert to their declared values), so it needs a
+# re-freeze decision. Donovan is unaffected either way (measured).
+# Row 0x10 = 0x1000 is inert in a Pyron-only build (nothing loads id 0x10)
+# and is forward-compatible: on the M3b merge row 0x10 IS Huitzil, whose
+# correct value is exactly WIDE bank 4.
 [table_fix]
 stage = 6
 region = "x026142"
 pad_len = 0x1440
 table_off = 0x13EE
-rows_hex = "600060000000200060000000400040000000600040006000600000000000400060001000000020006000000040004000"
-note = "ported per-char OBJ bank table -> vanilla vsavj values + row 0x11 = WIDE bank 4"
+rows_hex = "600000740000200060000000400040000000600000686000006a00000000400010001000000020006000000040004000"
+note = "ported per-char OBJ bank table -> row 0x11 = WIDE bank 4 (row 0x10 = 0x1000 to dodge the pcrel-scan false positive; see the comment above)"
 
 # ── vsavj's own per-char OBJ bank table (0x282D4): the engine's char-init
 # reads row = runtime char id. Variant row 0x11 is a vanilla alias of row
@@ -291,3 +316,168 @@ slot_stride = 2
 old_hex = "6000"
 new_hex = "6000"
 new_hex_variant = "1000"
+
+# ── Select family (the H/Donovan template; arrays are shared, only the
+# per-id expect_* values are P's). All nine alias anchors verified from
+# the ROMs 14z-74: every vsavj variant row 0x11 currently aliases its
+# base-half row 0x01 counterpart, which is what makes the repoint
+# superset-safe. art = "native_c5": records keep NATIVE vs2 tile codes
+# and the art rides WIDE group C bank 5 — no placement map.
+[[select_records]]
+stage = 6
+name = "portrait"
+hole = "wide_ext"
+art = "native_c5"
+allow_placeholder_tiles = false
+vj_p1 = 0x26742A
+vj_p2 = 0x2674AA
+vs2_p1 = 0x2A0762
+vs2_p2 = 0x2A07E2
+expect_vs2_p1 = 0x2A639C
+expect_vs2_p2 = 0x2A63C6
+expect_vj_alias_p1 = 0x27195E
+expect_vj_alias_p2 = 0x271D70
+
+[[select_records]]
+stage = 6
+name = "name_banner"
+hole = "wide_ext"
+art = "native_c5"
+allow_placeholder_tiles = false
+vj_p1 = 0x2675AA
+vj_p2 = 0x26762A
+vs2_p1 = 0x2A08E2
+vs2_p2 = 0x2A0962
+expect_vs2_p1 = 0x2A6570
+expect_vs2_p2 = 0x2A7680
+expect_vj_alias_p1 = 0x272156
+expect_vj_alias_p2 = 0x273060
+
+[[select_records]]
+stage = 6
+name = "splash_p1"
+hole = "wide_ext"
+art = "native_c5"
+allow_placeholder_tiles = false
+vj_p1 = 0x2672AA
+vs2_p1 = 0x2A05E2
+expect_vs2_p1 = 0x2A7F2C
+expect_vj_alias_p1 = 0x273494
+
+[[select_records]]
+stage = 6
+name = "splash_p2"
+hole = "wide_ext"
+art = "native_c5"
+allow_placeholder_tiles = false
+vj_p1 = 0x26732A
+vs2_p1 = 0x2A0662
+expect_vs2_p1 = 0x2A7F4A
+expect_vj_alias_p1 = 0x2737DA
+
+# NOTE (14z-73/74): this row is named "win_quote" for historical reasons
+# but it ports the win-screen PORTRAIT record. The win-screen QUOTE TEXT is
+# a SEPARATE, still-un-ported structure that mis-maps for EVERY variant id
+# (Donovan shows Victor's lines, Phobos shows Bulleta's — a base-character
+# fold); fixing it is one shared job, not a per-tenant row. See
+# docs/game/engine_internals.md "Win screen".
+[[select_records]]
+stage = 6
+name = "win_quote"
+hole = "wide_ext"
+art = "native_c5"
+allow_placeholder_tiles = false
+vj_p1 = 0x2673AA
+vs2_p1 = 0x2A06E2
+expect_vs2_p1 = 0x2A8CB6
+expect_vj_alias_p1 = 0x273B68
+
+# highlight = host_ring exactly as ratified for Donovan and H: the records
+# encode no cell identity and the wheel's extended base table places them,
+# so the tenant's rows point at the HOST's ring record verbatim. (P's vs2
+# rows DO hold real records here, unlike H's sentinels — but the piece is
+# still never composed from vs2, by the ratified design.)
+[[select_records]]
+stage = 6
+name = "highlight"
+hole = "wide_ext"
+art = "host_ring"
+ring_ref_cell = 0x0F
+vj_p1 = 0x268A02
+vj_p2 = 0x268A82
+vs2_p1 = 0x2A18FE
+vs2_p2 = 0x2A197E
+expect_vs2_p1 = 0x2A6742
+expect_vs2_p2 = 0x2A6EF2
+expect_vj_alias_p1 = 0x2725DC
+expect_vj_alias_p2 = 0x272800
+
+# ── Drawer bank gates: VERBATIM from the H/Donovan rows. The bodies use
+# tt/tu tenant-id substitution, so they follow this manifest's tenant
+# (0x11) with no edit.
+[[site_thunk]]
+stage = 6
+name = "name_bank_variant_id"
+only_variant_slot = true
+site = 0x05FCE0
+old_hex = "207c002675aa"
+thunk_hex = "207c002675aa0c2c00tt038266083d7c300000184e753d7c200000184e75"
+
+[[site_thunk]]
+stage = 6
+name = "splash_bank_variant_id"
+only_variant_slot = true
+site = 0x06C0E0
+old_hex = "207c002672aa"
+thunk_hex = "207c002672aa0c2e00tt000a66083d7c300000184e753d7c200000184e75"
+
+[[site_thunk]]
+stage = 6
+name = "winquote_bank_variant_id"
+only_variant_slot = true
+site = 0x05F328
+old_hex = "207c002672aa"
+thunk_hex = "207c002672aa0c0000tu66083d7c300000184e754e75"
+
+# ── Select-portrait palettes: Pyron takes the DONOVAN DEDICATED-BLOCK
+# form, not H's grid column. Measured 14z-74 at vs2's own uploader
+# (0x6B194): `cmpi.b #$11,d6 / addi.w #$BC,d0` for Pyron vs `#$13 ->
+# +0xC6` for Donovan, then the shared `lsl.w #5,d0; lea (a0,d0.w),a0`.
+# Deriving the grid base from Donovan's known block self-checks the math:
+#   base = 0x3C2A3C - (0xC6<<5) = 0x3C117C
+#   Pyron = 0x3C117C + (0xBC<<5) = 0x3C28FC   (10 variant rows x 0x20)
+# Verified real data: 10 DISTINCT non-zero palette rows at that address.
+# Thunk body identical to Donovan's (d0 = min(variant,9); block indexed
+# d0*0x20), so the block is contiguous and needs no gather form.
+[[site_thunk]]
+stage = 6
+name = "select_pal_variant_id"
+only_variant_slot = true
+site = 0x05F146
+old_hex = "0c0600126606"
+thunk_hex = "0c0600tt661c3d7c30000018207cpppppppp0c40000963027009588f4ef90005f1623d7c200000180c06001266024e75588f4ef90005f152"
+data_subst = "pppppppp=0x3C28FC:0x140:wide_ext"
+
+# ── The 21-cell wheel: tenant-independent, verbatim from H's row.
+[[select_wheel]]
+stage = 6
+profile = "cps2-wide-v1"
+name = "roster21"
+layout = "build/manifest/wheel_layout_proposed.json"
+hole = "wide_ext"
+table_b = 0x0211E4
+record = 0x272A68
+record_ptr = 0x2689FE
+coord_list = 0x32A50A
+expect_count = 17
+expect_budget = 0x55
+expect_cptr = 0x32A50A
+bank5 = true
+bank_site = 0x5F8B2
+bank_site_old = "3d7c20000018"
+highlight_base_site = 0x5FAE2
+pal_block_a = 0x3A3800
+ring_rows = true
+ring_ref_cell = 0x0F
+highlight_array = 0x268A02
+march_retarget_mid = true
