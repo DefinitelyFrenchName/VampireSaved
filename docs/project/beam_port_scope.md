@@ -157,13 +157,20 @@ one run) on the native leg:
   `0x2621D6` is read at f3165/f3167 (the P beam) *and* at f3465 (the K
   low beam) — same list, same emitter PC `0x019E0E`. The maintainer's
   99% visual read was right, and ONE port covers both.
-- **236+2P (ES) is UNRESOLVED.** No read at the ES attempt — but that
-  does NOT mean a different machine, because the rig does not prove the
-  ES came out. ES is resource-gated and degrades silently to the normal
-  special exactly like Dark Force did (14z-69, three sessions lost to
-  it); `$FF8509` was poked but that is the DF stock field, not
-  necessarily the ES resource. Identify the ES resource and ASSERT the
-  move actually fired before drawing any conclusion.
+- **236+2P (ES) RESOLVED — same art path.** The maintainer supplied the
+  missing fact: ES consumes one meter stock, exactly like DF, and 236+2K
+  is the SAME move as 236+2P (P hits high, K hits low, ES hits mid).
+  Captured on native with stocks poked: Phobos takes the transformed blue
+  shape, the stock counter drops 3 -> 2 (the state assertion — not just
+  the input), and the girthy beam fires at f3785. Its sprites are
+  **pal 0x0C in bank 3, H's own band**, same as P and K — it simply uses
+  MORE of them (24 codes reaching 0x1F58, against 5 for P/K).
+  The earlier "no read at the ES attempt" was ambiguous by construction:
+  a girthier beam means different tiles, so a null read could not
+  distinguish "did not fire" from "different list".
+
+  **So ONE port covers all three variants.**
+
 - **`0x0937AE` is NOT a beam variant.** Execution breakpoints across all
   three: `0x0934A8` runs 1129 times (constantly, from before the ray —
   it is the object's general per-frame machine, not beam-specific, so
@@ -185,6 +192,14 @@ on any new root BEFORE freezing its length.
 4. Hook per A; rebuild; verify against native on replay 83b.
 5. Then **D**: check the ES and low-beam variants with the maintainer's
    inputs.
+
+## Pre-check already done — the gfx side is READY
+
+All **157** tiles the three variants draw (expanded for multi-tile
+sprites, `base + row*0x10 + col`) are ALREADY present in our group C —
+0 missing. So fixing the dispatch should yield a real beam, not the
+fuchsia blocks the 214+P explosion produced. Run this check again after
+the port, but the copy inventory is not expected to need extending.
 
 ## Verification when built
 
