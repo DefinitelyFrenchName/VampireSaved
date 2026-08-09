@@ -467,3 +467,46 @@ ring_rows = true
 ring_ref_cell = 0x0F
 highlight_array = 0x268A02
 march_retarget_mid = true
+
+# ── COSMO DISRUPTION: the dead sub-state row (14z-74) ────────────────────
+# THE DEFECT (maintainer playtest): the EX (41236 + hold/release 2P/2K)
+# CRASHED and reset the game. Reproduced by tests/replays/pyron/
+# 72_pyron_cosmo_2p.rpl: CRASH vec4 (illegal instruction) at PC 0x018498,
+# then the whole match state zeroes — a watchdog reset, which is NOT a 68k
+# exception, so the field trace and not the crash guard is what proves it.
+#
+# MECHANISM — the BEAM's defect class again. The shared engine dispatches
+# this sub-state through a self-encoding, pc-relative jump table:
+#     018460  move.w $18468(pc,d0.w),d1
+#     018464  jmp    $18468(pc,d1.w)
+# with d0 = 0xa2 (entry 81) at the crash. Entry 81 is IN RANGE — the table
+# holds 265 entries and entry 0 (0x0212) self-encodes the length — but
+# vsavj stores 0x0006 there, a displacement pointing back INTO the table.
+# vs2's twin table (0x016d34, 277 entries; dispatcher 0x016d30) stores
+# 0x023c = a real handler at vs2 0x016f70. So vsav ships the row as a STUB
+# where vs2 fills it, and the ported character drives the engine straight
+# into it; the jmp then executes the table's own data until it hits an
+# illegal instruction.
+#
+# WHY THIS IS ONE WORD AND NOT A DISPATCH TAKEOVER. vs2's handler is eight
+# position-independent bytes — `move.b 0x17(a3),0x54(a1) / rts`
+# (136b001700544e75) — with no absolute or pc-relative operands. vsavj
+# ALREADY CONTAINS those exact bytes at 0x01868C, which is table + 0x224 —
+# and 0x0224 is the table's most common entry, i.e. the shared handler
+# vanilla already points many live states at. So repointing entry 81 to
+# 0x0224 reproduces vs2's behaviour EXACTLY with no ported code, no
+# displaced instruction and no legacy cycles.
+#
+# SUPERSET SAFETY — measured, not argued. Entry 81 is DEAD in vanilla: a
+# read watchpoint on its slot (0x01850A) in the OPCODES space (the table is
+# read pc-relatively, so a plain wpset is blind — 14z-71) sees ZERO reads
+# from the dispatcher across legacy replays 02 and 03, against a control on
+# the live entry-0 slot that sees 13 and 8. The single hit each replay does
+# show is frame 1 at PC 0x000926 — the boot ROM-checksum sweep, which the
+# control shows too and which is excluded by PC.
+[[code_word]]
+stage = 6
+name = "cosmo_substate81"
+addr = 0x01850A
+old_hex = "0006"
+new_hex = "0224"
