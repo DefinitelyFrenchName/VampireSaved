@@ -124,6 +124,46 @@ No hook, no cycles, nothing to ratify. Cost: decode the type-2 format
 from its handler (`0x01B234`), write the transform, and accept that the
 flattened list is authored data the sibling oracle cannot check.
 
+## Session 14z-72 — the grab victim: instrument built, grab window
+## located, and the RIG IS NOT COMPARABLE (no attribution yet)
+
+**New instrument, kept: `tests/lua/field_trace.lua`** — logs named RAM
+fields EVERY frame (`FIELDS="ff8810:w:vx,..."`, signed reads, replay +
+POKES grammar, optional frame window). We had "who wrote this?"
+(trace_writes), "what sprites exist?" (obj_records_dump) and "is whole RAM
+identical?" (replay.lua) but nothing that answered **"how did this value
+move over time, and where do the legs part company?"** — the question
+every trajectory defect asks. Previously that meant dozens of whole-RAM
+DUMPS at named frames.
+
+**Grab window located: f3154-3273** (the victim's position changes over
+that span on both legs). The 14z-71 sampling that returned grenade frames
+was at f3431-3449 — roughly 200 frames late. `test_hui_grab.sh` samples
+3200/3230/3300, which is the correct neighbourhood and was there to be
+read all along.
+
+**THE RIG IS NOT CROSS-LEG COMPARABLE, and no attribution may be made
+until it is.** At f3150, BEFORE the grab, the victim is at x=936 on
+native and x=915 on ours — 21px apart. The fighters therefore start at
+different spacing, the grab connects at a different range, and every
+downstream difference inherits that.
+
+Provisional and NOT a finding (recorded only so it is not re-derived):
+with the absolute offset cancelled (victim position RELATIVE to the
+attacker), native's victim arcs to dy +278 and settles at dx +111; ours
+arcs to +179 and settles at +131. That is consistent with the maintainer's
+report of a wrong mid-animation trajectory — and equally consistent with
+two grabs that simply connected at different ranges. **Do not act on it.**
+
+**Next step: make the legs start identically.** The clean fix is the 83d
+grenade-rig trick — walk both fighters into a CORNER first, which pins
+spacing deterministically on both legs, rather than poking positions
+mid-match (which the engine may overwrite and which would change the
+connect range that is itself under test). Author
+`tests/replays/hui/80b_hui_grab_corner.rpl` with the maintainer's inputs:
+regular grab **6MP/6HP at contact**, Circuit Scrapper **63214+MP/HP at
+contact** — both need the fighters touching.
+
 ## Session 14z-71 CLOSE — ritual complete
 
 - **STATE** updated (this file, newest-first above).

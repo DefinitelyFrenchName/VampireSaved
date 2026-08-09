@@ -30,10 +30,20 @@ PER-FRAME data. Suspect the per-frame victim-offset / capture-pose data or
 its stride — not the grab logic, whose damage and launch arc are already
 native-exact and gated.
 
-**First move, before reading any code:** per-frame A/B of the victim's
-position fields, native vs ours, across the grab window. Positions are
-mapped fields (`docs/game/atlas/ram.md`), so they compare directly; the
-first divergent frame and the size of the jump name the data.
+**Progress 14z-72 — instrument built, rig blocked.** `tests/lua/field_trace.lua`
+(new) logs named RAM fields every frame; the grab window is **f3154-3273**
+(victim P2 = `$FF8800`, x `+0x10`, y `+0x14`). But the current rig is **NOT
+cross-leg comparable**: at f3150, before the grab, the victim is 21px
+further right on native than on ours, so the grab connects at a different
+range and every downstream difference inherits it. No attribution was made.
+
+**Next move: fix the rig, then measure.** Walk both fighters into a CORNER
+first — the 83d grenade-rig trick — so spacing is pinned deterministically
+on both legs. Prefer that to poking positions mid-match, which the engine
+may overwrite and which would alter the very connect range under test.
+Then re-run the A/B on the victim's offset RELATIVE to the attacker (that
+cancels absolute placement and is the physically meaningful quantity for a
+grab).
 
 ## 2. Win quote — cosmetic, root-caused, not built
 
