@@ -610,7 +610,26 @@ data_subst = "pppppppp=0x3C28FC:0x140:wide_ext"
 # come from vs2 verbatim. vsavj stager bias -0x3800 gives the poke values.
 # NOTE the lo long is FFF00002 for Pyron, not H's FFE80002 — his plate has a
 # different x offset, so this is not a copy of H's row.
-# INCOMPLETE (14z-74) — READ BEFORE JUDGING A BLANK PLATE. These three rows
+# INCOMPLETE (14z-74) — READ BEFORE JUDGING A BLANK PLATE.
+# THE MISSING HALF IS NOW LOCATED (maintainer confirmed pyron14 shows no name
+# AND no mugshot, matching the measurement). The per-tenant HUD config lives
+# in tools/check_tenant_hud.py's TENANTS dict and has rows for 0x13 and 0x10
+# but NONE for 0x11 — it carries exactly the fields the art copy needs:
+#     0x13 Donovan: mug_anchor 0xBE90 name_anchor 0xBE8C
+#                   mug_src 0x4D62  name_src 0x4D55  name_bx 3
+#     0x10 Huitzil: mug_anchor 0xBE9A name_anchor 0xBE92
+#                   mug_src 0x47A0  name_src 0x46AB  name_bx 2
+# Pyron's values follow from the vs2 entries above plus the +0x4200 stager
+# bias, and land right next to Donovan's (adjacent rows in the vs2 table):
+#     0x11 PYRON:   mug_src 0x0B60+0x4200 = 0x4D60
+#                   name_src 0x0B53+0x4200 = 0x4D53
+#                   name_bx 2 (attrs 0102; H 0x01->2, D 0x02->3)
+#                   name_hi 0x86920102  name_lo 0xFFF00002 (the rows below)
+# Anchors: reusing H's (0xBE9A/0xBE92) is fine in a SINGLE-TENANT build but
+# would COLLIDE on the M3b merge — give him his own free-pool anchors then.
+# Still to find: the placer that actually copies mug_src/name_src art to the
+# anchors in group C (check_tenant_hud.py is the GATE, not the placer).
+ These three rows
 # are correct and land (verified in the patch notes), but they only repoint
 # the TABLE ENTRIES at the free-pool anchors; nothing yet PLACES Pyron's HUD
 # ART there. Measured: the in-match plate stops reading "Demitri" and renders
