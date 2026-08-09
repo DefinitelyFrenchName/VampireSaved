@@ -53,7 +53,7 @@
 #
 # Usage: ROMDIR=... [BEAM_WALK_EXPECT=absent|walks] \
 #            tests/test_beam_anim_walk.sh [wide-builddir]
-#        (defaults to build/hui14; needs a build carrying H's real art)
+#        (defaults to build/hui17; needs a build carrying H's real art)
 set -eu
 
 ROMDIR="${ROMDIR:?set ROMDIR}"
@@ -62,7 +62,7 @@ cd "$REPO"
 WORK="$(mktemp -d)"
 trap 'rm -rf "$WORK"' EXIT
 
-BUILD="${1:-build/hui14}"
+BUILD="${1:-build/hui17}"
 EXPECT="${BEAM_WALK_EXPECT:-absent}"
 case "$BUILD" in /*) ;; *) BUILD="$REPO/$BUILD" ;; esac
 [ -f "$BUILD/rompath/vsavjw.zip" ] || {

@@ -594,6 +594,17 @@ tests/audit_palette_seq_ids.sh        # 14z-69p: which palette-seq ids does LEGA
                                       # audit is its ONLY guard. Use GUARD_PROBE_MAX:
                                       # the default 400-hit cap truncated it once and
                                       # hid id 0x27
+tests/test_beam_variants.sh    [bd]   # 14z-70h: the beam-port premises. All THREE
+                                      # variants (236+P / 236+K / 236+2P==2K) are ONE
+                                      # art path — pal 0x0C from the tenant band — and
+                                      # every tile they draw is ALREADY in group C, so
+                                      # the port needs no copy-inventory work. Encodes
+                                      # two paid-for traps: ES CONSUMES A METER STOCK
+                                      # (empty meter = silent downgrade, like DF, so it
+                                      # asserts the ES is richer than P), and multi-tile
+                                      # sprites must be expanded w*h at base+row*0x10+col
+                                      # (obj_records_dump reports the BASE code only).
+                                      # Native leg only, ~1 min
 tests/test_beam_anim_walk.sh   [bd]   # 14z-70: does the build ever WALK the anim
                                       # nodes that carry the beam sprite lists?
                                       # Native reads 0x24FCFA twice in its beam
@@ -638,6 +649,7 @@ before session end (persistent suite doctrine, CLAUDE.md §4).
 
 | Build | SHA-1 (zip) | Notes |
 |---|---|---|
+| **hui17 — + the 214+P GROUND EXPLOSION (PING #13, 14z-70f, MAINTAINER-CONFIRMED)** | fingerprint `699de9b7ed40e4662f1943b7baaf606082d29dcf` (program unchanged from hui15/16 — the fix is gfx-only, as the shadow fix was) | `build/hui17`; launcher default. = hui14 + (a) the x088512 root grown 0x3B40 -> 0x3B98 with a RAW tail from +0x3B78, repairing three pc-rel tables that resolved into the ANIM region — a REAL latent repair that is behaviourally inert today (the code that reads them never runs); (b) `extra_tiles/0x10.json` 2 -> **569 tiles**, fixing the grenade's ground detonation, which drew a solid FUCHSIA rectangle because its codes were remapped bank 3->4 but the tiles were never copied. Reproduce ONLY with `tests/replays/hui/83d_hui_grenade_ground.rpl` — 214+**LP** with both fighters walked to their corners; every earlier rig fired MP from start distance, so the bomb hit the OPPONENT and the capture showed the on-contact explosion instead. Gates: gfx_layout3, hui_boot (legacy masked-v2 EXACT), hui_winscreen, pairs, ex, grab, air, walk, audit_empty_tiles, m3a_reproducible — all PASS |
 | **hui14 — + the DARK FORCE PALETTE (14z-69p, NOT yet frozen)** | fingerprint `c25b3824a82bcf482069bbd14291078cbf8abbbd` | `build/hui14`. = hui13 + one `[[data_port]]` row: palette-seq rows 0x1E-0x21 (vsavj `0x39ACC0`) replaced with the sequence native's DF actually shows (vs2 `0x3ABEDC`, vh2 twin `0x38BEB0`). He now flashes his own warm gold instead of purple; the afterimages stay by design. Legacy-inert because vanilla never requests those ids — guarded by `tests/audit_palette_seq_ids.sh` (10,504 sampled calls, only 0x26/0x27), which is the ONLY guard since the palette path never transits work RAM. Gate `test_hui_df_style.sh` now defaults to `--expect colours-fixed` |
 | **hui13 — + the CHILD SHADOW FIX (14z-69o, playtest-confirmed)** | fingerprint `31d576bebc8fcd3230205d5f5f9ce41659930ea3` (same as hui12 — the fix is gfx-only, the program is unchanged) | `build/hui13`. = hui12 + two tiles (`0x0F8B`, `0x0F8C`) added to the group-C copy inventory via the new per-tenant `build/manifest/extra_tiles/<char>.json`. The child sidekick's shadow CORE resolved to an EMPTY group-C tile and rendered as a solid rectangle; the tiles are referenced by records the `obj_records.py` pointer walk never reaches, so they were never copied. Verified: 0 empty-tile draws over replay 82 (was 2), both tiles byte-identical to vs2, and a pixel A/B at f3500 shows the rectangle become native's tapered shadow (159 px changed, bbox x139-186 y184-199). Gates: gfx_layout3, boot, m3a-reproducible, pairs, ex, grab, air, walk, winscreen, wide_render_content — all PASS |
 | **hui12 — the pc-rel TABLE FIX (14z-69i, NOT yet frozen, not yet playtested)** | fingerprint `31d576bebc8fcd3230205d5f5f9ce41659930ea3` | `build/hui12`. = hui11 + region `x06cac0` forced to its declared 0xEBC (`:f0xca8`) so the row-8 machine's seven pc-rel DATA TABLES sit inside it, with the tail EMITTED RAW (CPS-2 decrypts opcode fetches only, so a data read returns the stored bytes). All seven now read byte-identical to vs2 — they previously resolved into unrelated bytes, which was the "ported machine reads garbage" park. Legacy untouched: boot masked-v2 EXACT, m3a-reproducible bit-exact, and every H gate green (pairs, ex, grab, air, walk, fx_flow, winscreen, df_style, ladder, census). **The beam still does not draw** — measured against native at its own frames (see STATE 14z-69i), so the residual is the emitter/draw path, not the tables |

@@ -70,6 +70,19 @@ Authoritative implementations + section comments:
 | root spec `:f<off>` | force a region past the sibling-oracle boundary and emit from `<off>` as RAW data. For a code region whose OWN pc-relative tables sit beyond the boundary: inside the region the pointers resolve correctly, and raw emission makes the DATA reads return the stored bytes (CPS-2 decrypts opcode fetches only). Forced tail is registered as a dead zone | 14z-69i/j |
 | `data_port df_palette_seq_rows` | palette-seq rows 0x1E-0x21 (vsavj 0x39ACC0) <- the sequence native's Dark Force shows (vs2 0x3ABEDC / vh2 0x38BEB0). Legacy-inert ONLY because vanilla never requests those ids — and no RAM gate can check that, so `tests/audit_palette_seq_ids.sh` is the sole guard | 14z-69p |
 
+## 14z-70 additions
+
+| patch / facility | what it does | since |
+|---|---|---|
+| `extra_tiles/0x10.json` **2 -> 569 tiles** | the 214+P grenade's GROUND detonation drew a solid FUCHSIA rectangle: codes correctly remapped bank 3->4, tiles never copied into group C. Span rule — every tile in 0x0A00-0x0C40 that vs2 bank 3 has art for and group C lacks. **A per-drawn-tile inventory (115) DOES NOT WORK**: `obj_records_dump` reports a multi-tile sprite's BASE code only, and the block is one 6x6 sprite whose other 35 tiles are invisible to it | 14z-70f |
+| `:f` on a SOURCE-ONLY (`:s`) root | `extract_char.py`'s `:s` branch returned early and never honoured `f<off>`; the generator already read `raw_from` per region. Now a source-only code region can carry its own pc-relative data tables. Used by `0x88512:0x3b98:s:f0x3b78` | 14z-70d |
+| `x088512` grown 0x3B40 -> 0x3B98 | three `lea (d16,pc)` tables at 0x08C08A/9A/A2 sat past the region end and resolved into the ANIM region placed right after. A REAL latent repair — but **behaviourally inert**: the code that reads them never executes in any measured scenario, and the fix changed no rendered pixel. Kept on the gate sweep, not on a behavioural claim | 14z-70d |
+
+**Ordering note (14z-70):** the two shipped changes are independent —
+`extra_tiles` is gfx-only (the program fingerprint is unchanged by it,
+which is itself the evidence) and the `x088512` root change is
+program-only and inert.
+
 **Exclusivity / ordering note:** the `:f` root and the raw-emit tail are
 one mechanism — landing `:f` alone moves the tables without fixing their
 byte image. `extra_tiles` and `data_port df_palette_seq_rows` are

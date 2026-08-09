@@ -1,6 +1,15 @@
 # STATE — living progress log
 
-Updated: 2026-08-08 (session 14z-70 IN PROGRESS — the beam residual moved
+Updated: 2026-08-09 (session 14z-70 CLOSED — the 214+P GROUND explosion
+FIXED and maintainer-confirmed (PING #13, build/hui17); the BEAM fully
+scoped and measured, ready to build (docs/project/beam_port_scope.md);
+THE ANCHOR METHOD adopted as the first move for any non-drawing effect;
+and a working agreement with the maintainer on captures, scoping, and
+not asking him code questions as gameplay questions. FOUR of my own
+claims were retracted in-session after clean re-measures. Read
+docs/NEXT_SESSION.md first.)
+
+Previously: 2026-08-08 (session 14z-70 IN PROGRESS — the beam residual moved
 off the draw path and onto anim-sequence SELECTION: our build never walks
 the beam anim nodes at all, measured both legs in one emulator. New gate
 `tests/test_beam_anim_walk.sh` freezes it. Read the 14z-70 section below,
@@ -86,6 +95,42 @@ address), then find what selects base `0x24EDD4` + offset for it. That
 selection is the defect.
 
 Full write-up: `docs/game/engine_internals.md`, beam/effect family.
+
+## Session 14z-70 CLOSE — ritual complete
+
+- **STATE** updated (this file, newest-first sections above).
+- **docs/NEXT_SESSION.md** rewritten: opener is the beam port, with the
+  measured chain table, the two already-verified premises, the working
+  agreement, and seven method notes.
+- **docs/project/beam_port_scope.md** — the scope, written BEFORE
+  building at the maintainer's instruction and corrected twice by
+  measurement while it was being written.
+- **HANDOFF** registry carries hui17 with what it contains and the rig
+  needed to see it; the gate list carries the two new gates; the
+  launcher default is hui17.
+- **patch_index / patch_notes** carry the 569-tile inventory, the `:f`
+  on a source-only root, and the x088512 growth — with the failed
+  115-tile attempt recorded, since the reason it failed is the lesson.
+- **Persistent suite**: `tests/test_beam_anim_walk.sh` (proof-of-fix,
+  flips when the beam draws), `tests/test_beam_variants.sh` (the port's
+  two premises + the ES downgrade trap), replays 83c / 83d / 86, and
+  `audit_empty_tiles.sh` hardened both ways and ground-truthed.
+- **Closing sweep, all PASS**: m3a_reproducible, hui_boot (legacy
+  masked-v2 EXACT), gfx_layout3, audit_empty_tiles, hui_winscreen,
+  hui_pairs, hui_ex, hui_grab, hui_air, hui_walk, beam_anim_walk,
+  beam_variants, patch_overlap, romset_identity, compare_composite.
+
+**Four retractions this session, all after clean re-measures**: "the
+explosion is not broken" (wrong event — the rig hit the opponent), "the
+x088512 tables are the explosion's root" (that code never runs), "the
+beam object is never created" (it exists; it is never driven), and "the
+beam machine" as a name for 0x0934A8 (it is the object's general
+per-frame machine). Each is written down with the comparison error that
+produced it. The pattern is consistent: a measured count of zero is
+reliable; the story I attach to it is not.
+
+OPEN: the beam port (scoped, ready), the win quote, FG pacing; then H's
+freeze, then Pyron.
 
 ## Session 14z-70f/g — THE 214+P GROUND EXPLOSION FIXED (PING #13,
 ## build/hui17), and the BEAM narrowed to "the object is never created"

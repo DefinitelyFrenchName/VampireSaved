@@ -2283,3 +2283,47 @@ patch_notes_fragment.md.
   flow's dependency closure; effect_machine: wrong entry, hot for
   legacy). The parked bodies + anatomy live as comments in
   huitzil.toml.
+
+## 14z-70 — the ground explosion, and one inert repair
+
+**`extra_tiles/0x10.json`: 2 -> 569 tiles.** The 214+P grenade's GROUND
+detonation (NOT the on-contact hit explosion — see the rig note below)
+drew a solid fuchsia rectangle. Its sprite codes are correctly remapped
+bank 3 -> bank 4 (identical code ranges to native, verified in the same
+OBJ dump that shows pal 0a/0c remapped correctly), but the tiles were
+never copied into group C, so they resolve to all-zero tiles. Same class
+as the child sidekick's shadow (14z-69o), two orders of magnitude bigger.
+
+Rule used: every tile in the effect's span **0x0A00-0x0C40** that vs2
+bank 3 has art for and our group C lacks. Source mapping validated on 6
+populated tiles — group C bank 4 tile `c` <- vs2 group B index
+`0x10000 + c`. Gfx-only: `build/hui17` carries the SAME program
+fingerprint as hui15/hui16 (`699de9b7`), which is the evidence that no
+program byte moved.
+
+**The first attempt shipped 115 tiles and did not work.** A per-drawn-
+tile inventory misses the other 35 tiles of every 6x6 sprite, because
+`obj_records_dump` reports only a sprite's BASE code — and the fuchsia
+block IS one 6x6 sprite. The span rule is a superset that covers any
+multi-tile layout.
+
+**Rig, because it is the whole reason this hid for three sessions:**
+`tests/replays/hui/83d_hui_grenade_ground.rpl` — 214+**LP** (shortest
+arc) with BOTH fighters walked back to their corners. Every earlier rig
+fired 214+MP from 2P start distance, where the bomb reaches the opponent;
+those captures show the on-contact explosion, which is correct and always
+was.
+
+**`x088512` 0x3B40 -> 0x3B98, raw tail from +0x3B78.** Its own three
+`lea (d16,pc),A0` at 0x08C014/26/38 target tables at 0x08C08A/9A/A2,
+0x38/0x48/0x50 past the old end, so each resolved to `target + delta`
+inside the ANIM region placed immediately after (0x0D8950). Fixed via the
+14z-69j mechanism, plus a small `extract_char.py` change so a SOURCE-ONLY
+root honours `f<off>` at all. `verify_pcrel_data.py` 72 BROKEN -> 69.
+
+**It fixes nothing observable and is kept on that basis.** The code that
+reads those tables never executes in any measured scenario (execution
+breakpoint at the placed twin `PRG:0x0D8912`: zero hits), and the
+explosion's sprite codes are byte-identical before and after. It is a
+latent repair of an already-ratified class, proven safe by legacy
+masked-v2 EXACT and both frozen references rebuilding bit-exact.
