@@ -349,15 +349,25 @@ len = 0x500
 src_head_hex = "0e000f600f900fb0"
 table = 0x38C198
 
-[[palette]]
-name = "effect"
-stage = 6
-src = 0x3AC45C
-len = 0xDC0
-src_head_hex = "05370639075b088d"
-table = 0x38C218
-hole = "a"
-extra_tables = "0x38C258"
+# EFFECT PALETTE — DEFERRED, and deliberately NOT ported (14z-74).
+# Porting it caused a visible 30Hz BLINK on Pyron's sprite, measured:
+# palette RAM row 10 (0x90C140) alternated every frame between his correct
+# block and a competing one, where NATIVE holds it CONSTANT (native animates
+# rows 1/2/3 only; ours animated 1/2/3 AND 10).
+# ROOT CAUSE: the effect palette table at 0x38C218 has only SIXTEEN rows
+# (0x00-0x0F) — 0x38C258 is the NEXT table, and it is a COPY of the first
+# rows (the "vanilla third-table sharing"). A variant id therefore indexes
+# PAST the table: row 0x11 lands at 0x38c25c = extra-table row 0x01, which
+# vanilla uses (0x3923e0). The sprite table 0x38C198 is 32 rows, so the
+# sprite row above is legitimately inside it — that half is sound and stays.
+# NOTE FOR THE MERGE: Huitzil's frozen row has the SAME shape (his row 0x10
+# lands at 0x38c258 = extra-table row 0x00), so this is a shared hazard, not
+# a Pyron-only mistake; it simply has not produced a reported symptom on him.
+# Legacy is intact either way (measured: replay 02 on the effect-ported build
+# was still the ratified select-wheel window only).
+# TO FIX PROPERLY: determine how the engine resolves an effect palette for a
+# VARIANT id (a 16-row table cannot hold one) — either a fold, a separate
+# variant table, or a thunk — before writing anything in that region.
 
 # ── Select family (the H/Donovan template; arrays are shared, only the
 # per-id expect_* values are P's). All nine alias anchors verified from
