@@ -267,42 +267,28 @@ new_hex_variant = "3d7c10000018"
 note = "OBJ bank setter (pod/companion zone): vs2 bank 3 -> WIDE bank 4"
 
 # ── The ported per-char OBJ bank table copy (x026142 tail).
+# Rows = the VANILLA vsavj 0x282D4 values, with Pyron's own row 0x11 =
+# 0x1000 (his sprites fetch from WIDE bank 4 on any read path that
+# resolves through the ported copy). Row 0x10 stays vanilla: there is no
+# tenant at 0x10 in this build.
 #
-# READ THIS BEFORE EDITING rows_hex — there is a GENERATOR BUG under it
-# (14z-74, measured; registered as a maintainer decision in STATE.md).
-# The pcrel_escape_fix blob pass (gen_donovan_patch.py ~1173) scans this
-# region for `bra.w/bsr.w` (any `0x6000`-form word with a zero low byte)
-# and rewrites the FOLLOWING word to a trampoline displacement. It runs
-# AFTER table_fix and its scan range covers this table — which is DATA.
-# Every row holding 0x6000 therefore makes the generator clobber the row
-# after it. Measured consequences, both tenants:
-#   * rows 0x01/0x0A/0x0C emerge as 0x0074/0x0068/0x006A on H's build AND
-#     P's — the values are baked into both manifests as fixed points of
-#     the corruption, NOT (as an earlier revision of this comment said)
-#     "relocation-affected bytes". The raw source holds 0x4000 there.
-#   * H is otherwise unharmed only by luck: his row 0x10 = 0x1000 is not
-#     a branch form, so his tenant row 0x11 is never read as a
-#     displacement.
-#   * P at 0x11 is NOT lucky: with row 0x10 at its vanilla 0x6000, the
-#     scanner reads his tenant row as that branch's displacement and
-#     overwrites 0x1000 -> 0x0066 (caught by verify_gfx_build).
-#
-# THE FIX HERE IS THE MANIFEST-LEVEL ONE, deliberately: set row 0x10 to
-# 0x1000 so it is not a branch form, which leaves P's row 0x11 intact.
-# Repairing the generator instead is the correct long-term fix, but it
-# CHANGES THE FROZEN huitzil-m1 BUILD (measured: 22c016ac -> 9deda080, as
-# his rows 0x01/0x0A/0x0C revert to their declared values), so it needs a
-# re-freeze decision. Donovan is unaffected either way (measured).
-# Row 0x10 = 0x1000 is inert in a Pyron-only build (nothing loads id 0x10)
-# and is forward-compatible: on the M3b merge row 0x10 IS Huitzil, whose
-# correct value is exactly WIDE bank 4.
+# HISTORY (14z-74) — do not "restore" the odd values you may see in older
+# builds. A generator bug used to corrupt this table: the
+# pcrel_escape_fix blob pass scanned the region for `bra.w/bsr.w` (any
+# `0x6000`-form word) and rewrote the word AFTER it, and it ran after
+# table_fix over a range covering this table, which is DATA. Any row
+# holding 0x6000 therefore clobbered the row following it — rows
+# 0x01/0x0A/0x0C came out as 0x0074/0x0068/0x006A on every tenant build,
+# and Pyron's TENANT row lost its 0x1000 -> 0x0066. Fixed at the source
+# (maintainer decision D5, 14z-74): the scan now skips the table_fix
+# span, so the declared values below are what actually lands.
 [table_fix]
 stage = 6
 region = "x026142"
 pad_len = 0x1440
 table_off = 0x13EE
-rows_hex = "600000740000200060000000400040000000600000686000006a00000000400010001000000020006000000040004000"
-note = "ported per-char OBJ bank table -> row 0x11 = WIDE bank 4 (row 0x10 = 0x1000 to dodge the pcrel-scan false positive; see the comment above)"
+rows_hex = "600060000000200060000000400040000000600040006000600000000000400060001000000020006000000040004000"
+note = "ported per-char OBJ bank table -> vanilla vsavj values + row 0x11 = WIDE bank 4"
 
 # ── vsavj's own per-char OBJ bank table (0x282D4): the engine's char-init
 # reads row = runtime char id. Variant row 0x11 is a vanilla alias of row

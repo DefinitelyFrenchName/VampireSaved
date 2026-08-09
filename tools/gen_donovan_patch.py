@@ -1169,8 +1169,27 @@ def main():
                 tramp_off = orig_len
                 tramp_of = {}
                 n_esc = n_trip = 0
+                # 14z-74 (maintainer-approved D5): the [table_fix] bank-word
+                # table is DATA, not code — but this scan treats any
+                # `0x6000`-form word as a bra.w/bsr.w and rewrites the word
+                # AFTER it to a trampoline displacement. table_fix writes that
+                # table earlier in this same loop iteration, so every row
+                # holding 0x6000 silently clobbered the row following it.
+                # Measured: Huitzil's rows 0x01/0x0A/0x0C emerged as
+                # 0074/0068/006a (garbage bank words, baked into manifests as
+                # fixed points of the bug), and Pyron's TENANT row 0x11 lost
+                # its 0x1000 -> 0x0066. Huitzil escaped only because his own
+                # row 0x10 = 0x1000 is not a branch form. Exclude the table.
+                tf_span = None
+                if (tf and tf["region"] == name
+                        and args.stage >= _int(tf.get("stage", 0))):
+                    _to = _int(tf["table_off"])
+                    tf_span = (_to, _to + len(bytes.fromhex(tf["rows_hex"])))
                 i = 0
                 while i + 4 <= orig_len:
+                    if tf_span and tf_span[0] <= i < tf_span[1]:
+                        i = tf_span[1]
+                        continue
                     w = int.from_bytes(blob[i:i + 2], "big")
                     if (w & 0xF000) == 0x6000 and (w & 0xFF) == 0:
                         disp = int.from_bytes(blob[i + 2:i + 4], "big")
