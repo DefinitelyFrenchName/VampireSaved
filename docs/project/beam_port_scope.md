@@ -147,10 +147,29 @@ will contain `jsr`/`jmp` to routines that may themselves be vs2-only.
 `extract_char.py` resolves this once rooted, but the closure size is
 unknown and could dominate the port.
 
-**D. Is `0x0937AE` one of the maintainer's variants?** He reports three
-beams (236P, 236+2P ES girthier, 236+K low). Two vs2-only machines and
-three variants do not obviously line up — worth knowing before scoping
-the second one in or out.
+**D. PARTLY RESOLVED — and it was a badly-posed question.** It was asked
+of the maintainer as if it were a gameplay judgement; "same machine" is a
+CODE fact and he can only report what it looks like. Measured instead,
+with `tests/replays/hui/86_hui_beam_variants.rpl` (all three variants in
+one run) on the native leg:
+
+- **236+P and 236+K are the SAME art path.** The beam sprite list
+  `0x2621D6` is read at f3165/f3167 (the P beam) *and* at f3465 (the K
+  low beam) — same list, same emitter PC `0x019E0E`. The maintainer's
+  99% visual read was right, and ONE port covers both.
+- **236+2P (ES) is UNRESOLVED.** No read at the ES attempt — but that
+  does NOT mean a different machine, because the rig does not prove the
+  ES came out. ES is resource-gated and degrades silently to the normal
+  special exactly like Dark Force did (14z-69, three sessions lost to
+  it); `$FF8509` was poked but that is the DF stock field, not
+  necessarily the ES resource. Identify the ES resource and ASSERT the
+  move actually fired before drawing any conclusion.
+- **`0x0937AE` is NOT a beam variant.** Execution breakpoints across all
+  three: `0x0934A8` runs 1129 times (constantly, from before the ray —
+  it is the object's general per-frame machine, not beam-specific, so
+  "the beam machine" was too strong a label), while `0x0937AE` fires only
+  the frame-1 arming artefact. It is some other vs2-only effect and is
+  OUT of this port's scope until something shows it is needed.
 
 **E. pc-relative data tables.** `x088512` was 0x50 bytes too short for
 exactly this reason (14z-70c). Run `census_regions.py` / the pcrel census
