@@ -1064,6 +1064,21 @@ def main():
                                     f"reader_old_hex must be the 4-byte "
                                     f"lea(d16,pc),An alone")
                         continue
+                # shape "pointer-inline" (14z-74, Pyron's air dive): the site
+                # is `lea (d16,pc),An` followed by a NOP the original build
+                # left there. lea.l #imm32,An is exactly those 6 bytes, so the
+                # pointer can be redirected IN PLACE — no helper, no
+                # allocation, and none of the bsr.w reach constraint that
+                # makes "pointer" fail when the near gaps are empty. Same
+                # ghost-clean argument as the other shapes: LEA and NOP both
+                # set no flags, so nothing downstream can observe the swap.
+                elif shape == "pointer-inline":
+                    if (len(dold) != 6 or (_lw & 0xF1FF) != 0x41FA
+                            or int.from_bytes(dold[4:6], "big") != 0x4E71):
+                        fail.append(f"data_in_code {dc['note']}: "
+                                    f"pointer-inline reader_old_hex must be "
+                                    f"lea(d16,pc),An followed by a NOP")
+                        continue
                 elif (len(dold) != 8 or (_lw & 0xF1FF) != 0x41FA
                         or (_rw & 0x0038) != 0x0030 or (_rw & 7) != _an
                         or (_rw >> 12) not in (1, 2, 3)):
@@ -1136,6 +1151,16 @@ def main():
                                  f"table {ta:#08x} (DATA view of "
                                  f"{man['src_set']} {t_src:#08x}; "
                                  f"{dc['note']})")
+                    continue
+                elif shape == "pointer-inline":
+                    # lea (d16,pc),An + nop  ->  lea.l #table,An  (6 bytes)
+                    blob[rd_off:rd_off + 6] = (
+                        (0x41F9 | (_an << 9)).to_bytes(2, "big")
+                        + ta.to_bytes(4, "big"))
+                    notes.append(f"# {name}+{rd_off:#x}: data_in_code "
+                                 f"[pointer-inline] lea.l #{ta:#08x},a{_an} "
+                                 f"in place (DATA view of {man['src_set']} "
+                                 f"{t_src:#08x}; {dc['note']})")
                     continue
                 ha = alloc(dc_hole, 12, f"data_in_code helper")
                 if ha is None:

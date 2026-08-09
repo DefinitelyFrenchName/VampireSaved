@@ -142,6 +142,49 @@ reader = 0x08BFF6
 reader_old_hex = "47fa004a30330000"
 note = "pod-zone word offset/record table (a3 re-derived from it; self-relative; shared-zone copy)"
 
+# ── AIR DIVE per-strength velocity table (14z-74) — THE air 214+P BUG.
+# Maintainer: air 214+P sends him off the top of the screen, wrapping
+# vertically, controls dead; MP wraps at the LEFT edge, HP at the RIGHT.
+#
+# The move is the air dive (seq 0x0A, $100 = 4; driver vs2 0x057690). At
+# 0x0576A8 it indexes a 3-row (xv.w, yv.w) table by button strength and
+# then sets GRAVITY TO ZERO — so a wrong velocity is never pulled back and
+# the state never reaches its ground check, which is why the controls die.
+#
+# The table is DATA at vs2 0x0576F4, read as `(a2)+ / (a2)` — i.e. through
+# the DATA view — but it lives INSIDE his `code` region, which is placed in
+# hole_a (class crypt) and therefore re-encrypted so the OPCODE view is
+# faithful. The data view is then garbage. Measured:
+#     vs2  DATA  0x0576F4 : 0388fc78 0388fc78 0388fc78
+#     vh2  DATA  0x057724 : 0388fc78 0388fc78 0388fc78   (sibling oracle: it IS data)
+#     ours DATA  (code+0x234): fc1cec8e e1d44d34 65292f3a  (garbage)
+# decoded (xv, yv), native vs ours:
+#     LP (904,-904) vs (-996,-4978)   -> dives into the floor, looks normal
+#     MP (904,-904) vs (-7724,+19764) -> hard LEFT and UP   = the report
+#     HP (904,-904) vs (+25897,+12090)-> hard RIGHT and UP  = the report
+# Native is a clean 45-degree dive at every strength.
+#
+# TWO INSTRUMENTS MISSED IT, both worth fixing generically:
+#   * extract.log calls these 12 bytes "1 dead filler zone (+0x234)". The
+#     dead-filler classifier compares vs2 vs vh2 in the OPCODE view, where a
+#     data table always differs — so a real table is indistinguishable from
+#     junk. A cheap discriminator: if the two siblings' DATA views are
+#     byte-identical, it is DATA (as here).
+#   * tools/census_regions.py saw the lea(pc) but bailed in
+#     `_redefines_an` on the next instruction `lea (a2,d2.w),a2` — an INDEX
+#     ADD on the same register, where the pointer plainly survives. That is
+#     why pyron.toml's "0 data_in_code" census line was wrong.
+# A sweep of every lea(d16,pc),An in all 24 crypt-placed regions found
+# exactly two data-view readers: the pod-zone row below, and this one.
+[[data_in_code]]
+region = "code"
+shape = "pointer-inline"
+table = 0x0576F4
+table_len = 0xC
+reader = 0x0576AE
+reader_old_hex = "45fa00444e71"
+note = "air-dive per-strength (xv,yv) rows; a2 re-derived by `lea (a2,d2.w),a2`"
+
 # The shared zones' pcrel escapes (oracle-invisible; targets resolved
 # in the overlay — the same twin rows as H's).
 [[pcrel_escape_fix]]
