@@ -194,7 +194,27 @@ Bank table now verifies clean.
 
 ### Decisions pending (maintainer) — 14z-74
 
-- **D5 — repair the pcrel-scan/table_fix collision in the generator?**
+- **D5 — RESOLVED (maintainer: option (a), with "test before re-freezing").**
+  The generator fix is APPLIED (commit d87d9a2) and VALIDATED:
+  * new Huitzil candidate **`build/hui27` = `9deda080`**; delta vs the frozen
+    build is EXACTLY 24 bytes — the 3 corrupted rows repaired
+    (`0074/0068/006a` -> `6000/4000/6000`) plus 3 now-unnecessary trampolines.
+  * full H battery **16/16 PASS** (incl. legacy masked-v2 EXACT).
+  * the oracle suite run against **huitzil-m1's OWN frozen 71-replay
+    expectation set: GREEN, 54 PASS / 17 SKIP / 0 FAIL** — identical counts
+    to the frozen build, i.e. the repair is behaviorally inert across
+    everything the suite covers. (Temporary registry row, removed after.)
+  * Pyron's manifest workaround reverted; his table now declares honest
+    vanilla values + row 0x11 = WIDE bank 4, and verifies.
+  **AWAITING MAINTAINER PLAYTEST before the re-freeze to huitzil-m2.**
+  TRANSIENT STATE, deliberate and short-lived: the registry still maps
+  `huitzil-m1 -> 22c016ac`, so that fingerprint NO LONGER rebuilds from the
+  tree until the re-freeze lands. Playtest focus: rows 0x01/0x0A/0x0C are
+  Demitri / Bishamon / Lord Raptor in the ported table copy, so any visible
+  effect would be their graphics in matches involving Phobos.
+
+- ~~**D5 — repair the pcrel-scan/table_fix collision in the generator?**~~
+  (original framing, kept for the record)
   The correct fix is one guard (exclude the `table_fix` span from the
   escape scan; drafted and tested). Measured consequences:
   * Donovan: **unaffected**, m3a still bit-exact.
