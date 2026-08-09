@@ -1,4 +1,4 @@
-# NEXT SESSION — orientation (updated at the close of 14z-73, 2026-08-09)
+# NEXT SESSION — orientation (updated at the close of 14z-74, 2026-08-09)
 
 **Session goal: PYRON.** Phobos is FROZEN (`9deda080 -> huitzil-m2`,
 `run_suite.sh vsavjw` GREEN 54/17). The grab-victim teleport was fixed and
@@ -16,7 +16,7 @@ GREEN. Rebuilds bit-exact from `huitzil.toml` at `TENANT_CHAR=0x10` stage 6.
 ## 1. THE GRAB VICTIM'S MID-ANIMATION PLACEMENT — FIXED (14z-73) ✓
 
 Maintainer-confirmed clean on BOTH grabs (regular 6MP/6HP and Circuit
-Scrapper 63214), in MAME and FBNeo. Build `build/hui26`.
+Scrapper 63214), in MAME and FBNeo. Shipped in the frozen `build/hui27`.
 
 Root cause: the victim's hold position comes from a per-attacker keyframe
 block selected via pointer table `0xBE27A` (indexed by attacker id); H's
@@ -37,7 +37,7 @@ the bug was pure data.
 The PORTRAIT already WORKS (renders since hui16; the misnamed `win_quote`
 select_records entry pokes `0x2673ea` <- vs2 `0x2A881E`). Do NOT touch that
 entry — a 14z-73 attempt to repurpose it broke the portrait and was
-reverted (freeze intact, `22c016ac`).
+reverted (freeze intact).
 
 The ONLY real gap is the **QUOTE TEXT** — a separate structure: record →
 per-line CHARACTER CODES → the SHARED kana/kanji font (bank-1 `0xb6xx`,
@@ -59,13 +59,20 @@ With correct sprites the maintainer re-evaluated the FG super: it feels
 fine. The "slowness" was the broken GFX, not a timing bug — no timing change
 was ever needed. **Do not chase it.**
 
-## 4. FREEZE Phobos — the remaining step
+## 4. FREEZE Phobos — DONE ✓ (14z-74)
 
-`build/hui26` is the freeze candidate. Freeze = registry row + expectation
-set, maintainer-gated. Only the cosmetic win quote (§2) is open, and it need
-not block. Full H battery was GREEN on hui26 (see the 14z-73 build-registry
-note). Before freezing: make hui26 the launcher default, confirm the
-maintainer wants to freeze with the win quote still open (or fix it first).
+Frozen as **`huitzil-m2` (`9deda080`, `build/hui27`)** after maintainer
+playtest. Supersedes m1 (`22c016ac`), which can no longer be produced from the
+tree because decision D5 fixed the generator bug that corrupted its ported OBJ
+bank table. Its expectation set was renamed to `huitzil-m2` (content unchanged;
+GREEN on the new build, 54 PASS / 17 SKIP). Only the cosmetic win quote (§2)
+remains open on Phobos.
+
+**OPEN OBSERVATION (not a regression, measured):** the maintainer saw a brief
+flash at the end of round 1 in a Bishamon vs Phobos match. hui26 vs hui27 are
+bit-identical across all 14,621 frames of that match (palettes included), so
+D5 did not cause it — pre-existing or an emulator artifact. Worth a look if it
+recurs.
 
 ---
 
@@ -74,10 +81,13 @@ maintainer wants to freeze with the win quote still open (or fix it first).
 Ladder stages 1-4 exist and are green; nothing renders yet. Three things
 from 14z-71 to carry in:
 
-- **Re-check `gfx_layout3.toml`'s "one-source-bank premise" BEFORE his gfx
-  rung.** It is incomplete: a tenant with a type-4 effect draws from a
-  second gfx bank. Huitzil's beam takes its muzzle and tip from his own
-  band and its stretching middle from bank 1.
+- ~~Re-check the "one-source-bank premise" before his gfx rung~~ **DONE
+  (14z-74): it HOLDS for Pyron.** His fighter span carries **0 list-type-4**
+  sprite lists, measured against a live 26-hit control on Huitzil's (whose
+  beam is a known type 4). So no ported handler and no `--strip-tiles` for
+  his fighter art. Frozen as `tests/test_list_type_census.sh`. CAVEAT: that
+  covers his FIGHTER span — his effect data rides the shared `x088512`
+  region and is not extracted yet; re-run the census when it lands.
 - **Read `docs/project/porting_sprite_lists.md` first** — four questions
   to ask of any ported effect, each with its mechanism, safety argument
   and gate. It exists so Pyron does not re-pay Huitzil's beam.
