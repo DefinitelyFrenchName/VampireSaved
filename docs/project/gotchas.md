@@ -1582,3 +1582,44 @@ Rules:
 - The onset-frame agreement (both legs read the same relative value before
   the event) is a free same-instrument positive control — if it does NOT
   agree pre-event, THEN suspect the rig.
+
+## Never chain a legacy measurement onto a build in one step (14z-74)
+## — it produced a WRONG COMMIT
+
+Running a rebuild and then the legacy check inside ONE command block gave a
+false FAIL twice in a row: once on a build carrying `port_param32` (which I
+then recorded as "breaks legacy" and refused) and once on a build that did
+NOT carry it. The second false failure is what exposed the first, because
+that same build had passed the identical check minutes earlier.
+
+Re-measured with the build and the check as SEPARATE steps, two independent
+runs on a freshly built image: clean both times, the ratified select-wheel
+window and nothing more.
+
+Rules:
+- Build in one step. Measure in another. Never in the same command.
+- **Re-run before believing a gate that contradicts a previous green.** Two
+  contradictory results on one image is a broken instrument, not a finding.
+- I committed the false claim while the contradicting output was on screen.
+  If the text you are writing disagrees with the last tool output, stop.
+
+## A dead-filler classifier that compares the OPCODE view is blind to DATA
+## (14z-74, cost the air-214+P bug)
+
+`extract_char.py` labelled 12 bytes at Pyron's `code+0x234` "1 dead filler
+zone". They were his air-dive per-strength velocity table — read through the
+DATA view, inside a crypt-re-encrypted region, so the port fed the move
+garbage and it flew off-screen with gravity zeroed.
+
+The classifier compares the two sibling ROMs in the OPCODE view, where an
+embedded data table ALWAYS differs (different keys, different addresses), so
+real data is indistinguishable from junk debris.
+
+Cheap discriminator, which flags this run instantly: **if the two siblings'
+DATA views of a candidate filler run are byte-identical, it is DATA.**
+(vs2 0x0576F4 and vh2 0x057724 are both `0388fc78` x3.)
+
+Related blind spot in the same family: `census_regions.py` bails in
+`_redefines_an` on `lea (An,Xn),An` — an INDEX ADD on the destination
+register, where the pointer plainly survives. That single test is why
+Pyron's manifest carried a wrong "0 data_in_code" census line.

@@ -165,4 +165,6 @@ is a GAME gotcha if it is true of the game regardless of the port.
 - A symptom grouping is a HYPOTHESIS — test it member by member, cheapest first (14z-71, the effect family: the premise was right for 3 of 4 and nobody checked for three sessions)
 - Cross-build A/B playtest beats analysis for "when did this change" — and settled a question two measurements got wrong (14z-71)
 - When a claim changes, grep for the CLAIM not the files — headers and summary lines outlive corrections (14z-71, standing order in CLAUDE.md §5)
+- Never chain a legacy measurement onto a build in one step, and re-run before believing a gate that contradicts a prior green — it produced a wrong commit (14z-74)
+- A dead-filler / junk classifier that compares siblings in the OPCODE view is blind to embedded DATA tables; compare their DATA views instead (14z-74, cost the air-214+P bug)
 - Cross-emulator position A/B: compare the RELATIVE offset (p2x−p1x), never absolute x — the two emulators run the match at a ~21px global camera shift, and comparing absolute x fabricated a "rig not comparable" blocker that cost a session (14z-72→73, the grab victim)

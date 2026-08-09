@@ -1,23 +1,14 @@
 # STATE — living progress log
 
-Updated: 2026-08-09 (session 14z-73 — THE GRAB VICTIM IS FIXED and
-MAINTAINER-CONFIRMED (both grabs, MAME + FBNeo). The 14z-72 "rig not
-comparable" blocker was a measurement error (absolute victim-x vs the
-RELATIVE offset, dx=42 both legs). Root cause: the capture positioner
-(reached via H's ported clone 0xc9eb0) reads a per-attacker keyframe block
-via pointer table 0xBE27A; H's row 0x10 ALIASED character 0's block, so H
-held the victim with the wrong offsets (−27 vs native +74). Fix (build/hui26,
-`22c016ac`): one `[[data_port]]` grab_hold_keyframes ports H's own vs2 block
-(0x0C56AA) and repoints row 0xBE2BA — legacy masked-v2 EXACT; victim now
-tracks native's exact keyframe sequence (gate peak Δ=0). Also: FG "slowness"
-was the broken GFX, not timing — resolved by observation, item closed. New
-gate `tests/test_hui_grab_victim.sh` + `tools/check_grab_victim.py`
-(phase-tolerant). **PHOBOS FROZEN (maintainer decision): registered
-`22c016ac -> huitzil-m1`; expectation set 38 sha1 / 13 masked / 17 skip;
-`run_suite.sh vsavjw` GREEN (54 PASS / 17 SKIP); committed + pushed.** Only
-the cosmetic win quote (a 3-level data port) is deferred. NEXT: Pyron. Read
-the 14z-73 section below.)
-
+Updated: 2026-08-10 (session 14z-74 — PYRON RENDERS, and three of his four
+playtest defects are FIXED and maintainer-confirmed: the Cosmo Disruption
+crash, the air 214+P runaway, and the win screen. Phobos was RE-FROZEN as
+huitzil-m2 (9deda080) after decision D5 repaired a generator bug, tested
+before freezing at the maintainer's insistence. Pyron's render rung landed
+Steps 0/1/2/3/5 + art; Step 4 (HUD) is HALF done and his plate is currently
+BLANK. THREE of my own claims were retracted in-session — read them below
+before trusting any number in this entry. Current build build/pyron14
+(34f4b77d). Read docs/NEXT_SESSION.md first.)
 Previously: 2026-08-09 (session 14z-71 — THE BEAM DRAWS. Root cause: vsav
 ships effect-class row 16 as a STUB where vs2/vh2 carry the beam's
 handler, and underneath that its sprite-list drawer has no list-type 12.
@@ -252,6 +243,87 @@ Donovan's SAFE_LO 0xAD80, so the gfx_layout3 disjointness invariant is in
 question) and (ii) a **record/entry parity delta** (src 745/14992 vs out
 756/15014). Both are genuine layout/content questions — measure before
 touching `gfx_layout3.toml`, whose Pyron row is a RATIFIED reservation.
+
+
+## Session 14z-74 — Pyron RENDERS; Cosmo/air/win-screen fixed; Phobos re-frozen
+
+**Phobos: RE-FROZEN as `huitzil-m2` (`9deda080`).** Decision D5 (maintainer-
+approved) repaired a generator bug: the `pcrel_escape_fix` scan treated any
+`0x6000`-form word as a `bra.w` and rewrote the word after it — and it ran
+AFTER `table_fix` over a range covering the ported OBJ bank table, which is
+DATA. Delta vs m1 is exactly 24 bytes (3 repaired rows + 3 now-unneeded
+trampolines). The maintainer required TESTING BEFORE RE-FREEZING; that is
+what caught a false claim of mine (below). Full battery 16/16, the m1
+expectation set green on the new build (54 PASS/17 SKIP), and Phobos-vs-
+Demitri/Sasquatch/Q-Bee/Bishamon bit-identical to m1 across 14,621 frames.
+
+**PYRON RENDERS.** His render rung (stage 6 unlocked for 0x11):
+- Step 0: one-source-bank premise MEASURED for him — 0 list-type-4 in his
+  fighter span against a live 26-hit control on H's. Gate
+  `tests/test_list_type_census.sh`.
+- Step 1: 12 OBJ bank setters + table_fix + obj_bank_word_slot.
+- Step 2: SPRITE palettes (vs2 0x39C19C). EFFECT palette DEFERRED — its
+  table has only 16 rows, so a variant id spills into the adjacent shared
+  table (a hazard H's FROZEN row shares).
+- Step 3: 6 select_records + drawer thunks + roster21 + his select palette
+  (the Donovan +0xBC dedicated block, 0x3C28FC).
+- Step 5: win screen — position (vs2 table 0x6B210 row 0x11 = 0x00C0,0x0094
+  vs our 0x0080,0x0098 alias) and palette (remap row 0x10 -> 0x3C35BC).
+  MAINTAINER-CONFIRMED.
+- Step 4: HUD — table entries ported, ART NOT PLACED, plate renders BLANK.
+  Gap located: the per-tenant HUD config (tools/check_tenant_hud.py TENANTS)
+  has rows for 0x13/0x10 and none for 0x11.
+- A verifier fix was needed to get his gfx green: the record-walk SWEEP is
+  now relocation-aware (source-accepted offsets only), because a +6 read
+  STRADDLING a relocated pointer invented 11 phantom records and 8
+  out-of-band tiles. H and D unaffected.
+
+**Three maintainer-confirmed gameplay fixes.**
+1. **Cosmo Disruption crashed/reset.** vsavj ships sub-state 81's jump-table
+   entry as a STUB (0x0006, pointing back into the table) where vs2 fills
+   it — the BEAM's defect class, third instance. Fix is ONE WORD: vsavj
+   already contains vs2's 8-byte handler at table+0x224, so entry 81 is
+   repointed there. Entry 81 measured DEAD in vanilla (0 dispatcher reads vs
+   a 12/7 control), filtering the boot ROM-checksum sweep by PC. Gate
+   `tests/test_pyron_cosmo.sh`.
+2. **Air 214+P runaway.** A 12-byte DATA table at vs2 0x0576F4, read via
+   `(a2)+`, lives inside his crypt-re-encrypted `code` region, so the data
+   view was garbage — and the move sets GRAVITY TO ZERO, so a wrong velocity
+   is never pulled back and the state never lands (hence dead controls).
+   native (904,-904) x3; ours MP (-7724,+19764) = left+up, HP (+25897,
+   +12090) = right+up — exactly the maintainer's MP-left/HP-right report;
+   LP's garbage yv was negative, which is why LP never looked broken. Fixed
+   with a new `data_in_code shape="pointer-inline"` (lea(d16,pc),An + NOP ->
+   lea.l #table,An, in place; no helper, no bsr.w reach constraint).
+3. **Wrong palettes** — his sprite palette rows (Step 2 above).
+
+**RETRACTIONS — read these before trusting any measurement here.**
+- **"port_param32 breaks legacy" was WRONG.** I recorded it and refused the
+  fix. It was a MEASUREMENT ARTIFACT from chaining the legacy check onto a
+  rebuild in one command; the same artifact also produced a false failure on
+  a build WITHOUT the flag, which is what exposed it. Re-measured in
+  isolation, twice: clean. **Never chain a legacy measurement onto a build
+  in one step, and re-run before believing a gate that contradicts a prior
+  green.** I also committed the false claim while the contradicting output
+  was on screen.
+- **"the effect palette row causes the blink" was WRONG** — removing it did
+  not stop the blink.
+- **"ours 543 palette-seq calls vs native 0" is CONFOUNDED** — the hits are
+  in the SELECT screen, where our flow (extended wheel, ported records) is
+  not at the same point as native's on the same frame. Re-measure anchored
+  on screen state before treating it as an attribution.
+
+**OPEN on Pyron:** the sprite/HUD BLINK (palette row 10 animated by the
+palette-seq uploader 0x02AD68; his anim nodes are CORRECT, so it is not the
+air-dive class), HUD art placement, the effect palette, and the win QUOTE
+(the shared variant-id fold — Pyron is now the third data point for it).
+
+**TWO GENERIC INSTRUMENT BLIND SPOTS found (worth fixing before more
+tenants):** the extractor's dead-filler classifier compares siblings in the
+OPCODE view, where real data is indistinguishable from junk (it called the
+air-dive table "dead filler"); and `census_regions.py` bails in
+`_redefines_an` on `lea (An,Xn),An`, an index add where the pointer plainly
+survives (which is why Pyron's "0 data_in_code" census line was wrong).
 
 ## Session 14z-73 — the grab victim: FIXED and MAINTAINER-CONFIRMED (both
 ## grabs, MAME + FBNeo). The victim's capture-pose keyframe-pointer table

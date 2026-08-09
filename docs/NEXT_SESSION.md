@@ -1,150 +1,104 @@
-# NEXT SESSION — orientation (updated at the close of 14z-74, 2026-08-09)
+# NEXT SESSION — orientation (written at the close of 14z-74, 2026-08-10)
 
-**Session goal: PYRON.** Phobos is FROZEN (`9deda080 -> huitzil-m2`,
-`run_suite.sh vsavjw` GREEN 54/17). The grab-victim teleport was fixed and
-maintainer-confirmed on both grabs in MAME + FBNeo (§1); FG pacing is
-resolved-by-observation (§3). The only Phobos item left is the cosmetic win
-quote (§2), a 3-level data port deferred per docs — it does NOT block Pyron.
+**Session goal: finish Pyron's rung.** He RENDERS and three of his four
+playtest defects are fixed and maintainer-confirmed. Four things are open,
+one of them half-built.
 
-**Frozen build: `build/hui27` (`9deda080 -> huitzil-m2`)** — = hui25 + the
-grab-hold keyframe fix. Playtest-clean (beam, ES, low beam, grab lightning,
-both grabs track native). Full H battery GREEN (15/15) + full oracle suite
-GREEN. Rebuilds bit-exact from `huitzil.toml` at `TENANT_CHAR=0x10` stage 6.
-
----
-
-## 1. THE GRAB VICTIM'S MID-ANIMATION PLACEMENT — FIXED (14z-73) ✓
-
-Maintainer-confirmed clean on BOTH grabs (regular 6MP/6HP and Circuit
-Scrapper 63214), in MAME and FBNeo. Shipped in the frozen `build/hui27`.
-
-Root cause: the victim's hold position comes from a per-attacker keyframe
-block selected via pointer table `0xBE27A` (indexed by attacker id); H's
-row 0x10 aliased character 0's block, so H held the victim with the wrong
-offsets (−27px vs native +74). Fix: `[[data_port]] grab_hold_keyframes` in
-`huitzil.toml` ports H's own vs2 block (`0x0C56AA`) into `wide_ext` and
-repoints row `0xBE2BA` — the exact twin of Donovan's `throw_victim_keyframes`.
-Legacy masked-v2 EXACT; victim now tracks native's exact keyframe sequence
-(gate `test_hui_grab_victim.sh`, `GRAB_VICTIM_EXPECT=matches`, peak Δ=0).
-
-Retraction logged (STATE 14z-73): I first mis-measured "positioner never
-invoked" by breakpointing the vanilla engine copy `0x2802e`; H's grab
-routes to its ported CLONE `0xc9eb0`. The positioner was always invoked;
-the bug was pure data.
-
-## 2. Win screen — cosmetic, MEASURED, genuinely NOT KISS (does NOT block)
-
-The PORTRAIT already WORKS (renders since hui16; the misnamed `win_quote`
-select_records entry pokes `0x2673ea` <- vs2 `0x2A881E`). Do NOT touch that
-entry — a 14z-73 attempt to repurpose it broke the portrait and was
-reverted (freeze intact).
-
-The ONLY real gap is the **QUOTE TEXT** — a separate structure: record →
-per-line CHARACTER CODES → the SHARED kana/kanji font (bank-1 `0xb6xx`,
-pal 09). It is a SHARED mechanism that mis-maps EVERY variant id, not a
-per-tenant miss: **maintainer-confirmed 14z-73 — Donovan (id 0x13) shows
-VICTOR's (0x03) quotes** (`0x13 & 0x0F = 0x03`, a base-character fold), and
-Phobos (0x10) shows a Bulleta line. So fixing the quote is ONE universal
-fix for all tenants, not three. The fetch/fold was NOT reliably identified
-in 14z-73 (two attempts changed nothing); reach the screen with
-`tests/replays/28_don_quotewin.rpl` + forced pick (quote ~f12200), measure
-the LIVE fetch of the pal-09 text objects, THEN author. Do it once Pyron
-gives a working reference (a tenant whose SHELL quote we can compare
-against). Full detail + misfires: `engine_internals.md` "Win screen".
-Cosmetic; deferred.
-
-## 3. FG pacing — RESOLVED by observation (14z-73) ✓
-
-With correct sprites the maintainer re-evaluated the FG super: it feels
-fine. The "slowness" was the broken GFX, not a timing bug — no timing change
-was ever needed. **Do not chase it.**
-
-## 4. FREEZE Phobos — DONE ✓ (14z-74)
-
-Frozen as **`huitzil-m2` (`9deda080`, `build/hui27`)** after maintainer
-playtest. Supersedes m1 (`22c016ac`), which can no longer be produced from the
-tree because decision D5 fixed the generator bug that corrupted its ported OBJ
-bank table. Its expectation set was renamed to `huitzil-m2` (content unchanged;
-GREEN on the new build, 54 PASS / 17 SKIP). Only the cosmetic win quote (§2)
-remains open on Phobos.
-
-**OPEN OBSERVATION (not a regression, measured):** the maintainer saw a brief
-flash at the end of round 1 in a Bishamon vs Phobos match. hui26 vs hui27 are
-bit-identical across all 14,621 frames of that match (palettes included), so
-D5 did not cause it — pre-existing or an emulator artifact. Worth a look if it
-recurs.
+**Current build: `build/pyron14` (`34f4b77d`)** — not frozen. Rebuild:
+```sh
+TENANT_MANIFEST=build/manifest/pyron.toml TENANT_CHAR=0x11 \
+GEN_FLAGS="--profile cps2-wide-v1 --allow-plausible --tripwire-open" \
+    tools/build_donovan.sh 6 build/pyronNN
+```
+**Phobos is FROZEN as `huitzil-m2` (`9deda080`, `build/hui27`)**; Donovan as
+`donovan-m3a`. Both rebuild bit-exact — keep it that way
+(`tests/test_m3a_reproducible.sh` after every machinery change).
 
 ---
 
-## After Phobos: Pyron
+## THE RULE THAT COST A WRONG COMMIT (14z-74)
 
-Ladder stages 1-4 exist and are green; nothing renders yet. Three things
-from 14z-71 to carry in:
+**Never chain a legacy measurement onto a build in one command**, and
+**re-run before believing a gate that contradicts a previous green.** I
+recorded "port_param32 breaks legacy", refused the fix, and committed that
+claim while the contradicting output was on screen. It was an artifact of
+chaining; the same artifact also failed a build that did NOT carry the flag,
+which is what exposed it. Two isolated re-runs were clean.
 
-- ~~Re-check the "one-source-bank premise" before his gfx rung~~ **DONE
-  (14z-74): it HOLDS for Pyron.** His fighter span carries **0 list-type-4**
-  sprite lists, measured against a live 26-hit control on Huitzil's (whose
-  beam is a known type 4). So no ported handler and no `--strip-tiles` for
-  his fighter art. Frozen as `tests/test_list_type_census.sh`. CAVEAT: that
-  covers his FIGHTER span — his effect data rides the shared `x088512`
-  region and is not extracted yet; re-run the census when it lands.
-- **Read `docs/project/porting_sprite_lists.md` first** — four questions
-  to ask of any ported effect, each with its mechanism, safety argument
-  and gate. It exists so Pyron does not re-pay Huitzil's beam.
-- **A render-layer gate is the outstanding suite gap** (maintainer's
-  point): every audit we have — empty tiles, OBJ dumps, tile-content
-  hashes — lives on the DATA side. *The tiles being there and fetched does
-  not mean they are shown.* The beam and the grab lightning are
-  known-good references to seed one from.
-- **If Pyron grabs/throws, port his per-attacker `slot_ptr_table` rows
-  (14z-73).** Tables like the grab-hold keyframes (`0xBE27A`) and any other
-  per-ATTACKER-char pointer table are 32 rows where the variant half
-  (0x10-0x1F) ALIASES the vanilla half — a tenant at a variant id silently
-  inherits a vanilla character's data until its row is repointed. Huitzil's
-  `grab_hold_keyframes` / Donovan's `throw_victim_keyframes` are the
-  template; `tests/test_hui_grab_victim.sh` is the A/B gate to clone.
+## 1. HUD — HALF BUILT, plate currently BLANK
 
----
+The three table entries are ported and correct; nothing places his ART at
+the free-pool anchors, so the plate shows nothing (it used to show
+"Demitri"). **Gap located:** the per-tenant HUD config in
+`tools/check_tenant_hud.py`'s `TENANTS` dict has rows for 0x13 and 0x10 and
+NONE for 0x11. Pyron's values (derived + cross-checked against the other
+two, which sit adjacent in the vs2 table):
+```
+0x11: mug_src 0x4D60  name_src 0x4D53  name_bx 2
+      name_hi 0x86920102  name_lo 0xFFF00002
+```
+Reusing H's anchors (0xBE9A/0xBE92) is fine single-tenant but COLLIDES on
+the M3b merge — give him his own then. Still to find: the PLACER that copies
+that art into group C (`check_tenant_hud.py` is the gate, not the placer).
+If a wrong name is preferable to none meanwhile, revert the three
+`[[aux_poke]]` rows in `pyron.toml`.
 
-## Read before your first attribution
+## 2. The sprite/HUD BLINK
 
-`docs/project/gotchas.md`, the 14z-71 entries: *a symptom grouping is a
-hypothesis*, *when a claim changes grep for the claim*, and *cross-build
-A/B beats analysis*. Plus **CLAUDE.md §5's RETRACTION DISCIPLINE**, which
-is new this session.
+Palette RAM row 10 (0x90C140) alternates every frame; native holds it
+constant. Row 10 is shared by his sprite AND the in-match HUD mugshot, which
+is why both blink and why the mugshot showed DEMITRI's art in PYRON's
+colours. Writer is the palette-SEQUENCE uploader (PC 0x02AD68), driven by an
+anim script (A0 walks the 0x18 node stride), starting DURING SELECT.
+**His anim nodes are CORRECT** (byte-identical to vs2 bar a properly
+relocated pointer), so this is NOT the air-dive class.
+**Do not act on the "ours 543 calls / native 0" figure** — the hits are in
+the select screen, where our flow and native's are not at the same point on
+the same frame. RE-MEASURE ANCHORED ON SCREEN STATE (both legs sitting on
+his select portrait), then compare.
 
-**The four instrument failures of 14z-71, because they will recur:**
+## 3. Effect palette — deferred, and it is a SHARED hazard
 
-1. A `wpset` watchpoint is **silently blind to pc-relative reads** — CPS-2
-   serves them from AS_OPCODES, so dispatch tables need `wposet`
-   (`WATCH=...,r,o`). It reported 0 where the truth was 598.
-2. **MAME parses a watch length as HEX.** A ten-byte window (`a`) the
-   tracer's regex rejected killed the run before it started and wrote an
-   empty trace — indistinguishable from "0 accesses". Truth was 39.
-3. **The boot RAM test writes every byte of work RAM**, so a bare write
-   count on any address returns phantom hits. Filter by PC.
-4. **An atlas parse with a hardcoded size** fell back to an empty range
-   and reported a cheerful "unarmed" — a blind instrument wearing a pass.
+Not ported: the effect palette table 0x38C218 has only SIXTEEN rows, so a
+variant id indexes past it into the adjacent shared table (row 0x11 ->
+0x38c25c = that table's row 0x01, a value vanilla uses). **Huitzil's FROZEN
+row has the same shape** (his 0x10 lands on its row 0x00) — worth resolving
+before the M3b merge. Understand how the engine resolves an effect palette
+for a variant id before writing anything there.
 
-The defence that worked on all four: **a positive control on the same
-instrument and the same leg.** A dead instrument and a real finding are
-the same shape from outside.
+## 4. Win QUOTE — the shared variant-id fold
 
-**And the two things that beat analysis outright:** the maintainer naming
-wrong art from a screenshot, and a two-build A/B playtest settling an
-attribution that six build-dumps had got backwards. Send captures early;
-bisect the builds before analysing the code.
+Still wrong for every tenant: Donovan shows VICTOR's quotes, Phobos a
+Bulleta line (`id & 0x0F` folding). ONE universal fix, not three. Pyron is
+now the third data point. Detail + two failed attempts:
+`docs/game/engine_internals.md` "Win screen".
 
 ---
 
-## What the beam was, in three lines (for context, not action)
+## Instrument blind spots found in 14z-74 — fix before more tenants
 
-vsav ships effect-class row 16 as a **stub** where vs2/vh2 carry the
-beam's handler; its drawer has **no list-type 12** (the composite) and the
-table can neither grow nor move; and its type-4 handler biases tile codes
-**+0x3800 where vs2 uses +0x4200** — one byte — while composing its own
-gfx bank. Fixed by a ported handler on a dead class row, a takeover of the
-unused list-type 6, and a ported type-4 copy with both constants
-corrected. Zero legacy cycles. Full write-up:
-`docs/game/atlas/sprite_lists.md` and `engine_internals.md`'s
-"sprite-list DRAWER".
+1. **The extractor's dead-filler classifier is VIEW-BLIND.** It compares the
+   two sibling ROMs in the OPCODE view, where an embedded data table always
+   differs, so real data is indistinguishable from junk. It labelled the
+   air-dive velocity table "1 dead filler zone (+0x234)". Cheap
+   discriminator: if the siblings' DATA views are byte-identical, it is DATA.
+2. **`tools/census_regions.py` bails in `_redefines_an`** on
+   `lea (An,Xn),An` — an index add where the pointer plainly survives. That
+   is why `pyron.toml`'s "0 data_in_code" census line was wrong. Re-run the
+   census across all tenants after fixing.
+
+## Gates added this session
+
+- `tests/test_list_type_census.sh` — the one-source-bank re-check per tenant,
+  with a live positive control (its first version was blind to type 4 and
+  read 0 for HUITZIL, whose beam is one).
+- `tests/test_pyron_cosmo.sh` — the Cosmo fix: static, deadness (opcodes
+  space + PC filter, with a control), runtime.
+- `tests/test_hui_grab_victim.sh` + `tools/check_grab_victim.py` (14z-73).
+
+## Recurring lesson worth re-reading
+
+Three defects this session and last were the SAME shape: **vsav ships a
+table row as a stub/alias where vs2 fills it** (the beam's effect-class row
+16, Pyron's Cosmo sub-state 81, the grab-hold keyframe row). When a ported
+character does something vanilla never does, suspect a dead row first.
