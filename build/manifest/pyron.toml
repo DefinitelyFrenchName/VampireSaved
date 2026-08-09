@@ -418,6 +418,20 @@ table = 0x38C198
 # row his sprite AND the in-match HUD mugshot draw from; hence the mugshot
 # blinks too, and shows PYRON's palette on DEMITRI's art (his HUD rows are
 # unported, so the art falls back while the palette row is the tenant's).
+# REFINED 14z-74 (maintainer: the blink happens during CHARACTER SELECT too):
+#   * The probe hits start at frame ~2363 — i.e. DURING SELECT, before any
+#     match. A0 walks 0x000d45c6, +0x18, +0x18 ... = the ANIM NODE stride, so
+#     an anim script is driving the palette-seq call node by node.
+#   * Those anim nodes are CORRECT: byte-identical to vs2 except a properly
+#     relocated pointer (vs2 0x270a32 -> ours 0x0dff0c, exactly the anim
+#     region delta). So this is NOT the air-dive class (a data view read as
+#     opcodes); the ported data is faithful.
+#   * CAVEAT ON THE 543-vs-0 COMPARISON: because the hits are in the select
+#     screen, and our select flow (extended wheel, ported records) is not at
+#     the same point as native's at the same frame, "native 0 calls" may be
+#     comparing different screens rather than proving native never animates.
+#     Re-measure by ANCHORING on the same on-screen state, not the frame
+#     index, before treating the id-0x26 request itself as the defect.
 # NEXT: find what makes his state request 0x26 when native's does not —
 # a per-character palette-seq id / flag that is aliased or unported.
 #
