@@ -45,11 +45,27 @@ import json
 import sys
 
 
-def walk(dat, base, start, end, cptr_ok, sweep_lo=0x8000, sweep_hi=0xEEBB):
+def walk(dat, base, start, end, cptr_ok, sweep_lo=0x8000, sweep_hi=0xEEBB,
+         sweep_allow=None, sweep_seen=None):
     """dat indexed by ROM address - base. Returns (tiles set, n_entries,
     n_records). sweep_lo/hi: the band-coherence window of the SWEEP pass
     (offset-computed records) — historically the Donovan/Jedah band; a
-    tenant's own band for anyone else (14z-67 de-Donovanization)."""
+    tenant's own band for anyone else (14z-67 de-Donovanization).
+
+    sweep_seen / sweep_allow (14z-74) make the SWEEP pass relocation-aware.
+    The sweep is a heuristic — it scans every even offset for a record-shaped
+    header — and its cptr test only asks "does this long land in an aux
+    region?". After placement that question has a DIFFERENT answer for the
+    same bytes, because the aux regions move: a 4-byte read at +6 that
+    STRADDLES a relocated pointer can land inside the new aux window while
+    the source's equivalent read fell outside it. Measured on Pyron
+    (14z-74): 8 such straddles invented 11 records and 8 out-of-band tiles
+    in the built image, with the underlying pointer correctly relocated —
+    i.e. a verifier artifact, not a build defect. Passing the source's
+    accepted sweep offsets as `sweep_allow` makes the built-image walk
+    VERIFY the source's record structure instead of re-deriving it, which
+    is what a src-vs-out parity check means in the first place.
+    Offsets are relative to `start`."""
     tiles, entries, records = set(), 0, 0
     seen = set()
     for a in range(start, end - 4, 2):
@@ -104,6 +120,8 @@ def walk(dat, base, start, end, cptr_ok, sweep_lo=0x8000, sweep_hi=0xEEBB):
     for a in range(start, end - 10, 2):
         if a in seen:
             continue
+        if sweep_allow is not None and (a - start) not in sweep_allow:
+            continue
         o = a - base
         fmt = int.from_bytes(dat[o:o + 2], "big")
         cptr = int.from_bytes(dat[o + 6:o + 10], "big")
@@ -142,6 +160,8 @@ def walk(dat, base, start, end, cptr_ok, sweep_lo=0x8000, sweep_hi=0xEEBB):
                for _, _a in ent):
             continue
         seen.add(a)
+        if sweep_seen is not None:
+            sweep_seen.append(a - start)
         records += 1
         for t, at in ent:
             bx = ((at >> 8) & 15) + 1

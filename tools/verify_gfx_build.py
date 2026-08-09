@@ -73,10 +73,16 @@ def main():
                    check=True, capture_output=True)
 
     src = open(f"{outbase}/extract/region_anim.bin", "rb").read()
+    # 14z-74: collect the SOURCE's accepted sweep offsets and hand them to the
+    # built-image walk below, so the sweep heuristic cannot invent records from
+    # straddled reads that only look like pointers after placement moved the
+    # aux regions (measured on Pyron: 8 straddles -> 11 phantom records and 8
+    # out-of-band tiles, with the real pointer correctly relocated).
+    s_sweep = []
     _, s_entries, s_records = walk(
         src, src_base, src_base, src_end,
         lambda c: any(a <= c < b for a, b in aux_src),
-        sweep_lo, sweep_hi)
+        sweep_lo, sweep_hi, sweep_seen=s_sweep)
 
     out = open(data_path, "rb").read()
     aux_dst = [(r["dst"], r["dst"] + r["len"])
@@ -84,7 +90,7 @@ def main():
     tiles, o_entries, o_records = walk(
         out, 0, anim["dst"], anim["dst"] + anim["len"],
         lambda c: any(a <= c < b for a, b in aux_dst),
-        sweep_lo, sweep_hi)
+        sweep_lo, sweep_hi, sweep_allow=set(s_sweep))
 
     fail = 0
     if (s_records, s_entries) != (o_records, o_entries):
