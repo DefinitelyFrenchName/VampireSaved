@@ -5,10 +5,26 @@ shipped byte changes (the standing "plan and scope first" rule).
 
 ## What is broken, measured
 
-The 236P freeze ray's **visual object is never created**. The freeze
-itself works, which is why the symptom is "muzzle orb and beam both
-missing while the opponent still ices" — they are one object that never
-exists.
+The 236P freeze ray's visual object **exists on both legs but is never
+DRIVEN into its beam states on ours**. The freeze itself works, which is
+why the symptom is "muzzle orb and beam both missing while the opponent
+still ices".
+
+> **CORRECTION (open item B, run before building — this is why B went
+> first).** An earlier reading of this said the object is "never
+> created". That was wrong. The effect-type byte `$FFD404` is written
+> **17 times on each leg at IDENTICAL frames** (1, 11, 12, 21, 22, 74,
+> 469, 471, 473, 820, 824, 830, 893, 2074, 2308, 2310, 2366), with the
+> PCs pairing cleanly (`0x015668`<->`0x016F56`,
+> `0x015822`<->`0x0170DA`). The object is set up identically on both
+> legs. The f3150+ header writes counted below are **sub-state updates
+> on an existing object**, not creation — and none of them is a write to
+> the effect-type byte on either leg.
+>
+> The machine still has to be ported (it is genuinely absent from our
+> build), but the question it must answer changed: not "why is nothing
+> created" but **"why is the existing object never dispatched into
+> machine #7 during the move"**.
 
 Rig: `tests/replays/hui/83b_hui_ray_2p.rpl` (maintainer-confirmed:
 LP/MP/HP look identical; 236+2P is the girthier ES beam; 236+K is the low
@@ -80,10 +96,14 @@ Not resolvable by pattern search: the dispatch idiom
 (`102e0004 323b0006 4efb1002`) occurs **348 times** in vs2. Use the R1
 map / `reconcile_batch.py`.
 
-**B. Does our effect object ever get type 7 at `+0x04`?** CHEAP AND FIRST.
-If the object is never stamped type 7, porting the machine changes
-nothing and the real defect is upstream. This is the execution-breakpoint
-check that 14z-70d was built for — do it before writing any manifest row.
+**B. RESOLVED — and it corrected the premise (see the correction above).**
+The object exists and is stamped identically on both legs; nothing writes
+the effect-type byte during the move on either leg. What remains open is
+the successor question: **what selects machine #7 for that object during
+the ray on native, and what does our build do instead at that moment?**
+The type byte is set early and does not change, so the selector is either
+another field of the object or the dispatcher's own input. Measure that
+before rooting anything.
 
 **C. Transitive closure of the machine bodies.** 0x36/0x4A bytes of code
 will contain `jsr`/`jmp` to routines that may themselves be vs2-only.
