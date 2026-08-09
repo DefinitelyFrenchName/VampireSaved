@@ -142,6 +142,83 @@ No hook, no cycles, nothing to ratify. Cost: decode the type-2 format
 from its handler (`0x01B234`), write the transform, and accept that the
 flattened list is authored data the sibling oracle cannot check.
 
+## Session 14z-74 — PYRON's render rung OPENED (Steps 0/1/3 landed), and a
+## GENERATOR BUG found under it
+
+**Progress (all committed, all frozen references still bit-exact).**
+- **Step 0** — stage 6 unlocked for 0x11, and the carried-forward
+  "re-check the one-source-bank premise for Pyron" question ANSWERED:
+  his fighter anim span carries **0 list-type-4** sprite lists, against a
+  live **26-hit control on Huitzil's** (whose beam is a known type 4).
+  Type 4 is the format that composes its own bank word and cannot reach
+  group C via the record path, so Pyron needs NO ported handler and NO
+  `--strip-tiles`: his delta-0 placement is complete. Frozen as
+  `tests/test_list_type_census.sh` + `tools/list_type_census.py`.
+  *The control is the point:* the first version of that census read 0
+  type-4 for HUITZIL, because it applied the coordinate-pointer
+  constraint that only types 0/2/8 have (type 4 carries entries inline).
+  A census blind to its target looks exactly like a clean result.
+  CAVEAT: covers his FIGHTER span; his effect data rides the shared
+  x088512 region and is not extracted yet — re-run when it lands.
+- **Step 1** — his 12 OBJ bank setters (measured by scanning his BUILT
+  region images, against a control that re-derives H's 12 manifest rows;
+  the first scan mask was wrong and read 0 for both — caught by the
+  control), plus the ported bank table and `obj_bank_word_slot`.
+- **Step 3** — the select family: 6 select_records (nine alias anchors
+  verified), 3 drawer thunks, roster21, and his select palette. vs2's own
+  uploader confirms Pyron takes the **Donovan dedicated-block** form
+  (`cmpi.b #$11,d6 / addi.w #$BC,d0`); the block address 0x3C28FC is
+  derived by math that self-checks against Donovan's known 0x3C2A3C.
+
+**THE GENERATOR BUG (decision pending, see below).** The
+`pcrel_escape_fix` blob pass (gen_donovan_patch.py ~1173) scans a region
+for `bra.w/bsr.w` — any `0x6000`-form word with a zero low byte — and
+rewrites the FOLLOWING word to a trampoline displacement. It runs AFTER
+`table_fix` and its scan range COVERS the ported per-char OBJ bank table,
+which is DATA. Every table row holding 0x6000 therefore makes the
+generator clobber the row after it. Measured:
+- rows 0x01/0x0A/0x0C emerge as `0074/0068/006a` on BOTH tenants' builds.
+  Those values are baked into both manifests as **fixed points of the
+  corruption**. **RETRACTED:** an earlier comment of mine called them
+  "relocation-affected bytes of the ported copy" — they are not; the raw
+  source region holds 0x4000 there.
+- Huitzil is unharmed only by LUCK: his row 0x10 = 0x1000 is not a branch
+  form, so his tenant row is never read as a displacement.
+- Pyron at 0x11 is not lucky: row 0x10's vanilla 0x6000 made the scanner
+  eat his tenant row (0x1000 -> 0x0066). Caught by `verify_gfx_build`.
+
+**Worked around at the manifest level** (row 0x10 = 0x1000 so it is not a
+branch form): inert in a Pyron-only build, forward-compatible (on the M3b
+merge row 0x10 IS Huitzil, whose correct value is exactly WIDE bank 4).
+Bank table now verifies clean.
+
+### Decisions pending (maintainer) — 14z-74
+
+- **D5 — repair the pcrel-scan/table_fix collision in the generator?**
+  The correct fix is one guard (exclude the `table_fix` span from the
+  escape scan; drafted and tested). Measured consequences:
+  * Donovan: **unaffected**, m3a still bit-exact.
+  * Huitzil: **the frozen huitzil-m1 build CHANGES**, `22c016ac ->
+    9deda080`, because his rows 0x01/0x0A/0x0C revert from the corrupted
+    values to their declared ones. That is a REPAIR (garbage bank words
+    -> correct ones) but it is a byte change to a frozen, playtested,
+    registered build, so it needs a re-freeze + re-playtest.
+  * Options: (a) apply the generator fix and re-freeze Huitzil as
+    huitzil-m2; (b) keep the manifest workaround per tenant and leave the
+    latent corruption; (c) apply the fix but only for new tenants.
+  * Recommendation: **(a)** — the ported table's legacy rows currently
+    hold garbage bank words on every tenant build, and the longer it
+    stands the more manifests bake in fixed points of a bug. But it is a
+    frozen-build change, so it is the maintainer's call.
+
+**Open on Pyron (next session's first work):** `verify_gfx_build` still
+reports (i) **6 tile codes above his reserved window** `0xA42C`
+(`0xa4f4 0xad5c 0xb444 0xb4c8 0xf4d8 0xf518` — four of them beyond
+Donovan's SAFE_LO 0xAD80, so the gfx_layout3 disjointness invariant is in
+question) and (ii) a **record/entry parity delta** (src 745/14992 vs out
+756/15014). Both are genuine layout/content questions — measure before
+touching `gfx_layout3.toml`, whose Pyron row is a RATIFIED reservation.
+
 ## Session 14z-73 — the grab victim: FIXED and MAINTAINER-CONFIRMED (both
 ## grabs, MAME + FBNeo). The victim's capture-pose keyframe-pointer table
 ## row for H aliased character 0's block; ported H's own block. Also: the
