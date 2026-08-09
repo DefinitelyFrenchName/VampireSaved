@@ -408,6 +408,19 @@ table = 0x38C198
 # a Pyron-only mistake; it simply has not produced a reported symptom on him.
 # Legacy is intact either way (measured: replay 02 on the effect-ported build
 # was still the ratified select-wheel window only).
+# MEASURED SOURCE OF THE BLINK (14z-74, probe on the palette-seq uploader
+# 0x2AD82, the audit_palette_seq_ids.sh instrument):
+#     ours   543 calls, ALL with id 0x26
+#     native   0 calls
+# So our Pyron continuously requests palette-SEQUENCE 0x26 — an id LEGACY
+# uses (the audit's frozen answer is {0x26,0x27}) — while native Pyron
+# requests none at all. The sequence animates palette row 10, which is the
+# row his sprite AND the in-match HUD mugshot draw from; hence the mugshot
+# blinks too, and shows PYRON's palette on DEMITRI's art (his HUD rows are
+# unported, so the art falls back while the palette row is the tenant's).
+# NEXT: find what makes his state request 0x26 when native's does not —
+# a per-character palette-seq id / flag that is aliased or unported.
+#
 # CROSS-TENANT CHECK (14z-74, maintainer asked whether Phobos is exposed):
 # NO — measured on the same rig, palette-row churn over 15 frames:
 #     PYRON   (0x11)            rows 1,2,3 AND 10   <- the blink
