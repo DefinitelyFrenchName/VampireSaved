@@ -1,0 +1,42 @@
+# pyron AIR 214+P (14z-74). Maintainer-reported: doing 214+P in the AIR
+# sends his sprite up past the top of the screen, then it cycles the screen
+# bottom-to-top at speed and the controls stop responding.
+#
+# The symptom reads as a Y-VELOCITY / gravity datum (a rise that is never
+# cancelled, with the Y position wrapping) rather than a bad dispatch — but
+# that is a hypothesis, so this rig exists to be run on BOTH legs: native
+# vsav2 (where Pyron is a real character) and our build, with the same
+# inputs. Compare y, yv (+0x44), gravity (+0x4C) and seq.
+#
+#   POKES="1400:ff8782:11;1450:ff8782:11;1500:ff8782:11;1400:ff8b82:03;1450:ff8b82:03;1500:ff8b82:03"
+#
+# P1 starts left facing right, so 214 = D -> DL -> L. Three attempts, each
+# jumping first and inputting the motion a few frames into the rise, spaced
+# so a landed attempt still leaves time for the next.
+300-305 sys=C1
+420-425 sys=C2
+800-803 sys=S1
+940-943 sys=S2
+1100-1102 p2=R
+1160-1162 p2=R
+1300-1302 p1=1
+1360-1362 p2=1
+# ── attempt 1: neutral jump, then 214+LP in the air
+3400-3406 p1=U
+3416-3418 p1=D
+3419-3421 p1=DL
+3422-3424 p1=L
+3425-3427 p1=1
+# ── attempt 2: jump, 214+MP a little later into the rise
+3700-3706 p1=U
+3720-3722 p1=D
+3723-3725 p1=DL
+3726-3728 p1=L
+3729-3731 p1=2
+# ── attempt 3: forward jump, 214+HP
+4000-4006 p1=UR
+4016-4018 p1=D
+4019-4021 p1=DL
+4022-4024 p1=L
+4025-4027 p1=3
+4600 wait
