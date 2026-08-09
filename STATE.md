@@ -12,8 +12,11 @@ held the victim with the wrong offsets (−27 vs native +74). Fix (build/hui26,
 tracks native's exact keyframe sequence (gate peak Δ=0). Also: FG "slowness"
 was the broken GFX, not timing — resolved by observation, item closed. New
 gate `tests/test_hui_grab_victim.sh` + `tools/check_grab_victim.py`
-(phase-tolerant). Phobos is now freeze-candidate; only the cosmetic win
-quote remains. Read the 14z-73 section below.)
+(phase-tolerant). **PHOBOS FROZEN (maintainer decision): registered
+`22c016ac -> huitzil-m1`; expectation set 38 sha1 / 13 masked / 17 skip;
+`run_suite.sh vsavjw` GREEN (54 PASS / 17 SKIP); committed + pushed.** Only
+the cosmetic win quote (a 3-level data port) is deferred. NEXT: Pyron. Read
+the 14z-73 section below.)
 
 Previously: 2026-08-09 (session 14z-71 — THE BEAM DRAWS. Root cause: vsav
 ships effect-class row 16 as a STUB where vs2/vh2 carry the beam's

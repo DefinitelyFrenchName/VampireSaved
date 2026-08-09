@@ -1,15 +1,15 @@
 # NEXT SESSION — orientation (updated at the close of 14z-73, 2026-08-09)
 
-**Session goal: FREEZE Phobos.** The grab-victim teleport (the last piece of
-real work) is FIXED and maintainer-confirmed on both grabs in MAME + FBNeo
-(§1). FG pacing is resolved-by-observation (§3). Only the cosmetic win quote
-remains (§2), and it need not block the freeze.
+**Session goal: PYRON.** Phobos is FROZEN (`22c016ac -> huitzil-m1`,
+`run_suite.sh vsavjw` GREEN 54/17). The grab-victim teleport was fixed and
+maintainer-confirmed on both grabs in MAME + FBNeo (§1); FG pacing is
+resolved-by-observation (§3). The only Phobos item left is the cosmetic win
+quote (§2), a 3-level data port deferred per docs — it does NOT block Pyron.
 
-**Current build: `build/hui26` (`22c016ac`)** — = hui25 + the grab-hold
-keyframe fix. Playtest-clean (beam, ES, low beam, grab lightning, and now
-the grab victim tracks native on both grabs). Not yet frozen; make it the
-launcher default. 14z-73 full H battery GREEN (15/15) incl. legacy masked-v2
-EXACT and `test_hui_grab_victim.sh` (`GRAB_VICTIM_EXPECT=matches`, peak Δ=0).
+**Frozen build: `build/hui26` (`22c016ac -> huitzil-m1`)** — = hui25 + the
+grab-hold keyframe fix. Playtest-clean (beam, ES, low beam, grab lightning,
+both grabs track native). Full H battery GREEN (15/15) + full oracle suite
+GREEN. Rebuilds bit-exact from `huitzil.toml` at `TENANT_CHAR=0x10` stage 6.
 
 ---
 
