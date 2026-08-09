@@ -953,42 +953,53 @@ block laid out with the VANILLA 0xAA0 stride carrying only the tenant's
 8 sets, plus a thunk that rebases `a0 = block - id*0xA0` when
 `d6 == tenant`, so the vanilla arithmetic lands on the tenant's set).
 
-### 3. Win QUOTE — the same big record table, with a `-4` BIAS
-Fetch helper vsavj `0x5F328`: `movea.l #$2672AA,a0; andi.w #$ff,d0;
-lsl.w #2,d0; lea -4(a0,d0.w),a0`. The caller sets `d0 = 0x60 + id`
-(P1) or `0x80 + id` (P2).
-**Because of the `-4`, the entry actually read is index `0x60+id-1`**,
-i.e. array base `0x2672AA + 4*0x5F = 0x267426` (P1) and
-`0x2674A6` (P2) indexed by id. Repointing the naive `0x60+id` row
-changes nothing and looks like "the record is right but the text is
-wrong" (14z-68m). vs2's twin table is `0x2A05E2` (bases `0x2A075E` /
-`0x2A07DE`); Huitzil's records are `0x2A5F36` (P1) / `0x2A6346` (P2).
-NOTE the same table serves the SELECT portrait at base `0x26742A`
-indexed by id WITHOUT the bias — the arrays OVERLAP (`0x26742A` row
-0x10 IS `0x2672AA` row 0x70), which is exactly what makes it easy to
-repoint the wrong entry.
+### 3. Win screen — PORTRAIT and QUOTE are DIFFERENT mechanisms (14z-73,
+### measured in-emulator; the earlier 14z-68 account was wrong on both)
+The shared fetch helper vsavj `0x5F328`: `movea.l #$2672AA,a0;
+andi.w #$ff,d0; lsl.w #2,d0; lea -4(a0,d0.w),a0; move.l a0,$1c(a6)` —
+it stores the *slot address* as the anim ptr (+0x1C); the anim
+interpreter then reads the record from it.
 
-**Scope warning (14z-68p/r): the quote is a THREE-LEVEL data
-structure, not a repoint.** Levels measured:
-1. the table entry -> a quote record (12-byte header, then 4-byte
-   entries whose low 3 bytes are a ROM address);
-2. those addresses point into `0x1BADxx` (vs2) / `0x1BB2xx` (vsavj) —
-   per-line entries, themselves holding 3-byte addresses;
-3. which reference glyph data at `0x1C4Cxx`.
-So porting a tenant's quote means carrying levels 2 and 3 as well (or
-re-encoding the glyphs against the host font). Mechanical but not
-small, and purely cosmetic — defer behind visible defects.
-CONFIRMED 14z-68r: on a tenant build the quote renders the HOST's line
-(Huitzil on Bulleta's row 0x10 shows her child-voice quote), because
-the `-4`-biased entry is the one the drawer reads and it is still
-vanilla.
+**RETRACTED (14z-73): `d0` is `0x40 + WINNER id`, not `0x60+id`.**
+Breakpointing `0x5F328` at the actual win screen (replay 28 + forced
+pick) measured `d0 = 0x50` for a Huitzil (id 0x10) win — so the slot is
+`0x2672AA + 4*(0x40+id) - 4`; for id 0x10 that is `0x2673E6`. The
+14z-68/NEXT_SESSION `0x60+id` (index `0x6F`, slot `0x267466`) was wrong;
+repointing it changes nothing (measured — hui27 did exactly that and the
+screen was unchanged). There is no separate P2 slot in evidence — the id
+is the WINNER's, and the arcade win screen (the one with the CONTINUE
+counter) always has a P1 winner.
+
+**And `0x5F328` drives the PORTRAIT, not the quote.** At the win screen
+the record it fetches (id 0x10 -> vs2 `0x2A8B7E`, base `0x2A06DE`) is the
+victory PORTRAIT (obj_records_dump: pal 15-19, tiles bank-1 `0xb7xx`).
+Repointing it to the tenant's own record is still not enough — the
+portrait's tiles are not placed in group C, so it renders as a
+PLACEHOLDER. (The earlier "Huitzil's records are `0x2A5F36`/`0x2A6346`"
+were from the `0x2A075E` select-portrait array — a different piece.)
+
+**The QUOTE TEXT is a SEPARATE structure (this part of 14z-68p/r stands,
+re-confirmed 14z-73).** It is rendered from the SHARED kana/kanji font
+(bank-1 tiles `0xb6xx`, pal 09 — measured on-screen via obj_records_dump)
+via Phobos-specific per-line CHARACTER-CODE data that is un-ported, so a
+tenant win shows a stray HOST line. The font is already present; only the
+record + line codes need porting. This is the real, non-KISS job — defer
+behind visible defects. **Two prior misfires to learn from:** the
+original `win_quote` manifest entry placed Pyron's record (`0x2A881E`,
+off by the `-4`) via the select-portrait array; a 14z-73 "KISS" attempt
+repointed the wrong array entirely. Neither touched the quote. Measure
+the fetch at the live screen before authoring the next attempt.
 
 ### Per-tenant win-screen checklist
 1. `[[code_word]]` x2 — position x/y (slot-following, CODE rows).
 2. `[[win_pal_variant]]` — palette; pick the row from the OPCODE view
    of `0x6B2F2` and CONFIRM with the 5*row marker.
-3. Quote records at the `-4`-biased bases `0x267426` / `0x2674A6`.
-4. Snapshot the actual screen and compare against a native capture —
+3. PORTRAIT record: fetch `0x5F328`, `d0 = 0x40+id`, `-4` bias → slot
+   `0x2673E6` for id 0x10 (source vs2 `0x2A8B7E`); AND place its bank-1
+   `0xb7xx` tiles in group C, or it renders as a placeholder.
+4. QUOTE text: separate multi-level structure (record → line char codes →
+   shared bank-1 `0xb6xx` font) — the un-ported part; not `0x5F328`.
+5. Snapshot the actual screen and compare against a native capture —
    the RAM and ROM can both check out while the screen is wrong
    (14z-68: palette RAM matched vs2 and all 134 tiles matched vs2,
    and the screen was still Donovan-coloured, because "matches vs2"

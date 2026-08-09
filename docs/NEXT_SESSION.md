@@ -32,11 +32,24 @@ invoked" by breakpointing the vanilla engine copy `0x2802e`; H's grab
 routes to its ported CLONE `0xc9eb0`. The positioner was always invoked;
 the bug was pure data.
 
-## 2. Win quote — cosmetic, root-caused, not built (does NOT block freeze)
+## 2. Win screen — cosmetic, MEASURED, genuinely NOT KISS (does NOT block)
 
-The consumer's `lea -4(a0,d0.w)` bias means it reads index `0x60+id-1` =
-0x6F where we repointed 0x70. His records are vs2 `0x2A5F36`/`0x2A6346`
-via bases `0x267426`/`0x2674A6`.
+14z-73 took a shot and REVERTED it (freeze intact). It is TWO separate
+cosmetic breaks, both measured in-emulator (reach the screen with
+`tests/replays/28_don_quotewin.rpl` + the forced-pick pokes; the quote is
+at ~f12200):
+- **Portrait** — fetch helper `0x5F328`, `d0 = 0x40 + winner id` (measured
+  `d0=0x50` for id 0x10; the old `0x60+id` note was WRONG), `-4` bias →
+  slot `0x2673E6`, source vs2 `0x2A8B7E`. But even repointed it shows a
+  PLACEHOLDER — its tiles (bank-1 `0xb7xx`) aren't placed in group C.
+- **Quote text** — a SEPARATE multi-level structure: record → per-line
+  CHARACTER CODES → the SHARED kana/kanji font (bank-1 `0xb6xx`, pal 09).
+  The font is present; the char-code data is Phobos-specific and un-ported.
+  This is the real job; `0x5F328` does NOT drive it.
+
+Full mechanism + the two prior misfires: `docs/game/engine_internals.md`
+"Win screen". Do NOT repeat the "repoint one pointer" attempts — measure
+the live fetch first. Purely cosmetic; deferred per the original guidance.
 
 ## 3. FG pacing — RESOLVED by observation (14z-73) ✓
 
