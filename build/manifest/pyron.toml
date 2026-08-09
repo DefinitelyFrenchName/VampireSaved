@@ -43,31 +43,33 @@ alloc_wrap = "0x15702,0x1572e"
 # His rows live in a per-tenant overlay — the shared map is frozen for
 # Donovan's reproducibility (the reconciliation_huitzil.toml precedent).
 recon_overlay = "build/manifest/reconciliation_pyron.toml"
-# ── PHYSICS PARAMS — MEASURED, and the obvious fix is REFUSED (14z-74).
-# His velocity/gravity rows currently fall back to a vanilla alias, so he
-# moves under ANOTHER CHARACTER'S physics. Measured against the native
-# vsav2 leg on the same replay+inputs
+# ── PHYSICS PARAMS (14z-74): port his param32 rows — velocities, jump
+# params and the rest of the 32-bit per-character parameter families.
+# WITHOUT this his rows fall back to a vanilla alias and he moves under
+# ANOTHER CHARACTER'S physics (Huitzil hit the same thing: "all three
+# consumers index the RAW id (no fold)"). MEASURED against the native
+# vsav2 leg, same replay and inputs
 # (tests/replays/pyron/73_pyron_air_214p.rpl), neutral jump:
 #     native  jump yv 548864   gravity -28672 (-0x7000)
-#     ours    jump yv 507904   gravity -24576 (-0x6000)
-# That is the leading explanation for the maintainer-reported air 214+P
+#     before  jump yv 507904   gravity -24576 (-0x6000)
+#     after   jump yv 548864   gravity -28672   <- matches native EXACTLY
+# This is the leading explanation for the maintainer-reported air 214+P
 # runaway: an air special whose upward velocity is tuned for HIS gravity is
 # never pulled back under someone else's, so he rises until the Y position
 # wraps and, never landing, never returns control.
 #
-# `port_param32 = true` (the flag Huitzil carries) DOES fix the physics —
-# rebuilt with it, his jump yv and gravity match native EXACTLY. It is NOT
-# ENABLED because it BREAKS LEGACY, measured: legacy replay 02
-# (Demitri vs CPU) then diverges to frame 5520 with ZERO identical frames
-# after, i.e. no re-convergence — a superset violation, not a tolerated
-# window. The likely mechanism is the fold: 0x11 & 0x0F = 0x01 = DEMITRI,
-# so writing Pyron's param rows lands on a vanilla character's. Huitzil at
-# 0x10 folds onto row 0x00 and his manifest already flags this family as a
-# known hazard ("the 14w-b VALUE_SKIP landmine ... gated on his own full
-# soak battery").
-# So the fix needs a FOLD-AWARE mechanism (port only the rows the tenant's
-# own consumers read, or relocate the table), not this flag. Do not simply
-# turn it on.
+# RETRACTED (14z-74, same session): an earlier revision of this comment
+# claimed the flag BREAKS LEGACY (replay 02 diverging to f5520 with no
+# re-convergence) and refused it. That was a MEASUREMENT ARTIFACT — the
+# legacy check had been chained immediately after a rebuild in one step, and
+# the very same artifact also produced a FALSE failure on a build that did
+# not carry the flag. Re-measured in isolation, twice, on a freshly built
+# image: with the flag the legacy replay is the ratified select-wheel window
+# and nothing more (divergent frames 787, ONE run, 889..1675, 3845 identical
+# frames after). Lesson, and it cost a wrong commit: never chain a legacy
+# measurement onto a build in the same step, and re-run before believing a
+# gate that contradicts a previous green.
+port_param32 = true
 
 # ── ADDRESS-SPACE MODEL — same shape as the other tenants'; duplicated
 # for the single-tenant ladder. The M3b Phase 2 merge hoists this into a
