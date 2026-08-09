@@ -235,13 +235,17 @@ python3 tools/patch_prg.py "$ROMDIR/vsavj.zip" "$OUTBASE/prg" \
 #     vanilla. The generator also emitted the matching tile-placement map.
 # Stage-6 gfx is per-tenant via the ratified 3-tenant layout manifest
 # (14z-67, build/manifest/gfx_layout3.toml): obj_records span and
-# band/delta resolve from the tenant's row. Pyron's row is a RESERVATION
-# — his stage-6 manifest sections (bank plumbing, select rows) do not
-# exist yet, so refuse his gfx loudly rather than build it half-wired.
-if [ "$STAGE" -ge 6 ] && [ "$TENANT_CHAR" != "0x13" ] && [ "$TENANT_CHAR" != "0x10" ]; then
-    echo "build_donovan.sh: stage >= 6 supports tenants 0x13/0x10 today" >&2
-    echo "  (Pyron's layout share is reserved but his stage-6 manifest" >&2
-    echo "  sections are M3b Phase 5). Build this tenant at stage <= 5." >&2
+# band/delta resolve from the tenant's row. 14z-74: Pyron (0x11) UNLOCKED —
+# his gfx rung is in progress, and his one-source-bank premise is measured
+# (tests/test_list_type_census.sh: 0 type-4 in his fighter span, against a
+# live 26-hit control on Huitzil's), so his delta-0 placement is complete
+# with no strip-tiles work. Anyone else still gets refused loudly rather
+# than built half-wired.
+if [ "$STAGE" -ge 6 ] && [ "$TENANT_CHAR" != "0x13" ] \
+   && [ "$TENANT_CHAR" != "0x10" ] && [ "$TENANT_CHAR" != "0x11" ]; then
+    echo "build_donovan.sh: stage >= 6 supports tenants 0x13/0x10/0x11 today" >&2
+    echo "  (this tenant's stage-6 manifest sections do not exist yet)." >&2
+    echo "  Build it at stage <= 5." >&2
     exit 1
 fi
 TEN_ID="$(python3 -c "import json;print(json.load(open('$OUTBASE/patch/tenant.json'))['id'])")"
