@@ -330,6 +330,35 @@ old_hex = "6000"
 new_hex = "6000"
 new_hex_variant = "1000"
 
+# ── Sprite + effect palettes (14z-74; the Donovan/H template). Maintainer
+# playtest: "palettes are wrong" — this is that gap. His blocks are read
+# from vs2's own per-character palette POINTER tables, row 0x11:
+#     sprite  vs2 0x396B94[0x11] = 0x39C19C   (len 0x500, = H's stride)
+#     effect  vs2 0x396C14[0x11] = 0x3AC45C   (len 0xDC0, = H's stride)
+# Strides cross-checked against rows 0x0F-0x13 on both tables, and against
+# H's frozen rows (0x39BC9C / 0x3AB69C), so the row indexing is anchored and
+# not inferred from Pyron alone. src_head_hex pins the block so a table that
+# ever moves fails the build loudly instead of porting silently-wrong colour.
+# extra_tables mirrors the vanilla third-table sharing exactly as H's and
+# Donovan's do.
+[[palette]]
+name = "sprite"
+stage = 6
+src = 0x39C19C
+len = 0x500
+src_head_hex = "0e000f600f900fb0"
+table = 0x38C198
+
+[[palette]]
+name = "effect"
+stage = 6
+src = 0x3AC45C
+len = 0xDC0
+src_head_hex = "05370639075b088d"
+table = 0x38C218
+hole = "a"
+extra_tables = "0x38C258"
+
 # ── Select family (the H/Donovan template; arrays are shared, only the
 # per-id expect_* values are P's). All nine alias anchors verified from
 # the ROMs 14z-74: every vsavj variant row 0x11 currently aliases its
