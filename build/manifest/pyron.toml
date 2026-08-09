@@ -126,3 +126,168 @@ pad = 0x60
 stage = 4
 region = "x05c800"
 pad = 0x20
+
+# ══ 14z-74: THE P GFX RUNG — stage-6 sections ═══════════════════════════
+#
+# Layout: build/manifest/gfx_layout3.toml row "pyron" — his art is vs2
+# BANK 3 native codes, band 0x4ED5-0x8647, placed into WIDE group C bank 4
+# at DELTA 0 (no record remap). No [gfx_remap] section ON PURPOSE: nothing
+# moves, so there is no effect map and no tile-word rewrite. Same strongest-
+# correctness class as Huitzil's rung.
+#
+# ONE-SOURCE-BANK PREMISE: MEASURED FOR HIM, not assumed
+# (tests/test_list_type_census.sh, 14z-74). His FIGHTER anim span carries
+# ZERO list-type-4 sprite lists — against a live 26-hit control on Huitzil's
+# span, whose beam is a known type 4. Type 4 is the one format that composes
+# its OWN bank word (bank 1) instead of taking the object's, so a tenant
+# carrying one needs a ported handler + --strip-tiles to reach group C
+# (Huitzil's beam, three sessions). Pyron needs neither: the bank plumbing
+# below is his whole program-side gfx surface.
+# CAVEAT: that census covers his FIGHTER span. His effect/companion data
+# rides the SHARED x088512 region and is not extracted yet — re-run the
+# census over it when his effect rung lands.
+
+# ── OBJ bank setters: every hardcoded `move.w #$6000,$18(aN)` in P's
+# ported regions. Measured 14z-74 by scanning his built region images
+# (12 sites), against a control scan of Huitzil's build that re-derives
+# his 12 manifest rows. 11 sites sit in SHARED regions at addresses
+# IDENTICAL to H's rows (the rows are properties of the shared source
+# bytes); the 12th, 0x05938C, is in H's x057456 but lands in P's own
+# `code` region (his handler zone 0x0574C0 subsumes it).
+# All tenants share WIDE bank 4 in the ratified layout, so the variant
+# word is 0x1000 everywhere. new_hex == old_hex: there is no base-half
+# P configuration (variant-id native), the row exists for the variant
+# value only.
+[[port_patch]]
+stage = 6
+region = "code"
+src_addr = 0x05938C
+old_hex = "397c60000018"
+new_hex = "397c60000018"
+new_hex_variant = "397c10000018"
+note = "OBJ bank setter (P own code zone): vs2 bank 3 -> WIDE bank 4"
+
+[[port_patch]]
+stage = 6
+region = "x05c800"
+src_addr = 0x05CF38
+old_hex = "3d7c60000018"
+new_hex = "3d7c60000018"
+new_hex_variant = "3d7c10000018"
+note = "OBJ bank setter (shared zone): vs2 bank 3 -> WIDE bank 4"
+
+[[port_patch]]
+stage = 6
+region = "x05c800"
+src_addr = 0x0620D4
+old_hex = "397c60000018"
+new_hex = "397c60000018"
+new_hex_variant = "397c10000018"
+note = "OBJ bank setter (shared zone): vs2 bank 3 -> WIDE bank 4"
+
+[[port_patch]]
+stage = 6
+region = "x05c800"
+src_addr = 0x062194
+old_hex = "397c60000018"
+new_hex = "397c60000018"
+new_hex_variant = "397c10000018"
+note = "OBJ bank setter (shared zone): vs2 bank 3 -> WIDE bank 4"
+
+[[port_patch]]
+stage = 6
+region = "x06800c"
+src_addr = 0x068360
+old_hex = "397c60000018"
+new_hex = "397c60000018"
+new_hex_variant = "397c10000018"
+note = "OBJ bank setter (shared zone): vs2 bank 3 -> WIDE bank 4"
+
+[[port_patch]]
+stage = 6
+region = "x06800c"
+src_addr = 0x0683A2
+old_hex = "397c60000018"
+new_hex = "397c60000018"
+new_hex_variant = "397c10000018"
+note = "OBJ bank setter (shared zone): vs2 bank 3 -> WIDE bank 4"
+
+[[port_patch]]
+stage = 6
+region = "x06800c"
+src_addr = 0x0683EA
+old_hex = "397c60000018"
+new_hex = "397c60000018"
+new_hex_variant = "397c10000018"
+note = "OBJ bank setter (shared zone): vs2 bank 3 -> WIDE bank 4"
+
+[[port_patch]]
+stage = 6
+region = "x06800c"
+src_addr = 0x06842E
+old_hex = "397c60000018"
+new_hex = "397c60000018"
+new_hex_variant = "397c10000018"
+note = "OBJ bank setter (shared zone): vs2 bank 3 -> WIDE bank 4"
+
+[[port_patch]]
+stage = 6
+region = "x0692f6"
+src_addr = 0x069490
+old_hex = "397c60000018"
+new_hex = "397c60000018"
+new_hex_variant = "397c10000018"
+note = "OBJ bank setter (shared zone): vs2 bank 3 -> WIDE bank 4"
+
+[[port_patch]]
+stage = 6
+region = "x088512"
+src_addr = 0x08873E
+old_hex = "3d7c60000018"
+new_hex = "3d7c60000018"
+new_hex_variant = "3d7c10000018"
+note = "OBJ bank setter (pod/companion zone): vs2 bank 3 -> WIDE bank 4"
+
+[[port_patch]]
+stage = 6
+region = "x088512"
+src_addr = 0x089D26
+old_hex = "3d7c60000018"
+new_hex = "3d7c60000018"
+new_hex_variant = "3d7c10000018"
+note = "OBJ bank setter (pod/companion zone): vs2 bank 3 -> WIDE bank 4"
+
+[[port_patch]]
+stage = 6
+region = "x088512"
+src_addr = 0x08B100
+old_hex = "3d7c60000018"
+new_hex = "3d7c60000018"
+new_hex_variant = "3d7c10000018"
+note = "OBJ bank setter (pod/companion zone): vs2 bank 3 -> WIDE bank 4"
+
+# ── The ported per-char OBJ bank table copy (x026142 tail), same shape as
+# H's: rows = VANILLA vsavj 0x282D4 values EXCEPT the tenant's own row.
+# Here row 0x11 = 0x1000 (P's sprites fetch from WIDE bank 4 on any read
+# path that resolves through the ported copy) and row 0x10 is back to its
+# vanilla 0x6000 alias — this is P's build, not H's.
+[table_fix]
+stage = 6
+region = "x026142"
+pad_len = 0x1440
+table_off = 0x13EE
+rows_hex = "600060000000200060000000400040000000600040006000600000000000400060001000000020006000000040004000"
+note = "ported per-char OBJ bank table -> vanilla vsavj values + row 0x11 = WIDE bank 4"
+
+# ── vsavj's own per-char OBJ bank table (0x282D4): the engine's char-init
+# reads row = runtime char id. Variant row 0x11 is a vanilla alias of row
+# 0x01 (the generator's alias anchor); superset-safe because no legacy
+# gameplay path assigns ids 0x10-0x1F (tests/audit_id_writers.sh).
+[[code_word]]
+stage = 6
+name = "obj_bank_word_slot"
+slot_table = 0x0282D4
+slot_stride = 2
+old_hex = "6000"
+new_hex = "6000"
+new_hex_variant = "1000"
