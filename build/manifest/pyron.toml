@@ -408,6 +408,22 @@ table = 0x38C198
 # a Pyron-only mistake; it simply has not produced a reported symptom on him.
 # Legacy is intact either way (measured: replay 02 on the effect-ported build
 # was still the ratified select-wheel window only).
+# CROSS-TENANT CHECK (14z-74, maintainer asked whether Phobos is exposed):
+# NO — measured on the same rig, palette-row churn over 15 frames:
+#     PYRON   (0x11)            rows 1,2,3 AND 10   <- the blink
+#     HUITZIL (frozen m2, 0x10) rows 1,2,3          = native
+#     DONOVAN (frozen m3a,0x13) rows 1,2,3          = native
+# So the blink is Pyron-specific, not a shared tenant hazard. It is also a
+# DIFFERENT phenomenon from Donovan's old "sword/statue blink" (14z-33),
+# which was BANK ATTRIBUTION — records of two banks processed with one
+# bank's semantics, rendering real art from the wrong place (geometry
+# right, content someone else's). Pyron's is palette RAM: a palette-SEQUENCE
+# animation (uploader PC 0x02AD68) rewriting row 10 every other frame where
+# native writes it zero times. Same visible word, unrelated mechanisms.
+# Note the maintainer also sees the in-match HUD MUGSHOT blinking — and that
+# mugshot is DEMITRI's (his HUD rows are unported), which confirms the churn
+# is a shared palette ROW, not Pyron's own art.
+#
 # TO FIX PROPERLY: determine how the engine resolves an effect palette for a
 # VARIANT id (a 16-row table cannot hold one) — either a fold, a separate
 # variant table, or a thunk — before writing anything in that region.
