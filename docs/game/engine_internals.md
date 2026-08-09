@@ -810,6 +810,33 @@ measurement, GOTCHAS). Treat the row as behaviour-bearing.
   the ATTACKER's code — H's FG draws it RANDOMLY (table16[rand&15],
   ids 1/3/5) per barrage hit. The intro-variant at +0x0A is likewise
   RNG-drawn at char load.
+  - **DURING-HOLD victim placement — a per-ATTACKER keyframe block
+    (14z-73, FIXED).** The victim's per-frame position during a grab is
+    written by a shared engine CAPTURE POSITIONER (vsavj `0x28058`):
+    `victim_pos = attacker_pos ± facing-flipped (Xoff,Yoff)`, where the
+    offsets come from a per-ATTACKER KEYFRAME block selected through
+    pointer table `0xBE27A` indexed by the attacker's char id
+    (`movea.l #$be27a,a0; movea.l (a0,id*4),a0`; the victim-side per-record
+    offset is then added, indexed by the VICTIM id). This is DISTINCT from
+    the victim-side pose tables (`0xBCE7A` family, ported wholesale) and
+    from the post-release throw ARC (`throw_arc_tables`, the vertical
+    launch). The table is 32 rows; rows 0x10-0x1F alias 0x00-0x0F, so a
+    ported tenant at a variant id inherits a VANILLA character's block
+    unless its own row is repointed — exactly Donovan's
+    `throw_victim_keyframes` (`donovan.toml:711`) and Huitzil's
+    `grab_hold_keyframes` (`huitzil.toml`, 14z-73). Measured (Circuit
+    Scrapper 63214, `tests/test_hui_grab_victim.sh`): before the fix H's
+    row 0x10 aliased character 0's block, holding the victim −27px behind
+    vs native +74 in front; after porting H's own vs2 block `0x0C56AA` the
+    victim tracks native's exact keyframe sequence. **A ported tenant's
+    per-attacker `slot_ptr_table` rows are a REQUIRED port item — check
+    them for every new grappler/thrower.** NOTE for measurement: compare
+    `dx = p2x − p1x` (relative), never absolute victim-x — the ~21px
+    cross-emulator camera shift cancels only in the relative measure (an
+    absolute-x comparison stalled 14z-72 for a session). And a ported
+    tenant reaches this positioner through a CLONE of it (H's is `0xc9eb0`,
+    because `0x27282` fell inside region x026142), not the vanilla copy at
+    `0x2802e` — breakpoint the tenant's clone, not the engine twin.
 
 ## Select-portrait palette dispatch + HUD stager biases (14z-67,
 ## measured on the H gfx rung)

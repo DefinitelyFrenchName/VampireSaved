@@ -1,6 +1,21 @@
 # STATE — living progress log
 
-Updated: 2026-08-09 (session 14z-71 — THE BEAM DRAWS. Root cause: vsav
+Updated: 2026-08-09 (session 14z-73 — THE GRAB VICTIM IS FIXED and
+MAINTAINER-CONFIRMED (both grabs, MAME + FBNeo). The 14z-72 "rig not
+comparable" blocker was a measurement error (absolute victim-x vs the
+RELATIVE offset, dx=42 both legs). Root cause: the capture positioner
+(reached via H's ported clone 0xc9eb0) reads a per-attacker keyframe block
+via pointer table 0xBE27A; H's row 0x10 ALIASED character 0's block, so H
+held the victim with the wrong offsets (−27 vs native +74). Fix (build/hui26,
+`22c016ac`): one `[[data_port]]` grab_hold_keyframes ports H's own vs2 block
+(0x0C56AA) and repoints row 0xBE2BA — legacy masked-v2 EXACT; victim now
+tracks native's exact keyframe sequence (gate peak Δ=0). Also: FG "slowness"
+was the broken GFX, not timing — resolved by observation, item closed. New
+gate `tests/test_hui_grab_victim.sh` + `tools/check_grab_victim.py`
+(phase-tolerant). Phobos is now freeze-candidate; only the cosmetic win
+quote remains. Read the 14z-73 section below.)
+
+Previously: 2026-08-09 (session 14z-71 — THE BEAM DRAWS. Root cause: vsav
 ships effect-class row 16 as a STUB where vs2/vh2 carry the beam's
 handler, and underneath that its sprite-list drawer has no list-type 12.
 Both fixed in build/hui20 (40cc10b1) at ZERO legacy cost, by porting the
@@ -124,8 +139,107 @@ No hook, no cycles, nothing to ratify. Cost: decode the type-2 format
 from its handler (`0x01B234`), write the transform, and accept that the
 flattened list is authored data the sibling oracle cannot check.
 
-## Session 14z-72 — the grab victim: instrument built, grab window
-## located, and the RIG IS NOT COMPARABLE (no attribution yet)
+## Session 14z-73 — the grab victim: FIXED and MAINTAINER-CONFIRMED (both
+## grabs, MAME + FBNeo). The victim's capture-pose keyframe-pointer table
+## row for H aliased character 0's block; ported H's own block. Also: the
+## FG "slowness" was the broken GFX, not timing — resolved by observation.
+
+**The 14z-72 blocker was a measurement error, not a rig problem.** Running
+replay 80 (Circuit Scrapper, 63214+MP on a 2P Victor dummy) through the new
+`field_trace.lua` on **both legs** — native `vsav2` and our `build/hui25`
+`vsavjw`, both forced to P1=Huitzil(0x10)/P2=Victor(0x03) — shows the setup
+is byte-identical across legs: same characters, same facing (p1face=1,
+p2face=0), same seq timing (grab seq 0x0E enters at f3152 on both, victim
+enters seq 2 at f3154 on both), same damage (0x13). And **pre-grab the
+victim offset RELATIVE to the attacker is dx=42 on both legs** — the 21px
+"gap" 14z-72 saw was absolute x; the whole match is globally shifted and it
+cancels in the relative measure. No cornering needed.
+
+**The defect, isolated.** From the first held frame (f3154) the victim's
+relative offset diverges hard and stays wrong through the hold:
+
+| phase | native reldx | ours reldx | Δdx |
+|---|---|---|---|
+| pre-grab f3150 | +42 | +42 | 0 |
+| onset f3152 (seq 0x0E) | +42 | +42 | 0 |
+| hold f3154..3164 | +74..+82 (out front) | −27 (behind) | ~**−109** |
+
+Native holds the victim ~78px in FRONT of Phobos; ours snaps it ~27px
+BEHIND — a ~109px horizontal teleport, visible from grab onset (snapshots
+f3152/3158 confirm: identical at onset, victim on the wrong side by f3158).
+It is **not a clean sign-flip** (−78 would be), so the offset VALUE is
+wrong, not just its sign — consistent with a mis-read/un-ported datum. The
+post-release vertical LAUNCH (dy arc) is the SEPARATE known throw-arc issue
+and is deliberately out of scope for this gate.
+
+**ROOT CAUSE (confirmed, code-level).** The victim's hold position is
+written by a shared engine CAPTURE POSITIONER that computes
+`victim_pos = attacker_pos ± facing-flipped (Xoff,Yoff)`, where the offsets
+come from a per-ATTACKER KEYFRAME block selected through pointer table
+`0xBE27A` indexed by the attacker's char id (`movea.l #$be27a,a0;
+movea.l (a0,id*4),a0`). vsavj's positioner is at `0x28058`; **H's grab
+reaches it through the ported CLONE at `0xc9eb0`** — because `0x27282`
+falls inside H's ported region x026142, the generator relocated the
+reference as an internal target into the clone, which runs identically and
+even reads the correctly-reconciled table base. So the positioner IS
+invoked; the **sole** defect is the DATUM: vsavj table **row 0x10
+(Huitzil) = `0x092C4A`, an ALIAS of row 0x00** (character 0's block), where
+vs2 row 0x10 = `0x0C56AA` = H's OWN block. H therefore held the victim with
+character 0's offsets (dx −27 vs native +74). This is the exact twin of
+Donovan's `throw_victim_keyframes` (`donovan.toml:711`, same
+`slot_ptr_table`); `huitzil.toml` simply lacked the analogous row.
+
+**MID-SESSION RETRACTION (own):** I first measured "the positioner is never
+invoked (0 hits at `0x2802e`)" and posited a crypt-hole invocation bug. That
+was a false negative — I breakpointed the VANILLA engine copy `0x2802e`,
+but H's grab routes to the CLONE `0xc9eb0`. A subagent caught it by watching
+the actual writer PC (positive control). The invocation was never broken;
+the bug was pure data. Lesson logged: check the address the tenant's OWN
+relocated code uses, not the vanilla twin.
+
+**THE FIX (build/hui26, fingerprint `22c016ac`).** One `[[data_port]]`
+`grab_hold_keyframes` in `huitzil.toml`: places H's vs2 block `0x0C56AA`
+(len `0x1D80`, sibling-identical to vh2 `0x0C4F3C` through `0x1E1A`) into
+`wide_ext` and repoints table row `0xBE2BA` (row 0x10) to it. Host block
+`0x092C4A` and every vanilla row untouched → **legacy masked-v2 EXACT**.
+Result: the victim now follows native's EXACT keyframe sequence
+(74,82,82,74,… then the wind-up, then the throw arc), the only residual a
+±1-frame cross-emulator phase. **Maintainer-confirmed clean on BOTH the
+regular grab (6MP/6HP) and Circuit Scrapper (63214), in MAME and FBNeo.**
+
+**FG PACING — resolved by observation (was NEXT_SESSION §3).** With correct
+sprites the maintainer re-evaluated the FG super and it now feels fine; the
+"slowness" was the broken GFX, not a timing bug. No timing change was ever
+needed. Item closed — do not chase it.
+
+**Shipped this session (persistent suite):**
+- `tools/check_grab_victim.py` — relative-offset A/B verdict. Anchors on the
+  seq-0x0E onset; REFUSES TO JUDGE unless both legs grabbed (seq 0x0E +
+  victim took ≥0x13); PHASE-TOLERANT (±2 frames, §4 cross-emulator skew).
+  `differs` = peak |Δdx| ≥30 (the OPEN defect on hui25); `matches` = ≤4
+  (hui26: peak 0). Vertical launch reported, not gated (throw-arc is separate).
+- `tests/test_hui_grab_victim.sh` `[bd]` (default `build/hui25` for the
+  `differs` reference; pass `build/hui26` with `GRAB_VICTIM_EXPECT=matches`)
+  — native-vs-build field_trace A/B + TWO verdict-logic controls, both
+  rejected. Built-in validity: both legs read reldx=+42 at onset.
+
+**Method notes worth keeping.** (1) A relative measure beats a corner rig
+here: cancelling absolute placement is cheaper and more robust than pinning
+it. (2) The onset-frame agreement (reldx=+42 both) is a same-instrument
+positive control folded into the measurement — a dead instrument would not
+have produced it. (3) Snapshots (`snapshot_frames.lua`) turned the number
+into a picture for the maintainer before any code was touched.
+
+
+##
+## RETRACTED (14z-73): the rig IS cross-leg comparable. 14z-72 compared the
+## victim's ABSOLUTE x (936 native vs 915 ours = 21px) and concluded the
+## legs start at different spacing. But the whole match is globally shifted
+## ~21px (camera/origin); the victim offset RELATIVE to the attacker is
+## dx=42 on BOTH legs pre-grab. No cornering is needed — replay 80 with a
+## both-sides forced pick is already comparable. See the 14z-73 section
+## above for the measurement, attribution, and the shipped gate. The
+## eliminations below (instrument, grab window) stay valid.
 
 **New instrument, kept: `tests/lua/field_trace.lua`** — logs named RAM
 fields EVERY frame (`FIELDS="ff8810:w:vx,..."`, signed reads, replay +
@@ -142,11 +256,12 @@ was at f3431-3449 — roughly 200 frames late. `test_hui_grab.sh` samples
 3200/3230/3300, which is the correct neighbourhood and was there to be
 read all along.
 
-**THE RIG IS NOT CROSS-LEG COMPARABLE, and no attribution may be made
-until it is.** At f3150, BEFORE the grab, the victim is at x=936 on
-native and x=915 on ours — 21px apart. The fighters therefore start at
-different spacing, the grab connects at a different range, and every
-downstream difference inherits that.
+**~~THE RIG IS NOT CROSS-LEG COMPARABLE~~ — RETRACTED (14z-73).** At
+f3150, BEFORE the grab, the victim is at x=936 on native and x=915 on
+ours — 21px apart *in absolute x*. 14z-72 read that as different spacing.
+It is not: the RELATIVE offset dx=(p2x-p1x)=42 on both legs. The 21px is
+a global camera/origin shift that cancels in the relative measure. The
+rig was comparable all along; the error was measuring absolute x.
 
 Provisional and NOT a finding (recorded only so it is not re-derived):
 with the absolute offset cancelled (victim position RELATIVE to the

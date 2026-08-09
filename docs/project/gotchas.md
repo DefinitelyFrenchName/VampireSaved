@@ -1552,3 +1552,33 @@ Measured twice in one session:
 
 Both were found by grepping the assertion's wording across the repo, in
 one pass. Neither was found by re-reading the documents.
+
+## Cross-emulator position A/B: compare RELATIVE offset, not absolute x
+## (14z-72 lost a session to this; 14z-73)
+
+Our new-character A/B runs native `vsav2` against our `vsavjw` — two
+different builds of the engine. They traverse the same states but the
+match sits at a **fixed ~21px global camera/origin shift** between the two,
+so any ABSOLUTE screen coordinate differs by that constant even when
+nothing is wrong.
+
+14z-72 measured the grab victim's absolute x (936 native vs 915 ours),
+read the 21px as "the fighters start at different spacing", declared the
+rig **not cross-leg comparable**, and proposed authoring a whole new
+corner-walk replay to pin absolute position. All of that was wasted: the
+victim offset RELATIVE to the attacker (`dx = p2x − p1x`) was **42 on both
+legs** the whole time. 14z-73 ran the same replay 80, compared the relative
+offset, and both measured AND attributed the defect in one session — no new
+rig needed.
+
+Rules:
+- For any cross-emulator A/B of a POSITION, cancel absolute placement
+  first: compare a difference between two objects in the same frame
+  (`p2 − p1`), or an offset from a fixed landmark. `tools/check_grab_victim.py`
+  is the worked example; `field_trace.lua` logs both blocks so the subtraction
+  is trivial.
+- A relative measure is CHEAPER and more robust than a corner rig. Reach for
+  "cancel the shift" before "pin the position".
+- The onset-frame agreement (both legs read the same relative value before
+  the event) is a free same-instrument positive control — if it does NOT
+  agree pre-event, THEN suspect the rig.

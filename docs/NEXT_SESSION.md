@@ -1,61 +1,56 @@
-# NEXT SESSION — orientation (written at the close of 14z-71, 2026-08-09)
+# NEXT SESSION — orientation (updated at the close of 14z-73, 2026-08-09)
 
-**Session goal: finish Phobos and freeze him.** One piece of real work,
-two cosmetic. The beam arc is done and maintainer-confirmed.
+**Session goal: FREEZE Phobos.** The grab-victim teleport (the last piece of
+real work) is FIXED and maintainer-confirmed on both grabs in MAME + FBNeo
+(§1). FG pacing is resolved-by-observation (§3). Only the cosmetic win quote
+remains (§2), and it need not block the freeze.
 
-**Current build: `build/hui25` (`b0fb2f94`)** — launcher default,
-playtested clean (beam, ES, low beam, and the grab lightning). Not frozen.
-14z-71 closing sweep: **18/18 PASS**, legacy masked-v2 EXACT.
+**Current build: `build/hui26` (`22c016ac`)** — = hui25 + the grab-hold
+keyframe fix. Playtest-clean (beam, ES, low beam, grab lightning, and now
+the grab victim tracks native on both grabs). Not yet frozen; make it the
+launcher default. 14z-73 full H battery GREEN (15/15) incl. legacy masked-v2
+EXACT and `test_hui_grab_victim.sh` (`GRAB_VICTIM_EXPECT=matches`, peak Δ=0).
 
 ---
 
-## 1. THE GRAB VICTIM'S MID-ANIMATION PLACEMENT — the only real work
+## 1. THE GRAB VICTIM'S MID-ANIMATION PLACEMENT — FIXED (14z-73) ✓
 
-Maintainer-reported, in scope, **not a blocker**: during a grab the
-VICTIM's sprite teleports around mid-animation. Start and end are correct;
-Phobos' own sprite and all the effects are fine.
+Maintainer-confirmed clean on BOTH grabs (regular 6MP/6HP and Circuit
+Scrapper 63214), in MAME and FBNeo. Build `build/hui26`.
 
-**Inputs — both need the fighters TOUCHING:**
-- regular grab: **6MP** or **6HP** at contact
-- Circuit Scrapper: **63214+MP** or **HP** at contact
+Root cause: the victim's hold position comes from a per-attacker keyframe
+block selected via pointer table `0xBE27A` (indexed by attacker id); H's
+row 0x10 aliased character 0's block, so H held the victim with the wrong
+offsets (−27px vs native +74). Fix: `[[data_port]] grab_hold_keyframes` in
+`huitzil.toml` ports H's own vs2 block (`0x0C56AA`) into `wide_ext` and
+repoints row `0xBE2BA` — the exact twin of Donovan's `throw_victim_keyframes`.
+Legacy masked-v2 EXACT; victim now tracks native's exact keyframe sequence
+(gate `test_hui_grab_victim.sh`, `GRAB_VICTIM_EXPECT=matches`, peak Δ=0).
 
-A rig that fires these at range measures nothing. **Verify
-`tests/replays/hui/80_hui_grab_2p.rpl` actually connects before reading
-anything off it** — 14z-71 sampled that replay and got grenade frames,
-which is how an entire measurement went wrong.
+Retraction logged (STATE 14z-73): I first mis-measured "positioner never
+invoked" by breakpointing the vanilla engine copy `0x2802e`; H's grab
+routes to its ported CLONE `0xc9eb0`. The positioner was always invoked;
+the bug was pure data.
 
-**The shape tells you where to look.** Endpoints right, middle wrong:
-endpoints are set by discrete events (connect, release), the middle by
-PER-FRAME data. Suspect the per-frame victim-offset / capture-pose data or
-its stride — not the grab logic, whose damage and launch arc are already
-native-exact and gated.
-
-**Progress 14z-72 — instrument built, rig blocked.** `tests/lua/field_trace.lua`
-(new) logs named RAM fields every frame; the grab window is **f3154-3273**
-(victim P2 = `$FF8800`, x `+0x10`, y `+0x14`). But the current rig is **NOT
-cross-leg comparable**: at f3150, before the grab, the victim is 21px
-further right on native than on ours, so the grab connects at a different
-range and every downstream difference inherits it. No attribution was made.
-
-**Next move: fix the rig, then measure.** Walk both fighters into a CORNER
-first — the 83d grenade-rig trick — so spacing is pinned deterministically
-on both legs. Prefer that to poking positions mid-match, which the engine
-may overwrite and which would alter the very connect range under test.
-Then re-run the A/B on the victim's offset RELATIVE to the attacker (that
-cancels absolute placement and is the physically meaningful quantity for a
-grab).
-
-## 2. Win quote — cosmetic, root-caused, not built
+## 2. Win quote — cosmetic, root-caused, not built (does NOT block freeze)
 
 The consumer's `lea -4(a0,d0.w)` bias means it reads index `0x60+id-1` =
 0x6F where we repointed 0x70. His records are vs2 `0x2A5F36`/`0x2A6346`
 via bases `0x267426`/`0x2674A6`.
 
-## 3. FG pacing — untouched
+## 3. FG pacing — RESOLVED by observation (14z-73) ✓
 
-## 4. Then FREEZE Phobos
+With correct sprites the maintainer re-evaluated the FG super: it feels
+fine. The "slowness" was the broken GFX, not a timing bug — no timing change
+was ever needed. **Do not chase it.**
 
-Registry row + expectation set, maintainer-gated.
+## 4. FREEZE Phobos — the remaining step
+
+`build/hui26` is the freeze candidate. Freeze = registry row + expectation
+set, maintainer-gated. Only the cosmetic win quote (§2) is open, and it need
+not block. Full H battery was GREEN on hui26 (see the 14z-73 build-registry
+note). Before freezing: make hui26 the launcher default, confirm the
+maintainer wants to freeze with the win quote still open (or fix it first).
 
 ---
 
@@ -76,6 +71,13 @@ from 14z-71 to carry in:
   hashes — lives on the DATA side. *The tiles being there and fetched does
   not mean they are shown.* The beam and the grab lightning are
   known-good references to seed one from.
+- **If Pyron grabs/throws, port his per-attacker `slot_ptr_table` rows
+  (14z-73).** Tables like the grab-hold keyframes (`0xBE27A`) and any other
+  per-ATTACKER-char pointer table are 32 rows where the variant half
+  (0x10-0x1F) ALIASES the vanilla half — a tenant at a variant id silently
+  inherits a vanilla character's data until its row is repointed. Huitzil's
+  `grab_hold_keyframes` / Donovan's `throw_victim_keyframes` are the
+  template; `tests/test_hui_grab_victim.sh` is the A/B gate to clone.
 
 ---
 

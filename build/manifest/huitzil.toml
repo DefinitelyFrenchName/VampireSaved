@@ -1135,6 +1135,43 @@ len = 0x80
 dst_old_head = "05310fff0e9e0ece0d7e093e064d045c"
 note = "DF palette-seq rows 0x1E-0x21 <- the sequence native DF actually shows (vs2 0x3ABEDC)"
 
+# ══ 14z-73 THE GRAB-HOLD VICTIM PLACEMENT ═══════════════════════════════
+#
+# THE DEFECT, measured on both legs (tests/test_hui_grab_victim.sh): during
+# H's grab the VICTIM is held at the wrong offset — native holds it +78px in
+# FRONT of the attacker, ours snaps it -27px BEHIND (~109px). Setup is
+# byte-identical across legs (chars, facing, seq 0x0E timing, 0x13 damage);
+# only the victim's per-frame position diverges, from grab onset.
+#
+# ROOT CAUSE. The victim's hold position is written by a shared engine
+# CAPTURE POSITIONER (vsavj 0x28058; H's grab reaches it via the ported
+# clone at 0xc9eb0, since 0x27282 falls inside H's ported region x026142):
+#   victim_pos = attacker_pos +/- facing-flipped per-frame (Xoff,Yoff)
+# read from a per-ATTACKER-char KEYFRAME block via pointer table 0xBE27A,
+# indexed by attacker id (movea.l #$be27a,a0; movea.l (a0,id*4),a0). vsavj
+# row 0x10 (Huitzil) = 0x092C4A, an ALIAS of row 0x00 (char 0's block) — so
+# H holds the victim with character 0's offsets. vs2 row 0x10 = 0x0C56AA =
+# H's OWN block. This is H's missing twin of Donovan's throw_victim_keyframes
+# (donovan.toml:711, same slot_ptr_table). Block is position-independent
+# (internal refs are block-relative word offsets); vs2/vh2 byte-identical
+# through the structural end (32-entry victim header, max off 0x1BE0 + record
+# span -> 0x1D80; sibling identity holds to 0x1E1A). Superset-safe: only the
+# tenant's row 0x10 is repointed; every vanilla row and the host block
+# (0x092C4A) stay untouched. Fixes both the clone and the vanilla engine
+# readers at once (both read 0xBE27A). Verify: GRAB_VICTIM_EXPECT=matches.
+[[data_port]]
+stage = 6
+name = "grab_hold_keyframes"
+src = 0x0C56AA
+len = 0x1D80
+orc = 0x0C4F3C
+dst = 0x092C4A
+dst_end = 0x094954
+dst_old_head = "0040011001e002b003800450052005f0"
+slot_ptr_table = 0xBE27A
+hole = "wide_ext"
+note = "grab-hold victim keyframes: row 0x10 <- H's own block (vs2 0x0C56AA), was char-0 alias 0x092C4A"
+
 # ══ 14z-71 THE BEAM: effect-CLASS row 16 ════════════════════════════════
 #
 # THE DEFECT, measured on both legs rather than reasoned about. Every

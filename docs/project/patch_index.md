@@ -88,6 +88,18 @@ one mechanism — landing `:f` alone moves the tables without fixing their
 byte image. `extra_tiles` and `data_port df_palette_seq_rows` are
 independent of both and of each other.
 
+## 14z-73 additions
+
+| patch / facility | what it does | since |
+|---|---|---|
+| `data_port grab_hold_keyframes` | the grab-victim HOLD placement. The capture positioner writes `victim_pos = attacker_pos ± facing-flipped keyframe (Xoff,Yoff)`, selecting a per-ATTACKER keyframe block via pointer table `0xBE27A[attacker_id]` (H reaches it through his ported clone `0xc9eb0`). vsavj row 0x10 aliased character 0's block (`0x092C4A`), so H held the victim with the wrong offsets (dx −27 vs native +74). Ports H's own vs2 block `0x0C56AA` (len `0x1D80`; orc-identical to vh2 `0x0C4F3C` through `0x1E1A`) into `wide_ext` and repoints row `0xBE2BA`. The exact twin of Donovan's `throw_victim_keyframes`; superset-safe (only the variant row moves). Guarded by `tests/test_hui_grab_victim.sh` (phase-tolerant relative-offset A/B, `matches` peak Δ=0) | 14z-73 |
+
+**Ordering / exclusivity note (14z-73):** `grab_hold_keyframes` is
+independent of every other patch — one variant-row repoint plus a placed
+block; the program fingerprint changes but no legacy path is touched
+(masked-v2 EXACT). It is the twin of `throw_victim_keyframes` on a
+different tenant and shares the same `slot_ptr_table` mechanism.
+
 ## Tooling
 
 `tools/patch_prg.py` applies the JSON op-list in 68k word-value space
