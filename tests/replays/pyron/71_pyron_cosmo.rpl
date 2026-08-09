@@ -1,0 +1,51 @@
+# pyron COSMO DISRUPTION (EX): 41236 + HOLD and RELEASE 2P/2K.
+# Maintainer-reported 14z-74: this move CRASHES / resets the game.
+#
+# THE MOVE COSTS A METER STOCK. With an empty meter the EX pair is
+# downgraded to a single button and nothing fires — the trap that cost
+# three sessions on Dark Force and the Erasing Sphere. So the runner MUST
+# poke the stock count ($FF8509) before the attempt, exactly as
+# 72_hui_ex_es.rpl does, or this replay measures nothing:
+#   POKES="1400:ff8782:11;1450:ff8782:11;1500:ff8782:11;3000:ff8509:03;3020:ff8509:03"
+#
+# P1 starts on the left facing right, so back = L and forward = R;
+# 41236 = L -> DL -> D -> DR -> R. Then hold the two-button pair and
+# release it. Two attempts (the seq dispatch can eat a frame-pinned
+# input): the first with 2K (45), the second with 2P (12), so one replay
+# covers both of the maintainer's reported inputs.
+#
+# TIMING (measured 14z-74): the match goes live ~f3000 but the round
+# intro runs past it — inputs before ~f3300 do nothing. Attempts start at
+# 3400 and repeat every 400 frames, the same cadence as 72_hui_ex_es.
+300-305 sys=C1
+800-803 sys=S1
+1700-1702 p1=1
+# ── attempt 1: 41236 + hold 45 (2K), release
+3400-3402 p1=L
+3403-3405 p1=DL
+3406-3408 p1=D
+3409-3411 p1=DR
+3412-3414 p1=R
+3415-3455 p1=45
+# ── attempt 2: 41236 + hold 12 (2P), release
+3800-3802 p1=L
+3803-3805 p1=DL
+3806-3808 p1=D
+3809-3811 p1=DR
+3812-3814 p1=R
+3815-3855 p1=12
+# ── attempt 3: 41236 + hold 45 (2K), release
+4200-4202 p1=L
+4203-4205 p1=DL
+4206-4208 p1=D
+4209-4211 p1=DR
+4212-4214 p1=R
+4215-4255 p1=45
+# ── attempt 4: 41236 + hold 12 (2P), release
+4600-4602 p1=L
+4603-4605 p1=DL
+4606-4608 p1=D
+4609-4611 p1=DR
+4612-4614 p1=R
+4615-4655 p1=12
+5100 wait
