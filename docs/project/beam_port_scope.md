@@ -82,19 +82,56 @@ object's **effect TYPE** — indexing a 22-entry word table at `0x08D4A8`:
 So the beam is **effect type 7**. The dispatcher is likewise outside every
 ported root.
 
+## THE CHAIN, resolved (14z-70h) — where the two builds part company
+
+Walking down from the shared dispatcher, comparing both legs at each
+link. **Most of this path already exists on our build**, which is the
+good news and it shrinks the port considerably:
+
+| link | native | ours | status |
+|---|---|---|---|
+| effect-type reader | `0x093080` (950 reads) | `0x0844F4` (950) | **shared** |
+| its dispatch table | `0x093088`, 32 entries | `0x0844FC`, 32 entries | **shared, same shape** |
+| entry #2 target | `0x093442` | `0x08471A` | **shared** — byte-identical for 0x1C bytes, both ending `jmp` to the paired engine tail (`$01581A` <-> `$0170D2`) |
+| the next routine | **`0x093460`** | **absent** | **vs2-only** |
+| beam machine | `0x0934A8` | absent | **vs2-only** |
+
+The vs2-only routine is four instructions:
+
+```
+093460  movea.w 0x30(A6),A4      ; the OWNER pointer -> A4
+093464  move.b  0x04(A6),D0      ; effect type
+093468  move.w  (0x06,pc,D0.w),D1
+09346C  jmp     (0x02,pc,D1.w)   ; table 0x093470, #22 -> the beam machine 0x0934A8
+```
+
+That `movea.w 0x30(A6),A4` is why the machine's id gate works: A4 is the
+OWNER, so `move.b 0x382(A4),D0` reads the owner's character id.
+
+Runtime confirmation of exactly this split: watching READS of the
+effect-type byte `$FFD404`, native shows **950 from the shared reader
+`0x093080` plus 60 from the vs2-only `0x093468`**; ours shows **950 from
+`0x0844F4` and nothing else**. Our build walks the shared path every
+frame and simply has nowhere to go for the beam.
+
+**Consequence for the port — it is smaller than first scoped.** We do NOT
+need to port the outer dispatcher or the type-2 routine; both exist. We
+need the vs2-only routine at `0x093460` (a handful of bytes plus its
+32-entry table at `0x093470`), the beam machine `0x0934A8` (0x36), and
+whatever the machine's closure pulls in. The hook is a single
+owner-gated diversion at the tail of the shared routine.
+
 ## OPEN — must be resolved before building
 
-**A. Where is vsavj's twin of the outer dispatcher, and what does its
-type-7 entry point to?** This decides the whole shape of the fix:
-- if vsavj's entry #7 is **dead/unused**, we repoint it at the ported
-  machine — tenant-only by construction, exactly the 14z-67 precedent
-  where ids 0x4E-0x53 "read ZERO on vsavj";
-- if it is **live**, the hook must be an owner-gated `site_thunk` so
-  legacy behaviour is untouched.
-
-Not resolvable by pattern search: the dispatch idiom
-(`102e0004 323b0006 4efb1002`) occurs **348 times** in vs2. Use the R1
-map / `reconcile_batch.py`.
+**A. RESOLVED by the chain table above** — and NOT the way it was
+framed. There is no dead entry to repoint: the shared dispatcher and its
+type-2 routine exist on both legs and are byte-identical, so the
+divergence is a vs2-only routine that follows them. The hook is therefore
+an **owner-gated diversion**, not a table edit: only objects whose owner
+(`0x30(A6)` -> `+0x382`) is the tenant may take the new path, so legacy
+dispatch is untouched by construction. Still to determine: exactly where
+that diversion is safest to place, and how the vs2-only routine is
+ENTERED on native (candidate `jmp 0x0930D6` table `0x0930DA`).
 
 **B. RESOLVED — and it corrected the premise (see the correction above).**
 The object exists and is stamped identically on both legs; nothing writes
