@@ -10800,6 +10800,28 @@ Original write-up kept below.
 
 ## Decisions pending (human)
 
+- **IF `anim` CANNOT LEAVE THE CRYPT WINDOW — the fallback order is set
+  (maintainer, 2026-08-10).** Framing recorded verbatim in effect: *"we'll see
+  if and how we can grow the crypt window and still have everything work, or
+  if we need to cut down access to a character (in which case I'll leave Pyron
+  aside, but that's kind of a last resort)"*.
+
+  So the ladder, best to worst:
+  1. **Make `anim` movable** — root-cause the odd pointer. If this works, no
+     decision is needed at all, which is why it is the active task.
+  2. **Grow the crypt window in the WIDE profile.** A profile change, so
+     maintainer-approved by construction, and it must be shown not to break
+     anything (the profile's whole justification is the emulator superset
+     invariant — `tests/test_wide_profile.sh` / `test_mame_wide.sh` are the
+     gates, plus `test_crypt_boundary.sh` since the window's EDGE is what
+     would move). Deficit to cover if nothing else changes: **125,560 bytes**.
+  3. **Ship two tenants, Pyron aside.** Explicitly a LAST RESORT. Note the
+     measured irony: Pyron's reach-constrained set is **0 bytes** — he is the
+     cheapest tenant on every axis except his `anim` (111,872). Dropping any
+     one tenant frees roughly its own anim, so on space grounds alone the
+     choice between them is close to arbitrary; it is a roster decision, not
+     an engineering one.
+
 - ~~**THE MERGED BUILD'S `[init_shim]`: ONE SHIM, THREE TENANTS (14z-77)**~~
   **DECIDED 2026-08-10 (maintainer): the recommendation below, in full** —
   adopt phase mode, dispatch flavor per id, gate the write so Pyron stays
