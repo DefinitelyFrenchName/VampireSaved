@@ -218,7 +218,8 @@ def merge_manifests(docs):
                 if _same_row(cur, val):
                     cur["_owner"] = None
                 elif key in _SINGLETON_MERGE:
-                    merged[key], why = _SINGLETON_MERGE[key](cur, val)
+                    merged[key], why = _SINGLETON_MERGE[key](
+                        cur, val, {"tenant_ids": tenant_row_ids(docs)})
                     collisions += why
                 else:
                     collisions.append(
@@ -296,7 +297,27 @@ def _who(row):
     return row.get("_owner") or "shared"
 
 
-def merge_init_shim(a, b):
+def tenant_row_ids(docs):
+    """Every id a tenant of these documents could occupy (M3b slice H).
+
+    Both the plain `id` and every `id_by_profile` value, because the merge
+    runs before the profile picks between them. Used to decide whether a
+    difference sits on a row some tenant OWNS — and will therefore be
+    overwritten — or on a vanilla row, where a difference is a real
+    disagreement.
+    """
+    ids = set()
+    for doc in docs:
+        for t in doc.get("tenant") or []:
+            if "id" in t:
+                ids.add(_int(t["id"]))
+            for kv in str(t.get("id_by_profile", "")).split(","):
+                if kv.strip():
+                    ids.add(_int(kv.partition("=")[2].strip()))
+    return ids
+
+
+def merge_init_shim(a, b, ctx=None):
     """Merge two `[init_shim]` declarations (M3b slice G, MAINTAINER-RATIFIED
     2026-08-10). Returns (merged, collisions).
 
@@ -351,7 +372,46 @@ def _flavor_of(shim):
                                  _int(shim.get("flavor_held", 0)))}
 
 
-_SINGLETON_MERGE = {"init_shim": merge_init_shim}
+def merge_table_fix(a, b, ctx=None):
+    """Merge two `[table_fix]` declarations (M3b slice H). -> (merged, why).
+
+    `rows_hex` is the VANILLA vsavj OBJ bank table, and the generator writes
+    each tenant's own row over it from that tenant's declared `gfx_bank`. So
+    the three manifests differ only where a tenant baked its own row into the
+    baseline as well — positions the generator overwrites regardless.
+
+    That makes the union safe, but ONLY at those positions: a difference
+    anywhere else means the two files disagree about a VANILLA row, which no
+    later write would correct. Those stay collisions.
+
+    The word index of a differing position is the character ID whose row it
+    is, which is what lets this be checked rather than assumed.
+    """
+    why = []
+    for k in ("region", "pad_len", "table_off", "stage"):
+        if a.get(k) != b.get(k):
+            why.append(f"[table_fix]: {_who(a)} and {_who(b)} disagree on "
+                       f"'{k}' ({a.get(k)!r} vs {b.get(k)!r})")
+    ra, rb = a.get("rows_hex", ""), b.get("rows_hex", "")
+    if len(ra) != len(rb):
+        why.append(f"[table_fix]: {_who(a)} and {_who(b)} declare tables of "
+                   f"different length ({len(ra) // 4} vs {len(rb) // 4} rows)")
+        return dict(a, _owner=None), why
+    owned = (ctx or {}).get("tenant_ids") or set()
+    for i in range(0, len(ra), 4):                    # one word = one row
+        if ra[i:i + 4] != rb[i:i + 4] and (i // 4) not in owned:
+            why.append(
+                f"[table_fix]: {_who(a)} and {_who(b)} disagree on bank-table "
+                f"row {i // 4:#04x} ({ra[i:i+4]} vs {rb[i:i+4]}) — the "
+                f"generator only overwrites a row a TENANT owns, so this one "
+                f"would ship whichever file happened to win")
+    out = dict(a)
+    out["_owner"] = None
+    out["note"] = "merged vanilla bank table; tenant rows written per tenant"
+    return out, why
+
+
+_SINGLETON_MERGE = {"init_shim": merge_init_shim, "table_fix": merge_table_fix}
 
 
 def flavor_write(default, held, flav_d, hold_flag, mid=b""):
@@ -1256,21 +1316,28 @@ def main():
                 # were placed in. That coincidence dies the moment the tenant
                 # moves — row 0x13's vanilla value is 0x2000 — so make it
                 # explicit rather than inherited.
-                _tid = _int(port["port"]["dst_slot"])
-                _tbank = _int(port["port"].get("gfx_bank", 2))
+                # Slice H: a row per TENANT, not one for the build. The
+                # region is shared (all three declare x026142), so under the
+                # loop it is placed once and this one table must carry every
+                # tenant's bank word. Reading `T`/`_tenants` rather than
+                # `port["port"]` also closes the same latent trap slice E
+                # found: that dict stays `_tenants[0]` forever.
                 from gfx_tiles import bank_word as _bw
-                if (_tid + 1) * 2 <= len(rows):
+                for _ten in (port.get("_tenants") or [T]):
+                    _tid = _int(_ten["dst_slot"])
+                    _tbank = _int(_ten.get("gfx_bank", 2))
+                    if (_tid + 1) * 2 > len(rows):
+                        fail.append(f"table_fix: tenant id {_tid:#04x} is "
+                                    f"beyond the {len(rows) // 2}-row bank "
+                                    f"table; the table must be widened "
+                                    f"before a tenant can live there")
+                        continue
                     _was = int.from_bytes(rows[_tid * 2:_tid * 2 + 2], "big")
                     rows[_tid * 2:_tid * 2 + 2] = _bw(_tbank).to_bytes(2, "big")
                     notes.append(f"# {name}+{toff + _tid * 2:#x}: bank table "
                                  f"row {_tid:#04x} <- {_bw(_tbank):#06x} "
                                  f"(bank {_tbank}, WIDE encoding; vanilla row "
                                  f"was {_was:#06x}) — tenant-driven")
-                else:
-                    fail.append(f"table_fix: tenant id {_tid:#04x} is beyond "
-                                f"the {len(rows) // 2}-row bank table; the "
-                                f"table must be widened before a tenant can "
-                                f"live there")
                 blob[toff:toff + len(rows)] = bytes(rows)
                 notes.append(f"# {name}+{toff:#x}: table_fix {len(rows)} "
                              f"bytes ({tf['note']})")

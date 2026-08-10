@@ -82,9 +82,9 @@ print("== 3: the collision inventory is EXACTLY the known set ==")
 # build by construction (a variant id requires the profile), so those rows
 # never take the value they disagree about.
 EXPECT = [
-    # [init_shim] was the third blocker until slice G merged it (ratified).
-    "[table_fix]: huitzil and donovan declare DIFFERENT singleton tables",
-    "[table_fix]: pyron and donovan declare DIFFERENT singleton tables",
+    # [init_shim] was a blocker until slice G merged it (maintainer-ratified);
+    # [table_fix] until slice H. THERE ARE NOW ZERO REAL BLOCKERS — every
+    # remaining entry is base-track-only and dissolves on a WIDE build.
 ]
 # base-track-only: reported, but not a merge blocker. Each MUST carry the
 # dissolves-on-WIDE wording — if one ever stops doing so, the tenants have
@@ -102,7 +102,7 @@ SOFT = [
 ]
 EXPECT = EXPECT + SOFT
 eq("real blockers (non-base-track)",
-   sum(1 for c in coll if "BASE-TRACK ONLY" not in c), 2)
+   sum(1 for c in coll if "BASE-TRACK ONLY" not in c), 0)
 for c in coll:
     if c.startswith("[[port_patch]]") and "BASE-TRACK ONLY" not in c:
         bad.append("port_patch collision is no longer base-track-only, so it "
@@ -169,6 +169,37 @@ if not bad:
     print("  ok: phase wins, flavor per owner, Pyron unwritten by")
     print("      construction, N=1 byte-identical, N=2 chain verified")
 
+print("== 3c: [table_fix] merges by per-row union (slice H) ==")
+from gen_donovan_patch import merge_table_fix, tenant_row_ids
+ids = tenant_row_ids(docs)
+eq("tenant row ids", ids, {0x0F, 0x10, 0x11, 0x13})
+# rows_hex is the VANILLA bank table; the generator writes each tenant's own
+# row over it. So differences ON A TENANT'S ROW are safe (overwritten), and
+# the merged baseline is the vanilla one.
+eq("merged rows_hex is the vanilla baseline",
+   m["table_fix"]["rows_hex"], docs[0]["table_fix"]["rows_hex"])
+eq("table_fix is shared after merge", m["table_fix"]["_owner"], None)
+# ...and a difference on a row NO tenant owns must still collide, because
+# nothing downstream would correct it.
+base = {"table_fix": {"region": "r", "table_off": 0, "pad_len": 0,
+                      "rows_hex": "6000" * 24, "_owner": "x"}}
+oth  = {"table_fix": {"region": "r", "table_off": 0, "pad_len": 0,
+                      "rows_hex": "6000" * 5 + "1000" + "6000" * 18,
+                      "_owner": "y"}}
+_, cA = merge_table_fix(base["table_fix"], oth["table_fix"],
+                        {"tenant_ids": {5}})
+eq("differing row a tenant OWNS is permitted", len(cA), 0)
+_, cB = merge_table_fix(base["table_fix"], oth["table_fix"],
+                        {"tenant_ids": {0x13}})
+eq("differing row NO tenant owns collides", len(cB), 1)
+_, cC = merge_table_fix(base["table_fix"],
+                        dict(oth["table_fix"], rows_hex="6000" * 12),
+                        {"tenant_ids": {5}})
+eq("different table LENGTH collides", len(cC), 1)
+if not bad:
+    print("  ok: vanilla baseline kept, tenant rows deferred to the")
+    print("      generator, non-tenant differences still collide (3 controls)")
+
 print("== 4: verdict controls — the merge must NOT be permissive ==")
 # 4a. a differing singleton MUST collide (not silently pick one)
 a = {"table_fix": {"rows_hex": "aa", "_owner": "x"}}
@@ -205,5 +236,5 @@ sys.exit(1 if bad else 0)
 PY
 
 echo "PASS: manifest merge (inert at one file, frozen dedup shapes, the exact"
-echo "      11-collision inventory (2 real blockers), the ratified [init_shim]"
-echo "      merge, and 4 permissiveness controls)"
+echo "      9-collision inventory (ZERO real blockers), the ratified"
+echo "      [init_shim] merge, the [table_fix] union, and 7 controls)"

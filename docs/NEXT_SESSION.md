@@ -245,10 +245,9 @@ manifests: `[[space]]` 9→3, `[[obj_hook]]` 6→2, `[[select_wheel]]` 3→1,
 90→87, `[[code_word]]` 13→11, `[[pcrel_escape_fix]]` 7→5 — and 12 collisions,
 in **two classes**:
 
-**TWO REAL BLOCKERS** (was three; `[init_shim]` was merged by slice G).
-`[table_fix]` twice (D vs H, D vs P) — `rows_hex` differs by exactly the
-tenant's own OBJ bank row, so the resolution is a per-row UNION and it is
-purely mechanical. It is a TOML singleton, so the schema cannot express two.
+**ZERO REAL BLOCKERS** (was three: `[init_shim]` merged by slice G,
+`[table_fix]` by slice H). Nine collisions remain and every one is
+base-track-only.
 
 **SIX THAT DISSOLVE.** The `x05c800` / `x088512` `port_patch` rows: Donovan
 writes the host band's word where H/P write a no-op — **but all three agree on
@@ -270,6 +269,13 @@ category.
   declaring tenant emits today's exact 46 bytes, which is what keeps the
   frozen references bit-exact. Pyron declares no shim, gets no entry, and so
   receives NO flavor write — by construction.
+
+- **Slice H** (14z-77) — `[table_fix]` by per-row UNION. `rows_hex` is the
+  vanilla bank table and the generator writes each tenant's row over it, so
+  differences on a row a tenant OWNS are safe; a difference on any other row
+  still collides. The emitter now writes a row per TENANT, not one for the
+  build — region `x026142` is declared by all three, so under the loop it is
+  placed once and must carry every tenant's bank word.
 
 ### TWO OPEN MEASUREMENTS BEFORE THE FIRST MERGED BUILD IS TRUSTED
 

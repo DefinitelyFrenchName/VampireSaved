@@ -489,6 +489,31 @@ payload must collide; same span + same payload must dedup).
 is at **0x8b100**; `0x8b0f8` is byte-identical across all three files and
 dedups as shared. The gate failed on it, which is the gate working.
 
+### 14z-77f — slice H: `[table_fix]` by per-row union — ZERO real blockers
+
+`rows_hex` is the VANILLA vsavj OBJ bank table, and the generator already
+writes each tenant's own row over it from that tenant's declared `gfx_bank`.
+So the three manifests differ only where a tenant ALSO baked its own row into
+the baseline — positions the generator overwrites regardless. That is what
+makes the union safe, and `merge_table_fix()` checks it rather than assuming
+it: the word index of a differing position IS the character id whose row it
+is, so a difference on a row **no tenant owns** stays a collision, because
+nothing downstream would correct it.
+
+`tenant_row_ids()` supplies the owned set — both the plain `id` and every
+`id_by_profile` value, since the merge runs before the profile picks between
+them. Measured on the three manifests: `{0x0F, 0x10, 0x11, 0x13}`.
+
+The emitter now writes a row **per tenant** rather than one for the build.
+Region `x026142` is declared by all three, so under the loop it is placed once
+and that one table must carry every tenant's bank word. It also reads
+`_tenants`/`T` instead of `port["port"]` — the same latent trap slice E found
+in two other places.
+
+**The merged manifest now has ZERO real blockers.** Nine collisions remain and
+every one is base-track-only: the tenants disagree on a value a WIDE build
+never takes, and a merged build is a WIDE build by construction.
+
 ### 14z-77e — slice G: the ratified `[init_shim]` merge
 
 Maintainer approved the recommendation in full (2026-08-10). Implemented; the
