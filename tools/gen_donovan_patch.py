@@ -270,9 +270,23 @@ def main():
             _row["status"] = "verified"
             unstubbed.append((_st["name"], _v2, _vj))
 
-    dst_slot = _int(port["port"]["dst_slot"])
-    var_slot = dst_slot | 0x10
-    mirror = port["port"].get("mirror_variant", True)
+    # ── tenant identity (M3b slice B, 14z-76) ────────────────────────────────
+    # ONE source of truth. `T` is the build's tenant context (tenant_context());
+    # `row_ident()` derives the (row, mirror row, mirror?) triple that EVERY
+    # per-character table write needs, and takes an explicit tenant so a caller
+    # in the future N-tenant loop passes its own instead of closing over
+    # main()'s scope. The three scalars below stay as the derived view for the
+    # sites not yet converted — they are now consistent by construction rather
+    # than by three separate reads of the same dict.
+    T = (port.get("_tenants") or [port["port"]])[0]
+
+    def row_ident(tenant=None):
+        """(row, mirror_row, mirror?) for a tenant; defaults to this build's."""
+        tt = T if tenant is None else tenant
+        r = _int(tt["dst_slot"])
+        return r, r | 0x10, tt.get("mirror_variant", True)
+
+    dst_slot, var_slot, mirror = row_ident()
     # ── address-space model (Phase C) ────────────────────────────────────────
     # Placement used to be two hard-coded holes. It is now a declarative,
     # ORDERED list of spaces, because the roster does not fit in two holes and
@@ -389,23 +403,29 @@ def main():
         es = (t["span"] // 32) if t["kind"] == "byte2d" else (t["stride"] // 32)
         return _int(t["vsavj"]) + slot * es, es
 
-    def repoint(tname, value, what):
-        """poke32 a bank pointer entry at dst_slot (+ variant mirror)."""
-        a, es = table_entry_addr(tname, dst_slot)
+    def repoint(tname, value, what, tenant=None):
+        """poke32 a bank pointer entry at the tenant's row (+ variant mirror).
+
+        M3b slice B: row identity comes from `tenant` (default: this build's),
+        not from main()'s scalars — so every one of this function's call sites
+        is already correct when the N-tenant loop lands and passes its own.
+        """
+        _row, _var, _mir = row_ident(tenant)
+        a, es = table_entry_addr(tname, _row)
         assert es == 4
         ops.append({"op": "poke32", "addr": f"{a:#x}", "val": f"{value:#010x}"})
-        notes.append(f"poke32 {a:#08x} <- {value:#010x}  {tname}[{dst_slot:#x}] {what}")
-        if mirror:
-            av, _ = table_entry_addr(tname, var_slot)
+        notes.append(f"poke32 {a:#08x} <- {value:#010x}  {tname}[{_row:#x}] {what}")
+        if _mir:
+            av, _ = table_entry_addr(tname, _var)
             if vj_u32(av) != vj_u32(a):
-                fail.append(f"{tname}: slot {var_slot:#x} does not alias "
-                            f"{dst_slot:#x} in vanilla ({vj_u32(av):#x} vs "
+                fail.append(f"{tname}: slot {_var:#x} does not alias "
+                            f"{_row:#x} in vanilla ({vj_u32(av):#x} vs "
                             f"{vj_u32(a):#x}) — mirror assumption broken")
             else:
                 ops.append({"op": "poke32", "addr": f"{av:#x}",
                             "val": f"{value:#010x}"})
                 notes.append(f"poke32 {av:#08x} <- {value:#010x}  "
-                             f"{tname}[{var_slot:#x}] variant mirror")
+                             f"{tname}[{_var:#x}] variant mirror")
 
     def poke_bytes(addr, data, what):
         """Raw bytes at addr; odd-aligned edges are merged with vanilla
