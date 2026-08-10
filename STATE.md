@@ -14,7 +14,7 @@ tables alias rows 0x10-0x1F onto 0x00-0x0F, so Pyron ran a base-half
 character's animated-palette handler. THREE such tables, not one: the
 maintainer's playtest of pyron16 found the blink still alive on the SELECT
 screen and the ROUTE MAP, because the first fix covered only the in-match
-dispatcher. build/pyron17 (5dc6da06) is MAINTAINER-CONFIRMED clean — no blink in select or the route map, no regression surfaced — and is ready to freeze on the maintainer's word. 14z-74's confounded "543 vs 0" figure is
+dispatcher. build/pyron17 (5dc6da06) is MAINTAINER-CONFIRMED visually clean. **THE FREEZE WAS ATTEMPTED AND STOPPED**: pyron17 fails the vanilla-legacy basis on 3 of 13 masked replays with a SECOND divergence that never re-converges. Pre-existing (identical on pyron14), not port_param32, and Pyron-specific (huitzil-m2 is clean on the same replay). CLAUDE.md rule 6: that is now the only task. 14z-74's confounded "543 vs 0" figure is
 RETRACTED, and one of MY OWN eliminations was wrong and is corrected
 below. Read docs/NEXT_SESSION.md first.)
 
@@ -143,7 +143,52 @@ No hook, no cycles, nothing to ratify. Cost: decode the type-2 format
 from its handler (`0x01B234`), write the transform, and accept that the
 flattened list is authored data the sibling oracle cannot check.
 
-## Session 14z-75 — Pyron's HUD ART placed; the BLINK root-caused and frozen
+## Session 14z-75 — BLOCKING: pyron17 fails the vanilla-legacy basis
+## (freeze attempted, STOPPED — rule 6)
+
+**THE FREEZE DID NOT HAPPEN.** The set was built (42 `.sha1` + 13 `.masked` +
+17 `.skip` = 72/72, freeze pass clean, no nondeterminism) and the verification
+pass then failed on three legacy replays. The registry row is WITHHELD;
+`tests/expected/pyron-m1/NOT_RATIFIED.md` carries the full measurement.
+
+| replay | expected | measured |
+|---|---|---|
+| `01_attract_long` | `exact` | live state diverged |
+| `05_timeout_idle` | `window 889 1675` | 2 runs: `889..1675` **and `4024..12120`**, 0 identical after |
+| `07_mash_storm` | `window 889 1675` | 2 runs: `889..1675` and `2241..4320`, 0 identical after |
+
+10 of 13 masked classes — including every `composite` — pass unchanged.
+The first run in each failure IS the ratified select window and re-converges
+cleanly (05: 2348 bit-identical frames). The SECOND divergence never
+re-converges, which under §4 means match state was touched.
+
+**Established by measurement, so nobody re-derives it:**
+- **Pre-existing.** pyron14 measures the byte-identical shape. It predates
+  this session and both maintainer playtests.
+- **NOT `port_param32`.** A build with the flag off measures identically —
+  which independently re-confirms 14z-74's retraction on a much longer
+  replay than the one that retraction used.
+- **Pyron-specific.** huitzil-m2 on the same replay: ONE run (the select
+  window), then **10,446 bit-identical frames**.
+- **Same matchup on both legs** (P1 0x01, P2 0x0E) — not a cursor landing
+  on a different character.
+- RAM diff at onset frame 4024 (38 live bytes): the P1 fighter block plus
+  **`$FFBF00-$FFBF3x`, an EFFECT-PIECE POOL slot** (`$FFB800-$FFBFFF`) that
+  is all zeros in vanilla and populated in ours. We allocate an effect piece
+  vanilla never allocates. By f4100: 1007 live bytes over ~260 ranges.
+
+**Prime suspects, untested:** the two `[[obj_hook]]` type-dispatch unions
+(`0x54470` / `0x5E542`) and `alloc_wrap` — Huitzil's build does not carry
+them in the same shape.
+
+**A LESSON ABOUT THIS SESSION'S OWN PROCESS:** every gate I ran was
+tenant-scoped (blink, HUD, cosmo, empty tiles, layout), and all were green
+while a legacy replay diverged permanently. The vanilla-legacy suite is the
+gate that would have caught it, and it had never been run against a Pyron
+build — Pyron was never frozen, so no expectation set existed. **Run
+`run_suite.sh` against a tenant build EARLY, not at freeze time.**
+
+## Session 14z-75 — Pyron's HUD ART placed; the BLINK root-caused and fixed
 
 **1. HUD — DONE (build/pyron15, `3fb71586`).** 14z-74 ported the three
 variant-id table entries and left the plate BLANK because nothing placed his

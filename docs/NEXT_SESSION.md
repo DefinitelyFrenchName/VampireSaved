@@ -1,7 +1,37 @@
 # NEXT SESSION — orientation (written at the close of 14z-75, 2026-08-10)
 
-**Session goal: finish Pyron's rung.** His HUD and his BLINK are both DONE.
-TWO items remain open.
+**SESSION GOAL: the legacy divergence. Nothing else until it is green.**
+
+**BLOCKING (CLAUDE.md rule 6).** pyron17 fails the vanilla-legacy basis on
+`01_attract_long`, `05_timeout_idle`, `07_mash_storm`. 05 and 07 carry a
+SECOND divergence (05: frames `4024..12120`) that NEVER re-converges — under
+§4 that means match state was touched. The freeze was attempted and STOPPED;
+the registry row is withheld. Full measurement:
+`tests/expected/pyron-m1/NOT_RATIFIED.md`.
+
+Already established, do not re-derive: it is **pre-existing** (pyron14 is
+byte-identical), **not `port_param32`** (measured with the flag off),
+**Pyron-specific** (huitzil-m2 is ONE select window then 10,446 identical
+frames), and the **same matchup** runs on both legs. At onset f4024 the diff
+is the P1 fighter block plus `$FFBF00-$FFBF3x` — an **effect-piece pool slot**
+vanilla leaves zeroed. Suspects: the two `[[obj_hook]]` unions
+(`0x54470`/`0x5E542`) and `alloc_wrap`.
+
+**Reproduce in one command:**
+```sh
+ROMDIR=... MAME_ROMPATH="$PWD/build/pyron17/rompath;$ROMDIR" \
+MASK_RANGES=043c-043d,4182-41a2,41c2-41e2,4222-4262,7f00-8000 \
+  tools/run_replay_mame.sh vsavjw tests/replays/05_timeout_idle.rpl out.log
+# then diff out.log against tests/expected/vsavj/masked-v2/logs/05_timeout_idle.log
+```
+
+**PROCESS LESSON: run `run_suite.sh` against a tenant build EARLY.** Every
+tenant-scoped gate was green while this was broken; the vanilla-legacy suite
+is the only thing that sees it, and it had never been pointed at a Pyron
+build because Pyron was never frozen.
+
+His HUD and his BLINK are both DONE and maintainer-confirmed. Two cosmetic
+items also remain open.
 
 **Current build: `build/pyron17` (`5dc6da06`) — this is the one to
 playtest.** Not frozen. Run it:
