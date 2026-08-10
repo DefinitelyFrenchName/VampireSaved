@@ -13,7 +13,32 @@ ROMDIR=... MAME_BIN=~/.cache/vampire-saved/mame/cps2 \
 MAME_ROMPATH="build/pyron20/rompath;$ROMDIR" tests/run_suite.sh vsavjw
 ```
 
-**So M3b — merging the three into one build — is the next milestone.**
+**So M3b — merging the three into one build — is the next milestone**, and it
+is PLANNED (14z-76). Read `docs/project/M3b_plan.md` for the original, but
+note its phase order was overtaken: Phase 0 and Phase 1 are DONE, Phase 3's
+measurement is done and ratified, and Phases 4/5 (H and P content) landed
+through the SINGLE-tenant generator per ratified decision D4. **The whole
+remaining milestone is Phase 2 — the multi-tenant generator — plus Phase 3's
+implementation.** Phase 6 (arcade ladder, VS-pool) is OUT OF SCOPE by
+maintainer decision (2026-08-10); it becomes its own milestone and D3 stays
+open.
+
+**The standing gate is `tests/test_m3a_reproducible.sh`, extended 14z-76 from
+two frozen targets to all FOUR** (m5_stock, donovan-m3a, huitzil-m2,
+pyron-m2). Run it after every machinery commit. Its value scales with the
+count: the refactor must leave three independent tenant fingerprints
+untouched, so each frozen vertical is an independent oracle over the same
+change — the payoff of D4's "freeze each vertical first, then merge".
+
+Measured blast radius for Phase 2: `gen_donovan_patch.py` has ONE binding of
+tenant identity (`dst_slot` at :251) and **37 read sites** closing over it —
+14 table-row, 9 gating, 4 baked into emitted machine code (the silent class),
+1 select-cell ownership, 1 output naming. The allocator itself composes
+correctly; the hazards are `placed`/memo dicts keyed by address not
+(tenant, address), five engine sites all three tenants patch identically
+(0x5FCE0 / 0x6C0E0 / 0x5F328 / 0x5F146 / 0x5F1B6 — these need ONE thunk
+dispatching on N ids), and `[table_fix]`, which must MERGE rows rather than
+dedup.
 
 ---
 
