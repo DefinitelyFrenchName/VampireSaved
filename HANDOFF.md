@@ -445,6 +445,25 @@ tests/test_tenant_id.sh               # the tenant id is a BUILD INPUT: resoluti
                                       # (asserted by no test before this; the loop
                                       # slice deletes the refusal and flips it).
                                       # Pure functions, no ROMs, no emulator. ~1s
+tests/test_tenant_row_owner.sh [ex]   # 14z-77 (M3b slices C+D): is the row-OWNER
+                                      # threading LOAD-BEARING? Every slice of the
+                                      # multi-tenant refactor is INERT by design, so
+                                      # a threading accidentally DISCONNECTED from
+                                      # the emitted ops leaves the four fingerprints
+                                      # unchanged too and reads as a success. This
+                                      # gate perturbs ONE owner-derived row at a time
+                                      # and requires patch.json to change. 7 sites.
+                                      # Runs the GENERATOR ALONE against an existing
+                                      # extract dir (default build/m5_wide/extract,
+                                      # SKIPs without one), so each control costs
+                                      # seconds not a 4-min four-target rebuild.
+                                      # Verdict logic ground-truthed: it perturbs an
+                                      # intentionally UNUSED binding and requires the
+                                      # checker to call it DEAD. Edits the generator
+                                      # in place; trap restores on EXIT/INT/TERM and
+                                      # a section asserts byte-identity. ~9s. Run it
+                                      # WITH test_m3a_reproducible.sh on every M3b
+                                      # machinery commit — opposite questions
 tests/test_tenant_select_records.sh   # M3a select-records mechanism (14z-62): a
                                       # variant-id build carries the tenant's OWN six
                                       # select records (space-model allocations, six

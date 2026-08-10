@@ -385,17 +385,41 @@ def main():
         return r, r | 0x10, tt.get("mirror_variant", True)
 
     def owner_of(row):
-        """The tenant context that owns a manifest row (M3b slice C).
+        """The tenant context that owns a MANIFEST row (M3b slice C).
 
-        Every GATE below asks this rather than testing `dst_slot`, so it is
-        already asking the right question when the N-tenant loop lands. The
-        row ARITHMETIC (table rows, thunk bodies) still reads the derived
-        scalars — that is the next slice, and the loop must not land before
-        both are converted.
+        Every gate (slice C) and every manifest-row table address (slice D)
+        asks this instead of the `dst_slot` scalar, so both are already
+        asking the right question when the N-tenant loop lands.
         """
         return row_owner(row, port.get("_tenants") or [], T)
 
+    # WHAT STILL READS THE SCALARS, and why it is not an oversight (slice D).
+    # The remaining reads split into three classes, and only the first is
+    # answerable by `owner_of()` — the other two have no manifest row to ask:
+    #
+    #   EXTRACTION-SIDE — driven by `man` (regions.json) and the region
+    #     blobs, which are the output of ONE tenant's extraction. Under the
+    #     loop these are per-iteration data, not shared rows, so they are
+    #     correct the moment the loop rebinds `T`. That rebinding belongs to
+    #     the REGION-IDENTITY slice (M3b_plan Phase 2 item 2: key regions by
+    #     (src_set, src_addr, len) so a shared span is placed once).
+    #     Sites: the stage-1 scaffold/trampolines, the OBJ bank-table region
+    #     fixup, `man["values"]` rows, `engine_dispatch`'s alias probe.
+    #
+    #   BAKED INTO EMITTED MACHINE CODE — `charid_sites`, the win-pal thunk
+    #     rebase, TT/TU substitution, the overlay T-select thunk. Each bakes
+    #     ONE id into ONE code fragment; N tenants need either N fragments or
+    #     an N-way compare chain, which is a design decision rather than a
+    #     mechanical edit. This class fails SILENTLY, so it lands last and
+    #     alone.
+    #
+    #   OUTPUT NAMING — `tenant.json`, which becomes an array with the loop.
     dst_slot, var_slot, mirror = row_ident()
+    # Slice D: the select CELLS every tenant occupies. The wheel skips a
+    # tenant's own cell because its P1/P2 rows come from that tenant's
+    # `select_records` host_ring row — true of each tenant independently,
+    # so this is a SET, not the build's one slot.
+    _tenant_cells = {_int(t["dst_slot"]) for t in (port.get("_tenants") or [T])}
     # ── address-space model (Phase C) ────────────────────────────────────────
     # Placement used to be two hard-coded holes. It is now a declarative,
     # ORDERED list of spaces, because the roster does not fit in two holes and
@@ -1913,7 +1937,8 @@ def main():
                             f"'row' — the row follows the tenant now "
                             f"(14z-62c); delete the key")
                 continue
-            prow = dst_slot
+            # Slice D: the row is the OWNING tenant's, not the build's.
+            prow, _pvar, _pmir = row_ident(owner_of(pal))
             if prow >= 0x10:
                 ta = _int(pal["table"]) + 4 * prow
                 aa = _int(pal["table"]) + 4 * (prow & 0x0F)
@@ -2728,12 +2753,11 @@ def main():
                 nfix += 1
             if not ok:
                 continue
-            # The GATE is the owner's (slice C); the row ARITHMETIC below
-            # still reads the build scalar `dst_slot` — that is the next
-            # slice's, and the N-tenant loop must not land before it moves.
             if spt is not None and _ovar:
-                row_at = spt + 4 * dst_slot
-                alias_at = spt + 4 * (dst_slot & 0x0F)
+                # Slice D: the repointed row is the OWNER's.
+                _orow = _int(_own["dst_slot"])
+                row_at = spt + 4 * _orow
+                alias_at = spt + 4 * (_orow & 0x0F)
                 if vj_u32(row_at) != vj_u32(alias_at):
                     fail.append(f"data_port {nm}: variant row {row_at:#x} "
                                 f"({vj_u32(row_at):#x}) does not alias its "
@@ -2757,11 +2781,11 @@ def main():
                 ops.append({"op": "poke32", "addr": f"{row_at:#x}",
                             "val": f"{pdst:#x}"})
                 notes.append(f"data   {pdst:#08x} +{ln:#x}  data_port {nm} "
-                             f"PLACED (tenant at {dst_slot:#04x}; host block "
+                             f"PLACED (tenant at {_orow:#04x}; host block "
                              f"{dst:#x} untouched) <- {man['src_set']} "
                              f"{src:#08x} ({nfix} fixes)")
                 notes.append(f"poke32 {row_at:#08x} <- {pdst:#x}  data_port "
-                             f"{nm} ptr-table {spt:#x} row {dst_slot:#04x}")
+                             f"{nm} ptr-table {spt:#x} row {_orow:#04x}")
                 fragments.append((pdst, ln, "VS2",
                                   f"data_port {nm} placed block "
                                   f"({man['src_set']} {src:#06x})"))
@@ -2826,7 +2850,7 @@ def main():
                             f"fixed 'ptr_row' — the row follows the tenant "
                             f"now (14z-62c); delete the key")
                 continue
-            ptr_row = dst_slot
+            ptr_row = _int(owner_of(st)["dst_slot"])   # slice D: the OWNER's
             ptr_at = _int(st["ptr_table"]) + ptr_row * 4
             old_ptr = vj_u32(ptr_at)
             if ptr_row >= 0x10:
@@ -3075,8 +3099,8 @@ def main():
                                     f"not a record")
                         continue
                     for _c, spec in newcells:
-                        if halves != "mirror" and _c == dst_slot:
-                            continue   # the tenant's P1/P2 rows are
+                        if halves != "mirror" and _c in _tenant_cells:
+                            continue   # a tenant's P1/P2 rows are
                                        # select_records host_ring's
                         row = hl + off + 4 * _c
                         ops.append({"op": "poke32", "addr": f"{row:#x}",
@@ -3432,7 +3456,6 @@ def main():
                  if row_applies(sr, owner_of(sr), only_variant=True)]
     if args.stage >= 6 and _sel_rows:
         import select_port as _selp
-        _src_char = _int(port["port"]["src_char"])
         src_data = (root / f"build/out/{man['src_set']}_data.bin").read_bytes()
 
         def _u16(b, o):
@@ -3447,6 +3470,11 @@ def main():
             if args.stage < _int(sr.get("stage", 0)):
                 continue
             nm = sr["name"]
+            # Slice D: this row's identity is its OWNER's — both the vsavj
+            # row it repoints and the vs2 SOURCE character it reads from.
+            _sown = owner_of(sr)
+            _srow = _int(_sown["dst_slot"])
+            _src_char = _int(_sown["src_char"])
             # art = "native_c5" (14z-62j, option A): the record keeps its
             # NATIVE vs2 tile codes and the art rides WIDE group C bank 5
             # at 0x10000+code — no placement map, no placeholders. The
@@ -3466,8 +3494,8 @@ def main():
                 if f"vj_{side}" not in sr:
                     continue
                 vj_base = _int(sr[f"vj_{side}"])
-                vj_row = vj_base + 4 * dst_slot
-                vj_alias = vj_base + 4 * (dst_slot & 0x0F)
+                vj_row = vj_base + 4 * _srow
+                vj_alias = vj_base + 4 * (_srow & 0x0F)
                 exp_alias = _int(sr[f"expect_vj_alias_{side}"])
                 vsrc = _u32(src_data, _int(sr[f"vs2_{side}"]) + 4 * _src_char)
                 bad = []
@@ -3498,7 +3526,7 @@ def main():
                                 "val": f"{ref_rec:#x}"})
                     notes.append(f"poke32 {vj_row:#08x} <- {ref_rec:#x}  "
                                  f"select_records {nm}/{side} array row "
-                                 f"{dst_slot:#04x} = the HOST row "
+                                 f"{_srow:#04x} = the HOST row "
                                  f"{ref_c:#04x} ring record VERBATIM "
                                  f"(host_ring; was {exp_alias:#x})")
                     continue
@@ -3570,7 +3598,7 @@ def main():
                              f"vs2's own{ph})")
                 notes.append(f"poke32 {vj_row:#08x} <- {rec_dst:#x}  "
                              f"select_records {nm}/{side} array row "
-                             f"{dst_slot:#04x} (was {exp_alias:#x}, the "
+                             f"{_srow:#04x} (was {exp_alias:#x}, the "
                              f"base-half alias)")
                 fragments.append((cl_dst, len(cl), "VS2",
                                   f"select_records {nm}/{side} coord list"))
@@ -3940,16 +3968,16 @@ def main():
             # old_hex documents the BASE-HALF slot's vanilla word; a
             # variant entry is anchored on being a vanilla alias of its
             # base-half counterpart instead.
-            # Slice C seam: this block's slot ARITHMETIC still reads the
-            # build scalar. It moves to row_ident(owner_of(cw)) in the
-            # scalar-reads slice, which must land before the N-tenant loop.
             if "slot_table" in cw:
+                # Slice D: the entry is the row OWNER's, and so is its
+                # mirror (a variant-id tenant has none).
+                _crow, _cvar, _cmir = row_ident(owner_of(cw))
                 stb = _int(cw["slot_table"])
                 sst = _int(cw.get("slot_stride", 4))
                 sof = _int(cw.get("slot_off", 0))
-                addr = stb + sst * dst_slot + sof
-                if dst_slot >= 0x10:
-                    alias = stb + sst * (dst_slot & 0x0F) + sof
+                addr = stb + sst * _crow + sof
+                if _crow >= 0x10:
+                    alias = stb + sst * (_crow & 0x0F) + sof
                     if opc_img_cw[addr:addr + 2] != opc_img_cw[alias:alias + 2]:
                         fail.append(f"code_word {nm}: variant entry at "
                                     f"{addr:#x} does not alias its base-half "
@@ -3960,8 +3988,8 @@ def main():
                                 f"!= old_hex ({opc_img_cw[addr:addr+2].hex()})")
                     continue
                 targets = [addr]
-                if cw.get("slot_mirror") and dst_slot < 0x10:
-                    targets.append(stb + sst * (dst_slot | 0x10) + sof)
+                if cw.get("slot_mirror") and _crow < 0x10:
+                    targets.append(stb + sst * _cvar + sof)
                 for a2 in targets:
                     ops.append({"op": "code", "addr": f"{a2:#x}",
                                 "hex": new.hex()})

@@ -194,32 +194,69 @@ them with no build, same reason as slice A's `tenant_context`):
 `manifest_owner`, `stamp_owner`, `row_owner`, `is_variant_tenant`,
 `row_applies`, `row_hex`; plus one `owner_of(row)` closure in `main()`.
 
-### NEXT SLICE — the scalar row ARITHMETIC
+- **Slice D** (14z-77) — the MANIFEST-ROW arithmetic follows the owner too:
+  palette table row, `select_records` array row **and its vs2 `src_char`**,
+  `data_port slot_ptr_table`, `sound_table ptr_row`, `code_word slot_table`
+  (+ its mirror), and the select-wheel's tenant-cell test, which became a SET
+  over all tenants rather than an equality against the build's one slot.
 
-Slice C converted the GATES and deliberately left the arithmetic. The seam is
-commented in the source at each site. Remaining:
+### THE REMAINING SCALAR READS ARE NOT ONE CLASS (slice D's finding)
 
-- `table_entry_addr()` on the bare scalars — `:489`, `:1870`, `:1894` are the
-  live ones (**the gap-table block at `:1908` is `if False`, dead since the
-  14w Felicia regression** — do not count its four calls);
-- the hand-rolled `base + stride*slot` sites: palettes `:1812-1815`,
-  `data_port slot_ptr_table` `:2630-2631`, `select_records` `:3356-3357`,
-  `code_word slot_table` `:3828-3842`. These use manifest-supplied strides, so
-  they need a sibling helper rather than `table_entry_addr()`.
+The plan assumed "7 `table_entry_addr()` reads, same mechanical shape as slice
+B". Reading them showed **three classes, and only one is answerable by
+`owner_of()`** — the other two have no manifest row to ask. The split is
+written into the source above `dst_slot`'s definition. Also: **four of those
+seven calls are DEAD** — the gap-table block is `for a_t in (man["auto_tables"]
+if False else [])`, disabled since the 14w Felicia triangle-jump regression.
+Do not budget for them.
 
-Same mechanical shape as slice B: thread `row_ident(owner_of(row))`.
+1. **EXTRACTION-SIDE** — driven by `man` (regions.json) and the region blobs,
+   i.e. the output of ONE tenant's extraction. Under the loop these are
+   per-iteration data, not shared rows, so they are correct the moment the loop
+   rebinds `T`. **This is the REGION-IDENTITY slice** (M3b_plan Phase 2 item 2:
+   key regions by `(src_set, src_addr, len)` so a shared span is placed once) —
+   and it is the one that also has to solve Donovan's 12 `x028122` relocations
+   rewriting shared bytes H/P do not declare. Sites: the stage-1
+   scaffold/trampolines, the OBJ bank-table region fixup, `man["values"]`,
+   `engine_dispatch`'s alias probe.
+2. **BAKED INTO EMITTED MACHINE CODE** — see below.
+3. **OUTPUT NAMING** — `tenant.json`, which becomes an array with the loop.
 
-Then, and deliberately last: the **4 sites baked into emitted machine code**
-(`charid_sites` `:916`, the win-pal thunk rebase `:3532-3533`, TT/TU
-substitution `:3613-3630`, the overlay T-select thunk `:3994-3997`). That class
-fails **silently** — a wrong tenant there yields a build that passes every
-structural check and is wrong in the ROM. Budget room to bisect: each step is a
-full four-target rebuild (~4 min).
+### NEXT SLICE — pick region identity (1) or the baked code (2)
 
-> **ORDERING INVARIANT (14z-77).** The N-tenant loop slice lands only after
-> gating AND scalar reads AND the baked-code sites are ALL owner-threaded.
-> Landing it earlier ships a build whose gates consult the row's owner while
-> its arithmetic consults tenant `[0]`.
+Region identity is the bigger one and unblocks shared-span dedup; the baked
+code is smaller but is the silent class. Either can go first.
+
+Deliberately last regardless: the **4 sites baked into emitted machine code**
+(`charid_sites` `:1049`, the win-pal thunk rebase `:3678`, TT/TU substitution
+`:3762`, the overlay T-select thunk `:4144` — line numbers as of 14z-77). Each
+bakes ONE id into ONE code fragment; N tenants need either N fragments or an
+N-way compare chain, which is a design decision, not a mechanical edit. That
+class fails **silently** — a wrong tenant there yields a build that passes
+every structural check and is wrong in the ROM. Budget room to bisect: each
+step is a full four-target rebuild (~4 min).
+
+> **ORDERING INVARIANT (14z-77).** The N-tenant loop lands only after all four
+> classes are converted: gating (C, done), manifest-row arithmetic (D, done),
+> extraction/region identity, and the baked-code sites. Landing it earlier
+> ships a build whose gates consult the row's owner while its arithmetic
+> consults tenant `[0]`.
+
+### The gate that makes an inert slice checkable
+
+`tests/test_tenant_row_owner.sh` (14z-77, ~9s, needs `ROMDIR` and an extract
+dir; SKIPs without one). The fingerprint gate proves the values did not move —
+which a threading accidentally **disconnected** from the emitted ops would also
+do. This one perturbs ONE owner-derived row at a time, running the GENERATOR
+ALONE against an existing extract dir, and requires `patch.json` to change.
+Seven sites, plus a negative control that perturbs an intentionally UNUSED
+binding and requires the checker to call it dead. **Run it with the fingerprint
+gate on every further M3b machinery commit** — the two answer opposite
+questions and neither substitutes for the other.
+
+It perturbs `tools/gen_donovan_patch.py` in place; the trap restores on EXIT/
+INT/TERM and section 3 asserts byte-identity independently (verified against a
+mid-run SIGINT).
 
 ## Carried into M3b — gate defaults point at intermediate builds
 

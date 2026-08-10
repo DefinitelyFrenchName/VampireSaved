@@ -1,7 +1,12 @@
 # STATE — living progress log
 
-Updated: 2026-08-10 (session 14z-77 — **M3b slice C: the gating family now
-asks the ROW'S OWNER, not the build's single `dst_slot`.** The manifest-schema
+Updated: 2026-08-10 (session 14z-77 — **M3b slices C and D: the gating family
+AND the manifest-row arithmetic now ask the ROW'S OWNER, not the build's single
+`dst_slot`.** Slice D also corrected the plan's premise: four of its seven
+named sites are DEAD code, and the rest are THREE classes, only one of which
+`owner_of()` can answer. New gate `tests/test_tenant_row_owner.sh` (~9s) answers
+the question no fingerprint can — is the threading load-bearing? — by
+perturbing one owner-derived row at a time. The manifest-schema
 question 14z-76 stopped on is ratified: **per-FILE ownership, stamped by the
 loader** — the merge adds tenants without editing a single manifest row, and
 each frozen vertical stays independently buildable as its own reproduction
@@ -338,6 +343,55 @@ truth table (both keys × both owner kinds, unkeyed, and section-declared), the
 directions** — which no test asserted at all before this. The loop slice
 deletes that refusal; a control that fires today and is flipped then is the
 honest record of when multi-tenant builds actually arrived.
+
+### 14z-77b — slice D: the manifest-row ARITHMETIC follows the owner too
+
+Converted: the palette table row; the `select_records` array row **and its vs2
+`src_char`** (a tenant-identity read that no prior count named); `data_port`'s
+`slot_ptr_table` row; `sound_table`'s `ptr_row`; `code_word`'s `slot_table`
+entry and its mirror; and the select-wheel's tenant-cell test, which becomes a
+**SET over all tenants** rather than an equality against the build's one slot —
+each tenant's own cell is skipped because that tenant's `select_records`
+host_ring row supplies its P1/P2 rows, which is true of each independently.
+Four fingerprints bit-exact.
+
+**THE PLAN'S PREMISE FOR THIS SLICE WAS WRONG, and the correction is the
+finding.** It read "7 `table_entry_addr()` reads, same mechanical shape as
+slice B". Reading them showed:
+
+- **four of the seven are DEAD** — the gap-table block is
+  `for a_t in (man["auto_tables"] if False else [])`, disabled since the 14w
+  Felicia triangle-jump regression;
+- the rest are **three classes, not one**, and only the manifest-row class is
+  answerable by `owner_of()`. The other two have no row to ask: the
+  EXTRACTION-SIDE sites are driven by `man`/region blobs (one tenant's
+  extraction output, correct the moment the loop rebinds `T` — that is the
+  region-identity slice, M3b_plan Phase 2 item 2), and the BAKED-CODE sites
+  bake one id into one fragment. The split is now written into the source
+  above `dst_slot`'s definition so the next session does not re-derive it.
+
+**NEW GATE `tests/test_tenant_row_owner.sh` (~9s).** Every slice of this
+refactor is inert by design, and that is precisely the hazard: a threading
+accidentally DISCONNECTED from the emitted ops leaves the four fingerprints
+unchanged too, and reads as a successful slice. So the fingerprint gate cannot
+answer "is this code path load-bearing?" — this one does, by perturbing ONE
+owner-derived row at a time and requiring `patch.json` to change. It runs the
+**generator alone** against an existing extract dir, which is what makes
+per-site controls cost seconds instead of a 4-minute four-target rebuild.
+
+Seven sites, all live: palette 243→241 ops, select_records 243→220, wheel
+243→245 (the two DUPLICATE pokes the skip exists to suppress), slice C's whole
+gating family 243→205, and data_port/sound_table/code_word changing op VALUES
+at a constant count. Its own verdict logic is ground-truthed: a section
+perturbs the intentionally-unused `_pvar` binding and REQUIRES the checker to
+call it dead — without which a checker that always said "live" would pass all
+seven. It edits the generator in place, so the trap restores on EXIT/INT/TERM
+and a section asserts byte-identity; verified by interrupting a run with
+SIGINT mid-flight.
+
+Note the instrument's own trap: the first interrupt check was **confounded** —
+it asked `git diff --quiet`, which can never be clean while the slice itself is
+uncommitted. Re-run against a snapshot instead.
 
 ### 14z-76c — M3b STARTED: the multi-tenant generator, slices A and B
 
