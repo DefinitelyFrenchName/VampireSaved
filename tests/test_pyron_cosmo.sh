@@ -31,7 +31,27 @@
 # all diverged from vanilla and NEVER re-converged. Removing this one word
 # restores all four to the ratified select-wheel window and nothing more.
 #
-# AND THE CRASH HAS NEVER BEEN REPRODUCED IN THIS HARNESS (measured 14z-75).
+# THE CRASH IS NOW REPRODUCED (14z-75, after the maintainer supplied the
+# recipe: hold the pair until the move ends by itself). See
+# tests/replays/pyron/80_pyron_cosmo_pairsweep.rpl — DETERMINISTIC watchdog
+# reset at f4840, and it reproduces IDENTICALLY on pyron14, pyron17 and
+# pyron18. That is the important part: **the withdrawn word never fixed the
+# Cosmo crash.** It was present in pyron14, the build where the fix was
+# declared maintainer-confirmed, and the revert did not cause it.
+#
+# SHAPE: it is a HANG, not an exception. Whole-RAM stops changing at f4770
+# (11 frames), resumes briefly, freezes again f4788-f4836, and the watchdog
+# clears work RAM at f4838. The crash guard sees nothing.
+# CONDITIONS measured: it needs MULTIPLE COMPLETED firings — one or two held
+# firings survive; the three-attempt sweep resets. The BUTTON PAIR matters:
+# LK+MK (45) never fires the move in this harness at all (stock never spent),
+# while MP+HP (23) and LP+HP (13) do.
+# INSTRUMENT NOTE: MAME's -debug perturbs the crash AWAY (no freeze in a
+# debug run over the same window), so the next step needs FBNeo's
+# non-perturbing write tap with PC attribution, not the MAME debugger.
+#
+# The older text below is kept for the record.
+# (SUPERSEDED) NEVER REPRODUCED IN THIS HARNESS (measured earlier 14z-75).
 # On build/pyron18, which does NOT carry the withdrawn word, replay 77 fires
 # the EX four times over twelve attempts and the match survives to the end;
 # build/pyron17, which DOES carry it, survives too. On replay 71 the two

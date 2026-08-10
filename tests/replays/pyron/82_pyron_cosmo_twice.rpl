@@ -1,0 +1,21 @@
+# pyron COSMO DISRUPTION — two COMPLETED firings (14z-75).
+# The crash is cumulative: one held firing is survivable, the pair sweep
+# (replay 80) reset right after the SECOND one completed. Both attempts use
+# MP+HP and HOLD 200 frames so the move runs to completion.
+#   POKES="1400:ff8782:11;1450:ff8782:11;1500:ff8782:11;3300:ff8509:09;3900:ff8509:09"
+300-305 sys=C1
+800-803 sys=S1
+1700-1702 p1=1
+3400-3402 p1=L
+3403-3405 p1=DL
+3406-3408 p1=D
+3409-3411 p1=DR
+3412-3414 p1=R
+3415-3615 p1=23
+4000-4002 p1=L
+4003-4005 p1=DL
+4006-4008 p1=D
+4009-4011 p1=DR
+4012-4014 p1=R
+4015-4215 p1=23
+5200 wait

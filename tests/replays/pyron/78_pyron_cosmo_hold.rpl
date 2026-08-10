@@ -1,0 +1,33 @@
+# pyron COSMO DISRUPTION — THE MAINTAINER'S 100% REPRO (14z-75).
+#
+# Reported reproducing on BOTH MAME and FBNeo: 41236 + 2K, and then HOLD
+# until the move finishes BY ITSELF. The energy sphere that does the hits
+# appears for a few frames and the game CRASH-RESETS, with or without the
+# sphere connecting.
+#
+# WHY THE EARLIER RIGS MISSED IT. Replay 71 and replay 77 both RELEASE the
+# pair after ~41 frames (3415-3455). That aborts the move before it
+# completes, so the sphere phase is never reached — 77 fired the EX four
+# times over twelve attempts and never crashed. The hold length IS the
+# repro condition, not the motion.
+#
+# So: ONE attempt, 2K held for 400 frames and never released inside the
+# window, then a long tail so a watchdog reset has somewhere to show.
+#
+# THE MOVE COSTS A STOCK — with an empty meter the pair is downgraded to a
+# single button and nothing fires. Run with:
+#   POKES="1400:ff8782:11;1450:ff8782:11;1500:ff8782:11;3000:ff8509:09;3300:ff8509:09"
+#
+# VERDICT: a watchdog reset is not a 68k exception. Judge by whether the
+# match SURVIVES — P1 +0x382 still 0x11 late in the run — or by snapshots.
+300-305 sys=C1
+800-803 sys=S1
+1700-1702 p1=1
+# 41236, then HOLD 2K and do not let go
+3400-3402 p1=L
+3403-3405 p1=DL
+3406-3408 p1=D
+3409-3411 p1=DR
+3412-3414 p1=R
+3415-3815 p1=45
+5200 wait

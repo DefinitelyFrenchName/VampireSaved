@@ -1,0 +1,35 @@
+# pyron COSMO DISRUPTION — the maintainer's hold recipe, reached through the
+# REAL PICK FLOW rather than a forced-pick poke (14z-75).
+#
+# WHY: forced-pick pokes load the character but do NOT run the pick flow —
+# documented already for the HUD index field, which the real flow populates
+# and the poke leaves reading an alias row (docs/GOTCHAS.md). If any of that
+# state feeds the move, a poked rig can miss a crash that real play hits.
+# This rig walks the cursor onto Pyron's cell and picks him, exactly as
+# replay 40 does, then performs the move.
+#
+# Cursor path from the default Demitri cell 0x01 (see replay 40's header):
+#   D -> 0x06 , D -> 0x08 , DR -> 0x0B , D -> 0x11
+# The third press is DR, not D: the extension rewires 0x08 D to Huitzil's
+# cell 0x10, so the diagonal is the route to the cell carrying Pyron's edge.
+#
+# Then the maintainer's 100% repro: 41236 + 2K, HELD until the move ends by
+# itself. Releasing early is what made replays 71/77 miss it.
+#
+# Meter only (the pick is real, so no id poke):
+#   POKES="3000:ff8509:09;3300:ff8509:09"
+300-305 sys=C1
+800-803 sys=S1
+1000-1002 p1=D
+1040-1042 p1=D
+1080-1082 p1=DR
+1120-1122 p1=D
+1700-1702 p1=1
+# 41236, then HOLD 2K and do not let go
+3400-3402 p1=L
+3403-3405 p1=DL
+3406-3408 p1=D
+3409-3411 p1=DR
+3412-3414 p1=R
+3415-3815 p1=45
+5200 wait

@@ -1,0 +1,28 @@
+# pyron COSMO DISRUPTION — THE MINIMAL CRASH REPRO (14z-75).
+#
+# Maintainer: 41236 + a two-button pair, HELD until the move ends by itself;
+# the energy sphere appears for a few frames and the game CRASH-RESETS, with
+# or without it connecting. Reproduces on both MAME and FBNeo.
+#
+# Isolated from the pair sweep (replay 80): the crash lands on the MP+HP
+# pair, ~200 frames after the hold begins — i.e. as the move completes.
+# Earlier rigs (71, 77, 78, 79) missed it for two reasons: they RELEASED the
+# pair after ~41 frames, and they used LK+MK, which never fires the move at
+# all in this harness (measured: stock never spent).
+#
+# THE MOVE COSTS A STOCK — with an empty meter the pair is downgraded and
+# nothing fires, so the meter poke is mandatory:
+#   POKES="1400:ff8782:11;1450:ff8782:11;1500:ff8782:11;3300:ff8509:09"
+#
+# VERDICT: a watchdog reset is not a 68k exception. Judge by P1 +0x382 —
+# 0x11 while the match lives, 0x00 once the game has reset.
+300-305 sys=C1
+800-803 sys=S1
+1700-1702 p1=1
+3400-3402 p1=L
+3403-3405 p1=DL
+3406-3408 p1=D
+3409-3411 p1=DR
+3412-3414 p1=R
+3415-3615 p1=23
+4600 wait
