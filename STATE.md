@@ -489,6 +489,60 @@ payload must collide; same span + same payload must dedup).
 is at **0x8b100**; `0x8b0f8` is byte-identical across all three files and
 dedups as shared. The gate failed on it, which is the gate working.
 
+### 14z-77g — BOTH slice-G measurements CLOSED, and one of my predictions
+### is RETRACTED
+
+**1. `(0x382,A6)` DOES hold the character id at char-init — MEASURED.** The
+`flavor_tail` chain is sound. On donovan-m3a, probing the shim's own address:
+`A6=$FF8400 -> $FF8782 = 0x13` and `A6=$FF8800 -> $FF8B82 = 0x13`, on two
+independent 2P replays. BOTH player structs, because the chain must work for
+either. Gate `tests/test_shim_charid.sh` (~44s), with a verdict control
+(offset `+0x000` must NOT read the id, so the pass is evidence about `+0x382`
+specifically) and an instrument control (a known-executed address must report
+hits first).
+
+The instrument needed extending: `GUARD_PROBE` dumped registers but not
+memory, and frame-level ordering is too coarse for two events inside one
+frame. `replay_guard.lua` gained **`GUARD_PROBE_MEM="<reg>+<hexoff>"`**, which
+appends the byte at that register plus offset AT THE HIT.
+
+**The rig had to be fixed before it measured anything.** The first attempt
+probed replay 11 and got ZERO hits — and zero would have read as "the shim
+never runs". A positive control on the same instrument (the pool seeder,
+4 hits) proved the probe was armed, so the zero was a fact about the RIG:
+replay 11 never forms a Donovan match on this build. The forced-pick pokes on
+replay 12/03/16 produce it. That control is now section 0 of the gate.
+
+**2. Phase mode is NOT inert for Donovan. My slice-G prediction is
+RETRACTED.** I wrote that the gate "should be inert for him — it only narrows
+the seed to the char-load phase, where his first init already sits". Measured
+A/B against donovan-m3a:
+
+- **LEGACY: bit-identical.** Four replays, 30,284 frames. The shim is hosted
+  on the tenant's dispatch row, so legacy never executes it. The superset
+  invariant is untouched — which is the part that would have blocked the
+  merge.
+- **DONOVAN'S OWN CONTENT: a bounded, fully re-convergent transient.**
+  Divergence begins at the EXACT frame the shim runs (2886 on replay 12, 2363
+  on 19/20 — the same frames `GUARD_PROBE` reports the hit), lasts 24-135
+  frames across 13-16 short runs, then re-converges completely: 6,000-9,700
+  identical frames afterwards, **including a full round-2 on replay 20**.
+
+So the cost is real but confined to his own char-init pool state during the
+load phase, and nothing legacy can observe. **Whether that transient is
+acceptable is a maintainer call**, not a harness one; the ratified condition
+was "measure before trusting", and this is the measurement. Note it fits none
+of §4's existing comparison classes — too many runs for flicker, too many
+runs for the bounded-window class — but it is not a legacy comparison, so no
+class is required; it is tenant content measured against an earlier build of
+the same tenant.
+
+Captured as `tests/audit_phase_mode_cost.sh` (on-demand, ~15 min): it rebuilds
+the probe variant, proves the shim executed, requires legacy bit-identity, and
+requires each Donovan replay to diverge AND re-converge with 500+ clean frames
+after. A run that comes back identical FAILS — that would mean the rig stopped
+forming the match, which is the failure this whole measurement nearly shipped.
+
 ### 14z-77f — slice H: `[table_fix]` by per-row union — ZERO real blockers
 
 `rows_hex` is the VANILLA vsavj OBJ bank table, and the generator already

@@ -35,7 +35,8 @@
 --   STACK <sp8> <val8>            (up to 16 ROM-plausible return addresses)
 --   PCWEEDS <frame> <pc6>         (max 10, then suppressed)
 --   SOFTRESET <frame> <val8>
---   PROBE <frame> D0=.. D1=.. A0=.. A6=.. RET <sp0.l>   (GUARD_PROBE hits;
+--   PROBE <frame> D0=.. D1=.. A0=.. A6=.. RET <sp0.l> [MEM[reg+off]=bb]
+--                                 (GUARD_PROBE hits; GUARD_PROBE_MEM adds MEM;
 --                                 non-fatal, run continues; PROBE-CAP at 400)
 -- and finally "END <n>" (clean) or "END-CRASH <frame>" (crashed).
 
@@ -264,6 +265,20 @@ end
 -- only seen each replay's first 400 calls. Raise it whenever the
 -- question is "what values does this site EVER see".
 local probe_addr = tonumber(os.getenv("GUARD_PROBE") or "", 16)
+-- GUARD_PROBE_MEM="<reg>+<hexoff>" (e.g. "A6+382") appends MEM=<byte> to each
+-- PROBE line: the byte at that register plus offset AT THE MOMENT OF THE HIT.
+-- Added 14z-77 for the question "does the player struct already hold the
+-- character id when the init shim runs?" — a register dump alone cannot
+-- answer it, and frame-level ordering is too coarse for two events inside one
+-- frame. Offset is hex, register is any name in cpu.state.
+local probe_mem_reg, probe_mem_off
+do
+    local pm = os.getenv("GUARD_PROBE_MEM")
+    if pm and #pm > 0 then
+        probe_mem_reg, probe_mem_off = pm:match("^(%a%d?)%+(%x+)$")
+        probe_mem_off = tonumber(probe_mem_off or "", 16)
+    end
+end
 local probe_cond = os.getenv("GUARD_PROBE_COND")
 local probe_hits = 0
 local PROBE_MAX = tonumber(os.getenv("GUARD_PROBE_MAX") or "") or 400
@@ -286,10 +301,19 @@ if debugger then
             elseif probe_addr and pc == probe_addr then
                 local st = cpu.state
                 local sp = (st["A7"] or st["SP"]).value
+                local memtxt = ""
+                if probe_mem_reg and st[probe_mem_reg] then
+                    local at = (st[probe_mem_reg].value + probe_mem_off)
+                               & 0xFFFFFF
+                    memtxt = string.format(" MEM[%s+%x=%06x]=%02x",
+                                           probe_mem_reg, probe_mem_off, at,
+                                           program:read_u8(at))
+                end
                 f:write(string.format(
-                    "PROBE %d D0=%08x D1=%08x A0=%08x A6=%08x RET %08x\n",
+                    "PROBE %d D0=%08x D1=%08x A0=%08x A6=%08x RET %08x%s\n",
                     frame, st["D0"].value, st["D1"].value,
-                    st["A0"].value, st["A6"].value, program:read_u32(sp)))
+                    st["A0"].value, st["A6"].value, program:read_u32(sp),
+                    memtxt))
                 probe_hits = probe_hits + 1
                 if probe_hits >= PROBE_MAX then
                     debugger:command("bpclear")

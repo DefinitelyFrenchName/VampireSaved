@@ -277,21 +277,28 @@ category.
   build — region `x026142` is declared by all three, so under the loop it is
   placed once and must carry every tenant's bank word.
 
-### TWO OPEN MEASUREMENTS BEFORE THE FIRST MERGED BUILD IS TRUSTED
+### ~~TWO OPEN MEASUREMENTS~~ — BOTH CLOSED (14z-77), one RETRACTION
 
-Both are named in the source at their sites; neither blocks further machinery
-work, and nothing ships on them yet because the N>1 path is unreachable until
-the loop lands.
+1. **`(0x382,A6)` DOES hold the character id at char-init.** Measured on both
+   player structs, two replays: `$FF8782` and `$FF8B82` both read `0x13` at the
+   shim's own address. The `flavor_tail` chain is sound. Gate
+   `tests/test_shim_charid.sh` (~44s). New instrument:
+   `GUARD_PROBE_MEM="<reg>+<hexoff>"` on `replay_guard.lua`.
+2. **Phase mode is NOT inert for Donovan — my slice-G prediction is
+   RETRACTED.** Legacy is bit-identical (4 replays, 30,284 frames — the shim
+   is hosted on the tenant's dispatch row, so legacy never executes it), but
+   his OWN content diverges at the exact frame the shim runs, for 24-135
+   frames in 13-16 short runs, then **fully re-converges** — 6,000-9,700
+   identical frames after, including a complete round-2. A bounded transient
+   in his char-init pool state, invisible to legacy. **Whether it is
+   acceptable is a maintainer call**; the measurement exists now.
+   `tests/audit_phase_mode_cost.sh` (on-demand, ~15 min).
 
-1. **Does `(0x382,A6)` hold the character id at char-init?** The whole
-   `flavor_tail` chain rests on it. Strongly implied (the dispatch it is hosted
-   on is itself id-indexed, and `+0x382` is the id field of both player
-   structs) but NOT measured at this point in the frame. Probe: FBNeo write tap
-   or a MAME breakpoint at the shim's own address on any tenant build.
-2. **Donovan's battery under phase mode** — the maintainer's ratified
-   condition. His shim bytes change in a merged build because Phobos forces the
-   gate. It should be inert (the gate only narrows the seed to the char-load
-   phase, where his first init already sits) but the replays decide that.
+**RIG LESSON, paid for again.** The char-id probe first returned ZERO hits,
+which reads as "the shim never runs". A positive control on the same
+instrument showed the probe was armed — so the zero was a fact about the RIG:
+replay 11 never forms a Donovan match on this build. Forced-pick pokes fixed
+it. Both new gates now open with that control.
 
 ### NEXT SLICE — region identity, then the N-way dispatch FORM
 

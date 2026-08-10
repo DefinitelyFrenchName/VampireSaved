@@ -445,6 +445,34 @@ tests/test_tenant_id.sh               # the tenant id is a BUILD INPUT: resoluti
                                       # (asserted by no test before this; the loop
                                       # slice deletes the refusal and flips it).
                                       # Pure functions, no ROMs, no emulator. ~1s
+tests/test_shim_charid.sh    [bd id] # 14z-77 (M3b slice G): the init shim can
+                                      # identify WHICH tenant it runs for —
+                                      # (0x382,A6) already holds the character id
+                                      # at char-init. That was an ASSUMPTION the
+                                      # merged shim's per-id flavor chain rests
+                                      # on; measured on BOTH player structs
+                                      # ($FF8782 and $FF8B82 = 0x13), 2 replays.
+                                      # NEEDS THE FORCED-PICK POKES: replay 11
+                                      # never forms a Donovan match and returns a
+                                      # meaningless zero, so section 0 proves the
+                                      # probe is armed before any verdict. Verdict
+                                      # control: offset +0x000 must NOT read the
+                                      # id. ~44s. Defaults build/m5_wide, id 0x13
+tests/audit_phase_mode_cost.sh        # 14z-77: what Phobos' phase-gated latch
+                                      # costs Donovan — the maintainer's ratified
+                                      # condition for adopting it in the merge.
+                                      # Builds a phase-mode Donovan and A/Bs it
+                                      # LIVE against donovan-m3a (no registry row
+                                      # exists for it, and run_suite refuses an
+                                      # unregistered fingerprint). LEGACY must be
+                                      # bit-identical (4 replays, 30,284 frames —
+                                      # it is); his OWN content must diverge AND
+                                      # re-converge (24-135 frames in 13-16 runs
+                                      # from the exact frame the shim runs, then
+                                      # 6,000-9,700 identical incl. a full
+                                      # round-2). An IDENTICAL result FAILS — that
+                                      # means the rig stopped forming the match.
+                                      # On-demand, ~15 min
 tests/test_manifest_merge.sh          # 14z-77 (M3b slice F): what the three
                                       # tenant manifests DO when merged. Freezes
                                       # the shared-row dedup counts (space 9->3,
