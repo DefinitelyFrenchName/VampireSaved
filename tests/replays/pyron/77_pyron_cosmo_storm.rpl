@@ -1,0 +1,100 @@
+# pyron COSMO DISRUPTION — the HARD repro attempt (14z-75).
+#
+# WHY THIS EXISTS. 14z-74 "fixed" a maintainer-reported Cosmo crash with a
+# one-word repoint that 14z-75 proved (a) corrupts legacy for every character
+# and (b) is BIT-IDENTICAL for Pyron on replay 71 — i.e. it never affected the
+# move at all. Before building any replacement, the crash has to be
+# REPRODUCED. Replay 71 fires the EX exactly ONCE (attempt 1 spends no stock;
+# only attempt 2 does, ~f3900) and neither build resets, so it is too weak to
+# support a "no crash" claim in either direction.
+#
+# This rig fires the EX repeatedly with both button pairs, keeping the meter
+# topped up so no attempt is silently downgraded (the standing trap: with an
+# empty meter the pair becomes a single button and NOTHING fires).
+#
+# RUN WITH (stocks re-poked throughout — the move spends one each time):
+#   POKES="1400:ff8782:11;1450:ff8782:11;1500:ff8782:11;\
+#          3300:ff8509:09;3700:ff8509:09;4100:ff8509:09;4500:ff8509:09;\
+#          4900:ff8509:09;5300:ff8509:09;5700:ff8509:09;6100:ff8509:09;\
+#          6500:ff8509:09;6900:ff8509:09;7300:ff8509:09;7700:ff8509:09"
+#
+# VERDICT: a watchdog reset is NOT a 68k exception, so the crash guard cannot
+# see it (14z-74 established this). Judge by whether the MATCH SURVIVES —
+# fighter block + match state still live at the end — or by snapshots.
+300-305 sys=C1
+800-803 sys=S1
+1700-1702 p1=1
+# 12 attempts, alternating 2K (45) and 2P (12), every 400 frames from 3400.
+3400-3402 p1=L
+3403-3405 p1=DL
+3406-3408 p1=D
+3409-3411 p1=DR
+3412-3414 p1=R
+3415-3455 p1=45
+3800-3802 p1=L
+3803-3805 p1=DL
+3806-3808 p1=D
+3809-3811 p1=DR
+3812-3814 p1=R
+3815-3855 p1=12
+4200-4202 p1=L
+4203-4205 p1=DL
+4206-4208 p1=D
+4209-4211 p1=DR
+4212-4214 p1=R
+4215-4255 p1=45
+4600-4602 p1=L
+4603-4605 p1=DL
+4606-4608 p1=D
+4609-4611 p1=DR
+4612-4614 p1=R
+4615-4655 p1=12
+5000-5002 p1=L
+5003-5005 p1=DL
+5006-5008 p1=D
+5009-5011 p1=DR
+5012-5014 p1=R
+5015-5055 p1=45
+5400-5402 p1=L
+5403-5405 p1=DL
+5406-5408 p1=D
+5409-5411 p1=DR
+5412-5414 p1=R
+5415-5455 p1=12
+5800-5802 p1=L
+5803-5805 p1=DL
+5806-5808 p1=D
+5809-5811 p1=DR
+5812-5814 p1=R
+5815-5855 p1=45
+6200-6202 p1=L
+6203-6205 p1=DL
+6206-6208 p1=D
+6209-6211 p1=DR
+6212-6214 p1=R
+6215-6255 p1=12
+6600-6602 p1=L
+6603-6605 p1=DL
+6606-6608 p1=D
+6609-6611 p1=DR
+6612-6614 p1=R
+6615-6655 p1=45
+7000-7002 p1=L
+7003-7005 p1=DL
+7006-7008 p1=D
+7009-7011 p1=DR
+7012-7014 p1=R
+7015-7055 p1=12
+7400-7402 p1=L
+7403-7405 p1=DL
+7406-7408 p1=D
+7409-7411 p1=DR
+7412-7414 p1=R
+7415-7455 p1=45
+7800-7802 p1=L
+7803-7805 p1=DL
+7806-7808 p1=D
+7809-7811 p1=DR
+7812-7814 p1=R
+7815-7855 p1=12
+8600 wait

@@ -31,11 +31,21 @@
 # all diverged from vanilla and NEVER re-converged. Removing this one word
 # restores all four to the ratified select-wheel window and nothing more.
 #
-# THE COSMO DISRUPTION CRASH IS THEREFORE OPEN AGAIN. A replacement must be
-# built on the real mechanism, must be gated on the tenant id so legacy
-# cannot reach it, must prove deadness on a replay that EXERCISES the
-# neighbouring code, and must pass tests/run_suite.sh — not a tenant-scoped
-# gate alone.
+# AND THE CRASH HAS NEVER BEEN REPRODUCED IN THIS HARNESS (measured 14z-75).
+# On build/pyron18, which does NOT carry the withdrawn word, replay 77 fires
+# the EX four times over twelve attempts and the match survives to the end;
+# build/pyron17, which DOES carry it, survives too. On replay 71 the two
+# builds are BIT-IDENTICAL — the word never touched the move there at all.
+# (They do diverge on replay 77 from f6837, so the word is not inert for
+# Pyron in general; it simply prevents no crash we can demonstrate.)
+#
+# SO THERE IS NOTHING TO RE-FIX UNTIL THE CRASH IS REPRODUCED. What this
+# harness does NOT cover, and what the maintainer's report may depend on:
+# a real cursor pick rather than a forced-pick poke, arcade mode rather than
+# 1P-vs-CPU, other opponents and stages, the move CONNECTING vs whiffing,
+# and mid-combo or cornered activations. Get one of those reproducing before
+# writing a single byte — the last attempt fixed a crash nobody had
+# reproduced and corrupted legacy for every character instead.
 #
 # Usage: ROMDIR=... tests/test_pyron_cosmo.sh [outbase]
 set -eu
@@ -80,6 +90,58 @@ if n!=80:
 print("   ok: index 81 is off the end by 2, exactly as the withdrawal says")
 PY
 
+echo "== 3. runtime: the EX fires repeatedly and the MATCH SURVIVES"
+# A watchdog reset is NOT a 68k exception, so the crash guard cannot see it
+# (14z-74). Judge by survival: after twelve EX attempts the P1 fighter block
+# must still hold Pyron. The gate REFUSES to pass unless the EX actually
+# fired at least once — with an empty meter the pair is silently downgraded
+# and a "no crash" result would prove nothing.
+if [ "${SKIP_RUNTIME:-0}" = 1 ]; then
+    echo "   SKIPPED (SKIP_RUNTIME=1)"
+else
+    [ -f "$BUILD/rompath/vsavjw.zip" ] || {
+        echo "FAIL: no $BUILD/rompath/vsavjw.zip"; exit 1; }
+    PK="1400:ff8782:11;1450:ff8782:11;1500:ff8782:11"
+    for f in 3300 3700 4100 4500 4900 5300 5700 6100 6500 6900 7300 7700; do
+        PK="$PK;$f:ff8509:09"
+    done
+    SAMPLES="3690 4090 4490 4890 5290 5690 6090 6490 6890 7290 7690 8090"
+    DUMPS="$(python3 -c "
+import sys
+fr='$SAMPLES'.split()
+print(';'.join(['%s:ff8500-ff851f'%f for f in fr] + ['8600:ff8400-ff87ff']))")"
+    mkdir -p "$WORK/rt"
+    ( cd "$WORK/rt" && POKES="$PK" DUMPS="$DUMPS" \
+      MAME_ROMPATH="$BUILD/rompath;$ROMDIR" \
+      MAME_BIN="${MAME_BIN:-$HOME/.cache/vampire-saved/mame/cps2}" \
+      "$REPO/tools/run_replay_mame.sh" vsavjw \
+      "$REPO/tests/replays/pyron/77_pyron_cosmo_storm.rpl" ram.log s1 \
+      > out.log 2>&1 ) || { echo "FAIL: the runtime leg did not complete"; fail=1; }
+    python3 - "$WORK/rt" "$SAMPLES" <<'PY2' || fail=1
+import os, sys
+d, samples = sys.argv[1], sys.argv[2].split()
+fired = 0
+for f in samples:
+    b = open(os.path.join(d, "dump_%s_ff8500.bin" % f), "rb").read()
+    if 0x09 - b[0x09] > 0:
+        fired += 1
+print(f"   EX activations measured (a stock spent): {fired}/12")
+if fired == 0:
+    print("FAIL: the EX never fired — every attempt was downgraded, so this "
+          "section proves nothing about crashing")
+    sys.exit(1)
+blk = open(os.path.join(d, "dump_8600_ff8400.bin"), "rb").read()
+cid = blk[0x382]
+print(f"   P1 +0x382 at f8600 = {cid:#04x}")
+if cid != 0x11:
+    print("FAIL: Pyron is no longer in the match at f8600 — the game reset "
+          "(watchdog) or the match ended unexpectedly")
+    sys.exit(1)
+print("   ok: the match survived twelve EX attempts")
+PY2
+fi
+
 [ "$fail" -ne 0 ] && { echo "FAIL: pyron cosmo withdrawal guard"; exit 1; }
-echo "PASS: pyron cosmo withdrawal guard (the bad word stays out;"
-echo "      NOTE the Cosmo Disruption crash is OPEN — see the header)"
+echo "PASS: pyron cosmo guard (the bad word stays out; the EX fires and the"
+echo "      match survives). NOTE: the maintainer-reported crash has NEVER"
+echo "      been reproduced in this harness — see the header." 
