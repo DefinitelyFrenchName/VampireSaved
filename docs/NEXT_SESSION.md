@@ -230,6 +230,41 @@ Do not budget for them.
   forever, so under the loop those fragments would have baked the FIRST
   tenant's id — silently, since wrong-character gating does not crash.
 
+- **Slice F** (14z-77) — `--port` is REPEATABLE and the documents MERGE.
+  `merge_manifests()` concatenates owned rows, dedups rows identical apart
+  from their owner (engine declarations all three tenants make the same way),
+  and REFUSES on anything else. With one file it is the identity, which is
+  why it is inert. **The merged manifest is now expressible** even though the
+  `>1 tenant` refusal still blocks BUILDING it.
+
+### THE MERGE'S COLLISION SET IS NOW MEASURED, NOT PREDICTED (slice F)
+
+`tests/test_manifest_merge.sh` (~1s) freezes it. Merging the three real
+manifests: `[[space]]` 9→3, `[[obj_hook]]` 6→2, `[[select_wheel]]` 3→1,
+`[[site_thunk]]` 34→28 (the three `*_bank_variant_id` rows), `[[port_patch]]`
+90→87, `[[code_word]]` 13→11, `[[pcrel_escape_fix]]` 7→5 — and 12 collisions,
+in **two classes**:
+
+**THREE REAL BLOCKERS.** `[init_shim]` (D vs H differ on
+`flavor_default`/`flavor_held`/`latch_mode`; P declares none) and `[table_fix]`
+twice (D vs H, D vs P — `rows_hex` differs by exactly the tenant's own OBJ bank
+row). Both are TOML SINGLETONS, so the schema cannot even express two: the
+resolution is a per-row union for `table_fix`, and for `init_shim` either
+promotion to `[[init_shim]]` or attachment to the tenant row.
+
+**SIX THAT DISSOLVE.** The `x05c800` / `x088512` `port_patch` rows: Donovan
+writes the host band's word where H/P write a no-op — **but all three agree on
+`new_hex_variant`**, and a merged build is a WIDE build by construction (a
+variant id requires the profile, `tenant_context`'s refusal), so those rows
+never take the value they disagree about. Measured, not assumed; the gate
+requires each to keep carrying the "dissolves on WIDE" wording, so if the
+tenants ever stop agreeing on the variant value it becomes a real blocker
+loudly.
+
+This retires "shared-span handling is load-bearing, not an edge case" as an
+open worry: it is load-bearing, and it is now three named rows rather than a
+category.
+
 ### NEXT SLICE — region identity, then the N-way dispatch FORM
 
 **1. Region/extraction identity** (M3b_plan Phase 2 item 2). Key regions by

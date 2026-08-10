@@ -445,6 +445,23 @@ tests/test_tenant_id.sh               # the tenant id is a BUILD INPUT: resoluti
                                       # (asserted by no test before this; the loop
                                       # slice deletes the refusal and flips it).
                                       # Pure functions, no ROMs, no emulator. ~1s
+tests/test_manifest_merge.sh          # 14z-77 (M3b slice F): what the three
+                                      # tenant manifests DO when merged. Freezes
+                                      # the shared-row dedup counts (space 9->3,
+                                      # obj_hook 6->2, wheel 3->1, site_thunk
+                                      # 34->28, port_patch 90->87) and the exact
+                                      # 12-collision inventory in TWO classes:
+                                      # THREE real blockers ([init_shim] once,
+                                      # [table_fix] twice — TOML singletons, so
+                                      # the schema cannot express two) and SIX
+                                      # that DISSOLVE on the WIDE track (all
+                                      # three tenants agree on new_hex_variant,
+                                      # and a merged build is a WIDE build by
+                                      # construction). A span collision is
+                                      # invisible to row dedup AND to
+                                      # patch_prg.py's overlap assertion, hence
+                                      # its own check. 4 permissiveness
+                                      # controls. No ROMs, ~1s
 tests/test_tenant_row_owner.sh [ex]   # 14z-77 (M3b slices C+D): is the row-OWNER
                                       # threading LOAD-BEARING? Every slice of the
                                       # multi-tenant refactor is INERT by design, so

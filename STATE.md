@@ -1,6 +1,11 @@
 # STATE — living progress log
 
-Updated: 2026-08-10 (session 14z-77 — **M3b slices C, D and E: the gating
+Updated: 2026-08-10 (session 14z-77 — **M3b slices C-F.** Slice F makes the
+merged manifest EXPRESSIBLE (`--port` is repeatable; the documents merge) and
+turns the merge's hazards from a list in a document into a MEASUREMENT: 12
+collisions, of which only THREE are real blockers — the six `port_patch` ones
+dissolve on the WIDE track because all three tenants agree on the variant
+value. Frozen by `tests/test_manifest_merge.sh`. **M3b slices C, D and E: the gating
 family, the manifest-row arithmetic AND every id baked into emitted 68k now ask
 the ROW'S OWNER, not the build's single `dst_slot`.** Slice D corrected the
 plan's premise: four of its seven named sites are DEAD code, and the rest are
@@ -430,6 +435,59 @@ directory**, and all ten sites report live. A gate that had only ever been
 pointed at already-passing sites would have shipped with that hole; it was the
 first genuinely different site that exposed it. Its own dead-binding control
 (`_pvar`) still passes, so the fix did not make everything look live.
+
+### 14z-77d — slice F: the merged manifest is EXPRESSIBLE, and the merge's
+### collision set is now MEASURED
+
+`--port` is repeatable — one manifest FILE per tenant, which is what the
+ratified per-file ownership buys. `merge_manifests()` concatenates owned rows,
+DEDUPS rows identical apart from their owner, and REFUSES on anything else.
+With one document it is the identity, so the slice is inert; four fingerprints
+bit-exact. The `>1 tenant` refusal STAYS — the manifest can now express the
+merge, `main()` still cannot perform it, and those are different statements.
+
+Refusing is the design, not a limitation. `[table_fix]`'s `rows_hex` differs by
+exactly the tenant's own OBJ bank row, so "last file wins" would silently drop
+a tenant's bank word with nothing downstream to catch it.
+
+**Dedup, measured:** `[[space]]` 9→3, `[[obj_hook]]` 6→2, `[[select_wheel]]`
+3→1, `[[site_thunk]]` 34→28 (the three `*_bank_variant_id` rows),
+`[[port_patch]]` 90→87, `[[code_word]]` 13→11, `[[pcrel_escape_fix]]` 7→5.
+
+**Collisions: 12, in TWO CLASSES — and the split is the finding.**
+
+- **THREE REAL BLOCKERS.** `[init_shim]` (D vs H differ on `flavor_default` /
+  `flavor_held` / `latch_mode`; P declares none) and `[table_fix]` twice.
+  Both are TOML SINGLETONS, so the schema cannot express two: `table_fix`
+  wants a per-row union, `init_shim` either promotion to `[[init_shim]]` or
+  attachment to the tenant row.
+- **SIX THAT DISSOLVE.** The `x05c800`/`x088512` `port_patch` rows disagree
+  only on the BASE-track `new_hex` — **all three tenants agree on
+  `new_hex_variant`** — and a merged build is a WIDE build by construction
+  (a variant id requires the profile). Those rows never take the value they
+  disagree about. The gate requires each to keep carrying the
+  "dissolves on WIDE" wording, so if the agreement ever breaks it becomes a
+  real blocker loudly rather than quietly.
+
+A span collision is invisible to BOTH existing safety nets, which is why it
+needed its own check: the rows are not identical, so row dedup does not see
+them, and they land in different regions' blobs, so `patch_prg.py`'s op-overlap
+assertion does not either.
+
+This retires the standing worry that "shared-span handling is load-bearing, not
+an edge case" (M3b_plan `:58-69`). It is load-bearing — and it is now three
+named rows instead of a category.
+
+New gate `tests/test_manifest_merge.sh` (~1s, no ROMs): the one-document
+identity, 12 frozen section shapes, the exact collision inventory with the
+blocker/base-track split, and four permissiveness controls (a differing
+singleton must collide; an identical one must dedup; same span + different
+payload must collide; same span + same payload must dedup).
+
+**One correction made in-session:** the frozen inventory first named
+`x088512/0x8b0f8`, transcribed from a four-address list. The measured collision
+is at **0x8b100**; `0x8b0f8` is byte-identical across all three files and
+dedups as shared. The gate failed on it, which is the gate working.
 
 ### 14z-76c — M3b STARTED: the multi-tenant generator, slices A and B
 

@@ -168,6 +168,142 @@ def stamp_owner(doc, owner):
     return doc
 
 
+def merge_manifests(docs):
+    """Merge N owner-stamped manifest documents into one (M3b slice F).
+
+    With ONE document this is the identity, which is what makes the slice
+    inert; the frozen fingerprints prove it.
+
+    The policy, and why each half of it is what it is:
+
+    * ARRAY-OF-TABLES rows CONCATENATE, in file order. Ownership already
+      distinguishes them (slice C), so the gates and table addresses stay
+      correct without the merge having to understand any section.
+    * Rows that are byte-identical across files EXCEPT for `_owner` DEDUP to
+      one row marked shared (`_owner=None`). This is the `[[space]]`,
+      `[[obj_hook]]`, `[[select_wheel]]` and `*_bank_variant_id` shape: all
+      three tenants declare them identically because they are properties of
+      the ENGINE, not of a character. Emitting N copies of an engine patch
+      is last-write-wins at best and a double-apply at worst.
+    * SINGLETON tables (`[table_fix]`, `[init_shim]`, ...) cannot merge by
+      concatenation — TOML cannot even express two. Identical ones dedup;
+      DIFFERING ones are a COLLISION, and this function refuses rather than
+      picking. `[table_fix]` is the known case: its `rows_hex` differs by
+      exactly the tenant's own row, so the resolution is a per-row union,
+      not a choice between two strings — and a silent pick would drop a
+      tenant's OBJ bank word with nothing to catch it.
+
+    Returns (merged_doc, collisions) — collisions is a list of human-readable
+    strings. The caller decides whether a collision is fatal, so a tool can
+    MEASURE the merge without being able to perform it.
+    """
+    if len(docs) == 1:
+        return docs[0], []
+    merged, collisions = {}, []
+    for doc in docs:
+        for key, val in doc.items():
+            if key not in merged:
+                merged[key] = [dict(r) for r in val] if isinstance(val, list) \
+                    else (dict(val) if isinstance(val, dict) else val)
+                continue
+            cur = merged[key]
+            if isinstance(val, list) and isinstance(cur, list):
+                for row in val:
+                    twin = next((c for c in cur if _same_row(c, row)), None)
+                    if twin is None:
+                        cur.append(dict(row))
+                    else:
+                        twin["_owner"] = None      # shared engine row
+            elif isinstance(val, dict) and isinstance(cur, dict):
+                if _same_row(cur, val):
+                    cur["_owner"] = None
+                else:
+                    collisions.append(
+                        f"[{key}]: {val.get('_owner')} and {cur.get('_owner')} "
+                        f"declare DIFFERENT singleton tables; keys differing: "
+                        f"{sorted(_row_diff_keys(cur, val))}")
+            elif cur != val:
+                collisions.append(f"{key}: incompatible shapes across files")
+    collisions += _span_collisions(merged)
+    return merged, collisions
+
+
+# Which key(s) identify the BYTES a row writes, per section. Two rows that
+# agree on these and disagree on their payload are patching the same span
+# with different intent — invisible to the row-identity dedup above, because
+# the rows are not identical, and invisible to the op-overlap assertion in
+# patch_prg.py when the rows land in different regions' blobs.
+_SPAN_KEYS = {
+    "port_patch": ("region", "src_addr"),
+    "aux_poke":   ("op", "addr"),
+    "code_word":  ("addr",),
+    "data_port":  ("dst",),
+}
+
+
+def _span_collisions(merged):
+    """Rows from different owners writing the SAME bytes differently.
+
+    This is the shape NEXT_SESSION flagged before the merge existed: the
+    `x05c800` / `x088512` / `x06800c` / `x0692f6` OBJ-bank rows are declared
+    by more than one tenant at the same `(region, src_addr)`, and differ only
+    in whether they write the host band's word or the WIDE group-C one. They
+    are properties of the SHARED SOURCE BYTES, not of a character, so the
+    merge must resolve them to ONE row — it cannot apply both.
+    """
+    out = []
+    for sect, keys in _SPAN_KEYS.items():
+        rows = merged.get(sect)
+        if not isinstance(rows, list):
+            continue
+        seen = {}
+        for r in rows:
+            if not all(k in r for k in keys):
+                continue
+            ident = tuple(f"{r[k]:#x}" if isinstance(r[k], int) else str(r[k])
+                          for k in keys)
+            prev = seen.get(ident)
+            if prev is None:
+                seen[ident] = r
+            elif _row_diff_keys(prev, r) - {"note", "name", "stage"}:
+                diff = sorted(_row_diff_keys(prev, r) - {"note", "name"})
+                # A disagreement confined to the BASE-track value, where the
+                # owners agree on the variant one, does not reach a merged
+                # build: a tenant at a variant id requires the WIDE profile
+                # (tenant_context's refusal), so a merged build is a WIDE
+                # build and takes `new_hex_variant` at every one of these
+                # rows. Say so rather than reporting a blocker that is not
+                # one — six of the twelve measured collisions are this.
+                vs = {prev.get("new_hex_variant"), r.get("new_hex_variant")}
+                if diff == ["new_hex"] and len(vs) == 1 and None not in vs:
+                    out.append(
+                        f"[[{sect}]] {'/'.join(ident)}: {_who(prev)} and "
+                        f"{_who(r)} differ on new_hex ONLY, and agree on "
+                        f"new_hex_variant={vs.pop()} — BASE-TRACK ONLY, "
+                        f"dissolves on a WIDE (merged) build")
+                else:
+                    out.append(
+                        f"[[{sect}]] {'/'.join(ident)}: {_who(prev)} and "
+                        f"{_who(r)} write the SAME bytes differently ({diff})")
+    return out
+
+
+def _who(row):
+    """A row's owner for a message; deduped engine rows report as shared."""
+    return row.get("_owner") or "shared"
+
+
+def _row_diff_keys(a, b):
+    """Keys on which two rows differ, ignoring the ownership stamp."""
+    return {k for k in set(a) | set(b)
+            if k != "_owner" and a.get(k) != b.get(k)}
+
+
+def _same_row(a, b):
+    """Same row apart from who owns it — i.e. a shared engine declaration."""
+    return not _row_diff_keys(a, b)
+
+
 def normalise_tenants(port, profile=None, override=None):
     """`[[tenant]]` supersedes `[port]`.
 
@@ -269,7 +405,11 @@ def main():
     ap.add_argument("--vsavj", type=Path, required=True)
     ap.add_argument("--stage", type=int, required=True, choices=range(1, 7))
     root = Path(__file__).resolve().parent.parent
-    ap.add_argument("--port", type=Path, default=root / "build/manifest/donovan.toml")
+    # REPEATABLE (M3b slice F): one manifest FILE per tenant. Ownership comes
+    # from the file (slice C), so the merged build is `--port a --port b ...`
+    # and no manifest row changes. Default preserved exactly.
+    ap.add_argument("--port", type=Path, action="append", dest="port",
+                    help="port manifest; repeat once per tenant")
     ap.add_argument("--recon", type=Path,
                     default=root / "build/manifest/reconciliation.toml")
     ap.add_argument("--bank-map", type=Path,
@@ -298,11 +438,22 @@ def main():
     out.mkdir(parents=True, exist_ok=True)
 
     man = json.loads((args.extract_dir / "regions.json").read_text())
-    port = toml_loads(args.port.read_text())
-    # PER-FILE TENANT OWNERSHIP (M3b slice C): every row this file declares
-    # belongs to this file's tenant. Stamped here, at the one place that
-    # knows which file a row came from.
-    stamp_owner(port, manifest_owner(port))
+    # PER-FILE TENANT OWNERSHIP (M3b slice C): every row a file declares
+    # belongs to that file's tenant. Stamped here, at the one place that
+    # knows which file a row came from — then the documents MERGE (slice F).
+    _ports = args.port or [root / "build/manifest/donovan.toml"]
+    _docs = []
+    for _pp in _ports:
+        _d = toml_loads(_pp.read_text())
+        stamp_owner(_d, manifest_owner(_d))
+        _docs.append(_d)
+    port, _collisions = merge_manifests(_docs)
+    if _collisions:
+        raise SystemExit(
+            "gen_donovan_patch: the manifests collide and the merge will not "
+            "guess:\n  " + "\n  ".join(_collisions) +
+            "\nResolve each in the manifests (or teach merge_manifests() the "
+            "per-section union) before building them together.")
     # Dotted table names are BANNED in this manifest (14z-62c): tomllib
     # nests them, the subset parser detaches them as orphan top-level keys
     # — the same manifest builds DIFFERENT bytes per host python. The
