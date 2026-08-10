@@ -156,6 +156,45 @@ before comparing, or entries 40/41 read as "80/82, out of range".
   defect shape in this port. When a ported character does something vanilla
   never does, suspect a dead row first.
 
+## M3b is UNDER WAY — slices A and B landed (14z-76)
+
+The multi-tenant generator refactor is started. Two slices in, each inert by
+construction and verified against ALL FOUR frozen fingerprints:
+
+- **Slice A** (`b7e743a`) — `tenant_context(t, port, profile, override)`, a
+  pure function resolving ONE `[[tenant]]` row: id_by_profile, the
+  variant-needs-profile and reserved-0x12/0x18 refusals, `mirror_variant`,
+  the variant gfx-bank override. `normalise_tenants()` builds a LIST of them
+  (`port["_tenants"]`) and hands `main()` `_tenants[0]` flattened as before.
+- **Slice B** (`587885e`) — `T` + `row_ident(tenant)` give ONE source of
+  tenant identity; `dst_slot`/`var_slot`/`mirror` are now a derived view.
+  `repoint()` (10 call sites) takes `tenant=None`, so all ten are already
+  correct when the loop lands.
+
+**The refusal at `gen_donovan_patch.py` stays until `main()` iterates** — it
+states what is implemented, not what the manifest can express.
+
+### NEXT SLICE — the gating family, and take it WHOLE
+
+9 sites: `only_base_slot`, `only_variant_slot`, `new_hex_variant`, plus the
+`select_records` and `win_pal_variant` blocks gated on `dst_slot >= 0x10`.
+
+**This is where the DESIGN question starts, which is why 14z-76 stopped here
+rather than half-converting it.** These encode "is THE tenant a variant id?"
+as a global branch; correct is "is THIS ROW's owning tenant a variant id?" —
+which needs rows to declare an owner, i.e. a **manifest-schema decision**, not
+a mechanical edit. Do the family whole, ownership included.
+
+Then, and deliberately last: the **4 sites baked into emitted machine code**
+(`charid_sites`, the win-pal thunk rebase, TT/TU substitution, the overlay
+T-select thunk). That class fails **silently** — a wrong tenant there yields a
+build that passes every structural check and is wrong in the ROM. Budget room
+to bisect: each step is a full four-target rebuild.
+
+Remaining after B: 7 `table_entry_addr()` reads still on the bare scalars
+(value-row/gap-table blocks, palettes, select_records, `code_word`
+`slot_table`) — same mechanical shape as slice B.
+
 ## Carried into M3b — gate defaults point at intermediate builds
 
 Several tenant gates default to superseded interim builds (`pyron17`,
