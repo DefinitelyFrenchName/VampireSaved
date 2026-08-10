@@ -3,8 +3,9 @@
 **SESSION GOAL: the legacy divergence. Nothing else until it is green.**
 
 **BLOCKING (CLAUDE.md rule 6).** pyron17 fails the vanilla-legacy basis on
-`01_attract_long`, `05_timeout_idle`, `07_mash_storm`. 05 and 07 carry a
-SECOND divergence (05: frames `4024..12120`) that NEVER re-converges — under
+`01_attract_long`, `05_timeout_idle`, `07_mash_storm`, `30_demitri_throw`
+(suite: 51 PASS / 17 SKIP / 4 FAIL). The last three carry a SECOND divergence
+(05: frames `4024..12120`) that NEVER re-converges — under
 §4 that means match state was touched. The freeze was attempted and STOPPED;
 the registry row is withheld. Full measurement:
 `tests/expected/pyron-m1/NOT_RATIFIED.md`.

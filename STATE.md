@@ -14,7 +14,7 @@ tables alias rows 0x10-0x1F onto 0x00-0x0F, so Pyron ran a base-half
 character's animated-palette handler. THREE such tables, not one: the
 maintainer's playtest of pyron16 found the blink still alive on the SELECT
 screen and the ROUTE MAP, because the first fix covered only the in-match
-dispatcher. build/pyron17 (5dc6da06) is MAINTAINER-CONFIRMED visually clean. **THE FREEZE WAS ATTEMPTED AND STOPPED**: pyron17 fails the vanilla-legacy basis on 3 of 13 masked replays with a SECOND divergence that never re-converges. Pre-existing (identical on pyron14), not port_param32, and Pyron-specific (huitzil-m2 is clean on the same replay). CLAUDE.md rule 6: that is now the only task. 14z-74's confounded "543 vs 0" figure is
+dispatcher. build/pyron17 (5dc6da06) is MAINTAINER-CONFIRMED visually clean. **THE FREEZE WAS ATTEMPTED AND STOPPED**: pyron17 fails the vanilla-legacy basis on 4 of 13 masked replays with a SECOND divergence that never re-converges. Pre-existing (identical on pyron14), not port_param32, and Pyron-specific (huitzil-m2 is clean on the same replay). CLAUDE.md rule 6: that is now the only task. 14z-74's confounded "543 vs 0" figure is
 RETRACTED, and one of MY OWN eliminations was wrong and is corrected
 below. Read docs/NEXT_SESSION.md first.)
 
@@ -156,8 +156,10 @@ pass then failed on three legacy replays. The registry row is WITHHELD;
 | `01_attract_long` | `exact` | live state diverged |
 | `05_timeout_idle` | `window 889 1675` | 2 runs: `889..1675` **and `4024..12120`**, 0 identical after |
 | `07_mash_storm` | `window 889 1675` | 2 runs: `889..1675` and `2241..4320`, 0 identical after |
+| `30_demitri_throw` | `window 889 2015` | 2 runs, ends `4720`, 0 identical after |
 
-10 of 13 masked classes — including every `composite` — pass unchanged.
+Final tally **51 PASS / 17 SKIP / 4 FAIL**. 9 of 13 masked classes — including
+every `composite` — pass unchanged.
 The first run in each failure IS the ratified select window and re-converges
 cleanly (05: 2348 bit-identical frames). The SECOND divergence never
 re-converges, which under §4 means match state was touched.

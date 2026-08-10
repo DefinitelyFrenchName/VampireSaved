@@ -11,16 +11,18 @@ because the measurements below cost several hours and are worth not repeating.
 
 - 42 `.sha1` + 13 `.masked` + 17 `.skip` = 72 of 72 replays accounted for.
 - The `--freeze` pass ran clean: no nondeterminism, no run failures.
-- 10 of the 13 legacy `.masked` classes (seeded from huitzil-m2 and then
+- 9 of the 13 legacy `.masked` classes (seeded from huitzil-m2 and then
   VERIFIED) pass on pyron17 unchanged — including every `composite` one.
+- Final suite tally: **51 PASS / 17 SKIP / 4 FAIL — SUITE RED**.
 
-## Why it is not ratified — three failures
+## Why it is not ratified — FOUR failures (51 PASS / 17 SKIP / 4 FAIL)
 
 | replay | seeded class | measured |
 |---|---|---|
 | `01_attract_long` | `exact` | live state diverged from vanilla |
 | `05_timeout_idle` | `window 889 1675` | 2 runs: `889..1675` **and `4024..12120`**, 0 identical after |
 | `07_mash_storm` | `window 889 1675` | 2 runs: `889..1675` and `2241..4320`, 0 identical after |
+| `30_demitri_throw` | `window 889 2015` | 2 runs, ends `4720`, 0 identical after |
 
 The first run in each is the ratified select-wheel window and re-converges
 cleanly (05: 2348 bit-identical frames, 1676..4023). The SECOND divergence is
