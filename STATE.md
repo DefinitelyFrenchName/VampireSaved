@@ -489,6 +489,55 @@ payload must collide; same span + same payload must dedup).
 is at **0x8b100**; `0x8b0f8` is byte-identical across all three files and
 dedups as shared. The gate failed on it, which is the gate working.
 
+### 14z-77j — WHY `anim` cannot move: an UNRELOCATED base pointer
+
+Root-caused to the instruction, and **one hypothesis of mine is refuted along
+the way.**
+
+**The faulting code** (vanilla, `PRG:0x015084`):
+
+```
+015084  andi.w  #$00FF,D0        ; character id
+015088  add.w   D0,D0            ; id*2
+01508a  move.w  (0,A0,D0.w),D0   ; read a SIGNED 16-BIT OFFSET from a table
+01508e  lea     (0,A0,D0.w),A0   ; A0 = table base + that offset
+015092  move.l  A0,(0x1C,A6)
+015096  move.l  (A0),(0x20,A6)   ; <-- vec3 address error, A0 odd
+```
+
+A base-plus-signed-16-bit-offset table, the same shape as the win-quote bank.
+
+**REFUTED: "anim must stay within +/-32 KB of the table that indexes it."** I
+was forming that hypothesis from the crash base landing inside `x2b7ef4`. It is
+wrong: **`huitzil-m2` runs with `x2b7ef4` in `wide_ext` and `anim` in the crypt
+window, 3.3 MB apart**, and `pyron-m2` likewise (3.29 MB). Adjacency is not the
+constraint. Measured before publishing, which is the only reason it did not
+become a finding.
+
+**THE ACTUAL MECHANISM.** Probing `0x01508a` on BOTH builds at the faulting
+frame gives the SAME base: `A0 = 0x000DDA1E`, byte-identical. So the base does
+not track anim's placement at all. On the working build `0x0DDA1E` falls inside
+anim's placed span (`0x0D3070-0x0F3F70`); when anim moves to `wide_ext`, the
+allocator slides `x2b7ef4` into that address range, so the same stale base now
+reads **x2b7ef4's bytes as 16-bit offsets** — hence an arbitrary, odd A0.
+
+**So this is an UNRELOCATED REFERENCE to anim, not a reach or crypt-window
+dependency.** anim "cannot move" only because something still points at where
+it used to be. That reframes the blocker from a hardware/layout constraint
+(which would have forced the maintainer's fallback ladder) into a generator
+bug — the far better outcome, and one that would make the profile-growth and
+drop-a-character options unnecessary.
+
+**NOT YET ESTABLISHED: where that base is loaded from.** `RET = 0x00FF02DC` is
+a RAM address, so the routine is reached through a RAM trampoline and the
+caller is not readable from the ROM alone. Next probe: trace backwards from
+`0x01508a` for the instruction that sets A0 — `GUARD_TRACE` across the call, or
+a write-tap on the RAM trampoline at `$FF02DC`. Once the source is known, the
+question is simply why the generator's relocation pass does not rewrite it.
+
+Everything above is reproducible from `tests/audit_region_movability.sh` plus
+two `GUARD_PROBE=01508a` runs (working build and `region_space="anim=wide_ext"`).
+
 ### 14z-77i — slice J + THE MERGE'S BINDING CONSTRAINT IS ONE REGION: `anim`
 
 **Slice J: `region_space`.** Placement had NO reach analysis at all — the rule

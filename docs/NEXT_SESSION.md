@@ -369,7 +369,25 @@ With every movable region relocated, three tenants STILL need 470,200 bytes of
 the 344,640-byte crypt window — over by 125,560 — and **`anim` alone is
 371,712 of it**.
 
-> ## M3b IS BLOCKED ON ONE QUESTION: why can `anim` not leave the crypt window?
+> ## M3b IS BLOCKED ON ONE BUG: an UNRELOCATED pointer into `anim`
+>
+> **Root-caused 14z-77 and it is NOT a hardware constraint.** The base pointer
+> that indexes anim reads `0x000DDA1E` on the working build AND on the moved
+> build — identical, so it never tracked anim's placement. On the working build
+> that address happens to fall inside anim; once anim leaves, `x2b7ef4` slides
+> into the same range and the 16-bit offsets read its bytes instead.
+>
+> **REFUTED en route:** "anim must stay within ±32 KB of `x2b7ef4`".
+> `huitzil-m2` runs with them **3.3 MB apart**. Adjacency is not the constraint.
+>
+> **Next probe:** find where A0 is loaded before `PRG:0x01508a`. `RET` is
+> `0x00FF02DC`, a RAM trampoline, so the caller is not readable from ROM —
+> use `GUARD_TRACE` across the call or a write-tap on `$FF02DC`. Then ask why
+> the relocation pass misses it.
+>
+> This reframes the blocker from a layout constraint into a generator bug,
+> which would make BOTH fallbacks (growing the crypt window, dropping a
+> tenant) unnecessary.
 >
 > Not ownership, not the manifest merge, not gating or baked code — all done.
 > Not total space — `wide_ext` has 2 MB free. Everything else moves.

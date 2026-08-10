@@ -14,10 +14,15 @@
 # (odd A0) at vanilla PC 0x015098, frame 1401. Bisected to ONE region.
 #
 # FROZEN RESULT (14z-77, donovan-m3a):
-#   anim         CRASHES  — vec3 address error, odd pointer. The animation
-#                          region has an undeclared dependency on living in
-#                          the crypt window that near_map/layout_group do not
-#                          express.
+#   anim         CRASHES  — vec3 address error, odd pointer. ROOT CAUSE
+#                          NARROWED 14z-77 (see STATE): a base pointer used to
+#                          index anim does NOT track anim's placement — it
+#                          reads 0x000DDA1E on BOTH the working and the moved
+#                          build. On the working build that address is inside
+#                          anim; once anim leaves, x2b7ef4 slides into the
+#                          same address and the 16-bit offsets read garbage.
+#                          So it is an UNRELOCATED reference, not a crypt-window
+#                          or a reach dependency.
 #   aux0_4       runs     — 0xE070 of data
 #   x06717c      runs     — 0x154 of CODE. **Code DOES run from the raw
 #                          extension**, which is what test_crypt_boundary.sh
