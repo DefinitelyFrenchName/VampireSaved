@@ -918,3 +918,58 @@ name = "palette_routine_row_11_c"
 addr = 0x0737B2
 old_hex = "0042"
 new_hex = "0040"
+
+# ══ 14z-75 THE COSMO DISRUPTION CRASH — FIXED IN HIS OWN DATA ════════════
+#
+# THE CRASH, measured (rig tests/replays/pyron/72_pyron_cosmo_2p.rpl, which
+# reproduces where 71/77/78/79 do not):
+#     f3569  PC 018464  D0 = 0x00A2  D1 = 0x80000006  A3 = 0x000FDF52
+# The shared engine dispatches this sub-state through a pc-relative table:
+#     018460  move.w ($6,PC,D0.w),D1     ; table base 0x018468
+#     018464  jmp    ($2,PC,D1.w)
+# D0 = 0xA2 is index 81. THE TABLE HAS ONLY 80 ENTRIES (0..79): it ends at
+# 0x018508, where a SECOND dispatcher begins (`323b 0006 / 4efb 1002`, its
+# own table at 0x018510). So index 81 reads 0x01850A — dispatcher #2's
+# DISPLACEMENT OPERAND, value 0x0006 — and jumps to 0x018468+6 = 0x01846E,
+# i.e. into the table's own bytes. Executing those hits an illegal
+# instruction and the watchdog resets the board.
+#
+# WHY THE 14z-74 FIX WAS WITHDRAWN (see the block above): it wrote that same
+# word 0x0006 -> 0x0224. That DID stop the crash — measured, pyron17 does not
+# reset on rig 72 where pyron18 does — because the out-of-range read then
+# returns a real handler. But the word is dispatcher #2's displacement, so it
+# also moved dispatcher #2's table for EVERY character and broke four legacy
+# replays. Right effect, wrong byte.
+#
+# 14z-74 recorded "the table is 265 entries, entry 81 is IN RANGE" from
+# entry 0 = 0x0212 read as a self-encoded length. That reading is RETRACTED:
+# 0x0212 is simply entry 0's displacement (-> handler 0x01867A), and entries
+# "80/82/83" decode as 0x323b/0x4efb/0x1002 — the second dispatcher's own
+# instruction words, not table data.
+#
+# THE FIX, entirely inside HIS OWN PORTED DATA. vs2's table is larger, so
+# index 81 is valid there; vsavj's is not, and the port copied the index
+# verbatim — an index-space mismatch, the same class as the id space. The
+# sub-state byte lives at vs2 0x0D0C7F (region hitbox_proj), reached as
+# +0x17(A3) — exactly the field vs2's handler reads (`move.b 0x17(a3),
+# 0x54(a1)`). Retarget it to an IN-RANGE index whose entry already holds
+# 0x0224, the displacement that reaches 0x01868C — the handler 14z-74
+# established is byte-identical to vs2's. Index 79 (0x4F) is such an entry
+# (45 of the 80 entries hold 0x0224).
+#
+# LEGACY-SAFE BY CONSTRUCTION: this byte is in a region that exists only in
+# the tenant's build. No shared engine byte is touched, so no vanilla path
+# can observe it.
+#
+# CAVEAT to verify in playtest: the handler copies this byte to 0x54(a1), so
+# the value recorded in the fighter block changes 81 -> 79. If anything
+# downstream compares that field against 81 the move could behave
+# differently; nothing is known to, but it is the one thing this change
+# could plausibly perturb, and only a playtest will show it.
+[[port_patch]]
+stage = 6
+region = "hitbox_proj"
+src_addr = 0x0D0C7E
+old_hex = "0151"
+new_hex = "014f"
+note = "Cosmo Disruption sub-state 81 -> 79: vsavj's dispatch table has 80 entries, so 81 read past its end into the next dispatcher's operand and jumped into the table (watchdog reset). 79's entry is already 0x0224 = the same handler vs2 uses."
