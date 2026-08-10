@@ -1,4 +1,28 @@
-# Playtest guide — build `1464942a` (tenant at 0x13, option A phases 1-2): expected interims vs real bugs
+# HISTORICAL — playtest guide for build `1464942a` (14z-62f). DO NOT USE AS AN OPEN LIST.
+
+> **STATUS: SUPERSEDED. Every "EXPECTED" item below was FIXED in 14z-63/64
+> and none of them is open.** This page is kept as the record of what that
+> one interim build looked like and how its defects were classified — not as
+> a description of any current build.
+>
+> Specifically, all of these are DONE: the HUD name plate (no longer
+> "VICTOR"), the win-screen portrait/palette, the medallion placeholder art,
+> the misplaced highlight strip, the select-screen sword palette, and the
+> medallion WHITE-OUT (retired 14z-64 — the marchers' vestigial mid-row
+> writes redirected to scratch row 0x02 at all three dest computations).
+>
+> **M3a itself is CLOSED**, frozen and maintainer-ratified as `donovan-m3a`
+> (`4b7d0dc7`, tag `freeze/donovan-m3a`). For what is actually open, read
+> `docs/NEXT_SESSION.md`; for build status, the registry in `HANDOFF.md`.
+>
+> The one residual still recorded against M3a is in the `donovan-m3a`
+> registry row: Pyron placeholder medallion recolors after a 2P
+> Donovan-hover (row 0x1A, the P2 sword row) — cosmetic, on a placeholder
+> asset that `pyron-m2` has since replaced with his real art, so it should be
+> re-checked at the M3b merge rather than treated as standing work.
+
+## Original guide follows, unedited (build `1464942a`, tenant at 0x13, option A phases 1-2)
+
 
 For the 14z-62f playtest of `build/m3a_selrec`. Everything in the first
 table is a DOCUMENTED interim with a known mechanism and a queued fix —

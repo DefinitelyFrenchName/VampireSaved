@@ -549,7 +549,7 @@ tests/test_pyron_cosmo.sh      [bd]   # 14z-74: the Cosmo Disruption crash. 3 se
                                       # runtime (no crash, the EX still FIRES, the match
                                       # survives — a watchdog reset is not a 68k
                                       # exception, so the field trace proves it, not the
-                                      # guard). Defaults to build/pyron7
+                                      # guard). Defaults to build/pyron18
 tests/test_variant_dispatch.sh [bd]   # 14z-75: THE VARIANT-ROW DISPATCH SWEEP.
                                       # vsav aliases rows 0x10-0x1F of 32-row
                                       # per-character JUMP TABLES onto 0x00-0x0F, so a
@@ -589,7 +589,7 @@ tests/test_pyron_blink.sh      [bd]   # 14z-75: the sprite/HUD BLINK. Palette ro
                                       # value). PYRON_BLINK_EXPECT=fixed (default) |
                                       # blinks (reproduces the pre-fix shape on pyron15).
                                       # Checker tools/check_pyron_blink.py. Defaults
-                                      # pyron16
+                                      # build/pyron17
 tests/test_hui_grab_victim.sh  [bd]   # grab-victim placement A/B (14z-73): native
                                       # vsav2 vs the build, replay 80 through
                                       # field_trace.lua, comparing the victim offset
@@ -681,7 +681,7 @@ tests/test_hui_df_style.sh     [bd]   # the DARK FORCE gate (14z-69): replay 85
                                       # (--expect differs: purple row 0x0A vs native
                                       # gold, his art drawn ~4x over); set
                                       # DF_STYLE_EXPECT=matches when fixed. Three
-                                      # verdict controls. Defaults to build/hui11
+                                      # verdict controls. Defaults to build/hui25
 tests/audit_empty_tiles.sh    [bd]     # 14z-69o: does the build DRAW any sprite whose
                                       # group-C tile is BLANK? A remapped-but-uncopied
                                       # tile renders as a SOLID RECTANGLE and no other

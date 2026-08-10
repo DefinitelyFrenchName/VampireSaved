@@ -131,6 +131,19 @@ before comparing, or entries 40/41 read as "80/82, out of range".
   defect shape in this port. When a ported character does something vanilla
   never does, suspect a dead row first.
 
+## Carried into M3b — gate defaults point at intermediate builds
+
+Several tenant gates default to superseded interim builds (`pyron17`,
+`pyron18`, `hui25`) rather than the frozen ones (`pyron20`/`pyron-m2`,
+`hui27`/`huitzil-m2`). Left alone deliberately in 14z-76: some of those
+defaults are the gate's designed pre-fix REFERENCE (e.g.
+`PYRON_BLINK_EXPECT=blinks` reproduces on `pyron15`), so retargeting them
+blind would break their semantics, and the build dirs are untracked so a
+fresh checkout has none of them anyway. **The merge has to repoint all of
+them at the merged build regardless** — do it there, per gate, checking
+what each default is FOR. HANDOFF's stated defaults were corrected to match
+the code in 14z-76.
+
 ## Instrument blind spots still open
 
 1. **The extractor's dead-filler classifier is VIEW-BLIND** — it compares
