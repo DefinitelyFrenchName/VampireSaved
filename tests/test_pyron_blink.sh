@@ -3,8 +3,13 @@
 #
 # Palette RAM row 10 (0x90C140) carries Pyron's SPRITE and his in-match
 # HUD MUGSHOT — which is why both blinked. Before the fix it alternated
-# every frame while native vsav2 held it constant. FIXED in build/pyron16;
+# every frame while native vsav2 held it constant. FIXED in build/pyron17;
 # this gate now guards the fix and would make a regression loud.
+#
+# NOTE this gate only sees the IN-MATCH instance. The same defect lived in
+# TWO more tables that drive the SELECT screen and the between-fight ROUTE
+# MAP, and pyron16 — which passed this gate — still blinked on both.
+# tests/test_variant_dispatch.sh is the gate that covers all three.
 #
 #   1. NATIVE vs OURS on replay 76, the same script and the same pokes on
 #      both legs; tools/check_pyron_blink.py does the verdict.
@@ -18,15 +23,13 @@
 # to native's constant and the other vsavj palette-seq row 0x26 under the
 # uploader's 0xF000 OR — and still passes on build/pyron15.
 #
-# ROOT CAUSE (14z-75, FIXED): a DEAD ROW. There is a per-character
-# palette-routine dispatcher at 0x2A894 (`move.b ($382,A6),D1` -> word
-# table at 0x2A8A4, indexed by id*2 -> jmp). Most characters point at the
-# DEFAULT handler (displacement 0x0040), which animates nothing. vsavj's
-# rows 0x10-0x1F ALIAS 0x00-0x0F, so row 0x11 gave Pyron row 0x01's
-# ANIMATED handler (`moveq #$26,D0 / bra 0x2AD82`) — vs2's own row 0x11 is
-# the default. He ran a base-half character's palette animation every
-# frame. Fixed by one word (`palette_routine_row_11` in pyron.toml):
-# 0x2A8C6 008E -> 0040, i.e. exactly what vs2 already holds. Legacy-safe by
+# ROOT CAUSE (14z-75): a DEAD ROW, in THREE per-character palette-routine
+# jump tables whose rows 0x10-0x1F alias 0x00-0x0F, so row 0x11 gave Pyron
+# row 0x01's ANIMATED handler where vs2's row 0x11 is the DEFAULT no-op:
+#     0x2A8A4 (in-match)   patch 0x2A8C6  008E -> 0040
+#     0x2B650 (select/map) patch 0x2B672  0042 -> 0040
+#     0x73790 (select/map) patch 0x737B2  0042 -> 0040
+# Each is one word, each set to vs2's own value. Legacy-safe by
 # construction — vanilla never puts an id in 0x10-0x1F (audit_id_writers).
 #
 # The symptom looked like a Dark Force recolour because 0x2AD82 IS the
@@ -48,7 +51,7 @@ WORK="$(mktemp -d)"
 trap 'rm -rf "$WORK"' EXIT
 fail=0
 
-BUILD="${1:-build/pyron16}"
+BUILD="${1:-build/pyron17}"
 case "$BUILD" in /*) ;; *) BUILD="$REPO/$BUILD" ;; esac
 EXPECT="${PYRON_BLINK_EXPECT:-fixed}"
 export MAME_BIN="${MAME_BIN:-$HOME/.cache/vampire-saved/mame/cps2}"

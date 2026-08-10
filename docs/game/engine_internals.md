@@ -70,7 +70,7 @@ correct. One dead row is the whole defect.
 | 3 | grab-hold keyframe ptr table `0xBE27A` row 0x10 | ALIAS of row 0x00 (char 0's block) | the tenant's own block | `[[data_port]]` + row repoint (14z-73) |
 | 4 | sub-state jump table `0x18468` entry 81 (Cosmo Disruption) | `0x0006` — a displacement pointing back INTO the table | a real handler | **one word**: repoint to `0x0224`, which already holds vs2's identical 8-byte handler (14z-74) |
 | 5 | in-fight HUD mugshot `0x89884` + name `0x898C4`, rows `0x10-0x1F` | pure ALIASES of `0x00-0x0F` (both tables) | rows 0x10/0x11/0x13 filled for H/Pyron/Donovan | three tenant-gated pokes + place the art at free-pool anchors (14z-63/75) |
-| 6 | per-character palette-routine table `0x2A8A4` row 0x11 | ALIAS of row 0x01 (its ANIMATED palette handler) | the DEFAULT no-op handler | **one word**: `0x2A8C6` `008E -> 0040` (14z-75, Pyron's blink) |
+| 6 | per-character palette-routine tables `0x2A8A4`, `0x2B650`, `0x73790` row 0x11 (THREE of them) | ALIASES of row 0x01 (its ANIMATED palette handler) | the DEFAULT no-op handler | **one word each**: `0x2A8C6`/`0x2B672`/`0x737B2` -> `0040` (14z-75, Pyron's blink; sweep with `tests/test_variant_dispatch.sh`) |
 
 **Diagnostic recipe** (all six were found this way):
 1. Find the table and the index the tenant drives it with (a breakpoint on
@@ -636,16 +636,37 @@ a word-displacement table at **`0x2A8A4`**, indexed by `id*2`. Most
 characters carry displacement `0x0040` = the DEFAULT handler, which animates
 nothing. vsavj's rows `0x10-0x1F` alias `0x00-0x0F`, so **row 0x11 handed
 Pyron row 0x01's ANIMATED handler** (`moveq #$26,D0 / add.b ($3AE,A6),D0 /
-bra 0x2AD82`) where vs2's own row 0x11 is the default. Fix: one word,
-`0x2A8C6` `008E -> 0040` — what vs2 already holds. Legacy-safe by
+bra 0x2AD82`) where vs2's own row 0x11 is the default.
+
+**THERE ARE THREE SUCH TABLES, not one**, and fixing only the first left the
+blink alive on the select screen and the between-fight route map (maintainer
+playtest of pyron16). All three carry the same shape and the same one-word
+fix to vs2's own value:
+
+| table | dispatcher / index | row 0x11 vsavj -> vs2 | patch |
+|---|---|---|---|
+| `0x2A8A4` | `0x2A894`, `move.b ($382,A6)` | `008E` -> `0040` | `0x2A8C6` |
+| `0x2B650` | `0x2B64C`, `move.b ($382,A4)` | `0042` -> `0040` | `0x2B672` |
+| `0x73790` | `0x7378C`, `move.b ($39,A6)`  | `0042` -> `0040` | `0x737B2` |
+
+`0x2B650`'s row-0x11 body carries the SAME `moveq #$26,D0 / add.b ($3AE,A4),D0`
+request, branching to the second resolver site `0x2B7E8` — which our build
+called 523 times against native's 180, the tell that the first fix was
+incomplete. After all three: **0 and 180, exactly native's counts** (and
+exactly Huitzil's).
+
+**Find these by SWEEPING for the shape, not by chasing a screen** —
+`tools/audit_variant_dispatch.py` / `tests/test_variant_dispatch.sh` do it
+statically for any tenant. Legacy-safe by
 construction (vanilla never puts an id in `0x10-0x1F`), and measured
 legacy-inert: replay 02 bit-identical across the fix.
 
-Note the table rows for the other tenants: Donovan's `0x13` is already
-`0x0040` (which is why this never surfaced on him), and **Huitzil's `0x10`
-is `0x004A` — row 0x00's handler — where vs2's is the default.** He carries
-the same class latently; it is benign today (0 hits at `0x2AD82`), but it is
-not what native does. `huitzil-m2` is frozen, so that is a maintainer call.
+Other tenants, from the same sweep: Donovan's `0x13` is `0x0040` in all
+three tables — the no-op — where vs2 runs his own routines; that is a
+MISSING feature, not a spurious one, and harmless. **Huitzil's `0x10` is
+`0x004A` in `0x2A8A4`** (row 0x00's handler) where vs2's is the default —
+the same spurious class, latent and benign today (0 hits at `0x2AD82` on the
+frozen build). `huitzil-m2` is frozen, so that is a maintainer call.
 
 **The symptom lied about its cause.** `0x2AD82` is the DF-family palette-seq
 resolver (H's 14z-69p work), so this read as "a Dark Force recolour without

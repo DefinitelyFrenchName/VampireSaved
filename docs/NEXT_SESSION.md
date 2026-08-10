@@ -3,11 +3,11 @@
 **Session goal: finish Pyron's rung.** His HUD and his BLINK are both DONE.
 TWO items remain open.
 
-**Current build: `build/pyron16` (`bd837784`) — this is the one to
+**Current build: `build/pyron17` (`5dc6da06`) — this is the one to
 playtest.** Not frozen. Run it:
 ```sh
 export ROMDIR=/path/to/reference/sets
-tools/run_wide.sh build/pyron16 fbneo      # or: ... mame
+tools/run_wide.sh build/pyron17 fbneo      # or: ... mame
 ```
 Rebuild:
 ```sh
@@ -24,21 +24,25 @@ huitzil too if you touch anything shared like `effect_tail.json`).
 
 ## 1. THE BLINK — FIXED (nothing to do; here is what it was)
 
-A **DEAD ROW**, the sixth instance. The per-character palette-routine table
-at `0x2A8A4` (dispatcher `0x2A894`, indexed by the character id at +0x382)
-aliases rows `0x10-0x1F` onto `0x00-0x0F`, so Pyron's row 0x11 handed him
-row 0x01's ANIMATED palette handler where vs2's row 0x11 is the default
-no-op. He ran Demitri's palette animation every frame on row 10 — the row
-his sprite AND his HUD mugshot share, which is why both blinked.
+A **DEAD ROW**, in **THREE** per-character palette-routine jump tables whose
+rows `0x10-0x1F` alias `0x00-0x0F` — so Pyron's row 0x11 handed him row
+0x01's ANIMATED palette handler where vs2's row 0x11 is the default no-op:
+`0x2A8A4` (in-match), `0x2B650` and `0x73790` (select screen + route map).
+One word each, to vs2's own value: `0x2A8C6`, `0x2B672`, `0x737B2` -> `0040`.
 
-Fix: one word, `0x2A8C6` `008E -> 0040`, exactly what vs2 holds. Guarded by
-`tests/test_pyron_blink.sh` (default `fixed`; `PYRON_BLINK_EXPECT=blinks`
-reproduces the pre-fix shape on pyron15).
+**pyron16 fixed only the first and the blink survived on two screens** — the
+tell was the second resolver site `0x2B7E8` at 523 calls vs native's 180.
+Now 0 and 180, exactly native's and Huitzil's.
 
-**Latent on Huitzil:** his row `0x10` is `0x004A` (row 0x00's handler) where
-vs2's is the default. Benign today (0 hits at the resolver) but not what
-native does. `huitzil-m2` is FROZEN and maintainer-confirmed — **changing it
-is a maintainer decision**, and it is worth raising before the M3b merge.
+**THE LESSON: an aliased-variant-row table is rarely ALONE. Sweep for the
+SHAPE, don't chase the screen** — `tests/test_variant_dispatch.sh`.
+
+**Latent on Huitzil:** his row `0x10` in `0x2A8A4` is `0x004A` (row 0x00's
+handler) where vs2's is the default — the only spurious row the sweep still
+reports. Benign today (0 hits at the resolver) but not what native does.
+`huitzil-m2` is FROZEN and maintainer-confirmed — **changing it is a
+maintainer decision**, and it is worth raising before the M3b merge. His
+rows in the other two tables already match vs2.
 
 ## 2. Effect palette — deferred, and a SHARED hazard
 
@@ -73,8 +77,15 @@ the third data point. Detail + two failed attempts:
 
 ## Gates added in 14z-75
 
+- `tests/test_variant_dispatch.sh` + `tools/audit_variant_dispatch.py` — THE
+  sweep for the port's most common defect shape (aliased variant rows in
+  per-character jump tables). Run it for every tenant. It also reports, for
+  information, rows where vs2 runs a routine we do not — Donovan's 0x13 is
+  the no-op in all five tables, a missing feature rather than a spurious one.
 - `tests/test_pyron_blink.sh` + `tools/check_pyron_blink.py` + replay 76 —
   the blink, checked by MECHANISM (both values named), not just by symptom.
+  NOTE it only sees the IN-MATCH instance; pyron16 passed it while still
+  blinking on two other screens.
 - `tests/replays/40_pick_pyron_cell.rpl` — walks the wheel onto his cell,
   the 0x11 twin of replays 36/37. Used by `test_tenant_hud.sh` section 3.
 

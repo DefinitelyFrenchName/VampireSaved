@@ -9,10 +9,12 @@ never the placer. He has his OWN free-pool anchors (name 0xBE94, mug
 (3fb71586); byte-attributed against pyron14 as exactly 2 program bytes and
 6 tiles. Also: build/manifest/pyron.toml had NOT PARSED since fcfe5c7, so
 pyron14 was unrebuildable from the tree — fixed. THE BLINK is now
-root-caused AND FIXED — one word. It was a DEAD ROW: the per-character
-palette-routine table aliases rows 0x10-0x1F onto 0x00-0x0F, so Pyron ran
-Demitri's animated-palette handler every frame. build/pyron16 (bd837784)
-is the build to playtest. 14z-74's confounded "543 vs 0" figure is
+root-caused AND FIXED. It was a DEAD ROW — per-character palette-routine
+tables alias rows 0x10-0x1F onto 0x00-0x0F, so Pyron ran a base-half
+character's animated-palette handler. THREE such tables, not one: the
+maintainer's playtest of pyron16 found the blink still alive on the SELECT
+screen and the ROUTE MAP, because the first fix covered only the in-match
+dispatcher. build/pyron17 (5dc6da06) is the build to playtest. 14z-74's confounded "543 vs 0" figure is
 RETRACTED, and one of MY OWN eliminations was wrong and is corrected
 below. Read docs/NEXT_SESSION.md first.)
 
@@ -179,7 +181,7 @@ pyron14 could not be rebuilt from the tree at all. Found by parsing the
 manifest before editing it. (A rebuild in that commit would have caught it —
 the same lesson as 14z-74's chaining rule, from the other direction.)
 
-**2. THE BLINK — ROOT-CAUSED AND FIXED (build/pyron16, `bd837784`).**
+**2. THE BLINK — ROOT-CAUSED AND FIXED (build/pyron17, `5dc6da06`).**
 
 Measured first, anchored in-match with both legs PROVEN to hold Pyron
 (+0x382 = 0x11), as a **phase-independent** property (distinct palette-row-10
@@ -200,12 +202,37 @@ animates nothing. vsavj's rows `0x10-0x1F` alias `0x00-0x0F`, so **row 0x11
 handed Pyron row 0x01's ANIMATED handler** (`moveq #$26,D0 / bra 0x2AD82`)
 where vs2's own row 0x11 is the default.
 
-**THE FIX is one word:** `0x2A8C6` `008E -> 0040` — exactly what vs2 holds
-(`palette_routine_row_11` in pyron.toml). Verified: the spurious resolver
-calls went **581 -> 0** (native 0, Huitzil 0); palette row 10 now constant
-and bit-identical to native; the mugshot is pixel-identical across
-consecutive frames. Legacy: replay 02 **bit-identical** between pyron15 and
-pyron16, and the whole-romset delta is **exactly those 2 bytes**.
+**THREE TABLES, NOT ONE — and that cost a playtest round.** pyron16 fixed
+only `0x2A8A4` (the in-match dispatcher) and the maintainer reported the
+blink still alive on the SELECT screen and the between-fight ROUTE MAP. The
+tell had been on screen the whole time: the SECOND resolver site `0x2B7E8`
+was called **523** times against native's **180**, and I noted it without
+chasing it. Sweeping the ROM for the SHAPE — every `jmp (d8,PC,Dn.w)` word
+table whose rows 0x10-0x1F alias 0x00-0x0F — found five such tables and two
+more carrying Pyron's row on a base-half routine:
+
+| table | dispatcher / index | row 0x11 | patch |
+|---|---|---|---|
+| `0x2A8A4` | `0x2A894` `move.b ($382,A6)` | `008E` -> `0040` | `0x2A8C6` |
+| `0x2B650` | `0x2B64C` `move.b ($382,A4)` | `0042` -> `0040` | `0x2B672` |
+| `0x73790` | `0x7378C` `move.b ($39,A6)`  | `0042` -> `0040` | `0x737B2` |
+
+`0x2B650`'s row-0x11 body holds the SAME `moveq #$26,D0 / add.b ($3AE,A4),D0`
+request branching to `0x2B7E8`. Verified: resolver counts are now
+`0x2AD82`=**0** and `0x2B7E8`=**180** — exactly native's, and exactly
+Huitzil's (were 581/523). Palette row 10 constant and bit-identical to
+native; the mugshot pixel-identical across consecutive frames. Legacy:
+replay 02 **bit-identical** across every step, and the pyron16->17 delta is
+**exactly 4 bytes**.
+
+**LESSON, and it cost a playtest round: an aliased-variant-row table is
+rarely ALONE.** Sweep for the shape, do not chase the screen. New gate
+`tests/test_variant_dispatch.sh` + `tools/audit_variant_dispatch.py` does
+exactly that for any tenant, and catches all three on pyron15. Its
+coverage control exists because the first twin-finder demanded a UNIQUE
+context match and therefore silently skipped `0x2A8A4` — vsav ships two
+byte-identical copies of that dispatcher, so twins must be matched by
+ORDINAL.
 Legacy-safe by construction — the table is indexed by the character id and
 `tests/audit_id_writers.sh` **re-run this session, PASS**: no legacy
 gameplay path writes an id in `0x10-0x1F`.

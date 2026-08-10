@@ -171,3 +171,4 @@ is a GAME gotcha if it is true of the game regardless of the port.
 - Cross-emulator position A/B: compare the RELATIVE offset (p2x−p1x), never absolute x — the two emulators run the match at a ~21px global camera shift, and comparing absolute x fabricated a "rig not comparable" blocker that cost a session (14z-72→73, the grab victim)
 - `placements.json`'s dst/src is a LINEAR map while the extractor auto-discovers SUB-REGION shifts — compare by CORRELATION, or a faithfully-ported region reads as 75% corrupt (14z-75)
 - Read a jump/data TABLE BASE off the code that indexes it, never off a content match — a row-content match put vs2's palette-seq base 8 rows out and produced a confidently wrong elimination (14z-75)
+- A per-character table aliasing rows 0x10-0x1F onto 0x00-0x0F is usually not ALONE — Pyron's blink lived in THREE such tables and fixing one left two screens broken; sweep for the SHAPE (tests/test_variant_dispatch.sh), don't chase the screen (14z-75)

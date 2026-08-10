@@ -851,3 +851,40 @@ name = "palette_routine_row_11"
 addr = 0x02A8C6
 old_hex = "008e"
 new_hex = "0040"
+
+# ── 14z-75 (round 2, maintainer playtest of pyron16): the blink survived on
+# the SELECT screen and on the between-fight ROUTE MAP. Same defect, two
+# more tables — the fix above only covered the IN-MATCH dispatcher.
+#
+# Found by SWEEPING the ROM for the shape instead of chasing one screen:
+# every `jmp (d8,PC,Dn.w)` word table whose rows 0x10-0x1F alias 0x00-0x0F.
+# Five exist; three needed nothing, and these two put Pyron on row 0x01's
+# handler where vs2 has the DEFAULT:
+#
+#   table 0x02B650 (dispatcher 0x02B64C, `move.b ($382,A4),D0`)
+#       vsavj row 0x11 = 0x0042 (alias of row 0x01) -> 0x02B692
+#       vs2   row 0x11 = 0x0040 -> the default, whose body is a bare RTS
+#       and 0x02B692 contains the SAME palette request as the in-match one
+#       (`moveq #$26,D0 / add.b ($3AE,A4),D0`) branching to 0x02B7E8 — the
+#       site our build over-called 523 times against native's 180.
+#
+#   table 0x073790 (dispatcher 0x07378C, `move.b ($39,A6),D0`)
+#       vsavj row 0x11 = 0x0042 -> 0x0737D2 ; vs2 row 0x11 = 0x0040 (RTS)
+#
+# Huitzil's row 0x10 already MATCHES vs2 in both of these (0x0040 and 0x0042
+# respectively), so neither touches him. Donovan's row 0x13 differs from vs2
+# in both, but in the SAFE direction — ours is the no-op default where vs2
+# runs his own routine, i.e. a missing feature, not a spurious one.
+[[code_word]]
+stage = 6
+name = "palette_routine_row_11_b"
+addr = 0x02B672
+old_hex = "0042"
+new_hex = "0040"
+
+[[code_word]]
+stage = 6
+name = "palette_routine_row_11_c"
+addr = 0x0737B2
+old_hex = "0042"
+new_hex = "0040"
