@@ -10514,6 +10514,52 @@ Original write-up kept below.
 
 ## Decisions pending (human)
 
+- **THE MERGED BUILD'S `[init_shim]`: ONE SHIM, THREE TENANTS (14z-77, M3b).**
+  Surfaced by slice F's collision measurement — it is one of the three real
+  merge blockers, and unlike the other two it is not purely mechanical.
+
+  **The mechanics, measured.** The shim is emitted ONCE per build at ONE site
+  (`dispatch_00`'s seed hook, `seed_entry = 0x016C64` — identical in both
+  manifests that declare it). It (a) seeds the object pool if the latch is
+  clear, and (b) writes the VS2/VH2 **flavor** byte to `+0x3C2` of the player
+  struct being initialised, or `flavor_held` when that player's Start is held.
+
+  Three things follow, and only the first is mechanical:
+
+  1. **Flavor polarity is per tenant and already ratified.** D1 (VS2 default)
+     means `0x01` for Donovan and `0x00` for Phobos — the polarity differs
+     because the engine branch each character tests differs (14z-66 measured
+     it against native). A merged shim must write the id-appropriate byte,
+     i.e. the same N-way dispatch the thunks need. No decision required.
+  2. **`latch_mode = "phase"` is NOT per tenant — the seeder is shared, so a
+     merged build either has the gate or does not.** Phobos NEEDS it: without
+     it his ecosystem drains pool 0 and the round-2 char re-init re-runs the
+     seeder over LIVE pools (14z-65 measured the f4890 wipe, orphaned queues,
+     and a freed slot dispatched into palette space). He is in the merged
+     build, so **the merged build must carry the gate**, and Donovan's shim
+     bytes therefore change — the generator's own comment says his frozen
+     bytes stand "until his own re-freeze adopts the mode". The gate only
+     narrows WHEN the seed runs (to `$FF800C == 0x40000`, the char-load
+     phase), and Donovan's first init is at that phase, so it SHOULD be inert
+     for him — but that is an argument, not a measurement, and this project
+     does not ship arguments. **Required before the merged build is trusted:
+     Donovan's replay battery on a phase-mode build, compared to
+     donovan-m3a.**
+  3. **Pyron declares NO `[init_shim]` at all.** In a merged build the shim
+     runs at char-init for whatever the hosted dispatch covers, so he could
+     be given a `+0x3C2` flavor byte he has never had. Whether he reads that
+     byte is UNMEASURED. Options: give him an explicit row (needs his own
+     polarity measured against native vs2, the 14z-66 procedure), or gate the
+     flavor write so only tenants that declare one receive it.
+
+  **Recommendation:** adopt phase mode for the merged build (2 is forced),
+  dispatch the flavor bytes per id (1), and gate the write so Pyron is
+  untouched until his polarity is measured (3, the conservative half) — then
+  measure Donovan's battery before trusting the merged build. The alternative
+  worth the maintainer's attention: if Donovan's battery DOES move under phase
+  mode, the fallback is a per-id gate on the phase check itself, which is more
+  emitted code at a shared site and wants explicit sign-off.
+
 - ~~**THE BEAM'S LIST-TYPE 12: FLATTEN, OR RATIFY THE HOOK? (14z-71)**~~
   **DECIDED 2026-08-09 (maintainer): NEITHER — take over the dead
   list-type 6**, with the explicit condition that the deadness assumption

@@ -245,12 +245,16 @@ manifests: `[[space]]` 9→3, `[[obj_hook]]` 6→2, `[[select_wheel]]` 3→1,
 90→87, `[[code_word]]` 13→11, `[[pcrel_escape_fix]]` 7→5 — and 12 collisions,
 in **two classes**:
 
-**THREE REAL BLOCKERS.** `[init_shim]` (D vs H differ on
-`flavor_default`/`flavor_held`/`latch_mode`; P declares none) and `[table_fix]`
-twice (D vs H, D vs P — `rows_hex` differs by exactly the tenant's own OBJ bank
-row). Both are TOML SINGLETONS, so the schema cannot even express two: the
-resolution is a per-row union for `table_fix`, and for `init_shim` either
-promotion to `[[init_shim]]` or attachment to the tenant row.
+**THREE REAL BLOCKERS.** `[table_fix]` twice (D vs H, D vs P — `rows_hex`
+differs by exactly the tenant's own OBJ bank row; the resolution is a per-row
+union, and it is purely mechanical), and `[init_shim]` once — **which is NOT
+mechanical and is now a DECISION PENDING in STATE.md.** The shim is emitted
+ONCE at ONE site, so a merged build has one seeder: Phobos needs
+`latch_mode = "phase"` (without it his ecosystem drains pool 0 and the round-2
+re-init re-runs the seeder over live pools), which means **Donovan's frozen
+shim bytes change** and his battery must be re-measured; and Pyron declares no
+shim at all, so a merged one could hand him a `+0x3C2` flavor byte he has never
+had, whose effect is unmeasured. Read the STATE entry before touching it.
 
 **SIX THAT DISSOLVE.** The `x05c800` / `x088512` `port_patch` rows: Donovan
 writes the host band's word where H/P write a no-op — **but all three agree on
