@@ -1,5 +1,7 @@
 # registry.tsv — build fingerprint (program-image SHA-1) -> expectation set
 # Rows added only at freeze time, as a build decision recorded in STATE.md.
+# Every row also has an annotated git tag freeze/<expectation-set> at the
+# commit that froze it — the way back to a tree that reproduces it.
 # sha1	expectation-set	notes
 b0eb9ecd8a6fd354f398d4347002b204b784f47c	vsavj	vanilla vsavj (Japan 970519) reference program image
 a02aeefff4c7a053337b10c923c8c328573788fa	donovan-m2	M2a freeze: donovan-m2 stage 5 (hooked build; masked legacy basis per CLAUDE.md §4 v2) — frozen 2026-07-28, STATE.md

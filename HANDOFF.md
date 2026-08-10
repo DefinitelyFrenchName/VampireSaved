@@ -773,6 +773,15 @@ before session end (persistent suite doctrine, CLAUDE.md §4).
 
 ## Build registry
 
+**Every frozen build is git-tagged `freeze/<name>`** (annotated; the tag
+message carries the fingerprint and how to reproduce). `git tag -l 'freeze/*'`
+lists them. This matters most for SUPERSEDED builds — `pyron-m1` and
+`huitzil-m1` cannot be produced from today's tree because their manifests
+moved on, and their tag is the only way back to a tree that does.
+NOTE: the tags mark the commit at which each build was frozen and was
+reproducible AT THAT TIME; no one has re-verified the older ones since.
+
+
 | Build | SHA-1 (zip) | Notes |
 |---|---|---|
 | pyron-m1 — SUPERSEDED by pyron-m2 (14z-76); no longer producible from the tree (pyron.toml now carries the effect-palette row) | fingerprint `d8b282daab75fcb3c52e75170a05a600fd0f3ad7` | `build/pyron19`; REGISTERED `-> pyron-m1`. The THIRD full-roster tenant, at his native vs2 id 0x11. Everything the 14z-74/75 arc landed: his art at delta 0, select family + 21-cell wheel, sprite palettes, win screen, his own variant-id HUD (anchors 0xBE94/0xBE9C), physics, the air 214+P fix, THE BLINK (three aliased palette-routine tables, one word each — sweep them with `tests/test_variant_dispatch.sh`), and THE COSMO CRASH fixed in HIS OWN DATA (sub-state index 81 is out of range for vsavj's 80-entry table; retargeted 81->79 at vs2 0x0D0C7F, one byte, tenant-scoped — the 14z-74 engine-side repoint of the shared word is WITHDRAWN, it broke four legacy replays). Expectation set `tests/expected/pyron-m1/`: 42 `.sha1` + 13 `.masked` + 17 `.skip` = 72/72 replays, `run_suite.sh vsavjw` **GREEN (55 PASS / 17 SKIP / 0 FAIL)**. Validate: `ROMDIR=... MAME_BIN=~/.cache/vampire-saved/mame/cps2 MAME_ROMPATH="build/pyron19/rompath;$ROMDIR" tests/run_suite.sh vsavjw`. OPEN (non-blocking): the win QUOTE (shared fold), his EFFECT palette (PORTED 14z-76 on `build/pyron20` `69e8c6f0`, awaiting playtest — the "16-row table" reason this row was deferred is RETRACTED, see the pyron20 row below), and replay 80's f4840 reset — an INDEPENDENT defect present on pyron14 too. |
