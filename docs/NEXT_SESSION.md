@@ -388,6 +388,61 @@ the 344,640-byte crypt window — over by 125,560 — and **`anim` alone is
 > This reframes the blocker from a layout constraint into a generator bug,
 > which would make BOTH fallbacks (growing the crypt window, dropping a
 > tenant) unnecessary.
+
+### REPRODUCE IT IN THREE COMMANDS (and the three traps that cost time)
+
+```sh
+export ROMDIR=/path/to/reference/sets
+export MAME_BIN=~/.cache/vampire-saved/mame/cps2      # TRAP 1
+POK="1400:ff8782:13;1450:ff8782:13;1500:ff8782:13"    # TRAP 2
+
+# 1. build Donovan with anim in wide_ext (inject into the FIRST occurrence —
+#    donovan.toml carries hole_b_regions TWICE, [[tenant]] and legacy [port])
+python3 - <<'EOF'
+import pathlib
+m = pathlib.Path("build/manifest/donovan.toml").read_text()
+a = 'hole_b_regions = "aux0_4,hitbox"'
+pathlib.Path("build/manifest/_animprobe.toml").write_text(
+    m.replace(a, a + '\nregion_space = "anim=wide_ext"', 1))          # TRAP 3
+EOF
+KEY_SET=vsavj TENANT_MANIFEST=build/manifest/_animprobe.toml TENANT_CHAR=0x13 \
+WIDE_ROMSET="$PWD/build/wide0/rompath/vsavjw.zip" \
+GEN_FLAGS="--allow-plausible --tripwire-open --profile cps2-wide-v1" \
+tools/build_donovan.sh 6 /tmp/animmv
+
+# 2. see the crash
+POKES="$POK" MAME_ROMPATH="/tmp/animmv/rompath;$ROMDIR" \
+  tools/run_replay_guarded.sh vsavjw tests/replays/12_donovan_vs_cpu.rpl \
+  /tmp/an.log /tmp/anbox        # -> CRASH 1401 vec3 PC 015098 ADDR 000decc3
+
+# 3. the base pointer, on BOTH builds — they are IDENTICAL, which is the finding
+POKES="$POK" MAME_ROMPATH="$PWD/build/m5_wide/rompath;$ROMDIR" \
+GUARD_PROBE=01508a GUARD_PROBE_MAX=2000 \
+  tools/run_replay_guarded.sh vsavjw tests/replays/12_donovan_vs_cpu.rpl \
+  /tmp/wbase.log /tmp/wbx
+awk '$2>=1400 && $2<=1402' /tmp/wbase.log | grep '^PROBE'
+#   PROBE 1401 ... A0=000dda1e ...   <- same on the anim-moved build
+```
+
+**TRAP 1 — `MAME_BIN`.** Without the WIDE source build, MAME reports
+*"Unknown system: vsavjw"* and lists near-matches. That is an EMULATOR
+problem, not a ROM problem (HANDOFF says so, and renaming the zip to force it
+is actively harmful).
+
+**TRAP 2 — the rig must FORM the match.** `11_pick_donovan.rpl` never runs
+Donovan's char-init on a variant-id build: probing it returns ZERO hits, which
+reads exactly like "the code never executes". Use the forced-pick pokes with
+replay 12 (or 03/16 for both player structs). A positive control on a
+known-executed address — the pool seeder `0x016C64` gives 4 hits — is what
+distinguishes a real zero from a blind one.
+
+**TRAP 3 — `donovan.toml` declares `hole_b_regions` TWICE**, in `[[tenant]]`
+and in the superseded flat `[port]`. `normalise_tenants()` prefers
+`[[tenant]]`, so inject into the FIRST occurrence only.
+
+**New instrument this session:** `GUARD_PROBE_MEM="<reg>+<hexoff>"` on
+`replay_guard.lua` appends the byte at that register+offset to each PROBE
+line. Frame-level ordering is too coarse when two events sit inside one frame.
 >
 > Not ownership, not the manifest merge, not gating or baked code — all done.
 > Not total space — `wide_ext` has 2 MB free. Everything else moves.
