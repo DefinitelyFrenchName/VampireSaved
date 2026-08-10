@@ -489,6 +489,69 @@ payload must collide; same span + same payload must dedup).
 is at **0x8b100**; `0x8b0f8` is byte-identical across all three files and
 dedups as shared. The gate failed on it, which is the gate working.
 
+### 14z-77h — REGION IDENTITY: the plan's premise is MEASURED and CORRECTED
+
+M3b_plan Phase 2 item 2 says "key regions by (src_set, src_addr, len); a
+shared span is placed ONCE and all tenants' relocations resolve through the
+shared placement." **Measured across the three frozen builds, that is not
+achievable for four of the seventeen shared spans**, and the merge design has
+to account for it. `tools/audit_region_overlap.py`, frozen by
+`tests/test_region_overlap.sh` (~1s, no ROMs).
+
+**Three classes, measured: 17 shared spans / 8 name collisions / 13 unique.**
+The 8 collisions are TWO kinds wanting OPPOSITE treatment, which the plan
+treated as one:
+
+- **7 generic per-tenant names** — `anim`, `code`, `hitbox`, `hitbox_proj`,
+  `aux0_0..2`. Same name, completely different spans; each is that tenant's
+  OWN region. These need per-tenant NAMESPACING, not sharing. (D anim
+  0x27F548/0x20F00, H 0x245872/0x1E800, P 0x264086/0x1B500.)
+- **1 EXTENT collision** — `x088512`, same start in all three, three lengths
+  (D 0x2F00, H 0x3B98, P 0x3B40). One region extracted to three different
+  extents; the merge wants the union extent.
+
+**The finding: a shared SOURCE span does not imply a shareable BLOB.** Each
+tenant's run rewrites pointers inside a shared region to reach that tenant's
+own placements, so the blobs differ by construction. Classified per byte
+across the three tenants:
+
+| span | 1-differs (disjoint, unionable) | CONFLICT (2+ disagree) |
+|---|---|---|
+| `x026142` | 68 | **54** |
+| `x028122` | 45 | **50** |
+| `x05c800` | 485 | **348** |
+| `x2b7ef4` | 1076 | **1548** |
+| | | **2000 total** |
+
+A *1-differs* byte is one tenant's own row in a per-character table — disjoint,
+so a union is well defined (this is `[table_fix]`'s shape, generalised). A
+*CONFLICT* byte is one field that two or more tenants want to hold different
+values: only one can ship. **Those four spans therefore need a per-tenant COPY,
+or a per-character indirection at each conflicting field** — not a single
+placement.
+
+The other 13 shared spans are declared by H and P only, and with two tenants
+"exactly one differs" and "both disagree" are the same observation, so the tool
+reports them **UNDECIDABLE** rather than as a reassuring zero. They become
+decidable when a third tenant declares them, or under a merged build.
+
+**THE NUMBER IS ONLY REAL BECAUSE PLACEMENT IS NORMALISED OUT, and that is the
+trap this tool exists to avoid.** The three references are INDEPENDENT
+single-tenant builds, so each allocator chose its own addresses; a pointer into
+a SHARED region then reads as a conflict when a merged build would resolve it
+to one address. Un-relocating every word that lands in a placed region back to
+its SOURCE address removes exactly that artefact — and it accounts for **73% of
+the raw figure (7,591 -> 2,000)**. A gate quoting the raw number would have
+been confidently wrong, so `--no-normalise` is kept purely as the control that
+proves the normalisation is load-bearing, and section 3 asserts it every run.
+
+**What this means for the next slice.** Region identity is not one mechanism
+but three: namespace the 7 generic names per tenant; take the union extent for
+`x088512`; and for each of the 4 conflicting shared spans decide COPY vs
+INDIRECTION — which needs the conflicting fields identified by purpose, not
+just counted. The counts are frozen, so that analysis can proceed against a
+fixed target.
+
 ### 14z-77g — BOTH slice-G measurements CLOSED, and one of my predictions
 ### is RETRACTED
 

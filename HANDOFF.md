@@ -473,6 +473,24 @@ tests/audit_phase_mode_cost.sh        # 14z-77: what Phobos' phase-gated latch
                                       # round-2). An IDENTICAL result FAILS — that
                                       # means the rig stopped forming the match.
                                       # On-demand, ~15 min
+tests/test_region_overlap.sh [bd...]  # 14z-77: can the tenants' shared source
+                                      # spans be placed ONCE? M3b_plan Phase 2
+                                      # item 2 assumes yes; MEASURED, four of the
+                                      # 17 cannot. Freezes 17 shared / 8 name
+                                      # collisions (7 generic per-tenant names +
+                                      # x088512's extent) / 13 unique, and 2000
+                                      # CONFLICTING bytes over x026142/x028122/
+                                      # x05c800/x2b7ef4 — fields two or more
+                                      # tenants write differently, so only one
+                                      # can ship. Two-tenant spans report
+                                      # UNDECIDABLE, never a reassuring zero.
+                                      # Section 3 is the control that placement
+                                      # normalisation is load-bearing: 7591 raw
+                                      # -> 2000, i.e. 73% of the raw number is an
+                                      # artefact of three INDEPENDENT builds'
+                                      # allocators. tools/audit_region_overlap.py
+                                      # (--no-normalise is the control only,
+                                      # never a verdict). Static, ~1s
 tests/test_manifest_merge.sh          # 14z-77 (M3b slice F): what the three
                                       # tenant manifests DO when merged. Freezes
                                       # the shared-row dedup counts (space 9->3,

@@ -302,13 +302,34 @@ it. Both new gates now open with that control.
 
 ### NEXT SLICE — region identity, then the N-way dispatch FORM
 
-**1. Region/extraction identity** (M3b_plan Phase 2 item 2). Key regions by
-`(src_set, src_addr, len)`; place a shared span ONCE and resolve every
-tenant's relocations through that placement. Fixes the `x{addr}` name
-collision and the PC-reach constraint together, and it is where Donovan's 12
-`x028122` relocations — rewriting shared bytes H/P do not declare — have to be
-resolved. Once the loop rebinds `T`, every extraction-side site listed above
-is correct.
+**1. Region/extraction identity — MEASURED 14z-77, and it is THREE mechanisms,
+not one.** M3b_plan Phase 2 item 2's "a shared span is placed ONCE" holds for
+most spans but NOT for four of them. `tests/test_region_overlap.sh` (~1s)
+freezes the picture; `tools/audit_region_overlap.py` produces it.
+
+- **7 generic names need per-tenant NAMESPACING** — `anim`, `code`, `hitbox`,
+  `hitbox_proj`, `aux0_0..2` are the same name for completely different spans,
+  one per tenant. Not shared at all.
+- **`x088512` needs the UNION EXTENT** — same start in all three, three
+  lengths (D 0x2F00, H 0x3B98, P 0x3B40).
+- **4 shared spans CONFLICT and cannot be placed once** — `x026142` (54
+  bytes), `x028122` (50), `x05c800` (348), `x2b7ef4` (1548): **2,000 bytes**
+  where two or more tenants write DIFFERENT values to the SAME field. Only one
+  can ship, so each needs a per-tenant COPY or a per-character INDIRECTION.
+  The disjoint *1-differs* bytes (1,674) are the `[table_fix]` shape
+  generalised — one tenant's own row — and those DO union cleanly.
+- 13 further shared spans are H+P only and are reported **UNDECIDABLE**, not
+  zero: with two tenants "one differs" and "both disagree" are the same
+  observation.
+
+**Do not quote an un-normalised conflict count.** The three references are
+independent builds whose allocators chose different addresses, so a pointer
+into a shared region reads as a conflict spuriously — that artefact is **73%
+of the raw figure (7,591 -> 2,000)**. Section 3 of the gate is the control.
+
+The open analysis: identify the 2,000 conflicting bytes BY PURPOSE (which
+field, why each tenant wants it different) to choose copy vs indirection per
+span. The counts are frozen, so that work has a fixed target.
 
 **2. The N-way dispatch form** — what slice E deliberately did NOT do. Each
 baked fragment still tests ONE id, and the sites are SHARED: all three tenants
