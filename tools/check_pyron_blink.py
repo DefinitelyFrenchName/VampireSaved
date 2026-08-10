@@ -2,11 +2,14 @@
 """check_pyron_blink.py — verdict logic for the Pyron sprite/HUD BLINK
 (14z-75), kept out of the shell so it can be controlled directly.
 
-THE DEFECT. Palette RAM row 10 (0x90C140) is Pyron's sprite palette AND
-his in-match HUD mugshot palette. On our build it ALTERNATES every frame
-between his correct colours and a second value; native vsav2 holds it
-constant. Both the sprite and the mugshot blink, and the mugshot showed
-Demitri's art in Pyron's colours before the HUD art landed (14z-75).
+THE DEFECT (FIXED in build/pyron16; this checker now guards the fix).
+Palette RAM row 10 (0x90C140) is Pyron's sprite palette AND his in-match
+HUD mugshot palette, so both blinked. It ALTERNATED every frame between
+his correct colours and vsavj palette-seq row 0x26; native vsav2 holds it
+constant. Root cause was a DEAD ROW: the per-character palette-routine
+table at 0x2A8A4 aliases rows 0x10-0x1F onto 0x00-0x0F, so id 0x11 ran
+row 0x01's animated-palette handler where vs2's row 0x11 is the default
+no-op. Fixed by one word at 0x2A8C6 (008E -> 0040).
 
 WHY THIS IS MEASURED PER LEG AND NOT FRAME-BY-FRAME. The two games are
 not at the same point on the same frame, so a frame-indexed native/ours

@@ -1,9 +1,15 @@
 # NEXT SESSION — orientation (written at the close of 14z-75, 2026-08-10)
 
-**Session goal: finish Pyron's rung.** His HUD is now DONE. Three items are
-open, and the blink is root-caused down to one remaining question.
+**Session goal: finish Pyron's rung.** His HUD and his BLINK are both DONE.
+TWO items remain open.
 
-**Current build: `build/pyron15` (`3fb71586`)** — not frozen. Rebuild:
+**Current build: `build/pyron16` (`bd837784`) — this is the one to
+playtest.** Not frozen. Run it:
+```sh
+export ROMDIR=/path/to/reference/sets
+tools/run_wide.sh build/pyron16 fbneo      # or: ... mame
+```
+Rebuild:
 ```sh
 TENANT_MANIFEST=build/manifest/pyron.toml TENANT_CHAR=0x11 \
 GEN_FLAGS="--profile cps2-wide-v1 --allow-plausible --tripwire-open" \
@@ -16,30 +22,23 @@ huitzil too if you touch anything shared like `effect_tail.json`).
 
 ---
 
-## 1. THE BLINK — one question left
+## 1. THE BLINK — FIXED (nothing to do; here is what it was)
 
-**Do not re-derive the mechanism; it is measured and frozen** by
-`tests/test_pyron_blink.sh` (replay 76, one rig for both games, 7 verdict
-controls). Palette row 10 carries his SPRITE and his HUD MUGSHOT, so both
-blink. Over 40 consecutive in-match frames: **native 1 value / 0 changes,
-ours 2 values / 39 changes**, and ours' two values are named — native's
-constant, and vsavj palette-seq row `0x26` (`0x39ADC0`) under the uploader's
-`0xF000` OR. Writer `PC 0x02AD68`. The seq uploads are purely ADDITIVE.
+A **DEAD ROW**, the sixth instance. The per-character palette-routine table
+at `0x2A8A4` (dispatcher `0x2A894`, indexed by the character id at +0x382)
+aliases rows `0x10-0x1F` onto `0x00-0x0F`, so Pyron's row 0x11 handed him
+row 0x01's ANIMATED palette handler where vs2's row 0x11 is the default
+no-op. He ran Demitri's palette animation every frame on row 10 — the row
+his sprite AND his HUD mugshot share, which is why both blinked.
 
-Already eliminated (do not spend a session on these again): the anim nodes
-(byte-identical to vs2 `0x2650EC`), the seq table content (vsavj row 0x26 ==
-vs2's), a dead row (0x26 is live in legacy), and row misdirection (native
-animates only stage rows 0x00-0x03).
+Fix: one word, `0x2A8C6` `008E -> 0040`, exactly what vs2 holds. Guarded by
+`tests/test_pyron_blink.sh` (default `fixed`; `PYRON_BLINK_EXPECT=blinks`
+reproduces the pre-fix shape on pyron15).
 
-**THE QUESTION: what GATES the request?** Same script, same id, same data —
-ours animates, native does not. Lead: probing the resolver `0x2AD82` returns
-`RET 0x00FF02DC` with `A6 = 0xFF8400` (his own fighter block), i.e. the
-request is issued from a work-RAM thunk on his object's behalf. Get the
-equivalent site on the native leg and diff the state that reaches it.
-Subsystem write-up: `docs/game/engine_internals.md`, "The palette-SEQUENCE
-uploader".
-
-When fixed, flip the gate: `PYRON_BLINK_EXPECT=fixed`.
+**Latent on Huitzil:** his row `0x10` is `0x004A` (row 0x00's handler) where
+vs2's is the default. Benign today (0 hits at the resolver) but not what
+native does. `huitzil-m2` is FROZEN and maintainer-confirmed — **changing it
+is a maintainer decision**, and it is worth raising before the M3b merge.
 
 ## 2. Effect palette — deferred, and a SHARED hazard
 
@@ -75,7 +74,7 @@ the third data point. Detail + two failed attempts:
 ## Gates added in 14z-75
 
 - `tests/test_pyron_blink.sh` + `tools/check_pyron_blink.py` + replay 76 —
-  the blink, frozen by MECHANISM (both values named), not just by symptom.
+  the blink, checked by MECHANISM (both values named), not just by symptom.
 - `tests/replays/40_pick_pyron_cell.rpl` — walks the wheel onto his cell,
   the 0x11 twin of replays 36/37. Used by `test_tenant_hud.sh` section 3.
 
@@ -92,7 +91,12 @@ the third data point. Detail + two failed attempts:
 - **`placements.json` dst/src is LINEAR; the extractor shifts sub-regions.**
   Correlate to find the true source offset — mapping through it made a
   correctly-ported region read as 75% corrupt (14z-75).
+- **Read a table BASE off the code that indexes it, never off a content
+  match.** A row-content match put vs2's palette-seq base 8 rows out and
+  produced a confidently wrong elimination (14z-75).
+- **Check the MODE FLAG before believing a mode.** The blink ran through the
+  Dark Force palette resolver while `$FF802E = 0` on both legs.
 - **THE DEAD-ROW CLASS** — `docs/game/engine_internals.md`, the section of
-  that name. FIVE instances now (Pyron's HUD rows are the newest) and the
+  that name. SIX instances now (Pyron's HUD rows and his palette-routine row) and the
   most common defect shape in this port. **When a ported character does
   something vanilla never does, suspect a dead row first.**

@@ -48,7 +48,7 @@ duplicated: `docs/project/cps2_wide.md` (the WIDE profile), `docs/game/atlas/`
 
 
 ## THE DEAD-ROW CLASS — vsav ships table rows as STUBS or ALIASES where
-## vs2/vh2 fill them (named 14z-74; FIVE instances and counting)
+## vs2/vh2 fill them (named 14z-74; SIX instances and counting)
 
 **The single most common defect shape in this port.** vsav and vs2 share an
 engine, and their per-character / per-state dispatch and data tables are
@@ -70,8 +70,9 @@ correct. One dead row is the whole defect.
 | 3 | grab-hold keyframe ptr table `0xBE27A` row 0x10 | ALIAS of row 0x00 (char 0's block) | the tenant's own block | `[[data_port]]` + row repoint (14z-73) |
 | 4 | sub-state jump table `0x18468` entry 81 (Cosmo Disruption) | `0x0006` — a displacement pointing back INTO the table | a real handler | **one word**: repoint to `0x0224`, which already holds vs2's identical 8-byte handler (14z-74) |
 | 5 | in-fight HUD mugshot `0x89884` + name `0x898C4`, rows `0x10-0x1F` | pure ALIASES of `0x00-0x0F` (both tables) | rows 0x10/0x11/0x13 filled for H/Pyron/Donovan | three tenant-gated pokes + place the art at free-pool anchors (14z-63/75) |
+| 6 | per-character palette-routine table `0x2A8A4` row 0x11 | ALIAS of row 0x01 (its ANIMATED palette handler) | the DEFAULT no-op handler | **one word**: `0x2A8C6` `008E -> 0040` (14z-75, Pyron's blink) |
 
-**Diagnostic recipe** (all five were found this way):
+**Diagnostic recipe** (all six were found this way):
 1. Find the table and the index the tenant drives it with (a breakpoint on
    the dispatcher, or the crash PC).
 2. Read the SAME row in vs2/vh2. If vs2 has a real target where vsav has a
@@ -602,8 +603,13 @@ not the match-start palette load. **Read this before attributing any
 
 - **Resolver** `PRG:0x02AD82`: `a0 = 0x39A900 + (d0 & 0xFFF) * 0x20`, i.e.
   a global table of 0x20-byte palette rows indexed by a *sequence id* in
-  `d0`. Table base `0x39A900`; vs2's twin is `0x3B093C` (located by
-  anchoring rows 0x26/0x27, which agree).
+  `d0`. Table base `0x39A900`; vs2's twin is **`0x3B0A3C`** (read off vs2's own
+  resolver immediate — do NOT derive it by content-matching a row, which
+  is how 14z-75 first got `0x3B093C`, exactly 8 rows out). **The two
+  tables are NOT row-aligned: vsavj row `0x26` == vs2 row `0x1E`**, a
+  uniform +8 shift from row 0x1E up, so a ported script's seq ids must be
+  remapped +8. The port already does this correctly (measured: ours asks
+  0x26/0x39/0x3A where native asks 0x1E/0x31/0x32).
 - **Uploader** `PRG:0x02AD68` (row start) and `0x02AD7C` (row+0x10) copy
   the resolved row into palette RAM, applying `0xF000` — a stored
   `0x0RGB` becomes a palette-RAM `0xFRGB`. Do not expect to find a
@@ -618,18 +624,33 @@ not the match-start palette load. **Read this before attributing any
   this path, because it never transits work RAM and so is invisible to
   every RAM gate.
 
-**The Pyron instance (OPEN).** His palette row 10 — shared by his sprite
-AND his in-match HUD mugshot, which is why both blink — alternates every
-frame between his own palette and seq row `0x26`; native holds it
-constant. The uploads are **purely additive**: ours performs every write
-native does (`0x1433E`/`0x14190`, 240/144 hits, exactly matching native's
-`0x129B6`/`0x12852`) *plus* 91+91 alternating seq writes. Eliminated:
-his anim nodes (byte-identical to vs2 `0x2650EC` bar relocated pointers),
-the seq row's content (vsavj `0x39ADC0` == vs2's), a dead row (0x26 is
-live in legacy), and row misdirection (native animates only stage rows
-0x00-0x03). So the same script, id and data animate on ours and not
-native; the open question is what **gates** the request. Gate + rig:
-`tests/test_pyron_blink.sh`, replay 76.
+**The Pyron instance (14z-75, FIXED) — a DEAD ROW.** His palette row 10
+alternated every frame between his own palette and seq row `0x26`; native
+held it constant. The cause was NOT the sequence machinery at all but the
+**per-character palette-routine dispatcher** that feeds it:
+
+    0x2A894  moveq #0,D1 / move.b ($382,A6),D1     <- the CHARACTER ID
+             add.w D1,D1 / move.w ($6,PC,D1.w),D1 / jmp ($2,PC,D1.w)
+
+a word-displacement table at **`0x2A8A4`**, indexed by `id*2`. Most
+characters carry displacement `0x0040` = the DEFAULT handler, which animates
+nothing. vsavj's rows `0x10-0x1F` alias `0x00-0x0F`, so **row 0x11 handed
+Pyron row 0x01's ANIMATED handler** (`moveq #$26,D0 / add.b ($3AE,A6),D0 /
+bra 0x2AD82`) where vs2's own row 0x11 is the default. Fix: one word,
+`0x2A8C6` `008E -> 0040` — what vs2 already holds. Legacy-safe by
+construction (vanilla never puts an id in `0x10-0x1F`), and measured
+legacy-inert: replay 02 bit-identical across the fix.
+
+Note the table rows for the other tenants: Donovan's `0x13` is already
+`0x0040` (which is why this never surfaced on him), and **Huitzil's `0x10`
+is `0x004A` — row 0x00's handler — where vs2's is the default.** He carries
+the same class latently; it is benign today (0 hits at `0x2AD82`), but it is
+not what native does. `huitzil-m2` is frozen, so that is a maintainer call.
+
+**The symptom lied about its cause.** `0x2AD82` is the DF-family palette-seq
+resolver (H's 14z-69p work), so this read as "a Dark Force recolour without
+Dark Force" — but `$FF802E = 0` on both legs. Check the mode flag before
+believing a mode.
 
 **Measuring this path at all:** a watchpoint on the palette ADDRESS works
 on both games regardless of their different PCs (`WATCH=90c140,20,w`),

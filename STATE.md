@@ -9,9 +9,12 @@ never the placer. He has his OWN free-pool anchors (name 0xBE94, mug
 (3fb71586); byte-attributed against pyron14 as exactly 2 program bytes and
 6 tiles. Also: build/manifest/pyron.toml had NOT PARSED since fcfe5c7, so
 pyron14 was unrebuildable from the tree — fixed. THE BLINK is now
-root-caused and frozen by a gate, and 14z-74's confounded "543 vs 0" figure
-is RETRACTED and REPLACED by a phase-independent measurement. Read
-docs/NEXT_SESSION.md first.)
+root-caused AND FIXED — one word. It was a DEAD ROW: the per-character
+palette-routine table aliases rows 0x10-0x1F onto 0x00-0x0F, so Pyron ran
+Demitri's animated-palette handler every frame. build/pyron16 (bd837784)
+is the build to playtest. 14z-74's confounded "543 vs 0" figure is
+RETRACTED, and one of MY OWN eliminations was wrong and is corrected
+below. Read docs/NEXT_SESSION.md first.)
 
 Previously: 2026-08-10 (session 14z-74 — PYRON RENDERS; Cosmo/air/win-screen fixed; Phobos re-frozen as huitzil-m2 9deda080; Step 4 HUD half done, plate BLANK. Three claims retracted in-session.)
 Previously: 2026-08-09 (session 14z-71 — THE BEAM DRAWS. Root cause: vsav
@@ -176,52 +179,63 @@ pyron14 could not be rebuilt from the tree at all. Found by parsing the
 manifest before editing it. (A rebuild in that commit would have caught it —
 the same lesson as 14z-74's chaining rule, from the other direction.)
 
-**2. THE BLINK — root-caused, frozen, not yet fixed.**
-`tests/test_pyron_blink.sh` + `tools/check_pyron_blink.py` + replay 76 (one
-rig that runs unchanged on both games).
+**2. THE BLINK — ROOT-CAUSED AND FIXED (build/pyron16, `bd837784`).**
 
-Measured, anchored in-match with both legs PROVEN to hold Pyron (+0x382 =
-0x11), as a **phase-independent** property — distinct palette-row-10 values
-over 40 CONSECUTIVE frames:
+Measured first, anchored in-match with both legs PROVEN to hold Pyron
+(+0x382 = 0x11), as a **phase-independent** property (distinct palette-row-10
+values over 40 CONSECUTIVE frames) — because the two games are never on the
+same frame:
 
-| leg | distinct values | frame-to-frame changes |
-|---|---|---|
-| native vsav2 | 1 | 0 |
-| ours (pyron15) | 2 | 39 |
+| leg | distinct values | changes | after the fix |
+|---|---|---|---|
+| native vsav2 | 1 | 0 | 1 / 0 |
+| ours | 2 | 39 | **1 / 0, bit-identical to native** |
 
-and ours' two values are NAMED: one bit-identical to native's constant, the
-other **vsavj palette-seq row 0x26 (`0x39ADC0`)** under the uploader's
-`0xF000` OR. Writer `PC 0x02AD68`/`0x02AD7C`, alternating source pointers
-(91 writes each). The seq uploads are **purely additive** — ours also
-performs every write native does (`0x1433E`/`0x14190` at 240/144 hits,
-exactly matching native's `0x129B6`/`0x12852`).
+**ROOT CAUSE — a DEAD ROW, the fifth instance.** Found with an instruction
+trace (`GUARD_TRACE`) of a frame that performs the write. A per-character
+palette-routine dispatcher at `0x2A894` reads the CHARACTER ID
+(`move.b ($382,A6),D1`) and jumps through a word table at **`0x2A8A4`**.
+Most characters carry displacement `0x0040` = the DEFAULT handler, which
+animates nothing. vsavj's rows `0x10-0x1F` alias `0x00-0x0F`, so **row 0x11
+handed Pyron row 0x01's ANIMATED handler** (`moveq #$26,D0 / bra 0x2AD82`)
+where vs2's own row 0x11 is the default.
 
-**Eliminated, so nobody re-derives them:**
-- NOT the anim nodes — ours `0x0D45C6ff` are byte-identical to vs2
-  `0x2650EC` bar properly relocated pointers. (14z-74 called them correct;
-  this re-confirms it at the RIGHT alignment — see the retraction below.)
-- NOT the seq table content — vsavj row 0x26 == vs2's (table base
-  `0x3B093C`, located by anchoring rows 0x26/0x27, which agree).
-- NOT a dead row — 0x26 is one of only two ids legacy ever requests.
-- NOT misdirection to another row — native animates only stage rows
-  0x00-0x03; no native row carries this 2-state flip.
+**THE FIX is one word:** `0x2A8C6` `008E -> 0040` — exactly what vs2 holds
+(`palette_routine_row_11` in pyron.toml). Verified: the spurious resolver
+calls went **581 -> 0** (native 0, Huitzil 0); palette row 10 now constant
+and bit-identical to native; the mugshot is pixel-identical across
+consecutive frames. Legacy: replay 02 **bit-identical** between pyron15 and
+pyron16, and the whole-romset delta is **exactly those 2 bytes**.
+Legacy-safe by construction — the table is indexed by the character id and
+`tests/audit_id_writers.sh` **re-run this session, PASS**: no legacy
+gameplay path writes an id in `0x10-0x1F`.
 
-So the same anim script, the same id and the same data animate on ours and
-not on native. **The open question is what GATES the request** (or selects
-its destination row), not what it contains. Lead: the resolver probe returns
-`RET 0x00FF02DC` with `A6 = 0xFF8400` — issued from a work-RAM thunk on his
-own object's behalf. Compare that site against the native leg.
+**The symptom lied about its cause.** `0x2AD82` is the DF-family palette-seq
+resolver (H's 14z-69p work), so it read as "a Dark Force recolour without
+Dark Force" — but `$FF802E = 0` on **both** legs. Check the mode flag before
+believing a mode.
 
-Subsystem written up in `docs/game/engine_internals.md`, "The palette-
-SEQUENCE uploader" — including the technique that made the native leg
-measurable at all: **a watchpoint on the palette ADDRESS works on both games
-regardless of their different PCs**, so vs2's uploader never had to be found.
+**CROSS-TENANT, NOT ACTED ON:** Huitzil's row `0x10` is `0x004A` (row 0x00's
+handler) where vs2's is the default — the same class, latent and benign
+today (0 hits at `0x2AD82`). **`huitzil-m2` is frozen and
+maintainer-confirmed, so changing it is a maintainer decision.** Donovan's
+row `0x13` is already `0x0040`, which is why this never surfaced on him.
 
-**RETRACTION (14z-74's figure, now resolved).** "ours 543 palette-seq calls
-/ native 0" is retracted — its own caveat was right, the hits were in the
-select screen and it compared different screens. Replaced by the table
-above. Corrected at all three sites it had propagated to (STATE, pyron.toml,
-and NEXT_SESSION at rewrite); re-grepped clean.
+**RETRACTION OF MY OWN ELIMINATION (same session).** I wrote "NOT the
+palette-seq table content — vsavj row 0x26 is byte-identical to vs2's
+(table base 0x3B093C)". Both halves were wrong: vs2's real base is
+**`0x3B0A3C`** (its resolver's own immediate), and the tables are **not**
+row-aligned — vsavj row `0x26` == vs2 row `0x1E`, a uniform +8 shift. The
+port's id remap already handles that correctly (ours asks 0x26/0x39/0x3A
+where native asks 0x1E/0x31/0x32), so the conclusion survived but the
+reasoning did not. **Read a table base off the code, never off a content
+match.** Also corrected: "the same script, same id and same data animate on
+ours and not native" — native runs palette sequences too, just through a
+different per-character routine.
+
+**Retracted from 14z-74:** "ours 543 palette-seq calls / native 0" — its own
+caveat was right, the hits were in the select screen and it compared
+different screens. Replaced by the table above.
 
 **New gotcha (cost me several iterations).** `placements.json`'s dst/src is
 a LINEAR map, but the extractor auto-discovers SUB-REGION shifts — mapping

@@ -445,20 +445,24 @@ table = 0x38C198
 #     faithful.
 # WHAT 14z-75 ELIMINATED, so nobody re-derives it:
 #   * NOT the anim nodes (above).
-#   * NOT the palette-seq table CONTENT — vsavj row 0x26 (0x39ADC0) is
-#     byte-identical to vs2's (vs2 table base 0x3B093C, located by anchoring
-#     rows 0x26 and 0x27, which agree).
+#   * CORRECTED 14z-75 (this elimination was WRONG as first written): I
+#     claimed "vsavj row 0x26 is byte-identical to vs2's" from a table base
+#     of 0x3B093C derived by CONTENT-MATCHING a row. vs2's real base is
+#     0x3B0A3C (its resolver's own immediate), and the tables are NOT
+#     row-aligned: vsavj row 0x26 == vs2 row 0x1E, a uniform +8 shift. The
+#     port's id remap already handles this correctly (ours asks 0x26/0x39/
+#     0x3A where native asks 0x1E/0x31/0x32) — so it was never the defect,
+#     but the reasoning that said so was unsound. Read a table base off the
+#     code, never off a content match.
 #   * NOT a dead row — 0x26 is one of only two ids legacy ever requests.
 #   * NOT misdirection to another palette row — over 12 consecutive frames
 #     native animates ONLY stage rows 0x00-0x03; no native row carries this
 #     2-state flip.
-# So the same anim script, the same id and the same data animate on ours and
-# not on native.
-# NEXT: the question is no longer WHAT is requested but WHAT GATES the
-# request (or selects its destination row). Get the caller: probe 0x2AD82
-# returns RET 0x00FF02DC with A6 = 0xFF8400 (his own fighter block), so the
-# request is issued from a work-RAM thunk on his object's behalf — start
-# there, and compare against the same site on the native leg.
+# ANSWERED 14z-75 by an instruction trace: the gate is a PER-CHARACTER
+# palette-routine dispatch table whose row 0x11 vsavj leaves as an alias of
+# row 0x01. See the fix block at the end of this file
+# (`palette_routine_row_11`). Native never runs this path for Pyron because
+# vs2's row 0x11 points at the default no-op handler.
 #
 # CROSS-TENANT CHECK (14z-74, maintainer asked whether Phobos is exposed):
 # NO — measured on the same rig, palette-row churn over 15 frames:
@@ -798,3 +802,52 @@ name = "cosmo_substate81"
 addr = 0x01850A
 old_hex = "0006"
 new_hex = "0224"
+
+# ══ 14z-75 THE SPRITE/HUD BLINK — ROOT-CAUSED, and it is a DEAD ROW ═══════
+#
+# THE DEFECT (measured, tests/test_pyron_blink.sh): palette RAM row 10
+# (0x90C140) — his SPRITE's row AND his in-match HUD MUGSHOT's row, which is
+# why both blink — alternated every frame between his own palette and vsavj
+# palette-seq row 0x26. Native holds it constant.
+#
+# THE MECHANISM, from an instruction trace (GUARD_TRACE) of a frame that
+# performs the write. There is a PER-CHARACTER PALETTE-ROUTINE dispatcher:
+#     0x2A894  moveq #0,D1 / move.b ($382,A6),D1   <- the CHARACTER ID
+#              add.w D1,D1 / move.w ($6,PC,D1.w),D1 / jmp ($2,PC,D1.w)
+# with a WORD-displacement table at 0x2A8A4 indexed by id*2. Most characters
+# point at the DEFAULT handler 0x2A8E4 (displacement 0x0040), which does no
+# palette animation. vsavj's rows 0x10-0x1F ALIAS 0x00-0x0F, so:
+#     row 0x11 (Pyron)   = 0x008E -> 0x2A932  <- row 0x01's ANIMATED handler
+#                                                (moveq #$26,D0 ;
+#                                                 add.b ($3AE,A6),D0 ;
+#                                                 bra 0x2AD82)
+#     vs2  row 0x11      = 0x0040 -> the DEFAULT handler
+# So our Pyron inherited a base-half character's animated-palette routine and
+# ran it every frame, while native Pyron uses the plain default. 0x2AD82 is
+# the palette-seq resolver — the same one H's DARK FORCE work found, which is
+# why the symptom looked like a DF recolour without Dark Force ($FF802E = 0
+# on BOTH legs, measured).
+#
+# THE FIX is one word: make row 0x11 what vs2's row 0x11 already is.
+#
+# WHY IT IS LEGACY-SAFE BY CONSTRUCTION: the table is indexed by the
+# character id at +0x382, and vanilla NEVER puts an id in 0x10-0x1F in either
+# player struct — that is the standing invariant `tests/audit_id_writers.sh`
+# exists to enforce. Row 0x11 is therefore unreachable in legacy, so this
+# word is inert for every vanilla path. (Note the table is read
+# PC-RELATIVELY, so any watchpoint on it must use the OPCODES space —
+# docs/GOTCHAS.md.)
+#
+# CROSS-TENANT NOTE, NOT ACTED ON HERE: Huitzil's row 0x10 is 0x004A ->
+# 0x2A8EE, i.e. row 0x00's handler, where vs2's row 0x10 is also the DEFAULT
+# 0x0040. He therefore carries the same class of defect, latent — it is
+# benign in effect (measured: 0 hits at 0x2AD82 on the frozen build), but it
+# is not what native does. huitzil-m2 is FROZEN and maintainer-confirmed, so
+# changing it is a maintainer decision, not mine. Donovan's row 0x13 is
+# already 0x0040 — which is why this never surfaced on him.
+[[code_word]]
+stage = 6
+name = "palette_routine_row_11"
+addr = 0x02A8C6
+old_hex = "008e"
+new_hex = "0040"

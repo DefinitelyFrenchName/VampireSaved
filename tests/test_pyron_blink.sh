@@ -2,9 +2,9 @@
 # test_pyron_blink.sh — the Pyron sprite/HUD BLINK gate (14z-75).
 #
 # Palette RAM row 10 (0x90C140) carries Pyron's SPRITE and his in-match
-# HUD MUGSHOT. On our build it alternates every frame; native vsav2 holds
-# it constant. This gate freezes the defect's measured shape and its
-# MECHANISM, so a fix is provable and a regression is loud.
+# HUD MUGSHOT — which is why both blinked. Before the fix it alternated
+# every frame while native vsav2 held it constant. FIXED in build/pyron16;
+# this gate now guards the fix and would make a regression loud.
 #
 #   1. NATIVE vs OURS on replay 76, the same script and the same pokes on
 #      both legs; tools/check_pyron_blink.py does the verdict.
@@ -12,25 +12,31 @@
 #      synthetic dumps. This file exists because "native is constant" and
 #      "native was never measured" look identical in a passing log.
 #
-# PYRON_BLINK_EXPECT=blinks (default) freezes the OPEN defect: ours shows
-# exactly 2 values alternating every frame, one bit-identical to native's
-# constant and the other vsavj palette-seq row 0x26 under the uploader's
-# 0xF000 OR. Set =fixed when it is fixed; the gate then requires ours to
-# be constant AND equal to native.
+# PYRON_BLINK_EXPECT=fixed (the default since the fix) requires ours to
+# hold row 10 constant AND equal native's bit-for-bit. =blinks reproduces
+# the pre-fix shape — exactly 2 values alternating every frame, one equal
+# to native's constant and the other vsavj palette-seq row 0x26 under the
+# uploader's 0xF000 OR — and still passes on build/pyron15.
 #
-# WHAT THIS GATE ALREADY ELIMINATES (14z-75, so a future session does not
-# re-derive them):
-#   * NOT the anim nodes — ours at 0x0D45C6ff are byte-identical to their
-#     vs2 source (0x2650EC) apart from properly relocated pointers.
-#   * NOT the palette-seq table content — vsavj row 0x26 (0x39ADC0) is
-#     byte-identical to vs2's (table base 0x3B093C).
-#   * NOT a dead row — 0x26 is one of only two ids legacy ever requests
-#     (tests/audit_palette_seq_ids.sh).
-#   * NOT misdirection to another row — native animates no row carrying
-#     this 2-state flip; it animates only stage rows 0x00-0x03.
-#   So the same script, same id and same data animate on ours and not on
-#   native: the open question is what GATES the request or selects its
-#   destination row, not what it contains.
+# ROOT CAUSE (14z-75, FIXED): a DEAD ROW. There is a per-character
+# palette-routine dispatcher at 0x2A894 (`move.b ($382,A6),D1` -> word
+# table at 0x2A8A4, indexed by id*2 -> jmp). Most characters point at the
+# DEFAULT handler (displacement 0x0040), which animates nothing. vsavj's
+# rows 0x10-0x1F ALIAS 0x00-0x0F, so row 0x11 gave Pyron row 0x01's
+# ANIMATED handler (`moveq #$26,D0 / bra 0x2AD82`) — vs2's own row 0x11 is
+# the default. He ran a base-half character's palette animation every
+# frame. Fixed by one word (`palette_routine_row_11` in pyron.toml):
+# 0x2A8C6 008E -> 0040, i.e. exactly what vs2 already holds. Legacy-safe by
+# construction — vanilla never puts an id in 0x10-0x1F (audit_id_writers).
+#
+# The symptom looked like a Dark Force recolour because 0x2AD82 IS the
+# DF-family palette-seq resolver (huitzil.toml 14z-69p) — but $FF802E = 0
+# on both legs: he was never in Dark Force.
+#
+# CROSS-TENANT: Huitzil's row 0x10 is 0x004A (row 0x00's handler) where
+# vs2's is the default — the same class, latent and currently benign
+# (0 hits at 0x2AD82). huitzil-m2 is FROZEN; changing it is a maintainer
+# call.
 #
 # Usage: ROMDIR=... tests/test_pyron_blink.sh [outbase]
 # Env: MAME_BIN, PYRON_BLINK_EXPECT, SKIP_RUNTIME=1 (controls only).
@@ -42,9 +48,9 @@ WORK="$(mktemp -d)"
 trap 'rm -rf "$WORK"' EXIT
 fail=0
 
-BUILD="${1:-build/pyron15}"
+BUILD="${1:-build/pyron16}"
 case "$BUILD" in /*) ;; *) BUILD="$REPO/$BUILD" ;; esac
-EXPECT="${PYRON_BLINK_EXPECT:-blinks}"
+EXPECT="${PYRON_BLINK_EXPECT:-fixed}"
 export MAME_BIN="${MAME_BIN:-$HOME/.cache/vampire-saved/mame/cps2}"
 
 RPL="$REPO/tests/replays/pyron/76_pyron_blink_vs2.rpl"
