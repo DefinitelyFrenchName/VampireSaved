@@ -489,6 +489,64 @@ payload must collide; same span + same payload must dedup).
 is at **0x8b100**; `0x8b0f8` is byte-identical across all three files and
 dedups as shared. The gate failed on it, which is the gate working.
 
+### 14z-77e — slice G: the ratified `[init_shim]` merge
+
+Maintainer approved the recommendation in full (2026-08-10). Implemented; the
+merge's real blockers drop from three to **two** (`[table_fix]` twice, which is
+a mechanical per-row union).
+
+`merge_init_shim()` splits the declaration three ways, because the three parts
+resolve differently:
+
+- **MACHINERY** (`dispatch`, `seed_entry`, `latch_disp`, `flavor_disp`,
+  `flavor_hold_flag`, `objram_clear`) must AGREE — there is one hook and it
+  cannot be two things. Disagreement is still a named collision.
+- **`latch_mode = "phase"` wins if ANY tenant declares it.** Not a preference:
+  the seeder is shared and Phobos needs the gate, so a build containing him
+  carries it for everyone.
+- **FLAVOR stays per tenant** as `_flavor_by_owner` — D `0x01`/`0x00`,
+  H `0x00`/`0x01`, because the engine branch each character tests differs.
+
+The emitter's tail (`flavor_tail()`):
+
+- **ONE declaring tenant → exactly today's 46 bytes**, unconditional write, no
+  compare. That is what keeps the four frozen references bit-exact, and it is
+  asserted on the literal hex rather than assumed.
+- **MORE THAN ONE → 54-byte blocks**, one per declaring tenant:
+  `cmpi.b #id,(0x382,A6)` / `bne.s +0x2E` / the 40-byte flavor write / `jmp
+  handler`. Each block exits with its OWN jmp, so the chain needs no long
+  backward branch and has no branch-distance limit at any N — the naive
+  "branch to a shared exit" form overflows `bra.s` at four tenants.
+- **A tenant with no entry falls through to the trailing `jmp` and gets no
+  write.** That is how Pyron stays untouched: by construction, not by a check
+  someone could forget.
+
+Verified: four fingerprints bit-exact; the single-tenant generator output is
+byte-identical to the pre-slice-G baseline except `patch_notes_fragment.md`
+(the note now lists N flavors — documentation, not shipped bytes).
+`tests/test_manifest_merge.sh` gained the section: phase wins, flavor map
+exact, Pyron absent, N=1 hex frozen, and the N=2 chain decoded block by block
+(cmpi id, `bne` displacement landing exactly on the next block, the per-block
+jmp, the fallthrough).
+
+**TWO MEASUREMENTS REMAIN OPEN, and both are named in the source.**
+
+1. **`(0x382,A6)` holding the character id at char-init is UNVERIFIED.** It is
+   strongly implied — the dispatch this shim is hosted on is itself indexed by
+   the id, and `+0x382` is the id field of both player structs — but it has not
+   been measured at this point in the frame, and the whole N>1 chain rests on
+   it. The path is unreachable until the loop lands, so nothing ships on it;
+   measure with the FBNeo write tap or a MAME breakpoint at the shim's own
+   address on a tenant build before the first merged build is trusted.
+2. **Donovan's battery under phase mode** — the ratified condition. His shim
+   bytes change in a merged build (the gate is forced by Phobos); it should be
+   inert because the gate only narrows the seed to the char-load phase where
+   his first init already sits, but the replays decide that, not the argument.
+
+Also refused by construction: `objram_clear` with more than one declaring
+tenant. It is Donovan-gated today (`false` everywhere), and a merged shim would
+arm it for every tenant — a scope change that wants its own decision.
+
 ### 14z-76c — M3b STARTED: the multi-tenant generator, slices A and B
 
 Scope ratified this session (maintainer): **M3b = the merge itself.** Phase 6
@@ -10514,9 +10572,16 @@ Original write-up kept below.
 
 ## Decisions pending (human)
 
-- **THE MERGED BUILD'S `[init_shim]`: ONE SHIM, THREE TENANTS (14z-77, M3b).**
-  Surfaced by slice F's collision measurement — it is one of the three real
-  merge blockers, and unlike the other two it is not purely mechanical.
+- ~~**THE MERGED BUILD'S `[init_shim]`: ONE SHIM, THREE TENANTS (14z-77)**~~
+  **DECIDED 2026-08-10 (maintainer): the recommendation below, in full** —
+  adopt phase mode, dispatch flavor per id, gate the write so Pyron stays
+  untouched until his polarity is measured against native, then run Donovan's
+  battery on a phase-mode build before trusting the merge. **IMPLEMENTED as
+  slice G** (14z-77e); the two measurements it names remain OPEN and are
+  listed there. Original entry follows.
+
+  Surfaced by slice F's collision measurement — it was one of the three real
+  merge blockers, and unlike the other two it was not purely mechanical.
 
   **The mechanics, measured.** The shim is emitted ONCE per build at ONE site
   (`dispatch_00`'s seed hook, `seed_entry = 0x016C64` — identical in both

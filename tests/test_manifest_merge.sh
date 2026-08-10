@@ -82,7 +82,7 @@ print("== 3: the collision inventory is EXACTLY the known set ==")
 # build by construction (a variant id requires the profile), so those rows
 # never take the value they disagree about.
 EXPECT = [
-    "[init_shim]: huitzil and donovan declare DIFFERENT singleton tables",
+    # [init_shim] was the third blocker until slice G merged it (ratified).
     "[table_fix]: huitzil and donovan declare DIFFERENT singleton tables",
     "[table_fix]: pyron and donovan declare DIFFERENT singleton tables",
 ]
@@ -102,7 +102,7 @@ SOFT = [
 ]
 EXPECT = EXPECT + SOFT
 eq("real blockers (non-base-track)",
-   sum(1 for c in coll if "BASE-TRACK ONLY" not in c), 3)
+   sum(1 for c in coll if "BASE-TRACK ONLY" not in c), 2)
 for c in coll:
     if c.startswith("[[port_patch]]") and "BASE-TRACK ONLY" not in c:
         bad.append("port_patch collision is no longer base-track-only, so it "
@@ -118,6 +118,56 @@ if len(coll) == len(EXPECT) and not bad:
 else:
     for c in coll:
         print("      (got) %s" % c)
+
+print("== 3b: [init_shim] merges (slice G, maintainer-ratified) ==")
+from gen_donovan_patch import flavor_tail, flavor_write
+sh = m["init_shim"]
+# latch_mode is NOT per tenant: the seeder is shared, so a build containing
+# Phobos carries his phase gate for everyone. Not a preference — without it
+# his ecosystem drains pool 0 and the round-2 re-init re-seeds LIVE pools.
+eq("phase mode wins", sh.get("latch_mode"), "phase")
+# flavor IS per tenant: the polarity differs because the engine branch each
+# character tests differs (14z-66, measured against native).
+eq("flavor per owner", sh.get("_flavor_by_owner"),
+   {"donovan": (0x01, 0x00), "huitzil": (0x00, 0x01)})
+eq("scalar flavor keys removed", "flavor_default" in sh, False)
+# Pyron declares no shim, so he gets no entry and therefore NO WRITE — the
+# ratified conservative half, by construction rather than by a check.
+eq("pyron absent from the flavor map", "pyron" in sh["_flavor_by_owner"], False)
+
+TEN = [{"name": "donovan", "dst_slot": 0x13},
+       {"name": "huitzil", "dst_slot": 0x10},
+       {"name": "pyron",   "dst_slot": 0x11}]
+f = []
+one = flavor_tail({"donovan": (1, 0)}, 0x3C2, 0xFF8060, 0x123456, b"", TEN, f)
+# ONE declaring tenant must emit exactly the bytes the shim has always had —
+# an unconditional write, no compare. This is what keeps the four frozen
+# references bit-exact, so it is asserted on the bytes, not assumed.
+eq("N=1 tail length", len(one), 46)
+eq("N=1 has no id compare", one[:2].hex(), "1d7c")
+eq("N=1 tail bytes", one.hex(),
+   "1d7c000103c2bdfc00ff8400660a0839000000ff8060"
+   "60080839000100ff806067061d7c000003c24ef900123456")
+two = flavor_tail(sh["_flavor_by_owner"], 0x3C2, 0xFF8060, 0x123456, b"", TEN, f)
+eq("N=2 tail length", len(two), 54 * 2 + 6)
+eq("no emit failures", f, [])
+for i, (name, tid) in enumerate((("donovan", 0x13), ("huitzil", 0x10))):
+    blk = two[i * 54:(i + 1) * 54]
+    # cmpi.b #id,(0x382,A6) — the player struct's character-id field
+    eq("block %d cmpi" % i, blk[:6].hex(), "0c2e00%02x0382" % tid)
+    # bne.s +0x2E: PC after the branch is block+8, so it lands on block+54,
+    # i.e. exactly the next block. Uniform at any N — no branch-distance
+    # limit, which is why each block exits with its own jmp.
+    eq("block %d bne disp" % i, blk[6:8].hex(), "662e")
+    eq("block %d lands on next" % i, 8 + 0x2E, 54)
+    eq("block %d exits via jmp" % i, blk[48:54].hex(), "4ef900123456")
+# a tenant with no entry matches nothing and falls through to the trailing
+# jmp — no flavor byte is written for it at all
+eq("no cmpi for pyron", "0c2e00110382" in two.hex(), False)
+eq("trailing fallthrough jmp", two[108:].hex(), "4ef900123456")
+if not bad:
+    print("  ok: phase wins, flavor per owner, Pyron unwritten by")
+    print("      construction, N=1 byte-identical, N=2 chain verified")
 
 print("== 4: verdict controls — the merge must NOT be permissive ==")
 # 4a. a differing singleton MUST collide (not silently pick one)
@@ -155,4 +205,5 @@ sys.exit(1 if bad else 0)
 PY
 
 echo "PASS: manifest merge (inert at one file, frozen dedup shapes, the exact"
-echo "      12-collision inventory, and 4 permissiveness controls)"
+echo "      11-collision inventory (2 real blockers), the ratified [init_shim]"
+echo "      merge, and 4 permissiveness controls)"

@@ -217,6 +217,9 @@ def merge_manifests(docs):
             elif isinstance(val, dict) and isinstance(cur, dict):
                 if _same_row(cur, val):
                     cur["_owner"] = None
+                elif key in _SINGLETON_MERGE:
+                    merged[key], why = _SINGLETON_MERGE[key](cur, val)
+                    collisions += why
                 else:
                     collisions.append(
                         f"[{key}]: {val.get('_owner')} and {cur.get('_owner')} "
@@ -291,6 +294,142 @@ def _span_collisions(merged):
 def _who(row):
     """A row's owner for a message; deduped engine rows report as shared."""
     return row.get("_owner") or "shared"
+
+
+def merge_init_shim(a, b):
+    """Merge two `[init_shim]` declarations (M3b slice G, MAINTAINER-RATIFIED
+    2026-08-10). Returns (merged, collisions).
+
+    The shim is emitted ONCE per build at ONE site, so a merged build has one
+    seeder and one flavor writer. The three parts resolve differently:
+
+    * MACHINERY (`dispatch`, `seed_entry`, `latch_disp`, `flavor_disp`,
+      `flavor_hold_flag`, `objram_clear`) must AGREE. Disagreement is a real
+      collision — there is one hook and it cannot be two things.
+    * `latch_mode = "phase"` wins if ANY tenant declares it. It is not a
+      preference: Phobos NEEDS the gate (without it his ecosystem drains pool
+      0 and the round-2 char re-init re-runs the seeder over LIVE pools —
+      14z-65 measured the f4890 wipe, orphaned queues, and a freed slot
+      dispatched into palette space), and the seeder is shared, so a build
+      containing him carries the gate for everyone.
+    * FLAVOR (`flavor_default` / `flavor_held`) is PER TENANT and stays so:
+      D1 (VS2 default) means 0x01 for Donovan and 0x00 for Phobos, because
+      the engine branch each character tests differs (14z-66 measured it
+      against native). They collect into `_flavor_by_owner`, which the
+      emitter turns into an id-dispatched write.
+
+    A tenant that declares NO flavor gets NO write — so Pyron, who declares no
+    shim at all, keeps a `+0x3C2` the engine never touches for him. That is
+    the ratified conservative half, and it is by construction rather than by
+    a check that could be forgotten.
+    """
+    MACHINERY = ("dispatch", "seed_entry", "latch_disp", "flavor_disp",
+                 "flavor_hold_flag", "objram_clear")
+    why = []
+    for k in MACHINERY:
+        if a.get(k) != b.get(k):
+            why.append(f"[init_shim]: {_who(a)} and {_who(b)} disagree on "
+                       f"'{k}' ({a.get(k)!r} vs {b.get(k)!r}) — the shim is "
+                       f"ONE hook and cannot be two things")
+    out = dict(a)
+    out["_owner"] = None
+    if "phase" in (a.get("latch_mode"), b.get("latch_mode")):
+        out["latch_mode"] = "phase"
+    flav = dict(a.get("_flavor_by_owner") or _flavor_of(a))
+    flav.update(b.get("_flavor_by_owner") or _flavor_of(b))
+    out["_flavor_by_owner"] = flav
+    out.pop("flavor_default", None)
+    out.pop("flavor_held", None)
+    return out, why
+
+
+def _flavor_of(shim):
+    """`{owner: (default, held)}` for one declaration; {} if it declares none."""
+    if "flavor_default" not in shim:
+        return {}
+    return {shim.get("_owner"): (_int(shim["flavor_default"]),
+                                 _int(shim.get("flavor_held", 0)))}
+
+
+_SINGLETON_MERGE = {"init_shim": merge_init_shim}
+
+
+def flavor_write(default, held, flav_d, hold_flag, mid=b""):
+    """The VS2/VH2 flavor write for ONE tenant: 40 bytes (+ `mid`), CCR-only.
+
+    `move.b #default,(flavor,A6)`, then the per-player Start bitmask test —
+    holding YOUR Start through match load selects the other game's flavor
+    (`move.b #held`). `mid` is the objram_clear marker, which sits between the
+    default write and the P1/P2 test in the single-tenant layout and must stay
+    there byte-for-byte.
+    """
+    return (bytes([0x1D, 0x7C, 0x00, default])                 # move.b #def,
+            + flav_d.to_bytes(2, "big")                        #   (flavor,A6)
+            + mid
+            + bytes([0xBD, 0xFC, 0x00, 0xFF, 0x84, 0x00])      # cmpa.l #$FF8400,A6
+            + bytes([0x66, 0x0A])                              # bne.s p2bit
+            + bytes([0x08, 0x39, 0x00, 0x00])                  # btst #0,
+            + hold_flag.to_bytes(4, "big")                     #   (flag).l
+            + bytes([0x60, 0x08])                              # bra.s join
+            + bytes([0x08, 0x39, 0x00, 0x01])                  # p2bit: btst #1,
+            + hold_flag.to_bytes(4, "big")                     #   (flag).l
+            + bytes([0x67, 0x06])                              # join: beq.s out
+            + bytes([0x1D, 0x7C, 0x00, held])                  # move.b #held,
+            + flav_d.to_bytes(2, "big"))                       #   (flavor,A6)
+
+
+def flavor_tail(flav_map, flav_d, hold_flag, newt, objclr, tenants, fail):
+    """The shim's flavor tail: one write, or an id-DISPATCHED chain.
+
+    ONE declaring tenant -> exactly the bytes the single-tenant shim has
+    always emitted, so the frozen references cannot move. This is the whole
+    reason the two cases are not unified.
+
+    MORE THAN ONE -> a chain of 54-byte blocks, one per declaring tenant:
+
+        cmpi.b #id,(0x382,A6)   ; this player's character id
+        bne.s   <next block>    ; +46, uniform — no branch-distance limit
+        <40-byte flavor write>
+        jmp     <handler>       ; each block exits directly, so the chain
+                                ; needs no long backward branch at any N
+
+    A tenant with NO entry matches nothing and FALLS THROUGH to the trailing
+    `jmp`, so nothing is written for it. That is how Pyron stays untouched
+    (maintainer-ratified 14z-77) — by construction, not by a check.
+
+    UNVERIFIED ASSUMPTION, and it is load-bearing for N>1: that `(0x382,A6)`
+    already holds the character id when this shim runs at char-init. It is
+    strongly implied — the dispatch this shim is hosted on is itself indexed
+    by the id, and `+0x382` is the id field for both player structs
+    (docs/game/atlas/ram.md) — but it has NOT been measured at this point in
+    the frame. The N>1 path is unreachable until the loop lands, so nothing
+    ships on it yet. MEASURE IT FIRST: read `$FF8782` at the shim's own
+    address with the FBNeo write tap or a MAME breakpoint on a tenant build.
+    """
+    if len(flav_map) <= 1:
+        (default, held), = flav_map.values() or [(0, 0)]
+        return (flavor_write(default, held, flav_d, hold_flag, objclr)
+                + bytes([0x4E, 0xF9]) + newt.to_bytes(4, "big"))
+    if objclr:
+        fail.append("init_shim: objram_clear with more than one declaring "
+                    "tenant would arm the clear for ALL of them — it is "
+                    "Donovan-gated by construction today. Decide its scope "
+                    "before enabling it on a merged build.")
+    by_name = {t.get("name"): t for t in tenants}
+    out = b""
+    for name, (default, held) in sorted(flav_map.items()):
+        who = by_name.get(name)
+        if who is None:
+            fail.append(f"init_shim: flavor declared for {name!r}, which is "
+                        f"not a tenant of this build")
+            continue
+        tid = _int(who["dst_slot"]) & 0xFF
+        out += (bytes([0x0C, 0x2E, 0x00, tid, 0x03, 0x82])   # cmpi.b #id,(0x382,A6)
+                + bytes([0x66, 0x2E])                        # bne.s next (+46)
+                + flavor_write(default, held, flav_d, hold_flag)
+                + bytes([0x4E, 0xF9]) + newt.to_bytes(4, "big"))   # jmp handler
+    # no tenant matched -> no flavor write at all
+    return out + bytes([0x4E, 0xF9]) + newt.to_bytes(4, "big")
 
 
 def _row_diff_keys(a, b):
@@ -2656,7 +2795,17 @@ def main():
                 #   move.l A5,-(SP); lea $FF8000.l,A5; tst.l (latch,A5)
                 #   bne.s +6; jsr seed_entry; movea.l (SP)+,A5
                 #   move.b #flavor_default,(flavor_disp,A6); jmp handler
+                # Slice G: the flavor tail is one unconditional write for a
+                # single declaring tenant (today's bytes, so the frozen
+                # references are untouched) and an id-DISPATCHED chain for
+                # more than one — see flavor_tail().
+                _flav_map = shim_cfg.get("_flavor_by_owner")
+                if _flav_map is None:
+                    _flav_map = _flavor_of(dict(shim_cfg, _owner=T.get("name")))
+                _flav_n = len(_flav_map)
                 _shimlen = 76 if shim_cfg.get("objram_clear") else 68
+                if _flav_n > 1:
+                    _shimlen += 54 * _flav_n - 40   # chain replaces the tail
                 if shim_cfg.get("latch_mode") == "phase":
                     _shimlen += 12
                 sd = alloc("a", _shimlen, "init seed shim")
@@ -2664,7 +2813,6 @@ def main():
                     continue
                 latch = _int(shim_cfg["latch_disp"])
                 flav_d = _int(shim_cfg["flavor_disp"])
-                flav_v = _int(shim_cfg["flavor_default"])
                 # Start-hold flavor selector (stage 5; community-confirmed
                 # protocol, docs/game/atlas/character_tables.md): the byte at
                 # flavor_hold_flag is a per-player Start bitmask (bit 0 =
@@ -2673,7 +2821,6 @@ def main():
                 # game's flavor (latch <- flavor_held). All ops CCR-only —
                 # no register clobbers before the handler.
                 hold_flag = _int(shim_cfg["flavor_hold_flag"])
-                flav_h = _int(shim_cfg["flavor_held"])
                 # OBJ-RAM stale-tail clear (session 14z-7, manifest flag
                 # objram_clear): zero the full 8KB sprite list once per
                 # Donovan char-init. The VS-screen/fade leftovers in the
@@ -2717,28 +2864,27 @@ def main():
                         + bytes([0x4E, 0xB9])
                         + _int(shim_cfg["seed_entry"]).to_bytes(4, "big")
                         + bytes([0x2A, 0x5F])                     # movea.l (SP)+,A5
-                        + bytes([0x1D, 0x7C, 0x00, flav_v])       # move.b #default,
-                        + flav_d.to_bytes(2, "big")               #   (flavor,A6)
-                        + objclr                                  # OBJ-RAM tail clear
-                        + bytes([0xBD, 0xFC, 0x00, 0xFF, 0x84, 0x00])  # cmpa.l #$FF8400,A6
-                        + bytes([0x66, 0x0A])                     # bne.s p2bit
-                        + bytes([0x08, 0x39, 0x00, 0x00])         # btst #0,
-                        + hold_flag.to_bytes(4, "big")            #   (flag).l
-                        + bytes([0x60, 0x08])                     # bra.s join
-                        + bytes([0x08, 0x39, 0x00, 0x01])         # p2bit: btst #1,
-                        + hold_flag.to_bytes(4, "big")            #   (flag).l
-                        + bytes([0x67, 0x06])                     # join: beq.s skip
-                        + bytes([0x1D, 0x7C, 0x00, flav_h])       # move.b #held,
-                        + flav_d.to_bytes(2, "big")               #   (flavor,A6)
-                        + bytes([0x4E, 0xF9]) + newt.to_bytes(4, "big"))  # skip: jmp
-                assert len(shim) == 68 + len(objclr) + len(phase_gate), len(shim)
+                        + flavor_tail(_flav_map, flav_d, hold_flag, newt,
+                                      objclr, port.get("_tenants") or [T],
+                                      fail))
+                if len(_flav_map) <= 1:
+                    assert len(shim) == 68 + len(objclr) + len(phase_gate), \
+                        len(shim)
+                else:
+                    assert len(shim) == 22 + len(phase_gate) + len(objclr) \
+                        + 54 * len(_flav_map) + 6, len(shim)
                 ops.append({"op": "code", "addr": f"{sd:#x}", "hex": shim.hex()})
                 notes.append(f"code   {sd:#08x} init shim (pool latch A5+"
                              f"{latch:#x}, seeder "
                              f"{_int(shim_cfg['seed_entry']):#x}; flavor "
-                             f"(A6+{flav_d:#x})<-{flav_v:#04x}, Start-held "
-                             f"[{hold_flag:#x} bit=player] -> {flav_h:#04x}) "
-                             f"-> handler {newt:#08x}")
+                             f"(A6+{flav_d:#x}) "
+                             + ", ".join(
+                                 f"{_n}<-{_dv:#04x}/held {_hv:#04x}"
+                                 for _n, (_dv, _hv) in sorted(_flav_map.items()))
+                             + f" [Start bitmask {hold_flag:#x}, bit=player]"
+                             + (f", id-dispatched on (A6+0x382)"
+                                if len(_flav_map) > 1 else "")
+                             + f") -> handler {newt:#08x}")
                 fragments.append((sd, len(shim), "GEN",
                                   "pool-seed + flavor(+Start-hold) init shim"))
                 repoint(d["table"], sd, "donovan handler via seed shim")

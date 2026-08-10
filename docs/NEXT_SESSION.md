@@ -245,16 +245,10 @@ manifests: `[[space]]` 9→3, `[[obj_hook]]` 6→2, `[[select_wheel]]` 3→1,
 90→87, `[[code_word]]` 13→11, `[[pcrel_escape_fix]]` 7→5 — and 12 collisions,
 in **two classes**:
 
-**THREE REAL BLOCKERS.** `[table_fix]` twice (D vs H, D vs P — `rows_hex`
-differs by exactly the tenant's own OBJ bank row; the resolution is a per-row
-union, and it is purely mechanical), and `[init_shim]` once — **which is NOT
-mechanical and is now a DECISION PENDING in STATE.md.** The shim is emitted
-ONCE at ONE site, so a merged build has one seeder: Phobos needs
-`latch_mode = "phase"` (without it his ecosystem drains pool 0 and the round-2
-re-init re-runs the seeder over live pools), which means **Donovan's frozen
-shim bytes change** and his battery must be re-measured; and Pyron declares no
-shim at all, so a merged one could hand him a `+0x3C2` flavor byte he has never
-had, whose effect is unmeasured. Read the STATE entry before touching it.
+**TWO REAL BLOCKERS** (was three; `[init_shim]` was merged by slice G).
+`[table_fix]` twice (D vs H, D vs P) — `rows_hex` differs by exactly the
+tenant's own OBJ bank row, so the resolution is a per-row UNION and it is
+purely mechanical. It is a TOML singleton, so the schema cannot express two.
 
 **SIX THAT DISSOLVE.** The `x05c800` / `x088512` `port_patch` rows: Donovan
 writes the host band's word where H/P write a no-op — **but all three agree on
@@ -268,6 +262,30 @@ loudly.
 This retires "shared-span handling is load-bearing, not an edge case" as an
 open worry: it is load-bearing, and it is now three named rows rather than a
 category.
+
+- **Slice G** (14z-77) — the maintainer-ratified `[init_shim]` merge.
+  Machinery keys must agree; `latch_mode = "phase"` wins if ANY tenant asks
+  (the seeder is shared and Phobos needs it); flavor stays per tenant and is
+  emitted as an id-dispatched chain when more than one declares it. ONE
+  declaring tenant emits today's exact 46 bytes, which is what keeps the
+  frozen references bit-exact. Pyron declares no shim, gets no entry, and so
+  receives NO flavor write — by construction.
+
+### TWO OPEN MEASUREMENTS BEFORE THE FIRST MERGED BUILD IS TRUSTED
+
+Both are named in the source at their sites; neither blocks further machinery
+work, and nothing ships on them yet because the N>1 path is unreachable until
+the loop lands.
+
+1. **Does `(0x382,A6)` hold the character id at char-init?** The whole
+   `flavor_tail` chain rests on it. Strongly implied (the dispatch it is hosted
+   on is itself id-indexed, and `+0x382` is the id field of both player
+   structs) but NOT measured at this point in the frame. Probe: FBNeo write tap
+   or a MAME breakpoint at the shim's own address on any tenant build.
+2. **Donovan's battery under phase mode** — the maintainer's ratified
+   condition. His shim bytes change in a merged build because Phobos forces the
+   gate. It should be inert (the gate only narrows the seed to the char-load
+   phase, where his first init already sits) but the replays decide that.
 
 ### NEXT SLICE — region identity, then the N-way dispatch FORM
 
