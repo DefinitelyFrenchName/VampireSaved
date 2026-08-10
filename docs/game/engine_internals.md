@@ -1117,17 +1117,94 @@ reverted. The `d0=0x50 -> 0x2673E6` fetch measured at `0x5F328` was some
 OTHER piece; poking `0x2673E6` changed neither portrait nor quote, so it
 is not the lever for either.
 
-**The QUOTE TEXT is a SEPARATE structure and is the ONLY real gap (this
-part of 14z-68p/r stands).** It is rendered from the SHARED kana/kanji
-font (bank-1 tiles `0xb6xx`, pal 09 — measured on-screen via
-obj_records_dump) via Phobos-specific per-line CHARACTER-CODE data that is
-un-ported, so a tenant win shows a stray HOST line. The font is already
-present; only the record + line codes need porting. **Its fetch was NOT
-reliably identified in 14z-73** — two attempts (repointing `0x2673E6`, and
-a wrong-array `0x267466`) changed nothing. Measure the LIVE fetch that
-drives the pal-09 text objects (reach the screen with replay 28 + forced
-pick; quote at ~f12200) before authoring the next attempt. Cosmetic —
-defer behind visible defects.
+### The WIN-QUOTE TEXT SYSTEM — fully decoded (14z-76)
+
+Three sessions attempted this by repointing per-character POINTER arrays.
+None of them could ever have worked: **the quote system contains no absolute
+pointers to repoint.** It is a 2D winner-x-loser lookup built entirely from
+16-bit relative offsets and pc-relative byte tables.
+
+**1. What the quote actually is.** The **pal-0** objects — 32 of them, two
+lines of 16 chars at y=176/192, font tiles ~`0x3EE5-0x427F`, `0x3820` = space
+(short lines are space-padded). The 44 **pal-09** objects on the same screen
+are static furniture and are NOT the quote; proved by forcing the winner to
+two different ids on one rig — portrait palettes differ, pal-09 is
+byte-identical, pal-0 differs.
+
+**2. The two indices** (`PRG:0x0098BC`):
+
+```
+move.w a0,$13a(a5) / move.b $382(a0),d0 / bsr 0x9996 / move.b d0,$158(a5)  ; WINNER
+move.w a1,$13c(a5) / move.b $382(a1),d0 / bsr 0x9996 / move.b d0,$159(a5)  ; LOSER
+```
+
+The mapper `0x9996` is **pass-through** but for two special cases
+(`0x0B -> 0x04`, `0x1B -> 0x14`, the Shadow/Marionette slots). **It does NOT
+fold to 4 bits** — measured: a verified tenant win writes `$158 = 0x13`.
+
+**3. The selector** (`PRG:0x00C87C-0x00C8C8`) installs the text pointer:
+
+```
+move.b  $93(a5),d0 / movea.l #$112BC,a1 / movea.l (a1,d0.w),a1  ; text bank
+move.b  $158(a5),d0 / add.w d0,d0
+move.w  (a1,d0.w),d2 / lea (a1,d2.w),a1        ; 16-bit offset RELATIVE to a1
+asl.w   #4,d0 / add.b $159(a5),d0
+move.b  $C912(pc,d0.w),d0                      ; TABLE A, index ($158*2)<<4 + $159
+ext.w d0 / asl.w #4,d0 / add.w d1,d0
+move.b  $C8E2(pc,d0.w),d0                      ; TABLE B, 16 wide
+add.w   d0,d0 / adda.w (a1,d0.w),a1            ; final 16-bit offset -> the string
+move.l  a1,$30(a4)                             ; INSTALL
+```
+
+**4. The renderer** (`PRG:0x089062`) reads `$30(a6)` and walks
+`len.w, chars.w[len], len.w, chars.w[len], 0x0000`, masking each char with
+`andi.w #$fff`; the drawer adds the `0x3800` font base. Strings sit in flat
+runs (observed stride `0x46` for the 2x16 form).
+
+**5. WHY EVERY TENANT SHOWS A HOST LINE — it is the ALIAS class.**
+
+The per-character split is the **first-level table at the bank base**, indexed
+by the winner id as 16-bit offsets. vsavj's bank (`root 0x0112BC -> bank
+0x32D28A`) has **32 entries, and its variant half is exactly aliased**:
+
+```
+winner 0x10 -> offset 0x0042 = winner 0x00's (Bulleta)
+winner 0x11 -> offset 0x04a2 = winner 0x01's (Demitri)
+winner 0x13 -> offset 0x0d62 = winner 0x03's (Victor)
+```
+
+which is precisely the reported symptom for all three tenants.
+
+**RETRACTED (mine, same session):** I first diagnosed this as the INDEX-SPACE
+class — "table A is authored only to `0x1EF`, the tenant reads `0x263` in a
+zero region and falls back to a default". That is wrong. **Table A
+(`0xC912`, vs2 `0xB1EA`) is not the per-character selector at all** — it is a
+special-matchup flag, near-entirely zero in BOTH games including for vs2's own
+newcomers, its one non-zero being winner 0x01 vs loser 0x01 (a mirror match).
+Zero there is the correct default, not a fallback. The deadness measurement I
+took of that span is sound but measures a span the fix does not need.
+
+**6. VS2 HAS THE DATA, for exactly our three tenants** (`root 0x00F954 ->
+bank 0x09CA24`, same 32-entry shape). Its variant half is aliased too, EXCEPT:
+
+| tenant | id | vs2 block | offset span |
+|---|---|---|---|
+| Phobos | `0x10` | `0x09FE24` | `0x3400`, len `0x360` |
+| Pyron | `0x11` | `0x0A0184` | `0x3760`, len `0x460` |
+| Donovan | `0x13` | `0x0A05E4` | `0x3BC0` |
+
+**7. THE FIX, and it is in-family.** Per tenant: copy his vs2 block into free
+space, then write the 16-bit offset at `0x32D28A + id*2`. That is a **two-byte
+variant-row repoint plus data**, the same shape as the sprite/effect palette
+rows, and legacy-safe by the same argument — vanilla never puts an id in
+`0x10-0x1F` (`tests/audit_id_writers.sh`).
+
+**THE ONE HARD CONSTRAINT:** the offset is **16-bit and relative to the bank
+base**, so a ported block must live within `0x32D28A + 0xFFFF`. Offset space
+is not the problem (vanilla's last block sits at offset `0x3C5A`, and three
+blocks add ~`0xC20`); **whether there is free ROM immediately reachable from
+the bank is the open question**, and it is what decides whether this is a
+simple data port or needs the bank relocated.
 
 ### Per-tenant win-screen checklist
 1. `[[code_word]]` x2 — position x/y (slot-following, CODE rows).
@@ -1137,8 +1214,11 @@ defer behind visible defects.
    the tenant's portrait record (Huitzil = vs2 `0x2A881E`). Already done
    and working via the (misnamed) `win_quote` select_records entry.
 4. QUOTE text: separate structure (record → line char codes → shared
-   bank-1 `0xb6xx` font, pal 09) — the un-ported part; fetch NOT yet
-   identified (measure the live pal-09 text objects first).
+   bank-1 `0xb6xx` font, pal 09) — STILL the un-ported part. Path measured
+   14z-76: drawer `0x01B300`/`0x01B3F8`, sprite list `0x28D866`+, char codes
+   `0x2F3A7A`. **Do NOT repoint the `0x267xxx` arrays for this — all three
+   already carry a tenant repoint and none is read at the win screen.**
+   Open: what selects the `0x28D866` record per character.
 5. Snapshot the actual screen and compare against a native capture —
    the RAM and ROM can both check out while the screen is wrong
    (14z-68: palette RAM matched vs2 and all 134 tiles matched vs2,

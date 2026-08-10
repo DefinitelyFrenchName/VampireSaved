@@ -2394,3 +2394,50 @@ breakpoint at the placed twin `PRG:0x0D8912`: zero hits), and the
 explosion's sprite codes are byte-identical before and after. It is a
 latent repair of an already-ratified class, proven safe by legacy
 masked-v2 EXACT and both frozen references rebuilding bit-exact.
+
+## Session 14z-76 (Pyron's effect palette; build/pyron20 69e8c6f0)
+
+One `[[palette]]` row added to `build/manifest/pyron.toml`, immediately after
+his `sprite` entry:
+
+```toml
+[[palette]]
+name = "effect"
+stage = 6
+src = 0x3AC45C          # vs2 0x396C14[0x11]; stride 0xDC0
+len = 0xDC0
+src_head_hex = "05370639075b088d"
+table = 0x38C218
+```
+
+Generated delta against `pyron19`, exactly two ops and nothing else:
+
+| op | addr | value | provenance |
+|---|---|---|---|
+| `data_file` | `0x3FABA0` (hole_b) | `palette_block_effect.bin`, `0xDC0` | `VS2` (vs2 `0x3AC45C`) |
+| `poke32` | `0x38C25C` | `0x003FABA0` | `GEN` — effect table row `0x11` |
+
+`0x38C25C` = `0x38C218 + 4*0x11`, i.e. **row 0x11 of the 32-row effect
+palette pointer table** — a variant alias row, which legacy never indexes
+(`tests/audit_id_writers.sh`). Before this change it held `0x3923E0`, row
+0x01's value, so Pyron drew his effect/flash palettes from **Demitri's**
+block. No `extra_tables` key: the generator emits extras only on the base
+half, so a variant-id tenant has none.
+
+**RETRACTION.** The deferral note in `pyron.toml` (and M3b merge blocker #2 in
+`docs/NEXT_SESSION.md`) claimed this table has only 16 rows and that a variant
+id spills into a separate table at `0x38C258`. It does not — see
+`docs/game/atlas/character_tables.md` "The per-character palette POINTER
+tables" and `docs/game/gotchas.md` "A VARIANT ALIAS ROW holds a value vanilla
+uses". The comment block in the manifest was rewritten to the measured model,
+keeping the still-valid eliminations from the 14z-74/75 blink hunt.
+
+Gates: `run_suite.sh vsavjw` GREEN (55 PASS / 17 SKIP / 0 FAIL — the same
+class inventory as `pyron-m1`, so legacy is untouched), `test_pyron_blink.sh`
+still `fixed`, plus cosmo / variant_dispatch / gfx_layout3 / empty_tiles /
+m3a_reproducible and the new `tests/test_effect_palette_table.sh`.
+
+NOT established: visibility. The block is read 0 times in ordinary play
+(two vanilla fighting replays, a 6000-frame Pyron soak; positive control 60
+reads of his sprite block on the same rig). It is a rare-event palette whose
+only documented trigger is the electrocute X-ray plus DF/status tints.

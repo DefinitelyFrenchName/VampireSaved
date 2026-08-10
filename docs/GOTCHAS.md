@@ -42,6 +42,8 @@ is a GAME gotcha if it is true of the game regardless of the port.
 - The content-twin trap: vsavj keeps byte-identical copies of engine code inside per-char families — hook the LIVE one, found by tracing
 - Sampling a STATE-gated effect at the wrong moment reads as "not reproduced" (14z-68u)
 - A MODE-gated symptom needs the MODE PROVEN ENTERED — pressing the input is not entering it (14z-69, cost this session twice)
+- The two games' sprite-list handlers do NOT agree: a per-handler CODE BIAS differs between vsav and vs2 (14z-71)
+- A VARIANT ALIAS ROW holds a value vanilla uses — that does not make the SLOT used (14z-76, deferred a fix for two sessions)
 
 ## Platform — CPS-2, MAME, FBNeo (`platform/gotchas.md`)
 
@@ -64,6 +66,7 @@ is a GAME gotcha if it is true of the game regardless of the port.
 - FBNeo's d_cps2.cpp is not valid UTF-8, and SKIPDEPEND hides driver edits
 - FBNeo harness: no video means the sprite path never runs, and stdout is captured to the sandbox log
 - FBNeo matches zip members by CRC — a mismatch loads 0xFF FILL and still prints "(OK)"
+- A MAME watchpoint logs REGISTERS, not the value written — use FBNeo's value tap when the question is "what went in" (14z-76)
 - MAME's build system cannot handle a SPACE anywhere in the source path
 - rsync `--exclude 'build/'` also excludes `scripts/build/`
 - MAME 0.288's OSD is SDL3 and it is found ONLY through pkg-config

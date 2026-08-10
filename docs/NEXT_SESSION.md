@@ -1,32 +1,29 @@
 # NEXT SESSION — orientation (written at the close of 14z-75, 2026-08-10)
 
-**ALL THREE TENANTS ARE NOW FROZEN.** Donovan `donovan-m3a` (4b7d0dc7),
-Phobos `huitzil-m2` (9deda080), **Pyron `pyron-m1` (d8b282da)** — the last
-frozen this session, maintainer-ratified, `run_suite.sh vsavjw` GREEN
-(55 PASS / 17 SKIP / 0 FAIL, 72/72 replays). All three rebuild bit-exact.
+**ALL THREE TENANTS ARE FROZEN.** Donovan `donovan-m3a` (4b7d0dc7),
+Phobos `huitzil-m2` (9deda080), **Pyron `pyron-m2` (69e8c6f0 — RE-FROZEN
+14z-76, supersedes pyron-m1 d8b282da, which can no longer be produced from
+the tree)**. `run_suite.sh vsavjw` GREEN (55 PASS / 17 SKIP / 0 FAIL,
+72/72 replays). All three rebuild bit-exact.
 
 ```sh
 export ROMDIR=/path/to/reference/sets
-tools/run_wide.sh build/pyron19 fbneo     # play it
+tools/run_wide.sh build/pyron20 fbneo     # play it
 ROMDIR=... MAME_BIN=~/.cache/vampire-saved/mame/cps2 \
-MAME_ROMPATH="build/pyron19/rompath;$ROMDIR" tests/run_suite.sh vsavjw
+MAME_ROMPATH="build/pyron20/rompath;$ROMDIR" tests/run_suite.sh vsavjw
 ```
 
 **So M3b — merging the three into one build — is the next milestone.**
 
 ---
 
-## Before the merge: three things that will collide
+## Before the merge: two things that will collide
 
 1. **Free-pool HUD anchors are per tenant and must stay disjoint.** Donovan
    0xBE8C/0xBE90, Phobos 0xBE92/0xBE9A, Pyron 0xBE94/0xBE9C. All six of
    Pyron's cells were chosen blank + inside `protected_tiles.json`'s audited
    pool for exactly this reason.
-2. **The EFFECT palette hazard is SHARED.** The table at `0x38C218` has only
-   sixteen rows, so a variant id indexes past it into the adjacent shared
-   table — Pyron's 0x11 lands on its row 0x01, Phobos' 0x10 on row 0x00, both
-   values vanilla uses. Neither is ported. Resolve it once, for both.
-3. **Phobos carries one latent aliased row.** `0x2A8A4` row 0x10 is `0x004A`
+2. **Phobos carries one latent aliased row.** `0x2A8A4` row 0x10 is `0x004A`
    (row 0x00's handler) where vs2 has the default. Benign today (0 hits at
    the resolver) but not what native does, and `huitzil-m2` is frozen — so
    changing it is a maintainer decision. `tests/test_variant_dispatch.sh`
@@ -34,16 +31,41 @@ MAME_ROMPATH="build/pyron19/rompath;$ROMDIR" tests/run_suite.sh vsavjw
 
 ## Open on Pyron (none blocked the freeze)
 
-- **The win QUOTE** — still the host's line, for all three tenants. ONE
-  shared `id & 0x0F` fold, not three fixes. Detail + two failed attempts:
-  `docs/game/engine_internals.md` "Win screen".
-- **His EFFECT palette** — unported (see hazard 2). Unconfirmed whether it is
-  even visible; ask the maintainer to look before spending on it.
+- **The win QUOTE** — **DECODED, and DEFERRED BY MAINTAINER DECISION
+  (14z-76). Do it LAST**, on the merged M3b build, after the mechanical port
+  is complete and certified. Do NOT start it opportunistically.
+  Cause: the first-level 16-bit offset table at the quote bank
+  (`root 0x0112BC -> bank 0x32D28A`) has 32 entries with the variant half
+  **exactly aliased** (`0x10->0x00`, `0x11->0x01`, `0x13->0x03`) — the alias
+  class, matching the symptom on all three tenants exactly.
+  **The cheap fix is impossible:** those offsets are 16-bit SIGNED relative to
+  the bank, and the `bank +/- 0x8000` window has **zero** free bytes (scanned;
+  not one 0x40 run). `hole_b` and `wide_ext` are both out of reach.
+  **The only path is relocating the whole bank** (~`0x40DC` copy + `0xC20` of
+  tenant blocks into `wide_ext`, then ONE long at `0x0112BC`) — which is a
+  SHARED surface, unlike every other tenant change in this port.
+  Full recipe, vs2 source addresses, risk analysis and the required gates:
+  `docs/project/patch_index.md` "DEFERRED BY MAINTAINER DECISION — the
+  win-quote bank relocation". Mechanism: `docs/game/engine_internals.md`
+  "The WIN-QUOTE TEXT SYSTEM".
+- ~~**His EFFECT palette**~~ — **CLOSED 14z-76, in `pyron-m2`.** Playtest: Pyron's electrocuted state
+  is WRONG on pyron19 (red shock aura) and CORRECT on pyron20 (yellow,
+  identical to vs2); **Demitri is identical across both builds and correct**,
+  which is the legacy check that no RAM gate can perform — the palette path
+  never transits work RAM. The "16-row table" premise that deferred this for
+  two sessions is RETRACTED: `0x38C218` is ONE 32-row id-indexed table and
+  `0x38C258` is its second half, so row 0x11 is an ordinary variant alias row
+  (`tests/test_effect_palette_table.sh`).
 - **`tests/replays/pyron/80_pyron_cosmo_pairsweep.rpl` still resets at
   f4840.** INDEPENDENT of everything fixed this session — it reproduces on
-  pyron14 too. Most likely another out-of-range index of the same class as
-  the Cosmo one. Needs a contrived 12-attempt sequence, so it is low priority
-  but it is a real defect. Repro:
+  pyron14 too. **"Most likely another out-of-range index of the same class"
+  is WEAKENED (14z-76):** the new sweep finds only three tables where vs2 is
+  longer, and on this exact rig none explains it — the Cosmo table dispatches
+  only entries 0/4/5/40/41 (last at f4799, all in range) and the other two are
+  never dispatched at all, 0 hits against a 25-hit positive control on the
+  same instrument. So either it lives in the 29 unjudged tables or it is a
+  different mechanism. Needs a contrived 12-attempt sequence, so it is low
+  priority but it is a real defect. Repro:
   ```sh
   POKES="1400:ff8782:11;1450:ff8782:11;1500:ff8782:11;3300:ff8509:09;3900:ff8509:09;\
   4500:ff8509:09;5100:ff8509:09;5700:ff8509:09;6300:ff8509:09"
@@ -64,8 +86,18 @@ tenant drives an out-of-range index, retarget HIS index to an in-range entry
 that already reaches the right handler — one byte, unreachable by legacy.
 
 **Sweep for it:** `tests/test_variant_dispatch.sh` finds the aliased-variant
-row shape. There is no equivalent sweep yet for OUT-OF-RANGE indices — worth
-writing before the fourth tenant.
+row shape; **`tests/test_index_space.sh` (14z-76) is now the sweep for THIS
+one** — it derives every `jmp (d8,PC,Dn.w)` table's entry count in both ROMs
+and reports the tables where vs2 is longer. Ground-truthed: it re-derives the
+Cosmo table at 80 entries against vs2's 84, danger window [80..83], which
+contains the index that crashed. Result on the two ROMs: **3 risky tables,
+29 of 110 honestly NOT JUDGED** (no twin located; two of them are large —
+`0x018510` 81 entries and `0x02385c` 80). Closing that coverage gap is the
+next improvement to the instrument.
+
+**Trap when using its output at runtime:** the danger window is in ENTRY
+numbers but a dispatcher's register holds entry*2 (`add.w d0,d0`). Halve
+before comparing, or entries 40/41 read as "80/82, out of range".
 
 ## Rules that cost real time — carried forward
 

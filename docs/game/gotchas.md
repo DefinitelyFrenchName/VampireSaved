@@ -465,3 +465,46 @@ Rules:
   type 2 takes the object's — so a tenant's procedural strips cannot reach
   a WIDE group-C bank through the record path at all.
 - Frozen inventory: `tests/test_beam_list_type6.sh` section 1c.
+
+## A VARIANT ALIAS ROW holds a value vanilla uses — that does not make the
+## SLOT used, and reading it that way deferred a fix for two sessions (14z-76)
+
+Every 32-row per-character table in vsav aliases rows `0x10-0x1F` onto
+`0x00-0x0F`. So a tenant's row *always* contains a pointer vanilla also uses
+somewhere — that is the definition of an alias, and it is precisely the
+property that makes repointing the row superset-safe.
+
+The effect-palette table `0x38C218` was read the other way round: row 0x11
+holds `0x3923E0`, Demitri's block, "which vanilla uses", so the row was
+declared off-limits and a second 16-row table was invented to explain it
+(`0x38C258`, allegedly "the next table"). It is the same table's second half.
+
+Three cheap checks that settle any table's shape, in the order they should be
+run:
+
+1. **Read the indexer, not the data.** `move.b $382(a6),d1 / lsl.w #2,d1 /
+   movea.l (a0,d1.w),a0` takes the id byte unmasked — so rows above 0x0F are
+   reachable and the table is at least 32 rows. A fold (`andi #$0F`) is what
+   a 16-row table would need, and there was none.
+2. **Grep for the supposed second base.** `0x38C258` appears ZERO times in
+   either ROM view. Nothing that is never loaded as a base is a table.
+3. **Compare the alias exception SET across sibling tables.** The sprite table
+   and the effect table both deviate from their base half at exactly rows
+   `0x12` and `0x18` — vsav's own variant datasets. Two tables agreeing on the
+   same two exceptions cannot be a coincidence of two unrelated 16-row tables.
+
+**THIS IS THE SECOND TIME.** The id-space work already made and corrected the
+identical error on a different table: *"I wrote that `PRG:0x04FAC4` folds
+because the table it indexes genuinely has 16 rows. Wrong — I read that table
+out of the OPCODE image, where 16 rows of noise look exactly as much like 16
+rows as like 32. From the DATA image it is plainly 32 rows"* (STATE.md, the
+`anim_pairs` correction). Same shape, same wrong conclusion, same fix: **count
+a table's rows from the DATA view and from the indexer's arithmetic, never
+from where the bytes stop looking familiar.**
+
+**And diff the docs against the code that implements them.**
+`tools/gen_donovan_patch.py` carried the correct model in a comment ("the
+hand-rolled 0x1F MIRROR (0x38C258 == 0x38C218 + 0x40 — measured, NOT a
+separate table)") the entire time, and its alias assertion would have passed.
+Two documents asserted the opposite of the generator and nobody compared them.
+Frozen by `tests/test_effect_palette_table.sh`.

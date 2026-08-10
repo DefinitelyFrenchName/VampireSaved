@@ -392,97 +392,74 @@ len = 0x500
 src_head_hex = "0e000f600f900fb0"
 table = 0x38C198
 
-# EFFECT PALETTE — DEFERRED, and deliberately NOT ported (14z-74).
-# Porting it caused a visible 30Hz BLINK on Pyron's sprite, measured:
-# palette RAM row 10 (0x90C140) alternated every frame between his correct
-# block and a competing one, where NATIVE holds it CONSTANT (native animates
-# rows 1/2/3 only; ours animated 1/2/3 AND 10).
-# ROOT CAUSE: the effect palette table at 0x38C218 has only SIXTEEN rows
-# (0x00-0x0F) — 0x38C258 is the NEXT table, and it is a COPY of the first
-# rows (the "vanilla third-table sharing"). A variant id therefore indexes
-# PAST the table: row 0x11 lands at 0x38c25c = extra-table row 0x01, which
-# vanilla uses (0x3923e0). The sprite table 0x38C198 is 32 rows, so the
-# sprite row above is legitimately inside it — that half is sound and stays.
-# NOTE FOR THE MERGE: Huitzil's frozen row has the SAME shape (his row 0x10
-# lands at 0x38c258 = extra-table row 0x00), so this is a shared hazard, not
-# a Pyron-only mistake; it simply has not produced a reported symptom on him.
-# Legacy is intact either way (measured: replay 02 on the effect-ported build
-# was still the ratified select-wheel window only).
-# MEASURED SOURCE OF THE BLINK. The sequence animates palette row 10, which
-# is the row his sprite AND the in-match HUD mugshot draw from; hence the
-# mugshot blinked too, and showed PYRON's palette on DEMITRI's art (the HUD
-# art was unported then — fixed 14z-75, so the art is now his).
+# ── EFFECT PALETTE — PORTED 14z-76. His block is vs2 0x396C14[0x11] =
+# 0x3AC45C, len 0xDC0, the same per-char stride Donovan's and H's rows use
+# (cross-checked against rows 0x0F-0x13 on the same table). The block holds
+# the palette-effect rows the uploader family 0x2AD20 serves: the electrocute
+# X-ray body tint, Dark Force / status tints, flash and aura rows.
 #
-# THE 14z-74 FIGURE "ours 543 calls / native 0" IS RETRACTED (14z-75): its
-# own caveat was right, the hits were in the select screen and it compared
-# different screens. RE-MEASURED anchored on an in-match state, both legs
-# proven to hold Pyron (+0x382 = 0x11), as a PHASE-INDEPENDENT property —
-# the number of distinct row-10 values over 40 CONSECUTIVE frames:
-#     native  1 distinct value,  0 changes
-#     ours    2 distinct values, 39 changes  (every frame)
-# and ours' two values are NAMED: one is bit-identical to native's constant,
-# the other is vsavj palette-seq row 0x26 (0x39ADC0) under the uploader's
-# 0xF000 OR. Frozen by tests/test_pyron_blink.sh (+ replay 76, a rig that
-# runs unchanged on both games, and 7 verdict controls).
-# Writer: PC 0x02AD68/0x02AD7C, alternating source A0 = 0x39ADC0 (seq row
-# 0x26) and 0x3FA6A0 (his own palette), 91 writes each. Ours also performs
-# every write native does — PC 0x1433E/0x14190 hit 240/144 times, exactly
-# matching native's 0x129B6/0x12852 — so the seq upload is PURELY ADDITIVE.
-# REFINED 14z-74 (maintainer: the blink happens during CHARACTER SELECT too):
-#   * The probe hits start at frame ~2363 — i.e. DURING SELECT, before any
-#     match. A0 walks 0x000d45c6, +0x18, +0x18 ... = the ANIM NODE stride, so
-#     an anim script is driving the palette-seq call node by node.
-#   * Those anim nodes are CORRECT: byte-identical to vs2 except a properly
-#     relocated pointer (vs2 0x270a32 -> ours 0x0dff0c, exactly the anim
-#     region delta). So this is NOT the air-dive class (a data view read as
-#     opcodes); the ported data is faithful.
-#   * The anim nodes are CORRECT — RECONFIRMED 14z-75 at the right
-#     alignment. 14z-74's linear dst/src map was off (the extractor
-#     auto-discovers sub-region shifts, so a naive map showed 75% of the
-#     region differing); correlating puts ours 0x0D45C6 at vs2 0x2650EC,
-#     where the two are byte-identical apart from properly relocated
-#     pointers. So this is NOT the air-dive class; the ported data is
-#     faithful.
-# WHAT 14z-75 ELIMINATED, so nobody re-derives it:
-#   * NOT the anim nodes (above).
-#   * CORRECTED 14z-75 (this elimination was WRONG as first written): I
-#     claimed "vsavj row 0x26 is byte-identical to vs2's" from a table base
-#     of 0x3B093C derived by CONTENT-MATCHING a row. vs2's real base is
-#     0x3B0A3C (its resolver's own immediate), and the tables are NOT
-#     row-aligned: vsavj row 0x26 == vs2 row 0x1E, a uniform +8 shift. The
-#     port's id remap already handles this correctly (ours asks 0x26/0x39/
-#     0x3A where native asks 0x1E/0x31/0x32) — so it was never the defect,
-#     but the reasoning that said so was unsound. Read a table base off the
-#     code, never off a content match.
-#   * NOT a dead row — 0x26 is one of only two ids legacy ever requests.
-#   * NOT misdirection to another palette row — over 12 consecutive frames
-#     native animates ONLY stage rows 0x00-0x03; no native row carries this
-#     2-state flip.
-# ANSWERED 14z-75 by an instruction trace: the gate is a PER-CHARACTER
-# palette-routine dispatch table whose row 0x11 vsavj leaves as an alias of
-# row 0x01. See the fix block at the end of this file
-# (`palette_routine_row_11`). Native never runs this path for Pyron because
-# vs2's row 0x11 points at the default no-op handler.
+# THIS ROW WAS DEFERRED FOR TWO SESSIONS ON TWO REASONS. BOTH ARE WRONG.
 #
-# CROSS-TENANT CHECK (14z-74, maintainer asked whether Phobos is exposed):
-# NO — measured on the same rig, palette-row churn over 15 frames:
-#     PYRON   (0x11)            rows 1,2,3 AND 10   <- the blink
-#     HUITZIL (frozen m2, 0x10) rows 1,2,3          = native
-#     DONOVAN (frozen m3a,0x13) rows 1,2,3          = native
-# So the blink is Pyron-specific, not a shared tenant hazard. It is also a
-# DIFFERENT phenomenon from Donovan's old "sword/statue blink" (14z-33),
-# which was BANK ATTRIBUTION — records of two banks processed with one
-# bank's semantics, rendering real art from the wrong place (geometry
-# right, content someone else's). Pyron's is palette RAM: a palette-SEQUENCE
-# animation (uploader PC 0x02AD68) rewriting row 10 every other frame where
-# native writes it zero times. Same visible word, unrelated mechanisms.
-# Note the maintainer also sees the in-match HUD MUGSHOT blinking — and that
-# mugshot is DEMITRI's (his HUD rows are unported), which confirms the churn
-# is a shared palette ROW, not Pyron's own art.
+# 1. RETRACTED (14z-76) — "the table at 0x38C218 has only SIXTEEN rows, so a
+#    variant id indexes PAST it into the adjacent shared table at 0x38C258,
+#    whose row 0x01 vanilla uses". IT IS ONE 32-ROW TABLE indexed by the full
+#    character id, exactly like the sprite table 0x38C198 above it. Three
+#    independent measurements:
+#      * the reader at PRG:0x02AFA2 is
+#            movea.l #$38c218,a0 / moveq #0,d1 / move.b $382(a6),d1 /
+#            lsl.w #2,d1 / movea.l (a0,d1.w),a0
+#        — the RAW id byte, no fold and no mask. Same shape at 0x02AD20,
+#        0x02B25A, 0x02B45C and 0x02B4CA;
+#      * 0x38C258 has ZERO references in either ROM view — it is never a base
+#        address. Nor is 0x38C1D8, the other claimed "table";
+#      * both tables' variant halves alias the base half EXCEPT at rows 0x12
+#        and 0x18, and 0x18 is Oboro Bishamon — a variant dataset vsav
+#        genuinely ships. Two independent tables with the same two exceptions
+#        is not coincidence.
+#    So row 0x11 is an ordinary variant alias row that legacy never indexes
+#    (tests/audit_id_writers.sh: no legacy path writes an id in 0x10-0x1F),
+#    no different from the sprite row above it. tools/gen_donovan_patch.py
+#    had this right all along — "the hand-rolled 0x1F MIRROR (0x38C258 ==
+#    0x38C218 + 0x40 — measured, NOT a separate table)" — and this comment
+#    block contradicted the generator for two sessions. Frozen by
+#    tests/test_effect_palette_table.sh.
 #
-# TO FIX PROPERLY: determine how the engine resolves an effect palette for a
-# VARIANT id (a 16-row table cannot hold one) — either a fold, a separate
-# variant table, or a thunk — before writing anything in that region.
+# 2. RETRACTED ALREADY, in STATE.md — "porting this row caused the 30Hz
+#    blink". Removing it did not stop the blink. The blink was THREE aliased
+#    palette-routine dispatch tables (0x2A8A4 / 0x2B650 / 0x73790), fixed
+#    14z-75 and gated by tests/test_pyron_blink.sh. It was never this row.
+#
+# WHAT IT COST HIM WHILE UNPORTED: row 0x11 aliases row 0x01, so he wore
+# DEMITRI's effect palette. 110/110 rows differ, 88% of the block's bytes.
+# On the rows the readers actually select — 0x0A+variant, 0x00+variant,
+# 0x680, 0x6C0 — Demitri gives ONE beige/gold ramp for every confirm-button
+# variant (his rows 0x0A and 0x0B are byte-identical) where Pyron's own block
+# gives fire (0x0A), green (0x0B) and violet (0x0C). Same magnitude as
+# Donovan's pre-14z-12 state, which was plainly visible: the grey electrocute
+# X-ray with purple electricity, which was Jedah's block, one table over.
+#
+# STILL-VALID ELIMINATIONS from the 14z-74/75 blink hunt, kept so nobody
+# re-derives them: the ported ANIM NODES are correct (byte-identical to vs2
+# at the right alignment — correlating puts ours 0x0D45C6 at vs2 0x2650EC —
+# so it was never the air-dive class); the PALETTE-SEQ ID REMAP is correct
+# (vsavj row 0x26 == vs2 row 0x1E, a uniform +8 shift the port already
+# applies); 0x26 is NOT a dead row (one of only two ids legacy ever
+# requests); and no native row carries the 2-state flip. Also retracted in
+# 14z-75: the figure "ours 543 palette-seq calls / native 0" — it compared
+# different screens. And read a table base off the code that indexes it,
+# never off a content match: vs2's seq base is 0x3B0A3C, not the 0x3B093C a
+# content match produced.
+#
+# No `hole` key: defaults to hole_b, matching the sprite row above.
+# No `extra_tables`: the generator emits extras only on the base half (a
+# variant-id tenant has no mirror), so the key would be inert here.
+[[palette]]
+name = "effect"
+stage = 6
+src = 0x3AC45C
+len = 0xDC0
+src_head_hex = "05370639075b088d"
+table = 0x38C218
 
 # ── Select family (the H/Donovan template; arrays are shared, only the
 # per-id expect_* values are P's). All nine alias anchors verified from

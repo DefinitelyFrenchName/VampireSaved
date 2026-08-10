@@ -662,3 +662,35 @@ Rules:
 - This is the same family as the other two 14z-71 instrument traps: the
   failure is always a **"count everything" default**, and the defence is
   always a control or a discriminator, never a tuned threshold.
+
+## A MAME watchpoint logs REGISTERS, not the VALUE WRITTEN — reading the
+## value off a register snapshot attributed a write to the wrong caller (14z-76)
+
+`tests/lua/trace_writes.lua` logs `frame PC D0 D1 A0..A6` at each hit. It does
+**not** log the datum. On a `move.l a1,$30(a4)` it is tempting to read A1 as
+"the value written" — and that is right only if the sample came from the call
+you care about. In 14z-76 the win-quote installer was sampled on a *different*
+invocation in the same frame; A1 read `0x330F4C` while the field actually
+received `0x3311C2`. That mis-attribution sent the investigation looking for a
+second, non-existent installer, and produced a self-contradiction ("the field
+is read before anything writes it") that stood until the right instrument was
+used.
+
+**FBNeo's write tap logs the value**, one line per word, with PC attribution
+and non-perturbing:
+
+```
+FBNEO_HTAP="fff230-fff233" tools/run_replay_fbneo.sh vsavjw <rpl> out.log
+    -> out.log.tap:  11996 fff230 0033 W pc=00c8cc
+                     11996 fff232 11c2 W pc=00c8cc
+```
+
+Two consequences worth internalising:
+- **a 68k `move.l` appears as TWO WORD writes**, so a pointer shows up split
+  (`0033` + `11c2`); grepping the tap for the full value finds nothing;
+- when a MAME register snapshot and a value tap disagree, **the value tap
+  wins** — and the disagreement is the signal that you sampled the wrong call,
+  not that a second writer exists.
+
+Reach for the FBNeo tap the moment the question is "what value went in", and
+keep MAME's for "which code ran".

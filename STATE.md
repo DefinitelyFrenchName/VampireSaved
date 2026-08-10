@@ -1,6 +1,24 @@
 # STATE — living progress log
 
-Updated: 2026-08-10 (session 14z-75 — **PYRON IS FROZEN as `pyron-m1`
+Updated: 2026-08-10 (session 14z-76 — **PYRON RE-FROZEN as `pyron-m2`
+(69e8c6f0)** — his EFFECT palette ported and maintainer-confirmed visible;
+supersedes `pyron-m1` (d8b282da), which can no longer be produced from the
+tree. The premise that deferred
+it for two sessions — "the table at 0x38C218 has only sixteen rows, so a
+variant id indexes past it into an adjacent shared table" — is RETRACTED: it
+is ONE 32-row id-indexed table and 0x38C258 is its second half. Row 0x11 is an
+ordinary variant alias row, so the port is a 7-line manifest row, exactly like
+Donovan's and Phobos'. Suite GREEN (55/17/0, unchanged from pyron-m1); new
+gate `tests/test_effect_palette_table.sh`. **M3b merge blocker #2 dissolves.**
+Visibility CONFIRMED by playtest after the automated leg could not decide it
+(0 reads of any character's effect block across two vanilla fighting replays
+and a 6000-frame soak, against a live positive control — a rare-event palette
+needing the electrocute trigger no replay produces): Pyron's shock aura is RED
+on pyron19 and YELLOW on pyron20, matching vs2; Demitri unchanged and correct
+on both, which is the legacy check no RAM gate can make. Read docs/NEXT_SESSION.md
+first.)
+
+Previously: 2026-08-10 (session 14z-75 — **PYRON IS FROZEN as `pyron-m1`
 (d8b282da)**, the third full-roster tenant, maintainer-ratified. This session
 landed his HUD art, killed the sprite/HUD BLINK in all three places it lived,
 found and FIXED a legacy regression that a previous session had shipped, and
@@ -135,6 +153,158 @@ type 2` — so it can be FLATTENED at build time into one type-2 list.
 No hook, no cycles, nothing to ratify. Cost: decode the type-2 format
 from its handler (`0x01B234`), write the transform, and accept that the
 flattened list is authored data the sibling oracle cannot check.
+
+## Session 14z-76 — Pyron's EFFECT PALETTE ported; the "16-row hazard" retracted
+
+Asked where his unported effect palette would be visible in play. Answering
+that dissolved the reason it was unported.
+
+**THE RETRACTION.** `build/manifest/pyron.toml` and `docs/NEXT_SESSION.md`
+both asserted that the effect-palette pointer table at `0x38C218` "has only
+SIXTEEN rows", so a variant id "indexes PAST it" into an adjacent shared table
+at `0x38C258` whose row 0x01 vanilla uses — and NEXT_SESSION carried that as
+M3b merge blocker #2, shared with Phobos. It is one 32-row table indexed by
+the full character id, exactly like the sprite table `0x38C198` above it.
+Measured three independent ways:
+
+- the five sites that index it all carry the same 18-byte preamble
+  `movea.l #$38c218,a0 / moveq #0,d1 / move.b $382(a6),d1 / lsl.w #2,d1 /
+  movea.l (a0,d1.w),a0` — the RAW id byte, no mask and no fold;
+- `0x38C258` has **zero references** in either ROM view; so does `0x38C1D8`,
+  the other claimed "table". Neither is ever loaded as a base;
+- both tables' variant halves alias the base half **except at rows 0x12 and
+  0x18** — and 0x18 is Oboro Bishamon, a variant dataset vsav genuinely
+  ships. Two independent tables agreeing on the same two exceptions is what
+  rules out the two-16-row-tables reading.
+
+**Where the reasoning went wrong, because it is a repeatable trap:** row 0x11
+holds `0x3923E0`, which vanilla *does* use — as row 0x01's value. That is what
+an ALIAS row is. "The value is used" was read as "the slot is used". Every
+variant row in this port has that property; it is the reason repointing them
+is safe, not a reason it is dangerous. `tools/gen_donovan_patch.py` had the
+right model in a comment the whole time ("the hand-rolled 0x1F MIRROR
+(0x38C258 == 0x38C218 + 0x40 — measured, NOT a separate table)"), and its
+alias assertion passes on row 0x11. The docs contradicted the generator for
+two sessions and nobody diffed them.
+
+The second objection, "porting this row caused the 30Hz blink", was already
+retracted in 14z-75 (removing it did not stop the blink; it was three aliased
+palette-routine dispatch tables).
+
+**THE PORT.** One `[[palette]]` row: vs2 `0x396C14[0x11] = 0x3AC45C`, len
+`0xDC0`, into `hole_b`. The generated delta against `pyron19` is exactly two
+ops and nothing else — `data_file 0x3faba0` and `poke32 0x38c25c ->
+0x003faba0` — and `build/pyron20` fingerprints `69e8c6f0`.
+
+Gates, all green: `run_suite.sh vsavjw` **55 PASS / 17 SKIP / 0 FAIL**, the
+same class inventory as `pyron-m1` (legacy is untouched: a variant row plus
+free-space data); `test_pyron_blink.sh` still `fixed`; `test_pyron_cosmo.sh`;
+`test_variant_dispatch.sh`; `test_gfx_layout3.sh`; `audit_empty_tiles.sh`;
+`test_m3a_reproducible.sh` (donovan-m3a and m5_stock still bit-exact).
+
+**NEW GATE `tests/test_effect_palette_table.sh`** + `tools/audit_effect_palette_table.py`
+— freezes the measurement the whole change rests on (32-row shape, the
+0x12/0x18 alias exceptions, zero references to either table half, the five
+readers' unmasked-id preamble, three further sites on FIXED rows 0x06/0x0C/0x0E,
+and on a build: tenant row repointed + base-half rows pristine). Four negative
+controls: a fold in the reader, a reference to `0x38C258`, a de-aliased variant
+row, and a build clobbering a base-half row. All four fire.
+
+**WHAT IS NOT ESTABLISHED: that any of it is VISIBLE.** The block is a
+rare-event resource, measured:
+
+| run | reads |
+|---|---|
+| pyron20, Pyron mash soak 6000f, watch his ported effect block | **0** |
+| same rig/instrument, watch his ported SPRITE block (positive control) | **60**, first at f1401 |
+| vanilla, `02_demitri_vs_cpu`, watch Demitri's own effect block | **0** |
+| vanilla, `03_two_player_vs` + `07_mash_storm`, watch ALL SIXTEEN blocks | **0 inside any block** (2022/2018 hits, all outside — stage pages at `0x39A800+`, sprite blocks) |
+
+So ordinary play never consults it, which is consistent with its history:
+Donovan's wrong effect palette never showed in an automated replay either — it
+surfaced in a round-32 playtest capture of an ELECTROCUTE, and the electrocute
+X-ray plus DF/status tints are the only triggers the repo attributes to this
+block. No existing replay produces one. **The automated leg can prove the port
+correct and legacy-safe; only a playtest can prove it visible.**
+
+Static evidence that it should matter when the event fires: Pyron wore
+DEMITRI's block (row 0x11 aliases 0x01). 110/110 rows differ, 88% of bytes. On
+the rows the readers select, Demitri gives ONE beige/gold ramp for every
+confirm-button variant (his rows 0x0A and 0x0B are byte-identical) where
+Pyron's own block gives fire (0x0A), green (0x0B) and violet (0x0C). The
+per-variant colour change is the naked-eye tell that needs no reference.
+
+**RESOLVED — FROZEN as `pyron-m2` (maintainer decision, 2026-08-10).**
+Playtest: Pyron's shock aura RED on pyron19 / YELLOW on pyron20, matching vs2;
+**Demitri identical across both builds and correct**, the legacy check no RAM
+gate can make. Expectation set renamed `pyron-m1` -> `pyron-m2` (content
+unchanged); pyron-m1's registry row kept WITHOUT a dispatch mapping, as
+huitzil-m1's was. Rebuild verified bit-exact into a scratch dir.
+NOTE on my own colour prediction: I called the pyron19 row "beige/gold" and
+the pyron20 row a "fire ramp"; the maintainer saw RED -> YELLOW. The ROM data
+was read correctly — row 0x0A on the host block is a pale ramp plus a hard
+`F00`, and the tenant block's is `FF0 FFB FFF` — but my colour NAMING buried
+the salient hue on both sides. Row 0x34 is red in both builds and is not the
+tell. Also unresolved: several
+effect-table readers sit inside the target span of the per-character
+palette-routine dispatch tables whose row 0x11 is now the vs2 default no-op —
+if EVERY reader is dispatcher-reached, his block is unreachable by
+construction and the port is inert. Two of the five (`0x2AFA2`, `0x2B25A`) are
+not in either dispatcher's target set, so at least those are reached another
+way; this was not run to ground.
+
+### 14z-76b — the OUT-OF-RANGE INDEX SWEEP exists; the f4840 hypothesis weakens
+
+`docs/NEXT_SESSION.md` asked for this instrument before a fourth tenant:
+`test_variant_dispatch.sh` sweeps the aliased-variant-row shape, nothing swept
+the index-space one. **`tools/audit_index_space.py` + `tests/test_index_space.sh`**
+now do.
+
+It derives every `jmp (d8,PC,Dn.w)` table's entry count in BOTH ROMs from two
+structural bounds — a target cannot land inside its own table, and a table
+cannot overlap the next dispatcher's code — and reports the tables where vs2
+is longer. Result on the two ROMs:
+
+| vsavj table | vsavj | vs2 | danger ENTRY window |
+|---|---|---|---|
+| `0x0018468` | 80 | 84 | [80..83] — the known Cosmo crash (index 81) |
+| `0x00185da` | 86 | 90 | [86..89] |
+| `0x003975e` | 10 | 11 | [10..10] |
+
+110 tables found, 81 twinned (24 of them by instruction SHAPE), **29 NOT
+JUDGED** — reported per table, and the count is frozen in the gate so a
+matcher that quietly stops judging cannot read as "no risk". Two of the
+unjudged are large (`0x018510` 81 entries, `0x02385c` 80).
+
+**Two bugs in my own first version, both caught by controls I wrote first:**
+- bound (a) alone (N <= min(displacement)/2) is far too loose — the Cosmo
+  table's nearest target is base+0x212, so it permitted 265 where the truth is
+  80. The anchor bound is what makes it exact.
+- the anchor landed 4 bytes late (a broken byte test), so the NEXT
+  dispatcher's operand word was read as an entry and collapsed the count to 3.
+The `--expect-known` positive control failed on both and is why they surfaced.
+
+**COVERAGE was the real weakness.** The byte-exact context matcher inherited
+from `audit_variant_dispatch.py` left 53 of 110 unjudged *including the Cosmo
+table itself* — the surrounding code carries relocated branch displacements,
+so no byte context matches. Matching on the last 8 MNEMONICS (operands
+discarded, ordinal correspondence within a shape class) took it to 29.
+
+**THE f4840 RESET IS PROBABLY NOT THIS CLASS.** NEXT_SESSION guessed it was
+"most likely another out-of-range index of the same class". Measured on the
+repro rig (replay 80, pyron19), all three risky tables are exonerated:
+- the Cosmo dispatcher runs entries 0/4/5/40/41 only, last at f4799, every one
+  in range for its 80 entries;
+- the other two dispatchers get **0 hits**, against a **25-hit positive
+  control** at the Cosmo dispatcher on the same rig and instrument.
+
+So it is in the 29 unjudged tables or it is a different mechanism.
+
+**A UNITS TRAP, recorded because it produced a false alarm for a minute.** The
+danger window is in ENTRY numbers; the dispatcher's register is not. The idiom
+is `move.b <sub-state>,d0 / add.w d0,d0 / move.w (d8,PC,d0.w),d1`, so the
+register holds entry*2 — d0 = 80 and 82 are entries 40 and 41, not
+out-of-range indices. Halve before comparing.
 
 ## Session 14z-75 — PYRON FROZEN as `pyron-m1` (d8b282da)
 
@@ -464,6 +634,9 @@ Demitri/Sasquatch/Q-Bee/Bishamon bit-identical to m1 across 14,621 frames.
 - Step 2: SPRITE palettes (vs2 0x39C19C). EFFECT palette DEFERRED — its
   table has only 16 rows, so a variant id spills into the adjacent shared
   table (a hazard H's FROZEN row shares).
+  **RETRACTED 14z-76: that table has THIRTY-TWO rows and 0x38C258 is its
+  second half, so there is no spill and no hazard. Ported on pyron20; see
+  the 14z-76 entry.**
 - Step 3: 6 select_records + drawer thunks + roster21 + his select palette
   (the Donovan +0xBC dedicated block, 0x3C28FC).
 - Step 5: win screen — position (vs2 table 0x6B210 row 0x11 = 0x00C0,0x0094

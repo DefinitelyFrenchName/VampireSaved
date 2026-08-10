@@ -121,3 +121,58 @@ auto-detecting `tests/run_suite.sh` (fingerprint -> expectation set via
 Full rationale and the porting checklist: `porting_sprite_lists.md`.
 Facts: `../game/atlas/sprite_lists.md`.
 
+
+## DEFERRED BY MAINTAINER DECISION (14z-76) — the win-quote bank relocation
+
+**Status: NOT STARTED, deliberately. Do this LAST**, on the merged M3b build,
+after the mechanical port is complete and certified. Maintainer's ordering,
+and it is the correct one — see "why later is cheaper" below.
+
+**What it fixes.** All three tenants render a host character's win quote:
+Phobos a Bulleta line, Pyron Demitri's, Donovan Victor's. Cosmetic only; no
+gameplay surface. Mechanism fully decoded in
+`../game/engine_internals.md` "The WIN-QUOTE TEXT SYSTEM".
+
+**Root cause.** The per-character split is the first-level 16-bit offset table
+at the quote bank base. vsavj's table has 32 entries and its variant half is
+**exactly aliased** — `0x10->0x00`, `0x11->0x01`, `0x13->0x03`.
+
+**Why the cheap fix is impossible.** The offsets are 16-bit and SIGNED
+relative to the bank base, so a ported block must live inside
+`0x32D28A +/- 0x8000`. That window was scanned: **zero free bytes** — not one
+run of 0x40 bytes of `00`/`FF`. `hole_b` (`0x3EC720`) and `wide_ext`
+(`0x400010`) are both far out of reach. Appending in place cannot be done.
+
+**The only path — relocate the whole bank.** Every offset inside the bank is
+relative to its base, so moving it wholesale preserves the entire structure:
+
+| step | detail |
+|---|---|
+| 1 | copy the bank verbatim, **~`0x40DC` bytes** from `PRG:0x32D28A`, into `wide_ext` |
+| 2 | append the three tenant blocks (~`0xC20`); total ~`0x4CFC`, inside a `+/-0x8000` window |
+| 3 | port from vs2 (`root 0x00F954 -> bank 0x09CA24`): Phobos `0x09FE24` len `0x360`, Pyron `0x0A0184` len `0x460`, Donovan `0x0A05E4` |
+| 4 | write the three first-level offsets at `newbase + id*2` for `0x10`/`0x11`/`0x13` |
+| 5 | change **ONE long**: the root at `PRG:0x0112BC`. Read as DATA (inside the crypt range but on the data path) — write it in the DATA view |
+
+**THE RISK, and why it is not a variant-row change.** The root long is a
+SHARED surface: it reroutes *every* character's quote lookup through our copy.
+The safety argument is "the copy is byte-identical for rows `0x00-0x0F`" —
+sound, but an argument about a 16KB blob rather than a two-byte repoint. It
+therefore needs, at minimum:
+- a gate asserting the copied span byte-for-byte against vanilla;
+- the legacy suite green (replay 28 reaches a win screen);
+- **a gate that LOOKS at a vanilla win screen** — text rendering never
+  transits work RAM, so the RAM suite is blind to it for exactly the reason it
+  was blind to the effect palette (14z-76). An OBJ-record or pixel A/B of the
+  pal-0 objects is the only real check.
+
+**Why later is cheaper, not just safer.**
+1. Done now it would be done THREE times, in three single-tenant builds,
+   producing three copies of the same bank to reconcile at the merge. After
+   M3b it is one copy, one root change, one set of offsets.
+2. It is the only shared-surface change in the port. Landing it LAST makes a
+   regression a one-commit bisect; landing it early taxes every subsequent
+   tenant investigation with "rule out the 16KB blob" first.
+3. Nothing decays: every address above is a property of the two ROMs.
+   `wide_ext` has `0x1FB0F0` free against a need of ~`0x4CFC` — no reservation
+   required.

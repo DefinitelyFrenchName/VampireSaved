@@ -108,6 +108,51 @@ The newcomers' anim data sits in an appended region
 (`PRG:0x23xxxx-0x28xxxx`, outside the encrypted 1MB) — ~110-125KB per
 character by inter-base spacing.
 
+### The per-character palette POINTER tables (measured 14z-76)
+
+**Two 32-row tables, indexed by the FULL character id, back to back:**
+
+| base | rows | what each row points at |
+|---|---|---|
+| `PRG:0x38C198` | 32 | the character's SPRITE palette block (len `0x500`) |
+| `PRG:0x38C218` | 32 | the character's EFFECT/flash palette block (len `0xDC0`) |
+
+They end at `0x38C298`; the palette data itself starts at `0x38C2A0`.
+
+**`0x38C1D8` and `0x38C258` are NOT tables.** They are those two tables'
+variant halves (rows `0x10-0x1F`), and neither address is ever loaded as a
+base — **zero references in either ROM view.** An early note called this
+family "FOUR 16-slot tables at +0x00/+0x40/+0x80/+0xC0"; that reading is
+RETRACTED, and it cost two sessions of a deferred Pyron port.
+
+Both variant halves alias the base half **except at rows `0x12` and `0x18`**,
+which carry their own blocks — `0x18` is Oboro Bishamon, a variant dataset
+vsav genuinely ships. Two independent tables agreeing on the same two
+exceptions is the measurement that settles the shape.
+
+The id reaches the index **unmasked**. Five sites index the effect table and
+all carry the identical preamble
+
+```
+movea.l #$38c218,a0 / moveq #0,d1 / move.b $382(a6),d1 /
+lsl.w #2,d1        / movea.l (a0,d1.w),a0
+```
+
+at `0x02AD20`, `0x02AFA2`, `0x02B25A`, `0x02B45C`, `0x02B4CA`. Three further
+sites (`0x02ABCE`, `0x02ABF0`, `0x02AC12`) take FIXED rows `0x06`/`0x0C`/`0x0E`
+— effects that always draw from Anakaris'/Q-Bee's/Lilith's block whoever the
+affected fighter is.
+
+**Consequence for tenants:** a variant-id row here is an ordinary alias row,
+so repointing it is superset-safe by the same argument as every other 32-row
+per-character table in this port. All three tenants do it. Frozen by
+`tests/test_effect_palette_table.sh`.
+
+**Do not read "the value in a variant row is used by vanilla" as "the slot is
+used".** That is what an alias row IS, and it is the reason repointing is
+safe — not a reason it is dangerous. (14z-76; the mistake that deferred
+Pyron's effect palette.)
+
 ### Palette pipeline (partial)
 
 Palettes live in CPS2 palette RAM `0x90C000+`, uploaded straight from ROM
