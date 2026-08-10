@@ -437,7 +437,14 @@ tests/test_select_arrays.sh           # the select record-pointer arrays (M3a): 
 tests/test_tenant_id.sh               # the tenant id is a BUILD INPUT: resolution,
                                       # the variant-id-needs-profile refusal, and the
                                       # frozen-reference reproducibility guard (no
-                                      # id_by_profile until M3a completes). ~1s
+                                      # id_by_profile until M3a completes). EXTENDED
+                                      # 14z-77 (M3b slice C) with ROW OWNERSHIP: the
+                                      # per-FILE stamp, row_owner resolution, the
+                                      # row_applies truth table, row_hex selection, and
+                                      # the multi-tenant refusal in BOTH directions
+                                      # (asserted by no test before this; the loop
+                                      # slice deletes the refusal and flips it).
+                                      # Pure functions, no ROMs, no emulator. ~1s
 tests/test_tenant_select_records.sh   # M3a select-records mechanism (14z-62): a
                                       # variant-id build carries the tenant's OWN six
                                       # select records (space-model allocations, six
@@ -643,10 +650,16 @@ tests/test_patch_overlap.sh           # ground truth for the patch_prg op-overla
                                       # assertion (14z-65): two ops writing one word
                                       # is a NAMED build error; disjoint and
                                       # word-adjacent ops stay clean. ~2s, no emulator
-tests/test_m3a_reproducible.sh        # M3b Phase 0 gate: the frozen reference pair
-                                      # (donovan-m3a 4b7d0dc7 / m5_stock 6c93cfa8)
-                                      # rebuilds bit-exact from the tree (scratch
-                                      # dirs). Run after EVERY M3b machinery commit
+tests/test_m3a_reproducible.sh        # M3b Phase 0 gate: ALL FOUR frozen references
+                                      # (donovan-m3a 4b7d0dc7 / m5_stock 6c93cfa8 /
+                                      # huitzil-m2 9deda080 / pyron-m2 69e8c6f0)
+                                      # rebuild bit-exact from the tree (scratch
+                                      # dirs). Extended from the original PAIR in
+                                      # 14z-76; its value scales with the count —
+                                      # three independent tenant fingerprints are
+                                      # three independent oracles over one refactor.
+                                      # Needs only ROMDIR, no emulator. ~4 min.
+                                      # Run after EVERY M3b machinery commit
 tests/test_romset_identity.sh         # ground truth for tools/audit_romset_identity.py:
                                       # no member may carry the PRISTINE bytes of a member
                                       # the build patched (both emulators resolve a ROM

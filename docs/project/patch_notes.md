@@ -274,9 +274,10 @@ machinery changes and one emitted-patch change:
   Stock builds are untouched: sound_table is profile-gated off there, so
   the generic repoint still serves rows 0x0F/0x1F.
 - `tests/test_m3a_reproducible.sh`: the M3b Phase 0 gate — the frozen
-  reference pair must rebuild bit-exact from the tree after every
+  references must rebuild bit-exact from the tree after every
   machinery commit of the milestone (scratch builds; canonical dirs
-  untouched).
+  untouched). Written here as a PAIR; extended 14z-76 to **all four**
+  (m5_stock, donovan-m3a, huitzil-m2, pyron-m2).
 
 ## donovan-m2 stage 5 — the last two music triggers: engine_data masquerade rows (2026-07-28, playtest round 2)
 

@@ -1,6 +1,18 @@
 # STATE — living progress log
 
-Updated: 2026-08-10 (session 14z-76 — **PYRON RE-FROZEN as `pyron-m2`
+Updated: 2026-08-10 (session 14z-77 — **M3b slice C: the gating family now
+asks the ROW'S OWNER, not the build's single `dst_slot`.** The manifest-schema
+question 14z-76 stopped on is ratified: **per-FILE ownership, stamped by the
+loader** — the merge adds tenants without editing a single manifest row, and
+each frozen vertical stays independently buildable as its own reproduction
+oracle. All 10 gating sites converted (the 9 named in the blast radius plus
+the `data_port` `slot_ptr_table` pair). Inert by construction: **all four
+frozen fingerprints bit-exact**. Both new gates proved able to FAIL before
+being trusted. New ORDERING INVARIANT recorded: the N-tenant loop lands only
+after gating AND scalar reads AND the baked-code sites are owner-threaded.
+Read docs/NEXT_SESSION.md first.)
+
+Previously: 2026-08-10 (session 14z-76 — **PYRON RE-FROZEN as `pyron-m2`
 (69e8c6f0)** — his EFFECT palette ported and maintainer-confirmed visible;
 supersedes `pyron-m1` (d8b282da), which can no longer be produced from the
 tree. **M3b is also UNDER WAY**: the reproducibility gate now covers all four
@@ -254,6 +266,78 @@ if EVERY reader is dispatcher-reached, his block is unreachable by
 construction and the port is inert. Two of the five (`0x2AFA2`, `0x2B25A`) are
 not in either dispatcher's target set, so at least those are reached another
 way; this was not run to ground.
+
+## Session 14z-77 — M3b slice C: rows get an OWNER, and the gating family
+## asks it instead of the build scalar
+
+**The manifest-schema decision 14z-76 stopped on is RATIFIED (maintainer,
+2026-08-10): per-FILE ownership, stamped by the LOADER.** A manifest file
+already scopes to exactly one tenant — that is how `recon_overlay` has worked
+since 14z-65 — so the loader is what knows a row's owner, and stamping it
+there means the merge adds tenants **without editing a single manifest row**.
+Options considered and declined: a per-row `tenant = "name"` key in one merged
+manifest (~180 row edits, and each vertical stops being separately buildable),
+and TOML nesting under `[[tenant]]` (unforgeable, but forces the full
+shared-vs-tenant section split to be committed before the merge discovers it).
+
+The decisive property is the one the project already relies on: each frozen
+vertical stays independently buildable and re-freezable, so it stays an
+independent reproduction oracle. It also satisfies `M3b_plan.md`'s Phase 2
+exit gate — "the 3-tenant manifest with ONLY Donovan enabled reproduces
+4b7d0dc7 bit-exact" — by passing one file.
+
+**What landed.** Four module-level pure functions (module-level for the same
+reason slice A's `tenant_context()` is: `tests/test_tenant_id.sh` imports and
+drives them without a build): `manifest_owner()`, `stamp_owner()`,
+`row_owner()`, `is_variant_tenant()`, `row_applies()`, `row_hex()`. In
+`main()`, one closure `owner_of(row)`. `_owner` is generator-internal, stamped
+on the parsed document only — **the manifest files on disk are untouched**, so
+the four other tools/tests that parse them see nothing new.
+
+**All 10 gating sites converted** — the 9 named in the blast radius plus the
+`data_port` `slot_ptr_table` pair (2587/2629), which is not in that count but
+has identical semantics on the same rows; leaving it would have reproduced
+exactly the half-converted state 14z-76 refused to hand over. The two OUTER
+block gates (`select_records`, `win_pal_variant`) moved INWARD to a per-row
+filter: those sections are variant-only BY CONSTRUCTION and carry no key, so
+the property is declared at the call site via `only_variant=True`. A merged
+build can hold a base-half tenant and a variant tenant at once, which is
+precisely what one outer test cannot express.
+
+**Deliberately NOT converted, and the seam is commented in the source at each
+one:** the row ARITHMETIC (`spt + 4*dst_slot`, `vj_base + 4*dst_slot`, the
+`code_word slot_table` block) and the 4 sites baked into emitted machine code.
+
+> **ORDERING INVARIANT (new, and load-bearing): the N-tenant loop slice lands
+> only after gating AND scalar reads AND the baked-code sites are all
+> owner-threaded.** Landing the loop earlier ships a build in which a row's
+> GATE consults its owner while the row's ARITHMETIC consults tenant `[0]` —
+> and the baked-code class fails SILENTLY, passing every structural check.
+
+**The refusal at `normalise_tenants()` STAYS** — it states what `main()`
+implements, not what the manifest can express.
+
+**Verification.** Baseline established BEFORE the change (all four
+fingerprints green on the untouched tree, 3:54) so a later red could not be
+blamed on the wrong thing. After: **four fingerprints bit-exact**
+(4b7d0dc7 / 6c93cfa8 / 9deda080 / 69e8c6f0), `test_tenant_id`,
+`test_patch_overlap`.
+
+**Both new gates were proved able to FAIL** (CLAUDE.md §4, verdict logic is
+itself tested). Inverting the variant test inside `row_applies()`: the static
+gate flipped all six truth-table rows and exited 1, and
+`test_m3a_reproducible.sh` died on the FIRST target — the inverted gate empties
+`_sel_rows`, `select_records` never runs, `select_tiles.json` is never written
+and the gfx stage cannot proceed. Control reverted before commit.
+
+**`tests/test_tenant_id.sh` gained the row-ownership family** (still ~1s, no
+ROMs, no emulator): per-file stamping across all three manifests, `row_owner`
+resolution incl. the unowned and unknown-name fallbacks, the `row_applies`
+truth table (both keys × both owner kinds, unkeyed, and section-declared), the
+`row_hex` selection incl. its fallback, **and the multi-tenant refusal in BOTH
+directions** — which no test asserted at all before this. The loop slice
+deletes that refusal; a control that fires today and is flipped then is the
+honest record of when multi-tenant builds actually arrived.
 
 ### 14z-76c — M3b STARTED: the multi-tenant generator, slices A and B
 

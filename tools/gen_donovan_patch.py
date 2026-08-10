@@ -131,6 +131,43 @@ def tenant_context(t, port, profile=None, override=None):
     return p
 
 
+def manifest_owner(doc):
+    """The tenant a manifest FILE belongs to (None for a legacy `[port]`)."""
+    ten = doc.get("tenant") or []
+    return ten[0].get("name") if ten else None
+
+
+def stamp_owner(doc, owner):
+    """Stamp per-FILE tenant ownership onto every manifest row (M3b slice C).
+
+    A manifest file scopes to exactly ONE tenant. That is already how
+    `recon_overlay` works — a whole override TOML scoped to one tenant's
+    builds — so the LOADER is what knows a row's owner, and stamping it here
+    is what lets the merge add tenants without editing a single manifest and
+    keeps each vertical independently buildable (and re-freezable) as its own
+    reproduction oracle.
+
+    Rows then carry their owner into the gates, which is the difference
+    between "is THE tenant a variant id?" (a global test against one scalar,
+    meaningless once N tenants share a build) and "is THIS ROW's owning
+    tenant a variant id?".
+
+    `_owner` is generator-internal — leading underscore, like `_tenants` — and
+    is stamped on the parsed document only. The manifest files on disk are
+    untouched, so the tests and tools that parse them see nothing new. An
+    explicit `_owner` already on a row wins, so an authored merged manifest
+    can override the per-file default later without changing this function.
+    """
+    for v in doc.values():
+        if isinstance(v, dict):
+            v.setdefault("_owner", owner)
+        elif isinstance(v, list):
+            for row in v:
+                if isinstance(row, dict):
+                    row.setdefault("_owner", owner)
+    return doc
+
+
 def normalise_tenants(port, profile=None, override=None):
     """`[[tenant]]` supersedes `[port]`.
 
@@ -161,6 +198,63 @@ def normalise_tenants(port, profile=None, override=None):
     port["_tenants"] = contexts
     port["port"] = contexts[0]
     return port
+
+
+def row_owner(row, tenants, default=None):
+    """The tenant context that owns a row (M3b slice C).
+
+    `default` — this build's tenant — serves rows with no owner, i.e. a
+    legacy `[port]`-only manifest, which has no tenant name to stamp.
+    """
+    name = row.get("_owner")
+    if name is not None:
+        for t in tenants:
+            if t.get("name") == name:
+                return t
+    return default
+
+
+def is_variant_tenant(tenant):
+    """Is this tenant on a VARIANT id (0x10-0x1F) rather than a base slot?"""
+    return _int(tenant["dst_slot"]) >= 0x10
+
+
+def row_applies(row, tenant, only_variant=False, only_base=False):
+    """Does a gated manifest row apply, given its OWNING tenant?
+
+    `only_base_slot` (14z-62c): the row writes TENANT CONTENT over the HOST
+    slot's own bytes in place — legitimate only while the tenant OCCUPIES
+    that slot. On a variant-id build the host is a live legacy character
+    again and the write would corrupt him.
+
+    `only_variant_slot` (14z-63): the row writes a VARIANT-half table row
+    (e.g. the HUD tables' aliased row 0x13) — meaningful only when the tenant
+    IS at a variant id; on the base-slot track the variant half must stay the
+    vanilla alias.
+
+    `only_variant`/`only_base` let a SECTION declare the same property for
+    rows that carry no key because the whole section is variant-only by
+    construction (`select_records`, `win_pal_variant`).
+    """
+    var = is_variant_tenant(tenant)
+    if (row.get("only_base_slot") or only_base) and var:
+        return False
+    if (row.get("only_variant_slot") or only_variant) and not var:
+        return False
+    return True
+
+
+def row_hex(row, key, tenant):
+    """`<key>`, or its `_variant` twin when the row's OWNER is at a variant id.
+
+    (14z-62d) A row whose replacement value depends on WHERE the tenant
+    lives — the OBJ bank setters write the host band's word at a base-half
+    slot and the WIDE group-C word at a variant id.
+    """
+    vk = key + "_variant"
+    if is_variant_tenant(tenant) and vk in row:
+        return row[vk]
+    return row[key]
 
 
 def load_bank_map(path):
@@ -205,6 +299,10 @@ def main():
 
     man = json.loads((args.extract_dir / "regions.json").read_text())
     port = toml_loads(args.port.read_text())
+    # PER-FILE TENANT OWNERSHIP (M3b slice C): every row this file declares
+    # belongs to this file's tenant. Stamped here, at the one place that
+    # knows which file a row came from.
+    stamp_owner(port, manifest_owner(port))
     # Dotted table names are BANNED in this manifest (14z-62c): tomllib
     # nests them, the subset parser detaches them as orphan top-level keys
     # — the same manifest builds DIFFERENT bytes per host python. The
@@ -285,6 +383,17 @@ def main():
         tt = T if tenant is None else tenant
         r = _int(tt["dst_slot"])
         return r, r | 0x10, tt.get("mirror_variant", True)
+
+    def owner_of(row):
+        """The tenant context that owns a manifest row (M3b slice C).
+
+        Every GATE below asks this rather than testing `dst_slot`, so it is
+        already asking the right question when the N-tenant loop lands. The
+        row ARITHMETIC (table rows, thunk bodies) still reads the derived
+        scalars — that is the next slice, and the loop must not land before
+        both are converted.
+        """
+        return row_owner(row, port.get("_tenants") or [], T)
 
     dst_slot, var_slot, mirror = row_ident()
     # ── address-space model (Phase C) ────────────────────────────────────────
@@ -1045,13 +1154,8 @@ def main():
                     continue
                 off = _int(pp["src_addr"]) - r["src"]
                 old = bytes.fromhex(pp["old_hex"])
-                # new_hex_variant (14z-62d): a row whose replacement value
-                # depends on WHERE the tenant lives — the OBJ bank setters
-                # write the host band's word at a base-half slot and the
-                # WIDE group-C word at a variant id.
-                _nh = pp["new_hex"]
-                if dst_slot >= 0x10 and "new_hex_variant" in pp:
-                    _nh = pp["new_hex_variant"]
+                # new_hex_variant (14z-62d), by the row's OWNER (slice C).
+                _nh = row_hex(pp, "new_hex", owner_of(pp))
                 new = bytes.fromhex(_nh)
                 if not (0 <= off < r["len"]) or blob[off:off + len(old)] != old:
                     fail.append(f"port_patch {pp['note']}: bytes at "
@@ -2519,23 +2623,18 @@ def main():
 
     if args.stage >= 5:
         for p in port.get("aux_poke", []):
-            # only_base_slot (14z-62c): the row writes TENANT CONTENT over
-            # the HOST slot's own bytes in place — legitimate only while the
-            # tenant OCCUPIES that slot. On a variant-id build the host is a
-            # live legacy character again and the write would corrupt him;
-            # the row is skipped and the tenant-side equivalent (if any) is
-            # a separate, mechanism-measured row.
-            if p.get("only_base_slot") and dst_slot >= 0x10:
-                notes.append(f"# aux {p['name']}: SKIPPED (host-slot content; "
-                             f"tenant is at variant id {dst_slot:#04x})")
-                continue
-            # only_variant_slot (14z-63): the row writes a VARIANT-half
-            # table row (e.g. HUD tables' aliased row 0x13) — meaningful
-            # only when the tenant IS at a variant id; on the base-slot
-            # track the variant half must stay the vanilla alias.
-            if p.get("only_variant_slot") and dst_slot < 0x10:
-                notes.append(f"# aux {p['name']}: SKIPPED (variant-half row; "
-                             f"tenant is at base slot {dst_slot:#04x})")
+            # only_base_slot / only_variant_slot, resolved against the row's
+            # OWNING tenant (slice C) — see row_applies() for both rationales.
+            _own = owner_of(p)
+            _oid = _int(_own["dst_slot"])
+            if not row_applies(p, _own):
+                if p.get("only_base_slot"):
+                    notes.append(f"# aux {p['name']}: SKIPPED (host-slot "
+                                 f"content; tenant is at variant id "
+                                 f"{_oid:#04x})")
+                else:
+                    notes.append(f"# aux {p['name']}: SKIPPED (variant-half "
+                                 f"row; tenant is at base slot {_oid:#04x})")
                 continue
             ops.append({"op": p["op"], "addr": f"{_int(p['addr']):#x}",
                         "val": f"{_int(p['val']):#x}"})
@@ -2552,13 +2651,16 @@ def main():
             if args.stage < _int(dp.get("stage", 0)):
                 continue
             nm = dp["name"]
-            # only_base_slot (14z-62c): in-place tenant content over the
-            # HOST slot's bytes — skipped on variant-id builds, where the
-            # host is a live legacy character again (same rationale as the
-            # aux_poke gate above).
-            if dp.get("only_base_slot") and dst_slot >= 0x10:
+            # only_base_slot (14z-62c), resolved against the row's OWNER
+            # (slice C): in-place tenant content over the HOST slot's bytes
+            # — skipped on variant-id builds, where the host is a live legacy
+            # character again (same rationale as the aux_poke gate above).
+            _own = owner_of(dp)
+            _ovar = is_variant_tenant(_own)
+            if not row_applies(dp, _own):
                 notes.append(f"# data_port {nm}: SKIPPED (host-slot content; "
-                             f"tenant is at variant id {dst_slot:#04x})")
+                             f"tenant is at variant id "
+                             f"{_int(_own['dst_slot']):#04x})")
                 continue
             src, dst, ln = _int(dp["src"]), _int(dp["dst"]), _int(dp["len"])
             _img = dp.get("src_image", man["src_set"])
@@ -2584,7 +2686,7 @@ def main():
             # place+repoint shape as sound_table, after asserting the
             # variant row is a vanilla alias of its base-half counterpart.
             spt = _int(dp["slot_ptr_table"]) if "slot_ptr_table" in dp else None
-            if spt is None or dst_slot < 0x10:
+            if spt is None or not _ovar:
                 if dst + ln > _int(dp["dst_end"]):
                     fail.append(f"data_port {nm}: {ln:#x} bytes overrun "
                                 f"dst_end {_int(dp['dst_end']):#x}")
@@ -2626,7 +2728,10 @@ def main():
                 nfix += 1
             if not ok:
                 continue
-            if spt is not None and dst_slot >= 0x10:
+            # The GATE is the owner's (slice C); the row ARITHMETIC below
+            # still reads the build scalar `dst_slot` — that is the next
+            # slice's, and the N-tenant loop must not land before it moves.
+            if spt is not None and _ovar:
                 row_at = spt + 4 * dst_slot
                 alias_at = spt + 4 * (dst_slot & 0x0F)
                 if vj_u32(row_at) != vj_u32(alias_at):
@@ -3317,7 +3422,15 @@ def main():
     # art these records reference — and none of the slot-0x0F-only families
     # (splash/win-quote), whose Jedah art therefore returns to vanilla on
     # variant-id builds.
-    if args.stage >= 6 and dst_slot >= 0x10 and port.get("select_records"):
+    #
+    # Slice C: the variant-id test moved off the build scalar and onto each
+    # row's OWNER. The section is variant-only BY CONSTRUCTION (no row
+    # carries a key), so it is declared here rather than in the manifest. A
+    # merged build can hold a base-half tenant and a variant tenant at once,
+    # which is exactly what a single outer test cannot express.
+    _sel_rows = [sr for sr in port.get("select_records", [])
+                 if row_applies(sr, owner_of(sr), only_variant=True)]
+    if args.stage >= 6 and _sel_rows:
         import select_port as _selp
         _src_char = _int(port["port"]["src_char"])
         src_data = (root / f"build/out/{man['src_set']}_data.bin").read_bytes()
@@ -3330,7 +3443,7 @@ def main():
 
         sel_pairs = {}
         sel_bank5 = set()
-        for sr in port["select_records"]:
+        for sr in _sel_rows:
             if args.stage < _int(sr.get("stage", 0)):
                 continue
             nm = sr["name"]
@@ -3484,8 +3597,13 @@ def main():
     # (color*17 + id)*unit arithmetic then lands each color on the
     # tenant's set. Variant-id builds only; the 0x0F track keeps its
     # in-place slice replacement (win_pal_slot0f_c0..c7).
-    if args.stage >= 6 and dst_slot >= 0x10:
-        for wp in port.get("win_pal_variant", []):
+    #
+    # Slice C: variant-only BY CONSTRUCTION, per the row's OWNER — same
+    # reasoning as select_records above.
+    _wp_rows = [wp for wp in port.get("win_pal_variant", [])
+                if row_applies(wp, owner_of(wp), only_variant=True)]
+    if args.stage >= 6 and _wp_rows:
+        for wp in _wp_rows:
             if args.stage < _int(wp.get("stage", 0)):
                 continue
             nm = wp["name"]
@@ -3578,13 +3696,15 @@ def main():
             if args.stage < _int(st.get("stage", 6)):
                 continue
             nm = st["name"]
-            # only_variant_slot (14z-62e): a thunk that exists only for the
-            # de-substituted tenant (e.g. the select-palette redirect, whose
-            # block lives in profile-gated space). Skipped at base-half
-            # slots, where the in-place mechanisms serve.
-            if st.get("only_variant_slot") and dst_slot < 0x10:
+            # only_variant_slot (14z-62e), by the row's OWNER (slice C): a
+            # thunk that exists only for the de-substituted tenant (e.g. the
+            # select-palette redirect, whose block lives in profile-gated
+            # space). Skipped at base-half slots, where the in-place
+            # mechanisms serve.
+            _own = owner_of(st)
+            if not row_applies(st, _own):
                 notes.append(f"# site_thunk {nm}: SKIPPED (variant-id-only; "
-                             f"tenant is at {dst_slot:#04x})")
+                             f"tenant is at {_int(_own['dst_slot']):#04x})")
                 continue
             site = _int(st["site"])
             old = bytes.fromhex(st["old_hex"])
@@ -3803,11 +3923,10 @@ def main():
                 continue
             nm = cw["name"]
             old = bytes.fromhex(cw["old_hex"])
-            # new_hex_variant (14z-62d): value differs by where the tenant
-            # lives (e.g. the OBJ bank word: host band vs WIDE group C).
-            _nh = cw["new_hex"]
-            if dst_slot >= 0x10 and "new_hex_variant" in cw:
-                _nh = cw["new_hex_variant"]
+            # new_hex_variant (14z-62d), by the row's OWNER (slice C): value
+            # differs by where the tenant lives (e.g. the OBJ bank word: host
+            # band vs WIDE group C).
+            _nh = row_hex(cw, "new_hex", owner_of(cw))
             new = bytes.fromhex(_nh)
             if len(old) != 2 or len(new) != 2:
                 fail.append(f"code_word {nm}: old/new must be exactly 2 bytes")
@@ -3821,6 +3940,9 @@ def main():
             # old_hex documents the BASE-HALF slot's vanilla word; a
             # variant entry is anchored on being a vanilla alias of its
             # base-half counterpart instead.
+            # Slice C seam: this block's slot ARITHMETIC still reads the
+            # build scalar. It moves to row_ident(owner_of(cw)) in the
+            # scalar-reads slice, which must land before the N-tenant loop.
             if "slot_table" in cw:
                 stb = _int(cw["slot_table"])
                 sst = _int(cw.get("slot_stride", 4))

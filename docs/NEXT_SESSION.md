@@ -1,4 +1,4 @@
-# NEXT SESSION — orientation (written at the close of 14z-75, 2026-08-10)
+# NEXT SESSION — orientation (written at the close of 14z-77, 2026-08-10)
 
 **ALL THREE TENANTS ARE FROZEN.** Donovan `donovan-m3a` (4b7d0dc7),
 Phobos `huitzil-m2` (9deda080), **Pyron `pyron-m2` (69e8c6f0 — RE-FROZEN
@@ -32,7 +32,9 @@ change — the payoff of D4's "freeze each vertical first, then merge".
 
 Measured blast radius for Phase 2: `gen_donovan_patch.py` has ONE binding of
 tenant identity (`dst_slot` at :251) and **37 read sites** closing over it —
-14 table-row, 9 gating, 4 baked into emitted machine code (the silent class),
+14 table-row, ~~9 gating~~ (**DONE, slice C 14z-77 — 10 sites; the count was 9
+because the `data_port` `slot_ptr_table` pair was not in it**), 4 baked into
+emitted machine code (the silent class),
 1 select-cell ownership, 1 output naming. The allocator itself composes
 correctly; the hazards are `placed`/memo dicts keyed by address not
 (tenant, address), five engine sites all three tenants patch identically
@@ -156,9 +158,9 @@ before comparing, or entries 40/41 read as "80/82, out of range".
   defect shape in this port. When a ported character does something vanilla
   never does, suspect a dead row first.
 
-## M3b is UNDER WAY — slices A and B landed (14z-76)
+## M3b is UNDER WAY — slices A, B and C landed (14z-76, 14z-77)
 
-The multi-tenant generator refactor is started. Two slices in, each inert by
+The multi-tenant generator refactor is started. Three slices in, each inert by
 construction and verified against ALL FOUR frozen fingerprints:
 
 - **Slice A** (`b7e743a`) — `tenant_context(t, port, profile, override)`, a
@@ -170,30 +172,54 @@ construction and verified against ALL FOUR frozen fingerprints:
   tenant identity; `dst_slot`/`var_slot`/`mirror` are now a derived view.
   `repoint()` (10 call sites) takes `tenant=None`, so all ten are already
   correct when the loop lands.
+- **Slice C** (14z-77) — **rows have an OWNER, and every gate asks it.**
 
 **The refusal at `gen_donovan_patch.py` stays until `main()` iterates** — it
-states what is implemented, not what the manifest can express.
+states what is implemented, not what the manifest can express. It is now
+asserted in BOTH directions by `tests/test_tenant_id.sh`; the loop slice
+deletes it and flips that control.
 
-### NEXT SLICE — the gating family, and take it WHOLE
+### OWNERSHIP IS DECIDED (maintainer, 2026-08-10): per FILE, stamped by the loader
 
-9 sites: `only_base_slot`, `only_variant_slot`, `new_hex_variant`, plus the
-`select_records` and `win_pal_variant` blocks gated on `dst_slot >= 0x10`.
+A manifest file scopes to exactly one tenant — as `recon_overlay` already
+does — so `stamp_owner()` tags every parsed row with its file's tenant at load
+time. **No manifest edits, now or at the merge.** Each vertical therefore stays
+independently buildable and re-freezable as its own reproduction oracle, and
+`M3b_plan.md`'s Phase 2 exit gate is satisfied by passing one file. `_owner` is
+generator-internal and never written to disk, so the other tools that parse
+these manifests see nothing new.
 
-**This is where the DESIGN question starts, which is why 14z-76 stopped here
-rather than half-converting it.** These encode "is THE tenant a variant id?"
-as a global branch; correct is "is THIS ROW's owning tenant a variant id?" —
-which needs rows to declare an owner, i.e. a **manifest-schema decision**, not
-a mechanical edit. Do the family whole, ownership included.
+The accessors are module-level pure functions (so `test_tenant_id.sh` drives
+them with no build, same reason as slice A's `tenant_context`):
+`manifest_owner`, `stamp_owner`, `row_owner`, `is_variant_tenant`,
+`row_applies`, `row_hex`; plus one `owner_of(row)` closure in `main()`.
+
+### NEXT SLICE — the scalar row ARITHMETIC
+
+Slice C converted the GATES and deliberately left the arithmetic. The seam is
+commented in the source at each site. Remaining:
+
+- `table_entry_addr()` on the bare scalars — `:489`, `:1870`, `:1894` are the
+  live ones (**the gap-table block at `:1908` is `if False`, dead since the
+  14w Felicia regression** — do not count its four calls);
+- the hand-rolled `base + stride*slot` sites: palettes `:1812-1815`,
+  `data_port slot_ptr_table` `:2630-2631`, `select_records` `:3356-3357`,
+  `code_word slot_table` `:3828-3842`. These use manifest-supplied strides, so
+  they need a sibling helper rather than `table_entry_addr()`.
+
+Same mechanical shape as slice B: thread `row_ident(owner_of(row))`.
 
 Then, and deliberately last: the **4 sites baked into emitted machine code**
-(`charid_sites`, the win-pal thunk rebase, TT/TU substitution, the overlay
-T-select thunk). That class fails **silently** — a wrong tenant there yields a
-build that passes every structural check and is wrong in the ROM. Budget room
-to bisect: each step is a full four-target rebuild.
+(`charid_sites` `:916`, the win-pal thunk rebase `:3532-3533`, TT/TU
+substitution `:3613-3630`, the overlay T-select thunk `:3994-3997`). That class
+fails **silently** — a wrong tenant there yields a build that passes every
+structural check and is wrong in the ROM. Budget room to bisect: each step is a
+full four-target rebuild (~4 min).
 
-Remaining after B: 7 `table_entry_addr()` reads still on the bare scalars
-(value-row/gap-table blocks, palettes, select_records, `code_word`
-`slot_table`) — same mechanical shape as slice B.
+> **ORDERING INVARIANT (14z-77).** The N-tenant loop slice lands only after
+> gating AND scalar reads AND the baked-code sites are ALL owner-threaded.
+> Landing it earlier ships a build whose gates consult the row's owner while
+> its arithmetic consults tenant `[0]`.
 
 ## Carried into M3b — gate defaults point at intermediate builds
 
