@@ -14,7 +14,7 @@ tables alias rows 0x10-0x1F onto 0x00-0x0F, so Pyron ran a base-half
 character's animated-palette handler. THREE such tables, not one: the
 maintainer's playtest of pyron16 found the blink still alive on the SELECT
 screen and the ROUTE MAP, because the first fix covered only the in-match
-dispatcher. build/pyron17 (5dc6da06) is the build to playtest. 14z-74's confounded "543 vs 0" figure is
+dispatcher. build/pyron17 (5dc6da06) is MAINTAINER-CONFIRMED clean — no blink in select or the route map, no regression surfaced — and is ready to freeze on the maintainer's word. 14z-74's confounded "543 vs 0" figure is
 RETRACTED, and one of MY OWN eliminations was wrong and is corrected
 below. Read docs/NEXT_SESSION.md first.)
 
@@ -224,6 +224,12 @@ Huitzil's (were 581/523). Palette row 10 constant and bit-identical to
 native; the mugshot pixel-identical across consecutive frames. Legacy:
 replay 02 **bit-identical** across every step, and the pyron16->17 delta is
 **exactly 4 bytes**.
+
+**MAINTAINER PLAYTEST (pyron17): CONFIRMED.** No blink in character select
+or on the route map; all graphics clean; no regression surfaced. Gate
+battery re-run on pyron17 afterwards — variant_dispatch, pyron_blink,
+tenant_hud, pyron_cosmo, audit_empty_tiles, gfx_layout3, list_type_census,
+m3a_reproducible: all PASS.
 
 **LESSON, and it cost a playtest round: an aliased-variant-row table is
 rarely ALONE.** Sweep for the shape, do not chase the screen. New gate
