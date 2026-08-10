@@ -68,30 +68,22 @@ def load_vsavj(zpath):
     return bytes(cps.words_to_logical_bytes(words))
 
 
-def normalise_tenants(port, profile=None, override=None):
-    """`[[tenant]]` supersedes `[port]`.
+def tenant_context(t, port, profile=None, override=None):
+    """Resolve ONE `[[tenant]]` row into the flat per-tenant dict.
 
-    A tenant is one ported character occupying one character id. Rather than
-    rewrite the six places that read `port["port"]`, a tenant row is
-    NORMALISED into the `[port]` shape the generator already understands —
-    so a manifest carrying a single tenant at the old slot must produce a
-    BYTE-IDENTICAL image, which is how this refactor is verified (the Phase
-    C discipline: a refactor that moves zero bytes).
+    M3b slice A (14z-76): this is the unit the multi-tenant generator will
+    build N of. It is a PURE function of (tenant row, base [port], profile,
+    override) — it reads no module state and writes none, so a caller can
+    loop it. Everything that makes a tenant a tenant (id resolution, the
+    reserved/variant guards, mirror_variant, the gfx-bank override) lives
+    here rather than in `main()`'s scope.
 
-    The one semantic change is `mirror_variant`. It exists because a
+    The one semantic point worth restating: `mirror_variant` exists because a
     BASE-half slot's variant row aliases it in vanilla (slot 0x0F and its
     mirror 0x1F). A tenant that IS a variant id has no mirror, and one at
-    0x13 must never touch 0x03 (Victor) — so the default is now derived
-    from the id rather than assumed true.
+    0x13 must never touch 0x03 (Victor) — so the default is derived from the
+    id rather than assumed true.
     """
-    tenants = port.get("tenant", [])
-    if not tenants:
-        return port                      # legacy [port] manifest, untouched
-    if len(tenants) > 1:
-        raise SystemExit("gen_donovan_patch: %d tenants declared; multi-tenant "
-                         "builds are not implemented yet (M3 Phase 3). Land "
-                         "one tenant at a time." % len(tenants))
-    t = tenants[0]
     # PROFILE-GATED ID (M3a, 14z-61). De-substitution — moving the tenant off
     # a legacy character's slot onto its own variant id — is ROSTER work, and
     # the dual-track ruling (14z-59g) puts roster work on the WIDE track: the
@@ -136,8 +128,38 @@ def normalise_tenants(port, profile=None, override=None):
     # base-slot bank (the host's band) stays whatever the manifest says.
     if tid >= 0x10:
         p["gfx_bank"] = _int(t.get("gfx_bank_variant", 4))
+    return p
+
+
+def normalise_tenants(port, profile=None, override=None):
+    """`[[tenant]]` supersedes `[port]`.
+
+    A tenant is one ported character occupying one character id. Rather than
+    rewrite the sites that read `port["port"]`, a tenant row is NORMALISED
+    into the `[port]` shape the generator already understands — so a manifest
+    carrying a single tenant at the old slot must produce a BYTE-IDENTICAL
+    image, which is how this refactor is verified (the Phase C discipline: a
+    refactor that moves zero bytes).
+
+    M3b slice A: the per-tenant resolution moved out to `tenant_context()`
+    and this function now builds a LIST of them, published as
+    `port["_tenants"]`. `main()` still consumes exactly one — `_tenants[0]`
+    flattened into `port["port"]`, byte-identically to before — so this slice
+    is inert by construction and the four frozen fingerprints prove it. The
+    refusal below stays until `main()` itself iterates; it is the honest
+    statement of what is implemented, not of what the manifest can express.
+    """
+    tenants = port.get("tenant", [])
+    if not tenants:
+        return port                      # legacy [port] manifest, untouched
+    if len(tenants) > 1:
+        raise SystemExit("gen_donovan_patch: %d tenants declared; multi-tenant "
+                         "builds are not implemented yet (M3 Phase 3). Land "
+                         "one tenant at a time." % len(tenants))
+    contexts = [tenant_context(t, port, profile, override) for t in tenants]
     port = dict(port)
-    port["port"] = p
+    port["_tenants"] = contexts
+    port["port"] = contexts[0]
     return port
 
 
