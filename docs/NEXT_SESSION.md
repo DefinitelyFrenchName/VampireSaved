@@ -351,12 +351,36 @@ saturated **by one tenant**. And regions live there for **reach, not
 encryption** — code above `PRG:0x0FFFFF` is stored raw and runs
 (`tests/test_crypt_boundary.sh` locks that).
 
-**So the next slice's question is: which regions GENUINELY need PC-reach, and
-which are in `hole_a` only because the allocator filled the nearest space
-first?** `wide_ext` has room for all three tenants with 2 MB spare. Start from
-`near_map` and the pc-relative escape machinery — those name the reach
-constraints explicitly. Everything is frozen in
-`tests/test_region_overlap.sh`, so the target does not move.
+**ANSWERED 14z-77, and it comes down to ONE REGION.** `region_space` (slice
+J) made placement a manifest tunable; the experiment then showed that
+"unconstrained by near_map/layout_group" is NOT sufficient for movability —
+moving all ten such regions crashed with a vec3 address error (odd A0) at
+vanilla PC 0x015098, f1401. Bisected (`tests/audit_region_movability.sh`,
+~4.5 min):
+
+| region | | |
+|---|---|---|
+| `anim` | **CRASHES** | vec3, odd pointer |
+| `aux0_4` | runs | data |
+| `x06717c` | runs | **CODE — the raw extension executes fine** |
+| `hitbox`+`hitbox_proj` | runs | data |
+
+With every movable region relocated, three tenants STILL need 470,200 bytes of
+the 344,640-byte crypt window — over by 125,560 — and **`anim` alone is
+371,712 of it**.
+
+> ## M3b IS BLOCKED ON ONE QUESTION: why can `anim` not leave the crypt window?
+>
+> Not ownership, not the manifest merge, not gating or baked code — all done.
+> Not total space — `wide_ext` has 2 MB free. Everything else moves.
+
+**Start here next session.** `CRASH 1401 vec3 PC 015098 ADDR 000decc3`, A0 odd,
+faulting in VANILLA code — so the engine is handed a misaligned anim pointer
+once the region moves. Check in order: a 16-bit anim offset field that cannot
+express the higher base; a pc-relative anim reference the escape machinery does
+not classify; or an alignment change (`alloc` aligns gap reuse to 0x10, the
+space cursor less obviously). The audit freezes the crash in BOTH directions —
+when `anim` moves, it FAILS and tells you the blocker is gone.
 
 **2. The N-way dispatch form** — what slice E deliberately did NOT do. Each
 baked fragment still tests ONE id, and the sites are SHARED: all three tenants

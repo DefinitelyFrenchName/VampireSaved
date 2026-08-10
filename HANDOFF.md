@@ -473,6 +473,19 @@ tests/audit_phase_mode_cost.sh        # 14z-77: what Phobos' phase-gated latch
                                       # round-2). An IDENTICAL result FAILS — that
                                       # means the rig stopped forming the match.
                                       # On-demand, ~15 min
+tests/audit_region_movability.sh      # 14z-77: which regions can live in
+                                      # wide_ext? THE MERGE'S BINDING CONSTRAINT
+                                      # is here. Frozen: anim CRASHES (vec3,
+                                      # odd A0, vanilla PC 0x015098 f1401) while
+                                      # aux0_4, hitbox(+proj) and x06717c — a
+                                      # CODE region — all run, so code executes
+                                      # from the raw extension. With everything
+                                      # movable relocated, three tenants still
+                                      # need 470,200 of the 344,640-byte crypt
+                                      # window, and anim alone is 371,712 of it.
+                                      # Expectations frozen BOTH ways: if anim
+                                      # ever moves, this FAILS and says so.
+                                      # On-demand, ~4.5 min
 tests/test_region_overlap.sh [bd...]  # 14z-77: can the tenants' shared source
                                       # spans be placed ONCE? M3b_plan Phase 2
                                       # item 2 assumes yes; MEASURED, four of the

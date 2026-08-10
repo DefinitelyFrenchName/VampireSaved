@@ -118,8 +118,8 @@ def tenant_context(t, port, profile=None, override=None):
     p["src_char"] = t["src_char"]
     p["dst_slot"] = tid
     p["mirror_variant"] = t.get("mirror_variant", tid < 0x10)
-    for k in ("alloc_wrap", "near_map", "hole_b_regions", "gfx_bank", "name",
-              "port_param32"):
+    for k in ("alloc_wrap", "near_map", "hole_b_regions", "region_space",
+              "gfx_bank", "name", "port_param32"):
         if k in t:
             p[k] = t[k]
     # A variant-id tenant's tiles live in the WIDE extension (that is WHY
@@ -1032,7 +1032,34 @@ def main():
         # allocate every wanted region first (deterministic order: code
         # first so it stays in the encrypted hole, then data)
         hole_b_set = set(x.strip() for x in
-                         port["port"].get("hole_b_regions", "").split(",") if x)
+                         T.get("hole_b_regions", "").split(",") if x)
+        # region_space (M3b slice J): per-region space assignment,
+        # "name=space,...". Generalises hole_b_regions, which stays working
+        # and stays the frozen manifests' spelling.
+        #
+        # WHY IT HAS TO EXIST. Today the choice is `hole_b if listed else
+        # hole_a` with no reach analysis at all, so every region lands in the
+        # crypt window by default. Measured 14z-77
+        # (tests/test_region_overlap.sh): one tenant already SATURATES it —
+        # three tenants keeping their own copies would need 761,316 bytes of
+        # hole_a's 264,544 and 171,614 of hole_b's 80,096, while wide_ext sits
+        # 2,051,556 bytes empty. The merge cannot proceed until a region can
+        # be told where to live, and that is a manifest tunable rather than a
+        # code edit (CLAUDE.md build conventions).
+        #
+        # Note this does NOT decide whether a region MAY move: PC-reach is a
+        # real constraint for near_map satellites and layout-group members,
+        # and whether ported CODE runs from the raw extension at all is a
+        # separate measurement. This key is what makes that measurable.
+        region_space = {}
+        for kv in str(T.get("region_space", "")).split(","):
+            if kv.strip():
+                _rn, _, _sp = kv.partition("=")
+                region_space[_rn.strip()] = _sp.strip()
+
+        def space_of(name):
+            """The space a region is assigned to (default: the crypt hole)."""
+            return region_space.get(name, "b" if name in hole_b_set else "a")
         # layout groups: regions that PC-reference each other must keep
         # their SOURCE-relative spacing (PC-relative displacements — both
         # direct and via word jump tables — are invisible to the oracle
@@ -1078,8 +1105,7 @@ def main():
             if name in grouped or name in near_map:
                 continue
             r = regions[name]
-            hole = "b" if name in hole_b_set else "a"
-            d = alloc(hole, r["len"], f"region {name}")
+            d = alloc(space_of(name), r["len"], f"region {name}")
             if d is not None:
                 placed[name] = d
                 fragments.append((d, r["len"], "VS2",
@@ -1102,7 +1128,11 @@ def main():
                 placed[name] = gs
                 gap_free[best] = ((gs + r["len"] + 0xF) & ~0xF, ge)
             else:
-                d = alloc("a", r["len"], f"region {name} (near {anchor})")
+                # follow the ANCHOR's space: a near_map satellite must land
+                # within d16 reach of it, so allocating elsewhere can only
+                # fail the distance assertion below (loudly, which is right).
+                d = alloc(space_of(anchor), r["len"],
+                          f"region {name} (near {anchor})")
                 if d is None:
                     continue
                 if abs(d - want_at) >= 0x6000:

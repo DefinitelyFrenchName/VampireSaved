@@ -489,6 +489,59 @@ payload must collide; same span + same payload must dedup).
 is at **0x8b100**; `0x8b0f8` is byte-identical across all three files and
 dedups as shared. The gate failed on it, which is the gate working.
 
+### 14z-77i — slice J + THE MERGE'S BINDING CONSTRAINT IS ONE REGION: `anim`
+
+**Slice J: `region_space`.** Placement had NO reach analysis at all — the rule
+was literally `hole_b if the manifest lists it else hole_a`, so every region
+defaults into the crypt window and `alloc()`'s fallback absorbs the overflow.
+`region_space = "name=space,..."` makes it a per-region manifest tunable
+(generalising `hole_b_regions`, which keeps working and keeps the frozen
+manifests' spelling). `near_map` satellites now follow their ANCHOR's space —
+allocating elsewhere could only trip the d16 distance assertion. Inert: four
+fingerprints bit-exact, generator output byte-identical.
+
+**Then the experiment it exists for.** Pushing all ten regions not named by
+`near_map` or a `layout_group` into `wide_ext` freed 179,344 bytes of hole_a
+and 68,144 of hole_b — and produced a **vec3 ADDRESS ERROR (odd A0) at vanilla
+PC 0x015098, frame 1401**. So "unconstrained by near_map/layout_group" is NOT a
+sufficient condition for movability; there are undeclared dependencies the
+manifest does not express.
+
+**Bisected to ONE region.** `tests/audit_region_movability.sh` (~4.5 min):
+
+| region | | |
+|---|---|---|
+| `anim` | **CRASHES** | vec3, odd pointer |
+| `aux0_4` | runs | 0xE070 data |
+| `x06717c` | runs | 0x154 **of CODE** |
+| `hitbox` + `hitbox_proj` | runs | 0x35C2 data |
+
+**CODE RUNS FROM THE RAW EXTENSION** — measured at runtime, confirming what
+`test_crypt_boundary.sh` locks statically. That removes the obvious fear.
+
+**And the space arithmetic then names the blocker exactly.** With every movable
+region relocated, three tenants STILL need 470,200 bytes of the 344,640-byte
+crypt window — over by 125,560 — and **`anim` alone is 371,712 of it**
+(D 134,912 / H 124,928 / P 111,872). Per tenant the truly reach-constrained
+sets are small (D 67,314 / H 31,174 / P **0**).
+
+> **M3b IS BLOCKED ON ONE QUESTION: why can `anim` not live outside the crypt
+> window?** Not on ownership, not on the manifest merge, not on the gating or
+> baked-code classes — those are all done — and not on total space, since
+> `wide_ext` has 2 MB free. Everything else measured this session moves.
+
+Next: root-cause the odd pointer. `CRASH 1401 vec3 PC 015098 ADDR 000decc3`
+with A0 odd, faulting in VANILLA code, so something hands the engine a
+misaligned anim pointer once the region moves. Candidates worth checking in
+order: a 16-bit (word) anim offset field that cannot express a >24-bit base;
+a pc-relative anim reference the escape machinery does not classify; or an
+odd-length placement changing alignment (`alloc` aligns to 0x10 on gap reuse
+but the space cursor is not obviously aligned).
+
+The audit's expectations are frozen in BOTH directions — if `anim` ever stops
+crashing it FAILS and says the blocker is gone, which is exactly the news
+worth interrupting for.
+
 ### 14z-77h — REGION IDENTITY: the plan's premise is MEASURED and CORRECTED
 
 M3b_plan Phase 2 item 2 says "key regions by (src_set, src_addr, len); a
