@@ -208,6 +208,36 @@ them at the merged build regardless** — do it there, per gate, checking
 what each default is FOR. HANDOFF's stated defaults were corrected to match
 the code in 14z-76.
 
+## RECOMMENDED: a stale-doc sweep, and a cheap gate that would catch it
+
+`docs/project/playtest_m3a_interims.md` sat stale for FOUR sessions reading as
+a live bug list ("HUD plate says VICTOR", "medallions placeholder") when every
+item had been fixed in 14z-63/64. It was found by accident, not by process.
+Assume others like it exist.
+
+**The sweep, in priority order** (cheap, do it before trusting any doc that
+describes defects):
+1. `grep -rln "1464942a\|m5w\|hui1[0-9]\|pyron1[0-9]\|donovan-m5w\|huitzil-m1\|pyron-m1" docs/`
+   — any doc naming a SUPERSEDED build is a staleness candidate. Check each
+   against the registry in `HANDOFF.md`.
+2. Grep for defect-list vocabulary — "EXPECTED", "do not report", "known
+   issue", "interim", "placeholder" — and verify each item against the current
+   frozen builds.
+3. Fix HEADERS and status lines first, keep the original text, mark it
+   HISTORICAL with the build it describes (CLAUDE.md §5 retraction discipline).
+
+**The gate worth writing (would have caught this one).** Any doc naming a
+build fingerprint or build-dir id must EITHER name one that is live in
+`tests/expected/registry.tsv`, OR carry an explicit `HISTORICAL` /
+`SUPERSEDED` marker. `playtest_m3a_interims.md` named `1464942a`, which is in
+no registry row and had no marker — a mechanical check would have flagged it
+the session after it went stale. Small, static, no emulator; the same shape as
+`test_index_space.sh`'s frozen-counts section.
+
+**The underlying rule this project already has and did not apply to itself:**
+a document describing a BUILD must say which build, in its header. Registry
+rows do this; playtest guides did not.
+
 ## Instrument blind spots still open
 
 1. **The extractor's dead-filler classifier is VIEW-BLIND** — it compares

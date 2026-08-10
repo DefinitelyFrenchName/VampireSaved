@@ -3,7 +3,9 @@
 Updated: 2026-08-10 (session 14z-76 — **PYRON RE-FROZEN as `pyron-m2`
 (69e8c6f0)** — his EFFECT palette ported and maintainer-confirmed visible;
 supersedes `pyron-m1` (d8b282da), which can no longer be produced from the
-tree. The premise that deferred
+tree. **M3b is also UNDER WAY**: the reproducibility gate now covers all four
+frozen builds, and slices A and B of the multi-tenant generator have landed
+(see the 14z-76c entry). The premise that deferred
 it for two sessions — "the table at 0x38C218 has only sixteen rows, so a
 variant id indexes past it into an adjacent shared table" — is RETRACTED: it
 is ONE 32-row id-indexed table and 0x38C258 is its second half. Row 0x11 is an
@@ -252,6 +254,53 @@ if EVERY reader is dispatcher-reached, his block is unreachable by
 construction and the port is inert. Two of the five (`0x2AFA2`, `0x2B25A`) are
 not in either dispatcher's target set, so at least those are reached another
 way; this was not run to ground.
+
+### 14z-76c — M3b STARTED: the multi-tenant generator, slices A and B
+
+Scope ratified this session (maintainer): **M3b = the merge itself.** Phase 6
+(arcade ladder, VS-pool palettes) is OUT, becoming its own milestone; D3 stays
+open. Approach ratified: **multi-tenant generator**, not chained single-tenant
+passes.
+
+The 14z-65 plan's phase order was overtaken by events — Phases 0 and 1 are
+DONE, Phase 3's measurement is done and ratified, and Phases 4/5 landed
+through the SINGLE-tenant generator per decision D4. So the remaining
+milestone is Phase 2 plus Phase 3's implementation.
+
+**The gate first.** `tests/test_m3a_reproducible.sh` extended from two frozen
+targets to **all four** (m5_stock, donovan-m3a, huitzil-m2, pyron-m2). Its
+value scales with the count: the refactor must leave three independent tenant
+fingerprints untouched, so each frozen vertical is an independent oracle over
+the same change. That is the payoff of D4's "freeze each vertical first".
+
+- **Slice A** — `tenant_context(t, port, profile, override)`, a pure function
+  resolving ONE `[[tenant]]` row (id_by_profile, the variant-needs-profile and
+  reserved-0x12/0x18 refusals, `mirror_variant`, the variant gfx-bank
+  override). `normalise_tenants()` builds a LIST (`port["_tenants"]`) and
+  hands `main()` `_tenants[0]` flattened as before. The flattening WAS the
+  single-tenant commitment the refusal exists because of.
+- **Slice B** — `T` + `row_ident(tenant)`: one source of tenant identity, with
+  `dst_slot`/`var_slot`/`mirror` demoted to a derived view. `repoint()` (10
+  call sites) takes `tenant=None`, so all ten are loop-ready untouched.
+
+Both inert by construction and verified: four fingerprints bit-exact,
+`test_tenant_id`, `test_patch_overlap`.
+
+**Measured blast radius** for the rest: ONE binding of tenant identity and 37
+read sites — 14 table-row, 9 gating, **4 baked into emitted machine code**, 1
+select-cell ownership, 1 output naming. The allocator composes correctly; the
+hazards are `placed`/memo dicts keyed by address not (tenant, address), five
+engine sites all three tenants patch identically (0x5FCE0 / 0x6C0E0 / 0x5F328
+/ 0x5F146 / 0x5F1B6 — one thunk dispatching on N ids), and `[table_fix]`,
+which must MERGE rows rather than dedup. Also named: Donovan's 12 `x028122`
+relocations rewrite SHARED bytes that H/P do not declare — on a deduped region
+they would go global.
+
+**Why the session stopped where it did.** The 9 gating sites are not a
+mechanical continuation: they encode "is THE tenant a variant id?" globally,
+and correct is "is THIS ROW's owning tenant a variant id?", which needs rows
+to declare an owner — a manifest-schema decision. Half-converting that family
+is a worse handoff than leaving it whole.
 
 ### 14z-76b — the OUT-OF-RANGE INDEX SWEEP exists; the f4840 hypothesis weakens
 
