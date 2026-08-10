@@ -69,6 +69,13 @@ writing before the fourth tenant.
 
 ## Rules that cost real time — carried forward
 
+- **BUG ARCHAEOLOGY FIRST — grep the history before fixing anything.** It may
+  already have been fixed once; the old fix or its withdrawal is the fastest
+  route to the mechanism. Find the last-known-good build and diff it against
+  its predecessor. **If the record is ambiguous about whether it was ever
+  fixed, ASK THE MAINTAINER** — they were there and will usually remember.
+  (14z-75: this is what cracked the Cosmo crash, after I had concluded the
+  opposite from rigs that never fired the move.)
 - **A negative result from a rig is a fact about the RIG until proven
   otherwise.** Prove the rig produces the EVENT, not just that it ran. Cosmo
   needed the right button pair, a long enough hold, AND meter — 4 of 12

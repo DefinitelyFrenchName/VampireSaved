@@ -1683,3 +1683,32 @@ SIX times on `05_timeout_idle`. A "0 reads" result proves nothing unless the
 replay set exercises the code around the address — a same-instrument positive
 control on a live row does NOT cover that, because it only shows the
 watchpoint works.
+
+## Check whether the bug was already fixed once — and ask if unsure
+## (14z-75, maintainer's lesson; cost most of a session)
+
+The maintainer reported Pyron's Cosmo Disruption crash. It had been "fixed"
+in 14z-74 and confirmed by playtest. I withdrew that fix (correctly — it
+corrupted legacy), then measured on rigs that never fired the move, and
+published **"the 14z-74 word never fixed the Cosmo crash."** That was wrong.
+The maintainer pushed back — *"you explicitly fixed Cosmo Disruption before
+... if I were you, I'd find this version, look at the diff with its previous
+version to isolate the fix and start from there"* — and that is exactly what
+cracked it.
+
+**The procedure, in order, BEFORE forming a theory:**
+
+1. `git log --oneline --grep="<symptom>"` and `git log -S "<manifest row>"`.
+   A defect being reported now may be a REGRESSION of something already
+   solved. Two commands.
+2. Identify the build where it was last known good and **diff it against its
+   predecessor.** The delta is the answer.
+3. **If the record is ambiguous about whether it was ever fixed, ASK.** The
+   maintainer was there and will usually remember. One sentence from them
+   beats an afternoon of rigs.
+
+The failure is expensive in BOTH directions: re-deriving a fix that already
+exists, or — as here — declaring "never fixed" about something that was, and
+shipping a build with the crash reintroduced. Note also how it compounded
+with the rig lesson: my evidence for "never fixed" was a set of negative
+results from rigs that produced no event at all.

@@ -233,6 +233,27 @@ legacy behavior is a failed change.
   header is worse than no documentation: it is confidently wrong, and it
   is what a future session will act on.
 
+- **BUG ARCHAEOLOGY FIRST (standing order, 14z-75): before fixing a bug,
+  check whether it has already been fixed once — and if you are unsure, ASK
+  THE MAINTAINER.** They were there and will usually remember.
+  1. `git log --oneline --grep="<symptom>"` and `git log -S "<manifest row>"`
+     BEFORE forming a theory. A defect the maintainer reports may be a
+     REGRESSION of something already solved, and the old fix (or its
+     withdrawal) is the fastest route to the mechanism.
+  2. Find the build where it was last known good and **diff it against its
+     predecessor.** The delta is the answer, and it is cheap.
+  3. **If the record is ambiguous about whether it was ever fixed, ask before
+     measuring.** One sentence from the maintainer beats an afternoon of
+     rigs, and a wrong assumption here is expensive in both directions:
+     re-fixing something already fixed, or declaring "never fixed" about
+     something that was.
+  Paid for in 14z-75: I concluded "the 14z-74 word never fixed the Cosmo
+  crash" from rigs that never fired the move, published it, and was corrected
+  by the maintainer — who remembered the fix working and told me to find that
+  version and diff it. That is exactly what cracked it. The archaeology took
+  two commands; the wrong conclusion took hours and produced a build with the
+  crash reintroduced.
+
 - **Anti-hyperfocus checkpoint (standing order):** deep-dive focus is the
   project's engine but also its failure mode. At natural boundaries — a
   finding confirmed, a test suite green, ~20 tool iterations on one problem —
