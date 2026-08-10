@@ -1,22 +1,15 @@
 # STATE — living progress log
 
-Updated: 2026-08-10 (session 14z-75 — PYRON'S HUD IS DONE: his plate reads
-"Pyron" and his mugshot draws his own art, closing the half 14z-74 left
-open. The missing piece was the ART PLACER — `place_variant_slot_<name>` in
-build/manifest/effect_tail.json; check_tenant_hud.py was always the gate,
-never the placer. He has his OWN free-pool anchors (name 0xBE94, mug
-0xBE9C) so the M3b merge does not collide. Current build build/pyron15
-(3fb71586); byte-attributed against pyron14 as exactly 2 program bytes and
-6 tiles. Also: build/manifest/pyron.toml had NOT PARSED since fcfe5c7, so
-pyron14 was unrebuildable from the tree — fixed. THE BLINK is now
-root-caused AND FIXED. It was a DEAD ROW — per-character palette-routine
-tables alias rows 0x10-0x1F onto 0x00-0x0F, so Pyron ran a base-half
-character's animated-palette handler. THREE such tables, not one: the
-maintainer's playtest of pyron16 found the blink still alive on the SELECT
-screen and the ROUTE MAP, because the first fix covered only the in-match
-dispatcher. build/pyron17 (5dc6da06) is MAINTAINER-CONFIRMED visually clean. **THE FREEZE WAS ATTEMPTED AND STOPPED**: pyron17 fails the vanilla-legacy basis on 4 of 13 masked replays with a SECOND divergence that never re-converges. Pre-existing (identical on pyron14), not port_param32, and Pyron-specific (huitzil-m2 is clean on the same replay). CLAUDE.md rule 6: that is now the only task. 14z-74's confounded "543 vs 0" figure is
-RETRACTED, and one of MY OWN eliminations was wrong and is corrected
-below. Read docs/NEXT_SESSION.md first.)
+Updated: 2026-08-10 (session 14z-75 — **PYRON IS FROZEN as `pyron-m1`
+(d8b282da)**, the third full-roster tenant, maintainer-ratified. This session
+landed his HUD art, killed the sprite/HUD BLINK in all three places it lived,
+found and FIXED a legacy regression that a previous session had shipped, and
+then fixed the Cosmo Disruption crash properly — in his own data, one byte,
+instead of the shared engine word that had been corrupting every character's
+dispatch. `run_suite.sh vsavjw` GREEN: 55 PASS / 17 SKIP / 0 FAIL, 72/72
+replays accounted for. All three earlier frozen references still rebuild
+bit-exact. FOUR of my own claims were retracted in-session — read them before
+trusting any number here. Read docs/NEXT_SESSION.md first.)
 
 Previously: 2026-08-10 (session 14z-74 — PYRON RENDERS; Cosmo/air/win-screen fixed; Phobos re-frozen as huitzil-m2 9deda080; Step 4 HUD half done, plate BLANK. Three claims retracted in-session.)
 Previously: 2026-08-09 (session 14z-71 — THE BEAM DRAWS. Root cause: vsav
@@ -143,52 +136,64 @@ No hook, no cycles, nothing to ratify. Cost: decode the type-2 format
 from its handler (`0x01B234`), write the transform, and accept that the
 flattened list is authored data the sibling oracle cannot check.
 
-## Session 14z-75 — BLOCKING: pyron17 fails the vanilla-legacy basis
-## (freeze attempted, STOPPED — rule 6)
+## Session 14z-75 — PYRON FROZEN as `pyron-m1` (d8b282da)
 
-**THE FREEZE DID NOT HAPPEN.** The set was built (42 `.sha1` + 13 `.masked` +
-17 `.skip` = 72/72, freeze pass clean, no nondeterminism) and the verification
-pass then failed on three legacy replays. The registry row is WITHHELD;
-`tests/expected/pyron-m1/NOT_RATIFIED.md` carries the full measurement.
+`run_suite.sh vsavjw` **GREEN — 55 PASS / 17 SKIP / 0 FAIL**; 42 self-frozen
+`.sha1` + 13 `.masked` + 17 `.skip` = 72/72 replays. donovan-m3a `4b7d0dc7`,
+m5_stock `6c93cfa8` and huitzil-m2 `9deda080` all still rebuild bit-exact.
+Maintainer playtest: HUD correct, no blink anywhere, no crash on either EX
+move or 236+P in long matches.
 
-| replay | expected | measured |
-|---|---|---|
-| `01_attract_long` | `exact` | live state diverged |
-| `05_timeout_idle` | `window 889 1675` | 2 runs: `889..1675` **and `4024..12120`**, 0 identical after |
-| `07_mash_storm` | `window 889 1675` | 2 runs: `889..1675` and `2241..4320`, 0 identical after |
-| `30_demitri_throw` | `window 889 2015` | 2 runs, ends `4720`, 0 identical after |
+**What landed:** his HUD art (the placer was `place_variant_slot_<name>` in
+effect_tail.json; own anchors 0xBE94/0xBE9C); the BLINK, which lived in
+THREE aliased per-character palette-routine tables, one word each; a legacy
+regression shipped by 14z-74, found and reverted; and the Cosmo crash, fixed
+properly.
 
-Final tally **51 PASS / 17 SKIP / 4 FAIL**. 9 of 13 masked classes — including
-every `composite` — pass unchanged.
-The first run in each failure IS the ratified select window and re-converges
-cleanly (05: 2348 bit-identical frames). The SECOND divergence never
-re-converges, which under §4 means match state was touched.
+**THE COSMO FIX — the shape worth remembering.** His sub-state index 81 is
+OUT OF RANGE for vsavj's dispatch table, which has 80 entries (0..79) and
+ends at 0x018508 where a SECOND dispatcher begins. Index 81 read that
+dispatcher's displacement operand (0x0006) and the jmp went into the table
+itself -> illegal instruction -> watchdog. 14z-74 fixed it by writing that
+shared word (0x0006 -> 0x0224): it genuinely stopped the crash, and it moved
+dispatcher #2's table for EVERY character, breaking four legacy replays.
+**Right effect, wrong byte.** The fix now in place retargets HIS OWN data —
+vs2 0x0D0C7F (region hitbox_proj, read as +0x17(A3)), 81 -> 79, one byte;
+entry 79 already holds 0x0224, the same handler vs2 uses. vs2's table is
+larger so 81 is valid there: this is an INDEX-SPACE mismatch, the same class
+as the id space, and the port had copied the index verbatim.
 
-**Established by measurement, so nobody re-derives it:**
-- **Pre-existing.** pyron14 measures the byte-identical shape. It predates
-  this session and both maintainer playtests.
-- **NOT `port_param32`.** A build with the flag off measures identically —
-  which independently re-confirms 14z-74's retraction on a much longer
-  replay than the one that retraction used.
-- **Pyron-specific.** huitzil-m2 on the same replay: ONE run (the select
-  window), then **10,446 bit-identical frames**.
-- **Same matchup on both legs** (P1 0x01, P2 0x0E) — not a cursor landing
-  on a different character.
-- RAM diff at onset frame 4024 (38 live bytes): the P1 fighter block plus
-  **`$FFBF00-$FFBF3x`, an EFFECT-PIECE POOL slot** (`$FFB800-$FFBFFF`) that
-  is all zeros in vanilla and populated in ours. We allocate an effect piece
-  vanilla never allocates. By f4100: 1007 live bytes over ~260 ranges.
+**FOUR RETRACTIONS OF MY OWN, all in one session.** Recorded because the
+pattern matters more than any one of them:
+1. *"ours 543 palette-seq calls vs native 0"* (inherited from 14z-74) —
+   confounded; replaced by a phase-independent measurement.
+2. *"the palette-seq tables are byte-identical"* — I derived vs2's table base
+   from a CONTENT MATCH and landed 8 rows out. Read a base off the code.
+3. *"index 81 is two entries past the end of an 80-entry table"* — I then
+   accepted 14z-74's "265 entries, in range" and retracted a correct finding,
+   before re-deriving that my original reading was right. The table really is
+   80 entries; 0x0212 is entry 0's displacement, not a self-encoded length.
+4. *"the 14z-74 word never fixed the Cosmo crash"* — WRONG, and the
+   maintainer pushed back on it. I had measured on rigs 71/77/80, none of
+   which reproduce: 71 and 77 RELEASE the pair early (aborting the move) and
+   rig 80's reset is a different event. Rig 72 reproduces, and on it the word
+   plainly works.
 
-**Prime suspects, untested:** the two `[[obj_hook]]` type-dispatch unions
-(`0x54470` / `0x5E542`) and `alloc_wrap` — Huitzil's build does not carry
-them in the same shape.
+**THE LESSON UNDER ALL FOUR: a negative result from a rig is a fact about the
+RIG until proven otherwise.** Hold length, button pair and meter state each
+independently decided whether Cosmo fired at all — 4 of 12 attempts fired in
+one rig, 0 of 12 in another. Before concluding "X does not happen", prove the
+rig produces the EVENT (here: a stock spent), not just that it ran.
 
-**A LESSON ABOUT THIS SESSION'S OWN PROCESS:** every gate I ran was
-tenant-scoped (blink, HUD, cosmo, empty tiles, layout), and all were green
-while a legacy replay diverged permanently. The vanilla-legacy suite is the
-gate that would have caught it, and it had never been run against a Pyron
-build — Pyron was never frozen, so no expectation set existed. **Run
-`run_suite.sh` against a tenant build EARLY, not at freeze time.**
+**Process lesson, already paid for:** every gate this session was
+tenant-scoped and green while a legacy replay diverged permanently. **Point
+`run_suite.sh` at a tenant build EARLY**, not at freeze time.
+
+**OPEN, none blocking:** the win QUOTE (one shared variant-id fold across all
+three tenants), his EFFECT palette (unported; unconfirmed whether visible),
+and `tests/replays/pyron/80_pyron_cosmo_pairsweep.rpl`, which still resets at
+f4840 — an INDEPENDENT defect that reproduces on pyron14 too, most likely
+another out-of-range index of the same class.
 
 ## Session 14z-75 — Pyron's HUD ART placed; the BLINK root-caused and fixed
 
