@@ -545,12 +545,45 @@ the raw figure (7,591 -> 2,000)**. A gate quoting the raw number would have
 been confidently wrong, so `--no-normalise` is kept purely as the control that
 proves the normalisation is load-bearing, and section 3 asserts it every run.
 
-**What this means for the next slice.** Region identity is not one mechanism
-but three: namespace the 7 generic names per tenant; take the union extent for
-`x088512`; and for each of the 4 conflicting shared spans decide COPY vs
-INDIRECTION — which needs the conflicting fields identified by purpose, not
-just counted. The counts are frozen, so that analysis can proceed against a
-fixed target.
+**WHAT THE CONFLICTING BYTES ARE — identified, not just counted.** Their
+structure is a giveaway: run-length histograms are dominated by 3-BYTE runs
+(a 4-byte pointer whose top byte agrees, i.e. a 24-bit address difference),
+and `x2b7ef4` is 614 two-byte fields at STRIDE 8. Resolving the pointers:
+**they point overwhelmingly at `anim`** — x026142 13/13, x028122 13/13,
+x05c800 48/67 — and each tenant's `anim` is a DIFFERENT source span. So these
+shared spans are shared CODE that each tenant SPECIALISES with pointers to its
+own private data. That is why the same offset holds three different values.
+
+**Which makes the resolution simple, and the plan's "place once" unnecessary
+rather than merely unachievable.** Each tenant's clone is SELF-CONTAINED:
+the per-character OBJ bank table inside `x026142` (+0x13EE) carries 14
+`1-differs` bytes and **ZERO conflicts** — each tenant sets its own row in its
+own copy, and no union is needed. So per-tenant COPIES resolve everything;
+sharing is an optimisation, not a requirement, and it is unsafe for these four.
+
+**THE ACTUAL BLOCKER IS SPACE, AND IT IS NOT TOTAL SIZE.** If every tenant
+keeps its own copy of what it places today:
+
+| space | needed | capacity | verdict |
+|---|---|---|---|
+| `hole_a` | 761,316 | 264,544 | **overflows by 496,772** |
+| `hole_b` | 171,614 | 80,096 | **overflows by 91,518** |
+| `wide_ext` | 45,580 | 2,097,136 | fits, 2,051,556 spare |
+
+The regions fit the IMAGE many times over — it is the CRYPT-window spaces that
+are saturated, **by ONE tenant**. And regions live there for **PC-REACH, not
+for encryption**: code above `PRG:0x0FFFFF` is stored raw and runs, which
+`tests/test_crypt_boundary.sh` already locks. So the region-identity slice's
+real question is **which regions genuinely need reach and which are in hole_a
+merely because the allocator filled the nearest space first** — because
+`wide_ext` has room for all of them with 2 MB to spare.
+
+That reframes M3b_plan Phase 2 item 2 exactly as it half-predicted: it said
+keying by identity "fixes the name-collision problem and the PC-reach
+constraints in one move". The name collisions turn out to be the easy half;
+reach is the whole problem.
+
+All of it frozen in `tests/test_region_overlap.sh` (4 sections, ~1s).
 
 ### 14z-77g — BOTH slice-G measurements CLOSED, and one of my predictions
 ### is RETRACTED

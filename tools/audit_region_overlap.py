@@ -48,6 +48,7 @@ Usage: audit_region_overlap.py <extract_or_build_dir>...  [--json]
 """
 import argparse
 import json
+import re
 import sys
 from collections import Counter
 from pathlib import Path
@@ -136,6 +137,42 @@ def compare_blobs(name, builds, ranges):
             "undecidable": False}
 
 
+def spaces_from_manifest(path="build/manifest/donovan.toml"):
+    """[(name, start, end)] from a manifest's [[space]] rows."""
+    txt = Path(path).read_text()
+    out = []
+    for m in re.finditer(r"\[\[space\]\]\s*\n((?:[a-z_]+ *=.*\n|#.*\n)+)", txt):
+        d = dict(re.findall(r"^([a-z_]+) *= *\"?([^\"\n]+?)\"?\s*$",
+                            m.group(1), re.M))
+        if "start" in d and "end" in d:
+            out.append((d.get("name", "?"), int(d["start"], 0), int(d["end"], 0)))
+    return out
+
+
+def space_demand(builds, spaces):
+    """How much each space would need if EVERY tenant kept its own copy.
+
+    This is the constraint that decides whether per-tenant copies are viable
+    at all, and it is not obvious from totals: the tenants' regions fit the
+    IMAGE many times over, but the crypt-window spaces are already saturated
+    by ONE tenant, because that is where the PC-reach-constrained regions go.
+    """
+    per, tot = {}, {n: 0 for n, _, _ in spaces}
+    for who, b in builds.items():
+        pl = json.loads(Path(b, "patch", "placements.json").read_text())
+        d = {n: 0 for n, _, _ in spaces}
+        for r in pl["regions"].values():
+            for n, lo, hi in spaces:
+                if lo <= r["dst"] < hi:
+                    d[n] += r["len"]
+                    break
+        per[who] = d
+        for n in d:
+            tot[n] += d[n]
+    return {"per_tenant": per, "if_all_copied": tot,
+            "capacity": {n: hi - lo for n, lo, hi in spaces}}
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("dirs", nargs="+", type=Path)
@@ -173,6 +210,12 @@ def main():
             report["blobs"][n] = r
     report["total_conflict"] = sum(
         v.get("conflict", 0) for v in report["blobs"].values())
+    if builds:
+        try:
+            report["space"] = space_demand(builds, spaces_from_manifest())
+        except Exception as e:                     # never fail the overlap
+            report["space"] = {"error": str(e)}    # report over an extra
+
 
     if args.json:
         print(json.dumps(report, indent=1))
@@ -213,6 +256,27 @@ def main():
                   "the same field, and only one\n  can ship. The merge needs "
                   "a per-tenant copy of that region, or a\n  per-character "
                   "indirection at each conflicting field.")
+    sp = report.get("space")
+    if sp and "error" not in sp:
+        print("\nSPACE DEMAND if every tenant keeps its OWN copy:")
+        print("  %-9s %10s %10s  %s" % ("space", "needed", "capacity", ""))
+        for n, cap in sp["capacity"].items():
+            need = sp["if_all_copied"][n]
+            verdict = ("fits, %d spare" % (cap - need) if need <= cap
+                       else "OVERFLOWS by %d" % (need - cap))
+            print("  %-9s %10d %10d  %s" % (n, need, cap, verdict))
+        over = [n for n, c in sp["capacity"].items()
+                if sp["if_all_copied"][n] > c]
+        if over:
+            print("\n  Per-tenant copies do NOT fit today's space model: %s."
+                  % ", ".join(over))
+            print("  The crypt-window spaces are saturated by ONE tenant, and")
+            print("  regions live there for PC-REACH, not for encryption "
+                  "(code above\n  PRG:0x0FFFFF is stored raw and runs — "
+                  "tests/test_crypt_boundary.sh).\n  So the question for the "
+                  "merge is which regions GENUINELY need reach,\n  and which "
+                  "are there only because the allocator filled the nearest\n"
+                  "  space first. wide_ext has room for all of them.")
     return 0
 
 

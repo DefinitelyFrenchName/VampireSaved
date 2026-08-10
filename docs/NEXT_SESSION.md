@@ -327,9 +327,36 @@ independent builds whose allocators chose different addresses, so a pointer
 into a shared region reads as a conflict spuriously — that artefact is **73%
 of the raw figure (7,591 -> 2,000)**. Section 3 of the gate is the control.
 
-The open analysis: identify the 2,000 conflicting bytes BY PURPOSE (which
-field, why each tenant wants it different) to choose copy vs indirection per
-span. The counts are frozen, so that work has a fixed target.
+**The conflicting bytes are IDENTIFIED (14z-77), and they make the answer
+simple.** 3-byte runs dominate — a 4-byte pointer whose top byte agrees — and
+they point overwhelmingly at **`anim`**, which is a different source span per
+tenant. These shared spans are shared CODE each tenant specialises with
+pointers to its own data. Each tenant's clone is SELF-CONTAINED: the OBJ bank
+table inside `x026142` has 14 `1-differs` bytes and ZERO conflicts, so no union
+is needed. **Per-tenant COPIES resolve everything; sharing is an optimisation,
+not a requirement.**
+
+### THE REAL BLOCKER IS PC-REACH, NOT SIZE — and it is quantified
+
+If every tenant keeps its own copy of what it places today:
+
+| space | needed | capacity | |
+|---|---|---|---|
+| `hole_a` | 761,316 | 264,544 | **overflows by 496,772** |
+| `hole_b` | 171,614 | 80,096 | **overflows by 91,518** |
+| `wide_ext` | 45,580 | 2,097,136 | fits, 2,051,556 spare |
+
+The regions fit the image many times over; the CRYPT-window spaces are
+saturated **by one tenant**. And regions live there for **reach, not
+encryption** — code above `PRG:0x0FFFFF` is stored raw and runs
+(`tests/test_crypt_boundary.sh` locks that).
+
+**So the next slice's question is: which regions GENUINELY need PC-reach, and
+which are in `hole_a` only because the allocator filled the nearest space
+first?** `wide_ext` has room for all three tenants with 2 MB spare. Start from
+`near_map` and the pc-relative escape machinery — those name the reach
+constraints explicitly. Everything is frozen in
+`tests/test_region_overlap.sh`, so the target does not move.
 
 **2. The N-way dispatch form** — what slice E deliberately did NOT do. Each
 baked fragment still tests ONE id, and the sites are SHARED: all three tenants

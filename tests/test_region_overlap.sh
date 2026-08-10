@@ -80,7 +80,27 @@ if not bad:
     print("  ok: 2000 conflicting bytes over 4 spans; 13 two-tenant spans")
     print("      honestly reported as undecidable rather than as zero")
 
-print("== 3: control — placement normalisation is LOAD-BEARING ==")
+print("== 3: per-tenant copies do NOT fit today's space model ==")
+sp = d.get("space", {})
+eq("space accounting present", "error" not in sp, True)
+# Frozen 14z-77. The totals are not the constraint — the tenants' regions fit
+# the IMAGE many times over. The CRYPT-window spaces are, because that is
+# where PC-reach-constrained regions go, and one tenant already saturates them.
+eq("hole_a demand if all three copied", sp["if_all_copied"]["hole_a"], 761316)
+eq("hole_b demand if all three copied", sp["if_all_copied"]["hole_b"], 171614)
+eq("wide_ext demand if all three copied", sp["if_all_copied"]["wide_ext"], 45580)
+eq("hole_a capacity", sp["capacity"]["hole_a"], 264544)
+eq("hole_b capacity", sp["capacity"]["hole_b"], 80096)
+eq("wide_ext capacity", sp["capacity"]["wide_ext"], 2097136)
+over = sorted(n for n, c in sp["capacity"].items()
+              if sp["if_all_copied"][n] > c)
+eq("spaces that overflow", over, ["hole_a", "hole_b"])
+if not bad:
+    print("  ok: hole_a overflows by 496772, hole_b by 91518; wide_ext has")
+    print("      2051556 spare — so the binding constraint is PC-REACH, not")
+    print("      total size (code above PRG:0x0FFFFF runs raw)")
+
+print("== 4: control — placement normalisation is LOAD-BEARING ==")
 raw = run(["--no-normalise"])
 eq("un-normalised total", raw["total_conflict"], 7591)
 if raw["total_conflict"] <= d["total_conflict"]:
@@ -96,5 +116,6 @@ for b in bad: print("  FAIL: %s" % b)
 sys.exit(1 if bad else 0)
 PY
 
-echo "PASS: region overlap frozen — 17 shared spans, 2000 bytes of them in"
-echo "      conflict, and the normalisation that makes that number real"
+echo "PASS: region overlap frozen — 17 shared spans, 2000 conflicting bytes,"
+echo "      the space demand that per-tenant copies would create, and the"
+echo "      normalisation control that makes those numbers real"
