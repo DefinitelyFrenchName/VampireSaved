@@ -796,12 +796,42 @@ march_retarget_mid = true
 # the live entry-0 slot that sees 13 and 8. The single hit each replay does
 # show is frame 1 at PC 0x000926 — the boot ROM-checksum sweep, which the
 # control shows too and which is excluded by PC.
-[[code_word]]
-stage = 6
-name = "cosmo_substate81"
-addr = 0x01850A
-old_hex = "0006"
-new_hex = "0224"
+# ══ WITHDRAWN 14z-75 — THIS "FIX" CORRUPTED LEGACY. DO NOT RESTORE. ══════
+# The 14z-74 Cosmo Disruption fix wrote what it believed was "entry 81 of the
+# sub-state jump table at 0x018468". IT IS NOT AN ENTRY. That table has
+# exactly EIGHTY entries (0..79); it ends at 0x018508, where the NEXT
+# dispatcher begins:
+#     018460  323b 0006     move.w (6,PC,Dn.w),D1   <- dispatcher #1
+#     018464  4efb 1002     jmp    (2,PC,D1.w)      ;  table base 0x018468
+#     018468  ... 80 entries ...
+#     018508  323b 0006     move.w (6,PC,D3.w),D1   <- dispatcher #2
+#     01850A                ^^^^ ITS DISPLACEMENT OPERAND  <- what we wrote
+#     01850C  4efb 1002     jmp    (2,PC,D1.w)      ;  table base 0x018510
+# 0x018468 + 81*2 = 0x01850A runs TWO ENTRIES OFF THE END of table #1 and
+# lands on dispatcher #2's displacement. Changing 0006 -> 0224 made that
+# dispatcher read its jump table 0x21E bytes away — FOR EVERY CHARACTER,
+# legacy included. The manifest's own words ("a displacement pointing back
+# INTO the table") were the clue: it was a displacement because it IS one.
+#
+# MEASURED (14z-75): vanilla reads 0x01850A SIX times during
+# 05_timeout_idle (frames 3190/3201/3211/3222/3233/3244, all at PC 0x018508,
+# i.e. that instruction fetching its own extension word) and ZERO times
+# during 02_demitri_vs_cpu — which is the replay 14z-74 used to certify the
+# row "DEAD". The deadness claim was true only of the replay it was measured
+# on. With this row present, 05_timeout_idle / 07_mash_storm /
+# 30_demitri_throw / 01_attract_long diverge from vanilla and NEVER
+# re-converge; removing this single row alone restores all four to the
+# ratified select-wheel window and nothing more.
+#
+# CLAUDE.md §1: "A change that improves the new characters but perturbs one
+# byte of legacy behavior is a failed change." Reverting is not optional.
+#
+# CONSEQUENCE: the Cosmo Disruption CRASH is OPEN again. It needs a fix built
+# on the REAL mechanism — find what actually dispatches Pyron's sub-state,
+# and gate any repoint on the tenant id so legacy cannot reach it. Whatever
+# replaces this must prove deadness on a replay that EXERCISES the
+# neighbouring code (05_timeout_idle does; 02 does not), and must pass
+# tests/run_suite.sh, not just a tenant-scoped gate.
 
 # ══ 14z-75 THE SPRITE/HUD BLINK — ROOT-CAUSED, and it is a DEAD ROW ═══════
 #

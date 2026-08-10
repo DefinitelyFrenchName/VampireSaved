@@ -1651,3 +1651,35 @@ pointer field. A structural match that is ~85% bytes with all differences in
 pointer positions is what "correctly ported" looks like; do not read a
 sub-90% figure as corruption until the alignment has been *found* rather
 than assumed.
+
+## "Entry N" past the end of a jump table is the NEXT routine's OPERAND
+## (14z-75, cost a shipped legacy regression and a blocked freeze)
+
+14z-74 fixed Pyron's Cosmo Disruption crash by repointing "entry 81 of the
+sub-state jump table at 0x018468" from 0x0006 to 0x0224. That table has
+EIGHTY entries. It ends at 0x018508, where the next dispatcher starts:
+
+    018460  323b 0006   move.w (6,PC,Dn.w),D1     <- dispatcher #1
+    018464  4efb 1002   jmp    (2,PC,D1.w)        ;  table base 0x018468
+    018468  ... 80 entries (0..79) ...
+    018508  323b 0006   move.w (6,PC,D3.w),D1     <- dispatcher #2
+    01850A              ^^^^ ITS DISPLACEMENT      <- what we wrote
+    01850C  4efb 1002   jmp    (2,PC,D1.w)        ;  table base 0x018510
+
+`0x018468 + 81*2 = 0x01850A`. Writing there made dispatcher #2 read its jump
+table 0x21E bytes away **for every character, legacy included**. Four legacy
+replays diverged from vanilla and never re-converged; removing that one word
+restored all four.
+
+**A word-displacement jump table ENDS WHERE CODE BEGINS.** Compute the entry
+count (`(first_code_addr - table_base) / 2`) and refuse any index >= it. The
+manifest's own description was the clue and was read past: it called the
+value "a displacement pointing back INTO the table" — it was a displacement
+because it IS one, belonging to an instruction.
+
+**And the deadness check that certified it was replay-limited.** Vanilla
+reads 0x01850A ZERO times on `02_demitri_vs_cpu` (the replay 14z-74 used) and
+SIX times on `05_timeout_idle`. A "0 reads" result proves nothing unless the
+replay set exercises the code around the address — a same-instrument positive
+control on a live row does NOT cover that, because it only shows the
+watchpoint works.

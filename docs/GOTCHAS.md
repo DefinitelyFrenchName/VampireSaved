@@ -172,3 +172,5 @@ is a GAME gotcha if it is true of the game regardless of the port.
 - `placements.json`'s dst/src is a LINEAR map while the extractor auto-discovers SUB-REGION shifts — compare by CORRELATION, or a faithfully-ported region reads as 75% corrupt (14z-75)
 - Read a jump/data TABLE BASE off the code that indexes it, never off a content match — a row-content match put vs2's palette-seq base 8 rows out and produced a confidently wrong elimination (14z-75)
 - A per-character table aliasing rows 0x10-0x1F onto 0x00-0x0F is usually not ALONE — Pyron's blink lived in THREE such tables and fixing one left two screens broken; sweep for the SHAPE (tests/test_variant_dispatch.sh), don't chase the screen (14z-75)
+- A jump-table "entry N" past the table's END is the NEXT routine's instruction operand — count the entries (the table ends where code begins) before writing one; 14z-74's Cosmo fix wrote index 81 of an 80-entry table and corrupted a second dispatcher's displacement for every character (14z-75)
+- A DEADNESS measurement is only as good as the replay it ran on — 0 reads on 02_demitri_vs_cpu, 6 reads on 05_timeout_idle, same address (14z-75)
