@@ -1043,12 +1043,18 @@ def main():
             # src_char there, dst_slot here (scan-confirmed sites only; the
             # literal was 0x13 until 14z-65, silently missing any other
             # tenant's sites)
-            src_id = _int(port["port"]["src_char"])
+            # Slice E: read the tenant from `T`, not `port["port"]`. The two
+            # are the same dict today; under the loop `T` rebinds per tenant
+            # while `port["port"]` stays `_tenants[0]` forever, so this blob
+            # would take the FIRST tenant's ids — silently, since the ported
+            # code would simply gate on the wrong character.
+            src_id = _int(T["src_char"])
+            _cid = _int(T["dst_slot"])
             for off in r.get("charid_sites", []):
                 if blob[off:off + 2] == bytes([0x00, src_id]):
-                    blob[off:off + 2] = bytes([0x00, dst_slot])
+                    blob[off:off + 2] = bytes([0x00, _cid])
                     notes.append(f"# {name}+{off:#x}: char-id imm "
-                                 f"{src_id:#x} -> {dst_slot:#x}")
+                                 f"{src_id:#x} -> {_cid:#x}")
             # PC-relative escapes (word-table entries / direct d16) from
             # source-only regions: rewrite each displacement against actual
             # placement; unresolved targets -> a shared per-region tripwire
@@ -3675,8 +3681,15 @@ def main():
                 # winner id at the site; movea sets no flags and the
                 # fall-through (moveq #0,d0) defines its own, so the
                 # thunk's CCR clobber is safe.
-                rebase = blk - dst_slot * unit
-                body = (f"0c06{dst_slot:04x}"      # cmpi.b #TT,d6
+                # Slice E: the id baked into the compare is the ROW OWNER's.
+                # THE N-TENANT FORM IS STILL OPEN: this is ONE thunk at ONE
+                # shared site (0x5F1B6), so N tenants need N compares chained
+                # here (each with its own rebase), not N copies of the thunk.
+                # That is the merge's design step; threading the owner is what
+                # makes the single-tenant emission correct meanwhile.
+                _wrow = _int(owner_of(wp)["dst_slot"])
+                rebase = blk - _wrow * unit
+                body = (f"0c06{_wrow:04x}"         # cmpi.b #TT,d6
                         f"6608"                    # bne.b +8 -> vanilla
                         f"207c{rebase:08x}"        # movea.l #rebase,a0
                         f"4e75"                    # rts
@@ -3759,7 +3772,12 @@ def main():
             # automatic rewrite — silently editing authored code could mask a
             # thunk that compares against some other character on purpose.
             _hx = st["thunk_hex"].lower()
-            _tid = _int(port["port"]["dst_slot"]) & 0xFF
+            # Slice E: TT/TU (and row_subst below, which derives from _tid)
+            # take the ROW OWNER's id. Same open N-tenant question as the
+            # win-pal thunk: the three `*_bank_variant_id` rows are declared
+            # identically by all three tenants at ONE shared site each, so the
+            # merge dedups them to one thunk whose body tests N ids.
+            _tid = _int(owner_of(st)["dst_slot"]) & 0xFF
             # TU (14z-62j): the tenant id under the WIN-QUOTE consumer bias
             # (+0x40 rows — the shared consumer at 0x5F328 receives d0
             # pre-biased per piece). Replaced before TT ("tu" contains no
@@ -4141,7 +4159,8 @@ def main():
                 # loud: the thunk would gate on 0x0F, so the tenant would get
                 # the VANILLA tables and Jedah would get the ported ones, with
                 # nothing to crash. Built from the tenant id instead.
-                _tid8 = "%02x" % (_int(port["port"]["dst_slot"]) & 0xFF)
+                # Slice E: from `T`, not `port["port"]` — see charid_sites.
+                _tid8 = "%02x" % (_int(T["dst_slot"]) & 0xFF)
                 thunk += bytes.fromhex("0c3900" + _tid8 + "00ff8782")
                 thunk += bytes.fromhex("670a")                    # yes -> ported
                 thunk += bytes.fromhex("0c3900" + _tid8 + "00ff8b82")

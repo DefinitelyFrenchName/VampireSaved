@@ -1,12 +1,16 @@
 # STATE — living progress log
 
-Updated: 2026-08-10 (session 14z-77 — **M3b slices C and D: the gating family
-AND the manifest-row arithmetic now ask the ROW'S OWNER, not the build's single
-`dst_slot`.** Slice D also corrected the plan's premise: four of its seven
-named sites are DEAD code, and the rest are THREE classes, only one of which
-`owner_of()` can answer. New gate `tests/test_tenant_row_owner.sh` (~9s) answers
-the question no fingerprint can — is the threading load-bearing? — by
-perturbing one owner-derived row at a time. The manifest-schema
+Updated: 2026-08-10 (session 14z-77 — **M3b slices C, D and E: the gating
+family, the manifest-row arithmetic AND every id baked into emitted 68k now ask
+the ROW'S OWNER, not the build's single `dst_slot`.** Slice D corrected the
+plan's premise: four of its seven named sites are DEAD code, and the rest are
+THREE classes, only one of which `owner_of()` can answer. Slice E found TWO
+LATENT TRAPS — `charid_sites` and the overlay thunk read `port["port"]`, which
+the loop never rebinds, so they would have baked the FIRST tenant's id into
+every tenant's code, silently. New gate `tests/test_tenant_row_owner.sh` (~9s)
+answers the question no fingerprint can — is the threading load-bearing? — and
+**found a blind spot in itself** while doing it (see 14z-77c). The
+manifest-schema
 question 14z-76 stopped on is ratified: **per-FILE ownership, stamped by the
 loader** — the merge adds tenants without editing a single manifest row, and
 each frozen vertical stays independently buildable as its own reproduction
@@ -392,6 +396,40 @@ SIGINT mid-flight.
 Note the instrument's own trap: the first interrupt check was **confounded** —
 it asked `git diff --quiet`, which can never be clean while the slice itself is
 uncommitted. Re-run against a snapshot instead.
+
+### 14z-77c — slice E: the BAKED-CODE class, mechanical half
+
+All four sites that bake an id into emitted 68k now take it from the row's
+owner (`win_pal_variant`'s compare+rebase; `site_thunk`'s TT/TU, and the
+`row_subst` address derived from it) or from `T` rather than `port["port"]`
+(`charid_sites`, the overlay T-select thunk). Four fingerprints bit-exact.
+
+**Two of them were LATENT TRAPS, not merely unconverted.** `charid_sites` and
+the overlay thunk read `port["port"]`, which `normalise_tenants()` pins to
+`_tenants[0]` and which the loop will never rebind. Under the loop those
+fragments would have baked the FIRST tenant's id into every tenant's code —
+and silently, because a thunk gating on the wrong character does not crash: the
+tenant takes the vanilla path and some other character takes the ported one.
+That is the exact failure mode the source comments at both sites warn about,
+one level up.
+
+**What slice E deliberately did NOT do: the N-way dispatch FORM.** Each
+fragment still tests ONE id, and these are SHARED sites — all three tenants
+declare `name_bank_variant_id` (0x5FCE0), `splash_bank_variant_id` (0x6C0E0)
+and `winquote_bank_variant_id` (0x5F328) as byte-identical rows, and
+`win_pal_variant` is one thunk at 0x5F1B6. The merge dedups each to ONE thunk
+whose body tests N ids. Design decision, flagged in the source at both sites.
+
+**THE LIVENESS GATE FOUND A BLIND SPOT IN ITSELF, and that is the entry worth
+reading.** Adding the slice-E controls, `charid_sites` reported **DEAD** — its
+perturbation changed nothing. The cause was not the threading: region blobs
+leave the generator as side `.bin` files referenced by `data_file`/`code_file`
+ops, so a byte changed INSIDE a blob moves no op, and the gate was comparing
+`patch.json` alone. It now compares a shasum manifest of the **whole output
+directory**, and all ten sites report live. A gate that had only ever been
+pointed at already-passing sites would have shipped with that hole; it was the
+first genuinely different site that exposed it. Its own dead-binding control
+(`_pvar`) still passes, so the fix did not make everything look live.
 
 ### 14z-76c — M3b STARTED: the multi-tenant generator, slices A and B
 

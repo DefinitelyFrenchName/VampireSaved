@@ -452,7 +452,14 @@ tests/test_tenant_row_owner.sh [ex]   # 14z-77 (M3b slices C+D): is the row-OWNE
                                       # the emitted ops leaves the four fingerprints
                                       # unchanged too and reads as a success. This
                                       # gate perturbs ONE owner-derived row at a time
-                                      # and requires patch.json to change. 7 sites.
+                                      # and requires the generator's OUTPUT to
+                                      # change. 10 sites (slices C/D/E).
+                                      # Compares the WHOLE OUTPUT DIR, not
+                                      # patch.json: region blobs leave as side
+                                      # .bin files, so a byte changed inside a
+                                      # blob moves no op — the first version
+                                      # had that blind spot and its own
+                                      # controls caught it.
                                       # Runs the GENERATOR ALONE against an existing
                                       # extract dir (default build/m5_wide/extract,
                                       # SKIPs without one), so each control costs

@@ -222,25 +222,39 @@ Do not budget for them.
 2. **BAKED INTO EMITTED MACHINE CODE** — see below.
 3. **OUTPUT NAMING** — `tenant.json`, which becomes an array with the loop.
 
-### NEXT SLICE — pick region identity (1) or the baked code (2)
+- **Slice E** (14z-77) — the BAKED-CODE class, mechanical half. All four sites
+  now take their id from the row's owner (`win_pal_variant`'s compare+rebase,
+  `site_thunk`'s TT/TU and the `row_subst` derived from it) or from `T` rather
+  than `port["port"]` (`charid_sites`, the overlay T-select thunk). The two
+  `port["port"]` reads were **latent traps**: that dict stays `_tenants[0]`
+  forever, so under the loop those fragments would have baked the FIRST
+  tenant's id — silently, since wrong-character gating does not crash.
 
-Region identity is the bigger one and unblocks shared-span dedup; the baked
-code is smaller but is the silent class. Either can go first.
+### NEXT SLICE — region identity, then the N-way dispatch FORM
 
-Deliberately last regardless: the **4 sites baked into emitted machine code**
-(`charid_sites` `:1049`, the win-pal thunk rebase `:3678`, TT/TU substitution
-`:3762`, the overlay T-select thunk `:4144` — line numbers as of 14z-77). Each
-bakes ONE id into ONE code fragment; N tenants need either N fragments or an
-N-way compare chain, which is a design decision, not a mechanical edit. That
-class fails **silently** — a wrong tenant there yields a build that passes
-every structural check and is wrong in the ROM. Budget room to bisect: each
-step is a full four-target rebuild (~4 min).
+**1. Region/extraction identity** (M3b_plan Phase 2 item 2). Key regions by
+`(src_set, src_addr, len)`; place a shared span ONCE and resolve every
+tenant's relocations through that placement. Fixes the `x{addr}` name
+collision and the PC-reach constraint together, and it is where Donovan's 12
+`x028122` relocations — rewriting shared bytes H/P do not declare — have to be
+resolved. Once the loop rebinds `T`, every extraction-side site listed above
+is correct.
+
+**2. The N-way dispatch form** — what slice E deliberately did NOT do. Each
+baked fragment still tests ONE id, and the sites are SHARED: all three tenants
+declare `name_bank_variant_id` (0x5FCE0), `splash_bank_variant_id` (0x6C0E0)
+and `winquote_bank_variant_id` (0x5F328) as byte-identical rows, and
+`win_pal_variant` is one thunk at one site (0x5F1B6). The merge must dedup
+each to ONE thunk whose body tests N ids — a compare chain, or a generated
+32-row table where the site is semantically a per-char lookup (M3b_plan Phase
+2 item 4: "manifest declares bodies; generator owns gates"). That is a design
+decision, not a mechanical edit, and it is the last thing before the loop.
 
 > **ORDERING INVARIANT (14z-77).** The N-tenant loop lands only after all four
 > classes are converted: gating (C, done), manifest-row arithmetic (D, done),
-> extraction/region identity, and the baked-code sites. Landing it earlier
-> ships a build whose gates consult the row's owner while its arithmetic
-> consults tenant `[0]`.
+> baked-code identity (E, done), and extraction/region identity — plus the
+> N-way dispatch form above. Landing it earlier ships a build whose gates
+> consult the row's owner while its arithmetic consults tenant `[0]`.
 
 ### The gate that makes an inert slice checkable
 
