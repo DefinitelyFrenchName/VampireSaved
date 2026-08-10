@@ -1,0 +1,40 @@
+# pyron SPRITE/HUD BLINK — the NATIVE-COMPARABLE rig (14z-75). Runs
+# UNCHANGED on native vsav2 and on a variant-id build, so ours-vs-native
+# is one diff at the same phase. Modelled on 85_hui_df_vs2.rpl.
+#
+# THE DEFECT: palette RAM row 10 (0x90C140) alternates every frame on our
+# build; native holds it constant. Row 10 is shared by Pyron's SPRITE and
+# his in-match HUD mugshot, which is why both blink.
+#
+# WHY THIS RIG IS IDLE. The observable is "does row 10 change from frame
+# to frame in a quiet match", so both fighters must be doing nothing:
+# a moving/animating Pyron may legitimately drive a palette sequence, and
+# that would confound the measurement. No buttons after the pick.
+#
+# WHY IT NEEDS NO FRAME ALIGNMENT (and why the 14z-74 "ours 543 / native
+# 0" figure was confounded): the two games are NOT at the same point on
+# the same frame, so a frame-indexed diff is meaningless. This rig instead
+# measures a PER-LEG property — the number of distinct row-10 values over
+# a window of CONSECUTIVE in-match frames — which is phase-independent.
+# 14z-74's figure counted uploader calls during SELECT, where the flows
+# genuinely diverge; that is the measurement this replaces.
+#
+# POKES for both legs (id forcing, the 14z-69 early-window flow):
+# POKES="1400:ff8782:11;1450:ff8782:11;1500:ff8782:11;1400:ff8b82:03;1450:ff8b82:03;1500:ff8b82:03"
+#   P1 $FF8782 = 0x11 (Pyron, native id on vsav2; the tenant id on ours)
+#   P2 $FF8B82 = 0x03 (Victor — id 0x03 on vsav AND vsav2; without it the
+#                      cursor path lands on different characters on the
+#                      two wheels and the sprite lists are not comparable)
+# ASSERT the pick took: P1 fighter block +0x382 must read 0x11 on BOTH
+# legs before any verdict (docs/game/atlas/ram.md). A mode/id that was
+# never entered is the standing trap here.
+300-305 sys=C1
+420-425 sys=C2
+800-803 sys=S1
+940-943 sys=S2
+1100-1102 p2=R
+1160-1162 p2=R
+1300-1302 p1=1
+1360-1362 p2=1
+# ...and then nothing. The match settles; both fighters idle in neutral.
+3800 wait

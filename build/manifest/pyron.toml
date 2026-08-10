@@ -408,16 +408,26 @@ table = 0x38C198
 # a Pyron-only mistake; it simply has not produced a reported symptom on him.
 # Legacy is intact either way (measured: replay 02 on the effect-ported build
 # was still the ratified select-wheel window only).
-# MEASURED SOURCE OF THE BLINK (14z-74, probe on the palette-seq uploader
-# 0x2AD82, the audit_palette_seq_ids.sh instrument):
-#     ours   543 calls, ALL with id 0x26
-#     native   0 calls
-# So our Pyron continuously requests palette-SEQUENCE 0x26 — an id LEGACY
-# uses (the audit's frozen answer is {0x26,0x27}) — while native Pyron
-# requests none at all. The sequence animates palette row 10, which is the
-# row his sprite AND the in-match HUD mugshot draw from; hence the mugshot
-# blinks too, and shows PYRON's palette on DEMITRI's art (his HUD rows are
-# unported, so the art falls back while the palette row is the tenant's).
+# MEASURED SOURCE OF THE BLINK. The sequence animates palette row 10, which
+# is the row his sprite AND the in-match HUD mugshot draw from; hence the
+# mugshot blinked too, and showed PYRON's palette on DEMITRI's art (the HUD
+# art was unported then — fixed 14z-75, so the art is now his).
+#
+# THE 14z-74 FIGURE "ours 543 calls / native 0" IS RETRACTED (14z-75): its
+# own caveat was right, the hits were in the select screen and it compared
+# different screens. RE-MEASURED anchored on an in-match state, both legs
+# proven to hold Pyron (+0x382 = 0x11), as a PHASE-INDEPENDENT property —
+# the number of distinct row-10 values over 40 CONSECUTIVE frames:
+#     native  1 distinct value,  0 changes
+#     ours    2 distinct values, 39 changes  (every frame)
+# and ours' two values are NAMED: one is bit-identical to native's constant,
+# the other is vsavj palette-seq row 0x26 (0x39ADC0) under the uploader's
+# 0xF000 OR. Frozen by tests/test_pyron_blink.sh (+ replay 76, a rig that
+# runs unchanged on both games, and 7 verdict controls).
+# Writer: PC 0x02AD68/0x02AD7C, alternating source A0 = 0x39ADC0 (seq row
+# 0x26) and 0x3FA6A0 (his own palette), 91 writes each. Ours also performs
+# every write native does — PC 0x1433E/0x14190 hit 240/144 times, exactly
+# matching native's 0x129B6/0x12852 — so the seq upload is PURELY ADDITIVE.
 # REFINED 14z-74 (maintainer: the blink happens during CHARACTER SELECT too):
 #   * The probe hits start at frame ~2363 — i.e. DURING SELECT, before any
 #     match. A0 walks 0x000d45c6, +0x18, +0x18 ... = the ANIM NODE stride, so
@@ -426,14 +436,29 @@ table = 0x38C198
 #     relocated pointer (vs2 0x270a32 -> ours 0x0dff0c, exactly the anim
 #     region delta). So this is NOT the air-dive class (a data view read as
 #     opcodes); the ported data is faithful.
-#   * CAVEAT ON THE 543-vs-0 COMPARISON: because the hits are in the select
-#     screen, and our select flow (extended wheel, ported records) is not at
-#     the same point as native's at the same frame, "native 0 calls" may be
-#     comparing different screens rather than proving native never animates.
-#     Re-measure by ANCHORING on the same on-screen state, not the frame
-#     index, before treating the id-0x26 request itself as the defect.
-# NEXT: find what makes his state request 0x26 when native's does not —
-# a per-character palette-seq id / flag that is aliased or unported.
+#   * The anim nodes are CORRECT — RECONFIRMED 14z-75 at the right
+#     alignment. 14z-74's linear dst/src map was off (the extractor
+#     auto-discovers sub-region shifts, so a naive map showed 75% of the
+#     region differing); correlating puts ours 0x0D45C6 at vs2 0x2650EC,
+#     where the two are byte-identical apart from properly relocated
+#     pointers. So this is NOT the air-dive class; the ported data is
+#     faithful.
+# WHAT 14z-75 ELIMINATED, so nobody re-derives it:
+#   * NOT the anim nodes (above).
+#   * NOT the palette-seq table CONTENT — vsavj row 0x26 (0x39ADC0) is
+#     byte-identical to vs2's (vs2 table base 0x3B093C, located by anchoring
+#     rows 0x26 and 0x27, which agree).
+#   * NOT a dead row — 0x26 is one of only two ids legacy ever requests.
+#   * NOT misdirection to another palette row — over 12 consecutive frames
+#     native animates ONLY stage rows 0x00-0x03; no native row carries this
+#     2-state flip.
+# So the same anim script, the same id and the same data animate on ours and
+# not on native.
+# NEXT: the question is no longer WHAT is requested but WHAT GATES the
+# request (or selects its destination row). Get the caller: probe 0x2AD82
+# returns RET 0x00FF02DC with A6 = 0xFF8400 (his own fighter block), so the
+# request is issued from a work-RAM thunk on his object's behalf — start
+# there, and compare against the same site on the native leg.
 #
 # CROSS-TENANT CHECK (14z-74, maintainer asked whether Phobos is exposed):
 # NO — measured on the same rig, palette-row churn over 15 frames:

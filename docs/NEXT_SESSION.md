@@ -1,81 +1,66 @@
-# NEXT SESSION — orientation (written at the close of 14z-74, 2026-08-10)
+# NEXT SESSION — orientation (written at the close of 14z-75, 2026-08-10)
 
-**Session goal: finish Pyron's rung.** He RENDERS and three of his four
-playtest defects are fixed and maintainer-confirmed. Four things are open,
-one of them half-built.
+**Session goal: finish Pyron's rung.** His HUD is now DONE. Three items are
+open, and the blink is root-caused down to one remaining question.
 
-**Current build: `build/pyron14` (`34f4b77d`)** — not frozen. Rebuild:
+**Current build: `build/pyron15` (`3fb71586`)** — not frozen. Rebuild:
 ```sh
 TENANT_MANIFEST=build/manifest/pyron.toml TENANT_CHAR=0x11 \
 GEN_FLAGS="--profile cps2-wide-v1 --allow-plausible --tripwire-open" \
     tools/build_donovan.sh 6 build/pyronNN
 ```
 **Phobos is FROZEN as `huitzil-m2` (`9deda080`, `build/hui27`)**; Donovan as
-`donovan-m3a`. Both rebuild bit-exact — keep it that way
-(`tests/test_m3a_reproducible.sh` after every machinery change).
+`donovan-m3a`. All three references rebuild bit-exact — keep it that way
+(`tests/test_m3a_reproducible.sh` after every machinery change, and rebuild
+huitzil too if you touch anything shared like `effect_tail.json`).
 
 ---
 
-## THE RULE THAT COST A WRONG COMMIT (14z-74)
+## 1. THE BLINK — one question left
 
-**Never chain a legacy measurement onto a build in one command**, and
-**re-run before believing a gate that contradicts a previous green.** I
-recorded "port_param32 breaks legacy", refused the fix, and committed that
-claim while the contradicting output was on screen. It was an artifact of
-chaining; the same artifact also failed a build that did NOT carry the flag,
-which is what exposed it. Two isolated re-runs were clean.
+**Do not re-derive the mechanism; it is measured and frozen** by
+`tests/test_pyron_blink.sh` (replay 76, one rig for both games, 7 verdict
+controls). Palette row 10 carries his SPRITE and his HUD MUGSHOT, so both
+blink. Over 40 consecutive in-match frames: **native 1 value / 0 changes,
+ours 2 values / 39 changes**, and ours' two values are named — native's
+constant, and vsavj palette-seq row `0x26` (`0x39ADC0`) under the uploader's
+`0xF000` OR. Writer `PC 0x02AD68`. The seq uploads are purely ADDITIVE.
 
-## 1. HUD — HALF BUILT, plate currently BLANK
+Already eliminated (do not spend a session on these again): the anim nodes
+(byte-identical to vs2 `0x2650EC`), the seq table content (vsavj row 0x26 ==
+vs2's), a dead row (0x26 is live in legacy), and row misdirection (native
+animates only stage rows 0x00-0x03).
 
-The three table entries are ported and correct; nothing places his ART at
-the free-pool anchors, so the plate shows nothing (it used to show
-"Demitri"). **Gap located:** the per-tenant HUD config in
-`tools/check_tenant_hud.py`'s `TENANTS` dict has rows for 0x13 and 0x10 and
-NONE for 0x11. Pyron's values (derived + cross-checked against the other
-two, which sit adjacent in the vs2 table):
-```
-0x11: mug_src 0x4D60  name_src 0x4D53  name_bx 2
-      name_hi 0x86920102  name_lo 0xFFF00002
-```
-Reusing H's anchors (0xBE9A/0xBE92) is fine single-tenant but COLLIDES on
-the M3b merge — give him his own then. Still to find: the PLACER that copies
-that art into group C (`check_tenant_hud.py` is the gate, not the placer).
-If a wrong name is preferable to none meanwhile, revert the three
-`[[aux_poke]]` rows in `pyron.toml`.
+**THE QUESTION: what GATES the request?** Same script, same id, same data —
+ours animates, native does not. Lead: probing the resolver `0x2AD82` returns
+`RET 0x00FF02DC` with `A6 = 0xFF8400` (his own fighter block), i.e. the
+request is issued from a work-RAM thunk on his object's behalf. Get the
+equivalent site on the native leg and diff the state that reaches it.
+Subsystem write-up: `docs/game/engine_internals.md`, "The palette-SEQUENCE
+uploader".
 
-## 2. The sprite/HUD BLINK
+When fixed, flip the gate: `PYRON_BLINK_EXPECT=fixed`.
 
-Palette RAM row 10 (0x90C140) alternates every frame; native holds it
-constant. Row 10 is shared by his sprite AND the in-match HUD mugshot, which
-is why both blink and why the mugshot showed DEMITRI's art in PYRON's
-colours. Writer is the palette-SEQUENCE uploader (PC 0x02AD68), driven by an
-anim script (A0 walks the 0x18 node stride), starting DURING SELECT.
-**His anim nodes are CORRECT** (byte-identical to vs2 bar a properly
-relocated pointer), so this is NOT the air-dive class.
-**Do not act on the "ours 543 calls / native 0" figure** — the hits are in
-the select screen, where our flow and native's are not at the same point on
-the same frame. RE-MEASURE ANCHORED ON SCREEN STATE (both legs sitting on
-his select portrait), then compare.
+## 2. Effect palette — deferred, and a SHARED hazard
 
-## 3. Effect palette — deferred, and it is a SHARED hazard
-
-Not ported: the effect palette table 0x38C218 has only SIXTEEN rows, so a
+Not ported: the effect palette table `0x38C218` has only SIXTEEN rows, so a
 variant id indexes past it into the adjacent shared table (row 0x11 ->
-0x38c25c = that table's row 0x01, a value vanilla uses). **Huitzil's FROZEN
+`0x38c25c` = that table's row 0x01, a value vanilla uses). **Huitzil's FROZEN
 row has the same shape** (his 0x10 lands on its row 0x00) — worth resolving
 before the M3b merge. Understand how the engine resolves an effect palette
-for a variant id before writing anything there.
+for a variant id before writing anything there. Note this is NOT the blink:
+14z-74 already proved removing the effect palette does not stop it.
 
-## 4. Win QUOTE — the shared variant-id fold
+## 3. Win QUOTE — the shared variant-id fold
 
 Still wrong for every tenant: Donovan shows VICTOR's quotes, Phobos a
 Bulleta line (`id & 0x0F` folding). ONE universal fix, not three. Pyron is
-now the third data point. Detail + two failed attempts:
+the third data point. Detail + two failed attempts:
 `docs/game/engine_internals.md` "Win screen".
 
 ---
 
-## Instrument blind spots found in 14z-74 — fix before more tenants
+## Instrument blind spots still open — fix before more tenants
 
 1. **The extractor's dead-filler classifier is VIEW-BLIND.** It compares the
    two sibling ROMs in the OPCODE view, where an embedded data table always
@@ -87,22 +72,27 @@ now the third data point. Detail + two failed attempts:
    is why `pyron.toml`'s "0 data_in_code" census line was wrong. Re-run the
    census across all tenants after fixing.
 
-## Gates added this session
+## Gates added in 14z-75
 
-- `tests/test_list_type_census.sh` — the one-source-bank re-check per tenant,
-  with a live positive control (its first version was blind to type 4 and
-  read 0 for HUITZIL, whose beam is one).
-- `tests/test_pyron_cosmo.sh` — the Cosmo fix: static, deadness (opcodes
-  space + PC filter, with a control), runtime.
-- `tests/test_hui_grab_victim.sh` + `tools/check_grab_victim.py` (14z-73).
+- `tests/test_pyron_blink.sh` + `tools/check_pyron_blink.py` + replay 76 —
+  the blink, frozen by MECHANISM (both values named), not just by symptom.
+- `tests/replays/40_pick_pyron_cell.rpl` — walks the wheel onto his cell,
+  the 0x11 twin of replays 36/37. Used by `test_tenant_hud.sh` section 3.
 
-## Read this before attributing anything
+## Rules that cost real time — carried forward
 
-**THE DEAD-ROW CLASS** — `docs/game/engine_internals.md`, the section of that
-name (now the file's first subsystem section). FOUR instances so far and the
-most common defect shape in this port: vsav ships a table row as a STUB or an
-ALIAS where vs2 fills it, legacy never indexes it, and a ported character
-indexes it immediately. It carries the diagnostic recipe, including the two
-instrument traps (pc-relative reads need the OPCODES space; the boot
-ROM-checksum sweep must be filtered by PC). **When a ported character does
-something vanilla never does, suspect a dead row first.**
+- **Never chain a legacy measurement onto a build in one command**, and
+  re-run before believing a gate that contradicts a previous green (14z-74:
+  produced a wrong commit). The other side of the same coin, 14z-75: a
+  commit that touches a manifest and does NOT rebuild can leave it
+  unparseable — `pyron.toml` was broken for a whole session that way.
+- **Compare the two games by a PHASE-INDEPENDENT property.** They are never
+  on the same frame. A frame-indexed diff produced the "543 vs 0" figure
+  that stood for a session and was wrong.
+- **`placements.json` dst/src is LINEAR; the extractor shifts sub-regions.**
+  Correlate to find the true source offset — mapping through it made a
+  correctly-ported region read as 75% corrupt (14z-75).
+- **THE DEAD-ROW CLASS** — `docs/game/engine_internals.md`, the section of
+  that name. FIVE instances now (Pyron's HUD rows are the newest) and the
+  most common defect shape in this port. **When a ported character does
+  something vanilla never does, suspect a dead row first.**

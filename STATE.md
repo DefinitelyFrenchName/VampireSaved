@@ -1,14 +1,19 @@
 # STATE — living progress log
 
-Updated: 2026-08-10 (session 14z-74 — PYRON RENDERS, and three of his four
-playtest defects are FIXED and maintainer-confirmed: the Cosmo Disruption
-crash, the air 214+P runaway, and the win screen. Phobos was RE-FROZEN as
-huitzil-m2 (9deda080) after decision D5 repaired a generator bug, tested
-before freezing at the maintainer's insistence. Pyron's render rung landed
-Steps 0/1/2/3/5 + art; Step 4 (HUD) is HALF done and his plate is currently
-BLANK. THREE of my own claims were retracted in-session — read them below
-before trusting any number in this entry. Current build build/pyron14
-(34f4b77d). Read docs/NEXT_SESSION.md first.)
+Updated: 2026-08-10 (session 14z-75 — PYRON'S HUD IS DONE: his plate reads
+"Pyron" and his mugshot draws his own art, closing the half 14z-74 left
+open. The missing piece was the ART PLACER — `place_variant_slot_<name>` in
+build/manifest/effect_tail.json; check_tenant_hud.py was always the gate,
+never the placer. He has his OWN free-pool anchors (name 0xBE94, mug
+0xBE9C) so the M3b merge does not collide. Current build build/pyron15
+(3fb71586); byte-attributed against pyron14 as exactly 2 program bytes and
+6 tiles. Also: build/manifest/pyron.toml had NOT PARSED since fcfe5c7, so
+pyron14 was unrebuildable from the tree — fixed. THE BLINK is now
+root-caused and frozen by a gate, and 14z-74's confounded "543 vs 0" figure
+is RETRACTED and REPLACED by a phase-independent measurement. Read
+docs/NEXT_SESSION.md first.)
+
+Previously: 2026-08-10 (session 14z-74 — PYRON RENDERS; Cosmo/air/win-screen fixed; Phobos re-frozen as huitzil-m2 9deda080; Step 4 HUD half done, plate BLANK. Three claims retracted in-session.)
 Previously: 2026-08-09 (session 14z-71 — THE BEAM DRAWS. Root cause: vsav
 ships effect-class row 16 as a STUB where vs2/vh2 carry the beam's
 handler, and underneath that its sprite-list drawer has no list-type 12.
@@ -132,6 +137,101 @@ type 2` — so it can be FLATTENED at build time into one type-2 list.
 No hook, no cycles, nothing to ratify. Cost: decode the type-2 format
 from its handler (`0x01B234`), write the transform, and accept that the
 flattened list is authored data the sibling oracle cannot check.
+
+## Session 14z-75 — Pyron's HUD ART placed; the BLINK root-caused and frozen
+
+**1. HUD — DONE (build/pyron15, `3fb71586`).** 14z-74 ported the three
+variant-id table entries and left the plate BLANK because nothing placed his
+art at the anchors they point at. **The placer is
+`place_variant_slot_<name>` in `build/manifest/effect_tail.json`**, consumed
+by `build_gfx_donovan.py:451` (it copies vs2 bank-1 blocks to vsav bank-1
+anchors on variant-id builds, scoped per tenant). There was a
+`place_variant_slot_huitzil` and none for pyron; `check_tenant_hud.py` was
+always the GATE, never the placer.
+
+Re-derived rather than trusted: both HUD tables dumped from the ROMs show
+vsavj rows 0x10-0x1F are pure ALIASES of 0x00-0x0F while vs2 fills
+0x10/0x11/0x13 — **the dead-row class in its clearest form**. vs2 row 0x11 =
+mug `0x0B60`, name `0B53 0102 FFF0 0002`; +0x4200 gives art codes 0x4D60
+(2x2) / 0x4D53 (2x1). Rendered and read them: the plate says "Pyron", beside
+"Phobos" and "Donovan" in the same sheet. Confirmed the lo long `FFF00002`
+is vs2's own and not a typo for H's `FFE80002` — 2-tile plates normally
+carry xoff -16 and it is H's -24 that is the outlier.
+
+Anchors are HIS OWN (name `0xBE94`, mug `0xBE9C`), not H's: reusing H's
+works single-tenant but collides on the M3b merge. All six cells blank in
+pristine vsav, inside `protected_tiles.json`'s audited pool, absent from
+`protected`/`observed_full_run`, disjoint from D's and H's.
+
+Verified in-emulator and by eye: the gate's section 3 sees the ENGINE stage
+`code=be9c`/`be94` in a real match reached by **walking the wheel onto his
+cell** (new replay 40; press 3 is DR, because the extension rewires 0x08 D
+to Huitzil's cell). Snapshots show the plate reading "Pyron" and his fiery
+mugshot flanking the timer. Byte-attributed vs pyron14: exactly TWO program
+bytes and exactly the SIX anchor tiles differ, in any member.
+
+**Also fixed: `build/manifest/pyron.toml` had not PARSED since fcfe5c7** — a
+comment line lost its leading `#`, so `_minitoml` failed at line 632 and
+pyron14 could not be rebuilt from the tree at all. Found by parsing the
+manifest before editing it. (A rebuild in that commit would have caught it —
+the same lesson as 14z-74's chaining rule, from the other direction.)
+
+**2. THE BLINK — root-caused, frozen, not yet fixed.**
+`tests/test_pyron_blink.sh` + `tools/check_pyron_blink.py` + replay 76 (one
+rig that runs unchanged on both games).
+
+Measured, anchored in-match with both legs PROVEN to hold Pyron (+0x382 =
+0x11), as a **phase-independent** property — distinct palette-row-10 values
+over 40 CONSECUTIVE frames:
+
+| leg | distinct values | frame-to-frame changes |
+|---|---|---|
+| native vsav2 | 1 | 0 |
+| ours (pyron15) | 2 | 39 |
+
+and ours' two values are NAMED: one bit-identical to native's constant, the
+other **vsavj palette-seq row 0x26 (`0x39ADC0`)** under the uploader's
+`0xF000` OR. Writer `PC 0x02AD68`/`0x02AD7C`, alternating source pointers
+(91 writes each). The seq uploads are **purely additive** — ours also
+performs every write native does (`0x1433E`/`0x14190` at 240/144 hits,
+exactly matching native's `0x129B6`/`0x12852`).
+
+**Eliminated, so nobody re-derives them:**
+- NOT the anim nodes — ours `0x0D45C6ff` are byte-identical to vs2
+  `0x2650EC` bar properly relocated pointers. (14z-74 called them correct;
+  this re-confirms it at the RIGHT alignment — see the retraction below.)
+- NOT the seq table content — vsavj row 0x26 == vs2's (table base
+  `0x3B093C`, located by anchoring rows 0x26/0x27, which agree).
+- NOT a dead row — 0x26 is one of only two ids legacy ever requests.
+- NOT misdirection to another row — native animates only stage rows
+  0x00-0x03; no native row carries this 2-state flip.
+
+So the same anim script, the same id and the same data animate on ours and
+not on native. **The open question is what GATES the request** (or selects
+its destination row), not what it contains. Lead: the resolver probe returns
+`RET 0x00FF02DC` with `A6 = 0xFF8400` — issued from a work-RAM thunk on his
+own object's behalf. Compare that site against the native leg.
+
+Subsystem written up in `docs/game/engine_internals.md`, "The palette-
+SEQUENCE uploader" — including the technique that made the native leg
+measurable at all: **a watchpoint on the palette ADDRESS works on both games
+regardless of their different PCs**, so vs2's uploader never had to be found.
+
+**RETRACTION (14z-74's figure, now resolved).** "ours 543 palette-seq calls
+/ native 0" is retracted — its own caveat was right, the hits were in the
+select screen and it compared different screens. Replaced by the table
+above. Corrected at all three sites it had propagated to (STATE, pyron.toml,
+and NEXT_SESSION at rewrite); re-grepped clean.
+
+**New gotcha (cost me several iterations).** `placements.json`'s dst/src is
+a LINEAR map, but the extractor auto-discovers SUB-REGION shifts — mapping
+through it put the anim nodes 0xF00 off and made a faithfully-ported region
+measure **75% differing**, which reads exactly like corruption. Correlate to
+find the true offset before concluding anything about ported data.
+
+**Frozen references all still bit-exact:** donovan-m3a `4b7d0dc7`, m5_stock
+`6c93cfa8`, and huitzil-m2 `9deda080` — the last rebuilt explicitly because
+`effect_tail.json` is shared across tenants.
 
 ## Session 14z-74 — PYRON's render rung OPENED (Steps 0/1/3 landed), and a
 ## GENERATOR BUG found under it
@@ -308,10 +408,15 @@ Demitri/Sasquatch/Q-Bee/Bishamon bit-identical to m1 across 14,621 frames.
   was on screen.
 - **"the effect palette row causes the blink" was WRONG** — removing it did
   not stop the blink.
-- **"ours 543 palette-seq calls vs native 0" is CONFOUNDED** — the hits are
-  in the SELECT screen, where our flow (extended wheel, ported records) is
-  not at the same point as native's on the same frame. Re-measure anchored
-  on screen state before treating it as an attribution.
+- **"ours 543 palette-seq calls vs native 0" was CONFOUNDED — now RETRACTED
+  and REPLACED (14z-75).** The caveat was right: the hits were in the SELECT
+  screen, where our flow is not at the same point as native's on the same
+  frame, so it compared different screens. Re-measured anchored on an
+  in-match state, both legs proven to hold Pyron, as a phase-independent
+  property — distinct palette-row-10 values over 40 CONSECUTIVE frames:
+  **native 1 value / 0 changes, ours 2 values / 39 changes**, with ours' two
+  values NAMED (native's constant, and vsavj palette-seq row 0x26 under the
+  uploader's 0xF000 OR). Frozen by `tests/test_pyron_blink.sh`.
 
 **OPEN on Pyron:** the sprite/HUD BLINK (palette row 10 animated by the
 palette-seq uploader 0x02AD68; his anim nodes are CORRECT, so it is not the

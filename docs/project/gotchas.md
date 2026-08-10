@@ -1623,3 +1623,31 @@ Related blind spot in the same family: `census_regions.py` bails in
 `_redefines_an` on `lea (An,Xn),An` — an INDEX ADD on the destination
 register, where the pointer plainly survives. That single test is why
 Pyron's manifest carried a wrong "0 data_in_code" census line.
+
+## `placements.json`'s dst/src is a LINEAR map, but the extractor
+## auto-discovers SUB-REGION shifts — comparing through it fabricates
+## "the ported data is corrupt" (14z-75)
+
+Checking whether Pyron's anim nodes matched their vs2 source, I mapped ours
+`0x0D45C6` through the covering region row (`dst 0x0D3560, src 0x263186`) and
+got vs2 `0x2641EC`. The bytes disagreed, and the whole region measured **75%
+differing**. That reads exactly like a corrupt port — the nodes had in fact
+been ported faithfully.
+
+The region row records ONE dst/src pair, but `extract_char.py` resolves
+shifts *within* a region (its "auto-discovered region shifts"), so the true
+correspondence drifts from the linear estimate — here by `+0xF00`.
+
+Do this instead: **correlate.** Slide the candidate source across a window
+around the linear estimate and take the offset with the most matching bytes:
+
+    best = max(range(-0x4000, 0x4001),
+               key=lambda sh: sum(ours[A-W//2+i] == vs2[est+sh-W//2+i]
+                                  for i in range(W)))
+
+At the true offset (`0x2650EC`) the two are byte-identical apart from
+properly relocated pointers — 889/1024 matching bytes, and every mismatch a
+pointer field. A structural match that is ~85% bytes with all differences in
+pointer positions is what "correctly ported" looks like; do not read a
+sub-90% figure as corruption until the alignment has been *found* rather
+than assumed.

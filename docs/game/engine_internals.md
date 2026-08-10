@@ -48,7 +48,7 @@ duplicated: `docs/project/cps2_wide.md` (the WIDE profile), `docs/game/atlas/`
 
 
 ## THE DEAD-ROW CLASS — vsav ships table rows as STUBS or ALIASES where
-## vs2/vh2 fill them (named 14z-74; FOUR instances and counting)
+## vs2/vh2 fill them (named 14z-74; FIVE instances and counting)
 
 **The single most common defect shape in this port.** vsav and vs2 share an
 engine, and their per-character / per-state dispatch and data tables are
@@ -69,8 +69,9 @@ correct. One dead row is the whole defect.
 | 2 | sprite-list drawer, type 12 | table has no such type, and can neither grow (entry 0 IS the length) nor move (`(d8,PC,Xn)`) | a composite handler | takeover of the unused list-type 6 (14z-71) |
 | 3 | grab-hold keyframe ptr table `0xBE27A` row 0x10 | ALIAS of row 0x00 (char 0's block) | the tenant's own block | `[[data_port]]` + row repoint (14z-73) |
 | 4 | sub-state jump table `0x18468` entry 81 (Cosmo Disruption) | `0x0006` — a displacement pointing back INTO the table | a real handler | **one word**: repoint to `0x0224`, which already holds vs2's identical 8-byte handler (14z-74) |
+| 5 | in-fight HUD mugshot `0x89884` + name `0x898C4`, rows `0x10-0x1F` | pure ALIASES of `0x00-0x0F` (both tables) | rows 0x10/0x11/0x13 filled for H/Pyron/Donovan | three tenant-gated pokes + place the art at free-pool anchors (14z-63/75) |
 
-**Diagnostic recipe** (all four were found this way):
+**Diagnostic recipe** (all five were found this way):
 1. Find the table and the index the tenant drives it with (a breakpoint on
    the dispatcher, or the crash PC).
 2. Read the SAME row in vs2/vh2. If vs2 has a real target where vsav has a
@@ -592,6 +593,51 @@ medallion recolor; future Huitzil/Pyron rows) surfaces in this buffer
 during fades in LEGACY replays. Handled by the third masked window
 (tests/lib/m2a_common.sh M2A_MASK + docs/game/atlas/ram.md; pending
 maintainer ratification, STATE 14z-49b).
+
+### The palette-SEQUENCE uploader (14z-75, measured on the Pyron blink)
+
+A second, separate path writes `90C000` — not the fade buffer above, and
+not the match-start palette load. **Read this before attributing any
+"his colours flicker/blink" symptom on a ported character.**
+
+- **Resolver** `PRG:0x02AD82`: `a0 = 0x39A900 + (d0 & 0xFFF) * 0x20`, i.e.
+  a global table of 0x20-byte palette rows indexed by a *sequence id* in
+  `d0`. Table base `0x39A900`; vs2's twin is `0x3B093C` (located by
+  anchoring rows 0x26/0x27, which agree).
+- **Uploader** `PRG:0x02AD68` (row start) and `0x02AD7C` (row+0x10) copy
+  the resolved row into palette RAM, applying `0xF000` — a stored
+  `0x0RGB` becomes a palette-RAM `0xFRGB`. Do not expect to find a
+  palette-RAM value verbatim in the ROM; search for it with the top
+  nibble of each even byte cleared.
+- **It is driven by the ANIM SCRIPT**, node by node: `a0` walks the
+  0x18 anim-node stride, `a6` is the requesting object's fighter block.
+  So a palette sequence is *animation data*, not a per-character palette
+  table row — which is why a character can request one continuously.
+- **Legacy only ever requests ids `{0x26, 0x27}`** — frozen by
+  `tests/audit_palette_seq_ids.sh`, and that audit is the ONLY guard on
+  this path, because it never transits work RAM and so is invisible to
+  every RAM gate.
+
+**The Pyron instance (OPEN).** His palette row 10 — shared by his sprite
+AND his in-match HUD mugshot, which is why both blink — alternates every
+frame between his own palette and seq row `0x26`; native holds it
+constant. The uploads are **purely additive**: ours performs every write
+native does (`0x1433E`/`0x14190`, 240/144 hits, exactly matching native's
+`0x129B6`/`0x12852`) *plus* 91+91 alternating seq writes. Eliminated:
+his anim nodes (byte-identical to vs2 `0x2650EC` bar relocated pointers),
+the seq row's content (vsavj `0x39ADC0` == vs2's), a dead row (0x26 is
+live in legacy), and row misdirection (native animates only stage rows
+0x00-0x03). So the same script, id and data animate on ours and not
+native; the open question is what **gates** the request. Gate + rig:
+`tests/test_pyron_blink.sh`, replay 76.
+
+**Measuring this path at all:** a watchpoint on the palette ADDRESS works
+on both games regardless of their different PCs (`WATCH=90c140,20,w`),
+which is how the native leg was measured without first finding vs2's
+uploader. Compare legs by a PHASE-INDEPENDENT property (distinct values
+over N consecutive frames), never frame-indexed — the two games are not
+on the same frame, and a frame-indexed diff produced a confounded figure
+that stood for a whole session (STATE 14z-74/75 retraction).
 
 ## Sound subsystem: the QSound command path (session 14z-51, measured)
 
