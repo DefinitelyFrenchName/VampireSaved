@@ -826,12 +826,15 @@ march_retarget_mid = true
 # CLAUDE.md §1: "A change that improves the new characters but perturbs one
 # byte of legacy behavior is a failed change." Reverting is not optional.
 #
-# CONSEQUENCE: the Cosmo Disruption CRASH is OPEN again. It needs a fix built
-# on the REAL mechanism — find what actually dispatches Pyron's sub-state,
-# and gate any repoint on the tenant id so legacy cannot reach it. Whatever
-# replaces this must prove deadness on a replay that EXERCISES the
-# neighbouring code (05_timeout_idle does; 02 does not), and must pass
-# tests/run_suite.sh, not just a tenant-scoped gate.
+# RESOLVED, same session: withdrawing this word DID reopen the crash (rig 72:
+# pyron18 resets at f3650, pyron17 does not) — so the 14z-74 word genuinely
+# worked, it was simply the wrong byte. The crash is now FIXED in Pyron's OWN
+# DATA by the `port_patch` at the end of this file: his sub-state index 81 is
+# out of range for vsavj's 80-entry dispatch table, so it is retargeted to 79
+# (vs2 0x0D0C7F, region hitbox_proj), an in-range entry that already reaches
+# the same handler. One byte, unreachable by legacy. See that block.
+# Do NOT restore the word below — `tests/test_pyron_cosmo.sh` fails if it
+# comes back.
 
 # ══ 14z-75 THE SPRITE/HUD BLINK — ROOT-CAUSED, and it is a DEAD ROW ═══════
 #
