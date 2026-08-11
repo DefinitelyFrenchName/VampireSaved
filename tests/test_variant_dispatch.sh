@@ -35,8 +35,26 @@ trap 'rm -rf "$WORK"' EXIT
 fail=0
 
 BUILD="${1:-build/pyron17}"
-TENANT="${2:-0x11}"
 case "$BUILD" in /*) ;; *) BUILD="$REPO/$BUILD" ;; esac
+# THE TENANT COMES FROM THE BUILD, not from a default (14z-78).
+# It used to be `${2:-0x11}`, so `test_variant_dispatch.sh build/hui27` swept a
+# HUITZIL build while judging PYRON's id — reporting three "spurious inherited
+# routines" that belong to no tenant on that build, and hiding the fact that
+# Phobos' real answer is ONE row. A gate that silently answers a different
+# question than the one its caller asked is worse than no gate.
+# Every build writes its own id to patch/tenant.json, so ask it. An explicit
+# second argument still wins, for sweeping a build at an id it does not carry.
+TENANT="${2:-}"
+if [ -z "$TENANT" ] && [ -f "$BUILD/patch/tenant.json" ]; then
+    TENANT="$(python3 -c "import json,sys;print(hex(json.load(open(sys.argv[1]))['id']))" \
+              "$BUILD/patch/tenant.json" 2>/dev/null || true)"
+fi
+if [ -z "$TENANT" ]; then
+    echo "FAIL: no tenant id — $BUILD has no patch/tenant.json and none was"
+    echo "      given. Refusing to guess: a wrong id makes this gate report on"
+    echo "      a character the build does not back."
+    exit 1
+fi
 OPIMG="$BUILD/verify_op.bin"
 [ -f "$OPIMG" ] || { echo "FAIL: no $OPIMG"; exit 1; }
 
