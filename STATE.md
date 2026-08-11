@@ -696,6 +696,40 @@ native figure.
    dismissed a live defect, which is exactly the confident pruning that hid
    Plasma Trap.
 
+### DONOVAN'S 15 CANDIDATES ARE CLEARED — by a NEGATIVE result that is
+### actually conclusive, and here is why
+
+Maintainer swept Donovan's full movelist: no crashes, no resets, no visible or
+mechanical defects. Normally a negative playtest result is weak evidence. Here
+it is strong, and the reason is structural.
+
+**Each out-of-range entry has a FIXED consequence, derivable statically:**
+
+| entry | reads | target | consequence |
+|---|---|---|---|
+| 80 | `0x323B` | `0x01B6A3` ODD | vec3 crash — **LOUD** |
+| 81 | `0x0006` | `0x01846E` = table+6 | executes the TABLE AS CODE -> watchdog reset — **LOUD** |
+| 82 | `0x4EFB` | `0x01D363` ODD | vec3 crash — **LOUD** |
+| 83 | `0x1002` | `0x01946A` real code | runs the WRONG ROUTINE — **SILENT** |
+
+Entry 81 independently reproduces the Cosmo record ("`0x0006` — a displacement
+pointing back INTO the table"), which is a control on this derivation.
+
+**Donovan's 15 candidates sit at entries 80, 81 and 82 — every one LOUD.** A
+live one could not have been missed by eye. So the sweep clears them: they are
+dead records, or those words are not indices. The static list could not
+distinguish them; the loudness analysis plus one playtest can.
+
+**The same reasoning does NOT clear Phobos.** His remaining candidate is entry
+83, the only SILENT one — no crash, no reset, just a wrong routine. A playtest
+cannot clear it, which is exactly why the instrument matters there and nowhere
+else.
+
+**Method worth keeping: classify the CONSEQUENCE before valuing the evidence.**
+"No crash" means everything for a loud entry and nothing for a silent one. The
+same negative result had completely different weight for the two tenants, and
+only the static consequence table says which.
+
 ### (b') DESIGN, MAINTAINER-APPROVED FOR THE FULL WINDOW — not yet written
 
 Maintainer approved (b') covering entries 80-83. Design is settled; the
