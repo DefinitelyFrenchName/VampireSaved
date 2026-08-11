@@ -1419,6 +1419,50 @@ draws a companion's shadow is NOT this servant path. The remaining
 child-companion shadow item is attributed instead to the bank-0 piece
 family (uniform -0x16A8 tile-code delta, bank word 0 vs 3).
 
+### THE DARK FORCE PALETTE-SEQUENCE BLOCKS — measured census (14z-79b)
+
+Which palette-seq ids does each character request in Dark Force? Measured on
+**vanilla vsavj**, one MAME run per character, `$FF802E`=1 asserted on every
+row (`tests/audit_palette_seq_ids.sh`, `CHARS="..."`). This is the input to any
+future "give a tenant his own block" work, and it is a MEASUREMENT because the
+static route does not work — see the warning below.
+
+| ids | owner |
+|---|---|
+| `0x1E-0x21` | **Bulleta `0x00`** |
+| `0x26`, `0x27` | Demitri `0x01` |
+| `0x44-0x47` | Zabel `0x04` |
+| `0x6F-0x72` | Bishamon `0x08` **and** Oboro Bishamon `0x18` (same block) |
+| `0x264-0x267` | Q-Bee `0x0C` |
+| `0x29C-0x2A0` | `0x12` — **five ids, not four** |
+| none | Gallon `0x02`, Victor `0x03`, Morrigan `0x05`, Felicia `0x07`, Aulbath `0x09`, Sasquatch `0x0A`, Lei-Lei `0x0D`, Lilith `0x0E`, Jedah `0x0F` |
+
+**NOT MEASURED: Anakaris `0x06`.** Two attempts, both `$FF802E`=0 — the rig
+never entered Dark Force for him, so his zero is a fact about the RIG. (`0x0B`
+is also unmeasured and is not a character — Shadow/Marionette machinery.)
+
+**STRONG INFERENCE, NOT A MEASUREMENT:** the routines hardcode seven base
+constants — `0x1E 0x26 0x44 0x6F 0xAA 0x264 0x29C` (e.g. `0640 001e` at
+`0x02a92c`). Six have measured owners above. The seventh, **`0xAA`, has no
+measured owner and Anakaris is the one character not measured**, so `0xAA-0xAD`
+is very probably his. Treat it as OCCUPIED until someone reaches his DF.
+
+**WHY THIS CANNOT BE DERIVED FROM TABLE `0x02A8A4`.** The obvious model — row
+per character, each pointing at a routine with one hardcoded base — is WRONG.
+Rows `0x02-0x07`, `0x09`, `0x0D-0x0F` all hold `0x0040` and reach the SAME
+routine at `0x02a8e4`, yet `0x04` requests `0x44-0x47` and `0x02/0x03/0x05/0x07`
+request nothing. That routine is conditional (`cmp.b (0x14f,a6),d0 / bne.w
+0x030ee8`) and at least some ids arrive by another path entirely. A static
+reading of the table produces a confident and wrong map.
+
+**ADDRESSING LIMIT for anyone allocating a block.** The resolver is
+`a0 = 0x39A900 + (d0 & 0x0FFF) * 0x20`, so the reachable window is
+`0x39A900-0x3BA8E0` — a block cannot live in `wide_ext`. And "no character
+requests id N" is NOT sufficient to call row N free: those bytes may belong to
+another structure entirely. Establish what the bytes ARE, not just that nobody
+asked for them — the 14z-69 row satisfied "nobody asked" on a sample that
+could not ask.
+
 ## The SUB-STATE DISPATCHER FAMILY at 0x018460 (14z-79)
 
 Three sibling dispatchers sit back-to-back and share ONE handler pool. All are

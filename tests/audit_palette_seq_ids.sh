@@ -76,9 +76,15 @@ done
 # read 1, or the run is reported as NOT-DF and the audit fails rather than
 # quietly contributing a non-DF sample (that is exactly how phase A lied).
 DFRPL="tests/replays/hui/85_hui_df_vs2.rpl"
+NODF=""
 echo
 echo "  -- phase B: Dark Force forced (the half phase A cannot reach) --"
-for ch in 00 01 03 04; do
+# CHARS overrides the sweep set. The default four are the cheap regression
+# set (Bulleta 0x00 owns 0x1E-0x21, Demitri 0x01 owns 0x26, Victor 0x03 has no
+# DF palette path at all, char 0x04 owns 0x44-0x47). Pass the full roster when
+# you need the FREE-BLOCK census — e.g. before giving a tenant his own block:
+#   CHARS="00 01 02 03 04 05 06 07 08 09 0a 0b 0c 0d 0e 0f" tests/audit_palette_seq_ids.sh
+for ch in ${CHARS:-00 01 03 04}; do
     [ -f "$DFRPL" ] || break
     d="$W/df$ch"; mkdir -p "$d"
     PKD="1400:ff8782:$ch;1450:ff8782:$ch;1500:ff8782:$ch;1400:ff8b82:03;1450:ff8b82:03;1500:ff8b82:03;3100:ff8509:03;3120:ff8509:03"
@@ -103,10 +109,13 @@ print(best)")
     ids=$(grep '^PROBE' "$d/g.log" 2>/dev/null \
           | sed -n 's/.*D0=00000*\([0-9a-f]*\).*/\1/p' | sort -u)
     if [ "$dfon" != "1" ]; then
-        printf "  char 0x%-4s NOT IN DARK FORCE (\$FF802E=%s) — rig failed\n" "$ch" "$dfon"
-        echo "FAIL: a phase-B run did not enter Dark Force; its zero is a fact"
-        echo "      about the RIG, not about the engine. Fix the rig, not this."
-        exit 1
+        # Report and CONTINUE, but remember it: a char that never entered DF
+        # contributes nothing and must not be silently counted as "clean".
+        # (0x0B is not a character — it is Shadow/Marionette machinery — so a
+        # full-roster census is expected to have at least one of these.)
+        printf "  char 0x%-4s NOT IN DARK FORCE (\$FF802E=%s) — CONTRIBUTES NOTHING\n" "$ch" "$dfon"
+        NODF="$NODF $ch"
+        continue
     fi
     echo "$ids" >> "$W/ids.txt"
     printf "  char 0x%-4s %6s calls   DF=on   ids: %s\n" "$ch" "$n" "$(echo $ids)"
@@ -140,6 +149,14 @@ if [ -n "$bad" ]; then
     echo "  ok: no manifest writes those rows"
 fi
 echo
+if [ -n "$NODF" ]; then
+    echo
+    echo "  INCOMPLETE: these chars never entered Dark Force:$NODF"
+    echo "  Their ids are NOT in the union below. A block that looks free may"
+    echo "  simply belong to one of them — do NOT treat this census as a"
+    echo "  free-block proof until every character is accounted for."
+    exit 1
+fi
 echo "PASS: palette-seq id inventory taken WITH Dark Force (phase B controlled"
 echo "      on \$FF802E). Union: $UNION"
 echo "      Any tenant palette-seq block must avoid every id listed above."

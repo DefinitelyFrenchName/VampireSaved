@@ -51,9 +51,16 @@ vanilla offset**.
    fragment covers ~30% of shared writes by exact address.)
 2. **Phobos' own palette-seq block** — the proper fix for his Dark Force. Free
    4-row id block + a copy of Bulleta's routine with that base + `0x02A8A4` row
-   0x10 repointed. Start from the rebuilt audit's inventory
-   (`1e 1f 20 21 26 27 44 45 46 47`), but note it is a **4-character sample** —
-   "free" must be established across all 18 before anything is written.
+   0x10 repointed. **The full-roster census is DONE (14z-79b)** — see
+   `docs/game/engine_internals.md` "THE DARK FORCE PALETTE-SEQUENCE BLOCKS".
+   Occupied: `0x1E-0x21` (Bulleta), `0x26/0x27` (Demitri), `0x44-0x47` (Zabel),
+   `0x6F-0x72` (Bishamon + Oboro), `0x264-0x267` (Q-Bee), `0x29C-0x2A0` (0x12,
+   five ids), and very probably `0xAA-0xAD` (Anakaris — the one unmeasured
+   character and the one hardcoded base with no owner; treat as occupied).
+   TWO CAVEATS BEFORE ALLOCATING: the resolver masks to 12 bits, so a block
+   must live inside `0x39A900-0x3BA8E0` and CANNOT go in `wide_ext`; and
+   "nobody requests id N" does not make row N free — establish what those bytes
+   ARE. The 14z-69 row passed "nobody asked" on a sample that could not ask.
 3. **Pyron's Zodiac Fire has no rig** (236+P, ES 236+2P) — guard-cancel only,
    so it is ours to build, and it is the last unswept move of the three
    movelists.
