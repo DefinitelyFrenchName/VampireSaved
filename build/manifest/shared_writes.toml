@@ -1,0 +1,244 @@
+# shared_writes.toml — THE FROZEN SHARED-SURFACE WRITE INVENTORY (14z-79)
+#
+# Every build op that lands OUTSIDE declared free space and OUTSIDE a known
+# variant row (0x10-0x1F of a bank_map per-character table) is listed here,
+# per tenant. `tests/test_shared_writes.sh` fails on any addition, removal or
+# change.
+#
+# WHY THIS EXISTS. `tests/test_hui_ladder.sh` already requires every op to
+# write free space or a variant row — but it runs stages 1-3, and the row that
+# broke Bulleta was stage 4:
+#
+#     data_port df_palette_seq_rows -> vsavj 0x39ACC0, 0x80 bytes
+#
+# Those are palette-seq ids 0x1E-0x21, BULLETA'S Dark Force block. It shipped
+# in 14z-69 and rendered a LEGACY character wrong for ten sessions, invisible
+# to every RAM gate because the palette path never transits work RAM. Nothing
+# failed, because the invariant that names that class stopped one stage short.
+# `tools/audit_shared_writes.py` flags exactly that write on build/hui27 —
+# the instrument's positive control.
+#
+# WHAT A GREEN RUN MEANS, precisely: the set of writes onto vanilla-readable
+# bytes is UNCHANGED since it was last reviewed. It does NOT mean the writes
+# are safe. An entry frozen without checking whose bytes it lands on stays
+# wrong and green — which is what would have happened to the DF row. When this
+# gate fails, the work is to establish WHOSE bytes the new write touches, not
+# to re-freeze until it passes.
+#
+# THE CLASSES currently present (all three tenants):
+#   * `site_thunk` engine sites — 6 bytes of `jmp`/`jsr` at a hooked engine
+#     address. Justified per row in the manifest that declares them.
+#   * select-wheel roster21: TABLE B cursor-navigation rows (3 new rows + 5
+#     inbound edges from existing cells — required for the appended cells to
+#     be reachable) and two march mid-row retargets. Gated by
+#     `tests/test_select_wheel.sh`, which walks all 128 (cell,direction) pairs
+#     in MAME.
+#   * select record-array rows (0x2672xx/0x2675xx/0x268xxx) — the tenant's own
+#     rows of 32-row arrays that bank_map does not declare, so the variant-row
+#     check cannot see them. Gated by `tests/test_select_arrays.sh`.
+#   * palette pointer-table variant halves (0x38c1d8 / 0x38c258) — row 0x10/
+#     0x11 of the 32-row sprite/effect palette pointer tables. Gated by
+#     `tests/test_effect_palette_table.sh`.
+#   * `data_port` pointer-table rows (e.g. 0xbe2ba row 0x10) — a variant row of
+#     a table bank_map does not declare.
+#   * `code_word` / `obj_hook` engine words, each justified in its manifest row.
+#
+# Regenerate a tenant's list after a REVIEWED change:
+#   python3 tools/audit_shared_writes.py build/<dir> | tail -n +2
+
+[[tenant]]
+name = "donovan"
+build = "build/m5_wide"
+count = 67
+writes = [
+  "0x018458 6 code",
+  "0x0185ca 6 code",
+  "0x01c586 6 code",
+  "0x01c59a 6 code",
+  "0x021224 8 data",
+  "0x02122c 8 data",
+  "0x02123c 8 data",
+  "0x021264 8 data",
+  "0x02126c 8 data",
+  "0x02127c 8 data",
+  "0x023ad8 6 code",
+  "0x023ade 6 code",
+  "0x0282fa 2 code",
+  "0x028d4e 2 data",
+  "0x028d50 4 data",
+  "0x02a7c8 6 code",
+  "0x02ad82 6 code",
+  "0x02ad94 6 code",
+  "0x02b342 6 code",
+  "0x02b598 6 code",
+  "0x02b7d8 6 code",
+  "0x02b7e8 6 code",
+  "0x054470 6 code",
+  "0x05e542 6 code",
+  "0x05f146 6 code",
+  "0x05f1b6 6 code",
+  "0x05f24c 2 code",
+  "0x05f24e 2 code",
+  "0x05f328 6 code",
+  "0x05f8b2 6 code",
+  "0x05f9d0 6 code",
+  "0x05fb22 4 code",
+  "0x05fb26 4 code",
+  "0x05fb2e 4 code",
+  "0x05fce0 6 code",
+  "0x06c0e0 6 code",
+  "0x08459c 2 code",
+  "0x0845ec 6 code",
+  "0x0845f8 6 code",
+  "0x084602 6 code",
+  "0x084624 6 code",
+  "0x0898aa 2 poke16",
+  "0x08995c 4 poke32",
+  "0x089960 4 poke32",
+  "0x0be2c6 4 poke32",
+  "0x2672f6 4 poke32",
+  "0x267376 4 poke32",
+  "0x2673f6 4 poke32",
+  "0x267476 4 poke32",
+  "0x2674f6 4 poke32",
+  "0x2675f6 4 poke32",
+  "0x267676 4 poke32",
+  "0x2689fe 4 poke32",
+  "0x268a42 4 poke32",
+  "0x268a46 4 poke32",
+  "0x268a4e 4 poke32",
+  "0x268ac2 4 poke32",
+  "0x268ac6 4 poke32",
+  "0x268ace 4 poke32",
+  "0x268b42 4 poke32",
+  "0x268b46 4 poke32",
+  "0x268b4e 4 poke32",
+  "0x38c1e4 4 poke32",
+  "0x38c264 4 poke32",
+  "0x3a3ac0 32 data",
+  "0x3a3b20 32 data",
+  "0x3a3b40 32 data",
+]
+
+[[tenant]]
+name = "huitzil"
+build = "build/hui29"
+count = 59
+writes = [
+  "0x018460 6 code",
+  "0x01b6aa 6 code",
+  "0x021224 8 data",
+  "0x02122c 8 data",
+  "0x02123c 8 data",
+  "0x021264 8 data",
+  "0x02126c 8 data",
+  "0x02127c 8 data",
+  "0x022a0e 6 code",
+  "0x0282f4 2 code",
+  "0x028386 6 code",
+  "0x028d4e 2 poke16",
+  "0x028d50 2 poke16",
+  "0x028d52 2 poke16",
+  "0x02b598 6 code",
+  "0x02b7d8 6 code",
+  "0x054470 6 code",
+  "0x05e542 6 code",
+  "0x05e7d6 6 code",
+  "0x05f146 6 code",
+  "0x05f1b6 6 code",
+  "0x05f240 2 code",
+  "0x05f242 2 code",
+  "0x05f328 6 code",
+  "0x05f8b2 6 code",
+  "0x05fb22 4 code",
+  "0x05fb26 4 code",
+  "0x05fb2e 4 code",
+  "0x05fce0 6 code",
+  "0x060ef0 6 code",
+  "0x06c0e0 6 code",
+  "0x080aec 4 code",
+  "0x08245c 6 code",
+  "0x0898a4 2 poke16",
+  "0x089944 4 poke32",
+  "0x089948 4 poke32",
+  "0x0be2ba 4 poke32",
+  "0x2672ea 4 poke32",
+  "0x26736a 4 poke32",
+  "0x2673ea 4 poke32",
+  "0x26746a 4 poke32",
+  "0x2674ea 4 poke32",
+  "0x2675ea 4 poke32",
+  "0x26766a 4 poke32",
+  "0x2689fe 4 poke32",
+  "0x268a42 4 poke32",
+  "0x268a46 4 poke32",
+  "0x268a4e 4 poke32",
+  "0x268ac2 4 poke32",
+  "0x268ac6 4 poke32",
+  "0x268ace 4 poke32",
+  "0x268b42 4 poke32",
+  "0x268b46 4 poke32",
+  "0x268b4e 4 poke32",
+  "0x38c1d8 4 poke32",
+  "0x38c258 4 poke32",
+  "0x3a3ac0 32 data",
+  "0x3a3b20 32 data",
+  "0x3a3b40 32 data",
+]
+
+[[tenant]]
+name = "pyron"
+build = "build/pyron20"
+count = 50
+writes = [
+  "0x021224 8 data",
+  "0x02122c 8 data",
+  "0x02123c 8 data",
+  "0x021264 8 data",
+  "0x02126c 8 data",
+  "0x02127c 8 data",
+  "0x0282f6 2 code",
+  "0x02a8c6 2 code",
+  "0x02b598 6 code",
+  "0x02b672 2 code",
+  "0x02b7d8 6 code",
+  "0x054470 6 code",
+  "0x05e542 6 code",
+  "0x05f146 6 code",
+  "0x05f1b6 6 code",
+  "0x05f244 2 code",
+  "0x05f246 2 code",
+  "0x05f328 6 code",
+  "0x05f8b2 6 code",
+  "0x05fb22 4 code",
+  "0x05fb26 4 code",
+  "0x05fb2e 4 code",
+  "0x05fce0 6 code",
+  "0x06c0e0 6 code",
+  "0x0737b2 2 code",
+  "0x0898a6 2 poke16",
+  "0x08994c 4 poke32",
+  "0x089950 4 poke32",
+  "0x2672ee 4 poke32",
+  "0x26736e 4 poke32",
+  "0x2673ee 4 poke32",
+  "0x26746e 4 poke32",
+  "0x2674ee 4 poke32",
+  "0x2675ee 4 poke32",
+  "0x26766e 4 poke32",
+  "0x2689fe 4 poke32",
+  "0x268a42 4 poke32",
+  "0x268a46 4 poke32",
+  "0x268a4e 4 poke32",
+  "0x268ac2 4 poke32",
+  "0x268ac6 4 poke32",
+  "0x268ace 4 poke32",
+  "0x268b42 4 poke32",
+  "0x268b46 4 poke32",
+  "0x268b4e 4 poke32",
+  "0x38c1dc 4 poke32",
+  "0x38c25c 4 poke32",
+  "0x3a3ac0 32 data",
+  "0x3a3b20 32 data",
+  "0x3a3b40 32 data",
+]

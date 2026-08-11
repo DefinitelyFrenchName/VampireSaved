@@ -36,27 +36,30 @@ vanilla offset**.
 
 ## Open, in rough priority order
 
-1. **Extend the op invariant to stage 6** (`tests/test_hui_ladder.sh` runs
-   stages 1-3 only). It already encodes the right rule — every op writes
-   declared free space or a VARIANT ROW — and the row that broke Bulleta wrote
-   a BASE row at stage 4. With an explicit allowlist for justified shared
-   writes, this catches the whole class for every tenant at build time. Measured
-   exposure today: 60 of 260 ops write shared surface; most are legitimate
-   hooks.
-2. **Attribute six undocumented shared writes** at `0x0212xx` (8 bytes each,
-   character-id lists containing 0x10/0x11/0x13). Not in any manifest, patch
-   note, or declared bank_map table.
-3. **Phobos' own palette-seq block** — the proper fix for his Dark Force. Free
+1. ~~Extend the op invariant to stage 6~~ **DONE (14z-79b):
+   `tests/test_shared_writes.sh` + `tools/audit_shared_writes.py` +
+   `build/manifest/shared_writes.toml`.** Every write landing outside declared
+   free space and outside a known variant row is now frozen per tenant
+   (donovan 67 / huitzil 59 / pyron 50) and any change fails the gate.
+   Ground-truthed: it flags the withdrawn DF-palette write on `build/hui27`.
+   **Read its honest limit before trusting a green run** — it proves the set is
+   UNCHANGED SINCE REVIEWED, not that the writes are safe; an entry frozen
+   without checking whose bytes it lands on stays wrong and green. NOT done,
+   and worth doing: tagging each op with its emitting mechanism in the
+   generator, which would let the gate say WHAT a new write is, not just that
+   it appeared. (Post-hoc attribution does not work — measured, the atlas
+   fragment covers ~30% of shared writes by exact address.)
+2. **Phobos' own palette-seq block** — the proper fix for his Dark Force. Free
    4-row id block + a copy of Bulleta's routine with that base + `0x02A8A4` row
    0x10 repointed. Start from the rebuilt audit's inventory
    (`1e 1f 20 21 26 27 44 45 46 47`), but note it is a **4-character sample** —
    "free" must be established across all 18 before anything is written.
-4. **Pyron's Zodiac Fire has no rig** (236+P, ES 236+2P) — guard-cancel only,
+3. **Pyron's Zodiac Fire has no rig** (236+P, ES 236+2P) — guard-cancel only,
    so it is ours to build, and it is the last unswept move of the three
    movelists.
-5. `80_pyron_cosmo_pairsweep.rpl` still resets at f4840 — independent, real,
+4. `80_pyron_cosmo_pairsweep.rpl` still resets at f4840 — independent, real,
    low priority.
-6. Polish the three NEW select medallions and their selection ring: imperfect
+5. Polish the three NEW select medallions and their selection ring: imperfect
    shapes, slightly shifted placement, correct portraits at correct locations.
    Cosmetic, maintainer-described as **polish, not rework**.
 
@@ -65,7 +68,7 @@ vanilla offset**.
 `tests/test_variant_dispatch.sh` FAILS on table `0x02a8a4` row 0x10
 (`ours 0x004a`, vs2 `0x0040`). **That is a real defect**, not noise: it is the
 aliased row that puts Phobos on Bulleta's palette routine, and it is what made
-14z-69p overwrite her Dark Force block. It stays red until item 3 lands. It had
+14z-69p overwrite her Dark Force block. It stays red until item 2 lands. It had
 been red since 14z-74 and was recorded as "benign — 0 hits at the resolver";
 that zero came from replays in which nobody activated Dark Force.
 

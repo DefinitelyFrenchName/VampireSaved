@@ -65,6 +65,13 @@ tests/test_thunk_addr_literal.sh
 # dispatch, the very class the thunk removes. This re-derives every byte from
 # the reference ROMs. Cheap, no emulator; SKIPs without a Huitzil build.
 tests/test_index_window_thunk.sh
+# 14z-79: the frozen SHARED-SURFACE WRITE inventory. test_hui_ladder.sh
+# already requires every op to write free space or a variant row, but it
+# runs stages 1-3 and the row that broke Bulleta was stage 4. This lists
+# every write onto vanilla-readable bytes, per tenant, and fails on any
+# change — turning the next one into a build-time review instead of a
+# playtest ten sessions later. Static, no emulator, seconds.
+tests/test_shared_writes.sh
 # The M3a select-records mechanism (14z-62): a variant-id build must carry
 # the tenant's OWN select records and the host's must be vanilla bytes.
 # Builds its own 0x13 scratch build and measures the row fetch in MAME, so

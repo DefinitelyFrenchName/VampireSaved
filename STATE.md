@@ -251,9 +251,16 @@ Two classes are worth attributing:
   medallions and their selection ring have imperfect shapes and slightly
   shifted placement with correct portraits at the correct locations —
   **polish, not rework.**
-* six 8-byte `data` writes at `0x0212xx` carrying character-id lists including
-  0x10/0x11/0x13 — **undocumented**: not in the manifest, not in the patch
-  notes, not in any declared bank_map table. Attribute them.
+* ~~six 8-byte `data` writes at `0x0212xx`~~ **ATTRIBUTED, not undocumented —
+  my claim was wrong (corrected same session).** They are the select wheel's
+  TABLE B (cursor navigation): "28 bytes over 3 new rows + 5 inbound edges".
+  The patch note anchors at the table BASE `0x0211e4`, not at each written
+  row, which is why an exact-address match missed it. Modifying existing
+  cells' inbound edges is REQUIRED for the appended cells to be reachable,
+  and it is already gated by `tests/test_select_wheel.sh` (a generated walk
+  over all 128 cell/direction pairs, measured in MAME). **All 59 shared-surface
+  ops on the frozen build are attributed.** Lesson: attribute an op by the
+  emitter's note ANCHOR, not by matching its own address.
 
 **RECOMMENDED NEXT GATE: extend the op invariant to stage 6** with an explicit
 allowlist where a shared write is justified. That converts "the host character
