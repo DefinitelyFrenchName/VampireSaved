@@ -556,6 +556,65 @@ of it is a structural change that wants a fresh context and incremental
 fingerprint checks, not the tail of a long session. The classification above is
 the design; executing it is the next slice.
 
+### PLASMA TRAP FIX: NOT a free retarget like Cosmo — MAINTAINER DECISION
+
+The Cosmo fix worked because entry 81's handler COPIES a byte
+(`move.b (0x17,A3),(0x54,A1); rts`) and 45 in-range vsavj entries do the same,
+including 79. Phobos' entry 82 is a different shape:
+
+```
+vs2 entry 82 handler @0x016FEC:  137c 0052 0054 4e75
+                                 move.b #$52,(0x54,A1) ; rts
+```
+
+It writes the LITERAL class **0x52**. vsavj's 80 entries only ever write
+classes 0x00-0x4F, so **no in-range entry has that handler** and the one-byte
+retarget Cosmo used is not available.
+
+**Method note — offsets are NOT comparable between the ROMs.** Matching vs2
+entry 82's table offset against vsavj's produced "entry 36", which is a
+coincidence: **0 of the 80 shared entries have equal offset values**, because
+the handlers sit at different addresses in the two code layouts. Handlers must
+be matched by CODE. Control: doing so re-finds Cosmo's answer (vsavj 79 is
+among the 8-byte matches for vs2 entry 81); at 16 bytes it correctly finds
+nothing, because these handlers are 8 bytes and the next 8 belong to the
+following one.
+
+**What 0x52 means.** It is a HIT CLASS, in the 0x4E-0x53 range vs2 added for
+the newcomers' moves. `huitzil.toml:807` records vs2's mapping:
+0x4E-0x53 -> property 0F/1B/1F/19/0F/03, so **class 0x52 -> property 0x0F**.
+
+**Three in-range entries are property-equivalent:**
+
+| entry | writes class | property |
+|---|---|---|
+| 6 | 0x06 | 0x0F |
+| 7 | 0x07 | 0x0F |
+| 56 | 0x06 | 0x0F |
+
+**DO NOT SHIP THAT WITHOUT SIGN-OFF, and the reason is on the record.** 14z-28
+withdrew exactly this kind of remap: "the class byte feeds THREE consumers (on-
+hit reaction property, the death path re-read, per-victim aura effect-row) and
+no native class satisfies all three" — remapping 0x4E to 0x04 stopped a crash
+and BROKE THE MOVE. Property equivalence covers ONE of the three consumers.
+Cosmo's own manifest carries the same caveat for a change of 81->79; this one
+is 0x52->0x06, a much bigger jump in the value the fighter block records.
+
+**Options, for the maintainer:**
+- **(a)** retarget Phobos' index 82 -> 6 (or 7/56) in HIS data, one byte, and
+  playtest the reaction. Cheapest, ratified pattern, but only the first of the
+  three consumers is verified equivalent.
+- **(b)** port a handler that writes 0x52 and reach it from an in-range entry
+  that is provably dead in vanilla. Preserves the class byte exactly, costs a
+  dead-entry deadness proof (the `audit_effect_class_rows.sh` pattern).
+- **(c)** leave the move broken and gate it out until after the merge.
+
+Recommendation: **(b)** if a dead in-range entry exists — it is the only option
+that keeps all three consumers seeing the value vs2 gives them; fall back to
+(a) with a targeted playtest of the move's hit reaction if not. Either way the
+remaining work is a DEADNESS measurement plus a playtest, not more static
+analysis.
+
 ### 14z-78c/d — the merged manifest is CLEAN, and the loop's last unknown found
 
 **78c: `--extract` is repeatable and PAIRS with `--port`.** Much smaller than
