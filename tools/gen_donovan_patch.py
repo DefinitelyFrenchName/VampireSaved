@@ -609,6 +609,14 @@ def main():
     # and no manifest row changes. Default preserved exactly.
     ap.add_argument("--port", type=Path, action="append", dest="port",
                     help="port manifest; repeat once per tenant")
+    # REPEATABLE, AND PAIRED WITH --port (M3b, 14z-78c). Each tenant has its
+    # OWN extraction — regions.json plus the region_*.bin blobs — so a
+    # multi-tenant build needs one extract dir per manifest, in the same
+    # order. The positional stays the FIRST tenant's extraction, which is what
+    # keeps every existing invocation (and the frozen references) unchanged.
+    ap.add_argument("--extract", type=Path, action="append", dest="extract",
+                    help="additional tenant's extract dir; repeat in the same "
+                         "order as --port (the positional is the first)")
     ap.add_argument("--recon", type=Path,
                     default=root / "build/manifest/reconciliation.toml")
     ap.add_argument("--bank-map", type=Path,
@@ -636,11 +644,28 @@ def main():
     out = args.out_dir
     out.mkdir(parents=True, exist_ok=True)
 
-    man = json.loads((args.extract_dir / "regions.json").read_text())
     # PER-FILE TENANT OWNERSHIP (M3b slice C): every row a file declares
     # belongs to that file's tenant. Stamped here, at the one place that
     # knows which file a row came from — then the documents MERGE (slice F).
     _ports = args.port or [root / "build/manifest/donovan.toml"]
+    # EXTRACTIONS PAIR 1:1 WITH MANIFESTS (14z-78c). The positional is the
+    # first tenant's; --extract adds the rest, in --port order. Checked here
+    # rather than at first use, because the failure it prevents — tenant N
+    # built against tenant M's regions — produces a plausible build rather
+    # than an error.
+    _extracts = [args.extract_dir] + list(args.extract or [])
+    if len(_extracts) != len(_ports):
+        raise SystemExit(
+            "gen_donovan_patch: %d extract dir(s) but %d --port manifest(s). "
+            "Each tenant needs its OWN extraction; pass --extract once per "
+            "additional --port, in the same order.\n  extracts: %s\n  ports:    %s"
+            % (len(_extracts), len(_ports),
+               ", ".join(str(e) for e in _extracts),
+               ", ".join(str(p) for p in _ports)))
+    # Per-tenant extraction state. The loop rebinds these; today there is
+    # exactly one tenant, so this is the same binding main() has always had.
+    extract_dir = _extracts[0]
+    man = json.loads((extract_dir / "regions.json").read_text())
     _docs = []
     for _pp in _ports:
         _d = toml_loads(_pp.read_text())
@@ -1328,7 +1353,9 @@ def main():
 
         for name in sorted(placed):
             r = regions[name]
-            blob = bytearray((args.extract_dir / f"region_{name}.bin").read_bytes())
+            # extract_dir, not args.extract_dir: the blob must come from the
+            # extraction of the tenant being placed (14z-78c pairing).
+            blob = bytearray((extract_dir / f"region_{name}.bin").read_bytes())
             # [table_fix] pad + whole-table rewrite (see the config note in
             # donovan.toml): zero-pad the blob to the reserved length and
             # write the documented row values at the table offset.
