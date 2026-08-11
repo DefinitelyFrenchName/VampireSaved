@@ -40,10 +40,24 @@ index on a record his code never reaches (the DEAD-ROW question, which is a
 runtime one). Pyron's and Phobos' real defects sit at the same stride, so the
 pattern alone cannot separate them.
 
-Read the output as a RANKED TEST TARGET LIST, not a defect list: it turns "play
-every move of three characters at every strength" into a short list of moves
-worth watching for a reset. A hit is a reason to test, and only the test — or a
-runtime deadness probe on the record — decides.
+THIS DOES NOT REDUCE THE SCOPE OF MOVES TO PLAYTEST, and an earlier version of
+this docstring wrongly implied it did (maintainer-corrected, 14z-78). Two
+reasons, both structural:
+
+  * it reports vs2 ADDRESSES, not moves, so there is no move-set to narrow TO;
+  * it sees exactly ONE defect class. A move can crash from a dead table row,
+    an allocator on an unseeded pool, or an effect-class stub, and this sweep
+    stays silent on every one of them.
+
+So a full movelist pass — every move, every strength, every tenant — remains
+required, and skipping a move because it is absent here would be unsafe. The
+output is a PRIOR, not a filter: it says where to look once something trips,
+and what to suspect first. A hit is a reason to test; only the test, or a
+runtime deadness probe on the record, decides.
+
+The companion instrument for the pass itself is `tests/lua/index_watch.lua`,
+which attributes a dangerous dispatch to the move as it is played. It secures
+the sweep; it does not shorten it either.
 
 THE SHARPENING THIS WANTS NEXT: a vanilla baseline. If vsav's OWN characters
 carry the same field at the same record offset and it never exceeds the vsavj
@@ -160,7 +174,7 @@ def main():
             seen.setdefault(h["addr"], set()).add(name)
     shared = {a for a, who in seen.items() if len(who) > 1}
 
-    print("\n== TENANT-OWNED candidates — the test target list ==")
+    print("\n== TENANT-OWNED candidates — where to look, NOT a shortened test list ==")
     rows = []
     for name in sorted(per):
         own = [h for h in per[name] if h["addr"] not in shared]
