@@ -1,0 +1,102 @@
+# hui AIR 214+K "PLASMA TRAP" — the mine's TIMER detonation (14z-78,
+# maintainer-reported crash-reset). Phobos throws a mine in a downward arc;
+# it lands, rolls forward slowly for roughly half a second (~1/6 screen),
+# STOPS, and detonates into a small low-hitting dome of electricity. The
+# crash is at that detonation, on every Phobos build ever made — the move
+# appears in no other rig, gate or doc in this repo, which is why every gate
+# was green while it crashed.
+#
+# WHAT THIS RIG HAS TO GET RIGHT (the 83d lesson, applied):
+#   1. AIR. The move is air-only — 214+K on the ground is a different move.
+#      P1 jumps and inputs the motion while RISING, so the mine is thrown
+#      with height to arc down from.
+#   2. THE TRIGGER IS A TIMER, NOT A COLLISION (maintainer-confirmed). So the
+#      mine must be given room to land and roll UNDISTURBED: if it reaches
+#      P2 the event captured is a contact explosion, which is a different
+#      code path — exactly the error 83c made with the grenade. Both fighters
+#      walk to their own corners first.
+#   3. TIME. Land + roll (~30f) + detonate. Each attempt gets ~450 frames of
+#      quiet afterwards; a rig that ends before the timer expires proves
+#      nothing at all.
+#   4. THREE STRENGTHS. Button strength sets the throw arc (83d), and the
+#      maintainer said "214+K" without distinguishing. LK/MK/HK are fired in
+#      turn so no single arc can be the reason nothing happened, and so a
+#      strength-specific defect is still caught.
+#
+# VERDICT NOTE — a watchdog reset is NOT a 68k exception, so the crash guard
+# can come back clean while the machine has rebooted. Watch P1 +0x382
+# ($FF8782): 0x10 while he is alive, 0x00 once the watchdog has cleared RAM.
+# That single bit also discriminates the two leading mechanisms: a FAULT
+# means an out-of-range dispatch (the Cosmo shape), a silent REBOOT means an
+# allocator spinning on an unseeded pool (Huitzil's own documented precedent).
+#
+# ── STATUS 14z-78: THIS RIG DOES NOT YET REPRODUCE THE CRASH ────────────
+# Measured on build/hui27 (huitzil-m2), field_trace on
+# ff8782/ff8406/ff8407, 6 attempts: LK/MK/HK x neutral and forward jump x
+# motion at +14/+24/+34 frames after the jump.
+#
+#   * the rig is ARMED: p1char = 0x10 for all 3200 traced frames, so the
+#     match forms with Phobos and the probe is live.
+#   * actions DO fire on the button: seq 0x0E on the four early-motion
+#     attempts; seq 0x02 -> 0x0A and 0x02 -> 0x08 on the two +34f ones,
+#     which had probably already landed (ground moves, not the air special).
+#   * NO crash and NO watchdog reset: p1char never leaves 0x10, the guard
+#     reports 0 faults, and the replay runs to the end.
+#
+# So this is a fact about the RIG, not about the build — the maintainer
+# reproduces the crash by hand on every Phobos build. seq 0x0E firing at
+# exactly the button frame for every strength looks more like a plain
+# jumping kick than Plasma Trap; the 214 motion is probably not registering
+# in the air. Awaiting the maintainer on: which kick strength, what jump
+# height/type, whether the motion is 214 relative to FACING, whether it
+# needs meter, and roughly how many frames from throw to detonation.
+#
+# DO NOT promote this to a gate until it reproduces; a green here today
+# would mean nothing.
+#
+# BOTH SIDES POKED: P1 = Huitzil (0x10), P2 = Victor (0x03 on vsav AND vsav2).
+# Early window only (replay-80 rule).
+# POKES="1400:ff8782:10;1450:ff8782:10;1500:ff8782:10;1400:ff8b82:03;1450:ff8b82:03;1500:ff8b82:03"
+300-305 sys=C1
+420-425 sys=C2
+800-803 sys=S1
+940-943 sys=S2
+1100-1102 p2=R
+1160-1162 p2=R
+1300-1302 p1=1
+1360-1362 p2=1
+# ── walk both fighters back to their corners (300 frames each way), so the
+#    mine lands and rolls in open ground instead of into P2
+2900-3200 p1=L
+2900-3200 p2=R
+# ── jump=U motion at +14f, button 4
+3400-3406 p1=U
+3414-3418 p1=D
+3419-3423 p1=DL
+3424-3428 p1=L4
+# ── jump=U motion at +24f, button 5
+3900-3906 p1=U
+3924-3928 p1=D
+3929-3933 p1=DL
+3934-3938 p1=L5
+# ── jump=U motion at +34f, button 6
+4400-4406 p1=U
+4434-4438 p1=D
+4439-4443 p1=DL
+4444-4448 p1=L6
+# ── jump=UR motion at +14f, button 4
+4900-4906 p1=UR
+4914-4918 p1=D
+4919-4923 p1=DL
+4924-4928 p1=L4
+# ── jump=UR motion at +24f, button 5
+5400-5406 p1=UR
+5424-5428 p1=D
+5429-5433 p1=DL
+5434-5438 p1=L5
+# ── jump=UR motion at +34f, button 6
+5900-5906 p1=UR
+5934-5938 p1=D
+5939-5943 p1=DL
+5944-5948 p1=L6
+6600 wait
