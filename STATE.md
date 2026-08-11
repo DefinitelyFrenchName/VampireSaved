@@ -744,6 +744,52 @@ else.
 same negative result had completely different weight for the two tenants, and
 only the static consequence table says which.
 
+### THE FULL CONSEQUENCE TABLE — what each bad entry does, for all 3 tables
+
+Derived statically; entry 81 independently reproduces the Cosmo record, which
+controls the derivation. This is what decides whether a clean playtest is
+evidence or noise.
+
+| table | valid | entry | consequence |
+|---|---|---|---|
+| `0x018468` | 0..79 | 80 | ODD -> vec3 crash — LOUD |
+| | | 81 | jumps to table+6, executes the TABLE AS CODE -> reset — LOUD (Cosmo) |
+| | | 82 | ODD -> vec3 crash — LOUD (**Plasma Trap**) |
+| | | **83** | even, real code `0x01946A` -> wrong routine — **SILENT** (**Reflect Wall**) |
+| `0x0185da` | 0..85 | 86 | ODD — LOUD |
+| | | 87 | into the table -> reset — LOUD (Donovan cand.) |
+| | | 88 | ODD — LOUD (Phobos cand.) |
+| | | 89 | ODD — LOUD (Donovan cand.) |
+| `0x03975e` | 0..9 | **10** | even, real code `0x03E18C` -> **SILENT** (all three tenants) |
+
+**WHAT THE THREE SWEEPS THEREFORE ESTABLISH:**
+
+* **Donovan — clear.** All his candidates sit at loud entries (80/81/82,
+  87/89). A live one could not be missed by eye; his sweep saw nothing.
+* **Phobos — accounted for.** All three `0x018468` candidates are identified
+  (82 Plasma Trap, 83 Reflect Wall). His `0x0185da` entry-88 candidate is LOUD
+  and his sweep was clean, so it is cleared too. **No re-sweep would add
+  anything**, and his instrument log recording nothing costs us nothing here.
+* **Pyron — clear, by direct observation.** 29 dispatches, 0 dangerous,
+  entries 0/1/4/10/44/68 all in range, `P1 char=11` throughout, heartbeat
+  running start to finish.
+
+**THE ONE REMAINING GAP: entry 10 of `0x03975e`, SILENT, 18 candidates across
+all three tenants.** A human sweep cannot close it — a silent misdispatch
+leaves nothing to see, which is the whole point of the class. Two cheap facts
+argue it is cold: Pyron's full-movelist log never reached that dispatcher at
+all, and neither did the Reflect Wall run. Measure it against the replay suite
+rather than spending another human pass.
+
+**OPEN, and both are GUARD-CANCEL-ONLY so the maintainer cannot reach them:**
+Phobos' Reflect Wall is done (rig 81 existed); **Pyron's Zodiac Fire (236+P,
+ES 236+2P) has no rig** and is the last untested move of the three movelists.
+
+**SCOPE NOTE FOR (b'):** it covers `0x018468` entries 80-83. Table `0x0185da`
+needs no cover — all four bad entries are loud and all are cleared by
+playtest. Entry 10 of `0x03975e` is silent and uncleared; whether (b') should
+grow a second site depends on the deadness measurement above.
+
 ### (b') DESIGN, MAINTAINER-APPROVED FOR THE FULL WINDOW — not yet written
 
 Maintainer approved (b') covering entries 80-83. Design is settled; the
