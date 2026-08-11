@@ -1419,15 +1419,62 @@ draws a companion's shadow is NOT this servant path. The remaining
 child-companion shadow item is attributed instead to the bank-0 piece
 family (uniform -0x16A8 tile-code delta, bank word 0 vs 3).
 
-## Dark Force (14z-66/67 mechanics UNPROVEN; style measured 14z-69,
-## PALETTE FIXED and playtest-confirmed 14z-69p in build/hui14)
+## The SUB-STATE DISPATCHER FAMILY at 0x018460 (14z-79)
 
-> Status: the DF **palette** is fixed and shipped — one `[[data_port]]`
-> row replacing palette-seq rows 0x1E-0x21 with the sequence native's DF
-> actually shows (vs2 `0x3ABEDC`). He flashes his own warm gold instead
-> of purple. Legacy-inert because vanilla only ever requests seq ids
-> 0x26/0x27, guarded by `tests/audit_palette_seq_ids.sh` — which is the
-> ONLY guard, since the palette path never transits work RAM. The
+Three sibling dispatchers sit back-to-back and share ONE handler pool. All are
+reached by fall-through from a guard chain, not by call, so a handler's `rts`
+exits the enclosing subroutine (`0x018230`, whose only located caller is the
+`bsr.w` at `0x018216` — a handler therefore returns to `0x01821A`).
+
+| dispatcher | shape | table | entries | table ends |
+|---|---|---|---|---|
+| `0x018460` | `323b 0006` / `4efb 1002` | `0x018468` | 80 | `0x018508` |
+| `0x018508` | `323b 0006` / `4efb 1002` | `0x018510` | 80 | `0x0185B0` |
+| `0x0185D2` | `303b 0006` / `4efb 0002` (D0, not D1) | `0x0185DA` | 80 | `0x01867A` |
+
+Handler pool: **`0x01867A`-`0x0187BA`**. Dispatchers 2 and 3 target handlers
+inside the same pool, and dispatcher-1 handlers branch INTO dispatcher-3's
+handler space (e.g. `0x0186A2`). **Do not relocate that pool piecemeal.**
+
+The index arrives as `moveq #0,d0 / move.b (0x17,a3),d0 / add.w d0,d0` at
+`0x018438` — entry*2, with **no bounds check**. Four guards
+(`0x018440`-`0x01845F`) can divert to `0x0185B0` or to dispatcher 2 before the
+dispatch happens; a hook that must run after them therefore cannot sit earlier
+than `0x018460`, and no 6-byte instruction-aligned window ends there (the two
+preceding instructions are 4+4 bytes).
+
+**Two properties measured in 14z-79 that anyone re-hosting this dispatcher
+needs.** (1) The table is read PC-relatively, so it lives in the OPCODE view;
+an An-relative replacement reads the DATA view and gets ciphertext — 38 of the
+80 targets come out odd. (2) **D1 is dead on ENTRY to every handler and live
+afterwards**: none of the 23 distinct handlers reads the CCR or D1 before
+writing it, but they `rts` into a `bsr.w` chain that does consume D1. A
+replacement must leave D1 holding the vanilla table offset.
+
+vsavj's table has 80 entries where vs2's twin (`0x016D34`, dispatcher
+`0x016D2C`) has 84 — the index-space class. See the (b') thunk
+(`build/manifest/huitzil.toml`, `index_window_018468`).
+
+## Dark Force (14z-66/67 mechanics UNPROVEN; style measured 14z-69;
+## the 14z-69p PALETTE FIX WAS WITHDRAWN 14z-79 — it broke Bulleta)
+
+> Status: the DF palette is **OPEN**, and his DF is purple on purpose.
+> The 14z-69p `[[data_port]]` row that rewrote palette-seq rows
+> 0x1E-0x21 is WITHDRAWN: those ids are **Bulleta's Dark Force block**
+> (236 resolver calls in one vanilla DF, measured), so the row rendered a
+> legacy character wrong on every Huitzil build from 14z-69 until 14z-79.
+> Phobos only lands on her ids because row 0x10 of the per-character
+> palette-routine table `0x02A8A4` is `0x004A` — row 0x00's handler — and
+> the base id is hardcoded in that routine (`0640 001e` at `0x02a92c`).
+> The collision is structural: in vs2, slot 0x10 IS Huitzil and id 0x1E is
+> HIS (180 calls, `$FF802E`=1, measured native). Repointing the row at
+> vs2's `0x0040` does not help — that routine has no DF path at all.
+> PROPER FIX, deferred: give him his own free 4-row block plus a copy of
+> the routine with that base. Retracted claim: "legacy only ever requests
+> seq ids 0x26/0x27" — false; `tests/audit_palette_seq_ids.sh` sampled
+> replays in which Dark Force never activates, and 0x26 is Demitri's own
+> block. The palette path never transits work RAM, so no RAM gate can see
+> any of this; the maintainer's playtest found it. The
 > afterimages remain by design, and the underlying MECHANICS are still
 > unproven; the analysis below stands.
 

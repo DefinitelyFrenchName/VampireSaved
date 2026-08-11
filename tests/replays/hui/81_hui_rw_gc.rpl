@@ -3,6 +3,17 @@
 # of record: P1 seq-0x0E progression frame-identical; the attacker is
 # blown back (native x 322->487 vs ours 322->474 — knockback magnitude
 # = the alias-physics class, queued). Early-window 2P pokes only.
+#
+# 14z-79. This rig also drives ENTRY 83 of dispatcher 0x018464 — out of range
+# for vsavj's 80-entry table, and SILENT (even target, real code). Measured at
+# f3214 and f3315, D0=0xA6, on both hui27 and hui28. The (b') thunk now routes
+# those to vs2's own handler.
+#   TWO CORRECTIONS TO THE HEADER ABOVE, both measured via test_hui_pairs.sh:
+#   * the "ours 322->474" figure does NOT reproduce — x @f3240 is 476 on hui27
+#     (pre-fix) and 476 on hui28 (post-fix). Treat 474 as a stale figure.
+#   * 14z-78 predicted the wrong-routine dispatch WAS the knockback
+#     discrepancy and that (b') would retire it. It did not: 476 -> 476,
+#     unchanged. The alias-physics item stays QUEUED, not retired.
 300-305 sys=C1
 420-425 sys=C2
 800-803 sys=S1

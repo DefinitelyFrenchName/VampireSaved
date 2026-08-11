@@ -59,6 +59,12 @@ tests/test_tenant_id.sh
 # the guard that makes it loud. Cheap, no emulator (needs an extract dir;
 # SKIPs without one).
 tests/test_thunk_addr_literal.sh
+# 14z-79: the (b') index-window thunk. Its body carries a COPY of engine
+# table 0x018468 and 23 handler addresses, so `old_hex` proves only that we
+# patched the right place — one wrong trampoline is a SILENT wrong-routine
+# dispatch, the very class the thunk removes. This re-derives every byte from
+# the reference ROMs. Cheap, no emulator; SKIPs without a Huitzil build.
+tests/test_index_window_thunk.sh
 # The M3a select-records mechanism (14z-62): a variant-id build must carry
 # the tenant's OWN select records and the host's must be vanilla bytes.
 # Builds its own 0x13 scratch build and measures the row fetch in MAME, so

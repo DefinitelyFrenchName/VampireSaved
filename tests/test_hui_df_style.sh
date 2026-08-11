@@ -33,13 +33,23 @@
 #      vacuous-pass shape that fooled the first version), the recolour
 #      absent, and the afterimages absent.
 #
-# EXPECTATION. Default --expect colours-fixed (14z-69p): the RECOLOUR is
+# EXPECTATION — DEFAULT REVERTED TO `differs` IN 14z-79. The 14z-69p
+# palette fix this gate used to assert has been WITHDRAWN, so his DF is
+# purple again ON PURPOSE. Do NOT "re-fix" it by restoring the
+# df_palette_seq_rows row: that row wrote palette-seq ids 0x1E-0x21, which
+# are BULLETA'S DF block, and it rendered a vanilla character wrong on every
+# Huitzil build from 14z-69 until it was withdrawn. The full mechanism and
+# the proper tenant-scoped fix are in build/manifest/huitzil.toml under
+# "WITHDRAWN 14z-79". Flip this default back to colours-fixed only when
+# Phobos has his OWN palette-seq block.
+#
+# Historical (14z-69p), what colours-fixed asserted: the RECOLOUR is
 # fixed and the MODE is kept on purpose. Ours must no longer upload the
 # purple ramp, must land on the warm sequence native's DF also shows
 # (one animation step apart — rows of ONE ported block, vs2 0x3ABEDC),
 # and must STILL draw the afterimages, because that mode is his real
 # Vampire Savior Dark Force and the maintainer asked to keep it.
-# DF_STYLE_EXPECT=differs replays the pre-fix state; =matches asserts
+# DF_STYLE_EXPECT=differs is the CURRENT default; =matches asserts
 # full native equality, which is NOT the target here (the two games run
 # different DF systems, so their palettes are one ramp step apart).
 #
@@ -60,7 +70,7 @@ WORK="$(mktemp -d)"
 trap 'rm -rf "$WORK"' EXIT
 
 BUILD="${1:-build/hui25}"
-EXPECT="${DF_STYLE_EXPECT:-colours-fixed}"
+EXPECT="${DF_STYLE_EXPECT:-differs}"   # 14z-79: the 69p fix is WITHDRAWN (see header)
 case "$BUILD" in /*) ;; *) BUILD="$REPO/$BUILD" ;; esac
 [ -f "$BUILD/rompath/vsavjw.zip" ] || {
     echo "FAIL: no $BUILD/rompath/vsavjw.zip (WIDE tenant build required)"; exit 1; }

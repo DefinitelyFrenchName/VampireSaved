@@ -1,6 +1,28 @@
 # STATE — living progress log
 
-Updated: 2026-08-11 (session 14z-78 — **M3b'S BLOCKER CLEARED, AND THE THREE
+Updated: 2026-08-11 (session 14z-79 — **PHOBOS RE-FROZEN AS `huitzil-m3`
+(34c8b47d): the (b') thunk landed, and a LEGACY DEFECT THAT HAD SHIPPED SINCE
+14z-69 WAS FOUND BY PLAYTEST AND WITHDRAWN.** (b') covers the out-of-range
+window of dispatcher `0x018460` and fixes BOTH Phobos defects — Plasma Trap
+(entry 82, LOUD, maintainer-confirmed) and Reflect Wall (entry 83, SILENT,
+rig-verified at f3214/f3315 with `D0=0xA6`). The body is GENERATED and
+reconstructed from the ROMs by a new gate; it was exhaustively simulated over
+all 65,536 index values before it ever ran. **TWO PARTS OF THE 14z-78 SPEC
+WERE WRONG AND BOTH WERE CAUGHT BY MEASUREMENT:** its `lea 0x018468,a0` normal
+path is a DATA-space read that returns ciphertext (38 of 80 legacy targets come
+out ODD), and its D1 requirement — which I overrode on a static finding and had
+to restore when the legacy suite went systematically red. **THE BIGGER FINDING
+IS BULLETA'S:** the 14z-69p DF-palette row wrote palette-seq ids 0x1E-0x21,
+which are BULLETA'S Dark Force block, so a VANILLA character rendered wrong on
+every Huitzil build for ten sessions — invisible to every RAM gate because the
+palette path never transits work RAM, and missed by its own guard because that
+guard's replays cannot activate Dark Force. The row is WITHDRAWN; Phobos' DF is
+purple again by maintainer decision, pending a proper tenant-scoped block.
+`test_variant_dispatch.sh` had been reporting the responsible aliased row as a
+FAIL since 14z-74 and it was written off as benign — it was right all along.
+Read docs/NEXT_SESSION.md first.)
+
+Previously: 2026-08-11 (session 14z-78 — **M3b'S BLOCKER CLEARED, AND THE THREE
 MOVELISTS SWEPT.** `anim` moves: the vec3 that made it immovable was two
 `donovan.toml` thunks baking its placed address as a hex literal, not a
 hardware limit. Fixed with `region_subst`, INERT — all four frozen
@@ -111,6 +133,142 @@ findings were RETRACTED in-session after clean re-measures — each with
 the comparison error written down so it cannot be repeated. Every gate
 green at close, including two NEW audits. Read docs/NEXT_SESSION.md
 first, then the 14z-69 sections below.)
+
+## Session 14z-79 — (b') LANDED, AND BULLETA'S DARK FORCE WAS BROKEN
+## FOR TEN SESSIONS
+
+### THE (b') THUNK — what shipped, and the two spec errors caught on the way
+
+Site `PRG:0x018460`, `patch = "jmp"`, 470-byte body in hole_a, owned by
+huitzil.toml (maintainer decision: both live defects are Phobos', and Donovan
+and Pyron were cleared by their movelist sweeps, so keeping the row on one
+tenant costs ONE re-freeze and leaves the other three fingerprints as
+independent oracles).
+
+**Verified before it ever ran.** The body is emitted by
+`tools/gen_index_window_thunk.py` and simulated over ALL 65,536 index values:
+80/80 legacy entries reach their vanilla handler with vanilla D1, 4/4 danger
+entries run vs2's body byte-for-byte, and every one of the other 65,452 values
+is LOUD (vec3). There is no silent path. `tests/test_index_window_thunk.sh`
+reconstructs all 470 bytes from the two reference ROMs.
+
+**SPEC ERROR 1 — the normal path read ciphertext.** STATE 14z-78 specified
+`lea 0x018468,a0 / move.w (0,a0,d0.w),d1`. That is a DATA-space read; CPS-2
+decrypts program-space fetches only. Measured: 38 of the 80 legacy targets come
+out ODD in the data view, 0 in the opcode view. It would have address-errored
+on the hottest path in the game. Fix: the body carries its own copy of the
+table and keeps the read pc-relative — a `code` op re-encrypts with its
+embedded data (docs/platform/gotchas.md).
+
+**SPEC ERROR 2 — D1, and this one I introduced.** The spec said D1 must be left
+holding the vanilla offset. A static sweep showed D1 is dead on ENTRY to all 80
+handlers, so I dropped the restore. The sweep was true and insufficient: the
+handlers `rts` into `0x01821A`, a chain of five `bsr.w`, which the entry-level
+analysis never looked at. Result: EVERY self-frozen legacy log moved and two
+masked replays went from one divergent run to two. Restoring D1
+(`move.w #imm,d1` per trampoline, which also reproduces vanilla's CCR exactly)
+put `02_demitri_vs_cpu` back to its frozen masked-window shape.
+
+**What made it diagnosable was killing the cheap theory first.** The site is
+COLD — 22 dispatches per 5,520-frame replay, 2 on `63_idle_select` — and an
+image diff showed the build differed from its predecessor at ONLY the 6-byte
+site and the thunk body. ~80 extra cycles cannot produce systematic divergence,
+so "the hook is expensive" was dead and "the hook is wrong" was all that was
+left. Do the cost measurement and the image diff BEFORE theorising: they
+separate two failures that look identical and have opposite fixes.
+
+### BULLETA'S DARK FORCE — a legacy character broken since 14z-69
+
+**Found by maintainer playtest.** He tested Bulleta specifically because she is
+the SHELL Phobos occupies (variant `0x10` aliases base slot `0x00`), reasoning
+that the host is the most side-effect-prone member of the vanilla cast. He was
+right, and the same reasoning names Victor for Donovan (`0x13`/`0x03`) and
+Demitri for Pyron (`0x11`/`0x01`).
+
+**Mechanism, fully measured.** Palette-seq ids `0x1E-0x21` are Bulleta's DF
+block — 236 resolver calls in one DF on vanilla vsavj, `$FF802E`=1, calls
+confined to f3260-f3881 with none earlier in a replay that starts at frame 0.
+Controls on the same instrument: Demitri -> `0x26`, char `0x04` -> `0x44-0x47`,
+Victor -> none at all (his palette-routine row is the default, which has no DF
+path — a self-consistent cross-check). The base id is hardcoded IN THE ROUTINE
+(`0640 001e` at `0x02a92c`), and each character reaches a different routine via
+the per-character palette-routine table `0x02A8A4`.
+
+Phobos lands on Bulleta's routine because **row 0x10 of `0x02A8A4` is `0x004A`
+— row 0x00's handler.** 14z-69p saw his DF was wrong and rewrote palette-seq
+rows `0x1E-0x21`, i.e. Bulleta's colours.
+
+**The collision is structural.** In vs2, slot `0x10` IS Huitzil and id `0x1E`
+is HIS (180 calls, `$FF802E`=1, measured native). In vsavj `0x1E` is Bulleta's.
+Both games are right; the merged ROM has one row. Repointing `0x02A8A4` row
+0x10 at vs2's `0x0040` does NOT work either — that routine has no DF path
+(`cmp.b/bne/rts`, no `tst.b (0x111,a6)`), so he would get no recolour at all.
+
+**Decision (maintainer): WITHDRAW the row now**, restoring Bulleta immediately
+at near-zero risk, and fix Phobos properly later. His DF is purple again — wrong
+versus native, harmless to every legacy character.
+
+**PROPER FIX, DEFERRED.** Give Phobos his own palette-seq block: a free 4-row
+id block, a copy of Bulleta's routine with that base substituted, `0x02A8A4`
+row 0x10 repointed at it, `0x1E-0x21` left vanilla. All tenant-scoped, all
+inside the op invariant. Input: the rebuilt audit's inventory (below). NOTE it
+is a 4-character sample — "free" must be established across all 18.
+
+### HOW BOTH GUARDS FAILED, and what was done about it
+
+1. **`audit_palette_seq_ids.sh` returned a FALSE PASS for ten sessions.** Its
+   replay set is ordinary play and DF COSTS A BANKED STOCK, so none of its
+   replays could activate the mode it was guarding; it saw `{0x26,0x27}` —
+   Demitri's own block — and generalised. REWRITTEN with a phase B that forces
+   DF across four characters and REFUSES TO JUDGE unless `$FF802E`=1. (My first
+   version of that control sampled one frame, f3300, and reported "never in
+   Dark Force" for a run that entered it between f3300 and f3400 — a one-frame
+   sample of a MODE is a coin toss on its onset. It now samples 3300/3400/3500.)
+   New union: `1e 1f 20 21 26 27 44 45 46 47`.
+2. **`test_variant_dispatch.sh` WAS RIGHT ALL ALONG.** It has reported
+   `0x02a8a4` row 0x10 as a FAIL on every run since 14z-74, including on frozen
+   `huitzil-m2`, and it was recorded as "benign — 0 hits at the resolver". That
+   zero came from replays where nobody activated DF. It stays RED and is now
+   recorded as KNOWN-OPEN, tied to the deferred fix. A permanently red gate
+   that is explained away is worse than no gate.
+
+### THE OP INVARIANT ALREADY ENCODES THE RULE — IT JUST STOPS AT STAGE 3
+
+`tests/test_hui_ladder.sh` requires every emitted op to write either declared
+free space or a VARIANT ROW (0x10-0x1F). `df_palette_seq_rows` wrote Bulleta's
+BASE rows, so it violates that rule outright — but the gate runs stages 1-3 and
+the row is stage 4. Measured exposure on the shipped build: **60 of 260 ops
+write shared surface.** Most are legitimate engine hooks (the 6-byte site_thunk
+sites, poke32s into variant rows of 32-row tables the classifier does not know).
+Two classes are worth attributing:
+
+* three `data +0x20` medallion palette rows (`0x3a3ac0/0x3a3b20/0x3a3b40`,
+  rows 0x16/0x19/0x1a for the new wheel cells) — CLOSED by maintainer
+  observation: across every build carrying medallions, all 18 VANILLA
+  medallions have been correct, and that screen shows all of them at once
+  every session, so the consequence is loud-and-always-visible and a clean
+  observation IS conclusive here (unlike a mode-gated palette). The three NEW
+  medallions and their selection ring have imperfect shapes and slightly
+  shifted placement with correct portraits at the correct locations —
+  **polish, not rework.**
+* six 8-byte `data` writes at `0x0212xx` carrying character-id lists including
+  0x10/0x11/0x13 — **undocumented**: not in the manifest, not in the patch
+  notes, not in any declared bank_map table. Attribute them.
+
+**RECOMMENDED NEXT GATE: extend the op invariant to stage 6** with an explicit
+allowlist where a shared write is justified. That converts "the host character
+is exposed" from an instinct into a build-time check covering every host,
+without rigging anyone's moves. The (b') thunk's own site would be flagged by
+it, correctly — it needs a declared justification (the impossibility argument).
+
+### FREEZE
+
+`huitzil-m3` = `34c8b47de5a43a67e7292f16d0ad133d287fa7e4`, `build/hui29`.
+13/13 masked legacy replays PASS with **frozen flicker inventories unchanged**;
+`.sha1` determinism baselines re-frozen (28 moved). hui28-vs-hui29 work RAM is
+bit-identical on every replay tested, which is the palette-never-transits-RAM
+argument confirmed empirically. `donovan-m3a`, `m5_stock` and `pyron-m2` all
+still rebuild bit-exact.
 
 ## Session 14z-71 — THE BEAM: row 16 of the effect-class table is a
 ## STUB in vsav, and underneath it vsav has no list-type 12
@@ -12179,7 +12337,7 @@ behaviour or rendering** — before anything else is suspected.
 
 | Reused resource | Claim | Guard | Fallback if wrong |
 |---|---|---|---|
-| palette-seq ids 0x1E-0x21 (`0x39ACC0`) | vanilla only ever requests 0x26/0x27 | `tests/audit_palette_seq_ids.sh` (10,504 sampled calls) | none — the palette path never transits work RAM, so the audit is the ONLY guard |
+| ~~palette-seq ids 0x1E-0x21 (`0x39ACC0`)~~ **CLAIM FALSE, ROW WITHDRAWN 14z-79 (they are Bulleta's DF block)** | vanilla only ever requests 0x26/0x27 | `tests/audit_palette_seq_ids.sh` (10,504 sampled calls) | none — the palette path never transits work RAM, so the audit is the ONLY guard |
 | effect-class row 16 (`0x080AEC`) | vanilla never dispatches class 16 | `tests/audit_effect_class_rows.sh` §1, 0 reads vs a 1760-hit control | none needed: the row was a stub (`rts`), so a wrong claim costs at most the old no-op |
 | drawer list-type 6 (`0x01B6AA`) | vanilla has no type-6 sprite lists | `audit_effect_class_rows.sh` §1/§4 + `tests/test_beam_list_type6.sh` | **YES — non-tenant lists run vsav's original type-6 code, and arming the `$FF010C` tripwire FAILS the gate** |
 

@@ -68,7 +68,9 @@ Authoritative implementations + section comments:
 |---|---|---|
 | `extra_tiles/<char>.json` | codes merged into the group-C copy inventory that the OBJ-record walk cannot reach (it follows pointers; offset-computed records are invisible). Without them the bank is remapped while the tile is absent and the sprite renders as a SOLID RECTANGLE — the child sidekick's shadow. Guarded by `tests/audit_empty_tiles.sh` | 14z-69o |
 | root spec `:f<off>` | force a region past the sibling-oracle boundary and emit from `<off>` as RAW data. For a code region whose OWN pc-relative tables sit beyond the boundary: inside the region the pointers resolve correctly, and raw emission makes the DATA reads return the stored bytes (CPS-2 decrypts opcode fetches only). Forced tail is registered as a dead zone | 14z-69i/j |
-| `data_port df_palette_seq_rows` | palette-seq rows 0x1E-0x21 (vsavj 0x39ACC0) <- the sequence native's Dark Force shows (vs2 0x3ABEDC / vh2 0x38BEB0). Legacy-inert ONLY because vanilla never requests those ids — and no RAM gate can check that, so `tests/audit_palette_seq_ids.sh` is the sole guard | 14z-69p |
+| ~~`data_port df_palette_seq_rows`~~ **WITHDRAWN 14z-79 — it overwrote BULLETA's DF block and broke a legacy character; see huitzil.toml "WITHDRAWN 14z-79"** | palette-seq rows 0x1E-0x21 (vsavj 0x39ACC0) <- the sequence native's Dark Force shows (vs2 0x3ABEDC / vh2 0x38BEB0). Legacy-inert ONLY because vanilla never requests those ids — and no RAM gate can check that, so `tests/audit_palette_seq_ids.sh` is the sole guard | 14z-69p |
+
+| `site_thunk index_window_018468` | engine site 0x018460 -> a 470-byte thunk in hole_a covering the out-of-range window of table 0x018468 (entries 80-83 run vs2's handlers inline; every other index takes the vanilla path; anything else is a defined vec3). Fixes Plasma Trap (82, LOUD) and Reflect Wall (83, SILENT). Owned by Phobos; tenant-id-independent, so the merged build inherits it. Legacy-safe by IMPOSSIBILITY — vanilla reaching 80-83 crashes today. Gate: tests/test_index_window_thunk.sh. Generator: tools/gen_index_window_thunk.py |
 
 ## 14z-70 additions
 

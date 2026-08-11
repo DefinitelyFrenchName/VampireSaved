@@ -508,3 +508,42 @@ hand-rolled 0x1F MIRROR (0x38C258 == 0x38C218 + 0x40 — measured, NOT a
 separate table)") the entire time, and its alias assertion would have passed.
 Two documents asserted the opposite of the generator and nobody compared them.
 Frozen by `tests/test_effect_palette_table.sh`.
+
+## "Dead on ENTRY" is not "dead" — a dispatcher's output register is read
+## downstream of the handler's rts (14z-79, cost a build)
+
+vsavj's sub-state dispatcher at `PRG:0x018460` is
+`move.w (6,PC,D0.w),D1 / jmp (2,PC,D1.w)`. The (b') thunk reproduces it from
+hole_a, and the question was whether D1 has to come out holding the same
+value.
+
+A static sweep answered it, and answered a narrower question than it looked
+like: across the 80 entries' 23 distinct handlers, the first instruction is
+always one of seven opcodes (`322d 137c 136b 4a2b 4a29 0c29 0c2b`), none reads
+the CCR, and the only handler touching D1 writes it first. True, checkable,
+and **it licenses nothing** — because the handlers are 8-30 bytes ending in
+`rts`, and what they return into (`0x01821A`, a chain of five `bsr.w`) was
+never in the sweep's scope. D1 is dead on entry and live afterwards.
+
+Shipping the thunk without restoring D1 moved **every self-frozen legacy log**
+and pushed two masked replays from one divergent run to two. Restoring it
+(`move.w #<vanilla offset>,d1` in each trampoline) put `02_demitri_vs_cpu`
+back to its frozen `masked-window` shape — same expectation, unchanged.
+
+WHAT MADE IT DIAGNOSABLE was killing the obvious theory first. The site is
+COLD — measured 22 dispatches per 5,520-frame replay, and only 2 on
+`63_idle_select` — and an image diff showed the build differed from its
+predecessor at **only** the 6-byte site and the thunk body. ~80 extra cycles
+cannot produce systematic divergence, so "hook cost" was dead and the cause
+had to be semantic; with registers, flags, stack and target PC all verified
+identical, exactly one candidate was left. Do the cost measurement and the
+image diff BEFORE theorising: together they separate "the hook is wrong" from
+"the hook is expensive", and those have completely different fixes.
+
+Corollary for the register question generally: prefer reproducing the
+displaced instruction's ENTIRE architectural effect over proving each part of
+it unobserved. `move.w #imm,d1` also reproduces vanilla's CCR exactly (N/Z
+from the value, V/C cleared, low word only), so the deadness question stops
+needing an answer at all. STATE 14z-78 had specified this correctly ("D1 must
+be left holding the table OFFSET — a handler downstream may read it"); an
+entry-only measurement is not grounds to override a whole-effect rule.

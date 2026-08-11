@@ -1088,6 +1088,51 @@ pad = 0x60
 # works, but its helper must be within bsr.w of the site and hole_a's free
 # space is ~0x27000 away — so the raw-emit design is the better one.
 
+# ══ WITHDRAWN 14z-79 — THIS ROW BROKE BULLETA'S DARK FORCE ══════════════
+#
+# The row below is COMMENTED OUT. Its legacy-safety claim ("legacy NEVER
+# REQUESTS THESE IDS") is RETRACTED: it is false, and the analysis under it
+# is kept only as the record of how it was reached.
+#
+# WHAT IS ACTUALLY TRUE. Palette-seq ids 0x1E-0x21 are BULLETA'S DF block.
+# Measured on vanilla vsavj with a stocked meter (P1 poked to 0x00): 236
+# resolver calls, every one of them id 1e/1f/20/21. Controls on the same
+# instrument: Demitri (0x01) -> 0x26, char 0x04 -> 0x44-0x47. The base id is
+# hardcoded IN THE ROUTINE (`0640 001e` at 0x02a92c), and each character
+# reaches a different routine, so these ids are per-character property.
+#
+# WHY H WAS ON THEM AT ALL — the real defect, still open. Row 0x10 of the
+# per-character palette-routine table 0x02A8A4 is 0x004A, which is ROW 0x00'S
+# handler: Phobos inherits BULLETA'S routine and therefore her base 0x1E.
+# That aliased row is a known one — tests/test_variant_dispatch.sh has
+# reported it as a FAIL on every run, and it was recorded as benign on the
+# strength of "0 hits at the resolver" measured over replays in which nobody
+# activated Dark Force. It is not benign.
+#
+# THE COLLISION IS STRUCTURAL, which is why this row cannot simply be fixed
+# in place. In vs2, slot 0x10 IS Huitzil and id 0x1E is HIS block (measured
+# on native: 180 calls on id 0x1E with $FF802E=1). In vsavj id 0x1E is
+# Bulleta's. Both characters legitimately want the same id and the merged ROM
+# has one row. Repointing 0x02A8A4 row 0x10 at vs2's value (0x0040) does not
+# work either: that routine has no DF path at all (no `tst.b (0x111,a6)`), so
+# he would get no recolour.
+#
+# THE PROPER FIX, deferred as its own piece: give Phobos his OWN palette-seq
+# block — a free 4-row id block, a copy of Bulleta's routine with that base
+# substituted, 0x02A8A4 row 0x10 repointed at it, and 0x1E-0x21 left vanilla.
+# All tenant-scoped, all inside the op invariant.
+#
+# UNTIL THEN his DF is purple again — wrong versus native, and harmless to
+# every legacy character, which is the trade the maintainer chose (14z-79).
+# Cost of NOT doing this: a vanilla character rendered wrong on every Huitzil
+# build since 14z-69, invisible to every RAM gate because the palette path
+# never transits work RAM. Found by maintainer playtest, not by the suite.
+#
+# HOW THE GUARD MISSED IT: tests/audit_palette_seq_ids.sh runs a
+# Demitri-heavy replay set in which Dark Force never activates, so it sampled
+# {0x26, 0x27} — Demitri's own block — and generalised. An audit whose
+# replays cannot produce the mode it guards cannot report on that mode.
+#
 # ── 14z-69p: THE DARK FORCE PALETTE (ping #7 / #11 item: "purple
 # recolour while moving"). MECHANISM, measured:
 # H's DF drives a palette-SEQUENCE animation, not a static swap. One
@@ -1107,6 +1152,10 @@ pad = 0x60
 # program-byte dispatch at 0x29F4A — only THREE opcodes, none of them
 # ours), so a wrap would have to sit on engine code that legacy runs
 # 800-3800 times per replay. Instead: legacy NEVER REQUESTS THESE IDS.
+#   *** RETRACTED 14z-79 — FALSE. Bulleta requests exactly these ids in
+#   *** Dark Force (236 calls, measured on vanilla). See the WITHDRAWN
+#   *** header above. Everything below this line is the superseded
+#   *** analysis, kept for the record.
 # Audited with an uncapped probe on 0x2AD82 across ten legacy replays
 # (tests/audit_palette_seq_ids.sh): the only ids vanilla ever asks for
 # are 0x26 and 0x27. Rewriting rows 0x1E-0x21 is therefore inert for
@@ -1138,16 +1187,16 @@ pad = 0x60
 # blob (unique occurrence in vh2), and the four rows' self-index tails
 # (0000/0001/0002/0003) match vsavj's at the destination, which is what
 # proves the window is row-aligned on rows 0x1E-0x21 and not shifted.
-[[data_port]]
-stage = 4
-name = "df_palette_seq_rows"
-src = 0x3ABEDC
-orc = 0x38BEB0
-dst = 0x39ACC0
-dst_end = 0x39AD40
-len = 0x80
-dst_old_head = "05310fff0e9e0ece0d7e093e064d045c"
-note = "DF palette-seq rows 0x1E-0x21 <- the sequence native DF actually shows (vs2 0x3ABEDC)"
+# [[data_port]]
+# stage = 4
+# name = "df_palette_seq_rows"
+# src = 0x3ABEDC
+# orc = 0x38BEB0
+# dst = 0x39ACC0
+# dst_end = 0x39AD40
+# len = 0x80
+# dst_old_head = "05310fff0e9e0ece0d7e093e064d045c"
+# note = "DF palette-seq rows 0x1E-0x21 <- the sequence native DF actually shows (vs2 0x3ABEDC)"
 
 # ══ 14z-73 THE GRAB-HOLD VICTIM PLACEMENT ═══════════════════════════════
 #
@@ -1708,3 +1757,101 @@ src_addr = 0x251F56
 old_hex = "000c"
 new_hex = "0006"
 note = "composite list 251F56: list-type 12 -> the taken-over type 6"
+
+# ── 14z-79: (b') — THE OUT-OF-RANGE INDEX WINDOW OF `0x018468` ────────────
+# Fixes TWO confirmed Phobos defects with one change, and retires the whole
+# danger window of this dispatcher for every tenant.
+#
+# THE CLASS. vsavj's sub-state table at 0x018468 has 80 entries; vs2's twin
+# (0x016D34) has 84. A ported character carries vs2's indices verbatim, so
+# entries 80-83 read the words of the NEXT dispatcher (`323b 0006 4efb 1002`
+# at 0x018508) as offsets:
+#
+#   80  0x323B -> 0x01B6A3  ODD -> vec3                        LOUD  (none live)
+#   81  0x0006 -> 0x01846E  the table itself -> reset          LOUD  (Pyron
+#                                                  Cosmo, fixed in his data)
+#   82  0x4EFB -> 0x01D363  ODD -> vec3       PLASMA TRAP      LOUD
+#   83  0x1002 -> 0x01946A  real code -> WRONG ROUTINE         SILENT
+#                                             REFLECT WALL
+#
+# Plasma Trap (air 214+MK) crashed on every Phobos build while every gate
+# stayed green; Reflect Wall (623+P guard cancel) has been running the wrong
+# routine in silence.
+#
+# 14z-78 PREDICTED that this would also fix the knockback discrepancy filed in
+# tests/replays/hui/81_hui_rw_gc.rpl's header ("alias physics, queued").
+# MEASURED 14z-79, AND THE PREDICTION IS WRONG: attacker x @f3240 is 476 on
+# hui27 and 476 on hui28, i.e. UNCHANGED by this thunk. That item stays
+# queued. (The header's "474" does not reproduce on today's instrument
+# either — see the note appended to the replay.)
+#
+# WHY NOT THE ONE-BYTE RETARGET that fixed Pyron's Cosmo (14z-75)? Full-body
+# twin search over the 80 in-range handlers: entries 80/81/83 have twins, and
+# 82 and 83 — the two that are actually LIVE — do not. Entry 82 writes the
+# literal class 0x52, which no vsavj handler writes. So (a) cannot preserve
+# behaviour and (b') was approved for the full 80-83 window.
+#
+# LEGACY-SAFE BY IMPOSSIBILITY, not by a deadness measurement. Vanilla
+# reaching entries 80-83 CRASHES today, so no legacy behaviour can depend on
+# the branch this adds. That is the whole argument, and it is needed: the
+# conservative static deadness scan saturated (all 80 entries "used"), so no
+# in-range entry could be proved free.
+#
+# TWO MEASUREMENTS SHAPE THE BODY (14z-79); the design recorded in STATE
+# 14z-78 was wrong on the first and made unnecessary by the second.
+#
+#  1. THE TABLE READS THROUGH THE OPCODE VIEW. The spec had the thunk read it
+#     with `lea 0x018468,a0 / move.w (0,a0,d0.w),d1`. That is a DATA-space
+#     read and CPS-2 decrypts only program-space fetches (docs/platform/
+#     gotchas.md), so it returns ciphertext: 38 of the 80 legacy targets come
+#     out ODD — an address error on the hottest path in the game. The body
+#     therefore carries its OWN copy of the index table and reads it
+#     PC-relatively; inside a `code` op it re-encrypts with the body, so the
+#     read decrypts back to what we authored.
+#
+#  2. D1 AND THE CCR ARE FREE. The 80 handlers reduce to 23 distinct targets;
+#     none reads the condition codes on entry, and D1 is dead on entry to
+#     every one (the only handler that touches D1, 0x01867A, writes it
+#     first). So the dispatcher's `d1 = offset` result is never consumed, and
+#     the normal path needs no borrowed register and no stack: the spec's
+#     save/restore dance — whose failure mode was a SILENT 4-byte-per-dispatch
+#     stack leak — is deleted rather than verified.
+#
+# WHAT LEGACY PAYS: two compares and one extra jmp, touching D1 (dead) and the
+# CCR (free) and writing NOTHING to RAM. Trampolines exist because
+# `jmp (2,PC,d1.w)` reaches +/-32K and the handlers are ~0xE4A48 from hole_a.
+#
+# EVERY OTHER INDEX IS LOUD. The danger dispatch is four EXACT equality tests,
+# so nothing merely >= 0xA0 picks up entry 80's handler. Odd d0 faults exactly
+# as vanilla does (odd read, vec3); even d0 >= 0xA8 — unreachable, since vs2's
+# own table stops at 83 — is trapped to an odd address for a defined vec3
+# rather than a wild jump. Exhaustively simulated over all 65,536 index
+# values: 80/80 legacy entries reach their vanilla handler, 4/4 danger
+# entries run vs2's body byte-for-byte, and there is NO silent path.
+#
+# THE BODY IS GENERATED, NEVER HAND-TYPED:
+#   python3 tools/gen_index_window_thunk.py \
+#       build/out/vsavj_opcodes.bin build/out/vsav2_opcodes.bin
+# and tests/test_index_window_thunk.sh reconstructs it from the two ROMs
+# rather than diffing it with a tolerance.
+#
+# OWNED BY PHOBOS (maintainer decision, 14z-79): both live defects are his,
+# and Donovan/Pyron were cleared by full movelist sweeps — all their
+# candidates sit at LOUD entries. Keeping the row here costs ONE re-freeze and
+# leaves the other three frozen fingerprints as independent oracles for the
+# rest of M3b. The merged build still gets the cover: the thunk tests no
+# character id.
+#
+# `rts_ok`: 0x018460 is not a subroutine head — it is the tail of subroutine
+# 0x018230 (0 jsr/jmp/Bcc targets land on it; its only caller is the bsr.w at
+# 0x018216), so a handler's `rts` returns to 0x01821A. `rts` is therefore the
+# correct exit for the four inline bodies, exactly as vanilla's handlers do.
+[[site_thunk]]
+stage = 4
+name = "index_window_018468"
+site = 0x018460
+old_hex = "323b00064efb"
+patch = "jmp"
+rts_ok = true
+thunk_hex = "0c4000a06408323b00484efb10020c4000a467280c4000a6672a0c4000a0670c0c4000a2670e4ef900000001137c000f00544e75136b001700544e75137c005200544e7542290121137c000100544e7500e200ec00ec00f6010000f6010a0114011e00ec012800ec013200ec013c014600ec00ec00f600f600ec015000ec015a016400ec00ec00ec00ec00ec00ec016e00ec00ec00ec00ec0178018200f600ec018c018c00ec019600ec00ec00ec00ec00ec00ec00ec00ec00ec00ec00ec00f6010a011e00ec00f600ec00ec00ec00ec01a000ec00ec00ec00ec01aa00ec00ec011e00f601b401be00f6013200ec00ec323c02124ef90001867a323c02244ef90001868c323c022c4ef900018694323c02484ef9000186b0323c02684ef9000186d0323c02704ef9000186d8323c02784ef9000186e0323c02864ef9000186ee323c02944ef9000186fc323c02a24ef90001870a323c02b04ef900018718323c02c84ef900018730323c02d64ef90001873e323c02fa4ef900018762323c02e44ef90001874c323c02b84ef900018720323c03024ef90001876a323c03204ef900018788323c02ec4ef900018754323c03104ef900018778323c033e4ef9000187a6323c021c4ef900018684323c02564ef9000186be"
+note = "(b') 14z-79: entries 80-83 run vs2's handlers inline; every other index takes the vanilla path or a defined vec3. Fixes Plasma Trap (82) and Reflect Wall (83)"

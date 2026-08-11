@@ -4,7 +4,7 @@
 # EVERY frozen reference must rebuild BIT-EXACT from the current tree:
 #   donovan-m3a (WIDE)  4b7d0dc7319ed6cf94a02b22938cdb18946dfddd
 #   m5_stock            6c93cfa8a8a80ae2303d3acaf8c7bff487f369c5
-#   huitzil-m2 (WIDE)   9deda0808e87601b10e2171405805d4669ba2624
+#   huitzil-m3 (WIDE)   34c8b47de5a43a67e7292f16d0ad133d287fa7e4
 #   pyron-m2   (WIDE)   69e8c6f08b9fc5859948e50cfb41156d62adf1ec
 #
 # EXTENDED 14z-76 from the original pair to all four. This is the standing
@@ -29,7 +29,12 @@ trap 'rm -rf "$WORK"' EXIT
 
 EXPECT_WIDE="4b7d0dc7319ed6cf94a02b22938cdb18946dfddd"
 EXPECT_STOCK="6c93cfa8a8a80ae2303d3acaf8c7bff487f369c5"
-EXPECT_HUI="9deda0808e87601b10e2171405805d4669ba2624"
+# huitzil-m3 (14z-79, maintainer-ratified). Supersedes huitzil-m2
+# (9deda0808e87601b10e2171405805d4669ba2624), which can no longer be
+# produced from the tree: huitzil.toml gained the (b') index-window thunk
+# and lost the withdrawn df_palette_seq_rows row. git tag freeze/huitzil-m2
+# is the way back to a tree that reproduces it.
+EXPECT_HUI="34c8b47de5a43a67e7292f16d0ad133d287fa7e4"
 EXPECT_PYR="69e8c6f08b9fc5859948e50cfb41156d62adf1ec"
 
 # The WIDE overlay romset (deterministic from the audited reference sets;

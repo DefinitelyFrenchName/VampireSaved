@@ -105,6 +105,26 @@ Port rules that follow:
 - When reading engine tables for analysis, pick the view by how the ENGINE
   addresses them, not by where they live.
 
+INSTANCE, 14z-79 — RELOCATING a pc-relative dispatcher, not just its table.
+The (b') thunk had to reproduce vsavj's `move.w (6,PC,D0.w),D1 / jmp
+(2,PC,D1.w)` at `0x018460` from a thunk in hole_a, ~0xE4A48 away — far past
+the +/-127 an 8-bit pc-displacement reaches. The design of record (STATE
+14z-78) therefore rewrote the read as `lea 0x018468,a0 / move.w (0,a0,d0.w),d1`
+— textbook second-rule territory, and it would have shipped: measured on the
+two views, **38 of the 80 legacy targets come out ODD in the data view** (all
+80 are even in the opcode view), i.e. an address error on the hottest path in
+the game. Cheap discriminator, worth running on any table before trusting a
+read of it:
+
+    opcode view:  min 0x01867a  max 0x0187a6  odd 0/80
+    data   view:  min 0x0104c8  max 0x02025b  odd 38/80   <- ciphertext
+
+The fix used the FIRST rule rather than the second: carry a copy of the table
+INSIDE the thunk body, which is emitted as a `code` op and so re-encrypts with
+it, and keep reading it pc-relatively. No raw-copy machinery, no view
+conversion, and the read decrypts back to exactly what was authored. Prefer
+that shape whenever the mover is a thunk rather than a whole ported region.
+
 ## CPS-2 gfx simms are not tile-contiguous — naive slicing silently "works" on siblings only
 
 A 16x16 tile's 32 bytes within a simm are 16 two-byte PAIRS at stride 4
