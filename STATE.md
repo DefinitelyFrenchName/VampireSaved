@@ -556,6 +556,52 @@ of it is a structural change that wants a fresh context and incremental
 fingerprint checks, not the tail of a long session. The classification above is
 the design; executing it is the next slice.
 
+### (b') DESIGN, MAINTAINER-APPROVED FOR THE FULL WINDOW — not yet written
+
+Maintainer approved (b') covering entries 80-83. Design is settled; the
+assembly is NOT written, deliberately (see the last paragraph).
+
+**The site.** `0x018460` is `323b 0006` (`move.w (6,PC,D0.w),D1`) and
+`0x018464` is `4efb 1002` (`jmp (2,PC,D1.w)`) — 8 bytes. A `site_thunk` takes
+a 6-byte site, so `jmp thunk` (`4ef9`+addr) covers `0x018460-0x018465` and
+leaves `0x018466-67` orphaned but never executed. Use `patch = "jmp"`.
+
+**THE CONSTRAINT that shapes everything.** The original read is
+`(d8,PC,D0.w)` — an 8-bit displacement, range +/-127. From hole_a the thunk
+would need d = -0xA7B9A. **So the normal path cannot be reproduced
+PC-relatively; it needs an ADDRESS REGISTER holding 0x018468.**
+
+**Which is solvable WITHOUT knowing register liveness** — save and restore via
+the stack rather than hunting for a free register. Two exactness requirements
+that are easy to miss and would corrupt legacy silently:
+
+1. **D1 must be left holding the table OFFSET**, exactly as vanilla does — a
+   handler downstream may read it. So D1 cannot be used as a scratch for the
+   computed target.
+2. **A0 (or whichever register is borrowed) must be restored AND the stack
+   balanced** before control reaches the handler. The natural trick — push the
+   computed target and `rts` to it — has to interleave with the saved
+   register's slot; get the ordering wrong and either A0 is wrong or the
+   stack leaks 4 bytes per dispatch.
+
+**The danger path is the easy half:** for D0 >= 160 (entry >= 80), perform
+vs2's handler inline. Entry 82 is `move.b #$52,(0x54,A1); rts`; 80/81/83 take
+their own vs2 bodies (0x017024 / 0x016F70 / 0x016F78), which are all short.
+
+**Why it is legacy-safe by construction, restated for the record:** vanilla
+reaching entry 80-83 CRASHES today, so no legacy behaviour can depend on that
+branch. This is an impossibility argument and needs no deadness sampling —
+which matters because the sampling came back empty (all 80 entries are used
+under a conservative scan).
+
+**NOT WRITTEN THIS SESSION, and that is the right call.** Hand-written 68k
+that borrows a register and rebalances the stack is precisely the kind of
+change that fails silently in legacy paths, and it needs room to be tested
+properly rather than being typed at the end of a long session. The same
+judgement was applied to the loop re-indent. Next session: write the thunk,
+prove D1/A0/stack exactness against a vanilla A/B at the dispatcher, then the
+full battery.
+
 ### PLASMA TRAP FIX — (b) AS FRAMED IS DEAD; (b') IS BETTER THAN BOTH
 
 Maintainer approved **(b) with fallback to (a)**. (b) needed an in-range table
