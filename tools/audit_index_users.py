@@ -134,8 +134,15 @@ def scan(vs2_data, regions, windows):
                 continue
             entry = w & 0xFF
             if entry in wanted:
+                # The word AFTER the index is a weak SHAPE signal: all three
+                # known-real indices (Cosmo, and Plasma Trap twice) are
+                # followed by 0x0002. Reported, never filtered on — three
+                # samples cannot carry a filter, and applying it as one would
+                # have demoted Phobos' entry-83 candidate on no real evidence.
                 hits.append({"region": name, "addr": a, "word": w,
-                             "entry": entry, "tables": wanted[entry]})
+                             "entry": entry, "tables": wanted[entry],
+                             "next": int.from_bytes(vs2_data[a + 2:a + 4],
+                                                    "big")})
     return hits
 
 
@@ -181,10 +188,12 @@ def main():
         print(f"\n  {name}: {len(own)} candidate(s)")
         for h in sorted(own, key=lambda x: x["addr"]):
             tb = ", ".join(f"table {t[0]:#x} (vsavj {t[2]})" for t in h["tables"])
+            shape = "shape=known" if h.get("next") == 0x0002 else "shape=other"
             print(f"     entry {h['entry']:>3}  word {h['word']:#06x}  "
-                  f"{h['region']}@{h['addr']:#08x}   -> {tb}")
+                  f"{h['region']}@{h['addr']:#08x}  {shape}  -> {tb}")
             rows.append(dict(tenant=name, **{k: h[k] for k in
-                                             ("region", "addr", "word", "entry")}))
+                                             ("region", "addr", "word", "entry",
+                                              "next")}))
     nsh = len(shared)
     print(f"\n  ({nsh} address(es) filtered as SHARED dispatch data, seen at the "
           f"same vs2 address for 2+ tenants)")

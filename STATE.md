@@ -575,6 +575,45 @@ the maintainer's in-progress full movelist sweep is exactly the coverage that
 verdict lacked. Re-probe 0x2a8a4's resolver across that sweep before treating
 "benign" as settled.
 
+### THE SHARPENING FAILED TO PRUNE — and that STRENGTHENS the case for (b')
+
+Attempted the vanilla-baseline sharpening. It does not work, and the reason is
+worth more than the pruning would have been.
+
+**What was tried.** All three known-real indices (Pyron's Cosmo, Phobos' Plasma
+Trap twice) share a local shape: the word following the index is `0x0002`.
+Used as a filter over the 21 candidates on table `0x18464`, it prunes **3**.
+
+**Why that is bad news, not good.** The 18 survivors include **15 of
+Donovan's**, and their byte context is STRUCTURALLY IDENTICAL to the confirmed
+defects — same zero run before, same `01xx` cluster, same `0x0002` after. So
+the candidates are not obviously look-alike fields in a different structure.
+Either those records are never DISPATCHED (a runtime question this cannot
+answer), or **Donovan carries latent crashes nobody has triggered.**
+
+The earlier ROM-wide conservative scan already failed for the opposite reason —
+it saturated, finding all 80 entries "used". Between them: there is no static
+way to shrink this list, and the honest reading is that the list may be
+substantially REAL.
+
+**CORRECTION to the test priorities I gave the maintainer.** I ranked Phobos'
+entry-83 candidate (`x022400@0x0231ee`) as the best single target. It is one of
+the 3 the shape signal PRUNES. That is weak evidence — three samples cannot
+carry a filter — but it is evidence against, and I ranked it top on none.
+Treat it as unranked rather than first.
+
+**The signal is now REPORTED, never filtered on** (`shape=known` / `shape=other`
+per candidate). Applying it as a filter would have silently demoted entry 83 on
+three samples' worth of evidence, which is exactly the kind of confident
+pruning that hid Plasma Trap in the first place.
+
+**THE REAL CONCLUSION: pruning is the wrong goal.** If Donovan's 15 may be
+genuine, no test list is short, and chasing them move-by-move is unbounded.
+(b') covering the full 80-83 window retires the ENTIRE class for ALL THREE
+tenants in one change, whatever those records turn out to do — which is now
+clearly worth more than any amount of list-narrowing. It also means (b')
+should land BEFORE anyone spends time on the per-move hunt.
+
 ### (b') DESIGN, MAINTAINER-APPROVED FOR THE FULL WINDOW — not yet written
 
 Maintainer approved (b') covering entries 80-83. Design is settled; the
