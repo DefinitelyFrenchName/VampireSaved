@@ -556,6 +556,25 @@ of it is a structural change that wants a fresh context and incremental
 fingerprint checks, not the tail of a long session. The classification above is
 the design; executing it is the next slice.
 
+### RE-EXAMINE PHOBOS' "BENIGN" ALIASED ROW — its deadness has the same
+### provenance problem Plasma Trap just exposed
+
+With the gate fixed to judge each build at its own id, Phobos' real answer at
+0x10 is ONE row: `0x02a8a4 row 0x10 = 0x004a` (should be 0x0040) — the latent
+aliased row NEXT_SESSION records as "benign today (0 hits at the resolver)".
+
+**That verdict was measured the same way the Plasma Trap deadness was: on
+replays that never fired the move.** Plasma Trap has just demonstrated that
+this repo's move coverage has holes big enough to hide a crash on every build
+ever made. "0 hits at the resolver" is only as strong as the moveset the
+resolver was watched over, and nobody had played 214+MK in the air.
+
+Not a claim that the row is live — a claim that the EVIDENCE for it being dead
+is weaker than it reads. Cheap to settle now that `index_watch.lua` exists:
+the maintainer's in-progress full movelist sweep is exactly the coverage that
+verdict lacked. Re-probe 0x2a8a4's resolver across that sweep before treating
+"benign" as settled.
+
 ### (b') DESIGN, MAINTAINER-APPROVED FOR THE FULL WINDOW — not yet written
 
 Maintainer approved (b') covering entries 80-83. Design is settled; the
