@@ -790,6 +790,32 @@ needs no cover — all four bad entries are loud and all are cleared by
 playtest. Entry 10 of `0x03975e` is silent and uncleared; whether (b') should
 grow a second site depends on the deadness measurement above.
 
+### ENTRY 10 IS UNREACHABLE — (b') NEEDS NO SECOND SITE. Scope is CLOSED.
+
+The last open question on (b')'s scope. Entry 10 of `0x03975e` is the only
+other SILENT bad entry, and 18 candidates sit on it across all three tenants —
+a human sweep can never clear it, so it had to be measured.
+
+**The dispatcher itself is never reached.** `GUARD_PROBE=03975a` over seven
+action-dense tenant replays covering all three characters
+(hui_mash / hui_ex_fg / hui_air, pyron_mash / pyron_cosmo, don_dp_spam /
+don_mash): **0 hits, every one.** Add the maintainer's full Pyron movelist
+sweep (29 dispatches logged, all on `0x018464`, none on this one) and the
+Reflect Wall run (0 hits).
+
+**Controlled, because seven zeros with no control is the blind-zero trap.**
+On the SAME replay with the SAME rig: `0x018464` fires 13 times and the pool
+seeder `0x016C64` fires 9. And the probe address is verified to be the
+dispatcher: `0x03975a` = `4efb 1002`, the same `jmp (d8,PC,Xn)` shape.
+
+So the 18 entry-10 candidates cannot fire, and **(b') covers `0x018468`
+entries 80-83 and nothing else**:
+
+* `0x018468` 80-83 — **covered by (b')**; 82 and 83 are confirmed live defects.
+* `0x0185da` 86-89 — **no cover needed**; all four are LOUD and all are
+  cleared by the three clean playtests.
+* `0x03975e` 10 — **no cover needed**; the dispatcher is cold, measured.
+
 ### (b') DESIGN, MAINTAINER-APPROVED FOR THE FULL WINDOW — not yet written
 
 Maintainer approved (b') covering entries 80-83. Design is settled; the
