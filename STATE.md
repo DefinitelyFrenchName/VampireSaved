@@ -556,6 +556,53 @@ of it is a structural change that wants a fresh context and incremental
 fingerprint checks, not the tail of a long session. The classification above is
 the design; executing it is the next slice.
 
+### PLASMA TRAP FIX — (b) AS FRAMED IS DEAD; (b') IS BETTER THAN BOTH
+
+Maintainer approved **(b) with fallback to (a)**. (b) needed an in-range table
+entry PROVABLY DEAD in vanilla, to carry a handler writing class 0x52.
+
+**There is no such entry, and the measurement says so cleanly.**
+
+* Runtime, 4 action-dense legacy replays on vanilla vsavj, 80 dispatches
+  total: only entries **0, 2, 3, 4, 5** ever appear. That is FAR too thin to
+  call the other 75 dead — 80 samples over an 80-entry table is exactly the
+  "a deadness measurement is only as good as the replay it ran on" trap, so
+  it was not used as a verdict.
+* Static and CONSERVATIVE instead (over-counting use only shrinks the dead
+  set, so it fails safe): every word `0x01NN` anywhere in either ROM view is
+  treated as a use. **All 80 entries appear. The conservative dead set is
+  EMPTY.** Control: the 5 runtime-observed entries are all in the used set.
+
+So (b) as framed cannot be built without a tighter, riskier liveness test —
+and a wrong "dead" call here is precisely what 14z-74 did when it rewrote a
+live shared word and broke four legacy replays.
+
+**(b') — extend the table WITHOUT touching it, gated on the INDEX.** A
+`site_thunk` at the dispatcher (`0x018460`) that tests the index and, for the
+out-of-range values, performs vs2's handler inline (`move.b #$52,(0x54,A1)`
+for 82) before rejoining; everything else falls through to the vanilla path
+untouched.
+
+Why this is safe BY CONSTRUCTION, which is stronger than any deadness proof:
+**vanilla reaching entry 82 crashes today.** No legacy behaviour can depend on
+a path that faults, so a branch taken only when D0 >= 160 is unreachable for
+every vanilla character without the machine already being dead. The deadness
+argument is replaced by an impossibility argument, and needs no sampling.
+
+It also keeps class **0x52 exactly**, so all THREE consumers of the class byte
+(reaction property, death-path re-read, per-victim aura row) see what vs2
+gives them — the thing (a) cannot promise and 14z-28 proved matters.
+
+Cost: an engine hook on a shared dispatcher. Cheap here — the site is COLD
+(80 dispatches across four full replays), and hook cost is what the masked-v2
+legacy basis exists for.
+
+Bonus: the same thunk can cover entries 80, 81 and 83, which retires the whole
+danger window for every tenant at once rather than one move at a time.
+
+**Fallback (a) unchanged** if (b') proves awkward: retarget Phobos' index
+82 -> 6 in his own data, and playtest the hit reaction.
+
 ### PLASMA TRAP FIX: NOT a free retarget like Cosmo — MAINTAINER DECISION
 
 The Cosmo fix worked because entry 81's handler COPIES a byte
