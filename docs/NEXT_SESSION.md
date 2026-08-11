@@ -6,8 +6,13 @@
 > fingerprints bit-exact), and the class is now a build error. Details below
 > under "THE CRYPT-WINDOW BLOCKER IS CLEARED".
 >
-> **The remaining M3b work is the region-identity slice and the N-way dispatch
-> form, then the N-tenant loop.**
+> **AND THE REMAINING WORK SHRANK.** Region identity DISSOLVED (14z-78b): with
+> `anim` movable, every tenant keeps its own copy of every region and it fits
+> with room to spare, so the shared-span dedup, the union extent, the 2,000
+> conflicting bytes and the name-namespacing all stop being work items. What is
+> left is **the N-way dispatch FORM** (a design decision) and **the N-tenant
+> loop**, whose state boundary is now classified — see "1. Region identity" and
+> STATE 14z-78b.
 
 **ALL THREE TENANTS ARE FROZEN.** Donovan `donovan-m3a` (4b7d0dc7),
 Phobos `huitzil-m2` (9deda080), **Pyron `pyron-m2` (69e8c6f0 — RE-FROZEN
@@ -370,44 +375,35 @@ ran.
 
 ### NEXT SLICE — region identity, then the N-way dispatch FORM
 
-**1. Region/extraction identity — MEASURED 14z-77, and it is THREE mechanisms,
-not one.** M3b_plan Phase 2 item 2's "a shared span is placed ONCE" holds for
-most spans but NOT for four of them. `tests/test_region_overlap.sh` (~1s)
-freezes the picture; `tools/audit_region_overlap.py` produces it.
+**1. Region identity — DISSOLVED 14z-78. Do not budget the three mechanisms.**
+The 14z-77 analysis (7 names to namespace, `x088512`'s union extent, 4
+conflicting spans, 13 UNDECIDABLE) described the problem you get if regions are
+SHARED between tenants. With `anim` movable they need not be: every tenant
+keeps its own copy of everything and it fits with room to spare —
+reach-constrained 98,488 of 344,640 crypt bytes, everything else 880,022 of
+`wide_ext`'s 2,097,136. Nothing shared, nothing to conflict. Names do not need
+namespacing either: `placed`/`regions` are per-iteration data, so `placed[name]`
+stays exactly as written. Full reasoning and the space table: STATE 14z-78b.
 
-- **7 generic names need per-tenant NAMESPACING** — `anim`, `code`, `hitbox`,
-  `hitbox_proj`, `aux0_0..2` are the same name for completely different spans,
-  one per tenant. Not shared at all.
-- **`x088512` needs the UNION EXTENT** — same start in all three, three
-  lengths (D 0x2F00, H 0x3B98, P 0x3B40).
-- **4 shared spans CONFLICT and cannot be placed once** — `x026142` (54
-  bytes), `x028122` (50), `x05c800` (348), `x2b7ef4` (1548): **2,000 bytes**
-  where two or more tenants write DIFFERENT values to the SAME field. Only one
-  can ship, so each needs a per-tenant COPY or a per-character INDIRECTION.
-  The disjoint *1-differs* bytes (1,674) are the `[table_fix]` shape
-  generalised — one tenant's own row — and those DO union cleanly.
-- 13 further shared spans are H+P only and are reported **UNDECIDABLE**, not
-  zero: with two tenants "one differs" and "both disagree" are the same
-  observation.
+**What is actually left is ONE slice — the loop — and its design is done.**
+The state boundary is classified in STATE 14z-78b:
 
-**Do not quote an un-normalised conflict count.** The three references are
-independent builds whose allocators chose different addresses, so a pointer
-into a shared region reads as a conflict spuriously — that artefact is **73%
-of the raw figure (7,591 -> 2,000)**. Section 3 of the gate is the control.
+- **SHARED, stays above the loop:** `spaces` (carries the allocator cursor
+  `cur`), `gap_free`, and the accumulating `ops`/`notes`/`fail`/`fragments`.
+  Reset `spaces` per tenant and they allocate over each other.
+- **PER TENANT, moves inside:** `man` (:639), `regions` (:987), `placed`
+  (:985), `patched_clones` (:1153), `farm_ports` (:1243), and `dc_tables`
+  (:835) — that last one is declared at the shared level today and is exactly
+  the "memo keyed by address, not (tenant, address)" hazard the blast radius
+  named.
+- **The one interface change:** `--extract` must become repeatable and PAIR
+  with `--port`. `extract_dir` is a single positional (:602) and region blobs
+  are read from it (:1331); `--port` went repeatable in slice F. One extraction
+  per tenant, so they must travel together.
+- Then delete the `len(tenants) > 1` refusal at `gen_donovan_patch.py:527`.
 
-**The conflicting bytes are IDENTIFIED (14z-77), and they make the answer
-simple.** 3-byte runs dominate — a 4-byte pointer whose top byte agrees — and
-they point overwhelmingly at **`anim`**, which is a different source span per
-tenant. These shared spans are shared CODE each tenant specialises with
-pointers to its own data. Each tenant's clone is SELF-CONTAINED: the OBJ bank
-table inside `x026142` has 14 `1-differs` bytes and ZERO conflicts, so no union
-is needed. **Per-tenant COPIES resolve everything; sharing is an optimisation,
-not a requirement.**
-
-**Note added 14z-78:** `region_subst` resolves against `placed[name]`, so once
-region names are tenant-namespaced it must resolve through the row's OWNER —
-the same shape as slices D/E. The two select-companion rows fixed in 14z-78
-are the first consumers that will need it.
+`main()` is ~4,000 lines, so hoist the loop body incrementally and run
+`test_m3a_reproducible.sh` + `test_tenant_row_owner.sh` between steps.
 
 **2. The N-way dispatch form** — what slice E deliberately did NOT do. Each
 baked fragment still tests ONE id, and the sites are SHARED: all three tenants

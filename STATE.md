@@ -490,6 +490,72 @@ verdict needs a **liveness control** proving the tenant's match formed, or an
 unformed match reads as a clean pass. Donovan needed none only because his case
 used to crash, which proved the path ran.
 
+### 14z-78b — REGION IDENTITY DISSOLVES INTO THE LOOP, and most of the
+### planned Phase-2 work with it
+
+Two simplifications, both consequences of `anim` becoming movable.
+
+**1. Nothing needs to be SHARED, so nothing can conflict.** M3b_plan Phase 2
+item 2 says "key regions by `(src_set, src_addr, len)` so a shared span is
+placed ONCE". 14z-77h already corrected its premise (four of seventeen shared
+spans conflict). With `anim` out of the crypt window the correction completes:
+**every tenant keeps its own copy of every region, and it fits comfortably.**
+
+| | bytes | capacity | spare |
+|---|---|---|---|
+| reach-constrained -> crypt window | 98,488 | 344,640 | 246,152 |
+| everything else -> `wide_ext` | 880,022 | 2,097,136 | 1,217,114 |
+
+(all-copied total 978,510, from `tests/test_region_overlap.sh`'s own
+`if_all_copied` figures.)
+
+That deletes, as work items: the shared-span dedup, `x088512`'s union extent,
+the 2,000 conflicting bytes across `x026142`/`x028122`/`x05c800`/`x2b7ef4`, and
+the 13 UNDECIDABLE H+P spans. 14z-77h's conclusion was already "per-tenant
+COPIES resolve everything; sharing is an optimisation, not a requirement" — it
+is now also AFFORDABLE, which is what was missing.
+
+Safe because each clone is self-contained: these are shared CODE spans that
+each tenant specialises with pointers to its OWN data, and the relocated
+copies are read-only, so vanilla is untouched and each tenant's dispatch
+reaches its own clone (measured 14z-77h).
+
+**2. The "7 generic names need per-tenant NAMESPACING" item also dissolves.**
+Names only collide if `placed`/`regions` are shared dicts. They need not be —
+they are per-iteration data. So there is no keying refactor: `placed[name]`
+stays exactly as written and is simply rebound each iteration.
+
+### THE LOOP'S STATE BOUNDARY — classified, and it is the whole remaining slice
+
+| state | line | under the loop |
+|---|---|---|
+| `spaces` (carries `cur`) | 790 | **SHARED** — reset it and tenants allocate over each other |
+| `gap_free` | 833 | **SHARED** — same reason |
+| `ops` / `notes` / `fail` / `fragments` | 825-828 | **SHARED**, accumulate |
+| `man` (regions.json) | 639 | per tenant |
+| `regions` | 987 | per tenant |
+| `placed` | 985 | per tenant |
+| `patched_clones` | 1153 | per tenant |
+| `farm_ports` | 1243 | per tenant |
+| `dc_tables`, keyed `(t_src,t_len)` | 835 | **per tenant** — declared at the shared level today; this is exactly the "memo keyed by address, not (tenant, address)" hazard the blast radius named |
+
+**The one real interface change: `--extract` must become repeatable and PAIR
+with `--port`.** Today `extract_dir` is a single positional (line 602) and the
+region blobs are read from it (line 1331), while `--port` is already
+repeatable (slice F). One extraction per tenant, so the two must travel
+together.
+
+So the remaining M3b generator work is: pair `--extract` with `--port`; move
+the six per-tenant bindings inside the loop body while leaving the four shared
+ones outside; move `dc_tables` in with them; delete the `len(tenants) > 1`
+refusal at :527. Plus the N-way dispatch FORM, which is unchanged and remains
+a design decision rather than a mechanical edit.
+
+NOT attempted in 14z-78: `main()` is ~4,000 lines and hoisting a loop body out
+of it is a structural change that wants a fresh context and incremental
+fingerprint checks, not the tail of a long session. The classification above is
+the design; executing it is the next slice.
+
 ## Session 14z-77 — M3b slice C: rows get an OWNER, and the gating family
 ## asks it instead of the build scalar
 
