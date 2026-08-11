@@ -556,6 +556,56 @@ of it is a structural change that wants a fresh context and incremental
 fingerprint checks, not the tail of a long session. The classification above is
 the design; executing it is the next slice.
 
+### 14z-78c/d — the merged manifest is CLEAN, and the loop's last unknown found
+
+**78c: `--extract` is repeatable and PAIRS with `--port`.** Much smaller than
+the blast radius implied — `args.extract_dir` had exactly TWO uses (:639
+regions.json, :1356 the region blob). Both now go through a per-tenant
+`extract_dir` binding. Count checked at load, because the failure it prevents
+(tenant N built against tenant M's regions) yields a plausible build, not an
+error. Three controls run by hand; generator output byte-identical.
+
+**78d: the nine remaining merge collisions RESOLVE.** All were "differ on
+`new_hex`, agree on `new_hex_variant`" — labelled as dissolving on WIDE since
+slice F, but still refused. Now resolved, conditionally: "merged implies WIDE
+implies variant ids" is the CONVERSE of what `tenant_context` guarantees, so
+the merge instead asks `tenant_ids_under(docs, profile)` what id each tenant
+actually lands on, failing closed when it cannot tell. `tenant_row_ids()`
+cannot answer this — it returns every id a tenant COULD take, including
+Donovan's base 0x0F, so it can never report all-variant.
+
+The collapse sets `new_hex` to the agreed variant value rather than leaving
+the disagreement in place, so a future reader taking the base track cannot
+silently emit the host band's word. That is the baked-anim-literal defect
+class one level up, and it costs nothing to close here.
+
+**A 3-tenant WIDE merge now reports ZERO collisions** and stops only at the
+`len(tenants) > 1` refusal.
+
+### THE LOOP IS ONE MECHANICAL STEP PLUS ONE GATE — both now known
+
+The re-indent is safe, and that was checked rather than assumed:
+- **no top-level `return` anywhere in `main()` after line 1000**, so wrapping
+  cannot break control flow;
+- the per-tenant `man` read sits ABOVE the shared setup but has **zero uses
+  between the read and `placed`**, so it moves down into the loop untouched;
+- the body is a contiguous run of 4-space statements ending cleanly at the
+  `── emit ──` block; output writing is entirely below it.
+
+**The one thing that is NOT mechanical, found by reading `row_applies`:**
+it gates on the tenant's SLOT TRACK (variant vs base), not on ownership
+versus the current iteration. Run the body N times as-is and every SHARED row
+(`_owner=None`) is emitted N times — the double-apply `merge_manifests`'
+docstring warns about, and last-write-wins at best.
+
+So the loop needs an iteration gate alongside the existing ones:
+
+> a row belongs to THIS iteration if `_owner` is the current tenant, **or**
+> `_owner is None` and this is the first iteration.
+
+Natural extension of slice C, and it is the last unknown. Once it exists the
+refusal at :527 can go.
+
 ## Session 14z-77 — M3b slice C: rows get an OWNER, and the gating family
 ## asks it instead of the build scalar
 
