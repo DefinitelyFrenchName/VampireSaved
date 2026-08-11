@@ -1,8 +1,28 @@
 # STATE — living progress log
 
-Updated: 2026-08-11 (session 14z-80 — **THE N-TENANT LOOP LANDED. The
-generator emits three tenants into one image and the `>1 tenant` refusal that
-has stood since M3 Phase 3 is deleted.** `main()`'s body (3,723 lines) is now
+Updated: 2026-08-11 (session 14z-80, second half — **A 3-TENANT MERGED PATCH
+NOW APPLIES.** After the loop landed, four defects were found and fixed under
+it, each one MEASURED before it was touched: the iteration gate's shared-row
+rule was wrong for rows that name a REGION (Huitzil's and Pyron's copies of
+x05c800/x088512 kept vs2's OBJ bank — the wrong graphics bank, silently) and
+wrong again for rows whose ADDRESS derives from the tenant's slot (H's and P's
+`slot_table` rows wrote DONOVAN'S entries); `obj_hook`'s one engine table
+resolved only tenant 0's handlers, sending all TWELVE of Huitzil's secondary
+objects to planted ILLEGALs; and the last collisions were AGREEMENTS —
+different mechanisms writing identical bytes — now dropped at emit. Then the
+N-way dispatch FORM turned out not to be a design decision at all: both shared
+sites already carry compare-chain elements whose branch targets whatever
+follows, so N tenants chain by CONCATENATION and N=1 is byte-identical. Op
+collisions 10 pairs/36 bytes -> 4/24 -> **0/0**, and `patch_prg` writes the 12
+members. All four frozen references still rebuild bit-exact throughout.
+**This is the PROGRAM half only** — the gfx half is single-tenant by decision,
+nothing has been in an emulator, and no legacy gate has seen a merged image.
+`tests/test_tenant_loop.sh` (~17 s) covers it with 5 verdict controls, one of
+which caught itself doing nothing. Read docs/NEXT_SESSION.md first.)
+
+Previously: 2026-08-11 (session 14z-80, first half — **THE N-TENANT LOOP
+LANDED. The generator emits three tenants into one image and the `>1 tenant`
+refusal that has stood since M3 Phase 3 is deleted.** `main()`'s body (3,723 lines) is now
 a loop body; the iteration gate makes a row belong to ONE iteration; and all
 four frozen references still rebuild bit-exact, which is the whole safety
 argument. **THREE TRAPS were under the "one re-indent plus one gate" estimate,
@@ -12,9 +32,10 @@ invisible to the op-overlap assertion and impossible to see with one tenant);
 `recon_overlay` is a `[[tenant]]` key that `tenant_context()` never copied, so
 every tenant after the first silently built against the shared map alone; and
 `pcrel_far_tramps` is a second address-keyed memo of the class STATE 14z-78
-named only `dc_tables` for. **A 3-tenant merge now GENERATES (612 ops) but does
-not APPLY:** patch_prg refuses it at the first op overlap, and the full
-inventory is 10 op pairs / 36 bytes — 34 bytes inside the four shared spans
+named only `dc_tables` for. **A 3-tenant merge GENERATES (612 ops) but at this
+point did not yet APPLY — SUPERSEDED the same day, see the top of this file:**
+patch_prg refused it at the first op overlap, and the inventory was
+10 op pairs / 36 bytes — 34 bytes inside the four shared spans
 14z-77h already froze as conflicting, and four 6-byte collisions at engine
 SITES where each tenant emits its own thunk, i.e. the N-way dispatch FORM with
 a number on it at last. New gate `tests/test_tenant_loop.sh` (~6 s, generator
@@ -238,8 +259,10 @@ either overlay, so building the base map before the overlays is inert.
 | 2 (D+H) | 455 of 502 declared | GENERATION OK |
 | 3 (D+H+P) | 612 of 707 declared | GENERATION OK |
 
-**It generates; it does not apply.** `patch_prg.py` refuses the merged patch by
-name at the first op overlap. Full inventory, frozen by the new gate:
+**It generates; it does not apply — SUPERSEDED by 14z-80e-h below, which took
+this to 0/0 and made patch_prg accept it. The analysis stands as the starting
+point; the numbers are historical.** `patch_prg.py` refused the merged patch by
+name at the first op overlap. Inventory at that point:
 **10 overlapping op pairs / 36 bytes.** 34 of those bytes lie inside the four
 shared spans 14z-77h froze as conflicting (`x026142`/`x028122`/`x05c800`/
 `x2b7ef4`). The largest class is four 6-byte collisions at engine SITES —
@@ -282,19 +305,80 @@ Also re-frozen: `tests/test_manifest_merge.sh`'s `site_thunk` row, RED since
 14z-79 added the (b') thunk to huitzil.toml (10→11 per file, 28→29 merged; the
 shared count is unchanged because (b') is owned).
 
-### OPEN AFTER THIS SLICE, in the order they block a merged build
+### 14z-80e/f/g/h — FOUR DEFECTS UNDER THE LOOP, AND THE MERGE CLOSES
 
-1. **Shared-row union.** A shared row emitted on iteration 0 sees only tenant
-   0's `placed`/`regions`. `obj_hook` resolves each ported handler through
-   exactly those, so on a merged build the other tenants' extra handlers fall
-   to their tripwires — loud at runtime, not silent. The fix is a union pass
-   AFTER the loop against every tenant's placements. Commented in the source at
-   the section and in `row_here()`'s docstring.
-2. **The N-way dispatch FORM** (slice E's open design decision): one thunk per
-   engine site whose body tests N ids. The 4 site collisions above are it.
-3. **The remaining 6 shared-span op collisions** (`x028122` and friends) —
-   fields two or more tenants write differently, 14z-77h's conflicting set.
-4. **Driver + gfx halves**, single-tenant by decision.
+The four items this section originally listed as open are DONE. Each was
+measured before it was touched, and three of them were invisible to every
+gate that existed at the time.
+
+**1. The iteration gate's shared-row rule was wrong TWICE (14z-80e, 14z-80g).**
+14z-80b shipped "an unowned row belongs to iteration 0". That is right for a
+row patching one engine address and wrong for a row whose EFFECT is
+tenant-derived:
+
+| key | what iteration-0 did | measured |
+|---|---|---|
+| `region`/`regions` | patched only tenant 0's COPY of the shared spans | all 6 shared `port_patch` OBJ bank setters left Huitzil's and Pyron's x05c800/x088512 holding vs2's bank 3 — the wrong graphics bank, silently. Also dropped 2 `pcrel_escape_fix` rows and the merged `[table_fix]` union |
+| `slot_table` | wrote tenant 0's TABLE ENTRY for everyone | H's and P's `obj_bank_word_slot`/`win_pos_x_slot` wrote DONOVAN'S entries (0x282FA / 0x5F24C), colliding with his, while H and P got none |
+
+Fixed by classifying the row, and — for the second — by keeping `_owners`
+through `merge_manifests`' dedup: two tenants declaring the same row TEXT are
+not writing the same word, and the merge used to forget who they were.
+
+**2. `obj_hook` resolved only tenant 0's handlers (14z-80f).** One engine
+table, entries ported by different tenants. 15 extras fell to tripwires and
+TWELVE were Huitzil's (types 64-75) — every one of his secondary objects would
+have dispatched to a planted ILLEGAL on spawn. Now `engine_here()` runs it on
+the LAST iteration through `resolve_ported()`/`resolve_recon()` over every
+tenant's published view: 17/17 placed, 59-63 in Donovan's regions and 64-75 in
+Huitzil's OWN copies, and types 121-123 (handler 0x6A70C, ported by nobody)
+correctly still tripwired.
+
+**3. The rest were AGREEMENTS, not conflicts (14z-80g).** Donovan's
+`data_port hit_class_props_ext` and H's/P's `aux_poke effect_map_*` write the
+same three words with the same values; H's and P's adjacent `byte15b` entries
+widen to one word with the same content. Nothing silently won — but patch_prg
+rightly refuses any two ops on one word, so a merged patch stopped on an
+agreement. An op whose every byte is already written with the same value is
+dropped at emit, named in the notes; anything partial or disagreeing is left
+for patch_prg, because this pass must not become a way to hide a real one.
+
+**4. The N-way dispatch FORM was not a design decision (14z-80h).** Both
+shared sites already carry compare-chain elements —
+`cmpi.b #TT,d6 / bne.s <past my work> / <my work>` — whose branch targets
+whatever follows, so "the next element" and "the vanilla tail" are the same
+address. N tenants chain by CONCATENATION with no displacement to recompute,
+and at N=1 the bytes are identical to the single-element form, which is why
+nothing had to be re-frozen. The split point is READ FROM THE BODY (element
+length = 6 + the bne displacement, after asserting the `0c06`/`66xx` opening);
+a body without that shape is a named build error. `win_pal_variant` became
+engine-level; `site_thunk` could not (its bodies carry each tenant's own
+placements), so each iteration records its body and the chain is assembled
+after the loop.
+
+**RESULT.** Op collisions **10 pairs / 36 bytes -> 4/24 -> 0/0**, and
+`patch_prg` applies the 3-tenant patch (12 members). Ops: 3-tenant 612 -> 590,
+2-tenant 455 -> 436. All four frozen references bit-exact after every step.
+
+**WHAT THIS IS NOT.** The PROGRAM half composes. The gfx half is
+single-tenant by decision, no merged image has been in an emulator, and no
+legacy or behaviour gate has been near one. Those are the next milestones,
+in that order.
+
+### OPEN AFTER THIS SLICE
+
+1. **The gfx half is single-tenant** (M3b_plan Phase 3, undesigned): group-C
+   tile-code coexistence, `build_gfx_donovan.py`'s per-tenant band/delta/bank,
+   and the per-tenant `select_tiles.json`/`wheel_bank5.json` the generator now
+   emits under per-tenant names.
+2. **`build_donovan.sh` is single-tenant**: it needs one extraction per tenant
+   and to pass `--extract`/`--port` pairs.
+3. **A merged image has never run.** Before any of it: the legacy suite on a
+   merged build, then the per-tenant behaviour batteries.
+4. **`region_space` on the manifests, deliberately.** Not a blocker — three
+   tenants fit because `alloc()`'s fallback spills into `wide_ext` — but a
+   spill is not a placement design, and adding the rows moves the frozen
+   huitzil/pyron placements, so it is a re-freeze and the maintainer's call.
 
 ## Session 14z-79 — (b') LANDED, AND BULLETA'S DARK FORCE WAS BROKEN
 ## FOR TEN SESSIONS

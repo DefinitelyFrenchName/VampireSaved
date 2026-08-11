@@ -615,37 +615,37 @@ tests/test_manifest_merge.sh          # 14z-77 (M3b slice F): what the three
                                       # patch_prg.py's overlap assertion, hence
                                       # its own check. 4 permissiveness
                                       # controls. No ROMs, ~1s
-tests/test_tenant_loop.sh             # 14z-80: THE N-TENANT LOOP IS REAL. main()'s
-                                      # body is now a loop body, and for ONE tenant
-                                      # it is inert — so the four fingerprints
-                                      # cannot tell a working loop from one that
-                                      # silently ran once, or that built every
-                                      # later tenant against tenant 0's data. Six
-                                      # sections, GENERATOR ALONE against the
-                                      # existing extract dirs (~6s, no emulator,
-                                      # SKIPs without them): determinism ground
-                                      # truth; N=1 frozen per tenant (D 243 /
-                                      # H 259 / P 205 ops) with NO tenant-suffixed
-                                      # side file; N=2 455 of 502 declared and
-                                      # N=3 612 of 707, i.e. the shared rows
-                                      # emitted ONCE — the iteration gate MEASURED;
-                                      # each tenant's regions at DISTINCT addresses
-                                      # (the four shared region names are different
-                                      # spans), per-tenant side files, tenants.json
-                                      # in declaration order; and the merged
-                                      # patch's remaining op collisions FROZEN at
-                                      # 10 pairs / 36 bytes incl. engine sites
-                                      # 0x5F1B6 + 0x5F146. Freezing what is still
-                                      # BROKEN is deliberate: that is the work list
-                                      # for the shared-row-union / N-way-dispatch
-                                      # slice, and a shrinking number is how it
-                                      # reports progress. HONEST LIMIT, stated in
-                                      # the file: it proves the GENERATOR emits N
-                                      # tenants, NOT that a merged ROM builds —
-                                      # patch_prg still refuses the merged patch by
-                                      # name. 2 verdict controls (one-iteration
-                                      # collapse; side_name() disabled must be
-                                      # CAUGHT, not clobber)
+tests/test_tenant_loop.sh             # 14z-80: THE MERGE GATE. A 3-tenant patch
+                                      # composes AND applies — 590 ops, ZERO op
+                                      # collisions, patch_prg writes 12 members.
+                                      # Nine sections, GENERATOR ALONE against the
+                                      # existing extract dirs (~17s, no emulator,
+                                      # SKIPs without them). HONEST LIMIT, stated
+                                      # in the header: that is the PROGRAM half
+                                      # ONLY. The gfx half is single-tenant by
+                                      # decision, no merged image has run in an
+                                      # emulator, and no legacy gate has seen one.
+                                      # "N tenants generate", "the patch applies"
+                                      # and "the ROM is correct" are three
+                                      # different statements; this makes the first
+                                      # two. Sections: determinism; N=1 frozen per
+                                      # tenant (D 243 / H 259 / P 205) with no
+                                      # tenant-suffixed side file; N=2 436 and
+                                      # N=3 590 of 707 declared; each tenant's
+                                      # regions at DISTINCT addresses (the four
+                                      # shared names are different spans);
+                                      # 4 shared REGION rows reaching every
+                                      # tenant's copy; 4b the obj_hook union
+                                      # (17/17, entries ATTRIBUTED per tenant —
+                                      # a count alone cannot tell whose copy);
+                                      # 4c slot_table rows at 3 distinct slots +
+                                      # the agreeing-duplicate count; 4d both
+                                      # N-way chains DECODED (ids in declaration
+                                      # order, each element with its own data
+                                      # pointer); 5 zero collisions AND patch_prg
+                                      # actually applying it. 5 VERDICT CONTROLS,
+                                      # one of which caught ITSELF perturbing
+                                      # nothing (`set() or {...}` is falsy)
 tests/test_tenant_row_owner.sh [ex]   # 14z-77 (M3b slices C+D): is the row-OWNER
                                       # threading LOAD-BEARING? Every slice of the
                                       # multi-tenant refactor is INERT by design, so

@@ -1091,14 +1091,11 @@ def main():
     #   BAKED INTO EMITTED MACHINE CODE — `charid_sites`, the win-pal thunk
     #     rebase, TT/TU substitution, the overlay T-select thunk. Each takes
     #     its id from the row's owner or from `T` (slice E), so a per-tenant
-    #     site is correct. What is STILL OPEN is the shared-SITE case: three
-    #     `*_bank_variant_id` thunks and `win_pal_variant` sit at ONE engine
-    #     address that every tenant patches, so a merged build emits N
-    #     six-byte ops at the same place. Measured 14z-80: exactly four such
-    #     collisions, at 0x5F1B6 (x2) and 0x5F146 (x2). The fix is one thunk
-    #     whose body tests N ids — the N-way dispatch FORM, still a design
-    #     decision. It fails SILENTLY (a thunk gating on the wrong character
-    #     does not crash), so it lands alone and with its own gate.
+    #     site is correct. The shared-SITE case — `win_pal_variant` at
+    #     0x5F1B6 and the `select_pal_variant_id` site_thunk at 0x5F146, one
+    #     address every tenant patches — is CLOSED (14z-80h): both bodies are
+    #     compare-chain elements already, so N tenants chain by
+    #     concatenation and N=1 is byte-identical. See the chain passes.
     #
     #   OUTPUT NAMING — RESOLVED: `tenant.json` stays tenant 0 for its four
     #     consumers and the array goes to `tenants.json`; side files take a
@@ -2887,16 +2884,17 @@ def main():
                         f"engine twin of {own:#x} (alias char row {alias:#x} "
                         f"differs)")
 
-        # SHARED ROWS, AND THE LIMIT OF THE ITERATION-0 RULE (14z-80). Every
-        # tenant's manifest declares these rows identically, so merge_manifests
-        # dedups them to `_owner=None` and `row_here()` emits them on
-        # iteration 0 — but the table built below resolves each ported handler
-        # through `region_of()`/`placed`, which on iteration 0 hold ONLY
-        # tenant 0's regions. So on a merged build the other tenants' extra
-        # handlers do not resolve and fall to their tripwires: loud at
-        # runtime, not silent, but wrong. Fixing it means running the union
-        # AFTER the loop against every tenant's placements — the named
-        # "shared-row union" slice. See row_here()'s docstring.
+        # THE ENGINE-LEVEL UNION (14z-80f). Every tenant's manifest declares
+        # these rows identically, so merge_manifests dedups them to one — and
+        # the table built below resolves each ported handler through the
+        # tenant that PLACED it, which is why this runs via engine_rows() on
+        # the LAST iteration and resolves through resolve_ported() /
+        # resolve_recon() rather than this iteration's `placed`/`recon`.
+        #
+        # WHAT IT COST TO GET WRONG, measured on the 3-tenant build before the
+        # fix: 15 extra types fell to tripwires and TWELVE were Huitzil's
+        # (types 64-75), so every one of his secondary objects would have
+        # dispatched to a planted ILLEGAL the moment it spawned.
         for ph in (engine_rows("obj_hook") if args.stage >= 4 else []):
             site = _int(ph["site"])
             vtab = _int(ph["vanilla_table"])

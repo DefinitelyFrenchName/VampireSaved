@@ -144,29 +144,48 @@ green (Phase 0); content lands only through the refactored machinery.
    seventeen shared spans as CONFLICTING anyway. The name-collision problem
    is solved by per-tenant spellings (`side_name()`, `placements.json`'s
    `@<tenant>` suffix), not by shared placement.
-3. **THE NEXT SLICE, and now measured.** Engine-extension union: a shared row
-   (`_owner=None`) is emitted on iteration 0, where only tenant 0's
-   `placed`/`regions` exist — so `obj_hook`'s extended table sends the other
-   tenants' extra handlers to their tripwires. Run the union AFTER the loop,
-   against every tenant's placements. seq_ids and reaction cases become
-   per-tenant contributions merged at emit, as written. (A separate
-   `engine_ext.toml` is no longer needed to express this: `merge_manifests`
-   already dedups the identical rows to unowned ones — measured `obj_hook`
-   6→2, `select_wheel` 3→1.)
-4. site_thunk gating: replace single `cmpi.b #TT` gates with id-dispatched
-   forms — a generated 32-row table where the site is semantically a
-   per-char lookup (matches the engine's own convention), a compare-chain
-   where it is genuinely a small set. Manifest declares bodies; generator
-   owns gates. Same for win_pal_variant's rebase. **MEASURED 14z-80:** this
-   is four 6-byte op collisions, at `0x5F1B6` ×2 and `0x5F146` ×2 — every
-   tenant emitting its own thunk at one engine site. It is what stops the
-   merged patch applying, and `tests/test_tenant_loop.sh` section 4 is the
-   number it has to move.
-5. Per-tenant outputs: `tenant.json` et al become arrays (or per-tenant
-   files) with the gfx/verify consumers updated in the same commit.
-   Exit gate: the 3-tenant manifest with ONLY Donovan enabled reproduces
-   4b7d0dc7 bit-exact; enabling a second tenant is additive under the
-   overlap assertion; new dispatch/suite gates green.
+3. **LANDED 14z-80f.** Engine-extension union: `engine_here()` runs the
+   engine-level sections on the LAST iteration and `resolve_ported()` /
+   `resolve_recon()` resolve through every tenant's published view. Measured
+   before: 15 of `obj_hook`'s extras fell to tripwires and TWELVE were
+   Huitzil's, so every one of his secondary objects would have dispatched to
+   a planted ILLEGAL. After: 17/17 placed, entries 59-63 in Donovan's regions
+   and 64-75 in Huitzil's own copies, and the 3 nobody ports still tripwired.
+   No `engine_ext.toml` was needed — `merge_manifests` already dedups the
+   identical rows (measured `obj_hook` 6→2, `select_wheel` 3→1).
+4. **LANDED 14z-80h, and it was NOT the design decision this item assumed.**
+   Both shared sites already carry compare-chain elements
+   (`cmpi.b #TT,d6 / bne.s <past my work> / <my work>`) whose branch targets
+   whatever follows — so "the next element" and "the vanilla tail" are the
+   same address, N tenants chain by CONCATENATION with no displacement to
+   recompute, and N=1 is byte-identical to the single-element form. No
+   32-row table, no re-freeze. The split point is READ FROM THE BODY
+   (element = 6 + the bne displacement, after asserting the `0c06`/`66xx`
+   opening); a body without that shape is a named build error.
+   `win_pal_variant` became engine-level; `site_thunk` could not (its bodies
+   carry each tenant's own placements), so each iteration records its body
+   and the chain is assembled after the loop.
+
+**PHASE 2 EXIT: MET, for the program half.** The 3-tenant manifest with only
+Donovan enabled reproduces `4b7d0dc7` bit-exact — by passing ONE FILE, which
+is what per-file ownership bought (14z-77); note that passing three files with
+only Donovan iterating is a DIFFERENT build (241 ops, not 243), because the
+merge folds the singletons and the dedup moves allocations. Enabling the other
+two is additive under the overlap assertion: 590 ops, ZERO collisions,
+`patch_prg` applies it. Gate `tests/test_tenant_loop.sh`, 5 verdict controls.
+**WHAT PHASE 2 DOES NOT GIVE.** The program image composes; that is all. The
+gfx half is single-tenant (Phase 3), `build_donovan.sh` is single-tenant, no
+merged image has run in an emulator, and no legacy or behaviour gate has seen
+one. Those are the next three steps, in that order.
+
+5. **LANDED 14z-80c/h.** Per-tenant outputs: `tenants.json` carries the array
+   while `tenant.json` stays tenant 0 — so `build_gfx_donovan.py`,
+   `verify_gfx_build.py`, `check_tenant_hud.py` and `build_donovan.sh` need
+   no edit and every single-tenant build emits the same files. Side files
+   written inside the loop take a per-tenant SPELLING (`side_name()`), tenant
+   0 keeping the historical one; `write_out()` refuses any name written twice
+   with different bytes. `placements.json` accumulates with `@<tenant>`
+   suffixes. The gfx consumers of the per-tenant files are Phase 3.
 
 ### Phase 3 — gfx coexistence in group C (the named "new mechanism")
 
