@@ -667,6 +667,14 @@ MISSING feature, not a spurious one, and harmless. **Huitzil's `0x10` is
 `0x004A` in `0x2A8A4`** (row 0x00's handler) where vs2's is the default —
 the same spurious class, latent and benign today (0 hits at `0x2AD82` on the
 frozen build). `huitzil-m2` is frozen, so that is a maintainer call.
+**CAVEAT ADDED 14z-78: that "0 hits" has the provenance problem Plasma Trap
+exposed.** It was measured over replays that never fired the move — and
+Plasma Trap crashed on every Phobos build ever made while every gate stayed
+green, because nobody had played air 214+MK. "0 hits at the resolver" is only
+as strong as the moveset the resolver was watched over. Not a claim the row is
+live; a claim the evidence is weaker than it reads. The maintainer's 14z-78
+full movelist sweep is the coverage it lacked — re-probe `0x2AD82` across it
+before treating "benign" as settled.
 
 **The symptom lied about its cause.** `0x2AD82` is the DF-family palette-seq
 resolver (H's 14z-69p work), so this read as "a Dark Force recolour without

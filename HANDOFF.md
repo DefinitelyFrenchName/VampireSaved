@@ -901,6 +901,41 @@ tests/test_wide_render_content.sh     # the WIDE track must SERVE the ported con
                                       # the not-in-the-battery class)
 ```
 
+### THE OUT-OF-RANGE INDEX TOOLKIT (14z-78) — three instruments, one class
+
+`audit_index_space.py` names the DANGER WINDOWS (entries vsavj's table cannot
+answer but vs2's can). Two crashes had already landed in the same window
+before anyone asked who drives them:
+
+| table | valid | entry | consequence | driver |
+|---|---|---|---|---|
+| `0x018468` | 0..79 | 80 | ODD -> vec3 — LOUD | (none live) |
+| | | 81 | jumps into the table -> reset — LOUD | Pyron Cosmo (fixed 14z-75) |
+| | | 82 | ODD -> vec3 — LOUD | **Phobos Plasma Trap** |
+| | | 83 | even, real code — **SILENT** | **Phobos Reflect Wall** |
+| `0x0185da` | 0..85 | 86-89 | all LOUD | none live (cleared by playtest) |
+| `0x03975e` | 0..9 | 10 | SILENT | dispatcher never reached (measured) |
+
+**Read the CONSEQUENCE before valuing any evidence.** "No crash" clears a LOUD
+entry completely and a SILENT one not at all — the same clean playtest cleared
+Donovan's 15 candidates and said nothing about Phobos' entry 83.
+
+- `tools/audit_index_users.py` — WHICH tenant data lands in a window. Learned
+  from the ratified Cosmo fix (index = low byte of `0x01NN`), windows taken by
+  RUNNING `audit_index_space.py` so the two cannot disagree. Reports a `shape`
+  signal, never filters on it: that 3-sample signature would have pruned entry
+  83, which is real. **Does NOT narrow the moves to playtest** — it reports
+  addresses, not moves, and sees one defect class only.
+- `tests/lua/index_watch.lua` — attributes a dangerous dispatch to the MOVE
+  during LIVE play (breakpoints are cheap: ~11 dispatches per 130s). Carries a
+  HEARTBEAT because a dead watch once produced a tidy-looking empty log for a
+  whole sweep; an idle watch now says so. Prove it with `INDEX_ALL=1` before
+  trusting quiet. `INDEX_WATCH="jmp:n_valid,..."` overrides the windows.
+- `tests/replays/hui/87_hui_plasma_trap.rpl` — reproduces the crash (forward
+  jump, 214 at +10f, MK). **NOT a gate**, and its scripted strengths are NOT
+  authoritative: its "LK" variant crashes where the maintainer's real LK does
+  not.
+
 Diagnostic instruments added with that gate (MAME Lua, all rerunnable):
 `tests/lua/snapshot_frames.lua` (real PNG snapshots headlessly — MAME
 renders its bitmap internally even under `-video none`, so `video:snapshot()`

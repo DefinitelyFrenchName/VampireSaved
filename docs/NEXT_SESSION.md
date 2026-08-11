@@ -1,18 +1,81 @@
 # NEXT SESSION — orientation (written at the close of 14z-78, 2026-08-11)
 
-> **M3b'S BLOCKER IS CLEARED.** `anim` moves; the crypt-window overflow is
-> gone. It was never a hardware limit — two `donovan.toml` thunks baked the
-> region's placed address as a hex literal. Fixed inertly (all four frozen
-> fingerprints bit-exact), and the class is now a build error. Details below
-> under "THE CRYPT-WINDOW BLOCKER IS CLEARED".
+> ## START HERE: one task is specified and ready to encode
 >
-> **AND THE REMAINING WORK SHRANK.** Region identity DISSOLVED (14z-78b): with
-> `anim` movable, every tenant keeps its own copy of every region and it fits
-> with room to spare, so the shared-span dedup, the union extent, the 2,000
-> conflicting bytes and the name-namespacing all stop being work items. What is
-> left is **the N-way dispatch FORM** (a design decision) and **the N-tenant
-> loop**, whose state boundary is now classified — see "1. Region identity" and
-> STATE 14z-78b.
+> **Write the (b') thunk.** Everything it needs is decided and written down in
+> STATE 14z-78 "(b') IS FULLY SPECIFIED": the site (`jmp thunk` over
+> `0x018460-65`, `patch = "jmp"`), all four vs2 handler bodies verbatim, and
+> the stack-balanced normal path that was the blocker. It fixes TWO confirmed
+> defects — Phobos' Plasma Trap crash and his Reflect Wall SILENT
+> misdispatch — and retires the whole danger window for all three tenants.
+>
+> It was NOT encoded last session on purpose: three static analyses that hour
+> were wrong (each caught, but the RATE was the signal), and hand-written 68k
+> whose failure mode is a silent stack leak is the worst thing to write then.
+> Encode it fresh. Verify in this order: build -> Plasma Trap rig (crash gone)
+> -> Reflect Wall rig (entry 83 reaches the right routine) -> four
+> fingerprints -> legacy suite.
+>
+> One detail to confirm against the core rather than trust:
+> `move.l (a7)+,(a7)` (`0x2E9F`) relies on the source EA incrementing a7
+> BEFORE the destination EA is evaluated. Wrong = 4 bytes leaked per dispatch,
+> visible only as a slow stack overflow.
+
+## The state in one paragraph
+
+M3b's blocker is GONE — `anim` moves, and it was a hex literal in two
+`donovan.toml` thunks, not a hardware limit. The merged manifest is
+collision-free. All three tenants are frozen, rebuild bit-exact, and have had
+a full human movelist sweep. Two real defects came out of that sweep, both in
+Phobos, both fixed by the one change above. `run_suite.sh` is GREEN again for
+the first time since 14z-75.
+
+## What is left on M3b, in order
+
+1. **The (b') thunk** (above) — not M3b machinery, but it is the open defect.
+2. **The N-tenant loop** — one mechanical re-indent PLUS one gate. Both known:
+   see "THE LOOP IS ONE MECHANICAL STEP PLUS ONE GATE" in STATE. The gate is
+   the non-obvious half — `row_applies` gates on the tenant's SLOT TRACK, not
+   on ownership-versus-iteration, so running the body N times emits every
+   SHARED row N times.
+3. **The N-way dispatch form** — the last design decision (four shared sites
+   need one thunk testing N ids).
+4. Then: merged build, expectation set, freeze.
+
+Region identity DISSOLVED (14z-78b) — do not budget it. Per-tenant copies of
+everything fit with room to spare now that `anim` moves.
+
+## Sweep results — all three tenants, full movelists
+
+| tenant | verdict | how it was established |
+|---|---|---|
+| Donovan | clear | all his candidates sit at LOUD entries; sweep saw nothing |
+| Phobos | 2 defects, both root-caused | Plasma Trap (82, loud), Reflect Wall (83, silent) |
+| Pyron | clear | direct instrument observation, 29 dispatches, 0 dangerous |
+
+**Still untested anywhere: Pyron's Zodiac Fire** (236+P, ES 236+2P) —
+guard-cancel only, so the maintainer cannot reach it and no rig exists. Build
+one from `tests/replays/hui/81_hui_rw_gc.rpl`'s template, and give it a
+SIGNATURE CHECK: 14z-78 claimed "Reflect Wall drives entry 83" having only
+measured "replay 81 drives entry 83", and had to go back and control it.
+
+## Rules this session paid for
+
+- **An instrument that cannot observe X does not report "no X".** "Silent
+  watchdog reboot, no fault" came from a `field_trace` run with no exception
+  hooks. Under the guard it faults every time.
+- **A derived register is not a measured one.** "The index is negative" came
+  from picking the address that held `0x4EFB` without checking whether another
+  address held the same word. One `GUARD_PROBE` settled it: D0 = 0xA4.
+- **Sanity-check a zero before building on it.** `audit_index_space.py` given
+  the ROM ZIPS instead of decrypted images returns zero tables, silently.
+- **A quiet log is not a clean log.** A whole sweep recorded nothing and looked
+  tidy; the warning lived in a hook this MAME lacks.
+- **Classify the CONSEQUENCE before valuing the evidence** — see HANDOFF's
+  out-of-range index toolkit. The same clean playtest cleared 15 candidates
+  and said nothing about one other.
+
+---
 
 **ALL THREE TENANTS ARE FROZEN.** Donovan `donovan-m3a` (4b7d0dc7),
 Phobos `huitzil-m2` (9deda080), **Pyron `pyron-m2` (69e8c6f0 — RE-FROZEN
@@ -65,10 +128,18 @@ dedup.
    Pyron's cells were chosen blank + inside `protected_tiles.json`'s audited
    pool for exactly this reason.
 2. **Phobos carries one latent aliased row.** `0x2A8A4` row 0x10 is `0x004A`
-   (row 0x00's handler) where vs2 has the default. Benign today (0 hits at
+   (row 0x00's handler) where vs2 has the default. Called benign (0 hits at
    the resolver) but not what native does, and `huitzil-m2` is frozen — so
    changing it is a maintainer decision. `tests/test_variant_dispatch.sh`
-   reports it every run.
+   reports it every run — **and now at the BUILD'S OWN id: it used to default
+   to 0x11, so sweeping a Huitzil build judged PYRON and reported three
+   spurious rows belonging to no tenant on it (14z-78).**
+   **CAVEAT (14z-78): the "0 hits" has Plasma Trap's provenance problem** —
+   measured over replays that never fired the move, and Plasma Trap crashed on
+   every Phobos build while every gate stayed green because nobody had played
+   air 214+MK. Not a claim the row is live; a claim the evidence is weaker
+   than it reads. Re-probe `0x2AD82` across the 14z-78 movelist sweep before
+   treating "benign" as settled.
 
 ## Open on Pyron (none blocked the freeze)
 

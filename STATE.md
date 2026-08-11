@@ -1,27 +1,25 @@
 # STATE — living progress log
 
-Updated: 2026-08-11 (session 14z-78 — **M3b'S BLOCKER IS CLEARED: `anim` MOVES.**
-The vec3 that made anim immovable was never a layout, reach or crypt-window
-constraint — `donovan.toml`'s two select-companion thunks baked
-`207c000dda1e` (`movea.l #$000DDA1E,A0`), anim's placed address hand-computed
-once into authored hex, tracking nothing. Move the region and both bodies still
-aimed at the vacated range, where `x2b7ef4` had slid in; the resolver read its
-bytes as 16-bit offsets and took an address error in VANILLA code. Found by an
-opcode-anchored sweep of every hex blob in the three manifests — **exactly two
-hits, no others** — not by tracing from the fault, which had dead-ended on a RAM
-return address (the resolve thunks TAIL-JUMP the resolver, so the stack holds
-the select keeper's caller). Fixed with `region_subst`, the mechanism that
-already existed for this (14z-66), and the fix is INERT: **all four frozen
-fingerprints bit-exact, donovan-m3a still 4b7d0dc7**, because in the default
-layout `placed[anim]+0xA9AE` evaluates to the same 0x0DDA1E. Runtime proof is a
-three-way comparison, not an absent crash: site 0x845EC fires at f1401 AND f1402
-on the working build; the baked build fires once and faults on the second; the
-fixed build reproduces the working signature exactly. New guard makes the class a
-BUILD error (`tests/test_thunk_addr_literal.sh`) — the third of a family whose
-first two cover the tenant id and whose gap was the ALLOCATOR's output. Three
-tenants now need 98,488 of the 344,640-byte crypt window, was 470,200. SCOPE:
-measured on Donovan; H/P anim movability is inferred from the manifests and still
-wants a liveness control. Read docs/NEXT_SESSION.md first.)
+Updated: 2026-08-11 (session 14z-78 — **M3b'S BLOCKER CLEARED, AND THE THREE
+MOVELISTS SWEPT.** `anim` moves: the vec3 that made it immovable was two
+`donovan.toml` thunks baking its placed address as a hex literal, not a
+hardware limit. Fixed with `region_subst`, INERT — all four frozen
+fingerprints bit-exact. Three tenants now need 98,488 of the 344,640-byte
+crypt window instead of 470,200. The merged manifest is COLLISION-FREE
+(slice 78d resolves the last nine, conditionally on the profile, failing
+closed); `--extract` pairs with `--port`; region identity DISSOLVED (per-tenant
+copies of everything fit) so the loop is one re-indent plus ONE gate, both
+specified. Maintainer swept all three full movelists: Donovan and Pyron clear,
+**Phobos has TWO defects** — Plasma Trap (air 214+MK, entry 82, crashes) and
+Reflect Wall (entry 83, SILENT wrong-routine dispatch), both in the same
+already-known table, both fixed by one change. That change, (b'), is FULLY
+SPECIFIED and deliberately not encoded — three static analyses that hour were
+wrong and 68k with a silent-stack-leak failure mode is the worst thing to write
+at an elevated error rate. New: `tools/audit_index_users.py`,
+`tests/lua/index_watch.lua`, `tests/test_thunk_addr_literal.sh`, three `.skip`
+expectations that make `run_suite.sh` GREEN again for the first time since
+14z-75, and `test_variant_dispatch.sh` now judges the BUILD'S OWN tenant.
+Read docs/NEXT_SESSION.md first.)
 
 Previously: 2026-08-10 (session 14z-77 — **M3b slices C-F.** Slice F makes the
 merged manifest EXPRESSIBLE (`--port` is repeatable; the documents merge) and
@@ -1210,6 +1208,10 @@ this port's own history rather than guessed:
    shorter than vs2's, sub-state 81 into an 80-entry table). Produces a jump
    into garbage, i.e. a real fault. `tests/test_index_space.sh` still reports
    3 risky tables and **29 NOT JUDGED**, so its coverage gap could hide this.
+   [SUPERSEDED same session: the table IS judged and IS one of the three
+   risky ones. "29 NOT JUDGED" came from querying audit_index_space.py with
+   the ROM zips when it takes DECRYPTED images — it returned zero tables and
+   I did not sanity-check the zero.]
 3. **The aliased palette-routine row.** `tests/test_variant_dispatch.sh` at
    Phobos' own id reports EXACTLY ONE spurious inherited routine —
    `0x02a8a4 row 0x10 = 0x004a, should be 0x0040`. This is the row
