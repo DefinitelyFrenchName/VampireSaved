@@ -121,9 +121,10 @@ done
 # The load-bearing question. A loop that ran once would produce Donovan's
 # 243 ops here; a loop that ran twice against tenant 0's data would produce
 # 243 twice over. The counts are frozen, and so is the DEDUP they imply:
-# 243 + 259 = 502 declared, 443 emitted: 47 rows recognised as SHARED and
-# emitted once (the iteration gate), and 12 tripwire ops no longer needed
-# because the engine union (section 4b) resolves Huitzil's handlers instead.
+# 243 + 259 = 502 declared, 440 emitted. The gap is three things and all of
+# them are checked below: rows recognised as SHARED and emitted once (the
+# iteration gate), tripwire ops no longer needed because the engine union
+# resolves Huitzil's handlers (4b), and agreeing duplicate ops dropped (4c).
 # Same arithmetic for three.
 echo "== 2: N tenants — the loop iterates and shared rows emit once =="
 gen2 "$WORK/two"
@@ -139,8 +140,8 @@ check_n() {  # check_n <label> <dir> <want ops> <sum of 1-tenant counts>
         echo "  FAIL: $1 $got ops, frozen at $3"; fail=1
     fi
 }
-check_n "2 tenants" "$WORK/two"   443 502
-check_n "3 tenants" "$WORK/three" 600 707
+check_n "2 tenants" "$WORK/two"   440 502
+check_n "3 tenants" "$WORK/three" 598 707
 
 # ── 3: every tenant's own content is present ────────────────────────────
 # An op count alone cannot tell "both tenants ran" from "tenant 0 ran twice".
@@ -312,6 +313,48 @@ if not bad:
 sys.exit(1 if bad else 0)
 PY
 
+# ── 4c: slot-table rows follow their DECLARING tenants, and agreeing
+# ──     duplicate ops are dropped rather than left to collide ───────────
+# `code_word` rows carrying `slot_table` write `table + stride*dst_slot` —
+# a DIFFERENT word per tenant, so two tenants declaring the same row text
+# are not writing the same word. The dedup used to collapse them to one
+# unowned row, which then wrote DONOVAN'S entry (0x282FA / 0x5F24C, two of
+# the ten original collisions) while Huitzil and Pyron got none. `_owners`
+# now survives the dedup and the row is applied once per declaring tenant.
+#
+# Separately: ops that write the SAME BYTES at the same address through
+# different mechanisms (Donovan's `data_port hit_class_props_ext` vs H's and
+# P's `aux_poke effect_map_*`; H's and P's adjacent byte15b entries widened
+# to one word) are AGREEMENTS, not conflicts — dropped at emit with a note,
+# so patch_prg's assertion stays strict about real ones.
+echo "== 4c: slot-table rows per tenant; agreeing duplicates dropped =="
+python3 - "$WORK/three" <<'PY' || fail=1
+import re, sys
+notes = open(sys.argv[1] + "/patch_notes_fragment.md").read()
+bad = []
+# FROZEN 14z-80g. Three tenants at 0x13/0x10/0x11 over stride 2 and stride 4.
+WANT = {"obj_bank_word_slot": {0x282fa, 0x282f4, 0x282f6},
+        "win_pos_x_slot":     {0x5f24c, 0x5f240, 0x5f244}}
+for nm, want in WANT.items():
+    got = {int(a, 16) for a in
+           re.findall(r"code\s+(0x[0-9a-f]+) \+0x2\s+code_word " + nm, notes)}
+    if got != want:
+        bad.append("%s wrote %s, expected one entry per tenant at %s"
+                   % (nm, sorted(hex(x) for x in got),
+                      sorted(hex(x) for x in want)))
+n_drop = len(re.findall(r"DROPPED: already written identically", notes))
+if n_drop != 4:
+    bad.append("%d agreeing duplicate ops dropped, frozen at 4 — if this "
+               "grew, a NEW pair of tenants started agreeing and should be "
+               "understood before it is normalised away" % n_drop)
+for b in bad:
+    print("  FAIL: %s" % b)
+if not bad:
+    print("  ok: 6 slot entries at 3 distinct tenant slots; %d agreeing "
+          "duplicate ops dropped" % n_drop)
+sys.exit(1 if bad else 0)
+PY
+
 # ── 5: what a merged patch STILL cannot do, frozen by name ──────────────
 # The generator emits it; patch_prg refuses it. Freezing the inventory is
 # the point: it is the work list for the shared-row union / N-way dispatch
@@ -342,11 +385,15 @@ for i, o in enumerate(ops):
         else:
             owner[b] = i
 sites = sorted({int(ops[i]["addr"], 16) for _, i in pairs})
-# FROZEN 14z-80. 10 pairs / 36 bytes. Four of the pairs are 6-byte engine
-# SITES (0x5F1B6 twice, 0x5F146 twice) where each tenant emits its own
-# thunk — the N-way dispatch FORM. 34 of the 36 bytes lie inside the four
-# shared spans 14z-77h already froze as conflicting.
-WANT_PAIRS, WANT_BYTES = 10, 36
+# FROZEN 14z-80g at 4 pairs / 24 bytes, down from 10/36: what remains is
+# EXACTLY the N-way dispatch FORM and nothing else. Both sites are patched
+# once per tenant — 0x5F1B6 by win_pal_variant, 0x5F146 by the site_thunk
+# `select_pal_variant_id` — and the fix is one thunk per site whose body
+# tests N ids (M3b_plan Phase 2 item 4), which is a design decision, not a
+# mechanical edit. Everything else that used to collide was a real defect
+# and is fixed: the slot_table rows wrote Donovan's entry for every tenant
+# (14z-80g), and the rest were AGREEING duplicates now dropped at emit.
+WANT_PAIRS, WANT_BYTES = 4, 24
 bad = []
 if (len(pairs), nbytes) != (WANT_PAIRS, WANT_BYTES):
     bad.append("collisions moved: %d pairs / %d bytes, frozen at %d/%d. If "
@@ -395,7 +442,7 @@ restore
 # the count must collapse away from the 3-tenant figure.
 ctl_ops="$( [ -f "$WORK/ctl1/patch.json" ] && nops "$WORK/ctl1" || echo 0 )"
 if [ "$ctl_ops" -gt 0 ] && [ "$ctl_ops" -lt 300 ]; then
-    echo "  ok: a one-iteration loop collapses 600 -> $ctl_ops ops —"
+    echo "  ok: a one-iteration loop collapses 598 -> $ctl_ops ops —"
     echo "      section 2 is measuring the ITERATION, not the manifest"
 else
     echo "  FAIL: the one-iteration control produced $ctl_ops ops; expected"
@@ -433,9 +480,9 @@ python3 - <<'PY'
 import pathlib
 p = pathlib.Path("tools/gen_donovan_patch.py")
 s = p.read_text()
-a = '        return True if ("region" in row or "regions" in row) else (_ti == 0)'
+a = '        if any(k in row for k in ("region", "regions", "slot_table")):'
 assert s.count(a) == 1, "row_here()'s shared-row rule moved"
-p.write_text(s.replace(a, "        return _ti == 0"))
+p.write_text(s.replace(a, "        if False:"))
 PY
 gen3 "$WORK/ctl3"
 restore

@@ -224,9 +224,21 @@ def merge_manifests(docs, profile=None):
                     if twin is None:
                         cur.append(dict(row))
                     else:
+                        # SHARED, and WHO shared it is kept (14z-80g). Dedup
+                        # used to record only "nobody owns this", which is
+                        # right for an engine row and wrong for a row whose
+                        # ADDRESS is derived from the tenant's slot: two
+                        # tenants declaring the same `slot_table` row are NOT
+                        # writing the same word, they are writing their own
+                        # entries, and the merged row has to remember which
+                        # tenants they were. `row_here()` reads this.
+                        twin.setdefault("_owners", [twin.get("_owner")])
+                        twin["_owners"].append(row.get("_owner"))
                         twin["_owner"] = None      # shared engine row
             elif isinstance(val, dict) and isinstance(cur, dict):
                 if _same_row(cur, val):
+                    cur.setdefault("_owners", [cur.get("_owner")])
+                    cur["_owners"].append(val.get("_owner"))
                     cur["_owner"] = None
                 elif key in _SINGLETON_MERGE:
                     merged[key], why = _SINGLETON_MERGE[key](
@@ -567,7 +579,7 @@ def flavor_tail(flav_map, flav_d, hold_flag, newt, objclr, tenants, fail):
 def _row_diff_keys(a, b):
     """Keys on which two rows differ, ignoring the ownership stamp."""
     return {k for k in set(a) | set(b)
-            if k != "_owner" and a.get(k) != b.get(k)}
+            if k not in ("_owner", "_owners") and a.get(k) != b.get(k)}
 
 
 def _same_row(a, b):
@@ -924,20 +936,31 @@ def main():
         split is not cosmetic (14z-80b shipped it as "unowned => iteration 0"
         and that was measurably wrong):
 
-          REGION-SCOPED (the row names a `region`/`regions`). Every tenant
-            keeps its OWN COPY of the shared source spans — that is the
-            14z-78b ruling — so the row must be applied to EVERY copy. It
-            therefore belongs to every iteration, and each section's own
-            `regions.get(name)` / `!= name` test self-gates the tenants that
-            do not have it. Emitted on iteration 0 alone, the six shared
-            `port_patch` OBJ bank setters patched only Donovan's copies of
-            x05c800/x088512 and left Huitzil's and Pyron's holding vs2's
-            bank 3 — sprites drawn from the wrong graphics bank, silently
-            (measured 14z-80e, all 6/6 unpatched in a 3-tenant build).
+          TENANT-DERIVED — the row's EFFECT depends on which tenant applies
+            it, so identical TEXT does not mean identical effect and it must
+            be applied once per DECLARING tenant (`_owners`, kept by the
+            dedup). Two keys mark it:
+              `region`/`regions` — every tenant keeps its OWN COPY of the
+                shared source spans (14z-78b), so the row patches N blobs.
+                Emitted on iteration 0 alone, the six shared `port_patch`
+                OBJ bank setters patched only Donovan's copies of
+                x05c800/x088512 and left Huitzil's and Pyron's holding vs2's
+                bank 3 — the wrong graphics bank, silently (measured
+                14z-80e: 6/6 unpatched).
+              `slot_table` — the ADDRESS is `table + stride*dst_slot`, i.e.
+                a different word per tenant. Emitted on iteration 0 the
+                shared `obj_bank_word_slot`/`win_pos_x_slot` rows (declared
+                by Huitzil and Pyron) wrote DONOVAN'S entries, colliding
+                with his own rows at 0x282FA and 0x5F24C — two of the ten
+                op collisions — while H and P got none (14z-80g).
+            The declaring set matters here and only here: those two rows are
+            H's and P's, so applying them on Donovan's iteration is wrong in
+            both directions.
 
-          ENGINE-SITE (everything else: obj_hook, select_wheel, site_thunk,
-            code_word...). One address in the one shared image, so it must
-            be emitted ONCE — iteration 0.
+          ENGINE-SITE (everything else: obj_hook, select_wheel, site_thunk).
+            One address in the one shared image, so it must be emitted
+            ONCE — iteration 0, or, when its content needs every tenant's
+            placements, the last (see `engine_here()`).
 
         LIMIT ON THE SECOND CLASS, and it is the next slice: a shared
         engine-site row emitted on iteration 0 sees only tenant 0's
@@ -949,7 +972,12 @@ def main():
         o = row.get("_owner")
         if o is not None:
             return o == T.get("name")
-        return True if ("region" in row or "regions" in row) else (_ti == 0)
+        if any(k in row for k in ("region", "regions", "slot_table")):
+            # once per DECLARING tenant; `_owners` is absent on a
+            # single-document build, where the one iteration is the answer
+            owners = row.get("_owners")
+            return True if not owners else (T.get("name") in owners)
+        return _ti == 0
 
     def tenant_rows(section):
         """The rows of a manifest LIST section belonging to this iteration.
@@ -5023,6 +5051,58 @@ def main():
             all_placements[_key] = {"dst": placed[_rn],
                                     "src": man["regions"][_rn]["src"],
                                     "len": man["regions"][_rn]["len"]}
+
+    # ── AGREEING DUPLICATE OPS (14z-80g) ────────────────────────────────────
+    # Two tenants can emit the SAME BYTES at the same address through
+    # different mechanisms — Donovan's `data_port hit_class_props_ext` writes
+    # 0x28D4E-0x28D53 while Huitzil's and Pyron's `aux_poke effect_map_*`
+    # poke16 the same three words with the same values, and H's and P's
+    # adjacent `byte15b` entries both widen to the word 0xBE88A with the
+    # same content. Nothing silently wins there — but patch_prg's overlap
+    # assertion (rightly) refuses ANY two ops writing one word, so a merged
+    # patch stops on an agreement.
+    #
+    # An op whose every byte is ALREADY written with the SAME value is
+    # therefore dropped, with a note naming who covered it. Anything else —
+    # a partial overlap, or one byte of disagreement — is left in place for
+    # patch_prg to refuse, because that is a real conflict and this pass must
+    # not become a way to make one disappear. Inert for one tenant: a
+    # single-tenant build emits no overlapping ops at all.
+    def _op_bytes(o):
+        """(addr, bytes) an op writes, or (addr, None) if not resolvable."""
+        a = int(o["addr"], 16)
+        if "hex" in o:
+            return a, bytes.fromhex(o["hex"])
+        if o["op"] == "poke32":
+            return a, int(o["val"], 16).to_bytes(4, "big")
+        if o["op"] == "poke16":
+            return a, int(o["val"], 16).to_bytes(2, "big")
+        if "path" in o:
+            p = out / o["path"]
+            return a, (p.read_bytes() if p.is_file() else None)
+        return a, None
+
+    _bytemap, _kept, _dropped = {}, [], 0
+    for _o in ops:
+        _a, _b = _op_bytes(_o)
+        if _b is None:
+            _kept.append(_o)
+            continue
+        _covered = all(_bytemap.get(_a + i, (None,))[0] == _b[i]
+                       for i in range(len(_b)))
+        if _covered and len(_b):
+            _dropped += 1
+            _by = {_bytemap[_a + i][1] for i in range(len(_b))}
+            notes.append(f"# op {_o['op']} {_a:#08x} +{len(_b):#x} DROPPED: "
+                         f"already written identically by {sorted(_by)}")
+            continue
+        for i in range(len(_b)):
+            _bytemap.setdefault(_a + i, (_b[i], f"{_o['op']}@{_a:#x}"))
+        _kept.append(_o)
+    if _dropped:
+        ops[:] = _kept
+        notes.append(f"# {_dropped} agreeing duplicate op(s) dropped "
+                     f"(identical bytes at the same address)")
 
     # ── emit ─────────────────────────────────────────────────────────────────
     (out / "placements.json").write_text(json.dumps(
