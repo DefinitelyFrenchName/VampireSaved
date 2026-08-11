@@ -113,12 +113,32 @@ end)
 -- are written periodically so an interrupted session still leaves a usable
 -- record -- which matters here, because a human ends this run by closing the
 -- window, not by reaching a frame count.
-local last_report = 0
+-- HEARTBEAT. MAME 0.288's Lua has no emu.register_stop, so nothing can be
+-- written at exit; and an earlier version only reported once `seen > 0`, which
+-- meant a watch that never fired produced a TIDY-LOOKING log with no dispatch
+-- lines and no warning. A whole Phobos sweep was recorded that way and told us
+-- nothing (14z-78). The heartbeat therefore fires REGARDLESS of seen, so
+-- "armed but idle" and "never armed" can never look alike again.
+local last_report, ticks = -1, 0
 emu.register_periodic(function()
-    if seen - last_report >= 25 or (seen > 0 and last_report == 0) then
-        last_report = seen
-        f:write(string.format("# progress dispatches_seen=%d dangerous=%d\n",
-                              seen, hits))
-        f:flush()
+    ticks = ticks + 1
+    if ticks % 600 ~= 0 then return end          -- ~ once a second
+    if seen == last_report then return end
+    last_report = seen
+    if seen == 0 then
+        f:write(string.format(
+            "# WARNING f%d: %d dispatches seen. The watch is ARMED but has " ..
+            "observed NOTHING yet. If this is the last line in the file, the " ..
+            "run recorded no data and proves nothing.\n", frame, seen))
+    else
+        f:write(string.format("# progress f%d dispatches_seen=%d dangerous=%d\n",
+                              frame, seen, hits))
     end
+    f:flush()
 end)
+
+-- And say it up front too, so the file is never silent about its own state.
+f:write("# NOTE: if no 'ok'/'DANGER' line and no progress line ever appears,\n")
+f:write("#       this run observed NOTHING. That is not a clean result.\n")
+f:write("#       Verify with INDEX_ALL=1 first: it should log every dispatch.\n")
+f:flush()
