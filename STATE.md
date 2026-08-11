@@ -606,6 +606,70 @@ So the loop needs an iteration gate alongside the existing ones:
 Natural extension of slice C, and it is the last unknown. Once it exists the
 refusal at :527 can go.
 
+### OPEN DEFECT (maintainer playtest, 2026-08-11): Phobos' PLASMA TRAP
+### crash-resets when the mine triggers
+
+**Air 214+K.** Sends a landmine-looking item to the floor; when the mine
+TRIGGERS the game crash-resets. **Not a regression and not anim-related** —
+the maintainer reproduces it on EVERY version of the Phobos port, including
+pre-`anim`-relocation builds. It was missed because the move was missed: it is
+absent from every rig, gate and doc in this repo (`grep -i plasma|landmine`
+returns nothing but Donovan's unrelated 214K plant).
+
+Triage done, rig NOT yet built. Four candidate mechanisms, all grounded in
+this port's own history rather than guessed:
+
+1. **Unseeded pool -> allocator hang -> watchdog reboot.** The strongest fit
+   and Huitzil's OWN precedent: `huitzil.toml`'s init-shim comment records
+   exactly this symptom — "an allocator on an unseeded pool hangs without an
+   exception: handler entered at f2886, no fault, watchdog reboot". The mine's
+   detonation almost certainly spawns an explosion object from a pool. If his
+   shim does not seed the one the detonation allocates from, this is it.
+2. **An out-of-range dispatch index** — Pyron's Cosmo shape (vsavj's table
+   shorter than vs2's, sub-state 81 into an 80-entry table). Produces a jump
+   into garbage, i.e. a real fault. `tests/test_index_space.sh` still reports
+   3 risky tables and **29 NOT JUDGED**, so its coverage gap could hide this.
+3. **The aliased palette-routine row.** `tests/test_variant_dispatch.sh` at
+   Phobos' own id reports EXACTLY ONE spurious inherited routine —
+   `0x02a8a4 row 0x10 = 0x004a, should be 0x0040`. This is the row
+   NEXT_SESSION recorded as "benign today (0 hits at the resolver)" — and that
+   deadness verdict was measured on replays that never fired Plasma Trap,
+   which is the "a deadness measurement is only as good as the replay it ran
+   on" trap verbatim. Weakened by Pyron's twin at row 0x11 producing a BLINK,
+   not a crash.
+4. **An effect-class stub row.** vsav ships rows 16/17/19/31 as stubs where
+   vs2/vh2 fill 16/17/19; the beam port filled row 16 only, so **17 and 19 are
+   still stubs**. Weakest of the four: a bare-`rts` stub makes an object INERT
+   (the beam "did not draw"), it does not reset the machine.
+
+**The discriminating measurement, and it is one bit:** does it FAULT or HANG?
+A watchdog reset is not a 68k exception, so `run_replay_guarded.sh` will show
+nothing and only a field trace proves it (the Cosmo lesson). Fault => (2);
+silent reboot => (1).
+
+**Rig warning, paid for twice already:** the rig must produce the EVENT, not
+just run. Cosmo needed the right button pair AND a long enough hold AND meter,
+and fired 4 times in 12 attempts in one rig and 0 in 12 in another. This one
+needs air 214+K at a height that lets the mine LAND, then whatever triggers it
+(proximity? timer?) — and "no crash" from a rig that never armed the mine
+means nothing.
+
+**Fixing it re-freezes `huitzil-m2`, so it is a maintainer decision** whether
+to do it now or on the merged build.
+
+### GATE DEFECT found while triaging: test_variant_dispatch.sh judged the
+### WRONG TENANT
+
+`TENANT="${2:-0x11}"` is the second POSITIONAL, so
+`tests/test_variant_dispatch.sh build/hui27` sweeps a Huitzil build while
+judging **Pyron's** id, and reports three spurious routines that are not on
+that build's tenant at all. Phobos' real answer needs
+`tests/test_variant_dispatch.sh build/hui27 0x10` and is ONE row, not three.
+The default made the gate silently answer a different question than the one
+its caller asked — the same shape as the interim-build gate defaults already
+flagged for the merge. It should derive the tenant from the build's own
+`tenant.json` rather than defaulting.
+
 ## Session 14z-77 — M3b slice C: rows get an OWNER, and the gating family
 ## asks it instead of the build scalar
 
