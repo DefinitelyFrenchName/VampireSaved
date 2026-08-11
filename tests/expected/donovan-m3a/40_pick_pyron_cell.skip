@@ -5,8 +5,8 @@ itself is NOT dead — pyron-m2 carries a real .sha1 for it, where the cell IS
 backed.
 
 Added 14z-78 (maintainer sign-off). The replay landed in 14z-75, three days
-after this expectation set was frozen in 14z-64, so the set had no entry for it
-and run_suite.sh reported NO-EXPECTATION -> SUITE RED with 0 FAIL and 0
-divergence. A replay added after a freeze may invalidate that freeze; the
+after this set was frozen in 14z-64, so the set had no entry for it and the
+suite went red on an unaccounted replay — with zero divergences, so never a
+regression. A replay added after a freeze may invalidate that freeze; the
 truthful classification here is "not applicable to this build", not a frozen
 checksum.

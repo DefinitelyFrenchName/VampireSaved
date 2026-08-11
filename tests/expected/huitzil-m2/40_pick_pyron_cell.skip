@@ -4,8 +4,12 @@ skip. The tenant pick on this build is covered by 37_pick_huitzil_cell; the
 replay itself is NOT dead — pyron-m2 carries a real .sha1 for it.
 
 Added 14z-78 (maintainer sign-off). The replay landed in 14z-75, after this
-expectation set was frozen (as huitzil-m1) in 14z-73, so the set had no entry
-for it and run_suite.sh reported NO-EXPECTATION -> SUITE RED with 0 FAIL and 0
-divergence. Found by the coverage matrix built while fixing the same gap on
-donovan-m3a — the defect was never Donovan-specific, it is what happens to any
-frozen set when the suite grows a replay for a tenant that set does not back.
+set was frozen (as huitzil-m1) in 14z-73, so the set had no entry for it and
+the suite went red on an unaccounted replay — zero divergences throughout.
+Found by the coverage matrix built while fixing the same gap on donovan-m3a:
+the defect was never Donovan-specific, it is what happens to any frozen set
+when the suite grows a replay for a tenant that set does not back.
+
+NB: keep skip-reason prose free of the literal tokens a log scan greps for
+(the verdict words). The first version of these three files contained them and
+made a grep over the suite log report phantom failures.
