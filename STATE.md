@@ -655,6 +655,47 @@ evidence about which strength does what.
 it). It is the only Phobos move with no coverage from either the sweep or the
 gates, so it stays an unknown rather than a pass.
 
+### REFLECT WALL IS DEFECTIVE TOO — SILENTLY. Entry 83 is LIVE.
+
+The maintainer could not sweep Reflect Wall (guard-cancel only, 623+P, needs a
+blocking dummy and a 2P partner). Tested here instead: the repo already had a
+working rig, `tests/replays/hui/81_hui_rw_gc.rpl`, from the 14z-66 gate.
+
+**Result: 0 faults, but it drives entry 83 of table `0x018464` — OUT OF RANGE.**
+No other risky dispatcher is reached (`0x0185d6` and `0x03975a`: zero hits).
+
+**Why it does not crash, and why that is worse.** The two out-of-range reads
+land on consecutive words of the SAME instruction — the next dispatcher's
+`jmp`:
+
+| entry | reads | value | target | result |
+|---|---|---|---|---|
+| 82 | `0x01850C` | `0x4EFB` — the `jmp` OPCODE | `0x01D363` **odd** | vec3 crash (Plasma Trap) |
+| 83 | `0x01850E` | `0x1002` — that jmp's EXTENSION word | `0x01946A` **even** | **no fault**; runs a live routine |
+
+So Plasma Trap crashes loudly and Reflect Wall executes the WRONG ROUTINE in
+silence. Nothing catches it: not the guard, not a playtest looking for resets,
+not any gate.
+
+**IT MAY ALREADY HAVE BEEN OBSERVED AND MISATTRIBUTED.** `81_hui_rw_gc.rpl`'s
+own header records "the attacker is blown back (native x 322->487 vs ours
+322->474 — knockback magnitude = **the alias-physics class, queued**)". A
+wrong-routine dispatch is a far better explanation for a wrong knockback than
+alias physics. **Prediction: (b') fixes the knockback discrepancy too**, and if
+it does, that queued item is retired rather than merely deferred. Cheap to
+check — re-run the same replay after the fix and compare against the frozen
+native figure.
+
+**THIS VALIDATES TWO EARLIER CALLS.**
+1. **(b') covering the FULL window rather than entry 82.** Entry 83 is live on
+   a second move, and would have been left broken by an entry-82-only fix —
+   silently, so nobody would have found it.
+2. **Reporting the `shape` signal instead of filtering on it.** The weak
+   3-sample signature marked entry 83's candidate `shape=other`, i.e. it would
+   have been PRUNED. It is real. Filtering on three samples would have
+   dismissed a live defect, which is exactly the confident pruning that hid
+   Plasma Trap.
+
 ### (b') DESIGN, MAINTAINER-APPROVED FOR THE FULL WINDOW — not yet written
 
 Maintainer approved (b') covering entries 80-83. Design is settled; the
