@@ -641,8 +641,50 @@ left over:
 * `0x4EFB` is the word at `0x018464` — **the dispatcher's own `jmp` opcode**
 * so D0 = `0x018464` − `0x018468` = **−4 (0xFFFC)**
 
-**The index register went NEGATIVE.** It read four bytes BEFORE the table,
-took the `jmp` opcode itself as a 16-bit offset, and jumped to an odd address.
+**CORRECTED (same session, twice — see below): the index is 82, and it is
+PAST THE END of an 80-entry table.** `D0 = 0x00A4` measured at the dispatcher,
+i.e. entry 82. It reads at `0x018468 + 0xA4 = 0x01850C`, which lies beyond the
+table and holds the NEXT dispatcher's own `jmp` opcode `0x4EFB`; taken as a
+16-bit offset that gives the odd target `0x01D363`.
+
+> **TWO WRONG CLAIMS I PUBLISHED AND THEN HAD TO WITHDRAW, both from the same
+> root: I derived a register value instead of measuring it.**
+>
+> 1. *"D0 is negative (−4)."* I reasoned backwards from "which address holds
+>    `0x4EFB`" and picked `0x018464` — never checking whether any OTHER address
+>    held the same word. `0x01850C` does. One `GUARD_PROBE` at the dispatcher
+>    settled it in one run: `D0 = 0x000000A4`.
+> 2. *"It is a silent watchdog reboot, no 68k fault."* Read off a `field_trace`
+>    run, which has no exception hooks and could not have reported one.
+>
+> The rule both violate is already in this repo for deadness measurements;
+> it generalises: **an instrument that cannot observe X does not report
+> "no X", and a derived register is not a measured one.**
+
+**AND IT IS THE SAME TABLE AS PYRON'S COSMO DISRUPTION.** `0x018468`, the
+sub-state jump table `test_pyron_cosmo.sh` and `engine_internals.md` already
+document. vsavj **80** entries, vs2 **84**, danger window **[80..83]**:
+
+| tenant | move | entry | status |
+|---|---|---|---|
+| Pyron | Cosmo Disruption | 81 | FIXED 14z-74/75, in his own data |
+| Phobos | Plasma Trap (air 214+MK) | **82** | **this defect** |
+
+`tests/test_index_space.sh` ALREADY flags this table as one of its three risky
+ones, with the exact window. So this was never an instrument gap — my earlier
+"it is among the 29 NOT JUDGED" was a third wrong claim, caused by querying
+`audit_index_space.py` with the ROM ZIPS when it takes DECRYPTED images, and
+getting a silent zero-table answer I did not sanity-check.
+
+**The real gap is a process one, and it is worth more than the bug:** after
+Cosmo was fixed at entry 81, nobody asked WHO ELSE drives entries 80, 82 and
+83 of the same table. Entry 83 is still unaccounted for. The sweep names
+windows; nothing enumerates the tenant data that lands IN them.
+
+**The fix follows the ratified pattern** (14z-74's lesson — never the shared
+table; that broke four legacy replays): retarget Phobos' OWN index from 82 to
+an in-range entry already reaching the right handler, exactly as Pyron's 81->79
+at vs2 `0x0D0C7F`, one byte, unreachable by legacy.
 
 **This is a NEW sub-class of the index-space family, and it explains a
 coverage gap.** `tests/test_index_space.sh` hunts for indices past the END of a
