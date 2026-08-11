@@ -833,6 +833,55 @@ def main():
         """
         return row_owner(row, port.get("_tenants") or [], T)
 
+    def row_here(row):
+        """Does this MANIFEST ROW belong to the CURRENT loop iteration?
+
+        THE ITERATION GATE (M3b, 14z-80). `row_applies()` asks whether a row
+        is meaningful for its OWNER's slot track; it says nothing about which
+        iteration should emit it. Run the body N times without this and every
+        SHARED row (`_owner=None` — the rows every tenant's manifest declares
+        identically, deduped by merge_manifests) is emitted N times: an op
+        collision at best, last-write-wins at worst.
+
+        The rule (STATE 14z-78): a row belongs to this iteration if its owner
+        IS this tenant, or it is unowned and this is the first iteration.
+
+        LIMIT, and it is the next slice, not a subtlety to forget: a shared
+        row emitted on iteration 0 sees only tenant 0's `placed`/`regions`.
+        For `obj_hook` — whose extended table resolves each ported handler
+        through `region_of()`/`placed` — that means the OTHER tenants' extra
+        handlers do not resolve and fall to their tripwires. Correct for one
+        tenant, and the reason "shared-row union" is named as open work
+        rather than shipped here. Each such section carries a pointer to
+        this docstring.
+        """
+        o = row.get("_owner")
+        if o is None:
+            return _ti == 0
+        return o == T.get("name")
+
+    def tenant_rows(section):
+        """The rows of a manifest LIST section belonging to this iteration.
+
+        Every list-section read inside the loop body goes through here, so a
+        MISSED site is findable by grepping `port.get("` below the loop
+        header rather than by reasoning about it — which is what
+        tests/test_tenant_loop.sh does.
+        """
+        return [r for r in port.get(section, []) if row_here(r)]
+
+    def singleton(section):
+        """The same test for a TOML singleton (`[table_fix]`, `[init_shim]`…).
+
+        A singleton is either owned by one tenant's file or was merged from
+        several (merge_init_shim/merge_table_fix), which stamps it unowned —
+        so it emits once, on iteration 0, carrying every tenant's content.
+        """
+        d = port.get(section)
+        if not isinstance(d, dict) or not row_here(d):
+            return None
+        return d
+
     # WHAT STILL READS THE SCALARS, and why it is not an oversight (slice D).
     # The remaining reads split into three classes, and only the first is
     # answerable by `owner_of()` — the other two have no manifest row to ask:
@@ -1110,7 +1159,7 @@ def main():
             def table_addr_src(tname):
                 t = bank[tname]
                 es = (t["span"] // 32) if t["kind"] == "byte2d" else (t["stride"] // 32)
-                src_slot = _int(port["port"]["src_char"])
+                src_slot = _int(T["src_char"])
                 return (src_bank_origin + (_int(t["vsavj"]) - VSAVJ_ORIGIN)
                         + src_slot * es)
             want = stage_regions(regions, args.stage)
@@ -1118,7 +1167,7 @@ def main():
             # engine table grows to cover it; the blob pad + table rewrite
             # happen in the blob pass below. Must run BEFORE allocation so
             # the placement reserves the padded length.
-            tf = port.get("table_fix")
+            tf = singleton("table_fix")
             if tf and args.stage >= _int(tf.get("stage", 0)):
                 tfr = regions.get(tf["region"])
                 if tfr and tfr["len"] < _int(tf["pad_len"]):
@@ -1138,7 +1187,7 @@ def main():
             # `jmp <resolved>.l` trampoline in the pad. Must run before
             # allocation so placement reserves the pad.
             pcrel_fixes = {}
-            for pf in port.get("pcrel_escape_fix", []):
+            for pf in tenant_rows("pcrel_escape_fix"):
                 if args.stage < _int(pf.get("stage", 4)):
                     continue
                 pfr = regions.get(pf["region"])
@@ -1183,7 +1232,7 @@ def main():
             # because the sibling games preserve spacing too). Allocate the
             # whole span; recycle the inter-region gaps via gap_free.
             grouped = set()
-            for grp in port.get("layout_group", []):
+            for grp in tenant_rows("layout_group"):
                 members = [m for m in grp["regions"].split(",")
                            if m in regions and m in want]
                 if not members:
@@ -1214,7 +1263,7 @@ def main():
             # near_map: satellite regions that must land within d16 reach of an
             # anchor region (PC-rel table-entry rewrites) — placed after it
             near_map = {}
-            for pair in port["port"].get("near_map", "").split(","):
+            for pair in T.get("near_map", "").split(","):
                 if "=" in pair:
                     sat, anchor = pair.split("=")
                     near_map[sat.strip()] = anchor.strip()
@@ -1323,7 +1372,7 @@ def main():
             # Wrap the mapped allocators with a zero-fill (category byte at +8
             # preserved; only HIS calls are wrapped, vanilla allocs untouched).
             alloc_wrap_set = {_int(x) for x in
-                              port["port"].get("alloc_wrap", "").split(",") if x}
+                              T.get("alloc_wrap", "").split(",") if x}
             alloc_wrappers = {}
 
             def alloc_wrapper_for(tgt, where):
@@ -1495,7 +1544,7 @@ def main():
                 # source bytes) — for value-level porting decisions the
                 # extraction faithfully copies but the host engine needs
                 # differently (e.g. hit-class remaps).
-                for rf in port.get("region_fix", []):
+                for rf in tenant_rows("region_fix"):
                     if rf["region"] != name or args.stage < _int(rf.get("stage", 0)):
                         continue
                     roff = _int(rf["off"])
@@ -1656,7 +1705,7 @@ def main():
                 # future writer that makes the branch reachable faults loudly
                 # (vec3, A0 = the poison block) instead of silently reading
                 # unrelated vsavj bytes
-                for ip in port.get("imm_poison", []):
+                for ip in tenant_rows("imm_poison"):
                     if ip["region"] != name:
                         continue
                     off = _int(ip["src_addr"]) - r["src"]
@@ -1683,7 +1732,7 @@ def main():
                 # byte edits on ported code, old bytes verified. Rows may carry
                 # a minimum stage (e.g. the M2b gfx-bank patches are stage-6
                 # only, keeping stage-5 builds byte-identical to the freeze).
-                for pp in port.get("port_patch", []):
+                for pp in tenant_rows("port_patch"):
                     if pp["region"] != name:
                         continue
                     if args.stage < _int(pp.get("stage", 0)):
@@ -1713,7 +1762,7 @@ def main():
                 # (a1,d0.w),d0` (8 bytes -> jsr helper + nop): lea sets no
                 # flags and the helper's move.b sets NZ exactly like the
                 # displaced one, so the reroute is ghost-clean.
-                for dc in port.get("data_in_code", []):
+                for dc in tenant_rows("data_in_code"):
                     if dc["region"] != name:
                         continue
                     if args.stage < _int(dc.get("stage", 4)):
@@ -1955,7 +2004,7 @@ def main():
                 # placement delta. Effect/low codes stay untouched (per-record
                 # effect map is a later step; they render garbled, never crash
                 # — tile codes cannot fault).
-                gr = port.get("gfx_remap")
+                gr = singleton("gfx_remap")
                 if (gr and gr["region"] == name
                         and args.stage >= _int(gr.get("stage", 0))):
                     b_lo, b_hi = _int(gr["band_lo"]), _int(gr["band_hi"])
@@ -2214,7 +2263,7 @@ def main():
                     # shared region) — skip the b2 rewrite so no effect_map
                     # is fabricated for a build that places no shelf.
                     b2_recs = ({int(x, 16) for x in et.get("bank2_recs", [])}
-                               if port.get("gfx_remap") else set())
+                               if singleton("gfx_remap") else set())
                     # 14z-67 (ping #7: the fuchsia-explosion / missing-ray /
                     # missing-electricity class): 2,007 of the 5,714 bank-1
                     # tiles these records reference are NOT byte-identical in
@@ -2227,8 +2276,8 @@ def main():
                     # flip the ported piece-spawner setters #$2000 -> #$3000
                     # (manifest port_patch rows — tenant-only by
                     # construction: only ported content reaches them).
-                    c5_mode = (not port.get("gfx_remap")
-                               and _int(port["port"].get("gfx_bank", 2)) >= 4)
+                    c5_mode = (not singleton("gfx_remap")
+                               and _int(T.get("gfx_bank", 2)) >= 4)
                     c5_tiles = set()
                     b2map = {}
                     for k, v_ in et.get("bank2_place", {}).items():
@@ -2362,7 +2411,7 @@ def main():
                             fail.append(f"effect_tail: {n_et} tile words / "
                                         f"{n_cfix + n_cport} coord lists — "
                                         f"below expectation, walker drifted")
-                    if port.get("gfx_remap") and n_rw < 10000:
+                    if singleton("gfx_remap") and n_rw < 10000:
                         fail.append(f"gfx_remap: only {n_rw} tile words rewritten "
                                     f"(expected ~14k) — walker or band drifted")
                 d = placed[name]
@@ -2414,10 +2463,12 @@ def main():
             # replaced-slot content, superset-clean). Decoded session 14:
             # uploader vsavj 0x1C3FE (vs2 twin 0x1AE6E), table indexed by
             # the pre-scaled char id, 12 rows to palette RAM 0x90C140.
+            # `[palette]` may be a singleton OR a list, so it takes the
+            # iteration gate in both shapes rather than through rows().
             pals = port.get("palette")
             if isinstance(pals, dict):
                 pals = [pals]
-            for pal in (pals or []):
+            for pal in [p for p in (pals or []) if row_here(p)]:
                 if args.stage < _int(pal.get("stage", 0)):
                     continue
                 psrc, plen = _int(pal["src"]), _int(pal["len"])
@@ -2486,7 +2537,7 @@ def main():
             # soak battery re-examined the hazard (playtest round-1 item 2:
             # he moved at the row-0x10 ALIAS content = Bulleta's speeds).
             # Donovan's manifest carries no flag -> his bytes are unchanged.
-            VALUE_SKIP = set() if port["port"].get("port_param32", False) \
+            VALUE_SKIP = set() if T.get("port_param32", False) \
                 else {"param32_a", "param32_b", "jump_params"}
             # Explicit-ownership claims (14z-65): a [[sound_table]] row that WILL
             # emit repoints its ptr_table row ITSELF (the measured, id-allowlisted
@@ -2498,7 +2549,7 @@ def main():
             # (sound_table skipped there) keeps the generic repoint unchanged.
             claimed_ptr_tables = {
                 _int(st["ptr_table"]): f"sound_table {st['name']}"
-                for st in (port.get("sound_table", []) if args.stage >= 6 else [])
+                for st in (tenant_rows("sound_table") if args.stage >= 6 else [])
                 if args.stage >= _int(st.get("stage", 0))
                 and not (st.get("profile") and st["profile"] != args.profile)
             }
@@ -2598,7 +2649,7 @@ def main():
                 t = bank[tn]
                 es = (t["span"] // 32) if t["kind"] == "byte2d" else (t["stride"] // 32)
                 base_src = src_bank_origin + (_int(t["vsavj"]) - VSAVJ_ORIGIN)
-                own = _src_u32(base_src + _int(port["port"]["src_char"]) * es)
+                own = _src_u32(base_src + _int(T["src_char"]) * es)
                 alias = _src_u32(base_src + (dst_slot & 0x0F) * es)
                 if own == alias:
                     continue
@@ -2617,7 +2668,17 @@ def main():
                         f"engine twin of {own:#x} (alias char row {alias:#x} "
                         f"differs)")
 
-        for ph in (port.get("obj_hook", []) if args.stage >= 4 else []):
+        # SHARED ROWS, AND THE LIMIT OF THE ITERATION-0 RULE (14z-80). Every
+        # tenant's manifest declares these rows identically, so merge_manifests
+        # dedups them to `_owner=None` and `row_here()` emits them on
+        # iteration 0 — but the table built below resolves each ported handler
+        # through `region_of()`/`placed`, which on iteration 0 hold ONLY
+        # tenant 0's regions. So on a merged build the other tenants' extra
+        # handlers do not resolve and fall to their tripwires: loud at
+        # runtime, not silent, but wrong. Fixing it means running the union
+        # AFTER the loop against every tenant's placements — the named
+        # "shared-row union" slice. See row_here()'s docstring.
+        for ph in (tenant_rows("obj_hook") if args.stage >= 4 else []):
             site = _int(ph["site"])
             vtab = _int(ph["vanilla_table"])
             n_van = _int(ph["vanilla_entries"])
@@ -2679,7 +2740,7 @@ def main():
             # is not the next index is a build error, because the engine indexes
             # this table by type*4 and a hole would dispatch to whatever the
             # allocator left there.
-            for ex in [e for e in port.get("obj_hook_extra", [])
+            for ex in [e for e in tenant_rows("obj_hook_extra")
                        if _int(e["site"]) == site]:
                 idx = _int(ex["index"])
                 cur = len(table) // 4
@@ -2741,7 +2802,7 @@ def main():
                              f"(vanilla types identical via table copy)")
                 fragments.append((site, 6, "GEN", "obj_hook engine site"))
 
-        sh = port.get("state_hook") if args.stage >= 4 else None
+        sh = singleton("state_hook") if args.stage >= 4 else None
         if sh:
             # +0x14E engine state-dispatch extension (donovan.toml [state_hook];
             # design + measured constants: docs/project/tables/reconciliation.md
@@ -2887,7 +2948,7 @@ def main():
                 fragments.append((mt, 50, "GEN", "state_hook thunk"))
                 fragments.append((site, 6, "GEN", "state_hook engine site"))
 
-        rh = port.get("reaction_hook") if args.stage >= 4 else None
+        rh = singleton("reaction_hook") if args.stage >= 4 else None
         if rh:
             # Hit-reaction dispatch extension (donovan.toml [reaction_hook];
             # measured constants + design in the toml comment / reconciliation
@@ -2947,8 +3008,8 @@ def main():
                 fragments.append((sp, 6, "GEN", "reaction_hook engine site"))
 
         if args.stage >= 4:
-            shim_cfg = port.get("init_shim")
-            keeper_cfgs = {k["table"]: k for k in port.get("dispatch_keeper", [])}
+            shim_cfg = singleton("init_shim")
+            keeper_cfgs = {k["table"]: k for k in tenant_rows("dispatch_keeper")}
             for d in man["dispatch"]:
                 newt = None
                 tgt = d["src_target"]
@@ -3117,7 +3178,7 @@ def main():
         # shock garble — stays cleared). Donovan-gated by construction: the
         # blob only runs from HIS routine; legacy paths never execute it and
         # $FF7F00 is inside the masked dead-stack window.
-        if args.stage >= 6 and (port.get("init_shim") or {}).get("objram_clear"):
+        if args.stage >= 6 and (singleton("init_shim") or {}).get("objram_clear"):
             if "x065e5a" not in placed:
                 fail.append("objram_clear: region x065e5a not placed")
             else:
@@ -3166,7 +3227,7 @@ def main():
                     fragments.append((site, 6, "GEN", "objram clear detour site"))
 
         if args.stage >= 5:
-            for p in port.get("aux_poke", []):
+            for p in tenant_rows("aux_poke"):
                 # only_base_slot / only_variant_slot, resolved against the row's
                 # OWNING tenant (slice C) — see row_applies() for both rationales.
                 _own = owner_of(p)
@@ -3191,7 +3252,7 @@ def main():
         # (dst_old_head — proves we overwrite exactly the span we think we do),
         # explicit destination bound (dst_end), and old-verified in-blob fixes.
         if args.stage >= 6:
-            for dp in port.get("data_port", []):
+            for dp in tenant_rows("data_port"):
                 if args.stage < _int(dp.get("stage", 0)):
                     continue
                 nm = dp["name"]
@@ -3327,7 +3388,7 @@ def main():
         # array length is bounded by OUR measurement (max index used + 1),
         # not by the length of the slot's vanilla array.
         if args.stage >= 6:
-            for st in port.get("sound_table", []):
+            for st in tenant_rows("sound_table"):
                 if args.stage < _int(st.get("stage", 0)):
                     continue
                 # Profile-gated CONTENT, the companion to profile-gated space: a
@@ -3415,7 +3476,7 @@ def main():
         # (docs/game/atlas/select_screen.md), which is what makes copy-and-repoint
         # safe rather than a relocation that has to be prayed over.
         if args.stage >= 6:
-            for sw in port.get("select_wheel", []):
+            for sw in tenant_rows("select_wheel"):
                 if args.stage < _int(sw.get("stage", 0)):
                     continue
                 if sw.get("profile") and sw["profile"] != args.profile:
@@ -3493,7 +3554,7 @@ def main():
                 # and the vs2 palette bytes are written into select block A
                 # (the wheel view's live copy) in the bank5 branch below.
                 bank5_active = (sw.get("bank5")
-                                and _int(port["port"].get("gfx_bank", 2)) >= 4)
+                                and _int(T.get("gfx_bank", 2)) >= 4)
                 if bank5_active:
                     for _c, spec in newcells:
                         if "pal_row" in spec:
@@ -3659,7 +3720,7 @@ def main():
                 # 0x0F+WIDE shape keeps its placeholder medallions).
                 if sw.get("bank5"):
                     from gfx_tiles import bank_word as _bw5
-                    if _int(port["port"].get("gfx_bank", 2)) < 4:
+                    if _int(T.get("gfx_bank", 2)) < 4:
                         notes.append(f"# select_wheel {nm}: bank5 SKIPPED — "
                                      f"tenant gfx bank < 4 (no group C); "
                                      f"placeholder medallions retained")
@@ -3971,7 +4032,7 @@ def main():
         # carries a key), so it is declared here rather than in the manifest. A
         # merged build can hold a base-half tenant and a variant tenant at once,
         # which is exactly what a single outer test cannot express.
-        _sel_rows = [sr for sr in port.get("select_records", [])
+        _sel_rows = [sr for sr in tenant_rows("select_records")
                      if row_applies(sr, owner_of(sr), only_variant=True)]
         if args.stage >= 6 and _sel_rows:
             import select_port as _selp
@@ -4147,7 +4208,7 @@ def main():
         #
         # Slice C: variant-only BY CONSTRUCTION, per the row's OWNER — same
         # reasoning as select_records above.
-        _wp_rows = [wp for wp in port.get("win_pal_variant", [])
+        _wp_rows = [wp for wp in tenant_rows("win_pal_variant")
                     if row_applies(wp, owner_of(wp), only_variant=True)]
         if args.stage >= 6 and _wp_rows:
             for wp in _wp_rows:
@@ -4246,7 +4307,7 @@ def main():
         # by continuing the flow, never rts).
         if args.stage >= 4:
             opc_img_st = None
-            for st in port.get("site_thunk", []):
+            for st in tenant_rows("site_thunk"):
                 if args.stage < _int(st.get("stage", 6)):
                     continue
                 nm = st["name"]
@@ -4541,7 +4602,7 @@ def main():
         # code op so crypt-range re-encryption applies.
         if args.stage >= 6:
             opc_img_cw = None
-            for cw in port.get("code_word", []):
+            for cw in tenant_rows("code_word"):
                 if args.stage < _int(cw.get("stage", 0)):
                     continue
                 nm = cw["name"]
@@ -4622,7 +4683,7 @@ def main():
         # instead of silently patching someone else's row.
         if args.stage >= 4:
             opc_img_cp = None
-            for cp in port.get("code_ptr", []):
+            for cp in tenant_rows("code_ptr"):
                 if args.stage < _int(cp.get("stage", 4)):
                     continue
                 nm = cp["name"]
@@ -4692,8 +4753,14 @@ def main():
         # pristine vs2 + the vsavj opcode dump (topology B, STATE 14q): the
         # relocated vs2 overlay zone slice lands in Jedah's strip area and
         # his per-char code immediates are repointed (code ops re-encrypt).
+        #
+        # THE SHARED-FILE CLASS (14z-80): this section is driven by a file,
+        # not by an owned manifest row, so `row_here()` has nothing to ask.
+        # It takes the same iteration-0 rule by hand. Note its T-select thunk
+        # bakes ONE tenant id (slice E), so on a merged build it gates on
+        # tenant 0 — the same open N-way-dispatch question, recorded there.
         ovdir = Path(__file__).resolve().parent.parent / "build/manifest/overlay"
-        if args.stage >= 6 and (ovdir / "overlay_patch.json").exists():
+        if _ti == 0 and args.stage >= 6 and (ovdir / "overlay_patch.json").exists():
             ovm = json.loads((ovdir / "overlay_patch.json").read_text())
             for seg in ovm["segments"]:
                 blob = (ovdir / seg["path"]).read_bytes()
