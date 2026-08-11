@@ -656,6 +656,20 @@ it). It is the only Phobos move with no coverage from either the sweep or the
 gates, so it stays an unknown rather than a pass.
 
 ### REFLECT WALL IS DEFECTIVE TOO — SILENTLY. Entry 83 is LIVE.
+### (ATTRIBUTION CONTROLLED 14z-78, after the maintainer challenged it)
+
+> **The maintainer was right to challenge the first version of this claim.** I
+> wrote "Reflect Wall drives entry 83" when what I had measured was "replay 81
+> drives entry 83" — and a guard cancel needs P1 IN BLOCKSTUN *and* the 623+P
+> to come out, so either half failing means a different action was measured. I
+> had not run the positive control, on the very rig whose gate exists to
+> provide one.
+>
+> **Now controlled, and the claim stands:** `tests/test_hui_pairs.sh` reports
+> `P1 seq=0e, attacker blown back — guard cancel fires`, and the entry-83
+> dispatches land at **f3214 and f3315**, the first 11 frames before the gate
+> samples the GC state at f3225 and the second on the replay's second attempt.
+> `D0=0xA6` (entry 83), `D1=0x1002`. The move is attributed.
 
 The maintainer could not sweep Reflect Wall (guard-cancel only, 623+P, needs a
 blocking dummy and a 2P partner). Tested here instead: the repo already had a
