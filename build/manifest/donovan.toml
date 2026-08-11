@@ -928,8 +928,8 @@ thunk_hex = "0c3900TT00ff878267120c3900TT00ff8b82670841f9003b59404e7541fa00044e7
 # number — the same owner-mirroring scheme as the in-match sword).
 # Donovan's whole data chain (offset table -> nodes -> records with
 # remapped tile codes -> coord lists in hole b) was already carried by
-# the anim-region closure: his ported anim table lives at 0x0DDA1E
-# (byte-identical offsets to vs2 0x289EF6, verified). Fix = route
+# the anim-region closure: his ported anim table is vs2 0x289EF6,
+# i.e. anim + 0xA9AE (byte-identical offsets, verified). Fix = route
 # entry 0x0F to the existing +0x46 handler and make the handler's two
 # table lea sites char-conditional. Legacy note: entry 0x0F is only
 # consulted when the keeper's owner is char 0x0F (the replaced slot);
@@ -987,27 +987,46 @@ new_hex_variant = "1000"
 # Handler table sites: 0x845EC (lea 0x2083BC; next op tst — flags
 # dead) and 0x845F8 (lea 0x2087CA; next op move.l — sets flags before
 # any read). Thunks: owner id (cached at $a(a6) by the keeper's
-# dispatch) == 0x0F -> lea the ported Donovan anim table 0x0DDA1E,
-# else the vanilla lea. The node INDEX is injected at the resolver
+# dispatch) == the tenant -> lea the ported Donovan anim table at
+# anim + 0xA9AE, else the vanilla lea. The node INDEX is injected at
+# the resolver
 # call sites below (0x10B > 0xFF exceeds the masked resolver's 8-bit
 # range — the measured flourish node at index 0xFC SELF-LOOPS, giving
 # a permanent oversized blade; the settled back-sword node 0x28DC58 =
 # offset 0x3D62 = index 0x10B needs the UNMASKED resolver entry
 # 0x15088, the same masked/unmasked pair pattern as the sword-swing
 # fix). Pure code, no embedded data -> hole "a" is safe.
+#
+# 14z-78: the table address was a BAKED LITERAL (`207c000dda1e` =
+# movea.l #$000DDA1E,A0), so it did not track the allocator. That made
+# `anim` immovable and was M3b's ONLY remaining blocker: relocating the
+# region left both bodies still aiming at 0x0DDA1E, where x2b7ef4 had
+# slid in, and the resolver read its bytes as 16-bit offsets -> odd A0
+# -> vec3 at vanilla PC 0x015098. Measured on replay 12 with the
+# forced-pick pokes: the site fires TWICE on a working build (f1401 and
+# f1402, one per companion owner); the baked build fired at f1401 and
+# faulted at f1402; the region_subst build reproduces the working
+# two-hit signature, which is what proves the path RAN rather than
+# being skipped.
+# `region_subst` resolves anim's PLACED address at emit time, so the
+# body follows the region wherever it goes. In the default layout it
+# evaluates to the same 0x0DDA1E (placed 0x0D3070 + 0xA9AE), which is
+# why the frozen donovan-m3a fingerprint is untouched.
 [[site_thunk]]
 stage = 6
 name = "select_companion_tbl_a"
 site = 0x0845EC
 old_hex = "207c002083bc"
-thunk_hex = "0c2e00TT000a6708207c002083bc4e75207c000dda1e4e75"
+thunk_hex = "0c2e00TT000a6708207c002083bc4e75207cnnnnnnnn4e75"
+region_subst = "nnnnnnnn=anim:0xa9ae"
 
 [[site_thunk]]
 stage = 6
 name = "select_companion_tbl_b"
 site = 0x0845F8
 old_hex = "207c002087ca"
-thunk_hex = "0c2e00TT000a6708207c002087ca4e75207c000dda1e4e75"
+thunk_hex = "0c2e00TT000a6708207c002087ca4e75207cnnnnnnnn4e75"
+region_subst = "nnnnnnnn=anim:0xa9ae"
 
 # Resolver call sites in the same handler: 0x84602 (state 1; next op
 # moveq — flags dead) and 0x84624 (state-2 re-resolve from the saved

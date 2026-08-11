@@ -1712,3 +1712,42 @@ exists, or — as here — declaring "never fixed" about something that was, and
 shipping a build with the crash reintroduced. Note also how it compounded
 with the rig lesson: my evidence for "never fixed" was a set of negative
 results from rigs that produced no event at all.
+
+## A PLACED address baked into a hand-authored `thunk_hex` tracks NOTHING
+## (14z-78, cost a session and read as a hardware limit)
+
+`[[site_thunk]]` bodies are hand-written machine code. Anything the BUILD
+chooses that gets typed into them as a literal stops tracking the moment that
+choice changes — and nothing fails, because the hex is opaque to every pass
+that would otherwise rewrite it.
+
+The generator already guarded this for the tenant's CHARACTER ID (twice; both
+guards exist because that trap bit). It did not guard the ALLOCATOR's output.
+
+`donovan.toml`'s two select-companion thunks carried `207c000dda1e` —
+`movea.l #$000DDA1E,A0`, `anim`'s placed address, hand-computed once in 14z-22.
+Relocating `anim` left both bodies aimed at the vacated range; another region
+slid in, the resolver read its bytes as signed 16-bit offsets, and the engine
+took a vec3 address error at **vanilla** PC `0x015098`. A crash in untouched
+Capcom code, from a manifest typo, three sessions after it was written.
+
+**What it cost:** `anim` is 371,712 of the 470,200 bytes three tenants need
+from a 344,640-byte crypt window, so "anim cannot move" was recorded as M3b's
+binding constraint, and the maintainer was given a fallback ladder (grow the
+profile, or drop a character) for a problem that was a hex literal.
+
+Two lessons, both cheap:
+
+1. **When a stale value is IDENTICAL on two builds, grep for the VALUE before
+   tracing the CODE.** "Same on both builds" already proves it is not computed
+   — something wrote it down. `grep -ri dda1e build/manifest tools docs` found
+   it in seconds; the planned instruction trace was aimed at a dead end (the
+   resolve thunks TAIL-JUMP, so the stack held the wrong caller).
+2. **Write `region_subst`, never the address.** It resolves
+   `placed[region]+offset` at emit time. In the default layout it emits the
+   identical byte, so converting a literal is fingerprint-inert.
+
+Now a build error: `tests/test_thunk_addr_literal.sh`. Its coverage boundary is
+stated rather than assumed — opcode-anchored and word-aligned, so a raw
+longword in embedded data is still out of scope (an unanchored scan reads
+operand pairs as addresses and is pure noise).

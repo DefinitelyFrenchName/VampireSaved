@@ -1,0 +1,12 @@
+picks the PYRON cell (id 0x11), which this build does not back (donovan-m3a
+backs only Donovan at 0x13). The exact twin of huitzil-m2's 11_pick_donovan
+skip. The tenant pick on this build is covered by 11_pick_donovan; the replay
+itself is NOT dead — pyron-m2 carries a real .sha1 for it, where the cell IS
+backed.
+
+Added 14z-78 (maintainer sign-off). The replay landed in 14z-75, three days
+after this expectation set was frozen in 14z-64, so the set had no entry for it
+and run_suite.sh reported NO-EXPECTATION -> SUITE RED with 0 FAIL and 0
+divergence. A replay added after a freeze may invalidate that freeze; the
+truthful classification here is "not applicable to this build", not a frozen
+checksum.

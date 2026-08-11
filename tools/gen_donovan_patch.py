@@ -4166,6 +4166,12 @@ def main():
             # automatic rewrite — silently editing authored code could mask a
             # thunk that compares against some other character on purpose.
             _hx = st["thunk_hex"].lower()
+            # The AUTHORED body, before any substitution — the stale
+            # placed-address guard below reads this, not _hx: after
+            # region_subst/data_subst run, a placed address in the body is
+            # exactly what we asked for, so only the pre-substitution text
+            # can tell an authored literal from a resolved one.
+            _hx_authored = _hx
             # Slice E: TT/TU (and row_subst below, which derives from _tid)
             # take the ROW OWNER's id. Same open N-tenant question as the
             # win-pal thunk: the three `*_bank_variant_id` rows are declared
@@ -4310,6 +4316,64 @@ def main():
                         f"{_m.start() + 6} (An-relative form), but the tenant "
                         f"is {_tid:#04x}. Write 'TT' there so it tracks the "
                         f"tenant.")
+            # STALE PLACED-ADDRESS guard (14z-78). The two guards above are
+            # the same trap one dimension over: an authored body that bakes
+            # a value the BUILD chooses. They cover the tenant id; this one
+            # covers the ALLOCATOR's output.
+            #
+            # Paid for by M3b's only remaining blocker. The two select-
+            # companion thunks carried `207c000dda1e` (movea.l
+            # #$000DDA1E,A0) — anim's placed address, hand-computed once.
+            # It tracked nothing, so relocating `anim` left both bodies
+            # aiming into whatever slid into the vacated range; the resolver
+            # read those bytes as 16-bit offsets and took an address error
+            # at vanilla PC 0x015098. Nothing failed at BUILD time, which is
+            # why "anim cannot move" stood as a layout constraint for a
+            # session. `region_subst` is the correct spelling and this makes
+            # the wrong one loud.
+            #
+            # Anchored on the opcodes that take a 32-bit absolute/immediate
+            # operand, and word-aligned — an unanchored scan reads operand
+            # pairs as addresses (e.g. a body ending `...0040` + `4e75`
+            # parses as 0x00404E75, inside wide_ext) and would be noise.
+            # That anchor set is therefore this guard's coverage boundary:
+            # a placed address reached some other way (a raw longword in an
+            # embedded data table) is NOT caught here.
+            _abs_ops = {"4ef9": "jmp", "4eb9": "jsr", "4879": "pea"}
+            for _r in range(8):
+                _abs_ops["%04x" % (0x207C + _r * 0x200)] = f"movea.l ->A{_r}"
+                _abs_ops["%04x" % (0x41F9 + _r * 0x200)] = f"lea ->A{_r}"
+                _abs_ops["%04x" % (0x203C + _r * 0x200)] = f"move.l ->D{_r}"
+                _abs_ops["%04x" % (0x2039 + _r * 0x200)] = f"move.l abs->D{_r}"
+            # addr_literal_ok: a literal that is placement-valued ON PURPOSE
+            # (same escape hatch as id_literal_ok above).
+            _ok_addrs = {_int(x) for x in
+                         str(st.get("addr_literal_ok", "")).split(",")
+                         if x.strip()}
+            for _i in range(0, len(_hx_authored) - 11, 4):   # word-aligned
+                if _hx_authored[_i:_i + 4] not in _abs_ops:
+                    continue
+                _w = _hx_authored[_i + 4:_i + 12]
+                if len(_w) < 8 or not all(c in "0123456789abcdef" for c in _w):
+                    continue        # a placeholder, or runs off the end
+                _v = int(_w, 16)
+                if _v in _ok_addrs:
+                    continue
+                for _rn in sorted(placed):
+                    _lo = placed[_rn]
+                    _hi = _lo + regions[_rn]["len"]
+                    if _lo <= _v < _hi:
+                        fail.append(
+                            f"site_thunk {st['name']}: body bakes "
+                            f"{_v:#08x} ({_abs_ops[_hx_authored[_i:_i + 4]]}) "
+                            f"at hex offset {_i + 4}, which is inside placed "
+                            f"region '{_rn}' ({_lo:#08x}+{_hi - _lo:#x}). A "
+                            f"placed address does NOT track the allocator — "
+                            f"write a placeholder and "
+                            f"region_subst = \"<ph>={_rn}:{_v - _lo:#x}\", or "
+                            f"list it in addr_literal_ok if it is meant to be "
+                            f"a fixed address.")
+                        break
             body = bytes.fromhex(_hx)
             # hole "b" is REQUIRED for thunks carrying embedded data read
             # via data loads: hole "a" lies inside the CPS-2 crypt range,

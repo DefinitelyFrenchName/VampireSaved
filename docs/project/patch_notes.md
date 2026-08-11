@@ -2442,3 +2442,69 @@ NOT established: visibility. The block is read 0 times in ordinary play
 (two vanilla fighting replays, a 6000-frame Pyron soak; positive control 60
 reads of his sprite block on the same rig). It is a rare-event palette whose
 only documented trigger is the electrocute X-ray plus DF/status tints.
+
+---
+
+## Session 14z-78 — `anim`'s placed address stops being a literal
+
+**Files:** `build/manifest/donovan.toml` (2 rows + comments),
+`tools/gen_donovan_patch.py` (new guard), `tests/test_thunk_addr_literal.sh`
+(new), `tests/audit_region_movability.sh` (expectation flipped),
+`tests/run_battery_m2.sh` (gate registered).
+
+**Emitted-byte delta on every frozen build: ZERO.** All four references rebuild
+bit-exact (donovan-m3a `4b7d0dc7`, m5_stock `6c93cfa8`, huitzil-m2 `9deda080`,
+pyron-m2 `69e8c6f0`). The change only alters what is emitted when `anim` is
+placed somewhere other than its default `hole_a` address.
+
+### The two rows
+
+`[[site_thunk]] select_companion_tbl_a` (site `0x0845EC`) and
+`select_companion_tbl_b` (site `0x0845F8`), authored in 14z-22 (see that
+session's entry above, whose "ported anim table 0xDDA1E" is the literal in
+question — historical, superseded here):
+
+```
+-  thunk_hex = "0c2e00TT000a6708207c002083bc4e75207c000dda1e4e75"
++  thunk_hex = "0c2e00TT000a6708207c002083bc4e75207cnnnnnnnn4e75"
++  region_subst = "nnnnnnnn=anim:0xa9ae"
+```
+
+(`_b` identically, with its own vanilla lea `207c002087ca`.)
+
+`207c 000dda1e` is `movea.l #$000DDA1E,A0`. `0x0DDA1E` was `anim`'s placed
+address, hand-computed once and tracking nothing thereafter. The offset is
+derived from the SOURCE side and cross-checks against the placement side:
+vs2 `0x289EF6` (the ported anim table) − anim's src `0x27F548` = `0xA9AE`;
+`placed[anim] 0x0D3070 + 0xA9AE = 0x0DDA1E`, the literal itself. In the
+default layout `region_subst` therefore emits the identical longword; on a
+build with `region_space = "anim=wide_ext"` it emits `207c 0040a9be`.
+
+Placeholder `nnnnnnnn` is deliberately NON-HEX. Substitution is textual, so
+the existing `aaaaaaaa` spelling (huitzil.toml:1387) can in principle collide
+with a real byte run in a longer body.
+
+### Why it mattered
+
+Relocating `anim` left both bodies aiming into the vacated address range,
+where `x2b7ef4` slid in. The resolver at `0x015084` reads
+`move.w (0,A0,D0.w),D0` / `lea (0,A0,D0.w),A0` — a base-plus-signed-16-bit
+offset table — so it produced an odd A0 and `move.l (A0),(0x20,A6)` took a
+vec3 address error in VANILLA code at `PC 0x015098`. That crash was recorded
+as M3b's binding constraint for a session. `anim` is 371,712 of the 470,200
+bytes three tenants needed from a 344,640-byte crypt window; with it movable
+the requirement is 98,488 and the overflow is gone.
+
+### The guard
+
+`gen_donovan_patch.py` gains a third stale-literal guard beside the two that
+cover the tenant id. An opcode-anchored (`2n7c` movea.l / `4nf9` lea /
+`4ef9`,`4eb9` jmp,jsr / `2n3c` / `4879` pea), word-aligned 32-bit operand in
+the PRE-SUBSTITUTION body that lands in any placed region's destination span
+fails the build, naming the region and printing the exact `region_subst`
+spelling to use. Escape hatch `addr_literal_ok`, mirroring `id_literal_ok`.
+
+Coverage boundary, asserted in the gate rather than assumed: a raw longword in
+embedded data is NOT caught. An unanchored scan was tried and rejected — it
+reads operand pairs as addresses (`...0040` + `4e75` parses as `0x00404E75`,
+inside wide_ext).

@@ -243,7 +243,9 @@ FBNeo) | `docs/project/` (this port). The discriminator: **would this
 still be true if we abandoned the roster hack tomorrow?** File by the
 FACT, not by the task you were doing when you learned it.
 
-`docs/GOTCHAS.md` is now an INDEX of all 135 entries grouped by bucket;
+`docs/GOTCHAS.md` is now an INDEX of every entry, grouped by bucket
+(the count used to be quoted here; it was stale by 25 within a few
+sessions, so it is deliberately not repeated);
 the entries live in `docs/{game,platform,project}/gotchas.md`. Every
 existing citation of `docs/GOTCHAS.md` still lands there.
 
@@ -473,19 +475,47 @@ tests/audit_phase_mode_cost.sh        # 14z-77: what Phobos' phase-gated latch
                                       # round-2). An IDENTICAL result FAILS — that
                                       # means the rig stopped forming the match.
                                       # On-demand, ~15 min
-tests/audit_region_movability.sh      # 14z-77: which regions can live in
-                                      # wide_ext? THE MERGE'S BINDING CONSTRAINT
-                                      # is here. Frozen: anim CRASHES (vec3,
-                                      # odd A0, vanilla PC 0x015098 f1401) while
-                                      # aux0_4, hitbox(+proj) and x06717c — a
-                                      # CODE region — all run, so code executes
-                                      # from the raw extension. With everything
-                                      # movable relocated, three tenants still
-                                      # need 470,200 of the 344,640-byte crypt
-                                      # window, and anim alone is 371,712 of it.
+tests/audit_region_movability.sh      # 14z-77, RE-FROZEN 14z-78: which regions
+                                      # can live in wide_ext? ALL OF THEM NOW —
+                                      # anim, aux0_4, hitbox(+proj) and x06717c
+                                      # (a CODE region, so code executes from
+                                      # the raw extension). anim was the ONE
+                                      # crasher and M3b's binding constraint;
+                                      # its vec3 (odd A0, vanilla PC 0x015098)
+                                      # was NOT a layout limit but a placed
+                                      # address baked into two donovan.toml
+                                      # thunk bodies — fixed 14z-78 with
+                                      # region_subst, and the class is now a
+                                      # BUILD error (test_thunk_addr_literal).
+                                      # Three tenants need 98,488 of the
+                                      # 344,640-byte crypt window, was 470,200.
+                                      # MEASURED ON DONOVAN ONLY: H/P anim
+                                      # movability is inferred from the
+                                      # manifests, not measured — a "runs"
+                                      # verdict for them needs a liveness
+                                      # control first (header says why).
                                       # Expectations frozen BOTH ways: if anim
-                                      # ever moves, this FAILS and says so.
+                                      # crashes again that is a REGRESSION.
                                       # On-demand, ~4.5 min
+tests/test_thunk_addr_literal.sh      # 14z-78: a placed address baked into a
+                                      # hand-authored site_thunk body is a BUILD
+                                      # error. Third guard of the family whose
+                                      # first two cover the tenant ID; this one
+                                      # covers the ALLOCATOR's output, the gap
+                                      # that made anim look immovable for a
+                                      # session. Opcode-anchored + word-aligned
+                                      # (an unanchored scan reads operand pairs
+                                      # as addresses); the anchor set is the
+                                      # documented coverage boundary — a raw
+                                      # longword in embedded data is OUT OF
+                                      # SCOPE and section 3c says so rather than
+                                      # letting section 1 read as total cover.
+                                      # 4 sections incl. all three real
+                                      # manifests staying quiet, the
+                                      # addr_literal_ok escape hatch, and 2
+                                      # verdict controls. Runs the GENERATOR
+                                      # ALONE against an extract dir; never
+                                      # edits a tracked file. No emulator, ~40s
 tests/test_region_overlap.sh [bd...]  # 14z-77: can the tenants' shared source
                                       # spans be placed ONCE? M3b_plan Phase 2
                                       # item 2 assumes yes; MEASURED, four of the
@@ -912,7 +942,7 @@ reproducible AT THAT TIME; no one has re-verified the older ones since.
 | **hui10 — PING #9 (14z-68 close, NOT yet frozen)** | fingerprint `64128aa7465e15378c0082afcc953aa9730744ce` | `build/hui10` (pinned, PING9_ARTIFACT.md); playtest default of `tools/run_hui_behavior.sh`. = hui9 + **the win-screen palette fix** (source re-derived from vs2's win drawer 0x6B29C: the char id is remapped through the byte table at 0x6B2F2 — read via the DATA view — giving H row 0x59, i.e. 0x3C2BBC + 0x59*0xA0 = 0x3C635C, a GOLD ramp; the old 0x3C347C was the pink/lavender guess). Verified in-emulator: win-screen palette RAM reads the gold ramp at both sample frames. Plus three behaviourally-inert shipped fixes (spawner-region boundary, two newcomer-id mask widenings, the obj_hook_extra facility). Gates at cut: boot masked-v2 EXACT, ex, grab, air, pairs, walk, fx_flow, ladder, m3a — all PASS. STILL OPEN: win-pose garbled art blocks, the beam/effect family, the child-companion shadow, DF style, FG pacing |
 | **hui9 — PING #8 (14z-67 close, NOT yet frozen)** | fingerprint `9e3105e0be8a5b5c85f5c792c5c9947f49196098` | `build/hui9` (pinned, PING8_ARTIFACT.md); = hui6 + the ping-round fixes: effect byte-map rows (236P ray spawns), c5 companion-record art in bank 5 + spawner bank flips, the throw-arc superset tables (63214 launch yv 16.0 native-exact). Playtest default of `tools/run_hui_behavior.sh`. REMAINING before freeze: the effect-flow closure (NEXT_SESSION recipe), shadow restore, win-pal, DF style, FG pacing |
 | hui6 — the ping-#7 reference (superseded by hui9) | fingerprint `b99b73597b7ab09761e0da58e81527db8747c7e5` | `build/hui6`; rebuild: `TENANT_MANIFEST=build/manifest/huitzil.toml TENANT_CHAR=0x10 GEN_FLAGS="--profile cps2-wide-v1 --allow-plausible --tripwire-open" tools/build_donovan.sh 6 build/hui6`. Huitzil at native 0x10 with HIS REAL ART end to end: fighter band at delta 0 in group C bank 4 (native codes, no record remap), select figure/portrait/name, 21-cell wheel, VS splash, HUD mug/plate (pool 0xBE9A/0xBE92), sprite+effect+win palettes, x05c800 escape fix. Cell 0x10 hand-pickable (replay 37: D,D,D from default). Every gate green incl. behavior battery ON this build + oracle (1741). Playtest: `tools/run_hui_behavior.sh`. FREEZE after maintainer confirmation (registry row + expectation set) |
-| **donovan-m3a — THE WIDE REFERENCE (FROZEN 2026-08-06, 14z-64, maintainer-ratified)** | fingerprint `4b7d0dc7319ed6cf94a02b22938cdb18946dfddd` | `build/m5_wide` (rebuilds bit-exact from the tree); REGISTERED `-> donovan-m3a`. The M3a de-substitution complete: tenant at native 0x13 via `id_by_profile` (build with `--profile cps2-wide-v1`, no id flag), Jedah fully restored, select family + wheel from group C bank 5 with real medallion art/palettes, ring reuse, variant-id HUD/win-pal, the 14z-2 mirror-victim fix. Masked basis V2 (per-set `mask` file; staging-slot windows for rows 0x16/0x19/0x1A; vanilla logs `tests/expected/vsavj/masked-v2`). Stock twin **6c93cfa8** at `build/m5_stock` (= old ae701ffb + exactly the 2-byte mirror fix). Validate: `ROMDIR=... MAME_BIN=~/.cache/vampire-saved/mame/cps2 MAME_ROMPATH="build/m5_wide/rompath;$ROMDIR" tests/run_suite.sh vsavjw` |
+| **donovan-m3a — THE WIDE REFERENCE (FROZEN 2026-08-06, 14z-64, maintainer-ratified)** | fingerprint `4b7d0dc7319ed6cf94a02b22938cdb18946dfddd` | `build/m5_wide` (rebuilds bit-exact from the tree); REGISTERED `-> donovan-m3a`. The M3a de-substitution complete: tenant at native 0x13 via `id_by_profile` (build with `--profile cps2-wide-v1`, no id flag), Jedah fully restored, select family + wheel from group C bank 5 with real medallion art/palettes, ring reuse, variant-id HUD/win-pal, the 14z-2 mirror-victim fix. Masked basis V2 (per-set `mask` file; staging-slot windows for rows 0x16/0x19/0x1A; vanilla logs `tests/expected/vsavj/masked-v2`). Stock twin **6c93cfa8** at `build/m5_stock` (= old ae701ffb + exactly the 2-byte mirror fix). Validate: `ROMDIR=... MAME_BIN=~/.cache/vampire-saved/mame/cps2 MAME_ROMPATH="build/m5_wide/rompath;$ROMDIR" tests/run_suite.sh vsavjw` — **FIXED 14z-78 (maintainer sign-off): this command had been RED since 14z-75** on two `NO-EXPECTATION` replays (`37_pick_huitzil_cell`, `40_pick_pyron_cell`), both added AFTER this set was frozen in 14z-64, so it had no entry for either. 0 FAIL and 0 divergence throughout — never a regression. Both are now `.skip` ("picks a cell this build does not back"), matching `11_pick_donovan`'s precedent. **`huitzil-m2` had the same gap** on `40_pick_pyron_cell` and is fixed the same way. Ruling: a replay added after a freeze may invalidate that freeze. See STATE.md "frozen sets were RED on UNACCOUNTED replays". |
 | donovan-m5w — superseded by donovan-m3a | fingerprint `9bac6ee378e1a5ce0674423279c357a4d2a076ec` | `build/m5_wide`; REGISTERED `-> donovan-m5w`. Rebuilt through the fixed romset pipeline (group C zero-filled; `audit_romset_identity.py` clean) + the 14z-60 select-wheel extension. Maintainer playtest confirmed with and without Donovan. Gates: `test_wide_profile.sh`, `test_mame_wide.sh`, `test_wide_render_content.sh` (3,721/3,721 frames pixel-identical to the stock track), `test_romset_identity.sh` — all PASS. Expectation set `tests/expected/donovan-m5w/`: 33 self-frozen `.sha1` + full logs, 14 authored `.masked` (`diverge` ×3, §4 v3 `window` ×4, §4 v4 `composite` ×7), 16 `.skip` — all 63 replays accounted for and **`run_suite.sh` GREEN**. Validate any WIDE build with `ROMDIR=... MAME_BIN=~/.cache/vampire-saved/mame/cps2 MAME_ROMPATH="<rompath>;$ROMDIR" tests/run_suite.sh vsavjw` |
 | **m5_stock (the stock twin, re-frozen 2026-08-06)** | fingerprint `6c93cfa8a8a80ae2303d3acaf8c7bff487f369c5` | `build/m5_stock`; rebuilds bit-exact. = the former ae701ffb + EXACTLY the 2-byte mirror-victim fix (PRG:0x0B1A16, byte-attributed). Not registered — the dual-track partner and the rendering gate's reference. Full battery GREEN at freeze |
 | ~~m5w~~ **KNOWN-BAD, kept as evidence** | `ac52eeff` | the 14z-60y sprite garble: its `vsavjw.zip` carries group C as byte copies of group B, so the loader served pristine tiles for the patched group B. Do not playtest. `python3 tools/audit_romset_identity.py build/m5w/rompath` names all four shadows |

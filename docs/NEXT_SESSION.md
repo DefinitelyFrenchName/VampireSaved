@@ -1,4 +1,13 @@
-# NEXT SESSION — orientation (written at the close of 14z-77, 2026-08-10)
+# NEXT SESSION — orientation (written at the close of 14z-78, 2026-08-11)
+
+> **M3b'S BLOCKER IS CLEARED.** `anim` moves; the crypt-window overflow is
+> gone. It was never a hardware limit — two `donovan.toml` thunks baked the
+> region's placed address as a hex literal. Fixed inertly (all four frozen
+> fingerprints bit-exact), and the class is now a build error. Details below
+> under "THE CRYPT-WINDOW BLOCKER IS CLEARED".
+>
+> **The remaining M3b work is the region-identity slice and the N-way dispatch
+> form, then the N-tenant loop.**
 
 **ALL THREE TENANTS ARE FROZEN.** Donovan `donovan-m3a` (4b7d0dc7),
 Phobos `huitzil-m2` (9deda080), **Pyron `pyron-m2` (69e8c6f0 — RE-FROZEN
@@ -99,7 +108,7 @@ dedup.
   # watch P1 +0x382: 0x11 while alive, 0x00 once the watchdog has cleared RAM
   ```
 
-## THE INDEX-SPACE CLASS — the lesson of this session
+## THE INDEX-SPACE CLASS — the lesson of 14z-76
 
 vsavj's tables are SMALLER than vs2's. A ported character carries vs2's
 indices verbatim, and any index past the end of vsavj's table dispatches into
@@ -300,6 +309,65 @@ instrument showed the probe was armed — so the zero was a fact about the RIG:
 replay 11 never forms a Donovan match on this build. Forced-pick pokes fixed
 it. Both new gates now open with that control.
 
+### THE CRYPT-WINDOW BLOCKER IS CLEARED (14z-78) — `anim` MOVES
+
+If every tenant keeps its own copy of what it places TODAY (default placement):
+
+| space | needed | capacity | |
+|---|---|---|---|
+| `hole_a` | 761,316 | 264,544 | overflows by 496,772 |
+| `hole_b` | 171,614 | 80,096 | overflows by 91,518 |
+| `wide_ext` | 45,580 | 2,097,136 | fits, 2,051,556 spare |
+
+The regions fit the image many times over; the crypt-window spaces are
+saturated **by one tenant**. `region_space` (slice J) makes placement a
+per-region manifest tunable, and `tests/audit_region_movability.sh` measures
+what it can be used for. **As of 14z-78 every region it measures MOVES** —
+`anim`, `aux0_4`, `hitbox(+proj)`, and `x06717c`, which is CODE, so the raw
+extension executes fine (`tests/test_crypt_boundary.sh` locks that statically).
+
+With `anim` movable, three tenants need **98,488** of the 344,640-byte crypt
+window (D 67,314 / H 31,174 / P 0) instead of 470,200. **The overflow is gone,
+and neither maintainer fallback — growing the profile, dropping a tenant — is
+needed.**
+
+> #### What `anim` actually was: a hex literal, not a hardware limit
+>
+> `donovan.toml`'s two select-companion thunks baked `207c000dda1e`
+> (`movea.l #$000DDA1E,A0`) — `anim`'s placed address, hand-computed once in
+> 14z-22 and tracking nothing since. Move the region and both bodies still
+> aimed at the vacated range, where `x2b7ef4` slid in; the resolver read its
+> bytes as signed 16-bit offsets and the engine took a vec3 in VANILLA code at
+> PC 0x015098.
+>
+> Fixed with `region_subst = "nnnnnnnn=anim:0xa9ae"` — the mechanism that
+> already existed for this (14z-66), also used by `huitzil.toml:1387` on this
+> same region. **Inert:** in the default layout it emits the identical byte, so
+> all four frozen fingerprints rebuild bit-exact and `donovan-m3a` is still
+> `4b7d0dc7`.
+>
+> **Two lessons worth keeping.** (1) When a stale value is IDENTICAL on two
+> builds, grep for the VALUE before tracing the CODE — "same on both" already
+> proves it is not computed. The planned instruction trace was aimed at a dead
+> end: the resolve thunks TAIL-JUMP the resolver, so `RET = 0x00FF02DC` was the
+> select keeper's caller, not the resolver's. (2) An absent crash proves
+> nothing; the verdict came from a three-way comparison where the fixed build
+> reproduces the working build's exact probe signature (2 hits, f1401/f1402),
+> proving the path RAN.
+>
+> The class is now a BUILD error: `tests/test_thunk_addr_literal.sh`.
+
+**STILL UNMEASURED — do this before trusting the 98,488 figure for the merge.**
+`audit_region_movability.sh` builds DONOVAN only (donovan.toml, 0x13, replay
+12). Huitzil's and Pyron's `anim` are *inferred* movable: `huitzil.toml`
+already spells its anim reference `region_subst` and the 14z-78 sweep found no
+baked placed address in either manifest. That is an argument, not a
+measurement. Extending the audit is **not** a loop over manifests — a "runs"
+verdict needs a LIVENESS CONTROL proving the tenant's match formed, or an
+unformed match reads as a clean pass (the blind-zero trap, paid for twice).
+Donovan needs none only because his case used to crash, which proved the path
+ran.
+
 ### NEXT SLICE — region identity, then the N-way dispatch FORM
 
 **1. Region/extraction identity — MEASURED 14z-77, and it is THREE mechanisms,
@@ -336,124 +404,10 @@ table inside `x026142` has 14 `1-differs` bytes and ZERO conflicts, so no union
 is needed. **Per-tenant COPIES resolve everything; sharing is an optimisation,
 not a requirement.**
 
-### THE REAL BLOCKER IS PC-REACH, NOT SIZE — and it is quantified
-
-If every tenant keeps its own copy of what it places today:
-
-| space | needed | capacity | |
-|---|---|---|---|
-| `hole_a` | 761,316 | 264,544 | **overflows by 496,772** |
-| `hole_b` | 171,614 | 80,096 | **overflows by 91,518** |
-| `wide_ext` | 45,580 | 2,097,136 | fits, 2,051,556 spare |
-
-The regions fit the image many times over; the CRYPT-window spaces are
-saturated **by one tenant**. And regions live there for **reach, not
-encryption** — code above `PRG:0x0FFFFF` is stored raw and runs
-(`tests/test_crypt_boundary.sh` locks that).
-
-**ANSWERED 14z-77, and it comes down to ONE REGION.** `region_space` (slice
-J) made placement a manifest tunable; the experiment then showed that
-"unconstrained by near_map/layout_group" is NOT sufficient for movability —
-moving all ten such regions crashed with a vec3 address error (odd A0) at
-vanilla PC 0x015098, f1401. Bisected (`tests/audit_region_movability.sh`,
-~4.5 min):
-
-| region | | |
-|---|---|---|
-| `anim` | **CRASHES** | vec3, odd pointer |
-| `aux0_4` | runs | data |
-| `x06717c` | runs | **CODE — the raw extension executes fine** |
-| `hitbox`+`hitbox_proj` | runs | data |
-
-With every movable region relocated, three tenants STILL need 470,200 bytes of
-the 344,640-byte crypt window — over by 125,560 — and **`anim` alone is
-371,712 of it**.
-
-> ## M3b IS BLOCKED ON ONE BUG: an UNRELOCATED pointer into `anim`
->
-> **Root-caused 14z-77 and it is NOT a hardware constraint.** The base pointer
-> that indexes anim reads `0x000DDA1E` on the working build AND on the moved
-> build — identical, so it never tracked anim's placement. On the working build
-> that address happens to fall inside anim; once anim leaves, `x2b7ef4` slides
-> into the same range and the 16-bit offsets read its bytes instead.
->
-> **REFUTED en route:** "anim must stay within ±32 KB of `x2b7ef4`".
-> `huitzil-m2` runs with them **3.3 MB apart**. Adjacency is not the constraint.
->
-> **Next probe:** find where A0 is loaded before `PRG:0x01508a`. `RET` is
-> `0x00FF02DC`, a RAM trampoline, so the caller is not readable from ROM —
-> use `GUARD_TRACE` across the call or a write-tap on `$FF02DC`. Then ask why
-> the relocation pass misses it.
->
-> This reframes the blocker from a layout constraint into a generator bug,
-> which would make BOTH fallbacks (growing the crypt window, dropping a
-> tenant) unnecessary.
-
-### REPRODUCE IT IN THREE COMMANDS (and the three traps that cost time)
-
-```sh
-export ROMDIR=/path/to/reference/sets
-export MAME_BIN=~/.cache/vampire-saved/mame/cps2      # TRAP 1
-POK="1400:ff8782:13;1450:ff8782:13;1500:ff8782:13"    # TRAP 2
-
-# 1. build Donovan with anim in wide_ext (inject into the FIRST occurrence —
-#    donovan.toml carries hole_b_regions TWICE, [[tenant]] and legacy [port])
-python3 - <<'EOF'
-import pathlib
-m = pathlib.Path("build/manifest/donovan.toml").read_text()
-a = 'hole_b_regions = "aux0_4,hitbox"'
-pathlib.Path("build/manifest/_animprobe.toml").write_text(
-    m.replace(a, a + '\nregion_space = "anim=wide_ext"', 1))          # TRAP 3
-EOF
-KEY_SET=vsavj TENANT_MANIFEST=build/manifest/_animprobe.toml TENANT_CHAR=0x13 \
-WIDE_ROMSET="$PWD/build/wide0/rompath/vsavjw.zip" \
-GEN_FLAGS="--allow-plausible --tripwire-open --profile cps2-wide-v1" \
-tools/build_donovan.sh 6 /tmp/animmv
-
-# 2. see the crash
-POKES="$POK" MAME_ROMPATH="/tmp/animmv/rompath;$ROMDIR" \
-  tools/run_replay_guarded.sh vsavjw tests/replays/12_donovan_vs_cpu.rpl \
-  /tmp/an.log /tmp/anbox        # -> CRASH 1401 vec3 PC 015098 ADDR 000decc3
-
-# 3. the base pointer, on BOTH builds — they are IDENTICAL, which is the finding
-POKES="$POK" MAME_ROMPATH="$PWD/build/m5_wide/rompath;$ROMDIR" \
-GUARD_PROBE=01508a GUARD_PROBE_MAX=2000 \
-  tools/run_replay_guarded.sh vsavjw tests/replays/12_donovan_vs_cpu.rpl \
-  /tmp/wbase.log /tmp/wbx
-awk '$2>=1400 && $2<=1402' /tmp/wbase.log | grep '^PROBE'
-#   PROBE 1401 ... A0=000dda1e ...   <- same on the anim-moved build
-```
-
-**TRAP 1 — `MAME_BIN`.** Without the WIDE source build, MAME reports
-*"Unknown system: vsavjw"* and lists near-matches. That is an EMULATOR
-problem, not a ROM problem (HANDOFF says so, and renaming the zip to force it
-is actively harmful).
-
-**TRAP 2 — the rig must FORM the match.** `11_pick_donovan.rpl` never runs
-Donovan's char-init on a variant-id build: probing it returns ZERO hits, which
-reads exactly like "the code never executes". Use the forced-pick pokes with
-replay 12 (or 03/16 for both player structs). A positive control on a
-known-executed address — the pool seeder `0x016C64` gives 4 hits — is what
-distinguishes a real zero from a blind one.
-
-**TRAP 3 — `donovan.toml` declares `hole_b_regions` TWICE**, in `[[tenant]]`
-and in the superseded flat `[port]`. `normalise_tenants()` prefers
-`[[tenant]]`, so inject into the FIRST occurrence only.
-
-**New instrument this session:** `GUARD_PROBE_MEM="<reg>+<hexoff>"` on
-`replay_guard.lua` appends the byte at that register+offset to each PROBE
-line. Frame-level ordering is too coarse when two events sit inside one frame.
->
-> Not ownership, not the manifest merge, not gating or baked code — all done.
-> Not total space — `wide_ext` has 2 MB free. Everything else moves.
-
-**Start here next session.** `CRASH 1401 vec3 PC 015098 ADDR 000decc3`, A0 odd,
-faulting in VANILLA code — so the engine is handed a misaligned anim pointer
-once the region moves. Check in order: a 16-bit anim offset field that cannot
-express the higher base; a pc-relative anim reference the escape machinery does
-not classify; or an alignment change (`alloc` aligns gap reuse to 0x10, the
-space cursor less obviously). The audit freezes the crash in BOTH directions —
-when `anim` moves, it FAILS and tells you the blocker is gone.
+**Note added 14z-78:** `region_subst` resolves against `placed[name]`, so once
+region names are tenant-namespaced it must resolve through the row's OWNER —
+the same shape as slices D/E. The two select-companion rows fixed in 14z-78
+are the first consumers that will need it.
 
 **2. The N-way dispatch form** — what slice E deliberately did NOT do. Each
 baked fragment still tests ONE id, and the sites are SHARED: all three tenants
@@ -486,6 +440,14 @@ questions and neither substitutes for the other.
 It perturbs `tools/gen_donovan_patch.py` in place; the trap restores on EXIT/
 INT/TERM and section 3 asserts byte-identity independently (verified against a
 mid-run SIGINT).
+
+**Added 14z-78: `tests/test_thunk_addr_literal.sh`** (~40s, same standalone-
+generator technique, but it perturbs COPIES of the manifest and never touches a
+tracked file). No `[[site_thunk]]` body may bake a PLACED address as a literal —
+the guard that would have turned M3b's blocker into a build error instead of a
+crash in vanilla code. Registered in `run_battery_m2.sh` with the cheap rule
+locks. Its own coverage boundary is asserted in section 3c rather than left
+implied: a raw longword in embedded data is out of scope.
 
 ## Carried into M3b — gate defaults point at intermediate builds
 

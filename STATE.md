@@ -1,6 +1,29 @@
 # STATE — living progress log
 
-Updated: 2026-08-10 (session 14z-77 — **M3b slices C-F.** Slice F makes the
+Updated: 2026-08-11 (session 14z-78 — **M3b'S BLOCKER IS CLEARED: `anim` MOVES.**
+The vec3 that made anim immovable was never a layout, reach or crypt-window
+constraint — `donovan.toml`'s two select-companion thunks baked
+`207c000dda1e` (`movea.l #$000DDA1E,A0`), anim's placed address hand-computed
+once into authored hex, tracking nothing. Move the region and both bodies still
+aimed at the vacated range, where `x2b7ef4` had slid in; the resolver read its
+bytes as 16-bit offsets and took an address error in VANILLA code. Found by an
+opcode-anchored sweep of every hex blob in the three manifests — **exactly two
+hits, no others** — not by tracing from the fault, which had dead-ended on a RAM
+return address (the resolve thunks TAIL-JUMP the resolver, so the stack holds
+the select keeper's caller). Fixed with `region_subst`, the mechanism that
+already existed for this (14z-66), and the fix is INERT: **all four frozen
+fingerprints bit-exact, donovan-m3a still 4b7d0dc7**, because in the default
+layout `placed[anim]+0xA9AE` evaluates to the same 0x0DDA1E. Runtime proof is a
+three-way comparison, not an absent crash: site 0x845EC fires at f1401 AND f1402
+on the working build; the baked build fires once and faults on the second; the
+fixed build reproduces the working signature exactly. New guard makes the class a
+BUILD error (`tests/test_thunk_addr_literal.sh`) — the third of a family whose
+first two cover the tenant id and whose gap was the ALLOCATOR's output. Three
+tenants now need 98,488 of the 344,640-byte crypt window, was 470,200. SCOPE:
+measured on Donovan; H/P anim movability is inferred from the manifests and still
+wants a liveness control. Read docs/NEXT_SESSION.md first.)
+
+Previously: 2026-08-10 (session 14z-77 — **M3b slices C-F.** Slice F makes the
 merged manifest EXPRESSIBLE (`--port` is repeatable; the documents merge) and
 turns the merge's hazards from a list in a document into a MEASUREMENT: 12
 collisions, of which only THREE are real blockers — the six `port_patch` ones
@@ -281,6 +304,192 @@ construction and the port is inert. Two of the five (`0x2AFA2`, `0x2B25A`) are
 not in either dispatcher's target set, so at least those are reached another
 way; this was not run to ground.
 
+## Session 14z-78 — `anim` MOVES: M3b's blocker was a hex literal
+
+**The blocker is cleared, and it was a generator/manifest bug exactly as
+14z-77j predicted.** Not reach, not the crypt window, not alignment.
+
+### What it was
+
+`build/manifest/donovan.toml`'s two select-companion thunks
+(`select_companion_tbl_a` / `_b`, sites `0x0845EC` / `0x0845F8`) carried:
+
+```
+thunk_hex = "0c2e00TT000a6708207c002083bc4e75207c000dda1e4e75"
+                                              ^^^^^^^^^^^^
+                       207c 000dda1e = movea.l #$000DDA1E,A0
+```
+
+`0x0DDA1E` is `anim`'s placed address plus `0xA9AE`, hand-computed once when the
+companion was ported (14z-22) and tracking nothing since. `TT` tracks the
+tenant; the address did not. Move `anim` and both bodies still aim at the
+vacated range — `x2b7ef4` slides in, the resolver at `0x015084` reads its bytes
+as signed 16-bit offsets, `lea (0,A0,D0.w),A0` yields an odd A0, and
+`move.l (A0),(0x20,A6)` takes a vec3 in VANILLA code.
+
+### How it was found — the sweep, not the trace
+
+14z-77j's next-probe plan (trace back from `0x01508a`) was aimed at a dead end:
+`RET = 0x00FF02DC` is a RAM address because the *resolve* thunks reach the
+resolver by **tail-jump** (`4ef900015084`), so the stack holds the select
+keeper's caller, not the resolver's. The caller was never going to be readable
+that way.
+
+What cracked it in seconds was searching for the VALUE instead:
+`grep -ri dda1e build/manifest tools docs` — the manifest names it in a comment
+and bakes it two lines later. An opcode-anchored sweep of every hex blob in all
+three tenant manifests then bounded the class: **exactly two hits.** Every other
+placement-range literal in the manifests is a *source-set* address (`src =`,
+`orc =`, `vsav2 =`).
+
+**Lesson worth carrying: when a stale value is identical across two builds, grep
+for the VALUE before tracing the CODE.** "Identical on both builds" already says
+it is not computed; something wrote it down.
+
+### The fix, and why it is inert
+
+`region_subst = "nnnnnnnn=anim:0xa9ae"` — the mechanism added in 14z-66 for
+precisely this, already used by `huitzil.toml:1387` on this same region. The
+offset is derived from the source side and agrees with the placement side:
+`vs2 0x289EF6 − anim_src 0x27F548 = 0xA9AE`, and `placed[anim] 0x0D3070 +
+0xA9AE = 0x0DDA1E`, the literal itself. So in the default layout it emits the
+same bytes: **all four frozen fingerprints rebuild bit-exact, donovan-m3a still
+`4b7d0dc7`.** A moved build now emits `207c 0040a9be`.
+
+A non-hex placeholder (`n`) was chosen over the existing `aaaaaaaa` spelling:
+substitution is textual, so a hex-digit placeholder can collide with a real byte
+run in a longer body.
+
+### The runtime proof is a three-way comparison
+
+An absent crash proves nothing on its own — the rig might simply have stopped
+forming the match. `GUARD_PROBE=0845ec` on replay 12 with forced-pick pokes:
+
+| build | f1401 | f1402 | faults |
+|---|---|---|---|
+| `m5_wide` (anim in hole_a) | PROBE A6=`ffd400` | PROBE A6=`ffd480` | 0 |
+| anim→`wide_ext`, baked literal | PROBE A6=`ffd400` | **CRASH** vec3 | 1 |
+| anim→`wide_ext`, `region_subst` | PROBE A6=`ffd400` | PROBE A6=`ffd480` | 0 |
+
+The path executes twice per select entry (two companion owners); the broken
+build died on the second. The fixed build reproduces the working signature
+frame-for-frame, so the code path is proven RUN, not skipped.
+
+### The guard — `tests/test_thunk_addr_literal.sh`
+
+The generator already failed the build on stale *char-id* literals in thunk
+bodies (two guards, both added after that trap bit). It had none for the
+allocator's output, which is why this cost a session. Now: an opcode-anchored,
+word-aligned 32-bit operand in the **pre-substitution** body that lands inside
+any placed region's destination span is a hard build error naming the region and
+printing the exact `region_subst` spelling to use. Escape hatch
+`addr_literal_ok`, following `id_literal_ok`.
+
+Coverage boundary, asserted rather than assumed (section 3c): a raw longword in
+embedded data is NOT caught. An unanchored scan was tried and rejected — it
+reads operand pairs as addresses (a body ending `...0040` + `4e75` parses as
+`0x00404E75`, inside wide_ext).
+
+### Space, and what is NOT yet measured
+
+Three tenants now need **98,488** of the 344,640-byte crypt window
+(D 67,314 / H 31,174 / P 0), against 470,200 before. The overflow is gone.
+
+### RESOLVED (maintainer, 2026-08-11, option (a)): frozen sets were RED on
+### UNACCOUNTED replays — three gaps, not one, all fixed as `.skip`
+
+**Maintainer ruling: "if it was added after the freeze it should be able to
+invalidate the freeze."** Applied to the whole class.
+
+The coverage matrix over the three tenant-cell pick replays — built while
+fixing the first gap, and the reason the other two were found:
+
+| replay | donovan-m3a | huitzil-m2 | pyron-m2 |
+|---|---|---|---|
+| `11_pick_donovan` | masked | skip | skip |
+| `37_pick_huitzil_cell` | **was MISSING** -> skip | sha1 | sha1 |
+| `40_pick_pyron_cell` | **was MISSING** -> skip | **was MISSING** -> skip | sha1 |
+
+So `run_suite.sh` was RED against **both** `build/m5_wide` AND `build/hui27`,
+for the same mechanism: a frozen expectation set does not know about a replay
+added for a tenant it does not back. Not Donovan-specific, and not a
+regression — 0 FAIL and 0 divergence in every case.
+
+`.skip` rather than a frozen checksum because that is the truthful
+classification and it matches `11_pick_donovan`'s existing precedent exactly:
+the cell is unbacked on that build. (`pyron-m2` freezes `.sha1` for both, which
+is also valid — a self-frozen determinism checksum — and is left alone.)
+
+**The replays are NOT dead** (the maintainer raised removal as an option):
+each is live on the set whose tenant it picks, carrying a real `.sha1` there.
+
+Verified after the fix: all three frozen sets account for all 72 suite replays,
+0 missing. NOTE the sweep that produces that number must glob
+`tests/replays/*.rpl` only — a recursive glob pulls in `replays/{hui,pyron}/`,
+which the suite does not enumerate (those are driven by their own gates) and
+reports 33 phantom gaps per set.
+
+The original write-up follows.
+
+### The finding as first recorded — the donovan-m3a suite is RED,
+### and has been since 14z-75 (count corrected above: it was TWO, not one)
+
+`HANDOFF.md`'s `donovan-m3a` registry row tells you to validate with
+
+```sh
+MAME_ROMPATH="build/m5_wide/rompath;$ROMDIR" tests/run_suite.sh vsavjw
+```
+
+That command reports **SUITE RED** today: 54 PASS / 16 SKIP / **0 FAIL**, with
+
+```
+40_pick_pyron_cell    NO-EXPECTATION (freeze after review, as a STATE.md decision)
+```
+
+**Not a regression, and provably not 14z-78's doing.** `tests/expected/` is
+untouched by this session; the `donovan-m3a` expectation set was frozen
+2026-08-07 (14z-64) and `40_pick_pyron_cell.rpl` was added 2026-08-10 (14z-75),
+three days later, so the set has no entry for it. Only `pyron-m2` does. The
+stronger argument needs no history at all: **all four builds rebuild
+BIT-IDENTICAL to their frozen references, so any suite result on them is
+unchanged by this session's edits by construction.**
+
+`run_suite.sh:177` fails NO-EXPECTATION on purpose — "an unvalidated replay must
+never read as green" — so the runner is working correctly. It is reporting a
+DECISION that has not been made: the suite grew a Pyron replay and the frozen
+Donovan set was never extended to say what that replay should do on a
+Donovan-only build.
+
+**Not Claude's to decide** (the runner's own text says "as a STATE.md
+decision"). Options:
+- (a) freeze `40_pick_pyron_cell` into `donovan-m3a` as a `.skip` with the
+  reason "picks Pyron's cell 0x11, unbacked on this Donovan-only build" —
+  exactly the precedent `huitzil-m2` set for `11_pick_donovan`;
+- (b) freeze a real expectation for it on the Donovan set;
+- (c) leave it and correct HANDOFF's registry row to say the documented
+  validate command is expected RED on this one replay.
+
+Recommendation: **(a)** — it matches the existing precedent, it is the truthful
+classification, and it makes the documented command green again. Any of the
+three needs maintainer sign-off since it edits a frozen expectation set.
+
+That figure is ARITHMETIC ON 14z-77's MEASUREMENT, not a fresh one: 470,200
+minus anim's 371,712 (D 134,912 / H 124,928 / P 111,872), and it agrees with
+14z-77i's independently-reported per-tenant reach-constrained sets. What 14z-78
+measured is that the subtraction is now LEGAL — anim can actually leave.
+`tools/audit_region_overlap.py` reports DEFAULT placement only (761,316 /
+171,614 / 45,580 against 264,544 / 80,096 / 2,097,136), so the post-move demand
+is not yet derivable from a tool. Worth exposing there.
+
+**Measured on Donovan only.** `audit_region_movability.sh` builds `donovan.toml`
+at 0x13 with replay 12. Huitzil's and Pyron's `anim` are *inferred* movable —
+`huitzil.toml` already spells its anim reference `region_subst`, and the sweep
+found no baked placed address in either manifest — but that is an argument, not
+a measurement. Extending the audit is not a loop over manifests: a "runs"
+verdict needs a **liveness control** proving the tenant's match formed, or an
+unformed match reads as a clean pass. Donovan needed none only because his case
+used to crash, which proved the path ran.
+
 ## Session 14z-77 — M3b slice C: rows get an OWNER, and the gating family
 ## asks it instead of the build scalar
 
@@ -491,6 +700,14 @@ dedups as shared. The gate failed on it, which is the gate working.
 
 ### 14z-77j — WHY `anim` cannot move: an UNRELOCATED base pointer
 
+> **RESOLVED 14z-78 — `anim` MOVES.** The diagnosis below is CORRECT and led
+> straight to the fix: it was an unrelocated reference, not a reach or
+> crypt-window dependency. What it did not have was the *source*, and the
+> next-probe suggestion below (trace back from `0x01508a`) was aimed at a dead
+> end — `RET` is a RAM address because the resolve thunks TAIL-JUMP the
+> resolver. The answer was a baked literal in `donovan.toml`, found by grepping
+> for the VALUE. See session 14z-78 above.
+
 Root-caused to the instruction, and **one hypothesis of mine is refuted along
 the way.**
 
@@ -540,6 +757,12 @@ two `GUARD_PROBE=01508a` runs (working build and `region_space="anim=wide_ext"`)
 
 ### 14z-77i — slice J + THE MERGE'S BINDING CONSTRAINT IS ONE REGION: `anim`
 
+> **RESOLVED 14z-78 — that constraint is GONE.** The bisection below is sound
+> and its eliminations all stand (code runs from the raw extension; the other
+> regions move). Only the conclusion changed: `anim` was not immovable, a thunk
+> baked its placed address. Three tenants now need 98,488 crypt bytes, not
+> 470,200. See session 14z-78 above.
+
 **Slice J: `region_space`.** Placement had NO reach analysis at all — the rule
 was literally `hole_b if the manifest lists it else hole_a`, so every region
 defaults into the crypt window and `alloc()`'s fallback absorbs the overflow.
@@ -574,6 +797,7 @@ crypt window — over by 125,560 — and **`anim` alone is 371,712 of it**
 (D 134,912 / H 124,928 / P 111,872). Per tenant the truly reach-constrained
 sets are small (D 67,314 / H 31,174 / P **0**).
 
+> [ANSWERED 14z-78: a thunk baked anim's placed address. `anim` moves.]
 > **M3b IS BLOCKED ON ONE QUESTION: why can `anim` not live outside the crypt
 > window?** Not on ownership, not on the manifest merge, not on the gating or
 > baked-code classes — those are all done — and not on total space, since

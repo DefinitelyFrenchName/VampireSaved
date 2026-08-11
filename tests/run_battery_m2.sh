@@ -53,6 +53,12 @@ tests/test_romset_identity.sh
 # The tenant id is a build input and the frozen reference must stay
 # reproducible while the M3a move is in progress. Cheap, no emulator.
 tests/test_tenant_id.sh
+# 14z-78: no site_thunk body may bake a PLACED address as a literal — it
+# tracks nothing, and the failure surfaces as a crash in vanilla code on a
+# build whose placement changed, not at build time. This is the gate for
+# the guard that makes it loud. Cheap, no emulator (needs an extract dir;
+# SKIPs without one).
+tests/test_thunk_addr_literal.sh
 # The M3a select-records mechanism (14z-62): a variant-id build must carry
 # the tenant's OWN select records and the host's must be vanilla bytes.
 # Builds its own 0x13 scratch build and measures the row fetch in MAME, so

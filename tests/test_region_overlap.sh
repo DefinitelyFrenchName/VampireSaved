@@ -97,8 +97,15 @@ over = sorted(n for n, c in sp["capacity"].items()
 eq("spaces that overflow", over, ["hole_a", "hole_b"])
 if not bad:
     print("  ok: hole_a overflows by 496772, hole_b by 91518; wide_ext has")
-    print("      2051556 spare — so the binding constraint is PC-REACH, not")
-    print("      total size (code above PRG:0x0FFFFF runs raw)")
+    print("      2051556 spare — so the DEFAULT placement overflows, not the")
+    print("      image (code above PRG:0x0FFFFF runs raw)")
+    # 14z-77 read this as "the binding constraint is PC-REACH". CORRECTED
+    # 14z-78: it is neither reach nor size, it is placement POLICY. Every
+    # region audit_region_movability.sh measures — anim included — runs from
+    # wide_ext once `region_space` puts it there. anim only looked
+    # reach-bound because a thunk baked its placed address as a literal.
+    print("      NB: these are DEFAULT-placement demands. region_space moves")
+    print("      regions out; see tests/audit_region_movability.sh")
 
 print("== 4: control — placement normalisation is LOAD-BEARING ==")
 raw = run(["--no-normalise"])
