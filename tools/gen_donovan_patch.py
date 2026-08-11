@@ -1002,6 +1002,16 @@ def main():
     # Every one of his secondary objects would have dispatched to an ILLEGAL
     # the moment it spawned.
     tenant_views = []   # per tenant: name, regions, placed, recon, src_set
+    # Sites declared by MORE THAN ONE tenant cannot take one thunk each. The
+    # set is known from the merged manifest before anything is emitted; the
+    # bodies are collected during the loop (each built with its own tenant's
+    # placements) and chained after it.
+    _st_multi = {a for a in
+                 [_int(r["site"]) for r in port.get("site_thunk", [])
+                  if "site" in r]
+                 if [_int(r["site"]) for r in port.get("site_thunk", [])
+                     if "site" in r].count(a) > 1}
+    _st_multi_bodies = {}
 
     def engine_here():
         """Is this the iteration on which engine-level sections emit?"""
@@ -4418,9 +4428,23 @@ def main():
         #
         # Slice C: variant-only BY CONSTRUCTION, per the row's OWNER — same
         # reasoning as select_records above.
-        _wp_rows = [wp for wp in tenant_rows("win_pal_variant")
+        # N-WAY, BY CONCATENATION (14z-80h). This is ONE thunk at ONE
+        # shared site (0x5F1B6), so N tenants cannot each patch it — that was
+        # 2 of the merged patch's 4 remaining op collisions. The body's shape
+        # makes the N-way form free: each element is
+        #     cmpi.b #TT,d6 / bne.b +8 / movea.l #rebase,a0 / rts
+        # i.e. 14 bytes whose `bne.b +8` skips exactly its own movea+rts, so
+        # "the next element" and "the vanilla tail" are the SAME target and
+        # chaining is a pure CONCATENATION with no displacement to recompute. For one tenant the emitted bytes are therefore identical
+        # to the single-element form this replaces — which is why the three
+        # frozen verticals do not move.
+        #
+        # ENGINE-LEVEL: emitted once, on the last iteration, over EVERY
+        # tenant's rows (engine_rows) rather than per iteration.
+        _wp_rows = [wp for wp in engine_rows("win_pal_variant")
                     if row_applies(wp, owner_of(wp), only_variant=True)]
         if args.stage >= 6 and _wp_rows:
+            _wp_sites = {}          # site -> [(name, row, rebase, pool)]
             for wp in _wp_rows:
                 if args.stage < _int(wp.get("stage", 0)):
                     continue
@@ -4460,47 +4484,55 @@ def main():
                                 "addr": f"{blk + c * cstride:#x}",
                                 "hex": sl.hex()})
                 else:
-                    # thunk: cmpi.b #TT,d6 / bne.b vanilla / movea.l #rebase,a0
-                    # / rts / vanilla: movea.l #pool,a0 / rts.  d6 holds the
-                    # winner id at the site; movea sets no flags and the
-                    # fall-through (moveq #0,d0) defines its own, so the
-                    # thunk's CCR clobber is safe.
-                    # Slice E: the id baked into the compare is the ROW OWNER's.
-                    # THE N-TENANT FORM IS STILL OPEN: this is ONE thunk at ONE
-                    # shared site (0x5F1B6), so N tenants need N compares chained
-                    # here (each with its own rebase), not N copies of the thunk.
-                    # That is the merge's design step; threading the owner is what
-                    # makes the single-tenant emission correct meanwhile.
+                    # One CHAIN ELEMENT per tenant. d6 holds the winner id at
+                    # the site; movea sets no flags and the fall-through
+                    # (moveq #0,d0) defines its own, so the CCR clobber is
+                    # safe. Slice E: the id in the compare is the ROW OWNER's.
                     _wrow = _int(owner_of(wp)["dst_slot"])
                     rebase = blk - _wrow * unit
-                    body = (f"0c06{_wrow:04x}"         # cmpi.b #TT,d6
-                            f"6608"                    # bne.b +8 -> vanilla
-                            f"207c{rebase:08x}"        # movea.l #rebase,a0
-                            f"4e75"                    # rts
-                            f"207c{pool:08x}"          # movea.l #pool,a0
-                            f"4e75")                   # rts
-                    tk = alloc("a", len(body) // 2,
-                               f"win_pal_variant {nm} thunk")
-                    if tk is None:
-                        continue
-                    ops.append({"op": "code", "addr": f"{tk:#x}", "hex": body})
-                    ops.append({"op": "code", "addr": f"{site:#x}",
-                                "hex": f"4eb9{tk:08x}"})
+                    _wp_sites.setdefault(site, []).append(
+                        {"name": nm, "row": _wrow, "rebase": rebase,
+                         "pool": pool})
                     notes.append(f"data   {blk:#08x} +{blk_len:#x}  "
                                  f"win_pal_variant {nm}: sparse block, "
                                  f"{ncol} sets of {unit:#x} at stride "
                                  f"{cstride:#x} (vs2 {vsrc:#x} "
                                  f"stride {vstride:#x})")
-                    notes.append(f"code   {tk:#08x} +{len(body)//2:#x}  "
-                                 f"win_pal_variant {nm} thunk (d6==TT -> "
-                                 f"a0 = {rebase:#x}; else vanilla pool "
-                                 f"{pool:#x})")
-                    notes.append(f"code   {site:#08x} +6     win_pal_variant "
-                                 f"{nm}: movea.l #pool -> jsr {tk:#x}")
                     fragments.append((blk, blk_len, "VS2",
                                       f"win_pal_variant {nm} sparse block"))
-                    fragments.append((tk, len(body) // 2, "NEW",
-                                      f"win_pal_variant {nm} thunk"))
+
+            # ONE thunk per site, whichever tenants declared it. Elements in
+            # declaration order; the vanilla tail last, reached by any
+            # element whose compare fails.
+            for _site, _els in sorted(_wp_sites.items()):
+                _pools = {e["pool"] for e in _els}
+                if len(_pools) != 1:
+                    fail.append(f"win_pal_variant @{_site:#x}: tenants declare "
+                                f"different pool bases {sorted(_pools)} — one "
+                                f"thunk cannot serve them")
+                    continue
+                _pool = _pools.pop()
+                body = "".join(f"0c06{e['row']:04x}"      # cmpi.b #TT,d6
+                               f"6608"                    # bne.b +8 -> next
+                               f"207c{e['rebase']:08x}"   # movea.l #rebase,a0
+                               f"4e75"                    # rts
+                               for e in _els)
+                body += f"207c{_pool:08x}4e75"            # vanilla tail
+                tk = alloc("a", len(body) // 2, "win_pal_variant thunk")
+                if tk is None:
+                    continue
+                ops.append({"op": "code", "addr": f"{tk:#x}", "hex": body})
+                ops.append({"op": "code", "addr": f"{_site:#x}",
+                            "hex": f"4eb9{tk:08x}"})
+                notes.append(f"code   {tk:#08x} +{len(body)//2:#x}  "
+                             f"win_pal_variant thunk, {len(_els)}-way: "
+                             + ", ".join(f"{e['name']} d6=={e['row']:#04x} -> "
+                                         f"a0={e['rebase']:#x}" for e in _els)
+                             + f"; else vanilla pool {_pool:#x}")
+                notes.append(f"code   {_site:#08x} +6     win_pal_variant: "
+                             f"movea.l #pool -> jsr {tk:#x}")
+                fragments.append((tk, len(body) // 2, "NEW",
+                                  f"win_pal_variant {len(_els)}-way thunk"))
 
         # ── site_thunk: generic 6-byte engine-site -> jsr thunk (14q pattern) ───
         # The thunk body is authored hex (must preserve the displaced
@@ -4765,6 +4797,17 @@ def main():
                                 f"a fixed address.")
                             break
                 body = bytes.fromhex(_hx)
+                if site in _st_multi:
+                    # More than one tenant declares this site: record THIS
+                    # tenant's fully-substituted body (built with its own
+                    # placements) and let the chain pass below emit one thunk
+                    # for all of them. Never reached on a single-tenant build,
+                    # where no site is multi-declared.
+                    _st_multi_bodies.setdefault(site, []).append(
+                        (nm, body, st.get("patch", "jsr")))
+                    notes.append(f"# site_thunk {nm}: body deferred to the "
+                                 f"{site:#08x} chain ({len(body)} bytes)")
+                    continue
                 # hole "b" is REQUIRED for thunks carrying embedded data read
                 # via data loads: hole "a" lies inside the CPS-2 crypt range,
                 # where placed bytes are stored re-encrypted for opcode
@@ -4804,6 +4847,72 @@ def main():
                              f"site {site:#08x} {patch_kind}-routed")
                 fragments.append((td, len(body), "GEN", f"site_thunk {nm}"))
                 fragments.append((site, 6, "GEN", f"site_thunk {nm} engine site"))
+
+        # ── site_thunk, THE MULTI-TENANT SITES (14z-80h) ────────────────────
+        # A site MORE THAN ONE tenant declares cannot take one thunk per
+        # tenant: the loop above skipped those rows, recording each tenant's
+        # fully-substituted body (built with ITS OWN placements, which is why
+        # this cannot simply be hoisted out of the loop), and they are chained
+        # into ONE thunk here, on the last iteration.
+        #
+        # The chain is a CONCATENATION and the split point is READ FROM THE
+        # BODY, not assumed: the shape is
+        #     0c06 00TT      cmpi.b #TT,d6
+        #     66 dd          bne.s +dd     -> the next element / the tail
+        #     <dd bytes>     this tenant's work
+        #     <tail>         the non-tenant path
+        # so element length = 6 + dd, and each element's own `bne` already
+        # targets whatever follows it. Every declaring tenant must present the
+        # SAME tail, which is what makes one chain legitimate.
+        if engine_here() and _st_multi_bodies:
+            for _site, _els in sorted(_st_multi_bodies.items()):
+                _heads, _tail, _kind, _bad = [], None, None, False
+                for _nm, _b, _pk in _els:
+                    if len(_b) < 8 or _b[0:2] != b"\x0c\x06" or _b[4] != 0x66:
+                        fail.append(
+                            f"site_thunk {_nm}: {len(_els)} tenants declare "
+                            f"site {_site:#x}, so their bodies must chain — "
+                            f"but this one does not open with `cmpi.b #TT,d6 / "
+                            f"bne.s` ({_b[:6].hex()}), so where one element "
+                            f"ends cannot be derived. Chain it by hand or give "
+                            f"the tenants separate sites.")
+                        _bad = True
+                        break
+                    _elen = 6 + _b[5]
+                    if _elen > len(_b):
+                        fail.append(f"site_thunk {_nm}: bne.s displacement "
+                                    f"{_b[5]:#x} runs past the body")
+                        _bad = True
+                        break
+                    _heads.append(_b[:_elen])
+                    if _tail is None:
+                        _tail, _kind = _b[_elen:], _pk
+                    elif _b[_elen:] != _tail:
+                        fail.append(
+                            f"site_thunk {_nm}: the tenants at site "
+                            f"{_site:#x} present DIFFERENT non-tenant tails, "
+                            f"so one chain cannot serve them")
+                        _bad = True
+                        break
+                if _bad:
+                    continue
+                body = b"".join(_heads) + _tail
+                td = alloc("a", len(body), f"site_thunk chain @{_site:#x}")
+                if td is None:
+                    fail.append(f"site_thunk chain @{_site:#x}: no room")
+                    continue
+                ops.append({"op": "code", "addr": f"{td:#x}", "hex": body.hex()})
+                ops.append({"op": "code", "addr": f"{_site:#x}",
+                            "hex": ("4ef9" if _kind == "jmp" else "4eb9")
+                            + f"{td:08x}"})
+                notes.append(f"code   {td:#08x} +{len(body):#x}  site_thunk "
+                             f"{len(_els)}-way chain at {_site:#08x}: "
+                             + ", ".join(n for n, _, _ in _els)
+                             + f" ({len(_tail)} shared tail bytes)")
+                fragments.append((td, len(body), "GEN",
+                                  f"site_thunk {len(_els)}-way chain"))
+                fragments.append((_site, 6, "GEN",
+                                  f"site_thunk chain engine site"))
 
         # ── code_word: guarded single-word code patch (session 14z-22) ─────────
         # For data-in-code words a 6-byte site_thunk cannot touch without

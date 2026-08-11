@@ -15,11 +15,14 @@
 # a four-minute rebuild, and no emulator. It SKIPs when the extractions are
 # absent, since build dirs are untracked.
 #
-# WHAT IT DOES **NOT** CLAIM. A merged patch is generated, not applied: the
-# ops still collide at the shared engine sites, and section 5 freezes that
-# inventory rather than hiding it. "The generator can emit N tenants" and
-# "a merged ROM builds" are different statements and this file only makes
-# the first.
+# WHAT IT DOES **NOT** CLAIM (read this before quoting a green run). As of
+# 14z-80h a 3-tenant patch both generates AND applies — section 5 runs
+# patch_prg over it and requires zero op collisions. That is still only "the
+# PROGRAM half composes". It has never been run in an emulator, the gfx half
+# is single-tenant by decision, and no legacy or behaviour gate has been near
+# a merged image. "The generator can emit N tenants", "a merged patch
+# applies" and "a merged ROM is correct" are three different statements and
+# this file makes the first two.
 #
 # SECTION 4 IS HERE BECAUSE THE FIRST VERSION OF THIS FILE COULD NOT SEE
 # THE DEFECT IT GUARDS. Every other section was green while a merged build
@@ -121,11 +124,11 @@ done
 # The load-bearing question. A loop that ran once would produce Donovan's
 # 243 ops here; a loop that ran twice against tenant 0's data would produce
 # 243 twice over. The counts are frozen, and so is the DEDUP they imply:
-# 243 + 259 = 502 declared, 440 emitted. The gap is three things and all of
+# 243 + 259 = 502 declared, 436 emitted. The gap is four things and all of
 # them are checked below: rows recognised as SHARED and emitted once (the
 # iteration gate), tripwire ops no longer needed because the engine union
-# resolves Huitzil's handlers (4b), and agreeing duplicate ops dropped (4c).
-# Same arithmetic for three.
+# resolves Huitzil's handlers (4b), agreeing duplicate ops dropped (4c), and
+# N per-tenant thunks folded into one N-way chain (4d). Same for three.
 echo "== 2: N tenants — the loop iterates and shared rows emit once =="
 gen2 "$WORK/two"
 gen3 "$WORK/three"
@@ -140,8 +143,8 @@ check_n() {  # check_n <label> <dir> <want ops> <sum of 1-tenant counts>
         echo "  FAIL: $1 $got ops, frozen at $3"; fail=1
     fi
 }
-check_n "2 tenants" "$WORK/two"   440 502
-check_n "3 tenants" "$WORK/three" 598 707
+check_n "2 tenants" "$WORK/two"   436 502
+check_n "3 tenants" "$WORK/three" 590 707
 
 # ── 3: every tenant's own content is present ────────────────────────────
 # An op count alone cannot tell "both tenants ran" from "tenant 0 ran twice".
@@ -355,11 +358,96 @@ if not bad:
 sys.exit(1 if bad else 0)
 PY
 
-# ── 5: what a merged patch STILL cannot do, frozen by name ──────────────
-# The generator emits it; patch_prg refuses it. Freezing the inventory is
-# the point: it is the work list for the shared-row union / N-way dispatch
-# slice, and a SHRINKING number is how that slice will report progress.
-echo "== 5: the merged patch's remaining op collisions (frozen) =="
+# ── 4d: N per-tenant thunks at ONE site fold into one N-way chain ───────
+# `win_pal_variant` (0x5F1B6) and the `select_pal_variant_id` site_thunk
+# (0x5F146) are each ONE engine site that every tenant patches — the merged
+# patch's last 4 op collisions. Both bodies are already compare-chain
+# elements: `cmpi.b #TT,d6 / bne.s <past my work> / <my work>`, where the
+# branch already targets whatever follows. So N tenants chain by pure
+# CONCATENATION, and at N=1 the bytes are identical to the single-element
+# form — which is why the three frozen verticals did not move.
+#
+# Checked by DECODING the emitted chain, not by counting: element count, the
+# ids in declaration order, and that each element carries its OWN tenant's
+# data pointer. A chain of the right length whose elements all pointed at one
+# tenant's block would pass a count check and be wrong.
+echo "== 4d: the N-way chains at the shared engine sites =="
+python3 - "$WORK/three" <<'PY' || fail=1
+import json, re, sys
+d = sys.argv[1]
+ops = json.load(open(d + "/patch.json"))["ops"]
+notes = open(d + "/patch_notes_fragment.md").read()
+bad = []
+
+def body_at(addr):
+    for o in ops:
+        if o.get("addr") == addr and o["op"] == "code" and "hex" in o:
+            return bytes.fromhex(o["hex"])
+    return None
+
+def decode_chain(b):
+    """[(id, own pointer)] for a cmpi.b/bne.s element chain, plus the tail."""
+    els, off = [], 0
+    while off + 6 <= len(b) and b[off:off + 2] == b"\x0c\x06" and b[off + 4] == 0x66:
+        elen = 6 + b[off + 5]
+        ptr = None
+        for k in range(off + 6, off + elen - 5):
+            if b[k:k + 2] == b"\x20\x7c":          # movea.l #imm,a0
+                ptr = int.from_bytes(b[k + 2:k + 6], "big")
+                break
+        els.append((b[off + 3], ptr))
+        off += elen
+    return els, b[off:]
+
+# FROZEN 14z-80h: three tenants, ids in DECLARATION order.
+WANT_IDS = [0x13, 0x10, 0x11]
+PATTERNS = (("win_pal_variant",
+             r"code\s+(0x[0-9a-f]+) \+0x[0-9a-f]+\s+win_pal_variant thunk, (\d+)-way"),
+            ("site_thunk",
+             r"code\s+(0x[0-9a-f]+) \+0x[0-9a-f]+\s+site_thunk (\d+)-way chain"))
+for what, pat in PATTERNS:
+    m = re.search(pat, notes)
+    if not m:
+        bad.append("%s: no N-way chain emitted at all" % what)
+        continue
+    b = body_at(m.group(1))
+    if b is None:
+        bad.append("%s: the chain at %s is not in patch.json" % (what, m.group(1)))
+        continue
+    els, tail = decode_chain(b)
+    ids = [i for i, _ in els]
+    if int(m.group(2)) != 3 or ids != WANT_IDS:
+        bad.append("%s: %d-way with ids %s, expected 3-way %s"
+                   % (what, int(m.group(2)), [hex(i) for i in ids],
+                      [hex(i) for i in WANT_IDS]))
+        continue
+    ptrs = [p for _, p in els]
+    if None in ptrs:
+        bad.append("%s: an element carries no movea.l pointer" % what)
+    elif len(set(ptrs)) != 3:
+        bad.append("%s: the 3 elements share pointers %s — every tenant would "
+                   "get one tenant's data" % (what, [hex(p) for p in ptrs]))
+    if not tail:
+        bad.append("%s: the chain has no non-tenant tail" % what)
+for b in bad:
+    print("  FAIL: %s" % b)
+if not bad:
+    print("  ok: both shared sites carry ONE 3-way chain, ids 0x13/0x10/0x11 "
+          "in declaration order, each element with its own data pointer")
+sys.exit(1 if bad else 0)
+PY
+
+# ── 5: the merged patch APPLIES ─────────────────────────────────────────
+# Until 14z-80h this section froze an INVENTORY of collisions, because the
+# generator emitted a merged patch that patch_prg refused. It now requires
+# ZERO — and then actually runs patch_prg, because "no two ops overlap" is
+# this file's own arithmetic while patch_prg is the tool that has to accept
+# it. Both, or the check only tests my own opinion.
+#
+# This is where the honest limit sits: a merged PROGRAM image composes. The
+# gfx half is single-tenant, nothing has been in an emulator, and no legacy
+# gate has seen a merged image.
+echo "== 5: the merged patch has no op collisions AND patch_prg applies it =="
 python3 - "$WORK/three" <<'PY' || fail=1
 import json, os, sys
 d = sys.argv[1]
@@ -384,33 +472,39 @@ for i, o in enumerate(ops):
             pairs.add((owner[b], i)); nbytes += 1
         else:
             owner[b] = i
-sites = sorted({int(ops[i]["addr"], 16) for _, i in pairs})
-# FROZEN 14z-80g at 4 pairs / 24 bytes, down from 10/36: what remains is
-# EXACTLY the N-way dispatch FORM and nothing else. Both sites are patched
-# once per tenant — 0x5F1B6 by win_pal_variant, 0x5F146 by the site_thunk
-# `select_pal_variant_id` — and the fix is one thunk per site whose body
-# tests N ids (M3b_plan Phase 2 item 4), which is a design decision, not a
-# mechanical edit. Everything else that used to collide was a real defect
-# and is fixed: the slot_table rows wrote Donovan's entry for every tenant
-# (14z-80g), and the rest were AGREEING duplicates now dropped at emit.
-WANT_PAIRS, WANT_BYTES = 4, 24
+# The whole history of this number, because it is the one worth keeping:
+#   10 pairs / 36 bytes  the loop's first merged patch (14z-80d)
+#    4 / 24              after the slot_table rows followed their tenants and
+#                        the AGREEING duplicates were dropped (14z-80g)
+#    0 / 0               after the two shared engine sites took N-way chains
+#                        (14z-80h). Anything above zero is a REGRESSION now,
+#                        not a work list.
 bad = []
-if (len(pairs), nbytes) != (WANT_PAIRS, WANT_BYTES):
-    bad.append("collisions moved: %d pairs / %d bytes, frozen at %d/%d. If "
-               "they SHRANK, re-freeze and say which slice closed them."
-               % (len(pairs), nbytes, WANT_PAIRS, WANT_BYTES))
-for s in (0x5F1B6, 0x5F146):
-    if s not in sites:
-        bad.append("the known N-way dispatch site %#x no longer collides — "
-                   "if that is the fix landing, re-freeze this section" % s)
+if pairs:
+    bad.append("%d op pair(s) / %d byte(s) collide; a merged patch must have "
+               "NONE. Offenders: %s"
+               % (len(pairs), nbytes,
+                  ", ".join("%s@%s x %s@%s"
+                            % (ops[j]["op"], ops[j]["addr"],
+                               ops[i]["op"], ops[i]["addr"])
+                            for j, i in sorted(pairs)[:6])))
 for b in bad:
     print("  FAIL: %s" % b)
 if not bad:
-    print("  ok: %d op pairs / %d bytes collide, incl. the engine sites "
-          "0x5F1B6 and 0x5F146 (the N-way dispatch form is still open)"
-          % (len(pairs), nbytes))
+    print("  ok: %d ops, no two writing one byte" % len(ops))
 sys.exit(1 if bad else 0)
 PY
+
+# ...and the tool that has to accept it actually does.
+if python3 tools/patch_prg.py "$ROMDIR/vsavj.zip" "$WORK/prg" \
+        --patch "$WORK/three/patch.json" > "$WORK/prg.log" 2>&1; then
+    echo "  ok: patch_prg applied the 3-tenant patch ($(grep -c 'sha1' \
+"$WORK/prg.log" 2>/dev/null || echo '?') members written)"
+else
+    echo "  FAIL: patch_prg refused the merged patch:"
+    tail -3 "$WORK/prg.log"
+    fail=1
+fi
 
 # ── 6: verdict controls — the sections above must be able to FAIL ──────
 # Without this the whole file could be passing on a loop that never runs.
@@ -442,7 +536,7 @@ restore
 # the count must collapse away from the 3-tenant figure.
 ctl_ops="$( [ -f "$WORK/ctl1/patch.json" ] && nops "$WORK/ctl1" || echo 0 )"
 if [ "$ctl_ops" -gt 0 ] && [ "$ctl_ops" -lt 300 ]; then
-    echo "  ok: a one-iteration loop collapses 598 -> $ctl_ops ops —"
+    echo "  ok: a one-iteration loop collapses 590 -> $ctl_ops ops —"
     echo "      section 2 is measuring the ITERATION, not the manifest"
 else
     echo "  FAIL: the one-iteration control produced $ctl_ops ops; expected"
@@ -547,8 +641,58 @@ else
     fail=1
 fi
 
+# The fifth control covers sections 4d AND 5 at once: with the multi-declared
+# site set emptied, the site_thunk rows emit one thunk per tenant again — so
+# there must be no N-way chain to decode AND the ops must collide. If this
+# control passes silently, neither section is measuring anything.
+python3 - <<'PY'
+import pathlib
+p = pathlib.Path("tools/gen_donovan_patch.py")
+s = p.read_text()
+a = "    _st_multi = {a for a in\n"
+assert s.count(a) == 1, "_st_multi moved"
+# `set() if True else {...}` — NOT `set() or {...}`, which is falsy and
+# returns the comprehension, i.e. a control that perturbs nothing. That
+# exact mistake was made here first and caught by this control failing.
+p.write_text(s.replace(a, "    _st_multi = set() if True else {a for a in\n"))
+PY
+gen3 "$WORK/ctl5"
+restore
+_c5_chain=0; _c5_clash=0
+grep -q "site_thunk 3-way chain" "$WORK/ctl5/patch_notes_fragment.md" 2>/dev/null || _c5_chain=1
+python3 - "$WORK/ctl5" >/dev/null 2>&1 <<'PY' || _c5_clash=1
+import json, os, sys
+d = sys.argv[1]
+ops = json.load(open(os.path.join(d, "patch.json")))["ops"]
+def length(o):
+    if "hex" in o: return len(o["hex"]) // 2
+    if o["op"] == "poke32": return 4
+    if o["op"] == "poke16": return 2
+    if "path" in o: return os.path.getsize(os.path.join(d, o["path"]))
+    return 2
+owner = {}
+for i, o in enumerate(ops):
+    a = int(o["addr"], 16)
+    for b in range(a, a + length(o)):
+        if b in owner:
+            sys.exit(1)          # collided, as the control requires
+        owner[b] = i
+sys.exit(0)                      # no collision -> the control did nothing
+PY
+if [ "$_c5_chain" = 1 ] && [ "$_c5_clash" = 1 ]; then
+    echo "  ok: without the multi-site chain the thunks collide again and no"
+    echo "      chain is emitted — sections 4d and 5 both measure it"
+else
+    echo "  FAIL: emptying _st_multi left the build looking healthy"
+    echo "        (chain absent=$_c5_chain, ops collided=$_c5_clash) — so"
+    echo "        sections 4d/5 would not notice the chain being lost"
+    fail=1
+fi
+
 [ "$fail" = 0 ] || { echo "FAIL: tenant loop gate"; exit 1; }
-echo "PASS: tenant loop gate (N=1 inert for all three tenants, the loop"
-echo "      iterates with shared rows emitted once, each tenant's content"
-echo "      present, shared region rows reaching every copy, the merged"
-echo "      patch's collisions frozen, and 4 verdict controls)"
+echo "PASS: tenant loop gate — N=1 inert for all three tenants; the loop"
+echo "      iterates with shared rows emitted once; each tenant's content"
+echo "      present; shared region rows reach every copy; the engine union"
+echo "      and the N-way chains resolve every tenant; the merged 3-tenant"
+echo "      patch has ZERO op collisions and patch_prg applies it; 5"
+echo "      verdict controls. (The PROGRAM half only — see the header.)"
