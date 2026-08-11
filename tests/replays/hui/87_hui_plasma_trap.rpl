@@ -69,34 +69,16 @@
 #    mine lands and rolls in open ground instead of into P2
 2900-3200 p1=L
 2900-3200 p2=R
-# ── jump=U motion at +14f, button 4
-3400-3406 p1=U
-3414-3418 p1=D
-3419-3423 p1=DL
-3424-3428 p1=L4
-# ── jump=U motion at +24f, button 5
-3900-3906 p1=U
-3924-3928 p1=D
-3929-3933 p1=DL
-3934-3938 p1=L5
-# ── jump=U motion at +34f, button 6
-4400-4406 p1=U
-4434-4438 p1=D
-4439-4443 p1=DL
-4444-4448 p1=L6
-# ── jump=UR motion at +14f, button 4
-4900-4906 p1=UR
-4914-4918 p1=D
-4919-4923 p1=DL
-4924-4928 p1=L4
-# ── jump=UR motion at +24f, button 5
-5400-5406 p1=UR
-5424-5428 p1=D
-5429-5433 p1=DL
-5434-5438 p1=L5
-# ── jump=UR motion at +34f, button 6
-5900-5906 p1=UR
-5934-5938 p1=D
-5939-5943 p1=DL
-5944-5948 p1=L6
-6600 wait
+# ── THE REPRODUCING INPUT (14z-78): forward jump, 214 starting 10
+#    frames in, MEDIUM kick. Two spaced attempts; the first is the
+#    one that fires (crash lands ~152f later, so the second is only
+#    insurance against the seq-D thunk eating a frame-pinned input).
+3400-3405 p1=UR
+3410-3412 p1=D
+3413-3415 p1=DL
+3416-3420 p1=L5
+4200-4205 p1=UR
+4210-4212 p1=D
+4213-4215 p1=DL
+4216-4220 p1=L5
+4800 wait

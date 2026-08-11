@@ -606,8 +606,69 @@ So the loop needs an iteration gate alongside the existing ones:
 Natural extension of slice C, and it is the last unknown. Once it exists the
 refusal at :527 can go.
 
-### OPEN DEFECT (maintainer playtest, 2026-08-11): Phobos' PLASMA TRAP
-### crash-resets when the mine triggers
+### PLASMA TRAP: REPRODUCED AND THE FAULT MECHANISM IS EXACT (14z-78)
+
+**The maintainer's discriminator cracked it: it crashes on MK ONLY** — LK and
+HK are fine. That is what turned a vague "air 214+K crashes" into a rig: I had
+already fired MK twice without a crash, which proved my 214 was not registering
+in the air at all and every attempt had been a plain jumping kick.
+
+**Reproducing input** (`tests/replays/hui/87_hui_plasma_trap.rpl`, on
+`build/hui27`): FORWARD jump, 214 motion starting **10 frames** into the jump,
+**MEDIUM kick**. Found by shotgunning 14 all-MK attempts across jump type and
+motion delay (the Cosmo precedent: 12 attempts, 4 fired). Death lands ~152
+frames after the input — the arc, the landing, the roll, then the detonation.
+
+**RETRACTED WITHIN THE SESSION: "it is a silent watchdog reboot, no fault."**
+I read that off the field_trace run, which has no exception hooks and was never
+going to report a fault. Wrong instrument. Under the crash guard it faults
+every time. The lesson is the one already in GOTCHAS about deadness
+measurements, one step over: **an instrument that cannot observe X does not
+report "no X".**
+
+**THE FAULT, exactly:**
+
+```
+018460: 323b 0006    move.w (6,PC,D0.w),D1    ; table base 0x018468
+018464: 4efb 1002    jmp    (2,PC,D1.w)       ; target = 0x018468 + D1
+018468: 0212 0224 0224 022c ...               ; the offset table
+```
+
+`CRASH vec3 PC 018466 ADDR 0001d363`, and the arithmetic closes with nothing
+left over:
+
+* target `0x01D363` − table base `0x018468` = **D1 = 0x4EFB**
+* `0x4EFB` is the word at `0x018464` — **the dispatcher's own `jmp` opcode**
+* so D0 = `0x018464` − `0x018468` = **−4 (0xFFFC)**
+
+**The index register went NEGATIVE.** It read four bytes BEFORE the table,
+took the `jmp` opcode itself as a 16-bit offset, and jumped to an odd address.
+
+**This is a NEW sub-class of the index-space family, and it explains a
+coverage gap.** `tests/test_index_space.sh` hunts for indices past the END of a
+table — an under-long vsavj table reached by a ported over-long index. It can
+never catch this one, because the index is below zero, and the table's length
+is irrelevant. That is also why this dispatcher sits among its **29 NOT
+JUDGED**. The sweep needs a second question: can any tenant path drive a
+dispatch index NEGATIVE?
+
+**STILL OPEN: why D0 is −4, and why only for MK.** The three strengths must
+select different data; LK and HK resolve, MK does not. Next probe: trace back
+from `0x018460` for what loads D0 (`GUARD_TRACE` across the dispatcher, or
+`GUARD_PROBE=018460` reading D0 on an LK/HK run versus an MK run — the
+A/B is the answer, exactly as the identical-base-pointer A/B was for anim).
+
+**Fix policy unchanged and maintainer-agreed:** diagnose now, land on the
+merged build, do not re-freeze `huitzil-m2` and lose one of the three
+reproduction oracles before the loop lands.
+
+**Maintainer flagged a coverage question worth taking seriously:** if MK alone
+was broken here, other per-STRENGTH variants may be broken on all three
+tenants and no gate would know. The test matrix in CLAUDE.md §4 does not
+require every special at every strength. A static sweep would be far cheaper
+than playtesting the cross product.
+
+### (superseded triage below) OPEN DEFECT: Phobos' PLASMA TRAP crash-resets
 
 **Air 214+K.** Sends a landmine-looking item to the floor; when the mine
 TRIGGERS the game crash-resets. **Not a regression and not anim-related** —
