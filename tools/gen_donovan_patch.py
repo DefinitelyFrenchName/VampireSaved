@@ -918,22 +918,38 @@ def main():
         identically, deduped by merge_manifests) is emitted N times: an op
         collision at best, last-write-wins at worst.
 
-        The rule (STATE 14z-78): a row belongs to this iteration if its owner
-        IS this tenant, or it is unowned and this is the first iteration.
+        An OWNED row belongs to its owner's iteration. An UNOWNED (shared)
+        row — the rows every manifest declares identically, which
+        merge_manifests dedups to one — splits by WHAT IT KEYS ON, and the
+        split is not cosmetic (14z-80b shipped it as "unowned => iteration 0"
+        and that was measurably wrong):
 
-        LIMIT, and it is the next slice, not a subtlety to forget: a shared
-        row emitted on iteration 0 sees only tenant 0's `placed`/`regions`.
-        For `obj_hook` — whose extended table resolves each ported handler
-        through `region_of()`/`placed` — that means the OTHER tenants' extra
-        handlers do not resolve and fall to their tripwires. Correct for one
-        tenant, and the reason "shared-row union" is named as open work
-        rather than shipped here. Each such section carries a pointer to
-        this docstring.
+          REGION-SCOPED (the row names a `region`/`regions`). Every tenant
+            keeps its OWN COPY of the shared source spans — that is the
+            14z-78b ruling — so the row must be applied to EVERY copy. It
+            therefore belongs to every iteration, and each section's own
+            `regions.get(name)` / `!= name` test self-gates the tenants that
+            do not have it. Emitted on iteration 0 alone, the six shared
+            `port_patch` OBJ bank setters patched only Donovan's copies of
+            x05c800/x088512 and left Huitzil's and Pyron's holding vs2's
+            bank 3 — sprites drawn from the wrong graphics bank, silently
+            (measured 14z-80e, all 6/6 unpatched in a 3-tenant build).
+
+          ENGINE-SITE (everything else: obj_hook, select_wheel, site_thunk,
+            code_word...). One address in the one shared image, so it must
+            be emitted ONCE — iteration 0.
+
+        LIMIT ON THE SECOND CLASS, and it is the next slice: a shared
+        engine-site row emitted on iteration 0 sees only tenant 0's
+        `placed`/`regions`. `obj_hook`'s extended table resolves each ported
+        handler through exactly those, so the OTHER tenants' extra handlers
+        fall to their tripwires. Loud at runtime, not silent. The fix is a
+        union pass AFTER the loop; that section carries a pointer here.
         """
         o = row.get("_owner")
-        if o is None:
-            return _ti == 0
-        return o == T.get("name")
+        if o is not None:
+            return o == T.get("name")
+        return True if ("region" in row or "regions" in row) else (_ti == 0)
 
     def tenant_rows(section):
         """The rows of a manifest LIST section belonging to this iteration.

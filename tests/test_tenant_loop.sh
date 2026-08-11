@@ -16,10 +16,16 @@
 # absent, since build dirs are untracked.
 #
 # WHAT IT DOES **NOT** CLAIM. A merged patch is generated, not applied: the
-# ops still collide at the shared engine sites, and section 4 freezes that
+# ops still collide at the shared engine sites, and section 5 freezes that
 # inventory rather than hiding it. "The generator can emit N tenants" and
 # "a merged ROM builds" are different statements and this file only makes
 # the first.
+#
+# SECTION 4 IS HERE BECAUSE THE FIRST VERSION OF THIS FILE COULD NOT SEE
+# THE DEFECT IT GUARDS. Every other section was green while a merged build
+# left two tenants' shared regions holding the wrong OBJ bank — a blob
+# patch emits no op, so no count moved. Read its header before trusting a
+# green run of the others.
 #
 # Usage: ROMDIR=... tests/test_tenant_loop.sh
 set -eu
@@ -172,11 +178,73 @@ if not bad:
 sys.exit(1 if bad else 0)
 PY
 
-# ── 4: what a merged patch STILL cannot do, frozen by name ──────────────
+# ── 4: SHARED region-scoped rows reach EVERY tenant's copy ──────────────
+# This section exists because the first version of this gate could not see
+# the defect it was meant to guard. 14z-80b shipped the iteration gate as
+# "unowned row => iteration 0", which is right for a row that patches one
+# engine address and WRONG for a row that names a REGION: every tenant keeps
+# its own copy of the shared source spans (14z-78b), so such a row has to be
+# applied to every copy. Emitted on iteration 0 alone, the six shared
+# port_patch OBJ bank setters patched only Donovan's x05c800/x088512 and left
+# Huitzil's and Pyron's holding vs2's bank 3 — the wrong graphics bank,
+# silently. Sections 0-3 and 5 were ALL GREEN with that defect present, and
+# the op count did not move (a blob patch emits no op), so nothing here could
+# have caught it. It is measured directly now.
+echo "== 4: shared region-scoped rows applied to every tenant's copy =="
+python3 - "$WORK/three" <<'PY' || fail=1
+import importlib.util, json, sys
+from pathlib import Path
+spec = importlib.util.spec_from_file_location("g", "tools/gen_donovan_patch.py")
+g = importlib.util.module_from_spec(spec); spec.loader.exec_module(g)
+out = Path(sys.argv[1])
+
+docs = []
+for p in ("donovan", "huitzil", "pyron"):
+    d = g.toml_loads(Path("build/manifest/%s.toml" % p).read_text())
+    g.stamp_owner(d, g.manifest_owner(d)); docs.append(d)
+merged, _ = g.merge_manifests(docs, "cps2-wide-v1")
+shared = [r for r in merged["port_patch"] if r.get("_owner") is None]
+
+TENANTS = (("donovan", "build/m5_wide/extract", 0x13, ""),
+           ("huitzil", "build/hui29/extract",   0x10, ".huitzil"),
+           ("pyron",   "build/pyron20/extract", 0x11, ".pyron"))
+bad, checked = [], 0
+if len(shared) < 6:
+    bad.append("only %d shared port_patch rows — the fixture moved" % len(shared))
+for who, ex, tid, suffix in TENANTS:
+    regions = json.loads(Path(ex, "regions.json").read_text())["regions"]
+    for row in shared:
+        nm = row["region"]
+        if nm not in regions:
+            continue
+        blob = out / ("fixed_%s%s.bin" % (nm, suffix))
+        if not blob.is_file():
+            bad.append("%s: %s not emitted" % (who, blob.name)); continue
+        b = blob.read_bytes()
+        off = g._int(row["src_addr"]) - regions[nm]["src"]
+        old = bytes.fromhex(row["old_hex"])
+        new = bytes.fromhex(g.row_hex(row, "new_hex", {"dst_slot": tid}))
+        got = b[off:off + len(old)]
+        checked += 1
+        if got != new:
+            bad.append("%s %s+%#x: %s (expected the ported %s) — %s"
+                       % (who, nm, off,
+                          "UNPATCHED, still vs2's bytes" if got == old
+                          else "unexpected " + got.hex(),
+                          new.hex(), row["note"][:40]))
+for b in bad:
+    print("  FAIL: %s" % b)
+if not bad:
+    print("  ok: %d shared-row sites patched across the three tenants' own "
+          "copies of x05c800/x088512" % checked)
+sys.exit(1 if bad else 0)
+PY
+
+# ── 5: what a merged patch STILL cannot do, frozen by name ──────────────
 # The generator emits it; patch_prg refuses it. Freezing the inventory is
 # the point: it is the work list for the shared-row union / N-way dispatch
 # slice, and a SHRINKING number is how that slice will report progress.
-echo "== 4: the merged patch's remaining op collisions (frozen) =="
+echo "== 5: the merged patch's remaining op collisions (frozen) =="
 python3 - "$WORK/three" <<'PY' || fail=1
 import json, os, sys
 d = sys.argv[1]
@@ -225,11 +293,11 @@ if not bad:
 sys.exit(1 if bad else 0)
 PY
 
-# ── 5: verdict controls — sections 2-4 must be able to FAIL ─────────────
+# ── 6: verdict controls — the sections above must be able to FAIL ──────
 # Without this the whole file could be passing on a loop that never runs.
 # The control forces the body to one iteration and requires the counts to
 # go back to Donovan's, i.e. requires section 2 to notice.
-echo "== 5: verdict controls =="
+echo "== 6: verdict controls =="
 cp tools/gen_donovan_patch.py "$WORK/gen.bak"
 restore() { cp "$WORK/gen.bak" tools/gen_donovan_patch.py; }
 trap 'restore; rm -rf "$WORK"' EXIT INT TERM
@@ -285,7 +353,60 @@ else
     fail=1
 fi
 
+# The third control is section 4's, and it is the one this file was missing.
+# Reverting row_here() to the 14z-80b rule ("unowned => iteration 0") must be
+# CAUGHT — that rule left Huitzil's and Pyron's copies of the shared regions
+# holding vs2's OBJ bank, and every other section stayed green through it.
+python3 - <<'PY'
+import pathlib
+p = pathlib.Path("tools/gen_donovan_patch.py")
+s = p.read_text()
+a = '        return True if ("region" in row or "regions" in row) else (_ti == 0)'
+assert s.count(a) == 1, "row_here()'s shared-row rule moved"
+p.write_text(s.replace(a, "        return _ti == 0"))
+PY
+gen3 "$WORK/ctl3"
+restore
+if python3 - "$WORK/ctl3" >/dev/null 2>&1 <<'PY'
+import json, sys
+from pathlib import Path
+# the huitzil copy must still hold vs2's bytes under the reverted rule
+b = Path(sys.argv[1], "fixed_x05c800.huitzil.bin")
+sys.exit(0 if b.is_file() else 1)
+PY
+then
+    if tests_out=$(python3 - "$WORK/ctl3" 2>&1 <<'PY'
+import importlib.util, json, sys
+from pathlib import Path
+spec = importlib.util.spec_from_file_location("g", "tools/gen_donovan_patch.py")
+g = importlib.util.module_from_spec(spec); spec.loader.exec_module(g)
+docs = []
+for p in ("donovan", "huitzil", "pyron"):
+    d = g.toml_loads(Path("build/manifest/%s.toml" % p).read_text())
+    g.stamp_owner(d, g.manifest_owner(d)); docs.append(d)
+merged, _ = g.merge_manifests(docs, "cps2-wide-v1")
+row = [r for r in merged["port_patch"]
+       if r.get("_owner") is None and r["region"] == "x05c800"][0]
+reg = json.loads(Path("build/hui29/extract/regions.json").read_text())["regions"]
+b = Path(sys.argv[1], "fixed_x05c800.huitzil.bin").read_bytes()
+off = g._int(row["src_addr"]) - reg["x05c800"]["src"]
+old = bytes.fromhex(row["old_hex"])
+sys.exit(0 if b[off:off + len(old)] == old else 1)
+PY
+    ); then
+        echo "  ok: the iteration-0 rule leaves huitzil's shared region"
+        echo "      UNPATCHED — section 4 is measuring the real defect"
+    else
+        echo "  FAIL: reverting row_here() did NOT reproduce the unpatched"
+        echo "        shared region, so section 4 cannot fail on it"
+        fail=1
+    fi
+else
+    echo "  FAIL: the section-4 control produced no huitzil blob"; fail=1
+fi
+
 [ "$fail" = 0 ] || { echo "FAIL: tenant loop gate"; exit 1; }
 echo "PASS: tenant loop gate (N=1 inert for all three tenants, the loop"
 echo "      iterates with shared rows emitted once, each tenant's content"
-echo "      present, the merged patch's collisions frozen, 2 controls)"
+echo "      present, shared region rows reaching every copy, the merged"
+echo "      patch's collisions frozen, and 3 verdict controls)"
