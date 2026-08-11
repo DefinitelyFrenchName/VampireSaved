@@ -1512,7 +1512,10 @@ vsavj's table has 80 entries where vs2's twin (`0x016D34`, dispatcher
 > the base id is hardcoded in that routine (`0640 001e` at `0x02a92c`).
 > The collision is structural: in vs2, slot 0x10 IS Huitzil and id 0x1E is
 > HIS (180 calls, `$FF802E`=1, measured native). Repointing the row at
-> vs2's `0x0040` does not help — that routine has no DF path at all.
+> vs2's `0x0040` has an **unknown** outcome (RETRACTED 14z-79b: "that routine
+> has no DF path at all" came from reading five instructions at `0x02a8e4` and
+> not following the `bne.w` to `0x030ee8`; char `0x04` shares that same row
+> value and DOES request `0x44-0x47`). Measure it before assuming either way.
 > PROPER FIX, deferred: give him his own free 4-row block plus a copy of
 > the routine with that base. Retracted claim: "legacy only ever requests
 > seq ids 0x26/0x27" — false; `tests/audit_palette_seq_ids.sh` sampled

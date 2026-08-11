@@ -24,7 +24,7 @@
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"
-BUILDS="${*:-build/m5_wide build/hui27 build/pyron20}"
+BUILDS="${*:-build/m5_wide build/hui29 build/pyron20}"
 for b in $BUILDS; do
     if [ ! -f "$b/patch/placements.json" ]; then
         echo "SKIP: $b has no patch/placements.json (build dirs are untracked)"

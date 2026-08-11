@@ -149,7 +149,13 @@ export ROMDIR=/path/to/reference/sets
 tools/run_wide.sh build/m5_wide fbneo      # or: ... mame
 ```
 
-**`build/m5_wide` (fingerprint `9bac6ee3`) is the current WIDE build.**
+**Current WIDE builds (14z-79):** `build/hui29` = **`huitzil-m3`
+(`34c8b47d`)** is the one to playtest for Phobos; `build/m5_wide` =
+**`donovan-m3a` (`4b7d0dc7`)** for Donovan and `build/pyron20` =
+**`pyron-m2` (`69e8c6f0`)** for Pyron. (This line previously read
+"`build/m5_wide` (fingerprint `9bac6ee3`) is the current WIDE build" —
+`9bac6ee3` is `donovan-m5w`, SUPERSEDED by `donovan-m3a` back in 14z-64;
+corrected in the 14z-79 stale-doc sweep.)
 `build/m5w` (`ac52eeff`) is the KNOWN-BAD artifact of the 14z-60y sprite
 garble, kept as evidence — do not playtest it. `tools/audit_romset_identity.py
 build/m5w/rompath` names its four shadowed members in a second. Rebuild the
@@ -235,6 +241,24 @@ parked on "needs a native reference" (the win QUOTE set, the child
 shadow, effect art) can now be A/B'd directly. Do not characterise a
 tenant symptom without this leg — 14z-69 retracted two findings that
 were artefacts of measuring our build alone (docs/GOTCHAS.md).
+
+## THE DF PALETTE-SEQ BLOCK CENSUS (14z-79b) — measured, and it had to be
+
+Which palette-seq ids each character requests in Dark Force, measured on
+vanilla vsavj with `$FF802E`=1 asserted per row:
+`docs/game/engine_internals.md` "THE DARK FORCE PALETTE-SEQUENCE BLOCKS".
+Occupied: `0x1E-0x21` Bulleta, `0x26/0x27` Demitri, `0x44-0x47` Zabel,
+`0x6F-0x72` Bishamon+Oboro, `0x264-0x267` Q-Bee, `0x29C-0x2A0` char 0x12
+(five ids), and probably `0xAA-0xAD` Anakaris — the one character the rig
+could not put into DF, and the one hardcoded base with no measured owner.
+
+**Do not derive this from table `0x02A8A4`.** Ten rows share routine `0x0040`
+yet only some request ids; the routine is conditional and a static reading
+gives a confident wrong map. **And the resolver masks to 12 bits**
+(`0x39A900 + (d0 & 0x0FFF)*0x20`), so a tenant block must live inside
+`0x39A900-0x3BA8E0` and CANNOT go in `wide_ext`.
+
+Run it: `CHARS="00 01 02 ... 18" tests/audit_palette_seq_ids.sh`.
 
 ## DOCS ARE SPLIT THREE WAYS (14z-69) — `docs/README.md`
 
@@ -497,6 +521,27 @@ tests/audit_region_movability.sh      # 14z-77, RE-FROZEN 14z-78: which regions
                                       # Expectations frozen BOTH ways: if anim
                                       # crashes again that is a REGRESSION.
                                       # On-demand, ~4.5 min
+tests/test_shared_writes.sh           # 14z-79b: THE FROZEN SHARED-SURFACE WRITE
+                                      # INVENTORY. test_hui_ladder.sh already
+                                      # requires every op to write free space or
+                                      # a VARIANT ROW — but it runs stages 1-3,
+                                      # and the row that broke Bulleta was stage
+                                      # 4. Every write landing on
+                                      # vanilla-readable bytes is frozen per
+                                      # tenant in build/manifest/
+                                      # shared_writes.toml (D 67 / H 59 / P 50);
+                                      # any addition, removal or change FAILS,
+                                      # which is the point — it forces someone
+                                      # to establish whose bytes a new write
+                                      # touches. GROUND-TRUTHED: it flags
+                                      # 0x39acc0 +128 on build/hui27, the real
+                                      # defect. + 2 verdict controls.
+                                      # HONEST LIMIT, stated in the tool: a pass
+                                      # means the set is UNCHANGED SINCE
+                                      # REVIEWED, not that the writes are safe;
+                                      # an entry frozen without checking stays
+                                      # wrong and green. tools/
+                                      # audit_shared_writes.py. Static, seconds
 tests/test_index_window_thunk.sh [bd] # 14z-79: the (b') index-window thunk at
                                       # engine site 0x018460. RECONSTRUCTS all
                                       # 470 body bytes from the two reference

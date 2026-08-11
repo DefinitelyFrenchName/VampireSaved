@@ -8,7 +8,7 @@
 # window for every tenant.
 #
 # WHY A GATE AT ALL, given the build already asserts old_hex? Because the
-# BODY is 378 bytes of authored machine code carrying a copy of the engine's
+# BODY is 470 bytes of authored machine code carrying a copy of the engine's
 # index table and 23 handler addresses. `old_hex` proves we patched the right
 # place; nothing proves the body still means what it meant. One wrong
 # trampoline address is a SILENT wrong-routine dispatch — the exact defect
@@ -32,7 +32,7 @@
 #      fail is not evidence (docs/GOTCHAS.md).
 #
 # No emulator, no ROMs beyond $ROMDIR, seconds.
-# Usage: ROMDIR=... tests/test_index_window_thunk.sh [builddir]   (default build/hui28)
+# Usage: ROMDIR=... tests/test_index_window_thunk.sh [builddir]   (default build/hui29)
 set -eu
 
 ROMDIR="${ROMDIR:?set ROMDIR}"
@@ -41,7 +41,7 @@ cd "$REPO"
 WORK="$(mktemp -d)"
 trap 'rm -rf "$WORK"' EXIT
 
-BUILD="${1:-build/hui28}"
+BUILD="${1:-build/hui29}"
 case "$BUILD" in /*) ;; *) BUILD="$REPO/$BUILD" ;; esac
 [ -f "$BUILD/verify_op.bin" ] || {
     echo "SKIP: no $BUILD/verify_op.bin (build a Huitzil stage-6 build first)"

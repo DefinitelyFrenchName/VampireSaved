@@ -1114,8 +1114,14 @@ pad = 0x60
 # on native: 180 calls on id 0x1E with $FF802E=1). In vsavj id 0x1E is
 # Bulleta's. Both characters legitimately want the same id and the merged ROM
 # has one row. Repointing 0x02A8A4 row 0x10 at vs2's value (0x0040) does not
-# work either: that routine has no DF path at all (no `tst.b (0x111,a6)`), so
-# he would get no recolour.
+# work either — but NOT for the reason first given here. RETRACTED 14z-79b:
+# "that routine has no DF path at all" was read off five instructions at
+# 0x02a8e4 (`cmp.b (0x14f,a6),d0 / bne.w / rts`) without following the bne.w,
+# which goes to 0x030ee8. The census disproves it: char 0x04 holds the SAME
+# row value 0x0040 and DOES request ids 0x44-0x47. That routine is conditional
+# and is shared by characters with and without palette requests, so what
+# repointing row 0x10 to 0x0040 would give Phobos is UNKNOWN and must be
+# MEASURED, not asserted either way.
 #
 # THE PROPER FIX, deferred as its own piece: give Phobos his OWN palette-seq
 # block — a free 4-row id block, a copy of Bulleta's routine with that base

@@ -20,7 +20,14 @@ guard's replays cannot activate Dark Force. The row is WITHDRAWN; Phobos' DF is
 purple again by maintainer decision, pending a proper tenant-scoped block.
 `test_variant_dispatch.sh` had been reporting the responsible aliased row as a
 FAIL since 14z-74 and it was written off as benign — it was right all along.
-Read docs/NEXT_SESSION.md first.)
+**Two follow-ons landed the same day:** `14z-79b` froze the SHARED-SURFACE
+WRITE inventory (`tests/test_shared_writes.sh`, ground-truthed against the real
+defect on hui27) — the gate that would have caught this at build time, since
+the op invariant that names the class stops at stage 3; and `14z-79c` measured
+the DF palette-seq block census across the roster, which RETRACTED two static
+readings of mine, including "the default routine has no DF path" (five
+instructions read, the `bne.w` never followed). Read docs/NEXT_SESSION.md
+first.)
 
 Previously: 2026-08-11 (session 14z-78 — **M3b'S BLOCKER CLEARED, AND THE THREE
 MOVELISTS SWEPT.** `anim` moves: the vec3 that made it immovable was two
@@ -201,8 +208,11 @@ rows `0x1E-0x21`, i.e. Bulleta's colours.
 **The collision is structural.** In vs2, slot `0x10` IS Huitzil and id `0x1E`
 is HIS (180 calls, `$FF802E`=1, measured native). In vsavj `0x1E` is Bulleta's.
 Both games are right; the merged ROM has one row. Repointing `0x02A8A4` row
-0x10 at vs2's `0x0040` does NOT work either — that routine has no DF path
-(`cmp.b/bne/rts`, no `tst.b (0x111,a6)`), so he would get no recolour at all.
+0x10 at vs2's `0x0040` has an UNKNOWN outcome. (My "that routine has no DF
+path" was RETRACTED later the same session by the census — I read five
+instructions at `0x02a8e4` and never followed the `bne.w` to `0x030ee8`; char
+`0x04` holds the same row value and DOES request `0x44-0x47`.) It must be
+measured, not asserted.
 
 **Decision (maintainer): WITHDRAW the row now**, restoring Bulleta immediately
 at near-zero risk, and fix Phobos properly later. His DF is purple again — wrong

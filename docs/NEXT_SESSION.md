@@ -41,7 +41,8 @@ vanilla offset**.
    `build/manifest/shared_writes.toml`.** Every write landing outside declared
    free space and outside a known variant row is now frozen per tenant
    (donovan 67 / huitzil 59 / pyron 50) and any change fails the gate.
-   Ground-truthed: it flags the withdrawn DF-palette write on `build/hui27`.
+   Ground-truthed: it flags the withdrawn DF-palette write on `build/hui27` (= the superseded
+   `huitzil-m2`, which carried it — that build is the control, not a target).
    **Read its honest limit before trusting a green run** — it proves the set is
    UNCHANGED SINCE REVIEWED, not that the writes are safe; an entry frozen
    without checking whose bytes it lands on stays wrong and green. NOT done,
