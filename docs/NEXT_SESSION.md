@@ -6,10 +6,12 @@
 > Donovan + Phobos + Pyron into one program image, 590 ops, zero op
 > collisions, and `patch_prg` writes the 12 members. That is the PROGRAM half.
 >
-> **Next, in this order:** (1) the gfx half, which is still single-tenant and
-> is M3b_plan Phase 3, still undesigned; (2) `build_donovan.sh`, which needs
-> one extraction per tenant; (3) RUN a merged image — nothing merged has been
-> in an emulator, and no legacy gate has seen one.
+> **FIRST PRIORITY (maintainer, 14z-80 close): prove a merged image does not
+> perturb LEGACY, before any gfx design work.** It can be done with PRISTINE
+> graphics — legacy characters do not read group C — so it does not wait on
+> M3b_plan Phase 3, and it is the first evidence the merge behaves rather than
+> merely composes. Full recipe below; it is deliberately ahead of the gfx half
+> in the list.
 >
 > Nothing shipped in a ROM this session. All four frozen builds are unchanged
 > and rebuild bit-exact.
@@ -37,21 +39,80 @@ once N tenants exist. A row's effect can depend on which tenant applies it
 (its own copy of a region, its own slot, its own placements), and the merge's
 dedup was throwing that information away.
 
-## Open, in the order it blocks a playable merged build
+## 1. THE MERGED-LEGACY MEASUREMENT — first priority
 
-1. **The gfx half** (M3b_plan Phase 3). `build_gfx_donovan.py` is
-   single-tenant: per-tenant band/delta/bank must come from the manifest, the
-   group-C pass must chain, and a cross-tenant tile-collision gate is needed.
-   The generator already emits the per-tenant inputs
-   (`select_tiles.<tenant>.json`, `wheel_bank5.<tenant>.json`, `tenants.json`).
-   Phase 3 says MEASURE first: do the three bands pack into bank 4's 0x10000
-   codes, or does group C have to grow to 8 members?
-2. **`build_donovan.sh` is single-tenant** — one extraction per tenant, then
-   `--extract`/`--port` pairs in order. Small, but it is what makes a merged
-   build reachable from the command line at all.
-3. **RUN one.** The legacy suite on a merged build first (`run_suite.sh`
-   against its own fingerprint), then each tenant's behaviour battery. Until
-   then "the merge works" means "the program image composes", nothing more.
+**The question:** does a program image carrying all three tenants' hooks
+perturb vanilla behaviour? Nothing merged has ever run. This answers the one
+thing that would invalidate the whole merge, and it needs **no tenant art**,
+so it does not wait on Phase 3.
+
+**Why pristine gfx is legitimate here.** Tenant art lives in group C; vanilla
+characters read groups A/B, and on a variant-id build vsav's group B stays
+PRISTINE by construction (the de-substitution invariant). A merged image
+packed against the zero-filled `build/wide0/rompath/vsavjw.zip` therefore
+renders every LEGACY character correctly and the three tenants as blanks. That
+is exactly the right instrument for a legacy verdict, and useless for anything
+else — say so in the build log, because such a build must never reach a
+playtest.
+
+**The four constraints, all confirmed by reading the code (not yet by
+running it):**
+
+1. **The driver is single-tenant.** `tools/build_donovan.sh` takes
+   `TENANT_MANIFEST`/`TENANT_CHAR` and one extraction. It needs one extraction
+   per tenant and `--extract`/`--port` pairs in `--port` order — the generator
+   already checks the pairing and refuses a mismatch.
+2. **Skip the gfx stage, do NOT lower the stage.** The gfx work is
+   `build_donovan.sh:285-396`, the whole `if [ "$STAGE" -ge 6 ]` block
+   including `verify_gfx_build.py`. The PACK step above it (:263-279) is
+   independent and already merges the WIDE overlay, so a merged program image
+   packs as `vsavjw` with group C empty. The generator must still run at
+   **stage 6** — its `select_records`/`site_thunk` rows are stage-6 gated — so
+   this is a `SKIP_GFX=1` escape on that block, not a lower stage.
+   `audit_romset_identity.py` runs unconditionally after it (:406) and still
+   guards the merged romset, which is what you want.
+3. **`run_suite.sh` CANNOT judge this build.** It fails on an unregistered
+   fingerprint (`tests/run_suite.sh:53-54`) and registry rows are added only
+   at freeze time. The verdict has to be a **LIVE A/B between two builds** —
+   `tests/audit_phase_mode_cost.sh` is the template, and its header explains
+   this exact constraint.
+4. **Section 0 must prove the merged image BOOTS and forms matches** before
+   any "identical" is believed. The audit_phase_mode_cost lesson, verbatim:
+   without a rig that produces the event, every replay compares identical and
+   the green measures nothing.
+
+**Two legs, in this order:**
+
+- **(a) vs VANILLA, masked-v2 basis** — the superset-invariant question and
+  the confidence being sought. Expect the §4 classes that already apply to
+  hook-carrying builds: the frozen flicker inventories, the §4 v3 bounded
+  select-screen window, and most likely §4 v4 **composite**, since a merged
+  build carries all three tenants' hooks AND the extended wheel. Any class
+  that does not match must be mechanism-attributed before it is accepted
+  (CLAUDE.md §4) — a merged build is exactly where "we widened the tolerance"
+  would be easiest and worst.
+- **(b) vs the three frozen single-tenant builds** — does MERGING change what
+  each tenant's own build did? A differential, cheap once (a)'s rig exists,
+  and the sharper signal about the merge specifically.
+
+**Expected non-issue, state it up front:** with group C zero-filled,
+`audit_empty_tiles.sh` will report the tenants drawing blank tiles. That is
+correct and is not a defect of this build — it is why the build is
+legacy-only.
+
+## Then, in order
+
+2. **The gfx half** (M3b_plan Phase 3). `build_gfx_donovan.py` is
+   single-tenant: per-tenant band/delta/bank from the manifest, a chaining
+   group-C pass, and a cross-tenant tile-collision gate. The generator already
+   emits the per-tenant inputs (`select_tiles.<tenant>.json`,
+   `wheel_bank5.<tenant>.json`, `tenants.json`). Phase 3 says MEASURE first:
+   do the three bands pack into bank 4's 0x10000 codes, or must group C grow
+   to 8 members? The second answer bumps the CPS-2 WIDE profile version and
+   touches BOTH emulator descriptor patches — Rule 1 v2 and
+   `docs/project/cps2_wide.md` governance, i.e. a maintainer decision.
+3. **Then run the tenants for real** — each behaviour battery on a merged
+   build with its own art, then a playtest.
 4. **`region_space` on the manifests, deliberately.** Three tenants fit today
    only because `alloc()`'s fallback chain spills into `wide_ext` — hole_a and
    hole_b come out exactly full. A spill is not a placement design. Adding the

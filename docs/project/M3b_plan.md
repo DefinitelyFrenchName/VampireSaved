@@ -187,6 +187,26 @@ one. Those are the next three steps, in that order.
    with different bytes. `placements.json` accumulates with `@<tenant>`
    suffixes. The gfx consumers of the per-tenant files are Phase 3.
 
+### Phase 2b — the merged-LEGACY measurement (maintainer, 14z-80 close)
+
+**Runs BEFORE Phase 3, and does not depend on it.** A merged program image
+carrying all three tenants' hooks has never been executed. Whether it perturbs
+vanilla is the one question that would invalidate the merge, and it is
+answerable with PRISTINE graphics: legacy characters read groups A/B, and on a
+variant-id build vsav's group B stays pristine by construction, so a merged
+image packed against the zero-filled WIDE overlay renders every legacy
+character correctly and the three tenants as blanks.
+
+The route, the four constraints and the two comparison legs are written out in
+`docs/NEXT_SESSION.md`. In short: extend the driver to N extractions, skip the
+gfx block while keeping the generator at stage 6, and take the verdict as a
+LIVE A/B (`run_suite.sh` refuses an unregistered fingerprint) on the
+`tests/audit_phase_mode_cost.sh` template, with a section 0 that proves the
+image boots and forms matches first.
+
+Exit gate: legacy behaviour on a merged build classified under the §4 basis
+with every non-exact class mechanism-attributed — not widened.
+
 ### Phase 3 — gfx coexistence in group C (the named "new mechanism")
 
 1. MEASURE first: H/P native tile-code ranges in vs2 (obj_records walk of

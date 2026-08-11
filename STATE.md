@@ -367,14 +367,37 @@ in that order.
 
 ### OPEN AFTER THIS SLICE
 
-1. **The gfx half is single-tenant** (M3b_plan Phase 3, undesigned): group-C
+**ORDERING DECIDED BY THE MAINTAINER (14z-80 close): the merged-LEGACY
+measurement comes FIRST, ahead of any gfx design work.** The reason is that it
+buys confidence in the merge itself and it does NOT depend on Phase 3: legacy
+characters do not read group C, and on a variant-id build vsav's group B stays
+pristine by construction, so a merged program image packed against the
+zero-filled WIDE overlay renders every legacy character correctly and the three
+tenants as blanks. That is the right instrument for a legacy verdict and
+useless for anything else.
+
+1. **Prove a merged image does not perturb legacy.** Recipe and the four
+   constraints in `docs/NEXT_SESSION.md`, all confirmed by reading the code
+   rather than running it: the driver needs N extractions and `--extract`/
+   `--port` pairs; the gfx block (`build_donovan.sh:285-396`) is skipped with
+   the generator still at STAGE 6 (its select/site_thunk rows are stage-6
+   gated), while the independent pack step above it (:263-279) and the
+   unconditional `audit_romset_identity.py` (:406) both still run;
+   `run_suite.sh` cannot judge it (unregistered fingerprint, rows only at
+   freeze time), so the verdict is a LIVE A/B on the
+   `tests/audit_phase_mode_cost.sh` template; and section 0 must prove the
+   image BOOTS and forms matches before any "identical" is believed. Two legs:
+   vs VANILLA on the masked-v2 basis (the superset-invariant question), then
+   vs the three frozen single-tenant builds (does merging change what each
+   tenant's own build did?).
+2. **The gfx half is single-tenant** (M3b_plan Phase 3, undesigned): group-C
    tile-code coexistence, `build_gfx_donovan.py`'s per-tenant band/delta/bank,
    and the per-tenant `select_tiles.json`/`wheel_bank5.json` the generator now
-   emits under per-tenant names.
-2. **`build_donovan.sh` is single-tenant**: it needs one extraction per tenant
-   and to pass `--extract`/`--port` pairs.
-3. **A merged image has never run.** Before any of it: the legacy suite on a
-   merged build, then the per-tenant behaviour batteries.
+   emits under per-tenant names. MEASURE first (pack into bank 4 vs grow group
+   C to 8 members); the second answer is a profile-version bump and a
+   maintainer decision.
+3. **Then run the tenants for real** — behaviour batteries on a merged build
+   with its own art, then a playtest.
 4. **`region_space` on the manifests, deliberately.** Not a blocker — three
    tenants fit because `alloc()`'s fallback spills into `wide_ext` — but a
    spill is not a placement design, and adding the rows moves the frozen
