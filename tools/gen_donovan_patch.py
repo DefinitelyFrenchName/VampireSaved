@@ -961,6 +961,59 @@ def main():
         """
         return [r for r in port.get(section, []) if row_here(r)]
 
+    # ── THE ENGINE-LEVEL UNION (14z-80f) ────────────────────────────────────
+    # An ENGINE table — `obj_hook`'s extended secondary-object dispatch — is
+    # one table at one address in the one shared image, and its entries point
+    # at handlers that DIFFERENT TENANTS port. It can therefore neither be
+    # emitted per tenant (N copies at one address) nor emitted before the
+    # tenants exist (iteration 0 knows only tenant 0's placements). So it runs
+    # ONCE, on the LAST iteration, resolving through every tenant's view.
+    #
+    # Measured before the fix, on a 3-tenant build: 15 extra types fell to
+    # tripwires and TWELVE of them are handlers Huitzil places (types 64-75).
+    # Every one of his secondary objects would have dispatched to an ILLEGAL
+    # the moment it spawned.
+    tenant_views = []   # per tenant: name, regions, placed, recon, src_set
+
+    def engine_here():
+        """Is this the iteration on which engine-level sections emit?"""
+        return _ti == len(_tenant_list) - 1
+
+    def engine_rows(section):
+        """Rows of an engine-level section — once, on the last iteration."""
+        return list(port.get(section, [])) if engine_here() else []
+
+    def resolve_ported(tgt):
+        """(placed address, tenant name) for a SOURCE target any tenant ported.
+
+        Scans the accumulated views in tenant order, so a span two tenants
+        both copied resolves to the FIRST tenant's copy — which is correct
+        for a shared engine table: the copies are byte-equal clones of the
+        same source, each specialised only through its own data pointers,
+        and one address has to win.
+        """
+        for v in tenant_views:
+            for nm, r in v["regions"].items():
+                if (r["len"] > 0 and r["src"] <= tgt < r["src"] + r["len"]
+                        and nm in v["placed"]):
+                    return v["placed"][nm] + (tgt - r["src"]), v["name"]
+        return None, None
+
+    def resolve_recon(tgt):
+        """A verified reconciliation row for `tgt` from ANY tenant's map.
+
+        The overlays are per tenant (recon_for), so a row Huitzil's overlay
+        resolves is invisible to Donovan's map — and an engine table must see
+        both.
+        """
+        for v in tenant_views:
+            m = v["recon"].get(tgt)
+            if m and (m.get("status") == "verified"
+                      or (args.allow_plausible
+                          and m.get("status") == "plausible")):
+                return m
+        return None
+
     def side_name(name):
         """The per-tenant spelling of a side file written INSIDE the loop.
 
@@ -1260,6 +1313,16 @@ def main():
 
         # ── stages 2+: Donovan regions ───────────────────────────────────────────
         placed = {}   # region name -> dest addr
+        # This tenant's view, published for the engine-level union. It holds
+        # LIVE references to `placed` and to this tenant's regions — `placed`
+        # is a fresh dict per iteration and is filled in below, so by the time
+        # the union runs (last iteration) every view, including the current
+        # one, is complete. Copying here instead would publish an empty map.
+        tenant_views.append({"name": T.get("name", "t%d" % _ti),
+                             "regions": man.get("regions", {}),
+                             "placed": placed,
+                             "recon": recon,
+                             "src_set": man.get("src_set")})
         if args.stage >= 2:
             regions = man["regions"]
             bank_doc = toml_loads(args.bank_map.read_text())
@@ -2796,7 +2859,7 @@ def main():
         # runtime, not silent, but wrong. Fixing it means running the union
         # AFTER the loop against every tenant's placements — the named
         # "shared-row union" slice. See row_here()'s docstring.
-        for ph in (tenant_rows("obj_hook") if args.stage >= 4 else []):
+        for ph in (engine_rows("obj_hook") if args.stage >= 4 else []):
             site = _int(ph["site"])
             vtab = _int(ph["vanilla_table"])
             n_van = _int(ph["vanilla_entries"])
@@ -2826,14 +2889,14 @@ def main():
             ported = 0
             for k in range(n_van, n_src):
                 tgt = int.from_bytes(src_pt[stab + k * 4:stab + k * 4 + 4], "big")
-                host = region_of(tgt)
-                m = recon.get(tgt)
-                if host and host in placed:
-                    newt = tgt + (placed[host] - regions[host]["src"])
+                # UNION over every tenant (14z-80f), not this iteration's
+                # regions: types 64-75 are Huitzil's, 59-63 Donovan's, and
+                # ONE table has to carry them all.
+                newt, _by = resolve_ported(tgt)
+                m = resolve_recon(tgt)
+                if newt is not None:
                     ported += 1
-                elif m and (m.get("status") == "verified"
-                            or (args.allow_plausible
-                                and m.get("status") == "plausible")):
+                elif m:
                     newt = _int(m["vsavj"])
                     ported += 1
                 else:
@@ -2858,7 +2921,7 @@ def main():
             # is not the next index is a build error, because the engine indexes
             # this table by type*4 and a hole would dispatch to whatever the
             # allocator left there.
-            for ex in [e for e in tenant_rows("obj_hook_extra")
+            for ex in [e for e in engine_rows("obj_hook_extra")
                        if _int(e["site"]) == site]:
                 idx = _int(ex["index"])
                 cur = len(table) // 4
@@ -2867,13 +2930,12 @@ def main():
                                 f"the next table index ({cur}) — no gaps allowed")
                     continue
                 tgt = _int(ex["src"])
-                host = region_of(tgt)
-                m = recon.get(tgt)
-                if host and host in placed:
-                    newt = tgt + (placed[host] - regions[host]["src"])
-                elif m and (m.get("status") == "verified"
-                            or (args.allow_plausible
-                                and m.get("status") == "plausible")):
+                # union over every tenant, as above (14z-80f)
+                newt, _by = resolve_ported(tgt)
+                m = resolve_recon(tgt)
+                if newt is not None:
+                    pass
+                elif m:
                     newt = _int(m["vsavj"])
                 else:
                     newt = tripwire_for(tgt, f"obj_hook@{site:#x} authored type {idx}") \

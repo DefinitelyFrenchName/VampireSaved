@@ -121,8 +121,10 @@ done
 # The load-bearing question. A loop that ran once would produce Donovan's
 # 243 ops here; a loop that ran twice against tenant 0's data would produce
 # 243 twice over. The counts are frozen, and so is the DEDUP they imply:
-# 243 + 259 = 502 declared, 455 emitted, i.e. 47 rows recognised as shared
-# and emitted ONCE (the iteration gate). Same for three.
+# 243 + 259 = 502 declared, 443 emitted: 47 rows recognised as SHARED and
+# emitted once (the iteration gate), and 12 tripwire ops no longer needed
+# because the engine union (section 4b) resolves Huitzil's handlers instead.
+# Same arithmetic for three.
 echo "== 2: N tenants — the loop iterates and shared rows emit once =="
 gen2 "$WORK/two"
 gen3 "$WORK/three"
@@ -137,8 +139,8 @@ check_n() {  # check_n <label> <dir> <want ops> <sum of 1-tenant counts>
         echo "  FAIL: $1 $got ops, frozen at $3"; fail=1
     fi
 }
-check_n "2 tenants" "$WORK/two"   455 502
-check_n "3 tenants" "$WORK/three" 612 707
+check_n "2 tenants" "$WORK/two"   443 502
+check_n "3 tenants" "$WORK/three" 600 707
 
 # ── 3: every tenant's own content is present ────────────────────────────
 # An op count alone cannot tell "both tenants ran" from "tenant 0 ran twice".
@@ -240,6 +242,76 @@ if not bad:
 sys.exit(1 if bad else 0)
 PY
 
+# ── 4b: the ENGINE-LEVEL UNION — one table, every tenant's handlers ─────
+# `obj_hook`'s extended secondary-object table is ONE table at ONE address
+# whose entries point at handlers DIFFERENT TENANTS port: 59-63 are
+# Donovan's, 64-75 Huitzil's. Emitted on iteration 0 it saw only tenant 0's
+# placements and sent all twelve of Huitzil's to TRIPWIRES — an ILLEGAL the
+# moment one of his secondary objects spawned. It now runs on the LAST
+# iteration through `resolve_ported()`.
+#
+# The check is per-ENTRY attribution, not a count: an entry pointing into
+# SOME placed region is not evidence it points into the RIGHT tenant's copy,
+# and the shared spans mean a wrong-tenant target would still look placed.
+echo "== 4b: the obj_hook union resolves each tenant's own handlers =="
+python3 - "$WORK/three" <<'PY' || fail=1
+import json, os, re, sys
+d = sys.argv[1]
+notes = open(os.path.join(d, "patch_notes_fragment.md")).read()
+pl = json.load(open(os.path.join(d, "placements.json")))["regions"]
+ops = json.load(open(os.path.join(d, "patch.json")))["ops"]
+bad = []
+
+m = re.search(r"data\s+(0x[0-9a-f]+) \+0x[0-9a-f]+\s+proj_hook extended type "
+              r"table \((\d+) vanilla \+ (\d+) ported, (\d+) placed\)", notes)
+if not m:
+    print("  FAIL: no proj_hook extended-table note"); sys.exit(1)
+addr, n_van, n_ext, n_placed = (int(m.group(1), 16), int(m.group(2)),
+                                int(m.group(3)), int(m.group(4)))
+# FROZEN 14z-80f: 17 of the 17 ported extras resolve. It was 5 before the
+# union — the other twelve are Huitzil's.
+if n_placed != 17:
+    bad.append("%d of %d ported extras placed, frozen at 17 (5 means the "
+               "union regressed to tenant 0 only)" % (n_placed, n_ext))
+
+op = [o for o in ops if o.get("addr") == hex(addr) and o["op"] == "data"]
+if not op:
+    print("  FAIL: the extended table op is not in patch.json"); sys.exit(1)
+tbl = bytes.fromhex(op[0]["hex"])
+
+def owner(a):
+    for k, v in pl.items():
+        if v["dst"] <= a < v["dst"] + v["len"]:
+            return k
+    return None
+
+EXPECT = {**{k: "donovan" for k in range(59, 64)},
+          **{k: "huitzil" for k in range(64, 76)}}
+for k, who in EXPECT.items():
+    tgt = int.from_bytes(tbl[k * 4:k * 4 + 4], "big")
+    o = owner(tgt)
+    if o is None:
+        bad.append("type %d -> %#x is in no placed region (a tripwire?)"
+                   % (k, tgt)); continue
+    got = o.split("@")[1] if "@" in o else "donovan"
+    if got != who:
+        bad.append("type %d resolves into %s's %s, expected %s's"
+                   % (k, got, o, who))
+# types 121-123 point at 0x6A70C, which NO tenant ports — they must STAY
+# tripwires, or the union has started resolving things it cannot.
+still = len(re.findall(r"obj_hook@\S+ type 12[123]: unresolved", notes))
+if still != 3:
+    bad.append("%d of the 3 genuinely-unported types (121-123) still "
+               "tripwire — expected all 3" % still)
+for b in bad:
+    print("  FAIL: %s" % b)
+if not bad:
+    print("  ok: %d/%d ported extras placed; types 59-63 in donovan's "
+          "regions and 64-75 in huitzil's OWN copies; 121-123 still "
+          "tripwired" % (n_placed, n_ext))
+sys.exit(1 if bad else 0)
+PY
+
 # ── 5: what a merged patch STILL cannot do, frozen by name ──────────────
 # The generator emits it; patch_prg refuses it. Freezing the inventory is
 # the point: it is the work list for the shared-row union / N-way dispatch
@@ -323,7 +395,7 @@ restore
 # the count must collapse away from the 3-tenant figure.
 ctl_ops="$( [ -f "$WORK/ctl1/patch.json" ] && nops "$WORK/ctl1" || echo 0 )"
 if [ "$ctl_ops" -gt 0 ] && [ "$ctl_ops" -lt 300 ]; then
-    echo "  ok: a one-iteration loop collapses 612 -> $ctl_ops ops —"
+    echo "  ok: a one-iteration loop collapses 600 -> $ctl_ops ops —"
     echo "      section 2 is measuring the ITERATION, not the manifest"
 else
     echo "  FAIL: the one-iteration control produced $ctl_ops ops; expected"
@@ -405,8 +477,31 @@ else
     echo "  FAIL: the section-4 control produced no huitzil blob"; fail=1
 fi
 
+# The fourth control is section 4b's: forcing the engine union back onto
+# iteration 0 must send Huitzil's twelve handlers to tripwires again.
+python3 - <<'PY'
+import pathlib
+p = pathlib.Path("tools/gen_donovan_patch.py")
+s = p.read_text()
+a = "        return _ti == len(_tenant_list) - 1\n"
+assert s.count(a) == 1, "engine_here() moved"
+p.write_text(s.replace(a, "        return _ti == 0\n"))
+PY
+gen3 "$WORK/ctl4"
+restore
+if grep -q "17 ported, 5 placed" "$WORK/ctl4/patch_notes_fragment.md" 2>/dev/null; then
+    echo "  ok: the union forced onto iteration 0 drops to 5/17 placed —"
+    echo "      section 4b is measuring the real defect"
+else
+    echo "  FAIL: forcing the union onto iteration 0 did NOT reduce the"
+    echo "        placed count, so section 4b cannot fail on it. Got:"
+    grep -o "17 ported, [0-9]* placed" "$WORK/ctl4/patch_notes_fragment.md" 2>/dev/null \
+        || echo "        (no extended-table note at all)"
+    fail=1
+fi
+
 [ "$fail" = 0 ] || { echo "FAIL: tenant loop gate"; exit 1; }
 echo "PASS: tenant loop gate (N=1 inert for all three tenants, the loop"
 echo "      iterates with shared rows emitted once, each tenant's content"
 echo "      present, shared region rows reaching every copy, the merged"
-echo "      patch's collisions frozen, and 3 verdict controls)"
+echo "      patch's collisions frozen, and 4 verdict controls)"
