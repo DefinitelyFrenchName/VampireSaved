@@ -168,7 +168,7 @@ def stamp_owner(doc, owner):
     return doc
 
 
-def merge_manifests(docs):
+def merge_manifests(docs, profile=None):
     """Merge N owner-stamped manifest documents into one (M3b slice F).
 
     With ONE document this is the identity, which is what makes the slice
@@ -199,6 +199,12 @@ def merge_manifests(docs):
     """
     if len(docs) == 1:
         return docs[0], []
+    # Every tenant on a variant id => the base-track value is unreachable and
+    # one class of span disagreement resolves. `tenant_ids_under` returns None
+    # when it cannot tell, and `all()` over an empty list is True, so require
+    # a non-empty list explicitly: an unknown must not read as "all variant".
+    _ids = tenant_ids_under(docs, profile)
+    all_variant = bool(_ids) and all(0x10 <= i <= 0x1F for i in _ids)
     merged, collisions = {}, []
     for doc in docs:
         for key, val in doc.items():
@@ -228,7 +234,7 @@ def merge_manifests(docs):
                         f"{sorted(_row_diff_keys(cur, val))}")
             elif cur != val:
                 collisions.append(f"{key}: incompatible shapes across files")
-    collisions += _span_collisions(merged)
+    collisions += _span_collisions(merged, all_variant)
     return merged, collisions
 
 
@@ -245,8 +251,14 @@ _SPAN_KEYS = {
 }
 
 
-def _span_collisions(merged):
+def _span_collisions(merged, all_variant=False):
     """Rows from different owners writing the SAME bytes differently.
+
+    `all_variant` says every tenant takes a variant id under the build's
+    profile, which makes the base-track (`new_hex`) value unreachable. That
+    turns one class of disagreement from a blocker into something the merge
+    can RESOLVE — see the branch below. It defaults False so a caller that
+    does not know fails closed.
 
     This is the shape NEXT_SESSION flagged before the merge existed: the
     `x05c800` / `x088512` / `x06800c` / `x0692f6` OBJ-bank rows are declared
@@ -256,6 +268,7 @@ def _span_collisions(merged):
     merge must resolve them to ONE row — it cannot apply both.
     """
     out = []
+    _resolved = []          # duplicate rows the base-track branch collapsed
     for sect, keys in _SPAN_KEYS.items():
         rows = merged.get(sect)
         if not isinstance(rows, list):
@@ -280,15 +293,40 @@ def _span_collisions(merged):
                 # one — six of the twelve measured collisions are this.
                 vs = {prev.get("new_hex_variant"), r.get("new_hex_variant")}
                 if diff == ["new_hex"] and len(vs) == 1 and None not in vs:
+                    if all_variant:
+                        # RESOLVED (14z-78d), not merely explained. Every
+                        # tenant takes a variant id under this profile, so the
+                        # base-track value is unreachable and the owners agree
+                        # on the one that IS used. Collapse `new_hex` onto the
+                        # agreed variant value: the row then writes the same
+                        # bytes down either path, so a future reader that
+                        # takes the base track cannot silently get the host
+                        # band's word. Marked shared — it is a property of the
+                        # source bytes, not of a character.
+                        prev["new_hex"] = prev["new_hex_variant"]
+                        r["new_hex"] = r["new_hex_variant"]
+                        prev["_owner"] = None
+                        _resolved.append(r)
+                        continue
                     out.append(
                         f"[[{sect}]] {'/'.join(ident)}: {_who(prev)} and "
                         f"{_who(r)} differ on new_hex ONLY, and agree on "
-                        f"new_hex_variant={vs.pop()} — BASE-TRACK ONLY, "
-                        f"dissolves on a WIDE (merged) build")
+                        f"new_hex_variant={vs.pop()} — BASE-TRACK ONLY, and it "
+                        f"would dissolve on a WIDE build, but not every tenant "
+                        f"takes a variant id here, so the base value IS "
+                        f"reachable and this is a real disagreement")
                 else:
                     out.append(
                         f"[[{sect}]] {'/'.join(ident)}: {_who(prev)} and "
                         f"{_who(r)} write the SAME bytes differently ({diff})")
+    # Drop the collapsed duplicates. Done after the scan so the loop above is
+    # not mutating the list it walks — and by IDENTITY, because two rows that
+    # now compare equal are exactly what this is deduping.
+    for sect in _SPAN_KEYS:
+        rows = merged.get(sect)
+        if isinstance(rows, list) and _resolved:
+            merged[sect] = [x for x in rows
+                            if not any(x is y for y in _resolved)]
     return out
 
 
@@ -314,6 +352,35 @@ def tenant_row_ids(docs):
             for kv in str(t.get("id_by_profile", "")).split(","):
                 if kv.strip():
                     ids.add(_int(kv.partition("=")[2].strip()))
+    return ids
+
+
+def tenant_ids_under(docs, profile):
+    """The id each tenant ACTUALLY takes under `profile` (M3b, 14z-78d).
+
+    `tenant_row_ids` deliberately returns every id a tenant COULD occupy,
+    which is the right question for "will some tenant overwrite this row".
+    It is the wrong question for "is the base-track value reachable": it
+    includes Donovan's base 0x0F, so it can never answer yes.
+
+    Same selection `tenant_context` makes, and it has to be a separate
+    function because the merge runs BEFORE `normalise_tenants` resolves ids.
+    Returns None if any tenant's id cannot be determined, so callers fail
+    closed rather than assuming the variant track.
+    """
+    ids = []
+    for doc in docs:
+        for t in doc.get("tenant") or []:
+            pick = None
+            for kv in str(t.get("id_by_profile", "")).split(","):
+                k, _, v = kv.partition("=")
+                if k.strip() and k.strip() == (profile or "") and v.strip():
+                    pick = _int(v.strip())
+            if pick is None and "id" in t:
+                pick = _int(t["id"])
+            if pick is None:
+                return None
+            ids.append(pick)
     return ids
 
 
@@ -671,7 +738,7 @@ def main():
         _d = toml_loads(_pp.read_text())
         stamp_owner(_d, manifest_owner(_d))
         _docs.append(_d)
-    port, _collisions = merge_manifests(_docs)
+    port, _collisions = merge_manifests(_docs, args.profile)
     if _collisions:
         raise SystemExit(
             "gen_donovan_patch: the manifests collide and the merge will not "

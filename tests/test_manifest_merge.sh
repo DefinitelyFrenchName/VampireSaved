@@ -200,6 +200,55 @@ if not bad:
     print("  ok: vanilla baseline kept, tenant rows deferred to the")
     print("      generator, non-tenant differences still collide (3 controls)")
 
+print("== 3d: the base-track class RESOLVES under the WIDE profile (14z-78d) ==")
+# The nine remaining collisions are all "differ on new_hex, agree on
+# new_hex_variant". They are real when the base value is reachable and
+# unreachable when every tenant sits on a variant id — so the merge takes the
+# profile and decides, instead of refusing either way.
+WIDE = "cps2-wide-v1"
+# Donovan's REAL shape: a base id, promoted to a variant id by the profile.
+# Using a hardcoded variant `id` here would make the no-profile control
+# vacuous — the id would be variant either way (the first version of this
+# section did exactly that and reported the code broken).
+def _pp(owner, base, tenant=None):
+    return {"port_patch": [{"region": "r", "src_addr": 1, "new_hex": base,
+                            "new_hex_variant": "1000", "_owner": owner}],
+            "tenant": [tenant or {"name": owner, "id": 0x0F,
+                                  "id_by_profile": f"{WIDE}=0x13"}]}
+m, c = merge_manifests([_pp("d", "4000"), _pp("h", "6000")], WIDE)
+eq("variant ids + profile -> resolved, no collision", len(c), 0)
+eq("...and collapses to ONE row", len(m["port_patch"]), 1)
+# The collapse must make the row write the AGREED value down either path —
+# otherwise a later reader taking the base track silently gets a host band
+# word, which is the exact defect class this whole session was about.
+eq("...whose new_hex is now the agreed variant value",
+   m["port_patch"][0]["new_hex"], "1000")
+eq("...marked shared", m["port_patch"][0]["_owner"], None)
+# CONTROL 1: no profile -> id_by_profile does not fire -> both tenants sit on
+# the BASE id -> the base value is reachable -> still a collision.
+_, c = merge_manifests([_pp("d", "4000"), _pp("h", "6000")])
+eq("no profile -> base ids -> still collides", len(c), 1)
+# CONTROL 2: one tenant pinned to a base id even under the profile.
+# This is why tenant_row_ids() cannot answer the question: it returns every
+# id a tenant COULD take, so it can never report all-variant.
+pinned = _pp("h", "6000", tenant={"name": "h", "id": 0x0F})
+_, c = merge_manifests([_pp("d", "4000"), pinned], WIDE)
+eq("one base-id tenant -> still collides", len(c), 1)
+# CONTROL 3: the resolution is narrow. A row differing on something OTHER
+# than new_hex must still collide even with all-variant ids.
+x = _pp("d", "4000"); y = _pp("h", "4000")
+y["port_patch"][0]["new_hex_variant"] = "2000"
+_, c = merge_manifests([x, y], WIDE)
+eq("differing variant value still collides", len(c), 1)
+# CONTROL 4: tenant_ids_under fails CLOSED — a tenant whose id cannot be
+# determined must not read as "all variant" (all() over [] is True).
+noid = _pp("h", "6000", tenant={"name": "h"})
+_, c = merge_manifests([_pp("d", "4000"), noid], WIDE)
+eq("undeterminable id -> fails closed, collides", len(c), 1)
+if not bad:
+    print("  ok: resolves under the profile and collapses to the agreed")
+    print("      value; 4 controls keep the resolution narrow")
+
 print("== 4: verdict controls — the merge must NOT be permissive ==")
 # 4a. a differing singleton MUST collide (not silently pick one)
 a = {"table_fix": {"rows_hex": "aa", "_owner": "x"}}
@@ -236,5 +285,6 @@ sys.exit(1 if bad else 0)
 PY
 
 echo "PASS: manifest merge (inert at one file, frozen dedup shapes, the exact"
-echo "      9-collision inventory (ZERO real blockers), the ratified"
-echo "      [init_shim] merge, the [table_fix] union, and 7 controls)"
+echo "      9-collision inventory (ZERO real blockers) which RESOLVES under"
+echo "      the WIDE profile, the ratified [init_shim] merge, the [table_fix]"
+echo "      union, and 11 controls)"
