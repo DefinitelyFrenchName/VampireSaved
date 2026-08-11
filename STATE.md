@@ -614,6 +614,47 @@ tenants in one change, whatever those records turn out to do — which is now
 clearly worth more than any amount of list-narrowing. It also means (b')
 should land BEFORE anyone spends time on the per-move hunt.
 
+### PLASMA TRAP: THE PER-STRENGTH DATA CONFIRMS THE STATIC PICTURE EXACTLY
+
+Maintainer's Phobos sweep (2026-08-11), whole movelist bar Reflect Wall:
+**Plasma Trap is the ONLY crash**, and it splits by strength —
+LK never crashes, MK always crashes, HK does not crash at match start but
+CAN crash later.
+
+The static records match that one-for-one. Three records at stride 0x20:
+
+| record | index word | entry | maintainer |
+|---|---|---|---|
+| `0x0d071c` | `0x0144` | **68** — in range | LK never crashes |
+| `0x0d073c` | `0x0152` | **82** — OUT OF RANGE | crashes |
+| `0x0d075c` | `0x0152` | **82** — OUT OF RANGE | crashes |
+
+So the move is PARTLY ported correctly: LK's sub-state is in range and is fine.
+Two of the three strengths carry 82.
+
+The two 82-records are byte-identical **except for one byte** —
+`010c110c` **`0900`** `01520002` versus `010c110c` **`0000`** `01520002` — which
+is the obvious candidate for why one crashes unconditionally and the other only
+sometimes (a duration or condition field). Not worth chasing: see below.
+
+**THIS IS THE ARGUMENT FOR (b') MADE CONCRETE.** A per-record fix needs TWO
+byte edits, needs the right in-range value chosen for each, and still leaves
+HK's conditional path to be reasoned about. The dispatcher-level fix handles
+both records, both strengths and the conditional in ONE change, without anyone
+having to work out what the differing byte means.
+
+**RIG CAVEAT, and my scripted rig is the unreliable one here.** Earlier I ran
+an "LK" variant of the reproducing replay (`sed s/L5/L4/`) and it CRASHED at
+f4294. The maintainer's LK never crashes, and LK's index is provably in range
+(68), so my scripted L4 did NOT produce LK Plasma Trap — input leniency or the
+button mapping gave something else. **Hands-on strength data is authoritative
+over the scripted rig**, and `87_hui_plasma_trap.rpl` must not be read as
+evidence about which strength does what.
+
+**OPEN: Reflect Wall is the one move not swept** (maintainer could not execute
+it). It is the only Phobos move with no coverage from either the sweep or the
+gates, so it stays an unknown rather than a pass.
+
 ### (b') DESIGN, MAINTAINER-APPROVED FOR THE FULL WINDOW — not yet written
 
 Maintainer approved (b') covering entries 80-83. Design is settled; the
