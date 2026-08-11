@@ -856,6 +856,11 @@ def main():
     # the array is not placed — a stock-size build, where the row is
     # profile-gated away — the helper stays stubbed BY CONSTRUCTION. There is
     # no ordering of edits that can produce a live helper with no array.
+    #
+    # Runs BEFORE the loop and mutates the row OBJECTS in `recon_base`, which
+    # `recon_for()` copies by reference — so the un-stub reaches every tenant's
+    # map. Checked rather than assumed (14z-80): no unstub address is shadowed
+    # by either tenant overlay, so building the base map first is inert.
     unstubbed = []
     for _st in port.get("sound_table", []):
         if args.stage < _int(_st.get("stage", 0)):
@@ -877,13 +882,13 @@ def main():
             unstubbed.append((_st["name"], _v2, _vj))
 
     # ── tenant identity (M3b slice B, 14z-76) ────────────────────────────────
-    # ONE source of truth. `T` is the build's tenant context (tenant_context());
-    # `row_ident()` derives the (row, mirror row, mirror?) triple that EVERY
-    # per-character table write needs, and takes an explicit tenant so a caller
-    # in the future N-tenant loop passes its own instead of closing over
-    # main()'s scope. The three scalars below stay as the derived view for the
-    # sites not yet converted — they are now consistent by construction rather
-    # than by three separate reads of the same dict.
+    # ONE source of truth. `T` is the CURRENT ITERATION's tenant context
+    # (tenant_context()); the loop below rebinds it, and every closure here
+    # reads it rather than capturing a value. `row_ident()` derives the
+    # (row, mirror row, mirror?) triple that EVERY per-character table write
+    # needs, and takes an explicit tenant so a caller can pass one that is
+    # not the current iteration's. The three scalars are re-derived per
+    # iteration, inside the loop.
     T = (port.get("_tenants") or [port["port"]])[0]
 
     def row_ident(tenant=None):
@@ -897,7 +902,9 @@ def main():
 
         Every gate (slice C) and every manifest-row table address (slice D)
         asks this instead of the `dst_slot` scalar, so both are already
-        asking the right question when the N-tenant loop lands.
+        asking the right question now that the N-tenant loop is here
+        (14z-80); `row_here()` below answers the separate question of
+        WHICH iteration emits the row.
         """
         return row_owner(row, port.get("_tenants") or [], T)
 
@@ -964,27 +971,31 @@ def main():
             return None
         return d
 
-    # WHAT STILL READS THE SCALARS, and why it is not an oversight (slice D).
-    # The remaining reads split into three classes, and only the first is
-    # answerable by `owner_of()` — the other two have no manifest row to ask:
+    # WHERE THE PER-TENANT READS NOW COME FROM (slice D, closed 14z-80).
+    # Three classes, and the loop resolved two of them:
     #
     #   EXTRACTION-SIDE — driven by `man` (regions.json) and the region
-    #     blobs, which are the output of ONE tenant's extraction. Under the
-    #     loop these are per-iteration data, not shared rows, so they are
-    #     correct the moment the loop rebinds `T`. That rebinding belongs to
-    #     the REGION-IDENTITY slice (M3b_plan Phase 2 item 2: key regions by
-    #     (src_set, src_addr, len) so a shared span is placed once).
-    #     Sites: the stage-1 scaffold/trampolines, the OBJ bank-table region
-    #     fixup, `man["values"]` rows, `engine_dispatch`'s alias probe.
+    #     blobs, which are the output of ONE tenant's extraction. RESOLVED:
+    #     they are per-iteration data and the loop rebinds them (`man`,
+    #     `extract_dir`, `regions`, `placed`), so the stage-1 scaffold, the
+    #     OBJ bank-table fixup, `man["values"]` and `engine_dispatch`'s
+    #     alias probe all see their own tenant's.
     #
     #   BAKED INTO EMITTED MACHINE CODE — `charid_sites`, the win-pal thunk
-    #     rebase, TT/TU substitution, the overlay T-select thunk. Each bakes
-    #     ONE id into ONE code fragment; N tenants need either N fragments or
-    #     an N-way compare chain, which is a design decision rather than a
-    #     mechanical edit. This class fails SILENTLY, so it lands last and
-    #     alone.
+    #     rebase, TT/TU substitution, the overlay T-select thunk. Each takes
+    #     its id from the row's owner or from `T` (slice E), so a per-tenant
+    #     site is correct. What is STILL OPEN is the shared-SITE case: three
+    #     `*_bank_variant_id` thunks and `win_pal_variant` sit at ONE engine
+    #     address that every tenant patches, so a merged build emits N
+    #     six-byte ops at the same place. Measured 14z-80: exactly four such
+    #     collisions, at 0x5F1B6 (x2) and 0x5F146 (x2). The fix is one thunk
+    #     whose body tests N ids — the N-way dispatch FORM, still a design
+    #     decision. It fails SILENTLY (a thunk gating on the wrong character
+    #     does not crash), so it lands alone and with its own gate.
     #
-    #   OUTPUT NAMING — `tenant.json`, which becomes an array with the loop.
+    #   OUTPUT NAMING — RESOLVED: `tenant.json` stays tenant 0 for its four
+    #     consumers and the array goes to `tenants.json`; side files take a
+    #     per-tenant spelling via `side_name()`.
     # dst_slot/var_slot/mirror are derived per ITERATION (see the loop).
     # Slice D: the select CELLS every tenant occupies. The wheel skips a
     # tenant's own cell because its P1/P2 rows come from that tenant's
@@ -1112,7 +1123,7 @@ def main():
 
         M3b slice B: row identity comes from `tenant` (default: this build's),
         not from main()'s scalars — so every one of this function's call sites
-        is already correct when the N-tenant loop lands and passes its own.
+        is correct under the N-tenant loop, which passes its own (14z-80).
         """
         _row, _var, _mir = row_ident(tenant)
         a, es = table_entry_addr(tname, _row)

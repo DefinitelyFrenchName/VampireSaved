@@ -34,10 +34,14 @@ reference stays reproducible from the tree at every intermediate commit
   group C bank 4 tile-code coexistence (undesigned — see Phase 3) and
   QSound (16 MB is MAME's hard ceiling; three voice banks vs the added
   8 MB is unsized — see Watch items).
-- **The generator refuses >1 tenant by design** (gen_donovan_patch.py:87-93,
-  "M3 Phase 3"). Everything downstream closes over ONE `dst_slot`. The
-  gating vocabulary (only_base_slot / only_variant_slot / new_hex_variant /
-  slot_table / TT-substitution) is id-parameterized but single-valued.
+- ~~**The generator refuses >1 tenant by design**~~ **RETIRED 14z-80 — the
+  refusal is deleted and `main()` iterates (Phase 2 item 1).** As recon
+  found it: everything downstream closed over ONE `dst_slot`, and the gating
+  vocabulary (only_base_slot / only_variant_slot / new_hex_variant /
+  slot_table / TT-substitution) was id-parameterized but single-valued. That
+  is what slices C-E converted to the row's OWNER and 14z-80 wrapped in the
+  loop. The one piece still genuinely single-valued is TT-substitution — see
+  Phase 2 item 4.
 - **Merge-of-independent-patches is unsound; single-process N-tenant loop
   is the design** (decided by analysis, recorded here):
   1. `alloc()` verifies destination bytes against PRISTINE vsavj
@@ -122,25 +126,42 @@ green (Phase 0); content lands only through the refactored machinery.
 
 ### Phase 2 — multi-tenant generator (one process, N tenants)
 
-1. Tenant loop: per-tenant record replaces the `dst_slot`/`mirror`
-   module scalars; per-tenant sections (regions/palettes/value rows/
-   data_port/aux_poke/port_patch/code_word/select_records/win_pal) iterate;
+1. **LANDED 14z-80.** Tenant loop: per-tenant record replaces the
+   `dst_slot`/`mirror` module scalars; per-tenant sections iterate;
    `spaces`/`ops`/fragments stay process-global (one cursor, one ledger).
-2. Region identity: key regions by `(src_set, src_addr, len)`; a shared
-   span (the newcomer stubs, shared support zones) is placed ONCE and all
-   tenants' relocations resolve through the shared placement. Fixes the
-   name-collision problem (`x{addr}` names) and the PC-reach constraints in
-   one move.
-3. Engine-extension manifest: hoist obj_hook ×2 / state_hook /
-   reaction_hook out of the per-tenant manifest into a shared
-   `build/manifest/engine_ext.toml`, emitted ONCE per build as the union
-   over tenants (+ tripwires for the still-unported). seq_ids and reaction
-   cases become per-tenant contributions merged at emit.
+   Delivered with the iteration gate (`row_here`/`tenant_rows`/`singleton`),
+   per-tenant side-file names, per-tenant recon overlays, and the `>1 tenant`
+   refusal deleted. Gate `tests/test_tenant_loop.sh`. Three tenants generate
+   (612 ops); the merged patch does not yet APPLY — see item 3.
+2. ~~Region identity: key regions by `(src_set, src_addr, len)`; a shared
+   span is placed ONCE and all tenants' relocations resolve through the
+   shared placement.~~ **DISSOLVED (14z-78b, implemented 14z-80).** Every
+   tenant keeps its OWN copy of every region and it fits: three tenants need
+   98,488 of the 344,640-byte crypt window since `anim` became movable, and
+   `alloc()`'s fallback chain spills the rest into `wide_ext` (measured
+   14z-80: `hole_a`/`hole_b` exactly full, 0x145AA0 spare). Sharing was an
+   optimisation, not a requirement, and 14z-77h measured four of the
+   seventeen shared spans as CONFLICTING anyway. The name-collision problem
+   is solved by per-tenant spellings (`side_name()`, `placements.json`'s
+   `@<tenant>` suffix), not by shared placement.
+3. **THE NEXT SLICE, and now measured.** Engine-extension union: a shared row
+   (`_owner=None`) is emitted on iteration 0, where only tenant 0's
+   `placed`/`regions` exist — so `obj_hook`'s extended table sends the other
+   tenants' extra handlers to their tripwires. Run the union AFTER the loop,
+   against every tenant's placements. seq_ids and reaction cases become
+   per-tenant contributions merged at emit, as written. (A separate
+   `engine_ext.toml` is no longer needed to express this: `merge_manifests`
+   already dedups the identical rows to unowned ones — measured `obj_hook`
+   6→2, `select_wheel` 3→1.)
 4. site_thunk gating: replace single `cmpi.b #TT` gates with id-dispatched
    forms — a generated 32-row table where the site is semantically a
    per-char lookup (matches the engine's own convention), a compare-chain
    where it is genuinely a small set. Manifest declares bodies; generator
-   owns gates. Same for win_pal_variant's rebase.
+   owns gates. Same for win_pal_variant's rebase. **MEASURED 14z-80:** this
+   is four 6-byte op collisions, at `0x5F1B6` ×2 and `0x5F146` ×2 — every
+   tenant emitting its own thunk at one engine site. It is what stops the
+   merged patch applying, and `tests/test_tenant_loop.sh` section 4 is the
+   number it has to move.
 5. Per-tenant outputs: `tenant.json` et al become arrays (or per-tenant
    files) with the gfx/verify consumers updated in the same commit.
    Exit gate: the 3-tenant manifest with ONLY Donovan enabled reproduces

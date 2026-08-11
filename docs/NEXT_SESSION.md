@@ -1,119 +1,101 @@
-# NEXT SESSION — orientation (written at the close of 14z-79, 2026-08-11)
+# NEXT SESSION — orientation (written at the close of 14z-80, 2026-08-11)
 
 > ## START HERE
 >
-> **M3b's remaining milestone is unchanged and still specified: the N-tenant
-> loop plus the N-way dispatch form.** Nothing in 14z-79 touched the generator;
-> read "NEXT SLICE — region identity, then the N-way dispatch FORM" in STATE
-> 14z-78 and the ORDERING INVARIANT under it. The loop is one mechanical
-> re-indent plus one gate, and both are written down.
+> **The N-tenant loop LANDED. M3b's remaining milestone is now the SHARED-ROW
+> UNION plus the N-way dispatch FORM** — items 1 and 2 below, in that order.
+> Both are named, both have a measured work list rather than a description,
+> and `tests/test_tenant_loop.sh` section 4 is the number they have to move.
 >
-> Before that, if you want a small high-value piece first, take **the op
-> invariant extension** (below). It is the gate that would have caught this
-> session's legacy defect at build time.
+> Nothing shipped in a ROM this session. All four frozen builds are unchanged
+> and still rebuild bit-exact.
 
 ## The state in one paragraph
 
-**Phobos is re-frozen as `huitzil-m3` (34c8b47d).** The (b') thunk landed and
-fixes both his defects — Plasma Trap and Reflect Wall. In the same commit a
-LEGACY defect that had shipped since 14z-69 was withdrawn: the DF-palette row
-was overwriting **Bulleta's** Dark Force palette. All four frozen verticals
-rebuild bit-exact. `run_suite.sh` is green on the re-frozen baselines.
+`gen_donovan_patch.py`'s `main()` body is now the body of a loop over the
+tenants, the `>1 tenant` refusal is deleted, and a three-manifest merge
+**generates**: 612 ops, GENERATION OK. It does not **apply** — `patch_prg.py`
+refuses it at the first op overlap, and the whole inventory is 10 op pairs /
+36 bytes. For one tenant everything is byte-identical: donovan-m3a, m5_stock,
+huitzil-m3 and pyron-m2 all rebuild bit-exact, and the generator's output
+DIRECTORY is identical to the pre-slice generator for all three manifests.
 
-## What (b') is, in case a symptom points back at it
+## What to do next, and why in this order
 
-A 470-byte thunk at engine site `PRG:0x018460` covering the out-of-range window
-of dispatch table `0x018468` (vsavj has 80 entries, vs2's twin has 84). Entries
-80-83 run vs2's handlers inline; every other index takes the vanilla path;
-anything else is a defined vec3. Legacy-safe by IMPOSSIBILITY — vanilla
-reaching 80-83 crashes today. The body is GENERATED
-(`tools/gen_index_window_thunk.py`), never hand-edited, and
-`tests/test_index_window_thunk.sh` reconstructs all 470 bytes from the ROMs.
-Two properties it depends on, both measured, both in
-`docs/game/engine_internals.md` "The SUB-STATE DISPATCHER FAMILY":
-the table reads through the **opcode** view, and **D1 must come out holding the
-vanilla offset**.
+1. **Shared-row union.** Rows every manifest declares identically merge to
+   `_owner=None` and the iteration gate emits them on iteration 0 — where only
+   tenant 0's `placed`/`regions` exist. `obj_hook` resolves each ported handler
+   through exactly those (`gen_donovan_patch.py`, the `tenant_rows("obj_hook")`
+   section — the limit is commented there and in `row_here()`'s docstring), so
+   a merged build sends the other tenants' extra handlers to their tripwires.
+   Loud at runtime, not silent. The fix is a union pass AFTER the loop, against
+   every tenant's placements. This blocks a merged build being *correct*.
+2. **The N-way dispatch FORM** — slice E's deferred design decision, and now
+   four measured collisions: `0x5F1B6` ×2 and `0x5F146` ×2, 6 bytes each, where
+   each tenant emits its own thunk at one engine site. One thunk whose body
+   tests N ids. This blocks a merged build being *applicable*.
+3. **The remaining 6 shared-span op collisions** (`x028122`, `0x282FA`,
+   `0x5F24C`, `0xBE88A`) — fields two or more tenants write differently.
+   14z-77h's conflicting set, now with exact addresses.
+4. **`region_space` on the manifests, deliberately.** Not a blocker — three
+   tenants fit today because `alloc()`'s fallback chain spills into `wide_ext`
+   on its own (`hole_a`/`hole_b` come out exactly full, 0x145AA0 spare). But a
+   spill is not a placement DESIGN. Adding the rows moves the frozen
+   huitzil/pyron placements, so it is a re-freeze and the maintainer's call.
+5. Then the driver and gfx halves, which are single-tenant by decision.
 
-## Open, in rough priority order
+## Still open from 14z-79, unchanged
 
-1. ~~Extend the op invariant to stage 6~~ **DONE (14z-79b):
-   `tests/test_shared_writes.sh` + `tools/audit_shared_writes.py` +
-   `build/manifest/shared_writes.toml`.** Every write landing outside declared
-   free space and outside a known variant row is now frozen per tenant
-   (donovan 67 / huitzil 59 / pyron 50) and any change fails the gate.
-   Ground-truthed: it flags the withdrawn DF-palette write on `build/hui27` (= the superseded
-   `huitzil-m2`, which carried it — that build is the control, not a target).
-   **Read its honest limit before trusting a green run** — it proves the set is
-   UNCHANGED SINCE REVIEWED, not that the writes are safe; an entry frozen
-   without checking whose bytes it lands on stays wrong and green. NOT done,
-   and worth doing: tagging each op with its emitting mechanism in the
-   generator, which would let the gate say WHAT a new write is, not just that
-   it appeared. (Post-hoc attribution does not work — measured, the atlas
-   fragment covers ~30% of shared writes by exact address.)
-2. **Phobos' own palette-seq block** — the proper fix for his Dark Force. Free
-   4-row id block + a copy of Bulleta's routine with that base + `0x02A8A4` row
-   0x10 repointed. **The full-roster census is DONE (14z-79b)** — see
-   `docs/game/engine_internals.md` "THE DARK FORCE PALETTE-SEQUENCE BLOCKS".
-   Occupied: `0x1E-0x21` (Bulleta), `0x26/0x27` (Demitri), `0x44-0x47` (Zabel),
-   `0x6F-0x72` (Bishamon + Oboro), `0x264-0x267` (Q-Bee), `0x29C-0x2A0` (0x12,
-   five ids), and very probably `0xAA-0xAD` (Anakaris — the one unmeasured
-   character and the one hardcoded base with no owner; treat as occupied).
-   TWO CAVEATS BEFORE ALLOCATING: the resolver masks to 12 bits, so a block
-   must live inside `0x39A900-0x3BA8E0` and CANNOT go in `wide_ext`; and
-   "nobody requests id N" does not make row N free — establish what those bytes
-   ARE. The 14z-69 row passed "nobody asked" on a sample that could not ask.
-3. **Pyron's Zodiac Fire has no rig** (236+P, ES 236+2P) — guard-cancel only,
-   so it is ours to build, and it is the last unswept move of the three
-   movelists.
-4. `80_pyron_cosmo_pairsweep.rpl` still resets at f4840 — independent, real,
-   low priority.
-5. Polish the three NEW select medallions and their selection ring: imperfect
-   shapes, slightly shifted placement, correct portraits at correct locations.
-   Cosmetic, maintainer-described as **polish, not rework**.
+- **Phobos' own palette-seq block** — the proper fix for his Dark Force. Census
+  done (`docs/game/engine_internals.md` "THE DARK FORCE PALETTE-SEQUENCE
+  BLOCKS"). Two caveats before allocating: the resolver masks to 12 bits, so a
+  block must live in `0x39A900-0x3BA8E0` and CANNOT go in `wide_ext`; and
+  "nobody requests id N" does not make row N free.
+- **Pyron's Zodiac Fire has no rig** (236+P, ES 236+2P) — guard-cancel only.
+- `80_pyron_cosmo_pairsweep.rpl` still resets at f4840 — independent, low.
+- The three NEW select medallions: polish, not rework.
+- Tagging each op with its emitting mechanism in the generator, so
+  `test_shared_writes.sh` can say WHAT a new write is, not just that it
+  appeared.
 
 ## KNOWN-OPEN RED — do not "explain it away" again
 
 `tests/test_variant_dispatch.sh` FAILS on table `0x02a8a4` row 0x10
-(`ours 0x004a`, vs2 `0x0040`). **That is a real defect**, not noise: it is the
-aliased row that puts Phobos on Bulleta's palette routine, and it is what made
-14z-69p overwrite her Dark Force block. It stays red until item 2 lands. It had
-been red since 14z-74 and was recorded as "benign — 0 hits at the resolver";
-that zero came from replays in which nobody activated Dark Force.
+(`ours 0x004a`, vs2 `0x0040`). Real defect: the aliased row that puts Phobos on
+Bulleta's palette routine. Red until Phobos gets his own block.
 
 ## Rules this session paid for
 
-- **"Dead on ENTRY" is not "dead."** A sweep over handler first-instructions
-  says nothing about what happens after their `rts`. Prefer reproducing a
-  displaced instruction's WHOLE architectural effect over proving each part of
-  it unobserved.
-- **Separate "the hook is wrong" from "the hook is expensive" BEFORE
-  theorising.** Measure the dispatch rate and diff the two images. They look
-  identical in the logs and have opposite fixes.
-- **An audit whose replays cannot produce the mode it guards cannot report on
-  that mode** — and a MODE control must sample several frames, because a
-  one-frame sample is a coin toss on the onset. Both halves of that were paid
-  for this session, the second by me, immediately after criticising the first.
-- **Classify the CONSEQUENCE before valuing a clean observation.** "I never saw
-  it" cleared the vanilla medallions (all 18 visible every session — loud) and
-  was worth nothing for Bulleta's DF (mode-gated — silent). Same evidence,
-  opposite weight.
-- **The HOST character is the exposed one.** A tenant at variant `0x1N` aliases
-  base slot `0xN`: Bulleta←Phobos, Demitri←Pyron, Victor←Donovan. When a tenant
-  change misbehaves, test the host first.
-- **Never edit a script while it is running** — bash re-reads it by byte
-  offset and dies with a bogus syntax error.
-- **Redirect long background jobs straight to a file**; piping through `tail`
-  buffers everything and a kill loses the lot.
+- **A shared NAMESPACE with per-tenant CONTENT is a silent-corruption shape,
+  and no existing net sees it.** The side files are named after regions; seven
+  region names are shared across tenants; the op-overlap assertion compares
+  ADDRESSES, which differ. One tenant can never expose it.
+- **When a key is per-tenant configuration, check that the per-tenant CONTEXT
+  actually carries it.** `tenant_context()` copies a fixed key list;
+  `recon_overlay` was not on it, so every tenant after the first built against
+  the shared map. Found by RUNNING a 2-tenant build, not by reading.
+- **Do the mechanical re-indent in its own commit and review it with
+  `git diff -w`.** 3,723 lines moved; the diff under `-w` was the loop header
+  and five bindings, and that is the only reason it was reviewable.
+- **Freeze what is still broken, by name.** The merged patch's collision
+  inventory is the next slice's work list, and a shrinking number is how that
+  slice will report progress. Omitting it would have made the gate read as
+  "merged builds work".
+- **A frozen count that moves for a good reason should be re-frozen with the
+  reason, promptly.** `test_manifest_merge.sh` had been red since 14z-79 added
+  the (b') thunk row — a legitimate addition nobody re-froze.
 
 ## Build / validate
 
 ```sh
 export ROMDIR=/path/to/reference/sets
-tools/run_wide.sh build/hui29 fbneo        # play it
-ROMDIR=... MAME_BIN=~/.cache/vampire-saved/mame/cps2 \
-MAME_ROMPATH="build/hui29/rompath;$ROMDIR" tests/run_suite.sh vsavjw
+tests/test_tenant_loop.sh                  # ~6s, the loop gate
+tests/test_tenant_row_owner.sh             # ~9s, the threading gate
+tests/test_m3a_reproducible.sh             # ~4 min, all four fingerprints
+tools/run_wide.sh build/hui29 fbneo        # play Phobos
 ```
 
-Rebuild the tenant verticals with `tests/test_m3a_reproducible.sh` (all four
-frozen references, ~4 min, no emulator). Run it after EVERY M3b machinery
-commit, together with `tests/test_tenant_row_owner.sh`.
+Run `test_m3a_reproducible.sh` together with `test_tenant_row_owner.sh` and
+`test_tenant_loop.sh` after EVERY M3b machinery commit — they ask three
+different questions (did the values move / is the threading live / does the
+loop iterate) and no one of them substitutes for another.

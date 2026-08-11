@@ -1,6 +1,27 @@
 # STATE — living progress log
 
-Updated: 2026-08-11 (session 14z-79 — **PHOBOS RE-FROZEN AS `huitzil-m3`
+Updated: 2026-08-11 (session 14z-80 — **THE N-TENANT LOOP LANDED. The
+generator emits three tenants into one image and the `>1 tenant` refusal that
+has stood since M3 Phase 3 is deleted.** `main()`'s body (3,723 lines) is now
+a loop body; the iteration gate makes a row belong to ONE iteration; and all
+four frozen references still rebuild bit-exact, which is the whole safety
+argument. **THREE TRAPS were under the "one re-indent plus one gate" estimate,
+and none of them was in the spec:** the side-file NAMESPACE is shared while the
+content is not (tenant B's blob would have been served at tenant A's address —
+invisible to the op-overlap assertion and impossible to see with one tenant);
+`recon_overlay` is a `[[tenant]]` key that `tenant_context()` never copied, so
+every tenant after the first silently built against the shared map alone; and
+`pcrel_far_tramps` is a second address-keyed memo of the class STATE 14z-78
+named only `dc_tables` for. **A 3-tenant merge now GENERATES (612 ops) but does
+not APPLY:** patch_prg refuses it at the first op overlap, and the full
+inventory is 10 op pairs / 36 bytes — 34 bytes inside the four shared spans
+14z-77h already froze as conflicting, and four 6-byte collisions at engine
+SITES where each tenant emits its own thunk, i.e. the N-way dispatch FORM with
+a number on it at last. New gate `tests/test_tenant_loop.sh` (~6 s, generator
+alone) freezes all of it, including what is still broken. Read
+docs/NEXT_SESSION.md first.)
+
+Previously: 2026-08-11 (session 14z-79 — **PHOBOS RE-FROZEN AS `huitzil-m3`
 (34c8b47d): the (b') thunk landed, and a LEGACY DEFECT THAT HAD SHIPPED SINCE
 14z-69 WAS FOUND BY PLAYTEST AND WITHDRAWN.** (b') covers the out-of-range
 window of dispatcher `0x018460` and fixes BOTH Phobos defects — Plasma Trap
@@ -140,6 +161,140 @@ findings were RETRACTED in-session after clean re-measures — each with
 the comparison error written down so it cannot be repeated. Every gate
 green at close, including two NEW audits. Read docs/NEXT_SESSION.md
 first, then the 14z-69 sections below.)
+
+## Session 14z-80 — THE N-TENANT LOOP: `main()` iterates, and the three
+## traps that were not in the spec
+
+M3b's remaining milestone. Everything the loop depends on had landed
+(slices A-F: per-file ownership, owner-threaded gating/arithmetic/baked-code,
+repeatable `--port` paired with `--extract`, a collision-free 3-tenant merge),
+so the ORDERING INVARIANT of 14z-77 was satisfied and the loop was allowed to
+land. Scope, agreed with the maintainer before starting: **generator only.**
+`build_donovan.sh` stays single-tenant and the gfx half is untouched (Phase 3).
+
+### THE STATE BOUNDARY, as implemented
+
+| SHARED (accumulates) | PER TENANT (rebound each iteration) |
+|---|---|
+| `spaces`/`order` — ONE cursor, so tenants cannot allocate over each other | `extract_dir`, `man` |
+| `gap_free` | `recon` (see trap 2) |
+| `ops`, `notes`, `fail`, `fragments`, `all_placements` | `dst_slot`/`var_slot`/`mirror` |
+| `alloc` / `repoint` / `poke_bytes` / `table_entry_addr` | `placed`, `regions`, `dc_tables`, `pcrel_far_tramps` |
+| `row_ident` / `owner_of` / `row_here` closures (they read the rebound `T`) | `patched_clones`, `farm_ports` (already inside `if stage>=2`) |
+
+**`pcrel_far_tramps` is added to 14z-78's list.** It is the same shape
+`dc_tables` was called out for — a memo keyed by ADDRESS with no tenant key.
+Sharing it hands tenant B a trampoline placed near tenant A and trips the d16
+check at its own use site: a spurious hard fail rather than a wrong image, but
+wrong, and it was not in the classification.
+
+### THE ITERATION GATE
+
+`row_here(row)`: the row's `_owner` IS this tenant, **or** it is unowned and
+this is iteration 0. Applied through `tenant_rows(section)` (19 list sections)
+and `singleton(section)` (9 singleton reads), so a MISSED site is findable by
+grepping `port.get("` below the loop header rather than by reasoning — which
+is what the new gate does. Named `tenant_rows` and not `rows` because `rows` is
+already a local bytearray in the `table_fix` and `select_wheel` blocks, which
+would have silently rebound the helper mid-body.
+
+Eight `port["port"]` reads inside the body were converted to `T` in the same
+change and they are the **silent** ones — `port["port"]` is pinned to
+`_tenants[0]` forever, so each would have given every tenant the FIRST tenant's
+value (`src_char` twice, `near_map`, `alloc_wrap`, `port_param32`, `gfx_bank`
+three times). Same trap class slice E found in `charid_sites`.
+
+### THE THREE TRAPS
+
+**1. THE SIDE-FILE NAMESPACE IS SHARED; THE CONTENT IS NOT.** Region blobs
+leave as files named after the REGION (`fixed_x026142.bin`), and 14z-77h froze
+SEVEN region names as shared across the three tenants. Under the loop tenant
+B's write clobbers tenant A's file while A's op still names that path — and the
+patcher then writes B's bytes at A's address. Invisible to patch_prg's overlap
+assertion (the addresses differ) and impossible to see with one tenant. Fixed
+with a per-tenant SPELLING (`side_name()`), tenant 0 keeping the historical one
+so every single-tenant build emits the identical file set, and `write_out()`
+underneath refusing any name written twice with different bytes.
+
+**2. THE RECON OVERLAY WAS TENANT 0'S, FOR EVERYONE — and it was MEASURED, not
+reasoned.** `recon_overlay` is a `[[tenant]]` key, but `tenant_context()`
+copies a fixed key list and it was not on it, so `T.get("recon_overlay")`
+returned nothing and the loop fell back to `tenant[0]`'s. The first
+donovan+huitzil run died on `x022400+0xb74: bank_ref 0xd96b8 needs a verified
+reconciliation row` — a row huitzil's own overlay resolves. Each tenant now
+gets the shared map plus ITS OWN overlay (`recon_for()`), which is the
+per-tenant row scoping the comment at that site has promised since 14z-65.
+Ordering check done rather than assumed: no `unstub` address is shadowed by
+either overlay, so building the base map before the overlays is inert.
+
+**3. `placements.json` needed accumulating**, with the shared names suffixed
+`@<tenant>` — they are DIFFERENT spans.
+
+### WHAT A MERGED BUILD DOES TODAY, exactly
+
+| tenants | ops | result |
+|---|---|---|
+| 1 (each of D/H/P) | 243 / 259 / 205 | output directory byte-identical to the pre-slice generator |
+| 2 (D+H) | 455 of 502 declared | GENERATION OK |
+| 3 (D+H+P) | 612 of 707 declared | GENERATION OK |
+
+**It generates; it does not apply.** `patch_prg.py` refuses the merged patch by
+name at the first op overlap. Full inventory, frozen by the new gate:
+**10 overlapping op pairs / 36 bytes.** 34 of those bytes lie inside the four
+shared spans 14z-77h froze as conflicting (`x026142`/`x028122`/`x05c800`/
+`x2b7ef4`). The largest class is four 6-byte collisions at engine SITES —
+`0x5F1B6` twice and `0x5F146` twice — where each tenant emits its own thunk.
+**That is the N-way dispatch FORM, and it now has a number instead of a
+description.**
+
+Note also, from the one-iteration control: over the MERGED document tenant 0
+alone emits **241** ops, not donovan-alone's 243, because `merge_manifests`
+folds the singletons and the dedup moves allocations. So "three manifests with
+only Donovan iterating" is NOT the same build as "donovan.toml alone" — which
+is precisely why M3b_plan's Phase 2 exit gate reproduces `4b7d0dc7` by passing
+ONE FILE, the thing per-file ownership bought in 14z-77.
+
+### THE SPACE QUESTION ANSWERED ITSELF
+
+The plan expected a 2-tenant run to overflow `hole_a` (14z-77 measured one
+tenant saturating the crypt window) and budgeted a scratch-manifest rig with
+`region_space` overrides for the gate. Not needed: `alloc()`'s declared
+fallback chain spills into `wide_ext` on its own, and three tenants fit with
+`hole_a`/`hole_b` exactly full and 0x145AA0 spare in `wide_ext`. `region_space`
+remains worth setting deliberately — the spill is not a placement DESIGN — but
+it is not a blocker and it does not need to touch the frozen manifests.
+
+### GATE
+
+`tests/test_tenant_loop.sh`, generator alone, ~6 s: determinism ground truth;
+N=1 frozen per tenant with no tenant-suffixed side files; the N=2/N=3 op counts
+AND their dedup arithmetic; each tenant's regions placed at distinct addresses
+with per-tenant side files and `tenants.json` in declaration order; the
+collision inventory of section 4; and two verdict controls — forcing one
+iteration must collapse 612 to under 300, and disabling `side_name()` must be
+CAUGHT rather than clobber.
+
+`tests/test_tenant_id.sh`'s refusal control is FLIPPED, as 14z-77 wrote it to
+be: two tenants must now be accepted, in declaration ORDER, because the loop
+pairs `_tenants[i]` with `_extracts[i]` by position.
+
+Also re-frozen: `tests/test_manifest_merge.sh`'s `site_thunk` row, RED since
+14z-79 added the (b') thunk to huitzil.toml (10→11 per file, 28→29 merged; the
+shared count is unchanged because (b') is owned).
+
+### OPEN AFTER THIS SLICE, in the order they block a merged build
+
+1. **Shared-row union.** A shared row emitted on iteration 0 sees only tenant
+   0's `placed`/`regions`. `obj_hook` resolves each ported handler through
+   exactly those, so on a merged build the other tenants' extra handlers fall
+   to their tripwires — loud at runtime, not silent. The fix is a union pass
+   AFTER the loop against every tenant's placements. Commented in the source at
+   the section and in `row_here()`'s docstring.
+2. **The N-way dispatch FORM** (slice E's open design decision): one thunk per
+   engine site whose body tests N ids. The 4 site collisions above are it.
+3. **The remaining 6 shared-span op collisions** (`x028122` and friends) —
+   fields two or more tenants write differently, 14z-77h's conflicting set.
+4. **Driver + gfx halves**, single-tenant by decision.
 
 ## Session 14z-79 — (b') LANDED, AND BULLETA'S DARK FORCE WAS BROKEN
 ## FOR TEN SESSIONS
