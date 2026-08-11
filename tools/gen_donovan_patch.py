@@ -32,6 +32,7 @@ Usage:
 """
 
 import argparse
+import hashlib
 import json
 import struct
 import sys
@@ -118,8 +119,12 @@ def tenant_context(t, port, profile=None, override=None):
     p["src_char"] = t["src_char"]
     p["dst_slot"] = tid
     p["mirror_variant"] = t.get("mirror_variant", tid < 0x10)
+    # `recon_overlay` joined this list in 14z-80: it is per-tenant
+    # configuration and the N-tenant loop asks the CONTEXT for it. While it
+    # was missing, the loop read only `tenant[0]`'s overlay and every later
+    # tenant silently built against the shared map alone.
     for k in ("alloc_wrap", "near_map", "hole_b_regions", "region_space",
-              "gfx_bank", "name", "port_param32"):
+              "gfx_bank", "name", "port_param32", "recon_overlay"):
         if k in t:
             p[k] = t[k]
     # A variant-id tenant's tiles live in the WIDE extension (that is WHY
@@ -582,19 +587,23 @@ def normalise_tenants(port, profile=None, override=None):
 
     M3b slice A: the per-tenant resolution moved out to `tenant_context()`
     and this function now builds a LIST of them, published as
-    `port["_tenants"]`. `main()` still consumes exactly one — `_tenants[0]`
-    flattened into `port["port"]`, byte-identically to before — so this slice
-    is inert by construction and the four frozen fingerprints prove it. The
-    refusal below stays until `main()` itself iterates; it is the honest
-    statement of what is implemented, not of what the manifest can express.
+    `port["_tenants"]`.
+
+    THE >1 REFUSAL IS GONE (14z-80): `main()` now ITERATES over that list.
+    It stood from the beginning of M3 as the honest statement that the
+    manifest could express a merge the generator could not perform; the
+    control in tests/test_tenant_id.sh that required it to fire is flipped
+    in the same commit, which is the honest record of when multi-tenant
+    builds arrived.
+
+    `port["port"]` still holds `_tenants[0]` for the sites OUTSIDE the loop
+    that need a build-level default (`tenant.json`, `owner_of()`'s fallback
+    for an unowned legacy `[port]` manifest). Inside the loop every read
+    goes through `T`.
     """
     tenants = port.get("tenant", [])
     if not tenants:
         return port                      # legacy [port] manifest, untouched
-    if len(tenants) > 1:
-        raise SystemExit("gen_donovan_patch: %d tenants declared; multi-tenant "
-                         "builds are not implemented yet (M3 Phase 3). Land "
-                         "one tenant at a time." % len(tenants))
     contexts = [tenant_context(t, port, profile, override) for t in tenants]
     port = dict(port)
     port["_tenants"] = contexts
@@ -711,6 +720,44 @@ def main():
     out = args.out_dir
     out.mkdir(parents=True, exist_ok=True)
 
+    # ── THE SIDE-FILE NAMESPACE IS SHARED; THE CONTENT IS NOT (14z-80) ──────
+    # Region blobs and palette blocks leave the generator as side files named
+    # after the REGION (`fixed_x026142.bin`) or the palette (`palette_block_
+    # sprite.bin`), referenced by a data_file/code_file op. Those names are
+    # per tenant in content but not in spelling: 14z-77h froze SEVEN generic
+    # region names shared across the three tenants. Under the N-tenant loop
+    # tenant B's write therefore CLOBBERS tenant A's file while tenant A's op
+    # still names that path — and the patcher then writes B's bytes at A's
+    # address.
+    #
+    # That is invisible to every existing net: patch_prg's overlap assertion
+    # compares op ADDRESSES (which differ), and the four fingerprints cannot
+    # see it because it cannot happen with one tenant.
+    #
+    # So a side file written inside the loop takes a per-tenant SPELLING —
+    # and tenant 0 keeps the historical one, which is what makes this inert
+    # for every single-tenant build and every frozen reference. The ops carry
+    # the path, so the patcher needs no change. `write_out()` keeps a
+    # collision backstop underneath: any name still written twice with
+    # different bytes is a NAMED build error, never a silent clobber.
+    _written = {}
+
+    def write_out(name, data, who=None):
+        """Write a side file into `out`, refusing a differing rewrite."""
+        blob = data.encode() if isinstance(data, str) else bytes(data)
+        digest = hashlib.sha1(blob).hexdigest()
+        prev = _written.get(name)
+        if prev is not None and prev[0] != digest:
+            raise SystemExit(
+                "gen_donovan_patch: side file '%s' written twice with "
+                "DIFFERENT content (first by %s, now by %s). Its name is "
+                "shared across tenants but its bytes are not, so the second "
+                "write would serve its bytes at the FIRST tenant's address. "
+                "Route it through side_name()." % (name, prev[1], who or "?"))
+        _written[name] = (digest, who or "?")
+        (out / name).write_bytes(blob)
+        return name
+
     # PER-FILE TENANT OWNERSHIP (M3b slice C): every row a file declares
     # belongs to that file's tenant. Stamped here, at the one place that
     # knows which file a row came from — then the documents MERGE (slice F).
@@ -756,23 +803,44 @@ def main():
     port = normalise_tenants(port, args.profile, args.tenant_id)
     bank = load_bank_map(args.bank_map)
     vj = load_vsavj(args.vsavj)
-    recon = {}
+    recon_base = {}
     if args.recon.is_file():
         for m in toml_loads(args.recon.read_text()).get("map", []):
-            recon[_int(m["vsav2"])] = m
+            recon_base[_int(m["vsav2"])] = m
+    recon = recon_base   # rebound per tenant inside the loop (see recon_for)
+
     # PER-TENANT RECON OVERLAY (14z-65): the shared map's rows are frozen
     # for the reference tenant's reproducibility — his build consumes OPEN
     # rows as tripwires, so resolving a row he references changes HIS
     # bytes. A tenant manifest may declare recon_overlay = "<toml>" whose
-    # rows override the shared map for THAT tenant's builds only. The
-    # Phase 2 merge replaces this with proper per-tenant row scoping.
-    _ov = port.get("recon_overlay") or (port.get("tenant") or [{}])[0].get("recon_overlay")
-    if _ov:
-        _ovp = root / _ov
-        if not _ovp.is_file():
-            raise SystemExit(f"recon_overlay {_ov} not found")
-        for m in toml_loads(_ovp.read_text()).get("map", []):
-            recon[_int(m["vsav2"])] = m
+    # rows override the shared map for THAT tenant's builds only.
+    #
+    # 14z-80 — THE SCOPING THE COMMENT HERE PROMISED, and it was NOT
+    # cosmetic. This read used to be `port["recon_overlay"] or
+    # tenant[0]["recon_overlay"]`, i.e. the FIRST tenant's, applied to a
+    # single shared map. Under the loop that silently dropped every later
+    # tenant's overlay: measured on the first donovan+huitzil run, which
+    # died on `x022400+0xb74: bank_ref 0xd96b8 needs a verified
+    # reconciliation row` — a row huitzil's own overlay resolves. Now each
+    # tenant gets the shared map plus ITS OWN overlay, and no other
+    # tenant's, which is also what makes the frozen single-tenant builds
+    # identical (each sees exactly what it saw alone).
+    _ov_cache = {}
+
+    def recon_for(tenant):
+        """The reconciliation map for one tenant: shared rows + its overlay."""
+        ov = port.get("recon_overlay") or tenant.get("recon_overlay")
+        if not ov:
+            return recon_base
+        if ov not in _ov_cache:
+            ovp = root / ov
+            if not ovp.is_file():
+                raise SystemExit(f"recon_overlay {ov} not found")
+            merged = dict(recon_base)
+            for m in toml_loads(ovp.read_text()).get("map", []):
+                merged[_int(m["vsav2"])] = m
+            _ov_cache[ov] = merged
+        return _ov_cache[ov]
 
     # ── M5: the per-node sfx helper goes live ONLY with the record array ─────
     # 14z-52 measured exactly why this coupling has to be structural. The
@@ -870,6 +938,20 @@ def main():
         """
         return [r for r in port.get(section, []) if row_here(r)]
 
+    def side_name(name):
+        """The per-tenant spelling of a side file written INSIDE the loop.
+
+        Tenant 0 keeps the historical name, so every single-tenant build —
+        including all four frozen references — emits the identical file set.
+        Later tenants get `<stem>.<tenant><ext>`, because the content is per
+        tenant while the name (a region name, a palette name) is not: seven
+        region names are shared across the three tenants (14z-77h).
+        """
+        if _ti == 0:
+            return name
+        stem, dot, ext = name.partition(".")
+        return "%s.%s%s%s" % (stem, T.get("name", "t%d" % _ti), dot, ext)
+
     def singleton(section):
         """The same test for a TOML singleton (`[table_fix]`, `[init_shim]`…).
 
@@ -965,6 +1047,7 @@ def main():
     notes = []
     fail = []
     fragments = []  # (dst, len, provenance, what) for the atlas fragment
+    all_placements = {}  # every tenant's placed regions, for placements.json
 
     def vj_u32(addr):
         return int.from_bytes(vj[addr:addr + 4], "big")
@@ -1080,6 +1163,7 @@ def main():
     for _ti, T in enumerate(_tenant_list):
         extract_dir = _extracts[_ti]
         man = json.loads((extract_dir / "regions.json").read_text())
+        recon = recon_for(T)
         dst_slot, var_slot, mirror = row_ident()
         # Memos keyed by ADDRESS, not (tenant, address) — so they are bound
         # HERE, per tenant. Sharing `pcrel_far_tramps` would hand tenant B a
@@ -2212,13 +2296,15 @@ def main():
                         pairs.extend([s, d] for s, d in zip(src_span, dst_span))
                         if isb:
                             exc_srcs.update(src_span)
-                    json.dump(pairs, (out / "effect_map.json").open("w"))
+                    write_out(side_name("effect_map.json"),
+                              json.dumps(pairs).encode(), "gfx_remap")
                     # band srcs relocated by exception AND not otherwise needed
                     # at src+delta must be skipped by build_gfx's band loop
                     # (their delta target is a protected position!)
                     skip = sorted(exc_srcs - nonexc_band_srcs)
-                    json.dump({"skip_band_src": skip},
-                              (out / "tile_exceptions.json").open("w"))
+                    write_out(side_name("tile_exceptions.json"),
+                              json.dumps({"skip_band_src": skip}).encode(),
+                              "gfx_remap")
                     notes.append(f"# {name}: gfx_remap +{delta:#x} on {n_rw} "
                                  f"band tile words, {n_exc} exception words, "
                                  f"{n_eff} effect words ({len(blocks)} blocks "
@@ -2368,9 +2454,10 @@ def main():
                     if extra_lists:
                         la = alloc("b", len(extra_lists),
                                    "companion-effect coordinate lists")
-                        (out / "effect_lists.bin").write_bytes(bytes(extra_lists))
+                        _efl = write_out(side_name("effect_lists.bin"),
+                                         extra_lists, "effect lists")
                         ops.append({"op": "data_file", "addr": f"{la:#x}",
-                                    "path": "effect_lists.bin"})
+                                    "path": _efl})
                         fragments.append((la, len(extra_lists), "VS2",
                                           "companion-effect coord lists"))
                         # resolve the 0xEE-tagged placeholders
@@ -2382,15 +2469,17 @@ def main():
                     if b2_pairs:
                         # only reachable with [gfx_remap] present (b2_recs
                         # gating above), whose pass wrote effect_map.json
-                        emj = json.loads((out / "effect_map.json").read_text())
+                        emj = json.loads((out / side_name("effect_map.json")).read_text())
                         known = {tuple(p) for p in emj}
                         for p in b2_pairs:
                             if (p[0], p[1]) not in known:
                                 emj.append(p)
                                 known.add((p[0], p[1]))
-                        (out / "effect_map.json").write_text(json.dumps(emj))
+                        _written.pop(side_name("effect_map.json"), None)
+                        write_out(side_name("effect_map.json"),
+                                  json.dumps(emj).encode(), "b2_pairs")
                     if c5_mode:
-                        (out / "effect_c5.json").write_text(
+                        write_out(side_name("effect_c5.json"),
                             json.dumps(sorted(c5_tiles)))
                         notes.append(f"# {name}: effect-c5 — {len(c5_tiles)} "
                                      f"bank-1 codes kept NATIVE (art -> group C "
@@ -2426,12 +2515,12 @@ def main():
                     # first table, raw data from there. The pointers themselves
                     # need no rewriting — inside the region they already resolve
                     # to the right address.
-                    head = out / f"fixed_{name}.bin"
-                    head.write_bytes(bytes(blob[:raw_from]))
-                    ops.append({"op": op, "addr": f"{d:#x}", "path": head.name})
+                    head = write_out(side_name(f"fixed_{name}.bin"),
+                                     blob[:raw_from], f"region {name}")
+                    ops.append({"op": op, "addr": f"{d:#x}", "path": head})
                     notes.append(f"{op:9s} {d:#08x} +{raw_from:#x}  donovan "
                                  f"{name} code (from vsav2 0x{r['src']:06X})")
-                    tail = out / f"fixed_{name}_tables.bin"
+                    tail_name = side_name(f"fixed_{name}_tables.bin")
                     # from the SOURCE DATA IMAGE, not from `blob`: blob holds the
                     # region's OPCODE-view (plaintext) content, but an (An)-based
                     # read is a DATA-space read and returns the raw stored bytes
@@ -2440,10 +2529,12 @@ def main():
                     # the copy read like vs2's original, store vs2's raw bytes.
                     # Safe for this span by construction: it is the forced tail,
                     # a dead zone, so no pointer fixups were applied to it.
-                    tail.write_bytes(bytes(src_data_img[r["src"] + raw_from:
-                                                        r["src"] + r["len"]]))
+                    write_out(tail_name,
+                              src_data_img[r["src"] + raw_from:
+                                           r["src"] + r["len"]],
+                              f"region {name} tables")
                     ops.append({"op": "data_file", "addr": f"{d + raw_from:#x}",
-                                "path": tail.name})
+                                "path": tail_name})
                     notes.append(f"data_file {d + raw_from:#08x} "
                                  f"+{len(blob) - raw_from:#x}  donovan {name} "
                                  f"RAW TABLES (unencrypted; vs2 "
@@ -2451,9 +2542,9 @@ def main():
                     fragments.append((d + raw_from, len(blob) - raw_from, "VS2",
                                       f"{name} raw pc-rel data tables"))
                 else:
-                    fixed = out / f"fixed_{name}.bin"
-                    fixed.write_bytes(bytes(blob))
-                    ops.append({"op": op, "addr": f"{d:#x}", "path": fixed.name})
+                    fixed = write_out(side_name(f"fixed_{name}.bin"), blob,
+                                      f"region {name}")
+                    ops.append({"op": op, "addr": f"{d:#x}", "path": fixed})
                     notes.append(f"{op:9s} {d:#08x} +{r['len']:#x}  donovan {name} "
                                  f"(from vsav2 0x{r['src']:06X})")
 
@@ -2483,8 +2574,8 @@ def main():
                 if pa is None:
                     fail.append(f"palette {pname}: no room")
                     continue
-                fn = f"palette_block_{pname}.bin"
-                (out / fn).write_bytes(pblock)
+                fn = write_out(side_name(f"palette_block_{pname}.bin"), pblock,
+                               f"palette {pname}")
                 ops.append({"op": "data_file", "addr": f"{pa:#x}", "path": fn})
                 fragments.append((pa, plen, "VS2", f"{pname} palette block"))
                 # The row FOLLOWS THE TENANT (14z-62c — the manifest used to
@@ -3757,7 +3848,7 @@ def main():
                             fail.append(f"select_wheel {nm}: host/new tile "
                                         f"overlap {sorted(hex(x) for x in both)}")
                             continue
-                        (out / "wheel_bank5.json").write_text(json.dumps(
+                        write_out(side_name("wheel_bank5.json"), json.dumps(
                             {"host": sorted(host_t), "vs2": sorted(new_t)}))
                         notes.append(f"code   {site:#08x} +6     select_wheel "
                                      f"{nm}: drawer bank word #$2000 -> "
@@ -4185,13 +4276,15 @@ def main():
                     fragments.append((rec_dst, len(body), "VS2",
                                       f"select_records {nm}/{side} record"))
             _pairs = sorted([s, d] for s, d in sel_pairs.items())
-            (out / "select_tiles.json").write_text(json.dumps(_pairs))
+            write_out(side_name("select_tiles.json"),
+                      json.dumps(_pairs).encode(), "select_records")
             notes.append(f"# select_records: {len(_pairs)} bank-1 tile placements "
                          f"-> select_tiles.json (only the composed records' art; "
                          f"the slot-0x0F splash/win-quote families are NOT "
                          f"placed, so that Jedah art stays vanilla)")
-            (out / "select_bank5.json").write_text(
-                json.dumps(sorted(sel_bank5)))
+            write_out(side_name("select_bank5.json"),
+                      json.dumps(sorted(sel_bank5)).encode(),
+                      "select_records")
             notes.append(f"# select_records: {len(sel_bank5)} native bank-1 "
                          f"tiles -> select_bank5.json (copied vs2 -> group C "
                          f"bank 5 by build_gfx; the drawer's bank is thunk-"
@@ -4765,7 +4858,7 @@ def main():
             for seg in ovm["segments"]:
                 blob = (ovdir / seg["path"]).read_bytes()
                 assert len(blob) == seg["len"], f"overlay {seg['path']} length"
-                (out / seg["path"]).write_bytes(blob)
+                write_out(seg["path"], blob, "overlay segment")
                 pa = int(seg["at"], 16)
                 ops.append({"op": "data_file", "addr": f"{pa:#x}",
                             "path": seg["path"]})
@@ -4814,7 +4907,7 @@ def main():
                     thunk += bytes.fromhex("4e75")
             ta = alloc("a", len(thunk), "overlay T-select thunks")
             if ta is not None:
-                (out / "overlay_thunks.bin").write_bytes(bytes(thunk))
+                write_out("overlay_thunks.bin", thunk, "overlay thunks")
                 ops.append({"op": "code_file", "addr": f"{ta:#x}",
                             "path": "overlay_thunks.bin"})
                 fragments.append((ta, len(thunk), "GEN",
@@ -4829,13 +4922,22 @@ def main():
                          f"{len(ovm['pokes'])} T-sites thunked "
                          f"({len(pairs_seen)} thunks at {ta:#x})")
 
+        # ── end of the per-tenant body: harvest what the emit block needs ──
+        # `placed` and `man` are rebound on the next iteration, so this
+        # tenant's placements are copied out here. Tenant 0 keeps the bare
+        # region name — placements.json's consumers (verify_gfx_build.py,
+        # verify_pcrel_data.py, audit_region_overlap.py) key by it — and
+        # later tenants are suffixed, because seven region names are shared
+        # across the three tenants (14z-77h) and they are DIFFERENT spans.
+        for _rn in placed:
+            _key = _rn if _ti == 0 else f"{_rn}@{T.get('name', _ti)}"
+            all_placements[_key] = {"dst": placed[_rn],
+                                    "src": man["regions"][_rn]["src"],
+                                    "len": man["regions"][_rn]["len"]}
+
     # ── emit ─────────────────────────────────────────────────────────────────
-    placements = {name: {"dst": placed[name],
-                         "src": man["regions"][name]["src"],
-                         "len": man["regions"][name]["len"]}
-                  for name in placed}
     (out / "placements.json").write_text(json.dumps(
-        {"stage": args.stage, "regions": placements}, indent=1))
+        {"stage": args.stage, "regions": all_placements}, indent=1))
     # ── tenant.json: the id the GFX half must agree with ────────────────────
     # build_gfx_donovan.py and verify_gfx_build.py used to hard-code slot
     # 0x0F ("Jedah's bank"), so they were silently independent of the port's
@@ -4843,15 +4945,25 @@ def main():
     # table row 0x0F. Emitting the tenant here makes one manifest row drive
     # BOTH halves, and lets the gfx verifier assert against the same id the
     # program half used rather than a constant.
+    #
+    # 14z-80: `tenant.json` still describes tenant 0 and is UNCHANGED, so the
+    # four consumers (build_gfx_donovan.py, verify_gfx_build.py,
+    # check_tenant_hud.py, build_donovan.sh) need no edit and every
+    # single-tenant build emits the same bytes. The full array goes to a NEW
+    # `tenants.json`, which is what a multi-tenant gfx half will read — that
+    # half is single-tenant today, by decision.
+    def _tenant_row(tp):
+        return {"name": tp.get("name", "donovan"),
+                "id": _int(tp["dst_slot"]),
+                "mirror_variant": bool(tp.get("mirror_variant", False)),
+                "src_set": tp.get("src_set"),
+                "src_char": _int(tp["src_char"]) if "src_char" in tp else None,
+                "gfx_bank": _int(tp["gfx_bank"]) if "gfx_bank" in tp else 2}
+
     _tp = port.get("port", {})
-    (out / "tenant.json").write_text(json.dumps(
-        {"name": _tp.get("name", "donovan"),
-         "id": _int(_tp["dst_slot"]),
-         "mirror_variant": bool(_tp.get("mirror_variant", False)),
-         "src_set": _tp.get("src_set"),
-         "src_char": _int(_tp["src_char"]) if "src_char" in _tp else None,
-         "gfx_bank": _int(_tp["gfx_bank"]) if "gfx_bank" in _tp else 2},
-        indent=1))
+    (out / "tenant.json").write_text(json.dumps(_tenant_row(_tp), indent=1))
+    (out / "tenants.json").write_text(json.dumps(
+        [_tenant_row(t) for t in _tenant_list], indent=1))
     # ── program-image extension (Phase C step 2) ─────────────────────────────
     # If any op lands beyond the base 4MB image, the patcher must GROW the
     # image and emit the appended ROM members. The generator is what knows the

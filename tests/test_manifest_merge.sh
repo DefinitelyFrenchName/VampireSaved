@@ -55,7 +55,12 @@ FROZEN = [
     ("space",            (3, 3, 3),  3,  3),   # identical in all three
     ("obj_hook",         (2, 2, 2),  2,  2),
     ("select_wheel",     (1, 1, 1),  1,  1),   # one 21-cell wheel per build
-    ("site_thunk",       (20, 10, 4), 28, 3),  # the 3 *_bank_variant_id rows
+    # RE-FROZEN 14z-80: huitzil 10 -> 11 and merged 28 -> 29. This gate had
+    # been RED since 14z-79, which added the (b') index-window thunk to
+    # huitzil.toml — a real, deliberate row, so the count moved for a reason
+    # and the freeze follows it. (The shared count is unchanged: (b') is
+    # OWNED by huitzil, per the 14z-79 decision to keep it on one tenant.)
+    ("site_thunk",       (20, 11, 4), 29, 3),  # the 3 *_bank_variant_id rows
     ("pcrel_escape_fix", (0, 5, 2),  5,  2),   # the H<->P shared-source pair
     ("code_word",        (4, 3, 6),  11, 2),
     ("port_patch",       (21, 55, 14), 87, 3),

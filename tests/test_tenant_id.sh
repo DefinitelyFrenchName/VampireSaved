@@ -27,10 +27,14 @@
 #   5. per-FILE ownership stamping (the loader is what knows a row's owner)
 #   6. row_applies() truth table: both gate keys x both owner kinds
 #   7. row_hex() variant selection, including the fallback
-#   8. the multi-tenant refusal, in BOTH directions. It was asserted by no
-#      test at all before this; the loop slice DELETES it, so a control that
-#      fires today and is flipped then is the honest record of when
-#      multi-tenant builds actually arrived.
+#   8. multi-tenant acceptance: count, DECLARATION ORDER, and port[0].
+#      FLIPPED 14z-80. It was written as "the >1 refusal must fire", by no
+#      test at all before 14z-77, so that flipping it would be the honest
+#      record of when multi-tenant builds actually arrived. main() now
+#      iterates, so it arrived. Order is asserted because the loop pairs
+#      `_tenants[i]` with `_extracts[i]` BY POSITION: a reordering would
+#      build each tenant against another tenant's extraction and still
+#      report success.
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"
@@ -145,23 +149,36 @@ eq("row_hex @variant",         row_hex(ROW, "new_hex", VAR), "1000")
 eq("row_hex @variant no twin", row_hex({"new_hex": "6000"}, "new_hex", VAR),
    "6000")
 
-# 8. the multi-tenant refusal, BOTH directions.
+# 8. MULTI-TENANT IS IMPLEMENTED (14z-80). This control was written in
+#    14z-77 to require the >1 refusal to FIRE, precisely so that flipping it
+#    would be the honest record of when multi-tenant builds arrived. It has
+#    now been flipped: `main()` iterates, so both shapes must be ACCEPTED,
+#    every tenant must survive into `_tenants` in DECLARATION ORDER (the
+#    loop pairs `_tenants[i]` with `_extracts[i]` by position — a reordering
+#    would build each tenant against another's extraction and still
+#    succeed), and `port["port"]` must remain tenant 0 for the sites outside
+#    the loop.
 one = {"tenant": [{"name": "a", "src_set": "vsav2", "src_char": 0x13,
                    "id": 0x0F}]}
 two = {"tenant": [dict(one["tenant"][0]),
                   dict(one["tenant"][0], name="b", id=0x10)]}
 try:
-    normalise_tenants(dict(one))
-    eq("1 tenant accepted", True, True)
+    p1 = normalise_tenants(dict(one))
+    eq("1 tenant: count",   len(p1["_tenants"]), 1)
+    eq("1 tenant: port[0]", p1["port"]["name"],  "a")
 except SystemExit as e:
     bad.append("1 tenant was REFUSED: %s" % e)
 try:
-    normalise_tenants(dict(two))
-    bad.append("2 tenants were ACCEPTED — the refusal is gone, but main() "
-               "does not iterate yet")
+    # WITH a profile: tenant b sits on variant id 0x10, and a variant id
+    # requires one (check 4 above). A merged build is a WIDE build by
+    # construction, so this is the realistic shape rather than a workaround.
+    p2 = normalise_tenants(dict(two), "cps2-wide-v1")
+    eq("2 tenants: count", len(p2["_tenants"]), 2)
+    eq("2 tenants: order", [t["name"] for t in p2["_tenants"]], ["a", "b"])
+    eq("2 tenants: port[0]", p2["port"]["name"], "a")
 except SystemExit as e:
-    if "multi-tenant" not in str(e):
-        bad.append("2 tenants refused for the wrong reason: %s" % e)
+    bad.append("2 tenants were REFUSED — the loop is implemented, so the "
+               "refusal should be gone: %s" % e)
 
 for b in bad:
     print("  FAIL: %s" % b)
@@ -169,7 +186,7 @@ sys.exit(1 if bad else 0)
 PY
 then
     echo "  ok: stamping, row_owner, row_applies, row_hex, and the"
-    echo "      multi-tenant refusal (both directions)"
+    echo "      multi-tenant acceptance (count, order, port[0])"
 else
     fail=1
 fi
