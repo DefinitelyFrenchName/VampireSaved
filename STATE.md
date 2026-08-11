@@ -816,6 +816,72 @@ entries 80-83 and nothing else**:
   cleared by the three clean playtests.
 * `0x03975e` 10 — **no cover needed**; the dispatcher is cold, measured.
 
+### (b') IS FULLY SPECIFIED — bodies, site, and the stack-balanced normal path
+
+**(a) is not available for either live defect.** Full-body twin search over the
+80 in-range handlers:
+
+| entry | vs2 body | in-range twin |
+|---|---|---|
+| 80 | `137c000f00544e75` | entry 15 |
+| 81 | `136b001700544e75` | 45 entries (incl. 79 — Cosmo's fix) |
+| **82** | `137c005200544e75` | **NONE** |
+| **83** | `42290121137c000100544e75` | **NONE** |
+
+The two entries that are actually LIVE are exactly the two with no twin, so any
+(a)-style retarget changes behaviour. (b') it is.
+
+**The danger bodies, verbatim from vs2:**
+
+```
+80: 137c 000f 0054 4e75              move.b #$0F,(0x54,a1) ; rts
+81: 136b 0017 0054 4e75              move.b (0x17,a3),(0x54,a1) ; rts
+82: 137c 0052 0054 4e75              move.b #$52,(0x54,a1) ; rts
+83: 4229 0121 137c 0001 0054 4e75    clr.b (0x121,a1) ; move.b #$01,(0x54,a1) ; rts
+```
+
+**The normal path, stack-balanced, no register liveness assumption needed.**
+This was the blocker — the thunk sits in hole_a so the vanilla
+`(d8,PC,D0.w)` read is out of range (needs d = -0xA7B9A vs +/-127) and an
+address register is required. Borrow A0 and give it back:
+
+```
+    move.l  a0,-(sp)          ; [S-4] = a0_old
+    lea     0x018468,a0       ; the table base, absolutely
+    move.w  (0,a0,d0.w),d1    ; d1 = offset — EXACTLY vanilla's semantics
+    lea     (0,a0,d1.w),a0    ; a0 = target
+    move.l  a0,-(sp)          ; [S-8] = target
+    movea.l (4,sp),a0         ; a0 = a0_old   (restored)
+    move.l  (sp)+,(sp)        ; pop target over the a0_old slot
+    rts                       ; -> target, sp back to S
+```
+
+Traced: entry sp = S (we arrive by `jmp`, so nothing is pushed for us). After
+the two pushes sp = S-8. `movea.l (4,sp),a0` restores from [S-4]. The
+`move.l (sp)+,(sp)` idiom reads [S-8] and writes it to the POST-increment (sp)
+= [S-4]; `rts` then pops it, leaving sp = S. **A0 restored, D1 holds the offset
+as vanilla leaves it, stack balanced.**
+
+The one subtlety to verify on the real core: `move.l (a7)+,(a7)` (`0x2E9F`)
+relies on the source EA being evaluated — and a7 incremented — before the
+destination EA. That is 68000 behaviour, but it is the kind of detail worth
+confirming against the emulator rather than trusting, since getting it wrong
+leaks 4 bytes per dispatch and only shows up as a slow stack overflow.
+
+**Site:** `jmp thunk` (`4ef9`+addr, 6 bytes) over `0x018460-0x018465`, leaving
+`0x018466-67` orphaned and unexecuted. `patch = "jmp"`.
+
+**NOT ENCODED THIS SESSION — and the reason is a quality signal, not a
+schedule one.** Three static analyses in the last hour were wrong: the A0
+liveness scan decoded displacement words as opcodes (this repo's own
+operand-pair gotcha), the first handler match compared table OFFSETS between
+ROMs whose layouts differ, and the risky-table print hex-parsed a decimal int.
+Each was caught, but the rate is the signal. Hand-written 68k whose failure
+mode is a silent stack leak is the worst possible thing to write while that
+rate is elevated. Encode it fresh, then: build, Plasma Trap rig (crash gone),
+Reflect Wall rig (entry 83 reaches the right routine), four fingerprints,
+legacy suite.
+
 ### (b') DESIGN, MAINTAINER-APPROVED FOR THE FULL WINDOW — not yet written
 
 Maintainer approved (b') covering entries 80-83. Design is settled; the
