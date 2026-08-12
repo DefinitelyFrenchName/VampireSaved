@@ -124,11 +124,17 @@ done
 # The load-bearing question. A loop that ran once would produce Donovan's
 # 243 ops here; a loop that ran twice against tenant 0's data would produce
 # 243 twice over. The counts are frozen, and so is the DEDUP they imply:
-# 243 + 259 = 502 declared, 436 emitted. The gap is four things and all of
+# 243 + 259 = 502 declared, 442 emitted. The gap is four things and all of
 # them are checked below: rows recognised as SHARED and emitted once (the
 # iteration gate), tripwire ops no longer needed because the engine union
 # resolves Huitzil's handlers (4b), agreeing duplicate ops dropped (4c), and
 # N per-tenant thunks folded into one N-way chain (4d). Same for three.
+# 14z-81c NOTE: these counts moved to 442/596 for a few hours while the
+# multi-owner obj_hook stub fix was in (three owner-dispatch stubs + three
+# fallback tripwires), then moved BACK when the stub design was WITHDRAWN
+# the same day — two measured timing failure modes; see OBJ_HOOK_OWNER_READ
+# in gen_donovan_patch.py and STATE 14z-81c. The multi-resolver DETECTION
+# and its FIRST-WINS notes remain (zero ops — notes only).
 echo "== 2: N tenants — the loop iterates and shared rows emit once =="
 gen2 "$WORK/two"
 gen3 "$WORK/three"

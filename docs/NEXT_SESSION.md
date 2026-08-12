@@ -15,12 +15,24 @@
 > Donovan's planted tripwire ADDRESS as a data base (hence vec3, not the
 > tripwire's own ILLEGAL).
 >
-> **FIRST PRIORITY: implement the fix** — an owner-id dispatch chain per
-> multi-owner obj_hook type (the ratified 14z-80h chain form; owner
-> linkage `(+0x30,A6) -> (0x382,player)` measured in the crash dump; tail
-> = tripwire; inert at N=1 by construction). Full design + open questions:
-> STATE 14z-81b. Regression gate already in place:
-> `tests/audit_merged_vec3.sh` (~4 min) flips green when fixed.
+> **A STUB FIX WAS IMPLEMENTED, MEASURED GREEN FOR HUITZIL, AND WITHDRAWN
+> the same day (14z-81c)** — dispatch-time owner reads have two MEASURED
+> timing failure modes (stale/recycled parent chains broke donovan/12;
+> spawn-instant field transience is the 115 census), and two
+> counterexamples from six replays means the space is not enumerated.
+> The merged instrument is back to bit-identical pre-fix bytes
+> (7a9eabb3, verified). All machinery was kept: the detection + 19
+> FIRST-WINS notes (zero image bytes), the hand-verified stub builder,
+> the census rig, GUARD_PROBE_TRACE.
+>
+> **FIRST PRIORITY: the spawn-time TAG design** — each tenant's own copy
+> stamps its spawns, so a tag byte (or per-tenant TYPE NUMBERS rewritten
+> in the copies' stamp immediates) makes dispatch timing-proof with NO
+> runtime owner read. Measure first: the full stamp-site census (x088512
+> immediates cover only 116/117/119 — where do 114/115/118/120 get
+> stamped?) and a type-COMPARISON census inside the family regions.
+> `tests/audit_merged_vec3.sh` (~4 min) is the unchanged regression gate;
+> it FAILS by design until the real fix lands.
 
 ## The state in one paragraph
 
@@ -48,38 +60,43 @@ ADDRESS consumed as a data base. (Note the 0xC0114+0xB8AC decomposition in
 the first-pass chase was a red herring — the literal is the tripwire
 address directly.)
 
-The premises were measured 14z-81b BEFORE authoring 68k (the 14z-78 rule),
-and one failed — which is why no stub shipped that day. What is already
-settled (all in STATE 14z-81b, all rerunnable):
+THE DESIGN QUESTION IS SETTLED BY MEASUREMENT (14z-81c): the owner-walk
+stub family — design (a) — was implemented and WITHDRAWN; dispatch-time
+owner reads are structurally fragile at spawn instants (full record in
+STATE 14z-81c; the withdrawn code and its measured owner-read rows live
+in `OBJ_HOOK_OWNER_READ`'s comment in gen_donovan_patch.py, and the
+hand-verified `owner_dispatch_stub()` builder is kept for reuse).
 
-- Multi-owner set = types **114-120** (site 0x5E542; site 0x54470
-  partitions cleanly, needs nothing).
-- Walker register contract MEASURED (vanilla 0x5E52A-54 disassembled):
-  A1/D1 clobber-safe, no pushes needed; handler entry contract is
-  A0=handler, D0=0, CCR=moveq's Z — reproduce per exit with
-  `moveq #0,d0; movea.l #handler,a0; jmp (a0)`.
-- Owner linkage at `+0x30`: WORKS for 117 (P1 direct) and 119 (creator →
-  player, depth 2); **FAILS for 115** — reads 0x00 at dispatch time while
-  the same frame's dump shows 0x84 in the same slot (field AND type byte
-  are time-varying within a frame). 114/116/118/120 NOT OBSERVED — no
-  verdict. Census rig: `tests/audit_objhook_owner_census.sh` (~6 min).
+**The spawn-time TAG design is what remains, and it starts with two
+censuses:**
 
-DECIDE THE DESIGN FIRST (options in STATE 14z-81b): (a) the owner-walk
-stub — viable for 117/119, needs the 115-family timing answered; or
-(b) the spawn-time tenant TAG — each tenant's own copy stamps its spawns,
-so a tag byte in a known-free object field makes the dispatch one
-`cmpi.b`, no walks, no time-variance; costs a free-field census + a
-stamp-site census inside x088512 (the reconciler's notes already list the
-copies' write sites). (b) looks structurally cleaner; measure its two
-censuses before committing to it.
+1. **Stamp sites** — where does each of types 114-120 get its type byte
+   written? x088512's `move.l #$01xxTTxx,(A4)` immediates cover
+   116 (+0x20b0), 117 (+0x27ce), 119 (+0x1dc4, +0x2138) only;
+   114/115/118/120 are stamped elsewhere (x06cac0?) or computed. The
+   pattern-scan that found these is in the 14z-81b session record; run
+   it over the other family regions, and cross-check dynamically (tap
+   writes of the type byte on hui29 — FBNEO_HTAP on a live object's +0x02
+   or a GUARD watch).
+2. **Type comparisons** — code inside the family regions that compares
+   type bytes (`cmpi.b #type` / sibling-type checks). Renumbering or
+   tagging must not break them; vanilla engine code cannot reference
+   types ≥114 (vsavj's table ends at 113), so the exposure is bounded to
+   the ported regions themselves.
 
-Then: emit in `engine_here()`'s obj_hook union for types resolved by >1
-tenant's view; inert at N=1 by construction — assert all four frozen
-fingerprints bit-exact FIRST, then `tests/audit_merged_vec3.sh` flips
-green, then re-run `tests/audit_merged_legacy.sh` in full (~45 min).
-The `resolve_ported()` docstring ("the copies are byte-equal clones …
-one address has to win", gen_donovan_patch.py:1035) is the WRONG PREMISE
-that produced this bug — fix it in the same commit.
+Then pick the variant: a tag byte in a known-free object field (needs a
+free-field census; dispatch = one `cmpi.b (off,A6)`), or per-tenant TYPE
+NUMBERS via blob transform of the stamp immediates + per-tenant table
+entries (no dispatch code at all; table grows; obj_hook_extra is the
+blessed facility for exactly this — see its comment at
+gen_donovan_patch.py's authored-union block).
+
+Inertness argument stays the same: nothing emits at N=1; assert all four
+frozen fingerprints FIRST, then `tests/audit_merged_vec3.sh` flips green,
+then the full `tests/audit_merged_legacy.sh` (~45 min) — and this time
+also re-run `donovan/12_vs_cpu` specifically: it is the replay that
+caught the withdrawn design, and any new dispatch layer must keep it
+guard-clean.
 
 ## Then, in order
 

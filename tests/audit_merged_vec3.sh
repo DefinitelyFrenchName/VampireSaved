@@ -27,10 +27,16 @@
 # The route is the defect: object TYPE 117's handler lives in x088512,
 # which ALL tenants port, so the merged obj_hook union's ONE extended-table
 # entry can only point at one tenant's internally tenant-reconciled copy.
-# Fix: an owner-id dispatch chain per MULTI-OWNER type
-# ((+0x30,A6) -> player struct -> (0x382) id — linkage measured in the
-# crash dump), inert at N=1 by construction. This audit flips green when
-# the merged satellite reads its base from anim@huitzil and survives.
+#
+# FIX STATUS (14z-81c): the owner-id dispatch STUB design was implemented,
+# turned this audit GREEN (A0=0x425FFC, crash-free), and was WITHDRAWN the
+# same day — dispatch-time owner reads have two measured timing failure
+# modes (STATE 14z-81c; donovan/12 regressed on a stale parent chain). The
+# standing fix design is SPAWN-TIME TENANT TAGGING (docs/NEXT_SESSION.md).
+# This audit flips green when the merged satellite reads its base from
+# anim@huitzil and survives — whatever mechanism delivers that — and it
+# must be paired with donovan/12_vs_cpu staying guard-clean, the replay
+# that caught the withdrawn design.
 #
 # Usage: ROMDIR=... [MAME_BIN=...] tests/audit_merged_vec3.sh [merged_build]
 # Default merged build: build/merged1 (rebuild it with
@@ -91,6 +97,10 @@ CRASH="$(grep -m1 '^CRASH' "$W/new.log" || true)"
 [ -n "$M" ] || { echo "FAIL: rig dead on $MERGED — no PROBE at 2886"; exit 1; }
 echo "  measured A0=0x$M (healthy would be 0x$EXP); ${CRASH:-no crash}"
 
+# numeric compare — the probe prints A0 zero-padded to 8 digits, the
+# placements-derived expectation does not, and the FIRST live PASS of this
+# gate (14z-81b, the fix build) was mis-verdicted by that string mismatch
+M="$(printf '%d' "0x$M")"; EXP="$(printf '%d' "0x$EXP")"
 if [ "$M" = "$EXP" ] && [ -z "$CRASH" ]; then
     echo "PASS: the merged satellite reads its anim base from anim@huitzil"
     echo "      and the run is crash-free — the 14z-81 defect is FIXED;"

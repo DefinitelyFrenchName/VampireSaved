@@ -509,6 +509,113 @@ def merge_table_fix(a, b, ctx=None):
 _SINGLETON_MERGE = {"init_shim": merge_init_shim, "table_fix": merge_table_fix}
 
 
+# ── 14z-81b: multi-owner obj_hook dispatch ───────────────────────────────────
+# A type resolved by MORE THAN ONE tenant's view cannot dispatch through one
+# table entry: the copies are internally tenant-reconciled (per-tenant anim
+# literals; cross-tenant pointers are planted tripwires), so tenant B running
+# tenant A's copy consumes A's tripwire addresses as DATA — the merged
+# Huitzil vec3 crash (STATE 14z-81b). Such an entry points at a generated
+# owner-id dispatch instead. The OWNER-READ per (site, type) is MEASURED,
+# never assumed (tests/audit_objhook_owner_census.sh + the 14z-81b tick
+# trace, which is where each shape below comes from):
+#   d30 — the object's +0x30 word IS the owning player struct (type 117:
+#         measured P1 across 2,752 dispatches)
+#   h30 — +0x30 is the CREATOR OBJECT; ITS +0x30 is the player (type 119)
+#   d32 — the player lives at +0x32 (type 115: its own handler's first
+#         instruction is `movea.w ($32,A6),A4`, and its +0x30 reads ZERO at
+#         dispatch time — the measured reason d30 cannot serve it)
+# WITHDRAWN 14z-81c, THE SAME DAY IT SHIPPED — the map below is EMPTY on
+# purpose. The stub design was implemented, measured green for Huitzil
+# (both former crashers guard-clean), and then TWO failure modes of
+# dispatch-time owner reads were measured in the same battery:
+#   1. STALE/RECYCLED PARENT CHAINS — donovan/12_vs_cpu, f2886: a type-119
+#      object's creator hop walked to P2 through a recycled slot and the
+#      stub tripwired an object that first-wins had served correctly.
+#   2. TRANSIENT IDS AT SPAWN INSTANTS — (0x382,P2) legitimately holds the
+#      CPU's REAL pick (0x06) on vs-CPU rigs, and +0x30/+0x32/type bytes
+#      are re-written WITHIN the spawn frame (the type-115 census).
+# Two counterexamples from six replays means the failure space is not
+# enumerated; a mis-dispatch is SILENT-WRONG, which is worse than the
+# known loud crash. The robust design is spawn-time tenant tagging (each
+# tenant's own copy stamps its spawns — no runtime owner read at all);
+# design + censuses in STATE 14z-81b/c. The measured rows, kept for that
+# session (they are real measurements of the healthy single-tenant paths):
+#   (0x05E542, 115): "d32"   (0x05E542, 117): "d30"   (0x05E542, 119): "h30"
+OBJ_HOOK_OWNER_READ = {}
+
+
+def owner_dispatch_stub(shape, tenants, tripwire):
+    """68k bytes for one MULTI-OWNER obj_hook table entry.
+
+    `tenants` = [(char_id, handler_addr)] in declaration order; `tripwire` =
+    the planted-ILLEGAL address for every path that cannot NAME its owner
+    (walk dead-ends, and a player id no tenant claims).
+
+    Entry contract, MEASURED from the vanilla walker 0x5E52A-54 (14z-81b):
+    A6 = object, D0 = 0, A1/D1 are not read by the walker or defined for
+    handlers (clobber-safe, no saves needed — so no stack writes, no ghost
+    bytes). Every exit re-establishes the vanilla handler entry state
+    exactly: A0 = the handler's own address, D0 = 0, CCR = moveq's Z
+    (movea does not touch CCR; `jmp (a0)` enters the handler as the vanilla
+    `jsr (A0)` would have).
+
+    Player compares use the SIGN-EXTENDED forms ($FFFF8400/$FFFF8800):
+    the owner words are loaded with `movea.w`, unlike the init shim's
+    absolute `cmpa.l #$FF8400,A6` — both measured in live registers.
+    """
+    out = bytearray()
+    fix = []                       # (offset of displacement byte, label)
+    labels = {}
+
+    def _beq(lbl):
+        out.extend(b"\x67\x00")
+        fix.append((len(out) - 1, lbl))
+
+    def _bne(lbl):
+        out.extend(b"\x66\x00")
+        fix.append((len(out) - 1, lbl))
+
+    CMP_P1 = bytes.fromhex("b3fcffff8400")     # cmpa.l #$ffff8400,a1
+    CMP_P2 = bytes.fromhex("b3fcffff8800")
+    if shape == "d30":
+        out += bytes.fromhex("326e0030")       # movea.w (0x30,a6),a1
+    elif shape == "d32":
+        out += bytes.fromhex("326e0032")       # movea.w (0x32,a6),a1
+    elif shape == "h30":
+        out += bytes.fromhex("326e0030")       # movea.w (0x30,a6),a1
+        out += bytes.fromhex("2209")           # move.l a1,d1
+        out += bytes.fromhex("08010000")       # btst #0,d1
+        _bne("tw")                             # odd word: not a pointer
+        out += bytes.fromhex("b2fc0000")       # cmpa.w #0,a1
+        _beq("tw")                             # unlinked: cannot hop
+        out += bytes.fromhex("32690030")       # movea.w (0x30,a1),a1
+    else:
+        raise ValueError(f"unknown owner-read shape {shape!r}")
+    out += CMP_P1
+    _beq("got")
+    out += CMP_P2
+    _beq("got")
+    labels["tw"] = len(out)
+    out += b"\x4e\xf9" + tripwire.to_bytes(4, "big")   # jmp tripwire
+    labels["got"] = len(out)
+    for i, (cid, _h) in enumerate(tenants):
+        out += bytes.fromhex("0c29")           # cmpi.b #id,(0x382,a1)
+        out += bytes([0x00, cid & 0xFF])
+        out += bytes.fromhex("0382")
+        _beq("t%d" % i)
+    out += b"\x4e\xf9" + tripwire.to_bytes(4, "big")   # player, unclaimed id
+    for i, (_cid, h) in enumerate(tenants):
+        labels["t%d" % i] = len(out)
+        out += bytes.fromhex("7000")                   # moveq #0,d0
+        out += b"\x20\x7c" + h.to_bytes(4, "big")      # movea.l #handler,a0
+        out += bytes.fromhex("4ed0")                   # jmp (a0)
+    for off, lbl in fix:
+        disp = labels[lbl] - (off + 1)                 # base = opcode + 2
+        assert 0 < disp < 0x80, (lbl, disp)
+        out[off] = disp
+    return bytes(out)
+
+
 def flavor_write(default, held, flav_d, hold_flag, mid=b""):
     """The VS2/VH2 flavor write for ONE tenant: 40 bytes (+ `mid`), CCR-only.
 
@@ -1058,6 +1165,24 @@ def main():
                         and nm in v["placed"]):
                     return v["placed"][nm] + (tgt - r["src"]), v["name"]
         return None, None
+
+    def resolve_ported_all(tgt):
+        """EVERY tenant's resolution of a SOURCE target — [(addr, name)].
+
+        `resolve_ported()` returns the first; the obj_hook union needs ALL,
+        because a type resolved by more than one tenant's view is
+        MULTI-OWNER and must dispatch on the object's OWNER (14z-81b) —
+        first-wins there is the merged Huitzil vec3 crash.
+        """
+        out = []
+        for v in tenant_views:
+            for nm, r in v["regions"].items():
+                if (r["len"] > 0 and r["src"] <= tgt < r["src"] + r["len"]
+                        and nm in v["placed"]):
+                    out.append((v["placed"][nm] + (tgt - r["src"]),
+                                v["name"]))
+                    break
+        return out
 
     def resolve_recon(tgt):
         """A verified reconciliation row for `tgt` from ANY tenant's map.
@@ -2950,9 +3075,73 @@ def main():
                 # UNION over every tenant (14z-80f), not this iteration's
                 # regions: types 64-75 are Huitzil's, 59-63 Donovan's, and
                 # ONE table has to carry them all.
-                newt, _by = resolve_ported(tgt)
+                res = resolve_ported_all(tgt)
                 m = resolve_recon(tgt)
-                if newt is not None:
+                if len({a for a, _ in res}) > 1:
+                    # 14z-81b: MULTI-RESOLVER type — more than one tenant's
+                    # view places its handler. With a MEASURED owner-read
+                    # (OBJ_HOOK_OWNER_READ) the entry dispatches on the
+                    # object's owner; without one it stays FIRST-WINS with a
+                    # loud note, because a tripwire here would break types
+                    # that are multi-resolver only through region CO-PORTING
+                    # (site 0x54470's 64-75: Huitzil's twelve, whose handler
+                    # regions Pyron also ports — measured 14z-81b when the
+                    # first cut of this branch tripwired all of them).
+                    # FIRST-WINS ON AN UNMEASURED TYPE IS DECLARATION-ORDER
+                    # LUCK, not correctness — the note names each one so the
+                    # census rig can retire it into a stub.
+                    shape = OBJ_HOOK_OWNER_READ.get((site, k))
+                    ids = {t.get("name"): _int(t["dst_slot"])
+                           for t in (port.get("_tenants") or [])}
+                    newt = None
+                    if shape is None:
+                        newt = res[0][0]
+                        notes.append(
+                            f"#   obj_hook@{site:#x} type {k} MULTI-RESOLVER "
+                            f"({', '.join(n for _, n in res)}) with no "
+                            f"measured owner-read -> FIRST-WINS "
+                            f"({res[0][1]} {res[0][0]:#x}); order-dependent "
+                            f"— measure it "
+                            f"(tests/audit_objhook_owner_census.sh) and "
+                            f"extend OBJ_HOOK_OWNER_READ")
+                    else:
+                        tw = tripwire_for(tgt, f"obj_hook@{site:#x} type {k} "
+                                               f"owner-dispatch fallback") \
+                            if args.tripwire_open else None
+                        tens = [(ids[n], a) for a, n in res if n in ids]
+                        if tw is None:
+                            fail.append(f"obj_hook@{site:#x}: type {k}'s "
+                                        f"owner-dispatch needs a tripwire "
+                                        f"for its unknown-owner paths — "
+                                        f"build with --tripwire-open")
+                            newt = 0
+                        elif len(tens) != len(res):
+                            fail.append(f"obj_hook@{site:#x} type {k}: a "
+                                        f"resolving view has no tenant id "
+                                        f"({[n for _, n in res]} vs "
+                                        f"{sorted(ids)})")
+                            newt = 0
+                        else:
+                            stub = owner_dispatch_stub(shape, tens, tw)
+                            sd = alloc("a", len(stub),
+                                       f"objhook owner stub type {k}")
+                            if sd is None:
+                                newt = 0
+                            else:
+                                ops.append({"op": "code", "addr": f"{sd:#x}",
+                                            "hex": stub.hex()})
+                                notes.append(
+                                    f"code   {sd:#08x} obj_hook type {k} "
+                                    f"OWNER-DISPATCH ({shape}; "
+                                    + ", ".join(f"{n} {a:#x}" for a, n in res)
+                                    + f"; unknown owner -> tripwire {tw:#x})")
+                                fragments.append((sd, len(stub), "GEN",
+                                                  f"obj_hook owner stub "
+                                                  f"type {k}"))
+                                newt = sd
+                    ported += 1
+                elif res:
+                    newt = res[0][0]
                     ported += 1
                 elif m:
                     newt = _int(m["vsavj"])

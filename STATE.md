@@ -22,7 +22,11 @@ Donovan value was NAMED the same day (see the 14z-81b addendum below):
 the merged obj_hook union's ONE entry for a MULTI-OWNER type routes every
 tenant into tenant-0's internally tenant-reconciled x088512 copy.
 `tests/audit_merged_vec3.sh` is the rerunnable probe and the regression
-gate for the fix. **Pyron crashes under
+gate for the fix. **A fix was then IMPLEMENTED, MEASURED GREEN FOR
+HUITZIL, AND WITHDRAWN the same day (14z-81c below): dispatch-time owner
+reads have two measured timing failure modes, so the merged image is back
+to bit-identical pre-fix bytes (fingerprint verified) and the robust
+spawn-time-tag design is specified for the next session.** **Pyron crashes under
 the mash storm** (deterministic vec3 at f7997; evidence kept in
 `build/gate_failures/`). Donovan is guard-clean; his divergences vs m3a are
 UNATTRIBUTED but shaped like cached placed pointers. F2 — the merged
@@ -273,6 +277,76 @@ with 14z-78's code-runs-from-wide_ext finding).
 | Donovan | 12_vs_cpu, 20_round2 | guard-clean; vs m3a: 20 TRANSIENT (890..3667, then 8453 identical incl. round 2), 12 PERMANENT (890..end, 722 interleaved runs). UNATTRIBUTED; the shape fits cached placed pointers (placements differ between the builds by construction), but that is a hypothesis, not an attribution |
 | Huitzil | 70_mash, 83_fx | **CRASH, both, deterministic** — vec3 at char-init (MAME f2886/2887, 4/4 runs incl. the probe audit), pushed PC 015098, odd A0=000c6df9 |
 | Pyron | 70_mash, 72_cosmo_2p | **70 CRASHES at f7997** (vec3, PC 01ab10, odd RAM ptr $FF31B5, A3=0x49bb8a in his own wide_ext; identical REGS on re-run — deterministic; evidence in `build/gate_failures/merged1_b_70_pyron_mash.log`). 72 (the only rig that fires Cosmo) guard-clean, PERMANENT divergence from f890 as expected |
+
+### 14z-81c — THE STUB FIX: implemented, measured green for Huitzil,
+### and WITHDRAWN the same day on two measured failure modes
+
+The maintainer ruled "fix the vec3 slot first"; this is the honest record
+of the first attempt. Every premise was measured before authoring
+(walker register contract from the vanilla disassembly; per-type
+owner-reads from the census + a full 115-tick trace via the new
+`GUARD_PROBE_TRACE`), the owner-dispatch stubs were emitted for the three
+MEASURED types (115=d32, 117=d30, 119=hop-via-+0x30), and the results
+were real:
+
+- **N=1 inert**: all four frozen fingerprints bit-exact with the stub
+  code in the generator (no type is multi-resolver with one tenant).
+- **Huitzil FIXED**: `audit_merged_vec3.sh` GREEN — the merged satellite
+  read `A0=0x425FFC` (= anim@huitzil+0xB8AC, the healthy value) and ran
+  crash-free; both former crashers (70_mash, 83_fx) guard-clean in the
+  full battery. (The gate's FIRST live PASS caught the gate's own
+  verdict bug — a zero-padding string compare — which could not be
+  ground-truthed until a fixed build existed. Fixed to numeric.)
+- **Legacy untouched**: leg (a) 13/14 VERBATIM, byte-for-byte the same
+  table — the stubs never execute on legacy content.
+
+**And then the same battery measured two failure modes of ANY
+dispatch-time owner read:**
+
+1. **Stale/recycled parent chains** — `donovan/12_vs_cpu` REGRESSED
+   (guard-clean before, tripwire after): a type-119 object's creator hop
+   walked through a recycled slot to P2, and `(0x382,P2)` was `0x06` —
+   which is not transient at all but the CPU's REAL pick (the forced-pick
+   pokes hold only through select; the loaded struct carries the true
+   character). First-wins had served that object correctly.
+2. **Spawn-instant transience** — the type-115 census: +0x30 reads zero
+   at dispatch while the same frame's dump shows the owner; the type
+   byte itself morphs 115→117 within the frame.
+
+Two counterexamples from six replays means the failure space is not
+enumerated, and a mis-dispatch is SILENT-WRONG — worse than the known
+loud crash on an unshippable instrument build. Per the 14z-78 precedent
+the emission was WITHDRAWN: `OBJ_HOOK_OWNER_READ = {}` (the measured rows
+kept in its comment), and the rebuilt merged image is **bit-identical to
+the pre-fix instrument — fingerprint 7a9eabb3 verified**, which is the
+revert's own regression proof.
+
+**KEPT (all zero image bytes or N=1-inert):** the multi-resolver
+detection with FIRST-WINS notes — 19 notes in a merged fragment, naming
+every order-dependent entry including site 0x54470's types 64-75, whose
+correctness today is DECLARATION-ORDER LUCK (huitzil declares before
+pyron; the first cut of the branch tripwired them and taught the
+multi-resolver ≠ multi-owner distinction); `resolve_ported_all()`; the
+stub builder (`owner_dispatch_stub`, correct 68k, hand-verified and
+battle-tested — reusable); `GUARD_PROBE_TRACE`; the census rig; and the
+vec3 gate's numeric-compare fix.
+
+**THE ROBUST DESIGN (next session): spawn-time tenant tagging.** Each
+tenant's OWN copy stamps its spawns, so a tag written at spawn — or
+per-tenant TYPE NUMBERS rewritten in the copies' stamp immediates — makes
+dispatch timing-proof with NO runtime owner read. Census so far: x088512
+carries `move.l #$01xxTTxx,(A4)` stamp immediates for types 116/117/119
+(offsets +0x20b0/+0x27ce/+0x1dc4,+0x2138); types 114/115/118/120 are
+stamped elsewhere or computed — that census, plus a type-COMPARISON
+census inside the family regions, is the next session's first
+measurement. Also measured today and relevant: Donovan's own content
+uses the 117/119 family (his objects dispatched them in a
+Donovan-vs-CPU match), so ALL THREE tenants stamp.
+
+**Unchanged by all of this:** Pyron's f7997 crash (byte-identical
+registers pre- and post-fix — fully independent, still open) and the 04
+flicker at 2005 (deterministic, held un-ratified per the maintainer's
+ruling).
 
 ### 14z-81b addendum — THE VEC3 SLOT IS NAMED (same day, after the
 ### maintainer's rulings): a MULTI-OWNER obj_hook type has ONE table entry

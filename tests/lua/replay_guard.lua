@@ -289,6 +289,12 @@ local PROBE_MAX = tonumber(os.getenv("GUARD_PROBE_MAX") or "") or 400
 -- pointer as a "RAM-stub caller". History names the real instruction stream
 -- into the probe site.
 local PROBE_HIST = tonumber(os.getenv("GUARD_PROBE_HIST") or "") or 0
+-- GUARD_PROBE_TRACE=<path> (14z-81b): start a full instruction trace at the
+-- FIRST probe hit and stop it at the SECOND. `history` shows the stream INTO
+-- a site; this captures the stream OUT of it — a handler's complete tick is
+-- everything between two consecutive dispatches. The trace file is large
+-- (one frame ≈ a few MB of text); this is a diagnosis rig, never a gate.
+local PROBE_TRACE = os.getenv("GUARD_PROBE_TRACE") or ""
 if debugger and probe_addr then
     if probe_cond and #probe_cond > 0 then
         debugger:command(string.format("bpset 0x%x,%s", probe_addr, probe_cond))
@@ -328,6 +334,16 @@ if debugger then
                     local n = #cl
                     for i = math.max(1, n - PROBE_HIST), n do
                         f:write("HIST " .. tostring(cl[i]) .. "\n")
+                    end
+                end
+                if PROBE_TRACE ~= "" then
+                    if probe_hits == 0 then
+                        debugger:command(string.format("trace %s,maincpu",
+                                                       PROBE_TRACE))
+                        f:write("TRACE-START\n")
+                    elseif probe_hits == 1 then
+                        debugger:command("trace off,maincpu")
+                        f:write("TRACE-STOP\n")
                     end
                 end
                 probe_hits = probe_hits + 1

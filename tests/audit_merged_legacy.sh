@@ -165,6 +165,9 @@ python3 tools/gen_donovan_patch.py "$D_EX" "$OUT/patch" \
 grep -q '^GENERATION OK' "$OUT/gen.log" || {
     echo "  FAIL: no GENERATION OK"; tail -15 "$OUT/gen.log"; exit 1; }
 NOPS="$(python3 -c "import json;print(len(json.load(open('$OUT/patch/patch.json'))['ops']))")"
+# 590: matches test_tenant_loop.sh's frozen 3-tenant count (which is
+# re-frozen FIRST whenever the merge legitimately changes). It was 596 for
+# a few hours 14z-81c while the withdrawn stub fix was in.
 if [ "$NOPS" = 590 ]; then
     echo "  ok: 590 ops (the frozen test_tenant_loop fixture — same merge)"
 else

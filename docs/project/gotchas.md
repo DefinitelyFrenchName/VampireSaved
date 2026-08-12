@@ -1782,3 +1782,37 @@ mechanism written into a script's output becomes "the finding" the moment
 someone reads a failure without re-measuring. Pre-arm attributions in
 comments and headers as PREDICTIONS; make the printed verdict carry only
 what was measured, or point at the probe that measures it.
+
+## Dispatch-time owner reads are transient at spawn instants — two measured counterexamples (14z-81c)
+
+The withdrawn multi-owner obj_hook stub design read the dispatching
+object's owner at runtime (+0x30/+0x32 walks to a player struct, then
+`(0x382)` for the id). Six replays produced two distinct failure modes:
+a type-119 creator hop walked through a RECYCLED slot to the wrong player
+(donovan/12, a regression on a replay first-wins served correctly), and
+the type-115 census showed +0x30 AND the type byte itself rewritten
+WITHIN the spawn frame. Owner facts measured on healthy steady-state
+ticks do not hold at the spawn instants where this family dispatches —
+and spawn instants are exactly when a per-tenant machine needs routing.
+Route on facts baked at BUILD time (spawn-time tags, per-tenant type
+numbers), not on runtime state near a spawn.
+
+## Forced-pick pokes hold through SELECT only — a vs-CPU P2 carries the CPU's REAL pick at match time (14z-81c)
+
+`(0x382,$FF8800)` read 0x06 (the CPU's actual character) at f2886 on
+`12_donovan_vs_cpu` despite the rig poking `$FF8B82 = 0x13` at frames
+1400-1500 — the pokes force the SELECT commit, and the loaded struct is
+rebuilt from the real pick. On 2P replays both structs hold the poked id
+(test_shim_charid measured exactly that), which makes it easy to assume
+the same on vs-CPU rigs. Any check of the form "(0x382,P2) == my tenant"
+is rig-dependent: true on 2P forced-pick replays, false on vs-CPU ones.
+
+## A gate's PASS path is untested until something real passes — treat the first live PASS as a verdict-control moment (14z-81c)
+
+`audit_merged_vec3.sh` was ground-truthed on its FAIL path at birth (the
+defect existed) and mis-verdicted its first real PASS on a zero-padding
+string compare ("00425ffc" != "425ffc" — the probe pads, the expectation
+does not). "The verdict logic is itself tested" (CLAUDE.md §4) cuts both
+ways: a gate born against a live defect has never exercised PASS, so its
+first green is not routine — read the printed values, not just the
+verdict word.
