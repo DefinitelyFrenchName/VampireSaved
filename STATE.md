@@ -328,7 +328,9 @@ first, then the 14z-69 sections below.)
 ## Session 14z-82d — the playtest reports, measured
 
 Maintainer playtests of the two new freezes (both: NO crashes — the fix's
-primary claim confirmed by hand).
+primary claim confirmed by hand). **CLOSING VERDICT (maintainer, same
+day): "all 3 characters seem identical to their previous build"** — the
+playtest sign-off on the 14z-82c re-freezes.
 
 ### hui30: "air 214+MK has sfx now (only MK)" — RESOLVED: it is the
 ### 14z-79 (b') fix being HEARD, not a hui30 delta
@@ -347,10 +349,16 @@ replays can be sound-tapped at all):
    and is identical on hui30.
 4. The explanation that fits "only the MK version": the (b') crash's
    reproducing input WAS medium kick (14z-78/79) — pre-hui29 the MK
-   detonation killed the machine BEFORE its sfx ever played, LK/HK
-   completed. The maintainer's ear-baseline for MK was the crash.
-   Optional follow-up if wanted: native-vs2 comparison of the detonation
-   id (the native leg + a 214MK rig) to confirm 0x049A is vs2-faithful.
+   detonation killed the machine BEFORE its sfx ever played. The
+   maintainer's ear-baseline for MK was the crash.
+   COMPLETED BY THE MAINTAINER (same day, completeness note, explicitly
+   NOT a blocker and not before M5): **LK and HK trap detonations have
+   NO sound at all, and never did** — so the full picture is: LK/HK
+   detonation sfx MISSING (pre-existing, possibly vs2-faithful,
+   possibly a gap — a native-vs2 three-strength ring comparison decides
+   when the sound arc comes; 87's strength-sweep section is the ready
+   rig), MK's sound restored by (b'). Filed in the M5-family sound
+   bucket.
 
 **Scope CORRECTION recorded while measuring: the hit-class sweep is
 POOL-vs-POOL** — both loop registers stride pool slots and the f7997

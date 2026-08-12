@@ -78,6 +78,11 @@ always measures the REF leg on a crash (MERGE-SPECIFIC vs LATENT).
   `tests/test_variant_dispatch.sh`, table 0x02a8a4 row 0x10).
 - Pyron's Zodiac Fire has no rig (guard-cancel only — Claude's to rig).
 - The win-screen QUOTE (both tenants; shared fold).
+- NEW (14z-82d, maintainer playtest, M5-family sound bucket): Phobos'
+  LK/HK Plasma Trap detonations have NO sound and never did (MK's was
+  restored by (b'); maintainer filed for completeness, explicitly not a
+  blocker before M5). Native-vs2 three-strength ring comparison decides
+  faithful-vs-gap; 87's strength sweep is the ready rig.
 - NEW (14z-82d, maintainer playtest): pyron's win-pose voice (his
   laugh) renders DISTORTED — pre-existing (pyron20≡pyron21 ring A/B
   byte-identical), likely a vs2 sample id without its backing QSound
