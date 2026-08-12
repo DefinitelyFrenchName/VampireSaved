@@ -58,7 +58,15 @@ ROMDIR="${ROMDIR:?set ROMDIR}"
 MAME_BIN="${MAME_BIN:-$HOME/.cache/vampire-saved/mame/cps2}"
 export MAME_BIN
 
-OUT="build/merged1"
+# 14z-83 S6: OUT and the prebuilt switch are parameterized so the SAME
+# legs can re-verdict a merged-with-gfx build (tools/build_merged.sh).
+# Defaults unchanged: the standing audit still rebuilds the LEGACY-ONLY
+# zero-overlay instrument from scratch. With MERGED_PREBUILT=1 the build
+# steps are skipped and the existing artifact is verified in place
+# (593-op assert + member identity still run — a prebuilt dir is trusted
+# for its bytes, never for its shape).
+OUT="${MERGED_OUT:-build/merged1}"
+PREBUILT="${MERGED_PREBUILT:-0}"
 WIDE_ZIP="${WIDE_ROMSET:-$PWD/build/wide0/rompath/vsavjw.zip}"
 EXPECT="tests/expected/donovan-m3a"          # the ratified prior (see header)
 BASE_LOGS="tests/expected/vsavj/masked-v2/logs"
@@ -153,6 +161,21 @@ else:
              ";".join("%d-%d" % (fr(x), fr(y)) for x, y in wins)))
 PY
 
+if [ "$PREBUILT" = 1 ]; then
+    echo "== B: PREBUILT merged artifact at $OUT (build skipped; shape"
+    echo "      asserted below — 593 ops, member identity) =="
+    [ -f "$OUT/rompath/vsavjw.zip" ] || {
+        echo "FAIL: MERGED_PREBUILT=1 but no $OUT/rompath/vsavjw.zip"; exit 1; }
+    [ -f "$OUT/patch/patch.json" ] || {
+        echo "FAIL: MERGED_PREBUILT=1 but no $OUT/patch/patch.json"; exit 1; }
+    NOPS="$(python3 -c "import json;print(len(json.load(open('$OUT/patch/patch.json'))['ops']))")"
+    [ "$NOPS" = 593 ] || { echo "FAIL: $NOPS ops, frozen fixture is 593"; exit 1; }
+    echo "  ok: 593 ops (the frozen test_tenant_loop fixture)"
+    python3 tools/audit_romset_identity.py "$OUT/rompath" || {
+        echo "  FAIL: member-identity audit"; exit 1; }
+    FP="$(python3 tools/build_fingerprint.py "$OUT/rompath;$ROMDIR" --set vsavjw --sha-only || true)"
+    echo "  ok: prebuilt artifact verified; fingerprint $FP"
+else
 echo "== B: build the merged image (LEGACY-ONLY INSTRUMENT — never playtest,"
 echo "      never register; tenants render BLANK by design) =="
 rm -rf "$OUT"; mkdir -p "$OUT"
@@ -202,8 +225,9 @@ NEVER playtest this build. NEVER give it a registry row.
 fingerprint: $FP
 EOF
 echo "  ok: built and packed ($NOPS ops); fingerprint $FP (unregistered ON PURPOSE)"
+fi
 
-# ── probe addresses, scraped from the fragment the generator just wrote ────
+# ── probe addresses, scraped from the fragment the generator wrote ────
 # ("MERGED init shim" since the 14z-82 F2 fix; the old spelling matches a
 # pre-fix build so the negative branch below can still name it)
 SHIM="$(sed -n 's/^code *0x0*\([0-9a-f]*\) \(MERGED \)\{0,1\}init shim .*/\1/p' \
