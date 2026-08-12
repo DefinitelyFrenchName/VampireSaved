@@ -15,7 +15,7 @@
 # zero hits everywhere = dead probe, not success).
 #
 # Sections:
-#   0  verdict control on build/hui29 (single-tenant, original numbers by
+#   0  verdict control on build/hui30 (single-tenant, original numbers by
 #      design): the probe MUST see original-range dispatches there — the
 #      instrument can see what section 1 claims is absent.
 #   1  merged + huitzil mash: original range = 0, huitzil's renumbered
@@ -36,7 +36,7 @@ ROMDIR="${ROMDIR:?set ROMDIR}"
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"
 MERGED="${1:-build/merged1}"
-REF=build/hui29
+REF=build/hui30
 W="${TMPDIR:-/tmp}/type_dispatch_$$"
 mkdir -p "$W"
 trap 'rm -rf "$W"' EXIT
@@ -139,7 +139,7 @@ echo "probes: $REF thunk 0x$TH_REF, $MERGED thunk 0x$TH_MRG"
 
 echo "== 0: verdict control — original range visible on $REF =="
 probe_run "$REF" "$TH_REF" hui/70_hui_mash "$HUI_SOAK" "$W/ref.log"
-verdict "$W/ref.log" "hui29/70_mash" see "" || fail=1
+verdict "$W/ref.log" "ref/70_mash" see "" || fail=1
 
 echo "== 1: merged + huitzil =="
 probe_run "$MERGED" "$TH_MRG" hui/70_hui_mash "$HUI_SOAK" "$W/hui.log"

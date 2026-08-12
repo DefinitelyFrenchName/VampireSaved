@@ -1,6 +1,39 @@
 # STATE — living progress log
 
-Updated: 2026-08-12 (session 14z-82b, same day — **f7997 ROOT-CAUSED AND
+Updated: 2026-08-12 (session 14z-82c, same day — **THE HIT-CLASS FIX IS
+ADOPTED (maintainer decision 1) AND BOTH TENANTS ARE RE-FROZEN:
+`huitzil-m4` (e66678d0, build/hui30) and `pyron-m3` (6c7f7322,
+build/pyron21 — byte-identical to the measured probe build).** Decision 2
+(Donovan's map[61]/[62]) leans keep-zeros and gained its measurement: his
+type-61 objects EXIST in both his replays but NEVER enter the hit-class
+map there (probe: 0 entries) — the gap is unexercised like Huitzil's.
+**A THIRD defect dissolved under the fix, measured with a control:** the
+`80_pyron_cosmo_pairsweep` reset open since 14z-75 is the SAME map
+over-index (pyron-m2: CRASH f4638 vec3 PC 01AB10 ADDR $FF31B7 — the f7997
+signature; pyron-m3: END-clean 7,520 frames). **The freeze ladder:** all
+four fingerprints bit-exact (constants re-frozen to m4/m3);
+test_tenant_loop re-frozen 261/207/439/593 (+2 ops per declaring build,
+deduped once on the merge); registry rows + expectation sets carried over
+RENAMED (huitzil-m4/pyron-m3); run_suite hui30 **GREEN** after exactly
+THREE `.sha1` self-baselines were re-frozen (21/22/26 — the don-mash
+trio), each ATTRIBUTED BY BYTES: a full-RAM dump-diff at a divergent
+frame shows **3 bytes, all in the $FF7Fxx dead-stack ghost window, zero
+live bytes** (the ratified hook-cycle class; the debug-timeline fire
+probes did NOT transfer to the checksum timeline — vs-CPU/chaos content,
+the documented -debug caveat — so the attribution was made on the right
+timeline instead); pyron21's suite moved the SAME three, re-frozen the
+same way — verification **SUITE GREEN, 55 PASS** (an earlier attempt was
+killed by the environment at 40/40 PASS; the clean re-run completed). **The merged
+instrument now has ZERO crashes:** audit_merged_legacy leg (b) is
+guard-clean on all six entries incl. pyron/70 END 11017, and leg (a) is
+13/14 verbatim — the ONLY remaining FAIL anywhere is 04's
+held-un-ratified {1525, 2005, 2009, 2195} inventory, per the maintainer's
+standing hold (its mechanism now named). Harness note: the win_pal
+fragment-note wording differs m3→m4 builds (the 14z-80h chain emitter's
+note format) — bytes identical, cosmetic only. Read docs/NEXT_SESSION.md
+first.)
+
+Previously: 2026-08-12 (session 14z-82b, same day — **f7997 ROOT-CAUSED AND
 FIXED ON A PROBE BUILD, AND IT WAS NEVER A MERGED DEFECT: the frozen
 pyron-m2 build crashes at f7997 SOLO.** The crash is vsavj's
 projectile-pool hit sweep (seven dispatchers, ONE 64-entry byte map at
@@ -291,6 +324,75 @@ findings were RETRACTED in-session after clean re-measures — each with
 the comparison error written down so it cannot be repeated. Every gate
 green at close, including two NEW audits. Read docs/NEXT_SESSION.md
 first, then the 14z-69 sections below.)
+
+## Session 14z-82c — the hit-class fix ADOPTED; huitzil-m4 + pyron-m3 frozen
+
+Maintainer decisions (2026-08-12, same day): **1 ADOPTED** (the row + both
+re-freezes); **2 leaning keep-zeros** pending the identity answer, which
+was given and measured — Donovan's types 59-63 are the projectile-pool
+objects his SWORD-COMPANION machine spawns (61's handler = the sword
+routine region x065e5a; measured type-61 spawns in both his replays at
+$FF94xx), and a probe shows those objects NEVER enter the hit-class map
+in his replays (0 entries) — the missing-reaction gap is unexercised.
+
+### What shipped
+
+- The `hitclass_map_extend` row in BOTH tenant manifests (shared, dedups
+  on the merge; donovan not exposed, does not declare). The
+  reconstruction gate's section 2 now locks both committed rows.
+- **huitzil-m4** = build/hui30, fingerprint e66678d0; **pyron-m3** =
+  build/pyron21, fingerprint 6c7f7322 — byte-identical to the 14z-82b
+  probe build, so every probe measurement transfers.
+- Registry rows added; huitzil-m3/pyron-m2 superseded (mappings removed,
+  records kept; the old dirs stay on disk as the pre-fix A/B baselines);
+  expectation sets RENAMED (content carried over).
+- Re-freezes, in the re-freeze-FIRST order: test_m3a_reproducible
+  constants; test_tenant_loop 243/261/207 singles, 439/593 merges
+  (+2 ops per declaring build, deduped once); audit_merged_legacy's 593.
+- Test-default sweep: every gate that pointed at hui29/pyron20 now
+  points at hui30/pyron21; audit_hitclass_map_cost reworked for
+  post-adoption semantics (builds pyron.toml verbatim, A/Bs against the
+  kept pre-fix pyron20 artifact).
+
+### The suites, and the one attribution that had to be re-made
+
+Both suites moved EXACTLY three `.sha1` self-baselines — 21_don_mash,
+22_don_dualmash, 26_don_arcade_mash — and no masked-class entry anywhere.
+The first attribution attempt (hook-fire alignment, the huitzil-m3
+precedent) FAILED honestly: under the guard's -debug timeline two of the
+three showed ZERO thunk fires and the third fired AFTER its divergence
+onset. The reason is documented: -debug runs are not
+checksum-comparable, and these are vs-CPU/chaos replays whose collision
+timing is exquisitely phase-sensitive. The attribution that stands was
+made ON THE CHECKSUM TIMELINE with bytes, not inference: a full-RAM
+dump-diff at a mid-window divergent frame (22_don_dualmash f13224,
+hui29 vs hui30) shows **three divergent bytes, all inside
+RAM:$FF7F00-$FF7FFF (the dead-stack ghost window), zero live-state
+bytes** — the ratified hook-cycle class, invisible on the masked basis
+(hence 13/13 masked green) and trivially visible to unmasked `.sha1`
+self-logs. Divergence shapes: bounded windows (140/52/76 frames) that
+fully re-converge (1,374/651/29,221 identical tail frames). The three
+baselines were re-frozen per build from fresh runs (hashes matched the
+suites' `got` values — determinism confirmed); verification: hui30
+**SUITE GREEN**, pyron21 **SUITE GREEN (55 PASS)** (one environment-
+killed attempt at 40/40 PASS in between — no measurement lost).
+
+### The pairsweep dissolution (third kill for one fix)
+
+`80_pyron_cosmo_pairsweep` (reset at "f4840", open since 14z-75,
+suspected "another out-of-range index of the same class" — correct):
+under the guard on pyron-m2 it is the EXACT f7997 signature (CRASH f4638
+vec3 PC 01AB10 ADDR $FF31B7); on pyron-m3, END-clean through 7,520
+frames. One vanilla map, three defects: f7997, the pairsweep reset, and
+Huitzil's unexercised 68/72 exposure.
+
+### The merged instrument: zero crashes remain
+
+audit_merged_legacy on the adopted tree (593 ops): section 0 F2-fixed +
+all three char-inits execute + determinism; leg (a) 13/14 VERBATIM (04's
+held inventory the only FAIL, per the standing hold); **leg (b) ALL SIX
+guard-clean** — donovan 12/20, huitzil 70/83, pyron 72, and pyron/70 now
+END 11017 on the merged build. The M3b program half has no known crash.
 
 ## Session 14z-82b — f7997: a LATENT vanilla map over-index, fixed on a probe
 
@@ -12968,8 +13070,9 @@ Original write-up kept below.
 
 ## Decisions pending (human)
 
-- **ADOPT THE HIT-CLASS MAP EXTENSION + RE-FREEZE huitzil & pyron
-  (14z-82b).** The generated `hitclass_map_extend` site_thunk fixes a
+- ~~**ADOPT THE HIT-CLASS MAP EXTENSION + RE-FREEZE huitzil & pyron
+  (14z-82b).**~~ **DECIDED 2026-08-12 (maintainer): ADOPTED** — shipped as
+  huitzil-m4 (e66678d0) + pyron-m3 (6c7f7322), 14z-82c. Original entry: The generated `hitclass_map_extend` site_thunk fixes a
   playtest-reachable crash LATENT IN BOTH FROZEN TENANT BUILDS (pyron's
   satellite type-64 contact = the f7997 vec3, measured on pyron-m2 solo;
   Huitzil's 68/72 share the pool). Numbers, all measured on a probe build
@@ -12984,7 +13087,13 @@ Original write-up kept below.
   untouched. RECOMMENDATION: adopt — it is the third instance of the
   "vs2 widened an index consumer" class (14z-26, 14z-35 precedents) and
   the crash needs one satellite contact to fire in a real match.
-- **DONOVAN's map entries 61/62 (14z-82b, separate and smaller).** vs2
+- **DONOVAN's map entries 61/62 (14z-82b, separate and smaller;
+  maintainer LEANING (a) keep-zeros 2026-08-12, pending final word).**
+  MEASURED SINCE: his types 59-63 are the projectile-pool objects his
+  SWORD-COMPANION machine spawns (61 = the sword-routine region
+  x065e5a's family; spawns measured in both his replays), and they enter
+  the hit-class map ZERO times in his replays — the missing reaction is
+  UNEXERCISED, so (a) costs nothing observable today. Original entry: vs2
   gives his satellite types 61/62 hit classes 0x0E/0x04 where vsavj
   holds the do-nothing 0 — so his type-61/62 projectile hits currently
   produce NO hit-class reaction on every shipped build, and always have.

@@ -71,10 +71,10 @@ run_leg() {  # run_leg <name> <build> <replay> <pokes>
 }
 
 echo "running 6 tap legs (~8 min):"
-run_leg hui_70  build/hui29   hui/70_hui_mash        "$HUI_SOAK"
-run_leg hui_83  build/hui29   hui/83_hui_fx          "$HUI_FX"
-run_leg pyr_70  build/pyron20 pyron/70_pyron_mash    "$PYR_SOAK"
-run_leg pyr_72  build/pyron20 pyron/72_pyron_cosmo_2p "$PYR_COSMO"
+run_leg hui_70  build/hui30   hui/70_hui_mash        "$HUI_SOAK"
+run_leg hui_83  build/hui30   hui/83_hui_fx          "$HUI_FX"
+run_leg pyr_70  build/pyron21 pyron/70_pyron_mash    "$PYR_SOAK"
+run_leg pyr_72  build/pyron21 pyron/72_pyron_cosmo_2p "$PYR_COSMO"
 run_leg don_12  build/m5_wide 12_donovan_vs_cpu      "$POK13"
 run_leg don_20  build/m5_wide 20_don_round2          "$POK13"
 echo
@@ -99,7 +99,7 @@ for ln in open("build/manifest/type_stamps.toml"):
 if kind == "stamp" and "src_addr" in cur:
     stamps[int(cur["src_addr"], 0)] = dict(cur)
 
-BUILDS = {"hui": "build/hui29", "pyr": "build/pyron20", "don": "build/m5_wide"}
+BUILDS = {"hui": "build/hui30", "pyr": "build/pyron21", "don": "build/m5_wide"}
 placed = {}
 for tag, b in BUILDS.items():
     placed[tag] = json.load(open(f"{b}/patch/placements.json"))["regions"]

@@ -1,85 +1,96 @@
-# NEXT SESSION — orientation (written at the close of 14z-82b, 2026-08-12)
+# NEXT SESSION — orientation (written at the close of 14z-82c, 2026-08-12)
 
 > ## START HERE
 >
-> **Two fixes this day, one adopted, one awaiting the maintainer.**
+> **The 14z-82 day closed with THREE fixes shipped and the merged
+> instrument crash-free.**
 >
-> **ADOPTED (14z-82, commit 33c2c70): the merged Huitzil vec3 + F2.**
-> Per-tenant TYPE NUMBERS (first resolver keeps originals): both former
-> Huitzil crashers guard-clean over full replays, donovan/12_vs_cpu
-> guard-clean, leg (a) 13/14 ratified classes VERBATIM, all four frozen
-> fingerprints bit-exact throughout. The merged shim now serves both
-> declaring tenants (per-owner handler exits; pyron direct by decision).
+> 1. **Per-tenant TYPE NUMBERS** (14z-82, commit 33c2c70): the merged
+>    Huitzil vec3 + F2, measured through the full ladder.
+> 2. **The hit-class map extension** (14z-82b root-cause, 14z-82c
+>    ADOPTED): vsavj's projectile-pool hit sweep maps type bytes through
+>    a 64-entry map at `PRG:0x1A888`; vs2's has 80. This ONE vanilla map
+>    was THREE defects — pyron's f7997 (latent in frozen pyron-m2 SOLO),
+>    the `80_pyron_cosmo_pairsweep` reset open since 14z-75 (same
+>    signature, measured with a control), and Huitzil's unexercised 68/72
+>    exposure. **Frozen: `huitzil-m4` (e66678d0, build/hui30) and
+>    `pyron-m3` (6c7f7322, build/pyron21)** — playtest these.
+> 3. **audit_merged_legacy is now: leg (a) 13/14 VERBATIM, leg (b) ALL
+>    SIX guard-clean** (pyron/70 END 11017 on the merged build). The
+>    only FAIL anywhere is 04's held-un-ratified flicker inventory.
 >
-> **AWAITING DECISION (14z-82b): the f7997 fix — and the crash was NEVER
-> a merged defect.** Frozen pyron-m2 crashes at f7997 SOLO (measured; the
-> leg-b harness used to bail before measuring the ref leg — fixed — and
-> the covering soak builds stage 4, so the frozen artifact was never
-> soaked). Mechanism: vsavj's projectile-pool hit sweep maps both
-> colliding objects' TYPE bytes through one 64-entry byte map at
-> `PRG:0x1A888` (seven callers); pyron's type-64 satellite landing a hit
-> over-indexes it (map[64] = the following rts's 0x4E — the crash D0).
-> vs2's sibling map has 80 entries. Huitzil spawns 68/72 into the same
-> pool (exposed, unexercised). The fix is GENERATED
-> (tools/gen_hitclass_map_thunk.py), gated
-> (tests/test_hitclass_map_thunk.sh), and MEASURED on a probe build
-> (tests/audit_hitclass_map_cost.sh): the 11,017-frame soak that crashes
-> frozen pyron-m2 runs END-clean, legacy BIT-IDENTICAL over 30,284
-> frames, fire census = legacy never enters the map at all.
-> **Manifests deliberately untouched — adopting the row re-freezes
-> huitzil + pyron (STATE Decisions pending, with a recommendation).**
+> **Both verification suites are GREEN** (hui30, and pyron21 at 55
+> PASS). **FIRST PRIORITY: the 04 ratification** — the maintainer can
+> now ratify the merged 04 inventory ({1525, 2005, 2009, 2195}) with its
+> mechanism NAMED ($FF0460 = the sound driver's record-pointer spill,
+> scripted lock tests/audit_ff0460_writer.sh) — or hold further. After
+> that: decision 2's final word, then the gfx half (M3b Phase 3).
 
-## First priorities (in order)
+## The .sha1 re-freeze attribution (read before touching those baselines)
 
-1. **The maintainer's two 14z-82b decisions** (STATE Decisions pending):
-   adopt `hitclass_map_extend` + re-freeze huitzil/pyron (recommended);
-   and Donovan's map[61]/[62] zeros (keep, recommended). On adoption:
-   add the row to both manifests (generate the hex with the tool, never
-   hand-type), re-freeze fingerprints + registry rows + their masked
-   legacy self-logs, re-run test_hitclass_map_thunk (its section 2 then
-   locks the committed rows) and both tenants' batteries.
-2. **The 04/2005 ratification** (maintainer): with BOTH leg-(b) crashes
-   now explained/fixed, the merged flicker/window table can be
-   re-measured and ratified; the 2005 mechanism is named ($FF0460 =
-   sound-driver record-pointer spill; tests/audit_ff0460_writer.sh).
-3. **Then the gfx half** (M3b Phase 3) and the tenant batteries on a
-   merged build.
-4. Deferred with measurements attached: the 0x54470 family's FIRST-WINS
-   notes (frozen stamp map + the truncated embedded walker at 0x5C602);
-   type 120 (no reachable stamp; first-wins + the dispatch-range gate).
+Both suites moved EXACTLY the three don-mash `.sha1` self-baselines
+(21/22/26) and nothing else. Attribution was made ON THE CHECKSUM
+TIMELINE with bytes: a full-RAM dump-diff at a divergent frame shows 3
+bytes, all in the $FF7Fxx dead-stack ghost window, zero live bytes — the
+ratified hook-cycle class (masked entries all green). NOTE the failed
+first attempt: -debug guard probes showed fire counts that contradicted
+the divergence onsets — debug timelines do NOT transfer to checksum
+timelines on vs-CPU/chaos content. Attribute with dumps, not debug
+probes, on this replay class.
 
-## New instruments (14z-82 + 14z-82b, all in the suite)
+## Then, in order
+
+2. **The 04/2005 ratification decision** (maintainer) — everything it
+   was waiting on is done: both crashes fixed, mechanism named,
+   re-measured same-day on the adopted tree (identical inventory).
+3. **Decision 2 final word** (maintainer, leaning keep-zeros, measured
+   unexercised): Donovan's map[61]/[62] — his sword-companion objects'
+   hit classes, vs2 populates, vsavj zeros. Two bytes + a Donovan
+   re-freeze if ever wanted.
+4. **Then the gfx half** (M3b Phase 3) and the tenant batteries on a
+   merged build — the program half now has NO known crash.
+5. Deferred with measurements attached: the 0x54470 family's FIRST-WINS
+   notes; type 120 (no reachable stamp).
+
+## Current builds (registry)
+
+| build | set | fingerprint |
+|---|---|---|
+| build/m5_wide | donovan-m3a | 4b7d0dc7 |
+| build/hui30 | **huitzil-m4** | e66678d0 |
+| build/pyron21 | **pyron-m3** | 6c7f7322 |
+| build/hui29, build/pyron20 | superseded (pre-fix A/B baselines, keep) | 34c8b47d / 69e8c6f0 |
+
+## Instruments added across 14z-82/-82b/-82c (all in the suite)
 
 ```sh
-tests/test_type_stamp_census.sh     # static census vs frozen inventory
-tests/audit_type_writes.sh          # dynamic writer-PC census (~8 min)
+tests/test_type_stamp_census.sh     # static stamp census vs frozen inventory
+tests/audit_type_writes.sh          # dynamic writer-PC census
 tests/audit_type_dispatch_range.sh  # merged: zero original-range dispatches
-tests/audit_ff0460_writer.sh        # the $FF0460 owner lock (~1 min)
-tests/test_hitclass_map_thunk.sh    # 14z-82b fix reconstruction gate (~2 s)
-tests/audit_hitclass_map_cost.sh    # 14z-82b decision numbers (~20 min)
+tests/audit_ff0460_writer.sh        # the $FF0460 owner lock
+tests/test_hitclass_map_thunk.sh    # hit-class fix reconstruction gate
+tests/audit_hitclass_map_cost.sh    # hit-class adoption numbers, rerunnable
 ```
-`GUARD_PROBE_HIST` also dumps history at CRASH time; `audit_merged_legacy`
-leg-b now always measures the REF leg on a crash (MERGE-SPECIFIC vs
-LATENT verdict — the gap that mis-attributed f7997 for two sessions).
+`GUARD_PROBE_HIST` fires at CRASH time too; `audit_merged_legacy` leg-b
+always measures the REF leg on a crash (MERGE-SPECIFIC vs LATENT).
 
-## Still open from earlier sessions, unchanged
+## Still open, unchanged
 
 - Phobos' own palette-seq block (KNOWN-OPEN RED on
   `tests/test_variant_dispatch.sh`, table 0x02a8a4 row 0x10).
-- Pyron's Zodiac Fire has no rig (guard-cancel only).
-- `80_pyron_cosmo_pairsweep.rpl` resets at f4840 — independent, low.
+- Pyron's Zodiac Fire has no rig (guard-cancel only — Claude's to rig).
+- The win-screen QUOTE (both tenants; shared fold).
 - The three NEW select medallions: polish.
-- `region_space` rows on the manifests — re-freeze, maintainer's call.
+- `region_space` rows re-freeze — maintainer's call.
 - Op-tagging so `test_shared_writes.sh` can name what a new write is.
 
 ## Build / validate
 
 ```sh
 export ROMDIR=/path/to/reference/sets
-tests/test_m3a_reproducible.sh             # ~4 min, all four fingerprints
-tests/test_tenant_loop.sh                  # ~17 s, the merge gate (437/591)
-tests/audit_merged_vec3.sh                 # ~4 min: GREEN since 14z-82
-tests/audit_merged_legacy.sh               # ~45 min (fails BY DESIGN on 04's
-                                           # held inventory + pyron f7997
-                                           # until the 14z-82b fix is adopted)
+tests/test_m3a_reproducible.sh             # ~4 min (m4/m3 constants)
+tests/test_tenant_loop.sh                  # ~17 s (261/207/439/593)
+tests/audit_merged_vec3.sh                 # ~4 min: GREEN
+tests/audit_merged_legacy.sh               # ~45 min (fails ONLY on 04's
+                                           # held inventory, by design)
 ```

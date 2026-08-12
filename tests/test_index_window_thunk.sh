@@ -32,7 +32,7 @@
 #      fail is not evidence (docs/GOTCHAS.md).
 #
 # No emulator, no ROMs beyond $ROMDIR, seconds.
-# Usage: ROMDIR=... tests/test_index_window_thunk.sh [builddir]   (default build/hui29)
+# Usage: ROMDIR=... tests/test_index_window_thunk.sh [builddir]   (default build/hui30)
 set -eu
 
 ROMDIR="${ROMDIR:?set ROMDIR}"
@@ -41,7 +41,7 @@ cd "$REPO"
 WORK="$(mktemp -d)"
 trap 'rm -rf "$WORK"' EXIT
 
-BUILD="${1:-build/hui29}"
+BUILD="${1:-build/hui30}"
 case "$BUILD" in /*) ;; *) BUILD="$REPO/$BUILD" ;; esac
 [ -f "$BUILD/verify_op.bin" ] || {
     echo "SKIP: no $BUILD/verify_op.bin (build a Huitzil stage-6 build first)"

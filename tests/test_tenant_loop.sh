@@ -37,8 +37,8 @@ cd "$REPO"
 ROMDIR="${ROMDIR:?set ROMDIR}"
 
 D_EX=build/m5_wide/extract      # donovan  (the WIDE reference)
-H_EX=build/hui29/extract        # huitzil  (huitzil-m3)
-P_EX=build/pyron20/extract      # pyron    (pyron-m2)
+H_EX=build/hui30/extract        # huitzil  (huitzil-m4)
+P_EX=build/pyron21/extract      # pyron    (pyron-m3)
 
 for e in "$D_EX" "$H_EX" "$P_EX"; do
     if [ ! -d "$e" ]; then
@@ -102,7 +102,11 @@ fi
 # passes are three different proofs that the iteration gate did not drop a
 # section it happens not to reach on Donovan.
 echo "== 1: one tenant per run — the frozen op counts =="
-FROZEN_1="donovan:243 huitzil:259 pyron:205"
+# RE-FROZEN 14z-82c (was 259/205): the ADOPTED hitclass_map_extend
+# site_thunk adds exactly TWO ops (body + site jmp) to each declaring
+# build — huitzil and pyron declare it, donovan does not (his types fit
+# the vanilla map).
+FROZEN_1="donovan:243 huitzil:261 pyron:207"
 for row in $FROZEN_1; do
     who="${row%%:*}"; want="${row##*:}"
     case "$who" in donovan) ex="$D_EX" ;; huitzil) ex="$H_EX" ;; *) ex="$P_EX" ;; esac
@@ -124,7 +128,7 @@ done
 # The load-bearing question. A loop that ran once would produce Donovan's
 # 243 ops here; a loop that ran twice against tenant 0's data would produce
 # 243 twice over. The counts are frozen, and so is the DEDUP they imply:
-# 243 + 259 = 502 declared, 442 emitted. The gap is four things and all of
+# 243 + 261 = 504 declared, 439 emitted (14z-82c). The gap is four things and all of
 # them are checked below: rows recognised as SHARED and emitted once (the
 # iteration gate), tripwire ops no longer needed because the engine union
 # resolves Huitzil's handlers (4b), agreeing duplicate ops dropped (4c), and
@@ -155,8 +159,8 @@ check_n() {  # check_n <label> <dir> <want ops> <sum of 1-tenant counts>
 # into tenant-0's handler). The shim itself and the dispatch-row pokes
 # rebalance to the same count; the 12 renumbered obj_hook entries grow the
 # TABLE op's hex, not the op count. Single-tenant counts above unchanged.
-check_n "2 tenants" "$WORK/two"   437 502
-check_n "3 tenants" "$WORK/three" 591 707
+check_n "2 tenants" "$WORK/two"   439 504
+check_n "3 tenants" "$WORK/three" 593 711
 
 # ── 3: every tenant's own content is present ────────────────────────────
 # An op count alone cannot tell "both tenants ran" from "tenant 0 ran twice".
@@ -224,8 +228,8 @@ merged, _ = g.merge_manifests(docs, "cps2-wide-v1")
 shared = [r for r in merged["port_patch"] if r.get("_owner") is None]
 
 TENANTS = (("donovan", "build/m5_wide/extract", 0x13, ""),
-           ("huitzil", "build/hui29/extract",   0x10, ".huitzil"),
-           ("pyron",   "build/pyron20/extract", 0x11, ".pyron"))
+           ("huitzil", "build/hui30/extract",   0x10, ".huitzil"),
+           ("pyron",   "build/pyron21/extract", 0x11, ".pyron"))
 bad, checked = [], 0
 if len(shared) < 6:
     bad.append("only %d shared port_patch rows — the fixture moved" % len(shared))
@@ -612,7 +616,7 @@ for p in ("donovan", "huitzil", "pyron"):
 merged, _ = g.merge_manifests(docs, "cps2-wide-v1")
 row = [r for r in merged["port_patch"]
        if r.get("_owner") is None and r["region"] == "x05c800"][0]
-reg = json.loads(Path("build/hui29/extract/regions.json").read_text())["regions"]
+reg = json.loads(Path("build/hui30/extract/regions.json").read_text())["regions"]
 b = Path(sys.argv[1], "fixed_x05c800.huitzil.bin").read_bytes()
 off = g._int(row["src_addr"]) - reg["x05c800"]["src"]
 old = bytes.fromhex(row["old_hex"])

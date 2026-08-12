@@ -78,7 +78,7 @@ PY
 echo "== section 0: the guard is QUIET on all three real manifests =="
 # The load-bearing half. A guard that fires on correct input is worse than no
 # guard, and the three frozen tenants are the only real corpus there is.
-for t in donovan:build/m5_wide huitzil:build/hui27 pyron:build/pyron20; do
+for t in donovan:build/m5_wide huitzil:build/hui27 pyron:build/pyron21; do
     nm=${t%%:*}; bd=${t##*:}
     if [ ! -d "$bd/extract" ]; then
         echo "  SKIP: $nm (no $bd/extract)"; continue

@@ -32,13 +32,13 @@ fail=0
 
 IMG=build/out/vsav2_opcodes.bin
 REGS="--regions build/m5_wide/extract/regions.json \
-      --regions build/hui29/extract/regions.json \
-      --regions build/pyron20/extract/regions.json"
+      --regions build/hui30/extract/regions.json \
+      --regions build/pyron21/extract/regions.json"
 FROZEN=build/manifest/type_stamps.toml
 
 for f in "$IMG" build/m5_wide/extract/regions.json \
-         build/hui29/extract/regions.json \
-         build/pyron20/extract/regions.json "$FROZEN"; do
+         build/hui30/extract/regions.json \
+         build/pyron21/extract/regions.json "$FROZEN"; do
     [ -f "$f" ] || { echo "SKIP: missing $f"; exit 0; }
 done
 

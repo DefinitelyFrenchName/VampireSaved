@@ -2691,3 +2691,21 @@ frozen fingerprints; decision + recommendation in STATE. Harness repairs
 landed with it: `audit_merged_legacy` leg-b now always measures the REF
 leg on a crash (MERGE-SPECIFIC vs LATENT verdict), closing the gap that
 mis-attributed this crash for two sessions.
+
+### 14z-82c — ADOPTED: huitzil-m4 (e66678d0) + pyron-m3 (6c7f7322)
+
+Maintainer decision 1 adopted the row into BOTH tenant manifests (shared;
+dedups to one thunk on the merge; donovan not exposed, does not declare).
+pyron-m3 is byte-identical to the measured probe build. Re-freezes in the
+re-freeze-FIRST order: m3a constants, tenant_loop 261/207/439/593,
+audit_merged_legacy 593. Suites: both builds moved EXACTLY the three
+don-mash `.sha1` self-baselines (21/22/26) and no masked entry —
+attributed BY BYTES on the checksum timeline (full-RAM dump-diff at a
+divergent frame: 3 bytes, all $FF7Fxx dead-stack ghosts, zero live) and
+re-frozen; hui30 SUITE GREEN. THE PAIRSWEEP DISSOLVED under the fix with
+a control (pyron-m2: CRASH f4638, the f7997 signature; pyron-m3:
+END-clean 7,520) — one vanilla map was THREE defects. The merged
+instrument now: leg (a) 13/14 verbatim, leg (b) all six guard-clean
+(pyron/70 END 11017 merged). Decision 2 (Donovan's map[61]/[62]) leaning
+keep-zeros; measured: his sword-companion objects never enter the map in
+his replays (0 entries) — unexercised.

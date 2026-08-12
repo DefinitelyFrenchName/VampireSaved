@@ -22,7 +22,7 @@
 #             when one of them matters.
 #
 # Usage: ROMDIR=... [MAME_BIN=...] tests/audit_objhook_owner_census.sh [build]
-# Default build: build/hui29. ~6 min: two guarded runs. REPORT-ONLY (exit 0
+# Default build: build/hui30. ~6 min: two guarded runs. REPORT-ONLY (exit 0
 # unless the rig is dead): this is a measurement, not a gate.
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
@@ -30,7 +30,7 @@ cd "$REPO"
 ROMDIR="${ROMDIR:?set ROMDIR}"
 MAME_BIN="${MAME_BIN:-$HOME/.cache/vampire-saved/mame/cps2}"
 export MAME_BIN
-BUILD="${1:-build/hui29}"
+BUILD="${1:-build/hui30}"
 
 [ -d "$BUILD/rompath" ] || { echo "SKIP: no $BUILD/rompath"; exit 0; }
 [ -x "$MAME_BIN" ]      || { echo "SKIP: no WIDE MAME binary"; exit 0; }

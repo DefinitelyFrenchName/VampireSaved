@@ -1,10 +1,10 @@
 #!/bin/sh
 # audit_merged_legacy.sh — does a 3-TENANT MERGED program image perturb LEGACY?
 #
-# WHY (14z-80 close, maintainer-ordered FIRST priority). The 3-tenant merged
-# patch APPLIES (590 ops, 0 collisions) but nothing merged has ever run in an
-# emulator, and no legacy gate has seen a merged image. This audit is the
-# first evidence the merge BEHAVES rather than merely composes.
+# WHY (14z-80 close, maintainer-ordered FIRST priority; counts re-frozen
+# since — see the 593 gate below). The 3-tenant merged patch APPLIES but
+# nothing merged had ever run in an emulator when this was written. This
+# audit is the evidence the merge BEHAVES rather than merely composes.
 #
 # THE INSTRUMENT. The merged program image is packed against the zero-filled
 # WIDE overlay (build/wide0): legacy characters read gfx groups A/B only, and
@@ -27,17 +27,11 @@
 # both class tables against vanilla are known, so that differential adds no
 # signal. Do not re-add it.
 #
-# F2 (14z-81, CONFIRMED statically and by section 0's HENT != SHIM check):
-# the merged [init_shim] is a singleton (_owner=None, merge_init_shim) ->
-# row_here -> emitted on iteration 0 only -> planted at dispatch_00[0x13].
-# Huitzil's row is direct-repointed to his handler, so in a MERGED build his
-# char-init bypasses pool seeding, the phase gate, and his flavor write (the
-# slice-G id-dispatched flavor chain can only ever fire with id 0x13 today).
-# Pyron declares no shim (ratified). NOTE (measured 14z-81): F2 is NOT the
-# mechanism of the Huitzil leg-(b) crash — that is the satellite anim-base
-# defect (tests/audit_merged_vec3.sh); he crashes at spawn, before seeding
-# could matter. F2 stands as a second, independent defect whose consequences
-# are unmeasured.
+# F2 is FIXED (14z-82; the defect was measured 14z-81): the merged
+# [init_shim] is assembled at engine_here and planted on EVERY declaring
+# tenant's dispatch row (per-owner handler exits; Pyron direct by ratified
+# decision). Section 0 asserts the POST-fix shape: HENT == SHIM,
+# PENT != SHIM.
 #
 # CLASS DEVIATIONS ARE MEASURED, NOT RATIFIED. Merged hook chains are longer
 # (N=3 concatenation), so cycle skew may shift a flicker frame or a window
@@ -66,8 +60,8 @@ BASE_LOGS="tests/expected/vsavj/masked-v2/logs"
 # test_m3a_reproducible.sh re-extracts and all four fingerprints are
 # bit-exact, so these dirs ARE the fresh-extraction bytes).
 D_EX="build/m5_wide/extract"
-H_EX="build/hui29/extract"
-P_EX="build/pyron20/extract"
+H_EX="build/hui30/extract"
+P_EX="build/pyron21/extract"
 
 missing=""
 [ -d "$D_EX" ]      || missing="$missing $D_EX"
@@ -80,7 +74,7 @@ if [ -n "$missing" ]; then
     echo "      extract dirs come from the frozen verticals (HANDOFF.md registry):"
     echo "        KEY_SET=vsavj WIDE_ROMSET=... GEN_FLAGS=\"--allow-plausible \\"
     echo "          --tripwire-open --profile cps2-wide-v1\" tools/build_donovan.sh 6 build/m5_wide"
-    echo "        (+ TENANT_MANIFEST/TENANT_CHAR for build/hui29 and build/pyron20)"
+    echo "        (+ TENANT_MANIFEST/TENANT_CHAR for build/hui30 and build/pyron21)"
     echo "      overlay: python3 tools/build_wide_romset.py \"\$ROMDIR\" build/wide0/rompath \\"
     echo "               --qsound 2 --gfx 4 --prg 4"
     exit 0
@@ -165,16 +159,15 @@ python3 tools/gen_donovan_patch.py "$D_EX" "$OUT/patch" \
 grep -q '^GENERATION OK' "$OUT/gen.log" || {
     echo "  FAIL: no GENERATION OK"; tail -15 "$OUT/gen.log"; exit 1; }
 NOPS="$(python3 -c "import json;print(len(json.load(open('$OUT/patch/patch.json'))['ops']))")"
-# 591: matches test_tenant_loop.sh's frozen 3-tenant count (which is
+# 593: matches test_tenant_loop.sh's frozen 3-tenant count (which is
 # re-frozen FIRST whenever the merge legitimately changes). History: 590
-# through 14z-81; 596 for a few hours 14z-81c while the withdrawn stub fix
-# was in; 591 since 14z-82 — the F2 merged-shim fall-through tripwire is
-# the one added op (the renumbered obj_hook entries grow the table op's
-# hex, not the count).
-if [ "$NOPS" = 591 ]; then
-    echo "  ok: 591 ops (the frozen test_tenant_loop fixture — same merge)"
+# through 14z-81; 596 briefly 14z-81c (withdrawn stub); 591 since 14z-82
+# (the F2 fall-through tripwire); 593 since 14z-82c — the ADOPTED
+# hitclass_map_extend thunk (body + site jmp, shared row deduped once).
+if [ "$NOPS" = 593 ]; then
+    echo "  ok: 593 ops (the frozen test_tenant_loop fixture — same merge)"
 else
-    echo "  FAIL: $NOPS ops, frozen fixture is 591 — the generator drifted;"
+    echo "  FAIL: $NOPS ops, frozen fixture is 593 — the generator drifted;"
     echo "        re-freeze test_tenant_loop.sh FIRST, then revisit this audit"
     exit 1
 fi
@@ -430,10 +423,10 @@ PY
 }
 legb 12_donovan_vs_cpu      build/m5_wide  "$POK13"     "donovan/12_vs_cpu"
 legb 20_don_round2          build/m5_wide  "$POK13"     "donovan/20_round2"
-legb hui/70_hui_mash        build/hui29    "$HUI_SOAK"  "huitzil/70_mash"
-legb hui/83_hui_fx          build/hui29    "$HUI_FX"    "huitzil/83_fx"
-legb pyron/70_pyron_mash    build/pyron20  "$PYR_SOAK"  "pyron/70_mash"
-legb pyron/72_pyron_cosmo_2p build/pyron20 "$PYR_COSMO" "pyron/72_cosmo_2p"
+legb hui/70_hui_mash        build/hui30    "$HUI_SOAK"  "huitzil/70_mash"
+legb hui/83_hui_fx          build/hui30    "$HUI_FX"    "huitzil/83_fx"
+legb pyron/70_pyron_mash    build/pyron21  "$PYR_SOAK"  "pyron/70_mash"
+legb pyron/72_pyron_cosmo_2p build/pyron21 "$PYR_COSMO" "pyron/72_cosmo_2p"
 
 echo
 if [ "$fail" != 0 ]; then

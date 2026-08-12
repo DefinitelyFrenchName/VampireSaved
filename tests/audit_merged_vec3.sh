@@ -49,7 +49,7 @@ ROMDIR="${ROMDIR:?set ROMDIR}"
 MAME_BIN="${MAME_BIN:-$HOME/.cache/vampire-saved/mame/cps2}"
 export MAME_BIN
 MERGED="${1:-build/merged1}"
-REF=build/hui29
+REF=build/hui30
 
 for d in "$MERGED/rompath" "$REF/rompath"; do
     [ -d "$d" ] || { echo "SKIP: missing $d (run tests/audit_merged_legacy.sh"; \

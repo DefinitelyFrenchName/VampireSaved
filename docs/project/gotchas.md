@@ -1861,3 +1861,21 @@ soak is long" says nothing about whether the rare interaction ever
 occurred. For dispatch-guarded paths, pair the soak with a FIRE CENSUS
 (probe the dispatcher, count entries and input values) so "never fired"
 and "fired and survived" stop looking identical.
+
+## -debug fire counts do not transfer to checksum timelines on vs-CPU/chaos content — attribute divergences with DUMPS, not debug probes (14z-82c)
+
+The three moved don-mash `.sha1` baselines were first "attributed" by
+probing the new thunk under the guard (-debug): two replays showed ZERO
+fires and the third fired 3,000 frames AFTER its divergence onset — a
+contradiction that would have read as "the thunk is not the cause" and
+sent the hunt somewhere wrong. The documented caveat ("-debug runs are
+deterministic but NOT checksum-comparable") cuts deeper than checksums:
+on collision-timing-sensitive content (vs-CPU AI, input chaos) the debug
+timeline plays a DIFFERENT MATCH by the ten-thousandth frame, so its
+event counts say nothing about the run being attributed. The attribution
+that works: DUMPS=<frame>:ff0000-ffffff on BOTH builds at a divergent
+frame (replay.lua, non-debug, replay-exact) and diff the bytes — here: 3
+bytes, all in the $FF7Fxx dead-stack ghost window, zero live state = the
+ratified hook-cycle class, re-freeze licensed. Also paid for twice in
+one day: DUMPS writes land next to CHECKSUM_OUT, so two runs into one
+directory silently clobber the first dump — separate out dirs per leg.

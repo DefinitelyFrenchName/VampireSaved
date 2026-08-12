@@ -71,9 +71,9 @@ python3 - "$WORK" <<'PY' || fail=1
 import json, re, shutil, subprocess, sys
 from pathlib import Path
 work = Path(sys.argv[1])
-src = Path("build/hui29")
+src = Path("build/hui30")
 if not (src / "patch/patch.json").exists():
-    print("  SKIP (no build/hui29)"); sys.exit(0)
+    print("  SKIP (no build/hui30)"); sys.exit(0)
 ok = True
 for tag, mutate in (
     ("an ADDED shared write (a new byte poked into vanilla space)",

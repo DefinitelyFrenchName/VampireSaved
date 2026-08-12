@@ -34,8 +34,10 @@ EXPECT_STOCK="6c93cfa8a8a80ae2303d3acaf8c7bff487f369c5"
 # produced from the tree: huitzil.toml gained the (b') index-window thunk
 # and lost the withdrawn df_palette_seq_rows row. git tag freeze/huitzil-m2
 # is the way back to a tree that reproduces it.
-EXPECT_HUI="34c8b47de5a43a67e7292f16d0ad133d287fa7e4"
-EXPECT_PYR="69e8c6f08b9fc5859948e50cfb41156d62adf1ec"
+# huitzil-m4 (14z-82c: + the ADOPTED hitclass_map_extend thunk)
+EXPECT_HUI="e66678d087824d1639750d2b9565c0b99ad2b250"
+# pyron-m3 (14z-82c: + the ADOPTED hitclass_map_extend thunk — the f7997 fix)
+EXPECT_PYR="6c7f7322da793c12b3681dd3ef5a76b3792ae5d0"
 
 # The WIDE overlay romset (deterministic from the audited reference sets;
 # built into scratch so the canonical build/wide0 is never clobbered).

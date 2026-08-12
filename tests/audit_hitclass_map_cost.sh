@@ -1,6 +1,6 @@
 #!/bin/sh
 # audit_hitclass_map_cost.sh — what the 14z-82b hit-class map extension
-# FIXES and what it COSTS legacy content, measured on a probe build.
+# FIXES and what it COSTS legacy content (ADOPTED 14z-82c; rerunnable).
 #
 # THE DEFECT IT FIXES (measured, 14z-82b): vsavj's projectile-pool hit
 # sweep maps both colliding objects' type bytes through one 64-entry byte
@@ -10,16 +10,19 @@
 # f7997 with no probes and no merge; huitzil spawns types 68/72 into the
 # same pool and shares the exposure; donovan's 59-63 fit the map).
 #
-# THE FIX under measurement: the generated site_thunk body
+# THE FIX (ADOPTED 2026-08-12, 14z-82c — the manifests carry the row;
+# build/pyron21 = pyron-m3 is byte-identical to the originally measured
+# probe build): the generated site_thunk body
 # (tools/gen_hitclass_map_thunk.py — vanilla's 64 bytes verbatim + vs2's
-# 16 extension entries + a loud >=80 ILLEGAL). ADOPTING it into the real
-# manifests moves the huitzil/pyron frozen fingerprints — a maintainer
-# re-freeze decision; this audit produces the numbers that decision needs.
+# 16 extension entries + a loud >=80 ILLEGAL). This audit re-measures the
+# adoption numbers on demand against build/pyron20, the last PRE-fix
+# artifact (kept on disk; not tree-reproducible — git tag freeze/pyron-m2
+# is the way back).
 #
 # Sections:
-#   0  build the probe variant (pyron.toml + the generated row; NEVER
-#      freeze it) and prove THE FIX: the 11,017-frame chaos soak that
-#      crashes the frozen build at f7997 must END clean.
+#   0  build the CURRENT pyron vertical (pyron.toml verbatim — it carries
+#      the row since 14z-82c) and prove THE FIX: the 11,017-frame chaos
+#      soak that crashes the PRE-fix build at f7997 must END clean.
 #   1  LEGACY COST: live A/B probe-vs-pyron20 whole-RAM checksums over
 #      four legacy replays. The builds differ by ONLY the thunk, so any
 #      divergence is the thunk's cycle cost where legacy hits transit
@@ -38,6 +41,8 @@ ROMDIR="${ROMDIR:?set ROMDIR}"
 MAME_BIN="${MAME_BIN:-$HOME/.cache/vampire-saved/mame/cps2}"
 export MAME_BIN
 
+# the PRE-fix baseline artifact (pyron-m2). Not tree-reproducible; if the
+# dir is gone, rebuild it from git tag freeze/pyron-m2.
 REF=build/pyron20
 WIDE_ZIP="${WIDE_ROMSET:-$PWD/build/wide0/rompath/vsavjw.zip}"
 if [ ! -d "$REF/rompath" ] || [ ! -x "$MAME_BIN" ] || [ ! -f "$WIDE_ZIP" ]; then
@@ -46,28 +51,16 @@ if [ ! -d "$REF/rompath" ] || [ ! -x "$MAME_BIN" ] || [ ! -f "$WIDE_ZIP" ]; then
 fi
 
 WORK="$(mktemp -d)"
-trap 'rm -rf "$WORK" build/manifest/_hitclass_probe.toml' EXIT
+trap 'rm -rf "$WORK"' EXIT
 fail=0
 abspath() { case "$1" in /*) echo "$1";; *) echo "$PWD/$1";; esac; }
 
-echo "== 0: build the probe (MEASUREMENT ONLY — never freeze it) =="
-THUNK="$(python3 tools/gen_hitclass_map_thunk.py \
-         build/out/vsavj_opcodes.bin build/out/vsav2_opcodes.bin 2>/dev/null)"
-[ -n "$THUNK" ] || { echo "FAIL: thunk generation failed"; exit 1; }
-cp build/manifest/pyron.toml build/manifest/_hitclass_probe.toml
-cat >> build/manifest/_hitclass_probe.toml <<EOF
-
-[[site_thunk]]
-stage = 4
-name = "hitclass_map_extend"
-site = 0x01A888
-old_hex = "103b00044e75"
-patch = "jmp"
-rts_ok = true
-thunk_hex = "$THUNK"
-note = "14z-82b probe: extend the projectile hit-class byte map to vs2's 80 entries"
-EOF
-KEY_SET=vsavj TENANT_MANIFEST=build/manifest/_hitclass_probe.toml \
+echo "== 0: build the current pyron vertical (pyron.toml verbatim) =="
+grep -q 'name = "hitclass_map_extend"' build/manifest/pyron.toml || {
+    echo "FAIL: pyron.toml no longer carries hitclass_map_extend — the"
+    echo "      adopted fix was removed; this audit's premise is gone"
+    exit 1; }
+KEY_SET=vsavj TENANT_MANIFEST=build/manifest/pyron.toml \
 TENANT_CHAR=0x11 WIDE_ROMSET="$WIDE_ZIP" \
 GEN_FLAGS="--profile cps2-wide-v1 --allow-plausible --tripwire-open" \
     tools/build_donovan.sh 6 "$WORK/fix" > "$WORK/build.log" 2>&1 || {
@@ -128,8 +121,7 @@ echo "   denominator for section 1, not a divergence source)"
 echo
 if [ "$fail" = 0 ]; then
     echo "PASS: the fix holds and legacy content is bit-identical on the"
-    echo "      measured replays. Adoption still needs the maintainer:"
-    echo "      the row moves the huitzil/pyron frozen fingerprints."
+    echo "      measured replays (the 14z-82c adoption numbers reproduce)."
 else
     echo "RESULT: read the sections — a DIVERGES line is the thunk's"
     echo "        measured legacy cost, the number the re-freeze decision"

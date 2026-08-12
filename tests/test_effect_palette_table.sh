@@ -24,7 +24,7 @@ WORK="$(mktemp -d)"
 trap 'rm -rf "$WORK"' EXIT
 fail=0
 
-BUILD="${1:-build/pyron20}"
+BUILD="${1:-build/pyron21}"
 TENANT="${2:-0x11}"
 case "$BUILD" in /*) ;; *) BUILD="$REPO/$BUILD" ;; esac
 OPIMG="$BUILD/verify_op.bin"
