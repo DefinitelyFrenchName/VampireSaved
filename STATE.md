@@ -13087,8 +13087,13 @@ Original write-up kept below.
   untouched. RECOMMENDATION: adopt — it is the third instance of the
   "vs2 widened an index consumer" class (14z-26, 14z-35 precedents) and
   the crash needs one satellite contact to fire in a real match.
-- **DONOVAN's map entries 61/62 (14z-82b, separate and smaller;
-  maintainer LEANING (a) keep-zeros 2026-08-12, pending final word).**
+- ~~**DONOVAN's map entries 61/62 (14z-82b, separate and smaller).**~~
+  **DECIDED 2026-08-12 (maintainer): (a) KEEP VANILLA'S ZEROS** — his
+  sword-companion objects' hit-class reactions stay as every shipped
+  build has had them; measured unexercised (0 map entries in his
+  replays). Revisit only if his satellite hits ever feel wrong in
+  playtest — then it is 2 bytes in the generator's policy + a Donovan
+  re-freeze. Original entry:
   MEASURED SINCE: his types 59-63 are the projectile-pool objects his
   SWORD-COMPANION machine spawns (61 = the sword-routine region
   x065e5a's family; spawns measured in both his replays), and they enter

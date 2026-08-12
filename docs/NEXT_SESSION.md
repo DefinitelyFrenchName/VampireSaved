@@ -20,11 +20,11 @@
 >    only FAIL anywhere is 04's held-un-ratified flicker inventory.
 >
 > **Both verification suites are GREEN** (hui30, and pyron21 at 55
-> PASS). **FIRST PRIORITY: the 04 ratification** — the maintainer can
-> now ratify the merged 04 inventory ({1525, 2005, 2009, 2195}) with its
-> mechanism NAMED ($FF0460 = the sound driver's record-pointer spill,
-> scripted lock tests/audit_ff0460_writer.sh) — or hold further. After
-> that: decision 2's final word, then the gfx half (M3b Phase 3).
+> PASS). Decision 2 is DECIDED (keep vanilla's zeros). **FIRST
+> PRIORITY: the 04 ratification** — the merged 04 inventory ({1525,
+> 2005, 2009, 2195}) with its mechanism NAMED ($FF0460 = the sound
+> driver's record-pointer spill, tests/audit_ff0460_writer.sh) — ratify
+> or hold further. Then the gfx half (M3b Phase 3).
 
 ## The .sha1 re-freeze attribution (read before touching those baselines)
 
@@ -43,10 +43,8 @@ probes, on this replay class.
 2. **The 04/2005 ratification decision** (maintainer) — everything it
    was waiting on is done: both crashes fixed, mechanism named,
    re-measured same-day on the adopted tree (identical inventory).
-3. **Decision 2 final word** (maintainer, leaning keep-zeros, measured
-   unexercised): Donovan's map[61]/[62] — his sword-companion objects'
-   hit classes, vs2 populates, vsavj zeros. Two bytes + a Donovan
-   re-freeze if ever wanted.
+3. ~~Decision 2~~ DECIDED (keep zeros, 2026-08-12): Donovan's
+   map[61]/[62] stay vanilla; revisit only on playtest feel.
 4. **Then the gfx half** (M3b Phase 3) and the tenant batteries on a
    merged build — the program half now has NO known crash.
 5. Deferred with measurements attached: the 0x54470 family's FIRST-WINS
