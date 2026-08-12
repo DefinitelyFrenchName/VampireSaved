@@ -1347,6 +1347,39 @@ ZERO dispatches in the original range [0x1C8,0x1E4) during later
 tenants' replays (a census-missed stamp would land there), renumbered
 range live for Huitzil, originals still serving tenant-0.
 
+### The projectile-pool HIT-CLASS map — a second type consumer, bounded at 64 (14z-82b)
+
+The walkers are not the only consumers of the type byte. The
+projectile-pool hit sweep (`vsavj PRG:0x1A770-0x1A886`) is SEVEN
+dispatchers — one per collision pairing — that on an OVERLAP (`bhi.s`
+skips otherwise; the dispatch is per-collision, not per-frame) map BOTH
+objects' type bytes through ONE shared routine:
+
+```
+0x1A888: move.b (4,PC,D0.w),d0 ; rts    map at 0x1A88E, 64 entries
+```
+
+then `move.w (6,PC,D0.w),d1; jmp (2,PC,D1.w)` through per-dispatcher
+8-word tables. vs2's sibling map (routine 0x19292, map 0x19298) has **80
+entries**: 0-58 byte-identical (vanilla's true domain — its type table
+has 59 rows), 59-63 divergent (vs2 gives Donovan's 61/62 classes
+0x0E/0x04; vsavj zeros them), 64-79 the newcomer extension. So **any
+ported type >= 64 in the $FF94xx pool that lands a hit over-indexes
+vsavj's map** — map[64] = the following rts opcode's 0x4E — and takes a
+wild jump: the f7997 vec3, latent in frozen pyron-m2 (satellite type 64)
+and shared by Huitzil (68/72 in the same pool). Third instance of the
+"vs2 widened an index consumer" class (14z-26 property table, 14z-35
+dispatch table, 14z-79's 0x018460 window is the same family).
+
+Fix (generated, measured, ADOPTION PENDING — STATE 14z-82b):
+`tools/gen_hitclass_map_thunk.py` + `tests/test_hitclass_map_thunk.sh` +
+`tests/audit_hitclass_map_cost.sh`. Legacy content measured entering
+this map ZERO times across four replays — the sweep serves
+secondary-object collisions vanilla content doesn't produce there.
+
+Atlas rows this depends on: the $FF9400 projectile-pool row and the
++0x02 type-byte row in `docs/game/atlas/ram.md`.
+
 ## Allocator wrappers and slot recycling (14z-65)
 
 vs2's allocators `0x15702` / `0x1572E` are wrapped (`alloc_wrap` in the

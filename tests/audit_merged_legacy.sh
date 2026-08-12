@@ -373,6 +373,24 @@ legb() {  # legb <replay-rel> <refbuild> <pokes> <label>
             echo "         probe. NOT the F2 pool-seeder path: he crashes at"
             echo "         spawn, before seeding could matter)"
         fi
+        # 14z-82b: ALWAYS measure the REFERENCE leg too. Bailing here left
+        # "the single-tenant build is clean" as an ASSUMPTION, and it was
+        # false — pyron20 crashes at f7997 solo (the latent hit-class map
+        # over-index). A guard verdict on the ref leg decides whether the
+        # defect is MERGE-SPECIFIC or LATENT IN THE FROZEN BUILD, which are
+        # different bugs with different owners.
+        if POKES="$pk" MAME_ROMPATH="$(abspath "$ref")/rompath;$ROMDIR" \
+             tools/run_replay_guarded.sh vsavjw "tests/replays/$rpl.rpl" \
+             "$W/gr_$nm.log" "$W/grbox_$nm" > "$W/gr_$nm.out" 2>&1; then
+            echo "        ref leg ($ref): guard CLEAN — the crash is"
+            echo "        MERGE-SPECIFIC"
+        else
+            echo "        ref leg ($ref): guard ALSO trips —"
+            grep -m1 -E "CRASH|SOFTRESET|PCWEEDS" "$W/gr_$nm.log" \
+                | sed 's/^/        /' || true
+            echo "        the defect is LATENT IN THE FROZEN BUILD, not a"
+            echo "        merge artifact — attribute it there"
+        fi
         fail=1; return 0
     fi
     POKES="$pk" MAME_ROMPATH="$(abspath "$ref")/rompath;$ROMDIR" \

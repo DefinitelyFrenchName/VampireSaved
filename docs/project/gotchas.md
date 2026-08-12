@@ -1834,3 +1834,30 @@ family write must map to a frozen row), and the dispatch-range gate on the
 merged build (zero original-range dispatches on later tenants' replays).
 Also: d16 matters — `move.b #$73,(2,A4)` is a type stamp, `(3,A4)` is the
 owner/sub-state byte; a d16-blind match conflates two different fields.
+
+## A two-leg A/B that bails on leg 1 leaves leg 2's health an ASSUMPTION — and the assumption was false (14z-82b)
+
+`audit_merged_legacy`'s leg-b ran the MERGED build first and returned on
+its crash, so "the single-tenant reference is clean" was never a
+measurement — it was the natural reading of a report that only ever
+showed the merged leg failing. pyron-m2 crashes at f7997 SOLO: the defect
+sat in the FROZEN build for two sessions while every record called it a
+merge artifact, and the fix hunt started in the wrong codebase half. The
+repair is structural, not procedural: on a leg-1 crash the gate now runs
+the reference leg anyway and prints MERGE-SPECIFIC vs LATENT IN THE
+FROZEN BUILD — the attribution is part of the verdict, not homework left
+to the reader. Related gap, same lesson: the only gate that ran the
+crashing replay at all (`test_pyron_soak.sh`) builds STAGE 4, so the
+frozen stage-6 artifact was never soaked — a covering gate that rebuilds
+at a different stage covers a DIFFERENT build.
+
+## A hit-path defect fires per COLLISION, not per frame — soak length is not coverage (14z-82b)
+
+The hit-class map over-index needs a specific object's hitbox to OVERLAP
+something (`bhi.s` skips the dispatch otherwise): an 11,017-frame chaos
+soak produced exactly ONE dispatch, at f7997. A replay battery can be
+green for sessions while carrying a one-collision-away crash, and "the
+soak is long" says nothing about whether the rare interaction ever
+occurred. For dispatch-guarded paths, pair the soak with a FIRE CENSUS
+(probe the dispatcher, count entries and input values) so "never fired"
+and "fired and survived" stop looking identical.

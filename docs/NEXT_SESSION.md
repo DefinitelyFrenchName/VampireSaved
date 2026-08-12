@@ -1,78 +1,66 @@
-# NEXT SESSION — orientation (written at the close of 14z-82, 2026-08-12)
+# NEXT SESSION — orientation (written at the close of 14z-82b, 2026-08-12)
 
 > ## START HERE
 >
-> **THE MERGED HUITZIL VEC3 IS FIXED AND F2 IS FIXED — both measured
-> through the full ladder.** Per-tenant TYPE NUMBERS shipped
-> (maintainer-decided at plan review: first resolver keeps originals):
-> non-first tenants' stamps are rewritten at build time from a FROZEN
-> census and the union grows per-tenant entries into each tenant's OWN
-> copy. Both former Huitzil crashers are guard-clean over full replays;
-> donovan/12_vs_cpu (the withdrawn-design killer) is guard-clean; all
-> four frozen fingerprints bit-exact throughout; leg (a) 13/14 ratified
-> classes VERBATIM. The merged shim now serves BOTH declaring tenants
-> (per-owner handler exits, tripwire fall-through; pyron direct by
-> decision).
+> **Two fixes this day, one adopted, one awaiting the maintainer.**
 >
-> **FIRST PRIORITY: Pyron's f7997 vec3 — now with a named route and a
-> measured elimination.** Crash-time history (GUARD_PROBE_HIST fires
-> from the guard's crash handler now): vanilla dispatcher 0x1A77E →
-> `0x1A790 move.b (2,A6),d0` → byte map 0x1A888 → word table → computed
-> jmp → garbage → vec3 on odd $FF31B5. A `b@(a6+2) >= 0x72` probe at the
-> mapper recorded **ZERO hits** while the crash fired identically — NOT
-> the type-numbering class, and not a census gap. What's implicated:
-> A3 = 0x49bAEA inside PYRON'S OWN wide_ext feeding that vanilla path,
-> and the fault address = $FF310A + 0xAB (an ODD table-derived offset
-> into a RAM record) — the shape of a pyron-placed data/table defect
-> (data_in_code / pcrel / placement class), one level removed. Start
-> from build/gate_failures/merged1_b_70_pyron_mash.log; the
-> single-tenant pyron20 build runs this replay CLEAN, so diff the legs
-> (index_watch / GUARD watches on the $FF310A record chain; what fills
-> its +0xAB-ish field, and from which placed table?).
+> **ADOPTED (14z-82, commit 33c2c70): the merged Huitzil vec3 + F2.**
+> Per-tenant TYPE NUMBERS (first resolver keeps originals): both former
+> Huitzil crashers guard-clean over full replays, donovan/12_vs_cpu
+> guard-clean, leg (a) 13/14 ratified classes VERBATIM, all four frozen
+> fingerprints bit-exact throughout. The merged shim now serves both
+> declaring tenants (per-owner handler exits; pyron direct by decision).
+>
+> **AWAITING DECISION (14z-82b): the f7997 fix — and the crash was NEVER
+> a merged defect.** Frozen pyron-m2 crashes at f7997 SOLO (measured; the
+> leg-b harness used to bail before measuring the ref leg — fixed — and
+> the covering soak builds stage 4, so the frozen artifact was never
+> soaked). Mechanism: vsavj's projectile-pool hit sweep maps both
+> colliding objects' TYPE bytes through one 64-entry byte map at
+> `PRG:0x1A888` (seven callers); pyron's type-64 satellite landing a hit
+> over-indexes it (map[64] = the following rts's 0x4E — the crash D0).
+> vs2's sibling map has 80 entries. Huitzil spawns 68/72 into the same
+> pool (exposed, unexercised). The fix is GENERATED
+> (tools/gen_hitclass_map_thunk.py), gated
+> (tests/test_hitclass_map_thunk.sh), and MEASURED on a probe build
+> (tests/audit_hitclass_map_cost.sh): the 11,017-frame soak that crashes
+> frozen pyron-m2 runs END-clean, legacy BIT-IDENTICAL over 30,284
+> frames, fire census = legacy never enters the map at all.
+> **Manifests deliberately untouched — adopting the row re-freezes
+> huitzil + pyron (STATE Decisions pending, with a recommendation).**
 
-## The state in one paragraph
+## First priorities (in order)
 
-`build/merged1` (rebuilt by every audit run — do NOT pin its fingerprint;
-591 ops; gfx-skipped LEGACY-ONLY instrument, never playtest) carries both
-14z-82 fixes. The one leg-(a) deviation is still `04_select_fuzz`'s extra
-deterministic flicker frame 2005 — HELD un-ratified per the maintainer's
-standing decision, but its mechanism is now NAMED: $FF0460 is the sound
-driver's record-pointer spill (writer PRG:0x0011E2; scripted lock
-`tests/audit_ff0460_writer.sh`; atlas row added), and the flicker is a
-mid-scan sample — the ratified hook-flicker family. Leg (b): huitzil
-70/83 guard-clean, donovan 12/20 guard-clean (20 re-converges 890..3667),
-pyron 72 guard-clean, pyron 70 = f7997 (above).
-
-## Then, in order
-
-2. **The 04/2005 ratification decision** (maintainer): the whole merged
-   flicker/window table wants re-measuring and ratifying once f7997 is
-   fixed — the mechanism input is ready (named owner, scripted audit).
+1. **The maintainer's two 14z-82b decisions** (STATE Decisions pending):
+   adopt `hitclass_map_extend` + re-freeze huitzil/pyron (recommended);
+   and Donovan's map[61]/[62] zeros (keep, recommended). On adoption:
+   add the row to both manifests (generate the hex with the tool, never
+   hand-type), re-freeze fingerprints + registry rows + their masked
+   legacy self-logs, re-run test_hitclass_map_thunk (its section 2 then
+   locks the committed rows) and both tenants' batteries.
+2. **The 04/2005 ratification** (maintainer): with BOTH leg-(b) crashes
+   now explained/fixed, the merged flicker/window table can be
+   re-measured and ratified; the 2005 mechanism is named ($FF0460 =
+   sound-driver record-pointer spill; tests/audit_ff0460_writer.sh).
 3. **Then the gfx half** (M3b Phase 3) and the tenant batteries on a
-   merged build — unchanged from 14z-80's list, now behind ONE remaining
-   crash instead of two.
-4. The 0x54470 family (types 59-75) stays FIRST-WINS/deferred, but its
-   measurement is attached: the frozen inventory maps its stamps, and
-   the embedded TRUNCATED walker copy at src 0x5C602 (inside all three
-   tenants' spans, table cut at every region end) is a named hazard for
-   any future renumbering THERE. Un-defer only on measurement.
+   merged build.
+4. Deferred with measurements attached: the 0x54470 family's FIRST-WINS
+   notes (frozen stamp map + the truncated embedded walker at 0x5C602);
+   type 120 (no reachable stamp; first-wins + the dispatch-range gate).
 
-## New instruments this session (all in the suite)
+## New instruments (14z-82 + 14z-82b, all in the suite)
 
 ```sh
-tests/test_type_stamp_census.sh     # ~5 s: static census vs the frozen
-                                    # inventory (build/manifest/
-                                    # type_stamps.toml); 2 verdict controls
-tests/audit_type_writes.sh          # ~8 min: dynamic writer-PC census on
-                                    # the ground-truth builds (run BEFORE
-                                    # trusting any renumber-path change)
-tests/audit_type_dispatch_range.sh  # ~8 min: merged build — zero
-                                    # original-range dispatches on later
-                                    # tenants' replays; renumbered live
-tests/audit_ff0460_writer.sh        # ~1 min: the $FF0460 owner lock
+tests/test_type_stamp_census.sh     # static census vs frozen inventory
+tests/audit_type_writes.sh          # dynamic writer-PC census (~8 min)
+tests/audit_type_dispatch_range.sh  # merged: zero original-range dispatches
+tests/audit_ff0460_writer.sh        # the $FF0460 owner lock (~1 min)
+tests/test_hitclass_map_thunk.sh    # 14z-82b fix reconstruction gate (~2 s)
+tests/audit_hitclass_map_cost.sh    # 14z-82b decision numbers (~20 min)
 ```
-`GUARD_PROBE_HIST` now also dumps history at CRASH time (replay_guard);
-`tests/lua/type_write_census.lua` is the filtered pool-write tap.
+`GUARD_PROBE_HIST` also dumps history at CRASH time; `audit_merged_legacy`
+leg-b now always measures the REF leg on a crash (MERGE-SPECIFIC vs
+LATENT verdict — the gap that mis-attributed f7997 for two sessions).
 
 ## Still open from earlier sessions, unchanged
 
@@ -91,8 +79,7 @@ export ROMDIR=/path/to/reference/sets
 tests/test_m3a_reproducible.sh             # ~4 min, all four fingerprints
 tests/test_tenant_loop.sh                  # ~17 s, the merge gate (437/591)
 tests/audit_merged_vec3.sh                 # ~4 min: GREEN since 14z-82
-tests/audit_merged_legacy.sh               # ~45 min: rebuilds build/merged1 +
-                                           # the whole two-leg measurement
-                                           # (fails BY DESIGN on 04's held
-                                           # inventory + pyron f7997)
+tests/audit_merged_legacy.sh               # ~45 min (fails BY DESIGN on 04's
+                                           # held inventory + pyron f7997
+                                           # until the 14z-82b fix is adopted)
 ```

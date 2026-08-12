@@ -518,6 +518,22 @@ tests/audit_type_writes.sh            # 14z-82 ON-DEMAND (~8 min, 6 MAME tap
                                       # trusting any renumber-path change.
                                       # Measured 14z-82: all writers in
                                       # inventory; 118/120 NOT OBSERVED
+tests/test_hitclass_map_thunk.sh      # 14z-82b: the f7997 fix body (the
+                                      # projectile hit-class byte map extended
+                                      # to vs2's 80 entries) reconstructs from
+                                      # the two ROMs; any committed manifest
+                                      # row must match it byte-for-byte. Notes
+                                      # "not adopted" while the maintainer
+                                      # re-freeze decision is pending. 2
+                                      # verdict controls. No emulator, ~2 s
+tests/audit_hitclass_map_cost.sh      # 14z-82b ON-DEMAND (~20 min): the
+                                      # adoption numbers on a PROBE build —
+                                      # the 11,017-frame soak that crashes
+                                      # frozen pyron-m2 must END clean; legacy
+                                      # A/B bit-identical (measured: 30,284
+                                      # frames, zero divergence); fire census
+                                      # (legacy enters the map 0 times).
+                                      # Never freezes the probe
 tests/audit_type_dispatch_range.sh    # 14z-82 (~8 min, 4 guarded runs): on the
                                       # MERGED build, ZERO obj_hook dispatches
                                       # in the ORIGINAL 114-119 range during

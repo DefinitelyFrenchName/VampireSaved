@@ -1,6 +1,37 @@
 # STATE — living progress log
 
-Updated: 2026-08-12 (session 14z-82 — **THE MERGED HUITZIL VEC3 IS FIXED —
+Updated: 2026-08-12 (session 14z-82b, same day — **f7997 ROOT-CAUSED AND
+FIXED ON A PROBE BUILD, AND IT WAS NEVER A MERGED DEFECT: the frozen
+pyron-m2 build crashes at f7997 SOLO.** The crash is vsavj's
+projectile-pool hit sweep (seven dispatchers, ONE 64-entry byte map at
+`PRG:0x1A888`) over-indexed by a ported type-64 satellite hit — map[64]
+reads the following rts opcode's 0x4E, exactly the crash D0; vs2's
+sibling map has 80 entries. "Single-tenant is clean" had NEVER been
+measured: `audit_merged_legacy`'s leg-b bails after the merged leg (now
+fixed — it measures the ref leg on every crash and says MERGE-SPECIFIC
+vs LATENT), and the covering soak gate builds STAGE 4, not the frozen
+stage-6 artifact. Huitzil shares the exposure (types 68/72 measured in
+the same pool; zero map entries on his suite replays — unexercised, not
+safe). My own hours-old "pyron-placed data/table defect" attribution is
+RETRACTED — A3 was a live register, not causal. **The fix is generated,
+gated, and measured**: `tools/gen_hitclass_map_thunk.py` builds a 94-byte
+site_thunk body (vanilla's 64 map bytes verbatim + vs2's 16 extension
+entries + a loud >=80 ILLEGAL; safety asserts incl. 0-58 prefix identity
+and word-table entry identity), `tests/test_hitclass_map_thunk.sh` is the
+reconstruction gate, and `tests/audit_hitclass_map_cost.sh` measured on a
+probe build: **the 11,017-frame soak that crashes frozen pyron-m2 runs
+END-clean, and legacy content is BIT-IDENTICAL on four replays (30,284
+frames) — the fire census shows legacy never enters this map at all.**
+Bonus finding: vs2 populates map[61]/[62] (DONOVAN's satellite types)
+with real hit classes where vsavj holds zeros — his projectile hit-class
+reactions are silently absent on every shipped build; the fix keeps
+vanilla's zeros (donovan-m3a untouched). **ADOPTION IS THE MAINTAINER'S:
+the row moves the huitzil+pyron frozen fingerprints — decision recorded
+under Decisions pending with all numbers.** Manifests deliberately
+untouched; all four frozen fingerprints still bit-exact. Read
+docs/NEXT_SESSION.md first.)
+
+Previously: 2026-08-12 (session 14z-82 — **THE MERGED HUITZIL VEC3 IS FIXED —
 per-tenant TYPE NUMBERS, measured green end to end — AND F2 IS FIXED the
 same emit path.** The spawn-time design shipped as maintainer-decided at
 plan review: variant (b), FIRST RESOLVER KEEPS ORIGINALS. Two censuses
@@ -261,6 +292,97 @@ the comparison error written down so it cannot be repeated. Every gate
 green at close, including two NEW audits. Read docs/NEXT_SESSION.md
 first, then the 14z-69 sections below.)
 
+## Session 14z-82b — f7997: a LATENT vanilla map over-index, fixed on a probe
+
+### The archaeology that reopened it
+
+`git log --grep` surfaced two prior fixes of the SAME class — 14z-26
+(hit-class property table 0x28D00: vs2 extended, vsavj zeros) and 14z-35
+(type-0x51 over-indexing a 0x50-entry dispatch table) — the "vs2 widened
+an index consumer vsavj didn't" family, third instance.
+
+### The mechanism, measured end to end
+
+1. Crash-time history (the new GUARD_PROBE_HIST-at-crash) named the
+   route; static decode completed it: the projectile-pool hit sweep at
+   `PRG:0x1A770-0x1A886` is SEVEN dispatchers (4 bsr.w + 3 bsr.s — a
+   bsr.w-only caller scan missed three) all funneling BOTH colliding
+   objects' type bytes through ONE byte map:
+   `0x1A888: move.b (4,PC,D0.w),d0; rts`, map at 0x1A88E, 64 entries.
+2. The crash D0=0x4E == map[64] == the following rts opcode's first
+   byte. The dispatching input was TYPE 64 — pyron's satellite (his
+   copies stamp it; the 5 writes land at $FF9402/$FF9502, the projectile
+   pool, per the 14z-82 dynamic census; the f7997 instance at $FF9602
+   was past the census's 7000-frame window). The map value indexes a
+   word table; garbage displacement 0x35E jumped to 0x1AAFE; the garbage
+   stream faulted on odd $FF31B5. The 14z-82 probe with
+   `b@(a6+2) >= 0x72` was blind BY CONSTRUCTION (64 = 0x40 < 0x72) —
+   the type-renumber elimination stands, the "pyron-placed data" reading
+   does not (A3 was pyron handler context in live registers, not causal).
+3. **The dispatch fires only on a HIT** (`bhi.s` skips it) — which is
+   why it is timing-rare: an 11,017-frame chaos soak produces exactly
+   one, at f7997.
+4. **pyron20 (frozen, stage 6) crashes SOLO** — same replay, same pokes,
+   no probes, no merge: CRASH 7997 vec3, identical registers (A3 =
+   0xFDC8A, his own single-tenant placement of the same handler data).
+   Never caught because (a) `audit_merged_legacy` leg-b bails after the
+   merged leg (the ref leg was an assumption — NOW FIXED: it always
+   measures the ref leg and prints MERGE-SPECIFIC vs LATENT), and
+   (b) `test_pyron_soak.sh` builds STAGE 4, not the frozen stage-6
+   artifact — the only gate running 70_mash never ran it on pyron-m2.
+5. vs2's sibling map (dispatcher 0x1919A, map 0x19298) has **80
+   entries**: 0-58 byte-identical to vsavj (vanilla's true domain — its
+   type table has 59 rows), 59-63 divergent (see the Donovan finding),
+   64-79 the extension (64→0x02, 68-70→0x04, 71→0x08, 73→0x04, 76→0x04,
+   rest 0). Every extension value lands on a word-table entry that is
+   byte-identical across the engines, or the do-nothing default (a plain
+   rts) — asserted by the generator, so the transplant needs NO handler
+   porting.
+6. **Huitzil shares the exposure**: his pod code writes types 68/72 into
+   the same pool (measured $FF95xx/$FF98xx); zero map entries on his two
+   suite replays — UNEXERCISED, not safe. Donovan's 59-63 fit the map.
+
+### The fix (built, gated, measured — NOT adopted; see Decisions pending)
+
+- `tools/gen_hitclass_map_thunk.py` — the 94-byte body, generated from
+  the two reference images, never hand-typed: `cmpi.w #80,d0; bcc.s
+  ILLEGAL; move.b (4,PC,D0.w),d0; rts; <64 vanilla + 16 vs2 map bytes>;
+  ILLEGAL`. Indices 0-63 byte-identical semantics (vanilla's own bytes,
+  same CCR/register contract); 64-79 vs2-faithful; >=80 a LOUD planted
+  ILLEGAL (vs2's own domain ends at 79; renumbered 5E542-types can never
+  reach this pool per the census, and if one ever did it traps loudly).
+  The generator's own asserts CAUGHT two wrong first readings: the map
+  is 80 entries, not 83 (an odd-alignment impossibility flagged it), and
+  the engines' maps differ at 61/62 (the Donovan finding below).
+  site_thunk row shape: site 0x01A888, old_hex 103b00044e75,
+  patch="jmp", rts_ok (a bsr-entered handler whose body exits by rts —
+  stack-neutral, ghost-clean).
+- `tests/test_hitclass_map_thunk.sh` — reconstruction gate (regenerates
+  from the ROMs, compares any committed row, two verdict controls). ALL
+  PASS; notes "row not adopted yet" by design.
+- `tests/audit_hitclass_map_cost.sh` — the decision numbers, on a probe
+  build (pyron.toml + the row, built to a temp dir, never frozen):
+  * **THE FIX HOLDS**: the 70_mash soak END-clean through 11,017 frames
+    (the frozen build crashes at 7997).
+  * **LEGACY COST: ZERO** — bit-identical whole-RAM checksums on
+    01_attract_long / 02_demitri_vs_cpu / 03_two_player_vs /
+    05_timeout_idle (30,284 frames), and the FIRE CENSUS explains it:
+    legacy content NEVER ENTERS this map on any measured replay (0
+    entries; the probe mechanism's liveness is proven by pyron's own
+    f7997 dispatch). The thunk is unreachable for measured legacy
+    content — the same argument class as the extended-table entries.
+
+### Corrections to hours-old claims (retraction discipline, same session)
+
+- RETRACTED: "f7997 is a pyron-placed data/table defect one level
+  removed" (14z-82 close, NEXT_SESSION + patch_notes) — the causal chain
+  is the vanilla map over-index; A3's wide_ext value was incidental.
+- RETRACTED: "the single-tenant pyron20 build runs this replay CLEAN" —
+  never measured; measured now: it crashes. The leg-b harness gap and
+  the stage-4 soak gap are both closed/documented.
+- STANDS: the type-renumber fix and every 14z-82 measurement (the
+  elimination probe's zero was correct for what it asked).
+
 ## Session 14z-82 — PER-TENANT TYPE NUMBERS: the vec3 slot fixed, F2 fixed
 
 Scope followed the maintainer's 14z-81 rulings in order: vec3 slot first,
@@ -397,6 +519,10 @@ ratification decision itself stays with the maintainer (decision 1,
 14z-81) — now about a named mechanism.
 
 ### Pyron f7997: STANDS, and it is measured NOT to be this class
+### (SUPERSEDED same day by 14z-82b above: the "pyron-placed data/table
+### defect" attribution below is RETRACTED — the crash is a LATENT vanilla
+### hit-class map over-index, present in frozen pyron-m2 solo, fixed on a
+### probe build. The elimination measurement in this subsection stands.)
 
 Crash-time instruction history (GUARD_PROBE_HIST now also fires from the
 guard's on_crash — added this session, replay_guard.lua) names the
@@ -12841,6 +12967,35 @@ docs/project/playtest_m3a_interims.md so the report can classify against it.
 Original write-up kept below.
 
 ## Decisions pending (human)
+
+- **ADOPT THE HIT-CLASS MAP EXTENSION + RE-FREEZE huitzil & pyron
+  (14z-82b).** The generated `hitclass_map_extend` site_thunk fixes a
+  playtest-reachable crash LATENT IN BOTH FROZEN TENANT BUILDS (pyron's
+  satellite type-64 contact = the f7997 vec3, measured on pyron-m2 solo;
+  Huitzil's 68/72 share the pool). Numbers, all measured on a probe build
+  (tests/audit_hitclass_map_cost.sh, rerunnable): fix holds through the
+  11,017-frame soak that crashes the frozen build; LEGACY BIT-IDENTICAL
+  over 30,284 frames on four replays, with a fire census showing legacy
+  never enters the map at all. Cost of adoption: the row goes in
+  huitzil.toml + pyron.toml (shared, dedups on the merge) → BOTH
+  verticals re-freeze (new fingerprints; registry rows; their frozen
+  masked legacy self-logs re-measured — expected unchanged given the
+  zero-fire census, but measured is the standard). Donovan/stock
+  untouched. RECOMMENDATION: adopt — it is the third instance of the
+  "vs2 widened an index consumer" class (14z-26, 14z-35 precedents) and
+  the crash needs one satellite contact to fire in a real match.
+- **DONOVAN's map entries 61/62 (14z-82b, separate and smaller).** vs2
+  gives his satellite types 61/62 hit classes 0x0E/0x04 where vsavj
+  holds the do-nothing 0 — so his type-61/62 projectile hits currently
+  produce NO hit-class reaction on every shipped build, and always have.
+  The fix above deliberately keeps vanilla's zeros (donovan-m3a
+  byte-untouched). Options: (a) keep zeros — shipped behavior, nothing
+  moves; (b) adopt vs2's two bytes in the same thunk body — vs2-faithful
+  hit reactions for his satellite, at the cost of a Donovan re-freeze
+  and a battery re-measure. If (b) is ever wanted, it is a 2-byte change
+  to the generator's policy plus the measurements; playtest feel decides
+  whether the missing reaction is real. RECOMMENDATION: (a) for now;
+  revisit if his satellite hits ever feel wrong in playtest.
 
 - **IF `anim` CANNOT LEAVE THE CRYPT WINDOW — the fallback order is set
   (maintainer, 2026-08-10).** Framing recorded verbatim in effect: *"we'll see
