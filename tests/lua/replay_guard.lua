@@ -282,6 +282,13 @@ end
 local probe_cond = os.getenv("GUARD_PROBE_COND")
 local probe_hits = 0
 local PROBE_MAX = tonumber(os.getenv("GUARD_PROBE_MAX") or "") or 400
+-- GUARD_PROBE_HIST=N (14z-81): on each probe hit, append the debugger's
+-- last-N-instruction `history` as HIST lines. Exists because a probe's
+-- RET <(SP)> names the caller ONLY for jsr entry — a tail-JMP leaves (SP)
+-- holding unrelated data, which is how the vec3 chase read a channel-record
+-- pointer as a "RAM-stub caller". History names the real instruction stream
+-- into the probe site.
+local PROBE_HIST = tonumber(os.getenv("GUARD_PROBE_HIST") or "") or 0
 if debugger and probe_addr then
     if probe_cond and #probe_cond > 0 then
         debugger:command(string.format("bpset 0x%x,%s", probe_addr, probe_cond))
@@ -314,6 +321,15 @@ if debugger then
                     frame, st["D0"].value, st["D1"].value,
                     st["A0"].value, st["A6"].value, program:read_u32(sp),
                     memtxt))
+                if PROBE_HIST > 0 then
+                    debugger:command(string.format("history maincpu,%d",
+                                                   PROBE_HIST))
+                    local cl = debugger.consolelog
+                    local n = #cl
+                    for i = math.max(1, n - PROBE_HIST), n do
+                        f:write("HIST " .. tostring(cl[i]) .. "\n")
+                    end
+                end
                 probe_hits = probe_hits + 1
                 if probe_hits >= PROBE_MAX then
                     debugger:command("bpclear")

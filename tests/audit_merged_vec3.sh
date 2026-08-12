@@ -17,9 +17,20 @@
 # all fifteen anim_index_{a,a2,b,c,proj}[id] rows are correct per tenant in
 # the merged fragment; the x06cac0 satellite-machine blob differs from
 # hui29's only in correctly re-derived literals; the pc-rel stub + word
-# table at x026142+0x13E2 is byte-identical. The pointer slot that holds
-# the Donovan value is NOT yet named — that is the open item this audit
-# exists to re-measure.
+# table at x026142+0x13E2 is byte-identical.
+#
+# NAMED same day (14z-81b, via GUARD_PROBE_HIST): the crash executes
+# `movea.l #$cb9c0,A0; jmp $15084` INSIDE TENANT-0's x088512 copy — 0xCB9C0
+# is Donovan's PLANTED TRIPWIRE for the huitzil-anim pointer he does not
+# port (m5_wide fragment:140), consumed as a DATA base instead of jumped
+# to. Huitzil's own copy holds the correct 0x425FFC at the same offset.
+# The route is the defect: object TYPE 117's handler lives in x088512,
+# which ALL tenants port, so the merged obj_hook union's ONE extended-table
+# entry can only point at one tenant's internally tenant-reconciled copy.
+# Fix: an owner-id dispatch chain per MULTI-OWNER type
+# ((+0x30,A6) -> player struct -> (0x382) id — linkage measured in the
+# crash dump), inert at N=1 by construction. This audit flips green when
+# the merged satellite reads its base from anim@huitzil and survives.
 #
 # Usage: ROMDIR=... [MAME_BIN=...] tests/audit_merged_vec3.sh [merged_build]
 # Default merged build: build/merged1 (rebuild it with

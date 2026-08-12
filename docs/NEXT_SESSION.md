@@ -4,15 +4,23 @@
 >
 > **The merged-legacy measurement ran. Split verdict: LEGACY IS SAFE — the
 > merged image lands on donovan-m3a's ratified classes 13/14 VERBATIM — but
-> TWO TENANTS BREAK on their own content.** Huitzil crashes at char-init
-> (deterministic vec3, localized to one still-unnamed pointer slot that
-> holds a DONOVAN address); Pyron crashes mid-mash-storm. Nothing here
-> touches a frozen build; all four references rebuild bit-exact.
+> TWO TENANTS BREAK on their own content.** Huitzil crashes at char-init;
+> Pyron crashes mid-mash-storm. Nothing here touches a frozen build; all
+> four references rebuild bit-exact.
 >
-> **FIRST PRIORITY: name the pointer slot behind the Huitzil vec3 crash and
-> fix it.** The chase is already 90% done and captured — read the 14z-81
-> STATE section, then run `tests/audit_merged_vec3.sh` (~4 min): it prints
-> the healthy-vs-bad values and is the regression gate for the fix.
+> **THE VEC3 SLOT IS NAMED (14z-81b): a MULTI-OWNER obj_hook type has ONE
+> extended-table entry.** Type 117's handler lives in x088512, which ALL
+> tenants port; the merged union routed everyone into tenant-0's
+> internally tenant-reconciled copy, and Huitzil's object consumed
+> Donovan's planted tripwire ADDRESS as a data base (hence vec3, not the
+> tripwire's own ILLEGAL).
+>
+> **FIRST PRIORITY: implement the fix** — an owner-id dispatch chain per
+> multi-owner obj_hook type (the ratified 14z-80h chain form; owner
+> linkage `(+0x30,A6) -> (0x382,player)` measured in the crash dump; tail
+> = tripwire; inert at N=1 by construction). Full design + open questions:
+> STATE 14z-81b. Regression gate already in place:
+> `tests/audit_merged_vec3.sh` (~4 min) flips green when fixed.
 
 ## The state in one paragraph
 
@@ -27,29 +35,39 @@ speculation, WITHDRAWN). Leg (b): Donovan guard-clean (divergences vs m3a
 unattributed but placement-shaped), Huitzil vec3 at f2886 (4/4 runs), Pyron
 vec3 at f7997 (2/2 runs, evidence in build/gate_failures/).
 
-## 1. THE VEC3 SLOT — first priority, with the trail already blazed
+## 1. THE VEC3 FIX — first priority; the slot is NAMED, the design is
+##    written (STATE 14z-81b)
 
-Measured and ruled out (details + numbers in STATE 14z-81):
+Root cause, verified end to end: the merged obj_hook union gives a
+MULTI-OWNER type (117 — its handler lives in x088512, which all three
+tenants port) ONE extended-table entry, and routed every tenant into
+tenant-0's copy. The copies are internally tenant-reconciled (per-tenant
+anim literals; cross-tenant pointers are planted tripwires), so Huitzil's
+object executed `movea.l #$cb9c0,A0; jmp $15084` — Donovan's TRIPWIRE
+ADDRESS consumed as a data base. (Note the 0xC0114+0xB8AC decomposition in
+the first-pass chase was a red herring — the literal is the tripwire
+address directly.)
 
-- Crash: satellite object $FFB800, vanilla anim walker entry 0x15084,
-  fault at 0x15096; merged base A0=0xCB9C0 (unplaced gap), healthy would be
-  anim@huitzil+0xB8AC = 0x425FFC (hui29 measures 0xE456C = his anim+0xB8AC).
-- 0xCB9C0 is in NO rom byte and NO op — runtime-composed; minus the 0xB8AC
-  offset it is 0xC0114 = TENANT-0's ported `code` + 0xA74.
-- Already verified correct: all 15 anim_index rows; the x06cac0 blob's
-  re-derived literals; the x026142+0x13E2 pc-rel stub (byte-identical).
+Implement: in `engine_here()`'s obj_hook union, detect types resolved by
+>1 tenant's view; for each, emit an owner-id dispatch chain
+(`movea.w (0x30,a6),a1; cmpi.b #id,(0x382,a1); bne.s next; jmp <that
+tenant's copy>`; tail = tripwire) and point the table entry at it. Inert
+at N=1 by construction (no multi-owner types exist), so all four frozen
+fingerprints must stay bit-exact — assert that first, then
+`tests/audit_merged_vec3.sh` flips green, then re-run
+`tests/audit_merged_legacy.sh` in full (~45 min).
 
-Next probe: GUARD_PROBE at H's satellite spawn handler (x06cac0@huitzil is
-at 0x415980 in merged; obj_hook types 64-75 dispatch there) and watch where
-the 0xC0114 half is LOADED from — or `tests/lua/index_watch.lua`. Warning
-from this session (gotcha filed): the pushed vec3 PC (0x15098) is
-mid-instruction — probe ENTRY addresses, never the CRASH-line PC. And the
-FBNeo tap is not comparable here (frame skew + slot recycling put the
-satellite elsewhere; merged even survives the replay on FBNeo — MAME is the
-instrument).
-
-Fix lands → `tests/audit_merged_vec3.sh` flips green → re-run
-`tests/audit_merged_legacy.sh` in full.
+Verify before emitting 68k (the 14z-78 rule — do not author 68k from
+static reading alone):
+- `+0x30` holds the owning player struct for EVERY type in the
+  multi-owner family (measured for the type-117 instance in the crash
+  dump; check the others — the spawn code `move.w A6,($30,A4)` stores the
+  CREATOR, which for nested spawns may be an object, not the player: walk
+  one level if so, or find the player field the family actually carries).
+- The dispatcher's register contract at the entry (is a1 clobberable?) —
+  the existing ghost-clean obj_hook thunks document the contract.
+- Whether Pyron's f7997 crash dissolves with this fix (same family) or is
+  a second instance — re-run his leg with GUARD_PROBE_HIST if it stands.
 
 ## Then, in order
 

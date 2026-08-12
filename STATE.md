@@ -18,8 +18,11 @@ CRASHES at char-init** — deterministic vec3, 4/4 runs; his satellite's
 runtime-composed anim base carries a DONOVAN address while all fifteen
 `anim_index_*` rows are CORRECT and his satellite-machine blob differs from
 hui29's only in correctly re-derived literals; the pointer slot holding the
-Donovan value is NOT yet named. `tests/audit_merged_vec3.sh` is the
-rerunnable probe and the regression gate for the fix. **Pyron crashes under
+Donovan value was NAMED the same day (see the 14z-81b addendum below):
+the merged obj_hook union's ONE entry for a MULTI-OWNER type routes every
+tenant into tenant-0's internally tenant-reconciled x088512 copy.
+`tests/audit_merged_vec3.sh` is the rerunnable probe and the regression
+gate for the fix. **Pyron crashes under
 the mash storm** (deterministic vec3 at f7997; evidence kept in
 `build/gate_failures/`). Donovan is guard-clean; his divergences vs m3a are
 UNATTRIBUTED but shaped like cached placed pointers. F2 — the merged
@@ -271,7 +274,67 @@ with 14z-78's code-runs-from-wide_ext finding).
 | Huitzil | 70_mash, 83_fx | **CRASH, both, deterministic** — vec3 at char-init (MAME f2886/2887, 4/4 runs incl. the probe audit), pushed PC 015098, odd A0=000c6df9 |
 | Pyron | 70_mash, 72_cosmo_2p | **70 CRASHES at f7997** (vec3, PC 01ab10, odd RAM ptr $FF31B5, A3=0x49bb8a in his own wide_ext; identical REGS on re-run — deterministic; evidence in `build/gate_failures/merged1_b_70_pyron_mash.log`). 72 (the only rig that fires Cosmo) guard-clean, PERMANENT divergence from f890 as expected |
 
-### The Huitzil crash, localized to one unnamed pointer slot
+### 14z-81b addendum — THE VEC3 SLOT IS NAMED (same day, after the
+### maintainer's rulings): a MULTI-OWNER obj_hook type has ONE table entry
+
+`GUARD_PROBE_HIST` (added to the guard this session — the debugger's
+`history` captured at each probe hit, because RET <(SP)> lies for tail-jmp
+entry) shows the crash instruction stream verbatim:
+
+```
+0D22C4: movea.l #$cb9c0, A0     <- inside TENANT-0's x088512 copy
+0D22CA: jmp     $15084.l        <- the vanilla anim walker
+```
+
+The chain of facts, each verified:
+
+1. `0xCB9C0` is a PLANTED TRIPWIRE in tenant-0's build:
+   `x088512+0x2156: unresolved 0x25111e -> tripwire 0xcb9c0`
+   (m5_wide fragment:140). Donovan's copy of the satellite-spawn literal
+   targets HUITZIL-anim source space he does not port — dead path for him,
+   correctly tripwired, single-tenant-fine. The walker consumed the
+   tripwire ADDRESS AS A DATA BASE, so the planted ILLEGAL never got to
+   name itself — it surfaced as a vec3 two instructions later. (A tripwire
+   only names itself when JUMPED to; used as data it is just a bad
+   pointer. Worth remembering when reading any vec3 near a tripwire
+   block.)
+2. Huitzil's OWN copy is CORRECT: `fixed_x088512.huitzil.bin` at the same
+   offset holds `movea.l #$425FFC` = anim@huitzil+0xB8AC exactly (and
+   pyron's holds his own 0x4A7BE0). The reconciler did its job per tenant.
+3. The defect is the ROUTE: the crashing object is TYPE 117 (0x75, header
+   `01007500` in the crash dump), dispatched from the vanilla pool walker
+   (0x5E52A / obj_hook site 0x5E542's EXTENDED table) into tenant-0's
+   copy. Type 117 appears in NO tenant's tripwire list — its handler
+   lives in x088512, which ALL THREE tenants port, so every tenant's view
+   resolves it and the engine-level union (14z-80f) had to pick one
+   address for ONE table slot. It picked tenant-0's copy. One
+   tenant-reconciled copy cannot serve N tenants: any non-tenant-0 tenant
+   spawning the 117 family executes Donovan's literals.
+4. The fix's one runtime prerequisite is MEASURED: the object's `+0x30`
+   word holds the OWNING PLAYER struct's low word (`0x8400` in the crash
+   dump = $FF8400 = P1; the sign-extended `movea.w` idiom is visible in
+   the crash registers, A3=0xFFFF8800). So an owner-id dispatch can read
+   `(+0x30,A6) -> (0x382,player)` — the exact read test_shim_charid.sh
+   validated on player structs.
+
+**FIX DESIGN (the 14z-80h chain form, applied to obj_hook):** for a type
+resolved by MORE THAN ONE tenant's view, the union's entry must point at a
+generated owner-id dispatch —
+`movea.w (0x30,a6),a1; cmpi.b #id,(0x382,a1); bne.s next; jmp <that
+tenant's copy handler>` per tenant, tail = tripwire (an object owned by a
+LEGACY character reaching a tenant type is a bug worth naming, not a
+fall-through). At N=1 no type is multi-owner, so nothing is emitted and
+every frozen build stays bit-exact BY CONSTRUCTION. Open questions for the
+implementing session: whether `+0x30` is the owner for EVERY type in the
+117 family (verify per type before emitting), the dispatcher's register
+contract at the entry (is a1 clobberable — the existing ghost-clean thunks
+document the contract), and whether Pyron's f7997 crash dissolves with
+this fix (his objects transit the same family) or is a second instance to
+chase with the same GUARD_PROBE_HIST rig.
+
+### The Huitzil crash, localized (the 14z-81 first-pass chase; the
+### conclusion is superseded by the 14z-81b addendum above — the slot IS
+### now named)
 
 The chase, each step measured (probe rig = `audit_merged_vec3.sh`):
 
@@ -282,9 +345,15 @@ The chase, each step measured (probe rig = `audit_merged_vec3.sh`):
    a clean zero forever; gotcha filed).
 2. The crashing object is `$FFB800` — a SATELLITE, not the player struct.
    Entry probe at f2886, both builds, same object, same index (D0=0), same
-   RAM-stub caller: hui29 healthy base `A0=0x000E456C` = his placed anim +
+   `(SP)` long: hui29 healthy base `A0=0x000E456C` = his placed anim +
    0xB8AC; merged `A0=0x000CB9C0` — an UNPLACED GAP. Healthy merged value
-   would be anim@huitzil + 0xB8AC = 0x425FFC.
+   would be anim@huitzil + 0xB8AC = 0x425FFC. (CORRECTED 14z-81 same day:
+   that `(SP)` long `0x00FF02DC` was first read as a "RAM-stub caller" —
+   it is a CHANNEL-RECORD POINTER in the $FF02xx block, identical on both
+   builds because the walker is entered by TAIL-JMP and `(SP)` holds the
+   outer frame's data, not a return address. `GUARD_PROBE_HIST` was added
+   to the guard so a probe can name a jmp-entry caller from the debugger's
+   instruction history instead.)
 3. `0x000CB9C0` appears NOWHERE in the merged image (raw-byte search and
    ops search both empty) — the base is COMPOSED AT RUNTIME.
 4. `0xCB9C0 - 0xB8AC = 0x000C0114` = **tenant-0's ported `code` region +
