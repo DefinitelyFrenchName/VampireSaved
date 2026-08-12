@@ -47,8 +47,8 @@ speculation, WITHDRAWN). Leg (b): Donovan guard-clean (divergences vs m3a
 unattributed but placement-shaped), Huitzil vec3 at f2886 (4/4 runs), Pyron
 vec3 at f7997 (2/2 runs, evidence in build/gate_failures/).
 
-## 1. THE VEC3 FIX — first priority; the slot is NAMED, the design is
-##    written (STATE 14z-81b)
+## 1. THE VEC3 FIX — first priority: the spawn-time TAG design
+##    (root cause STATE 14z-81b; the withdrawn stub attempt 14z-81c)
 
 Root cause, verified end to end: the merged obj_hook union gives a
 MULTI-OWNER type (117 — its handler lives in x088512, which all three
@@ -108,8 +108,12 @@ guard-clean.
    merged-H skips pool seed/phase gate/flavor). Fix shape: the shim's tail
    jmp targets ONE handler and later tenants aren't placed on iteration 0,
    so this is the site_thunk assemble-after-the-loop pattern (14z-80h).
-   Maintainer recommendation queued: fix after the vec3 slot is named —
-   same emit path, one re-measure covers both.
+   Maintainer-DECIDED ordering: after the vec3 slot is named. The slot IS
+   named, so F2 unblocks once the tag fix lands — same emit path, one
+   re-measure covers both. Note the 14z-81c lesson applies here too: the
+   shim's flavor chain reads (0x382,A6) at char-init, which IS measured
+   valid for the PLAYER structs (test_shim_charid) — but do not extend
+   that assumption to objects or to vs-CPU P2 without measuring.
 4. **The 2005 flicker's owner** — identify the $FF0460 writer
    (FBNEO_HTAP="0460-0463" is the cheap instrument) so the ratification
    decision is about a NAMED mechanism. Then the maintainer decides
