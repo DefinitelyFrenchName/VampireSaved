@@ -1010,6 +1010,16 @@ tests/audit_gfx_merged_census.sh      # 14z-83 (M3b Phase 3 S0): the COMPLETE
                                       # 45,449/65,536; pools EMPTY. Two
                                       # comparator verdict controls (must-
                                       # fire both directions). Static, ~3min
+tests/test_gfx_collision_gate.sh      # 14z-83 (S1): ground truth for
+                                      # build_gfx place() — same-source-or-
+                                      # fail on EVERY pass (was 2 of 8; the
+                                      # band pass had NO check). Clean write,
+                                      # benign same-source skip, different-
+                                      # bytes MUST-RAISE control naming both
+                                      # provenances, and the single-write-
+                                      # path textual lock. Emits
+                                      # gfx_written.json (the S2 chain
+                                      # ledger). No ROMs, ~1s
 tests/test_extract_hp.sh              # Huitzil/Pyron extraction gate (14z-65):
                                       # frozen region shapes (piecewise shifts,
                                       # dead filler, the H insertion sliver) +

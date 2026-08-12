@@ -69,6 +69,29 @@ def load_group(z, prefix, group):
     return out
 
 
+def place(dst, written, idx, tile, kind, sidx, pass_name):
+    """same-source-or-fail — gfx_layout3.toml's collision_rule, generalized
+    to EVERY pass (14z-83 S1; it was implemented on 2 of 8). A destination
+    written twice must carry byte-identical tiles: identical -> benign
+    skip (returns False), different -> a NAMED build error. `written` is a
+    dict idx -> (kind, sidx) so the error names both provenances — that
+    dict is also the cross-link ledger the chain mode consumes (S2).
+
+    Solo-build bit-identity: no solo pass collides with different bytes
+    today (tests/audit_gfx_merged_census.sh, intra-tenant = 0), so this
+    changes no output byte on any existing path — it converts silent
+    impossibilities into loud errors."""
+    if idx in written:
+        assert tile_bytes(dst, idx) == tile, (
+            f"{pass_name}: dst 0x{idx:05X} collides with DIFFERENT bytes "
+            f"(prior {written[idx][0]}:0x{written[idx][1]:05X}, "
+            f"new {kind}:0x{sidx:05X}) — same-source-or-fail")
+        return False
+    write_tile(dst, idx, tile)
+    written[idx] = (kind, sidx)
+    return True
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("romdir")
@@ -139,7 +162,7 @@ def main():
     args = ap.parse_args()
     os.makedirs(args.outdir, exist_ok=True)
 
-    global DST_BANK, DELTA, BAND_LO, BAND_HI, SRC_BANK
+    global DST_BANK, DELTA, BAND_LO, BAND_HI, SRC_BANK, SAFE_LO, SAFE_HI
     layout_row = None
     frozen_ceiling = SAFE_LO   # Donovan's safe window floor: the delta-0
     #                            write ceiling (disjointness by interval)
@@ -173,6 +196,15 @@ def main():
         if _t.get("name") == "donovan":
             assert (DELTA, BAND_LO, BAND_HI) == (0x2750, 0x863F, 0xC2EF), \
                 "layout donovan row drifted from the frozen constants"
+        # 14z-83 S1: the safe window is manifest-driven like band/delta
+        # (it was the last module-constant pair) — with the same frozen-
+        # drift assert, since the m3a reference bakes these values.
+        if "safe_lo" in layout_row:
+            assert (int(layout_row["safe_lo"]), int(layout_row["safe_hi"])) \
+                == (SAFE_LO, SAFE_HI), \
+                "layout safe window drifted from the frozen constants"
+            SAFE_LO = int(layout_row["safe_lo"])
+            SAFE_HI = int(layout_row["safe_hi"])
     # WIDE group C (banks 4-5): the tenant's band+shelf keep their in-group
     # tile indices (code+DELTA, unchanged from the host-band layout, so the
     # RECORDS need no rewrite at all) but the tile DATA goes into the four
@@ -221,7 +253,7 @@ def main():
 
     # src bank 3 -> group-B index = 0x10000 + code
     # dst bank 2 -> group-B index = 0x00000 + code
-    written = set()
+    written = {}      # idx -> (src kind, src idx): the collision ledger
     # session 14z-10: band srcs whose delta target is a PROTECTED vanilla
     # position are relocated by the generator's exception pool (they
     # arrive via effect_map pairs instead) — never write their delta slot.
@@ -234,9 +266,8 @@ def main():
     for code in band:
         if code in skip_band:
             continue
-        tile = tile_bytes(src, 0x10000 + code)
-        write_tile(dst, (code + DELTA), tile)
-        written.add(code + DELTA)
+        place(dst, written, code + DELTA, tile_bytes(src, 0x10000 + code),
+              "vs2B", 0x10000 + code, "band")
 
     # effect tiles: explicit (src, dst) pairs from the generator's
     # shelf-pack of the mixed-record shared-effect blocks
@@ -245,9 +276,8 @@ def main():
         eff_pairs = json.load(open(args.effects))
         for s, t in eff_pairs:
             assert SAFE_LO <= t <= SAFE_HI, f"effect dst 0x{t:04X} unsafe"
-            assert t not in written, f"effect dst 0x{t:04X} collides"
-            write_tile(dst, t, tile_bytes(src, 0x10000 + s))
-            written.add(t)
+            place(dst, written, t, tile_bytes(src, 0x10000 + s),
+                  "vs2B", 0x10000 + s, "effects")
         print(f"effects: {len(eff_pairs)} tiles placed from effect_map")
 
     # 14z-71: PROCEDURAL-STRIP art (the beam's stretching middle). Sourced
@@ -265,9 +295,8 @@ def main():
             d1 = c + shift
             assert d1 < 0x10000, \
                 f"strip dst 0x{d1:05X} leaves group C bank 4"
-            assert d1 not in written, f"strip dst 0x{d1:05X} collides"
-            write_tile(dst, d1, tile_bytes(srcA1, 0x10000 + c))
-            written.add(d1)
+            place(dst, written, d1, tile_bytes(srcA1, 0x10000 + c),
+                  "vs2A", 0x10000 + c, "strip")
         print(f"strip tiles: {len(st['tiles'])} vs2 bank-1 tiles copied to "
               f"group C bank 4 at +{shift:#06x} "
               f"(0x{min(st['tiles'])+shift:04X}-0x{max(st['tiles'])+shift:04X})")
@@ -286,10 +315,8 @@ def main():
         eff5 = json.load(open(args.effect_c5))
         srcA5 = load_group(z2, "vs2", GROUP_A)
         for c in eff5:
-            d5 = 0x10000 + c
-            assert d5 not in written, f"effect-c5 dst 0x{d5:05X} collides"
-            write_tile(dst, d5, tile_bytes(srcA5, 0x10000 + c))
-            written.add(d5)
+            place(dst, written, 0x10000 + c, tile_bytes(srcA5, 0x10000 + c),
+                  "vs2A", 0x10000 + c, "effect-c5")
         print(f"effect-c5: {len(eff5)} native bank-1 tiles copied to "
               f"group C upper bank")
     elif args.effect_c5:
@@ -306,15 +333,10 @@ def main():
         if srcA5 is None:
             srcA5 = load_group(z2, "vs2", GROUP_A)
         for c in b5:
-            d5 = 0x10000 + c
-            if d5 in written:
-                # same-source rule: an effect-c5 tile already placed this
-                # code from the SAME vs2 group A — byte-identical is benign
-                assert tile_bytes(dst, d5) == tile_bytes(srcA5, 0x10000 + c), \
-                    f"bank-5 dst 0x{d5:05X} collides with DIFFERENT bytes"
-                continue
-            write_tile(dst, d5, tile_bytes(srcA5, 0x10000 + c))
-            written.add(d5)
+            # same-source rule: an effect-c5 tile may already have placed
+            # this code from the SAME vs2 group A — place() skips it
+            place(dst, written, 0x10000 + c, tile_bytes(srcA5, 0x10000 + c),
+                  "vs2A", 0x10000 + c, "select-bank5")
         print(f"select bank-5: {len(b5)} native tiles copied to group C "
               f"upper bank")
     elif args.select_bank5:
@@ -333,19 +355,12 @@ def main():
         if srcA5 is None and wb5["vs2"]:
             srcA5 = load_group(z2, "vs2", GROUP_A)
         for c in wb5["host"]:
-            d5 = 0x10000 + c
-            assert d5 not in written, f"wheel host dst 0x{d5:05X} collides"
-            write_tile(dst, d5, tile_bytes(srcA_host, 0x10000 + c))
-            written.add(d5)
+            place(dst, written, 0x10000 + c,
+                  tile_bytes(srcA_host, 0x10000 + c),
+                  "vsavA", 0x10000 + c, "wheel-host")
         for c in wb5["vs2"]:
-            d5 = 0x10000 + c
-            if d5 in written:
-                assert tile_bytes(dst, d5) == \
-                    tile_bytes(srcA5, 0x10000 + c), \
-                    f"wheel vs2 dst 0x{d5:05X} collides with DIFFERENT bytes"
-                continue
-            write_tile(dst, d5, tile_bytes(srcA5, 0x10000 + c))
-            written.add(d5)
+            place(dst, written, 0x10000 + c, tile_bytes(srcA5, 0x10000 + c),
+                  "vs2A", 0x10000 + c, "wheel-vs2")
         print(f"wheel bank-5: {len(wb5['host'])} host tiles (byte-identical "
               f"vsav group A) + {len(wb5['vs2'])} vs2 medallion tiles "
               f"copied to group C upper bank")
@@ -421,6 +436,11 @@ def main():
             print(f"  wrote vm3.{n}m sha1 "
                   f"{hashlib.sha1(bytes(buf)).hexdigest()}")
 
+    # group-A passes share one ledger: three passes write the same four
+    # members (chaining through the outdir files), and a cross-pass
+    # different-bytes overwrite was SILENT before place() (each pass
+    # readback-verified only its own pairs) — 14z-83 S1
+    writtenA = {}
     # effect-tail art: vs2 bank-1 blocks placed at vsav bank-1 anchors
     if args.effect_tail:
         et = json.load(open(args.effect_tail))
@@ -460,8 +480,9 @@ def main():
                 for dx in range(int(bx)):
                     s_ = (t & ~0xF) + (dy << 4) + ((t + dx) & 0xF)
                     d_ = (anchor & ~0xF) + (dy << 4) + ((anchor + dx) & 0xF)
-                    write_tile(dstA0, 0x10000 + d_,
-                               tile_bytes(srcA0, 0x10000 + s_))
+                    place(dstA0, writtenA, 0x10000 + d_,
+                          tile_bytes(srcA0, 0x10000 + s_),
+                          "vs2A", 0x10000 + s_, "effect-tail")
                     n += 1
         for k, v in places.items():
             tt, bx, by = k.split(",")
@@ -487,7 +508,9 @@ def main():
         else:
             dstA = [bytearray(s) for s in load_group(za, "vm3", GROUP_A)]
         for s_, t_ in sel:
-            write_tile(dstA, 0x10000 + t_, tile_bytes(srcA, 0x10000 + s_))
+            place(dstA, writtenA, 0x10000 + t_,
+                  tile_bytes(srcA, 0x10000 + s_),
+                  "vs2A", 0x10000 + s_, "select")
         for s_, t_ in sel:
             assert tile_bytes(dstA, 0x10000 + t_) == \
                 tile_bytes(srcA, 0x10000 + s_), \
@@ -511,7 +534,9 @@ def main():
         else:
             dstA = [bytearray(s) for s in load_group(za, "vm3", GROUP_A)]
         for s_, t_ in ovl:
-            write_tile(dstA, 0x10000 + t_, tile_bytes(srcA, 0x10000 + s_))
+            place(dstA, writtenA, 0x10000 + t_,
+                  tile_bytes(srcA, 0x10000 + s_),
+                  "vs2A", 0x10000 + s_, "overlay")
         for s_, t_ in ovl:
             assert tile_bytes(dstA, 0x10000 + t_) == \
                 tile_bytes(srcA, 0x10000 + s_), \
@@ -522,6 +547,19 @@ def main():
             open(path, "wb").write(buf)
             print(f"  wrote vm3.{n}m sha1 "
                   f"{hashlib.sha1(bytes(buf)).hexdigest()}")
+
+    # the write ledger (14z-83 S1): every destination this run touched,
+    # with its source provenance — the chain mode (S2) loads a prior
+    # link's ledger so cross-LINK collisions get the same
+    # same-source-or-fail treatment place() gives cross-PASS ones
+    ledger_group = "C" if group_c else "B"
+    ledger = {ledger_group: sorted([i, k, s]
+                                   for i, (k, s) in written.items()),
+              "A": sorted([i, k, s] for i, (k, s) in writtenA.items())}
+    json.dump(ledger, open(os.path.join(args.outdir, "gfx_written.json"),
+                           "w"))
+    print(f"wrote gfx_written.json ({len(written)} group-{ledger_group} + "
+          f"{len(writtenA)} group-A entries)")
 
     spec = {"delta": DELTA, "band_lo": BAND_LO, "band_hi": BAND_HI,
             "dst_bank_word": bank_word(DST_BANK),
