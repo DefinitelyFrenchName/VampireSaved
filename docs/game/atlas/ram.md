@@ -28,6 +28,7 @@ this list require a measured mechanism + maintainer sign-off.
 |---|---|---|---|
 | `RAM:$FF7F00-$FF7FFF` | system stack reserve; SP rests at $FF8000 at the frame-done sample point, so everything below is dead (stale return addresses, abandoned exception frames, interrupt-time register saves). Hook cycle-skew makes these bytes differ while live state is identical. Observed divergence extent: $FF7FA0-$FF7FFF | ghost (dead at sample) | [D: frame-boundary dumps vanilla vs hooked, session 7] |
 | `RAM:$FF043C` | 68k↔QSound handshake latch (values 04/08, toggles per frame); phase-shifts one frame under hook cycle skew — same family as the $FF1CF0 latch under `-debug` (GOTCHAS) | phase | [D: single-byte diff isolation, session 7] |
+| `RAM:$FF0460.l` (and `$FF045C.l`) | the SOUND DRIVER's current-record pointer spill (and its SP spill): the driver's dispatch prologue at `PRG:0x0011DE/0x0011E2` (`move.l sp,(-$7BA4,A5); move.l a0,(-$7BA0,A5)`, A5=$FF8000) saves A0 = whichever record it is servicing — the $FF02xx channel records (0x20-stride: $025C/$027C/$029C/$02BC/$02DC…$033C) or the $FF043C latch — dozens of times per frame (FBNEO_HTAP: one writer PC, 415k writes over 04_select_fuzz). At a frame-done sample it normally rests at $00FF043C; a hook-cycle-skewed frame can sample it MID-SCAN (the 14z-81 merged flicker at f2005 read $00FF02DC) — one-frame pointer-phase, no gameplay surface. This retires the WITHDRAWN "sound-queue drain cursor" speculation with a measured owner | phase | [D: FBNEO_HTAP ff0460-ff0463 on vanilla 04_select_fuzz + opcode-view disassembly of 0x11D6-0x11EC, 14z-82] |
 | `RAM:$FF4182-$FF41A1` | palette-fade staging buffer: the 0x20-byte slot where select palette-block-A row 14 lands when a venue fade stages block-A rows (buffer family: `$FF4182 + row*0x20`, F-bright applied at staging). The 14z-49 medallion recolor changes that ROM row by design (data_port `med_pal_row14_a`: vsavj `0x3A3A80` ← vs2 `0x3BAFDC`), so the slot's content legitimately differs from vanilla on this build. Display-only (buffer → 90C000; the destination venue overwrites row 14 — legacy win screens pixel-compare 0-diff at f9200/f9400). Masked 14z-49, **maintainer-ratified 2026-08-02 (round 64)**. Expected content while masked — vanilla: `fffcfdc8fb96f973fcfffbcffa9df97af768f658f447f326ff00fc00f800f014`; this build: `fffffda8fc86fb75fa64f743f532f322facef78df458ffd6fb84fc22f922f005` (= vs2's live select row 05). **Audit on suspicion:** `tests/audit_mask_window_ff4182.sh` — reruns the original attribution measurement (05_timeout_idle f9126, vanilla + patched) and asserts the window holds exactly the expected row on each side AND the surrounding buffer bytes (`$FF4140-$FF41DF` outside the window) still match vanilla — i.e., the blind spot hides the designed diff and nothing else. Rerun it whenever: a new divergence lands near `$FF41xx`, row 14's source is retuned, or a new palette-block port is added (Huitzil/Pyron — extend the window per-slot then, never pre-widen) | designed content (this build) | [D: 05_timeout_idle f9126 byte-for-byte attribution + win-screen pixel A/B, session 14z-49; scripted audit added 14z-49d] |
 
 ## System / match globals
@@ -158,6 +159,15 @@ Fighter object ($FF8400 P1 / $FF8800 P2):
 
 Effect-piece pool $FFB800-$FFBFFF (0x80-stride slots):
 - +0x00 alive/header (fleet spawner writes 0x01000800),
+- **+0x02 TYPE byte** — the pool walker 0x5E52A's dispatch index
+  (`move.b (2,a6),d0; *4` into the table at 0x5E556); written by header
+  longs `move.l #$01xxTTss,(A4)` or byte stamps `move.b #type,(2,A4)`
+  (the full frozen inventory: build/manifest/type_stamps.toml, 14z-82).
+  On multi-tenant builds, non-first tenants' extended types (114-119)
+  are RENUMBERED per tenant (engine_internals "Per-tenant TYPE
+  NUMBERS"),
+- +0x03 owner id / sub-state (written with the type by the spawn
+  idiom; usage differs by family — pods: owner id, effects: sub-state),
 - +0x0A subtype (fleet pieces 0x25/0x26),
 - +0x1C record chain (head ptr; [head+4] = OBJ record — NULL until
   the anim stepper 0x1378A-family installs it),
@@ -165,3 +175,9 @@ Effect-piece pool $FFB800-$FFBFFF (0x80-stride slots):
   sets the real bank),
 - +0x30 owner link (movea.w-compatible fighter pointer),
 - +0x54 effect id / +0x56 sub-id.
+
+Local pool $FFC800-$FFCFFF (24 × 0x80-stride slots; 14z-82): walked by
+an embedded dispatcher INSIDE the x088512 span (src 0x8B988 =
+x088512+0x3476, hui/pyron copies) with its OWN table at x088512+0x3494 —
+its +0x02 type bytes are a SEPARATE small numbering space (0..~23),
+nothing to do with the 0x5E556 table's numbers.

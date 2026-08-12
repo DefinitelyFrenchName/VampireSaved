@@ -405,16 +405,15 @@ def merge_init_shim(a, b, ctx=None):
     """Merge two `[init_shim]` declarations (M3b slice G, MAINTAINER-RATIFIED
     2026-08-10). Returns (merged, collisions).
 
-    MEASURED GAP (14z-81, STATE F2): this merge produces the intended ONE
-    declaration, but the emitter plants the shim only on ITERATION 0's
-    dispatch row (`row_here` -> `_ti == 0`), and later tenants' rows are
-    direct-repointed — so on a merged build every tenant AFTER the first
-    bypasses the seeder, the phase gate and his flavor write, and the
-    id-dispatched chain below only ever runs with tenant 0's id. The fix is
-    the site_thunk assemble-after-the-loop shape (14z-80h): the tail jmp
-    targets one handler, and later tenants' handlers are not placed yet on
-    iteration 0. Open defect; do not read this docstring as the emitted
-    behaviour.
+    F2 FIXED (14z-82; the gap was MEASURED 14z-81): on a multi-tenant build
+    the emitter no longer plants the shim on iteration 0 — every DECLARING
+    tenant's dispatch row is collected during its own iteration and ONE
+    merged shim is assembled at engine_here (the site_thunk
+    assemble-after-the-loop shape, 14z-80h), with flavor_chain_multi giving
+    each block its OWNER's handler exit and a tripwire fall-through.
+    Asserted post-fix by tests/audit_merged_legacy.sh section 0
+    (HENT == SHIM, PENT != SHIM). Single-tenant builds keep the historical
+    iteration-0 emission byte-for-byte.
 
     The shim is emitted ONCE per build at ONE site, so a merged build has one
     seeder and one flavor writer. The three parts resolve differently:
@@ -616,6 +615,38 @@ def owner_dispatch_stub(shape, tenants, tripwire):
     return bytes(out)
 
 
+def load_type_stamps(path):
+    """Parse the FROZEN type-stamp inventory (build/manifest/type_stamps.toml,
+    14z-82) — the minimal TOML subset the file uses (rows of `k = v`).
+
+    The inventory is produced by tools/audit_type_stamps.py, HUMAN-REVIEWED,
+    and gated by tests/test_type_stamp_census.sh; this loader trusts its
+    shape and fails loudly on anything it does not recognise, because a
+    half-read inventory silently narrows the renumber worklist — the exact
+    census-gap class the dynamic audit exists to prevent."""
+    rows = []
+    cur = None
+    for ln in Path(path).read_text().splitlines():
+        s = ln.strip()
+        if s.startswith("[["):
+            cur = {"_kind": s.strip("[]")}
+            rows.append(cur)
+        elif cur is not None and "=" in s and not s.startswith("#"):
+            k, _, v = s.partition("=")
+            cur[k.strip()] = v.split("#")[0].strip().strip('"')
+    return rows
+
+
+# the per-form byte layout of a stamp site: (verified span length, offset of
+# the TYPE byte inside it). stamp_l_*: op(2) + $01xxTTss(4) -> TT at +4;
+# stamp_b_d16: op(2) + imm word 00TT(2) + d16(2) -> TT at +3 (d16==2 rows
+# only — a d16==3 row writes the owner/substate byte, never the type).
+_STAMP_FORMS = {
+    "stamp_l_ind": (6, 4), "stamp_l_post": (6, 4), "stamp_l_pre": (6, 4),
+    "stamp_l_d16": (8, 4), "stamp_b_d16": (6, 3),
+}
+
+
 def flavor_write(default, held, flav_d, hold_flag, mid=b""):
     """The VS2/VH2 flavor write for ONE tenant: 40 bytes (+ `mid`), CCR-only.
 
@@ -672,6 +703,11 @@ def flavor_tail(flav_map, flav_d, hold_flag, newt, objclr, tenants, fail):
         (default, held), = flav_map.values() or [(0, 0)]
         return (flavor_write(default, held, flav_d, hold_flag, objclr)
                 + bytes([0x4E, 0xF9]) + newt.to_bytes(4, "big"))
+    # N>1 through THIS function is dead since the 14z-82 F2 fix — the merged
+    # shim is assembled at engine_here via flavor_chain_multi (per-owner
+    # HANDLER exits, tripwire fall-through), because this chain's uniform
+    # `jmp newt` could only ever exit into tenant-0's handler. Kept for the
+    # historical record and the single-tenant assert path.
     if objclr:
         fail.append("init_shim: objram_clear with more than one declaring "
                     "tenant would arm the clear for ALL of them — it is "
@@ -692,6 +728,39 @@ def flavor_tail(flav_map, flav_d, hold_flag, newt, objclr, tenants, fail):
                 + bytes([0x4E, 0xF9]) + newt.to_bytes(4, "big"))   # jmp handler
     # no tenant matched -> no flavor write at all
     return out + bytes([0x4E, 0xF9]) + newt.to_bytes(4, "big")
+
+
+def flavor_chain_multi(flav_map, flav_d, hold_flag, handlers, fallthrough):
+    """14z-82 F2: the MERGED shim's tail — the one-shim-N-rows design.
+
+    One 54-byte block per declaring tenant:
+
+        cmpi.b #id,(0x382,A6)   ; this player's character id
+        bne.s   <next block>    ; +46, uniform
+        <40-byte flavor write>
+        jmp     <THE OWNER'S OWN handler>
+
+    The same shim is planted on EVERY declaring tenant's dispatch row
+    (assembled at engine_here, after all handlers are placed — the 14z-80h
+    shape), so the block that matches exits into the right tenant's
+    char-init: seeder + phase gate + flavor now run for every declaring
+    tenant, which is the F2 defect closed. The id read here is the one
+    test_shim_charid.sh measured valid on BOTH player structs at char-init.
+
+    `handlers` = {owner: (char_id, placed_handler)}. Fall-through = jmp to
+    a planted TRIPWIRE: the shim is reachable only from declaring tenants'
+    id-indexed dispatch rows, so an unmatched id is a routing bug worth
+    naming loudly — never a silent detour into tenant-0's handler (that
+    silent detour IS the F2 class).
+    """
+    out = b""
+    for name, (default, held) in sorted(flav_map.items()):
+        tid, handler = handlers[name]
+        out += (bytes([0x0C, 0x2E, 0x00, tid & 0xFF, 0x03, 0x82])
+                + bytes([0x66, 0x2E])                        # bne.s next (+46)
+                + flavor_write(default, held, flav_d, hold_flag)
+                + bytes([0x4E, 0xF9]) + handler.to_bytes(4, "big"))
+    return out + bytes([0x4E, 0xF9]) + fallthrough.to_bytes(4, "big")
 
 
 def _row_diff_keys(a, b):
@@ -846,6 +915,11 @@ def main():
                          "to per-target planted-ILLEGAL tripwires instead of "
                          "failing — the guard's fault PC then names exactly "
                          "which unresolved target actually fires")
+    ap.add_argument("--type-stamps", type=Path,
+                    default=Path("build/manifest/type_stamps.toml"),
+                    help="the FROZEN type-stamp inventory (14z-82) that the "
+                         "per-tenant type-renumber pass consumes on multi-"
+                         "tenant builds; single-tenant builds never read it")
     args = ap.parse_args()
     out = args.out_dir
     out.mkdir(parents=True, exist_ok=True)
@@ -1422,6 +1496,187 @@ def main():
             " — each manifest must declare exactly ONE [[tenant]], so that a"
             " tenant and its extraction pair by position."
             % (len(_tenant_list), len(_extracts)))
+
+    # ── 14z-82: PER-TENANT TYPE NUMBERS for multi-owner obj_hook types ──────
+    # The merged union gives a multi-owner type ONE table entry, routing
+    # every tenant into tenant-0's internally tenant-reconciled copy (the
+    # merged Huitzil vec3, STATE 14z-81b). The withdrawn owner-read stub
+    # proved dispatch-time state is transient at spawn instants (14z-81c),
+    # so the fix routes on facts baked at BUILD time: each NON-FIRST
+    # resolver tenant that stamps a family type gets its OWN type number —
+    # its copies' stamp immediates are rewritten and the union grows a
+    # per-tenant entry resolving to that tenant's copy. The FIRST resolver
+    # keeps the original numbers (maintainer-decided scope, 14z-82): the
+    # guard-clean tenant's bytes stay untouched, and the census-gap
+    # detector is dynamic instead (tests/audit_type_dispatch_range.sh:
+    # zero original-range dispatches on later tenants' replays).
+    #
+    # Scope: site 0x5E542's extension (types 114-120) ONLY. Site 0x54470's
+    # 64-75 stay FIRST-WINS with their loud notes — deferred WITH a
+    # measurement attached (the frozen inventory's 59-75 rows + the same
+    # dispatch-range probe pointed at that site).
+    #
+    # Everything here is derived from PLACEMENT-INDEPENDENT inputs (the
+    # tenants' regions.json + the frozen stamp inventory), so it runs
+    # before the loop; and it is EMPTY at N=1 by construction — no type is
+    # multi-resolver with one view — which is the frozen-fingerprint
+    # inertness argument, the same one that held for the withdrawn stub.
+    # 14z-82 F2: on a multi-tenant build the [init_shim] singleton serves
+    # EVERY declaring tenant — the per-iteration handlers are collected in
+    # `_shim_multi` and ONE shim (per-owner flavor + per-owner handler
+    # exits, flavor_chain_multi) is assembled at engine_here, then planted
+    # on each declaring tenant's dispatch row. None at N=1: the historical
+    # single-tenant emission is untouched (the frozen-fingerprint argument).
+    _shim_multi = {} if len(_tenant_list) > 1 else None
+    _shim_cfg_all = port.get("init_shim") \
+        if isinstance(port.get("init_shim"), dict) else None
+
+    RENUMBER_SITE = 0x5E542
+    RENUMBER_TYPES = range(114, 121)
+    TYPE_RENUMBER = {}       # (site, orig_type, tenant name) -> new index
+    TYPE_RENUMBER_ORDER = []  # [(site, new_index, orig_type, tenant, tgt)]
+    TYPE_STAMP_WORK = []      # [(tenant, src_addr, span, tt_off, exp_bytes,
+                              #   orig_type, form)]
+    if len(_tenant_list) >= 2:
+        _tnames = [t.get("name") for t in _tenant_list]
+        if None in _tnames or len(set(_tnames)) != len(_tnames):
+            raise SystemExit("gen_donovan_patch: multi-tenant builds need "
+                             "unique [[tenant]] name fields (type-renumber "
+                             "keys on them)")
+        _tregions = []   # per tenant: {name: (src, len, kind)}
+        for _ed in _extracts:
+            _rj = json.loads((Path(_ed) / "regions.json").read_text())
+            _tregions.append({k: (v["src"], v["len"], v.get("kind", "?"))
+                              for k, v in _rj["regions"].items()})
+
+        def _owning_tenants(addr, code_only=True):
+            outn = []
+            for _tn, _regs in zip(_tnames, _tregions):
+                for _rn, (_s, _l, _k) in _regs.items():
+                    if _s <= addr < _s + _l and (not code_only
+                                                 or _k != "data"):
+                        outn.append(_tn)
+                        break
+            return outn
+
+        _oh_rows = [r for r in port.get("obj_hook", [])
+                    if _int(r["site"]) == RENUMBER_SITE]
+        if _oh_rows:
+            if not args.type_stamps.is_file():
+                raise SystemExit(
+                    f"gen_donovan_patch: multi-tenant build with obj_hook "
+                    f"site {RENUMBER_SITE:#x} needs the frozen type-stamp "
+                    f"inventory ({args.type_stamps}) — run tools/"
+                    f"audit_type_stamps.py + review + freeze first (14z-82)")
+            _inv = load_type_stamps(args.type_stamps)
+            _src_sets = {t["src_set"] for t in _tenant_list}
+            if len(_src_sets) != 1:
+                raise SystemExit("gen_donovan_patch: type-renumber assumes "
+                                 "one shared src_set; got %s" % _src_sets)
+            _src_img = (root / f"build/out/{_tenant_list[0]['src_set']}"
+                               f"_opcodes.bin").read_bytes()
+            _ph = _oh_rows[0]
+            _stab = _int(_ph["src_table"])
+            _n_van = _int(_ph["vanilla_entries"])
+            _n_src = _int(_ph["src_entries"])
+            _next = _n_src + len([e for e in port.get("obj_hook_extra", [])
+                                  if _int(e["site"]) == RENUMBER_SITE])
+            # stamps per (type, tenant), from the frozen inventory
+            _stamps_by = {}
+            for _row in _inv:
+                if _row["_kind"] != "stamp":
+                    continue
+                _sa = int(_row["src_addr"], 0)
+                _ty = int(_row["type"], 0)
+                if _ty not in RENUMBER_TYPES:
+                    continue
+                _fm = _row["form"]
+                if _fm not in _STAMP_FORMS:
+                    raise SystemExit(
+                        f"gen_donovan_patch: frozen stamp 0x{_sa:06X} has "
+                        f"unhandled form {_fm!r} — extend _STAMP_FORMS "
+                        f"deliberately, never skip (a skipped stamp keeps "
+                        f"an ORIGINAL number alive in a renumbered tenant)")
+                if _fm == "stamp_b_d16" and int(_row.get("d16", "0"), 0) != 2:
+                    continue   # +0x03 owner/substate writes are not stamps
+                _span, _ttoff = _STAMP_FORMS[_fm]
+                _exp = _src_img[_sa:_sa + _span]
+                # the inventory's imm must match the image (drift = the
+                # census gate failed to run; refuse to guess)
+                _imm = int(_row["imm"], 0)
+                _imm_bytes = _imm.to_bytes(4, "big") if _fm.startswith(
+                    "stamp_l") else _imm.to_bytes(2, "big")
+                if _imm_bytes not in _exp:
+                    raise SystemExit(
+                        f"gen_donovan_patch: frozen stamp 0x{_sa:06X} imm "
+                        f"{_imm:#x} not present in source bytes "
+                        f"{_exp.hex()} — inventory vs image drift")
+                for _tn in _owning_tenants(_sa):
+                    _stamps_by.setdefault((_ty, _tn), []).append(
+                        (_sa, _span, _ttoff, _exp, _fm))
+            for _k in range(_n_van, _n_src):
+                _ty = _k
+                if _ty not in RENUMBER_TYPES:
+                    continue
+                _tgt = int.from_bytes(_src_img[_stab + _k * 4:
+                                               _stab + _k * 4 + 4], "big")
+                _resolvers = _owning_tenants(_tgt, code_only=False)
+                if len(_resolvers) < 2:
+                    continue
+                for _tn in _resolvers[1:]:
+                    _st = _stamps_by.get((_ty, _tn))
+                    if not _st:
+                        continue   # no stamp -> keeps first-wins (type 120)
+                    TYPE_RENUMBER[(RENUMBER_SITE, _ty, _tn)] = _next
+                    TYPE_RENUMBER_ORDER.append(
+                        (RENUMBER_SITE, _next, _ty, _tn, _tgt))
+                    for _sa, _span, _ttoff, _exp, _fm in _st:
+                        TYPE_STAMP_WORK.append(
+                            (_tn, _sa, _span, _ttoff, _exp, _ty, _fm))
+                    _next += 1
+            if _next > 256:
+                raise SystemExit(
+                    f"gen_donovan_patch: type-renumber ran past the 256-"
+                    f"entry ceiling (next index {_next}) — the walker "
+                    f"indexes a BYTE (move.b (2,a6),d0)")
+            # fail closed on reviewed compares: a family-typed compare in a
+            # RENUMBERED tenant's code regions must carry an explicit
+            # action (today: all reviewed rows are action="none" because
+            # none reads the type byte — d16 0x54/0x14/0xA8 or register)
+            for _row in _inv:
+                if _row["_kind"] != "compare":
+                    continue
+                _ty = int(_row["type"], 0)
+                if _ty not in RENUMBER_TYPES:
+                    continue
+                for _tn in _owning_tenants(int(_row["src_addr"], 0)):
+                    if (RENUMBER_SITE, _ty, _tn) in TYPE_RENUMBER \
+                            and _row.get("action") != "none":
+                        fail.append(
+                            f"type_stamps compare 0x{int(_row['src_addr'],0):06X}"
+                            f" (type {_ty}, tenant {_tn}) has action="
+                            f"{_row.get('action')!r} — a renumbered type's "
+                            f"compare needs an explicit reviewed action")
+            # overlap backstop: no port_patch/imm_poison row may touch a
+            # rewritten stamp's span (pass-ordering surprises become loud)
+            _spans = {}
+            for _tn, _sa, _span, _to, _e, _ty, _fm in TYPE_STAMP_WORK:
+                _spans.setdefault((_sa, _sa + _span), _tn)
+            for _sect, _key in (("port_patch", "old_hex"),
+                                ("imm_poison", None)):
+                for _rw in port.get(_sect, []):
+                    if "src_addr" not in _rw:
+                        continue
+                    _ra = _int(_rw["src_addr"])
+                    _rl = len(bytes.fromhex(_rw[_key])) if _key else 4
+                    for (_lo, _hi), _tn in _spans.items():
+                        if _ra < _hi and _lo < _ra + _rl:
+                            fail.append(
+                                f"{_sect} at 0x{_ra:06X} overlaps the "
+                                f"type-stamp rewrite span 0x{_lo:06X}-"
+                                f"0x{_hi:06X} ({_tn}) — resolve the "
+                                f"collision explicitly")
+
     for _ti, T in enumerate(_tenant_list):
         extract_dir = _extracts[_ti]
         man = json.loads((extract_dir / "regions.json").read_text())
@@ -2105,6 +2360,34 @@ def main():
                     blob[off:off + len(new)] = new
                     notes.append(f"# {name}+{off:#x}: port_patch {pp['old_hex']} "
                                  f"-> {_nh} ({pp['note']})")
+
+                # 14z-82: the per-tenant TYPE-NUMBER rewrite. For every frozen
+                # stamp site inside THIS tenant's copy of THIS region whose
+                # type this tenant renumbers, rewrite exactly the TT byte of
+                # the stamp immediate. The full source span is verified first
+                # (opcode + immediate + addressing words): a mismatch means a
+                # prior pass touched a stamp site, which is a build error to
+                # investigate, never to overwrite. Emits nothing (not even a
+                # note) when the map is empty — N=1 stays byte-identical.
+                for _tn, _sa, _span, _ttoff, _exp, _oty, _fm in TYPE_STAMP_WORK:
+                    if _tn != T.get("name"):
+                        continue
+                    _soff = _sa - r["src"]
+                    if not (0 <= _soff < r["len"]):
+                        continue
+                    _newt = TYPE_RENUMBER[(RENUMBER_SITE, _oty, _tn)]
+                    if bytes(blob[_soff:_soff + _span]) != _exp:
+                        fail.append(
+                            f"type_renumber {name}+{_soff:#x} ({_fm} type "
+                            f"{_oty}): bytes "
+                            f"{bytes(blob[_soff:_soff + _span]).hex()} != "
+                            f"source {_exp.hex()} — a prior pass touched a "
+                            f"stamp site; investigate, do not overwrite")
+                        continue
+                    blob[_soff + _ttoff] = _newt
+                    notes.append(f"# {name}+{_soff:#x}: type_renumber {_fm} "
+                                 f"type {_oty} -> {_newt} ({_tn}'s own "
+                                 f"number; site {RENUMBER_SITE:#x})")
 
                 # data_in_code (14z-66): a small DATA table embedded in a CODE
                 # region placed in the crypt hole is stored re-encrypted, so
@@ -3096,14 +3379,32 @@ def main():
                     newt = None
                     if shape is None:
                         newt = res[0][0]
-                        notes.append(
-                            f"#   obj_hook@{site:#x} type {k} MULTI-RESOLVER "
-                            f"({', '.join(n for _, n in res)}) with no "
-                            f"measured owner-read -> FIRST-WINS "
-                            f"({res[0][1]} {res[0][0]:#x}); order-dependent "
-                            f"— measure it "
-                            f"(tests/audit_objhook_owner_census.sh) and "
-                            f"extend OBJ_HOOK_OWNER_READ")
+                        _ren = [(tn2, TYPE_RENUMBER[(site, k, tn2)])
+                                for _a, tn2 in res
+                                if (site, k, tn2) in TYPE_RENUMBER]
+                        if _ren:
+                            # 14z-82: NOT first-wins luck — the original
+                            # entry serves the FIRST resolver BY DESIGN;
+                            # every later stamping tenant dispatches its
+                            # OWN appended number (see the renumber rows
+                            # below), so this entry is unreachable for
+                            # them by construction.
+                            notes.append(
+                                f"#   obj_hook@{site:#x} type {k} original "
+                                f"entry serves FIRST resolver {res[0][1]} "
+                                f"{res[0][0]:#x} by design (14z-82); "
+                                f"renumbered: "
+                                + ", ".join(f"{tn2}->{ni}"
+                                            for tn2, ni in _ren))
+                        else:
+                            notes.append(
+                                f"#   obj_hook@{site:#x} type {k} MULTI-RESOLVER "
+                                f"({', '.join(n for _, n in res)}) with no "
+                                f"measured owner-read -> FIRST-WINS "
+                                f"({res[0][1]} {res[0][0]:#x}); order-dependent "
+                                f"— measure it "
+                                f"(tests/audit_objhook_owner_census.sh) and "
+                                f"extend OBJ_HOOK_OWNER_READ")
                     else:
                         tw = tripwire_for(tgt, f"obj_hook@{site:#x} type {k} "
                                                f"owner-dispatch fallback") \
@@ -3195,13 +3496,44 @@ def main():
                 notes.append(f"#   obj_hook authored type {idx} -> {newt:#08x} "
                              f"(from {args.src_set if hasattr(args, 'src_set') else 'src'} "
                              f"{tgt:#x}; {ex.get('note', '')})")
+            # 14z-82: the RENUMBERED per-tenant entries. Appended after the
+            # ported and authored rows, in the pre-loop assignment order —
+            # the running index must match the assignment exactly (the
+            # no-gap discipline: the engine indexes this table by type*4).
+            # Each resolves through the OWNING tenant's view only, which is
+            # the whole point: tenant B's objects dispatch tenant B's copy.
+            for _site2, _idx2, _oty2, _tn2, _tgt2 in TYPE_RENUMBER_ORDER:
+                if _site2 != site:
+                    continue
+                cur = len(table) // 4
+                if _idx2 != cur:
+                    fail.append(f"obj_hook@{site:#x}: renumbered type "
+                                f"{_oty2} ({_tn2}) assigned index {_idx2} "
+                                f"but the table is at {cur} — assignment/"
+                                f"emission drift, no gaps allowed")
+                    continue
+                _own = [a for a, n in resolve_ported_all(_tgt2) if n == _tn2]
+                if not _own:
+                    fail.append(f"obj_hook@{site:#x}: renumbered type "
+                                f"{_oty2}: {_tn2} does not place handler "
+                                f"{_tgt2:#x} — resolver-set drift since "
+                                f"the pre-loop computation")
+                    continue
+                table += _own[0].to_bytes(4, "big")
+                notes.append(f"#   obj_hook renumbered type {_idx2} = "
+                             f"{_tn2}'s {_oty2} -> {_own[0]:#08x} (its OWN "
+                             f"copy; stamps rewritten in-region, 14z-82)")
+            _n_renum = sum(1 for _s2, *_r2 in TYPE_RENUMBER_ORDER
+                           if _s2 == site)
             tdst = alloc("a", len(table), "obj_hook ext table")
             thunk = None
             if tdst is not None:
                 ops.append({"op": "data", "addr": f"{tdst:#x}", "hex": table.hex()})
                 notes.append(f"data   {tdst:#08x} +{len(table):#x}  proj_hook "
                              f"extended type table ({n_van} vanilla + "
-                             f"{n_src - n_van} ported, {ported} placed)")
+                             f"{n_src - n_van} ported, {ported} placed"
+                             + (f", {_n_renum} renumbered" if _n_renum
+                                else "") + ")")
                 fragments.append((tdst, len(table), "GEN", "proj_hook ext table"))
                 thunk = alloc("a", 18, "obj_hook thunk")
             if thunk is not None:
@@ -3486,6 +3818,18 @@ def main():
                                  f"-> jsr {sp:#x}) -> handler {newt:#08x}")
                     fragments.append((kd, 24, "GEN", "satellite respawn keeper"))
                     repoint(d["table"], kd, "handler via respawn keeper")
+                    continue
+                if (_shim_multi is not None and _shim_cfg_all
+                        and d["table"] == _shim_cfg_all["dispatch"]
+                        and T.get("name") in
+                        (_shim_cfg_all.get("_flavor_by_owner") or {})):
+                    # 14z-82 F2: multi-tenant build — collect this DECLARING
+                    # tenant's placed handler; the one merged shim is
+                    # assembled and planted at engine_here (all handlers
+                    # placed by then). A tenant with no declared flavor
+                    # (Pyron) falls through to the direct repoint below,
+                    # untouched by the ratified decision.
+                    _shim_multi[T.get("name")] = newt
                     continue
                 if shim_cfg and d["table"] == shim_cfg["dispatch"]:
                     # synthesized pool-seeding + flavor-default init shim (see
@@ -5123,6 +5467,87 @@ def main():
                 fragments.append((_site, 6, "GEN",
                                   f"site_thunk chain engine site"))
 
+        # ── 14z-82 F2: the MERGED init shim, assembled after the loop ────────
+        # Every declaring tenant's dispatch row routes through ONE shim:
+        # seeder + phase gate once, then flavor_chain_multi's per-owner
+        # blocks, each exiting into its OWNER's placed handler. Assembled
+        # here (engine_here) because later tenants' handlers do not exist on
+        # iteration 0 — the same reason the site_thunk chains above are.
+        if engine_here() and _shim_multi:
+            _sc = _shim_cfg_all
+            _fmap = dict(_sc.get("_flavor_by_owner") or {})
+            _missing = sorted(set(_fmap) - set(_shim_multi))
+            if _missing:
+                fail.append(f"init_shim: declaring tenant(s) {_missing} never "
+                            f"reached the dispatch collector — a dispatch row "
+                            f"was consumed by an earlier branch; no shim "
+                            f"planted for them")
+            elif _sc.get("objram_clear"):
+                fail.append("init_shim: objram_clear on a multi-tenant build "
+                            "is Donovan-gated by construction today — decide "
+                            "its merged scope before enabling (the standing "
+                            "flavor_tail refusal, now enforced here)")
+            else:
+                _tw = tripwire_for(0xF2F2F2, "init_shim chain fall-through "
+                                   "(an id no declaring tenant claims)") \
+                    if args.tripwire_open else None
+                if _tw is None:
+                    fail.append("init_shim: the merged chain fall-through "
+                                "needs a tripwire — build with "
+                                "--tripwire-open")
+                else:
+                    _latch = _int(_sc["latch_disp"])
+                    _flavd = _int(_sc["flavor_disp"])
+                    _hold = _int(_sc["flavor_hold_flag"])
+                    _pg = b""
+                    if _sc.get("latch_mode") == "phase":
+                        _pg = (bytes([0x0C, 0xB9, 0x00, 0x04, 0x00, 0x00,
+                                      0x00, 0xFF, 0x80, 0x0C])
+                               + bytes([0x66, 0x0C]))
+                    _ids2 = {t.get("name"): _int(t["dst_slot"])
+                             for t in _tenant_list}
+                    _hmap = {n: (_ids2[n], h)
+                             for n, h in _shim_multi.items()}
+                    _shim = (bytes([0x2F, 0x0D])
+                             + bytes([0x4B, 0xF9, 0x00, 0xFF, 0x80, 0x00])
+                             + _pg
+                             + bytes([0x4A, 0xAD]) + _latch.to_bytes(2, "big")
+                             + bytes([0x66, 0x06])
+                             + bytes([0x4E, 0xB9])
+                             + _int(_sc["seed_entry"]).to_bytes(4, "big")
+                             + bytes([0x2A, 0x5F])
+                             + flavor_chain_multi(_fmap, _flavd, _hold,
+                                                  _hmap, _tw))
+                    assert len(_shim) == 22 + len(_pg) + 54 * len(_fmap) + 6, \
+                        len(_shim)
+                    _sd = alloc("a", len(_shim), "merged init seed shim")
+                    if _sd is None:
+                        fail.append("init_shim: no room for the merged shim")
+                    else:
+                        ops.append({"op": "code", "addr": f"{_sd:#x}",
+                                    "hex": _shim.hex()})
+                        notes.append(
+                            f"code   {_sd:#08x} MERGED init shim (pool latch "
+                            f"A5+{_latch:#x}, seeder "
+                            f"{_int(_sc['seed_entry']):#x}"
+                            + (", phase-gated" if _pg else "")
+                            + f"; flavor (A6+{_flavd:#x}) "
+                            + ", ".join(
+                                f"{_n}<-{_dv:#04x}/held {_hv:#04x}"
+                                f"->handler {_hmap[_n][1]:#x}"
+                                for _n, (_dv, _hv) in sorted(_fmap.items()))
+                            + f" [Start bitmask {_hold:#x}]; unmatched id -> "
+                            f"tripwire {_tw:#x}) planted on "
+                            f"{len(_hmap)} dispatch rows (F2 fix)")
+                        fragments.append((_sd, len(_shim), "GEN",
+                                          "merged pool-seed + flavor init "
+                                          "shim (F2)"))
+                        _tby = {t.get("name"): t for t in _tenant_list}
+                        for _n2 in sorted(_shim_multi):
+                            repoint(_sc["dispatch"], _sd,
+                                    f"{_n2} handler via MERGED seed shim "
+                                    f"(F2)", tenant=_tby[_n2])
+
         # ── code_word: guarded single-word code patch (session 14z-22) ─────────
         # For data-in-code words a 6-byte site_thunk cannot touch without
         # clobbering neighbors (jump-table entries, embedded constants).
@@ -5451,6 +5876,14 @@ def main():
     (out / "tenant.json").write_text(json.dumps(_tenant_row(_tp), indent=1))
     (out / "tenants.json").write_text(json.dumps(
         [_tenant_row(t) for t in _tenant_list], indent=1))
+    # 14z-82: the type-renumber map, for the gates (audit_type_dispatch_range
+    # reads the renumbered index range) and the atlas. Written ONLY when
+    # non-empty, so every single-tenant build's file set is unchanged.
+    if TYPE_RENUMBER_ORDER:
+        (out / "type_map.json").write_text(json.dumps(
+            [{"site": s, "index": i, "orig_type": t, "tenant": tn,
+              "src_handler": tgt}
+             for s, i, t, tn, tgt in TYPE_RENUMBER_ORDER], indent=1))
     # ── program-image extension (Phase C step 2) ─────────────────────────────
     # If any op lands beyond the base 4MB image, the patcher must GROW the
     # image and emit the appended ROM members. The generator is what knows the

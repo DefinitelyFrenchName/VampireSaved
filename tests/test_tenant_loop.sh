@@ -149,8 +149,14 @@ check_n() {  # check_n <label> <dir> <want ops> <sum of 1-tenant counts>
         echo "  FAIL: $1 $got ops, frozen at $3"; fail=1
     fi
 }
-check_n "2 tenants" "$WORK/two"   436 502
-check_n "3 tenants" "$WORK/three" 590 707
+# RE-FROZEN 14z-82 (was 436/590): the F2 fix adds exactly ONE op to any
+# multi-tenant merge — the merged init shim's chain fall-through TRIPWIRE
+# (an unmatched id at the shim is a named ILLEGAL, never a silent detour
+# into tenant-0's handler). The shim itself and the dispatch-row pokes
+# rebalance to the same count; the 12 renumbered obj_hook entries grow the
+# TABLE op's hex, not the op count. Single-tenant counts above unchanged.
+check_n "2 tenants" "$WORK/two"   437 502
+check_n "3 tenants" "$WORK/three" 591 707
 
 # ── 3: every tenant's own content is present ────────────────────────────
 # An op count alone cannot tell "both tenants ran" from "tenant 0 ran twice".

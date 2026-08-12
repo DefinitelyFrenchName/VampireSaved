@@ -2564,3 +2564,75 @@ dispatches per 5,520-frame replay.
 
 **`data_port df_palette_seq_rows` — WITHDRAWN** (see the 14z-69 entry above,
 now marked RETRACTED). It overwrote BULLETA'S Dark Force palette block.
+
+## 14z-82 — per-tenant TYPE NUMBERS (the merged obj_hook vec3 fix) + the F2 merged shim
+
+**The defect (14z-81b):** the merged obj_hook union gave multi-owner types
+114-120 (site 0x5E542; handlers all inside x088512, which every tenant
+ports as an internally tenant-reconciled copy) ONE table entry each,
+first-wins → tenant-0's copy — so merged Huitzil's type-117 satellite
+consumed Donovan's planted tripwire address 0xCB9C0 as an anim base (the
+deterministic char-init vec3). The dispatch-time owner-read stub was
+implemented and WITHDRAWN the same day (14z-81c, two measured timing
+failure modes); the ratified direction is the build-time route
+(docs/project/gotchas.md "Route on facts baked at BUILD time").
+
+**The fix (maintainer-decided scope: FIRST RESOLVER KEEPS ORIGINALS):**
+
+* `build/manifest/type_stamps.toml` — the FROZEN, human-reviewed census of
+  every family stamp site / compare / +0x02-+0x03 reader / embedded
+  walker, produced by `tools/audit_type_stamps.py` (opcode-anchored;
+  positive control on the six measured sites; negative control on the
+  three unported stamps). The census found a whole stamp FORM the 14z-81b
+  ad-hoc scan was blind to — `move.b #type,(2,A4)` (~20 additional
+  type-115 sites, the spawn idiom `beq.s; move.b #1,(A4); type at +2;
+  owner at +3`) — and proved NO compare in any tenant's code regions reads
+  the type byte (d16 values are 0x54/0x14/0xA8 or register-sourced).
+  Dynamically cross-checked by `tests/audit_type_writes.sh` (6 tap legs on
+  the ground-truth builds): every observed 114-120 write maps to a frozen
+  stamp row; types 118/120 NOT OBSERVED (recorded, not assumed); the
+  115→117 "morph" is the 117 header re-stamp at x088512+0x27CE, which
+  renumbers with everything else.
+* Generator (`tools/gen_donovan_patch.py`): a pre-loop pure map
+  (`compute`-style block after `_tenant_list`) assigns new type numbers to
+  every NON-first resolver tenant with ≥1 frozen stamp site — 12
+  assignments at N=3 (indices 124-135: H/P × types 114-119; type 120 has
+  ZERO reachable stamp sites anywhere and keeps first-wins). A
+  per-iteration blob pass rewrites ONLY the TT byte of each stamp
+  immediate in that tenant's own region copies (full source span verified
+  first; 69 rewrites at N=3, reconciled 1:1 against the inventory), and
+  the union appends per-tenant entries resolving through the OWNING
+  tenant's view (no-gap asserted). Table op grows 0x1F0→0x220; op COUNT
+  unchanged. Empty at N=1 — all four frozen fingerprints bit-exact.
+* Byte-level proof: hui copy x088512+0x27CE stamps `28BC 0100 8200`
+  (130), pyron's `...8300` (131), donovan's untouched `...7500`.
+
+**Measured green:** `audit_merged_vec3.sh` PASS (merged satellite A0 =
+0x425FFC = anim@huitzil+0xB8AC, crash-free); new gate
+`tests/audit_type_dispatch_range.sh`: merged hui mash = original range
+[0x1C8,0x1E4) CLEAN with 5,862 renumbered dispatches (the full stream
+moved), donovan originals intact (4,575), verdict control on hui29 sees
+5,862 original-range hits.
+
+**F2 (the merged shim served only tenant 0) — fixed the same emit path:**
+`flavor_chain_multi()` gives each 54-byte chain block its OWNER's handler
+exit (the old chain's uniform `jmp` could only exit into tenant-0);
+declaring tenants' handlers are collected per iteration and ONE merged
+shim is assembled at engine_here (the 14z-80h shape), planted on BOTH
+declaring rows (dispatch_00[0x13] and [0x10] → the shim; pyron [0x11]
+stays direct by ratified decision); unmatched id → planted tripwire —
+that fall-through tripwire is the ONE op the fix adds (590→591,
+re-frozen in test_tenant_loop.sh + audit_merged_legacy.sh FIRST, per the
+standing rule). audit_merged_legacy section 0 now asserts the POST-fix
+shape (HENT == SHIM, PENT != SHIM).
+
+**Pyron f7997: NOT this class — measured elimination.** Crash-time
+instruction history (GUARD_PROBE_HIST now also fires from the guard's
+crash handler) names a vanilla dispatcher chain 0x1A77E→0x1A790
+`move.b (2,A6),d0` → byte map 0x1A888 → word table → computed jmp; a probe
+with `b@(a6+2) >= 0x72` recorded ZERO hits through the whole replay while
+the crash still fired identically — so no extended-family type ever enters
+that mapper, and the census's exposure claim stands. A3=0x49bb8a (inside
+pyron's wide_ext) feeding that vanilla path + the odd derived pointer
+$FF31B5 point at a pyron-placed data/table defect one level removed —
+open, next session.

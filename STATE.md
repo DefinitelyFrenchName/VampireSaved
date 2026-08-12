@@ -1,6 +1,46 @@
 # STATE — living progress log
 
-Updated: 2026-08-12 (session 14z-81 — **THE MERGED-LEGACY MEASUREMENT RAN,
+Updated: 2026-08-12 (session 14z-82 — **THE MERGED HUITZIL VEC3 IS FIXED —
+per-tenant TYPE NUMBERS, measured green end to end — AND F2 IS FIXED the
+same emit path.** The spawn-time design shipped as maintainer-decided at
+plan review: variant (b), FIRST RESOLVER KEEPS ORIGINALS. Two censuses
+came first (the 14z-78 rule): the STATIC stamp census
+(`tools/audit_type_stamps.py` → frozen `build/manifest/type_stamps.toml`,
+194 reviewed rows) found a second stamp FORM the 14z-81b scan was blind
+to (`move.b #type,(2,A4)` — ~26 more sites, 20+ for type 115 alone),
+proved NO tenant code compares/table-indexes the family type byte, and
+found two embedded walkers in the ported spans (vs2's own 0x54470 site;
+a $FFC800 local pool with its own table) — both separate numbering
+spaces; the DYNAMIC census (`tests/audit_type_writes.sh`, 6 tap legs)
+mapped every observed 114-120 write to a frozen row (118/120 NOT
+OBSERVED, recorded). The generator then renumbers: 12 per-tenant entries
+(124-135, H/P × 114-119; type 120 has ZERO reachable stamps and keeps
+first-wins), 69 TT-byte rewrites verified against source bytes, table op
+grows 0x1F0→0x220, EMPTY at N=1 — all four frozen fingerprints
+bit-exact. Measured: `audit_merged_vec3` GREEN (A0 = anim@huitzil+0xB8AC,
+crash-free); new gate `tests/audit_type_dispatch_range.sh` — merged hui
+mash: ZERO original-range dispatches with 5,862 renumbered (the whole
+stream moved), donovan originals intact; full `audit_merged_legacy`: leg
+(a) 13/14 ratified classes VERBATIM, **both former Huitzil crashers
+guard-clean over full replays, donovan/12_vs_cpu guard-clean** (the
+replay that killed the withdrawn stub). **F2**: one merged shim
+(`flavor_chain_multi` — per-OWNER handler exits, tripwire fall-through)
+assembled at engine_here, planted on both declaring rows, pyron direct
+by decision; +1 op (the tripwire), re-frozen 437/591 FIRST; section-0
+asserts the post-fix shape and both tenants' char-init executes through
+the shim. **Named, not fixed:** the 04 flicker's owner — $FF0460 is the
+SOUND DRIVER's record-pointer spill (writer PRG:0x0011E2, measured by
+tap + disassembly, scripted as `tests/audit_ff0460_writer.sh`), so the
+held ratification decision is now about a named mechanism; and **pyron
+f7997 STANDS, measured NOT this class** (crash-time GUARD_PROBE_HIST —
+now armed from the guard's crash handler too — names a vanilla
+dispatcher 0x1A77E→0x1A790→byte-map 0x1A888→computed jmp; a
+`b@(a6+2)>=0x72` probe recorded ZERO extended types entering it while
+the crash fired identically; A3 in pyron's wide_ext + odd $FF31B5 point
+at a pyron-placed data/table defect — next session's first target).
+Read docs/NEXT_SESSION.md first.)
+
+Previously: 2026-08-12 (session 14z-81 — **THE MERGED-LEGACY MEASUREMENT RAN,
 AND THE ANSWER IS SPLIT: LEGACY IS SAFE, THE TENANTS ARE NOT.** The
 maintainer-ordered first priority is answered. A 3-tenant merged image
 (`build/merged1`, fingerprint 7a9eabb3, gfx skipped — a LEGACY-ONLY
@@ -220,6 +260,179 @@ findings were RETRACTED in-session after clean re-measures — each with
 the comparison error written down so it cannot be repeated. Every gate
 green at close, including two NEW audits. Read docs/NEXT_SESSION.md
 first, then the 14z-69 sections below.)
+
+## Session 14z-82 — PER-TENANT TYPE NUMBERS: the vec3 slot fixed, F2 fixed
+
+Scope followed the maintainer's 14z-81 rulings in order: vec3 slot first,
+F2 after (same emit path, one expensive re-measure covering both), gfx
+still behind. Design variant decided by the maintainer at plan review:
+**(b) per-tenant TYPE NUMBERS, first resolver keeps originals** — the
+guard-clean tenant's bytes untouched, the census-gap detector dynamic.
+
+### The censuses (before any 68k/bytes — the 14z-78 rule)
+
+**Static** (`tools/audit_type_stamps.py`; frozen, human-reviewed
+inventory `build/manifest/type_stamps.toml`; gate
+`tests/test_type_stamp_census.sh` with two demonstrated-FAIL verdict
+controls):
+- **A second stamp FORM existed**: `move.b #type,(2,A4)` — the spawn
+  idiom `beq.s <alloc-fail>; move.b #1,(A4); type at +2; owner at +3` —
+  ~26 sites the 14z-81b move.l-only scan could not see (type 115 alone:
+  20+ in the pod code). GOTCHAS entry filed (a one-form census reads
+  exactly like a complete inventory).
+- Full 114-120 stamp map: 117 = ONE site (x088512+0x27CE, all three
+  copies); 116/119 x088512-only; 115 hui/pyron only; 118 two sites
+  (hui/pyron); 114 ~25 sites across 8 per-tenant region names; **120 =
+  ZERO sites in any ported span** (only vs2 stamp 0x00B63C, unported).
+- **No compare or table-index of the family type byte exists in any
+  tenant's code regions** — every candidate compare reads (0x54,An)
+  effect-id / (0x14,An) state / registers; every (2,An)-reader
+  candidate decoded as record/table reads through An≠object. The only
+  true type-index consumers are the pool walkers.
+- **Two EMBEDDED walkers live inside the ported spans** (census pass 4):
+  vs2's own 0x54470-site walker at src 0x5C602 (its 76-entry table
+  TRUNCATED by every tenant's region end) and a third pool walker at
+  src 0x8B988 = x088512+0x3476 (hui/pyron copies): pool **$FFC800**,
+  24×0x80 slots, OWN local table at +0x3494 — a separate numbering
+  space. Neither sees 114-120 (vanilla's own pool separation); both
+  recorded in the inventory and the atlas.
+- The main walker (0x5E52A family) is UNPORTED by everyone — every
+  114-120 dispatch in our builds transits the ONE patched engine site.
+
+**Dynamic** (`tests/audit_type_writes.sh` — 6 MAME tap legs over the
+ground-truth builds via new `tests/lua/type_write_census.lua`):
+- **Every observed 114-120 type-byte write maps to a frozen stamp row**
+  (the gate for register-sourced/computed stamps the static scan cannot
+  see). 117-stamp rig-liveness green.
+- Types **118/120 NOT OBSERVED** — no verdict, recorded as such. 118
+  renumbers on static evidence (a build-time byte edit, old-verified);
+  120 is not renumbered and the dispatch-range gate carries the
+  residual.
+- The 115→117 mid-frame "morph" (14z-81c) is the 117 header re-stamp at
+  x088512+0x27CE — inside the same per-tenant copy, so stamps renumber
+  TOGETHER and the morph is timing-proof under this design.
+
+### The emit path (gen_donovan_patch.py; all N=1-inert by construction)
+
+Pre-loop pure map (placement-independent: tenants' regions.json + the
+frozen inventory + the src table): for each multi-resolver type at site
+0x5E542, every NON-first resolver tenant with ≥1 frozen stamp site gets
+the next index after the authored obj_hook_extra rows — 12 assignments
+(124-135 = H/P × 114-119), <256 asserted (byte-indexed walker).
+Per-iteration blob pass rewrites ONLY the TT byte per stamp
+(full-source-span verified first; port_patch/imm_poison overlap
+asserted) — 69 rewrites at N=3, reconciled 1:1 against the inventory;
+byte-proof: hui x088512+0x27CE `...8200` (130), pyron `...8300` (131),
+donovan untouched `...7500`. The union appends the renumbered entries
+resolving through the OWNING tenant's view (no-gap asserted); the
+original entries serve the first resolver BY DESIGN (note says so; the
+FIRST-WINS warning note now applies only to unrenumbered types — 120 —
+and the deferred 0x54470 family). Map + worklist EMPTY at N=1; the
+frozen references cannot move — and did not (test_m3a_reproducible
+bit-exact, run before anything else, twice: pre- and post-F2).
+
+### F2 — the merged shim now serves every declaring tenant
+
+Root defect: `singleton()` planted the shim on iteration 0's row only,
+and the old chain's uniform `jmp newt` could only exit into tenant-0's
+handler. Fix: `flavor_chain_multi()` — each 54-byte block exits into its
+OWNER's handler; declaring tenants' handlers are collected per iteration
+and ONE merged shim is assembled at engine_here (the 14z-80h
+assemble-after-the-loop shape), planted on dispatch_00[0x13] AND [0x10];
+pyron [0x11] stays direct (ratified: declares no shim); unmatched id →
+planted TRIPWIRE — that fall-through tripwire is the ONE op added
+(590→591; test_tenant_loop 436/590→437/591 and audit_merged_legacy's
+fixture re-frozen FIRST, per the standing rule). Fragment:
+`MERGED init shim ... donovan<-0x01->handler 0xc1030,
+huitzil<-0x00->handler 0x403b00 ... planted on 2 dispatch rows`.
+audit_merged_legacy section 0 now asserts the POST-fix shape (HENT ==
+SHIM, PENT != SHIM) and measured both tenants' char-init executing
+through the shim (2 hits each at 0x4ba4e0).
+
+### Measured verdicts (the full ladder, in the §4 order)
+
+1. `test_m3a_reproducible` — four frozen fingerprints bit-exact, run
+   FIRST both pre- and post-F2.
+2. `test_tenant_loop` — green at the re-frozen 437/591; all five
+   verdict controls intact; single-tenant counts unchanged (243/259/205).
+3. `test_type_stamp_census` — green + two demonstrated FAILs.
+4. `audit_merged_vec3` — **GREEN**: merged satellite A0 = anim@huitzil
+   +0xB8AC (per placements.json), crash-free. (Read per the 14z-81c
+   first-green rule: printed values checked, not just the verdict.)
+5. NEW `audit_type_dispatch_range` — verdict control on hui29 sees 5,862
+   original-range dispatches; merged hui mash: original range CLEAN,
+   **5,862 renumbered** (the entire stream moved to his numbers);
+   merged pyron: original range clean, 0 renumbered (EXPECTED — his
+   content provably never spawns this family in these replays; probe
+   liveness comes from the sibling sections); merged donovan: 4,575
+   originals still served.
+6. `audit_merged_legacy` (~45 min, both fixes in one re-measure): 591
+   ops asserted; section 0 F2-fixed + all three char-inits execute;
+   determinism leg bit-identical; **leg (a) 13/14 ratified classes
+   VERBATIM** — the one FAIL is `04_select_fuzz`'s held-un-ratified
+   {1525, 2005, 2009, 2195} inventory, BY DESIGN per the maintainer's
+   standing decision; **leg (b): huitzil 70_mash AND 83_fx GUARD-CLEAN
+   over their full replays** (the two former crashers),
+   **donovan/12_vs_cpu guard-clean** (the withdrawn-design killer),
+   donovan/20 transient-and-reconverged (890..3667, 8,453 clean after —
+   the 14z-81 shape), pyron/72 guard-clean, pyron/70 still f7997 (below).
+7. `test_hui_pairs` not re-run BY MEASUREMENT: the frozen hui29 bytes
+   are proven bit-exact by the fingerprint gate, and identical bytes
+   cannot produce a different replay.
+
+### The 04 flicker's owner is NAMED (ratification input, not a fix)
+
+`FBNEO_HTAP ff0460-ff0463` on vanilla 04_select_fuzz: ONE gameplay
+writer, 394k writes — `PRG:0x0011E2 move.l a0,(-$7BA0,A5)` (tap
+attributes the following PC 0x11E6), the SOUND DRIVER's dispatch
+prologue spilling its current record pointer (with SP at $FF045C);
+values cycle the $FF02xx channel records (0x20-stride 025C..02DC, 031C,
+033C) and rest at the $FF043C latch. The merged flicker at f2005 sampled
+it MID-SCAN ($00FF02DC) — one-frame pointer phase, no gameplay surface,
+the ratified hook-flicker family. The 14z-81 "sound-queue drain cursor"
+WITHDRAWAL is superseded by this measured owner. Scripted:
+`tests/audit_ff0460_writer.sh` (single-writer + value-range locks; a
+frame<200 boot filter, liveness control). Atlas row added. The
+ratification decision itself stays with the maintainer (decision 1,
+14z-81) — now about a named mechanism.
+
+### Pyron f7997: STANDS, and it is measured NOT to be this class
+
+Crash-time instruction history (GUARD_PROBE_HIST now also fires from the
+guard's on_crash — added this session, replay_guard.lua) names the
+route: hitbox-ish compare at 0x191BA.. → vanilla dispatcher 0x1A77E →
+`0x1A790 move.b (2,A6),d0` → byte class-map `0x1A888 move.b
+(4,PC,D0.w)` → word table → `jmp (2,PC,D1.w)` → garbage stream →
+vec3 on odd $FF31B5. **The elimination measurement:** a probe at 0x1A790
+with `b@(a6+2) >= 0x72` recorded ZERO hits across the whole replay while
+the crash fired identically — no extended-family type ever enters that
+mapper, so the renumbering (and the census's exposure claim) are not
+implicated. What IS implicated: A3 = 0x49bAEA (inside pyron's OWN
+wide_ext placements) feeding that vanilla path, and the fault address
+$FF31B5 = A4+0xAB (an ODD table-derived offset into the $FF310A record)
+— the shape of a pyron-placed data/table defect (data_in_code / pcrel /
+placement class), one level removed from the dispatcher. Evidence:
+build/gate_failures/merged1_b_70_pyron_mash.log + the HIST capture.
+NEXT SESSION'S FIRST TARGET.
+
+### Kept / retired
+
+- RETIRED: "types 114/115/118/120 are stamped elsewhere or computed"
+  (census answered all four); the FIRST-WINS/declaration-order-luck
+  status for types 114-119 (now designed); F2 as an open defect (all
+  copies fixed: merge_init_shim docstring, HANDOFF registry row +
+  merged1 paragraph, audit_merged_legacy section 0). Historical entries
+  stand unedited per the retraction discipline; NEXT_SESSION rewritten.
+- KEPT: the 19 FIRST-WINS notes' machinery (now printing the designed
+  note for renumbered types, the warning only for 120 and the deferred
+  0x54470 family); `owner_dispatch_stub()`/`OBJ_HOOK_OWNER_READ` as the
+  historical record; the census rigs.
+- The 0x54470 family (59-75) stays DEFERRED with its notes standing —
+  now WITH its measurement attached: the frozen inventory carries its
+  full stamp map (donovan/hui/pyron each stamp subsets; x088512's 17
+  type-65-family stamp sites are in all copies), and the embedded
+  truncated walker at 0x5C602 is a named renumbering hazard for THAT
+  family only.
 
 ## Session 14z-81 — THE MERGED-LEGACY MEASUREMENT: legacy safe, tenants not
 

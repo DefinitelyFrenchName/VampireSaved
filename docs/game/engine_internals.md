@@ -1296,6 +1296,57 @@ ported machine.
    offsets produces odd/negative indices and an address error. Port
    the region, or leave it alone.
 
+### Per-tenant TYPE NUMBERS on multi-tenant builds (14z-82)
+
+A MULTI-OWNER type — one whose handler region every tenant ports as its
+own reconciled copy (site `0x5E542`'s 114-120, the x088512 family) —
+cannot dispatch through one union entry: the copies carry per-tenant
+literals and each other's tripwire addresses as data (the merged Huitzil
+vec3, STATE 14z-81b), and dispatch-time owner reads are transient at
+spawn instants (the withdrawn 14z-81c stub). So on a multi-tenant build
+the generator renumbers the types at BUILD time: the FIRST resolver
+tenant keeps 114-120; every later tenant that STAMPS a type gets its own
+number (124+ appended entries resolving into its OWN copy) and the stamp
+immediates in its copies are rewritten — no runtime read at all.
+
+The mechanism rests on a FROZEN census, `build/manifest/type_stamps.toml`
+(tools/audit_type_stamps.py; gate tests/test_type_stamp_census.sh):
+* **Stamp forms are TWO, not one**: `move.l #$01xxTTss,(A4)` header
+  stamps AND `move.b #type,(2,A4)` byte stamps — the spawn idiom is
+  `beq.s <alloc-fail>; move.b #1,(A4); type at +2; owner/sub at +3`.
+  The 14z-81b ad-hoc scan knew only the move.l form and was blind to
+  ~26 sites.
+* Type 117 has exactly ONE stamp (x088512+0x27CE); 116/119 are
+  x088512-only; 114 has ~25 sites across 8 per-tenant region names;
+  **type 120 has ZERO stamp sites in any ported span** (its only vs2
+  stamp 0x00B63C is unported) and keeps first-wins.
+* The 115→117 mid-frame type "morph" (14z-81c) is simply the 117 header
+  re-stamp running later in the same copy — stamps renumber together,
+  so the morph is timing-proof under renumbering.
+* NO code in any tenant's regions COMPARES or table-indexes the type
+  byte for this family (census passes 3/4 + the dynamic writer census
+  tests/audit_type_writes.sh) — the exposure is the walker alone.
+
+Atlas rows this section depends on: `docs/game/atlas/ram.md` object-pool
+rows ($FFB800 0x80-stride, +0x02 type / +0x03 owner-sub, +0x30 owner
+link; $FF9400 projectile pool; $FFC800 local pool below).
+
+**Embedded walkers inside the ported spans (census pass 4):** the copies
+CONTAIN two more dispatchers of the same shape — vs2's own 0x54470-site
+walker at src 0x5C602 (76-entry table at 0x5C620, TRUNCATED by every
+tenant's region end) and a THIRD pool walker at src 0x8B988
+(x088512+0x3476, hui/pyron copies only): pool **$FFC800**, 24 slots ×
+0x80, with its own LOCAL table at +0x3494 — a separate type numbering
+space (its +0x02 values index 0..~23). Neither sees 114-120 (vanilla's
+own pool separation), so renumbering does not touch them — but any
+0x54470-family (59-75) renumbering would, which is one reason that
+family stays DEFERRED with its FIRST-WINS notes standing.
+
+Dynamic gate: tests/audit_type_dispatch_range.sh — on the merged build,
+ZERO dispatches in the original range [0x1C8,0x1E4) during later
+tenants' replays (a census-missed stamp would land there), renumbered
+range live for Huitzil, originals still serving tenant-0.
+
 ## Allocator wrappers and slot recycling (14z-65)
 
 vs2's allocators `0x15702` / `0x1572E` are wrapped (`alloc_wrap` in the

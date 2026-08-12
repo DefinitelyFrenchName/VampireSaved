@@ -28,15 +28,16 @@
 # which ALL tenants port, so the merged obj_hook union's ONE extended-table
 # entry can only point at one tenant's internally tenant-reconciled copy.
 #
-# FIX STATUS (14z-81c): the owner-id dispatch STUB design was implemented,
-# turned this audit GREEN (A0=0x425FFC, crash-free), and was WITHDRAWN the
-# same day — dispatch-time owner reads have two measured timing failure
-# modes (STATE 14z-81c; donovan/12 regressed on a stale parent chain). The
-# standing fix design is SPAWN-TIME TENANT TAGGING (docs/NEXT_SESSION.md).
-# This audit flips green when the merged satellite reads its base from
-# anim@huitzil and survives — whatever mechanism delivers that — and it
-# must be paired with donovan/12_vs_cpu staying guard-clean, the replay
-# that caught the withdrawn design.
+# FIX STATUS: GREEN since 14z-82 — per-tenant TYPE NUMBERS (the shipped
+# design; the 14z-81c owner-read STUB was implemented, briefly green, and
+# WITHDRAWN on two measured timing failure modes — STATE 14z-81c). Every
+# non-first tenant's stamps are renumbered at build time from the frozen
+# inventory (build/manifest/type_stamps.toml) and the union carries
+# per-tenant entries into each tenant's OWN copy, so this probe reads
+# A0 = anim@huitzil + 0xB8AC on the merged build. A FAIL here now is a
+# REGRESSION of that mechanism. Still pair any change with
+# donovan/12_vs_cpu staying guard-clean — the replay that caught the
+# withdrawn design.
 #
 # Usage: ROMDIR=... [MAME_BIN=...] tests/audit_merged_vec3.sh [merged_build]
 # Default merged build: build/merged1 (rebuild it with
@@ -106,8 +107,11 @@ if [ "$M" = "$EXP" ] && [ -z "$CRASH" ]; then
     echo "      and the run is crash-free — the 14z-81 defect is FIXED;"
     echo "      re-run tests/audit_merged_legacy.sh before trusting more"
 else
-    echo "FAIL: the 14z-81 defect stands — the satellite's runtime-composed"
-    echo "      base is wrong on the merged build (see header for everything"
-    echo "      already ruled out). This is EXPECTED until the fix lands."
+    echo "FAIL: the satellite's runtime-composed base is wrong on the"
+    echo "      merged build (see header for everything already ruled out)."
+    echo "      Since 14z-82 this gate is GREEN (per-tenant type numbers),"
+    echo "      so this is a REGRESSION of the multi-owner dispatch — check"
+    echo "      the renumber map/worklist and the frozen stamp inventory"
+    echo "      (tests/test_type_stamp_census.sh) first."
     exit 1
 fi

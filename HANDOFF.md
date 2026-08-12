@@ -159,12 +159,13 @@ corrected in the 14z-79 stale-doc sweep.)
 `build/m5w` (`ac52eeff`) is the KNOWN-BAD artifact of the 14z-60y sprite
 garble, kept as evidence — do not playtest it. `tools/audit_romset_identity.py
 build/m5w/rompath` names its four shadowed members in a second.
-`build/merged1` (`7a9eabb3`) is the 14z-81 **MERGED-LEGACY INSTRUMENT** —
-the 3-tenant program image with gfx SKIPPED (group C zero-filled): legacy
-characters render correctly, the tenants draw BLANKS by design. **Never
-playtest it, never give it a registry row** (its own
-`README-LEGACY-ONLY.txt` says why); it is rebuilt from scratch by every
-`tests/audit_merged_legacy.sh` run. Rebuild the
+`build/merged1` is the **MERGED-LEGACY INSTRUMENT** (14z-81; carries the
+14z-82 type-renumber + F2 fixes) — the 3-tenant program image with gfx
+SKIPPED (group C zero-filled): legacy characters render correctly, the
+tenants draw BLANKS by design. **Never playtest it, never give it a
+registry row** (its own `README-LEGACY-ONLY.txt` says why); it is rebuilt
+from scratch by every `tests/audit_merged_legacy.sh` run, so its
+fingerprint moves with the generator — do not pin it in docs. Rebuild the
 pair with:
 
 ```sh
@@ -482,11 +483,13 @@ tests/test_shim_charid.sh    [bd id] # 14z-77 (M3b slice G): the init shim can
                                       # (0x382,A6) already holds the character id
                                       # at char-init. That was an ASSUMPTION the
                                       # merged shim's per-id flavor chain rests
-                                      # on. (14z-81 STATUS: the chain is emitted
-                                      # but UNREACHABLE for tenants after the
-                                      # first — merged-H's dispatch row bypasses
-                                      # the shim entirely, STATE 14z-81 F2. The
-                                      # id-read finding here stays valid.)
+                                      # on. (F2 FIXED 14z-82: the merged shim
+                                      # is assembled at engine_here and planted
+                                      # on EVERY declaring tenant's row, each
+                                      # chain block exiting into its OWNER's
+                                      # handler; audit_merged_legacy section 0
+                                      # asserts HENT==SHIM. The id-read finding
+                                      # here is what the chain rests on.)
                                       # Measured on BOTH player structs
                                       # ($FF8782 and $FF8B82 = 0x13), 2 replays.
                                       # NEEDS THE FORCED-PICK POKES: replay 11
@@ -495,6 +498,34 @@ tests/test_shim_charid.sh    [bd id] # 14z-77 (M3b slice G): the init shim can
                                       # probe is armed before any verdict. Verdict
                                       # control: offset +0x000 must NOT read the
                                       # id. ~44s. Defaults build/m5_wide, id 0x13
+tests/test_type_stamp_census.sh       # 14z-82: the STATIC type-stamp census
+                                      # (tools/audit_type_stamps.py) reproduces
+                                      # the FROZEN inventory build/manifest/
+                                      # type_stamps.toml — every family stamp/
+                                      # compare/reader/embedded-walker site,
+                                      # source-address-keyed, positive control
+                                      # on the six measured sites + negative
+                                      # control on the three unported stamps.
+                                      # Drift = FAIL (re-review, never absorb).
+                                      # 2 verdict controls. No emulator, ~5 s
+tests/audit_type_writes.sh            # 14z-82 ON-DEMAND (~8 min, 6 MAME tap
+                                      # legs): the DYNAMIC half — every
+                                      # family-valued type-byte write's PC must
+                                      # map to a frozen stamp row (catches
+                                      # register-sourced/computed stamps the
+                                      # static scan cannot see). 117-stamp
+                                      # rig-liveness control. Run BEFORE
+                                      # trusting any renumber-path change.
+                                      # Measured 14z-82: all writers in
+                                      # inventory; 118/120 NOT OBSERVED
+tests/audit_type_dispatch_range.sh    # 14z-82 (~8 min, 4 guarded runs): on the
+                                      # MERGED build, ZERO obj_hook dispatches
+                                      # in the ORIGINAL 114-119 range during
+                                      # hui/pyron replays (a census-missed
+                                      # stamp would land there), renumbered
+                                      # range LIVE for huitzil, originals still
+                                      # serving donovan; verdict control sees
+                                      # originals on hui29. Reads type_map.json
 tests/audit_phase_mode_cost.sh        # 14z-77: what Phobos' phase-gated latch
                                       # costs Donovan — the maintainer's ratified
                                       # condition for adopting it in the merge.

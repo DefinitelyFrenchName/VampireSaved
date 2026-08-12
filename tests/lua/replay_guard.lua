@@ -239,6 +239,24 @@ local function on_crash(vec)
             if shown >= 16 then break end
         end
     end
+    -- 14z-82: crash-time instruction history (opt-in via GUARD_PROBE_HIST,
+    -- same env as the probe-hit history). The exception pushes a
+    -- MID-INSTRUCTION PC for group-0 faults, so the CRASH line alone cannot
+    -- name the instruction STREAM into the fault; the debugger's `history`
+    -- at the handler breakpoint can — the instrument that named the merged
+    -- Huitzil vec3's route (14z-81b), now available without a separate
+    -- probe address.
+    local nh = tonumber(os.getenv("GUARD_PROBE_HIST") or "") or 0
+    if nh > 0 and debugger then
+        pcall(function()
+            debugger:command(string.format("history maincpu,%d", nh))
+            local cl = debugger.consolelog
+            local n = #cl
+            for i = math.max(1, n - nh), n do
+                f:write("HIST " .. tostring(cl[i]) .. "\n")
+            end
+        end)
+    end
     local df = assert(io.open(string.format("%s/crash_%d_ff0000.bin", out_dir, frame), "wb"))
     df:write(program:read_range(0xff0000, 0xffffff, 8))
     df:close()
@@ -288,6 +306,10 @@ local PROBE_MAX = tonumber(os.getenv("GUARD_PROBE_MAX") or "") or 400
 -- holding unrelated data, which is how the vec3 chase read a channel-record
 -- pointer as a "RAM-stub caller". History names the real instruction stream
 -- into the probe site.
+-- 14z-82: the same env ALSO arms a crash-time history dump — on_crash()
+-- appends HIST lines before END-CRASH, so a vec3's route can be named
+-- without knowing a probe-able entry address first (the group-0 pushed PC
+-- is mid-instruction and can never be probed — the standing gotcha).
 local PROBE_HIST = tonumber(os.getenv("GUARD_PROBE_HIST") or "") or 0
 -- GUARD_PROBE_TRACE=<path> (14z-81b): start a full instruction trace at the
 -- FIRST probe hit and stop it at the SECOND. `history` shows the stream INTO

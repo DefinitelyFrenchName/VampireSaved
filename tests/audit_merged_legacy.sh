@@ -165,13 +165,16 @@ python3 tools/gen_donovan_patch.py "$D_EX" "$OUT/patch" \
 grep -q '^GENERATION OK' "$OUT/gen.log" || {
     echo "  FAIL: no GENERATION OK"; tail -15 "$OUT/gen.log"; exit 1; }
 NOPS="$(python3 -c "import json;print(len(json.load(open('$OUT/patch/patch.json'))['ops']))")"
-# 590: matches test_tenant_loop.sh's frozen 3-tenant count (which is
-# re-frozen FIRST whenever the merge legitimately changes). It was 596 for
-# a few hours 14z-81c while the withdrawn stub fix was in.
-if [ "$NOPS" = 590 ]; then
-    echo "  ok: 590 ops (the frozen test_tenant_loop fixture — same merge)"
+# 591: matches test_tenant_loop.sh's frozen 3-tenant count (which is
+# re-frozen FIRST whenever the merge legitimately changes). History: 590
+# through 14z-81; 596 for a few hours 14z-81c while the withdrawn stub fix
+# was in; 591 since 14z-82 — the F2 merged-shim fall-through tripwire is
+# the one added op (the renumbered obj_hook entries grow the table op's
+# hex, not the count).
+if [ "$NOPS" = 591 ]; then
+    echo "  ok: 591 ops (the frozen test_tenant_loop fixture — same merge)"
 else
-    echo "  FAIL: $NOPS ops, frozen fixture is 590 — the generator drifted;"
+    echo "  FAIL: $NOPS ops, frozen fixture is 591 — the generator drifted;"
     echo "        re-freeze test_tenant_loop.sh FIRST, then revisit this audit"
     exit 1
 fi
@@ -200,7 +203,9 @@ EOF
 echo "  ok: built and packed ($NOPS ops); fingerprint $FP (unregistered ON PURPOSE)"
 
 # ── probe addresses, scraped from the fragment the generator just wrote ────
-SHIM="$(sed -n 's/^code *0x0*\([0-9a-f]*\) init shim .*/\1/p' \
+# ("MERGED init shim" since the 14z-82 F2 fix; the old spelling matches a
+# pre-fix build so the negative branch below can still name it)
+SHIM="$(sed -n 's/^code *0x0*\([0-9a-f]*\) \(MERGED \)\{0,1\}init shim .*/\1/p' \
         "$OUT/patch/patch_notes_fragment.md" | head -1)"
 HENT="$(sed -n 's/^poke32 0x[0-9a-f]* <- 0x0*\([0-9a-f]*\) *dispatch_00\[0x10\].*/\1/p' \
         "$OUT/patch/patch_notes_fragment.md" | head -1)"
@@ -209,13 +214,21 @@ PENT="$(sed -n 's/^poke32 0x[0-9a-f]* <- 0x0*\([0-9a-f]*\) *dispatch_00\[0x11\].
 [ -n "$SHIM" ] || { echo "FAIL: no 'init shim' line in the fragment"; exit 1; }
 [ -n "$HENT" ] || { echo "FAIL: no dispatch_00[0x10] line (huitzil)"; exit 1; }
 [ -n "$PENT" ] || { echo "FAIL: no dispatch_00[0x11] line (pyron)"; exit 1; }
+# 14z-82: F2 is FIXED — the assertion is now the POST-fix shape: every
+# DECLARING tenant's row routes through the ONE merged shim (Huitzil's row
+# = the shim), and Pyron (declares no shim) stays direct BY DECISION.
 if [ "$HENT" = "$SHIM" ]; then
-    echo "  note: Huitzil's dispatch entry IS the shim — F2 does NOT hold on"
-    echo "        this build; update the header and STATE before trusting it"
+    echo "  ok: F2 fixed — Huitzil's dispatch entry IS the merged shim"
+    echo "      (0x$SHIM): pool seed + phase gate + his flavor run for him"
 else
-    echo "  note: F2 confirmed statically — Huitzil char-init dispatches to"
-    echo "        0x$HENT, BYPASSING the shim (0x$SHIM): no pool seed, no"
-    echo "        phase gate, no flavor write for him on a merged build"
+    echo "  FAIL: Huitzil char-init dispatches to 0x$HENT, BYPASSING the"
+    echo "        shim (0x$SHIM) — the F2 defect (STATE 14z-81) is BACK"
+    exit 1
+fi
+if [ "$PENT" = "$SHIM" ]; then
+    echo "  FAIL: Pyron's dispatch entry is the shim — he declares NO"
+    echo "        [init_shim] and must stay direct (ratified 14z-77)"
+    exit 1
 fi
 
 MERGED_RP="$(abspath "$OUT")/rompath;$ROMDIR"

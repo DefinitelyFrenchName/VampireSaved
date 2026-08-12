@@ -1816,3 +1816,21 @@ does not). "The verdict logic is itself tested" (CLAUDE.md §4) cuts both
 ways: a gate born against a live defect has never exercised PASS, so its
 first green is not routine — read the printed values, not just the
 verdict word.
+
+## A stamp census must enumerate WRITE FORMS, not just the known immediate shape (14z-82)
+
+The 14z-81b type-stamp scan matched `move.l #$01xxTTss,(An)` and concluded
+"types 114/115/118/120 are stamped elsewhere or computed". Productizing the
+census (tools/audit_type_stamps.py) with the `move.b #imm,(d16,An)` form
+found ~26 MORE stamp sites — type 115 alone has 20+ byte-stamp sites in the
+pod code, all following the one spawn idiom (`beq.s <alloc-fail>; move.b
+#1,(A4); move.b #type,(2,A4); move.b #owner,(3,A4)`). A one-form scan reads
+exactly like a complete inventory, and a renumbering fix built on it would
+have left every missed site serving the ORIGINAL number — the silent
+mis-dispatch class the fix exists to kill. The countermeasures that ship
+with the census: a positive control (--expect on measured sites), a
+DYNAMIC writer-PC audit (tests/audit_type_writes.sh — every observed
+family write must map to a frozen row), and the dispatch-range gate on the
+merged build (zero original-range dispatches on later tenants' replays).
+Also: d16 matters — `move.b #$73,(2,A4)` is a type stamp, `(3,A4)` is the
+owner/sub-state byte; a d16-blind match conflates two different fields.
