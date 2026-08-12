@@ -1020,6 +1020,16 @@ tests/test_gfx_collision_gate.sh      # 14z-83 (S1): ground truth for
                                       # path textual lock. Emits
                                       # gfx_written.json (the S2 chain
                                       # ledger). No ROMs, ~1s
+tests/test_gfx_chain.sh               # 14z-83 (S2): the group-C gfx CHAIN
+                                      # (--chain: prior link's members +
+                                      # ledger seed the next). 4 sections:
+                                      # solo Donovan == frozen build/m5_wide
+                                      # /gfx byte-for-byte; idempotent
+                                      # re-chain; D->H cumulative; and the
+                                      # MUST-FAIL control — P onto H dies at
+                                      # the known strip collision naming
+                                      # both sources. >>> S3 flips section 4
+                                      # to full-chain success. ~6 min
 tests/test_extract_hp.sh              # Huitzil/Pyron extraction gate (14z-65):
                                       # frozen region shapes (piecewise shifts,
                                       # dead filler, the H insertion sliver) +

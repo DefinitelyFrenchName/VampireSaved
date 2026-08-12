@@ -146,6 +146,19 @@ def main():
                          "group C 0x10000+code. Group-C mode only; the "
                          "drawer's select-init bank word is flipped on "
                          "the program side")
+    ap.add_argument("--chain",
+                    help="a PRIOR link's outdir (14z-83 S2): group-C "
+                         "members start from its vsw simms instead of "
+                         "zeros, group-A members from its vm3 copies, and "
+                         "its gfx_written.json seeds the collision ledger "
+                         "— so cross-LINK collisions get the same "
+                         "same-source-or-fail verdict place() gives "
+                         "cross-pass ones, and the last link's members "
+                         "carry every link's tiles. The ledger file is "
+                         "REQUIRED (the marker of a completed link): a "
+                         "mistyped path must fail loudly, never silently "
+                         "build solo and wipe the prior link. Group-C "
+                         "mode only")
     ap.add_argument("--tenant",
                     help="tenant.json from gen_donovan_patch.py. Supplies the "
                          "destination gfx bank, so this half cannot drift "
@@ -243,17 +256,44 @@ def main():
     z2 = zipfile.ZipFile(os.path.join(args.romdir, "vsav2.zip"))
     za = zipfile.ZipFile(os.path.join(args.romdir, "vsav.zip"))
     src = load_group(z2, "vs2", GROUP_B)      # bank 3 = group B (>=0x20000)
+    chain_ledger = {"C": [], "B": [], "A": []}
+    if args.chain:
+        assert group_c, "--chain is a group-C mechanism (the merge is " \
+                        "WIDE-only); a stock-track chain has no design"
+        assert os.path.abspath(args.chain) != os.path.abspath(args.outdir), \
+            "--chain dir must not be the outdir"
+        led_path = os.path.join(args.chain, "gfx_written.json")
+        assert os.path.exists(led_path), \
+            f"--chain {args.chain} has no gfx_written.json — not a " \
+            "completed link (a wrong path here would silently wipe it)"
+        print(f"  chain {led_path} sha1 {hashlib.sha1(open(led_path, 'rb').read()).hexdigest()}")
+        chain_ledger.update(json.load(open(led_path)))
     if group_c:
-        # fresh zero simms — group C ships zero-filled from
-        # build_wide_romset.py, so "untouched == zero" is the invariant
-        dst_orig = [bytes(0x400000) for _ in GROUP_C]
+        if args.chain:
+            # continue the prior link's members; "untouched == prior
+            # link's bytes" becomes the invariant
+            dst_orig = []
+            for n in GROUP_C:
+                p = os.path.join(args.chain, f"vsw.{n}m")
+                data = open(p, "rb").read()
+                print(f"  chain vsw.{n}m sha1 "
+                      f"{hashlib.sha1(data).hexdigest()}")
+                dst_orig.append(data)
+        else:
+            # fresh zero simms — group C ships zero-filled from
+            # build_wide_romset.py, so "untouched == zero" is the invariant
+            dst_orig = [bytes(0x400000) for _ in GROUP_C]
     else:
         dst_orig = load_group(za, "vm3", GROUP_B)  # bank 2 = group B too
     dst = [bytearray(s) for s in dst_orig]
 
     # src bank 3 -> group-B index = 0x10000 + code
     # dst bank 2 -> group-B index = 0x00000 + code
-    written = {}      # idx -> (src kind, src idx): the collision ledger
+    # idx -> (src kind, src idx): the collision ledger, seeded with the
+    # prior link's entries so a cross-link collision is judged by place()
+    # exactly like a cross-pass one (bytes are compared against the dst
+    # buffer, which carries the prior link's tiles)
+    written = {i: (k, s) for i, k, s in chain_ledger["C"]}
     # session 14z-10: band srcs whose delta target is a PROTECTED vanilla
     # position are relocated by the generator's exception pool (they
     # arrive via effect_map pairs instead) — never write their delta slot.
@@ -439,13 +479,31 @@ def main():
     # group-A passes share one ledger: three passes write the same four
     # members (chaining through the outdir files), and a cross-pass
     # different-bytes overwrite was SILENT before place() (each pass
-    # readback-verified only its own pairs) — 14z-83 S1
-    writtenA = {}
+    # readback-verified only its own pairs) — 14z-83 S1. Chained links
+    # (S2) pre-copy the prior link's vm3 group-A members into the outdir
+    # so the passes' existing file-chaining carries them cumulatively.
+    writtenA = {i: (k, s) for i, k, s in chain_ledger["A"]}
+    if args.chain:
+        prev0 = os.path.join(args.chain, f"vm3.{GROUP_A[0]}m")
+        if os.path.exists(prev0):
+            for nm in GROUP_A:
+                data = open(os.path.join(args.chain, f"vm3.{nm}m"),
+                            "rb").read()
+                open(os.path.join(args.outdir, f"vm3.{nm}m"),
+                     "wb").write(data)
+            print("  chain: prior link's group-A members carried forward")
     # effect-tail art: vs2 bank-1 blocks placed at vsav bank-1 anchors
     if args.effect_tail:
         et = json.load(open(args.effect_tail))
         srcA0 = load_group(z2, "vs2", GROUP_A)
-        dstA0 = [bytearray(s) for s in load_group(za, "vm3", GROUP_A)]
+        # base = the outdir's members when they exist (a chained link's
+        # carried-forward copies); pristine vsav otherwise — solo builds
+        # start this pass with an empty outdir, so nothing changes there
+        if os.path.exists(os.path.join(args.outdir, f"vm3.{GROUP_A[0]}m")):
+            dstA0 = [bytearray(open(os.path.join(args.outdir,
+                     f"vm3.{nm}m"), "rb").read()) for nm in GROUP_A]
+        else:
+            dstA0 = [bytearray(s) for s in load_group(za, "vm3", GROUP_A)]
         n = 0
         # place_host_slot (14z-62h): entries that overwrite the HOST's own
         # cells (HUD mugshot, wheel medallion) — only while the tenant
@@ -501,8 +559,9 @@ def main():
     if args.select_tiles:
         sel = json.load(open(args.select_tiles))
         srcA = load_group(z2, "vs2", GROUP_A)
-        if args.effect_tail:
-            # chain on the effect-tail-patched members
+        if os.path.exists(os.path.join(args.outdir, f"vm3.{GROUP_A[0]}m")):
+            # chain on the members written so far (this run's effect-tail
+            # pass, or a chained link's carried-forward copies)
             dstA = [bytearray(open(os.path.join(args.outdir,
                     f"vm3.{nm}m"), "rb").read()) for nm in GROUP_A]
         else:
