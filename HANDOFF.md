@@ -146,7 +146,10 @@ rendering change. Ground truth: `tests/test_replay_video_selfcheck.sh`.
 
 ```sh
 export ROMDIR=/path/to/reference/sets
-tools/run_wide.sh build/m5_wide fbneo      # or: ... mame
+tools/run_wide.sh build/m3b_merged fbneo   # THE 3-TENANT BUILD (all 18
+                                           # selectable, art included) —
+                                           # pending maintainer playtest
+tools/run_wide.sh build/m5_wide fbneo      # or the solo builds; ... mame
 ```
 
 **Current WIDE builds (14z-83):** `build/hui31` = **`huitzil-m5`

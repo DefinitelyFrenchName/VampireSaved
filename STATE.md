@@ -52,9 +52,31 @@ strip/extras/pool-honesty locks; run_suite on hui31 GREEN on the CARRIED
 m4 expectation set with ZERO .sha1 movers (the relocated codes ride the
 OBJ emit path, invisible to RAM-basis gates by documented design);
 m3a_reproducible all four incl. the new EXPECT_HUI. Remaining on S3:
-the maintainer's beam visual confirm at next playtest. NEXT: S4 (driver
-merged-gfx mode -> build/m3b_merged), S5 (H/P's first render gates), S6
-(merged re-verdict + registry).** Read docs/NEXT_SESSION.md first.)
+the maintainer's beam visual confirm at next playtest. **THEN S4-S6
+LANDED THE SAME SESSION AND THE ARC IS MEASURED COMPLETE: THE FIRST
+FULL-ROSTER BUILD WITH ART EXISTS AND PASSES EVERY GATE.**
+`tools/build_merged.sh` builds `build/m3b_merged` (fec49437 this run —
+unregistered ON PURPOSE, registering is the pending freeze decision):
+the 593-op merged program + the S2 gfx chain consuming the merged
+generator's own per-tenant side files, group B pristine, per-tenant
+verify/HUD green (verify_gfx_build + check_tenant_hud gained
+--tenant/--gfx-dir; the bank-table copy question was MEASURED first —
+every x026142 copy carries all three rows). S5:
+`tests/test_merged_render_content.sh` — H/P's FIRST render gates —
+live-A/B vs the frozen solos in decoded gfx memory: D/H/P bands + the
+relocated strip serve the frozen art, de-substitution held, 4-window
+poison control fired, 3 pick replays live; ITS OWN FIRST RUN caught the
+union-vs-subset window hazard at P's band head (documented in the gate
+header — window moved to 0x5000, statically verified); empty-tiles green
+on H (3 replays) and P (2) legs. S6: `audit_merged_legacy` gained
+MERGED_OUT/MERGED_PREBUILT (defaults unchanged) and the gfx-carrying
+build passed the FULL legacy audit — leg (a) 14/14 (attract EXACT, 04 on
+the ratified inventory), leg (b) all six guard-clean. PENDING
+(maintainer): the m3b_merged playtest (incl. the beam visual confirm)
+and its registry row/name at freeze. Parked: audit_merged_legacy leg-b's
+H reference still names superseded hui30 (extract byte-identical;
+report-only surface) — update with the audit's next scheduled run.**
+Read docs/NEXT_SESSION.md first.)
 
 ### Decisions — 14z-83, M3b Phase 3 (the gfx half)
 

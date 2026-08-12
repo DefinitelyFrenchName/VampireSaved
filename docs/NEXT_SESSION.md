@@ -1,101 +1,80 @@
-# NEXT SESSION — orientation (updated mid-14z-83, 2026-08-12: Phase 3 underway)
+# NEXT SESSION — orientation (written at the close of 14z-83, 2026-08-12)
 
 > ## START HERE
 >
-> **THE GFX ARC (M3b Phase 3) IS UNDERWAY — S0-S2 landed, S3 is BLOCKED
-> on ONE maintainer ruling** (STATE.md "Decisions pending — 14z-83"):
-> relocate Huitzil's 288-tile beam strip (shift 0x1000 → 0x3800, dst
-> 0x86A0-0x87BF, handler bias 0x5200 → 0x7A00) and re-freeze huitzil-m4
-> → m5. The S0 census proved this is the ONLY real collision in the
-> whole 3-tenant merged gfx write set — everything else is byte-proven
-> same-source. **If the ruling is in: execute S3 first** (three sites:
-> `strip_tiles/0x10.json` shift, the `068152000000` bias inside
-> `beam_list_type6.thunk_hex` in huitzil.toml, and
-> `test_beam_list_type6.sh`'s byte lock; + `gfx_layout3.toml` [[strip]]
-> row + pool-1 ledger split; + flip `test_gfx_chain.sh` section 4 to
-> full-chain success), then the H battery + beam gates + playtest →
-> ratify huitzil-m5, update `test_m3a_reproducible.sh` EXPECT_HUI +
-> registry.
+> **M3b PHASE 3 IS MEASURED COMPLETE. THE FIRST FULL-ROSTER BUILD WITH
+> ART EXISTS AND PASSES EVERY GATE: `build/m3b_merged`** (built by
+> `tools/build_merged.sh`, fingerprint moves with the generator — do not
+> pin; unregistered ON PURPOSE until the freeze decision).
 >
-> Landed this session (all committed, all gates green):
-> - **The 04 ratification EXECUTED** → `audit_merged_legacy` FULL GREEN
->   (14/14 + six guard-clean) — the first all-green merged measurement.
->   The merged-04 expectation lives inline in the audit script.
-> - **S0**: `tests/audit_gfx_merged_census.sh` — the complete merged
->   group-C write-set census, 2 comparator controls. ONE real collision
->   (the strip); occupancy 45,449/65,536; pools EMPTY; plan A holds.
-> - **S1**: `place()` — same-source-or-fail on EVERY gfx pass (was 2/8)
->   + the `gfx_written.json` ledger. `tests/test_gfx_collision_gate.sh`.
-> - **S2**: `--chain` — links compose over members + cumulative ledger.
->   `tests/test_gfx_chain.sh` (solo byte-identical / idempotent / D->H
->   cumulative / P-onto-H must-fail).
-> - All four frozen fingerprints rebuilt bit-exact after every step.
+> **FIRST ACT: the maintainer playtest.**
+> `tools/run_wide.sh build/m3b_merged fbneo` — all 18 characters
+> selectable with art. Specifically wanted from the playtest:
+> - the BEAM (Huitzil 214+K family): its strip art moved to bank-4
+>   0x86A0-0x87BF in S3 (maintainer-approved relocation; every static
+>   and render gate is green but the eye is the final instrument);
+> - the usual sweep: each tenant picks/plays/wins, a legacy character or
+>   two for feel, select screen, HUD/mugshots/names.
+> After a clean playtest: the REGISTRY decision (row + name for the
+> merged build — a maintainer freeze decision; run_suite refuses the
+> build until then), then the tenant batteries on the merged build.
 >
-> **After S3: S4** (driver merged-gfx mode → `build/m3b_merged`;
-> verify_gfx_build/check_tenant_hud multi-tenant — design them against
-> the driver's real layout), **S5** (merged render gates — H/P's first —
-> + audit_empty_tiles), **S6** (merged legacy re-verdict + registry +
-> playtest). Plan: `/Users/koneko/.claude/plans/vectorized-riding-lerdorf.md`;
-> read `docs/project/cps2_wide.md` + HANDOFF gfx notes first (sentinels,
-> hash-shadowing, the two-romsets rule).
+> ## What 14z-83 landed (one session, all committed, all gates green)
+>
+> 1. **The 04 ratification executed** → `audit_merged_legacy` FULL GREEN
+>    — the project's first all-green merged measurement.
+> 2. **S0** the merged group-C census (`audit_gfx_merged_census.sh`):
+>    exactly ONE real collision existed (H's 288 strip dsts in P's band).
+> 3. **S1** `place()` — same-source-or-fail on every gfx pass + ledger.
+> 4. **S2** `--chain` — gfx links compose (`test_gfx_chain.sh`).
+> 5. **S3** the strip relocation (maintainer-ruled option a): shift
+>    0x3800, bias 0x7A00; **huitzil-m5 frozen** (38188bb1, build/hui31,
+>    tag freeze/huitzil-m5); census now ZERO real collisions; FULL
+>    3-tenant chain green; suite green on the carried set, zero .sha1
+>    movers.
+> 6. **S4** `tools/build_merged.sh` + multi-tenant verify/HUD checkers →
+>    `build/m3b_merged`.
+> 7. **S5** `test_merged_render_content.sh` — H/P's FIRST render gates —
+>    all bands + strip serve the frozen solo art; empty-tiles green
+>    (H 3 replays, P 2).
+> 8. **S6** the gfx-carrying build passed the FULL legacy audit (leg (a)
+>    14/14, leg (b) six guard-clean; `MERGED_OUT`/`MERGED_PREBUILT`).
 
 ## Current builds (registry)
 
 | build | set | fingerprint |
 |---|---|---|
+| build/m3b_merged | **UNREGISTERED — pending playtest + freeze** | (moves; see its README) |
 | build/m5_wide | donovan-m3a | 4b7d0dc7 |
-| build/hui31 | **huitzil-m5** (14z-83: strip relocation) | 38188bb1 |
+| build/hui31 | **huitzil-m5** (14z-83 S3: strip relocation) | 38188bb1 |
 | build/pyron21 | **pyron-m3** | 6c7f7322 |
-| build/hui30 | superseded huitzil-m4 (pre-relocation baseline, keep) | e66678d0 |
-| build/hui29, build/pyron20 | superseded (pre-fix A/B baselines, keep) | 34c8b47d / 69e8c6f0 |
+| build/hui30 | superseded huitzil-m4 (keep) | e66678d0 |
 
-`build/merged1` is the LEGACY-ONLY instrument — never playtest, never
-register; rebuilt by every `audit_merged_legacy` run (fingerprint moves
-with the generator; do not pin it in docs).
-
-## The .sha1 re-freeze attribution (read before touching those baselines)
-
-Both suites moved EXACTLY the three don-mash `.sha1` self-baselines
-(21/22/26) and nothing else in 14z-82c. Attribution was made ON THE
-CHECKSUM TIMELINE with bytes: a full-RAM dump-diff at a divergent frame
-shows 3 bytes, all in the $FF7Fxx dead-stack ghost window, zero live bytes
-— the ratified hook-cycle class (masked entries all green). NOTE the
-failed first attempt: -debug guard probes showed fire counts that
-contradicted the divergence onsets — debug timelines do NOT transfer to
-checksum timelines on vs-CPU/chaos content. Attribute with dumps, not
-debug probes, on this replay class.
-
-## Still open, unchanged
+## Still open, unchanged (pre-existing ledger)
 
 - Phobos' own palette-seq block (KNOWN-OPEN RED on
   `tests/test_variant_dispatch.sh`, table 0x02a8a4 row 0x10).
 - Pyron's Zodiac Fire has no rig (guard-cancel only — Claude's to rig).
 - The win-screen QUOTE (both tenants; shared fold).
-- (14z-82d, maintainer playtest, M5-family sound bucket): Phobos' LK/HK
-  Plasma Trap detonations have NO sound and never did (MK's was restored
-  by (b'); maintainer filed for completeness, explicitly not a blocker
-  before M5). Native-vs2 three-strength ring comparison decides
-  faithful-vs-gap; 87's strength sweep is the ready rig.
-- (14z-82d, maintainer playtest): pyron's win-pose voice (his laugh)
-  renders DISTORTED — pre-existing (pyron20≡pyron21 ring A/B
-  byte-identical), likely a vs2 sample id without its backing QSound
-  sample in vsav (the M5 voice-arc family). Ring-tap the win pose for
-  the id, compare sample data across the sets.
+- M5-family sound: Phobos LK/HK trap silence; pyron win-laugh distortion.
 - The three NEW select medallions: polish.
 - `region_space` rows re-freeze — maintainer's call.
-- Op-tagging so `test_shared_writes.sh` can name what a new write is.
-- Deferred with measurements attached: the 0x54470 family's FIRST-WINS
-  notes; type 120 (no reachable stamp).
+- Op-tagging for `test_shared_writes.sh`.
+- NEW parked (14z-83): `audit_merged_legacy` leg-b's H reference names
+  superseded hui30 (extract byte-identical, report-only) — update with
+  the audit's next scheduled run. A Donovan empty-tiles rig with a
+  measured frame window (H/P legs exist; D is covered by band
+  equivalence + solo history, but has no dedicated leg).
 
 ## Build / validate
 
 ```sh
 export ROMDIR=/path/to/reference/sets
-tests/test_m3a_reproducible.sh             # ~4 min (m4/m3 constants)
-tests/test_tenant_loop.sh                  # ~17 s (261/207/439/593)
-tests/audit_merged_vec3.sh                 # ~4 min: GREEN
-tests/audit_merged_legacy.sh               # ~45 min: FULL GREEN as of
-                                           # 14z-83 (any FAIL is a
-                                           # regression — stop and
-                                           # root-cause)
+tools/build_merged.sh build/m3b_merged     # ~15 min, the 3-tenant build
+tests/test_m3a_reproducible.sh             # ~5 min (all four frozen refs)
+tests/audit_gfx_merged_census.sh           # ~4 min, ZERO real collisions
+tests/test_gfx_chain.sh                    # ~9 min, full chain + fixture
+tests/test_merged_render_content.sh        # ~25 min, the render gate
+MERGED_OUT=build/m3b_merged MERGED_PREBUILT=1 \
+  tests/audit_merged_legacy.sh             # ~45 min, legacy re-verdict
 ```
