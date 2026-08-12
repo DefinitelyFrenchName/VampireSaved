@@ -41,6 +41,7 @@ Prints the inventory: entries, unique expanded tiles, band clusters.
 """
 
 import argparse
+import hashlib
 import json
 import sys
 
@@ -203,6 +204,10 @@ def main():
     args = ap.parse_args()
 
     dat = open(args.image, "rb").read()
+    # repo convention: every analysis tool prints the SHA-1 of what it reads
+    # (added 14z-83 — this was the one gfx tool without it, so a walk's
+    # provenance was unrecorded in its own output)
+    print(f"read {args.image} sha1 {hashlib.sha1(dat).hexdigest()}")
     inreg = (args.start, args.end)
 
     def cptr_ok(p):

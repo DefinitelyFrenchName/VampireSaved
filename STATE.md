@@ -28,6 +28,39 @@ half of the merge is now MEASURED SAFE with zero known crashes and zero
 held deviations — next arc: the gfx half (M3b Phase 3), then the tenant
 batteries on a merged build.** Read docs/NEXT_SESSION.md first.)
 
+### Decisions pending (maintainer) — 14z-83, M3b Phase 3 (the gfx half)
+
+1. **The beam-strip relocation + huitzil re-freeze.** The S0 merged
+   group-C census (`tests/audit_gfx_merged_census.sh`, fresh-derived from
+   the reference ROMs, comparator verdict-controlled both directions)
+   found EXACTLY ONE real collision in the whole 3-tenant merged gfx
+   write set: Huitzil's 288 procedural beam-strip tiles (vs2 group-A
+   source, placed at `code+0x1000` = 0x5EA0-0x5FBF) land inside Pyron's
+   native band (vs2 group-B source, different bytes). Everything else —
+   6,000+ shared destinations — is byte-proven same-source benign; bank-4
+   occupancy 45,449/65,536 (69.3%); all three ratified free pools EMPTY.
+   The 0x1000 shift is baked in three places: `strip_tiles/0x10.json`,
+   the `addi.l #$52000000,d1` bias inside `beam_list_type6.thunk_hex`
+   (huitzil.toml), and `test_beam_list_type6.sh`'s byte lock.
+   Options:
+   (a) **RECOMMENDED — relocate in ALL builds**: shift 0x1000 → 0x3800
+       (dst 0x86A0-0x87BF, head of free pool 1; 16-aligned so the
+       handler's row-wrap survives; above P's band, below D's floor;
+       pool measured empty). Handler bias 0x5200 → 0x7A00. One mechanism
+       everywhere; the pool ledger splits in `gfx_layout3.toml` in the
+       same commit. COST: huitzil-m4 (e66678d0) re-freezes → huitzil-m5
+       (one program byte in the thunk + the gfx member move), with the
+       full H battery + beam gates + your playtest before ratification.
+   (b) merged-only shift: keeps m4 frozen but forks the handler bias per
+       build — a new knob needing byte-identity proofs on every path,
+       and the solo build stops representing what ships merged.
+   (c) relocate Pyron's band instead: gives up his delta-0 no-remap
+       property over 14K tiles to spare 288 — strictly worse.
+   The relocation address itself has NO gameplay surface (tile indices
+   are invisible); the decision is really about accepting the m4→m5
+   re-freeze. S1/S2 (collision-gate refactor + chain mode, both
+   bit-identity-gated) proceed unblocked while this pends.
+
 Previously: 2026-08-12 (session 14z-82d close — **THE 14z-82 DAY ENDS FULLY
 RESOLVED: three fixes shipped, both tenants re-frozen and
 MAINTAINER-PLAYTEST-CONFIRMED ("all 3 characters seem identical to their

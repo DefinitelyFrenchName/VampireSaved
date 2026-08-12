@@ -995,6 +995,21 @@ tests/test_gfx_layout3.sh             # the 3-tenant group-C layout fact-locks
                                       # by interval, the flip-condition bound.
                                       # Static, ~90s. Ledger:
                                       # build/manifest/gfx_layout3.toml
+tests/audit_gfx_merged_census.sh      # 14z-83 (M3b Phase 3 S0): the COMPLETE
+                                      # merged group-C write-set census
+                                      # (tools/audit_gfx_merged.py) — every
+                                      # build_gfx pass, both banks, incl. the
+                                      # side inventories test_gfx_layout3 is
+                                      # blind to (strip/extra/effect_map/
+                                      # bank-5 sets). Byte-compares every
+                                      # colliding dst at source. Freezes: the
+                                      # ONLY real collision = H's 288 strip
+                                      # dsts 0x5EA0-0x5FBF inside P's band
+                                      # (the S3 relocation target — flips to
+                                      # ZERO when it lands); occupancy
+                                      # 45,449/65,536; pools EMPTY. Two
+                                      # comparator verdict controls (must-
+                                      # fire both directions). Static, ~3min
 tests/test_extract_hp.sh              # Huitzil/Pyron extraction gate (14z-65):
                                       # frozen region shapes (piecewise shifts,
                                       # dead filler, the H insertion sliver) +
