@@ -726,17 +726,22 @@ tests/audit_merged_legacy.sh          # 14z-81: THE MERGED-LEGACY MEASUREMENT,
                                       # merged determinism, then (a) 14 legacy
                                       # replays vs the frozen vanilla masked-v2
                                       # basis dispatched through donovan-m3a's
-                                      # ratified class table VERBATIM — any
+                                      # ratified class table VERBATIM, except
+                                      # 04's RATIFIED merged-specific inventory
+                                      # ({1525,2005,2009,2195}/889-1104,
+                                      # maintainer 2026-08-12, encoded inline
+                                      # in the script by design) — any other
                                       # deviation FAILS with the measured shape
                                       # + a proposed spec line, never a widened
                                       # tolerance — and (b) tenant content vs
                                       # the three frozen single-tenant builds
                                       # (guard-clean + first-divergence floor +
-                                      # classified report). 14z-81 result:
-                                      # leg (a) 13/14 verbatim (04 grew flicker
-                                      # frame 2005 — unratified), leg (b) H and
-                                      # P CRASH (see STATE 14z-81). Failing
-                                      # logs kept in build/gate_failures/
+                                      # classified report). 14z-83 result:
+                                      # FULL GREEN — leg (a) 14/14, leg (b)
+                                      # all six guard-clean, exit 0: the first
+                                      # all-green merged measurement. Failing
+                                      # logs (when any) kept in
+                                      # build/gate_failures/
 tests/audit_merged_vec3.sh [bd]       # 14z-81: the merged Huitzil satellite
                                       # anim-base probe — the crash localized
                                       # by the measurement above, made

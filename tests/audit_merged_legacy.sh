@@ -18,7 +18,10 @@
 # SAME ratified comparison classes as the frozen single-tenant builds
 # (tests/expected/donovan-m3a/*.masked — all three tenant sets agree
 # byte-for-byte on the 13 shared legacy entries, and a merged build backs
-# 0x13 so 11_pick_donovan applies too). It proves NOTHING about tenant
+# 0x13 so 11_pick_donovan applies too) — with ONE ratified merged-specific
+# exception: 04_select_fuzz lands on the RATIFIED MERGED inventory
+# {1525,2005,2009,2195} / window 889-1104 (see the leg-a override below),
+# not the single-tenant prior. It proves NOTHING about tenant
 # correctness: gfx is pristine by design, and the tenants' own behaviour
 # batteries wait for the gfx half (M3b Phase 3).
 #
@@ -40,6 +43,11 @@
 # FAILS on it while printing the measured shape and a proposed expectation
 # line, and never widens a tolerance. A PERMANENT class on a legacy replay
 # is a superset-invariant violation and halts forward work (CLAUDE.md §2.6).
+# Exactly ONE merged-specific expectation has been through that process and
+# is signed: 04_select_fuzz, composite {1525,2005,2009,2195} / 889-1104,
+# ratified by the maintainer 2026-08-12 (14z-82d) with the mechanism named
+# ($FF0460 sound-driver record-pointer spill). It is encoded inline in the
+# leg-(a) loop; everything else still fails loudly.
 #
 # Usage: ROMDIR=... [MAME_BIN=...] tests/audit_merged_legacy.sh
 # On-demand: builds build/merged1 and runs ~26 replay legs (~40 min).
@@ -265,12 +273,25 @@ cmp -s "$W/a_03_two_player_vs.log" "$W/det2.log" || {
 echo "  ok: two masked runs of 03_two_player_vs bit-identical"
 
 echo "== 1 (leg a): merged vs VANILLA on the masked-v2 basis — the superset"
-echo "      question. Expectation: donovan-m3a's ratified classes VERBATIM. =="
+echo "      question. Expectation: donovan-m3a's ratified classes VERBATIM,"
+echo "      plus the ratified merged-04 inventory (14z-82d). =="
 : > "$W/summary"
 for spec in "$EXPECT"/*.masked; do
     name="$(basename "$spec" .masked)"
     printf '%-24s ' "$name"
     sline="$(cat "$spec")"
+    # MERGED-ONLY RATIFIED EXPECTATION (maintainer, 2026-08-12, 14z-82d).
+    # The merged image's longer hook chains add ONE flicker frame (2005) to
+    # 04's frozen single-tenant inventory; byte-attributed to the low word
+    # of the sound driver's record-pointer spill at RAM:$FF0460 (writer
+    # PRG:0x0011E2, locked by tests/audit_ff0460_writer.sh) — one-frame
+    # pointer phase, no gameplay surface, the ratified hook-flicker family.
+    # The merged instrument is unregistered by design, so this expectation
+    # lives HERE, not in a .masked file; the single-tenant prior
+    # (tests/expected/donovan-m3a/04_select_fuzz.masked) is unchanged.
+    if [ "$name" = "04_select_fuzz" ]; then
+        sline="composite vsavj/masked-v2 1525,2005,2009,2195 889-1104"
+    fi
     class=${sline%% *}; rest=${sline#* }; base=${rest%% *}; args=${rest#* }
     baselog="$REPO/tests/expected/$base/logs/$name.log"
     log="$W/a_$name.log"
@@ -436,7 +457,8 @@ if [ "$fail" != 0 ]; then
     exit 1
 fi
 echo "PASS: the 3-tenant merged program image lands on the ratified legacy"
-echo "      classes VERBATIM (leg a), and each tenant's own content forms"
+echo "      classes VERBATIM (leg a; 04 on its ratified merged-specific"
+echo "      inventory, 14z-82d), and each tenant's own content forms"
 echo "      matches, survives the crash guard, and leaves boot/attract"
 echo "      untouched relative to its frozen single-tenant build (leg b)."
 echo "      This proves LEGACY SAFETY of the merge only — tenant correctness"

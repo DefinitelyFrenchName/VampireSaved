@@ -1,6 +1,34 @@
 # STATE — living progress log
 
-Updated: 2026-08-12 (session 14z-82d close — **THE 14z-82 DAY ENDS FULLY
+Updated: 2026-08-12 (session 14z-83 — **THE 04 RATIFICATION IS EXECUTED AND
+THE MERGED MEASUREMENT IS FULL GREEN — the project's first all-green merged
+run.** The ratified merged-04 expectation (`composite vsavj/masked-v2
+1525,2005,2009,2195 889-1104` — the audit's own proposed line verbatim) is
+encoded INLINE in `tests/audit_merged_legacy.sh`'s leg-(a) loop (the merged
+instrument is unregistered by design, so its expectation lives in the audit,
+not a .masked file; the single-tenant prior
+`tests/expected/donovan-m3a/04_select_fuzz.masked` is untouched), with the
+header/banner/PASS text updated to name the ONE signed carve-out — every
+other deviation still fails loudly, per the standing watch. Pre-verified in
+seconds before the run: the spec line PASSes `compare_composite.py` against
+the archived `build/gate_failures/merged1_a_04_select_fuzz.log`. Then the
+full audit ran to **FULL GREEN, exit 0**: merged image built at the frozen
+593 ops (fingerprint e771d667 this run — unregistered, moves with the
+generator, do not pin), F2 shape asserted (HENT==SHIM), all three tenants'
+char-inits execute, merged determinism holds, **leg (a) 14/14 PASS** — 04
+measured EXACTLY the ratified inventory ({1525,2005,2009,2195}, window
+889-1104, 1325 identical frames after) and the other 13 landed on
+donovan-m3a's classes verbatim, attract EXACT included — and **leg (b) all
+six guard-clean** vs the frozen single-tenant builds (donovan 12/20,
+huitzil 70/83, pyron 70/72). ROMDIR audited clean first (76/76). Docs:
+HANDOFF's audit_merged_legacy registry row updated (stale "13/14, H and P
+CRASH" result trailer replaced); the retraction grep found the remaining
+hold claims only in NEXT_SESSION.md, rewritten this session. **The program
+half of the merge is now MEASURED SAFE with zero known crashes and zero
+held deviations — next arc: the gfx half (M3b Phase 3), then the tenant
+batteries on a merged build.** Read docs/NEXT_SESSION.md first.)
+
+Previously: 2026-08-12 (session 14z-82d close — **THE 14z-82 DAY ENDS FULLY
 RESOLVED: three fixes shipped, both tenants re-frozen and
 MAINTAINER-PLAYTEST-CONFIRMED ("all 3 characters seem identical to their
 previous build", no crashes), and every open decision RULED.** The day in
