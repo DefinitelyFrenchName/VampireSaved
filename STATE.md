@@ -334,7 +334,8 @@ does, by design), and its section-0 equivalent (no PROBE at 2886 on hui29 =
 rig dead) guards the dead-instrument case. `test_tenant_loop` green;
 `test_m3a_reproducible` re-run this session (all four fingerprints).
 
-### Decisions pending (maintainer) — 14z-81
+### Decisions — RESOLVED by the maintainer, 2026-08-12 (were "pending" for
+### less than a day; kept here in full so the ruling sits beside its options)
 
 1. **The 04_select_fuzz flicker at 2005.** One deterministic, fully
    re-convergent extra flicker frame on the merged build, two live bytes,
@@ -343,15 +344,21 @@ rig dead) guards the dead-instrument case. `test_tenant_loop` green;
    AND the two crashes are fixed, then re-measure the whole table
    (recommended — the merge is changing anyway); (b) ratify the widened
    inventory now for a future merged expectation set.
+   **DECIDED: (a) — hold, re-measure the whole table after the fixes.**
+   Nothing is ratified for merged builds until then; the audit keeps
+   failing on the widened inventory by design.
 2. **The H shim bypass (F2).** Fix now (assemble-after-loop chain, then
    re-measure `audit_phase_mode_cost`-style) or accept temporarily and
    gate on the vec3 fix first? Recommendation: fix AFTER the vec3 slot is
    named — both touch the same emit path and one re-measure covers both.
+   **DECIDED: fix AFTER the vec3 slot is named**, as recommended.
 3. **Does Phase 3 (gfx) wait for the leg-(b) fixes?** The gfx design is
    independent of the program-side defects, but any tenant behaviour
    battery on a merged build is meaningless until Huitzil survives
    char-init. Recommendation: fix the vec3 slot first — it is one
    localized defect with a regression gate already in place.
+   **DECIDED: agreed — the vec3 slot first.** Phase 3 order stands behind
+   the leg-(b) fixes.
 
 ## Session 14z-80 — THE N-TENANT LOOP: `main()` iterates, and the three
 ## traps that were not in the spec

@@ -71,13 +71,13 @@ Fix lands → `tests/audit_merged_vec3.sh` flips green → re-run
 5. **Then the gfx half** (M3b Phase 3) and the tenant batteries on a merged
    build — unchanged from 14z-80's list, now explicitly behind the fixes.
 
-## Decisions pending (maintainer) — see STATE 14z-81 for full text
+## Decisions — MADE by the maintainer 2026-08-12 (full text in STATE 14z-81)
 
-1. Ratify the widened 04 flicker inventory now, or re-measure after fixes
-   (recommended).
-2. F2 fix ordering (recommended: after the vec3 slot is named).
-3. Whether Phase 3 gfx design waits for the leg-(b) fixes (recommended:
-   fix vec3 first; it is localized and gated).
+1. The widened 04 flicker inventory is NOT ratified — hold, re-measure the
+   whole table after the fixes.
+2. F2 is fixed AFTER the vec3 slot is named (same emit path, one
+   re-measure covers both).
+3. The vec3 slot comes first; Phase 3 gfx stands behind the leg-(b) fixes.
 
 ## Still open from 14z-79/-80, unchanged
 
