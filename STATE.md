@@ -1,6 +1,30 @@
 # STATE — living progress log
 
-Updated: 2026-08-12 (session 14z-82c, same day — **THE HIT-CLASS FIX IS
+Updated: 2026-08-12 (session 14z-82d close — **THE 14z-82 DAY ENDS FULLY
+RESOLVED: three fixes shipped, both tenants re-frozen and
+MAINTAINER-PLAYTEST-CONFIRMED ("all 3 characters seem identical to their
+previous build", no crashes), and every open decision RULED.** The day in
+one breath: (82) per-tenant TYPE NUMBERS fixed the merged Huitzil vec3 +
+F2; (82b) f7997 root-caused as a LATENT vanilla hit-class map over-index
+present in frozen pyron-m2 SOLO, fix generated+measured; (82c) the fix
+ADOPTED — huitzil-m4 (e66678d0, build/hui30) + pyron-m3 (6c7f7322,
+build/pyron21) frozen, suites GREEN, the pairsweep reset dissolved with a
+control (one vanilla map = three defects), merged instrument crash-free
+(leg (b) all six guard-clean); (82d) both playtest reports MEASURED — the
+"new" MK trap sfx is the 14z-79 (b') fix being heard (ring A/B
+byte-identical; the mine named as pool type 69; the hit sweep scoped to
+POOL-vs-POOL), the pyron win-pose laugh distortion is pre-existing (ring
+A/B identical; filed, M5-family) as is the LK/HK trap silence
+(maintainer completeness note), and **the merged 04 inventory {1525,
+2005, 2009, 2195} is RATIFIED (maintainer)** — its execution (encode in
+audit_merged_legacy + run to the project's first FULL-GREEN merged
+measurement) is next session's first act. Decisions ruled today: hit-class
+adoption (ADOPTED), Donovan's map[61]/[62] (KEEP ZEROS), the 04 inventory
+(RATIFIED). Remaining open ledger: the two M5-family sound items, the
+known cosmetic opens, and M3b Phase 3 (gfx) as the next arc — the program
+half has NO known crash. Read docs/NEXT_SESSION.md first.)
+
+Previously: 2026-08-12 (session 14z-82c, same day — **THE HIT-CLASS FIX IS
 ADOPTED (maintainer decision 1) AND BOTH TENANTS ARE RE-FROZEN:
 `huitzil-m4` (e66678d0, build/hui30) and `pyron-m3` (6c7f7322,
 build/pyron21 — byte-identical to the measured probe build).** Decision 2

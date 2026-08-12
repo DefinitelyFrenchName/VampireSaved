@@ -536,6 +536,14 @@ tests/audit_hitclass_map_cost.sh      # 14z-82b ON-DEMAND (~20 min): the
                                       # frames, zero divergence); fire census
                                       # (legacy enters the map 0 times).
                                       # Never freezes the probe
+tests/audit_trap_sound.sh             # 14z-82d (~10 min, 2 runs): the MK
+                                      # Plasma Trap SPAWNS (type-69 pool
+                                      # write) and SOUNDS (ring id 0x049A) on
+                                      # the current huitzil build — locks the
+                                      # behavior the (b') fix restored; a
+                                      # silent/crashing trap is loud here.
+                                      # LK/HK silence is a KNOWN-OPEN it does
+                                      # not cover (M5-family)
 tests/audit_type_dispatch_range.sh    # 14z-82 (~8 min, 4 guarded runs): on the
                                       # MERGED build, ZERO obj_hook dispatches
                                       # in the ORIGINAL 114-119 range during

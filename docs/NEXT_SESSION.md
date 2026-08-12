@@ -71,6 +71,7 @@ tests/audit_type_dispatch_range.sh  # merged: zero original-range dispatches
 tests/audit_ff0460_writer.sh        # the $FF0460 owner lock
 tests/test_hitclass_map_thunk.sh    # hit-class fix reconstruction gate
 tests/audit_hitclass_map_cost.sh    # hit-class adoption numbers, rerunnable
+tests/audit_trap_sound.sh           # MK trap fires AND sounds (14z-82d lock)
 ```
 `GUARD_PROBE_HIST` fires at CRASH time too; `audit_merged_legacy` leg-b
 always measures the REF leg on a crash (MERGE-SPECIFIC vs LATENT).
