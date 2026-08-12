@@ -1031,6 +1031,19 @@ rig dead) guards the dead-instrument case. `test_tenant_loop` green;
    **DECIDED: (a) — hold, re-measure the whole table after the fixes.**
    Nothing is ratified for merged builds until then; the audit keeps
    failing on the widened inventory by design.
+   **SUPERSEDED 2026-08-12 (14z-82d close): RATIFIED.** All hold
+   conditions were met (both crashes fixed, mechanism named —
+   $FF0460 = the sound driver's record-pointer spill,
+   tests/audit_ff0460_writer.sh — and the same-day re-measure on the
+   adopted tree reproduced the identical inventory), and the maintainer
+   ratified the merged 04 inventory {1525, 2005, 2009, 2195} (composite,
+   window 889-1104): "given the state of exploration and how limited the
+   practical impact is, I'm fine with ratifying." EXECUTION IS NEXT
+   SESSION'S FIRST ACT (maintainer: any work next session): encode the
+   ratified merged-04 expectation in audit_merged_legacy (the merged
+   instrument is unregistered by design, so its expectation lives in the
+   audit; the audit's own proposed line is the spec verbatim) and run
+   the audit to full green.
 2. **The H shim bypass (F2).** Fix now (assemble-after-loop chain, then
    re-measure `audit_phase_mode_cost`-style) or accept temporarily and
    gate on the vec3 fix first? Recommendation: fix AFTER the vec3 slot is

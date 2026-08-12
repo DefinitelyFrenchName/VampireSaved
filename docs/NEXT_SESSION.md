@@ -19,12 +19,16 @@
 >    SIX guard-clean** (pyron/70 END 11017 on the merged build). The
 >    only FAIL anywhere is 04's held-un-ratified flicker inventory.
 >
-> **Both verification suites are GREEN** (hui30, and pyron21 at 55
-> PASS). Decision 2 is DECIDED (keep vanilla's zeros). **FIRST
-> PRIORITY: the 04 ratification** — the merged 04 inventory ({1525,
-> 2005, 2009, 2195}) with its mechanism NAMED ($FF0460 = the sound
-> driver's record-pointer spill, tests/audit_ff0460_writer.sh) — ratify
-> or hold further. Then the gfx half (M3b Phase 3).
+> **Both verification suites are GREEN** (hui30, pyron21 at 55 PASS),
+> all decisions are in: decision 2 DECIDED (keep vanilla's zeros) and
+> **THE 04 INVENTORY IS RATIFIED (maintainer, 2026-08-12)** — {1525,
+> 2005, 2009, 2195}, composite, window 889-1104, mechanism named.
+> **FIRST ACT NEXT SESSION: execute the ratification** — encode the
+> ratified merged-04 expectation in audit_merged_legacy (the merged
+> instrument is unregistered by design, so its expectation lives in the
+> audit script; its own printed "proposed:" line is the spec verbatim)
+> and run the audit to FULL GREEN — the first all-green merged
+> measurement in the project. Then the gfx half (M3b Phase 3).
 
 ## The .sha1 re-freeze attribution (read before touching those baselines)
 
@@ -40,9 +44,8 @@ probes, on this replay class.
 
 ## Then, in order
 
-2. **The 04/2005 ratification decision** (maintainer) — everything it
-   was waiting on is done: both crashes fixed, mechanism named,
-   re-measured same-day on the adopted tree (identical inventory).
+2. ~~The 04/2005 ratification decision~~ **RATIFIED (2026-08-12)** —
+   execution per the START HERE block above.
 3. ~~Decision 2~~ DECIDED (keep zeros, 2026-08-12): Donovan's
    map[61]/[62] stay vanilla; revisit only on playtest feel.
 4. **Then the gfx half** (M3b Phase 3) and the tenant batteries on a
