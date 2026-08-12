@@ -26,7 +26,19 @@ CRASH" result trailer replaced); the retraction grep found the remaining
 hold claims only in NEXT_SESSION.md, rewritten this session. **The program
 half of the merge is now MEASURED SAFE with zero known crashes and zero
 held deviations — next arc: the gfx half (M3b Phase 3), then the tenant
-batteries on a merged build.** Read docs/NEXT_SESSION.md first.)
+batteries on a merged build.** SAME SESSION, Phase 3 S0-S2 LANDED: the
+merged group-C write-set census (tools/audit_gfx_merged.py + gate, two
+comparator controls) re-derived the layout fresh and found EXACTLY ONE
+real collision — Huitzil's 288 strip dsts 0x5EA0-0x5FBF (vs2A) inside
+Pyron's band (vs2B); place() now carries every gfx write
+(same-source-or-fail on all passes, was 2 of 8, ground-truthed incl. the
+must-raise control); and --chain composes links over members + a
+cumulative ledger (gate: solo byte-identical to frozen, idempotent, D->H
+cumulative, P-onto-H fails loudly at the strip). All four frozen
+fingerprints rebuilt bit-exact after EVERY step. **BLOCKED on the strip
+relocation ruling (Decisions pending below): S3 relocates the strip
+(recommend shift 0x3800, dst 0x86A0-0x87BF, bias 0x7A00) and re-freezes
+huitzil-m4 -> m5.** Read docs/NEXT_SESSION.md first.)
 
 ### Decisions pending (maintainer) — 14z-83, M3b Phase 3 (the gfx half)
 

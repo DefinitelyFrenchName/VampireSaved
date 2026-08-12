@@ -1,29 +1,43 @@
-# NEXT SESSION — orientation (written at the close of 14z-83, 2026-08-12)
+# NEXT SESSION — orientation (updated mid-14z-83, 2026-08-12: Phase 3 underway)
 
 > ## START HERE
 >
-> **THE MERGED PROGRAM HALF IS DONE AND MEASURED: the 04 ratification is
-> executed and `audit_merged_legacy` ran to FULL GREEN (exit 0) — the
-> project's first all-green merged measurement.**
+> **THE GFX ARC (M3b Phase 3) IS UNDERWAY — S0-S2 landed, S3 is BLOCKED
+> on ONE maintainer ruling** (STATE.md "Decisions pending — 14z-83"):
+> relocate Huitzil's 288-tile beam strip (shift 0x1000 → 0x3800, dst
+> 0x86A0-0x87BF, handler bias 0x5200 → 0x7A00) and re-freeze huitzil-m4
+> → m5. The S0 census proved this is the ONLY real collision in the
+> whole 3-tenant merged gfx write set — everything else is byte-proven
+> same-source. **If the ruling is in: execute S3 first** (three sites:
+> `strip_tiles/0x10.json` shift, the `068152000000` bias inside
+> `beam_list_type6.thunk_hex` in huitzil.toml, and
+> `test_beam_list_type6.sh`'s byte lock; + `gfx_layout3.toml` [[strip]]
+> row + pool-1 ledger split; + flip `test_gfx_chain.sh` section 4 to
+> full-chain success), then the H battery + beam gates + playtest →
+> ratify huitzil-m5, update `test_m3a_reproducible.sh` EXPECT_HUI +
+> registry.
 >
-> - The ratified merged-04 expectation (`composite vsavj/masked-v2
->   1525,2005,2009,2195 889-1104`) lives INLINE in
->   `tests/audit_merged_legacy.sh`'s leg-(a) loop (the merged instrument
->   is unregistered by design; the single-tenant prior
->   `tests/expected/donovan-m3a/04_select_fuzz.masked` is untouched).
->   Every OTHER deviation still fails loudly — the carve-out is exactly
->   one signed expectation, mechanism named ($FF0460 sound-driver
->   record-pointer spill, `tests/audit_ff0460_writer.sh`).
-> - Measured 14z-83: leg (a) 14/14 PASS (attract EXACT; 04 exactly the
->   ratified inventory, 1325 identical frames after), leg (b) all six
->   guard-clean. 593 ops, F2 shape asserted, all three char-inits
->   execute, merged determinism holds.
+> Landed this session (all committed, all gates green):
+> - **The 04 ratification EXECUTED** → `audit_merged_legacy` FULL GREEN
+>   (14/14 + six guard-clean) — the first all-green merged measurement.
+>   The merged-04 expectation lives inline in the audit script.
+> - **S0**: `tests/audit_gfx_merged_census.sh` — the complete merged
+>   group-C write-set census, 2 comparator controls. ONE real collision
+>   (the strip); occupancy 45,449/65,536; pools EMPTY; plan A holds.
+> - **S1**: `place()` — same-source-or-fail on EVERY gfx pass (was 2/8)
+>   + the `gfx_written.json` ledger. `tests/test_gfx_collision_gate.sh`.
+> - **S2**: `--chain` — links compose over members + cumulative ledger.
+>   `tests/test_gfx_chain.sh` (solo byte-identical / idempotent / D->H
+>   cumulative / P-onto-H must-fail).
+> - All four frozen fingerprints rebuilt bit-exact after every step.
 >
-> **NEXT ARC: the gfx half (M3b Phase 3)** — the merge is program-only by
-> decision; gfx is still single-tenant. Then the tenant batteries on a
-> merged build. Before starting, read `docs/project/cps2_wide.md` and the
-> HANDOFF gfx notes (group C sentinels, the hash-shadowing trap, the
-> two-romsets rule).
+> **After S3: S4** (driver merged-gfx mode → `build/m3b_merged`;
+> verify_gfx_build/check_tenant_hud multi-tenant — design them against
+> the driver's real layout), **S5** (merged render gates — H/P's first —
+> + audit_empty_tiles), **S6** (merged legacy re-verdict + registry +
+> playtest). Plan: `/Users/koneko/.claude/plans/vectorized-riding-lerdorf.md`;
+> read `docs/project/cps2_wide.md` + HANDOFF gfx notes first (sentinels,
+> hash-shadowing, the two-romsets rule).
 
 ## Current builds (registry)
 
