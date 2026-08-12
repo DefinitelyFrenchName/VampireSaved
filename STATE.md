@@ -319,18 +319,54 @@ The chain of facts, each verified:
 
 **FIX DESIGN (the 14z-80h chain form, applied to obj_hook):** for a type
 resolved by MORE THAN ONE tenant's view, the union's entry must point at a
-generated owner-id dispatch —
-`movea.w (0x30,a6),a1; cmpi.b #id,(0x382,a1); bne.s next; jmp <that
-tenant's copy handler>` per tenant, tail = tripwire (an object owned by a
-LEGACY character reaching a tenant type is a bug worth naming, not a
+generated owner-id dispatch; tail = tripwire (an object owned by a LEGACY
+character reaching a tenant type is a bug worth naming, not a
 fall-through). At N=1 no type is multi-owner, so nothing is emitted and
-every frozen build stays bit-exact BY CONSTRUCTION. Open questions for the
-implementing session: whether `+0x30` is the owner for EVERY type in the
-117 family (verify per type before emitting), the dispatcher's register
-contract at the entry (is a1 clobberable — the existing ghost-clean thunks
-document the contract), and whether Pyron's f7997 crash dissolves with
-this fix (his objects transit the same family) or is a second instance to
-chase with the same GUARD_PROBE_HIST rig.
+every frozen build stays bit-exact BY CONSTRUCTION.
+
+**14z-81b MEASUREMENTS TOWARD IT — and why the stub did NOT ship the same
+day.** The premises were measured before authoring 68k (the 14z-78 rule),
+and one of them failed:
+
+- **The multi-owner set is types 114-120** (seven; site 0x5E542's extended
+  table, handlers = x088512 copy offsets +0x0/+0x12BA/+0x1D5C/+0x20DA/
+  +0x27E6/+0x2BC8/+0x2CEA). Site 0x54470's extension partitions cleanly
+  (59-63 Donovan-only, 64-75 Huitzil-only) — no stubs needed there.
+- **The walker's register contract is MEASURED** (vanilla 0x5E52A-0x5E554
+  disassembled): loop state is A6/A5/($B5,A5) only; A1 and D1 are never
+  read — clobber-safe with NO pushes. Handler entry contract: A0 = the
+  handler's own address, D0 = 0, CCR = moveq's Z — reproducible per exit
+  with `moveq #0,d0; movea.l #handler,a0; jmp (a0)` (movea does not touch
+  CCR).
+- **`+0x30` owner linkage: works for 117 (P1 direct) and 119 (creator
+  object -> player at depth 2), FAILS for 115.** Census over two replays
+  (`tests/audit_objhook_owner_census.sh`, the rerunnable rig): type 115
+  dispatches with `+0x30` = 0x00 AT DISPATCH TIME, while the SAME frame's
+  end-of-frame dump shows 0x84 in the same slot — and the slot's type
+  byte reads 117 in the dump vs 115 at the dispatch instant. The field
+  (and the type byte) are TIME-VARYING WITHIN A FRAME for this part of
+  the family. An owner-walk stub would tripwire legitimate 115s — merged
+  Huitzil fires them constantly. Types 114/116/118/120 were NOT OBSERVED
+  by these replays: no verdict, and a design that assumes their shape is
+  guessing.
+
+**Two candidate designs for the implementing session:**
+(a) **Owner-walk stub** (unrolled depth-4 `movea.w (0x30,aN),a1` chain
+    against $FFFF8400/$FFFF8800, then per-tenant `cmpi.b #id,(0x382,a1)`)
+    — proven viable for 117/119 only; needs a per-type answer for
+    115-family timing before it can carry the whole table.
+(b) **Spawn-time tenant tag** — each tenant's OWN copy stamps its spawns
+    (the `move.l #$1007700,(A4)`-style writes live inside the per-tenant
+    copies), so patching the stamp sites to also write a tenant-tag byte
+    into a KNOWN-FREE object field makes the dispatch a single
+    `cmpi.b #tag,(off,A6)` — no walks, no time-variance, and the tagging
+    is per-tenant by construction. Costs: a free-field census (which
+    object byte is never touched by any handler in the family) and a
+    stamp-site census inside x088512 (the reconciler's note list already
+    enumerates the copies' write sites).
+Also still open: whether Pyron's f7997 crash dissolves with this fix (his
+objects transit the same family) or is a second instance — re-run his leg
+with GUARD_PROBE_HIST when the fix build exists.
 
 ### The Huitzil crash, localized (the 14z-81 first-pass chase; the
 ### conclusion is superseded by the 14z-81b addendum above — the slot IS

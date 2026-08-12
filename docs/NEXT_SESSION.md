@@ -48,26 +48,38 @@ ADDRESS consumed as a data base. (Note the 0xC0114+0xB8AC decomposition in
 the first-pass chase was a red herring — the literal is the tripwire
 address directly.)
 
-Implement: in `engine_here()`'s obj_hook union, detect types resolved by
->1 tenant's view; for each, emit an owner-id dispatch chain
-(`movea.w (0x30,a6),a1; cmpi.b #id,(0x382,a1); bne.s next; jmp <that
-tenant's copy>`; tail = tripwire) and point the table entry at it. Inert
-at N=1 by construction (no multi-owner types exist), so all four frozen
-fingerprints must stay bit-exact — assert that first, then
-`tests/audit_merged_vec3.sh` flips green, then re-run
-`tests/audit_merged_legacy.sh` in full (~45 min).
+The premises were measured 14z-81b BEFORE authoring 68k (the 14z-78 rule),
+and one failed — which is why no stub shipped that day. What is already
+settled (all in STATE 14z-81b, all rerunnable):
 
-Verify before emitting 68k (the 14z-78 rule — do not author 68k from
-static reading alone):
-- `+0x30` holds the owning player struct for EVERY type in the
-  multi-owner family (measured for the type-117 instance in the crash
-  dump; check the others — the spawn code `move.w A6,($30,A4)` stores the
-  CREATOR, which for nested spawns may be an object, not the player: walk
-  one level if so, or find the player field the family actually carries).
-- The dispatcher's register contract at the entry (is a1 clobberable?) —
-  the existing ghost-clean obj_hook thunks document the contract.
-- Whether Pyron's f7997 crash dissolves with this fix (same family) or is
-  a second instance — re-run his leg with GUARD_PROBE_HIST if it stands.
+- Multi-owner set = types **114-120** (site 0x5E542; site 0x54470
+  partitions cleanly, needs nothing).
+- Walker register contract MEASURED (vanilla 0x5E52A-54 disassembled):
+  A1/D1 clobber-safe, no pushes needed; handler entry contract is
+  A0=handler, D0=0, CCR=moveq's Z — reproduce per exit with
+  `moveq #0,d0; movea.l #handler,a0; jmp (a0)`.
+- Owner linkage at `+0x30`: WORKS for 117 (P1 direct) and 119 (creator →
+  player, depth 2); **FAILS for 115** — reads 0x00 at dispatch time while
+  the same frame's dump shows 0x84 in the same slot (field AND type byte
+  are time-varying within a frame). 114/116/118/120 NOT OBSERVED — no
+  verdict. Census rig: `tests/audit_objhook_owner_census.sh` (~6 min).
+
+DECIDE THE DESIGN FIRST (options in STATE 14z-81b): (a) the owner-walk
+stub — viable for 117/119, needs the 115-family timing answered; or
+(b) the spawn-time tenant TAG — each tenant's own copy stamps its spawns,
+so a tag byte in a known-free object field makes the dispatch one
+`cmpi.b`, no walks, no time-variance; costs a free-field census + a
+stamp-site census inside x088512 (the reconciler's notes already list the
+copies' write sites). (b) looks structurally cleaner; measure its two
+censuses before committing to it.
+
+Then: emit in `engine_here()`'s obj_hook union for types resolved by >1
+tenant's view; inert at N=1 by construction — assert all four frozen
+fingerprints bit-exact FIRST, then `tests/audit_merged_vec3.sh` flips
+green, then re-run `tests/audit_merged_legacy.sh` in full (~45 min).
+The `resolve_ported()` docstring ("the copies are byte-equal clones …
+one address has to win", gen_donovan_patch.py:1035) is the WRONG PREMISE
+that produced this bug — fix it in the same commit.
 
 ## Then, in order
 

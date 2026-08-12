@@ -695,6 +695,20 @@ tests/audit_merged_vec3.sh [bd]       # 14z-81: the merged Huitzil satellite
                                       # then it is the regression gate. Rig
                                       # control: no PROBE at 2886 on hui29 =
                                       # rig dead, hard fail
+tests/audit_objhook_owner_census.sh   # 14z-81b: which OWNER does each extended
+                                      # obj_hook type (114-120, the multi-owner
+                                      # x088512 pool family) carry at DISPATCH
+                                      # TIME? The vec3-fix design measurement,
+                                      # rerunnable (~6 min, hui29 by default,
+                                      # REPORT-ONLY). Measured: 117 carries P1
+                                      # directly, 119 the creator object
+                                      # (player at depth 2), 115 reads ZERO at
+                                      # dispatch while the same frame's dump
+                                      # shows 0x84 — TIME-VARYING; 114/116/
+                                      # 118/120 not observed (says so rather
+                                      # than guessing). Probes the build's own
+                                      # obj_hook thunk (D0 still type*4 there;
+                                      # at site+6 it is already cleared)
 tests/test_tenant_row_owner.sh [ex]   # 14z-77 (M3b slices C+D): is the row-OWNER
                                       # threading LOAD-BEARING? Every slice of the
                                       # multi-tenant refactor is INERT by design, so

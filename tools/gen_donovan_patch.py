@@ -1036,10 +1036,21 @@ def main():
         """(placed address, tenant name) for a SOURCE target any tenant ported.
 
         Scans the accumulated views in tenant order, so a span two tenants
-        both copied resolves to the FIRST tenant's copy — which is correct
-        for a shared engine table: the copies are byte-equal clones of the
-        same source, each specialised only through its own data pointers,
-        and one address has to win.
+        both copied resolves to the FIRST tenant's copy.
+
+        KNOWN DEFECT (14z-81b, MEASURED — the merged Huitzil vec3 crash):
+        first-wins is WRONG for a multi-owner obj_hook type. The premise
+        this docstring used to assert ("the copies are byte-equal clones,
+        specialised only through data pointers") is false in the way that
+        matters: the copies are INTERNALLY TENANT-RECONCILED — per-tenant
+        anim literals, and cross-tenant pointers rewritten to planted
+        TRIPWIRES — so tenant B executing tenant A's copy consumes A's
+        tripwire addresses as data. Types 114-120 (site 0x5E542's
+        extension, the x088512 pool family) are resolved by every tenant's
+        view and need an owner dispatch instead (design + measurements:
+        STATE 14z-81b; regression gate: tests/audit_merged_vec3.sh).
+        Single-tenant builds are unaffected (one view, first-wins trivially
+        correct).
         """
         for v in tenant_views:
             for nm, r in v["regions"].items():
