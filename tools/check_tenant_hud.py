@@ -73,11 +73,28 @@ def block(anchor, bx, by):
 
 
 def main():
-    outbase, data_path, romdir = sys.argv[1:4]
+    # 14z-83 S4: multi-tenant form. Solo invocation (3 positionals) is
+    # unchanged; a merged build checks each tenant with --tenant <name>
+    # (row from tenants.json) and --gfx-dir <last chain link> (the
+    # cumulative group-A members carry every tenant's HUD art).
+    import argparse
+    ap = argparse.ArgumentParser()
+    ap.add_argument("outbase")
+    ap.add_argument("data_path")
+    ap.add_argument("romdir")
+    ap.add_argument("--tenant")
+    ap.add_argument("--gfx-dir")
+    args = ap.parse_args()
+    outbase, data_path, romdir = args.outbase, args.data_path, args.romdir
     out = Path(outbase)
+    gfx_dir = Path(args.gfx_dir) if args.gfx_dir else out / "gfx"
     vj = Path(data_path).read_bytes()
 
-    tj = json.loads((out / "patch" / "tenant.json").read_text())
+    if args.tenant:
+        tens = json.loads((out / "patch" / "tenants.json").read_text())
+        tj = {t["name"]: t for t in tens}[args.tenant]
+    else:
+        tj = json.loads((out / "patch" / "tenant.json").read_text())
     TENANT = int(tj["id"])
     if TENANT not in TENANTS:
         die(f"no HUD fact row for tenant id {TENANT:#04x} — measure and "
@@ -108,7 +125,7 @@ def main():
     print(f"POKES {len(EXPECTED_POKES)}")
 
     # 3. the art, straight from the members
-    ga_built = [open(out / "gfx" / f"vm3.{n}m", "rb").read()
+    ga_built = [open(gfx_dir / f"vm3.{n}m", "rb").read()
                 for n in GROUP_A]
     z2 = zipfile.ZipFile(Path(romdir) / "vsav2.zip")
     g2 = [z2.read(f"vs2.{n}m") for n in GROUP_A]

@@ -164,6 +164,14 @@ corrected in the 14z-79 stale-doc sweep.)
 `build/m5w` (`ac52eeff`) is the KNOWN-BAD artifact of the 14z-60y sprite
 garble, kept as evidence — do not playtest it. `tools/audit_romset_identity.py
 build/m5w/rompath` names its four shadowed members in a second.
+**`build/m3b_merged` is the MERGED BUILD WITH GFX** (14z-83 S4,
+`tools/build_merged.sh`): the 593-op 3-tenant program image + the S2 gfx
+chain (D → H → P, last link's members packed, group B pristine). The
+FIRST artifact where all 18 characters have both code and art.
+UNREGISTERED until the S6 freeze decision — run_suite refuses it, and it
+reaches a playtest only after the S5 render gates and the S6 legacy
+re-verdict. Rebuild: `ROMDIR=... tools/build_merged.sh build/m3b_merged`
+(~15 min); its fingerprint moves with the generator — do not pin it.
 `build/merged1` is the **MERGED-LEGACY INSTRUMENT** (14z-81; carries the
 14z-82 type-renumber + F2 fixes) — the 3-tenant program image with gfx
 SKIPPED (group C zero-filled): legacy characters render correctly, the

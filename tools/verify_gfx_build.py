@@ -30,13 +30,44 @@ from _minitoml import loads as toml_loads  # noqa: E402
 
 
 def main():
-    outbase = sys.argv[1]
+    # 14z-83 S4: multi-tenant form. The solo invocation
+    # (`verify_gfx_build.py <outbase>`) is byte-unchanged; a merged build
+    # verifies each tenant with --tenant <name> (row from tenants.json,
+    # placement keys gain the @<name> suffix for non-first tenants),
+    # --gfx-dir <link dir> (the tenant's own chain link) and
+    # --extract-dir <frozen extract dir> (the merged build has no
+    # extract/ of its own — the three frozen verticals' extracts are the
+    # generator's inputs).
+    import argparse
+    ap = argparse.ArgumentParser()
+    ap.add_argument("outbase")
+    ap.add_argument("--tenant", help="tenant NAME (merged builds); row "
+                    "resolved from patch/tenants.json")
+    ap.add_argument("--gfx-dir", help="remap_spec dir (default "
+                    "<outbase>/gfx)")
+    ap.add_argument("--extract-dir", help="extraction dir (default "
+                    "<outbase>/extract)")
+    args = ap.parse_args()
+    outbase = args.outbase
+    gfx_dir = args.gfx_dir or f"{outbase}/gfx"
+    ex_dir = args.extract_dir or f"{outbase}/extract"
+
     pl = json.load(open(f"{outbase}/patch/placements.json"))
-    anim = pl["regions"]["anim"]
-    spec = json.load(open(f"{outbase}/gfx/remap_spec.json"))
+    if args.tenant:
+        _tens = json.load(open(f"{outbase}/patch/tenants.json"))
+        _tj = {t["name"]: t for t in _tens}[args.tenant]
+        # tenant 0 keeps the bare spellings (the historical, solo-
+        # compatible ones); later tenants ride the @<name> suffix
+        sfx = "" if _tens[0]["name"] == args.tenant else f"@{args.tenant}"
+    else:
+        _tj = json.load(open(f"{outbase}/patch/tenant.json"))
+        sfx = ""
+    anim = pl["regions"]["anim" + sfx]
+    spec = json.load(open(f"{gfx_dir}/remap_spec.json"))
     # effect_map exists only for delta-shifted tenants (Donovan); a
     # delta-0 tenant places everything at native codes (14z-67)
-    _ep = f"{outbase}/patch/effect_map.json"
+    _ep = f"{outbase}/patch/effect_map.json" if not sfx else \
+        f"{outbase}/patch/effect_map.{args.tenant}.json"
     eff = json.load(open(_ep)) if os.path.exists(_ep) else []
     lo = spec["placed"][0]
     hi = max([spec["placed"][1]] + [t for _, t in eff])
@@ -44,13 +75,12 @@ def main():
     # per-tenant source facts (14z-67, de-Donovanized): the anim span
     # from the tenant's layout row, the aux cptr windows from the
     # extraction itself (they were module constants — Donovan's values)
-    rj = json.load(open(f"{outbase}/extract/regions.json"))
+    rj = json.load(open(f"{ex_dir}/regions.json"))
     aux_src = [(v["src"], v["src"] + v["len"])
                for n, v in rj["regions"].items() if n.startswith("aux")]
     _root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     _lay = toml_loads(open(os.path.join(
         _root, "build/manifest/gfx_layout3.toml")).read())
-    _tj = json.load(open(f"{outbase}/patch/tenant.json"))
     _row = {r["name"]: r for r in _lay["tenant"]}[_tj["name"]]
     src_base = _row["anim_base"]
     src_end = _row["anim_base"] + _row["anim_len"]
@@ -72,7 +102,7 @@ def main():
                     "--data-out", data_path],
                    check=True, capture_output=True)
 
-    src = open(f"{outbase}/extract/region_anim.bin", "rb").read()
+    src = open(f"{ex_dir}/region_anim.bin", "rb").read()
     # 14z-74: collect the SOURCE's accepted sweep offsets and hand them to the
     # built-image walk below, so the sweep heuristic cannot invent records from
     # straddled reads that only look like pointers after placement moved the
@@ -85,8 +115,11 @@ def main():
         sweep_lo, sweep_hi, sweep_seen=s_sweep)
 
     out = open(data_path, "rb").read()
+    # this tenant's aux placements only: bare keys for the first tenant,
+    # @<name>-suffixed for the others (a merged build carries all three)
     aux_dst = [(r["dst"], r["dst"] + r["len"])
-               for n, r in pl["regions"].items() if n.startswith("aux")]
+               for n, r in pl["regions"].items() if n.startswith("aux")
+               and (n.endswith(sfx) if sfx else "@" not in n)]
     tiles, o_entries, o_records = walk(
         out, 0, anim["dst"], anim["dst"] + anim["len"],
         lambda c: any(a <= c < b for a, b in aux_dst),
@@ -128,22 +161,26 @@ def main():
         print(f"  ok: all {len(tiles)} tile codes within "
               f"[0x{lo:04X},0x{hi:04X}]")
     opimg = open(op_path, "rb").read()
-    x26 = pl["regions"]["x026142"]["dst"]
+    # 14z-83 S4: the tenant's OWN copy of the bank-table region. Measured
+    # on the merged image before trusting this key choice: every copy
+    # (x026142, @huitzil, @pyron) carries ALL THREE tenants' rows
+    # (0x10/0x11/0x13 = 0x1000, Jedah 0x0F = 0x4000), so whichever copy
+    # the engine serves, the row is right — and the per-tenant key keeps
+    # this check meaningful per link.
+    x26 = pl["regions"]["x026142" + sfx]["dst"]
     # The tenant's id and gfx bank, not constants. This check used to assert
     # row 0x0F == 0x4000 outright, so it agreed with the port only by
     # coincidence: a build whose tenant had moved still asserted Jedah's row
-    # and passed. Reading tenant.json makes the program half and the gfx half
-    # answer to one manifest row. Falls back to the historical constants when
-    # a build predates tenant.json.
-    tj = f"{outbase}/patch/tenant.json"
+    # and passed. Reading the tenant row makes the program half and the gfx
+    # half answer to one manifest row. Falls back to the historical
+    # constants when a build predates tenant.json.
     from gfx_tiles import bank_word
     slot, want = 0x0F, 0x4000
-    if os.path.isfile(tj):
-        t = json.load(open(tj))
-        slot = int(t["id"])
+    if _tj is not None:
+        slot = int(_tj["id"])
         # WIDE encoding, NOT gfx_bank << 13 (bank 4 = 0x1000, the bit-12
         # promote; 4 << 13 would be the sprite-list terminator)
-        want = bank_word(int(t.get("gfx_bank", 2)))
+        want = bank_word(int(_tj.get("gfx_bank", 2)))
     off = x26 + 0x13EE + slot * 2
     row = int.from_bytes(opimg[off:off + 2], "big")
     if row != want:
