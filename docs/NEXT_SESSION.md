@@ -44,8 +44,9 @@
 | build | set | fingerprint |
 |---|---|---|
 | build/m5_wide | donovan-m3a | 4b7d0dc7 |
-| build/hui30 | **huitzil-m4** | e66678d0 |
+| build/hui31 | **huitzil-m5** (14z-83: strip relocation) | 38188bb1 |
 | build/pyron21 | **pyron-m3** | 6c7f7322 |
+| build/hui30 | superseded huitzil-m4 (pre-relocation baseline, keep) | e66678d0 |
 | build/hui29, build/pyron20 | superseded (pre-fix A/B baselines, keep) | 34c8b47d / 69e8c6f0 |
 
 `build/merged1` is the LEGACY-ONLY instrument — never playtest, never

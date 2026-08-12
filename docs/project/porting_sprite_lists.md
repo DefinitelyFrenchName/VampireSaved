@@ -65,7 +65,10 @@ is there.
 
 *Mechanism:* port a copy of the handler carrying the SOURCE game's bias,
 plus any placement shift, and dispatch only the tenant's lists to it.
-Huitzil's: `0x4200 + 0x1000` (group-C shift) = `addi.l #$52000000`.
+Huitzil's: `0x4200 + 0x3800` (group-C shift) = `addi.l #$7A000000`
+(was `0x4200 + 0x1000 = addi.l #$52000000` until the 14z-83 relocation —
+the old dst sat inside Pyron's native band, the one real collision in
+the merged group-C write set).
 
 *Alternative rejected:* shifting the raw codes in the ported list data
 would fix the bias but not the bank (below), so the handler copy is needed
@@ -97,7 +100,7 @@ into group C at `code + shift`.
 `tools/build_gfx_donovan.py --strip-tiles build/manifest/strip_tiles/<char>.json`
 
 ```json
-{ "shift": "0x1000", "tiles": [ 20128, 20129, ... ] }
+{ "shift": "0x3800", "tiles": [ 20128, 20129, ... ] }
 ```
 
 Copies **vs2 bank-1** tile `c` to **group C bank 4** tile `c + shift`, with

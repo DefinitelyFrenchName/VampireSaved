@@ -1,35 +1,33 @@
 #!/bin/sh
-# test_gfx_chain.sh — the group-C gfx CHAIN mode (14z-83 S2). ~6 min.
+# test_gfx_chain.sh — the group-C gfx CHAIN mode (14z-83 S2; expectation
+# flipped by the S3 strip relocation: the full D->H->P chain now SUCCEEDS,
+# and the must-fail control runs on an old-shift fixture). ~9 min.
 #
 # The merge's gfx half runs build_gfx once per tenant, each link chaining
-# over the prior link's members + write ledger (--chain). This gate proves
-# the mechanism four ways, using the FROZEN build dirs' side files as
-# inputs (their provenance is test_m3a_reproducible.sh):
+# over the prior link's members + write ledger (--chain). Five sections,
+# using the FROZEN build dirs' side files as inputs (provenance:
+# test_m3a_reproducible.sh):
 #
 #   1. SOLO BYTE-IDENTITY: a chain-free Donovan run reproduces the frozen
-#      build/m5_wide/gfx members byte-for-byte (the S1/S2 refactors did
-#      not move the solo path).
-#   2. IDEMPOTENCE (chain-of-one): re-running the same link over its own
-#      output is a no-op — every write is a benign same-source skip;
-#      members and ledger come out byte-identical.
-#   3. CHAIN CARRIES: Donovan -> Huitzil SUCCEEDS (their write sets'
-#      overlaps are all same-source), and Huitzil's output ledger is
-#      CUMULATIVE (it contains Donovan's entries).
-#   4. THE MUST-FAIL CONTROL: chaining Pyron onto Huitzil's link FAILS
-#      loudly at the known 288-code strip collision (P's band write hits
-#      H's strip tile with different bytes — the audit_gfx_merged_census
-#      defect, held for the S3 relocation). A chain that swallows this is
-#      not a collision gate.
-#      >>> S3 NOTE: when the strip relocation lands, case 4 FLIPS — the
-#      full D->H->P chain must then succeed and this gate asserts that
-#      instead (update the expectation WITH the relocation commit).
+#      build/m5_wide/gfx members byte-for-byte.
+#   2. IDEMPOTENCE (chain-of-one): re-running a link over its own output
+#      is a no-op (members + ledger identical).
+#   3. D -> H chains; H's ledger is CUMULATIVE and carries the RELOCATED
+#      strip at 0x86A0-0x87BF.
+#   4. H -> P completes THE FULL 3-TENANT CHAIN (zero real collisions
+#      since S3) — P's members carry all three tenants' art.
+#   5. THE MUST-FAIL CONTROL: an old-shift (0x1000) strip fixture rebuilds
+#      the historical defect — chaining P onto that H' link dies loudly at
+#      a strip-range dst naming both sources. A chain that swallows this
+#      is not a collision gate.
 set -eu
 ROMDIR="${ROMDIR:?set ROMDIR}"
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"
 W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT
+HUI="${HUI:-build/hui31}"
 
-for d in build/m5_wide build/hui30 build/pyron21; do
+for d in build/m5_wide "$HUI" build/pyron21; do
     [ -d "$d/patch" ] || { echo "SKIP: missing $d (frozen build inputs)"; exit 0; }
 done
 [ -f build/m5_wide/gfx/vsw.31m ] || {
@@ -45,6 +43,31 @@ gfx_d() {  # donovan link -> $1, optional --chain $2
         --effect-tail build/manifest/effect_tail.json \
         --tenant build/m5_wide/patch/tenant.json \
         ${2:+--chain "$2"}
+}
+
+gfx_h() {  # huitzil link -> $1, chain $2, strip json $3
+    python3 tools/build_gfx_donovan.py "$ROMDIR" "$1" \
+        --tiles "$HUI/donovan_tiles.json" \
+        --select-tiles "$HUI/select_tiles.json" \
+        --select-bank5 "$HUI/patch/select_bank5.json" \
+        --effect-c5 "$HUI/patch/effect_c5.json" \
+        --wheel-bank5 "$HUI/patch/wheel_bank5.json" \
+        --strip-tiles "$3" \
+        --effect-tail build/manifest/effect_tail.json \
+        --tenant "$HUI/patch/tenant.json" \
+        --chain "$2"
+}
+
+gfx_p() {  # pyron link -> $1, chain $2
+    python3 tools/build_gfx_donovan.py "$ROMDIR" "$1" \
+        --tiles build/pyron21/donovan_tiles.json \
+        --select-tiles build/pyron21/select_tiles.json \
+        --select-bank5 build/pyron21/patch/select_bank5.json \
+        --effect-c5 build/pyron21/patch/effect_c5.json \
+        --wheel-bank5 build/pyron21/patch/wheel_bank5.json \
+        --effect-tail build/manifest/effect_tail.json \
+        --tenant build/pyron21/patch/tenant.json \
+        --chain "$2"
 }
 
 echo "== 1: solo Donovan link == frozen build/m5_wide/gfx byte-for-byte =="
@@ -70,17 +93,9 @@ assert a == b, "ledger changed on an idempotent re-chain"
 print("  ok: members and ledger identical (all writes were benign skips)")
 PY
 
-echo "== 3: Donovan -> Huitzil chains (same-source overlaps only) =="
-python3 tools/build_gfx_donovan.py "$ROMDIR" "$W/gfx_h" \
-    --tiles build/hui30/donovan_tiles.json \
-    --select-tiles build/hui30/select_tiles.json \
-    --select-bank5 build/hui30/patch/select_bank5.json \
-    --effect-c5 build/hui30/patch/effect_c5.json \
-    --wheel-bank5 build/hui30/patch/wheel_bank5.json \
-    --strip-tiles build/manifest/strip_tiles/0x10.json \
-    --effect-tail build/manifest/effect_tail.json \
-    --tenant build/hui30/patch/tenant.json \
-    --chain "$W/gfx_d" > "$W/h.log" 2>&1 || { tail -5 "$W/h.log"; exit 1; }
+echo "== 3: Donovan -> Huitzil chains; relocated strip in the ledger =="
+gfx_h "$W/gfx_h" "$W/gfx_d" build/manifest/strip_tiles/0x10.json \
+    > "$W/h.log" 2>&1 || { tail -5 "$W/h.log"; exit 1; }
 python3 - "$W" <<'PY'
 import json, sys
 d = json.load(open(sys.argv[1] + "/gfx_d/gfx_written.json"))
@@ -90,37 +105,58 @@ hc = {tuple(e) for e in h["C"]}
 missing = dc - hc
 assert not missing, f"H ledger lost {len(missing)} of D's entries — " \
                     "not cumulative"
-print(f"  ok: H link succeeded; ledger cumulative "
-      f"({len(dc)} D entries all present, {len(hc)} total)")
+strip = sorted(i for i, k, s in h["C"]
+               if k == "vs2A" and i < 0x10000 and 0x14EA0 <= s <= 0x14FBF)
+assert (len(strip), min(strip), max(strip)) == (288, 0x86A0, 0x87BF), \
+    f"strip not at the relocated dst: {len(strip)} entries " \
+    f"{min(strip):#x}-{max(strip):#x}"
+print(f"  ok: H link cumulative ({len(dc)} D entries carried); strip at "
+      f"0x86A0-0x87BF (288)")
 PY
 
-echo "== 4: MUST-FAIL — Pyron onto Huitzil dies at the strip collision =="
+echo "== 4: Huitzil -> Pyron completes the FULL 3-tenant chain =="
+gfx_p "$W/gfx_p" "$W/gfx_h" > "$W/p.log" 2>&1 || { tail -5 "$W/p.log"; exit 1; }
+python3 - "$W" <<'PY'
+import json, sys
+h = json.load(open(sys.argv[1] + "/gfx_h/gfx_written.json"))
+p = json.load(open(sys.argv[1] + "/gfx_p/gfx_written.json"))
+hc = {tuple(e) for e in h["C"]}
+pc = {tuple(e) for e in p["C"]}
+missing = hc - pc
+assert not missing, f"P ledger lost {len(missing)} entries — not cumulative"
+b4 = {i for i, k, s in p["C"] if i < 0x10000}
+print(f"  ok: FULL CHAIN — P's members carry all three tenants "
+      f"({len(b4)} bank-4 codes, {len(pc)} total group-C entries)")
+PY
+
+echo "== 5: MUST-FAIL — the old-shift fixture reproduces the collision =="
+python3 - "$W" <<'PY'
+import json, sys
+st = json.load(open("build/manifest/strip_tiles/0x10.json"))
+st["shift"] = "0x1000"
+json.dump(st, open(sys.argv[1] + "/strip_old.json", "w"))
+PY
+gfx_h "$W/gfx_h_old" "$W/gfx_d" "$W/strip_old.json" \
+    > "$W/hold.log" 2>&1 || { tail -5 "$W/hold.log"; exit 1; }
 set +e
-python3 tools/build_gfx_donovan.py "$ROMDIR" "$W/gfx_p" \
-    --tiles build/pyron21/donovan_tiles.json \
-    --select-tiles build/pyron21/select_tiles.json \
-    --select-bank5 build/pyron21/patch/select_bank5.json \
-    --effect-c5 build/pyron21/patch/effect_c5.json \
-    --wheel-bank5 build/pyron21/patch/wheel_bank5.json \
-    --effect-tail build/manifest/effect_tail.json \
-    --tenant build/pyron21/patch/tenant.json \
-    --chain "$W/gfx_h" > "$W/p.log" 2>&1
+gfx_p "$W/gfx_p_old" "$W/gfx_h_old" > "$W/pold.log" 2>&1
 rc=$?
 set -e
 if [ "$rc" = 0 ]; then
-    echo "FAIL: the P link SUCCEEDED over the known 288-code strip"
+    echo "FAIL: the P link SUCCEEDED over the old-shift fixture's known"
     echo "      collision — the chain swallowed a different-bytes overwrite"
     exit 1
 fi
-grep -q "collides with DIFFERENT bytes" "$W/p.log" || {
-    echo "FAIL: P link failed for the wrong reason:"; tail -5 "$W/p.log"
-    exit 1; }
-grep -qE "0x05[EF][0-9A-F]{2}" "$W/p.log" || {
+grep -q "collides with DIFFERENT bytes" "$W/pold.log" || {
+    echo "FAIL: P fixture link failed for the wrong reason:"
+    tail -5 "$W/pold.log"; exit 1; }
+grep -qE "0x05[EF][0-9A-F]{2}" "$W/pold.log" || {
     echo "FAIL: the collision error does not name a strip-range code:"
-    grep "collides" "$W/p.log" | head -2; exit 1; }
-echo "  ok: P link failed loudly at a strip-range dst, naming both sources:"
-grep "collides" "$W/p.log" | head -1 | sed 's/^/     /'
+    grep "collides" "$W/pold.log" | head -2; exit 1; }
+echo "  ok: fixture P link failed loudly at a strip-range dst:"
+grep "collides" "$W/pold.log" | head -1 | sed 's/^/     /'
 
 echo
-echo "PASS: gfx chain mode — solo identical, idempotent, cumulative, and"
-echo "      the known collision fails loudly (S3 flips case 4 to success)"
+echo "PASS: gfx chain mode — solo identical, idempotent, FULL 3-tenant"
+echo "      chain green since the S3 relocation, and the old-shift fixture"
+echo "      still fails loudly"

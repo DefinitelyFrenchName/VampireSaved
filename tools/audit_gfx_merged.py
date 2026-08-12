@@ -84,7 +84,7 @@ def main():
     ap.add_argument("--layout", default=os.path.join(
         REPO, "build/manifest/gfx_layout3.toml"))
     ap.add_argument("--build-d", default=os.path.join(REPO, "build/m5_wide"))
-    ap.add_argument("--build-h", default=os.path.join(REPO, "build/hui30"))
+    ap.add_argument("--build-h", default=os.path.join(REPO, "build/hui31"))
     ap.add_argument("--build-p", default=os.path.join(REPO, "build/pyron21"))
     ap.add_argument("--strip-json", default=os.path.join(
         REPO, "build/manifest/strip_tiles/0x10.json"),

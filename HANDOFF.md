@@ -149,12 +149,15 @@ export ROMDIR=/path/to/reference/sets
 tools/run_wide.sh build/m5_wide fbneo      # or: ... mame
 ```
 
-**Current WIDE builds (14z-82c):** `build/hui30` = **`huitzil-m4`
-(`e66678d0`)** is the one to playtest for Phobos; `build/m5_wide` =
+**Current WIDE builds (14z-83):** `build/hui31` = **`huitzil-m5`
+(`38188bb1`)** is the one to playtest for Phobos (= m4 + the
+maintainer-approved beam-strip relocation to bank-4 0x86A0-0x87BF —
+the one real collision in the merged gfx write set removed; beam visual
+confirm wanted at playtest); `build/m5_wide` =
 **`donovan-m3a` (`4b7d0dc7`)** for Donovan and `build/pyron21` =
 **`pyron-m3` (`6c7f7322`)** for Pyron — both tenants carry the ADOPTED
-hitclass_map_extend thunk (the f7997 fix; pyron-m2/huitzil-m3 are
-SUPERSEDED, kept on disk as the pre-fix A/B baselines). (This line previously read
+hitclass_map_extend thunk (the f7997 fix; pyron-m2/huitzil-m3/huitzil-m4
+are SUPERSEDED, kept on disk as pre-fix A/B baselines). (This line previously read
 "`build/m5_wide` (fingerprint `9bac6ee3`) is the current WIDE build" —
 `9bac6ee3` is `donovan-m5w`, SUPERSEDED by `donovan-m3a` back in 14z-64;
 corrected in the 14z-79 stale-doc sweep.)

@@ -86,12 +86,33 @@ safe_hi = 0xEEBB            # shelf) is builder-asserted inside this
 sweep_lo = 0x8000           # the walker's HISTORICAL sweep window —
 sweep_hi = 0xEEBB           # frozen (m3a reproducibility)
 
-# Free pools in bank 4 after all three tenants (measured 14z-67).
+# Huitzil's procedural beam strip (side inventory: the type-4 handler
+# composes its own bank word, so this art cannot ride the record path —
+# build/manifest/strip_tiles/0x10.json). RELOCATED 14z-83
+# (maintainer-approved): dst = code + 0x3800 = 0x86A0-0x87BF, drawn from
+# the head of free pool 1. The old dst 0x5EA0-0x5FBF (shift 0x1000) sat
+# inside PYRON's native band with different source bytes — the one real
+# collision in the 3-tenant merged write set
+# (tests/audit_gfx_merged_census.sh). The shift is also baked into the
+# ported handler's code bias (beam_list_type6.thunk_hex: 0x4200 + shift).
+[[strip]]
+tenant = "huitzil"
+src_lo = 0x4EA0             # vs2 bank 1 (group A)
+src_hi = 0x4FBF
+shift = 0x3800
+dst_lo = 0x86A0
+dst_hi = 0x87BF             # 288 codes
+
+# Free pools in bank 4 after all three tenants (measured 14z-67;
+# pool 1 split 14z-83 by the strip relocation above).
 # H/P effect-shelf or future needs draw from here; a draw updates this
 # ledger in the same commit.
 [[free_pool]]
 lo = 0x8648
-hi = 0xA42B                 # 7,652 codes (largest run)
+hi = 0x869F                 # 88 codes (below the relocated strip)
+[[free_pool]]
+lo = 0x87C0
+hi = 0xA42B                 # 7,276 codes (largest run)
 [[free_pool]]
 lo = 0xA42D
 hi = 0xAD7F                 # 2,387 codes

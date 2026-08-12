@@ -35,14 +35,34 @@ Pyron's band (vs2B); place() now carries every gfx write
 must-raise control); and --chain composes links over members + a
 cumulative ledger (gate: solo byte-identical to frozen, idempotent, D->H
 cumulative, P-onto-H fails loudly at the strip). All four frozen
-fingerprints rebuilt bit-exact after EVERY step. **BLOCKED on the strip
-relocation ruling (Decisions pending below): S3 relocates the strip
-(recommend shift 0x3800, dst 0x86A0-0x87BF, bias 0x7A00) and re-freezes
-huitzil-m4 -> m5.** Read docs/NEXT_SESSION.md first.)
+fingerprints rebuilt bit-exact after EVERY step. **S3 EXECUTED the same
+session (maintainer ruled option (a): "your proposal is satisfactory"):
+the strip relocated — `strip_tiles/0x10.json` shift 0x1000 -> 0x3800
+(dst 0x86A0-0x87BF, pool 1 split in gfx_layout3.toml + a [[strip]] row),
+`beam_list_type6.thunk_hex` bias 0x5200 -> 0x7A00 (six bytes), and
+`huitzil-m4` RE-FROZEN as `huitzil-m5` (38188bb1, build/hui31; tag
+freeze/huitzil-m4 is the way back). Gates at freeze, all green:
+test_beam_list_type6 on the built image (bias reconstruction 0x7A00);
+census flipped to ZERO REAL collisions (old shift kept as the must-fire
+fixture, 3 controls); test_gfx_chain flipped to FULL 3-TENANT CHAIN
+SUCCESS (first time — P's final members carry all three tenants' art,
+45,737 bank-4 codes, cross-agreeing with the census union exactly) with
+the old-shift fixture as the retained must-fail; test_gfx_layout3 gained
+strip/extras/pool-honesty locks; run_suite on hui31 GREEN on the CARRIED
+m4 expectation set with ZERO .sha1 movers (the relocated codes ride the
+OBJ emit path, invisible to RAM-basis gates by documented design);
+m3a_reproducible all four incl. the new EXPECT_HUI. Remaining on S3:
+the maintainer's beam visual confirm at next playtest. NEXT: S4 (driver
+merged-gfx mode -> build/m3b_merged), S5 (H/P's first render gates), S6
+(merged re-verdict + registry).** Read docs/NEXT_SESSION.md first.)
 
-### Decisions pending (maintainer) — 14z-83, M3b Phase 3 (the gfx half)
+### Decisions — 14z-83, M3b Phase 3 (the gfx half)
 
-1. **The beam-strip relocation + huitzil re-freeze.** The S0 merged
+1. **The beam-strip relocation + huitzil re-freeze. DECIDED (maintainer,
+   2026-08-12): option (a) — "your proposal is satisfactory." Executed
+   the same session as S3: shift 0x3800, dst 0x86A0-0x87BF, bias 0x7A00,
+   huitzil-m4 -> m5 (38188bb1, build/hui31); playtest confirm of the
+   beam pending.** The brief as presented: The S0 merged
    group-C census (`tests/audit_gfx_merged_census.sh`, fresh-derived from
    the reference ROMs, comparator verdict-controlled both directions)
    found EXACTLY ONE real collision in the whole 3-tenant merged gfx

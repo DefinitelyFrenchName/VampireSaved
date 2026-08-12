@@ -1,5 +1,36 @@
 # patch_notes — per-change detail: every byte, and why
 
+## 14z-83 S3 — the beam-strip relocation (huitzil-m4 -> m5): byte detail
+
+**Why (maintainer-approved 2026-08-12):** the S0 merged group-C census
+(`tests/audit_gfx_merged_census.sh`) found the strip's dst `0x5EA0-0x5FBF`
+(288 codes, vs2 group-A source) sitting inside PYRON's native band (vs2
+group-B source, different bytes) — the ONE real collision in the whole
+3-tenant merged write set. Purely a placement change: tile indices have no
+gameplay surface.
+
+**`strip_tiles/0x10.json`** — `shift` `0x1000` -> `0x3800`; dst becomes
+`0x86A0-0x87BF`, the head of ratified free pool 1 (16-aligned, so the
+type-4 handler's within-row column wrap is preserved; pool measured empty
+by the census).
+
+**`beam_list_type6.thunk_hex`** (huitzil.toml) — SIX BYTES:
+`addi.l #$52000000,d1` -> `addi.l #$7A000000,d1` (the ported type-4
+handler's code bias = vs2's 0x4200 + the shift; the shift and the bias
+must move together — `tests/test_beam_list_type6.sh` 1b reconstructs the
+handler from vsavj `0x01B61A` + exactly these two constants).
+
+**`gfx_layout3.toml`** — `[[strip]]` row added (the ledger was blind to
+side inventories — how the collision shipped unseen for ten sessions);
+free pool 1 split `0x8648-0xA42B` -> `0x8648-0x869F` + `0x87C0-0xA42B`.
+
+**Gates moved with it (same commit):** census expectation flips to ZERO
+real collisions (old shift kept as the must-fire fixture, controls B/C);
+`test_gfx_chain.sh` section 4 flips to FULL 3-tenant chain success
+(old-shift fixture keeps the must-fail); `test_gfx_layout3.sh` gains the
+strip/extras/pool-honesty locks. New fingerprint
+`38188bb12dd6b971a4067b89edaad54eabbfe343` = huitzil-m5.
+
 ## 14z-71 — the beam: byte detail
 
 **`code_ptr beam_effect_class16`** — 4 bytes at vsavj `PRG:0x080AEC`,

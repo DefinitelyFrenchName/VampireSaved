@@ -84,7 +84,10 @@ else:
 #     low, landing on the freeze/reflection art. That byte was dismissed as
 #     "a relocated address" for most of a session; this check exists so it
 #     can never be dismissed again.
-# Ported bias = vs2's 0x4200 + the group-C placement shift 0x1000 = 0x5200.
+# Ported bias = vs2's 0x4200 + the group-C placement shift. The shift was
+# 0x1000 (bias 0x5200) until 14z-83 relocated the strip to 0x86A0-0x87BF
+# (maintainer-approved: the old dst sat inside Pyron's native band — the one
+# real collision in the merged write set); it is now 0x3800, bias 0x7A00.
 print("1b. the ported type-4 handler is vsavj's with exactly the two constants")
 t4 = body[0x72:]
 src4 = bytearray(vj[0x01B61A:0x01B61A + 0x90])
@@ -92,9 +95,9 @@ if len(t4) != len(src4):
     bad(f"ported type-4 is {len(t4):#x} bytes, vsavj's is {len(src4):#x}")
 else:
     src4[0x3A:0x3E] = bytes.fromhex("00401000")      # bank 4
-    src4[0x7C:0x82] = bytes.fromhex("068152000000")  # vs2 bias + shift
+    src4[0x7C:0x82] = bytes.fromhex("06817a000000")  # vs2 bias + shift
     if bytes(src4) == t4:
-        ok("vsavj 0x01B61A verbatim + bank 0x1000 + bias 0x5200")
+        ok("vsavj 0x01B61A verbatim + bank 0x1000 + bias 0x7A00")
     else:
         d4 = [hex(i) for i in range(len(t4)) if t4[i] != src4[i]]
         bad(f"ported type-4 differs from the documented form at {d4[:8]}")

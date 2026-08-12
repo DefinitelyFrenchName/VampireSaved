@@ -35,7 +35,11 @@ EXPECT_STOCK="6c93cfa8a8a80ae2303d3acaf8c7bff487f369c5"
 # and lost the withdrawn df_palette_seq_rows row. git tag freeze/huitzil-m2
 # is the way back to a tree that reproduces it.
 # huitzil-m4 (14z-82c: + the ADOPTED hitclass_map_extend thunk)
-EXPECT_HUI="e66678d087824d1639750d2b9565c0b99ad2b250"
+# EXPECT_HUI="e66678d087824d1639750d2b9565c0b99ad2b250"  # git tag freeze/huitzil-m4
+# huitzil-m5 (14z-83 S3, maintainer-approved: the beam-strip relocation —
+# shift 0x1000 -> 0x3800, handler bias 0x5200 -> 0x7A00; the one real
+# collision in the merged group-C write set removed)
+EXPECT_HUI="38188bb12dd6b971a4067b89edaad54eabbfe343"
 # pyron-m3 (14z-82c: + the ADOPTED hitclass_map_extend thunk — the f7997 fix)
 EXPECT_PYR="6c7f7322da793c12b3681dd3ef5a76b3792ae5d0"
 

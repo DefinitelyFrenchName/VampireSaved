@@ -115,6 +115,40 @@ print(f"  ok: shared codes H∩P={len(tiles['huitzil'] & tiles['pyron'])} "
       f"P∩D={len(tiles['pyron'] & d)} H∩D={len(tiles['huitzil'] & d)} "
       "(same-source, delta-0 compatible)")
 
+# 5. the SIDE INVENTORIES the interval proof was blind to (added 14z-83:
+#    the strip's old dst sat inside Pyron's band for ten sessions while
+#    this gate was green — tests/audit_gfx_merged_census.sh found it).
+#    The strip and H's extra_tiles must be disjoint from every walked
+#    inventory, from Donovan's dst window, and from the free-pool ledger.
+strip = json.load(open(os.path.join(repo,
+    "build/manifest/strip_tiles/0x10.json")))
+sh = int(strip["shift"], 16)
+sdst = {c + sh for c in strip["tiles"]}
+srow = man["strip"][0]
+check(srow["shift"] == sh
+      and min(sdst) == srow["dst_lo"] and max(sdst) == srow["dst_hi"],
+      f"manifest [[strip]] row matches the json (shift {sh:#x}, dst "
+      f"{min(sdst):#06x}-{max(sdst):#06x})")
+extra = set(json.load(open(os.path.join(repo,
+    "build/manifest/extra_tiles/0x10.json")))["tiles"])
+hp_all = tiles["huitzil"] | tiles["pyron"] | extra
+check(not (sdst & hp_all),
+      f"strip dsts disjoint from H/P native codes (+H extras)")
+check(max(sdst) < safe_lo or min(sdst) > ten["donovan"]["safe_hi"],
+      "strip dsts outside Donovan's dst window")
+check(max(hp_all | {0}) < safe_lo,
+      f"H/P native codes incl. extras all below Donovan SAFE_LO "
+      f"({max(hp_all):#06x})")
+pool = set()
+for p in man["free_pool"]:
+    pool.update(range(p["lo"], p["hi"] + 1))
+# (Donovan's dsts are effect-map-dependent — his pool honesty is the
+# census's check, which has his real dst set; here: the static sets)
+used = (sdst | hp_all) & pool
+check(not used,
+      f"free-pool ledger honest: no strip/H/P code inside a pool "
+      f"({len(pool)} pool codes)")
+
 sys.exit(1 if fails else 0)
 PY
 rc=$?

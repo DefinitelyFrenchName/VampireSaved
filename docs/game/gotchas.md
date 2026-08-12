@@ -460,7 +460,9 @@ Rules:
 - Before porting any sprite list, check its handler's constants against
   the host's — not just whether the routines "look the same".
 - A ported handler copy must carry the SOURCE game's bias, plus any
-  placement shift (Huitzil's: vs2's 0x4200 + a 0x1000 group-C shift).
+  placement shift (Huitzil's: vs2's 0x4200 + the group-C shift — 0x3800
+  since the 14z-83 strip relocation, 0x1000 before it; the shift and the
+  bias must move TOGETHER, see build/manifest/strip_tiles/0x10.json).
 - Type 4 also composes its OWN bank word (`ori.w #$2000` = bank 1) where
   type 2 takes the object's — so a tenant's procedural strips cannot reach
   a WIDE group-C bank through the record path at all.
