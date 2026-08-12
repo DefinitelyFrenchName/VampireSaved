@@ -325,6 +325,62 @@ the comparison error written down so it cannot be repeated. Every gate
 green at close, including two NEW audits. Read docs/NEXT_SESSION.md
 first, then the 14z-69 sections below.)
 
+## Session 14z-82d — the playtest reports, measured
+
+Maintainer playtests of the two new freezes (both: NO crashes — the fix's
+primary claim confirmed by hand).
+
+### hui30: "air 214+MK has sfx now (only MK)" — RESOLVED: it is the
+### 14z-79 (b') fix being HEARD, not a hui30 delta
+
+Measured chain (rigs + ring taps; ring_tap.lua gained POKES so tenant
+replays can be sound-tapped at all):
+1. Ring A/B on the 87 timer rig: hui29 vs hui30 **byte-identical**
+   (1,591 entries, zero diff).
+2. A new contact-shaped rig (88) — also byte-identical (1,580), but its
+   liveness probes showed the MOVE fired (the mine is pool TYPE 69,
+   spawns at $FF9502 — newly named) while the CONTACT event did not, so
+   the contact question stays with rig 88's honest status header.
+3. hui29's timer rig demonstrably fires AND sounds the trap: type-69
+   spawns at f3432/f4232, detonation id 0x049A enqueued at f3571/f3716
+   (throw id 0x010A at f3474). So the MK detonation sfx EXISTS on hui29
+   and is identical on hui30.
+4. The explanation that fits "only the MK version": the (b') crash's
+   reproducing input WAS medium kick (14z-78/79) — pre-hui29 the MK
+   detonation killed the machine BEFORE its sfx ever played, LK/HK
+   completed. The maintainer's ear-baseline for MK was the crash.
+   Optional follow-up if wanted: native-vs2 comparison of the detonation
+   id (the native leg + a 214MK rig) to confirm 0x049A is vs2-faithful.
+
+**Scope CORRECTION recorded while measuring: the hit-class sweep is
+POOL-vs-POOL** — both loop registers stride pool slots and the f7997
+crash held pool addresses on BOTH sides; an object hitting a FIGHTER
+never transits the extended map. This narrows the fix's live surface to
+pool-object clashes (satellite/mine/projectile overlaps) and means
+trap-vs-fighter audio was never in the fix's blast radius — supporting
+measurement for the resolution above.
+
+### hui30: "specials feel harder to input" — no build-side mechanism
+
+The hui29→hui30 image delta is the thunk alone (measured: zero
+placements moved, 2 ops); the thunk executes only on pool-vs-pool hit
+dispatch and costs ~28 cycles per fire; input buffering/motion
+recognition paths are untouched, and the full suite basis moved only
+the three dead-stack-attributed mash baselines. Nothing build-side can
+produce a systematic input-window change. Left as reported.
+
+### pyron21: no crash; "distorted SFX during his win pose (his laugh)"
+
+Measured: ring A/B of 61_tenant_2pwin on pyron20 vs pyron21 —
+**byte-identical** (1,688 entries, zero diff), and the fix touches no
+QSound member, so playback is identical too: the distortion is
+PRE-EXISTING on pyron-m2 and newly noticed, NOT a regression. Filed as
+a NEW OPEN ITEM: pyron's win-pose voice (his laugh) renders distorted —
+likely class: the win-pose voice id enqueues a vs2 SAMPLE id whose
+backing sample vsav's QSound ROM does not carry (the Donovan M5
+voice-arc family). Instrument when picked up: ring-tap the win pose for
+the id, then compare the QSound sample data behind it in vsav vs vs2.
+
 ## Session 14z-82c — the hit-class fix ADOPTED; huitzil-m4 + pyron-m3 frozen
 
 Maintainer decisions (2026-08-12, same day): **1 ADOPTED** (the row + both

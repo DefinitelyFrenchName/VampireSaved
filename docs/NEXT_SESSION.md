@@ -78,6 +78,11 @@ always measures the REF leg on a crash (MERGE-SPECIFIC vs LATENT).
   `tests/test_variant_dispatch.sh`, table 0x02a8a4 row 0x10).
 - Pyron's Zodiac Fire has no rig (guard-cancel only — Claude's to rig).
 - The win-screen QUOTE (both tenants; shared fold).
+- NEW (14z-82d, maintainer playtest): pyron's win-pose voice (his
+  laugh) renders DISTORTED — pre-existing (pyron20≡pyron21 ring A/B
+  byte-identical), likely a vs2 sample id without its backing QSound
+  sample in vsav (the M5 voice-arc family). Ring-tap the win pose for
+  the id, compare sample data across the sets.
 - The three NEW select medallions: polish.
 - `region_space` rows re-freeze — maintainer's call.
 - Op-tagging so `test_shared_writes.sh` can name what a new write is.

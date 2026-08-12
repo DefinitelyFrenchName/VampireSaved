@@ -1,0 +1,67 @@
+# hui AIR 214+MK "PLASMA TRAP" — the CONTACT explosion (14z-82d).
+# 87's twin with the spacing INVERTED: 87 walks both fighters apart so the
+# mine detonates by TIMER (its header explains why contact is "a different
+# code path" — this rig IS that other code path, on purpose).
+#
+# WHY (maintainer playtest report, hui30 — RESOLVED 14z-82d, see STATE):
+# air 214+MK "has sfx now". MEASURED OUTCOME: the sfx is NOT a hui30
+# delta — ring A/B on 87 AND on this rig is byte-identical hui29 vs
+# hui30, and hui29's timer rig demonstrably fires the trap (type-69 pool
+# spawns f3432/f4232) and sounds its detonation (id 0x049A at
+# f3571/f3716). The "new" MK sfx is the 14z-79 (b') fix's restoration:
+# pre-hui29 the MK detonation CRASHED the machine before its sound (the
+# reproducing input was MK specifically), which is exactly why the sound
+# is new to the ear and MK-only. ALSO MEASURED HERE: the trap = pool
+# type 69, and the hit-class sweep is POOL-vs-POOL (both loop registers
+# stride pool slots; the f7997 crash regs sit in the pool on both
+# sides) — a trap hitting a FIGHTER never transits the extended map, so
+# the hitclass fix cannot change trap-vs-fighter audio.
+#
+# STATUS: the CONTACT event (mine overlapping another POOL object) is
+# still unproduced by this rig (0 map entries on both cuts — the v1 P2
+# walk-through and the v2 stationary-P2 shapes). Kept as the starting
+# point for a pool-vs-pool contact rig (needs an opposing PROJECTILE to
+# clash with, e.g. P2 Victor doing a pool-object move into the mine —
+# not a walking fighter). DO NOT promote to a gate until the map probe
+# fires ≥1 (87's rule: a green that produced no event proves nothing).
+#
+# THE SPACING (the 83c/87 lesson, applied in reverse): fighters stay
+# NEAR CENTER — no corner walks — and P2 nudges TOWARD the landing spot
+# after the throw, so the mine lands/rolls INTO P2 and explodes on
+# contact. MK only (the maintainer's observed strength; 87 covers the
+# strength sweep for the timer path). Two spaced attempts, insurance
+# against a seq-thunk-eaten frame-pinned input (87's rule).
+#
+# BOTH SIDES POKED: P1 = Huitzil (0x10), P2 = Victor (0x03 on vsav AND
+# vsav2). Early window only (replay-80 rule).
+# POKES="1400:ff8782:10;1450:ff8782:10;1500:ff8782:10;1400:ff8b82:03;1450:ff8b82:03;1500:ff8b82:03"
+300-305 sys=C1
+420-425 sys=C2
+800-803 sys=S1
+940-943 sys=S2
+1100-1102 p2=R
+1160-1162 p2=R
+1300-1302 p1=1
+1360-1362 p2=1
+# ── P1 closes most of the distance so the forward-jump arc drops the
+#    mine AT the stationary P2's feet (v2: the first cut had P2 walk
+#    through the zone before detonation — 0 map entries, rig dead)
+2900-3080 p1=R
+# ── attempt 1: throw at point-ish blank; P2 stands still
+3400-3405 p1=UR
+3410-3412 p1=D
+3413-3415 p1=DL
+3416-3420 p1=L5
+# ── attempt 2: P2 steps in on a NARROW window timed to land+roll
+4200-4205 p1=UR
+4210-4212 p1=D
+4213-4215 p1=DL
+4216-4220 p1=L5
+4255-4310 p2=L
+# ── attempt 3: neutral jump, closest range
+4700-4703 p1=R
+4750-4755 p1=U
+4760-4762 p1=D
+4763-4765 p1=DL
+4766-4770 p1=L5
+5400 wait
