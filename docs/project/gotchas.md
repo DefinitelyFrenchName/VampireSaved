@@ -1751,3 +1751,34 @@ Now a build error: `tests/test_thunk_addr_literal.sh`. Its coverage boundary is
 stated rather than assumed — opcode-anchored and word-aligned, so a raw
 longword in embedded data is still out of scope (an unanchored scan reads
 operand pairs as addresses and is pure noise).
+
+## The pushed group-0 exception PC is mid-instruction — probing it reads a clean zero (14z-81)
+
+The merged-legacy audit's Huitzil crash reported `CRASH 2886 vec3 PC 015098`.
+A `GUARD_PROBE=15098` breakpoint produced ZERO probe lines on the crashing
+build — at the crash itself — and zero on the healthy reference across 11,017
+frames. Nothing was wrong with the probe machinery: a 68000 group-0 exception
+(address/bus error) pushes a PC from INSIDE the faulting instruction, so
+`0x15098` is the middle of the `move.l (a0),(0x20,a6)` that starts at
+`0x15096`, and no instruction ever BEGINS there for a breakpoint to match.
+The dead-instrument class again, in a new coat: a probe that cannot fire
+prints the same clean zero as a site that is never reached.
+
+**Rule: probe ENTRY addresses (read the disassembly around the crash PC and
+find the routine's entry), never the CRASH-line PC itself.** And demand the
+rig-liveness control before believing any zero: `tests/audit_merged_vec3.sh`
+hard-fails when its healthy-reference probe reads no hits, which is what
+turns this trap into a named error instead of a wrong conclusion.
+
+## A pre-armed attribution is a hypothesis, not a finding — print the measured mechanism (14z-81)
+
+`audit_merged_legacy.sh` was written with F2 (the merged shim serving only
+tenant 0 → unseeded pools) as the pre-armed attribution for any Huitzil
+leg-(b) crash, and its failure message SAID so. The measured crash was a
+different mechanism entirely (the satellite anim-base defect, at spawn,
+before seeding could matter) — the message was corrected the same day, but
+only because the measurement happened to run the same session. A plausible
+mechanism written into a script's output becomes "the finding" the moment
+someone reads a failure without re-measuring. Pre-arm attributions in
+comments and headers as PREDICTIONS; make the printed verdict carry only
+what was measured, or point at the probe that measures it.

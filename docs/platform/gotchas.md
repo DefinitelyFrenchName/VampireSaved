@@ -714,3 +714,16 @@ Two consequences worth internalising:
 
 Reach for the FBNeo tap the moment the question is "what value went in", and
 keep MAME's for "which code ran".
+
+## FBNeo/MAME frame indices and object slots do not transfer — a slot-keyed tap chases a different object (14z-81)
+
+The merged Huitzil crash is deterministic on MAME at frame 2886, object
+`$FFB800`. An `FBNEO_HTAP` on that slot showed healthy writes on BOTH builds
+— and the merged build survived the whole 11,017-frame replay on FBNeo. Not
+a contradiction: the emulators traverse the same states on different frame
+indices (documented since session 2), the RAM state at pick time therefore
+differs, and the object ALLOCATOR hands the satellite a different slot — so
+the tap watched some other object, and the defect's observable moved. A tap
+or probe keyed on an OBJECT SLOT is only meaningful within one emulator's
+run; to cross emulators, key on content (the handler PC, the type byte),
+and treat MAME as the instrument when the finding is frame-addressed.

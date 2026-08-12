@@ -405,6 +405,17 @@ def merge_init_shim(a, b, ctx=None):
     """Merge two `[init_shim]` declarations (M3b slice G, MAINTAINER-RATIFIED
     2026-08-10). Returns (merged, collisions).
 
+    MEASURED GAP (14z-81, STATE F2): this merge produces the intended ONE
+    declaration, but the emitter plants the shim only on ITERATION 0's
+    dispatch row (`row_here` -> `_ti == 0`), and later tenants' rows are
+    direct-repointed — so on a merged build every tenant AFTER the first
+    bypasses the seeder, the phase gate and his flavor write, and the
+    id-dispatched chain below only ever runs with tenant 0's id. The fix is
+    the site_thunk assemble-after-the-loop shape (14z-80h): the tail jmp
+    targets one handler, and later tenants' handlers are not placed yet on
+    iteration 0. Open defect; do not read this docstring as the emitted
+    behaviour.
+
     The shim is emitted ONCE per build at ONE site, so a merged build has one
     seeder and one flavor writer. The three parts resolve differently:
 

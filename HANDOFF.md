@@ -158,7 +158,13 @@ tools/run_wide.sh build/m5_wide fbneo      # or: ... mame
 corrected in the 14z-79 stale-doc sweep.)
 `build/m5w` (`ac52eeff`) is the KNOWN-BAD artifact of the 14z-60y sprite
 garble, kept as evidence — do not playtest it. `tools/audit_romset_identity.py
-build/m5w/rompath` names its four shadowed members in a second. Rebuild the
+build/m5w/rompath` names its four shadowed members in a second.
+`build/merged1` (`7a9eabb3`) is the 14z-81 **MERGED-LEGACY INSTRUMENT** —
+the 3-tenant program image with gfx SKIPPED (group C zero-filled): legacy
+characters render correctly, the tenants draw BLANKS by design. **Never
+playtest it, never give it a registry row** (its own
+`README-LEGACY-ONLY.txt` says why); it is rebuilt from scratch by every
+`tests/audit_merged_legacy.sh` run. Rebuild the
 pair with:
 
 ```sh
@@ -476,7 +482,12 @@ tests/test_shim_charid.sh    [bd id] # 14z-77 (M3b slice G): the init shim can
                                       # (0x382,A6) already holds the character id
                                       # at char-init. That was an ASSUMPTION the
                                       # merged shim's per-id flavor chain rests
-                                      # on; measured on BOTH player structs
+                                      # on. (14z-81 STATUS: the chain is emitted
+                                      # but UNREACHABLE for tenants after the
+                                      # first — merged-H's dispatch row bypasses
+                                      # the shim entirely, STATE 14z-81 F2. The
+                                      # id-read finding here stays valid.)
+                                      # Measured on BOTH player structs
                                       # ($FF8782 and $FF8B82 = 0x13), 2 replays.
                                       # NEEDS THE FORCED-PICK POKES: replay 11
                                       # never forms a Donovan match and returns a
@@ -646,6 +657,44 @@ tests/test_tenant_loop.sh             # 14z-80: THE MERGE GATE. A 3-tenant patch
                                       # actually applying it. 5 VERDICT CONTROLS,
                                       # one of which caught ITSELF perturbing
                                       # nothing (`set() or {...}` is falsy)
+tests/audit_merged_legacy.sh          # 14z-81: THE MERGED-LEGACY MEASUREMENT,
+                                      # rerunnable (~45 min, on-demand). Builds
+                                      # build/merged1 (3-tenant program image
+                                      # against the zero-filled wide0 overlay,
+                                      # gfx skipped — LEGACY-ONLY, never
+                                      # playtest, no registry row on purpose),
+                                      # proves the rig forms all three tenants'
+                                      # matches (guarded char-init probes) and
+                                      # merged determinism, then (a) 14 legacy
+                                      # replays vs the frozen vanilla masked-v2
+                                      # basis dispatched through donovan-m3a's
+                                      # ratified class table VERBATIM — any
+                                      # deviation FAILS with the measured shape
+                                      # + a proposed spec line, never a widened
+                                      # tolerance — and (b) tenant content vs
+                                      # the three frozen single-tenant builds
+                                      # (guard-clean + first-divergence floor +
+                                      # classified report). 14z-81 result:
+                                      # leg (a) 13/14 verbatim (04 grew flicker
+                                      # frame 2005 — unratified), leg (b) H and
+                                      # P CRASH (see STATE 14z-81). Failing
+                                      # logs kept in build/gate_failures/
+tests/audit_merged_vec3.sh [bd]       # 14z-81: the merged Huitzil satellite
+                                      # anim-base probe — the crash localized
+                                      # by the measurement above, made
+                                      # rerunnable (~4 min, 2 guarded runs).
+                                      # Probes the vanilla walker ENTRY
+                                      # (0x15084; the pushed vec3 PC 0x15098
+                                      # is MID-INSTRUCTION and probes as a
+                                      # clean zero — the dead-instrument trap,
+                                      # gotcha filed) on hui29 and the merged
+                                      # build, same object/frame/index, and
+                                      # compares the base against the
+                                      # placements-derived healthy value.
+                                      # FAILS BY DESIGN until the fix lands;
+                                      # then it is the regression gate. Rig
+                                      # control: no PROBE at 2886 on hui29 =
+                                      # rig dead, hard fail
 tests/test_tenant_row_owner.sh [ex]   # 14z-77 (M3b slices C+D): is the row-OWNER
                                       # threading LOAD-BEARING? Every slice of the
                                       # multi-tenant refactor is INERT by design, so

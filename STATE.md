@@ -1,6 +1,37 @@
 # STATE — living progress log
 
-Updated: 2026-08-11 (session 14z-80, second half — **A 3-TENANT MERGED PATCH
+Updated: 2026-08-12 (session 14z-81 — **THE MERGED-LEGACY MEASUREMENT RAN,
+AND THE ANSWER IS SPLIT: LEGACY IS SAFE, THE TENANTS ARE NOT.** The
+maintainer-ordered first priority is answered. A 3-tenant merged image
+(`build/merged1`, fingerprint 7a9eabb3, gfx skipped — a LEGACY-ONLY
+instrument, never playtest it) boots, forms all three tenants' matches
+(char-init probes on all three; H's and P's handlers execute from the raw
+wide extension), is run-to-run deterministic, and lands on donovan-m3a's
+ratified legacy classes **13/14 VERBATIM** on the masked-v2 basis — attract
+EXACT included. The one deviation: `04_select_fuzz` grows ONE deterministic
+flicker frame (2005, beside the frozen 2009; measured 3/3 merged runs while
+m3a re-measured clean the same day), byte-localized to the low word of ONE
+engine pointer at `RAM:$FF0460` (one frame, fully re-convergent; the
+pointer's owner is UNIDENTIFIED — an in-flight "sound-queue cursor" reading
+was WITHDRAWN as speculation). **Leg (b) is where the merge fails: Huitzil
+CRASHES at char-init** — deterministic vec3, 4/4 runs; his satellite's
+runtime-composed anim base carries a DONOVAN address while all fifteen
+`anim_index_*` rows are CORRECT and his satellite-machine blob differs from
+hui29's only in correctly re-derived literals; the pointer slot holding the
+Donovan value is NOT yet named. `tests/audit_merged_vec3.sh` is the
+rerunnable probe and the regression gate for the fix. **Pyron crashes under
+the mash storm** (deterministic vec3 at f7997; evidence kept in
+`build/gate_failures/`). Donovan is guard-clean; his divergences vs m3a are
+UNATTRIBUTED but shaped like cached placed pointers. F2 — the merged
+`[init_shim]` serves ONLY tenant 0, so merged-H's char-init bypasses
+seeder/phase-gate/flavor — is CONFIRMED statically but is NOT the crash
+mechanism (he dies at spawn, before seeding could matter); it stands as a
+second, independent defect. All four frozen references rebuild bit-exact;
+`test_tenant_loop` green. New: `tests/audit_merged_legacy.sh` (~45 min, the
+whole measurement, rerunnable), `tests/audit_merged_vec3.sh` (~4 min). Read
+docs/NEXT_SESSION.md first.)
+
+Previously: 2026-08-11 (session 14z-80, second half — **A 3-TENANT MERGED PATCH
 NOW APPLIES.** After the loop landed, four defects were found and fixed under
 it, each one MEASURED before it was touched: the iteration gate's shared-row
 rule was wrong for rows that name a REGION (Huitzil's and Pyron's copies of
@@ -182,6 +213,145 @@ findings were RETRACTED in-session after clean re-measures — each with
 the comparison error written down so it cannot be repeated. Every gate
 green at close, including two NEW audits. Read docs/NEXT_SESSION.md
 first, then the 14z-69 sections below.)
+
+## Session 14z-81 — THE MERGED-LEGACY MEASUREMENT: legacy safe, tenants not
+
+The 14z-80 close set this as the session's only first priority, and it ran
+to completion. Instrument: `build/merged1` — the 3-tenant program image
+(the exact `test_tenant_loop` 590-op merge, asserted) packed against the
+zero-filled `build/wide0` overlay, gfx skipped. Legacy characters read
+groups A/B (group B pristine by construction), so the build renders legacy
+correctly and the tenants as blanks: right for a legacy verdict, useless
+for anything else. It has NO registry row on purpose and must NEVER be
+playtested (`build/merged1/README-LEGACY-ONLY.txt`).
+
+Everything below is rerunnable: `tests/audit_merged_legacy.sh` (build +
+section 0 rig proof + determinism + both legs, ~45 min) and
+`tests/audit_merged_vec3.sh` (the crash probe, ~4 min).
+
+### Leg (a) — merged vs VANILLA, masked-v2: 13/14 ratified classes VERBATIM
+
+Expectation was donovan-m3a's frozen table (all three tenant sets agree on
+the 13 shared legacy entries; a merged build backs 0x13 so `11_pick_donovan`
+applies). Measured: every class, onset, window end, flicker inventory and
+re-convergence EXACT — `01_attract_long` bit-identical, the `08` two-window
+composite (one per select entry), `05` through a full timeout match, `11`
+window 889..2415 — except ONE:
+
+- **`04_select_fuzz`: one extra flicker frame at 2005** (measured
+  {1525, 2005, 2009, 2195} vs frozen {1525, 2009, 2195}); window 889-1104
+  and the 1325-frame re-converged tail unchanged. Deterministic (two fresh
+  merged runs identical) and merge-specific (m3a re-measured the frozen
+  inventory the same day, same instrument). Byte attribution (whole-RAM
+  dumps, vanilla vs merged at 2005): 66 dead-stack bytes plus exactly TWO
+  live bytes `$FF0462-$FF0463` — the low word of a LONG at `$FF0460` that
+  holds `$00FF043C` (the QSound latch's address) on vanilla and `$00FF02DC`
+  on merged at that frame; re-converged one frame later. A one-frame
+  pointer-phase artifact with no gameplay surface, but the POINTER'S OWNER
+  IS UNIDENTIFIED — `$FF0460` is not in the atlas, and my first reading
+  ("sound-queue drain cursor") is WITHDRAWN as unverified speculation
+  ($FF02DC also appears as a RAM-stub return address in unrelated healthy
+  flow, so the value alone proves nothing). Identify the writer before any
+  ratification argument (FBNEO_HTAP on ff0460-ff0463 is the cheap
+  instrument).
+
+Per CLAUDE.md §4 the widened inventory is MEASURED, NOT RATIFIED: the audit
+FAILS on it by design until the maintainer signs it off or the mechanism is
+removed. Also measured: two masked runs of `03` bit-identical (first-ever
+determinism check on a merged image), and section 0 proved all three
+char-init entries execute (shim 0xcbf80 for D; `dispatch_00[0x10]` →
+0x403b70 and `[0x11]` → 0x45f504 — both in the raw extension, consistent
+with 14z-78's code-runs-from-wide_ext finding).
+
+### Leg (b) — merged vs the frozen single-tenant builds: two tenants break
+
+| tenant | replays | verdict |
+|---|---|---|
+| Donovan | 12_vs_cpu, 20_round2 | guard-clean; vs m3a: 20 TRANSIENT (890..3667, then 8453 identical incl. round 2), 12 PERMANENT (890..end, 722 interleaved runs). UNATTRIBUTED; the shape fits cached placed pointers (placements differ between the builds by construction), but that is a hypothesis, not an attribution |
+| Huitzil | 70_mash, 83_fx | **CRASH, both, deterministic** — vec3 at char-init (MAME f2886/2887, 4/4 runs incl. the probe audit), pushed PC 015098, odd A0=000c6df9 |
+| Pyron | 70_mash, 72_cosmo_2p | **70 CRASHES at f7997** (vec3, PC 01ab10, odd RAM ptr $FF31B5, A3=0x49bb8a in his own wide_ext; identical REGS on re-run — deterministic; evidence in `build/gate_failures/merged1_b_70_pyron_mash.log`). 72 (the only rig that fires Cosmo) guard-clean, PERMANENT divergence from f890 as expected |
+
+### The Huitzil crash, localized to one unnamed pointer slot
+
+The chase, each step measured (probe rig = `audit_merged_vec3.sh`):
+
+1. The faulting site is the vanilla anim walker — entry `PRG:0x15084`
+   (`andi.w #$ff,d0; add.w d0,d0; move.w (0,a0,d0.w),d0; lea (0,a0,d0.w),a0;
+   move.l a0,(0x1c,a6); move.l (a0),(0x20,a6)`); the fault is the last move
+   at 0x15096 (pushed vec3 PC 0x15098 is MID-INSTRUCTION — probing IT reads
+   a clean zero forever; gotcha filed).
+2. The crashing object is `$FFB800` — a SATELLITE, not the player struct.
+   Entry probe at f2886, both builds, same object, same index (D0=0), same
+   RAM-stub caller: hui29 healthy base `A0=0x000E456C` = his placed anim +
+   0xB8AC; merged `A0=0x000CB9C0` — an UNPLACED GAP. Healthy merged value
+   would be anim@huitzil + 0xB8AC = 0x425FFC.
+3. `0x000CB9C0` appears NOWHERE in the merged image (raw-byte search and
+   ops search both empty) — the base is COMPOSED AT RUNTIME.
+4. `0xCB9C0 - 0xB8AC = 0x000C0114` = **tenant-0's ported `code` region +
+   0xA74** (vsav2 0x059490+0xA74): a DONOVAN address feeding a HUITZIL
+   object's anim walk.
+5. Ruled out by direct verification: all fifteen `anim_index_{a,a2,b,c,
+   proj}[id]` rows are correct per tenant in the merged fragment (H's five
+   point into anim@huitzil); H's `x06cac0` satellite-machine blob is
+   byte-identical to hui29's except literals correctly re-derived to merged
+   placements (spot-checked, incl. the x026142 dc-table pointer
+   0xCA152→0x40BE62); the pc-rel stub + word table at x026142+0x13E2 is
+   byte-identical (position-independent).
+6. NOT the F2 path: the crash is at spawn's first anim walk; the bypassed
+   pool seeder never gets a chance to matter.
+
+So one per-tenant pointer slot — read by the satellite spawn path, not any
+of the tables above — holds tenant-0's value in a merged image. The next
+step is a spawn-entry trace (GUARD_PROBE on H's satellite spawn handler in
+`x06cac0@huitzil` at 0x415980, or `tests/lua/index_watch.lua`), watching
+where the composed base's 0xC0114 half is LOADED from. Note for that
+session: FBNeo taps on object slot $FFB800 are NOT comparable to the MAME
+runs — frame skew plus slot recycling put the satellite in a different
+slot there (and merged survives the whole replay on FBNeo, so the defect's
+observable is emulator-frame-dependent; the MAME leg is the instrument).
+
+### F2 — the merged shim serves only tenant 0 (confirmed, separate defect)
+
+`merge_init_shim` stamps `_owner=None` → `row_here` → iteration 0 →
+planted at `dispatch_00[0x13]` only; merged-H's row is direct-repointed to
+his handler (fragment shows `dispatch_00[0x10] donovan handler`, no shim;
+statically `HENT != SHIM` asserted by the audit's section 0). Merged-H
+therefore skips pool seeding, the phase gate, and his flavor write; the
+slice-G id-dispatched flavor chain can only ever run with id 0x13 today.
+Consequences unmeasured (the vec3 crash fires first). Fix shape is a
+design question — the shim's tail jmp targets ONE handler, and later
+tenants' handlers aren't placed yet on iteration 0, so this is the
+`site_thunk`-style assemble-after-the-loop pattern (14z-80h), not a
+one-line gate change.
+
+### Verdict controls run this session
+
+The leg-(a) checker demonstrated BOTH verdicts on real data with one
+instrument: m3a PASS + merged FAIL on `04` the same day (drift is caught),
+and the composite/window classes fail bit-identical pairs by construction.
+The vec3 probe audit proved it can FAIL before being trusted (it currently
+does, by design), and its section-0 equivalent (no PROBE at 2886 on hui29 =
+rig dead) guards the dead-instrument case. `test_tenant_loop` green;
+`test_m3a_reproducible` re-run this session (all four fingerprints).
+
+### Decisions pending (maintainer) — 14z-81
+
+1. **The 04_select_fuzz flicker at 2005.** One deterministic, fully
+   re-convergent extra flicker frame on the merged build, two live bytes,
+   mechanism family known (one-frame pointer phase), owner unidentified.
+   Options: (a) hold ratification until the pointer's writer is identified
+   AND the two crashes are fixed, then re-measure the whole table
+   (recommended — the merge is changing anyway); (b) ratify the widened
+   inventory now for a future merged expectation set.
+2. **The H shim bypass (F2).** Fix now (assemble-after-loop chain, then
+   re-measure `audit_phase_mode_cost`-style) or accept temporarily and
+   gate on the vec3 fix first? Recommendation: fix AFTER the vec3 slot is
+   named — both touch the same emit path and one re-measure covers both.
+3. **Does Phase 3 (gfx) wait for the leg-(b) fixes?** The gfx design is
+   independent of the program-side defects, but any tenant behaviour
+   battery on a merged build is meaningless until Huitzil survives
+   char-init. Recommendation: fix the vec3 slot first — it is one
+   localized defect with a regression gate already in place.
 
 ## Session 14z-80 — THE N-TENANT LOOP: `main()` iterates, and the three
 ## traps that were not in the spec
