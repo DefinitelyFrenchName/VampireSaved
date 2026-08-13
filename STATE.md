@@ -13,8 +13,27 @@ relocated cptr; the bank-5 art side files are byte-identical to solo.
 Right codes rendering as body-sprite tiles = bank-5 codes drawn from a
 LOWER BANK — prime suspect: the drawer's program-side BANK GATE serves
 tenant 0 only in the merge (the F2 class on the select family; D clean
-because tenant 0's gate works). NEXT: locate the bank-gate emit, probe
-the drawer bank word at hover ($FFB818-class) merged vs solo.
+because tenant 0's gate works). **ROOT-CAUSED THE SAME SESSION, bodies
+read from the merged image:** the three drawer bank gates
+(`name_bank_variant_id` @0x3FFBF0, `splash_bank_variant_id` @0x3FFC10,
+`winquote_bank_variant_id` @0x3FFC30) each carry ONLY DONOVAN's compare
+(`0c2c0013` / `0c2e0013` / `0c000053`) — all three tenants declare them
+(TT-substituted), but their bodies open with the displaced MOVEA before
+the compare, a shape the 14z-80h chain assembler cannot parse
+(`select_pal_variant_id`, whose displaced instruction IS a compare,
+chained correctly — which is why H/P select portraits render right).
+Instead of the promised named build error, the identical-site rows
+SILENTLY collapsed to the first declarer. TWO defects therefore: the
+missing chain shape, and the silent dedup loophole. FIX DESIGN: extend
+the site_thunk chain assembly with the DISPLACED-HEAD shape — bodies
+sharing a 6-byte head == old_hex followed by the existing compare-chain
+grammar; merged = head + concatenated per-tenant elements + shared tail
+(each element's bne.s +8 lands on the next element unchanged — measured
+on the real bodies); N=1 is byte-identical to today's solo bodies, so NO
+solo re-freeze. Plus: same-site different-bytes dedup becomes a named
+error. The win-PORTRAIT mess (H+P) is likely the same family via a
+different row kind — the census extends to ALL per-tenant-substituted
+row kinds at identical addresses during the fix.
 **(2) H-vs-P STUCK-DIRECTION INPUTS** (one side acts as if holding
 left/right regardless of input; auto-guard measured by the maintainer) —
 merged-specific, in the FIRST-EVER tenant-vs-tenant coverage; gameplay
