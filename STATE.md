@@ -1,6 +1,64 @@
 # STATE — living progress log
 
-Updated: 2026-08-13 (session 14z-85e close — **THE DEEPER-TESTING FIELD
+Updated: 2026-08-13 (session 14z-85f close — **THE FINAL GUARDIAN
+DAMAGE PARITY ITEM IS CLOSED: root-caused, fixed, and verified
+BIT-EXACT to native vs2.** Both 14z-85e hypotheses were eliminated by
+measurement (scaler tables byte-equivalent; native hit count identical
+at 12 ticks); the real mechanism is same-value class #4 in the ported
+object-hit damage APPLIER (vs2 0x28A6A → the tenant x028122 copies):
+jsr targets reconciled, A5 staging displacements ported VERBATIM, so
+every object-path hit staged damage into vs2's $FF3494/96/98 — dead
+memory on vsavj ($FF3442/44/46 is what 0x18AB0 reads). 12 combo-counted
+beam ticks, zero HP; hitstop/sparks/satellites all live, which is why
+two playtest cycles missed it. THE FIX: Donovan's session-14n six
+port_patch rows (same region, same instructions, play-proven) were
+never propagated to H/P — added to huitzil.toml + pyron.toml verbatim;
+14x rollback family untouched; post-fix census: zero vs2 damage-band
+A5 writes left in ported space. Measured on the NEW native-comparable
+rig (89_hui_ex_fg_vs2, the 85 opening + five 623+2K attempts,
+per-attempt stock-decrement EX tells): native 23/23/23/23/52 HP ×12
+ticks; ours BEFORE 1/1/1/1/1; ours AFTER = the native staircase
+bit-exact, solos and merged. FREEZES: huitzil-m8 = build/hui34
+(c48cd722), pyron-m5 = build/pyron23 (65e9a40e), merged rebuild
+build/m3b_merged2; registry + m3a EXPECTs + expectation sets
+carried-renamed; tags freeze/huitzil-m8, freeze/pyron-m5. GATES:
+audit_fg_parity NEW (ground-truthed failing on the pre-fix merged; 2
+verdict controls), tenant_loop GREEN counts UNCHANGED (port_patch =
+region rewrite, not ops), merged legacy audit PASS (leg a verbatim
+incl. ratified 04+11), reconciliation rows added + verified
+build-inert. audit_fg_damage's 10 HP measured UNCHANGED on the fixed
+build — its CPU-rig ticks were fighter-path contacts all along;
+reframed as a plain regression lock. The engine damage pipeline is now
+SYNTHESIZED in docs/game/engine_internals.md (two appliers, scaler
+chain, staging protocol, multi-hit dedup ring). NEW DECISION BRIEF
+below: tenant DEFENSE rows (found during the table compare). NEXT
+SESSION: maintainer playtest of m3b_merged2 (FG + throw-family spot
+checks on H/P); then the trap ring-entry A/B and the voice arc's
+0x02E5 decode, unchanged from 14z-85e.)
+
+### Decisions pending — 14z-85f: tenant DEFENSE-side table rows
+### (defender curves + low-HP rally thresholds)
+
+Found during the scaler-table compare: the per-character DEFENSE table
+(vsavj 0x0B8940 ↔ vs2 0x0D2ABE, 32B/id row) and the low-HP rally
+threshold bytes (0x0BCC80 ↔ 0x0D6E1E) differ between the games ONLY on
+per-id rows — the roster id shuffle. Our tenants sit on vanilla vsavj
+rows: Huitzil-as-defender takes vsavj row 0x10's curve (and threshold
+0x38) instead of his native vs2 row 0x10 values (threshold 0x28);
+same class for Pyron (0x11) and Donovan (0x13). Defender-side only —
+attack-side parity is closed by the 14z-85f fix. Options:
+(a) RECOMMENDED — adopt the native vs2 rows per tenant via a
+    variant-gated table extension (the hitclass_map_extend shape:
+    generated body reconstructing from the two ROMs, bounds-check, no
+    vanilla-row edits — legacy ids keep vanilla rows by construction).
+    Restores each tenant's native defense feel; measurable by a
+    defender-side damage A/B on the same 89-style rig.
+(b) Keep vanilla rows (current behavior) — the tenants' defense is
+    then a vsavj-native approximation, deliberately.
+Gameplay-feel either way, so it is the maintainer's call; no work is
+blocked on it.
+
+Previously: 2026-08-13 (session 14z-85e close — **THE DEEPER-TESTING FIELD
 REPORT: NO REGRESSIONS (95% tenant movelists, ~50% of four legacy
 characters) on the 677-op merged build**; both parity items advanced to
 measured mechanisms the same session. (1) FINAL GUARDIAN (623+2K):
@@ -561,6 +619,33 @@ vanilla characters including Buletta" — full-scope test to follow.
    class-table row, the fix is a variant-gated table extension — the
    hitclass_map_extend precedent — NEVER an edit of vanilla rows
    (legacy characters share them).]**
+   **[CLOSED 14z-85f, 2026-08-13 — BOTH hypotheses above were wrong;
+   fixed and native-parity-verified. The scaler tables are
+   byte-equivalent between the games (attack 0x0B8140↔0x0D22BE, final
+   2D maps 0x0B9140/0x0BA1C0↔0x0D32DE/0x0D435E, combo + RNG-spice
+   tables — all IDENTICAL; the only differing rows are per-character-id
+   defense rows irrelevant to the rig's matchup), and native hit count
+   is IDENTICAL too (12 ticks both games, measured on the new
+   native-comparable replay 89_hui_ex_fg_vs2). The real mechanism: the
+   beam ticks are processed by the PORTED vs2 object-hit damage applier
+   (vs2 0x28A6A → H's copy 0x40C828; vsavj's own twin 0x29738 exists
+   but ported reactions call the ported copy), whose jsr targets were
+   reconciled but whose A5-relative staging displacements were ported
+   VERBATIM — damage staged into vs2's work vars $FF3494/96/98, which
+   vsavj's post-process (0x18AB0) never reads ($FF3442/44/46): 12
+   combo-counted ticks, zero HP. Same-value class #4, and EXACTLY
+   Donovan's session-14n throw-damage defect — his six port_patch rows
+   fix the same instructions in the same region x028122 and were never
+   propagated to H/P manifests. Fix: the six rows added to
+   huitzil.toml + pyron.toml (the 14x grab-pointer rollback family
+   left untouched; census: zero vs2 damage-band A5 writes remain in
+   ported space). Measured after: 23/23/23/23/52 HP staircase
+   BIT-EXACT to native (incl. the cornered 30-HP terminal hit). The
+   audit's 10 HP on the 71/73 CPU rigs was fighter-path contact
+   damage, unchanged by the fix — never the parity number. Gate:
+   tests/audit_fg_parity.sh (ground-truthed failing on the pre-fix
+   merged). Builds: huitzil-m8 (build/hui34, c48cd722) / pyron-m5
+   (build/pyron23, 65e9a40e) / merged build/m3b_merged2.]**
 
 ### Decisions — 14z-84 (2): the merged-11 flicker frame from the
 ### bank-gate fix. **DECIDED (maintainer, 2026-08-13): RATIFIED** —

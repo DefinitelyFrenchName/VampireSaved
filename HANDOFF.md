@@ -146,32 +146,40 @@ rendering change. Ground truth: `tests/test_replay_video_selfcheck.sh`.
 
 ```sh
 export ROMDIR=/path/to/reference/sets
-tools/run_wide.sh build/m3b_merged fbneo   # THE 3-TENANT BUILD (all 18
-                                           # selectable, art included) —
+tools/run_wide.sh build/m3b_merged2 fbneo  # THE 3-TENANT BUILD (all 18
+                                           # selectable, art included;
+                                           # 14z-85f FG damage fix) —
                                            # pending maintainer playtest
 tools/run_wide.sh build/m5_wide fbneo      # or the solo builds; ... mame
 ```
 
-**Current WIDE builds (14z-85b):** `build/hui33` = **`huitzil-m7`
-(`284e3b1c`)** for Phobos (= m6 + hui_sfx_records: his curated per-node
-sfx + the helper unstub — his kept node sfx become AUDIBLE on solo) and
-`build/pyron22` = **`pyron-m4` (`ac22418f`)** for Pyron (= m3 +
-pyr_sfx_records — kills the merged music retrigger at its source);
+**Current WIDE builds (14z-85f):** `build/hui34` = **`huitzil-m8`
+(`c48cd722`)** for Phobos and `build/pyron23` = **`pyron-m5`
+(`65e9a40e`)** for Pyron — = m7/m4 + the six x028122 object-hit damage
+work-var port_patch rows each (the FINAL GUARDIAN zero-damage fix:
+Donovan's 14n family propagated; same-value class #4);
 `build/m5_wide` = **`donovan-m3a` (`4b7d0dc7`)** for Donovan.
-huitzil-m6 (`build/hui32`) and pyron-m3 (`build/pyron21`) are SUPERSEDED,
-kept on disk as pre-sfx A/B baselines (their extract dirs remain the
-tenant_loop/build_merged inputs — extraction is unchanged by the rows).
+`build/m3b_merged2` is the merged rebuild carrying the fix
+(FG native-parity verified by tests/audit_fg_parity.sh);
+`build/m3b_merged` is the pre-fix merged, kept as the parity audit's
+ground-truth-failing reference. huitzil-m7 (`build/hui33`) and
+pyron-m4 (`build/pyron22`) are SUPERSEDED, kept on disk
+(their extract dirs remain the tenant_loop/build_merged inputs —
+extraction is unchanged by port_patch rows).
 `build/m5w` (`ac52eeff`) is the KNOWN-BAD artifact of the 14z-60y sprite
 garble, kept as evidence — do not playtest it. `tools/audit_romset_identity.py
 build/m5w/rompath` names its four shadowed members in a second.
-**`build/m3b_merged` is the MERGED BUILD WITH GFX** (14z-83 S4,
-`tools/build_merged.sh`): the 669-op 3-tenant program image (14z-85 owner
-tag + 14z-85b sfx records; was 597 pre-14z-85) + the S2 gfx
+**`build/m3b_merged2` is the MERGED BUILD WITH GFX** (14z-83 S4,
+`tools/build_merged.sh`; rebuilt 14z-85f with the FG damage fix): the
+677-op 3-tenant program image (14z-85 owner tag + 14z-85b sfx records +
+14z-85f x028122 damage work-var rows) + the S2 gfx
 chain (D → H → P, last link's members packed, group B pristine). The
 FIRST artifact where all 18 characters have both code and art.
 UNREGISTERED until the S6 freeze decision — run_suite refuses it, and it
 reaches a playtest only after the S5 render gates and the S6 legacy
-re-verdict. Rebuild: `ROMDIR=... tools/build_merged.sh build/m3b_merged`
+re-verdict (legacy audit PASS on it 14z-85f, leg a verbatim). The
+pre-fix `build/m3b_merged` is kept as audit_fg_parity's known-bad
+reference. Rebuild: `ROMDIR=... tools/build_merged.sh build/m3b_merged2`
 (~15 min); its fingerprint moves with the generator — do not pin it.
 `build/merged1` is the **MERGED-LEGACY INSTRUMENT** (14z-81; carries the
 14z-82 type-renumber + F2 fixes) — the 3-tenant program image with gfx
@@ -1054,16 +1062,30 @@ tests/audit_pool_free_byte.sh         # REWRITTEN 14z-85 (the 14z-84 version
                                       # write at b8+0x7E covers +0x7F — the
                                       # 14z-84 zero-writes there was a word-
                                       # offset accounting artifact. ~20 min
-tests/audit_fg_damage.sh              # 14z-85e (~5 min, 2 runs): Phobos'
-                                      # EX Final Guardian damage FROZEN at
-                                      # the measured known-open 10 HP (the
-                                      # vs2-parity item; port byte-faithful,
-                                      # power byte 2 both games — the
-                                      # divergence is the per-game scaler).
-                                      # Liveness: the stock decrement must
-                                      # occur (EX-downgrade trap) or the run
-                                      # proves nothing. Re-freeze WITH the
-                                      # vs2 reference when the fix ships
+tests/audit_fg_damage.sh              # 14z-85e, REFRAMED 14z-85f (~5 min):
+                                      # FG damage vs CPU frozen at 10 HP —
+                                      # measured UNCHANGED by the fix: these
+                                      # rigs' ticks were fighter-path
+                                      # contacts, never the broken path. A
+                                      # plain regression lock now; the
+                                      # PARITY gate is audit_fg_parity.sh.
+                                      # Liveness: stock decrement or the
+                                      # run proves nothing (downgrade trap)
+tests/audit_fg_parity.sh              # 14z-85f (~4 min, 2 parallel runs):
+                                      # THE FG PARITY GATE — the native-
+                                      # comparable 89_hui_ex_fg_vs2 replay
+                                      # on native vsav2 AND the build; BOTH
+                                      # legs must match the frozen native
+                                      # staircase 23/23/23/23/52 HP with 12
+                                      # ticks and 5 per-attempt stock-
+                                      # decrement EX tells. Locks the
+                                      # x028122 object-hit damage work-var
+                                      # reconciliation (same-value class
+                                      # #4: ported applier staged into
+                                      # vs2's $FF3494 family, vsavj reads
+                                      # $FF3442). Ground-truthed FAILING on
+                                      # the pre-fix merged; 2 verdict
+                                      # controls (tick removed, no stocks)
 tests/audit_pyron_ring.sh             # 14z-85, RE-FROZEN 14z-85b (~10 min,
                                       # 4 runs): pyron's merged-vs-solo
                                       # ring-id diff must be EMPTY (the

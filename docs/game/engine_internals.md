@@ -1476,6 +1476,85 @@ copies of vs2's FULL tables. **Superset proof, static:** map1's prefix
 games, so vanilla content reads identical values through the clone and
 the thunk can be unconditional.
 
+## The DAMAGE pipeline: two appliers, one scaler chain (14z-85e/85f,
+## measured on Phobos' FINAL GUARDIAN; twins verified in both engines)
+
+Depends on atlas rows: fighter structs `$FF8400/$FF8800` (`+0x50` HP,
+`+0x52` white HP, `+0x144` combo counter, `+0x382` char id,
+`+0x3B3` per-char stat byte, `+0x8C` attack-record table ptr,
+`+0x32` attacker/owner link), the A5 work-var families below, and
+docs/game/gotchas.md "Same-value class #4".
+
+**Two parallel damage APPLIERS feed one staging protocol** (all
+addresses vsavj; vs2 twins in parentheses, verified instruction-
+parallel):
+
+- **Fighter-hit stager** `PRG:0x0189BA` (vs2 `0x01732C`): the path for
+  fighter-vs-fighter contacts. Reads base power from the hit record —
+  real `(8,A3)`, white `(9,A3)` — through the scaler chain below into
+  the staging vars, then falls into the post-process.
+- **Object-hit applier** `PRG:0x29738` (vs2 `0x28A6A`): the path for
+  pool-object hits (projectiles, beams). Called BY per-hit REACTION
+  handlers (54 call sites in vsavj, 78 in vs2 — one per hit class
+  family). Entry: D0 = attack id; `A3 = ($8C,a6) + id*32` (a6 = the
+  ATTACKER context), victim via `($32,a6)`; writes hitstop
+  `#$3C/(0x13A,a1)` + `#$0A/(0x13B,a1)`, then the same staging
+  protocol, then `jsr` post-process. The applier ends with the shared
+  white-HP/KO logic (the KO signature `move.w #$FFFF,(0x50,a1)` +
+  `(0x52,a1)` — the session-10 reconciliation anchor).
+
+**The scaler chain** (`bsr` targets of both appliers):
+- `PRG:0x18B8C` (vs2 `0x17522`) attack scaling: `class = power & 0x1F`;
+  `d2 = attack_table[class*32 + attacker (+0x3B3)]` — table at
+  `PRG:0x0B8140` (vs2 `0x0D22BE`), **byte-identical between the
+  games**. Bit 5 of the raw power byte skips the stat add. Then the
+  damage-level config jump (`(0xB2,a6)`; both games: ×1, ×1.25, ×0.5,
+  ×0.25 — vs2 adds ×0.75), a random spice pass (`0x18D22`, table
+  `0x0BB240`/vs2 `0x0D53DE`), and **the minimum floor: d2==0 → 1,
+  cap 0x7F**. Class 2 rows cap at 2 — small-tick beams are 1-2
+  HP/tick BY DESIGN in both games.
+- `PRG:0x18C08` (vs2 `0x175AE`) defense/apply: defender-side d3 from
+  defense table `0x0B8940` (vs2 `0x0D2ABE`; 32B per char id — rows
+  0x0A/0x10/0x13/0x19/0x1A differ between the games = the roster id
+  shuffle, see the port note below), combo-counter tables
+  (`0x19610/0x19A10/0x19E10/0x1A210`; identical), low-HP rally
+  (threshold/char `0x0BCC80`, spice `0x0B8D40`), then **final damage =
+  2D map `0x0B9140[d3*0x80 + d2]`** (negative d3 → `0x0BA1C0`; both
+  maps byte-identical to vs2's `0x0D32DE/0x0D435E`). The "walker
+  A0=0xB91C0 +0x180/tick" seen live in 14z-85e was this map's row
+  pointer moving as d3 grows with the combo.
+- Post-process `PRG:0x18AB0` (vs2 `0x17422`): reads the staged words
+  and applies them — HP decrement `sub.w d4,(0x50,a1)` @`0x18AC0`.
+
+**The staging protocol is A5 work vars, and the layouts differ by a
+uniform -0x52** (gotchas class #4): vsavj stages real/white/flag at
+`-0x4BBE/-0x4BBC/-0x4BBA(a5)` = `$FF3442/44/46`; vs2 at
+`-0x4B6C/-0x4B6A/-0x4B68(a5)` = `$FF3494/96/98`. Attacker/victim
+registration: vsavj `-0x4BC6/-0x4BC4`, vs2 `-0x4B74/-0x4B72`.
+**Ported engine-family code (region x028122 carries the vs2 applier +
+reaction handlers per tenant) must have its staging displacements
+port_patched to the vsavj layout** — the reconciler rewrites absolute
+addresses, not d16 displacements. Donovan's six session-14n rows are
+the template; propagated to H/P 14z-85f after Phobos' FG beam ticks
+measured 12 combo-counted hits with ZERO HP (damage staged into the
+vs2 vars nobody reads). The 14x rollback rule still holds: the
+attacker/victim-registration and state-byte family
+(`-0x4B74/-0x4B72/-0x4B3D`) is consumed by PORTED readers and must
+stay at vs2 offsets. Gate: `tests/audit_fg_parity.sh`.
+
+**Multi-hit accounting:** the gate at `PRG:0x18090` dedups by hit id —
+record byte `+0x10` vs the victim's recent-hit ring at `+0x6C`
+(rotating index at attacker context `+0x70`). The combo counter
+(`+0x144`, victim) is incremented by the REACTION handlers (vs2 beam
+reaction `0x56002`: +3/tick), not by the appliers.
+
+**Port note (defense side, OPEN):** tenant ids sit on vanilla vsavj
+defense-table rows — row 0x10's curve and low-HP threshold
+(vsavj 0x38 vs vs2 0x28 for Huitzil) are vanilla leftovers, NOT the
+characters' native vs2 values. Filed 14z-85f as a decision brief
+(gameplay-feel: adopting vs2 defense rows is a variant-gated table
+extension, the hitclass precedent).
+
 ## Shadow / reflection servants (14z-66; premise CORRECTED 14z-68f)
 
 Per-player shadow servants (class-0x0C trio, vanilla spawner

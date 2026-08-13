@@ -1870,3 +1870,56 @@ vsavj = 0x02a7e0
 kind = "stubbed_sound"
 status = "verified"
 note = "H KEPT SILENT (14z-65 sweep): sfx id 0x3ea — vsavj same-id keys DIFFERENT content (keyons records, measured). Revisit with the M5 voice-bank port."
+
+# ── 14z-85f: the object-hit damage pipeline (the FG parity item).
+# Applier verified by full instruction-parallel disassembly (found by
+# the jsr-scaler signature 142b0008 670a 4eb9<scaler>, unique in each
+# image) + live behavior (both games' beam ticks traverse it — REGLOG
+# taps on the staging words). Its A5 staging displacements are the
+# same-value class #4 family: ported copies need the six port_patch
+# rows (donovan/huitzil/pyron.toml), NOT a jsr reconciliation.
+[[map]]
+vsav2 = 0x028a6a
+vsavj = 0x029738
+kind = "engine_sub"
+status = "verified"
+note = "object-hit damage applier (D0=atk id, a6=attacker ctx, victim via (0x32,a6)); jsr'd by the per-hit-class reaction handlers (78 sites vs2 / 54 vsavj); stages via the A5 damage work vars (class-#4 family, -0x52 shift)"
+
+# The scaler-chain DATA tables (14z-85f static compare, both data
+# views): attack + both final 2D maps + combo + RNG-spice tables are
+# BYTE-IDENTICAL between the games; defense/low-HP tables differ only
+# on per-character-id rows (the roster id shuffle).
+[[map]]
+vsav2 = 0x0d22be
+vsavj = 0x0b8140
+kind = "engine_data"
+status = "verified"
+note = "attack scaling table, 32B/class row, idx class*32+attacker(+0x3B3); BYTE-IDENTICAL both games (0x800 compared)"
+
+[[map]]
+vsav2 = 0x0d2abe
+vsavj = 0x0b8940
+kind = "engine_data"
+status = "verified"
+note = "defense base table, 32B/char-id row; differs ONLY on id rows 0x0A/0x10/0x13/0x19/0x1A (roster shuffle) — tenant ids ride vanilla vsavj rows (OPEN defense-parity brief, STATE 14z-85f)"
+
+[[map]]
+vsav2 = 0x0d32de
+vsavj = 0x0b9140
+kind = "engine_data"
+status = "verified"
+note = "final damage 2D map (d3>=0), 0x80/row x 0x21 rows; BYTE-IDENTICAL both games"
+
+[[map]]
+vsav2 = 0x0d435e
+vsavj = 0x0ba1c0
+kind = "engine_data"
+status = "verified"
+note = "final damage 2D map (d3<0 / drain); BYTE-IDENTICAL both games"
+
+[[map]]
+vsav2 = 0x0d6e1e
+vsavj = 0x0bcc80
+kind = "engine_data"
+status = "verified"
+note = "per-char low-HP rally threshold bytes; per-id differences (roster shuffle; Huitzil 0x28 vs vsavj row-0x10's 0x38)"

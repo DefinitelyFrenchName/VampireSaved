@@ -574,3 +574,29 @@ x026142's own escapes, resolved by two methods now proven:
   0x269AC (operand-heavy float-body helper, tripwired).
 These rows are consumed by [[pcrel_escape_fix]] trampolines, not
 operand rewrites — see docs/GOTCHAS.md on oracle-invisible escapes.
+
+## Session 14z-85f — the object-hit damage applier + the scaler-table data rows
+
+The FINAL GUARDIAN parity work added six rows:
+- **`0x028A6A ↔ 0x29738` (engine_sub, verified)** — the OBJECT-HIT
+  damage applier (D0 = attack id, a6 = attacker context, victim via
+  `(0x32,a6)`), the object-path sibling of the session-10 damage
+  wrapper trio. Found by the jsr-scaler signature
+  (`142b0008 670a 4eb9<scaler>`), UNIQUE in each image; verified by
+  full instruction-parallel disassembly and live REGLOG taps on the
+  staging words (both games' FG beam ticks traverse it). NOTE its A5
+  staging displacements are the same-value class-#4 family — ported
+  copies are corrected by the six x028122 [[port_patch]] rows per
+  tenant manifest, never by a jsr reconciliation.
+- **Five engine_data rows** for the scaler-chain tables (attack
+  `0x0D22BE↔0x0B8140`, defense `0x0D2ABE↔0x0B8940`, final 2D maps
+  `0x0D32DE↔0x0B9140` and `0x0D435E↔0x0BA1C0`, low-HP thresholds
+  `0x0D6E1E↔0x0BCC80`), located by disassembling the verified twins on
+  both sides (every `movea.l #table` quoted) and compared byte-level
+  in the data views: attack + both final maps + combo + RNG-spice are
+  BYTE-IDENTICAL between the games; defense/low-HP differ only on
+  per-character-id rows (the roster id shuffle → the 14z-85f tenant
+  DEFENSE decision brief in STATE).
+Adding these rows was verified BUILD-INERT (hui fingerprint unchanged
+on a scratch rebuild) — they are documentation for the resolver, not
+new resolutions the generator consumes.

@@ -1,108 +1,81 @@
-# NEXT SESSION — orientation (written at the close of 14z-85e, 2026-08-13)
-
-> ## FIELD VERDICT FIRST
->
-> Deeper testing (maintainer): **NO REGRESSIONS** — 95% movelist
-> coverage for Donovan/Pyron/Phobos, ~50% for Bulleta/Victor/Demitri/
-> Morrigan, on the 677-op merged build. Two NON-regression parity items,
-> both advanced to measured mechanisms (STATE 14z-85e):
-> 1. **FINAL GUARDIAN (623+2K) damage**: ~10/288 HP on our build
->    (1-2/tick; EX-firing verified by stock decrement). The port is
->    BYTE-FAITHFUL and the power byte is 2 in vs2's own data — the
->    divergence is the per-game SCALER (damage-class tables, live-reg
->    candidates 0x0ABFxx/walker 0xB91C0) or native hit-count. NEXT:
->    compare the scaler tables against vs2's twins (reconciliation for
->    0x18108's twin) + a retuned native replay for vs2's number. Fix
->    shape if class-table: variant-gated extension (hitclass precedent),
->    NEVER vanilla-row edits.
-> 2. **Plasma-trap detonation sound**: SYSTEMATIC on native vs2 vs
->    proximity-gated on ours — the 14z-84 closure reopened (it compared
->    our build against itself). The id IS enqueued even when silent →
->    volume/pan ring-entry params hypothesis; rig = full 16-byte entry
->    A/B near/far, ours vs native.
-
+# NEXT SESSION — orientation (written at the close of 14z-85f, 2026-08-13)
 
 > ## START HERE
 >
-> **BOTH 14z-85 FIXES ARE SHIPPED, LADDER-GREEN, AND FIELD-CONFIRMED**
-> (maintainer, first playtest): *"the music triggering is gone, Piled
-> Hell has its hitbox — needs deeper testing but it does look very
-> good."*
-> 1. **The spawn-time OWNER TAG** (ruled option (a)): obj_hook 64-75
->    dispatch on the object's spawn-time tag (+0x7F of the **$FF9400**
->    slot), 80 stamp-site detours, 12 tag stubs, tripwire silent under
->    2,046 live dispatches.
-> 2. **Per-tenant sfx records** (ruled option (a) — "the obvious
->    solution if it fits"; it fits): pyr/hui_sfx_records, the
->    don_sfx_records precedent, curation in
->    docs/project/tables/sfx_records.md. The music retrigger was NEVER
->    the 64-75 dispatch (ring identical before/after the tag) — it was
->    the per-node sfx helper reading RAW vs2 records through the
->    generic tail_data_ptr repoint.
+> **THE FINAL GUARDIAN DAMAGE PARITY ITEM IS CLOSED — fixed and
+> verified BIT-EXACT to native vs2** (STATE 14z-85f). The mechanism was
+> NEITHER 14z-85e hypothesis: the ported object-hit damage applier
+> (vs2 0x28A6A, tenant x028122 copies) staged damage into vs2's A5
+> work vars ($FF3494/96/98) which vsavj never reads — same-value
+> class #4, and EXACTLY Donovan's session-14n throw fix, never
+> propagated to H/P manifests. Six port_patch rows each →
+> **huitzil-m8 (build/hui34, c48cd722) / pyron-m5 (build/pyron23,
+> 65e9a40e) / merged build/m3b_merged2**. Gate:
+> `tests/audit_fg_parity.sh` (native A/B, frozen staircase
+> 23/23/23/23/52, ground-truthed failing on the pre-fix merged).
+> The damage pipeline is synthesized in engine_internals.md.
 >
-> **FIRST ACT: support the maintainer's deeper full-scope testing** of
-> `build/m3b_merged` (677 ops, gfx included; still UNREGISTERED pending
-> the S6 freeze decision) — "prod comes first", so the voice arc below
-> starts in parallel. Then:
-> - ~~Extend tag stubs to 59-63~~ **DONE 14z-85c** (ruled + executed:
->   the foreign-stamper rule; 59/61/62/63 donovan-only stubs, 60 direct;
->   counts 490/677; ladder green).
-> - **THE M5 VOICE-SAMPLES ARC IS RULED GO** ("cleverly, MiSTer-aware —
->   core tweaks acceptable"). The measured design brief is in STATE
->   14z-85c: ~616 KB+ of vs2 sample windows into the WIDE QSound
->   image's free upper 8 MB (banks 0x80+ — MAME's LLE bank register is
->   15-bit, measured in qsound.cpp); Z80 driver has 27,727 B free for
->   the new id rows (WIDE A4). **THE Z80 RE IS UNDERWAY — read STATE
->   14z-85d before touching it** (id table @FILE 0x11006 4B/id both
->   games; interpreter/track/channel state mapped; kabuki disasm =
->   MAME debugger dasm; instrument tests/lua/qs_table_trace.lua).
->   NEXT CONCRETE STEPS: (1) decode the 0x02E5 id-entry consumption
->   (the captured qtrace flow has it) → entry format + the sample
->   bank/start/end ROM source; (2) free-id census with the CORRECT
->   entry decode; (3) longer-window keyon re-sweep (~36 scoped ids
->   attack-blind); (4) packer + Z80 rows + record remaps (NOTE: the
->   restored ids CANNOT keep their vs2 numbers — 0x700+ are vanilla
->   MUSIC ids; new ids from free space + remap in our record arrays);
->   (5) verify jtcores' QSound region growth for MiSTer.
+> **FIRST ACT: the maintainer's playtest of `build/m3b_merged2`** —
+> FG damage (should now feel native), plus H/P throw/projectile
+> damage spot checks (the same applier serves them). Then, in
+> maintainer-pressure order:
+> 1. **Plasma-trap detonation sound** parity item (UNCHANGED from
+>    14z-85e): systematic on native vs2, proximity-gated on ours; the
+>    id IS enqueued when "silent" → volume/pan ring-entry params
+>    hypothesis; rig = full 16-byte ring-entry A/B near/far, ours vs
+>    native (audit_trap_sound has the enqueue side).
+> 2. **THE M5 VOICE-SAMPLES ARC** (ruled GO; brief in STATE 14z-85c;
+>    Z80 RE state in 14z-85d — id table @FILE 0x11006 4B/id both
+>    games; next concrete step: decode the 0x02E5 id-entry consumption
+>    from the captured qtrace → entry format + sample bank/start/end).
+>    Restored ids CANNOT keep vs2 numbers (0x700+ are vsavj MUSIC).
+> 3. **NEW DECISION PENDING (14z-85f): tenant DEFENSE rows** — tenants
+>    ride vanilla vsavj defender-curve/low-HP-threshold rows, not
+>    their native vs2 values (found in the table compare; brief with
+>    options in STATE). Recommended shape: variant-gated table
+>    extension, hitclass precedent. Maintainer's call; nothing blocks.
 >
-> ## Corrections that must outlive this session (14z-85)
+> ## Corrections that must outlive this session (14z-85f)
 >
-> - Pool attribution: $FFB800/0x80 = the 0x5E542/114-120 family;
->   **$FF9400/0x100 = the 0x54470/59-75 family** (walker 0x54458). The
->   14z-84 census had the wrong pool; retracted and re-measured.
-> - **Bucket write taps by BYTE LANE** — a word write at +0x7E covers
->   byte +0x7F; word-offset bucketing invented the "$FFB800 +0x7F free"
->   claim (GOTCHAS, platform).
+> - The 14z-85e "per-game scaler" AND "native hit-count" hypotheses
+>   are both RETRACTED by measurement: scaler tables byte-equivalent,
+>   12 ticks both games. Grep-swept; audit_fg_damage reframed (its
+>   10 HP = fighter-path contact damage, never the parity number).
+> - A port_patch on a shared engine-family region fixes ONE tenant's
+>   copy — when a tenant imports a region, grep every manifest's rows
+>   for it (GOTCHAS, project). Converse: the 14x rolled-back families
+>   stay at vs2 offsets (ported readers consume them).
 >
 > ## New/changed suite members
 >
-> - tests/audit_fg_damage.sh — NEW 14z-85e: FG damage frozen at the
->   known-open 10 HP with the stock-decrement liveness control;
->   re-freeze WITH the vs2 reference when the scaler fix ships.
-> - tests/audit_pyron_ring.sh — merged-vs-solo ring diff frozen EMPTY.
-> - tests/audit_pool_free_byte.sh — REWRITTEN: both pools, pre/post-tag
->   modes, FORCE_MODE negative control (ground-truthed both directions).
-> - tests/audit_type_dispatch_range.sh — §4-6: 0x54470 family liveness +
->   tag-stub tripwire silence.
-> - tests/test_tenant_loop.sh — 243/266/208 solo, 490/677 merged; §4b
->   decodes all 16 tag stubs per entry (59-75 family, 14z-85c).
+> - tests/audit_fg_parity.sh — NEW: the FG parity gate (native +
+>   build vs the frozen staircase; 2 verdict controls; fails on the
+>   pre-fix merged).
+> - tests/replays/hui/89_hui_ex_fg_vs2.rpl — NEW: native-comparable
+>   FG rig (85-opening + five 623+2K attempts, stock-decrement tells).
+> - tests/audit_fg_damage.sh — REFRAMED: regression lock on the
+>   fighter-path 10 HP; no longer the parity item's gate.
+> - tests/lua/bp_regs.lua — NEW instrument: replay/POKES playback +
+>   auto-resuming debugger breakpoints logging registers at named PCs.
 
 ## Current builds (registry)
 
 | build | set | fingerprint |
 |---|---|---|
-| build/m3b_merged | UNREGISTERED (pending deeper test + S6 freeze) | moves with generator (677 ops) |
+| build/m3b_merged2 | UNREGISTERED (pending playtest + S6 freeze) | moves with generator (677 ops) |
+| build/m3b_merged | pre-fix merged — audit_fg_parity's known-bad reference | superseded |
 | build/m5_wide | donovan-m3a | 4b7d0dc7 |
-| build/hui33 | **huitzil-m7** | 284e3b1c |
-| build/pyron22 | **pyron-m4** | ac22418f |
-| build/hui32, pyron21 | superseded m6/m3 (keep — pre-sfx A/B baselines; their extract dirs stay the tenant_loop/build_merged inputs) | db4bcd11 / 6c7f7322 |
+| build/hui34 | **huitzil-m8** | c48cd722 |
+| build/pyron23 | **pyron-m5** | 65e9a40e |
+| build/hui33, pyron22 | superseded m7/m4 | 284e3b1c / ac22418f |
+| build/hui32, pyron21 | superseded m6/m3 (extract dirs = tenant_loop/build_merged inputs) | db4bcd11 / 6c7f7322 |
 
 ## Still open (the short list)
 
-- THE M5 VOICE-SAMPLES ARC (ruled GO; brief in STATE 14z-85c — the
-  next big implementation).
+- Plasma-trap detonation sound parity (rig named above).
+- THE M5 VOICE-SAMPLES ARC (ruled GO; the next big implementation).
+- Tenant DEFENSE rows decision (14z-85f brief).
 - Pyron's medallion whitening on 2P hover (row-0x1A family).
-- Phobos EX damage-data suspicion (maintainer will name move+numbers).
 - H-vs-P stuck-direction (~1/30, possibly emulator-side).
 - Round-end flicker (parked; needs the maintainer's recording).
 - Win-screen QUOTE (both tenants); pyron win-laugh distortion
@@ -114,12 +87,10 @@
 ```sh
 export ROMDIR=/path/to/reference/sets
 export MAME_BIN=~/.cache/vampire-saved/mame/cps2   # run_suite needs it
-tools/build_merged.sh build/m3b_merged     # ~15 min (677-op fixture)
+tools/build_merged.sh build/m3b_merged2    # ~15 min (677-op fixture)
+tests/audit_fg_parity.sh build/m3b_merged2 # ~4 min — the FG parity gate
 tests/test_tenant_loop.sh                  # generator gate (490/677)
 tests/test_m3a_reproducible.sh             # ~6 min (all four refs)
-tests/audit_type_dispatch_range.sh build/m3b_merged   # ~15 min, §0-6
-tests/audit_pool_free_byte.sh              # ~20 min (post-tag mode)
-tests/audit_pyron_ring.sh                  # ~10 min (EMPTY diff frozen)
-MERGED_OUT=build/m3b_merged MERGED_PREBUILT=1 \
+MERGED_OUT=build/m3b_merged2 MERGED_PREBUILT=1 \
   tests/audit_merged_legacy.sh             # ~45 min: leg a verbatim
 ```

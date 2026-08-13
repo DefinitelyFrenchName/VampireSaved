@@ -1914,3 +1914,25 @@ fact transfers to a family, decode the family's walker. Re-measured on
 the right pool the byte WAS free — the mechanism survived, but only by
 luck, and the $FFB800 result turned out doubly wrong (see the platform
 byte-lane entry).
+
+## A port_patch on a shared engine-family region fixes ONE tenant's copy (14z-85f)
+
+Every tenant carries his OWN copy of the ported engine-family regions
+(x028122 = the vs2 object-hit damage applier + reaction handlers; the
+merged image holds three). Donovan's session-14n throw-damage fix — six
+port_patch rows reconciling the applier's A5 staging displacements to
+the vsavj layout (same-value class #4) — lived only in donovan.toml, so
+Huitzil's and Pyron's copies shipped with the vs2 displacements intact:
+their object-path hits staged damage into $FF3494/96/98, which the
+vsavj engine never reads. Face: Phobos' FINAL GUARDIAN beam ticking 12
+times, combo counting, ZERO HP — while hitstop, sparks and satellites
+all worked (the applier's other effects don't route through the dead
+vars). Cost: the defect survived TWO playtest cycles because most
+moves' contacts take the fighter-path stager, which was never broken.
+Rule: when a new tenant imports a region that carries port_patch rows
+in ANY existing manifest, the rows come with it — grep
+`region = "<name>"` across build/manifest/*.toml is the two-second
+check. And its converse from 14x still binds: do NOT blanket-copy the
+rolled-back families (the grab-pointer/state rows are stage-99 parked
+in donovan.toml because ported READERS consume those vars at vs2
+offsets).

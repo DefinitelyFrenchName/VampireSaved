@@ -2884,3 +2884,68 @@ gone, no solo id missing.
 **FIELD-CONFIRMED (maintainer, first playtest, 2026-08-13): "the music
 triggering is gone, Piled Hell has its hitbox — needs deeper testing but
 it does look very good."**
+
+## 14z-85f — the x028122 object-hit damage work-var reconciliation
+## (huitzil-m8 / pyron-m5: the FINAL GUARDIAN zero-damage fix)
+
+**The defect (closing the 14z-85e parity item):** FG's beam ticks are
+hits BY pool objects (the type-02 beam particles; attacker context a6 =
+per-hit ctx), processed by per-hit-class REACTION handlers that live in
+ported vs2 code. The reaction (vs2 0x55FA8/combo writer 0x56002; H's
+copy at merged 0x4026E2, region "code (grouped)") calls the ported
+object-hit damage APPLIER (vs2 0x28A6A → H's copy 0x40C828, region
+x028122). The porting machinery reconciled the applier's jsr targets
+(vsavj scaler 0x18B8C, post-process 0x18AB0, pre-check 0x5E9B4) but its
+A5-relative STAGING DISPLACEMENTS shipped verbatim: scaled damage
+staged at vs2's -0x4B6C/-0x4B6A/-0x4B68(a5) = $FF3494/96/98, while
+vsavj's post-process reads -0x4BBE/-0x4BBC/-0x4BBA = $FF3442/44/46.
+Result: 12 combo-counted beam ticks (hitstop, sparks, satellites all
+live), ZERO HP staged. Same-value class #4 — and byte-for-byte
+Donovan's session-14n throw-damage defect, whose six port_patch rows
+patch the SAME instructions in the SAME region and never propagated to
+the H/P manifests (gotcha filed).
+
+**Eliminated by measurement en route (14z-85e's two hypotheses):** the
+scaler tables are byte-equivalent between the games (attack
+0x0B8140↔0x0D22BE, final 2D maps 0x0B9140/0x0BA1C0↔0x0D32DE/0x0D435E,
+combo + RNG-spice; defense/low-HP tables differ only on per-char-id
+rows — the roster shuffle), and native hit count is identical (12
+ticks). Full pipeline synthesis: docs/game/engine_internals.md "The
+DAMAGE pipeline".
+
+**Every byte, and why:** six [[port_patch]] rows per manifest
+(huitzil.toml + pyron.toml), stage 6, region x028122 — vs2 src
+0x28AC2/0x28AC8/0x28AD8/0x28ADC/0x28AE2/0x28AF2, each a 2-byte
+displacement change (b498→b446, b494→b442 ×2, b496→b444 ×2, plus the
+flag-word immediates' rows) = 12 bytes per tenant copy. Donovan's rows
+verbatim. The 14x rollback family (-0x4B74/-0x4B72/-0x4B3D — attacker/
+victim registration + state byte) left at vs2 offsets on purpose:
+ported readers consume them (donovan.toml stage-99 parked rows).
+Static census after: ZERO vs2 damage-band A5 writes remain in ported
+space on either build (the remaining b48c/b48e/b4c3 hits are the
+rollback family, by design).
+
+**Measured (tests/replays/hui/89_hui_ex_fg_vs2.rpl — new
+native-comparable rig, the 85_hui_df_vs2 opening + five spaced 623+2K
+attempts):** before: native 23/23/23/23/52 HP (12 ticks each; the 5th
+cornered, 11 ticks + one 30-HP terminal hit) vs ours 1/1/1/1/1. After:
+BIT-EXACT parity, both solos and the merged rebuild. audit_fg_damage's
+71/73 CPU rigs measure 10 HP UNCHANGED by the fix — those ticks were
+fighter-path contacts (never broken); header reframed.
+
+**Gates:** tests/audit_fg_parity.sh NEW (both legs vs the frozen
+staircase; per-attempt stock-decrement EX tells; 2 verdict controls;
+ground-truthed FAILING on the pre-fix merged), tenant_loop GREEN with
+counts UNCHANGED (port_patch rows are region rewrites, not ops),
+m3a_reproducible on the new EXPECTs, merged legacy audit PASS (leg a
+verbatim incl. ratified 04+11), run_suite on the carried-renamed sets.
+Builds: huitzil-m8 = build/hui34 (c48cd722), pyron-m5 = build/pyron23
+(65e9a40e), merged = build/m3b_merged2 (moves with generator).
+Reconciliation rows added (applier 0x28A6A↔0x29738 verified + the five
+scaler-table data rows); verified build-inert (fingerprint unchanged).
+
+**OPEN, filed as a decision brief (STATE 14z-85f):** tenant DEFENSE
+rows — ids 0x10/0x11/0x13 ride vanilla vsavj defense-table rows and
+low-HP thresholds, not their native vs2 values (defender-side; found
+during the table compare). Adopting vs2's rows = a variant-gated
+table extension (hitclass precedent); gameplay-feel, maintainer's call.
