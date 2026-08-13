@@ -543,12 +543,39 @@ _SINGLETON_MERGE = {"init_shim": merge_init_shim, "table_fix": merge_table_fix}
 OBJ_HOOK_OWNER_READ = {}
 
 
+# ── 14z-85: SPAWN-TIME OWNER TAG for the 0x54470 family (59-75) ─────────────
+# The robust design the withdrawal note above names, ruled OPTION (a) by the
+# maintainer (2026-08-13). Every frozen 59-75 stamp site is detoured through
+# a thunk that ALSO writes the stamping tenant's id into the object's tag
+# byte — a fact baked at BUILD time, read at dispatch by obj_hook entries
+# 64-75 (owner_dispatch_stub shape "tag" below). The tag byte is MEASURED
+# free on the family's OWN pool ($FF9400, 0x100-stride slots, walker
+# 0x54458 — NOT the $FFB800/0x80 pool of the 0x5E542 family, which is what
+# the first 14z-84 census measured by mistake): 804 live-slot observations,
+# zero writes to +0x7F across 19,357 tapped pool writes, three legs incl.
+# live family content (types 0x42/0x45) — 14z-85 census, suite-captured in
+# tests/audit_pool_free_byte.sh. Zero/unclaimed tags fall through every
+# compare into the tripwire: an untagged family object is a stamp site the
+# tag emission missed, loud by design. Nothing clears +0x7F (zero writers
+# measured), so stale tags in reused slots are unread — stubs run only for
+# family types, and every family spawn re-tags.
+OWNER_TAG_SITE = 0x54470
+OWNER_TAG_TYPES = range(59, 76)       # tag emission: the whole family
+OWNER_TAG_STUB_TYPES = range(64, 76)  # owner stubs: the ruled entry range
+OWNER_TAG_OFF = 0x7F                  # slot offset, measured free (14z-85)
+
+
 def owner_dispatch_stub(shape, tenants, tripwire):
     """68k bytes for one MULTI-OWNER obj_hook table entry.
 
     `tenants` = [(char_id, handler_addr)] in declaration order; `tripwire` =
     the planted-ILLEGAL address for every path that cannot NAME its owner
     (walk dead-ends, and a player id no tenant claims).
+
+    Shape "tag" (14z-85) performs NO runtime owner read at all — it compares
+    the object's spawn-time tag byte (+OWNER_TAG_OFF, written by the stamping
+    tenant's own detoured stamp site) against each tenant id; a zero or
+    unclaimed tag falls through every compare into the tripwire.
 
     Entry contract, MEASURED from the vanilla walker 0x5E52A-54 (14z-81b):
     A6 = object, D0 = 0, A1/D1 are not read by the walker or defined for
@@ -576,33 +603,45 @@ def owner_dispatch_stub(shape, tenants, tripwire):
 
     CMP_P1 = bytes.fromhex("b3fcffff8400")     # cmpa.l #$ffff8400,a1
     CMP_P2 = bytes.fromhex("b3fcffff8800")
-    if shape == "d30":
-        out += bytes.fromhex("326e0030")       # movea.w (0x30,a6),a1
-    elif shape == "d32":
-        out += bytes.fromhex("326e0032")       # movea.w (0x32,a6),a1
-    elif shape == "h30":
-        out += bytes.fromhex("326e0030")       # movea.w (0x30,a6),a1
-        out += bytes.fromhex("2209")           # move.l a1,d1
-        out += bytes.fromhex("08010000")       # btst #0,d1
-        _bne("tw")                             # odd word: not a pointer
-        out += bytes.fromhex("b2fc0000")       # cmpa.w #0,a1
-        _beq("tw")                             # unlinked: cannot hop
-        out += bytes.fromhex("32690030")       # movea.w (0x30,a1),a1
+    if shape == "tag":
+        # 14z-85: dispatch on the SPAWN-TIME tag — no owner read, no player
+        # hop. A6 = object (walker contract); the compares touch no register,
+        # and the exits below re-establish the vanilla entry state exactly.
+        for i, (cid, _h) in enumerate(tenants):
+            out += bytes.fromhex("0c2e")       # cmpi.b #id,(OWNER_TAG_OFF,a6)
+            out += bytes([0x00, cid & 0xFF])
+            out += OWNER_TAG_OFF.to_bytes(2, "big")
+            _beq("t%d" % i)
+        # zero tag (missed stamp site) or unclaimed tag: LOUD by design
+        out += b"\x4e\xf9" + tripwire.to_bytes(4, "big")   # jmp tripwire
     else:
-        raise ValueError(f"unknown owner-read shape {shape!r}")
-    out += CMP_P1
-    _beq("got")
-    out += CMP_P2
-    _beq("got")
-    labels["tw"] = len(out)
-    out += b"\x4e\xf9" + tripwire.to_bytes(4, "big")   # jmp tripwire
-    labels["got"] = len(out)
-    for i, (cid, _h) in enumerate(tenants):
-        out += bytes.fromhex("0c29")           # cmpi.b #id,(0x382,a1)
-        out += bytes([0x00, cid & 0xFF])
-        out += bytes.fromhex("0382")
-        _beq("t%d" % i)
-    out += b"\x4e\xf9" + tripwire.to_bytes(4, "big")   # player, unclaimed id
+        if shape == "d30":
+            out += bytes.fromhex("326e0030")       # movea.w (0x30,a6),a1
+        elif shape == "d32":
+            out += bytes.fromhex("326e0032")       # movea.w (0x32,a6),a1
+        elif shape == "h30":
+            out += bytes.fromhex("326e0030")       # movea.w (0x30,a6),a1
+            out += bytes.fromhex("2209")           # move.l a1,d1
+            out += bytes.fromhex("08010000")       # btst #0,d1
+            _bne("tw")                             # odd word: not a pointer
+            out += bytes.fromhex("b2fc0000")       # cmpa.w #0,a1
+            _beq("tw")                             # unlinked: cannot hop
+            out += bytes.fromhex("32690030")       # movea.w (0x30,a1),a1
+        else:
+            raise ValueError(f"unknown owner-read shape {shape!r}")
+        out += CMP_P1
+        _beq("got")
+        out += CMP_P2
+        _beq("got")
+        labels["tw"] = len(out)
+        out += b"\x4e\xf9" + tripwire.to_bytes(4, "big")   # jmp tripwire
+        labels["got"] = len(out)
+        for i, (cid, _h) in enumerate(tenants):
+            out += bytes.fromhex("0c29")           # cmpi.b #id,(0x382,a1)
+            out += bytes([0x00, cid & 0xFF])
+            out += bytes.fromhex("0382")
+            _beq("t%d" % i)
+        out += b"\x4e\xf9" + tripwire.to_bytes(4, "big")   # player, unclaimed id
     for i, (_cid, h) in enumerate(tenants):
         labels["t%d" % i] = len(out)
         out += bytes.fromhex("7000")                   # moveq #0,d0
@@ -1561,6 +1600,11 @@ def main():
     TYPE_RENUMBER_ORDER = []  # [(site, new_index, orig_type, tenant, tgt)]
     TYPE_STAMP_WORK = []      # [(tenant, src_addr, span, tt_off, exp_bytes,
                               #   orig_type, form)]
+    OWNER_TAG_WORK = []       # 14z-85: [(tenant, src_addr, span, exp_bytes,
+                              #   type, form)] — the 59-75 detour worklist
+    OWNER_TAG_STAMPERS = {}   # type -> {tenant names with stamp sites}
+    OWNER_TAG_THUNKS = {}     # (tenant, exp_bytes) -> placed thunk address
+    OWNER_TAG_MAP = []        # rows for patch/tag_map.json (gates + atlas)
     if len(_tenant_list) >= 2:
         _tnames = [t.get("name") for t in _tenant_list]
         if None in _tnames or len(set(_tnames)) != len(_tnames):
@@ -1698,6 +1742,86 @@ def main():
                             fail.append(
                                 f"{_sect} at 0x{_ra:06X} overlaps the "
                                 f"type-stamp rewrite span 0x{_lo:06X}-"
+                                f"0x{_hi:06X} ({_tn}) — resolve the "
+                                f"collision explicitly")
+
+        # ── 14z-85: OWNER-TAG derivation for the 0x54470 family (59-75) ──────
+        # Same shape as the renumber pass above: placement-independent inputs
+        # (frozen inventory + regions.json), derived pre-loop, EMPTY at N=1 by
+        # construction (this whole block is inside the >= 2 gate) — the solo
+        # fingerprints stay bit-identical. Every declaring tenant's family
+        # stamp site is detoured (in-loop, beside the renumber rewrite) so a
+        # fresh family object ALWAYS carries its stamper's tag — including
+        # tenants that stamp a type whose handler they do not place (dead
+        # paths today; their spawn would tripwire under its OWN tag instead
+        # of silently running a stale one).
+        _tag_rows = [r for r in port.get("obj_hook", [])
+                     if _int(r["site"]) == OWNER_TAG_SITE]
+        if _tag_rows:
+            if not args.type_stamps.is_file():
+                raise SystemExit(
+                    f"gen_donovan_patch: multi-tenant build with obj_hook "
+                    f"site {OWNER_TAG_SITE:#x} needs the frozen type-stamp "
+                    f"inventory ({args.type_stamps}) — the owner-tag pass "
+                    f"detours every frozen 59-75 stamp site (14z-85)")
+            _inv2 = load_type_stamps(args.type_stamps)
+            _src_sets2 = {t["src_set"] for t in _tenant_list}
+            if len(_src_sets2) != 1:
+                raise SystemExit("gen_donovan_patch: owner-tag assumes one "
+                                 "shared src_set; got %s" % _src_sets2)
+            _src_img2 = (root / f"build/out/{_tenant_list[0]['src_set']}"
+                                f"_opcodes.bin").read_bytes()
+            for _row in _inv2:
+                if _row["_kind"] != "stamp":
+                    continue
+                _sa = int(_row["src_addr"], 0)
+                _ty = int(_row["type"], 0)
+                if _ty not in OWNER_TAG_TYPES:
+                    continue
+                _fm = _row["form"]
+                if _fm not in _STAMP_FORMS:
+                    raise SystemExit(
+                        f"gen_donovan_patch: frozen stamp 0x{_sa:06X} has "
+                        f"unhandled form {_fm!r} — extend _STAMP_FORMS "
+                        f"deliberately, never skip (a skipped stamp spawns "
+                        f"UNTAGGED family objects that tripwire at dispatch)")
+                if _fm == "stamp_b_d16" and int(_row.get("d16", "0"), 0) != 2:
+                    continue   # +0x03 owner/substate writes are not stamps
+                _span, _ttoff = _STAMP_FORMS[_fm]
+                if _span != 6:
+                    raise SystemExit(
+                        f"gen_donovan_patch: owner-tag stamp 0x{_sa:06X} "
+                        f"form {_fm} span {_span} != 6 — the jsr detour "
+                        f"replaces exactly 6 bytes; extend deliberately")
+                _exp = _src_img2[_sa:_sa + _span]
+                _imm = int(_row["imm"], 0)
+                _imm_bytes = _imm.to_bytes(4, "big") if _fm.startswith(
+                    "stamp_l") else _imm.to_bytes(2, "big")
+                if _imm_bytes not in _exp:
+                    raise SystemExit(
+                        f"gen_donovan_patch: frozen stamp 0x{_sa:06X} imm "
+                        f"{_imm:#x} not present in source bytes "
+                        f"{_exp.hex()} — inventory vs image drift")
+                for _tn in _owning_tenants(_sa):
+                    OWNER_TAG_WORK.append((_tn, _sa, _span, _exp, _ty, _fm))
+                    OWNER_TAG_STAMPERS.setdefault(_ty, set()).add(_tn)
+            # overlap backstop, exactly as the renumber's: no port_patch/
+            # imm_poison row may touch a detoured span
+            _tspans = {}
+            for _tn, _sa, _span, _e, _ty, _fm in OWNER_TAG_WORK:
+                _tspans.setdefault((_sa, _sa + _span), _tn)
+            for _sect, _key in (("port_patch", "old_hex"),
+                                ("imm_poison", None)):
+                for _rw in port.get(_sect, []):
+                    if "src_addr" not in _rw:
+                        continue
+                    _ra = _int(_rw["src_addr"])
+                    _rl = len(bytes.fromhex(_rw[_key])) if _key else 4
+                    for (_lo, _hi), _tn in _tspans.items():
+                        if _ra < _hi and _lo < _ra + _rl:
+                            fail.append(
+                                f"{_sect} at 0x{_ra:06X} overlaps the "
+                                f"owner-tag detour span 0x{_lo:06X}-"
                                 f"0x{_hi:06X} ({_tn}) — resolve the "
                                 f"collision explicitly")
 
@@ -2412,6 +2536,62 @@ def main():
                     notes.append(f"# {name}+{_soff:#x}: type_renumber {_fm} "
                                  f"type {_oty} -> {_newt} ({_tn}'s own "
                                  f"number; site {RENUMBER_SITE:#x})")
+
+                # 14z-85: the OWNER-TAG detour. Every frozen 59-75 stamp site
+                # inside THIS tenant's copy of THIS region is replaced (both
+                # family forms are exactly 6 bytes = one jsr <abs.l>) with a
+                # jump to a per-(tenant, instruction) thunk that writes the
+                # tenant's id into the object's tag byte (+OWNER_TAG_OFF,A4 —
+                # A4 is the slot pointer at every family stamp site), then
+                # executes the ORIGINAL stamp LAST (jsr/rts set no flags, so
+                # the site's CCR result is reproduced exactly), then returns.
+                # The stack push happens in TENANT code only — no legacy path
+                # executes these sites, so the bit-exact legacy gate is
+                # untouched by construction. Emits nothing when the worklist
+                # is empty — N=1 stays byte-identical.
+                for _tn, _sa, _span, _exp, _oty, _fm in OWNER_TAG_WORK:
+                    if _tn != T.get("name"):
+                        continue
+                    _soff = _sa - r["src"]
+                    if not (0 <= _soff < r["len"]):
+                        continue
+                    if bytes(blob[_soff:_soff + _span]) != _exp:
+                        fail.append(
+                            f"owner_tag {name}+{_soff:#x} ({_fm} type "
+                            f"{_oty}): bytes "
+                            f"{bytes(blob[_soff:_soff + _span]).hex()} != "
+                            f"source {_exp.hex()} — a prior pass touched a "
+                            f"stamp site; investigate, do not overwrite")
+                        continue
+                    _tk = OWNER_TAG_THUNKS.get((_tn, _exp))
+                    if _tk is None:
+                        _body = (bytes([0x19, 0x7C, 0x00, dst_slot & 0xFF,
+                                        0x00, OWNER_TAG_OFF])  # move.b #id,(d16,A4)
+                                 + _exp                        # original stamp, CCR-last
+                                 + b"\x4e\x75")                # rts
+                        _tk = alloc("a", len(_body),
+                                    f"owner-tag thunk {_tn} {_fm}")
+                        if _tk is None:
+                            fail.append(f"owner_tag: no space for {_tn}'s "
+                                        f"{_fm} thunk")
+                            continue
+                        ops.append({"op": "code", "addr": f"{_tk:#x}",
+                                    "hex": _body.hex()})
+                        notes.append(
+                            f"code   {_tk:#08x} owner-tag thunk ({_tn} id "
+                            f"{dst_slot & 0xFF:#x} -> (+{OWNER_TAG_OFF:#x},"
+                            f"A4), then {_fm} {_exp.hex()}, rts)")
+                        fragments.append((_tk, len(_body), "GEN",
+                                          f"owner-tag thunk {_tn}"))
+                        OWNER_TAG_THUNKS[(_tn, _exp)] = _tk
+                    blob[_soff:_soff + 6] = b"\x4e\xb9" + _tk.to_bytes(4, "big")
+                    notes.append(f"# {name}+{_soff:#x}: owner_tag {_fm} type "
+                                 f"{_oty} -> jsr {_tk:#x} ({_tn} id "
+                                 f"{dst_slot & 0xFF:#x})")
+                    OWNER_TAG_MAP.append(
+                        {"src_addr": _sa, "region": name, "tenant": _tn,
+                         "type": _oty, "form": _fm, "tag": dst_slot & 0xFF,
+                         "thunk": _tk, "tag_write_pc": _tk})
 
                 # data_in_code (14z-66): a small DATA table embedded in a CODE
                 # region placed in the crypt hole is stored re-encrypted, so
@@ -3398,6 +3578,13 @@ def main():
                     # LUCK, not correctness — the note names each one so the
                     # census rig can retire it into a stub.
                     shape = OBJ_HOOK_OWNER_READ.get((site, k))
+                    if (shape is None and site == OWNER_TAG_SITE
+                            and k in OWNER_TAG_STUB_TYPES
+                            and len(_tenant_list) >= 2):
+                        # 14z-85: the ruled owner-tag dispatch (option (a)) —
+                        # the tag was baked at spawn by the detoured stamp
+                        # sites (OWNER_TAG_WORK), so no runtime owner read.
+                        shape = "tag"
                     ids = {t.get("name"): _int(t["dst_slot"])
                            for t in (port.get("_tenants") or [])}
                     newt = None
@@ -3464,6 +3651,21 @@ def main():
                                                   f"obj_hook owner stub "
                                                   f"type {k}"))
                                 newt = sd
+                                if shape == "tag":
+                                    _extra = sorted(
+                                        OWNER_TAG_STAMPERS.get(k, set())
+                                        - {n for _, n in res})
+                                    if _extra:
+                                        notes.append(
+                                            f"#   obj_hook@{site:#x} type "
+                                            f"{k}: stamp sites also exist "
+                                            f"in {', '.join(_extra)} (no "
+                                            f"handler copy placed) — a live "
+                                            f"spawn there would tripwire "
+                                            f"under its OWN tag; solo "
+                                            f"builds already tripwire this "
+                                            f"type for them and playtest "
+                                            f"green (dead paths)")
                     ported += 1
                 elif res:
                     newt = res[0][0]
@@ -5952,6 +6154,12 @@ def main():
             [{"site": s, "index": i, "orig_type": t, "tenant": tn,
               "src_handler": tgt}
              for s, i, t, tn, tgt in TYPE_RENUMBER_ORDER], indent=1))
+    # 14z-85: the owner-tag map — every detoured 59-75 stamp site, its tag
+    # value and its thunk (= the tag-write PC the pool-byte audit asserts
+    # against). Written ONLY when non-empty: single-tenant file sets are
+    # unchanged (the owner-tag pass is empty at N=1 by construction).
+    if OWNER_TAG_MAP:
+        (out / "tag_map.json").write_text(json.dumps(OWNER_TAG_MAP, indent=1))
     # ── program-image extension (Phase C step 2) ─────────────────────────────
     # If any op lands beyond the base 4MB image, the patcher must GROW the
     # image and emit the appended ROM members. The generator is what knows the
