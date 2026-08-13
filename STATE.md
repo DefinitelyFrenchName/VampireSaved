@@ -1,6 +1,50 @@
 # STATE — living progress log
 
-Updated: 2026-08-12 (session 14z-83 — **THE 04 RATIFICATION IS EXECUTED AND
+Updated: 2026-08-13 (session 14z-84 open — **THE FIRST FULL-ROSTER
+PLAYTEST REPORT (maintainer, build/m3b_merged) IS FILED AND TRIAGED; the
+big picture: Donovan/Demitri/Victor/legacy CLEAN incl. midnight-bliss
+transformations, and every defect is tenant-scoped or known-family.**
+The ledger, by class, with the measurements already made:
+**(1) SELECT/VS NAMES + WIN PORTRAITS garbled for H AND P (D clean) —
+ONE MERGED-SPECIFIC CLASS, partially measured:** the select
+record-pointer rows for 0x10/0x11 point at correct per-tenant records in
+wide_ext; the records are byte-identical to solo modulo the correctly
+relocated cptr; the bank-5 art side files are byte-identical to solo.
+Right codes rendering as body-sprite tiles = bank-5 codes drawn from a
+LOWER BANK — prime suspect: the drawer's program-side BANK GATE serves
+tenant 0 only in the merge (the F2 class on the select family; D clean
+because tenant 0's gate works). NEXT: locate the bank-gate emit, probe
+the drawer bank word at hover ($FFB818-class) merged vs solo.
+**(2) H-vs-P STUCK-DIRECTION INPUTS** (one side acts as if holding
+left/right regardless of input; auto-guard measured by the maintainer) —
+merged-specific, in the FIRST-EVER tenant-vs-tenant coverage; gameplay
+defect, co-top priority. Rig: forced-pick H vs P, idle inputs, watch
+both players' input/direction bytes.
+**(3) P SPECIALS EACH RETRIGGER MUSIC** (every special starts a music
+track from its beginning) — suspect his sound-ring/record pointer in the
+merge or ids landing in the vsavj music range (the class test_don_sound
+guards for D; no P sound gate exists). Ring-tap A/B solo pyron21 vs
+merged on 71_pyron_cosmo.
+**(4) BULLETA DF PALETTE WRONG (DF only; she is otherwise clean) — the
+14z-79 class RECURS; STATICALLY EXONERATED in the merge:** no merged op
+touches her block 0x39ACC0-0x39AD5F, and the only palette-window ops
+(3 at 0x3A3Axx) are byte-identical across all four builds. So the
+aliasing is DYNAMIC (dispatch/staging) — A/B a DF rig solo vs merged;
+the KNOWN-OPEN variant_dispatch row 0x10 file is adjacent.
+**(5) P medallion whitens after a 2P hover** — the documented m3a
+known-residual family (row 0x1A doubles as the P2 sword-accent row);
+cosmetic, parked.
+**(6) Phobos 1-frame black flicker at bliss-end/KO** — unconfirmed,
+needs a frame-capture rig (never seen on vanilla characters per the
+maintainer).
+**(7) Piled Hell (DF 623+2K) hitbox** — maintainer investigating the
+expected behavior; hold.
+Also filed: the S5 render gate covers bank-4 bands but no bank-5
+window — a coverage gap to close (would not have caught (1), which is
+program-side, but closes the art half). Read docs/NEXT_SESSION.md
+first.)
+
+Previously: 2026-08-12 (session 14z-83 — **THE 04 RATIFICATION IS EXECUTED AND
 THE MERGED MEASUREMENT IS FULL GREEN — the project's first all-green merged
 run.** The ratified merged-04 expectation (`composite vsavj/masked-v2
 1525,2005,2009,2195 889-1104` — the audit's own proposed line verbatim) is
