@@ -1054,6 +1054,16 @@ tests/audit_pool_free_byte.sh         # REWRITTEN 14z-85 (the 14z-84 version
                                       # write at b8+0x7E covers +0x7F — the
                                       # 14z-84 zero-writes there was a word-
                                       # offset accounting artifact. ~20 min
+tests/audit_fg_damage.sh              # 14z-85e (~5 min, 2 runs): Phobos'
+                                      # EX Final Guardian damage FROZEN at
+                                      # the measured known-open 10 HP (the
+                                      # vs2-parity item; port byte-faithful,
+                                      # power byte 2 both games — the
+                                      # divergence is the per-game scaler).
+                                      # Liveness: the stock decrement must
+                                      # occur (EX-downgrade trap) or the run
+                                      # proves nothing. Re-freeze WITH the
+                                      # vs2 reference when the fix ships
 tests/audit_pyron_ring.sh             # 14z-85, RE-FROZEN 14z-85b (~10 min,
                                       # 4 runs): pyron's merged-vs-solo
                                       # ring-id diff must be EMPTY (the

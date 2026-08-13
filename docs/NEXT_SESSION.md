@@ -76,6 +76,9 @@
 >
 > ## New/changed suite members
 >
+> - tests/audit_fg_damage.sh — NEW 14z-85e: FG damage frozen at the
+>   known-open 10 HP with the stock-decrement liveness control;
+>   re-freeze WITH the vs2 reference when the scaler fix ships.
 > - tests/audit_pyron_ring.sh — merged-vs-solo ring diff frozen EMPTY.
 > - tests/audit_pool_free_byte.sh — REWRITTEN: both pools, pre/post-tag
 >   modes, FORCE_MODE negative control (ground-truthed both directions).
