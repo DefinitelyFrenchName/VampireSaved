@@ -1038,6 +1038,25 @@ tests/test_gfx_collision_gate.sh      # 14z-83 (S1): ground truth for
                                       # path textual lock. Emits
                                       # gfx_written.json (the S2 chain
                                       # ledger). No ROMs, ~1s
+tests/audit_pool_free_byte.sh         # 14z-84: the owner-tag byte (+0x7F of
+                                      # the $FFB800 pool slot) is FREE —
+                                      # census (zero in every live slot) +
+                                      # PC-attributed write tap (zero writes;
+                                      # liveness proven on the busy fields),
+                                      # both tenants. The 59-75 owner-
+                                      # dispatch fix's foundation; EXTEND
+                                      # when the tag ships (+0x7F writes
+                                      # from our stamp sites become
+                                      # expected). ~15 min
+tests/audit_df_gold.sh                # 14z-84: Phobos' DF uploads HIS gold
+                                      # block (live palette RAM vs the
+                                      # build's own placed block) and
+                                      # Bulleta's DF does NOT leak it (the
+                                      # 14z-69p anti-class). Compare on
+                                      # 0x0FFF color bits — the uploader ORs
+                                      # the alpha nibble (v1 compared raw
+                                      # bytes and called a WORKING upload
+                                      # dead). DF-controlled rig. ~10 min
 tests/audit_select_bank_gates.sh      # 14z-84: the merged drawer bank gates
                                       # (name/splash/winquote *_bank_variant
                                       # _id) must gate EVERY declaring

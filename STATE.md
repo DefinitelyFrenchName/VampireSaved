@@ -1,6 +1,41 @@
 # STATE — living progress log
 
-Updated: 2026-08-13 (session 14z-84 open — **THE FIRST FULL-ROSTER
+Updated: 2026-08-13 (session 14z-84 close — **THE FULL-ROSTER PLAYTEST
+CYCLE: seven findings triaged, four CLOSED, one feature SHIPPED, both
+pending rulings RULED AND EXECUTED.** The day in one breath: the
+playtest report triaged (7 findings); the select/VS name + win-portrait
+class root-caused (three movea-head bank gates deduped to tenant 0's
+compare) and FIXED via the displaced-head chain shape —
+field-confirmed; Bulleta's DF closed NOT-A-BUG with pixel-identical
+captures (purple IS Savior's look — the maintainer's VS2 comparison
+error, and the probe-perturbed cross-build A/B gotcha paid en route);
+the trap "silence" closed NOT-A-BUG (proximity-triggered, all three
+variants confirmed); **PHOBOS' OWN DARK FORCE GOLD SHIPPED as
+huitzil-m6 (db4bcd11, build/hui32, tag freeze/huitzil-m6)** — the
+row-0x10 self-supply design (no funnel thunk, no window write), the
+last known-open red (variant_dispatch) GREEN for the first time since
+14z-74, two hard lessons paid (the PC-relative row word needs code_word
+not aux_poke — wild jump + watchdog caught by capture; the
+shared_writes build pins had rotted two freezes — now toml-driven, the
+hitclass backfills surfaced); the merged build rebuilt (bank gates +
+render + census green, gold confirmed end-to-end); the round-end
+flicker rig ran aimed and CANNOT reproduce the event (558 frames,
+brightness-level, parked awaiting the maintainer's recording);
+Pyron's medallion + music confirmed still-present (known classes).
+RULINGS EXECUTED: **merged-11 flicker RATIFIED** → encoded beside 04's,
+legacy audit back to FULL GREEN 14/14 with both merged-specific
+expectations; **59-75 owner-dispatch RULED option (a)** — and its
+foundation MEASURED: the tag lives at +0x7F of the pool slot (1,342
+live-slot census + PC-attributed tap, zero writes both tenants,
+near-candidates disqualified by our own hole_b writes), zero-tag
+tripwire designed in. Suite-captured before close:
+tests/audit_pool_free_byte.sh + tests/audit_df_gold.sh. **NEXT SESSION
+FIRST ACT: the owner-tag generator implementation** — tag emission at
+the frozen stamp-inventory sites, owner_dispatch_stubs on entries
+64-75, the ladder, the ring-tap before/after on Pyron's specials. Read
+docs/NEXT_SESSION.md first.)
+
+Previously: 2026-08-13 (session 14z-84 open — **THE FIRST FULL-ROSTER
 PLAYTEST REPORT (maintainer, build/m3b_merged) IS FILED AND TRIAGED; the
 big picture: Donovan/Demitri/Victor/legacy CLEAN incl. midnight-bliss
 transformations, and every defect is tenant-scoped or known-family.**
