@@ -76,6 +76,24 @@ DEFERRED knowingly: renumbering (the 14z-82 fix for 114-120) is blocked
 here by vs2's own embedded walkers (0x5C602 truncated-table) and the
 hit-class map domain. DESIGN NEEDED — decision brief below.
 
+### Decisions pending (maintainer) — 14z-84 (2): the merged-11 flicker
+### frame from the bank-gate fix
+
+The bank-gate chain fix costs ~2 extra cmpi/bne pairs per drawer call on
+non-matching ids. Measured effect on the merged legacy audit: EXACTLY ONE
+replay moved — `11_pick_donovan` gained ONE flicker frame at 2836 beside
+its ratified window 889-2415 (13/14 others verbatim). BYTE-ATTRIBUTED
+(full-RAM dump-diff at 2836, masked basis): 12 live bytes at
+$FF4064-$FF4071 = fade-staging row 0x0B's slot ($FF3F02 + row*0x20 — the
+same staging-buffer family the masked-v2 windows already cover for the
+medallion rows); vanilla holds the fill pattern, merged fills it one
+frame later. One-frame phase, fully re-convergent (884 clean frames
+after), no gameplay surface — the ratified hook-cycle family, the
+merged-04 mechanism's species. PROPOSED (the audit's own line):
+`composite vsavj/masked-v2 2836 889-2415` as a merged-only override in
+audit_merged_legacy beside 04's. Awaiting ratification; the audit FAILS
+on 11 by design until then.
+
 ### Decisions pending (maintainer) — 14z-84: owner-correct dispatch for
 ### the 59-75 object family on merged builds
 
