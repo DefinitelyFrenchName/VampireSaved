@@ -81,6 +81,34 @@ DEFERRED knowingly: renumbering (the 14z-82 fix for 114-120) is blocked
 here by vs2's own embedded walkers (0x5C602 truncated-table) and the
 hit-class map domain. DESIGN NEEDED — decision brief below.
 
+### 14z-84: Phobos' own DF block (maintainer pull-forward) — design triage
+
+MEASURED CONSTRAINTS, both hard: (1) the resolver window 0x39A900-0x3BA8E0
+contains ZERO padding runs >= 0x80 bytes (scanned on vanilla data view) —
+every byte belongs to something, so a 4-row in-window allocation needs a
+dead-structure provenance hunt with no guaranteed result; (2) the resolver
+(0x2AD82 family) sits in the in-match palette upload path whose funnel
+(0x2AD44) is under the standing never-thunk rule — the 14z-64 permanent
+phase-shift class (Demitri requests ids constantly; a per-request compare
+is the same hazard). DESIGN CHOSEN (mechanism, mine; the LOOK — native
+vs2 gold, src 0x3ABEDC 0x80 bytes — is the ratified goal): the ROW-0x10
+TENANT ROUTINE SELF-UPLOADS — repoint table 0x02A8A4 row 0x10 (currently
+the spurious Bulleta alias 0x004A, the known-open red) at a tenant thunk
+that performs the DF palette upload itself from a gold block placed in
+wide_ext: no funnel touch, no resolver thunk, no window bytes, and
+unreachable by construction for every legacy id (variant row). Also fixes
+the variant_dispatch red row in the same stroke (vs2-native row 0x10 =
+0x0040; ours becomes the tenant routine — OURS-DOES-MORE only where vs2's
+own game does more, which is the gate's licensed direction... verify the
+gate's verdict semantics accept a tenant-scoped routine vs2 lacks, else
+the gate gains a ratified-exception row). NEXT (implementation): disasm
+the seq player's step mechanics (write PCs 0x1433C/0x2AD64/0x2AD78
+measured, ~1 step per 6 frames, 16 words/row) + Bulleta's routine 0x004A
+shape to size the thunk; then manifest rows (only_variant_slot), gates
+(variant_dispatch green, shared_writes: NO new shared-surface writes —
+the block lives in wide_ext), DF pixel A/B (Phobos GOLD, Bulleta still
+purple), and the ladder.
+
 ### Decisions pending (maintainer) — 14z-84 (2): the merged-11 flicker
 ### frame from the bank-gate fix
 
