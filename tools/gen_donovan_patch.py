@@ -561,7 +561,15 @@ OBJ_HOOK_OWNER_READ = {}
 # family types, and every family spawn re-tags.
 OWNER_TAG_SITE = 0x54470
 OWNER_TAG_TYPES = range(59, 76)       # tag emission: the whole family
-OWNER_TAG_STUB_TYPES = range(64, 76)  # owner stubs: the ruled entry range
+# owner stubs (EXTENDED 14z-85c, maintainer-ruled): originally 64-75 (the
+# multi-resolver entries). Now the whole family — a SINGLE-resolver entry
+# whose type is stamped by a NON-resolver tenant (59/61/62/63: donovan's
+# copies, but H and P carry stamp sites in co-ported code — dead paths
+# today, solo builds tripwire them and playtest green) also gets a stub,
+# so a future live spawn tripwires under its OWN tag instead of silently
+# running donovan's copy. Types with no foreign stampers (60: no stamp
+# sites at all) keep the direct pointer.
+OWNER_TAG_STUB_TYPES = range(59, 76)
 OWNER_TAG_OFF = 0x7F                  # slot offset, measured free (14z-85)
 
 
@@ -3564,7 +3572,19 @@ def main():
                 # ONE table has to carry them all.
                 res = resolve_ported_all(tgt)
                 m = resolve_recon(tgt)
-                if len({a for a, _ in res}) > 1:
+                # 14z-85c (maintainer-ruled): a tag stub is warranted when
+                # the entry is MULTI-resolver (64-75: two tenants' copies)
+                # OR when a NON-resolver tenant stamps the type (59/61/62/
+                # 63: donovan's copies, but H/P carry stamp sites in
+                # co-ported code — dead today; a live spawn must tripwire
+                # under its OWN tag, never silently run donovan's copy).
+                _want_tag_stub = (
+                    site == OWNER_TAG_SITE and k in OWNER_TAG_STUB_TYPES
+                    and len(_tenant_list) >= 2 and res
+                    and (len({a for a, _ in res}) > 1
+                         or (OWNER_TAG_STAMPERS.get(k, set())
+                             - {n for _, n in res})))
+                if len({a for a, _ in res}) > 1 or _want_tag_stub:
                     # 14z-81b: MULTI-RESOLVER type — more than one tenant's
                     # view places its handler. With a MEASURED owner-read
                     # (OBJ_HOOK_OWNER_READ) the entry dispatches on the
@@ -3578,9 +3598,7 @@ def main():
                     # LUCK, not correctness — the note names each one so the
                     # census rig can retire it into a stub.
                     shape = OBJ_HOOK_OWNER_READ.get((site, k))
-                    if (shape is None and site == OWNER_TAG_SITE
-                            and k in OWNER_TAG_STUB_TYPES
-                            and len(_tenant_list) >= 2):
+                    if shape is None and _want_tag_stub:
                         # 14z-85: the ruled owner-tag dispatch (option (a)) —
                         # the tag was baked at spawn by the detoured stamp
                         # sites (OWNER_TAG_WORK), so no runtime owner read.

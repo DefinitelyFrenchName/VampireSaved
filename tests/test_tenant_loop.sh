@@ -172,8 +172,13 @@ check_n() {  # check_n <label> <dir> <want ops> <sum of 1-tenant counts>
 # Single-tenant counts above unchanged — the pass is empty at N=1.
 # RE-FROZEN 14z-85b (was 473/667): +1 per declaring tenant — the
 # hui/pyr_sfx_records rows (see FROZEN_1 note above).
-check_n "2 tenants" "$WORK/two"   474 508
-check_n "3 tenants" "$WORK/three" 669 715
+# RE-FROZEN 14z-85c (was 474/669): the 59-63 stub extension (maintainer-
+# ruled). N=3 +8 = 4 donovan-only stubs (59/61/62/63) + 4 tripwires.
+# N=2 (D+H) +16 = 8 stubs + 8 tripwires: the FOREIGN-STAMPER rule fires
+# for 59/61/62/63 (H stamps, D resolves) AND for 65/66/73/75 (D stamps,
+# H resolves) — at N=3 the latter four are multi-resolver anyway.
+check_n "2 tenants" "$WORK/two"   490 508
+check_n "3 tenants" "$WORK/three" 677 715
 
 # ── 3: every tenant's own content is present ────────────────────────────
 # An op count alone cannot tell "both tenants ran" from "tenant 0 ran twice".
@@ -324,7 +329,9 @@ def owner(a):
             return k
     return None
 
-for k, who in {k: "donovan" for k in range(59, 64)}.items():
+# type 60 is the one direct pointer left in the family: no tenant has a
+# stamp site for it, so it keeps donovan's copy without a stub (14z-85c).
+for k, who in {60: "donovan"}.items():
     tgt = int.from_bytes(tbl[k * 4:k * 4 + 4], "big")
     o = owner(tgt)
     if o is None:
@@ -334,15 +341,19 @@ for k, who in {k: "donovan" for k in range(59, 64)}.items():
     if got != who:
         bad.append("type %d resolves into %s's %s, expected %s's"
                    % (k, got, o, who))
-# 14z-85: entries 64-75 are TAG STUBS (owner_dispatch_stub shape "tag" —
-# the ruled option (a)). Per-ENTRY attribution, decoded from the stub's
-# own bytes: each compare id must route to a handler placed in THAT
-# tenant's copy (0x10 -> huitzil's, 0x11 -> pyron's), with one tripwire
-# fall-through for zero/unclaimed tags. A first-wins pointer (the pre-fix
-# shape) fails here because it is not a decodable stub op.
+# 14z-85 (ext. 14z-85c): family entries are TAG STUBS (owner_dispatch_stub
+# shape "tag" — the ruled option (a)). Per-ENTRY attribution, decoded from
+# the stub's own bytes: each compare id must route to a handler placed in
+# THAT tenant's copy, with one tripwire fall-through for zero/unclaimed
+# tags. 59/61/62/63 are donovan-only stubs (single resolver; H/P stamp
+# those types at dead co-ported sites — their tags must tripwire, never
+# silently run donovan's copy). 64-75 are huitzil+pyron stubs. A direct
+# first-wins pointer fails here because it is not a decodable stub op.
 code_at = {int(o["addr"], 16): o["hex"] for o in ops if o["op"] == "code"}
-TAG_OWNER = {0x10: "huitzil", 0x11: "pyron"}
-for k in range(64, 76):
+TAG_OWNER = {0x13: "donovan", 0x10: "huitzil", 0x11: "pyron"}
+EXPECT_IDS = {**{k: [0x13] for k in (59, 61, 62, 63)},
+              **{k: [0x10, 0x11] for k in range(64, 76)}}
+for k, want_ids in EXPECT_IDS.items():
     tgt = int.from_bytes(tbl[k * 4:k * 4 + 4], "big")
     h = code_at.get(tgt)
     if h is None:
@@ -351,10 +362,12 @@ for k in range(64, 76):
     cmp_ids = [int(x, 16) for x in re.findall(r"0c2e00([0-9a-f]{2})007f", h)]
     exits = [int(x, 16) for x in re.findall(r"7000207c([0-9a-f]{8})4ed0", h)]
     tws = re.findall(r"4ef9([0-9a-f]{8})", h)
-    if sorted(cmp_ids) != [0x10, 0x11] or len(exits) != 2 or len(tws) != 1:
-        bad.append("type %d stub %#x does not decode as a 2-tenant tag stub "
-                   "(ids %s, %d exits, %d tripwires)"
-                   % (k, tgt, [hex(i) for i in cmp_ids], len(exits), len(tws)))
+    if sorted(cmp_ids) != want_ids or len(exits) != len(want_ids) \
+            or len(tws) != 1:
+        bad.append("type %d stub %#x does not decode as a %d-tenant tag "
+                   "stub (ids %s, %d exits, %d tripwires)"
+                   % (k, tgt, len(want_ids), [hex(i) for i in cmp_ids],
+                      len(exits), len(tws)))
         continue
     for cid, haddr in zip(cmp_ids, exits):
         o = owner(haddr)
@@ -371,10 +384,11 @@ if still != 3:
 for b in bad:
     print("  FAIL: %s" % b)
 if not bad:
-    print("  ok: %d/%d ported extras placed; types 59-63 in donovan's "
-          "regions; 64-75 are TAG STUBS routing 0x10->huitzil / "
-          "0x11->pyron with a tripwire fall-through (14z-85); 121-123 "
-          "still tripwired" % (n_placed, n_ext))
+    print("  ok: %d/%d ported extras placed; 59/61/62/63 donovan-only TAG "
+          "STUBS, 60 his direct pointer, 64-75 H/P TAG STUBS, every "
+          "compare routed into its owner's copy with a tripwire "
+          "fall-through (14z-85/85c); 121-123 still tripwired"
+          % (n_placed, n_ext))
 sys.exit(1 if bad else 0)
 PY
 
