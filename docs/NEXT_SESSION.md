@@ -1,84 +1,60 @@
-# NEXT SESSION — orientation (written at the close of 14z-84, 2026-08-13)
+# NEXT SESSION — orientation (written at the close of 14z-85, 2026-08-13)
 
 > ## START HERE
 >
-> **FIRST ACT: implement the spawn-time OWNER TAG for the 59-75 object
-> family** (maintainer ruled option (a), 2026-08-13; STATE 14z-84 has
-> the full brief + measurements). This is the last known merged
-> program-behavior defect class — it is what makes Pyron's specials
-> start MUSIC on the merged build (his family-64-75 objects run
-> HUITZIL's handler copies by declaration-order luck; solo builds
-> structurally cannot show it).
+> **THE SPAWN-TIME OWNER TAG SHIPPED AND IS FULLY VERIFIED** (14z-85,
+> the ruled option (a)): obj_hook 64-75 dispatch on the object's
+> spawn-time tag (+0x7F of the **$FF9400** slot — NOT $FFB800, see the
+> corrections below), 80 stamp sites detoured, 12 tag stubs, tripwire
+> silent under 2,046 live family dispatches, solos bit-exact, merged
+> legacy audit 14/14 verbatim.
 >
-> The foundation is MEASURED AND SUITE-CAPTURED:
-> - **The tag byte: +0x7F of the $FFB800 pool slot** — zero values in
->   1,342 live-slot observations AND zero writes (PC-attributed tap,
->   liveness proven), both tenants. Guard:
->   `tests/audit_pool_free_byte.sh` (extend it when the tag ships:
->   +0x7F writes from OUR emitted stamp sites become expected).
->   **[CORRECTED 14z-85, 2026-08-13: WRONG POOL — $FFB800/0x80 is the
->   0x5E542/114-120 family's pool; the 59-75 family lives in
->   $FF9400/0x100 (walker 0x54458). Re-measured there: +0x7F free,
->   804 live-slot obs, zero writes under BYTE-LANE accounting. And the
->   $FFB800 +0x7F "freeness" was itself an artifact — hole_b's word
->   write at +0x7E covers that byte lane.]**
-> - Near-candidates +0x7C/+0x7E are DISQUALIFIED (one write each from
->   our own hole_b code at PC 0x3FFFD6).
+> **FIRST ACT: hand the maintainer the rebuilt merged build for the
+> FULL-SCOPE playtest** (they were waiting on this fix; the Piled Hell
+> hitbox question likely closes with it) **and get the two 14z-85
+> rulings** (STATE "Decisions pending"):
+> 1. **Per-tenant sfx records** — the ACTUAL music-retrigger fix. The
+>    14z-84 "unified mechanism" claim was PARTIALLY WRONG: the ring
+>    inventory is identical before/after the tag. Measured mechanism:
+>    donovan's [[sound_table]] un-stubs the per-node sfx helper
+>    ENGINE-WIDE but repoints only HIS ptr row (0x0BF41A+4*char);
+>    pyron's nodes fire vanilla row 0x11 → music id 0x729 every ~5s.
+>    Recommended (a): pyr/hui record arrays, the don_sfx_records
+>    keep/zero policy, curated tables into docs/project/tables/.
+>    Guard until then: tests/audit_pyron_ring.sh (frozen known-open
+>    diff: cosmo {0x110}; mash {0x110,0x111,0x112,0x31b,0x729}).
+> 2. **Extend tag stubs to 59-63?** Single-resolver (donovan) entries;
+>    H/P stamp those types at dead co-ported sites (solo builds
+>    tripwire them and playtest green). Tags already emitted there;
+>    recommended (a) ~5 stubs at the next op-count re-freeze.
 >
-> The implementation, in order:
-> 1. TAG EMISSION at every frozen stamp-inventory site for types 59-75
->    (`build/manifest/type_stamps.toml` enumerates them; the 14z-82
->    renumber machinery is the precedent — it rewrote stamp immediates,
->    this adds a tag write per site; the two stamp FORMS are documented
->    there). Verify each site's position relative to slot init.
-> 2. OWNER-DISPATCH STUBS on obj_hook entries 64-75, keyed on
->    (0x7F,A4), with a ZERO-TAG TRIPWIRE (an untagged family object = a
->    missed stamp site, loud by design — nothing clears +0x7F, so
->    stale tags in legacy-reused slots are unread but a missing fresh
->    stamp must never dispatch by luck). The stub builder exists and is
->    battle-tested: `owner_dispatch_stub()` (14z-81c; its DISPATCH-TIME
->    OWNER READ approach was withdrawn for two measured timing failure
->    modes — the spawn-time tag avoids both, which is the whole design).
-> 3. THE LADDER: solo fingerprints bit-exact (test_m3a_reproducible —
->    tag rows must be merged-relevant only OR the solos re-freeze;
->    decide deliberately), tenant_loop counts, merged rebuild,
->    audit_merged_vec3 + audit_type_dispatch_range, legacy audit
->    (prebuilt, expect 14/14 with the TWO ratified merged expectations
->    04 + 11), and **the ring-tap on Pyron's specials as the fix's own
->    before/after** (music ids on the current build → correct sfx
->    after; tests/lua/ring_tap.lua + replay pyron/71).
-> 4. Then the maintainer's FULL-SCOPE test (they are waiting for this
->    fix to make it worthwhile) — likely closes the Piled Hell hitbox
->    question too.
+> ## The 14z-85 corrections (read before trusting old pool claims)
 >
-> ## The 14z-84 day (all committed; 8ad4a84..f6fcf59 + close)
+> - The 14z-84 tag census measured the WRONG POOL: $FFB800/0x80 is the
+>   0x5E542/114-120 family's; the 59-75 family lives in
+>   **$FF9400/0x100** (walker 0x54458). Re-measured: +0x7F free there.
+> - The $FFB800 "+0x7F free" was ALSO a word-offset tap artifact —
+>   hole_b writes a word at +0x7E covering byte +0x7F. **Bucket write
+>   taps by BYTE LANE** (GOTCHAS, platform).
 >
-> Seven playtest findings triaged: the select/VS name + win-portrait
-> class ROOT-CAUSED AND FIXED (displaced-head chain shape; the three
-> movea-head bank gates were deduping to tenant 0's compare) —
-> field-confirmed; Bulleta DF closed NOT-A-BUG (purple IS Savior; VS2
-> comparison error; probe-free cross-build A/B gotcha paid); trap
-> "silence" closed NOT-A-BUG (proximity-triggered, maintainer-confirmed
-> all three variants); **PHOBOS' DF GOLD SHIPPED (huitzil-m6, db4bcd11,
-> build/hui32, tag freeze/huitzil-m6)** — variant_dispatch GREEN first
-> time since 14z-74; two lessons paid (PC-relative table words need
-> code_word, not aux_poke — watchdog reset caught by capture; the
-> shared_writes pins had rotted two freezes — now toml-driven, hitclass
-> backfills surfaced); merged-11 flicker RATIFIED + encoded → legacy
-> audit FULL GREEN 14/14; the flicker rig cannot reproduce the
-> round-end event (558 frames, brightness-level — parked awaiting the
-> maintainer's recording).
+> ## What shipped (all committed, d567b79..HEAD)
 >
-> New suite members this session: audit_select_bank_gates,
-> audit_pool_free_byte, audit_df_gold (the shipped gold's guard;
-> its first version compared raw bytes and called a working upload
-> dead — the uploader ORs the alpha nibble; compare 0x0FFF-masked).
+> - gen_donovan_patch: owner-tag pass (renumber-pass pattern, N>=2
+>   gated, empty at N=1 — solos verified bit-exact), shape "tag" in
+>   owner_dispatch_stub, tag_map.json side file.
+> - Gates: tenant_loop 473/667 re-frozen + §4b decodes stubs per entry;
+>   667 pins in build_merged/audit_merged_legacy; audit_pool_free_byte
+>   REWRITTEN (both pools, pre/post-tag modes, FORCE_MODE negative
+>   control — ground-truthed BOTH directions); dispatch-range §4-6
+>   (0x54470 liveness + tripwire silence); NEW audit_pyron_ring.
+> - Ladder: ALL GREEN end to end incl. legacy 14/14 (ratified 04+11).
+> - Evidence: build/owner_tag_evidence/ (before/after ring traces).
 
 ## Current builds (registry)
 
 | build | set | fingerprint |
 |---|---|---|
-| build/m3b_merged | UNREGISTERED (pending full-scope test + freeze) | 3cf7541a this build |
+| build/m3b_merged | UNREGISTERED (pending full-scope test + freeze) | 517feab1 this build (667 ops, owner tag) |
 | build/m5_wide | donovan-m3a | 4b7d0dc7 |
 | build/hui32 | **huitzil-m6** | db4bcd11 |
 | build/pyron21 | **pyron-m3** | 6c7f7322 |
@@ -86,19 +62,16 @@
 
 ## Still open (the short list)
 
-- **Pyron merged music/handlers** — the owner-tag arc above IS the fix.
-  **[CORRECTED 14z-85: the HANDLER half yes (shipped, verified); the
-  MUSIC half no — it is the per-node sfx helper class (donovan's
-  sound_table un-stubs it engine-wide; pyron/huitzil ptr rows are not
-  repointed). Needs per-tenant sfx-record rows; decisions-pending.]**
-- Pyron's medallion whitening on 2P hover (the documented row-0x1A
-  residual family; belongs with proper palette-row design work).
+- **Per-tenant sfx records** (music retrigger — ruling pending, brief
+  above; co-top with the full-scope test).
+- 59-63 stub extension (ruling pending, cheap).
+- Pyron's medallion whitening on 2P hover (row-0x1A family; palette-row
+  design work).
 - Phobos EX damage-data suspicion (maintainer will name move+numbers;
   rig = the native-vs2 damage-table A/B).
 - H-vs-P stuck-direction (maintainer testing FBNeo leg; ~1/30, also vs
   legacy opponents — possibly emulator-side).
-- Round-end flicker (parked; needs the maintainer's recording for a
-  frame window; post-round only, not a blocker).
+- Round-end flicker (parked; needs the maintainer's recording).
 - The win-screen QUOTE (both tenants); pyron win-laugh distortion
   (M5-family); select medallions polish; region_space re-freeze
   (maintainer); op-tagging for test_shared_writes; the 14z-83 parked
@@ -108,10 +81,12 @@
 
 ```sh
 export ROMDIR=/path/to/reference/sets
-tools/build_merged.sh build/m3b_merged     # ~15 min (597-op fixture)
+tools/build_merged.sh build/m3b_merged     # ~15 min (667-op fixture)
+tests/test_tenant_loop.sh                  # generator gate (473/667)
 tests/test_m3a_reproducible.sh             # ~6 min (all four refs)
-tests/audit_df_gold.sh                     # ~10 min (the gold guard)
-tests/audit_pool_free_byte.sh              # ~15 min (the tag byte)
+tests/audit_type_dispatch_range.sh build/m3b_merged   # ~15 min, §0-6
+tests/audit_pool_free_byte.sh              # ~20 min (post-tag mode)
+tests/audit_pyron_ring.sh                  # ~10 min (known-open frozen)
 MERGED_OUT=build/m3b_merged MERGED_PREBUILT=1 \
-  tests/audit_merged_legacy.sh             # ~45 min: FULL GREEN 14/14
+  tests/audit_merged_legacy.sh             # ~45 min: 14/14
 ```

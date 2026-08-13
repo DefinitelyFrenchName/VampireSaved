@@ -168,7 +168,8 @@ corrected in the 14z-79 stale-doc sweep.)
 garble, kept as evidence — do not playtest it. `tools/audit_romset_identity.py
 build/m5w/rompath` names its four shadowed members in a second.
 **`build/m3b_merged` is the MERGED BUILD WITH GFX** (14z-83 S4,
-`tools/build_merged.sh`): the 593-op 3-tenant program image + the S2 gfx
+`tools/build_merged.sh`): the 667-op 3-tenant program image (14z-85 owner
+tag; was 593 pre-14z-84, 597 pre-14z-85) + the S2 gfx
 chain (D → H → P, last link's members packed, group B pristine). The
 FIRST artifact where all 18 characters have both code and art.
 UNREGISTERED until the S6 freeze decision — run_suite refuses it, and it
@@ -562,15 +563,19 @@ tests/audit_trap_sound.sh             # 14z-82d (~10 min, 2 runs): the MK
                                       # three variants). Not covered here; was
                                       # filed as a KNOWN-OPEN this audit does
                                       # not cover (M5-family)
-tests/audit_type_dispatch_range.sh    # 14z-82 (~8 min, 4 guarded runs): on the
-                                      # MERGED build, ZERO obj_hook dispatches
-                                      # in the ORIGINAL 114-119 range during
+tests/audit_type_dispatch_range.sh    # 14z-82, EXTENDED 14z-85 (~15 min, 7
+                                      # guarded runs): on the MERGED build,
+                                      # ZERO obj_hook dispatches in the
+                                      # ORIGINAL 114-119 range during
                                       # hui/pyron replays (a census-missed
                                       # stamp would land there), renumbered
                                       # range LIVE for huitzil, originals still
                                       # serving donovan; verdict control sees
                                       # originals on the ref build. Reads
-                                      # type_map.json
+                                      # type_map.json. 14z-85 §4-6: 0x54470
+                                      # family (59-75) dispatch LIVE on H+P
+                                      # legs with the tag-stub tripwire
+                                      # SILENT; solo verdict control
 tests/audit_phase_mode_cost.sh        # 14z-77: what Phobos' phase-gated latch
                                       # costs Donovan — the maintainer's ratified
                                       # condition for adopting it in the merge.
@@ -1052,6 +1057,15 @@ tests/audit_pool_free_byte.sh         # REWRITTEN 14z-85 (the 14z-84 version
                                       # write at b8+0x7E covers +0x7F — the
                                       # 14z-84 zero-writes there was a word-
                                       # offset accounting artifact. ~20 min
+tests/audit_pyron_ring.sh             # 14z-85 (~10 min, 4 runs): pyron's
+                                      # merged-vs-solo ring-id diff must equal
+                                      # the FROZEN known-open inventory (the
+                                      # per-node sfx helper class — donovan's
+                                      # sound_table un-stubs it engine-wide,
+                                      # pyron/hui ptr rows not repointed;
+                                      # music 0x729 + 4 ids). Drift or a
+                                      # missing solo id FAILS. Re-freeze to
+                                      # empty when per-tenant sfx records ship
 tests/audit_df_gold.sh                # 14z-84: Phobos' DF uploads HIS gold
                                       # block (live palette RAM vs the
                                       # build's own placed block) and

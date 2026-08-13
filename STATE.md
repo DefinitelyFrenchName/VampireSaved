@@ -1,6 +1,49 @@
 # STATE — living progress log
 
-Updated: 2026-08-13 (session 14z-84 close — **THE FULL-ROSTER PLAYTEST
+Updated: 2026-08-13 (session 14z-85 close — **THE SPAWN-TIME OWNER TAG
+SHIPPED AND FULLY VERIFIED (maintainer option (a), the prescribed first
+act), with two measurement corrections en route and one mechanism
+re-attribution.** The arc: (1) the 14z-84 free-byte census was caught
+measuring the WRONG POOL before anything was emitted — walker 0x54458
+decoded: the 59-75 family lives in $FF9400/0x100-stride, not
+$FFB800/0x80; re-measured there, +0x7F IS free (804 live-slot obs, zero
+writes, byte-lane accounting, live family content types 0x42/0x45); and
+the $FFB800 "freeness" was itself a WORD-OFFSET tap artifact (hole_b's
+word at +0x7E covers byte +0x7F — a tag there would have been clobbered
+by our own code); both retractions grep-swept, two GOTCHAS filed.
+(2) THE IMPLEMENTATION (gen_donovan_patch, renumber-pass pattern, N>=2
+gated): 80 stamp-site detours (D9/H40/P31, 6-byte jsr, full-span
+old-verified) through 46 memoized tag thunks (tag write then ORIGINAL
+stamp CCR-last), 12 tag stubs on obj_hook 64-75 (`cmpi.b #id,(0x7F,A6)`
+per resolver, zero/unclaimed tag → tripwire), tag_map.json side file;
+solos bit-exact BY CONSTRUCTION and verified (all four frozen
+fingerprints reproduce). (3) THE LADDER, ALL GREEN: tenant_loop
+re-frozen 473/667 with §4b decoding the stubs per entry + 5 verdict
+controls; merged rebuilt (667 ops); vec3 GREEN; dispatch-range §0-6 —
+2,046 stubbed family dispatches on pyron's mash leg, TRIPWIRE SILENT;
+pool audit post-tag mode GREEN (293/293 family live-slot obs carry the
+stamper's tag, writer PCs == the emitted thunks) with the forced-pre
+negative control failing both directions; merged legacy audit PASS
+(leg a verbatim incl. ratified 04+11). (4) THE RE-ATTRIBUTION: the ring
+inventory on pyron's replays is IDENTICAL before/after the tag — the
+MUSIC retrigger is NOT the 64-75 dispatch defect. Root-caused the same
+session: donovan's [[sound_table]] un-stubs the per-node sfx helper
+(vs2 0x5122 → vsavj 0x4CE2) ENGINE-WIDE but repoints only HIS per-char
+ptr row (0x0BF41A+4*char); pyron's nodes fire through vanilla row 0x11
+— wrong records, incl. vsavj MUSIC track 0x729 (x6/mash leg). Solo
+pyron: helper stubbed, silent (so solo is missing his node sfx too —
+same class). Confounders eliminated (P2=0x0E both builds, ring stream
+frame-locked otherwise). 14z-84 finding (3)'s unified-mechanism claim
+PARTIALLY RETRACTED in place. New gate audit_pyron_ring.sh freezes the
+known-open inventory (drift fails). Suite: audit_pool_free_byte
+REWRITTEN (both pools, pre/post-tag modes, FORCE_MODE control).
+DECISIONS PENDING (2, briefs below): per-tenant sfx records — the
+actual music fix; the 59-63 stub extension. **NEXT SESSION FIRST ACT:
+the maintainer's FULL-SCOPE playtest on the rebuilt merged build (the
+owner tag was what they were waiting for; Piled Hell hitbox check rides
+it) + the two rulings.** Read docs/NEXT_SESSION.md first.)
+
+Previously: 2026-08-13 (session 14z-84 close — **THE FULL-ROSTER PLAYTEST
 CYCLE: seven findings triaged, four CLOSED, one feature SHIPPED, both
 pending rulings RULED AND EXECUTED.** The day in one breath: the
 playtest report triaged (7 findings); the select/VS name + win-portrait
@@ -131,6 +174,61 @@ shared pools, cross-dispatched). The 0x54470 family (59-75) was
 DEFERRED knowingly: renumbering (the 14z-82 fix for 114-120) is blocked
 here by vs2's own embedded walkers (0x5C602 truncated-table) and the
 hit-class map domain. DESIGN NEEDED — decision brief below.
+
+### Decisions pending (maintainer) — 14z-85 (1): per-tenant sfx records
+### (the ACTUAL music-retrigger fix)
+
+MEASURED MECHANISM (14z-85; full record in the close header + the
+audit_pyron_ring.sh header): donovan's [[sound_table]] row un-stubs the
+engine's per-node sfx helper (vs2 0x5122 → vsavj 0x4CE2) ENGINE-WIDE —
+deliberately, for his own curated don_sfx_records array at per-char ptr
+row 0x13 (0x0BF41A + 4*char). Pyron's and Huitzil's ptr rows (0x11,
+0x10) were never repointed, so on any build carrying donovan's row
+their anim nodes fire through the vanilla vsavj pointers — wrong record
+arrays, measured ids incl. vsavj MUSIC track 0x729 every ~5s of pyron
+play (the maintainer's "specials each retrigger music"). On solo
+H/P builds the helper stays stubbed → their node sfx are silently
+MISSING (same class, other direction). Options:
+(a) RECOMMENDED — PER-TENANT RECORD ARRAYS, the donovan precedent
+    verbatim: extract vs2's record arrays for chars 0x10/0x11, curate
+    with the SAME policy (keep ids that exist as sfx in vsavj; ZERO
+    music-range 0x700-0x7FF and absent-sample ids — the engine skips
+    id==0), place in wide_ext, poke ptr rows 0x10/0x11. The curated
+    tables land in docs/project/tables/ for review (Rule 5 — this is
+    player-audible data, hence the ruling request). audit_pyron_ring
+    re-freezes to empty diff; a hui twin gate gets added.
+(b) Gate the helper per char id (only 0x13 uses it): smallest change,
+    but PERMANENTLY silences H/P node sfx that vs2 plays — a feel
+    regression vs (a), and it still needs a thunk.
+(c) Defer: the merged build keeps retriggering music on P specials —
+    rejected by the playtest report's own filing.
+S-priority: co-top with the full-scope test — it is the last KNOWN
+player-audible merged defect. NOT part of the 14z-84 owner-tag ruling
+(measured: ring inventory identical before/after the tag).
+
+### Decisions pending (maintainer) — 14z-85 (2): extend the tag stubs
+### to entries 59-63?
+
+The ruling covered stubs on 64-75. MEASURED THIS SESSION (resolver ×
+stamper matrix from the frozen inventory + all three regions.json):
+entries 59-63 are SINGLE-resolver (donovan's copies place the
+handlers), but H and P carry stamp sites for types 59/61/62/63 in
+co-ported code. Today those paths are DEAD for H/P (their solo builds
+tripwire 59-63 and playtest green), so on the merged build a
+hypothetical H/P spawn of 59-63 would run DONOVAN's copy silently —
+the same class the tag just fixed, latent. The tags are ALREADY
+EMITTED at those sites (the pass covers 59-75); only stubs are
+missing. Options:
+(a) RECOMMENDED — extend OWNER_TAG_STUB_TYPES to 59-75: ~5 more stubs
+    + tripwires (op counts re-freeze), donovan id joins the compare
+    lists; a dead-path spawn becomes loud-by-tag instead of silently
+    wrong. Cheap, symmetric, closes the class.
+(b) Leave as ruled: 59-63 single-resolver entries stay direct pointers
+    to donovan's copies; the stamper-not-resolver notes in the build
+    log document the latency. Zero cost; the latent path stays silent
+    if it ever wakes.
+Recommendation (a) at the next op-count re-freeze opportunity; not
+urgent (no observed live path).
 
 ### 14z-84: Phobos' own DF block (maintainer pull-forward) — design triage
 

@@ -1897,3 +1897,20 @@ A/B whose verdict is a byte-diff between two builds' dumps runs with
 taps (tap_writes.lua) or plain DUMPS only — never under GUARD_PROBE /
 -debug; if a probe is needed to find an address, find it first, then
 re-run the A/B clean.
+
+## A pool measurement is a claim about ONE pool — decode the walker first (14z-85)
+
+The 14z-84 owner-tag census measured $FFB800 (0x80-stride) and its
+conclusion was carried into the ruling brief as "the tag byte" — but
+the 59-75 family the tag serves lives in $FF9400 (0x100-stride, walker
+head 0x54458 `lea ($1400,A5),A6`, stride `lea ($100,A6),A6`). The two
+pools share a layout family, the same replays exercise both, and the
+census numbers looked healthy — nothing about the measurement itself
+said "wrong pool". What said it: decoding the DISPATCH WALKER's own
+base+stride from the opcode view (two instructions), plus ram.md's
+$FF9400 row and the 14z-82 dynamic census's own $FF94xx stamp
+addresses, all already on record. Before trusting that a slot-level
+fact transfers to a family, decode the family's walker. Re-measured on
+the right pool the byte WAS free — the mechanism survived, but only by
+luck, and the $FFB800 result turned out doubly wrong (see the platform
+byte-lane entry).

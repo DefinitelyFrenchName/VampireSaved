@@ -2785,3 +2785,66 @@ instrument now: leg (a) 13/14 verbatim, leg (b) all six guard-clean
 (pyron/70 END 11017 merged). Decision 2 (Donovan's map[61]/[62]) leaning
 keep-zeros; measured: his sword-companion objects never enter the map in
 his replays (0 entries) — unexercised.
+
+## 14z-85 — the spawn-time OWNER TAG (site 0x54470's 59-75 family; maintainer option (a))
+
+The last known merged program-behavior defect class: obj_hook union
+entries 64-75 served every tenant through HUITZIL's copies by
+declaration-order luck (huitzil declares before pyron). Ruled option (a)
+2026-08-13; implemented and verified this session.
+
+**Every byte, and why:**
+
+- **80 stamp-site detours** (blob edits, 0 ops): every frozen 59-75
+  stamp row (`build/manifest/type_stamps.toml`; d16==2 only; both
+  family forms are exactly 6 bytes) in every declaring tenant's copy —
+  donovan 9, huitzil 40, pyron 31 — has its 6-byte stamp instruction
+  replaced by `jsr <thunk>` (`4EB9 xxxxxxxx`), full source span
+  old-verified before the write (the type_renumber discipline).
+- **46 tag thunks** (code ops, alloc chain → wide_ext; memoized per
+  (tenant, original-instruction)): `move.b #tenant_id,(0x7F,A4)`
+  (`197C 00id 007F`) + the ORIGINAL stamp instruction (CCR-LAST — jsr/
+  rts set no flags, so the site's flag result is reproduced exactly) +
+  `rts`. A4 = the slot pointer at every family stamp site (all 41
+  inventory rows). The jsr push is tenant-code-only; no legacy path
+  executes these sites.
+- **12 tag stubs** on entries 64-75 (+12 tripwire ops):
+  `owner_dispatch_stub` shape `"tag"` — per resolving tenant
+  `cmpi.b #id,(0x7F,A6); beq.s exit_i` (A6 = object at the walker's
+  dispatch, per the measured 14z-81b entry contract), fall-through
+  `jmp <tripwire>` (zero tag = a stamp site the emission missed, LOUD;
+  unclaimed tag = same). Exits re-establish vanilla handler entry state
+  (`moveq #0,d0; movea.l #handler,a0; jmp (a0)`).
+- **The tag byte: +0x7F of the $FF9400 slot** (0x100 stride, walker
+  0x54458). Measured free THIS session: 804 live-slot observations,
+  zero +0x7F writes across 19,357 tapped pool writes under BYTE-LANE
+  accounting, three legs with live family content (types 0x42/0x45).
+  The 14z-84 census had measured the WRONG POOL ($FFB800 = the
+  0x5E542/114-120 family's) — retracted in place; and its "+0x7F free"
+  was itself a word-offset accounting artifact (hole_b writes a word at
+  b8+0x7E covering byte +0x7F). A tag there would have been clobbered.
+- **Scope**: stubs on 64-75 exactly as ruled. Entries 59-63 are
+  single-resolver (donovan's copies) — H/P stamp those types at
+  (currently dead) shared sites; their tags emit anyway so any future
+  live spawn tripwires under its own tag. Stamper-not-resolver cases
+  (donovan stamps 65/66/73/75, places no handler) are printed notes,
+  not errors — solo builds already tripwire those types for him and
+  playtest green.
+- **N=1 inert by construction** (the `len(_tenant_list) >= 2` gate):
+  all four frozen solo references rebuild bit-exact
+  (4b7d0dc7/6c93cfa8/db4bcd11/6c7f7322). Side file `tag_map.json`
+  (only when non-empty) carries site/tenant/tag/thunk rows = the
+  writer PCs the pool audit asserts.
+
+**Measured green:** tenant_loop 473/667 (re-frozen; §4b decodes the
+stubs per entry) + 5 verdict controls; dispatch-range §0-6 ALL PASS —
+2,046 stubbed family dispatches on pyron's mash leg, tripwire SILENT,
+0x54470 family visible on the solo control; vec3 GREEN; pool audit
+post-tag mode GREEN (293/293 family live-slot obs carry the stamper's
+tag; +0x7F writer PCs == the emitted thunks; forced-pre negative
+control fails both directions); merged legacy audit 14/14 (04+11
+ratified expectations).
+
+**What the fix did NOT change (measured, own before/after):** the ring
+inventory on pyron's replays — the music retrigger is the per-node sfx
+helper class (see the 14z-85 STATE entry), not 64-75 dispatch.

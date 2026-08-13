@@ -157,7 +157,10 @@ Fighter object ($FF8400 P1 / $FF8800 P2):
 - +0x382 char id (the per-char dispatch index — the seq-D head and
   the effect stage-2 record installer both read it).
 
-Effect-piece pool $FFB800-$FFBFFF (0x80-stride slots):
+Effect-piece pool $FFB800-$FFC7FF (32 × 0x80-stride slots; range
+CORRECTED 14z-85 — the walker's own count byte is `move.b #0x20,($B5,A5)`
+= 32 slots, this row used to say $FFBFFF/16 and understated the pool by
+half):
 - +0x00 alive/header (fleet spawner writes 0x01000800),
 - **+0x02 TYPE byte** — the pool walker 0x5E52A's dispatch index
   (`move.b (2,a6),d0; *4` into the table at 0x5E556); written by header
@@ -174,7 +177,27 @@ Effect-piece pool $FFB800-$FFBFFF (0x80-stride slots):
 - +0x18 bank word (fleet spawner inits 0; the subtype's first tick
   sets the real bank),
 - +0x30 owner link (movea.w-compatible fighter pointer),
-- +0x54 effect id / +0x56 sub-id.
+- +0x54 effect id / +0x56 sub-id,
+- +0x7C-+0x7F: OUR hole_b code writes WORDS at +0x7C/+0x7E (PC
+  0x3FFFD6) — a word at +0x7E covers byte +0x7F, so +0x7F is NOT free
+  on this pool (14z-85; the 14z-84 "free" reading was a word-offset tap
+  accounting artifact).
+
+Projectile pool $FF9400-$FFB3FF (32 × 0x100-stride slots; expanded
+14z-85 from the one-line row above): the 0x54470-site walker's pool
+(head 0x54458: `lea ($1400,A5),A6`, stride `lea ($100,A6),A6`, live
+test `tst.b (A6)`). Same layout family as $FFB800 for the low fields:
+- +0x00 alive (the walker's own liveness test),
+- +0x02 TYPE byte — walker 0x54458's dispatch index into the table at
+  0x54484 (59 vanilla entries; extended 59-75 on tenant builds; the
+  59-75 stamp inventory: build/manifest/type_stamps.toml),
+- **+0x7F OWNER TAG (14z-85, tenant builds only)**: written at spawn by
+  the detoured 59-75 stamp sites (`move.b #tenant_id,(0x7F,A4)` in the
+  tag thunks; tag_map.json lists the writer PCs), read by the obj_hook
+  64-75 tag stubs (`cmpi.b #id,(0x7F,A6)`). Measured free on vanilla
+  paths: 804 live-slot obs, zero writes (byte-lane accounting), 3 legs
+  incl. live family content — tests/audit_pool_free_byte.sh. Nothing
+  clears it; stale tags in reused slots are unread by design.
 
 Local pool $FFC800-$FFCFFF (24 × 0x80-stride slots; 14z-82): walked by
 an embedded dispatcher INSIDE the x088512 span (src 0x8B988 =

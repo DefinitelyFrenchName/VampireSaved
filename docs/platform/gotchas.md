@@ -727,3 +727,21 @@ the tap watched some other object, and the defect's observable moved. A tap
 or probe keyed on an OBJECT SLOT is only meaningful within one emulator's
 run; to cross emulators, key on content (the handler PC, the type byte),
 and treat MAME as the instrument when the finding is frame-addressed.
+
+## A write tap bucketed by WORD OFFSET reads a word's low-byte lane as "never written" (14z-85)
+
+The 68k bus is 16-bit: one `move.w X,(0x7E,An)` is ONE tap callback at
+offset +0x7E — and it writes BYTES +0x7E AND +0x7F. The 14z-84 pool
+free-byte audit bucketed `off % stride` without splitting lanes, so slot
+byte +0x7F read as "zero writes" while our own hole_b code was writing
+it every run (as the low byte of its +0x7E word). A tag byte chosen on
+that evidence would have been silently clobbered.
+
+**The rule: bucket write taps by BYTE LANE.** Split every hit by its
+16-bit mask (`mask & 0xFF00` → byte at off, `mask & 0x00FF` → off+1;
+handle the 32-bit-data defensive case like tap_writes' collect mode),
+and only then histogram. `tests/audit_pool_free_byte.sh` (14z-85
+rewrite) is the worked example. Symmetric hazard on the read side: a
+"nobody writes this byte" claim from a word-bucketed tap is not
+evidence — re-derive with lanes before trusting any freeness claim
+made before 14z-85.
