@@ -1879,3 +1879,21 @@ bytes, all in the $FF7Fxx dead-stack ghost window, zero live state = the
 ratified hook-cycle class, re-freeze licensed. Also paid for twice in
 one day: DUMPS writes land next to CHECKSUM_OUT, so two runs into one
 directory silently clobber the first dump — separate out dirs per leg.
+
+## Cross-build A/B dumps must run PROBE-FREE — debugger overhead lands differently on two different builds (14z-84)
+
+The Bulleta-DF A/B's first run compared vanilla-vs-merged palette RAM
+dumps taken under `GUARD_PROBE=2ad82` (hundreds of logging-breakpoint
+stops on the palette-seq resolver) and found a persistent 23-byte diff in
+row 0x0A — which a probe-free re-run proved to be ZERO. The probe's
+per-stop overhead perturbs frame timing, and on two DIFFERENT BUILDS the
+perturbation lands at different instruction boundaries, phase-shifting a
+palette-seq animation differently per leg: the "diff" was two legs of one
+animation sampled at different steps. This is the `-debug`-timeline
+caveat's cross-build instance (STATE 14z-82c: "debug timelines do NOT
+transfer to checksum timelines"): a probe that is harmless WITHIN one
+leg's measurements still invalidates a CROSS-LEG comparison. Rule: any
+A/B whose verdict is a byte-diff between two builds' dumps runs with
+taps (tap_writes.lua) or plain DUMPS only — never under GUARD_PROBE /
+-debug; if a probe is needed to find an address, find it first, then
+re-run the A/B clean.

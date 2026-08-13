@@ -47,7 +47,12 @@ byte-identical); merged rebuild carries 62/62/50-byte chains gating
 `tests/audit_select_bank_gates.sh`, ground-truthed FAILING on the
 pre-fix image. Merged fingerprint now 02e2302e (moves with generator,
 unregistered). Win-portrait coverage rides the splash-consumer gate by
-hypothesis — the maintainer playtest decides.
+hypothesis — the maintainer playtest decides. **FIELD-CONFIRMED
+(maintainer, 2026-08-13): "problem solved on that build" — select/VS
+names AND win portraits both fixed on 02e2302e; the win portraits do
+ride the splash consumer.** (Maintainer also notes a few further
+possible-incorrects, explicitly NOT regressions — details to follow
+when filed.)
 **(2) H-vs-P STUCK-DIRECTION INPUTS** (one side acts as if holding
 left/right regardless of input; auto-guard measured by the maintainer) —
 merged-specific, in the FIRST-EVER tenant-vs-tenant coverage; gameplay
@@ -125,6 +130,20 @@ touches her block 0x39ACC0-0x39AD5F, and the only palette-window ops
 (3 at 0x3A3Axx) are byte-identical across all four builds. So the
 aliasing is DYNAMIC (dispatch/staging) — A/B a DF rig solo vs merged;
 the KNOWN-OPEN variant_dispatch row 0x10 file is adjacent.
+**MEASURED 14z-84 AND NOT YET REPRODUCED:** clean (probe-free) 4-leg
+A/B, Bulleta-P1 forced into controlled DF ($FF802E=1 asserted): vs
+Victor — palette RAM rows 0-0x1F BYTE-IDENTICAL vanilla-vs-merged at
+f3400/f3500; vs Pyron — only rows 16-19 differ, which are the P2
+OPPONENT'S rows where vanilla-at-id-0x11 renders the alias fold and is
+not a valid oracle; Bulleta's own rows identical. Her row-0x0A write
+stream (palette-seq player 0x2AD78/64 + 0x1433C) is hit-for-hit
+byte-identical across legs. THE RIG DOES NOT REPRODUCE THE SIGHTING —
+repro conditions requested from the maintainer (opponent, side, pick
+path, mode). INSTRUMENT GOTCHA PAID: the first A/B ran under
+GUARD_PROBE and showed a phantom persistent 23-byte row-0x0A diff —
+debugger-probe overhead lands differently on two DIFFERENT BUILDS, so
+cross-build A/B dumps must run probe-free (the -debug-timeline caveat's
+cross-build instance; filed in docs/project/gotchas.md).
 **(5) P medallion whitens after a 2P hover** — the documented m3a
 known-residual family (row 0x1A doubles as the P2 sword-accent row);
 cosmetic, parked.
