@@ -182,6 +182,10 @@ vanilla characters including Buletta" — full-scope test to follow.
 ### Decisions — 14z-84 (2): the merged-11 flicker frame from the
 ### bank-gate fix. **DECIDED (maintainer, 2026-08-13): RATIFIED** —
 ### encoded as the merged-only override beside 04's the same session.
+### EXECUTED TO FULL GREEN the same session: the spec pre-verified
+### against the kept failure log, then the complete legacy audit passed
+### 14/14 on the merged build (AUDIT-EXIT 0) with both ratified
+### merged-specific expectations (04 + 11) in place.
 
 The bank-gate chain fix costs ~2 extra cmpi/bne pairs per drawer call on
 non-matching ids. Measured effect on the merged legacy audit: EXACTLY ONE
