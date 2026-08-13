@@ -87,6 +87,10 @@
 ## Still open (the short list)
 
 - **Pyron merged music/handlers** — the owner-tag arc above IS the fix.
+  **[CORRECTED 14z-85: the HANDLER half yes (shipped, verified); the
+  MUSIC half no — it is the per-node sfx helper class (donovan's
+  sound_table un-stubs it engine-wide; pyron/huitzil ptr rows are not
+  repointed). Needs per-tenant sfx-record rows; decisions-pending.]**
 - Pyron's medallion whitening on 2P hover (the documented row-0x1A
   residual family; belongs with proper palette-row design work).
 - Phobos EX damage-data suspicion (maintainer will name move+numbers;

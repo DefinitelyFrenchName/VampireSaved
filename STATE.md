@@ -106,7 +106,16 @@ character physics and replay 03 never idles; the defect needs an
 idle-tail rig. SUPERSEDED AS A SEPARATE ITEM by the unifying mechanism
 under (3).
 **(3) P SPECIALS EACH RETRIGGER MUSIC — UNIFIED MECHANISM CANDIDATE FOR
-(2)/(3)/(8), CONFIRMED BY THE STANDING RECORD:** obj_hook union entries
+(2)/(3)/(8), CONFIRMED BY THE STANDING RECORD:** [PARTIALLY RETRACTED
+14z-85: the 64-75 dispatch defect below is real and is FIXED (owner
+tag, measured: 2,046 stub dispatches, vec3 green, tripwire silent) —
+but the MUSIC symptom survived the fix unchanged and has its OWN
+measured mechanism: donovan's [[sound_table]] row un-stubs the
+per-node sfx helper (vs2 0x5122 -> vsavj 0x4CE2) ENGINE-WIDE while
+repointing only HIS per-char ptr row (0x0BF41A+4*char, row 0x13);
+pyron's nodes fire through the vanilla row-0x11 pointer — wrong
+records, ids incl. vsavj MUSIC track 0x729. Solo pyron: helper
+stubbed, silent. See the 14z-85 entry + decisions-pending.] obj_hook union entries
 64-75 resolve to HUITZIL's copies by DECLARATION-ORDER LUCK (14z-81c
 "KEPT" note, verbatim: "site 0x54470's types 64-75, whose correctness
 today is DECLARATION-ORDER LUCK (huitzil declares before pyron)"; 14z-80f:

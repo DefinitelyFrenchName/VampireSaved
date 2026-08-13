@@ -1339,13 +1339,40 @@ tenant's region end) and a THIRD pool walker at src 0x8B988
 0x80, with its own LOCAL table at +0x3494 — a separate type numbering
 space (its +0x02 values index 0..~23). Neither sees 114-120 (vanilla's
 own pool separation), so renumbering does not touch them — but any
-0x54470-family (59-75) renumbering would, which is one reason that
-family stays DEFERRED with its FIRST-WINS notes standing.
+0x54470-family (59-75) renumbering would, which is why that family is
+served by the SPAWN-TIME OWNER TAG instead (14z-85, below), never by
+renumbering.
+
+**The 0x54470 family (59-75): the SPAWN-TIME OWNER TAG (14z-85,
+maintainer option (a)).** Renumbering is blocked here by vs2's own
+embedded 0x5C602 walker (truncated table) and the hit-class map's
+64-entry domain, so the merged build routes on a fact baked at spawn:
+every frozen 59-75 stamp site (both forms are exactly 6 bytes) is
+detoured through a `jsr` thunk that writes the stamping tenant's id
+into the object's tag byte — **+0x7F of the $FF9400 slot** (0x100
+stride, walker 0x54458; measured free 14z-85: 804 live-slot obs, zero
+writes under byte-lane accounting) — then executes the original stamp
+CCR-last. obj_hook entries 64-75 are tag stubs (`cmpi.b #id,(0x7F,A6)`
+per resolving tenant); a zero or unclaimed tag falls into a planted
+ILLEGAL — an untagged family object is a stamp site the emission
+missed, loud by design. Nothing clears +0x7F, so stale tags in reused
+slots are unread (stubs run only for family types; every family spawn
+re-tags). Entries 59-63 are single-resolver (donovan's copies) and
+carry no stubs — H/P stamp those types at (currently dead) shared
+sites; their tags are emitted anyway so any future live spawn
+tripwires under its own tag instead of silently running donovan's
+copy. Side file: `patch/tag_map.json`. NOTE the register asymmetry:
+the tag WRITE is `(0x7F,A4)` (A4 = slot pointer at every stamp site);
+the tag READ is `(0x7F,A6)` (A6 = object at walker dispatch).
 
 Dynamic gate: tests/audit_type_dispatch_range.sh — on the merged build,
 ZERO dispatches in the original range [0x1C8,0x1E4) during later
 tenants' replays (a census-missed stamp would land there), renumbered
-range live for Huitzil, originals still serving tenant-0.
+range live for Huitzil, originals still serving tenant-0; and (14z-85)
+0x54470 family dispatch live on H and P legs with the tag-stub
+tripwire SILENT. The tag bytes themselves: tests/audit_pool_free_byte.sh
+(post-tag mode — family slots carry the stamper's tag, +0x7F writer PCs
+are exactly the emitted thunks).
 
 ### The projectile-pool HIT-CLASS map — a second type consumer, bounded at 64 (14z-82b)
 
