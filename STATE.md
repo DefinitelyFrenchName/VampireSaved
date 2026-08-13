@@ -147,7 +147,11 @@ rows purple where vs2's are gold", her block 0x1E-0x21). The merged
 build is FAITHFUL on this item; the "wrong" purple appears to BE vsavj's
 Bulleta DF — the gold memory is the VS2-family look. Captures sent to
 the maintainer; their confirmation decides whether this files as
-not-a-bug (vanilla-faithful) or stays open with a new repro. Caveats
+not-a-bug (vanilla-faithful) or stays open with a new repro.
+**CLOSED NOT-A-BUG (maintainer, 2026-08-13): "You are correct Buletta
+should be purple in Savior, I mistakenly compared to VS2 where she is
+not." The 14z-79 record's purple-vs-gold split named the exact
+confusion.** Caveats
 stated: this capture run could not dump-assert $FF802E
 (snapshot_frames.lua has no DUMPS env) — the identical rig asserted it
 in the three prior runs and the DF aura is visible on screen; the pick
@@ -162,7 +166,16 @@ known-residual family (row 0x1A doubles as the P2 sword-accent row);
 cosmetic, parked.
 **(6) Phobos 1-frame black flicker at bliss-end/KO** — unconfirmed,
 needs a frame-capture rig (never seen on vanilla characters per the
-maintainer).
+maintainer). FIRST SCAN RAN (14z-84): VIDEO_OUT streams over
+hui/70_mash (11,017 frames incl. round ends), solo hui31 AND merged —
+zero recurrences of the boot-black framebuffer checksum in either leg.
+HONEST LIMIT (RH-15): the detector matches EXACT boot-black only and
+never proved it can see an in-game black frame (round fades produced
+zero hits too — they may never reach the boot-black bitmap), so this is
+weak evidence of absence, not clearance. Next iteration needs a
+brightness-level detector over KO-window snapshots, or the maintainer's
+own record/slow-mo confirmation to establish the event exists. Also the
+bliss-end variant (needs a Demitri rig) is uncovered.
 **(7) Piled Hell (DF 623+2K) hitbox** — maintainer investigating the
 expected behavior; hold.
 Also filed: the S5 render gate covers bank-4 bands but no bank-5
