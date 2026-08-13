@@ -18,6 +18,13 @@
 # near. The item this line used to file as KNOWN-OPEN — LK/HK
 # detonations have NO sound and never did — whether that is vs2-faithful
 # needs a native three-strength comparison when the sound arc comes.
+# REOPENED AS A PARITY QUESTION (maintainer, 14z-85e): on NATIVE VS2
+# the detonation sound is SYSTEMATIC, not proximity-gated — the 14z-84
+# closure compared our build against itself. This audit's own facts
+# stand (the id IS enqueued even in 'silent' cases), which points the
+# hypothesis at the ring entry's VOLUME/PAN params (QSound is
+# positional): compare full 16-byte entries near/far, ours vs native
+# vs2. See STATE 14z-85e.
 #
 # Usage: ROMDIR=... tests/audit_trap_sound.sh [builddir]   (~10 min, 2 runs)
 set -eu

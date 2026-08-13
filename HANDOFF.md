@@ -554,12 +554,12 @@ tests/audit_trap_sound.sh             # 14z-82d (~10 min, 2 runs): the MK
                                       # the current huitzil build — locks the
                                       # behavior the (b') fix restored; a
                                       # silent/crashing trap is loud here.
-                                      # LK/HK 'silence' RESOLVED 14z-84:
-                                      # detonation sound is PROXIMITY-
-                                      # triggered (maintainer-confirmed, all
-                                      # three variants). Not covered here; was
-                                      # filed as a KNOWN-OPEN this audit does
-                                      # not cover (M5-family)
+                                      # LK/HK 'silence' RESOLVED 14z-84
+                                      # (proximity-triggered on OUR build),
+                                      # REOPENED 14z-85e as a PARITY item:
+                                      # native VS2 sounds SYSTEMATICALLY —
+                                      # ring-entry volume/pan A/B is the rig
+                                      # (STATE 14z-85e)
 tests/audit_type_dispatch_range.sh    # 14z-82, EXTENDED 14z-85 (~15 min, 7
                                       # guarded runs): on the MERGED build,
                                       # ZERO obj_hook dispatches in the

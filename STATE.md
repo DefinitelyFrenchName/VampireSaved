@@ -467,12 +467,43 @@ vanilla characters including Buletta" — full-scope test to follow.
    proximity-gated by design; the filed silence was traps detonating
    with nobody close. Living copies updated (NEXT_SESSION, HANDOFF's
    audit_trap_sound row, the audit's own header); historical entries
-   stand.
+   stand. **[REOPENED AS A PARITY QUESTION 14z-85e, 2026-08-13: the
+   maintainer's deeper pass compared against NATIVE VS2 — there the
+   detonation sound is SYSTEMATIC, not proximity-gated. "Our build is
+   self-consistently proximity-gated" stands; "that is vs2's design"
+   does NOT — the closure had compared our build against itself (the
+   verify-reports-against-vanilla class). Maintainer: "entirely
+   unprecedented, might point to deeper differences." Hypothesis to
+   test FIRST: QSound is positional — if the detonation's ring-entry
+   volume/pan params are distance-scaled differently on our build
+   (wrong param source, not a missing enqueue: audit_trap_sound
+   already proves 0x049A IS enqueued even in the 'silent' cases),
+   distant detonations would be volume-zero rather than un-triggered.
+   Rig: ring-tap BOTH legs (ours + native-vs2 poke) on the trap
+   replays, compare the FULL 16-byte ring entries (param fields, not
+   just ids) for near and far detonations.]**
 2. **NEW, detail pending: one of Phobos' EX moves may carry wrong
    DAMAGE DATA** (explicitly not animation/sound/feel). Awaiting the
    move name + expected-vs-observed numbers; the rig once named is the
    native-vs2 damage-table A/B (the port_param32/hitbox-family
-   comparison precedents).
+   comparison precedents). **[NAMED AND QUANTIFIED 14z-85e: FINAL
+   GUARDIAN (623+2K). Measured on the merged build (replays
+   71/73_hui_ex_fg, P2 HP $FF8850 — NOTE the fighter structs are
+   $FF8400/$FF8800; +0x50 HP, +0x382 char id — the first rig dumped
+   $FF8BD0 and read zeros): the EX CONNECTS as a multi-hit but deals
+   1-2 HP per tick, ~10 total of 288 (0x120→0x116, 7 ticks, BOTH
+   replays) — the minimum-damage-floor signature: the damage lookup
+   likely returns ZERO and only the chip floor lands. HYPOTHESIS (the
+   f7997 sibling): vsavj's per-hit DAMAGE table is 64-bounded like the
+   hit-class byte map, and FG's hits over-index it into zeros where
+   vs2 has real rows — same class, different consumer. The native-vs2
+   leg formed a match (id poke works, HP live 0x120) but the move
+   WHIFFED — replay input timing does not transfer (known limit);
+   the vs2 reference number needs a retuned native rig. NEXT: probe
+   the HP-decrement writer PC during an FG tick, walk to the damage
+   read, compare the table/index against vs2's — the
+   hitclass_map_extend machinery is the fix precedent if the
+   hypothesis holds.]**
 
 ### Decisions — 14z-84 (2): the merged-11 flicker frame from the
 ### bank-gate fix. **DECIDED (maintainer, 2026-08-13): RATIFIED** —
