@@ -122,10 +122,17 @@ writes = [
 
 [[tenant]]
 name = "huitzil"
-build = "build/hui29"
-count = 59
+build = "build/hui32"
+count = 62
 writes = [
   "0x018460 6 code",
+  # 14z-84 BACKFILL: the hitclass_map_extend site (the ADOPTED 14z-82c
+  # fix, maintainer decision 1 — vsavj's 64-entry projectile hit-class
+  # map extended to vs2's 80). Shipped in huitzil-m4 and -m5 but this
+  # inventory was never regenerated past hui29; its review IS the
+  # adoption record (tests/test_hitclass_map_thunk.sh reconstructs the
+  # body from the ROMs).
+  "0x01a888 6 code",
   "0x01b6aa 6 code",
   "0x021224 8 data",
   "0x02122c 8 data",
@@ -139,6 +146,16 @@ writes = [
   "0x028d4e 2 poke16",
   "0x028d50 2 poke16",
   "0x028d52 2 poke16",
+  # 14z-84 REVIEWED: the DF gold rows (Phobos' own block, maintainer-
+  # ratified design). 0x2a8c4 = table 0x02A8A4 row 0x10's word (the
+  # VARIANT row — legacy never carries an id in 0x10-0x1F,
+  # tests/audit_id_writers.sh) repointed at the trampoline; 0x2a8d6 =
+  # rows 0x19-0x1B's alias words (indexable only by ids 0x19-0x1B,
+  # which cannot occur: id guards + roster) carrying the 6-byte jmp to
+  # the df_gold_variant_id thunk. Both READ-reachable only via ids that
+  # do not exist on any track.
+  "0x02a8c4 2 code",
+  "0x02a8d6 6 code",
   "0x02b598 6 code",
   "0x02b7d8 6 code",
   "0x054470 6 code",
@@ -188,9 +205,13 @@ writes = [
 
 [[tenant]]
 name = "pyron"
-build = "build/pyron20"
-count = 50
+build = "build/pyron21"
+count = 51
 writes = [
+  # 14z-84 BACKFILL: the hitclass_map_extend site (ADOPTED 14z-82c, the
+  # f7997 fix) — shipped in pyron-m3 but this inventory was never
+  # regenerated past pyron20. Review = the adoption record.
+  "0x01a888 6 code",
   "0x021224 8 data",
   "0x02122c 8 data",
   "0x02123c 8 data",

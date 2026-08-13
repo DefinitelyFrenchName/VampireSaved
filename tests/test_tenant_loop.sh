@@ -37,7 +37,7 @@ cd "$REPO"
 ROMDIR="${ROMDIR:?set ROMDIR}"
 
 D_EX=build/m5_wide/extract      # donovan  (the WIDE reference)
-H_EX=build/hui30/extract        # huitzil  (huitzil-m4)
+H_EX=build/hui32/extract        # huitzil  (huitzil-m6)
 P_EX=build/pyron21/extract      # pyron    (pyron-m3)
 
 for e in "$D_EX" "$H_EX" "$P_EX"; do
@@ -106,7 +106,7 @@ echo "== 1: one tenant per run — the frozen op counts =="
 # site_thunk adds exactly TWO ops (body + site jmp) to each declaring
 # build — huitzil and pyron declare it, donovan does not (his types fit
 # the vanilla map).
-FROZEN_1="donovan:243 huitzil:261 pyron:207"
+FROZEN_1="donovan:243 huitzil:265 pyron:207"
 for row in $FROZEN_1; do
     who="${row%%:*}"; want="${row##*:}"
     case "$who" in donovan) ex="$D_EX" ;; huitzil) ex="$H_EX" ;; *) ex="$P_EX" ;; esac
@@ -128,7 +128,7 @@ done
 # The load-bearing question. A loop that ran once would produce Donovan's
 # 243 ops here; a loop that ran twice against tenant 0's data would produce
 # 243 twice over. The counts are frozen, and so is the DEDUP they imply:
-# 243 + 261 = 504 declared, 439 emitted (14z-82c). The gap is four things and all of
+# 243 + 265 = 508 declared, 443 emitted (14z-84: +4 huitzil ops — the DF gold thunk, its data block, the trampoline site and the row code_word). The gap is four things and all of
 # them are checked below: rows recognised as SHARED and emitted once (the
 # iteration gate), tripwire ops no longer needed because the engine union
 # resolves Huitzil's handlers (4b), agreeing duplicate ops dropped (4c), and
@@ -159,8 +159,8 @@ check_n() {  # check_n <label> <dir> <want ops> <sum of 1-tenant counts>
 # into tenant-0's handler). The shim itself and the dispatch-row pokes
 # rebalance to the same count; the 12 renumbered obj_hook entries grow the
 # TABLE op's hex, not the op count. Single-tenant counts above unchanged.
-check_n "2 tenants" "$WORK/two"   439 504
-check_n "3 tenants" "$WORK/three" 593 711
+check_n "2 tenants" "$WORK/two"   443 508
+check_n "3 tenants" "$WORK/three" 597 715
 
 # ── 3: every tenant's own content is present ────────────────────────────
 # An op count alone cannot tell "both tenants ran" from "tenant 0 ran twice".

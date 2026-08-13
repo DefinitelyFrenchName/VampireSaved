@@ -1,5 +1,50 @@
 # patch_notes — per-change detail: every byte, and why
 
+## 14z-84 — Phobos' own Dark Force palette block (huitzil-m5 -> m6): byte detail
+
+**Why (maintainer pull-forward, design ratified 2026-08-13):** the proper
+fix the 14z-79 withdrawal deferred. His DF was purple because table
+`0x02A8A4` row 0x10 ALIASES row 0x00 — Bulleta's routine (0x2A8EE),
+which requests HER seq ids `0x1E + step + side*4`. vs2's own row 0x10 is
+the bare default; his native gold arrives by a vs2-only path (ids
+0x5A5-family reaching 0x3ABEDC through the vs2 resolver's SIGNED lea
+wrap below its base 0x3B0A3C — an addressing subtlety worth keeping).
+
+**`code_word df_seq_entry_10`** — 2 bytes: table row 0x10's word
+(`0x2A8C4`) `004a` -> `0032`, pointing dispatch at `0x2A8A4+0x32 =
+0x2A8D6`. MUST be a code op: the dispatcher reads the table
+PC-RELATIVELY (opcode view). The first attempt used aux_poke (data
+view); the stored 0x0032 DECRYPTED to 0x56EA — a wild jump and a
+watchdog reset on his first palette tick, caught by a boot-screen
+capture at f3420 and a byte read of the built image.
+
+**`site_thunk df_gold_variant_id` site** — 6 bytes at `0x2A8D6`
+(`004000e40124` = rows 0x19-0x1B's alias words -> `jmp <thunk>`). Those
+slots are indexable only by ids 0x19-0x1B, which no track produces
+(audit_id_writers; id guards refuse 0x12/0x18; roster = 0x10/0x11/0x13).
+Reviewed shared-surface writes (shared_writes.toml, H count 59 -> 62
+incl. the 14z-82c hitclass backfill this review surfaced).
+
+**The thunk body** — 0x54 bytes in hole_a: Bulleta's routine TRANSCRIBED
+(the beam_list_type6 discipline) with exactly: far pc-rel branches ->
+abs `jmp/jsr 0x2ADAC` (the vanilla changed-path); the `0x2A7E0` skip ->
+a local rts (that target IS rts); the base add `addi.w #$1e,d0 /
+bra 0x2AD82` -> `lsl.w #5,d0; movea.l #gold,a0; adda.w d0,a0;
+jmp 0x2AD3C` — the resolver's own computation against OUR block,
+entering the shared uploader exactly as every vanilla requester does.
+No funnel thunk (the 0x2AD44 never-thunk rule; a resolver compare is
+the 14z-64 permanent-phase class), no resolver-window write (the window
+has ZERO padding — measured).
+
+**The gold block** — 0x100 bytes placed in wide_ext via `data_subst`:
+vs2 `0x3ABEDC` (P1 rows) + `0x3ABF5C` (P2 rows — the `$381(a6)` side
+term), vh2 twin `0x38BEB0+0x100` byte-identical (the sibling oracle).
+
+**Gates:** `test_variant_dispatch` GREEN for the first time since 14z-74
+(the designed-row licence is exact: only 0x0032 at that row passes);
+`tenant_loop` re-frozen 265/443/597 (+4 H ops); screen captures — Phobos
+GOLD in DF, Bulleta still purple on the same build.
+
 ## 14z-83 S3 — the beam-strip relocation (huitzil-m4 -> m5): byte detail
 
 **Why (maintainer-approved 2026-08-12):** the S0 merged group-C census

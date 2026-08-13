@@ -76,7 +76,7 @@ BASE_LOGS="tests/expected/vsavj/masked-v2/logs"
 # test_m3a_reproducible.sh re-extracts and all four fingerprints are
 # bit-exact, so these dirs ARE the fresh-extraction bytes).
 D_EX="build/m5_wide/extract"
-H_EX="build/hui30/extract"
+H_EX="build/hui32/extract"
 P_EX="build/pyron21/extract"
 
 missing=""
@@ -169,8 +169,8 @@ if [ "$PREBUILT" = 1 ]; then
     [ -f "$OUT/patch/patch.json" ] || {
         echo "FAIL: MERGED_PREBUILT=1 but no $OUT/patch/patch.json"; exit 1; }
     NOPS="$(python3 -c "import json;print(len(json.load(open('$OUT/patch/patch.json'))['ops']))")"
-    [ "$NOPS" = 593 ] || { echo "FAIL: $NOPS ops, frozen fixture is 593"; exit 1; }
-    echo "  ok: 593 ops (the frozen test_tenant_loop fixture)"
+    [ "$NOPS" = 597 ] || { echo "FAIL: $NOPS ops, frozen fixture is 597"; exit 1; }
+    echo "  ok: 597 ops (the frozen test_tenant_loop fixture)"
     python3 tools/audit_romset_identity.py "$OUT/rompath" || {
         echo "  FAIL: member-identity audit"; exit 1; }
     FP="$(python3 tools/build_fingerprint.py "$OUT/rompath;$ROMDIR" --set vsavjw --sha-only || true)"
@@ -195,10 +195,10 @@ NOPS="$(python3 -c "import json;print(len(json.load(open('$OUT/patch/patch.json'
 # through 14z-81; 596 briefly 14z-81c (withdrawn stub); 591 since 14z-82
 # (the F2 fall-through tripwire); 593 since 14z-82c — the ADOPTED
 # hitclass_map_extend thunk (body + site jmp, shared row deduped once).
-if [ "$NOPS" = 593 ]; then
-    echo "  ok: 593 ops (the frozen test_tenant_loop fixture — same merge)"
+if [ "$NOPS" = 597 ]; then
+    echo "  ok: 597 ops (the frozen test_tenant_loop fixture — same merge)"
 else
-    echo "  FAIL: $NOPS ops, frozen fixture is 593 — the generator drifted;"
+    echo "  FAIL: $NOPS ops, frozen fixture is 597 — the generator drifted;"
     echo "        re-freeze test_tenant_loop.sh FIRST, then revisit this audit"
     exit 1
 fi

@@ -46,14 +46,15 @@
 |---|---|---|
 | build/m3b_merged | **UNREGISTERED — pending playtest + freeze** | (moves; see its README) |
 | build/m5_wide | donovan-m3a | 4b7d0dc7 |
-| build/hui31 | **huitzil-m5** (14z-83 S3: strip relocation) | 38188bb1 |
+| build/hui32 | **huitzil-m6** (14z-84: the DF gold block) | db4bcd11 |
 | build/pyron21 | **pyron-m3** | 6c7f7322 |
-| build/hui30 | superseded huitzil-m4 (keep) | e66678d0 |
+| build/hui31, build/hui30 | superseded m5 / m4 (keep) | 38188bb1 / e66678d0 |
 
 ## Still open, unchanged (pre-existing ledger)
 
-- Phobos' own palette-seq block (KNOWN-OPEN RED on
-  `tests/test_variant_dispatch.sh`, table 0x02a8a4 row 0x10).
+- ~~Phobos' own palette-seq block~~ **SHIPPED 14z-84 (huitzil-m6):
+  native gold, screen-verified solo AND merged; variant_dispatch GREEN
+  for the first time since 14z-74.**
 - Pyron's Zodiac Fire has no rig (guard-cancel only — Claude's to rig).
 - The win-screen QUOTE (both tenants; shared fold).
 - M5-family sound: Phobos LK/HK trap silence; pyron win-laugh distortion.

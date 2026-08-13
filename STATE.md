@@ -109,6 +109,38 @@ shape to size the thunk; then manifest rows (only_variant_slot), gates
 the block lives in wide_ext), DF pixel A/B (Phobos GOLD, Bulleta still
 purple), and the ladder.
 
+### 14z-84: THE DF GOLD BLOCK SHIPPED — huitzil-m6 (db4bcd11), the last
+### known-open red retired
+
+Implemented the ratified design the same session. The mechanism (all
+measured before authoring): table 0x02A8A4 rows are signed-word
+displacements; row 0x10 aliased Bulleta's routine (id = base 0x1E +
+step + $381(a6)*4 — the SIDE term: every DF block is really 8 rows and
+the census lists were P1 halves); the resolver computes a0 and enters
+the shared uploader at 0x2AD3C; vs2's row 0x10 is the bare default (his
+native gold ids 0x5A5-family reach 0x3ABEDC through the vs2 resolver's
+SIGNED-lea wrap). The fix: code_word repoints row 0x10 at a 6-byte
+trampoline in the table's own never-indexed rows-0x19-0x1B slot →
+df_gold_variant_id thunk (Bulleta's routine transcribed, a0 = the gold
+block in wide_ext — vs2 0x3ABEDC both sides, vh2 twin byte-identical —
+jmp 0x2AD3C). TWO LESSONS PAID: (1) the row word is read PC-RELATIVELY
+— the aux_poke form shipped it into the DATA view, decrypting to a wild
+jump + watchdog reset, caught by a boot-screen capture and a built-image
+byte read; code_word (crypt re-encryption) is the correct kind. (2) the
+shared_writes gate's build pins had rotted two freezes (hui29/pyron20
+hardcoded in the test AND the control) — comparing frozen inventories
+against superseded images; now toml-driven, and the review surfaced the
+14z-82c hitclass site missing from BOTH H and P inventories
+(backfilled, attributed to the adoption record). SCREEN-VERIFIED:
+Phobos GOLD in DF, Bulleta still purple on the same build (captures
+sent). Gates: variant_dispatch GREEN for the first time since 14z-74
+(exact designed-row licence), shared_writes 62/51 with reviewed
+entries, tenant_loop re-frozen 265/443/597 (+4 H ops; the two 593
+dependents moved with it), registry/expectations carried m5→m6,
+EXPECT_HUI updated. In flight at this writing: run_suite on hui32,
+m3a_reproducible, then the m3b_merged rebuild + gates + merged DF
+capture.
+
 ### Decisions pending (maintainer) — 14z-84 (2): the merged-11 flicker
 ### frame from the bank-gate fix
 

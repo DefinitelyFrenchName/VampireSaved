@@ -152,14 +152,14 @@ tools/run_wide.sh build/m3b_merged fbneo   # THE 3-TENANT BUILD (all 18
 tools/run_wide.sh build/m5_wide fbneo      # or the solo builds; ... mame
 ```
 
-**Current WIDE builds (14z-83):** `build/hui31` = **`huitzil-m5`
-(`38188bb1`)** is the one to playtest for Phobos (= m4 + the
-maintainer-approved beam-strip relocation to bank-4 0x86A0-0x87BF —
-the one real collision in the merged gfx write set removed; beam visual
-confirm wanted at playtest); `build/m5_wide` =
+**Current WIDE builds (14z-84):** `build/hui32` = **`huitzil-m6`
+(`db4bcd11`)** is the one to playtest for Phobos (= m5 + HIS OWN DARK
+FORCE BLOCK, native vs2 gold — screen-verified, the last known-open red
+retired; also carries the m5 beam-strip relocation, beam visual confirm
+still wanted); `build/m5_wide` =
 **`donovan-m3a` (`4b7d0dc7`)** for Donovan and `build/pyron21` =
 **`pyron-m3` (`6c7f7322`)** for Pyron — both tenants carry the ADOPTED
-hitclass_map_extend thunk (the f7997 fix; pyron-m2/huitzil-m3/huitzil-m4
+hitclass_map_extend thunk (the f7997 fix; pyron-m2/huitzil-m3/-m4/-m5
 are SUPERSEDED, kept on disk as pre-fix A/B baselines). (This line previously read
 "`build/m5_wide` (fingerprint `9bac6ee3`) is the current WIDE build" —
 `9bac6ee3` is `donovan-m5w`, SUPERSEDED by `donovan-m3a` back in 14z-64;

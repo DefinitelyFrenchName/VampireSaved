@@ -125,9 +125,22 @@ def main():
             print(f"  table {base:#08x} (jmp {jmp_addr:#08x}) alias {n}/16 "
                   f"— vs2 twin NOT FOUND, cannot judge")
             continue
+        # DESIGNED rows (14z-84, maintainer-ratified): a tenant row whose
+        # OURS value is a deliberate tenant-scoped routine vs2 does not
+        # carry. Keyed (table, row) -> required OURS value: anything else
+        # at the same row still fails, so this is an exact licence, not a
+        # tolerance. The one entry: the DF-gold trampoline — vs2's own
+        # row 0x10 is the bare default (his native gold arrives by a
+        # vs2-only path), ours points 0x2A8A4+0x32 = the rows-0x19-0x1B
+        # alias slot carrying the jmp to the df_gold_variant_id thunk.
+        DESIGNED = {(0x2A8A4, 0x10): 0x0032}
         row_states = []
         for r in ROWS_OF_INTEREST:
             if o[r] == e2[r]:
+                continue
+            if DESIGNED.get((base, r)) == o[r]:
+                print(f"      row {r:#04x}: ours {o[r]:#06x}  vs2 "
+                      f"{e2[r]:#06x}  DESIGNED (df_gold_variant_id, 14z-84)")
                 continue
             # which direction?
             default = e2[r] == 0x0040 or o[r] != 0x0040 and e2[r] == 0x0040

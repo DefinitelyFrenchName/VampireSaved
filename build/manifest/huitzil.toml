@@ -1204,6 +1204,74 @@ pad = 0x60
 # dst_old_head = "05310fff0e9e0ece0d7e093e064d045c"
 # note = "DF palette-seq rows 0x1E-0x21 <- the sequence native DF actually shows (vs2 0x3ABEDC)"
 
+# ══ 14z-84 PHOBOS' OWN DF PALETTE BLOCK (maintainer pull-forward) ═══════
+#
+# THE PROPER FIX the 14z-79 withdrawal deferred. Design ratified by the
+# maintainer 2026-08-13 (STATE 14z-84 triage): the ROW-0x10 TENANT
+# ROUTINE SELF-SUPPLIES — no funnel thunk (0x2AD44 never-thunk rule; the
+# resolver is the same hazard class), no resolver-window allocation (the
+# window has ZERO padding, measured), no shared-block hijack (the 14z-69p
+# defect).
+#
+# MECHANISM, from disassembly (all measured this session):
+# - Table 0x02A8A4 rows are SIGNED WORD displacements from the table
+#   base; row 0x10 currently aliases row 0x00 (0x004A = Bulleta's
+#   routine at 0x2A8EE) — WHY his DF was purple: her routine requests
+#   ids 0x1E + step(0..3, advanced every other frame via the $B4(a5)
+#   parity bit) + $381(a6)*4 (the player side), i.e. HER 8-row block.
+# - The resolver (0x2AD82) computes a0 = 0x39A900+(id&0xFFF)*0x20 and
+#   enters the shared uploader at 0x2AD3C. Our thunk computes a0 itself
+#   (gold block + (step+side*4)*0x20) and enters 0x2AD3C identically.
+# - vs2's OWN row 0x10 is the bare default (0x0040, no DF path); native
+#   gold arrives by another path whose vs2 ids (0x5A5-family, signed-lea
+#   wrap below the vs2 base 0x3B0A3C) resolve to 0x3ABEDC. Both sides'
+#   rows (P1 0x3ABEDC, P2 0x3ABF5C, 0x80 each) verified against the vh2
+#   twin 0x38BEB0+0x100 BYTE-IDENTICAL.
+#
+# PLACEMENT: the trampoline lives in table 0x02A8A4's OWN alias half —
+# rows 0x19-0x1B's word slots (0x2A8D6, vanilla "004000e40124" = the
+# row 0x09-0x0B aliases). Those bytes are read ONLY by indexing ids
+# 0x19-0x1B, which cannot occur: legacy never writes an id in 0x10-0x1F
+# (tests/audit_id_writers.sh), 0x12/0x18 are refused by the id guards,
+# and the roster occupies 0x10/0x11/0x13. Reviewed shared-surface write
+# (build/manifest/shared_writes.toml).
+#
+# THE BODY is Bulleta's routine 0x2A8EE TRANSCRIBED with exactly these
+# substitutions: far pc-rel branches -> abs jmp/jsr (0x2ADAC the vanilla
+# changed-path, 0x2AD3C the uploader); the 0x2A7E0 skip target -> a
+# local rts (that target IS a bare rts); the base add
+# `addi.w #$1e,d0 / bra 0x2AD82` -> `lsl.w #5,d0 / movea.l #gold,a0 /
+# adda.w d0,a0 / jmp 0x2AD3C` (the resolver's own computation, our
+# block). Step/side state bytes ($195/$381 a6) are the fighter's own —
+# per-object, no sharing.
+[[site_thunk]]
+stage = 6
+name = "df_gold_variant_id"
+only_variant_slot = true
+site = 0x02A8D6
+old_hex = "004000e40124"
+patch = "jmp"
+rts_ok = true
+thunk_hex = "4a2e0111660eb02e014f66024e754ef90002adacb02e014f67064eb90002adac082d000000b4670260024e75102e01955200020000031d4001957200122e0381e549d041eb48207cggggggggd0c04ef90002ad3c"
+data_subst = "gggggggg=0x3ABEDC:0x100:wide_ext"
+
+# THE ROW WORD MUST BE A CODE OP, NOT A DATA POKE (measured 14z-84: the
+# aux_poke form shipped 0x0032 into the DATA view, the dispatcher reads
+# the table PC-RELATIVELY through the OPCODE view, and the word decrypted
+# to 0x56EA — a wild jump and a watchdog reset on the first Phobos
+# palette tick; the boot screen at f3420 was the reset). code_word emits
+# a code op so crypt-range re-encryption applies — the code_ptr/beam
+# precedent, and exactly what this row kind was built for (14z-22).
+[[code_word]]
+stage = 6
+name = "df_seq_entry_10"
+only_variant_slot = true
+slot_table = 0x02A8A4
+slot_stride = 2
+old_hex = "004a"         # base-half row 0x00's word; the variant row is
+                         # anchored on ALIASING it (the machinery checks)
+new_hex = "0032"         # -> 0x2A8A4+0x32 = 0x2A8D6, the trampoline
+
 # ══ 14z-73 THE GRAB-HOLD VICTIM PLACEMENT ═══════════════════════════════
 #
 # THE DEFECT, measured on both legs (tests/test_hui_grab_victim.sh): during

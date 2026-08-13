@@ -23,7 +23,7 @@ WIDE_ZIP="${WIDE_ROMSET:-$PWD/build/wide0/rompath/vsavjw.zip}"
 # (extraction is deterministic — test_m3a_reproducible re-extracts and
 # all four fingerprints are bit-exact, so these dirs ARE the bytes)
 D_EX="build/m5_wide/extract"
-H_EX="build/hui31/extract"
+H_EX="build/hui32/extract"
 P_EX="build/pyron21/extract"
 missing=""
 for d in "$D_EX" "$H_EX" "$P_EX"; do [ -d "$d" ] || missing="$missing $d"; done
@@ -44,11 +44,11 @@ python3 tools/gen_donovan_patch.py "$D_EX" "$OUT/patch" \
 grep -q '^GENERATION OK' "$OUT/gen.log" || {
     echo "FAIL: no GENERATION OK"; tail -15 "$OUT/gen.log"; exit 1; }
 NOPS="$(python3 -c "import json;print(len(json.load(open('$OUT/patch/patch.json'))['ops']))")"
-[ "$NOPS" = 593 ] || {
-    echo "FAIL: $NOPS ops, frozen fixture is 593 (re-freeze"
+[ "$NOPS" = 597 ] || {
+    echo "FAIL: $NOPS ops, frozen fixture is 597 (re-freeze"
     echo "      test_tenant_loop FIRST if the merge legitimately changed)"
     exit 1; }
-echo "  ok: 593 ops (the frozen test_tenant_loop fixture)"
+echo "  ok: 597 ops (the frozen test_tenant_loop fixture)"
 python3 tools/patch_prg.py "$ROMDIR/vsavj.zip" "$OUT/prg" \
     --patch "$OUT/patch/patch.json" > "$OUT/patch_prg.log" 2>&1 || {
         echo "FAIL: patch_prg refused the merged patch"
@@ -168,7 +168,7 @@ done
 FP="$(python3 tools/build_fingerprint.py "$OUT/rompath;$ROMDIR" --set vsavjw --sha-only)"
 cat > "$OUT/README.txt" <<EOF
 3-TENANT MERGED BUILD WITH GFX (tools/build_merged.sh, 14z-83 S4).
-Program: the 593-op merged image. Gfx: the S2 chain (D -> H -> P), last
+Program: the 597-op merged image. Gfx: the S2 chain (D -> H -> P), last
 link's members packed; group B pristine.
 NOT REGISTERED (S6 decision) — run_suite refuses it until frozen.
 fingerprint: $FP

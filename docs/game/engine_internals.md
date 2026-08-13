@@ -1547,6 +1547,19 @@ another structure entirely. Establish what the bytes ARE, not just that nobody
 asked for them — the 14z-69 row satisfied "nobody asked" on a sample that
 could not ask.
 
+**THE TENANT ANSWER (14z-84, shipped in huitzil-m6): none of the above.**
+Phobos' own block does NOT allocate in the window and does NOT touch the
+resolver: table 0x02A8A4 row 0x10 (his variant row — the alias that made
+his DF purple) is repointed at a tenant thunk that computes a0 = a gold
+block in wide_ext (vs2 0x3ABEDC, both player sides) and enters the shared
+uploader at 0x2AD3C exactly as the resolver does. Two mechanism facts this
+work measured: the row routines' id = base + step(0..3, every-other-frame
+via the $B4(a5) parity bit) + $381(a6)*4 (the PLAYER SIDE — every block is
+really 8 rows, and this census's per-char id lists are the P1 halves); and
+vs2's resolver reaches BELOW its base via the lea's SIGNED word index
+(ids >= 0x400 wrap negative), which is how his native gold ids
+(0x5A5-family) resolve to 0x3ABEDC there.
+
 ## The SUB-STATE DISPATCHER FAMILY at 0x018460 (14z-79)
 
 Three sibling dispatchers sit back-to-back and share ONE handler pool. All are

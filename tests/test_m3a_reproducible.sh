@@ -39,7 +39,8 @@ EXPECT_STOCK="6c93cfa8a8a80ae2303d3acaf8c7bff487f369c5"
 # huitzil-m5 (14z-83 S3, maintainer-approved: the beam-strip relocation —
 # shift 0x1000 -> 0x3800, handler bias 0x5200 -> 0x7A00; the one real
 # collision in the merged group-C write set removed)
-EXPECT_HUI="38188bb12dd6b971a4067b89edaad54eabbfe343"
+# huitzil-m6 (14z-84: the DF gold block — Phobos native gold, tag freeze/huitzil-m5 is the way back)
+EXPECT_HUI="db4bcd11f8386b7dc75d6e8f7a915d9974f3c0d4"
 # pyron-m3 (14z-82c: + the ADOPTED hitclass_map_extend thunk — the f7997 fix)
 EXPECT_PYR="6c7f7322da793c12b3681dd3ef5a76b3792ae5d0"
 

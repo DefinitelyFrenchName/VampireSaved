@@ -37,7 +37,19 @@ fail=0
 seen=0
 
 echo "== 1. each tenant build matches its frozen inventory"
-for pair in donovan:m5_wide huitzil:hui29 pyron:pyron20; do
+# The build dir per tenant comes from the TOML's own `build =` field
+# (14z-84: the pins were hardcoded here and rotted two freezes behind —
+# hui29/pyron20 while the frozen builds were m5/m3 — so the gate
+# compared frozen inventories against superseded images and read the
+# newly-reviewed entries as GONE).
+PAIRS="$(python3 - <<'PY'
+import re
+s = open("build/manifest/shared_writes.toml").read()
+for m in re.finditer(r'name = "(\w+)"\s*\nbuild = "build/([^"]+)"', s):
+    print(f"{m.group(1)}:{m.group(2)}")
+PY
+)"
+for pair in $PAIRS; do
     t=${pair%%:*}; b=${pair#*:}
     if [ ! -f "build/$b/patch/patch.json" ]; then
         echo "  SKIP $t (no build/$b)"; continue
@@ -71,9 +83,15 @@ python3 - "$WORK" <<'PY' || fail=1
 import json, re, shutil, subprocess, sys
 from pathlib import Path
 work = Path(sys.argv[1])
-src = Path("build/hui30")
+# the control mutates the CURRENT frozen huitzil build — from the toml's
+# own build field (14z-84: a hardcoded pin here rotted exactly like the
+# section-1 pins did)
+import re as _re
+_m = _re.search(r'name = "huitzil"\s*\nbuild = "([^"]+)"',
+                open("build/manifest/shared_writes.toml").read())
+src = Path(_m.group(1))
 if not (src / "patch/patch.json").exists():
-    print("  SKIP (no build/hui30)"); sys.exit(0)
+    print(f"  SKIP (no {src})"); sys.exit(0)
 ok = True
 for tag, mutate in (
     ("an ADDED shared write (a new byte poked into vanilla space)",
