@@ -16,6 +16,12 @@
 >   liveness proven), both tenants. Guard:
 >   `tests/audit_pool_free_byte.sh` (extend it when the tag ships:
 >   +0x7F writes from OUR emitted stamp sites become expected).
+>   **[CORRECTED 14z-85, 2026-08-13: WRONG POOL — $FFB800/0x80 is the
+>   0x5E542/114-120 family's pool; the 59-75 family lives in
+>   $FF9400/0x100 (walker 0x54458). Re-measured there: +0x7F free,
+>   804 live-slot obs, zero writes under BYTE-LANE accounting. And the
+>   $FFB800 +0x7F "freeness" was itself an artifact — hole_b's word
+>   write at +0x7E covers that byte lane.]**
 > - Near-candidates +0x7C/+0x7E are DISQUALIFIED (one write each from
 >   our own hole_b code at PC 0x3FFFD6).
 >

@@ -28,9 +28,17 @@
 #   FORCE_MODE=pre|post overrides — the negative control: post-mode
 #       against a pre-fix build MUST fail (untagged family slots).
 #
-# KNOWN NEIGHBOR FACT (frozen, $FFB800): +0x7C/+0x7E take writes from OUR
-# hole_b code (PC 0x3FFFD6) — DISQUALIFIED as tag bytes, and their hits
-# staying nonzero doubles as a liveness control (asserted below).
+# KNOWN NEIGHBOR FACT (re-measured 14z-85, $FFB800): OUR hole_b code
+# (PC 0x3FFFD6) writes WORDS at +0x7C/+0x7E — and a word at +0x7E covers
+# byte +0x7F. The 14z-84 "zero writes on $FFB800 +0x7F" was an artifact of
+# WORD-OFFSET accounting (the old parse bucketed the tap's off field
+# without splitting byte lanes); under byte-lane accounting +0x7F IS
+# written on that pool by our own code (low byte observed zero, so the
+# census still reads +0x7F==0 in live slots). Tag bytes on $FFB800 would
+# have been CLOBBERED — one more reason the tag lives on $FF9400, where
+# byte-lane accounting shows zero +0x7F writes on every leg. The hole_b
+# hits staying nonzero doubles as a liveness control (asserted below).
+# GOTCHA filed: bucket write taps by BYTE LANE, never by word offset.
 #
 # Usage: ROMDIR=... tests/audit_pool_free_byte.sh [merged builddir]
 set -eu
@@ -132,7 +140,7 @@ for leg, tid in LEGS.items():
                 nz7f_b8 += 1
     # ── tap: one range covers both pools (ff9400 base) ──────────────────
     w7f_94 = collections.Counter()   # PC -> hits on $FF9400 +0x7F
-    w7f_b8 = 0
+    w7f_b8_pcs = set()
     for ln in open(f"{W}/tap_{leg}/tap.txt"):
         m = re.match(r"frame \d+ PC ([0-9a-f]+) off ([0-9a-f]+) "
                      r"data ([0-9a-f]+) mask ([0-9a-f]+)", ln)
@@ -156,11 +164,11 @@ for leg, tid in LEGS.items():
                 if so == 0x00: agg["b8_00"] += 1
                 if so == 0x20: agg["b8_20"] += 1
                 if so in (0x7C, 0x7E): agg["b8_7c7e"] += 1
-                if so == 0x7F: w7f_b8 += 1
+                if so == 0x7F: w7f_b8_pcs.add(pc)
     # ── verdicts per leg ────────────────────────────────────────────────
     print(f"  [{leg}] $FF9400 live {live94} (family {fam}, tagged "
           f"{fam_tagged}) | $FFB800 live {liveb8} | +0x7F writes "
-          f"94:{sum(w7f_94.values())} b8:{w7f_b8}")
+          f"94:{sum(w7f_94.values())} b8pcs:{len(w7f_b8_pcs)}")
     if leg == "hfx" and liveb8 < 200:
         errs.append(f"{leg}: only {liveb8} live $FFB800 slots — the rig "
                     "did not form the effect content (verdict vacuous)")
@@ -171,9 +179,17 @@ for leg, tid in LEGS.items():
     if nz7f_b8:
         errs.append(f"{leg}: $FFB800 +0x7F NONZERO in {nz7f_b8}/{liveb8} "
                     "live slots")
-    if w7f_b8:
-        errs.append(f"{leg}: $FFB800 +0x7F took {w7f_b8} write(s) — a tag "
-                    "strayed into the effect pool; investigate")
+    # $FFB800 +0x7F write-freeness is NOT asserted: our own hole_b word
+    # write at +0x7E covers that byte lane (header). What must never
+    # happen is a TAG THUNK writing there — a family stamp allocated
+    # from the effect pool (checked in post mode below).
+    if MODE == "post":
+        stray = {p for p in w7f_b8_pcs if p in tag_pcs}
+        if stray:
+            errs.append(f"{leg}: TAG THUNK PC(s) wrote $FFB800 +0x7F: "
+                        + ", ".join(f"{p:#x}" for p in sorted(stray))
+                        + " — a family stamp allocated from the effect "
+                        "pool; investigate")
     if MODE == "pre":
         if z7f_94:
             errs.append(f"{leg}: $FF9400 +0x7F NONZERO in {z7f_94}/{live94} "

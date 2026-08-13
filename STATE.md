@@ -28,7 +28,14 @@ expectations; **59-75 owner-dispatch RULED option (a)** — and its
 foundation MEASURED: the tag lives at +0x7F of the pool slot (1,342
 live-slot census + PC-attributed tap, zero writes both tenants,
 near-candidates disqualified by our own hole_b writes), zero-tag
-tripwire designed in. Suite-captured before close:
+tripwire designed in. **[CORRECTED 14z-85, 2026-08-13: that census ran
+on the WRONG POOL — $FFB800/0x80 is the 0x5E542/114-120 family's pool;
+the 59-75 family lives in $FF9400/0x100 (walker 0x54458, corroborated
+by ram.md and the 14z-82 dynamic census's own $FF94xx stamp addresses).
+Re-measured on $FF9400: +0x7F IS free there (804 live-slot obs, zero
+writes, byte-lane accounting). The $FFB800 +0x7F "freeness" was also an
+instrument artifact — hole_b's WORD write at +0x7E covers byte +0x7F;
+the old parse bucketed by word offset. See the 14z-85 entry.]** Suite-captured before close:
 tests/audit_pool_free_byte.sh + tests/audit_df_gold.sh. **NEXT SESSION
 FIRST ACT: the owner-tag generator implementation** — tag emission at
 the frozen stamp-inventory sites, owner_dispatch_stubs on entries
@@ -243,7 +250,12 @@ on 11 by design until then.
 ### the free-byte measurement is its first act. The brief as presented:
 
 **THE FREE-BYTE MEASUREMENT IS DONE (same session): the tag lives at
-+0x7F of the $FFB800-pool slot.** Census: 1,342 live-slot observations
++0x7F of the $FFB800-pool slot.** [CORRECTED 14z-85: wrong pool — the
+59-75 family lives in $FF9400/0x100-stride, not $FFB800; re-measured
+free there. And $FFB800 +0x7F takes a byte-lane write from hole_b's
+word write at +0x7E — the zero below was word-offset accounting. The
+eliminations and instrument design below remain valid; the CONCLUSION
+moved pools. See the 14z-85 entry.] Census: 1,342 live-slot observations
 (both tenants, effect-heavy windows, merged build) — 54 offsets
 constant-zero in every live slot, intersected across H (58) and P (93,
 H's stricter set doing the narrowing). Write-tap (pool-wide, PC-
