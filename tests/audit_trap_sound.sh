@@ -13,7 +13,9 @@
 # Measured ground truth (hui29 == hui30): spawns f3432/f4232, throw id
 # 0x010A f3474, detonation id 0x049A at f3571/f3716.
 #
-# KNOWN-OPEN it does NOT cover (maintainer, 14z-82d, M5-family): LK/HK
+# RESOLVED NOT-A-BUG (maintainer, 14z-84): the detonation sound is
+# PROXIMITY-TRIGGERED — all three variants sound with the opponent
+# near. The item this line used to file as KNOWN-OPEN — LK/HK
 # detonations have NO sound and never did — whether that is vs2-faithful
 # needs a native three-strength comparison when the sound arc comes.
 #

@@ -556,7 +556,11 @@ tests/audit_trap_sound.sh             # 14z-82d (~10 min, 2 runs): the MK
                                       # the current huitzil build — locks the
                                       # behavior the (b') fix restored; a
                                       # silent/crashing trap is loud here.
-                                      # LK/HK silence is a KNOWN-OPEN it does
+                                      # LK/HK 'silence' RESOLVED 14z-84:
+                                      # detonation sound is PROXIMITY-
+                                      # triggered (maintainer-confirmed, all
+                                      # three variants). Not covered here; was
+                                      # filed as a KNOWN-OPEN this audit does
                                       # not cover (M5-family)
 tests/audit_type_dispatch_range.sh    # 14z-82 (~8 min, 4 guarded runs): on the
                                       # MERGED build, ZERO obj_hook dispatches

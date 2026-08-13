@@ -141,6 +141,25 @@ EXPECT_HUI updated. In flight at this writing: run_suite on hui32,
 m3a_reproducible, then the m3b_merged rebuild + gates + merged DF
 capture.
 
+### 14z-84 playtest verdict (maintainer): m6 GREEN on targeted items +
+### vanilla smoke; TWO ledger moves
+
+"Tests are all green on the targeted items plus a quick smoke test on
+vanilla characters including Buletta" — full-scope test to follow.
+1. **RESOLVED NOT-A-BUG: the Phobos LK/HK Plasma Trap "silence"
+   (filed 14z-82d, M5-family).** Maintainer: "sound is confirmed for
+   Plasma trap's all three variants (LK/MK/HK), turns out it is
+   triggered by PROXIMITY to the opponent." The detonation sound is
+   proximity-gated by design; the filed silence was traps detonating
+   with nobody close. Living copies updated (NEXT_SESSION, HANDOFF's
+   audit_trap_sound row, the audit's own header); historical entries
+   stand.
+2. **NEW, detail pending: one of Phobos' EX moves may carry wrong
+   DAMAGE DATA** (explicitly not animation/sound/feel). Awaiting the
+   move name + expected-vs-observed numbers; the rig once named is the
+   native-vs2 damage-table A/B (the port_param32/hitbox-family
+   comparison precedents).
+
 ### Decisions pending (maintainer) — 14z-84 (2): the merged-11 flicker
 ### frame from the bank-gate fix
 

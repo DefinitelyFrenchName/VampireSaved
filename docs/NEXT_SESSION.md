@@ -57,10 +57,18 @@
   for the first time since 14z-74.**
 - Pyron's Zodiac Fire has no rig (guard-cancel only — Claude's to rig).
 - The win-screen QUOTE (both tenants; shared fold).
-- M5-family sound: Phobos LK/HK trap silence; pyron win-laugh distortion.
+- M5-family sound: pyron win-laugh distortion. (~~Phobos LK/HK trap
+  silence~~ RESOLVED NOT-A-BUG 14z-84: the detonation sound is
+  PROXIMITY-TRIGGERED — maintainer confirmed all three variants sound
+  when the opponent is near; the filed 'silence' was traps detonating
+  with nobody close.)
 - The three NEW select medallions: polish.
 - `region_space` rows re-freeze — maintainer's call.
 - Op-tagging for `test_shared_writes.sh`.
+- NEW (14z-84 playtest, detail pending): one of Phobos' EX moves may
+  have wrong DAMAGE DATA (not animation/sound/feel) — maintainer will
+  name the move + numbers; the native-vs2 damage-table A/B is the rig
+  once named.
 - NEW parked (14z-83): `audit_merged_legacy` leg-b's H reference names
   superseded hui30 (extract byte-identical, report-only) — update with
   the audit's next scheduled run. A Donovan empty-tiles rig with a
