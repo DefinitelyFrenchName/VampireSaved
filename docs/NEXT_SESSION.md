@@ -1,4 +1,4 @@
-# NEXT SESSION — orientation (written at the close of 14z-85b, 2026-08-13)
+# NEXT SESSION — orientation (written at the close of 14z-85c, 2026-08-13)
 
 > ## START HERE
 >
@@ -19,18 +19,22 @@
 >    generic tail_data_ptr repoint.
 >
 > **FIRST ACT: support the maintainer's deeper full-scope testing** of
-> `build/m3b_merged` (669 ops, gfx included; still UNREGISTERED pending
-> the S6 freeze decision). Then:
-> - **Ruling still pending: extend tag stubs to 59-63?** (explained to
->   the maintainer 14z-85: H/P stamp types 59/61-63 at dead co-ported
->   sites; a stub makes any future live spawn loud instead of silently
->   running donovan's copy. ~5 stubs, one op-count re-freeze, zero
->   behavior change on working paths. Recommended (a), not urgent.)
-> - **The M5 voice-samples decision** is now the only thing between all
->   three tenants and their voice lines (their voice-bank ids are
->   zeroed = silent; restoring them = grow the QSound sample region —
->   WIDE has 16MB headroom, don's 14z-51 analysis lists the absent
->   samples).
+> `build/m3b_merged` (677 ops, gfx included; still UNREGISTERED pending
+> the S6 freeze decision) — "prod comes first", so the voice arc below
+> starts in parallel. Then:
+> - ~~Extend tag stubs to 59-63~~ **DONE 14z-85c** (ruled + executed:
+>   the foreign-stamper rule; 59/61/62/63 donovan-only stubs, 60 direct;
+>   counts 490/677; ladder green).
+> - **THE M5 VOICE-SAMPLES ARC IS RULED GO** ("cleverly, MiSTer-aware —
+>   core tweaks acceptable"). The measured design brief is in STATE
+>   14z-85c: ~616 KB+ of vs2 sample windows into the WIDE QSound
+>   image's free upper 8 MB (banks 0x80+ — MAME's LLE bank register is
+>   15-bit, measured in qsound.cpp); Z80 driver has 27,727 B free for
+>   the new id rows (WIDE A4). NEXT CONCRETE STEPS: (1) longer-window
+>   keyon re-sweep (the 12-frame maps are attack-blind — ~36 scoped ids
+>   logged nothing); (2) RE the vs2 Z80 sample-table row format + bank
+>   field width; (3) the packer + manifest rows + un-zeroing the keep
+>   lists; (4) verify jtcores' QSound region growth for MiSTer.
 >
 > ## Corrections that must outlive this session (14z-85)
 >
@@ -48,14 +52,14 @@
 >   modes, FORCE_MODE negative control (ground-truthed both directions).
 > - tests/audit_type_dispatch_range.sh — §4-6: 0x54470 family liveness +
 >   tag-stub tripwire silence.
-> - tests/test_tenant_loop.sh — 243/266/208 solo, 474/669 merged; §4b
->   decodes the tag stubs per entry.
+> - tests/test_tenant_loop.sh — 243/266/208 solo, 490/677 merged; §4b
+>   decodes all 16 tag stubs per entry (59-75 family, 14z-85c).
 
 ## Current builds (registry)
 
 | build | set | fingerprint |
 |---|---|---|
-| build/m3b_merged | UNREGISTERED (pending deeper test + S6 freeze) | moves with generator (669 ops) |
+| build/m3b_merged | UNREGISTERED (pending deeper test + S6 freeze) | moves with generator (677 ops) |
 | build/m5_wide | donovan-m3a | 4b7d0dc7 |
 | build/hui33 | **huitzil-m7** | 284e3b1c |
 | build/pyron22 | **pyron-m4** | ac22418f |
@@ -63,9 +67,8 @@
 
 ## Still open (the short list)
 
-- 59-63 stub extension (ruling pending, cheap).
-- M5 voice samples (the standing decision; all three tenants' voice
-  banks silenced until then).
+- THE M5 VOICE-SAMPLES ARC (ruled GO; brief in STATE 14z-85c — the
+  next big implementation).
 - Pyron's medallion whitening on 2P hover (row-0x1A family).
 - Phobos EX damage-data suspicion (maintainer will name move+numbers).
 - H-vs-P stuck-direction (~1/30, possibly emulator-side).
@@ -79,8 +82,8 @@
 ```sh
 export ROMDIR=/path/to/reference/sets
 export MAME_BIN=~/.cache/vampire-saved/mame/cps2   # run_suite needs it
-tools/build_merged.sh build/m3b_merged     # ~15 min (669-op fixture)
-tests/test_tenant_loop.sh                  # generator gate (474/669)
+tools/build_merged.sh build/m3b_merged     # ~15 min (677-op fixture)
+tests/test_tenant_loop.sh                  # generator gate (490/677)
 tests/test_m3a_reproducible.sh             # ~6 min (all four refs)
 tests/audit_type_dispatch_range.sh build/m3b_merged   # ~15 min, §0-6
 tests/audit_pool_free_byte.sh              # ~20 min (post-tag mode)

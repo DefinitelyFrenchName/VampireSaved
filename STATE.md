@@ -33,8 +33,11 @@ merged-vs-solo diff (every pre-fix id incl. music 0x729 GONE, no solo
 id missing), merged legacy audit PASS (leg a verbatim incl. ratified
 04+11). Solo behavior change, deliberate: H/P node sfx become AUDIBLE
 on their solo builds (no build of theirs ever carried the unstub).
-DECISION STILL PENDING: the 59-63 stub extension (explained to the
-maintainer; fold into the next op-count re-freeze if ruled (a)).
+[DECIDED AND EXECUTED 14z-85c, same day: the 59-63 stub extension —
+maintainer ruled "that makes sense, do it" after the explanation. The
+FOREIGN-STAMPER rule generalizes the stub trigger; 59/61/62/63 are
+donovan-only stubs, 60 keeps the direct pointer; counts re-frozen
+243/266/208 + 490/677; solos byte-identical; full ladder green.]
 **NEXT: the maintainer's deeper full-scope testing; the M5
 voice-samples decision is now the only thing between the tenants and
 their voice lines.**)
@@ -214,6 +217,60 @@ DEFERRED knowingly: renumbering (the 14z-82 fix for 114-120) is blocked
 here by vs2's own embedded walkers (0x5C602 truncated-table) and the
 hit-class map domain. DESIGN NEEDED — decision brief below.
 
+### 14z-85c: M5 VOICE SAMPLES — the measured design brief (maintainer
+### ruled GO 2026-08-13: "we need to do this cleverly, and ideally in a
+### way that makes it playable on MiSTer, even if that be with a
+### slightly tweaked core")
+
+WHAT IT RESTORES: every voice-bank id the keep/zero policy silenced —
+donovan's 0x700-0x71F/0x750-0x757 block, phobos' 0x735-0x74E, pyron's
+0x720-0x72F, plus the absent-sample odds (0x31B etc.). MEASURED SIZE
+(from the keyon maps, UNDER-measured — the 12-frame sweep logged no
+keyons for ~36 of the scoped ids): 45 distinct sample windows, ~616 KB
+union (D ~274 KB, H ~251 KB, P ~91 KB). True need larger but same
+order; re-measure with longer sweep windows before packing.
+
+THE THREE MECHANICAL FACTS THAT MAKE IT FIT (all measured):
+1. **The WIDE QSound image is 16 MB with the upper 8 MB free** (B0,
+   proven inert; vsav's 11m/12m are byte-full, so nothing below 8 MB
+   is available — and legacy sample content is untouchable anyway).
+2. **The chip addresses the upper half.** MAME's LLE (the DL-1425 DSP16
+   running its real internal ROM): `read_byte((bank << 16) | offset)`
+   with a 15-BIT bank register (`m_rom_bank & 0x8000 | offset`,
+   qsound.cpp) into `device_rom_interface<24>` = 16 MB. Banks 0x80-0xFF
+   (8-16 MB) are reachable; every vs2 sample sits in banks 0-127, so
+   OUR banks collide with nothing. The bank values come from the sound
+   driver's own sample tables — which we author.
+3. **The Z80 driver has room for the new table rows**: 27,727 B free,
+   largest run 13,961 B (WIDE A4 measurement) — the id → sample-params
+   rows for the restored ids go there. TO VERIFY at implementation:
+   the Z80 table's bank field width (needs >= 8 bits for banks 0x80+)
+   and the exact row format (RE the vs2 Z80 driver's rows for these
+   ids — the params are already in vs2's audiocpu member).
+
+THE SHAPE OF THE IMPLEMENTATION (its own arc):
+(a) longer-window keyon re-sweep of the scoped ids on vs2 (the current
+    maps are attack-window-blind); (b) pack the measured sample windows
+    into the QSound extension members at banks 0x80+ (builder flag on
+    build_wide_romset.py or a chained packer, provenance VS2); (c) port
+    the Z80 table rows with banks rebased to the extension (manifest-
+    declared, docs table like sfx_records.md); (d) UN-ZERO the ids in
+    don/hui/pyr_sfx_records keep lists; (e) gates: a qs_sweep A/B (the
+    restored id keys the SAME sample content as vs2), ring inventories
+    re-frozen, legacy audit (Z80 member changes are legacy-invisible
+    only if the vanilla rows are untouched — assert byte-identity of
+    the vanilla table span).
+
+MISTER (the maintainer's constraint): jotego's CPS2 core runs QSound as
+LLE too (jtdsp16 executing the real DL-1425 internal ROM), so the bank
+semantics should match MAME's — the tweak is the CORE'S QSound ROM
+region size (8 MB in the stock core) growing to 16 MB in its SDRAM map,
+plus the MRA/rom loading. FILED, NOT VERIFIED — check jtcores' QSound
+sample addressing before promising; the maintainer has accepted core
+tweaks. NOTE the whole WIDE profile already requires a tweaked core on
+MiSTer (PRG 6 MB, GFX 48 MB); the QSound half is the smallest of the
+three growths.
+
 ### Decisions — 14z-85 (1): per-tenant sfx records (the ACTUAL
 ### music-retrigger fix). **DECIDED (maintainer, 2026-08-13): OPTION
 ### (a)** — "the obvious solution if it fits"; fit verified (wide_ext
@@ -249,8 +306,11 @@ S-priority: co-top with the full-scope test — it is the last KNOWN
 player-audible merged defect. NOT part of the 14z-84 owner-tag ruling
 (measured: ring inventory identical before/after the tag).
 
-### Decisions pending (maintainer) — 14z-85 (2): extend the tag stubs
-### to entries 59-63?
+### Decisions — 14z-85 (2): extend the tag stubs to entries 59-63?
+### **DECIDED (maintainer, 2026-08-13): (a) — "that makes sense, do
+### it." EXECUTED 14z-85c the same day** (foreign-stamper rule, 4 new
+### donovan-only stubs, counts 490/677, ladder green). The brief as
+### presented:
 
 The ruling covered stubs on 64-75. MEASURED THIS SESSION (resolver ×
 stamper matrix from the frozen inventory + all three regions.json):
