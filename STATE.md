@@ -179,8 +179,9 @@ vanilla characters including Buletta" — full-scope test to follow.
    native-vs2 damage-table A/B (the port_param32/hitbox-family
    comparison precedents).
 
-### Decisions pending (maintainer) — 14z-84 (2): the merged-11 flicker
-### frame from the bank-gate fix
+### Decisions — 14z-84 (2): the merged-11 flicker frame from the
+### bank-gate fix. **DECIDED (maintainer, 2026-08-13): RATIFIED** —
+### encoded as the merged-only override beside 04's the same session.
 
 The bank-gate chain fix costs ~2 extra cmpi/bne pairs per drawer call on
 non-matching ids. Measured effect on the merged legacy audit: EXACTLY ONE
@@ -197,8 +198,29 @@ merged-04 mechanism's species. PROPOSED (the audit's own line):
 audit_merged_legacy beside 04's. Awaiting ratification; the audit FAILS
 on 11 by design until then.
 
-### Decisions pending (maintainer) — 14z-84: owner-correct dispatch for
-### the 59-75 object family on merged builds
+### Decisions — 14z-84: owner-correct dispatch for the 59-75 object
+### family on merged builds. **DECIDED (maintainer, 2026-08-13): OPTION
+### (a) — the spawn-time owner tag.** Implementation is the next arc;
+### the free-byte measurement is its first act. The brief as presented:
+
+**THE FREE-BYTE MEASUREMENT IS DONE (same session): the tag lives at
++0x7F of the $FFB800-pool slot.** Census: 1,342 live-slot observations
+(both tenants, effect-heavy windows, merged build) — 54 offsets
+constant-zero in every live slot, intersected across H (58) and P (93,
+H's stricter set doing the narrowing). Write-tap (pool-wide, PC-
+attributed, 13,716/9,499 hits proving the instrument live on the
+documented busy fields 0x00/0x20/0x1C/0x26): **+0x7F took ZERO writes
+on both legs**; the near-candidates +0x7C/+0x7E were disqualified by
+exactly one write each from PC 0x3FFFD6 — OUR OWN hole_b code, which
+the census correctly surfaced. Slot-reuse analysis → the stubs carry a
+ZERO-TAG TRIPWIRE: an untagged family object = a stamp site the tag
+emission missed, loud by design (nothing clears +0x7F, so a fresh
+stamp+tag on every tenant spawn is the invariant; stale tags in
+legacy-reused slots are unread — stubs fire only for family types).
+NEXT: the generator implementation — tag emission at every frozen
+stamp-inventory site for types 59-75, owner_dispatch_stubs (14z-81c
+builder) on entries 64-75 keyed on (0x7F,A4), then the ladder with the
+ring-tap on Pyron's specials as the fix's own before/after.
 
 The last known merged program defect class. Options:
 (a) RECOMMENDED — SPAWN-TIME OWNER TAG, dispatch on the tag: each

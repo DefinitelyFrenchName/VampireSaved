@@ -316,6 +316,17 @@ for spec in "$EXPECT"/*.masked; do
     if [ "$name" = "04_select_fuzz" ]; then
         sline="composite vsavj/masked-v2 1525,2005,2009,2195 889-1104"
     fi
+    # MERGED-ONLY RATIFIED EXPECTATION #2 (maintainer, 2026-08-13,
+    # 14z-84). The chained drawer bank gates (the select/VS name fix)
+    # cost ~2 extra cmpi/bne pairs per call; on the VS screen after the
+    # Donovan pick, fade-staging row 0x0B ($FF4064-71, the $FF3F02 +
+    # row*0x20 family) fills ONE FRAME LATER — byte-attributed by
+    # full-RAM dump-diff at f2836 (12 live bytes, fully re-convergent,
+    # 884 clean frames after; the merged-04 mechanism's species). The
+    # ratified window 889-2415 itself is unchanged.
+    if [ "$name" = "11_pick_donovan" ]; then
+        sline="composite vsavj/masked-v2 2836 889-2415"
+    fi
     class=${sline%% *}; rest=${sline#* }; base=${rest%% *}; args=${rest#* }
     baselog="$REPO/tests/expected/$base/logs/$name.log"
     log="$W/a_$name.log"
