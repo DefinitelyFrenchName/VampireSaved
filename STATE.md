@@ -141,6 +141,25 @@ EXPECT_HUI updated. In flight at this writing: run_suite on hui32,
 m3a_reproducible, then the m3b_merged rebuild + gates + merged DF
 capture.
 
+### 14z-84 (2nd report): medallion + music confirmed still present (both
+### known-state: row-0x1A family / the pending 59-75 ruling); the flicker
+### upgraded to REPRODUCIBLE-at-round-end — and the aimed rig still
+### cannot catch it
+
+The brightness-level rig (the checksum detector's replacement) ran twice
+on the merged build over hui/70_mash with Phobos forced: (1) every frame
+of 7700-7860 — the window after HIS KO at f7704 (the maintainer's named
+condition), 160 PNGs, mean 84.2 sd 2.9, ZERO dark outliers; (2) every
+2ND frame across BOTH complete round-end sequences (7345-7700 his win,
+7860-8300 the post-KO tail), 398 PNGs, mean 87.2 sd 3.1, ZERO outliers
+— with the sparse-sweep caveat stated (a 1-frame event has a coin-flip
+catch rate in leg 2; leg 1 was exhaustive for its window). The event
+does not reproduce under the rig's conditions (mash-vs-CPU inputs;
+real-play conditions differ). NEXT INSTRUMENT: the maintainer's own
+recording — wall-clock timing of one occurrence converts to a frame
+window the exhaustive rig can then cover. Not a blocker (post-round
+only, maintainer's own call).
+
 ### 14z-84 playtest verdict (maintainer): m6 GREEN on targeted items +
 ### vanilla smoke; TWO ledger moves
 
