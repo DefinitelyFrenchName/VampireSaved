@@ -106,7 +106,12 @@ echo "== 1: one tenant per run — the frozen op counts =="
 # site_thunk adds exactly TWO ops (body + site jmp) to each declaring
 # build — huitzil and pyron declare it, donovan does not (his types fit
 # the vanilla map).
-FROZEN_1="donovan:243 huitzil:265 pyron:207"
+# RE-FROZEN 14z-85b (was 265/207): the per-tenant sfx records
+# (hui_sfx_records / pyr_sfx_records, maintainer-ruled) add NET +1 op to
+# each declaring build: +2 (record array data + ptr-row poke32) −1 (the
+# generic tail_data_ptr repoint is claim-suppressed, 14z-65 machinery).
+# Donovan unchanged — his don_sfx_records row predates this.
+FROZEN_1="donovan:243 huitzil:266 pyron:208"
 for row in $FROZEN_1; do
     who="${row%%:*}"; want="${row##*:}"
     case "$who" in donovan) ex="$D_EX" ;; huitzil) ex="$H_EX" ;; *) ex="$P_EX" ;; esac
@@ -165,8 +170,10 @@ check_n() {  # check_n <label> <dir> <want ops> <sum of 1-tenant counts>
 # N=3 +70 = 46 thunks (D 9 + H 21 + P 16) + 12 tag stubs on entries
 # 64-75 + their 12 tripwires. The 80 site detours are blob edits (0 ops).
 # Single-tenant counts above unchanged — the pass is empty at N=1.
-check_n "2 tenants" "$WORK/two"   473 508
-check_n "3 tenants" "$WORK/three" 667 715
+# RE-FROZEN 14z-85b (was 473/667): +1 per declaring tenant — the
+# hui/pyr_sfx_records rows (see FROZEN_1 note above).
+check_n "2 tenants" "$WORK/two"   474 508
+check_n "3 tenants" "$WORK/three" 669 715
 
 # ── 3: every tenant's own content is present ────────────────────────────
 # An op count alone cannot tell "both tenants ran" from "tenant 0 ran twice".

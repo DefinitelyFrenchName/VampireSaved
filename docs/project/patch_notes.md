@@ -2848,3 +2848,39 @@ ratified expectations).
 **What the fix did NOT change (measured, own before/after):** the ring
 inventory on pyron's replays — the music retrigger is the per-node sfx
 helper class (see the 14z-85 STATE entry), not 64-75 dispatch.
+
+## 14z-85b — per-tenant sfx records (pyr_sfx_records / hui_sfx_records; maintainer-ruled option (a))
+
+The ACTUAL music-retrigger fix (the mechanism the owner tag was wrongly
+credited with — see 14z-85 above). Two manifest rows, the don_sfx_records
+precedent verbatim; per-id curation in docs/project/tables/sfx_records.md.
+
+**Every byte, and why:**
+- `pyr_sfx_records`: vs2 0x0C8B18, 23 records (exact shape-scanned bound;
+  the over-run span holds keep-id lookalikes) → wide_ext, id-allowlisted
+  (keep 0x110/0x111/0x112/0x202 — all in don's ratified set; 15 zeroed
+  incl. the 0x720-0x72F voice block whose 0x729 WAS the measured music
+  retrigger). poke32 ptr row 0x11 (was the vanilla 0x95894 Demitri alias,
+  displaced pre-fix by the generic tail_data_ptr repoint at his RAW
+  records).
+- `hui_sfx_records`: vs2 0x0C742A, 24 records → wide_ext (keep the trio +
+  0x198/0x199, measured SHARED 14z-85 — equal keyon signatures, don-0x119's
+  sample family; 18 zeroed). poke32 ptr row 0x10 (was 0x938BA).
+- Both rows carry the idempotent helper unstub (vs2 0x5122 → vsavj 0x4CE2),
+  so SOLO H/P builds gain audible node sfx (they were silent — no build of
+  theirs ever carried the unstub). NET +1 op per declaring build (the
+  claim machinery suppresses the generic repoint).
+
+**Freeze ceremony:** huitzil-m7 = build/hui33 (284e3b1c), pyron-m4 =
+build/pyron22 (ac22418f); expectation sets carried RENAMED; suites GREEN
+with --freeze; every .sha1 mover byte-attributed: ONE divergent frame
+(f890, the select-init staging of the repointed ptr rows, re-converges
+same frame) on every replay, plus one bounded run (f2410-2596, the
+tenant's now-audible node sfx) on the two tenant-pick replays ONLY.
+tenant_loop re-frozen 266/208 solo, 474/669 merged. Ring gate re-frozen
+to EMPTY merged-vs-solo diff — measured: every pre-fix id incl. 0x729
+gone, no solo id missing.
+
+**FIELD-CONFIRMED (maintainer, first playtest, 2026-08-13): "the music
+triggering is gone, Piled Hell has its hitbox — needs deeper testing but
+it does look very good."**

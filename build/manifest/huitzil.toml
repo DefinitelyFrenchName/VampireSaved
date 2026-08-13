@@ -1957,3 +1957,26 @@ patch = "jmp"
 rts_ok = true
 thunk_hex = "0c4000506456103b00044e750600040802000008000e040204060000000006000c000000000004000600060000000000000600000800000800040a0000000002020000000600000000000000020200000404040800040000000000004afc"
 note = "14z-82c: extend the projectile hit-class byte map to vs2's 80 entries; >=80 traps loud (f7997 fix)"
+
+# ── M5 sounds (14z-85b, maintainer-ruled option (a)): Phobos' per-node sfx
+# records — see pyron.toml's pyr_sfx_records comment for the shared
+# mechanism (per-node helper + tail_data_ptr raw-records defect) and
+# docs/project/tables/sfx_records.md for the per-id classification.
+# THE ARRAY (measured 14z-85): vs2 0x0C742A, 24 records (shape-scanned
+# against the don control; over-run span clean of keep ids). ID CURATION:
+# keep 0x110/0x111/0x112 (don's ratified shared trio) + 0x198/0x199 —
+# MEASURED SHARED this session (identical keyon signatures both sets,
+# same sample family as don's kept 0x119). Zeroed: 0x12C (vsavj id keys a
+# different sample window), 0x3E2 (silent both sets), 0x735-0x74E (his
+# vs2 voice/sfx block; vsavj keys OTHER content across that gap —
+# unfaithful, silenced pending the M5 voice-samples decision).
+[[sound_table]]
+stage = 6
+profile = "cps2-wide-v1"
+name = "hui_sfx_records"
+hole = "wide_ext"
+src = 0x0C742A
+entries = 24
+ptr_table = 0x0BF41A
+keep_ids = "0x110,0x111,0x112,0x198,0x199"
+unstub = "0x005122=0x004CE2"

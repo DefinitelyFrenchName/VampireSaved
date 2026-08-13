@@ -1,5 +1,12 @@
 # STATE — living progress log
 
+FIELD VERDICT (maintainer, 2026-08-13, first playtest of the 14z-85/85b
+merged build): **"the music triggering is gone, Piled Hell has its
+hitbox — needs deeper testing but it does look very good."** Both
+predicted fixes confirmed on first contact: the sfx-records fix killed
+the music retrigger (audible), and the owner tag restored Piled Hell's
+hitbox (his objects now run HIS handler data). Deeper testing to follow.
+
 Updated: 2026-08-13 (session 14z-85 close — **THE SPAWN-TIME OWNER TAG
 SHIPPED AND FULLY VERIFIED (maintainer option (a), the prescribed first
 act), with two measurement corrections en route and one mechanism
@@ -175,8 +182,12 @@ DEFERRED knowingly: renumbering (the 14z-82 fix for 114-120) is blocked
 here by vs2's own embedded walkers (0x5C602 truncated-table) and the
 hit-class map domain. DESIGN NEEDED — decision brief below.
 
-### Decisions pending (maintainer) — 14z-85 (1): per-tenant sfx records
-### (the ACTUAL music-retrigger fix)
+### Decisions — 14z-85 (1): per-tenant sfx records (the ACTUAL
+### music-retrigger fix). **DECIDED (maintainer, 2026-08-13): OPTION
+### (a)** — "the obvious solution if it fits"; fit verified (wide_ext
+### ~1.3MB free vs a few hundred bytes per array). Implementation is
+### the 14z-85b arc; curated tables land in docs/project/tables/ for
+### review. The brief as presented:
 
 MEASURED MECHANISM (14z-85; full record in the close header + the
 audit_pyron_ring.sh header): donovan's [[sound_table]] row un-stubs the

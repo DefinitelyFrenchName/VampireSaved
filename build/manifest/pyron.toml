@@ -981,3 +981,33 @@ patch = "jmp"
 rts_ok = true
 thunk_hex = "0c4000506456103b00044e750600040802000008000e040204060000000006000c000000000004000600060000000000000600000800000800040a0000000002020000000600000000000000020200000404040800040000000000004afc"
 note = "14z-82c: extend the projectile hit-class byte map to vs2's 80 entries; >=80 traps loud (f7997 fix)"
+
+# ── M5 sounds (14z-85b, maintainer-ruled option (a)): Pyron's per-node sfx
+# records, the don_sfx_records precedent verbatim. THE MEASURED DEFECT: the
+# per-node sfx helper (vs2 0x5122 -> vsavj twin 0x4CE2, un-stubbed by any
+# build carrying a sound_table row) reads the per-char record array through
+# vsavj ptr table 0x0BF41A; without this row the generic tail_data_ptr
+# repoint aimed row 0x11 at the RAW vs2 records inside the ported hitbox
+# region — unremapped ids incl. vsavj MUSIC track 0x729 on every ~5s of
+# play (the 14z-84 playtest "specials retrigger music", root-caused 14z-85).
+# THE ARRAY (measured 14z-85): vs2 0x0C8B18, 23 records (shape-scanned
+# against the don control; the over-run span holds keep-id lookalikes, so
+# the bound is exact, not padded). ID CURATION (docs/project/tables/
+# sfx_records.md): keep 0x110/0x111/0x112/0x202 — all four in don's
+# ratified keep set (0x110-0x112 the shared trio, 0x202 content-verified
+# 14z-52). Zeroed: 0x101/0x319 (vsavj id keys a DIFFERENT sample —
+# keyon-signature mismatch), 0x31B (no vsavj sample), 0x3D8/0x3DA (silent
+# both sets), 0x720-0x72F (his vs2 voice/sfx block = vsavj's music-range
+# gap; restoring them needs ported samples — the standing M5 voice-samples
+# decision, same as don's voice bank). The engine skips id==0, so zeroed
+# entries are SILENT, never wrong.
+[[sound_table]]
+stage = 6
+profile = "cps2-wide-v1"
+name = "pyr_sfx_records"
+hole = "wide_ext"
+src = 0x0C8B18
+entries = 23
+ptr_table = 0x0BF41A
+keep_ids = "0x110,0x111,0x112,0x202"
+unstub = "0x005122=0x004CE2"

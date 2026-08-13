@@ -11,14 +11,15 @@
 # the MERGED build pyron's nodes fire through the vanilla row 0x11
 # pointer — wrong records, ids incl. vsavj MUSIC track 0x729. Solo
 # pyron has no donovan row, the helper stays stubbed, nothing fires.
-# THE FIX (open, STATE 14z-85 decisions-pending): per-tenant curated
-# record arrays (pyr_sfx_records @row 0x11, hui_sfx_records @row 0x10)
-# following the don_sfx_records keep/zero policy.
+# THE FIX SHIPPED 14z-85b (maintainer-ruled option (a)): pyr_sfx_records
+# @row 0x11 (+ hui_sfx_records @row 0x10), the don_sfx_records keep/zero
+# policy — docs/project/tables/sfx_records.md. Measured on the rebuilt
+# merged build vs pyron-m4: the diff is EMPTY — every known-open id
+# (incl. music 0x729) gone, no solo id missing.
 #
-# VERDICT until that fix ships: the merged-vs-solo id-set DIFF must
-# equal the FROZEN KNOWN-OPEN inventory below, per replay — any NEW id
-# (or a solo id going missing on merged) is DRIFT and fails. When the
-# sfx-records fix lands, re-freeze both sets to empty.
+# VERDICT: the merged-vs-solo id-set DIFF must equal the FROZEN
+# inventory below (now EMPTY), per replay — any NEW id (or a solo id
+# going missing on merged) fails.
 # Housekeeping ids 0x0000/0xFFFF excluded (test_don_sound precedent).
 #
 # pyron/71 NEEDS the meter pokes or the EX never fires (replay header).
@@ -29,7 +30,7 @@ ROMDIR="${ROMDIR:?set ROMDIR}"
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"
 MERGED="${1:-build/m3b_merged}"
-SOLO="${2:-build/pyron21}"
+SOLO="${2:-build/pyron22}"   # pyron-m4 (14z-85b: solo carries pyr_sfx_records)
 [ -f "$MERGED/rompath/vsavjw.zip" ] || { echo "SKIP: no $MERGED"; exit 0; }
 [ -f "$SOLO/rompath/vsavjw.zip" ] || { echo "SKIP: no $SOLO"; exit 0; }
 MAME_BIN="${MAME_BIN:-$HOME/.cache/vampire-saved/mame/cps2}"
@@ -77,11 +78,10 @@ for name in ("cosmo", "mash"):
         errs.append(f"{name}: solo inventory only {len(s)} ids — dead rig "
                     "(verdict vacuous)")
         continue
-    # FROZEN KNOWN-OPEN (14z-85, the per-node sfx helper class — header):
-    # the measured merged-only id set per replay. Re-freeze to empty when
-    # the per-tenant sfx-records fix ships.
-    KNOWN_OPEN = {"cosmo": {0x110},
-                  "mash":  {0x110, 0x111, 0x112, 0x31B, 0x729}}[name]
+    # RE-FROZEN 14z-85b (was cosmo {0x110}; mash {0x110,0x111,0x112,
+    # 0x31b,0x729} — the pre-fix known-open inventory): the sfx-records
+    # fix shipped and the measured diff is EMPTY on both replays.
+    KNOWN_OPEN = {"cosmo": set(), "mash": set()}[name]
     extra = set(m) - set(s)
     missing = set(s) - set(m)
     if extra != KNOWN_OPEN:

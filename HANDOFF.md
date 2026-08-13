@@ -152,24 +152,21 @@ tools/run_wide.sh build/m3b_merged fbneo   # THE 3-TENANT BUILD (all 18
 tools/run_wide.sh build/m5_wide fbneo      # or the solo builds; ... mame
 ```
 
-**Current WIDE builds (14z-84):** `build/hui32` = **`huitzil-m6`
-(`db4bcd11`)** is the one to playtest for Phobos (= m5 + HIS OWN DARK
-FORCE BLOCK, native vs2 gold — screen-verified, the last known-open red
-retired; also carries the m5 beam-strip relocation, beam visual confirm
-still wanted); `build/m5_wide` =
-**`donovan-m3a` (`4b7d0dc7`)** for Donovan and `build/pyron21` =
-**`pyron-m3` (`6c7f7322`)** for Pyron — both tenants carry the ADOPTED
-hitclass_map_extend thunk (the f7997 fix; pyron-m2/huitzil-m3/-m4/-m5
-are SUPERSEDED, kept on disk as pre-fix A/B baselines). (This line previously read
-"`build/m5_wide` (fingerprint `9bac6ee3`) is the current WIDE build" —
-`9bac6ee3` is `donovan-m5w`, SUPERSEDED by `donovan-m3a` back in 14z-64;
-corrected in the 14z-79 stale-doc sweep.)
+**Current WIDE builds (14z-85b):** `build/hui33` = **`huitzil-m7`
+(`284e3b1c`)** for Phobos (= m6 + hui_sfx_records: his curated per-node
+sfx + the helper unstub — his kept node sfx become AUDIBLE on solo) and
+`build/pyron22` = **`pyron-m4` (`ac22418f`)** for Pyron (= m3 +
+pyr_sfx_records — kills the merged music retrigger at its source);
+`build/m5_wide` = **`donovan-m3a` (`4b7d0dc7`)** for Donovan.
+huitzil-m6 (`build/hui32`) and pyron-m3 (`build/pyron21`) are SUPERSEDED,
+kept on disk as pre-sfx A/B baselines (their extract dirs remain the
+tenant_loop/build_merged inputs — extraction is unchanged by the rows).
 `build/m5w` (`ac52eeff`) is the KNOWN-BAD artifact of the 14z-60y sprite
 garble, kept as evidence — do not playtest it. `tools/audit_romset_identity.py
 build/m5w/rompath` names its four shadowed members in a second.
 **`build/m3b_merged` is the MERGED BUILD WITH GFX** (14z-83 S4,
-`tools/build_merged.sh`): the 667-op 3-tenant program image (14z-85 owner
-tag; was 593 pre-14z-84, 597 pre-14z-85) + the S2 gfx
+`tools/build_merged.sh`): the 669-op 3-tenant program image (14z-85 owner
+tag + 14z-85b sfx records; was 597 pre-14z-85) + the S2 gfx
 chain (D → H → P, last link's members packed, group B pristine). The
 FIRST artifact where all 18 characters have both code and art.
 UNREGISTERED until the S6 freeze decision — run_suite refuses it, and it
@@ -1057,15 +1054,14 @@ tests/audit_pool_free_byte.sh         # REWRITTEN 14z-85 (the 14z-84 version
                                       # write at b8+0x7E covers +0x7F — the
                                       # 14z-84 zero-writes there was a word-
                                       # offset accounting artifact. ~20 min
-tests/audit_pyron_ring.sh             # 14z-85 (~10 min, 4 runs): pyron's
-                                      # merged-vs-solo ring-id diff must equal
-                                      # the FROZEN known-open inventory (the
-                                      # per-node sfx helper class — donovan's
-                                      # sound_table un-stubs it engine-wide,
-                                      # pyron/hui ptr rows not repointed;
-                                      # music 0x729 + 4 ids). Drift or a
-                                      # missing solo id FAILS. Re-freeze to
-                                      # empty when per-tenant sfx records ship
+tests/audit_pyron_ring.sh             # 14z-85, RE-FROZEN 14z-85b (~10 min,
+                                      # 4 runs): pyron's merged-vs-solo
+                                      # ring-id diff must be EMPTY (the
+                                      # per-node sfx helper class is FIXED —
+                                      # pyr/hui_sfx_records curated arrays;
+                                      # pre-fix the diff was music 0x729 + 4
+                                      # ids). Any new id or a missing solo
+                                      # id FAILS. Solo default: pyron22
 tests/audit_df_gold.sh                # 14z-84: Phobos' DF uploads HIS gold
                                       # block (live palette RAM vs the
                                       # build's own placed block) and
