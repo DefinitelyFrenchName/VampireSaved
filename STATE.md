@@ -1,13 +1,45 @@
 # STATE — living progress log
 
-FIELD VERDICT (maintainer, 2026-08-13, first playtest of the 14z-85/85b
-merged build): **"the music triggering is gone, Piled Hell has its
-hitbox — needs deeper testing but it does look very good."** Both
-predicted fixes confirmed on first contact: the sfx-records fix killed
-the music retrigger (audible), and the owner tag restored Piled Hell's
-hitbox (his objects now run HIS handler data). Deeper testing to follow.
+Updated: 2026-08-13 (session 14z-85b close — **PER-TENANT SFX RECORDS
+SHIPPED (maintainer-ruled option (a), same day) AND FIELD-CONFIRMED
+alongside the owner tag: "the music triggering is gone, Piled Hell has
+its hitbox — needs deeper testing but it does look very good."** The
+arc, ruled to green in one pass: (1) the fix derived entirely from
+measurement — vs2's per-char record ptr table found at 0xD95B8 (its
+row 0x13 = don's known 0x0CB01A, the cross-check), Phobos' array at
+0x0C742A (24 records) and Pyron's at 0x0C8B18 (23; the over-run span
+holds keep-id lookalikes so the bound is exact), both shape-scanned
+against the don control; per-id curation reproduced the 14z-52 method
+on the measured keyon maps, with the comparator GROUND-TRUTHED first
+(known-shared ids must read equal; the maps' 12-frame-window blindness
+to the trio documented in docs/project/tables/sfx_records.md — keeps
+rest on don's ratified set + two NEW measured-SHARED ids 0x198/0x199
+for Phobos). (2) Two manifest rows, the don precedent verbatim (NET +1
+op each; the 14z-65 claim machinery suppresses the generic
+tail_data_ptr repoint that had been serving RAW vs2 records to the
+unstubbed helper — the actual music mechanism). (3) THE FREEZE
+CEREMONY: huitzil-m7 = build/hui33 (284e3b1c), pyron-m4 = build/pyron22
+(ac22418f), sets carried RENAMED, suites GREEN with --freeze, and every
+.sha1 mover byte-attributed — ONE divergent frame (f890, the
+select-init staging of the repointed ptr rows, re-converges same frame)
+on EVERY replay, plus exactly one bounded run (f2410-2596, the
+now-audible node sfx) on the two tenant-pick replays; masked legacy
+classes verbatim. tenant_loop 243/266/208 + 474/669; m3a_reproducible
+green on the new EXPECTs; tags freeze/huitzil-m7, freeze/pyron-m4.
+(4) THE MERGED LADDER, all green on the rebuilt m3b_merged (669 ops):
+vec3, dispatch-range §0-6 (tag stubs live, tripwire silent), pool audit
+post-tag, trap sound on hui33, audit_pyron_ring RE-FROZEN TO EMPTY
+merged-vs-solo diff (every pre-fix id incl. music 0x729 GONE, no solo
+id missing), merged legacy audit PASS (leg a verbatim incl. ratified
+04+11). Solo behavior change, deliberate: H/P node sfx become AUDIBLE
+on their solo builds (no build of theirs ever carried the unstub).
+DECISION STILL PENDING: the 59-63 stub extension (explained to the
+maintainer; fold into the next op-count re-freeze if ruled (a)).
+**NEXT: the maintainer's deeper full-scope testing; the M5
+voice-samples decision is now the only thing between the tenants and
+their voice lines.**)
 
-Updated: 2026-08-13 (session 14z-85 close — **THE SPAWN-TIME OWNER TAG
+Previously: 2026-08-13 (session 14z-85 close — **THE SPAWN-TIME OWNER TAG
 SHIPPED AND FULLY VERIFIED (maintainer option (a), the prescribed first
 act), with two measurement corrections en route and one mechanism
 re-attribution.** The arc: (1) the 14z-84 free-byte census was caught
