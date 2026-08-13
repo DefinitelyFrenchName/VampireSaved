@@ -139,7 +139,20 @@ not a valid oracle; Bulleta's own rows identical. Her row-0x0A write
 stream (palette-seq player 0x2AD78/64 + 0x1433C) is hit-for-hit
 byte-identical across legs. THE RIG DOES NOT REPRODUCE THE SIGHTING —
 repro conditions requested from the maintainer (opponent, side, pick
-path, mode). INSTRUMENT GOTCHA PAID: the first A/B ran under
+path, mode). **MAINTAINER RECIPE RUN (P1 Bulleta, P2 Morrigan 0x05, DF
+via banked stock) WITH SCREEN CAPTURES, both legs: all four frame pairs
+PIXEL-IDENTICAL vanilla-vs-merged, and BOTH render her PURPLE in DF —
+vanilla vsavj itself does this, matching the 14z-79 record ("vsavj's
+rows purple where vs2's are gold", her block 0x1E-0x21). The merged
+build is FAITHFUL on this item; the "wrong" purple appears to BE vsavj's
+Bulleta DF — the gold memory is the VS2-family look. Captures sent to
+the maintainer; their confirmation decides whether this files as
+not-a-bug (vanilla-faithful) or stays open with a new repro. Caveats
+stated: this capture run could not dump-assert $FF802E
+(snapshot_frames.lua has no DUMPS env) — the identical rig asserted it
+in the three prior runs and the DF aura is visible on screen; the pick
+color is the replay's, not necessarily LP-default — shared by both legs,
+and the vanilla leg is the oracle regardless.** INSTRUMENT GOTCHA PAID: the first A/B ran under
 GUARD_PROBE and showed a phantom persistent 23-byte row-0x0A diff —
 debugger-probe overhead lands differently on two DIFFERENT BUILDS, so
 cross-build A/B dumps must run probe-free (the -debug-timeline caveat's
