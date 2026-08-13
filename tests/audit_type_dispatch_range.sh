@@ -24,8 +24,20 @@
 #   3  merged + donovan vs-CPU: original range >= 1 (tenant-0 keeps the
 #      original entries and they must still serve him)
 #
-# Probe: the site-0x5E542 obj_hook thunk entry, scraped from the build's
-# patch_notes_fragment.md (LAST `obj_hook thunk` row — site order; the
+# 14z-85 — the 0x54470 family (59-75), which the OWNER TAG serves (no
+# renumbering there; entries 64-75 are tag stubs whose zero/unclaimed-tag
+# fall-through is a planted ILLEGAL):
+#   4  verdict control on build/hui30 + plasma trap: family dispatches at
+#      the 0x54470 site MUST be visible (the instrument can see them)
+#   5  merged + huitzil plasma trap: family dispatches >= 1 AND no CRASH —
+#      a tripwire fire here is an UNTAGGED family object (a stamp site
+#      the tag emission missed) or an unclaimed tag
+#   6  merged + pyron mash: same, for pyron's family content (type 66
+#      measured live in this replay, 14z-85 census)
+#
+# Probe: the per-site obj_hook thunk entries, scraped from the build's
+# patch_notes_fragment.md (rows are emitted in site order: FIRST row =
+# site 0x54470, LAST row = site 0x5E542; the
 # audit_objhook_owner_census.sh pattern). At thunk entry D0 still holds
 # type*4 (at site+6 it is already cleared). Guarded runs are never
 # checksum-compared (GOTCHAS).
@@ -56,14 +68,18 @@ thunk_of() {  # thunk_of <builddir> — LAST obj_hook thunk row = site 0x5E542
     sed -n 's/^code *0x0*\([0-9a-f]*\) obj_hook thunk .*/\1/p' \
         "$1/patch/patch_notes_fragment.md" | tail -1
 }
+thunk54_of() {  # FIRST obj_hook thunk row = site 0x54470 (site order)
+    sed -n 's/^code *0x0*\([0-9a-f]*\) obj_hook thunk .*/\1/p' \
+        "$1/patch/patch_notes_fragment.md" | head -1
+}
 
 HUI_SOAK="1704:ff8782:10;1760:ff8782:10;1900:ff8782:10;2100:ff8782:10;2400:ff8782:10"
 PYR_SOAK="1704:ff8782:11;1760:ff8782:11;1900:ff8782:11;2100:ff8782:11;2400:ff8782:11"
 POK13="1400:ff8782:13;1450:ff8782:13;1500:ff8782:13;1400:ff8b82:13;1450:ff8b82:13;1500:ff8b82:13"
 
-probe_run() {  # probe_run <build> <thunk> <replay> <pokes> <out>
+probe_run() {  # probe_run <build> <thunk> <replay> <pokes> <out> [cond]
     POKES="$4" MAME_ROMPATH="$(abspath "$1")/rompath;$ROMDIR" \
-    GUARD_PROBE="$2" GUARD_PROBE_COND="d0 >= 0x1c8" GUARD_PROBE_MAX=20000 \
+    GUARD_PROBE="$2" GUARD_PROBE_COND="${6:-d0 >= 0x1c8}" GUARD_PROBE_MAX=20000 \
         tools/run_replay_guarded.sh vsavjw "tests/replays/$3.rpl" \
         "$5" "${5%.log}_box" >/dev/null 2>&1 || true
     [ -f "$5" ] || : >"$5"   # a dead run still gets an (empty) log to judge
@@ -152,6 +168,67 @@ verdict "$W/pyr.log" "merged/pyr_70" zero_noren pyron || fail=1
 echo "== 3: merged + donovan (originals still serve tenant-0) =="
 probe_run "$MERGED" "$TH_MRG" 12_donovan_vs_cpu "$POK13" "$W/don.log"
 verdict "$W/don.log" "merged/don_12" see "" || fail=1
+
+# ── 14z-85: the 0x54470 family — tag-stub dispatch liveness + tripwire
+# ── silence. D0 at thunk entry = type*4: family = [0xEC,0x130), the
+# ── stubbed 64-75 subrange = [0x100,0x130). A CRASH on the merged legs
+# ── is the zero-tag tripwire firing: a stamp site the emission missed.
+verdict54() {  # verdict54 <log> <label> <want: see|live_nocrash>
+    python3 - "$1" "$2" "$3" <<'PY'
+import re, sys
+log, label, want = sys.argv[1:4]
+fam = stub = 0
+crash = None
+for ln in open(log, errors="replace"):
+    m = re.match(r"PROBE (\d+) D0=([0-9a-f]+) ", ln)
+    if m:
+        d0 = int(m.group(2), 16)
+        if 0xEC <= d0 < 0x130:
+            fam += 1
+            if d0 >= 0x100:
+                stub += 1
+    elif ln.startswith("CRASH") and crash is None:
+        crash = ln.strip()
+ok = True
+if fam < 1:
+    print(f"  FAIL  {label}: zero 0x54470 family dispatches — dead probe "
+          f"or the rig never spawned family content; this run proves "
+          f"nothing"); ok = False
+else:
+    print(f"  PASS  {label}: {fam} family dispatch(es), {stub} in the "
+          f"stubbed 64-75 range")
+if want == "live_nocrash" and crash:
+    print(f"  FAIL  {label}: {crash} — a tag stub tripwired (an untagged "
+          f"family object = a missed stamp site, or an unclaimed tag)")
+    ok = False
+elif crash:
+    print(f"  note  {label}: {crash}")
+sys.exit(0 if ok else 1)
+PY
+}
+
+T54_REF="$(thunk54_of "$REF")"
+T54_MRG="$(thunk54_of "$MERGED")"
+[ -n "$T54_REF" ] && [ -n "$T54_MRG" ] || {
+    echo "FAIL: could not scrape the 0x54470 thunk address"; exit 1; }
+[ "$T54_MRG" != "$TH_MRG" ] || {
+    echo "FAIL: 0x54470 and 0x5E542 thunks scraped identically — the"
+    echo "      site-order assumption broke; fix the scrape"; exit 1; }
+
+echo "== 4: verdict control — 0x54470 family visible on $REF =="
+probe_run "$REF" "$T54_REF" hui/87_hui_plasma_trap "$HUI_SOAK" \
+    "$W/ref54.log" "d0 >= 0xec"
+verdict54 "$W/ref54.log" "ref54/87_trap" see || fail=1
+
+echo "== 5: merged + huitzil — tag stubs serve H, tripwire silent =="
+probe_run "$MERGED" "$T54_MRG" hui/87_hui_plasma_trap "$HUI_SOAK" \
+    "$W/hui54.log" "d0 >= 0xec"
+verdict54 "$W/hui54.log" "merged54/hui_87" live_nocrash || fail=1
+
+echo "== 6: merged + pyron — tag stubs serve P, tripwire silent =="
+probe_run "$MERGED" "$T54_MRG" pyron/70_pyron_mash "$PYR_SOAK" \
+    "$W/pyr54.log" "d0 >= 0xec"
+verdict54 "$W/pyr54.log" "merged54/pyr_70" live_nocrash || fail=1
 
 [ "$fail" = 0 ] && echo "audit_type_dispatch_range: ALL PASS" \
                 || echo "audit_type_dispatch_range: FAILURES"

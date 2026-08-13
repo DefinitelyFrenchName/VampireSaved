@@ -1,22 +1,36 @@
 #!/bin/sh
-# audit_pool_free_byte.sh — the owner-tag byte (+0x7F of the $FFB800 pool
-# slot) is FREE, re-measured (14z-84; the 59-75 owner-dispatch fix's
-# foundation). On-demand, ~15 min (2 tap legs + 2 dump legs on the merged
-# build).
+# audit_pool_free_byte.sh — the owner-tag byte (+0x7F of an object-pool
+# slot) audit, BOTH pools. On-demand, ~20 min (3 legs x census + tap on
+# the merged build).
 #
-# WHAT IT RE-DERIVES (the measurement the fix rests on):
-#   1. CENSUS — +0x7F is zero in EVERY live pool slot (type byte +0x02
-#      nonzero) across both tenants' effect-heavy windows;
-#   2. WRITE-TAP — zero writes hit +0x7F (offset%0x80 == 0x7F) in the
-#      same windows, with the instrument's liveness proven by the
-#      documented busy fields (+0x00/+0x20 must show heavy traffic).
-# KNOWN NEIGHBOR FACT (frozen): +0x7C/+0x7E each take exactly ONE write
-# from OUR hole_b code — they are DISQUALIFIED, and their hit staying
-# nonzero doubles as a second liveness control.
+# POOL ATTRIBUTION (corrected 14z-85 — the 14z-84 version of this audit
+# measured only $FFB800 and attributed the result to the 59-75 family,
+# which was the WRONG POOL):
+#   $FF9400 + n*0x100, 32 slots — walker 0x54458 / site 0x54470, the
+#       59-75 family. THE TAG'S POOL. Re-measured 14z-85: 804 live-slot
+#       observations, zero +0x7F writes across 19,357 tapped pool writes,
+#       live family content on two legs (types 0x42/0x45).
+#   $FFB800 + n*0x80, 32 slots — walker 0x5E52A / site 0x5E542, the
+#       114-120 family (renumbered 14z-82, no tags needed). +0x7F is
+#       measured free here too (the 14z-84 census, still valid FOR THIS
+#       POOL) and must STAY untouched — a tag write landing here means a
+#       family stamp allocated from the effect pool, which the census
+#       never observed and which must be investigated, not absorbed.
 #
-# Once the owner-tag ships, +0x7F writes from OUR stamp-site emissions
-# are EXPECTED — this audit then asserts the writer PCs are exactly the
-# emitted tag sites (extend at that point, do not delete).
+# TWO MODES, auto-selected by the build's own tag_map.json:
+#   pre-tag build (no tag_map.json): +0x7F takes ZERO writes and is zero
+#       in every live slot, both pools — the original freeness claim.
+#   post-tag build: on $FF9400, live FAMILY-typed slots (type 0x3B-0x4B)
+#       must carry the forced tenant's tag (the zero-tag tripwire's
+#       static twin), and every +0x7F writer PC must be one of the
+#       emitted tag thunks (tag_map.json tag_write_pc rows); $FFB800
+#       +0x7F stays zero-write/zero-value.
+#   FORCE_MODE=pre|post overrides — the negative control: post-mode
+#       against a pre-fix build MUST fail (untagged family slots).
+#
+# KNOWN NEIGHBOR FACT (frozen, $FFB800): +0x7C/+0x7E take writes from OUR
+# hole_b code (PC 0x3FFFD6) — DISQUALIFIED as tag bytes, and their hits
+# staying nonzero doubles as a liveness control (asserted below).
 #
 # Usage: ROMDIR=... tests/audit_pool_free_byte.sh [merged builddir]
 set -eu
@@ -30,69 +44,178 @@ export MAME_BIN
 W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT
 fail=0
 
-DF=$(python3 -c "print(';'.join(f'{f}:ffb800-ffc7ff' for f in range(3100,3612,4)))")
-for leg in hfx:hui/83_hui_fx:10 pcosmo:pyron/71_pyron_cosmo:11; do
-    name="${leg%%:*}"; rest="${leg#*:}"; rp="${rest%%:*}"; id="${rest##*:}"
-    PK="1400:ff8782:$id;1450:ff8782:$id;1500:ff8782:$id"
+MODE="${FORCE_MODE:-}"
+if [ -z "$MODE" ]; then
+    if [ -f "$BUILD/patch/tag_map.json" ]; then MODE=post; else MODE=pre; fi
+fi
+echo "mode: $MODE (owner-tag $([ "$MODE" = post ] && echo shipped || echo 'not in this build'))"
+
+# leg spec: name : replay : forced id : frames : window lo : window hi
+# (pcosmo NEEDS the meter pokes or the EX never fires — replay header)
+run_leg() {
+    name="$1"; rp="$2"; pk="$3"; frames="$4"; wlo="$5"; whi="$6"
+    DF=$(python3 -c "print(';'.join(f'{f}:ff9400-ffb3ff;{f}:ffb800-ffc7ff' for f in range($wlo,$whi,4)))")
     d="$W/$name"; mkdir -p "$d"
     ( cd "$d" && MAME_ROMPATH="$REPO/$BUILD/rompath;$ROMDIR" \
-      MAME_SANDBOX="$d/sb" POKES="$PK" \
-      REPLAY="$REPO/tests/replays/$rp.rpl" DUMPS="$DF" FRAMES=3620 \
+      MAME_SANDBOX="$d/sb" POKES="$pk" \
+      REPLAY="$REPO/tests/replays/$rp.rpl" DUMPS="$DF" FRAMES="$frames" \
       CHECKSUM_OUT="$d/c.ram" \
       "$REPO/tools/run_mame.sh" vsavjw \
       -autoboot_script "$REPO/tests/lua/replay.lua" > "$d/out" 2>&1 ) \
         || { echo "FAIL: $name census leg did not run"; fail=1; }
     t="$W/tap_$name"; mkdir -p "$t"
     ( cd "$t" && MAME_ROMPATH="$REPO/$BUILD/rompath;$ROMDIR" \
-      MAME_SANDBOX="$t/sb" POKES="$PK" \
+      MAME_SANDBOX="$t/sb" POKES="$pk" \
       REPLAY="$REPO/tests/replays/$rp.rpl" \
-      TAP="ffb800,4096" WINDOW="3100,3610" FRAMES=3620 \
+      TAP="ff9400,13312" WINDOW="$wlo,$whi" FRAMES="$frames" \
       TRACE_OUT="$t/tap.txt" \
       "$REPO/tools/run_mame.sh" vsavjw \
       -autoboot_script "$REPO/tests/lua/tap_writes.lua" > "$t/out" 2>&1 ) \
         || { echo "FAIL: $name tap leg did not run"; fail=1; }
-done
+}
 
-python3 - "$W" <<'PY' || fail=1
-import glob, re, sys, collections
+PK10="1400:ff8782:10;1450:ff8782:10;1500:ff8782:10"
+PK11="1400:ff8782:11;1450:ff8782:11;1500:ff8782:11;3000:ff8509:03;3020:ff8509:03"
+run_leg hfx    hui/83_hui_fx          "$PK10" 3620 3100 3608 &
+run_leg htrap  hui/87_hui_plasma_trap "$PK10" 4810 3300 4800 &
+run_leg pcosmo pyron/71_pyron_cosmo   "$PK11" 5200 3300 5150 &
+wait
+
+MODE="$MODE" BUILD="$BUILD" python3 - "$W" <<'PY' || fail=1
+import glob, json, os, re, sys, collections
 W = sys.argv[1]
+MODE = os.environ["MODE"]
+BUILD = os.environ["BUILD"]
+LEGS = {"hfx": 0x10, "htrap": 0x10, "pcosmo": 0x11}
+FAMILY = range(0x3B, 0x4C)                      # types 59-75
+tag_pcs = set()
+if MODE == "post":
+    try:
+        tag_pcs = {r["tag_write_pc"] for r in
+                   json.load(open(f"{BUILD}/patch/tag_map.json"))}
+    except FileNotFoundError:
+        print("FAIL: post mode needs tag_map.json (FORCE_MODE against a "
+              "pre-tag build: point BUILD's tag_map elsewhere explicitly)")
+        sys.exit(1)
 errs = []
-for leg in ("hfx", "pcosmo"):
-    live = 0; nonzero7f = 0
+agg = {"b8_00": 0, "b8_20": 0, "b8_7c7e": 0, "94_01": 0, "94_20": 0,
+       "tag_hits": 0}
+for leg, tid in LEGS.items():
+    # ── census: $FF9400 (0x100 stride) ──────────────────────────────────
+    live94 = fam = fam_tagged = fam_wrong = 0
+    z7f_94 = 0
+    for f in sorted(glob.glob(f"{W}/{leg}/dump_*_ff9400.bin")):
+        d = open(f, "rb").read()
+        for s in range(0, min(len(d), 0x2000), 0x100):
+            slot = d[s:s + 0x100]
+            if len(slot) < 0x100 or slot[0] == 0:
+                continue
+            live94 += 1
+            if slot[2] in FAMILY:
+                fam += 1
+                if slot[0x7F] == tid:
+                    fam_tagged += 1
+                else:
+                    fam_wrong += 1
+            if slot[0x7F] != 0:
+                z7f_94 += 1
+    # ── census: $FFB800 (0x80 stride) ───────────────────────────────────
+    liveb8 = nz7f_b8 = 0
     for f in sorted(glob.glob(f"{W}/{leg}/dump_*_ffb800.bin")):
         d = open(f, "rb").read()
         for s in range(0, min(len(d), 0x1000), 0x80):
-            slot = d[s:s+0x80]
+            slot = d[s:s + 0x80]
             if len(slot) < 0x80 or slot[2] == 0:
                 continue
-            live += 1
+            liveb8 += 1
             if slot[0x7F] != 0:
-                nonzero7f += 1
-    if live < 200:
-        errs.append(f"{leg}: only {live} live-slot observations — the rig "
-                    "did not form the effect content (verdict vacuous)")
-    elif nonzero7f:
-        errs.append(f"{leg}: +0x7F NONZERO in {nonzero7f}/{live} live slots")
-    else:
-        print(f"  ok: {leg} census — +0x7F zero in all {live} live slots")
-    hits = collections.Counter()
+                nz7f_b8 += 1
+    # ── tap: one range covers both pools (ff9400 base) ──────────────────
+    w7f_94 = collections.Counter()   # PC -> hits on $FF9400 +0x7F
+    w7f_b8 = 0
     for ln in open(f"{W}/tap_{leg}/tap.txt"):
-        m = re.match(r"frame \d+ PC [0-9a-f]+ off ([0-9a-f]+)", ln)
-        if m:
-            hits[int(m.group(1), 16) % 0x80] += 1
-    if hits[0x00] < 100 or hits[0x20] < 100:
-        errs.append(f"{leg}: busy fields quiet (+0x00={hits[0x00]}, "
-                    f"+0x20={hits[0x20]}) — the tap is not live")
-    elif hits[0x7F]:
-        errs.append(f"{leg}: +0x7F took {hits[0x7F]} write(s)")
+        m = re.match(r"frame \d+ PC ([0-9a-f]+) off ([0-9a-f]+) "
+                     r"data ([0-9a-f]+) mask ([0-9a-f]+)", ln)
+        if not m:
+            continue
+        pc, off = int(m.group(1), 16), int(m.group(2), 16)
+        mask = int(m.group(4), 16)
+        m16 = mask & 0xFFFF if (mask & 0xFFFF) else (mask >> 16) & 0xFFFF
+        rel = off - 0xFF9400
+        for lane, hit in ((0, m16 & 0xFF00), (1, m16 & 0x00FF)):
+            if not hit:
+                continue
+            b = rel + lane
+            if 0 <= b < 0x2000:                       # $FF9400 pool
+                so = b % 0x100
+                if so == 0x01: agg["94_01"] += 1
+                if so == 0x20: agg["94_20"] += 1
+                if so == 0x7F: w7f_94[pc] += 1
+            elif 0x2400 <= b < 0x3400:                # $FFB800 pool
+                so = (b - 0x2400) % 0x80
+                if so == 0x00: agg["b8_00"] += 1
+                if so == 0x20: agg["b8_20"] += 1
+                if so in (0x7C, 0x7E): agg["b8_7c7e"] += 1
+                if so == 0x7F: w7f_b8 += 1
+    # ── verdicts per leg ────────────────────────────────────────────────
+    print(f"  [{leg}] $FF9400 live {live94} (family {fam}, tagged "
+          f"{fam_tagged}) | $FFB800 live {liveb8} | +0x7F writes "
+          f"94:{sum(w7f_94.values())} b8:{w7f_b8}")
+    if leg == "hfx" and liveb8 < 200:
+        errs.append(f"{leg}: only {liveb8} live $FFB800 slots — the rig "
+                    "did not form the effect content (verdict vacuous)")
+    if leg in ("htrap", "pcosmo") and fam < 30:
+        errs.append(f"{leg}: only {fam} family-typed live slots on "
+                    "$FF9400 — the rig did not form family content "
+                    "(verdict vacuous)")
+    if nz7f_b8:
+        errs.append(f"{leg}: $FFB800 +0x7F NONZERO in {nz7f_b8}/{liveb8} "
+                    "live slots")
+    if w7f_b8:
+        errs.append(f"{leg}: $FFB800 +0x7F took {w7f_b8} write(s) — a tag "
+                    "strayed into the effect pool; investigate")
+    if MODE == "pre":
+        if z7f_94:
+            errs.append(f"{leg}: $FF9400 +0x7F NONZERO in {z7f_94}/{live94} "
+                        "live slots (pre-tag build)")
+        if w7f_94:
+            errs.append(f"{leg}: $FF9400 +0x7F took "
+                        f"{sum(w7f_94.values())} write(s) (pre-tag build)")
     else:
-        print(f"  ok: {leg} tap — zero +0x7F writes; instrument live "
-              f"(+0x00={hits[0x00]}, +0x20={hits[0x20]})")
+        if fam_wrong:
+            errs.append(f"{leg}: {fam_wrong}/{fam} family slots NOT "
+                        f"carrying tag {tid:#x} — a stamp site the tag "
+                        "emission missed (the tripwire's static twin)")
+        bad_pcs = set(w7f_94) - tag_pcs
+        if bad_pcs:
+            errs.append(f"{leg}: +0x7F written by PCs outside the emitted "
+                        f"tag thunks: "
+                        + ", ".join(f"{p:#x}" for p in sorted(bad_pcs)))
+        agg["tag_hits"] += sum(w7f_94.values())
+# ── aggregated instrument liveness (unconditional totals first) ─────────
+print(f"  liveness: b8 +0x00={agg['b8_00']} +0x20={agg['b8_20']} "
+      f"+0x7C/7E={agg['b8_7c7e']} | 94 +0x01={agg['94_01']} "
+      f"+0x20={agg['94_20']} | tag writes={agg['tag_hits']}")
+if agg["b8_00"] < 100 or agg["b8_20"] < 100:
+    errs.append("busy $FFB800 fields quiet — the tap is not live")
+if agg["94_01"] < 100 or agg["94_20"] < 100:
+    errs.append("busy $FF9400 fields quiet — the tap is not live")
+if agg["b8_7c7e"] < 1:
+    errs.append("the hole_b +0x7C/+0x7E writes vanished — second liveness "
+                "control dead (or our hole_b code changed; re-measure)")
+if MODE == "post" and agg["tag_hits"] < 1:
+    errs.append("post-tag build but ZERO tag writes observed — the "
+                "detours are not live")
 for e in errs:
     print("FAIL:", e)
 sys.exit(1 if errs else 0)
 PY
 
-[ "$fail" = 0 ] || { echo "FAIL: pool free-byte audit"; exit 1; }
-echo "PASS: +0x7F is free — zero values in live slots AND zero writes,"
-echo "      both tenants, instrument liveness proven"
+[ "$fail" = 0 ] || { echo "FAIL: pool tag-byte audit ($MODE mode)"; exit 1; }
+if [ "$MODE" = post ]; then
+    echo "PASS: family slots tagged by their stampers, +0x7F writers are"
+    echo "      exactly the emitted tag thunks, effect pool untouched"
+else
+    echo "PASS: +0x7F free on BOTH pools — zero values in live slots AND"
+    echo "      zero writes, instrument liveness proven"
+fi

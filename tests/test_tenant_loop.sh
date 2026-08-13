@@ -159,8 +159,14 @@ check_n() {  # check_n <label> <dir> <want ops> <sum of 1-tenant counts>
 # into tenant-0's handler). The shim itself and the dispatch-row pokes
 # rebalance to the same count; the 12 renumbered obj_hook entries grow the
 # TABLE op's hex, not the op count. Single-tenant counts above unchanged.
-check_n "2 tenants" "$WORK/two"   443 508
-check_n "3 tenants" "$WORK/three" 597 715
+# RE-FROZEN 14z-85 (was 443/597): the spawn-time OWNER TAG (maintainer
+# option (a)). N=2 (D+H) +30 = the 30 distinct owner-tag thunks (D 9 +
+# H 21; entries 64-75 are SINGLE-resolver without pyron, so no stubs).
+# N=3 +70 = 46 thunks (D 9 + H 21 + P 16) + 12 tag stubs on entries
+# 64-75 + their 12 tripwires. The 80 site detours are blob edits (0 ops).
+# Single-tenant counts above unchanged — the pass is empty at N=1.
+check_n "2 tenants" "$WORK/two"   473 508
+check_n "3 tenants" "$WORK/three" 667 715
 
 # ── 3: every tenant's own content is present ────────────────────────────
 # An op count alone cannot tell "both tenants ran" from "tenant 0 ran twice".
@@ -265,14 +271,20 @@ PY
 # ── 4b: the ENGINE-LEVEL UNION — one table, every tenant's handlers ─────
 # `obj_hook`'s extended secondary-object table is ONE table at ONE address
 # whose entries point at handlers DIFFERENT TENANTS port: 59-63 are
-# Donovan's, 64-75 Huitzil's. Emitted on iteration 0 it saw only tenant 0's
-# placements and sent all twelve of Huitzil's to TRIPWIRES — an ILLEGAL the
-# moment one of his secondary objects spawned. It now runs on the LAST
-# iteration through `resolve_ported()`.
+# Donovan's; 64-75 are handler copies BOTH huitzil and pyron place, so
+# (14z-85, maintainer option (a)) each of those entries is a TAG STUB
+# dispatching on the object's spawn-time owner tag — first-wins into
+# huitzil's copies was declaration-order luck and Pyron's family objects
+# ran H's copies (music retrigger, STATE 14z-84 finding (3)). Emitted on
+# iteration 0 the union saw only tenant 0's placements and sent all twelve
+# to TRIPWIRES — an ILLEGAL the moment one of his secondary objects
+# spawned. It runs on the LAST iteration through `resolve_ported()`.
 #
 # The check is per-ENTRY attribution, not a count: an entry pointing into
 # SOME placed region is not evidence it points into the RIGHT tenant's copy,
 # and the shared spans mean a wrong-tenant target would still look placed.
+# For 64-75 the stub's own bytes are decoded: each compare id must route
+# to a handler in THAT tenant's copy.
 echo "== 4b: the obj_hook union resolves each tenant's own handlers =="
 python3 - "$WORK/three" <<'PY' || fail=1
 import json, os, re, sys
@@ -305,9 +317,7 @@ def owner(a):
             return k
     return None
 
-EXPECT = {**{k: "donovan" for k in range(59, 64)},
-          **{k: "huitzil" for k in range(64, 76)}}
-for k, who in EXPECT.items():
+for k, who in {k: "donovan" for k in range(59, 64)}.items():
     tgt = int.from_bytes(tbl[k * 4:k * 4 + 4], "big")
     o = owner(tgt)
     if o is None:
@@ -317,6 +327,34 @@ for k, who in EXPECT.items():
     if got != who:
         bad.append("type %d resolves into %s's %s, expected %s's"
                    % (k, got, o, who))
+# 14z-85: entries 64-75 are TAG STUBS (owner_dispatch_stub shape "tag" —
+# the ruled option (a)). Per-ENTRY attribution, decoded from the stub's
+# own bytes: each compare id must route to a handler placed in THAT
+# tenant's copy (0x10 -> huitzil's, 0x11 -> pyron's), with one tripwire
+# fall-through for zero/unclaimed tags. A first-wins pointer (the pre-fix
+# shape) fails here because it is not a decodable stub op.
+code_at = {int(o["addr"], 16): o["hex"] for o in ops if o["op"] == "code"}
+TAG_OWNER = {0x10: "huitzil", 0x11: "pyron"}
+for k in range(64, 76):
+    tgt = int.from_bytes(tbl[k * 4:k * 4 + 4], "big")
+    h = code_at.get(tgt)
+    if h is None:
+        bad.append("type %d -> %#x is not a generated code op (first-wins "
+                   "regression?)" % (k, tgt)); continue
+    cmp_ids = [int(x, 16) for x in re.findall(r"0c2e00([0-9a-f]{2})007f", h)]
+    exits = [int(x, 16) for x in re.findall(r"7000207c([0-9a-f]{8})4ed0", h)]
+    tws = re.findall(r"4ef9([0-9a-f]{8})", h)
+    if sorted(cmp_ids) != [0x10, 0x11] or len(exits) != 2 or len(tws) != 1:
+        bad.append("type %d stub %#x does not decode as a 2-tenant tag stub "
+                   "(ids %s, %d exits, %d tripwires)"
+                   % (k, tgt, [hex(i) for i in cmp_ids], len(exits), len(tws)))
+        continue
+    for cid, haddr in zip(cmp_ids, exits):
+        o = owner(haddr)
+        got = (o.split("@")[1] if "@" in (o or "") else "donovan") if o else None
+        if got != TAG_OWNER[cid]:
+            bad.append("type %d tag %#x routes to %s (%s), expected %s's copy"
+                       % (k, cid, hex(haddr), o, TAG_OWNER[cid]))
 # types 121-123 point at 0x6A70C, which NO tenant ports — they must STAY
 # tripwires, or the union has started resolving things it cannot.
 still = len(re.findall(r"obj_hook@\S+ type 12[123]: unresolved", notes))
@@ -327,8 +365,9 @@ for b in bad:
     print("  FAIL: %s" % b)
 if not bad:
     print("  ok: %d/%d ported extras placed; types 59-63 in donovan's "
-          "regions and 64-75 in huitzil's OWN copies; 121-123 still "
-          "tripwired" % (n_placed, n_ext))
+          "regions; 64-75 are TAG STUBS routing 0x10->huitzil / "
+          "0x11->pyron with a tripwire fall-through (14z-85); 121-123 "
+          "still tripwired" % (n_placed, n_ext))
 sys.exit(1 if bad else 0)
 PY
 

@@ -169,8 +169,8 @@ if [ "$PREBUILT" = 1 ]; then
     [ -f "$OUT/patch/patch.json" ] || {
         echo "FAIL: MERGED_PREBUILT=1 but no $OUT/patch/patch.json"; exit 1; }
     NOPS="$(python3 -c "import json;print(len(json.load(open('$OUT/patch/patch.json'))['ops']))")"
-    [ "$NOPS" = 597 ] || { echo "FAIL: $NOPS ops, frozen fixture is 597"; exit 1; }
-    echo "  ok: 597 ops (the frozen test_tenant_loop fixture)"
+    [ "$NOPS" = 667 ] || { echo "FAIL: $NOPS ops, frozen fixture is 667"; exit 1; }
+    echo "  ok: 667 ops (the frozen test_tenant_loop fixture; 14z-85 owner tag)"
     python3 tools/audit_romset_identity.py "$OUT/rompath" || {
         echo "  FAIL: member-identity audit"; exit 1; }
     FP="$(python3 tools/build_fingerprint.py "$OUT/rompath;$ROMDIR" --set vsavjw --sha-only || true)"
@@ -195,10 +195,10 @@ NOPS="$(python3 -c "import json;print(len(json.load(open('$OUT/patch/patch.json'
 # through 14z-81; 596 briefly 14z-81c (withdrawn stub); 591 since 14z-82
 # (the F2 fall-through tripwire); 593 since 14z-82c — the ADOPTED
 # hitclass_map_extend thunk (body + site jmp, shared row deduped once).
-if [ "$NOPS" = 597 ]; then
-    echo "  ok: 597 ops (the frozen test_tenant_loop fixture — same merge)"
+if [ "$NOPS" = 667 ]; then
+    echo "  ok: 667 ops (the frozen test_tenant_loop fixture — same merge)"
 else
-    echo "  FAIL: $NOPS ops, frozen fixture is 597 — the generator drifted;"
+    echo "  FAIL: $NOPS ops, frozen fixture is 667 — the generator drifted;"
     echo "        re-freeze test_tenant_loop.sh FIRST, then revisit this audit"
     exit 1
 fi
