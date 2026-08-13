@@ -1034,6 +1034,16 @@ tests/test_gfx_collision_gate.sh      # 14z-83 (S1): ground truth for
                                       # path textual lock. Emits
                                       # gfx_written.json (the S2 chain
                                       # ledger). No ROMs, ~1s
+tests/audit_select_bank_gates.sh      # 14z-84: the merged drawer bank gates
+                                      # (name/splash/winquote *_bank_variant
+                                      # _id) must gate EVERY declaring
+                                      # tenant's id — the first-playtest
+                                      # name/portrait garble class (shared
+                                      # TT-placeholder rows deduped to
+                                      # tenant 0's compare). Static over
+                                      # patch.json + fragment + manifests,
+                                      # ground-truthed FAILING on the
+                                      # pre-fix build. ~1s
 tests/test_merged_render_content.sh   # 14z-83 (S5): the MERGED render gate
                                       # — H/P's FIRST render gates anywhere.
                                       # Live A/B vs the three frozen solo

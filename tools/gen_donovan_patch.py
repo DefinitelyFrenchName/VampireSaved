@@ -1169,6 +1169,21 @@ def main():
             # single-document build, where the one iteration is the answer
             owners = row.get("_owners")
             return True if not owners else (T.get("name") in owners)
+        if ("thunk_hex" in row
+                and ("tt" in str(row["thunk_hex"]).lower()
+                     or "tu" in str(row["thunk_hex"]).lower())):
+            # 14z-84: a shared ENGINE-SITE thunk whose body SUBSTITUTES the
+            # tenant id (the *_bank_variant_id class) — identical TEXT,
+            # per-tenant EFFECT. One site cannot take N thunks, so each
+            # declaring tenant's iteration builds ITS substituted body and
+            # the chain pass emits one thunk gating ALL of them. This used
+            # to fall through to `_ti == 0`, so the merged gate compared
+            # tenant 0's id alone: H/P hover never flipped the select/VS
+            # name drawers to bank 5 and their bank-5 codes drew host
+            # sprite art (the first full-roster playtest's name/portrait
+            # garble, measured from the merged image's placed bodies).
+            owners = row.get("_owners")
+            return True if not owners else (T.get("name") in owners)
         return _ti == 0
 
     def tenant_rows(section):
@@ -1203,6 +1218,15 @@ def main():
                   if "site" in r]
                  if [_int(r["site"]) for r in port.get("site_thunk", [])
                      if "site" in r].count(a) > 1}
+    # 14z-84: a DEDUPED shared thunk with a tenant-id placeholder is also a
+    # multi-tenant site — one manifest row, N substituted bodies (row_here
+    # now yields it on every declaring iteration). Without this the site
+    # counted once and the single-thunk path gated tenant 0's id alone.
+    _st_multi |= {_int(r["site"]) for r in port.get("site_thunk", [])
+                  if "site" in r and r.get("_owner") is None
+                  and len(r.get("_owners") or []) > 1
+                  and ("tt" in str(r.get("thunk_hex", "")).lower()
+                       or "tu" in str(r.get("thunk_hex", "")).lower())}
     _st_multi_bodies = {}
 
     def engine_here():
@@ -5357,7 +5381,7 @@ def main():
                     # for all of them. Never reached on a single-tenant build,
                     # where no site is multi-declared.
                     _st_multi_bodies.setdefault(site, []).append(
-                        (nm, body, st.get("patch", "jsr")))
+                        (nm, body, st.get("patch", "jsr"), old))
                     notes.append(f"# site_thunk {nm}: body deferred to the "
                                  f"{site:#08x} chain ({len(body)} bytes)")
                     continue
@@ -5420,27 +5444,71 @@ def main():
         if engine_here() and _st_multi_bodies:
             for _site, _els in sorted(_st_multi_bodies.items()):
                 _heads, _tail, _kind, _bad = [], None, None, False
-                for _nm, _b, _pk in _els:
-                    if len(_b) < 8 or _b[0:2] != b"\x0c\x06" or _b[4] != 0x66:
+                _dhead = None      # displaced-head shape (14z-84): the 6-byte
+                #                    displaced original opens EVERY body, then
+                #                    the compare element(s). None = the
+                #                    original compare-first shape.
+                for _nm, _b, _pk, _old in _els:
+                    _pb = _b
+                    if not (len(_pb) >= 8 and _pb[0:2] == b"\x0c\x06"
+                            and _pb[4] == 0x66):
+                        # not compare-first: accept the DISPLACED-HEAD shape —
+                        # body = <6-byte head == the site's old bytes> +
+                        # <cmpi (4 or 6 bytes) / bne.s dd / dd bytes> + tail.
+                        # Every declarer must carry the identical head.
+                        _h, _pb = _b[:6], _b[6:]
+                        if _h != _old:
+                            fail.append(
+                                f"site_thunk {_nm}: {len(_els)} tenants "
+                                f"declare site {_site:#x}, so their bodies "
+                                f"must chain — but this one opens neither "
+                                f"with `cmpi.b #TT,d6 / bne.s` nor with the "
+                                f"displaced original ({_b[:6].hex()} != "
+                                f"{_old.hex()}). Chain it by hand or give "
+                                f"the tenants separate sites.")
+                            _bad = True
+                            break
+                        if _dhead is None:
+                            _dhead = _h
+                        elif _h != _dhead:
+                            fail.append(f"site_thunk {_nm}: declarers at "
+                                        f"{_site:#x} present DIFFERENT "
+                                        f"displaced heads")
+                            _bad = True
+                            break
+                        _hoff = 6
+                    else:
+                        _hoff = 0
+                        if _dhead is not None:
+                            fail.append(f"site_thunk {_nm}: site {_site:#x} "
+                                        f"mixes compare-first and displaced-"
+                                        f"head bodies — one shape per site")
+                            _bad = True
+                            break
+                    # the compare element: cmpi is 4 bytes (register dest) or
+                    # 6 (with an ea displacement); the bne.s that ends it sits
+                    # right after
+                    if len(_pb) >= 6 and _pb[0] == 0x0C and _pb[4] == 0x66:
+                        _boff = 4
+                    elif len(_pb) >= 8 and _pb[0] == 0x0C and _pb[6] == 0x66:
+                        _boff = 6
+                    else:
                         fail.append(
-                            f"site_thunk {_nm}: {len(_els)} tenants declare "
-                            f"site {_site:#x}, so their bodies must chain — "
-                            f"but this one does not open with `cmpi.b #TT,d6 / "
-                            f"bne.s` ({_b[:6].hex()}), so where one element "
-                            f"ends cannot be derived. Chain it by hand or give "
-                            f"the tenants separate sites.")
+                            f"site_thunk {_nm}: body at {_site:#x} has no "
+                            f"parseable `cmpi / bne.s` element after "
+                            f"offset {_hoff} ({_pb[:8].hex()})")
                         _bad = True
                         break
-                    _elen = 6 + _b[5]
-                    if _elen > len(_b):
+                    _elen = _boff + 2 + _pb[_boff + 1]
+                    if _elen > len(_pb):
                         fail.append(f"site_thunk {_nm}: bne.s displacement "
-                                    f"{_b[5]:#x} runs past the body")
+                                    f"{_pb[_boff + 1]:#x} runs past the body")
                         _bad = True
                         break
-                    _heads.append(_b[:_elen])
+                    _heads.append(_pb[:_elen])
                     if _tail is None:
-                        _tail, _kind = _b[_elen:], _pk
-                    elif _b[_elen:] != _tail:
+                        _tail, _kind = _pb[_elen:], _pk
+                    elif _pb[_elen:] != _tail:
                         fail.append(
                             f"site_thunk {_nm}: the tenants at site "
                             f"{_site:#x} present DIFFERENT non-tenant tails, "
@@ -5449,7 +5517,7 @@ def main():
                         break
                 if _bad:
                     continue
-                body = b"".join(_heads) + _tail
+                body = (_dhead or b"") + b"".join(_heads) + _tail
                 td = alloc("a", len(body), f"site_thunk chain @{_site:#x}")
                 if td is None:
                     fail.append(f"site_thunk chain @{_site:#x}: no room")
@@ -5460,7 +5528,7 @@ def main():
                             + f"{td:08x}"})
                 notes.append(f"code   {td:#08x} +{len(body):#x}  site_thunk "
                              f"{len(_els)}-way chain at {_site:#08x}: "
-                             + ", ".join(n for n, _, _ in _els)
+                             + ", ".join(n for n, _, _, _ in _els)
                              + f" ({len(_tail)} shared tail bytes)")
                 fragments.append((td, len(body), "GEN",
                                   f"site_thunk {len(_els)}-way chain"))

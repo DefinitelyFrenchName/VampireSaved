@@ -667,10 +667,20 @@ p = pathlib.Path("tools/gen_donovan_patch.py")
 s = p.read_text()
 a = "    _st_multi = {a for a in\n"
 assert s.count(a) == 1, "_st_multi moved"
+# 14z-84: the mechanism gained a SECOND feeding path (deduped shared rows
+# with a tenant-id placeholder, `_st_multi |=`); a control that empties
+# only the first leaves chains standing and reads MUDDLED — measured the
+# day the path was added: chain-note grep still hit, so the control
+# failed against a working build. Empty BOTH.
+b = "    _st_multi |= {_int(r[\"site\"]) for r in port.get(\"site_thunk\", [])\n"
+assert s.count(b) == 1, "_st_multi extension moved"
 # `set() if True else {...}` — NOT `set() or {...}`, which is falsy and
 # returns the comprehension, i.e. a control that perturbs nothing. That
 # exact mistake was made here first and caught by this control failing.
-p.write_text(s.replace(a, "    _st_multi = set() if True else {a for a in\n"))
+s = s.replace(a, "    _st_multi = set() if True else {a for a in\n")
+s = s.replace(b, "    _st_multi |= set() if True else "
+                 "{_int(r[\"site\"]) for r in port.get(\"site_thunk\", [])\n")
+p.write_text(s)
 PY
 gen3 "$WORK/ctl5"
 restore

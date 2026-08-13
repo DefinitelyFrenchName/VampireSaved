@@ -33,7 +33,21 @@ on the real bodies); N=1 is byte-identical to today's solo bodies, so NO
 solo re-freeze. Plus: same-site different-bytes dedup becomes a named
 error. The win-PORTRAIT mess (H+P) is likely the same family via a
 different row kind — the census extends to ALL per-tenant-substituted
-row kinds at identical addresses during the fix.
+row kinds at identical addresses during the fix. **FIX IMPLEMENTED AND
+MEASURED THE SAME SESSION:** row_here routes shared TT-placeholder
+site_thunks to every declaring iteration; `_st_multi` counts them; the
+chain assembler gained the DISPLACED-HEAD shape (head must equal the
+site's old bytes, uniform across declarers; cmpi parse handles 4- and
+6-byte forms; mixing shapes at one site refused). Measured: tenant-loop
+gate green with its fifth control STRENGTHENED (it now empties BOTH
+_st_multi feeds — emptying only the first read muddled against the fixed
+generator, caught live); all four solo fingerprints bit-exact (N=1
+byte-identical); merged rebuild carries 62/62/50-byte chains gating
+0x13/0x10/0x11 (and biased 0x53/0x50/0x51) — new gate
+`tests/audit_select_bank_gates.sh`, ground-truthed FAILING on the
+pre-fix image. Merged fingerprint now 02e2302e (moves with generator,
+unregistered). Win-portrait coverage rides the splash-consumer gate by
+hypothesis — the maintainer playtest decides.
 **(2) H-vs-P STUCK-DIRECTION INPUTS** (one side acts as if holding
 left/right regardless of input; auto-guard measured by the maintainer) —
 merged-specific, in the FIRST-EVER tenant-vs-tenant coverage; gameplay
