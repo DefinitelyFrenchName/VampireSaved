@@ -503,7 +503,21 @@ vanilla characters including Buletta" — full-scope test to follow.
    the HP-decrement writer PC during an FG tick, walk to the damage
    read, compare the table/index against vs2's — the
    hitclass_map_extend machinery is the fix precedent if the
-   hypothesis holds.]**
+   hypothesis holds. RIG VALIDATED against the downgrade trap
+   (maintainer's reminder — EX needs a stock): $FF8509 dumped across
+   the run, stocks 3→2 EXACTLY at f3816 = the third attempt fired as
+   the REAL EX (attempts 1/2 at 3016/3416 did not take: no decrement,
+   no damage). PIPELINE PCs MEASURED (merged build, FG ticks):
+   HP decrement `sub.w d4,(0x50,a1)` @PRG:0x018AC0, damage word
+   staged at **$FF3442** (d16 0xB442 off A5=$FF8000 is NEGATIVE — the
+   14z-51 sign trap, first tap read $FFB442 and caught the $FFB444
+   combo counter instead); writers 0x0189DA (stages 0) then 0x018A0C
+   (stages the final 2/1); upstream 0x018108 writes $FF3440=0x0101
+   with a per-tick data walker A0=0xB91C0 +0x180/tick (VANILLA data
+   space) and A2 alternating 0x0ABFC6/0x0AC0FE (vanilla) with
+   A3=0x44ACC6 (wide_ext ported hit data). NEXT: decode 0x18108's
+   sources — which byte of the ported hit data enters the computation
+   and what scales it to 2/1.]**
 
 ### Decisions — 14z-84 (2): the merged-11 flicker frame from the
 ### bank-gate fix. **DECIDED (maintainer, 2026-08-13): RATIFIED** —
