@@ -443,6 +443,70 @@ new_hex = "397c60000018"
 new_hex_variant = "397c10000018"
 note = "OBJ bank setter (H farm zone): vs2 bank 3 -> WIDE bank 4"
 
+# ── Object-hit damage work-var reconciliation (14z-85f; the FINAL
+# GUARDIAN zero-damage beam). H's x028122 copy carries vs2's ported
+# object-hit damage applier (vs2 0x28A6A, ours 0x40C828 on the merged
+# image): its jsr targets reconcile to vsavj (scaler 0x18B8C, post-
+# process 0x18AB0) but its A5-relative staging displacements ported
+# VERBATIM — scaled damage lands in vs2's work vars (-$4B6C/-$4B6A/
+# -$4B68 = $FF3494/96/98) while vsavj's post-process reads ITS layout
+# (-$4BBE/-$4BBC/-$4BBA = $FF3442/44/46). Measured on the 89_hui_ex_fg
+# _vs2 A/B: 12 beam ticks per EX hit and combo-count on BOTH legs, but
+# native 23 HP vs ours 0 (the lone 1 HP came via the fighter-path
+# stager). Same-value class #4 (docs/game/gotchas.md); these six rows
+# are Donovan's session-14n throw-damage fix VERBATIM (same region,
+# same instructions — his copy is patched and play-proven; the fix
+# never propagated when H/P were ported). The 14x grab-pointer rollback
+# family (-$4B74/-$4B72/-$4B3D) is deliberately NOT touched: ported
+# readers consume those vars (donovan.toml stage-99 record).
+[[port_patch]]
+stage = 6
+region = "x028122"
+src_addr = 0x028AC2
+old_hex = "3b7c0001b498"
+new_hex = "3b7c0001b446"
+note = "obj-hit dmg: flag var -> vsavj layout (-0x4BBA)"
+
+[[port_patch]]
+stage = 6
+region = "x028122"
+src_addr = 0x028AC8
+old_hex = "426db494"
+new_hex = "426db442"
+note = "obj-hit dmg: clr damage var -> vsavj layout (-0x4BBE)"
+
+[[port_patch]]
+stage = 6
+region = "x028122"
+src_addr = 0x028AD8
+old_hex = "3b42b494"
+new_hex = "3b42b442"
+note = "obj-hit dmg: scaled damage -> vsavj layout (-0x4BBE)"
+
+[[port_patch]]
+stage = 6
+region = "x028122"
+src_addr = 0x028ADC
+old_hex = "3b7c0000b498"
+new_hex = "3b7c0000b446"
+note = "obj-hit dmg: flag clear -> vsavj layout (-0x4BBA)"
+
+[[port_patch]]
+stage = 6
+region = "x028122"
+src_addr = 0x028AE2
+old_hex = "426db496"
+new_hex = "426db444"
+note = "obj-hit dmg: clr white var -> vsavj layout (-0x4BBC)"
+
+[[port_patch]]
+stage = 6
+region = "x028122"
+src_addr = 0x028AF2
+old_hex = "3b42b496"
+new_hex = "3b42b444"
+note = "obj-hit dmg: white damage -> vsavj layout (-0x4BBC)"
+
 # ── The ported per-char OBJ bank table copy (x026142 tail; the same
 # truncation + vs2-values defects Donovan's table_fix repairs). Rows =
 # VANILLA vsavj 0x282D4 values EXCEPT row 0x10 = 0x1000: H's sprites

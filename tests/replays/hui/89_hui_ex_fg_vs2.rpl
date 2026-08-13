@@ -1,0 +1,47 @@
+# hui EX FINAL GUARDIAN (623+2K) — the NATIVE-COMPARABLE rig (14z-85f,
+# the FG damage parity item). Built on the 85_hui_df_vs2 opening, which
+# runs UNCHANGED on native vsav2 and on a variant-id build: both sides
+# forced by poke (P1 Huitzil 0x10 — native id on both games; P2 Victor
+# 0x03 on both), P2 joins as a human and then idles, so the defender
+# takes the beam standing at round-start spacing on both legs.
+#
+# POKES for both legs (the runner MUST supply these):
+# POKES="1400:ff8782:10;1450:ff8782:10;1500:ff8782:10;1400:ff8b82:03;1450:ff8b82:03;1500:ff8b82:03;3100:ff8509:03;3120:ff8509:03;3900:ff8509:03;4300:ff8509:03"
+#   P1 $FF8782 = 0x10, P2 $FF8B82 = 0x03 (early-window commit pokes)
+#   P1 $FF8509 = 3 banked stocks, re-poked before the late attempts —
+#   an EX costs a stock; with an empty meter 623+2K is DOWNGRADED to a
+#   plain DP and measures nothing (the 14z-85e trap). The EX-fired tell
+#   is the $FF8509 DECREMENT at the attempt frame, never the animation.
+#
+# Five attempts spaced 300 frames: the 85 rig measured the match formed
+# and accepting inputs by f3160 on BOTH games; the spread covers accept-
+# frame drift between the two games without retuning per leg.
+300-305 sys=C1
+420-425 sys=C2
+800-803 sys=S1
+940-943 sys=S2
+1100-1102 p2=R
+1160-1162 p2=R
+1300-1302 p1=1
+1360-1362 p2=1
+# attempt 1
+3260-3262 p1=R
+3263-3265 p1=D
+3266-3269 p1=DR45
+# attempt 2
+3560-3562 p1=R
+3563-3565 p1=D
+3566-3569 p1=DR45
+# attempt 3
+3860-3862 p1=R
+3863-3865 p1=D
+3866-3869 p1=DR45
+# attempt 4
+4160-4162 p1=R
+4163-4165 p1=D
+4166-4169 p1=DR45
+# attempt 5
+4460-4462 p1=R
+4463-4465 p1=D
+4466-4469 p1=DR45
+5200 wait

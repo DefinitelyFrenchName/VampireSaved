@@ -1,17 +1,20 @@
 #!/bin/sh
 # audit_fg_damage.sh — Phobos' EX Final Guardian (623+2K) damage on the
-# merged build, FROZEN at the measured KNOWN-OPEN value (14z-85e).
+# merged build vs a CPU opponent, FROZEN at the measured value.
 # On-demand, ~5 min (2 MAME runs).
 #
-# THE ITEM THIS LOCKS (maintainer field report, 14z-85e): FG connects as
-# a multi-hit but deals 1-2 HP/tick, ~10 of 288 total — while native VS2
-# deals "quite a lot". MEASURED SAME SESSION: the port is BYTE-FAITHFUL
-# (hitbox_proj record identical to vs2; base power byte (8,A3) = 2 in
-# BOTH games), so the divergence is the per-game SCALER (damage-class
-# tables) or native hit-count — STATE 14z-85e has the pipeline PCs.
-# This audit freezes the CURRENT behavior so any change is loud in both
-# directions: a regression (damage drops/EX stops firing) and the FIX
-# (damage rises → re-freeze to the vs2-matched number, deliberately).
+# STATUS (14z-85f): the 14z-85e parity item this was filed against is
+# CLOSED — the divergence was NEVER the scaler (all scaler tables are
+# byte-equivalent between the games) but the ported object-hit damage
+# applier staging into vs2's A5 work vars, which vsavj never reads
+# (same-value class #4; fixed by the six x028122 port_patch rows,
+# huitzil-m8/pyron-m5). THE PARITY GATE IS tests/audit_fg_parity.sh
+# (native A/B on the frozen staircase). This audit's own 10 HP was
+# measured UNCHANGED by the fix: on these CPU-opponent rigs the ticks
+# that landed were FIGHTER-path contacts (legitimately staged all
+# along); the broken object-path ticks never connected here. The 10
+# therefore stays frozen as a plain regression lock on these rigs —
+# it is NOT the parity number and never was.
 #
 # VERDICT LIVENESS (the 14z-85e downgrade trap, maintainer-flagged): the
 # EX costs a meter stock — a run where $FF8509 never decrements measured
@@ -51,9 +54,9 @@ wait
 python3 - "$W" <<'PY' || fail=1
 import glob, sys
 W = sys.argv[1]
-# FROZEN KNOWN-OPEN (14z-85e): total P2 damage in the window per leg.
-# When the scaler fix ships, re-freeze to the vs2-matched number —
-# deliberately, with the vs2 reference measurement beside it.
+# FROZEN (14z-85e, re-verified UNCHANGED on the fixed build 14z-85f):
+# total P2 damage per leg — fighter-path contact damage on these
+# CPU-opponent rigs. The parity number lives in audit_fg_parity.sh.
 EXPECT = {"fgA": 10, "fgC": 10}
 errs = []
 for leg, want in EXPECT.items():
@@ -80,10 +83,10 @@ for leg, want in EXPECT.items():
         continue
     dmg = live[0] - min(live)
     if dmg != want:
-        errs.append(f"{leg}: FG dealt {dmg} HP, frozen known-open is "
-                    f"{want} — if this is the scaler fix landing, "
-                    "re-freeze WITH the vs2 reference measurement; "
-                    "anything else, investigate")
+        errs.append(f"{leg}: FG dealt {dmg} HP, frozen value is {want} "
+                    "— regression on the fighter-path contacts these "
+                    "rigs measure (the object-path parity gate is "
+                    "audit_fg_parity.sh); investigate")
     else:
         print(f"  ok: {leg} — EX fired (stock {max(stock)}->{min(stock)}), "
               f"damage {dmg} HP (the frozen known-open value)")
@@ -94,5 +97,5 @@ PY
 
 [ "$fail" = 0 ] || { echo "FAIL: FG damage audit"; exit 1; }
 echo "PASS: Final Guardian fires as the real EX and deals the frozen"
-echo "      known-open damage (10 HP) on both rigs — the 14z-85e parity"
-echo "      item is UNCHANGED (fix pending, STATE 14z-85e)"
+echo "      fighter-path damage (10 HP) on both CPU-opponent rigs —"
+echo "      the parity gate is audit_fg_parity.sh (14z-85f)"

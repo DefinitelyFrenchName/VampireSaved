@@ -43,12 +43,17 @@ EXPECT_STOCK="6c93cfa8a8a80ae2303d3acaf8c7bff487f369c5"
 # EXPECT_HUI="db4bcd11f8386b7dc75d6e8f7a915d9974f3c0d4"  # git tag freeze/huitzil-m6
 # huitzil-m7 (14z-85b, maintainer-ruled: + hui_sfx_records — his per-node sfx
 # curated + helper unstub; tag freeze/huitzil-m6 is the way back)
-EXPECT_HUI="284e3b1c4f2ebfd3ff817cf4cd8fe7ee9989a7a2"
+# EXPECT_HUI="284e3b1c4f2ebfd3ff817cf4cd8fe7ee9989a7a2"  # git tag freeze/huitzil-m7
+# 14z-85f: + the six x028122 object-hit damage work-var port_patch rows
+# (the FG zero-damage fix — Donovan's 14n family, propagated)
+EXPECT_HUI="c48cd72258216c73222b7bd52a03213cbf8e073e"
 # pyron-m3 (14z-82c: + the ADOPTED hitclass_map_extend thunk — the f7997 fix)
 # EXPECT_PYR="6c7f7322da793c12b3681dd3ef5a76b3792ae5d0"  # git tag freeze/pyron-m3
 # pyron-m4 (14z-85b, maintainer-ruled: + pyr_sfx_records — kills the merged
 # music retrigger at its source; tag freeze/pyron-m3 is the way back)
-EXPECT_PYR="ac22418f7efb6126ce4d1e33db82ade7ab0a658a"
+# EXPECT_PYR="ac22418f7efb6126ce4d1e33db82ade7ab0a658a"  # git tag freeze/pyron-m4
+# 14z-85f: + the six x028122 object-hit damage work-var port_patch rows
+EXPECT_PYR="65e9a40ee211c94b5d8d76a4eec6cf41834e74c0"
 
 # The WIDE overlay romset (deterministic from the audited reference sets;
 # built into scratch so the canonical build/wide0 is never clobbered).

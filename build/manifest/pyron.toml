@@ -336,6 +336,63 @@ new_hex = "3d7c60000018"
 new_hex_variant = "3d7c10000018"
 note = "OBJ bank setter (pod/companion zone): vs2 bank 3 -> WIDE bank 4"
 
+# ── Object-hit damage work-var reconciliation (14z-85f; found on
+# Huitzil's FINAL GUARDIAN zero-damage beam, P's copy carries the same
+# unpatched bytes — verified in the merged image at his x028122 copy).
+# The ported object-hit damage applier (vs2 0x28A6A) stages scaled
+# damage into vs2's A5 work vars (-$4B6C/-$4B6A/-$4B68) which vsavj's
+# post-process never reads (it reads -$4BBE/-$4BBC/-$4BBA). Same-value
+# class #4; the six rows are Donovan's session-14n fix VERBATIM (his
+# copy is patched and play-proven). The 14x grab-pointer rollback
+# family (-$4B74/-$4B72/-$4B3D) deliberately NOT touched.
+[[port_patch]]
+stage = 6
+region = "x028122"
+src_addr = 0x028AC2
+old_hex = "3b7c0001b498"
+new_hex = "3b7c0001b446"
+note = "obj-hit dmg: flag var -> vsavj layout (-0x4BBA)"
+
+[[port_patch]]
+stage = 6
+region = "x028122"
+src_addr = 0x028AC8
+old_hex = "426db494"
+new_hex = "426db442"
+note = "obj-hit dmg: clr damage var -> vsavj layout (-0x4BBE)"
+
+[[port_patch]]
+stage = 6
+region = "x028122"
+src_addr = 0x028AD8
+old_hex = "3b42b494"
+new_hex = "3b42b442"
+note = "obj-hit dmg: scaled damage -> vsavj layout (-0x4BBE)"
+
+[[port_patch]]
+stage = 6
+region = "x028122"
+src_addr = 0x028ADC
+old_hex = "3b7c0000b498"
+new_hex = "3b7c0000b446"
+note = "obj-hit dmg: flag clear -> vsavj layout (-0x4BBA)"
+
+[[port_patch]]
+stage = 6
+region = "x028122"
+src_addr = 0x028AE2
+old_hex = "426db496"
+new_hex = "426db444"
+note = "obj-hit dmg: clr white var -> vsavj layout (-0x4BBC)"
+
+[[port_patch]]
+stage = 6
+region = "x028122"
+src_addr = 0x028AF2
+old_hex = "3b42b496"
+new_hex = "3b42b444"
+note = "obj-hit dmg: white damage -> vsavj layout (-0x4BBC)"
+
 # ── The ported per-char OBJ bank table copy (x026142 tail).
 # Rows = the VANILLA vsavj 0x282D4 values, with Pyron's own row 0x11 =
 # 0x1000 (his sprites fetch from WIDE bank 4 on any read path that
