@@ -1,6 +1,30 @@
 # STATE — living progress log
 
-Updated: 2026-08-13 (session 14z-85b close — **PER-TENANT SFX RECORDS
+Updated: 2026-08-13 (session 14z-85e close — **THE DEEPER-TESTING FIELD
+REPORT: NO REGRESSIONS (95% tenant movelists, ~50% of four legacy
+characters) on the 677-op merged build**; both parity items advanced to
+measured mechanisms the same session. (1) FINAL GUARDIAN (623+2K):
+quantified ~10/288 HP on our build (1-2/tick, 7 ticks, rig validated
+against the EX-downgrade trap — stock 3→2 at the firing attempt);
+pipeline PC-mapped (HP dec 0x018AC0, damage var $FF3442 — the
+A5-negative-d16 sign trap re-paid en route, stagers 0x0189DA/0x018A0C,
+power read (8,A3)); the zero-byte-port hypothesis ELIMINATED — our
+hitbox_proj bytes are identical to vs2's and the power byte is 2 in
+BOTH games, so the divergence is the per-game SCALING (damage-class
+tables, candidates 0x0ABFxx) or native hit-count — next rig named.
+(2) Plasma-trap detonation sound REOPENED as a parity item (native VS2
+is SYSTEMATIC; the 14z-84 not-a-bug closure compared our build against
+itself); volume/pan ring-entry hypothesis + rig filed. Also this
+session block: 14z-85c (59-63 stubs ruled+shipped, foreign-stamper
+rule, 490/677, full ladder green) and 14z-85d (the Z80 sound-driver RE
+first pass — id table located at FILE 0x11006 both games, interpreter/
+track/channel state mapped, kabuki = MAME debugger dasm; the 0x02E5
+entry-consumption decode is the voice arc's next step). NEXT SESSION:
+the FG scaler-table comparison (small, likely the quick win), the
+trap ring-entry A/B, and the voice arc's 0x02E5 decode — in whichever
+order the maintainer's testing pressure suggests.)
+
+Previously: 2026-08-13 (session 14z-85b close — **PER-TENANT SFX RECORDS
 SHIPPED (maintainer-ruled option (a), same day) AND FIELD-CONFIRMED
 alongside the owner tag: "the music triggering is gone, Piled Hell has
 its hitbox — needs deeper testing but it does look very good."** The
@@ -515,9 +539,28 @@ vanilla characters including Buletta" — full-scope test to follow.
    (stages the final 2/1); upstream 0x018108 writes $FF3440=0x0101
    with a per-tick data walker A0=0xB91C0 +0x180/tick (VANILLA data
    space) and A2 alternating 0x0ABFC6/0x0AC0FE (vanilla) with
-   A3=0x44ACC6 (wide_ext ported hit data). NEXT: decode 0x18108's
-   sources — which byte of the ported hit data enters the computation
-   and what scales it to 2/1.]**
+   A3=0x44ACC6 (wide_ext ported hit data). DECODED FURTHER (same
+   session): the stager at 0x189BA reads BASE ATTACK POWER from the
+   hit record at (8,A3)/(9,A3) (real/white), D2 → a bsr scaling chain
+   → D3 → $FF3442. A3 = hitbox_proj@huitzil + 0x346 (NOT hitbox — the
+   record sits in the projectile hit-data region). HYPOTHESIS
+   ELIMINATED BY MEASUREMENT: our placed bytes are IDENTICAL to the
+   vs2 source, and the power byte is **2 IN VS2'S OWN DATA** — the
+   port is faithful and there is no zero-byte gap; the observed 2/1
+   ticks are power-2 faithfully applied by VSAVJ'S scaler. The
+   divergence therefore lives in (a) the SCALING chain — the power
+   byte is plausibly a damage-CLASS index into per-game engine tables
+   (candidates measured in live registers: the walker A0=0xB91C0
+   +0x180/tick and A2=0x0ABFC6/0x0AC0FE, vanilla vsavj data) where
+   vsavj's class-2 row maps small and vs2's maps big — or (b) native
+   HIT COUNT/per-tick values. NEXT RIG: measure native vs2's FG
+   damage-per-tick + tick count (needs the retuned native replay), and
+   compare the vsavj scaler tables at 0x0ABFxx against vs2's twins
+   (reconciliation lookup for 0x18108's vs2 twin routine gives the
+   twin table addresses). NOTE FOR THE FIX SHAPE: if it is the
+   class-table row, the fix is a variant-gated table extension — the
+   hitclass_map_extend precedent — NEVER an edit of vanilla rows
+   (legacy characters share them).]**
 
 ### Decisions — 14z-84 (2): the merged-11 flicker frame from the
 ### bank-gate fix. **DECIDED (maintainer, 2026-08-13): RATIFIED** —

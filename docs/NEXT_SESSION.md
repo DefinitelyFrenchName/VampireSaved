@@ -1,4 +1,26 @@
-# NEXT SESSION — orientation (written at the close of 14z-85c, 2026-08-13)
+# NEXT SESSION — orientation (written at the close of 14z-85e, 2026-08-13)
+
+> ## FIELD VERDICT FIRST
+>
+> Deeper testing (maintainer): **NO REGRESSIONS** — 95% movelist
+> coverage for Donovan/Pyron/Phobos, ~50% for Bulleta/Victor/Demitri/
+> Morrigan, on the 677-op merged build. Two NON-regression parity items,
+> both advanced to measured mechanisms (STATE 14z-85e):
+> 1. **FINAL GUARDIAN (623+2K) damage**: ~10/288 HP on our build
+>    (1-2/tick; EX-firing verified by stock decrement). The port is
+>    BYTE-FAITHFUL and the power byte is 2 in vs2's own data — the
+>    divergence is the per-game SCALER (damage-class tables, live-reg
+>    candidates 0x0ABFxx/walker 0xB91C0) or native hit-count. NEXT:
+>    compare the scaler tables against vs2's twins (reconciliation for
+>    0x18108's twin) + a retuned native replay for vs2's number. Fix
+>    shape if class-table: variant-gated extension (hitclass precedent),
+>    NEVER vanilla-row edits.
+> 2. **Plasma-trap detonation sound**: SYSTEMATIC on native vs2 vs
+>    proximity-gated on ours — the 14z-84 closure reopened (it compared
+>    our build against itself). The id IS enqueued even when silent →
+>    volume/pan ring-entry params hypothesis; rig = full 16-byte entry
+>    A/B near/far, ours vs native.
+
 
 > ## START HERE
 >
