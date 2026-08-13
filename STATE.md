@@ -52,12 +52,55 @@ hypothesis — the maintainer playtest decides.
 left/right regardless of input; auto-guard measured by the maintainer) —
 merged-specific, in the FIRST-EVER tenant-vs-tenant coverage; gameplay
 defect, co-top priority. Rig: forced-pick H vs P, idle inputs, watch
-both players' input/direction bytes.
-**(3) P SPECIALS EACH RETRIGGER MUSIC** (every special starts a music
-track from its beginning) — suspect his sound-ring/record pointer in the
-merge or ids landing in the vsavj music range (the class test_don_sound
-guards for D; no P sound gate exists). Ring-tap A/B solo pyron21 vs
-merged on 71_pyron_cosmo.
+both players' input/direction bytes. FIRST RIG RAN (field_trace, 3 legs
+over replay 03: control + both pick orders): the match FORMS, ids held,
+positions plausible, no runaway drift — but the leg is confounded by
+character physics and replay 03 never idles; the defect needs an
+idle-tail rig. SUPERSEDED AS A SEPARATE ITEM by the unifying mechanism
+under (3).
+**(3) P SPECIALS EACH RETRIGGER MUSIC — UNIFIED MECHANISM CANDIDATE FOR
+(2)/(3)/(8), CONFIRMED BY THE STANDING RECORD:** obj_hook union entries
+64-75 resolve to HUITZIL's copies by DECLARATION-ORDER LUCK (14z-81c
+"KEPT" note, verbatim: "site 0x54470's types 64-75, whose correctness
+today is DECLARATION-ORDER LUCK (huitzil declares before pyron)"; 14z-80f:
+"entries 59-63 in Donovan's regions and 64-75 in Huitzil's own copies").
+On the MERGED build every Pyron family-64-75 object (his cosmo satellite
+IS type 64 — the f7997 type) dispatches through H's tenant-reconciled
+copies: H's anim literals, H's data pointers, H's cross-tenant
+tripwires. Solo builds cannot exhibit this (one view). Explains at once:
+P's specials starting MUSIC (wrong handler → wrong sfx/data path
+enqueues ids in the music range), the possibly-missing Piled Hell
+hitbox, and H-vs-P interaction weirdness (both tenants' objects in the
+shared pools, cross-dispatched). The 0x54470 family (59-75) was
+DEFERRED knowingly: renumbering (the 14z-82 fix for 114-120) is blocked
+here by vs2's own embedded walkers (0x5C602 truncated-table) and the
+hit-class map domain. DESIGN NEEDED — decision brief below.
+
+### Decisions pending (maintainer) — 14z-84: owner-correct dispatch for
+### the 59-75 object family on merged builds
+
+The last known merged program defect class. Options:
+(a) RECOMMENDED — SPAWN-TIME OWNER TAG, dispatch on the tag: each
+    stamp site (statically enumerated per copy in the frozen
+    type_stamps inventory; 17 type-65-family sites per copy) also
+    writes a per-tenant OWNER TAG into a free byte of the object;
+    obj_hook entries 64-75 become owner_dispatch_stubs (the
+    battle-tested 14z-81c stub builder) keying on THE TAG — written at
+    spawn by code that knows its tenant statically, avoiding the two
+    measured 14z-81c dispatch-time-read timing failures. Needs: a
+    verified-free object byte (measure, not assume), stamp-site tag
+    emission, stub table swap. No type-byte renumbering, so the
+    embedded walkers and the hit-class map are untouched.
+(b) ONE SHARED RECONCILED COPY: make the 59-75 handler regions
+    engine-level with N-tenant reconciliation (vs2's own architecture —
+    its single walker serves all newcomers). Structurally cleanest,
+    largest change; the per-tenant-literals problem returns as a
+    parameterization problem.
+(c) Defer further: rejected by the playtest — the defects are
+    player-visible on the first full-roster build.
+S-priority: this class blocks the merged build's behavioral correctness
+for Pyron and tenant-vs-tenant play; the select bank-gate fix (shipped
+today) covers the visual class independently.
 **(4) BULLETA DF PALETTE WRONG (DF only; she is otherwise clean) — the
 14z-79 class RECURS; STATICALLY EXONERATED in the merge:** no merged op
 touches her block 0x39ACC0-0x39AD5F, and the only palette-window ops
