@@ -30,11 +30,18 @@
 >   14z-85c: ~616 KB+ of vs2 sample windows into the WIDE QSound
 >   image's free upper 8 MB (banks 0x80+ — MAME's LLE bank register is
 >   15-bit, measured in qsound.cpp); Z80 driver has 27,727 B free for
->   the new id rows (WIDE A4). NEXT CONCRETE STEPS: (1) longer-window
->   keyon re-sweep (the 12-frame maps are attack-blind — ~36 scoped ids
->   logged nothing); (2) RE the vs2 Z80 sample-table row format + bank
->   field width; (3) the packer + manifest rows + un-zeroing the keep
->   lists; (4) verify jtcores' QSound region growth for MiSTer.
+>   the new id rows (WIDE A4). **THE Z80 RE IS UNDERWAY — read STATE
+>   14z-85d before touching it** (id table @FILE 0x11006 4B/id both
+>   games; interpreter/track/channel state mapped; kabuki disasm =
+>   MAME debugger dasm; instrument tests/lua/qs_table_trace.lua).
+>   NEXT CONCRETE STEPS: (1) decode the 0x02E5 id-entry consumption
+>   (the captured qtrace flow has it) → entry format + the sample
+>   bank/start/end ROM source; (2) free-id census with the CORRECT
+>   entry decode; (3) longer-window keyon re-sweep (~36 scoped ids
+>   attack-blind); (4) packer + Z80 rows + record remaps (NOTE: the
+>   restored ids CANNOT keep their vs2 numbers — 0x700+ are vanilla
+>   MUSIC ids; new ids from free space + remap in our record arrays);
+>   (5) verify jtcores' QSound region growth for MiSTer.
 >
 > ## Corrections that must outlive this session (14z-85)
 >

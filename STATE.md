@@ -217,6 +217,49 @@ DEFERRED knowingly: renumbering (the 14z-82 fix for 114-120) is blocked
 here by vs2's own embedded walkers (0x5C602 truncated-table) and the
 hit-class map domain. DESIGN NEEDED — decision brief below.
 
+### 14z-85d: the Z80 sound-driver RE — first measurement pass (the
+### voice arc's step 2, IN PROGRESS at session close)
+
+All measured live on vsavj (MAME Lua taps + the debugger's decrypted
+disasm/trace — the Z80 is KABUKI-encrypted, so `dasm`/`trace` through
+MAME's debugger is the ONLY correct static view; a raw member dump is
+data-view only; operand fetches DO hit program-space read taps, filter
+|addr−pc|>16). Instrument captured: tests/lua/qs_table_trace.lua.
+
+- **Ring path**: 68k ring entries reach Z80 shared RAM ($C000 window,
+  handshake $CFFD==0x88); IRQ @0x0038 copies 16-byte entries to
+  $F100+idx ($F015, +0x10/entry); consumer @0x0271 walks $F016 behind
+  it. Id = big-endian word at entry +0.
+- **THE ID TABLE**: 4 bytes/id, 24-bit base held at $F012:$F013/14
+  (BOTH games: 0x009006 → banked CPU $9006 = FILE 0x11006, bank 0),
+  id normalized mod ($F010) = 0x6D8 ids (vsavj) / 0xA70 (vs2). Bank
+  switch = (top bits − 2) | 0x80 → $D003 (the observed 0x80/0x88
+  writes). Entry: [0]=flags/type (nonzero → the 0x02E5 consumption
+  path, NOT YET DECODED — vsavj 0x119 = 33 07 50 18), [1..2]=16-bit
+  value (naive read 0x0750 — NOT directly the stream addr; 0x02E5
+  resolves it). NEXT: follow 0x02E5 (the scratch qtrace/z.tr holds the
+  full real flow for id 0x119).
+- **Track state (IX)**: +0x01 seq BANK (|0x80 → $D003), +0x02/03
+  stream ptr (id 0x119's stream ran at CPU $87AA bank 8 = FILE
+  0x307AA), +0x05/06 tick. Interpreter @0x0EBA; commands ≥0x20 via
+  table @0x1126; volume handler 0x15F9 (table @0x35F1), pitch 0x1F80
+  family (@0x1FFE/0x206A — its `cp $6C` is a PITCH LIMIT, a value-
+  coincidence trap, NOT the sample bank).
+- **Channel state**: QSound sample bank at $F756+n*0x50 (readers
+  0x0E65/0x0E96, RAM-to-RAM writer 0x0E9F) — the ROM source of
+  bank/start/loop/end NOT yet traced (zero fixed-ROM data reads carry
+  them at keyon; they enter channel state earlier — likely the 0x02E5
+  leg closes this).
+- **Chip writer choke point**: 0x1E86/8A/8E ($D001/$D000/$D002).
+  Keyon burst for id 0x119: ch13 (regs 0x68-0x6F) — end 0x5000, loop
+  0x3104, bank reg 0x60 ← 0x806C, keyon 0x6B ← 0x8000 — matching the
+  14z-51 keyon maps exactly.
+- **The candidate 8-byte sample table @FILE 0x5219 is UNCONFIRMED**:
+  rows match keyon params ([vol][bank][start LE][end−loop LE][end LE];
+  the 0x119-shaped row at 0x55C9) but ZERO play-time reads hit it
+  (taps proven live) and no RAM copy found — do NOT patch on
+  pattern-match; find its reader first (RH-27/RH-32).
+
 ### 14z-85c: M5 VOICE SAMPLES — the measured design brief (maintainer
 ### ruled GO 2026-08-13: "we need to do this cleverly, and ideally in a
 ### way that makes it playable on MiSTer, even if that be with a
