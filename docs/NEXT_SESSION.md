@@ -11,21 +11,16 @@
 > **THE PLAN (read STATE 14z-85d — the Z80 RE state — and 14z-85c —
 > the ruled design brief — before starting):**
 >
-> 1. **Decode the 0x02E5 id-entry consumption** (the arc's keystone).
->    The Z80 is KABUKI-encrypted: MAME debugger `dasm`/`trace` is the
->    ONLY correct static view (14z-85d). Re-capture the trace for a
->    known id (0x119 was the 14z-85d subject; instrument
->    tests/lua/qs_table_trace.lua is captured, the scratch z.tr is
->    gone — recapture is ~minutes). Deliverables: the id-table entry
->    format ([0]=flags, [1..2]=value — how 0x02E5 resolves it to
->    stream/sample), and the ROM source of the $F756+n*0x50 channel
->    bank/start/loop/end (zero fixed-ROM reads carry them at keyon —
->    the 0x02E5 leg likely closes this). The 8-byte table @FILE 0x5219
->    stays UNCONFIRMED until its reader is found (RH-27/32 — do NOT
->    patch on pattern-match).
-> 2. **Free-id census** on vsavj's table (0x6D8 ids, 4B/id @FILE
->    0x11006) with the CORRECT entry decode — where new rows can go.
->    Restored ids CANNOT keep vs2 numbers (0x700+ are vsavj MUSIC).
+> 1. **Decode the 0x02E5 id-entry consumption** — DONE 14z-86, and it
+>    rewrote the 14z-85d picture (retraction banner there; corrected
+>    decode in engine_internals "The QSound Z80 driver"): the Z80 is
+>    NOT encrypted; entries are 24-bit flat-file song addresses (mod
+>    0x6D8, b0==0 = free row); sample records @0x45FA found by their
+>    reader 0x1350; the bank field is 8-bit (banks 0x80+ expressible).
+> 2. **Free-id census** — DONE 14z-86: tools/audit_qs_id_table.py
+>    (bases derived from the $3B00 anchors; vsavj 240 free rows incl.
+>    0x58-0xDC, 0x3D8-0x3FF). Note the id space WRAPS mod 0x6D8
+>    (0x739 ≡ row 0x61); "0x700+ music" is a 68k-side convention.
 > 3. **THE EJECTION PILOT (0x739 — the smallest end-to-end proof)**:
 >    (a) locate vs2 0x739's sample — it keyed NOTHING in the 12-frame
 >    sweep (delayed attack): re-probe on vs2 with the 45-frame window

@@ -745,3 +745,30 @@ rewrite) is the worked example. Symmetric hazard on the read side: a
 "nobody writes this byte" claim from a word-bucketed tap is not
 evidence — re-derive with lanes before trusting any freeness claim
 made before 14z-85.
+
+## A member's REGION layout is not its FILE layout — and the Z80 driver's own address space is a THIRD thing (14z-86)
+
+MAME loads CPS2's `vm3.01` split (`ROM_LOAD` 0x8000 at region 0, then
+`ROM_CONTINUE` at region 0x10000; `vm3.02` at region 0x28000). A session of
+Z80-driver RE (14z-85d) assumed region==file above the fixed window and read
+every table at region-derived offsets: the id table "at FILE 0x11006", entry
+bytes "33 07 50 18", an "8-byte table @0x5219" — all plausible-looking bytes
+at WRONG offsets, and the garbage the wrong offsets produced for CODE was
+confidently explained as "KABUKI encryption" (the Z80 is plain; KABUKI is the
+CPS1-QSound generation). One read tap with DATA logging (qs_table_trace,
+SPANS over the banked window) collapsed the whole edifice in one run: the
+driver's 24-bit logical addresses are FLAT member-concat file offsets, full
+stop (flat = CPU + bank*0x4000 in the $8000 window; bank register hw-masked
+to 4 bits, MAME `qsound_banksw_w`).
+
+The rules this paid for:
+- **Before deriving any file offset from an emulator address, read the
+  driver's ROM_LOAD lines** — `ROM_CONTINUE`/split loads make region↔file
+  non-affine, and every downstream "FILE 0xNNNNN" claim inherits the error.
+- **A tap that logs PC only cannot arbitrate a mapping; log the DATA.** The
+  PC flow matched the wrong mapping perfectly — only the data bytes
+  (02 9A B2 vs 33 07 50) decided.
+- **"It disassembles as garbage" is not evidence of encryption** — it is
+  evidence you may be at the wrong offset. Check the emulator's opcode-map
+  config (AS_OPCODES) and byte-compare a live-traced PC against the file
+  before concluding cipher.

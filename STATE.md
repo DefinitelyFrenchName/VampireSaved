@@ -500,6 +500,20 @@ hit-class map domain. DESIGN NEEDED — decision brief below.
 
 ### 14z-85d: the Z80 sound-driver RE — first measurement pass (the
 ### voice arc's step 2, IN PROGRESS at session close)
+### **RETRACTION BANNER (14z-86, 2026-08-14): the detail below is
+### POISONED by one root error — a wrong region↔file mapping (MAME
+### loads vm3.01 split via ROM_CONTINUE; the driver's 24-bit
+### addresses are FLAT member-concat offsets). WRONG below: "KABUKI-
+### encrypted" (the Z80 is PLAIN — garbage at wrong offsets read as
+### ciphertext); "FILE 0x11006" (real: flat 0x9006); "0x119 = 33 07
+### 50 18" (real: 02 9A B2 00); the "8-byte table @FILE 0x5219 /
+### row at 0x55C9" (real table base 0x45FA, reader 0x1350; 0x5219
+### is a misaligned mid-table phase); "commands ≥0x20 via table
+### @0x1126" (that is a doubling-mask table). STILL RIGHT: the ring
+### path, the mod ($F010) normalization, track-state offsets, the
+### chip choke, the keyon reg map. The corrected full decode:
+### docs/game/engine_internals.md "The QSound Z80 driver" (14z-86).
+### Kept below unedited as the historical record.**
 
 All measured live on vsavj (MAME Lua taps + the debugger's decrypted
 disasm/trace — the Z80 is KABUKI-encrypted, so `dasm`/`trace` through

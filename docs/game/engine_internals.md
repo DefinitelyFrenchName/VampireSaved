@@ -786,15 +786,119 @@ that is ported into our build at ~`PRG:0xCE3B8` (vanilla twin
   SAMPLE CONTENT is byte-identical in vsav's own QSound image
   (0x6C0000), keyed as the 0x198/0x199 family: the restoration is a
   synthesized vsavj twin stub playing 0x199 (kind=sound_stub recon
-  row, huitzil-m9), no sample port needed. 0x739 has no vsavj
-  equivalent (M5). CAUTION for future silencing calls: a 0x7xx id's
-  FAITHFULNESS is a property of its sample CONTENT, not its number —
-  content-search vsav's image before writing a stubbed_sound row.
+  row, huitzil-m9), no sample port needed. ~~0x739 has no vsavj
+  equivalent~~ CORRECTED 14z-86: 0x739's sample content, sample
+  record (#0x5C, bank 0x18 @0x18D800) AND note-table-1 entry 0x28
+  all exist on vsavj — only the Z80 SONG (id row + song block) is
+  missing; see "The QSound Z80 driver" below. CAUTION for future
+  silencing calls: a 0x7xx id's FAITHFULNESS is a property of its
+  sample CONTENT, not its number — content-search vsav's image
+  before writing a stubbed_sound row.
 - **Ours 0x010A vs native 0x010B** at the same event (~throw+40f):
   both shared-library single-voice sounds (same start/end, relocated
   banks), reached through a per-char engine row — the defense-rows
   family (tenant rides the vanilla vsavj row). Cosmetic, recorded in
   the audit header, not gated.
+
+### The QSound Z80 driver: id table, songs, streams, sample records
+### (14z-86 — reader-traced end to end on live vsavj, id 0x119, then
+### confirmed static; RETRACTS most of the 14z-85d filed detail)
+
+**THE FILE-MAPPING TRAP that poisoned 14z-85d (read this first).**
+MAME loads `vm3.01` split: file 0x0000-0x7FFF at region 0, file
+0x8000-0x1FFFF at region 0x10000 (`ROM_CONTINUE`), `vm3.02` at region
+0x28000. The 14z-85d session assumed region==file+0 above 0x10000 and
+derived "id table at FILE 0x11006, entry for 0x119 = `33 07 50 18`" —
+bytes read from the WRONG file offset that happened to look plausible.
+The tap-verified truth: **the driver's 24-bit logical addresses ARE
+flat-file offsets** (vm3.01+vm3.02 concatenated, 0x40000 total). CPU
+mapping: fixed region CPU<0x8000 == flat; banked window $8000-$BFFF
+with bank b == flat `CPU + b*0x4000`. Bank register $D003 =
+`((addr>>14)-2)|0x80`; the HARDWARE masks the bank to 4 bits (MAME
+`qsound_banksw_w`: `data & 0x0f`, overflow → bank 0), so only the low
+18 bits of an address reach ROM.
+
+**The Z80 is NOT encrypted** (RETRACTS 14z-85d "KABUKI-encrypted").
+Proven three ways: file bytes at PC 0x1E82 and 0x0271 equal the traced
+instructions verbatim, and MAME's cps2 config maps AS_OPCODES only for
+the 68k. KABUKI is the CPS1-QSound generation. Static disassembly of
+the member works directly (`dasm <f>,<off>,<len>,1,:audiocpu` in the
+MAME debugger — the device is the FIFTH param; fourth is a bool, and a
+device in slot four fails silently). The "garbage" that suggested
+encryption was the wrong-offset reads above.
+
+**Fixed-ROM anchor block** (everything below derives from it):
+`word($3B00)` → sound-bank header (vsavj 0x9000): `[id-mod word BE]
+[2 config bytes]`, id table at header+6. `word($3B02)` → sample-record
+table (vsavj 0x45FA, vs2 0x4798). `word($3B04)` → ARRAY of note-table
+pointers (vsavj 0x3B12/0x3D02/0x3ED6/0x3F92) — $3B04 is pointer[0],
+selected per track by stream cmd `1F n` (handler 0x17D5).
+
+**Id table** (vsavj flat 0x9006, mod 0x6D8 ids; vs2 mod 0xA70): 4 B
+per id = `[addr-hi][addr-mid][addr-lo][tail]`, a 24-bit BE flat-file
+address of the song block. The consumer (0x0271) normalizes the ring
+id MOD ($F010) — **the id space WRAPS: 0x739 ≡ row 0x61 on vsavj**
+(the "0x700+ = music" boundary is a 68k-side convention only).
+`addr-hi == 0` → the consumer RETURNS (0x02E1 `ld a,d / ret z` with Z
+still set): **b0==0 rows are FREE / no-op ids** — and therefore a song
+block below flat 0x10000 is UNREACHABLE from the table (that free run
+in fixed ROM cannot hold songs). Ring id high byte 0xFF → system
+commands (jump table 0x0992 indexed by id low). Census tool:
+`tools/audit_qs_id_table.py` (derives every base from the anchors;
+vsavj: 1512 live / 240 free rows incl. 0x58-0xDC and 0x3D8-0x3FF).
+
+**Song block**: `[priority][16 slot words BE]`; slot word w≠0 → track
+on that slot at song_base+w. Slot index == voice number (id 0x119:
+slot 13 → the measured ch13 keyon). Track init (0x0431): priority
+gate vs (ix+$40), zero 0x50-byte track state at $F200+slot*0x50, then
++0x01=bank byte, +0x02/03=folded CPU stream ptr, +0x40=priority,
++0x25=tick 1, +0x30/31=note-table ptr[0] default, +0x33=5.
+
+**Stream grammar** (cmds <0x20 via handler chain; ≥0x20 = wait/dur
+events; table @0x1126 is a DOUBLING-MASK table, RETRACTS "commands
+≥0x20 via table @0x1126"): `09 n` tempo bits (ix+$04); `05 hi lo`
+16-bit param → ix+$41/42 (or ($F020) when ($F004)≠0); `06 n`, `1F n`
+note-table select (ptr array at $3B04); `08 n` — THE SAMPLE SELECT:
+n&0x7F ×4 into the note table → `[sample# LE][→ix+$0D][instr#&0x7F]`;
+`07 p` pitch (xlate 0x34F1); `19 v` volume (handler 0x15E1); `01 g v`
+key-on; `03 n` long wait; `17 n` end-of-track.
+
+**Instrument (envelope) rows**: `0x5A1A + instr*8` on vsavj (vs2
+0x5BD8 — these two immediates at 0x0D85/0x129F are the ONLY code-region
+diffs between the games' fixed ROMs; the interpreters are otherwise
+byte-identical, which is the licence for verbatim stream copies). Five
+row bytes are indices through xlate tables 0x36F1/0x3771/0x35F1 into
+ix+$36..$3F.
+
+**Sample records** (routine 0x1350): `base + sample#*8`, 8 B =
+`[bank][start LE][loop LE][end LE][transpose→ix+$0C]`. Chip writes
+through the $D007-busy-wait choke: reg v+2 ← 0, v+1 ← start, v+5 ←
+end, v+4 ← **end−loop**, reg ((v-1)&15)*8 ← data hi 0x80 : lo BANK.
+**The bank field is a full 8-bit byte → banks 0x80-0xFF (the WIDE
+upper 8 MB) are natively expressible** — the 14z-85c "verify bank
+field width" item, answered. (RETRACTS the "8-byte table @FILE
+0x5219 / 0x119-shaped row at 0x55C9" candidate: 0x5219 is a
+MISALIGNED mid-table phase of the real 0x45FA table — 8-byte-periodic
+data pattern-matches at any offset; the reader (0x1350) decides.)
+Tables are adjacent: vsavj samples 0x45FA-0x5A19 (644 records),
+envelopes 0x5A1A-0x5E19; free zero runs 0x5C4F-0x9000 (unused
+envelope tail + scratch — UNREACHABLE for songs, see b0==0 above) and
+flat 0x3C977-0x40000 (banked, b0=0x03 — song-capable).
+
+**The trap sounds, fully resolved static** (14z-86): vs2 id 0x73A
+(detonation) = song @0x34365, slot 15, stream `... 1F 01, 08 23` →
+note-table-1 entry 0x23 → sample record bank 0x6C start 0 end 0x5000
+— byte-identical record AND content on vsavj (the m9 chirp, now
+confirmed through the full chain). vs2 id 0x739 (ejection) = song
+@0x34332 (0x33 bytes), slot 11, one note: `08 28, 07 5A, 19 1E, 03
+B4, 17 30` → vs2 sample #0x9D (bank 0x25 @0x255800-0x257FFF) whose
+0x2800 content bytes sit **byte-identical in vsav's image at
+0x18D800 = vsavj's own record #0x5C = exactly what vsavj
+note-table-1 entry 0x28 already points to.** The ejection port
+therefore needs NO sample packing and NO table growth: one free id
+row + vs2's 0x33-byte song block copied verbatim into the banked
+free run. Envelope row 0 (both songs' instrument) is byte-identical
+across the games.
 
 ## The sprite-list DRAWER: how an object becomes sprite entries
 ## (measured 14z-71 on the Huitzil beam; the layer ABOVE the OBJ entry)
