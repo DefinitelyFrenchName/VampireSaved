@@ -2034,6 +2034,39 @@ note = "14z-82c: extend the projectile hit-class byte map to vs2's 80 entries; >
 # different sample window), 0x3E2 (silent both sets), 0x735-0x74E (his
 # vs2 voice/sfx block; vsavj keys OTHER content across that gap —
 # unfaithful, silenced pending the M5 voice-samples decision).
+# ── 14z-85g(2), maintainer-ruled option (a) 2026-08-14: the trap SHOCK
+# restoration — the vs2-licensed one-byte class remap (the 14z-33
+# licence verbatim: "only remap when the source engine itself proves
+# equivalence"). The dome's two hit records carry vs2's EXTENDED class
+# 0x52; vsavj's victim-reaction jump table (PRG:0x2385C) ends before
+# it — entry[0x52] reads code bytes and the dispatch takes a
+# wild-but-lucky jump (plain hit, no shock). vs2's OWN table aliases
+# class 0x52 ≡ 0x06 ≡ 0x38 (same entry 0x2CE -> handler 0x22656, the
+# shock install), and vsavj entry[0x06] = its native electric-shake
+# 0x23AC8 — a STRUCTURAL TWIN of vs2's handler minus one guard (vs2's
+# 0x52 path skips the ATTACKER's 0x0B hit-freeze; the attacker is a
+# mine). property[0x06] == property[0x52] == 0x0F both games. KNOWN
+# DEVIATION (maintainer-accepted with the ruling): Phobos receives the
+# normal 11-frame attacker hit-freeze when the trap connects — vs2
+# exempts him. Option (b) (faithful dispatch thunk, exemption
+# included) is on record in STATE 14z-85g(2) if the freeze bothers
+# play. Gate: tests/audit_trap_shock.sh (the deep-overlap rig).
+[[region_fix]]
+stage = 6
+region = "hitbox_proj"
+off = 0x17D
+old_hex = "52"
+new_hex = "06"
+note = "trap dome hit record 1: class 0x52 -> 0x06 (vs2-alias-proven; routes vsavj electric-shake 0x23AC8)"
+
+[[region_fix]]
+stage = 6
+region = "hitbox_proj"
+off = 0x19D
+old_hex = "52"
+new_hex = "06"
+note = "trap dome hit record 2: class 0x52 -> 0x06 (vs2-alias-proven)"
+
 # 14z-85g REMAP: record node 11 (id 0x73A) remapped to vsavj 0x199
 # instead of zeroed — measured content-equivalent (sample bytes
 # IDENTICAL in both games' QSound images at 0x6C0000, bank 108,

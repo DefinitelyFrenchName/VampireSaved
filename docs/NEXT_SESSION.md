@@ -87,11 +87,13 @@
 
 | build | set | fingerprint |
 |---|---|---|
-| build/m3b_merged3 | UNREGISTERED (pending ear-check + S6 freeze) | moves with generator (678 ops) |
+| build/m3b_merged4 | UNREGISTERED (pending play-check + S6 freeze) | moves with generator (678 ops) |
+| build/m3b_merged3 | superseded (pre-shock merged) | superseded |
 | build/m3b_merged2 | superseded (pre-chirp merged; FG-fix reference) | superseded |
 | build/m3b_merged | pre-FG-fix merged — audit_fg_parity's known-bad reference | superseded |
 | build/m5_wide | donovan-m3a | 4b7d0dc7 |
-| build/hui36 | **huitzil-m9** | 3d9ffc89 |
+| build/hui37 | **huitzil-m10** | 9a948a11 |
+| build/hui36 | superseded m9 (audit_trap_shock's known-bad reference) | 3d9ffc89 |
 | build/hui34 | superseded m8 (audit_trap_parity's known-bad reference) | c48cd722 |
 | build/pyron23 | **pyron-m5** | 65e9a40e |
 | build/hui33, pyron22 | superseded m7/m4 | 284e3b1c / ac22418f |
@@ -99,17 +101,14 @@
 
 ## Still open (the short list)
 
-- **Trap SHOCK status — MECHANISM FULLY MEASURED (14z-85g(2)),
-  DECISION PENDING**: the dome's hit records carry vs2 class 0x52;
-  vsavj's reaction jump table (0x2385C) ends before it (wild-but-lucky
-  jump today). vs2's own table aliases 0x52 ≡ 0x06 = vsavj's native
-  electric-shake 0x23AC8 (structural twin of vs2's 0x52 handler minus
-  the attacker-freeze exemption). Options in STATE: (a) RECOMMENDED
-  one-byte class remaps 0x52→0x06 (two hitbox_proj records; deviation:
-  Phobos takes the normal 11f attacker freeze on trap connect);
-  (b) faithful dispatch thunk (legacy flicker-inventory risk, needs
-  ratification). The deep-overlap rig (rig60, P2 walk N=60) is the
-  gate seed — capture as audit_trap_shock with the fix.
+- ~~Trap SHOCK status~~ **FIXED (14z-85g(2), maintainer-ruled option
+  (a), huitzil-m10 = build/hui37 9a948a11 / merged build/m3b_merged4)**:
+  class remaps 0x52→0x06 route the dome hit into vsavj's native
+  electric-shake — shock install verified (seq7=4, freeze 0x18).
+  PLAY-CHECK the accepted deviation: Phobos takes the normal 11f
+  attacker freeze on trap connect (vs2 exempts him; option (b) on
+  record in STATE if it bothers play). Gate: audit_trap_shock
+  (rig 92; fails on m9 by design).
 
 - **FLAKY CRASH RESET (14z-85f field report, priority by maintainer
   pressure): 2P Don-vs-Pyron → Donovan PERFECT win → COM Sasquatch

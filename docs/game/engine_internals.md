@@ -1573,6 +1573,25 @@ attacker/victim-registration and state-byte family
 (`-0x4B74/-0x4B72/-0x4B3D`) is consumed by PORTED readers and must
 stay at vs2 offsets. Gate: `tests/audit_fg_parity.sh`.
 
+**The victim-side REACTION CLASS dispatch (14z-85g(2), measured):**
+after the appliers, the victim's reaction is chosen at `PRG:0x2384E`:
+`move.b (0x54,a6),d0; add.w d0,d0; move.w (0x2385C,pc,d0.w),d1;
+jmp (pc,d1)` — the class byte (copied from the hit record, byte +0x1D
+of the 0x20-stride hitbox/hitbox_proj records) indexes a PC-relative
+word jump table. vs2's twin (dispatch 0x2237A, table 0x22388) has
+0x54 entries; **vsavj's table ends earlier — any vs2-extended class
+(0x4E+) over-indexes into code bytes** (the Donovan 421P/column class,
+14z-33/34; the trap dome's class 0x52, 14z-85g(2)). vs2's table
+carries ALIASES (0x52 ≡ 0x06 ≡ 0x38 → the shock install 0x22656),
+which is the remap licence: vsavj entry[0x06] = the native
+electric-shake 0x23AC8, a structural twin of vs2's 0x52 handler minus
+the attacker-freeze exemption (vs2 skips the attacker's 0x0B when the
+"attacker" is a mine). The handlers end in property[class] (the
+0x28D00/0x27FD8 byte map — property 0x0F = electric) → the common
+install (vsavj 0x27EC0 ↔ vs2 0x27114). Atlas rows: victim `+0x54`
+class, `+0x5C` freeze, `+0x07` seq sub-state (4 = shock), attacker
+link `+0x32`.
+
 **Multi-hit accounting:** the gate at `PRG:0x18090` dedups by hit id —
 record byte `+0x10` vs the victim's recent-hit ring at `+0x6C`
 (rotating index at attacker context `+0x70`). The combo counter

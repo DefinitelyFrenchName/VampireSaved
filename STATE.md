@@ -38,19 +38,26 @@ bp_regs stack-read fix (A7-first; the USP top carried the true return
 faithfulness is a property of its sample CONTENT, not its number —
 content-search vsav's image before any stubbed_sound row. EAR-CHECK
 CONFIRMED same day (maintainer): "the sound is correct and happening
-at all times so this is fixed." SAME REPORT FILED A NEW PARITY ITEM
-— **the trap's hit does not inflict SHOCK status** (aura + paralysis
-à la Victor held-down-HP / Donovan 214+P) as it does on native vs2;
-not a regression (likely never worked). Mechanism candidates + rig
-in NEXT_SESSION (reaction-dispatch routing vs hitclass-extension
-licence vs bounded status table; Donovan's working 214+P shock is
-the on-build control; the 88 rigs never produced a trap HIT — the
-rig needs one first). NEXT SESSION: the trap shock item, the M5
-arc (ejection 0x739 = smallest target; voice blocks after the
-0x02E5 decode, 14z-85d).)
+at all times so this is fixed." SAME REPORT FILED THE SHOCK ITEM —
+**investigated, ruled, and FIXED the same day: see the 14z-85g(2)
+decision entry below (huitzil-m10, 9a948a11)** — the dome hit now
+inflicts the native shock via vsavj's own electric-shake handler
+(vs2-licensed class remap 0x52→0x06). NEXT SESSION: maintainer
+play-check of the shock feel (the accepted Phobos attacker-freeze
+deviation in particular) on build/m3b_merged4; the M5 arc (ejection
+0x739 = smallest target; voice blocks after the 0x02E5 decode,
+14z-85d).)
 
-### Decisions pending — 14z-85g(2): the trap SHOCK restoration shape
-### (mechanism fully measured; two options, gameplay-feel tradeoff)
+### Decisions — 14z-85g(2): the trap SHOCK restoration shape.
+### **DECIDED (maintainer, 2026-08-14): OPTION (a) — the vs2-licensed
+### one-byte class remaps. EXECUTED TO FULL GREEN the same session:**
+### huitzil-m10 = build/hui37 (9a948a11), the two region_fix rows,
+### bp-verified 0x23AC8 firing (D0=0x0C) with the shock install
+### (seq7=4, freeze 0x18) and the accepted attacker-freeze deviation
+### PRESENT (asserted by the new gate audit_trap_shock, ground-truthed
+### failing on m9); merged rebuilt build/m3b_merged4. Option (b)
+### remains on record below if play dislikes the Phobos freeze.
+### Original brief follows:
 
 **THE MECHANISM (measured end-to-end, new deep-overlap rig
 rig60/fine-sweep):** the trap dome's hit records carry vs2's EXTENDED

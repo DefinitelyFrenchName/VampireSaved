@@ -153,19 +153,18 @@ tools/run_wide.sh build/m3b_merged2 fbneo  # THE 3-TENANT BUILD (all 18
 tools/run_wide.sh build/m5_wide fbneo      # or the solo builds; ... mame
 ```
 
-**Current WIDE builds (14z-85f):** `build/hui34` = **`huitzil-m8`
-(`c48cd722`)** for Phobos and `build/pyron23` = **`pyron-m5`
-(`65e9a40e`)** for Pyron — = m7/m4 + the six x028122 object-hit damage
-work-var port_patch rows each (the FINAL GUARDIAN zero-damage fix:
-Donovan's 14n family propagated; same-value class #4);
-`build/m5_wide` = **`donovan-m3a` (`4b7d0dc7`)** for Donovan.
-`build/m3b_merged2` is the merged rebuild carrying the fix
-(FG native-parity verified by tests/audit_fg_parity.sh);
-`build/m3b_merged` is the pre-fix merged, kept as the parity audit's
-ground-truth-failing reference. huitzil-m7 (`build/hui33`) and
-pyron-m4 (`build/pyron22`) are SUPERSEDED, kept on disk
-(their extract dirs remain the tenant_loop/build_merged inputs —
-extraction is unchanged by port_patch rows).
+**Current WIDE builds (14z-85g(2)):** `build/hui37` = **`huitzil-m10`
+(`9a948a11`)** for Phobos (= m8 + the restored trap-detonation chirp
+(m9, sound_stub 0x4F2E→vsavj 0x199) + the trap SHOCK class remaps
+0x52→0x06 (m10, maintainer-ruled)); `build/pyron23` = **`pyron-m5`
+(`65e9a40e`)** for Pyron (= m4 + the six x028122 damage work-var
+rows); `build/m5_wide` = **`donovan-m3a` (`4b7d0dc7`)** for Donovan.
+**`build/m3b_merged4` is the current merged** (chirp + shock + FG
+fix); m3b_merged3/2 are superseded intermediates; `build/m3b_merged`
+(pre-FG) and `build/hui34`/`hui36` (pre-chirp/pre-shock) are kept as
+the parity/shock audits' ground-truth-failing references. Superseded
+solos hui33/pyron22 stay on disk (their extract dirs remain the
+tenant_loop/build_merged inputs).
 `build/m5w` (`ac52eeff`) is the KNOWN-BAD artifact of the 14z-60y sprite
 garble, kept as evidence — do not playtest it. `tools/audit_romset_identity.py
 build/m5w/rompath` names its four shadowed members in a second.
@@ -568,6 +567,16 @@ tests/audit_trap_sound.sh             # 14z-82d, RE-SCOPED 14z-85g (~10 min):
                                       # trap dies before ANY ring activity).
                                       # The PARITY question is CLOSED by
                                       # measurement — see audit_trap_parity
+tests/audit_trap_shock.sh             # 14z-85g(2) (~4 min, 2 parallel):
+                                      # the trap dome inflicts SHOCK — rig
+                                      # 92 (deep-overlap, walk N=60) on
+                                      # ours + native; ours must show class
+                                      # 0x06 (the ruled remap) + seq7==4 +
+                                      # freeze>=0x10, native its own 0x52;
+                                      # ALSO asserts the accepted deviation
+                                      # (Phobos' 11f attacker freeze)
+                                      # PRESENT so drift is loud. Fails on
+                                      # huitzil-m9- by design
 tests/audit_trap_parity.sh            # 14z-85g (~5 min, 2 parallel runs):
                                       # THE TRAP-SOUND PARITY GATE — replay
                                       # 87 on native vsav2 AND the build;

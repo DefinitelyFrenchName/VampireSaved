@@ -3001,3 +3001,62 @@ m3a_reproducible on the new EXPECT_HUI; run_suite on the
 carried-renamed set; merged rebuilt (build/m3b_merged3).
 Build: huitzil-m9 = build/hui36 (3d9ffc89). Maintainer EAR-CHECK
 pending — the final gate for a sound item.
+
+## 14z-85g(2) — the trap SHOCK restoration (huitzil-m10: two
+## vs2-licensed class remaps; maintainer-ruled option (a))
+
+**The defect (maintainer field report, same day as the chirp
+confirmation):** the trap dome's hit inflicted no shock status. The
+dome's hit records carry vs2's EXTENDED class 0x52 (victim +0x54 =
+0x52 at the hit, both games — measured on the new deep-overlap rig
+92). The victim-side reaction dispatch (`PRG:0x2384E`: class × 2 into
+the PC-relative word jump table at 0x2385C) reaches a dedicated shock
+handler on vs2 (table 0x22388 entry[0x52] = 0x2CE → 0x22656,
+bp-verified firing at the native hit) — but vsavj's table ends before
+0x52: entry[0x52] reads CODE BYTES (0x1D7C) and ours took a
+wild-but-lucky plain-hit jump (bp-verified: the dispatch runs, no
+shock handler fires). Donovan's 14z-33/34 class, one dispatch table
+over.
+
+**The licence (the 14z-33 rule — "only remap when the source engine
+itself proves equivalence"):** vs2's OWN table aliases class 0x52 ≡
+0x06 ≡ 0x38 (one entry), and vsavj entry[0x06] = its native
+electric-shake handler 0x23AC8 — a STRUCTURAL TWIN of vs2's 0x22656
+(instruction-parallel; same sub-state 4 / freeze 0x18 / property
+lookup / common-install tail 0x27EC0 ↔ 0x27114) minus ONE guard:
+vs2's `cmpi.b #$52; beq` skips the ATTACKER's 0x0B hit-freeze (the
+attacker is a mine). property[0x06] == property[0x52] == 0x0F on both
+games (Donovan's ported extension rows cover 0x52 on ours anyway).
+
+**Every byte, and why:** two `[[region_fix]]` rows in huitzil.toml —
+hitbox_proj +0x17D and +0x19D (the dome's two records, class byte at
+record +0x1D): `52` → `06`. Nothing else; the shock rides pure
+vanilla machinery (Victor's own path).
+
+**KNOWN, MAINTAINER-ACCEPTED DEVIATION:** Phobos receives the normal
+11-frame attacker hit-freeze when the trap connects (vsavj's 0x06
+path applies it; vs2's 0x52 guard exempts him). The gate asserts the
+deviation PRESENT so drift in either direction is loud. Option (b) —
+a dispatch site_thunk with an inline clone carrying the exemption
+(the es_type51_dispatch pattern) — is specified in STATE 14z-85g(2)
+if play dislikes the freeze; its cost is jsr cycles on the ENGINE-WIDE
+reaction dispatch (legacy flicker-inventory ratification).
+
+**Also measured en route (rig sweep):** the mine's roll is
+PROXIMITY-TERMINATED — it stops shorter the closer the opponent
+stands (549/545/527/509 across P2-walk N=40-55) — and rolling THROUGH
+the opponent triggers nothing: the shock is the dome hit, by vs2's
+design.
+
+**Measured after:** vsavj 0x23AC8 fires at the dome hit (D0=0x0C =
+class 0x06×2), victim shows the native shock signature (seq7=4,
+freeze 0x18 decay — pre-fix ours showed seq7=2), attacker freeze
+present. Native leg unchanged (its own 0x52 path).
+
+**Gates:** audit_trap_shock NEW (rig 92 ours+native, per-leg class
+expectations, the deviation assertion, verdict control; ground-truthed
+FAILING on huitzil-m9); audit_trap_parity green (chirp unaffected);
+tenant_loop counts UNCHANGED (region_fix = region rewrite);
+m3a_reproducible on the new EXPECT_HUI; run_suite on the
+carried-renamed set. Build: huitzil-m10 = build/hui37 (9a948a11),
+merged = build/m3b_merged4.
