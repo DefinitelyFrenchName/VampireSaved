@@ -7,9 +7,9 @@
 > `6eed421b`; merged **build/m3b_merged5**) with NO sample port — the
 > whole Z80 sound driver is decoded (engine_internals "The QSound Z80
 > driver"; the 14z-85d KABUKI/file-mapping detail is RETRACTED at its
-> root, banner there). **EAR-CHECK PENDING**: the ejection "pop" at
-> mine throw, on build/m3b_merged5 (or the hui38 solo) — first thing
-> to ask the maintainer.
+> root, banner there). **EAR-CHECK CONFIRMED (maintainer,
+> 2026-08-14): "The trap mine ejection sound is indeed there" — THE
+> TRAP IS FULLY CLOSED, all four items field-confirmed.**
 >
 > **THE MACHINERY NOW IN PLACE (use it, don't re-derive):**
 > - WIDE v1.1: Z80 driver members are content members `vsw.z01/z02`
@@ -89,9 +89,10 @@
 
 ## Still open (the short list)
 
-- **EAR-CHECK the restored trap ejection** (huitzil-m11 / m3b_merged5)
-  — the trap is otherwise fully CLOSED (chirp 14z-85g, shock
-  14z-85g(2), ejection 14z-86; all field-confirmed except the last).
+- ~~EAR-CHECK the restored trap ejection~~ **CONFIRMED (maintainer,
+  2026-08-14): "indeed there" — THE TRAP IS FULLY CLOSED** (damage
+  14z-85f, chirp 14z-85g, shock 14z-85g(2), ejection 14z-86, all
+  field-confirmed).
 - THE M5 VOICE-BLOCK BATCH (this session's plan above).
 - FLAKY CRASH RESET (Sasquatch intro; rig designed, STATE 14z-85f).
 - Pyron's medallion whitening on 2P hover (row-0x1A family).

@@ -66,8 +66,12 @@ a divergence). FIXED IN PLACE: STOCK vsw.z01/z02 injected into
 build/m5_wide, hui30, pyron21 (the audit's leg-b refs) + hui34/36/37
 (the parity/shock ground-truth refs) — program members untouched,
 all three leg-b fingerprints verified unchanged (4b7d0dc7/e66678d0/
-6c7f7322); the audit rerun after the fix. EAR-CHECK PENDING (maintainer): the ejection pop at
-mine throw on build/m3b_merged5 or build/hui38. NEXT SESSION: the
+6c7f7322); the audit rerun after the fix. EAR-CHECK CONFIRMED same
+day (maintainer): "The trap mine ejection sound is indeed there" —
+and no OTHER new sounds, which is correct (only the ejection was
+ported; the voice blocks are the next batch). **THE TRAP IS FULLY
+CLOSED — all four items field-confirmed** (damage 14z-85f, chirp
+14z-85g, shock 14z-85g(2), ejection 14z-86). NEXT SESSION: the
 voice-block batch on the now-complete machinery (song rows for
 content already in vsav's image; extension packing at banks 0x80+
 only for the truly-absent vs2-only samples), the 45-frame keyon
