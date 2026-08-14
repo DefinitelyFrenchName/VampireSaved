@@ -1,0 +1,24 @@
+# 90: Donovan 214+K sword-plant rig (14z-86, the plant-end "ding"
+# investigation — engine_internals "per-game engine voice"). 2P match via
+# forced-pick pokes (P1=0x13 Donovan, P2=0x03), three plants (LK/MK/HK)
+# each with a long quiet tail so the END-of-plant sound sits isolated.
+300-305 sys=C1
+420-425 sys=C1
+800-803 sys=S2
+3100-3102 p1=D
+3103-3105 p1=DL
+3106-3108 p1=L
+3109-3112 p1=L4
+4200-4202 p1=D
+4203-4205 p1=DL
+4206-4208 p1=L
+4209-4212 p1=L5
+5300-5302 p1=D
+5303-5305 p1=DL
+5306-5308 p1=L
+5309-5312 p1=L6
+#
+# USAGE (the 14z-86 captures): ring A/B ours-vs-native with ring_tap
+# (POKES="1400:ff8782:13;1450:ff8782:13;1500:ff8782:13;1400:ff8b82:03;
+# 1450:ff8b82:03;1500:ff8b82:03"); the plant-end delta sits ~f3960-4010.
+# NOT a gate — the diagnostic rig for the parked fix (STATE 14z-86).

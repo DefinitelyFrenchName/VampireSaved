@@ -961,6 +961,47 @@ across the games.
   priority-suppressed track echo, measured moving with injection
   timing).
 
+### The per-node sfx dispatch, second pass (14z-86, the sword-plant
+### "ding" investigation) — sound CLASSES, and the per-game engine voice
+
+- **The (0x382,A6) byte at DISPATCH time is a SOUND CLASS, not always
+  the character id.** The dispatcher head (`move.b (0x382,a6),d1;
+  lsl.w #2,d1; lea $BF41A,a0; movea.l (a0,d1.w),a0` @vsavj 0x27F16)
+  normally reads the fighter's char id — but engine EFFECTS dispatch
+  with a class of their own: measured at the Donovan sword-plant end,
+  the dispatch on P1's block read class **0x0C** on our build, and
+  native vs2's equivalent dispatch resolved its 0x0C-class array too
+  (its own idiom, not a port artifact). WHO writes the override is
+  NOT yet measured — a byte write-watch on $FF8782 caught no write in
+  the dispatch window (candidate: a RAM-mirror write the watch missed;
+  open, next-session).
+- **THE PER-GAME ENGINE VOICE CLASS** (second worked instance; the
+  first was the trap audit's 010A-vs-010B, recorded cosmetic): a
+  SHARED engine effect fires per-node sounds through per-game DATA —
+  each game voices the same effect with its own sound. Worked
+  instance, fully measured: the sword-plant-end effect walks each
+  game's OWN (vanilla, unported) effect anim — vs2's node carries sfx
+  index 28 → its class-0x0C array → **id 0x29B** (the proper plant
+  "thunk"); vsavj's twin anim (walked at vanilla 0x1FDEF2/0x1FDF0A)
+  carries index **13** → **id 0x308**, an ordinary vsavj chime that
+  reads as a spurious "ding" in this context (maintainer field
+  report). The class-0x0C ARRAYS are byte-identical across the games
+  at those nodes (both carry 0x307/0x308/0x309 in sequence) — the
+  divergence is the NODE INDEX in each game's own effect anim, i.e.
+  engine data, not the port.
+- **The native sound is expressible on vsavj**: vsavj's own id 0x29B
+  resolves to the SAME sample content as vs2's (shared library,
+  byte-equal windows) — no sample work needed for a fix.
+- **Parked fix design** (decision brief in STATE 14z-86): redirect the
+  class byte for the TENANT-triggered effect to the variant row 0x1C
+  (vanilla-aliased to 0x0C; no legacy path writes a 0x1C class) and
+  place a curated 14-node array whose node 13 = 0x29B — native sound,
+  zero legacy surface. Blocked only on finding the class-writer (one
+  watchpoint session). Rig: tests/replays/don/90_don_plant.rpl (three
+  plants LK/MK/HK, long quiet tails); the ring A/B synchronizes with
+  native through the plant and isolates the delta to
+  ours{0x62B(=0x32B facing-aliased),0x308} vs native{0x29B}.
+
 ## The sprite-list DRAWER: how an object becomes sprite entries
 ## (measured 14z-71 on the Huitzil beam; the layer ABOVE the OBJ entry)
 
