@@ -18,7 +18,12 @@ CPS-2 WIDE v1
                    reserved, never allocate: $400000-$40000F (CpsFrg regs)
   GFX    : 48 MB   12 uniform 4 MB members (3 groups of 4)
                    19-bit tile address via the CPS-2 Turbo rule (see below)
-  QSOUND : 16 MB   4 uniform 4 MB members
+  QSOUND : 16 MB   4 uniform 4 MB members; since v1.2 (14z-86) the two
+           EXTENSION members vsw.21m/22m are CONTENT members (sentinel
+           CRCs 0xdec0de3a/3b — the old shared zero-fill CRC would
+           hash-shadow a content-bearing 21m onto the still-zero 22m).
+           The M5 voice batch packs absent vs2 sample windows there
+           (banks 0x80+; tools/build_qs_songs.py [voice_batch]).
   Z80    : 256 KB unchanged in SIZE; since v1.1 (14z-86) the two driver
            members are CONTENT members `vsw.z01/z02` (sentinel CRCs
            0xdec0de38/39 in both descriptors, resolve by NAME) so builds

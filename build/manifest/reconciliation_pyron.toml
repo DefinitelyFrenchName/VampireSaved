@@ -90,9 +90,12 @@ note = "P KEPT SILENT: sfx id 0x1d4 — vsavj same-id keys DIFFERENT content (H-
 [[map]]
 vsav2 = 0x004efa
 vsavj = 0x02a7e0
-kind = "stubbed_sound"
+kind = "sound_stub"
+profile = "cps2-wide-v1"
+sfx_id = 0x90
+helper = 0x5FFF00
 status = "verified"
-note = "P KEPT SILENT: sfx id 0x748 — newcomer voice range (shared farm row, H-verified id). Revisit at M5."
+note = "M5 VOICE RESTORED (14z-86): vs2 sfx 0x748 -> authored vsavj id 0x90 (qs_songs voice_batch; helper = the alias thunk). Prior: P KEPT SILENT: sfx id 0x748 — newcomer voice range (shared farm row, H-verified id). Revisit at M5."
 
 [[map]]
 vsav2 = 0x004f2e
@@ -104,20 +107,29 @@ note = "P KEPT SILENT: sfx id 0x73a — newcomer voice range (shared farm row, H
 [[map]]
 vsav2 = 0x004f62
 vsavj = 0x02a7e0
-kind = "stubbed_sound"
+kind = "sound_stub"
+profile = "cps2-wide-v1"
+sfx_id = 0x7f
+helper = 0x5FFF00
 status = "verified"
-note = "P KEPT SILENT (14z-67 NEW row): sfx id 0x735 — newcomer voice range, id read from the farm bytes (same jsr 0x330E shape). Revisit at M5."
+note = "M5 VOICE RESTORED (14z-86): vs2 sfx 0x735 -> authored vsavj id 0x7f (qs_songs voice_batch; helper = the alias thunk). Prior: P KEPT SILENT (14z-67 NEW row): sfx id 0x735 — newcomer voice range, id read from the farm bytes (same jsr 0x330E shape). Revisit at M5."
 
 [[map]]
 vsav2 = 0x004fb0
 vsavj = 0x02a7e0
-kind = "stubbed_sound"
+kind = "sound_stub"
+profile = "cps2-wide-v1"
+sfx_id = 0xa0
+helper = 0x5FFF00
 status = "verified"
-note = "P KEPT SILENT: sfx id 0x729 — newcomer voice range (shared farm row, H-verified id). Revisit at M5."
+note = "M5 VOICE RESTORED (14z-86): vs2 sfx 0x729 -> authored vsavj id 0xa0 (qs_songs voice_batch; helper = the alias thunk). Prior: P KEPT SILENT: sfx id 0x729 — newcomer voice range (shared farm row, H-verified id). Revisit at M5."
 
 [[map]]
 vsav2 = 0x004fca
 vsavj = 0x02a7e0
-kind = "stubbed_sound"
+kind = "sound_stub"
+profile = "cps2-wide-v1"
+sfx_id = 0xa5
+helper = 0x5FFF00
 status = "verified"
-note = "P KEPT SILENT: sfx id 0x72e — newcomer voice range (shared farm row, H-verified id). Revisit at M5."
+note = "M5 VOICE RESTORED (14z-86): vs2 sfx 0x72e -> authored vsavj id 0xa5 (qs_songs voice_batch; helper = the alias thunk). Prior: P KEPT SILENT: sfx id 0x72e — newcomer voice range (shared farm row, H-verified id). Revisit at M5."

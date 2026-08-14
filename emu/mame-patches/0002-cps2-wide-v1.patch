@@ -208,8 +208,8 @@ index 8602b6ca..bbde2ac1 100644
 +	ROM_LOAD16_WORD_SWAP( "vm3.12m",   0x400000, 0x400000, CRC(9cd71557) SHA1(7059db25698a0b286314c5961c618f6d2e6f24a1) )
 +	// The QSound length MUST stay a power of two: the sample reader masks
 +	// the address with (length - 1). 8->16MB is legal, 8->12MB is not.
-+	ROM_LOAD16_WORD_SWAP( "vsw.21m",   0x800000, 0x400000, CRC(1147406a) SHA1(2bccbd2f38f15c13eb7d5a89fd9d85f595e23bc3) )
-+	ROM_LOAD16_WORD_SWAP( "vsw.22m",   0xc00000, 0x400000, CRC(1147406a) SHA1(2bccbd2f38f15c13eb7d5a89fd9d85f595e23bc3) )
++	ROM_LOAD16_WORD_SWAP( "vsw.21m",   0x800000, 0x400000, CRC(dec0de3a) SHA1(aaaa5e19325d8bb05317b9c4aaba40209d35ba74) ) // WIDE v1.2 QSound content member (14z-86): SENTINEL hashes — the M5 voice batch packs samples here, resolves by name
++	ROM_LOAD16_WORD_SWAP( "vsw.22m",   0xc00000, 0x400000, CRC(dec0de3b) SHA1(bbbb6b13b927ef03cc89f1b7eaa943476231ecbb) ) // sentinel (see vsw.21m)
 +
 +	ROM_REGION( 0x20, "key", 0 )
 +	ROM_LOAD( "vsavj.key",    0x000000, 0x000014, CRC(36d28ab8) SHA1(7de11dbe4a7ea0e8b68ab332f80e32cb6c1bf48e) )

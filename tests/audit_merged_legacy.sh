@@ -16,7 +16,7 @@
 #
 # WHAT A GREEN RUN PROVES: the merged image's legacy behaviour lands on the
 # SAME ratified comparison classes as the frozen single-tenant builds
-# (tests/expected/donovan-m3a/*.masked — all three tenant sets agree
+# (tests/expected/donovan-m4/*.masked — all three tenant sets agree
 # byte-for-byte on the 13 shared legacy entries, and a merged build backs
 # 0x13 so 11_pick_donovan applies too) — with ONE ratified merged-specific
 # exception: 04_select_fuzz lands on the RATIFIED MERGED inventory
@@ -68,7 +68,7 @@ export MAME_BIN
 OUT="${MERGED_OUT:-build/merged1}"
 PREBUILT="${MERGED_PREBUILT:-0}"
 WIDE_ZIP="${WIDE_ROMSET:-$PWD/build/wide0/rompath/vsavjw.zip}"
-EXPECT="tests/expected/donovan-m3a"          # the ratified prior (see header)
+EXPECT="tests/expected/donovan-m4"          # the ratified prior (see header)
 BASE_LOGS="tests/expected/vsavj/masked-v2/logs"
 
 # The three frozen extract dirs are the generator's inputs, exactly as
@@ -163,14 +163,14 @@ PY
 
 if [ "$PREBUILT" = 1 ]; then
     echo "== B: PREBUILT merged artifact at $OUT (build skipped; shape"
-    echo "      asserted below — 678 ops, member identity) =="
+    echo "      asserted below — 729 ops, member identity) =="
     [ -f "$OUT/rompath/vsavjw.zip" ] || {
         echo "FAIL: MERGED_PREBUILT=1 but no $OUT/rompath/vsavjw.zip"; exit 1; }
     [ -f "$OUT/patch/patch.json" ] || {
         echo "FAIL: MERGED_PREBUILT=1 but no $OUT/patch/patch.json"; exit 1; }
     NOPS="$(python3 -c "import json;print(len(json.load(open('$OUT/patch/patch.json'))['ops']))")"
-    [ "$NOPS" = 678 ] || { echo "FAIL: $NOPS ops, frozen fixture is 678"; exit 1; }
-    echo "  ok: 678 ops (the frozen test_tenant_loop fixture; 14z-85g sound_stub)"
+    [ "$NOPS" = 729 ] || { echo "FAIL: $NOPS ops, frozen fixture is 729"; exit 1; }
+    echo "  ok: 729 ops (the frozen test_tenant_loop fixture; 14z-86 voice batch)"
     python3 tools/audit_romset_identity.py "$OUT/rompath" || {
         echo "  FAIL: member-identity audit"; exit 1; }
     FP="$(python3 tools/build_fingerprint.py "$OUT/rompath;$ROMDIR" --set vsavjw --sha-only || true)"
@@ -190,17 +190,19 @@ python3 tools/gen_donovan_patch.py "$D_EX" "$OUT/patch" \
 grep -q '^GENERATION OK' "$OUT/gen.log" || {
     echo "  FAIL: no GENERATION OK"; tail -15 "$OUT/gen.log"; exit 1; }
 NOPS="$(python3 -c "import json;print(len(json.load(open('$OUT/patch/patch.json'))['ops']))")"
-# 678: matches test_tenant_loop.sh's frozen 3-tenant count (which is
+# 729: matches test_tenant_loop.sh's frozen 3-tenant count (which is
 # re-frozen FIRST whenever the merge legitimately changes). History: 590
 # through 14z-81; 596 briefly 14z-81c (withdrawn stub); 591 since 14z-82
 # (the F2 fall-through tripwire); 593 since 14z-82c — the ADOPTED
 # hitclass_map_extend thunk (body + site jmp, shared row deduped once);
 # 677 since 14z-85 (owner-tag stubs + tripwires); 678 since 14z-85g
-# (the m9 sound_stub op — the restored trap-detonation chirp).
-if [ "$NOPS" = 678 ]; then
-    echo "  ok: 678 ops (the frozen test_tenant_loop fixture — same merge)"
+# (the m9 sound_stub op — the restored trap-detonation chirp); 729
+# since 14z-86 (the M5 voice batch: alias-thunk pokes + voice farm
+# stubs).
+if [ "$NOPS" = 729 ]; then
+    echo "  ok: 729 ops (the frozen test_tenant_loop fixture — same merge)"
 else
-    echo "  FAIL: $NOPS ops, frozen fixture is 678 — the generator drifted;"
+    echo "  FAIL: $NOPS ops, frozen fixture is 729 — the generator drifted;"
     echo "        re-freeze test_tenant_loop.sh FIRST, then revisit this audit"
     exit 1
 fi
@@ -314,7 +316,7 @@ for spec in "$EXPECT"/*.masked; do
     # pointer phase, no gameplay surface, the ratified hook-flicker family.
     # The merged instrument is unregistered by design, so this expectation
     # lives HERE, not in a .masked file; the single-tenant prior
-    # (tests/expected/donovan-m3a/04_select_fuzz.masked) is unchanged.
+    # (tests/expected/donovan-m4/04_select_fuzz.masked) is unchanged.
     if [ "$name" = "04_select_fuzz" ]; then
         sline="composite vsavj/masked-v2 1525,2005,2009,2195 889-1104"
     fi

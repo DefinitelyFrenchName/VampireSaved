@@ -1,0 +1,108 @@
+#!/bin/sh
+# audit_qs_voice_batch.sh — THE VOICE-BATCH KEYON A/B (14z-86, on-demand,
+# ~8 min, 2 parallel MAME runs).
+#
+# Builds the qs_songs voice batch onto a scratch copy of the canonical
+# WIDE overlay (or verifies a given BUILD's romset directly), then sweeps
+# EVERY authored voice id on ours and every scoped vs2 id on native
+# vsav2 (test-mode venue, 240-frame isolation spacing) and compares the
+# whole-run keyon multisets via tools/check_qs_voice_batch.py: no native
+# signature missing, nothing ours plays foreign to vs2's sample library,
+# counts within tolerance. Static-side correctness (verbatim songs,
+# authored records/T7, vanilla-span identity) is build_qs_songs.py's own
+# refusal set + test_qs_songs.sh.
+#
+# Verdict control: a corrupted byte in the packed extension member must
+# flip the verdict (foreign signature) — run on a doctored copy.
+#
+# Usage: ROMDIR=... tests/audit_qs_voice_batch.sh [builddir]
+#   builddir given  -> verify that build's vsavjw.zip in place
+#   no builddir     -> self-build onto a scratch overlay copy
+set -u
+REPO="$(cd "$(dirname "$0")/.." && pwd)"
+ROMDIR="${ROMDIR:?set ROMDIR}"
+WIDE_BIN="${MAME_BIN:-$HOME/.cache/vampire-saved/mame/cps2}"
+[ -x "$WIDE_BIN" ] || { echo "SKIP: no WIDE MAME binary"; exit 0; }
+export REPO ROMDIR
+W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT
+fail() { echo "FAIL: $*"; exit 1; }
+
+mkdir -p "$W/rp" "$W/ours" "$W/native"
+if [ -n "${1:-}" ]; then
+    cp "$1/rompath/vsavjw.zip" "$W/rp/vsavjw.zip" || fail "no romset in $1"
+else
+    [ -f "$REPO/build/wide0/rompath/vsavjw.zip" ] || {
+        echo "SKIP: no canonical overlay"; exit 0; }
+    cp "$REPO/build/wide0/rompath/vsavjw.zip" "$W/rp/vsavjw.zip"
+    python3 "$REPO/tools/build_qs_songs.py" "$W/rp/vsavjw.zip" \
+        "$ROMDIR/vsav2.zip" --vsav "$ROMDIR/vsav.zip" \
+        --ledger "$W/ledger.json" > "$W/build.log" || {
+        tail -5 "$W/build.log"; fail "builder errored"; }
+fi
+# the id lists come from the manifest-driven builder ledger (or re-derive)
+[ -f "$W/ledger.json" ] || python3 "$REPO/tools/build_qs_songs.py" \
+    "$W/rp/vsavjw.zip" "$ROMDIR/vsav2.zip" --vsav "$ROMDIR/vsav.zip" \
+    --ledger "$W/ledger.json" --dry-run > /dev/null 2>&1 || true
+if [ ! -f "$W/ledger.json" ]; then
+    # verify-in-place path: rebuild the ledger from a scratch overlay
+    cp "$REPO/build/wide0/rompath/vsavjw.zip" "$W/scratch.zip"
+    python3 "$REPO/tools/build_qs_songs.py" "$W/scratch.zip" \
+        "$ROMDIR/vsav2.zip" --vsav "$ROMDIR/vsav.zip" \
+        --ledger "$W/ledger.json" > /dev/null || fail "ledger derivation"
+fi
+OURS="$(python3 -c "
+import json; l = json.load(open('$W/ledger.json'))
+print(','.join('%x' % v['id'] for v in l['voices']))")"
+NATIVE="$(python3 -c "
+import json; l = json.load(open('$W/ledger.json'))
+print(','.join('%x' % v['vs2_id'] for v in l['voices']))")"
+
+( cd "$W/ours" && ROMDIR="$ROMDIR" MAME_BIN="$WIDE_BIN" \
+  MAME_ROMPATH="$W/rp;$ROMDIR" MAME_SANDBOX="$W/ours/sb" \
+  REPLAY="$REPO/tests/replays/06_test_mode.rpl" IDLIST="$OURS" STEP=240 \
+  TRACE_OUT=sweep.txt FRAMES=21000 \
+  "$REPO/tools/run_mame.sh" vsavjw \
+  -autoboot_script "$REPO/tests/lua/qs_sweep.lua" > out 2>&1 ) &
+( cd "$W/native" && ROMDIR="$ROMDIR" MAME_SANDBOX="$W/native/sb" \
+  REPLAY="$REPO/tests/replays/06_test_mode.rpl" IDLIST="$NATIVE" STEP=240 \
+  TRACE_OUT=sweep.txt FRAMES=21000 \
+  "$REPO/tools/run_mame.sh" vsav2 \
+  -autoboot_script "$REPO/tests/lua/qs_sweep.lua" > out 2>&1 ) &
+wait
+for leg in ours native; do
+    [ -s "$W/$leg/sweep.txt" ] || { tail -5 "$W/$leg/out"; fail "$leg leg dead"; }
+done
+python3 "$REPO/tools/check_qs_voice_batch.py" "$W/ours/sweep.txt" \
+    "$W/native/sweep.txt" "$W/rp/vsavjw.zip" --romdir "$ROMDIR" \
+    || fail "keyon multiset A/B"
+
+# verdict control: corrupt one packed sample byte -> must flip to foreign
+python3 - "$W" <<'PY' || exit 1
+import sys, zipfile, subprocess, os
+w = sys.argv[1]
+repo = os.environ["REPO"]; romdir = os.environ["ROMDIR"]
+src = zipfile.ZipFile(f"{w}/rp/vsavjw.zip")
+data = {n: src.read(n) for n in src.namelist()}
+ext = bytearray(data["vsw.21m"])
+if not any(ext):
+    print("  note: no packed content in this romset — control vacuous, FAIL")
+    sys.exit(1)
+i = next(i for i, b in enumerate(ext) if b)
+ext[i] ^= 0x55
+data["vsw.21m"] = bytes(ext)
+with zipfile.ZipFile(f"{w}/bad.zip", "w") as z:
+    for n, b in data.items():
+        z.writestr(n, b)
+r = subprocess.run([sys.executable, f"{repo}/tools/check_qs_voice_batch.py",
+                    f"{w}/ours/sweep.txt", f"{w}/native/sweep.txt",
+                    f"{w}/bad.zip", "--romdir", romdir],
+                   capture_output=True, text=True)
+if r.returncode == 0:
+    print("  CONTROL DEAD: corrupted packed sample still passed")
+    sys.exit(1)
+print("  ok: verdict control fired (corrupted sample -> foreign)")
+PY
+[ $? -eq 0 ] || exit 1
+
+echo "PASS: voice-batch keyon A/B — every native signature keyed by ours,"
+echo "      nothing foreign to vs2's library, counts within tolerance"

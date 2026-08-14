@@ -15,16 +15,22 @@ note = "H KEPT SILENT (14z-65 sweep 2, handler regions): sfx id 0x1d4 — vsavj 
 [[map]]
 vsav2 = 0x004e44
 vsavj = 0x02a7e0
-kind = "stubbed_sound"
+kind = "sound_stub"
+profile = "cps2-wide-v1"
+sfx_id = 0x90
+helper = 0x5FFF00
 status = "verified"
-note = "H KEPT SILENT (14z-65): sfx id 0x748 — newcomer voice-bank range (0x7xx), the established stub class. Revisit with the M5 voice-bank port."
+note = "M5 VOICE RESTORED (14z-86): vs2 sfx 0x748 -> authored vsavj id 0x90 (qs_songs voice_batch; helper = the alias thunk). Prior: H KEPT SILENT (14z-65): sfx id 0x748 — newcomer voice-bank range (0x7xx), the established stub class. Revisit with the M5 voice-bank port."
 
 [[map]]
 vsav2 = 0x004eac
 vsavj = 0x02a7e0
-kind = "stubbed_sound"
+kind = "sound_stub"
+profile = "cps2-wide-v1"
+sfx_id = 0x94
+helper = 0x5FFF00
 status = "verified"
-note = "H KEPT SILENT (14z-65): sfx id 0x74c — newcomer voice-bank range (0x7xx), the established stub class. Revisit with the M5 voice-bank port."
+note = "M5 VOICE RESTORED (14z-86): vs2 sfx 0x74c -> authored vsavj id 0x94 (qs_songs voice_batch; helper = the alias thunk). Prior: H KEPT SILENT (14z-65): sfx id 0x74c — newcomer voice-bank range (0x7xx), the established stub class. Revisit with the M5 voice-bank port."
 
 [[map]]
 vsav2 = 0x004ee0
@@ -55,30 +61,42 @@ note = "H RESTORED 14z-85g: trap detonation chirp — vs2 0x73A content == vsavj
 [[map]]
 vsav2 = 0x004f62
 vsavj = 0x02a7e0
-kind = "stubbed_sound"
+kind = "sound_stub"
+profile = "cps2-wide-v1"
+sfx_id = 0x7f
+helper = 0x5FFF00
 status = "verified"
-note = "H KEPT SILENT (14z-65): sfx id 0x735 — vsavj same-id keys DIFFERENT content (keyons, measured). Named by the round-2 soak (scanner-merge ref, invisible to the diff-ref sweep). Revisit with the M5 voice-bank port."
+note = "M5 VOICE RESTORED (14z-86): vs2 sfx 0x735 -> authored vsavj id 0x7f (qs_songs voice_batch; helper = the alias thunk). Prior: H KEPT SILENT (14z-65): sfx id 0x735 — vsavj same-id keys DIFFERENT content (keyons, measured). Named by the round-2 soak (scanner-merge ref, invisible to the diff-ref sweep). Revisit with the M5 voice-bank port."
 
 [[map]]
 vsav2 = 0x004efa
 vsavj = 0x02a7e0
-kind = "stubbed_sound"
+kind = "sound_stub"
+profile = "cps2-wide-v1"
+sfx_id = 0x90
+helper = 0x5FFF00
 status = "verified"
-note = "H KEPT SILENT (14z-66): sfx id 0x748 — newcomer voice-bank range (0x7xx), the established stub class. Named by the ES crash repro (replay 72: x0689cc+0xec one-shot voice cue in the Erasing Sphere flow reached its tripwire, vec4 f3513). Revisit with the M5 voice-bank port."
+note = "M5 VOICE RESTORED (14z-86): vs2 sfx 0x748 -> authored vsavj id 0x90 (qs_songs voice_batch; helper = the alias thunk). Prior: H KEPT SILENT (14z-66): sfx id 0x748 — newcomer voice-bank range (0x7xx), the established stub class. Named by the ES crash repro (replay 72: x0689cc+0xec one-shot voice cue in the Erasing Sphere flow reached its tripwire, vec4 f3513). Revisit with the M5 voice-bank port."
 
 [[map]]
 vsav2 = 0x004fb0
 vsavj = 0x02a7e0
-kind = "stubbed_sound"
+kind = "sound_stub"
+profile = "cps2-wide-v1"
+sfx_id = 0xa0
+helper = 0x5FFF00
 status = "verified"
-note = "H KEPT SILENT (14z-66): sfx id 0x729 — newcomer voice-bank range (0x7xx), the established stub class. Stubbed with 0x4efa (same farm family, disasm-verified id). Revisit with the M5 voice-bank port."
+note = "M5 VOICE RESTORED (14z-86): vs2 sfx 0x729 -> authored vsavj id 0xa0 (qs_songs voice_batch; helper = the alias thunk). Prior: H KEPT SILENT (14z-66): sfx id 0x729 — newcomer voice-bank range (0x7xx), the established stub class. Stubbed with 0x4efa (same farm family, disasm-verified id). Revisit with the M5 voice-bank port."
 
 [[map]]
 vsav2 = 0x004fca
 vsavj = 0x02a7e0
-kind = "stubbed_sound"
+kind = "sound_stub"
+profile = "cps2-wide-v1"
+sfx_id = 0xa5
+helper = 0x5FFF00
 status = "verified"
-note = "H KEPT SILENT (14z-66): sfx id 0x72e — newcomer voice-bank range (0x7xx), the established stub class. Stubbed with 0x4efa (same farm family, disasm-verified id). Revisit with the M5 voice-bank port."
+note = "M5 VOICE RESTORED (14z-86): vs2 sfx 0x72e -> authored vsavj id 0xa5 (qs_songs voice_batch; helper = the alias thunk). Prior: H KEPT SILENT (14z-66): sfx id 0x72e — newcomer voice-bank range (0x7xx), the established stub class. Stubbed with 0x4efa (same farm family, disasm-verified id). Revisit with the M5 voice-bank port."
 
 [[map]]
 vsav2 = 0x2bc3ec

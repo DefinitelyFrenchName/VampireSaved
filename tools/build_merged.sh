@@ -44,13 +44,14 @@ python3 tools/gen_donovan_patch.py "$D_EX" "$OUT/patch" \
 grep -q '^GENERATION OK' "$OUT/gen.log" || {
     echo "FAIL: no GENERATION OK"; tail -15 "$OUT/gen.log"; exit 1; }
 NOPS="$(python3 -c "import json;print(len(json.load(open('$OUT/patch/patch.json'))['ops']))")"
-# RE-FROZEN 14z-85g (was 677): +1 = hui's sound_stub op (the restored
-# trap-detonation chirp).
-[ "$NOPS" = 678 ] || {
-    echo "FAIL: $NOPS ops, frozen fixture is 678 (re-freeze"
+# RE-FROZEN 14z-86 (was 678): +51 = the M5 voice batch (15 shared
+# alias-thunk pokes + the restored voice farm stubs across the three
+# recon maps). Matches test_tenant_loop's frozen 3-tenant count.
+[ "$NOPS" = 729 ] || {
+    echo "FAIL: $NOPS ops, frozen fixture is 729 (re-freeze"
     echo "      test_tenant_loop FIRST if the merge legitimately changed)"
     exit 1; }
-echo "  ok: 678 ops (the frozen test_tenant_loop fixture; 14z-85g chirp stub)"
+echo "  ok: 729 ops (the frozen test_tenant_loop fixture; 14z-86 voice batch)"
 python3 tools/patch_prg.py "$ROMDIR/vsavj.zip" "$OUT/prg" \
     --patch "$OUT/patch/patch.json" > "$OUT/patch_prg.log" 2>&1 || {
         echo "FAIL: patch_prg refused the merged patch"
@@ -144,7 +145,7 @@ echo "  ok: group-A members + group-C simms from the last link ($CHAIN)"
 # WIDE v1.1 (14z-86): authored Z80 songs (M5) into vsw.z01/z02 — same
 # uniform injection as build_donovan.sh's WIDE branch.
 if [ -f build/manifest/qs_songs.toml ]; then
-    python3 tools/build_qs_songs.py "$RPZIP" "$ROMDIR/vsav2.zip" || {
+    python3 tools/build_qs_songs.py "$RPZIP" "$ROMDIR/vsav2.zip" --vsav "$ROMDIR/vsav.zip" || {
         echo "FAIL: qs song injection"; exit 1; }
 fi
 # group B must stay PRISTINE in the packed vsav.zip (de-substitution)

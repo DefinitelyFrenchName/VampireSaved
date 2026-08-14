@@ -35,6 +35,7 @@ fi
 
 cp "$REPO/build/wide0/rompath/vsavjw.zip" "$W/t.zip"
 python3 "$REPO/tools/build_qs_songs.py" "$W/t.zip" "$ROMDIR/vsav2.zip" \
+    --vsav "$ROMDIR/vsav.zip" --ledger "$W/ledger.json" \
     --manifest "$REPO/build/manifest/qs_songs.toml" > "$W/build.log" \
     || fail "builder errored: $(tail -3 "$W/build.log")"
 
@@ -53,13 +54,15 @@ stock = za.read("vm3.01") + za.read("vm3.02")
 zb = zipfile.ZipFile(f"{romdir}/vsav2.zip")
 vs2 = zb.read("vs2.01") + zb.read("vs2.02")
 
+import json as _json
+ledger = _json.load(open(f"{w}/ledger.json"))
 TABLE = 0x9006
 touched = set()
+for sp in ledger["spans"]:          # the builder's own declared spans
+    touched.update(range(sp["off"], sp["off"] + sp["len"]))
 for s in songs:
     row = TABLE + s["id"] * 4
     place, ln, src = s["place"], s["len"], s["vs2_src"]
-    touched.update(range(row, row + 4))
-    touched.update(range(place, place + ln))
     if out[place:place + ln] != vs2[src:src + ln]:
         sys.exit(f"FAIL: {s['name']} placement != vs2 source bytes")
     want = bytes([(place >> 16) & 0xFF, (place >> 8) & 0xFF, place & 0xFF, 0])
@@ -69,10 +72,24 @@ for s in songs:
         sys.exit(f"FAIL: {s['name']} entry b0==0 — unreachable by the driver's own no-op law")
     if stock[row:row + 4] != b"\x00\x00\x00\x00":
         sys.exit(f"FAIL: {s['name']} targets a NON-FREE stock row")
+# voice-batch songs: verbatim vs their vs2 sources (independent re-check)
+for v in ledger.get("voices", []):
+    blob = vs2_song = None
+    at, ln = v["at"], v["len"]
+    # locate the vs2 source: its song addr from the vs2 id table
+    vrow = 0x9006 + (v["vs2_id"] % 0xA70) * 4
+    vaddr = (vs2[vrow] << 16) | (vs2[vrow + 1] << 8) | vs2[vrow + 2]
+    if out[at:at + ln] != vs2[vaddr:vaddr + ln]:
+        sys.exit(f"FAIL: voice {v['vs2_id']:#x} copy != vs2 source")
+# the two relocation pointer writes are the ONLY non-zero-span writes:
+t0_stock = stock[0x3B04] | (stock[0x3B05] << 8)
+if out[0x3B04] | (out[0x3B05] << 8) == t0_stock and ledger.get("voices"):
+    sys.exit("FAIL: table-0 pointer not repointed on a voice build")
 for i in range(len(out)):
     if i not in touched and out[i] != stock[i]:
         sys.exit(f"FAIL: byte {i:#x} differs from stock outside every declared span")
-print(f"ok: {len(songs)} songs verified against references; "
+print(f"ok: {len(songs)} songs + {len(ledger.get('voices', []))} voice songs "
+      f"verified against references; "
       f"{len(out) - len(touched)} vanilla bytes identical")
 
 # control 1: corrupt a placed byte -> the placement check above must catch it

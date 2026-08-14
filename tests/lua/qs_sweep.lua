@@ -8,6 +8,9 @@ local ids = {}
 local idlist = os.getenv("IDLIST")
 if idlist then for tok in idlist:gmatch("[^,]+") do ids[#ids+1]=tonumber(tok,16) end
 else for i=s_id,e_id do ids[#ids+1]=i end end
+-- STEP overrides the injection spacing (IDLIST mode kept SWEEP's default
+-- 12 frames, which is attack-window-blind — the 14z-85/86 lesson)
+stepf = tonumber(os.getenv("STEP") or "") or stepf
 local ring_idx = tonumber(os.getenv("RING_IDX") or "70", 16)
 local out_path = os.getenv("TRACE_OUT") or "qs_sweep.txt"
 

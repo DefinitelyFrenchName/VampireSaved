@@ -1842,13 +1842,14 @@ src = 0x0CB01A
 entries = 44
 ptr_table = 0x0BF41A
 ptr_old = 0x000B3220
-keep_ids = "0x110,0x111,0x112,0x119,0x152,0x202"
+keep_ids = "0x110,0x111,0x112,0x119,0x152,0x202,0x58,0x59,0x5a,0x5b,0x5c,0x5d,0x5e,0x5f,0x60,0x61,0x62,0x63,0x64,0x65,0x66,0x67,0x68,0x69,0x6a,0x6b,0x6c,0x6d,0x6e,0x6f,0x70,0x71,0x72,0x73,0x74,0x75,0x76,0x77,0x78,0x79,0x7a,0x7b"
+remap_ids = "0x700:0x58,0x701:0x59,0x702:0x5a,0x703:0x5b,0x704:0x5c,0x705:0x5d,0x706:0x5e,0x707:0x5f,0x708:0x60,0x709:0x61,0x70a:0x62,0x70b:0x63,0x70c:0x64,0x70d:0x65,0x70e:0x66,0x70f:0x67,0x710:0x68,0x711:0x69,0x712:0x6a,0x713:0x6b,0x714:0x6c,0x715:0x6d,0x716:0x6e,0x717:0x6f,0x718:0x70,0x719:0x71,0x71a:0x72,0x71b:0x73,0x71c:0x74,0x71d:0x75,0x71e:0x76,0x71f:0x77,0x750:0x78,0x751:0x79,0x752:0x7a,0x753:0x7b"
 # Un-stub the per-node sfx helper (vs2 0x005122 -> vsavj twin 0x004CE2, the
 # address recorded in its reconciliation row). Placing it HERE and not in
 # reconciliation.toml is deliberate: the helper is only safe once this
 # array exists, so the two must be impossible to enable separately. A stock
 # build skips this whole row and the helper stays stubbed.
-unstub = "0x005122=0x004CE2"
+unstub = "0x005122=0x5FFF00"   # -> the voice alias thunk (14z-86)
 
 # ── SELECT WHEEL: three appended cells (14z-60s) ────────────────────────────
 # Adds Huitzil/Phobos (0x10), Pyron (0x11) and Donovan (0x13) to the
@@ -2054,3 +2055,119 @@ expect_vs2_p1 = 0x2A6750
 expect_vs2_p2 = 0x2A6F00
 expect_vj_alias_p1 = 0x272594
 expect_vj_alias_p2 = 0x2727C0
+
+# THE VOICE ALIAS THUNK (14z-86, shared by all tenants — identical
+# rows dedupe on merge). A range-gated clone of the per-node sfx
+# helper 0x4CE2: ids in the authored voice range 0x58-0xA6 SKIP the
+# +0x300 facing alias (their alias rows are LIVE foreign sounds —
+# only 38 free (base,alias) pairs exist vs 79 voices, measured);
+# every other id keeps vanilla aliasing. Measured basis for the
+# deviation: 74/81 native alias songs are channel-slot-only
+# variants (same stream, same sample — the alias is channel
+# allocation, not sound content). Pinned at 0x5FFF00 (wide_ext
+# tail, ~1.5MB above the allocator; patch_prg overlap assertion
+# guards collision). unstub + the voice sound_stubs jsr here.
+[[aux_poke]]
+name = "voice_alias_thunk_w00"
+addr = 0x5fff00
+op = "poke16"
+only_variant_slot = true   # WIDE-only: stock builds have no 0x5FFFxx image
+val = 0x082E
+
+[[aux_poke]]
+name = "voice_alias_thunk_w01"
+addr = 0x5fff02
+op = "poke16"
+only_variant_slot = true   # WIDE-only: stock builds have no 0x5FFFxx image
+val = 0x0000
+
+[[aux_poke]]
+name = "voice_alias_thunk_w02"
+addr = 0x5fff04
+op = "poke16"
+only_variant_slot = true   # WIDE-only: stock builds have no 0x5FFFxx image
+val = 0x0070
+
+[[aux_poke]]
+name = "voice_alias_thunk_w03"
+addr = 0x5fff06
+op = "poke16"
+only_variant_slot = true   # WIDE-only: stock builds have no 0x5FFFxx image
+val = 0x6710
+
+[[aux_poke]]
+name = "voice_alias_thunk_w04"
+addr = 0x5fff08
+op = "poke16"
+only_variant_slot = true   # WIDE-only: stock builds have no 0x5FFFxx image
+val = 0x0C41
+
+[[aux_poke]]
+name = "voice_alias_thunk_w05"
+addr = 0x5fff0a
+op = "poke16"
+only_variant_slot = true   # WIDE-only: stock builds have no 0x5FFFxx image
+val = 0x0058
+
+[[aux_poke]]
+name = "voice_alias_thunk_w06"
+addr = 0x5fff0c
+op = "poke16"
+only_variant_slot = true   # WIDE-only: stock builds have no 0x5FFFxx image
+val = 0x6506
+
+[[aux_poke]]
+name = "voice_alias_thunk_w07"
+addr = 0x5fff0e
+op = "poke16"
+only_variant_slot = true   # WIDE-only: stock builds have no 0x5FFFxx image
+val = 0x0C41
+
+[[aux_poke]]
+name = "voice_alias_thunk_w08"
+addr = 0x5fff10
+op = "poke16"
+only_variant_slot = true   # WIDE-only: stock builds have no 0x5FFFxx image
+val = 0x00A7
+
+[[aux_poke]]
+name = "voice_alias_thunk_w09"
+addr = 0x5fff12
+op = "poke16"
+only_variant_slot = true   # WIDE-only: stock builds have no 0x5FFFxx image
+val = 0x6504
+
+[[aux_poke]]
+name = "voice_alias_thunk_w10"
+addr = 0x5fff14
+op = "poke16"
+only_variant_slot = true   # WIDE-only: stock builds have no 0x5FFFxx image
+val = 0x0641
+
+[[aux_poke]]
+name = "voice_alias_thunk_w11"
+addr = 0x5fff16
+op = "poke16"
+only_variant_slot = true   # WIDE-only: stock builds have no 0x5FFFxx image
+val = 0x0300
+
+[[aux_poke]]
+name = "voice_alias_thunk_w12"
+addr = 0x5fff18
+op = "poke16"
+only_variant_slot = true   # WIDE-only: stock builds have no 0x5FFFxx image
+val = 0x4EF9
+
+[[aux_poke]]
+name = "voice_alias_thunk_w13"
+addr = 0x5fff1a
+op = "poke16"
+only_variant_slot = true   # WIDE-only: stock builds have no 0x5FFFxx image
+val = 0x0000
+
+[[aux_poke]]
+name = "voice_alias_thunk_w14"
+addr = 0x5fff1c
+op = "poke16"
+only_variant_slot = true   # WIDE-only: stock builds have no 0x5FFFxx image
+val = 0x3316

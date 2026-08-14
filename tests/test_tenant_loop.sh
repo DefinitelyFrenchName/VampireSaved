@@ -111,10 +111,16 @@ echo "== 1: one tenant per run — the frozen op counts =="
 # each declaring build: +2 (record array data + ptr-row poke32) −1 (the
 # generic tail_data_ptr repoint is claim-suppressed, 14z-65 machinery).
 # Donovan unchanged — his don_sfx_records row predates this.
-# RE-FROZEN 14z-85g (hui 266->267): +1 GEN op — the kind=sound_stub
+# RE-FROZEN 14z-86 (D 243->265, H 267->300, P 208->234): THE M5 VOICE
+# BATCH — +15 shared aux_poke ops (the voice alias thunk at 0x5FFF00,
+# identical rows in all three manifests, deduped on merge) + the
+# restored voice farm sound_stubs (kind=sound_stub recon rows, per
+# tenant: the shared base farm + each overlay's own) per 14z-86's
+# qs_songs voice_batch. Prior re-freeze 14z-85g (hui 266->267): +1 GEN
+# op — the kind=sound_stub
 # synthesized stub for vs2 farm 0x4F2E (the restored trap-detonation
 # chirp, reconciliation_huitzil.toml).
-FROZEN_1="donovan:243 huitzil:267 pyron:208"
+FROZEN_1="donovan:265 huitzil:300 pyron:234"
 for row in $FROZEN_1; do
     who="${row%%:*}"; want="${row##*:}"
     case "$who" in donovan) ex="$D_EX" ;; huitzil) ex="$H_EX" ;; *) ex="$P_EX" ;; esac
@@ -182,8 +188,8 @@ check_n() {  # check_n <label> <dir> <want ops> <sum of 1-tenant counts>
 # H resolves) — at N=3 the latter four are multi-resolver anyway.
 # RE-FROZEN 14z-85g (+1 each: hui's sound_stub op rides every N that
 # includes him).
-check_n "2 tenants" "$WORK/two"   491 510
-check_n "3 tenants" "$WORK/three" 678 718
+check_n "2 tenants" "$WORK/two"   531 560
+check_n "3 tenants" "$WORK/three" 729 770
 
 # ── 3: every tenant's own content is present ────────────────────────────
 # An op count alone cannot tell "both tenants ran" from "tenant 0 ran twice".

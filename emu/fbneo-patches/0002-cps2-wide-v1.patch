@@ -133,8 +133,8 @@ index 6931097..1aa72c4 100644
 +
 +	{ "vm3.11m",       0x400000, 0xe80e956e, CPS2_QSND | BRF_SND },
 +	{ "vm3.12m",       0x400000, 0x9cd71557, CPS2_QSND | BRF_SND },
-+	{ "vsw.21m",       0x400000, 0x1147406a, CPS2_QSND | BRF_SND },   // WIDE v1
-+	{ "vsw.22m",       0x400000, 0x1147406a, CPS2_QSND | BRF_SND },   // WIDE v1
++	{ "vsw.21m",       0x400000, 0xdec0de3a, CPS2_QSND | BRF_SND },   // WIDE v1.2 QSOUND CONTENT MEMBER (14z-86): sentinel CRC — the M5 voice batch packs samples here; the old shared zero-fill CRC would hash-shadow a content-bearing 21m onto the still-zero 22m (the 14z-60z class)
++	{ "vsw.22m",       0x400000, 0xdec0de3b, CPS2_QSND | BRF_SND },   // WIDE v1.2 QSOUND CONTENT MEMBER (14z-86): sentinel CRC (see vsw.21m)
 +
 +	{ "vsavj.key",     0x000014, 0x36d28ab8, CPS2_ENCRYPTION_KEY },
 +};

@@ -36,3 +36,29 @@ place = 0x3C9C0
 vs2_src = 0x35ACD                   # byte-identical stream, slot 12 instead of 11
 len = 0x33
 provenance = "VS2"
+
+# THE VOICE-BLOCK BATCH (14z-86, maintainer GO "do it!"). Fully derived:
+# every scoped vs2 song copied VERBATIM; its voice note table (vs2's 8th
+# pointer-array slot, which vsavj lacks) authored at t7_base and reached
+# by relocating table 0 byte-identically (ptr word $3B04 -> table0_copy;
+# the vacated word at the old table-0 base becomes the 8th slot pointer).
+# Sample records authored at high indices landing in the post-envelope
+# free zero run; content found in vsav's image is referenced in place
+# (end-exclusive compare), absent content packs into vsw.21m (banks
+# 0x80+, WIDE v1.2). Table-1 entries ride vsavj's native table 1
+# (measured content-equivalent for every used index). Envelope premise:
+# every voice uses instrument 0, byte-identical rows (the builder FAILS
+# if a nonzero instr ever appears). 68k side: tenant remap_ids follow
+# the builder's ledger; the facing +0x300 alias is SKIPPED for the new
+# id range by the tenant helper thunk (measured: 74/81 native alias
+# songs are channel-slot-only variants — the deviation is channel
+# allocation, not sound content; STATE 14z-86 decision note).
+[voice_batch]
+enable = true
+ids = "0x700-0x71f,0x750-0x757,0x735-0x74e,0x720-0x72f"
+exclude = "0x739,0x73a"       # ported at m11/m9 (ejection/chirp)
+id_base = 0x058               # sequential rows in the 0x58-0xD7 free block
+songs_base = 0x3CA00          # banked free run, after the ejection pair
+table0_copy = 0x5F00          # fixed free run (byte-identical relocation)
+t7_base = 0x6100              # the authored voice note table
+records_base = 0x6402         # first 8-aligned-to-0x45FA addr >= 0x6400

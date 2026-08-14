@@ -2189,10 +2189,17 @@ def main():
                 per-node sfx helper vsavj 0x4CE2."""
                 if tgt not in sound_stubs:
                     sid = _int(m["sfx_id"])
+                    # optional per-row helper override (14z-86, the voice
+                    # batch): stubs whose id sits in the authored voice
+                    # range must jsr the range-gated alias thunk instead
+                    # of vanilla 0x4CE2 (whose +0x300 facing alias would
+                    # land on a LIVE foreign row)
+                    helper = _int(m.get("helper", 0x4CE2))
                     body = (bytes.fromhex("4eb90000330e")        # jsr save
                             + bytes([0x22, 0x3C]) + sid.to_bytes(4, "big")
                             + bytes.fromhex("74007600")          # clr d2,d3
-                            + bytes.fromhex("4eb900004ce2")      # jsr helper
+                            + bytes.fromhex("4eb9")              # jsr helper
+                            + helper.to_bytes(4, "big")
                             + bytes.fromhex("4ef900003306"))     # jmp restore
                     sd = alloc("a", len(body), f"sound stub {tgt:#x}")
                     if sd is None:
@@ -2278,6 +2285,15 @@ def main():
                     if m and m.get("kind") == "farm_port":
                         return farm_port_for(tgt, m, where)
                     if m and m.get("kind") == "sound_stub":
+                        # profile-gated stub (14z-86, the voice batch): a
+                        # row whose `profile` the build does not carry
+                        # falls back to the SILENCE stub — its authored
+                        # Z80 id rows and its alias thunk exist only on
+                        # profile builds (a stock build jsr'ing the
+                        # pinned thunk address would run off the 4MB
+                        # image)
+                        if m.get("profile") and m["profile"] != args.profile:
+                            return 0x2A7E0
                         return sound_stub_for(tgt, m, where)
                     if m and m.get("kind") == "patched_clone":
                         return patched_clone_for(tgt, m, where)

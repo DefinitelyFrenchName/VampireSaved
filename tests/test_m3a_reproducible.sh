@@ -27,7 +27,10 @@ cd "$REPO"
 WORK="$(mktemp -d)"
 trap 'rm -rf "$WORK"' EXIT
 
-EXPECT_WIDE="4b7d0dc7319ed6cf94a02b22938cdb18946dfddd"
+# EXPECT_WIDE="4b7d0dc7319ed6cf94a02b22938cdb18946dfddd"  # git tag freeze/donovan-m3a
+# 14z-86 (the M5 VOICE BATCH — donovan-m4: the voice remaps + thunk pokes
+# + farm stubs; stock twin measured UNCHANGED at 6c93cfa8)
+EXPECT_WIDE="84f49aaab0641e071f8db00a69c839754643594f"
 EXPECT_STOCK="6c93cfa8a8a80ae2303d3acaf8c7bff487f369c5"
 # huitzil-m3 (14z-79, maintainer-ratified). Supersedes huitzil-m2
 # (9deda0808e87601b10e2171405805d4669ba2624), which can no longer be
@@ -51,16 +54,20 @@ EXPECT_STOCK="6c93cfa8a8a80ae2303d3acaf8c7bff487f369c5"
 # 14z-85g(2): + the two trap-shock class region_fix rows (0x52 -> 0x06)
 # EXPECT_HUI="9a948a11b0184d576442b14784ad37fc98123a3a"  # git tag freeze/huitzil-m10
 # 14z-86 (the M5 ejection pilot): + record node 10 remap 0x739 -> 0xD8
-# (keep_ids + remap_ids in hui_sfx_records; the authored Z80 song rows
-# live in vsw.z01/z02 OUTSIDE the program fingerprint)
-EXPECT_HUI="6eed421be848c2de333bec9a82ef74de18cd88c9"
+# EXPECT_HUI="6eed421be848c2de333bec9a82ef74de18cd88c9"  # git tag freeze/huitzil-m11
+# 14z-86 (the M5 VOICE BATCH): + the voice remaps/keeps, the alias-thunk
+# aux_pokes and the restored voice farm sound_stubs (all profile-gated —
+# the stock twin is BIT-IDENTICAL, measured)
+EXPECT_HUI="e1f598d6113f32ed5bda66a684e53d30b36447e9"
 # pyron-m3 (14z-82c: + the ADOPTED hitclass_map_extend thunk — the f7997 fix)
 # EXPECT_PYR="6c7f7322da793c12b3681dd3ef5a76b3792ae5d0"  # git tag freeze/pyron-m3
 # pyron-m4 (14z-85b, maintainer-ruled: + pyr_sfx_records — kills the merged
 # music retrigger at its source; tag freeze/pyron-m3 is the way back)
 # EXPECT_PYR="ac22418f7efb6126ce4d1e33db82ade7ab0a658a"  # git tag freeze/pyron-m4
 # 14z-85f: + the six x028122 object-hit damage work-var port_patch rows
-EXPECT_PYR="65e9a40ee211c94b5d8d76a4eec6cf41834e74c0"
+# EXPECT_PYR="65e9a40ee211c94b5d8d76a4eec6cf41834e74c0"  # git tag freeze/pyron-m5
+# 14z-86 (the M5 VOICE BATCH — see EXPECT_HUI)
+EXPECT_PYR="4c6e3fb6785cc9b418dd52744c7046a6a459f71e"
 
 # The WIDE overlay romset (deterministic from the audited reference sets;
 # built into scratch so the canonical build/wide0 is never clobbered).

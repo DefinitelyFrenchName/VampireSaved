@@ -152,16 +152,22 @@ note = "M5 RESTORED (14z-52): sfx id 0x142 -> vsavj same-id farm entry 0x047fe. 
 [[map]]
 vsav2 = 0x004ddc
 vsavj = 0x02a7e0
-kind = "stubbed_sound"
+kind = "sound_stub"
+profile = "cps2-wide-v1"
+sfx_id = 0x84
+helper = 0x5FFF00
 status = "verified"
-note = "H KEPT SILENT (14z-65): sfx id 0x73c (Huitzil voice-bank range) — vsavj same-id keys DIFFERENT multi-voice music-class content (keyons_vsavj vs keyons_vs2, measured). Restoring needs ported samples (M5 voice-bank decision). Fired at his init f2887."
+note = "M5 VOICE RESTORED (14z-86): vs2 sfx 0x73c -> authored vsavj id 0x84 (qs_songs voice_batch; helper = the alias thunk). Prior: H KEPT SILENT (14z-65): sfx id 0x73c (Huitzil voice-bank range) — vsavj same-id keys DIFFERENT multi-voice music-class content (keyons_vsavj vs keyons_vs2, measured). Restoring needs ported samples (M5 voice-bank decision). Fired at his init f2887."
 
 [[map]]
 vsav2 = 0x004df6
 vsavj = 0x02a7e0
-kind = "stubbed_sound"
+kind = "sound_stub"
+profile = "cps2-wide-v1"
+sfx_id = 0x86
+helper = 0x5FFF00
 status = "verified"
-note = "M5 KEPT SILENT (14z-52): sfx id 0x73e — sample ABSENT from vsav's (full) sample ROMs. Measured, docs/project/m5/don_id_plan.json; restoring it would play the wrong sound. Revisit only with ported samples (STATE decision: voice samples)."
+note = "M5 VOICE RESTORED (14z-86): vs2 sfx 0x73e -> authored vsavj id 0x86 (qs_songs voice_batch; helper = the alias thunk). Prior: M5 KEPT SILENT (14z-52): sfx id 0x73e — sample ABSENT from vsav's (full) sample ROMs. Measured, docs/project/m5/don_id_plan.json; restoring it would play the wrong sound. Revisit only with ported samples (STATE decision: voice samples)."
 
 [[map]]
 vsav2 = 0x004e10
@@ -173,23 +179,32 @@ note = "-; refs: jsr"
 [[map]]
 vsav2 = 0x004e2a
 vsavj = 0x02a7e0
-kind = "stubbed_sound"
+kind = "sound_stub"
+profile = "cps2-wide-v1"
+sfx_id = 0x8f
+helper = 0x5FFF00
 status = "verified"
-note = "M5 KEPT SILENT (14z-52): sfx id 0x747 — sample ABSENT from vsav's (full) sample ROMs. Measured, docs/project/m5/don_id_plan.json; restoring it would play the wrong sound. Revisit only with ported samples (STATE decision: voice samples)."
+note = "M5 VOICE RESTORED (14z-86): vs2 sfx 0x747 -> authored vsavj id 0x8f (qs_songs voice_batch; helper = the alias thunk). Prior: M5 KEPT SILENT (14z-52): sfx id 0x747 — sample ABSENT from vsav's (full) sample ROMs. Measured, docs/project/m5/don_id_plan.json; restoring it would play the wrong sound. Revisit only with ported samples (STATE decision: voice samples)."
 
 [[map]]
 vsav2 = 0x004e5e
 vsavj = 0x02a7e0
-kind = "stubbed_sound"
+kind = "sound_stub"
+profile = "cps2-wide-v1"
+sfx_id = 0x91
+helper = 0x5FFF00
 status = "verified"
-note = "H KEPT SILENT (14z-65): sfx id 0x749 — vsavj same-id keys DIFFERENT multi-voice content (measured). Revisit with ported samples."
+note = "M5 VOICE RESTORED (14z-86): vs2 sfx 0x749 -> authored vsavj id 0x91 (qs_songs voice_batch; helper = the alias thunk). Prior: H KEPT SILENT (14z-65): sfx id 0x749 — vsavj same-id keys DIFFERENT multi-voice content (measured). Revisit with ported samples."
 
 [[map]]
 vsav2 = 0x004e78
 vsavj = 0x02a7e0
-kind = "stubbed_sound"
+kind = "sound_stub"
+profile = "cps2-wide-v1"
+sfx_id = 0x92
+helper = 0x5FFF00
 status = "verified"
-note = "H KEPT SILENT (14z-65): sfx id 0x74a — vsavj same-id keys DIFFERENT multi-voice content (measured). The FIRST tripwire his init hit (f2887)."
+note = "M5 VOICE RESTORED (14z-86): vs2 sfx 0x74a -> authored vsavj id 0x92 (qs_songs voice_batch; helper = the alias thunk). Prior: H KEPT SILENT (14z-65): sfx id 0x74a — vsavj same-id keys DIFFERENT multi-voice content (measured). The FIRST tripwire his init hit (f2887)."
 
 [[map]]
 vsav2 = 0x004e92
@@ -215,9 +230,12 @@ note = "M5 RESTORED (14z-52): sfx id 0x2d4 -> vsavj same-id farm entry 0x04a5e. 
 [[map]]
 vsav2 = 0x004f48
 vsavj = 0x02a7e0
-kind = "stubbed_sound"
+kind = "sound_stub"
+profile = "cps2-wide-v1"
+sfx_id = 0x8b
+helper = 0x5FFF00
 status = "verified"
-note = "H KEPT SILENT (14z-65): sfx id 0x743 — vsavj same-id keys DIFFERENT multi-voice content (measured). Revisit with ported samples."
+note = "M5 VOICE RESTORED (14z-86): vs2 sfx 0x743 -> authored vsavj id 0x8b (qs_songs voice_batch; helper = the alias thunk). Prior: H KEPT SILENT (14z-65): sfx id 0x743 — vsavj same-id keys DIFFERENT multi-voice content (measured). Revisit with ported samples."
 
 [[map]]
 vsav2 = 0x004f7c
@@ -229,9 +247,12 @@ note = "-; refs: jsr"
 [[map]]
 vsav2 = 0x004f96
 vsavj = 0x02a7e0
-kind = "stubbed_sound"
+kind = "sound_stub"
+profile = "cps2-wide-v1"
+sfx_id = 0xa1
+helper = 0x5FFF00
 status = "verified"
-note = "H KEPT SILENT (14z-65): sfx id 0x72a — vsavj same-id keys DIFFERENT multi-voice content (measured). Revisit with ported samples."
+note = "M5 VOICE RESTORED (14z-86): vs2 sfx 0x72a -> authored vsavj id 0xa1 (qs_songs voice_batch; helper = the alias thunk). Prior: H KEPT SILENT (14z-65): sfx id 0x72a — vsavj same-id keys DIFFERENT multi-voice content (measured). Revisit with ported samples."
 
 [[map]]
 vsav2 = 0x004fe4
@@ -271,30 +292,42 @@ note = "M5 KEPT SILENT (14z-52): sfx id 0x173 — vsavj same-id keys DIFFERENT s
 [[map]]
 vsav2 = 0x0050a0
 vsavj = 0x02a7e0
-kind = "stubbed_sound"
+kind = "sound_stub"
+profile = "cps2-wide-v1"
+sfx_id = 0x7b
+helper = 0x5FFF00
 status = "verified"
-note = "M5 KEPT SILENT (14z-52): sfx id 0x753 — vsavj id is a MUSIC TRACK (multi-voice, sustained — measured). Measured, docs/project/m5/don_id_plan.json; restoring it would play the wrong sound. Revisit only with ported samples (STATE decision: voice samples)."
+note = "M5 VOICE RESTORED (14z-86): vs2 sfx 0x753 -> authored vsavj id 0x7b (qs_songs voice_batch; helper = the alias thunk). Prior: M5 KEPT SILENT (14z-52): sfx id 0x753 — vsavj id is a MUSIC TRACK (multi-voice, sustained — measured). Measured, docs/project/m5/don_id_plan.json; restoring it would play the wrong sound. Revisit only with ported samples (STATE decision: voice samples)."
 
 [[map]]
 vsav2 = 0x0050ba
 vsavj = 0x02a7e0
-kind = "stubbed_sound"
+kind = "sound_stub"
+profile = "cps2-wide-v1"
+sfx_id = 0x7c
+helper = 0x5FFF00
 status = "verified"
-note = "M5 KEPT SILENT (14z-52): sfx id 0x754 — vsavj id is a MUSIC TRACK (multi-voice, sustained — measured). Measured, docs/project/m5/don_id_plan.json; restoring it would play the wrong sound. Revisit only with ported samples (STATE decision: voice samples)."
+note = "M5 VOICE RESTORED (14z-86): vs2 sfx 0x754 -> authored vsavj id 0x7c (qs_songs voice_batch; helper = the alias thunk). Prior: M5 KEPT SILENT (14z-52): sfx id 0x754 — vsavj id is a MUSIC TRACK (multi-voice, sustained — measured). Measured, docs/project/m5/don_id_plan.json; restoring it would play the wrong sound. Revisit only with ported samples (STATE decision: voice samples)."
 
 [[map]]
 vsav2 = 0x0050d4
 vsavj = 0x02a7e0
-kind = "stubbed_sound"
+kind = "sound_stub"
+profile = "cps2-wide-v1"
+sfx_id = 0x7d
+helper = 0x5FFF00
 status = "verified"
-note = "M5 KEPT SILENT (14z-52): sfx id 0x755 — vsavj id is a MUSIC TRACK (multi-voice, sustained — measured). Measured, docs/project/m5/don_id_plan.json; restoring it would play the wrong sound. Revisit only with ported samples (STATE decision: voice samples)."
+note = "M5 VOICE RESTORED (14z-86): vs2 sfx 0x755 -> authored vsavj id 0x7d (qs_songs voice_batch; helper = the alias thunk). Prior: M5 KEPT SILENT (14z-52): sfx id 0x755 — vsavj id is a MUSIC TRACK (multi-voice, sustained — measured). Measured, docs/project/m5/don_id_plan.json; restoring it would play the wrong sound. Revisit only with ported samples (STATE decision: voice samples)."
 
 [[map]]
 vsav2 = 0x0050ee
 vsavj = 0x02a7e0
-kind = "stubbed_sound"
+kind = "sound_stub"
+profile = "cps2-wide-v1"
+sfx_id = 0x7e
+helper = 0x5FFF00
 status = "verified"
-note = "M5 KEPT SILENT (14z-52): sfx id 0x756 — vsavj id is a MUSIC TRACK (multi-voice, sustained — measured). Measured, docs/project/m5/don_id_plan.json; restoring it would play the wrong sound. Revisit only with ported samples (STATE decision: voice samples)."
+note = "M5 VOICE RESTORED (14z-86): vs2 sfx 0x756 -> authored vsavj id 0x7e (qs_songs voice_batch; helper = the alias thunk). Prior: M5 KEPT SILENT (14z-52): sfx id 0x756 — vsavj id is a MUSIC TRACK (multi-voice, sustained — measured). Measured, docs/project/m5/don_id_plan.json; restoring it would play the wrong sound. Revisit only with ported samples (STATE decision: voice samples)."
 
 [[map]]
 vsav2 = 0x005122
@@ -1653,9 +1686,12 @@ note = "M5 KEPT SILENT (14z-52): sfx id 0x112 — restorable id but vsavj has NO
 [[map]]
 vsav2 = 0x005086
 vsavj = 0x02a7e0
-kind = "stubbed_sound"
+kind = "sound_stub"
+profile = "cps2-wide-v1"
+sfx_id = 0x75
+helper = 0x5FFF00
 status = "verified"
-note = "M5 KEPT SILENT (14z-52): sfx id 0x71d — vsavj id is a MUSIC TRACK (multi-voice, sustained — measured). Measured, docs/project/m5/don_id_plan.json; restoring it would play the wrong sound. Revisit only with ported samples (STATE decision: voice samples)."
+note = "M5 VOICE RESTORED (14z-86): vs2 sfx 0x71d -> authored vsavj id 0x75 (qs_songs voice_batch; helper = the alias thunk). Prior: M5 KEPT SILENT (14z-52): sfx id 0x71d — vsavj id is a MUSIC TRACK (multi-voice, sustained — measured). Measured, docs/project/m5/don_id_plan.json; restoring it would play the wrong sound. Revisit only with ported samples (STATE decision: voice samples)."
 
 [[map]]
 vsav2 = 0x04223c
@@ -1846,23 +1882,32 @@ note = "hand (14z-65): Huitzil's dispatch_07 row target — a per-char SUBSTATE 
 [[map]]
 vsav2 = 0x004e10
 vsavj = 0x02a7e0
-kind = "stubbed_sound"
+kind = "sound_stub"
+profile = "cps2-wide-v1"
+sfx_id = 0x85
+helper = 0x5FFF00
 status = "verified"
-note = "H KEPT SILENT (14z-65 sweep): sfx id 0x73d — vsavj same-id keys DIFFERENT content (keyons records, measured). Revisit with the M5 voice-bank port."
+note = "M5 VOICE RESTORED (14z-86): vs2 sfx 0x73d -> authored vsavj id 0x85 (qs_songs voice_batch; helper = the alias thunk). Prior: H KEPT SILENT (14z-65 sweep): sfx id 0x73d — vsavj same-id keys DIFFERENT content (keyons records, measured). Revisit with the M5 voice-bank port."
 
 [[map]]
 vsav2 = 0x004e92
 vsavj = 0x02a7e0
-kind = "stubbed_sound"
+kind = "sound_stub"
+profile = "cps2-wide-v1"
+sfx_id = 0x93
+helper = 0x5FFF00
 status = "verified"
-note = "H KEPT SILENT (14z-65 sweep): sfx id 0x74b — vsavj same-id keys DIFFERENT content (keyons records, measured). Revisit with the M5 voice-bank port."
+note = "M5 VOICE RESTORED (14z-86): vs2 sfx 0x74b -> authored vsavj id 0x93 (qs_songs voice_batch; helper = the alias thunk). Prior: H KEPT SILENT (14z-65 sweep): sfx id 0x74b — vsavj same-id keys DIFFERENT content (keyons records, measured). Revisit with the M5 voice-bank port."
 
 [[map]]
 vsav2 = 0x004ec6
 vsavj = 0x02a7e0
-kind = "stubbed_sound"
+kind = "sound_stub"
+profile = "cps2-wide-v1"
+sfx_id = 0x95
+helper = 0x5FFF00
 status = "verified"
-note = "H KEPT SILENT (14z-65 sweep): sfx id 0x74d — vsavj same-id keys DIFFERENT content (keyons records, measured). Revisit with the M5 voice-bank port."
+note = "M5 VOICE RESTORED (14z-86): vs2 sfx 0x74d -> authored vsavj id 0x95 (qs_songs voice_batch; helper = the alias thunk). Prior: H KEPT SILENT (14z-65 sweep): sfx id 0x74d — vsavj same-id keys DIFFERENT content (keyons records, measured). Revisit with the M5 voice-bank port."
 
 [[map]]
 vsav2 = 0x004f7c

@@ -123,7 +123,7 @@ exp=$(cat "$REPO/tests/expected/vsavj/02_demitri_vs_cpu.sha1")
 echo "  ok: bit-identical to the frozen vanilla expectation"
 
 echo "== legacy under the v2 masked basis on stage 4 (hooked build)"
-MASK_RANGES="$(cat "$REPO/tests/expected/donovan-m3a/mask")" \
+MASK_RANGES="$(cat "$REPO/tests/expected/donovan-m4/mask")" \
 MAME_ROMPATH="$WORK/pyr4/rompath;$ROMDIR" \
     tools/run_replay_mame.sh vsavj tests/replays/02_demitri_vs_cpu.rpl \
     "$WORK/r02m.log" "$WORK/r02mbox" > /dev/null 2>&1

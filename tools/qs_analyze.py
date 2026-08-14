@@ -2,7 +2,11 @@ import re, sys, json
 from collections import defaultdict
 # parse sweep log -> per id: list of key-ons (bank,start,end,loop)
 # QSound: voice v regs at v*8+k; bank for voice v lives at ((v-1)&15)*8+0
+# usage: qs_analyze.py <sweep.log> <out.json> [window_frames]
+#   window default 12 — the historical value the frozen keyon maps used;
+#   delayed-attack sounds need 45+ (14z-85/86)
 log, out = sys.argv[1], sys.argv[2]
+WINDOW = int(sys.argv[3]) if len(sys.argv) > 3 else 12
 tri={}
 regs={}          # last-known reg values
 cur=None; curfr=0
@@ -25,7 +29,7 @@ for line in open(log):
     if reg<0x80 and (reg&7)==3 and data==0x8000 and cur is not None:
         v=reg>>3
         fr0=id_start_frame[cur]
-        if fr0 <= fr < fr0+12:
+        if fr0 <= fr < fr0+WINDOW:
             bank = regs.get(((v-1)&15)*8, 0) & 0x7F
             start= regs.get(v*8+1, 0)
             end  = regs.get(v*8+5, 0)

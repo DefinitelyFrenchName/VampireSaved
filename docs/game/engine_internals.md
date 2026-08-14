@@ -900,6 +900,67 @@ row + vs2's 0x33-byte song block copied verbatim into the banked
 free run. Envelope row 0 (both songs' instrument) is byte-identical
 across the games.
 
+### Z80 driver, second pass (14z-86, the voice batch) — dispatch table,
+### note-table array semantics, the dead type-C song class, the alias bit
+
+- **The real command dispatch**: the fetch loop at 0x1166 reads a
+  byte; ≥0x20 RETURNS to the tick path (a WAIT/sustain event); <0x20
+  dispatches via the pointer table at **0x1186** (32 × 2B). Operand counts (both games, byte-identical
+  interpreters): 00-03 zero-op flag toggles (ix+$04 bits), 04/05 two
+  ops, 06-11 one op, 12-15 zero (read track state not stream), **16 =
+  16-bit signed STREAM JUMP** (loops), **17 = end-of-track, no
+  operand** (the "17 30" reading of 14z-86 morning was the end marker
+  plus the NEXT song's priority byte), 18 pan/level, 19 volume, 1A-1E
+  one op (xlates 0x38F1/0x39F1/0x37F1 etc.), **1F = note-table select**.
+- **cmd 1F indexes the pointer array at $3B04 with an UNBOUNDED byte**
+  — vsavj has SEVEN slots (0x3B12…0x455A), **vs2 has EIGHT: slot 7 is
+  its VOICE note table**, which is why every voice song runs `1F 07`
+  and why vsavj cannot resolve them natively. No phantom index (7-255,
+  the out-of-array reads land in table data) yields a pointer into
+  authorable space — measured exhaustively. The port's answer:
+  RELOCATE table 0 byte-identically (repoint the $3B04 word) and write
+  the vacated word at the old table-0 base as the 8th slot pointer →
+  an authored voice table in the fixed-ROM free run. Every consumer
+  follows the moved pointer to identical bytes; no deadness proofs.
+- **Note-table bases are 16-bit** (ix+$30/31; cmd-08 does base+op*4
+  with one carry bit) — authored note tables must live below ~flat
+  0x10000. Sample RECORDS are 16-bit-indexed from 0x45FA and
+  bank-switched — high indices land in the post-envelope free zero run
+  (0x5E22+), so authored records need NO table growth.
+- **A third SONG CLASS exists and is DEAD CODE in both games** (zero
+  of 3,000+ live songs use it): header byte0 = 0x80|voice → a FLAT
+  11-byte one-shot format parsed at 0x0311: [80|voice][priority]
+  [→ix+06][→ix+05][→ix+09][→ix+08][pitch via 0x34F1][sample# BE →
+  ix+2F/2E][b9,b10 → ix+14/15 pitch base]. **Proven EXECUTABLE by
+  authored probe** (14z-86: a hand-crafted row keyed the exact record
+  with the same keyon tuple as the multi-track version). Kept as a
+  capability reserve — the batch shipped verbatim multi songs instead.
+  Related: the note-on resolver at 0x0D0A treats ix+$2F bit7 as a
+  dual-mode switch (set = (table,entry) indirection, clear = RAW
+  sample number).
+- **The +0x300 id alias is the FACING bit** (`btst #0,$70(a6)` — the
+  same helper idiom id_space.md documents as facing) and natively
+  selects a per-facing TWIN SONG: measured over the 81 scoped voice
+  pairs, 74 differ ONLY in the channel-slot word, 6 are identical, 1
+  other — the alias is CHANNEL ALLOCATION, not sound content. The
+  voice batch skips it for the authored range 0x58-0xA6 (a range-gated
+  thunk clone of the helper at PRG:0x5FFF00) because only 38 free
+  (base, base+0x300) row pairs exist against 79 voices; kept vanilla
+  ids keep vanilla aliasing through the thunk's else-branch. Deviation
+  surface: simultaneous same-voice triggers share a channel (restart)
+  instead of layering on two.
+- **Song extents**: songs are stored contiguously; a song's length =
+  the gap to the next song start (sorted id-table addresses). Verified
+  batch-wide: no track stream overruns its extent.
+- The keyon-window disciplines: qs_sweep IDLIST mode takes STEP (the
+  12-frame default is attack-window-blind), qs_analyze takes the
+  window as its 3rd arg, and per-id window attribution is VENUE-FLAKY
+  for delayed keyons — batch A/Bs compare WHOLE-RUN (voice, length,
+  content) multisets instead (tools/check_qs_voice_batch.py; a
+  signature ours-only whose content exists in vs2's library is a
+  priority-suppressed track echo, measured moving with injection
+  timing).
+
 ## The sprite-list DRAWER: how an object becomes sprite entries
 ## (measured 14z-71 on the Huitzil beam; the layer ABOVE the OBJ entry)
 

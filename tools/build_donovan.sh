@@ -281,7 +281,7 @@ if python3 -c "import json,sys; sys.exit(0 if json.load(open('$OUTBASE/patch/pat
     # fingerprint, so frozen references are unaffected by construction.
     if [ -f build/manifest/qs_songs.toml ]; then
         python3 tools/build_qs_songs.py "$OUTBASE/rompath/vsavjw.zip" \
-            "$ROMDIR/vsav2.zip" || exit 1
+            "$ROMDIR/vsav2.zip" --vsav "$ROMDIR/vsav.zip" || exit 1
     fi
 else
     ROMDIR="$ROMDIR" tools/pack_build.sh "$OUTBASE/prg" "$OUTBASE/rompath" > /dev/null
