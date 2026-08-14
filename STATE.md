@@ -36,6 +36,68 @@ SESSION: maintainer playtest of m3b_merged2 (FG + throw-family spot
 checks on H/P); then the trap ring-entry A/B and the voice arc's
 0x02E5 decode, unchanged from 14z-85e.)
 
+### KNOWN-OPEN — 14z-85f (maintainer field report, 2026-08-14): ONE
+### flaky CRASH RESET at a match transition on the merged build.
+### Not reproduced; filed with the exact recipe for a scripted rig.
+
+**The maintainer's recipe, verbatim in substance** (alongside "Final
+Guardian corrected, overall everything is as expected"):
+1. 2P versus: Donovan (P1) vs Pyron (P2).
+2. Donovan wins **with a PERFECT**.
+3. Next match forms against **COM Sasquatch** → crash during or just
+   after the character-introduction animation.
+Non-reproducible so far: same setup without Sasquatch-second = no
+crash; Sasquatch as FIRST match = no crash; input-buffer overload = no
+crash. Maintainer's read: very unlikely emulator-side — "a wrong
+pointer or hook somewhere". BUG ARCHAEOLOGY DONE (14z-85f close): no
+prior record of this class (git grep Sasquatch/intro/perfect — only
+the m2 bank-table and gfx-band items, unrelated).
+
+**Why "crash reset" narrows it (unmeasured, but structural):** a reset
+is the watchdog signature, and the merged build carries DELIBERATE
+loud-by-design ILLEGAL tripwires that end in exactly that: the 59-75
+owner-tag stubs (zero/unclaimed tag), the hitclass-map bounds check,
+and the init-shim unmatched-id case. A tripwire firing here would be
+the instrument WORKING — catching a stamp/dispatch path the census
+missed on a state only this sequence reaches. Candidate mechanisms, in
+order of prior:
+(a) **Stale-state leak across the match transition**: the Pyron match
+    populates $FF9400/$FFB800 pool slots (owner tags at +0x7F, family
+    type bytes); nothing clears tags by design ("stale tags in
+    legacy-reused slots are unread — stubs fire only for family
+    types"). The intro of the NEXT match is exactly where pools are
+    re-seeded — if any path reads a stale family type or tag before
+    the re-seed (or the perfect-win path skips a teardown the normal
+    win performs), a stub can fire on a stale slot.
+(b) **Perfect-flag side path**: a PERFECT win takes extra win-screen
+    branches (the "Perfect" splash object family) — a census-missed
+    stamp site there would tag nothing and trip on the next family
+    dispatch.
+(c) A plain wrong pointer on the Sasquatch intro path reading a
+    tenant-displaced row (the F2/bank-gate class) — but that class was
+    deterministic in every prior instance, and this is flaky, which
+    fits pool-state timing better.
+
+**THE RIG (next session, on build/m3b_merged2):**
+1. Scripted 2P Don-vs-Pyron with a perfect win (P2 idle — Pyron takes
+   no damage-dealing action; poke P2 HP low if the timer is the
+   obstacle), then continue into the COM ladder; FORCE the second
+   opponent to Sasquatch by poking the next-opponent variable at the
+   win screen (find it via dump-diff across the transition — it is
+   written before the VS screen; ram.md has no row yet, add one).
+2. Arm the run with the tripwire-visibility instruments: bp_regs.lua
+   breakpoints on ALL planted ILLEGAL/tripwire addresses (tag stubs,
+   hitclass bound, init-shim unmatched), plus a $FF9400/$FFB800 pool
+   dump at the transition frames — a fire names the mechanism in one
+   run; a watchdog reset with NO tripwire hit points at (c).
+3. Repeat N=20 with jittered win-frame timing (the flakiness likely
+   rides pool-slot reuse order). A clean N=20 does NOT close the item
+   (the maintainer could not reproduce either); it stays open until
+   the mechanism is named.
+Cheap first check before any of that: does the 61_tenant_2pwin replay
+family already cover a 2P tenant win → COM transition? If yes, diff
+what the perfect path adds.
+
 ### Decisions pending — 14z-85f: tenant DEFENSE-side table rows
 ### (defender curves + low-HP rally thresholds)
 

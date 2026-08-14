@@ -15,10 +15,12 @@
 > 23/23/23/23/52, ground-truthed failing on the pre-fix merged).
 > The damage pipeline is synthesized in engine_internals.md.
 >
-> **FIRST ACT: the maintainer's playtest of `build/m3b_merged2`** —
-> FG damage (should now feel native), plus H/P throw/projectile
-> damage spot checks (the same applier serves them). Then, in
-> maintainer-pressure order:
+> ~~FIRST ACT: the maintainer's playtest of `build/m3b_merged2`~~
+> **DONE (maintainer, 2026-08-14): "Final Guardian corrected, overall
+> everything is as expected"** — but the playtest surfaced ONE flaky
+> crash reset (Don-perfect-win → Sasquatch intro; see Still open
+> below and STATE 14z-85f). Next, in maintainer-pressure order —
+> the crash rig first if the maintainer hits it again:
 > 1. **Plasma-trap detonation sound** parity item (UNCHANGED from
 >    14z-85e): systematic on native vs2, proximity-gated on ours; the
 >    id IS enqueued when "silent" → volume/pan ring-entry params
@@ -72,6 +74,15 @@
 
 ## Still open (the short list)
 
+- **FLAKY CRASH RESET (14z-85f field report, priority by maintainer
+  pressure): 2P Don-vs-Pyron → Donovan PERFECT win → COM Sasquatch
+  second match → reset at the intro.** Not reproduced (maintainer
+  tried; no prior record — archaeology done). Full recipe, mechanism
+  candidates (stale pool tags across the transition / perfect-path
+  stamp site / wrong pointer) and the designed rig (forced-Sasquatch
+  poke + tripwire breakpoints via bp_regs.lua + pool dumps, N=20)
+  in STATE 14z-85f. NOTE: a tripwire fire here is the instrument
+  working — capture the reset PC before theorizing.
 - Plasma-trap detonation sound parity (rig named above).
 - THE M5 VOICE-SAMPLES ARC (ruled GO; the next big implementation).
 - Tenant DEFENSE rows decision (14z-85f brief).
