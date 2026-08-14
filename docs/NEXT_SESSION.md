@@ -1,8 +1,8 @@
 # NEXT SESSION — orientation (written at the close of 14z-85g, 2026-08-14)
 #
-# EAR-CHECK FIRST: the trap-detonation chirp is restored on
-# build/m3b_merged3 (and solo build/hui36) — the maintainer's ears are
-# the final gate for a sound item.
+# Trap chirp EAR-CHECK CONFIRMED (maintainer, 2026-08-14): "correct
+# and happening at all times". The trap's remaining opens: the
+# EJECTION sound (M5) and the NEW shock-status parity item below.
 
 > ## START HERE
 >
@@ -98,6 +98,27 @@
 | build/hui32, pyron21 | superseded m6/m3 (extract dirs = tenant_loop/build_merged inputs) | db4bcd11 / 6c7f7322 |
 
 ## Still open (the short list)
+
+- **NEW (14z-85g field report): the plasma trap's hit does not inflict
+  SHOCK status** (aura + paralysis, as Victor's held-down-HP or
+  Donovan's 214+P do) — on native vs2 it does. Not a regression
+  (likely never worked). Mechanism candidates, in prior order:
+  (a) the victim-side REACTION dispatch on the hit's status/class —
+  the electric-shake pair is engine-generation-drifted (vsavj 0x23AC8
+  writes 0x18/0x0B where vs2 0x226E0 writes 0x0C/0x04, engine_internals)
+  and vsavj's dispatch may map the trap's class to a plain-hit handler;
+  (b) the hitclass_map_extend entry for the trap's contact — its
+  transplant licence required byte-identical dispatch targets, so a
+  shock-specific vs2 target may have been licensed to the do-nothing
+  default; (c) a status byte in the hit record consumed by a bounded
+  vanilla table (the f7997 sibling shape). RIG: first make the trap
+  HIT connect in a replay (the 88 rigs never produced a hit — check
+  P2 HP/status fields +0x11E/+0x134/+0x145 family and the shock-window
+  fields test_don_accent locks); native leg = the same replay on vs2;
+  then bp the reaction dispatch on both legs at the hit. Donovan's
+  214+P shock on OUR build is the working-reference control (if his
+  shock works, the machinery exists and the trap's routing is the
+  delta).
 
 - **FLAKY CRASH RESET (14z-85f field report, priority by maintainer
   pressure): 2P Don-vs-Pyron → Donovan PERFECT win → COM Sasquatch

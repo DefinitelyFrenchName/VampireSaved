@@ -36,10 +36,18 @@ carried-renamed set, merged rebuilt (build/m3b_merged3). En route:
 bp_regs stack-read fix (A7-first; the USP top carried the true return
 — the farm-stub attribution), and a GOTCHA class named: a 0x7xx id's
 faithfulness is a property of its sample CONTENT, not its number —
-content-search vsav's image before any stubbed_sound row. NEXT
-SESSION: maintainer EAR-CHECK of the chirp on m3b_merged3; the M5
-arc's smallest target is now the ejection 0x739; then the voice
-blocks (0x02E5 decode first, 14z-85d).)
+content-search vsav's image before any stubbed_sound row. EAR-CHECK
+CONFIRMED same day (maintainer): "the sound is correct and happening
+at all times so this is fixed." SAME REPORT FILED A NEW PARITY ITEM
+— **the trap's hit does not inflict SHOCK status** (aura + paralysis
+à la Victor held-down-HP / Donovan 214+P) as it does on native vs2;
+not a regression (likely never worked). Mechanism candidates + rig
+in NEXT_SESSION (reaction-dispatch routing vs hitclass-extension
+licence vs bounded status table; Donovan's working 214+P shock is
+the on-build control; the 88 rigs never produced a trap HIT — the
+rig needs one first). NEXT SESSION: the trap shock item, the M5
+arc (ejection 0x739 = smallest target; voice blocks after the
+0x02E5 decode, 14z-85d).)
 
 Previously: 2026-08-13 (session 14z-85f close — **THE FINAL GUARDIAN
 DAMAGE PARITY ITEM IS CLOSED: root-caused, fixed, and verified
