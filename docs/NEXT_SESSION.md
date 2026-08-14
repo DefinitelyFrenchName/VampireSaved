@@ -1,87 +1,78 @@
-# NEXT SESSION — orientation (written at the close of 14z-85g, 2026-08-14)
-#
-# Trap chirp EAR-CHECK CONFIRMED (maintainer, 2026-08-14): "correct
-# and happening at all times". The trap's remaining opens: the
-# EJECTION sound (M5) and the NEW shock-status parity item below.
+# NEXT SESSION — orientation (written at the close of 14z-85g(2), 2026-08-14)
 
-> ## START HERE
+> ## START HERE — THE M5 VOICE ARC OPENS (planned at 14z-85g(2) close)
 >
-> **THE FINAL GUARDIAN DAMAGE PARITY ITEM IS CLOSED — fixed and
-> verified BIT-EXACT to native vs2** (STATE 14z-85f). The mechanism was
-> NEITHER 14z-85e hypothesis: the ported object-hit damage applier
-> (vs2 0x28A6A, tenant x028122 copies) staged damage into vs2's A5
-> work vars ($FF3494/96/98) which vsavj never reads — same-value
-> class #4, and EXACTLY Donovan's session-14n throw fix, never
-> propagated to H/P manifests. Six port_patch rows each →
-> **huitzil-m8 (build/hui34, c48cd722) / pyron-m5 (build/pyron23,
-> 65e9a40e) / merged build/m3b_merged2**. Gate:
-> `tests/audit_fg_parity.sh` (native A/B, frozen staircase
-> 23/23/23/23/52, ground-truthed failing on the pre-fix merged).
-> The damage pipeline is synthesized in engine_internals.md.
+> Everything else is CLOSED and field-confirmed: FG damage native-parity
+> (14z-85f), the trap detonation chirp ("correct and happening at all
+> times"), the trap shock ("plasma trap feels good") — all frozen,
+> gated, play-checked. Current builds: **build/m3b_merged4** (merged),
+> huitzil-m10 (build/hui37, 9a948a11) / pyron-m5 / donovan-m3a solos.
 >
-> ~~FIRST ACT: the maintainer's playtest of `build/m3b_merged2`~~
-> **DONE (maintainer, 2026-08-14): "Final Guardian corrected, overall
-> everything is as expected"** — but the playtest surfaced ONE flaky
-> crash reset (Don-perfect-win → Sasquatch intro; see Still open
-> below and STATE 14z-85f). Next, in maintainer-pressure order —
-> the crash rig first if the maintainer hits it again:
-> 1. ~~Plasma-trap detonation sound parity~~ **CLOSED AND THE
->    DETONATION RESTORED (14z-85g, huitzil-m9)**: the chirp's sample
->    is byte-identical in vsav's own QSound image (the maintainer's
->    field call, proven) — vs2 farm stub 0x4F2E's blanket 14z-65
->    silence replaced by a synthesized sound_stub playing vsavj
->    0x199. Fires at native timing on replay 87, both attempts. The
->    EJECTION sound (0x739, record node 10) stays silent — the one
->    remaining M5 item for the trap (no vsavj equivalent exists).
->    0x049A = periodic ambient (14z-82d attribution retracted). Gate:
->    audit_trap_parity (re-frozen to the restored state). MAINTAINER
->    EAR-CHECK PENDING on build/m3b_merged3 / build/hui36.
-> 2. **THE M5 VOICE-SAMPLES ARC** (ruled GO; brief in STATE 14z-85c;
->    Z80 RE state in 14z-85d — id table @FILE 0x11006 4B/id both
->    games). **OPENS WITH THE TRAP PILOT (14z-85g): port vs2's two
->    trap samples (0x73A ≈ one ~20KB window bank 108; 0x739 needs the
->    45-frame re-probe) into the WIDE QSound upper 8MB, NEW free
->    vsavj ids, remap record nodes 10/11, re-freeze
->    audit_trap_parity** — two ids, one array, the smallest end-to-end
->    proof of the whole arc. First concrete step unchanged: decode the
->    0x02E5 id-entry consumption from the captured qtrace → entry
->    format + sample bank/start/end. Restored ids CANNOT keep vs2
->    numbers (0x700+ are vsavj MUSIC).
-> 3. ~~Tenant DEFENSE rows decision~~ **DECIDED (maintainer,
->    2026-08-14): keep the vanilla vsavj approximation** — choice +
->    exact values + the option-(a) change recipe documented in
->    docs/project/tables/defense_rows.md (Pyron needs nothing either
->    way; the delta is 2 rows + 2 threshold bytes). No work item.
+> **THE PLAN (read STATE 14z-85d — the Z80 RE state — and 14z-85c —
+> the ruled design brief — before starting):**
 >
-> ## Corrections that must outlive this session (14z-85f)
+> 1. **Decode the 0x02E5 id-entry consumption** (the arc's keystone).
+>    The Z80 is KABUKI-encrypted: MAME debugger `dasm`/`trace` is the
+>    ONLY correct static view (14z-85d). Re-capture the trace for a
+>    known id (0x119 was the 14z-85d subject; instrument
+>    tests/lua/qs_table_trace.lua is captured, the scratch z.tr is
+>    gone — recapture is ~minutes). Deliverables: the id-table entry
+>    format ([0]=flags, [1..2]=value — how 0x02E5 resolves it to
+>    stream/sample), and the ROM source of the $F756+n*0x50 channel
+>    bank/start/loop/end (zero fixed-ROM reads carry them at keyon —
+>    the 0x02E5 leg likely closes this). The 8-byte table @FILE 0x5219
+>    stays UNCONFIRMED until its reader is found (RH-27/32 — do NOT
+>    patch on pattern-match).
+> 2. **Free-id census** on vsavj's table (0x6D8 ids, 4B/id @FILE
+>    0x11006) with the CORRECT entry decode — where new rows can go.
+>    Restored ids CANNOT keep vs2 numbers (0x700+ are vsavj MUSIC).
+> 3. **THE EJECTION PILOT (0x739 — the smallest end-to-end proof)**:
+>    (a) locate vs2 0x739's sample — it keyed NOTHING in the 12-frame
+>    sweep (delayed attack): re-probe on vs2 with the 45-frame window
+>    (qs_sweep + qs_analyze); (b) pack the sample window into the WIDE
+>    QSound image's free upper 8 MB (banks 0x80+; MAME LLE bank reg is
+>    15-bit — measured; verify FBNeo's HLE side too); (c) add the Z80
+>    id-table row at a free vsavj id (Z80 member patch — the driver
+>    has 27,727 B free, WIDE A4; the row format from step 1); (d) wire
+>    hui record node 10 via the EXISTING remap_ids machinery
+>    ("0x739:NEWID" — the m9 precedent); (e) verify: qs-level keyon on
+>    the new id matches vs2's, ring shows it at mine spawn, EAR-CHECK.
+>    Re-freeze audit_trap_parity deliberately (0739-slot expectation).
+> 4. **MiSTer check** (the ruling's condition): jtcores' QSound region
+>    growth for 16 MB — a descriptor/core question, scoped in the
+>    14z-85c brief step 5.
 >
-> - The 14z-85e "per-game scaler" AND "native hit-count" hypotheses
->   are both RETRACTED by measurement: scaler tables byte-equivalent,
->   12 ticks both games. Grep-swept; audit_fg_damage reframed (its
->   10 HP = fighter-path contact damage, never the parity number).
-> - A port_patch on a shared engine-family region fixes ONE tenant's
->   copy — when a tenant imports a region, grep every manifest's rows
->   for it (GOTCHAS, project). Converse: the 14x rolled-back families
->   stay at vs2 offsets (ported readers consume them).
+> **Carry-forward notes:**
+> - The merged legacy audit last ran on m3b_merged2 (14z-85f). The
+>   m9/m10 deltas are tenant-data + hole/wide_ext code with zero
+>   legacy surface BY CONSTRUCTION, but run
+>   `MERGED_OUT=build/m3b_merged4 MERGED_PREBUILT=1
+>   tests/audit_merged_legacy.sh` (~45 min) once before the S6 freeze
+>   decision — do not let the gap reach a registry row.
+> - tools/m68dis.py is the promoted session disassembler (capstone;
+>   opcode-view vs data-view discipline in its header).
+> - The flaky Sasquatch-intro crash rig (STATE 14z-85f) stays armed if
+>   the maintainer hits it again.
 >
-> ## New/changed suite members
+> ## Corrections that must outlive 14z-85g (still load-bearing)
 >
-> - tests/audit_fg_parity.sh — NEW: the FG parity gate (native +
->   build vs the frozen staircase; 2 verdict controls; fails on the
->   pre-fix merged).
-> - tests/replays/hui/89_hui_ex_fg_vs2.rpl — NEW: native-comparable
->   FG rig (85-opening + five 623+2K attempts, stock-decrement tells).
-> - tests/audit_fg_damage.sh — REFRAMED: regression lock on the
->   fighter-path 10 HP; no longer the parity item's gate.
-> - tests/lua/bp_regs.lua — NEW instrument: replay/POKES playback +
->   auto-resuming debugger breakpoints logging registers at named PCs.
-> - tests/audit_trap_parity.sh — NEW (14z-85g): the trap-sound parity
->   gate (native + build, frozen per-attempt inventories, forbids
->   0739/073a on ours, verdict control).
-> - tests/lua/ring_tap.lua — FULL=1 mode: complete 16-byte entry
->   capture (default mode line-compatible).
-> - tests/audit_trap_sound.sh — RE-SCOPED: spawn + ring-liveness lock
->   (0x049A = periodic ambient; the detonation attribution retracted).
+> - 0x049A is PERIODIC AMBIENT — the 14z-82d "detonation id"
+>   attribution is RETRACTED (two cadence beats).
+> - A 0x7xx sfx id's faithfulness is a property of its sample CONTENT,
+>   not its number — content-search vsav's image (2 lines) before any
+>   stubbed_sound row or M5 plan (GOTCHAS; the chirp shipped from it).
+> - vsavj's victim-reaction jump table (0x2385C) ends before the vs2
+>   extension classes — any ported record carrying class 0x4E+ needs
+>   the alias licence check (engine_internals, the damage pipeline).
+>
+> ## New/changed suite members (14z-85g/g(2))
+>
+> - tests/audit_trap_parity.sh — chirp restored state (fails pre-m9).
+> - tests/audit_trap_shock.sh — dome shock + deviation (fails pre-m10).
+> - tests/replays/hui/89_hui_ex_fg_vs2.rpl / 92_hui_trap_shock.rpl —
+>   native-comparable FG and deep-overlap trap rigs.
+> - tests/lua/ring_tap.lua FULL mode; tests/lua/bp_regs.lua (A7-first).
+> - tests/audit_fg_parity.sh / audit_fg_damage.sh (14z-85f pair).
 
 ## Current builds (registry)
 
