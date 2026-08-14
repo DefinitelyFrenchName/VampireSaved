@@ -8,8 +8,11 @@ The 68k side fires the NEW id via the tenants' `remap_ids` (records)
 and the restored farm `sound_stub` rows; the Z80 rows are authored by
 the builder (verbatim vs2 songs; the voice note table via the table-0
 relocation; sample records; packed samples in vsw.21m for content
-absent from vsav's image — HALF-BANK packed: the DSP compares sample
-pointers signed 16-bit, so no window may straddle offset 0x8000). The
+absent from vsav's image — packed under BOTH playback laws: HALF-BANK (the DSP compares
+sample pointers signed 16-bit — no window may straddle offset
+0x8000) and BYTE-PARITY (the members are stored pre-swapped and
+byteswapped at load, so the destination must keep the source
+offset's parity or every byte pair plays crossed)). The
 facing +0x300 alias is SKIPPED for the new range 0x58-0xA6 by the
 alias thunk at PRG:0x5FFF00 (measured: 74/81 native alias songs are
 channel-slot-only variants — the skipped behavior is channel
@@ -108,16 +111,16 @@ allocation, not sound content).
 | 0x188 | 0x3c5 | `820000d631e6313c` | ext@0x820000 |
 | 0x18d | 0x3c6 | `820080ddd4cef13c` | ext@0x828000 |
 | 0x1c | 0x3c7 | `830000f344ff443c` | ext@0x830000 |
-| 0x25e | 0x3c8 | `83ff44f25cfe5c3c` | ext@0x8344ff |
-| 0x172 | 0x3c9 | `83fe5cf173fd733c` | ext@0x835cfe |
-| 0x151 | 0x3ca | `8300806e8d7a8d3c` | ext@0x838000 |
-| 0x1b5 | 0x3cb | `837a8d6dbf79bf48` | ext@0x838d7a |
-| 0x286 | 0x3cc | `8379bfb8cec9ce3c` | ext@0x83bf79 |
-| 0x1d6 | 0x3cd | `83c9cebce3c8e33c` | ext@0x83cec9 |
-| 0x83 | 0x3ce | `83c8e3bbf7c7f73c` | ext@0x83e3c8 |
+| 0x25e | 0x3c8 | `830045f35cff5c3c` | ext@0x834500 |
+| 0x172 | 0x3c9 | `83ff5cf273fe733c` | ext@0x835cff |
+| 0x151 | 0x3ca | `8301806f8d7b8d3c` | ext@0x838001 |
+| 0x1b5 | 0x3cb | `837c8d6fbf7bbf48` | ext@0x838d7c |
+| 0x286 | 0x3cc | `837cbfbbceccce3c` | ext@0x83bf7c |
+| 0x1d6 | 0x3cd | `83cdcec0e3cce33c` | ext@0x83cecd |
+| 0x83 | 0x3ce | `83cce3bff7cbf73c` | ext@0x83e3cc |
 | 0xcc | 0x3cf | `840000f327ff273c` | ext@0x840000 |
-| 0x6d | 0x3d0 | `84ff27f254fe5448` | ext@0x8427ff |
-| 0x25a | 0x3d1 | `84fe54ae6dbe6d3c` | ext@0x8454fe |
+| 0x6d | 0x3d0 | `840028f354ff5448` | ext@0x842800 |
+| 0x25a | 0x3d1 | `840055b06dc06d3c` | ext@0x845500 |
 | 0x6a | 0x3d2 | `8400808c92ffff3c` | ext@0x848000 |
 | 0x1e | 0x3d3 | `850000f32eff2e3c` | ext@0x850000 |
 | 0x262 | 0x3d4 | `85ff2e833b8f3b3c` | ext@0x852eff |
@@ -126,35 +129,35 @@ allocation, not sound content).
 | 0x1f2 | 0x3d7 | `86008011ac0ecd3c` | ext@0x868000 |
 | 0x192 | 0x3d8 | `8700005046aa5a3c` | ext@0x870000 |
 | 0x1ff | 0x3d9 | `870080f3a9ffa93c` | ext@0x878000 |
-| 0xa1 | 0x3da | `87ffa9f2e3fee33c` | ext@0x87a9ff |
-| 0x280 | 0x3db | `87fee30ef151f73c` | ext@0x87e3fe |
+| 0xa1 | 0x3da | `8700aaf3e3ffe33c` | ext@0x87aa00 |
+| 0x280 | 0x3db | `87ffe30ff152f73c` | ext@0x87e3ff |
 | 0x1ee | 0x3dc | `880000401c80273c` | ext@0x880000 |
 | 0x66 | 0x3dd | `880080f3ddffdd3c` | ext@0x888000 |
 | 0x64 | 0x3de | `890000f36fff6f3c` | ext@0x890000 |
 | 0x24f | 0x3df | `890080f3a8ffa83c` | ext@0x898000 |
-| 0x1d4 | 0x3e0 | `89ffa8d7bee7be3c` | ext@0x89a8ff |
-| 0x6f | 0x3e1 | `89e7bedaeae6ea3c` | ext@0x89bee7 |
+| 0x1d4 | 0x3e0 | `8900a9d8bee8be3c` | ext@0x89a900 |
+| 0x6f | 0x3e1 | `89e8bedbeae7ea3c` | ext@0x89bee8 |
 | 0x212 | 0x3e2 | `8a0000f31eff1e3c` | ext@0x8a0000 |
-| 0xdd | 0x3e3 | `8aff1ef241fe413c` | ext@0x8a1eff |
-| 0x24e | 0x3e4 | `8afe41f16afd6a3c` | ext@0x8a41fe |
+| 0xdd | 0x3e3 | `8a001ff341ff413c` | ext@0x8a1f00 |
+| 0x24e | 0x3e4 | `8a0042f36aff6a3c` | ext@0x8a4200 |
 | 0xdc | 0x3e5 | `8a0080f3adffad3c` | ext@0x8a8000 |
 | 0x1cc | 0x3e6 | `8affadf2ccfecc3c` | ext@0x8aadff |
 | 0x2d | 0x3e7 | `8afeccf1ecfdec3c` | ext@0x8accfe |
-| 0x1b1 | 0x3e8 | `8afdec9dfaadfa3c` | ext@0x8aecfd |
-| 0x1d7 | 0x3e9 | `8b0000f314ff143c` | ext@0x8b0000 |
-| 0x269 | 0x3ea | `8bff14f22cfe2c3c` | ext@0x8b14ff |
-| 0x99 | 0x3eb | `8bfe2cf15ffd5f3c` | ext@0x8b2cfe |
+| 0x1b1 | 0x3e8 | `8afeec9efaaefa3c` | ext@0x8aecfe |
+| 0x1d7 | 0x3e9 | `8b0100f41400153c` | ext@0x8b0001 |
+| 0x269 | 0x3ea | `8b0015f32cff2c3c` | ext@0x8b1500 |
+| 0x99 | 0x3eb | `8b002df35fff5f3c` | ext@0x8b2d00 |
 | 0x71 | 0x3ec | `8b0080f3a0ffa03c` | ext@0x8b8000 |
-| 0x235 | 0x3ed | `8bffa0f2befebe3c` | ext@0x8ba0ff |
-| 0x91 | 0x3ee | `8bfebef1dbfddb3c` | ext@0x8bbefe |
+| 0x235 | 0x3ed | `8b00a1f3beffbe3c` | ext@0x8ba100 |
+| 0x91 | 0x3ee | `8b00bff3dbffdb3c` | ext@0x8bbf00 |
 | 0x93 | 0x3ef | `8c0000f335ff353c` | ext@0x8c0000 |
-| 0x1a | 0x3f0 | `8cff35f27dfe7d3c` | ext@0x8c35ff |
+| 0x1a | 0x3f0 | `8c0036f37dff7d3c` | ext@0x8c3600 |
 | 0x1b3 | 0x3f1 | `8c0080f3b4ffb43c` | ext@0x8c8000 |
-| 0xad | 0x3f2 | `8cffb4dbcefece3c` | ext@0x8cb4ff |
-| 0x5d | 0x3f3 | `8cfecef1f6fdf63c` | ext@0x8ccefe |
-| 0x1fa | 0x3f4 | `8d0000f32eff2e3c` | ext@0x8d0000 |
-| 0x223 | 0x3f5 | `8dff2ef258fe583c` | ext@0x8d2eff |
-| 0x164 | 0x3f6 | `8dfe58f173fd733c` | ext@0x8d58fe |
+| 0xad | 0x3f2 | `8c00b5dcceffce3c` | ext@0x8cb500 |
+| 0x5d | 0x3f3 | `8c00cff3f6fff63c` | ext@0x8ccf00 |
+| 0x1fa | 0x3f4 | `8d0100f42e002f3c` | ext@0x8d0001 |
+| 0x223 | 0x3f5 | `8d002ff358ff583c` | ext@0x8d2f00 |
+| 0x164 | 0x3f6 | `8dff58f273fe733c` | ext@0x8d58ff |
 | 0xda | 0x3f7 | `8d0080f399ff993c` | ext@0x8d8000 |
-| 0xd | 0x3f8 | `8dff99f2b9feb93c` | ext@0x8d99ff |
+| 0xd | 0x3f8 | `8d009af3b9ffb93c` | ext@0x8d9a00 |
 | 0x68 | 0x3f9 | `8e0000f357ff573c` | ext@0x8e0000 |

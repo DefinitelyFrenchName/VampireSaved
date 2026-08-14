@@ -794,3 +794,18 @@ not fully model, keep one gate at the OUTPUT level, not just the state
 level. (Also: MAME -wavwrite works headless by appending
 `-sound auto -wavwrite f.wav` AFTER run_mame.sh's -sound none — last
 option wins.)
+
+## QSound packing law #2: the destination offset must keep the SOURCE offset's BYTE PARITY (14z-86)
+
+The voice batch still sounded "like PC-speaker synthesis in a DOS game"
+(maintainer, on BOTH emulators) after the half-bank fix. The mechanism:
+the QSound members are stored PRE-SWAPPED and both emulators byteswap
+16-bit pairs at load — so the audio stream a sample yields depends on the
+byte LANE of its offset. A window copied from an even source offset to an
+odd destination (or vice versa) plays with every byte pair exchanged: RMS
+preserved, high band doubled, words recognizable but harsh. File-level
+content comparison is BLIND to it (the bytes are equal; the LANES differ),
+and so was the first WAV checker (it only flagged collapsed high band, not
+elevated — the maintainer's ear caught what the threshold passed; the
+checker now flags both directions). The packer keeps parity; the
+found-in-vsav path requires parity-matching hits.

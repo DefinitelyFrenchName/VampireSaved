@@ -240,9 +240,16 @@ def main():
             if at >= 0:
                 nb, nst = at >> 16, at & 0xFFFF
                 if (nst & 0x8000) != ((nst + (w1 - w0) - 1) & 0x8000) \
-                        or nst + (w1 - w0) > 0x10000:
-                    # same signed-pointer law as the packer below: the
+                        or nst + (w1 - w0) > 0x10000 \
+                        or (at & 1) != (w0 & 1):
+                    # the two playback laws (both measured 14z-86): the
                     # window must live wholly in one half of its bank
+                    # (signed pointer compare), and it must keep the
+                    # SOURCE's byte parity — the members are stored
+                    # pre-swapped and both emulators byteswap 16-bit
+                    # pairs at load, so a lane-crossed copy plays with
+                    # every byte pair exchanged (the "PC-speaker"
+                    # distortion: RMS preserved, high band doubled)
                     at = -1
                 else:
                     src_tag = f"vsav@{at:#x}"
@@ -258,8 +265,16 @@ def main():
                 if (w1 - w0) > 0x8000:
                     sys.exit(f"sample {s:#x}: window {w1-w0:#x} exceeds a "
                              f"half-bank — not expressible (native never is)")
+                # BYTE-PARITY LAW (measured 14z-86): the members are
+                # stored pre-swapped and byteswapped at load on BOTH
+                # emulators, so the destination offset must keep the
+                # source offset's parity or every byte pair plays
+                # crossed (the "PC-speaker" distortion the maintainer
+                # caught; file-level comparison is blind to it)
+                if (ext_cur & 1) != (w0 & 1):
+                    ext_cur += 1
                 if (ext_cur & 0x7FFF) + (w1 - w0) > 0x8000:
-                    ext_cur = (ext_cur + 0x7FFF) & ~0x7FFF
+                    ext_cur = ((ext_cur + 0x7FFF) & ~0x7FFF) | (w0 & 1)
                 if ext_cur + (w1 - w0) > EXTLIM:
                     sys.exit("extension member vsw.21m overflow")
                 ext_packed.append((ext_cur, blob))

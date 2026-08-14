@@ -48,8 +48,12 @@ def main():
         rows += 1
         q_o = mo[1] / mo[0] if mo[0] else 0
         q_n = mn[1] / mn[0] if mn[0] else 0
-        if q_n > 0 and (q_o < 0.6 * q_n or mo[0] < 0.5 * mn[0]
-                        or mo[0] > 2 * mn[0]):
+        if q_n > 0 and (q_o < 0.6 * q_n or q_o > 1.5 * q_n
+                        or mo[0] < 0.5 * mn[0] or mo[0] > 2 * mn[0]):
+            # BOTH directions: collapsed high band = the truncation
+            # class; ELEVATED high band = the byte-lane ("PC-speaker")
+            # class the first version missed — the maintainer's ear
+            # caught what a low-only threshold passed (14z-86)
             sus.append((v["vs2_id"], mo, mn))
     print(f"{rows} sounding windows; {len(sus)} suspects")
     for vid, mo, mn in sus:
