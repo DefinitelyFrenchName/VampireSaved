@@ -1,6 +1,25 @@
 # STATE — living progress log
 
-Updated: 2026-08-14 (session 14z-85g close — **THE PLASMA-TRAP
+Updated: 2026-08-14 (day close, sessions 14z-85f/g/g(2) — **THREE
+FIXES SHIPPED, FROZEN, AND FIELD-CONFIRMED IN ONE DAY, each with a
+gate that fails on its predecessor:** (1) 14z-85f FINAL GUARDIAN
+damage native-parity (huitzil-m8/pyron-m5 — the x028122 work-var
+reconciliation; "everything is as expected"); (2) 14z-85g the trap
+DETONATION CHIRP restored with NO sample port (huitzil-m9 — sound_stub
+0x4F2E → vsavj 0x199, same sample bytes; "correct and happening at
+all times"); (3) 14z-85g(2) the trap SHOCK restored (huitzil-m10 =
+build/hui37 9a948a11 — the vs2-licensed class remaps 0x52→0x06;
+"plasma trap feels good", the Phobos attacker-freeze deviation
+accepted). Current merged: build/m3b_merged4. Also: the defense-rows
+ruling DOCUMENTED (kept vanilla), the flaky Sasquatch-intro crash
+FILED with its rig, the 0x049A ambient retraction, two new GOTCHAs
+(port_patch propagation; content-vs-number), tools/m68dis.py promoted.
+The trap is CLOSED except the M5-scoped ejection sound. NEXT SESSION:
+**THE M5 VOICE ARC — the full implementation plan is in
+docs/NEXT_SESSION.md** (0x02E5 decode → free-id census → the 0x739
+ejection pilot on the existing remap_ids machinery → MiSTer check).)
+
+Previously: 2026-08-14 (session 14z-85g close — **THE PLASMA-TRAP
 DETONATION SOUND IS RESTORED (huitzil-m9, 3d9ffc89) — no sample port
 needed; the maintainer's field call ("the chirp IS in the build")
 proven by measurement.** The arc, in order: (1) the four-leg ring A/B

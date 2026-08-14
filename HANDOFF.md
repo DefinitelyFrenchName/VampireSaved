@@ -146,10 +146,11 @@ rendering change. Ground truth: `tests/test_replay_video_selfcheck.sh`.
 
 ```sh
 export ROMDIR=/path/to/reference/sets
-tools/run_wide.sh build/m3b_merged2 fbneo  # THE 3-TENANT BUILD (all 18
-                                           # selectable, art included;
-                                           # 14z-85f FG damage fix) —
-                                           # pending maintainer playtest
+tools/run_wide.sh build/m3b_merged4 fbneo  # THE 3-TENANT BUILD (all 18
+                                           # selectable, art included; FG
+                                           # damage + trap chirp + trap
+                                           # shock — all field-confirmed
+                                           # 14z-85f/g/g(2))
 tools/run_wide.sh build/m5_wide fbneo      # or the solo builds; ... mame
 ```
 
@@ -168,18 +169,20 @@ tenant_loop/build_merged inputs).
 `build/m5w` (`ac52eeff`) is the KNOWN-BAD artifact of the 14z-60y sprite
 garble, kept as evidence — do not playtest it. `tools/audit_romset_identity.py
 build/m5w/rompath` names its four shadowed members in a second.
-**`build/m3b_merged2` is the MERGED BUILD WITH GFX** (14z-83 S4,
-`tools/build_merged.sh`; rebuilt 14z-85f with the FG damage fix): the
-677-op 3-tenant program image (14z-85 owner tag + 14z-85b sfx records +
-14z-85f x028122 damage work-var rows) + the S2 gfx
-chain (D → H → P, last link's members packed, group B pristine). The
-FIRST artifact where all 18 characters have both code and art.
-UNREGISTERED until the S6 freeze decision — run_suite refuses it, and it
-reaches a playtest only after the S5 render gates and the S6 legacy
-re-verdict (legacy audit PASS on it 14z-85f, leg a verbatim). The
-pre-fix `build/m3b_merged` is kept as audit_fg_parity's known-bad
-reference. Rebuild: `ROMDIR=... tools/build_merged.sh build/m3b_merged2`
-(~15 min); its fingerprint moves with the generator — do not pin it.
+**`build/m3b_merged4` is the MERGED BUILD WITH GFX** (14z-83 S4,
+`tools/build_merged.sh`; rebuilt through 14z-85f/g/g(2)): the 678-op
+3-tenant program image (owner tag + sfx records + x028122 damage
+work-var rows + the chirp sound_stub + the shock class remaps) + the
+S2 gfx chain (D → H → P, last link's members packed, group B
+pristine). UNREGISTERED until the S6 freeze decision — run_suite
+refuses it. NOTE (14z-85g(2) carry-forward): the merged legacy audit
+last ran on the merged2 generation — run it once on merged4 before
+any S6 motion (the m9/m10 deltas have zero legacy surface by
+construction, but the gap must not reach a registry row). The pre-fix
+`build/m3b_merged` (FG) and `build/hui34`/`hui36` (chirp/shock) are
+kept as the parity audits' known-bad references. Rebuild:
+`ROMDIR=... tools/build_merged.sh build/m3b_merged4` (~15 min); its
+fingerprint moves with the generator — do not pin it.
 `build/merged1` is the **MERGED-LEGACY INSTRUMENT** (14z-81; carries the
 14z-82 type-renumber + F2 fixes) — the 3-tenant program image with gfx
 SKIPPED (group C zero-filled): legacy characters render correctly, the

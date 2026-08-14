@@ -124,10 +124,14 @@
 ```sh
 export ROMDIR=/path/to/reference/sets
 export MAME_BIN=~/.cache/vampire-saved/mame/cps2   # run_suite needs it
-tools/build_merged.sh build/m3b_merged2    # ~15 min (677-op fixture)
-tests/audit_fg_parity.sh build/m3b_merged2 # ~4 min — the FG parity gate
-tests/test_tenant_loop.sh                  # generator gate (490/677)
+tools/build_merged.sh build/m3b_merged4    # ~15 min (678-op fixture)
+tests/audit_fg_parity.sh build/m3b_merged4 # ~4 min — the FG parity gate
+tests/audit_trap_parity.sh build/m3b_merged4 # ~5 min — the chirp gate
+tests/audit_trap_shock.sh build/m3b_merged4  # ~4 min — the shock gate
+tests/test_tenant_loop.sh                  # generator gate (491/678)
 tests/test_m3a_reproducible.sh             # ~6 min (all four refs)
-MERGED_OUT=build/m3b_merged2 MERGED_PREBUILT=1 \
-  tests/audit_merged_legacy.sh             # ~45 min: leg a verbatim
+MERGED_OUT=build/m3b_merged4 MERGED_PREBUILT=1 \
+  tests/audit_merged_legacy.sh             # ~45 min: leg a verbatim —
+                                           # RUN ONCE before any S6 motion
+                                           # (last ran on the merged2 gen)
 ```
