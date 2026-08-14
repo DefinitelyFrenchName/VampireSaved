@@ -42,11 +42,13 @@ at all times so this is fixed." SAME REPORT FILED THE SHOCK ITEM —
 **investigated, ruled, and FIXED the same day: see the 14z-85g(2)
 decision entry below (huitzil-m10, 9a948a11)** — the dome hit now
 inflicts the native shock via vsavj's own electric-shake handler
-(vs2-licensed class remap 0x52→0x06). NEXT SESSION: maintainer
-play-check of the shock feel (the accepted Phobos attacker-freeze
-deviation in particular) on build/m3b_merged4; the M5 arc (ejection
-0x739 = smallest target; voice blocks after the 0x02E5 decode,
-14z-85d).)
+(vs2-licensed class remap 0x52→0x06). PLAY-CHECK
+CONFIRMED same day (maintainer): "tests are good, plasma trap feels
+good" — the shock feel AND the accepted attacker-freeze deviation
+both pass in play; the trap is CLOSED except the M5-scoped ejection
+sound. NEXT SESSION: the M5 arc (ejection 0x739 = smallest target;
+voice blocks after the 0x02E5 decode, 14z-85d); the flaky
+Sasquatch-intro crash rig if it resurfaces.)
 
 ### Decisions — 14z-85g(2): the trap SHOCK restoration shape.
 ### **DECIDED (maintainer, 2026-08-14): OPTION (a) — the vs2-licensed

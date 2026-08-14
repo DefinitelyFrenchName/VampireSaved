@@ -105,10 +105,9 @@
   (a), huitzil-m10 = build/hui37 9a948a11 / merged build/m3b_merged4)**:
   class remaps 0x52→0x06 route the dome hit into vsavj's native
   electric-shake — shock install verified (seq7=4, freeze 0x18).
-  PLAY-CHECK the accepted deviation: Phobos takes the normal 11f
-  attacker freeze on trap connect (vs2 exempts him; option (b) on
-  record in STATE if it bothers play). Gate: audit_trap_shock
-  (rig 92; fails on m9 by design).
+  PLAY-CHECK CONFIRMED (maintainer, 2026-08-14): "plasma trap feels
+  good" — deviation accepted in play. The trap is CLOSED except the
+  M5-scoped ejection sound. Gate: audit_trap_shock (rig 92).
 
 - **FLAKY CRASH RESET (14z-85f field report, priority by maintainer
   pressure): 2P Don-vs-Pyron → Donovan PERFECT win → COM Sasquatch
