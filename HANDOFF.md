@@ -175,10 +175,12 @@ build/m5w/rompath` names its four shadowed members in a second.
 work-var rows + the chirp sound_stub + the shock class remaps) + the
 S2 gfx chain (D → H → P, last link's members packed, group B
 pristine). UNREGISTERED until the S6 freeze decision — run_suite
-refuses it. NOTE (14z-85g(2) carry-forward): the merged legacy audit
-last ran on the merged2 generation — run it once on merged4 before
-any S6 motion (the m9/m10 deltas have zero legacy surface by
-construction, but the gap must not reach a registry row). The pre-fix
+refuses it. The 14z-85g(2) merged-legacy-audit carry-forward is
+CLOSED (14z-86): `MERGED_OUT=build/m3b_merged4 MERGED_PREBUILT=1
+tests/audit_merged_legacy.sh` AUDIT-EXIT 0 (leg a 14/14 on the
+ratified classes verbatim; the audit's frozen op count re-frozen
+677→678 to match tenant_loop's 14z-85g re-freeze — the m9 sound_stub
+op — per the script's own re-freeze-tenant_loop-FIRST protocol). The pre-fix
 `build/m3b_merged` (FG) and `build/hui34`/`hui36` (chirp/shock) are
 kept as the parity audits' known-bad references. Rebuild:
 `ROMDIR=... tools/build_merged.sh build/m3b_merged4` (~15 min); its

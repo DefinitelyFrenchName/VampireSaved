@@ -2,7 +2,7 @@
 # audit_merged_legacy.sh — does a 3-TENANT MERGED program image perturb LEGACY?
 #
 # WHY (14z-80 close, maintainer-ordered FIRST priority; counts re-frozen
-# since — see the 593 gate below). The 3-tenant merged patch APPLIES but
+# since — see the op-count gate below). The 3-tenant merged patch APPLIES but
 # nothing merged had ever run in an emulator when this was written. This
 # audit is the evidence the merge BEHAVES rather than merely composes.
 #
@@ -63,7 +63,7 @@ export MAME_BIN
 # Defaults unchanged: the standing audit still rebuilds the LEGACY-ONLY
 # zero-overlay instrument from scratch. With MERGED_PREBUILT=1 the build
 # steps are skipped and the existing artifact is verified in place
-# (593-op assert + member identity still run — a prebuilt dir is trusted
+# (op-count assert + member identity still run — a prebuilt dir is trusted
 # for its bytes, never for its shape).
 OUT="${MERGED_OUT:-build/merged1}"
 PREBUILT="${MERGED_PREBUILT:-0}"
@@ -163,14 +163,14 @@ PY
 
 if [ "$PREBUILT" = 1 ]; then
     echo "== B: PREBUILT merged artifact at $OUT (build skipped; shape"
-    echo "      asserted below — 593 ops, member identity) =="
+    echo "      asserted below — 678 ops, member identity) =="
     [ -f "$OUT/rompath/vsavjw.zip" ] || {
         echo "FAIL: MERGED_PREBUILT=1 but no $OUT/rompath/vsavjw.zip"; exit 1; }
     [ -f "$OUT/patch/patch.json" ] || {
         echo "FAIL: MERGED_PREBUILT=1 but no $OUT/patch/patch.json"; exit 1; }
     NOPS="$(python3 -c "import json;print(len(json.load(open('$OUT/patch/patch.json'))['ops']))")"
-    [ "$NOPS" = 677 ] || { echo "FAIL: $NOPS ops, frozen fixture is 677"; exit 1; }
-    echo "  ok: 677 ops (the frozen test_tenant_loop fixture; 14z-85 owner tag)"
+    [ "$NOPS" = 678 ] || { echo "FAIL: $NOPS ops, frozen fixture is 678"; exit 1; }
+    echo "  ok: 678 ops (the frozen test_tenant_loop fixture; 14z-85g sound_stub)"
     python3 tools/audit_romset_identity.py "$OUT/rompath" || {
         echo "  FAIL: member-identity audit"; exit 1; }
     FP="$(python3 tools/build_fingerprint.py "$OUT/rompath;$ROMDIR" --set vsavjw --sha-only || true)"
@@ -190,15 +190,17 @@ python3 tools/gen_donovan_patch.py "$D_EX" "$OUT/patch" \
 grep -q '^GENERATION OK' "$OUT/gen.log" || {
     echo "  FAIL: no GENERATION OK"; tail -15 "$OUT/gen.log"; exit 1; }
 NOPS="$(python3 -c "import json;print(len(json.load(open('$OUT/patch/patch.json'))['ops']))")"
-# 593: matches test_tenant_loop.sh's frozen 3-tenant count (which is
+# 678: matches test_tenant_loop.sh's frozen 3-tenant count (which is
 # re-frozen FIRST whenever the merge legitimately changes). History: 590
 # through 14z-81; 596 briefly 14z-81c (withdrawn stub); 591 since 14z-82
 # (the F2 fall-through tripwire); 593 since 14z-82c — the ADOPTED
-# hitclass_map_extend thunk (body + site jmp, shared row deduped once).
-if [ "$NOPS" = 677 ]; then
-    echo "  ok: 677 ops (the frozen test_tenant_loop fixture — same merge)"
+# hitclass_map_extend thunk (body + site jmp, shared row deduped once);
+# 677 since 14z-85 (owner-tag stubs + tripwires); 678 since 14z-85g
+# (the m9 sound_stub op — the restored trap-detonation chirp).
+if [ "$NOPS" = 678 ]; then
+    echo "  ok: 678 ops (the frozen test_tenant_loop fixture — same merge)"
 else
-    echo "  FAIL: $NOPS ops, frozen fixture is 677 — the generator drifted;"
+    echo "  FAIL: $NOPS ops, frozen fixture is 678 — the generator drifted;"
     echo "        re-freeze test_tenant_loop.sh FIRST, then revisit this audit"
     exit 1
 fi

@@ -43,12 +43,10 @@
 >    14z-85c brief step 5.
 >
 > **Carry-forward notes:**
-> - The merged legacy audit last ran on m3b_merged2 (14z-85f). The
->   m9/m10 deltas are tenant-data + hole/wide_ext code with zero
->   legacy surface BY CONSTRUCTION, but run
->   `MERGED_OUT=build/m3b_merged4 MERGED_PREBUILT=1
->   tests/audit_merged_legacy.sh` (~45 min) once before the S6 freeze
->   decision — do not let the gap reach a registry row.
+> - ~~The merged legacy audit gap~~ CLOSED 14z-86: the audit ran on
+>   m3b_merged4, AUDIT-EXIT 0 (leg a 14/14 verbatim). Its frozen op
+>   count was re-frozen 677→678 (the m9 sound_stub op) per its own
+>   protocol — tenant_loop had been re-frozen FIRST at 14z-85g.
 > - tools/m68dis.py is the promoted session disassembler (capstone;
 >   opcode-view vs data-view discipline in its header).
 > - The flaky Sasquatch-intro crash rig (STATE 14z-85f) stays armed if
