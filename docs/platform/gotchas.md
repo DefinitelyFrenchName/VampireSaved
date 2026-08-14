@@ -772,3 +772,25 @@ The rules this paid for:
   evidence you may be at the wrong offset. Check the emulator's opcode-map
   config (AS_OPCODES) and byte-compare a live-traced PC against the file
   before concluding cipher.
+
+## QSound sample windows must live in ONE HALF of their 64K bank — the DSP compares pointers SIGNED (14z-86)
+
+The M5 voice packer placed sample windows first-fit avoiding only 0x10000
+crossings. Four restored voices came out attack-then-silence: their windows
+straddled bank offset 0x8000, and the DL-1425 program compares the playback
+pointer against END in SIGNED 16-bit — start positive, end "negative" →
+the end condition holds at once and the voice collapses to its silent loop
+tail. Every NATIVE record respects the half-bank law (checked corpus-wide);
+the packer now packs at 0x8000 granularity and refuses >0x8000 windows.
+
+The instrument lesson outranks the law: **register-level and content-level
+A/Bs were BLIND to this defect** — the records were arithmetically correct,
+the member bytes byte-identical, keyon/pitch/volume registers equal; only
+the AUDIO differed. A semantic of the CONSUMER (signed compare) made equal
+data behave differently. The catch came from the EAR-LEVEL instrument
+(paired -wavwrite captures + per-window RMS/high-band comparison,
+tests/audit_qs_voice_wav.sh) — when porting content into a player you do
+not fully model, keep one gate at the OUTPUT level, not just the state
+level. (Also: MAME -wavwrite works headless by appending
+`-sound auto -wavwrite f.wav` AFTER run_mame.sh's -sound none — last
+option wins.)

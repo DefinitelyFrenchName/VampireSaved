@@ -8,10 +8,12 @@ The 68k side fires the NEW id via the tenants' `remap_ids` (records)
 and the restored farm `sound_stub` rows; the Z80 rows are authored by
 the builder (verbatim vs2 songs; the voice note table via the table-0
 relocation; sample records; packed samples in vsw.21m for content
-absent from vsav's image). The facing +0x300 alias is SKIPPED for the
-new range 0x58-0xA6 by the alias thunk at PRG:0x5FFF00 (measured:
-74/81 native alias songs are channel-slot-only variants — the skipped
-behavior is channel allocation, not sound content).
+absent from vsav's image — HALF-BANK packed: the DSP compares sample
+pointers signed 16-bit, so no window may straddle offset 0x8000). The
+facing +0x300 alias is SKIPPED for the new range 0x58-0xA6 by the
+alias thunk at PRG:0x5FFF00 (measured: 74/81 native alias songs are
+channel-slot-only variants — the skipped behavior is channel
+allocation, not sound content).
 
 | vs2 id | new id | song @flat | len | notes |
 |---|---|---|---|---|
@@ -100,59 +102,59 @@ behavior is channel allocation, not sound content).
 | vs2 sample | new index | record | source |
 |---|---|---|---|
 | 0x5b | 0x3c1 | `800000f33dff3d48` | ext@0x800000 |
-| 0x1b2 | 0x3c2 | `80ff3da888ae883c` | ext@0x803dff |
-| 0x163 | 0x3c3 | `80ae88a3cb20ed3c` | ext@0x8088ae |
-| 0x62 | 0x3c4 | `810000f35fff5f3c` | ext@0x810000 |
-| 0x188 | 0x3c5 | `81ff5fd591e5913c` | ext@0x815fff |
-| 0x18d | 0x3c6 | `820000dd54ce713c` | ext@0x820000 |
-| 0x1c | 0x3c7 | `82ce71c1b6cdb63c` | ext@0x8271ce |
-| 0x25e | 0x3c8 | `82cdb6c0ceccce3c` | ext@0x82b6cd |
-| 0x172 | 0x3c9 | `82cccebfe5cbe53c` | ext@0x82cecc |
-| 0x151 | 0x3ca | `82cbe539f345f33c` | ext@0x82e5cb |
-| 0x1b5 | 0x3cb | `830000f331ff3148` | ext@0x830000 |
-| 0x286 | 0x3cc | `83ff313e414f413c` | ext@0x8331ff |
-| 0x1d6 | 0x3cd | `834f4142564e563c` | ext@0x83414f |
-| 0x83 | 0x3ce | `834e56416a4d6a3c` | ext@0x83564e |
-| 0xcc | 0x3cf | `834d6a40924c923c` | ext@0x836a4d |
-| 0x6d | 0x3d0 | `834c923fbf4bbf48` | ext@0x83924c |
-| 0x25a | 0x3d1 | `834bbffbd70bd83c` | ext@0x83bf4b |
-| 0x6a | 0x3d2 | `8400008c12ff7f3c` | ext@0x840000 |
-| 0x1e | 0x3d3 | `84ff7ff2aefeae3c` | ext@0x847fff |
-| 0x262 | 0x3d4 | `84feae82bb8ebb3c` | ext@0x84aefe |
-| 0x6b | 0x3d5 | `850000f37fff7f3c` | ext@0x850000 |
-| 0x1e0 | 0x3d6 | `85ff7faabd37c23c` | ext@0x857fff |
-| 0x1f2 | 0x3d7 | `860000112c0e4d3c` | ext@0x860000 |
-| 0x192 | 0x3d8 | `860e4d5e93b8a73c` | ext@0x864d0e |
-| 0x1ff | 0x3d9 | `86b8a7abd1b7d13c` | ext@0x86a7b8 |
-| 0xa1 | 0x3da | `870000f339ff393c` | ext@0x870000 |
-| 0x280 | 0x3db | `87ff390f47524d3c` | ext@0x8739ff |
-| 0x1ee | 0x3dc | `87524d9269d2743c` | ext@0x874d52 |
-| 0x66 | 0x3dd | `87d274c5d2d1d23c` | ext@0x8774d2 |
-| 0x64 | 0x3de | `880000f36fff6f3c` | ext@0x880000 |
-| 0x24f | 0x3df | `88ff6ff298fe983c` | ext@0x886fff |
-| 0x1d4 | 0x3e0 | `88fe98d6aee6ae3c` | ext@0x8898fe |
-| 0x6f | 0x3e1 | `88e6aed9dae5da3c` | ext@0x88aee6 |
-| 0x212 | 0x3e2 | `88e5dad8f9e4f93c` | ext@0x88dae5 |
-| 0xdd | 0x3e3 | `890000f322ff223c` | ext@0x890000 |
-| 0x24e | 0x3e4 | `89ff22f24bfe4b3c` | ext@0x8922ff |
-| 0xdc | 0x3e5 | `89fe4bf179fd793c` | ext@0x894bfe |
-| 0x1cc | 0x3e6 | `89fd79f098fc983c` | ext@0x8979fd |
-| 0x2d | 0x3e7 | `89fc98efb8fbb83c` | ext@0x8998fc |
-| 0x1b1 | 0x3e8 | `89fbb89bc6abc63c` | ext@0x89b8fb |
-| 0x1d7 | 0x3e9 | `89abc69edbaadb3c` | ext@0x89c6ab |
-| 0x269 | 0x3ea | `89aadb9df3a9f33c` | ext@0x89dbaa |
-| 0x99 | 0x3eb | `8a0000f332ff323c` | ext@0x8a0000 |
-| 0x71 | 0x3ec | `8aff32f253fe533c` | ext@0x8a32ff |
-| 0x235 | 0x3ed | `8afe53f171fd713c` | ext@0x8a53fe |
-| 0x91 | 0x3ee | `8afd71f08efc8e3c` | ext@0x8a71fd |
-| 0x93 | 0x3ef | `8afc8eefc4fbc43c` | ext@0x8a8efc |
-| 0x1a | 0x3f0 | `8b0000f347ff473c` | ext@0x8b0000 |
-| 0x1b3 | 0x3f1 | `8bff47f27cfe7c3c` | ext@0x8b47ff |
-| 0xad | 0x3f2 | `8bfe7cda96fd963c` | ext@0x8b7cfe |
-| 0x5d | 0x3f3 | `8bfd96f0befcbe3c` | ext@0x8b96fd |
-| 0x1fa | 0x3f4 | `8bfcbeefedfbed3c` | ext@0x8bbefc |
-| 0x223 | 0x3f5 | `8c0000f329ff293c` | ext@0x8c0000 |
-| 0x164 | 0x3f6 | `8cff29f244fe443c` | ext@0x8c29ff |
-| 0xda | 0x3f7 | `8cfe44f15efd5e3c` | ext@0x8c44fe |
-| 0xd | 0x3f8 | `8cfd5ef07efc7e3c` | ext@0x8c5efd |
-| 0x68 | 0x3f9 | `8cfc7eefd6fbd63c` | ext@0x8c7efc |
+| 0x1b2 | 0x3c2 | `800080a9caafca3c` | ext@0x808000 |
+| 0x163 | 0x3c3 | `810000f54272643c` | ext@0x810000 |
+| 0x62 | 0x3c4 | `810080f3dfffdf3c` | ext@0x818000 |
+| 0x188 | 0x3c5 | `820000d631e6313c` | ext@0x820000 |
+| 0x18d | 0x3c6 | `820080ddd4cef13c` | ext@0x828000 |
+| 0x1c | 0x3c7 | `830000f344ff443c` | ext@0x830000 |
+| 0x25e | 0x3c8 | `83ff44f25cfe5c3c` | ext@0x8344ff |
+| 0x172 | 0x3c9 | `83fe5cf173fd733c` | ext@0x835cfe |
+| 0x151 | 0x3ca | `8300806e8d7a8d3c` | ext@0x838000 |
+| 0x1b5 | 0x3cb | `837a8d6dbf79bf48` | ext@0x838d7a |
+| 0x286 | 0x3cc | `8379bfb8cec9ce3c` | ext@0x83bf79 |
+| 0x1d6 | 0x3cd | `83c9cebce3c8e33c` | ext@0x83cec9 |
+| 0x83 | 0x3ce | `83c8e3bbf7c7f73c` | ext@0x83e3c8 |
+| 0xcc | 0x3cf | `840000f327ff273c` | ext@0x840000 |
+| 0x6d | 0x3d0 | `84ff27f254fe5448` | ext@0x8427ff |
+| 0x25a | 0x3d1 | `84fe54ae6dbe6d3c` | ext@0x8454fe |
+| 0x6a | 0x3d2 | `8400808c92ffff3c` | ext@0x848000 |
+| 0x1e | 0x3d3 | `850000f32eff2e3c` | ext@0x850000 |
+| 0x262 | 0x3d4 | `85ff2e833b8f3b3c` | ext@0x852eff |
+| 0x6b | 0x3d5 | `850080f3ffffff3c` | ext@0x858000 |
+| 0x1e0 | 0x3d6 | `860000ab3d38423c` | ext@0x860000 |
+| 0x1f2 | 0x3d7 | `86008011ac0ecd3c` | ext@0x868000 |
+| 0x192 | 0x3d8 | `8700005046aa5a3c` | ext@0x870000 |
+| 0x1ff | 0x3d9 | `870080f3a9ffa93c` | ext@0x878000 |
+| 0xa1 | 0x3da | `87ffa9f2e3fee33c` | ext@0x87a9ff |
+| 0x280 | 0x3db | `87fee30ef151f73c` | ext@0x87e3fe |
+| 0x1ee | 0x3dc | `880000401c80273c` | ext@0x880000 |
+| 0x66 | 0x3dd | `880080f3ddffdd3c` | ext@0x888000 |
+| 0x64 | 0x3de | `890000f36fff6f3c` | ext@0x890000 |
+| 0x24f | 0x3df | `890080f3a8ffa83c` | ext@0x898000 |
+| 0x1d4 | 0x3e0 | `89ffa8d7bee7be3c` | ext@0x89a8ff |
+| 0x6f | 0x3e1 | `89e7bedaeae6ea3c` | ext@0x89bee7 |
+| 0x212 | 0x3e2 | `8a0000f31eff1e3c` | ext@0x8a0000 |
+| 0xdd | 0x3e3 | `8aff1ef241fe413c` | ext@0x8a1eff |
+| 0x24e | 0x3e4 | `8afe41f16afd6a3c` | ext@0x8a41fe |
+| 0xdc | 0x3e5 | `8a0080f3adffad3c` | ext@0x8a8000 |
+| 0x1cc | 0x3e6 | `8affadf2ccfecc3c` | ext@0x8aadff |
+| 0x2d | 0x3e7 | `8afeccf1ecfdec3c` | ext@0x8accfe |
+| 0x1b1 | 0x3e8 | `8afdec9dfaadfa3c` | ext@0x8aecfd |
+| 0x1d7 | 0x3e9 | `8b0000f314ff143c` | ext@0x8b0000 |
+| 0x269 | 0x3ea | `8bff14f22cfe2c3c` | ext@0x8b14ff |
+| 0x99 | 0x3eb | `8bfe2cf15ffd5f3c` | ext@0x8b2cfe |
+| 0x71 | 0x3ec | `8b0080f3a0ffa03c` | ext@0x8b8000 |
+| 0x235 | 0x3ed | `8bffa0f2befebe3c` | ext@0x8ba0ff |
+| 0x91 | 0x3ee | `8bfebef1dbfddb3c` | ext@0x8bbefe |
+| 0x93 | 0x3ef | `8c0000f335ff353c` | ext@0x8c0000 |
+| 0x1a | 0x3f0 | `8cff35f27dfe7d3c` | ext@0x8c35ff |
+| 0x1b3 | 0x3f1 | `8c0080f3b4ffb43c` | ext@0x8c8000 |
+| 0xad | 0x3f2 | `8cffb4dbcefece3c` | ext@0x8cb4ff |
+| 0x5d | 0x3f3 | `8cfecef1f6fdf63c` | ext@0x8ccefe |
+| 0x1fa | 0x3f4 | `8d0000f32eff2e3c` | ext@0x8d0000 |
+| 0x223 | 0x3f5 | `8dff2ef258fe583c` | ext@0x8d2eff |
+| 0x164 | 0x3f6 | `8dfe58f173fd733c` | ext@0x8d58fe |
+| 0xda | 0x3f7 | `8d0080f399ff993c` | ext@0x8d8000 |
+| 0xd | 0x3f8 | `8dff99f2b9feb93c` | ext@0x8d99ff |
+| 0x68 | 0x3f9 | `8e0000f357ff573c` | ext@0x8e0000 |

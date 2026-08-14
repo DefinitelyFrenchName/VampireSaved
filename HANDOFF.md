@@ -146,23 +146,28 @@ rendering change. Ground truth: `tests/test_replay_video_selfcheck.sh`.
 
 ```sh
 export ROMDIR=/path/to/reference/sets
-tools/run_wide.sh build/m3b_merged5 fbneo  # THE 3-TENANT BUILD (all 18
-                                           # selectable, art included; FG
-                                           # damage + trap chirp + shock
-                                           # field-confirmed 14z-85f/g/g(2);
-                                           # + the 14z-86 trap EJECTION —
-                                           # ear-check pending)
+tools/run_wide.sh build/m3b_merged6 fbneo  # THE 3-TENANT BUILD (all 18
+                                           # selectable, art included; the
+                                           # trap fully field-confirmed
+                                           # 14z-85f..14z-86; + THE M5
+                                           # VOICE BATCH (79 restored
+                                           # voice/sfx ids) — ear-check
+                                           # pending)
 tools/run_wide.sh build/m5_wide fbneo      # or the solo builds; ... mame
 ```
 
-**Current WIDE builds (14z-86):** `build/hui38` = **`huitzil-m11`
-(`6eed421b`)** for Phobos (= m10 + the M5 ejection pilot: record node
-10 remap 0x739→0xD8 onto authored Z80 songs — WIDE v1.1 content
-members `vsw.z01/z02`, `tools/build_qs_songs.py` +
-`build/manifest/qs_songs.toml`); `build/pyron23` = **`pyron-m5`
-(`65e9a40e`)** for Pyron; `build/m5_wide` = **`donovan-m3a`
-(`4b7d0dc7`)** for Donovan. **`build/m3b_merged5` is the current
-merged** (= merged4 content + the ejection). **COMPAT (WIDE v1.1,
+**Current WIDE builds (14z-86, THE M5 VOICE BATCH):** `build/hui39` =
+**`huitzil-m12` (`e1f598d6`)**, `build/pyron24` = **`pyron-m6`
+(`4c6e3fb6`)**, `build/don_m4` = **`donovan-m4` (`84f49aaa`)** — each
+= its predecessor + its voice block restored (79 verbatim vs2 songs at
+authored vsavj ids 0x58-0xA6; WIDE v1.2 content members incl. packed
+samples in `vsw.21m`; the facing-alias thunk; per-tenant remaps + farm
+stubs; the whole batch PROFILE-GATED — the stock twin is bit-identical
+6c93cfa8, measured). **`build/m3b_merged6` is the current merged.**
+The map: `docs/project/tables/qs_voice_map.md`. Superseded:
+hui38/pyron23/m5_wide (donovan-m3a — tag `freeze/donovan-m3a` is the
+way back; its expectation set carried-renamed `donovan-m4`),
+m3b_merged5. **COMPAT (WIDE v1.1,
 14z-86): builds made before v1.1 (hui37 and older, m3b_merged4 and
 older) lack `vsw.z01/z02` and DO NOT BOOT on the v1.1 emulator
 binaries** — inject stock copies (2-line python, see
@@ -587,6 +592,27 @@ tests/audit_trap_shock.sh             # 14z-85g(2) (~4 min, 2 parallel):
                                       # (Phobos' 11f attacker freeze)
                                       # PRESENT so drift is loud. Fails on
                                       # huitzil-m9- by design
+tests/audit_qs_voice_wav.sh           # 14z-86 (~12 min, 2 -wavwrite runs):
+                                      # THE EAR-LEVEL VOICE A/B — per-window
+                                      # RMS/high-band vs native audio. Exists
+                                      # because it CAUGHT the half-bank
+                                      # truncation the register/content gates
+                                      # were BLIND to (signed DSP pointer
+                                      # compare — equal data, different
+                                      # behavior). Synthetic-truncation
+                                      # verdict control. Keep BOTH gates
+tests/audit_qs_voice_batch.sh         # 14z-86 (~10 min, 2 parallel): THE
+                                      # VOICE-BATCH KEYON A/B — every authored
+                                      # voice id swept on ours vs the scoped
+                                      # vs2 ids on native; WHOLE-RUN content
+                                      # multisets compared (per-id window
+                                      # attribution is venue-flaky, measured):
+                                      # no native signature missing, nothing
+                                      # ours plays foreign to vs2's library,
+                                      # counts bounded. Verdict control
+                                      # (corrupted packed sample -> foreign).
+                                      # tools/check_qs_voice_batch.py.
+                                      # Self-builds or verifies a build's zip
 tests/test_qs_id_table.sh             # 14z-86: the Z80 sound-id-table census
                                       # gate — both games' censuses frozen
                                       # (bases DERIVED from the $3B00 anchors),
@@ -1377,6 +1403,7 @@ reproducible AT THAT TIME; no one has re-verified the older ones since.
 
 | Build | SHA-1 (zip) | Notes |
 |---|---|---|
+| **donovan-m4 / huitzil-m12 / pyron-m6 — THE M5 VOICE BATCH (14z-86) — supersede m3a/m11/m5** | `84f49aaa` / `e1f598d6` / `4c6e3fb6` | `build/don_m4` / `build/hui39` / `build/pyron24`; REGISTERED; tags `freeze/{donovan-m4,huitzil-m12,pyron-m6}`. Each = predecessor + its VOICE BLOCK: 79 verbatim vs2 songs at authored ids 0x58-0xA6 (Z80 rows via `tools/build_qs_songs.py [voice_batch]`: the 8th note-table slot restored via the table-0 relocation; authored records; 841 KB packed into `vsw.21m` = WIDE v1.2 content member), per-tenant remaps (D36/H14/P10) + 25 farm sound_stubs + the facing-alias thunk @0x5FFF00 (voice ids skip +0x300 — measured channel-allocation-only). ALL profile-gated; stock twin bit-identical (6c93cfa8, measured). Gates at freeze: keyon batch A/B GREEN (whole-run content multisets vs native), trap parity/shock green (hui39 + merged6), FG parity green (merged6), m3a all-four bit-exact, tenant_loop re-frozen 265/300/234+531/729. Map: `docs/project/tables/qs_voice_map.md`. EAR-CHECK PENDING |
 | **huitzil-m11 — PHOBOS FROZEN (14z-86) — supersedes huitzil-m10** | fingerprint `6eed421be848c2de333bec9a82ef74de18cd88c9` | `build/hui38`; REGISTERED `-> huitzil-m11`; tag `freeze/huitzil-m11`. = m10 + **the M5 EJECTION PILOT**: trap record node 10 remapped 0x739→0xD8 onto AUTHORED Z80 song rows (WIDE v1.1 content members `vsw.z01/z02`, sentinel CRCs 0xdec0de38/39; `tools/build_qs_songs.py` injects vs2's 0x33-byte song verbatim at flat 0x3C980 + the 0x3D8 alias twin at 0x3C9C0 from `build/manifest/qs_songs.toml`). NO sample port — the content is byte-identical in vsav's own image (0x18D800 = record #0x5C = note-entry 0x28). Keyon A/B matches native (v11/v12, 0x2800 window); ring rig 87 shows 00d8 in the 0739 slot both windows. Gates at freeze: audit_trap_parity RE-FROZEN (ground-truthed failing pre-pilot), test_qs_songs + test_qs_id_table NEW, trap shock/sound green, m3a on the new EXPECT. Full decode: engine_internals "The QSound Z80 driver". EAR-CHECK CONFIRMED (maintainer, 2026-08-14): "The trap mine ejection sound is indeed there" — no other new sounds, as expected (only the ejection was ported; the voice blocks are the next batch). THE TRAP IS FULLY CLOSED, all four items field-confirmed (damage 14z-85f, chirp 14z-85g, shock 14z-85g(2), ejection 14z-86). |
 | **huitzil-m4 — PHOBOS RE-FROZEN (14z-82c, maintainer-adopted 2026-08-12) — supersedes huitzil-m3** | fingerprint `e66678d087824d1639750d2b9565c0b99ad2b250` | `build/hui30`; REGISTERED `-> huitzil-m4`; rebuilds bit-exact. = huitzil-m3 + the ADOPTED **`hitclass_map_extend`** site_thunk (shared with pyron; the f7997-class fix): vsavj's projectile-pool hit sweep maps colliding objects' type bytes through a 64-entry byte map at `PRG:0x1A888` (seven callers); Phobos stamps types 68/72 into that pool, so a landed hit would over-index it exactly as pyron-m2's type-64 satellite measured. Body GENERATED (`tools/gen_hitclass_map_thunk.py`) and reconstructed by `tests/test_hitclass_map_thunk.sh`; legacy measured BIT-IDENTICAL (fire census: legacy never enters the map). Expectation set `tests/expected/huitzil-m4/` (renamed from huitzil-m3, content unchanged). Validate: `MAME_ROMPATH="build/hui30/rompath;$ROMDIR" tests/run_suite.sh vsavjw`. KNOWN-OPEN unchanged from m3 (variant_dispatch row 0x10 red; win-quote) |
 | **pyron-m3 — PYRON RE-FROZEN (14z-82c, maintainer-adopted 2026-08-12) — supersedes pyron-m2** | fingerprint `6c7f7322da793c12b3681dd3ef5a76b3792ae5d0` | `build/pyron21`; REGISTERED `-> pyron-m3`; rebuilds bit-exact; BYTE-IDENTICAL to the measured 14z-82b probe build. = pyron-m2 + **`hitclass_map_extend`** — THE f7997 FIX: his type-64 satellite landing a hit over-indexed vsavj's 64-entry projectile hit-class map (map[64] = the following rts's 0x4E), a LATENT crash measured on pyron-m2 SOLO. The 11,017-frame soak that crashes pyron-m2 runs END-clean; legacy BIT-IDENTICAL over 30,284 frames (`tests/audit_hitclass_map_cost.sh`, rerunnable). Expectation set `tests/expected/pyron-m3/` (renamed from pyron-m2, content unchanged). Validate: `MAME_ROMPATH="build/pyron21/rompath;$ROMDIR" tests/run_suite.sh vsavjw`. ALSO DISSOLVED (measured): replay 80's f4840 reset — same crash signature on pyron-m2 (vec3 f4638 PC 01AB10), END-clean on pyron-m3. OPEN unchanged from m2: win-quote |

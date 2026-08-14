@@ -239,14 +239,27 @@ def main():
             at = qs.find(blob)
             if at >= 0:
                 nb, nst = at >> 16, at & 0xFFFF
-                if nst + (w1 - w0) > 0x10000:
-                    sys.exit(f"sample {s:#x}: vsav hit at {at:#x} crosses a "
-                             f"64K bank — cannot express in a record")
-                src_tag = f"vsav@{at:#x}"
-            else:
-                # pack into the extension: first fit, no 64K crossing
-                if (ext_cur & 0xFFFF) + (w1 - w0) > 0x10000:
-                    ext_cur = (ext_cur + 0xFFFF) & ~0xFFFF
+                if (nst & 0x8000) != ((nst + (w1 - w0) - 1) & 0x8000) \
+                        or nst + (w1 - w0) > 0x10000:
+                    # same signed-pointer law as the packer below: the
+                    # window must live wholly in one half of its bank
+                    at = -1
+                else:
+                    src_tag = f"vsav@{at:#x}"
+            if at < 0:
+                # pack into the extension: first fit, HALF-BANK (0x8000)
+                # granularity — the DSP compares sample pointers SIGNED
+                # 16-bit, so a window straddling offset 0x8000 in its bank
+                # ends immediately (start positive, end "negative"; the
+                # voice collapses to its silent loop tail — measured
+                # 14z-86: the 4 quiet/truncated voices were exactly the
+                # windows crossing 0x8000, and every NATIVE record lives
+                # wholly in one half of its bank)
+                if (w1 - w0) > 0x8000:
+                    sys.exit(f"sample {s:#x}: window {w1-w0:#x} exceeds a "
+                             f"half-bank — not expressible (native never is)")
+                if (ext_cur & 0x7FFF) + (w1 - w0) > 0x8000:
+                    ext_cur = (ext_cur + 0x7FFF) & ~0x7FFF
                 if ext_cur + (w1 - w0) > EXTLIM:
                     sys.exit("extension member vsw.21m overflow")
                 ext_packed.append((ext_cur, blob))
