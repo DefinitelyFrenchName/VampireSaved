@@ -1,6 +1,79 @@
 # STATE — living progress log
 
-Updated: 2026-08-14 (day close, sessions 14z-85f/g/g(2) — **THREE
+Updated: 2026-08-14 (session 14z-86 close — **THE M5 VOICE ARC OPENED
+AND ITS PILOT SHIPPED IN ONE SESSION: the trap mine-EJECTION sound is
+RESTORED (huitzil-m11 = build/hui38 6eed421b, merged build/m3b_merged5)
+— and the entire Z80 sound driver is now DECODED, with the 14z-85d
+detail RETRACTED at its root.** The arc, in order: (0) the merged
+legacy audit carry-forward CLOSED on m3b_merged4 (AUDIT-EXIT 0; the
+audit's frozen op count re-frozen 677→678 per its own
+tenant_loop-FIRST protocol). (1) THE ROOT RETRACTION: one wrong
+region↔file mapping (MAME loads vm3.01 split via ROM_CONTINUE) had
+produced ALL of 14z-85d's wrong detail — "KABUKI-encrypted" (the Z80
+is PLAIN; proven by byte-compare at two traced PCs + MAME's config),
+"FILE 0x11006" (real: the driver's 24-bit addresses ARE flat
+member-concat offsets; table at 0x9006), "0x119 = 33 07 50 18" (real:
+02 9A B2 00, tap-verified), the "0x5219 table" (a misaligned mid-table
+phase; the REAL sample records sit at 0x45FA, found by their READER
+0x1350). Retraction banner on 14z-85d; gotcha filed (region≠file /
+log tap DATA / garbage-disasm is not cipher). (2) THE FULL DECODE
+(engine_internals "The QSound Z80 driver"): anchors word($3B00/02/04)
+→ id table (0x9006, mod 0x6D8, 4B = 24-bit BE song addr + tail;
+b0==0 = FREE/no-op — and the id space WRAPS mod 0x6D8, so "0x700+ =
+music" is 68k-side convention only); song = [priority][16 slot words],
+slot == voice; stream cmds (1F selects note tables from the $3B04
+ptr ARRAY, 08 selects [sample#][instr]); sample records 8B
+[bank][start][loop][end][transpose] — **the bank field is 8-bit, so
+WIDE banks 0x80+ are natively expressible (the 14z-85c verify item,
+answered)**. Census: tools/audit_qs_id_table.py — vsavj 1512 live /
+240 free rows. (3) THE PILOT COLLAPSED BY MEASUREMENT: vs2's 0x739 is
+a one-note Z80 song whose sample content sits BYTE-IDENTICAL in
+vsav's own image (vs2 0x255800-0x257FFF == vsav 0x18D800 = vsavj
+record #0x5C = note-table-1 entry 0x28) — NO sample port, NO table
+growth; the interpreters are byte-identical (only the two
+envelope-base immediates differ below 0x34F1), licensing verbatim
+stream copies. (4) SHIPPED: WIDE v1.1 — the Z80 driver members become
+CONTENT members vsw.z01/z02 (sentinel CRCs 0xdec0de38/39 both
+descriptors; stock names would hash-shadow, the 14z-60z class);
+tools/build_qs_songs.py + build/manifest/qs_songs.toml inject vs2's
+song VERBATIM at free id 0xD8 (@flat 0x3C980) + the 0x3D8 alias twin
+of native's 0xA39 (@0x3C9C0; the helper's +0x300 path);
+hui_sfx_records remap_ids 0x739→0xD8. MEASURED: keyon A/B matches
+native (voice 11/12, 0x2800 window); ring rig 87 fires 00d8 in the
+0739 slot of BOTH attempt windows. (5) LADDER FULL GREEN:
+test_wide_profile PASS (superset invariant on a FRESH reference — the
+cached one predated the 14z-59e harness change), test_mame_wide PASS,
+audit_trap_parity RE-FROZEN + ground-truthed FAILING on the pre-pilot
+shape, trap shock/sound PASS, merged trap+FG parity PASS, tenant_loop
+PASS (678 unchanged — content, not ops), m3a PASS (donovan-m3a
+4b7d0dc7 UNCHANGED — Z80 members sit outside the program
+fingerprint), run_suite vsavjw SUITE GREEN on the carried-renamed
+huitzil-m11 set with ZERO .sha1 movement, and the merged5 LEGACY
+AUDIT GREEN (AUDIT-EXIT 0, leg a verbatim — no gap carries to S6). New suite members:
+test_qs_id_table.sh (census + code-identity licence + content lock),
+test_qs_songs.sh (3 controls); instrument tests/lua/qs_z80_trace.lua
+(bounded Z80 trace + dasm — the dasm device is the FIFTH param).
+(6) MISTER VERIFIED FROM SOURCE (cps2_wide.md): jtcores QSound IS
+jtdsp16 LLE, but the stock bank latch keeps 7 BITS — banks 0x80+
+ALIAS (mis-play, not silence); ~4-line RTL width fix; 16 MB fits
+SDRAM BA1 under JTFRAME_SDRAM_LARGE; the full WIDE set still exceeds
+the 64 MB ceiling (GFX capped 32 MB). THE PILOT RIDES BANK 0x18 —
+MiSTer-compatible as-is. COMPAT NOTE: pre-v1.1 builds lack vsw.z01/z02
+and need stock-member injection to boot on v1.1 binaries — measured
+the hard way: the merged5 legacy audit's FIRST run died
+instrumentally on leg (b)'s frozen reference builds (no ref log, not
+a divergence). FIXED IN PLACE: STOCK vsw.z01/z02 injected into
+build/m5_wide, hui30, pyron21 (the audit's leg-b refs) + hui34/36/37
+(the parity/shock ground-truth refs) — program members untouched,
+all three leg-b fingerprints verified unchanged (4b7d0dc7/e66678d0/
+6c7f7322); the audit rerun after the fix. EAR-CHECK PENDING (maintainer): the ejection pop at
+mine throw on build/m3b_merged5 or build/hui38. NEXT SESSION: the
+voice-block batch on the now-complete machinery (song rows for
+content already in vsav's image; extension packing at banks 0x80+
+only for the truly-absent vs2-only samples), the 45-frame keyon
+re-sweep, and the Sasquatch rig if it resurfaces.)
+
+Previously: 2026-08-14 (day close, sessions 14z-85f/g/g(2) — **THREE
 FIXES SHIPPED, FROZEN, AND FIELD-CONFIRMED IN ONE DAY, each with a
 gate that fails on its predecessor:** (1) 14z-85f FINAL GUARDIAN
 damage native-parity (huitzil-m8/pyron-m5 — the x028122 work-var
