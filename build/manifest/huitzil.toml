@@ -2034,6 +2034,20 @@ note = "14z-82c: extend the projectile hit-class byte map to vs2's 80 entries; >
 # different sample window), 0x3E2 (silent both sets), 0x735-0x74E (his
 # vs2 voice/sfx block; vsavj keys OTHER content across that gap —
 # unfaithful, silenced pending the M5 voice-samples decision).
+# 14z-85g REMAP: record node 11 (id 0x73A) remapped to vsavj 0x199
+# instead of zeroed — measured content-equivalent (sample bytes
+# IDENTICAL in both games' QSound images at 0x6C0000, bank 108,
+# 0-20480, pitch 12548; vsavj keys them as the 0x198/0x199 family,
+# already in the keep set). NOTE (measured same session): the trap's
+# TIMER DETONATION does NOT flow through this record — it is the
+# sound-farm stub vs2 0x4F2E jsr'd from the mine handler
+# (x068458+0x120), restored by the kind=sound_stub row in
+# reconciliation_huitzil.toml. This remap keeps node 11
+# content-faithful for any record-path dispatch of it (none observed
+# in the 87/88 rigs — data-only, protected by the keep set either
+# way). Node 10 (0x739, the mine-EJECTION sound) stays zeroed — no
+# measured vsavj equivalent; fully M5 scope (maintainer-scoped
+# 2026-08-14). Gate: tests/audit_trap_parity.sh.
 [[sound_table]]
 stage = 6
 profile = "cps2-wide-v1"
@@ -2043,4 +2057,5 @@ src = 0x0C742A
 entries = 24
 ptr_table = 0x0BF41A
 keep_ids = "0x110,0x111,0x112,0x198,0x199"
+remap_ids = "0x73A:0x199"
 unstub = "0x005122=0x004CE2"

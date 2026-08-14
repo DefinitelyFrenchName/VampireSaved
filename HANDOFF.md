@@ -574,15 +574,14 @@ tests/audit_trap_parity.sh            # 14z-85g (~5 min, 2 parallel runs):
                                       # frozen per-attempt inventories:
                                       # native 0739(spawn)/010b/073a(timer
                                       # detonation), ours 010a only. The
-                                      # missing pair = per-node record nodes
-                                      # 10/11, ZEROED CORRECTLY by the
-                                      # 14z-85b curation (vsavj keys MUSIC
-                                      # content at those ids); restoration =
-                                      # the M5 voice-samples PILOT (new ids
-                                      # + record remap — re-freeze then).
-                                      # Also FORBIDS 0739/073a on ours
-                                      # (their appearance = the music bug).
-                                      # Verdict control + per-leg liveness
+                                      # detonation chirp RESTORED 14z-85g
+                                      # (huitzil-m9): sound_stub for vs2
+                                      # farm 0x4F2E plays vsavj 0x199 —
+                                      # same sample bytes, native timing.
+                                      # Ejection 0739 stays M5 (no vsavj
+                                      # equivalent). FORBIDS 0739/073a on
+                                      # ours (music on vsavj). Verdict
+                                      # control + per-leg liveness
 tests/audit_type_dispatch_range.sh    # 14z-82, EXTENDED 14z-85 (~15 min, 7
                                       # guarded runs): on the MERGED build,
                                       # ZERO obj_hook dispatches in the

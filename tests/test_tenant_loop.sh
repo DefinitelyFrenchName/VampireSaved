@@ -111,7 +111,10 @@ echo "== 1: one tenant per run — the frozen op counts =="
 # each declaring build: +2 (record array data + ptr-row poke32) −1 (the
 # generic tail_data_ptr repoint is claim-suppressed, 14z-65 machinery).
 # Donovan unchanged — his don_sfx_records row predates this.
-FROZEN_1="donovan:243 huitzil:266 pyron:208"
+# RE-FROZEN 14z-85g (hui 266->267): +1 GEN op — the kind=sound_stub
+# synthesized stub for vs2 farm 0x4F2E (the restored trap-detonation
+# chirp, reconciliation_huitzil.toml).
+FROZEN_1="donovan:243 huitzil:267 pyron:208"
 for row in $FROZEN_1; do
     who="${row%%:*}"; want="${row##*:}"
     case "$who" in donovan) ex="$D_EX" ;; huitzil) ex="$H_EX" ;; *) ex="$P_EX" ;; esac
@@ -177,8 +180,10 @@ check_n() {  # check_n <label> <dir> <want ops> <sum of 1-tenant counts>
 # N=2 (D+H) +16 = 8 stubs + 8 tripwires: the FOREIGN-STAMPER rule fires
 # for 59/61/62/63 (H stamps, D resolves) AND for 65/66/73/75 (D stamps,
 # H resolves) — at N=3 the latter four are multi-resolver anyway.
-check_n "2 tenants" "$WORK/two"   490 508
-check_n "3 tenants" "$WORK/three" 677 715
+# RE-FROZEN 14z-85g (+1 each: hui's sound_stub op rides every N that
+# includes him).
+check_n "2 tenants" "$WORK/two"   491 510
+check_n "3 tenants" "$WORK/three" 678 718
 
 # ── 3: every tenant's own content is present ────────────────────────────
 # An op count alone cannot tell "both tenants ran" from "tenant 0 ran twice".

@@ -1936,3 +1936,23 @@ check. And its converse from 14x still binds: do NOT blanket-copy the
 rolled-back families (the grab-pointer/state rows are stage-99 parked
 in donovan.toml because ported READERS consume those vars at vs2
 offsets).
+
+## A 0x7xx sfx id's faithfulness is a property of its CONTENT, not its number (14z-85g)
+
+The 14z-65 silencing sweep classed every vs2 sound-farm stub playing a
+0x7xx id as "newcomer voice-bank range, keep silent pending M5" — a
+NUMBER-based rule. For 0x73A (the trap detonation chirp) it was wrong:
+the sample bytes are byte-identical in vsav's own QSound image at the
+same address (0x6C0000), keyed there as the 0x198/0x199 family — the
+maintainer could HEAR the sound existed in the build while the docs
+said it needed a sample port. Cost: the item shipped through two
+closure attempts (14z-84 "proximity not-a-bug", 14z-85g first reading
+"restoration = M5") before the content check — two python lines
+(extract the vs2 keyon's window, bytes.find in vsav's image) — settled
+it. Rule: before writing a stubbed_sound row (or planning a sample
+port), CONTENT-SEARCH vsav's QSound image for the vs2 keyon's window
+and check keyons_vsavj for an id at the hit address; the fix may be a
+kind=sound_stub row instead of an M5 dependency. And attribute the
+CALL PATH before attributing the record: the trap detonation goes
+through the 0x4EE0-0x4F60 farm-stub band, not the per-node record its
+array happens to also carry.

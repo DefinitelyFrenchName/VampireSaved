@@ -2173,6 +2173,39 @@ def main():
                 alloc_wrappers[tgt] = wd
                 return wd
 
+            sound_stubs = {}
+
+            def sound_stub_for(tgt, m, where):
+                """kind="sound_stub" (14z-85g): a vs2 sound-farm stub whose
+                vs2 ID has no faithful same-id vsavj meaning, but whose
+                SAMPLE CONTENT exists on vsavj under a different id (the
+                trap-detonation precedent: vs2 0x73A == vsavj 0x199 —
+                identical bytes at the same QSound address, same pitch).
+                Synthesize the vsavj twin of the vs2 stub shape with the
+                row's `sfx_id`: save-regs / move.l #id,d1 / clr d2,d3 /
+                jsr helper / jmp restore. The save (0x330E) and restore
+                (0x3306) pair is byte-identical at the SAME address in
+                both games (verified recon rows), and the helper is the
+                per-node sfx helper vsavj 0x4CE2."""
+                if tgt not in sound_stubs:
+                    sid = _int(m["sfx_id"])
+                    body = (bytes.fromhex("4eb90000330e")        # jsr save
+                            + bytes([0x22, 0x3C]) + sid.to_bytes(4, "big")
+                            + bytes.fromhex("74007600")          # clr d2,d3
+                            + bytes.fromhex("4eb900004ce2")      # jsr helper
+                            + bytes.fromhex("4ef900003306"))     # jmp restore
+                    sd = alloc("a", len(body), f"sound stub {tgt:#x}")
+                    if sd is None:
+                        return None
+                    ops.append({"op": "code", "addr": f"{sd:#x}",
+                                "hex": body.hex()})
+                    notes.append(f"code   {sd:#08x} sound stub for {tgt:#x} "
+                                 f"(vsavj sfx id {sid:#x})")
+                    fragments.append((sd, len(body), "GEN",
+                                      f"sound stub {tgt:#x} id {sid:#x}"))
+                    sound_stubs[tgt] = sd
+                return sound_stubs[tgt]
+
             farm_ports = {}
 
             def farm_port_for(tgt, m, where):
@@ -2244,6 +2277,8 @@ def main():
                     m = recon.get(tgt)
                     if m and m.get("kind") == "farm_port":
                         return farm_port_for(tgt, m, where)
+                    if m and m.get("kind") == "sound_stub":
+                        return sound_stub_for(tgt, m, where)
                     if m and m.get("kind") == "patched_clone":
                         return patched_clone_for(tgt, m, where)
                     ok = m and (m.get("status") == "verified"
@@ -4416,16 +4451,48 @@ def main():
                 src = _int(st["src"])
                 n = _int(st["entries"])
                 keep = {_int(x) for x in str(st["keep_ids"]).split(",") if x.strip()}
+                # remap_ids (14z-85g): "srcid:dstid,..." — rewrite a record's
+                # id to a MEASURED-EQUIVALENT vsavj id before the allowlist
+                # pass (the trap-detonation precedent: vs2 0x73A keys the
+                # same sample bytes vsavj keys at 0x199 — same content, same
+                # pitch, only the id space differs). The target must be in
+                # keep_ids: a remap the zero pass would then kill is a
+                # contradiction, loud by construction.
+                remap = {}
+                for _sp in str(st.get("remap_ids", "")).split(","):
+                    _sp = _sp.strip()
+                    if not _sp:
+                        continue
+                    _a, _b = (_int(x) for x in _sp.split(":"))
+                    if _b not in keep:
+                        fail.append(f"sound_table {nm}: remap target "
+                                    f"{_b:#x} is not in keep_ids — the "
+                                    f"allowlist pass would re-zero it")
+                        break
+                    remap[_a] = _b
+                else:
+                    pass
+                if any(f.startswith(f"sound_table {nm}: remap target")
+                       for f in fail):
+                    continue
                 sdat = (root / f"build/out/{man['src_set']}_data.bin").read_bytes()
                 blob = bytearray(sdat[src:src + n * 8])
                 if len(blob) != n * 8:
                     fail.append(f"sound_table {nm}: src read short")
                     continue
                 zeroed = []
+                remapped = []
                 for i in range(n):
                     o = i * 8
                     sid = int.from_bytes(blob[o:o + 2], "big")
                     alt = int.from_bytes(blob[o + 2:o + 4], "big")
+                    if sid in remap:
+                        remapped.append((i, sid, remap[sid]))
+                        sid = remap[sid]
+                        blob[o:o + 2] = sid.to_bytes(2, "big")
+                    if alt in remap:
+                        alt = remap[alt]
+                        blob[o + 2:o + 4] = alt.to_bytes(2, "big")
                     if sid and sid not in keep:
                         zeroed.append((i, sid))
                         blob[o:o + 2] = b"\x00\x00"
@@ -4467,7 +4534,8 @@ def main():
                         for i in range(n) if int.from_bytes(blob[i*8:i*8+2], "big")]
                 notes.append(f"data   {dst:#08x} +{len(blob):#x}  sound_table {nm} "
                              f"<- {man['src_set']} {src:#08x} ({n} entries; "
-                             f"kept {kept}; zeroed {len(zeroed)} unplayable ids)")
+                             f"kept {kept}; zeroed {len(zeroed)} unplayable ids; "
+                             f"remapped {[(i, hex(a), hex(b)) for i, a, b in remapped]})")
                 notes.append(f"poke32 {ptr_at:#08x} <- {dst:#x}  "
                              f"sound_table {nm} per-char ptr row "
                              f"{ptr_row:#04x} (was {old_ptr:#x})")

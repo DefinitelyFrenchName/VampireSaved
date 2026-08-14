@@ -4,18 +4,22 @@
 # ring-id inventories compared against the frozen measurement.
 # On-demand, ~5 min (2 MAME runs, parallel).
 #
-# THE MEASURED MECHANISM THIS FREEZES (closing the 14z-85e parity item):
+# THE MEASURED MECHANISM THIS FREEZES (14z-85g, both halves):
 # native vs2 fires per trap attempt: id 0x0739 at the mine SPAWN
-# (throw+15f), 0x010B, then 0x073A at the TIMER DETONATION. Our build
-# fires only 0x010A. The missing pair are per-node sfx record nodes
-# 10/11 of hui's array (vs2 0x0C742A) — ZEROED BY THE 14z-85b CURATION,
-# AND CORRECTLY SO: vsavj keys MUSIC-FAMILY content at those same ids
-# (keyons_vsavj: 6- and 5-voice keyons vs vs2's single-voice sfx), so
-# un-zeroing would resurrect the music-retrigger bug. The trap silence
-# is the curation's designed cost; the restoration is the M5
-# voice-samples PILOT (port vs2's two samples into the WIDE QSound
-# upper 8MB, NEW free vsavj ids, remap record nodes 10/11). When that
-# ships, re-freeze OURS_EXPECT to the new ids — deliberately.
+# (throw+15f, per-node record node 10), 0x010B, then 0x073A at the
+# TIMER DETONATION (the sound-farm stub vs2 0x4F2E, jsr'd from the
+# mine handler x068458+0x120 — NOT the record path).
+# OUR build (huitzil-m9+):
+#  - DETONATION RESTORED: 0x73A's sample content is byte-identical in
+#    both games' QSound images (0x6C0000, bank 108, 0-20480, pitch
+#    12548) — vsavj keys it as 0x199/0x499. The hui recon overlay's
+#    0x4F2E row (was stubbed_sound -> rts, the 14z-65 blanket 0x7xx
+#    silence) is now kind=sound_stub sfx_id=0x199: a synthesized
+#    vsavj twin stub. The detonation chirp fires SYSTEMATICALLY.
+#  - EJECTION (0x739) still silent: record node 10 zeroed — vsavj
+#    keys MUSIC-family content at that id and no vsavj equivalent is
+#    measured; fully M5 scope (maintainer-scoped 2026-08-14). When
+#    the M5 port ships it, re-freeze OURS_EXPECT — deliberately.
 #
 # ALSO LOCKED: ours MUST NOT enqueue 0x0739/0x073A (on vsavj they are
 # music — their appearance would BE the music bug), and the periodic
@@ -74,8 +78,10 @@ WINDOWS = [(3400, 3900), (4200, 4700)]
 # equal — ours' attempt 2 also carries an 0117/00f3 pair, an ordinary
 # engine event on that leg's timeline).
 NATIVE_EXPECT = [["0739", "010b", "073a"], ["0739", "010b", "073a"]]
-OURS_EXPECT   = [["010a"], ["010a", "0117", "00f3"]]   # known-open;
-                                              # re-freeze at the M5 pilot
+OURS_EXPECT   = [["010a", "0199"], ["010a", "0199", "0117", "00f3"]]
+# ours: 0199 = the RESTORED detonation chirp (vsavj id for 0x73A's
+# content); 0739 (ejection) stays absent pending M5; 010a-vs-010b is
+# the recorded per-char-row cosmetic delta
 FORBIDDEN_OURS = {"0739", "073a"}             # music on vsavj — never
 
 def parse(leg):
@@ -111,11 +117,12 @@ native = parse("native"); ours = parse("ours")
 errs += verdict(native, NATIVE_EXPECT, "native")
 errs += verdict(ours, OURS_EXPECT, "ours")
 if not errs:
-    print("  ok: native fires 0739/010b/073a per attempt; ours fires 010a")
-    print("      (known-open: nodes 10/11 zeroed pending the M5 pilot)")
+    print("  ok: native fires 0739/010b/073a per attempt; ours fires")
+    print("      010a + the RESTORED detonation chirp 0199 (ejection 0739")
+    print("      still M5-pending, by scope)")
 
 # Verdict-logic control: the checker on a mutated inventory MUST fail.
-mut = [(f, ("0111" if i == "010a" else i)) for f, i in ours]
+mut = [(f, ("0111" if i == "0199" else i)) for f, i in ours]
 if not verdict(mut, OURS_EXPECT, "ours"):
     errs.append("control PASSED with a mutated inventory — verdict logic "
                 "is not checking the ids")
@@ -126,6 +133,6 @@ for e in errs: print("FAIL:", e)
 sys.exit(1 if errs else 0)
 PY
 rc=$?
-[ "$rc" = 0 ] && echo "audit_trap_parity: PASS (frozen known-open delta holds)" \
+[ "$rc" = 0 ] && echo "audit_trap_parity: PASS (restored-detonation state holds)" \
              || echo "audit_trap_parity: FAILURES"
 exit "$rc"

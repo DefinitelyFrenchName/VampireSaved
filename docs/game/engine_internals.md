@@ -775,14 +775,21 @@ that is ported into our build at ~`PRG:0xCE3B8` (vanilla twin
   around action — the first live observation of a non-id entry field
   varying (level-ish semantics, not yet decoded). The 14z-82d
   "detonation id 0x049A" attribution was two cadence beats — RETRACTED.
-- **The trap's real sfx are per-node record nodes 10/11** (ids
-  0x0739 spawn / 0x073A timer detonation; Huitzil array vs2
-  `0x0C742A`). Native fires them per attempt; timer-detonation 0x073A
-  appears on the FAR spacing (the near legs' mines did not reach the
-  timer path in rig 88's shape). vsavj keys MUSIC-family content at
-  those same ids (keyons: 6/5-voice vs vs2's single-voice sfx) — the
-  same-id-different-content class, which is why the 14z-85b curation
-  zeroed them and why any restoration must use NEW ids (the M5 arc).
+- **The trap's real sfx (measured end-to-end 14z-85g):** the
+  spawn-EJECT sound is per-node record node 10 (id 0x0739, dispatched
+  on Phobos' anim context via the record path); the TIMER-DETONATION
+  sound is NOT a record dispatch — it is **sound-farm stub vs2
+  `0x4F2E`** (`jsr $330E; move.l #$73A,d1; bsr helper; jmp $3306`),
+  jsr'd from the mine handler at `x068458+0x120`. vs2's engine
+  carries a FARM of such one-id stubs around 0x4EE0-0x4F60. vsavj
+  keys MUSIC-family content at the same 0x7xx ids — but 0x73A's
+  SAMPLE CONTENT is byte-identical in vsav's own QSound image
+  (0x6C0000), keyed as the 0x198/0x199 family: the restoration is a
+  synthesized vsavj twin stub playing 0x199 (kind=sound_stub recon
+  row, huitzil-m9), no sample port needed. 0x739 has no vsavj
+  equivalent (M5). CAUTION for future silencing calls: a 0x7xx id's
+  FAITHFULNESS is a property of its sample CONTENT, not its number —
+  content-search vsav's image before writing a stubbed_sound row.
 - **Ours 0x010A vs native 0x010B** at the same event (~throw+40f):
   both shared-library single-voice sounds (same start/end, relocated
   banks), reached through a per-char engine row — the defense-rows

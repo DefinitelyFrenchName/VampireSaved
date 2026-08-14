@@ -2951,3 +2951,53 @@ sides, and the option-(a) change recipe (variant-gated reader thunks,
 hitclass precedent; Donovan's row would supersede donovan-m3a) are
 documented in docs/project/tables/defense_rows.md. Pyron needs
 nothing either way — his rows are byte-identical between the games.
+
+## 14z-85g — the restored trap-detonation chirp (huitzil-m9: the
+## sound_stub row + the sound_table remap machinery)
+
+**The finding chain (each step measured):** the four-leg ring A/B
+killed the 14z-85e volume/pan hypothesis (entries essentially identical
+across legs; 0x049A = periodic ambient, the 14z-82d detonation
+attribution retracted); the real delta is native firing
+0739/010b/073a per attempt where ours fired 010a. First reading
+("record nodes 10/11 zeroed, restoration = M5") was corrected by the
+maintainer's field observation and the content check: **vs2 0x73A's
+sample bytes are BYTE-IDENTICAL in vsav's own QSound image**
+(0x6C0000, bank 108, 0-20480, pitch 12548; vsavj ids 0x198/0x199
+family, +0x300 alias 0x498/0x499). And the detonation call is not the
+record path: bp-attributed (USP-top return — the bp_regs A7-first fix)
+to **sound-farm stub vs2 0x4F2E** (`jsr $330E; move.l #$73A,d1;
+moveq 0,d2/d3; bsr $5122; jmp $3306` — a farm of such one-id stubs at
+0x4EE0-0x4F60), jsr'd from the mine handler at x068458+0x120. Hui's
+recon overlay had silenced it to the 0x2A7E0 rts (the 14z-65 blanket
+"0x7xx = voice bank" number rule — see the new GOTCHA).
+
+**Every byte, and why:**
+- `reconciliation_huitzil.toml` 0x4F2E row: stubbed_sound → **kind =
+  "sound_stub", sfx_id = 0x199**. The generator (new kind, sibling of
+  farm_port) synthesizes a 26-byte vsavj twin stub in hole_a:
+  `jsr $330E.l; move.l #$199,d1; moveq #0,d2; moveq #0,d3;
+  jsr $4CE2.l; jmp $3306.l`. The save (0x330E) / restore (0x3306)
+  pair is byte-identical at the SAME address in both games (verified
+  rows); the helper is the per-node sfx helper; base id 0x199 lets
+  the helper's own (0x70,a6) flag produce the 0x499 alias exactly as
+  the engine intends. +1 op (tenant_loop re-frozen 243/267/208 +
+  491/678).
+- `huitzil.toml` hui_sfx_records gained **remap_ids = "0x73A:0x199"**
+  (new sound_table key, target must be in keep_ids or the build
+  fails): record node 11 stays content-faithful for any record-path
+  dispatch (none observed in the 87/88 rigs — data-only, defense in
+  depth). Node 10 (0x739, the mine-ejection sound) stays zeroed: no
+  vsavj equivalent exists; fully M5 scope (maintainer-scoped
+  2026-08-14).
+
+**Measured after:** ours fires 0x199 at f3500/f4301 — native's 0x73A
+timing (f3494/f4295), both attempts, replay 87.
+
+**Gates:** audit_trap_parity RE-FROZEN to the restored state
+(ground-truthed failing on pre-fix huitzil-m8); audit_trap_sound
+green (re-scoped: spawn + ring liveness); tenant_loop re-frozen;
+m3a_reproducible on the new EXPECT_HUI; run_suite on the
+carried-renamed set; merged rebuilt (build/m3b_merged3).
+Build: huitzil-m9 = build/hui36 (3d9ffc89). Maintainer EAR-CHECK
+pending — the final gate for a sound item.

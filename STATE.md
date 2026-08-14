@@ -1,36 +1,45 @@
 # STATE — living progress log
 
-Updated: 2026-08-14 (session 14z-85g close — **THE PLASMA-TRAP SOUND
-PARITY ITEM IS CLOSED BY MEASUREMENT; the fix rides the M5 arc as its
-named PILOT.** The four-leg ring A/B (87/88 × ours/native, new FULL
-ring-tap mode capturing complete 16-byte entries) killed the 14z-85e
-volume/pan hypothesis AND its premise: (1) **0x049A is PERIODIC
-AMBIENT** — ~144f cadence from f2594, pre-trap, both games; the
-14z-82d "detonation id" attribution was two cadence beats
-(RETRACTED in place; audit_trap_sound re-scoped to what it really
-locks — spawn + ring liveness). (2) **The trap's real sounds are
-per-node record nodes 10/11**: native fires 0x0739 at the mine spawn
-and 0x073A at the timer detonation, every attempt; ours fires NEITHER
-because the 14z-85b curation zeroed them — **CORRECTLY: vsavj keys
-MUSIC-family content at those very ids** (keyons 6/5-voice vs vs2's
-single-voice sfx; un-zeroing = the music-retrigger bug). Silence-far
-is the music fix's designed cost; the maintainer's "sounds near" is
-other ids (hit/kept-node family), not the detonation records. (3) THE
-RESTORATION = the M5 voice-samples PILOT, now named: vs2's two
-samples (0x73A ≈ one ~20KB window, bank 108; 0x739 needs the
-45-frame re-probe — sweep-blind delayed attack) into the WIDE QSound
-upper 8MB, NEW free vsavj ids, record nodes 10/11 remapped. Two ids,
-one array — the smallest end-to-end proof of the whole arc. (4) NEW
-GATE tests/audit_trap_parity.sh: frozen per-attempt inventories
-(native 0739/010b/073a; ours 010a known-open — re-freeze at the
-pilot), FORBIDS 0739/073a on ours (their appearance IS the music
-bug), per-leg ambient liveness, verdict control; ring_tap.lua gained
-FULL mode (default mode line-compatible, audit_trap_sound still
-green). Secondary observation recorded, not gated: ours 0x010A vs
-native 0x010B at the same event — a shared-library pair reached
-through a per-char engine row, the defense-rows family (cosmetic).
-NEXT SESSION: the M5 voice arc opens with the trap pilot — 0x02E5
-id-entry decode first (14z-85d), then the two-sample port.)
+Updated: 2026-08-14 (session 14z-85g close — **THE PLASMA-TRAP
+DETONATION SOUND IS RESTORED (huitzil-m9, 3d9ffc89) — no sample port
+needed; the maintainer's field call ("the chirp IS in the build")
+proven by measurement.** The arc, in order: (1) the four-leg ring A/B
+(87/88 × ours/native, new ring_tap FULL mode) killed the 14z-85e
+volume/pan hypothesis AND its premise — 0x049A is PERIODIC AMBIENT
+(~144f cadence from f2594, pre-trap, both games; the 14z-82d
+"detonation id" attribution RETRACTED in place), and the real delta is
+WHICH ids fire: native 0739(spawn)/010b/073a(detonation) per attempt,
+ours 010a only. (2) First reading — "nodes 10/11 zeroed by the
+curation, restoration = M5" — was HALF wrong, and the maintainer's
+correction drove the second measurement: 0x73A's SAMPLE CONTENT is
+byte-identical in vsav's own QSound image (0x6C0000, bank 108,
+0-20480, pitch 12548), keyed natively as vsavj 0x198/0x199 (+0x300
+alias 0x499). And the detonation is NOT a record dispatch at all —
+bp-attributed to **sound-farm stub vs2 0x4F2E** (`move.l #$73A,d1`
+farm around 0x4EE0-0x4F60), jsr'd from the mine handler x068458+0x120,
+which the 14z-65 blanket "0x7xx = voice bank" policy had silenced to
+the 0x2A7E0 rts (hui recon overlay, stubbed_sound). (3) THE FIX: the
+overlay row re-kinded **sound_stub sfx_id=0x199** — the generator
+(new kind, farm_port sibling) synthesizes the vsavj twin stub
+(save/id/helper/restore; the 0x330E/0x3306 pair is byte-identical
+same-address in both games); plus sound_table gained remap_ids
+(allowlist-checked) and node 11 is remapped 0x73A→0x199 as
+content-faithful defense in depth (record path unobserved in rigs).
+Measured: ours fires 0x199 at f3500/f4301 = native's 0x73A timing,
+both attempts. The EJECTION sound (0x739, node 10) stays silent —
+no vsavj equivalent exists; fully M5 scope (maintainer-scoped
+2026-08-14). (4) LADDER: audit_trap_parity RE-FROZEN to the restored
+state (ground-truthed failing on pre-fix m8), audit_trap_sound
+re-scoped and green, tenant_loop re-frozen 243/267/208 + 491/678
+(+1 stub op), m3a on the new EXPECT_HUI, run_suite on the
+carried-renamed set, merged rebuilt (build/m3b_merged3). En route:
+bp_regs stack-read fix (A7-first; the USP top carried the true return
+— the farm-stub attribution), and a GOTCHA class named: a 0x7xx id's
+faithfulness is a property of its sample CONTENT, not its number —
+content-search vsav's image before any stubbed_sound row. NEXT
+SESSION: maintainer EAR-CHECK of the chirp on m3b_merged3; the M5
+arc's smallest target is now the ejection 0x739; then the voice
+blocks (0x02E5 decode first, 14z-85d).)
 
 Previously: 2026-08-13 (session 14z-85f close — **THE FINAL GUARDIAN
 DAMAGE PARITY ITEM IS CLOSED: root-caused, fixed, and verified
@@ -678,7 +687,11 @@ vanilla characters including Buletta" — full-scope test to follow.
    restoration = the M5 voice-samples PILOT (vs2's two samples into
    the WIDE QSound upper 8MB, NEW free ids, record nodes 10/11
    remapped). Gate: tests/audit_trap_parity.sh freezes the known-open
-   delta and FORBIDS 0739/073a on ours. See the 14z-85g entry.]**
+   delta and FORBIDS 0739/073a on ours. See the 14z-85g entry.
+   [AMENDED same session: the DETONATION was then restored WITHOUT
+   any sample port — 0x73A's content is byte-identical in vsav's own
+   image (vsavj ids 0x199/0x499); sound_stub row, huitzil-m9. Only
+   the EJECTION (0x739) remains M5.]]**
 2. **NEW, detail pending: one of Phobos' EX moves may carry wrong
    DAMAGE DATA** (explicitly not animation/sound/feel). Awaiting the
    move name + expected-vs-observed numbers; the rig once named is the

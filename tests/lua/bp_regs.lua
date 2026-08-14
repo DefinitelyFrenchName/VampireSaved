@@ -152,7 +152,10 @@ emu.register_periodic(function()
         for _, n in ipairs({"D0","D1","D2","D3","A0","A1","A2","A3","A4","A6"}) do
             r[#r + 1] = n .. "=" .. string.format("%08x", st[n].value)
         end
-        local spr = st["SP"] or st["A7"]
+        -- A7 first: MAME's m68k "SP" state can resolve to the inactive
+        -- stack pointer (measured 14z-85g: constant garbage ret on every
+        -- hit); A7 is the active one.
+        local spr = st["A7"] or st["SP"]
         local sp = spr.value
         local ok, ret = pcall(function()
             return string.format("ret=%08x,%08x", space:read_u32(sp), space:read_u32(sp + 4))

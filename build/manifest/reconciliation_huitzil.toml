@@ -33,12 +33,24 @@ kind = "stubbed_sound"
 status = "verified"
 note = "H KEPT SILENT (14z-65): sfx id 0x74f — newcomer voice-bank range (0x7xx), the established stub class. Revisit with the M5 voice-bank port."
 
+# 14z-85g RESTORED (the trap timer-detonation chirp — maintainer field
+# report "the sound IS in the build" proven right): vs2 stub 0x4F2E
+# plays id 0x73A, whose SAMPLE CONTENT is byte-identical in both
+# games' QSound images at the same address (0x6C0000, bank 108,
+# 0-20480, pitch 12548) — vsavj keys it as the 0x198/0x199 family
+# (0x499 alias). The 14z-65 blanket "0x7xx = voice bank, silence"
+# call was wrong for THIS id (content measured 14z-85g). kind
+# sound_stub synthesizes the vsavj twin stub playing 0x199 (base id;
+# the helper's own (0x70,a6) flag aliases to 0x499 — both key the
+# same sample/pitch). The save/restore pair (0x330E/0x3306) is
+# byte-identical same-address in both games (verified rows above).
+# Gate: tests/audit_trap_parity.sh (re-frozen with the restored id).
 [[map]]
 vsav2 = 0x004f2e
-vsavj = 0x02a7e0
-kind = "stubbed_sound"
+kind = "sound_stub"
+sfx_id = 0x199
 status = "verified"
-note = "H KEPT SILENT (14z-65): sfx id 0x73a — newcomer voice-bank range. Named by the round-2 soak. Revisit with the M5 voice-bank port."
+note = "H RESTORED 14z-85g: trap detonation chirp — vs2 0x73A content == vsavj 0x199 (measured, same QSound bytes/pitch); synthesized stub, not the 0x2A7E0 silence rts"
 
 [[map]]
 vsav2 = 0x004f62

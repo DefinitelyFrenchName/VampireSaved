@@ -17,8 +17,9 @@
 # — and on our build they are ZEROED BY THE 14z-85b CURATION, correctly
 # (vsavj keys MUSIC-family content at those same ids; un-zeroing =
 # the music-retrigger bug). The parity question this header used to
-# carry is therefore CLOSED BY MEASUREMENT: silence far is the
-# curation's designed cost; restoration = the M5 voice-samples pilot.
+# carry is therefore CLOSED: the detonation chirp is RESTORED 14z-85g
+# (sound_stub -> vsavj 0x199, same sample bytes; huitzil-m9); only the
+# EJECTION sound (0x739) remains M5.
 # THE PARITY GATE is tests/audit_trap_parity.sh (frozen per-attempt
 # inventories, ours vs native; forbids 0739/073a on ours).
 #

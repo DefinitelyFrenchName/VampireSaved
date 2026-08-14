@@ -1,4 +1,8 @@
 # NEXT SESSION — orientation (written at the close of 14z-85g, 2026-08-14)
+#
+# EAR-CHECK FIRST: the trap-detonation chirp is restored on
+# build/m3b_merged3 (and solo build/hui36) — the maintainer's ears are
+# the final gate for a sound item.
 
 > ## START HERE
 >
@@ -21,14 +25,17 @@
 > crash reset (Don-perfect-win → Sasquatch intro; see Still open
 > below and STATE 14z-85f). Next, in maintainer-pressure order —
 > the crash rig first if the maintainer hits it again:
-> 1. ~~Plasma-trap detonation sound parity~~ **CLOSED BY MEASUREMENT
->    (14z-85g)**: the trap's sfx are record nodes 10/11 (0x739 spawn /
->    0x73A timer detonation) — native fires them, ours has them ZEROED
->    by the 14z-85b curation, CORRECTLY (vsavj keys MUSIC at those
->    ids). The volume/pan hypothesis is dead; 0x049A is periodic
->    ambient (the 14z-82d attribution retracted). Gate:
->    tests/audit_trap_parity.sh (frozen known-open delta; forbids
->    0739/073a on ours). The fix = the M5 pilot below.
+> 1. ~~Plasma-trap detonation sound parity~~ **CLOSED AND THE
+>    DETONATION RESTORED (14z-85g, huitzil-m9)**: the chirp's sample
+>    is byte-identical in vsav's own QSound image (the maintainer's
+>    field call, proven) — vs2 farm stub 0x4F2E's blanket 14z-65
+>    silence replaced by a synthesized sound_stub playing vsavj
+>    0x199. Fires at native timing on replay 87, both attempts. The
+>    EJECTION sound (0x739, record node 10) stays silent — the one
+>    remaining M5 item for the trap (no vsavj equivalent exists).
+>    0x049A = periodic ambient (14z-82d attribution retracted). Gate:
+>    audit_trap_parity (re-frozen to the restored state). MAINTAINER
+>    EAR-CHECK PENDING on build/m3b_merged3 / build/hui36.
 > 2. **THE M5 VOICE-SAMPLES ARC** (ruled GO; brief in STATE 14z-85c;
 >    Z80 RE state in 14z-85d — id table @FILE 0x11006 4B/id both
 >    games). **OPENS WITH THE TRAP PILOT (14z-85g): port vs2's two
@@ -80,10 +87,12 @@
 
 | build | set | fingerprint |
 |---|---|---|
-| build/m3b_merged2 | UNREGISTERED (pending playtest + S6 freeze) | moves with generator (677 ops) |
-| build/m3b_merged | pre-fix merged — audit_fg_parity's known-bad reference | superseded |
+| build/m3b_merged3 | UNREGISTERED (pending ear-check + S6 freeze) | moves with generator (678 ops) |
+| build/m3b_merged2 | superseded (pre-chirp merged; FG-fix reference) | superseded |
+| build/m3b_merged | pre-FG-fix merged — audit_fg_parity's known-bad reference | superseded |
 | build/m5_wide | donovan-m3a | 4b7d0dc7 |
-| build/hui34 | **huitzil-m8** | c48cd722 |
+| build/hui36 | **huitzil-m9** | 3d9ffc89 |
+| build/hui34 | superseded m8 (audit_trap_parity's known-bad reference) | c48cd722 |
 | build/pyron23 | **pyron-m5** | 65e9a40e |
 | build/hui33, pyron22 | superseded m7/m4 | 284e3b1c / ac22418f |
 | build/hui32, pyron21 | superseded m6/m3 (extract dirs = tenant_loop/build_merged inputs) | db4bcd11 / 6c7f7322 |
@@ -99,8 +108,9 @@
   poke + tripwire breakpoints via bp_regs.lua + pool dumps, N=20)
   in STATE 14z-85f. NOTE: a tripwire fire here is the instrument
   working — capture the reset PC before theorizing.
-- THE M5 VOICE-SAMPLES ARC (ruled GO; opens with the trap pilot —
-  see START HERE).
+- THE M5 VOICE-SAMPLES ARC (ruled GO). The trap DETONATION no longer
+  needs it (restored 14z-85g); the trap EJECTION (0x739) is now the
+  smallest single M5 target, alongside the voice blocks.
 - Pyron's medallion whitening on 2P hover (row-0x1A family).
 - H-vs-P stuck-direction (~1/30, possibly emulator-side).
 - Round-end flicker (parked; needs the maintainer's recording).

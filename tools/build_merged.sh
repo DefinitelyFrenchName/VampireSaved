@@ -44,11 +44,13 @@ python3 tools/gen_donovan_patch.py "$D_EX" "$OUT/patch" \
 grep -q '^GENERATION OK' "$OUT/gen.log" || {
     echo "FAIL: no GENERATION OK"; tail -15 "$OUT/gen.log"; exit 1; }
 NOPS="$(python3 -c "import json;print(len(json.load(open('$OUT/patch/patch.json'))['ops']))")"
-[ "$NOPS" = 677 ] || {
-    echo "FAIL: $NOPS ops, frozen fixture is 677 (re-freeze"
+# RE-FROZEN 14z-85g (was 677): +1 = hui's sound_stub op (the restored
+# trap-detonation chirp).
+[ "$NOPS" = 678 ] || {
+    echo "FAIL: $NOPS ops, frozen fixture is 678 (re-freeze"
     echo "      test_tenant_loop FIRST if the merge legitimately changed)"
     exit 1; }
-echo "  ok: 677 ops (the frozen test_tenant_loop fixture; 14z-85 owner tag)"
+echo "  ok: 678 ops (the frozen test_tenant_loop fixture; 14z-85g chirp stub)"
 python3 tools/patch_prg.py "$ROMDIR/vsavj.zip" "$OUT/prg" \
     --patch "$OUT/patch/patch.json" > "$OUT/patch_prg.log" 2>&1 || {
         echo "FAIL: patch_prg refused the merged patch"
@@ -168,7 +170,7 @@ done
 FP="$(python3 tools/build_fingerprint.py "$OUT/rompath;$ROMDIR" --set vsavjw --sha-only)"
 cat > "$OUT/README.txt" <<EOF
 3-TENANT MERGED BUILD WITH GFX (tools/build_merged.sh, 14z-83 S4).
-Program: the 677-op merged image. Gfx: the S2 chain (D -> H -> P), last
+Program: the 678-op merged image. Gfx: the S2 chain (D -> H -> P), last
 link's members packed; group B pristine.
 NOT REGISTERED (S6 decision) — run_suite refuses it until frozen.
 fingerprint: $FP
