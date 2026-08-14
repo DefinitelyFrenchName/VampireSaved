@@ -67,7 +67,11 @@ done
 python3 "$REPO/tools/check_qs_voice_wav.py" "$W/ours/voices.wav" \
     "$W/native/voices.wav" "$W/ledger.json" || fail "spectral A/B"
 
-# verdict control: truncate one sounding window in a copy -> must fire
+# verdict control: truncate one sounding window in a copy -> must fire.
+# Zero the HEAD (the loud attack), not the tail: RMS is attack-dominated,
+# and a tail-zeroing control barely moves the metric — the first version
+# of this control could not fail (RH-9; caught by its own dead-control
+# check on the first shipped-artifact run, 14z-86)
 python3 - "$W" <<'PY' || exit 1
 import json, os, subprocess, sys, wave, struct
 w = sys.argv[1]
@@ -77,10 +81,9 @@ params = src.getparams()
 raw = bytearray(src.readframes(src.getnframes()))
 rate, nch = params.framerate, params.nchannels
 led = json.load(open(f"{w}/ledger.json"))
-# zero the tail 80% of the first sounding window
 f0 = 1050 + 240 * 0
-a = int((f0 + 40) / 60 * rate) * nch * 2
-b = int((f0 + 200) / 60 * rate) * nch * 2
+a = int(f0 / 60 * rate) * nch * 2
+b = int((f0 + 160) / 60 * rate) * nch * 2
 raw[a:b] = bytes(b - a)
 out = wave.open(f"{w}/bad.wav", "wb")
 out.setparams(params); out.writeframes(bytes(raw)); out.close()

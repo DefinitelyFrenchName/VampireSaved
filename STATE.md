@@ -1,6 +1,55 @@
 # STATE — living progress log
 
-Updated: 2026-08-14 (session 14z-86 close — **THE M5 VOICE ARC OPENED
+Updated: 2026-08-15 (session 14z-86 FULL close — **THE M5 VOICE-BLOCK
+BATCH SHIPPED AND FIELD-CONFIRMED: all 79 scoped voice/sfx ids restored
+across the three tenants (donovan-m4 84f49aaa / huitzil-m12 e1f598d6 /
+pyron-m6 4c6e3fb6, merged build/m3b_merged6), through TWO
+maintainer-caught playback-law defects to "the sounds are normal now
+among all 3 newcomers".** The batch (all measured): vs2's 8th
+note-table slot (its voice table) restored on vsavj via the
+byte-identical table-0 relocation; 79 verbatim vs2 songs at authored
+ids 0x58-0xA6; authored sample records at free-run high indices; 57
+absent sample windows packed into vsw.21m (WIDE v1.2 content members,
+sentinel CRCs dec0de3a/3b); per-tenant remaps D36/H14/P10 + 25
+byte-verified farm sound_stub restorations + the facing-alias thunk
+@0x5FFF00 (voice ids skip +0x300 — only 38 free pairs vs 79 voices;
+measured: 74/81 native alias songs are channel-slot-only twins, so the
+deviation is channel allocation, not content — DOCUMENTED DEVIATION,
+revisit per-id if play objects). ALL profile-gated: the stock twin
+rebuilds BIT-IDENTICAL (6c93cfa8, measured). **THE TWO QSOUND PLAYBACK
+LAWS, both maintainer-caught and both now packer-enforced + gated
+(docs/platform/gotchas.md):** (1) HALF-BANK — the DSP compares sample
+pointers SIGNED 16-bit; a window straddling bank offset 0x8000
+truncates to its silent loop tail ("low-res" report; 4 windows); (2)
+BYTE-PARITY — the members are stored pre-swapped and byteswapped at
+load on BOTH emulators, so a copy must keep its source offset's byte
+lane or every byte pair plays crossed ("PC-speaker synthesis" report;
+19 windows; file-level comparison is BLIND to both classes). THE
+INSTRUMENT LESSON (gotcha): register- and content-level A/Bs passed
+both defects — the EAR-LEVEL gate caught them
+(tests/audit_qs_voice_wav.sh, paired -wavwrite captures + TWO-SIDED
+spectral thresholds; its own first verdict-control was RH-9-dead
+(tail-zeroing barely moves attack-dominated RMS) and was caught by
+the dead-control check — now head-zeroing and firing). FINAL BATTERY
+ALL GREEN: three solo suites (tenant-content .sha1s re-frozen
+deliberately — the restored voices now PLAY, shifting those replays'
+timelines; legacy masked classes held throughout), voice-batch keyon
+gate + WAV gate + trap parity on merged6, merged legacy audit
+AUDIT-EXIT 0. **PARKED (decision brief + rig ready): the sword-plant
+"ding"** — diagnosed NOT a port defect but THE PER-GAME ENGINE VOICE
+class (engine_internals "per-node sfx dispatch, second pass"): a
+shared engine effect dispatches with SOUND CLASS 0x0C (the (0x382,A6)
+byte is a class, overridden by effects); each game's own effect anim
+carries a different node (vs2 28→0x29B the proper thunk; vsavj
+13→0x308 the chime). vsavj's 0x29B is content-identical to vs2's, so
+the native sound is expressible: fix design = variant-row-0x1C
+redirect + curated node-13 array, blocked only on finding the
+class-writer (a $FF8782 byte-watch caught no write — mirror-write
+suspected). Rig: tests/replays/don/90_don_plant.rpl. EAR-CHECK: voices
+CONFIRMED normal (maintainer, 2026-08-15); the ding is the one open
+audible item.)
+
+Previously: 2026-08-14 (session 14z-86 close — **THE M5 VOICE ARC OPENED
 AND ITS PILOT SHIPPED IN ONE SESSION: the trap mine-EJECTION sound is
 RESTORED (huitzil-m11 = build/hui38 6eed421b, merged build/m3b_merged5)
 — and the entire Z80 sound driver is now DECODED, with the 14z-85d
