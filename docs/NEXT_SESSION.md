@@ -99,26 +99,17 @@
 
 ## Still open (the short list)
 
-- **NEW (14z-85g field report): the plasma trap's hit does not inflict
-  SHOCK status** (aura + paralysis, as Victor's held-down-HP or
-  Donovan's 214+P do) — on native vs2 it does. Not a regression
-  (likely never worked). Mechanism candidates, in prior order:
-  (a) the victim-side REACTION dispatch on the hit's status/class —
-  the electric-shake pair is engine-generation-drifted (vsavj 0x23AC8
-  writes 0x18/0x0B where vs2 0x226E0 writes 0x0C/0x04, engine_internals)
-  and vsavj's dispatch may map the trap's class to a plain-hit handler;
-  (b) the hitclass_map_extend entry for the trap's contact — its
-  transplant licence required byte-identical dispatch targets, so a
-  shock-specific vs2 target may have been licensed to the do-nothing
-  default; (c) a status byte in the hit record consumed by a bounded
-  vanilla table (the f7997 sibling shape). RIG: first make the trap
-  HIT connect in a replay (the 88 rigs never produced a hit — check
-  P2 HP/status fields +0x11E/+0x134/+0x145 family and the shock-window
-  fields test_don_accent locks); native leg = the same replay on vs2;
-  then bp the reaction dispatch on both legs at the hit. Donovan's
-  214+P shock on OUR build is the working-reference control (if his
-  shock works, the machinery exists and the trap's routing is the
-  delta).
+- **Trap SHOCK status — MECHANISM FULLY MEASURED (14z-85g(2)),
+  DECISION PENDING**: the dome's hit records carry vs2 class 0x52;
+  vsavj's reaction jump table (0x2385C) ends before it (wild-but-lucky
+  jump today). vs2's own table aliases 0x52 ≡ 0x06 = vsavj's native
+  electric-shake 0x23AC8 (structural twin of vs2's 0x52 handler minus
+  the attacker-freeze exemption). Options in STATE: (a) RECOMMENDED
+  one-byte class remaps 0x52→0x06 (two hitbox_proj records; deviation:
+  Phobos takes the normal 11f attacker freeze on trap connect);
+  (b) faithful dispatch thunk (legacy flicker-inventory risk, needs
+  ratification). The deep-overlap rig (rig60, P2 walk N=60) is the
+  gate seed — capture as audit_trap_shock with the fix.
 
 - **FLAKY CRASH RESET (14z-85f field report, priority by maintainer
   pressure): 2P Don-vs-Pyron → Donovan PERFECT win → COM Sasquatch

@@ -49,6 +49,58 @@ rig needs one first). NEXT SESSION: the trap shock item, the M5
 arc (ejection 0x739 = smallest target; voice blocks after the
 0x02E5 decode, 14z-85d).)
 
+### Decisions pending — 14z-85g(2): the trap SHOCK restoration shape
+### (mechanism fully measured; two options, gameplay-feel tradeoff)
+
+**THE MECHANISM (measured end-to-end, new deep-overlap rig
+rig60/fine-sweep):** the trap dome's hit records carry vs2's EXTENDED
+class 0x52 (two records, hui hitbox_proj +0x17D/+0x19D, byte +0x1D of
+their 0x20-stride records; the victim's +0x54 reads 0x52 on BOTH legs
+at the hit). The victim-side REACTION dispatch (`PRG:0x2384E`:
+`move.b (0x54,a6),d0; add.w d0,d0; move.w (0x2385C,pc,d0),d1;
+jmp (pc,d1)`) indexes a per-class jump table — vs2's (0x22388, 0x54
+entries) routes 0x52 to a DEDICATED handler 0x22656 (bp-verified
+firing at the native hit, D0=0xA4): the SHOCK install — sub-state 4,
+victim freeze 0x18, property[class] lookup → common install 0x27114.
+vsavj's table ends earlier: entry[0x52] reads CODE BYTES (0x1D7C) and
+ours takes a wild-but-lucky jump (no crash; plain-hit-looking
+behavior; bp-verified the dispatch runs, the intended handler
+doesn't). KEY LICENCE FACTS: vs2's own table ALIASES class 0x52 ≡
+0x06 ≡ 0x38 (same entry 0x2CE), and vsavj entry[0x06] = its own
+electric-shake 0x23AC8 — which is a STRUCTURAL TWIN of vs2's 0x22656
+minus ONE guard: vs2's `cmpi.b #$52; beq` SKIPS the attacker-freeze
+(the "attacker" is a mine — vs2 exempts Phobos from the 0x0B
+hit-freeze). property[0x06] == property[0x52] == 0x0F on both games
+(Donovan's ported rows cover 0x52 on ours). The sweep also measured:
+the mine's roll is PROXIMITY-TERMINATED (stops shorter the closer the
+opponent stands: 549/545/527/509 across N=40-55) and rolling THROUGH
+the opponent triggers nothing — the shock is the dome hit, as vs2
+built it.
+
+**Option (a) — the vs2-licensed one-byte remap (RECOMMENDED):**
+region_fix rows: the two hitbox_proj class bytes 0x52 → 0x06 (the
+14z-33 licence verbatim — "only remap when the source engine itself
+proves equivalence"; vs2's table proves 0x52 ≡ 0x06). The trap hit
+then rides vsavj's own 0x23AC8: identical shock install (freeze 0x18,
+sub-state 4, property 0x0F → aura/paralysis machinery — Victor's own
+path). DEVIATION: Phobos receives the 11-frame attacker hit-freeze
+(0x0B) when the trap connects — vs2's 0x52 guard exempts him; vsavj's
+0x06 path doesn't. Zero legacy surface (data-only, hui's own region).
+**Option (b) — the fully faithful dispatch thunk:** es_type51_dispatch
+sibling at site 0x2384E (6-byte jsr, thunk: class==0x52 → inline clone
+of vs2's 0x22656 with the attacker-freeze skip, lea 0x28D00 abs, jmp
+0x27EC0 the vsavj common-install twin; else rts to vanilla). Exact
+native behavior incl. the exemption — but the site is the ENGINE-WIDE
+reaction dispatch (every hit, every character): the added jsr cycles
+land on legacy replays and may grow the frozen flicker inventories →
+the merged legacy audit would need re-measurement and maintainer
+ratification of any new flicker (the 2026-07-27 standing watch).
+Recommendation: (a) — one byte per record, Victor-proven machinery,
+and the deviation (attacker freeze on trap connect) is the NORMAL
+vsavj rule for electric hits; (b) held in reserve if the freeze
+bothers play. Either way the gate is the deep-overlap rig captured as
+a suite audit (fails today: no 0x23AC8/clone dispatch on ours).
+
 Previously: 2026-08-13 (session 14z-85f close — **THE FINAL GUARDIAN
 DAMAGE PARITY ITEM IS CLOSED: root-caused, fixed, and verified
 BIT-EXACT to native vs2.** Both 14z-85e hypotheses were eliminated by
