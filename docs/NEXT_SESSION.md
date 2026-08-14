@@ -1,76 +1,68 @@
-# NEXT SESSION — orientation (written at the close of 14z-86, 2026-08-15)
+# NEXT SESSION — orientation (written at the close of 14z-87, 2026-08-15)
 
-> ## START HERE — THE SWORD-PLANT "DING" FIX (rig + design ready)
+> ## START HERE — THE DING RULING (maintainer decision pending)
 >
-> The M5 voice batch is SHIPPED AND FIELD-CONFIRMED ("the sounds are
-> normal now among all 3 newcomers"): donovan-m4 (`build/don_m4`,
-> `84f49aaa`) / huitzil-m12 (`build/hui39`, `e1f598d6`) / pyron-m6
-> (`build/pyron24`, `4c6e3fb6`), merged **build/m3b_merged6**. Full
-> battery green (suites, voice keyon gate, ear-level WAV gate, trap
-> gates, merged legacy audit).
+> 14z-87 root-caused the sword-plant "ding" and RETRACTED the 14z-86
+> diagnosis at its root. The mechanism (measured end-to-end,
+> engine_internals "The per-node sfx dispatch, third pass"):
+> `(0x382,A6)` is the fighter's VOICE-FLAVOR CLASS; at a
+> match-sequencer event the engine BORROWS P1 a class
+> (`PRG:0x0AEF6`) from the OPPONENT's row of the candidate table
+> `0x00B268` — vs2's rows include the tenants' classes, vsavj's
+> don't, so tenant engine-voice events play a random VANILLA flavor
+> (a lottery: the in-use mask rides the QSound-latch phase; measured
+> borrows 0x06/0x0C/0x09/0x00 MAME, 0x04 FBNeo).
 >
-> **THE ONE OPEN AUDIBLE ITEM** — Donovan 214+K sword plant ends with
-> a "ding" vs2 doesn't have. DIAGNOSED, not a port defect
-> (engine_internals "per-node sfx dispatch, second pass"): a shared
-> engine effect dispatches per-node sound with SOUND CLASS 0x0C (the
-> (0x382,A6) byte is a CLASS — engine effects override it); each
-> game's own effect anim carries a different sfx node — vs2 node 28 →
-> 0x29B (the proper thunk), vsavj node 13 → 0x308 (an ordinary vsavj
-> chime, foreign in context). vsavj's 0x29B is content-identical to
-> vs2's, so the native sound is expressible.
+> **BLOCKED ON: the maintainer ruling — STATE "Decisions pending —
+> 14z-87"**: (a) accept as a per-game engine-voice deviation, or
+> (b) RECOMMENDED: the tenant-keeps-own-class thunk at `PRG:0x0AEF6`
+> (skip the borrow when `(0x382,A1)` pre-value ≥ 0x10) — tenant voices
+> come from their own authored M5 arrays (Donovan node 13 → authored
+> 0x61, sample-backed), covers H/P for free, removes the lottery; COST:
+> an engine-site hook on a legacy-reached path → flicker inventories
+> may move → re-measure + ratification (2026-07-27 standing watch).
+> Implementation checklist if (b): measure the consumers of `$FF8114`
+> (index) and `$FF8100` (voice number) before choosing skip-whole vs
+> skip-write-only; then rebuild solos+merged, run
+> `tests/audit_voice_borrow.sh` with `VOICE_BORROW_EXPECT=own-class`,
+> the trap/voice gates, and the merged legacy audit with the flicker
+> re-measurement. Option (c) optional either way: port vs2 rows
+> 0x10/0x11/0x13 of `0x00B268`/`0x00BB68` into our variant rows (the
+> mirrored borrow direction; data-only).
 >
-> **THE FIX PLAN**:
-> 1. Find the class-0x0C WRITER (the one open measurement): a byte
->    write-watch on $FF8782 caught NO write in the dispatch window —
->    suspect a RAM-MIRROR write (watch the mirrors too) or a
->    wider-window write. Rig: tests/replays/don/90_don_plant.rpl;
->    the dispatch fires ~f3999 (debug timeline), dispatcher head
->    0x27F16, char-read bp at 0x27F1A shows D1=0x0C.
-> 2. If the writer is TENANT-REACHED code (Donovan's ported plant
->    handler or an effect it spawns): patch OUR write 0x0C → 0x1C
->    (variant row, no legacy path writes it) + place a curated
->    14-node array at row 0x1C (node 13 = {0x29B, 0x29B, 0}) via the
->    existing table machinery. Native sound, zero legacy surface.
-> 3. If the writer is pure engine code: the brief goes back to the
->    maintainer with options (accept as the per-game-voice class like
->    010A/010B, or an aimed thunk).
-> 4. Re-run the plant rig ring A/B (ours must fire 0x29B in the
->    window; the 0x62B/0x308 pair gone) + an ear-check.
->
-> **THEN: the voice-scope odds** (the remaining M5 sfx tail):
-> 0x112 / 0x14a / 0x173 / 0x31B etc. — same-id-different-content ids
-> whose vs2 content is absent on vsavj (the don recon KEPT-SILENT
-> rows list them). The machinery is complete: resolve statically
-> (audit tool), author songs/records via qs_songs (BOTH packing laws
-> enforced), remap per tenant, verify with the keyon + WAV gates.
+> **New instruments (captured):** `tests/lua/read_tap.lua` (non-debug
+> PC-attributed READ+WRITE tap — serializes state-dependent values in
+> ONE run; the instrument that broke the case) and
+> `tests/audit_voice_borrow.sh` (the mechanism frozen as lottery-proof
+> invariants; GREEN on don_m4, 2 verdict controls, ~6 min).
+> **New gotchas:** cross-run correlation of state-dependent values
+> [platform]; +0x382 is not the char id in match [game].
 >
 > **Carry-forward notes:**
-> - The 14z-86 close battery is ALL GREEN incl. the merged6 legacy
->   audit (AUDIT-EXIT 0) — no gap carries to S6.
-> - Tenant-content .sha1s were RE-FROZEN deliberately (the restored
->   voices now play, shifting those replays' timelines — don's
->   win/lose, pyron's pick); legacy masked classes held throughout.
-> - The facing-alias skip for voice ids 0x58-0xA6 is a DOCUMENTED
->   DEVIATION (channel allocation only — 74/81 native alias songs are
->   slot-only twins); revisit per-id via the 38 free pairs if play
->   ever objects.
-> - The flaky Sasquatch-intro crash rig (STATE 14z-85f) stays armed.
-> - COMPAT: pre-WIDE-v1.1 builds don't boot on current binaries
->   (vsw.z01/z02); several frozen dirs were upgraded in place with
->   stock members (fingerprint-verified).
+> - No build shipped in 14z-87 — donovan-m4/huitzil-m12/pyron-m6 and
+>   build/m3b_merged6 stand unchanged; the 14z-86 battery remains the
+>   latest green.
+> - OPEN SUB-ITEM (new, unattributed): the ours-only P2-block class-3
+>   node-18 dispatch (ring id 0x62B at f3966 of rig 90; native does
+>   not fire it in the window) — an EVENT difference, separate from
+>   the flavor mechanism; the (b) thunk would not change it.
+> - The 14z-86 items still open: the M5 sfx odds
+>   (0x112/0x14a/0x173/0x31B), the flaky Sasquatch-intro crash rig
+>   (STATE 14z-85f, stays armed), Pyron 2P-hover medallion whitening,
+>   H-vs-P stuck direction, round-end flicker (needs the maintainer's
+>   recording), win-screen QUOTEs, select-medallion polish.
 >
-> ## Load-bearing laws from 14z-86 (do not re-derive)
+> ## Load-bearing laws from 14z-87 (do not re-derive)
 >
-> - QSound playback laws: HALF-BANK (signed pointer compare) +
->   BYTE-PARITY (pre-swapped members) — both enforced in
->   tools/build_qs_songs.py, both gated by audit_qs_voice_wav.sh.
-> - Register/content-level A/Bs are BLIND to consumer-semantic
->   classes; keep one gate at the OUTPUT level.
-> - The Z80 is NOT KABUKI; driver addresses are flat member-concat
->   offsets; the full decode is engine_internals "The QSound Z80
->   driver" (+ second-pass sections).
+> - Never correlate a state-dependent value across runs — serialize
+>   read+write in one run; write watches run UNWINDOWED first (the
+>   boot POST is the liveness control).
+> - Debug and non-debug are different worlds AND identical non-debug
+>   runs differ where sound state feeds a decision (the QSound-latch
+>   one-frame phase) — gate on run-stable invariants, not lottery
+>   outcomes (audit_voice_borrow.sh is the worked example).
 
-## Current builds (registry)
+## Current builds (registry — unchanged from 14z-86)
 
 | build | set | fingerprint |
 |---|---|---|
@@ -78,33 +70,19 @@
 | build/don_m4 | **donovan-m4** | 84f49aaa |
 | build/hui39 | **huitzil-m12** | e1f598d6 |
 | build/pyron24 | **pyron-m6** | 4c6e3fb6 |
-| build/m5_stock | stock twin (unchanged — the batch is profile-gated) | 6c93cfa8 |
-| build/hui38, pyron23, m5_wide | superseded m11/m5/m3a (tags are the way back) | — |
-
-## Still open (the short list)
-
-- **The sword-plant ding** (this session's opener — rig + design ready).
-- The M5 sfx odds (0x112/0x14a/0x173/0x31B family).
-- FLAKY CRASH RESET (Sasquatch intro; rig designed, STATE 14z-85f).
-- Pyron's medallion whitening on 2P hover (row-0x1A family).
-- H-vs-P stuck-direction (~1/30, possibly emulator-side).
-- Round-end flicker (parked; needs the maintainer's recording).
-- Win-screen QUOTE (both tenants); select medallions polish;
-  region_space re-freeze; op-tagging for test_shared_writes.
+| build/m5_stock | stock twin | 6c93cfa8 |
 
 ## Build / validate
 
 ```sh
 export ROMDIR=/path/to/reference/sets
 export MAME_BIN=~/.cache/vampire-saved/mame/cps2
-tools/build_merged.sh build/m3b_merged6      # ~15 min (729-op fixture)
+tests/audit_voice_borrow.sh build/don_m4       # ~6 min — the 14z-87 mechanism gate
+tools/build_merged.sh build/m3b_merged6        # ~15 min (729-op fixture)
 tests/audit_qs_voice_batch.sh build/m3b_merged6  # ~10 min — keyon A/B
 tests/audit_qs_voice_wav.sh build/m3b_merged6    # ~12 min — EAR-level A/B
-tests/audit_trap_parity.sh build/m3b_merged6 # ~5 min — ejection+chirp
-tests/test_qs_songs.sh                       # ~30 s — song machinery
-tests/test_qs_id_table.sh                    # ~5 s — Z80 census
-tests/test_tenant_loop.sh                    # generator gate (531/729)
-tests/test_m3a_reproducible.sh               # ~6 min (all four refs)
-MERGED_OUT=build/m3b_merged6 MERGED_PREBUILT=1 \
-  tests/audit_merged_legacy.sh               # ~45 min (green at close)
+tests/audit_trap_parity.sh build/m3b_merged6   # ~5 min — ejection+chirp
+tests/test_qs_songs.sh                         # ~30 s — song machinery
+tests/test_tenant_loop.sh                      # generator gate (531/729)
+tests/test_m3a_reproducible.sh                 # ~6 min (all four refs)
 ```

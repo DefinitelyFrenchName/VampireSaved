@@ -52,8 +52,9 @@ is 0x400 bytes; combat struct at +0x000, further state above +0x100.
 
 | Extended-block offset | Meaning | Evidence |
 |---|---|---|
-| +0x382 (`$FF8782`/`$FF8B82`) | selected character ID (write 0x18 = Oboro Bishamon — TCRF cheat). Updates live with the hovered slot during character select (verified: P2 cursor R,R = 0x05→0x01→0x03 on both emulators); a not-joined side shows a different block signature entirely | [C:tcrf, D] |
+| +0x382 (`$FF8782`/`$FF8B82`) | selected character ID at select/commit — but IN MATCH it is the **VOICE-FLAVOR CLASS** for the per-node sfx dispatcher (`PRG:0x27F16` → table `0x0BF41A`), and the engine REASSIGNS it mid-match: the voice-class borrow (sequencer event → `PRG:0x0AEF6`) writes a class from the opponent-row candidate list, so a match-time read is NOT the char id (measured 0x06/0x0C/… on a Donovan P1; 14z-87, engine_internals "third pass"). Select-time behavior unchanged: updates live with the hovered slot (verified both emulators); write 0x18 = Oboro (TCRF cheat) | [C:tcrf, D, 14z-87] |
 | +0x392.w (`$FF8792`) | special-meter gauge CANDIDATE (steps 0→0x500→0x1400 while attacking; semantics unconfirmed) | [D] |
+| — voice-class borrow block (14z-87, `A5=$FF8000` frame): | pool `RAM:$FF1E48` (8 candidate classes, copied per event from ROM `0x00B268` row `(0x382,opponent)<<6 + $FF8121`), voice-number list `RAM:$FF1E50` (from ROM `0x00BB68`), in-use mask `RAM:$FF8110.l` (bit = class; sound-state-fed — the run-to-run lottery), chosen index `RAM:$FF8114.w`, scan bound `RAM:$FF8138.w` (=6 measured), venue byte `RAM:$FF8121` | [D, 14z-87] |
 
 ## Combat struct (player block +0x000) [C, verified D/T]
 

@@ -750,8 +750,12 @@ that is ported into our build at ~`PRG:0xCE3B8` (vanilla twin
     tst.w d1 ; beq skip                                ; **id 0 = SILENT**
     ... move.b (4/5,a0,d0.w),d2 ; move.w (6,a0,d0.w),d3 ; jsr helper
 
-- Per-char pointer tables: vsavj `0xBF41A`, vs2 `0xD95B8` (20 rows,
-  4-byte pointers; row = char id). Record entries are 8 bytes:
+- Per-char pointer tables: vsavj `0xBF41A`, vs2 `0xD95B8` (**32 rows**,
+  4-byte pointers, variant half 0x10-0x1F aliasing the base half —
+  re-verified 14z-87, matches bank_map `tail_data_ptr` stride 0x80; the
+  "20 rows" previously written here was wrong; row = char id — see the
+  third pass below for when the row index is NOT the char id). Record
+  entries are 8 bytes:
   `id.w, alt_id.w, p4.b, p5.b, d3.w`.
 - **`id == 0` is the engine's own silence path** — the clean way to
   suppress a sound with no faithful equivalent (used by the
@@ -961,46 +965,80 @@ across the games.
   priority-suppressed track echo, measured moving with injection
   timing).
 
-### The per-node sfx dispatch, second pass (14z-86, the sword-plant
-### "ding" investigation) — sound CLASSES, and the per-game engine voice
+### The per-node sfx dispatch, second pass (14z-86) — RETRACTED 14z-87;
+### superseded by "third pass: the VOICE-CLASS BORROW" directly below
 
-- **The (0x382,A6) byte at DISPATCH time is a SOUND CLASS, not always
-  the character id.** The dispatcher head (`move.b (0x382,a6),d1;
-  lsl.w #2,d1; lea $BF41A,a0; movea.l (a0,d1.w),a0` @vsavj 0x27F16)
-  normally reads the fighter's char id — but engine EFFECTS dispatch
-  with a class of their own: measured at the Donovan sword-plant end,
-  the dispatch on P1's block read class **0x0C** on our build, and
-  native vs2's equivalent dispatch resolved its 0x0C-class array too
-  (its own idiom, not a port artifact). WHO writes the override is
-  NOT yet measured — a byte write-watch on $FF8782 caught no write in
-  the dispatch window (candidate: a RAM-mirror write the watch missed;
-  open, next-session).
-- **THE PER-GAME ENGINE VOICE CLASS** (second worked instance; the
-  first was the trap audit's 010A-vs-010B, recorded cosmetic): a
-  SHARED engine effect fires per-node sounds through per-game DATA —
-  each game voices the same effect with its own sound. Worked
-  instance, fully measured: the sword-plant-end effect walks each
-  game's OWN (vanilla, unported) effect anim — vs2's node carries sfx
-  index 28 → its class-0x0C array → **id 0x29B** (the proper plant
-  "thunk"); vsavj's twin anim (walked at vanilla 0x1FDEF2/0x1FDF0A)
-  carries index **13** → **id 0x308**, an ordinary vsavj chime that
-  reads as a spurious "ding" in this context (maintainer field
-  report). The class-0x0C ARRAYS are byte-identical across the games
-  at those nodes (both carry 0x307/0x308/0x309 in sequence) — the
-  divergence is the NODE INDEX in each game's own effect anim, i.e.
-  engine data, not the port.
-- **The native sound is expressible on vsavj**: vsavj's own id 0x29B
-  resolves to the SAME sample content as vs2's (shared library,
-  byte-equal windows) — no sample work needed for a fix.
-- **Parked fix design** (decision brief in STATE 14z-86): redirect the
-  class byte for the TENANT-triggered effect to the variant row 0x1C
-  (vanilla-aliased to 0x0C; no legacy path writes a 0x1C class) and
-  place a curated 14-node array whose node 13 = 0x29B — native sound,
-  zero legacy surface. Blocked only on finding the class-writer (one
-  watchpoint session). Rig: tests/replays/don/90_don_plant.rpl (three
-  plants LK/MK/HK, long quiet tails); the ring A/B synchronizes with
-  native through the plant and isolates the delta to
-  ours{0x62B(=0x32B facing-aliased),0x308} vs native{0x29B}.
+[RETRACTED 14z-87 — kept for the eliminations; the conclusions are
+superseded. What survives: the dispatcher head decode (`move.b
+(0x382,a6),d1; lsl.w #2,d1; lea $BF41A,a0` @vsavj 0x27F16, vs2 twin
+0x2716A), the per-game anim-node divergence (vsavj node 13 / vs2 node
+28, anim bytes 0x0D@0x1FDF20 vs 0x1C@0x19D832), and the rig. What was
+WRONG, each re-measured 14z-87: (1) "the dispatch reads class 0x0C on
+both games / the class-0x0C arrays are byte-identical and 0x29B sits at
+their node 28" — 0x29B lives at class row 0x07/0x17 node 28 in BOTH
+games (exhaustive 32-row × 48-node scan), the 0x0C arrays are NOT
+byte-identical over their extent, and the classes actually read were
+run-varying (see below); (2) "who writes the class is unmeasured;
+mirror-write suspected" — the writer is PRG:0x0AEF6, it fires ~536
+frames BEFORE the watched window, and no RAM mirror exists (the MAME
+cps2 map is one flat range); the "invisible write" was an artifact of
+correlating a STATE-DEPENDENT value across different runs
+(docs/platform/gotchas.md, 14z-87); (3) the row-0x1C fix design is dead
+— the class is a dynamic borrow result, not a 0x0C constant.]
+
+### The per-node sfx dispatch, third pass (14z-87) — THE VOICE-CLASS
+### BORROW: (0x382,A6) is the fighter's voice-FLAVOR class
+
+**Atlas rows this section depends on:** `atlas/ram.md` ($FF1E48 pool,
+$FF8110 mask, fighter +0x382), `bank_map.toml` `tail_data_ptr`
+(0x0BF41A).
+
+- **The model:** table `0x0BF41A`'s 16 base rows are PER-CHARACTER
+  voice arrays; the per-node sfx dispatcher (`0x27F16`) plays
+  `row[(0x382,A6)][node]` — the NODE names an effect-sound slot, the
+  CLASS picks whose FLAVOR voices it. The byte usually holds the char
+  id, but the engine reassigns it.
+- **The borrow (measured end-to-end, rig 90):** at a match-sequencer
+  event (caller chain by history probe: state machine `PRG:0x0206DA`
+  sub-state advance → `jsr $AE7C`; ~f3463 in the rig), the engine hands
+  P1 a voice class: populator `PRG:0x0AF16` copies an 8-byte candidate
+  list into pool `RAM:$FF1E48` (paired voice-number list from
+  `0x00BB68` into `RAM:$FF1E50`) from ROM table **`0x00B268`**, row =
+  `(0x382,A0)<<6` + venue byte `$121(A5)` — **A0 is the OPPONENT**
+  after the entry exg dance (A5=$FF8000 here, so A0/A1 are the
+  $FF8400/$FF8800 fighter blocks). The scan at `PRG:0x0AEDA` takes the
+  first candidate whose bit in in-use mask `RAM:$FF8110` is clear and
+  writes it to `(0x382,A1)` at **`PRG:0x0AEF6`**. Verified with
+  independent redundancy: live pool bytes == ROM row 3 (Victor)
+  venue-slot 3 on both games. There is a tagged path too
+  (`tst.b $3bc(a0)` → row `0x800 + $3bd(a0)*8` — engine-tag rows after
+  the 32 char rows), and a `$AC(a5)==3` path that picks a voice number
+  by RNG — not yet needed for any port question.
+- **The candidate rows are ROSTER-AUTHORED:** vs2's Victor row is
+  `{13,00,0C,08,01,11,0F,18}` — Donovan's class first — so native
+  Donovan-vs-Victor keeps HIS OWN voice row for engine-voice events
+  (measured borrow = 0x13). vsavj's Victor row is
+  `{06,0C,01,08,07,02,0F,18}`: vanilla classes only, so a tenant P1
+  gets a vanilla flavor — the sword-plant "ding" is
+  `row[borrowed][13]` (node 13 per vsavj's engine anim). Rows
+  0x10-0x1F of both tables alias 0x00-0x0F (row 0x13 == row 0x03,
+  verified) — the tenant rows are unported.
+- **The borrow result is a LOTTERY:** the in-use mask is
+  sound-state-fed; identical-input runs measured borrows
+  0x06/0x0C/0x09/0x00 (MAME) and 0x04 (FBNeo) — the QSound-latch
+  one-frame phase (the standing masked non-determinism) flips it. So
+  the ding's exact id varies per run/venue; 14z-86's
+  ours{0x62B,0x308} / native{0x29B} ring signature reproduces
+  canonically but is one outcome, not a constant (0x308 = row0C[13];
+  0x29B = row07[28]).
+- **Fix status:** engine-side; decision brief in STATE "Decisions
+  pending — 14z-87" (accept vs the tenant-keeps-own-class thunk at
+  0x0AEF6, with the flicker-inventory cost). Gate:
+  `tests/audit_voice_borrow.sh` freezes the STABLE invariants (single
+  mid-match writer PC, pool == ROM row bytes, fired id ∈ the
+  candidate-row node-13 family). Open sub-item: the ours-only P2-block
+  class-3 node-18 dispatch (0x62B at f3966) is an EVENT difference,
+  unattributed.
 
 ## The sprite-list DRAWER: how an object becomes sprite entries
 ## (measured 14z-71 on the Huitzil beam; the layer ABOVE the OBJ entry)

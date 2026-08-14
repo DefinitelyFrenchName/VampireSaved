@@ -549,3 +549,19 @@ from the value, V/C cleared, low word only), so the deadness question stops
 needing an answer at all. STATE 14z-78 had specified this correctly ("D1 must
 be left holding the table OFFSET — a handler downstream may read it"); an
 entry-only measurement is not grounds to override a whole-effect rule.
+
+## +0x382 is the char id only at SELECT — in match it is the VOICE-FLAVOR CLASS, and the engine reassigns it (14z-87)
+
+The forced-pick pokes write the char id there, the TCRF cheat writes 0x18
+there, and audit_id_writers censuses it — all correct for select/commit.
+But mid-match the engine's voice-class borrow (match-sequencer event →
+`jsr $AE7C`, write at `PRG:0x0AEF6`) overwrites it with an allocated
+VOICE CLASS drawn from the OPPONENT's row of the candidate table
+`0x00B268` (rows authored per roster; vsavj's predate the tenants), and
+the per-node sfx dispatcher (`0x27F16`) plays `row[class][node]` from it.
+Consequences, both paid for: (1) a match-time "char id" read from +0x382
+is wrong (measured 0x06/0x0C on a Donovan P1); (2) a tenant's
+engine-voice events play a VANILLA character's flavor — the sword-plant
+"ding". Full mechanism: engine_internals "The per-node sfx dispatch,
+third pass"; decision brief: STATE "Decisions pending — 14z-87";
+mechanism gate: tests/audit_voice_borrow.sh.

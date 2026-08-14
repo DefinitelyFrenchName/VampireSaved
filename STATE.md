@@ -1,6 +1,119 @@
 # STATE — living progress log
 
-Updated: 2026-08-15 (session 14z-86 FULL close — **THE M5 VOICE-BLOCK
+Updated: 2026-08-15 (session 14z-87 — **THE SWORD-PLANT "DING" ROOT-CAUSED
+TO A DIFFERENT MECHANISM THAN 14z-86 DIAGNOSED — the parked fix design is
+DEAD, the real mechanism is measured end-to-end, and the fix is an
+ENGINE-SIDE decision: brief below ("Decisions pending — 14z-87"), no build
+shipped.** The measured mechanism (every number from this session's runs,
+rig 90, single-run serialized where it matters):
+(1) `(0x382,A6)` is the fighter's **VOICE-FLAVOR CLASS** for the per-node
+sfx dispatcher (`PRG:0x27F16` → table `0x0BF41A`, whose 16 base rows are
+the per-character voice arrays; the NODE indexes an effect-sound slot, the
+CLASS picks whose flavor plays it).
+(2) At a match-sequencer event (~f3463 in rig 90; caller chain measured by
+history probe: state machine `PRG:0x0206DA` sub-state advance → `jsr
+$AE7C`), the engine **BORROWS a voice class for P1**: populator
+`PRG:0x0AF16` copies an 8-byte candidate list into the RAM pool
+`RAM:$FF1E48` from ROM table `0x00B268` (paired voice-number table
+`0x00BB68` → `RAM:$FF1E50`), row = `(0x382,A0)<<6` — **A0 = the OPPONENT
+after the exg dance** — + venue offset `$121(A5)`; the scan at
+`PRG:0x0AEDA` takes the first candidate whose bit in the in-use mask
+`RAM:$FF8110` is clear and writes it to `(0x382,A1)` at **`PRG:0x0AEF6`**
+(`move.b d1,$382(a1)` — this is the "class writer" 14z-86 could not find).
+Verified with independent redundancy: the live pool bytes == ROM row 0x03
+(P2=Victor) venue-slot 3 on BOTH games, static == live.
+(3) vs2's Victor row is `{13,00,0C,08,01,11,0F,18}` — it CONTAINS Donovan's
+class 0x13 (vs2's candidate rows are authored for its roster), so natively
+Donovan's engine-voice events (incl. the plant-end node) play HIS OWN row's
+entries (measured: native borrow = 0x13, pool[0]). vsavj's Victor row is
+`{06,0C,01,08,07,02,0F,18}` — vanilla classes only, so ours plays a VANILLA
+row: the ding = `row[borrowed][13]` (vsavj's engine effect anim carries sfx
+node 13 where vs2's carries 28 — anim bytes 0x0D vs 0x1C, verified at
+`0x1FDF20` / vs2 `0x19D832`).
+(4) **The fired id is a LOTTERY**: the in-use mask is sound-state-fed, and
+identical-input runs borrow differently (measured: 0x06/0x0C/0x09/0x00
+across MAME runs, 0x04 on FBNeo — the documented QSound-latch one-frame
+phase is the standing non-determinism of exactly this kind). The 14z-86
+signature (ours {0x62B,0x308}, native 0x29B) reproduces canonically but is
+ONE lottery outcome, not a constant: 0x308 = row0C[13], 0x29B = row07[28].
+(5) vsavj rows 0x10-0x1F of the candidate tables alias 0x00-0x0F (Donovan's
+row 0x13 == Victor's row 0x03, verified); the tenant rows are unported.
+**Why the 14z-86 byte-watch was "silent" (both retractions):** the write
+happens ~536 frames BEFORE the dispatch window that was watched (RH-26 —
+the window bounds the claim), and CROSS-RUN CORRELATION of a
+state-dependent value manufactured the "invisible write": each run
+allocates a different class, so the value read in run B never matched the
+value written in run A. No RAM mirror exists (MAME cps2 map is one flat
+`.ram()` range) and no write was ever invisible — confirmed by both
+emulators' write taps, both MAME tap layers, and a single-run
+read+write-serialized watch (new instrument, promoted). The 14z-86 claims
+"the (0x382,A6) byte is a class OVERRIDDEN AT DISPATCH by engine effects",
+"the class-0x0C arrays are byte-identical across the games / vs2 node 28 →
+0x29B in the class-0x0C array" (0x29B lives at row 0x07/0x17 node 28; the
+0x0C arrays are NOT byte-identical over their full extent), and
+"mirror-write suspected" are RETRACTED; the variant-row-0x1C fix design is
+DEAD (the borrowed class is dynamic — 0x0C was one outcome — and the writer
+is engine code on a legacy-reached path reading the LEGACY OPPONENT's
+table row). Grep-the-claim pass done on engine_internals/NEXT_SESSION/
+STATE. Instruments captured per the suite doctrine:
+`tests/lua/read_tap.lua` (the first non-debug PC-attributed READ tap — the
+instrument that broke the case), `tests/audit_voice_borrow.sh` (the
+mechanism frozen as stable invariants: single mid-match writer PC, pool ==
+ROM row bytes, fired id ∈ the candidate-row node-13 family). GOTCHA filed
+(platform): a state-dependent value may not be correlated ACROSS runs —
+write and read must be serialized in ONE run; debug and non-debug runs are
+different worlds, and even identical non-debug runs differ through the
+QSound-latch phase. OPEN SUB-ITEM: the ours-only P2-block class-3 node-18
+dispatch (0x62B at f3966; native does not fire it in the window) is an
+EVENT difference, unattributed — separate from the flavor mechanism, and
+the recommended fix would not change it. NEXT: the maintainer ruling on
+the brief below; then (if (b)) the thunk + flicker re-measurement, or the
+voice-scope odds.)
+
+### Decisions pending — 14z-87: the sword-plant "ding" (engine voice-class
+### borrow). Maintainer ruling requested.
+
+**The defect, in one sentence:** when a tenant is in the match, the
+engine's voice-class borrow (match-sequencer event → `PRG:0x0AEF6`) can
+only hand P1 a VANILLA voice class — the candidate list comes from the
+OPPONENT's row of a per-character ROM table (`0x00B268`) that vs2 authored
+for its full roster and vsavj obviously didn't — so tenant engine-voice
+events (the plant-end chime among them) play a random vanilla character's
+flavor, varying run-to-run with the QSound-latch phase.
+
+**Option (a) — accept as a per-game engine-voice deviation.** Zero code.
+The ding stays: always some vanilla effect id (0x308-family measured),
+varying by venue/state. The maintainer explicitly reported it, so
+acceptance seems unlikely, but it is the zero-risk baseline.
+
+**Option (b) — the tenant-keeps-own-class thunk (RECOMMENDED).** At the
+borrow write (`PRG:0x0AEF6`, inside `$AE7C`): if `(0x382,A1)`'s PRE-value
+is ≥ 0x10 (a tenant id — legacy gameplay never writes 0x10-0x1F there,
+`tests/audit_id_writers.sh`), skip the borrow: the byte already holds the
+tenant's own class, and our authored voice row (don_sfx_records at
+`0x400E60`: node 13 = authored 0x61 = vs2's 0x709, node 28 = 0x6D = 0x715,
+all sample-backed M5 content) plays HIS OWN voice — which is what native
+does vs Victor (measured pool[0] = 0x13). Covers Huitzil/Pyron for free.
+Known deviations vs native, both cosmetic-positive: when 0x13 is in-use
+native falls back to another resident row, ours would keep 0x13 (strictly
+more Donovan-flavored, and it REMOVES the lottery); and the LINE differs
+(vsavj's engine anim asks node 13 → his 0x709-equivalent; native's node 28
+→ 0x715-equivalent — both his own voice). COST: an engine-site hook on a
+legacy-reached (rare, ~once-per-match-phase) path — added cycles land on
+legacy replays, so the frozen flicker inventories may move → re-measure
+and maintainer ratification per the 2026-07-27 standing watch.
+Implementation checklist item: the skip must keep `$FF8114` (index) and
+`$FF8100` (voice number from table `0x00BB68`) coherent — measure their
+consumers before choosing skip-whole vs skip-write-only.
+
+**Option (c) — optional completeness (either way):** port vs2's rows
+0x10/0x11/0x13 of BOTH tables (`0x00B268`/`0x00BB68`) into our variant
+rows (data-only, tenant rows). This fixes the MIRRORED direction (a
+legacy P1 borrowing FROM a tenant opponent's row — today it reads the
+row-3 alias, which is sane but unported); it CANNOT fix the reported
+direction (the row read there belongs to the legacy opponent).
+
+Previously: 2026-08-15 (session 14z-86 FULL close — **THE M5 VOICE-BLOCK
 BATCH SHIPPED AND FIELD-CONFIRMED: all 79 scoped voice/sfx ids restored
 across the three tenants (donovan-m4 84f49aaa / huitzil-m12 e1f598d6 /
 pyron-m6 4c6e3fb6, merged build/m3b_merged6), through TWO
@@ -36,7 +149,11 @@ deliberately — the restored voices now PLAY, shifting those replays'
 timelines; legacy masked classes held throughout), voice-batch keyon
 gate + WAV gate + trap parity on merged6, merged legacy audit
 AUDIT-EXIT 0. **PARKED (decision brief + rig ready): the sword-plant
-"ding"** — diagnosed NOT a port defect but THE PER-GAME ENGINE VOICE
+"ding"** [DIAGNOSIS SUPERSEDED 14z-87 — see the entry above: the real
+mechanism is the engine VOICE-CLASS BORROW at PRG:0x0AEF6; the
+0x0C-constant / node-28-in-the-0x0C-array / mirror-write readings below
+are RETRACTED, and the row-0x1C fix design is dead] — diagnosed NOT a
+port defect but THE PER-GAME ENGINE VOICE
 class (engine_internals "per-node sfx dispatch, second pass"): a
 shared engine effect dispatches with SOUND CLASS 0x0C (the (0x382,A6)
 byte is a class, overridden by effects); each game's own effect anim

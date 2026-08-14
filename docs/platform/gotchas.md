@@ -819,3 +819,34 @@ not the reads absent (RH-15). For chip-side sample questions use the
 register stream (the d000-d002 write log), the loaded-region dump
 (space:read_u8 works fine for YOUR reads), or the ear-level WAV capture —
 not read taps on device ROM spaces.
+
+## A state-dependent value may not be correlated ACROSS runs — serialize read and write in ONE run (14z-87)
+
+The sword-plant "ding" hunt spent most of a session on a phantom
+"invisible write": a write tap on `$FF8782` said the last mid-match write
+was 0x06, a debugger bp said the dispatcher later READ 0x0C from that
+byte, both instruments were provably live — and no mechanism on either
+emulator can change RAM without a bus write. The resolution: **the value
+is a dynamic ALLOCATION result (the voice-class borrow scan), and every
+run allocates differently** — measured 0x06/0x0C/0x09/0x00 across
+identical-input MAME runs and 0x04 on FBNeo. The write from run A was
+being compared with the read from run B. In one run with read AND write
+taps installed together (`tests/lua/read_tap.lua`), the write was 0x0C
+and the read was 0x0C: nothing was ever invisible.
+
+Two sub-traps, both paid for here:
+- **Debug and non-debug runs are different worlds** (the standing
+  checksum gotcha), but so are two IDENTICAL non-debug runs when the
+  value derives from sound state: the QSound handshake latch's one-frame
+  phase (the documented masked non-determinism) feeds the in-use mask
+  the borrow scan consults, so even the canonical timeline is a lottery
+  at this one point.
+- **The watch window bounds the claim** (RH-26): the 14z-86 byte-watch
+  covered the DISPATCH window and concluded "no write"; the write fires
+  ~536 frames earlier, at a match-sequencer event. Run write watches
+  unwindowed first — the boot-POST hits double as the liveness control.
+
+Rule: before comparing a written value with a read value, demand they
+come from the SAME run, serialized by one instrument. For any value fed
+by allocation, RNG, or sound state, a cross-run equality argument is not
+evidence — it is the phantom-generator.
