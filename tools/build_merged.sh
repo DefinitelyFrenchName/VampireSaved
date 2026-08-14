@@ -177,7 +177,7 @@ done
 FP="$(python3 tools/build_fingerprint.py "$OUT/rompath;$ROMDIR" --set vsavjw --sha-only)"
 cat > "$OUT/README.txt" <<EOF
 3-TENANT MERGED BUILD WITH GFX (tools/build_merged.sh, 14z-83 S4).
-Program: the 678-op merged image. Gfx: the S2 chain (D -> H -> P), last
+Program: the 729-op merged image. Gfx: the S2 chain (D -> H -> P), last
 link's members packed; group B pristine.
 NOT REGISTERED (S6 decision) — run_suite refuses it until frozen.
 fingerprint: $FP

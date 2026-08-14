@@ -1,11 +1,13 @@
 #!/bin/sh
 # test_m3a_reproducible.sh — the M3b Phase 0 reproducibility gate (14z-65).
 #
-# EVERY frozen reference must rebuild BIT-EXACT from the current tree:
-#   donovan-m3a (WIDE)  4b7d0dc7319ed6cf94a02b22938cdb18946dfddd
+# EVERY frozen reference must rebuild BIT-EXACT from the current tree
+# (the CURRENT four live in the EXPECT_* lines below — this header names
+# them; the dated ladder of superseded fingerprints follows there too):
+#   donovan-m4 (WIDE)   84f49aaab0641e071f8db00a69c839754643594f
 #   m5_stock            6c93cfa8a8a80ae2303d3acaf8c7bff487f369c5
-#   huitzil-m3 (WIDE)   34c8b47de5a43a67e7292f16d0ad133d287fa7e4
-#   pyron-m2   (WIDE)   69e8c6f08b9fc5859948e50cfb41156d62adf1ec
+#   huitzil-m12 (WIDE)  e1f598d6113f32ed5bda66a684e53d30b36447e9
+#   pyron-m6   (WIDE)   4c6e3fb6785cc9b418dd52744c7046a6a459f71e
 #
 # EXTENDED 14z-76 from the original pair to all four. This is the standing
 # gate for the M3b multi-tenant refactor and its value scales with the count:

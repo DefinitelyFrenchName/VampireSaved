@@ -809,3 +809,13 @@ and so was the first WAV checker (it only flagged collapsed high band, not
 elevated — the maintainer's ear caught what the threshold passed; the
 checker now flags both directions). The packer keeps parity; the
 found-in-vsav path requires parity-matching hits.
+
+## A Lua read tap on a device_rom_interface space sees NOTHING (14z-86)
+
+`install_read_tap` over MAME's `:qsound` "rom" space logged zero hits while
+the DSP audibly streamed samples — the rom interface reads through cached
+direct pointers, bypassing the tap layer entirely. The instrument was dead,
+not the reads absent (RH-15). For chip-side sample questions use the
+register stream (the d000-d002 write log), the loaded-region dump
+(space:read_u8 works fine for YOUR reads), or the ear-level WAV capture —
+not read taps on device ROM spaces.

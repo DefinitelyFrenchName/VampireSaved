@@ -153,7 +153,8 @@ tools/run_wide.sh build/m3b_merged6 fbneo  # THE 3-TENANT BUILD (all 18
                                            # VOICE BATCH (79 restored
                                            # voice/sfx ids, field-confirmed;
                                            # open: the plant ding)
-tools/run_wide.sh build/m5_wide fbneo      # or the solo builds; ... mame
+tools/run_wide.sh build/don_m4 fbneo       # or the solo builds (hui39,
+                                           # pyron24); ... mame
 ```
 
 **Current WIDE builds (14z-86, THE M5 VOICE BATCH):** `build/hui39` =
@@ -179,21 +180,22 @@ dirs remain the tenant_loop/build_merged inputs).
 `build/m5w` (`ac52eeff`) is the KNOWN-BAD artifact of the 14z-60y sprite
 garble, kept as evidence — do not playtest it. `tools/audit_romset_identity.py
 build/m5w/rompath` names its four shadowed members in a second.
-**`build/m3b_merged4` is the MERGED BUILD WITH GFX** (14z-83 S4,
-`tools/build_merged.sh`; rebuilt through 14z-85f/g/g(2)): the 678-op
-3-tenant program image (owner tag + sfx records + x028122 damage
-work-var rows + the chirp sound_stub + the shock class remaps) + the
-S2 gfx chain (D → H → P, last link's members packed, group B
-pristine). UNREGISTERED until the S6 freeze decision — run_suite
-refuses it. The 14z-85g(2) merged-legacy-audit carry-forward is
-CLOSED (14z-86): `MERGED_OUT=build/m3b_merged4 MERGED_PREBUILT=1
-tests/audit_merged_legacy.sh` AUDIT-EXIT 0 (leg a 14/14 on the
-ratified classes verbatim; the audit's frozen op count re-frozen
-677→678 to match tenant_loop's 14z-85g re-freeze — the m9 sound_stub
-op — per the script's own re-freeze-tenant_loop-FIRST protocol). The pre-fix
-`build/m3b_merged` (FG) and `build/hui34`/`hui36` (chirp/shock) are
-kept as the parity audits' known-bad references. Rebuild:
-`ROMDIR=... tools/build_merged.sh build/m3b_merged4` (~15 min); its
+**`build/m3b_merged6` is the MERGED BUILD WITH GFX** (14z-83 S4,
+`tools/build_merged.sh`; rebuilt through 14z-86): the 729-op 3-tenant
+program image (owner tag + sfx records + damage work-var rows + the
+chirp/shock fixes + THE M5 VOICE BATCH: remaps, alias-thunk pokes,
+farm stubs) + the S2 gfx chain (D → H → P, group B pristine) + the
+authored Z80/sample members (`vsw.z01/z02`, `vsw.21m` — both playback
+laws enforced). UNREGISTERED until the S6 freeze decision — run_suite
+refuses it. The merged legacy audit is GREEN on it at 14z-86 close
+(AUDIT-EXIT 0; the audit's frozen op count re-frozen 678→729 per its
+own tenant_loop-FIRST protocol; earlier same-session it ran green on
+merged4 at 678, closing the 14z-85g(2) carry-forward). Superseded
+merged intermediates (m3b_merged4/5, pre-v1.1) do not boot on current
+binaries without member injection. The pre-fix `build/m3b_merged`
+(FG) and `build/hui34`/`hui36` (chirp/shock) are kept as the parity
+audits' known-bad references (same injection caveat). Rebuild:
+`ROMDIR=... tools/build_merged.sh build/m3b_merged6` (~15 min); its
 fingerprint moves with the generator — do not pin it.
 `build/merged1` is the **MERGED-LEGACY INSTRUMENT** (14z-81; carries the
 14z-82 type-renumber + F2 fixes) — the 3-tenant program image with gfx
@@ -207,7 +209,9 @@ pair with:
 ```sh
 GEN_FLAGS="--allow-plausible --tripwire-open" tools/build_donovan.sh 6 build/m5_stock
 KEY_SET=vsavj GEN_FLAGS="--allow-plausible --tripwire-open --profile cps2-wide-v1" \
-    tools/build_donovan.sh 6 build/m5_wide
+    tools/build_donovan.sh 6 build/don_m4   # (build/m5_wide = the superseded
+                                            # donovan-m3a dir; its extract stays
+                                            # the tenant_loop/merged input)
 ```
 
 Three things must agree and `run_wide.sh` asserts all three, naming the one
