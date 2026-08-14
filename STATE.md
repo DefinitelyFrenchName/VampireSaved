@@ -1,6 +1,38 @@
 # STATE — living progress log
 
-Updated: 2026-08-13 (session 14z-85f close — **THE FINAL GUARDIAN
+Updated: 2026-08-14 (session 14z-85g close — **THE PLASMA-TRAP SOUND
+PARITY ITEM IS CLOSED BY MEASUREMENT; the fix rides the M5 arc as its
+named PILOT.** The four-leg ring A/B (87/88 × ours/native, new FULL
+ring-tap mode capturing complete 16-byte entries) killed the 14z-85e
+volume/pan hypothesis AND its premise: (1) **0x049A is PERIODIC
+AMBIENT** — ~144f cadence from f2594, pre-trap, both games; the
+14z-82d "detonation id" attribution was two cadence beats
+(RETRACTED in place; audit_trap_sound re-scoped to what it really
+locks — spawn + ring liveness). (2) **The trap's real sounds are
+per-node record nodes 10/11**: native fires 0x0739 at the mine spawn
+and 0x073A at the timer detonation, every attempt; ours fires NEITHER
+because the 14z-85b curation zeroed them — **CORRECTLY: vsavj keys
+MUSIC-family content at those very ids** (keyons 6/5-voice vs vs2's
+single-voice sfx; un-zeroing = the music-retrigger bug). Silence-far
+is the music fix's designed cost; the maintainer's "sounds near" is
+other ids (hit/kept-node family), not the detonation records. (3) THE
+RESTORATION = the M5 voice-samples PILOT, now named: vs2's two
+samples (0x73A ≈ one ~20KB window, bank 108; 0x739 needs the
+45-frame re-probe — sweep-blind delayed attack) into the WIDE QSound
+upper 8MB, NEW free vsavj ids, record nodes 10/11 remapped. Two ids,
+one array — the smallest end-to-end proof of the whole arc. (4) NEW
+GATE tests/audit_trap_parity.sh: frozen per-attempt inventories
+(native 0739/010b/073a; ours 010a known-open — re-freeze at the
+pilot), FORBIDS 0739/073a on ours (their appearance IS the music
+bug), per-leg ambient liveness, verdict control; ring_tap.lua gained
+FULL mode (default mode line-compatible, audit_trap_sound still
+green). Secondary observation recorded, not gated: ours 0x010A vs
+native 0x010B at the same event — a shared-library pair reached
+through a per-char engine row, the defense-rows family (cosmetic).
+NEXT SESSION: the M5 voice arc opens with the trap pilot — 0x02E5
+id-entry decode first (14z-85d), then the two-sample port.)
+
+Previously: 2026-08-13 (session 14z-85f close — **THE FINAL GUARDIAN
 DAMAGE PARITY ITEM IS CLOSED: root-caused, fixed, and verified
 BIT-EXACT to native vs2.** Both 14z-85e hypotheses were eliminated by
 measurement (scaler tables byte-equivalent; native hit count identical
@@ -634,6 +666,19 @@ vanilla characters including Buletta" — full-scope test to follow.
    Rig: ring-tap BOTH legs (ours + native-vs2 poke) on the trap
    replays, compare the FULL 16-byte ring entries (param fields, not
    just ids) for near and far detonations.]**
+   **[CLOSED 14z-85g, 2026-08-14 — the volume/pan hypothesis is DEAD
+   and the premise was mis-founded: 0x049A is PERIODIC AMBIENT (~144f
+   cadence starting pre-trap, both games — the 14z-82d "detonation id"
+   was a cadence coincidence). The real trap sounds are per-node
+   record ids 0x0739 (spawn) / 0x073A (timer detonation), measured
+   firing on native vs2 per attempt and ABSENT on ours because the
+   14z-85b curation zeroed nodes 10/11 — CORRECTLY: vsavj keys
+   MUSIC-family content at those ids (keyons: 6/5-voice vs vs2's
+   single-voice sfx). Silence-far is the music-fix's designed cost;
+   restoration = the M5 voice-samples PILOT (vs2's two samples into
+   the WIDE QSound upper 8MB, NEW free ids, record nodes 10/11
+   remapped). Gate: tests/audit_trap_parity.sh freezes the known-open
+   delta and FORBIDS 0739/073a on ours. See the 14z-85g entry.]**
 2. **NEW, detail pending: one of Phobos' EX moves may carry wrong
    DAMAGE DATA** (explicitly not animation/sound/feel). Awaiting the
    move name + expected-vs-observed numbers; the rig once named is the
@@ -1335,7 +1380,11 @@ replays can be sound-tapped at all):
 3. hui29's timer rig demonstrably fires AND sounds the trap: type-69
    spawns at f3432/f4232, detonation id 0x049A enqueued at f3571/f3716
    (throw id 0x010A at f3474). So the MK detonation sfx EXISTS on hui29
-   and is identical on hui30.
+   and is identical on hui30. **[CORRECTED 14z-85g: 0x049A is PERIODIC
+   AMBIENT — f3571/f3716 are two ~144f cadence beats (the cadence runs
+   from f2594, before any trap input, on native vs2 too). The trap's
+   real sfx are record ids 0x0739/0x073A, zeroed on our builds by the
+   14z-85b curation. The hui29==hui30 A/B equality stands.]**
 4. The explanation that fits "only the MK version": the (b') crash's
    reproducing input WAS medium kick (14z-78/79) — pre-hui29 the MK
    detonation killed the machine BEFORE its sfx ever played. The

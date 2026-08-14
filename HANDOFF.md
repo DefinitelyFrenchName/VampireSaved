@@ -556,18 +556,33 @@ tests/audit_hitclass_map_cost.sh      # 14z-82b ON-DEMAND (~20 min): the
                                       # frames, zero divergence); fire census
                                       # (legacy enters the map 0 times).
                                       # Never freezes the probe
-tests/audit_trap_sound.sh             # 14z-82d (~10 min, 2 runs): the MK
-                                      # Plasma Trap SPAWNS (type-69 pool
-                                      # write) and SOUNDS (ring id 0x049A) on
-                                      # the current huitzil build — locks the
-                                      # behavior the (b') fix restored; a
-                                      # silent/crashing trap is loud here.
-                                      # LK/HK 'silence' RESOLVED 14z-84
-                                      # (proximity-triggered on OUR build),
-                                      # REOPENED 14z-85e as a PARITY item:
-                                      # native VS2 sounds SYSTEMATICALLY —
-                                      # ring-entry volume/pan A/B is the rig
-                                      # (STATE 14z-85e)
+tests/audit_trap_sound.sh             # 14z-82d, RE-SCOPED 14z-85g (~10 min):
+                                      # the MK Plasma Trap SPAWNS (type-69
+                                      # pool write) and the sound RING is
+                                      # live during the run (id 0x049A —
+                                      # which 14z-85g measured as PERIODIC
+                                      # AMBIENT, ~144f cadence starting
+                                      # pre-trap; the 14z-82d "detonation
+                                      # id" attribution is RETRACTED). Still
+                                      # locks the (b') crash fix (a crashing
+                                      # trap dies before ANY ring activity).
+                                      # The PARITY question is CLOSED by
+                                      # measurement — see audit_trap_parity
+tests/audit_trap_parity.sh            # 14z-85g (~5 min, 2 parallel runs):
+                                      # THE TRAP-SOUND PARITY GATE — replay
+                                      # 87 on native vsav2 AND the build;
+                                      # frozen per-attempt inventories:
+                                      # native 0739(spawn)/010b/073a(timer
+                                      # detonation), ours 010a only. The
+                                      # missing pair = per-node record nodes
+                                      # 10/11, ZEROED CORRECTLY by the
+                                      # 14z-85b curation (vsavj keys MUSIC
+                                      # content at those ids); restoration =
+                                      # the M5 voice-samples PILOT (new ids
+                                      # + record remap — re-freeze then).
+                                      # Also FORBIDS 0739/073a on ours
+                                      # (their appearance = the music bug).
+                                      # Verdict control + per-leg liveness
 tests/audit_type_dispatch_range.sh    # 14z-82, EXTENDED 14z-85 (~15 min, 7
                                       # guarded runs): on the MERGED build,
                                       # ZERO obj_hook dispatches in the

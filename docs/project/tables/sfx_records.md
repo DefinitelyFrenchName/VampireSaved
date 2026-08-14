@@ -32,7 +32,7 @@ holds keep-id lookalikes, so bounds are exact, never padded.
 | | **0x198 0x199** | measured SHARED 14z-85: identical keyon signatures both sets — (0,20480,12548), the same sample family as don's kept 0x119 |
 | zeroed: mismatch | 0x12C | vsavj keys a DIFFERENT sample window ((32768,49151) vs vs2's (16384,32767), same length — a different slice) |
 | zeroed: silent | 0x3E2 | no keyons either set |
-| zeroed: voice block | 0x735-0x74E (16 ids) | his vs2 voice/sfx bank; vsavj keys OTHER content across that gap (3-8 keyons each) — unfaithful |
+| zeroed: voice block | 0x735-0x74E (16 ids) | his vs2 voice/sfx bank; vsavj keys OTHER content across that gap (3-8 keyons each) — unfaithful. **14z-85g: nodes 10/11 of this block (0x739 trap spawn / 0x73A trap timer-detonation) are the measured cause of the trap-sound parity gap (native fires them per attempt; audit_trap_parity freezes the delta) — NAMED FIRST TARGETS of the M5 pilot: vs2's samples into the WIDE QSound upper 8MB, NEW free vsavj ids, these two record entries remapped. vs2 0x73A keyon (15,108,0,20480) ≈ a single ~20KB sample; 0x739 keyed nothing in the 12-frame sweep (delayed attack — use the 45-frame re-probe when porting)** |
 
 ## pyron — `pyr_sfx_records` (23 entries, vs2 `0x0C8B18`; 14z-85)
 

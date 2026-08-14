@@ -765,6 +765,30 @@ that is ported into our build at ~`PRG:0xCE3B8` (vanilla twin
   `addi.w #$300,d1` (the +0x300 id alias seen in the sweep maps) and
   jumps into the enqueue path.
 
+### Ring-level facts from the trap parity A/B (14z-85g, measured on
+### replay 87 ours-vs-native, FULL ring tap)
+
+- **Id 0x049A is PERIODIC AMBIENT**: ~144-frame cadence starting
+  f2594 (pre-trap, both games; the enqueue PCs are the vanilla
+  `PRG:0x31EA` routine at identical addresses in both engines). Its
+  `+6` param word sits at 0x1200 baseline and rises to 0x1400/0x1500
+  around action — the first live observation of a non-id entry field
+  varying (level-ish semantics, not yet decoded). The 14z-82d
+  "detonation id 0x049A" attribution was two cadence beats — RETRACTED.
+- **The trap's real sfx are per-node record nodes 10/11** (ids
+  0x0739 spawn / 0x073A timer detonation; Huitzil array vs2
+  `0x0C742A`). Native fires them per attempt; timer-detonation 0x073A
+  appears on the FAR spacing (the near legs' mines did not reach the
+  timer path in rig 88's shape). vsavj keys MUSIC-family content at
+  those same ids (keyons: 6/5-voice vs vs2's single-voice sfx) — the
+  same-id-different-content class, which is why the 14z-85b curation
+  zeroed them and why any restoration must use NEW ids (the M5 arc).
+- **Ours 0x010A vs native 0x010B** at the same event (~throw+40f):
+  both shared-library single-voice sounds (same start/end, relocated
+  banks), reached through a per-char engine row — the defense-rows
+  family (tenant rides the vanilla vsavj row). Cosmetic, recorded in
+  the audit header, not gated.
+
 ## The sprite-list DRAWER: how an object becomes sprite entries
 ## (measured 14z-71 on the Huitzil beam; the layer ABOVE the OBJ entry)
 

@@ -1,30 +1,26 @@
 #!/bin/sh
-# audit_trap_sound.sh — the MK Plasma Trap fires AND sounds (14z-82d lock).
+# audit_trap_sound.sh — the MK Plasma Trap fires, ring live (14z-82d
+# lock, RE-SCOPED 14z-85g).
 #
 # WHY. Air 214+MK's detonation crashed the machine on every Phobos build
-# before the 14z-79 (b') fix — so its sfx had never been HEARD, and the
-# maintainer's hui30 playtest read the restored sound as a new change.
-# The 14z-82d measurement chain (ring A/B hui29-vs-hui30 byte-identical
-# on both trap rigs; the liveness probes that named the mine as pool
-# TYPE 69) resolved it. This audit locks the resolved behavior so a
-# regression is loud: on the current huitzil build, the 87 timer rig
-# must SPAWN the mine (type-69 write into the projectile pool) and SOUND
-# its detonation (id 0x049A enqueued into the ring shortly after).
-# Measured ground truth (hui29 == hui30): spawns f3432/f4232, throw id
-# 0x010A f3474, detonation id 0x049A at f3571/f3716.
+# before the 14z-79 (b') fix. This audit locks that fix: the 87 timer
+# rig must SPAWN the mine (type-69 write into the projectile pool) and
+# the sound RING must be live across the run (id 0x049A enqueued — a
+# crashing trap dies before any ring activity continues).
 #
-# RESOLVED NOT-A-BUG (maintainer, 14z-84): the detonation sound is
-# PROXIMITY-TRIGGERED — all three variants sound with the opponent
-# near. The item this line used to file as KNOWN-OPEN — LK/HK
-# detonations have NO sound and never did — whether that is vs2-faithful
-# needs a native three-strength comparison when the sound arc comes.
-# REOPENED AS A PARITY QUESTION (maintainer, 14z-85e): on NATIVE VS2
-# the detonation sound is SYSTEMATIC, not proximity-gated — the 14z-84
-# closure compared our build against itself. This audit's own facts
-# stand (the id IS enqueued even in 'silent' cases), which points the
-# hypothesis at the ring entry's VOLUME/PAN params (QSound is
-# positional): compare full 16-byte entries near/far, ours vs native
-# vs2. See STATE 14z-85e.
+# RETRACTED (14z-85g): the 14z-82d attribution of 0x049A as "the
+# detonation sfx" was a timing coincidence — 0x049A is PERIODIC AMBIENT
+# (~144-frame cadence, starts f2594, BEFORE any trap input, on native
+# vs2 too; its f3571/f3716 hits are two cadence beats, not two
+# detonations). The trap's REAL sounds are per-node record nodes 10/11
+# (ids 0x0739 spawn / 0x073A timer detonation), measured on native vs2
+# — and on our build they are ZEROED BY THE 14z-85b CURATION, correctly
+# (vsavj keys MUSIC-family content at those same ids; un-zeroing =
+# the music-retrigger bug). The parity question this header used to
+# carry is therefore CLOSED BY MEASUREMENT: silence far is the
+# curation's designed cost; restoration = the M5 voice-samples pilot.
+# THE PARITY GATE is tests/audit_trap_parity.sh (frozen per-attempt
+# inventories, ours vs native; forbids 0739/073a on ours).
 #
 # Usage: ROMDIR=... tests/audit_trap_sound.sh [builddir]   (~10 min, 2 runs)
 set -eu
@@ -59,7 +55,9 @@ else
     exit 1
 fi
 
-# ── 2: the detonation SOUNDS (id 0x049A in the ring after the spawn) ────
+# ── 2: the ring is LIVE across the trap window (ambient id 0x049A
+#       present — a crash would cut the cadence; NOT the detonation id,
+#       see the header retraction) ─────────────────────────────────────
 REPLAY="$PWD/tests/replays/hui/87_hui_plasma_trap.rpl" FRAMES=5000 \
 POKES="$PK" TRACE_OUT="$W/ring.txt" MAME_SANDBOX="$W/sbx2" \
 MAME_ROMPATH="$(abspath "$BUILD")/rompath;$ROMDIR" \
@@ -67,14 +65,13 @@ MAME_ROMPATH="$(abspath "$BUILD")/rompath;$ROMDIR" \
     -autoboot_script "$PWD/tests/lua/ring_tap.lua" >/dev/null 2>&1 || true
 DET="$(grep -c "id 049a" "$W/ring.txt" || true)"
 if [ "${DET:-0}" -ge 1 ]; then
-    echo "  PASS  2: detonation sfx enqueued (id 049a x$DET)"
+    echo "  PASS  2: ring live across the trap window (ambient 049a x$DET)"
 else
-    echo "  FAIL  2: detonation id 0x049A never reached the ring — the"
-    echo "        MK trap has gone silent (or worse: check the guard on"
-    echo "        this rig; pre-(b') builds CRASHED here)"
+    echo "  FAIL  2: ambient id 0x049A never reached the ring — the run"
+    echo "        died or the tap is dead (pre-(b') builds CRASHED here)"
     fail=1
 fi
 
-[ "$fail" = 0 ] && echo "audit_trap_sound: PASS (MK trap fires and sounds)" \
+[ "$fail" = 0 ] && echo "audit_trap_sound: PASS (MK trap fires; ring live)" \
                 || echo "audit_trap_sound: FAILURES"
 exit "$fail"

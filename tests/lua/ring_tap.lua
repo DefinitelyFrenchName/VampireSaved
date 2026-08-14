@@ -41,11 +41,23 @@ if replay_path then
     end
 end
 local tap
+-- FULL=1 (14z-85g): ALSO log every word write into the ring, tagged with
+-- entry index + offset, so the complete 16-byte entry {id.l, d2.l, d3.l,
+-- pad} is reconstructable (the trap-parity A/B needs the d2/d3 param
+-- fields, not just the id). The id lines above stay UNCHANGED in both
+-- modes — audit_trap_sound.sh greps their exact format.
+local full = (os.getenv("FULL") or "") ~= ""
 local function install()
     tap=space:install_write_tap(0xFF0E0E,0xFF1DFF,"ring",function(offset,data,mask)
         if frame<wa or frame>wb then return end
+        local rel = offset - 0xFF0E0E
+        if full then
+            f:write(string.format("F f%d e%02x +%x %04x pc %06x\n",
+                frame, math.floor(rel/16), rel%16, data & 0xFFFF,
+                cpu.state["CURPC"].value))
+        end
         -- 68k move.l splits into two word writes; the id low word lands at +2
-        if (offset - 0xFF0E0E) % 16 ~= 2 then return end
+        if rel % 16 ~= 2 then return end
         local id=data & 0xFFFF
         if true then
             f:write(string.format("f%d id %04x pc %06x\n", frame, id, cpu.state["CURPC"].value))

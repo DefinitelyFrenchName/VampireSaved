@@ -1,4 +1,4 @@
-# NEXT SESSION — orientation (written at the close of 14z-85f, 2026-08-13)
+# NEXT SESSION — orientation (written at the close of 14z-85g, 2026-08-14)
 
 > ## START HERE
 >
@@ -21,16 +21,25 @@
 > crash reset (Don-perfect-win → Sasquatch intro; see Still open
 > below and STATE 14z-85f). Next, in maintainer-pressure order —
 > the crash rig first if the maintainer hits it again:
-> 1. **Plasma-trap detonation sound** parity item (UNCHANGED from
->    14z-85e): systematic on native vs2, proximity-gated on ours; the
->    id IS enqueued when "silent" → volume/pan ring-entry params
->    hypothesis; rig = full 16-byte ring-entry A/B near/far, ours vs
->    native (audit_trap_sound has the enqueue side).
+> 1. ~~Plasma-trap detonation sound parity~~ **CLOSED BY MEASUREMENT
+>    (14z-85g)**: the trap's sfx are record nodes 10/11 (0x739 spawn /
+>    0x73A timer detonation) — native fires them, ours has them ZEROED
+>    by the 14z-85b curation, CORRECTLY (vsavj keys MUSIC at those
+>    ids). The volume/pan hypothesis is dead; 0x049A is periodic
+>    ambient (the 14z-82d attribution retracted). Gate:
+>    tests/audit_trap_parity.sh (frozen known-open delta; forbids
+>    0739/073a on ours). The fix = the M5 pilot below.
 > 2. **THE M5 VOICE-SAMPLES ARC** (ruled GO; brief in STATE 14z-85c;
 >    Z80 RE state in 14z-85d — id table @FILE 0x11006 4B/id both
->    games; next concrete step: decode the 0x02E5 id-entry consumption
->    from the captured qtrace → entry format + sample bank/start/end).
->    Restored ids CANNOT keep vs2 numbers (0x700+ are vsavj MUSIC).
+>    games). **OPENS WITH THE TRAP PILOT (14z-85g): port vs2's two
+>    trap samples (0x73A ≈ one ~20KB window bank 108; 0x739 needs the
+>    45-frame re-probe) into the WIDE QSound upper 8MB, NEW free
+>    vsavj ids, remap record nodes 10/11, re-freeze
+>    audit_trap_parity** — two ids, one array, the smallest end-to-end
+>    proof of the whole arc. First concrete step unchanged: decode the
+>    0x02E5 id-entry consumption from the captured qtrace → entry
+>    format + sample bank/start/end. Restored ids CANNOT keep vs2
+>    numbers (0x700+ are vsavj MUSIC).
 > 3. ~~Tenant DEFENSE rows decision~~ **DECIDED (maintainer,
 >    2026-08-14): keep the vanilla vsavj approximation** — choice +
 >    exact values + the option-(a) change recipe documented in
@@ -59,6 +68,13 @@
 >   fighter-path 10 HP; no longer the parity item's gate.
 > - tests/lua/bp_regs.lua — NEW instrument: replay/POKES playback +
 >   auto-resuming debugger breakpoints logging registers at named PCs.
+> - tests/audit_trap_parity.sh — NEW (14z-85g): the trap-sound parity
+>   gate (native + build, frozen per-attempt inventories, forbids
+>   0739/073a on ours, verdict control).
+> - tests/lua/ring_tap.lua — FULL=1 mode: complete 16-byte entry
+>   capture (default mode line-compatible).
+> - tests/audit_trap_sound.sh — RE-SCOPED: spawn + ring-liveness lock
+>   (0x049A = periodic ambient; the detonation attribution retracted).
 
 ## Current builds (registry)
 
@@ -83,8 +99,8 @@
   poke + tripwire breakpoints via bp_regs.lua + pool dumps, N=20)
   in STATE 14z-85f. NOTE: a tripwire fire here is the instrument
   working — capture the reset PC before theorizing.
-- Plasma-trap detonation sound parity (rig named above).
-- THE M5 VOICE-SAMPLES ARC (ruled GO; the next big implementation).
+- THE M5 VOICE-SAMPLES ARC (ruled GO; opens with the trap pilot —
+  see START HERE).
 - Pyron's medallion whitening on 2P hover (row-0x1A family).
 - H-vs-P stuck-direction (~1/30, possibly emulator-side).
 - Round-end flicker (parked; needs the maintainer's recording).
