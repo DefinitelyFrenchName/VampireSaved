@@ -1548,12 +1548,13 @@ record byte `+0x10` vs the victim's recent-hit ring at `+0x6C`
 (`+0x144`, victim) is incremented by the REACTION handlers (vs2 beam
 reaction `0x56002`: +3/tick), not by the appliers.
 
-**Port note (defense side, OPEN):** tenant ids sit on vanilla vsavj
-defense-table rows — row 0x10's curve and low-HP threshold
-(vsavj 0x38 vs vs2 0x28 for Huitzil) are vanilla leftovers, NOT the
-characters' native vs2 values. Filed 14z-85f as a decision brief
-(gameplay-feel: adopting vs2 defense rows is a variant-gated table
-extension, the hitclass precedent).
+**Port note (defense side, DECIDED 2026-08-14):** tenant ids sit on
+vanilla vsavj defense-table rows — row 0x10's curve and low-HP
+threshold (vsavj 0x38 vs vs2 0x28 for Huitzil) are vanilla values,
+NOT the characters' native vs2 tuning. Maintainer-ruled KEPT as the
+deliberate vsavj approximation; the values and the would-be change
+recipe live in docs/project/tables/defense_rows.md. (Pyron's rows are
+identical between the games — unaffected either way.)
 
 ## Shadow / reflection servants (14z-66; premise CORRECTED 14z-68f)
 

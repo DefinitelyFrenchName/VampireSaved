@@ -98,8 +98,16 @@ Cheap first check before any of that: does the 61_tenant_2pwin replay
 family already cover a 2P tenant win → COM transition? If yes, diff
 what the perfect path adds.
 
-### Decisions pending — 14z-85f: tenant DEFENSE-side table rows
-### (defender curves + low-HP rally thresholds)
+### Decisions — 14z-85f: tenant DEFENSE-side table rows (defender
+### curves + low-HP rally thresholds). **DECIDED (maintainer,
+### 2026-08-14): OPTION (b) — keep the vanilla vsavj approximation,
+### with the choice and the change recipe DOCUMENTED** in
+### docs/project/tables/defense_rows.md (exact rows both games, the
+### option-(a) thunk shape, reader-site PCs, and the re-freeze cost —
+### Donovan's row would supersede donovan-m3a). Measured scope note:
+### Pyron needs nothing either way (his rows are byte-identical
+### between the games); the delta is two defense rows (H/D, exactly
+### content-swapped) + two threshold bytes. Original brief follows:
 
 Found during the scaler-table compare: the per-character DEFENSE table
 (vsavj 0x0B8940 ↔ vs2 0x0D2ABE, 32B/id row) and the low-HP rally

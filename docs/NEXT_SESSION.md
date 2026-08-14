@@ -31,11 +31,11 @@
 >    games; next concrete step: decode the 0x02E5 id-entry consumption
 >    from the captured qtrace → entry format + sample bank/start/end).
 >    Restored ids CANNOT keep vs2 numbers (0x700+ are vsavj MUSIC).
-> 3. **NEW DECISION PENDING (14z-85f): tenant DEFENSE rows** — tenants
->    ride vanilla vsavj defender-curve/low-HP-threshold rows, not
->    their native vs2 values (found in the table compare; brief with
->    options in STATE). Recommended shape: variant-gated table
->    extension, hitclass precedent. Maintainer's call; nothing blocks.
+> 3. ~~Tenant DEFENSE rows decision~~ **DECIDED (maintainer,
+>    2026-08-14): keep the vanilla vsavj approximation** — choice +
+>    exact values + the option-(a) change recipe documented in
+>    docs/project/tables/defense_rows.md (Pyron needs nothing either
+>    way; the delta is 2 rows + 2 threshold bytes). No work item.
 >
 > ## Corrections that must outlive this session (14z-85f)
 >
@@ -85,7 +85,6 @@
   working — capture the reset PC before theorizing.
 - Plasma-trap detonation sound parity (rig named above).
 - THE M5 VOICE-SAMPLES ARC (ruled GO; the next big implementation).
-- Tenant DEFENSE rows decision (14z-85f brief).
 - Pyron's medallion whitening on 2P hover (row-0x1A family).
 - H-vs-P stuck-direction (~1/30, possibly emulator-side).
 - Round-end flicker (parked; needs the maintainer's recording).

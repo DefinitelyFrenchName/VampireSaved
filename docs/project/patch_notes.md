@@ -2944,8 +2944,10 @@ Builds: huitzil-m8 = build/hui34 (c48cd722), pyron-m5 = build/pyron23
 Reconciliation rows added (applier 0x28A6A↔0x29738 verified + the five
 scaler-table data rows); verified build-inert (fingerprint unchanged).
 
-**OPEN, filed as a decision brief (STATE 14z-85f):** tenant DEFENSE
-rows — ids 0x10/0x11/0x13 ride vanilla vsavj defense-table rows and
-low-HP thresholds, not their native vs2 values (defender-side; found
-during the table compare). Adopting vs2's rows = a variant-gated
-table extension (hitclass precedent); gameplay-feel, maintainer's call.
+**DECIDED (maintainer, 2026-08-14): keep the vanilla vsavj
+approximation** for the tenant DEFENSE rows (defender-side; found
+during the table compare). The choice, the exact values on both
+sides, and the option-(a) change recipe (variant-gated reader thunks,
+hitclass precedent; Donovan's row would supersede donovan-m3a) are
+documented in docs/project/tables/defense_rows.md. Pyron needs
+nothing either way — his rows are byte-identical between the games.
