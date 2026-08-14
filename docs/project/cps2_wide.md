@@ -19,7 +19,15 @@ CPS-2 WIDE v1
   GFX    : 48 MB   12 uniform 4 MB members (3 groups of 4)
                    19-bit tile address via the CPS-2 Turbo rule (see below)
   QSOUND : 16 MB   4 uniform 4 MB members
-  Z80    : unchanged (256 KB; ~27 KB free measured, not a constraint)
+  Z80    : 256 KB unchanged in SIZE; since v1.1 (14z-86) the two driver
+           members are CONTENT members `vsw.z01/z02` (sentinel CRCs
+           0xdec0de38/39 in both descriptors, resolve by NAME) so builds
+           can carry authored M5 song rows (tools/build_qs_songs.py +
+           build/manifest/qs_songs.toml; gate tests/test_qs_songs.sh).
+           Stock names vm3.01/02 would hash-shadow to vsav.zip's
+           pristine members (the 14z-60z class). The canonical overlay
+           ships STOCK bytes; content builds patch free id rows + zero
+           runs only (vanilla-span identity gated). ~27 KB free measured.
   Everything else: bit-identical stock CPS-2
 ```
 
@@ -407,9 +415,32 @@ bank-1 codes (374 codes as of m3a) — not a constraint.
 
 ## Known limits, stated up front
 
-- **MiSTer**: ~70 MB of ROM is out of reach for 32 MB configurations. WIDE
-  v1 is a desktop-emulation profile; a MiSTer-shaped variant would need
-  the per-slot exclusivity work to pull GFX back toward 32 MB.
+- **MiSTer** (source-verified 14z-86, jtcores @1ae053f3 + jtdsp16
+  @71fa564a — replaces the 14z-85c filed-not-verified note):
+  - QSound IS LLE (jtcps15_sound.v instantiates jtdsp16 running the
+    real dl-1425.bin, streamed to BRAM at download) — the 14z-85c
+    premise holds.
+  - **BUT the stock sample-address path is 23 bits (8 MB) and the
+    bank latch keeps only 7 bits** (`jtcps15_sound.v:47,361-367`:
+    `qsnd_addr[22:16] <= dsp_ab[6:0]`) — banks 0x80+ ALIAS onto
+    0x00-0x7F, i.e. relocated samples would MIS-PLAY legacy audio,
+    not stay silent. MAME's 16-bit bank register has no such mask.
+  - The 16 MB growth is a ~4-line RTL width fix (qsnd_addr 23→24,
+    bank latch [6:0]→[7:0], PCM_AW 23→24): SDRAM bank 1 already
+    holds 16 MB under JTFRAME_SDRAM_LARGE and the loader path is
+    [23:1] — region sizes are header-driven, no MRA/toml change.
+  - **The full WIDE set does not fit MiSTer regardless**: GFX is
+    architecturally capped at 32 MB (two 16 MB banks), 68k PRG at
+    4 MB, and the 64 MB JTFRAME_SDRAM_LARGE ceiling (+26-bit ioctl)
+    excludes ~70 MB; the bigger JTFRAME_SDRAM_XL tier exists in
+    jtframe but no shipped core uses it — adopting it is core
+    surgery, not a descriptor tweak. A MiSTer-shaped variant still
+    means pulling GFX back toward 32 MB (per-slot exclusivity) and
+    PRG within 4 MB.
+  - Consequence for M5: sfx restored at banks < 0x80 (the 14z-86
+    ejection pilot rides vsav's own image at bank 0x18) are
+    MiSTer-compatible as-is; only content placed in the QSound
+    extension (banks 0x80+) needs the width fix.
 - **Netplay**: FBNeo is the primary target because it is the GGPO rollback
   reference platform. A custom build means peers need the same binary and
   the same set — release notes must say so.

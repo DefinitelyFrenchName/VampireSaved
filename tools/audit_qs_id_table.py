@@ -57,14 +57,16 @@ def main():
     if not zpath:
         sys.exit("src must be <set.zip>:<prefix>")
     z = zipfile.ZipFile(zpath)
-    # the Z80 driver is exactly <prefix>.01 + <prefix>.02 (the audio-cpu
-    # members); a bare prefix match would also swallow the gfx/qsound
+    # the Z80 driver is exactly <prefix>.01 + <prefix>.02 (stock naming:
+    # vm3.01) or <prefix>01 + <prefix>02 (the WIDE content members
+    # vsw.z01/z02); a bare prefix match would also swallow the gfx/qsound
     # members (vm3.05a..vm3.20m)
-    members = sorted(n for n in z.namelist()
-                     if n.lower() in (prefix.lower() + ".01",
-                                      prefix.lower() + ".02"))
-    if not members:
-        sys.exit(f"no {prefix}.01/{prefix}.02 members in {zpath}")
+    p = prefix.lower()
+    wanted = {p + ".01", p + ".02", p + "01", p + "02"}
+    members = sorted(n for n in z.namelist() if n.lower() in wanted)
+    if len(members) != 2:
+        sys.exit(f"no {prefix}(.)01/02 member pair in {zpath} "
+                 f"(found {members})")
     data = b""
     for n in members:
         b = z.read(n)

@@ -199,9 +199,9 @@ index 8602b6ca..bbde2ac1 100644
 +	ROM_LOAD64_WORD( "vsw.37m",   0x2000006, 0x400000, CRC(dec0de37) SHA1(0444481dc5526fcc96defbe153562778967b8374) )
 +
 +	ROM_REGION( QSOUND_SIZE, "audiocpu", 0 ) // 64k for the audio CPU (+banks)
-+	ROM_LOAD( "vm3.01",   0x00000, 0x08000, CRC(f778769b) SHA1(788ce1ad8a322179f634df9e62a31ad776b96762) )
++	ROM_LOAD( "vsw.z01",  0x00000, 0x08000, CRC(dec0de38) SHA1(9d35ba74a9ec5e19325d8bb05317b9c4aaba4020) ) // WIDE v1.1 Z80 content member (14z-86): SENTINEL hashes, resolves by name so builds can patch the sound driver (M5 songs); stock vm3.01 bytes when unpatched
 +	ROM_CONTINUE(         0x10000, 0x18000 )
-+	ROM_LOAD( "vm3.02",   0x28000, 0x20000, CRC(cc09faa1) SHA1(2962ef0ceaf7e7279de3c421ea998763330eb43e) )
++	ROM_LOAD( "vsw.z02",  0x28000, 0x20000, CRC(dec0de39) SHA1(d6b46b13b927ef03cc89f1b7eaa943476231ecbb) ) // sentinel (see vsw.z01)
 +
 +	ROM_REGION( 0x1000000, "qsound", 0 ) // QSound samples — WIDE v1: 8MB -> 16MB
 +	ROM_LOAD16_WORD_SWAP( "vm3.11m",   0x000000, 0x400000, CRC(e80e956e) SHA1(74181fca4b764fb3c56ceef2cb4c6fd6c18ec4b6) )

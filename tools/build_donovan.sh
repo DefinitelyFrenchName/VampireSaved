@@ -274,6 +274,15 @@ if python3 -c "import json,sys; sys.exit(0 if json.load(open('$OUTBASE/patch/pat
     echo "WIDE build: packing as $PACK_SET (merging $PACK_MERGE)"
     ROMDIR="$ROMDIR" tools/pack_build.sh "$OUTBASE/prg" "$OUTBASE/rompath" \
         --set "$PACK_SET" --merge "$PACK_MERGE" > /dev/null
+    # WIDE v1.1 (14z-86): inject the authored Z80 songs (M5) into the
+    # packed set's vsw.z01/z02 content members. Applied to EVERY WIDE
+    # build uniformly — the rows live at FREE ids (driver no-ops unless
+    # a record fires them) and the members are outside the program
+    # fingerprint, so frozen references are unaffected by construction.
+    if [ -f build/manifest/qs_songs.toml ]; then
+        python3 tools/build_qs_songs.py "$OUTBASE/rompath/vsavjw.zip" \
+            "$ROMDIR/vsav2.zip" || exit 1
+    fi
 else
     ROMDIR="$ROMDIR" tools/pack_build.sh "$OUTBASE/prg" "$OUTBASE/rompath" > /dev/null
 fi

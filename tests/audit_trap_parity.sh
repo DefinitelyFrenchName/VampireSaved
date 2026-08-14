@@ -16,10 +16,17 @@
 #    0x4F2E row (was stubbed_sound -> rts, the 14z-65 blanket 0x7xx
 #    silence) is now kind=sound_stub sfx_id=0x199: a synthesized
 #    vsavj twin stub. The detonation chirp fires SYSTEMATICALLY.
-#  - EJECTION (0x739) still silent: record node 10 zeroed — vsavj
-#    keys MUSIC-family content at that id and no vsavj equivalent is
-#    measured; fully M5 scope (maintainer-scoped 2026-08-14). When
-#    the M5 port ships it, re-freeze OURS_EXPECT — deliberately.
+#  - EJECTION RESTORED (14z-86, huitzil-m11, the M5 pilot): record
+#    node 10 remapped 0x739 -> 0xD8, an AUTHORED Z80 song row
+#    (build/manifest/qs_songs.toml via tools/build_qs_songs.py): vs2's
+#    one-note song copied verbatim at a free vsavj id; its sample
+#    content is byte-identical in vsav's own image (0x18D800 = vsavj
+#    record #0x5C = note-table-1 entry 0x28), so no sample port. The
+#    +0x300 helper alias lands on the authored twin 0x3D8 (mirrors
+#    native's 0xA39). Keyon A/B measured matching native (voice 11/12,
+#    0x2800 window). OURS_EXPECT re-frozen deliberately with 00d8 in
+#    the 0739 slot of BOTH windows — the re-freeze this header
+#    anticipated since m9.
 #
 # ALSO LOCKED: ours MUST NOT enqueue 0x0739/0x073A (on vsavj they are
 # music — their appearance would BE the music bug), and the periodic
@@ -36,7 +43,7 @@ set -eu
 ROMDIR="${ROMDIR:?set ROMDIR}"
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"
-BUILD="${1:-build/hui34}"
+BUILD="${1:-build/hui38}"
 [ -d "$BUILD/rompath" ] || { echo "SKIP: no build at $BUILD"; exit 0; }
 WIDE_BIN="${MAME_BIN:-$HOME/.cache/vampire-saved/mame/cps2}"
 [ -x "$WIDE_BIN" ] || { echo "SKIP: no WIDE MAME binary"; exit 0; }
@@ -78,10 +85,12 @@ WINDOWS = [(3400, 3900), (4200, 4700)]
 # equal — ours' attempt 2 also carries an 0117/00f3 pair, an ordinary
 # engine event on that leg's timeline).
 NATIVE_EXPECT = [["0739", "010b", "073a"], ["0739", "010b", "073a"]]
-OURS_EXPECT   = [["010a", "0199"], ["010a", "0199", "0117", "00f3"]]
-# ours: 0199 = the RESTORED detonation chirp (vsavj id for 0x73A's
-# content); 0739 (ejection) stays absent pending M5; 010a-vs-010b is
-# the recorded per-char-row cosmetic delta
+OURS_EXPECT   = [["00d8", "010a", "0199"],
+                 ["00d8", "010a", "0199", "0117", "00f3"]]
+# ours: 00d8 = the RESTORED ejection (14z-86 authored Z80 song, the
+# 0739 slot); 0199 = the RESTORED detonation chirp (vsavj id for
+# 0x73A's content); 010a-vs-010b is the recorded per-char-row
+# cosmetic delta
 FORBIDDEN_OURS = {"0739", "073a"}             # music on vsavj — never
 
 def parse(leg):
@@ -117,9 +126,9 @@ native = parse("native"); ours = parse("ours")
 errs += verdict(native, NATIVE_EXPECT, "native")
 errs += verdict(ours, OURS_EXPECT, "ours")
 if not errs:
-    print("  ok: native fires 0739/010b/073a per attempt; ours fires")
-    print("      010a + the RESTORED detonation chirp 0199 (ejection 0739")
-    print("      still M5-pending, by scope)")
+    print("  ok: native fires 0739/010b/073a per attempt; ours fires the")
+    print("      RESTORED ejection 00d8 (the 0739 slot, authored Z80 song)")
+    print("      + 010a + the RESTORED detonation chirp 0199")
 
 # Verdict-logic control: the checker on a mutated inventory MUST fail.
 mut = [(f, ("0111" if i == "0199" else i)) for f, i in ours]
@@ -133,6 +142,6 @@ for e in errs: print("FAIL:", e)
 sys.exit(1 if errs else 0)
 PY
 rc=$?
-[ "$rc" = 0 ] && echo "audit_trap_parity: PASS (restored-detonation state holds)" \
+[ "$rc" = 0 ] && echo "audit_trap_parity: PASS (restored ejection+detonation state holds)" \
              || echo "audit_trap_parity: FAILURES"
 exit "$rc"

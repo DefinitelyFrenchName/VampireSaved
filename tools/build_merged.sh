@@ -141,6 +141,12 @@ rm -rf "$GFXSTAGE"
 RPZIP="$(cd "$OUT/rompath" && pwd)/vsavjw.zip"
 ( cd "$CHAIN" && zip -q -X "$RPZIP" vsw.*m )
 echo "  ok: group-A members + group-C simms from the last link ($CHAIN)"
+# WIDE v1.1 (14z-86): authored Z80 songs (M5) into vsw.z01/z02 — same
+# uniform injection as build_donovan.sh's WIDE branch.
+if [ -f build/manifest/qs_songs.toml ]; then
+    python3 tools/build_qs_songs.py "$RPZIP" "$ROMDIR/vsav2.zip" || {
+        echo "FAIL: qs song injection"; exit 1; }
+fi
 # group B must stay PRISTINE in the packed vsav.zip (de-substitution)
 python3 - "$OUT/rompath/vsav.zip" "$ROMDIR/vsav.zip" <<'PY'
 import sys, zipfile

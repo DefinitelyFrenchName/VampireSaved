@@ -68,6 +68,13 @@ def main():
             zf.writestr(f"vsw.{21+i}m", blank)
         GROUP_B = ["vm3.14m", "vm3.16m", "vm3.18m", "vm3.20m"]
         parent = zipfile.ZipFile(os.path.join(a.romdir, "vsav.zip"))
+        # WIDE v1.1 (14z-86): the Z80 driver members are CONTENT members
+        # named vsw.z01/z02 (sentinel CRCs 0xdec0de38/39 in both
+        # descriptors) so builds can patch the sound driver (M5 songs)
+        # without hash-shadowing to vsav.zip's pristine vm3.01/02 (the
+        # 14z-60z class). The canonical overlay carries stock bytes.
+        for zn, pn in (("vsw.z01", "vm3.01"), ("vsw.z02", "vm3.02")):
+            zf.writestr(zn, parent.read(pn))
         for i in range(a.gfx):
             name = f"vsw.{31+2*i}m"   # odd names mirror the stock interleave
             if a.gfx_copy_group_b and i < len(GROUP_B):
@@ -82,7 +89,8 @@ def main():
     print("  NOTE: group C descriptor CRCs are SENTINELS (0xdec0de31..37), "
           "never member CRCs — any real value hash-shadows (pristine-B was "
           "14z-60z; the zero-fill CRC collides with the zero QSound members, "
-          "14z-62d). Do not 'fix' them to match these files.")
+          "14z-62d). Do not 'fix' them to match these files. The Z80 members "
+          "vsw.z01/z02 (0xdec0de38/39) are the same class since WIDE v1.1.")
     print("  NOTE: descriptor sizes in FBNeo's VsavjwRomDesc[] must match "
           "these members exactly — a member LARGER than its declared length "
           "is silently truncated at load (load.cpp), with no diagnostic.")

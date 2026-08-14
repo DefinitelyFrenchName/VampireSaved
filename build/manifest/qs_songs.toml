@@ -1,0 +1,38 @@
+# qs_songs.toml — authored Z80 sound-driver songs (the M5 voice arc).
+#
+# Consumed by tools/build_qs_songs.py, which injects the rows into a WIDE
+# build's vsw.z01/z02 members (the Z80 driver — WIDE v1.1 content members,
+# sentinel CRCs 0xdec0de38/39). Format facts: docs/game/engine_internals.md
+# "The QSound Z80 driver" (14z-86, reader-traced). Every song row is copied
+# VERBATIM from a reference driver (provenance below); the builder refuses
+# non-free target ids, non-zero placement spans, and placements below flat
+# 0x10000 (entry byte0==0 is the driver's own free/no-op marker, so such a
+# song would be unreachable).
+#
+# THE 0x739 EJECTION PILOT (14z-86; maintainer-ruled GO 14z-85c, ejection
+# scoped M5 2026-08-14). vs2's mine spawn-ejection "pop" is a one-note Z80
+# song whose sample content sits byte-identical in vsav's own image
+# (vs2 0x255800-0x257FFF == vsav 0x18D800, = vsavj sample record #0x5C =
+# note-table-1 entry 0x28 — all pre-existing on vsavj). Only the SONG rows
+# are missing; these two restore them at free vsavj ids. The pair mirrors
+# the engine's own +0x300 alias (helper `addi.w #$300,d1` on
+# `btst #0,$70(a6)`): native backs 0x739 AND 0xA39 with twin songs
+# (slot 11 / slot 12), so we author both. Wired from the 68k side by
+# huitzil.toml's hui_sfx_records remap_ids "0x739:0xD8" — the helper's
+# alias path then lands on 0x3D8 exactly as native lands on 0xA39.
+
+[[song]]
+name = "hui_trap_eject"            # vs2 id 0x739 — mine spawn-ejection
+id = 0x0D8                          # FREE vsavj row (census 14z-86); +0x300 alias 0x3D8 also free
+place = 0x3C980                     # flat offset in the 0x3C977-0x40000 zero run (vsw.z02)
+vs2_src = 0x34332                   # vs2 song block (priority + 16 slots + stream)
+len = 0x33
+provenance = "VS2"
+
+[[song]]
+name = "hui_trap_eject_alt"        # vs2 id 0xA39 (= 0x739 + 0x300, the helper alias)
+id = 0x3D8
+place = 0x3C9C0
+vs2_src = 0x35ACD                   # byte-identical stream, slot 12 instead of 11
+len = 0x33
+provenance = "VS2"

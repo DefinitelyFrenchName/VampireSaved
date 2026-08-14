@@ -2078,9 +2078,16 @@ note = "trap dome hit record 2: class 0x52 -> 0x06 (vs2-alias-proven)"
 # reconciliation_huitzil.toml. This remap keeps node 11
 # content-faithful for any record-path dispatch of it (none observed
 # in the 87/88 rigs — data-only, protected by the keep set either
-# way). Node 10 (0x739, the mine-EJECTION sound) stays zeroed — no
-# measured vsavj equivalent; fully M5 scope (maintainer-scoped
-# 2026-08-14). Gate: tests/audit_trap_parity.sh.
+# way). 14z-86 (the M5 ejection pilot): node 10 (0x739, the
+# mine-EJECTION sound) is REMAPPED to vsavj 0xD8 — an authored Z80
+# song row (build/manifest/qs_songs.toml via tools/build_qs_songs.py:
+# vs2's 0x739 one-note song copied verbatim; its sample content is
+# byte-identical in vsav's own image at 0x18D800 = vsavj record #0x5C
+# = note-table-1 entry 0x28, so no sample port). The helper's +0x300
+# alias path (btst #0,$70(a6) -> addi.w #$300) lands on 0x3D8, the
+# authored twin of native's 0xA39 alias song. Keyon A/B measured
+# matching native (voice 11/12, 0x2800 window). Gates:
+# tests/audit_trap_parity.sh (re-frozen), tests/test_qs_songs.sh.
 [[sound_table]]
 stage = 6
 profile = "cps2-wide-v1"
@@ -2089,6 +2096,6 @@ hole = "wide_ext"
 src = 0x0C742A
 entries = 24
 ptr_table = 0x0BF41A
-keep_ids = "0x110,0x111,0x112,0x198,0x199"
-remap_ids = "0x73A:0x199"
+keep_ids = "0x110,0x111,0x112,0x198,0x199,0x0D8"
+remap_ids = "0x73A:0x199,0x739:0x0D8"
 unstub = "0x005122=0x004CE2"

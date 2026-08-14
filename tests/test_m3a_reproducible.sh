@@ -49,7 +49,11 @@ EXPECT_STOCK="6c93cfa8a8a80ae2303d3acaf8c7bff487f369c5"
 # vsavj 0x199) + the node-11 record remap
 # EXPECT_HUI="3d9ffc896d7a2d5d70d75a912848134dbe2e284c"  # git tag freeze/huitzil-m9
 # 14z-85g(2): + the two trap-shock class region_fix rows (0x52 -> 0x06)
-EXPECT_HUI="9a948a11b0184d576442b14784ad37fc98123a3a"
+# EXPECT_HUI="9a948a11b0184d576442b14784ad37fc98123a3a"  # git tag freeze/huitzil-m10
+# 14z-86 (the M5 ejection pilot): + record node 10 remap 0x739 -> 0xD8
+# (keep_ids + remap_ids in hui_sfx_records; the authored Z80 song rows
+# live in vsw.z01/z02 OUTSIDE the program fingerprint)
+EXPECT_HUI="6eed421be848c2de333bec9a82ef74de18cd88c9"
 # pyron-m3 (14z-82c: + the ADOPTED hitclass_map_extend thunk — the f7997 fix)
 # EXPECT_PYR="6c7f7322da793c12b3681dd3ef5a76b3792ae5d0"  # git tag freeze/pyron-m3
 # pyron-m4 (14z-85b, maintainer-ruled: + pyr_sfx_records — kills the merged
