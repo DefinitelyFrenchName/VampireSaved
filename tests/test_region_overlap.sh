@@ -24,12 +24,41 @@
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"
-BUILDS="${*:-build/m5_wide build/hui30 build/pyron21}"
+# 14z-90 (GitHub issue #9). Sections 1-4 below are a FROZEN HISTORICAL
+# MEASUREMENT taken on build/m5_wide + build/hui30 + build/pyron21 — the trio
+# current at 14z-77. Those numbers are NOT re-pointed at today's builds, and
+# that is deliberate: STATE.md records "the 2,000 conflicting bytes across
+# x026142/x028122/x05c800/x2b7ef4" as the evidence that DELETED the shared-span
+# dedup work item. Overwriting 2000 with today's figure would detach a closed
+# decision from the measurement that closed it.
+#
+# What was actually wrong is that this was the ONLY thing the gate asserted, so
+# it reported PASS about three builds nobody ships. Section 5 adds the CURRENT
+# trio. Both are true at once; neither replaces the other.
+HIST_BUILDS="build/m5_wide build/hui30 build/pyron21"
+CUR_BUILDS="build/don_m5 build/hui40 build/pyron25"
+BUILDS="${*:-$HIST_BUILDS}"
+
+# Presence is two-tier. An UNBUILT tree (no build dir has placements.json at
+# all) skips once and says so. A tree that HAS builds but is missing a named
+# one is a stale pin or a pruned dir, and that must be loud — a silent exit 0
+# here is how a gate ends up reporting on builds that are not there.
+_have=0
+for b in $BUILDS $CUR_BUILDS; do
+    [ -f "$b/patch/placements.json" ] && _have=1
+done
+if [ "$_have" = 0 ]; then
+    echo "SKIP: no build dir carries patch/placements.json (unbuilt tree;"
+    echo "      build dirs are untracked). Nothing was measured."
+    exit 0
+fi
 for b in $BUILDS; do
-    if [ ! -f "$b/patch/placements.json" ]; then
-        echo "SKIP: $b has no patch/placements.json (build dirs are untracked)"
-        exit 0
-    fi
+    [ -f "$b/patch/placements.json" ] || {
+        echo "FAIL: $b has no patch/placements.json, but other builds do —"
+        echo "      this gate names that build, so a missing one is a stale"
+        echo "      pin or a pruned dir, not a reason to pass quietly"
+        exit 1
+    }
 done
 
 python3 - $BUILDS <<'PY'
@@ -123,6 +152,69 @@ for b in bad: print("  FAIL: %s" % b)
 sys.exit(1 if bad else 0)
 PY
 
-echo "PASS: region overlap frozen — 17 shared spans, 2000 conflicting bytes,"
-echo "      the space demand that per-tenant copies would create, and the"
-echo "      normalisation control that makes those numbers real"
+echo "  (sections 1-4 are the FROZEN 14z-77 measurement on $BUILDS)"
+
+# --- 5: the CURRENT trio (14z-90, issue #9) -----------------------------
+# The gate above asserts facts about builds that are no longer shipped. This
+# section asserts the same shape on the builds that ARE. Measured 2026-08-16
+# on build/don_m5 (donovan-m5) + build/hui40 (huitzil-m13) + build/pyron25
+# (pyron-m7). Only run when the caller did not name its own trio.
+if [ $# -eq 0 ]; then
+    echo "== 5: the CURRENT trio — don_m5 / hui40 / pyron25 =="
+    for b in $CUR_BUILDS; do
+        [ -f "$b/patch/placements.json" ] || {
+            echo "FAIL: current build $b has no patch/placements.json"; exit 1; }
+    done
+    python3 - $CUR_BUILDS <<'PY'
+import json, subprocess, sys
+def run(extra):
+    out = subprocess.run([sys.executable, "tools/audit_region_overlap.py",
+                          *sys.argv[1:], "--json", *extra],
+                         capture_output=True, text=True)
+    if out.returncode != 0:
+        print("  FAIL: audit tool errored\n" + out.stderr); sys.exit(1)
+    return json.loads(out.stdout)
+
+bad = []
+def eq(what, got, want):
+    if got != want: bad.append("%s: got %r, expected %r" % (what, got, want))
+
+d = run([])
+eq("shared spans", len(d["shared"]), 17)
+eq("name collisions", len(d["name_clash"]), 8)
+eq("unique to one tenant", len(d["unique"]), 13)
+# The span figures MOVED from the 14z-77 trio, and that movement is the point:
+# 2000 -> 2012, with every one of the four spans shifting. A gate frozen only
+# on the old trio could not see this.
+FROZEN_CUR = {"x026142": (65, 54), "x028122": (39, 50),
+              "x05c800": (486, 347), "x2b7ef4": (1063, 1561)}
+for n, (solo, conf) in FROZEN_CUR.items():
+    v = d["blobs"].get(n, {})
+    eq("%s (1-differs, conflict)" % n, (v.get("solo"), v.get("conflict")),
+       (solo, conf))
+eq("total conflicting bytes", d["total_conflict"], 2012)
+und = sorted(n for n, v in d["blobs"].items() if v.get("undecidable"))
+eq("two-tenant spans reported undecidable", len(und), 13)
+
+# Same normalisation control as section 4: without it the figure is an
+# artefact of three independent allocators, not a fact about the content.
+raw = run(["--no-normalise"])
+eq("un-normalised total", raw["total_conflict"], 7603)
+if raw["total_conflict"] <= d["total_conflict"]:
+    bad.append("normalisation did not reduce the count on the current trio")
+
+if bad:
+    print("  FAIL (current trio):")
+    for b in bad: print("    " + b)
+else:
+    print("  ok: 2012 conflicting bytes over the same 4 spans (7603 raw);")
+    print("      17 shared / 8 collisions / 13 unique / 13 undecidable —")
+    print("      the SHAPE is unchanged from 14z-77, the figures moved")
+sys.exit(1 if bad else 0)
+PY
+fi
+
+echo "PASS: region overlap frozen — 17 shared spans; 2000 conflicting bytes on"
+echo "      the 14z-77 trio and 2012 on the shipped trio, both asserted; the"
+echo "      space demand per-tenant copies would create; and the normalisation"
+echo "      control that makes those numbers real"

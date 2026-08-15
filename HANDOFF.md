@@ -1096,6 +1096,13 @@ tests/test_effect_palette_table.sh    # 14z-76: the per-character palette POINTE
                                       # variant row, a build clobbering a base-half
                                       # row). tools/audit_effect_palette_table.py.
                                       # Static, seconds
+tests/test_region_overlap_control.sh  # 14z-90 (issue #9): ground truth that the
+                                      # region-overlap gate's CURRENT-trio
+                                      # constants can fail. Points section 5 at
+                                      # the superseded trio (must reject:
+                                      # 2000 vs 2012) and names an absent build
+                                      # (must FAIL, not SKIP), plus a positive
+                                      # control. No ROMs, no emulator, ~2 min
 tests/test_movability_liveness.sh     # 14z-90 (issue #5): ground truth that
                                       # tests/audit_region_movability.sh cannot
                                       # score a DEAD emulator as `runs`. Injects
