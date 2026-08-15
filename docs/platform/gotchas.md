@@ -850,3 +850,19 @@ Rule: before comparing a written value with a read value, demand they
 come from the SAME run, serialized by one instrument. For any value fed
 by allocation, RNG, or sound state, a cross-run equality argument is not
 evidence — it is the phantom-generator.
+
+## A QSound "pure synthetic beep" is a TIGHT-LOOP sample — and a raw-window render can never reproduce it (14z-87b)
+
+The hardware plays samples only; a clean pitched tone is a sample record
+whose loop region is a few dozen samples (vsavj record #0x3E: loop
+0xFFF4-0xFFFF = 11 saturated bytes → ~1.17kHz pure tone at the driver
+rate). Two paid-for corollaries: (1) rendering a record's raw window
+start→end ONCE mischaracterizes its in-engine sound completely — the
+sustained tone lives in the loop, not the window; render attack + loop
+repetitions, or better, isolate the real sound by DIFFERENCING a
+silence-probe build's audio against the reference build's (the two runs
+are identical until the silenced id's first enqueue, so the difference IS
+the sound); (2) a silence-probe verdict must compare the DIFFERENCE
+SIGNAL, not envelope peaks at chosen frames — peak equality at two
+timestamps "refuted" the true beep source for half a session while the
+global diff showed audio removed at exactly the enqueue frame.

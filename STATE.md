@@ -24,6 +24,30 @@
 ### 0x012, 0x111. Blocked on the maintainer's pick; next instrument if
 ### needed: per-id silence-probe builds (the 0x152 pattern) over the
 ### remaining candidates.
+###
+### 14z-87b UPDATE (same day): the maintainer's round-1 verdict — NONE of
+### the raw-window WAVs is the beep, and the beep is "far shorter than 1s,
+### a very clean PURE SYNTHETIC beep, not sounding like a sample" — CRACKED
+### IT TWICE OVER. (1) On QSound a "pure synthetic tone" IS a sample with a
+### TIGHT LOOP (a few dozen samples repeating = a clean pitched tone), so
+### my raw-window renders could never have sounded like the beep — a
+### rendering-method error, and a lesson: never represent in-engine sound
+### by playing a raw window once. (2) My 0x152 "refutation" is RETRACTED —
+### it compared envelope peaks at two frames instead of the difference
+### signal; the global probe-vs-m5 WAV diff shows audio REMOVED starting
+### exactly at the 0x152 enqueue (f4450), and the ISOLATED difference
+### signal is **~300ms of ~1.17kHz pure tone** — the 11-sample saturated
+### loop of vsavj sample record #0x3E (loop 0xFFF4-0xFFFF) playing as a
+### synthetic beep, matching the maintainer's description in duration,
+### pitch class, and character. The isolated in-engine sound + vs2's
+### proper 0x152 sample sent for ear confirmation (round 2). If confirmed:
+### fix = the M5 pipeline — authored song verbatim + authored record, with
+### vs2's #0x3E content PACKED into vsw.21m (measured ABSENT from vsav's
+### image; one ~12KB window, same wide-bank mechanism as the voice batch,
+### no new MiSTer surface) + remap 0x152 in don_sfx_records (and audit the
+### OTHER kept ids' resolved-window content the same way — 0x11B's #0x45
+### is already measured divergent with vs2's content FOUND in vsav at
+### 0x1EC800, both playback laws passing).
 
 Updated: 2026-08-15 (session 14z-87 close — **THE VOICE-CLASS BORROW FIX
 SHIPPED (maintainer-decided option b+c, same day as the root-cause):
