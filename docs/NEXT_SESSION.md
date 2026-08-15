@@ -52,14 +52,19 @@
 >   (this fix changes ALL tenant engine-voice events to their own rows).
 > - The M5 sfx odds (0x112/0x14a/0x173/0x31B family — machinery ready).
 > - FLAKY CRASH RESET (Sasquatch intro; rig designed, STATE 14z-85f).
-> - Pyron's medallion whitening — NEW PRECISE TRIGGER (maintainer,
->   14z-87b close): on merged7 it fires EXACTLY when P2 moves the
->   selection ring onto DONOVAN's cell; nothing else triggers it.
->   Reads as a select-palette row steal (Donovan's P2-hover load vs
->   the row Pyron's medallion uses — the row-0x1A family). NEXT
->   OPENER: reproduce with a select replay + snapshot pair (P2 ring
->   on Donovan vs elsewhere), diff palette RAM at the hover frame,
->   name the two writers.
+> - Pyron's medallion whitening — REPRODUCED SAME SESSION on the
+>   maintainer's trigger (P2 ring onto DONOVAN's cell; nothing else):
+>   scripted rig tests/replays/92_p2_ring_walk.rpl on merged7,
+>   snapshot pair sent (ring-on-Aulbath = medallion normal orange;
+>   ring-on-DONOVAN = shades of white; f1250 vs f1330 in the rig's
+>   timeline). Reads as a select-palette row steal (Donovan's P2-hover
+>   palette load vs the row Pyron's medallion uses — row-0x1A family).
+>   NEXT OPENER: diff palette RAM ($90C000 region + the $FF4182-family
+>   staging windows) between f1250 and f1330, name the row and BOTH
+>   writers (Donovan's P2-hover row in his manifest vs Pyron's medallion
+>   row), then a data-only row reassignment. P2 walk to Donovan from
+>   default: D,D,D,L,D,R,R (ring order Aulbath->...->Pyron@f1250->
+>   ->Donovan@f1330).
 > - H-vs-P stuck-direction (~1/30, possibly emulator-side).
 > - Round-end flicker (parked; needs the maintainer's recording).
 > - Win-screen QUOTE (both tenants); select medallions polish;

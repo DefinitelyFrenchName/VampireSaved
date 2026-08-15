@@ -1,0 +1,22 @@
+# 92: P2 selection-ring walk v2 (14z-87b, the Pyron-medallion repro).
+# P2 walks DOWN toward the appended cells (H/P/D live at the wheel's
+# bottom; Donovan = D from cell 0x09 per the atlas neighbor map), one
+# step every 40 frames, no confirms; snapshot series catches the
+# medallion at every ring stop.
+300-305 sys=C1
+420-425 sys=C2
+800-803 sys=S1
+940-943 sys=S2
+1100-1102 p2=D
+1140-1142 p2=D
+1180-1182 p2=D
+1220-1222 p2=L
+1260-1262 p2=D
+1300-1302 p2=R
+1340-1342 p2=R
+1380-1382 p2=D
+1420-1422 p2=L
+1460-1462 p2=L
+1500-1502 p2=D
+1540-1542 p2=D
+1700 wait
