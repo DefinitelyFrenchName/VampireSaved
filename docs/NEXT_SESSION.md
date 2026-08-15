@@ -58,6 +58,13 @@
 > portrait-side fix can reuse; H-vs-P stuck-direction not reproduced —
 > keep listed, assume emulator-side or resolved.
 
+> ## SCOPE RULING (maintainer, 2026-08-15): the build targets 2P
+> ## COMPETITIVE play. Shadow/Marionette/Oboro interaction with the
+> ## tenants and single-player ENDINGS for the new three are
+> ## NICE-TO-HAVE, not blockers (like the medallion tint and win quotes).
+> ## Mandatory core = legacy fidelity + the tenants' 2P match correctness
+> ## (18x18 matrix crash-free), then release engineering.
+
 > ## START HERE — the open list, in order
 > - The M5 sfx odds (0x112/0x14a/0x173/0x31B family — machinery ready).
 > - FLAKY CRASH RESET (Sasquatch intro; rig designed, STATE 14z-85f).

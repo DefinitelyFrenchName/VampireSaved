@@ -9,6 +9,16 @@
 ### overflow by ~310KB, measured); a 17-character variant is impossible.
 ### Recorded per the decided-items discipline; stretch-goal priority.
 
+### DECIDED (maintainer, 2026-08-15, post-close): SCOPE PRIORITY — the
+### build targets 2P COMPETITIVE PLAY. Therefore (a) the Shadow /
+### Marionette / Oboro secret-mode interaction matrix with the tenants
+### (SPEC M5 acceptance line) is a NICE-TO-HAVE, not mandatory; (b) a
+### missing/improper single-player ENDING for a non-vanilla character is
+### NOT a blocker (nice-to-have). Together with the same-day rulings on
+### the medallion tint and the win quotes: cosmetic and single-player-only
+### surfaces are optional; legacy fidelity + 2P match correctness of the
+### three tenants (the 18x18 matrix, crash-free) remain the mandatory core.
+
 ### DECIDED (maintainer, 2026-08-15): OPTION (1) — REVERT the medallion
 ### move. EXECUTED 14z-88 (same session): wheel_layout cells.11 pal_row
 ### 29 -> 26 (+ shared_writes.toml back to 0x3a3b40 x3); don_m5 / hui40 /
