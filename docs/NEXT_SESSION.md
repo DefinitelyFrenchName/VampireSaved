@@ -59,12 +59,22 @@
 >   ring-on-DONOVAN = shades of white; f1250 vs f1330 in the rig's
 >   timeline). Reads as a select-palette row steal (Donovan's P2-hover
 >   palette load vs the row Pyron's medallion uses — row-0x1A family).
->   NEXT OPENER: diff palette RAM ($90C000 region + the $FF4182-family
->   staging windows) between f1250 and f1330, name the row and BOTH
->   writers (Donovan's P2-hover row in his manifest vs Pyron's medallion
->   row), then a data-only row reassignment. P2 walk to Donovan from
->   default: D,D,D,L,D,R,R (ring order Aulbath->...->Pyron@f1250->
->   ->Donovan@f1330).
+>   MEASURED (14z-87b close, maintainer-confirmed captures): the
+>   collision is DONOVAN'S P2-HOVER PORTRAIT drawing with pal row
+>   0x1A — PYRON'S MEDALLION ROW (OBJ dump at ring-on-Donovan: 20 new
+>   sprites, codes ad90-ad9d at the P2 portrait coords, all pal=1a;
+>   at ring-on-Pyron pal=1a has ONE entry). Layout rows: D med 0x16 /
+>   H med 0x19 / P med 0x1A; generator-reserved {14,15,17,18,1E}.
+>   Frame-boundary palette dumps show row 0x1A content UNCHANGED while
+>   rows 0x18/0x1C/0x1F move with the hover — so the visible whitening
+>   is mid-frame (the hover load vs the per-frame re-assert machinery,
+>   "the WHITE-OUT fix" family in donovan.toml's select_wheel section) —
+>   attribute the WRITER of the P2-portrait row assignment (his P2
+>   select_records portrait row / the select_pal_variant_id thunk)
+>   before moving it. FIX SHAPE: data-only — move Donovan's P2-hover
+>   portrait row off 0x1A to a free row. Rig: 92_p2_ring_walk.rpl (P2
+>   walk D,D,D,L,D,R,R; ring on Pyron @f1250, on Donovan @f1330);
+>   OBJ pair + palette dumps + snapshot pair all in the session log.
 > - H-vs-P stuck-direction (~1/30, possibly emulator-side).
 > - Round-end flicker (parked; needs the maintainer's recording).
 > - Win-screen QUOTE (both tenants); select medallions polish;
