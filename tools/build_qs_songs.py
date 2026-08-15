@@ -235,12 +235,21 @@ def main():
             lo = struct.unpack_from("<H", vs2, ro + 3)[0]
             en = struct.unpack_from("<H", vs2, ro + 5)[0]
             w0, w1 = (bank << 16) | st, (bank << 16) | en
-            blob = q2[w0:w1]
+            # PACKING LAW #3 (14z-87b, the sword-plant beep): the record's
+            # `end` offset is played/looped INCLUSIVE (proven by field
+            # width: native windows end at 0xFFFF), so the copy must
+            # include the byte AT `end`. The original exclusive copy left
+            # every packed sample's last played byte holding the NEXT
+            # blob's first byte — for a voice whose loop tail is silence,
+            # one foreign byte = a ~1.8kHz impulse-train beep sustained to
+            # keyoff (rec#0x3C8 / Donovan 0x705, fired at every plant;
+            # 2 more contaminated records in the 14z-87b census).
+            blob = q2[w0:w1 + 1]
             at = qs.find(blob)
             if at >= 0:
                 nb, nst = at >> 16, at & 0xFFFF
-                if (nst & 0x8000) != ((nst + (w1 - w0) - 1) & 0x8000) \
-                        or nst + (w1 - w0) > 0x10000 \
+                if (nst & 0x8000) != ((nst + (w1 - w0)) & 0x8000) \
+                        or nst + (w1 - w0) + 1 > 0x10000 \
                         or (at & 1) != (w0 & 1):
                     # the two playback laws (both measured 14z-86): the
                     # window must live wholly in one half of its bank
@@ -262,8 +271,8 @@ def main():
                 # 14z-86: the 4 quiet/truncated voices were exactly the
                 # windows crossing 0x8000, and every NATIVE record lives
                 # wholly in one half of its bank)
-                if (w1 - w0) > 0x8000:
-                    sys.exit(f"sample {s:#x}: window {w1-w0:#x} exceeds a "
+                if (w1 - w0 + 1) > 0x8000:
+                    sys.exit(f"sample {s:#x}: window {w1-w0+1:#x} exceeds a "
                              f"half-bank — not expressible (native never is)")
                 # BYTE-PARITY LAW (measured 14z-86): the members are
                 # stored pre-swapped and byteswapped at load on BOTH
@@ -273,17 +282,17 @@ def main():
                 # caught; file-level comparison is blind to it)
                 if (ext_cur & 1) != (w0 & 1):
                     ext_cur += 1
-                if (ext_cur & 0x7FFF) + (w1 - w0) > 0x8000:
+                if (ext_cur & 0x7FFF) + (w1 - w0 + 1) > 0x8000:
                     ext_cur = ((ext_cur + 0x7FFF) & ~0x7FFF) | (w0 & 1)
-                if ext_cur + (w1 - w0) > EXTLIM:
+                if ext_cur + (w1 - w0 + 1) > EXTLIM:
                     sys.exit("extension member vsw.21m overflow")
                 ext_packed.append((ext_cur, blob))
                 img = 0x800000 + ext_cur          # image offset (bank 0x80+)
                 nb, nst = img >> 16, img & 0xFFFF
                 src_tag = f"ext@{img:#x}"
                 ledger["ext"].append({"sample": s, "img": img,
-                                      "size": w1 - w0})
-                ext_cur += w1 - w0
+                                      "size": w1 - w0 + 1})
+                ext_cur += w1 - w0 + 1
             n = (rec_cur - 0x45FA) // 8
             newrec = bytes([nb]) + struct.pack("<H", nst) \
                 + struct.pack("<H", (nst + (lo - st)) & 0xFFFF) \

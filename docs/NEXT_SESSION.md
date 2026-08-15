@@ -20,11 +20,18 @@
 > all-four, tenant_loop 270/305/239 + 538/738, merged legacy audit PASS,
 > trap parity PASS.
 >
-> **THE EAR-CHECK ASK:** the plant end should now be a DONOVAN VOICE on
-> every venue (measured: authored 0x6A — a different LINE than native's
-> node-28 voice because vsavj's engine anim asks a different node; both
-> are his own voice). If the specific line bothers the ear, the lever is
-> array content curation, not the class machinery.
+> **14z-87b (same day): THE PLANT BEEP ITSELF ROOT-CAUSED AND FIXED,
+> ear-confirmed** — QSound packing law #3 (the record `end` offset plays
+> INCLUSIVE; the packer copied exclusive, so packed samples' last played
+> byte held the next blob's head — 3 of 57 records contaminated, one
+> fired at every plant as a ~1.85kHz impulse-train beep). Packer fixed,
+> law-3 gate added to test_qs_songs (green 57/57 + verdict control),
+> all four artifacts rebuilt with PROGRAM FINGERPRINTS UNCHANGED (only
+> sound members moved), keyon/WAV/trap gates green. ALSO: rigs 90/91v1
+> NEVER FORMED A MATCH (no joins/confirms — gotcha filed); rig 91 is
+> the fixed plant rig (verified: authored 0x5D/0x62 fire at the plant).
+> **THE FIELD-CHECK ASK:** plants on every strength — no beep; and one
+> listen around H/P voices (the two other cleaned records).
 >
 > **Load-bearing from 14z-87 (do not re-derive):**
 > - `(0x382,A6)` is the char id only at SELECT; in match it is the

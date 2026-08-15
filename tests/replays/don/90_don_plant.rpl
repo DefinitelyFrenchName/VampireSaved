@@ -1,3 +1,12 @@
+# ── BROKEN, DEPRECATED (14z-87b): THIS RIG NEVER FORMED A MATCH ──────
+# It presses only S2 (no coin 2, no S1, no confirm presses), so P1 never
+# joins and every p1= input below goes to NOBODY; the select screen times
+# out into a CPU game (verified by snapshots at f3150/f3230). Every 14z-86
+# capture and 14z-87 measurement 'of the plant' on this rig observed that
+# CPU match instead. Use tests/replays/don/91_don_replant.rpl (proper
+# joins/confirms; plants verified by ring + snapshots). Kept as the
+# negative-example artifact for the gotcha (docs/GOTCHAS.md 14z-87b).
+#
 # 90: Donovan 214+K sword-plant rig (14z-86, the plant-end "ding"
 # investigation — engine_internals "per-game engine voice"). 2P match via
 # forced-pick pokes (P1=0x13 Donovan, P2=0x03), three plants (LK/MK/HK)

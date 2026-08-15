@@ -866,3 +866,34 @@ the sound); (2) a silence-probe verdict must compare the DIFFERENCE
 SIGNAL, not envelope peaks at chosen frames — peak equality at two
 timestamps "refuted" the true beep source for half a session while the
 global diff showed audio removed at exactly the enqueue frame.
+
+## QSound packing law #3: the record's `end` offset PLAYS — copy the inclusive window (14z-87b)
+
+The sword-plant "beep" (maintainer ear-confirmed against a byte-synthesized
+prediction): a sample record's `end` field is played/looped INCLUSIVE —
+proven by field width, since native windows end at 0xFFFF, which an
+exclusive bound could not express — but the voice-batch packer copied
+`q2[w0:w1]` EXCLUSIVE. Every packed sample's last played byte therefore
+held the NEXT blob's first byte. For a voice whose loop tail is silence,
+ONE foreign byte turns the sustained loop into an impulse train (13-sample
+period ≈ 1.85kHz — a "pure computer beep" to the ear, ~70ms to keyoff).
+Measured: exactly 3 of 57 packed records had a non-zero contaminated end
+byte — the others landed on 0x00 neighbors by luck, which is why the batch
+otherwise sounded normal and the WAV gate's per-window thresholds passed.
+rec#0x3C8 = Donovan voice 0x705 = fired at EVERY sword plant = the report.
+Enforced in tools/build_qs_songs.py (inclusive copy, all size math +1) and
+gated by test_qs_songs.sh's law-3 section (resolved inclusive window ==
+vs2's, per record, + a flipped-end-byte verdict control). The find-in-vsav
+path inherits the law automatically (the searched blob now includes the
+end byte).
+
+The hunt's meta-lesson, paid in three wrong candidates: the beep was
+invisible to every id-level comparison because the defect lives BELOW the
+id layer (same ids, same songs, same records-by-construction — one byte of
+neighboring content), and it was absent from every rig capture because THE
+RIG NEVER FORMED A MATCH (no S1/coin-2/confirms — the p1= inputs went to
+nobody, verified by select-screen snapshots; rigs 90/91v1 measured a
+timed-out CPU match for two sessions). Verify a rig produces the EVENT
+(snapshot the screen, read the ring) before believing any capture of it,
+and when a report says "synthetic beep", think TIGHT LOOP / impulse train,
+not sample content.

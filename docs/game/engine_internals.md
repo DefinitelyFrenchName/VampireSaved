@@ -1038,10 +1038,13 @@ $FF8110 mask, fighter +0x382), `bank_map.toml` `tail_data_ptr`
   pre-value is 0x10/0x11/0x13 the borrow write is skipped
   (skip-write-only — the scan and its $FF8114/$FF8100 side effects run
   unchanged); tenants keep their own class and their engine-voice
-  events play their AUTHORED voice rows (measured: the plant-end fires
-  authored 0x6A through Donovan's ported dispatcher; the foreign
-  0x62B/0x308 pair gone — the 0x62B sub-item dissolved with the
-  timeline). (c) vs2's candidate/voice-number rows 0x10/0x11/0x13
+  events play their AUTHORED voice rows. [CORRECTED 14z-87b: the
+  "plant-end fires authored 0x6A" measurement came from rig 90, which
+  NEVER FORMED A MATCH (no joins/confirms — the captures observed a
+  timed-out CPU game; gotcha filed). On the REAL plant (rig 91, match
+  verified by snapshots + ring) the plant fires authored voices
+  0x5D/0x62 (vs2 0x705/0x70A). The borrow-mechanism findings stand —
+  they were measured on a real (if unintended) running match.] (c) vs2's candidate/voice-number rows 0x10/0x11/0x13
   ported over the variant aliases (per-tenant [[data_port]] rows).
   All only_variant_slot-gated; the stock twin measured BIT-IDENTICAL.
   Cost measured: ~60 cycles on an event firing 0-1×/match (0 hits in

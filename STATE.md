@@ -1,5 +1,48 @@
 # STATE — living progress log
 
+Updated: 2026-08-15 (session 14z-87b close — **THE SWORD-PLANT BEEP
+ROOT-CAUSED AND FIXED, EAR-CONFIRMED against a byte-synthesized
+prediction ("Is THIS your beep? Yes! Yes it is!"): QSOUND PACKING LAW #3
+— the record's `end` offset plays INCLUSIVE, the voice-batch packer
+copied end-EXCLUSIVE, so every packed sample's last played byte held the
+NEXT blob's first byte.** For a voice whose loop tail is silence, ONE
+foreign byte = a 13-sample impulse train ≈ 1.85kHz sustained ~70ms to
+keyoff — a "pure computer beep". Measured: exactly 3 of 57 packed
+records contaminated (rec#0x3C8 = Donovan voice 0x705 = fired at EVERY
+plant = the report; rec#0x3DA, rec#0x3E5 the other two — now also
+clean); the rest landed on 0x00 neighbors by luck, which is why the
+batch otherwise sounded normal and every register/keyon/WAV-threshold
+gate passed. FIX: tools/build_qs_songs.py packs the INCLUSIVE window
+(all size math +1; the find-in-vsav path inherits the law via the
+searched blob); gate: test_qs_songs.sh law-3 section (every record's
+resolved inclusive window == vs2's, + a flipped-end-byte verdict
+control) — GREEN, 57/57. Rebuilt don_m5/hui40/pyron25 + m3b_merged7:
+ALL FOUR PROGRAM FINGERPRINTS UNCHANGED (3c599fb6/2629561c/94ce9a48;
+only vsw.z01/z02/21m member content moved) — zero expectation churn.
+Fixed-build plant capture: the ~1.8kHz burst GONE (0 beep-class events),
+same voices on the same frames. **THE HUNT'S THREE RETRACTIONS, all
+maintainer-loop-driven ("validation loops about what you think you
+should be looking for vs what I perceive in play is paramount"):**
+(1) the 0x152/record-#0x3E theory — WRONG (the maintainer's "none of
+these / far shorter / pure synthetic" verdict exposed both a
+rendering-method error (a raw-window render cannot reproduce a
+tight-loop tone) and a probe-verdict error (peak-compare at chosen
+frames instead of the difference signal)); (2) the entire id-level
+search — the defect lives BELOW the id layer (same ids/songs/records-by-
+construction, one byte of neighboring content); (3) **RIGS 90/91v1
+NEVER FORMED A MATCH** (only S2 pressed — no coin 2, no S1, no
+confirms; every p1= input went to NOBODY and the select screen timed
+out into a CPU game, proven by snapshots) — every 14z-86 capture and
+14z-87 "plant" measurement observed that CPU match; rig 90 is flagged
+BROKEN/DEPRECATED in its header, rig 91 (proper joins/confirms,
+plants verified by ring+snapshots: authored 0x5D/0x62 = vs2 0x705/0x70A
+fire at the plant) replaces it; the borrow-mechanism findings stand
+(measured on a real, if unintended, match). Gotchas filed: packing law
+#3 [platform]; the rig-never-formed-a-match class [project]. Awaiting
+the maintainer field-check of the rebuilt artifacts; merged gates
+(keyon/WAV/trap parity) re-run at close.)
+
+
 ### FIELD VERDICT (maintainer, 2026-08-15, post-close): **the beep
 ### PERSISTS unchanged on don_m5 AND merged7** — "medium-high pitch, very
 ### short but loud, around when the sword is in the ground or reappearing

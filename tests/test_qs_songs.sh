@@ -102,6 +102,89 @@ print("ok: control 1 fired (corrupted song byte detected)")
 PY
 [ $? -eq 0 ] || exit 1
 
+# ── PACKING LAW #3 (14z-87b): every authored record's INCLUSIVE window ──
+# The DSP plays/loops through the record's `end` offset INCLUSIVE (field
+# width proves it: native windows end at 0xFFFF). The original packer
+# copied end-EXCLUSIVE, so every packed sample's last played byte held the
+# NEXT blob's first byte — for a silent loop tail, one foreign byte = a
+# ~1.8kHz impulse-train beep to keyoff (the sword-plant beep: rec#0x3C8 =
+# Donovan 0x705, fired at every plant; 3 contaminated records measured).
+# Assert: for every voice_batch record, the CONTENT AT THE RESOLVED WINDOW
+# [start..end] INCLUSIVE equals vs2's source window inclusive — this is a
+# claim about what PLAYS, not about what was written.
+python3 - "$W" "$ROMDIR" <<'PY' || exit 1
+import os, sys, zipfile, json, struct
+w, romdir = sys.argv[1], sys.argv[2]
+ledger = json.load(open(f"{w}/ledger.json"))
+if not ledger.get("records"):
+    print("ok: law 3 vacuous (no voice_batch records in this manifest)")
+    sys.exit(0)
+zt = zipfile.ZipFile(f"{w}/t.zip")
+z21 = zt.read("vsw.21m")
+za = zipfile.ZipFile(f"{romdir}/vsav.zip")
+qs = za.read("vm3.11m") + za.read("vm3.12m")
+zb = zipfile.ZipFile(f"{romdir}/vsav2.zip")
+q2 = zb.read("vs2.11m") + zb.read("vs2.12m")
+v2z = zb.read("vs2.01") + zb.read("vs2.02")
+v2rec = struct.unpack_from("<H", v2z, 0x3B02)[0]
+bad = 0
+for r in ledger["records"]:
+    s = r["vs2_sample"]
+    rec = bytes.fromhex(r["rec"])
+    nb, nst = rec[0], struct.unpack("<H", rec[1:3])[0]
+    nen = struct.unpack("<H", rec[5:7])[0]
+    if nb >= 0x80:
+        got = z21[((nb - 0x80) << 16) | nst:(((nb - 0x80) << 16) | nen) + 1]
+    else:
+        got = qs[(nb << 16) | nst:((nb << 16) | nen) + 1]
+    ro = v2rec + s * 8
+    b2 = v2z[ro]
+    st2 = struct.unpack_from("<H", v2z, ro + 1)[0]
+    en2 = struct.unpack_from("<H", v2z, ro + 5)[0]
+    want = q2[(b2 << 16) | st2:((b2 << 16) | en2) + 1]
+    if got != want:
+        print(f"FAIL law3: sample {s:#x} rec#{r['new_index']:#x}: inclusive "
+              f"window differs (len {len(got):#x} vs {len(want):#x}; "
+              f"end byte {got[-1:] .hex()} vs {want[-1:].hex()})")
+        bad += 1
+if bad:
+    sys.exit(1)
+print(f"ok: law 3 — all {len(ledger['records'])} records' inclusive windows "
+      f"match vs2 (incl. the end byte)")
+PY
+[ $? -eq 0 ] || exit 1
+
+# law-3 verdict control: flip one record's END byte in the packed member —
+# the checker above must catch it (RH-9: a control that has failed on purpose)
+python3 - "$W" "$ROMDIR" <<'PY' || exit 1
+import sys, zipfile, json, struct, io, os
+w, romdir = sys.argv[1], sys.argv[2]
+ledger = json.load(open(f"{w}/ledger.json"))
+recs = [r for r in ledger.get("records", []) if bytes.fromhex(r["rec"])[0] >= 0x80]
+if not recs:
+    print("ok: law-3 control vacuous (no packed records)"); sys.exit(0)
+r = recs[0]
+rec = bytes.fromhex(r["rec"])
+nb, nst = rec[0], struct.unpack("<H", rec[1:3])[0]
+nen = struct.unpack("<H", rec[5:7])[0]
+zt = zipfile.ZipFile(f"{w}/t.zip")
+z21 = bytearray(zt.read("vsw.21m"))
+off = (((nb - 0x80) << 16) | nen)
+z21[off] ^= 0x5A
+zb = zipfile.ZipFile(f"{romdir}/vsav2.zip")
+q2 = zb.read("vs2.11m") + zb.read("vs2.12m")
+v2z = zb.read("vs2.01") + zb.read("vs2.02")
+v2rec = struct.unpack_from("<H", v2z, 0x3B02)[0]
+ro = v2rec + r["vs2_sample"] * 8
+b2 = v2z[ro]; st2 = struct.unpack_from("<H", v2z, ro+1)[0]; en2 = struct.unpack_from("<H", v2z, ro+5)[0]
+want = q2[(b2 << 16) | st2:((b2 << 16) | en2) + 1]
+got = bytes(z21[((nb - 0x80) << 16) | nst:off + 1])
+if got == want:
+    sys.exit("FAIL: LAW-3 CONTROL DEAD — a flipped end byte still matches")
+print("ok: law-3 verdict control fired (flipped end byte caught)")
+PY
+[ $? -eq 0 ] || exit 1
+
 # control 2: the builder must REFUSE a live target id (0x119)
 cp "$REPO/build/wide0/rompath/vsavjw.zip" "$W/t2.zip"
 cat > "$W/bad.toml" <<'EOF'
