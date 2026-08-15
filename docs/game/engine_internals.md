@@ -66,7 +66,7 @@ correct. One dead row is the whole defect.
 | # | instance | vsav holds | vs2 holds | fix |
 |---|---|---|---|---|
 | 1 | effect-class row 16 (the beam) `0x080AEC` | stub -> bare `rts` | the beam's handler | `[[code_ptr]]` port + repoint (14z-71) |
-| 2 | sprite-list drawer, type 12 | table has no such type, and can neither grow (entry 0 IS the length) nor move (`(d8,PC,Xn)`) | a composite handler | takeover of the unused list-type 6 (14z-71) |
+| 2 | sprite-list drawer, type 12 | table has no such type, and can neither grow (entry 0 IS the length) nor move (`(d8,PC,Xn)`) | a composite handler | takeover of list-type 6 (14z-71) — **NOT unused: legacy lists reach it too (measured 14z-89, 387/948 tripwire arms on replays 21/26); the fallback to vsav's own type-6 code is what keeps that correct** |
 | 3 | grab-hold keyframe ptr table `0xBE27A` row 0x10 | ALIAS of row 0x00 (char 0's block) | the tenant's own block | `[[data_port]]` + row repoint (14z-73) |
 | 4 | sub-state jump table `0x18468` entry 81 (Cosmo Disruption) | `0x0006` — a displacement pointing back INTO the table | a real handler | **one word**: repoint to `0x0224`, which already holds vs2's identical 8-byte handler (14z-74) |
 | 5 | in-fight HUD mugshot `0x89884` + name `0x898C4`, rows `0x10-0x1F` | pure ALIASES of `0x00-0x0F` (both tables) | rows 0x10/0x11/0x13 filled for H/Pyron/Donovan | three tenant-gated pokes + place the art at free-pool anchors (14z-63/75) |

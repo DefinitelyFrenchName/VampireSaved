@@ -1,0 +1,22 @@
+MEASURED 14z-89, NOT RATIFIED - this legacy pairing does not
+re-converge with vanilla, so no class in the CLAUDE.md §4
+vocabulary describes it. It is NOT self-frozen any more: a
+self-frozen .sha1 cannot see a legacy regression (14z-88).
+
+    shape: 10237/14120 frames differ in 3 run(s), first at frame 829, last ends frame 14120, then 0 identical
+    runs: 829-829 889-2091 5088-14120
+
+ATTRIBUTED (14z-89 full-RAM dump diff at the onset, vs vanilla): NOT a
+main-loop slip - the per-iteration counters $FF8081/$FF80B4 match
+vanilla EXACTLY at every sampled frame. The only live divergence is
+$FF010C/$FF010D, THE TYPE-6 FALLBACK TRIPWIRE (huitzil.toml site_thunk
+beam_list_type6): 0 on vanilla, counting up on this build (0x5a by
+f5600). Per the standing watch in tests/audit_effect_class_rows.sh a
+write to that counter means A LEGACY LIST REACHED LIST-TYPE 6, i.e.
+the type-6 deadness claim in STATE.md's DEADNESS REGISTER is WRONG.
+Rendering stays correct (the fallback runs vanilla's own code) but this
+is a STOP-AND-ASSESS event. The tripwire audit's default replay set is
+02/07/09/30 - it had never run on this replay.
+
+DECISION NEEDED (STATE.md 'Decisions pending'): ratify a class,
+or treat as a superset-invariant regression to fix.

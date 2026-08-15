@@ -1,0 +1,24 @@
+MEASURED 14z-89, NOT RATIFIED - this legacy pairing does not
+re-converge with vanilla, so no class in the CLAUDE.md §4
+vocabulary describes it. It is NOT self-frozen any more: a
+self-frozen .sha1 cannot see a legacy regression (14z-88).
+
+    shape: 2857/18520 frames differ in 5 run(s), first at frame 829, last ends frame 18520, then 0 identical
+    runs: 829-829 889-2091 12313-12313 12733-12733 16870-18520
+
+ATTRIBUTED (14z-89 full-RAM dump diff at the onset, vs vanilla): the
+same one-main-loop-iteration class as 38, OPPOSITE SIGN - this build
+runs one iteration AHEAD from f16871 ($FF8081/$FF80B4 f8/9c vanilla vs
+f9/9d ours; still exactly one apart at f17500) and never re-converges.
+Onset context at f16870: the live differences are the OBJ-chain return
+address $FF06DF-$FF06E5 and a $FFF991-$FFF9C9 ramp buffer whose bytes
+sit 2-6 steps further along - i.e. the WIN-SCREEN FADE is one step
+ahead, then the main loop gains an iteration. Same mechanism family as
+14z-88: the fade's per-colour work is data-dependent and this build's
+palette content differs on the rows the roster work edits.
+IDENTICAL SHAPE ON ALL THREE SETS (2857/18520 frames, runs 829,
+889-2091, 12313, 12733, 16870-18520), so the cause is shared, not
+tenant-specific.
+
+DECISION NEEDED (STATE.md 'Decisions pending'): ratify a class,
+or treat as a superset-invariant regression to fix.

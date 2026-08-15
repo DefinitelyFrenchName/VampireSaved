@@ -99,7 +99,13 @@ sibling-identical and pointer-free.
 (`3a18be456500` -> `jmp <thunk>`), plus a 0x102-byte body. vsav's drawer
 has six sprite-list types, vs2 seven; the beam's list is TYPE 12, a
 composite. The table cannot grow (entry 0's offset IS its length) or move
-(`(d8,PC,Xn)`), so the port takes over vsav's UNUSED type 6.
+(`(d8,PC,Xn)`), so the port takes over vsav's type 6, measured unused at the time.
+**CORRECTED 14z-89: type 6 is NOT unused** — legacy lists reach it on
+long mash/arcade replays (tripwire armed 387x on 21_don_mash, 948x on
+26_don_arcade_mash, PC-attributed inside the thunk). The 14z-71 deadness
+measurement was sound but covered four replays. Nothing rendered wrong,
+because the fallback below is not an optimisation but the design: this is
+the case it was built for.
 Body layout: a placed-region range gate; then vs2's composite handler
 (`0x01A1FC`) verbatim bar six scratch displacements and a local `bsr`;
 then a tripwire + a faithful reproduction of vsav's own type-6 head

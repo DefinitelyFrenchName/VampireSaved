@@ -1,0 +1,21 @@
+MEASURED 14z-89, NOT RATIFIED - this legacy pairing does not
+re-converge with vanilla, so no class in the CLAUDE.md §4
+vocabulary describes it. It is NOT self-frozen any more: a
+self-frozen .sha1 cannot see a legacy regression (14z-88).
+
+    shape: 3889/5000 frames differ in 3 run(s), first at frame 829, last ends frame 5000, then 0 identical
+    runs: 829-829 889-2091 2316-5000
+
+ATTRIBUTED (14z-89 full-RAM dump diff at the onset, vs vanilla): the
+build LOSES ONE MAIN-LOOP ITERATION at f2317 and never regains it -
+the per-iteration counters $FF8081/$FF80B4 read cf/03 on vanilla and
+ce/02 on this build, and stay one behind (f2400: 14/13, 47/46). At
+f2316 the only live differences are the OBJ-builder bsr-chain return
+addresses $FF06B5-$FF06D3 (execution position, docs/game/atlas/ram.md)
+plus dead stack. This is the SAME CLASS the maintainer refused to
+ratify in 14z-88 (option 2) and reverted the medallion move to avoid -
+measured here on the REVERTED build, against vanilla, which no gate
+had ever done for this replay.
+
+DECISION NEEDED (STATE.md 'Decisions pending'): ratify a class,
+or treat as a superset-invariant regression to fix.

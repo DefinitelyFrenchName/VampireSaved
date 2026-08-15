@@ -85,6 +85,168 @@
 ### one attributed by tests/audit_mask_window_ff42a2.sh to the staging
 ### family or the OBJ-chain phase EXCEPT 38 (H/P), which is the regression.
 
+### DECISIONS PENDING — 14z-89 (three, all opened by the coverage sweep;
+### nothing is re-frozen and no build byte moved this session)
+###
+### (1) **THE ONE-MAIN-LOOP-ITERATION CLASS IS ON THE SHIPPED BUILDS.**
+### This is the class the maintainer declined to ratify in 14z-88 (option 2)
+### and reverted the medallion move to avoid. Measured 14z-89 against
+### VANILLA — which no gate had ever done for these replays — it is present
+### on the reverted builds anyway, from a different cause:
+###   - `38_victor_p1_vsavj` on **donovan-m5**: LOSES one iteration at f2317
+###     (the select→VS fade). $FF8081/$FF80B4 = cf/03 vanilla vs ce/02 ours,
+###     still one behind at f2400 (14/13, 47/46). H/P are CLEAN here — the
+###     mirror image of 14z-88, where the 0x1D move broke H/P and not D.
+###   - `24_don_winmash` on **ALL THREE SETS, identical shape**: GAINS one
+###     iteration at f16871 after the WIN-SCREEN fade runs one step ahead
+###     ($FFF991-$FFF9C9 ramp 2-6 steps along at f16870), then stays exactly
+###     one ahead (f17500: fe/ff, 11/12). Shared cause, not tenant-specific.
+### Mechanism is the 14z-88 one: fade per-colour work is DATA-DEPENDENT, the
+### frame already runs at the VBL edge, and our palette content on the edited
+### rows moves the cycle count across it. OPTIONS: (a) ratify a class
+### "one-time main-loop iteration slip at a transition fade, no gameplay
+### surface" — it is a whole-RAM divergence that never re-converges, i.e. a
+### change to what the superset invariant means, and NOT mine to make;
+### (b) treat as a regression and engineer fade-cycle neutrality (make the
+### fade skip our rows, or pad it — both need measurement, and 14z-88 showed
+### every row choice moves cycles somewhere); (c) accept per-replay with a
+### frozen onset, which is (a) narrowed to named replays.
+### RECOMMENDATION: (c) — it is the smallest thing that is honest. It keeps
+### every other legacy replay on a strict basis, names the two affected
+### transitions, and does not license the class in general. But note what
+### (a)/(c) cost: the counters are LIVE state, so "frame-identical" becomes
+### "frame-identical except at named transitions".
+###
+### (2) **THE TYPE-6 DEADNESS CLAIM IS FALSE — and the fallback held.**
+### `21_don_mash` (387x) and `26_don_arcade_mash` (948x) arm the `$FF010C`
+### tripwire on **huitzil-m13**, PC-attributed inside the thunk body: LEGACY
+### lists reach the taken-over list-type 6. Rendering stayed correct (the
+### fallback runs vsav's own type-6 head, reproduced instruction-for-
+### instruction) — the "safe and loud" design did exactly its job, and this
+### is the DEADNESS REGISTER's first real hit. Why it was missed: the gate's
+### default replay set is 02/07/09/30 and nobody pointed it at a long mash
+### rig. The residual cost is the counter itself: `$FF010C/$FF010D` is live
+### work RAM vanilla does not keep, so both replays diverge permanently from
+### the vanilla basis. OPTIONS: (a) keep the counter (accept two `.pending`
+### replays forever); (b) make the tripwire diagnostic-only — count in a
+### masked window or drop the count and keep a latch — so legacy RAM matches
+### again; (c) stop taking over type 6 (large, and the beam depends on it).
+### RECOMMENDATION: (b). The counter's job is to make a wrong assumption
+### loud; it has now done that, and a latch inside an already-masked window
+### keeps the signal while returning the two replays to a strict basis.
+###
+### (4) **A FOURTH, SMALL ONE — merged `12_donovan_vs_cpu`.** With leg (a)
+### now covering 45 replays the merged audit is 42 PASS / 3 FAIL: 21 and 26
+### are the type-6 tripwire above (merged carries huitzil's thunk, so the
+### same two replays), and `12_donovan_vs_cpu` measures the UNION of the two
+### solo shapes — `composite vsavj/masked-v2 2836,5713 889-2415` where the
+### donovan-m5 prior has flicker {5713} and the H/P prior {2836}. BOTH frames
+### are already attributed: 2836 is the slot-0x0B staging phase you ratified
+### 2026-08-12 (merged) and 2026-08-15 (solo); 5713 is the OBJ-chain return
+### address $FF06D0-$FF06EF (execution position), attributed by dump diff
+### this session. This is the ordinary "merged hook chains are longer" case
+### that 04_select_fuzz and 11_pick_donovan already carry inline overrides
+### for. RECOMMENDATION: ratify the union as merged-specific override #3.
+### I did not add it myself — the existing two are maintainer-ratified and
+### absorbing a third silently is how a tolerance widens.
+###
+### (3) **`61_tenant_2pwin` / `62_tenant_2plose` on huitzil-m13 / pyron-m7**
+### measure LEGACY by loaded ids but navigate to select cell 0x13, which
+### neither vanilla (16 cells) nor those builds back. Ruled by me as
+### self-frozen-correct with the reason written into
+### `tests/expected/<set>/<name>.legacy-exempt` (printed by the audit every
+### run). Flagging it because it is a judgement, not a measurement: say the
+### word and they become `.pending` instead.
+
+Updated: 2026-08-15 (session 14z-89 — **THE LEGACY-COVERAGE GAP IS CLOSED,
+AND CLOSING IT FOUND THREE THINGS.** The 14z-88 first task, executed: every
+replay whose loaded characters equal vanilla's is now compared against the
+vanilla masked basis instead of against itself, on all three sets, and a
+standing gate makes the class unable to return.
+
+**THE GAP WAS FAR BIGGER THAN "31-40".** Measured, not assumed: **35 of the
+~43 self-frozen replays on each set are legacy pairings.** Cause: the
+`*_don_*` and `*_victor_*` families were authored on the SUBSTITUTION track
+where select cell 0x0F was Donovan; M3a restored Jedah to 0x0F and moved the
+tenants to appended cells, so those replays have been legacy content wearing
+tenant filenames for many sessions — guarded only against themselves. That
+is precisely how the 14z-88 regression stayed green.
+
+**THE INSTRUMENT** (`tests/audit_legacy_pairings.sh`, new, ~30 min,
+JOBS-parallel): measures each replay's loaded-character signature on vanilla
+AND on the build, then asserts that every LEGACY verdict carries a `.masked`
+or `.pending`. Two design points that are load-bearing: the signature is
+**+0x60.l** (the per-character hitbox-data base — a ROM pointer, constant
+for the match) and NOT +0x382, which is the char id only at select and the
+voice-flavor class in match (14z-87); and the comparison is over the
+DISTINCT-value sequence, not the frame-indexed trajectory, so a hook-cycle
+load phase does not read as a different match. 7 static verdict controls
+(incl. the dead-instrument refusal and a voice-class control) plus a LIVE
+positive control per set: the same replay with the tenant id poked must flip
+LEGACY→TENANT. Verdicts: donovan-m5 45 LEGACY / 4 TENANT / 6 NO-MATCH;
+huitzil-m13 46/3/6; pyron-m7 46/4/6 — and every TENANT verdict is exactly a
+tenant-pick rig, which is the sanity check.
+
+**THE PROMOTION.** 35 vanilla basis logs frozen into
+`tests/expected/vsavj/masked-v2/` (double-run deterministic; the basis now
+carries a `MASK` record and 49 logs), and **93 (set, replay) pairs authored
+as `.masked`** — 69 of them on the ratified 2P shape `composite 829
+889-2091` verbatim, the rest on the same shape plus measured flicker frames.
+**Every new flicker frame is attributed** by full-RAM dump diff to a
+ratified family: the palette staging-slot phase (the 11_pick_donovan
+species), the OBJ-chain return address $FF06D0-$FF06EF (execution position),
+the $FF80B5 input-accept latch, and — at 26/f36857 — sound-driver record
+pointers at $FF0554/$FF0558, the same species as the ratified $FF0460 spill.
+No new mask window was needed and the 13 pre-existing masked classes are
+untouched. The superseded `.sha1` + frozen log are deleted per the
+maintainer's ruling (masked-only, matching the existing legacy replays).
+
+**WHAT IT FOUND: 6 replays that do NOT re-converge with vanilla** — all
+deterministic (double-run), all attributed, all now `.pending` (suite reads
+RED, naming the shape, per the maintainer's ruling) — see "Decisions pending
+— 14z-89" above. Two are the one-main-loop-iteration class on the SHIPPED
+builds (38 on donovan-m5; 24 on all three); two are the type-6 tripwire
+arming on legacy content (21/26 on huitzil-m13), which falsifies a DEADNESS
+REGISTER row — corrected in place, with patch_index / engine_internals /
+huitzil.toml / patch_notes re-grepped and fixed; two are the cell-0x13 rigs
+ruled self-frozen-correct with a written reason.
+
+**ALSO LANDED (harness):** `tools/describe_masked_shape.py` — the shape
+classifier lifted out of the `audit_merged_legacy.sh` heredoc where it only
+ever ran on that audit's failure path, now shared and ground-truthed by
+`tests/test_describe_masked_shape.sh` (11 assertions incl. both threshold
+boundaries and the never-re-converges refusal); extraction verified
+output-identical on six real log pairs. `tools/freeze_masked_basis.sh`
+gained three guards for the EXTEND direction it had never been used in —
+it refuses a mask that disagrees with the basis's `MASK` record, scrubs
+POKES/DUMPS/TAIL_FRAMES/… from the environment, and `VERIFY_BASIS=<name>`
+re-derives an already-frozen log and requires bit-identity before writing
+anything (run this session: 16_xemu_2p reproduced bit-for-bit, which is what
+proves the mask matches the basis AND that the instrument has not moved
+since masked-v2 was frozen). `tools/propose_masked_specs.sh` authors the
+proposals. BATTERY AT CLOSE: the three suites are RED on exactly the 6 `.pending`
+replays and NOTHING else — donovan-m5 53 PASS / 2 PENDING / 18 SKIP,
+huitzil-m13 52 / 3 / 18, pyron-m7 55 / 1 / 17, with **0 FAIL and 0
+nondeterministic runs** across all three; every one of the 93 promoted
+specs passes and the 13 pre-existing masked classes are byte-unchanged
+(checked with git, not by eye). `test_m3a_reproducible` PASS — all four
+frozen fingerprints rebuild bit-exact (3c599fb6 / 6c93cfa8 / 2629561c /
+94ce9a48), which is the proof that a session spent entirely in the
+harness moved no shipped byte. `test_describe_masked_shape` PASS 11/11.
+`audit_legacy_pairings` re-run to confirm the gate it installs now
+passes on all three sets. `audit_merged_legacy` re-run with leg (a) grown 14 -> 45 (the glob follows
+donovan-m5's .masked set): **42 PASS / 3 FAIL**, i.e. 30 newly-covered
+legacy replays pass on the MERGED build with the single-tenant classes
+verbatim — the strongest merged-legacy evidence to date. The 3 failures
+are all named above: 21/26 (the type-6 tripwire, merged carries huitzil's
+thunk) and 12 (the union shape, decision 4). The audit exits FAIL by
+design; leg (b) is a report and its six tenant legs were guard-clean.
+`audit_legacy_pairings` PASS on all three sets, both live controls firing
+and the two exemptions printed with their reasons.
+
+No build byte moved: this session touches the harness and the
+expectations only.)
+
 Updated: 2026-08-15 (session 14z-88 — **THE RATIFIED ROW-0x1D STAGING
 WINDOW APPLIED (V3 masked basis) — and the recipe's predictions corrected
 by measurement, one of them into a LEGACY REGRESSION (decision above).**
@@ -15262,7 +15424,7 @@ behaviour or rendering** — before anything else is suspected.
 |---|---|---|---|
 | ~~palette-seq ids 0x1E-0x21 (`0x39ACC0`)~~ **CLAIM FALSE, ROW WITHDRAWN 14z-79 (they are Bulleta's DF block)** | vanilla only ever requests 0x26/0x27 | `tests/audit_palette_seq_ids.sh` (10,504 sampled calls) | none — the palette path never transits work RAM, so the audit is the ONLY guard |
 | effect-class row 16 (`0x080AEC`) | vanilla never dispatches class 16 | `tests/audit_effect_class_rows.sh` §1, 0 reads vs a 1760-hit control | none needed: the row was a stub (`rts`), so a wrong claim costs at most the old no-op |
-| drawer list-type 6 (`0x01B6AA`) | vanilla has no type-6 sprite lists | `audit_effect_class_rows.sh` §1/§4 + `tests/test_beam_list_type6.sh` | **YES — non-tenant lists run vsav's original type-6 code, and arming the `$FF010C` tripwire FAILS the gate** |
+| ~~drawer list-type 6 (`0x01B6AA`)~~ **CLAIM FALSE (measured 14z-89) — LEGACY LISTS DO REACH TYPE 6** | vanilla has no type-6 sprite lists | `audit_effect_class_rows.sh` §1/§4 + `tests/test_beam_list_type6.sh` | **THE FALLBACK HELD — this is what a safe-and-loud design buys.** 14z-89 measured the tripwire ARMED on legacy content on huitzil-m13: `21_don_mash` 387 times and `26_don_arcade_mash` 948 times, PC-attributed to inside the thunk body (0x0FD060). Rendering stayed correct throughout (the fallback runs vsav's own type-6 code, reproduced instruction-for-instruction), so nothing rendered wrong and no playtest ever saw it — exactly the outcome the register's "prefer designs where being wrong is safe and loud" rule was written for. WHY IT WAS MISSED: the deadness measurement was sound but its COVERAGE was four replays (`02/07/09/30`), and the gate has always run on that default set; the two replays that arm it are long mash/arcade rigs nobody pointed it at. COST TODAY: `$FF010C/$FF010D` is a live work-RAM counter vanilla does not keep, so both replays diverge permanently from the vanilla masked basis — they are `.pending` on huitzil-m13 pending the maintainer's ruling. OPEN: does the fallback need to stop counting (make the tripwire diagnostic-only / move it out of work RAM), or is the counter acceptable? See "Decisions pending — 14z-89" |
 
 Rules for adding a row: the claim must be measured with a POSITIVE CONTROL
 on the same instrument and leg (a blind instrument and a real zero look

@@ -1,0 +1,15 @@
+MEASURED 14z-89, NOT RATIFIED - this legacy pairing does not
+re-converge with vanilla, so no class in the CLAUDE.md §4
+vocabulary describes it. It is NOT self-frozen any more: a
+self-frozen .sha1 cannot see a legacy regression (14z-88).
+
+    shape: 37297/40620 frames differ in 3 run(s), first at frame 889, last ends frame 40620, then 0 identical
+    runs: 889-2415 2836-2836 4852-40620
+
+ATTRIBUTED (14z-89, vs vanilla): same as 21_don_mash on this set - the
+main-loop counters match vanilla exactly and the only live divergence
+is the TYPE-6 FALLBACK TRIPWIRE $FF010C/$FF010D (0 vanilla, 0x0183 by
+f5400). See that replay's .pending for the standing-watch consequence.
+
+DECISION NEEDED (STATE.md 'Decisions pending'): ratify a class,
+or treat as a superset-invariant regression to fix.

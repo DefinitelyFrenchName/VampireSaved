@@ -172,10 +172,15 @@ there); a different palette in a processed row moved one legacy pairing's
 main loop across a VBL (replay 38 on the H/P/merged builds: one iteration
 lost, whole-RAM never re-converges vs vanilla) while every masked-13
 legacy class stayed frozen. Data-only ≠ cycle-neutral. Before moving or
-recoloring any select palette row: run the P2-human legacy pairings
-(31-40) against vanilla, not just the masked 13; and attribute moved
-`.sha1`s with tests/audit_mask_window_ff42a2.sh before re-freezing —
-that audit is what caught it.
+recoloring any select palette row: run the legacy pairings against
+vanilla, not just the masked 13; and attribute moved `.sha1`s with
+tests/audit_mask_window_ff42a2.sh before re-freezing — that audit is what
+caught it. **UPDATED 14z-89: "the P2-human legacy pairings (31-40)" was an
+under-count — 35 of the ~43 self-frozen replays per set are legacy
+pairings, they are `.masked` now, and `tests/audit_legacy_pairings.sh`
+keeps it that way. The same sweep found the class ALREADY PRESENT on the
+reverted builds (replay 38 on donovan-m5, replay 24 on all three), so
+this is not only a rule for future row moves.**
 
 ## PC-relative word tables are DATA — never let a pointer heuristic rewrite them (paid: 2026-07-25, ~1h)
 
@@ -1981,3 +1986,48 @@ kind=sound_stub row instead of an M5 dependency. And attribute the
 CALL PATH before attributing the record: the trap detonation goes
 through the 0x4EE0-0x4F60 farm-stub band, not the per-node record its
 array happens to also carry.
+
+## A self-frozen `.sha1` cannot see a legacy regression — and a replay's FILENAME does not tell you what it loads (14z-88 paid it, 14z-89 measured the extent)
+
+`run_suite.sh`'s default expectation kind is `.sha1`: the whole-log
+checksum of the build's OWN earlier run. It answers "did this build
+change since I froze it", which is a determinism/change detector — and
+it is structurally incapable of answering the superset question, because
+re-freezing makes any behaviour correct by definition. Only a `.masked`
+spec compares against the frozen VANILLA basis.
+
+That is fine as long as self-frozen replays are tenant content. They
+were not. The `*_don_*` and `*_victor_*` families were authored on the
+SUBSTITUTION track, where select cell 0x0F was Donovan; the M3a
+de-substitution restored Jedah to 0x0F and moved the tenants to appended
+cells 0x13/0x10/0x11. From that commit on, those replays loaded VANILLA
+CHARACTERS while keeping tenant filenames, tenant-sounding gate names,
+and self-frozen expectations. **Measured 14z-89: 35 of the ~43
+self-frozen replays on each current set are legacy pairings.**
+
+The bill arrived in 14z-88: the medallion row move cost
+`38_victor_p1_vsavj` (P1 Victor vs P2 Jedah) one main-loop iteration at
+the select→VS fade, never re-converging against vanilla — a
+superset-invariant regression that every battery reported GREEN, because
+that replay was compared only against itself.
+
+Rules now:
+- **Classify by measurement, never by filename or authorship intent.**
+  `tests/audit_legacy_pairings.sh` measures each replay's loaded-character
+  signature on vanilla and on the build and FAILS if a legacy pairing is
+  guarded only by a self-frozen expectation. Run it whenever a replay is
+  added, a cell mapping moves, or a tenant changes id.
+- **The signature is +0x60, not +0x382.** Player-block +0x382 is the char
+  id only at select; in match it is the voice-flavor class and the engine
+  reassigns it from a sound-state-fed list (the entry above, 14z-87), so
+  it reports "different characters" on voice noise. +0x60.l is the
+  per-character hitbox-data base — a ROM pointer, constant for the match,
+  distinct per character (Demitri 0x93B6A, Victor 0x9769E).
+- **Compare the distinct-value SEQUENCE, not the frame-indexed
+  trajectory.** Hooks cost cycles; the build can load the same fighters a
+  frame or two later, and a frame-indexed diff calls that a different match.
+- **A "select-only" replay is not automatically tenant-affected.**
+  63_idle_select looks like the extended-wheel rigs (44/58/64/92, which
+  never populate a fighter block) but its timer-forced pick lands on
+  vanilla's character — measured LEGACY, promoted. Assumption would have
+  left it in the hole.

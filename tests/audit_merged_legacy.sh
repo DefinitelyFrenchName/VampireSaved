@@ -50,7 +50,10 @@
 # leg-(a) loop; everything else still fails loudly.
 #
 # Usage: ROMDIR=... [MAME_BIN=...] tests/audit_merged_legacy.sh
-# On-demand: builds build/merged1 and runs ~26 replay legs (~40 min).
+# On-demand: builds build/merged1 and runs the legs below (~2 h since
+# 14z-89 — leg (a) is a GLOB over tests/expected/donovan-m5/*.masked and
+# that set grew 14 -> 47 with the legacy-pairing promotion; it was ~40 min
+# at 14 replays).
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"
@@ -104,62 +107,11 @@ fail=0
 # only section 0 catches it).
 abspath() { case "$1" in /*) echo "$1";; *) echo "$PWD/$1";; esac; }
 
-# describe.py — the measured shape of a divergence, and a proposed
-# expectation line in the ratified vocabulary (FLICKER_MAX=2, same as
-# compare_composite.py). Used for reporting on any non-matching class.
-# Frames are read from the log's first column (compare_window.py's own
-# convention: onset/end are FRAME NUMBERS, end = last divergent frame,
-# inclusive), so a proposed line drops into a .masked spec verbatim.
-cat > "$W/describe.py" <<'PY'
-import sys
-def load(path):
-    out = []
-    for line in open(path):
-        f = line.split()
-        if not f or f[0] == "END":
-            continue
-        if len(f) >= 2:
-            out.append((int(f[0]), f[1]))
-    return out
-a, b = load(sys.argv[1]), load(sys.argv[2])
-n = min(len(a), len(b))
-note = "" if len(a) == len(b) else " [LENGTH MISMATCH %d vs %d]" % (len(a), len(b))
-d = [i for i in range(n) if a[i] != b[i]]
-if not d:
-    print("shape: bit-identical%s" % note)
-    print("proposed: exact vsavj/masked-v2 -")
-    sys.exit(0)
-runs, s, p = [], d[0], d[0]
-for i in d[1:]:
-    if i != p + 1:
-        runs.append((s, p)); s = i
-    p = i
-runs.append((s, p))
-tail = n - 1 - runs[-1][1]
-fr = lambda i: a[i][0]                       # index -> frame number
-flick = [r for r in runs if r[1] - r[0] + 1 <= 2]
-wins  = [r for r in runs if r[1] - r[0] + 1 > 2]
-print("shape: %d/%d frames differ in %d run(s), first at frame %d, last ends "
-      "frame %d, then %d identical%s" % (len(d), n, len(runs), fr(runs[0][0]),
-                                         fr(runs[-1][1]), tail, note))
-print("runs: " + " ".join("%d-%d" % (fr(x), fr(y)) for x, y in runs))
-if tail <= 60:
-    print("proposed: NONE — does not re-converge (>=60 identical tail "
-          "required); this is not expressible in the ratified vocabulary "
-          "and must be root-caused")
-elif not wins:
-    print("proposed: flicker vsavj/masked-v2 %d %s"
-          % (len(d), ",".join(str(fr(i)) for i in d)))
-elif not flick:
-    print("proposed: window vsavj/masked-v2 %d %d" % (fr(wins[0][0]), fr(wins[0][1]))
-          if len(wins) == 1 else
-          "proposed: composite vsavj/masked-v2 - " +
-          ";".join("%d-%d" % (fr(x), fr(y)) for x, y in wins))
-else:
-    print("proposed: composite vsavj/masked-v2 %s %s"
-          % (",".join(str(fr(i)) for r in flick for i in range(r[0], r[1] + 1)),
-             ";".join("%d-%d" % (fr(x), fr(y)) for x, y in wins)))
-PY
+# The measured shape of a divergence + a proposed expectation line in the
+# ratified vocabulary is tools/describe_masked_shape.py (14z-89: lifted out
+# of the heredoc that used to live here when the legacy-pairing promotion
+# needed the same classifier — one set of thresholds, one place to correct;
+# extraction verified output-identical on six real log pairs).
 
 if [ "$PREBUILT" = 1 ]; then
     echo "== B: PREBUILT merged artifact at $OUT (build skipped; shape"
@@ -380,7 +332,7 @@ for spec in "$EXPECT"/*.masked; do
         echo "        MEASURED, NOT RATIFIED — mechanism-attribute before touching"
         echo "        the expectation (CLAUDE.md §4). Measured shape:"
         python3 tools/analyze_divergence.py "$baselog" "$log" 2>&1 | sed 's/^/        /'
-        python3 "$W/describe.py" "$baselog" "$log" | sed 's/^/        /'
+        python3 tools/describe_masked_shape.py "$baselog" "$log" | sed 's/^/        /'
         mkdir -p build/gate_failures
         cp "$log" "build/gate_failures/merged1_a_$name.log"
         echo "        log kept: build/gate_failures/merged1_a_$name.log"

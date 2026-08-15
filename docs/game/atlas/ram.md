@@ -31,6 +31,16 @@ the two sides must share the mask; `tools/freeze_masked_basis.sh`):
 - **V2** `043c-043d,4182-41a2,41c2-41e2,4222-4262,7f00-8000` — + the
   medallion rows' slots 0x16 / 0x19+0x1A (14z-64, ratified with the
   donovan-m3a bundle 2026-08-06); `tests/expected/vsavj/masked-v2/`.
+  **EXTENDED 14z-89 from 14 to 49 logs** (the legacy-pairing promotion —
+  every replay whose loaded characters equal vanilla's now has a basis
+  log). Note the distinction: adding LOGS to a basis is not a basis
+  change, because the mask is what the checksum depends on; adding a
+  WINDOW is, and needs a new dir. The mask string above is unchanged, and
+  the dir now carries its own `MASK` record — `freeze_masked_basis.sh`
+  refuses a mask that disagrees with it, and its `VERIFY_BASIS=<name>`
+  control re-derived `16_xemu_2p` bit-for-bit before the extension was
+  written (that is the proof the mask matches these logs AND that the
+  instrument has not moved since 14z-64).
 - **V3 (PARKED)** `043c-043d,4182-41a2,41c2-41e2,4222-4262,42a2-42c2,7f00-8000`
   — + row 0x1D's slot (14z-88; ratified 2026-08-15 for the 14z-87b
   medallion move 0x1A→0x1D, WITHDRAWN the same day when the move was

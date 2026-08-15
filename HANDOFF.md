@@ -864,10 +864,16 @@ tests/audit_merged_legacy.sh          # 14z-81: THE MERGED-LEGACY MEASUREMENT,
                                       # playtest, no registry row on purpose),
                                       # proves the rig forms all three tenants'
                                       # matches (guarded char-init probes) and
-                                      # merged determinism, then (a) 14 legacy
-                                      # replays vs the frozen vanilla masked
-                                      # basis (V2; the mask comes from
-                                      # donovan-m5/mask) dispatched through
+                                      # merged determinism, then (a) THE
+                                      # LEGACY REPLAYS vs the frozen vanilla
+                                      # masked basis (V2; the mask comes from
+                                      # donovan-m5/mask) — the list is a GLOB
+                                      # over tests/expected/donovan-m5/*.masked,
+                                      # so it grew 14 -> 47 with the 14z-89
+                                      # legacy-pairing promotion and the
+                                      # runtime grew with it (~45 min -> ~2 h);
+                                      # a new .masked there joins this leg with
+                                      # no edit here — dispatched through
                                       # donovan-m3a's
                                       # ratified class table VERBATIM, except
                                       # 04's RATIFIED merged-specific inventory
@@ -880,11 +886,49 @@ tests/audit_merged_legacy.sh          # 14z-81: THE MERGED-LEGACY MEASUREMENT,
                                       # the three frozen single-tenant builds
                                       # (guard-clean + first-divergence floor +
                                       # classified report). 14z-83 result:
-                                      # FULL GREEN — leg (a) 14/14, leg (b)
-                                      # all six guard-clean, exit 0: the first
-                                      # all-green merged measurement. Failing
-                                      # logs (when any) kept in
+                                      # FULL GREEN at leg (a) 14/14 — the
+                                      # first all-green merged measurement.
+                                      # CURRENT (14z-89, leg (a) grown to 45
+                                      # by the legacy-pairing promotion):
+                                      # 42 PASS / 3 FAIL, leg (b) all six
+                                      # guard-clean. The 3 are measured and
+                                      # attributed, awaiting rulings (STATE
+                                      # "DECISIONS PENDING — 14z-89"): 21/26
+                                      # arm the type-6 tripwire on legacy,
+                                      # 12 measures the UNION of the two solo
+                                      # shapes. Failing logs kept in
                                       # build/gate_failures/
+tests/audit_legacy_pairings.sh        # 14z-89: WHICH REPLAYS ARE LEGACY
+                                      # CONTENT — and is each one compared
+                                      # against VANILLA rather than against
+                                      # itself? Measures every non-skip
+                                      # replay's loaded-character signature
+                                      # on vanilla AND on the build and
+                                      # FAILS if a legacy pairing carries
+                                      # only a self-frozen `.sha1` (which
+                                      # by construction cannot see a legacy
+                                      # regression — that is how the 14z-88
+                                      # medallion regression stayed green).
+                                      # The filename does not answer it:
+                                      # the *_don_*/*_victor_* families
+                                      # became LEGACY when M3a restored
+                                      # Jedah to cell 0x0F, and 35 of ~43
+                                      # self-frozen replays per set measured
+                                      # as legacy pairings. Signature is
+                                      # +0x60.l (the per-character hitbox
+                                      # base) NOT +0x382 (the voice class in
+                                      # match, 14z-87); compares the
+                                      # distinct-value SEQUENCE so a
+                                      # hook-cycle load phase is tolerated.
+                                      # 7 static verdict controls incl. the
+                                      # dead-instrument refusal, plus a LIVE
+                                      # positive control per set (the same
+                                      # replay with the tenant id poked must
+                                      # flip LEGACY->TENANT). NO POKES
+                                      # otherwise — it measures what
+                                      # run_suite dispatches. ~30 min,
+                                      # JOBS-parallel; report per set in
+                                      # build/legacy_pairings/*.tsv
 tests/audit_merged_vec3.sh [bd]       # 14z-81: the merged Huitzil satellite
                                       # anim-base probe — the crash localized
                                       # by the measurement above, made
@@ -1015,6 +1059,22 @@ tests/test_compare_composite.sh       # ground truth for the §4 v4 composite cl
                                       # windows, RATIFIED 2026-08-06): 7 synthetic
                                       # cases + a no-loophole check. No emulator.
                                       # donovan-m5w freezes 7 replays in this class
+tests/test_describe_masked_shape.sh   # 14z-89: ground truth for
+                                      # tools/describe_masked_shape.py, the
+                                      # classifier that turns a measured masked
+                                      # divergence into a PROPOSED expectation
+                                      # line. It used to be a heredoc inside
+                                      # audit_merged_legacy.sh, run only on that
+                                      # audit's failure path — i.e. only when
+                                      # something was already wrong — and its
+                                      # output is COPIED INTO EXPECTATION FILES
+                                      # by hand. 11 assertions: one per branch
+                                      # (exact/flicker/window/composite/two-window)
+                                      # + the replay-38 signature (never
+                                      # re-converges = NOT expressible, must be
+                                      # root-caused) + both threshold boundaries
+                                      # (flicker<=2 frames, re-convergence>60) +
+                                      # the length-mismatch report. Static, ~1 s
 tests/test_hui_boot.sh                # Huitzil stage-4 BOOT gate (14z-65): the
                                       # forced-pick match forms with HIS data
                                       # (base read from the build's own patch),
