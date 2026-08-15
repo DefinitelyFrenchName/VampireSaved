@@ -52,7 +52,14 @@
 >   (this fix changes ALL tenant engine-voice events to their own rows).
 > - The M5 sfx odds (0x112/0x14a/0x173/0x31B family — machinery ready).
 > - FLAKY CRASH RESET (Sasquatch intro; rig designed, STATE 14z-85f).
-> - Pyron's medallion whitening on 2P hover (row-0x1A family).
+> - Pyron's medallion whitening — NEW PRECISE TRIGGER (maintainer,
+>   14z-87b close): on merged7 it fires EXACTLY when P2 moves the
+>   selection ring onto DONOVAN's cell; nothing else triggers it.
+>   Reads as a select-palette row steal (Donovan's P2-hover load vs
+>   the row Pyron's medallion uses — the row-0x1A family). NEXT
+>   OPENER: reproduce with a select replay + snapshot pair (P2 ring
+>   on Donovan vs elsewhere), diff palette RAM at the hover frame,
+>   name the two writers.
 > - H-vs-P stuck-direction (~1/30, possibly emulator-side).
 > - Round-end flicker (parked; needs the maintainer's recording).
 > - Win-screen QUOTE (both tenants); select medallions polish;

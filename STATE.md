@@ -38,9 +38,17 @@ BROKEN/DEPRECATED in its header, rig 91 (proper joins/confirms,
 plants verified by ring+snapshots: authored 0x5D/0x62 = vs2 0x705/0x70A
 fire at the plant) replaces it; the borrow-mechanism findings stand
 (measured on a real, if unintended, match). Gotchas filed: packing law
-#3 [platform]; the rig-never-formed-a-match class [project]. Awaiting
-the maintainer field-check of the rebuilt artifacts; merged gates
-(keyon/WAV/trap parity) re-run at close.)
+#3 [platform]; the rig-never-formed-a-match class [project]. **FIELD-
+CONFIRMED (maintainer, 2026-08-15): "all sounds for Pyron, Phobos and
+Donovan are clean now, no obvious regression" (vanilla characters not
+yet play-tested — the masked legacy suites cover them at the RAM level;
+merged keyon/WAV/trap gates green).** NEW REPRO INFO filed the same
+message — Pyron's medallion whitening (the known-open row-0x1A family
+item): on merged7 it fires EXACTLY when P2 moves their selection ring
+onto DONOVAN's cell; no other move from either player triggers it. The
+shape reads as a select-palette row steal (Donovan's P2-hover palette
+load clobbering the row Pyron's medallion uses) — next session's
+opener, see NEXT_SESSION.)
 
 
 ### FIELD VERDICT (maintainer, 2026-08-15, post-close): **the beep
