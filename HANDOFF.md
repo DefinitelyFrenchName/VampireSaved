@@ -1096,6 +1096,14 @@ tests/test_effect_palette_table.sh    # 14z-76: the per-character palette POINTE
                                       # variant row, a build clobbering a base-half
                                       # row). tools/audit_effect_palette_table.py.
                                       # Static, seconds
+tests/test_gfx_menus_guard.sh         # 14z-90 (issue #6): ground truth for the
+                                      # pixel gate's rompath guard. An absent
+                                      # rompath and a vsavjw-only rompath must
+                                      # both FAIL — the second is the one a
+                                      # directory check cannot catch, where MAME
+                                      # would resolve by hash out of $ROMDIR and
+                                      # compare vanilla to vanilla. Plus a
+                                      # positive control. ROMDIR, ~40s
 tests/test_region_overlap_control.sh  # 14z-90 (issue #9): ground truth that the
                                       # region-overlap gate's CURRENT-trio
                                       # constants can fail. Points section 5 at
