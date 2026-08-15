@@ -1096,6 +1096,14 @@ tests/test_effect_palette_table.sh    # 14z-76: the per-character palette POINTE
                                       # variant row, a build clobbering a base-half
                                       # row). tools/audit_effect_palette_table.py.
                                       # Static, seconds
+tests/test_suite_dispatch_selftest.sh # 14z-90 (issue #7): ground truth for the
+                                      # kind->owner table in
+                                      # tests/test_suite_dispatch.sh. Three
+                                      # negative controls: an unlisted kind, an
+                                      # owner that no longer reads its kind, and
+                                      # a false battery-chain claim — each must
+                                      # turn the gate RED and name the reason.
+                                      # ROMDIR, no emulator, ~10s
 tests/test_build_gate_status.sh       # 14z-90 (issue #1): ground truth that a
                                       # REJECTED build aborts the gate instead of
                                       # being soaked and stamped PASS. Copies the

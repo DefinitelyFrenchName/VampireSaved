@@ -91,11 +91,50 @@ kinds=$(for f in "$REPO"/tests/expected/*/*.*; do
             [ "$ext" = "sha1" ] && continue
             echo "$ext"
         done | sort -u)
+# 14z-90 (issue #7): the check used to demand that EVERY kind be handled by
+# run_suite.sh. That is wrong for MARKER kinds. `.legacy-exempt` records the
+# maintainer's 61/62 ruling and is read by tests/audit_legacy_pairings.sh; the
+# replays it annotates carry a `.sha1` beside it and ARE dispatched normally.
+# So the gate was a false RED. The fix is not to loosen it — "handled by some
+# script somewhere" would green-light a genuinely undispatched kind — but to
+# name the OWNER per kind and assert that owner actually reads it. A kind
+# missing from this table is a hard failure, so a new marker cannot appear
+# unannounced, and an orphaned marker whose owner was deleted now goes red
+# (which the old check could not see).
+#
+#   <kind>:<owner script>:<how the owner is reached>
+#     battery  = must be invoked from tests/run_battery_m2.sh
+#     toplevel = run directly by the operator; HANDOFF.md documents it.
+#                Declared, not assumed: an owner may not silently claim
+#                coverage it does not have.
+KIND_OWNERS="masked:tests/run_suite.sh:toplevel
+pending:tests/run_suite.sh:toplevel
+skip:tests/run_suite.sh:toplevel
+diverge:tests/run_suite.sh:toplevel
+legacy-exempt:tests/audit_legacy_pairings.sh:toplevel"
+
 for k in $kinds; do
-    if grep -q "\.$k\"" "$REPO/tests/run_suite.sh"; then
-        echo "  ok: '.$k' expectations are handled by run_suite.sh"
+    row=$(echo "$KIND_OWNERS" | grep "^$k:" || true)
+    if [ -z "$row" ]; then
+        echo "FAIL: '.$k' expectations exist but the kind is not in the owner table"
+        fail=1
+        continue
+    fi
+    owner=$(echo "$row" | cut -d: -f2)
+    chain=$(echo "$row" | cut -d: -f3)
+    if [ ! -f "$REPO/$owner" ]; then
+        echo "FAIL: '.$k' names owner $owner, which does not exist"
+        fail=1
+    elif grep -q "\.$k\"" "$REPO/$owner"; then
+        echo "  ok: '.$k' expectations are read by $owner ($chain)"
     else
-        echo "FAIL: '.$k' expectation files exist but run_suite.sh never reads them"
+        echo "FAIL: '.$k' names owner $owner, but that script never reads the kind"
+        fail=1
+    fi
+    if [ "$chain" = battery ] \
+       && ! grep -q "$(basename "$owner")" "$REPO/tests/run_battery_m2.sh"; then
+        echo "FAIL: '.$k' owner $owner claims to run in the battery, but"
+        echo "      tests/run_battery_m2.sh never invokes it"
         fail=1
     fi
 done
