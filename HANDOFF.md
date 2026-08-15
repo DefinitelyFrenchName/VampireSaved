@@ -1096,6 +1096,16 @@ tests/test_effect_palette_table.sh    # 14z-76: the per-character palette POINTE
                                       # variant row, a build clobbering a base-half
                                       # row). tools/audit_effect_palette_table.py.
                                       # Static, seconds
+tests/test_movability_liveness.sh     # 14z-90 (issue #5): ground truth that
+                                      # tests/audit_region_movability.sh cannot
+                                      # score a DEAD emulator as `runs`. Injects
+                                      # stub builder/runner via BUILDER_CMD and
+                                      # GUARDED_RUNNER: never-started and
+                                      # empty-log rigs must FAIL and be named
+                                      # `dead`; a live rig must still score
+                                      # `runs`. Pre-fix the same rig exited 0
+                                      # and printed the budget claim.
+                                      # ROMDIR, no emulator, seconds
 tests/test_suite_dispatch_selftest.sh # 14z-90 (issue #7): ground truth for the
                                       # kind->owner table in
                                       # tests/test_suite_dispatch.sh. Three

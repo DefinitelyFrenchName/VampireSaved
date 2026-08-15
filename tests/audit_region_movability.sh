@@ -52,6 +52,23 @@
 # twice — see NEXT_SESSION "RIG LESSON"). Donovan needs no such control today
 # only because his case USED to crash, which proved the path ran.
 #
+# 14z-90 (GitHub issue #5): "needs no such control today" was WRONG as an
+# argument about THIS script, and the control is now in place for every leg —
+# the runner's exit code and an `^END ` line, with anything else scored `dead`
+# so it fails rather than passing. Ground truth: tests/test_movability_liveness.sh.
+# Measured on the pre-fix scoring with an emulator that never starts: exit 0 and
+# the full PASS text, budget claim included.
+#
+# PROVENANCE OF THE FROZEN VERDICTS, so a rerun does not have to trust the
+# above: anim's `runs` was NOT established by this script's verdict. Commit
+# 72c4338 established it by a three-way probe comparison — site 0x845EC fires
+# twice per select entry (f1401/f1402) on a working build, the baked build
+# fired once and faulted, the fixed build reproduced the working signature.
+# The other three regions were measured in the 14z-77 batch in which anim
+# CRASHED, and a crash cannot come from a dead emulator. So the recorded
+# conclusions stand; what was broken was the reproduction contract, which is
+# what this fix restores.
+#
 # The expectations stay frozen in both directions: if anim ever crashes here
 # again, a placement-dependent reference has been reintroduced somewhere the
 # build-time guard cannot see, and that is news worth stopping for.
@@ -69,6 +86,12 @@ if [ ! -x "$MAME_BIN" ] || [ ! -f "$WIDE_ZIP" ]; then
     echo "SKIP: need the WIDE MAME binary and a WIDE overlay romset"
     exit 0
 fi
+
+# 14z-90 (issue #5): a seam so the liveness control can inject a stub runner
+# and prove this audit FAILS on a dead emulator without a ~4.5 min build.
+# Production default is the real guarded runner; nothing else sets it.
+GUARDED="${GUARDED_RUNNER:-tools/run_replay_guarded.sh}"
+BUILDER="${BUILDER_CMD:-tools/build_donovan.sh}"
 
 WORK="$(mktemp -d)"
 trap 'rm -rf "$WORK" build/manifest/_movability.toml' EXIT
@@ -91,23 +114,42 @@ PY
     if ! KEY_SET=vsavj TENANT_MANIFEST=build/manifest/_movability.toml \
          TENANT_CHAR=0x13 WIDE_ROMSET="$WIDE_ZIP" \
          GEN_FLAGS="--allow-plausible --tripwire-open --profile cps2-wide-v1" \
-         tools/build_donovan.sh 6 "$WORK/$1" > "$WORK/$1.build" 2>&1; then
+         "$BUILDER" 6 "$WORK/$1" > "$WORK/$1.build" 2>&1; then
         echo "  FAIL: $1 — the BUILD errored, so runtime says nothing"
         tail -5 "$WORK/$1.build"
         fail=1; return
     fi
+    # 14z-90 (issue #5): the verdict used to derive from the ABSENCE of a crash
+    # string, with the runner's status thrown away by `|| true`. Every way of
+    # producing no output therefore scored `runs`: an empty log, a missing log
+    # (grep exits 2, which lands in the else), a crashed or never-started
+    # emulator. run_replay_guarded.sh already exits non-zero unless the log
+    # ends in a clean END line — that signal was being discarded. The file's
+    # own header demands this control for the H/P extension; it was never
+    # applied to the existing legs.
+    rc=0
     POKES="$POK" MAME_ROMPATH="$WORK/$1/rompath;$ROMDIR" \
-        tools/run_replay_guarded.sh vsavjw \
+        "$GUARDED" vsavjw \
         tests/replays/12_donovan_vs_cpu.rpl "$WORK/$1.rl" "$WORK/$1.box" \
-        >/dev/null 2>&1 || true
-    if grep -qE '^(CRASH|PCWEEDS|SOFTRESET)' "$WORK/$1.rl"; then got=crash;
-    else got=runs; fi
+        >/dev/null 2>&1 || rc=$?
+    if grep -qE '^(CRASH|PCWEEDS|SOFTRESET)' "$WORK/$1.rl" 2>/dev/null; then
+        got=crash
+    elif [ "$rc" = 0 ] && grep -q '^END ' "$WORK/$1.rl" 2>/dev/null; then
+        got=runs
+    else
+        # matches neither expectation, so the case always FAILs — a dead rig
+        # must never be scored as evidence either way.
+        got=dead
+    fi
     if [ "$got" = "$3" ]; then
         detail=""
         [ "$got" = crash ] && detail="  ($(grep -m1 '^CRASH' "$WORK/$1.rl"))"
         echo "  ok: $1 -> $got$detail"
     else
         echo "  FAIL: $1 -> $got, expected $3"
+        [ "$got" = dead ] && echo "        DEAD RIG: the guarded runner exited" \
+            "$rc and/or the log has no END line — this leg measured NOTHING," \
+            "so it is evidence for neither verdict (14z-90, issue #5)"
         # A region that STOPS moving is a regression of the 14z-78 fix: some
         # reference has gone back to being placement-dependent. Start with the
         # build-time guard's blind spot — a raw longword in embedded data, which
