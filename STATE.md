@@ -1,5 +1,14 @@
 # STATE — living progress log
 
+### DECIDED (maintainer, 2026-08-15, session close): **MiSTer = CORE
+### SURGERY ONLY, full stop.** The one-character substitution track is
+### not a MiSTer deliverable; MiSTer ships the full three-tenant roster
+### (jtcps PRG-cap lift + our QSound width fix + a MiSTer-shaped WIDE
+### profile, GFX <=32MB / ~54MB total) or it waits. Numbers behind the
+### ruling: only ONE added character fits the 4MB PRG cap (D+H alone
+### overflow by ~310KB, measured); a 17-character variant is impossible.
+### Recorded per the decided-items discipline; stretch-goal priority.
+
 Updated: 2026-08-15 (session 14z-87b FULL close — **THREE FIXES SHIPPED
 AND FIELD/SMOKE-CONFIRMED IN ONE DAY: the voice-borrow fix (b+c,
 "all sounds clean"), THE SWORD-PLANT BEEP (packing law #3,

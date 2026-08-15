@@ -29,7 +29,14 @@
 > pre-M5 voices unless a QSound-extended stock variant + the 4-line
 > width fix ships); (2) jtcps PRG-cap surgery for all three (+ our
 > 32MB GFX repack profile + the width fix; ~54MB total fits the 64MB
-> tier). No ruling yet on WHICH — parked as a roadmap decision.
+> tier). **DECIDED (maintainer, 2026-08-15, session close): "the only
+> way forward for MiSTer is core surgery, full stop."** The substitution
+> track is NOT a MiSTer deliverable; MiSTer ships all three or waits.
+> Scope when picked up: jtcps PRG-cap lift (+ possibly JTFRAME_SDRAM_XL)
+> on the core side; our side = the 4-line QSound width fix + a
+> MiSTer-shaped WIDE profile (GFX repacked <=32MB, ~54MB total) with its
+> own full gate battery per the dual-track doctrine. Stretch-goal
+> priority — after the roster work, not before.
 
 > ## START HERE — THE VOICE-BORROW FIX AWAITS THE EAR-CHECK
 >
