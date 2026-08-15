@@ -16,7 +16,7 @@
 #
 # WHAT A GREEN RUN PROVES: the merged image's legacy behaviour lands on the
 # SAME ratified comparison classes as the frozen single-tenant builds
-# (tests/expected/donovan-m6/*.masked — all three tenant sets agree
+# (tests/expected/donovan-m5/*.masked — all three tenant sets agree
 # byte-for-byte on the 13 shared legacy entries, and a merged build backs
 # 0x13 so 11_pick_donovan applies too) — with ONE ratified merged-specific
 # exception: 04_select_fuzz lands on the RATIFIED MERGED inventory
@@ -68,8 +68,8 @@ export MAME_BIN
 OUT="${MERGED_OUT:-build/merged1}"
 PREBUILT="${MERGED_PREBUILT:-0}"
 WIDE_ZIP="${WIDE_ROMSET:-$PWD/build/wide0/rompath/vsavjw.zip}"
-EXPECT="tests/expected/donovan-m6"          # the ratified prior (see header)
-BASE_LOGS="tests/expected/vsavj/masked-v3/logs"
+EXPECT="tests/expected/donovan-m5"          # the ratified prior (see header)
+BASE_LOGS="tests/expected/vsavj/masked-v2/logs"
 
 # The three frozen extract dirs are the generator's inputs, exactly as
 # tests/test_tenant_loop.sh uses them (extraction is deterministic —
@@ -127,7 +127,7 @@ note = "" if len(a) == len(b) else " [LENGTH MISMATCH %d vs %d]" % (len(a), len(
 d = [i for i in range(n) if a[i] != b[i]]
 if not d:
     print("shape: bit-identical%s" % note)
-    print("proposed: exact vsavj/masked-v3 -")
+    print("proposed: exact vsavj/masked-v2 -")
     sys.exit(0)
 runs, s, p = [], d[0], d[0]
 for i in d[1:]:
@@ -148,15 +148,15 @@ if tail <= 60:
           "required); this is not expressible in the ratified vocabulary "
           "and must be root-caused")
 elif not wins:
-    print("proposed: flicker vsavj/masked-v3 %d %s"
+    print("proposed: flicker vsavj/masked-v2 %d %s"
           % (len(d), ",".join(str(fr(i)) for i in d)))
 elif not flick:
-    print("proposed: window vsavj/masked-v3 %d %d" % (fr(wins[0][0]), fr(wins[0][1]))
+    print("proposed: window vsavj/masked-v2 %d %d" % (fr(wins[0][0]), fr(wins[0][1]))
           if len(wins) == 1 else
-          "proposed: composite vsavj/masked-v3 - " +
+          "proposed: composite vsavj/masked-v2 - " +
           ";".join("%d-%d" % (fr(x), fr(y)) for x, y in wins))
 else:
-    print("proposed: composite vsavj/masked-v3 %s %s"
+    print("proposed: composite vsavj/masked-v2 %s %s"
           % (",".join(str(fr(i)) for r in flick for i in range(r[0], r[1] + 1)),
              ";".join("%d-%d" % (fr(x), fr(y)) for x, y in wins)))
 PY
@@ -302,7 +302,7 @@ cmp -s "$W/a_03_two_player_vs.log" "$W/det2.log" || {
     exit 1; }
 echo "  ok: two masked runs of 03_two_player_vs bit-identical"
 
-echo "== 1 (leg a): merged vs VANILLA on the masked-v3 basis — the superset"
+echo "== 1 (leg a): merged vs VANILLA on the masked-v2 basis — the superset"
 echo "      question. Expectation: donovan-m3a's ratified classes VERBATIM,"
 echo "      plus the ratified merged-04 inventory (14z-82d). =="
 : > "$W/summary"
@@ -318,9 +318,9 @@ for spec in "$EXPECT"/*.masked; do
     # pointer phase, no gameplay surface, the ratified hook-flicker family.
     # The merged instrument is unregistered by design, so this expectation
     # lives HERE, not in a .masked file; the single-tenant prior
-    # (tests/expected/donovan-m6/04_select_fuzz.masked) is unchanged.
+    # (tests/expected/donovan-m5/04_select_fuzz.masked) is unchanged.
     if [ "$name" = "04_select_fuzz" ]; then
-        sline="composite vsavj/masked-v3 1525,2005,2009,2195 889-1104"
+        sline="composite vsavj/masked-v2 1525,2005,2009,2195 889-1104"
     fi
     # MERGED-ONLY RATIFIED EXPECTATION #2 (maintainer, 2026-08-13,
     # 14z-84). The chained drawer bank gates (the select/VS name fix)
@@ -329,13 +329,9 @@ for spec in "$EXPECT"/*.masked; do
     # row*0x20 family) fills ONE FRAME LATER — byte-attributed by
     # full-RAM dump-diff at f2836 (12 live bytes, fully re-convergent,
     # 884 clean frames after; the merged-04 mechanism's species). The
-    # ratified window 889-2415 itself is unchanged. 14z-88: the SOLO
-    # donovan-m6 prior now carries the SAME shape (the 14z-87b medallion
-    # move brought the identical one-frame slot-0x0B phase to the solo
-    # build; maintainer-ratified 2026-08-15) — the override is kept for
-    # its rationale but is no longer a deviation from the prior.
+    # ratified window 889-2415 itself is unchanged.
     if [ "$name" = "11_pick_donovan" ]; then
-        sline="composite vsavj/masked-v3 2836 889-2415"
+        sline="composite vsavj/masked-v2 2836 889-2415"
     fi
     class=${sline%% *}; rest=${sline#* }; base=${rest%% *}; args=${rest#* }
     baselog="$REPO/tests/expected/$base/logs/$name.log"

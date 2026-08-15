@@ -9,7 +9,32 @@
 ### overflow by ~310KB, measured); a 17-character variant is impossible.
 ### Recorded per the decided-items discipline; stretch-goal priority.
 
-### DECISION PENDING (maintainer) — 14z-88: THE MEDALLION MOVE (row 0x1D)
+### DECIDED (maintainer, 2026-08-15): OPTION (1) — REVERT the medallion
+### move. EXECUTED 14z-88 (same session): wheel_layout cells.11 pal_row
+### 29 -> 26 (+ shared_writes.toml back to 0x3a3b40 x3); don_m5 / hui40 /
+### pyron25 rebuilt IN PLACE and reproduce donovan-m5 3c599fb6 /
+### huitzil-m13 2629561c / pyron-m7 94ce9a48 exactly; their frozen V2
+### expectation sets restored from ee55c50; the m6/m14/m8 sets removed and
+### their registry rows WITHDRAWN (commented, reason attached); the four
+### gates back on the V2 basis (masked-v3 kept on disk, PARKED); merged7
+### rebuilt (738 ops). BATTERY AT CLOSE (all on the reverted builds):
+### three suites plain GREEN (donovan-m5 54 PASS; rig 92_p2_ring_walk
+### frozen on the three sets — it had NO expectation on the restored
+### sets, double-run deterministic); test_tenant_loop 738/…; shared_writes
+### frozen inventory PASS; m3a all-four bit-exact (3c599fb6/6c93cfa8/
+### 2629561c/94ce9a48); audit_merged_legacy AUDIT-EXIT 0 (V2 basis);
+### audit_trap_parity PASS; hui_boot / pyron_ladder PASS (masked-v2
+### EXACT); tenant_select_records PASS after ONE stale pin was fixed —
+### its splash section pinned the CPU opponent's RNG ladder-draw record
+### (0x2738b8, 14z-62e); the draw follows hook-cycle-shifted RNG state and
+### had moved to 0x273a02 by the 14z-87 batch (pre-existing, unrelated to
+### the medallion — the gate had sat out the batteries); it now matches
+### the SHAPE (a VANILLA record then the tenant's) and prints the draw. The
+### merged-only cosmetic P2-ring-on-Donovan medallion whitening is BACK;
+### the maintainer ruled it OPTIONAL / nice-to-have ("purely cosmetic and
+### outside of combat, like the win quotes") — the portrait-side fix is
+### documented in NEXT_SESSION but is not a task unless it is cheap.
+### ORIGINAL BRIEF (kept for the record): 14z-88: THE MEDALLION MOVE (row 0x1D)
 ### CARRIES A LEGACY REGRESSION on the H/P/merged builds. Measured, not
 ### inferred: replay 38 (P1 Victor vs P2 Jedah picked on cell 0F — ids
 ### 0x00/0x04, IDENTICAL to vanilla's, a pure legacy pairing) on hui40 /

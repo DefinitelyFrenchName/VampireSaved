@@ -1,56 +1,71 @@
 # NEXT SESSION — orientation (written at the close of 14z-88, 2026-08-15)
 
-> ## FIRST TASK — THE MAINTAINER'S RULING ON THE 14z-88 REGRESSION
-> ## (STATE "DECISION PENDING — 14z-88"; recommended: REVERT the
-> ## medallion move, then fix the collision on the portrait side)
+> ## FIRST TASK — close the legacy-coverage gap 14z-88 exposed
+> ## (the medallion whitening itself is OPTIONAL — maintainer, 2026-08-15:
+> ## "purely cosmetic and outside of combat, like the win quotes; fully
+> ## optional/nice-to-have if correcting it is too costly")
 >
-> 14z-88 applied the ratified row-0x1D window (V3 basis, below) and, in
-> attributing the moved tenant `.sha1`s before re-freezing, MEASURED that
-> the 14z-87b medallion move (Pyron pal_row 0x1A -> 0x1D) makes replay 38
-> (P1 Victor vs P2 Jedah on cell 0F — ids identical to vanilla, a LEGACY
+> 14z-88 (maintainer-decided, executed): the 14z-87b medallion move
+> (Pyron pal_row 0x1A -> 0x1D) was REVERTED — it made replay 38 (P1
+> Victor vs P2 Jedah on cell 0F, ids identical to vanilla: a LEGACY
 > pairing) lose one main-loop iteration at the select->VS fade on the
-> huitzil-m14 / pyron-m8 / merged7 builds: whole-RAM vs vanilla never
-> re-converges (pre-move builds: the ordinary composite 829 + window
-> 889-2091, 2909 identical after). Root cause: the fade's per-color work
-> is data-dependent and that frame already runs at the VBL edge; the
-> palette content on row 0x1D crossed it. A 0x1B probe moved OTHER frozen
-> inventories and 0x1B is OBJ-used anyway. Options and recommendation are
-> in STATE; NOTHING was re-frozen — the three suites are RED on the tenant
-> `.sha1` rows by design until the ruling. If REVERT: `wheel_layout_
-> proposed.json` cells.11 pal_row 29 -> 26 reproduces donovan-m5 /
-> huitzil-m13 / pyron-m7 (3c599fb6 / 2629561c / 94ce9a48, all frozen
-> sets green; the V3 window then hides nothing and the sets go back to
-> the V2 basis — keep masked-v3 + the tools; the P2-ring-on-Donovan
-> whitening returns until the portrait-side fix). ALSO close the coverage
-> gap that let this hide: promote the P2-human legacy pairings (31-40
-> victor family, and any replay whose loaded ids equal vanilla's) from
-> `.sha1` to `.masked` legacy classes on every set + into
-> audit_merged_legacy's list.
+> huitzil / pyron / merged builds (whole-RAM never re-converges vs
+> vanilla; pre-move builds show the ordinary composite 829 + window
+> 889-2091). Root cause: the fade's per-color work is data-dependent
+> and that frame already runs at the VBL edge (vanilla's per-iteration
+> counter $FF8081 shows 2 frames/iteration there); Pyron's palette on
+> row 0x1D crossed it. A 0x1B probe moved OTHER frozen inventories
+> (04 lost flicker 1525; 05 never re-converged) and 0x1B is used by 18
+> select sprites anyway — every row choice moves cycles somewhere.
+> CURRENT builds are donovan-m5 / huitzil-m13 / pyron-m7 again
+> (3c599fb6 / 2629561c / 94ce9a48; dirs don_m5/hui40/pyron25; merged
+> build/m3b_merged7 rebuilt, 738 ops) — battery green at close (STATE).
+> The merged-only cosmetic P2-ring-on-Donovan medallion whitening is
+> BACK — and by the maintainer's ruling it is a NICE-TO-HAVE, not a
+> task: only pick it up if it is cheap. IF picked up: leave Pyron's
+> medallion on 0x1A and move DONOVAN'S P2-HOVER PORTRAIT off row 0x1A
+> instead (the 20 sprites,
+> codes ad90-ad9d, that draw with pal=1a by vs2-heritage attr — 14z-87b
+> OBJ census; his P2 select_records portrait row / select_pal_variant_id
+> thunk are the writers to attribute), OR skip the medallion rows in the
+> fade — either way MEASURE THE COST FIRST: run the P2-human legacy
+> pairings (31-40) against vanilla, not just the masked 13, and attribute
+> every moved .sha1 with tests/audit_mask_window_ff42a2.sh before any
+> re-freeze (that audit is what caught it). THE ACTUAL FIRST TASK: close
+> the gap for good — promote 31-40 (any replay whose loaded ids equal
+> vanilla's) from `.sha1` to `.masked` legacy classes on every set + into
+> audit_merged_legacy, so a legacy pairing can never again hide behind a
+> self-frozen expectation.
+> The V3 basis (row 0x1D's slot) is PARKED — tests/expected/vsavj/
+> masked-v3 + tools/freeze_masked_basis.sh stay for whatever row lands.
 >
-> ## What landed (14z-88), keep:
-> V3 masked basis: mask `043c-043d,4182-41a2,41c2-41e2,4222-4262,42a2-
-> 42c2,7f00-8000` + `tests/expected/vsavj/masked-v3/` (`tools/freeze_
-> masked_basis.sh` — a window is a BASIS: masked bytes are skipped from
-> the checksum, so the vanilla side is regenerated under the same mask);
-> the 13 shared legacy `.masked` replays hold their FROZEN classes on all
-> three sets; audit_merged_legacy 14/14 + leg (b) clean on V3; hui_boot /
-> pyron_ladder / tenant_select_records green. Solo donovan-m6 replay 11 =
-> `composite 2836 889-2415` (MAINTAINER-RATIFIED 2026-08-15: the merged-
-> ratified one-frame slot-0x0B staging phase, writer PRG:0x01C3BA, now on
-> the solo build too). `tests/audit_mask_window_ff42a2.sh` = the pre/post
+> ## What 14z-88 measured and kept (parked with the revert):
+> The V3 masked basis mechanics work: mask `043c-043d,4182-41a2,41c2-
+> 41e2,4222-4262,42a2-42c2,7f00-8000` + `tests/expected/vsavj/masked-v3/`
+> (`tools/freeze_masked_basis.sh` — a window is a BASIS: masked bytes are
+> skipped from the checksum, so the vanilla side is regenerated under the
+> same mask); under it the 13 shared legacy `.masked` replays held their
+> FROZEN classes on all three sets and audit_merged_legacy was 14/14. On
+> the 0x1D build the SOLO Donovan replay 11 measured `composite 2836
+> 889-2415` (MAINTAINER-RATIFIED 2026-08-15: the merged-ratified one-frame
+> slot-0x0B staging phase, writer PRG:0x01C3BA) — moot after the revert
+> (plain window again) but the ratification stands for that row. `tests/audit_mask_window_ff42a2.sh` = the pre/post
 > attribution instrument (rebuild the pre-move builds in a worktree at
 > e6abaa9^; accepted classes: staging area, OBJ-chain return address at
 > $FF06DE, the $FF80B5 latch). Maintainer field results the same day:
-> merged7 medallions CLEAN for every hover combination (polish check
-> CLOSED — but see the decision); H-vs-P stuck-direction not reproduced —
+> merged7 (0x1D build) medallions CLEAN for every hover combination —
+> that measured the 0x1D row's freedom from OBJ collisions, which the
+> portrait-side fix can reuse; H-vs-P stuck-direction not reproduced —
 > keep listed, assume emulator-side or resolved.
 
 > ## START HERE — the open list, in order
 > - The M5 sfx odds (0x112/0x14a/0x173/0x31B family — machinery ready).
 > - FLAKY CRASH RESET (Sasquatch intro; rig designed, STATE 14z-85f).
 > - Round-end flicker (parked; needs the maintainer's recording).
-> - Win-screen QUOTE (both tenants); region_space re-freeze; op-tagging
->   for test_shared_writes.
+> - OPTIONAL / cosmetic (maintainer 2026-08-15): the merged-only
+>   P2-ring-on-Donovan medallion whitening (portrait-side fix, above);
+>   win-screen QUOTE (both tenants). Also: region_space re-freeze;
+>   op-tagging for test_shared_writes.
 > - H-vs-P stuck-direction (~1/30) — possible; not reproduced recently.
 > - Then MiSTer core surgery (stretch, DECIDED below) — after the roster.
 
@@ -151,7 +166,10 @@
 >   Snapshot-verified: ring-on-Donovan leaves the medallion orange.
 >   Rig: 92_p2_ring_walk.rpl (P2 walk D,D,D,L,D,R,R). The polish check
 >   (both cursors over all tenant cells) was DONE BY THE MAINTAINER
->   2026-08-15: all medallions clean for every combination — CLOSED.
+>   2026-08-15 on the 0x1D build: all medallions clean for every
+>   combination. **REVERTED 14z-88 (see FIRST TASK): the 0x1D row cost a
+>   legacy pairing a main-loop frame; the whitening is BACK on merged7
+>   and the fix moves to Donovan's P2-hover PORTRAIT row.**
 > - H-vs-P stuck-direction (~1/30) — not reproduced in any recent test
 >   (maintainer, 2026-08-15): keep listed, assume emulator-side or resolved.
 > - Round-end flicker (parked; needs the maintainer's recording).

@@ -147,7 +147,26 @@ else
                 $1=="frame" && a0!="00000000" && a0!=skip && a0!=prev {
                     printf "%s ", a0; prev=a0 }' "$WORK/$1.txt")
         fi
-        if [ "$got" = "$4" ]; then
+        # token "VANILLA" in the expected sequence matches ANY vanilla ROM
+        # record (an address below the WIDE extension and not the tenant's
+        # own) — for rows whose IDENTITY is an RNG draw (the CPU opponent's
+        # ladder draw shifts with hook cycles: 14z-62e froze 0x2738b8, the
+        # 14z-87 batch draws 0x273a02; the gate asserts the SHAPE — a
+        # vanilla record then the tenant's — and prints the draw).
+        seq_ok=1
+        _want="$4"; _got="$got"
+        while [ -n "$_want" ]; do
+            w=${_want%% *}; _want=${_want#* }; [ "$_want" = "$w" ] && _want=""
+            g=${_got%% *};  _got=${_got#* };   [ "$_got" = "$g" ] && _got=""
+            if [ "$w" = VANILLA ]; then
+                case "$g" in 00[0-3]?????) [ "$g" != "$(rowval splash_p1 p1)" ] || seq_ok=0 ;; *) seq_ok=0 ;; esac
+                [ -n "$g" ] && echo "  (RNG draw: vanilla record $g)"
+            else
+                [ "$w" = "$g" ] || seq_ok=0
+            fi
+        done
+        [ -z "$_got" ] || seq_ok=0
+        if [ "$seq_ok" = 1 ]; then
             echo "  ok: $1 — vanilla rows then the tenant's record"
         else
             echo "  FAIL: $1 — the engine fetched a different sequence"
@@ -182,13 +201,15 @@ else
         "00272156 0027218e 002721d4 002721c6 $(rowval name_banner p1) " \
         "" first
     # VS SPLASH (14z-62e; fires at the versus screen, ~frame 2599 on this
-    # replay): the CPU opponent's VANILLA splash_p2 row (0x06 for this
-    # replay's ladder draw) interleaves with the TENANT's composed
+    # replay): the CPU opponent's VANILLA splash_p2 row (an RNG ladder
+    # draw — 0x06 / record 0x2738b8 at 14z-62e, 0x273a02 by 14z-87: the
+    # draw follows hook-cycle-shifted RNG state, so it is matched as
+    # VANILLA, not pinned — 14z-88) interleaves with the TENANT's composed
     # splash_p1 record — the engine serving the tenant's own splash.
     # (The win-quote piece fires only at a match win; statics + alias
     # anchors cover it until a 0x13 win replay exists.)
     RT_FRAMES=2800 runtime splash 36_pick_tenant_cell.rpl "2672aa,100,r" \
-        "002738b8 $(rowval splash_p1 p1) " "" first
+        "VANILLA $(rowval splash_p1 p1) " "" first
     # ...and the +0x80 name structure has NO consumer on any measured path
     # (0 reads through 2P select, confirm, splash, match start). The
     # composed row is kept for safety; this asserts the measured negative
@@ -227,12 +248,14 @@ echo "== 4. de-substitution acceptance: picking the HOST re-converges =="
 # $FF4222-41 row 0x19, $FF4242-61 row 0x1A; the staging area is
 # $FF3F02 + row*0x20 and the ratified $FF4182 window is row 0x14's
 # slot — same mechanism, sibling slots, part of the bundle
-# ratification). 14z-88: V3 adds row 0x1D's slot ($FF42A2-C1 — Pyron's
-# medallion row after the 14z-87b move, maintainer-ratified 2026-08-15).
-# The mask is READ from the current expectation set (one source of truth,
-# not a copy) and the vanilla logs under that basis live in
-# tests/expected/vsavj/masked-v3/ (regenerated deterministically from
-# the frozen vanilla oracle by tools/freeze_masked_basis.sh).
+# ratification). The vanilla logs under this basis live in
+# tests/expected/vsavj/masked-v2/ (regenerated deterministically from
+# the frozen vanilla oracle — tools/freeze_masked_basis.sh). 14z-88: the
+# mask is READ from the current expectation set (one source of truth);
+# a V3 basis (row 0x1D's slot) was applied and WITHDRAWN the same day —
+# the 0x1D medallion move cost a legacy pairing one main-loop frame
+# (STATE 14z-88); with the row back on 0x1A this section is the plain
+# bounded window again.
 # measure as the §4 v3 BOUNDED WINDOW (PENDING RATIFICATION in the
 # re-freeze bundle). History: 14z-62c measured window 890-2362 ($FF06D1
 # menu counter tail); 14z-63 wheel bank-5 moved it to 889-2415 (onset =
@@ -244,28 +267,22 @@ echo "== 4. de-substitution acceptance: picking the HOST re-converges =="
 # rows 0x16/0x19 on select, so the transition fade never stages the
 # changed rows) — measured: the flicker inventory is EMPTY and the
 # window is unchanged, so the class reverts to the plain bounded
-# window. 14z-88: the 14z-87b medallion move (Pyron 0x1A -> 0x1D) brings
-# the flicker BACK — the transition fade's staging copy (PRG:0x01C3BA)
-# lands its slot-0x0B chunk one frame later at f2836 (12 bytes,
-# re-convergent), the shape the maintainer had already ratified for the
-# merged build; RATIFIED for the solo build 2026-08-15, so the class is
-# the §4 v4 COMPOSITE `2836 889-2415` (compare_composite) again.
-# This section is the reason the whole slot-row audit exists —
+# window. This section is the reason the whole slot-row audit exists —
 # it caught the palette/sfx/fixture rows still aimed at row 0x0F.
 if [ "${SKIP_RUNTIME:-0}" = 1 ]; then
     echo "  SKIPPED (SKIP_RUNTIME=1)"
 else
-    MASK_RANGES="$(cat tests/expected/donovan-m6/mask)" MAME_BIN="$WIDE_BIN" \
+    MASK_RANGES="$(cat tests/expected/donovan-m5/mask)" MAME_BIN="$WIDE_BIN" \
     MAME_ROMPATH="$OUTBASE/rompath;$ROMDIR" \
         tools/run_replay_mame.sh vsavjw tests/replays/11_pick_donovan.rpl \
         "$WORK/11_legacy.log" > "$WORK/11_legacy.out" 2>&1 || {
         echo "  FAIL: replay 11 did not complete"; fail=1; }
     if [ -f "$WORK/11_legacy.log" ]; then
-        if python3 tools/compare_composite.py \
-                tests/expected/vsavj/masked-v3/logs/11_pick_donovan.log \
-                "$WORK/11_legacy.log" --flicker 2836 --windows 889-2415 \
+        if python3 tools/compare_window.py \
+                tests/expected/vsavj/masked-v2/logs/11_pick_donovan.log \
+                "$WORK/11_legacy.log" --onset 889 --end 2415 \
                 > "$WORK/11_legacy.cmp" 2>&1; then
-            echo "  ok: host pick = composite {2836} + window 889-2415, fully re-convergent (ratified 2026-08-15)"
+            echo "  ok: host pick = bounded window 889-2415, fully re-convergent"
         else
             echo "  FAIL: the host pick does not re-converge as frozen:"
             sed 's/^/        /' "$WORK/11_legacy.cmp" | tail -5

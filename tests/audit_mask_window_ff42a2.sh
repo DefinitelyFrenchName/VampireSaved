@@ -1,7 +1,10 @@
 #!/bin/sh
 # audit_mask_window_ff42a2.sh — the row-0x1D palette-staging window
 # ($FF42A2-$FF42C1, mask entry `42a2-42c2`, V3 basis; maintainer-ratified
-# 2026-08-15, applied 14z-88) attributed on the TENANT-CONTENT replays.
+# 2026-08-15, applied 14z-88 — then WITHDRAWN the same day with the
+# medallion REVERT this audit motivated) attributed on the TENANT-CONTENT
+# replays. Kept as THE pre/post attribution instrument for any future
+# select-palette row move (it is what caught the 38 regression).
 #
 # THE QUESTION: when the 14z-87b medallion move (Pyron's wheel pal_row
 # 0x1A -> 0x1D, one layout field) moved a set's self-frozen `.sha1`
@@ -63,8 +66,10 @@ case "$POST" in /*) ;; *) POST="$REPO/$POST" ;; esac
 V2="043c-043d,4182-41a2,41c2-41e2,4222-4262,7f00-8000"
 V3="043c-043d,4182-41a2,41c2-41e2,4222-4262,42a2-42c2,7f00-8000"
 STG="4182-41a2,41c2-41e2,4222-4262,42a2-42c2"
-[ "$(cat "$REPO/tests/expected/donovan-m6/mask")" = "$V3" ] || {
-    echo "FAIL: donovan-m6/mask is not the V3 string this audit encodes"; exit 1; }
+# V2/V3 are the audit's own constants (the V3 basis is PARKED since the
+# 14z-88 revert — the row-0x1D window is not in any live set; override
+# with MASK_PRE_POST=... to attribute a different move under its mask).
+V3="${MASK_PRE_POST:-$V3}"
 WORK="$(mktemp -d)"
 trap 'rm -rf "$WORK"' EXIT
 cd "$REPO"

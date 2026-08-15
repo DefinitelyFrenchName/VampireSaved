@@ -67,9 +67,11 @@ check_diverge() {
 # staging area is $FF3F02 + row*0x20; row 0x14's slot $FF4182-$FF41A1
 # was ratified round 64 for the 14z-49 port, 14z-64 added the sibling
 # slots for the medallion rows 0x16/0x19/0x1A (V2, ratified with the
-# donovan-m3a bundle), and 14z-88 added row 0x1D's slot $FF42A2-$FF42C1
-# (V3, ratified 2026-08-15 — Pyron's medallion row after the 14z-87b
-# move). Must stay in sync with M2A_MASK in tests/lib/m2a_common.sh.
+# donovan-m3a bundle); 14z-88 added row 0x1D's slot $FF42A2-$FF42C1
+# (V3, ratified 2026-08-15 for the 14z-87b medallion move) and WITHDREW
+# it the same day with the move's revert (STATE 14z-88) — masked-v3 is
+# kept on disk as a parked basis. Must stay in sync with M2A_MASK in
+# tests/lib/m2a_common.sh.
 # PER-SET OVERRIDE (14z-64): an expectation set frozen under a different
 # basis ships tests/expected/<set>/mask with its MASK_RANGES string —
 # sets without one use the round-64 default below (the stock-track sets).
