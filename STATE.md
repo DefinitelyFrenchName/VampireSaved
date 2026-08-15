@@ -1,5 +1,30 @@
 # STATE — living progress log
 
+### FIELD VERDICT (maintainer, 2026-08-15, post-close): **the beep
+### PERSISTS unchanged on don_m5 AND merged7** — "medium-high pitch, very
+### short but loud, around when the sword is in the ground or reappearing
+### planted". The b+c fix stands as a real correctness fix (tenant voice
+### class), but it was NOT the reported symptom: the beep is INVARIANT
+### across m4/m5, so it is none of the ids the fix moved (0x308/0x62B/
+### 0x6A). Keep-or-revert: recommended KEEP (compatibility impact nil incl.
+### MiSTer — plain 68k code + ROM data, no new members/banking; awaiting
+### maintainer confirmation). HUNT REOPENED (14z-87b, in progress):
+### measured so far — 0x152 REFUTED by a silence-probe build (transients
+### identical with it gone; its dead-on ring timing was coincidence — the
+### ours-vs-native WAV differential is CONFOUNDED by the two games'
+### different music beds, gotcha-worthy); the kept-id record sweep shows
+### sample-RECORD divergence is COMMON (nearly every kept id's records
+### differ across games — record diff alone does not imply audible diff;
+### content-at-resolved-windows is the test); id 0x152's sample #0x3E IS
+### audibly divergent (vsavj saturated head vs vs2 real audio, vs2 content
+### ABSENT from vsav's image → needs a wide-bank sample port when fixed)
+### but it is NOT the beep. Candidate lineup (raw sample WAVs) sent to the
+### maintainer for ear identification: 0x198/0x498-family (chirp, bank
+### divergence at smp#23), 0x101, 0xF3 (smp#04 window divergence), 0x005,
+### 0x012, 0x111. Blocked on the maintainer's pick; next instrument if
+### needed: per-id silence-probe builds (the 0x152 pattern) over the
+### remaining candidates.
+
 Updated: 2026-08-15 (session 14z-87 close — **THE VOICE-CLASS BORROW FIX
 SHIPPED (maintainer-decided option b+c, same day as the root-cause):
 donovan-m5 3c599fb6 / huitzil-m13 2629561c / pyron-m7 94ce9a48, merged
