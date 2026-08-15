@@ -47,11 +47,11 @@ NOPS="$(python3 -c "import json;print(len(json.load(open('$OUT/patch/patch.json'
 # RE-FROZEN 14z-86 (was 678): +51 = the M5 voice batch (15 shared
 # alias-thunk pokes + the restored voice farm stubs across the three
 # recon maps). Matches test_tenant_loop's frozen 3-tenant count.
-[ "$NOPS" = 729 ] || {
-    echo "FAIL: $NOPS ops, frozen fixture is 729 (re-freeze"
+[ "$NOPS" = 738 ] || {
+    echo "FAIL: $NOPS ops, frozen fixture is 738 (re-freeze"
     echo "      test_tenant_loop FIRST if the merge legitimately changed)"
     exit 1; }
-echo "  ok: 729 ops (the frozen test_tenant_loop fixture; 14z-86 voice batch)"
+echo "  ok: 738 ops (the frozen test_tenant_loop fixture; 14z-87 voice-borrow fix)"
 python3 tools/patch_prg.py "$ROMDIR/vsavj.zip" "$OUT/prg" \
     --patch "$OUT/patch/patch.json" > "$OUT/patch_prg.log" 2>&1 || {
         echo "FAIL: patch_prg refused the merged patch"
@@ -177,7 +177,7 @@ done
 FP="$(python3 tools/build_fingerprint.py "$OUT/rompath;$ROMDIR" --set vsavjw --sha-only)"
 cat > "$OUT/README.txt" <<EOF
 3-TENANT MERGED BUILD WITH GFX (tools/build_merged.sh, 14z-83 S4).
-Program: the 729-op merged image. Gfx: the S2 chain (D -> H -> P), last
+Program: the 738-op merged image. Gfx: the S2 chain (D -> H -> P), last
 link's members packed; group B pristine.
 NOT REGISTERED (S6 decision) — run_suite refuses it until frozen.
 fingerprint: $FP

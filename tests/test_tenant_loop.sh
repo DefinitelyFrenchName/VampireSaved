@@ -120,7 +120,14 @@ echo "== 1: one tenant per run — the frozen op counts =="
 # op — the kind=sound_stub
 # synthesized stub for vs2 farm 0x4F2E (the restored trap-detonation
 # chirp, reconciliation_huitzil.toml).
-FROZEN_1="donovan:265 huitzil:300 pyron:234"
+# RE-FROZEN 14z-87 (D 265->270, H 300->305, P 234->239): THE VOICE-CLASS
+# BORROW fix, option (b)+(c) (maintainer-decided 2026-08-15) — +5 ops per
+# declaring tenant: the shared voice_borrow_keep_tenant site_thunk (2 ops:
+# body + jsr site, byte-identical rows deduped on merge) + the
+# voice_borrow_site_pad code_word (1 op: the stolen 4th word -> nop) + the
+# two per-tenant [[data_port]] candidate/voice-number table rows (2 ops).
+# All only_variant_slot-gated; the stock twin measured BIT-IDENTICAL.
+FROZEN_1="donovan:270 huitzil:305 pyron:239"
 for row in $FROZEN_1; do
     who="${row%%:*}"; want="${row##*:}"
     case "$who" in donovan) ex="$D_EX" ;; huitzil) ex="$H_EX" ;; *) ex="$P_EX" ;; esac
@@ -188,8 +195,12 @@ check_n() {  # check_n <label> <dir> <want ops> <sum of 1-tenant counts>
 # H resolves) — at N=3 the latter four are multi-resolver anyway.
 # RE-FROZEN 14z-85g (+1 each: hui's sound_stub op rides every N that
 # includes him).
-check_n "2 tenants" "$WORK/two"   531 560
-check_n "3 tenants" "$WORK/three" 729 770
+# RE-FROZEN 14z-87 (was 531/560 and 729/770): the voice-borrow fix —
+# +7 at N=2 (3 shared thunk/pad ops deduped + 2 data_port ops per tenant)
+# and +9 at N=3 (3 shared + 2x3 per-tenant), matching the +5-per-solo
+# delta above with the shared rows counted once.
+check_n "2 tenants" "$WORK/two"   538 570
+check_n "3 tenants" "$WORK/three" 738 785
 
 # ── 3: every tenant's own content is present ────────────────────────────
 # An op count alone cannot tell "both tenants ran" from "tenant 0 ran twice".

@@ -1070,6 +1070,52 @@ keep_ids = "0x110,0x111,0x112,0x202,0x97,0x9a,0x9e,0xa0,0xa1,0xa2,0xa3,0xa4,0xa5
 remap_ids = "0x720:0x97,0x723:0x9a,0x727:0x9e,0x729:0xa0,0x72a:0xa1,0x72b:0xa2,0x72c:0xa3,0x72d:0xa4,0x72e:0xa5,0x72f:0xa6"
 unstub = "0x005122=0x5FFF00"   # -> the voice alias thunk (14z-86)
 
+# ── THE VOICE-CLASS BORROW (14z-87, option b+c) ─────────────────────────────
+# Shared engine-site thunk + pad: byte-identical twins of donovan.toml's
+# rows (full mechanism narrative lives there; merged builds dedup them).
+# The per-tenant candidate/voice-number rows below port vs2's Pyron
+# (0x11) rows over vsavj's variant aliases.
+[[site_thunk]]
+stage = 6
+name = "voice_borrow_keep_tenant"
+site = 0x00AEF2
+old_hex = "3b4001141341"
+only_variant_slot = true
+id_literal_ok = "0x10,0x11,0x13"
+thunk_hex = "3b4001140c290010038267140c2900110382670c0c29001303826704134103824e75"
+note = "14z-87 option (b): keep a tenant's own voice class at the borrow write (all-tenant condition; shared engine site, deduped across manifests)"
+
+[[code_word]]
+stage = 6
+name = "voice_borrow_site_pad"
+addr = 0x00AEF8
+old_hex = "0382"
+new_hex = "4e71"
+only_variant_slot = true
+note = "14z-87: the stolen site's 4th word (tail of move.b d1,(0x382,a1)) -> nop; pairs with voice_borrow_keep_tenant"
+
+[[data_port]]
+stage = 6
+name = "voice_borrow_candidates_a"
+src = 0x9F6A          # vs2 0x9B2A + 0x11*0x40 (class-candidate table row 0x11)
+len = 0x40
+dst = 0xB6A8          # vsavj 0xB268 + 0x11*0x40 (variant row, alias of 0x01)
+dst_end = 0xB6E8
+dst_old_head = "06030a02040f0518000c070e0d0f05180a04090e000f05180e000a02070f05180c060302070f0518060e09000d0f0518040d0902070f0518030c00060e0f0518"
+only_variant_slot = true
+note = "14z-87 option (c): vs2's Pyron row of the voice-class candidate table (8 venue slots x 8 classes)"
+
+[[data_port]]
+stage = 6
+name = "voice_borrow_voicenums_b"
+src = 0xA86A          # vs2 0xA42A + 0x11*0x40 (paired voice-number table)
+len = 0x40
+dst = 0xBFA8          # vsavj 0xBB68 + 0x11*0x40 (variant row, alias of 0x01)
+dst_end = 0xBFE8
+dst_old_head = "061012021416000a0e1204021416000a0c1012021416000a080e12021416000a120610021416000a060812021416000a100c12021416000a101202061416000a"
+only_variant_slot = true
+note = "14z-87 option (c): vs2's Pyron row of the paired voice-number table (feeds $FF8100 via the borrow)"
+
 # THE VOICE ALIAS THUNK (14z-86, shared by all tenants — identical
 # rows dedupe on merge). A range-gated clone of the per-node sfx
 # helper 0x4CE2: ids in the authored voice range 0x58-0xA6 SKIP the

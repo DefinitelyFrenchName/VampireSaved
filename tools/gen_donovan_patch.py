@@ -5931,6 +5931,13 @@ def main():
                 if args.stage < _int(cw.get("stage", 0)):
                     continue
                 nm = cw["name"]
+                # only_base_slot / only_variant_slot (14z-87): same gating as
+                # aux_poke/data_port/site_thunk — added for the voice-borrow
+                # site pad, whose word must stay vanilla on the stock twin.
+                if not row_applies(cw, owner_of(cw)):
+                    notes.append(f"# code_word {nm}: SKIPPED (slot-track gated; "
+                                 f"owner at {_int(owner_of(cw)['dst_slot']):#04x})")
+                    continue
                 old = bytes.fromhex(cw["old_hex"])
                 # new_hex_variant (14z-62d), by the row's OWNER (slice C): value
                 # differs by where the tenant lives (e.g. the OBJ bank word: host

@@ -48,9 +48,19 @@
 
 [[tenant]]
 name = "donovan"
-build = "build/m5_wide"
-count = 67
+build = "build/don_m5"
+count = 71
 writes = [
+  # 14z-87 (the voice-borrow fix, maintainer-decided b+c): the shared
+  # engine borrow site (jsr + nop pad at 0x0AEF2/0x0AEF8 — the
+  # keep-tenant thunk; only_variant_slot-gated, stock twin bit-identical)
+  # and his two 0x40-byte candidate/voice-number table rows (variant rows
+  # 0x13 of 0x00B268/0x00BB68, aliases today; read only when the OPPONENT
+  # id is 0x10/0x11/0x13, which only tenants carry — reviewed superset-safe).
+  "0x00aef2 6 code",
+  "0x00aef8 2 code",
+  "0x00b728 64 data",
+  "0x00c028 64 data",
   "0x018458 6 code",
   "0x0185ca 6 code",
   "0x01c586 6 code",
@@ -122,9 +132,15 @@ writes = [
 
 [[tenant]]
 name = "huitzil"
-build = "build/hui32"
-count = 62
+build = "build/hui40"
+count = 66
 writes = [
+  # 14z-87: the voice-borrow site + his candidate/voice-number rows
+  # (variant rows 0x10) — see the donovan section's review note.
+  "0x00aef2 6 code",
+  "0x00aef8 2 code",
+  "0x00b668 64 data",
+  "0x00bf68 64 data",
   "0x018460 6 code",
   # 14z-84 BACKFILL: the hitclass_map_extend site (the ADOPTED 14z-82c
   # fix, maintainer decision 1 — vsavj's 64-entry projectile hit-class
@@ -205,9 +221,15 @@ writes = [
 
 [[tenant]]
 name = "pyron"
-build = "build/pyron21"
-count = 51
+build = "build/pyron25"
+count = 55
 writes = [
+  # 14z-87: the voice-borrow site + his candidate/voice-number rows
+  # (variant rows 0x11) — see the donovan section's review note.
+  "0x00aef2 6 code",
+  "0x00aef8 2 code",
+  "0x00b6a8 64 data",
+  "0x00bfa8 64 data",
   # 14z-84 BACKFILL: the hitclass_map_extend site (ADOPTED 14z-82c, the
   # f7997 fix) — shipped in pyron-m3 but this inventory was never
   # regenerated past pyron20. Review = the adoption record.

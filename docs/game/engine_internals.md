@@ -1031,14 +1031,27 @@ $FF8110 mask, fighter +0x382), `bank_map.toml` `tail_data_ptr`
   ours{0x62B,0x308} / native{0x29B} ring signature reproduces
   canonically but is one outcome, not a constant (0x308 = row0C[13];
   0x29B = row07[28]).
-- **Fix status:** engine-side; decision brief in STATE "Decisions
-  pending — 14z-87" (accept vs the tenant-keeps-own-class thunk at
-  0x0AEF6, with the flicker-inventory cost). Gate:
-  `tests/audit_voice_borrow.sh` freezes the STABLE invariants (single
-  mid-match writer PC, pool == ROM row bytes, fired id ∈ the
-  candidate-row node-13 family). Open sub-item: the ours-only P2-block
-  class-3 node-18 dispatch (0x62B at f3966) is an EVENT difference,
-  unattributed.
+- **Fix status: SHIPPED 14z-87 (maintainer-decided option b+c,
+  2026-08-15).** (b) the tenant-keeps-own-class thunk at the borrow
+  write (`voice_borrow_keep_tenant` site_thunk @0x0AEF2 + site-pad
+  code_word @0x0AEF8, all three manifests, deduped): when `(0x382,a1)`'s
+  pre-value is 0x10/0x11/0x13 the borrow write is skipped
+  (skip-write-only — the scan and its $FF8114/$FF8100 side effects run
+  unchanged); tenants keep their own class and their engine-voice
+  events play their AUTHORED voice rows (measured: the plant-end fires
+  authored 0x6A through Donovan's ported dispatcher; the foreign
+  0x62B/0x308 pair gone — the 0x62B sub-item dissolved with the
+  timeline). (c) vs2's candidate/voice-number rows 0x10/0x11/0x13
+  ported over the variant aliases (per-tenant [[data_port]] rows).
+  All only_variant_slot-gated; the stock twin measured BIT-IDENTICAL.
+  Cost measured: ~60 cycles on an event firing 0-1×/match (0 hits in
+  8000 frames of replay 03); the visible footprint on tenant-content
+  .sha1 logs is the hook-cycle dead-stack class (3 bytes in
+  $FF7F00-$FF7FFF at the event frame, live state identical) plus the
+  intended voice-content changes; legacy masked classes held with NO
+  flicker-inventory movement. Gate: `tests/audit_voice_borrow.sh`
+  (own-class default; lottery mode = the ground-truth-failing pair vs
+  build/don_m4).
 
 ## The sprite-list DRAWER: how an object becomes sprite entries
 ## (measured 14z-71 on the Huitzil beam; the layer ABOVE the OBJ entry)

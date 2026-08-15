@@ -4,10 +4,10 @@
 # EVERY frozen reference must rebuild BIT-EXACT from the current tree
 # (the CURRENT four live in the EXPECT_* lines below — this header names
 # them; the dated ladder of superseded fingerprints follows there too):
-#   donovan-m4 (WIDE)   84f49aaab0641e071f8db00a69c839754643594f
+#   donovan-m5 (WIDE)   3c599fb676de518606a60b2b4a4c42f80aa7c97b
 #   m5_stock            6c93cfa8a8a80ae2303d3acaf8c7bff487f369c5
-#   huitzil-m12 (WIDE)  e1f598d6113f32ed5bda66a684e53d30b36447e9
-#   pyron-m6   (WIDE)   4c6e3fb6785cc9b418dd52744c7046a6a459f71e
+#   huitzil-m13 (WIDE)  2629561cdc50ecd6ca443510a6d96e1116d7a939
+#   pyron-m7   (WIDE)   94ce9a48e0cc8c89a69dd72a58669b072e379988
 #
 # EXTENDED 14z-76 from the original pair to all four. This is the standing
 # gate for the M3b multi-tenant refactor and its value scales with the count:
@@ -32,7 +32,11 @@ trap 'rm -rf "$WORK"' EXIT
 # EXPECT_WIDE="4b7d0dc7319ed6cf94a02b22938cdb18946dfddd"  # git tag freeze/donovan-m3a
 # 14z-86 (the M5 VOICE BATCH — donovan-m4: the voice remaps + thunk pokes
 # + farm stubs; stock twin measured UNCHANGED at 6c93cfa8)
-EXPECT_WIDE="84f49aaab0641e071f8db00a69c839754643594f"
+# EXPECT_WIDE="84f49aaab0641e071f8db00a69c839754643594f"  # git tag freeze/donovan-m4
+# 14z-87 (the VOICE-CLASS BORROW fix, option b+c — donovan-m5: the shared
+# keep-tenant thunk + site pad + his two candidate/voice-number table
+# rows; all only_variant_slot-gated, stock twin measured UNCHANGED)
+EXPECT_WIDE="3c599fb676de518606a60b2b4a4c42f80aa7c97b"
 EXPECT_STOCK="6c93cfa8a8a80ae2303d3acaf8c7bff487f369c5"
 # huitzil-m3 (14z-79, maintainer-ratified). Supersedes huitzil-m2
 # (9deda0808e87601b10e2171405805d4669ba2624), which can no longer be
@@ -60,7 +64,9 @@ EXPECT_STOCK="6c93cfa8a8a80ae2303d3acaf8c7bff487f369c5"
 # 14z-86 (the M5 VOICE BATCH): + the voice remaps/keeps, the alias-thunk
 # aux_pokes and the restored voice farm sound_stubs (all profile-gated —
 # the stock twin is BIT-IDENTICAL, measured)
-EXPECT_HUI="e1f598d6113f32ed5bda66a684e53d30b36447e9"
+# EXPECT_HUI="e1f598d6113f32ed5bda66a684e53d30b36447e9"  # git tag freeze/huitzil-m12
+# 14z-87 (the VOICE-CLASS BORROW fix — huitzil-m13, same batch as donovan-m5)
+EXPECT_HUI="2629561cdc50ecd6ca443510a6d96e1116d7a939"
 # pyron-m3 (14z-82c: + the ADOPTED hitclass_map_extend thunk — the f7997 fix)
 # EXPECT_PYR="6c7f7322da793c12b3681dd3ef5a76b3792ae5d0"  # git tag freeze/pyron-m3
 # pyron-m4 (14z-85b, maintainer-ruled: + pyr_sfx_records — kills the merged
@@ -69,7 +75,9 @@ EXPECT_HUI="e1f598d6113f32ed5bda66a684e53d30b36447e9"
 # 14z-85f: + the six x028122 object-hit damage work-var port_patch rows
 # EXPECT_PYR="65e9a40ee211c94b5d8d76a4eec6cf41834e74c0"  # git tag freeze/pyron-m5
 # 14z-86 (the M5 VOICE BATCH — see EXPECT_HUI)
-EXPECT_PYR="4c6e3fb6785cc9b418dd52744c7046a6a459f71e"
+# EXPECT_PYR="4c6e3fb6785cc9b418dd52744c7046a6a459f71e"  # git tag freeze/pyron-m6
+# 14z-87 (the VOICE-CLASS BORROW fix — pyron-m7, same batch as donovan-m5)
+EXPECT_PYR="94ce9a48e0cc8c89a69dd72a58669b072e379988"
 
 # The WIDE overlay romset (deterministic from the audited reference sets;
 # built into scratch so the canonical build/wide0 is never clobbered).

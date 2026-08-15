@@ -1,6 +1,54 @@
 # STATE — living progress log
 
-Updated: 2026-08-15 (session 14z-87 — **THE SWORD-PLANT "DING" ROOT-CAUSED
+Updated: 2026-08-15 (session 14z-87 close — **THE VOICE-CLASS BORROW FIX
+SHIPPED (maintainer-decided option b+c, same day as the root-cause):
+donovan-m5 3c599fb6 / huitzil-m13 2629561c / pyron-m7 94ce9a48, merged
+build/m3b_merged7 (738 ops) — full battery green, awaiting the maintainer
+ear-check.** The fix, both halves only_variant_slot-gated (stock twin
+rebuilt BIT-IDENTICAL 6c93cfa8, measured — including the new code_word
+gating added to the generator for exactly this, proven inert by a
+pre-manifest m3a bit-exact rebuild):
+(b) **the tenant-keeps-own-class thunk** — `voice_borrow_keep_tenant`
+site_thunk at the borrow write `PRG:0x0AEF2` (jsr + `voice_borrow_site_pad`
+code_word nop at 0x0AEF8; body 34B in wide_ext @0x4060C0, byte-identical
+rows in all three manifests, deduped once on merge): when `(0x382,a1)`'s
+PRE-value is 0x10/0x11/0x13 the class write is skipped (skip-write-only —
+the scan and its $FF8114/$FF8100 side effects run unchanged; consumers
+measured first). The condition is the EXACT id set, not >=0x10 — 0x12/0x18
+are vanilla ids and keep the vanilla path byte-for-byte.
+(c) **the candidate-table port** — vs2's rows 0x10/0x11/0x13 of BOTH
+tables (`0x00B268` classes / `0x00BB68` voice numbers) as per-tenant
+[[data_port]] rows over the variant aliases (verified aliases; read only
+when the OPPONENT id is a tenant's — rows 0x12/0x18 untouched).
+MEASURED RESULT: the class byte holds 0x13 through the plant window (1190
+reads, zero borrow writes), the plant-end fires **authored 0x6A** (his own
+voice, via his ported dispatcher — a different NODE than vanilla's 13, so
+a different LINE than native's 0x715-equivalent; both his voice, ear-check
+arbitrates), the foreign 0x62B/0x308 pair is GONE (and the unattributed
+0x62B sub-item dissolved with it). The maintainer's two risk questions
+answered by measurement: (1) code lands in allocator free space +
+old_hex-verified sites + patch_prg overlap assertion; (2) the borrow fires
+0-1×/match (0 hits in 8000 frames of replay 03) at ~60 cycles — orders of
+magnitude under the recorded PERFORMANCE RULE (<1 frame good / 1-2
+validate / >=2 unacceptable); the only visible footprint is the dead-stack
+hook-cycle class (replay-63 RAM diff: 3 bytes in $FF7F00-$FF7FFF, live
+state identical) plus intended voice content. BATTERY: three solo suites
+FROZEN (exactly 5/5/6 tenant-content .sha1s moved, each pair
+mechanism-attributed; legacy masked classes held with NO flicker-inventory
+movement) and plain-verified GREEN; audit_voice_borrow own-class GREEN on
+don_m5 AND merged7 (lottery mode = the ground-truth-failing pair vs
+don_m4, kept on disk); m3a all-four bit-exact on the new EXPECTs;
+tenant_loop re-frozen 270/305/239 + 538/738; audit_merged_legacy PASS on
+merged7 (leg a verbatim); trap parity PASS on merged7; shared_writes
+re-frozen 71/66/55 (all entries reviewed). ALSO CAUGHT: three sessions of
+ACCRUED STALENESS in test_manifest_merge (aux_poke 14z-86, port_patch
+14z-85f, site_thunk/code_word counts — the gate sat out the batteries;
+re-frozen with attribution) and the stale expectation-set paths in
+test_pyron_ladder/test_hui_boot/audit_merged_legacy (renamed sets). NEXT:
+the maintainer ear-check (the plant end should now be a Donovan voice on
+every venue), then the M5 sfx odds / the Sasquatch rig.)
+
+Previously: 2026-08-15 (session 14z-87 — **THE SWORD-PLANT "DING" ROOT-CAUSED
 TO A DIFFERENT MECHANISM THAN 14z-86 DIAGNOSED — the parked fix design is
 DEAD, the real mechanism is measured end-to-end, and the fix is an
 ENGINE-SIDE decision: brief below ("Decisions pending — 14z-87"), no build
@@ -70,8 +118,22 @@ the recommended fix would not change it. NEXT: the maintainer ruling on
 the brief below; then (if (b)) the thunk + flicker re-measurement, or the
 voice-scope odds.)
 
-### Decisions pending — 14z-87: the sword-plant "ding" (engine voice-class
-### borrow). Maintainer ruling requested.
+### Decisions — 14z-87: the sword-plant "ding" (engine voice-class borrow).
+### **DECIDED (maintainer, 2026-08-15): OPTION (b) + (c)** — and
+### **EXECUTED TO FULL GREEN the same session** (donovan-m5/huitzil-m13/
+### pyron-m7 + merged7; see the close entry above). Maintainer
+### concerns to answer with measurements during implementation: (1) where
+### the added code lands / pointer-invalidation risk (answer: hole-allocator
+### free space + patch_prg overlap assertion + old_hex-verified hook site;
+### the skip condition must be id ∈ {0x10,0x11,0x13} EXACTLY — 0x12/0x18
+### are vanilla ids, and table rows 0x12/0x18 are legacy-reachable and stay
+### untouched); (2) performance — THE STANDING PERFORMANCE RULE (maintainer,
+### 2026-08-15, recorded): under ONE frame of impact is good; between one
+### and two frames needs validation; two frames or more is unacceptable.
+### The borrow event fires ~once per match phase, so the thunk's cycle cost
+### is orders of magnitude under the band — the cost to watch is timing
+### SKEW (flicker inventories), handled by the §4 re-measure + ratify
+### protocol. Original brief follows:
 
 **The defect, in one sentence:** when a tenant is in the match, the
 engine's voice-class borrow (match-sequencer event → `PRG:0x0AEF6`) can

@@ -1851,6 +1851,84 @@ remap_ids = "0x700:0x58,0x701:0x59,0x702:0x5a,0x703:0x5b,0x704:0x5c,0x705:0x5d,0
 # build skips this whole row and the helper stays stubbed.
 unstub = "0x005122=0x5FFF00"   # -> the voice alias thunk (14z-86)
 
+# ── THE VOICE-CLASS BORROW (14z-87, maintainer-decided option b+c) ──────────
+# Mechanism (measured; engine_internals "per-node sfx dispatch, third
+# pass"): at a match-sequencer event the engine BORROWS a fighter a voice
+# class at PRG:0x0AEF6 (`move.b d1,$382(a1)`), scanned from the OPPONENT's
+# row of candidate table 0x00B268 — rows vs2 authored for its roster and
+# vsavj didn't, so a tenant's engine-voice events played a random VANILLA
+# flavor (the sword-plant "ding"). Two pieces, both variant-slot-gated so
+# the stock twin stays bit-identical:
+#
+# (b) the tenant-keeps-own-class thunk: steal 8 bytes at 0x0AEF2
+#     (move.w d0,$114(a5) ; move.b d1,$382(a1)) -> jsr + nop pad (the pad
+#     is the [[code_word]] below — site_thunk displaces exactly 6 bytes).
+#     Body: re-do the move.w, then write the scanned class ONLY when
+#     (0x382,a1)'s PRE-value is not a tenant id (0x10/0x11/0x13 — legacy
+#     never writes 0x10-0x1F there, tests/audit_id_writers.sh; 0x12/0x18
+#     are vanilla ids and take the vanilla path untouched). The scan and
+#     its $FF8114/$FF8100 side effects run unchanged (skip-write-only —
+#     measured consumers, STATE 14z-87). Body layout:
+#       +00 3b400114      move.w d0,(0x114,a5)   ; displaced #1
+#       +04 0c2900100382  cmpi.b #0x10,(0x382,a1)
+#       +0a 6714          beq.s  keep
+#       +0c 0c2900110382  cmpi.b #0x11,(0x382,a1)
+#       +12 670c          beq.s  keep
+#       +14 0c2900130382  cmpi.b #0x13,(0x382,a1)
+#       +1a 6704          beq.s  keep
+#       +1c 13410382      move.b d1,(0x382,a1)   ; displaced #2 (the borrow)
+#       +20 4e75          keep: rts
+#     CCR exiting is irrelevant (0x0AEFA cmpi overwrites it). No scratch
+#     regs. Cost: ~60 cycles on an event measured at 0-1 per match
+#     (0 hits in 8000 frames of replay 03) — far under the one-frame rule.
+#     Declared byte-identically in all three manifests -> merged dedup.
+[[site_thunk]]
+stage = 6
+name = "voice_borrow_keep_tenant"
+site = 0x00AEF2
+old_hex = "3b4001141341"
+only_variant_slot = true
+id_literal_ok = "0x10,0x11,0x13"
+thunk_hex = "3b4001140c290010038267140c2900110382670c0c29001303826704134103824e75"
+note = "14z-87 option (b): keep a tenant's own voice class at the borrow write (all-tenant condition; shared engine site, deduped across manifests)"
+
+[[code_word]]
+stage = 6
+name = "voice_borrow_site_pad"
+addr = 0x00AEF8
+old_hex = "0382"
+new_hex = "4e71"
+only_variant_slot = true
+note = "14z-87: the stolen site's 4th word (tail of move.b d1,(0x382,a1)) -> nop; pairs with voice_borrow_keep_tenant"
+
+# (c) the candidate-table port: vs2's rows for THIS tenant into vsavj's
+#     variant rows (today pure aliases of the base half — verified — and
+#     read ONLY when the OPPONENT's (0x382) byte is 0x10/0x11/0x13, which
+#     only tenants carry: rows 0x12/0x18 are legacy-reachable and stay
+#     untouched). Fixes the mirrored borrow direction (a legacy fighter
+#     borrowing against a tenant opponent draws vs2's authored list).
+[[data_port]]
+stage = 6
+name = "voice_borrow_candidates_a"
+src = 0x9FEA          # vs2 0x9B2A + 0x13*0x40 (class-candidate table row 0x13)
+len = 0x40
+dst = 0xB728          # vsavj 0xB268 + 0x13*0x40 (variant row, alias of 0x03)
+dst_end = 0xB768
+dst_old_head = "060a040802010f180705090c000d0f180408050602000f18060c010807020f180c06070a04020f1809080105000d0f180a090407090d0f180006010c0a050f18"
+only_variant_slot = true
+note = "14z-87 option (c): vs2's Donovan row of the voice-class candidate table (8 venue slots x 8 classes)"
+
+[[data_port]]
+stage = 6
+name = "voice_borrow_voicenums_b"
+src = 0xA8EA          # vs2 0xA42A + 0x13*0x40 (paired voice-number table)
+len = 0x40
+dst = 0xC028          # vsavj 0xBB68 + 0x13*0x40 (variant row, alias of 0x03)
+dst_end = 0xC068
+dst_old_head = "0612100a0214160a0408120c0214160a100e08060214160a0612000a0414160a1206040c1014160a120a00080214160a0c0a10041214160a0e06000c1214160a"
+only_variant_slot = true
+note = "14z-87 option (c): vs2's Donovan row of the paired voice-number table (feeds $FF8100 via the borrow)"
+
 # ── SELECT WHEEL: three appended cells (14z-60s) ────────────────────────────
 # Adds Huitzil/Phobos (0x10), Pyron (0x11) and Donovan (0x13) to the
 # character-select wheel. Profile-gated CONTENT: a stock build skips this

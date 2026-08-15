@@ -2100,6 +2100,52 @@ keep_ids = "0x110,0x111,0x112,0x198,0x199,0x0D8,0x7f,0x80,0x81,0x82,0x83,0x88,0x
 remap_ids = "0x73A:0x199,0x739:0x0D8,0x735:0x7f,0x736:0x80,0x737:0x81,0x738:0x82,0x73b:0x83,0x740:0x88,0x741:0x89,0x742:0x8a,0x743:0x8b,0x744:0x8c,0x745:0x8d,0x746:0x8e,0x74c:0x94,0x74e:0x96"
 unstub = "0x005122=0x5FFF00"   # -> the voice alias thunk (14z-86)
 
+# ── THE VOICE-CLASS BORROW (14z-87, option b+c) ─────────────────────────────
+# Shared engine-site thunk + pad: byte-identical twins of donovan.toml's
+# rows (full mechanism narrative lives there; merged builds dedup them).
+# The per-tenant candidate/voice-number rows below port vs2's Huitzil
+# (0x10) rows over vsavj's variant aliases.
+[[site_thunk]]
+stage = 6
+name = "voice_borrow_keep_tenant"
+site = 0x00AEF2
+old_hex = "3b4001141341"
+only_variant_slot = true
+id_literal_ok = "0x10,0x11,0x13"
+thunk_hex = "3b4001140c290010038267140c2900110382670c0c29001303826704134103824e75"
+note = "14z-87 option (b): keep a tenant's own voice class at the borrow write (all-tenant condition; shared engine site, deduped across manifests)"
+
+[[code_word]]
+stage = 6
+name = "voice_borrow_site_pad"
+addr = 0x00AEF8
+old_hex = "0382"
+new_hex = "4e71"
+only_variant_slot = true
+note = "14z-87: the stolen site's 4th word (tail of move.b d1,(0x382,a1)) -> nop; pairs with voice_borrow_keep_tenant"
+
+[[data_port]]
+stage = 6
+name = "voice_borrow_candidates_a"
+src = 0x9F2A          # vs2 0x9B2A + 0x10*0x40 (class-candidate table row 0x10)
+len = 0x40
+dst = 0xB668          # vsavj 0xB268 + 0x10*0x40 (variant row, alias of 0x00)
+dst_end = 0xB6A8
+dst_old_head = "060a0308010f04180e0c0908050f0418080a09030e0f04180c07050e0d0f0418070c030a0e0f0418050d0908010f04180807090a0d0f04180306050e010f0418"
+only_variant_slot = true
+note = "14z-87 option (c): vs2's Huitzil row of the voice-class candidate table (8 venue slots x 8 classes)"
+
+[[data_port]]
+stage = 6
+name = "voice_borrow_voicenums_b"
+src = 0xA82A          # vs2 0xA42A + 0x10*0x40 (paired voice-number table)
+len = 0x40
+dst = 0xBF68          # vsavj 0xBB68 + 0x10*0x40 (variant row, alias of 0x00)
+dst_end = 0xBFA8
+dst_old_head = "06120e0a1416100a080c120a1416100a0a0c120e1416100a120408021416100a040c0e121416100a080c120a1416100a0a04120c1416100a0e0608021416100a"
+only_variant_slot = true
+note = "14z-87 option (c): vs2's Huitzil row of the paired voice-number table (feeds $FF8100 via the borrow)"
+
 # THE VOICE ALIAS THUNK (14z-86, shared by all tenants — identical
 # rows dedupe on merge). A range-gated clone of the per-node sfx
 # helper 0x4CE2: ids in the authored voice range 0x58-0xA6 SKIP the

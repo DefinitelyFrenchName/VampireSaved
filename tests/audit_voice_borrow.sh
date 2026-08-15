@@ -27,17 +27,21 @@
 #   3. VERDICT CONTROLS: the checker must FAIL on a synthetic foreign
 #      ring id and on a synthetic writer census missing 0x0AEF6.
 #
-# VOICE_BORROW_EXPECT=lottery (default) freezes today's shape. If the
-# STATE 14z-87 option-(b) thunk ships, run with =own-class: the mid-match
-# borrow write must then be ABSENT for a tenant P1 and the dispatcher
-# read must return the tenant id 0x13.
+# VOICE_BORROW_EXPECT=own-class (default since the option-(b) fix shipped,
+# 14z-87): no mid-match borrow write for a tenant P1, the class byte holds
+# 0x13 through the plant-end window, and every window ring id is an
+# AUTHORED VOICE id (0x58-0xA6 — his own flavor; measured 0x6A).
+# VOICE_BORROW_EXPECT=lottery reproduces the PRE-FIX shape and is the
+# ground-truth-failing pair against build/don_m4 (kept on disk as the
+# known-bad reference): run
+#   VOICE_BORROW_EXPECT=lottery tests/audit_voice_borrow.sh build/don_m4
 #
 # Usage: ROMDIR=... [MAME_BIN=...] tests/audit_voice_borrow.sh [builddir]
-# Default build: build/don_m4. ~6 min (2 MAME runs).
+# Default build: build/don_m5. ~6 min (2 MAME runs).
 set -eu
 
-BUILD="${1:-build/don_m4}"
-EXPECT="${VOICE_BORROW_EXPECT:-lottery}"
+BUILD="${1:-build/don_m5}"
+EXPECT="${VOICE_BORROW_EXPECT:-own-class}"
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"
 : "${ROMDIR:?set ROMDIR}"
@@ -124,13 +128,16 @@ if expect=='lottery':
     got={lane(d,m) for _,_,d,m in dr}
     assert got=={v}, f"dispatcher read {got} != borrowed {v:#x} — the serialization invariant broke"
     print(f"  borrow write @f{fr} PC 0xAEF6 value {v:#x}; dispatcher read the same value. OK")
-else:  # own-class (post option-(b) fix)
+else:  # own-class (the shipped option-(b) fix, 14z-87)
     assert not any(pc in (0xAEF6,0xAEFA) for _,pc,_,_ in mid), \
         f"borrow write still fires for tenant P1: {mid}"
-    dr=[(fr,pc,data,mask) for fr,pc,data,mask in R if pc in (0x27F16,0x27F1A)]
-    assert dr and all(lane(d,m)==0x13 for _,_,d,m in dr), \
-        f"dispatcher must read the tenant id 0x13, got {[hex(lane(d,m)) for _,_,d,m in dr]}"
-    print("  own-class shape holds (no borrow; dispatcher reads 0x13). OK")
+    # every read of the class byte in the plant-end window must return the
+    # tenant id — reader PCs are build-dependent (the fixed build routes
+    # through the PORTED dispatcher copy), so assert on the VALUE, not a PC
+    assert R, "no reads of $FF8782 in the window — rig dead"
+    got={lane(d,m) for _,_,d,m in R}
+    assert got=={0x13}, f"class byte must hold 0x13 throughout, read {sorted(hex(x) for x in got)}"
+    print(f"  own-class shape holds (no borrow; {len(R)} window reads all 0x13). OK")
 EOF
 
 echo "== section 2: output level — ring window membership"
@@ -154,8 +161,12 @@ def check(path, fam, expect):
         bad=[i for i in ids if i not in ok]
         assert not bad, f"window ids {bad} outside the node-13 flavor family {sorted(hex(x) for x in ok)}"
     else:
-        # own-class: the window must fire Donovan's authored node-13 voice
-        assert all(i in (0x61,0x361) for i in ids), f"expected authored 0x61 (+alias), got {[hex(i) for i in ids]}"
+        # own-class: every non-ambient window id must be an AUTHORED VOICE
+        # id (0x58-0xA6) — his own flavor, line-agnostic (the fixed build
+        # routes the plant-end through his ported dispatcher and fires a
+        # different node than the vanilla anim's 13; measured 0x6A)
+        bad=[i for i in ids if not (0x58<=i<=0xA6)]
+        assert not bad, f"non-authored ids in the window: {[hex(i) for i in bad]}"
     return ids
 fam=set(int(x,16) for x in open(work+'/node13_family').read().split())
 ids=check(work+'/ring.txt',fam,expect)

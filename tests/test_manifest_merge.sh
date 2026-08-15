@@ -60,15 +60,29 @@ FROZEN = [
     # huitzil.toml — a real, deliberate row, so the count moved for a reason
     # and the freeze follows it. (The shared count is unchanged: (b') is
     # OWNED by huitzil, per the 14z-79 decision to keep it on one tenant.)
-    ("site_thunk",       (20, 11, 4), 29, 3),  # the 3 *_bank_variant_id rows
+    # RE-FROZEN 14z-87: +1 shared voice_borrow_keep_tenant in all three
+    # manifests, ON TOP of accrued staleness (H +2, P +1, +1 shared from
+    # sessions that never re-ran this gate — it sat out several batteries;
+    # every delta accounted: aux_poke=14z-86 alias thunk, port_patch=
+    # 14z-85f damage rows, site_thunk/code_word=14z-85c..86 additions)
+    ("site_thunk",       (21, 14, 6), 32, 5),
     ("pcrel_escape_fix", (0, 5, 2),  5,  2),   # the H<->P shared-source pair
-    ("code_word",        (4, 3, 6),  11, 2),
-    ("port_patch",       (21, 55, 14), 87, 3),
+    # 14z-87: +1 shared voice_borrow_site_pad in all three manifests
+    # (H was already 4, not the frozen 3 — accrued staleness, see above)
+    ("code_word",        (5, 5, 7),  13, 3),
+    # RE-FROZEN 14z-87 (was (21,55,14),87,3 — STALE since 14z-85f: the FG
+    # damage fix propagated Donovan's six x028122 work-var port_patch rows
+    # to huitzil+pyron verbatim (+6 each, +6 shared) and this gate was not
+    # re-run at that close; caught here alongside the aux_poke staleness)
+    ("port_patch",       (21, 61, 20), 93, 9),
     ("tenant",           (1, 1, 1),  3,  0),   # never shared, by definition
     ("select_records",   (6, 6, 6),  18, 0),   # six pieces PER TENANT
     ("win_pal_variant",  (1, 1, 1),  3,  0),
     ("palette",          (2, 2, 2),  6,  0),
-    ("aux_poke",         (5, 6, 3),  14, 0),   # disjoint HUD free-pool anchors
+    # RE-FROZEN 14z-87 (was (5,6,3),14,0 — STALE since 14z-86: the M5
+    # voice-alias thunk added 15 byte-identical aux_poke rows to every
+    # manifest and this gate was not re-run at that close; caught here)
+    ("aux_poke",         (20, 21, 18), 29, 15), # HUD anchors + the 15 shared alias-thunk pokes
 ]
 for sect, per, total, shared in FROZEN:
     eq("%s per-file" % sect, tuple(len(d.get(sect, [])) for d in docs), per)

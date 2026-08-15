@@ -146,27 +146,31 @@ rendering change. Ground truth: `tests/test_replay_video_selfcheck.sh`.
 
 ```sh
 export ROMDIR=/path/to/reference/sets
-tools/run_wide.sh build/m3b_merged6 fbneo  # THE 3-TENANT BUILD (all 18
+tools/run_wide.sh build/m3b_merged7 fbneo  # THE 3-TENANT BUILD (all 18
                                            # selectable, art included; the
-                                           # trap fully field-confirmed
-                                           # 14z-85f..14z-86; + THE M5
-                                           # VOICE BATCH (79 restored
-                                           # voice/sfx ids, field-confirmed;
-                                           # open: the plant ding —
-                                           # 14z-87 root-caused, engine
-                                           # borrow; ruling pending)
-tools/run_wide.sh build/don_m4 fbneo       # or the solo builds (hui39,
-                                           # pyron24); ... mame
+                                           # trap + M5 voices field-
+                                           # confirmed 14z-85f..86; + THE
+                                           # 14z-87 VOICE-BORROW FIX (the
+                                           # plant-ding class killed at
+                                           # root — tenants keep their own
+                                           # voice class; awaiting the
+                                           # maintainer ear-check)
+tools/run_wide.sh build/don_m5 fbneo       # or the solo builds (hui40,
+                                           # pyron25); ... mame
 ```
 
-**Current WIDE builds (14z-86, THE M5 VOICE BATCH):** `build/hui39` =
-**`huitzil-m12` (`e1f598d6`)**, `build/pyron24` = **`pyron-m6`
-(`4c6e3fb6`)**, `build/don_m4` = **`donovan-m4` (`84f49aaa`)** — each
+**Current WIDE builds (14z-87, THE VOICE-BORROW FIX):** `build/hui40` =
+**`huitzil-m13` (`2629561c`)**, `build/pyron25` = **`pyron-m7`
+(`94ce9a48`)**, `build/don_m5` = **`donovan-m5` (`3c599fb6`)** — see the
+registry row (14z-87). Previous batch (14z-86, THE M5 VOICE BATCH):
+`build/hui39` = **`huitzil-m12` (`e1f598d6`)**, `build/pyron24` =
+**`pyron-m6` (`4c6e3fb6`)**, `build/don_m4` = **`donovan-m4`
+(`84f49aaa`)** — each
 = its predecessor + its voice block restored (79 verbatim vs2 songs at
 authored vsavj ids 0x58-0xA6; WIDE v1.2 content members incl. packed
 samples in `vsw.21m`; the facing-alias thunk; per-tenant remaps + farm
 stubs; the whole batch PROFILE-GATED — the stock twin is bit-identical
-6c93cfa8, measured). **`build/m3b_merged6` is the current merged.**
+6c93cfa8, measured). **`build/m3b_merged7` is the current merged** (14z-87; merged6 superseded).
 The map: `docs/project/tables/qs_voice_map.md`. Superseded:
 hui38/pyron23/m5_wide (donovan-m3a — tag `freeze/donovan-m3a` is the
 way back; its expectation set carried-renamed `donovan-m4`),
@@ -182,8 +186,8 @@ dirs remain the tenant_loop/build_merged inputs).
 `build/m5w` (`ac52eeff`) is the KNOWN-BAD artifact of the 14z-60y sprite
 garble, kept as evidence — do not playtest it. `tools/audit_romset_identity.py
 build/m5w/rompath` names its four shadowed members in a second.
-**`build/m3b_merged6` is the MERGED BUILD WITH GFX** (14z-83 S4,
-`tools/build_merged.sh`; rebuilt through 14z-86): the 729-op 3-tenant
+**`build/m3b_merged7` is the MERGED BUILD WITH GFX** (14z-83 S4 machinery,
+`tools/build_merged.sh`; rebuilt through 14z-87): the 738-op 3-tenant
 program image (owner tag + sfx records + damage work-var rows + the
 chirp/shock fixes + THE M5 VOICE BATCH: remaps, alias-thunk pokes,
 farm stubs) + the S2 gfx chain (D → H → P, group B pristine) + the
@@ -197,7 +201,7 @@ merged intermediates (m3b_merged4/5, pre-v1.1) do not boot on current
 binaries without member injection. The pre-fix `build/m3b_merged`
 (FG) and `build/hui34`/`hui36` (chirp/shock) are kept as the parity
 audits' known-bad references (same injection caveat). Rebuild:
-`ROMDIR=... tools/build_merged.sh build/m3b_merged6` (~15 min); its
+`ROMDIR=... tools/build_merged.sh build/m3b_merged7` (~15 min, 738-op fixture); its
 fingerprint moves with the generator — do not pin it.
 `build/merged1` is the **MERGED-LEGACY INSTRUMENT** (14z-81; carries the
 14z-82 type-renumber + F2 fixes) — the 3-tenant program image with gfx
@@ -1360,9 +1364,11 @@ tests/audit_voice_borrow.sh [bd]      # 14z-87 (~6 min, 2 MAME runs): THE
                                       # cross-run-correlation instrument), and
                                       # the ring-window membership over the
                                       # WHOLE candidate family. 2 verdict
-                                      # controls. VOICE_BORROW_EXPECT=own-class
-                                      # is the post-fix shape if STATE 14z-87
-                                      # option (b) ships. Defaults build/don_m4
+                                      # controls. Default: own-class on
+                                      # build/don_m5 (the SHIPPED b+c fix);
+                                      # VOICE_BORROW_EXPECT=lottery vs
+                                      # build/don_m4 = the ground-truth-
+                                      # failing pre-fix pair
 ```
 
 ### THE OUT-OF-RANGE INDEX TOOLKIT (14z-78) — three instruments, one class
@@ -1432,7 +1438,8 @@ reproducible AT THAT TIME; no one has re-verified the older ones since.
 
 | Build | SHA-1 (zip) | Notes |
 |---|---|---|
-| **donovan-m4 / huitzil-m12 / pyron-m6 — THE M5 VOICE BATCH (14z-86) — supersede m3a/m11/m5** | `84f49aaa` / `e1f598d6` / `4c6e3fb6` | `build/don_m4` / `build/hui39` / `build/pyron24`; REGISTERED; tags `freeze/{donovan-m4,huitzil-m12,pyron-m6}`. Each = predecessor + its VOICE BLOCK: 79 verbatim vs2 songs at authored ids 0x58-0xA6 (Z80 rows via `tools/build_qs_songs.py [voice_batch]`: the 8th note-table slot restored via the table-0 relocation; authored records; 841 KB packed into `vsw.21m` = WIDE v1.2 content member), per-tenant remaps (D36/H14/P10) + 25 farm sound_stubs + the facing-alias thunk @0x5FFF00 (voice ids skip +0x300 — measured channel-allocation-only). ALL profile-gated; stock twin bit-identical (6c93cfa8, measured). Gates at freeze: keyon batch A/B GREEN (whole-run content multisets vs native), trap parity/shock green (hui39 + merged6), FG parity green (merged6), m3a all-four bit-exact, tenant_loop re-frozen 265/300/234+531/729. Map: `docs/project/tables/qs_voice_map.md`. FIELD-CONFIRMED (maintainer, 2026-08-15): "the sounds are normal now among all 3 newcomers" — after the two maintainer-caught playback-law fixes (half-bank + byte-parity). One open audible item: the sword-plant ding — ROOT-CAUSED 14z-87 to the engine VOICE-CLASS BORROW (PRG:0x0AEF6; engine-side, the 14z-86 row-0x1C design retracted); maintainer decision pending (STATE "Decisions pending — 14z-87"). |
+| **donovan-m5 / huitzil-m13 / pyron-m7 — THE VOICE-CLASS BORROW FIX (14z-87, maintainer-decided b+c) — supersede m4/m12/m6** | `3c599fb6` / `2629561c` / `94ce9a48` | `build/don_m5` / `build/hui40` / `build/pyron25`; REGISTERED (sets carried-renamed from the m4/m12/m6 sets, tenant-content .sha1s re-frozen). Each = predecessor + the shared **voice_borrow_keep_tenant** thunk (engine borrow site `PRG:0x0AEF2/0x0AEF8`: tenants keep their OWN voice class — skip-write-only; legacy path byte-preserved) + its two ported candidate/voice-number table rows (variant rows of `0x00B268`/`0x00BB68`). Fixes the sword-plant "ding" class at its root: tenant engine-voice events now play their AUTHORED voices (plant-end measured authored 0x6A; the 0x62B/0x308 pair gone). ALL only_variant_slot-gated; stock twin BIT-IDENTICAL (6c93cfa8, measured). Cost: ~60 cycles on a 0-1×/match event; tenant-content .sha1 movement = the dead-stack hook-cycle class + intended voice content (measured, replay 63 RAM diff: 3 dead-stack bytes, live state identical); legacy masked classes held, NO flicker-inventory movement. Gates at freeze: audit_voice_borrow own-class (+ lottery ground-truth pair vs don_m4), m3a all-four bit-exact, tenant_loop re-frozen 270/305/239 + 538/738, manifest_merge re-frozen (incl. accrued staleness from 14z-85f/86 — caught here), shared_writes re-frozen 71/66/55. Mechanism: engine_internals "per-node sfx dispatch, third pass". Awaiting maintainer ear-check. |
+| donovan-m4 / huitzil-m12 / pyron-m6 — THE M5 VOICE BATCH (14z-86) — superseded by the 14z-87 row above (tags freeze/{donovan-m4,huitzil-m12,pyron-m6} are the way back; build/don_m4 stays on disk as audit_voice_borrow's lottery-mode ground-truth reference) | `84f49aaa` / `e1f598d6` / `4c6e3fb6` | `build/don_m4` / `build/hui39` / `build/pyron24`; REGISTERED; tags `freeze/{donovan-m4,huitzil-m12,pyron-m6}`. Each = predecessor + its VOICE BLOCK: 79 verbatim vs2 songs at authored ids 0x58-0xA6 (Z80 rows via `tools/build_qs_songs.py [voice_batch]`: the 8th note-table slot restored via the table-0 relocation; authored records; 841 KB packed into `vsw.21m` = WIDE v1.2 content member), per-tenant remaps (D36/H14/P10) + 25 farm sound_stubs + the facing-alias thunk @0x5FFF00 (voice ids skip +0x300 — measured channel-allocation-only). ALL profile-gated; stock twin bit-identical (6c93cfa8, measured). Gates at freeze: keyon batch A/B GREEN (whole-run content multisets vs native), trap parity/shock green (hui39 + merged6), FG parity green (merged6), m3a all-four bit-exact, tenant_loop re-frozen 265/300/234+531/729. Map: `docs/project/tables/qs_voice_map.md`. FIELD-CONFIRMED (maintainer, 2026-08-15): "the sounds are normal now among all 3 newcomers" — after the two maintainer-caught playback-law fixes (half-bank + byte-parity). One open audible item: the sword-plant ding — ROOT-CAUSED 14z-87 to the engine VOICE-CLASS BORROW (PRG:0x0AEF6; engine-side, the 14z-86 row-0x1C design retracted); DECIDED b+c and SHIPPED 14z-87 — see the donovan-m5 row above. |
 | **huitzil-m11 — PHOBOS FROZEN (14z-86) — supersedes huitzil-m10** | fingerprint `6eed421be848c2de333bec9a82ef74de18cd88c9` | `build/hui38`; REGISTERED `-> huitzil-m11`; tag `freeze/huitzil-m11`. = m10 + **the M5 EJECTION PILOT**: trap record node 10 remapped 0x739→0xD8 onto AUTHORED Z80 song rows (WIDE v1.1 content members `vsw.z01/z02`, sentinel CRCs 0xdec0de38/39; `tools/build_qs_songs.py` injects vs2's 0x33-byte song verbatim at flat 0x3C980 + the 0x3D8 alias twin at 0x3C9C0 from `build/manifest/qs_songs.toml`). NO sample port — the content is byte-identical in vsav's own image (0x18D800 = record #0x5C = note-entry 0x28). Keyon A/B matches native (v11/v12, 0x2800 window); ring rig 87 shows 00d8 in the 0739 slot both windows. Gates at freeze: audit_trap_parity RE-FROZEN (ground-truthed failing pre-pilot), test_qs_songs + test_qs_id_table NEW, trap shock/sound green, m3a on the new EXPECT. Full decode: engine_internals "The QSound Z80 driver". EAR-CHECK CONFIRMED (maintainer, 2026-08-14): "The trap mine ejection sound is indeed there" — no other new sounds, as expected (only the ejection was ported; the voice blocks are the next batch). THE TRAP IS FULLY CLOSED, all four items field-confirmed (damage 14z-85f, chirp 14z-85g, shock 14z-85g(2), ejection 14z-86). |
 | **huitzil-m4 — PHOBOS RE-FROZEN (14z-82c, maintainer-adopted 2026-08-12) — supersedes huitzil-m3** | fingerprint `e66678d087824d1639750d2b9565c0b99ad2b250` | `build/hui30`; REGISTERED `-> huitzil-m4`; rebuilds bit-exact. = huitzil-m3 + the ADOPTED **`hitclass_map_extend`** site_thunk (shared with pyron; the f7997-class fix): vsavj's projectile-pool hit sweep maps colliding objects' type bytes through a 64-entry byte map at `PRG:0x1A888` (seven callers); Phobos stamps types 68/72 into that pool, so a landed hit would over-index it exactly as pyron-m2's type-64 satellite measured. Body GENERATED (`tools/gen_hitclass_map_thunk.py`) and reconstructed by `tests/test_hitclass_map_thunk.sh`; legacy measured BIT-IDENTICAL (fire census: legacy never enters the map). Expectation set `tests/expected/huitzil-m4/` (renamed from huitzil-m3, content unchanged). Validate: `MAME_ROMPATH="build/hui30/rompath;$ROMDIR" tests/run_suite.sh vsavjw`. KNOWN-OPEN unchanged from m3 (variant_dispatch row 0x10 red; win-quote) |
 | **pyron-m3 — PYRON RE-FROZEN (14z-82c, maintainer-adopted 2026-08-12) — supersedes pyron-m2** | fingerprint `6c7f7322da793c12b3681dd3ef5a76b3792ae5d0` | `build/pyron21`; REGISTERED `-> pyron-m3`; rebuilds bit-exact; BYTE-IDENTICAL to the measured 14z-82b probe build. = pyron-m2 + **`hitclass_map_extend`** — THE f7997 FIX: his type-64 satellite landing a hit over-indexed vsavj's 64-entry projectile hit-class map (map[64] = the following rts's 0x4E), a LATENT crash measured on pyron-m2 SOLO. The 11,017-frame soak that crashes pyron-m2 runs END-clean; legacy BIT-IDENTICAL over 30,284 frames (`tests/audit_hitclass_map_cost.sh`, rerunnable). Expectation set `tests/expected/pyron-m3/` (renamed from pyron-m2, content unchanged). Validate: `MAME_ROMPATH="build/pyron21/rompath;$ROMDIR" tests/run_suite.sh vsavjw`. ALSO DISSOLVED (measured): replay 80's f4840 reset — same crash signature on pyron-m2 (vec3 f4638 PC 01AB10), END-clean on pyron-m3. OPEN unchanged from m2: win-quote |
