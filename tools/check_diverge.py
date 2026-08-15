@@ -30,6 +30,13 @@ def main():
         sys.exit(1)
     a = [l for l in base.read_text().splitlines() if not l.startswith("END")]
     b = [l for l in Path(log).read_text().splitlines() if not l.startswith("END")]
+    # 14z-90 (issue #3, found during judging — the filed issue named only
+    # compare_window/compare_composite and credited THIS tool as a mitigation
+    # for them). It carries the identical idiom: a short log compared against a
+    # prefix of the basis reports "no divergence" for a run that simply stopped.
+    if len(a) != len(b):
+        print(f"FAIL length mismatch ({len(a)} vs {len(b)} frames vs {baseset})")
+        sys.exit(1)
     div = None
     for i in range(min(len(a), len(b))):
         if a[i] != b[i]:

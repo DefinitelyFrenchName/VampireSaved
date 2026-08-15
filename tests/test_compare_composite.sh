@@ -72,6 +72,30 @@ check no_reconverge.log   fail "the window never re-converges"
 check identical.log       fail "the logs are bit-identical"
 check second_window.log   fail "an unfrozen second window appears"
 
+# --- 14z-90 (issue #3): a SHORT log must not be prefix-compared ----------
+# `n = min(len(a), len(b))` certified a run that stopped early as "fully
+# re-convergent" over frames it never read. Two cases: a plain truncation,
+# and the false GREEN — a run that breaks permanently AFTER the frozen shape,
+# where cutting the log before the break hid the break entirely.
+python3 - "$WORK" <<'PY'
+import sys, pathlib
+work = pathlib.Path(sys.argv[1])
+N = 4000
+shape = {829, 2093} | set(range(890, 1803))
+def write(path, diverge):
+    lines = [f"{i} {'ffffffffffffffff' if i in diverge else '%016x' % i}"
+             for i in range(1, N + 1)]
+    (work / path).write_text("\n".join(lines + [f"END {N}"]) + "\n")
+write("latebreak.log", shape | set(range(3000, N + 1)))
+src = (work / "ok.log").read_text().splitlines()
+(work / "trunc.log").write_text("\n".join(src[:2200]) + "\nEND 2200\n")
+lb = (work / "latebreak.log").read_text().splitlines()
+(work / "latebreak_trunc.log").write_text("\n".join(lb[:2500]) + "\nEND 2500\n")
+PY
+check trunc.log           fail "a truncated log is not prefix-compared"
+check latebreak.log       fail "a permanent break after the frozen shape"
+check latebreak_trunc.log fail "truncating before that break does not rescue it"
+
 # The class must not be usable as a loophole: it has to reject a shape that
 # `flicker` alone would reject, with the window list empty.
 if python3 "$REPO/tools/compare_composite.py" "$WORK/base.log" "$WORK/ok.log" \

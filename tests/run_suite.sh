@@ -50,6 +50,15 @@ ROMPATH="${MAME_ROMPATH:-$ROMDIR}"
 WORK="$(mktemp -d)"
 trap 'rm -rf "$WORK"' EXIT
 
+# 14z-90 (issue #3, defense in depth — NOT the root cause of that issue).
+# tools/freeze_masked_basis.sh:55 scrubs these before writing a basis ("guard
+# 3: nothing from the caller's shell may reach the frozen logs"); the GATE
+# side had no equivalent, so an exported TAIL_FRAMES could shorten a gate log
+# below its basis. The comparators now reject a length mismatch outright, so
+# this is belt-and-braces: the freeze side and the compare side should be
+# equally hermetic, or the two are not measuring the same thing.
+unset POKES DUMPS SNAP_FRAMES TAIL_FRAMES VIDEO_OUT INPUT_OUT INPUT_INJECT_TEST || true
+
 EXPSET=$(python3 "$REPO/tools/build_fingerprint.py" "$ROMPATH" --set "$SET") \
     || { echo "unregistered build fingerprint — see message above"; exit 1; }
 EXPDIR="$REPO/tests/expected/$EXPSET"

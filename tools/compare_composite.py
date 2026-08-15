@@ -81,7 +81,13 @@ def main():
     want_flicker = parse_flicker(args.flicker)
     want_windows = parse_windows(args.windows)
     a, b = load(args.a), load(args.b)
-    n = min(len(a), len(b))
+    # 14z-90 (issue #3): see tools/compare_window.py — min() certified a
+    # truncated run as fully re-convergent over frames it never compared.
+    if len(a) != len(b):
+        print(f"FAIL: length mismatch ({len(a)} vs {len(b)} frames) — a short "
+              f"log cannot be compared against a prefix of the basis")
+        return 1
+    n = len(a)
     if n == 0:
         print("FAIL: empty log(s)")
         return 1

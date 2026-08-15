@@ -51,7 +51,17 @@ def main():
     args = ap.parse_args()
 
     a, b = load(args.a), load(args.b)
-    n = min(len(a), len(b))
+    # 14z-90 (issue #3): min() silently compared a SHORT log against a prefix
+    # of the basis, so a run that ended early was certified "fully
+    # re-convergent, match state untouched" over frames that were never read.
+    # Clauses 3 and 4 of the §4 v3 class are unevaluable on absent frames, so
+    # this enforces the ratified class rather than altering it. The sibling
+    # compare_flicker.py has always rejected a length mismatch outright.
+    if len(a) != len(b):
+        print(f"FAIL: length mismatch ({len(a)} vs {len(b)} frames) — a short "
+              f"log cannot be compared against a prefix of the basis")
+        return 1
+    n = len(a)
     if n == 0:
         print("FAIL: empty log(s)")
         return 1

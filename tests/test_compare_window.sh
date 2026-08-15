@@ -69,6 +69,27 @@ check "a window that never re-converges is caught" 1 \
 check "a bit-identical pair is NOT a silent pass" 1 \
     "$W/base" "$W/base" --onset 100 --end 104
 
+# --- 14z-90 (issue #3): a SHORT log must not be compared to a prefix ------
+# The comparator used to do `n = min(len(a), len(b))`, so a run that ended
+# early was measured only over its own length and certified "fully
+# re-convergent, match state untouched" — clauses asserted over frames that
+# were never read.
+head -201 "$W/window" > "$W/trunc"                 # 200 frames of a 400 pair
+check "a truncated log is not silently prefix-compared" 1 \
+    "$W/base" "$W/trunc" --onset 100 --end 104
+
+# The one that matters, and it must carry the frozen window as well as the
+# later break — otherwise the pair fails for the wrong reason (no window at
+# all) and proves nothing. Here the expected window 100..104 IS present, and
+# the run then breaks permanently at 300. The full pair FAILs on the break;
+# truncated at 250 the break is invisible and the pre-fix comparator PASSED it.
+mk "$W/latebreak" 100 101 102 103 104 $(seq 300 400)
+check "the full log of a late permanent divergence FAILs" 1 \
+    "$W/base" "$W/latebreak" --onset 100 --end 104
+head -251 "$W/latebreak" > "$W/latebreak_trunc"    # cut at 250, before frame 300
+check "truncating before a permanent divergence does NOT rescue it" 1 \
+    "$W/base" "$W/latebreak_trunc" --onset 100 --end 104
+
 if [ "$fail" = 0 ]; then
     echo "COMPARE WINDOW: PASS"
 else
