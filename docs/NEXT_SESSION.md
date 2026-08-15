@@ -31,26 +31,39 @@
 >    797 vs 796 at f3000; 24 at f17500 P1 X 324 vs 570 / HP 144 vs 115, P2
 >    X 655 vs 335 / HP 144 vs 157, facings flipped. Replay inputs are
 >    scheduled by FRAME, so one lost logic step re-aligns every later input.
->    **THIS IS THE FIRST TASK** (CLAUDE.md §2.6 halts forward work).
->    **TWO HYPOTHESES ARE ALREADY DEAD** (measured at the maintainer's
->    "know more before designing a fix"):
->      - NOT a palette fade. My "win-screen fade" reading is RETRACTED: a
->        snapshot of both legs at 24's onset f16870 shows an ordinary
->        MID-MATCH frame (Jedah vs Bulleta, 5-hit combo, visually
->        identical), and the `$FFF991-$FFF9D3` bytes are the OBJ-builder's
->        walker state — exactly the `$79A2..$79D3(A5)` range its bsr chain
->        reads — not a fade ramp.
->      - NOT "we draw more sprites". `obj_records_dump` on replay 38's
->        onset: f2314/2315/2316 sprite lists are BYTE-IDENTICAL on both
->        legs (1397 entries at f2316, zero differing lines).
->    So the extra cycles go somewhere that changes neither the sprite list
->    nor the palette, and 24's onset is mid-match while 38's is at the
->    select→VS transition — no single-screen explanation survives.
->    NEXT: bisect by ENGINE HOOK FAMILY (obj_hook dispatch, init shim,
->    index-window thunk, voice-borrow thunk, select re-assert) — build a
->    probe with one family disabled at a time and see which moves the
->    onset. The in-place-edit + trap-restore pattern in
->    tests/test_tenant_row_owner.sh is the model.
+>    **THIS IS THE FIRST TASK** (CLAUDE.md §2.6 halts forward work) — but
+>    the DIAGNOSIS IS DONE: both root causes are named and confirmed
+>    complete, so what remains is designing the fix.
+>      - CONTROL: `build/wide0` (the WIDE romset carrying the UNPATCHED
+>        program) is BIT-IDENTICAL to vanilla on replay 38 — the profile,
+>        the descriptor and the container are inert; the cost is in the
+>        program patch.
+>      - **38 <- `fixture_row0f_override_bank0/1`.** The pair replaces
+>        `movea.l #0x3B5940,a0` at the venue fixture-load sites 0x01C586 /
+>        0x01C59A with two `cmpi.b #id,abs.l` + branches, and its OWN
+>        manifest comment says those sites are "shared by match intro AND
+>        attract" — legacy runs them on every venue load, on a frame
+>        already at the VBL edge. Remove -> the ratified 2P shape, 2909
+>        identical frames after. (Eliminated first, one probe build each:
+>        the 6 palette/accent thunks, the 3 drawer bank gates, the 4
+>        select_companion thunks.)
+>      - **24 <- the two `[[obj_hook]]` type-dispatch extensions**
+>        (per-object dispatch, hot every frame). Remove -> re-converges,
+>        5787 identical frames after.
+>      - BOTH removed: 38 -> `window 889 2091`, 24 -> `composite
+>        12313,12733 889-2091`. The causes are COMPLETE for donovan-m5, and
+>        the shapes come out CLEANER than the frozen classes (38 loses its
+>        829 flicker frame too), so the fix will re-freeze more than these
+>        two replays.
+>    FIX OPTIONS are in STATE. Leading one: give the guards a cheap LEGACY
+>    path — one precomputed "a tenant is in this match" byte (the init_shim
+>    already runs at char-init and could set it) instead of two
+>    `cmpi.b #imm,abs.l`, and the same treatment for obj_hook. CAVEAT: this
+>    is a cycle BUDGET, so cheaper guards may move the tipping point rather
+>    than remove it — validate any fix by re-running the promoted legacy
+>    replays (which is what this session made possible).
+>    Instrument: `tools/probe_hook_removal.sh <tag> <replay> <hook>...`
+>    (rebuild with named hooks removed, re-measure; ~5 min per probe).
 > 2. **DECIDED (maintainer): make the tripwire diagnostic-only.** Design
 >    recorded in STATE: drop the `$FF010C` write from the fallback path and
 >    have `audit_effect_class_rows.sh` §4 watch the fallback's EXECUTION

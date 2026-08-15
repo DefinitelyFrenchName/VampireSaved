@@ -898,6 +898,24 @@ tests/audit_merged_legacy.sh          # 14z-81: THE MERGED-LEGACY MEASUREMENT,
                                       # 12 measures the UNION of the two solo
                                       # shapes. Failing logs kept in
                                       # build/gate_failures/
+tools/probe_hook_removal.sh           # 14z-89: CAUSAL attribution for a
+                                      # legacy-cycle regression — rebuild a
+                                      # tenant with named hooks REMOVED and
+                                      # re-measure a legacy replay against
+                                      # the vanilla basis. The probe is not
+                                      # shippable (the tenant loses a
+                                      # feature) and does not need to be:
+                                      # the legacy replay never touches the
+                                      # tenant. Named both 14z-89 root
+                                      # causes after dump diffs stalled at
+                                      # "extra cycles somewhere":
+                                      # 38 <- fixture_row0f_override_bank0/1
+                                      # (two cmpi.b at venue fixture-load
+                                      # sites LEGACY runs every venue load),
+                                      # 24 <- the two [[obj_hook]] table
+                                      # extensions. Control in the header:
+                                      # the unmodified build must still FAIL
+                                      # the same replay. ~5 min per probe
 tests/audit_legacy_pairings.sh        # 14z-89: WHICH REPLAYS ARE LEGACY
                                       # CONTENT — and is each one compared
                                       # against VANILLA rather than against

@@ -55,3 +55,6 @@ build/donovan/
 # changed and produced a false gate FAIL (14z-61, docs/GOTCHAS.md).
 build/wide0/rompath/
 build/wide_canary/rompath/
+build/manifest/probe_*.toml
+build/probe_*/
+build/probe_*.log

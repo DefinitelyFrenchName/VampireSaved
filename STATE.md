@@ -125,15 +125,44 @@
 ###   differing lines. The OBJ OUTPUT agrees; only the chain's return
 ###   address (execution position at the frame-done sample) differs.
 ### CONCLUSION: the extra cycles are spent on a path that does NOT change
-### the sprite list and is NOT the palette fade. That points at the
-### per-frame ENGINE HOOKS themselves (obj_hook dispatch, the init shim,
-### the index-window thunk, the voice-borrow thunk, the select re-assert
-### machinery) — and note 24's onset is MID-MATCH while 38's is at the
-### select→VS transition, so any single-screen explanation is already
-### out. NEXT STEP (revised): bisect by hook family — build probe variants
-### with one family disabled at a time and see which one moves the onset.
-### The generator already supports this shape (test_tenant_row_owner.sh's
-### in-place edit + trap-restore pattern).
+### the sprite list and is NOT the palette fade — so the bisect ran, and
+### **BOTH ROOT CAUSES ARE NOW NAMED** (`tools/probe_hook_removal.sh`,
+### rebuild with a hook removed and re-measure; the legacy replay never
+### touches the tenant, so a crippled probe still answers the question):
+###   **CONTROL FIRST: `build/wide0` — the WIDE romset carrying the
+###   UNPATCHED program — is BIT-IDENTICAL to vanilla on replay 38.** So
+###   the profile, the descriptor changes and the romset container are all
+###   inert; the cost is in the program patch. Everything below is measured
+###   against that control.
+###   **38_victor_p1_vsavj <- `fixture_row0f_override_bank0/1`.** The pair
+###   replaces `movea.l #0x3B5940,a0` at the venue fixture-load sites
+###   0x01C586 / 0x01C59A with two `cmpi.b #id,abs.l` + branches. Their own
+###   manifest comment already says those sites are "shared by match intro
+###   AND attract — both measured": LEGACY runs them on EVERY venue load,
+###   and the match-intro frame sits at the VBL edge. Removing the pair ->
+###   the ratified 2P shape (composite 829 889-2091), 2909 identical after.
+###   Eliminated on the way (each its own probe build): the 6 palette/accent
+###   re-assert thunks, the 3 drawer bank gates, the 4 select_companion
+###   thunks — none of them moves it.
+###   **24_don_winmash <- the two `[[obj_hook]]` type-dispatch table
+###   extensions** (per-object dispatch, hot every frame). Removing them ->
+###   re-converges, 5787 identical frames after.
+###   **BOTH removed: the two failures are GONE and the causes are
+###   COMPLETE for this build** — 38 -> `window 889 2091`, 24 ->
+###   `composite 12313,12733 889-2091`. Note the shapes come out CLEANER
+###   than today's frozen classes (38 loses its 829 flicker frame as well),
+###   so whatever fix lands will re-freeze more than these two replays.
+### FIX OPTIONS (not mine to choose): (a) make the guards cheap on the
+### LEGACY path — the fixture pair can test ONE precomputed "a tenant is in
+### this match" byte (the init_shim already runs at char-init and could set
+### it) instead of two `cmpi.b #imm,abs.l`, and obj_hook wants the same
+### treatment; (b) move the work off the legacy path entirely (per-venue
+### data rather than a code hook); (c) accept and re-ratify, which the
+### measurement above argues against since it reaches HP and positions.
+### HONEST CAVEAT on (a): this is a CYCLE BUDGET, so making two hooks
+### cheaper may move the tipping point rather than remove it — any fix has
+### to be validated by re-running the promoted legacy replays, which is
+### exactly what this session made possible.
 ###
 ### (2) **DECIDED (maintainer, 2026-08-15): make the tripwire
 ### diagnostic-only** — *"I agree with your recommendation."* DESIGN (mine,
