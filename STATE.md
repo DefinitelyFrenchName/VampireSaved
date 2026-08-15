@@ -1,5 +1,39 @@
 # STATE — living progress log
 
+Updated: 2026-08-15 (session 14z-87b FULL close — **THREE FIXES SHIPPED
+AND FIELD/SMOKE-CONFIRMED IN ONE DAY: the voice-borrow fix (b+c,
+"all sounds clean"), THE SWORD-PLANT BEEP (packing law #3,
+ear-confirmed from a byte-synthesized prediction), and THE PYRON
+MEDALLION (smoke-confirmed fixed)** — donovan-m6 57754602 / huitzil-m14
+66feb5e8 / pyron-m8 fab92eb7 (dirs build/don_m5, hui40, pyron25 reused),
+merged build/m3b_merged7; stock twin BIT-IDENTICAL 6c93cfa8 through
+everything; ALL PUSHED to origin incl. freeze tags. THE MEDALLION FIX:
+one layout field (wheel_layout cells.11 pal_row 0x1A -> 0x1D) — the
+collision was Donovan's P2-hover PORTRAIT drawing with row 0x1A by
+vs2-heritage attr (20 OBJ sprites measured pal=1a on hover), which only
+a MERGED build can exhibit; 0x1D verified absent from every measured
+clobber list (march rows 0x16/0x19, phase-computed rows, both OBJ
+censuses); every consumer (pal-block write, attr re-palm, reassert body)
+derives from the layout, so one field moves them all. Snapshot-verified
+(ring-on-Donovan leaves the medallion orange) + maintainer
+smoke-confirmed. Gates at close: m3a all-four bit-exact on the new
+EXPECTs, tenant_loop GREEN (counts unchanged — content-only op),
+shared_writes re-frozen (the pal-block write 0x3a3b40 -> 0x3a3ba0, x3),
+registry rows + carried-renamed expectation sets (work-RAM streams
+untouched by palette-path changes — the fix is invisible to every RAM
+gate by construction, which is exactly why it needed the maintainer's
+trigger + the capture loop to find). **RITUAL NOTE: the three plain
+suites were STILL RUNNING at close (launched on the renamed sets;
+expected green since no fix byte transits work RAM) — if any comes back
+red, triage per the 14z-87b pattern before anything else.** The
+session's method lesson is recorded in memory + gotchas: sensory
+symptoms are settled by exchanging captures with the maintainer in BOTH
+directions ("you providing captures visual or auditory made us go
+forward very fast instead of tiptoeing in the dark"). NEXT: the
+maintainer's extensive test pass verdicts; then the M5 sfx odds /
+Sasquatch rig / the H-P hover-row polish check (NEXT_SESSION).)
+
+
 Updated: 2026-08-15 (session 14z-87b close — **THE SWORD-PLANT BEEP
 ROOT-CAUSED AND FIXED, EAR-CONFIRMED against a byte-synthesized
 prediction ("Is THIS your beep? Yes! Yes it is!"): QSOUND PACKING LAW #3

@@ -16,7 +16,7 @@
 #
 # WHAT A GREEN RUN PROVES: the merged image's legacy behaviour lands on the
 # SAME ratified comparison classes as the frozen single-tenant builds
-# (tests/expected/donovan-m5/*.masked — all three tenant sets agree
+# (tests/expected/donovan-m6/*.masked — all three tenant sets agree
 # byte-for-byte on the 13 shared legacy entries, and a merged build backs
 # 0x13 so 11_pick_donovan applies too) — with ONE ratified merged-specific
 # exception: 04_select_fuzz lands on the RATIFIED MERGED inventory
@@ -68,7 +68,7 @@ export MAME_BIN
 OUT="${MERGED_OUT:-build/merged1}"
 PREBUILT="${MERGED_PREBUILT:-0}"
 WIDE_ZIP="${WIDE_ROMSET:-$PWD/build/wide0/rompath/vsavjw.zip}"
-EXPECT="tests/expected/donovan-m5"          # the ratified prior (see header)
+EXPECT="tests/expected/donovan-m6"          # the ratified prior (see header)
 BASE_LOGS="tests/expected/vsavj/masked-v2/logs"
 
 # The three frozen extract dirs are the generator's inputs, exactly as
@@ -318,7 +318,7 @@ for spec in "$EXPECT"/*.masked; do
     # pointer phase, no gameplay surface, the ratified hook-flicker family.
     # The merged instrument is unregistered by design, so this expectation
     # lives HERE, not in a .masked file; the single-tenant prior
-    # (tests/expected/donovan-m5/04_select_fuzz.masked) is unchanged.
+    # (tests/expected/donovan-m6/04_select_fuzz.masked) is unchanged.
     if [ "$name" = "04_select_fuzz" ]; then
         sline="composite vsavj/masked-v2 1525,2005,2009,2195 889-1104"
     fi

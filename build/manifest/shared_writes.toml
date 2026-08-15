@@ -127,7 +127,7 @@ writes = [
   "0x38c264 4 poke32",
   "0x3a3ac0 32 data",
   "0x3a3b20 32 data",
-  "0x3a3b40 32 data",
+  "0x3a3ba0 32 data",
 ]
 
 [[tenant]]
@@ -216,7 +216,7 @@ writes = [
   "0x38c258 4 poke32",
   "0x3a3ac0 32 data",
   "0x3a3b20 32 data",
-  "0x3a3b40 32 data",
+  "0x3a3ba0 32 data",
 ]
 
 [[tenant]]
@@ -283,5 +283,5 @@ writes = [
   "0x38c25c 4 poke32",
   "0x3a3ac0 32 data",
   "0x3a3b20 32 data",
-  "0x3a3b40 32 data",
+  "0x3a3ba0 32 data",
 ]

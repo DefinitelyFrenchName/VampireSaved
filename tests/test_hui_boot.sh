@@ -59,7 +59,7 @@ echo "== legacy replay under the v2 masked basis (hooked build)"
 # of the ladder gate no longer applies (CLAUDE.md §4 hooked-build basis).
 # Measured 14z-65: EXACT under the v2 mask — frozen as EXACT; any future
 # flicker must be measured and ratified per doctrine, never tolerated here.
-MASK_RANGES="$(cat "$REPO/tests/expected/donovan-m5/mask")" \
+MASK_RANGES="$(cat "$REPO/tests/expected/donovan-m6/mask")" \
 MAME_ROMPATH="$WORK/hui4/rompath;$ROMDIR" MAME_BIN="${MAME_BIN:-mame}" \
     tools/run_replay_mame.sh "${SET:-vsavj}" tests/replays/02_demitri_vs_cpu.rpl \
     "$WORK/r02.log" "$WORK/r02box" > /dev/null 2>&1
