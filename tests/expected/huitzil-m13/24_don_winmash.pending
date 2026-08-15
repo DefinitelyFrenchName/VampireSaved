@@ -11,11 +11,17 @@ same one-main-loop-iteration class as 38, OPPOSITE SIGN - this build
 runs one iteration AHEAD from f16871 ($FF8081/$FF80B4 f8/9c vanilla vs
 f9/9d ours; still exactly one apart at f17500) and never re-converges.
 Onset context at f16870: the live differences are the OBJ-chain return
-address $FF06DF-$FF06E5 and a $FFF991-$FFF9C9 ramp buffer whose bytes
-sit 2-6 steps further along - i.e. the WIN-SCREEN FADE is one step
-ahead, then the main loop gains an iteration. Same mechanism family as
-14z-88: the fade's per-colour work is data-dependent and this build's
-palette content differs on the rows the roster work edits.
+address $FF06DF-$FF06E5 and $FFF991-$FFF9D3.
+RETRACTED (14z-89, same session): those bytes were first read as a
+"win-screen fade ramp one step ahead". They are NOT. A headless snapshot
+of both legs at f16870 shows an ORDINARY MID-MATCH FRAME (Jedah vs
+Bulleta, 5-hit combo, visually identical on both legs) - the replay is
+in the CPU ladder's next match by then, not on any win screen. And
+$FFF9A2-$FFF9D3 is exactly the `$79A2..$79D3(A5)` window the OBJ-builder
+bsr chain reads (A5=$FF8000), i.e. the sprite-list WALKER STATE: a table
+of 4-byte pointers into $FF3xxx whose low bytes differ by 2-6, plus
+small counts. So the first live symptom is in the OBJ path, one frame
+before the main loop gains its iteration - not a palette fade.
 IDENTICAL SHAPE ON ALL THREE SETS (2857/18520 frames, runs 829,
 889-2091, 12313, 12733, 16870-18520), so the cause is shared, not
 tenant-specific.

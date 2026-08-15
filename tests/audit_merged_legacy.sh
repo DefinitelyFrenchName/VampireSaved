@@ -285,6 +285,22 @@ for spec in "$EXPECT"/*.masked; do
     if [ "$name" = "11_pick_donovan" ]; then
         sline="composite vsavj/masked-v2 2836 889-2415"
     fi
+    # MERGED-ONLY RATIFIED EXPECTATION #3 (maintainer, 2026-08-15,
+    # 14z-89). The merged image carries ALL THREE tenants, so on this
+    # replay it shows the UNION of the two single-tenant flicker frames:
+    # 5713 is the donovan-m5 prior's frame (the OBJ-builder bsr-chain
+    # return address $FF06D0-$FF06EF — execution position at the
+    # frame-done sample, docs/game/atlas/ram.md) and 2836 is the
+    # huitzil-m13 / pyron-m7 priors' frame (the fade-staging slot-0x0B
+    # phase of override #2's species, ratified 2026-08-12 merged and
+    # 2026-08-15 solo). Both frames were dump-attributed in 14z-89; the
+    # window 889-2415 is unchanged from the priors. NOTE this is the
+    # THIRD such override — if a fourth appears, ask whether the merged
+    # build wants its own class table rather than a growing exception
+    # list.
+    if [ "$name" = "12_donovan_vs_cpu" ]; then
+        sline="composite vsavj/masked-v2 2836,5713 889-2415"
+    fi
     class=${sline%% *}; rest=${sline#* }; base=${rest%% *}; args=${rest#* }
     baselog="$REPO/tests/expected/$base/logs/$name.log"
     log="$W/a_$name.log"

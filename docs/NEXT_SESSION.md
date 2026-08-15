@@ -1,9 +1,12 @@
 # NEXT SESSION — orientation (written at the close of 14z-89, 2026-08-15)
 
-> ## FIRST TASK — THE LEGACY REGRESSION IN (1) BELOW. Ruled on by the
-> ## maintainer 2026-08-15: (3) decided, (2) correction accepted (its FIX
-> ## still unruled), (1) offered conditional ratification which MEASUREMENT
-> ## REFUSED, (4) still open. STATE carries the full record.
+> ## FIRST TASK — THE LEGACY REGRESSION IN (1) BELOW, then (2) in the
+> ## SAME re-freeze. All four 14z-89 findings ruled on by the maintainer
+> ## 2026-08-15: (1) conditional ratification offered and REFUSED BY
+> ## MEASUREMENT (it reaches gameplay state) — still an open regression;
+> ## (2) DECIDED, tripwire goes diagnostic-only (designed, not built);
+> ## (3) DECIDED, the 61/62 exemption stands; (4) DECIDED and APPLIED.
+> ## STATE carries the full record.
 >
 > 14z-89 closed the coverage gap 14z-88 exposed: every replay whose loaded
 > characters equal vanilla's is now compared against the VANILLA masked
@@ -29,26 +32,38 @@
 >    X 655 vs 335 / HP 144 vs 157, facings flipped. Replay inputs are
 >    scheduled by FRAME, so one lost logic step re-aligns every later input.
 >    **THIS IS THE FIRST TASK** (CLAUDE.md §2.6 halts forward work).
->    Cheapest next measurement, before designing any fix: 24 fails
->    IDENTICALLY on all three sets, so the cause is SHARED — do the
->    14z-88-style A/B with the edited palette rows' CONTENT reverted to
->    vanilla and see whether 24's onset moves. That names the cost source
->    (edited palette content vs the extended wheel vs the shared hooks)
->    before anything is engineered.
-> 2. **The type-6 deadness claim is FALSE — and the fallback held.** Legacy
->    lists reach the taken-over list-type 6 on huitzil-m13: the `$FF010C`
->    tripwire arms 387x on `21_don_mash` and 948x on `26_don_arcade_mash`,
->    PC-attributed inside the thunk. Nothing rendered wrong — that is the
->    safe-and-loud design working, and it is the DEADNESS REGISTER's first
->    real hit. Residual cost is the counter itself (live work RAM vanilla
->    does not keep). Recommendation: make the tripwire diagnostic-only
->    (latch inside an already-masked window) so those two return to a strict
->    basis without losing the signal.
-> 4. **Merged `12_donovan_vs_cpu`** (small, mechanical): leg (a) now covers
->    45 replays and is 42 PASS / 3 FAIL — 21/26 are ruling 2 above, and 12
->    measures the UNION of the two solo shapes (`composite 2836,5713
->    889-2415`; both frames already attributed). Same species as the 04 and
->    11 inline overrides you ratified. Recommendation: ratify as override #3.
+>    **TWO HYPOTHESES ARE ALREADY DEAD** (measured at the maintainer's
+>    "know more before designing a fix"):
+>      - NOT a palette fade. My "win-screen fade" reading is RETRACTED: a
+>        snapshot of both legs at 24's onset f16870 shows an ordinary
+>        MID-MATCH frame (Jedah vs Bulleta, 5-hit combo, visually
+>        identical), and the `$FFF991-$FFF9D3` bytes are the OBJ-builder's
+>        walker state — exactly the `$79A2..$79D3(A5)` range its bsr chain
+>        reads — not a fade ramp.
+>      - NOT "we draw more sprites". `obj_records_dump` on replay 38's
+>        onset: f2314/2315/2316 sprite lists are BYTE-IDENTICAL on both
+>        legs (1397 entries at f2316, zero differing lines).
+>    So the extra cycles go somewhere that changes neither the sprite list
+>    nor the palette, and 24's onset is mid-match while 38's is at the
+>    select→VS transition — no single-screen explanation survives.
+>    NEXT: bisect by ENGINE HOOK FAMILY (obj_hook dispatch, init shim,
+>    index-window thunk, voice-borrow thunk, select re-assert) — build a
+>    probe with one family disabled at a time and see which moves the
+>    onset. The in-place-edit + trap-restore pattern in
+>    tests/test_tenant_row_owner.sh is the model.
+> 2. **DECIDED (maintainer): make the tripwire diagnostic-only.** Design
+>    recorded in STATE: drop the `$FF010C` write from the fallback path and
+>    have `audit_effect_class_rows.sh` §4 watch the fallback's EXECUTION
+>    instead (it already PC-attributes every hit, so it needs the event and
+>    never the counter's value) — zero legacy RAM perturbation, no new mask
+>    window. NOT implemented, deliberately: it re-fingerprints huitzil and
+>    the merged build, and (1) will likely need a build change too, so both
+>    should land in ONE re-freeze.
+> 4. **DECIDED (maintainer): "Validated."** Merged override #3 applied in
+>    `audit_merged_legacy.sh` (`composite vsavj/masked-v2 2836,5713
+>    889-2415`), with both frames' attributions in the comment. It also
+>    flags that a FOURTH exception should prompt "does the merged build want
+>    its own class table?" rather than a longer list.
 >
 > 3. **DECIDED (maintainer, 2026-08-15): the 61/62 exemption stands.**
 >    They navigate to cell 0x13, which neither vanilla nor those builds

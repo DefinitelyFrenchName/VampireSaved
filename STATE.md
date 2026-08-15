@@ -102,26 +102,65 @@
 ### scheduled by FRAME, so once the main loop is one logic step out, every
 ### later input lands on a different step. **Therefore this stays an OPEN
 ### REGRESSION on legacy content (CLAUDE.md §1), not a class** — the four
-### `.pending` files carry the evidence. NEXT STEP (proposed): bisect what
-### makes the fade's cost differ. 24 fails IDENTICALLY on all three sets,
-### so the cause is shared (the wheel extension / the edited palette rows /
-### the shared hooks), and the 14z-88-style A/B is cheap: build a variant
-### with the edited palette rows' CONTENT reverted to vanilla and see
-### whether 24's onset moves. Do that before any fix is designed.
+### `.pending` files carry the evidence.
 ###
-### (2) **"excellent correction"** — the DEADNESS REGISTER row and the
-### four propagated claims stand corrected. The FIX is still unruled: the
-### residual is that `$FF010C/$FF010D` is a live counter vanilla does not
-### keep, so 21/26 cannot re-converge. Recommendation unchanged: make the
-### tripwire diagnostic-only so the signal survives without perturbing
-### legacy RAM. Not started.
+### **"WE NEED TO KNOW MORE BEFORE WE DESIGN A FIX" (maintainer) — DONE,
+### AND IT KILLED THE EXPERIMENT I HAD PROPOSED.** Two measurements, both
+### cheap, both eliminating a hypothesis:
+###   (i) **RETRACTED: "the win-screen fade is one step ahead" (my own
+###   attribution, hours old).** A headless snapshot of both legs at
+###   24's onset f16870 shows an ORDINARY MID-MATCH FRAME — Jedah vs
+###   Bulleta in the CPU ladder's next match, 5-hit combo, visually
+###   IDENTICAL on both legs. No fade, no win screen. And the
+###   `$FFF991-$FFF9D3` bytes I read as a "fade ramp" are exactly the
+###   `$79A2..$79D3(A5)` window the OBJ-builder bsr chain reads
+###   (A5=$FF8000): the sprite-list WALKER STATE (4-byte pointers into
+###   $FF3xxx, low bytes differing by 2-6, plus small counts). The first
+###   live symptom is in the OBJ path, one frame before the iteration is
+###   gained. So the proposed palette-content A/B was aimed at the wrong
+###   subsystem and is WITHDRAWN.
+###   (ii) **It is not "we draw more sprites" either.** `obj_records_dump`
+###   on replay 38's onset, both legs: f2314/2315/2316 are BYTE-IDENTICAL
+###   sprite lists — 1365/1380/1397 entries, 337/352/369 drawn, ZERO
+###   differing lines. The OBJ OUTPUT agrees; only the chain's return
+###   address (execution position at the frame-done sample) differs.
+### CONCLUSION: the extra cycles are spent on a path that does NOT change
+### the sprite list and is NOT the palette fade. That points at the
+### per-frame ENGINE HOOKS themselves (obj_hook dispatch, the init shim,
+### the index-window thunk, the voice-borrow thunk, the select re-assert
+### machinery) — and note 24's onset is MID-MATCH while 38's is at the
+### select→VS transition, so any single-screen explanation is already
+### out. NEXT STEP (revised): bisect by hook family — build probe variants
+### with one family disabled at a time and see which one moves the onset.
+### The generator already supports this shape (test_tenant_row_owner.sh's
+### in-place edit + trap-restore pattern).
+###
+### (2) **DECIDED (maintainer, 2026-08-15): make the tripwire
+### diagnostic-only** — *"I agree with your recommendation."* DESIGN (mine,
+### recorded now, NOT implemented): drop the `$FF010C` counter write from
+### the `beam_list_type6` thunk's fallback path entirely and have the gate
+### watch the fallback's EXECUTION instead of a memory write —
+### `audit_effect_class_rows.sh` §4 already PC-attributes every hit, so it
+### needs the event, never the counter's value. That perturbs zero legacy
+### RAM (strictly better than masking the two bytes, which would cost a new
+### basis and a permanent blind spot) and removes a write from the path.
+### SEQUENCING (deliberate): it is a thunk-body change, so it re-fingerprints
+### huitzil and the merged build and costs a re-freeze + full battery.
+### Finding (1) is an open regression that will very likely also require a
+### build change, so these should land in ONE re-freeze, not two — do (2)
+### with (1)'s fix rather than before it.
 ###
 ### (3) **DECIDED (maintainer): the 61/62 exemption stands** — *"I don't
 ### have reasons to oppose this judgment."* The `.legacy-exempt` files are
 ### the record; the audit prints them every run.
 ###
-### (4) OPEN — see the explanation in NEXT_SESSION; a one-line inline
-### override once ratified.
+### (4) **DECIDED (maintainer, 2026-08-15): "Validated."** Applied — the
+### merged-only override #3 is in `audit_merged_legacy.sh` beside #1/#2,
+### with both frames' attributions in the comment
+### (`composite vsavj/masked-v2 2836,5713 889-2415`). The comment also
+### flags the meta-point: this is the THIRD such exception, and a fourth
+### should prompt "does the merged build want its own class table?"
+### rather than a longer exception list.
 ###
 ### ORIGINAL BRIEF (kept for the record):
 ### DECISIONS PENDING — 14z-89 (three, all opened by the coverage sweep;
