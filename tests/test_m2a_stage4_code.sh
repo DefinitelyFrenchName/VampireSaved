@@ -32,8 +32,17 @@ fail=0
 
 echo "== build stage 4 =="
 mkdir -p "$OUTBASE"
+# --- build (no pipe: a rejected build must abort the gate) ---------------
+# 14z-90: see tests/test_m2b_stage6.sh for the full mechanism. tail's exit
+# status masked build_donovan.sh's own BUILD REJECTED paths.
 GEN_FLAGS="--allow-plausible --tripwire-open" \
-    tools/build_donovan.sh 4 "$OUTBASE" | tail -2
+    tools/build_donovan.sh 4 "$OUTBASE" \
+    > "$WORK/build.log" 2>&1 || { tail -20 "$WORK/build.log"; exit 1; }
+tail -2 "$WORK/build.log"
+[ -d "$OUTBASE/rompath" ] || {
+    echo "FAIL: no rompath at $OUTBASE — the build produced nothing to gate"
+    exit 1
+}
 RP="$OUTBASE/rompath;$ROMDIR"
 
 echo "== 1. extraction: bare-long veto fact-lock =="

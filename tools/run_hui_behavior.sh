@@ -74,9 +74,20 @@ if [ ! -f "$OUTBASE/rompath/vsavjw.zip" ]; then
         exit 1
     fi
     echo "building the stage-6 gfx build at $OUTBASE ..."
+    # 14z-90: no pipe. This script launches an INTERACTIVE PLAYTEST on the
+    # result, and `| tail -2` discarded build_donovan.sh's own BUILD REJECTED
+    # exit status — handing the maintainer a build the builder refused. Its
+    # own :414 comment: "A build that fails this must never reach a playtest".
+    _BLOG="$(mktemp -t huibuild)"
     TENANT_MANIFEST=build/manifest/huitzil.toml TENANT_CHAR=0x10 \
     GEN_FLAGS="--profile cps2-wide-v1 --allow-plausible --tripwire-open" \
-        tools/build_donovan.sh 6 "$OUTBASE" | tail -2
+        tools/build_donovan.sh 6 "$OUTBASE" \
+        > "$_BLOG" 2>&1 || { tail -20 "$_BLOG"; rm -f "$_BLOG"; exit 1; }
+    tail -2 "$_BLOG"; rm -f "$_BLOG"
+    [ -f "$OUTBASE/rompath/vsavjw.zip" ] || {
+        echo "FAIL: build left no $OUTBASE/rompath/vsavjw.zip — refusing to launch"
+        exit 1
+    }
 fi
 
 # Say WHAT is being launched. "Am I playing what I think I am?" has cost

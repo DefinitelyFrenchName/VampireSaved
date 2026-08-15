@@ -1096,6 +1096,16 @@ tests/test_effect_palette_table.sh    # 14z-76: the per-character palette POINTE
                                       # variant row, a build clobbering a base-half
                                       # row). tools/audit_effect_palette_table.py.
                                       # Static, seconds
+tests/test_build_gate_status.sh       # 14z-90 (issue #1): ground truth that a
+                                      # REJECTED build aborts the gate instead of
+                                      # being soaked and stamped PASS. Copies the
+                                      # stage-4/6 gates into a scratch repo with a
+                                      # stubbed build_donovan.sh; 3 failure modes
+                                      # (reject-after-pack, stale rompath, no
+                                      # rompath) + a positive control + the sibling
+                                      # gate. GATE_SRC=<dir> reruns it against the
+                                      # pre-fix gates, where it must FAIL.
+                                      # No ROMs, no emulator, ~1s
 tests/test_compare_composite.sh       # ground truth for the §4 v4 composite class
                                       # (frozen flicker inventory + frozen bounded
                                       # windows, RATIFIED 2026-08-06): 7 synthetic

@@ -28,8 +28,23 @@ cd "$REPO"
 fail=0
 
 echo "== build stage 6 (static output verification inside) =="
+# --- build (no pipe: a rejected build must abort the gate) ---------------
+# 14z-90: `| tail -3` handed this gate tail's exit status, so a build that
+# build_donovan.sh itself REJECTED (verify_gfx_build :404 / member-identity
+# :415, both AFTER the pack at :275/:287) was soaked, legacy-gated and
+# stamped PASS. Same class as docs/project/gotchas.md "Pipe a build tool
+# through tail". Stages 1/2/3 always used this form; 4 and 6 regressed it.
 GEN_FLAGS="--allow-plausible --tripwire-open" \
-    tools/build_donovan.sh 6 "$OUTBASE" | tail -3
+    tools/build_donovan.sh 6 "$OUTBASE" \
+    > "$WORK/build.log" 2>&1 || { tail -20 "$WORK/build.log"; exit 1; }
+tail -3 "$WORK/build.log"
+# A build that died before build_donovan.sh:263 (`rm -rf rompath`) leaves no
+# rompath at all, and run_mame.sh's chained `-rompath "dir;$ROMDIR"` then
+# resolves PRISTINE vsavj — the gate would measure vanilla and pass.
+[ -d "$OUTBASE/rompath" ] || {
+    echo "FAIL: no rompath at $OUTBASE — the build produced nothing to gate"
+    exit 1
+}
 RP="$OUTBASE/rompath;$ROMDIR"
 
 echo "== 1. guarded soaks on stage 6 =="

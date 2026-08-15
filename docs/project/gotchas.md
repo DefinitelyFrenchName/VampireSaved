@@ -413,6 +413,26 @@ with set -o pipefail; the tell was mtime: gfx/vm3.14m an hour older
 than the rompath zip. Check artifact mtimes when a fix "changes
 nothing".
 
+**SECOND payment (14z-90, GitHub issue #1).** The lesson was fixed in
+`build_donovan.sh` and then reintroduced in its CALLERS. Three gates
+piped the builder through `tail`, so the builder's own rejection paths
+(`verify_gfx_build.py` :404, `audit_romset_identity.py` :415) were
+discarded — and because the pack at :275/:287 happens BEFORE both, a
+REJECTED artifact was already on disk to be soaked, legacy-gated and
+stamped PASS. `run_hui_behavior.sh:79` was written 2026-08-07, a week
+AFTER the fix above: a documented gotcha does not protect a new call
+site, only a test does. Two variants beyond the filed one, both
+measured: a build dying before the `rm -rf rompath` at :263 leaves the
+PREVIOUS build's rompath and the gate validates yesterday's ROM under
+today's name; and on a FRESH outbase it leaves none, at which point
+`run_mame.sh`'s chained `-rompath "dir;$ROMDIR"` silently resolves the
+PRISTINE set and the legacy gate measures vanilla against vanilla. So
+the fix is two assertions, not one: propagate the status (redirect, not
+pipe — `pipefail` is a bashism these `#!/bin/sh` gates avoid) AND assert
+the rompath exists before measuring it. Ground truth:
+`tests/test_build_gate_status.sh`, which fails on the pre-fix tree via
+`GATE_SRC=`.
+
 ## A0-at-write is post-increment — SECOND payment (14z-18 tail row)
 The "accent super-cycle phase 2 reads 0x39FC00-0x39FC3F" conclusion
 derived a 0x40-byte window from two logged A0 values without
