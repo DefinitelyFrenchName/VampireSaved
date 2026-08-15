@@ -1,25 +1,59 @@
-# NEXT SESSION — orientation (written at the close of 14z-87, 2026-08-15)
+# NEXT SESSION — orientation (written at the close of 14z-88, 2026-08-15)
 
-> ## FIRST TASK — apply the RATIFIED row-0x1D staging-window mask
-> ## (maintainer, 2026-08-15: "Yes, but keep the implementation for
-> ## first task of next session")
+> ## FIRST TASK — THE MAINTAINER'S RULING ON THE 14z-88 REGRESSION
+> ## (STATE "DECISION PENDING — 14z-88"; recommended: REVERT the
+> ## medallion move, then fix the collision on the portrait side)
 >
-> The medallion fix (pal_row 0x1A -> 0x1D) moved the medallion's
-> palette-STAGING slot out from under the ratified masked basis: the
-> three suites on donovan-m6/huitzil-m14/pyron-m8 are RED solely on
-> that slot — byte-attributed: f5000 live diff vs vanilla = ZERO bytes
-> (match state untouched); f11000 = 30 bytes, all in $FF42A2-$FF42BA,
-> palette color words = row 0x1D's staging slot (the exact class of the
-> ratified V2 windows for rows 0x16/0x19/0x1A at $4182/$41C2/$4222).
-> THE TASK: (1) add window `42a2-42c2` to the mask files of all three
-> sets (donovan-m6/huitzil-m14/pyron-m8) + wherever the merged audit
-> takes its basis; (2) re-run the three suites — the window-class shapes
-> should RETURN to their frozen specs (no window re-freeze expected);
-> (3) re-freeze the don-content .sha1 replays that legitimately moved
-> (12/17/18/19/20 family — canonical whole-RAM logs include staging);
-> (4) plain-verify, commit, push. Everything else about the batch is
-> green (m3a all-four, tenant_loop, shared_writes, merged gates).
+> 14z-88 applied the ratified row-0x1D window (V3 basis, below) and, in
+> attributing the moved tenant `.sha1`s before re-freezing, MEASURED that
+> the 14z-87b medallion move (Pyron pal_row 0x1A -> 0x1D) makes replay 38
+> (P1 Victor vs P2 Jedah on cell 0F — ids identical to vanilla, a LEGACY
+> pairing) lose one main-loop iteration at the select->VS fade on the
+> huitzil-m14 / pyron-m8 / merged7 builds: whole-RAM vs vanilla never
+> re-converges (pre-move builds: the ordinary composite 829 + window
+> 889-2091, 2909 identical after). Root cause: the fade's per-color work
+> is data-dependent and that frame already runs at the VBL edge; the
+> palette content on row 0x1D crossed it. A 0x1B probe moved OTHER frozen
+> inventories and 0x1B is OBJ-used anyway. Options and recommendation are
+> in STATE; NOTHING was re-frozen — the three suites are RED on the tenant
+> `.sha1` rows by design until the ruling. If REVERT: `wheel_layout_
+> proposed.json` cells.11 pal_row 29 -> 26 reproduces donovan-m5 /
+> huitzil-m13 / pyron-m7 (3c599fb6 / 2629561c / 94ce9a48, all frozen
+> sets green; the V3 window then hides nothing and the sets go back to
+> the V2 basis — keep masked-v3 + the tools; the P2-ring-on-Donovan
+> whitening returns until the portrait-side fix). ALSO close the coverage
+> gap that let this hide: promote the P2-human legacy pairings (31-40
+> victor family, and any replay whose loaded ids equal vanilla's) from
+> `.sha1` to `.masked` legacy classes on every set + into
+> audit_merged_legacy's list.
 >
+> ## What landed (14z-88), keep:
+> V3 masked basis: mask `043c-043d,4182-41a2,41c2-41e2,4222-4262,42a2-
+> 42c2,7f00-8000` + `tests/expected/vsavj/masked-v3/` (`tools/freeze_
+> masked_basis.sh` — a window is a BASIS: masked bytes are skipped from
+> the checksum, so the vanilla side is regenerated under the same mask);
+> the 13 shared legacy `.masked` replays hold their FROZEN classes on all
+> three sets; audit_merged_legacy 14/14 + leg (b) clean on V3; hui_boot /
+> pyron_ladder / tenant_select_records green. Solo donovan-m6 replay 11 =
+> `composite 2836 889-2415` (MAINTAINER-RATIFIED 2026-08-15: the merged-
+> ratified one-frame slot-0x0B staging phase, writer PRG:0x01C3BA, now on
+> the solo build too). `tests/audit_mask_window_ff42a2.sh` = the pre/post
+> attribution instrument (rebuild the pre-move builds in a worktree at
+> e6abaa9^; accepted classes: staging area, OBJ-chain return address at
+> $FF06DE, the $FF80B5 latch). Maintainer field results the same day:
+> merged7 medallions CLEAN for every hover combination (polish check
+> CLOSED — but see the decision); H-vs-P stuck-direction not reproduced —
+> keep listed, assume emulator-side or resolved.
+
+> ## START HERE — the open list, in order
+> - The M5 sfx odds (0x112/0x14a/0x173/0x31B family — machinery ready).
+> - FLAKY CRASH RESET (Sasquatch intro; rig designed, STATE 14z-85f).
+> - Round-end flicker (parked; needs the maintainer's recording).
+> - Win-screen QUOTE (both tenants); region_space re-freeze; op-tagging
+>   for test_shared_writes.
+> - H-vs-P stuck-direction (~1/30) — possible; not reproduced recently.
+> - Then MiSTer core surgery (stretch, DECIDED below) — after the roster.
+
 > ## ALSO DECIDED (maintainer, 2026-08-15) — MiSTer decision space:
 > a "17-character variant" is NOT numerically possible (D+H alone
 > overflow 4MB PRG by ~310KB; only ONE added character fits the stock
@@ -38,7 +72,7 @@
 > own full gate battery per the dual-track doctrine. Stretch-goal
 > priority — after the roster work, not before.
 
-> ## START HERE — THE VOICE-BORROW FIX AWAITS THE EAR-CHECK
+> ## BACKGROUND (14z-87/87b) — the voice-borrow fix, ear-checked clean
 >
 > 14z-87 root-caused the sword-plant "ding" (the engine VOICE-CLASS
 > BORROW at `PRG:0x0AEF6` hands a tenant a random vanilla voice class —
@@ -115,12 +149,11 @@
 >   measured clobber list + both OBJ censuses; all machinery — pal
 >   block, attr re-palm, reassert — derives from the layout).
 >   Snapshot-verified: ring-on-Donovan leaves the medallion orange.
->   Rig: 92_p2_ring_walk.rpl (P2 walk D,D,D,L,D,R,R). REMAINING
->   POLISH CHECK for a later session: walk BOTH cursors over all
->   three tenant cells + all venue phases and confirm no other
->   hover-portrait/medallion row pair collides (H med 0x19 / D med
->   0x16 vs the P1/P2 hover-portrait rows of all three).
-> - H-vs-P stuck-direction (~1/30, possibly emulator-side).
+>   Rig: 92_p2_ring_walk.rpl (P2 walk D,D,D,L,D,R,R). The polish check
+>   (both cursors over all tenant cells) was DONE BY THE MAINTAINER
+>   2026-08-15: all medallions clean for every combination — CLOSED.
+> - H-vs-P stuck-direction (~1/30) — not reproduced in any recent test
+>   (maintainer, 2026-08-15): keep listed, assume emulator-side or resolved.
 > - Round-end flicker (parked; needs the maintainer's recording).
 > - Win-screen QUOTE (both tenants); select medallions polish;
 >   region_space re-freeze; op-tagging for test_shared_writes.

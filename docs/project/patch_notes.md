@@ -2105,6 +2105,23 @@ V2 masked basis (build 4b7d0dc7):
   per-expectation-set masks (old sets keep the round-64 basis — the
   stock track needs no change, verified: its battery ran green with
   the frozen inventories under the old basis).
+  - 14z-88 FOLLOW-UP — V3 MASKED BASIS (maintainer-ratified 2026-08-15,
+    applied 14z-88): the 14z-87b medallion move (Pyron's wheel pal_row
+    0x1A -> 0x1D) moved his medallion's STAGING slot to $FF42A2-C1, outside
+    V2 — the three suites went red on exactly that slot (byte-attributed:
+    f5000 live diff 0 bytes, f11000 = 30 palette words in $FF42A2-BA).
+    Mask entry `42a2-42c2` added to donovan-m6 / huitzil-m14 / pyron-m8;
+    vanilla basis regenerated as tests/expected/vsavj/masked-v3/
+    (tools/freeze_masked_basis.sh — instrument control: reproduces a v2
+    log bit-for-bit under the v2 mask); .masked specs re-based with their
+    classes UNCHANGED (11 on the solo Donovan set ratified to composite
+    2836 889-2415); the moved tenant-content .sha1s attributed by
+    tests/audit_mask_window_ff42a2.sh BEFORE any re-freeze — which found
+    the 38 legacy regression (STATE 14z-88 decision) and so NO .sha1 was
+    re-frozen. Lessons: "the palette path never transits work RAM" is
+    true of the palette write and FALSE of the staging copy — a
+    palette-row move is a mask move; and palette CONTENT in a fade's row
+    set is cycle-relevant on a frame-critical transition.
 - Measured on the final candidate: all three medallions stable through
   both stress protocols (15/15); the game-over screen pixel-identical
   to vanilla; the 14-replay sweep clean except the staging slots (v2

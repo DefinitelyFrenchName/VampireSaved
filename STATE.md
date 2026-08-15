@@ -9,6 +9,92 @@
 ### overflow by ~310KB, measured); a 17-character variant is impossible.
 ### Recorded per the decided-items discipline; stretch-goal priority.
 
+### DECISION PENDING (maintainer) — 14z-88: THE MEDALLION MOVE (row 0x1D)
+### CARRIES A LEGACY REGRESSION on the H/P/merged builds. Measured, not
+### inferred: replay 38 (P1 Victor vs P2 Jedah picked on cell 0F — ids
+### 0x00/0x04, IDENTICAL to vanilla's, a pure legacy pairing) on hui40 /
+### pyron25 / m3b_merged7 loses ONE main-loop iteration at f2317 (the
+### select→VS fade; the per-iteration counters $FF8081/$FF80B4 fall one
+### behind vanilla and stay there) and the whole-RAM stream NEVER
+### re-converges (V3-masked vs vanilla: "window 829..5000, 0 identical
+### after"); the pre-move builds (huitzil-m13 etc., rebuilt at e6abaa9^,
+### fingerprints reproduced) match vanilla EXACTLY on those counters and
+### land on the ordinary legacy shape (composite 829 + window 889-2091,
+### 2909 identical after). The zips differ ONLY in the two block-A rows
+### (60 bytes) + one layout attr byte. Mechanism: this fade already runs
+### at 2 frames/iteration (vanilla too — the counters show it), and the
+### palette content the fade blends is CYCLE-RELEVANT (data-dependent
+### per-color work): Pyron's palette on row 0x1D vs vanilla's costs enough
+### extra cycles on that one heavy frame to cross a VBL. It is not
+### specific to 0x1D being "special": a 0x1B probe made 38 clean again but
+### CHANGED 04's frozen flicker inventory (lost 1525), left 05 never
+### re-converging (its own slot stages sticky), AND 0x1B is used by 18
+### select sprites (OBJ census) — every row choice moves cycles somewhere.
+### Donovan-set 38 does not slip (different frame budget); only H/P/merged.
+### Why the batteries missed it: 38 is a self-frozen `.sha1` on the H/P
+### sets and is not in audit_merged_legacy's 14 — the P2-human legacy
+### pairings (31-40 victor family) are a masked-coverage GAP (see NEXT).
+### OPTIONS: (1) REVERT the medallion move (pal_row 0x1D -> 0x1A): returns
+### the exact m5/m13/m7 batch (legacy-clean, all frozen sets green) and
+### the merged-only cosmetic P2-ring-on-Donovan whitening comes back until
+### a cost-neutral fix (retarget DONOVAN's P2-hover PORTRAIT row instead of
+### the medallion, or a fade-side skip — both need measurement); (2) KEEP
+### 0x1D and RATIFY a new class "one-time main-loop slip at a transition
+### fade" for that pairing — a whole-RAM divergence that by construction
+### never re-converges, i.e. a change to what the superset invariant means
+### (not mine to make); (3) hold both builds, engineer the portrait-side
+### fix first. RECOMMENDATION: (1), then the portrait-side fix with the
+### 31-40 family promoted to masked legacy classes on every set so this
+### class cannot hide again. UNTIL RULED: nothing re-frozen; the tenant
+### `.sha1` rows of the three suites stay RED (37/38/39 per set) — every
+### one attributed by tests/audit_mask_window_ff42a2.sh to the staging
+### family or the OBJ-chain phase EXCEPT 38 (H/P), which is the regression.
+
+Updated: 2026-08-15 (session 14z-88 — **THE RATIFIED ROW-0x1D STAGING
+WINDOW APPLIED (V3 masked basis) — and the recipe's predictions corrected
+by measurement, one of them into a LEGACY REGRESSION (decision above).**
+Mechanics landed: mask entry `42a2-42c2` in all three sets'
+`tests/expected/<set>/mask`; because `replay.lua` SKIPS masked bytes from
+the checksum, a window is a BASIS change: the vanilla masked logs were
+REGENERATED under V3 into `tests/expected/vsavj/masked-v3/` (new tool
+`tools/freeze_masked_basis.sh`, double-run determinism, instrument
+control: reproduces a masked-v2 log bit-for-bit under the v2 mask), all
+40 `.masked` specs re-based (classes unchanged), the four gates that
+hardcoded masked-v2 moved (audit_merged_legacy, hui_boot, pyron_ladder,
+tenant_select_records — the last now READS the mask). RESULTS on V3:
+the 13 shared legacy `.masked` replays PASS on their FROZEN classes on
+all three sets; audit_merged_legacy 14/14 verbatim + leg (b) clean,
+AUDIT-EXIT 0; hui_boot / pyron_ladder / tenant_select_records PASS.
+Correction 1: 11_pick_donovan on the SOLO Donovan set measures
+`composite 2836 889-2415` — the transition fade's staging copy (writer
+PRG:0x01C3BA, ROM 0x390CD0 table; same PC/source/values both builds)
+lands its slot-0x0B chunk one frame later (12 bytes at the f2836 sample,
+in flight on the dead stack at 2837, re-convergent) — the shape ratified
+for the merged build on 2026-08-12; **RATIFIED for the solo set
+(maintainer, 2026-08-15)** and applied (`.masked` + the select_records
+gate). Correction 2: EVERY tenant `.sha1` moved (37/38/39 per set; only
+the select-only 44/58/64 held) — attributed one by one with the new
+`tests/audit_mask_window_ff42a2.sh` (pre-move builds rebuilt in a
+worktree at e6abaa9^, fingerprints 3c599fb6/2629561c/94ce9a48
+reproduced; V3-masked pairs EXACT or isolated single frames whose
+full-RAM dump-diff is confined to the staging area $FF3F02-$FF4301 or to
+the OBJ-builder bsr-chain return address on the secondary stack
+($FF06DE.l 0001AC1C vs 0001AC20/18 — execution position at the
+frame-done sample, docs/game/atlas/ram.md) — PLUS: `$FF80B5` one byte on
+26/61/37 = the input-accept transition latch, i.e. the ratified session-7
+flicker class itself (now an accepted class in the audit) and, decisively, **38 on H/P = the sustained
+one-frame slip** = the regression. Nothing re-frozen. ALSO from the
+maintainer today: merged7 medallions confirmed clean for every hover
+combination (the polish check is CLOSED — but see the decision: reverting
+brings the P2-ring-on-Donovan whitening back); H-vs-P stuck-direction not
+reproduced in recent tests — downgraded to "possible, assumed
+emulator-side or resolved", kept listed. Instruments filed:
+freeze_masked_basis.sh, audit_mask_window_ff42a2.sh; docs: ram.md
+(V1/V2/V3 basis list, the staging family row, the OBJ-chain stack row),
+engine_internals staging section, gotchas addendum ("a masked window is a
+BASIS; a palette-row move is a staging-slot move — and a fade-cycle
+change"), registry-row/HANDOFF retraction of "work-RAM streams unchanged".)
+
 Updated: 2026-08-15 (session 14z-87b FULL close — **THREE FIXES SHIPPED
 AND FIELD/SMOKE-CONFIRMED IN ONE DAY: the voice-borrow fix (b+c,
 "all sounds clean"), THE SWORD-PLANT BEEP (packing law #3,

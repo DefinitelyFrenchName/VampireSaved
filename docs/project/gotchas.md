@@ -151,6 +151,31 @@ cycle-exactly. RESOLVED 2026-07-25 (maintainer-approved CLAUDE.md §4
 amendment): hooked-build legacy comparison is live-RAM with exactly these
 two windows masked (docs/game/atlas/ram.md); frozen masked vanilla expectations
 live in tests/expected/vsavj/masked/, gate helper `m2a_legacy_gate_masked`.
+**Addendum (14z-88, paid: one red battery + a triage session): a masked
+window is a BASIS, not a flag.** `replay.lua` SKIPS masked bytes from the
+checksummed stream, so adding a window changes every frame's checksum on
+the build side — the vanilla masked logs must be REGENERATED under the same
+mask into a NEW basis dir (v1 `masked`, v2 `masked-v2`, v3 `masked-v3`;
+`tools/freeze_masked_basis.sh`), every `.masked` spec's `<baseset>` moved
+to it, and every gate that hardcodes the base path or the mask string
+updated (grep `masked-v` and `MASK_RANGES` across tests/). And the reason
+the fourth window was needed at all: a palette-ROW move (the 14z-87b
+medallion 0x1A -> 0x1D) is ALSO a STAGING-SLOT move ($FF3F02 + row*0x20).
+"The palette path never transits work RAM" is true of the palette write
+and false of the staging copy — the 14z-87b registry note said the work-RAM
+streams were unchanged, and the suites said otherwise the same evening.
+**And the second half of the lesson (14z-88, paid: the row move itself):
+palette CONTENT in a fade's row set is CYCLE-relevant.** The select→VS
+fade does data-dependent per-color work on a frame that already runs at
+the VBL edge (vanilla's per-iteration counter shows 2 frames/iteration
+there); a different palette in a processed row moved one legacy pairing's
+main loop across a VBL (replay 38 on the H/P/merged builds: one iteration
+lost, whole-RAM never re-converges vs vanilla) while every masked-13
+legacy class stayed frozen. Data-only ≠ cycle-neutral. Before moving or
+recoloring any select palette row: run the P2-human legacy pairings
+(31-40) against vanilla, not just the masked 13; and attribute moved
+`.sha1`s with tests/audit_mask_window_ff42a2.sh before re-freezing —
+that audit is what caught it.
 
 ## PC-relative word tables are DATA — never let a pointer heuristic rewrite them (paid: 2026-07-25, ~1h)
 

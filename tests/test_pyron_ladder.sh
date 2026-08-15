@@ -7,7 +7,7 @@
 # sites unconditionally (obj_hook 0x54470/0x5E542, state_hook 0x2A7C8,
 # reaction_hook 0x18458 — extension tables tripwired for the unported)
 # — so its op invariant carries exactly those four named exemptions,
-# and its legacy leg runs on the MASKED V2 basis (CLAUDE.md §4 hooked
+# and its legacy leg runs on the current MASKED basis (V3 since 14z-88; CLAUDE.md §4 hooked
 # builds), asserted EXACT like H's. Stage-4 extras: the forced-pick
 # boot probe (id-hold / load / guard).
 #   1. Stages 1-3 BUILD from the pyrtzil manifest.
@@ -128,9 +128,9 @@ MAME_ROMPATH="$WORK/pyr4/rompath;$ROMDIR" \
     tools/run_replay_mame.sh vsavj tests/replays/02_demitri_vs_cpu.rpl \
     "$WORK/r02m.log" "$WORK/r02mbox" > /dev/null 2>&1
 python3 "$REPO/tools/compare_flicker.py" "$WORK/r02m.log" \
-    "$REPO/tests/expected/vsavj/masked-v2/logs/02_demitri_vs_cpu.log" \
+    "$REPO/tests/expected/vsavj/masked-v3/logs/02_demitri_vs_cpu.log" \
     | grep -q "^EXACT" \
     || { echo "FAIL: stage-4 legacy not masked-EXACT"; exit 1; }
-echo "  ok: masked-v2 EXACT vs the frozen vanilla log"
+echo "  ok: masked-v3 EXACT vs the frozen vanilla log"
 
 echo "PASS: Pyron stage 1-4 ladder (builds + op invariant + boot probe + legacy bit-identity)"

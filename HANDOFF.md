@@ -162,7 +162,7 @@ tools/run_wide.sh build/don_m5 fbneo       # or the solo builds (hui40,
                                            # the CURRENT fingerprints)
 ```
 
-**Current WIDE builds (14z-87b, THE MEDALLION FIX):** `build/hui40` =
+**14z-88 WARNING (decision pending, STATE): the 14z-87b medallion move carries a LEGACY REGRESSION on the H/P/merged builds — replay 38 (Victor vs Jedah, a vanilla pairing) loses one main-loop frame at the select→VS fade and never re-converges vs vanilla; recommended REVERT to pal_row 0x1A (= the m5/m13/m7 batch) pending a portrait-side fix. Playtesting is unaffected (a one-frame fade hitch); the tenant `.sha1` suite rows are RED by design until the ruling.** **Current WIDE builds (14z-87b, THE MEDALLION FIX):** `build/hui40` =
 **`huitzil-m14` (`66feb5e8`)**, `build/pyron25` = **`pyron-m8`
 (`fab92eb7`)**, `build/don_m5` = **`donovan-m6` (`57754602`)** — the
 14z-87 voice-borrow sets + the beep fix (packing law #3, sound members)
@@ -511,6 +511,20 @@ tests/audit_id_writers.sh             # on-demand (22 MAME runs): every characte
                                       # on a variant id superset-safe by construction
 tests/audit_mask_window_ff4182.sh     # on-demand: proves the masked palette-staging
                                       # window hides the designed diff and nothing else
+tests/audit_mask_window_ff42a2.sh     # 14z-88: the ROW-0x1D staging window
+                                      # ($FF42A2-C1, V3 basis) attributed on the
+                                      # tenant-content .sha1 replays the 14z-87b
+                                      # medallion move shifted: pre-move vs
+                                      # post-move build IDENTICAL under the V3
+                                      # mask, DIFFERENT under V2 (control), +
+                                      # unmasked first-div frame. Args: pre
+                                      # rompath, post rompath, replay names
+tools/freeze_masked_basis.sh          # 14z-88: (re)generate a vanilla masked
+                                      # basis (logs+sha1, double-run determinism)
+                                      # under a given MASK_RANGES — masked bytes
+                                      # are SKIPPED from the checksum, so every
+                                      # window addition needs a NEW basis dir
+                                      # (masked / masked-v2 / masked-v3)
 tests/test_select_arrays.sh           # the select record-pointer arrays (M3a): all THREE
                                       # UI pieces (portrait 0x26742A, name 0x2675AA,
                                       # highlight 0x268A02), 32 rows per player with P2 at
@@ -844,8 +858,10 @@ tests/audit_merged_legacy.sh          # 14z-81: THE MERGED-LEGACY MEASUREMENT,
                                       # proves the rig forms all three tenants'
                                       # matches (guarded char-init probes) and
                                       # merged determinism, then (a) 14 legacy
-                                      # replays vs the frozen vanilla masked-v2
-                                      # basis dispatched through donovan-m3a's
+                                      # replays vs the frozen vanilla masked
+                                      # basis (V3 since 14z-88; the mask comes
+                                      # from donovan-m6/mask) dispatched through
+                                      # donovan-m3a's
                                       # ratified class table VERBATIM, except
                                       # 04's RATIFIED merged-specific inventory
                                       # ({1525,2005,2009,2195}/889-1104,
@@ -1100,7 +1116,8 @@ tests/test_pyron_ladder.sh            # the Pyron stage 1-4 ladder (14z-67):
                                       # invariant (stage 4 exempts exactly the
                                       # four generator hook sites), forced-pick
                                       # boot probe, stage-3 UNMASKED legacy
-                                      # bit-identity + stage-4 masked-v2 EXACT
+                                      # bit-identity + stage-4 masked EXACT (V3
+                                      # basis since 14z-88)
 tests/test_census_regions.sh [bd]     # ground truth for tools/census_regions.py
                                       # (14z-67): the data_in_code + pcrel-escape
                                       # censuses — H's frozen inventory (5 sites,
@@ -1444,7 +1461,7 @@ reproducible AT THAT TIME; no one has re-verified the older ones since.
 
 | Build | SHA-1 (zip) | Notes |
 |---|---|---|
-| **donovan-m6 / huitzil-m14 / pyron-m8 — THE 14z-87b BATCH (beep fix + medallion fix) — supersede m5/m13/m7** | `57754602` / `66feb5e8` / `fab92eb7` | `build/don_m5` / `build/hui40` / `build/pyron25` (dirs reused); REGISTERED (sets carried-renamed; work-RAM streams unchanged by both fixes). = the voice-borrow builds + (1) QSOUND PACKING LAW #3 (the record `end` byte plays INCLUSIVE; packer copied exclusive — 3 of 57 packed records held a foreign end byte; rec#0x3C8 = the sword-plant BEEP, ear-confirmed from a byte-synthesized prediction, fixed in build_qs_songs.py + law-3 gate in test_qs_songs.sh; sound members only) and (2) THE MEDALLION FIX (Pyron wheel-medallion pal_row 0x1A->0x1D, one layout field: Donovan's P2-hover portrait draws row 0x1A by vs2-heritage attr — the collision exists only MERGED; snapshot-verified both directions, maintainer-confirmed). Stock twin BIT-IDENTICAL 6c93cfa8 through both. |
+| **donovan-m6 / huitzil-m14 / pyron-m8 — THE 14z-87b BATCH (beep fix + medallion fix) — supersede m5/m13/m7** | `57754602` / `66feb5e8` / `fab92eb7` | `build/don_m5` / `build/hui40` / `build/pyron25` (dirs reused); REGISTERED (sets carried-renamed; work-RAM streams unchanged by both fixes — CORRECTED 14z-88: the medallion move moved its STAGING slot to $FF42A2, so the sets moved to the V3 masked basis and the tenant-content .sha1s were re-frozen after attribution). = the voice-borrow builds + (1) QSOUND PACKING LAW #3 (the record `end` byte plays INCLUSIVE; packer copied exclusive — 3 of 57 packed records held a foreign end byte; rec#0x3C8 = the sword-plant BEEP, ear-confirmed from a byte-synthesized prediction, fixed in build_qs_songs.py + law-3 gate in test_qs_songs.sh; sound members only) and (2) THE MEDALLION FIX (Pyron wheel-medallion pal_row 0x1A->0x1D, one layout field: Donovan's P2-hover portrait draws row 0x1A by vs2-heritage attr — the collision exists only MERGED; snapshot-verified both directions, maintainer-confirmed). Stock twin BIT-IDENTICAL 6c93cfa8 through both. |
 | donovan-m5 / huitzil-m13 / pyron-m7 — THE VOICE-CLASS BORROW FIX (14z-87, maintainer-decided b+c) — superseded by the row above (tags freeze/{donovan-m5,huitzil-m13,pyron-m7}) | `3c599fb6` / `2629561c` / `94ce9a48` | `build/don_m5` / `build/hui40` / `build/pyron25`; REGISTERED (sets carried-renamed from the m4/m12/m6 sets, tenant-content .sha1s re-frozen). Each = predecessor + the shared **voice_borrow_keep_tenant** thunk (engine borrow site `PRG:0x0AEF2/0x0AEF8`: tenants keep their OWN voice class — skip-write-only; legacy path byte-preserved) + its two ported candidate/voice-number table rows (variant rows of `0x00B268`/`0x00BB68`). Fixes the sword-plant "ding" class at its root: tenant engine-voice events now play their AUTHORED voices (plant-end measured authored 0x6A; the 0x62B/0x308 pair gone). ALL only_variant_slot-gated; stock twin BIT-IDENTICAL (6c93cfa8, measured). Cost: ~60 cycles on a 0-1×/match event; tenant-content .sha1 movement = the dead-stack hook-cycle class + intended voice content (measured, replay 63 RAM diff: 3 dead-stack bytes, live state identical); legacy masked classes held, NO flicker-inventory movement. Gates at freeze: audit_voice_borrow own-class (+ lottery ground-truth pair vs don_m4), m3a all-four bit-exact, tenant_loop re-frozen 270/305/239 + 538/738, manifest_merge re-frozen (incl. accrued staleness from 14z-85f/86 — caught here), shared_writes re-frozen 71/66/55. Mechanism: engine_internals "per-node sfx dispatch, third pass". Awaiting maintainer ear-check. |
 | donovan-m4 / huitzil-m12 / pyron-m6 — THE M5 VOICE BATCH (14z-86) — superseded by the 14z-87 row above (tags freeze/{donovan-m4,huitzil-m12,pyron-m6} are the way back; build/don_m4 stays on disk as audit_voice_borrow's lottery-mode ground-truth reference) | `84f49aaa` / `e1f598d6` / `4c6e3fb6` | `build/don_m4` / `build/hui39` / `build/pyron24`; REGISTERED; tags `freeze/{donovan-m4,huitzil-m12,pyron-m6}`. Each = predecessor + its VOICE BLOCK: 79 verbatim vs2 songs at authored ids 0x58-0xA6 (Z80 rows via `tools/build_qs_songs.py [voice_batch]`: the 8th note-table slot restored via the table-0 relocation; authored records; 841 KB packed into `vsw.21m` = WIDE v1.2 content member), per-tenant remaps (D36/H14/P10) + 25 farm sound_stubs + the facing-alias thunk @0x5FFF00 (voice ids skip +0x300 — measured channel-allocation-only). ALL profile-gated; stock twin bit-identical (6c93cfa8, measured). Gates at freeze: keyon batch A/B GREEN (whole-run content multisets vs native), trap parity/shock green (hui39 + merged6), FG parity green (merged6), m3a all-four bit-exact, tenant_loop re-frozen 265/300/234+531/729. Map: `docs/project/tables/qs_voice_map.md`. FIELD-CONFIRMED (maintainer, 2026-08-15): "the sounds are normal now among all 3 newcomers" — after the two maintainer-caught playback-law fixes (half-bank + byte-parity). One open audible item: the sword-plant ding — ROOT-CAUSED 14z-87 to the engine VOICE-CLASS BORROW (PRG:0x0AEF6; engine-side, the 14z-86 row-0x1C design retracted); DECIDED b+c and SHIPPED 14z-87 — see the donovan-m5 row above. |
 | **huitzil-m11 — PHOBOS FROZEN (14z-86) — supersedes huitzil-m10** | fingerprint `6eed421be848c2de333bec9a82ef74de18cd88c9` | `build/hui38`; REGISTERED `-> huitzil-m11`; tag `freeze/huitzil-m11`. = m10 + **the M5 EJECTION PILOT**: trap record node 10 remapped 0x739→0xD8 onto AUTHORED Z80 song rows (WIDE v1.1 content members `vsw.z01/z02`, sentinel CRCs 0xdec0de38/39; `tools/build_qs_songs.py` injects vs2's 0x33-byte song verbatim at flat 0x3C980 + the 0x3D8 alias twin at 0x3C9C0 from `build/manifest/qs_songs.toml`). NO sample port — the content is byte-identical in vsav's own image (0x18D800 = record #0x5C = note-entry 0x28). Keyon A/B matches native (v11/v12, 0x2800 window); ring rig 87 shows 00d8 in the 0739 slot both windows. Gates at freeze: audit_trap_parity RE-FROZEN (ground-truthed failing pre-pilot), test_qs_songs + test_qs_id_table NEW, trap shock/sound green, m3a on the new EXPECT. Full decode: engine_internals "The QSound Z80 driver". EAR-CHECK CONFIRMED (maintainer, 2026-08-14): "The trap mine ejection sound is indeed there" — no other new sounds, as expected (only the ejection was ported; the voice blocks are the next batch). THE TRAP IS FULLY CLOSED, all four items field-confirmed (damage 14z-85f, chirp 14z-85g, shock 14z-85g(2), ejection 14z-86). |

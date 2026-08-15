@@ -65,14 +65,18 @@ check_diverge() {
 # dead stack $FF7F00-$FF7FFF + QSound latch $FF043C + the palette
 # staging slots of the rows this project's palette ports edit — the
 # staging area is $FF3F02 + row*0x20; row 0x14's slot $FF4182-$FF41A1
-# was ratified round 64 for the 14z-49 port, and 14z-64 adds the
-# sibling slots for the medallion rows 0x16/0x19/0x1A, same mechanism,
-# PENDING the bundle ratification). Must stay in sync with M2A_MASK in
-# tests/lib/m2a_common.sh. PER-SET OVERRIDE (14z-64): an expectation
-# set frozen under a different basis ships tests/expected/<set>/mask
-# with its MASK_RANGES string — sets without one use the round-64
-# default below (the stock-track sets). The WIDE v2 sets add the
-# medallion rows' staging slots.
+# was ratified round 64 for the 14z-49 port, 14z-64 added the sibling
+# slots for the medallion rows 0x16/0x19/0x1A (V2, ratified with the
+# donovan-m3a bundle), and 14z-88 added row 0x1D's slot $FF42A2-$FF42C1
+# (V3, ratified 2026-08-15 — Pyron's medallion row after the 14z-87b
+# move). Must stay in sync with M2A_MASK in tests/lib/m2a_common.sh.
+# PER-SET OVERRIDE (14z-64): an expectation set frozen under a different
+# basis ships tests/expected/<set>/mask with its MASK_RANGES string —
+# sets without one use the round-64 default below (the stock-track sets).
+# A .masked spec's <baseset> MUST be the vanilla basis generated under
+# the SAME mask (masked bytes are skipped from the checksum, so v2 logs
+# cannot be compared under a v3 mask): tests/expected/vsavj/masked (v1),
+# masked-v2, masked-v3 — regenerate with tools/freeze_masked_basis.sh.
 MASK="043c-043d,4182-41a2,7f00-8000"
 if [ -f "$EXPDIR/mask" ]; then
     MASK="$(cat "$EXPDIR/mask")"

@@ -90,7 +90,7 @@ is a GAME gotcha if it is true of the game regardless of the port.
 - Pre-seeded from the ROM-audit round (2026-07-25, before repo existed)
 - Cross-emulator replays: same inputs ≠ same content (paid: 2026-07-25, ~2h)
 - Bare-long "pointers" in code are usually operand pairs — sibling-veto them (paid: 2026-07-25 session 7, ~3h incl. diagnosis)
-- Engine hooks on hot paths break whole-RAM legacy comparison — by construction (paid: 2026-07-25 session 7, ~2h)
+- Engine hooks on hot paths break whole-RAM legacy comparison — by construction (paid: 2026-07-25 session 7, ~2h) — ADDENDUM 14z-88: a masked window is a BASIS (regenerate the vanilla logs, re-base the specs); a palette-row move is a staging-slot move AND a fade-cycle change (data-only ≠ cycle-neutral)
 - PC-relative word tables are DATA — never let a pointer heuristic rewrite them (paid: 2026-07-25, ~1h)
 - Early-session generic rows can masquerade over later-understood structures
 - Per-record BANK attribution: the effect-tail triage has no bank column
