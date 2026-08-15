@@ -35,7 +35,19 @@
 > the gap for good — promote 31-40 (any replay whose loaded ids equal
 > vanilla's) from `.sha1` to `.masked` legacy classes on every set + into
 > audit_merged_legacy, so a legacy pairing can never again hide behind a
-> self-frozen expectation.
+> self-frozen expectation. PLAN (~one session, 3-4 h wall, mostly
+> background emulator time): (1) dump `$FF8782/$FF8B82` per self-frozen
+> replay on each set — sweep ALL of them, not just 31-40 — to list the
+> vanilla-id pairings (~30 min); (2) `tools/freeze_masked_basis.sh
+> tests/expected/vsavj/masked-v2 "<V2 mask>" <names>` for the new
+> vanilla base logs (~15 min); (3) run each on the three builds under V2,
+> double-run, classify — expected species = the ratified 2P shape
+> `composite 829 889-2091` (16_xemu_2p) — any other shape = ratify with
+> the maintainer or root-cause (~1 h); (4) author the `.masked` specs,
+> add the names to audit_merged_legacy's leg (a), run the three suites +
+> the merged audit (~1 h); (5) docs + commit (~20 min). Note the
+> replay-38 pre-move measurement is already in hand: on huitzil-m13
+> vs vanilla it is `composite 829 889-2091, 2909 identical after`.
 > The V3 basis (row 0x1D's slot) is PARKED — tests/expected/vsavj/
 > masked-v3 + tools/freeze_masked_basis.sh stay for whatever row lands.
 >
@@ -100,9 +112,10 @@
 > BORROW at `PRG:0x0AEF6` hands a tenant a random vanilla voice class —
 > engine_internals "per-node sfx dispatch, third pass") and, on the
 > maintainer's same-day b+c ruling, SHIPPED the fix — since superseded
-> by the 14z-87b batch: **donovan-m6 (`build/don_m5`, 57754602) /
-> huitzil-m14 (`build/hui40`, 66feb5e8) / pyron-m8 (`build/pyron25`,
-> fab92eb7), merged `build/m3b_merged7`**
+> by the 14z-87b batch (donovan-m6/huitzil-m14/pyron-m8 — WITHDRAWN
+> 14z-88, reverted to) **donovan-m5 (`build/don_m5`, 3c599fb6) /
+> huitzil-m13 (`build/hui40`, 2629561c) / pyron-m7 (`build/pyron25`,
+> 94ce9a48), merged `build/m3b_merged7`**
 > (738 ops). Tenants now KEEP their own voice class (the
 > `voice_borrow_keep_tenant` thunk, skip-write-only, exact id set
 > {0x10,0x11,0x13}) and vs2's candidate/voice-number table rows are
@@ -188,9 +201,9 @@
 | build | set | fingerprint |
 |---|---|---|
 | build/m3b_merged7 | UNREGISTERED (pending S6 freeze) | moves with generator (738 ops) |
-| build/don_m5 | **donovan-m6** | 57754602 |
-| build/hui40 | **huitzil-m14** | 66feb5e8 |
-| build/pyron25 | **pyron-m8** | fab92eb7 |
+| build/don_m5 | **donovan-m5** (14z-88 revert; m6 withdrawn) | 3c599fb6 |
+| build/hui40 | **huitzil-m13** (m14 withdrawn) | 2629561c |
+| build/pyron25 | **pyron-m7** (m8 withdrawn) | 94ce9a48 |
 | build/m5_stock | stock twin (unchanged — both fix halves variant-gated) | 6c93cfa8 |
 | build/don_m4, hui39, pyron24 | superseded m4/m12/m6 (tags are the way back; don_m4 = audit_voice_borrow's lottery ground-truth reference) | — |
 

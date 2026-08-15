@@ -866,8 +866,8 @@ tests/audit_merged_legacy.sh          # 14z-81: THE MERGED-LEGACY MEASUREMENT,
                                       # matches (guarded char-init probes) and
                                       # merged determinism, then (a) 14 legacy
                                       # replays vs the frozen vanilla masked
-                                      # basis (V3 since 14z-88; the mask comes
-                                      # from donovan-m6/mask) dispatched through
+                                      # basis (V2; the mask comes from
+                                      # donovan-m5/mask) dispatched through
                                       # donovan-m3a's
                                       # ratified class table VERBATIM, except
                                       # 04's RATIFIED merged-specific inventory
@@ -1128,8 +1128,8 @@ tests/test_pyron_ladder.sh            # the Pyron stage 1-4 ladder (14z-67):
                                       # invariant (stage 4 exempts exactly the
                                       # four generator hook sites), forced-pick
                                       # boot probe, stage-3 UNMASKED legacy
-                                      # bit-identity + stage-4 masked EXACT (V3
-                                      # basis since 14z-88)
+                                      # bit-identity + stage-4 masked EXACT (V2
+                                      # basis; V3 parked 14z-88)
 tests/test_census_regions.sh [bd]     # ground truth for tools/census_regions.py
                                       # (14z-67): the data_in_code + pcrel-escape
                                       # censuses — H's frozen inventory (5 sites,

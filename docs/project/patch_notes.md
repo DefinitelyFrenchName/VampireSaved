@@ -2110,7 +2110,7 @@ V2 masked basis (build 4b7d0dc7):
     0x1A -> 0x1D) moved his medallion's STAGING slot to $FF42A2-C1, outside
     V2 — the three suites went red on exactly that slot (byte-attributed:
     f5000 live diff 0 bytes, f11000 = 30 palette words in $FF42A2-BA).
-    Mask entry `42a2-42c2` added to donovan-m6 / huitzil-m14 / pyron-m8;
+    Mask entry `42a2-42c2` added to donovan-m6 / huitzil-m14 / pyron-m8 (all three WITHDRAWN the same day — see the 14z-88 revert);
     vanilla basis regenerated as tests/expected/vsavj/masked-v3/
     (tools/freeze_masked_basis.sh — instrument control: reproduces a v2
     log bit-for-bit under the v2 mask); .masked specs re-based with their
