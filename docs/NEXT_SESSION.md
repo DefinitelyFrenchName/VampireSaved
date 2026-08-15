@@ -1,5 +1,36 @@
 # NEXT SESSION — orientation (written at the close of 14z-87, 2026-08-15)
 
+> ## FIRST TASK — apply the RATIFIED row-0x1D staging-window mask
+> ## (maintainer, 2026-08-15: "Yes, but keep the implementation for
+> ## first task of next session")
+>
+> The medallion fix (pal_row 0x1A -> 0x1D) moved the medallion's
+> palette-STAGING slot out from under the ratified masked basis: the
+> three suites on donovan-m6/huitzil-m14/pyron-m8 are RED solely on
+> that slot — byte-attributed: f5000 live diff vs vanilla = ZERO bytes
+> (match state untouched); f11000 = 30 bytes, all in $FF42A2-$FF42BA,
+> palette color words = row 0x1D's staging slot (the exact class of the
+> ratified V2 windows for rows 0x16/0x19/0x1A at $4182/$41C2/$4222).
+> THE TASK: (1) add window `42a2-42c2` to the mask files of all three
+> sets (donovan-m6/huitzil-m14/pyron-m8) + wherever the merged audit
+> takes its basis; (2) re-run the three suites — the window-class shapes
+> should RETURN to their frozen specs (no window re-freeze expected);
+> (3) re-freeze the don-content .sha1 replays that legitimately moved
+> (12/17/18/19/20 family — canonical whole-RAM logs include staging);
+> (4) plain-verify, commit, push. Everything else about the batch is
+> green (m3a all-four, tenant_loop, shared_writes, merged gates).
+>
+> ## ALSO DECIDED (maintainer, 2026-08-15) — MiSTer decision space:
+> a "17-character variant" is NOT numerically possible (D+H alone
+> overflow 4MB PRG by ~310KB; only ONE added character fits the stock
+> image's ~345KB holes — H borderline at +45KB, D/P clean). The two
+> real options as the maintainer frames them: (1) current core =
+> Donovan-substitution (m5_stock shape; NOTE: loses Jedah, and carries
+> pre-M5 voices unless a QSound-extended stock variant + the 4-line
+> width fix ships); (2) jtcps PRG-cap surgery for all three (+ our
+> 32MB GFX repack profile + the width fix; ~54MB total fits the 64MB
+> tier). No ruling yet on WHICH — parked as a roadmap decision.
+
 > ## START HERE — THE VOICE-BORROW FIX AWAITS THE EAR-CHECK
 >
 > 14z-87 root-caused the sword-plant "ding" (the engine VOICE-CLASS

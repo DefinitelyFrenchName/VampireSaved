@@ -22,10 +22,17 @@ shared_writes re-frozen (the pal-block write 0x3a3b40 -> 0x3a3ba0, x3),
 registry rows + carried-renamed expectation sets (work-RAM streams
 untouched by palette-path changes — the fix is invisible to every RAM
 gate by construction, which is exactly why it needed the maintainer's
-trigger + the capture loop to find). **RITUAL NOTE: the three plain
-suites were STILL RUNNING at close (launched on the renamed sets;
-expected green since no fix byte transits work RAM) — if any comes back
-red, triage per the 14z-87b pattern before anything else.** The
+trigger + the capture loop to find). **RITUAL NOTE RESOLVED SAME
+SESSION: the three suites came back RED and were TRIAGED to a single
+benign mechanism — the medallion's palette-STAGING slot moved out from
+under the ratified mask (f5000 live diff vs vanilla = ZERO bytes; the
+only post-window divergence = 30 palette words at $FF42A2-$FF42BA =
+row 0x1D's staging slot, the exact V2-window class). The row-0x1D
+staging window ($42A2-$42C2) is MAINTAINER-RATIFIED (2026-08-15);
+implementation deliberately deferred to NEXT SESSION'S FIRST TASK
+(mask files x3 + suite rerun + .sha1 re-freeze — the recipe is in
+NEXT_SESSION). Until then the three suites are EXPECTED-RED on exactly
+this shape and nothing else.** The
 session's method lesson is recorded in memory + gotchas: sensory
 symptoms are settled by exchanging captures with the maintainer in BOTH
 directions ("you providing captures visual or auditory made us go
