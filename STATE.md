@@ -85,6 +85,45 @@
 ### one attributed by tests/audit_mask_window_ff42a2.sh to the staging
 ### family or the OBJ-chain phase EXCEPT 38 (H/P), which is the regression.
 
+### MAINTAINER RULINGS ON THE 14z-89 FINDINGS (2026-08-15, same session)
+### — and one of them resolved AGAINST ratifying, by measurement.
+###
+### (1) **CONDITIONAL RATIFICATION OFFERED — CONDITION NOT MET, SO NOT
+### TAKEN.** The maintainer's words: *"if ratifying solves the issues with
+### no known or forecast issues, consider it ratified."* Checked before
+### accepting, and it does not: the one-main-loop-iteration divergence is
+### neither a phase artifact nor display-only. It GROWS (replay 38: 3 live
+### bytes at f2400 -> 232 at f3000 -> 450 at f4500) and it reaches GAMEPLAY
+### STATE — replay 38 P1 X 797 vs 796 at f3000 and P2 HP 87 vs 88 at f4500;
+### replay 24 at f17500 P1 X 324 vs 570 / HP 144 vs 115, P2 X 655 vs 335 /
+### HP 144 vs 157, both facings flipped, i.e. a different match. No frame
+### offset in -3..+3 aligns the streams with or without the counters
+### excluded. MECHANISM for why the onset propagates: replay inputs are
+### scheduled by FRAME, so once the main loop is one logic step out, every
+### later input lands on a different step. **Therefore this stays an OPEN
+### REGRESSION on legacy content (CLAUDE.md §1), not a class** — the four
+### `.pending` files carry the evidence. NEXT STEP (proposed): bisect what
+### makes the fade's cost differ. 24 fails IDENTICALLY on all three sets,
+### so the cause is shared (the wheel extension / the edited palette rows /
+### the shared hooks), and the 14z-88-style A/B is cheap: build a variant
+### with the edited palette rows' CONTENT reverted to vanilla and see
+### whether 24's onset moves. Do that before any fix is designed.
+###
+### (2) **"excellent correction"** — the DEADNESS REGISTER row and the
+### four propagated claims stand corrected. The FIX is still unruled: the
+### residual is that `$FF010C/$FF010D` is a live counter vanilla does not
+### keep, so 21/26 cannot re-converge. Recommendation unchanged: make the
+### tripwire diagnostic-only so the signal survives without perturbing
+### legacy RAM. Not started.
+###
+### (3) **DECIDED (maintainer): the 61/62 exemption stands** — *"I don't
+### have reasons to oppose this judgment."* The `.legacy-exempt` files are
+### the record; the audit prints them every run.
+###
+### (4) OPEN — see the explanation in NEXT_SESSION; a one-line inline
+### override once ratified.
+###
+### ORIGINAL BRIEF (kept for the record):
 ### DECISIONS PENDING — 14z-89 (three, all opened by the coverage sweep;
 ### nothing is re-frozen and no build byte moved this session)
 ###

@@ -1,8 +1,9 @@
 # NEXT SESSION — orientation (written at the close of 14z-89, 2026-08-15)
 
-> ## FIRST TASK — THREE MAINTAINER RULINGS, then the fix each one implies
-> ## (nothing is blocked on measurement; everything below is measured,
-> ## attributed and written up in STATE "DECISIONS PENDING — 14z-89")
+> ## FIRST TASK — THE LEGACY REGRESSION IN (1) BELOW. Ruled on by the
+> ## maintainer 2026-08-15: (3) decided, (2) correction accepted (its FIX
+> ## still unruled), (1) offered conditional ratification which MEASUREMENT
+> ## REFUSED, (4) still open. STATE carries the full record.
 >
 > 14z-89 closed the coverage gap 14z-88 exposed: every replay whose loaded
 > characters equal vanilla's is now compared against the VANILLA masked
@@ -18,14 +19,22 @@
 > deterministic, all attributed, all `.pending` (so the three suites read RED
 > on exactly those and nothing else). They need a ruling:
 >
-> 1. **The one-main-loop-iteration class is on the SHIPPED builds** — the
->    class you declined to ratify in 14z-88 and reverted the medallion move
->    to avoid. `38_victor_p1_vsavj` on donovan-m5 LOSES an iteration at the
->    select→VS fade (f2317); `24_don_winmash` on ALL THREE GAINS one after
->    the win-screen fade (f16871), identical shape on every set. Same
->    mechanism as 14z-88 (fade per-colour work is data-dependent at a
->    VBL-edge frame). Options + my recommendation (c: per-replay ratification
->    with frozen onsets) are in STATE.
+> 1. **RESOLVED AGAINST RATIFYING — IT IS AN OPEN REGRESSION.** The
+>    maintainer offered conditional ratification ("if ratifying solves the
+>    issues with no known or forecast issues"); the condition was checked
+>    and FAILS. The divergence is not a phase artifact and not display-only:
+>    it grows (replay 38: 3 live bytes at f2400 -> 232 at f3000 -> 450 at
+>    f4500) and reaches GAMEPLAY state — 38 P2 HP 87 vs 88 at f4500, P1 X
+>    797 vs 796 at f3000; 24 at f17500 P1 X 324 vs 570 / HP 144 vs 115, P2
+>    X 655 vs 335 / HP 144 vs 157, facings flipped. Replay inputs are
+>    scheduled by FRAME, so one lost logic step re-aligns every later input.
+>    **THIS IS THE FIRST TASK** (CLAUDE.md §2.6 halts forward work).
+>    Cheapest next measurement, before designing any fix: 24 fails
+>    IDENTICALLY on all three sets, so the cause is SHARED — do the
+>    14z-88-style A/B with the edited palette rows' CONTENT reverted to
+>    vanilla and see whether 24's onset moves. That names the cost source
+>    (edited palette content vs the extended wheel vs the shared hooks)
+>    before anything is engineered.
 > 2. **The type-6 deadness claim is FALSE — and the fallback held.** Legacy
 >    lists reach the taken-over list-type 6 on huitzil-m13: the `$FF010C`
 >    tripwire arms 387x on `21_don_mash` and 948x on `26_don_arcade_mash`,
@@ -41,10 +50,10 @@
 >    889-2415`; both frames already attributed). Same species as the 04 and
 >    11 inline overrides you ratified. Recommendation: ratify as override #3.
 >
-> 3. **`61/62` on huitzil-m13 / pyron-m7** — LEGACY by ids but they navigate
->    to cell 0x13, which neither vanilla nor those builds back. I ruled them
->    self-frozen-correct with the reason in `<set>/<name>.legacy-exempt`
->    (printed by the audit every run). Say the word if you want `.pending`.
+> 3. **DECIDED (maintainer, 2026-08-15): the 61/62 exemption stands.**
+>    They navigate to cell 0x13, which neither vanilla nor those builds
+>    back; `<set>/<name>.legacy-exempt` carries the reason and the audit
+>    prints it every run. No further action.
 >
 > After the rulings: implement whichever fix each implies, re-run the three
 > suites + `tests/audit_legacy_pairings.sh` + `tests/audit_merged_legacy.sh`
