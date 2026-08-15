@@ -1,0 +1,15 @@
+# build/manifest/dispatch_census.toml — FROZEN legacy dispatch
+# observation for the two obj_hook sites (14z-89). Regenerate with
+# tests/audit_dispatch_census.sh --freeze. A NEW index here means the
+# free list shrank: re-review any repoint that relied on it.
+schema = 1
+
+[[site]]
+site = 0x54470
+entries = 59
+observed = [4,9,17,19,20,28,37,51,55]
+
+[[site]]
+site = 0x5e542
+entries = 114
+observed = [0,1,2,3,4,7,8,9,10,11,12,15,19,21,25,31,32,37,42,43,44,50,51,52,54,82,92,96,97,103,110]

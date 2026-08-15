@@ -75,12 +75,20 @@
 >        The dead-entry takeover that worked for effect-class row 16 has no
 >        cheap candidate: both tables are ALL-DISTINCT with zero RTS stubs
 >        (59/59, 114/114). Two routes, each needing measurement first:
->        (i) a RUNTIME DEADNESS CENSUS of which type indices legacy never
->        dispatches — repointing one is a pure data change, zero cycles,
->        but it needs 17 and 10 free indices which may not exist
->        (`tests/audit_type_dispatch_range.sh` is the instrument shape; and
->        census over the PROMOTED LEGACY CORPUS, not four replays — that
->        under-coverage is exactly how the type-6 deadness row went wrong);
+>        (i) the RUNTIME DEADNESS CENSUS — **RUN, and the answer is YES on
+>        the numbers**: `tests/audit_dispatch_census.sh` over all 49 legacy
+>        replays on vanilla gives 0x054470 = 9 types observed / **50 free**
+>        (17 needed) and 0x05E542 = 31 observed / **83 free** (10 needed),
+>        frozen in `build/manifest/dispatch_census.toml` so a newly-seen
+>        index FAILS. CAVEAT, same shape as the row we falsified today:
+>        0x054470 fires in only 5 of 49 replays (the long mash/arcade rigs)
+>        and the curve has NOT converged — 26_don_arcade_mash alone added
+>        types 51 and 55. So before shipping a repoint, add the STATIC
+>        complement (enumerate every type value vsavj's code can stamp —
+>        `tools/audit_type_stamps.py`, today pointed at vs2's 114-120
+>        family) and keep a tripwire that does NOT write live work RAM
+>        (ruling (2)'s design — watch EXECUTION — so both fixes share one
+>        mechanism);
 >        (ii) give the tenant's secondary objects their own pool walked by
 >        tenant code so they never enter the shared dispatcher — cleanest
 >        and zero-cost by construction, much the largest change.

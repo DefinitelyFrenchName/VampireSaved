@@ -898,6 +898,30 @@ tests/audit_merged_legacy.sh          # 14z-81: THE MERGED-LEGACY MEASUREMENT,
                                       # 12 measures the UNION of the two solo
                                       # shapes. Failing logs kept in
                                       # build/gate_failures/
+tests/audit_dispatch_census.sh        # 14z-89: WHICH type indices does
+                                      # LEGACY ever dispatch at the two
+                                      # obj_hook sites? Vanilla vsavj over
+                                      # the whole legacy corpus (every
+                                      # replay with a vanilla basis log),
+                                      # breakpoint per site, D0/4 = the
+                                      # index, SET-accumulated so a site
+                                      # firing 270k times costs one line.
+                                      # Feeds the option-(b) fix: a tenant
+                                      # type on a never-dispatched entry is
+                                      # a pure DATA repoint = ZERO legacy
+                                      # cycles, where any code hook there
+                                      # tips VBL-edge frames. Measured:
+                                      # 0x054470 9 observed / 50 free (17
+                                      # needed), 0x05E542 31 / 83 (10).
+                                      # FROZEN in build/manifest/
+                                      # dispatch_census.toml — a NEW index
+                                      # FAILS (the free list shrank).
+                                      # HONEST LIMIT in the header: 0x054470
+                                      # fires in only 5/49 replays and the
+                                      # curve has NOT converged, so this is
+                                      # a BOUND not a proof — pair it with
+                                      # the static stamp census before any
+                                      # repoint ships. ~2 min, JOBS-parallel
 tools/probe_hook_removal.sh           # 14z-89: CAUSAL attribution for a
                                       # legacy-cycle regression — rebuild a
                                       # tenant with named hooks REMOVED and

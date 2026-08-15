@@ -182,14 +182,37 @@
 ###   ALL-DISTINCT with zero RTS stubs (59/59 and 114/114 targets), so
 ###   nothing is obviously spare. Two routes, both needing measurement
 ###   before a design:
-###     (i) RUNTIME DEADNESS CENSUS — which of the 59 / 114 type indices
-###     does LEGACY never dispatch? Repointing a never-dispatched entry to
-###     tenant code is a pure DATA change: zero legacy cycles. Needs 17 and
-###     10 free indices respectively, which may simply not exist.
-###     `tests/audit_type_dispatch_range.sh` is the instrument shape. NOTE
-###     THE LESSON FROM THIS SESSION: a deadness claim measured on four
-###     replays is how the type-6 register row went wrong — census over the
-###     PROMOTED LEGACY CORPUS this time.
+###     (i) RUNTIME DEADNESS CENSUS — **RUN (14z-89), AND THE NUMBERS SAY
+###     YES, WITH A CAVEAT THAT MATTERS.** New instrument
+###     `tests/audit_dispatch_census.sh` + `tests/lua/dispatch_census.lua`
+###     (breakpoint at each site, D0/4 = the dispatched index, accumulate a
+###     SET so a site firing 270k times costs one line): vanilla vsavj over
+###     the WHOLE legacy corpus, all 49 replays that have a vanilla basis
+###     log, ~2 min.
+###       site 0x054470: 8,586 dispatches, 9 types observed
+###         {4,9,17,19,20,28,37,51,55} -> **50 never observed, 17 needed**.
+###       site 0x05E542: 270,991 dispatches, 31 types observed ->
+###         **83 never observed, 10 needed**.
+###     So route (i) is VIABLE on the numbers, with a wide margin at both
+###     sites, and the observation is FROZEN in
+###     `build/manifest/dispatch_census.toml` — a newly-dispatched index
+###     FAILS the audit, because that means the free list just shrank under
+###     a shipped repoint.
+###     **THE CAVEAT, AND IT IS THE SAME SHAPE AS THE ROW WE FALSIFIED
+###     TODAY:** site 0x054470 fires in only **5 of 49 replays** — 21, 22,
+###     23, 24, 26, i.e. the long mash and arcade rigs, the very family that
+###     armed the type-6 tripwire — and the curve has NOT converged:
+###     26_don_arcade_mash alone contributed types 51 and 55 that nothing
+###     else saw. "Never observed in this corpus" is a BOUND, not a proof,
+###     and the corpus does not cover the 18x18 matrix. BEFORE SHIPPING A
+###     REPOINT: (1) add the STATIC complement — enumerate every type value
+###     vsavj's own code can stamp (`tools/audit_type_stamps.py` exists;
+###     today it is pointed at vs2's 114-120 family and would need pointing
+###     at vsavj across both families) so the claim becomes structural
+###     rather than empirical; and (2) keep a tripwire on the taken-over
+###     entry that does NOT write live work RAM — which is exactly ruling
+###     (2)'s design (the gate watches EXECUTION, never a counter), so the
+###     two fixes share one mechanism.
 ###     (ii) Give the tenant's secondary objects their own pool walked by
 ###     TENANT code, so they never enter the shared dispatcher at all.
 ###     Architecturally the cleanest and zero-cost by construction; much
