@@ -152,17 +152,51 @@
 ###   `composite 12313,12733 889-2091`. Note the shapes come out CLEANER
 ###   than today's frozen classes (38 loses its 829 flicker frame as well),
 ###   so whatever fix lands will re-freeze more than these two replays.
-### FIX OPTIONS (not mine to choose): (a) make the guards cheap on the
-### LEGACY path — the fixture pair can test ONE precomputed "a tenant is in
-### this match" byte (the init_shim already runs at char-init and could set
-### it) instead of two `cmpi.b #imm,abs.l`, and obj_hook wants the same
-### treatment; (b) move the work off the legacy path entirely (per-venue
-### data rather than a code hook); (c) accept and re-ratify, which the
-### measurement above argues against since it reaches HP and positions.
-### HONEST CAVEAT on (a): this is a CYCLE BUDGET, so making two hooks
-### cheaper may move the tipping point rather than remove it — any fix has
-### to be validated by re-running the promoted legacy replays, which is
-### exactly what this session made possible.
+### **DECIDED (maintainer, 2026-08-15): OPTION (b) — move the work OFF the
+### legacy path.** Their reasoning, and I agree with it: (c) is off the
+### table on the gameplay-state evidence, and (a) is cheaper but "may just
+### move the goalpost" — it is a cycle BUDGET, so a leaner guard relocates
+### the tipping point instead of removing it, and the next VBL-edge frame
+### is found by the next replay someone writes. (b) is the only option
+### whose legacy cost is ZERO BY CONSTRUCTION rather than by measurement.
+###
+### WHAT (b) MEANS AT EACH SITE — measured this session, and the two halves
+### are NOT equally easy:
+###   **fixture_row0f_override (the tractable half).** Stop intercepting
+###   the SHARED venue fixture-load and instead re-assert palette row 0x0F
+###   from TENANT-OWNED code (char-init / the tenant's own per-frame
+###   handler), which vanilla never executes when no tenant is in the
+###   match. The thunk's own comment says the char id is "initialized
+###   before these sites run", so the ordering question — does tenant init
+###   run after the venue fixture load? — is the one thing to measure
+###   first. Residual risk is a one-frame stale colour at a venue
+###   transition, i.e. cosmetic, which the 2026-08-15 scope ruling makes
+###   optional.
+###   **obj_hook (the hard half).** Repointing is NOT available: the
+###   dispatch is `movea.l (0x12,PC,D0.w),A0` and BOTH tables are followed
+###   immediately by LIVE CODE (0x054570 `subq.b #1,(0x20,A6)...`,
+###   0x05E71E `move.b (4,A6),D0; move.w (6,PC,D3.w),D1; jmp (2,PC,D1.w)`),
+###   so the table can grow neither in place nor to a new base without
+###   adding an instruction. And the dead-entry takeover that worked for
+###   effect-class row 16 has NO cheap candidate here: both tables are
+###   ALL-DISTINCT with zero RTS stubs (59/59 and 114/114 targets), so
+###   nothing is obviously spare. Two routes, both needing measurement
+###   before a design:
+###     (i) RUNTIME DEADNESS CENSUS — which of the 59 / 114 type indices
+###     does LEGACY never dispatch? Repointing a never-dispatched entry to
+###     tenant code is a pure DATA change: zero legacy cycles. Needs 17 and
+###     10 free indices respectively, which may simply not exist.
+###     `tests/audit_type_dispatch_range.sh` is the instrument shape. NOTE
+###     THE LESSON FROM THIS SESSION: a deadness claim measured on four
+###     replays is how the type-6 register row went wrong — census over the
+###     PROMOTED LEGACY CORPUS this time.
+###     (ii) Give the tenant's secondary objects their own pool walked by
+###     TENANT code, so they never enter the shared dispatcher at all.
+###     Architecturally the cleanest and zero-cost by construction; much
+###     the largest change.
+### VALIDATION for whichever lands: re-run the promoted legacy replays —
+### that corpus is what makes a cycle-budget fix checkable at all, and it
+### is why closing the coverage gap had to come first.
 ###
 ### (2) **DECIDED (maintainer, 2026-08-15): make the tripwire
 ### diagnostic-only** — *"I agree with your recommendation."* DESIGN (mine,

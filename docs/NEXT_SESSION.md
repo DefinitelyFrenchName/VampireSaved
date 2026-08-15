@@ -55,13 +55,36 @@
 >        the shapes come out CLEANER than the frozen classes (38 loses its
 >        829 flicker frame too), so the fix will re-freeze more than these
 >        two replays.
->    FIX OPTIONS are in STATE. Leading one: give the guards a cheap LEGACY
->    path — one precomputed "a tenant is in this match" byte (the init_shim
->    already runs at char-init and could set it) instead of two
->    `cmpi.b #imm,abs.l`, and the same treatment for obj_hook. CAVEAT: this
->    is a cycle BUDGET, so cheaper guards may move the tipping point rather
->    than remove it — validate any fix by re-running the promoted legacy
->    replays (which is what this session made possible).
+>    **FIX = OPTION (b), DECIDED (maintainer): move the work OFF the
+>    legacy path.** (c) is out on the gameplay evidence; (a) is cheaper but
+>    "may just move the goalpost" — it is a cycle BUDGET, so a leaner guard
+>    relocates the tipping point instead of removing it. Only (b) is zero
+>    by construction. The two halves are NOT equally easy:
+>      - **fixture (tractable).** Stop intercepting the shared venue
+>        fixture-load; re-assert palette row 0x0F from TENANT-OWNED code
+>        (char-init / his own per-frame handler), which vanilla never runs.
+>        MEASURE FIRST: does tenant init run AFTER the venue fixture load?
+>        (The thunk's comment says the char id is set before those sites
+>        run, so the order is the open question.) Residual risk is a
+>        one-frame stale colour at a venue transition = cosmetic = optional
+>        under the scope ruling.
+>      - **obj_hook (hard).** Repointing is NOT available: the dispatch is
+>        `movea.l (0x12,PC,D0.w),A0` and BOTH tables are followed by LIVE
+>        CODE (0x054570, 0x05E71E — measured), so the table can grow
+>        neither in place nor to a new base without adding an instruction.
+>        The dead-entry takeover that worked for effect-class row 16 has no
+>        cheap candidate: both tables are ALL-DISTINCT with zero RTS stubs
+>        (59/59, 114/114). Two routes, each needing measurement first:
+>        (i) a RUNTIME DEADNESS CENSUS of which type indices legacy never
+>        dispatches — repointing one is a pure data change, zero cycles,
+>        but it needs 17 and 10 free indices which may not exist
+>        (`tests/audit_type_dispatch_range.sh` is the instrument shape; and
+>        census over the PROMOTED LEGACY CORPUS, not four replays — that
+>        under-coverage is exactly how the type-6 deadness row went wrong);
+>        (ii) give the tenant's secondary objects their own pool walked by
+>        tenant code so they never enter the shared dispatcher — cleanest
+>        and zero-cost by construction, much the largest change.
+>    VALIDATE whichever lands by re-running the promoted legacy replays.
 >    Instrument: `tools/probe_hook_removal.sh <tag> <replay> <hook>...`
 >    (rebuild with named hooks removed, re-measure; ~5 min per probe).
 > 2. **DECIDED (maintainer): make the tripwire diagnostic-only.** Design
