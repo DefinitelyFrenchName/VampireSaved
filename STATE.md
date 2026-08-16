@@ -2275,6 +2275,17 @@ checks on H/P); then the trap ring-entry A/B and the voice arc's
 ### flaky CRASH RESET at a match transition on the merged build.
 ### Not reproduced; filed with the exact recipe for a scripted rig.
 
+> **IT IS NOT THE 14z-93 TRIPWIRE CRASH (#91/#92).** Recorded here because
+> the two look alike on paper — both `vec4` at a match transition on the
+> merged build, and the structural read below correctly predicts that a
+> planted tripwire firing there "would be the instrument WORKING". 14z-93
+> found exactly such a tripwire and it is **HUITZIL-ONLY** (Pyron and
+> Donovan run the same 40,620-frame arcade rig END-clean on both the solo
+> and merged builds), while **the maintainer confirms Phobos was not
+> involved anywhere in this recipe** (2026-08-17). Two different bugs. Do
+> not design this rig around #92, and do not treat #92's fix as closing
+> this.
+
 **The maintainer's recipe, verbatim in substance** (alongside "Final
 Guardian corrected, overall everything is as expected"):
 1. 2P versus: Donovan (P1) vs Pyron (P2).
