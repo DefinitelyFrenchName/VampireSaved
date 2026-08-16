@@ -1096,6 +1096,16 @@ tests/test_effect_palette_table.sh    # 14z-76: the per-character palette POINTE
                                       # variant row, a build clobbering a base-half
                                       # row). tools/audit_effect_palette_table.py.
                                       # Static, seconds
+tools/artifact_manifest.py            # 14z-90 (issue #8): per-member SHA-1 of
+                                      # every packed zip in a rompath dir. The
+                                      # program fingerprint covers 8.1% of the
+                                      # shipped bytes; this covers all of it.
+                                      # Refuses a ';' rompath chain (that would
+                                      # fold $ROMDIR into the digest) and is
+                                      # timestamp-free by construction.
+                                      # Wired into test_m3a_reproducible.sh:
+                                      # HARD on member inventory, ADVISORY on
+                                      # member content until the legacy re-freeze
 tests/test_shell_portability.sh       # 14z-90 (issue #15): every #!/bin/sh
                                       # script must be POSIX sh. Strips heredoc
                                       # bodies first (these scripts embed Python

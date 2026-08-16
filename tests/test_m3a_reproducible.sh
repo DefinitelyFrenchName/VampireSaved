@@ -129,4 +129,57 @@ for _t in "huitzil:0x10:$EXPECT_HUI" "pyron:0x11:$EXPECT_PYR"; do
     echo "  ok: $_name reproduced ($_fp)"
 done
 
-echo "PASS: all four frozen references rebuild bit-exact from this tree"
+# ── whole-artifact coverage (14z-90, GitHub issue #8) ────────────────────
+# The four assertions above use build_fingerprint.py --sha-only, which hashes
+# ONLY the program members of ONE zip: measured 12 of 21 members, 6.00 MB of
+# 74.50 MB = 8.1% of what the set ships. Tenant gfx (vsw.31m/33m/35m/37m —
+# measured tenant-SPECIFIC), the WIDE overlay members, the authored QSound
+# songs vsw.z01/z02, the key, and the whole of the second packed zip were
+# never compared. So "rebuild bit-exact" was a claim about 8% of the artifact.
+#
+# SPLIT DELIBERATELY, and the split is the ruling on issue #8:
+#   HARD FAIL on member INVENTORY (count) — structural, and no legitimate
+#     build change alters it silently.
+#   ADVISORY on member CONTENT — because 25 of the last 28 commits touching
+#     build_gfx_donovan.py / gfx_layout3.toml / extra_tiles/ / effect_tail.json
+#     / qs_songs.toml would have forced a NEW re-freeze event here (+156% on a
+#     gate already re-frozen 16 times in 22 days). Promotion to hard-fail is
+#     scheduled WITH the pending legacy re-freeze, so the constants move once.
+# Digests frozen 2026-08-16 from the pre-fix tree, which reproduced all four
+# program fingerprints exactly.
+MANI_WIDE="68d408f9e6463e17a840bf148bce811871f07498 42"
+MANI_STOCK="edc5903becfb78aaff13288a01fe26bde6b5cd4c 30"
+MANI_HUI="d4b252e30b8abb43fb6a2adfa3c03bbf1c633cef 42"
+MANI_PYR="d71e885586df8215e6b64ed7bdbb461bdcbc71e3 42"
+
+m3a_manifest() {   # m3a_manifest <label> <rompath> <"digest count">
+    _got="$(python3 tools/artifact_manifest.py "$2")" || {
+        echo "FAIL: $1 manifest could not be computed (no zip?)"; exit 1; }
+    _wd="${3%% *}"; _wc="${3##* }"
+    _gd="${_got%% *}"; _gc="$(echo "$_got" | awk '{print $2}')"
+    if [ "$_gc" != "$_wc" ]; then
+        echo "FAIL: $1 member INVENTORY changed: $_gc members, expected $_wc"
+        echo "  (a member appeared or vanished — that is structural, not drift)"
+        exit 1
+    fi
+    if [ "$_gd" = "$_wd" ]; then
+        echo "  ok: $1 whole-artifact manifest matches ($_gc members)"
+    else
+        echo "  MANIFEST DRIFT: $1 content moved outside the program image"
+        echo "    frozen $_wd, measured $_gd ($_gc members, count unchanged)"
+        python3 tools/artifact_manifest.py "$2" --list > "$WORK/$1.mani" 2>/dev/null
+        echo "    member digests written to $WORK/$1.mani"
+        echo "    ADVISORY (issue #8): gfx/QSound drift does not fail this gate"
+        echo "    yet. If you did not intend it, stop — nothing else sees it."
+    fi
+}
+
+echo "== whole-artifact manifests (advisory on content, hard on inventory)"
+m3a_manifest donovan-m3a "$WORK/m3a_wide/rompath" "$MANI_WIDE"
+m3a_manifest m5_stock    "$WORK/m3a_stock/rompath" "$MANI_STOCK"
+m3a_manifest huitzil     "$WORK/huitzil/rompath"   "$MANI_HUI"
+m3a_manifest pyron       "$WORK/pyron/rompath"     "$MANI_PYR"
+
+echo "PASS: all four frozen references rebuild with bit-exact PROGRAM images"
+echo "      (gfx/QSound/key members and the second packed zip are covered by"
+echo "      the manifests above — advisory on content, hard on inventory)"
