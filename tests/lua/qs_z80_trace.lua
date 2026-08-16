@@ -29,6 +29,17 @@
 --   env DASM     "file:start:len" (hex start/len) — also emit a decrypted
 --                disassembly of the Z80 fixed ROM, e.g. "zdasm.txt:0:8000"
 --   env FRAMES   hard stop (default 3600)
+-- INPUT-STAGING CONVENTION (14z-90, GitHub issue #10). This instrument
+-- stages inputs at the START of the frame callback (`prev = held[frame]`),
+-- whereas tests/lua/replay.lua stages for the NEXT frame at the END
+-- (`held[frame + 1]`). The two therefore land a given press on DIFFERENT
+-- frames. That is tolerable here only because this instrument is a PASSIVE
+-- OBSERVER — a tap/census whose output is "what happened", not "what
+-- happened at replay.lua's frame N". DO NOT cross-reference a frame number
+-- from this log with a compare_* first-divergence, a masked window onset, or
+-- replay.lua's checksum log: they are one frame apart. Unifying the two
+-- conventions would re-date the frozen frame constants in this instrument's
+-- consuming gates and is deferred until after the legacy re-freeze.
 
 local ids = {}
 for tok in (os.getenv("IDLIST") or "119"):gmatch("[^,]+") do

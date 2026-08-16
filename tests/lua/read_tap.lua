@@ -71,7 +71,12 @@ space:add_change_notifier(function()
     install()
 end)
 
--- replay + pokes playback (verbatim subset of tap_writes.lua)
+-- replay + pokes playback. NOT a verbatim subset of tap_writes.lua —
+-- that claim is RETRACTED (14z-90, GitHub issue #10): tap_writes.lua
+-- stages `held[frame + 1]` at the end of the frame like replay.lua,
+-- this file parses and stages one frame earlier, so the two land a
+-- press on different frames. Its consumer audit_voice_borrow pins
+-- WINDOW="3985,4005", measured under THIS convention.
 local held = {}
 local replay_path = os.getenv("REPLAY")
 local FIELDS = nil

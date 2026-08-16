@@ -1,6 +1,17 @@
 -- scratch probe v2: replay-driven venue + id sweep pokes + QSound chip
 -- write log. env: REPLAY, SWEEP="s,e,step,first"(hex,hex,dec,dec) or
 -- IDLIST (csv hex), RING_IDX, TRACE_OUT
+-- INPUT-STAGING CONVENTION (14z-90, GitHub issue #10). This instrument
+-- stages inputs at the START of the frame callback (`prev = held[frame]`),
+-- whereas tests/lua/replay.lua stages for the NEXT frame at the END
+-- (`held[frame + 1]`). The two therefore land a given press on DIFFERENT
+-- frames. That is tolerable here only because this instrument is a PASSIVE
+-- OBSERVER — a tap/census whose output is "what happened", not "what
+-- happened at replay.lua's frame N". DO NOT cross-reference a frame number
+-- from this log with a compare_* first-divergence, a masked window onset, or
+-- replay.lua's checksum log: they are one frame apart. Unifying the two
+-- conventions would re-date the frozen frame constants in this instrument's
+-- consuming gates and is deferred until after the legacy re-freeze.
 local sw = os.getenv("SWEEP") or "0,10,12,1050"
 local s_id, e_id, stepf, firstf = sw:match("^(%x+),(%x+),(%d+),(%d+)$")
 s_id, e_id, stepf, firstf = tonumber(s_id,16), tonumber(e_id,16), tonumber(stepf), tonumber(firstf)

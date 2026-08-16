@@ -1,5 +1,37 @@
 # GOTCHAS (project) — traps in OUR pipeline and method
 
+## Half the Lua instruments stage inputs one frame off replay.lua — a frame number from one is not a frame number from the other (paid: 14z-90, GitHub issue #10)
+
+`tests/lua/replay.lua` writes its checksum for frame N and THEN stages
+inputs for N+1 (`held[frame + 1]`), so "the set in effect during frame N
+is the one staged at the end of N-1". Ten of the twenty replay
+instruments instead stage at the START of the callback
+(`prev = held[frame]`), landing a press one frame earlier. Measured
+split: every DIVERGENCE-ATTRIBUTION instrument (tap_writes, field_trace,
+trace_writes, type_write_census, dispatch_census, obj_record_*_trace,
+pal_poke_heal, replay_guard) is canonical; the drift is in the probe
+family (obj_records_dump, ring_tap, read_tap, qs_sweep, objy_bits,
+unmapped_probe, snapshot_frames, qs_table_trace, qs_z80_trace, bp_regs).
+Origin: `898daea` had one flavour; `23071cc` (14z-51) copied a variant
+and every later instrument copied the copy.
+
+The trap is not that the probes are "wrong" — most are passive observers
+whose output is unaffected by which frame a press lands on. The trap is
+CROSS-REFERENCING: taking a frame number out of a probe log and matching
+it against a `compare_*` first divergence, a masked window onset, or
+replay.lua's checksum log. Those are one frame apart, and nothing says so.
+
+Why it is not simply fixed: the frame constants in the consuming gates
+were tuned UNDER the drifted timing — `test_beam_variants.sh` DUMP_FRAMES
+(nine values, duplicated in two places), `test_tenant_hud.sh:104`
+DUMP_FRAMES=3100/FRAMES=3110, `test_hui_df_style.sh` OBJFR/PALFR,
+`audit_trap_parity.sh` WINDOWS, `audit_voice_borrow.sh` WINDOW=3985,4005.
+Correcting the staging without re-deriving those constants does not make
+the gates right, it silently re-dates them. The staging fix and the
+re-measurement are one change, and it is scheduled after the legacy
+re-freeze. Until then every drifted instrument carries a banner saying so.
+
+
 The build/extract/patch chain, the replay harness and gates, manifests,
 the WIDE profile, and reverse-engineering method that is ours rather
 than the game's. Dies with the project; the other two files do not.
