@@ -34,6 +34,26 @@ are the backstop for wrong mappings.
 
 ## Structural findings the map rests on
 
+- **THE ALLOCATOR -> POOL MAP, MEASURED (14z-93).** The six helpers
+  `vs2 0x156D6 + k*0x16` / `vsavj 0x016F8E + k*0x16` each pop from their own
+  free list; the pool BASE is not in the body, so it was measured at runtime
+  (breakpoint after the `movea.w (a0)+,a4` pop, reading A4):
+
+  | k | vs2 | vsavj | pool | `alloc_wrap`ped by all three tenants |
+  |---|---|---|---|---|
+  | 0 | `0x156d6` | `0x16f8e` | `$FF94xx` (projectile) | no |
+  | 1 | `0x156ec` | `0x16fa4` | `$FFB4xx-$FFB6xx` | no |
+  | 2 | `0x15702` | `0x16fba` | `$FFB8xx-$FFBFxx` | **yes** |
+  | 3 | `0x15718` | `0x16fd0` | `$FFC8xx` | no |
+  | 4 | `0x1572e` | `0x16fe6` | `$FFD4xx-$FFD6xx` | **yes** |
+  | 5 | `0x15744` | `0x16ffc` | `$FFE4xx` | no |
+
+  **Probe the pop at helper+0x10, not helper+0x0C** — +0x0C is inside the
+  `movea.l (0x7966,A5),a0` and a breakpoint there never fires, reading as a
+  clean zero (the mid-instruction dead-instrument trap, `docs/GOTCHAS.md`).
+  Measured 14z-93: the wrong offset returned 0 hits over 4,000 frames and
+  looked like "these allocators are never called".
+
 - **Allocator/pool family (MUST map, never port):** vsav2 secondary-object
   pool helpers `0x156D6 + k*0x16` (count `A5+0x7A42+k`, free list
   `A5+0x79E6+4k`) correspond to vsavj `0x016F8E + k*0x16` (count
