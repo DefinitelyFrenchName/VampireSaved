@@ -24,6 +24,10 @@ Exit 0 only if every clause holds.
 
 import argparse
 import sys
+import os as _os, sys as _sys
+_sys.path.insert(0, _os.path.dirname(_os.path.abspath(__file__)))
+from s4_thresholds import FLICKER_MAX, RECONVERGE   # CLAUDE.md §4 (GitHub #44)
+
 
 
 def load(path):
@@ -46,7 +50,7 @@ def main():
                     help="frozen first divergent frame")
     ap.add_argument("--end", type=int, required=True,
                     help="frozen last divergent frame")
-    ap.add_argument("--reconverge", type=int, default=60,
+    ap.add_argument("--reconverge", type=int, default=RECONVERGE,
                     help="minimum identical frames required after the window")
     args = ap.parse_args()
 

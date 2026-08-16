@@ -25,14 +25,18 @@ Tolerance (defaults from the session-7 measurements, deliberately tight):
 
 import argparse
 import sys
+import os as _os, sys as _sys
+_sys.path.insert(0, _os.path.dirname(_os.path.abspath(__file__)))
+from s4_thresholds import FLICKER_MAX, RECONVERGE   # CLAUDE.md §4 (GitHub #44)
+
 
 
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("log_a")
     ap.add_argument("log_b")
-    ap.add_argument("--max-stretch", type=int, default=2)
-    ap.add_argument("--min-converge", type=int, default=60)
+    ap.add_argument("--max-stretch", type=int, default=FLICKER_MAX)
+    ap.add_argument("--min-converge", type=int, default=RECONVERGE)
     ap.add_argument("--max-total", type=int, default=8)
     args = ap.parse_args()
 

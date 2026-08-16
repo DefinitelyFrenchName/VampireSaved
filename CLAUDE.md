@@ -119,12 +119,24 @@ legacy behavior is a failed change.
   a live vanilla leg across all 46 legacy replays. Revisit at MiSTer — a third
   implementation is where MAME-specific behaviour would surface.
 
-  Two FBNeo-only phase classes are measured and **await a ruling** (they are
-  not tolerances yet): the sound-driver work area `$FF0500-$FF05FF`
-  (`atlas/ram.md:74`) and the OBJ-builder secondary stack `$FF06D0-$FF06EF`
-  (`ram.md:62`, "execution POSITION, not state"). MAME shows zero difference
-  at the same frames. Note the second EXTENDS ram.md:62, which records that
-  class as appearing only on tenant-content replays.
+  **THE TWO FBNeo-ONLY PHASE CLASSES — RATIFIED 2026-08-16 (maintainer,
+  GitHub #78).** Two windows may differ on FBNeo where MAME shows ZERO
+  difference at the same frames: the sound-driver work area
+  `$FF0500-$FF05FF` (`atlas/ram.md:74`, already recorded as differing
+  between MAME/FBNeo boot phase) and the OBJ-builder secondary stack
+  `$FF06D0-$FF06EF` (`ram.md:62`, "execution POSITION, not state" — a
+  build whose per-frame work costs different cycles sits one `bsr`
+  further along at the sample instant). Neither is gameplay state.
+  **The ratification EXTENDS `ram.md:62`**, which had recorded that class
+  as appearing only on tenant-content replays where no vanilla oracle
+  applies; it appears here on LEGACY content under FBNeo.
+  **The window is NOT the tolerance.** As with every other non-exact
+  class, the expectation is FROZEN: `test_fbneo_legacy_oracle.sh` carries
+  the measured offset inventory (`$FF055B-$FF055D`, `$FF06D1/D4/DB`) and a
+  byte differing inside a window but OUTSIDE that inventory FAILS as
+  GROWTH. The standing watch applies verbatim — growth means stop and
+  root-cause, not widen. `FBNEO_ORACLE_EXPECT=exact` requires bit-identity
+  for anyone who wants it.
 - **Hooked-build legacy comparison (amended 2026-07-25 v1, refined to v2
   2026-07-27, both maintainer-approved):** for builds carrying engine
   hooks (code the vanilla game executes routed through added

@@ -8,9 +8,10 @@ tests/audit_merged_legacy.sh (14z-81..88) when a second caller appeared
 one set of thresholds, one place to correct. Behaviour is unchanged — the
 merged audit now calls this file instead of writing its own copy.
 
-Thresholds are the comparators' own, and must stay in step with them:
-  flicker run length  <= 2   (tools/compare_composite.py FLICKER_MAX)
-  re-convergence tail >= 60  (compare_window.py / compare_flicker.py default)
+Thresholds come from tools/s4_thresholds.py — the SINGLE ratified
+declaration shared with compare_composite/flicker/window (14z-93,
+GitHub #44). They used to be redeclared here and in each comparator
+with a 'must stay in step' comment and nothing asserting it.
 
 Frames are read from the log's FIRST COLUMN, which is compare_window.py's
 convention (onset/end are frame numbers, end = last divergent frame,
@@ -27,8 +28,9 @@ Usage: describe_masked_shape.py <base.log> <new.log> [--basis vsavj/masked-v2]
 import argparse
 import sys
 
-FLICKER_MAX = 2      # a divergent run this short or shorter is a flicker frame
-RECONVERGE = 60      # identical frames required after the last divergence
+import os as _os, sys as _sys
+_sys.path.insert(0, _os.path.dirname(_os.path.abspath(__file__)))
+from s4_thresholds import FLICKER_MAX, RECONVERGE   # CLAUDE.md §4 (GitHub #44)
 
 
 def load(path):

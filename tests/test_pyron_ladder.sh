@@ -31,7 +31,20 @@ cd "$REPO"
 WORK="$(mktemp -d)"
 trap 'rm -rf "$WORK"' EXIT
 
-for st in 1 2 3 4; do
+# STAGE 6 IS IN THE LADDER (14z-93, GitHub #90). It used to stop at 4, and
+# the boot probe below ran on the stage-4 build. That expectation was never
+# valid for this tenant: stages are cumulative and PYRON'S PORT IS STAGE 6 —
+# pyron.toml has THREE rows at stage <= 4 (two pcrel_escape_fix and the
+# shared hitclass_map_extend) against 44 at stage 6. Forcing char id 0x11
+# onto a build with none of his select/char-load machinery and demanding
+# "guard: clean" asserts something that build cannot deliver, and once #84
+# made the ladder actually build Pyron it duly crashed (CRASH 3020 vec4).
+# The frozen pyron-m9 passes the same probe cleanly, so the artifact was
+# never the problem.
+# The ladder inherited this shape from Huitzil, whose manifest genuinely
+# does carry half the port by stage 4 (51 rows). It does not transfer: for
+# Donovan it would be worse still — ZERO rows at stage <= 4.
+for st in 1 2 3 4 6; do
     echo "== stage $st build"
     # FIXED 14z-92 (GitHub #84). This was:
     #     TENANT_MANIFEST=... TENANT_CHAR=0x11 \
@@ -43,8 +56,13 @@ for st in 1 2 3 4; do
     # process — read neither and fell back to its DONOVAN defaults.
     # This ladder was building and validating Donovan at every stage.
     GF="--profile cps2-wide-v1"
-    [ "$st" = 4 ] && GF="$GF --allow-plausible --tripwire-open"
+    case "$st" in 4|6) GF="$GF --allow-plausible --tripwire-open" ;; esac
+    # The stage-6 rung needs the WIDE overlay to pack a vsavjw.zip; the
+    # earlier rungs are stock-shaped and pack vsavj.zip.
+    WR=""
+    [ "$st" = 6 ] && WR="$PWD/build/wide0/rompath/vsavjw.zip"
     TENANT_MANIFEST=build/manifest/pyron.toml TENANT_CHAR=0x11 GEN_FLAGS="$GF" \
+    KEY_SET=vsavj WIDE_ROMSET="$WR" \
         tools/build_donovan.sh "$st" "$WORK/pyr$st" > "$WORK/b$st.log" 2>&1 \
         || { tail -15 "$WORK/b$st.log"; echo "FAIL: stage $st build"; exit 1; }
     # ASSERT WHAT WAS ACTUALLY BUILT. The fix above is one line; this is the
@@ -69,6 +87,18 @@ PY
     fi
     echo "  ok: built ($(grep '^build fingerprint' "$WORK/b$st.log" | cut -d' ' -f3 | cut -c1-8))"
 
+    # THE OP INVARIANT IS A STAGE 1-4 CHECK, and 14z-93 scoped it back to
+    # that when stage 6 joined the ladder. At stage 6 the tenant
+    # legitimately writes select records, HUD rows, palettes and the wheel
+    # row — writes that land on vanilla-readable bytes BY DESIGN. The
+    # reviewed authority for those is build/manifest/shared_writes.toml,
+    # enforced by tests/test_shared_writes.sh, which fails on any addition,
+    # removal or change. Re-deriving a second, weaker version of that list
+    # here would just be a place for the two to disagree.
+    if [ "$st" = 6 ]; then
+        echo "  (op invariant: stage 1-4 check, skipped at 6 —"
+        echo "   tests/test_shared_writes.sh is the authority there)"
+    else
     python3 - "$WORK/pyr$st/patch/patch.json" "$st" <<'PY'
 import json, sys
 from pathlib import Path
@@ -157,10 +187,13 @@ if bad:
 print(f"  ok: op invariant holds ({len(ops)} ops: free space / variant "
       f"rows{' / %d reviewed shared writes' % len(HOOK_SITES) if HOOK_SITES else ''})")
 PY
+    fi
 done
 
-echo "== stage-4 boot probe (forced pick, id 0x11)"
-tools/force_pick_probe.sh "$WORK/pyr4/rompath" 11 "$WORK/probe" > "$WORK/probe.txt" 2>&1 || {
+# THE BOOT PROBE RUNS ON THE STAGE-6 RUNG (14z-93, GitHub #90) — the rung
+# that carries Pyron's port, and the one that corresponds to what ships.
+echo "== stage-6 boot probe (forced pick, id 0x11)"
+SET=vsavjw tools/force_pick_probe.sh "$WORK/pyr6/rompath" 11 "$WORK/probe" > "$WORK/probe.txt" 2>&1 || {
     cat "$WORK/probe.txt"; echo "FAIL: boot probe errored"; exit 1; }
 grep -q 'id-hold @2600: \$FF8782 = 0x11' "$WORK/probe.txt" || {
     cat "$WORK/probe.txt"; echo "FAIL: forced id did not hold"; exit 1; }
@@ -191,4 +224,4 @@ python3 "$REPO/tools/compare_flicker.py" "$WORK/r02m.log" \
     || { echo "FAIL: stage-4 legacy not masked-EXACT"; exit 1; }
 echo "  ok: masked-v2 EXACT vs the frozen vanilla log"
 
-echo "PASS: Pyron stage 1-4 ladder (builds + op invariant + boot probe + legacy bit-identity)"
+echo "PASS: Pyron stage 1-4+6 ladder (builds + op invariant + stage-6 boot probe + legacy bit-identity)"

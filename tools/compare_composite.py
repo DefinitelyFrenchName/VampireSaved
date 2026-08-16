@@ -48,7 +48,9 @@ Exit 0 only if every clause holds.
 import argparse
 import sys
 
-FLICKER_MAX = 2          # a run longer than this is not flicker (§4 v2)
+import os as _os, sys as _sys
+_sys.path.insert(0, _os.path.dirname(_os.path.abspath(__file__)))
+from s4_thresholds import FLICKER_MAX, RECONVERGE   # CLAUDE.md §4 (GitHub #44)
 
 
 def load(path):
@@ -87,7 +89,7 @@ def main():
                     help="frozen flicker frames, comma separated, or '-'")
     ap.add_argument("--windows", required=True,
                     help="frozen windows 'onset-end[;onset-end...]', or '-'")
-    ap.add_argument("--reconverge", type=int, default=60,
+    ap.add_argument("--reconverge", type=int, default=RECONVERGE,
                     help="minimum identical frames after the last run")
     # 14z-90 (GitHub issue #4). compare_flicker.py caps total divergent frames
     # at 8; this class had no cap at all. Measured across all 121 committed

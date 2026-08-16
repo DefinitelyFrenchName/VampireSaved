@@ -136,7 +136,7 @@ PY
         "$WORK/sb_${R}_new" > "$WORK/${R}_new.run" 2>&1 || true
 
     R="$R" FRAMES="$FRAMES" MASK="$MASK" W="$WORK" \
-    FBNEO_ORACLE_EXPECT="${FBNEO_ORACLE_EXPECT:-sound-phase-open}" \
+    FBNEO_ORACLE_EXPECT="${FBNEO_ORACLE_EXPECT:-phase-ratified}" \
     python3 - <<'PY' || fail=1
 import os, sys
 R, W, mask = os.environ["R"], os.environ["W"], os.environ["MASK"]
@@ -147,7 +147,7 @@ for rng in mask.split(","):
         continue
     a, b = rng.split("-"); skip.update(range(int(a, 16), int(b, 16)))
 
-EXPECT = os.environ.get("FBNEO_ORACLE_EXPECT", "sound-phase-open")
+EXPECT = os.environ.get("FBNEO_ORACLE_EXPECT", "phase-ratified")
 ok = True
 n_open = 0
 for leg in ("van", "new"):
@@ -168,14 +168,18 @@ for f in frames:
         ok = False; continue
     diff = [i for i in range(len(a)) if a[i] != b[i] and i not in skip]
     n_cmp += 1
-    # THE MEASURED OPEN DEVIATION (14z-92, awaiting a ruling). The first run
-    # of this gate found 3 consecutive bytes differing on FBNeo where MAME
-    # shows ZERO at the same frame — $FF055B-$FF055D, inside the SOUND-DRIVER
-    # WORK AREA that docs/game/atlas/ram.md:74 already records as
-    # "differs between MAME/FBNeo boot phase". Attributed, bounded, and NOT
-    # silently masked: a deviation confined to $FF0500-$FF05FF is reported
-    # and tolerated under the default EXPECT; anything outside it FAILS.
-    # Set FBNEO_ORACLE_EXPECT=exact once the deviation is ruled on.
+    # THE TWO FBNeo-ONLY PHASE CLASSES — RATIFIED 2026-08-16 (maintainer,
+    # GitHub #78). They were reported as `open:` awaiting a ruling; the
+    # ruling is KEEP-AS-TOLERANCE, so they are now a named §4 class.
+    #
+    # RATIFIED DOES NOT MEAN UNBOUNDED, and §4 is explicit that a non-exact
+    # class must have its expectation FROZEN. So the window is not the
+    # tolerance — the frozen OFFSET INVENTORY below is. A byte that differs
+    # inside a window but is NOT in the inventory is GROWTH and FAILS, the
+    # same doctrine as the flicker inventory's standing watch ("if flickers
+    # grow beyond the frozen inventory, stop and root-cause — that pattern
+    # would indicate a deeper issue, not tolerance noise").
+    # Set FBNEO_ORACLE_EXPECT=exact to require bit-identity anyway.
     # Two attributed windows, both named in docs/game/atlas/ram.md:
     #   $FF0500-$FF05FF  sound-driver work area — ram.md:74 already records
     #                    it as "differs between MAME/FBNeo boot phase"
@@ -192,10 +196,25 @@ for f in frames:
     # tenant-content replays where no vanilla oracle applies". It appears
     # here on LEGACY content under FBNeo. That is new and wants a ruling.
     WINDOWS = ((0x0500, 0x0600), (0x06D0, 0x06F0))
+    # THE FROZEN INVENTORY (measured 14z-92, ratified 14z-93). Every offset
+    # ever observed to differ inside an attributed window. Growth is loud.
+    # MEASURED 14z-93 across the whole sampled corpus, not transcribed from
+    # a note: the first attempt froze {0x55B-0x55D, 0x6D1, 0x6D4, 0x6DB}
+    # because the 14z-92 prose recorded only the FIRST byte of each
+    # differing run, and the gate immediately reported the rest as growth.
+    # The stack offsets sit at longword boundaries 0x06D0/0x06D4/0x06D8/
+    # 0x06DC +1..+3 — the low bytes of return addresses in the per-frame
+    # OBJ-builder bsr chain, exactly what ram.md:62 describes.
+    FROZEN = {0x055B, 0x055C, 0x055D,                    # sound-driver work area
+              0x06D1,                                    # OBJ-builder secondary
+              0x06D4, 0x06D5,                            #   stack: the low bytes
+              0x06D9,                                    #   of the bsr-chain
+              0x06DB, 0x06DC, 0x06DD}                    #   return addresses
     inwin = lambda i: any(lo <= i < hi for lo, hi in WINDOWS)
     outside = [i for i in diff if not inwin(i)]
     inside = [i for i in diff if inwin(i)]
-    if outside or (diff and EXPECT == "exact"):
+    grew = [i for i in inside if i not in FROZEN]
+    if outside or grew or (diff and EXPECT == "exact"):
         print(f"  FAIL: {R} f{f} — {len(diff)} masked byte(s) differ, "
               f"first at work-RAM +0x{diff[0]:04x} "
               f"(vanilla {a[diff[0]]:#04x} vs build {b[diff[0]]:#04x})")
@@ -203,18 +222,32 @@ for f in frames:
               f"MAME divergence for {R}, so it is not a tolerated class.")
         if outside:
             print(f"        {len(outside)} byte(s) are OUTSIDE the attributed "
-                  f"sound-driver window, first +0x{outside[0]:04x}")
+                  f"phase windows, first +0x{outside[0]:04x}")
+        if grew:
+            print(f"        inside-window offsets this frame: "
+                  + ",".join(f"+0x{i:04x}" for i in inside))
+            print(f"        {len(grew)} byte(s) are INSIDE a window but NOT in "
+                  f"the frozen inventory, first +0x{grew[0]:04x} — this is "
+                  f"GROWTH, not the ratified class. Root-cause it; do not "
+                  f"add it to FROZEN without a new measured mechanism and "
+                  f"maintainer sign-off (CLAUDE.md §4).")
         ok = False
     elif inside:
-        print(f"  open: {R} f{f} — {len(inside)} byte(s) differ, all inside "
-              f"an attributed phase window (+0x{inside[0]:04x}..); "
-              f"attributed, awaiting a ruling")
+        # Print the FULL offset list, not just the first: the inventory is
+        # the tolerance, so it has to be auditable from the gate's own
+        # output. (Freezing it from a prose note that recorded only the
+        # first byte of each run is exactly how 14z-93's first attempt got
+        # it wrong — the runs are 3 bytes, a longword return address
+        # differing in its low three.)
+        print(f"  phase: {R} f{f} — {len(inside)} byte(s) differ, all in the "
+              f"FROZEN inventory of the ratified FBNeo phase classes: "
+              + ",".join(f"+0x{i:04x}" for i in inside))
         n_open += 1
 if n_cmp == 0:
     print(f"  FAIL: {R} — zero frames actually compared")
     ok = False
 elif ok:
-    tail = f", {n_open} with an attributed phase deviation" if n_open else ""
+    tail = f", {n_open} with a ratified FBNeo phase deviation" if n_open else ""
     print(f"  ok: {R} — {n_cmp} sampled frames compared{tail} "
           f"(frames {', '.join(str(f) for f in frames)})")
 sys.exit(0 if ok else 1)
@@ -255,9 +288,12 @@ PY
 
 [ "$fail" -ne 0 ] && { echo "FAIL: FBNeo hacked-build legacy oracle"; exit 1; }
 echo "PASS: FBNeo legacy oracle (partial) — every sampled frame is either"
-echo "      masked-identical to vanilla under FBNeo, or differs ONLY inside"
-echo "      the attributed sound-driver work area (\$FF0500-\$FF05FF, which"
-echo "      docs/game/atlas/ram.md:74 already records as emulator-phase"
-echo "      sensitive). Any byte outside that window FAILS. Lines marked"
-echo "      'open:' are a MEASURED DEVIATION AWAITING A RULING, not a pass —"
-echo "      set FBNEO_ORACLE_EXPECT=exact to require bit-identity."
+echo "      masked-identical to vanilla under FBNeo, or differs ONLY at"
+echo "      offsets in the FROZEN inventory of the two ratified phase"
+echo "      classes. Any byte outside them FAILS. Lines marked"
+echo "      'phase:' are the RATIFIED FBNeo-only phase classes"
+echo "      (maintainer 2026-08-16, GitHub #78): the sound-driver work area"
+echo "      \$FF0500-\$FF05FF and the OBJ-builder secondary stack"
+echo "      \$FF06D0-\$FF06EF, each bounded by a FROZEN offset inventory —"
+echo "      a byte inside a window but outside the inventory FAILS as"
+echo "      GROWTH. Set FBNEO_ORACLE_EXPECT=exact to require bit-identity."
