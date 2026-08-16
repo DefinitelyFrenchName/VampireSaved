@@ -6,8 +6,14 @@
 #
 # Output: <outbase>/rompath/vsavj.zip — run with
 #   MAME_ROMPATH="<outbase>/rompath;$ROMDIR" tools/run_mame.sh vsavj ...
-# All ROM-derived intermediates live under <outbase> (gitignored) and are
-# regenerated from $ROMDIR on every run (repo rule 7).
+# All ROM-derived intermediates live under <outbase> and are regenerated from
+# $ROMDIR on every run (repo rule 7).
+# CORRECTED 14z-90 (GitHub issue #39): this said "(gitignored)". Most are —
+# .bin/.zip/vm3*/vs2*/vh2* are caught — but the WIDE program members
+# `<outbase>/prg/vsw.4[1-4]` match NO rule in .gitignore, and 16 of them are
+# tracked in git today. They are measured near-empty (0xFF fill), so nothing
+# ROM-derived has actually been committed, but the blanket claim above was
+# false and the ignore rule is a maintainer decision recorded on issue #39.
 set -eu
 set -o pipefail  # 14z-10: a crashed build_gfx must not pack stale tiles silently
 # NB the shebang above is bash, not sh, BECAUSE of that line (14z-90, issue

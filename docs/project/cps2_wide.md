@@ -157,8 +157,15 @@ patched — and runs inside `tools/build_donovan.sh`.
 | 19-bit tile address (bit-12 promote) | one condition widened at `cps_obj.cpp:429-434` + flag definition/extern/init/reset, gated on `Cps2Wide` (**B2 verified**) | **core, profile-gated** |
 | New driver entry carrying the profile | new `BurnRomInfo` + `BurnDriver` beside `VsavjRomDesc[]` | descriptor |
 
-So the entire profile costs **one gated conditional** in emulation logic.
-Everything else is table data.
+So the entire profile costs **two gated blocks** in emulation logic, both in
+`Cps2ObjDraw`, and everything else is table data. CORRECTED 14z-90 (GitHub
+issue #35): this line said "one gated conditional". The second block is the
+`CPS2_WIDE_CANARY` positive control, which `docs/project/patch_index.md`
+explicitly retains ("CPS2_WIDE_CANARY stays as the B4 positive control") — so
+it is deliberate and ratified, but it is not zero, and a governance summary
+that undercounts the change budget is the kind of claim this project's
+retraction discipline exists to catch. The canary is test-only and gated on
+the same `Cps2Wide` flag.
 
 ## Governance (Rule 1 v2)
 

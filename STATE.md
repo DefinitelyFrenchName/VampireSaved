@@ -1,5 +1,52 @@
 # STATE — living progress log
 
+### DECISIONS PENDING — 14z-90 POLICY CLUSTER (five, all filed by the
+### 2026-08-15 audit, all ruled MAINTAINER by the re-judging pass; each
+### carries a decision brief on its GitHub issue with options and costs).
+### NOTHING WAS ACTED ON. Recorded here per CLAUDE.md §5.
+
+### (5) **CLAUDE.md rule 1 vs the ratified Rule 1 v2** (GitHub #35).
+### Rule 1 names sprite code as stop-and-escalate; the tree modifies
+### cps_obj.cpp inside Cps2ObjDraw; Rule 1 v2 ratified that (round 66) and
+### CLAUDE.md contains no occurrence of "Rule 1 v2", "profile-gated" or
+### "WIDE". RECOMMENDATION: retitle the header + a two-line bounded
+### exception pointing at docs/project/cps2_wide.md:163, rather than
+### copying the spec into CLAUDE.md where it would drift.
+
+### (6) **`vsw.*` has no .gitignore rule; 16 members tracked** (#39).
+### The audit's "8 MiB of ROM-derived output" is FALSE — measured 0xFF
+### fill, 12 of 16 a single repeated byte. The missing rule is real, and
+### the profile targets ~338 KB of ported program ROM landing in exactly
+### those members. RECOMMENDATION: add `vsw.*` (not `vsw*.*`) and
+### `git rm --cached` the 16. History rewriting NOT warranted.
+
+### (7) **Root `fbneo/`, `mame/`, `.claude/worktrees/` unignored** (#40).
+### Nothing was ever committed from them, so the rule-7 half is
+### prospective. The REAL cost is measured and was paid all through
+### 14z-90: 471 MB of duplicate tools/tests/docs under
+### `.claude/worktrees/` means every retraction-discipline grep returns
+### pre-move copies, so a session can "fix" a claim in a worktree and
+### believe it done. RECOMMENDATION: ignore now (root-anchored, and
+### `.claude/worktrees/` not a blanket `.claude/`), delete later.
+
+### (8) **CI: none exists** (#41). A static job (py_compile, bash -n AND
+### dash -n) would have caught the #15 dash breakage the day it landed.
+### RECOMMENDATION: static + the 23 portable ground-truth gates, with the
+### list in `tests/ci_portable.txt` beside the gates, failing on SKIP, and
+### the job named `static-and-groundtruth` — a job called "tests" that
+### runs 3% of them is its own false green. NEEDS a human: executable
+### config on third-party infra plus a public badge on a rule-7 repo.
+
+### (9) **The three PNG goldens** (#73). Full renders of Capcom's title
+### and select artwork, committed and public. Better than the filing
+### thought: `test_gfx_menus.sh` compares `tobytes()` after masking, so a
+### SHA-256 of the masked buffer is VERDICT-IDENTICAL, not an
+### approximation — the only loss is the "N pixels differ" diagnostic.
+### RECOMMENDATION: rule them OUTSIDE rule 7 (a rendered frame is a
+### derived work, not ROM bytes) and RECORD that one line either way, so
+### it is not re-litigated. History rewriting not warranted.
+
+
 ### 14z-90 — THE 2026-08-15 AUDIT RE-JUDGED ADVERSARIALLY, TIER 1
 ### (critical + high) COMPLETE. 11 issues fixed and closed, 5 ruled and
 ### left open, 1 NEW defect revealed and filed. No build byte moved; no
