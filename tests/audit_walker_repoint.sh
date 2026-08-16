@@ -59,8 +59,10 @@ echo "vanilla walker jsr:   $OLD  (must be SILENT)"
 echo "relocated walker jsr: $NEW  (must FIRE)"
 
 frames_for() {
+    # NOTE the spaces around `=`: tests/test_shell_portability.sh scans for
+    # bash-array syntax and `f=(` inside an awk program looks exactly like it.
     sed 's/#.*//' "tests/replays/$1.rpl" | awk 'NF { split($1, r, "-");
-        f=(r[2]?r[2]:r[1]); if (f + 0 > m) m = f + 0 } END { print m + 120 }'
+        f = (r[2] ? r[2] : r[1]); if (f + 0 > m) m = f + 0 } END { print m + 120 }'
 }
 
 run_leg() {   # $1 tag  $2 rompath-build  $3 sites

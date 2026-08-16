@@ -48,9 +48,43 @@
 
 [[tenant]]
 name = "donovan"
-build = "build/don_m5"
-count = 69
+build = "build/don_m7"
+count = 90
 writes = [
+  # 14z-91 THE WALKER RELOCATION. REMOVED: "0x054470 6 code" and
+  # "0x05e542 6 code" — the obj_hook dispatch sites are VANILLA again, so
+  # the two engine-site writes that used to install `jmp thunk` are gone.
+  # ADDED: the 23 rows below, each the 4-byte OPERAND of a `jsr <walker>`
+  # at caller+2. REVIEWED: every one is a caller of vsavj's own object-pool
+  # walker (0x54458 x2, 0x5E52A x21); the inventory is frozen in the
+  # manifest's [[obj_hook]] rows, was enumerated BY REFERENCE FORM by
+  # tools/audit_walker_callers.py (23 jsr abs.l and nothing else reaches
+  # either walker), and the generator verifies each site's 6 vanilla bytes
+  # against `caller_old_hex` before writing. The 4EB9 opcode word is never
+  # touched. Dynamic completeness: tests/audit_walker_repoint.sh.
+  "0x0053f8 4 code",
+  "0x005412 4 code",
+  "0x00577e 4 code",
+  "0x0057aa 4 code",
+  "0x00590c 4 code",
+  "0x005ebe 4 code",
+  "0x009438 4 code",
+  "0x00943e 4 code",
+  "0x009cac 4 code",
+  "0x009f38 4 code",
+  "0x00a18a 4 code",
+  "0x00a806 4 code",
+  "0x00abce 4 code",
+  "0x010dfc 4 code",
+  "0x012a40 4 code",
+  "0x012d18 4 code",
+  "0x012e4e 4 code",
+  "0x012e68 4 code",
+  "0x020312 4 code",
+  "0x020318 4 code",
+  "0x02163a 4 code",
+  "0x021adc 4 code",
+  "0x021dec 4 code",
   # 14z-87 (the voice-borrow fix, maintainer-decided b+c): the shared
   # engine borrow site (jsr + nop pad at 0x0AEF2/0x0AEF8 — the
   # keep-tenant thunk; only_variant_slot-gated, stock twin bit-identical)
@@ -85,8 +119,6 @@ writes = [
   "0x02b598 6 code",
   "0x02b7d8 6 code",
   "0x02b7e8 6 code",
-  "0x054470 6 code",
-  "0x05e542 6 code",
   "0x05f146 6 code",
   "0x05f1b6 6 code",
   "0x05f24c 2 code",
@@ -134,9 +166,43 @@ writes = [
 
 [[tenant]]
 name = "huitzil"
-build = "build/hui40"
-count = 66
+build = "build/hui41"
+count = 87
 writes = [
+  # 14z-91 THE WALKER RELOCATION. REMOVED: "0x054470 6 code" and
+  # "0x05e542 6 code" — the obj_hook dispatch sites are VANILLA again, so
+  # the two engine-site writes that used to install `jmp thunk` are gone.
+  # ADDED: the 23 rows below, each the 4-byte OPERAND of a `jsr <walker>`
+  # at caller+2. REVIEWED: every one is a caller of vsavj's own object-pool
+  # walker (0x54458 x2, 0x5E52A x21); the inventory is frozen in the
+  # manifest's [[obj_hook]] rows, was enumerated BY REFERENCE FORM by
+  # tools/audit_walker_callers.py (23 jsr abs.l and nothing else reaches
+  # either walker), and the generator verifies each site's 6 vanilla bytes
+  # against `caller_old_hex` before writing. The 4EB9 opcode word is never
+  # touched. Dynamic completeness: tests/audit_walker_repoint.sh.
+  "0x0053f8 4 code",
+  "0x005412 4 code",
+  "0x00577e 4 code",
+  "0x0057aa 4 code",
+  "0x00590c 4 code",
+  "0x005ebe 4 code",
+  "0x009438 4 code",
+  "0x00943e 4 code",
+  "0x009cac 4 code",
+  "0x009f38 4 code",
+  "0x00a18a 4 code",
+  "0x00a806 4 code",
+  "0x00abce 4 code",
+  "0x010dfc 4 code",
+  "0x012a40 4 code",
+  "0x012d18 4 code",
+  "0x012e4e 4 code",
+  "0x012e68 4 code",
+  "0x020312 4 code",
+  "0x020318 4 code",
+  "0x02163a 4 code",
+  "0x021adc 4 code",
+  "0x021dec 4 code",
   # 14z-87: the voice-borrow site + his candidate/voice-number rows
   # (variant rows 0x10) — see the donovan section's review note.
   "0x00aef2 6 code",
@@ -176,8 +242,6 @@ writes = [
   "0x02a8d6 6 code",
   "0x02b598 6 code",
   "0x02b7d8 6 code",
-  "0x054470 6 code",
-  "0x05e542 6 code",
   "0x05e7d6 6 code",
   "0x05f146 6 code",
   "0x05f1b6 6 code",
@@ -223,9 +287,43 @@ writes = [
 
 [[tenant]]
 name = "pyron"
-build = "build/pyron25"
-count = 55
+build = "build/pyron26"
+count = 76
 writes = [
+  # 14z-91 THE WALKER RELOCATION. REMOVED: "0x054470 6 code" and
+  # "0x05e542 6 code" — the obj_hook dispatch sites are VANILLA again, so
+  # the two engine-site writes that used to install `jmp thunk` are gone.
+  # ADDED: the 23 rows below, each the 4-byte OPERAND of a `jsr <walker>`
+  # at caller+2. REVIEWED: every one is a caller of vsavj's own object-pool
+  # walker (0x54458 x2, 0x5E52A x21); the inventory is frozen in the
+  # manifest's [[obj_hook]] rows, was enumerated BY REFERENCE FORM by
+  # tools/audit_walker_callers.py (23 jsr abs.l and nothing else reaches
+  # either walker), and the generator verifies each site's 6 vanilla bytes
+  # against `caller_old_hex` before writing. The 4EB9 opcode word is never
+  # touched. Dynamic completeness: tests/audit_walker_repoint.sh.
+  "0x0053f8 4 code",
+  "0x005412 4 code",
+  "0x00577e 4 code",
+  "0x0057aa 4 code",
+  "0x00590c 4 code",
+  "0x005ebe 4 code",
+  "0x009438 4 code",
+  "0x00943e 4 code",
+  "0x009cac 4 code",
+  "0x009f38 4 code",
+  "0x00a18a 4 code",
+  "0x00a806 4 code",
+  "0x00abce 4 code",
+  "0x010dfc 4 code",
+  "0x012a40 4 code",
+  "0x012d18 4 code",
+  "0x012e4e 4 code",
+  "0x012e68 4 code",
+  "0x020312 4 code",
+  "0x020318 4 code",
+  "0x02163a 4 code",
+  "0x021adc 4 code",
+  "0x021dec 4 code",
   # 14z-87: the voice-borrow site + his candidate/voice-number rows
   # (variant rows 0x11) — see the donovan section's review note.
   "0x00aef2 6 code",
@@ -247,8 +345,6 @@ writes = [
   "0x02b598 6 code",
   "0x02b672 2 code",
   "0x02b7d8 6 code",
-  "0x054470 6 code",
-  "0x05e542 6 code",
   "0x05f146 6 code",
   "0x05f1b6 6 code",
   "0x05f244 2 code",

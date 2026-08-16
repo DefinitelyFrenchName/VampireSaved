@@ -16,7 +16,7 @@
 #
 # WHAT A GREEN RUN PROVES: the merged image's legacy behaviour lands on the
 # SAME ratified comparison classes as the frozen single-tenant builds
-# (tests/expected/donovan-m5/*.masked — all three tenant sets agree
+# (tests/expected/donovan-m7/*.masked — all three tenant sets agree
 # byte-for-byte on the 13 shared legacy entries, and a merged build backs
 # 0x13 so 11_pick_donovan applies too) — with ONE ratified merged-specific
 # exception: 04_select_fuzz lands on the RATIFIED MERGED inventory
@@ -51,7 +51,7 @@
 #
 # Usage: ROMDIR=... [MAME_BIN=...] tests/audit_merged_legacy.sh
 # On-demand: builds build/merged1 and runs the legs below (~2 h since
-# 14z-89 — leg (a) is a GLOB over tests/expected/donovan-m5/*.masked and
+# 14z-89 — leg (a) is a GLOB over tests/expected/donovan-m7/*.masked and
 # that set grew 14 -> 45 .masked with the legacy-pairing promotion; it was
 # ~40 min at 14 replays).
 # RETRACTED 14z-90 (GitHub issue #17): this line said "14 -> 47". It is 45
@@ -76,7 +76,15 @@ export MAME_BIN
 OUT="${MERGED_OUT:-build/merged1}"
 PREBUILT="${MERGED_PREBUILT:-0}"
 WIDE_ZIP="${WIDE_ROMSET:-$PWD/build/wide0/rompath/vsavjw.zip}"
-EXPECT="tests/expected/donovan-m5"          # the ratified prior (see header)
+EXPECT="tests/expected/donovan-m7"          # the ratified prior (see header)
+# 14z-91: was donovan-m5. The legacy-regression fix re-froze every set,
+# and frame 829 (the hook cycle-skew) is gone corpus-wide, so the m5
+# specs no longer describe ANY build. The three merged-only overrides
+# below are deliberately NOT updated with it: they are maintainer-
+# ratified, they derive from the same cycle mechanism that just
+# changed, and this audit is built to FAIL with a measured shape and a
+# proposed line rather than absorb a deviation. Whatever it reports is
+# a re-ratification question, not a re-freeze.
 BASE_LOGS="tests/expected/vsavj/masked-v2/logs"
 
 # The three frozen extract dirs are the generator's inputs, exactly as
@@ -120,14 +128,14 @@ abspath() { case "$1" in /*) echo "$1";; *) echo "$PWD/$1";; esac; }
 
 if [ "$PREBUILT" = 1 ]; then
     echo "== B: PREBUILT merged artifact at $OUT (build skipped; shape"
-    echo "      asserted below — 734 ops, member identity) =="
+    echo "      asserted below — 753 ops, member identity) =="
     [ -f "$OUT/rompath/vsavjw.zip" ] || {
         echo "FAIL: MERGED_PREBUILT=1 but no $OUT/rompath/vsavjw.zip"; exit 1; }
     [ -f "$OUT/patch/patch.json" ] || {
         echo "FAIL: MERGED_PREBUILT=1 but no $OUT/patch/patch.json"; exit 1; }
     NOPS="$(python3 -c "import json;print(len(json.load(open('$OUT/patch/patch.json'))['ops']))")"
-    [ "$NOPS" = 734 ] || { echo "FAIL: $NOPS ops, frozen fixture is 734"; exit 1; }
-    echo "  ok: 734 ops (the frozen test_tenant_loop fixture; 14z-87 voice-borrow fix)"
+    [ "$NOPS" = 753 ] || { echo "FAIL: $NOPS ops, frozen fixture is 753"; exit 1; }
+    echo "  ok: 753 ops (the frozen test_tenant_loop fixture; 14z-91 walker relocation)"
     python3 tools/audit_romset_identity.py "$OUT/rompath" || {
         echo "  FAIL: member-identity audit"; exit 1; }
     FP="$(python3 tools/build_fingerprint.py "$OUT/rompath;$ROMDIR" --set vsavjw --sha-only || true)"
@@ -156,13 +164,16 @@ NOPS="$(python3 -c "import json;print(len(json.load(open('$OUT/patch/patch.json'
 # (the m9 sound_stub op — the restored trap-detonation chirp); 729
 # since 14z-86 (the M5 voice batch: alias-thunk pokes + voice farm
 # stubs).
-# 734 since 14z-91 (was 738; the fixture row-0x0F override deleted, -4);
+# 753 since 14z-91: 738 - 4 (the fixture row-0x0F override deleted, 2 ops
+# per thunk) + 19 (the obj_walker relocation: the two sites drop 3 ops each
+# — table + thunk + site patch — and gain 1 walker+table op plus one 4-byte
+# operand repoint per caller, 2 + 21 = 23; so -6 +25);
 # 738 since 14z-87 (the voice-borrow fix: shared keep-tenant thunk 2 +
 # site-pad code_word 1, deduped once, + 2 data_port table rows x3 tenants).
-if [ "$NOPS" = 734 ]; then
-    echo "  ok: 734 ops (the frozen test_tenant_loop fixture — same merge)"
+if [ "$NOPS" = 753 ]; then
+    echo "  ok: 753 ops (the frozen test_tenant_loop fixture — same merge)"
 else
-    echo "  FAIL: $NOPS ops, frozen fixture is 734 — the generator drifted;"
+    echo "  FAIL: $NOPS ops, frozen fixture is 753 — the generator drifted;"
     echo "        re-freeze test_tenant_loop.sh FIRST, then revisit this audit"
     exit 1
 fi
