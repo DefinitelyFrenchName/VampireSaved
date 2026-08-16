@@ -47,9 +47,18 @@ if [ ! -f "$SRC/vsavjw.zip" ]; then
 fi
 
 echo "== 1. a STOCK build over a WIDE rompath must be REFUSED =="
-O="$WORK/frozen_copy"; mkdir -p "$O/rompath"
+O="$WORK/frozen_copy"; mkdir -p "$O/rompath" "$O/patch"
 cp "$SRC"/*.zip "$O/rompath/"
+# 14z-90: the guard's FIRST version sat just before the `rm -rf rompath`,
+# which is AFTER gen_donovan_patch.py has already rewritten $OUTBASE/patch/.
+# I destroyed build/don_m5's patch metadata with exactly this invocation while
+# testing that version — the rompath survived and the intermediates did not,
+# and two static gates went red until the build was regenerated. So the
+# control asserts BOTH survive; a guard that fires after the first write is
+# not a guard.
+echo "canary — must survive a refused rebuild" > "$O/patch/canary.txt"
 before="$(ls "$O/rompath" | sort | tr '\n' ' ')"
+before_patch="$(cat "$O/patch/canary.txt" 2>/dev/null || echo MISSING)"
 # no --profile: this is what tests/run_battery_m2.sh does, and it is the
 # exact invocation that would have destroyed the reference.
 set +e
@@ -76,6 +85,15 @@ if [ "$before" = "$after" ] && [ -n "$after" ]; then
 else
     echo "FAIL: the rompath was modified or destroyed"
     echo "      before: [$before]  after: [$after]"; fail=1
+fi
+after_patch="$(cat "$O/patch/canary.txt" 2>/dev/null || echo MISSING)"
+if [ "$before_patch" = "$after_patch" ]; then
+    echo "  ok: the patch/ intermediates SURVIVED — the guard fired before"
+    echo "      the first write, not just before the rm"
+else
+    echo "FAIL: patch/ was overwritten — the guard is placed AFTER generation,"
+    echo "      which is the exact defect that cost a rebuild in 14z-90"
+    fail=1
 fi
 
 echo "== 2. POSITIVE CONTROL: a WIDE build over a WIDE rompath must PROCEED =="

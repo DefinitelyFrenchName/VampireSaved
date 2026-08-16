@@ -32,6 +32,46 @@ mkdir -p "$OUTBASE"
 TENANT_MANIFEST="${TENANT_MANIFEST:-build/manifest/donovan.toml}"
 TENANT_CHAR="${TENANT_CHAR:-0x13}"
 
+# ── cross-track overwrite guard (14z-90, GitHub issue #26) ──────────────────
+# The callers take an arbitrary outbase and this script rewrites everything
+# under it. `tests/run_battery_m2.sh build/don_m5` would repack a STOCK build
+# over the registered WIDE reference — and the battery's prefix GEN_FLAGS
+# carries no --profile, so it cannot even produce the set it replaced. Every
+# gate pointed there would then measure a different ROM under a frozen name,
+# and the audits that cannot find it report success by skipping.
+#
+# THIS RUNS BEFORE ANYTHING IS WRITTEN, and that placement was paid for: the
+# first version of this guard sat just before the `rm -rf rompath` further
+# down, which is AFTER gen_donovan_patch.py has already overwritten
+# $OUTBASE/patch/. I damaged build/don_m5's patch metadata with my own test
+# that way — the rompath survived, the intermediates did not, and two static
+# gates went red until the build was regenerated. A guard that fires after the
+# first write is not a guard.
+#
+# It is a TRACK-MISMATCH check, not a frozen-reference check. Refusing every
+# registered rompath would block a documented workflow (HANDOFF.md:231 gives
+# `build_donovan.sh 6 build/don_m4`, and don_m4 IS a frozen reference);
+# rebuilding a WIDE reference AS WIDE is how reproducibility gets checked.
+if [ -d "$OUTBASE/rompath" ]; then
+    _bd_want=vsavj
+    case "${GEN_FLAGS:-}" in *--profile*) _bd_want=vsavjw ;; esac
+    _bd_have=""
+    [ -f "$OUTBASE/rompath/vsavj.zip" ]  && _bd_have=vsavj
+    [ -f "$OUTBASE/rompath/vsavjw.zip" ] && _bd_have=vsavjw
+    if [ -n "$_bd_have" ] && [ "$_bd_have" != "$_bd_want" ]; then
+        echo "REFUSING to rebuild into $OUTBASE." >&2
+        echo "  It holds a $_bd_have set; this build packs $_bd_want." >&2
+        echo "  Overwriting would replace one track's artifact with the" >&2
+        echo "  other's UNDER THE SAME NAME — every gate pointed here would" >&2
+        echo "  then measure a ROM that is not the one it names, and the" >&2
+        echo "  audits that cannot find it report success by skipping." >&2
+        echo "  Build into a fresh directory. To overwrite anyway:" >&2
+        echo "  REBUILD_CROSS_TRACK=1" >&2
+        [ "${REBUILD_CROSS_TRACK:-0}" = "1" ] || exit 1
+        echo "  REBUILD_CROSS_TRACK=1 — proceeding anyway." >&2
+    fi
+fi
+
 python3 tools/audit_roms.py "$ROMDIR" > /dev/null || {
     echo "ROM audit FAILED — stop (CLAUDE.md §3)"; exit 1; }
 
@@ -263,47 +303,6 @@ if [ "$STAGE" -ge 6 ]; then
         echo "select: tenant at variant id $TEN_ID — records generated" \
              "(select_port skipped; the host's select records stay vanilla)"
         cp "$OUTBASE/patch/select_tiles.json" "$OUTBASE/select_tiles.json"
-    fi
-fi
-
-# 14z-90 (GitHub issue #26). This `rm -rf` is unconditional and the callers
-# take an arbitrary outbase, so `tests/run_battery_m2.sh build/don_m5` deletes
-# the registered donovan-m5 reference and repacks a STOCK build under its name
-# — the battery's prefix GEN_FLAGS carries no --profile, so it cannot even
-# produce the WIDE set it just destroyed. Every gate then measures a different
-# ROM under a frozen name, and audit_legacy_pairings.sh reports success by
-# SKIPPING what it can no longer find.
-#
-# THE GUARD IS A TRACK-MISMATCH CHECK, NOT A "FROZEN REFERENCE" CHECK, and the
-# distinction was measured rather than assumed. Refusing every registered
-# rompath would block a DOCUMENTED workflow: HANDOFF.md:231 gives
-# `tools/build_donovan.sh 6 build/don_m4` as a rebuild recipe, and don_m4 is a
-# frozen reference (84f49aaa, in both the registry and the m3a gate).
-# Rebuilding a WIDE reference AS WIDE is legitimate — it is how reproducibility
-# is checked. What is never legitimate is replacing a set with a DIFFERENT one
-# under the same name, which is precisely the battery-against-a-WIDE-dir case.
-#
-# PACK_SET is derived below from the generator's own output, so it is known
-# here by the same means and cannot disagree with what will be built.
-if [ -d "$OUTBASE/rompath" ]; then
-    _bd_will_pack=vsavj
-    if python3 -c "import json,sys; sys.exit(0 if json.load(open('$OUTBASE/patch/patch.json')).get('image') else 1)" 2>/dev/null; then
-        _bd_will_pack=vsavjw
-    fi
-    _bd_have=""
-    [ -f "$OUTBASE/rompath/vsavj.zip" ]  && _bd_have="vsavj"
-    [ -f "$OUTBASE/rompath/vsavjw.zip" ] && _bd_have="vsavjw"
-    if [ -n "$_bd_have" ] && [ "$_bd_have" != "$_bd_will_pack" ]; then
-        echo "REFUSING to rebuild into $OUTBASE." >&2
-        echo "  It holds a $_bd_have set; this build packs $_bd_will_pack." >&2
-        echo "  Deleting it would replace one track's artifact with the" >&2
-        echo "  other's UNDER THE SAME NAME — every gate pointed here would" >&2
-        echo "  then measure a ROM that is not the one it names, and the" >&2
-        echo "  audits that cannot find it report success by skipping." >&2
-        echo "  Build into a fresh directory. To overwrite anyway:" >&2
-        echo "  REBUILD_CROSS_TRACK=1" >&2
-        [ "${REBUILD_CROSS_TRACK:-0}" = "1" ] || exit 1
-        echo "  REBUILD_CROSS_TRACK=1 — proceeding anyway." >&2
     fi
 fi
 
