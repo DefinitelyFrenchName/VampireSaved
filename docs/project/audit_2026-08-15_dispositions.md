@@ -60,26 +60,80 @@ deferred, or escalated — the reason is recorded per row.
 | 25 | medium | UPHELD, re-rated **low** | Open, not fixed | Null-as-evidence is real, but this is a retired one-shot already ratified downstream by other means, and the published A3 value *is* the null signature — fixing it now cannot recover the measurement. A hard-FAIL has unmeasured false-failure risk. |
 | 26 | medium | UPHELD medium(upper) | **FIXED** af557e1 + d465b19, closed | `run_battery_m2.sh build/don_m5` would repack STOCK over the registered WIDE reference. Guard is a TRACK-MISMATCH check, not a frozen-reference check — the latter blocked HANDOFF's own documented recipe. Then MOVED before the first write after my own test destroyed `build/don_m5/patch/`: generation runs before the `rm`. |
 | 27 | medium | **CONTESTED**, re-rated low | Open | A documented prerequisite of an on-demand builder, with producers and recipe in-tree and a loud failure. Also in direct conflict with #26: this asks for the pinned dirs to become derived, #26 asks for them to be protected. Maintainer call. |
+| 28 | medium | UPHELD medium | Open — actionable half deferred | The named checksum line is the smaller half; neither path re-derives `build/out/*.bin`, which the generator reads at 30+ sites, regenerated only on ABSENCE with no provenance. Landing only the cheap half would close the issue and leave the gap. |
+| 29 | medium | UPHELD, re-rated **low** | Open; `exit 77` REJECTED | Cited exemplar already fixed by #9. Nothing can skip on this machine. And `exit 77` would abort the battery under `set -eu` at a gate whose skip is correct-by-construction. Real defect is a runner TALLY (= #24), not a 34-script contract flip. |
+| 30 | medium | PARTIAL, re-rated **low** | **MAINTAINER**, open | The metric reports the top-level runner as an orphan. Both scripts cited as callerless appear by name in NEXT_SESSION's recipes; `test_m3a_reproducible.sh` ran 3x this pass. 114/144 have no in-tree caller but exactly ONE is undiscoverable. |
+| 31 | medium | PARTIAL, re-rated **low** | Half **FIXED** (as #58), rest open | No gate makes the masked swap, so worst case is a phantom RED not a false green. Header is falser than filed — five ignored vars, not three. |
 | 32 | medium | UPHELD medium | **FIXED** 2e4bf24, closed | A dropped write is not under-reporting: `SekMapHandler` replaces the default handler, so it is neither performed nor forwarded. Reachable from *legal* input via #37's coalescing. Fixed as per-span validation on top of #37 — validating named ranges alone leaves the gap between them. |
 | 33 | medium | UPHELD medium | **FIXED** 2e4bf24, closed | Fixed by REFUSING OBJ taps, not per-frame re-install: re-installing still loses the remainder of any flipping frame, turning a silent null into a plausible-but-incomplete log. |
 | 34 | medium | UPHELD medium | **FIXED** 2e4bf24, closed | Wrong logged address was live on every call site. Third defect found in the same five lines: odd-length hex silently truncated. |
 | 35 | medium | **MAINTAINER** | Brief posted, open | The governing document contradicts a ratified amendment in the file every session reads first. Recommendation: retitle + a two-line bounded exception, not a copy of the spec. |
 | 36 | medium | UPHELD | **FIXED** 441f05c, closed | The filed check (`git apply -R --check`) fails open on the issue's own scenario — measured. Gate reconstructs from pin + patches and compares whole files. Deliberately NOT wired into the build path: a hard gate ahead of untested changes is rule 2 backwards. |
 | 37 | medium | UPHELD, re-rated **low** | **FIXED** 2e4bf24, closed | No independent failure mode — the demonstrated harm is #32's. Landed because #32's validation is unsound without it. |
+| 38 | medium | UPHELD medium | Destructive half **FIXED** 8e6e2d0, rest open | Judging found worse than filed: `rm -f "$PLAY/roms"/*.zip` globs THROUGH a symlink and could delete the reference dumps — a class that already cost this project `qsound_hle.zip` once. |
 | 39 | medium | **MAINTAINER** (PARTIAL) | Brief posted, open | "8 MiB ROM-derived" is FALSE — measured 0xFF fill, 12 of 16 a single repeated byte. The missing `vsw.*` rule is real. No history rewrite. |
 | 40 | medium | **MAINTAINER** (PARTIAL) | Brief posted, open | Rule-7 half prospective; the real, already-paid cost is 471 MB of duplicate trees defeating every retraction-discipline grep. |
 | 41 | medium | **MAINTAINER** | Brief posted, open | Static CI would have caught #15 the day it landed. Must fail on SKIP, and must not be called "tests". |
+| 42 | medium | UPHELD medium | Open, deferred | Parsers cannot disagree here (py3.9, no tomllib) — the safety is an interpreter version, not an assertion. Fix stops the switching; needs the reserved rebuild. |
+| 43 | medium | UPHELD medium | Open, deferred | The lost fallback PREDATES the copy, so restoring is not inventing. Control needs no re-resolve: `allow_fallback=False` reproduces all 271 rows; `True` moves exactly 3. |
+| 44 | medium | UPHELD, re-rated **HIGH** | Partly fixed (#53); rest **MAINTAINER**, open | The only issue whose severity ROSE. Proposer and checkers disagree THREE ways; §4 v4's "permits nothing either component permits alone" is false at HEAD. |
+| 45 | low | **INVALID** | Closed, not planned | Timestamps real, conclusion false: nothing hashes a container. Both fingerprint tools are per-member and timestamp-free by construction. |
+| 46 | low | UPHELD low | Open, deferred | Its own refutation is wrong in the filer's favour: `select_port.py` mutates `build/m5_stock`, a FROZEN reference, not a scratch dir. |
+| 47 | low | UPHELD, severity **none** | Open, unfixed | 25 sites (not 19), all normalising to one shape, ZERO drift. Duplication without divergence is a maintainability note. |
+| 48 | low | **CONTESTED** low | Open | Scenario disproven; a FOURTH copy found; the real bug there is a missing `--set`. |
+| 49 | low | **CONTESTED**, severity none | Open | Byteswap verified identical exhaustively; `effect_tail.json` bit-reproducible. Enumeration note only. |
+| 50 | low | **CONTESTED** low | Open | "None reachable by a test" is false — allocator/code_ptr/overlay are covered. Splitting a 5,400-line generator function is the highest-risk refactor in the tree. |
+| 51 | low | UPHELD low | Open, deferred | Real off-by-one at FIVE sites, not two; measured no-op on every live span. |
+| 52 | low | UPHELD low | Open, queued behind #4 | The exemption spans the final SIXTY frames, not two. Zero frozen specs affected. |
+| 53 | low | UPHELD low | **FIXED** 336a0f2, closed | Proposer refused a 60-frame tail, enforcer accepts it. The ground truth asserted the WRONG side — flipped, boundary now pinned from both sides. |
+| 54 | low | UPHELD low | **FIXED** 070e225, closed | Two zero-frame logs: equal length, no differing rows, `EXACT` + exit 0 having compared nothing. |
+| 55 | low | UPHELD low | **FIXED** 070e225, closed | Worse than filed: on `--merge` the empty stage is filled with REFERENCE members, so the artifact fingerprints as VANILLA and dispatches to the vanilla expectations. |
+| 56 | low | **STALE** | Closed | Already fixed as #3's companion earlier in this same pass. |
+| 57 | low | UPHELD low | Open | Fix is groundable from the driver (`IP_ACTIVE_LOW`, `PORT_SERVICE_NO_TOGGLE`) but changes what every replay asserts at frame 0 — wants one measured pass. |
+| 58 | low | UPHELD low | **FIXED** 070e225, closed | Found independently by the #31 panel while I fixed it from #58's side — two panels converging from opposite directions. |
+| 59 | low | UPHELD low | Open | Dumps and inputs ARE frame-aligned; only pokes are not, and no gate makes a poked cross-emulator comparison. Doc defect. |
+| 60 | low | UPHELD low | Open | The real finding is the FALSE "SINGLE slot" rationale, not the ordering — a wrong rationale outlives a wrong loop. |
+| 61 | low | UPHELD low | Open | Census of every mask string: zero leaked or double-read bytes. Fix belongs in the runner, not `replay.lua` (which would put 216 golden logs in scope). |
+| 62 | low | UPHELD low | Open | Went from theoretical to live: masked-v3 is PARKED on disk, so a basis under an unused mask now exists. |
+| 63 | low | UPHELD low | **FIXED** 070e225, closed | Residual left open on the issue: both guards share one predicate, so they fail together. |
 | 64 | low | UPHELD low | **FIXED** 2e4bf24, closed | Both stated triggers refuted. The suggested bare `continue` was rejected: it downgrades a *caught* segfault to an uncaught silent skip. |
 | 65 | low | UPHELD low | **FIXED** 2e4bf24, closed | The sandbox missed the input that decides *which set is measured*. Clearing is guarded on `./roms` existing, else an ad-hoc invocation loses ROM resolution. |
+| 66 | low | UPHELD low | Open | Robustness, not security — no threat model. The misleading empty-`$NOPS` message (reads as "re-freeze") is the costly part; three uncited copies exist. |
+| 67 | low | UPHELD low | Open | Portability papercut, not rule 7 (a path is not content). Dead on every scripted path. |
+| 68 | low | UPHELD trivial | Open | Nine sites, not two. No threat model on either platform; every site already traps. Hygiene, not security. |
+| 69 | low | **CONTESTED** low | Open | The title's fix is INVERTED: `build/out` regenerates only on absence with no provenance, so standardising on it spreads an unverified dependency. Narrow half (a `|| true` on a decrypt) is real. |
+| 70 | low | **MAINTAINER** low | Open | Verbatim the decision already recorded as 14z-90 (3); premise moved when #2 landed. Two build GENERATIONS, not a forked copy. |
+| 71 | low | UPHELD low | Open | The duplication is the smaller half — five gates each run their own full build of the same thing. |
+| 72 | low | UPHELD low | **FIXED** 070e225, closed | Deleted. Larger half filed: all five tracked `build/scratch/*.py` omit the SHA-1 print, and two are cited as run instructions in the atlas. |
 | 73 | low | **MAINTAINER** | Brief posted, open | A SHA-256 of the masked buffer is verdict-IDENTICAL to the current pixel compare, so conversion is clean if ruled inside rule 7. Record it either way. |
-
-*(remaining rows appended as they are ruled)*
 
 ## Issues opened by this pass
 
 | # | Why |
 |---|---|
 | [#75](https://github.com/DefinitelyFrenchName/VampireSaved/issues/75) | REVEALED by the #14 fix: the merged build fails its own gfx verification for Huitzil, and has since merged6. Not caused by the fix — exposed by it. |
+
+## Tally
+
+73 issues ruled. **32 closed** (30 fixed, 1 invalid, 1 stale), **41 open** with
+a posted ruling: 9 awaiting a maintainer decision, the rest deferred with a
+named blocker — almost all of them "the fix is on the shipped-byte path and
+needs the rebuild rule 6 reserves for the legacy re-freeze".
+
+**Severity moved on 24 of them.** One rose (#44, medium → high: the proposer
+and the checkers disagree three ways and §4 v4 states a property the
+implementation does not have). The rest fell, mostly because a defect that is
+real but unreachable, or whose consequence is already netted downstream, is not
+the same as one that has produced a wrong number.
+
+**Nine fixes are NOT what the issue asked for**, because the filed remedy was
+measured to be wrong or worse: #2 (would manufacture false REDs), #6 (would
+fail by design), #8 (`--full` is rompath-dependent), #17 (would need a fourth
+override), #22 (would red every build), #29 (would abort the battery), #33
+(partial-frame coverage is worse than none), #36 (fails open on its own
+scenario), #64 (downgrades a caught crash to a silent skip).
+
+**One new defect was revealed** by a fix: #75.
 
 ## What this pass changed about how the harness is tested
 
