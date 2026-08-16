@@ -63,6 +63,14 @@ for that exact case.
 | `pyron26` + Pyron, `don_m7` + Donovan | `END 40620` clean |
 | `m3b_merged8` + Pyron, + Donovan | `END 40620` clean |
 
+> **"HUITZIL-ONLY" IS RETRACTED (14z-93, later the same session).** Those
+> clean legs are a TIMING accident, not tenant immunity. Under a sparse
+> probe at the writer `0x05ffb6` (3 hits), **Pyron crashes identically** —
+> f15076 write, CRASH 15079 at the same `0x1afb6` — and Donovan crashes at
+> `0x1850e`. The defect is a RACE marginal enough that a breakpoint firing
+> three times flips the outcome. See #92; the KNOWN-OPEN rows on
+> huitzil-m15 and merged-m1 are corrected to say "all tenants".
+
 Both PCs are the planted tripwire for the SAME target, per each build's own
 fragment: `ILLEGAL TRIPWIRE for unresolved 0x494de`.
 

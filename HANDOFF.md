@@ -213,9 +213,11 @@ stubs; the whole batch PROFILE-GATED — the stock twin is bit-identical
 6c93cfa8, measured). **KNOWN-OPEN on `merged-m1` (14z-93, GitHub #91/#92): it carries a
 REACHABLE planted ILLEGAL.** `tests/audit_tripwire_reach.sh` measures
 `CRASH 8887 vec4 PC 456930` — the tripwire for unresolved vs2 `0x494de` —
-on the 40,620-frame arcade marathon with Huitzil forced. Deterministic and
-HUITZIL-ONLY (the Pyron and Donovan legs run `END 40620` clean on the same
-build). The reconciliation row that resolves it is COMMITTED but this
+on the 40,620-frame arcade marathon with Huitzil forced. Deterministic.
+**NOT Huitzil-only — retracted 14z-93:** the Pyron and Donovan legs' clean
+`END 40620` is a TIMING accident, and under a sparse probe Pyron crashes
+identically (#92). It is a RACE, which is why three clean playtest matches
+prove nothing. The reconciliation row that resolves it is COMMITTED but this
 fingerprint predates it; resolving it exposes a second crash (#92), so the
 re-freeze waits for #92 rather than shipping twice. **`run_suite` does not
 see this** — no suite replay is long enough, which is why the artifact was

@@ -189,10 +189,11 @@ decision, not by neglect.
 
 
 - **#91 — A PLANTED ILLEGAL IS REACHABLE ON `merged-m1`. RULE 6: this is
-  the only forward task until it is green.** Deterministic, reproduced,
-  HUITZIL-ONLY: `hui41` CRASH 14767 and `m3b_merged8` CRASH 8887, both the
-  tripwire for **unresolved vs2 `0x494de`**; Pyron and Donovan legs run
-  `END 40620` clean on both builds. Rig: `26_don_arcade_mash` (40,620-frame
+  the only forward task until it is green.** Deterministic and reproduced:
+  `hui41` CRASH 14767 and `m3b_merged8` CRASH 8887, both the tripwire for
+  **unresolved vs2 `0x494de`**. **NOT Huitzil-only** — that was retracted
+  14z-93: Pyron and Donovan's clean `END 40620` legs are a TIMING accident,
+  and under a sparse probe Pyron crashes identically (#92). It is a RACE. Rig: `26_don_arcade_mash` (40,620-frame
   arcade marathon) with the forced pick — the suite's tenant rigs are too
   short to reach it and that replay picks a legacy character on its own,
   which is why this was invisible.
