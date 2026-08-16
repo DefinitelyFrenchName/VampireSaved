@@ -1,0 +1,16 @@
+== stage 1 build
+  ok: tenant is pyron id 0x11
+  ok: built (b45b4349)
+  ok: op invariant holds (7 ops: free space / variant rows)
+== stage 2 build
+  ok: tenant is pyron id 0x11
+  ok: built (1b225cf7)
+  ok: op invariant holds (25 ops: free space / variant rows)
+== stage 3 build
+  ok: tenant is pyron id 0x11
+  ok: built (a4cb113c)
+  ok: op invariant holds (34 ops: free space / variant rows)
+== stage 4 build
+  ok: tenant is pyron id 0x11
+  ok: built (a9c890a2)
+FAIL: ops outside free space + variant rows: [(108, 'code', '0x9438', 4), (109, 'code', '0x20312', 4), (112, 'code', '0x53f8', 4), (113, 'code', '0x5412', 4), (114, 'code', '0x577e', 4), (115, 'code', '0x57aa', 4), (116, 'code', '0x590c', 4), (117, 'code', '0x5ebe', 4), (118, 'code', '0x943e', 4), (119, 'code', '0x9cac', 4), (120, 'code', '0x9f38', 4), (121, 'code', '0xa18a', 4), (122, 'code', '0xa806', 4), (123, 'code', '0xabce', 4), (124, 'code', '0x10dfc', 4), (125, 'code', '0x12a40', 4), (126, 'code', '0x12d18', 4), (127, 'code', '0x12e4e', 4), (128, 'code', '0x12e68', 4), (129, 'code', '0x20318', 4), (130, 'code', '0x2163a', 4), (131, 'code', '0x21adc', 4), (132, 'code', '0x21dec', 4), (153, 'code', '0x1a888', 6)]

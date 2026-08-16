@@ -1,0 +1,60 @@
+== 0. build identity ==
+  WIDE binary: /Users/koneko/.cache/vampire-saved/mame/cps2  sha1 a54b56ec0fbef74b4c648533baab23769119d18f
+  reference  : /Users/koneko/.cache/vampire-saved/mame-ref/cps2  sha1 53c3a79a23a62129ac9de833a92afac91b73c784
+  WIDE  full-set fingerprint: e75cba445a3c82be728400599d2dc1b7e07edd07
+  WIDE    gfx/qsnd  16 members    64.00 MB
+  WIDE    key        2 members     0.00 MB
+  WIDE    prg       22 members    10.25 MB
+  WIDE    z80        2 members     0.25 MB
+  WIDE    zips: vsavjw.zip, vsav.zip
+  stock full-set fingerprint: c0a5beed30e269e5dcb3982a59e6c88e1c7c10f5
+  stock   gfx/qsnd  10 members    40.00 MB
+  stock   key        2 members     0.00 MB
+  stock   prg       16 members     8.00 MB
+  stock   z80        2 members     0.25 MB
+  stock   zips: vsavj.zip, vsav.zip
+== 1. emulator superset invariant (stock vsavj: reference vs WIDE binary) ==
+  both binaries report '0.288 (unknown)' — same pinned revision
+  ok: 01_attract_long bit-identical (RAM + framebuffer)
+  ok: 02_demitri_vs_cpu bit-identical (RAM + framebuffer)
+  ok: 03_two_player_vs bit-identical (RAM + framebuffer)
+  ok: 04_select_fuzz bit-identical (RAM + framebuffer)
+  ok: 05_timeout_idle bit-identical (RAM + framebuffer)
+  ok: 06_test_mode bit-identical (RAM + framebuffer)
+  ok: 07_mash_storm bit-identical (RAM + framebuffer)
+  ok: 08_challenger_join bit-identical (RAM + framebuffer)
+  ok: 09_mirror_pick bit-identical (RAM + framebuffer)
+  ok: 10_midattract_start bit-identical (RAM + framebuffer)
+  ok: 29_felicia_walljump bit-identical (RAM + framebuffer)
+  ok: 30_demitri_throw bit-identical (RAM + framebuffer)
+== 2. profile inertness (WIDE set vs stock set, same binary) ==
+  ok: 01_attract_long bit-identical on the grown regions (RAM + framebuffer)
+  ok: 02_demitri_vs_cpu bit-identical on the grown regions (RAM + framebuffer)
+  ok: 03_two_player_vs bit-identical on the grown regions (RAM + framebuffer)
+  ok: 04_select_fuzz bit-identical on the grown regions (RAM + framebuffer)
+  ok: 05_timeout_idle bit-identical on the grown regions (RAM + framebuffer)
+  ok: 06_test_mode bit-identical on the grown regions (RAM + framebuffer)
+  ok: 07_mash_storm bit-identical on the grown regions (RAM + framebuffer)
+  ok: 08_challenger_join bit-identical on the grown regions (RAM + framebuffer)
+  ok: 09_mirror_pick bit-identical on the grown regions (RAM + framebuffer)
+  ok: 10_midattract_start bit-identical on the grown regions (RAM + framebuffer)
+  ok: 29_felicia_walljump bit-identical on the grown regions (RAM + framebuffer)
+  ok: 30_demitri_throw bit-identical on the grown regions (RAM + framebuffer)
+== 3. B4 canary: sprites served from the appended gfx banks ==
+  ok: 01_attract_long identical with sprites fetched from banks 4/5
+  ok: 02_demitri_vs_cpu identical with sprites fetched from banks 4/5
+  ok: 03_two_player_vs identical with sprites fetched from banks 4/5
+  ok: 04_select_fuzz identical with sprites fetched from banks 4/5
+  ok: 05_timeout_idle identical with sprites fetched from banks 4/5
+  ok: 06_test_mode identical with sprites fetched from banks 4/5
+  ok: 07_mash_storm identical with sprites fetched from banks 4/5
+  ok: 08_challenger_join identical with sprites fetched from banks 4/5
+  ok: 09_mirror_pick identical with sprites fetched from banks 4/5
+  ok: 10_midattract_start identical with sprites fetched from banks 4/5
+  ok: 29_felicia_walljump identical with sprites fetched from banks 4/5
+  ok: 30_demitri_throw identical with sprites fetched from banks 4/5
+
+PASS: CPS-2 WIDE profile gate (MAME) — emulator superset invariant +
+      inertness, work RAM AND framebuffer, over 12 replays, plus the
+      B4 canary: the 19-bit path REACHES the appended banks here too.
+MAME-WIDE-EXIT 0

@@ -1,0 +1,72 @@
+source set /Users/koneko/Developer/Vampire_Saved/ROMS/vsav2.zip:
+  vsav2.zip/vs2j.03  sha1 a52f40618d7f12f1df5862ad8e15fea60bef22a2
+  vsav2.zip/vs2j.04  sha1 bf5c2e4339e1a66b3c819900cc9b723a537adf6b
+  vsav2.zip/vs2j.05  sha1 4d5625a9a06926c1a42c8f6e3a4c943f17750ec2
+  vsav2.zip/vs2j.06  sha1 d8c1040a6ee6b9fc677a6a32b99bf02b6a707812
+  vsav2.zip/vs2j.07  sha1 69dac07e1f483b6478f792d20a137d6a081fbea3
+  vsav2.zip/vs2j.08  sha1 de1184ab771c6f075cdefa744a28b09f78d91643
+  vsav2.zip/vs2j.09  sha1 0e9dd54e401e6d7c4fe81107ffd27e42ca810fcb
+  vsav2.zip/vs2j.10  sha1 bf0416df66a33c7a4678ab4a047de334dfd3b31e
+oracle set /Users/koneko/Developer/Vampire_Saved/ROMS/vhunt2.zip:
+  vhunt2.zip/vh2j.03a  sha1 f4e3a1b6ae823737d3b18561469f206921b48587
+  vhunt2.zip/vh2j.04a  sha1 78c53f8e984b00245486b751515248879df77437
+  vhunt2.zip/vh2j.05  sha1 60bbbd1765e76839b01c38765da2368c5188ec61
+  vhunt2.zip/vh2j.06  sha1 4f3b37004db8a3d3dde709b51c94c392615134b5
+  vhunt2.zip/vh2j.07  sha1 de4299197600608e83fe50775e3f352f5add844d
+  vhunt2.zip/vh2j.08  sha1 ad9a085b8403801035683b6f63eee33daf4e97ae
+  vhunt2.zip/vh2j.09  sha1 d842a824f0d0adc13a86f780084164c1273c45a4
+  vhunt2.zip/vh2j.10  sha1 2966b80b99ab065614a6ddb546110f482b998e32
+shifts (vsav2->vhunt2): code=+0x36, bank=-0x76e, anim=-0x13b74
+  code: sibling-insertion boundary at +0x27c0 — 6 source-only bytes, next group starts 0x57456 (delta +0x30)
+  code: 2 dead filler zone(s), 0x40 bytes (+0x13d4, +0x180c)
+  x057456: 1 dead filler zone(s), 0xc bytes (+0x29e)
+  code shift group x057456: 1 dispatch targets, local shift +0x30
+extra region x0d143e: DATA (segmented oracle), twin 0x0D0CD0, len 0x900, 0 pointer fields, 1 segments, 0 dead zones (0x0 bytes unaligned)
+extra region x05c800: twin 0x05C834 (shift +0x34), len 0x6A00
+extra region x026142: twin 0x026170 (shift +0x2e), len 0x1400
+extra region x028122: twin 0x028150 (shift +0x2e), len 0xE00
+extra region x088512: SOURCE-ONLY, len 0x3B40 (per-game hook; scanner refs)
+region hitbox: vsav2 0x0C4250+0x32B2 (data, shift bank)
+region hitbox_proj: vsav2 0x0D05C0+0x3C6 (data, shift bank)
+region anim: vsav2 0x245872+0xC900 (data, shift anim)
+region code: vsav2 0x054C90+0x27C6 (code, shift code)
+region x057456: vsav2 0x057456+0x5200 (code, shift x057456)
+region x0d143e: vsav2 0x0D143E+0x900 (data, shift x0d143e)
+region x05c800: vsav2 0x05C800+0x6A00 (code, shift x05c800)
+region x026142: vsav2 0x026142+0x1400 (code, shift x026142)
+region x028122: vsav2 0x028122+0xE00 (code, shift x028122)
+region x088512: vsav2 0x088512+0x3B40 (code, shift x088512)
+  anim: grown to +0x1E800 to close 2479 forward refs
+  DISCOVERED shift aux0 (-0x2002c): 3000 referencing fields, 2 cluster regions
+  hitbox: 0 pointer fields, 4 variant-site bytes (0.03%)
+  hitbox_proj: 0 pointer fields, 0 variant-site bytes (0.00%)
+  anim: 4151 pointer fields, 0 variant-site bytes (0.00%)
+  code: 416 pointer fields, 0 variant-site bytes (0.00%)
+  code: non-internal refs {'engine': 171, 'pcrel16': 7, 'code_neighbor': 1}
+  x057456: 754 pointer fields, 3 variant-site bytes (0.01%)
+  x057456: non-internal refs {'engine': 304, 'bank_ref': 6, 'code_neighbor': 17}
+  x0d143e: 0 pointer fields, 0 variant-site bytes (0.00%)
+  x05c800: 696 pointer fields, 0 variant-site bytes (0.00%)
+  x05c800: non-internal refs {'bank_ref': 4, 'engine': 579, 'code_neighbor': 2}
+  x026142: 40 pointer fields, 0 variant-site bytes (0.00%)
+  x026142: non-internal refs {'engine': 10, 'bank_ref': 30}
+  x028122: 44 pointer fields, 0 variant-site bytes (0.00%)
+  x028122: non-internal refs {'engine': 33, 'bank_ref': 6}
+  x088512: 0 pointer fields, 0 variant-site bytes (0.00%)
+  aux0_0: 0 pointer fields, 0 variant-site bytes (0.00%)
+  aux0_1: 0 pointer fields, 0 variant-site bytes (0.00%)
+  code: 2 same-value engine refs merged from the scanner (sibling-coincident operands)
+  x057456: 1 same-value engine refs merged from the scanner (sibling-coincident operands)
+  x057456: 1 char-id 0x10 immediates (rewritten to the dst slot at generation)
+  x05c800: 27 same-value engine refs merged from the scanner (sibling-coincident operands)
+  x05c800: 1 char-id 0x10 immediates (rewritten to the dst slot at generation)
+  x026142: 4 same-value engine refs merged from the scanner (sibling-coincident operands)
+  x026142: 3 char-id 0x10 immediates (rewritten to the dst slot at generation)
+  x028122: 2 same-value engine refs merged from the scanner (sibling-coincident operands)
+  x028122: 5 char-id 0x10 immediates (rewritten to the dst slot at generation)
+  x088512: 333 scanner-derived refs (source-only region); bare longs: 0 sibling-confirmed, 29 vetoed (operand bytes), 1 rejected (conflicting evidence), 11 rejected (divergent zone, unlabeled)
+  code: 22 oracle fields not labeled by the operand scanner (small-delta/PC-rel or unusual encoding) — first +0x9B
+  code scan: 1153 candidates, 1151 engine/ROM refs (R1 surface), 0 char-id 0x10 immediates
+
+values: 23 rows; engine dispatch entries: 1; auto tables: 21 (0 UNRESOLVED)
+EXTRACTION OK (oracle-validated)

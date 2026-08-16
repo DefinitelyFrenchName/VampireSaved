@@ -1,0 +1,116 @@
+== B: build the merged image (LEGACY-ONLY INSTRUMENT — never playtest,
+      never register; tenants render BLANK by design) ==
+  ok: 596 ops (the frozen test_tenant_loop fixture — same merge)
+  rompath  build/merged1/rompath
+  romdir   /Users/koneko/Developer/Vampire_Saved/ROMS
+  members  19 in 1 zips
+  patched  4: vm3j.03d, vm3j.04d, vm3j.07b, vm3j.10b
+  note: byte-identical members (harmless — shadow nothing): vsavjw.zip:vsw.21m, vsavjw.zip:vsw.22m, vsavjw.zip:vsw.31m, vsavjw.zip:vsw.33m, vsavjw.zip:vsw.35m, vsavjw.zip:vsw.37m
+  note: byte-identical members (harmless — shadow nothing): vsavjw.zip:vsw.43, vsavjw.zip:vsw.44
+PASS: no member shadows a patched member
+  ok: built and packed (596 ops); fingerprint 8a77c049de83918fcdfa46015e7fd0e208844222 (unregistered ON PURPOSE)
+  note: F2 confirmed statically — Huitzil char-init dispatches to
+        0x403b70, BYPASSING the shim (0xcbf80): no pool seed, no
+        phase gate, no flavor write for him on a merged build
+== 0: the rig FORMS all three tenants' matches (else every verdict
+      below is vacuous). Guarded runs — never checksum-compared. ==
+  ok: donovan char-init entry (0xcbf80) executed 2 time(s)
+  ok: huitzil char-init entry (0x403b70) executed 2 time(s)
+  ok: pyron char-init entry (0x45f504) executed 2 time(s)
+== 0b: run-to-run determinism on the merged image (never run before) ==
+  ok: two masked runs of 03_two_player_vs bit-identical
+== 1 (leg a): merged vs VANILLA on the masked-v2 basis — the superset
+      question. Expectation: donovan-m3a's ratified classes VERBATIM. ==
+01_attract_long          PASS exact (bit-identical)
+02_demitri_vs_cpu        PASS window (divergent frames 787, runs 1, window 889..1675, 3845 identical after)
+03_two_player_vs         PASS composite (divergent frames 985 in 3 run(s): flicker 829,2093, windows 889-1871, 3227 identical after)
+04_select_fuzz           FAIL composite: divergent frames 220 in 5 run(s): flicker 1525,2005,2009,2195, windows 889-1104, 1325 identical after  FAIL:   flicker frames [1525, 2005, 2009, 2195], frozen expectation [1525, 2009, 2195] 
+        MEASURED, NOT RATIFIED — mechanism-attribute before touching
+        the expectation (CLAUDE.md §4). Measured shape:
+        A: /Users/koneko/Developer/Vampire_Saved/VampireSaved/tests/expected/vsavj/masked-v2/logs/04_select_fuzz.log  3520 frames, END 3520
+        B: /var/folders/m7/v33ds745313314_cz_z2jghw0000gn/T/tmp.Qv8T7lVAVJ/a_04_select_fuzz.log  3520 frames, END 3520
+          divergent frames: 220 of 3520
+          window: 889..2195 (re-converges, 1325 clean frames after)
+        VERDICT: TRANSIENT — real state differed (not a clean phase shift).
+          5 contiguous run(s): 889-1104, 1525-1525, 2005-2005, 2009-2009, 2195-2195
+        shape: 220/3520 frames differ in 5 run(s), first at frame 889, last ends frame 2195, then 1325 identical
+        runs: 889-1104 1525-1525 2005-2005 2009-2009 2195-2195
+        proposed: composite vsavj/masked-v2 1525,2005,2009,2195 889-1104
+        log kept: build/gate_failures/merged1_a_04_select_fuzz.log
+05_timeout_idle          PASS window (divergent frames 787, runs 1, window 889..1675, 10445 identical after)
+06_test_mode             PASS diverge (PASS (diverges from vsavj/masked-v2 at exactly 700))
+07_mash_storm            PASS window (divergent frames 787, runs 1, window 889..1675, 2645 identical after)
+08_challenger_join       PASS composite (divergent frames 1592 in 3 run(s): flicker 3507, windows 889-1675;3807-4610, 2310 identical after)
+09_mirror_pick           PASS composite (divergent frames 1064 in 2 run(s): flicker 829, windows 889-1951, 2769 identical after)
+10_midattract_start      PASS composite (divergent frames 2579 in 3 run(s): flicker 3007,3129, windows 3189-5765, 355 identical after)
+11_pick_donovan          PASS window (divergent frames 1527, runs 1, window 889..2415, 1305 identical after)
+16_xemu_2p               PASS composite (divergent frames 1204 in 2 run(s): flicker 829, windows 889-2091, 2229 identical after)
+29_felicia_walljump      PASS composite (divergent frames 1128 in 2 run(s): flicker 2436, windows 889-2015, 1884 identical after)
+30_demitri_throw         PASS window (divergent frames 1127, runs 1, window 889..2015, 2705 identical after)
+  -- leg (a) summary (replay | expected class | verdict) --
+     01_attract_long          exact      PASS
+     02_demitri_vs_cpu        window     PASS
+     03_two_player_vs         composite  PASS
+     04_select_fuzz           composite  FAIL
+     05_timeout_idle          window     PASS
+     06_test_mode             diverge    PASS
+     07_mash_storm            window     PASS
+     08_challenger_join       composite  PASS
+     09_mirror_pick           composite  PASS
+     10_midattract_start      composite  PASS
+     11_pick_donovan          window     PASS
+     16_xemu_2p               composite  PASS
+     29_felicia_walljump      composite  PASS
+     30_demitri_throw         window     PASS
+== 2 (leg b): merged vs the frozen single-tenant builds on TENANT
+      content — does MERGING change what each tenant's build did?
+      Whole-RAM identity is NOT expected (placements differ and placed
+      addresses are cached into RAM pointers; the select screens also
+      legitimately differ — single-tenant builds back one medallion,
+      merged backs three). Gate: a clean guarded run, a first
+      divergence no earlier than frame 850 (boot/attract must be
+      unperturbed), and a NON-identical pair (identical = dead rig). ==
+donovan/12_vs_cpu            FAIL: guard tripped on the MERGED build:
+CRASH 2886 vec4 PC 4abf00 SP 00ff7ff0 ADDR -
+REGS D0=00000000 D1=ffffb800 D2=00000050 D3=00000000 D4=0000ffff D5=0000ffff D6=0000ffff D7=000002f2 A0=004abf10 A1=ffff8800 A2=0070815c A3=0018c204 A4=ffff8800 A5=00ff8000 A6=00ffba00
+        log kept: build/gate_failures/merged1_b_12_donovan_vs_cpu.log
+donovan/20_round2            ok: guard clean; vs build/m5_wide:
+        A: /var/folders/m7/v33ds745313314_cz_z2jghw0000gn/T/tmp.Qv8T7lVAVJ/b_20_don_round2_ref.log  12120 frames, END 12120
+        B: /var/folders/m7/v33ds745313314_cz_z2jghw0000gn/T/tmp.Qv8T7lVAVJ/b_20_don_round2_new.log  12120 frames, END 12120
+          divergent frames: 9030 of 12120
+          window: 890..11556 (re-converges, 564 clean frames after)
+        VERDICT: TRANSIENT — real state differed (not a clean phase shift).
+          388 contiguous run(s): 890-890, 896-928, 935-936, 942-942, 947-954, 956-958, 961-961, 963-963, 965-965, 967-1033 ...
+        (classified REPORT for the maintainer, not a gate — see header)
+huitzil/70_mash              ok: guard clean; vs build/hui29:
+        A: /var/folders/m7/v33ds745313314_cz_z2jghw0000gn/T/tmp.Qv8T7lVAVJ/b_70_hui_mash_ref.log  11017 frames, END 11017
+        B: /var/folders/m7/v33ds745313314_cz_z2jghw0000gn/T/tmp.Qv8T7lVAVJ/b_70_hui_mash_new.log  11017 frames, END 11017
+          divergent frames: 10018 of 11017
+          window: 890..11017 (runs to the end)
+        VERDICT: PERMANENT — real state differed (not a clean phase shift).
+          93 contiguous run(s): 890-891, 893-893, 895-904, 906-911, 913-915, 917-917, 919-920, 922-923, 925-953, 955-961 ...
+        (classified REPORT for the maintainer, not a gate — see header)
+huitzil/83_fx                ok: guard clean; vs build/hui29:
+        A: /var/folders/m7/v33ds745313314_cz_z2jghw0000gn/T/tmp.Qv8T7lVAVJ/b_83_hui_fx_ref.log  3820 frames, END 3820
+        B: /var/folders/m7/v33ds745313314_cz_z2jghw0000gn/T/tmp.Qv8T7lVAVJ/b_83_hui_fx_new.log  3820 frames, END 3820
+          divergent frames: 2861 of 3820
+          window: 890..3820 (runs to the end)
+        VERDICT: PERMANENT — real state differed (not a clean phase shift).
+          61 contiguous run(s): 890-891, 893-893, 895-904, 906-911, 913-915, 917-917, 919-920, 922-923, 925-953, 955-961 ...
+        (classified REPORT for the maintainer, not a gate — see header)
+pyron/70_mash                FAIL: guard tripped on the MERGED build:
+CRASH 7997 vec3 PC 01ab10 SP 00ff7fe8 ADDR 00ff31b5
+REGS D0=0000004e D1=0000035e D2=001004c0 D3=000000ff D4=00000076 D5=00000007 D6=04240001 D7=00000001 A0=00ff310c A1=ffff9500 A2=000b6f72 A3=0049bb8a A4=00ff310a A5=00ff8000 A6=ffff95fc
+        log kept: build/gate_failures/merged1_b_70_pyron_mash.log
+pyron/72_cosmo_2p            ok: guard clean; vs build/pyron20:
+        A: /var/folders/m7/v33ds745313314_cz_z2jghw0000gn/T/tmp.Qv8T7lVAVJ/b_72_pyron_cosmo_2p_ref.log  5120 frames, END 5120
+        B: /var/folders/m7/v33ds745313314_cz_z2jghw0000gn/T/tmp.Qv8T7lVAVJ/b_72_pyron_cosmo_2p_new.log  5120 frames, END 5120
+          divergent frames: 4083 of 5120
+          window: 890..5120 (runs to the end)
+        VERDICT: PERMANENT — real state differed (not a clean phase shift).
+          80 contiguous run(s): 890-891, 893-893, 895-929, 931-942, 944-945, 947-948, 950-958, 961-961, 963-963, 965-965 ...
+        (classified REPORT for the maintainer, not a gate — see header)
+
+FAIL: merged-legacy audit — read the per-replay verdicts above.
+      A leg-(a) deviation is MEASURED, NOT RATIFIED (CLAUDE.md §4);
+      a PERMANENT class there halts forward work (§2.6).

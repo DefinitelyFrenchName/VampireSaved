@@ -1,0 +1,19 @@
+== rig: 26_don_arcade_mash (forced pick, frozen builds) ==
+  FAIL: hui41_10 — CRASH 14767 vec4 PC 0fb6e0 SP 00ff7ff0 ADDR -
+        code   0x0fb6e0 ILLEGAL  TRIPWIRE for unresolved 0x494de
+        => an UNRECONCILED reference is reachable in play.
+           Resolve it (a reconciliation row) — do not widen
+           anything and do not remove the tripwire.
+  ok: pyron26_11 — END 40620
+  ok: don_m7_13 — END 40620
+  FAIL: m3b_merged8_10 — CRASH 8887 vec4 PC 456930 SP 00ff7ff0 ADDR -
+        code   0x456930 ILLEGAL  TRIPWIRE for unresolved 0x494de
+        => an UNRECONCILED reference is reachable in play.
+           Resolve it (a reconciliation row) — do not widen
+           anything and do not remove the tripwire.
+  ok: m3b_merged8_11 — END 40620
+  ok: m3b_merged8_13 — END 40620
+
+FAIL: a planted tripwire is REACHABLE on a shipping build.
+      Rule 6 — fixing this is the only task until green.
+EXIT=1

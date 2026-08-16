@@ -1,0 +1,5 @@
+73 sounding windows; 0 suspects
+  ok: verdict control fired (synthetic truncation -> suspect)
+PASS: ear-level voice A/B — per-window energy/spectral profile
+      matches native for every sounding pair
+MWAV3-EXIT 0

@@ -1,0 +1,38 @@
+== 0: the instrument's own ground truth ==
+  ok: two 1-tenant runs agree byte-for-byte (243 ops)
+== 1: one tenant per run — the frozen op counts ==
+  ok: donovan 243 ops
+  ok: huitzil 267 ops
+  ok: pyron 208 ops
+== 2: N tenants — the loop iterates and shared rows emit once ==
+  ok: 2 tenants 491 ops (of 510 declared — 19 shared rows deduped)
+  ok: 3 tenants 678 ops (of 718 declared — 40 shared rows deduped)
+== 3: each tenant's regions and side files are really there ==
+  ok: 3 tenants' regions placed at distinct addresses, per-tenant side files, tenants.json in declaration order
+== 4: shared region-scoped rows applied to every tenant's copy ==
+  ok: 36 shared-row sites patched across the three tenants' own copies of x05c800/x088512
+== 4b: the obj_hook union resolves each tenant's own handlers ==
+  ok: 17/17 ported extras placed; 59/61/62/63 donovan-only TAG STUBS, 60 his direct pointer, 64-75 H/P TAG STUBS, every compare routed into its owner's copy with a tripwire fall-through (14z-85/85c); 121-123 still tripwired
+== 4c: slot-table rows per tenant; agreeing duplicates dropped ==
+  ok: 6 slot entries at 3 distinct tenant slots; 4 agreeing duplicate ops dropped
+== 4d: the N-way chains at the shared engine sites ==
+  ok: both shared sites carry ONE 3-way chain, ids 0x13/0x10/0x11 in declaration order, each element with its own data pointer
+== 5: the merged patch has no op collisions AND patch_prg applies it ==
+  ok: 678 ops, no two writing one byte
+  ok: patch_prg applied the 3-tenant patch (12 members written)
+== 6: verdict controls ==
+  ok: a one-iteration loop collapses 590 -> 211 ops —
+      section 2 is measuring the ITERATION, not the manifest
+  ok: a shared side-file name is a NAMED build error, not a clobber
+  ok: the iteration-0 rule leaves huitzil's shared region
+      UNPATCHED — section 4 is measuring the real defect
+  ok: the union forced onto iteration 0 drops to 5/17 placed —
+      section 4b is measuring the real defect
+  ok: without the multi-site chain the thunks collide again and no
+      chain is emitted — sections 4d and 5 both measure it
+PASS: tenant loop gate — N=1 inert for all three tenants; the loop
+      iterates with shared rows emitted once; each tenant's content
+      present; shared region rows reach every copy; the engine union
+      and the N-way chains resolve every tenant; the merged 3-tenant
+      patch has ZERO op collisions and patch_prg applies it; 5
+      verdict controls. (The PROGRAM half only — see the header.)

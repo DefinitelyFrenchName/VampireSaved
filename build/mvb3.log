@@ -1,0 +1,6 @@
+whole-run signatures: ours 78 distinct / native 77 distinct
+suppressed-track echoes (content in vs2 library): 1
+foreign (ours-only): 0  missing (native-only): 0  count-drift>2: 0
+  ok: verdict control fired (corrupted sample -> foreign)
+PASS: voice-batch keyon A/B — every native signature keyed by ours,
+      nothing foreign to vs2's library, counts within tolerance

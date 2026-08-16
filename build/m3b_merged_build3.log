@@ -1,0 +1,59 @@
+== 1: merged program image (3 tenants, one generator process) ==
+  ok: 597 ops (the frozen test_tenant_loop fixture)
+== 2: gfx chain — one link per tenant over the prior link ==
+  -- link donovan
+     wrote gfx_written.json (16036 group-C + 270 group-A entries)
+     wrote remap_spec.json: {'delta': 10064, 'band_lo': 34367, 'band_hi': 49903, 'dst_bank_word': 4096, 'src_bank_word': 24576, 'placed': [44431, 59967]}
+  extra tiles: +569, inventory 15034 -> 15603
+  -- link huitzil
+     wrote gfx_written.json (37877 group-C + 276 group-A entries)
+     wrote remap_spec.json: {'delta': 0, 'band_lo': 2806, 'band_hi': 20220, 'dst_bank_word': 4096, 'src_bank_word': 24576, 'placed': [87, 20220]}
+  -- link pyron
+     wrote gfx_written.json (52347 group-C + 282 group-A entries)
+     wrote remap_spec.json: {'delta': 0, 'band_lo': 20181, 'band_hi': 34375, 'dst_bank_word': 4096, 'src_bank_word': 24576, 'placed': [63, 42028]}
+== 3: pack (program + LAST link's members) ==
+  ok: group-A members + group-C simms from the last link (build/m3b_merged/gfx_pyron)
+  ok: group B pristine in the packed vsav.zip
+  rompath  build/m3b_merged/rompath
+  romdir   /Users/koneko/Developer/Vampire_Saved/ROMS
+  members  40 in 2 zips
+  patched  8: vm3.13m, vm3.15m, vm3.17m, vm3.19m, vm3j.03d, vm3j.04d, vm3j.07b, vm3j.10b
+  note: byte-identical members (harmless — shadow nothing): vsavjw.zip:vsw.21m, vsavjw.zip:vsw.22m
+  note: byte-identical members (harmless — shadow nothing): vsavjw.zip:vsw.43, vsavjw.zip:vsw.44
+PASS: no member shadows a patched member
+== 4: per-tenant static verification ==
+  -- verify_gfx_build --tenant donovan
+       ok: record parity (1160 records, 14764 entries)
+       ok: no tile codes on protected positions (358 protected)
+       ok: all 15612 tile codes within [0xAD8F,0xEE73]
+       ok: placed bank table row 0x13 = 0x1000
+     PASS: gfx build output verification
+  -- check_tenant_hud --tenant donovan
+     TABLES aliased
+     POKES 3
+     ART mugshot@0xbe90 name@0xbe8c nonblank 7; host cells pristine
+     OK
+  -- verify_gfx_build --tenant huitzil
+       ok: record parity (1374 records, 14911 entries)
+       ok: no tile codes on protected positions (358 protected)
+       ok: all 15034 tile codes within [0x0057,0x4EFC]
+       ok: placed bank table row 0x10 = 0x1000
+     PASS: gfx build output verification
+  -- check_tenant_hud --tenant huitzil
+     TABLES aliased
+     POKES 3
+     ART mugshot@0xbe9a name@0xbe92 nonblank 6; host cells pristine
+     OK
+  -- verify_gfx_build --tenant pyron
+       ok: record parity (745 records, 14992 entries)
+       ok: no tile codes on protected positions (358 protected)
+       ok: all 14224 tile codes within [0x003F,0xA42C]
+       ok: placed bank table row 0x11 = 0x1000
+     PASS: gfx build output verification
+  -- check_tenant_hud --tenant pyron
+     TABLES aliased
+     POKES 3
+     ART mugshot@0xbe9c name@0xbe94 nonblank 6; host cells pristine
+     OK
+build fingerprint: 3cf7541a88b358d6690e85aaf556c50c5289acf7
+OK: merged build with gfx at build/m3b_merged/rompath (register at S6 freeze time)

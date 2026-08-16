@@ -1,0 +1,27 @@
+== build build/don_m7 -> expectation set donovan-m7; mask 043c-043d,4182-41a2,41c2-41e2,4222-4262,7f00-8000
+== leg A on the PATCHED binary (composition: test_wide_profile.sh)
+  phase: 01_attract_long f4026 — 3 byte(s) differ, all in the FROZEN inventory of the ratified FBNeo phase classes: +0x055b,+0x055c,+0x055d
+  phase: 01_attract_long f6734 — 3 byte(s) differ, all in the FROZEN inventory of the ratified FBNeo phase classes: +0x055b,+0x055c,+0x055d
+  ok: 01_attract_long — 5 sampled frames compared, 2 with a ratified FBNeo phase deviation (frames 1098, 2562, 4026, 5490, 6734)
+  ok: 06_test_mode — 5 sampled frames compared (frames 468, 1092, 1716, 2340, 2870)
+  phase: 21_don_mash f2118 — 3 byte(s) differ, all in the FROZEN inventory of the ratified FBNeo phase classes: +0x06db,+0x06dc,+0x06dd
+  phase: 21_don_mash f4942 — 1 byte(s) differ, all in the FROZEN inventory of the ratified FBNeo phase classes: +0x06d1
+  ok: 21_don_mash — 5 sampled frames compared, 2 with a ratified FBNeo phase deviation (frames 2118, 4942, 7766, 10590, 12990)
+  phase: 26_don_arcade_mash f6093 — 3 byte(s) differ, all in the FROZEN inventory of the ratified FBNeo phase classes: +0x06d4,+0x06d5,+0x06dd
+  phase: 26_don_arcade_mash f14217 — 3 byte(s) differ, all in the FROZEN inventory of the ratified FBNeo phase classes: +0x06d4,+0x06d5,+0x06d9
+  ok: 26_don_arcade_mash — 5 sampled frames compared, 2 with a ratified FBNeo phase deviation (frames 6093, 14217, 22341, 30465, 37370)
+== verdict controls on the comparator ==
+  control: byte outside the mask (+0x8000) CAUGHT: True
+  control: byte inside the mask (+0x043c) ignored: True
+  control: identical buffers report no difference: True
+PASS: FBNeo legacy oracle (partial) — every sampled frame is either
+      masked-identical to vanilla under FBNeo, or differs ONLY inside
+      the attributed sound-driver work area ($FF0500-$FF05FF, which
+      docs/game/atlas/ram.md:74 already records as emulator-phase
+      sensitive). Any byte outside that window FAILS. Lines marked
+      'phase:' lines are the RATIFIED FBNeo-only phase classes
+      (maintainer 2026-08-16, GitHub #78): the sound-driver work area
+      $FF0500-$FF05FF and the OBJ-builder secondary stack
+      $FF06D0-$FF06EF, each bounded by a FROZEN offset inventory —
+      a byte inside a window but outside the inventory FAILS as
+      GROWTH. Set FBNEO_ORACLE_EXPECT=exact to require bit-identity.

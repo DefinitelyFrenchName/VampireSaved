@@ -1,0 +1,52 @@
+MAME source: 27a8d9e8 (tag mame0288, verified)
+CPS-2 WIDE profile patch applied (verified in the mirror)
+Clang 21.0.0 detected
+scripts.c
+Linking genie
+Building configurations...
+Running action 'gmake'...
+Generating "build/projects/sdl3/mamecps2/gmake-osx-clang/Makefile"
+Generating "build/projects/sdl3/mamecps2/gmake-osx-clang/qtdbg_sdl3.make"
+Generating "build/projects/sdl3/mamecps2/gmake-osx-clang/osd_sdl3.make"
+Generating "build/projects/sdl3/mamecps2/gmake-osx-clang/ocore_sdl3.make"
+Generating "build/projects/sdl3/mamecps2/gmake-osx-clang/utils.make"
+Generating "build/projects/sdl3/mamecps2/gmake-osx-clang/formats.make"
+Generating "build/projects/sdl3/mamecps2/gmake-osx-clang/expat.make"
+Generating "build/projects/sdl3/mamecps2/gmake-osx-clang/zlib.make"
+Generating "build/projects/sdl3/mamecps2/gmake-osx-clang/zstd.make"
+Generating "build/projects/sdl3/mamecps2/gmake-osx-clang/softfloat3.make"
+Generating "build/projects/sdl3/mamecps2/gmake-osx-clang/jpeg.make"
+Generating "build/projects/sdl3/mamecps2/gmake-osx-clang/flac.make"
+Generating "build/projects/sdl3/mamecps2/gmake-osx-clang/7z.make"
+Generating "build/projects/sdl3/mamecps2/gmake-osx-clang/lua.make"
+Generating "build/projects/sdl3/mamecps2/gmake-osx-clang/lualibs.make"
+Generating "build/projects/sdl3/mamecps2/gmake-osx-clang/sqlite3.make"
+Generating "build/projects/sdl3/mamecps2/gmake-osx-clang/portmidi.make"
+Generating "build/projects/sdl3/mamecps2/gmake-osx-clang/bx.make"
+Generating "build/projects/sdl3/mamecps2/gmake-osx-clang/bimg.make"
+Generating "build/projects/sdl3/mamecps2/gmake-osx-clang/bgfx.make"
+Generating "build/projects/sdl3/mamecps2/gmake-osx-clang/portaudio.make"
+Generating "build/projects/sdl3/mamecps2/gmake-osx-clang/linenoise.make"
+Generating "build/projects/sdl3/mamecps2/gmake-osx-clang/utf8proc.make"
+Generating "build/projects/sdl3/mamecps2/gmake-osx-clang/wdlfft.make"
+Generating "build/projects/sdl3/mamecps2/gmake-osx-clang/ymfm.make"
+Generating "build/projects/sdl3/mamecps2/gmake-osx-clang/asmjit.make"
+Generating "build/projects/sdl3/mamecps2/gmake-osx-clang/emu.make"
+Generating "build/projects/sdl3/mamecps2/gmake-osx-clang/precompile.make"
+Generating "build/projects/sdl3/mamecps2/gmake-osx-clang/optional.make"
+Generating "build/projects/sdl3/mamecps2/gmake-osx-clang/dasm.make"
+Generating "build/projects/sdl3/mamecps2/gmake-osx-clang/frontend.make"
+Generating "build/projects/sdl3/mamecps2/gmake-osx-clang/mame_cps2.make"
+Generating "build/projects/sdl3/mamecps2/gmake-osx-clang/cps2.make"
+Done. Generated 33/33 projects.
+Compiling src/mame/capcom/cps2.cpp...
+Compiling src/lib/formats/all.cpp...
+Archiving libformats.a...
+Archiving libmame_cps2.a...
+Building driver list...
+1 source file(s) found
+325 driver(s) found
+Compiling generated/mame/cps2/drivlist.cpp...
+Linking cps2...
+verified: binary carries the vsavjw driver
+built: /Users/koneko/.cache/vampire-saved/mame/cps2

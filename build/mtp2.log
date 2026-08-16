@@ -1,0 +1,5 @@
+  ok: native fires 0739/010b/073a per attempt; ours fires the
+      RESTORED ejection 00d8 (the 0739 slot, authored Z80 song)
+      + 010a + the RESTORED detonation chirp 0199
+  ok: verdict control — mutation fails as designed
+audit_trap_parity: PASS (restored ejection+detonation state holds)

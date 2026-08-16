@@ -1,0 +1,3 @@
+SNAP 0000 frame 5500
+SNAP 0001 frame 5700
+SNAPSUMMARY frames=5750 taken=2 wanted=2

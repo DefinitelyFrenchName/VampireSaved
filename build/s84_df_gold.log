@@ -1,0 +1,4 @@
+  gold block read from the build: 0x412300, 8 distinct rows
+  ok: bulleta — DF on, gold rows absent
+FAIL: phobos: DF on but NO palette row equals a gold row — the upload is dead
+FAIL: DF gold guard

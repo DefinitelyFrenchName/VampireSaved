@@ -1,0 +1,15 @@
+== 1: solo Donovan link == frozen build/m5_wide/gfx byte-for-byte ==
+  ok: 4/4 vsw members identical to the frozen build
+== 2: idempotence — the link chained over its own output is a no-op ==
+  ok: members and ledger identical (all writes were benign skips)
+== 3: Donovan -> Huitzil chains; relocated strip in the ledger ==
+  ok: H link cumulative (16036 D entries carried); strip at 0x86A0-0x87BF (288)
+== 4: Huitzil -> Pyron completes the FULL 3-tenant chain ==
+  ok: FULL CHAIN — P's members carry all three tenants (45737 bank-4 codes, 52347 total group-C entries)
+== 5: MUST-FAIL — the old-shift fixture reproduces the collision ==
+  ok: fixture P link failed loudly at a strip-range dst:
+     AssertionError: band: dst 0x05EA0 collides with DIFFERENT bytes (prior vs2A:0x14EA0, new vs2B:0x15EA0) — same-source-or-fail
+
+PASS: gfx chain mode — solo identical, idempotent, FULL 3-tenant
+      chain green since the S3 relocation, and the old-shift fixture
+      still fails loudly

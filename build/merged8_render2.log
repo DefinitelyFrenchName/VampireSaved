@@ -1,0 +1,18 @@
+== 0. every rompath loads on this emulator binary ==
+  FAIL: m3b_merged8 (build/m3b_merged8/rompath) is REFUSED by MAME
+        Almost always a build frozen before a WIDE profile
+        bump (v1.1 vsw.z01/z02, v1.2 vsw.21m/22m). Re-point
+        the reference at the CURRENT frozen solo build.
+  FAIL: m5_wide (/Users/koneko/Developer/Vampire_Saved/VampireSaved/build/m5_wide/rompath) is REFUSED by MAME
+        Almost always a build frozen before a WIDE profile
+        bump (v1.1 vsw.z01/z02, v1.2 vsw.21m/22m). Re-point
+        the reference at the CURRENT frozen solo build.
+  FAIL: hui41 (/Users/koneko/Developer/Vampire_Saved/VampireSaved/build/hui41/rompath) is REFUSED by MAME
+        Almost always a build frozen before a WIDE profile
+        bump (v1.1 vsw.z01/z02, v1.2 vsw.21m/22m). Re-point
+        the reference at the CURRENT frozen solo build.
+  FAIL: pyron21 (/Users/koneko/Developer/Vampire_Saved/VampireSaved/build/pyron21/rompath) is REFUSED by MAME
+        Almost always a build frozen before a WIDE profile
+        bump (v1.1 vsw.z01/z02, v1.2 vsw.21m/22m). Re-point
+        the reference at the CURRENT frozen solo build.
+FAIL: merged content-rendering gate (preconditions)

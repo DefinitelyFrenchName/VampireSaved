@@ -1,0 +1,424 @@
+### donovan-m5 (build/don_m5)
+build build/don_m5 -> tests/expected/donovan-m5
+mask  043c-043d,4182-41a2,41c2-41e2,4222-4262,7f00-8000
+basis tests/expected/vsavj/masked-v2
+12_donovan_vs_cpu                  
+    shape: 1528/9320 frames differ in 2 run(s), first at frame 889, last ends frame 5713, then 3607 identical
+    runs: 889-2415 5713-5713
+    proposed: composite vsavj/masked-v2 5713 889-2415
+17_don_oracle_vsavj                
+    shape: 1204/4420 frames differ in 2 run(s), first at frame 829, last ends frame 2091, then 2329 identical
+    runs: 829-829 889-2091
+    proposed: composite vsavj/masked-v2 829 889-2091
+18_veteran_ctl_vsavj               
+    shape: 1204/4420 frames differ in 2 run(s), first at frame 829, last ends frame 2091, then 2329 identical
+    runs: 829-829 889-2091
+    proposed: composite vsavj/masked-v2 829 889-2091
+19_don_dp_spam                     
+    shape: 1204/5930 frames differ in 2 run(s), first at frame 829, last ends frame 2091, then 3839 identical
+    runs: 829-829 889-2091
+    proposed: composite vsavj/masked-v2 829 889-2091
+20_don_round2                      
+    shape: 1204/12120 frames differ in 2 run(s), first at frame 829, last ends frame 2091, then 10029 identical
+    runs: 829-829 889-2091
+    proposed: composite vsavj/masked-v2 829 889-2091
+21_don_mash                        
+    shape: 1206/14120 frames differ in 4 run(s), first at frame 829, last ends frame 11838, then 2282 identical
+    runs: 829-829 889-2091 11777-11777 11838-11838
+    proposed: composite vsavj/masked-v2 829,11777,11838 889-2091
+22_don_dualmash                    
+    shape: 1206/13920 frames differ in 4 run(s), first at frame 829, last ends frame 11918, then 2002 identical
+    runs: 829-829 889-2091 11862-11862 11918-11918
+    proposed: composite vsavj/masked-v2 829,11862,11918 889-2091
+23_don_matchwin                    
+    shape: 1206/18120 frames differ in 4 run(s), first at frame 829, last ends frame 12733, then 5387 identical
+    runs: 829-829 889-2091 12313-12313 12733-12733
+    proposed: composite vsavj/masked-v2 829,12313,12733 889-2091
+24_don_winmash                     
+    shape: 2857/18520 frames differ in 5 run(s), first at frame 829, last ends frame 18520, then 0 identical
+    runs: 829-829 889-2091 12313-12313 12733-12733 16870-18520
+    proposed: NONE — does not re-converge (>=60 identical tail required); this is not expressible in the ratified vocabulary and must be root-caused
+25_don_darkforce                   
+    shape: 1204/9120 frames differ in 2 run(s), first at frame 829, last ends frame 2091, then 7029 identical
+    runs: 829-829 889-2091
+    proposed: composite vsavj/masked-v2 829 889-2091
+26_don_arcade_mash                 
+    shape: 1530/40620 frames differ in 4 run(s), first at frame 889, last ends frame 36857, then 3763 identical
+    runs: 889-2415 8744-8744 8800-8800 36857-36857
+    proposed: composite vsavj/masked-v2 8744,8800,36857 889-2415
+28_don_quotewin                    
+    shape: 1206/14620 frames differ in 4 run(s), first at frame 829, last ends frame 12827, then 1793 identical
+    runs: 829-829 889-2091 12407-12407 12827-12827
+    proposed: composite vsavj/masked-v2 829,12407,12827 889-2091
+31_don_6hp_vsavj                   
+    shape: 1204/4220 frames differ in 2 run(s), first at frame 829, last ends frame 2091, then 2129 identical
+    runs: 829-829 889-2091
+    proposed: composite vsavj/masked-v2 829 889-2091
+32_victor_shock_vsavj              
+    shape: 1204/3820 frames differ in 2 run(s), first at frame 829, last ends frame 2091, then 1729 identical
+    runs: 829-829 889-2091
+    proposed: composite vsavj/masked-v2 829 889-2091
+33_victor_6hp_vsavj                
+    shape: 1204/3220 frames differ in 2 run(s), first at frame 829, last ends frame 2091, then 1129 identical
+    runs: 829-829 889-2091
+    proposed: composite vsavj/masked-v2 829 889-2091
+34_victor_5hp_vsavj                
+    shape: 1204/3320 frames differ in 2 run(s), first at frame 829, last ends frame 2091, then 1229 identical
+    runs: 829-829 889-2091
+    proposed: composite vsavj/masked-v2 829 889-2091
+35_victor_kd_vsavj                 
+    shape: 1204/3270 frames differ in 2 run(s), first at frame 829, last ends frame 2091, then 1179 identical
+    runs: 829-829 889-2091
+    proposed: composite vsavj/masked-v2 829 889-2091
+36_victor_kd2_vsavj                
+    shape: 1204/3270 frames differ in 2 run(s), first at frame 829, last ends frame 2091, then 1179 identical
+    runs: 829-829 889-2091
+    proposed: composite vsavj/masked-v2 829 889-2091
+37_victor_ko_vsavj                 
+    shape: 1205/9680 frames differ in 3 run(s), first at frame 829, last ends frame 6962, then 2718 identical
+    runs: 829-829 889-2091 6962-6962
+    proposed: composite vsavj/masked-v2 829,6962 889-2091
+38_victor_p1_vsavj                 
+    shape: 3889/5000 frames differ in 3 run(s), first at frame 829, last ends frame 5000, then 0 identical
+    runs: 829-829 889-2091 2316-5000
+    proposed: NONE — does not re-converge (>=60 identical tail required); this is not expressible in the ratified vocabulary and must be root-caused
+39_victor_cross_vsavj              
+    shape: 1204/4830 frames differ in 2 run(s), first at frame 829, last ends frame 2091, then 2739 identical
+    runs: 829-829 889-2091
+    proposed: composite vsavj/masked-v2 829 889-2091
+40_victor_5hp_defaultchar_vsavj    
+    shape: 1204/3320 frames differ in 2 run(s), first at frame 829, last ends frame 2091, then 1229 identical
+    runs: 829-829 889-2091
+    proposed: composite vsavj/masked-v2 829 889-2091
+41_don_altcolor_vsavj              
+    shape: 1204/4220 frames differ in 2 run(s), first at frame 829, last ends frame 2091, then 2129 identical
+    runs: 829-829 889-2091
+    proposed: composite vsavj/masked-v2 829 889-2091
+42_don_mirror_vsavj                
+    shape: 1204/4220 frames differ in 2 run(s), first at frame 829, last ends frame 2091, then 2129 identical
+    runs: 829-829 889-2091
+    proposed: composite vsavj/masked-v2 829 889-2091
+48_don_immortal_ko                 
+    shape: 1204/3520 frames differ in 2 run(s), first at frame 829, last ends frame 2091, then 1429 identical
+    runs: 829-829 889-2091
+    proposed: composite vsavj/masked-v2 829 889-2091
+50_don_column_ko                   
+    shape: 1204/3520 frames differ in 2 run(s), first at frame 829, last ends frame 2091, then 1429 identical
+    runs: 829-829 889-2091
+    proposed: composite vsavj/masked-v2 829 889-2091
+53_don_immortal_mash               
+    shape: 1204/3520 frames differ in 2 run(s), first at frame 829, last ends frame 2091, then 1429 identical
+    runs: 829-829 889-2091
+    proposed: composite vsavj/masked-v2 829 889-2091
+54_don_matchend_ko                 
+    shape: 1204/3920 frames differ in 2 run(s), first at frame 829, last ends frame 2091, then 1829 identical
+    runs: 829-829 889-2091
+    proposed: composite vsavj/masked-v2 829 889-2091
+56_don_es_ls                       
+    shape: 1204/3520 frames differ in 2 run(s), first at frame 829, last ends frame 2091, then 1429 identical
+    runs: 829-829 889-2091
+    proposed: composite vsavj/masked-v2 829 889-2091
+59_don_blizzard_hcf                
+    shape: 1204/3220 frames differ in 2 run(s), first at frame 829, last ends frame 2091, then 1129 identical
+    runs: 829-829 889-2091
+    proposed: composite vsavj/masked-v2 829 889-2091
+60_don_grapple_hcb                 
+    shape: 1204/3320 frames differ in 2 run(s), first at frame 829, last ends frame 2091, then 1229 identical
+    runs: 829-829 889-2091
+    proposed: composite vsavj/masked-v2 829 889-2091
+63_idle_select                     
+    shape: 2578/4320 frames differ in 2 run(s), first at frame 889, last ends frame 3886, then 434 identical
+    runs: 889-3465 3886-3886
+    proposed: composite vsavj/masked-v2 3886 889-3465
+65_don_mirror_throw                
+    shape: 1204/4520 frames differ in 2 run(s), first at frame 829, last ends frame 2091, then 2429 identical
+    runs: 829-829 889-2091
+    proposed: composite vsavj/masked-v2 829 889-2091
+### huitzil-m13 (build/hui40)
+build build/hui40 -> tests/expected/huitzil-m13
+mask  043c-043d,4182-41a2,41c2-41e2,4222-4262,7f00-8000
+basis tests/expected/vsavj/masked-v2
+12_donovan_vs_cpu                  
+    shape: 1528/9320 frames differ in 2 run(s), first at frame 889, last ends frame 2836, then 6484 identical
+    runs: 889-2415 2836-2836
+    proposed: composite vsavj/masked-v2 2836 889-2415
+17_don_oracle_vsavj                
+    shape: 1204/4420 frames differ in 2 run(s), first at frame 829, last ends frame 2091, then 2329 identical
+    runs: 829-829 889-2091
+    proposed: composite vsavj/masked-v2 829 889-2091
+18_veteran_ctl_vsavj               
+    shape: 1204/4420 frames differ in 2 run(s), first at frame 829, last ends frame 2091, then 2329 identical
+    runs: 829-829 889-2091
+    proposed: composite vsavj/masked-v2 829 889-2091
+19_don_dp_spam                     
+    shape: 1204/5930 frames differ in 2 run(s), first at frame 829, last ends frame 2091, then 3839 identical
+    runs: 829-829 889-2091
+    proposed: composite vsavj/masked-v2 829 889-2091
+20_don_round2                      
+    shape: 1204/12120 frames differ in 2 run(s), first at frame 829, last ends frame 2091, then 10029 identical
+    runs: 829-829 889-2091
+    proposed: composite vsavj/masked-v2 829 889-2091
+21_don_mash                        
+    shape: 10237/14120 frames differ in 3 run(s), first at frame 829, last ends frame 14120, then 0 identical
+    runs: 829-829 889-2091 5088-14120
+    proposed: NONE — does not re-converge (>=60 identical tail required); this is not expressible in the ratified vocabulary and must be root-caused
+22_don_dualmash                    
+    shape: 1206/13920 frames differ in 4 run(s), first at frame 829, last ends frame 11918, then 2002 identical
+    runs: 829-829 889-2091 11862-11862 11918-11918
+    proposed: composite vsavj/masked-v2 829,11862,11918 889-2091
+23_don_matchwin                    
+    shape: 1206/18120 frames differ in 4 run(s), first at frame 829, last ends frame 12733, then 5387 identical
+    runs: 829-829 889-2091 12313-12313 12733-12733
+    proposed: composite vsavj/masked-v2 829,12313,12733 889-2091
+24_don_winmash                     
+    shape: 2857/18520 frames differ in 5 run(s), first at frame 829, last ends frame 18520, then 0 identical
+    runs: 829-829 889-2091 12313-12313 12733-12733 16870-18520
+    proposed: NONE — does not re-converge (>=60 identical tail required); this is not expressible in the ratified vocabulary and must be root-caused
+25_don_darkforce                   
+    shape: 1204/9120 frames differ in 2 run(s), first at frame 829, last ends frame 2091, then 7029 identical
+    runs: 829-829 889-2091
+    proposed: composite vsavj/masked-v2 829 889-2091
+26_don_arcade_mash                 
+    shape: 37297/40620 frames differ in 3 run(s), first at frame 889, last ends frame 40620, then 0 identical
+    runs: 889-2415 2836-2836 4852-40620
+    proposed: NONE — does not re-converge (>=60 identical tail required); this is not expressible in the ratified vocabulary and must be root-caused
+28_don_quotewin                    
+    shape: 1206/14620 frames differ in 4 run(s), first at frame 829, last ends frame 12827, then 1793 identical
+    runs: 829-829 889-2091 12407-12407 12827-12827
+    proposed: composite vsavj/masked-v2 829,12407,12827 889-2091
+31_don_6hp_vsavj                   
+    shape: 1204/4220 frames differ in 2 run(s), first at frame 829, last ends frame 2091, then 2129 identical
+    runs: 829-829 889-2091
+    proposed: composite vsavj/masked-v2 829 889-2091
+32_victor_shock_vsavj              
+    shape: 1204/3820 frames differ in 2 run(s), first at frame 829, last ends frame 2091, then 1729 identical
+    runs: 829-829 889-2091
+    proposed: composite vsavj/masked-v2 829 889-2091
+33_victor_6hp_vsavj                
+    shape: 1204/3220 frames differ in 2 run(s), first at frame 829, last ends frame 2091, then 1129 identical
+    runs: 829-829 889-2091
+    proposed: composite vsavj/masked-v2 829 889-2091
+34_victor_5hp_vsavj                
+    shape: 1204/3320 frames differ in 2 run(s), first at frame 829, last ends frame 2091, then 1229 identical
+    runs: 829-829 889-2091
+    proposed: composite vsavj/masked-v2 829 889-2091
+35_victor_kd_vsavj                 
+    shape: 1204/3270 frames differ in 2 run(s), first at frame 829, last ends frame 2091, then 1179 identical
+    runs: 829-829 889-2091
+    proposed: composite vsavj/masked-v2 829 889-2091
+36_victor_kd2_vsavj                
+    shape: 1204/3270 frames differ in 2 run(s), first at frame 829, last ends frame 2091, then 1179 identical
+    runs: 829-829 889-2091
+    proposed: composite vsavj/masked-v2 829 889-2091
+37_victor_ko_vsavj                 
+    shape: 1206/9680 frames differ in 4 run(s), first at frame 829, last ends frame 7168, then 2512 identical
+    runs: 829-829 889-2091 6962-6962 7168-7168
+    proposed: composite vsavj/masked-v2 829,6962,7168 889-2091
+38_victor_p1_vsavj                 
+    shape: 1204/5000 frames differ in 2 run(s), first at frame 829, last ends frame 2091, then 2909 identical
+    runs: 829-829 889-2091
+    proposed: composite vsavj/masked-v2 829 889-2091
+39_victor_cross_vsavj              
+    shape: 1204/4830 frames differ in 2 run(s), first at frame 829, last ends frame 2091, then 2739 identical
+    runs: 829-829 889-2091
+    proposed: composite vsavj/masked-v2 829 889-2091
+40_victor_5hp_defaultchar_vsavj    
+    shape: 1204/3320 frames differ in 2 run(s), first at frame 829, last ends frame 2091, then 1229 identical
+    runs: 829-829 889-2091
+    proposed: composite vsavj/masked-v2 829 889-2091
+41_don_altcolor_vsavj              
+    shape: 1204/4220 frames differ in 2 run(s), first at frame 829, last ends frame 2091, then 2129 identical
+    runs: 829-829 889-2091
+    proposed: composite vsavj/masked-v2 829 889-2091
+42_don_mirror_vsavj                
+    shape: 1204/4220 frames differ in 2 run(s), first at frame 829, last ends frame 2091, then 2129 identical
+    runs: 829-829 889-2091
+    proposed: composite vsavj/masked-v2 829 889-2091
+48_don_immortal_ko                 
+    shape: 1204/3520 frames differ in 2 run(s), first at frame 829, last ends frame 2091, then 1429 identical
+    runs: 829-829 889-2091
+    proposed: composite vsavj/masked-v2 829 889-2091
+50_don_column_ko                   
+    shape: 1204/3520 frames differ in 2 run(s), first at frame 829, last ends frame 2091, then 1429 identical
+    runs: 829-829 889-2091
+    proposed: composite vsavj/masked-v2 829 889-2091
+53_don_immortal_mash               
+    shape: 1204/3520 frames differ in 2 run(s), first at frame 829, last ends frame 2091, then 1429 identical
+    runs: 829-829 889-2091
+    proposed: composite vsavj/masked-v2 829 889-2091
+54_don_matchend_ko                 
+    shape: 1204/3920 frames differ in 2 run(s), first at frame 829, last ends frame 2091, then 1829 identical
+    runs: 829-829 889-2091
+    proposed: composite vsavj/masked-v2 829 889-2091
+56_don_es_ls                       
+    shape: 1204/3520 frames differ in 2 run(s), first at frame 829, last ends frame 2091, then 1429 identical
+    runs: 829-829 889-2091
+    proposed: composite vsavj/masked-v2 829 889-2091
+59_don_blizzard_hcf                
+    shape: 1204/3220 frames differ in 2 run(s), first at frame 829, last ends frame 2091, then 1129 identical
+    runs: 829-829 889-2091
+    proposed: composite vsavj/masked-v2 829 889-2091
+60_don_grapple_hcb                 
+    shape: 1204/3320 frames differ in 2 run(s), first at frame 829, last ends frame 2091, then 1229 identical
+    runs: 829-829 889-2091
+    proposed: composite vsavj/masked-v2 829 889-2091
+61_tenant_2pwin                    
+    shape: 8733/9620 frames differ in 2 run(s), first at frame 829, last ends frame 9620, then 0 identical
+    runs: 829-829 889-9620
+    proposed: NONE — does not re-converge (>=60 identical tail required); this is not expressible in the ratified vocabulary and must be root-caused
+62_tenant_2plose                   
+    shape: 8733/9620 frames differ in 2 run(s), first at frame 829, last ends frame 9620, then 0 identical
+    runs: 829-829 889-9620
+    proposed: NONE — does not re-converge (>=60 identical tail required); this is not expressible in the ratified vocabulary and must be root-caused
+63_idle_select                     
+    shape: 2578/4320 frames differ in 2 run(s), first at frame 889, last ends frame 3886, then 434 identical
+    runs: 889-3465 3886-3886
+    proposed: composite vsavj/masked-v2 3886 889-3465
+65_don_mirror_throw                
+    shape: 1204/4520 frames differ in 2 run(s), first at frame 829, last ends frame 2091, then 2429 identical
+    runs: 829-829 889-2091
+    proposed: composite vsavj/masked-v2 829 889-2091
+### pyron-m7 (build/pyron25)
+build build/pyron25 -> tests/expected/pyron-m7
+mask  043c-043d,4182-41a2,41c2-41e2,4222-4262,7f00-8000
+basis tests/expected/vsavj/masked-v2
+12_donovan_vs_cpu                  
+    shape: 1528/9320 frames differ in 2 run(s), first at frame 889, last ends frame 2836, then 6484 identical
+    runs: 889-2415 2836-2836
+    proposed: composite vsavj/masked-v2 2836 889-2415
+17_don_oracle_vsavj                
+    shape: 1204/4420 frames differ in 2 run(s), first at frame 829, last ends frame 2091, then 2329 identical
+    runs: 829-829 889-2091
+    proposed: composite vsavj/masked-v2 829 889-2091
+18_veteran_ctl_vsavj               
+    shape: 1204/4420 frames differ in 2 run(s), first at frame 829, last ends frame 2091, then 2329 identical
+    runs: 829-829 889-2091
+    proposed: composite vsavj/masked-v2 829 889-2091
+19_don_dp_spam                     
+    shape: 1204/5930 frames differ in 2 run(s), first at frame 829, last ends frame 2091, then 3839 identical
+    runs: 829-829 889-2091
+    proposed: composite vsavj/masked-v2 829 889-2091
+20_don_round2                      
+    shape: 1204/12120 frames differ in 2 run(s), first at frame 829, last ends frame 2091, then 10029 identical
+    runs: 829-829 889-2091
+    proposed: composite vsavj/masked-v2 829 889-2091
+21_don_mash                        
+    shape: 1206/14120 frames differ in 4 run(s), first at frame 829, last ends frame 11838, then 2282 identical
+    runs: 829-829 889-2091 11777-11777 11838-11838
+    proposed: composite vsavj/masked-v2 829,11777,11838 889-2091
+22_don_dualmash                    
+    shape: 1206/13920 frames differ in 4 run(s), first at frame 829, last ends frame 11918, then 2002 identical
+    runs: 829-829 889-2091 11862-11862 11918-11918
+    proposed: composite vsavj/masked-v2 829,11862,11918 889-2091
+23_don_matchwin                    
+    shape: 1206/18120 frames differ in 4 run(s), first at frame 829, last ends frame 12733, then 5387 identical
+    runs: 829-829 889-2091 12313-12313 12733-12733
+    proposed: composite vsavj/masked-v2 829,12313,12733 889-2091
+24_don_winmash                     
+    shape: 2857/18520 frames differ in 5 run(s), first at frame 829, last ends frame 18520, then 0 identical
+    runs: 829-829 889-2091 12313-12313 12733-12733 16870-18520
+    proposed: NONE — does not re-converge (>=60 identical tail required); this is not expressible in the ratified vocabulary and must be root-caused
+25_don_darkforce                   
+    shape: 1204/9120 frames differ in 2 run(s), first at frame 829, last ends frame 2091, then 7029 identical
+    runs: 829-829 889-2091
+    proposed: composite vsavj/masked-v2 829 889-2091
+26_don_arcade_mash                 
+    shape: 1530/40620 frames differ in 4 run(s), first at frame 889, last ends frame 8800, then 31820 identical
+    runs: 889-2415 2836-2836 8744-8744 8800-8800
+    proposed: composite vsavj/masked-v2 2836,8744,8800 889-2415
+28_don_quotewin                    
+    shape: 1206/14620 frames differ in 4 run(s), first at frame 829, last ends frame 12827, then 1793 identical
+    runs: 829-829 889-2091 12407-12407 12827-12827
+    proposed: composite vsavj/masked-v2 829,12407,12827 889-2091
+31_don_6hp_vsavj                   
+    shape: 1204/4220 frames differ in 2 run(s), first at frame 829, last ends frame 2091, then 2129 identical
+    runs: 829-829 889-2091
+    proposed: composite vsavj/masked-v2 829 889-2091
+32_victor_shock_vsavj              
+    shape: 1204/3820 frames differ in 2 run(s), first at frame 829, last ends frame 2091, then 1729 identical
+    runs: 829-829 889-2091
+    proposed: composite vsavj/masked-v2 829 889-2091
+33_victor_6hp_vsavj                
+    shape: 1204/3220 frames differ in 2 run(s), first at frame 829, last ends frame 2091, then 1129 identical
+    runs: 829-829 889-2091
+    proposed: composite vsavj/masked-v2 829 889-2091
+34_victor_5hp_vsavj                
+    shape: 1204/3320 frames differ in 2 run(s), first at frame 829, last ends frame 2091, then 1229 identical
+    runs: 829-829 889-2091
+    proposed: composite vsavj/masked-v2 829 889-2091
+35_victor_kd_vsavj                 
+    shape: 1204/3270 frames differ in 2 run(s), first at frame 829, last ends frame 2091, then 1179 identical
+    runs: 829-829 889-2091
+    proposed: composite vsavj/masked-v2 829 889-2091
+36_victor_kd2_vsavj                
+    shape: 1204/3270 frames differ in 2 run(s), first at frame 829, last ends frame 2091, then 1179 identical
+    runs: 829-829 889-2091
+    proposed: composite vsavj/masked-v2 829 889-2091
+37_victor_ko_vsavj                 
+    shape: 1206/9680 frames differ in 4 run(s), first at frame 829, last ends frame 7168, then 2512 identical
+    runs: 829-829 889-2091 6962-6962 7168-7168
+    proposed: composite vsavj/masked-v2 829,6962,7168 889-2091
+38_victor_p1_vsavj                 
+    shape: 1204/5000 frames differ in 2 run(s), first at frame 829, last ends frame 2091, then 2909 identical
+    runs: 829-829 889-2091
+    proposed: composite vsavj/masked-v2 829 889-2091
+39_victor_cross_vsavj              
+    shape: 1204/4830 frames differ in 2 run(s), first at frame 829, last ends frame 2091, then 2739 identical
+    runs: 829-829 889-2091
+    proposed: composite vsavj/masked-v2 829 889-2091
+40_victor_5hp_defaultchar_vsavj    
+    shape: 1204/3320 frames differ in 2 run(s), first at frame 829, last ends frame 2091, then 1229 identical
+    runs: 829-829 889-2091
+    proposed: composite vsavj/masked-v2 829 889-2091
+41_don_altcolor_vsavj              
+    shape: 1204/4220 frames differ in 2 run(s), first at frame 829, last ends frame 2091, then 2129 identical
+    runs: 829-829 889-2091
+    proposed: composite vsavj/masked-v2 829 889-2091
+42_don_mirror_vsavj                
+    shape: 1204/4220 frames differ in 2 run(s), first at frame 829, last ends frame 2091, then 2129 identical
+    runs: 829-829 889-2091
+    proposed: composite vsavj/masked-v2 829 889-2091
+48_don_immortal_ko                 
+    shape: 1204/3520 frames differ in 2 run(s), first at frame 829, last ends frame 2091, then 1429 identical
+    runs: 829-829 889-2091
+    proposed: composite vsavj/masked-v2 829 889-2091
+50_don_column_ko                   
+    shape: 1204/3520 frames differ in 2 run(s), first at frame 829, last ends frame 2091, then 1429 identical
+    runs: 829-829 889-2091
+    proposed: composite vsavj/masked-v2 829 889-2091
+53_don_immortal_mash               
+    shape: 1204/3520 frames differ in 2 run(s), first at frame 829, last ends frame 2091, then 1429 identical
+    runs: 829-829 889-2091
+    proposed: composite vsavj/masked-v2 829 889-2091
+54_don_matchend_ko                 
+    shape: 1204/3920 frames differ in 2 run(s), first at frame 829, last ends frame 2091, then 1829 identical
+    runs: 829-829 889-2091
+    proposed: composite vsavj/masked-v2 829 889-2091
+56_don_es_ls                       
+    shape: 1204/3520 frames differ in 2 run(s), first at frame 829, last ends frame 2091, then 1429 identical
+    runs: 829-829 889-2091
+    proposed: composite vsavj/masked-v2 829 889-2091
+59_don_blizzard_hcf                
+    shape: 1204/3220 frames differ in 2 run(s), first at frame 829, last ends frame 2091, then 1129 identical
+    runs: 829-829 889-2091
+    proposed: composite vsavj/masked-v2 829 889-2091
+60_don_grapple_hcb                 
+    shape: 1204/3320 frames differ in 2 run(s), first at frame 829, last ends frame 2091, then 1229 identical
+    runs: 829-829 889-2091
+    proposed: composite vsavj/masked-v2 829 889-2091
+61_tenant_2pwin                    
+    shape: 8733/9620 frames differ in 2 run(s), first at frame 829, last ends frame 9620, then 0 identical
+    runs: 829-829 889-9620
+    proposed: NONE — does not re-converge (>=60 identical tail required); this is not expressible in the ratified vocabulary and must be root-caused
+62_tenant_2plose                   
+    shape: 8733/9620 frames differ in 2 run(s), first at frame 829, last ends frame 9620, then 0 identical
+    runs: 829-829 889-9620
+    proposed: NONE — does not re-converge (>=60 identical tail required); this is not expressible in the ratified vocabulary and must be root-caused
+63_idle_select                     
+    shape: 2578/4320 frames differ in 2 run(s), first at frame 889, last ends frame 3886, then 434 identical
+    runs: 889-3465 3886-3886
+    proposed: composite vsavj/masked-v2 3886 889-3465
+65_don_mirror_throw                
+    shape: 1204/4520 frames differ in 2 run(s), first at frame 829, last ends frame 2091, then 2429 identical
+    runs: 829-829 889-2091
+    proposed: composite vsavj/masked-v2 829 889-2091

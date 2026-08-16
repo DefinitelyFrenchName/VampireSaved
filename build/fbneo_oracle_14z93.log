@@ -1,0 +1,22 @@
+== build build/don_m7 -> expectation set donovan-m7; mask 043c-043d,4182-41a2,41c2-41e2,4222-4262,7f00-8000
+== leg A on the PATCHED binary (composition: test_wide_profile.sh)
+  phase: 01_attract_long f4026 — 3 byte(s) differ, all in the FROZEN inventory of the ratified FBNeo phase classes (+0x055b..)
+  phase: 01_attract_long f6734 — 3 byte(s) differ, all in the FROZEN inventory of the ratified FBNeo phase classes (+0x055b..)
+  ok: 01_attract_long — 5 sampled frames compared, 2 with a ratified FBNeo phase deviation (frames 1098, 2562, 4026, 5490, 6734)
+  ok: 06_test_mode — 5 sampled frames compared (frames 468, 1092, 1716, 2340, 2870)
+  FAIL: 21_don_mash f2118 — 3 masked byte(s) differ, first at work-RAM +0x06db (vanilla 0x05 vs build 0x0c)
+        FBNeo-only: this frame is clear of every ratified MAME divergence for 21_don_mash, so it is not a tolerated class.
+        2 byte(s) are INSIDE a window but NOT in the frozen inventory, first +0x06dc — this is GROWTH, not the ratified class. Root-cause it; do not add it to FROZEN without a new measured mechanism and maintainer sign-off (CLAUDE.md §4).
+  phase: 21_don_mash f4942 — 1 byte(s) differ, all in the FROZEN inventory of the ratified FBNeo phase classes (+0x06d1..)
+  FAIL: 26_don_arcade_mash f6093 — 3 masked byte(s) differ, first at work-RAM +0x06d4 (vanilla 0x81 vs build 0xad)
+        FBNeo-only: this frame is clear of every ratified MAME divergence for 26_don_arcade_mash, so it is not a tolerated class.
+        2 byte(s) are INSIDE a window but NOT in the frozen inventory, first +0x06d5 — this is GROWTH, not the ratified class. Root-cause it; do not add it to FROZEN without a new measured mechanism and maintainer sign-off (CLAUDE.md §4).
+  FAIL: 26_don_arcade_mash f14217 — 3 masked byte(s) differ, first at work-RAM +0x06d4 (vanilla 0x81 vs build 0xad)
+        FBNeo-only: this frame is clear of every ratified MAME divergence for 26_don_arcade_mash, so it is not a tolerated class.
+        2 byte(s) are INSIDE a window but NOT in the frozen inventory, first +0x06d5 — this is GROWTH, not the ratified class. Root-cause it; do not add it to FROZEN without a new measured mechanism and maintainer sign-off (CLAUDE.md §4).
+== verdict controls on the comparator ==
+  control: byte outside the mask (+0x8000) CAUGHT: True
+  control: byte inside the mask (+0x043c) ignored: True
+  control: identical buffers report no difference: True
+FAIL: FBNeo hacked-build legacy oracle
+EXIT=1

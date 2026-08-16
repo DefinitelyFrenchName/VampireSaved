@@ -1,0 +1,16 @@
+=== test_gfx_chain ===
+  ok: fixture P link failed loudly at a strip-range dst:
+     AssertionError: band: dst 0x05EA0 collides with DIFFERENT bytes (prior vs2A:0x14EA0, new vs2B:0x15EA0) — same-source-or-fail
+
+PASS: gfx chain mode — solo identical, idempotent, FULL 3-tenant
+      chain green since the S3 relocation, and the old-shift fixture
+      still fails loudly
+[rc=0]
+=== audit_gfx_merged_census ===
+  doctored vs2 group A: tile 0x4ea0 := group-B bytes of 0x5ea0
+  ok: control C fired (fixture REAL 288 -> 287 on the doctored source)
+
+PASS: merged group-C write-set census — ZERO real collisions since
+      the S3 strip relocation; occupancy frozen; all three
+      comparator controls fired
+[rc=0]

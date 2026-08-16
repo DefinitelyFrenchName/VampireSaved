@@ -1,0 +1,15 @@
+test_attribute_ramdiff           PASS
+test_audit_merged_dispatch       PASS
+test_build_gate_status           PASS
+test_compare_composite           PASS
+test_compare_flicker             PASS
+test_compare_window              PASS
+test_describe_masked_shape       PASS
+test_freeze_basis_sandbox        PASS
+test_gfx_collision_gate          PASS
+test_m2a_flicker_gate            PASS
+test_manifest_merge              PASS
+test_obj_record_walk             PASS
+test_shell_portability           PASS
+test_tenant_id                   PASS
+DONE

@@ -1,0 +1,20 @@
+== stage 1 build
+  ok: tenant is pyron id 0x11
+  ok: built (b45b4349)
+  ok: op invariant holds (7 ops: free space / variant rows)
+== stage 2 build
+  ok: tenant is pyron id 0x11
+  ok: built (1b225cf7)
+  ok: op invariant holds (25 ops: free space / variant rows)
+== stage 3 build
+  ok: tenant is pyron id 0x11
+  ok: built (a4cb113c)
+  ok: op invariant holds (34 ops: free space / variant rows)
+== stage 4 build
+  ok: tenant is pyron id 0x11
+  ok: built (a9c890a2)
+  ok: op invariant holds (154 ops: free space / variant rows / 78 reviewed shared writes)
+== stage 6 build
+  ok: tenant is pyron id 0x11
+  ok: built (fac4a777)
+FAIL: ops outside free space + variant rows: [(174, 'data', '0xb6a8', 64), (175, 'data', '0xbfa8', 64), (178, 'data', '0x21224', 8), (179, 'data', '0x2122c', 8), (180, 'data', '0x2123c', 8), (181, 'data', '0x21264', 8), (182, 'data', '0x2126c', 8), (183, 'data', '0x2127c', 8), (198, 'data', '0x3a3b20', 32), (199, 'data', '0x3a3b40', 32), (200, 'data', '0x3a3ac0', 32)]

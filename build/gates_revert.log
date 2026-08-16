@@ -1,0 +1,31 @@
+== tenant_loop
+      and the N-way chains resolve every tenant; the merged 3-tenant
+      patch has ZERO op collisions and patch_prg applies it; 5
+      verdict controls. (The PROGRAM half only — see the header.)
+== shared_writes
+  control: a REMOVED shared write (an engine hook silently dropped): CAUGHT
+  control: the UNMUTATED build still passes: True
+PASS: shared-surface writes match the frozen, reviewed inventory
+== m3a
+== rebuild pyron (0x11)
+  ok: pyron reproduced (94ce9a48e0cc8c89a69dd72a58669b072e379988)
+PASS: all four frozen references rebuild bit-exact from this tree
+== merged legacy
+      untouched relative to its frozen single-tenant build (leg b).
+      This proves LEGACY SAFETY of the merge only — tenant correctness
+      waits for the gfx half (M3b Phase 3).
+== trap parity
+      + 010a + the RESTORED detonation chirp 0199
+  ok: verdict control — mutation fails as designed
+audit_trap_parity: PASS (restored ejection+detonation state holds)
+== hui_boot
+  ok: masked-v2 EXACT vs the frozen vanilla log
+PASS: Huitzil stage-4 boot (his data loads, guard clean, legacy intact)
+== pyron_ladder
+  ok: masked-v2 EXACT vs the frozen vanilla log
+PASS: Pyron stage 1-4 ladder (builds + op invariant + boot probe + legacy bit-identity)
+== select_records
+== 4. de-substitution acceptance: picking the HOST re-converges ==
+  ok: host pick = bounded window 889-2415, fully re-convergent
+FAIL: tenant select-records gate
+GATES-DONE

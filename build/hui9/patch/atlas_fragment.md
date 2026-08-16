@@ -1,0 +1,94 @@
+| dest | len | provenance | what |
+|---|---|---|---|
+| `PRG:0x0BF6A0` | 0x27C6 | VS2 | donovan code (grouped, vsav2 0x054C90) |
+| `PRG:0x0C1E66` | 0x5200 | VS2 | donovan x057456 (grouped, vsav2 0x057456) |
+| `PRG:0x0C7070` | 0x576 | VS2 | donovan x02592a (vsav2 0x02592A) |
+| `PRG:0x0C75F0` | 0x14A0 | VS2 | donovan x026142 (vsav2 0x026142) |
+| `PRG:0x0C8A90` | 0xE00 | VS2 | donovan x028122 (vsav2 0x028122) |
+| `PRG:0x0C9890` | 0x6A20 | VS2 | donovan x05c800 (vsav2 0x05C800) |
+| `PRG:0x0D02B0` | 0x280 | VS2 | donovan x0672d0 (vsav2 0x0672D0) |
+| `PRG:0x0D0530` | 0x2F6 | VS2 | donovan x067550 (vsav2 0x067550) |
+| `PRG:0x0D0830` | 0x1BA | VS2 | donovan x067846 (vsav2 0x067846) |
+| `PRG:0x0D09F0` | 0x60C | VS2 | donovan x067a00 (vsav2 0x067A00) |
+| `PRG:0x0D1000` | 0x44C | VS2 | donovan x06800c (vsav2 0x06800C) |
+| `PRG:0x0D1450` | 0x310 | VS2 | donovan x068458 (vsav2 0x068458) |
+| `PRG:0x0D1760` | 0x264 | VS2 | donovan x068768 (vsav2 0x068768) |
+| `PRG:0x0D19D0` | 0x2AC | VS2 | donovan x0689cc (vsav2 0x0689CC) |
+| `PRG:0x0D1C80` | 0x3CE | VS2 | donovan x068c78 (vsav2 0x068C78) |
+| `PRG:0x0D2050` | 0x2B0 | VS2 | donovan x069046 (vsav2 0x069046) |
+| `PRG:0x0D2300` | 0x368 | VS2 | donovan x0692f6 (vsav2 0x0692F6) |
+| `PRG:0x0D2670` | 0x100 | VS2 | donovan x06965e (vsav2 0x06965E) |
+| `PRG:0x0D2770` | 0x3B40 | VS2 | donovan x088512 (vsav2 0x088512) |
+| `PRG:0x0D62B0` | 0x1E800 | VS2 | donovan anim (vsav2 0x245872) |
+| `PRG:0x0F4AB0` | 0x190 | VS2 | donovan aux0_0 (vsav2 0x334170) |
+| `PRG:0x3EC720` | 0xE620 | VS2 | donovan aux0_1 (vsav2 0x336560) |
+| `PRG:0x0F4C40` | 0x32B2 | VS2 | donovan hitbox (vsav2 0x0C4250) |
+| `PRG:0x0F7F00` | 0x3C6 | VS2 | donovan hitbox_proj (vsav2 0x0D05C0) |
+| `PRG:0x0F82D0` | 0x900 | VS2 | donovan x0d143e (vsav2 0x0D143E) |
+| `PRG:0x400010` | 0xB20C | VS2 | donovan x2b7ef4 (vsav2 0x2B7EF4) |
+| `PRG:0x0F8BF0` | 0xC | GEN | farm-port stub 0x2916c |
+| `PRG:0x0F8C10` | 0xC | GEN | farm-port stub 0x29184 |
+| `PRG:0x0F8C30` | 0xC | GEN | farm-port stub 0x2918c |
+| `PRG:0x0F8C40` | 0x2C | GEN | alloc wrapper 0x15702 |
+| `PRG:0x3FAD40` | 0x10 | VS2 | data_in_code table (FG capture-pose random table (native draws seqs 1/3/5)) |
+| `PRG:0x3FAD50` | 0xC | GEN | data_in_code helper (FG capture-pose random table (native draws seqs 1/3/5)) |
+| `PRG:0x3FAD60` | 0x10 | VS2 | data_in_code table (FG capture-pose table 2 (seqs 0x56-0x59)) |
+| `PRG:0x3FAD70` | 0xC | GEN | data_in_code helper (FG capture-pose table 2 (seqs 0x56-0x59)) |
+| `PRG:0x3FAD80` | 0x10 | VS2 | data_in_code table (capture-pose table 3 (seqs 0x56-0x59 twin)) |
+| `PRG:0x3FAD90` | 0xC | GEN | data_in_code helper (capture-pose table 3 (seqs 0x56-0x59 twin)) |
+| `PRG:0x3FADA0` | 0x10 | VS2 | data_in_code table (capture-pose table 4 (01/03/05 twin)) |
+| `PRG:0x3FADB0` | 0xC | GEN | data_in_code helper (capture-pose table 4 (01/03/05 twin)) |
+| `PRG:0x0F8CC0` | 0x2C | GEN | alloc wrapper 0x1572e |
+| `PRG:0x0F8D00` | 0xC | GEN | farm-port stub 0x2915c |
+| `PRG:0x0F8D20` | 0xC | GEN | farm-port stub 0x29164 |
+| `PRG:0x0F8DA0` | 0x40 | GEN | patched clone 0x5459a (vs2 0x5c77e) |
+| `PRG:0x3FADC0` | 0x100 | VS2 | data_in_code table (pod-zone word offset/record table (a3 re-derived from it; self-relative)) |
+| `PRG:0x3FAEC0` | 0xC | GEN | data_in_code helper (pod-zone word offset/record table (a3 re-derived from it; self-relative)) |
+| `PRG:0x3FAED0` | 0x2C48 | VS2 | companion-effect coord lists |
+| `PRG:0x3FDB20` | 0x500 | VS2 | sprite palette block |
+| `PRG:0x0F8ED0` | 0xDC0 | VS2 | effect palette block |
+| `PRG:0x0F9CD0` | 0x130 | GEN | proj_hook ext table |
+| `PRG:0x0F9E00` | 0x12 | GEN | obj_hook thunk |
+| `PRG:0x054470` | 0x6 | GEN | obj_hook engine site |
+| `PRG:0x0F9E30` | 0x1F0 | GEN | proj_hook ext table |
+| `PRG:0x0FA020` | 0x12 | GEN | obj_hook thunk |
+| `PRG:0x05E542` | 0x6 | GEN | obj_hook engine site |
+| `PRG:0x0FA040` | 0x50 | GEN | pool-seed + flavor(+Start-hold) init shim |
+| `PRG:0x40B280` | 0x5E | NEW | select_wheel roster21 record (21 cells) |
+| `PRG:0x40B220` | 0x54 | NEW | select_wheel roster21 coord list |
+| `PRG:0x0FA090` | 0x28 | NEW | select_wheel roster21 march mid-row retarget 0x2b598 |
+| `PRG:0x0FA0C0` | 0x28 | NEW | select_wheel roster21 march mid-row retarget 0x2b7d8 |
+| `PRG:0x40B2E0` | 0x1C | VS2 | select_records portrait/p1 coord list |
+| `PRG:0x40B300` | 0x26 | VS2 | select_records portrait/p1 record |
+| `PRG:0x40B330` | 0x1C | VS2 | select_records portrait/p2 coord list |
+| `PRG:0x40B350` | 0x26 | VS2 | select_records portrait/p2 record |
+| `PRG:0x40B380` | 0x4 | VS2 | select_records name_banner/p1 coord list |
+| `PRG:0x40B390` | 0xE | VS2 | select_records name_banner/p1 record |
+| `PRG:0x40B3A0` | 0x8 | VS2 | select_records name_banner/p2 coord list |
+| `PRG:0x40B3B0` | 0x12 | VS2 | select_records name_banner/p2 record |
+| `PRG:0x40B3D0` | 0x14 | VS2 | select_records splash_p1/p1 coord list |
+| `PRG:0x40B3F0` | 0x1E | VS2 | select_records splash_p1/p1 record |
+| `PRG:0x40B410` | 0x14 | VS2 | select_records splash_p2/p1 coord list |
+| `PRG:0x40B430` | 0x1E | VS2 | select_records splash_p2/p1 record |
+| `PRG:0x40B450` | 0x84 | VS2 | select_records win_quote/p1 coord list |
+| `PRG:0x40B4E0` | 0x8E | VS2 | select_records win_quote/p1 record |
+| `PRG:0x40B570` | 0x4B00 | VS2 | win_pal_variant hui_win_pal sparse block |
+| `PRG:0x0FA0F0` | 0x16 | NEW | win_pal_variant hui_win_pal thunk |
+| `PRG:0x0FA110` | 0x1A | GEN | site_thunk tenant_jump_seq |
+| `PRG:0x022A0E` | 0x6 | GEN | site_thunk tenant_jump_seq engine site |
+| `PRG:0x0FA130` | 0xE | GEN | site_thunk shadow_seq_guard |
+| `PRG:0x08245C` | 0x6 | GEN | site_thunk shadow_seq_guard engine site |
+| `PRG:0x0FA140` | 0x1E | GEN | site_thunk name_bank_variant_id |
+| `PRG:0x05FCE0` | 0x6 | GEN | site_thunk name_bank_variant_id engine site |
+| `PRG:0x0FA160` | 0x1E | GEN | site_thunk splash_bank_variant_id |
+| `PRG:0x06C0E0` | 0x6 | GEN | site_thunk splash_bank_variant_id engine site |
+| `PRG:0x0FA180` | 0x16 | GEN | site_thunk winquote_bank_variant_id |
+| `PRG:0x05F328` | 0x6 | GEN | site_thunk winquote_bank_variant_id engine site |
+| `PRG:0x410070` | 0x140 | VS2 | site_thunk select_pal_variant_id data block |
+| `PRG:0x0FA1A0` | 0x38 | GEN | site_thunk select_pal_variant_id |
+| `PRG:0x05F146` | 0x6 | GEN | site_thunk select_pal_variant_id engine site |
+| `PRG:0x4101B0` | 0x54 | VS2 | site_thunk throw_arc_tables data block |
+| `PRG:0x410210` | 0x370 | VS2 | site_thunk throw_arc_tables data block |
+| `PRG:0x0FA1E0` | 0x42 | GEN | site_thunk throw_arc_tables |
+| `PRG:0x028386` | 0x6 | GEN | site_thunk throw_arc_tables engine site |
+| `PRG:0x0282F4` | 0x2 | GEN | code_word obj_bank_word_slot |

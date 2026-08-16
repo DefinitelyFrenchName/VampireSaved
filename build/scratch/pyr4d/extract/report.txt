@@ -1,0 +1,44 @@
+shifts (vsav2->vhunt2): code=+0x30, bank=-0x76e, anim=-0x13b74
+  code: 1 dead filler zone(s), 0xc bytes (+0x234)
+extra region x0d143e: DATA (segmented oracle), twin 0x0D0CD0, len 0x900, 0 pointer fields, 1 segments, 0 dead zones (0x0 bytes unaligned)
+extra region x05c800: twin 0x05C834 (shift +0x34), len 0x6A00
+extra region x026142: twin 0x026170 (shift +0x2e), len 0x1400
+extra region x028122: twin 0x028150 (shift +0x2e), len 0xE00
+extra region x088512: SOURCE-ONLY, len 0x3B40 (per-game hook; scanner refs)
+extra region x2b7ef4: DATA (segmented oracle), twin 0x2A4398, len 0xB20C, 2065 pointer fields, 75 segments, 74 dead zones (0x54f7 bytes unaligned)
+region hitbox: vsav2 0x0C7502+0x16B6 (data, shift bank)
+region hitbox_proj: vsav2 0x0D0986+0x322 (data, shift bank)
+region anim: vsav2 0x264086+0xAD00 (data, shift anim)
+region code: vsav2 0x0574C0+0x5200 (code, shift code)
+region x0d143e: vsav2 0x0D143E+0x900 (data, shift x0d143e)
+region x05c800: vsav2 0x05C800+0x6A00 (code, shift x05c800)
+region x026142: vsav2 0x026142+0x1400 (code, shift x026142)
+region x028122: vsav2 0x028122+0xE00 (code, shift x028122)
+region x088512: vsav2 0x088512+0x3B40 (code, shift x088512)
+region x2b7ef4: vsav2 0x2B7EF4+0xB20C (data, shift x2b7ef4)
+  anim: grown to +0x1B500 to close 1805 forward refs
+  DISCOVERED shift aux0 (-0x2002c): 1614 referencing fields, 3 cluster regions
+  hitbox: 0 pointer fields, 0 variant-site bytes (0.00%)
+  hitbox_proj: 0 pointer fields, 0 variant-site bytes (0.00%)
+  anim: 2660 pointer fields, 0 variant-site bytes (0.00%)
+  code: 775 pointer fields, 4 variant-site bytes (0.02%)
+  code: non-internal refs {'engine': 316, 'bank_ref': 6}
+  x0d143e: 0 pointer fields, 0 variant-site bytes (0.00%)
+  x05c800: 696 pointer fields, 0 variant-site bytes (0.00%)
+  x05c800: non-internal refs {'bank_ref': 4, 'engine': 578}
+  x026142: 40 pointer fields, 0 variant-site bytes (0.00%)
+  x026142: non-internal refs {'engine': 10, 'bank_ref': 30}
+  x028122: 44 pointer fields, 0 variant-site bytes (0.00%)
+  x028122: non-internal refs {'engine': 33, 'bank_ref': 6}
+  x088512: 0 pointer fields, 0 variant-site bytes (0.00%)
+  x2b7ef4: 2065 pointer fields, 0 variant-site bytes (0.00%)
+  x2b7ef4: non-internal refs {'engine': 29}
+  aux0_0: 0 pointer fields, 0 variant-site bytes (0.00%)
+  aux0_1: 0 pointer fields, 0 variant-site bytes (0.00%)
+  aux0_2: 0 pointer fields, 0 variant-site bytes (0.00%)
+  code: 1 same-value engine refs merged from the scanner (sibling-coincident operands)
+  x05c800: 27 same-value engine refs merged from the scanner (sibling-coincident operands)
+  x026142: 4 same-value engine refs merged from the scanner (sibling-coincident operands)
+  x028122: 2 same-value engine refs merged from the scanner (sibling-coincident operands)
+  x088512: 333 scanner-derived refs (source-only region); bare longs: 0 sibling-confirmed, 58 vetoed (operand bytes), 1 rejected (conflicting evidence), 8 rejected (divergent zone, unlabeled)
+  code scan: 2078 candidates, 2076 engine/ROM refs (R1 surface), 0 char-id 0x11 immediates

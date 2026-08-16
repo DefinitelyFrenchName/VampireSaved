@@ -1,0 +1,79 @@
+build fingerprint -> expectation set 'pyron-m6'
+per-set mask: 043c-043d,4182-41a2,41c2-41e2,4222-4262,7f00-8000
+01_attract_long          authored .masked expectation — not self-frozen
+02_demitri_vs_cpu        authored .masked expectation — not self-frozen
+03_two_player_vs         authored .masked expectation — not self-frozen
+04_select_fuzz           authored .masked expectation — not self-frozen
+05_timeout_idle          authored .masked expectation — not self-frozen
+06_test_mode             authored .masked expectation — not self-frozen
+07_mash_storm            authored .masked expectation — not self-frozen
+08_challenger_join       authored .masked expectation — not self-frozen
+09_mirror_pick           authored .masked expectation — not self-frozen
+10_midattract_start      authored .masked expectation — not self-frozen
+11_pick_donovan          SKIP (picks the DONOVAN cell (id 0x13), which this Pyron-only build does not back
+(it backs only Pyron at 0x11). The pick therefore lands on an unbacked cell
+and the select divergence is not a clean vanilla-legacy window — the same
+reason this replay is skipped on huitzil-m2, which backs only 0x10.
+The tenant pick is covered by 40_pick_pyron_cell.)
+12_donovan_vs_cpu        frozen 533fc83d593ecca404fb046570448e61c00742e2
+16_xemu_2p               authored .masked expectation — not self-frozen
+17_don_oracle_vsav2      SKIP (targets the vsav2 romset; covered by tests/test_m2a_stage4_oracle.sh)
+17_don_oracle_vsavj      frozen fd891c8bb8bf1da47ed059f6c872c99045bd550d
+18_veteran_ctl_vsav2     SKIP (targets the vsav2 romset; covered by tests/test_m2a_stage4_oracle.sh)
+18_veteran_ctl_vsavj     frozen f1b62a5783d52d4be0d17ac632f089c54a4984f3
+19_don_dp_spam           frozen b166d42a8916b46814154fedd5f1b075a29a96de
+20_don_round2            frozen eb87b63df17bd45e9739f2fbad2cb24b190713de
+21_don_mash              frozen d71ec2511918de448d4cee9eb2ebb0bcdc4b64b1
+22_don_dualmash          frozen 92b9bb3f89f27efd51ab20dd98b9d7101ff75cb5
+23_don_matchwin          frozen 1fdf2ac502c9543b608c97584fd430ee47988a0a
+24_don_winmash           frozen 91f14bf8c9fabf57b0f9c37d99a2600ffbf79df9
+25_don_darkforce         frozen f0e2a30e3e1179349de1ff69fc39a84a4501b517
+26_don_arcade_mash       frozen b36beee7f39683ea858898f7d7e97c92db54390b
+27_don_throw_vsav2       SKIP (targets the vsav2 romset; throw oracle pair, see tests/replays/27_*)
+27_don_throw_vsavj       SKIP (added post-freeze (session 14n throw fix); validated by the throw oracle measurement + the m2b gate line)
+28_don_quotewin          frozen 1a23912f98c1054143b40b5bc27f9628ec849430
+29_felicia_walljump      authored .masked expectation — not self-frozen
+30_demitri_throw         authored .masked expectation — not self-frozen
+31_don_6hp_vsav2         SKIP (targets the vsav2 romset; native ground-truth half of an oracle pair (see the matching _vsavj replay / its gate))
+31_don_6hp_vsavj         frozen bd59be70ef274f4a664aa6a80fddbaafa6e6a087
+32_victor_shock_vsav2    SKIP (targets the vsav2 romset; native ground-truth half of an oracle pair (see the matching _vsavj replay / its gate))
+32_victor_shock_vsavj    frozen 91b89efe666989f04da16f03dcc5b6f186b27ab9
+33_victor_6hp_vsav2      SKIP (targets the vsav2 romset; native ground-truth half of an oracle pair (see the matching _vsavj replay / its gate))
+33_victor_6hp_vsavj      frozen 3ab97d4d7eea29f7158b8f8a36512a6c350f67be
+34_victor_5hp_vsav2      SKIP (targets the vsav2 romset; native ground-truth half of an oracle pair (see the matching _vsavj replay / its gate))
+34_victor_5hp_vsavj      frozen ef9d865c7a0ffd907b9fe1aa578b1611f9915622
+35_victor_kd_vsav2       SKIP (targets the vsav2 romset; native ground-truth half of an oracle pair (see the matching _vsavj replay / its gate))
+35_victor_kd_vsavj       frozen 63d075e6c60fede548d42b0813aa7cd313e4d5b9
+36_pick_tenant_cell      frozen ceb0d48e6d93778fa766b6ee199382d88c5b828a
+36_victor_kd2_vsav2      SKIP (targets the vsav2 romset; native ground-truth half of an oracle pair (see the matching _vsavj replay / its gate))
+36_victor_kd2_vsavj      frozen 168df419a24287014c4dbe07c9108a2cc1798aae
+37_p2_pick_tenant        frozen d5198d104b7e12216f1f2f0c26a7721b1b12d02a
+37_pick_huitzil_cell     frozen 082bcea13cebcf418393586f5987e86019fe58cc
+37_victor_ko_vsav2       SKIP (targets the vsav2 romset; native ground-truth half of an oracle pair (see the matching _vsavj replay / its gate))
+37_victor_ko_vsavj       frozen e66658e4dfebdd1eb3f4063ef29a7e44a04595f4
+38_victor_p1_vsavj       frozen 5c2ab1f000331083fe17b71d584a5fc7624ae45c
+39_victor_cross_vsavj    frozen 0b076750fa70febb5c75a440db41029e57ebe9d2
+40_pick_pyron_cell       frozen 93e0900d6d9d51f121fc356a4ff0eab5bf67b66d
+40_victor_5hp_defaultchar_vsavj frozen a8f79bced90d01a85b3289b7243aa2d06bfcea5e
+41_don_altcolor_vsav2    SKIP (targets the vsav2 romset; native ground-truth half of an oracle pair (see the matching _vsavj replay / its gate))
+41_don_altcolor_vsavj    frozen 6825db011d5c959659eb60a0cc4b4713b648f5ab
+42_don_mirror_vsavj      frozen 5a7d084b14c2e63adb2cdeec275976ba709397b4
+43_don_mirror_vsav2      SKIP (targets the vsav2 romset; native ground-truth half of an oracle pair (see the matching _vsavj replay / its gate))
+44_don_select_hover      frozen 27d62fe9bedd534ae2433552af159115f3afa899
+48_don_immortal_ko       frozen b0a9d26519202c01b2949e7191ffdbf79b1c3af0
+50_don_column_ko         frozen 819f867aecf809fbbd53264e800e23742ff4600f
+51_vs2_immortal_native   SKIP (targets the vsav2 romset; native no-mash Lightning Sword ground truth (datums frozen in the replay header + test_don_reactions))
+52_vs2_immortal_mash     SKIP (targets the vsav2 romset; native mash ground truth of the 52/53 pair (test_don_reactions datums))
+53_don_immortal_mash     frozen 9634cc3473f5833f47b508cd76f08704bdcb77c1
+54_don_matchend_ko       frozen d77a22f3a6cbc75682c4aad9edd57b82563aad21
+56_don_es_ls             frozen 4610e3af9be174000b11b9be4b6454c2b53e6dbc
+57_vs2_plant_native      SKIP (targets the vsav2 romset; native Killshread Plant ground truth (14z-39 reference data))
+58_don_select_confirm    frozen bfbdc89b817fddba0618baef94823bbf518ca57a
+59_don_blizzard_hcf      frozen 58697f8d5e7bb4f5d303e29012833ef634ccfbc5
+60_don_grapple_hcb       frozen a1547fc181fc139f3187c2cdd5b97adf9124bc92
+61_tenant_2pwin          frozen 81815153963ce35bf6879ef3a1c19b08e25494bb
+62_tenant_2plose         frozen 0fd850387209aa00783c4ed4b03c106014f4cf37
+63_idle_select           frozen 7e14127d830ae438955f551770f2db97adcd7ace
+64_select_mashright      frozen 98324b35622250c81d7a7e1d33d62ae8b8272837
+65_don_mirror_throw      frozen 794f962bb29da9dd004274441632fe0c9b0caa34
+SUITE GREEN

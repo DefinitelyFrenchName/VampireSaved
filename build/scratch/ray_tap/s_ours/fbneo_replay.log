@@ -1,0 +1,47 @@
+*** Starting emulation of vsavjw - Vampire Savior: The Lord of Vampire (Japan 970519, CPS-2 WIDE v1).
+Cheat cpu-register INIT.
+CPS-2 WIDE v1 profile active
+  - 68K ROM size:	0x00600000 (Decrypted with key)
+  - Z80 ROM size:	0x00040000
+  - Graphics data:	0x03000000
+  - QSound data:	0x01000000
+  - Key data:		0x00000014
+Loading program (vm3j.03d)... (OK)
+Loading program (vm3j.04d)... (OK)
+Loading program (vm3j.05a)... (OK)
+Loading program (vm3j.06b)... (OK)
+Loading program (vm3j.07b)... (OK)
+Loading program (vm3j.08a)... (OK)
+Loading program (vm3j.09b)... (OK)
+Loading program (vm3j.10b)... (OK)
+Loading program (vsw.41)... (OK)
+Loading program (vsw.42)... (OK)
+Loading program (vsw.43)... (OK)
+Loading program (vsw.44)... (OK)
+Loading graphics (vm3.13m)... (OK)
+Loading graphics (vm3.15m)... (OK)
+Loading graphics (vm3.17m)... (OK)
+Loading graphics (vm3.19m)... (OK)
+Loading graphics (vm3.14m)... (OK)
+Loading graphics (vm3.16m)... (OK)
+Loading graphics (vm3.18m)... (OK)
+Loading graphics (vm3.20m)... (OK)
+Loading graphics (vsw.31m)... (OK)
+Loading graphics (vsw.33m)... (OK)
+Loading graphics (vsw.35m)... (OK)
+Loading graphics (vsw.37m)... (OK)
+Loading program (vm3.01)... (OK)
+Loading program (vm3.02)... (OK)
+Loading sound (vm3.11m)... (OK)
+Loading sound (vm3.12m)... (OK)
+Loading sound (vsw.21m)... (OK)
+Loading sound (vsw.22m)... (OK)
+Loading vsavj.key... (OK)
+FBNeo v1.0.0.03
+Loading config from /Users/koneko/Library/Application Support/fbneo/config/fbneo.ini
+harness: write tap on 2 range(s), pages ff8000-ffbfff -> /Users/koneko/Developer/Vampire_Saved/VampireSaved/build/scratch/ray_tap/ours.tap
+harness: poke frame 1400 @ff8783 = 10
+harness: poke frame 1450 @ff8783 = 10
+harness: poke frame 1500 @ff8783 = 10
+harness: 4420 frames, log /Users/koneko/Developer/Vampire_Saved/VampireSaved/build/scratch/ray_tap/ours.log
+Doing exit cleanup

@@ -1,0 +1,27 @@
+1. effect-class row 16 (0x080AEC) is never dispatched by vanilla
+  ok: 21_don_mash -> 0 reads
+  ok: 26_don_arcade_mash -> 0 reads
+   positive control (row 37, the shared reader — same instrument, same leg):
+  ok: 1760 reads — the opcodes-space watchpoint DOES fire here,
+      so the zeros above are a finding and not a blind instrument
+2. vanilla DOES use $FF3578-$FF3581, so the composite handler cannot
+   keep vs2's own A5 displacements — it needs relocated scratch
+  ok: 21_don_mash -> 39 accesses (vsavj's $FF3502 buffer reaches in here)
+  ok: 26_don_arcade_mash -> 246 accesses (vsavj's $FF3502 buffer reaches in here)
+3. drawer list-type 10 is USED by legacy (so it is not a spare slot)
+  ok: 2702 reads of the type-10 entry — repointing it would change
+      legacy rendering; the shortcut is closed, measured not assumed
+4. the type-6 fallback tripwire ($FF010C) is never armed on legacy
+  (thunk body at 0x0FD060; only writes from inside it count)
+  FAIL: 21_don_mash armed the tripwire 387 time(s) — A LEGACY LIST REACHED
+        LIST-TYPE 6. Rendering is still correct (the fallback runs
+        vanilla's own code), but STOP: re-open the type-6 deadness
+        claim before continuing. See build/manifest/huitzil.toml,
+        site_thunk beam_list_type6.
+  FAIL: 26_don_arcade_mash armed the tripwire 948 time(s) — A LEGACY LIST REACHED
+        LIST-TYPE 6. Rendering is still correct (the fallback runs
+        vanilla's own code), but STOP: re-open the type-6 deadness
+        claim before continuing. See build/manifest/huitzil.toml,
+        site_thunk beam_list_type6.
+
+FAIL audit_effect_class_rows.sh

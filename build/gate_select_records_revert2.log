@@ -1,0 +1,25 @@
+== 0. building at --tenant-id 0x13 (fresh) ==
+  build fingerprint: 3c599fb676de518606a60b2b4a4c42f80aa7c97b
+  OK: stage 6 build at /var/folders/m7/v33ds745313314_cz_z2jghw0000gn/T/tmp.fTFlBLLqWq/build/rompath (fingerprint above; register in tests/expected/registry.tsv at freeze time)
+== 1. static: composition + host de-substitution ==
+  ok: 9 rows, 9 composed records, host bytes vanilla
+== 2. negative controls: the verdict logic is itself tested ==
+  ok: a pristine image (nothing repointed) is caught
+  ok: one flipped byte in a composed record is caught
+  ok: one flipped byte in the host record block is caught
+== 3. runtime: the engine fetches the tenant's rows on cell 0x13 ==
+  ok: big_portrait — vanilla rows then the tenant's record
+  ok: name_banner — vanilla rows then the tenant's record
+  ok: highlight — vanilla rows then the tenant's record
+  ok: p2_portrait — vanilla rows then the tenant's record
+  ok: p2_highlight — vanilla rows then the tenant's record
+  ok: p2_name_via_p1 — vanilla rows then the tenant's record
+  (RNG draw: vanilla record 00273a02)
+  ok: splash — vanilla rows then the tenant's record
+  ok: p2 name array (+0x80) unconsumed, as measured
+== 4. de-substitution acceptance: picking the HOST re-converges ==
+  ok: host pick = bounded window 889-2415, fully re-convergent
+PASS: tenant select-records gate (static composition + negative
+      controls + the engine's own row sequence onto cell 0x13 +
+      the host-pick re-convergence window)
+SR-EXIT 0

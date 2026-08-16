@@ -1,0 +1,116 @@
+harness patch already present
+WIDE=0: reverted the CPS-2 WIDE patch
+WIDE=0: harness-only build (verified clean)
+Making debug build...
+
+Compiling src/burn/drv/capcom/d_cps2.cpp...
+Compiling src/burn/drv/capcom/cps.cpp...
+Compiling src/burn/drv/capcom/cps_rw.cpp...
+Compiling src/burn/drv/capcom/cps_obj.cpp...
+src/burn/drv/capcom/cps_obj.cpp:44:2: warning: 'sprintf' is deprecated: This function is provided for compatibility reasons only.  Due to security concerns inherent in the design of sprintf(3), it is highly recommended that you use snprintf(3) instead. [-Wdeprecated-declarations]
+   44 |         _stprintf(filename, _T("%s%s.bld"), szAppBlendPath, BurnDrvGetText(DRV_NAME));
+      |         ^
+src/burner/sdl/tchar.h:26:24: note: expanded from macro '_stprintf'
+   26 | #define _stprintf      sprintf
+      |                        ^
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_stdio.h:278:1: note: 'sprintf' has been explicitly marked deprecated here
+  278 | __deprecated_msg("This function is provided for compatibility reasons only.  Due to security concerns inherent in the design of sprintf(3), it is highly recommended that you use snprintf(3) instead.")
+      | ^
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/sys/cdefs.h:227:48: note: expanded from macro '__deprecated_msg'
+  227 |         #define __deprecated_msg(_msg) __attribute__((__deprecated__(_msg)))
+      |                                                       ^
+src/burn/drv/capcom/cps_obj.cpp:57:3: warning: 'sprintf' is deprecated: This function is provided for compatibility reasons only.  Due to security concerns inherent in the design of sprintf(3), it is highly recommended that you use snprintf(3) instead. [-Wdeprecated-declarations]
+   57 |                 _stprintf(filename, _T("%s%s.bld"), szAppBlendPath, BurnDrvGetText(DRV_PARENT));
+      |                 ^
+src/burner/sdl/tchar.h:26:24: note: expanded from macro '_stprintf'
+   26 | #define _stprintf      sprintf
+      |                        ^
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_stdio.h:278:1: note: 'sprintf' has been explicitly marked deprecated here
+  278 | __deprecated_msg("This function is provided for compatibility reasons only.  Due to security concerns inherent in the design of sprintf(3), it is highly recommended that you use snprintf(3) instead.")
+      | ^
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/sys/cdefs.h:227:48: note: expanded from macro '__deprecated_msg'
+  227 |         #define __deprecated_msg(_msg) __attribute__((__deprecated__(_msg)))
+      |                                                       ^
+src/burn/drv/capcom/cps_rw.cpp:65:19: warning: unused variable 'nCPSExtraNVRAM' [-Wunused-const-variable]
+   65 | static const bool nCPSExtraNVRAM = false;
+      |                   ^~~~~~~~~~~~~~
+2 warnings generated.
+1 warning generated.
+Generating gamelist in src/dep/generated/driverlist.h...
+Generating gamelist.txt...
+Compiling src/burn/burn.cpp...
+src/burn/burn.cpp:1899:2: warning: 'sprintf' is deprecated: This function is provided for compatibility reasons only.  Due to security concerns inherent in the design of sprintf(3), it is highly recommended that you use snprintf(3) instead. [-Wdeprecated-declarations]
+ 1899 |         sprintf(pNewEntry->szName, "%s:%s %i", module, name, instance);
+      |         ^
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_stdio.h:278:1: note: 'sprintf' has been explicitly marked deprecated here
+  278 | __deprecated_msg("This function is provided for compatibility reasons only.  Due to security concerns inherent in the design of sprintf(3), it is highly recommended that you use snprintf(3) instead.")
+      | ^
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/sys/cdefs.h:227:48: note: expanded from macro '__deprecated_msg'
+  227 |         #define __deprecated_msg(_msg) __attribute__((__deprecated__(_msg)))
+      |                                                       ^
+1 warning generated.
+Linking drivers...
+
+Linking executable... fbneo
+ld: warning: -s is obsolete
+ld: warning: reducing alignment of section __DATA,__common from 0x8000 to 0x4000 because it exceeds segment maximum alignment
+verified: reference binary is free of the WIDE profile
+built: /Users/koneko/Developer/Vampire_Saved/VampireSaved/emu/fbneo/fbneo
+harness patch already present
+CPS-2 WIDE profile patch applied
+Making debug build...
+
+Compiling src/burn/drv/capcom/d_cps2.cpp...
+Compiling src/burn/drv/capcom/cps.cpp...
+Compiling src/burn/drv/capcom/cps_rw.cpp...
+Compiling src/burn/drv/capcom/cps_obj.cpp...
+src/burn/drv/capcom/cps_rw.cpp:74:19: warning: unused variable 'nCPSExtraNVRAM' [-Wunused-const-variable]
+   74 | static const bool nCPSExtraNVRAM = false;
+      |                   ^~~~~~~~~~~~~~
+src/burn/drv/capcom/cps_obj.cpp:44:2: warning: 'sprintf' is deprecated: This function is provided for compatibility reasons only.  Due to security concerns inherent in the design of sprintf(3), it is highly recommended that you use snprintf(3) instead. [-Wdeprecated-declarations]
+   44 |         _stprintf(filename, _T("%s%s.bld"), szAppBlendPath, BurnDrvGetText(DRV_NAME));
+      |         ^
+src/burner/sdl/tchar.h:26:24: note: expanded from macro '_stprintf'
+   26 | #define _stprintf      sprintf
+      |                        ^
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_stdio.h:278:1: note: 'sprintf' has been explicitly marked deprecated here
+  278 | __deprecated_msg("This function is provided for compatibility reasons only.  Due to security concerns inherent in the design of sprintf(3), it is highly recommended that you use snprintf(3) instead.")
+      | ^
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/sys/cdefs.h:227:48: note: expanded from macro '__deprecated_msg'
+  227 |         #define __deprecated_msg(_msg) __attribute__((__deprecated__(_msg)))
+      |                                                       ^
+src/burn/drv/capcom/cps_obj.cpp:57:3: warning: 'sprintf' is deprecated: This function is provided for compatibility reasons only.  Due to security concerns inherent in the design of sprintf(3), it is highly recommended that you use snprintf(3) instead. [-Wdeprecated-declarations]
+   57 |                 _stprintf(filename, _T("%s%s.bld"), szAppBlendPath, BurnDrvGetText(DRV_PARENT));
+      |                 ^
+src/burner/sdl/tchar.h:26:24: note: expanded from macro '_stprintf'
+   26 | #define _stprintf      sprintf
+      |                        ^
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_stdio.h:278:1: note: 'sprintf' has been explicitly marked deprecated here
+  278 | __deprecated_msg("This function is provided for compatibility reasons only.  Due to security concerns inherent in the design of sprintf(3), it is highly recommended that you use snprintf(3) instead.")
+      | ^
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/sys/cdefs.h:227:48: note: expanded from macro '__deprecated_msg'
+  227 |         #define __deprecated_msg(_msg) __attribute__((__deprecated__(_msg)))
+      |                                                       ^
+2 warnings generated.
+1 warning generated.
+Generating gamelist in src/dep/generated/driverlist.h...
+Generating gamelist.txt...
+Compiling src/burn/burn.cpp...
+src/burn/burn.cpp:1899:2: warning: 'sprintf' is deprecated: This function is provided for compatibility reasons only.  Due to security concerns inherent in the design of sprintf(3), it is highly recommended that you use snprintf(3) instead. [-Wdeprecated-declarations]
+ 1899 |         sprintf(pNewEntry->szName, "%s:%s %i", module, name, instance);
+      |         ^
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_stdio.h:278:1: note: 'sprintf' has been explicitly marked deprecated here
+  278 | __deprecated_msg("This function is provided for compatibility reasons only.  Due to security concerns inherent in the design of sprintf(3), it is highly recommended that you use snprintf(3) instead.")
+      | ^
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/sys/cdefs.h:227:48: note: expanded from macro '__deprecated_msg'
+  227 |         #define __deprecated_msg(_msg) __attribute__((__deprecated__(_msg)))
+      |                                                       ^
+1 warning generated.
+Linking drivers...
+
+Linking executable... fbneo
+ld: warning: -s is obsolete
+ld: warning: reducing alignment of section __DATA,__common from 0x8000 to 0x4000 because it exceeds segment maximum alignment
+verified: binary carries the CPS-2 WIDE profile
+built: /Users/koneko/Developer/Vampire_Saved/VampireSaved/emu/fbneo/fbneo
+REF-CHAIN-OK

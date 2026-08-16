@@ -1,0 +1,165 @@
+== 0: verdict controls (static; the checker before any verdict) ==
+  ok c1: identical legs -> LEGACY
+  ok c2: a different fighter base -> TENANT
+  ok c3: a two-frame load phase is tolerated -> LEGACY
+  ok c4: an EMPTY leg -> DEAD, never agreement
+  ok c4b: a TRUNCATED leg (no FIELDSUMMARY) -> DEAD
+  ok c5: no fighter on either leg -> NO-MATCH
+  ok c6: voice-class reassignment does not flip the verdict
+  build/don_m5 -> tests/expected/donovan-m5
+  build/hui40 -> tests/expected/huitzil-m13
+  build/pyron25 -> tests/expected/pyron-m7
+== 1: sweep — id trajectories, vanilla vs each build (JOBS=8) ==
+== 2: classify + assert coverage ==
+-- build/don_m5 -> tests/expected/donovan-m5 --
+  ok liveness: 16_xemu_2p reads LEGACY with a real fighter pair
+      liveness: LEGACY — same characters as vanilla: (93B6A,9769E)
+  ok control: the same replay with the tenant id poked -> TENANT
+  45 LEGACY / 4 TENANT / 6 NO-MATCH   -> build/legacy_pairings/pairings_donovan-m5.tsv
+  FAIL: legacy pairings guarded only by a self-frozen expectation —
+        a self-frozen log cannot see a legacy regression (14z-88):
+          12_donovan_vs_cpu (sha1)
+          17_don_oracle_vsavj (sha1)
+          18_veteran_ctl_vsavj (sha1)
+          19_don_dp_spam (sha1)
+          20_don_round2 (sha1)
+          21_don_mash (sha1)
+          22_don_dualmash (sha1)
+          23_don_matchwin (sha1)
+          24_don_winmash (sha1)
+          25_don_darkforce (sha1)
+          26_don_arcade_mash (sha1)
+          28_don_quotewin (sha1)
+          31_don_6hp_vsavj (sha1)
+          32_victor_shock_vsavj (sha1)
+          33_victor_6hp_vsavj (sha1)
+          34_victor_5hp_vsavj (sha1)
+          35_victor_kd_vsavj (sha1)
+          36_victor_kd2_vsavj (sha1)
+          37_victor_ko_vsavj (sha1)
+          38_victor_p1_vsavj (sha1)
+          39_victor_cross_vsavj (sha1)
+          40_victor_5hp_defaultchar_vsavj (sha1)
+          41_don_altcolor_vsavj (sha1)
+          42_don_mirror_vsavj (sha1)
+          48_don_immortal_ko (sha1)
+          50_don_column_ko (sha1)
+          53_don_immortal_mash (sha1)
+          54_don_matchend_ko (sha1)
+          56_don_es_ls (sha1)
+          59_don_blizzard_hcf (sha1)
+          60_don_grapple_hcb (sha1)
+          63_idle_select (sha1)
+          65_don_mirror_throw (sha1)
+        FIX: freeze the vanilla basis log, then author a .masked spec:
+          tools/freeze_masked_basis.sh tests/expected/vsavj/masked-v2 \
+            "$(cat tests/expected/donovan-m5/mask)" <name>...
+  no-match (hand-judged): 06_test_mode [masked]
+  no-match (hand-judged): 10_midattract_start [masked]
+  no-match (hand-judged): 44_don_select_hover [sha1]
+  no-match (hand-judged): 58_don_select_confirm [sha1]
+  no-match (hand-judged): 64_select_mashright [sha1]
+  no-match (hand-judged): 92_p2_ring_walk [sha1]
+-- build/hui40 -> tests/expected/huitzil-m13 --
+  ok liveness: 16_xemu_2p reads LEGACY with a real fighter pair
+      liveness: LEGACY — same characters as vanilla: (93B6A,9769E)
+  ok control: the same replay with the tenant id poked -> TENANT
+  46 LEGACY / 3 TENANT / 6 NO-MATCH   -> build/legacy_pairings/pairings_huitzil-m13.tsv
+  FAIL: legacy pairings guarded only by a self-frozen expectation —
+        a self-frozen log cannot see a legacy regression (14z-88):
+          12_donovan_vs_cpu (sha1)
+          17_don_oracle_vsavj (sha1)
+          18_veteran_ctl_vsavj (sha1)
+          19_don_dp_spam (sha1)
+          20_don_round2 (sha1)
+          21_don_mash (sha1)
+          22_don_dualmash (sha1)
+          23_don_matchwin (sha1)
+          24_don_winmash (sha1)
+          25_don_darkforce (sha1)
+          26_don_arcade_mash (sha1)
+          28_don_quotewin (sha1)
+          31_don_6hp_vsavj (sha1)
+          32_victor_shock_vsavj (sha1)
+          33_victor_6hp_vsavj (sha1)
+          34_victor_5hp_vsavj (sha1)
+          35_victor_kd_vsavj (sha1)
+          36_victor_kd2_vsavj (sha1)
+          37_victor_ko_vsavj (sha1)
+          38_victor_p1_vsavj (sha1)
+          39_victor_cross_vsavj (sha1)
+          40_victor_5hp_defaultchar_vsavj (sha1)
+          41_don_altcolor_vsavj (sha1)
+          42_don_mirror_vsavj (sha1)
+          48_don_immortal_ko (sha1)
+          50_don_column_ko (sha1)
+          53_don_immortal_mash (sha1)
+          54_don_matchend_ko (sha1)
+          56_don_es_ls (sha1)
+          59_don_blizzard_hcf (sha1)
+          60_don_grapple_hcb (sha1)
+          61_tenant_2pwin (sha1)
+          62_tenant_2plose (sha1)
+          63_idle_select (sha1)
+          65_don_mirror_throw (sha1)
+        FIX: freeze the vanilla basis log, then author a .masked spec:
+          tools/freeze_masked_basis.sh tests/expected/vsavj/masked-v2 \
+            "$(cat tests/expected/huitzil-m13/mask)" <name>...
+  no-match (hand-judged): 06_test_mode [masked]
+  no-match (hand-judged): 10_midattract_start [masked]
+  no-match (hand-judged): 44_don_select_hover [sha1]
+  no-match (hand-judged): 58_don_select_confirm [sha1]
+  no-match (hand-judged): 64_select_mashright [sha1]
+  no-match (hand-judged): 92_p2_ring_walk [sha1]
+-- build/pyron25 -> tests/expected/pyron-m7 --
+  ok liveness: 16_xemu_2p reads LEGACY with a real fighter pair
+      liveness: LEGACY — same characters as vanilla: (93B6A,9769E)
+  ok control: the same replay with the tenant id poked -> TENANT
+  46 LEGACY / 4 TENANT / 6 NO-MATCH   -> build/legacy_pairings/pairings_pyron-m7.tsv
+  FAIL: legacy pairings guarded only by a self-frozen expectation —
+        a self-frozen log cannot see a legacy regression (14z-88):
+          12_donovan_vs_cpu (sha1)
+          17_don_oracle_vsavj (sha1)
+          18_veteran_ctl_vsavj (sha1)
+          19_don_dp_spam (sha1)
+          20_don_round2 (sha1)
+          21_don_mash (sha1)
+          22_don_dualmash (sha1)
+          23_don_matchwin (sha1)
+          24_don_winmash (sha1)
+          25_don_darkforce (sha1)
+          26_don_arcade_mash (sha1)
+          28_don_quotewin (sha1)
+          31_don_6hp_vsavj (sha1)
+          32_victor_shock_vsavj (sha1)
+          33_victor_6hp_vsavj (sha1)
+          34_victor_5hp_vsavj (sha1)
+          35_victor_kd_vsavj (sha1)
+          36_victor_kd2_vsavj (sha1)
+          37_victor_ko_vsavj (sha1)
+          38_victor_p1_vsavj (sha1)
+          39_victor_cross_vsavj (sha1)
+          40_victor_5hp_defaultchar_vsavj (sha1)
+          41_don_altcolor_vsavj (sha1)
+          42_don_mirror_vsavj (sha1)
+          48_don_immortal_ko (sha1)
+          50_don_column_ko (sha1)
+          53_don_immortal_mash (sha1)
+          54_don_matchend_ko (sha1)
+          56_don_es_ls (sha1)
+          59_don_blizzard_hcf (sha1)
+          60_don_grapple_hcb (sha1)
+          61_tenant_2pwin (sha1)
+          62_tenant_2plose (sha1)
+          63_idle_select (sha1)
+          65_don_mirror_throw (sha1)
+        FIX: freeze the vanilla basis log, then author a .masked spec:
+          tools/freeze_masked_basis.sh tests/expected/vsavj/masked-v2 \
+            "$(cat tests/expected/pyron-m7/mask)" <name>...
+  no-match (hand-judged): 06_test_mode [masked]
+  no-match (hand-judged): 10_midattract_start [masked]
+  no-match (hand-judged): 44_don_select_hover [sha1]
+  no-match (hand-judged): 58_don_select_confirm [sha1]
+  no-match (hand-judged): 64_select_mashright [sha1]
+  no-match (hand-judged): 92_p2_ring_walk [sha1]
+LEGACY-PAIRING COVERAGE: FAIL

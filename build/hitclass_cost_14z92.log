@@ -1,0 +1,48 @@
+== corpus: 46 legacy pairings from tests/expected/pyron-m9 (JOBS=6) ==
+== 0: build the current pyron vertical (pyron.toml verbatim) ==
+  ok: built; body at 0xff1e0
+  removed from the twin: hitclass_map_extend
+  ok: no-thunk twin built (same manifest, hitclass_map_extend stripped)
+  ok: A/B is non-vacuous — fix fac4a77739ff9e29e23a8deb234dc0cb2c891dd8 != twin 3a546ab8aeed2c2efb0afb501b0dfc04a13c1750
+  FAIL: CONTROL DEAD — the soak did NOT crash on the no-thunk twin,
+        so an END-clean run on the fix build proves nothing about
+        the thunk. Check the rig before believing section 0.
+END 11017
+  ok: THE FIX HOLDS — the soak that crashes the no-thunk twin at
+      f7997 runs END-clean through 11,017 frames
+== 1: LEGACY COST — A/B fix vs the NO-THUNK TWIN ==
+  DIVERGES: 21_don_mash — the thunk's cycle cost reached legacy state;
+        shape (maintainer input, not a gate):
+        A: /var/folders/m7/v33ds745313314_cz_z2jghw0000gn/T/tmp.2GIi3XteMD/l_21_don_mash_ref  14120 frames, END 14120
+        B: /var/folders/m7/v33ds745313314_cz_z2jghw0000gn/T/tmp.2GIi3XteMD/l_21_don_mash_new  14120 frames, END 14120
+          divergent frames: 14 of 14120
+          window: 12495..12524 (re-converges, 1596 clean frames after)
+        VERDICT: TRANSIENT — real state differed (not a clean phase shift).
+          9 contiguous run(s): 12495-12499, 12501-12502, 12504-12504, 12506-12506, 12508-12508, 12517-12517, 12520-12520, 12522-12522, 12524-12524
+  DIVERGES: 22_don_dualmash — the thunk's cycle cost reached legacy state;
+        shape (maintainer input, not a gate):
+        A: /var/folders/m7/v33ds745313314_cz_z2jghw0000gn/T/tmp.2GIi3XteMD/l_22_don_dualmash_ref  13920 frames, END 13920
+        B: /var/folders/m7/v33ds745313314_cz_z2jghw0000gn/T/tmp.2GIi3XteMD/l_22_don_dualmash_new  13920 frames, END 13920
+          divergent frames: 137 of 13920
+          window: 13209..13383 (re-converges, 537 clean frames after)
+        VERDICT: TRANSIENT — real state differed (not a clean phase shift).
+          23 contiguous run(s): 13209-13209, 13211-13235, 13241-13241, 13243-13243, 13246-13246, 13249-13250, 13252-13261, 13263-13265, 13267-13327, 13329-13329 ...
+  DIVERGES: 26_don_arcade_mash — the thunk's cycle cost reached legacy state;
+        shape (maintainer input, not a gate):
+        A: /var/folders/m7/v33ds745313314_cz_z2jghw0000gn/T/tmp.2GIi3XteMD/l_26_don_arcade_mash_ref  40620 frames, END 40620
+        B: /var/folders/m7/v33ds745313314_cz_z2jghw0000gn/T/tmp.2GIi3XteMD/l_26_don_arcade_mash_new  40620 frames, END 40620
+          divergent frames: 99 of 40620
+          window: 11248..11380 (re-converges, 29240 clean frames after)
+        VERDICT: TRANSIENT — real state differed (not a clean phase shift).
+          15 contiguous run(s): 11248-11248, 11252-11254, 11257-11261, 11264-11265, 11272-11273, 11275-11275, 11277-11279, 11281-11312, 11316-11321, 11324-11326 ...
+  43/46 bit-identical, 3 divergent, 0 dead
+== 2: FIRE CENSUS — how often legacy content enters the map ==
+  24_don_winmash: 2 map entries; D0 values: 00000002 00000009 
+  26_don_arcade_mash: 228 map entries; D0 values: 00000004 0000000b 
+  corpus total: 230 map entries over 46 replays (0 dead)
+  (guarded runs are never checksum-compared — the census is a
+   denominator for section 1, not a divergence source)
+
+RESULT: read the sections — a DIVERGES line is the thunk's
+        measured legacy cost, the number the re-freeze decision
+        needs (CLAUDE.md §4: measured, then ratified).

@@ -1,0 +1,12 @@
+== 1: solo Donovan link == frozen build/m5_wide/gfx byte-for-byte ==
+  ok: 4/4 vsw members identical to the frozen build
+== 2: idempotence — the link chained over its own output is a no-op ==
+  ok: members and ledger identical (all writes were benign skips)
+== 3: Donovan -> Huitzil chains (same-source overlaps only) ==
+  ok: H link succeeded; ledger cumulative (16036 D entries all present, 37877 total)
+== 4: MUST-FAIL — Pyron onto Huitzil dies at the strip collision ==
+  ok: P link failed loudly at a strip-range dst, naming both sources:
+     AssertionError: band: dst 0x05EA0 collides with DIFFERENT bytes (prior vs2A:0x14EA0, new vs2B:0x15EA0) — same-source-or-fail
+
+PASS: gfx chain mode — solo identical, idempotent, cumulative, and
+      the known collision fails loudly (S3 flips case 4 to success)

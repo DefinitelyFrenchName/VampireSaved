@@ -1,0 +1,6 @@
+  ok: hfx census — +0x7F zero in all 694 live slots
+  ok: hfx tap — zero +0x7F writes; instrument live (+0x00=2869, +0x20=2472)
+  ok: pcosmo census — +0x7F zero in all 648 live slots
+  ok: pcosmo tap — zero +0x7F writes; instrument live (+0x00=693, +0x20=766)
+PASS: +0x7F is free — zero values in live slots AND zero writes,
+      both tenants, instrument liveness proven

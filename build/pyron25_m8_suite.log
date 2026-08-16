@@ -1,0 +1,80 @@
+build fingerprint -> expectation set 'pyron-m8'
+per-set mask: 043c-043d,4182-41a2,41c2-41e2,4222-4262,42a2-42c2,7f00-8000
+01_attract_long          PASS masked-exact
+02_demitri_vs_cpu        PASS masked-window (divergent frames 787, runs 1, window 889..1675, 3845 identical after)
+03_two_player_vs         PASS masked-composite (divergent frames 985 in 3 run(s): flicker 829,2093, windows 889-1871, 3227 identical after)
+04_select_fuzz           PASS masked-composite (divergent frames 219 in 4 run(s): flicker 1525,2009,2195, windows 889-1104, 1325 identical after)
+05_timeout_idle          PASS masked-window (divergent frames 787, runs 1, window 889..1675, 10445 identical after)
+06_test_mode             PASS (diverges from vsavj/masked-v3 at exactly 700)
+07_mash_storm            PASS masked-window (divergent frames 787, runs 1, window 889..1675, 2645 identical after)
+08_challenger_join       PASS masked-composite (divergent frames 1592 in 3 run(s): flicker 3507, windows 889-1675;3807-4610, 2310 identical after)
+09_mirror_pick           PASS masked-composite (divergent frames 1064 in 2 run(s): flicker 829, windows 889-1951, 2769 identical after)
+10_midattract_start      PASS masked-composite (divergent frames 2579 in 3 run(s): flicker 3007,3129, windows 3189-5765, 355 identical after)
+11_pick_donovan          SKIP (picks the DONOVAN cell (id 0x13), which this Pyron-only build does not back
+(it backs only Pyron at 0x11). The pick therefore lands on an unbacked cell
+and the select divergence is not a clean vanilla-legacy window — the same
+reason this replay is skipped on huitzil-m2, which backs only 0x10.
+The tenant pick is covered by 40_pick_pyron_cell.)
+12_donovan_vs_cpu        FAIL expected d9584b881e26859ccb144e889f3ddd25c321626d got fa60db779844c3882e70d687211828f2ac887bce
+16_xemu_2p               PASS masked-composite (divergent frames 1204 in 2 run(s): flicker 829, windows 889-2091, 2229 identical after)
+17_don_oracle_vsav2      SKIP (targets the vsav2 romset; covered by tests/test_m2a_stage4_oracle.sh)
+17_don_oracle_vsavj      FAIL expected fd891c8bb8bf1da47ed059f6c872c99045bd550d got 3f3a13117cdb799a5279b378e8bfb694737864d0
+18_veteran_ctl_vsav2     SKIP (targets the vsav2 romset; covered by tests/test_m2a_stage4_oracle.sh)
+18_veteran_ctl_vsavj     FAIL expected f1b62a5783d52d4be0d17ac632f089c54a4984f3 got ce7f5350a656609c7dabe78b5b7f0b93378cdc80
+19_don_dp_spam           FAIL expected b166d42a8916b46814154fedd5f1b075a29a96de got 6c79e1c5b140afaa4ea61c595dad667482a8e1ab
+20_don_round2            FAIL expected eb87b63df17bd45e9739f2fbad2cb24b190713de got 8644b45646ac282eb1f6fadeb7f607991bacda5f
+21_don_mash              FAIL expected d71ec2511918de448d4cee9eb2ebb0bcdc4b64b1 got a5a765b66ea42a29c94d0675344da6e4fae05e4d
+22_don_dualmash          FAIL expected 92b9bb3f89f27efd51ab20dd98b9d7101ff75cb5 got 30106721c54eae3a1c9321f70a1fa13f8650b1d8
+23_don_matchwin          FAIL expected 1fdf2ac502c9543b608c97584fd430ee47988a0a got 0e998f5edbf12d001ad0b4532125aa301aaa4fb9
+24_don_winmash           FAIL expected 91f14bf8c9fabf57b0f9c37d99a2600ffbf79df9 got 6fd8bdae294b5e704e9c52fa1b07522243df83dd
+25_don_darkforce         FAIL expected f0e2a30e3e1179349de1ff69fc39a84a4501b517 got aa2477c560208051d77e5c5653df367ef3ea63c1
+26_don_arcade_mash       FAIL expected 6d6467babc471a8a84eb8408cddb20385f6bc9d7 got e62cdfc0cda3849510d59aa676950e406ffba8d7
+27_don_throw_vsav2       SKIP (targets the vsav2 romset; throw oracle pair, see tests/replays/27_*)
+27_don_throw_vsavj       SKIP (added post-freeze (session 14n throw fix); validated by the throw oracle measurement + the m2b gate line)
+28_don_quotewin          FAIL expected 1a23912f98c1054143b40b5bc27f9628ec849430 got 16e94800b207abd42caf99949f4e291efc1c68a5
+29_felicia_walljump      PASS masked-composite (divergent frames 1128 in 2 run(s): flicker 2436, windows 889-2015, 1884 identical after)
+30_demitri_throw         PASS masked-window (divergent frames 1127, runs 1, window 889..2015, 2705 identical after)
+31_don_6hp_vsav2         SKIP (targets the vsav2 romset; native ground-truth half of an oracle pair (see the matching _vsavj replay / its gate))
+31_don_6hp_vsavj         FAIL expected bd59be70ef274f4a664aa6a80fddbaafa6e6a087 got 1f1eb623424289e4a56725f793141247d1fdfced
+32_victor_shock_vsav2    SKIP (targets the vsav2 romset; native ground-truth half of an oracle pair (see the matching _vsavj replay / its gate))
+32_victor_shock_vsavj    FAIL expected 91b89efe666989f04da16f03dcc5b6f186b27ab9 got 11980d29845504286105000e63bf2e26a20b9767
+33_victor_6hp_vsav2      SKIP (targets the vsav2 romset; native ground-truth half of an oracle pair (see the matching _vsavj replay / its gate))
+33_victor_6hp_vsavj      FAIL expected 3ab97d4d7eea29f7158b8f8a36512a6c350f67be got 3cb69cf355e59503526eeac6b0ab54d9367cdd74
+34_victor_5hp_vsav2      SKIP (targets the vsav2 romset; native ground-truth half of an oracle pair (see the matching _vsavj replay / its gate))
+34_victor_5hp_vsavj      FAIL expected ef9d865c7a0ffd907b9fe1aa578b1611f9915622 got 4abc2d580992b5906d64a990089cbaf466e3d776
+35_victor_kd_vsav2       SKIP (targets the vsav2 romset; native ground-truth half of an oracle pair (see the matching _vsavj replay / its gate))
+35_victor_kd_vsavj       FAIL expected 63d075e6c60fede548d42b0813aa7cd313e4d5b9 got b111faf4d2492d71974f6873b2510ea00b684425
+36_pick_tenant_cell      FAIL expected b139e63d7b4c039986ba2e11c080bd62bad65817 got 4235d7d18b63da219dd4b612beeff906f1cd47ec
+36_victor_kd2_vsav2      SKIP (targets the vsav2 romset; native ground-truth half of an oracle pair (see the matching _vsavj replay / its gate))
+36_victor_kd2_vsavj      FAIL expected 168df419a24287014c4dbe07c9108a2cc1798aae got 390e63c17c9ed07b3299524bf556bfad9bf2a8ab
+37_p2_pick_tenant        FAIL expected d5198d104b7e12216f1f2f0c26a7721b1b12d02a got b5ea0af9d77c74d727da2b03944fec9a51563221
+37_pick_huitzil_cell     FAIL expected d159e2f8cf2b0dc114b82236739649c7fc00a442 got 58462b65bdb8cb303d1fbe39eb31b1a9be5feb61
+37_victor_ko_vsav2       SKIP (targets the vsav2 romset; native ground-truth half of an oracle pair (see the matching _vsavj replay / its gate))
+37_victor_ko_vsavj       FAIL expected e66658e4dfebdd1eb3f4063ef29a7e44a04595f4 got 653c46694bf9f1fd52af154517c117a7fbfcd7ad
+38_victor_p1_vsavj       FAIL expected 5c2ab1f000331083fe17b71d584a5fc7624ae45c got 1ecacc6f056f8f0fff37cbd6b734d1e300c94851
+39_victor_cross_vsavj    FAIL expected 0b076750fa70febb5c75a440db41029e57ebe9d2 got 2df0269189b2aa415e05a198b6b01b116bfe1203
+40_pick_pyron_cell       FAIL expected 6a8b23c4e3def8d7067476ef5d55895b6cdd198a got 0237504f33b25a669af1d16b0dd52bdbcb71f070
+40_victor_5hp_defaultchar_vsavj FAIL expected a8f79bced90d01a85b3289b7243aa2d06bfcea5e got 0d3309351694530b88dae6eb296bb047f3080396
+41_don_altcolor_vsav2    SKIP (targets the vsav2 romset; native ground-truth half of an oracle pair (see the matching _vsavj replay / its gate))
+41_don_altcolor_vsavj    FAIL expected 6825db011d5c959659eb60a0cc4b4713b648f5ab got 2d77dd9362b542d322973da66e15618d894e4ca9
+42_don_mirror_vsavj      FAIL expected 5a7d084b14c2e63adb2cdeec275976ba709397b4 got f33fb48bb1b6cb69a87f6a8f2462e5f5b6282b2a
+43_don_mirror_vsav2      SKIP (targets the vsav2 romset; native ground-truth half of an oracle pair (see the matching _vsavj replay / its gate))
+44_don_select_hover      PASS
+48_don_immortal_ko       FAIL expected b0a9d26519202c01b2949e7191ffdbf79b1c3af0 got 6e7ece5caee0723aa17c92f20bf62f53cf1ebd59
+50_don_column_ko         FAIL expected 819f867aecf809fbbd53264e800e23742ff4600f got 071c04e69725d9e86434f6ec8ae7e34b95aa7dcd
+51_vs2_immortal_native   SKIP (targets the vsav2 romset; native no-mash Lightning Sword ground truth (datums frozen in the replay header + test_don_reactions))
+52_vs2_immortal_mash     SKIP (targets the vsav2 romset; native mash ground truth of the 52/53 pair (test_don_reactions datums))
+53_don_immortal_mash     FAIL expected 9634cc3473f5833f47b508cd76f08704bdcb77c1 got 4aa39ce89c2373ccee0f261561002a9a87b448d5
+54_don_matchend_ko       FAIL expected d77a22f3a6cbc75682c4aad9edd57b82563aad21 got 882450b8346e88ef82ff95746964e1e425efb51f
+56_don_es_ls             FAIL expected 4610e3af9be174000b11b9be4b6454c2b53e6dbc got cf2567eb52472a3e56f1a7f5ef276420921dd177
+57_vs2_plant_native      SKIP (targets the vsav2 romset; native Killshread Plant ground truth (14z-39 reference data))
+58_don_select_confirm    PASS
+59_don_blizzard_hcf      FAIL expected 58697f8d5e7bb4f5d303e29012833ef634ccfbc5 got da339c4883e94746680c2e7dd6622903c41ad31b
+60_don_grapple_hcb       FAIL expected a1547fc181fc139f3187c2cdd5b97adf9124bc92 got c7eb730d602e7f87fedd84759b0bcb158511c06f
+61_tenant_2pwin          FAIL expected 81815153963ce35bf6879ef3a1c19b08e25494bb got 9d90c7e1d5efcf6152322fc36f7a02b3ed24b246
+62_tenant_2plose         FAIL expected 0fd850387209aa00783c4ed4b03c106014f4cf37 got 75b333740ee390610fdb194c170b2aa9637e28e2
+63_idle_select           FAIL expected 5faf32a32f3f95928ad190c8172ca750b0d2f143 got 5fb6b4bc64a2a50de7b168197b5d85a9a77868a3
+64_select_mashright      PASS
+65_don_mirror_throw      FAIL expected 794f962bb29da9dd004274441632fe0c9b0caa34 got e39ef110676cb24bd6c2e358f24e3cdcc436e5e7
+92_p2_ring_walk          NO-EXPECTATION (freeze after review, as a STATE.md decision)
+SUITE RED

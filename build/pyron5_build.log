@@ -1,0 +1,12 @@
+stage 5: 118 ops, hole_a 0x0FEF00/0x100000 (free 0x1100), hole_b 0x3F7A40/0x400000 (free 0x85C0), wide_ext 0x400010/0x600000 (free 0x1FFFF0)
+GENERATION OK
+  vm3j.09b  sha1 09f77f7b466c147a5d894a4ec3b40bd068dfab26
+  vm3j.10b  sha1 468dc9a30317863fc7474231df1d758675fd5dd9  CHANGED
+3 member(s) changed
+  rompath  build/pyron5/rompath
+  romdir   /Users/koneko/Developer/Vampire_Saved/ROMS
+  members  9 in 1 zips
+  patched  3: vm3j.03d, vm3j.04d, vm3j.10b
+PASS: no member shadows a patched member
+build fingerprint: 33164e64ce6c44fe9c35ff0b198762ae4ca1b538
+OK: stage 5 build at build/pyron5/rompath (fingerprint above; register in tests/expected/registry.tsv at freeze time)

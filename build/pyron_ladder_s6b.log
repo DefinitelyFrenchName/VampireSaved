@@ -1,0 +1,28 @@
+== stage 1 build
+  ok: tenant is pyron id 0x11
+  ok: built (b45b4349)
+  ok: op invariant holds (7 ops: free space / variant rows)
+== stage 2 build
+  ok: tenant is pyron id 0x11
+  ok: built (1b225cf7)
+  ok: op invariant holds (25 ops: free space / variant rows)
+== stage 3 build
+  ok: tenant is pyron id 0x11
+  ok: built (a4cb113c)
+  ok: op invariant holds (34 ops: free space / variant rows)
+== stage 4 build
+  ok: tenant is pyron id 0x11
+  ok: built (a9c890a2)
+  ok: op invariant holds (154 ops: free space / variant rows / 78 reviewed shared writes)
+== stage 6 build
+  ok: tenant is pyron id 0x11
+  ok: built (fac4a777)
+  (op invariant: stage 1-4 check, skipped at 6 —
+   tests/test_shared_writes.sh is the authority there)
+== stage-6 boot probe (forced pick, id 0x11)
+  ok: id holds, his data loads, guard clean
+== legacy bit-identity on stage 3 (whole-RAM, unmasked — hook-free)
+  ok: bit-identical to the frozen vanilla expectation
+== legacy under the v2 masked basis on stage 4 (hooked build)
+  ok: masked-v2 EXACT vs the frozen vanilla log
+PASS: Pyron stage 1-4 ladder (builds + op invariant + boot probe + legacy bit-identity)

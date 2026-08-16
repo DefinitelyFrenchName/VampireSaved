@@ -1,0 +1,14 @@
+  ok: native fires 0739/010b/073a per attempt; ours fires the
+      RESTORED ejection 00d8 (the 0739 slot, authored Z80 song)
+      + 010a + the RESTORED detonation chirp 0199
+  ok: verdict control — mutation fails as designed
+audit_trap_parity: PASS (restored ejection+detonation state holds)
+MERGED-PARITY-EXIT 0
+  ok: native — 5 EX firings, staircase [(23, 12), (23, 12), (23, 12), (23, 12), (52, 12)]
+  ok: ours — 5 EX firings, staircase [(23, 12), (23, 12), (23, 12), (23, 12), (52, 12)]
+  ok: verdict controls — both mutations fail as designed
+PASS: Final Guardian damage is NATIVE-PARITY on this build —
+      both legs match the frozen staircase 23/23/23/23/52 with the
+      per-attempt EX-liveness tells (14z-85f fix: the x028122
+      object-hit damage work-var reconciliation)
+MERGED-FG-EXIT 0

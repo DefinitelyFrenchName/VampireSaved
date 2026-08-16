@@ -1,0 +1,39 @@
+═══ render content (~25 min) ═══
+== 1. member identity on the merged rompath ==
+  ok: no member shadows a patched member
+== 2. band equivalence: merged vs the frozen solo builds ==
+  ok: D band  0x4AD8F == m5_wide (fnv=60da4df960bffd6f)
+  FAIL: H band  0x40AF6 == hui31 — merged fnv=1060dc5353bfd8c9 != solo 
+  ok: P band  0x45000 == pyron21 (fnv=e6222280f7373063)
+  FAIL: strip   0x486A0 == hui31 (the S3 relocation, live) — merged fnv=82bfc63fce99efbc != solo 
+  ok: bank 2  0x2AD8F == PRISTINE (de-substitution held) (fnv=86a167c67d20463d)
+  ok: the four tenant windows are pairwise distinct (not a blind dump)
+== 3. poison control: zeroed group C + one shadow member ==
+  ok: the member-identity audit rejects the shadow
+  ok: poisoned D window differs — instrument live
+  ok: poisoned H window differs — instrument live
+  ok: poisoned P window differs — instrument live
+  ok: poisoned strip window differs — instrument live
+== 4. liveness: the three real pick replays on the merged build ==
+  ok: 36_pick_tenant_cell completed, live framebuffer (1686 distinct frames)
+  ok: 37_pick_huitzil_cell completed, live framebuffer (1749 distinct frames)
+  ok: 40_pick_pyron_cell completed, live framebuffer (1676 distinct frames)
+FAIL: merged content-rendering gate
+[rc=1] tests/test_merged_render_content.sh build/m3b_merged8/rompath
+═══ trap parity (~5 min) ═══
+  ok: native fires 0739/010b/073a per attempt; ours fires the
+      RESTORED ejection 00d8 (the 0739 slot, authored Z80 song)
+      + 010a + the RESTORED detonation chirp 0199
+  ok: verdict control — mutation fails as designed
+audit_trap_parity: PASS (restored ejection+detonation state holds)
+[rc=0] tests/audit_trap_parity.sh build/m3b_merged8
+═══ FG parity (~4 min) ═══
+  ok: native — 5 EX firings, staircase [(23, 12), (23, 12), (23, 12), (23, 12), (52, 12)]
+  ok: ours — 5 EX firings, staircase [(23, 12), (23, 12), (23, 12), (23, 12), (52, 12)]
+  ok: verdict controls — both mutations fail as designed
+PASS: Final Guardian damage is NATIVE-PARITY on this build —
+      both legs match the frozen staircase 23/23/23/23/52 with the
+      per-attempt EX-liveness tells (14z-85f fix: the x028122
+      object-hit damage work-var reconciliation)
+[rc=0] tests/audit_fg_parity.sh build/m3b_merged8
+CHAIN-DONE

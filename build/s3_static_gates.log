@@ -1,0 +1,46 @@
+  ok: vs2 bank-table rows 0x10/0x11/0x13 all 0x6000 (bank 3): 0x10=0x6000, 0x11=0x6000, 0x13=0x6000
+  ok: huitzil inventory locked (15034 unique; band 0x0af6-0x4efc 15010 tiles)
+  ok: huitzil manifest band row matches measurement
+  ok: pyron inventory locked (14225 unique; band 0x4ed5-0x8647 14171 tiles)
+  ok: pyron manifest band row matches measurement
+  ok: donovan inventory locked (15612 unique; band 0x863f-0xc2ef 15498 tiles)
+  ok: donovan manifest band row matches measurement
+  ok: manifest: H and P at delta 0
+  ok: manifest: Donovan frozen at delta +0x2750
+  ok: H∪P max native code 0xa42c < Donovan SAFE_LO 0xad80 (disjoint by interval)
+  ok: three tenants fit bank 4: worst-case 45918/65536 (19618 codes headroom)
+  ok: shared codes H∩P=41 P∩D=33 H∩D=82 (same-source, delta-0 compatible)
+  ok: manifest [[strip]] row matches the json (shift 0x3800, dst 0x86a0-0x87bf)
+  ok: strip dsts disjoint from H/P native codes (+H extras)
+  ok: strip dsts outside Donovan's dst window
+  ok: H/P native codes incl. extras all below Donovan SAFE_LO (0xa42c)
+  ok: free-pool ledger honest: no strip/H/P code inside a pool (14243 pool codes)
+PASS: 3-tenant group-C layout fact-locks
+== 0: decrypt vs2 once (shared by all census runs) ==
+== 1: the census on the real inputs ==
+  walk donovan: span 0x27f548+0x20f00 -> 1162 records, 14768 entries, 15612 unique tiles
+  walk huitzil: span 0x245872+0x1e800 -> 1374 records, 14911 entries, 15034 unique tiles
+  walk pyron: span 0x264086+0x1b500 -> 746 records, 14994 entries, 14225 unique tiles
+  donovan∩huitzil: 103 shared dsts (0 bank-4, 103 bank-5) -> 103 same-source benign, 0 REAL
+  donovan∩pyron: 103 shared dsts (0 bank-4, 103 bank-5) -> 103 same-source benign, 0 REAL
+  huitzil∩pyron: 5859 shared dsts (41 bank-4, 5818 bank-5) -> 5859 same-source benign, 0 REAL
+  intra-tenant collisions: 0 (0 same-source benign, 0 REAL)
+  bank 4 union: 45737/65536 codes (69.8%), 19799 free
+  bank 5 union: 6610/65536 codes
+  manifest pool 0x8648-0x869f: EMPTY
+  manifest pool 0x87c0-0xa42b: EMPTY
+  manifest pool 0xa42d-0xad7f: EMPTY
+  manifest pool 0xee74-0xffff: EMPTY
+CENSUS: 0 REAL collision(s) across the 3-tenant merged group-C write set
+  ok: ZERO real collisions; occupancy frozen (bank4 45737, four pools empty)
+== 2: control A — shift-0 strip must produce intra REAL collisions ==
+  ok: control A fired (72 intra REAL collisions on the doctored shift)
+== 3: control B — the OLD shift reproduces the historical 288 ==
+  ok: control B fired (old shift reproduces 288 REAL at 0x5EA0-0x5FBF)
+== 4: control C — one byte-identical tile drops the fixture to 287 ==
+  doctored vs2 group A: tile 0x4ea0 := group-B bytes of 0x5ea0
+  ok: control C fired (fixture REAL 288 -> 287 on the doctored source)
+
+PASS: merged group-C write-set census — ZERO real collisions since
+      the S3 strip relocation; occupancy frozen; all three
+      comparator controls fired

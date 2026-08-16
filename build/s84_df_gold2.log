@@ -1,0 +1,4 @@
+  gold block read from the build: 0x412300, 8 distinct rows (alpha-masked)
+  ok: phobos — DF on, gold rows present (2)
+  ok: bulleta — DF on, gold rows absent
+PASS: Phobos' DF uploads his gold block; Bulleta's DF is untouched

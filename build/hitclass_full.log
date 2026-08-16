@@ -1,0 +1,87 @@
+== corpus: 46 legacy pairings from tests/expected/pyron-m9 (JOBS=6) ==
+== 0: build the current pyron vertical (pyron.toml verbatim) ==
+  ok: built; body at 0xff1e0
+  removed from the twin: hitclass_map_extend
+  ok: no-thunk twin built (same manifest, hitclass_map_extend stripped)
+  ok: A/B is non-vacuous — fix fac4a77739ff9e29e23a8deb234dc0cb2c891dd8 != twin 3a546ab8aeed2c2efb0afb501b0dfc04a13c1750
+  FAIL: CONTROL DEAD — the soak did NOT crash on the no-thunk twin,
+        so an END-clean run on the fix build proves nothing about
+        the thunk. Section 4 diagnoses WHY with the map probe;
+        do not re-point the control at a new address until it has.
+END 11017
+  note: the soak runs END-clean through 11,017 frames on the fix
+        build — but with the control DEAD that is not evidence
+        about the thunk, only that this rig does not crash.
+== 1: LEGACY COST — A/B fix vs the NO-THUNK TWIN ==
+  DIVERGES: 21_don_mash — the thunk's cycle cost reached legacy state;
+        shape (maintainer input, not a gate):
+        A: /var/folders/m7/v33ds745313314_cz_z2jghw0000gn/T/tmp.g1gegrgwO8/l_21_don_mash_ref  14120 frames, END 14120
+        B: /var/folders/m7/v33ds745313314_cz_z2jghw0000gn/T/tmp.g1gegrgwO8/l_21_don_mash_new  14120 frames, END 14120
+          divergent frames: 14 of 14120
+          window: 12495..12524 (re-converges, 1596 clean frames after)
+        VERDICT: TRANSIENT — real state differed (not a clean phase shift).
+          9 contiguous run(s): 12495-12499, 12501-12502, 12504-12504, 12506-12506, 12508-12508, 12517-12517, 12520-12520, 12522-12522, 12524-12524
+  DIVERGES: 22_don_dualmash — the thunk's cycle cost reached legacy state;
+        shape (maintainer input, not a gate):
+        A: /var/folders/m7/v33ds745313314_cz_z2jghw0000gn/T/tmp.g1gegrgwO8/l_22_don_dualmash_ref  13920 frames, END 13920
+        B: /var/folders/m7/v33ds745313314_cz_z2jghw0000gn/T/tmp.g1gegrgwO8/l_22_don_dualmash_new  13920 frames, END 13920
+          divergent frames: 137 of 13920
+          window: 13209..13383 (re-converges, 537 clean frames after)
+        VERDICT: TRANSIENT — real state differed (not a clean phase shift).
+          23 contiguous run(s): 13209-13209, 13211-13235, 13241-13241, 13243-13243, 13246-13246, 13249-13250, 13252-13261, 13263-13265, 13267-13327, 13329-13329 ...
+  DIVERGES: 26_don_arcade_mash — the thunk's cycle cost reached legacy state;
+        shape (maintainer input, not a gate):
+        A: /var/folders/m7/v33ds745313314_cz_z2jghw0000gn/T/tmp.g1gegrgwO8/l_26_don_arcade_mash_ref  40620 frames, END 40620
+        B: /var/folders/m7/v33ds745313314_cz_z2jghw0000gn/T/tmp.g1gegrgwO8/l_26_don_arcade_mash_new  40620 frames, END 40620
+          divergent frames: 99 of 40620
+          window: 11248..11380 (re-converges, 29240 clean frames after)
+        VERDICT: TRANSIENT — real state differed (not a clean phase shift).
+          15 contiguous run(s): 11248-11248, 11252-11254, 11257-11261, 11264-11265, 11272-11273, 11275-11275, 11277-11279, 11281-11312, 11316-11321, 11324-11326 ...
+  43/46 bit-identical, 3 divergent, 0 dead
+== 2: FIRE CENSUS — how often legacy content enters the map ==
+  24_don_winmash: 2 map entries (0 ext >=0x40, 0 trap >=0x50); D0: 2,9
+  26_don_arcade_mash: 228 map entries (0 ext >=0x40, 0 trap >=0x50); D0: 4,b
+  corpus total: 230 map entries over 46 replays (0 dead)
+                0 at index >=0x40, 0 at index >=0x50
+  => legacy ENTERS (230 times) but stays inside vanilla's 64
+     entries, so it reads vanilla's own bytes out of the thunk.
+  (guarded runs are never checksum-compared — the census is a
+   denominator for section 1, not a divergence source)
+
+== 3: TENANT FIRE CENSUS — does a tenant reach the extension? ==
+  ok: huitzil vertical built; body at 0xfd360 (pyron's at 0xff1e0)
+  corpus: 37 tenant rigs (all of tests/replays/{hui,pyron})
+  ok armed[h]: 26_don_arcade_mash fires the probe 228 times
+  ok armed[p]: 26_don_arcade_mash fires the probe 228 times
+  ok pick[h]: every leg loaded ONE character (hb=0f7770 )
+  ok pick[p]: every leg loaded ONE character (hb=0fc6ac )
+  tenant total: 0 map entries over 37 legs
+                0 at index >=0x40 (the vs2 EXTENSION)
+                0 at index >=0x50 (the planted ILLEGAL)
+                37 legs produced no map entry at all, 0 dead
+  => NO RIG PRODUCES A POOL-VS-POOL CONTACT. Not evidence about
+     the thunk. The sweep is pool-vs-pool (both loop registers
+     stride pool slots), so a tenant projectile hitting a FIGHTER
+     never transits this map. NEXT STEP is a rig, not a ruling:
+     tests/replays/hui/88_hui_plasma_trap_contact.rpl's header
+     names what is needed — an opposing PROJECTILE to clash with
+     (P2 doing a pool-object move into the mine), not a walking
+     fighter.
+
+== 4: the dead crash control, diagnosed with the probe ==
+  soak rig on the FIX build: OK total=0 ext=0 trap=0 D0: -
+  => THE RIG NO LONGER REACHES THE MAP AT ALL. Section 0's control
+     cannot work on this replay under any build; it needs a rig that
+     produces a pool-vs-pool contact (see section 3).
+
+RESULT: read the sections TOGETHER, not separately (14z-92).
+        A DIVERGES line is NOT automatically the thunk's cycle
+        cost: stripping the row also moves the ALLOCATOR, so the
+        twin differs by the thunk AND by the placement shift its
+        absence causes. Cross-check each divergent replay against
+        its census count. Measured 14z-92: 26_don_arcade_mash
+        diverges WITH 228 map entries (map-transit cycles), while
+        21_don_mash and 22_don_dualmash diverge with ZERO entries
+        (placement shift, not the map). Only the first is a cost
+        the thunk itself imposes.
+EXIT=1

@@ -1,0 +1,15 @@
+{
+ "stage": 2,
+ "regions": {
+  "hitbox": {
+   "dst": 792096,
+   "src": 816386,
+   "len": 5814
+  },
+  "hitbox_proj": {
+   "dst": 797920,
+   "src": 854406,
+   "len": 802
+  }
+ }
+}

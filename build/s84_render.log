@@ -1,0 +1,22 @@
+== 1. member identity on the merged rompath ==
+  ok: no member shadows a patched member
+== 2. band equivalence: merged vs the frozen solo builds ==
+  ok: D band  0x4AD8F == m5_wide (fnv=60da4df960bffd6f)
+  ok: H band  0x40AF6 == hui31 (fnv=1060dc5353bfd8c9)
+  ok: P band  0x45000 == pyron21 (fnv=e6222280f7373063)
+  ok: strip   0x486A0 == hui31 (the S3 relocation, live) (fnv=82bfc63fce99efbc)
+  ok: bank 2  0x2AD8F == PRISTINE (de-substitution held) (fnv=86a167c67d20463d)
+  ok: the four tenant windows are pairwise distinct (not a blind dump)
+== 3. poison control: zeroed group C + one shadow member ==
+  ok: the member-identity audit rejects the shadow
+  ok: poisoned D window differs — instrument live
+  ok: poisoned H window differs — instrument live
+  ok: poisoned P window differs — instrument live
+  ok: poisoned strip window differs — instrument live
+== 4. liveness: the three real pick replays on the merged build ==
+  ok: 36_pick_tenant_cell completed, live framebuffer (1695 distinct frames)
+  ok: 37_pick_huitzil_cell completed, live framebuffer (1728 distinct frames)
+  ok: 40_pick_pyron_cell completed, live framebuffer (1690 distinct frames)
+PASS: merged content-rendering gate — all three tenants' bands + the
+      relocated strip serve the frozen solo art; de-substitution held;
+      poison control fired on all four windows; three pick replays live

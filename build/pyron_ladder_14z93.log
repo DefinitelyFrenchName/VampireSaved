@@ -1,0 +1,22 @@
+== stage 1 build
+  ok: tenant is pyron id 0x11
+  ok: built (b45b4349)
+  ok: op invariant holds (7 ops: free space / variant rows)
+== stage 2 build
+  ok: tenant is pyron id 0x11
+  ok: built (1b225cf7)
+  ok: op invariant holds (25 ops: free space / variant rows)
+== stage 3 build
+  ok: tenant is pyron id 0x11
+  ok: built (a4cb113c)
+  ok: op invariant holds (34 ops: free space / variant rows)
+== stage 4 build
+  ok: tenant is pyron id 0x11
+  ok: built (a9c890a2)
+  ok: op invariant holds (154 ops: free space / variant rows / 78 reviewed shared writes)
+== stage-4 boot probe (forced pick, id 0x11)
+id-hold @2600: $FF8782 = 0x11 (wanted 0x11)
+load    @3600: hitbox base 0x — char LOADED
+guard        : TRIPPED (see /var/folders/m7/v33ds745313314_cz_z2jghw0000gn/T/tmp.Qw9DWHr1ez/probe/run.out)
+FAIL: guard tripped
+EXIT=1

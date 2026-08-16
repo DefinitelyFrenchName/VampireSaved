@@ -1,0 +1,42 @@
+stage 6: 239 ops, hole_a 0x0FF250/0x100000 (free 0xDB0), hole_b 0x3FB960/0x400000 (free 0x46A0), wide_ext 0x404FD0/0x600000 (free 0x1FB030)
+GENERATION OK
+  vsw.43  sha1 13a184ec9e176371808938015111f8918cb4df7d
+  vsw.44  sha1 739ad1d33c279d69588cfe8e184ce49ab150684c  CHANGED
+6 member(s) changed
+select: tenant at variant id 17 — records generated (select_port skipped; the host's select records stay vanilla)
+WIDE build: packing as vsavjw (merging /Users/koneko/Developer/Vampire_Saved/VampireSaved/build/wide0/rompath/vsavjw.zip)
+read /Users/koneko/Developer/Vampire_Saved/ROMS/vsav2.zip:vs2.01+.02 sha1 a715ff504eda9f9bc4da4d603f3dc8a37b6f21c1
+read build/pyron25/rompath/vsavjw.zip:vsw.z01+vsw.z02 sha1 f6036f53e1826839c1304baac27f49ae23c9eb8d
+  hui_trap_eject: id 0xd8 -> 0x3c980 (0x33 B)
+  hui_trap_eject_alt: id 0x3d8 -> 0x3c9c0 (0x33 B)
+read /Users/koneko/Developer/Vampire_Saved/ROMS/vsav.zip:vm3.11m+12m sha1 3f18141caa841963af17def1da09130d7c807fd0
+read /Users/koneko/Developer/Vampire_Saved/ROMS/vsav2.zip:vs2.11m+12m sha1 73658b7e1cac65e23925f197b9af9adff9ec908c
+  voice_batch: 79 songs, 57 records (57 packed into vsw.21m, 940032 ext bytes), T7 57 entries (max 0x41), ids 0x58-0xa6
+diff accounted: 6135 declared bytes, rest untouched
+wrote build/pyron25/rompath/vsavjw.zip: vsw.z01 sha1 f381d18130af63c92804fbf4f0eedcff9f6e4dab, vsw.z02 sha1 7403091f9c07c462ec7557afefa3ded0b44f5905, vsw.21m sha1 6ce098a5ef0d4e03e47ed5b3422fb99f0992152d
+  read vs2.15m sha1 e873ad3e0fc8a06a5029113faf991f5c1b765316
+  read vs2.17m sha1 da94f1529da82a6bf2129f51548412e1ab2b001a
+  read vs2.19m sha1 0ff528e12e255ebf699101ac71f05b1f6bef7165
+select: 0 bank-1 tiles placed
+  wrote vm3.13m sha1 ded4ec21076be6a7ad97ba1c7ec6832d40dbcc82
+  wrote vm3.15m sha1 8fa5fd7bb70446a7ac06174f662e6f52abbffeae
+  wrote vm3.17m sha1 888727cc58b30fdc265d86180fac61d20b06237b
+  wrote vm3.19m sha1 b5c7885b13626e4d399c804cedfb3479a27bf566
+wrote gfx_written.json (20329 group-C + 276 group-A entries)
+wrote remap_spec.json: {'delta': 0, 'band_lo': 20181, 'band_hi': 34375, 'dst_bank_word': 4096, 'src_bank_word': 24576, 'placed': [63, 42028]}
+gfx: patched vsav.zip in rompath (ROMDIR untouched)
+gfx: group C members injected into vsavjw.zip (host group B pristine)
+  verified: group B members pristine in the packed vsav.zip
+  ok: record parity (745 records, 14992 entries)
+  ok: no tile codes on protected positions (358 protected)
+  ok: all 14224 tile codes within [0x003F,0xA42C]
+  ok: placed bank table row 0x11 = 0x1000
+PASS: gfx build output verification
+  rompath  build/pyron25/rompath
+  romdir   /Users/koneko/Developer/Vampire_Saved/ROMS
+  members  42 in 2 zips
+  patched  8: vm3.13m, vm3.15m, vm3.17m, vm3.19m, vm3j.03d, vm3j.04d, vm3j.07b, vm3j.10b
+  note: byte-identical members (harmless — shadow nothing): vsavjw.zip:vsw.42, vsavjw.zip:vsw.43
+PASS: no member shadows a patched member
+build fingerprint: 94ce9a48e0cc8c89a69dd72a58669b072e379988
+OK: stage 6 build at build/pyron25/rompath (fingerprint above; register in tests/expected/registry.tsv at freeze time)

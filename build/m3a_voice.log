@@ -1,0 +1,11 @@
+== WIDE overlay romset (scratch)
+== rebuild donovan-m3a (WIDE)
+  ok: donovan-m3a reproduced (84f49aaab0641e071f8db00a69c839754643594f)
+== rebuild m5_stock
+  ok: m5_stock reproduced (6c93cfa8a8a80ae2303d3acaf8c7bff487f369c5)
+== rebuild huitzil (0x10)
+  ok: huitzil reproduced (e1f598d6113f32ed5bda66a684e53d30b36447e9)
+== rebuild pyron (0x11)
+  ok: pyron reproduced (4c6e3fb6785cc9b418dd52744c7046a6a459f71e)
+PASS: all four frozen references rebuild bit-exact from this tree
+M3A-EXIT 0

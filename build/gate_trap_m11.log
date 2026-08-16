@@ -1,0 +1,10 @@
+  ok: ours — dome hit at f3500, shock install (class 0x6, seq7=4, freeze 0x17)
+  ok: ours — attacker freeze present (0x9 at f3502; the accepted deviation)
+  ok: native — dome hit at f3494, shock install (class 0x52, seq7=4, freeze 0x18)
+  ok: verdict control — pre-fix shape fails as designed
+audit_trap_shock: PASS (dome shock live, deviation as ruled)
+SHOCK-EXIT 0
+  PASS  1: mine spawned (type-69 pool write x2)
+  PASS  2: ring live across the trap window (ambient 049a x16)
+audit_trap_sound: PASS (MK trap fires; ring live)
+SOUND-EXIT 0

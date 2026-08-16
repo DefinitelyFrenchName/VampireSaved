@@ -1,0 +1,3 @@
+  ok pyron/71_pyron_cosmo: every group-C sprite resolves to real art
+  ok pyron/73_pyron_air_214p: every group-C sprite resolves to real art
+PASS: no sprite in this build draws from an empty group-C tile

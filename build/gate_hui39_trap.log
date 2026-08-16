@@ -1,0 +1,12 @@
+  ok: native fires 0739/010b/073a per attempt; ours fires the
+      RESTORED ejection 00d8 (the 0739 slot, authored Z80 song)
+      + 010a + the RESTORED detonation chirp 0199
+  ok: verdict control — mutation fails as designed
+audit_trap_parity: PASS (restored ejection+detonation state holds)
+TP-EXIT 0
+  ok: ours — dome hit at f3500, shock install (class 0x6, seq7=4, freeze 0x17)
+  ok: ours — attacker freeze present (0x9 at f3502; the accepted deviation)
+  ok: native — dome hit at f3494, shock install (class 0x52, seq7=4, freeze 0x18)
+  ok: verdict control — pre-fix shape fails as designed
+audit_trap_shock: PASS (dome shock live, deviation as ruled)
+TS-EXIT 0

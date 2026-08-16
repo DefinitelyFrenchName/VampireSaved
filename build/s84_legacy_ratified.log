@@ -1,0 +1,116 @@
+== B: PREBUILT merged artifact at build/m3b_merged (build skipped; shape
+      asserted below — 593 ops, member identity) ==
+  ok: 597 ops (the frozen test_tenant_loop fixture)
+  rompath  build/m3b_merged/rompath
+  romdir   /Users/koneko/Developer/Vampire_Saved/ROMS
+  members  40 in 2 zips
+  patched  8: vm3.13m, vm3.15m, vm3.17m, vm3.19m, vm3j.03d, vm3j.04d, vm3j.07b, vm3j.10b
+  note: byte-identical members (harmless — shadow nothing): vsavjw.zip:vsw.21m, vsavjw.zip:vsw.22m
+  note: byte-identical members (harmless — shadow nothing): vsavjw.zip:vsw.43, vsavjw.zip:vsw.44
+PASS: no member shadows a patched member
+  ok: prebuilt artifact verified; fingerprint 3cf7541a88b358d6690e85aaf556c50c5289acf7
+  ok: F2 fixed — Huitzil's dispatch entry IS the merged shim
+      (0x4ba700): pool seed + phase gate + his flavor run for him
+== 0: the rig FORMS all three tenants' matches (else every verdict
+      below is vacuous). Guarded runs — never checksum-compared. ==
+  ok: donovan char-init entry (0x4ba700) executed 2 time(s)
+  ok: huitzil char-init entry (0x4ba700) executed 2 time(s)
+  ok: pyron char-init entry (0x45f5c4) executed 2 time(s)
+== 0b: run-to-run determinism on the merged image (never run before) ==
+  ok: two masked runs of 03_two_player_vs bit-identical
+== 1 (leg a): merged vs VANILLA on the masked-v2 basis — the superset
+      question. Expectation: donovan-m3a's ratified classes VERBATIM,
+      plus the ratified merged-04 inventory (14z-82d). ==
+01_attract_long          PASS exact (bit-identical)
+02_demitri_vs_cpu        PASS window (divergent frames 787, runs 1, window 889..1675, 3845 identical after)
+03_two_player_vs         PASS composite (divergent frames 985 in 3 run(s): flicker 829,2093, windows 889-1871, 3227 identical after)
+04_select_fuzz           PASS composite (divergent frames 220 in 5 run(s): flicker 1525,2005,2009,2195, windows 889-1104, 1325 identical after)
+05_timeout_idle          PASS window (divergent frames 787, runs 1, window 889..1675, 10445 identical after)
+06_test_mode             PASS diverge (PASS (diverges from vsavj/masked-v2 at exactly 700))
+07_mash_storm            PASS window (divergent frames 787, runs 1, window 889..1675, 2645 identical after)
+08_challenger_join       PASS composite (divergent frames 1592 in 3 run(s): flicker 3507, windows 889-1675;3807-4610, 2310 identical after)
+09_mirror_pick           PASS composite (divergent frames 1064 in 2 run(s): flicker 829, windows 889-1951, 2769 identical after)
+10_midattract_start      PASS composite (divergent frames 2579 in 3 run(s): flicker 3007,3129, windows 3189-5765, 355 identical after)
+11_pick_donovan          PASS composite (divergent frames 1528 in 2 run(s): flicker 2836, windows 889-2415, 884 identical after)
+16_xemu_2p               PASS composite (divergent frames 1204 in 2 run(s): flicker 829, windows 889-2091, 2229 identical after)
+29_felicia_walljump      PASS composite (divergent frames 1128 in 2 run(s): flicker 2436, windows 889-2015, 1884 identical after)
+30_demitri_throw         PASS window (divergent frames 1127, runs 1, window 889..2015, 2705 identical after)
+  -- leg (a) summary (replay | expected class | verdict) --
+     01_attract_long          exact      PASS
+     02_demitri_vs_cpu        window     PASS
+     03_two_player_vs         composite  PASS
+     04_select_fuzz           composite  PASS
+     05_timeout_idle          window     PASS
+     06_test_mode             diverge    PASS
+     07_mash_storm            window     PASS
+     08_challenger_join       composite  PASS
+     09_mirror_pick           composite  PASS
+     10_midattract_start      composite  PASS
+     11_pick_donovan          composite  PASS
+     16_xemu_2p               composite  PASS
+     29_felicia_walljump      composite  PASS
+     30_demitri_throw         window     PASS
+== 2 (leg b): merged vs the frozen single-tenant builds on TENANT
+      content — does MERGING change what each tenant's build did?
+      Whole-RAM identity is NOT expected (placements differ and placed
+      addresses are cached into RAM pointers; the select screens also
+      legitimately differ — single-tenant builds back one medallion,
+      merged backs three). Gate: a clean guarded run, a first
+      divergence no earlier than frame 850 (boot/attract must be
+      unperturbed), and a NON-identical pair (identical = dead rig). ==
+donovan/12_vs_cpu            ok: guard clean; vs build/m5_wide:
+        A: /var/folders/m7/v33ds745313314_cz_z2jghw0000gn/T/tmp.kSwWUrdy34/b_12_donovan_vs_cpu_ref.log  9320 frames, END 9320
+        B: /var/folders/m7/v33ds745313314_cz_z2jghw0000gn/T/tmp.kSwWUrdy34/b_12_donovan_vs_cpu_new.log  9320 frames, END 9320
+          divergent frames: 4175 of 9320
+          window: 890..9320 (runs to the end)
+        VERDICT: PERMANENT — real state differed (not a clean phase shift).
+          731 contiguous run(s): 890-893, 895-898, 900-913, 915-915, 918-918, 920-920, 922-923, 925-926, 928-929, 1001-1001 ...
+        (classified REPORT for the maintainer, not a gate — see header)
+donovan/20_round2            ok: guard clean; vs build/m5_wide:
+        A: /var/folders/m7/v33ds745313314_cz_z2jghw0000gn/T/tmp.kSwWUrdy34/b_20_don_round2_ref.log  12120 frames, END 12120
+        B: /var/folders/m7/v33ds745313314_cz_z2jghw0000gn/T/tmp.kSwWUrdy34/b_20_don_round2_new.log  12120 frames, END 12120
+          divergent frames: 672 of 12120
+          window: 890..3667 (re-converges, 8453 clean frames after)
+        VERDICT: TRANSIENT — real state differed (not a clean phase shift).
+          133 contiguous run(s): 890-891, 896-928, 935-936, 941-941, 947-954, 956-958, 961-961, 963-963, 965-965, 967-1033 ...
+        (classified REPORT for the maintainer, not a gate — see header)
+huitzil/70_mash              ok: guard clean; vs build/hui30:
+        A: /var/folders/m7/v33ds745313314_cz_z2jghw0000gn/T/tmp.kSwWUrdy34/b_70_hui_mash_ref.log  11017 frames, END 11017
+        B: /var/folders/m7/v33ds745313314_cz_z2jghw0000gn/T/tmp.kSwWUrdy34/b_70_hui_mash_new.log  11017 frames, END 11017
+          divergent frames: 10011 of 11017
+          window: 890..11017 (runs to the end)
+        VERDICT: PERMANENT — real state differed (not a clean phase shift).
+          94 contiguous run(s): 890-891, 893-893, 895-904, 906-911, 913-915, 917-917, 919-920, 922-923, 925-953, 955-961 ...
+        (classified REPORT for the maintainer, not a gate — see header)
+huitzil/83_fx                ok: guard clean; vs build/hui30:
+        A: /var/folders/m7/v33ds745313314_cz_z2jghw0000gn/T/tmp.kSwWUrdy34/b_83_hui_fx_ref.log  3820 frames, END 3820
+        B: /var/folders/m7/v33ds745313314_cz_z2jghw0000gn/T/tmp.kSwWUrdy34/b_83_hui_fx_new.log  3820 frames, END 3820
+          divergent frames: 2857 of 3820
+          window: 890..3820 (runs to the end)
+        VERDICT: PERMANENT — real state differed (not a clean phase shift).
+          59 contiguous run(s): 890-891, 893-893, 895-904, 906-911, 913-915, 917-917, 919-920, 922-923, 925-953, 955-961 ...
+        (classified REPORT for the maintainer, not a gate — see header)
+pyron/70_mash                ok: guard clean; vs build/pyron21:
+        A: /var/folders/m7/v33ds745313314_cz_z2jghw0000gn/T/tmp.kSwWUrdy34/b_70_pyron_mash_ref.log  11017 frames, END 11017
+        B: /var/folders/m7/v33ds745313314_cz_z2jghw0000gn/T/tmp.kSwWUrdy34/b_70_pyron_mash_new.log  11017 frames, END 11017
+          divergent frames: 10011 of 11017
+          window: 890..11017 (runs to the end)
+        VERDICT: PERMANENT — real state differed (not a clean phase shift).
+          94 contiguous run(s): 890-891, 893-893, 895-904, 906-911, 913-915, 917-917, 919-920, 922-923, 925-953, 955-961 ...
+        (classified REPORT for the maintainer, not a gate — see header)
+pyron/72_cosmo_2p            ok: guard clean; vs build/pyron21:
+        A: /var/folders/m7/v33ds745313314_cz_z2jghw0000gn/T/tmp.kSwWUrdy34/b_72_pyron_cosmo_2p_ref.log  5120 frames, END 5120
+        B: /var/folders/m7/v33ds745313314_cz_z2jghw0000gn/T/tmp.kSwWUrdy34/b_72_pyron_cosmo_2p_new.log  5120 frames, END 5120
+          divergent frames: 4111 of 5120
+          window: 890..5120 (runs to the end)
+        VERDICT: PERMANENT — real state differed (not a clean phase shift).
+          91 contiguous run(s): 890-891, 893-893, 895-929, 931-942, 944-945, 947-948, 950-958, 961-961, 963-963, 965-965 ...
+        (classified REPORT for the maintainer, not a gate — see header)
+
+PASS: the 3-tenant merged program image lands on the ratified legacy
+      classes VERBATIM (leg a; 04 on its ratified merged-specific
+      inventory, 14z-82d), and each tenant's own content forms
+      matches, survives the crash guard, and leaves boot/attract
+      untouched relative to its frozen single-tenant build (leg b).
+      This proves LEGACY SAFETY of the merge only — tenant correctness
+      waits for the gfx half (M3b Phase 3).

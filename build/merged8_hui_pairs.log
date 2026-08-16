@@ -1,0 +1,8 @@
+== using existing build build/m3b_merged8
+== Reflect Wall guard cancel (replay 81)
+  P1 seq=0e  attacker x @3240 = 474
+  ok: guard cancel fires, attacker blown back
+== pair-press downgrade path, empty meter (replay 82) — NOT Dark Force
+  pair-press seqs: f3110=0a f4210=0a (0x0A = the empty-meter downgrade, NOT Dark Force — see test_hui_df_style.sh)
+  ok: both pair presses take the native downgrade path
+PASS: Huitzil pair coverage (Reflect Wall GC + pair-press downgrade)

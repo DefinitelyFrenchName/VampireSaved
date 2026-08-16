@@ -1,0 +1,4 @@
+  ok hui/82_hui_df_2p: every group-C sprite resolves to real art
+  ok hui/83_hui_fx: every group-C sprite resolves to real art
+  ok hui/83d_hui_grenade_ground: every group-C sprite resolves to real art
+PASS: no sprite in this build draws from an empty group-C tile

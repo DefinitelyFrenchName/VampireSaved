@@ -1,0 +1,51 @@
+== corpus: 46 legacy pairings from tests/expected/pyron-m9 (JOBS=6) ==
+== 0: build the current pyron vertical (pyron.toml verbatim) ==
+  ok: built; body at 0xff1e0
+  removed from the twin: hitclass_map_extend
+  ok: no-thunk twin built (same manifest, hitclass_map_extend stripped)
+  ok: A/B is non-vacuous — fix fac4a77739ff9e29e23a8deb234dc0cb2c891dd8 != twin 3a546ab8aeed2c2efb0afb501b0dfc04a13c1750
+  FAIL: CONTROL DEAD — the soak did NOT crash on the no-thunk twin,
+        so an END-clean run on the fix build proves nothing about
+        the thunk. Check the rig before believing section 0.
+END 11017
+  ok: THE FIX HOLDS — the soak that crashes the no-thunk twin at
+      f7997 runs END-clean through 11,017 frames
+== 1: LEGACY COST — SKIPPED (HITCLASS_TENANT_ONLY=1) ==
+== 2: FIRE CENSUS — SKIPPED (HITCLASS_TENANT_ONLY=1) ==
+
+== 3: TENANT FIRE CENSUS — does a tenant reach the extension? ==
+  ok: huitzil vertical built; body at 0xfd360 (pyron's at 0xff1e0)
+  corpus: RESTRICTED to [pyron/80_pyron_cosmo_pairsweep hui/87_hui_plasma_trap] (iteration mode)
+  ok armed[h]: 26_don_arcade_mash fires the probe 228 times
+  ok armed[p]: 26_don_arcade_mash fires the probe 228 times
+  ok pick[h]: every leg loaded ONE character (hb=0f7770 )
+  ok pick[p]: every leg loaded ONE character (hb=0fc6ac )
+  tenant total: 0 map entries over 2 legs
+                0 at index >=0x40 (the vs2 EXTENSION)
+                0 at index >=0x50 (the planted ILLEGAL)
+                2 legs produced no map entry at all, 0 dead
+  => NO RIG PRODUCES A POOL-VS-POOL CONTACT. Not evidence about
+     the thunk. The sweep is pool-vs-pool (both loop registers
+     stride pool slots), so a tenant projectile hitting a FIGHTER
+     never transits this map. NEXT STEP is a rig, not a ruling:
+     tests/replays/hui/88_hui_plasma_trap_contact.rpl's header
+     names what is needed — an opposing PROJECTILE to clash with
+     (P2 doing a pool-object move into the mine), not a walking
+     fighter.
+
+== 4: the dead crash control, diagnosed with the probe ==
+  soak rig on the FIX build: OK total=0 ext=0 trap=0 D0: -
+  => THE RIG NO LONGER REACHES THE MAP AT ALL. Section 0's control
+     cannot work on this replay under any build; it needs a rig that
+     produces a pool-vs-pool contact (see section 3).
+
+RESULT: read the sections TOGETHER, not separately (14z-92).
+        A DIVERGES line is NOT automatically the thunk's cycle
+        cost: stripping the row also moves the ALLOCATOR, so the
+        twin differs by the thunk AND by the placement shift its
+        absence causes. Cross-check each divergent replay against
+        its census count. Measured 14z-92: 26_don_arcade_mash
+        diverges WITH 228 map entries (map-transit cycles), while
+        21_don_mash and 22_don_dualmash diverge with ZERO entries
+        (placement shift, not the map). Only the first is a cost
+        the thunk itself imposes.

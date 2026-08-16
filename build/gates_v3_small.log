@@ -1,0 +1,18 @@
+== hui_boot
+  guard        : clean
+== legacy replay under the v2 masked basis (hooked build)
+  ok: masked-v3 EXACT vs the frozen vanilla log
+PASS: Huitzil stage-4 boot (his data loads, guard clean, legacy intact)
+== pyron_ladder
+  ok: bit-identical to the frozen vanilla expectation
+== legacy under the v2 masked basis on stage 4 (hooked build)
+  ok: masked-v3 EXACT vs the frozen vanilla log
+PASS: Pyron stage 1-4 ladder (builds + op invariant + boot probe + legacy bit-identity)
+== tenant_select_records
+        divergent frames 1528, runs 2, window 889..2836, 884 identical after
+        
+        FAIL:
+          2 contiguous runs; the class permits exactly 1 (scattered divergence is flicker, not a window)
+          window ends 2836, frozen expectation 2415
+FAIL: tenant select-records gate
+DONE
