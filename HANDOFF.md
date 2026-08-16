@@ -1096,6 +1096,23 @@ tests/test_effect_palette_table.sh    # 14z-76: the per-character palette POINTE
                                       # variant row, a build clobbering a base-half
                                       # row). tools/audit_effect_palette_table.py.
                                       # Static, seconds
+tests/test_frozen_rompath_guard.sh    # 14z-90 (issue #26): build_donovan.sh must
+                                      # refuse to replace one track's packed
+                                      # set with the other's under the same
+                                      # name (`run_battery_m2.sh build/don_m5`
+                                      # would repack STOCK over the registered
+                                      # WIDE reference). Track-mismatch check,
+                                      # NOT a frozen-reference check — the
+                                      # latter would block HANDOFF's own
+                                      # documented `build_donovan.sh 6
+                                      # build/don_m4` recipe. Runs on a COPY.
+                                      # ON-DEMAND, ~8 min (two real builds)
+tests/test_attribute_ramdiff.sh       # 14z-90 (issue #21): attribute_ramdiff
+                                      # must refuse when both logs resolve to
+                                      # the SAME dump file (MAME dump names are
+                                      # directory-scoped). A genuine zero-diff
+                                      # between DISTINCT files stays a note.
+                                      # No ROMs, no emulator, ~1s
 tests/test_fbneo_tree_integrity.sh    # 14z-90 (issue #36): emu/fbneo must be
                                       # EXACTLY the pinned commit + the two
                                       # tracked patches. Reconstructs from

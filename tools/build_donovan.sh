@@ -266,6 +266,47 @@ if [ "$STAGE" -ge 6 ]; then
     fi
 fi
 
+# 14z-90 (GitHub issue #26). This `rm -rf` is unconditional and the callers
+# take an arbitrary outbase, so `tests/run_battery_m2.sh build/don_m5` deletes
+# the registered donovan-m5 reference and repacks a STOCK build under its name
+# — the battery's prefix GEN_FLAGS carries no --profile, so it cannot even
+# produce the WIDE set it just destroyed. Every gate then measures a different
+# ROM under a frozen name, and audit_legacy_pairings.sh reports success by
+# SKIPPING what it can no longer find.
+#
+# THE GUARD IS A TRACK-MISMATCH CHECK, NOT A "FROZEN REFERENCE" CHECK, and the
+# distinction was measured rather than assumed. Refusing every registered
+# rompath would block a DOCUMENTED workflow: HANDOFF.md:231 gives
+# `tools/build_donovan.sh 6 build/don_m4` as a rebuild recipe, and don_m4 is a
+# frozen reference (84f49aaa, in both the registry and the m3a gate).
+# Rebuilding a WIDE reference AS WIDE is legitimate — it is how reproducibility
+# is checked. What is never legitimate is replacing a set with a DIFFERENT one
+# under the same name, which is precisely the battery-against-a-WIDE-dir case.
+#
+# PACK_SET is derived below from the generator's own output, so it is known
+# here by the same means and cannot disagree with what will be built.
+if [ -d "$OUTBASE/rompath" ]; then
+    _bd_will_pack=vsavj
+    if python3 -c "import json,sys; sys.exit(0 if json.load(open('$OUTBASE/patch/patch.json')).get('image') else 1)" 2>/dev/null; then
+        _bd_will_pack=vsavjw
+    fi
+    _bd_have=""
+    [ -f "$OUTBASE/rompath/vsavj.zip" ]  && _bd_have="vsavj"
+    [ -f "$OUTBASE/rompath/vsavjw.zip" ] && _bd_have="vsavjw"
+    if [ -n "$_bd_have" ] && [ "$_bd_have" != "$_bd_will_pack" ]; then
+        echo "REFUSING to rebuild into $OUTBASE." >&2
+        echo "  It holds a $_bd_have set; this build packs $_bd_will_pack." >&2
+        echo "  Deleting it would replace one track's artifact with the" >&2
+        echo "  other's UNDER THE SAME NAME — every gate pointed here would" >&2
+        echo "  then measure a ROM that is not the one it names, and the" >&2
+        echo "  audits that cannot find it report success by skipping." >&2
+        echo "  Build into a fresh directory. To overwrite anyway:" >&2
+        echo "  REBUILD_CROSS_TRACK=1" >&2
+        [ "${REBUILD_CROSS_TRACK:-0}" = "1" ] || exit 1
+        echo "  REBUILD_CROSS_TRACK=1 — proceeding anyway." >&2
+    fi
+fi
+
 rm -rf "$OUTBASE/rompath"
 # CPS-2 WIDE builds pack as the vsavjw SET and fold in the profile's appended
 # gfx/QSound members, which this pipeline does not produce itself. Detected
