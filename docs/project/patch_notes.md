@@ -2906,6 +2906,18 @@ liveness proven by pyron's own f7997 dispatch) — the thunk is
 unreachable for measured legacy content. Reconstruction gate:
 `tests/test_hitclass_map_thunk.sh` (2 verdict controls).
 
+> **THE FIRE-CENSUS SENTENCE ABOVE IS RETRACTED (14z-92, M4).** It is kept
+> as written because this is the 14z-82b record and historical entries are
+> not rewritten (CLAUDE.md §5.4) — but do not carry it forward. That census
+> was TWO replays (`02_demitri_vs_cpu`, `03_two_player_vs`), both of which
+> happen to score zero. Over the full 46-replay legacy corpus legacy enters
+> the map **230 times** (`26_don_arcade_mash` 228, `24_don_winmash` 2).
+> "The thunk is unreachable for legacy content" is FALSE. The fix is
+> unaffected and still sound: every observed legacy index is
+> 0x02/0x04/0x09/0x0b, far below 64, so legacy reads vanilla's own bytes
+> out of the thunk body. The correct argument is **"legacy enters
+> constantly and receives vanilla answers"**.
+
 **NOT ADOPTED in the manifests** — the row moves the huitzil + pyron
 frozen fingerprints; decision + recommendation in STATE. Harness repairs
 landed with it: `audit_merged_legacy` leg-b now always measures the REF
@@ -2929,6 +2941,14 @@ instrument now: leg (a) 13/14 verbatim, leg (b) all six guard-clean
 (pyron/70 END 11017 merged). Decision 2 (Donovan's map[61]/[62]) leaning
 keep-zeros; measured: his sword-companion objects never enter the map in
 his replays (0 entries) — unexercised.
+
+> **BASIS RESTATED 14z-92 (the decision is UNCHANGED).** The "0 entries"
+> above came from the same two-replay census that was falsified for legacy.
+> The corpus-wide run does NOT overturn decision 2: legacy enters 230 times
+> and every observed index is 0x02/0x04/0x09/0x0b — **none at 61 or 62** —
+> so Donovan's satellite hit classes remain unexercised on a 46-replay
+> basis rather than a 2-replay one. Keep-vanilla's-zeros stands, now on
+> evidence 23x wider.
 
 ## 14z-85 — the spawn-time OWNER TAG (site 0x54470's 59-75 family; maintainer option (a))
 

@@ -1,4 +1,4 @@
-# NEXT SESSION — orientation (written at the close of 14z-92, 2026-08-16)
+# NEXT SESSION — orientation (written at the close of 14z-93, 2026-08-16)
 
 > ## `merged-m1` IS FROZEN AND FIELD-CONFIRMED. All 18 characters in one
 > ## image (`build/m3b_merged8`, `952fc731`, 753 ops); every merged gate
@@ -6,7 +6,22 @@
 > ## "100% clean, as is its sound", Phobos' historically-broken moveset
 > ## incl. ES variants all good. **S6 IS CLOSED.**
 > ##
-> ## Nothing is blocked. What is waiting is RULINGS, not work.
+> ## Nothing is blocked. No build byte moved in 14z-93.
+
+## What 14z-93 was, in one line
+
+**The M4 keep-or-drop question is answered, and the answer needed a second
+number.** The tenant enters the hit-class map **0 times** over all 37 rigs —
+which alone reads like "drop it" — but the same corpus puts **121 objects of
+type >= 64 into the projectile pool**. The gap is CONTACT, not absence, so
+the recommendation is **KEEP**, and what is actually missing is a
+pool-vs-pool contact RIG. A zero measured against no denominator is the same
+shape that produced the retracted "legacy never enters the map" claim.
+
+Also: the 14z-92 retraction had **not** fully propagated — the retracted
+sentence was still live in `engine_internals.md` four lines below its own
+retraction. Fixed, plus patch_notes, registry.tsv, and a `patch_index.md`
+row that had never existed for a shipped patch.
 
 ## What 14z-92 was, in one line
 
@@ -131,13 +146,29 @@ three references rotted this session (`hui31`, `pyron20`, `pyron17`).
   it appears here on LEGACY content under FBNeo, which extends it. Per §4 a
   new tolerance needs sign-off. `FBNEO_ORACLE_EXPECT=exact` is the
   post-ruling target.
-- **OPEN from M4 — needs a ruling: is the thunk still load-bearing?** Its
-  crash control is DEAD (the no-thunk twin no longer reproduces f7997). But
-  the frozen inventory still has 93 stamp rows with type >= 64 against a
-  64-entry map, so the RIG stopped demonstrating the crash — the fix did not
-  stop being needed. The missing measurement is the TENANT side: how often a
-  tenant enters the map with an index >= 64. No section measures that today;
-  it is the number that would settle keep-or-drop.
+- ~~**OPEN from M4 — is the thunk still load-bearing?**~~ **MEASURED 14z-93.
+  RECOMMENDATION: KEEP.** The tenant enters the map **0 times** over all 37
+  hui+pyron rigs — while putting **121 objects of type >= 64 into the
+  projectile pool** (9 distinct types, 64-72, in 22 of the 37 rigs). The gap
+  is CONTACT, not absence: the sweep is POOL-vs-POOL, so a tenant projectile
+  hitting a FIGHTER never transits the map. Each of those 121 is one
+  collision away from indexing past vanilla's 64 entries.
+  **The dead crash control is diagnosed, not mysterious** (section 4): the
+  soak rig reaches the map 0 times, so the no-thunk twin has nothing to crash
+  on — yet that same rig still spawns 13 type-64/67 objects. A RIG failure.
+  Do NOT drop the row on it, and do not re-point it at a new crash address.
+  **Count the rows carefully:** 93 stamp rows carry `type >= 64`, but only
+  **36** are in the 64-75 projectile-pool band that can over-index this map;
+  the other 57 are the 114-120 obj_hook family (owner-tag served, never
+  reaches the sweep). 93 overstates the exposure 2.6x.
+- **THE WORK THIS TURNED THE RULING INTO: author a pool-vs-pool contact
+  rig.** No rig in the corpus produces one.
+  `tests/replays/hui/88_hui_plasma_trap_contact.rpl`'s header names what is
+  needed — "an opposing PROJECTILE to clash with, e.g. P2 Victor doing a
+  pool-object move into the mine — not a walking fighter". Pyron's cosmo rigs
+  are the richest source (17-28 type-66 spawns each), so a Pyron-vs-
+  projectile-character pairing is the likeliest route. With one, section 3
+  answers keep-or-drop outright and section 0's crash control can be revived.
 - The M5 sfx odds (0x112/0x14a/0x173/0x31B family — machinery ready).
 - FLAKY CRASH RESET (Sasquatch intro; rig designed, STATE 14z-85f).
 - Round-end flicker (parked; needs the maintainer's recording).

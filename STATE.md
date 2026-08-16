@@ -1,5 +1,133 @@
 # STATE — living progress log
 
+## Session 14z-93 — THE TENANT SIDE OF THE HIT-CLASS MAP, MEASURED. The
+## number M4 asked for is ZERO — and that is an argument to KEEP the
+## thunk, not to drop it, because 121 dangerous objects are in the pool.
+
+M4 (14z-92) closed with one question open and named it precisely: *"The
+missing measurement is the TENANT side — how often the tenant enters the map
+with an index >= 64 — which no section measures today. That is the number
+that would settle keep-or-drop."* It is now measured.
+
+**THE HEADLINE, and it needs both numbers to mean anything:**
+
+    tenant map entries, 37 rigs:     0   (0 ext >=0x40, 0 trap >=0x50)
+    type >= 64 objects INTO the pool: 121 over the same 37 rigs
+    distinct dangerous types live:    64,65,66,67,68,69,70,71,72  (9 of 11)
+    rigs that put one in the pool:    22 of 37
+
+So the tenant never enters the map — **while putting a dangerous object into
+the projectile pool 121 times.** The gap is not absence, it is **CONTACT**:
+the hit sweep is POOL-vs-POOL (both loop registers stride pool slots), so a
+tenant projectile hitting a FIGHTER never transits the map at all. Every one
+of those 121 objects is one collision away from indexing past vanilla's 64
+entries, and the thunk is what turns that into vs2's defined class instead of
+a wild jump into the `rts` opcode at map[64].
+
+**RECOMMENDATION TO THE MAINTAINER: KEEP `hitclass_map_extend`.** The
+keep-or-drop question cannot be answered "drop" on the evidence available,
+and the dead crash control is not evidence for dropping — see below. What is
+genuinely missing is a RIG, and it is now a specific, small piece of work.
+
+**WHY THE CRASH CONTROL DIED — diagnosed, not guessed (section 4).** The
+same probe on section 0's soak rig (`pyron/70_pyron_mash` + PYR_SOAK) on the
+FIX build reports `total=0`: **the rig no longer reaches the map at all.** So
+the no-thunk twin has nothing to crash on. That is a RIG failure, not a sign
+the fix stopped being needed — and the pool tap proves the point sharply,
+because that same rig still spawns **13** objects of types 64 and 67 into
+`$FF9402`/`$FF9502`. The object is there; the collision is not. Re-pointing
+the control at a different crash address would therefore fix nothing.
+
+**COUNT THE EXPOSURE CORRECTLY (correction).** The open item said "93 stamp
+rows with type >= 64 against a 64-entry map". Measured over
+`build/manifest/type_stamps.toml`: 93 is right, but only **36** are in the
+64-75 projectile-pool band that can over-index THIS map; the other **57** are
+the 114-120 obj_hook family, served by the spawn-time owner tag and never
+reaching the hit-class sweep (verified: 36 + 57 = 93, none outside either
+band). Quoting 93 here overstates the exposure 2.6x. Corrected in
+NEXT_SESSION and engine_internals.
+
+**SECTIONS 1-2 REPRODUCE 14z-92 EXACTLY**, which is the determinism
+confirmation the run also buys: 43/46 bit-identical with the same three
+transient divergences, and 230 legacy map entries (`26_don_arcade_mash` 228,
+`24_don_winmash` 2) — now **binned by the instrument**: 0 at >=0x40, 0 at
+>=0x50. The fix's restated safety argument ("legacy enters constantly and
+receives vanilla answers") is stated by the gate rather than by prose, and a
+future legacy replay that DOES reach the extension now fails loudly instead
+of needing someone to eyeball hex. Both verticals rebuilt from the current
+manifests reproduce the frozen shipping builds: pyron `fac4a777` = pyron-m9,
+thunk bodies `0xff1e0`/`0xfd360` = pyron26/hui41.
+
+**HONEST LIMITS, stated because a zero is easy to over-read:**
+- The 37 rigs were authored for other purposes. **None is a pool-vs-pool
+  contact rig** — `88_hui_plasma_trap_contact` was written to be one and its
+  own header records that it never produced the event on either cut.
+- The spawn census counts type STAMPS, not objects alive at collision time.
+  It bounds the exposure from below, which is the direction that matters.
+- Donovan is out of scope BY CONSTRUCTION (types 59-63 fit; `donovan.toml`
+  does not declare the row), so "tenant" here means Huitzil and Pyron.
+- 3 of 37 pool taps died by SIGSEGV in MAME's teardown. All 37 logs carry the
+  tap's `END` line, which is the validity criterion the tool asserts; the
+  known teardown class (audit_type_writes ignores the exit code for the same
+  reason). The shell's reaping message is now redirected into the leg log
+  instead of landing mid-table where it reads as a failed measurement.
+
+**SUITE (+2 ROM-free gates with 27 verdict controls between them, +2 audit
+sections):**
+- `tools/classify_hitclass_probe.py` + `tests/test_classify_hitclass_probe.sh`
+  (15 controls). D0 is the RAW index here (index*4 at the obj_hook sites), the
+  low WORD is the index, and DEAD / CRASH / CAPPED are each kept distinct from
+  a zero. **It caught its author**: the high-word fixture encoded the wrong
+  index width, and the control failed before any measurement was believed.
+- `tools/classify_pool_spawns.py` + `tests/test_classify_pool_spawns.sh`
+  (12 controls). The type byte is at +0x02, an EVEN address, hence the HIGH
+  lane of the logged word — and the real captures carry the same value in
+  both lanes (`data 00004040`), so a low-lane reader is right by coincidence.
+  Every lane control uses UNEQUAL lanes. **It caught the tool's first
+  version**, which read the low lane and produced correct output for the
+  wrong reason.
+- Both in `tests/ci_portable.txt`.
+
+**A CONTRADICTION FIXED IN THE AUDIT ITSELF.** Section 0 printed
+`ok: THE FIX HOLDS — the soak that crashes the no-thunk twin at f7997 runs
+END-clean` two lines UNDER `FAIL: CONTROL DEAD — the soak did NOT crash on
+the no-thunk twin`. Both branches were individually correct; the verdict's
+wording restated a premise its own control had just failed to establish, and
+it is the line a skimmer reads. Now gated on the control's result. Filed as a
+gotcha — a PASS line may state only what its own branch measured.
+
+**§5 RETRACTION MISSES FOUND AND FIXED.** 14z-92 recorded the "legacy never
+enters the map" retraction as propagated to engine_internals, HANDOFF and both
+manifests. It had not reached:
+- `docs/game/engine_internals.md` — the retracted sentence survived FOUR LINES
+  BELOW its own retraction, live and unmarked. Fixed at the source, with the
+  pool-vs-pool mechanism written up where the zero gets interpreted.
+- `docs/project/patch_notes.md` (two sites) — historical, so marked RETRACTED
+  in place per §5.4 rather than rewritten. Donovan's map[61]/[62] decision is
+  UNCHANGED but its basis is restated corpus-wide: none of the 230 entries is
+  at 61 or 62, so "unexercised" now rests on 46 replays instead of 2.
+- `tests/expected/registry.tsv` — the two superseded freeze rows carry a
+  retraction marker line; the row text is left frozen.
+- `hitclass_map_extend` had **no row in `docs/project/patch_index.md` at all**
+  despite being adopted and shipped in two manifests. Added, with the
+  keep-or-drop state as a deprecation-candidate entry — which is what that
+  registry is for.
+
+**GOTCHAS filed (2, project bucket):** a PASS line that hard-codes its
+control's conclusion; `DUMPS` land next to the LOG, not in the sandbox
+(caught before the 37-leg sweep ran — every leg would have overwritten the
+others' hitbox dumps, producing a plausible table with values attributed to
+the wrong leg).
+
+**OPEN — the work this converts the ruling into:** author a pool-vs-pool
+contact rig. `tests/replays/hui/88_hui_plasma_trap_contact.rpl`'s header
+already names what is needed — "an opposing PROJECTILE to clash with, e.g.
+P2 Victor doing a pool-object move into the mine — not a walking fighter".
+Pyron's cosmo rigs are the richest source (17-28 type-66 spawns each), so a
+Pyron-vs-Pyron or Pyron-vs-projectile-character pairing is the likeliest
+route. When one exists, section 3 answers keep-or-drop directly and section
+0's crash control can be revived on it.
+
 ## Session 14z-92 CLOSE — ritual complete
 
 **SHIPPED.** #75 closed (the merged gfx-verify abort was a verifier artifact,

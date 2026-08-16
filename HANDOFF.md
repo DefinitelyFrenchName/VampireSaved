@@ -652,7 +652,13 @@ tests/test_hitclass_map_thunk.sh      # 14z-82b: the f7997 fix body (the
                                       # "not adopted" while the maintainer
                                       # re-freeze decision is pending. 2
                                       # verdict controls. No emulator, ~2 s
-tests/audit_hitclass_map_cost.sh      # 14z-82b ON-DEMAND (~20 min): the
+tests/audit_hitclass_map_cost.sh      # 14z-82b ON-DEMAND (NO minute figure
+                                      # on purpose — the "~20 min" here was
+                                      # measured on the 4+2 replay version
+                                      # and was still being read a session
+                                      # after the corpus grew to 46. Budget
+                                      # on the work formula in the script
+                                      # header; poll the process): the
                                       # adoption numbers on a PROBE build —
                                       # the 11,017-frame soak that crashes
                                       # frozen pyron-m2 must END clean; legacy
@@ -669,7 +675,29 @@ tests/audit_hitclass_map_cost.sh      # 14z-82b ON-DEMAND (~20 min): the
                                       # claim is FALSIFIED — 230 entries over
                                       # 2 replays, all indices < 64, so legacy
                                       # gets vanilla answers; 43/46
-                                      # bit-identical. Never freezes the probe
+                                      # bit-identical. Never freezes the probe.
+                                      # EXTENDED 14z-93 with the OTHER HALF:
+                                      # section 3 is the TENANT fire census
+                                      # (what the thunk BUYS, the number M4
+                                      # left open), all 37 hui+pyron rigs on
+                                      # verticals built from the CURRENT
+                                      # manifests, indices binned in-domain /
+                                      # vs2-extension / trap. Huitzil+Pyron
+                                      # only — donovan.toml does not declare
+                                      # the row. Section 4 diagnoses section
+                                      # 0's dead crash control with the same
+                                      # probe. THE THREE VERDICTS ARE KEPT
+                                      # APART BY DESIGN: "reaches the
+                                      # extension", "enters but stays below
+                                      # 64", and "NO RIG PRODUCES THE EVENT"
+                                      # (the sweep is POOL-vs-POOL, so a
+                                      # tenant projectile hitting a FIGHTER
+                                      # never transits the map) mean
+                                      # different things, and folding them
+                                      # is what produced the retracted claim.
+                                      # HITCLASS_TENANT_ONLY=1 skips 1+2.
+                                      # Verdict logic ground-truthed by
+                                      # tests/test_classify_hitclass_probe.sh
 tests/audit_trap_sound.sh             # 14z-82d, RE-SCOPED 14z-85g (~10 min):
                                       # the MK Plasma Trap SPAWNS (type-69
                                       # pool write) and the sound RING is
@@ -1570,6 +1598,47 @@ tests/test_gfx_collision_gate.sh      # 14z-83 (S1): ground truth for
                                       # path textual lock. Emits
                                       # gfx_written.json (the S2 chain
                                       # ledger). No ROMs, ~1s
+tests/test_classify_hitclass_probe.sh # 14z-93: ground truth for the
+                                      # hit-class probe's VERDICT LOGIC
+                                      # (tools/classify_hitclass_probe.py),
+                                      # which decides whether a census zero
+                                      # means "the tenant stayed inside
+                                      # vanilla's 64 entries", "no rig
+                                      # produced the event" or "the rig
+                                      # died". 15 cases: the three real
+                                      # verdicts, the four states that are
+                                      # NOT a zero (DEAD / CRASH / CAPPED /
+                                      # absent log), and the ways it could
+                                      # be quietly wrong — D0 is the RAW
+                                      # index here (index*4 at the obj_hook
+                                      # sites, so a "fix" that divides would
+                                      # make 0x44 vanish), the low WORD is
+                                      # the index and a stale high word must
+                                      # be masked, while a LARGE low word is
+                                      # a real trap and must not be. Written
+                                      # first and it CAUGHT ITS AUTHOR: the
+                                      # high-word fixture encoded the wrong
+                                      # width. No ROMs, ~1s; in ci_portable
+tests/test_classify_pool_spawns.sh    # 14z-93: ground truth for the SPAWN
+                                      # DENOMINATOR (tools/classify_pool_
+                                      # spawns.py) — how many type >= 64
+                                      # objects entered the $FF9400
+                                      # projectile pool. Without it a zero
+                                      # from the map census is ambiguous
+                                      # between "never stamps a dangerous
+                                      # type" and "stamps them constantly,
+                                      # nothing collided" — opposite
+                                      # rulings. 12 cases. THE LANE is the
+                                      # sharp one: the type byte is at
+                                      # +0x02, an EVEN address, so it is
+                                      # the HIGH lane of the logged word —
+                                      # and the real captures carry the
+                                      # SAME value in both lanes
+                                      # (data 00004040), so a low-lane
+                                      # reader is right by coincidence.
+                                      # Every lane case uses UNEQUAL lanes.
+                                      # Caught the tool's first version.
+                                      # No ROMs, ~1s; in ci_portable
 tests/test_obj_record_walk.sh         # 14z-92 (GitHub #75): ground truth
                                       # for the RELOCATION-AWARENESS of
                                       # obj_records.walk's two heuristic

@@ -2259,3 +2259,56 @@ Rules now:
   tile inventories and gfx members statically and never start an emulator,
   so the profile bump cannot reach them (both measured green, 14z-92).
   When triaging this class, sort the references by "does it run?" first.
+
+## A PASS line that hard-codes its control's conclusion (paid: 14z-93, caught by reading a red log)
+
+`audit_hitclass_map_cost.sh` section 0 printed, unconditionally:
+
+```
+  ok: THE FIX HOLDS — the soak that crashes the no-thunk twin at
+      f7997 runs END-clean through 11,017 frames
+```
+
+two lines *under* the branch that had just reported `FAIL: CONTROL DEAD —
+the soak did NOT crash on the no-thunk twin`. The success message asserted
+the very premise its own control had failed to establish, and it is the
+line a skimmer reads.
+
+Both branches were individually correct — the control tested the twin, the
+verdict tested the fix build — but the verdict's WORDING carried a claim it
+had not checked. A reader taking the last line at face value comes away
+believing the crash was reproduced this run.
+
+**The rule: a verdict line may state only what its own branch measured.**
+If it wants to restate the control's finding, it has to be gated on the
+control's result — which is the fix here (`ctl_live`). Grep for success
+messages that describe something measured by a DIFFERENT section; they are
+where a decayed control keeps looking green.
+
+Related and the reason this matters here: the control had been dead since
+before 14z-92 and the audit exits 1 because of it — so the contradictory
+line had been printing under a red exit for a session, which is exactly
+the state in which nobody re-reads the prose.
+
+## `DUMPS` land next to the LOG, not in the sandbox (paid: 14z-93, caught before the sweep ran)
+
+`tests/lua/replay_guard.lua` computes `out_dir` from the CHECKSUM_OUT path
+(`local out_dir = out_path:match("^(.*)/[^/]+$")`), and writes dumps as
+`dump_<frame>_<addr>.bin`. The **sandbox argument has nothing to do with
+it.** So the natural shape for a parallel sweep —
+
+```sh
+tools/run_replay_guarded.sh vsavjw "$rpl" "$WORK/t_$tag.log" "$WORK/box_$tag"
+```
+
+— gives every leg its own sandbox and its own log, and then has all 37 legs
+write their dumps into the SAME `$WORK`, keyed only by frame and address.
+Legs whose dump frames collide overwrite each other silently, and there is
+no way afterwards to tell which leg produced which file. In a census whose
+whole point is "prove each leg loaded the right character", that reassigns
+one leg's evidence to another.
+
+**Give each leg its own DIRECTORY for the log**, not just its own sandbox:
+`"$WORK/tl_$tag/probe.log"`. Caught by inspection before the sweep ran; the
+failure would have been a plausible-looking table with attributed values,
+which is the worst kind.

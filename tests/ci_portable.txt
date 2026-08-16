@@ -26,6 +26,8 @@
 test_attribute_ramdiff
 test_audit_merged_dispatch
 test_build_gate_status
+test_classify_hitclass_probe
+test_classify_pool_spawns
 test_compare_composite
 test_compare_flicker
 test_compare_window

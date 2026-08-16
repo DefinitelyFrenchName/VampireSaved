@@ -35,7 +35,27 @@
 #      divergent = the run-shape report is the maintainer's input.
 #   2  FIRE CENSUS: how often legacy content actually enters the map
 #      routine (probe at the placed body, D0 = the map index) — the
-#      denominator for section 1's verdict, over the SAME corpus.
+#      denominator for section 1's verdict, over the SAME corpus. Since
+#      14z-93 the indices are BINNED (in-domain / vs2 extension / trap),
+#      so the fix's safety argument is stated by the instrument.
+#   3  TENANT FIRE CENSUS (14z-93): the other half — how often a TENANT
+#      enters the map with an index >= 64. That is what the thunk BUYS,
+#      and no section measured it before; STATE 14z-92 (M4) filed it as
+#      the number that would settle keep-or-drop. Huitzil + Pyron only
+#      (donovan.toml does not declare the row: his types 59-63 fit).
+#   4  WHY IS SECTION 0's CRASH CONTROL DEAD? Same probe on the soak rig,
+#      separating "the over-index still happens, the address moved" from
+#      "the rig stopped producing the event".
+#
+# WHAT SECTIONS 3-4 CANNOT DO, STATED UP FRONT. The hit sweep is
+# POOL-vs-POOL, so a tenant projectile hitting a FIGHTER never transits
+# this map (measured; tests/replays/hui/88_hui_plasma_trap_contact.rpl was
+# authored to force a pool-vs-pool contact and scored ZERO on both cuts).
+# A tenant zero here therefore has two possible meanings and the section
+# reports them as two verdicts, never one: "enters and stays below 64" is
+# a result; "no rig produced the event" is a gap in the RIGS. Collapsing
+# them is the exact coverage artefact that produced the retracted
+# "legacy never enters the map" claim.
 #
 # WIDENED 14z-92 (M4): both sections ran on a hardcoded FOUR replays
 # (section 1) and TWO (section 2). `hitclass_map_extend` is ADOPTED and
@@ -55,9 +75,18 @@
 # docs/project/gotchas.md "A frozen build stops being a usable REFERENCE").
 #
 # Usage: ROMDIR=... [MAME_BIN=...] [JOBS=6] [HITCLASS_SET=pyron-mN]
-#        [HITCLASS_REPLAYS="a b c"] tests/audit_hitclass_map_cost.sh
-# On-demand (1 build + 1 soak + 2*N checksum runs + N probe runs,
-# JOBS-parallel).
+#        [HITCLASS_REPLAYS="a b c"] [HITCLASS_TENANT_ONLY=1]
+#        [HITCLASS_TENANT_REPLAYS="hui/70_hui_mash ..."]
+#        tests/audit_hitclass_map_cost.sh
+# On-demand: 3 builds + 2 soaks + 2*N checksum runs + N legacy probe runs
+# + 37 tenant probe runs + 2 armed-probe controls + 1 soak probe,
+# JOBS-parallel. NO WALL-CLOCK FIGURE IS QUOTED HERE ON PURPOSE — the one
+# in HANDOFF went stale the moment the corpus grew 4 -> 46 and was still
+# being read a session later. Budget on the work formula, and poll the
+# process rather than trusting a completion notice.
+# HITCLASS_TENANT_ONLY=1 skips sections 1 and 2 (the 2*N + N legacy runs)
+# so section 3 can be iterated; section 0 still runs because section 3
+# needs its build and its $BODY.
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"
@@ -104,6 +133,25 @@ abspath() { case "$1" in /*) echo "$1";; *) echo "$PWD/$1";; esac; }
 JOBS="${JOBS:-6}"
 pool=0
 sync_pool() { pool=$((pool + 1)); if [ "$pool" -ge "$JOBS" ]; then wait; pool=0; fi; }
+
+# classify <probe log> — read one guarded-run log through the ground-truthed
+# classifier (tools/classify_hitclass_probe.py, gated by
+# tests/test_classify_hitclass_probe.sh). Sets $crc (0 OK / 1 DEAD /
+# 2 CAPPED / 3 CRASH) plus $c_st $c_total $c_ext $c_trap $c_vals.
+#
+# It is a function and not four greps because the states it separates are
+# the ones that make a zero mean different things — see the tool's header.
+classify() {
+    crc=0
+    _o="$(python3 tools/classify_hitclass_probe.py "$1" 2>&1)" || crc=$?
+    set -- $_o
+    c_st="${1:-DEAD}"; c_total="${2#total=}"; c_ext="${3#ext=}"
+    c_trap="${4#trap=}"; c_vals="${5#vals=}"
+    # A tool that failed to run at all must not present as a clean zero.
+    case "$c_total" in ''|*[!0-9]*) c_st=DEAD; c_total=0; c_ext=0; c_trap=0
+                                    c_vals="-"; crc=1 ;; esac
+    return 0
+}
 
 # THE LEGACY CORPUS (14z-92, M4) — resolved and printed, never pinned.
 if [ -n "${HITCLASS_SET:-}" ]; then
@@ -203,26 +251,44 @@ soak "$WORK/nothunk" "$WORK/soak_nothunk.log"
 # unless the same soak CRASHES without the thunk. Otherwise "no crash" may
 # mean the rig stopped firing the move (the downgrade class, paid for
 # repeatedly on this project).
+ctl_live=1
 if grep -q "^CRASH" "$WORK/soak_nothunk.log"; then
     echo "  ok: CONTROL — without the thunk the soak still CRASHES" \
          "($(grep -m1 '^CRASH' "$WORK/soak_nothunk.log" | cut -c1-60))"
 else
     echo "  FAIL: CONTROL DEAD — the soak did NOT crash on the no-thunk twin,"
     echo "        so an END-clean run on the fix build proves nothing about"
-    echo "        the thunk. Check the rig before believing section 0."
+    echo "        the thunk. Section 4 diagnoses WHY with the map probe;"
+    echo "        do not re-point the control at a new address until it has."
     grep -E "^(CRASH|END)" "$WORK/soak_nothunk.log" | head -3
+    ctl_live=0
     fail=1
 fi
 if grep -q "^END 11017" "$WORK/soak.log" \
         && ! grep -q "^CRASH" "$WORK/soak.log"; then
-    echo "  ok: THE FIX HOLDS — the soak that crashes the no-thunk twin at"
-    echo "      f7997 runs END-clean through 11,017 frames"
+    # 14z-93: this message used to read "the soak that crashes the no-thunk
+    # twin at f7997 runs END-clean" UNCONDITIONALLY — so on a dead control it
+    # asserted the crash two lines under the branch that had just reported
+    # there wasn't one. A success line must not restate the premise the
+    # control failed to establish.
+    if [ "$ctl_live" = 1 ]; then
+        echo "  ok: THE FIX HOLDS — the soak that crashes the no-thunk twin at"
+        echo "      f7997 runs END-clean through 11,017 frames"
+    else
+        echo "  note: the soak runs END-clean through 11,017 frames on the fix"
+        echo "        build — but with the control DEAD that is not evidence"
+        echo "        about the thunk, only that this rig does not crash."
+    fi
 else
     echo "  FAIL: the soak did not complete clean on the fix build:"
     grep -E "^(CRASH|END)" "$WORK/soak.log" | head -3
     fail=1
 fi
 
+if [ "${HITCLASS_TENANT_ONLY:-0}" = 1 ]; then
+    echo "== 1: LEGACY COST — SKIPPED (HITCLASS_TENANT_ONLY=1) =="
+    n_ok=0; n_div=0; n_dead=0
+else
 echo "== 1: LEGACY COST — A/B fix vs the NO-THUNK TWIN =="
 run() {  # run <build> <replay> <out> — explicit per-leg sandbox: these run
          # in PARALLEL, and two legs sharing a MAME sandbox inherit each
@@ -260,7 +326,11 @@ for R in $CORPUS; do
     fi
 done
 echo "  $n_ok/$NCORP bit-identical, $n_div divergent, $n_dead dead"
+fi
 
+if [ "${HITCLASS_TENANT_ONLY:-0}" = 1 ]; then
+    echo "== 2: FIRE CENSUS — SKIPPED (HITCLASS_TENANT_ONLY=1) =="
+else
 echo "== 2: FIRE CENSUS — how often legacy content enters the map =="
 for R in $CORPUS; do
     ( POKES="" MAME_ROMPATH="$(abspath "$WORK/fix")/rompath;$ROMDIR" \
@@ -270,28 +340,453 @@ for R in $CORPUS; do
     sync_pool
 done
 wait
-tot=0; c_dead=0; seen_vals=""
+tot=0; tot_ext=0; tot_trap=0; c_dead=0; seen_vals=""
 for R in $CORPUS; do
     # A guarded run that never started logs nothing, and "0 map entries"
     # from a dead rig is indistinguishable from a real zero — the trap this
     # project has paid for repeatedly. Require the run to have COMPLETED.
-    if [ ! -s "$WORK/f_$R.log" ] || ! grep -q '^END ' "$WORK/f_$R.log"; then
-        echo "  DEAD: $R — guarded run did not complete; its zero is not evidence"
-        c_dead=$((c_dead + 1)); fail=1; continue
-    fi
-    N="$(grep -c '^PROBE ' "$WORK/f_$R.log" || true)"
-    tot=$((tot + N))
-    if [ "$N" -gt 0 ]; then
-        VALS="$(grep '^PROBE ' "$WORK/f_$R.log" \
-                | sed 's/.*D0=\([0-9a-f]*\) .*/\1/' | sort -u | tr '\n' ' ')"
-        echo "  $R: $N map entries; D0 values: $VALS"
-        seen_vals="$seen_vals $VALS"
+    # 14z-93: the completeness check, the index binning and the CAP check
+    # all moved into tools/classify_hitclass_probe.py, which is
+    # ground-truthed by tests/test_classify_hitclass_probe.sh. The old
+    # `grep -q '^END '` could not see a PROBE-CAP truncation, and the old
+    # value list was raw hex nobody binned — the "all indices < 64"
+    # conclusion lived only in prose (docs/game/engine_internals.md).
+    classify "$WORK/f_$R.log"
+    n_total="$c_total"; n_ext="$c_ext"; n_trap="$c_trap"; vals="$c_vals"
+    case "$crc" in
+        1) echo "  DEAD: $R — guarded run did not complete; its zero is not evidence"
+           c_dead=$((c_dead + 1)); fail=1; continue ;;
+        3) echo "  CRASH: $R — the guard tripped on the FIX build; not a census result"
+           c_dead=$((c_dead + 1)); fail=1; continue ;;
+        2) echo "  CAPPED: $R — hit GUARD_PROBE_MAX; total is a FLOOR, not a count"
+           fail=1 ;;
+    esac
+    tot=$((tot + n_total)); tot_ext=$((tot_ext + n_ext))
+    tot_trap=$((tot_trap + n_trap))
+    if [ "$n_total" -gt 0 ]; then
+        echo "  $R: $n_total map entries ($n_ext ext >=0x40, $n_trap trap >=0x50); D0: $vals"
+        seen_vals="$seen_vals $vals"
     fi
 done
 echo "  corpus total: $tot map entries over $NCORP replays ($c_dead dead)"
-[ "$tot" = 0 ] && echo "  => legacy content NEVER enters the map on this corpus"
+echo "                $tot_ext at index >=0x40, $tot_trap at index >=0x50"
+if [ "$tot" = 0 ]; then
+    echo "  => legacy content NEVER enters the map on this corpus"
+elif [ "$tot_ext" = 0 ] && [ "$tot_trap" = 0 ]; then
+    # THE ADOPTED FIX'S ACTUAL SAFETY ARGUMENT, stated by the instrument
+    # rather than by prose. Retracted 14z-92: it is NOT "legacy never
+    # enters" (it enters 230 times) — it is "legacy enters constantly and
+    # receives VANILLA's own bytes", because the thunk body is vanilla's 64
+    # entries verbatim below 0x40.
+    echo "  => legacy ENTERS ($tot times) but stays inside vanilla's 64"
+    echo "     entries, so it reads vanilla's own bytes out of the thunk."
+else
+    echo "  => LEGACY REACHES THE EXTENSION ($tot_ext ext / $tot_trap trap)."
+    echo "     This contradicts the adopted fix's safety argument and is a"
+    echo "     STOP-AND-ESCALATE, not a tolerance: legacy would be reading"
+    echo "     vs2's bytes where vanilla read its own."
+    fail=1
+fi
 echo "  (guarded runs are never checksum-compared — the census is a"
 echo "   denominator for section 1, not a divergence source)"
+fi
+
+# ---------------------------------------------------------------- section 3
+# THE TENANT SIDE (14z-93). Sections 1-2 measure what the thunk costs
+# LEGACY. Nothing measured what it BUYS — how often a tenant enters the map
+# with an index >= 64, which is the number that settles keep-or-drop
+# (STATE 14z-92 M4). The crash control in section 0 is dead, so "the fix is
+# still needed" currently rests on the frozen stamp inventory alone.
+#
+# SCOPE IS HUITZIL + PYRON, BY CONSTRUCTION. Donovan's projectile types are
+# 59-63, they fit vanilla's 64-entry map, and donovan.toml deliberately does
+# not declare this row — there is no thunk on his build to probe. Stated
+# rather than silently omitted.
+#
+# WHAT A ZERO WOULD AND WOULD NOT MEAN. The hit sweep is POOL-vs-POOL: both
+# loop registers stride pool slots, so a tenant projectile hitting a FIGHTER
+# never transits this map (measured, tests/replays/hui/88_hui_plasma_trap_contact.rpl).
+# That replay was authored to produce a pool-vs-pool contact and scored 0 map
+# entries on both of its cuts. So "0 ext" and "no rig produces the event at
+# all" are DIFFERENT results and the section reports them as such — folding
+# them together is precisely the coverage artefact that produced the
+# retracted "legacy never enters" claim.
+echo
+echo "== 3: TENANT FIRE CENSUS — does a tenant reach the extension? =="
+
+# THE HUITZIL VERTICAL. Built from the CURRENT manifest for the same reason
+# section 0's twin is (":86-87 — a reference that is not rebuilt from the
+# SAME manifest is not a control; it is a second variable"), and NOT from
+# build/hui41: a frozen build stops being a usable reference the moment the
+# profile bumps (docs/project/gotchas.md; it cost this audit its pyron20
+# reference and cost test_merged_render_content six sessions of huitzil
+# coverage).
+grep -q 'name = "hitclass_map_extend"' build/manifest/huitzil.toml || {
+    echo "FAIL: huitzil.toml no longer carries hitclass_map_extend"; exit 1; }
+KEY_SET=vsavj TENANT_MANIFEST=build/manifest/huitzil.toml \
+TENANT_CHAR=0x10 WIDE_ROMSET="$WIDE_ZIP" \
+GEN_FLAGS="--profile cps2-wide-v1 --allow-plausible --tripwire-open" \
+    tools/build_donovan.sh 6 "$WORK/hfix" > "$WORK/build3.log" 2>&1 || {
+    echo "FAIL: huitzil vertical build errored"; tail -10 "$WORK/build3.log"; exit 1; }
+HBODY="$(sed -n 's/^code *0x0*\([0-9a-f]*\) .*site_thunk hitclass_map_extend.*/\1/p' \
+        "$WORK/hfix/patch/patch_notes_fragment.md" | head -1)"
+[ -n "$HBODY" ] || { echo "FAIL: huitzil thunk body not in the fragment"; exit 1; }
+echo "  ok: huitzil vertical built; body at 0x$HBODY (pyron's at 0x$BODY)"
+
+# THE CORPUS. An explicit table, NOT a glob: every tenant rig needs its own
+# forced-pick string (mash / fx / cosmo / 2p windows differ), and a poke that
+# misses yields a legitimate-looking zero from the WRONG character — the
+# test_pyron_ladder failure, which was green while building Donovan (#84).
+# 21 of the 37 rows carry their string in the replay's own header; the rest
+# are copied from the gate that drives that replay, named per row.
+# ALL 37, not a sample: a two-replay census is exactly what produced the
+# claim this section exists to replace.
+HUI_SOAK="1704:ff8782:10;1760:ff8782:10;1900:ff8782:10;2100:ff8782:10;2400:ff8782:10"
+HUI_FX="1400:ff8782:10;1450:ff8782:10;1500:ff8782:10"
+HUI_2P="1400:ff8782:10;1450:ff8782:10;1500:ff8782:10;1400:ff8b82:03;1450:ff8b82:03;1500:ff8b82:03"
+HUI_EX="$HUI_SOAK;3000:ff8509:09"
+HUI_FG="1400:ff8782:10;1450:ff8782:10;1500:ff8782:10;3000:ff8509:03;3020:ff8509:03"
+PYR_2P="1400:ff8782:11;1450:ff8782:11;1500:ff8782:11;1400:ff8b82:03;1450:ff8b82:03;1500:ff8b82:03"
+PYR_PICK="1400:ff8782:11;1450:ff8782:11;1500:ff8782:11"
+
+tenant_rows() {   # <tenant-key>|<replay>|<pokes>   — tenant key h or p
+cat <<ROWS
+h|hui/70_hui_mash|$HUI_SOAK
+h|hui/71_hui_ex_fg|$HUI_FG
+h|hui/72_hui_ex_es|$HUI_EX
+h|hui/73_hui_ex_fg_close|$HUI_EX
+h|hui/74_hui_walk|$HUI_SOAK
+h|hui/75_hui_air|$HUI_SOAK
+h|hui/76_hui_hcb|$HUI_FX
+h|hui/77_hui_fg_whiff|$HUI_EX
+h|hui/78_hui_fg_chaos|$HUI_EX
+h|hui/79_hui_airdash|$HUI_SOAK
+h|hui/80_hui_grab_2p|$HUI_FX
+h|hui/81_hui_rw_gc|$HUI_FX
+h|hui/82_hui_df_2p|$HUI_FX
+h|hui/83_hui_fx|$HUI_FX
+h|hui/83b_hui_ray_2p|$HUI_FX
+h|hui/83c_hui_grenade_2p|$HUI_2P
+h|hui/83d_hui_grenade_ground|$HUI_2P
+h|hui/85_hui_df_vs2|$HUI_2P;3100:ff8509:03;3120:ff8509:03
+h|hui/86_hui_beam_variants|$HUI_2P;3100:ff8509:03;3400:ff8509:03;3700:ff8509:03
+h|hui/87_hui_plasma_trap|$HUI_2P
+h|hui/88_hui_plasma_trap_contact|$HUI_2P
+h|hui/89_hui_ex_fg_vs2|$HUI_2P;3100:ff8509:03;3120:ff8509:03;3900:ff8509:03;4300:ff8509:03
+h|hui/90_hui_oracle|$HUI_FX;2360:ff80d4:42;2360:ff80d5:42;2500:ff8509:09
+h|hui/92_hui_trap_shock|$HUI_2P
+p|pyron/70_pyron_mash|$PYR_SOAK
+p|pyron/71_pyron_cosmo|$PYR_PICK;3000:ff8509:03;3020:ff8509:03
+p|pyron/72_pyron_cosmo_2p|$PYR_2P;3300:ff8509:03;3700:ff8509:03;4100:ff8509:03
+p|pyron/73_pyron_air_214p|$PYR_2P
+p|pyron/74_pyron_air_214p_sweep|$PYR_2P
+p|pyron/75_pyron_air_sweep|$PYR_2P
+p|pyron/76_pyron_blink_vs2|$PYR_2P
+p|pyron/77_pyron_cosmo_storm|$PYR_PICK;3300:ff8509:09;3700:ff8509:09;4100:ff8509:09;4500:ff8509:09;4900:ff8509:09;5300:ff8509:09;5700:ff8509:09;6100:ff8509:09;6500:ff8509:09;6900:ff8509:09;7300:ff8509:09;7700:ff8509:09
+p|pyron/78_pyron_cosmo_hold|$PYR_PICK;3000:ff8509:09;3300:ff8509:09
+p|pyron/79_pyron_cosmo_realpick|3000:ff8509:09;3300:ff8509:09
+p|pyron/80_pyron_cosmo_pairsweep|$PYR_PICK;3300:ff8509:09;3900:ff8509:09;4500:ff8509:09;5100:ff8509:09;5700:ff8509:09;6300:ff8509:09
+p|pyron/81_pyron_cosmo_repro|$PYR_PICK;3300:ff8509:09
+p|pyron/82_pyron_cosmo_twice|$PYR_PICK;3300:ff8509:09;3900:ff8509:09
+ROWS
+}
+
+# TABLE INTEGRITY, BEFORE ANY LEG RUNS. Every row must name a replay that
+# exists and carry a non-empty pick poke. The rows interpolate shell
+# variables (PYR_SOAK is defined up in section 0), so a reorder or a typo
+# would yield an EMPTY poke — and a leg with no forced pick still runs, still
+# ends cleanly, and reports a confident zero for the wrong character. That is
+# the #84 shape, and it is cheaper to refuse here than to explain later.
+for row in $(tenant_rows); do
+    case "$row" in *\|*\|*) ;; *) echo "FAIL: malformed corpus row [$row]"; exit 1 ;; esac
+    _r="${row#*|}"; _rpl="${_r%%|*}"; _pk="${_r#*|}"
+    [ -f "tests/replays/$_rpl.rpl" ] || {
+        echo "FAIL: corpus row names a missing replay: $_rpl"; exit 1; }
+    case "$_rpl" in
+        # THE ONE NAMED EXEMPTION. 79_pyron_cosmo_realpick picks Pyron
+        # through the WHEEL rather than by poke — that is the whole point of
+        # the rig (it is the "does the real select path reach him" control),
+        # so requiring a pick poke would break it. Its legitimacy is checked
+        # downstream instead, by the $FF8460 hitbox-base read: if the real
+        # pick failed, the leg reports NO-MATCH or a stray base, not a zero.
+        pyron/79_pyron_cosmo_realpick) ;;
+        *) case "$_pk" in
+               *ff8782*) ;;
+               *) echo "FAIL: corpus row $_rpl has no P1 pick poke [$_pk] — an"
+                  echo "      unpoked leg measures whatever the cursor landed on"
+                  exit 1 ;;
+           esac ;;
+    esac
+done
+TROWS="$(tenant_rows | grep -c '^[hp]|' || true)"
+if [ -n "${HITCLASS_TENANT_REPLAYS:-}" ]; then
+    echo "  corpus: RESTRICTED to [$HITCLASS_TENANT_REPLAYS] (iteration mode)"
+else
+    echo "  corpus: $TROWS tenant rigs (all of tests/replays/{hui,pyron})"
+fi
+
+# Every leg dumps the P1 hitbox base ($FF8460, the +0x60.l signature
+# audit_legacy_pairings.sh classifies on) at three points spread across the
+# run, so a leg that never formed the tenant's match cannot present its zero
+# as a measurement. +0x382 would NOT do: in match that byte is the voice
+# class and the engine reassigns it (14z-87, ram.md:85).
+last_frame() { sed 's/#.*//' "$1" | awk 'NF { split($1, r, "-");
+    f = (r[2] ? r[2] : r[1]); if (f + 0 > m) m = f + 0 } END { print m + 0 }'; }
+
+# EACH LEG GETS ITS OWN DIRECTORY. replay_guard.lua writes DUMPS next to the
+# CHECKSUM LOG, not into the sandbox (`out_dir` is the log's dirname), and
+# the filename is only `dump_<frame>_<addr>.bin` — so 37 legs sharing $WORK
+# would overwrite each other's hitbox dumps and silently attribute one leg's
+# character to another.
+tleg() {   # tleg <build> <body> <replay> <pokes> <tag>
+    rpl="tests/replays/$3.rpl"
+    lf="$(last_frame "$rpl")"
+    d1=$(( lf * 55 / 100 )); d2=$(( lf * 70 / 100 )); d3=$(( lf * 85 / 100 ))
+    mkdir -p "$WORK/tl_$5"
+    ( POKES="$4" MAME_ROMPATH="$(abspath "$1")/rompath;$ROMDIR" \
+      GUARD_PROBE="$2" GUARD_PROBE_MAX=20000 \
+      DUMPS="$d1:ff8460-ff8463;$d2:ff8460-ff8463;$d3:ff8460-ff8463" \
+        tools/run_replay_guarded.sh vsavjw "$rpl" \
+        "$WORK/tl_$5/probe.log" "$WORK/tl_$5/sb" >/dev/null 2>&1 || true ) &
+}
+
+# Rows carry no spaces (the poke grammar is `frame:addr:val;…`), so plain
+# word-splitting over the table is safe.
+for row in $(tenant_rows); do
+    tk="${row%%|*}"; rest="${row#*|}"; rpl="${rest%%|*}"; pk="${rest#*|}"
+    case "$row" in *\|*\|*) ;; *) continue ;; esac
+    if [ -n "${HITCLASS_TENANT_REPLAYS:-}" ]; then
+        want=0
+        for w in $HITCLASS_TENANT_REPLAYS; do
+            if [ "$w" = "$rpl" ]; then want=1; fi
+        done
+        [ "$want" = 1 ] || continue
+    fi
+    tag="$(printf '%s' "$rpl" | tr '/' '_')"
+    if [ "$tk" = h ]; then tleg "$WORK/hfix" "$HBODY" "$rpl" "$pk" "$tag"
+    else                   tleg "$WORK/fix"  "$BODY"  "$rpl" "$pk" "$tag"; fi
+    sync_pool
+done
+wait
+
+# THE ARMED-PROBE CONTROL. Every number below is a count of breakpoint hits;
+# if the breakpoint is not actually armed on these builds, every zero is
+# vacuous. 26_don_arcade_mash is the replay section 2 measures at 228 entries,
+# so it is the one leg whose non-zero is already known independently.
+for tk in h p; do
+    if [ "$tk" = h ]; then bd="$WORK/hfix"; bb="$HBODY"; else bd="$WORK/fix"; bb="$BODY"; fi
+    ( POKES="" MAME_ROMPATH="$(abspath "$bd")/rompath;$ROMDIR" \
+      GUARD_PROBE="$bb" GUARD_PROBE_MAX=20000 \
+        tools/run_replay_guarded.sh vsavjw tests/replays/26_don_arcade_mash.rpl \
+        "$WORK/armed_$tk.log" "$WORK/armedbox_$tk" >/dev/null 2>&1 || true ) &
+    sync_pool
+done
+wait
+armed_ok=1
+for tk in h p; do
+    classify "$WORK/armed_$tk.log"
+    if [ "$crc" = 0 ] && [ "$c_total" -gt 0 ]; then
+        echo "  ok armed[$tk]: 26_don_arcade_mash fires the probe $c_total times"
+    else
+        echo "  FAIL armed[$tk]: the probe did not fire on a replay measured at"
+        echo "        228 entries in section 2 ($c_st total=$c_total) — every"
+        echo "        tenant zero below is VACUOUS, not a finding."
+        armed_ok=0; fail=1
+    fi
+done
+
+# Read back the hitbox-base dumps: which character actually loaded.
+hb_of() {   # hb_of <tag> -> distinct non-zero $FF8460 longs seen, space-sep
+    python3 - "$WORK/tl_$1" <<'PY'
+import glob, os, sys
+seen = []
+for p in sorted(glob.glob(os.path.join(sys.argv[1], "dump_*_ff8460.bin"))):
+    with open(p, "rb") as fh:
+        b = fh.read(4)
+    if len(b) == 4:
+        v = int.from_bytes(b, "big")
+        if v and v not in seen:
+            seen.append(v)
+print(" ".join("%06x" % v for v in seen))
+PY
+}
+
+t_tot=0; t_ext=0; t_trap=0; t_dead=0; t_norig=0; t_legs=0
+: > "$WORK/tenant_report.txt"
+for row in $(tenant_rows); do
+    tk="${row%%|*}"; rest="${row#*|}"; rpl="${rest%%|*}"
+    case "$row" in *\|*\|*) ;; *) continue ;; esac
+    tag="$(printf '%s' "$rpl" | tr '/' '_')"
+    [ -d "$WORK/tl_$tag" ] || continue
+    t_legs=$((t_legs + 1))
+    classify "$WORK/tl_$tag/probe.log"
+    hb="$(hb_of "$tag")"
+    case "$crc" in
+        1) echo "  DEAD: $rpl — guarded run did not complete; not a measurement"
+           t_dead=$((t_dead + 1)); fail=1; continue ;;
+        3) echo "  CRASH: $rpl — the guard tripped ON THE FIX BUILD."
+           echo "        entries=$c_total ext=$c_ext trap=$c_trap D0: $c_vals"
+           echo "        A crash here is a FINDING, not a dead rig — root-cause"
+           echo "        it before reading any verdict below."
+           t_dead=$((t_dead + 1)); fail=1; continue ;;
+        2) echo "  CAPPED: $rpl — hit GUARD_PROBE_MAX; total is a FLOOR"
+           fail=1 ;;
+    esac
+    if [ -z "$hb" ]; then
+        echo "  NO-MATCH: $rpl — \$FF8460 never populated; the rig formed no"
+        echo "        match, so its $c_total entries describe nothing"
+        t_dead=$((t_dead + 1)); fail=1; continue
+    fi
+    t_tot=$((t_tot + c_total)); t_ext=$((t_ext + c_ext)); t_trap=$((t_trap + c_trap))
+    [ "$c_total" = 0 ] && t_norig=$((t_norig + 1))
+    printf '%s\t%s\t%s\t%s\t%s\t%s\n' \
+        "$tk" "$rpl" "$c_total" "$c_ext" "$c_trap" "$hb" >> "$WORK/tenant_report.txt"
+    if [ "$c_total" -gt 0 ]; then
+        echo "  $rpl: $c_total entries ($c_ext ext, $c_trap trap); D0: $c_vals; hb=$hb"
+    fi
+done
+
+# WHICH CHARACTER DID EACH LEG ACTUALLY LOAD? A single shared hitbox base
+# across a tenant's legs is the evidence the forced picks took; a stray value
+# is the #84 shape (a green gate measuring the wrong character).
+for tk in h p; do
+    [ -s "$WORK/tenant_report.txt" ] || break
+    bases="$(awk -F'\t' -v k="$tk" '$1 == k { print $6 }' "$WORK/tenant_report.txt" \
+             | tr ' ' '\n' | sed '/^$/d' | sort -u | tr '\n' ' ')"
+    nb="$(printf '%s' "$bases" | wc -w | tr -d ' ')"
+    if [ "${nb:-0}" -le 1 ]; then
+        echo "  ok pick[$tk]: every leg loaded ONE character (hb=$bases)"
+    else
+        echo "  NOTE pick[$tk]: legs loaded $nb distinct hitbox bases [$bases]."
+        echo "        Expected for 2P rigs (P1 is the tenant, but a leg whose"
+        echo "        pick MISSED would look the same). Per-leg values are in"
+        echo "        the table above; check any leg whose base is unique."
+    fi
+done
+
+# ---- THE SPAWN DENOMINATOR ----------------------------------------------
+# A zero from the map probe is ambiguous ON ITS OWN and the two readings
+# license opposite rulings: "the tenant never stamps a dangerous type" vs
+# "it stamps them constantly and nothing ever collided with one". This leg
+# supplies the second number — how many objects of type >= 64 went into the
+# $FF9400 projectile pool at all — using the pool tap (no debugger, so
+# frame counting stays replay-exact) over the SAME corpus.
+echo "  -- spawn denominator: type >= 64 into the \$FF9400 pool --"
+for row in $(tenant_rows); do
+    tk="${row%%|*}"; rest="${row#*|}"; rpl="${rest%%|*}"; pk="${rest#*|}"
+    case "$row" in *\|*\|*) ;; *) continue ;; esac
+    tag="$(printf '%s' "$rpl" | tr '/' '_')"
+    [ -d "$WORK/tl_$tag" ] || continue
+    if [ "$tk" = h ]; then bd="$WORK/hfix"; else bd="$WORK/fix"; fi
+    lf="$(last_frame "tests/replays/$rpl.rpl")"
+    mkdir -p "$WORK/sp_$tag"
+    # The subshell's OWN stderr is redirected too, not just the command's:
+    # MAME routinely dies by SIGSEGV in TEARDOWN after the log is complete
+    # (docs/GOTCHAS.md; audit_type_writes.sh ignores the exit code for the
+    # same reason), and the shell prints "Segmentation fault" when it reaps
+    # the child. Left unredirected that message lands in the middle of the
+    # results table and reads as a failed measurement. The validity
+    # criterion is the tap's own `END` line, asserted per leg below — a run
+    # that did not reach END is reported DEAD and fails the audit.
+    ( REPLAY="$PWD/tests/replays/$rpl.rpl" TAP="ff9400,3c00" \
+      FRAMES=$(( lf + 120 )) POKES="$pk" TRACE_OUT="$WORK/sp_$tag/tap.txt" \
+      MAME_ROMPATH="$(abspath "$bd")/rompath;$ROMDIR" \
+      MAME_SANDBOX="$WORK/sp_$tag/sb" \
+        tools/run_mame.sh vsavjw \
+        -autoboot_script tests/lua/type_write_census.lua \
+        >"$WORK/sp_$tag/mame.log" 2>&1 || true ) 2>>"$WORK/sp_$tag/mame.log" &
+    sync_pool
+done
+wait
+s_tot=0; s_dead=0; s_types=""
+for row in $(tenant_rows); do
+    rest="${row#*|}"; rpl="${rest%%|*}"
+    case "$row" in *\|*\|*) ;; *) continue ;; esac
+    tag="$(printf '%s' "$rpl" | tr '/' '_')"
+    [ -d "$WORK/sp_$tag" ] || continue
+    src=0
+    so="$(python3 tools/classify_pool_spawns.py "$WORK/sp_$tag/tap.txt" 2>&1)" || src=$?
+    if [ "$src" != 0 ]; then
+        echo "  DEAD(spawn): $rpl — tap did not complete; its zero is not evidence"
+        s_dead=$((s_dead + 1)); fail=1; continue
+    fi
+    n="$(printf '%s' "$so" | sed 's/.*spawns=\([0-9]*\).*/\1/')"
+    ty="$(printf '%s' "$so" | sed 's/.*types=\([^ ]*\).*/\1/')"
+    s_tot=$((s_tot + n))
+    if [ "$n" -gt 0 ]; then
+        echo "  $rpl: $n spawns of type >= 64; types: $ty"
+        s_types="$s_types,$ty"
+    fi
+done
+echo "  spawn total: $s_tot objects of type >= 64 entered the projectile"
+echo "               pool over $t_legs legs ($s_dead dead taps)"
+
+echo "  tenant total: $t_tot map entries over $t_legs legs"
+echo "                $t_ext at index >=0x40 (the vs2 EXTENSION)"
+echo "                $t_trap at index >=0x50 (the planted ILLEGAL)"
+echo "                $t_norig legs produced no map entry at all, $t_dead dead"
+if [ "$armed_ok" = 0 ]; then
+    echo "  => NO VERDICT: the probe was not armed (see FAIL armed above)."
+elif [ "$t_ext" -gt 0 ] || [ "$t_trap" -gt 0 ]; then
+    echo "  => THE THUNK IS LOAD-BEARING. A tenant reaches the extension"
+    echo "     $t_ext time(s); without the thunk each is a wild jump into"
+    echo "     the map[64] = 0x4E rts opcode (the f7997 vec3)."
+elif [ "$t_tot" -gt 0 ]; then
+    echo "  => TENANT ENTERS ($t_tot times) BUT STAYS BELOW 0x40 on this"
+    echo "     corpus. That is a real bounded answer, NOT a demonstration"
+    echo "     that the thunk is unnecessary: the frozen stamp inventory"
+    echo "     still carries type-64..75 rows in this pool, so the rigs"
+    echo "     reach the map without reaching those types."
+elif [ "$s_tot" -gt 0 ]; then
+    echo "  => NO RIG PRODUCES A POOL-VS-POOL CONTACT — BUT THE EXPOSURE IS"
+    echo "     LIVE. The corpus put $s_tot objects of type >= 64 into the"
+    echo "     projectile pool and entered the map ZERO times, so the gap is"
+    echo "     CONTACT, not absence: the dangerous object is present and"
+    echo "     nothing collided with it. The sweep is pool-vs-pool (both"
+    echo "     loop registers stride pool slots), so a tenant projectile"
+    echo "     hitting a FIGHTER never transits this map."
+    echo "     THIS IS NOT A LICENCE TO DROP THE THUNK. It is a missing RIG:"
+    echo "     tests/replays/hui/88_hui_plasma_trap_contact.rpl's header"
+    echo "     names what is needed — an opposing PROJECTILE to clash with"
+    echo "     (P2 doing a pool-object move into the mine), not a walking"
+    echo "     fighter."
+else
+    echo "  => NEITHER THE MAP NOR THE POOL SAW ANYTHING. No dangerous type"
+    echo "     was even stamped, so the rigs are not exercising the tenant's"
+    echo "     projectile machine at all. Fix the rigs before reading this"
+    echo "     as a fact about the thunk — and check the pick controls above."
+fi
+
+# ---------------------------------------------------------------- section 4
+# WHY IS SECTION 0'S CRASH CONTROL DEAD? Same probe, aimed at the soak rig
+# section 0 uses. An f7997 crash IS a >= 64 map entry, so this separates the
+# two candidate explanations instead of leaving "check the rig".
+echo
+echo "== 4: the dead crash control, diagnosed with the probe =="
+( POKES="$PYR_SOAK" MAME_ROMPATH="$(abspath "$WORK/fix")/rompath;$ROMDIR" \
+  GUARD_PROBE="$BODY" GUARD_PROBE_MAX=20000 \
+    tools/run_replay_guarded.sh vsavjw tests/replays/pyron/70_pyron_mash.rpl \
+    "$WORK/soak_probe.log" "$WORK/soakprobe_box" >/dev/null 2>&1 || true )
+classify "$WORK/soak_probe.log"
+echo "  soak rig on the FIX build: $c_st total=$c_total ext=$c_ext trap=$c_trap D0: $c_vals"
+if [ "$crc" = 1 ]; then
+    echo "  => INCONCLUSIVE: the probed soak did not complete."
+elif [ "$c_ext" -gt 0 ] || [ "$c_trap" -gt 0 ]; then
+    echo "  => THE OVER-INDEX STILL HAPPENS. The thunk is catching it; the"
+    echo "     control died only because the no-thunk twin's wild jump no"
+    echo "     longer lands on f7997 (placement moved under it across six"
+    echo "     manifest changes). Re-point the control at the GUARD, not at"
+    echo "     that address."
+elif [ "$c_total" -gt 0 ]; then
+    echo "  => THE RIG STOPPED PRODUCING THE EVENT. It still reaches the map"
+    echo "     ($c_total times) but never at an index >= 0x40, so there is"
+    echo "     nothing for the twin to crash on. The control needs a new rig,"
+    echo "     not a new address."
+else
+    echo "  => THE RIG NO LONGER REACHES THE MAP AT ALL. Section 0's control"
+    echo "     cannot work on this replay under any build; it needs a rig that"
+    echo "     produces a pool-vs-pool contact (see section 3)."
+fi
 
 echo
 if [ "$fail" = 0 ]; then

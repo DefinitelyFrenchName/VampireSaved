@@ -1777,14 +1777,47 @@ and produced the 14z-91 legacy regression, and this time it did fire. It is a `j
 `cmpi.w`/`bcc` on every collision-map lookup. The dispatch is per-COLLISION,
 not per-frame, so it is far colder than the obj_hook site was — but if a
 legacy replay ever fails to re-converge and the walker relocation is not the
-cause, look here next and re-run `tests/audit_hitclass_map_cost.sh` over the
-FULL corpus rather than its four-replay default.
+cause, look here next and re-run `tests/audit_hitclass_map_cost.sh`, whose
+corpus IS the full 46 legacy pairings since 14z-92 (it had a four-replay
+default until then).
+
+**THE SWEEP IS POOL-vs-POOL (measured, 14z-82d).** Both loop registers
+stride pool slots, so a projectile hitting a FIGHTER never transits this
+map at all — only a pool object overlapping another pool object does. That
+is the mechanism behind how rarely anything enters it, and it is why
+`tests/replays/hui/88_hui_plasma_trap_contact.rpl` was authored and still
+scores zero: a walking fighter is not a second pool object. Read any zero
+from this map against that fact before concluding anything about content.
+
+**THE TENANT SIDE — what the thunk BUYS — is measured by
+`tests/audit_hitclass_map_cost.sh` section 3 (14z-93)**, over all 37
+Huitzil/Pyron rigs, on verticals built from the CURRENT manifests, with the
+indices binned into in-domain (< 64) / vs2 EXTENSION (64-79) / TRAP (>= 80).
+Scope is Huitzil and Pyron by construction: Donovan's projectile types are
+59-63, they fit vanilla's map, and `donovan.toml` deliberately does not
+declare the row. The section reports THREE verdicts and never collapses
+them — "reaches the extension", "enters but stays below 64", and "no rig
+produces a pool-vs-pool contact at all". The third is a gap in the RIGS,
+not a finding about the thunk, and treating it as one is the coverage
+artefact that produced the retracted legacy claim below.
+
+**Counting the exposure (corrected 14z-93):** the frozen stamp inventory
+has 93 rows with `type >= 64`, but only **36** are in the 64-75
+projectile-pool band that can over-index THIS map. The other 57 are the
+114-120 obj_hook family, served by the spawn-time owner tag and never
+reaching the hit-class sweep. Quoting 93 against a 64-entry map overstates
+the exposure by 2.6x.
 
 Generated and reconstructed by (STATE 14z-82b):
 `tools/gen_hitclass_map_thunk.py` + `tests/test_hitclass_map_thunk.sh` +
-`tests/audit_hitclass_map_cost.sh`. Legacy content measured entering
-this map ZERO times across four replays — the sweep serves
-secondary-object collisions vanilla content doesn't produce there.
+`tests/audit_hitclass_map_cost.sh`.
+
+> **RETRACTED 14z-92.** This paragraph used to end "Legacy content measured
+> entering this map ZERO times across four replays — the sweep serves
+> secondary-object collisions vanilla content doesn't produce there." The
+> four-replay figure was falsified by the corpus-wide run: legacy enters
+> **230 times** (see the paragraph above). The sentence survived four lines
+> below its own retraction for a session — the §5 failure mode exactly.
 
 Atlas rows this depends on: the $FF9400 projectile-pool row and the
 +0x02 type-byte row in `docs/game/atlas/ram.md`.
