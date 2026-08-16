@@ -52,7 +52,16 @@ deferred, or escalated — the reason is recorded per row.
 | 13 | high | UPHELD, **held** high | Sequenced into the FBNeo rebuild batch, open | `0x75660aac` is the real CRC of a 512 KB zero-fill on all four PRG rows. Not a "skip verification" sentinel — the opposite: a correct CRC that **mis-resolves**, because `FindRomByCrc` returns the first match with no entry de-duplication. Archaeology: this is 14z-62d's *original* defect at the one site that sweep missed. MAME shadows identically, so dual-emulator agreement is blind here. Fix is a proven no-op on every set in the tree. |
 | 17 | high | UPHELD, re-rated **medium** | **FIXED** 02fb94d, closed | Leg (a) measured 43 of 45 legacy pairings and reported the gap nowhere; the script's own header claimed 47. The two dropped are the **only two** that expose the open regression. Ruled report-don't-include: a `.pending` file is prose, no class exists in any set to borrow, and a merged-only line would be override #4. |
 
-*(rows 18-73 appended as they are ruled)*
+| 18 | medium | UPHELD, re-rated **low** | Narrowed; actionable half is **#28**, open | Headline fix rejected by both judges: expected-old-bytes already exist one layer up (207 `old_hex` + 23 `dst_old_head` rows, semantically reviewable), and inlining them is +698 KB / a 22x `patch.json`. The primary path is netted — `build_fingerprint` uses the *identical* `_PRG_RE` selector patch_prg writes through. Real hole: `build_merged.sh` reaches patch_prg with an unaudited ROMDIR and an unregenerated cache. |
+| 32 | medium | UPHELD medium | **FIXED** 2e4bf24, closed | A dropped write is not under-reporting: `SekMapHandler` replaces the default handler, so it is neither performed nor forwarded. Reachable from *legal* input via #37's coalescing. Fixed as per-span validation on top of #37 — validating named ranges alone leaves the gap between them. |
+| 33 | medium | UPHELD medium | **FIXED** 2e4bf24, closed | Fixed by REFUSING OBJ taps, not per-frame re-install: re-installing still loses the remainder of any flipping frame, turning a silent null into a plausible-but-incomplete log. |
+| 34 | medium | UPHELD medium | **FIXED** 2e4bf24, closed | Wrong logged address was live on every call site. Third defect found in the same five lines: odd-length hex silently truncated. |
+| 36 | medium | UPHELD | **FIXED** 441f05c, closed | The filed check (`git apply -R --check`) fails open on the issue's own scenario — measured. Gate reconstructs from pin + patches and compares whole files. Deliberately NOT wired into the build path: a hard gate ahead of untested changes is rule 2 backwards. |
+| 37 | medium | UPHELD, re-rated **low** | **FIXED** 2e4bf24, closed | No independent failure mode — the demonstrated harm is #32's. Landed because #32's validation is unsound without it. |
+| 64 | low | UPHELD low | **FIXED** 2e4bf24, closed | Both stated triggers refuted. The suggested bare `continue` was rejected: it downgrades a *caught* segfault to an uncaught silent skip. |
+| 65 | low | UPHELD low | **FIXED** 2e4bf24, closed | The sandbox missed the input that decides *which set is measured*. Clearing is guarded on `./roms` existing, else an ad-hoc invocation loses ROM resolution. |
+
+*(remaining rows appended as they are ruled)*
 
 ## Issues opened by this pass
 
