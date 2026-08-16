@@ -48,7 +48,11 @@ deferred, or escalated — the reason is recorded per row.
 | 15 | high | UPHELD, re-rated **medium** | **FIXED** 5d2a9ca, closed | Reproduced under dash. The filing's `dash -n` census is unsound — it returns 0 on the very file proven dead. Re-censused with heredocs stripped: exactly one bashism in one file, so no 148-shebang migration. HANDOFF's "runs unchanged" claim, written 3 days after pipefail landed, corrected. |
 | 16 | high | UPHELD, **held** high | Docs + field set landed a5494ef; checkers **open** | 3 of 5 flagged tools refuted (static ROM scans, no RAM read). Scope wider the other way: 4 live in-match readers, not 2, including the dual-emulator field set. Mechanism misattributed by leg — ours is protected by the shipped keep-tenant thunk; native is not. Checker fix blocked on freezing our tenant hitbox bases. |
 
-*(rows 12, 13, 17 and 18-73 appended as they are ruled)*
+| 12 | high | UPHELD, **held** high | Shell half **FIXED** acb6623; C++ half batched, open | `main()` returns 0 unconditionally, and the runner's completion check is an *artifact* check that never cleared the artifact. Committed gates are saved by mktemp-fresh paths — but the documented *interactive* recipe uses a fixed reusable path, and the emulator's error text is hidden in the sandbox log. |
+| 13 | high | UPHELD, **held** high | Sequenced into the FBNeo rebuild batch, open | `0x75660aac` is the real CRC of a 512 KB zero-fill on all four PRG rows. Not a "skip verification" sentinel — the opposite: a correct CRC that **mis-resolves**, because `FindRomByCrc` returns the first match with no entry de-duplication. Archaeology: this is 14z-62d's *original* defect at the one site that sweep missed. MAME shadows identically, so dual-emulator agreement is blind here. Fix is a proven no-op on every set in the tree. |
+| 17 | high | UPHELD, re-rated **medium** | **FIXED** 02fb94d, closed | Leg (a) measured 43 of 45 legacy pairings and reported the gap nowhere; the script's own header claimed 47. The two dropped are the **only two** that expose the open regression. Ruled report-don't-include: a `.pending` file is prose, no class exists in any set to borrow, and a merged-only line would be override #4. |
+
+*(rows 18-73 appended as they are ruled)*
 
 ## Issues opened by this pass
 
