@@ -140,6 +140,12 @@ leg() {          # $1 out.field  $2 set  $3 rompath-or-empty  $4 rpl  $5 frames 
       FRAMES="$5" POKES="${6:-}" \
       "$REPO/tools/run_mame.sh" "$2" \
       -autoboot_script "$REPO/tests/lua/field_trace.lua" >"$d/mame.log" 2>&1 ) || true
+    # 14z-90 (GitHub issue #23). The `|| true` above is deliberate — one dead
+    # leg must not abort a 30-minute sweep — but the corpus downstream is a
+    # GLOB over the .field files this produces (:223), so a leg that died just
+    # VANISHED from the sweep and the audit still printed COVERAGE: PASS. A
+    # replay that was never measured must not read the same as one that was.
+    [ -s "$1" ] || : > "$1.DEAD"
 }
 pool=0
 sync_pool() { pool=$((pool + 1)); if [ "$pool" -ge "$JOBS" ]; then wait; pool=0; fi; }
@@ -220,6 +226,17 @@ for b in $BUILDS; do
     fi
 
     nl=0; nt=0; nn=0; holes=""
+    # 14z-90 (#23): the corpus below is a glob, so assert first that nothing
+    # dropped out of it. Without this the sweep's coverage is whatever
+    # happened to survive.
+    _dead=$(ls "$W/$tag"/*.field.DEAD "$W/van"/*.field.DEAD 2>/dev/null | wc -l | tr -d ' ')
+    if [ "${_dead:-0}" != 0 ]; then
+        echo "FAIL: $_dead leg(s) produced no field data — those replays were"
+        echo "      NOT measured, and a glob-derived corpus cannot see that:"
+        ls "$W/$tag"/*.field.DEAD "$W/van"/*.field.DEAD 2>/dev/null \
+            | sed 's|.*/||; s|\.field\.DEAD$||; s|^|        |'
+        fail=1
+    fi
     for f in "$W/$tag"/*.field; do
         name="$(basename "$f" .field)"
         if [ "$name" = CONTROL_forced ]; then continue; fi

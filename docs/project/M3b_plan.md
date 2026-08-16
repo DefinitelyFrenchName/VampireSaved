@@ -220,6 +220,15 @@ with every non-exact class mechanism-attributed — not widened.
      gfx_tiles GROUP/bank_word extension, BOTH emulator descriptor patches
      (member-for-member identical — the standing rule), profile version
      bump per docs/project/cps2_wide.md governance.
+     **RESOLVED — THIS BRANCH WAS NOT TAKEN (retracted 14z-90, GitHub issue
+     #19).** The packing estimate held: the three bands fit bank 4's codes,
+     the per-tenant allocator shipped, and `tests/test_gfx_layout3.sh` gates
+     it. No build has ever run `--gfx 8`, and no `vsw.41m`-style gfx member
+     exists. This line was the sole load-bearing evidence for issue #19's
+     claim that `_PRG_RE` would sweep a gfx member into the PROGRAM
+     fingerprint — a documented-but-untaken branch read as a live growth
+     path. Kept, marked, because the eliminations stay valid even when the
+     conclusion does not; the alternative above is what happened.
    Estimate says packing fits (~50K of 64K codes for three tenants), so
    plan A unless measurement disagrees.
 2. build_gfx_donovan.py → multi-tenant: per-tenant band/delta/bank from

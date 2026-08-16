@@ -59,6 +59,20 @@ def main():
         print(f"  FAIL: dump for frame {args.frame} missing "
               f"(A={bool(da_p)} B={bool(db_p)})")
         return 1
+    # 14z-90 (GitHub issue #21). find_dump()'s second pattern is DIRECTORY
+    # scoped (`<dir>/dump_<frame>_*.bin`), so when both logs live in the same
+    # directory — a real shape in this tree: tests/test_m2_repoint.sh:33,
+    # test_m2b_scroll3.sh:33, test_merged_render_content.sh:165 — both sides
+    # resolve to the SAME file. The comparison is then a file against itself,
+    # which is bit-identical by construction and returned 0 with a "note".
+    # A gate whose PASS is guaranteed is not a gate.
+    if os.path.abspath(da_p) == os.path.abspath(db_p):
+        print(f"  FAIL: both sides resolved to the SAME dump file\n"
+              f"    {da_p}\n"
+              f"  MAME's dump names are directory-scoped, so two runs sharing "
+              f"one directory collide. Give each run its own directory — "
+              f"comparing a file with itself can only ever pass.")
+        return 1
     da, db = open(da_p, "rb").read(), open(db_p, "rb").read()
     if len(da) != len(db):
         print(f"  FAIL: dumps differ in length ({len(da)} vs {len(db)})")
