@@ -1,5 +1,59 @@
 # STATE — living progress log
 
+## Session 14z-92 (3) — FREEZE RECORD: `merged-m1`, THE FIRST FROZEN
+## MERGED BUILD. All 18 characters in one image, every merged gate green.
+
+**Build:** `build/m3b_merged8` · program fingerprint
+`952fc73138b93e2024516872b95ddc615694d900` · 753 ops · tag
+`freeze/merged-m1`. Maintainer-decided 2026-08-16: the name, freezing on
+gate evidence with the playtest after, and **no `registry.tsv` row**.
+
+**GATES AT FREEZE — all green:**
+
+| gate | result |
+|---|---|
+| `verify_gfx_build` + `check_tenant_hud` × 3 tenants | PASS |
+| `test_merged_render_content` | PASS — D/H/P bands + the relocated strip byte-equal to the frozen solos, de-substitution held, 4-window poison control fired, 3 pick replays live |
+| `audit_trap_parity` | PASS |
+| `audit_fg_parity` | PASS — FG damage native-parity |
+| `audit_select_bank_gates` | PASS — all three thunks gate every declarer |
+| `audit_merged_legacy` | **AUDIT-EXIT 0** — leg (a) **47/47**, 0 FAIL, 0 NOT-EVALUATED; leg (b) all six guard-clean vs don_m7 / hui41 / pyron26 |
+
+The audit rebuilt its instrument from scratch and reproduced 753 ops and the
+same fingerprint, so the merged program build is deterministic end to end. It
+was run despite being, on this tree, a re-run of 14z-91's green result — the
+determinism confirmation is what it bought. `04_select_fuzz` landed on its
+ratified merged-specific inventory ({1525,2009} / 889-1104) from the
+`tests/expected/merged1` table.
+
+**NO `registry.tsv` ROW, AND THE REASON IS MEASURED.** The dispatch
+fingerprint covers PROGRAM members only (the blind spot
+`build_fingerprint.py` documents). `build/merged1` — the LEGACY-ONLY
+instrument whose tenants draw BLANK tiles — is generated from the same
+inputs, and this session's audit log prints its fingerprint as
+`952fc731…`: **identical to the shippable build's.** A registry row would
+therefore register the blanks instrument too, and the guard keeping it out
+of `run_suite` IS the absence of that row. So merged-m1 is frozen by
+annotated TAG + the HANDOFF build-registry row, and validated by the
+merged-specific gates rather than by run_suite dispatch. The rationale sits
+in the `registry.tsv` header — where someone would go to add the row — and
+names the two correct fixes if dispatch is ever genuinely needed (make the
+instrument fingerprint-distinct, or dispatch on `--full`). **Never the row.**
+
+**PLAYTEST PENDING, deliberately.** The S6 record had the freeze gated on a
+maintainer playtest incl. the beam visual confirm; the maintainer chose to
+freeze on gate evidence first and play after. `tools/run_wide.sh
+build/m3b_merged8 fbneo`. A freeze is reversible — m6/m14/m8 were withdrawn
+in 14z-88. **First thing to look at: the beam visual confirm, the S6
+carry-forward that has never been done on a merged build.**
+
+**OPEN ITEM, filed not fixed:** CLAUDE.md §5 requires shipped builds to carry
+a visible in-game version string as the playtester's naked-eye A/B tell.
+**No such machinery exists anywhere in this project** — nothing in the
+manifests, tools or docs. It was not added here: a program change to the
+build being frozen, at the moment of freezing it, is the wrong move. Today,
+builds are told apart by directory.
+
 ## Session 14z-92 (2) — merged8 QUALIFIED on the artifact gates, and a
 ## second dead instrument found under the first: test_merged_render_content
 ## had produced no huitzil measurement since 14z-86.

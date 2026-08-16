@@ -1,10 +1,15 @@
 # NEXT SESSION — orientation (updated at the close of 14z-92, 2026-08-16)
 
-> ## RULE 6 IS LIFTED (14z-91) AND #75 IS CLOSED (14z-92). There is a
-> ## merged build with gfx again — `build/m3b_merged8` (`952fc731`, 753
-> ## ops), the first one carrying the 14z-91 legacy fix. It is
-> ## UNREGISTERED and no merged CONTENT gate has run on it: that is the
-> ## S6 list, and it is the top of "START HERE".
+> ## `merged-m1` IS FROZEN — THE FIRST FROZEN MERGED BUILD. All 18
+> ## characters in one image (`build/m3b_merged8`, `952fc731`, 753 ops),
+> ## every merged gate green including `audit_merged_legacy` AUDIT-EXIT 0
+> ## (leg a 47/47, leg b 6/6). S6 is complete.
+> ##
+> ## **IT HAS NEVER BEEN PLAYED.** The maintainer froze on gate evidence
+> ## first and the playtest is the next thing that happens:
+> ## `tools/run_wide.sh build/m3b_merged8 fbneo` — and the FIRST thing to
+> ## look at is the BEAM VISUAL CONFIRM, the S6 carry-forward that has
+> ## never been done on a merged build.
 
 ## What 14z-92 was
 
@@ -101,21 +106,33 @@ The superseded framing, kept because it explains the shapes above:
   (`952fc731`, 753 ops) now exists** and is the first merged build carrying
   the 14z-91 legacy fix — UNREGISTERED, and no merged CONTENT gate has run on
   it. That is the S6 list below.
-- **`build/m3b_merged8` IS QUALIFIED on the artifact gates (14z-92):**
-  render-content, trap parity, FG parity and select-bank-gates all PASS.
-  Freezing/registering at S6 is yours to decide; nothing technical is
-  outstanding for it except the item below.
+- **PLAYTEST `merged-m1` — the top item, and the only thing S6 is waiting
+  on.** `tools/run_wide.sh build/m3b_merged8 fbneo`. Look at the BEAM
+  visual confirm first (never done on a merged build), then all three
+  tenants' art and sound in one image. There is no in-game version string
+  to A/B by — that CLAUDE.md §5 convention has never been implemented
+  here (open item, 14z-92); tell builds apart by directory. A freeze is
+  reversible: if it plays wrong, it gets withdrawn like m6/m14/m8 in
+  14z-88.
+- **`build/m3b_merged8` IS FROZEN as `merged-m1` (14z-92):**
+  render-content, trap parity, FG parity, select-bank-gates and
+  `audit_merged_legacy` (AUDIT-EXIT 0, leg a 47/47, leg b 6/6) all PASS.
+  Frozen by TAG + HANDOFF row with **no `registry.tsv` row on purpose** —
+  the legacy-only instrument `build/merged1` shares its program
+  fingerprint, so a row would register the blanks build too. Read the
+  `tests/expected/registry.tsv` header before touching that.
   Repaired in the process: `test_merged_render_content` named `build/hui31`
   as its huitzil reference — a pre-WIDE-v1.1 build MAME refuses — so H/P's
   only render gate had produced **no huitzil measurement since 14z-86**, and
   printed the dead leg as a content mismatch. Now points at `hui41` and
   reports an empty operand as a DEAD LEG. **D and P still name `m5_wide` /
   `pyron21`; re-point a row whenever that tenant is re-frozen.**
-- **OPTIONAL, ~2 h: `tests/audit_merged_legacy.sh`.** Deliberately not run.
-  It builds its own gfx-free instrument from the manifests and extracts, and
-  those are unchanged since 14z-91's full-green run (47/47, 6/6, 753 ops —
-  merged8 is the same 753). So it is a re-run, not coverage; what it would
-  still buy is a determinism check on the whole merged program build.
+- ~~OPTIONAL, ~2 h: `tests/audit_merged_legacy.sh`~~ **RUN at the freeze,
+  AUDIT-EXIT 0** (leg a 47/47 with 0 NOT-EVALUATED, leg b 6/6 guard-clean
+  vs don_m7 / hui41 / pyron26). It was a re-run on this tree by
+  construction; what it bought is the determinism confirmation — it
+  rebuilt its instrument from scratch and reproduced 753 ops and the same
+  fingerprint.
 - The merged build now has its own class table, `tests/expected/merged1/` —
   read its README before touching a spec there, and do not copy a tenant
   set's line into it: the two tables are measurably not interchangeable,
