@@ -71,12 +71,20 @@ space:add_change_notifier(function()
     install()
 end)
 
--- replay + pokes playback. NOT a verbatim subset of tap_writes.lua —
--- that claim is RETRACTED (14z-90, GitHub issue #10): tap_writes.lua
--- stages `held[frame + 1]` at the end of the frame like replay.lua,
--- this file parses and stages one frame earlier, so the two land a
--- press on different frames. Its consumer audit_voice_borrow pins
--- WINDOW="3985,4005", measured under THIS convention.
+-- replay + pokes playback.
+-- INPUT-STAGING CONVENTION (14z-90, GitHub issue #10; direction corrected
+-- and marker added 14z-93). NOT a verbatim subset of tap_writes.lua — that
+-- claim is RETRACTED: tap_writes.lua parses `held[fr]` and stages
+-- `held[frame + 1]` like replay.lua, whereas this file parses into
+-- `held[fr + 1]` and then stages `held[frame + 1]`.
+-- THE EFFECT IS ONE FRAME LATE, not early: a script line N is live during
+-- emulated frame N+1 here and during frame N under replay.lua. (The
+-- previous wording, "parses and stages one frame earlier", described where
+-- the value is written rather than when the press lands, and reads as the
+-- opposite of what happens.)
+-- Its consumer audit_voice_borrow pins WINDOW="3985,4005", measured under
+-- THIS convention — so the one-line fix (parse `held[fr]`) must move
+-- together with re-deriving that window.
 local held = {}
 local replay_path = os.getenv("REPLAY")
 local FIELDS = nil

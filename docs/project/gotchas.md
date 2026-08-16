@@ -31,6 +31,28 @@ the gates right, it silently re-dates them. The staging fix and the
 re-measurement are one change, and it is scheduled after the legacy
 re-freeze. Until then every drifted instrument carries a banner saying so.
 
+**STATUS 14z-93 (re-verified at HEAD; GitHub #10 still open).** Nothing has
+been fixed and the deferral is still deliberate — but two claims in this
+entry were not true when checked:
+
+- **"every drifted instrument carries a banner" was false for THREE of the
+  ten.** `bp_regs.lua` and `ring_tap.lua` had none at all, and
+  `bp_regs.lua`'s header asserted the OPPOSITE ("Combines tap_writes.lua's
+  replay/POKES playback" — tap_writes parses `held[fr]`, bp_regs parses
+  `held[fr + 1]`). `read_tap.lua` had one whose direction was backwards: it
+  said "one frame earlier" when the press lands one frame LATER. All fixed.
+- **The stated precondition has been met.** "Scheduled after the legacy
+  re-freeze" — that completed in 14z-91. The item is ripe, not blocked; it
+  waits on scheduling and on #91/#92 clearing under rule 6.
+
+Now frozen and gated by `tests/test_replay_stage_census.sh`: the split is
+pinned at exactly 10 deviant / 11 canonical, a NEW instrument copying the
+wrong flavour FAILS, and every deviant must carry the banner. **Strip Lua
+comments before classifying** — the banners quote `held[frame + 1]` while
+explaining the canonical convention, so a naive grep reads a drifted file as
+canonical. Measured 14z-93: that mistake turned the census from 10 deviants
+into 3 and was one step from being reported as "7 of 10 already fixed".
+
 
 The build/extract/patch chain, the replay harness and gates, manifests,
 the WIDE profile, and reverse-engineering method that is ours rather

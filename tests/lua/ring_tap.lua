@@ -1,5 +1,20 @@
 -- log every sound id enqueued into the 68k ring (FF0E0E, 16B entries),
 -- with frame + PC of the writer. env: REPLAY, FRAMES, TRACE_OUT, WINDOW
+--
+-- INPUT-STAGING CONVENTION (banner added 14z-93, GitHub issue #10). This
+-- instrument stages inputs at the START of the frame callback
+-- (`prev = held[frame]`, :90), whereas tests/lua/replay.lua stages for the
+-- NEXT frame at the END (`held[frame + 1]`). A script line N is therefore
+-- live during emulated frame N+1 here and during frame N there — a
+-- ONE-FRAME LATE shift. It matters for this instrument because its output
+-- IS frame-addressed (WINDOW=a,b) and audit_pyron_ring / audit_trap_sound /
+-- audit_voice_borrow pin windows against it. DO NOT cross-reference a frame
+-- number from this log with a compare_* first-divergence, a masked window
+-- onset, or replay.lua's checksum log.
+-- The fix is one line (stage `held[frame + 1]`), but it must move together
+-- with re-deriving those pinned windows, which were tuned UNDER this
+-- convention — see docs/project/gotchas.md, "Half the Lua instruments stage
+-- inputs one frame off replay.lua".
 local out_path=os.getenv("TRACE_OUT") or "ring.txt"
 local max_frames=tonumber(os.getenv("FRAMES") or "3600")
 local wa,wb=(os.getenv("WINDOW") or "0,99999999"):match("^(%d+),(%d+)$")

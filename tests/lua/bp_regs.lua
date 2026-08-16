@@ -1,8 +1,23 @@
 -- bp_regs.lua — log registers at named PCs while a replay drives the game
--- (14z-85f, the FG damage-path probe). Combines tap_writes.lua's
--- replay/POKES playback with index_watch.lua's auto-resuming debugger
--- breakpoints. Needs `-debug -debugger none` (run_mame.sh passes extra
+-- (14z-85f, the FG damage-path probe). Takes its replay/POKES playback from
+-- the tap_writes.lua family and its auto-resuming debugger breakpoints from
+-- index_watch.lua. Needs `-debug -debugger none` (run_mame.sh passes extra
 -- args through).
+--
+-- INPUT-STAGING CONVENTION (banner added 14z-93, GitHub issue #10). This
+-- header used to say it "Combines tap_writes.lua's replay/POKES playback",
+-- which is NOT TRUE of the input timing and is one of the three claims the
+-- issue asks to be retracted: tap_writes.lua parses `held[fr]` (:83) while
+-- this file parses `held[fr + 1]` (:89-90). Both then stage
+-- `held[frame + 1]`, so a script line N is live during emulated frame N+1
+-- here and during frame N under replay.lua — a ONE-FRAME LATE shift.
+-- DO NOT cross-reference a frame number from this log with a compare_*
+-- first-divergence, a masked window onset, or replay.lua's checksum log:
+-- they are one frame apart and nothing else says so.
+-- The fix is one line (parse `held[fr]`), but it must move together with
+-- re-deriving the frame constants of every consuming gate, which were
+-- tuned UNDER this convention — see docs/project/gotchas.md, "Half the Lua
+-- instruments stage inputs one frame off replay.lua".
 --
 --   env REPLAY     input script (replay.lua format)
 --   env POKES      "frame:addr:hexbytes;..." (same as replay.lua)

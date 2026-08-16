@@ -38,6 +38,7 @@ test_m2a_flicker_gate
 test_manifest_merge
 test_obj_record_walk
 test_qs_window_law
+test_replay_stage_census
 test_s4_thresholds
 test_shell_portability
 test_tenant_id
