@@ -1,5 +1,124 @@
 # STATE — living progress log
 
+### 14z-91 — THE LEGACY REGRESSION IS FIXED. Rule 6 lifts. Three changes,
+### one re-freeze, four new fingerprints; all six `.pending` replays are
+### gone and the legacy specs came out STRICTER than the ones they replace.
+
+TASK ZERO first, and it found something. The canary passed —
+`VERIFY_BASIS=16_xemu_2p` re-derived the frozen masked-v2 log BIT-FOR-BIT,
+so 14z-90's nine harness fixes moved no frozen artifact and 14z-89's 93
+promoted specs rest on solid ground. **But running the canary as documented
+also OVERWROTE that log**, 4248 of 4321 lines. `freeze_one()` derived its
+MAME sandbox paths from the replay NAME alone, and `run_mame.sh` treats an
+explicit `MAME_SANDBOX` as deliberate reuse; the documented command names
+the same replay twice (once as `VERIFY_BASIS`, once in the freeze list), so
+the freeze leg inherited the verify leg's EEPROM, diverged at frame 73, and
+wrote. Both legs were internally deterministic, so the pair-cmp and the
+instrument control were both green while the baseline moved. Ground-truthed
+on the emulator (fresh sandbox = identical to basis; reused = differs at
+f73), fixed with a one-line clear, gated by
+`tests/test_freeze_basis_sandbox.sh` whose verdict control reconstructs the
+pre-fix tool and requires it to reproduce the defect. The basis was restored
+from git and is byte-unchanged.
+
+**THE FIX (maintainer-decided this session).**
+  (A) `fixture_row0f_override_bank0/1` DELETED. The maintainer chose delete
+      over relocate: they buy vs2's red statue ramp on palette row 0x0F,
+      row 0x0E is byte-identical either way, and NO LIVE GATE asserted the
+      surface — `test_don_accent.sh` runs only from the M2 battery against
+      the parked m2c track, where cell 0x0F is the tenant; on m5+ that cell
+      is Jedah. The mechanism and the cost-neutral re-assert route (init
+      shim -> engine copy helper 0x1C3A4 -> staging row 0x0F, i.e. the
+      fade's SOURCE) are kept in the manifest, marked RETIRED.
+  (B) THE OBJ_HOOK DISPATCH SITES ARE NO LONGER PATCHED. Instead of putting
+      the union table in free space and overwriting the site with
+      `jmp thunk`, the whole 0x2C-byte pool WALKER is relocated verbatim
+      with its table appended at copy+0x2C, and only the 4-byte OPERAND of
+      each `jsr <walker>` is rewritten. Works because `site == walker+0x18`
+      and the dispatch is `movea.l (0x12,PC,D0.w),A0`: 0x18+2+0x12 = 0x2C,
+      so the copy resolves to its own table BY CONSTRUCTION.
+  (C) The `beam_list_type6` fallback stops writing `$FF010C`
+      (ruling 14z-89 (2)); §4 of `audit_effect_class_rows.sh` watches the
+      fallback's EXECUTION against a frozen inventory instead, and its
+      default replay set now includes the two rigs that arm it.
+
+**ROUTE (i) WAS REFUTED BEFORE IT WAS BUILT.** The plan of record was to
+repoint tenant types onto "never dispatched" table entries, on
+`dispatch_census.toml`'s 50-and-83 free lists. A pool-attributed STATIC
+sweep — forward from every call site of each pool's allocator (0x16F8E for
+$FF9400, 0x16FBA for $FFB800) — puts the TRUE free lists at **1 index and
+6**. The corpus reaches 9 of 58 real spawn types at one site and 31 of 108
+at the other: the same coverage artefact that falsified the list-type 6
+deadness claim, ~40x larger. It would also have traded a guarantee (a
+vanilla object CANNOT carry a type >= the vanilla entry count) for an
+inference, in the session after the register recorded its first false
+claim. The census is kept as a drift detector; its free-list framing is
+RETRACTED in the TOML, the audit, HANDOFF and engine_internals.
+
+**THE TWO MEASUREMENTS THAT GATED (B), both before any code was written.**
+  M1 `tests/audit_walker_ghost.sh` — the relocation changes exactly one
+    byte of state: the `jsr (A0)` pushes copy+0x20 instead of walker+0x20.
+    Measured on VANILLA over the whole corpus: **A7 = 0xff7ff6 CONSTANT**
+    at both walkers, 279,577 dispatches, 49/49 replays. The push lands at
+    0xff7ff2-0xff7ff5, inside the masked dead-stack window
+    $FF7F00-$FF7FFF. Cross-check: the dispatch counts reproduce
+    `dispatch_census.toml` exactly (8,586 / 270,991) on a different
+    instrument reading a different register. Frozen in
+    `build/manifest/walker_ghost.toml`; the gate FAILS rather than widening
+    the mask, and says so.
+  M2 `tools/audit_walker_callers.py` — completeness is the correctness
+    argument, so references are enumerated BY FORM: 23 `jsr abs.l` and
+    nothing else. Zero data longwords equal to a walker address anywhere in
+    the 4 MB image, zero pc-relative jsr/jmp, every branch hit accounted
+    for by name (the walkers' own +0x0C/+0x28 loop branches, or operand
+    words a linear scan misread). Zero longword references to either TABLE;
+    each walker body occurs exactly once.
+
+**THE RESULT.** Both regressed replays land EXACTLY on the shapes
+`probe_hook_removal.sh` predicted for "both causes removed":
+  38_victor_p1_vsavj  window 889 2091           2909 identical frames after
+  24_don_winmash      composite 12313,12733 889-2091   5787 identical after
+and `audit_walker_repoint.sh` measures the vanilla walkers SILENT with the
+relocated ones carrying **identical dispatch counts** either side of the
+move (1243 / 40236). Not one dispatch lost or gained.
+
+**THE RE-FREEZE.** 139 (set, replay) pairs re-measured; **zero
+NOT-EXPRESSIBLE** — every replay re-converges, so no new class, no new
+tolerance, and the vanilla basis is byte-unchanged.
+  * **Frame 829 is gone everywhere.** It was the hook cycle-skew. ~30 specs
+    per set collapse `composite … 829 889-2091` -> `window 889 2091`, i.e.
+    one fewer tolerated divergence each.
+  * `06_test_mode` goes `diverge 700` -> **exact** on all three sets,
+    retiring its frozen-first-divergence exemption.
+  * Two specs GAINED a flicker frame and both are attributed (my rule: a
+    gained frame is not written until it is). donovan 37 +7168 = staging
+    row 0x0A — and huitzil/pyron ALREADY carried 7168 there, so donovan
+    CONVERGED to its siblings. donovan 41 +2313 = staging row 0x0C
+    ($FF408E-$FF4091), and donovan.toml:862 documents this build patching
+    palette row 0x0C; deterministic over three runs. Both are the
+    display-only palette-fade STAGING BUFFER class
+    (engine_internals "The palette-fade staging buffer"), surfacing at a
+    different frame now that the hook's cycle cost no longer shifts the
+    fade.
+
+New sets `donovan-m7` / `huitzil-m15` / `pyron-m9` (m6/m14/m8 are burned by
+the 14z-88 withdrawal), fingerprints `c90b60c3` / `4531af1e` / `fac4a777`,
+stock twin `a054de5c`. All four rebuild bit-exact from the tree and their
+whole-artifact manifests match — and issue #8's promotion landed with them,
+so member CONTENT is now a HARD FAIL (it was advisory "until the pending
+legacy re-freeze, so the constants move once"; this was that re-freeze).
+
+**EFFECT ON THE PENDING DECISIONS.** GitHub #4 (does the >=60
+non-propagation window bind across a flicker->window boundary?) no longer
+ARISES on these builds: it was about flicker 829 sitting 59 frames before
+window onset 889, and no remaining flicker frame precedes any window onset.
+Worth ruling for the class table; it gates nothing now. The 55-frame pairs
+of decision (2) moved: donovan 22 keeps 11862,11918 and huitzil 26 has
+8744,8800, but donovan 26 lost 8800 and huitzil 22 lost 11918 — so the
+inventory that ruling addresses has changed and should be re-read before
+it is made.
+
+
 ### DECISIONS PENDING — 14z-90 POLICY CLUSTER (five, all filed by the
 ### 2026-08-15 audit, all ruled MAINTAINER by the re-judging pass; each
 ### carries a decision brief on its GitHub issue with options and costs).

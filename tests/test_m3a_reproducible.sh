@@ -185,7 +185,7 @@ m3a_manifest() {   # m3a_manifest <label> <rompath> <"digest count">
     fi
 }
 
-echo "== whole-artifact manifests (advisory on content, hard on inventory)"
+echo "== whole-artifact manifests (HARD on content and inventory, 14z-91)"
 m3a_manifest donovan-m3a "$WORK/m3a_wide/rompath" "$MANI_WIDE"
 m3a_manifest m5_stock    "$WORK/m3a_stock/rompath" "$MANI_STOCK"
 m3a_manifest huitzil     "$WORK/huitzil/rompath"   "$MANI_HUI"
@@ -193,4 +193,4 @@ m3a_manifest pyron       "$WORK/pyron/rompath"     "$MANI_PYR"
 
 echo "PASS: all four frozen references rebuild with bit-exact PROGRAM images"
 echo "      (gfx/QSound/key members and the second packed zip are covered by"
-echo "      the manifests above — advisory on content, hard on inventory)"
+echo "      the manifests above — HARD on content and inventory since 14z-91)"
