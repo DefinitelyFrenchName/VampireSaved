@@ -1,5 +1,82 @@
 # STATE — living progress log
 
+### 14z-90 — THE 2026-08-15 AUDIT RE-JUDGED ADVERSARIALLY, TIER 1
+### (critical + high) COMPLETE. 11 issues fixed and closed, 5 ruled and
+### left open, 1 NEW defect revealed and filed. No build byte moved; no
+### expectation re-frozen; the four program fingerprints and, for the
+### first time, the four WHOLE-ARTIFACT manifests are bit-exact.
+
+The 2026-08-15 review filed 73 issues. This session put each through a
+SECOND, independent adversarial pass — a verifier (re-prove at HEAD, with
+bug archaeology) and a devil's advocate (refute by default) from clean
+contexts, then an adjudicator on the pair — and acted on the verdict.
+Per-issue rulings: `docs/project/audit_2026-08-15_dispositions.md`.
+
+**The pass earned its keep by DISAGREEING with the audit, not by
+agreeing with it.** Five findings were correct and their proposed fixes
+were wrong:
+  - **#2**: string-comparing a frozen flicker inventory would MANUFACTURE
+    false REDs. Inventories legitimately move per build (m2b
+    `2 3507,3807` -> m2c `1 3507`, recorded at STATE:11658) and that
+    helper gates unfrozen dev builds. Implemented the standing watch's
+    literal text instead: fail on GROWTH, advise on shrink, never invent.
+  - **#6**: the `SET=vsavjw` half would be a GUARANTEED FALSE FAILURE —
+    the goldens are vanilla renders and the WIDE wheel adds three
+    medallions outside the mask. Also, the battery structurally cannot
+    build WIDE at any outbase (prefix GEN_FLAGS carries no --profile).
+  - **#9**: 38 of 39 sites are provable no-ops (extract dirs measured
+    byte-identical). Refused to overwrite the 2000-byte figure — it is
+    the retired evidence that killed the shared-span dedup item.
+  - **#16**: 3 of 5 flagged tools REFUTED (static ROM scans, no RAM read);
+    scope grew the other way to 4 live in-match readers; and the
+    mechanism is misattributed by LEG (ours is protected by the shipped
+    keep-tenant thunk, native is not).
+  - **#4**: the docstring sentence it tests against is unsatisfiable by
+    every member of the class. Escalated with numbers rather than acted on.
+
+**WHAT THE PASS REVEALED (new, filed as GitHub #75):** repairing #14's
+swallowed exit status exposed a LIVE failure it had been hiding —
+`verify_gfx_build.py --tenant huitzil` exits 1 on `build/m3b_merged7`
+(record/entry parity 1374,14911 != 1375,14978; 34 tile codes outside the
+placed window). `build/voice_builds.log` shows the same FAIL on merged6
+followed by `OK:` and exit 0; merged5 passed. Regression window merged5
+-> merged6 (14z-86). Two merged builds shipped with it printed and
+unread, including the one handed over for the 14z-87 ear-check. Donovan
+and Pyron pass on the same build. Classified REVEALED — the gate fix
+stands, the defect is tracked separately, and until #75 is triaged
+`build_merged.sh` will correctly ABORT the documented rebuild path.
+
+**Verification.** `test_m3a_reproducible.sh`: four program fingerprints
+bit-exact AND four whole-artifact manifests matching (42/30/42/42
+members) — gfx and QSound compared for the first time.
+`run_suite.sh` on don_m5: 53 PASS / 2 PENDING / 18 SKIP / 0 FAIL, the
+frozen RED baseline exactly, zero length mismatches. Fast tier 22/22.
+
+**Nine new ROM-free gates**, each proven to FAIL on the pre-fix tree.
+Three of them failed on their FIRST run for three different reasons — an
+assertion that was not discriminating (exit status, where the real
+property was "did the gate proceed to measure a refused artifact"), an
+anchored `sed` against a table row carrying a closing quote, and a stub
+passing the log as `$4` instead of `$3`. A control that has never been
+seen to fail is a decoration.
+
+**Rule 6 unchanged:** the 6 `.pending` legacy replays remain the first
+task. Nothing here displaces it, and the deferrals below are sequenced
+behind it deliberately.
+
+DEFERRED WITH REASONS (all commented on their issues, all still open):
+  - #10 instrument input-staging: correcting it re-dates ~14-18 frozen
+    frame constants across 12 gates. The staging fix and the
+    re-measurement are ONE change; scheduled after the re-freeze.
+  - #11 + #12 (C++ half): batch behind #36 with the tier-2 harness
+    issues. Seven hand-regenerated patch cycles on one untracked-in-
+    submodule file is how tree and patch drift apart.
+  - #16 checkers: blocked on freezing our tenant hitbox bases (+0x60.l);
+    the native values are documented, ours point into placed data.
+  - #8 hard-fail digests: land with the re-freeze so twelve constants
+    move once (+156% re-freeze tax measured if done now).
+
+
 ### DECISIONS PENDING — 14z-90 (the adversarial re-judging of the
 ### 2026-08-15 audit). Three, all opened by judging rather than by
 ### measurement drift; no build byte moved this session and nothing was
