@@ -145,12 +145,46 @@ ruling. The 21 still carrying `contested` are NOT in this list.
   `test_crash_guard.sh` compares a guarded log to an UNMASKED expectation,
   so masking must stay opt-in or that gate goes red.
 
-**STILL CONTESTED — 21 items, deliberately not scheduled.** Includes **#10
-(severity HIGH)**, "10 of 21 replay instruments feed inputs a frame later
-than replay.lua" — already documented as a gotcha
-(`docs/project/gotchas.md`, "Half the Lua instruments stage inputs one frame
-off replay.lua"), which is likely why it stayed contested; worth confirming
-that is deliberate, since it is the highest-severity open finding. Also #22
+**DEFERRED WITH A REASON, AND NOW RIPE — #10 (severity HIGH)**
+*"10 of 21 replay instruments feed inputs a frame later than replay.lua."*
+Re-verified at HEAD 14z-93 and CONFIRMED maintainer-deliberate: the finding
+is correct, it is mitigated, and the fix is deferred for a real reason.
+Label `deferred-with-reason`; it stays open and stays `contested` by
+decision, not by neglect.
+
+- **State:** 21 replay-driving instruments, **10 deviant / 11 canonical** —
+  the same 10 files, same two flavours the issue lists. Nothing fixed.
+- **Why deferred:** the frame constants of the consuming gates
+  (`test_beam_variants` DUMP_FRAMES, `test_tenant_hud` 3100/3110,
+  `test_hui_df_style` OBJFR/PALFR, `audit_trap_parity` WINDOWS,
+  `audit_voice_borrow` WINDOW=3985,4005) were tuned UNDER the drifted
+  timing. Correcting the staging alone does not make them right, it
+  silently RE-DATES them. The staging fix and the re-measurement are ONE
+  change — which is also this issue's own handoff.
+- **THE PRECONDITION IS NOW MET.** The gotcha scheduled it "after the
+  legacy re-freeze"; that completed in 14z-91. It is ripe, not blocked —
+  waiting on scheduling and on #91/#92 clearing under rule 6. **When it is
+  scheduled, budget the re-measurement, not the one-line edits:** the code
+  fix is one line per file in two flavours (group (i) stage
+  `held[frame + 1]`; group (ii) parse `held[fr]`), and all the cost is in
+  re-deriving those five gates' constants.
+- **Mitigation is now real** (it was not): the gotcha promised every
+  drifted instrument carried a banner and THREE did not — `bp_regs.lua`
+  (none, and its header asserted the opposite), `ring_tap.lua` (none, and
+  its output is frame-addressed), `read_tap.lua` (backwards direction).
+  Fixed 14z-93.
+- **Gated:** `tests/test_replay_stage_census.sh` pins the split at 10/11, a
+  NEW instrument copying the wrong flavour FAILS, every deviant must carry
+  the banner, and `replay.lua` must stay canonical. Set `EXPECT_DEVIANT=0`
+  when the fix lands and it flips to asserting uniformity. **Strip Lua
+  comments before censusing** — the banners quote `held[frame + 1]`, so a
+  naive grep reads a drifted file as canonical (measured: it turned 10
+  deviants into 3).
+- **Do NOT re-freeze anything from this fix.** `replay.lua` and
+  `replay_guard.lua` are both canonical and untouched, so no frozen log
+  moves.
+
+**STILL CONTESTED — 20 further items, deliberately not scheduled.** #22
 (medium, `verify_pcrel_data.py` run by nothing), #77, and 18 low items.
 
 

@@ -45,6 +45,15 @@ entry were not true when checked:
   re-freeze" — that completed in 14z-91. The item is ripe, not blocked; it
   waits on scheduling and on #91/#92 clearing under rule 6.
 
+**MAINTAINER DECISION 2026-08-16: keep it open, keep it deferred.** The
+finding is correct, the mitigation is now real, and the fix is scheduled
+rather than dropped — GitHub #10 carries `deferred-with-reason` alongside
+`contested` to say exactly that. This entry is the reason, and it should be
+read before anyone "just fixes the staging": the one-line edits are not the
+work, re-deriving the five gates' frame constants is. And when it is done,
+**re-freeze nothing** — `replay.lua` and `replay_guard.lua` are canonical
+and untouched, so no frozen log moves.
+
 Now frozen and gated by `tests/test_replay_stage_census.sh`: the split is
 pinned at exactly 10 deviant / 11 canonical, a NEW instrument copying the
 wrong flavour FAILS, and every deviant must carry the banner. **Strip Lua

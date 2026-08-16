@@ -1,5 +1,54 @@
 # STATE — living progress log
 
+## Session 14z-93 (3) — #10 RE-VERIFIED AND RULED: correct finding,
+## mitigated, fix DEFERRED WITH A REASON, precondition now met.
+
+The maintainer asked whether the one-frame input-staging split had ever been
+fixed or only documented. **Only documented — and that is deliberate.**
+
+Re-censused at HEAD (comments stripped): **21 replay-driving instruments,
+10 deviant / 11 canonical**, the same 10 files and same two flavours the
+issue lists. Nothing fixed.
+
+**WHY, and it is a real reason rather than neglect:** the frame constants of
+the consuming gates (`test_beam_variants` DUMP_FRAMES, `test_tenant_hud`
+3100/3110, `test_hui_df_style` OBJFR/PALFR, `audit_trap_parity` WINDOWS,
+`audit_voice_borrow` WINDOW=3985,4005) were tuned UNDER the drifted timing.
+Fixing the staging alone silently RE-DATES them. The staging fix and the
+re-measurement are one change — the issue's own handoff says the same.
+
+**RULED 2026-08-16 (maintainer): keep it open, keep it deferred, keep it
+scheduled.** GitHub #10 now carries `deferred-with-reason` beside
+`contested` so the state is legible without reading the thread. The
+precondition it was waiting on — "after the legacy re-freeze" — was met at
+14z-91, so it is RIPE; it waits on scheduling and on #91/#92 under rule 6.
+
+**THE MITIGATION WAS NOT REAL AND NOW IS.** The gotcha promised every
+drifted instrument carried a banner. Three did not: `bp_regs.lua` (none, and
+its header asserted the OPPOSITE — "Combines tap_writes.lua's replay/POKES
+playback", while tap_writes parses `held[fr]` and it parses `held[fr + 1]`),
+`ring_tap.lua` (none, and its output IS frame-addressed), and `read_tap.lua`
+(banner backwards — "one frame earlier" where the press lands one frame
+LATER). All fixed.
+
+**GATED:** `tests/test_replay_stage_census.sh` — the test the handoff says
+does not exist. It pins the split at 10/11, FAILS on a new instrument
+copying the wrong flavour (which is how this spread: one variant at
+`23071cc`, every later file copied the copy), requires every deviant to
+carry its banner, and requires `replay.lua` to stay canonical.
+`EXPECT_DEVIANT=0` flips it to asserting uniformity when the fix lands.
+
+**A TRAP THAT NEARLY PRODUCED A WRONG REPORT.** The banners QUOTE
+`held[frame + 1]` while explaining the canonical convention, so a census
+that does not strip Lua comments reads a drifted file as canonical. My first
+pass returned **3** deviants instead of 10 and was one step from "7 of 10
+already fixed". Caught by checking the actual staging lines instead of
+trusting the regex. The gate strips comments and carries a verdict control
+for that exact case.
+
+**When it is scheduled: re-freeze NOTHING.** `replay.lua` and
+`replay_guard.lua` are both canonical and untouched, so no frozen log moves.
+
 ## Session 14z-93 (2) — A PLANTED ILLEGAL IS REACHABLE ON THE SHIPPING
 ## MERGED BUILD. Found while trying to author a pool-vs-pool rig; it is
 ## HUITZIL-ONLY, deterministic, and it is a missing reconciliation row.
