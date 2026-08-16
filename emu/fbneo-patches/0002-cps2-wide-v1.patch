@@ -105,10 +105,10 @@ index 6931097..1aa72c4 100644
 +	// raw - simpler to author into than the original in-crypt hole.
 +	// Reserved, never allocate: $400000-$40000F (CpsFrg regs, now
 +	// read-shadowed by ROM; writes still reach the handler).
-+	{ "vsw.41",        0x080000, 0x75660aac, CPS2_PRG_68K | BRF_ESS | BRF_PRG },   // WIDE v1
-+	{ "vsw.42",        0x080000, 0x75660aac, CPS2_PRG_68K | BRF_ESS | BRF_PRG },   // WIDE v1
-+	{ "vsw.43",        0x080000, 0x75660aac, CPS2_PRG_68K | BRF_ESS | BRF_PRG },   // WIDE v1
-+	{ "vsw.44",        0x080000, 0x75660aac, CPS2_PRG_68K | BRF_ESS | BRF_PRG },   // WIDE v1
++	{ "vsw.41",        0x080000, 0xdec0de41, CPS2_PRG_68K | BRF_ESS | BRF_PRG },   // WIDE v1 SENTINEL CRC (14z-90, GitHub issue #13): 0x75660aac is the REAL crc32 of a 512KB zero-fill, so all four rows aliased each other and FindRomByCrc - which returns the FIRST match with no entry de-duplication - served a zero-filled sibling for a content-bearing vsw.41. Same class as the gfx rows below; the one site the 14z-62d sweep missed
++	{ "vsw.42",        0x080000, 0xdec0de42, CPS2_PRG_68K | BRF_ESS | BRF_PRG },   // WIDE v1 SENTINEL CRC (14z-90, GitHub issue #13): 0x75660aac is the REAL crc32 of a 512KB zero-fill, so all four rows aliased each other and FindRomByCrc - which returns the FIRST match with no entry de-duplication - served a zero-filled sibling for a content-bearing vsw.41. Same class as the gfx rows below; the one site the 14z-62d sweep missed
++	{ "vsw.43",        0x080000, 0xdec0de43, CPS2_PRG_68K | BRF_ESS | BRF_PRG },   // WIDE v1 SENTINEL CRC (14z-90, GitHub issue #13): 0x75660aac is the REAL crc32 of a 512KB zero-fill, so all four rows aliased each other and FindRomByCrc - which returns the FIRST match with no entry de-duplication - served a zero-filled sibling for a content-bearing vsw.41. Same class as the gfx rows below; the one site the 14z-62d sweep missed
++	{ "vsw.44",        0x080000, 0xdec0de44, CPS2_PRG_68K | BRF_ESS | BRF_PRG },   // WIDE v1 SENTINEL CRC (14z-90, GitHub issue #13): 0x75660aac is the REAL crc32 of a 512KB zero-fill, so all four rows aliased each other and FindRomByCrc - which returns the FIRST match with no entry de-duplication - served a zero-filled sibling for a content-bearing vsw.41. Same class as the gfx rows below; the one site the 14z-62d sweep missed
 +
 +	{ "vm3.13m",       0x400000, 0xfd8a11eb, CPS2_GFX | BRF_GRA },
 +	{ "vm3.15m",       0x400000, 0xdd1e7d4e, CPS2_GFX | BRF_GRA },

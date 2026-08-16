@@ -13,10 +13,10 @@ index 3bf65bd..0de57a1 100644
  alldir	+= 	intf/audio/linux
 diff --git a/src/burner/sdl/harness.cpp b/src/burner/sdl/harness.cpp
 new file mode 100644
-index 0000000..ec94aa8
+index 0000000..72d3743
 --- /dev/null
 +++ b/src/burner/sdl/harness.cpp
-@@ -0,0 +1,452 @@
+@@ -0,0 +1,567 @@
 +// harness.cpp — Vampire Saved test harness for the SDL2 frontend.
 +// FRONTEND-ONLY: no emulation-core file is touched by this feature.
 +//
@@ -53,7 +53,12 @@ index 0000000..ec94aa8
 +extern UINT8* CpsRam708;               // OBJ RAM  ($708000-$709FFF)
 +extern UINT8* CpsRam90;                // palette / gfx RAM ($900000-$92FFFF)
 +extern UINT8* CpsGfx; extern UINT32 nCpsGfxLen;   // decoded tile buffer
++extern INT32  nCpsObjectBank;          // live OBJ bank select (cps.h) — 14z-90
 +extern int InputMake(bool bCopy);
++
++// 14z-90 (GitHub issues #34/#64/#12): a run that could not do what it was
++// asked must not report success. Instruments set this; HarnessRun() returns it.
++static int nHarnessFailed = 0;
 +
 +static UINT32 nHarnessFrame = 0;       // current frame, for instrument logs
 +
@@ -72,8 +77,15 @@ index 0000000..ec94aa8
 +{
 +    if (a >= 0xFF0000 && a <= 0xFFFFFF && CpsRamFF)
 +        return &CpsRamFF[((a - 0xFF0000) & 0xFFFF) ^ 1];
-+    if (a >= 0x708000 && a <= 0x709FFF && CpsRam708)
-+        return &CpsRam708[((a - 0x708000) & 0x1FFF) ^ 1];
++    // 14z-90 (GitHub issue #11): OBJ RAM is BANKED. The driver maps
++    // CpsRam708 + nCpsObjectBank * 0x8000 at $708000 (cps_mem.cpp:86-101) and
++    // the drawer reads the opposite half; this resolver hardwired bank 0, so
++    // on bank-1 frames every dump returned the other buffer and every poke
++    // landed in the invisible half. The range also covers the three mirrors
++    // $70A000-$70FFFF, which the driver maps and this returned NULL for.
++    if (a >= 0x708000 && a <= 0x70FFFF && CpsRam708)
++        return &CpsRam708[(((a - 0x708000) & 0x1FFF) ^ 1)
++                          + nCpsObjectBank * 0x8000];
 +    if (a >= 0x900000 && a <= 0x92FFFF && CpsRam90)
 +        return &CpsRam90[((a - 0x900000) & 0x3FFFF) ^ 1];
 +    return NULL;
@@ -153,6 +165,8 @@ index 0000000..ec94aa8
 +    nScriptFrames = last + (UINT32)nHarnessTailFrames;
 +    if (nHarnessFrames > 0) nScriptFrames = (UINT32)nHarnessFrames;
 +    held = (UINT32*)calloc(nScriptFrames + 2, sizeof(UINT32));
++    if (!held) { printf("harness: out of memory for %u frames\n",
++                        nScriptFrames + 2); fclose(f); return 1; }
 +
 +    // pass 2: fill masks
 +    rewind(f);
@@ -262,17 +276,24 @@ index 0000000..ec94aa8
 +// Write-through helpers. A 68k byte at address a lives at (offset ^ 1); a
 +// 68k word at even address a therefore occupies host bytes [off] = low,
 +// [off+1] = high, which on a little-endian host is a plain UINT16 store.
-+static void harness_write_byte(UINT32 a, UINT8 d)
++// 14z-90 (GitHub issue #34): these returned void, so an address this resolver
++// cannot map was a SILENT no-op — a poke that never happened, reported as
++// applied. They now report, and the caller decides.
++static bool harness_write_byte(UINT32 a, UINT8 d)
 +{
 +    UINT8* p = harness_mem(a);
-+    if (p) *p = d;
++    if (!p) return false;
++    *p = d;
++    return true;
 +}
-+static void harness_write_word(UINT32 a, UINT16 d)
++static bool harness_write_word(UINT32 a, UINT16 d)
 +{
 +    UINT8* hi = harness_mem(a);        // 68k high byte
 +    UINT8* lo = harness_mem(a + 1);    // 68k low byte
-+    if (hi) *hi = (UINT8)(d >> 8);
-+    if (lo) *lo = (UINT8)(d & 0xFF);
++    if (!hi || !lo) return false;
++    *hi = (UINT8)(d >> 8);
++    *lo = (UINT8)(d & 0xFF);
++    return true;
 +}
 +
 +static void __fastcall HarnessTapWriteByte(UINT32 a, UINT8 d)
@@ -302,7 +323,12 @@ index 0000000..ec94aa8
 +
 +    char buf[1024]; snprintf(buf, sizeof(buf), "%s", spec);
 +    UINT32 lo = 0xFFFFFFFF, hi = 0;
-+    for (char* s = strtok(buf, ";"); s && nTapCount < HARNESS_TAP_MAX; s = strtok(NULL, ";")) {
++    for (char* s = strtok(buf, ";"); s; s = strtok(NULL, ";")) {
++        if (nTapCount >= HARNESS_TAP_MAX) {
++            printf("harness: REFUSING — more than %d tap ranges; the extras "
++                   "were silently dropped before 14z-90\n", HARNESS_TAP_MAX);
++            nTapCount = 0; nHarnessFailed = 1; return;
++        }
 +        UINT32 a0, a1;
 +        if (sscanf(s, "%x-%x", &a0, &a1) != 2 || a1 < a0) {
 +            printf("harness: bad FBNEO_HTAP range '%s'\n", s);
@@ -314,6 +340,43 @@ index 0000000..ec94aa8
 +    }
 +    if (!nTapCount) return;
 +
++    // 14z-90 (GitHub issues #32, #33, #37). Three defects met in this one
++    // function and had to be fixed together:
++    //
++    //  #37 the handler was installed over ONE coalesced min..max span, so two
++    //      individually-legal ranges silently mapped everything between them.
++    //  #32 a write the resolver cannot map was DROPPED, not forwarded — and
++    //      SekMapHandler replaces the default handler for those pages, so the
++    //      write is neither performed nor passed on. A tap over $800000 would
++    //      swallow the CPS-2 register writes that drive the object-bank
++    //      switch: the run becomes fiction, not merely under-reported.
++    //      "708000-7080ff;ff8000-ff80ff" — two legal ranges — reached that
++    //      today via #37's coalescing.
++    //  #33 OBJ RAM taps un-install themselves: CpsDoMapObjectBanks re-issues
++    //      SekMapMemory over $708000-$70FFFF on every bank flip, last writer
++    //      wins, and the tap goes dark mid-run.
++    //
++    // So: validate each range, refuse OBJ outright, and install per range.
++    for (int i = 0; i < nTapCount; i++) {
++        UINT32 p0 = nTapLo[i] & ~0xFFF, p1 = nTapHi[i] | 0xFFF;
++        if (!(nTapHi[i] < 0x708000 || nTapLo[i] > 0x70FFFF)) {
++            printf("harness: REFUSING tap %06x-%06x — OBJ RAM taps are "
++                   "un-installed by the object-bank switch and would go "
++                   "silently dark mid-run (14z-90 #33)\n",
++                   nTapLo[i], nTapHi[i]);
++            nTapCount = 0; nHarnessFailed = 1; return;
++        }
++        // Every PAGE the handler will cover must be resolvable, or writes to
++        // it are dropped rather than written through.
++        if (!harness_mem(p0) || !harness_mem(p1)) {
++            printf("harness: REFUSING tap %06x-%06x — its page span "
++                   "%06x-%06x is not wholly inside one resolvable RAM region, "
++                   "so writes there would be DROPPED, corrupting the run "
++                   "(14z-90 #32)\n", nTapLo[i], nTapHi[i], p0, p1);
++            nTapCount = 0; nHarnessFailed = 1; return;
++        }
++    }
++
 +    const char* outPath = getenv("FBNEO_HTAP_OUT");
 +    char path[MAX_PATH + 16];
 +    if (outPath && outPath[0]) snprintf(path, sizeof(path), "%s", outPath);
@@ -324,9 +387,17 @@ index 0000000..ec94aa8
 +
 +    SekSetWriteByteHandler(HARNESS_TAP_SLOT, HarnessTapWriteByte);
 +    SekSetWriteWordHandler(HARNESS_TAP_SLOT, HarnessTapWriteWord);
-+    SekMapHandler(HARNESS_TAP_SLOT, lo & ~0xFFF, hi | 0xFFF, MAP_WRITE);
-+    printf("harness: write tap on %d range(s), pages %06x-%06x -> %s\n",
-+           nTapCount, lo & ~0xFFF, hi | 0xFFF, path);
++    // Per range, NOT one min..max span (#37): the gap between two ranges is
++    // not a place the caller asked to tap, and mapping it is how #32 became
++    // reachable from legal input.
++    for (int i = 0; i < nTapCount; i++) {
++        SekMapHandler(HARNESS_TAP_SLOT, nTapLo[i] & ~0xFFF, nTapHi[i] | 0xFFF,
++                      MAP_WRITE);
++        printf("harness: write tap %06x-%06x, pages %06x-%06x\n",
++               nTapLo[i], nTapHi[i], nTapLo[i] & ~0xFFF, nTapHi[i] | 0xFFF);
++    }
++    printf("harness: write tap on %d range(s) -> %s\n", nTapCount, path);
++    (void)lo; (void)hi;
 +}
 +
 +// ── frame-scheduled pokes (B5b, FBNEO_HPOKE) ─────────────────────────────────
@@ -340,12 +411,35 @@ index 0000000..ec94aa8
 +    for (char* s = strtok(buf, ";"); s; s = strtok(NULL, ";")) {
 +        UINT32 fr, addr; char hex[512];
 +        if (sscanf(s, "%u:%x:%511s", &fr, &addr, hex) != 3 || fr != frame) continue;
++        // 14z-90 (GitHub issue #34), three defects in these five lines:
++        //  (a) `addr` was advanced by the loop and then PRINTED, so the log
++        //      named base+len — a poke of ff8100 reported @ff8104, in a
++        //      project where address notation is a CLAUDE.md rule;
++        //  (b) an unresolvable address was a silent no-op reported as applied,
++        //      which defeats the poke's whole purpose as a positive control;
++        //  (c) an odd-length hex string was silently TRUNCATED by `h[0] && h[1]`.
++        UINT32 base = addr;
++        size_t hlen = strlen(hex);
++        if (hlen & 1) {
++            printf("harness: poke frame %u @%06x REFUSED — odd-length hex "
++                   "'%s' (would have been silently truncated)\n", fr, base, hex);
++            nHarnessFailed = 1;
++            continue;
++        }
++        int nbad = 0;
 +        for (const char* h = hex; h[0] && h[1]; h += 2) {
 +            unsigned v;
 +            if (sscanf(h, "%2x", &v) != 1) break;
-+            harness_write_byte(addr++, (UINT8)v);
++            if (!harness_write_byte(addr, (UINT8)v)) nbad++;
++            addr++;
 +        }
-+        printf("harness: poke frame %u @%06x = %s\n", fr, addr, hex);
++        if (nbad) {
++            printf("harness: poke frame %u @%06x = %s FAILED — %d byte(s) "
++                   "unresolvable, NOT applied\n", fr, base, hex, nbad);
++            nHarnessFailed = 1;
++        } else {
++            printf("harness: poke frame %u @%06x = %s\n", fr, base, hex);
++        }
 +    }
 +}
 +
@@ -387,6 +481,9 @@ index 0000000..ec94aa8
 +        nBurnPitch = nVidW * nBurnBpp;
 +        nHarnessFBLen = nVidW * nVidH * nBurnBpp;
 +        pHarnessFB = (UINT8*)malloc(nHarnessFBLen);
++        // unconditional segfault on NULL — the next statement memsets it
++        if (!pHarnessFB) { printf("harness: out of memory for the framebuffer\n");
++                           return 1; }
 +        memset(pHarnessFB, 0, nHarnessFBLen);
 +        vout = fopen(szVideoOut, "w");
 +        if (!vout) { printf("harness: cannot write %s\n", szVideoOut); return 1; }
@@ -425,7 +522,19 @@ index 0000000..ec94aa8
 +                char path[MAX_PATH + 64];
 +                snprintf(path, sizeof(path), "%s.dump_%u_%06x.bin",
 +                         szHarnessOut, fr, first);
++                // 14z-90 (GitHub issue #64): this fopen was unchecked while
++                // the identical gfx dump 20 lines below guarded its own. The
++                // fix is NOT a bare `continue`: today a NULL deref segfaults,
++                // which exits non-zero and IS caught by run_replay_fbneo.sh,
++                // whereas a bare continue would print, skip the file, and exit
++                // 0 — and compare_fields.py and two gates consume these dumps.
++                // So: diagnose, flag the run as failed, and carry on.
 +                FILE* df = fopen(path, "wb");
++                if (!df) {
++                    printf("harness: cannot write %s — dump SKIPPED\n", path);
++                    nHarnessFailed = 1;
++                    continue;
++                }
 +                // B5b: resolved by ADDRESS, so this now reaches OBJ RAM
 +                // ($708000) and palette RAM ($900000) as well as work RAM.
 +                // Unresolvable addresses write 0xFF rather than silently
@@ -467,13 +576,27 @@ index 0000000..ec94aa8
 +    if (pHarnessFB) { free(pHarnessFB); pHarnessFB = NULL; }
 +    printf("harness: %u frames, log %s\n", nScriptFrames, szHarnessOut);
 +    free(held);
-+    return 0;
++    // 14z-90: a run that refused a tap, dropped a poke or could not write a
++    // dump has NOT done what it was asked. Reporting 0 here is what made the
++    // artifact check the only signal (GitHub issue #12).
++    if (nHarnessFailed)
++        printf("harness: FAILED — one or more instruments could not run; "
++               "this log is INCOMPLETE\n");
++    return nHarnessFailed;
 +}
 diff --git a/src/burner/sdl/main.cpp b/src/burner/sdl/main.cpp
-index 688404a..d8d8e65 100644
+index 688404a..7592a7f 100644
 --- a/src/burner/sdl/main.cpp
 +++ b/src/burner/sdl/main.cpp
-@@ -38,6 +38,14 @@ const char* romname = NULL;
+@@ -13,6 +13,7 @@
+  * figure out what is going on with the sdl sound output, something breaks after a few frames
+  * ------------------*/
+ 
++#include <sys/stat.h>   // 14z-90 (#65): ./roms probe
+ #include "burner.h"
+ 
+ INT32 display_set_controls();
+@@ -38,6 +39,14 @@ const char* romname = NULL;
  
  extern void InitSupportPaths();
  
@@ -488,7 +611,7 @@ index 688404a..d8d8e65 100644
  #ifdef BUILD_SDL2
  SDL_Window* sdlWindow = NULL;
  #endif
-@@ -116,6 +124,29 @@ int parseSwitches(int argc, char* argv[])
+@@ -116,6 +125,29 @@ int parseSwitches(int argc, char* argv[])
  			i++;
  			_tcscpy(CDEmuImage, argv[i]);
  		}
@@ -518,15 +641,36 @@ index 688404a..d8d8e65 100644
  	}
  	return 0;
  }
-@@ -246,9 +277,18 @@ void DoGame(int gameToRun)
+@@ -242,13 +274,38 @@ void generateDats()
+ }
+ 
+ 
++static int nHarnessExit = 0;   // 14z-90 (#12): harness status -> exit code
++
+ void DoGame(int gameToRun)
  {
- 	if (!DrvInit(gameToRun, 0))
+-	if (!DrvInit(gameToRun, 0))
++	// 14z-90 (#12): ONE DrvInit call — an earlier revision of this fix called
++	// it twice, which would have initialised the driver twice.
++	int nInitFailed = DrvInit(gameToRun, 0);
++	if (nInitFailed && HarnessActive())
++	{
++		// a harness run whose driver would not initialise produced nothing,
++		// and must not exit 0.
++		printf("harness: DrvInit failed for the requested set\n");
++		nHarnessExit = 1;
++	}
++	if (!nInitFailed)
  	{
 +		if (HarnessActive())
 +		{
 +			// headless scripted run: no media/audio init, no RunInit
 +			// (avoids StatedAuto auto-savestate load), see harness.cpp
-+			HarnessRun();
++			// 14z-90 (GitHub issue #12): this status used to be DISCARDED
++			// inside a void DoGame, and main() returned 0 unconditionally —
++			// so every harness failure exited 0 and the only signal left was
++			// the output artifact, which a previous run could satisfy.
++			nHarnessExit = HarnessRun();
 +		}
 +		else
 +		{
@@ -537,7 +681,7 @@ index 688404a..d8d8e65 100644
  	}
  	else
  	{
-@@ -401,6 +441,19 @@ int main(int argc, char* argv[])
+@@ -401,6 +458,46 @@ int main(int argc, char* argv[])
  #if defined(BUILD_SDL2) && !defined(SDL_WINDOWS)
  	bprintf = AppDebugPrintf;
  #endif
@@ -552,8 +696,44 @@ index 688404a..d8d8e65 100644
 +		_stprintf(szAppHiscorePath, _T("./"));
 +		_stprintf(szAppCheatsPath, _T("./"));
 +		bSaveconfig = 0;
++
++		// 14z-90 (GitHub issue #65). The comment above claimed ALL mutable
++		// per-game state was sandboxed. It was false for the one input that
++		// decides WHICH SET IS MEASURED: ConfigAppLoad() has already run by
++		// this point, and bzip.cpp walks szAppRomPaths[0..DIRS_MAX) in order,
++		// first hit wins. A vsavj.zip anywhere earlier in that list — put
++		// there by a package manager or another frontend — would be measured
++		// instead of the build under test, and every replay would report PASS
++		// on the wrong romset.
++		//
++		// Guarded on ./roms existing: the gates all run inside a sandbox that
++		// builds it, but clearing the list unconditionally would break an
++		// ad-hoc direct invocation of the binary, which is a worse trade.
++		{
++			FILE* probe = fopen("roms", "r");
++			struct stat st;
++			if (probe) fclose(probe);
++			if (stat("roms", &st) == 0 && (st.st_mode & S_IFDIR)) {
++				_stprintf(szAppRomPaths[0], _T("roms/"));
++				for (int rp = 1; rp < DIRS_MAX; rp++)
++					_stprintf(szAppRomPaths[rp], _T(""));
++				printf("harness: ROM search path pinned to ./roms\n");
++			} else {
++				printf("harness: WARNING ./roms absent — the app config's ROM "
++				       "search path is in effect and is NOT sandboxed\n");
++			}
++		}
 +	}
 +
  	BurnLibInit();
  
  	// Search for a game now, for use in the menu and loading a games
+@@ -454,7 +551,7 @@ int main(int argc, char* argv[])
+ 
+ 		DoGame(i);
+ 	}
+-	return 0;
++	return nHarnessExit;
+ }
+ 
+ /* const */ TCHAR* ANSIToTCHAR(const char* pszInString, TCHAR* pszOutString, int nOutSize)

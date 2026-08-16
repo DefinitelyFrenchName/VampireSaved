@@ -175,10 +175,10 @@ index 8602b6ca..bbde2ac1 100644
 +	// WIDE v1 program extension. Everything above $0FFFFF is outside the
 +	// CPS-2 encryption window, so this space is RAW.
 +	// Reserved, never allocate: $400000-$40000F (CPS2 output registers).
-+	ROM_LOAD16_WORD_SWAP( "vsw.41",   0x400000, 0x80000, CRC(75660aac) SHA1(6a521e1d2a632c26e53b83d2cc4b0edecfc1e68c) )
-+	ROM_LOAD16_WORD_SWAP( "vsw.42",   0x480000, 0x80000, CRC(75660aac) SHA1(6a521e1d2a632c26e53b83d2cc4b0edecfc1e68c) )
-+	ROM_LOAD16_WORD_SWAP( "vsw.43",   0x500000, 0x80000, CRC(75660aac) SHA1(6a521e1d2a632c26e53b83d2cc4b0edecfc1e68c) )
-+	ROM_LOAD16_WORD_SWAP( "vsw.44",   0x580000, 0x80000, CRC(75660aac) SHA1(6a521e1d2a632c26e53b83d2cc4b0edecfc1e68c) )
++	ROM_LOAD16_WORD_SWAP( "vsw.41",   0x400000, 0x80000, CRC(dec0de41) SHA1(88167cba6551bd84e438804de0c792b6a70856da) )
++	ROM_LOAD16_WORD_SWAP( "vsw.42",   0x480000, 0x80000, CRC(dec0de42) SHA1(1e8c204f22cc8fc91aa7ab361a16fa4ed0117ef2) )
++	ROM_LOAD16_WORD_SWAP( "vsw.43",   0x500000, 0x80000, CRC(dec0de43) SHA1(ed0bcf9903f3cb31a9879b687f0840e5ba2c7b5e) )
++	ROM_LOAD16_WORD_SWAP( "vsw.44",   0x580000, 0x80000, CRC(dec0de44) SHA1(1ad9c5e3f2ebe9ef3c32937361d5503fbcfa9e36) )
 +
 +	ROM_REGION( 0x3000000, "gfx", 0 )    // WIDE v1: 32MB -> 48MB
 +	ROM_LOAD64_WORD( "vm3.13m",   0x0000000, 0x400000, CRC(fd8a11eb) SHA1(21b9773959e17976ff46b75a6a405042836b2c5f) )
