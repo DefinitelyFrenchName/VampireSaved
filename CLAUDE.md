@@ -98,10 +98,33 @@ legacy behavior is a failed change.
 ## 4. Verification protocol (the harness is the project's spine)
 
 - **Oracle replays:** `tests/replays/` holds input scripts (per-frame joystick/
-  button state). The harness runs each script on (a) vanilla `vsav` on vanilla
-  FBNeo and (b) the hacked set on patched FBNeo, checksumming work RAM every
-  frame. Legacy-content replays must match for the full script length. First
-  divergent frame + RAM diff is the standard bug report format.
+  button state). The harness runs each script on (a) vanilla `vsav` and (b) the
+  hacked set, checksumming work RAM every frame. Legacy-content replays must
+  match for the full script length. First divergent frame + RAM diff is the
+  standard bug report format.
+
+  **WHICH EMULATOR ACTUALLY RUNS THIS, corrected 2026-08-16 (GitHub #78) —
+  this clause said "vanilla FBNeo … patched FBNeo" and described an oracle the
+  suite did not run.** The per-frame whole-corpus legacy oracle is **MAME**
+  (`tests/lib/m2a_common.sh`, the frozen `.masked` classes below). FBNeo
+  carries: the **emulator superset invariant** on pristine `vsavj`
+  (`test_wide_profile.sh`, reference vs patched binary), **dual-track**
+  inertness on one binary (`test_dualtrack.sh`), and since 14z-92 a
+  **sampled** hacked-build-vs-vanilla legacy check
+  (`test_fbneo_legacy_oracle.sh` — 4 replays × 5 frames, chosen clear of every
+  ratified divergence). The **full** FBNeo legacy track is
+  ACCEPTED-AND-DEFERRED: FBNeo has no frozen expectation corpus by design
+  (every FBNeo gate is a live A/B, which is what makes them
+  machine-independent), so building it means either freezing an FBNeo basis or
+  a live vanilla leg across all 46 legacy replays. Revisit at MiSTer — a third
+  implementation is where MAME-specific behaviour would surface.
+
+  Two FBNeo-only phase classes are measured and **await a ruling** (they are
+  not tolerances yet): the sound-driver work area `$FF0500-$FF05FF`
+  (`atlas/ram.md:74`) and the OBJ-builder secondary stack `$FF06D0-$FF06EF`
+  (`ram.md:62`, "execution POSITION, not state"). MAME shows zero difference
+  at the same frames. Note the second EXTENDS ram.md:62, which records that
+  class as appearing only on tenant-content replays.
 - **Hooked-build legacy comparison (amended 2026-07-25 v1, refined to v2
   2026-07-27, both maintainer-approved):** for builds carrying engine
   hooks (code the vanilla game executes routed through added

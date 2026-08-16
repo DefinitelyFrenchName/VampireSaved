@@ -172,6 +172,18 @@ The superseded framing, kept because it explains the shapes above:
   now "legacy enters and gets vanilla answers". Section 1: 43/46
   bit-identical, 3 transient re-convergent, 0 dead. Claim retracted in
   engine_internals, HANDOFF, and both manifests.
+- **OPEN from #78 — needs a ruling: two FBNeo-only phase classes.** The new
+  `tests/test_fbneo_legacy_oracle.sh` (the agreed partial) found, on its
+  first run, differences that MAME does NOT show at the same frames:
+  `$FF055B-$FF055D` (sound-driver work area, ram.md:74) and
+  `$FF06D1/D4/DB` (OBJ-builder secondary stack, ram.md:62 "execution
+  POSITION, not state"). Both are attributed and bounded to two named
+  windows; neither is gameplay state. They are reported as `open:` lines,
+  NOT as tolerances. **The ruling needed:** ram.md:62 records that class as
+  appearing only on tenant-content replays where no vanilla oracle applies —
+  it appears here on LEGACY content under FBNeo, which extends it. Per §4 a
+  new tolerance needs sign-off. `FBNEO_ORACLE_EXPECT=exact` is the
+  post-ruling target.
 - **OPEN from M4 — needs a ruling: is the thunk still load-bearing?** Its
   crash control is DEAD (the no-thunk twin no longer reproduces f7997). But
   the frozen inventory still has 93 stamp rows with type >= 64 against a
