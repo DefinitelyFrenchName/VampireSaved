@@ -211,23 +211,35 @@ dirs remain the tenant_loop/build_merged inputs).
 `build/m5w` (`ac52eeff`) is the KNOWN-BAD artifact of the 14z-60y sprite
 garble, kept as evidence — do not playtest it. `tools/audit_romset_identity.py
 build/m5w/rompath` names its four shadowed members in a second.
-**`build/m3b_merged7` is the MERGED BUILD WITH GFX** (14z-83 S4 machinery,
-`tools/build_merged.sh`; rebuilt through 14z-87): the 738-op 3-tenant
-program image (owner tag + sfx records + damage work-var rows + the
-chirp/shock fixes + THE M5 VOICE BATCH: remaps, alias-thunk pokes,
-farm stubs) + the S2 gfx chain (D → H → P, group B pristine) + the
-authored Z80/sample members (`vsw.z01/z02`, `vsw.21m` — both playback
-laws enforced). UNREGISTERED until the S6 freeze decision — run_suite
-refuses it. The merged legacy audit is GREEN on it at 14z-86 close
-(AUDIT-EXIT 0; the audit's frozen op count re-frozen 678→729 per its
-own tenant_loop-FIRST protocol; earlier same-session it ran green on
-merged4 at 678, closing the 14z-85g(2) carry-forward). Superseded
-merged intermediates (m3b_merged4/5, pre-v1.1) do not boot on current
-binaries without member injection. The pre-fix `build/m3b_merged`
-(FG) and `build/hui34`/`hui36` (chirp/shock) are kept as the parity
-audits' known-bad references (same injection caveat). Rebuild:
-`ROMDIR=... tools/build_merged.sh build/m3b_merged7` (~15 min, 738-op fixture); its
-fingerprint moves with the generator — do not pin it.
+**`build/m3b_merged8` is the MERGED BUILD WITH GFX** (14z-92; supersedes
+merged7, which was built at 14z-87 and predates the whole 14z-91 legacy
+fix). Fingerprint `952fc731`, **753 ops** — the 3-tenant program image
+(owner tag + sfx records + damage work-var rows + the chirp/shock fixes
++ the M5 VOICE BATCH + THE 14z-91 WALKER RELOCATION, fixture deletion
+and type-6 change) + the S2 gfx chain (D → H → P, group B pristine) +
+the authored Z80/sample members (`vsw.z01/z02`, `vsw.21m` — both
+playback laws enforced). All three tenants verify (`verify_gfx_build` +
+`check_tenant_hud`). UNREGISTERED until the S6 freeze decision —
+run_suite refuses it, and **no merged content gate has run on it yet**
+(render-content, trap/FG parity, merged legacy audit are the S6 list).
+`build/m3b_merged7` is superseded and was the build the #75 abort was
+measured on. Superseded merged intermediates (m3b_merged4/5, pre-v1.1)
+do not boot on current binaries without member injection. The pre-fix
+`build/m3b_merged` (FG) and `build/hui34`/`hui36` (chirp/shock) are
+kept as the parity audits' known-bad references (same injection
+caveat). Rebuild: `ROMDIR=... tools/build_merged.sh build/m3b_merged9`
+(~1 min, 753-op fixture); its fingerprint moves with the generator — do
+not pin it.
+**#75 CLOSED 14z-92, and read the second half of that sentence:** the
+huitzil gfx-verify abort was a VERIFIER artifact (obj_records.walk's
+pointer pass re-derived record structure from the relocated image, and
+the merged placement window happened to contain a straddled datum's
+value). Fixed + gated. **But the abort had already stopped happening on
+its own**: 14z-91 moved `anim@huitzil` 0x41a7e0 → 0x41a6e0 and the
+coincidence dissolved, so merged8 verifies green with the PRE-FIX tool
+too (measured, all three tenants). Nobody knew because nobody re-ran
+`build_merged.sh` after 14z-91. The fix removes the dice roll, not
+today's instance of it.
 `build/merged1` is the **MERGED-LEGACY INSTRUMENT** (14z-81; carries the
 14z-82 type-renumber + F2 fixes) — the 3-tenant program image with gfx
 SKIPPED (group C zero-filled): legacy characters render correctly, the
@@ -1519,6 +1531,35 @@ tests/test_gfx_collision_gate.sh      # 14z-83 (S1): ground truth for
                                       # path textual lock. Emits
                                       # gfx_written.json (the S2 chain
                                       # ledger). No ROMs, ~1s
+tests/test_obj_record_walk.sh         # 14z-92 (GitHub #75): ground truth
+                                      # for the RELOCATION-AWARENESS of
+                                      # obj_records.walk's two heuristic
+                                      # passes. Both decide "is this a
+                                      # record" from ADDRESSES, and
+                                      # placement moves the addresses under
+                                      # the same bytes — sweep asks about
+                                      # the aux windows (hardened 14z-74),
+                                      # the pointer pass asks about the
+                                      # REGION window (hardened here, after
+                                      # it invented a record on merged
+                                      # huitzil and aborted every merged
+                                      # build from merged6). A built-image
+                                      # walk must VERIFY the source's
+                                      # structure, never re-derive it.
+                                      # 4 verdict controls, each of which
+                                      # must actually fire: A the phantom
+                                      # (ptr_allow=None MUST invent it —
+                                      # the pre-fix behaviour needs no
+                                      # reconstruction), B the session-14b
+                                      # clobbered fmt-0 count, C an
+                                      # un-relocated pointer, D two
+                                      # pointers swapped onto each other's
+                                      # targets — which a COUNT check
+                                      # cannot see, so the gate proves the
+                                      # old blindness rather than asserting
+                                      # the new strictness. Synthetic
+                                      # fixture, no ROMs, no build dirs,
+                                      # ~1s; in tests/ci_portable.txt
 tests/audit_pool_free_byte.sh         # REWRITTEN 14z-85 (the 14z-84 version
                                       # measured only $FFB800 and attributed
                                       # it to the 59-75 family — WRONG POOL;

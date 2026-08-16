@@ -1,5 +1,89 @@
 # STATE — living progress log
 
+## Session 14z-92 — GitHub #75 CLOSED: the merged gfx-verify abort was the
+## 14z-74 phantom class in the pass 14z-74 did not harden. And the blocker
+## had already dissolved on its own — which nobody knew.
+
+**THE DEFECT.** `verify_gfx_build.py` compares a walk of the SOURCE anim
+region against a walk of the BUILT image. Both of `obj_records.walk`'s passes
+decide what is a record using predicates about ADDRESSES, and placement moves
+the addresses out from under the same bytes:
+
+| pass | predicate | what moves |
+|---|---|---|
+| sweep | "does the long at +6 land in an aux region?" | the aux regions |
+| pointer | "does this 4-byte value land inside `[start,end)`?" | the region |
+
+14z-74 hardened the sweep (`sweep_allow`, after 11 phantoms on Pyron) and left
+the pointer pass re-deriving structure from the relocated image. #75 was the
+bill. At Huitzil anim offset `0x1D160` the bytes `00 42 1e 94` STRADDLE one
+entry's attr and the next entry's tile **inside a real fmt-2 record that begins
+at `0x1D150`**, and read as `0x00421E94`. The merged placement window
+`[0x41A7E0,0x438FE0)` contains that value; the source window
+`[0x245872,0x264072)` and every solo placement do not. So the pass
+dereferenced it, landed on offset `0x76B4` where relocated bytes validate as
+`fmt=0 count=67` with a cptr inside the moved `aux0_1@huitzil`, and invented
+one record — **+1 record, +67 entries and all 34 out-of-band tile codes**
+(`attr 0x09b0` ⇒ bx=10, so each junk word expands to ten tiles).
+
+**THE TWO TELLS IT WAS NEVER A POINTER**, both measured: the longword is
+byte-identical in the source extract and in the build, and a real record
+pointer must be relocated (`0x245872` → `0x41A7E0`); and its target offset
+tracks the placement base (`0x7784` at merged5's, `0x76B4` at merged6's),
+where a real pointer's target offset is invariant.
+
+**NOT A BUILD DEFECT — established, not assumed.** Nothing in the pipeline
+walks the placed image: `build_merged.sh:77-81` and `build_donovan.sh:370` run
+`obj_records.py` over `region_anim.bin` in SOURCE space, and the generator's
+own sweep (`gen_donovan_patch.py:2967-2978`) runs pre-placement. Only
+`verify_gfx_build.py` walks the built image. No shipped ROM byte was ever
+influenced by the phantom.
+
+**THE TRIGGER, AND WHY merged5 WAS GREEN.** Nothing in the 14z-86 batch
+touches gfx (checked: `git log` over `tools/*gfx*`, `obj_records*`,
+`gfx_layout3.toml`, `extra_tiles/` in that window is empty). The voice batch
+grew two `wide_ext` allocations by a net `+0xD0`, `anim@huitzil` moved
+`0x41A710` → `0x41A7E0`, and at the old base the same false long resolved to
+bytes whose cptr happened to fail. merged5 passed by luck. Pyron moved
+`+0x320` on the same build and was lucky too.
+
+**THE FIX.** `ptr_seen`/`ptr_allow` on the pointer pass, mirroring
+`sweep_seen`/`sweep_allow`: the source walk records its accepted
+`{ptr_off: tgt_off}` map and the built walk accepts a candidate only at an
+endorsed pointer offset that resolves to the SAME target. Strictly stronger
+than what it replaces — control D of the new gate builds two pointers swapped
+onto each other's targets, shows the count check passes it, and shows the
+allow-map catches it. Both defaults are `None`, so the other four callers
+(the CLI, `audit_gfx_merged`, the two build drivers — all source-space) are
+byte-identical; a section of the gate asserts that rather than assuming it.
+Diagnostics too: a parity failure now NAMES the source records the build did
+not reproduce, and a rejected coincidence prints one line saying where it came
+from. "1374 != 1375" cost this whole investigation.
+
+**AND THE HALF THAT MATTERS FOR HONESTY: the blocker had already stopped
+blocking.** 14z-91 moved `anim@huitzil` again, `0x41A7E0` → `0x41A6E0`, and
+the coincidence dissolved. Measured with the PRE-FIX tool reconstructed from
+HEAD: `m3b_merged8` verifies green on all three tenants without the fix; only
+`m3b_merged7` still fails. So this session did not unblock the merged build —
+14z-91 had unblocked it by accident three days earlier and nobody re-ran
+`build_merged.sh` to find out. What the fix buys is the removal of a dice roll
+that re-rolls on every allocator change, plus a check that is strictly
+stronger. Recorded because the opposite claim ("the fix unblocked the S6
+path") was the one I nearly wrote.
+
+**SHIPPED:** `build/m3b_merged8` (fingerprint `952fc731`, 753 ops), the first
+merged build carrying the 14z-91 legacy fix. All three tenants pass
+`verify_gfx_build` + `check_tenant_hud`. UNREGISTERED — no merged content gate
+has run on it yet (render-content, trap/FG parity, merged legacy audit are the
+S6 list, and they are the maintainer's call).
+
+**Suite:** `tests/test_obj_record_walk.sh` (new, ROM-free, 4 verdict controls,
+added to `tests/ci_portable.txt` → 14 gates, all PASS). Gotcha filed in
+`docs/project/gotchas.md` + index. Retraction sweep: the "aborts TODAY on
+huitzil" comment in `build_merged.sh`, the "false positives negligible in
+record-zone data" claim in `obj_records.py` (it was measuring one placement
+address, not the data), and HANDOFF's merged block.
+
 ## Session 14z-91 CLOSE — ritual complete
 
 - **STATE** updated (this file, newest-first above): the session record, the

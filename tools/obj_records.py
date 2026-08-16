@@ -47,7 +47,8 @@ import sys
 
 
 def walk(dat, base, start, end, cptr_ok, sweep_lo=0x8000, sweep_hi=0xEEBB,
-         sweep_allow=None, sweep_seen=None):
+         sweep_allow=None, sweep_seen=None, ptr_allow=None, ptr_seen=None,
+         ptr_rejected=None):
     """dat indexed by ROM address - base. Returns (tiles set, n_entries,
     n_records). sweep_lo/hi: the band-coherence window of the SWEEP pass
     (offset-computed records) — historically the Donovan/Jedah band; a
@@ -66,7 +67,34 @@ def walk(dat, base, start, end, cptr_ok, sweep_lo=0x8000, sweep_hi=0xEEBB,
     accepted sweep offsets as `sweep_allow` makes the built-image walk
     VERIFY the source's record structure instead of re-deriving it, which
     is what a src-vs-out parity check means in the first place.
-    Offsets are relative to `start`."""
+    Offsets are relative to `start`.
+
+    ptr_seen / ptr_allow (14z-92, GitHub #75) do the SAME for the POINTER
+    pass, which 14z-74 left ungated. That pass is a heuristic too — it reads
+    a 4-byte value at every even offset and dereferences it if the value
+    falls inside [start,end) — and the SECOND predicate is the one that
+    moves: after placement, "is this long inside the region?" has a
+    different answer for the same bytes, because the REGION moves. Measured
+    on merged Huitzil: the bytes 00 42 1e 94 at region offset 0x1D160
+    STRADDLE one entry's attr and the next entry's tile inside a real
+    fmt-2 record, and read as 0x00421E94 — byte-identical in source and
+    build, i.e. never relocated, i.e. not a pointer. The source window
+    [0x245872,0x264072) and every solo placement exclude it; the merged
+    placement [0x41A7E0,0x438FE0) contains it, so the pass dereferenced it
+    to offset 0x76B4, where relocated bytes happen to read fmt=0 count=67
+    with a cptr that lands in the moved aux window. That ONE phantom record
+    was +1 record, +67 entries and 34 out-of-band tiles.
+    `ptr_seen` is a dict {ptr_off: tgt_off} the SOURCE walk fills; passing
+    it back as `ptr_allow` makes the built-image walk accept a candidate
+    only at a pointer offset the source accepted AND only if it resolves to
+    the same target offset — so the pass VERIFIES the relocation instead of
+    re-deriving the structure, and a pointer relocated to the WRONG target
+    is caught, which a bare count comparison can miss.
+    `ptr_rejected`, if a list, collects the (ptr_off, tgt_off) candidates
+    that VALIDATED as records and were then turned away by the allow-map —
+    i.e. the placement coincidences themselves, not merely every in-window
+    longword. That count is worth printing rather than hiding: it is 0 on
+    a build where nothing coincides and 1 on merged Huitzil."""
     tiles, entries, records = set(), 0, 0
     seen = set()
     for a in range(start, end - 4, 2):
@@ -102,7 +130,19 @@ def walk(dat, base, start, end, cptr_ok, sweep_lo=0x8000, sweep_hi=0xEEBB,
             ent = [(int.from_bytes(dat[o + 10 + 4*k:o + 12 + 4*k], "big"),
                     int.from_bytes(dat[o + 12 + 4*k:o + 14 + 4*k], "big"))
                    for k in range(count + 1)]
+        # The allow-map is consulted AFTER validation on purpose: what is
+        # worth counting is the candidates that would otherwise have been
+        # ACCEPTED as records — the placement coincidences — not every
+        # in-window longword the source never endorsed either. Rejecting
+        # here also leaves `seen` untouched, so a later, legitimate
+        # pointer to the same target is still free to claim it.
+        if ptr_allow is not None and ptr_allow.get(a - start) != v - start:
+            if ptr_rejected is not None:
+                ptr_rejected.append((a - start, v - start))
+            continue
         seen.add(v)
+        if ptr_seen is not None:
+            ptr_seen[a - start] = v - start
         records += 1
         for t, at in ent:
             bx = ((at >> 8) & 15) + 1
@@ -116,8 +156,19 @@ def walk(dat, base, start, end, cptr_ok, sweep_lo=0x8000, sweep_hi=0xEEBB,
     # in-region pointer and the pass above misses them: their band words
     # stayed unremapped and their tiles uninventoried (the round-31
     # X-ray garble). Scan every even offset as a candidate head with the
-    # same strict validation; the header+cptr joint constraint keeps
-    # false positives negligible in record-zone data.
+    # same strict validation.
+    # CORRECTED 14z-92 (#75): this comment used to claim "the header+cptr
+    # joint constraint keeps false positives negligible in record-zone
+    # data". That is not a property of the data — it is a property of the
+    # PLACEMENT ADDRESS, and it is re-rolled by every allocator change.
+    # Measured on merged Huitzil: 200 candidate heads are in-window in the
+    # BUILT image and were not in the source, and the count is the SAME on
+    # merged7 (where one of them validated as a record and aborted the
+    # build) and on merged8 (where none did). The surface does not shrink;
+    # only whether a candidate lands on validating bytes changes. Both
+    # heuristic passes therefore verify the source's structure
+    # (sweep_allow / ptr_allow) rather than trusting a false-positive rate
+    # that nobody re-measures.
     for a in range(start, end - 10, 2):
         if a in seen:
             continue

@@ -34,5 +34,6 @@ test_freeze_basis_sandbox
 test_gfx_collision_gate
 test_m2a_flicker_gate
 test_manifest_merge
+test_obj_record_walk
 test_shell_portability
 test_tenant_id

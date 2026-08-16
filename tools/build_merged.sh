@@ -174,10 +174,15 @@ for T in donovan:$D_EX huitzil:$H_EX pyron:$P_EX; do
     # POSIX and tests/test_shell_portability.sh now fails any #!/bin/sh script
     # that uses it. Redirect, then indent the log — same idiom as b4df1ff.
     #
-    # This guard is not theoretical: it aborts TODAY on huitzil (record/entry
-    # parity 1374,14911 != 1375,14978, and 34 tile codes outside the placed
-    # window) on build/m3b_merged7. That failure was printed and unread through
-    # merged6 and merged7 because of the swallowed status.
+    # This guard is not theoretical. It aborted on huitzil from merged6 to
+    # merged7 (record/entry parity 1374,14911 != 1375,14978, and 34 tile codes
+    # outside the placed window) — printed and unread until the status stopped
+    # being swallowed. RESOLVED 14z-92 (GitHub #75): that was a VERIFIER
+    # artifact, not a build defect. obj_records.walk's pointer pass was
+    # re-deriving record structure from the relocated image, and the merged
+    # placement window happened to contain a straddled datum's value; the pass
+    # is now relocation-aware (ptr_allow), as the sweep pass has been since
+    # 14z-74. Gate: tests/test_obj_record_walk.sh.
     echo "  -- verify_gfx_build --tenant $name"
     python3 tools/verify_gfx_build.py "$OUT" --tenant "$name" \
         --gfx-dir "$OUT/gfx_$name" --extract-dir "$ex" \

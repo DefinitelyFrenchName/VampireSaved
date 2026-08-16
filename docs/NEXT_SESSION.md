@@ -1,9 +1,24 @@
-# NEXT SESSION — orientation (written at the close of 14z-91, 2026-08-16)
+# NEXT SESSION — orientation (updated at the close of 14z-92, 2026-08-16)
 
-> ## THE LEGACY REGRESSION IS FIXED AND RULE 6 HAS LIFTED. The six
-> ## `.pending` replays are gone, the three suites are GREEN, and forward
-> ## work is unblocked for the first time in three sessions. What you pick
-> ## up next is a choice again, not a halt — see "START HERE".
+> ## RULE 6 IS LIFTED (14z-91) AND #75 IS CLOSED (14z-92). There is a
+> ## merged build with gfx again — `build/m3b_merged8` (`952fc731`, 753
+> ## ops), the first one carrying the 14z-91 legacy fix. It is
+> ## UNREGISTERED and no merged CONTENT gate has run on it: that is the
+> ## S6 list, and it is the top of "START HERE".
+
+## What 14z-92 was
+
+`verify_gfx_build.py --tenant huitzil` was aborting every merged build. It was
+a verifier artifact of the 14z-74 phantom class, in the ONE pass 14z-74 did
+not harden — the pointer pass re-derived record structure from the relocated
+image, and the merged placement window happened to contain a straddled datum's
+value. Fixed (`ptr_allow`), gated (`tests/test_obj_record_walk.sh`), and
+`build/m3b_merged8` built clean.
+
+**The caveat that matters:** the abort had already dissolved on its own. 14z-91
+moved `anim@huitzil` and the coincidence went away, so merged8 verifies green
+with the pre-fix tool too. The fix removes a dice roll that re-rolls on every
+allocator change; it did not unblock today's build. Full detail in STATE.
 
 ## What 14z-91 was
 
@@ -71,14 +86,29 @@ The superseded framing, kept because it explains the shapes above:
 
 ## START HERE — the open list, in order
 
-- **GitHub #75 — `build_merged.sh` ABORTS on huitzil.** Now the top
-  blocker: `verify_gfx_build.py --tenant huitzil` fails on m3b_merged7
-  (record/entry parity 1374,14911 != 1375,14978; 34 tile codes outside the
-  placed window; regression window merged5 -> merged6, 14z-86). It blocks a
-  new merged-WITH-GFX build, which is what the S6 freeze and playtesting
-  need. It did NOT block this session's legacy work, because
-  `audit_merged_legacy.sh` builds its own gfx-free instrument — and that
-  instrument is now FULL GREEN (leg (a) 47/47, leg (b) 6/6, 753 ops).
+- ~~**GitHub #75 — `build_merged.sh` ABORTS on huitzil.**~~ **CLOSED 14z-92.**
+  It was a VERIFIER artifact, not a build defect: `obj_records.walk`'s pointer
+  pass re-derived record structure from the relocated image, so a straddled
+  datum inside a real record became a valid record head under the merged
+  placement window (+1 record, +67 entries, 34 out-of-band tiles). Fixed with
+  the same `ptr_allow` treatment 14z-74 gave the sweep pass; gated by
+  `tests/test_obj_record_walk.sh` (4 verdict controls, ROM-free, in
+  ci_portable).
+  **Read this part too:** the abort had ALREADY stopped happening. 14z-91
+  moved `anim@huitzil` 0x41a7e0 -> 0x41a6e0 and the coincidence dissolved —
+  merged8 verifies green with the pre-fix tool too (measured). Nobody knew
+  because nobody re-ran `build_merged.sh` after 14z-91. **`build/m3b_merged8`
+  (`952fc731`, 753 ops) now exists** and is the first merged build carrying
+  the 14z-91 legacy fix — UNREGISTERED, and no merged CONTENT gate has run on
+  it. That is the S6 list below.
+- **NOW THE TOP ITEM: qualify `build/m3b_merged8`.** It is a fresh 3-tenant
+  program image nothing has measured beyond the static gfx/HUD verifiers.
+  In cost order: `tests/test_merged_render_content.sh` (~25 min — H/P's only
+  render gate), `tests/audit_trap_parity.sh` + `tests/audit_fg_parity.sh` +
+  `tests/audit_select_bank_gates.sh`, then `tests/audit_merged_legacy.sh`
+  (~2 h; it builds its own gfx-free instrument, so it measures the PROGRAM
+  half either way). Freezing/registering at S6 is the maintainer's decision,
+  not a consequence of those going green.
 - The merged build now has its own class table, `tests/expected/merged1/` —
   read its README before touching a spec there, and do not copy a tenant
   set's line into it: the two tables are measurably not interchangeable,
@@ -119,7 +149,8 @@ tests/audit_walker_ghost.sh                    # ~5 min — the mask assumption
 tests/audit_walker_repoint.sh build/don_m7     # ~5 min — caller completeness
 tests/test_obj_walker_relocation.sh build/don_m7   # seconds, ROM-free
 tests/audit_legacy_pairings.sh                 # ~30 min — the coverage gate
-tools/build_merged.sh build/m3b_merged8        # BLOCKED on #75
+tests/test_obj_record_walk.sh                  # seconds, ROM-free — the #75 gate
+tools/build_merged.sh build/m3b_merged9        # ~1 min; m3b_merged8 already built
 ```
 
 ## Rebuild recipes

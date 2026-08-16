@@ -2147,3 +2147,61 @@ Rules now:
   `region_subst` and `callers` do. It is the existing idiom for a reason.
 - Extending `_minitoml` is not free: it must then match `tomllib`
   exactly, or the two hosts disagree about what a manifest means.
+
+## A pointer-shaped heuristic is placement-dependent — merged5 passed by luck (14z-92)
+
+`verify_gfx_build.py` compares a walk of the SOURCE anim region against a
+walk of the BUILT image. Both of `obj_records.walk`'s passes decide what
+is a record using predicates that ask about ADDRESSES, and placement
+moves the addresses out from under the same bytes:
+
+| pass | predicate | what moves |
+|---|---|---|
+| sweep | "does the long at +6 land in an aux region?" | the aux regions |
+| pointer | "does this 4-byte value land inside `[start,end)`?" | the region |
+
+14z-74 hardened the sweep (`sweep_allow`) and left the pointer pass
+re-deriving structure from the relocated image. #75 was the bill: the
+bytes `00 42 1e 94` at Huitzil's anim offset `0x1D160` STRADDLE one
+entry's attr and the next entry's tile inside a real record, and read as
+`0x00421E94`. The merged placement window `[0x41A7E0,0x438FE0)` contains
+that value; the source window and every solo placement do not. So the
+pass dereferenced it, landed on bytes that validated as `fmt=0 count=67`,
+and invented one record — +67 entries and 34 out-of-band tile codes,
+which aborted every merged build from merged6 on.
+
+**The tell that it was never a pointer: the longword is byte-identical in
+the source extract and in the build.** A real record pointer must be
+relocated (source base `0x245872` → placed `0x41A7E0`); an unrelocated
+value cannot be one. A second tell: its target offset tracks the
+placement base (`0x7784` at merged5's base, `0x76B4` at merged6's) —
+a real pointer's target offset is invariant.
+
+Rules now:
+- **A built-image walk VERIFIES the source's structure; it never
+  re-derives it.** Both passes now take the source's accepted offsets
+  (`sweep_allow`, `ptr_allow`), and `ptr_allow` also requires the target
+  to match, which catches a pointer relocated to the WRONG target — a
+  defect a count comparison is blind to (control D of the gate proves the
+  blindness rather than asserting it).
+- **"It was green before" is not evidence.** merged5 passed because the
+  same false longword resolved to bytes whose cptr happened to fail. The
+  14z-86 voice batch grew `wide_ext` by `+0xD0`, the window slid, and the
+  dice came up differently. Nothing gfx-related changed in that batch.
+- **A false-positive rate is a property of the placement, not of the
+  data.** The old comment claiming "false positives negligible in
+  record-zone data" was measuring one address. Do not re-derive structure
+  in an address space you did not measure in.
+- **The surface does not shrink — the dice re-roll.** Measured: 200
+  candidate heads are in-window in the built image and were not in the
+  source, and that count is IDENTICAL on merged7 (one validated, build
+  aborted) and merged8 (none validated, build clean). "The number went
+  down" is not what happened and is not what to look for.
+- Latent for every tenant: Pyron moved `+0x320` on the same build and was
+  simply lucky. Any allocator growth re-rolls it.
+- Corollary paid for in the same session: **the abort had already stopped
+  happening.** 14z-91 moved `anim@huitzil` again and the coincidence
+  dissolved, so `m3b_merged8` verifies green with the PRE-FIX tool. A
+  blocker nobody re-runs can quietly stop blocking — re-measure a
+  known-red gate before you build a session around it, and say so when
+  the fix turns out not to be what unblocked the work.

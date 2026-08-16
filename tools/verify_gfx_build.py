@@ -108,11 +108,19 @@ def main():
     # straddled reads that only look like pointers after placement moved the
     # aux regions (measured on Pyron: 8 straddles -> 11 phantom records and 8
     # out-of-band tiles, with the real pointer correctly relocated).
+    # 14z-92 (#75): the same treatment for the POINTER pass, which 14z-74
+    # left ungated — a straddled read inside a real record read as an
+    # in-region pointer once the merged placement window happened to
+    # contain its value, inventing one record, 67 entries and 34
+    # out-of-band tiles. `s_ptr` maps the source's accepted pointer
+    # offsets to their target offsets; the built walk must reproduce that
+    # mapping exactly. See obj_records.walk's docstring.
     s_sweep = []
+    s_ptr = {}
     _, s_entries, s_records = walk(
         src, src_base, src_base, src_end,
         lambda c: any(a <= c < b for a, b in aux_src),
-        sweep_lo, sweep_hi, sweep_seen=s_sweep)
+        sweep_lo, sweep_hi, sweep_seen=s_sweep, ptr_seen=s_ptr)
 
     out = open(data_path, "rb").read()
     # this tenant's aux placements only: bare keys for the first tenant,
@@ -120,20 +128,49 @@ def main():
     aux_dst = [(r["dst"], r["dst"] + r["len"])
                for n, r in pl["regions"].items() if n.startswith("aux")
                and (n.endswith(sfx) if sfx else "@" not in n)]
+    o_ptr, o_rej = {}, []
     tiles, o_entries, o_records = walk(
         out, 0, anim["dst"], anim["dst"] + anim["len"],
         lambda c: any(a <= c < b for a, b in aux_dst),
-        sweep_lo, sweep_hi, sweep_allow=set(s_sweep))
+        sweep_lo, sweep_hi, sweep_allow=set(s_sweep),
+        ptr_allow=s_ptr, ptr_seen=o_ptr, ptr_rejected=o_rej)
 
     fail = 0
     if (s_records, s_entries) != (o_records, o_entries):
         print(f"FAIL: record/entry parity src ({s_records},{s_entries}) "
               f"!= out ({o_records},{o_entries}) — header corruption "
               f"or walker drift")
+        # 14z-92: name the records, not just the counts. "1374 != 1375"
+        # cost a whole investigation (#75); a source record the built
+        # image does not reproduce is the actual defect shape (a
+        # clobbered format/count word makes its record undetectable).
+        gone = sorted(set(s_ptr) - set(o_ptr))
+        for p in gone[:8]:
+            print(f"    not reproduced: ptr +0x{p:x} -> record "
+                  f"+0x{s_ptr[p]:x}")
+        if len(gone) > 8:
+            print(f"    ... and {len(gone) - 8} more")
         fail = 1
     else:
         print(f"  ok: record parity ({o_records} records, "
               f"{o_entries} entries)")
+    # The coincidences themselves: candidates that validated as records in
+    # the BUILT image and that the source never accepted. Printed rather
+    # than hidden — #75 was exactly one of these, and it aborted every
+    # merged build from merged6 on.
+    # Grouped by target: the discovering datum is usually a repeating run
+    # (#75's was coordinate data at an 8-byte stride, so one coincidence
+    # reported from seven offsets). One line per phantom, not per read.
+    _byt = {}
+    for p, t in o_rej:
+        _byt.setdefault(t, []).append(p)
+    for t in sorted(_byt):
+        _ps = sorted(_byt[t])
+        _via = f"+0x{_ps[0]:x}" + (f" (and {len(_ps) - 1} more)"
+                                   if len(_ps) > 1 else "")
+        print(f"  note: placement coincidence rejected — record-shaped "
+              f"bytes at +0x{t:x}, reached from {_via}; not a source "
+              f"record")
     # session 14z-10: codes may also land in the protected-tile POOL
     # (manifest protected_tiles.json) — vanilla-vetted free positions the
     # exception allocator uses; and NEVER on a protected position.
