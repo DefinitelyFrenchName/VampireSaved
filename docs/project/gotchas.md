@@ -2205,3 +2205,44 @@ Rules now:
   blocker nobody re-runs can quietly stop blocking — re-measure a
   known-red gate before you build a session around it, and say so when
   the fix turns out not to be what unblocked the work.
+
+## A frozen build stops being a usable REFERENCE when the profile bumps (14z-92)
+
+`test_merged_render_content.sh` — H and P's only render gate — compared the
+merged build against `build/hui31`. WIDE v1.1 (14z-86) made the Z80 driver
+members `vsw.z01/z02` content members and v1.2 made `vsw.21m/22m` content
+members with sentinel CRCs, so MAME **refuses** any build frozen before
+that:
+
+```
+vsw.z01 NOT FOUND (tried in vsavjw vsav)
+vsw.21m WRONG CHECKSUMS: EXPECTED CRC(dec0de3a) FOUND CRC(1147406a)
+Fatal error: Required files are missing, the machine cannot be run.
+```
+
+The gate had therefore produced **no huitzil measurement at all since
+14z-86**, and it did not say so — it printed
+
+```
+FAIL: H band 0x40AF6 == hui31 — merged fnv=1060dc5353bfd8c9 != solo
+```
+
+i.e. a dead leg rendered as a **content regression on the build under
+test**, which is the opposite of the truth. With a live reference the same
+comparison passes byte-for-byte.
+
+Rules now:
+- **An empty operand is never a verdict.** A comparator must detect a
+  missing measurement and name it (`DEAD LEG`) before it compares. Same law
+  as the blind-watchpoint and dead-rig entries; this is its comparator form.
+- **A profile bump invalidates every frozen build as a REFERENCE**, even
+  though it invalidates none of them as a record. When a tenant is
+  re-frozen, or the WIDE profile version moves, re-point the gates that
+  name a build by path. HANDOFF's COMPAT note covers booting a build for
+  PLAYTEST; it did not cover builds used as silent gate references.
+- **`-verifyroms` cannot be the liveness check on this project's sets.**
+  Group-C descriptor CRCs are deliberate sentinels (`0xdec0de31..37`) and
+  content members resolve by NAME, so it reports every content build BAD —
+  including builds that boot and render perfectly. Tried as a fail-fast
+  precondition in 14z-92; it failed all four rompaths and was reverted. The
+  live check is whether the run produced its artifact.

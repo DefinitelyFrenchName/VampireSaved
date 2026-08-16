@@ -220,8 +220,21 @@ and type-6 change) + the S2 gfx chain (D → H → P, group B pristine) +
 the authored Z80/sample members (`vsw.z01/z02`, `vsw.21m` — both
 playback laws enforced). All three tenants verify (`verify_gfx_build` +
 `check_tenant_hud`). UNREGISTERED until the S6 freeze decision —
-run_suite refuses it, and **no merged content gate has run on it yet**
-(render-content, trap/FG parity, merged legacy audit are the S6 list).
+run_suite refuses it. **QUALIFIED 14z-92 on the artifact gates:**
+`test_merged_render_content` PASS (after its huitzil reference was
+repaired — see below), `audit_trap_parity` PASS, `audit_fg_parity`
+PASS, `audit_select_bank_gates` PASS. `audit_merged_legacy` NOT run —
+it builds its own gfx-free instrument from unchanged manifests, so on
+this tree it is a re-run of 14z-91's green 47/47 + 6/6 at the same 753
+ops, not coverage.
+**`test_merged_render_content`'s huitzil reference was DEAD** (14z-92):
+it named `build/hui31`, a pre-WIDE-v1.1 build MAME now refuses
+(`vsw.z01 NOT FOUND`), so H/P's only render gate had produced no
+huitzil measurement since 14z-86 — and printed the dead leg as a
+content mismatch against an empty value. Re-pointed to `hui41`;
+an empty operand is now reported as a DEAD LEG. **D and P still name
+`m5_wide`/`pyron21`: they boot today and are one profile bump from the
+same failure. Re-point a tenant's row whenever it is re-frozen.**
 `build/m3b_merged7` is superseded and was the build the #75 abort was
 measured on. Superseded merged intermediates (m3b_merged4/5, pre-v1.1)
 do not boot on current binaries without member injection. The pre-fix

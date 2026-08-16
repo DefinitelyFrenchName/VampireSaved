@@ -1,5 +1,54 @@
 # STATE — living progress log
 
+## Session 14z-92 (2) — merged8 QUALIFIED on the artifact gates, and a
+## second dead instrument found under the first: test_merged_render_content
+## had produced no huitzil measurement since 14z-86.
+
+| gate | verdict |
+|---|---|
+| `audit_select_bank_gates build/m3b_merged8` | PASS — all three `*_bank_variant_id` thunks gate every declarer (D 0x13/0x53, H 0x10/0x50, P 0x11/0x51) |
+| `audit_trap_parity build/m3b_merged8` | PASS |
+| `audit_fg_parity build/m3b_merged8` | PASS — FG damage native-parity |
+| `test_merged_render_content build/m3b_merged8/rompath` | PASS **after** the gate repair below |
+
+**THE RENDER GATE WAS BROKEN, NOT THE BUILD.** Its first run reported two
+FAILs, both huitzil, both with an **empty** solo value:
+
+    FAIL: H band  0x40AF6 == hui31 — merged fnv=1060dc5353bfd8c9 != solo
+    FAIL: strip   0x486A0 == hui31 ...            != solo
+
+The empty operand is the tell. Ran the reference leg directly and MAME refuses
+`build/hui31` outright — `vsw.z01 NOT FOUND`, `vsw.21m WRONG CHECKSUMS:
+EXPECTED CRC(dec0de3a) FOUND CRC(1147406a)`, `Fatal error: Required files are
+missing`. hui31 carries **zero** `vsw.z0*` members: it is a pre-WIDE-v1.1
+build, and v1.2 moved `vsw.21m/22m` as well. **So this gate has produced no
+huitzil measurement since 14z-86** — H/P's only render gate, blind on H for six
+sessions. The not-in-the-battery class, compounded by a dead instrument that
+looked exactly like a verdict on the build under test.
+
+Repaired: the H reference re-points `hui31` → `hui41` (huitzil-m15, the current
+frozen solo — labels included), and with a live leg the comparison **passes**:
+merged8's huitzil band and relocated strip are byte-equal to the solo's.
+`chk()` now names an empty operand a **DEAD LEG** with the profile-bump
+explanation instead of printing it as a content mismatch. The header records
+that a tenant re-freeze obliges a re-point here, and that D and P still name
+older builds which boot today but are one profile bump from the same failure.
+
+**MY OWN ERROR, recorded in place so it is not repeated:** I added a
+`-verifyroms` precondition to fail fast, and it failed ALL FOUR rompaths
+including merged8, which boots and renders. The group-C descriptor CRCs are
+deliberate SENTINELS (`0xdec0de31..37`) and content members resolve by NAME, so
+`-verifyroms` calls every content build bad. Reverted, with the reason written
+where the check would go.
+
+**NOT RUN: `audit_merged_legacy.sh`.** It would be a re-run, not coverage: it
+builds its own gfx-free instrument from the manifests and extracts rather than
+reading merged8's rompath, and the only commit touching those inputs since
+14z-91's full-green run (47/47, 6/6 at 753 ops) is this session's — whose
+`build_merged.sh` change is comment-only (verified: no non-comment line moved).
+merged8 is 753 ops, the same fixture. What it would still buy is a determinism
+check on the whole merged program build; that is real but low-yield at ~2 h.
+
 ## Session 14z-92 — GitHub #75 CLOSED: the merged gfx-verify abort was the
 ## 14z-74 phantom class in the pass 14z-74 did not harden. And the blocker
 ## had already dissolved on its own — which nobody knew.

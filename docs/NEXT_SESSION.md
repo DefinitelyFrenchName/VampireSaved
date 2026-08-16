@@ -101,14 +101,21 @@ The superseded framing, kept because it explains the shapes above:
   (`952fc731`, 753 ops) now exists** and is the first merged build carrying
   the 14z-91 legacy fix — UNREGISTERED, and no merged CONTENT gate has run on
   it. That is the S6 list below.
-- **NOW THE TOP ITEM: qualify `build/m3b_merged8`.** It is a fresh 3-tenant
-  program image nothing has measured beyond the static gfx/HUD verifiers.
-  In cost order: `tests/test_merged_render_content.sh` (~25 min — H/P's only
-  render gate), `tests/audit_trap_parity.sh` + `tests/audit_fg_parity.sh` +
-  `tests/audit_select_bank_gates.sh`, then `tests/audit_merged_legacy.sh`
-  (~2 h; it builds its own gfx-free instrument, so it measures the PROGRAM
-  half either way). Freezing/registering at S6 is the maintainer's decision,
-  not a consequence of those going green.
+- **`build/m3b_merged8` IS QUALIFIED on the artifact gates (14z-92):**
+  render-content, trap parity, FG parity and select-bank-gates all PASS.
+  Freezing/registering at S6 is yours to decide; nothing technical is
+  outstanding for it except the item below.
+  Repaired in the process: `test_merged_render_content` named `build/hui31`
+  as its huitzil reference — a pre-WIDE-v1.1 build MAME refuses — so H/P's
+  only render gate had produced **no huitzil measurement since 14z-86**, and
+  printed the dead leg as a content mismatch. Now points at `hui41` and
+  reports an empty operand as a DEAD LEG. **D and P still name `m5_wide` /
+  `pyron21`; re-point a row whenever that tenant is re-frozen.**
+- **OPTIONAL, ~2 h: `tests/audit_merged_legacy.sh`.** Deliberately not run.
+  It builds its own gfx-free instrument from the manifests and extracts, and
+  those are unchanged since 14z-91's full-green run (47/47, 6/6, 753 ops —
+  merged8 is the same 753). So it is a re-run, not coverage; what it would
+  still buy is a determinism check on the whole merged program build.
 - The merged build now has its own class table, `tests/expected/merged1/` —
   read its README before touching a spec there, and do not copy a tenant
   set's line into it: the two tables are measurably not interchangeable,
