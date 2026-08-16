@@ -881,6 +881,33 @@ dst_old_head = "01110b0209020803"
 # miscolor is the un-ported row-0x0E/0x0F intro fixture override
 # (vs2 0x3CB7DC block) — open item, see STATE.md 14z-19.
 
+# RETIRED 14z-91 (maintainer-decided): the two rows below are DELETED.
+# They were a root cause of the legacy regression that halted forward work
+# — replay 38_victor_p1_vsavj, attributed by tools/probe_hook_removal.sh.
+# The sites are shared by match intro AND attract (this row's own comment
+# said so), so LEGACY paid `jsr` + two abs.l `cmpi.b` + `lea` + `rts` on
+# EVERY venue load, on a frame already at the VBL edge; that tipped the
+# main loop into losing one iteration at f2317, and it never re-converged.
+#
+# What they bought: vs2's red statue ramp on palette row 0x0F. Row 0x0E is
+# byte-identical either way (verified: vsavj 0x3B5940 == vs2 0x3CB7DC for
+# 0x20 bytes), so only row 0x0F was ever re-themed. That is background prop
+# colour with no gameplay surface, and the 2026-08-15 scope ruling makes
+# cosmetic surfaces nice-to-have (the build targets 2P competitive play).
+# NO LIVE GATE ASSERTED IT: tests/test_don_accent.sh runs only from
+# run_battery_m2.sh against build/donovan6, the parked m2c track where the
+# tenant sits at cell 0x0F — on the m5 track that cell is Jedah and the
+# thunk never fired for that gate's replay.
+#
+# THE MECHANISM IS KEPT BELOW, not deleted: the eliminations and the RE
+# stay valid, and a cost-neutral re-assert from TENANT-OWNED code (the
+# init shim calling the engine's own copy helper 0x1C3A4 into staging row
+# 0x0F at $FF40E2, i.e. the fade's SOURCE rather than its destination)
+# remains available if the colour is ever wanted back. That route needs
+# one measurement first — does tenant char-init run AFTER the venue
+# fixture load? — and STATE.md:13824 says char-init runs DURING the VS
+# screen, so the answer is not obvious.
+#
 # 14z-20: PALETTE ROW 0x0F FIXTURE OVERRIDE (the statue's steady
 # miscolor + row-0x0F consumers). Mechanism (measured, STATE 14z-19):
 # every venue loads palette rows 0x0E/0x0F from the global fixture
@@ -902,21 +929,9 @@ dst_old_head = "01110b0209020803"
 # The six direct fixture sites (0xB06E, 0x1BF12/24, 0x1C1B6/C8,
 # 0x203D8) serve other venues where char-id staleness is unproven —
 # NOT hooked; add per-site only with a measured venue that needs it.
-[[site_thunk]]
-stage = 6
-name = "fixture_row0f_override_bank0"
-hole = "b"
-site = 0x01C586
-old_hex = "207c003b5940"
-thunk_hex = "0c3900TT00ff878267120c3900TT00ff8b82670841f9003b59404e7541fa00044e750d000fff0ddd0bbb033b054f065f076f02160111011201130115021602280000001d0fff0ddd0bbb0a220e320e430e5405000000010002000400050006110001"
-
-[[site_thunk]]
-stage = 6
-name = "fixture_row0f_override_bank1"
-hole = "b"
-site = 0x01C59A
-old_hex = "207c003b5940"
-thunk_hex = "0c3900TT00ff878267120c3900TT00ff8b82670841f9003b59404e7541fa00044e750d000fff0ddd0bbb033b054f065f076f02160111011201130115021602280000001d0fff0ddd0bbb0a220e320e430e5405000000010002000400050006110001"
+# (the two [[site_thunk]] rows fixture_row0f_override_bank0 / _bank1 stood
+# here until 14z-91; sites 0x01C586 and 0x01C59A are now VANILLA. Their
+# bodies are recoverable from git history if the re-assert route is taken.)
 
 # 14z-22: SELECT-SCREEN SWORD (round-34 item; full RE in STATE
 # 14z-21c). The select venue runs a dedicated companion KEEPER

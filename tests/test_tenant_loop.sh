@@ -122,12 +122,20 @@ echo "== 1: one tenant per run — the frozen op counts =="
 # chirp, reconciliation_huitzil.toml).
 # RE-FROZEN 14z-87 (D 265->270, H 300->305, P 234->239): THE VOICE-CLASS
 # BORROW fix, option (b)+(c) (maintainer-decided 2026-08-15) — +5 ops per
+# RE-FROZEN 14z-91: donovan 270 -> 266 and the merges 538 -> 534 / 738 -> 734.
+# The two fixture_row0f_override site_thunks were DELETED (a legacy-regression
+# root cause: their venue fixture-load sites are shared by match intro AND
+# attract, so legacy paid for them on every venue load). Each thunk is 2 ops
+# — body + site patch — so -4 on donovan and -4 on every merge carrying him.
+# Huitzil and pyron are unchanged: the type-6 tripwire edit landed in the
+# thunk BODY, which emits the same two ops.
+#
 # declaring tenant: the shared voice_borrow_keep_tenant site_thunk (2 ops:
 # body + jsr site, byte-identical rows deduped on merge) + the
 # voice_borrow_site_pad code_word (1 op: the stolen 4th word -> nop) + the
 # two per-tenant [[data_port]] candidate/voice-number table rows (2 ops).
 # All only_variant_slot-gated; the stock twin measured BIT-IDENTICAL.
-FROZEN_1="donovan:270 huitzil:305 pyron:239"
+FROZEN_1="donovan:266 huitzil:305 pyron:239"
 for row in $FROZEN_1; do
     who="${row%%:*}"; want="${row##*:}"
     case "$who" in donovan) ex="$D_EX" ;; huitzil) ex="$H_EX" ;; *) ex="$P_EX" ;; esac
@@ -199,8 +207,8 @@ check_n() {  # check_n <label> <dir> <want ops> <sum of 1-tenant counts>
 # +7 at N=2 (3 shared thunk/pad ops deduped + 2 data_port ops per tenant)
 # and +9 at N=3 (3 shared + 2x3 per-tenant), matching the +5-per-solo
 # delta above with the shared rows counted once.
-check_n "2 tenants" "$WORK/two"   538 570
-check_n "3 tenants" "$WORK/three" 738 785
+check_n "2 tenants" "$WORK/two"   534 570
+check_n "3 tenants" "$WORK/three" 734 785
 
 # ── 3: every tenant's own content is present ────────────────────────────
 # An op count alone cannot tell "both tenants ran" from "tenant 0 ran twice".

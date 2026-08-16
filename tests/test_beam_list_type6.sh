@@ -24,8 +24,14 @@
 #      So it is checked STATICALLY, here, against the vanilla image.
 #
 # The dynamic half of the watch lives in tests/audit_effect_class_rows.sh
-# section 4: the fallback bumps $FF010C, and that counter must stay zero on
-# legacy. If it ever moves, the deadness claim was wrong — stop and assess.
+# section 4. AMENDED 14z-91: it used to assert a counter at $FF010C stayed
+# ZERO on legacy. 14z-89 measured that the deadness claim was FALSE — legacy
+# lists do reach type 6, 387x on 21_don_mash and 948x on 26_don_arcade_mash
+# — and the fallback held, exactly as designed. But the counter is live work
+# RAM vanilla does not keep, so those replays could not re-converge with the
+# vanilla basis. The counter is REMOVED; §4 now watches the fallback's
+# EXECUTION against a FROZEN per-replay inventory, and drift in either
+# direction is the stop-and-assess event.
 #
 # Usage: tests/test_beam_list_type6.sh [builddir]     (default build/hui25)
 #        No emulator, no ROMDIR. Seconds.
@@ -73,6 +79,31 @@ else:
     bad(f"body is NOT the documented transcription; differs at {d[:12]}"
         f"{' …' if len(d)>12 else ''}")
 
+# 1a. THE EXEMPTED WORD MUST STILL RESOLVE. `theirs[0x24:0x26] = mine[...]`
+# above exempts the bsr.w displacement from the vs2 comparison because it is
+# local to our body — which means NOTHING checked where it actually lands.
+# That mattered the moment the body's length changed: 14z-91 removed the
+# $FF010C counter at +0x4A, and this bsr.w at +0x32 is the ONE branch that
+# crosses the cut (its target moved +0x60 -> +0x5C, displacement 0x2C ->
+# 0x28). Get it wrong and the fallback calls into the middle of a bne.s, on
+# legacy content, on exactly the two long mash replays most gate defaults
+# never run. So resolve it and demand it lands on the local child
+# dispatcher's head.
+bsr_disp = int.from_bytes(body[0x34:0x36], 'big')
+bsr_tgt = 0x34 + bsr_disp
+if body[0x32:0x34] != b'\x61\x00':
+    bad(f"expected bsr.w at body +0x32, found {body[0x32:0x34].hex()}")
+elif not (0 < bsr_tgt < len(body) - 4):
+    bad(f"bsr.w at +0x32 targets +{bsr_tgt:#x}, outside the {len(body):#x}-byte body")
+elif body[bsr_tgt:bsr_tgt + 4] != bytes.fromhex("0c500004"):
+    bad(f"bsr.w at +0x32 targets +{bsr_tgt:#x} = {body[bsr_tgt:bsr_tgt+4].hex()}, "
+        f"expected 0c500004 (cmpi.w #4,(a0) — the local child dispatcher head). "
+        f"A displacement that was not re-derived after a body-length change "
+        f"lands mid-instruction and is silent until legacy runs it.")
+else:
+    ok(f"bsr.w at +0x32 resolves to +{bsr_tgt:#x} = cmpi.w #4,(a0), the local "
+       f"child dispatcher")
+
 # ── 1b. the ported TYPE-4 handler: vsav's, with exactly two constants ───
 # The beam's middle piece is a list-type 4 — a procedural strip generator.
 # Two constants in it are game-specific, and BOTH had to change:
@@ -89,7 +120,7 @@ else:
 # (maintainer-approved: the old dst sat inside Pyron's native band — the one
 # real collision in the merged write set); it is now 0x3800, bias 0x7A00.
 print("1b. the ported type-4 handler is vsavj's with exactly the two constants")
-t4 = body[0x72:]
+t4 = body[0x6E:]   # was 0x72; -4 since 14z-91 removed the $FF010C counter
 src4 = bytearray(vj[0x01B61A:0x01B61A + 0x90])
 if len(t4) != len(src4):
     bad(f"ported type-4 is {len(t4):#x} bytes, vsavj's is {len(src4):#x}")
@@ -156,14 +187,25 @@ if van[:4] != b'\x3a\x18\xbe\x45':
 else:
     ok("vanilla head is move.w (a0)+,d5 ; cmp.w d5,d7 ; bcs.w")
 tail = body[0x4A:]  # composite is 0x3A bytes (bsr.w, as vs2)
-want_head = bytes.fromhex("526d810c") + b'\x3a\x18\xbe\x45'
-if tail[:8] != want_head:
-    bad(f"fallback head is {tail[:8].hex()}, expected tripwire + the two displaced instructions")
+# 14z-91: the fallback no longer bumps a work-RAM counter. `526d810c`
+# (addq.w #1,(-0x7EF4,A5) -> $FF010C) was removed from the head, so the
+# fallback now opens directly with the two displaced vanilla instructions
+# and every later field in this slice moved down by 4. The tripwire is not
+# gone, it moved instruments: audit_effect_class_rows.sh §4 watches the
+# fallback's EXECUTION (it already PC-attributes every hit) instead of a
+# counter's value, which is what returns 21_don_mash and 26_don_arcade_mash
+# to a strict vanilla basis. A counter in live work RAM vanilla does not
+# keep cannot be reconciled with the superset invariant.
+want_head = b'\x3a\x18\xbe\x45'
+if tail[:4] != want_head:
+    bad(f"fallback head is {tail[:4].hex()}, expected the two displaced instructions")
+elif body[:0x4A].find(bytes.fromhex("526d810c")) != -1 or tail.find(bytes.fromhex("526d810c")) != -1:
+    bad("the $FF010C tripwire counter write is still present in the body")
 else:
-    ok("fallback bumps the tripwire, then re-executes both displaced instructions")
+    ok("fallback re-executes both displaced instructions, no work-RAM counter")
 # the two absolute jumps must be the vanilla rejoin and the original bcs target
-rejoin = int.from_bytes(tail[0x0C:0x10],'big')
-skip   = int.from_bytes(tail[0x12:0x16],'big')
+rejoin = int.from_bytes(tail[0x08:0x0C],'big')
+skip   = int.from_bytes(tail[0x0E:0x12],'big')
 # a .w branch is relative to its EXTENSION WORD, not to the opcode word:
 # bcs.w sits at 0x01B6AE, its displacement word at 0x01B6B0.
 orig_skip = 0x01B6B0 + int.from_bytes(vj[0x01B6B0:0x01B6B2],'big')

@@ -1544,26 +1544,47 @@ note = "effect-class row 16 -> the ported vs2 row-16 handler family (the beam)"
 # renders correctly**; we merely pay a few cycles on a dispatch legacy is
 # measured never to make.
 #
-# AND IT ANNOUNCES ITSELF. That same path bumps a counter at RAM $FF010C.
-# tests/audit_effect_class_rows.sh asserts the counter stays ZERO, so the
-# first legacy use of type 6 is a GATE FAILURE — a stop-and-assess event by
-# construction, not something a human has to notice. Per the maintainer's
-# standing instruction: if that counter ever moves, or if any unexplained
-# vanilla rendering regression appears, THIS ROW IS A FIRST SUSPECT — stop,
-# analyse and re-assess before continuing.
+# AND IT ANNOUNCES ITSELF — BY EXECUTION, NOT BY A COUNTER (amended 14z-91,
+# maintainer-decided 14z-89 ruling (2)). The fallback used to bump a counter
+# at RAM $FF010C. The deadness claim it guarded turned out FALSE — 14z-89
+# measured legacy lists reaching type 6 on `21_don_mash` (387x) and
+# `26_don_arcade_mash` (948x) — and the design worked exactly as intended:
+# rendering stayed correct because the fallback runs vsav's own type-6 code.
+# But $FF010C/$FF010D is live work RAM vanilla does not keep, so those two
+# legacy replays could never re-converge with the vanilla basis and sat
+# `.pending`. The counter write is now REMOVED and
+# tests/audit_effect_class_rows.sh §4 watches the fallback's EXECUTION
+# instead — it already PC-attributes every hit, so it needs the event and
+# never the counter's value. Zero legacy RAM perturbation, no mask window.
+# The gate now holds a FROZEN per-replay execution inventory rather than
+# demanding zero: a gate that fails on a known-nonzero event is permanently
+# red and gets ignored. Drift in EITHER direction is the stop-and-assess
+# event, and per the maintainer's standing instruction THIS ROW IS A FIRST
+# SUSPECT for any unexplained vanilla rendering regression.
 #
 # THE SCRATCH IS AUDITED, NOT INHERITED. vs2's own A5 displacements land in a
 # live vsavj buffer ($FF3578-$FF3581, 39 accesses per match replay), so the
-# three slots and the tripwire were moved to $FF0100-$FF010D: 36 accesses in
-# vanilla, ALL of them the boot clear, none after frame 900 — measured on four
-# legacy replays and on our own build during the beam replay.
+# three slots were moved to $FF0100-$FF010B: 36 accesses in vanilla, ALL of
+# them the boot clear, none after frame 900 — measured on four legacy replays
+# and on our own build during the beam replay. ($FF010C/$FF010D was the
+# tripwire counter's slot and is no longer written at all, 14z-91.)
 #
-# THE BODY IS A TRANSCRIPTION. Offsets +0x10..+0x4B are vs2's 0x01A1FC handler
-# instruction-for-instruction; the only changes are the four scratch
-# displacements, `bsr.w 0x199DC` -> `jsr 0x0001AFAE.l` (the untouched vanilla
-# "list already in A0" drawer entry), and the loop-back displacement moving
-# 0xCC -> 0xCA because that call is two bytes longer. Verified against vs2 by
+# THE BODY IS A TRANSCRIPTION. Offsets +0x10..+0x49 are vs2's 0x01A1FC handler
+# instruction-for-instruction; the only changes are the scratch
+# displacements and `bsr.w 0x199DC` -> `jsr 0x0001AFAE.l` (the untouched
+# vanilla "list already in A0" drawer entry). Verified against vs2 by
 # tests/test_beam_list_type6.sh.
+#
+# BODY LENGTH 0x102 -> 0xFE (14z-91), removing `526d810c`
+# (`addq.w #1,(-0x7EF4,A5)` = the $FF010C tripwire counter) at +0x4A. ONE
+# branch crossed the cut and moved with it: the `bsr.w` at +0x32 to the
+# body's OWN local child dispatcher, displacement 0x2C -> 0x28 (target
+# +0x60 -> +0x5C). Everything else is unaffected — the two entry branches
+# at +0x06/+0x0E target +0x4A itself, which is still the fallback head
+# because the deleted bytes were AT the cut, and every branch after the cut
+# shifts wholesale so keeps its displacement. Both rejoin jumps are
+# ABSOLUTE (0x0001B6B2 / 0x0001B73C) and do not move. Machine-verified: the
+# full branch inventory maps one-to-one under the shift.
 [[site_thunk]]
 stage = 4
 name = "beam_list_type6"
@@ -1572,8 +1593,8 @@ old_hex = "3a18be456500"
 patch = "jmp"
 rts_ok = true
 region_subst = "aaaaaaaa=anim:0x0,bbbbbbbb=anim:0x1e800"
-thunk_hex = "b1fcaaaaaaaa6542b1fcbbbbbbbb643a3b5881002b4881082b4481043018082e0000000b67024440d8404844d858484420506100002c206d810841e80008282d8104536d81006acc4e75526d810c3a18be4565064ef90001b6b24ef90001b73c0c50000466065448600000084ef90001afae3a18be45650000889e453a1822182018162e000beb0b02030060b70108030006671034010242f000e04a06420010444090424844d044024003ff004010004840080300056710340102420f00e84a06420010444090424844d044024003ff806e001a4840162e000f4a2e000e670e6a02d6010241ff600243001f824306817a00000048d2000345ea000851cdff804e75"
-note = "take over vsav's list-type 6 for the composite lists; non-tenant lists fall through to vanilla type 6 + tripwire (NOT unused — legacy reaches it, measured 14z-89; the fallback is what keeps it correct)"
+thunk_hex = "b1fcaaaaaaaa6542b1fcbbbbbbbb643a3b5881002b4881082b4481043018082e0000000b67024440d8404844d8584844205061000028206d810841e80008282d8104536d81006acc4e753a18be4565064ef90001b6b24ef90001b73c0c50000466065448600000084ef90001afae3a18be45650000889e453a1822182018162e000beb0b02030060b70108030006671034010242f000e04a06420010444090424844d044024003ff004010004840080300056710340102420f00e84a06420010444090424844d044024003ff806e001a4840162e000f4a2e000e670e6a02d6010241ff600243001f824306817a00000048d2000345ea000851cdff804e75"
+note = "take over vsav's list-type 6 for the composite lists; non-tenant lists fall through to vanilla type 6 (NOT unused — legacy reaches it, measured 14z-89: 21_don_mash 387x, 26_don_arcade_mash 948x; the fallback is what keeps it correct). Diagnostic-only since 14z-91: no work-RAM counter, execution watched by audit_effect_class_rows.sh §4"
 
 # ── 14z-71: the 39 composite lists' TYPE WORD, 000C -> 0006 ───────────────
 # These are OUR OWN ported copies (region "anim"), never vsav data. Each row

@@ -45,7 +45,13 @@ WORK="$(mktemp -d)"
 trap 'rm -rf "$WORK"' EXIT
 
 MAME_REF="${MAME_REF_BIN:-$HOME/.cache/vampire-saved/mame-ref/cps2}"
-REPLAYS="${REPLAYS:-02_demitri_vs_cpu 07_mash_storm 09_mirror_pick 30_demitri_throw}"
+# WIDENED 14z-91. The four short rigs were the default for ten sessions and
+# are exactly why the type-6 deadness claim survived being false: neither of
+# the two replays that actually reach the fallback was ever run here.
+# 21_don_mash (387 entries) and 26_don_arcade_mash (948) are the long mash
+# rigs that found it. Removing them from the default would restore the blind
+# spot, so they stay; REPLAYS= still overrides for a quick pass.
+REPLAYS="${REPLAYS:-02_demitri_vs_cpu 07_mash_storm 09_mirror_pick 30_demitri_throw 21_don_mash 26_don_arcade_mash}"
 
 # frames: last scripted frame + tail, per replay
 frames_for() {
@@ -122,70 +128,141 @@ else
     fail=1
 fi
 
-# ── 4. THE TRIPWIRE: legacy never takes the type-6 fallback ────────────
+# ── 4. THE TRIPWIRE: how often does LEGACY take the type-6 fallback? ────
 # THIS IS THE STANDING WATCH THE MAINTAINER ASKED FOR (14z-71). Sections 1-3
 # measure absence, and absence of evidence is not evidence of absence — we
 # may simply have missed how vsav uses list-type 6. The build therefore does
 # not ASSUME the slot is dead: anything that is not one of our own lists
-# falls through to vsav's original type-6 code, and bumps a counter at
-# $FF010C on the way past. A write to that counter means a list we did not
-# author reached the taken-over type, i.e. the deadness measurement was
-# WRONG. Rendering is still correct (that is the point of the fallback), but
-# it is a STOP-AND-ASSESS event: do not carry on until it is understood.
+# falls through to vsav's original type-6 code.
 #
-# COUNT BY PC, NOT BY FRAME. The boot RAM test writes every byte of work RAM,
-# $FF010C included (frames 5-72, PCs 0x000D36/0x000D3C/0x000DDC), so a bare
-# write count reports five "tripwire hits" on a perfectly clean run — this
-# gate cried wolf the first time it ran. Filtering by frame would work but
-# would also blind the check during boot and attract. Instead the write must
-# come from INSIDE the placed thunk body, whose address is read from the
-# build's own atlas — so boot clears are excluded by construction and a real
-# arming is caught at any frame.
+# AND THE DEADNESS CLAIM WAS WRONG. 14z-89 measured legacy lists reaching
+# type 6 on `21_don_mash` (387x) and `26_don_arcade_mash` (948x). The
+# "safe and loud" design did its job — rendering stayed correct throughout,
+# because the fallback runs vsav's own code instruction-for-instruction —
+# and this is the DEADNESS REGISTER's first real hit.
+#
+# WHY IT WAS MISSED, and what changed here (14z-91): the default replay set
+# was the four short rigs below, and nobody pointed the gate at a long mash
+# rig. The two that arm it are now IN the default. That is the whole reason
+# the widening is not optional.
+#
+# WATCH EXECUTION, NOT A COUNTER (maintainer ruling 14z-89 (2)). The
+# fallback used to bump $FF010C. That is live work RAM vanilla does not
+# keep, so the two arming replays could never re-converge with the vanilla
+# masked basis and sat `.pending` — a permanent legacy divergence bought to
+# observe an event we can observe directly. The counter is gone; this
+# section breakpoints the fallback's ENTRY instead. Zero legacy RAM
+# perturbation, no new mask window.
+#
+# THE VERDICT IS A FROZEN INVENTORY, NOT ZERO. A gate that fails on a
+# known-nonzero event is permanently red and gets ignored, which is worse
+# than no gate. Drift in EITHER direction is the stop-and-assess event: a
+# new non-zero where zero was frozen means a fresh legacy path reached the
+# taken-over type; a count that moves on 21/26 means the drawer's traffic
+# changed.
+#
+# ADDRESSES ARE DERIVED, NEVER HARDCODED. The thunk's placed address and
+# length come from the build's own atlas (a hardcoded size once made this
+# fall back to an empty PC range and report a cheerful "unarmed" — the same
+# blind-instrument shape this whole file exists to prevent), and the
+# fallback's offset inside the body is decoded from the manifest's two entry
+# branches, which must agree with each other.
+FB_FROZEN="build/manifest/type6_fallback.toml"
 if [ -n "${BUILD:-}" ]; then
-    echo "4. the type-6 fallback tripwire (\$FF010C) is never armed on legacy"
+    echo "4. the type-6 fallback's EXECUTION matches its frozen inventory"
     [ -f "$BUILD/rompath/vsavjw.zip" ] || { echo "  FAIL: no $BUILD/rompath/vsavjw.zip"; fail=1; }
-    # size-agnostic: the body grows as pieces are added (0x62 -> 0x102 when
-    # the ported type-4 handler went in). A hardcoded size made this fall
-    # back to an empty PC range and report a cheerful "unarmed" — the same
-    # blind-instrument shape this whole file exists to prevent.
     THUNK=$(sed -n 's/^| `PRG:0x\([0-9A-Fa-f]*\)` | 0x[0-9A-Fa-f]* | GEN | site_thunk beam_list_type6 |.*/\1/p' \
-            "$BUILD/patch/atlas_fragment.md" | head -1)
-    THUNK_LEN=$(sed -n 's/^| `PRG:0x[0-9A-Fa-f]*` | 0x\([0-9A-Fa-f]*\) | GEN | site_thunk beam_list_type6 |.*/\1/p' \
             "$BUILD/patch/atlas_fragment.md" | head -1)
     if [ -z "$THUNK" ]; then
         echo "  FAIL: cannot find the beam_list_type6 thunk in $BUILD's atlas"; fail=1
-    else
-        echo "  (thunk body at 0x$THUNK; only writes from inside it count)"
     fi
-    THUNK_LO=$((0x$THUNK)); THUNK_HI=$((THUNK_LO + 0x${THUNK_LEN:-62}))
-    for r in $REPLAYS; do
+    # the fallback offset, decoded from the manifest body's two entry branches
+    FB_OFF=$(python3 - <<'PY'
+import re, sys
+b = bytes.fromhex(re.search(r'name = "beam_list_type6".*?thunk_hex = "([0-9a-f]+)"',
+                            open('build/manifest/huitzil.toml').read(), re.S).group(1))
+o1 = 0x06 + 2 + b[0x07]          # bcs.s  "not in our low region"
+o2 = 0x0e + 2 + b[0x0f]          # bcc.s  "not in our high region"
+if o1 != o2:
+    sys.exit(f"entry branches disagree: {o1:#x} vs {o2:#x}")
+print(o1)
+PY
+) || { echo "  FAIL: $FB_OFF"; fail=1; FB_OFF=""; }
+    if [ -n "$THUNK" ] && [ -n "$FB_OFF" ]; then
+        BP=$(printf '%x' $((0x$THUNK + FB_OFF)))
+        echo "  (thunk at 0x$THUNK, fallback entry +$(printf '0x%x' "$FB_OFF") -> breakpoint 0x$BP)"
+        got=""
+        for r in $REPLAYS; do
+            MAME_ROMPATH="$BUILD/rompath;$ROMDIR" \
+            WATCH="$BP,1,b" TRACE_OUT="$WORK/trip_$r.txt" FRAMES="$(frames_for "$r")" \
+            REPLAY="$REPO/tests/replays/$r.rpl" MAME_SANDBOX="$WORK/sbx_trip_$r" \
+            MAME_BIN="${MAME_BIN:-$HOME/.cache/vampire-saved/mame/cps2}" \
+                tools/run_mame.sh vsavjw -debug -debugger none \
+                -autoboot_script "$REPO/tests/lua/trace_writes.lua" \
+                > "$WORK/trip_$r.log" 2>&1 || { echo "  FAIL: $r run did not complete"; fail=1; continue; }
+            n=$(awk -v p="$BP" '$1=="frame" && $3=="PC" && tolower($4)==tolower(p)' \
+                "$WORK/trip_$r.txt" | grep -c '^' || true)
+            got="$got $r:$n"
+            want=$(sed -n "s/^$r = \([0-9]*\)$/\1/p" "$FB_FROZEN" 2>/dev/null | head -1)
+            if [ "${1:-}" = "--freeze" ]; then
+                echo "  measured: $r -> $n"
+            elif [ -z "$want" ]; then
+                echo "  FAIL: $r has no frozen expectation in $FB_FROZEN (measured $n)"
+                echo "        run with --freeze after REVIEWING the number"; fail=1
+            elif [ "$n" = "$want" ]; then
+                echo "  ok: $r -> $n fallback entries (frozen)"
+            else
+                echo "  FAIL: $r took the type-6 fallback $n time(s), frozen at $want."
+                echo "        DRIFT EITHER WAY IS A STOP-AND-ASSESS EVENT: a new"
+                echo "        non-zero means a legacy path reached the taken-over"
+                echo "        list-type 6 for the first time; a changed count means"
+                echo "        the drawer's traffic moved. Re-open the deadness claim"
+                echo "        before continuing. See build/manifest/huitzil.toml,"
+                echo "        site_thunk beam_list_type6."
+                fail=1
+            fi
+        done
+        # POSITIVE CONTROL, same instrument and same leg. The old counter
+        # design had one for free: the boot RAM test wrote $FF010C, so a
+        # totally dead watchpoint could not look clean. A breakpoint sees
+        # none of that, so arm one on a PC that MUST execute and require
+        # hits — otherwise "0 entries" and "bpset silently did nothing" are
+        # the same observation. 0x000D36 is one of the boot RAM-test PCs the
+        # old design had to filter OUT; here it is the liveness proof.
+        cr="$(echo "$REPLAYS" | awk '{print $1}')"
         MAME_ROMPATH="$BUILD/rompath;$ROMDIR" \
-        WATCH=ff010c,2,w TRACE_OUT="$WORK/trip_$r.txt" FRAMES="$(frames_for "$r")" \
-        REPLAY="$REPO/tests/replays/$r.rpl" MAME_SANDBOX="$WORK/sbx_trip_$r" \
+        WATCH="d36,1,b" TRACE_OUT="$WORK/ctl.txt" FRAMES=200 \
+        REPLAY="$REPO/tests/replays/$cr.rpl" MAME_SANDBOX="$WORK/sbx_ctl" \
         MAME_BIN="${MAME_BIN:-$HOME/.cache/vampire-saved/mame/cps2}" \
             tools/run_mame.sh vsavjw -debug -debugger none \
             -autoboot_script "$REPO/tests/lua/trace_writes.lua" \
-            > "$WORK/trip_$r.log" 2>&1 || { echo "  FAIL: $r run did not complete"; fail=1; continue; }
-        # POSIX awk has no strtonum, so convert the PC in the shell
-        n=0
-        for pc in $(awk '$1=="frame" && $3=="PC" {print $4}' "$WORK/trip_$r.txt"); do
-            v=$((0x$pc))
-            if [ "$v" -ge "$THUNK_LO" ] && [ "$v" -lt "$THUNK_HI" ]; then
-                n=$((n + 1))
-            fi
-        done
-        if [ "$n" = "0" ]; then echo "  ok: $r -> tripwire unarmed"
+            > "$WORK/ctl.log" 2>&1 || true
+        cn=$(awk '$1=="frame" && $3=="PC"' "$WORK/ctl.txt" 2>/dev/null | grep -c '^' || true)
+        if [ "${cn:-0}" -gt 0 ]; then
+            echo "  ok: instrument control — bpset arms under this romset ($cn hits at 0x000d36)"
         else
-            echo "  FAIL: $r armed the tripwire $n time(s) — A LEGACY LIST REACHED"
-            echo "        LIST-TYPE 6. Rendering is still correct (the fallback runs"
-            echo "        vanilla's own code), but STOP: re-open the type-6 deadness"
-            echo "        claim before continuing. See build/manifest/huitzil.toml,"
-            echo "        site_thunk beam_list_type6."
+            echo "  FAIL: instrument control DEAD — a breakpoint on the boot RAM test"
+            echo "        PC 0x000d36 reported no hits, so every '0 entries' above is"
+            echo "        meaningless. Fix the instrument before reading any verdict."
             fail=1
         fi
-    done
+        if [ "${1:-}" = "--freeze" ]; then
+            { echo "# build/manifest/type6_fallback.toml — FROZEN per-replay count of"
+              echo "# LEGACY entries into the type-6 fallback (14z-91). Regenerate with"
+              echo "# BUILD=<dir> tests/audit_effect_class_rows.sh --freeze, and REVIEW"
+              echo "# every number: this file is the record of how often vanilla content"
+              echo "# reaches a list-type we took over. Drift either way is a"
+              echo "# stop-and-assess event, never something to absorb."
+              echo "schema = 1"; echo
+              for kv in $got; do
+                  echo "${kv%%:*} = ${kv##*:}"
+              done
+            } > "$FB_FROZEN"
+            echo "  FROZE $FB_FROZEN"
+        fi
+    fi
 else
-    echo "4. tripwire check SKIPPED (set BUILD=build/hui20 to run it)"
+    echo "4. fallback-execution check SKIPPED (set BUILD=build/hui40 to run it)"
 fi
 
 echo

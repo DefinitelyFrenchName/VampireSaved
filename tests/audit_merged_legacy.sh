@@ -120,14 +120,14 @@ abspath() { case "$1" in /*) echo "$1";; *) echo "$PWD/$1";; esac; }
 
 if [ "$PREBUILT" = 1 ]; then
     echo "== B: PREBUILT merged artifact at $OUT (build skipped; shape"
-    echo "      asserted below — 738 ops, member identity) =="
+    echo "      asserted below — 734 ops, member identity) =="
     [ -f "$OUT/rompath/vsavjw.zip" ] || {
         echo "FAIL: MERGED_PREBUILT=1 but no $OUT/rompath/vsavjw.zip"; exit 1; }
     [ -f "$OUT/patch/patch.json" ] || {
         echo "FAIL: MERGED_PREBUILT=1 but no $OUT/patch/patch.json"; exit 1; }
     NOPS="$(python3 -c "import json;print(len(json.load(open('$OUT/patch/patch.json'))['ops']))")"
-    [ "$NOPS" = 738 ] || { echo "FAIL: $NOPS ops, frozen fixture is 738"; exit 1; }
-    echo "  ok: 738 ops (the frozen test_tenant_loop fixture; 14z-87 voice-borrow fix)"
+    [ "$NOPS" = 734 ] || { echo "FAIL: $NOPS ops, frozen fixture is 734"; exit 1; }
+    echo "  ok: 734 ops (the frozen test_tenant_loop fixture; 14z-87 voice-borrow fix)"
     python3 tools/audit_romset_identity.py "$OUT/rompath" || {
         echo "  FAIL: member-identity audit"; exit 1; }
     FP="$(python3 tools/build_fingerprint.py "$OUT/rompath;$ROMDIR" --set vsavjw --sha-only || true)"
@@ -156,12 +156,13 @@ NOPS="$(python3 -c "import json;print(len(json.load(open('$OUT/patch/patch.json'
 # (the m9 sound_stub op — the restored trap-detonation chirp); 729
 # since 14z-86 (the M5 voice batch: alias-thunk pokes + voice farm
 # stubs).
+# 734 since 14z-91 (was 738; the fixture row-0x0F override deleted, -4);
 # 738 since 14z-87 (the voice-borrow fix: shared keep-tenant thunk 2 +
 # site-pad code_word 1, deduped once, + 2 data_port table rows x3 tenants).
-if [ "$NOPS" = 738 ]; then
-    echo "  ok: 738 ops (the frozen test_tenant_loop fixture — same merge)"
+if [ "$NOPS" = 734 ]; then
+    echo "  ok: 734 ops (the frozen test_tenant_loop fixture — same merge)"
 else
-    echo "  FAIL: $NOPS ops, frozen fixture is 738 — the generator drifted;"
+    echo "  FAIL: $NOPS ops, frozen fixture is 734 — the generator drifted;"
     echo "        re-freeze test_tenant_loop.sh FIRST, then revisit this audit"
     exit 1
 fi

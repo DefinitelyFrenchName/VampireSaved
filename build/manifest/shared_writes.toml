@@ -49,7 +49,7 @@
 [[tenant]]
 name = "donovan"
 build = "build/don_m5"
-count = 71
+count = 69
 writes = [
   # 14z-87 (the voice-borrow fix, maintainer-decided b+c): the shared
   # engine borrow site (jsr + nop pad at 0x0AEF2/0x0AEF8 — the
@@ -63,8 +63,10 @@ writes = [
   "0x00c028 64 data",
   "0x018458 6 code",
   "0x0185ca 6 code",
-  "0x01c586 6 code",
-  "0x01c59a 6 code",
+  # 0x01c586 / 0x01c59a REMOVED 14z-91: the fixture row-0x0F override thunks
+  # are deleted (a legacy-regression root cause; those venue fixture-load
+  # sites are shared by match intro AND attract, so legacy paid for them on
+  # every venue load). Both sites are vanilla again.
   "0x021224 8 data",
   "0x02122c 8 data",
   "0x02123c 8 data",
