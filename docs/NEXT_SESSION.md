@@ -6,7 +6,11 @@
 > ## "100% clean, as is its sound", Phobos' historically-broken moveset
 > ## incl. ES variants all good. **S6 IS CLOSED.**
 > ##
-> ## Nothing is blocked. No build byte moved in 14z-93.
+> ## **BLOCKED (rule 6): #91 — a planted ILLEGAL is REACHABLE on
+> ## `merged-m1`.** Huitzil-only, deterministic, and a missing
+> ## reconciliation row (vs2 `0x494de`, a divide helper vsavj
+> ## already has at `0x47fb6`). No build byte moved in 14z-93 —
+> ## the fix is a re-freeze, so it is the maintainer's call.
 
 ## What 14z-93 was, in one line
 
@@ -62,6 +66,24 @@ three references rotted this session (`hui31`, `pyron20`, `pyron17`).
   performance-positive result. Do not cite the obj_hook cycles for it.
 
 ## START HERE — the open list, in order
+
+- **#91 — A PLANTED ILLEGAL IS REACHABLE ON `merged-m1`. RULE 6: this is
+  the only forward task until it is green.** Deterministic, reproduced,
+  HUITZIL-ONLY: `hui41` CRASH 14767 and `m3b_merged8` CRASH 8887, both the
+  tripwire for **unresolved vs2 `0x494de`**; Pyron and Donovan legs run
+  `END 40620` clean on both builds. Rig: `26_don_arcade_mash` (40,620-frame
+  arcade marathon) with the forced pick — the suite's tenant rigs are too
+  short to reach it and that replay picks a legacy character on its own,
+  which is why this was invisible.
+  **`0x494de` is a 32-bit software DIVIDE helper** (11 callers in vs2) and
+  **vsavj has the byte-identical routine at `0x47fb6`** — a missing
+  reconciliation row, not a missing feature. Choose the LIVE twin by
+  tracing (it appears twice; content-twin trap). Do NOT remove or widen the
+  tripwire — it is the detector, and 51 other deferred targets sit behind it.
+  Costs a huitzil + merged re-freeze, so the row is a maintainer decision.
+  Instrument: `tests/audit_tripwire_reach.sh`. Possibly the 14z-85f flaky
+  crash reset, unproven — and note that recipe's opponent was PYRON, so if
+  it is the same mechanism the trigger is the opponent's path.
 
 - ~~**GitHub #75 — `build_merged.sh` ABORTS on huitzil.**~~ **CLOSED 14z-92.**
   It was a VERIFIER artifact, not a build defect: `obj_records.walk`'s pointer

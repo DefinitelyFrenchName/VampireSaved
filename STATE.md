@@ -1,5 +1,63 @@
 # STATE — living progress log
 
+## Session 14z-93 (2) — A PLANTED ILLEGAL IS REACHABLE ON THE SHIPPING
+## MERGED BUILD. Found while trying to author a pool-vs-pool rig; it is
+## HUITZIL-ONLY, deterministic, and it is a missing reconciliation row.
+
+**RULE 6 APPLIES.** GitHub #91. Deterministic, reproduced, and present on
+`merged-m1` — the artifact that was frozen and field-played.
+
+| leg (`26_don_arcade_mash`, forced pick, 40,620 frames) | result |
+|---|---|
+| `hui41` + Huitzil | **CRASH 14767** `vec4 PC 0fb6e0` |
+| `m3b_merged8` + Huitzil | **CRASH 8887** `vec4 PC 456930` |
+| `pyron26` + Pyron, `don_m7` + Donovan | `END 40620` clean |
+| `m3b_merged8` + Pyron, + Donovan | `END 40620` clean |
+
+Both PCs are the planted tripwire for the SAME target, per each build's own
+fragment: `ILLEGAL TRIPWIRE for unresolved 0x494de`.
+
+**WHAT A TRIPWIRE IS, and why this had never been measured.** Every shipped
+build carries `--tripwire-open`, whose help text is the finding: *"route refs
+with missing/open reconciliation rows to per-target planted-ILLEGAL tripwires
+INSTEAD OF FAILING"*. They are deferred unreconciled references, loud by
+design — huitzil-m15 52, pyron-m9 31, donovan-m7 36, merged-m1 70. **Nothing
+had ever asked whether any is REACHABLE.** The tenant rigs are short and
+move-focused (all 37 ran clean in the census above); playtests are long but
+unscripted; and `26_don_arcade_mash` is a LEGACY pairing that picks a legacy
+character on its own — which is exactly why 14z-92 measured 228 hit-class
+entries on it without ever touching a tenant. It only exercises tenant code
+once the forced pick is added, and nobody had done that.
+
+**`0x494de` IS A 32-BIT SOFTWARE DIVIDE HELPER** (`moveq/add.l/addx.l/cmp.l/
+sub.l/dbf` ×32, `rts`), called from **11 sites** in vs2 — and **vsavj carries
+the byte-identical routine at `0x47fb6`**. So it is a MISSING RECONCILIATION
+ROW, not a missing feature: a ported path that needs a divide executes an
+ILLEGAL. Pick the LIVE twin by tracing, not by first byte match — it appears
+twice in vsavj (the content-twin trap).
+
+**NOT FIXED HERE, and deliberately.** The row moves the huitzil and merged
+fingerprints, so it is a re-freeze and therefore a maintainer decision
+(registry convention: rows are added at freeze time as a STATE decision).
+Measured, captured and filed instead.
+
+**Plausibly the 14z-85f flaky crash reset**, whose own structural read was
+"a tripwire firing here would be the instrument WORKING". Unproven — and note
+the recipe there was Donovan vs **Pyron** into COM Sasquatch, so if it is the
+same mechanism the trigger is the OPPONENT's path, not the player's. The next
+rig should be designed to tell those apart.
+
+**INSTRUMENT:** `tests/audit_tripwire_reach.sh` (on-demand, ~15 min, JOBS=3).
+Fails on any fire and resolves the faulting PC to its fragment line so the
+report names the target. Honest limit in its header: a PASS is RIG-BOUNDED,
+never "no tripwire is reachable".
+
+**HOW IT WAS FOUND, because the route matters.** Not by looking for it. The
+KEEP ruling left "author a pool-vs-pool contact rig" as coverage work; rather
+than author a trade blind, the cheap move was to reuse the rig already known
+to produce 228 pool-vs-pool contacts (`26_don_arcade_mash`) with the tenant
+forced into it. It produced no map entries — and crashed instead.
+
 ## Session 14z-93 — THE TENANT SIDE OF THE HIT-CLASS MAP, MEASURED. The
 ## number M4 asked for is ZERO — and that is an argument to KEEP the
 ## thunk, not to drop it, because 121 dangerous objects are in the pool.

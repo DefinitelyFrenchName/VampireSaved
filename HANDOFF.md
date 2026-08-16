@@ -698,6 +698,31 @@ tests/audit_hitclass_map_cost.sh      # 14z-82b ON-DEMAND (NO minute figure
                                       # HITCLASS_TENANT_ONLY=1 skips 1+2.
                                       # Verdict logic ground-truthed by
                                       # tests/test_classify_hitclass_probe.sh
+tests/audit_tripwire_reach.sh          # 14z-93 (GitHub #91) ON-DEMAND (~15 min,
+                                      # JOBS=3): DO ANY PLANTED TRIPWIRES
+                                      # FIRE IN EXTENDED PLAY? Every build
+                                      # carries --tripwire-open, which routes
+                                      # UNRECONCILED refs to planted ILLEGALs
+                                      # instead of failing (huitzil-m15 52,
+                                      # pyron-m9 31, donovan-m7 36,
+                                      # merged-m1 70). Nothing had measured
+                                      # whether any is REACHABLE. Runs the
+                                      # 40,620-frame arcade marathon
+                                      # 26_don_arcade_mash with the tenant
+                                      # FORCED (it picks a legacy character
+                                      # on its own — that is why this was
+                                      # invisible) on each frozen build.
+                                      # MEASURED: hui41 CRASH 14767 and
+                                      # m3b_merged8 CRASH 8887, both the
+                                      # tripwire for unresolved 0x494de (a
+                                      # 32-bit DIVIDE helper; vsavj has the
+                                      # byte-identical routine at 0x47fb6);
+                                      # pyron/donovan legs clean. Resolves
+                                      # the faulting PC to its fragment line
+                                      # so the report NAMES the target.
+                                      # FAILS on any fire (rule 6) — never
+                                      # counts them down. Honest limit in
+                                      # the header: a PASS is RIG-BOUNDED
 tests/audit_trap_sound.sh             # 14z-82d, RE-SCOPED 14z-85g (~10 min):
                                       # the MK Plasma Trap SPAWNS (type-69
                                       # pool write) and the sound RING is
