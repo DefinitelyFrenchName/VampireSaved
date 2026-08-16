@@ -45,11 +45,14 @@
 # FAILS on it while printing the measured shape and a proposed expectation
 # line, and never widens a tolerance. A PERMANENT class on a legacy replay
 # is a superset-invariant violation and halts forward work (CLAUDE.md §2.6).
-# Exactly ONE merged-specific expectation has been through that process and
-# is signed: 04_select_fuzz, composite {1525,2005,2009,2195} / 889-1104,
-# ratified by the maintainer 2026-08-12 (14z-82d) with the mechanism named
-# ($FF0460 sound-driver record-pointer spill). It is encoded inline in the
-# leg-(a) loop; everything else still fails loudly.
+# SINCE 14z-91 the merged build has its OWN class table
+# (tests/expected/merged1) and there are no inline overrides at all. It
+# used to carry three, signed one at a time; when the legacy-regression
+# fix took the count to eight, that fired the question this file had
+# pre-registered — "a fourth should prompt: does the merged build want
+# its own class table?" — and the maintainer ruled that it does. Every
+# deviation from that table still fails loudly with a measured shape and
+# a proposed line, and is a RATIFICATION question, never a re-freeze.
 #
 # Usage: ROMDIR=... [MAME_BIN=...] tests/audit_merged_legacy.sh
 # On-demand: builds build/merged1 and runs the legs below (~2 h since
@@ -268,7 +271,6 @@ echo "  ok: two masked runs of 03_two_player_vs bit-identical"
 echo "== 1 (leg a): merged vs VANILLA on the masked-v2 basis — the superset"
 echo "      question. Expectation: the merged build's OWN ratified"
 echo "      classes in tests/expected/merged1 (14z-91),"
-echo "      plus the ratified merged-04 inventory (14z-82d). =="
 # --- ENUMERATE (14z-90, GitHub issue #17) --------------------------------
 # The glob below evaluates *.masked ONLY, and said nothing about anything
 # else in the directory. `.pending` marks a legacy pairing with NO ratified
@@ -311,7 +313,6 @@ for spec in "$EXPECT"/*.masked; do
     name="$(basename "$spec" .masked)"
     printf '%-24s ' "$name"
     sline="$(cat "$spec")"
-    # MERGED-ONLY RATIFIED EXPECTATION (maintainer, 2026-08-12, 14z-82d).
     # THE THREE MERGED-ONLY INLINE OVERRIDES WERE REMOVED 14z-91.
     # They lived here because the merged instrument is unregistered by
     # design and so had no set of its own. After the legacy-regression fix
@@ -487,7 +488,7 @@ if [ "$fail" != 0 ]; then
 fi
 echo "PASS: the 3-tenant merged program image lands on the ratified legacy"
 echo "      classes VERBATIM for the pairings that HAVE one (leg a; 04 on its ratified merged-specific"
-echo "      inventory, 14z-82d), and each tenant's own content forms"
+echo "      and each tenant's own content forms"
 echo "      matches, survives the crash guard, and leaves boot/attract"
 echo "      untouched relative to its frozen single-tenant build (leg b)."
 echo "      This proves LEGACY SAFETY of the merge only — tenant correctness"
