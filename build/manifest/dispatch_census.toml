@@ -1,7 +1,24 @@
 # build/manifest/dispatch_census.toml — FROZEN legacy dispatch
 # observation for the two obj_hook sites (14z-89). Regenerate with
-# tests/audit_dispatch_census.sh --freeze. A NEW index here means the
-# free list shrank: re-review any repoint that relied on it.
+# tests/audit_dispatch_census.sh --freeze.
+#
+# WHAT THIS IS NOT, corrected 14z-91: it is NOT a free list. The
+# complement of `observed` was read as "50 and 83 indices a tenant type
+# could be repointed onto". A pool-attributed STATIC sweep — scanning
+# forward from every call site of each pool's allocator (0x16F8E for
+# $FF9400, 0x16FBA for $FFB800) — measured the TRUE free lists at
+# **1 index and 6**. This corpus touches 9 of 58 real spawn types at
+# 0x54470 and 31 of 108 at 0x5E542; the rest are live types this corpus
+# simply never spawns. Same coverage artefact as the falsified list-type
+# 6 deadness claim, about 40x larger.
+#
+# The obj_hook fix therefore does NOT repoint onto vanilla indices — it
+# relocates the WALKER and leaves the dispatch site vanilla (14z-91), so
+# a tenant type stays >= the vanilla entry count, where a vanilla object
+# cannot reach it BY CONSTRUCTION.
+#
+# The census is still worth keeping and still fails on a NEW index: it is
+# the drift detector for which types legacy actually spawns.
 schema = 1
 
 [[site]]

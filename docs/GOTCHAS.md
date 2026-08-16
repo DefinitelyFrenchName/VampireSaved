@@ -14,6 +14,13 @@ one your current task belongs to. A trap you hit while porting Huitzil
 is a GAME gotcha if it is true of the game regardless of the port.
 
 
+### appended 14z-91 (project bucket)
+- The masked-basis canary corrupted the basis it verified (sandbox reuse)
+- awk compares hex fields as NUMBERS when they happen to look numeric
+- `_minitoml` accepts no arrays, and only on Python < 3.11
+### appended 14z-91 (platform bucket)
+- A pc-relatively-read table must be a `code` op at ANY address
+
 ## Game — Vampire Savior (`game/gotchas.md`)
 
 - OBJ record formats differ in ENTRY STRIDE, not just header meaning

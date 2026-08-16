@@ -1567,6 +1567,67 @@ else a tripwire so an unported type is LOUD).
 space, so decode them from the **OPCODE view**. The data view yields
 garbage (this is the same class as the win-screen remap table).
 
+**HOW THE UNION TABLE IS REACHED: the walker is relocated, the dispatch
+site is not patched (14z-91).** The extended table cannot live at the
+vanilla table's address — live code follows both (`0x054570`,
+`0x05E71E`, and `0x05E71E` is entry 0's own target as well as another
+`jmp (d8,PC,Dn.w)` dispatcher). The obvious answer, and the one that
+shipped for many sessions, is to put the union table in free space and
+replace the 6 vanilla bytes at the dispatch site with `jmp thunk`.
+
+**That hook is a legacy-cycle cost and it was a superset-invariant
+regression.** Site `0x05E542` dispatches **270,991 times** across the
+49-replay legacy corpus (`0x054470` 8,586 times, in only 5 of 49
+replays). The added jumps tipped frames already sitting at the VBL edge,
+the main loop lost or gained one iteration, and because replay inputs are
+scheduled by FRAME the streams never re-converged — reaching HP and
+position differences. Attributed by removal experiment
+(`tools/probe_hook_removal.sh`).
+
+The fix is to relocate the WALKER instead. Each dispatch site is the tail
+of a 0x2C-byte pool walker (`0x54458`, `0x5E52A`), so the generator copies
+the walker verbatim into free space, appends the union table at
+copy+0x2C, and rewrites only the 4-byte OPERAND of every
+`jsr <walker>` — 2 callers for the small site, 21 for the large one, and
+`tools/audit_walker_callers.py` proves that is the complete set (no data
+longword anywhere equals either walker address, no pc-relative
+jsr/jmp, and every branch hit is the walker's own loop).
+
+It works because `site == walker + 0x18` and the dispatch is
+`movea.l (0x12,PC,D0.w),A0`: 0x18 + 2 + 0x12 = 0x2C, so **the copy's own
+instruction lands on the copy's own table by construction**.
+
+Legacy cost is then zero by construction rather than by census: identical
+opcodes in identical order, and `jsr abs.l` costs the same whatever its
+operand while `movea.l (d8,PC,Dn.w)` costs the same wherever PC points.
+Measured either side of the move, the dispatch counts are IDENTICAL
+(1243 and 40236 on the same replay set), with the vanilla entries silent.
+
+Exactly one byte of state differs — the `jsr (A0)` pushes copy+0x20
+instead of walker+0x20. `tests/audit_walker_ghost.sh` measured A7 at both
+walkers as a **constant 0xff7ff6** over 279,577 dispatches in all 49
+corpus replays, so that longword lands at 0xff7ff2-0xff7ff5, inside the
+masked dead-stack window `$FF7F00-$FF7FFF`.
+
+Two things a repeat of this work will get wrong:
+- **the table must be emitted as a `code` op** once a relocated walker
+  reads it pc-relatively (it was `data` while a thunk read it
+  An-relatively). See `docs/platform/gotchas.md`.
+- **hole_a is FULL on a 3-tenant merge**, so the allocation must be
+  allowed to follow its fallback chain — which is safe, because `code` is
+  the correct op kind in raw space too.
+
+**Why not repoint tenant types onto "never dispatched" table entries?**
+Because the free lists are not free. `build/manifest/dispatch_census.toml`
+records 50 and 83 indices never observed across the legacy corpus, but a
+pool-attributed STATIC sweep (scanning forward from every call site of
+each pool's allocator — `0x16F8E` for `$FF9400`, `0x16FBA` for `$FFB800`)
+finds the true free lists are **1 index and 6**. The corpus touches 9 of
+58 real spawn types at one site and 31 of 108 at the other. That is the
+same coverage artefact that falsified the list-type 6 deadness claim,
+about 40x larger — and it would have traded a guarantee (a vanilla object
+CANNOT carry a type >= the vanilla entry count) for an inference.
+
 ### The shared-type trap, and `[[obj_hook_extra]]`
 Row 8 of the big table is the COMPANION machine — vsavj `0x606AC`,
 vs2 `0x6CAC0` — and **vs2 rewrote its own row 8**. So a tenant's

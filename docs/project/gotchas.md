@@ -2083,3 +2083,67 @@ Rules now:
   never populate a fighter block) but its timer-forced pick lands on
   vanilla's character — measured LEGACY, promoted. Assumption would have
   left it in the hole.
+
+## The masked-basis canary corrupted the basis it verified (14z-91)
+
+`tools/freeze_masked_basis.sh`'s `freeze_one()` derived its MAME sandbox
+paths from the replay NAME alone (`$WORK/sb_${_n}_$_i`), and
+`tools/run_mame.sh` treats an explicit `MAME_SANDBOX` as **deliberate
+reuse** — its own header says so ("to test nvram-carrying scenarios"). So
+calling `freeze_one` twice for one name in a single invocation handed the
+second call the first call's `cfg/` and `nvram/eeprom`.
+
+That is not an exotic ordering. It is exactly what the canary command
+`docs/NEXT_SESSION.md` documents does, because the name appears twice —
+once as `VERIFY_BASIS`, once in the freeze list:
+
+```
+verify leg  (fresh sandboxes) -> reproduces the frozen log BIT-FOR-BIT
+freeze leg  (dirty sandboxes) -> diverges at frame 73, and WRITES
+```
+
+Both legs are internally deterministic, so `freeze_one`'s own pair-`cmp`
+and the instrument control were both green while the baseline moved —
+4248 of 4321 lines. The tool printed "ok: reproduces ... bit-for-bit" and
+then silently redefined the thing it had just verified, which is the
+precise failure its own docstring warns against.
+
+Rules now:
+- **Clear a sandbox before every run** unless nvram carry-over is the
+  point. Fixed in the tool; gated by `tests/test_freeze_basis_sandbox.sh`,
+  whose verdict control reconstructs the pre-fix tool and requires it to
+  reproduce the defect.
+- **"The instrument control passed" is not "nothing moved".** Check
+  `git status` on the artifact after running anything that can write it.
+
+## awk compares hex fields as NUMBERS when they happen to look numeric (14z-91)
+
+A gate parsing `SP %06x hits %d` lines with `awk '$2 == s'` reported the
+correct count for site `54476` and a confident **0** for its twin
+`5e548` — from the same file, same run, same instrument.
+
+`"054476"` vs `"54476"`: both look numeric, so awk compares them
+NUMERICALLY and they match. `"05e548"` vs `"5e548"`: awk's numeric
+interpretation is scientific notation, and the comparison does not land
+the same way — so the field silently never matches.
+
+Rules now:
+- **Normalise both sides to the same width in the shell** (`printf '%06x'`)
+  and force a string comparison (`($2 "") == (s "")`).
+- A per-site zero next to a per-site correct number is the signature. A
+  blind instrument and a real zero look identical — if one site of a
+  matched pair reads 0, suspect the parser before the finding.
+
+## `_minitoml` accepts no arrays, and only on Python < 3.11 (14z-91)
+
+`tools/_minitoml.py` supports exactly string / int / bool, and
+`loads()` delegates to `tomllib` when the host has it. So a manifest row
+using a TOML array parses fine on Python 3.11+ and raises
+`unsupported value syntax: [` on 3.9 — a portability split that appears
+only on the older host.
+
+Rules now:
+- **Encode lists as comma-separated STRINGS** in manifests, as `regions`,
+  `region_subst` and `callers` do. It is the existing idiom for a reason.
+- Extending `_minitoml` is not free: it must then match `tomllib`
+  exactly, or the two hosts disagree about what a manifest means.

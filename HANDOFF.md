@@ -906,22 +906,28 @@ tests/audit_dispatch_census.sh        # 14z-89: WHICH type indices does
                                       # breakpoint per site, D0/4 = the
                                       # index, SET-accumulated so a site
                                       # firing 270k times costs one line.
-                                      # Feeds the option-(b) fix: a tenant
-                                      # type on a never-dispatched entry is
-                                      # a pure DATA repoint = ZERO legacy
-                                      # cycles, where any code hook there
-                                      # tips VBL-edge frames. Measured:
-                                      # 0x054470 9 observed / 50 free (17
-                                      # needed), 0x05E542 31 / 83 (10).
-                                      # FROZEN in build/manifest/
+                                      # Measured: 0x054470 9 types observed,
+                                      # 0x05E542 31. FROZEN in build/manifest/
                                       # dispatch_census.toml — a NEW index
-                                      # FAILS (the free list shrank).
-                                      # HONEST LIMIT in the header: 0x054470
-                                      # fires in only 5/49 replays and the
-                                      # curve has NOT converged, so this is
-                                      # a BOUND not a proof — pair it with
-                                      # the static stamp census before any
-                                      # repoint ships. ~2 min, JOBS-parallel
+                                      # FAILS.
+                                      # THE COMPLEMENT IS NOT A FREE LIST
+                                      # (corrected 14z-91). It was read as
+                                      # "50 and 83 indices a tenant type can
+                                      # take over"; a pool-attributed STATIC
+                                      # sweep (forward from each pool's
+                                      # allocator, 0x16F8E / 0x16FBA) puts
+                                      # the TRUE free lists at 1 and 6. This
+                                      # corpus reaches 9 of 58 real spawn
+                                      # types at one site and 31 of 108 at
+                                      # the other — the same coverage
+                                      # artefact that falsified list-type 6,
+                                      # ~40x larger. NO REPOINT SHIPPED ON
+                                      # IT: the 14z-91 fix relocates the
+                                      # WALKER instead (see obj_hook in
+                                      # patch_index), so tenant types stay
+                                      # above the vanilla entry count where
+                                      # vanilla cannot reach them BY
+                                      # CONSTRUCTION. ~2 min, JOBS-parallel
 tools/probe_hook_removal.sh           # 14z-89: CAUSAL attribution for a
                                       # legacy-cycle regression — rebuild a
                                       # tenant with named hooks REMOVED and
@@ -998,9 +1004,15 @@ tests/audit_objhook_owner_census.sh   # 14z-81b: which OWNER does each extended
                                       # dispatch while the same frame's dump
                                       # shows 0x84 — TIME-VARYING; 114/116/
                                       # 118/120 not observed (says so rather
-                                      # than guessing). Probes the build's own
+                                      # than guessing). Probed the build's own
                                       # obj_hook thunk (D0 still type*4 there;
-                                      # at site+6 it is already cleared)
+                                      # at site+6 it is already cleared).
+                                      # STALE SINCE 14z-91: there is no
+                                      # obj_hook thunk any more — the walker
+                                      # is relocated and the dispatch site is
+                                      # vanilla. Re-point this probe at the
+                                      # RELOCATED walker's dispatch
+                                      # (copy+0x18) before trusting it
 tests/test_tenant_row_owner.sh [ex]   # 14z-77 (M3b slices C+D): is the row-OWNER
                                       # threading LOAD-BEARING? Every slice of the
                                       # multi-tenant refactor is INERT by design, so

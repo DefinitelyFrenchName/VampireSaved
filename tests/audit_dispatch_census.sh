@@ -17,9 +17,18 @@
 # dispatched index (D0 holds index*4 AT the site and is cleared right after).
 #
 # THE FROZEN INVENTORY (build/manifest/dispatch_census.toml) is the point.
-# A NEW type observed = the free list just shrank = the deadness claim behind
-# a shipped repoint needs re-review, and this FAILS so nobody finds out from
-# a playtest. Drift is never absorbed silently.
+# A NEW type observed = this corpus just grew a spawn it never had, and this
+# FAILS so nobody finds out from a playtest. Drift is never absorbed silently.
+#
+# CORRECTED 14z-91 — THE COMPLEMENT IS NOT A FREE LIST, AND NO REPOINT
+# SHIPPED ON IT. The "50 and 83 never observed" figures below were read as
+# indices a tenant type could take over. A pool-attributed STATIC sweep
+# (forward from every call site of each pool's allocator: 0x16F8E for
+# $FF9400, 0x16FBA for $FFB800) measured the TRUE free lists at 1 and 6.
+# This corpus reaches 9 of 58 real spawn types at 0x54470 and 31 of 108 at
+# 0x5E542. The obj_hook fix relocates the WALKER instead and leaves the
+# dispatch site vanilla, so tenant types stay above the vanilla entry count
+# where a vanilla object cannot reach them BY CONSTRUCTION.
 #
 # COVERAGE IS THE WEAK PART, AND IT IS STATED RATHER THAN HIDDEN. Measured
 # 14z-89: site 0x054470 fires in only 5 of 50 replays — 21/22/23/24/26, the
@@ -64,7 +73,10 @@ W="$W" FROZEN="$FROZEN" python3 - "${1:---check}" <<'PY'
 import glob, os, re, sys
 W, FROZEN = os.environ["W"], os.environ["FROZEN"]
 mode = sys.argv[1]
-NEED = {0x54470: 17, 0x5e542: 10}     # entries the three tenants need today
+# RETIRED as a budget (14z-91): nothing is allocated from the complement
+# any more — see the header. Kept only so the report still says how many
+# entries the tenants add, which is a useful sanity line next to the counts.
+NEED = {0x54470: 17, 0x5e542: 10}     # entries the three tenants ADD today
 sites, per_replay, incomplete = {}, {}, []
 for f in sorted(glob.glob(f"{W}/*.txt")):
     name = os.path.basename(f)[:-4]
@@ -103,8 +115,9 @@ for a in sorted(sites):
     print(f"\n=== site {a:#08x}: {s['n']} entries, {s['hits']:,} dispatches in "
           f"{s['live']}/{len(glob.glob(f'{W}/*.txt'))} replays")
     print(f"    OBSERVED {len(seen)}: {seen}")
-    print(f"    NEVER OBSERVED {len(free)} (need {NEED.get(a,0)}): "
-          f"{'ENOUGH' if len(free) >= NEED.get(a,0) else 'NOT ENOUGH'}")
+    print(f"    NEVER OBSERVED IN THIS CORPUS {len(free)} "
+          f"(tenants add {NEED.get(a,0)} entries ABOVE the vanilla count) — "
+          f"NOT a free list, see the header")
     if s["live"] <= 5:
         print(f"    NOTE: only {s['live']} replays reach this site — "
               f"a thin base for a deadness claim; see the header")

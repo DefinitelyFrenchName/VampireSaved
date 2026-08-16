@@ -897,3 +897,34 @@ timed-out CPU match for two sessions). Verify a rig produces the EVENT
 (snapshot the screen, read the ring) before believing any capture of it,
 and when a report says "synthetic beep", think TIGHT LOOP / impulse train,
 not sample content.
+
+## A pc-relatively-read table must be a `code` op at ANY address (14z-91)
+
+`patch_prg.py` has two byte-emitting op kinds and they are not "inside vs
+outside the crypt window":
+
+- `data` stores the bytes verbatim;
+- `code` runs `cipher.crypt_words_at(..., decrypt=False)`, which is
+  **address-aware** — inside the CPS-2 key range it re-encrypts so the
+  CPU's decryption yields your bytes, and outside it returns them
+  unchanged, "matching how the CPU would fetch them"
+  (`tools/cps2_decrypt.py:325-330`).
+
+So the choice is decided by HOW THE BYTES ARE READ, not by where they
+land. Anything the 68000 fetches through AS_OPCODES — instructions, and
+every pc-relative table read (`movea.l (d8,PC,Dn.w)`, `move.w (d8,PC,Dn.w)`)
+— must be a `code` op wherever it goes. `data` is right for An-relative
+and absolute DATA reads only.
+
+The trap has both directions:
+- the obj_hook type table was correctly `data` while a thunk read it
+  An-relatively, and had to become `code` the moment a relocated walker
+  read it pc-relatively;
+- embedded data inside a thunk body in crypt space must be `data`
+  (`build/manifest/donovan.toml` hole "b" note) or a data read gets
+  ciphertext.
+
+Corollary: `alloc(..., fallback=False)` is NOT the way to keep a
+pc-relative table out of raw space. There is nothing to keep it out of —
+`code` is correct in raw space too. Forcing no-fallback instead makes
+every 3-tenant merge fail to generate, because hole_a is full.
