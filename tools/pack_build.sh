@@ -32,6 +32,19 @@ mkdir -p "$OUT"
 STAGE="$(mktemp -d)"
 trap 'rm -rf "$STAGE"' EXIT
 cp "$SRC"/*.* "$STAGE"/ 2>/dev/null || true
+# 14z-90 (GitHub issue #55). That `|| true` swallows a failed copy, and the
+# pack then proceeds over an EMPTY stage. On the --merge path the result is
+# worse than an empty zip: the merge fills it with the reference members, so
+# the artifact is a PRISTINE set whose program fingerprint equals the
+# registered VANILLA vsavj row — run_suite.sh would dispatch it to the vanilla
+# expectation set and read GREEN. A build that produced nothing must not be
+# packable, and must certainly not impersonate vanilla.
+_pb_n=$(ls -1 "$STAGE" 2>/dev/null | wc -l | tr -d ' ')
+[ "${_pb_n:-0}" -gt 0 ] || {
+    echo "pack_build.sh: no program members copied from $SRC — refusing to" >&2
+    echo "  pack. On the --merge path this would produce a set that" >&2
+    echo "  fingerprints as VANILLA and dispatch to the vanilla expectations." >&2
+    exit 1; }
 if [ -n "$MERGE" ]; then
     [ -f "$MERGE" ] || { echo "pack_build.sh: no merge zip at $MERGE" >&2; exit 1; }
     MSTAGE="$(mktemp -d)"

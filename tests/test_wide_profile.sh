@@ -50,7 +50,7 @@ python3 tools/build_fingerprint.py "$ROMDIR" --set vsavj --full \
 
 echo "== 1. emulator superset invariant (stock vsavj: reference binary vs WIDE binary) =="
 if [ -n "${FBNEO_REF:-}" ] && [ -x "${FBNEO_REF}" ] \
-   && grep -q "CPS-2 WIDE v1" "${FBNEO_REF}" 2>/dev/null; then
+   && strings -a "${FBNEO_REF}" 2>/dev/null | grep -q "CPS-2 WIDE v1"; then
     # Paid for 14z-59e: `WIDE=0 tools/setup_fbneo.sh` used to only SKIP
     # applying the profile patch, never revert it, so a reference built from
     # a tree that already carried it came out WITH the profile. Section 1

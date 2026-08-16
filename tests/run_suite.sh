@@ -57,7 +57,7 @@ trap 'rm -rf "$WORK"' EXIT
 # below its basis. The comparators now reject a length mismatch outright, so
 # this is belt-and-braces: the freeze side and the compare side should be
 # equally hermetic, or the two are not measuring the same thing.
-unset POKES DUMPS SNAP_FRAMES TAIL_FRAMES VIDEO_OUT INPUT_OUT INPUT_INJECT_TEST || true
+unset POKES DUMPS SNAP_FRAMES TAIL_FRAMES VIDEO_OUT INPUT_OUT INPUT_INJECT_TEST NO_INPUT_CHECK || true
 
 EXPSET=$(python3 "$REPO/tools/build_fingerprint.py" "$ROMPATH" --set "$SET") \
     || { echo "unregistered build fingerprint — see message above"; exit 1; }

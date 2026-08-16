@@ -74,7 +74,7 @@ cd "$FB" && make sdl2 SKIPDEPEND=1 \
 # compiled into the binary, so it answers "does this build carry the profile?"
 # without running anything. (Both directions: a reference that carries it, and
 # a WIDE build that does not, are equally broken.)
-if grep -q "CPS-2 WIDE v1" "$FB/fbneo" 2>/dev/null; then
+if strings -a "$FB/fbneo" 2>/dev/null | grep -q "CPS-2 WIDE v1" 2>/dev/null; then
     [ "${WIDE:-1}" = "0" ] && {
         echo "built REFERENCE binary still carries the WIDE profile" >&2; exit 1; }
     echo "verified: binary carries the CPS-2 WIDE profile"

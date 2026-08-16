@@ -42,6 +42,14 @@ def main():
         print(f"FAIL length mismatch ({len(a)} vs {len(b)} lines)")
         return 1
 
+    # 14z-90 (GitHub issue #54): two zero-frame logs are equal-length and
+    # produce no differing rows, so this printed EXACT and returned 0 having
+    # compared NOTHING. Its siblings compare_window/compare_composite guard
+    # this with their `n == 0` check; this one did not.
+    if not any(l.split() and l.split()[0].isdigit() for l in a):
+        print("FAIL no frame rows compared — the log has no data")
+        return 1
+
     bad = [i for i, (x, y) in enumerate(zip(a, b)) if x != y]
     if not bad:
         print("EXACT")

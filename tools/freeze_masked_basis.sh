@@ -52,7 +52,7 @@ WORK="$(mktemp -d)"
 trap 'rm -rf "$WORK"' EXIT
 
 # guard 3: nothing from the caller's shell may reach the frozen logs
-unset POKES DUMPS SNAP_FRAMES TAIL_FRAMES VIDEO_OUT INPUT_OUT INPUT_INJECT_TEST || true
+unset POKES DUMPS SNAP_FRAMES TAIL_FRAMES VIDEO_OUT INPUT_OUT INPUT_INJECT_TEST NO_INPUT_CHECK || true
 
 # guard 1: a basis dir has ONE mask
 if [ -f "$DEST/MASK" ]; then
