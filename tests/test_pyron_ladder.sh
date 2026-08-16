@@ -3,10 +3,13 @@
 #
 # Pyron is a VARIANT-ID tenant (0x11): no vanilla path can reach his rows,
 # so the stage 1-3 ladder invariant is total (the H-ladder shape).
-# STAGE 4 (14z-67 measured): the generator emits the FOUR engine-hook
-# sites unconditionally (obj_hook 0x54470/0x5E542, state_hook 0x2A7C8,
-# reaction_hook 0x18458 — extension tables tripwired for the unported)
-# — so its op invariant carries exactly those four named exemptions,
+# STAGE 4: the generator emits engine-hook sites unconditionally, so its
+# op invariant carries exemptions. CORRECTED 14z-92: those exemptions were
+# a hardcoded four (obj_hook 0x54470/0x5E542, state_hook 0x2A7C8,
+# reaction_hook 0x18458) which were DONOVAN's and went stale at 14z-91 —
+# the obj_hook sites are vanilla now and 23 walker-caller writes are new.
+# They are read from build/manifest/shared_writes.toml, the reviewed and
+# frozen per-tenant inventory, so the set maintains itself,
 # and its legacy leg runs on the MASKED V2 basis (CLAUDE.md §4 hooked
 # builds), asserted EXACT like H's. Stage-4 extras: the forced-pick
 # boot probe (id-hold / load / guard).
@@ -30,12 +33,40 @@ trap 'rm -rf "$WORK"' EXIT
 
 for st in 1 2 3 4; do
     echo "== stage $st build"
-    TENANT_MANIFEST=build/manifest/pyron.toml TENANT_CHAR=0x11 \
+    # FIXED 14z-92 (GitHub #84). This was:
+    #     TENANT_MANIFEST=... TENANT_CHAR=0x11 \
+    #     GF="--profile cps2-wide-v1"
+    # which the line continuation makes ONE logical line of three
+    # ASSIGNMENTS AND NO COMMAND. POSIX sh sets those as ordinary shell
+    # variables; they never enter any child's environment. Only GEN_FLAGS
+    # was attached to the build below, so `build_donovan.sh` — a separate
+    # process — read neither and fell back to its DONOVAN defaults.
+    # This ladder was building and validating Donovan at every stage.
     GF="--profile cps2-wide-v1"
     [ "$st" = 4 ] && GF="$GF --allow-plausible --tripwire-open"
-    GEN_FLAGS="$GF" \
+    TENANT_MANIFEST=build/manifest/pyron.toml TENANT_CHAR=0x11 GEN_FLAGS="$GF" \
         tools/build_donovan.sh "$st" "$WORK/pyr$st" > "$WORK/b$st.log" 2>&1 \
         || { tail -15 "$WORK/b$st.log"; echo "FAIL: stage $st build"; exit 1; }
+    # ASSERT WHAT WAS ACTUALLY BUILT. The fix above is one line; this is the
+    # part that stops the class recurring. A ladder that cannot say which
+    # tenant it built is not evidence about that tenant, and every green run
+    # of this gate before 14z-92 was evidence about the wrong one.
+    TJ="$WORK/pyr$st/patch/tenant.json"
+    if [ -f "$TJ" ]; then
+        python3 - "$TJ" <<'PY' || { echo "FAIL: stage $st built the wrong tenant"; exit 1; }
+import json, sys
+t = json.load(open(sys.argv[1]))
+if t.get("name") != "pyron" or t.get("id") != 0x11:
+    sys.exit(f"  FAIL: built tenant {t.get('name')} id {t.get('id'):#x}, "
+             f"expected pyron id 0x11 — the tenant selection did not reach "
+             f"build_donovan.sh (GitHub #84)")
+print(f"  ok: tenant is {t['name']} id {t['id']:#x}")
+PY
+    else
+        echo "  FAIL: stage $st produced no patch/tenant.json — cannot"
+        echo "        confirm WHICH tenant was built (GitHub #84)"
+        exit 1
+    fi
     echo "  ok: built ($(grep '^build fingerprint' "$WORK/b$st.log" | cut -d' ' -f3 | cut -c1-8))"
 
     python3 - "$WORK/pyr$st/patch/patch.json" "$st" <<'PY'
@@ -43,10 +74,37 @@ import json, sys
 from pathlib import Path
 
 SPACES = [(0x0BF6A0, 0x100000), (0x3EC720, 0x400000), (0x400010, 0x600000)]
-# stage 4: the generator's four engine-hook sites (unconditional,
-# 6-byte thunk calls; extension tables tripwired) — named exemptions
-HOOK_SITES = {0x54470, 0x5E542, 0x2A7C8, 0x18458} \
-    if sys.argv[2] == "4" else set()
+# STAGE-4 EXEMPTIONS — REWRITTEN 14z-92 (found by fixing GitHub #84).
+# This was a hardcoded {0x54470, 0x5E542, 0x2A7C8, 0x18458}: "the
+# generator's four engine-hook sites". Two problems, both invisible until
+# the ladder started building the right tenant:
+#   1. It was DONOVAN's list. This is the Pyron ladder.
+#   2. It went stale at 14z-91, which made the obj_hook dispatch sites
+#      VANILLA (0x54470/0x5E542 are no longer written at all) and added 23
+#      walker-CALLER operand writes that are not in it. So the invariant
+#      would fail for EITHER tenant now — it had simply not been run.
+#      That is GitHub #30 demonstrated: a gate nothing calls decays, and
+#      this one decayed silently for a full session.
+# The fix defers to the REVIEWED AUTHORITY instead of a literal list:
+# build/manifest/shared_writes.toml is the frozen per-tenant inventory of
+# every write landing on vanilla-readable bytes, and tests/
+# test_shared_writes.sh already fails on any addition, removal or change.
+# So "free space, a variant row, or a write someone reviewed and froze" is
+# the real invariant, and it maintains itself.
+HOOK_SITES = set()
+if sys.argv[2] == "4":
+    import re as _re
+    _txt = Path("build/manifest/shared_writes.toml").read_text()
+    # [[tenant]] blocks; take the pyron one's `writes = [ "0xADDR N kind", ]`
+    for _blk in _txt.split("[[tenant]]")[1:]:
+        if not _re.search(r'name\s*=\s*"pyron"', _blk):
+            continue
+        for _m in _re.finditer(r'"0x([0-9A-Fa-f]+)\s+\d+\s+\w+"', _blk):
+            HOOK_SITES.add(int(_m.group(1), 16))
+    if not HOOK_SITES:
+        sys.exit("  FAIL: no pyron rows in shared_writes.toml — the "
+                 "stage-4 exemption set would be empty, which is not a "
+                 "pass condition, it is a dead lookup")
 
 # bank-map tables: (base, entry_size) via the minimal subset parser shape
 import re
@@ -97,7 +155,7 @@ if bad:
     print("FAIL: ops outside free space + variant rows:", bad)
     sys.exit(1)
 print(f"  ok: op invariant holds ({len(ops)} ops: free space / variant "
-      f"rows{' / 4 named hook sites' if HOOK_SITES else ''})")
+      f"rows{' / %d reviewed shared writes' % len(HOOK_SITES) if HOOK_SITES else ''})")
 PY
 done
 

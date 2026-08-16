@@ -29,15 +29,24 @@ same symptom.
 Usage: check_pyron_blink.py <nativedir> <oursdir> <vsavj_data.bin>
                             <lo> <hi> [--expect blinks|fixed]
   <dir>/dump_<f>_90c140.bin  palette row 10 per frame (DUMPS grammar)
-  <dir>/dump_<f>_ff8400.bin  P1 fighter block (+0x382 = character id)
+  <dir>/dump_<f>_ff8400.bin  P1 fighter block (+0x60.l = hitbox base)
 """
 
 import sys
 from pathlib import Path
 
 SEQ_ROW_26 = 0x39ADC0        # vsavj palette-seq table 0x39A900 + 0x26*0x20
-PYRON_ID = 0x11
-ID_OFF = 0x382               # fighter block +0x382 (docs/game/atlas/ram.md)
+# 14z-92 (GitHub #16). This used to read +0x382 as "the character id" at
+# frames 3200/3400/3600 — all IN MATCH. 14z-87 proved that byte is the
+# fighter's VOICE-FLAVOR CLASS in match: the engine reassigns it at a
+# match-sequencer event by BORROWING from the opponent's row of candidate
+# table 0x00B268 (PRG:0x0AEF6). Our build is protected by the shipped
+# voice_borrow_keep_tenant thunk; the NATIVE leg is not, so a borrow there
+# produced a false REFUSE. Zero recorded firings, but a guard that can stop
+# measuring for the wrong reason is a guard that will eventually lie.
+# The id-stable signature is +0x60.l, the per-character HITBOX BASE — the
+# same one audit_legacy_pairings.sh uses, and for the same reason.
+HB_OFF = 0x60                # fighter block +0x60.l = per-character hitbox base
 
 
 def die(msg):
@@ -61,9 +70,13 @@ def leg(d, lo, hi):
         if not p.exists():
             die(f"{d.name}: missing palette dump for frame {f}")
         vals.append(p.read_bytes())
-    ids = sorted({b.read_bytes()[ID_OFF]
-                  for b in d.glob("dump_*_ff8400.bin")})
-    return vals, ids
+    # +0x60.l per sampled fighter-block frame. Compared as a SET: the
+    # character must not change mid-window, and it must be a real base.
+    bases = set()
+    for b in sorted(d.glob("dump_*_ff8400.bin")):
+        raw = b.read_bytes()
+        bases.add(int.from_bytes(raw[HB_OFF:HB_OFF + 4], "big"))
+    return vals, sorted(bases)
 
 
 def distinct(vals):
@@ -90,12 +103,21 @@ def main():
     #    character that was never picked is the standing trap here: an
     #    unpicked leg shows a perfectly constant palette and would read
     #    as "native is fine".
-    for tag, ids in (("native", nat_ids), ("ours", our_ids)):
-        if ids != [PYRON_ID]:
-            die(f"{tag}: P1 +0x382 = {[hex(i) for i in ids]}, expected "
-                f"[{PYRON_ID:#04x}] — Pyron was not in this match, so the "
-                f"palette says nothing")
-    print(f"  ok: both legs have Pyron in (+0x{ID_OFF:X} = {PYRON_ID:#04x})")
+    # The two legs run DIFFERENT games (native vsav2 vs our vsavjw), so
+    # their hitbox bases are different addresses by construction — this
+    # cannot compare them to each other or to one constant. What it CAN
+    # require, and what actually rules out the trap, is that each leg holds
+    # ONE non-zero base for the whole window: a character that was never
+    # picked reads zero, and a character that changed mid-window reads two.
+    for tag, bases in (("native", nat_ids), ("ours", our_ids)):
+        if len(bases) != 1 or bases[0] == 0:
+            die(f"{tag}: P1 +0x{HB_OFF:02X}.l = {[hex(b) for b in bases]} "
+                f"over the sampled frames — expected exactly one non-zero "
+                f"hitbox base. Zero means no character was loaded; two or "
+                f"more means the fighter changed mid-window. Either way the "
+                f"palette says nothing.")
+    print(f"  ok: both legs hold ONE non-zero fighter for the whole window "
+          f"(+0x{HB_OFF:02X}.l native {nat_ids[0]:#08x}, ours {our_ids[0]:#08x})")
 
     # 2. the phase-independent property
     nd, od = distinct(nat), distinct(our)

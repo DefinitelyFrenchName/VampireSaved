@@ -202,6 +202,13 @@ S6 is closed. The build was frozen on gate evidence first and played after,
 by maintainer decision; a freeze remains reversible (m6/m14/m8 were withdrawn
 in 14z-88).
 
+**RESOLVED 2026-08-16 (maintainer): the "feels better" was EMULATOR-SIDED,
+not the ROM.** So the mechanism sketched below is NOT the explanation, no
+headroom A/B is owed, and the project still has NO measured
+performance-positive result. The reasoning is kept because it is a fair
+description of what the walker relocation does to the main loop — it just
+is not what was felt. Original entry follows.
+
 **THE "FEELS BETTER" IS RECORDED AS AN IMPRESSION, NOT A FINDING** — the
 maintainer flagged it as such and it stays that way until measured. It is
 worth writing down that a plausible MECHANISM exists, because if it is real

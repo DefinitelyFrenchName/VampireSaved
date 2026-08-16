@@ -51,7 +51,12 @@ WORK="$(mktemp -d)"
 trap 'rm -rf "$WORK"' EXIT
 fail=0
 
-BUILD="${1:-build/pyron17}"
+# DEFAULT RE-POINTED 14z-92: was build/pyron17, which predates WIDE v1.1/v1.2
+# and is REFUSED by MAME today ("vsw.z01 NOT FOUND") — the same stale-reference
+# class as hui31 in test_merged_render_content and pyron20 in
+# audit_hitclass_map_cost, all three found the same session. pyron-m9 carries
+# the same blink fix pyron17 did. RE-POINT THIS WHEN PYRON IS RE-FROZEN.
+BUILD="${1:-build/pyron26}"
 case "$BUILD" in /*) ;; *) BUILD="$REPO/$BUILD" ;; esac
 EXPECT="${PYRON_BLINK_EXPECT:-fixed}"
 export MAME_BIN="${MAME_BIN:-$HOME/.cache/vampire-saved/mame/cps2}"
@@ -101,21 +106,25 @@ CTL="$WORK/ctl"
 python3 - "$CTL" "$VAN" "$LO" "$HI" <<'PY'
 import os, sys
 sys.path.insert(0, "tools")
-from check_pyron_blink import seq_to_palette, SEQ_ROW_26, PYRON_ID, ID_OFF
+from check_pyron_blink import seq_to_palette, SEQ_ROW_26, HB_OFF
 ctl, van, lo, hi = sys.argv[1], sys.argv[2], int(sys.argv[3]), int(sys.argv[4])
 vj = open(van, "rb").read()
 good = bytes.fromhex("fe00ff60ff90ffb0ffd0fff0fffbfffffdfffafff0fff0dff0bff09ff07ff000")
 seq = seq_to_palette(vj[SEQ_ROW_26:SEQ_ROW_26 + 0x20])
 other = bytes(32)
 
-def mk(name, ours_vals, nat_vals=None, ident=PYRON_ID):
+# 14z-92 (#16): the guard reads +0x60.l (hitbox base), not +0x382. A
+# synthetic leg therefore needs a plausible NON-ZERO base; base 0 is the
+# "no fighter was loaded" case the guard must refuse.
+PYRON_BASE = 0x00093B6A   # measured on build/pyron26, force_pick_probe
+def mk(name, ours_vals, nat_vals=None, base=PYRON_BASE):
     d = os.path.join(ctl, name)
     for legname, vals in (("native", nat_vals or [good] * (hi - lo)),
                           ("ours", ours_vals)):
         p = os.path.join(d, legname); os.makedirs(p, exist_ok=True)
         for i, f in enumerate(range(lo, hi)):
             open(os.path.join(p, "dump_%d_90c140.bin" % f), "wb").write(vals[i])
-        blk = bytearray(0x400); blk[ID_OFF] = ident
+        blk = bytearray(0x400); blk[HB_OFF:HB_OFF + 4] = base.to_bytes(4, "big")
         for f in (3200, 3400, 3600):
             open(os.path.join(p, "dump_%d_ff8400.bin" % f), "wb").write(bytes(blk))
 
@@ -123,7 +132,7 @@ n = hi - lo
 mk("real",        [good if i % 2 else seq for i in range(n)])
 mk("noblink",     [good] * n)
 mk("wrongsource", [good if i % 2 else other for i in range(n)])
-mk("notpicked",   [good if i % 2 else seq for i in range(n)], ident=0x03)
+mk("notpicked",   [good if i % 2 else seq for i in range(n)], base=0)
 mk("natmoves",    [good if i % 2 else seq for i in range(n)],
    nat_vals=[good if i % 3 else other for i in range(n)])
 print("   built: real, noblink, wrongsource, notpicked, natmoves")

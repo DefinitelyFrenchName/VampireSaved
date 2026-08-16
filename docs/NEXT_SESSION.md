@@ -126,19 +126,11 @@ The superseded framing, kept because it explains the shapes above:
   `test_variant_dispatch` / `test_index_window_thunk` all PASS on
   merged8 besides. **Remaining L/M/H strengths are unknown-unknowns, not
   a named mechanism — a nice-to-have, not a risk item.**
-- **"IT MAY FEEL BETTER" — measurable, and worth measuring once.** The
-  maintainer flagged it as feeling, not fact, and it is recorded as an
-  impression only. But a mechanism exists: 14z-91 left the two obj_hook
-  dispatch sites VANILLA (relocating the walker instead), removing
-  per-dispatch thunk cycles from a path `audit_walker_ghost` measured at
-  **279,577 dispatches across the corpus**. Saved cycles do not speed a
-  fixed-rate machine up — they widen main-loop headroom, and vsav's
-  visible slowdown is what eats headroom, so "snappier under load" is the
-  predicted shape. The test is a headroom/overrun A/B of merged8 vs
-  merged7 on a heavy-object replay. If it measures out it is the
-  project's first performance-POSITIVE result; if it does not, the
-  impression stays an impression and gets written down as refuted. **Do
-  not repeat "it's faster" until one of those happens.**
+- ~~"IT MAY FEEL BETTER"~~ **CLOSED (maintainer, 2026-08-16): it was
+  EMULATOR-SIDED**, not the ROM. No headroom/overrun A/B is needed and the
+  obj_hook-cycle mechanism is NOT the explanation. Recorded so nobody
+  re-opens it as a performance claim: the project has no measured
+  performance-positive result, and this was not one.
 - **`build/m3b_merged8` IS FROZEN as `merged-m1` (14z-92):**
   render-content, trap parity, FG parity, select-bank-gates and
   `audit_merged_legacy` (AUDIT-EXIT 0, leg a 47/47, leg b 6/6) all PASS.
