@@ -68,8 +68,6 @@ The superseded framing, kept because it explains the shapes above:
   asserted, on a track that gate does not run against. Its header now says
   it is pinned to the parked m2c track.
 
-Five policy calls are unchanged and still open: #35 (CLAUDE.md vs Rule 1
-v2), #39/#40 (.gitignore + untracking), #41 (CI), #73 (the PNG goldens).
 
 ## START HERE — the open list, in order
 
@@ -79,12 +77,12 @@ v2), #39/#40 (.gitignore + untracking), #41 (CI), #73 (the PNG goldens).
   placed window; regression window merged5 -> merged6, 14z-86). It blocks a
   new merged-WITH-GFX build, which is what the S6 freeze and playtesting
   need. It did NOT block this session's legacy work, because
-  `audit_merged_legacy.sh` builds its own gfx-free instrument.
-- **The merged PROGRAM image is already validated** — `audit_merged_legacy.sh`
-  is FULL GREEN on this batch (leg (a) 47/47, leg (b) 6/6, 753 ops). What
-  #75 blocks is the merged build WITH GFX, which is what the S6 freeze and
-  playtesting need. The merged build now has its own class table,
-  `tests/expected/merged1/` — read its README before touching a spec there.
+  `audit_merged_legacy.sh` builds its own gfx-free instrument — and that
+  instrument is now FULL GREEN (leg (a) 47/47, leg (b) 6/6, 753 ops).
+- The merged build now has its own class table, `tests/expected/merged1/` —
+  read its README before touching a spec there, and do not copy a tenant
+  set's line into it: the two tables are measurably not interchangeable,
+  which is why it exists.
 - **M4, not yet run: `audit_hitclass_map_cost.sh` over the FULL corpus.**
   `hitclass_map_extend` IS adopted (huitzil.toml:2048, pyron.toml:1044 — the
   "ADOPTION PENDING" in engine_internals was stale and is corrected), so it
