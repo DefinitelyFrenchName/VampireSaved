@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/env bash
 # build_donovan.sh — the donovan-m2 build driver: checksum gate -> extract
 # (vhunt2 oracle) -> generate staged patch -> apply -> pack runnable rompath.
 #
@@ -10,6 +10,12 @@
 # regenerated from $ROMDIR on every run (repo rule 7).
 set -eu
 set -o pipefail  # 14z-10: a crashed build_gfx must not pack stale tiles silently
+# NB the shebang above is bash, not sh, BECAUSE of that line (14z-90, issue
+# #15). Under dash this script died at line 12 with "set: Illegal option -o
+# pipefail" before touching anything. Deleting the line instead would be
+# worse: it silently reinstates the 14z-10 stale-tiles trap, which is the
+# defect pipefail exists to prevent, over five real `| tail -N` pipelines
+# in this file. Every other tracked .sh is clean POSIX and keeps #!/bin/sh.
 
 STAGE="${1:?usage: build_donovan.sh <stage 1-6> [outbase]}"
 OUTBASE="${2:-build/donovan}"

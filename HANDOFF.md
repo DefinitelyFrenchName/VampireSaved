@@ -421,7 +421,7 @@ test that decides whether a machine can be trusted.
 **Target ranking for this toolchain** (POSIX shell + SDL builds):
 | Target | Verdict |
 |---|---|
-| **Linux** | Best destination. Native SDL builds for both emulators, every `tests/*.sh` runs unchanged, true headless trivially. Only edit: `sysctl -n hw.ncpu` → `nproc` in `tools/setup_mame.sh`. |
+| **Linux** | Best destination. Native SDL builds for both emulators, every `tests/*.sh` runs unchanged, true headless trivially. Only edits: `sysctl -n hw.ncpu` → `nproc` in `tools/setup_mame.sh`, and note `tools/build_donovan.sh` requires **bash** (it relies on `set -o pipefail`; shebang corrected 14z-90 — the earlier "runs unchanged" claim was written three days after pipefail landed and was never validated under dash). |
 | **Intel Mac** | Lowest friction *today* — the scripts are already macOS-shaped and brew provides sdl3/pkgconf. Good stepping stone; architecture is a non-issue per the analysis above. |
 | **Windows 10** | Highest porting cost natively: the harness is POSIX shell plus FBNeo's **SDL** frontend, so it needs MSYS2 for both emulators and a POSIX shell for every gate. **Use WSL2 and treat it as the Linux target** — that is the pragmatic path if this is the machine that is free. |
 
@@ -1096,6 +1096,14 @@ tests/test_effect_palette_table.sh    # 14z-76: the per-character palette POINTE
                                       # variant row, a build clobbering a base-half
                                       # row). tools/audit_effect_palette_table.py.
                                       # Static, seconds
+tests/test_shell_portability.sh       # 14z-90 (issue #15): every #!/bin/sh
+                                      # script must be POSIX sh. Strips heredoc
+                                      # bodies first (these scripts embed Python
+                                      # and TOML; an unstripped census reports
+                                      # ~16 false [[table]] hits). A script that
+                                      # needs bash must say so in its shebang —
+                                      # today exactly one does.
+                                      # No ROMs, no emulator, ~1s
 tests/test_m2a_flicker_gate.sh        # 14z-90 (issue #2): ground truth that the
                                       # battery's masked flicker gate watches
                                       # GROWTH, not equality. 4 cases: growth
