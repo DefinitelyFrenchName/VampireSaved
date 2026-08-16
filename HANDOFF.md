@@ -1096,6 +1096,14 @@ tests/test_effect_palette_table.sh    # 14z-76: the per-character palette POINTE
                                       # variant row, a build clobbering a base-half
                                       # row). tools/audit_effect_palette_table.py.
                                       # Static, seconds
+tests/test_m2a_flicker_gate.sh        # 14z-90 (issue #2): ground truth that the
+                                      # battery's masked flicker gate watches
+                                      # GROWTH, not equality. 4 cases: growth
+                                      # FAILs; unchanged passes; a SHRINK does
+                                      # NOT fail (the m2b 2 3507,3807 -> m2c
+                                      # 1 3507 case, which is why equality was
+                                      # rejected); EXACT does not fail.
+                                      # No ROMs, no emulator, ~2s
 tests/test_gfx_menus_guard.sh         # 14z-90 (issue #6): ground truth for the
                                       # pixel gate's rompath guard. An absent
                                       # rompath and a vsavjw-only rompath must

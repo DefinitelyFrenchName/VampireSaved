@@ -85,6 +85,15 @@ m2a_legacy_gate() {
 # Hook-free builds keep m2a_legacy_gate (unmasked) above.
 M2A_MASK="043c-043d,4182-41a2,7f00-8000"
 M2A_MASKED_EXP="tests/expected/vsavj/masked"   # relative to $REPO
+# 14z-90 (issue #2): where this track's FROZEN flicker inventories live. The
+# gate reads field 4+ of `<replay>.masked` ("flicker vsavj/masked 2 829,2093")
+# and fails only on GROWTH beyond that set — see the note at the gate itself
+# for why equality is the wrong predicate on an unfrozen dev build.
+# NOTE this is the donovan-m2c generation, matching M2A_MASK (V1) and
+# M2A_MASKED_EXP above. Whether the M2 battery should still target that
+# generation, or be re-pointed at the current V2 basis and unified with
+# run_suite.sh's dispatch, is recorded in STATE.md as a maintainer question.
+M2A_FLICKER_SPECS="tests/expected/donovan-m2c"
 # What each legacy replay exercises (all vanilla-content; a gate name is
 # <NN>_<character>_<mechanic> — the character is the vanilla char driving
 # the scenario, NOT a porting target):
@@ -134,6 +143,7 @@ PYEOF
 m2a_legacy_gate_masked() {
     _mg_rp="$1"; _mg_w="$2"
     _mg_exp="$REPO/$M2A_MASKED_EXP"
+    _mg_exp_specs="$REPO/$M2A_FLICKER_SPECS"
     gate_fail=0
     [ -d "$_mg_exp/logs" ] || { echo "FAIL: no frozen masked logs at $_mg_exp (run m2a_freeze_masked)"; gate_fail=1; return; }
     _mg_keep="$REPO/build/gate_failures"
@@ -152,11 +162,65 @@ m2a_legacy_gate_masked() {
         m2a_run_masked "$_mg_rp" "$REPO/tests/replays/$_mg_r.rpl" \
             "$_mg_w/$_mg_r.log" "$_mg_w/${_mg_r}box"
         _mg_v=$(python3 "$REPO/tools/compare_flicker.py" \
-            "$_mg_exp/logs/$_mg_r.log" "$_mg_w/$_mg_r.log") \
-            && echo "  ok: $_mg_r masked ${_mg_v}" \
-            || { mkdir -p "$REPO/build/gate_failures"
-                 cp "$_mg_w/$_mg_r.log" "$REPO/build/gate_failures/$_mg_r.$(date +%s).log"
-                 echo "FAIL: $_mg_r masked: $_mg_v (log kept in build/gate_failures)"; gate_fail=1; }
+            "$_mg_exp/logs/$_mg_r.log" "$_mg_w/$_mg_r.log") || _mg_rc=$?
+        if [ "${_mg_rc:-0}" != 0 ]; then
+            mkdir -p "$REPO/build/gate_failures"
+            cp "$_mg_w/$_mg_r.log" "$REPO/build/gate_failures/$_mg_r.$(date +%s).log"
+            echo "FAIL: $_mg_r masked: $_mg_v (log kept in build/gate_failures)"
+            gate_fail=1
+        else
+            # 14z-90 (GitHub issue #2). compare_flicker's EXIT CODE cannot
+            # encode inventory equality — it has no inventory parameter — so
+            # this used to print "ok:" for ANY verdict inside the class
+            # thresholds, including a wholly different set of divergent frames.
+            # run_battery_m2.sh advertises a "frozen flicker inventory — watch
+            # for growth: standing maintainer watch" over that.
+            #
+            # The obvious fix (string-equality against a frozen inventory, as
+            # run_suite.sh does) is WRONG HERE and was refuted during judging:
+            # inventories legitimately move between builds on the same track —
+            # donovan-m2b 08_challenger_join is "2 3507,3807", donovan-m2c is
+            # "1 3507" — and this helper runs on UNFROZEN dev builds, so
+            # pinning one build's numbers manufactures false REDs on the gate
+            # that guards the superset invariant, which read as a rule-6 halt.
+            #
+            # So implement the standing watch's literal text instead: fail on
+            # GROWTH beyond the frozen inventory; ADVISE on shrink; and refuse
+            # to invent an inventory when none is frozen. A build that passes
+            # today cannot be reddened by this, by construction.
+            _mg_frozen=""
+            [ -f "$_mg_exp_specs/$_mg_r.masked" ] && _mg_frozen=$(
+                awk '{ for (i = 4; i <= NF; i++) printf "%s%s", $i, (i<NF?" ":"") }' \
+                    "$_mg_exp_specs/$_mg_r.masked")
+            if [ -z "$_mg_frozen" ]; then
+                echo "  ok: $_mg_r masked ${_mg_v}  [ADVISORY: no frozen"
+                echo "      inventory for this replay — growth cannot be checked]"
+            else
+                _mg_growth=$(FROZEN="$_mg_frozen" MEASURED="$_mg_v" python3 - <<'PY'
+import os, sys
+frozen = set(os.environ["FROZEN"].replace(",", " ").split())
+v = os.environ["MEASURED"].split()
+measured = set(v[2].split(",")) if len(v) >= 3 and v[0] == "FLICKER" else set()
+grown = sorted(measured - frozen, key=int)
+print(",".join(grown))
+PY
+)
+                if [ -n "$_mg_growth" ]; then
+                    mkdir -p "$REPO/build/gate_failures"
+                    cp "$_mg_w/$_mg_r.log" "$REPO/build/gate_failures/$_mg_r.$(date +%s).log"
+                    echo "FAIL: $_mg_r masked ${_mg_v} — flicker GREW beyond the"
+                    echo "      frozen inventory ($_mg_frozen): new frame(s) $_mg_growth."
+                    echo "      CLAUDE.md §4 standing watch: stop and root-cause."
+                    gate_fail=1
+                elif [ "$_mg_v" = "EXACT" ]; then
+                    echo "  ok: $_mg_r masked EXACT  [ADVISORY: frozen inventory"
+                    echo "      was $_mg_frozen — the divergence is GONE, not grown]"
+                else
+                    echo "  ok: $_mg_r masked ${_mg_v}  (within frozen $_mg_frozen)"
+                fi
+            fi
+        fi
+        _mg_rc=0
     done
     m2a_run_masked "$_mg_rp" "$REPO/tests/replays/06_test_mode.rpl" \
         "$_mg_w/06_test_mode.log" "$_mg_w/06box"
