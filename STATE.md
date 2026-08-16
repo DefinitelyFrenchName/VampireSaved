@@ -1,5 +1,70 @@
 # STATE — living progress log
 
+## Session 14z-91 CLOSE — ritual complete
+
+- **STATE** updated (this file, newest-first above): the session record, the
+  close with all eight rulings, and BOTH 14z-90 "DECISIONS PENDING" blocks
+  marked **DECIDED in place** with their original briefs kept unedited. A
+  ruled item must never still read as open.
+- **docs/NEXT_SESSION.md** rewritten for a session that is NOT halted: rule 6
+  has lifted, so the top item is GitHub #75 (build_merged.sh aborts on
+  huitzil, blocking the merged build WITH GFX and therefore the S6 freeze),
+  then M4 as cheap insurance.
+- **HANDOFF** carries the new build registry (donovan-m7 / huitzil-m15 /
+  pyron-m9 + stock twin, and why all four moved), the six new gates, the
+  merged1 set, and two corrections — the retracted dispatch-census "free
+  list" and the now-stale obj_hook-thunk probe in audit_objhook_owner_census.
+- **patch_notes / patch_index** carry all three changes with byte detail:
+  the two fixture sites returning to `207c 003b5940`, the walker bodies with
+  the `site == walker+0x18` / `0x18+2+0x12 = 0x2C` identity, the 23 caller
+  operand writes by address, the `data` -> `code` op-kind change, and the
+  type-6 body's two edits.
+- **CLAUDE.md** gained §4 **v5** (the >=60 rule is intra-mechanism, with the
+  two named 55-frame exemptions), a bounded **Rule 1 v2** exception in rule 1,
+  and the rendered-frames clarification in rule 7.
+- **New documentation:** `tests/expected/merged1/README.md` (why the merged
+  build has its own class table and what the eight deviations were),
+  `ci/README.md` (what enabling CI actually decides), the walker-relocation
+  section in `engine_internals.md`, and FOUR new GOTCHAS — the canary that
+  corrupted its own basis, awk comparing hex fields as numbers, `_minitoml`
+  accepting no arrays only on Python < 3.11, and the pc-relative table
+  op-kind rule.
+- **Persistent suite (6 new, 1 tool, 1 instrument):**
+  `audit_walker_ghost.sh` (+ `tests/lua/walker_sp.lua`),
+  `audit_walker_repoint.sh`, `test_obj_walker_relocation.sh`,
+  `test_freeze_basis_sandbox.sh`, `audit_flicker_attribution.sh`,
+  `tools/audit_walker_callers.py`. `audit_effect_class_rows.sh` §4 rewritten
+  to watch EXECUTION against a frozen inventory with its default replay set
+  widened to include the two rigs that arm it; `test_beam_list_type6.sh`
+  gained §1a (the exempted `bsr.w` displacement now resolves) and its
+  control; `freeze_masked_basis.sh` clears its sandbox.
+  **NOTHING WAS LEFT AS A THROWAWAY MEASUREMENT:** the two gained flicker
+  frames were attributed ad hoc during the re-freeze and that attribution is
+  now `audit_flicker_attribution.sh`, because it is the reason two specs
+  carry a flicker frame instead of being root-caused.
+- **Retraction re-greps, all seven CLEAN and shown:** the ENGINE-HOOK site
+  patch, the census free-list framing, the "tripwire stays zero" claim, the
+  hitclass ADOPTION PENDING contradiction, the merged 14z-82d overrides, the
+  fixture rows, and the 738-op fixture.
+- **Closing sweep, 22/22 PASS:** the 13-gate portable tier plus
+  shared_writes, type_stamp_census, thunk_addr_literal, shell_portability,
+  suite_dispatch, beam_list_type6, obj_walker_relocation, tenant_loop,
+  manifest_merge.
+
+**SHIPPED:** the legacy regression closed. Three suites GREEN, the coverage
+gate PASS, and the merged audit FULL GREEN on both legs (47/47, 6/6) — every
+legacy gate in the project passing at once, for the first time since the
+regression opened. The specs came out STRICTER than the ones they replaced.
+
+**FIVE RETRACTIONS**, and the last two are the lesson worth carrying: I
+committed a retraction as complete when `grep <marker>` came back clean
+because the MARKER had been removed from the line while the stale CLAIM had
+not, and separately rewrote a decisions section while leaving a contradicting
+paragraph three lines below it. §5 says re-grep AND show the result — showing
+it is what caught both. Grepping for a token is not the same as reading the
+sentence.
+
+
 ### 14z-91 CLOSE — EIGHT MAINTAINER RULINGS APPLIED, and the merged audit
 ### went FULL GREEN on the back of them. Both legs, for the first time
 ### since the regression opened.
@@ -185,7 +250,16 @@ inventory that ruling addresses has changed and should be re-read before
 it is made.
 
 
-### DECISIONS PENDING — 14z-90 POLICY CLUSTER (five, all filed by the
+### DECIDED 2026-08-16 (14z-91) — ALL FIVE RULED AND APPLIED. #35 CLAUDE.md
+### rule 1 retitled with a bounded Rule 1 v2 exception; #39/#40 `vsw.*` +
+### root-anchored /fbneo/, /mame/, /.claude/worktrees/ ignored and the 16
+### members untracked (no history rewrite); #73 the PNG goldens ruled
+### OUTSIDE rule 7 and the line recorded in CLAUDE.md; #41 CI DRAFTED but
+### deliberately NOT ENABLED (ci/static-and-groundtruth.yml sits outside
+### .github/workflows/; ci/README.md states what enabling decides).
+### The original briefs are kept below unedited as the record.
+###
+### (was) DECISIONS PENDING — 14z-90 POLICY CLUSTER (five, all filed by the
 ### 2026-08-15 audit, all ruled MAINTAINER by the re-judging pass; each
 ### carries a decision brief on its GitHub issue with options and costs).
 ### NOTHING WAS ACTED ON. Recorded here per CLAUDE.md §5.
@@ -309,7 +383,20 @@ DEFERRED WITH REASONS (all commented on their issues, all still open):
     move once (+156% re-freeze tax measured if done now).
 
 
-### DECISIONS PENDING — 14z-90 (the adversarial re-judging of the
+### DECIDED 2026-08-16 (14z-91) — ALL THREE RULED. (1) GitHub #4: option
+### (a), the >=60 rule is INTRA-MECHANISM — codified as CLAUDE.md §4 v5,
+### `--min-converge-flicker` stays default-off. Note the fix MOOTED the
+### question on current builds: it was about flicker 829 sitting 59 frames
+### before window onset 889, and 14z-91 removed 829 corpus-wide. (2) the
+### 55-frame pairs: per-replay NAMED EXEMPTION, and there are now TWO not
+### five (donovan-m7/22_don_dualmash 11862/11918, huitzil-m15/
+### 26_don_arcade_mash 8744/8800) — recorded in §4 v5 with what a third
+### would mean. (3) the M2 battery stays on the parked m2c/V1 track, header
+### noted; 14z-91 change A deleted the only surface test_don_accent.sh
+### asserted, on a track that gate does not run against.
+### The original briefs are kept below unedited as the record.
+###
+### (was) DECISIONS PENDING — 14z-90 (the adversarial re-judging of the
 ### 2026-08-15 audit). Three, all opened by judging rather than by
 ### measurement drift; no build byte moved this session and nothing was
 ### re-frozen.

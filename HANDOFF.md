@@ -972,6 +972,27 @@ tests/test_freeze_basis_sandbox.sh    # 14z-91: freeze_masked_basis.sh must
                                       # the verdict control reconstructs the
                                       # pre-fix tool and requires the defect.
                                       # ROM-free, ~1s
+tests/audit_flicker_attribution.sh    # 14z-91: WHY is each gained flicker
+                                      # frame in a frozen spec? The
+                                      # legacy re-freeze added exactly two
+                                      # (donovan-m7 41 +2313, 37 +7168) and
+                                      # the rule was that a gained frame is
+                                      # not written until it is attributed.
+                                      # Both are the palette-fade STAGING
+                                      # BUFFER ($FF3F02 + row*0x20, display-
+                                      # only per engine_internals): 41 in
+                                      # row 0x0C, which donovan.toml:862
+                                      # documents this build patching, and
+                                      # 37 in row 0x0A. Re-derives it via
+                                      # tools/attribute_ramdiff.py against
+                                      # NAMED windows, so a byte landing
+                                      # outside one re-opens the specs
+                                      # rather than widening a window. Also
+                                      # fails on an IDENTICAL pair — these
+                                      # frames are in the specs BECAUSE they
+                                      # differ, so identity means the rig
+                                      # died, not that the build improved.
+                                      # ~3 min, 4 MAME runs
 tests/expected/merged1/               # 14z-91: THE MERGED BUILD'S OWN
                                       # LEGACY CLASS TABLE (47 specs + its
                                       # own mask + a README). audit_merged_
