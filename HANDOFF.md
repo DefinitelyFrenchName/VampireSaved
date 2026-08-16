@@ -972,6 +972,23 @@ tests/test_freeze_basis_sandbox.sh    # 14z-91: freeze_masked_basis.sh must
                                       # the verdict control reconstructs the
                                       # pre-fix tool and requires the defect.
                                       # ROM-free, ~1s
+tests/expected/merged1/               # 14z-91: THE MERGED BUILD'S OWN
+                                      # LEGACY CLASS TABLE (47 specs + its
+                                      # own mask + a README). audit_merged_
+                                      # legacy.sh leg (a) dispatches through
+                                      # THIS, not a tenant set. Created when
+                                      # eight deviations fired the question
+                                      # that audit had pre-registered ("a
+                                      # fourth should prompt: does the
+                                      # merged build want its own class
+                                      # table?"). All eight were the merged
+                                      # build diverging LESS than the solo
+                                      # prior — strict subsets, none gained.
+                                      # NOT keyed by fingerprint: the merged
+                                      # instrument is rebuilt every run and
+                                      # is unregistered by design, so the
+                                      # set is selected by the audit's
+                                      # EXPECT constant
 tests/audit_dispatch_census.sh        # 14z-89: WHICH type indices does
                                       # LEGACY ever dispatch at the two
                                       # obj_hook sites? Vanilla vsavj over

@@ -44,10 +44,16 @@ fix is not profile-gated). m6/m14/m8 are BURNED by the 14z-88 withdrawal.
   `audit_walker_repoint`, `test_obj_walker_relocation`,
   `audit_walker_callers`, `test_freeze_basis_sandbox`.
 
-## Your decisions, waiting
+## Your decisions — ALL EIGHT RULED AND APPLIED at the 14z-91 close
 
-Two of the three comparator rulings **changed shape** because of this fix —
-re-read them before ruling:
+Nothing is waiting. For the record: the merged build got its own class table
+(and leg (b) was repointed at the post-fix solo builds); CLAUDE.md §4 gained
+v5, the >=60 rule is intra-mechanism, with the two remaining 55-frame pairs
+recorded as named exemptions; #35, #39/#40 and #73 are applied; #41 is
+drafted at `ci/static-and-groundtruth.yml` and deliberately NOT enabled —
+moving it into `.github/workflows/` is the whole act.
+
+The superseded framing, kept because it explains the shapes above:
 
 - **#4 (the ≥60 flicker→window boundary) no longer ARISES on these builds.**
   It was about flicker 829 sitting 59 frames before window onset 889. Frame
@@ -74,9 +80,11 @@ v2), #39/#40 (.gitignore + untracking), #41 (CI), #73 (the PNG goldens).
   new merged-WITH-GFX build, which is what the S6 freeze and playtesting
   need. It did NOT block this session's legacy work, because
   `audit_merged_legacy.sh` builds its own gfx-free instrument.
-- **The merged build then needs rebuilding on this batch** (734 ops now, was
-  738) and `audit_merged_legacy.sh` re-run — its leg (a) could not give a
-  complete verdict while any `.pending` existed, and none do now.
+- **The merged PROGRAM image is already validated** — `audit_merged_legacy.sh`
+  is FULL GREEN on this batch (leg (a) 47/47, leg (b) 6/6, 753 ops). What
+  #75 blocks is the merged build WITH GFX, which is what the S6 freeze and
+  playtesting need. The merged build now has its own class table,
+  `tests/expected/merged1/` — read its README before touching a spec there.
 - **M4, not yet run: `audit_hitclass_map_cost.sh` over the FULL corpus.**
   `hitclass_map_extend` IS adopted (huitzil.toml:2048, pyron.toml:1044 — the
   "ADOPTION PENDING" in engine_internals was stale and is corrected), so it

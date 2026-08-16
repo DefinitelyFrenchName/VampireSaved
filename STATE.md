@@ -1,5 +1,71 @@
 # STATE — living progress log
 
+### 14z-91 CLOSE — EIGHT MAINTAINER RULINGS APPLIED, and the merged audit
+### went FULL GREEN on the back of them. Both legs, for the first time
+### since the regression opened.
+
+  leg (a)  47 PASS / 0 FAIL    merged program image vs VANILLA, masked-v2
+  leg (b)  6/6 guard clean     tenant content vs the post-fix solo builds
+
+**(1) THE MERGED BUILD HAS ITS OWN CLASS TABLE** — `tests/expected/merged1/`
+(47 specs + its own `mask` + a README). The audit had pre-registered the
+trigger itself: *"this is the THIRD such exception, and a fourth should
+prompt 'does the merged build want its own class table?'"*. The fix took it
+to EIGHT, so the question was put and answered. The three inline overrides
+are removed; there is nothing left to special-case.
+  WHAT THE EIGHT WERE, and the direction matters: every one was the merged
+  build diverging **LESS** than the single-tenant prior — a strict subset of
+  the frozen flicker inventory, none gained. 04 [1525,2009] was
+  [1525,2005,2009,2195]; 11 and 12 and 41 lost their flicker frames entirely
+  and became plain windows; 22/23/24/28 each lost their second. These frames
+  are cycle-boundary artefacts and the merged build's timing is not the
+  solo's. Fewer divergences from vanilla is better legacy fidelity, and the
+  table stays EXACT, so an added frame still fails.
+
+**(2) LEG (b) REPOINTED** at don_m7 / hui41 / pyron26. Its six FAILs were a
+stale-reference artefact — the old references' walkers are still at the
+vanilla addresses, so the relocation moved a stack return address during
+attract and divergence started at f470, below the 850 floor. Nothing was
+wrong with the merged build.
+
+**(3) CLAUDE.md §4 v5 — THE >=60 RULE IS INTRA-MECHANISM** (GitHub #4,
+ruled option (a)). It governs the re-convergence TAIL and does not bind
+across the gap between two separately attributed mechanisms;
+`--min-converge-flicker` stays default-off. **(4)** The two remaining
+55-frame pairs are recorded there as NAMED EXEMPTIONS
+(`donovan-m7/22_don_dualmash` 11862/11918, `huitzil-m15/26_don_arcade_mash`
+8744/8800), with what a third would mean: measure the real minimum rather
+than lengthen the list.
+
+**(5-8) THE POLICY CLUSTER.** #35 CLAUDE.md rule 1 retitled with a bounded
+exception naming the two gated `Cps2ObjDraw` blocks and Rule 1 v2's five
+conditions (spec deliberately not copied in — two copies drift). #39/#40
+`vsw.*` + root-anchored `/fbneo/`, `/mame/`, `/.claude/worktrees/` ignored,
+the 16 tracked members untracked, no history rewrite. #73 the PNG goldens
+ruled outside rule 7 and the line recorded. #41 CI **drafted, not enabled**:
+`ci/static-and-groundtruth.yml` sits outside `.github/workflows/` on purpose,
+with `ci/README.md` stating that enabling means executable config on
+third-party infra and public logs on a rule-7 repo.
+
+**DRAFTING THE CI JOB PAID FOR ITSELF BEFORE IT RAN ANYWHERE.** Verifying
+the portable list found `test_manifest_merge` STALE — donovan lost two
+site_thunk rows with the fixture deletion, so (21,14,6)/32 should have been
+(19,14,6)/30, and I had missed it in change A. It also found my own SKIP
+check wrong: `test_audit_merged_dispatch` legitimately prints
+`ok: bb_skip|skip|SKIP` because it is the gate for expectation KINDS, so an
+unanchored `grep SKIP` would have failed a green gate. The list is 13, not
+the 23 ROM-free gates — the excluded ten need `build/out/*.bin` or build
+dirs, which are derived from ROM content rule 7 keeps out of the repo, and a
+gate that SKIPs for want of them is not portable but silent.
+
+**FOUR RETRACTIONS THIS SESSION**, and the last one is the instructive one:
+removing the three inline overrides left four references behind, and the
+audit was still PRINTING one on a PASS. `grep 14z-82d` came back clean
+because the marker had been removed from the line while the stale CLAIM had
+not — a retraction pass verified by grepping one token is not a retraction
+pass. §5 says re-grep AND show the result; showing it is what caught it.
+
+
 ### 14z-91 — THE LEGACY REGRESSION IS FIXED. Rule 6 lifts. Three changes,
 ### one re-freeze, four new fingerprints; all six `.pending` replays are
 ### gone and the legacy specs came out STRICTER than the ones they replace.
