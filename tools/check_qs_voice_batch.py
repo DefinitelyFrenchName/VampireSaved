@@ -47,14 +47,37 @@ def keyons(path):
                                 regs.get(v*8+2, 0)))
     return out
 
+# PACKING LAW #3 — THE ENDPOINT IS INCLUSIVE (14z-87b; enforced here 14z-93,
+# GitHub #82). The record's `end` offset is played/looped INCLUSIVE, proven
+# by field width (native windows end at 0xFFFF, so no exclusive reading is
+# expressible) and by the sword-plant beep: an EXCLUSIVE copy in
+# build_qs_songs.py left every packed sample's last played byte holding the
+# NEXT blob's first byte, audible as a ~1.8kHz impulse train to keyoff.
+# build_qs_songs.py:247 was corrected to `q2[w0:w1 + 1]` then; this checker
+# and audit_qs_voice_batch.py were NOT, so the one byte that caused the beep
+# sat outside the audit surface — corruption confined to it passed clean.
+#
+# The law itself lives in tools/qs_window.py so the builder and both audit
+# paths cannot drift apart again; tests/test_qs_window_law.sh is its ground
+# truth, including the terminal-byte-corruption control.
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from qs_window import try_window, length as _qs_len       # noqa: E402
+
+
+def _win(img, bb, s, e):
+    """The audible window for a QSound record, endpoint INCLUSIVE."""
+    return try_window(img, (bb << 16) | s, (bb << 16) | e)
+
+
 def sig(img, k, bank_or=0):
     fr, v, b, s, e, p = k
     b &= 0xFF
+    n = _qs_len(s, e)                  # INCLUSIVE length (packing law #3)
     for bb in ((b, b | 0x80) if bank_or else (b,)):
-        w = img[(bb << 16) | s:(bb << 16) | e]
+        w = _win(img, bb, s, e)
         if any(w):
-            return (v, e - s, hash(bytes(w)))
-    return (v, e - s, hash(b''))
+            return (v, n, hash(bytes(w)))
+    return (v, n, hash(b''))
 
 from collections import Counter
 co, co_blobs = Counter(), {}
@@ -63,7 +86,7 @@ for k in keyons(sys.argv[1]):
     co[s] += 1
     fr, v, b, st, e, p = k
     for bb in ((b & 0xFF), (b & 0xFF) | 0x80):
-        w = ours_img[(bb << 16) | st:(bb << 16) | e]
+        w = _win(ours_img, bb, st, e)   # INCLUSIVE, same law as sig()
         if any(w):
             co_blobs[s] = bytes(w); break
 cn = Counter(sig(nat_img, k) for k in keyons(sys.argv[2]))

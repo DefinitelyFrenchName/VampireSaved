@@ -15,6 +15,7 @@ is a GAME gotcha if it is true of the game regardless of the port.
 
 
 ### appended 14z-93 (project bucket)
+- A `|| fallback` after a pipeline reads the LAST command's status
 - A PASS line that hard-codes its control's conclusion
 - `DUMPS` land next to the LOG, not in the sandbox
 ### appended 14z-91 (project bucket)

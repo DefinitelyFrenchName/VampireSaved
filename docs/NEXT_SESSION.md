@@ -191,7 +191,14 @@ three references rotted this session (`hui31`, `pyron20`, `pyron17`).
   cost-neutral route back (init shim → the engine's own copy helper
   `0x1C3A4` → staging row 0x0F, i.e. the fade's SOURCE) is written up in
   `build/manifest/donovan.toml` above the retired rows.
-- H-vs-P stuck-direction (~1/30) — possible; not reproduced recently.
+- ~~H-vs-P stuck-direction (~1/30)~~ **CLOSED 2026-08-16 (maintainer):
+  never reproduced on FBNeo at all, and not reproduced on any recent build.**
+  Surmised to be either an emulator-side artefact or a symptom of the period
+  when Pyron and Phobos SHARED code — which they no longer do (the 14z-85
+  spawn-time owner tag gave the 0x54470 family per-tenant resolution, and the
+  type_renumber path did the same for 114-119). Not carried forward. If it
+  ever resurfaces, the first question is which emulator, and the second is
+  whether any shared-resolver path has been reintroduced.
 - Then MiSTer core surgery (stretch, DECIDED) — after the roster.
 
 ## Build / validate

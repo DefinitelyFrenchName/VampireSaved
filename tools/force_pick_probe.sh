@@ -43,10 +43,33 @@ else
     GUARD="TRIPPED (see $OUT/run.out)"
 fi
 
-MID="$(xxd -p "$OUT/dump_2600_ff8780.bin" 2>/dev/null | cut -c5-6 || echo '??')"
-BASE="$(xxd -p "$OUT/dump_3600_ff8460.bin" 2>/dev/null | cut -c1-8 || echo '????????')"
-echo "id-hold @2600: \$FF8782 = 0x$MID (wanted 0x$ID)"
-if [ "$BASE" = "00000000" ]; then
+# AN ABSENT DUMP IS NOT A VALUE (14z-93). This read
+#     BASE="$(xxd -p file 2>/dev/null | cut -c1-8 || echo '????????')"
+# and the fallback CANNOT fire: `xxd` exits non-zero on a missing file but
+# the pipeline's status is `cut`'s, which is 0. So a crash before frame 3600
+# — which is exactly when there is no dump — left $BASE EMPTY, the
+# `= "00000000"` test false, and the probe printed
+#     load @3600: hitbox base 0x — char LOADED
+# i.e. a machine that died at frame 3020 reported as a loaded character.
+# Same class as the hui31 dead leg (14z-92): an empty operand is never a
+# verdict. ABSENT, ZEROS and a real base are now three distinct outcomes.
+dumpval() {   # dumpval <file> <cut-spec> ; empty output = ABSENT
+    [ -s "$1" ] || return 1
+    xxd -p "$1" 2>/dev/null | cut "-c$2"
+}
+MID="$(dumpval "$OUT/dump_2600_ff8780.bin" 5-6 || true)"
+BASE="$(dumpval "$OUT/dump_3600_ff8460.bin" 1-8 || true)"
+
+if [ -z "$MID" ]; then
+    echo "id-hold @2600: NO DUMP — the run never reached frame 2600"
+else
+    echo "id-hold @2600: \$FF8782 = 0x$MID (wanted 0x$ID)"
+fi
+if [ -z "$BASE" ]; then
+    echo "load    @3600: NO DUMP — the run never reached frame 3600, so"
+    echo "               this is NOT a statement about the load path."
+    echo "               Read the guard verdict below first."
+elif [ "$BASE" = "00000000" ]; then
     echo "load    @3600: hitbox base ZEROS — WEDGED or WATCHDOG-REBOOTED"
     echo "               (zeros can be fresh-boot state — CHECK THE"
     echo "               SNAPSHOTS in $OUT/box/snap/ before concluding;"
@@ -55,3 +78,13 @@ else
     echo "load    @3600: hitbox base 0x$BASE — char LOADED"
 fi
 echo "guard        : $GUARD"
+if [ "$GUARD" != "clean" ]; then
+    # The crash line is the bug report; printing it here saves opening
+    # run.out to find out whether the guard tripped on a crash or on a
+    # romset the machine could not even load.
+    grep -E "^(CRASH|PCWEEDS|SOFTRESET|END-CRASH) " "$OUT/out.log" 2>/dev/null \
+        | head -2 | sed 's/^/               /'
+    grep -q "Fatal error: Required files are missing" "$OUT/run.out" 2>/dev/null \
+        && echo "               ROMSET DID NOT LOAD — not a crash. Check that" \
+        && echo "               SET= matches the zip this build actually packed."
+fi

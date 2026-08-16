@@ -2312,3 +2312,38 @@ one leg's evidence to another.
 `"$WORK/tl_$tag/probe.log"`. Caught by inspection before the sweep ran; the
 failure would have been a plausible-looking table with attributed values,
 which is the worst kind.
+
+## A `|| fallback` after a pipeline reads the LAST command's status, not the failing one (paid: 14z-93, GitHub #84's residue)
+
+`tools/force_pick_probe.sh` reported a machine that died at frame 3020 as a
+loaded character:
+
+```
+load @3600: hitbox base 0x — char LOADED
+```
+
+The parse was
+
+```sh
+BASE="$(xxd -p "$OUT/dump_3600_ff8460.bin" 2>/dev/null | cut -c1-8 || echo '????????')"
+```
+
+and the fallback **cannot fire**. `xxd` exits non-zero on a missing file, but
+the status of a pipeline is the status of its LAST command — `cut`, which
+succeeds on empty input and returns 0. So an absent dump yielded an EMPTY
+string, the `[ "$BASE" = "00000000" ]` wedge test was false, and control fell
+through to the `char LOADED` branch.
+
+Two rules out of it, and the second is the general one:
+
+1. **Guard the FILE, not the pipeline.** `[ -s "$f" ] || return 1` before
+   reading it. A `|| default` on a pipeline is decoration.
+2. **ABSENT, ZEROS and a value are three outcomes, not two.** This probe
+   already distinguished ZEROS (the 14z-65 wedge) from a real base — it just
+   had nowhere to put "there is no measurement". That is the same shape as
+   the `hui31` dead leg printed as a content mismatch (14z-92): an empty
+   operand is never a verdict.
+
+Worth knowing when triaging: the crash had been invisible because the gate
+that runs this probe was itself building the wrong tenant (#84), so the
+probe's own defect and the crash it was hiding surfaced in the same run.

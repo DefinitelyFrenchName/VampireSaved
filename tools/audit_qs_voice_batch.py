@@ -22,7 +22,12 @@ stream grammar measured 14z-86 from the 0x1186 dispatch table):
 
 Prints the SHA-1 of every member read.
 """
-import argparse, hashlib, json, struct, sys, zipfile
+import argparse, hashlib, json, os, struct, sys, zipfile
+
+# The QSound sample-window endpoint law, shared with build_qs_songs.py's
+# contract and check_qs_voice_batch.py (14z-93, GitHub #82).
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import qs_window  # noqa: E402
 
 # stream grammar: cmd -> operand byte count; measured from the handler
 # table @0x1186 (byte-identical interpreters both games, 14z-86)
@@ -166,14 +171,36 @@ def main():
                                      struct.unpack_from("<H", v2, ro + 1)[0],
                                      struct.unpack_from("<H", v2, ro + 3)[0],
                                      struct.unpack_from("<H", v2, ro + 5)[0])
-                # end-EXCLUSIVE: the byte at the end address sits outside
-                # the audible window (measured: the chirp differs cross-game
-                # in exactly that boundary byte and nothing else, 14z-86)
+                # END-INCLUSIVE (packing law #3). CORRECTED 14z-93
+                # (GitHub #82) — this read `q2[w0:w1]` and justified it
+                # with: "end-EXCLUSIVE: the byte at the end address sits
+                # outside the audible window (measured: the chirp differs
+                # cross-game in exactly that boundary byte and nothing
+                # else, 14z-86)". THAT BELIEF WAS SUPERSEDED AT 14z-87b
+                # and the correction never reached this file: the record's
+                # `end` is played/looped INCLUSIVE, proven by field width
+                # (native windows end at 0xFFFF) and by the sword-plant
+                # beep — an exclusive COPY left each packed sample's last
+                # played byte holding the next blob's first byte, a
+                # ~1.8kHz impulse train to keyoff. build_qs_songs.py:247
+                # was fixed then; this audit was not, so the single byte
+                # that caused the beep sat OUTSIDE the audit surface and
+                # corruption confined to it passed every batch check.
+                # The +1 is on the absolute index; `en` may be 0xFFFF, in
+                # which case the window ends exactly at the bank boundary.
+                # The law lives in tools/qs_window.py (shared with
+                # check_qs_voice_batch.py and ground-truthed by
+                # tests/test_qs_window_law.sh) so these cannot drift apart
+                # again — drifting apart is exactly what happened here.
                 w0, w1 = (bank << 16) | st, (bank << 16) | en
-                blob = q2[w0:w1]
+                try:
+                    blob = qs_window.window(q2, w0, w1)
+                except ValueError as exc:
+                    sys.exit(f"sample {s:#x}: {exc}")
                 at = qs.find(blob) if blob else -1
                 wins.append({"sample": s, "rec": v2[ro:ro + 8].hex(),
-                             "win": [w0, w1], "size": w1 - w0,
+                             "win": [w0, w1],
+                             "size": qs_window.length(w0, w1),
                              "in_vsav": at})
         r["windows"] = wins
         # "one note" here = one pitch event and one sample per song —
