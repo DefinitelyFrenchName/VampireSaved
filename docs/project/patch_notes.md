@@ -1,5 +1,123 @@
 # patch_notes — per-change detail: every byte, and why
 
+## 14z-91 — THE LEGACY REGRESSION FIX (m5/m13/m7 -> m7/m15/m9): byte detail
+
+Three changes, one re-freeze. All three were measured causes of the open
+legacy regression that halted forward work under CLAUDE.md §2.6; the fix
+is maintainer-decided option (b), "move the work off the legacy path, zero
+legacy cost by construction rather than by measurement".
+
+### A. `fixture_row0f_override_bank0/1` DELETED (donovan only)
+
+Sites `PRG:0x01C586` and `PRG:0x01C59A` return to vanilla
+`207c 003b5940` (`movea.l #$3B5940,a0`), 6 bytes each. The two
+`[[site_thunk]]` rows and their 0x40-byte embedded palette blocks are gone.
+
+They turned each site into `jsr thunk`, and the thunk paid
+`cmpi.b #TT,$FF8782.l` / `beq` / `cmpi.b #TT,$FF8B82.l` / `beq` / `lea` /
+`rts` before returning `a0`. Those are the venue fixture-load sites, and
+the row's own comment recorded that they are "shared by match intro AND
+attract — both measured": legacy ran the thunk on EVERY venue load, on a
+frame already at the VBL edge. Replay `38_victor_p1_vsavj` lost one
+main-loop iteration at f2317 and never re-converged.
+
+What is lost: vs2 re-themes palette row 0x0F for Donovan (the statue's red
+ramp, `0a22 0e32 0e43 0e54`); his venue now shows vsavj's own fixture ramp
+`033b 054f 065f 076f`. Row 0x0E is unaffected — verified byte-identical
+between vsavj `0x3B5940` and vs2 `0x3CB7DC` over 0x20 bytes, so only 0x0F
+was ever re-themed. Cosmetic, no gameplay surface, and no live gate
+asserted it (`tests/test_don_accent.sh` runs only from the M2 battery
+against the parked m2c track, where cell 0x0F is the tenant; on the m5+
+track that cell is Jedah and the thunk never fired for its replay).
+
+Ops -4 (2 rows x body + site patch). shared_writes donovan 71 -> 69.
+
+### B. the obj_hook dispatch sites left VANILLA — the WALKER is relocated
+
+`PRG:0x054470` and `PRG:0x05E542` keep their vanilla
+`207b 0012 7000 4e90` (`movea.l (0x12,PC,D0.w),A0 ; moveq #0,D0 ;
+jsr (A0)`). Nothing is written to either site.
+
+Previously the generator allocated the union type table in free space,
+emitted an 18-byte thunk (`lea tbl,A0 ; movea.l (A0,D0.w),A0 ; moveq #0,D0
+; jmp site+6`), and overwrote the site's first 6 bytes with
+`4EF9 <thunk>`. Ghost-clean, and still a per-dispatch cost: `0x05E542`
+dispatches **270,991** times across the 49-replay legacy corpus and
+`0x054470` 8,586 times. That is what tipped VBL-edge frames; removal
+experiments named it as the cause of `24_don_winmash` on all three sets.
+
+Now: each 0x2C-byte pool walker is copied verbatim and the union table
+appended directly behind it, in ONE `code` op.
+
+    walker A  0x054458  4ded1400 1b7c002000b5 4a16 6712 7000 102e0002
+                        d040 d040 207b0012 7000 4e90 4dee0100 532d00b5
+                        66e0 4e75                       (table 76 entries)
+    walker B  0x05E52A  same, with 3800 for the pool base and 0080 stride
+                                                        (table 124/136)
+
+The identity that makes it work: `site == walker + 0x18`, and the dispatch
+is `movea.l (0x12,PC,D0.w)`, so `0x18 + 2 + 0x12 = 0x2C` = `walker_len`.
+The copy's own instruction therefore resolves to the copy's own table with
+no fixup at all. Asserted at build time, not assumed.
+
+Each caller is repointed by a 4-byte OPERAND write at `caller+2`; the
+`4EB9` opcode word is never touched. 23 callers, frozen in the manifest:
+
+    walker A (2)   0x009436 0x020310
+    walker B (21)  0x0053f6 0x005410 0x00577c 0x0057a8 0x00590a 0x005ebc
+                   0x00943c 0x009caa 0x009f36 0x00a188 0x00a804 0x00abcc
+                   0x010dfa 0x012a3e 0x012d16 0x012e4c 0x012e66 0x020316
+                   0x021638 0x021ada 0x021dea
+
+`tools/audit_walker_callers.py` enumerates references BY FORM and finds
+nothing else reaches either walker: 0 data longwords equal to a walker
+address anywhere in the 4 MB image, 0 pc-relative jsr/jmp, and every branch
+hit is the walker's own loop (+0x0C beq, +0x28 bne) or an operand word a
+linear 2-byte scan misread. 0 longword references to either TABLE, and each
+walker body occurs exactly once.
+
+Ops +25 -6 = +19 per build.
+
+THE OP KIND CHANGED AND IT IS LOAD-BEARING. The table was a `data` op,
+correct only while a thunk read it An-relatively. The relocated walker
+reads it PC-relatively (AS_OPCODES), so it is now a `code` op — which is
+correct at any address, because `patch_prg`'s code path runs
+`crypt_words_at(decrypt=False)` and that is address-aware (re-encrypts
+inside the CPS-2 window, passes through above it). An early attempt to
+force `fallback=False` "to keep the table out of raw space" made every
+3-tenant merge fail to generate: hole_a is FULL on a merge, and there was
+nothing to keep it out of.
+
+### C. the type-6 fallback stops writing work RAM (huitzil only)
+
+`build/manifest/huitzil.toml` `[[site_thunk]] beam_list_type6`, body
+0x102 -> 0xFE bytes. Removed at body +0x4A:
+
+    526d 810c        addq.w #1,(-0x7EF4,A5)      ; A5=$FF8000 -> $FF010C
+
+and one displacement re-derived, the only branch crossing the cut:
+
+    +0x32  6100 002c -> 6100 0028   ; bsr.w to the body's own child
+                                    ; dispatcher, +0x60 -> +0x5C
+
+Everything else is unchanged: the two entry branches at +0x06/+0x0E target
++0x4A, which is still the fallback head because the deleted bytes were AT
+the cut; every branch after the cut shifts wholesale and keeps its
+displacement; both rejoin jumps are absolute (`4ef9 0001b6b2`,
+`4ef9 0001b73c`). Machine-verified: the whole branch inventory maps
+one-to-one under the shift, and +0x5C holds `0c50 0004` (`cmpi.w #4,(a0)`),
+the child dispatcher head.
+
+Why: 14z-89 measured legacy lists REACHING the taken-over list-type 6 —
+`21_don_mash` 387x, `26_don_arcade_mash` 948x — so the deadness claim was
+false and the fallback held (rendering stayed correct; it runs vsav's own
+type-6 code). The counter was the only residue, and it is live work RAM
+vanilla does not keep, so both replays diverged permanently from the
+vanilla basis. `tests/audit_effect_class_rows.sh` §4 now watches the
+fallback's EXECUTION against a frozen per-replay inventory instead, and its
+default replay set includes the two rigs that arm it — their absence is why
+the false claim survived ten sessions. Ops unchanged (a body edit).
+
 ## 14z-84 — Phobos' own Dark Force palette block (huitzil-m5 -> m6): byte detail
 
 **Why (maintainer pull-forward, design ratified 2026-08-13):** the proper
@@ -2739,7 +2857,10 @@ type 64 (< 0x72, invisible to that probe by construction); A3 was live
 register context, not causal; and the crash is LATENT in frozen pyron-m2
 itself.**
 
-## 14z-82b — the f7997 fix: vsavj's hit-class byte map extended to vs2's 80 entries (probe build; adoption pending)
+## 14z-82b — the f7997 fix: vsavj's hit-class byte map extended to vs2's 80 entries
+## (probe build at the time; ADOPTED 2026-08-12 — huitzil-m4 / pyron-m3 were re-frozen on it,
+## and it is live in huitzil.toml:2048 / pyron.toml:1044. Header corrected 14z-91: the entry
+## below is the record of the probe session and is NOT rewritten.)
 
 **Third instance of the "vs2 widened an index consumer" class** (14z-26:
 property table 0x28D00; 14z-35: the 0x50-entry dispatch table; now the

@@ -1757,7 +1757,23 @@ and shared by Huitzil (68/72 in the same pool). Third instance of the
 "vs2 widened an index consumer" class (14z-26 property table, 14z-35
 dispatch table, 14z-79's 0x018460 window is the same family).
 
-Fix (generated, measured, ADOPTION PENDING — STATE 14z-82b):
+Fix — **ADOPTED, not pending** (corrected 14z-91; the "ADOPTION PENDING"
+here contradicted HANDOFF's registry row for a whole session). The
+`hitclass_map_extend` site_thunk is declared by `huitzil.toml:2048` and
+`pyron.toml:1044` and is present in their builds; it was maintainer-adopted
+2026-08-12 and huitzil-m4 / pyron-m3 were re-frozen on it.
+
+**Because it IS shipped, it is a live hook on a SHARED engine site**, and
+its "legacy never enters the map" evidence is four replays — the same
+coverage shape that falsified the list-type 6 deadness claim and produced
+the 14z-91 legacy regression. It is a `jmp` over `0x1A888` plus a
+`cmpi.w`/`bcc` on every collision-map lookup. The dispatch is per-COLLISION,
+not per-frame, so it is far colder than the obj_hook site was — but if a
+legacy replay ever fails to re-converge and the walker relocation is not the
+cause, look here next and re-run `tests/audit_hitclass_map_cost.sh` over the
+FULL corpus rather than its four-replay default.
+
+Generated and reconstructed by (STATE 14z-82b):
 `tools/gen_hitclass_map_thunk.py` + `tests/test_hitclass_map_thunk.sh` +
 `tests/audit_hitclass_map_cost.sh`. Legacy content measured entering
 this map ZERO times across four replays — the sweep serves
