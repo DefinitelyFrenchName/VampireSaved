@@ -124,6 +124,11 @@ vanilla_table = 0x054484
 vanilla_entries = 59
 src_table = 0x05C620
 src_entries = 76
+walker = 0x54458
+walker_len = 0x2c
+walker_old_hex = "4ded14001b7c002000b54a1667127000102e0002d040d040207b001270004e904dee0100532d00b566e04e75"
+caller_old_hex = "4eb900054458"
+callers = "0x009436,0x020310"
 
 [[obj_hook]]
 site = 0x05E542
@@ -131,6 +136,11 @@ vanilla_table = 0x05E556
 vanilla_entries = 114
 src_table = 0x06A51C
 src_entries = 124
+walker = 0x5e52a
+walker_len = 0x2c
+walker_old_hex = "4ded38001b7c002000b54a1667127000102e0002d040d040207b001270004e904dee0080532d00b566e04e75"
+caller_old_hex = "4eb90005e52a"
+callers = "0x0053f6,0x005410,0x00577c,0x0057a8,0x00590a,0x005ebc,0x00943c,0x009caa,0x009f36,0x00a188,0x00a804,0x00abcc,0x010dfa,0x012a3e,0x012d16,0x012e4c,0x012e66,0x020316,0x021638,0x021ada,0x021dea"
 
 # The pod-zone embedded offset/record word table (x088512+0x3AE4 reader
 # — the 14z-66 data_in_code census row, shared bytes).

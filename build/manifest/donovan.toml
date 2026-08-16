@@ -268,12 +268,56 @@ flavor_hold_flag = 0xFF8060
 
 # (two of the seven type-dispatch sites need extension; the other five have
 # equal-sized tables in both games — verified session 4)
+#
+# THE WALKER IS RELOCATED, THE SITE IS NOT PATCHED (14z-91). Until now the
+# generator put the extended table in free space and overwrote the 6 vanilla
+# bytes at `site` with `jmp thunk`, because the table cannot grow in place
+# (live code follows both). That hook cost cycles on EVERY dispatch — site
+# 0x05E542 fires 270,991 times across the legacy corpus — which tipped
+# VBL-edge frames and is the measured cause of the 24_don_winmash legacy
+# regression (tools/probe_hook_removal.sh).
+#
+# Instead, copy the whole 0x2C-byte WALKER into free space and append the
+# extended table at copy+0x2C. The dispatch inside the walker is
+# `movea.l (0x12,PC,D0.w),A0` at walker+0x18, and 0x18+2+0x12 = 0x2C, so the
+# copy's own table lands exactly where its own instruction looks — the
+# layout reproduces itself BY CONSTRUCTION. Then rewrite only the OPERAND of
+# each `jsr <walker>`; the 4EB9 opcode word is never touched.
+#
+# Legacy cost is zero by construction, not by census: the relocated walker
+# executes the same opcodes in the same order, and `jsr abs.l` costs the same
+# whatever its operand while `movea.l (d8,PC,Dn.w)` costs the same wherever
+# PC points. Exactly one byte of state differs — the `jsr (A0)` pushes
+# copy+0x20 instead of walker+0x20 — and tests/audit_walker_ghost.sh measured
+# A7 = 0xff7ff6 CONSTANT at both walkers over 279,577 dispatches in all 49
+# corpus replays, so that longword lands at 0xff7ff2-0xff7ff5, inside the
+# masked dead-stack window $FF7F00-$FF7FFF.
+#
+# COMPLETENESS IS THE CORRECTNESS ARGUMENT: a caller we miss keeps walking
+# the VANILLA table — bit-identical for legacy, since it IS vanilla, but an
+# over-index for a tenant type. tools/audit_walker_callers.py enumerates the
+# references BY FORM and found 23 `jsr abs.l` and nothing else: no data
+# longword anywhere equals either walker address, no jsr/jmp (d16,PC), and
+# every branch hit is either the walker's own loop or an operand word
+# misread by a linear scan. `callers` below is that frozen inventory, and
+# `walker_old_hex`/`caller_old_hex` pin what is read before anything moves.
+# The runtime residual — a computed call — is closed by
+# tests/audit_walker_repoint.sh (zero hits on the vanilla entries).
+#
+# `callers` is a comma-separated STRING, not a TOML array: tools/_minitoml.py
+# (the Python<3.11 fallback) supports only string/int/bool, so an array would
+# parse on 3.11 and raise on 3.9.
 [[obj_hook]]
 site = 0x054470
 vanilla_table = 0x054484
 vanilla_entries = 59
 src_table = 0x05C620
 src_entries = 76
+walker = 0x54458
+walker_len = 0x2c
+walker_old_hex = "4ded14001b7c002000b54a1667127000102e0002d040d040207b001270004e904dee0100532d00b566e04e75"
+caller_old_hex = "4eb900054458"
+callers = "0x009436,0x020310"
 
 [[obj_hook]]
 site = 0x05E542
@@ -281,6 +325,11 @@ vanilla_table = 0x05E556
 vanilla_entries = 114
 src_table = 0x06A51C
 src_entries = 124
+walker = 0x5e52a
+walker_len = 0x2c
+walker_old_hex = "4ded38001b7c002000b54a1667127000102e0002d040d040207b001270004e904dee0080532d00b566e04e75"
+caller_old_hex = "4eb90005e52a"
+callers = "0x0053f6,0x005410,0x00577c,0x0057a8,0x00590a,0x005ebc,0x00943c,0x009caa,0x009f36,0x00a188,0x00a804,0x00abcc,0x010dfa,0x012a3e,0x012d16,0x012e4c,0x012e66,0x020316,0x021638,0x021ada,0x021dea"
 
 # non-bank repoints (select screen, win quotes, AI, versus tables) land here
 # as stage-5 RE pins their addresses down; op = poke16|poke32, both slots

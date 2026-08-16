@@ -3820,41 +3820,95 @@ def main():
                              f"copy; stamps rewritten in-region, 14z-82)")
             _n_renum = sum(1 for _s2, *_r2 in TYPE_RENUMBER_ORDER
                            if _s2 == site)
-            tdst = alloc("a", len(table), "obj_hook ext table")
-            thunk = None
-            if tdst is not None:
-                ops.append({"op": "data", "addr": f"{tdst:#x}", "hex": table.hex()})
-                notes.append(f"data   {tdst:#08x} +{len(table):#x}  proj_hook "
-                             f"extended type table ({n_van} vanilla + "
-                             f"{n_src - n_van} ported, {ported} placed"
-                             + (f", {_n_renum} renumbered" if _n_renum
-                                else "") + ")")
-                fragments.append((tdst, len(table), "GEN", "proj_hook ext table"))
-                thunk = alloc("a", 18, "obj_hook thunk")
-            if thunk is not None:
-                # GHOST-CLEAN topology (superset invariant, measured 2026-07-25):
-                # replace ONLY the movea+moveq (6 bytes) with `jmp thunk` and
-                # leave the vanilla `jsr (A0)` at its original address; the
-                # thunk indexes the extended table then jumps BACK to that jsr.
-                # The push therefore happens at the vanilla address with the
-                # vanilla return value — a jsr-into-thunk design pushes a
-                # different return address and leaves divergent ghost bytes
-                # below SP in work RAM, failing the bit-exact legacy gate.
-                tk = (bytes([0x41, 0xF9]) + tdst.to_bytes(4, "big")   # lea tbl,A0
-                      + bytes([0x20, 0x70, 0x00, 0x00])               # movea.l (A0,D0.w),A0
-                      + bytes([0x70, 0x00])                           # moveq #0,D0
-                      + bytes([0x4E, 0xF9]) + (site + 6).to_bytes(4, "big"))  # jmp site+6 (the vanilla jsr (A0))
-                ops.append({"op": "code", "addr": f"{thunk:#x}", "hex": tk.hex()})
-                notes.append(f"code   {thunk:#08x} obj_hook thunk (ghost-clean: "
-                             f"returns to vanilla jsr)")
-                fragments.append((thunk, len(tk), "GEN", "obj_hook thunk"))
-                site_patch = bytes([0x4E, 0xF9]) + thunk.to_bytes(4, "big")
-                ops.append({"op": "code", "addr": f"{site:#x}",
-                            "hex": site_patch.hex()})
-                notes.append(f"code   {site:#08x} ENGINE HOOK: dispatch -> jmp "
-                             f"thunk; vanilla jsr (A0) at {site + 6:#x} untouched "
-                             f"(vanilla types identical via table copy)")
-                fragments.append((site, 6, "GEN", "obj_hook engine site"))
+            # ── 14z-91: RELOCATE THE WALKER; THE SITE IS NEVER PATCHED ──
+            # This used to emit the table into free space plus an 18-byte
+            # thunk, and overwrite the 6 vanilla bytes at `site` with
+            # `jmp thunk` (the table cannot grow in place — live code follows
+            # both). Ghost-clean or not, that hook cost cycles on EVERY
+            # dispatch, and site 0x05E542 dispatches 270,991 times across the
+            # legacy corpus: enough to tip VBL-edge frames into losing a
+            # main-loop iteration. Measured cause of the 24_don_winmash legacy
+            # regression (tools/probe_hook_removal.sh), which reaches gameplay
+            # state and so is a superset-invariant failure, not a class.
+            #
+            # Instead copy the whole 0x2C-byte WALKER and append the extended
+            # table at copy+walker_len. The walker's own dispatch is
+            # `movea.l (0x12,PC,D0.w),A0` at walker+0x18, and 0x18+2+0x12 =
+            # 0x2C = walker_len, so the copy's instruction points at the
+            # copy's table BY CONSTRUCTION — asserted below rather than
+            # assumed. Then rewrite only the 4-byte OPERAND of each
+            # `jsr <walker>`; the 4EB9 opcode word is never touched.
+            #
+            # Zero legacy cost BY CONSTRUCTION, not by census: identical
+            # opcodes in identical order, and `jsr abs.l` costs the same
+            # whatever its operand while `movea.l (d8,PC,Dn.w)` costs the same
+            # wherever PC points. The single state difference is the pushed
+            # return address (copy+0x20 vs walker+0x20) — measured by
+            # tests/audit_walker_ghost.sh at A7 = 0xff7ff6 CONSTANT over
+            # 279,577 dispatches in all 49 corpus replays, i.e. inside the
+            # masked dead-stack window $FF7F00-$FF7FFF.
+            walker = _int(ph["walker"])
+            wlen = _int(ph["walker_len"])
+            callers = [int(c, 0) for c in str(ph["callers"]).split(",") if c.strip()]
+            cold = bytes.fromhex(ph["caller_old_hex"])
+            if site != walker + 0x18:
+                fail.append(f"obj_hook@{site:#x}: site is not walker+0x18 "
+                            f"(walker {walker:#x}) — the relocation's layout "
+                            f"assumption does not hold for this row")
+            if vtab != walker + wlen:
+                fail.append(f"obj_hook@{site:#x}: vanilla_table {vtab:#x} is not "
+                            f"walker+{wlen:#x} ({walker + wlen:#x}); the copy's "
+                            f"pc-relative dispatch would not land on its own table")
+            wbytes = vj_pt[walker:walker + wlen]
+            if wbytes != bytes.fromhex(ph["walker_old_hex"]):
+                fail.append(f"obj_hook@{site:#x}: walker bytes at {walker:#x} are "
+                            f"{wbytes.hex()}, manifest pins "
+                            f"{ph['walker_old_hex']} — relocating the wrong bytes")
+            # ONE contiguous block: the walker copy followed immediately by
+            # its table, emitted as a `code` op.
+            #
+            # `code` IS THE RIGHT KIND AT ANY ADDRESS, and this is the trap
+            # worth naming. The old design emitted the table as `data`, which
+            # was correct only because the thunk read it An-relatively (a DATA
+            # read). The relocated walker reads it PC-relatively — through
+            # AS_OPCODES — so it must arrive at the CPU as plaintext the same
+            # way the code around it does. patch_prg's `code` op runs
+            # crypt_words_at(decrypt=False), which is ADDRESS-AWARE: inside the
+            # CPS-2 window it re-encrypts so the CPU's decryption yields our
+            # bytes, and above it "words outside the key's encrypted range are
+            # returned unchanged, matching how the CPU would fetch them"
+            # (tools/cps2_decrypt.py:325-330). So `code` is correct whether the
+            # allocator lands this in crypt hole_a or raw hole_b, and the
+            # fallback chain is safe to follow — which matters, because hole_a
+            # is FULL on a 3-tenant merge.
+            wdst = alloc("a", wlen + len(table),
+                         "obj_walker relocated walker + ext table")
+            if wdst is not None:
+                ops.append({"op": "code", "addr": f"{wdst:#x}",
+                            "hex": (wbytes + table).hex()})
+                notes.append(f"code   {wdst:#08x} +{wlen + len(table):#x}  "
+                             f"obj_walker: {walker:#x} relocated verbatim + its "
+                             f"extended type table at +{wlen:#x} ({n_van} vanilla "
+                             f"+ {n_src - n_van} ported, {ported} placed"
+                             + (f", {_n_renum} renumbered" if _n_renum else "")
+                             + f"); dispatch site {site:#x} left VANILLA")
+                fragments.append((wdst, wlen, "GEN", "obj_walker relocated walker"))
+                fragments.append((wdst + wlen, len(table), "GEN",
+                                  "obj_walker ext type table"))
+                for _c in callers:
+                    if vj_pt[_c:_c + 6] != cold:
+                        fail.append(f"obj_hook@{site:#x}: caller {_c:#x} reads "
+                                    f"{vj_pt[_c:_c + 6].hex()}, expected "
+                                    f"{cold.hex()} (jsr {walker:#x}) — the frozen "
+                                    f"caller inventory does not match this image")
+                        continue
+                    # operand only: the 4EB9 opcode word stays vanilla
+                    ops.append({"op": "code", "addr": f"{_c + 2:#x}",
+                                "hex": f"{wdst:08x}"})
+                    fragments.append((_c + 2, 4, "GEN", "obj_walker caller repoint"))
+                notes.append(f"code   {len(callers)} caller operand(s) of "
+                             f"jsr {walker:#x} -> {wdst:#08x} "
+                             f"({', '.join(f'{c:#08x}' for c in callers)})")
 
         sh = singleton("state_hook") if args.stage >= 4 else None
         if sh:

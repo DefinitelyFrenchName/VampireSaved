@@ -122,7 +122,13 @@ echo "== 1: one tenant per run — the frozen op counts =="
 # chirp, reconciliation_huitzil.toml).
 # RE-FROZEN 14z-87 (D 265->270, H 300->305, P 234->239): THE VOICE-CLASS
 # BORROW fix, option (b)+(c) (maintainer-decided 2026-08-15) — +5 ops per
-# RE-FROZEN 14z-91: donovan 270 -> 266 and the merges 538 -> 534 / 738 -> 734.
+# RE-FROZEN 14z-91, TWICE. (a) donovan 270 -> 266 and the merges 538 -> 534
+# / 738 -> 734: the two fixture_row0f_override site_thunks deleted, 2 ops
+# each. (b) then 266 -> 285 / 534 -> 553 / 734 -> 753, uniformly +19, for the
+# obj_walker relocation: the two sites drop 3 ops each (table + thunk + site
+# patch = 6) and gain 1 walker+table op plus one 4-byte operand repoint per
+# caller (2 + 21 = 23), so -6 +25 = +19. Every tenant carries the same two
+# engine rows, so the delta is identical for all three and for every merge.
 # The two fixture_row0f_override site_thunks were DELETED (a legacy-regression
 # root cause: their venue fixture-load sites are shared by match intro AND
 # attract, so legacy paid for them on every venue load). Each thunk is 2 ops
@@ -135,7 +141,7 @@ echo "== 1: one tenant per run — the frozen op counts =="
 # voice_borrow_site_pad code_word (1 op: the stolen 4th word -> nop) + the
 # two per-tenant [[data_port]] candidate/voice-number table rows (2 ops).
 # All only_variant_slot-gated; the stock twin measured BIT-IDENTICAL.
-FROZEN_1="donovan:266 huitzil:305 pyron:239"
+FROZEN_1="donovan:285 huitzil:324 pyron:258"
 for row in $FROZEN_1; do
     who="${row%%:*}"; want="${row##*:}"
     case "$who" in donovan) ex="$D_EX" ;; huitzil) ex="$H_EX" ;; *) ex="$P_EX" ;; esac
@@ -207,8 +213,8 @@ check_n() {  # check_n <label> <dir> <want ops> <sum of 1-tenant counts>
 # +7 at N=2 (3 shared thunk/pad ops deduped + 2 data_port ops per tenant)
 # and +9 at N=3 (3 shared + 2x3 per-tenant), matching the +5-per-solo
 # delta above with the shared rows counted once.
-check_n "2 tenants" "$WORK/two"   534 570
-check_n "3 tenants" "$WORK/three" 734 785
+check_n "2 tenants" "$WORK/two"   553 570
+check_n "3 tenants" "$WORK/three" 753 785
 
 # ── 3: every tenant's own content is present ────────────────────────────
 # An op count alone cannot tell "both tenants ran" from "tenant 0 ran twice".
@@ -336,22 +342,32 @@ pl = json.load(open(os.path.join(d, "placements.json")))["regions"]
 ops = json.load(open(os.path.join(d, "patch.json")))["ops"]
 bad = []
 
-m = re.search(r"data\s+(0x[0-9a-f]+) \+0x[0-9a-f]+\s+proj_hook extended type "
-              r"table \((\d+) vanilla \+ (\d+) ported, (\d+) placed\)", notes)
+# 14z-91: the table no longer stands alone — it is appended to a relocated
+# copy of the WALKER, in ONE op, so the dispatch site can stay vanilla. The
+# note names both the block address and the table's offset inside it, and
+# the op is `code` (the table is read pc-relatively now, not An-relatively).
+# The regex still pins the site whose note ends "placed)" with no
+# ", N renumbered" — that is 0x54470, the site the 17-extra freeze is about.
+m = re.search(r"code\s+(0x[0-9a-f]+) \+0x[0-9a-f]+\s+obj_walker: 0x[0-9a-f]+ "
+              r"relocated verbatim \+ its extended type table at "
+              r"\+(0x[0-9a-f]+) \((\d+) vanilla \+ (\d+) ported, "
+              r"(\d+) placed\)", notes)
 if not m:
-    print("  FAIL: no proj_hook extended-table note"); sys.exit(1)
-addr, n_van, n_ext, n_placed = (int(m.group(1), 16), int(m.group(2)),
-                                int(m.group(3)), int(m.group(4)))
+    print("  FAIL: no obj_walker relocated-walker + extended-table note"); sys.exit(1)
+addr, tbl_off, n_van, n_ext, n_placed = (int(m.group(1), 16), int(m.group(2), 16),
+                                         int(m.group(3)), int(m.group(4)),
+                                         int(m.group(5)))
 # FROZEN 14z-80f: 17 of the 17 ported extras resolve. It was 5 before the
 # union — the other twelve are Huitzil's.
 if n_placed != 17:
     bad.append("%d of %d ported extras placed, frozen at 17 (5 means the "
                "union regressed to tenant 0 only)" % (n_placed, n_ext))
 
-op = [o for o in ops if o.get("addr") == hex(addr) and o["op"] == "data"]
+op = [o for o in ops if o.get("addr") == hex(addr) and o["op"] == "code"]
 if not op:
-    print("  FAIL: the extended table op is not in patch.json"); sys.exit(1)
-tbl = bytes.fromhex(op[0]["hex"])
+    print("  FAIL: the relocated walker + table op is not in patch.json"); sys.exit(1)
+blob = bytes.fromhex(op[0]["hex"])
+tbl = blob[tbl_off:]          # the walker copy occupies [0, tbl_off)
 
 def owner(a):
     for k, v in pl.items():
