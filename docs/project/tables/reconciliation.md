@@ -600,3 +600,39 @@ The FINAL GUARDIAN parity work added six rows:
 Adding these rows was verified BUILD-INERT (hui fingerprint unchanged
 on a scratch rebuild) — they are documentation for the resolver, not
 new resolutions the generator consumes.
+
+## 14z-93 — the missing row that was crashing the shipping build (#91)
+
+`vsav2 0x494de -> vsavj 0x47fb6`, `engine_sub`, **verified**.
+
+A 32-bit unsigned **software divide** helper (`moveq #0,d0 / moveq #31,d4 /
+add.l d3,d3 / addx.l d0,d0 / cmp.l d2,d0 / bcs / sub.l d2,d0 / addq #1,d3 /
+dbf / rts`). The row was **missing entirely** — not `open` — so the generator
+planted a tripwire, and that tripwire FIRED IN ORDINARY PLAY: `huitzil-m15`
+CRASH 14767 and `merged-m1` CRASH 8887 on the 40,620-frame arcade marathon
+with the tenant forced (`tests/audit_tripwire_reach.sh`).
+
+**How the target was chosen, because byte-identity alone would have been a
+coin flip.** The 22-byte body appears TWICE in vsavj — `0x47fb6` and
+`0x646de` — the content-twin shape `docs/GOTCHAS.md` warns about. Caller
+counts decide it:
+
+| copy | `jsr`/`jmp` callers |
+|---|---|
+| `0x47fb6` | **10** |
+| `0x646de` | 0 |
+| vs2 `0x494de` (the original) | 11 |
+
+and the vsavj caller addresses correspond monotonically to the vs2 ones. So
+`0x47fb6` is the live copy.
+
+Worth recording: the routine is a **pure leaf** — it touches no memory at
+all, only `d0`-`d4` — so unlike most twin choices this one cannot alter
+behaviour whichever copy is named. The live copy is chosen for provenance,
+and the caller-count evidence is what makes it `verified` rather than
+`plausible`.
+
+**This row does not by itself make the build green** — see STATE 14z-93 (3):
+resolving it lets the machine run 4,537 frames further and then hit a
+SECOND, independent crash at a vanilla dispatcher. That is tracked
+separately; the row stands on its own evidence.

@@ -1082,6 +1082,13 @@ status = "open"
 note = "-; refs: bare_long"
 
 [[map]]
+vsav2 = 0x0494de
+vsavj = 0x047fb6
+kind = "engine_sub"
+status = "verified"
+note = "14z-93 (GitHub #91): 32-bit unsigned software DIVIDE helper (moveq #0,d0 / moveq #31,d4 / add.l d3,d3 / addx.l d0,d0 / cmp.l d2,d0 / bcs / sub.l d2,d0 / addq #1,d3 / dbf / rts). THE ROW WAS MISSING ENTIRELY, not open, so it planted a tripwire that FIRES IN PLAY: huitzil-m15 CRASH 14767 and merged-m1 CRASH 8887 on the 40,620-frame arcade marathon with the tenant forced. Target chosen by CALLER COUNT, not by byte match alone: the 22-byte body appears TWICE in vsavj (0x47fb6 and 0x646de, the content-twin trap) and 0x646de has ZERO callers while 0x47fb6 has TEN, against ELEVEN for the vs2 original, with the caller addresses corresponding monotonically. Note the routine is a PURE LEAF - it touches no memory, only d0-d4 - so the twin choice cannot alter behaviour; the live copy is chosen for provenance."
+
+[[map]]
 vsav2 = 0x05c750
 vsavj = 0x054570
 kind = "engine_data"
@@ -1923,6 +1930,7 @@ note = "H KEPT SILENT (14z-65 sweep): sfx id 0x3ea — vsavj same-id keys DIFFER
 # taps on the staging words). Its A5 staging displacements are the
 # same-value class #4 family: ported copies need the six port_patch
 # rows (donovan/huitzil/pyron.toml), NOT a jsr reconciliation.
+
 [[map]]
 vsav2 = 0x028a6a
 vsavj = 0x029738
@@ -1934,6 +1942,7 @@ note = "object-hit damage applier (D0=atk id, a6=attacker ctx, victim via (0x32,
 # views): attack + both final 2D maps + combo + RNG-spice tables are
 # BYTE-IDENTICAL between the games; defense/low-HP tables differ only
 # on per-character-id rows (the roster id shuffle).
+
 [[map]]
 vsav2 = 0x0d22be
 vsavj = 0x0b8140
