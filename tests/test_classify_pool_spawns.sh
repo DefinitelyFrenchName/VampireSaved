@@ -8,6 +8,9 @@
 # ever collided" are the same zero on the map probe and opposite rulings on
 # whether `hitclass_map_extend` is still load-bearing. CLAUDE.md §4 requires
 # the classification code be validated before its verdicts are trusted.
+# (That ruling is now DECIDED — maintainer 2026-08-16, KEEP, on 0 entries
+# against 121 spawns — so this gate protects a decision rather than
+# informing an open one.)
 #
 # THE CASE THAT MATTERS MOST is the LANE. The tap logs word writes; the type
 # byte is at +0x02, an EVEN address, hence the HIGH lane on this big-endian

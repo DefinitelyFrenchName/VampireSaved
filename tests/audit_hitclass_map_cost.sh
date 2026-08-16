@@ -39,10 +39,16 @@
 #      14z-93 the indices are BINNED (in-domain / vs2 extension / trap),
 #      so the fix's safety argument is stated by the instrument.
 #   3  TENANT FIRE CENSUS (14z-93): the other half — how often a TENANT
-#      enters the map with an index >= 64. That is what the thunk BUYS,
-#      and no section measured it before; STATE 14z-92 (M4) filed it as
-#      the number that would settle keep-or-drop. Huitzil + Pyron only
-#      (donovan.toml does not declare the row: his types 59-63 fit).
+#      enters the map with an index >= 64, plus the SPAWN DENOMINATOR
+#      (how many type >= 64 objects entered the pool at all). That is what
+#      the thunk BUYS, and no section measured it before. Huitzil + Pyron
+#      only (donovan.toml does not declare the row: his types 59-63 fit).
+#      RESULT 14z-93: 0 map entries over 37 rigs against 121 pooled
+#      dangerous objects — the gap is CONTACT, not absence. On that basis
+#      the maintainer ruled **KEEP the thunk** (2026-08-16). This section
+#      is now a REGRESSION GATE on that ruling, not an open question:
+#      the only measurement that would reopen it is a pool-vs-pool
+#      contact rig scoring 0 extension entries.
 #   4  WHY IS SECTION 0's CRASH CONTROL DEAD? Same probe on the soak rig,
 #      separating "the over-index still happens, the address moved" from
 #      "the rig stopped producing the event".
@@ -393,10 +399,19 @@ fi
 
 # ---------------------------------------------------------------- section 3
 # THE TENANT SIDE (14z-93). Sections 1-2 measure what the thunk costs
-# LEGACY. Nothing measured what it BUYS — how often a tenant enters the map
-# with an index >= 64, which is the number that settles keep-or-drop
-# (STATE 14z-92 M4). The crash control in section 0 is dead, so "the fix is
-# still needed" currently rests on the frozen stamp inventory alone.
+# LEGACY. This measures what it BUYS — how often a tenant enters the map
+# with an index >= 64, and how many dangerous objects reach the pool at all.
+#
+# THE RULING THIS GATE NOW PROTECTS (maintainer, 2026-08-16): **KEEP
+# `hitclass_map_extend`**, on the measured asymmetry — 0 map entries over
+# 37 rigs, but 121 pooled objects of type >= 64, so the gap is CONTACT
+# rather than absence, and each of those 121 is one collision away from
+# indexing past vanilla's 64 entries. Cost of keeping is bounded and
+# measured (section 1: 43/46 bit-identical; section 2: all legacy indices
+# far below 64). Cost of dropping is the f7997 vec3.
+#
+# So a future run that reports 0 spawns as well as 0 entries is a
+# REGRESSION IN THE RIGS, not evidence for dropping the row.
 #
 # SCOPE IS HUITZIL + PYRON, BY CONSTRUCTION. Donovan's projectile types are
 # 59-63, they fit vanilla's 64-entry map, and donovan.toml deliberately does

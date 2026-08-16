@@ -14,6 +14,12 @@ into the `$FF9400` projectile pool at all. Map entries near zero WITH
 spawns well above zero means the exposure is live and the gap is CONTACT —
 i.e. a missing RIG, not a missing defect.
 
+That is exactly what it measured (14z-93): 0 entries against 121 spawns,
+on which the maintainer ruled **KEEP the thunk** (2026-08-16). The question
+is DECIDED; this tool is now the regression instrument behind that ruling,
+so a later run reporting 0 spawns means the rigs stopped exercising the
+tenant's projectile machine — not that the exposure went away.
+
 THE SLOT ARITHMETIC. The projectile pool is `$FF9400`, 0x100 stride, type
 byte at +0x02 (docs/game/atlas/ram.md; walker 0x54458). The tap logs word
 writes as `W frame <n> PC <pc> addr <a> data <d> mask <m>` and its own

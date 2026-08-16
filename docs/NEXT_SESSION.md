@@ -10,13 +10,15 @@
 
 ## What 14z-93 was, in one line
 
-**The M4 keep-or-drop question is answered, and the answer needed a second
-number.** The tenant enters the hit-class map **0 times** over all 37 rigs —
-which alone reads like "drop it" — but the same corpus puts **121 objects of
-type >= 64 into the projectile pool**. The gap is CONTACT, not absence, so
-the recommendation is **KEEP**, and what is actually missing is a
-pool-vs-pool contact RIG. A zero measured against no denominator is the same
-shape that produced the retracted "legacy never enters the map" claim.
+**The M4 keep-or-drop question is measured and RULED, and the answer needed a
+second number.** The tenant enters the hit-class map **0 times** over all 37
+rigs — which alone reads like "drop it" — but the same corpus puts **121
+objects of type >= 64 into the projectile pool**. The gap is CONTACT, not
+absence. **Maintainer ruled KEEP on 2026-08-16** ("more to lose by dropping
+it than keeping it"); the row stays and no build moved. What is missing is a
+pool-vs-pool contact RIG, which is now coverage work rather than a blocker.
+A zero measured against no denominator is the same shape that produced the
+retracted "legacy never enters the map" claim.
 
 Also: the 14z-92 retraction had **not** fully propagated — the retracted
 sentence was still live in `engine_internals.md` four lines below its own
@@ -146,8 +148,12 @@ three references rotted this session (`hui31`, `pyron20`, `pyron17`).
   it appears here on LEGACY content under FBNeo, which extends it. Per §4 a
   new tolerance needs sign-off. `FBNEO_ORACLE_EXPECT=exact` is the
   post-ruling target.
-- ~~**OPEN from M4 — is the thunk still load-bearing?**~~ **MEASURED 14z-93.
-  RECOMMENDATION: KEEP.** The tenant enters the map **0 times** over all 37
+- ~~**OPEN from M4 — is the thunk still load-bearing?**~~ **DECIDED
+  2026-08-16 (maintainer): KEEP `hitclass_map_extend`, at least for now** —
+  *"we have more to lose by dropping it than keeping it."* Nothing to do; the
+  row stays in `huitzil.toml` + `pyron.toml` and no build moves. The measured
+  basis follows, and the ONE thing that would reopen it is named at the end.
+  The tenant enters the map **0 times** over all 37
   hui+pyron rigs — while putting **121 objects of type >= 64 into the
   projectile pool** (9 distinct types, 64-72, in 22 of the 37 rigs). The gap
   is CONTACT, not absence: the sweep is POOL-vs-POOL, so a tenant projectile
@@ -161,14 +167,19 @@ three references rotted this session (`hui31`, `pyron20`, `pyron17`).
   **36** are in the 64-75 projectile-pool band that can over-index this map;
   the other 57 are the 114-120 obj_hook family (owner-tag served, never
   reaches the sweep). 93 overstates the exposure 2.6x.
-- **THE WORK THIS TURNED THE RULING INTO: author a pool-vs-pool contact
-  rig.** No rig in the corpus produces one.
+  **WHAT WOULD REOPEN IT (the "for now" clause):** a pool-vs-pool contact rig
+  that section 3 then measures at 0 extension entries. Nothing else — and
+  specifically not the dead crash control, which is a rig artefact.
+- **OPTIONAL, and no longer blocking anything: author a pool-vs-pool contact
+  rig.** No rig in the corpus produces one, which is why the census reads 0.
   `tests/replays/hui/88_hui_plasma_trap_contact.rpl`'s header names what is
   needed — "an opposing PROJECTILE to clash with, e.g. P2 Victor doing a
   pool-object move into the mine — not a walking fighter". Pyron's cosmo rigs
   are the richest source (17-28 type-66 spawns each), so a Pyron-vs-
-  projectile-character pairing is the likeliest route. With one, section 3
-  answers keep-or-drop outright and section 0's crash control can be revived.
+  projectile-character pairing is the likeliest route. It would buy two
+  things: the tenant census gets a real denominator, and section 0's crash
+  control becomes revivable. With KEEP decided, this is coverage work rather
+  than a decision blocker.
 - The M5 sfx odds (0x112/0x14a/0x173/0x31B family — machinery ready).
 - FLAKY CRASH RESET (Sasquatch intro; rig designed, STATE 14z-85f).
 - Round-end flicker (parked; needs the maintainer's recording).

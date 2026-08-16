@@ -24,10 +24,28 @@ of those 121 objects is one collision away from indexing past vanilla's 64
 entries, and the thunk is what turns that into vs2's defined class instead of
 a wild jump into the `rts` opcode at map[64].
 
-**RECOMMENDATION TO THE MAINTAINER: KEEP `hitclass_map_extend`.** The
-keep-or-drop question cannot be answered "drop" on the evidence available,
-and the dead crash control is not evidence for dropping — see below. What is
-genuinely missing is a RIG, and it is now a specific, small piece of work.
+**DECIDED 2026-08-16 (maintainer): KEEP `hitclass_map_extend`, at least for
+now** — *"by your own admission we have more to lose by dropping it than
+keeping it."* The row stays in `huitzil.toml` and `pyron.toml`; no build
+moves; no re-freeze is owed. Recorded in `docs/project/patch_index.md` as
+KEEP rather than as a deprecation candidate.
+
+The asymmetry the ruling rests on, both sides measured:
+- **Cost of keeping** — a live hook on a shared engine site, and it is small
+  and bounded: legacy 43/46 bit-identical with 3 transient re-convergent
+  divergences, and all 230 legacy map entries sit at indices 0x02/0x04/0x09/
+  0x0b, so legacy reads vanilla's own bytes out of the thunk body.
+- **Cost of dropping** — a wild jump through map[64] (= the following `rts`
+  opcode, 0x4E) the first time any of the 121 pooled type >= 64 objects
+  collides with another pool object. That is the f7997 vec3, and it was a
+  real measured crash on pyron-m2 before the fix.
+
+**THE "FOR NOW" CLAUSE, made concrete so it is not a vague hedge.** Exactly
+one thing would reopen this: a pool-vs-pool contact rig that section 3 then
+measures at **0 extension entries**. The dead crash control would NOT — it is
+a rig artefact (section 4), and re-pointing it at a new crash address proves
+nothing. Until such a rig exists the census has no denominator on the contact
+axis and cannot argue for dropping.
 
 **WHY THE CRASH CONTROL DIED — diagnosed, not guessed (section 4).** The
 same probe on section 0's soak rig (`pyron/70_pyron_mash` + PYR_SOAK) on the
@@ -197,10 +215,11 @@ assessed against the code — 11 confirmed, 1 contested (#77: the harness DOES
 NULL-check its calloc, and every consumer is bounded by the same variable, so
 a wrap truncates rather than overflows), 2 acted on.
 
-**OPEN, needing rulings:** the two FBNeo phase classes (#78); whether the
+**OPEN, needing rulings:** the two FBNeo phase classes (#78); ~~whether the
 hitclass thunk is still load-bearing (its crash rig died — measure the TENANT
-side before any keep/drop); the stage-4 boot-probe expectation exposed by
-#84; #44; #27; #30; #41 (maintainer's list).
+side before any keep/drop)~~ **DECIDED 2026-08-16 after the 14z-93
+measurement: KEEP** (see the 14z-93 entry at the top); the stage-4 boot-probe
+expectation exposed by #84; #44; #27; #30; #41 (maintainer's list).
 
 ## Session 14z-92 (5) — M4 RUN, AND IT FALSIFIED THE CLAIM IT WAS FILED TO
 ## CHECK: legacy enters the hit-class map 230 times, not zero. The fix is
@@ -256,6 +275,11 @@ pyron.toml still carry the fix, so **the RIG stopped demonstrating the crash;
 the fix did not stop being needed.** The missing measurement is the TENANT
 side — how often the tenant enters the map with an index >= 64 — which no
 section measures today. That is the number that would settle keep-or-drop.
+
+> **MEASURED AND SETTLED 14z-93.** Section 3 of the audit now measures it:
+> the tenant enters 0 times over 37 rigs, while 121 objects of type >= 64
+> enter the pool — the gap is CONTACT, not absence. Maintainer ruled
+> **KEEP** on 2026-08-16. See the 14z-93 entry at the top of this file.
 
 Exit 1 by design (the dead control fails the audit rather than being noted).
 
