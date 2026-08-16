@@ -1,0 +1,280 @@
+== B: build the merged image (LEGACY-ONLY INSTRUMENT — never playtest,
+      never register; tenants render BLANK by design) ==
+  ok: 753 ops (the frozen test_tenant_loop fixture — same merge)
+  rompath  build/merged1/rompath
+  romdir   /Users/koneko/Developer/Vampire_Saved/ROMS
+  members  21 in 1 zips
+  patched  4: vm3j.03d, vm3j.04d, vm3j.07b, vm3j.10b
+  note: byte-identical members (harmless — shadow nothing): vsavjw.zip:vsw.21m, vsavjw.zip:vsw.22m, vsavjw.zip:vsw.31m, vsavjw.zip:vsw.33m, vsavjw.zip:vsw.35m, vsavjw.zip:vsw.37m
+PASS: no member shadows a patched member
+  ok: built and packed (753 ops); fingerprint 952fc73138b93e2024516872b95ddc615694d900 (unregistered ON PURPOSE)
+  ok: F2 fixed — Huitzil's dispatch entry IS the merged shim
+      (0x4bb320): pool seed + phase gate + his flavor run for him
+== 0: the rig FORMS all three tenants' matches (else every verdict
+      below is vacuous). Guarded runs — never checksum-compared. ==
+  ok: donovan char-init entry (0x4bb320) executed 2 time(s)
+  ok: huitzil char-init entry (0x4bb320) executed 2 time(s)
+  ok: pyron char-init entry (0x45fae4) executed 2 time(s)
+== 0b: run-to-run determinism on the merged image (never run before) ==
+  ok: two masked runs of 03_two_player_vs bit-identical
+== 1 (leg a): merged vs VANILLA on the masked-v2 basis — the superset
+      question. Expectation: donovan-m3a's ratified classes VERBATIM,
+      plus the ratified merged-04 inventory (14z-82d). ==
+leg (a) coverage: 47/47 legacy pairings evaluated, 0 NOT EVALUATED (.pending)
+01_attract_long          PASS exact (bit-identical)
+02_demitri_vs_cpu        PASS window (divergent frames 787, runs 1, window 889..1675, 3845 identical after)
+03_two_player_vs         PASS composite (divergent frames 984 in 2 run(s): flicker 2093, windows 889-1871, 3227 identical after)
+04_select_fuzz           FAIL composite: divergent frames 218 in 3 run(s): flicker 1525,2009, windows 889-1104, 1511 identical after  FAIL:   flicker frames [1525, 2009], frozen expectation [1525, 2005, 2009, 2195] 
+        MEASURED, NOT RATIFIED — mechanism-attribute before touching
+        the expectation (CLAUDE.md §4). Measured shape:
+        A: /Users/koneko/Developer/Vampire_Saved/VampireSaved/tests/expected/vsavj/masked-v2/logs/04_select_fuzz.log  3520 frames, END 3520
+        B: /var/folders/m7/v33ds745313314_cz_z2jghw0000gn/T/tmp.HRbgDBemCH/a_04_select_fuzz.log  3520 frames, END 3520
+          divergent frames: 218 of 3520
+          window: 889..2009 (re-converges, 1511 clean frames after)
+        VERDICT: TRANSIENT — real state differed (not a clean phase shift).
+          3 contiguous run(s): 889-1104, 1525-1525, 2009-2009
+        shape: 218/3520 frames differ in 3 run(s), first at frame 889, last ends frame 2009, then 1511 identical
+        runs: 889-1104 1525-1525 2009-2009
+        proposed: composite vsavj/masked-v2 1525,2009 889-1104
+        log kept: build/gate_failures/merged1_a_04_select_fuzz.log
+05_timeout_idle          PASS window (divergent frames 787, runs 1, window 889..1675, 10445 identical after)
+06_test_mode             PASS exact (bit-identical)
+07_mash_storm            PASS window (divergent frames 787, runs 1, window 889..1675, 2645 identical after)
+08_challenger_join       PASS composite (divergent frames 1592 in 3 run(s): flicker 3507, windows 889-1675;3807-4610, 2310 identical after)
+09_mirror_pick           PASS window (divergent frames 1063, runs 1, window 889..1951, 2769 identical after)
+10_midattract_start      PASS window (divergent frames 2577, runs 1, window 3189..5765, 355 identical after)
+11_pick_donovan          FAIL composite: divergent frames 1527 in 1 run(s): flicker -, windows 889-2415, 1305 identical after  FAIL:   flicker frames -, frozen expectation [2836] 
+        MEASURED, NOT RATIFIED — mechanism-attribute before touching
+        the expectation (CLAUDE.md §4). Measured shape:
+        A: /Users/koneko/Developer/Vampire_Saved/VampireSaved/tests/expected/vsavj/masked-v2/logs/11_pick_donovan.log  3720 frames, END 3720
+        B: /var/folders/m7/v33ds745313314_cz_z2jghw0000gn/T/tmp.HRbgDBemCH/a_11_pick_donovan.log  3720 frames, END 3720
+          divergent frames: 1527 of 3720
+          window: 889..2415 (re-converges, 1305 clean frames after)
+        VERDICT: TRANSIENT — real state differed (not a clean phase shift).
+          1 contiguous run(s): 889-2415
+        shape: 1527/3720 frames differ in 1 run(s), first at frame 889, last ends frame 2415, then 1305 identical
+        runs: 889-2415
+        proposed: window vsavj/masked-v2 889 2415
+        log kept: build/gate_failures/merged1_a_11_pick_donovan.log
+12_donovan_vs_cpu        FAIL composite: divergent frames 1527 in 1 run(s): flicker -, windows 889-2415, 6905 identical after  FAIL:   flicker frames -, frozen expectation [2836, 5713] 
+        MEASURED, NOT RATIFIED — mechanism-attribute before touching
+        the expectation (CLAUDE.md §4). Measured shape:
+        A: /Users/koneko/Developer/Vampire_Saved/VampireSaved/tests/expected/vsavj/masked-v2/logs/12_donovan_vs_cpu.log  9320 frames, END 9320
+        B: /var/folders/m7/v33ds745313314_cz_z2jghw0000gn/T/tmp.HRbgDBemCH/a_12_donovan_vs_cpu.log  9320 frames, END 9320
+          divergent frames: 1527 of 9320
+          window: 889..2415 (re-converges, 6905 clean frames after)
+        VERDICT: TRANSIENT — real state differed (not a clean phase shift).
+          1 contiguous run(s): 889-2415
+        shape: 1527/9320 frames differ in 1 run(s), first at frame 889, last ends frame 2415, then 6905 identical
+        runs: 889-2415
+        proposed: window vsavj/masked-v2 889 2415
+        log kept: build/gate_failures/merged1_a_12_donovan_vs_cpu.log
+16_xemu_2p               PASS window (divergent frames 1203, runs 1, window 889..2091, 2229 identical after)
+17_don_oracle_vsavj      PASS window (divergent frames 1203, runs 1, window 889..2091, 2329 identical after)
+18_veteran_ctl_vsavj     PASS window (divergent frames 1203, runs 1, window 889..2091, 2329 identical after)
+19_don_dp_spam           PASS window (divergent frames 1203, runs 1, window 889..2091, 3839 identical after)
+20_don_round2            PASS window (divergent frames 1203, runs 1, window 889..2091, 10029 identical after)
+21_don_mash              PASS composite (divergent frames 1204 in 2 run(s): flicker 11777, windows 889-2091, 2343 identical after)
+22_don_dualmash          FAIL composite: divergent frames 1204 in 2 run(s): flicker 11862, windows 889-2091, 2058 identical after  FAIL:   flicker frames [11862], frozen expectation [11862, 11918] 
+        MEASURED, NOT RATIFIED — mechanism-attribute before touching
+        the expectation (CLAUDE.md §4). Measured shape:
+        A: /Users/koneko/Developer/Vampire_Saved/VampireSaved/tests/expected/vsavj/masked-v2/logs/22_don_dualmash.log  13920 frames, END 13920
+        B: /var/folders/m7/v33ds745313314_cz_z2jghw0000gn/T/tmp.HRbgDBemCH/a_22_don_dualmash.log  13920 frames, END 13920
+          divergent frames: 1204 of 13920
+          window: 889..11862 (re-converges, 2058 clean frames after)
+        VERDICT: TRANSIENT — real state differed (not a clean phase shift).
+          2 contiguous run(s): 889-2091, 11862-11862
+        shape: 1204/13920 frames differ in 2 run(s), first at frame 889, last ends frame 11862, then 2058 identical
+        runs: 889-2091 11862-11862
+        proposed: composite vsavj/masked-v2 11862 889-2091
+        log kept: build/gate_failures/merged1_a_22_don_dualmash.log
+23_don_matchwin          FAIL composite: divergent frames 1204 in 2 run(s): flicker 12313, windows 889-2091, 5807 identical after  FAIL:   flicker frames [12313], frozen expectation [12313, 12733] 
+        MEASURED, NOT RATIFIED — mechanism-attribute before touching
+        the expectation (CLAUDE.md §4). Measured shape:
+        A: /Users/koneko/Developer/Vampire_Saved/VampireSaved/tests/expected/vsavj/masked-v2/logs/23_don_matchwin.log  18120 frames, END 18120
+        B: /var/folders/m7/v33ds745313314_cz_z2jghw0000gn/T/tmp.HRbgDBemCH/a_23_don_matchwin.log  18120 frames, END 18120
+          divergent frames: 1204 of 18120
+          window: 889..12313 (re-converges, 5807 clean frames after)
+        VERDICT: TRANSIENT — real state differed (not a clean phase shift).
+          2 contiguous run(s): 889-2091, 12313-12313
+        shape: 1204/18120 frames differ in 2 run(s), first at frame 889, last ends frame 12313, then 5807 identical
+        runs: 889-2091 12313-12313
+        proposed: composite vsavj/masked-v2 12313 889-2091
+        log kept: build/gate_failures/merged1_a_23_don_matchwin.log
+24_don_winmash           FAIL composite: divergent frames 1204 in 2 run(s): flicker 12313, windows 889-2091, 6207 identical after  FAIL:   flicker frames [12313], frozen expectation [12313, 12733] 
+        MEASURED, NOT RATIFIED — mechanism-attribute before touching
+        the expectation (CLAUDE.md §4). Measured shape:
+        A: /Users/koneko/Developer/Vampire_Saved/VampireSaved/tests/expected/vsavj/masked-v2/logs/24_don_winmash.log  18520 frames, END 18520
+        B: /var/folders/m7/v33ds745313314_cz_z2jghw0000gn/T/tmp.HRbgDBemCH/a_24_don_winmash.log  18520 frames, END 18520
+          divergent frames: 1204 of 18520
+          window: 889..12313 (re-converges, 6207 clean frames after)
+        VERDICT: TRANSIENT — real state differed (not a clean phase shift).
+          2 contiguous run(s): 889-2091, 12313-12313
+        shape: 1204/18520 frames differ in 2 run(s), first at frame 889, last ends frame 12313, then 6207 identical
+        runs: 889-2091 12313-12313
+        proposed: composite vsavj/masked-v2 12313 889-2091
+        log kept: build/gate_failures/merged1_a_24_don_winmash.log
+25_don_darkforce         PASS window (divergent frames 1203, runs 1, window 889..2091, 7029 identical after)
+26_don_arcade_mash       PASS composite (divergent frames 1529 in 3 run(s): flicker 8744,36857, windows 889-2415, 3763 identical after)
+28_don_quotewin          FAIL composite: divergent frames 1204 in 2 run(s): flicker 12407, windows 889-2091, 2213 identical after  FAIL:   flicker frames [12407], frozen expectation [12407, 12827] 
+        MEASURED, NOT RATIFIED — mechanism-attribute before touching
+        the expectation (CLAUDE.md §4). Measured shape:
+        A: /Users/koneko/Developer/Vampire_Saved/VampireSaved/tests/expected/vsavj/masked-v2/logs/28_don_quotewin.log  14620 frames, END 14620
+        B: /var/folders/m7/v33ds745313314_cz_z2jghw0000gn/T/tmp.HRbgDBemCH/a_28_don_quotewin.log  14620 frames, END 14620
+          divergent frames: 1204 of 14620
+          window: 889..12407 (re-converges, 2213 clean frames after)
+        VERDICT: TRANSIENT — real state differed (not a clean phase shift).
+          2 contiguous run(s): 889-2091, 12407-12407
+        shape: 1204/14620 frames differ in 2 run(s), first at frame 889, last ends frame 12407, then 2213 identical
+        runs: 889-2091 12407-12407
+        proposed: composite vsavj/masked-v2 12407 889-2091
+        log kept: build/gate_failures/merged1_a_28_don_quotewin.log
+29_felicia_walljump      PASS composite (divergent frames 1128 in 2 run(s): flicker 2436, windows 889-2015, 1884 identical after)
+30_demitri_throw         PASS window (divergent frames 1127, runs 1, window 889..2015, 2705 identical after)
+31_don_6hp_vsavj         PASS window (divergent frames 1203, runs 1, window 889..2091, 2129 identical after)
+32_victor_shock_vsavj    PASS window (divergent frames 1203, runs 1, window 889..2091, 1729 identical after)
+33_victor_6hp_vsavj      PASS window (divergent frames 1203, runs 1, window 889..2091, 1129 identical after)
+34_victor_5hp_vsavj      PASS window (divergent frames 1203, runs 1, window 889..2091, 1229 identical after)
+35_victor_kd_vsavj       PASS window (divergent frames 1203, runs 1, window 889..2091, 1179 identical after)
+36_victor_kd2_vsavj      PASS window (divergent frames 1203, runs 1, window 889..2091, 1179 identical after)
+37_victor_ko_vsavj       PASS composite (divergent frames 1205 in 3 run(s): flicker 6962,7168, windows 889-2091, 2512 identical after)
+38_victor_p1_vsavj       PASS window (divergent frames 1203, runs 1, window 889..2091, 2909 identical after)
+39_victor_cross_vsavj    PASS window (divergent frames 1203, runs 1, window 889..2091, 2739 identical after)
+40_victor_5hp_defaultchar_vsavj PASS window (divergent frames 1203, runs 1, window 889..2091, 1229 identical after)
+41_don_altcolor_vsavj    FAIL composite: divergent frames 1203 in 1 run(s): flicker -, windows 889-2091, 2129 identical after  FAIL:   flicker frames -, frozen expectation [2313] 
+        MEASURED, NOT RATIFIED — mechanism-attribute before touching
+        the expectation (CLAUDE.md §4). Measured shape:
+        A: /Users/koneko/Developer/Vampire_Saved/VampireSaved/tests/expected/vsavj/masked-v2/logs/41_don_altcolor_vsavj.log  4220 frames, END 4220
+        B: /var/folders/m7/v33ds745313314_cz_z2jghw0000gn/T/tmp.HRbgDBemCH/a_41_don_altcolor_vsavj.log  4220 frames, END 4220
+          divergent frames: 1203 of 4220
+          window: 889..2091 (re-converges, 2129 clean frames after)
+        VERDICT: TRANSIENT — real state differed (not a clean phase shift).
+          1 contiguous run(s): 889-2091
+        shape: 1203/4220 frames differ in 1 run(s), first at frame 889, last ends frame 2091, then 2129 identical
+        runs: 889-2091
+        proposed: window vsavj/masked-v2 889 2091
+        log kept: build/gate_failures/merged1_a_41_don_altcolor_vsavj.log
+42_don_mirror_vsavj      PASS window (divergent frames 1203, runs 1, window 889..2091, 2129 identical after)
+48_don_immortal_ko       PASS window (divergent frames 1203, runs 1, window 889..2091, 1429 identical after)
+50_don_column_ko         PASS window (divergent frames 1203, runs 1, window 889..2091, 1429 identical after)
+53_don_immortal_mash     PASS window (divergent frames 1203, runs 1, window 889..2091, 1429 identical after)
+54_don_matchend_ko       PASS window (divergent frames 1203, runs 1, window 889..2091, 1829 identical after)
+56_don_es_ls             PASS window (divergent frames 1203, runs 1, window 889..2091, 1429 identical after)
+59_don_blizzard_hcf      PASS window (divergent frames 1203, runs 1, window 889..2091, 1129 identical after)
+60_don_grapple_hcb       PASS window (divergent frames 1203, runs 1, window 889..2091, 1229 identical after)
+63_idle_select           PASS composite (divergent frames 2578 in 2 run(s): flicker 3886, windows 889-3465, 434 identical after)
+65_don_mirror_throw      PASS window (divergent frames 1203, runs 1, window 889..2091, 2429 identical after)
+  -- leg (a) summary (replay | expected class | verdict) --
+     01_attract_long          exact      PASS
+     02_demitri_vs_cpu        window     PASS
+     03_two_player_vs         composite  PASS
+     04_select_fuzz           composite  FAIL
+     05_timeout_idle          window     PASS
+     06_test_mode             exact      PASS
+     07_mash_storm            window     PASS
+     08_challenger_join       composite  PASS
+     09_mirror_pick           window     PASS
+     10_midattract_start      window     PASS
+     11_pick_donovan          composite  FAIL
+     12_donovan_vs_cpu        composite  FAIL
+     16_xemu_2p               window     PASS
+     17_don_oracle_vsavj      window     PASS
+     18_veteran_ctl_vsavj     window     PASS
+     19_don_dp_spam           window     PASS
+     20_don_round2            window     PASS
+     21_don_mash              composite  PASS
+     22_don_dualmash          composite  FAIL
+     23_don_matchwin          composite  FAIL
+     24_don_winmash           composite  FAIL
+     25_don_darkforce         window     PASS
+     26_don_arcade_mash       composite  PASS
+     28_don_quotewin          composite  FAIL
+     29_felicia_walljump      composite  PASS
+     30_demitri_throw         window     PASS
+     31_don_6hp_vsavj         window     PASS
+     32_victor_shock_vsavj    window     PASS
+     33_victor_6hp_vsavj      window     PASS
+     34_victor_5hp_vsavj      window     PASS
+     35_victor_kd_vsavj       window     PASS
+     36_victor_kd2_vsavj      window     PASS
+     37_victor_ko_vsavj       composite  PASS
+     38_victor_p1_vsavj       window     PASS
+     39_victor_cross_vsavj    window     PASS
+     40_victor_5hp_defaultchar_vsavj window     PASS
+     41_don_altcolor_vsavj    composite  FAIL
+     42_don_mirror_vsavj      window     PASS
+     48_don_immortal_ko       window     PASS
+     50_don_column_ko         window     PASS
+     53_don_immortal_mash     window     PASS
+     54_don_matchend_ko       window     PASS
+     56_don_es_ls             window     PASS
+     59_don_blizzard_hcf      window     PASS
+     60_don_grapple_hcb       window     PASS
+     63_idle_select           composite  PASS
+     65_don_mirror_throw      window     PASS
+== 2 (leg b): merged vs the frozen single-tenant builds on TENANT
+      content — does MERGING change what each tenant's build did?
+      Whole-RAM identity is NOT expected (placements differ and placed
+      addresses are cached into RAM pointers; the select screens also
+      legitimately differ — single-tenant builds back one medallion,
+      merged backs three). Gate: a clean guarded run, a first
+      divergence no earlier than frame 850 (boot/attract must be
+      unperturbed), and a NON-identical pair (identical = dead rig). ==
+donovan/12_vs_cpu            FAIL: first divergence at frame 470 (< 850) — the merged
+        image perturbs BOOT/ATTRACT relative to build/m5_wide, which no
+        select/placement mechanism explains. Root-cause first.
+        A: /var/folders/m7/v33ds745313314_cz_z2jghw0000gn/T/tmp.HRbgDBemCH/b_12_donovan_vs_cpu_ref.log  9320 frames, END 9320
+        B: /var/folders/m7/v33ds745313314_cz_z2jghw0000gn/T/tmp.HRbgDBemCH/b_12_donovan_vs_cpu_new.log  9320 frames, END 9320
+          divergent frames: 8762 of 9320
+          window: 470..9320 (runs to the end)
+        VERDICT: PERMANENT — real state differed (not a clean phase shift).
+          82 contiguous run(s): 470-485, 487-487, 489-491, 493-497, 499-510, 512-512, 514-516, 518-522, 524-524, 526-528 ...
+donovan/20_round2            FAIL: first divergence at frame 470 (< 850) — the merged
+        image perturbs BOOT/ATTRACT relative to build/m5_wide, which no
+        select/placement mechanism explains. Root-cause first.
+        A: /var/folders/m7/v33ds745313314_cz_z2jghw0000gn/T/tmp.HRbgDBemCH/b_20_don_round2_ref.log  12120 frames, END 12120
+        B: /var/folders/m7/v33ds745313314_cz_z2jghw0000gn/T/tmp.HRbgDBemCH/b_20_don_round2_new.log  12120 frames, END 12120
+          divergent frames: 11549 of 12120
+          window: 470..12120 (runs to the end)
+        VERDICT: PERMANENT — real state differed (not a clean phase shift).
+          96 contiguous run(s): 470-481, 483-485, 487-487, 489-491, 493-497, 499-510, 512-516, 518-518, 520-522, 524-524 ...
+huitzil/70_mash              FAIL: first divergence at frame 470 (< 850) — the merged
+        image perturbs BOOT/ATTRACT relative to build/hui30, which no
+        select/placement mechanism explains. Root-cause first.
+        A: /var/folders/m7/v33ds745313314_cz_z2jghw0000gn/T/tmp.HRbgDBemCH/b_70_hui_mash_ref.log  11017 frames, END 11017
+        B: /var/folders/m7/v33ds745313314_cz_z2jghw0000gn/T/tmp.HRbgDBemCH/b_70_hui_mash_new.log  11017 frames, END 11017
+          divergent frames: 10435 of 11017
+          window: 470..11017 (runs to the end)
+        VERDICT: PERMANENT — real state differed (not a clean phase shift).
+          105 contiguous run(s): 470-485, 487-487, 489-491, 493-497, 499-510, 512-512, 514-516, 518-522, 524-524, 526-528 ...
+huitzil/83_fx                FAIL: first divergence at frame 470 (< 850) — the merged
+        image perturbs BOOT/ATTRACT relative to build/hui30, which no
+        select/placement mechanism explains. Root-cause first.
+        A: /var/folders/m7/v33ds745313314_cz_z2jghw0000gn/T/tmp.HRbgDBemCH/b_83_hui_fx_ref.log  3820 frames, END 3820
+        B: /var/folders/m7/v33ds745313314_cz_z2jghw0000gn/T/tmp.HRbgDBemCH/b_83_hui_fx_new.log  3820 frames, END 3820
+          divergent frames: 3253 of 3820
+          window: 470..3820 (runs to the end)
+        VERDICT: PERMANENT — real state differed (not a clean phase shift).
+          90 contiguous run(s): 470-485, 487-487, 489-491, 493-497, 499-510, 512-512, 514-516, 518-522, 524-524, 526-528 ...
+pyron/70_mash                FAIL: first divergence at frame 470 (< 850) — the merged
+        image perturbs BOOT/ATTRACT relative to build/pyron21, which no
+        select/placement mechanism explains. Root-cause first.
+        A: /var/folders/m7/v33ds745313314_cz_z2jghw0000gn/T/tmp.HRbgDBemCH/b_70_pyron_mash_ref.log  11017 frames, END 11017
+        B: /var/folders/m7/v33ds745313314_cz_z2jghw0000gn/T/tmp.HRbgDBemCH/b_70_pyron_mash_new.log  11017 frames, END 11017
+          divergent frames: 10435 of 11017
+          window: 470..11017 (runs to the end)
+        VERDICT: PERMANENT — real state differed (not a clean phase shift).
+          105 contiguous run(s): 470-485, 487-487, 489-491, 493-497, 499-510, 512-512, 514-516, 518-522, 524-524, 526-528 ...
+pyron/72_cosmo_2p            FAIL: first divergence at frame 470 (< 850) — the merged
+        image perturbs BOOT/ATTRACT relative to build/pyron21, which no
+        select/placement mechanism explains. Root-cause first.
+        A: /var/folders/m7/v33ds745313314_cz_z2jghw0000gn/T/tmp.HRbgDBemCH/b_72_pyron_cosmo_2p_ref.log  5120 frames, END 5120
+        B: /var/folders/m7/v33ds745313314_cz_z2jghw0000gn/T/tmp.HRbgDBemCH/b_72_pyron_cosmo_2p_new.log  5120 frames, END 5120
+          divergent frames: 4580 of 5120
+          window: 470..5120 (runs to the end)
+        VERDICT: PERMANENT — real state differed (not a clean phase shift).
+          71 contiguous run(s): 470-481, 483-485, 487-487, 489-491, 493-497, 499-510, 512-516, 518-518, 520-522, 524-524 ...
+
+FAIL: merged-legacy audit — read the per-replay verdicts above.
+      A leg-(a) deviation is MEASURED, NOT RATIFIED (CLAUDE.md §4);
+      a PERMANENT class there halts forward work (§2.6).
