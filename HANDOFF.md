@@ -1096,6 +1096,15 @@ tests/test_effect_palette_table.sh    # 14z-76: the per-character palette POINTE
                                       # variant row, a build clobbering a base-half
                                       # row). tools/audit_effect_palette_table.py.
                                       # Static, seconds
+tests/test_audit_merged_dispatch.sh   # 14z-90 (issue #17): ground truth for the
+                                      # expectation enumeration audit_merged_legacy.sh
+                                      # runs before its leg-(a) glob. The glob
+                                      # is *.masked only, so `.pending` — a
+                                      # pairing with no ratified class anywhere
+                                      # — was dropped silently, putting the
+                                      # blind spot over the open regression.
+                                      # Case 3 is live: donovan-m5 must name
+                                      # exactly 2 NOT-EVALUATED. ROM-free, ~1s
 tests/test_fbneo_runner_hygiene.sh    # 14z-90 (issue #12, shell half): a FAILED
                                       # FBNeo run must not leave the previous
                                       # run's log/.tap/side-channel outputs

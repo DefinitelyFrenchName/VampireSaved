@@ -52,8 +52,13 @@
 # Usage: ROMDIR=... [MAME_BIN=...] tests/audit_merged_legacy.sh
 # On-demand: builds build/merged1 and runs the legs below (~2 h since
 # 14z-89 — leg (a) is a GLOB over tests/expected/donovan-m5/*.masked and
-# that set grew 14 -> 47 with the legacy-pairing promotion; it was ~40 min
-# at 14 replays).
+# that set grew 14 -> 45 .masked with the legacy-pairing promotion; it was
+# ~40 min at 14 replays).
+# RETRACTED 14z-90 (GitHub issue #17): this line said "14 -> 47". It is 45
+# .masked plus 2 .pending, and the glob below evaluates only the .masked —
+# so the documented coverage overstated the measured coverage by exactly the
+# replays that are NOT evaluated. Those two are now enumerated and named
+# loudly before the glob runs; see ENUMERATE below.
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"
@@ -257,6 +262,43 @@ echo "  ok: two masked runs of 03_two_player_vs bit-identical"
 echo "== 1 (leg a): merged vs VANILLA on the masked-v2 basis — the superset"
 echo "      question. Expectation: donovan-m3a's ratified classes VERBATIM,"
 echo "      plus the ratified merged-04 inventory (14z-82d). =="
+# --- ENUMERATE (14z-90, GitHub issue #17) --------------------------------
+# The glob below evaluates *.masked ONLY, and said nothing about anything
+# else in the directory. `.pending` marks a legacy pairing with NO ratified
+# class in ANY expectation set, which is precisely the state this audit
+# exists to detect — so dropping it silently put the blind spot exactly over
+# the open regression. Costs no emulator time: it is a directory walk.
+#
+# It REPORTS rather than INCLUDES. A `.pending` file is prose, not a
+# `<class> <base> <args>` line, so there is nothing to compare against;
+# borrowing another set's class would be a FOURTH inline merged override,
+# which STATE.md 14z-89 (4) pre-flags as the wrong direction ("does the
+# merged build want its own class table?").
+. "$REPO/tests/lib/enumerate_expectations.sh"
+_eval=0; _noteval=0
+_enum="$(enumerate_expectations "$EXPECT" "$REPO")" || true
+for _line in $_enum; do
+    _n="${_line%%|*}"; _rest="${_line#*|}"
+    _kind="${_rest%%|*}"; _disp="${_rest##*|}"
+    case "$_disp" in
+        EVAL) _eval=$((_eval+1)) ;;
+        NOT-EVALUATED)
+            _noteval=$((_noteval+1))
+            echo "$_n  NOT EVALUATED — .pending (unratified legacy pairing)"
+            echo "      This legacy pairing has no ratified class in ANY"
+            echo "      expectation set, so the merged image is UNVERIFIED on"
+            echo "      it. Not skipped, not green: leg (a)'s verdict is"
+            echo "      INCOMPLETE while this file exists. Ratify the class in"
+            echo "      tests/expected/<set>/ and this line disappears."
+            fail=1 ;;
+        UNKNOWN-KIND)
+            echo "FAIL: audit_merged_legacy.sh does not implement expectation"
+            echo "      kind '.$_kind' ($_n) — it would be silently ignored"
+            fail=1 ;;
+    esac
+done
+echo "leg (a) coverage: $_eval/$((_eval+_noteval)) legacy pairings evaluated, $_noteval NOT EVALUATED (.pending)"
+
 : > "$W/summary"
 for spec in "$EXPECT"/*.masked; do
     name="$(basename "$spec" .masked)"
@@ -466,7 +508,7 @@ if [ "$fail" != 0 ]; then
     exit 1
 fi
 echo "PASS: the 3-tenant merged program image lands on the ratified legacy"
-echo "      classes VERBATIM (leg a; 04 on its ratified merged-specific"
+echo "      classes VERBATIM for the pairings that HAVE one (leg a; 04 on its ratified merged-specific"
 echo "      inventory, 14z-82d), and each tenant's own content forms"
 echo "      matches, survives the crash guard, and leaves boot/attract"
 echo "      untouched relative to its frozen single-tenant build (leg b)."
