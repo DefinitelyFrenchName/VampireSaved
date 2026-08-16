@@ -166,12 +166,36 @@ python3 tools/cps2_decrypt.py "$ROMDIR/vsavj.zip" "$OUT/vanilla_op.bin" \
     --data-out "$OUT/vanilla_data.bin" > /dev/null 2>&1
 for T in donovan:$D_EX huitzil:$H_EX pyron:$P_EX; do
     name="${T%%:*}"; ex="${T#*:}"
+    # 14z-90 (GitHub issue #14): these two were piped through `sed`, so under
+    # `#!/bin/sh` + `set -eu` with no pipefail the pipeline's status was sed's
+    # — always 0 — and BOTH verdict-bearing verifiers were unconditionally
+    # green. Third payment of docs/project/gotchas.md "Pipe a build tool
+    # through tail". `set -o pipefail` is NOT the fix here: this file is clean
+    # POSIX and tests/test_shell_portability.sh now fails any #!/bin/sh script
+    # that uses it. Redirect, then indent the log — same idiom as b4df1ff.
+    #
+    # This guard is not theoretical: it aborts TODAY on huitzil (record/entry
+    # parity 1374,14911 != 1375,14978, and 34 tile codes outside the placed
+    # window) on build/m3b_merged7. That failure was printed and unread through
+    # merged6 and merged7 because of the swallowed status.
     echo "  -- verify_gfx_build --tenant $name"
     python3 tools/verify_gfx_build.py "$OUT" --tenant "$name" \
-        --gfx-dir "$OUT/gfx_$name" --extract-dir "$ex" | sed 's/^/     /'
+        --gfx-dir "$OUT/gfx_$name" --extract-dir "$ex" \
+        > "$OUT/verify_$name.log" 2>&1 || {
+            sed 's/^/     /' "$OUT/verify_$name.log"
+            echo "FAIL: verify_gfx_build --tenant $name — this set is NOT" >&2
+            echo "      verified; do not run, register or playtest it." >&2
+            exit 1; }
+    sed 's/^/     /' "$OUT/verify_$name.log"
     echo "  -- check_tenant_hud --tenant $name"
     python3 tools/check_tenant_hud.py "$OUT" "$OUT/vanilla_data.bin" \
-        "$ROMDIR" --tenant "$name" --gfx-dir "$CHAIN" | sed 's/^/     /'
+        "$ROMDIR" --tenant "$name" --gfx-dir "$CHAIN" \
+        > "$OUT/hud_$name.log" 2>&1 || {
+            sed 's/^/     /' "$OUT/hud_$name.log"
+            echo "FAIL: check_tenant_hud --tenant $name — this set is NOT" >&2
+            echo "      verified; do not run, register or playtest it." >&2
+            exit 1; }
+    sed 's/^/     /' "$OUT/hud_$name.log"
 done
 
 FP="$(python3 tools/build_fingerprint.py "$OUT/rompath;$ROMDIR" --set vsavjw --sha-only)"
