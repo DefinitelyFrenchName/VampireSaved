@@ -94,13 +94,27 @@ gen "$W/b2" 500 100 101
 want "flicker-max (2 frames)" "$W/base" "$W/b2" "flicker vsavj/masked-v2 2 100,101"
 gen "$W/b3" 500 100 101 102
 want "flicker-max+1 (3 frames)" "$W/base" "$W/b3" "window vsavj/masked-v2 100 102"
-# 7b. exactly 60 identical frames after the run is NOT enough (tail > 60);
-#     61 is. This is the clause that separates "re-converged" from "ended".
+# 7b. THE RE-CONVERGENCE FLOOR IS ">= 60", so a tail of exactly 60 is ENOUGH.
+#     CORRECTED 14z-90 (GitHub issue #53): this case used to assert the
+#     opposite — that a 60-frame tail must be REFUSED — which is the wrong
+#     side of CLAUDE.md §4's ratified ">= 60". The proposer implemented the
+#     test's rule (`tail <= RECONVERGE`) and the enforcer
+#     (tools/compare_window.py) implemented §4's, so the tool that WRITES an
+#     expectation disagreed by one frame with the tool that CHECKS it. The
+#     tool was fixed and this case flipped; the boundary is now pinned from
+#     both sides so it cannot drift again silently.
 gen "$W/t60" 500 438 439 440        # frames 441..500 identical = tail exactly 60
-if $D "$W/base" "$W/t60" | grep -q "^proposed: NONE"; then
-    echo "  ok reconverge floor: a 60-frame tail is refused"
+if $D "$W/base" "$W/t60" | grep -q "^proposed: window"; then
+    echo "  ok reconverge floor: a 60-frame tail is ACCEPTED (>= 60)"
 else
-    echo "  FAIL: a 60-frame tail was accepted as re-convergence"; fail=1
+    echo "  FAIL: a 60-frame tail was refused — the proposer disagrees with"
+    echo "        compare_window, which accepts it"; fail=1
+fi
+gen "$W/t59" 500 439 440 441        # frames 442..500 identical = tail 59
+if $D "$W/base" "$W/t59" | grep -q "^proposed: NONE"; then
+    echo "  ok reconverge floor: a 59-frame tail is refused"
+else
+    echo "  FAIL: a 59-frame tail was accepted — the floor is not enforced"; fail=1
 fi
 gen "$W/t61" 500 437 438 439        # frames 440..500 identical = tail 61
 want "reconverge floor+1" "$W/base" "$W/t61" "window vsavj/masked-v2 437 439"

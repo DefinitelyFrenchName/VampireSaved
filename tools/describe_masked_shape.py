@@ -74,7 +74,11 @@ def main():
           "frame %d, then %d identical%s" % (len(d), n, len(runs), fr(runs[0][0]),
                                              fr(runs[-1][1]), tail, note))
     print("runs: " + " ".join("%d-%d" % (fr(x), fr(y)) for x, y in runs))
-    if tail <= RECONVERGE:
+    # 14z-90 (GitHub issue #53): was `tail <= RECONVERGE`, so the PROPOSER
+    # refused a tail of exactly 60 while the ENFORCER (compare_window)
+    # accepts it — §4 says ">= 60". One character, and it made the tool
+    # that writes expectations disagree with the tool that checks them.
+    if tail < RECONVERGE:
         print("proposed: NONE — does not re-converge (>=%d identical tail "
               "required); this is not expressible in the ratified vocabulary "
               "and must be root-caused" % RECONVERGE)

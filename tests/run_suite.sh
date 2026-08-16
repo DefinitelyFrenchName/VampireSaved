@@ -171,11 +171,18 @@ for rpl in "$REPO"/tests/replays/*.rpl; do
                 echo "FAIL masked-window: $(echo "$out" | tr '\n' ' ')"; fail=1
             fi ;;
         composite)
-            # PROPOSED §4 class (STATE 14z-61), strict conjunction of
-            # `flicker` and `window`: args "<flicker-csv> <window-list>".
-            # Nothing uses it until a .pending expectation is ratified into
-            # one — the implementation exists so that decision costs a word,
-            # not a session. Ground truth: tests/test_compare_composite.sh.
+            # RATIFIED §4 v4 class (CLAUDE.md, maintainer-ratified
+            # 2026-08-06), strict conjunction of `flicker` and `window`:
+            # args "<flicker-csv> <window-list>".
+            # CORRECTED 14z-90: this said "PROPOSED (STATE 14z-61)" and
+            # "Nothing uses it until a .pending expectation is ratified into
+            # one" — while 121 of the 185 .masked specs use it. The issue-#4
+            # retraction fixed the identical claim in compare_composite.py's
+            # docstring and MISSED this copy, which is exactly the failure
+            # CLAUDE.md's retraction discipline describes: grep the CLAIM, not
+            # the file you remember writing it in. Found by an independent
+            # judge re-reading this file for a different issue.
+            # Ground truth: tests/test_compare_composite.sh.
             cfl=${args%% *}; cwin=${args##* }
             if out=$(python3 "$REPO/tools/compare_composite.py" "$baselog" \
                         "$WORK/$name.1.log" --flicker "$cfl" --windows "$cwin" 2>&1); then
