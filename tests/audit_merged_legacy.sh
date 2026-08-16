@@ -487,7 +487,7 @@ if [ "$fail" != 0 ]; then
     exit 1
 fi
 echo "PASS: the 3-tenant merged program image lands on the ratified legacy"
-echo "      classes VERBATIM for the pairings that HAVE one (leg a; 04 on its ratified merged-specific"
+echo "      classes in tests/expected/merged1 — its OWN table since 14z-91 (leg a),"
 echo "      and each tenant's own content forms"
 echo "      matches, survives the crash guard, and leaves boot/attract"
 echo "      untouched relative to its frozen single-tenant build (leg b)."
