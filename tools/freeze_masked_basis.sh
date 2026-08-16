@@ -77,6 +77,18 @@ freeze_one() {
     _o="$WORK/out_$_n"
     if [ ! -f "$_rpl" ]; then echo "$_n: no such replay" > "$_o"; touch "$WORK/fail_$_n"; return 0; fi
     for _i in 1 2; do
+        # FRESH SANDBOX, ALWAYS (14z-91). run_mame.sh treats an explicit
+        # MAME_SANDBOX as DELIBERATE REUSE ("to test nvram-carrying scenarios",
+        # tools/run_mame.sh:6-10), and these paths are derived from the replay
+        # NAME alone — so calling freeze_one twice for one name in a single
+        # invocation hands the second call the first call's EEPROM. That is
+        # not hypothetical: it is what `VERIFY_BASIS=<name> ... <name>` does,
+        # i.e. the canary command docs/NEXT_SESSION.md documents. Measured:
+        # the verify leg reproduced the frozen log bit-for-bit, then the freeze
+        # leg ran on the dirty sandbox, diverged at frame 73 and OVERWROTE the
+        # basis it had just verified. Both legs are internally deterministic,
+        # so neither the pair-cmp nor the control could see it.
+        rm -rf "$WORK/sb_${_n}_$_i"
         if ! MASK_RANGES="$MASK" MAME_ROMPATH="$ROMDIR" \
              "$REPO/tools/run_replay_mame.sh" vsavj "$_rpl" "$WORK/$_n.$_i.log" \
              "$WORK/sb_${_n}_$_i" >"$WORK/mame_${_n}_$_i.log" 2>&1; then
