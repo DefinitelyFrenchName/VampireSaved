@@ -2,6 +2,26 @@
 # Rows added only at freeze time, as a build decision recorded in STATE.md.
 # Every row also has an annotated git tag freeze/<expectation-set> at the
 # commit that froze it — the way back to a tree that reproduces it.
+#
+# THE MERGED BUILD IS FROZEN AND DELIBERATELY HAS NO ROW HERE (merged-m1,
+# 14z-92, maintainer-decided). Do not "fix" this by adding one.
+# The dispatch fingerprint covers PROGRAM members only (the blind spot
+# build_fingerprint.py documents), and `build/merged1` — the LEGACY-ONLY
+# instrument whose three tenants draw BLANK tiles, packed against the
+# zero-filled overlay — is generated from the same inputs as the shippable
+# merged build. Both fingerprint 952fc731…, measured. So a row for the
+# merged build registers the blanks instrument too, and the guard that
+# keeps that instrument out of run_suite IS the absence of this row
+# (audit_merged_legacy.sh:15 "no registry row ON PURPOSE (run_suite.sh
+# refuses it)"; HANDOFF "never playtest it, never give it a registry row").
+# merged-m1 is frozen by annotated git tag + the HANDOFF build-registry row
+# instead, and is validated by the merged-specific gates
+# (test_merged_render_content, audit_trap_parity, audit_fg_parity,
+# audit_select_bank_gates, audit_merged_legacy) rather than by run_suite
+# dispatch. If a merged build ever NEEDS run_suite dispatch, the thing to
+# change is the discriminator — make the instrument fingerprint-distinct,
+# or dispatch on the whole-set fingerprint (build_fingerprint.py --full) —
+# never to add a row that silently green-lights the instrument.
 # sha1	expectation-set	notes
 b0eb9ecd8a6fd354f398d4347002b204b784f47c	vsavj	vanilla vsavj (Japan 970519) reference program image
 a02aeefff4c7a053337b10c923c8c328573788fa	donovan-m2	M2a freeze: donovan-m2 stage 5 (hooked build; masked legacy basis per CLAUDE.md §4 v2) — frozen 2026-07-28, STATE.md
