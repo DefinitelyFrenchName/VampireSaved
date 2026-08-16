@@ -111,16 +111,21 @@ The superseded framing, kept because it explains the shapes above:
   carry-forward is done, and the effect family — three defects, three
   root causes across 14z-70/71 — is closed end to end on the shipping
   artifact.
-- **L/M/H VARIANTS: the maintainer tested all MOVES on the three tenants
-  but not every strength variant of each.** Measured rather than carried
-  (14z-92 (4)): the known danger class is COVERED — `test_index_space`,
-  `test_variant_dispatch` (0 rows where ours runs a routine vs2 does not)
-  and `test_index_window_thunk` all PASS on merged8, entry 82 confirmed
-  live by `audit_trap_parity` and the SILENT entry 83 by
-  `test_hui_pairs`. Any strength reaching the out-of-range window gets a
-  DEFINED vs2 handler. What remains is unknown-unknowns, not a named
-  mechanism — so per-strength playtesting is now a nice-to-have, not a
-  risk item.
+- **PHOBOS' HISTORICALLY-DEFECTIVE MOVESET IS FIELD-CONFIRMED ON THE
+  MERGED BUILD** (maintainer, 2026-08-16): 236+P, 236+K, jump214+K,
+  236+2K, 214+2K "in the variants that broke or were incomplete in the
+  past and their ES variants". That is the beam family (14z-70/71, three
+  root causes) and the Plasma Trap (out-of-range entry 82, the LOUD one),
+  ES included — and an ES that fires is a stronger statement than it
+  looks, because an empty meter silently downgrades.
+  Combined with the rigs, the whole danger set for table 0x018468 is
+  covered by whichever instrument can reach it: entry 82 by the
+  maintainer AND `audit_trap_parity`; entry 83 (Reflect Wall, SILENT) by
+  `test_hui_pairs` only — it is guard-cancel-only, so a rig is the ONLY
+  way it can ever be confirmed. `test_index_space` /
+  `test_variant_dispatch` / `test_index_window_thunk` all PASS on
+  merged8 besides. **Remaining L/M/H strengths are unknown-unknowns, not
+  a named mechanism — a nice-to-have, not a risk item.**
 - **"IT MAY FEEL BETTER" — measurable, and worth measuring once.** The
   maintainer flagged it as feeling, not fact, and it is recorded as an
   impression only. But a mechanism exists: 14z-91 left the two obj_hook

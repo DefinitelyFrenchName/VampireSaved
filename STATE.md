@@ -12,6 +12,39 @@ half is SILENT: entry 83 of table `0x018468` is EVEN and lands on real code, so
 "no obvious regression" cannot clear it. Rather than ask for exhaustive
 per-strength playtesting, the static surface was measured on merged8.
 
+**AND THEN THE MAINTAINER NARROWED IT FURTHER (2026-08-16), which changes the
+verdict:** *"Phobos' 236+P, 236+K, jump214+K, 236+2K, 214+2K in the variants
+that broke or were incomplete in the past and their ES variants have been
+tested successfully."*
+
+That is not a sample — it is **the historically-defective set**, exercised
+including ES:
+- **236+P / 236+K / 236+2K** — the BEAM family. Three defects under one
+  symptom, closed across 14z-70/71 (effect-class row 16 was a STUB; drawer
+  list-type 6 takeover; the type-4 strip's `+0x3800` bias and its uncopied
+  bank-1 tiles). All three variants are one art path (`test_beam_variants`).
+- **jump 214+K** — the PLASMA TRAP, i.e. **out-of-range entry 82**, the LOUD
+  one that crashed every Phobos build until the (b') index-window thunk
+  (14z-79), and whose damage/chirp/shock/ejection arc closed over
+  14z-85f..14z-86.
+- **214+2K** and the ES variants — ES CONSUMES A METER STOCK, and an empty
+  meter silently downgrades to the single-button move (the trap that fooled
+  three sessions, `test_hui_df_style` / `test_beam_variants`), so an ES
+  reported as firing is a stronger statement than it looks.
+
+**COMBINED WITH THE RIG WORK, THE WHOLE DANGER SET FOR TABLE `0x018468` IS
+NOW COVERED BY WHICHEVER INSTRUMENT CAN REACH IT:**
+
+| entry | move | how confirmed on merged8 |
+|---|---|---|
+| 82 (LOUD) | jump 214+K, Plasma Trap | **maintainer field test**, + `audit_trap_parity` |
+| 83 (SILENT) | Reflect Wall | **rig only** — `test_hui_pairs` (GC fires, seq 0x0E, blowback). Guard-cancel-only, so it is not playtestable by hand (maintainer's standing note) and a rig is the ONLY way it can be confirmed |
+| 80, 81 | no live driver | thunk gives them defined vs2 handlers |
+
+The one entry a human cannot reach is the one a rig covers, and vice versa for
+the ES/timing-dependent moves. That is the coverage argument in its strongest
+form available on this build.
+
 **RESULT — the known danger class is COVERED, and the residual is narrower
 than "untested variants" sounds:**
 
