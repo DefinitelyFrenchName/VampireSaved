@@ -59,11 +59,13 @@ python3 tools/cps2_decrypt.py "$ROMDIR/vsav2.zip" "$WORK/v2.bin" \
 echo "== 1. the site is jmp-routed and the body reconstructs from the ROMs"
 python3 tools/gen_index_window_thunk.py "$WORK/vj.bin" "$WORK/v2.bin" --json \
     > "$WORK/facts.json"
-python3 - "$BUILD/verify_op.bin" "$WORK/vj.bin" "$WORK/facts.json" <<'PY' || fail=1
+python3 - "$BUILD/verify_op.bin" "$WORK/vj.bin" "$WORK/facts.json" \
+         "$BUILD/verify_data.bin" <<'PY' || fail=1
 import json, struct, sys
 img = open(sys.argv[1], "rb").read()
 van = open(sys.argv[2], "rb").read()
 f = json.load(open(sys.argv[3]))
+dat = open(sys.argv[4], "rb").read()
 SITE, TABLE, NEXT = 0x018460, 0x018468, 0x018508
 body = bytes.fromhex(f["thunk_hex"])
 ok = True
@@ -84,11 +86,42 @@ else:
     else:
         print(f"  ok: body byte-identical to the ROM-derived reconstruction "
               f"({f['n_distinct_targets']} trampolines, table +{f['table_off']:#x})")
-    # the thunk must not have been placed over anything it reads
-    if not (0x0BF6A0 <= th < 0x100000):
-        print(f"  FAIL: thunk at {th:#08x} is outside hole_a — a PC-relative "
-              f"read of its embedded table would see ciphertext")
+    # PLACEMENT (rewritten 14z-92). This used to assert `0x0BF6A0 <= th <
+    # 0x100000` — "inside hole_a" — and fail anything else with "a
+    # PC-relative read of its embedded table would see ciphertext". That
+    # bound was a PROXY written when hole_a was the only place the
+    # generator put this body, and the merged build (which places it in
+    # wide_ext at 0x45d9a0) fails it while being demonstrably correct.
+    # Measured on all three builds: the body reads its table PC-RELATIVELY,
+    # which goes through the OPCODE space and therefore DECRYPTS, so the
+    # opcode view is the one that matters and it is identical everywhere
+    # (00e200ec00ec00f6...). In hole_a the DATA view of that same table is
+    # ciphertext (and differs per address, hui41 vs hui30) — i.e. the old
+    # message described the encrypted case, not the raw one. Above
+    # PRG:0x0FFFFF there is no encryption at all, so both views agree.
+    # The body-identity check above already asserts the OPCODE view, which
+    # IS the real invariant. What is left to assert is the one placement
+    # that would genuinely break: a body STRADDLING the crypt boundary,
+    # half decrypting and half not.
+    CRYPT_END = 0x100000
+    if th < CRYPT_END < th + len(body):
+        print(f"  FAIL: thunk at {th:#08x}+{len(body):#x} STRADDLES the "
+              f"encryption boundary {CRYPT_END:#08x} — part of the body "
+              f"would decrypt and part would not")
         ok = False
+    elif th >= CRYPT_END:
+        # raw extension: assert the region really is raw, so that the
+        # pc-relative read returns the stored plaintext.
+        if img[th:th + len(body)] != dat[th:th + len(body)]:
+            print(f"  FAIL: thunk at {th:#08x} is above the crypt window but "
+                  f"its opcode and data views DIFFER — that region is not raw")
+            ok = False
+        else:
+            print(f"  ok: placed in the raw extension ({th:#08x}); opcode and "
+                  f"data views agree, so the pc-relative table read is plain")
+    else:
+        print(f"  ok: placed inside the crypt window ({th:#08x}); the "
+              f"pc-relative table read decrypts")
 sys.exit(0 if ok else 1)
 PY
 
@@ -156,6 +189,40 @@ for name, off, delta in (
 same = bytes(body) == built
 print(f"  control: the UNPERTURBED body still matches: {same}")
 sys.exit(0 if ok and same else 1)
+PY
+
+echo "== 5. verdict controls on the PLACEMENT predicate (14z-92)"
+# The predicate rewritten in section 1 must be able to FAIL. The old
+# hole_a bound could only fail by being too strict — it red-flagged the
+# merged build's correct wide_ext placement — so the replacement gets its
+# own controls. Pure logic, no ROMs.
+python3 - <<'PY' || fail=1
+CRYPT_END = 0x100000
+def verdict(th, n, op, dat):
+    if th < CRYPT_END < th + n:
+        return "straddle"
+    if th >= CRYPT_END:
+        return "raw-ok" if op == dat else "not-raw"
+    return "crypt-ok"
+
+B = 470
+cases = [
+    ("the real merged placement (raw, views agree)", 0x45d9a0, B, b"x", b"x", "raw-ok"),
+    ("the real solo placement (inside the crypt window)", 0x0fd180, B, b"x", b"y", "crypt-ok"),
+    ("STRADDLING the boundary — must be caught",
+     CRYPT_END - 8, B, b"x", b"x", "straddle"),
+    ("above the window but views DIFFER — region is not raw, must be caught",
+     0x400000, B, b"x", b"y", "not-raw"),
+    ("body ending exactly at the boundary is NOT a straddle",
+     CRYPT_END - B, B, b"x", b"y", "crypt-ok"),
+]
+ok = True
+for name, th, n, op, dat, want in cases:
+    got = verdict(th, n, op, dat)
+    good = got == want
+    ok = ok and good
+    print(f"  control: {name}: {'ok' if good else 'WRONG'} ({got})")
+raise SystemExit(0 if ok else 1)
 PY
 
 [ "$fail" -ne 0 ] && { echo "FAIL: index-window thunk gate"; exit 1; }
