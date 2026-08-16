@@ -28,6 +28,26 @@ FBNEO="${FBNEO_BIN:-$REPO/emu/fbneo/fbneo}"
 RPL="$(cd "$(dirname "$RPL")" && pwd)/$(basename "$RPL")"
 OUT_DIR="$(cd "$(dirname "$OUT")" && pwd)"; OUT="$OUT_DIR/$(basename "$OUT")"
 
+# 14z-90 (GitHub issue #12), the SHELL half. The completion check below is
+# `grep -q "^END " "$OUT"` — an ARTIFACT check — and nothing here removed the
+# artifact first. Combined with the C++ half (main.cpp discards HarnessRun()'s
+# status inside a void DoGame and returns 0 unconditionally, so a harness that
+# never ran still exits 0), a failed run left the PREVIOUS run's log in place
+# and the caller read it as success. Committed gates are saved by mktemp-fresh
+# paths, but docs/platform/gotchas.md:703 documents the interactive recipe with
+# a fixed reusable `out.log`, and the gotcha above it records that the
+# emulator's own error text is hidden in the sandbox log. Silent failure + a
+# hidden error + a fixed path is how a previous build's .tap gets written into
+# an atlas row.
+#
+# So: clear the outputs BEFORE the run. After this the run either produces a
+# fresh artifact or leaves none, and "no END line" cannot be satisfied by
+# yesterday's file. FBNEO_HVIDEO/FBNEO_HTAP_OUT are read via getenv inside the
+# harness and never appear in argv, so they must be cleared by name.
+rm -f "$OUT" "$OUT".tap "$OUT".dump_*.bin "$OUT".gfx_*.bin
+[ -n "${FBNEO_HVIDEO:-}" ] && rm -f "$FBNEO_HVIDEO"
+[ -n "${FBNEO_HTAP_OUT:-}" ] && rm -f "$FBNEO_HTAP_OUT"
+
 WORK="${SANDBOX:-$(mktemp -d)}"
 mkdir -p "$WORK"
 if [ -n "${FBNEO_ROMPATH:-}" ]; then

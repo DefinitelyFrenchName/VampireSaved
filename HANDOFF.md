@@ -1096,6 +1096,13 @@ tests/test_effect_palette_table.sh    # 14z-76: the per-character palette POINTE
                                       # variant row, a build clobbering a base-half
                                       # row). tools/audit_effect_palette_table.py.
                                       # Static, seconds
+tests/test_fbneo_runner_hygiene.sh    # 14z-90 (issue #12, shell half): a FAILED
+                                      # FBNeo run must not leave the previous
+                                      # run's log/.tap/side-channel outputs
+                                      # behind, because the completion check is
+                                      # an ARTIFACT check (grep ^END). Measured
+                                      # pre-fix: rc=1 but $OUT still present
+                                      # with its old content. ROMDIR, ~5s
 tools/artifact_manifest.py            # 14z-90 (issue #8): per-member SHA-1 of
                                       # every packed zip in a rompath dir. The
                                       # program fingerprint covers 8.1% of the
