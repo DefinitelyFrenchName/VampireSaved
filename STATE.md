@@ -90,11 +90,15 @@ fingerprints, so it is a re-freeze and therefore a maintainer decision
 (registry convention: rows are added at freeze time as a STATE decision).
 Measured, captured and filed instead.
 
-**Plausibly the 14z-85f flaky crash reset**, whose own structural read was
-"a tripwire firing here would be the instrument WORKING". Unproven — and note
-the recipe there was Donovan vs **Pyron** into COM Sasquatch, so if it is the
-same mechanism the trigger is the OPPONENT's path, not the player's. The next
-rig should be designed to tell those apart.
+**NOT the 14z-85f flaky crash reset — RETRACTED 2026-08-17 on the
+maintainer's answer.** I filed this as "plausibly" the same bug because both
+are `vec4` at a match transition and 14z-85f's own structural read was "a
+tripwire firing here would be the instrument WORKING". The maintainer
+confirms **Phobos was not involved anywhere in that recipe** (Donovan vs
+Pyron into COM Sasquatch), and this crash is HUITZIL-ONLY — Pyron and
+Donovan run the same 40,620-frame rig clean on both the solo and merged
+builds. Two different bugs. 14z-85f stays open on its own terms and its rig
+should not be designed around this one.
 
 **INSTRUMENT:** `tests/audit_tripwire_reach.sh` (on-demand, ~15 min, JOBS=3).
 Fails on any fire and resolves the faulting PC to its fragment line so the

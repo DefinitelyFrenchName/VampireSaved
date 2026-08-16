@@ -202,9 +202,9 @@ decision, not by neglect.
   tracing (it appears twice; content-twin trap). Do NOT remove or widen the
   tripwire — it is the detector, and 51 other deferred targets sit behind it.
   Costs a huitzil + merged re-freeze, so the row is a maintainer decision.
-  Instrument: `tests/audit_tripwire_reach.sh`. Possibly the 14z-85f flaky
-  crash reset, unproven — and note that recipe's opponent was PYRON, so if
-  it is the same mechanism the trigger is the opponent's path.
+  Instrument: `tests/audit_tripwire_reach.sh`. **NOT the 14z-85f flaky crash
+  reset** — retracted 2026-08-17: the maintainer confirms Phobos was not
+  involved in that recipe, and this is Huitzil-only. Two different bugs.
 
 - ~~**GitHub #75 — `build_merged.sh` ABORTS on huitzil.**~~ **CLOSED 14z-92.**
   It was a VERIFIER artifact, not a build defect: `obj_records.walk`'s pointer
