@@ -2246,3 +2246,8 @@ Rules now:
   including builds that boot and render perfectly. Tried as a fail-fast
   precondition in 14z-92; it failed all four rompaths and was reverted. The
   live check is whether the run produced its artifact.
+- **Only gates that BOOT the reference are exposed.** `test_gfx_chain.sh`
+  and `tools/audit_gfx_merged.py` also name `build/hui31`, but they read
+  tile inventories and gfx members statically and never start an emulator,
+  so the profile bump cannot reach them (both measured green, 14z-92).
+  When triaging this class, sort the references by "does it run?" first.
