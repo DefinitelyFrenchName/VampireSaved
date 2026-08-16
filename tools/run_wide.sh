@@ -50,8 +50,23 @@ fbneo)
     # launch it" failure. Build the overlay directory the replay runner
     # uses and run from it: reference zips first, the build's zips win.
     PLAY="${FBNEO_PLAY_DIR:-$HOME/.cache/vampire-saved/fbneo-play}"
+    # 14z-90 (GitHub issue #38). `rm -f "$PLAY/roms"/*.zip` globs THROUGH a
+    # symlink: if $PLAY/roms is ever a link to $ROMDIR — which the sibling
+    # runners create in their own sandboxes — this deletes the reference
+    # dumps themselves. They are irreplaceable commercial dumps, and this
+    # class has already cost this project once (ROMDIR lost qsound_hle.zip
+    # to an emulator run directly against it). Refuse rather than glob.
+    if [ -L "$PLAY/roms" ]; then
+        echo "REFUSING: $PLAY/roms is a SYMLINK (-> $(readlink "$PLAY/roms"))." >&2
+        echo "  Deleting *.zip through it would delete the reference dumps." >&2
+        echo "  Remove the link and re-run." >&2
+        exit 1
+    fi
     mkdir -p "$PLAY/roms"
-    rm -f "$PLAY/roms"/*.zip
+    # -maxdepth 1 -type l: only ever remove the LINKS this script created,
+    # never a real file, and never anything a link points at.
+    find "$PLAY/roms" -maxdepth 1 -type l -name '*.zip' -delete 2>/dev/null || true
+    find "$PLAY/roms" -maxdepth 1 -type f -name '*.zip' -delete 2>/dev/null || true
     for z in "$ROMDIR"/*.zip;  do ln -sf "$z" "$PLAY/roms/$(basename "$z")"; done
     for z in "$RP"/*.zip;      do ln -sf "$z" "$PLAY/roms/$(basename "$z")"; done
     echo "FBNeo: $BIN"

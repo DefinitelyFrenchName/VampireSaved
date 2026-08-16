@@ -52,6 +52,9 @@ WORK="${SANDBOX:-$(mktemp -d)}"
 mkdir -p "$WORK"
 if [ -n "${FBNEO_ROMPATH:-}" ]; then
     # per-zip overlay: reference zips first, overlay zips win
+    # 14z-90 (#38): NO trailing slash on the rm — `rm -rf "$WORK/roms/"`
+    # follows a symlink and would empty $ROMDIR. On the non-overlay branch
+    # below this path IS a symlink to $ROMDIR, and sandboxes get reused.
     rm -rf "$WORK/roms"; mkdir -p "$WORK/roms"
     for z in "$ROMDIR"/*.zip; do ln -sf "$z" "$WORK/roms/$(basename "$z")"; done
     for z in "$FBNEO_ROMPATH"/*.zip; do ln -sf "$z" "$WORK/roms/$(basename "$z")"; done
