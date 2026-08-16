@@ -2,9 +2,10 @@
 """compare_composite.py — the CONJUNCTION of two already-ratified §4
 comparison classes, for replays whose masked comparison shows both.
 
-STATUS: PROPOSED, awaiting maintainer ratification (STATE 14z-61). Nothing
-validates against it until a `.pending` expectation is turned into a
-`composite` one, which is a maintainer decision.
+STATUS: RATIFIED. CLAUDE.md §4 v4 (maintainer-ratified 2026-08-06) defines this
+class; 121 of the 185 frozen `.masked` specs use it. The header previously read
+"PROPOSED, awaiting maintainer ratification (STATE 14z-61)" and was stale by ten
+days — corrected 14z-90 under RETRACTION DISCIPLINE (GitHub issue #4).
 
 WHY IT EXISTS. On the WIDE reference build every select-reaching legacy
 replay measures as:
@@ -21,8 +22,20 @@ EXACTLY, not one added or missing; the windows are the wheel extension.
 
 This class is STRICTER than either component alone: every divergent run
 must be accounted for by name, the flicker set must match exactly, the
-window list must match exactly, and the run must fully re-converge. It
-tolerates nothing that `flicker` and `window` do not each tolerate.
+window list must match exactly, and the run must fully re-converge.
+
+Those FOUR clauses are the class, and they are what this tool enforces.
+An earlier line here read "It tolerates nothing that `flicker` and
+`window` do not each tolerate" — RETRACTED 14z-90 (GitHub issue #4). That
+property is not satisfiable by any member of the class and never was:
+`compare_flicker` rejects every composite log on its 8-frame cap (a
+window run is ~1200 frames), and `compare_window` rejects every
+multi-run log. It was rationale prose being read as a clause, and issue
+#4 measured the consequence — testing the code against that sentence
+"finds" 99 of 121 frozen specs in violation, when what is really at
+stake is whether the >=60 non-propagation window binds ACROSS the
+flicker->window boundary. That is a class-definition question, open with
+the maintainer (STATE.md "Decisions pending — 14z-90"), not a defect.
 
 Usage:
   compare_composite.py <base.log> <new.log> --flicker 829,2093 \\
@@ -76,6 +89,27 @@ def main():
                     help="frozen windows 'onset-end[;onset-end...]', or '-'")
     ap.add_argument("--reconverge", type=int, default=60,
                     help="minimum identical frames after the last run")
+    # 14z-90 (GitHub issue #4). compare_flicker.py caps total divergent frames
+    # at 8; this class had no cap at all. Measured across all 121 committed
+    # composite specs: the largest flicker inventory is 3, so the cap is FREE
+    # today (0/121 would red) — it closes a hole without moving an expectation.
+    # It applies to the FLICKER INVENTORY ONLY, never to window runs: a window
+    # is legitimately hundreds of frames, so capping total divergence would be
+    # a category error.
+    ap.add_argument("--max-total", type=int, default=8,
+                    help="maximum frames in the flicker inventory (§4 v2's "
+                         "cap; window runs are exempt by construction)")
+    # Whether the >=60 non-propagation window applies BETWEEN runs, and not
+    # merely after the last one, is a live maintainer question (see STATE.md
+    # "Decisions pending — 14z-90"). Measured: applying it across the
+    # flicker->window boundary reds 99 of 121 frozen specs, because the
+    # current builds sit at flicker 829 -> window onset 889, a 59-frame gap
+    # (it was exactly 60 before 14z-63 moved the onset 890 -> 889). So the
+    # check exists and is testable, but it is OFF by default and no frozen
+    # spec opts in. Do not flip the default without the ruling.
+    ap.add_argument("--min-converge-flicker", type=int, default=0,
+                    help="if >0, require this many identical frames between "
+                         "consecutive FLICKER runs (off by default; see §4)")
     args = ap.parse_args()
 
     want_flicker = parse_flicker(args.flicker)
@@ -133,6 +167,21 @@ def main():
         errs.append("windows %s, frozen expectation %s"
                     % (["%d-%d" % w for w in got_windows] or "-",
                        ["%d-%d" % w for w in want_windows] or "-"))
+    if len(got_flicker) > args.max_total:
+        errs.append("flicker inventory has %d frames, the class caps it at %d "
+                    "(§4 v2's max-total; a growing inventory is the standing "
+                    "watch's case, not tolerance headroom)"
+                    % (len(got_flicker), args.max_total))
+    if args.min_converge_flicker > 0:
+        fl_runs = [(lo, hi) for lo, hi in runs if hi - lo + 1 <= FLICKER_MAX]
+        for (p_lo, p_hi), (n_lo, n_hi) in zip(fl_runs, fl_runs[1:]):
+            gap = n_lo - p_hi - 1
+            if gap < args.min_converge_flicker:
+                errs.append("only %d identical frames between flicker runs "
+                            "ending %d and starting %d; --min-converge-flicker "
+                            "requires >= %d"
+                            % (gap, a[p_hi][0], a[n_lo][0],
+                               args.min_converge_flicker))
     if tail < args.reconverge:
         errs.append("only %d identical frames after the last run; the class "
                     "requires >= %d (re-convergence is the point, and its "

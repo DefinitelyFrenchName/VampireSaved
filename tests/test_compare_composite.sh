@@ -96,6 +96,50 @@ check trunc.log           fail "a truncated log is not prefix-compared"
 check latebreak.log       fail "a permanent break after the frozen shape"
 check latebreak_trunc.log fail "truncating before that break does not rescue it"
 
+# --- 14z-90 (issue #4): the flicker inventory has a CAP, and the inter-run
+# --- convergence check exists but is OFF by default ----------------------
+# Measured across all 121 frozen composite specs: the largest inventory is 3,
+# so --max-total 8 reds none of them. The fixture below is deliberately over
+# the cap.
+python3 - "$WORK" <<'PY'
+import sys, pathlib
+work = pathlib.Path(sys.argv[1])
+N = 4000
+big = set(range(1, 21, 2)) | set(range(890, 1803))   # 10 flicker frames
+write_lines = lambda p, d: (work / p).write_text("\n".join(
+    [f"{i} {'ffffffffffffffff' if i in d else '%016x' % i}" for i in range(1, N + 1)]
+    + [f"END {N}"]) + "\n")
+write_lines("bigflicker.log", big)
+# two flicker runs 55 frames apart — the shape behind the 5 anomalous specs
+write_lines("closeflicker.log", {829, 885, 2093} | set(range(945, 1858)))
+PY
+
+if python3 "$REPO/tools/compare_composite.py" "$WORK/base.log" "$WORK/bigflicker.log" \
+        --flicker 1,3,5,7,9,11,13,15,17,19 --windows 890-1802 >"$WORK/big.out" 2>&1; then
+    echo "  FAIL: a 10-frame flicker inventory passed the max-total cap"; fail=1
+else
+    echo "  ok: an over-cap flicker inventory is rejected (max-total)"
+fi
+
+# The inter-run check must be OFF by default (or it reds 99 of 121 frozen
+# specs), and must WORK when asked for. Both directions are asserted, because
+# a flag that does nothing is worse than no flag.
+if python3 "$REPO/tools/compare_composite.py" "$WORK/base.log" "$WORK/closeflicker.log" \
+        --flicker 829,885,2093 --windows 945-1857 >"$WORK/cf1.out" 2>&1; then
+    echo "  ok: a 55-frame flicker gap passes by DEFAULT (the boundary rule is"
+    echo "      an open maintainer question, not a silent tightening)"
+else
+    echo "  FAIL: the default is now stricter — this reds frozen specs"; fail=1
+fi
+if python3 "$REPO/tools/compare_composite.py" "$WORK/base.log" "$WORK/closeflicker.log" \
+        --flicker 829,885,2093 --windows 945-1857 --min-converge-flicker 60 \
+        >"$WORK/cf2.out" 2>&1; then
+    echo "  FAIL: --min-converge-flicker 60 accepted a 55-frame gap — the flag"
+    echo "        does nothing, which is worse than not having it"; fail=1
+else
+    echo "  ok: --min-converge-flicker 60 rejects a 55-frame gap when asked"
+fi
+
 # The class must not be usable as a loophole: it has to reject a shape that
 # `flicker` alone would reject, with the window list empty.
 if python3 "$REPO/tools/compare_composite.py" "$WORK/base.log" "$WORK/ok.log" \

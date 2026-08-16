@@ -1,5 +1,59 @@
 # STATE — living progress log
 
+### DECISIONS PENDING — 14z-90 (the adversarial re-judging of the
+### 2026-08-15 audit). Three, all opened by judging rather than by
+### measurement drift; no build byte moved this session and nothing was
+### re-frozen.
+
+### (1) **DOES THE >=60 NON-PROPAGATION WINDOW BIND ACROSS A
+### FLICKER->WINDOW BOUNDARY?** (GitHub issue #4.) On the current builds
+### every composite legacy spec is hook-flicker frame 829 followed by
+### select-window onset 889 — a 59-frame gap. Two independent judges each
+### reconstructed the build side of all 121 committed composite specs and
+### ran both checkers: applying flicker's >=60 rule across that boundary
+### reds **99 of 121**. Before 14z-63 the onset was 890 and the gap was
+### exactly 60; the move to 889 crossed the threshold with no rule saying
+### it mattered. The two runs are SEPARATELY ATTRIBUTED mechanisms (hook
+### cycle-skew vs the wheel-extension select re-entry), each independently
+### re-convergent, so this is a class-definition question, not a defect.
+### OPTIONS: (a) >=60 is intra-mechanism only, so a flicker->window gap is
+### unconstrained — codify and close; (b) it binds across mechanisms, in
+### which case 94-97 specs need re-freezing or the onset moves back to 890;
+### (c) a smaller cross-boundary minimum applies — name it.
+### RECOMMENDATION: (a), codified in §4, because the >=60 figure is a
+### single-mechanism non-propagation proof and nothing measured suggests
+### the two mechanisms interact. The checker now IMPLEMENTS the check
+### behind `--min-converge-flicker`, default OFF, opted into by no spec —
+### so the ruling is a one-line default change either way.
+
+### (2) **THE FIVE 55-FRAME FLICKER-TO-FLICKER GAPS.** (Same issue.)
+### `22_don_dualmash` on donovan-m5/huitzil-m13/pyron-m7 (flicker pair
+### 11862/11918) and `26_don_arcade_mash` on donovan-m5/pyron-m7 (pair
+### 8744/8800). Both pairs are 56 frames apart = 55 converged frames, and
+### both look like ONE mechanism firing twice. These violate >=60 under
+### ANY reading of (1). Per-frame attribution already exists and prints on
+### every audit run: `build/audit_ff42a2_don.log:7` gives f11862 "60
+### staging bytes in slots ['0x1a','0x1d']" and f11918 "66 staging bytes
+### in slots ['0xc','0x1a','0x1d']". OPTIONS: (a) re-freeze each pair as a
+### single contiguous run with a named interior tolerance; (b) a per-replay
+### named exemption with the mechanism written down; (c) rule that 60 is
+### the wrong minimum for this mechanism and set the real number.
+### RECOMMENDATION: (b) — smallest honest step, and the attribution is
+### already in hand.
+
+### (3) **DOES THE M2 BATTERY STILL TARGET THE donovan-m2c GENERATION?**
+### (GitHub issue #2.) `tests/lib/m2a_common.sh` hardcodes the V1 mask
+### (`043c-043d,4182-41a2,7f00-8000`) and the V1 basis
+### (`tests/expected/vsavj/masked`), while the live sets carry a per-set
+### `mask` file with the wider V2 ranges and measure as `window`/
+### `composite`. That is two build GENERATIONS, not one forked dispatcher
+### — so unifying them means deciding which generation the battery gates.
+### OPTIONS: (a) leave the battery on the parked m2c/V1 track and say so in
+### its header; (b) re-point it at the current V2 basis and unify with
+### `run_suite.sh`'s dispatch. RECOMMENDATION: (a) for now — (b) is real
+### work and belongs with the legacy re-freeze, not ahead of it.
+
+
 ### DECIDED (maintainer, 2026-08-15, session close): **MiSTer = CORE
 ### SURGERY ONLY, full stop.** The one-character substitution track is
 ### not a MiSTer deliverable; MiSTer ships the full three-tenant roster
