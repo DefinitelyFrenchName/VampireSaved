@@ -158,7 +158,12 @@ three references rotted this session (`hui31`, `pyron20`, `pyron17`).
   now "legacy enters and gets vanilla answers". Section 1: 43/46
   bit-identical, 3 transient re-convergent, 0 dead. Claim retracted in
   engine_internals, HANDOFF, and both manifests.
-- **OPEN from #78 — needs a ruling: two FBNeo-only phase classes.** The new
+- ~~**OPEN from #78 — two FBNeo-only phase classes.**~~ **RATIFIED
+  2026-08-16 (maintainer) and implemented 14z-93.** Both are now a named §4
+  class bounded by a FROZEN offset inventory (`$FF055B-D`; `$FF06D1`,
+  `$FF06D4-D5`, `$FF06D9`, `$FF06DB-DD`), measured rather than transcribed —
+  the 14z-92 note had recorded only the first byte of each run. Gate green.
+  `ram.md:62` extended: the class is NOT tenant-content-only. Original entry: The new
   `tests/test_fbneo_legacy_oracle.sh` (the agreed partial) found, on its
   first run, differences that MAME does NOT show at the same frames:
   `$FF055B-$FF055D` (sound-driver work area, ram.md:74) and
