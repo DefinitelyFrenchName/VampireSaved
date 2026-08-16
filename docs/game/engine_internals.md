@@ -303,6 +303,12 @@ Decoded via read/write/breakpoint traces on the live pick replay
   **`flags.l` here does NOT have the 0xFF top byte** the menu anim chain
   uses; `0x00400000`/`0x04000000`/`0x06000000` are the real values, so that
   test is not a validity discriminator for this table.
+  **`0x400000` reads IDENTICALLY on stock and WIDE (measured 14z-93):**
+  `7080 807d 6421 0000 0040 0010` on both, diverging only from +0x0C. So a
+  vanilla pointer of `0x00400000` dereferenced there is NOT a WIDE-profile
+  artefact — the reservation holds, and a stock build reaching the same
+  state would take the same garbage index `0x7080`. Recorded because the
+  opposite was proposed and falsified.
   **Do not conclude a base offset from arithmetic alone (14z-93, GitHub
   #92).** A crash pointer `0x267786` is `0x26778a - 4` AND is row 0x1A of
   the per-char long-pointer table `0x26771E` — two tables sitting near each
