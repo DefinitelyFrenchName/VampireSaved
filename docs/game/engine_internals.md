@@ -292,25 +292,24 @@ Decoded via read/write/breakpoint traces on the live pick replay
   `0x2A0426`; consumer `lea table; move.w (a0,d0.w); lea (a0,d0.w)` at
   0x15084), element ids per UI piece — 16-BIT OFFSETS, cannot reach
   ported regions; not the porting handle.
-  **DECODED 14z-93 (GitHub #92), and it is a live crash path.** The
-  consumer is `andi.w #$00ff,d0 / add.w d0,d0 / move.w (0,a0,d0.w),d0 /
-  lea (0,a0,d0.w),a0 / move.l a0,(0x1c,A6)` at `0x015084-0x015095`, so it
-  writes the MENU object's `+0x1C` chain pointer. Element id 0x00 has
-  offset `0x678` -> `0x26778a`, a valid struct (`flags 0x00400000`,
-  `payload 0x002695be` at +4).
-  On the Huitzil arcade path the object's `+0x1C` reads **`0x267786`** =
-  `0x26778a - 4`, i.e. the BASE was `0x26710E` rather than `0x267112`.
-  Reading `+4` of that then returns the real struct's FLAGS long
-  (`0x00400000`) as if it were a payload, `move.w (a0)+,d0` reads the
-  reserved CPS2 register window, and the resulting garbage index takes the
-  `jmp (4,PC,D0.w)` at `0x1afb4` to an odd address — `vec3`.
-  **The offsets in ROM are correct; only the base is wrong.** No element id
-  in 0..0x1FF carries offset `0x674`. Note the sibling per-char helper
-  `PRG:0x5F328` legitimately carries a `lea -4(a0,d0.w)`, so a `-4` applied
-  on a path that should not have it fits the evidence.
+  **DECODED 14z-93.** The consumer is `andi.w #$00ff,d0 / add.w d0,d0 /
+  move.w (0,a0,d0.w),d0 / lea (0,a0,d0.w),a0 / move.l a0,(0x1c,A6)` at
+  `0x015084-0x015095`, so it writes a MENU object's `+0x1C` chain pointer.
+  **The table BASE is supplied by the CALLER, not baked in** — the same
+  resolver is used with the owner's anim table (`donovan.toml:985-1000`,
+  the select-companion keeper), and `0x15088` is a documented UNMASKED
+  entry point that skips the `andi.w #$00ff,d0`. So an address near
+  `0x267112` does NOT imply this table was the source.
   **`flags.l` here does NOT have the 0xFF top byte** the menu anim chain
-  uses (`0x00400000`/`0x04000000`/`0x06000000` are the real values) — that
+  uses; `0x00400000`/`0x04000000`/`0x06000000` are the real values, so that
   test is not a validity discriminator for this table.
+  **Do not conclude a base offset from arithmetic alone (14z-93, GitHub
+  #92).** A crash pointer `0x267786` is `0x26778a - 4` AND is row 0x1A of
+  the per-char long-pointer table `0x26771E` — two tables sitting near each
+  other make several stories fit. Measured attribution (full-replay write
+  tap on the field, PC-histogrammed) put the writer at `0x05ffb6`, the
+  SELECT family — not this resolver at all. The off-by-4 reading was
+  retracted.
 - THE PER-CHAR ROOT: helper `PRG:0x5F328` — `movea.l #$2672AA,a0;
   andi #$ff; lsl #2; lea -4(a0,d0.w)` with d0 from the +0x382 select id
   (P2 side +0x20 rows; other index families pre-scaled). Root cells
