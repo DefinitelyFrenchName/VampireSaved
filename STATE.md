@@ -1,5 +1,70 @@
 # STATE — living progress log
 
+## Session 14z-92 (4) — the L/M/H coverage gap MEASURED rather than
+## carried, and the (b') thunk gate caught red-flagging the frozen build
+## over a stale proxy (its failure message had the encryption backwards).
+
+The maintainer's field report bounded itself: *"All moves have been tested on
+the 3 VS2 characters, just not all L / M / H variants for each."* On this
+engine that is a real residual (button strength selects the code path — rig 87's
+scripted LK crashes where the maintainer's real LK does not), and the dangerous
+half is SILENT: entry 83 of table `0x018468` is EVEN and lands on real code, so
+"no obvious regression" cannot clear it. Rather than ask for exhaustive
+per-strength playtesting, the static surface was measured on merged8.
+
+**RESULT — the known danger class is COVERED, and the residual is narrower
+than "untested variants" sounds:**
+
+| measurement | result |
+|---|---|
+| `test_index_space` | PASS — 110 tables, 81 twinned, 29 unjudged, **3 risky**, frozen counts unmoved |
+| `test_variant_dispatch build/m3b_merged8` | PASS — 5 aliased-variant tables, **0 rows where OURS RUNS A ROUTINE vs2 DOES NOT** (the live defect class), tenant rows 0x10/0x11/0x13 all match vs2 |
+| `test_index_window_thunk build/m3b_merged8` | PASS after the gate fix below — entries 80-83 all run vs2's handlers inline |
+| `audit_trap_parity` (entry 82, LOUD) | PASS on merged8 |
+| `test_hui_pairs` (entry 83, **SILENT**) | PASS on merged8 — GC fires, seq 0x0E, attacker blown back |
+
+So any strength variant that reaches the out-of-range window gets a DEFINED
+vs2 handler rather than a wild dispatch, and the one entry no playtest could
+clear was cleared by its designated positive control. The three "risky" tables
+are all accounted: `0x018468` covered by the thunk, `0x0185da` cleared by
+playtest, `0x03975e`'s dispatcher measured never reached. The residual from
+untested L/M/H is now "unknown unknowns", not a named mechanism.
+
+**THE GATE THAT FAILED ON A BUILD I HAD JUST FROZEN.** `test_index_window_thunk`
+red-flagged merged8:
+
+    FAIL: thunk at 0x45d9a0 is outside hole_a — a PC-relative read of its
+          embedded table would see ciphertext
+
+Body byte-identical to the ROM-derived reconstruction, engine around the site
+vanilla; only the PLACEMENT objected to. Solo builds put it in hole_a (hui41
+`0x0fd180`, hui30 `0x0fceb0`); the merged allocator puts it in `wide_ext`.
+
+**The gate was wrong AND its reason was inverted.** Measured, table at
+body+0x50:
+
+    merged8 (wide_ext, raw)  OP 00e200ec00ec00f6…  DATA 00e200ec00ec00f6…  same
+    hui41   (hole_a)         OP 00e200ec00ec00f6…  DATA ea8a6fb70c4c7301…  differ
+    hui30   (hole_a)         OP 00e200ec00ec00f6…  DATA ff42485172b8e26f…  differ
+
+The body reads its table PC-RELATIVELY, which goes through the OPCODE space and
+decrypts — that is what 14z-79's "keeps the read pc-relative" buys. The opcode
+view is the one that matters and it is identical in all three builds. It is in
+HOLE_A that the data view is ciphertext (address-dependent — hui41 and hui30
+differ); above `PRG:0x0FFFFF` there is no encryption at all. The message
+described the encrypted case while firing on the raw one.
+
+`0x0BF6A0 <= th < 0x100000` was a PROXY from when hole_a was the only placement
+the generator used. The body-identity check already asserts the real invariant;
+what was missing is the placement that would genuinely break — a body
+STRADDLING the crypt boundary, half decrypting and half not. That is now the
+assertion, plus a raw-region sanity (opcode view == data view) above the window,
+plus section 5: verdict controls on the placement predicate itself, because the
+old one could only fail by being too strict. All three builds PASS, each naming
+its own placement reason.
+
+**No build byte moved. merged-m1 stands.**
+
 ## Session 14z-92 (3) — FREEZE RECORD: `merged-m1`, THE FIRST FROZEN
 ## MERGED BUILD. All 18 characters in one image, every merged gate green.
 
@@ -61,10 +126,32 @@ predicts. UNMEASURED. Do not repeat it as fact; the measurement is a
 headroom/overrun comparison of merged8 vs merged7 on a heavy-object replay,
 and until someone runs it this paragraph is a hypothesis with a motive.
 
-**NOT SPECIFICALLY CONFIRMED: the BEAM visual on a merged build.** The S6
-carry-forward asked for it by name and the field report is a general
-no-regression verdict. The beam was maintainer-confirmed on SOLO huitzil
-(hui25, 14z-71); on a merged image it has still never been named as checked.
+**THE BEAM IS CLOSED ON A MERGED IMAGE (maintainer, 2026-08-16):** *"beam
+visual is 100% clean, as is its sound."* That was the S6 carry-forward and it
+is now confirmed on the merged build, not just on solo hui25 (14z-71). The
+effect family — three defects, three separate root causes across 14z-70/71 —
+is closed end to end on the shipping artifact.
+
+**THE COVERAGE BOUNDARY OF THE FIELD TEST, stated by the maintainer and
+recorded verbatim because a general "tested" is not a specific one:** *"All
+moves have been tested on the 3 VS2 characters, just not all L / M / H
+variants for each."*
+
+That boundary is NOT a formality on this engine, and the register says why:
+- **Button strength selects the code path.** `tests/replays/hui/87_hui_plasma_trap.rpl`'s
+  scripted "LK" variant crashes where the maintainer's real LK does not
+  (HANDOFF, the out-of-range index toolkit) — the same move at a different
+  strength is a different measurement.
+- **The dangerous residue is SILENT by construction.** Of the four
+  out-of-range entries in table `0x018468`, entry 83 (Phobos' Reflect Wall)
+  is EVEN and lands on real code: no crash, wrong routine. "No obvious
+  regression" clears every LOUD entry completely and a SILENT one not at
+  all — that sentence is already in HANDOFF and it applies directly to an
+  untested strength variant.
+So the honest state is: all MOVES exercised, per-strength variants NOT
+exhaustively exercised, and the residual risk class is a silent wrong-routine
+dispatch rather than a crash. See the 14z-92 (4) entry for what was measured
+about it.
 
 **OPEN ITEM, filed not fixed:** CLAUDE.md §5 requires shipped builds to carry
 a visible in-game version string as the playtester's naked-eye A/B tell.

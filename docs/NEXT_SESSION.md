@@ -106,12 +106,21 @@ The superseded framing, kept because it explains the shapes above:
   (`952fc731`, 753 ops) now exists** and is the first merged build carrying
   the 14z-91 legacy fix — UNREGISTERED, and no merged CONTENT gate has run on
   it. That is the S6 list below.
-- **THE BEAM VISUAL ON A MERGED IMAGE — still not named as checked.** The
-  S6 carry-forward asked for it specifically; the field verdict is a
-  general "no obvious regression". Confirmed on SOLO huitzil (hui25,
-  14z-71), never on a merged build. One playtest look at Phobos' 236+P /
-  236+K / 236+2P closes it, or `tests/test_beam_anim_walk.sh
-  build/m3b_merged8` measures the anim-node walk without a human.
+- ~~THE BEAM VISUAL ON A MERGED IMAGE~~ **CLOSED** (maintainer,
+  2026-08-16): *"beam visual is 100% clean, as is its sound."* The S6
+  carry-forward is done, and the effect family — three defects, three
+  root causes across 14z-70/71 — is closed end to end on the shipping
+  artifact.
+- **L/M/H VARIANTS: the maintainer tested all MOVES on the three tenants
+  but not every strength variant of each.** Measured rather than carried
+  (14z-92 (4)): the known danger class is COVERED — `test_index_space`,
+  `test_variant_dispatch` (0 rows where ours runs a routine vs2 does not)
+  and `test_index_window_thunk` all PASS on merged8, entry 82 confirmed
+  live by `audit_trap_parity` and the SILENT entry 83 by
+  `test_hui_pairs`. Any strength reaching the out-of-range window gets a
+  DEFINED vs2 handler. What remains is unknown-unknowns, not a named
+  mechanism — so per-strength playtesting is now a nice-to-have, not a
+  risk item.
 - **"IT MAY FEEL BETTER" — measurable, and worth measuring once.** The
   maintainer flagged it as feeling, not fact, and it is recorded as an
   impression only. But a mechanism exists: 14z-91 left the two obj_hook
