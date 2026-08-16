@@ -1,5 +1,65 @@
 # NEXT SESSION — orientation (written at the close of 14z-89, 2026-08-15)
 
+> ## TASK ZERO (maintainer, session close) — AN ADVERSARIAL CODE REVIEW of
+> ## the project has been done and its findings are being addressed.
+> ## Corrections only: nothing about the project's nature or its parts
+> ## changes. But some findings touch THE TEST HARNESS and the tooling this
+> ## session's conclusions rest on, so before resuming the fix below, go
+> ## over what was fixed and decide whether it moves the state of the work.
+> ## The bugfixes are worth it — this is an assessment, not a rollback.
+>
+> **WHY IT MATTERS HERE, CONCRETELY.** 14z-89 authored 93 `.masked` specs,
+> 35 vanilla basis logs, a frozen dispatch census and two root-cause
+> attributions — ALL of it produced by the harness. If a review fix changed
+> how a log is produced or compared, some of that is re-derived, not
+> re-argued. Exposure, worst first:
+>   1. `tests/lua/replay.lua` — MASK_RANGES semantics (masked bytes are
+>      SKIPPED from the stream), the per-frame checksum, input staging
+>      (`held[frame+1]`). A change here moves EVERY frozen log: the whole
+>      49-log masked-v2 basis and every `.sha1` would need re-deriving.
+>   2. The comparators — `compare_window.py`, `compare_composite.py`,
+>      `compare_flicker.py`, `check_diverge.py` — the 93 promoted specs are
+>      only "PASS" relative to these.
+>   3. `tools/describe_masked_shape.py` — every one of those 93 spec lines
+>      was COPIED from its output; a threshold change re-writes them.
+>   4. `tools/gen_donovan_patch.py` / `build_donovan.sh` — if the generator
+>      moved, the four frozen fingerprints move with it and every
+>      expectation set is orphaned (registry rows included).
+>   5. `tests/lua/field_trace.lua` vs `replay.lua` — the coverage gate's
+>      LEGACY/TENANT verdicts assume these two stage inputs IDENTICALLY
+>      (`held[frame+1]`). A fix applied to one and not the other silently
+>      re-classifies replays.
+>   6. `tests/lua/dispatch_census.lua` — the frozen free-index counts
+>      (50 / 83) behind the option-(b) fix.
+>
+> **THE CHECK, IN ORDER — instrument first, then data, then suites.** Each
+> step is cheap and each one localises the blast radius:
+> ```sh
+> VERIFY_BASIS=16_xemu_2p tools/freeze_masked_basis.sh >     tests/expected/vsavj/masked-v2 "$(cat tests/expected/donovan-m5/mask)" >     16_xemu_2p                      # THE canary: re-derives a frozen basis
+>                                     # log and demands bit-identity (~1 min)
+> tests/test_mame_parity.sh           # the pinned MAME build still reproduces
+>                                     # every frozen oracle log bit-for-bit
+> tests/test_describe_masked_shape.sh # 11 assertions incl. both thresholds
+> tests/test_compare_window.sh ; tests/test_compare_composite.sh
+> tests/test_compare_flicker.sh ; tests/test_suite_dispatch.sh
+> tests/test_m3a_reproducible.sh      # all four fingerprints bit-exact (~4 min)
+> tests/audit_dispatch_census.sh      # census still matches its frozen set
+> tests/audit_legacy_pairings.sh      # coverage gate + its 7 static controls
+> # then the three suites + audit_merged_legacy (the acceptance)
+> ```
+> **IF THE CANARY FAILS, DO NOT RE-FREEZE TO MAKE IT GREEN** — that silently
+> redefines the baseline the superset invariant rests on (HANDOFF says this
+> about the migration gate; it applies identically here). Re-derive
+> deliberately, and say in STATE which artifacts moved and why.
+>
+> **WHAT SURVIVES A HARNESS FIX REGARDLESS** (so it does not get re-litigated):
+> the legacy regression itself was confirmed with RAW FULL-RAM DUMPS — replay
+> 38 P2 HP 87 vs 88, replay 24 P1 X 324 vs 570 / HP 144 vs 115 — which is
+> comparator-independent evidence. The two root-cause attributions are
+> likewise removal experiments (remove the hook, the divergence goes away),
+> not comparator verdicts. A harness fix could change the SHAPES we froze; it
+> cannot make those measurements not have happened.
+
 > ## FIRST TASK — THE LEGACY REGRESSION IN (1) BELOW, then (2) in the
 > ## SAME re-freeze. All four 14z-89 findings ruled on by the maintainer
 > ## 2026-08-15: (1) conditional ratification offered and REFUSED BY
