@@ -1,4 +1,52 @@
-# NEXT SESSION — orientation (written at the close of 14z-89, 2026-08-15)
+# NEXT SESSION — orientation (written at the close of 14z-90, 2026-08-16)
+
+> ## FIRST TASK IS UNCHANGED: THE LEGACY REGRESSION. 14z-90 did not touch
+> ## it and does not displace it. What 14z-90 changed is the harness you
+> ## will use to validate the fix — see "what moved" below before you run
+> ## anything, because several gates now FAIL where they used to pass
+> ## quietly, and one builder now REFUSES an invocation that used to be
+> ## silently destructive.
+
+## What 14z-90 was
+
+The 2026-08-15 adversarial review filed 73 issues (GitHub #74). This session
+re-judged every one of them adversarially — verifier + devil's-advocate from
+clean contexts, then an adjudicator — and acted on the verdicts.
+**32 closed, 41 open with a posted ruling** (9 need YOUR decision).
+Per-issue reasons: `docs/project/audit_2026-08-15_dispositions.md`.
+No build byte moved. No expectation was re-frozen. The four program
+fingerprints and the four whole-artifact manifests are unchanged.
+
+## What moved, that you will notice
+
+- **`tools/build_donovan.sh` now REFUSES a cross-track rebuild.** Running the
+  battery against a WIDE build dir used to delete it and repack STOCK under
+  its name. Override is `REBUILD_CROSS_TRACK=1`. Same-track rebuilds (the
+  documented `build_donovan.sh 6 build/don_m4` recipe) are unaffected.
+- **`tools/build_merged.sh` will ABORT on huitzil** — its two verifiers no
+  longer have their exit status eaten by a pipe, and one of them fails today.
+  That is GitHub #75, filed, and it is a real pre-existing defect, not a new
+  breakage. The merged rebuild is blocked until it is triaged.
+- **FBNeo was rebuilt** with nine harness fixes. A run whose instrument could
+  not do its job now exits non-zero instead of 0. OBJ taps are refused
+  outright. `tests/test_fbneo_tree_integrity.sh` asserts the tree is exactly
+  the pinned commit plus the two tracked patches — run it after any
+  `emu/fbneo` edit, and regenerate patch 0001 with
+  `git -C emu/fbneo add -N src/burner/sdl/harness.cpp && git -C emu/fbneo diff`.
+- **11 new gates**, all ROM-free or near it, all registered in HANDOFF's table.
+  `for t in ...; do tests/$t.sh; done` over the fast tier is ~30 s and was
+  24/24 at close.
+
+## Your decisions, waiting (STATE.md "Decisions pending")
+
+Three from the comparator work — the flicker→window boundary rule (94 specs
+hinge on it), the five 55-frame pairs, and whether the M2 battery still
+targets the m2c generation — plus five policy calls with briefs on their
+issues: #35 (CLAUDE.md vs Rule 1 v2), #39/#40 (.gitignore + untracking),
+#41 (CI), #73 (the PNG goldens).
+
+## The legacy regression brief, carried forward verbatim from 14z-89
+
 
 > ## TASK ZERO (maintainer, session close) — AN ADVERSARIAL CODE REVIEW of
 > ## the project has been done and its findings are being addressed.
