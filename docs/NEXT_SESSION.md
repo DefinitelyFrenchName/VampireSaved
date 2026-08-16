@@ -7,7 +7,8 @@
 > ## incl. ES variants all good. **S6 IS CLOSED.**
 > ##
 > ## **BLOCKED (rule 6): #91 — a planted ILLEGAL is REACHABLE on
-> ## `merged-m1`.** Huitzil-only, deterministic, and a missing
+> ## `merged-m1`.** The TRIPWIRE (#91) is Huitzil-only; the vec3 it
+> ## unmasks (#92) is NOT — Pyron reproduces it. Deterministic, a missing
 > ## reconciliation row (vs2 `0x494de`, a divide helper vsavj
 > ## already has at `0x47fb6`). No build byte moved in 14z-93 —
 > ## the fix is a re-freeze, so it is the maintainer's call.
@@ -204,8 +205,9 @@ decision, not by neglect.
   tripwire — it is the detector, and 51 other deferred targets sit behind it.
   Costs a huitzil + merged re-freeze, so the row is a maintainer decision.
   Instrument: `tests/audit_tripwire_reach.sh`. **NOT the 14z-85f flaky crash
-  reset** — retracted 2026-08-17: the maintainer confirms Phobos was not
-  involved in that recipe, and this is Huitzil-only. Two different bugs.
+  reset** for the TRIPWIRE half (#91): Phobos was not in that recipe and the
+  tripwire is Huitzil-only. **But #92 (the `0x1afb6` vec3) reproduces on
+  PYRON, who IS in that recipe — so a 14z-85f/#92 link is OPEN.**
 
 - ~~**GitHub #75 — `build_merged.sh` ABORTS on huitzil.**~~ **CLOSED 14z-92.**
   It was a VERIFIER artifact, not a build defect: `obj_records.walk`'s pointer

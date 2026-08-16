@@ -103,10 +103,16 @@ maintainer's answer.** I filed this as "plausibly" the same bug because both
 are `vec4` at a match transition and 14z-85f's own structural read was "a
 tripwire firing here would be the instrument WORKING". The maintainer
 confirms **Phobos was not involved anywhere in that recipe** (Donovan vs
-Pyron into COM Sasquatch), and this crash is HUITZIL-ONLY — Pyron and
-Donovan run the same 40,620-frame rig clean on both the solo and merged
-builds. Two different bugs. 14z-85f stays open on its own terms and its rig
-should not be designed around this one.
+Pyron into COM Sasquatch).
+
+**AMENDED later the same session — SEPARATE #91 FROM #92 HERE.** The
+retraction above was written when both were believed Huitzil-only. That
+holds for **#91** (the `0x494de` tripwire fires only on Huitzil legs) but
+NOT for **#92** (the `0x1afb6` vec3), which Pyron reproduces identically
+under a sparse probe. Since the 14z-85f recipe HAD Pyron in it, a link
+between 14z-85f and **#92** is **no longer excluded** — only the link to
+#91's tripwire is. Do not treat 14z-85f as unrelated to #92 on the strength
+of the tenant argument; that argument only ever covered #91.
 
 **INSTRUMENT:** `tests/audit_tripwire_reach.sh` (on-demand, ~15 min, JOBS=3).
 Fails on any fire and resolves the faulting PC to its fragment line so the
@@ -2287,12 +2293,13 @@ checks on H/P); then the trap ring-entry A/B and the voice arc's
 > the two look alike on paper — both `vec4` at a match transition on the
 > merged build, and the structural read below correctly predicts that a
 > planted tripwire firing there "would be the instrument WORKING". 14z-93
-> found exactly such a tripwire and it is **HUITZIL-ONLY** (Pyron and
-> Donovan run the same 40,620-frame arcade rig END-clean on both the solo
-> and merged builds), while **the maintainer confirms Phobos was not
-> involved anywhere in this recipe** (2026-08-17). Two different bugs. Do
-> not design this rig around #92, and do not treat #92's fix as closing
-> this.
+> found exactly such a tripwire (#91) and THAT one is Huitzil-only, while
+> **the maintainer confirms Phobos was not involved anywhere in this
+> recipe** (2026-08-17) — so this is not #91.
+> **BUT NOT #92.** The `0x1afb6` vec3 filed as #92 reproduces on PYRON too
+> (measured under a sparse probe), and Pyron IS in this recipe. So a link
+> between this report and #92 is OPEN, not excluded. The tenant argument
+> only ever ruled out #91.
 
 **The maintainer's recipe, verbatim in substance** (alongside "Final
 Guardian corrected, overall everything is as expected"):
