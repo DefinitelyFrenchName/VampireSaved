@@ -2246,6 +2246,14 @@ Rules now:
   including builds that boot and render perfectly. Tried as a fail-fast
   precondition in 14z-92; it failed all four rompaths and was reverted. The
   live check is whether the run produced its artifact.
+- **FOUR instances in one session (14z-92), which is the real finding.**
+  `hui31` (test_merged_render_content), `pyron20`
+  (audit_hitclass_map_cost), `pyron17` (test_pyron_blink) and `don_m5`
+  (test_obj_walker_relocation). The last is the sharpest: that gate exists
+  to verify the 14z-91 walker relocation and defaulted to a build from
+  BEFORE it, so its no-argument invocation could only ever fail. A
+  path-named default is a dated assertion with no expiry check — when you
+  re-freeze a build, grep the suite for the OLD directory name.
 - **Only gates that BOOT the reference are exposed.** `test_gfx_chain.sh`
   and `tools/audit_gfx_merged.py` also name `build/hui31`, but they read
   tile inventories and gfx members statically and never start an emulator,

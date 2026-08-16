@@ -1,5 +1,79 @@
 # STATE — living progress log
 
+## Session 14z-92 CLOSE — ritual complete
+
+**SHIPPED.** #75 closed (the merged gfx-verify abort was a verifier artifact,
+not a build defect); **`merged-m1` FROZEN** — the first frozen MERGED build,
+all 18 characters in one image, every merged gate green and the maintainer's
+playtest confirming "no obvious regression", the beam "100% clean, as is its
+sound", and Phobos' historically-defective moveset incl. ES variants. S6 is
+closed. Fourteen commits.
+
+**WHAT THIS SESSION WAS ACTUALLY ABOUT, in one line: instruments that had
+quietly stopped measuring.** Five separate ones, none of which announced
+itself:
+
+| instrument | had been broken since | how it presented |
+|---|---|---|
+| `obj_records.walk` pointer pass | latent; fired at 14z-86 | a phantom record read as a build defect (#75) |
+| `test_merged_render_content` huitzil legs | 14z-86 | dead leg printed as a CONTENT REGRESSION |
+| `audit_hitclass_map_cost` reference | 14z-86 (boot) / 14z-82c (premise) | would have blamed 6 sessions of change on the thunk |
+| `test_pyron_ladder` tenant selection | always | **built Donovan**, green (#84) |
+| `test_pyron_blink` / `check_df_style` guard | 14z-87 | could false-REFUSE on the native leg (#16) |
+
+Four of the five were **green or unrun**, not red. That is the shape to
+remember: a decayed gate does not fail, it stops disagreeing.
+
+**THE TWO FINDINGS THAT CHANGED WHAT WE BELIEVE:**
+1. **M4 falsified its own premise.** `hitclass_map_extend`'s safety rested on
+   "legacy never enters the map", measured over TWO replays — both of which
+   score zero. Corpus-wide legacy enters **230 times**. The fix is still
+   sound (every index is far below 64, so legacy reads vanilla's own bytes)
+   but the argument on record was wrong and is now restated everywhere it
+   appeared.
+2. **#82: the tree contradicts itself in writing.** `build_qs_songs.py` says
+   the sample `end` byte plays INCLUSIVE (packing law #3, the sword-plant
+   beep); `audit_qs_voice_batch.py` justifies an exclusive slice with the
+   pre-14z-87b belief. The correction never propagated to the audit — a §5
+   retraction miss on the exact byte that caused the beep.
+
+**HONESTY LEDGER — things that were NOT what they first looked like:**
+- #75's blocker had **already dissolved**: 14z-91 moved `anim@huitzil` and
+  merged8 verifies green with the PRE-FIX tool too (measured). The fix
+  removes a dice roll; it did not unblock today's build.
+- The maintainer's "may feel better" was **emulator-sided**, not the ROM. The
+  obj_hook-cycle mechanism is NOT the explanation and the project still has
+  no measured performance-positive result.
+- My own errors, corrected in place: a `-verifyroms` precondition that failed
+  all four rompaths (group-C CRCs are sentinels); a pre/post comparison that
+  omitted `sweep_allow` and produced a false "pyron FAIL"; a "72 candidate
+  heads" figure taken from a subagent that measured 200; and two MAME dump
+  comparisons written to the same directory-scoped path (issue #21's trap)
+  before I caught it.
+
+**SUITE (+3 gates, +1 detector, all with verdict controls):**
+`test_obj_record_walk.sh` (ROM-free, in ci_portable → 14),
+`test_fbneo_legacy_oracle.sh` (#78 partial), the assignment-only continuation
+detector in `test_shell_portability.sh` (captures the #84 sweep, 3 controls),
+plus repairs to `test_merged_render_content`, `audit_hitclass_map_cost`,
+`test_index_window_thunk`, `test_pyron_ladder`, `test_pyron_blink`.
+
+**GOTCHAS filed (2):** a pointer-shaped heuristic is placement-dependent (and
+"it was green before" is not evidence); a frozen build stops being a usable
+GATE REFERENCE when the profile bumps — with the corollary that only gates
+which BOOT the reference are exposed.
+
+**TRACKER:** 56 → 50 open. Closed #75, #4, #35, #39, #40, #73, #16 (all
+verified applied in-tree before closing). All 14 Dunky13 issues (#76-#89)
+assessed against the code — 11 confirmed, 1 contested (#77: the harness DOES
+NULL-check its calloc, and every consumer is bounded by the same variable, so
+a wrap truncates rather than overflows), 2 acted on.
+
+**OPEN, needing rulings:** the two FBNeo phase classes (#78); whether the
+hitclass thunk is still load-bearing (its crash rig died — measure the TENANT
+side before any keep/drop); the stage-4 boot-probe expectation exposed by
+#84; #44; #27; #30; #41 (maintainer's list).
+
 ## Session 14z-92 (5) — M4 RUN, AND IT FALSIFIED THE CLAIM IT WAS FILED TO
 ## CHECK: legacy enters the hit-class map 230 times, not zero. The fix is
 ## still sound; its SAFETY ARGUMENT was wrong.

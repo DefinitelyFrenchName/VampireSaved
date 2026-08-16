@@ -1599,6 +1599,42 @@ tests/test_obj_record_walk.sh         # 14z-92 (GitHub #75): ground truth
                                       # the new strictness. Synthetic
                                       # fixture, no ROMs, no build dirs,
                                       # ~1s; in tests/ci_portable.txt
+tests/test_fbneo_legacy_oracle.sh     # 14z-92 (GitHub #78 PARTIAL): the
+                                      # HACKED build's legacy content vs
+                                      # VANILLA, on FBNeo. CLAUDE.md §4
+                                      # defined this oracle and the suite
+                                      # did not run it: FBNeo had the
+                                      # emulator superset invariant on
+                                      # PRISTINE vsavj + dual-track
+                                      # inertness, and the hacked-build
+                                      # legacy comparison lived on MAME —
+                                      # never their product. 4 replays x 5
+                                      # frames; SAMPLE FRAMES ARE DERIVED
+                                      # from each replay's frozen MAME spec
+                                      # and pushed clear of every ratified
+                                      # flicker/window, so a mismatch is
+                                      # FBNeo-only by construction. Set
+                                      # resolved from the build, never
+                                      # pinned. FBNEO_REF makes leg A a
+                                      # true reference binary; without it
+                                      # leg A runs vanilla on the patched
+                                      # binary and the claim is completed
+                                      # by test_wide_profile (named in the
+                                      # header, not assumed). 3 comparator
+                                      # controls incl. one proving the mask
+                                      # is APPLIED. FOUND ON ITS FIRST RUN,
+                                      # both cross-checked against MAME at
+                                      # the same frame (MAME: 0 diffs):
+                                      # $FF055B-$FF055D (sound-driver work
+                                      # area, ram.md:74) and $FF06D1/D4/DB
+                                      # (OBJ-builder secondary stack,
+                                      # ram.md:62 "execution POSITION, not
+                                      # state"). Reported as `open:` —
+                                      # MEASURED DEVIATIONS AWAITING A
+                                      # RULING, bounded to two named
+                                      # windows; anything outside FAILS.
+                                      # FBNEO_ORACLE_EXPECT=exact is the
+                                      # post-ruling target. ~5 min
 tests/audit_pool_free_byte.sh         # REWRITTEN 14z-85 (the 14z-84 version
                                       # measured only $FFB800 and attributed
                                       # it to the 59-75 family — WRONG POOL;

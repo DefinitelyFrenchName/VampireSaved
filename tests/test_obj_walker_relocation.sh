@@ -32,7 +32,15 @@
 #        No emulator, no ROMDIR beyond the decrypted view. Seconds.
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"; cd "$REPO"
-BUILD="${1:-build/don_m5}"
+# DEFAULT RE-POINTED 14z-92: was build/don_m5, which PREDATES the 14z-91
+# walker relocation this gate exists to verify — so the no-argument
+# invocation could only ever FAIL (it reports every caller as missing its
+# operand op). Fourth stale-default found in one session, after hui31
+# (test_merged_render_content), pyron20 (audit_hitclass_map_cost) and
+# pyron17 (test_pyron_blink); see docs/project/gotchas.md "A frozen build
+# stops being a usable REFERENCE". RE-POINT THIS ON THE NEXT DONOVAN
+# RE-FREEZE.
+BUILD="${1:-build/don_m7}"
 [ -f "$BUILD/patch/patch.json" ] || { echo "SKIP: no $BUILD/patch/patch.json"; exit 0; }
 [ -f build/out/vsavj_opcodes.bin ] || { echo "SKIP: no build/out/vsavj_opcodes.bin"; exit 0; }
 

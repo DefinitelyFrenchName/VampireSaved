@@ -95,6 +95,91 @@ if bad:
     print("  #!/usr/bin/env bash if the construct is load-bearing.")
     sys.exit(1)
 print(f"  ok: all {len(files)} tracked .sh files are honest about their shell")
+
+# ---------------------------------------------------------------------
+# THE ASSIGNMENT-ONLY CONTINUATION CHAIN (added 14z-92, GitHub #84).
+# A continuation whose whole logical line is VAR=... assignments and NO
+# COMMAND sets shell variables that never enter any child's environment.
+# tests/test_pyron_ladder.sh had exactly this shape, so build_donovan.sh —
+# a separate process — never saw the tenant selection and fell back to its
+# Donovan defaults. THE PYRON LADDER BUILT DONOVAN AT EVERY STAGE and
+# stayed green, because a gate that validates the wrong thing still
+# validates something.
+#
+# Deliberately NOT the naive "assignment line followed by an assignment
+# line": `VAR=a \` + `VAR=b command` is the normal correct idiom and must
+# not be flagged. The test is whether the joined chain EVER REACHES A
+# COMMAND. A multi-line single value (CORPUS="a b c ...") is also
+# assignment-only and legitimate, so a chain assigning exactly ONE
+# variable is exempt.
+import re as _re
+_ASSIGN = _re.compile(r"[A-Za-z_][A-Za-z0-9_]*=(?:\"[^\"]*\"|'[^']*'|[^\s]*)\s*")
+_off = []
+for _f in files:
+    _lines = open(_f).read().split("\n")
+    _i = 0
+    while _i < len(_lines):
+        if _lines[_i].rstrip().endswith("\\"):
+            _start, _parts = _i, []
+            while _i < len(_lines) and _lines[_i].rstrip().endswith("\\"):
+                _parts.append(_lines[_i].rstrip()[:-1]); _i += 1
+            if _i < len(_lines):
+                _parts.append(_lines[_i])
+            _log = " ".join(x.strip() for x in _parts).strip()
+            _rest, _n = _log, 0
+            while True:
+                _m = _ASSIGN.match(_rest)
+                if not _m:
+                    break
+                _rest = _rest[_m.end():]; _n += 1
+            if _n > 1 and not _rest.strip():
+                _off.append((_f, _start + 1, _log[:90]))
+        _i += 1
+if _off:
+    print("\nFAIL: continuation chains that assign several variables and")
+    print("      never reach a command. Those assignments are LOCAL and")
+    print("      do not reach any child process (GitHub #84).")
+    for _f, _ln, _t in _off:
+        print(f"  {_f}:{_ln}  {_t}")
+    sys.exit(1)
+print("  ok: no multi-variable continuation chain ends without a command")
+
+# VERDICT CONTROL on the detector just used. It must FIRE on the real
+# pre-fix #84 shape and stay SILENT on the two legitimate idioms it
+# resembles, or the clean sweep above means nothing.
+def _scan(text):
+    ls, out, i = text.split("\n"), [], 0
+    while i < len(ls):
+        if ls[i].rstrip().endswith("\\"):
+            parts = []
+            while i < len(ls) and ls[i].rstrip().endswith("\\"):
+                parts.append(ls[i].rstrip()[:-1]); i += 1
+            if i < len(ls):
+                parts.append(ls[i])
+            log = " ".join(x.strip() for x in parts).strip()
+            rest, n = log, 0
+            while True:
+                m = _ASSIGN.match(rest)
+                if not m:
+                    break
+                rest = rest[m.end():]; n += 1
+            if n > 1 and not rest.strip():
+                out.append(log)
+        i += 1
+    return out
+
+_bad = 'TENANT_MANIFEST=build/manifest/pyron.toml TENANT_CHAR=0x11 \\\n    GF="--profile cps2-wide-v1"\n'
+_ok1 = 'TENANT_MANIFEST=x TENANT_CHAR=0x11 \\\n    GEN_FLAGS="$GF" tools/build_donovan.sh 4 out\n'
+_ok2 = 'CORPUS="01_attract_long \\\n    02_demitri_vs_cpu"\n'
+for _name, _txt, _want in (("the real #84 shape", _bad, True),
+                           ("the correct idiom (chain reaches a command)", _ok1, False),
+                           ("a multi-line single value", _ok2, False)):
+    _got = bool(_scan(_txt))
+    _v = "ok" if _got == _want else "WRONG"
+    print(f"  control: {_name}: {'flagged' if _got else 'silent'} [{_v}]")
+    if _got != _want:
+        sys.exit(1)
 PY
 
-echo "PASS: shell portability (no #!/bin/sh script uses a bash-only construct)"
+echo "PASS: shell portability (no #!/bin/sh script uses a bash-only
+      construct; no assignment-only continuation chain strands its vars)"
