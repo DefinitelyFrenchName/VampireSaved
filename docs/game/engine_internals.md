@@ -1764,9 +1764,16 @@ here contradicted HANDOFF's registry row for a whole session). The
 2026-08-12 and huitzil-m4 / pyron-m3 were re-frozen on it.
 
 **Because it IS shipped, it is a live hook on a SHARED engine site**, and
-its "legacy never enters the map" evidence is four replays — the same
-coverage shape that falsified the list-type 6 deadness claim and produced
-the 14z-91 legacy regression. It is a `jmp` over `0x1A888` plus a
+**its "legacy never enters the map" evidence was FALSIFIED by measurement
+(14z-92, M4).** That claim rested on two census replays, and both of them
+happen to score zero. Over the 46-replay legacy corpus legacy enters the map
+**230 times** (`24_don_winmash` 2, `26_don_arcade_mash` 228). The fix is
+still sound and the argument is now the true one: every observed legacy index
+is 0x02/0x04/0x09/0x0b, far below 64, so legacy reads VANILLA's own bytes out
+of the thunk — "legacy enters constantly and receives vanilla answers", not
+"legacy never enters". Corroborated by 43/46 bit-identical in the same run.
+It was the same coverage shape that falsified the list-type 6 deadness claim
+and produced the 14z-91 legacy regression, and this time it did fire. It is a `jmp` over `0x1A888` plus a
 `cmpi.w`/`bcc` on every collision-map lookup. The dispatch is per-COLLISION,
 not per-frame, so it is far colder than the obj_hook site was — but if a
 legacy replay ever fails to re-converge and the walker relocation is not the

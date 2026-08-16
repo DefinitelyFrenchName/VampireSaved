@@ -1036,7 +1036,11 @@ note = "Cosmo Disruption sub-state 81 -> 79: vsavj's dispatch table has 80 entri
 # Measured before adoption (tests/audit_hitclass_map_cost.sh): the
 # 11,017-frame soak that crashes frozen pyron-m2 runs END-clean; legacy
 # BIT-IDENTICAL over 30,284 frames; fire census = legacy never enters the
-# map. Reconstruction gate: tests/test_hitclass_map_thunk.sh. Declared by
+# map. >>> THAT CENSUS FIGURE IS RETRACTED (14z-92, M4): it was two
+# replays, both scoring zero. Corpus-wide (46) legacy enters the map 230
+# times, all at indices 0x02/0x04/0x09/0x0b — far below 64 — so legacy reads
+# vanilla's own bytes out of the thunk. The row stays; the argument is
+# "legacy enters and gets vanilla answers", not "legacy never enters". Reconstruction gate: tests/test_hitclass_map_thunk.sh. Declared by
 # BOTH exposed tenants (shared row, dedups on the merge); donovan is not
 # exposed (his 59-63 fit) and deliberately does not declare it.
 [[site_thunk]]

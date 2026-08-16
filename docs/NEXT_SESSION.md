@@ -162,12 +162,23 @@ The superseded framing, kept because it explains the shapes above:
   read its README before touching a spec there, and do not copy a tenant
   set's line into it: the two tables are measurably not interchangeable,
   which is why it exists.
-- **M4, not yet run: `audit_hitclass_map_cost.sh` over the FULL corpus.**
-  `hitclass_map_extend` IS adopted (huitzil.toml:2048, pyron.toml:1044 — the
-  "ADOPTION PENDING" in engine_internals was stale and is corrected), so it
-  is a live hook on a shared engine site whose "legacy never enters" evidence
-  is four replays. Same coverage shape that produced this session's
-  regression. Cheap insurance, not a known defect.
+- ~~M4: `audit_hitclass_map_cost.sh` over the FULL corpus~~ **RUN 14z-92 —
+  AND IT FALSIFIED THE CLAIM IT WAS FILED TO CHECK.** `hitclass_map_extend`'s
+  adoption rested on "legacy never enters the map", measured over TWO
+  replays — both of which happen to score zero. Corpus-wide (46) legacy
+  enters **230 times** (`26_don_arcade_mash` 228, `24_don_winmash` 2). The
+  fix is still sound: every legacy index is 0x02/0x04/0x09/0x0b, far below
+  64, so legacy reads VANILLA's own bytes out of the thunk. The argument is
+  now "legacy enters and gets vanilla answers". Section 1: 43/46
+  bit-identical, 3 transient re-convergent, 0 dead. Claim retracted in
+  engine_internals, HANDOFF, and both manifests.
+- **OPEN from M4 — needs a ruling: is the thunk still load-bearing?** Its
+  crash control is DEAD (the no-thunk twin no longer reproduces f7997). But
+  the frozen inventory still has 93 stamp rows with type >= 64 against a
+  64-entry map, so the RIG stopped demonstrating the crash — the fix did not
+  stop being needed. The missing measurement is the TENANT side: how often a
+  tenant enters the map with an index >= 64. No section measures that today;
+  it is the number that would settle keep-or-drop.
 - The M5 sfx odds (0x112/0x14a/0x173/0x31B family — machinery ready).
 - FLAKY CRASH RESET (Sasquatch intro; rig designed, STATE 14z-85f).
 - Round-end flicker (parked; needs the maintainer's recording).

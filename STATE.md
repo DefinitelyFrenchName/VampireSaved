@@ -1,5 +1,62 @@
 # STATE — living progress log
 
+## Session 14z-92 (5) — M4 RUN, AND IT FALSIFIED THE CLAIM IT WAS FILED TO
+## CHECK: legacy enters the hit-class map 230 times, not zero. The fix is
+## still sound; its SAFETY ARGUMENT was wrong.
+
+M4 was "cheap insurance, not a known defect". It was not insurance.
+
+**THE HEADLINE.** `hitclass_map_extend`'s adoption rested on "legacy content
+never enters the map" — measured over TWO replays. Over the 46-replay legacy
+corpus:
+
+    24_don_winmash:      2 map entries;  D0 = 0x02, 0x09
+    26_don_arcade_mash: 228 map entries; D0 = 0x04, 0x0b
+    corpus total: 230 map entries over 46 replays (0 dead)
+
+The old census ran `02_demitri_vs_cpu` and `03_two_player_vs` — precisely two
+replays that score zero. **Legacy transits this thunk 230 times.**
+
+**THE FIX IS STILL SOUND, AND THE ARGUMENT MUST BE RESTATED.** Every observed
+legacy index is `0x02 / 0x04 / 0x09 / 0x0b`, far below 64, so legacy reads
+vanilla's own bytes out of the thunk (its body is vanilla's 64 verbatim +
+vs2's 16 extension entries). The claim is no longer "legacy never enters, so
+the thunk cannot affect legacy" — it is **"legacy enters constantly and
+receives vanilla answers"**, corroborated by section 1's 43/46 bit-identical.
+That is a weaker argument than the one on record, and it is the true one.
+
+**SECTION 1 (cost A/B over the corpus): 43/46 bit-identical, 3 divergent,
+0 dead.** All three divergences are TRANSIENT and fully re-convergent, late
+and heavy-frame, none at select or attract:
+
+    21_don_mash        14/14120 frames   12495..12524   1596 clean after
+    22_don_dualmash   137/13920 frames   13209..13383    537 clean after
+    26_don_arcade_mash 99/40620 frames   11248..11380  29240 clean after
+
+**AND THE TWO SECTIONS CROSS-CHECK, WHICH IS THE PART WORTH KEEPING.**
+`26_don_arcade_mash` diverges WITH 228 map entries — map-transit cycles, the
+thunk's own cost. `21_don_mash` and `22_don_dualmash` diverge with **ZERO**
+map entries, so their blips are NOT the thunk: they are the ALLOCATOR SHIFT
+caused by removing the row. The audit's summary line used to say "a DIVERGES
+line is the thunk's measured legacy cost" — that is imprecise and is now
+corrected in place, with the measurement as the worked example.
+
+Note this is fix-vs-twin, NOT fix-vs-vanilla. The shipped build's legacy
+fidelity is measured against VANILLA by its frozen `.masked` specs and
+pyron-m9 is green there; nothing here touches the superset invariant.
+
+**THE AUDIT ITSELF WAS UNRUNNABLE AND WOULD HAVE LIED** — see 14z-92 (4)
+below for the rebuilt reference; and its crash control is DEAD (the no-thunk
+twin no longer reproduces the f7997 crash). Precise statement of that, since
+I first framed it too strongly: the frozen stamp inventory still carries 93
+stamp rows with type >= 64 against a 64-entry map, and both huitzil.toml and
+pyron.toml still carry the fix, so **the RIG stopped demonstrating the crash;
+the fix did not stop being needed.** The missing measurement is the TENANT
+side — how often the tenant enters the map with an index >= 64 — which no
+section measures today. That is the number that would settle keep-or-drop.
+
+Exit 1 by design (the dead control fails the audit rather than being noted).
+
 ## Session 14z-92 (4) — the L/M/H coverage gap MEASURED rather than
 ## carried, and the (b') thunk gate caught red-flagging the frozen build
 ## over a stale proxy (its failure message had the encryption backwards).
