@@ -14,8 +14,14 @@
 # ($FF8004.l==$FF8008.l==0x40000, both HP==0x120, debounced 30 frames) is
 # documented in tools/compare_fields.py.
 timer	abs	0xFF8109	1	stable	round timer
-p1_char_id	p1	0x382	1	stable	selected character ID
-p2_char_id	p2	0x382	1	stable	selected character ID
+# 14z-90 (GitHub issue #16): p1/p2_char_id at +0x382 REMOVED from the
+# dual-emulator field set. 14z-87 measured that byte as the voice-flavor
+# class in match, reassigned by the engine from the opponent's candidate
+# row — and measured the borrow as a cross-emulator LOTTERY (0x06/0x0C/
+# 0x09/0x00 on MAME vs 0x04 on FBNeo, identical inputs). It is the one
+# field here known to disagree between the two codebases BY DESIGN, so
+# comparing it at every anchor asserts a disagreement. In-match identity
+# is carried by p1/p2_hitbox_base at +0x60 below.
 p1_hp	p1	0x50	2	stable	current HP (0x120 at round start)
 p2_hp	p2	0x50	2	stable	current HP
 p1_white_hp	p1	0x52	2	stable	white/displayed HP

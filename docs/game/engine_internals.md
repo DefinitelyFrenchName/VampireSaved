@@ -1778,7 +1778,9 @@ the thunk can be unconditional.
 ## measured on Phobos' FINAL GUARDIAN; twins verified in both engines)
 
 Depends on atlas rows: fighter structs `$FF8400/$FF8800` (`+0x50` HP,
-`+0x52` white HP, `+0x144` combo counter, `+0x382` char id,
+`+0x52` white HP, `+0x144` combo counter, `+0x382` char id AT SELECT ONLY
+(in match it is the voice-flavor class — 14z-87; use `+0x60.l` hitbox base
+for in-match identity),
 `+0x3B3` per-char stat byte, `+0x8C` attack-record table ptr,
 `+0x32` attacker/owner link), the A5 work-var families below, and
 docs/game/gotchas.md "Same-value class #4".

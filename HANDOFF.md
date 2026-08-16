@@ -289,7 +289,7 @@ POKES="1400:ff8782:10;1450:ff8782:10;1500:ff8782:10"   # P1; P2 = $FF8B82
 tools/run_replay_mame.sh vsav2 <replay> out.log        # ~6 s
 ```
 
-Verified by `+0x382 = 0x10` on the native leg, with DF (seq 0x0A) and
+Verified by `+0x382 = 0x10` on the native leg **(SELECT/commit time only — in MATCH this byte is the VOICE-FLAVOR class and the engine reassigns it; 14z-87, ram.md:85)**, with DF (seq 0x0A) and
 the air dash (seq 0x14) both firing. **Poke BOTH sides** when sprite
 lists are compared: the cursor path lands on different characters on
 the two wheels (P2 = 0x03 is Victor on vsav *and* vsav2).
@@ -1262,6 +1262,14 @@ tests/test_pyron_blink.sh      [bd]   # 14z-75: the sprite/HUD BLINK. Palette ro
                                       # 0x26 under the uploader's 0xF000 OR), so a
                                       # look-alike defect fails. REFUSES to judge unless
                                       # both legs show +0x382=0x11. 7 verdict controls.
+                                      # KNOWN WEAKNESS (14z-90, GitHub issue #16): that
+                                      # guard reads +0x382 IN MATCH (f3200/3400/3600),
+                                      # where 14z-87 proved it is the voice-flavor class,
+                                      # not the char id. Ours is protected by the shipped
+                                      # voice_borrow_keep_tenant thunk; the NATIVE leg is
+                                      # not, so a borrow there yields a false REFUSE.
+                                      # Zero recorded firings. Fix = gate on +0x60.l,
+                                      # blocked on freezing our tenant hitbox bases.
                                       # FIXED 14z-75 (a DEAD ROW: per-char palette-routine
                                       # table 0x2A8A4 row 0x11 aliased row 0x01's ANIMATED
                                       # handler; one word 0x2A8C6 008E->0040 = vs2's own

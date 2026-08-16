@@ -55,7 +55,7 @@ anything.
 
 ### 2. Code — how wide is the id where it is consumed?
 
-Every read of the id field `$382(An)` located, the destination register
+Every read of `$382(An)` located, the destination register
 tracked forward, and the first mask or compare applied to it recorded.
 
 | classification | vsavj | vsav2 |
