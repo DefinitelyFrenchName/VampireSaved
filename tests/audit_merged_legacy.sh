@@ -16,7 +16,9 @@
 #
 # WHAT A GREEN RUN PROVES: the merged image's legacy behaviour lands on the
 # SAME ratified comparison classes as the frozen single-tenant builds
-# (tests/expected/donovan-m7/*.masked — all three tenant sets agree
+# (tests/expected/merged1/*.masked — the merged build's OWN table since
+# 14z-91; it was a tenant set's until eight deviations fired the
+# pre-registered "does the merged build want its own class table?"
 # byte-for-byte on the 13 shared legacy entries, and a merged build backs
 # 0x13 so 11_pick_donovan applies too) — with ONE ratified merged-specific
 # exception: 04_select_fuzz lands on the RATIFIED MERGED inventory
@@ -51,7 +53,7 @@
 #
 # Usage: ROMDIR=... [MAME_BIN=...] tests/audit_merged_legacy.sh
 # On-demand: builds build/merged1 and runs the legs below (~2 h since
-# 14z-89 — leg (a) is a GLOB over tests/expected/donovan-m7/*.masked and
+# 14z-89 — leg (a) is a GLOB over tests/expected/merged1/*.masked and
 # that set grew 14 -> 45 .masked with the legacy-pairing promotion; it was
 # ~40 min at 14 replays).
 # RETRACTED 14z-90 (GitHub issue #17): this line said "14 -> 47". It is 45
@@ -76,15 +78,7 @@ export MAME_BIN
 OUT="${MERGED_OUT:-build/merged1}"
 PREBUILT="${MERGED_PREBUILT:-0}"
 WIDE_ZIP="${WIDE_ROMSET:-$PWD/build/wide0/rompath/vsavjw.zip}"
-EXPECT="tests/expected/donovan-m7"          # the ratified prior (see header)
-# 14z-91: was donovan-m5. The legacy-regression fix re-froze every set,
-# and frame 829 (the hook cycle-skew) is gone corpus-wide, so the m5
-# specs no longer describe ANY build. The three merged-only overrides
-# below are deliberately NOT updated with it: they are maintainer-
-# ratified, they derive from the same cycle mechanism that just
-# changed, and this audit is built to FAIL with a measured shape and a
-# proposed line rather than absorb a deviation. Whatever it reports is
-# a re-ratification question, not a re-freeze.
+EXPECT="tests/expected/merged1"            # the merged build's OWN class table
 BASE_LOGS="tests/expected/vsavj/masked-v2/logs"
 
 # The three frozen extract dirs are the generator's inputs, exactly as
@@ -272,7 +266,8 @@ cmp -s "$W/a_03_two_player_vs.log" "$W/det2.log" || {
 echo "  ok: two masked runs of 03_two_player_vs bit-identical"
 
 echo "== 1 (leg a): merged vs VANILLA on the masked-v2 basis — the superset"
-echo "      question. Expectation: donovan-m3a's ratified classes VERBATIM,"
+echo "      question. Expectation: the merged build's OWN ratified"
+echo "      classes in tests/expected/merged1 (14z-91),"
 echo "      plus the ratified merged-04 inventory (14z-82d). =="
 # --- ENUMERATE (14z-90, GitHub issue #17) --------------------------------
 # The glob below evaluates *.masked ONLY, and said nothing about anything
@@ -317,44 +312,15 @@ for spec in "$EXPECT"/*.masked; do
     printf '%-24s ' "$name"
     sline="$(cat "$spec")"
     # MERGED-ONLY RATIFIED EXPECTATION (maintainer, 2026-08-12, 14z-82d).
-    # The merged image's longer hook chains add ONE flicker frame (2005) to
-    # 04's frozen single-tenant inventory; byte-attributed to the low word
-    # of the sound driver's record-pointer spill at RAM:$FF0460 (writer
-    # PRG:0x0011E2, locked by tests/audit_ff0460_writer.sh) — one-frame
-    # pointer phase, no gameplay surface, the ratified hook-flicker family.
-    # The merged instrument is unregistered by design, so this expectation
-    # lives HERE, not in a .masked file; the single-tenant prior
-    # (tests/expected/donovan-m5/04_select_fuzz.masked) is unchanged.
-    if [ "$name" = "04_select_fuzz" ]; then
-        sline="composite vsavj/masked-v2 1525,2005,2009,2195 889-1104"
-    fi
-    # MERGED-ONLY RATIFIED EXPECTATION #2 (maintainer, 2026-08-13,
-    # 14z-84). The chained drawer bank gates (the select/VS name fix)
-    # cost ~2 extra cmpi/bne pairs per call; on the VS screen after the
-    # Donovan pick, fade-staging row 0x0B ($FF4064-71, the $FF3F02 +
-    # row*0x20 family) fills ONE FRAME LATER — byte-attributed by
-    # full-RAM dump-diff at f2836 (12 live bytes, fully re-convergent,
-    # 884 clean frames after; the merged-04 mechanism's species). The
-    # ratified window 889-2415 itself is unchanged.
-    if [ "$name" = "11_pick_donovan" ]; then
-        sline="composite vsavj/masked-v2 2836 889-2415"
-    fi
-    # MERGED-ONLY RATIFIED EXPECTATION #3 (maintainer, 2026-08-15,
-    # 14z-89). The merged image carries ALL THREE tenants, so on this
-    # replay it shows the UNION of the two single-tenant flicker frames:
-    # 5713 is the donovan-m5 prior's frame (the OBJ-builder bsr-chain
-    # return address $FF06D0-$FF06EF — execution position at the
-    # frame-done sample, docs/game/atlas/ram.md) and 2836 is the
-    # huitzil-m13 / pyron-m7 priors' frame (the fade-staging slot-0x0B
-    # phase of override #2's species, ratified 2026-08-12 merged and
-    # 2026-08-15 solo). Both frames were dump-attributed in 14z-89; the
-    # window 889-2415 is unchanged from the priors. NOTE this is the
-    # THIRD such override — if a fourth appears, ask whether the merged
-    # build wants its own class table rather than a growing exception
-    # list.
-    if [ "$name" = "12_donovan_vs_cpu" ]; then
-        sline="composite vsavj/masked-v2 2836,5713 889-2415"
-    fi
+    # THE THREE MERGED-ONLY INLINE OVERRIDES WERE REMOVED 14z-91.
+    # They lived here because the merged instrument is unregistered by
+    # design and so had no set of its own. After the legacy-regression fix
+    # there were EIGHT deviations, which fired the question this file had
+    # already pre-registered ("a fourth should prompt: does the merged
+    # build want its own class table?"). Maintainer-ruled: it does.
+    # $EXPECT is now tests/expected/merged1 — every class is exact and
+    # lives in a .masked file, so there is nothing to special-case here.
+    # See that set's README.md for the eight and why each moved.
     class=${sline%% *}; rest=${sline#* }; base=${rest%% *}; args=${rest#* }
     baselog="$REPO/tests/expected/$base/logs/$name.log"
     log="$W/a_$name.log"
@@ -505,12 +471,12 @@ PY
         "$W/b_${nm}_new.log" 2>&1 | sed 's/^/        /'
     echo "        (classified REPORT for the maintainer, not a gate — see header)"
 }
-legb 12_donovan_vs_cpu      build/m5_wide  "$POK13"     "donovan/12_vs_cpu"
-legb 20_don_round2          build/m5_wide  "$POK13"     "donovan/20_round2"
-legb hui/70_hui_mash        build/hui30    "$HUI_SOAK"  "huitzil/70_mash"
-legb hui/83_hui_fx          build/hui30    "$HUI_FX"    "huitzil/83_fx"
-legb pyron/70_pyron_mash    build/pyron21  "$PYR_SOAK"  "pyron/70_mash"
-legb pyron/72_pyron_cosmo_2p build/pyron21 "$PYR_COSMO" "pyron/72_cosmo_2p"
+legb 12_donovan_vs_cpu      build/don_m7  "$POK13"     "donovan/12_vs_cpu"
+legb 20_don_round2          build/don_m7  "$POK13"     "donovan/20_round2"
+legb hui/70_hui_mash        build/hui41    "$HUI_SOAK"  "huitzil/70_mash"
+legb hui/83_hui_fx          build/hui41    "$HUI_FX"    "huitzil/83_fx"
+legb pyron/70_pyron_mash    build/pyron26  "$PYR_SOAK"  "pyron/70_mash"
+legb pyron/72_pyron_cosmo_2p build/pyron26 "$PYR_COSMO" "pyron/72_cosmo_2p"
 
 echo
 if [ "$fail" != 0 ]; then

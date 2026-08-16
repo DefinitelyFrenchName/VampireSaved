@@ -120,6 +120,29 @@ legacy behavior is a failed change.
   3190 rather than 890 (it starts mid-attract). Checker
   `tools/compare_composite.py`, ground-truthed by
   `tests/test_compare_composite.sh` (seven cases plus a no-loophole check).
+  **Added v5 2026-08-16 (maintainer-ruled), THE >=60 RULE IS
+  INTRA-MECHANISM.** The 60-frame non-propagation figure is a
+  single-mechanism proof: it governs the RE-CONVERGENCE TAIL after the
+  last divergence, and it does NOT bind across the gap between two
+  SEPARATELY ATTRIBUTED mechanisms. So a flicker run followed by a
+  window onset, or one flicker run followed by another, is not
+  constrained by it. `tools/compare_composite.py` implements the
+  alternative behind `--min-converge-flicker`, which stays DEFAULT-OFF
+  and is opted into by no spec. Rationale: nothing measured suggests the
+  mechanisms interact, and applying it across a boundary would have
+  redded 99 of 121 committed composite specs purely because the
+  select-window onset moved 890 -> 889 in 14z-63. **Two NAMED
+  EXEMPTIONS are recorded against the day the flag is ever turned on**,
+  both 56 frames apart (55 identical between) and both the palette-fade
+  staging family, per-frame-attributed on every audit run:
+  `donovan-m7/22_don_dualmash` (11862/11918) and
+  `huitzil-m15/26_don_arcade_mash` (8744/8800). A third would mean the
+  gap is a property of the mechanism rather than a coincidence, and the
+  right response then is to measure the real minimum, not to lengthen
+  this list. (Historical note: this question was opened when flicker 829
+  sat 59 frames before window onset 889; frame 829 was the obj_hook
+  cycle-skew and 14z-91 removed it, so no current spec exercises the
+  boundary at all.)
   Every non-exact class must be
   mechanism-attributed and its expectation frozen; a replay may not be
   reclassified to a looser class without a new measured mechanism and
