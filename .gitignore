@@ -58,3 +58,23 @@ build/wide_canary/rompath/
 build/manifest/probe_*.toml
 build/probe_*/
 build/probe_*.log
+
+# ── 14z-91 (GitHub #39/#40, maintainer-ruled) ────────────────────────────
+# WIDE extension program members. `vsw.*`, NOT `vsw*.*`: the pattern must
+# not also swallow authored sources that happen to start with those letters.
+# Measured today these are 0xFF fill (12 of 16 a single repeated byte), so
+# the audit's "8 MiB of ROM-derived output" was false — but the profile
+# targets ~338 KB of PORTED PROGRAM ROM landing in exactly these members,
+# and rule 7 is about what the repo will hold tomorrow, not today.
+vsw.*
+
+# Root-anchored build/clone trees that were never meant to be committed.
+# The worktrees entry is not cosmetic: 471 MB of duplicated tools/tests/docs
+# under .claude/worktrees/ makes every retraction-discipline grep return
+# pre-move copies, so a session can "fix" a claim in a worktree and believe
+# it done (paid for repeatedly in 14z-90 and again in 14z-91 — every grep in
+# this repo now needs `| grep -v worktrees`). Scoped to .claude/worktrees/,
+# NOT a blanket .claude/, so agent/skill config stays trackable.
+/fbneo/
+/mame/
+/.claude/worktrees/

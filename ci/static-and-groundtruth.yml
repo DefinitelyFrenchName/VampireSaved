@@ -1,0 +1,62 @@
+# DRAFT — see ci/README.md. Not enabled: move to .github/workflows/ to run.
+name: static-and-groundtruth
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  static-and-groundtruth:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install dash (the shell the repo targets, and macOS cannot test)
+        run: sudo apt-get update && sudo apt-get install -y dash
+
+      - name: Python syntax
+        run: |
+          set -eu
+          find tools tests -name '*.py' -print0 \
+            | xargs -0 -n1 python3 -m py_compile
+          echo "ok: all Python files compile"
+
+      - name: Shell syntax — bash AND dash
+        run: |
+          set -eu
+          rc=0
+          for f in $(git ls-files '*.sh'); do
+            head -1 "$f" | grep -q bash && sh=bash || sh=dash
+            "$sh" -n "$f" || { echo "  FAIL: $f under $sh"; rc=1; }
+          done
+          [ "$rc" = 0 ] && echo "ok: every tracked .sh parses under its own shell"
+          exit "$rc"
+
+      # THE POINT OF THE JOB. A gate that SKIPs is not a pass: in a clean
+      # checkout a missing ROM or build dir makes several gates exit 0 with
+      # "SKIP", which would read as green forever.
+      #
+      # MATCH A SKIP VERDICT, NOT THE WORD. The pattern is anchored to the
+      # start of a line because `test_audit_merged_dispatch` legitimately
+      # prints `ok: bb_skip|skip|SKIP` — it is the gate for the expectation
+      # KINDS, one of which is `skip`. A bare `grep -q SKIP` fails it, which
+      # is how a green gate gets deleted from a portable list for no reason.
+      - name: Ground-truth gates (fail on SKIP)
+        run: |
+          set -eu
+          rc=0
+          while read -r t; do
+            case "$t" in ''|'#'*) continue ;; esac
+            printf '%-34s ' "$t"
+            out=$(tests/"$t".sh 2>&1) && st=0 || st=$?
+            if [ "$st" != 0 ]; then
+              echo "FAIL (exit $st)"; printf '%s\n' "$out" | tail -20; rc=1
+            elif printf '%s' "$out" | grep -qE '^[[:space:]]*SKIP'; then
+              echo "SKIPPED — not acceptable in CI, this gate must be"
+              echo "  portable or removed from tests/ci_portable.txt"
+              printf '%s\n' "$out" | grep SKIP | head -3; rc=1
+            else
+              echo PASS
+            fi
+          done < tests/ci_portable.txt
+          exit "$rc"

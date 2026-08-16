@@ -1,0 +1,38 @@
+# tests/ci_portable.txt — the gates a CLEAN CHECKOUT can run.
+#
+# "Clean checkout" means: no $ROMDIR, no decrypted views under build/out/,
+# no build directories. That is what CI has, and it is the whole reason this
+# list is shorter than "the ROM-free gates" — a gate that SKIPs for want of
+# build/out/vsavj_opcodes.bin is not portable, it is silent.
+#
+# THE JOB MUST FAIL ON SKIP. A CI job named "tests" that runs 3% of them and
+# reports green is its own false green; one that runs 12 and says so is
+# honest. The runner asserts each line below exits 0 AND does not print SKIP.
+#
+# Kept beside the gates, not in the workflow file, so adding a gate is a
+# one-line edit here rather than a change to executable CI config.
+#
+# EXCLUDED, with the reason — do not add these without solving it first:
+#   test_beam_list_type6        needs build/out/*.bin + a huitzil build dir
+#   test_hitclass_map_thunk     needs build/out/vsav2_opcodes.bin
+#   test_obj_walker_relocation  needs build/out/vsavj_opcodes.bin + a build
+#   test_type_stamp_census      needs build/out/*.bin + three build dirs
+#   test_region_overlap         needs the three tenant build dirs
+#   test_shared_writes          needs the three tenant build dirs
+#   test_select_wheel           drives MAME
+#   test_fbneo_tree_integrity*  needs the emu/fbneo submodule checked out
+# Every one of those is derived from ROM content, which rule 7 keeps out of
+# the repo. They stay local-only by design, not by oversight.
+test_attribute_ramdiff
+test_audit_merged_dispatch
+test_build_gate_status
+test_compare_composite
+test_compare_flicker
+test_compare_window
+test_describe_masked_shape
+test_freeze_basis_sandbox
+test_gfx_collision_gate
+test_m2a_flicker_gate
+test_manifest_merge
+test_shell_portability
+test_tenant_id

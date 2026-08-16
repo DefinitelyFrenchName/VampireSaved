@@ -65,7 +65,11 @@ FROZEN = [
     # sessions that never re-ran this gate — it sat out several batteries;
     # every delta accounted: aux_poke=14z-86 alias thunk, port_patch=
     # 14z-85f damage rows, site_thunk/code_word=14z-85c..86 additions)
-    ("site_thunk",       (21, 14, 6), 32, 5),
+    # 14z-91: donovan 21 -> 19 and merged 32 -> 30. The two
+    # fixture_row0f_override site_thunks were DELETED (a legacy-
+    # regression root cause; their venue fixture-load sites are shared
+    # by match intro AND attract). huitzil/pyron are unchanged.
+    ("site_thunk",       (19, 14, 6), 30, 5),
     ("pcrel_escape_fix", (0, 5, 2),  5,  2),   # the H<->P shared-source pair
     # 14z-87: +1 shared voice_borrow_site_pad in all three manifests
     # (H was already 4, not the frozen 3 — accrued staleness, see above)

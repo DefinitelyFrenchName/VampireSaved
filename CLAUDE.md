@@ -21,12 +21,29 @@ legacy behavior is a failed change.
 
 ## 2. Non-negotiable rules
 
-1. **Emulator cores are never modified.** Only cartridge/driver *descriptors*
-   (ROM region sizes, load maps, gfx decode lengths) may change in FBNeo/MAME.
-   If a task appears to require touching CPU, sprite, timing, or QSound
-   emulation code, stop and write up the problem in `STATE.md` instead. The
-   trust surface of emulator changes must remain a small, human-reviewable
-   set of declarative mapping lines.
+1. **Emulator cores are never modified, except inside a ratified profile
+   (Rule 1 v2).** Only cartridge/driver *descriptors* (ROM region sizes, load
+   maps, gfx decode lengths) may change in FBNeo/MAME. If a task appears to
+   require touching CPU, sprite, timing, or QSound emulation code, stop and
+   write up the problem in `STATE.md` instead. The trust surface of emulator
+   changes must remain a small, human-reviewable set of declarative mapping
+   lines.
+
+   **THE ONE BOUNDED EXCEPTION**, ratified round 66 and specified in
+   `docs/project/cps2_wide.md` "Governance (Rule 1 v2)": the CPS-2 WIDE
+   profile carries two gated blocks in `Cps2ObjDraw` (the 19-bit tile
+   promote, plus the `CPS2_WIDE_CANARY` positive control). Every such change
+   must be bounded and declarative, **profile-gated** by a flag set from a
+   new driver entry so stock `vsavj` and every other CPS-2 game are untouched
+   by construction, subject to the **emulator superset invariant** (the
+   patched binary running stock unmodified `vsavj` reproduces the frozen
+   vanilla expectations bit-for-bit, enforced as a battery gate), mirrored in
+   a second emulator where practical, and ratified per profile version. The
+   spec is NOT copied here on purpose — two copies drift, and that document
+   is the one kept current. Anything outside that profile is still
+   stop-and-escalate. (Corrected 14z-91, GitHub #35: this rule named sprite
+   code as stop-and-escalate while the tree had modified `cps_obj.cpp` under
+   a ratification this file never mentioned.)
 2. **No untested change survives a session.** Every patch, however trivial, is
    validated through the headless harness before being committed. "It should
    be equivalent" is not a test result. This standard is inherited from the
@@ -51,6 +68,17 @@ legacy behavior is a failed change.
    documentation, and authored assets only. Reference romsets live outside the
    tree in `ROMDIR` (env var) and are never committed, quoted at length, or
    uploaded anywhere.
+
+   **RENDERED FRAMES ARE OUTSIDE THIS RULE** (ruled 14z-91, GitHub #73). The
+   three committed PNG goldens under `tests/` are full renders of Capcom's
+   title and select artwork, and they stay: a rendered frame is a derived
+   work produced by our own pipeline, not ROM bytes. Recorded here so it is
+   not re-litigated. Worth knowing if it is ever revisited: `test_gfx_menus.sh`
+   compares `tobytes()` AFTER masking, so replacing each golden with a
+   SHA-256 of the masked buffer would be verdict-identical — the only loss is
+   the "N pixels differ" diagnostic. That is a diagnostics trade, not a rule-7
+   obligation. ROM BYTES remain forbidden in every form, including excerpts
+   pasted into docs.
 
 ## 3. Environment
 
