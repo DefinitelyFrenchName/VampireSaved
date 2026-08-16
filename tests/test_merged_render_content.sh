@@ -29,8 +29,8 @@
 # Sections:
 #   1. member identity (static) on the merged rompath.
 #   2. BAND EQUIVALENCE, merged vs solo, decoded gfx memory:
-#        D 0x4AD8F == m5_wide;  H 0x40AF6 == hui31;  P 0x45000 == pyron21;
-#        the RELOCATED STRIP 0x486A0 == hui31 (the S3 placement, live);
+#        D 0x4AD8F == m5_wide;  H 0x40AF6 == hui41;  P 0x45000 == pyron21;
+#        the RELOCATED STRIP 0x486A0 == hui41 (the S3 placement, live);
 #        merged bank 2 @ 0x2AD8F == PRISTINE (de-substitution held);
 #        and the four tenant windows are pairwise DISTINCT (a comparison
 #        of two broken dumps reads "identical" — RH-18; distinctness +
@@ -50,8 +50,21 @@ cd "$REPO"
 
 MERGED="${1:-$REPO/build/m3b_merged/rompath}"
 MAME_WIDE_BIN="${MAME_WIDE_BIN:-$HOME/.cache/vampire-saved/mame/cps2}"
+# THE SOLO REFERENCES MUST BE BUILDS THAT STILL BOOT ON THE CURRENT
+# EMULATOR BINARY, and that is not automatic (14z-92). WIDE v1.1 (14z-86)
+# made the Z80 driver members `vsw.z01/z02` content members, and v1.2 made
+# `vsw.21m/22m` content members with sentinel CRCs — so a reference frozen
+# before those profile versions is REFUSED BY MAME ("vsw.z01 NOT FOUND",
+# "vsw.21m WRONG CHECKSUMS") and its leg produces nothing at all.
+# `build/hui31` was exactly that: this gate had been un-runnable on its
+# huitzil legs since 14z-86 and nobody saw it, because a dead leg was
+# reported as a content mismatch against an empty value (both fixed here —
+# see chk()). Re-pointed to the CURRENT frozen solo, huitzil-m15.
+# WHEN A TENANT IS RE-FROZEN, RE-POINT ITS ROW HERE. D and P still name
+# older builds (donovan-m3a / pyron-m3); those boot and pass today, but
+# they are one profile bump away from the same failure.
 D_RP="$REPO/build/m5_wide/rompath"
-H_RP="$REPO/build/hui31/rompath"
+H_RP="$REPO/build/hui41/rompath"
 P_RP="$REPO/build/pyron21/rompath"
 
 [ -f "$MERGED/vsavjw.zip" ] || {
@@ -66,6 +79,16 @@ done
 WORK="$(mktemp -d)"
 trap 'rm -rf "$WORK"' EXIT
 fail=0
+
+# NO `-verifyroms` PRECONDITION HERE, and it is worth saying why so it is
+# not "helpfully" added later (tried and reverted, 14z-92): the group-C
+# descriptor CRCs are deliberate SENTINELS (0xdec0de31..37, HANDOFF
+# "Group C descriptor CRCs are SENTINELS") and content members resolve by
+# NAME, so `-verifyroms vsavjw` reports every content build BAD — including
+# builds that boot and render perfectly. It fails all four rompaths here
+# and is therefore a dead instrument for this gate. The live check is the
+# dump itself: a leg that cannot boot produces no dump, and chk() below
+# reports that as a DEAD LEG rather than as a content mismatch.
 
 echo "== 1. member identity on the merged rompath =="
 if python3 tools/audit_romset_identity.py "$MERGED" --quiet; then
@@ -109,16 +132,30 @@ s_s="$(band s_s "$H_RP" 486a0:16)"       || fail=1
 prist="$(bp prist 2ad8f:16)"             || fail=1
 
 chk() {  # chk <label> <got> <want>
-    if [ -n "$2" ] && [ "$2" = "$3" ]; then
+    # 14z-92: a DEAD LEG and a real mismatch must not look alike. An empty
+    # operand means the dump never ran (typically a reference build that
+    # predates the current WIDE profile and is refused by MAME) — reporting
+    # that as "merged <fnv> != solo <empty>" reads as a content regression
+    # on the build under test, which is the opposite of the truth. Name it.
+    if [ -z "$2" ] || [ -z "$3" ]; then
+        echo "  FAIL: $1 — DEAD LEG, no gfx dump produced" \
+             "(merged='$2' solo='$3')"
+        echo "        a reference frozen before WIDE v1.1/v1.2 is REFUSED by"
+        echo "        MAME (vsw.z01 NOT FOUND / vsw.21m WRONG CHECKSUMS)."
+        echo "        This is an instrument failure, NOT a verdict on the"
+        echo "        merged build. Check the .gfxrun log before believing"
+        echo "        anything about content."
+        fail=1
+    elif [ "$2" = "$3" ]; then
         echo "  ok: $1 ($2)"
     else
         echo "  FAIL: $1 — merged $2 != solo $3"; fail=1
     fi
 }
 chk "D band  0x4AD8F == m5_wide"  "$m_d" "$s_d"
-chk "H band  0x40AF6 == hui31"    "$m_h" "$s_h"
+chk "H band  0x40AF6 == hui41"    "$m_h" "$s_h"
 chk "P band  0x45000 == pyron21"  "$m_p" "$s_p"
-chk "strip   0x486A0 == hui31 (the S3 relocation, live)" "$m_s" "$s_s"
+chk "strip   0x486A0 == hui41 (the S3 relocation, live)" "$m_s" "$s_s"
 chk "bank 2  0x2AD8F == PRISTINE (de-substitution held)" "$m_b2" "$prist"
 distinct="$(printf '%s\n%s\n%s\n%s\n' "$m_d" "$m_h" "$m_p" "$m_s" | sort -u | wc -l | tr -d ' ')"
 if [ "$distinct" = 4 ]; then
