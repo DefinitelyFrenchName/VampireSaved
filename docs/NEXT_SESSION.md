@@ -1,300 +1,128 @@
-# NEXT SESSION — orientation (written at the close of 14z-90, 2026-08-16)
+# NEXT SESSION — orientation (written at the close of 14z-91, 2026-08-16)
 
-> ## FIRST TASK IS UNCHANGED: THE LEGACY REGRESSION. 14z-90 did not touch
-> ## it and does not displace it. What 14z-90 changed is the harness you
-> ## will use to validate the fix — see "what moved" below before you run
-> ## anything, because several gates now FAIL where they used to pass
-> ## quietly, and one builder now REFUSES an invocation that used to be
-> ## silently destructive.
+> ## THE LEGACY REGRESSION IS FIXED AND RULE 6 HAS LIFTED. The six
+> ## `.pending` replays are gone, the three suites are GREEN, and forward
+> ## work is unblocked for the first time in three sessions. What you pick
+> ## up next is a choice again, not a halt — see "START HERE".
 
-## What 14z-90 was
+## What 14z-91 was
 
-The 2026-08-15 adversarial review filed 73 issues (GitHub #74). This session
-re-judged every one of them adversarially — verifier + devil's-advocate from
-clean contexts, then an adjudicator — and acted on the verdicts.
-**32 closed, 41 open with a posted ruling** (9 need YOUR decision).
-Per-issue reasons: `docs/project/audit_2026-08-15_dispositions.md`.
-No build byte moved. No expectation was re-frozen. The four program
-fingerprints and the four whole-artifact manifests are unchanged.
+The open legacy regression (CLAUDE.md §1/§2.6) closed. Three changes in one
+re-freeze, four new fingerprints, and a corpus-wide re-measurement that came
+out **stricter** than what it replaced.
+
+| # | change | cleared |
+|---|---|---|
+| A | the two `fixture_row0f_override` site_thunks DELETED | `38_victor_p1_vsavj` |
+| B | obj_hook dispatch sites left VANILLA — the WALKERS are relocated | `24_don_winmash` (all 3 sets) |
+| C | the `beam_list_type6` fallback stops writing `$FF010C` | `21_don_mash`, `26_don_arcade_mash` |
+
+**Current builds:** `build/don_m7` = **donovan-m7 `c90b60c3`**,
+`build/hui41` = **huitzil-m15 `4531af1e`**, `build/pyron26` = **pyron-m9
+`fac4a777`**, stock twin `build/m5_stock2` `a054de5c`. All four moved (the
+fix is not profile-gated). m6/m14/m8 are BURNED by the 14z-88 withdrawal.
 
 ## What moved, that you will notice
 
-- **`tools/build_donovan.sh` now REFUSES a cross-track rebuild.** Running the
-  battery against a WIDE build dir used to delete it and repack STOCK under
-  its name. Override is `REBUILD_CROSS_TRACK=1`. Same-track rebuilds (the
-  documented `build_donovan.sh 6 build/don_m4` recipe) are unaffected.
-- **`tools/build_merged.sh` will ABORT on huitzil** — its two verifiers no
-  longer have their exit status eaten by a pipe, and one of them fails today.
-  That is GitHub #75, filed, and it is a real pre-existing defect, not a new
-  breakage. The merged rebuild is blocked until it is triaged.
-- **FBNeo was rebuilt** with nine harness fixes. A run whose instrument could
-  not do its job now exits non-zero instead of 0. OBJ taps are refused
-  outright. `tests/test_fbneo_tree_integrity.sh` asserts the tree is exactly
-  the pinned commit plus the two tracked patches — run it after any
-  `emu/fbneo` edit, and regenerate patch 0001 with
-  `git -C emu/fbneo add -N src/burner/sdl/harness.cpp && git -C emu/fbneo diff`.
-- **11 new gates**, all ROM-free or near it, all registered in HANDOFF's table.
-  `for t in ...; do tests/$t.sh; done` over the fast tier is ~30 s and was
-  24/24 at close.
+- **`tools/freeze_masked_basis.sh` had a live defect and it is fixed.** The
+  canary command this file used to document re-derived the frozen basis
+  bit-for-bit **and then overwrote it** (4248/4321 lines): `freeze_one`
+  derived its MAME sandbox from the replay NAME, the command names the same
+  replay twice, and the freeze leg inherited the verify leg's EEPROM. Both
+  legs were internally deterministic so every guard stayed green. Fixed;
+  gated by `tests/test_freeze_basis_sandbox.sh`. **The canary command below
+  is now safe to run as written.**
+- **The obj_hook site hook is gone.** Anything that assumed a thunk at
+  `0x54470`/`0x5E542` is stale — `audit_objhook_owner_census.sh` is flagged
+  in HANDOFF as needing its probe re-pointed at the relocated walker.
+- **`dispatch_census.toml`'s "free list" was retracted.** The complement of
+  `observed` is NOT free (true free lists: 1 and 6, not 50 and 83). It stays
+  as a drift detector for what legacy spawns.
+- **`test_m3a_reproducible.sh` member CONTENT is now a HARD FAIL** (issue #8
+  promotion, which was scheduled for exactly this re-freeze).
+- **5 new gates**, all registered in HANDOFF's table: `audit_walker_ghost`,
+  `audit_walker_repoint`, `test_obj_walker_relocation`,
+  `audit_walker_callers`, `test_freeze_basis_sandbox`.
 
-## Your decisions, waiting (STATE.md "Decisions pending")
+## Your decisions, waiting
 
-Three from the comparator work — the flicker→window boundary rule (94 specs
-hinge on it), the five 55-frame pairs, and whether the M2 battery still
-targets the m2c generation — plus five policy calls with briefs on their
-issues: #35 (CLAUDE.md vs Rule 1 v2), #39/#40 (.gitignore + untracking),
-#41 (CI), #73 (the PNG goldens).
+Two of the three comparator rulings **changed shape** because of this fix —
+re-read them before ruling:
 
-## The legacy regression brief, carried forward verbatim from 14z-89
+- **#4 (the ≥60 flicker→window boundary) no longer ARISES on these builds.**
+  It was about flicker 829 sitting 59 frames before window onset 889. Frame
+  829 is gone corpus-wide; no remaining flicker frame precedes any window
+  onset. Still worth codifying for the class table, but it gates nothing.
+- **The five 55-frame pairs moved.** donovan 22 keeps `11862,11918` and
+  huitzil 26 has `8744,8800`, but donovan 26 lost 8800 and huitzil 22 lost
+  11918. The inventory the ruling addresses is not the one it was written
+  against.
+- **#2 (does the M2 battery still target the m2c generation?)** unchanged —
+  and note change A removed the only surface `tests/test_don_accent.sh`
+  asserted, on a track that gate does not run against. Its header now says
+  it is pinned to the parked m2c track.
 
+Five policy calls are unchanged and still open: #35 (CLAUDE.md vs Rule 1
+v2), #39/#40 (.gitignore + untracking), #41 (CI), #73 (the PNG goldens).
 
-> ## TASK ZERO (maintainer, session close) — AN ADVERSARIAL CODE REVIEW of
-> ## the project has been done and its findings are being addressed.
-> ## Corrections only: nothing about the project's nature or its parts
-> ## changes. But some findings touch THE TEST HARNESS and the tooling this
-> ## session's conclusions rest on, so before resuming the fix below, go
-> ## over what was fixed and decide whether it moves the state of the work.
-> ## The bugfixes are worth it — this is an assessment, not a rollback.
->
-> **WHY IT MATTERS HERE, CONCRETELY.** 14z-89 authored 93 `.masked` specs,
-> 35 vanilla basis logs, a frozen dispatch census and two root-cause
-> attributions — ALL of it produced by the harness. If a review fix changed
-> how a log is produced or compared, some of that is re-derived, not
-> re-argued. Exposure, worst first:
->   1. `tests/lua/replay.lua` — MASK_RANGES semantics (masked bytes are
->      SKIPPED from the stream), the per-frame checksum, input staging
->      (`held[frame+1]`). A change here moves EVERY frozen log: the whole
->      49-log masked-v2 basis and every `.sha1` would need re-deriving.
->   2. The comparators — `compare_window.py`, `compare_composite.py`,
->      `compare_flicker.py`, `check_diverge.py` — the 93 promoted specs are
->      only "PASS" relative to these.
->   3. `tools/describe_masked_shape.py` — every one of those 93 spec lines
->      was COPIED from its output; a threshold change re-writes them.
->   4. `tools/gen_donovan_patch.py` / `build_donovan.sh` — if the generator
->      moved, the four frozen fingerprints move with it and every
->      expectation set is orphaned (registry rows included).
->   5. `tests/lua/field_trace.lua` vs `replay.lua` — the coverage gate's
->      LEGACY/TENANT verdicts assume these two stage inputs IDENTICALLY
->      (`held[frame+1]`). A fix applied to one and not the other silently
->      re-classifies replays.
->   6. `tests/lua/dispatch_census.lua` — the frozen free-index counts
->      (50 / 83) behind the option-(b) fix.
->
-> **THE CHECK, IN ORDER — instrument first, then data, then suites.** Each
-> step is cheap and each one localises the blast radius:
-> ```sh
-> VERIFY_BASIS=16_xemu_2p tools/freeze_masked_basis.sh >     tests/expected/vsavj/masked-v2 "$(cat tests/expected/donovan-m5/mask)" >     16_xemu_2p                      # THE canary: re-derives a frozen basis
->                                     # log and demands bit-identity (~1 min)
-> tests/test_mame_parity.sh           # the pinned MAME build still reproduces
->                                     # every frozen oracle log bit-for-bit
-> tests/test_describe_masked_shape.sh # 11 assertions incl. both thresholds
-> tests/test_compare_window.sh ; tests/test_compare_composite.sh
-> tests/test_compare_flicker.sh ; tests/test_suite_dispatch.sh
-> tests/test_m3a_reproducible.sh      # all four fingerprints bit-exact (~4 min)
-> tests/audit_dispatch_census.sh      # census still matches its frozen set
-> tests/audit_legacy_pairings.sh      # coverage gate + its 7 static controls
-> # then the three suites + audit_merged_legacy (the acceptance)
-> ```
-> **IF THE CANARY FAILS, DO NOT RE-FREEZE TO MAKE IT GREEN** — that silently
-> redefines the baseline the superset invariant rests on (HANDOFF says this
-> about the migration gate; it applies identically here). Re-derive
-> deliberately, and say in STATE which artifacts moved and why.
->
-> **WHAT SURVIVES A HARNESS FIX REGARDLESS** (so it does not get re-litigated):
-> the legacy regression itself was confirmed with RAW FULL-RAM DUMPS — replay
-> 38 P2 HP 87 vs 88, replay 24 P1 X 324 vs 570 / HP 144 vs 115 — which is
-> comparator-independent evidence. The two root-cause attributions are
-> likewise removal experiments (remove the hook, the divergence goes away),
-> not comparator verdicts. A harness fix could change the SHAPES we froze; it
-> cannot make those measurements not have happened.
+## START HERE — the open list, in order
 
-> ## FIRST TASK — THE LEGACY REGRESSION IN (1) BELOW, then (2) in the
-> ## SAME re-freeze. All four 14z-89 findings ruled on by the maintainer
-> ## 2026-08-15: (1) conditional ratification offered and REFUSED BY
-> ## MEASUREMENT (it reaches gameplay state) — still an open regression;
-> ## (2) DECIDED, tripwire goes diagnostic-only (designed, not built);
-> ## (3) DECIDED, the 61/62 exemption stands; (4) DECIDED and APPLIED.
-> ## STATE carries the full record.
->
-> 14z-89 closed the coverage gap 14z-88 exposed: every replay whose loaded
-> characters equal vanilla's is now compared against the VANILLA masked
-> basis instead of against itself, on all three sets, and
-> `tests/audit_legacy_pairings.sh` fails if that ever stops being true.
-> The gap was **35 of the ~43 self-frozen replays per set**, not the 10 the
-> 14z-88 note predicted — the `*_don_*`/`*_victor_*` families were authored
-> when select cell 0x0F was Donovan, and M3a made them legacy content.
-> 93 (set, replay) pairs are now `.masked`; 69 sit on the ratified 2P shape
-> `composite 829 889-2091` verbatim.
->
-> **Closing it found 6 replays that never re-converge with vanilla.** All
-> deterministic, all attributed, all `.pending` (so the three suites read RED
-> on exactly those and nothing else). They need a ruling:
->
-> 1. **RESOLVED AGAINST RATIFYING — IT IS AN OPEN REGRESSION.** The
->    maintainer offered conditional ratification ("if ratifying solves the
->    issues with no known or forecast issues"); the condition was checked
->    and FAILS. The divergence is not a phase artifact and not display-only:
->    it grows (replay 38: 3 live bytes at f2400 -> 232 at f3000 -> 450 at
->    f4500) and reaches GAMEPLAY state — 38 P2 HP 87 vs 88 at f4500, P1 X
->    797 vs 796 at f3000; 24 at f17500 P1 X 324 vs 570 / HP 144 vs 115, P2
->    X 655 vs 335 / HP 144 vs 157, facings flipped. Replay inputs are
->    scheduled by FRAME, so one lost logic step re-aligns every later input.
->    **THIS IS THE FIRST TASK** (CLAUDE.md §2.6 halts forward work) — but
->    the DIAGNOSIS IS DONE: both root causes are named and confirmed
->    complete, so what remains is designing the fix.
->      - CONTROL: `build/wide0` (the WIDE romset carrying the UNPATCHED
->        program) is BIT-IDENTICAL to vanilla on replay 38 — the profile,
->        the descriptor and the container are inert; the cost is in the
->        program patch.
->      - **38 <- `fixture_row0f_override_bank0/1`.** The pair replaces
->        `movea.l #0x3B5940,a0` at the venue fixture-load sites 0x01C586 /
->        0x01C59A with two `cmpi.b #id,abs.l` + branches, and its OWN
->        manifest comment says those sites are "shared by match intro AND
->        attract" — legacy runs them on every venue load, on a frame
->        already at the VBL edge. Remove -> the ratified 2P shape, 2909
->        identical frames after. (Eliminated first, one probe build each:
->        the 6 palette/accent thunks, the 3 drawer bank gates, the 4
->        select_companion thunks.)
->      - **24 <- the two `[[obj_hook]]` type-dispatch extensions**
->        (per-object dispatch, hot every frame). Remove -> re-converges,
->        5787 identical frames after.
->      - BOTH removed: 38 -> `window 889 2091`, 24 -> `composite
->        12313,12733 889-2091`. The causes are COMPLETE for donovan-m5, and
->        the shapes come out CLEANER than the frozen classes (38 loses its
->        829 flicker frame too), so the fix will re-freeze more than these
->        two replays.
->    **FIX = OPTION (b), DECIDED (maintainer): move the work OFF the
->    legacy path.** (c) is out on the gameplay evidence; (a) is cheaper but
->    "may just move the goalpost" — it is a cycle BUDGET, so a leaner guard
->    relocates the tipping point instead of removing it. Only (b) is zero
->    by construction. The two halves are NOT equally easy:
->      - **fixture (tractable).** Stop intercepting the shared venue
->        fixture-load; re-assert palette row 0x0F from TENANT-OWNED code
->        (char-init / his own per-frame handler), which vanilla never runs.
->        MEASURE FIRST: does tenant init run AFTER the venue fixture load?
->        (The thunk's comment says the char id is set before those sites
->        run, so the order is the open question.) Residual risk is a
->        one-frame stale colour at a venue transition = cosmetic = optional
->        under the scope ruling.
->      - **obj_hook (hard).** Repointing is NOT available: the dispatch is
->        `movea.l (0x12,PC,D0.w),A0` and BOTH tables are followed by LIVE
->        CODE (0x054570, 0x05E71E — measured), so the table can grow
->        neither in place nor to a new base without adding an instruction.
->        The dead-entry takeover that worked for effect-class row 16 has no
->        cheap candidate: both tables are ALL-DISTINCT with zero RTS stubs
->        (59/59, 114/114). Two routes, each needing measurement first:
->        (i) the RUNTIME DEADNESS CENSUS — **RUN, and the answer is YES on
->        the numbers**: `tests/audit_dispatch_census.sh` over all 49 legacy
->        replays on vanilla gives 0x054470 = 9 types observed / **50 free**
->        (17 needed) and 0x05E542 = 31 observed / **83 free** (10 needed),
->        frozen in `build/manifest/dispatch_census.toml` so a newly-seen
->        index FAILS. CAVEAT, same shape as the row we falsified today:
->        0x054470 fires in only 5 of 49 replays (the long mash/arcade rigs)
->        and the curve has NOT converged — 26_don_arcade_mash alone added
->        types 51 and 55. So before shipping a repoint, add the STATIC
->        complement (enumerate every type value vsavj's code can stamp —
->        `tools/audit_type_stamps.py`, today pointed at vs2's 114-120
->        family) and keep a tripwire that does NOT write live work RAM
->        (ruling (2)'s design — watch EXECUTION — so both fixes share one
->        mechanism);
->        (ii) give the tenant's secondary objects their own pool walked by
->        tenant code so they never enter the shared dispatcher — cleanest
->        and zero-cost by construction, much the largest change.
->    VALIDATE whichever lands by re-running the promoted legacy replays.
->    Instrument: `tools/probe_hook_removal.sh <tag> <replay> <hook>...`
->    (rebuild with named hooks removed, re-measure; ~5 min per probe).
-> 2. **DECIDED (maintainer): make the tripwire diagnostic-only.** Design
->    recorded in STATE: drop the `$FF010C` write from the fallback path and
->    have `audit_effect_class_rows.sh` §4 watch the fallback's EXECUTION
->    instead (it already PC-attributes every hit, so it needs the event and
->    never the counter's value) — zero legacy RAM perturbation, no new mask
->    window. NOT implemented, deliberately: it re-fingerprints huitzil and
->    the merged build, and (1) will likely need a build change too, so both
->    should land in ONE re-freeze.
-> 4. **DECIDED (maintainer): "Validated."** Merged override #3 applied in
->    `audit_merged_legacy.sh` (`composite vsavj/masked-v2 2836,5713
->    889-2415`), with both frames' attributions in the comment. It also
->    flags that a FOURTH exception should prompt "does the merged build want
->    its own class table?" rather than a longer list.
->
-> 3. **DECIDED (maintainer, 2026-08-15): the 61/62 exemption stands.**
->    They navigate to cell 0x13, which neither vanilla nor those builds
->    back; `<set>/<name>.legacy-exempt` carries the reason and the audit
->    prints it every run. No further action.
->
-> After the rulings: implement whichever fix each implies, re-run the three
-> suites + `tests/audit_legacy_pairings.sh` + `tests/audit_merged_legacy.sh`
-> (leg (a) is glob-driven and now covers 47 replays, ~2 h).
->
-> **BATTERY AT CLOSE.** The three suites are RED on exactly those 6
-> `.pending` replays and NOTHING else — donovan-m5 53 PASS / 2 PENDING /
-> 18 SKIP, huitzil-m13 52 / 3 / 18, pyron-m7 55 / 1 / 17, with **0 FAIL and
-> 0 nondeterministic runs** across all three, every one of the 93 promoted
-> specs passing and the 13 pre-existing masked classes byte-unchanged.
-> `test_m3a_reproducible` PASS (all four fingerprints bit-exact — no build
-> byte moved this session); `test_describe_masked_shape` PASS (11/11).
-
-> ## SCOPE RULING (maintainer, 2026-08-15): the build targets 2P
-> ## COMPETITIVE play. Shadow/Marionette/Oboro interaction with the
-> ## tenants and single-player ENDINGS for the new three are
-> ## NICE-TO-HAVE, not blockers (like the medallion tint and win quotes).
-> ## Mandatory core = legacy fidelity + the tenants' 2P match correctness
-> ## (18x18 matrix crash-free), then release engineering.
-
-> ## START HERE — the open list, in order
-> - The three rulings above (and the merged audit re-run after them).
-> - The M5 sfx odds (0x112/0x14a/0x173/0x31B family — machinery ready).
-> - FLAKY CRASH RESET (Sasquatch intro; rig designed, STATE 14z-85f).
-> - Round-end flicker (parked; needs the maintainer's recording).
-> - OPTIONAL / cosmetic (maintainer 2026-08-15): the merged-only
->   P2-ring-on-Donovan medallion whitening (fix Donovan's P2-hover PORTRAIT
->   row, not Pyron's medallion — and MEASURE THE FADE COST FIRST, that is
->   what 14z-88 cost); win-screen QUOTE (both tenants); region_space
->   re-freeze; op-tagging for test_shared_writes.
-> - H-vs-P stuck-direction (~1/30) — possible; not reproduced recently.
-> - Then MiSTer core surgery (stretch, DECIDED) — after the roster.
-
-> ## WHAT 14z-89 LEFT YOU (harness)
-> - `tests/audit_legacy_pairings.sh` — the coverage gate. Run it whenever a
->   replay is added, a cell mapping moves, or a tenant changes id. Signature
->   is +0x60.l (hitbox base), NOT +0x382 (the voice class in match).
->   Reports land in `build/legacy_pairings/*.tsv`.
-> - `tools/describe_masked_shape.py` (+ `tests/test_describe_masked_shape.sh`)
->   — the shape→proposed-spec classifier, lifted out of the merged audit's
->   heredoc and now ground-truthed on both threshold boundaries.
-> - `tools/propose_masked_specs.sh` — measure named replays masked on a build
->   and print drop-in `.masked` lines.
-> - `tools/freeze_masked_basis.sh` — now REFUSES a mask that disagrees with
->   the basis's `MASK` record, scrubs perturbing env vars, and takes
->   `VERIFY_BASIS=<name>` (re-derive an already-frozen log, require
->   bit-identity, write nothing if it moves). Use that on every extension.
-> - `tests/expected/vsavj/masked-v2/` is now 49 logs + a `MASK` record.
->   Adding LOGS to a basis is not a basis change; adding a WINDOW is.
-
-## Current builds (registry) — UNCHANGED by 14z-89 (no build byte moved)
-
-| build | set | fingerprint |
-|---|---|---|
-| build/m3b_merged7 | UNREGISTERED (pending S6 freeze) | moves with generator (738 ops) |
-| build/don_m5 | **donovan-m5** | 3c599fb6 |
-| build/hui40 | **huitzil-m13** | 2629561c |
-| build/pyron25 | **pyron-m7** | 94ce9a48 |
-| build/m5_stock | stock twin | 6c93cfa8 |
-| build/don_m4, hui39, pyron24 | superseded m4/m12/m6 (tags are the way back; don_m4 = audit_voice_borrow's lottery ground-truth reference) | — |
+- **GitHub #75 — `build_merged.sh` ABORTS on huitzil.** Now the top
+  blocker: `verify_gfx_build.py --tenant huitzil` fails on m3b_merged7
+  (record/entry parity 1374,14911 != 1375,14978; 34 tile codes outside the
+  placed window; regression window merged5 -> merged6, 14z-86). It blocks a
+  new merged-WITH-GFX build, which is what the S6 freeze and playtesting
+  need. It did NOT block this session's legacy work, because
+  `audit_merged_legacy.sh` builds its own gfx-free instrument.
+- **The merged build then needs rebuilding on this batch** (734 ops now, was
+  738) and `audit_merged_legacy.sh` re-run — its leg (a) could not give a
+  complete verdict while any `.pending` existed, and none do now.
+- **M4, not yet run: `audit_hitclass_map_cost.sh` over the FULL corpus.**
+  `hitclass_map_extend` IS adopted (huitzil.toml:2048, pyron.toml:1044 — the
+  "ADOPTION PENDING" in engine_internals was stale and is corrected), so it
+  is a live hook on a shared engine site whose "legacy never enters" evidence
+  is four replays. Same coverage shape that produced this session's
+  regression. Cheap insurance, not a known defect.
+- The M5 sfx odds (0x112/0x14a/0x173/0x31B family — machinery ready).
+- FLAKY CRASH RESET (Sasquatch intro; rig designed, STATE 14z-85f).
+- Round-end flicker (parked; needs the maintainer's recording).
+- OPTIONAL / cosmetic (maintainer 2026-08-15): the merged-only
+  P2-ring-on-Donovan medallion whitening; win-screen QUOTE (both tenants);
+  region_space re-freeze; op-tagging for test_shared_writes. **Donovan's
+  venue palette row 0x0F** joins this list — change A traded vs2's red
+  statue ramp for vsavj's, which the scope ruling makes optional; the
+  cost-neutral route back (init shim → the engine's own copy helper
+  `0x1C3A4` → staging row 0x0F, i.e. the fade's SOURCE) is written up in
+  `build/manifest/donovan.toml` above the retired rows.
+- H-vs-P stuck-direction (~1/30) — possible; not reproduced recently.
+- Then MiSTer core surgery (stretch, DECIDED) — after the roster.
 
 ## Build / validate
 
 ```sh
 export ROMDIR=/path/to/reference/sets
 export MAME_BIN=~/.cache/vampire-saved/mame/cps2
+
+# the canary — safe as written since 14z-91
+VERIFY_BASIS=16_xemu_2p tools/freeze_masked_basis.sh \
+  tests/expected/vsavj/masked-v2 "$(cat tests/expected/donovan-m7/mask)" 16_xemu_2p
+
+MAME_ROMPATH="$PWD/build/don_m7/rompath;$ROMDIR" tests/run_suite.sh vsavjw
+tests/test_m3a_reproducible.sh                 # ~6 min, all four, now hard on content
+tests/audit_walker_ghost.sh                    # ~5 min — the mask assumption
+tests/audit_walker_repoint.sh build/don_m7     # ~5 min — caller completeness
+tests/test_obj_walker_relocation.sh build/don_m7   # seconds, ROM-free
 tests/audit_legacy_pairings.sh                 # ~30 min — the coverage gate
-MAME_ROMPATH="$PWD/build/don_m5/rompath;$ROMDIR" tests/run_suite.sh vsavjw
-tests/test_describe_masked_shape.sh            # ~1 s
-tests/audit_voice_borrow.sh                    # ~6 min — own-class on build/don_m5
-tools/build_merged.sh build/m3b_merged7        # ~15 min (738-op fixture)
-tests/audit_trap_parity.sh build/m3b_merged7   # ~5 min — ejection+chirp
-tests/test_tenant_loop.sh                      # generator gate (538/738)
-tests/test_m3a_reproducible.sh                 # ~6 min (all four refs)
-MERGED_OUT=build/m3b_merged7 MERGED_PREBUILT=1 \
-  tests/audit_merged_legacy.sh                 # ~2 h since 14z-89 (leg a = 47)
+tools/build_merged.sh build/m3b_merged8        # BLOCKED on #75
+```
+
+## Rebuild recipes
+
+```sh
+KEY_SET=vsavj WIDE_ROMSET="$PWD/build/wide0/rompath/vsavjw.zip" \
+  GEN_FLAGS="--allow-plausible --tripwire-open --profile cps2-wide-v1" \
+  tools/build_donovan.sh 6 build/don_m7
+TENANT_MANIFEST=build/manifest/huitzil.toml TENANT_CHAR=0x10 ... build/hui41
+TENANT_MANIFEST=build/manifest/pyron.toml   TENANT_CHAR=0x11 ... build/pyron26
+GEN_FLAGS="--allow-plausible --tripwire-open" tools/build_donovan.sh 6 build/m5_stock2
 ```
