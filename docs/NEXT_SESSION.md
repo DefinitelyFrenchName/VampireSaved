@@ -5,11 +5,11 @@
 > ## every merged gate green including `audit_merged_legacy` AUDIT-EXIT 0
 > ## (leg a 47/47, leg b 6/6). S6 is complete.
 > ##
-> ## **IT HAS NEVER BEEN PLAYED.** The maintainer froze on gate evidence
-> ## first and the playtest is the next thing that happens:
-> ## `tools/run_wide.sh build/m3b_merged8 fbneo` — and the FIRST thing to
-> ## look at is the BEAM VISUAL CONFIRM, the S6 carry-forward that has
-> ## never been done on a merged build.
+> ## **PLAYED AND FIELD-CONFIRMED** (maintainer, 2026-08-16): "no obvious
+> ## regression", and the game "may even feel better" — flagged by the
+> ## maintainer as feeling, not fact, and recorded that way. S6 is closed.
+> ## Two threads left dangling by that verdict are the first two items
+> ## under START HERE.
 
 ## What 14z-92 was
 
@@ -106,14 +106,25 @@ The superseded framing, kept because it explains the shapes above:
   (`952fc731`, 753 ops) now exists** and is the first merged build carrying
   the 14z-91 legacy fix — UNREGISTERED, and no merged CONTENT gate has run on
   it. That is the S6 list below.
-- **PLAYTEST `merged-m1` — the top item, and the only thing S6 is waiting
-  on.** `tools/run_wide.sh build/m3b_merged8 fbneo`. Look at the BEAM
-  visual confirm first (never done on a merged build), then all three
-  tenants' art and sound in one image. There is no in-game version string
-  to A/B by — that CLAUDE.md §5 convention has never been implemented
-  here (open item, 14z-92); tell builds apart by directory. A freeze is
-  reversible: if it plays wrong, it gets withdrawn like m6/m14/m8 in
-  14z-88.
+- **THE BEAM VISUAL ON A MERGED IMAGE — still not named as checked.** The
+  S6 carry-forward asked for it specifically; the field verdict is a
+  general "no obvious regression". Confirmed on SOLO huitzil (hui25,
+  14z-71), never on a merged build. One playtest look at Phobos' 236+P /
+  236+K / 236+2P closes it, or `tests/test_beam_anim_walk.sh
+  build/m3b_merged8` measures the anim-node walk without a human.
+- **"IT MAY FEEL BETTER" — measurable, and worth measuring once.** The
+  maintainer flagged it as feeling, not fact, and it is recorded as an
+  impression only. But a mechanism exists: 14z-91 left the two obj_hook
+  dispatch sites VANILLA (relocating the walker instead), removing
+  per-dispatch thunk cycles from a path `audit_walker_ghost` measured at
+  **279,577 dispatches across the corpus**. Saved cycles do not speed a
+  fixed-rate machine up — they widen main-loop headroom, and vsav's
+  visible slowdown is what eats headroom, so "snappier under load" is the
+  predicted shape. The test is a headroom/overrun A/B of merged8 vs
+  merged7 on a heavy-object replay. If it measures out it is the
+  project's first performance-POSITIVE result; if it does not, the
+  impression stays an impression and gets written down as refuted. **Do
+  not repeat "it's faster" until one of those happens.**
 - **`build/m3b_merged8` IS FROZEN as `merged-m1` (14z-92):**
   render-content, trap parity, FG parity, select-bank-gates and
   `audit_merged_legacy` (AUDIT-EXIT 0, leg a 47/47, leg b 6/6) all PASS.

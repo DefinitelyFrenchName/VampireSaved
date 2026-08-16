@@ -40,12 +40,31 @@ in the `registry.tsv` header — where someone would go to add the row — and
 names the two correct fixes if dispatch is ever genuinely needed (make the
 instrument fingerprint-distinct, or dispatch on `--full`). **Never the row.**
 
-**PLAYTEST PENDING, deliberately.** The S6 record had the freeze gated on a
-maintainer playtest incl. the beam visual confirm; the maintainer chose to
-freeze on gate evidence first and play after. `tools/run_wide.sh
-build/m3b_merged8 fbneo`. A freeze is reversible — m6/m14/m8 were withdrawn
-in 14z-88. **First thing to look at: the beam visual confirm, the S6
-carry-forward that has never been done on a merged build.**
+**PLAYTEST — FIELD-CONFIRMED (maintainer, 2026-08-16):** *"Tests of
+m3b_merged8 show no obvious regression. Actually the feeling of the game may
+even be better (but that's feeling, not fact-based)."* The freeze stands and
+S6 is closed. The build was frozen on gate evidence first and played after,
+by maintainer decision; a freeze remains reversible (m6/m14/m8 were withdrawn
+in 14z-88).
+
+**THE "FEELS BETTER" IS RECORDED AS AN IMPRESSION, NOT A FINDING** — the
+maintainer flagged it as such and it stays that way until measured. It is
+worth writing down that a plausible MECHANISM exists, because if it is real
+it is measurable and it would be the first performance-positive result of the
+project: 14z-91 left the two obj_hook dispatch sites VANILLA (the walker is
+relocated instead), removing per-dispatch thunk cycles from a path that
+`audit_walker_ghost` measured at **279,577 dispatches across the corpus**.
+On a fixed-rate machine, saved cycles do not make the game faster — they
+widen the main loop's headroom, and vsav's visible slowdown is exactly what
+eats that headroom. So "snappier under load" is the shape the mechanism
+predicts. UNMEASURED. Do not repeat it as fact; the measurement is a
+headroom/overrun comparison of merged8 vs merged7 on a heavy-object replay,
+and until someone runs it this paragraph is a hypothesis with a motive.
+
+**NOT SPECIFICALLY CONFIRMED: the BEAM visual on a merged build.** The S6
+carry-forward asked for it by name and the field report is a general
+no-regression verdict. The beam was maintainer-confirmed on SOLO huitzil
+(hui25, 14z-71); on a merged image it has still never been named as checked.
 
 **OPEN ITEM, filed not fixed:** CLAUDE.md §5 requires shipped builds to carry
 a visible in-game version string as the playtester's naked-eye A/B tell.
