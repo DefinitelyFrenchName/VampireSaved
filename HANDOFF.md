@@ -155,19 +155,31 @@ tools/run_wide.sh build/m3b_merged7 fbneo  # THE 3-TENANT BUILD (all 18
                                            # root — tenants keep their own
                                            # voice class; awaiting the
                                            # maintainer ear-check)
-tools/run_wide.sh build/don_m5 fbneo       # or the solo builds (hui40,
-                                           # pyron25); ... mame
+tools/run_wide.sh build/don_m7 fbneo       # or the solo builds (hui41,
+                                           # pyron26); ... mame
                                            # (dirs reused; the registry row
                                            # names the CURRENT fingerprints
-                                           # — donovan-m5/huitzil-m13/
-                                           # pyron-m7 since the 14z-88 revert)
+                                           # — donovan-m7/huitzil-m15/
+                                           # pyron-m9 since the 14z-91 fix)
 ```
 
-**Current WIDE builds (14z-88 REVERT of the medallion move — the
-14z-87/87b batch minus the row change):** `build/hui40` =
-**`huitzil-m13` (`2629561c`)**, `build/pyron25` = **`pyron-m7`
-(`94ce9a48`)**, `build/don_m5` = **`donovan-m5` (`3c599fb6`)** — the
-14z-87 voice-borrow sets + the beep fix (packing law #3, sound members).
+**Current WIDE builds (14z-91, THE LEGACY-REGRESSION FIX):**
+`build/don_m7` = **`donovan-m7` (`c90b60c3`)**, `build/hui41` =
+**`huitzil-m15` (`4531af1e`)**, `build/pyron26` = **`pyron-m9`
+(`fac4a777`)**, stock twin `build/m5_stock2` (`a054de5c`). All four moved
+because the fix is NOT profile-gated. = the 14z-87 batch + (A) the two
+`fixture_row0f_override` site_thunks DELETED, (B) the obj_hook dispatch
+sites left VANILLA — each 0x2C-byte object-pool walker relocated into free
+space with its union table appended at copy+0x2C and only the 23 caller
+OPERANDS rewritten — and (C, huitzil only) the beam_list_type6 fallback's
+`$FF010C` counter removed. That cleared all six `.pending` legacy replays;
+frame 829 disappeared corpus-wide and ~30 specs per set became STRICTER
+(`composite … 829 889-2091` -> `window 889 2091`). `donovan-m6`/
+`huitzil-m14`/`pyron-m8` are BURNED (withdrawn 14z-88), hence m7/m15/m9.
+Previous batch: `build/don_m5` = `donovan-m5` (`3c599fb6`), `build/hui40` =
+`huitzil-m13` (`2629561c`), `build/pyron25` = `pyron-m7` (`94ce9a48`) —
+the 14z-87 voice-borrow sets + the beep fix (packing law #3, sound
+members).
 The 14z-87b medallion move (Pyron wheel pal_row 0x1A->0x1D, briefly
 donovan-m6/huitzil-m14/pyron-m8) was WITHDRAWN 14z-88 (maintainer-
 decided): the palette content on row 0x1D changed the select->VS fade's
@@ -898,6 +910,68 @@ tests/audit_merged_legacy.sh          # 14z-81: THE MERGED-LEGACY MEASUREMENT,
                                       # 12 measures the UNION of the two solo
                                       # shapes. Failing logs kept in
                                       # build/gate_failures/
+tests/audit_walker_ghost.sh           # 14z-91: WHERE does each object-pool
+                                      # walker's `jsr (A0)` push its return
+                                      # address, and is that longword inside
+                                      # the masked dead-stack window? THE
+                                      # measurement that gates the walker
+                                      # relocation — it is the single piece
+                                      # of state the move changes. Measured
+                                      # A7 = 0xff7ff6 CONSTANT at BOTH
+                                      # walkers over 279,577 dispatches in
+                                      # all 49 corpus replays, so the push
+                                      # lands at 0xff7ff2-0xff7ff5, inside
+                                      # $FF7F00-$FF7FFF. Frozen in
+                                      # build/manifest/walker_ghost.toml.
+                                      # FAILS rather than widening anything:
+                                      # the header says widening the mask is
+                                      # NOT the remedy. Cross-check: the
+                                      # dispatch counts reproduce
+                                      # dispatch_census.toml exactly on a
+                                      # different register. ~5 min
+tests/audit_walker_repoint.sh [bd]    # 14z-91: after the relocation, does
+                                      # ANYTHING still reach the vanilla
+                                      # walkers? Closes the residual the
+                                      # static caller scan cannot (a target
+                                      # computed at runtime). Vanilla entries
+                                      # must be SILENT, relocated entries
+                                      # must FIRE. NEGATIVE CONTROL is not
+                                      # optional and is built in: the same
+                                      # instrument on an un-relocated
+                                      # REF_BUILD must see the vanilla
+                                      # walkers, or every zero is just a dead
+                                      # breakpoint. Measured identical counts
+                                      # either side of the move (1243 /
+                                      # 40236). ~5 min
+tests/test_obj_walker_relocation.sh [bd] # 14z-91: the relocation is
+                                      # STRUCTURALLY what it claims, from
+                                      # patch.json alone — dispatch sites
+                                      # covered by NO op, walker bytes
+                                      # verbatim, table vanilla-prefixed, the
+                                      # copy's own pc-relative dispatch
+                                      # resolving to its own table, and every
+                                      # caller a 4-byte OPERAND write at
+                                      # caller+2 with 4EB9 untouched. 2
+                                      # verdict controls. ROM-free, seconds
+tools/audit_walker_callers.py         # 14z-91: every reference that can
+                                      # reach a walker, enumerated BY FORM
+                                      # (abs.l operand / data longword /
+                                      # pc-relative / branch). Found 23
+                                      # jsr.l and nothing else. Prints decode
+                                      # noise with context rather than
+                                      # filtering it silently. --toml emits
+                                      # the frozen manifest rows
+tests/test_freeze_basis_sandbox.sh    # 14z-91: freeze_masked_basis.sh must
+                                      # never hand one run's MAME sandbox to
+                                      # the next. The documented canary
+                                      # command named the same replay twice,
+                                      # so the freeze leg inherited the
+                                      # verify leg's EEPROM and OVERWROTE the
+                                      # basis it had just verified bit-for-
+                                      # bit. Scratch repo + stubbed runner;
+                                      # the verdict control reconstructs the
+                                      # pre-fix tool and requires the defect.
+                                      # ROM-free, ~1s
 tests/audit_dispatch_census.sh        # 14z-89: WHICH type indices does
                                       # LEGACY ever dispatch at the two
                                       # obj_hook sites? Vanilla vsavj over

@@ -40,8 +40,14 @@ trap 'rm -rf "$WORK"' EXIT
 # medallion pal_row 0x1A -> 0x1D); WITHDRAWN 14z-88 (a legacy pairing
 # lost a main-loop frame at the select->VS fade — STATE 14z-88), so the
 # frozen references are the 14z-87 batch again:
-EXPECT_WIDE="3c599fb676de518606a60b2b4a4c42f80aa7c97b"
-EXPECT_STOCK="6c93cfa8a8a80ae2303d3acaf8c7bff487f369c5"
+# 14z-91 THE LEGACY-REGRESSION FIX (donovan-m7 / huitzil-m15 / pyron-m9;
+# m6/m14/m8 are burned by the 14z-88 withdrawal). All four move because
+# the fix is NOT profile-gated: the fixture_row0f_override thunks are
+# deleted and the obj_hook dispatch sites are left vanilla, with each
+# object-pool walker relocated instead. Previous batch:
+# 3c599fb6 / 6c93cfa8 / 2629561c / 94ce9a48 (14z-87, tags freeze/*).
+EXPECT_WIDE="c90b60c3a59ca8268e4910fbb2e612e390668c79"
+EXPECT_STOCK="a054de5c0cfe868cb0aa9722abebdffd9dfcdb0d"
 # huitzil-m3 (14z-79, maintainer-ratified). Supersedes huitzil-m2
 # (9deda0808e87601b10e2171405805d4669ba2624), which can no longer be
 # produced from the tree: huitzil.toml gained the (b') index-window thunk
@@ -70,7 +76,7 @@ EXPECT_STOCK="6c93cfa8a8a80ae2303d3acaf8c7bff487f369c5"
 # the stock twin is BIT-IDENTICAL, measured)
 # EXPECT_HUI="e1f598d6113f32ed5bda66a684e53d30b36447e9"  # git tag freeze/huitzil-m12
 # 14z-87 (the VOICE-CLASS BORROW fix — huitzil-m13, same batch as donovan-m5)
-EXPECT_HUI="2629561cdc50ecd6ca443510a6d96e1116d7a939"
+EXPECT_HUI="4531af1e49b9c8c4b820229aba598e3eca444fc7"
 # pyron-m3 (14z-82c: + the ADOPTED hitclass_map_extend thunk — the f7997 fix)
 # EXPECT_PYR="6c7f7322da793c12b3681dd3ef5a76b3792ae5d0"  # git tag freeze/pyron-m3
 # pyron-m4 (14z-85b, maintainer-ruled: + pyr_sfx_records — kills the merged
@@ -81,7 +87,7 @@ EXPECT_HUI="2629561cdc50ecd6ca443510a6d96e1116d7a939"
 # 14z-86 (the M5 VOICE BATCH — see EXPECT_HUI)
 # EXPECT_PYR="4c6e3fb6785cc9b418dd52744c7046a6a459f71e"  # git tag freeze/pyron-m6
 # 14z-87 (the VOICE-CLASS BORROW fix — pyron-m7, same batch as donovan-m5)
-EXPECT_PYR="94ce9a48e0cc8c89a69dd72a58669b072e379988"
+EXPECT_PYR="fac4a77739ff9e29e23a8deb234dc0cb2c891dd8"
 
 # The WIDE overlay romset (deterministic from the audited reference sets;
 # built into scratch so the canonical build/wide0 is never clobbered).
@@ -143,14 +149,16 @@ done
 #   ADVISORY on member CONTENT — because 25 of the last 28 commits touching
 #     build_gfx_donovan.py / gfx_layout3.toml / extra_tiles/ / effect_tail.json
 #     / qs_songs.toml would have forced a NEW re-freeze event here (+156% on a
-#     gate already re-frozen 16 times in 22 days). Promotion to hard-fail is
+#     gate already re-frozen 16 times in 22 days). Promotion to hard-fail was
 #     scheduled WITH the pending legacy re-freeze, so the constants move once.
+#   PROMOTED 14z-91: that re-freeze is this one, so member CONTENT is now a
+#     HARD FAIL too. All eight constants moved together in one event.
 # Digests frozen 2026-08-16 from the pre-fix tree, which reproduced all four
 # program fingerprints exactly.
-MANI_WIDE="68d408f9e6463e17a840bf148bce811871f07498 42"
-MANI_STOCK="edc5903becfb78aaff13288a01fe26bde6b5cd4c 30"
-MANI_HUI="d4b252e30b8abb43fb6a2adfa3c03bbf1c633cef 42"
-MANI_PYR="d71e885586df8215e6b64ed7bdbb461bdcbc71e3 42"
+MANI_WIDE="bf3606e48400afbe296abca31642d02dc9fe502d 42"
+MANI_STOCK="9d30e409b0b1de3df87c1ff360f238cc48c311dc 30"
+MANI_HUI="7f4d52a330abf73df298b638dbca099ce3135541 42"
+MANI_PYR="d12d0c6a86bce271d6b7f59ccf6e0c3d98bc9393 42"
 
 m3a_manifest() {   # m3a_manifest <label> <rompath> <"digest count">
     _got="$(python3 tools/artifact_manifest.py "$2")" || {
@@ -165,12 +173,15 @@ m3a_manifest() {   # m3a_manifest <label> <rompath> <"digest count">
     if [ "$_gd" = "$_wd" ]; then
         echo "  ok: $1 whole-artifact manifest matches ($_gc members)"
     else
-        echo "  MANIFEST DRIFT: $1 content moved outside the program image"
+        echo "  FAIL: $1 content moved OUTSIDE the program image"
         echo "    frozen $_wd, measured $_gd ($_gc members, count unchanged)"
         python3 tools/artifact_manifest.py "$2" --list > "$WORK/$1.mani" 2>/dev/null
         echo "    member digests written to $WORK/$1.mani"
-        echo "    ADVISORY (issue #8): gfx/QSound drift does not fail this gate"
-        echo "    yet. If you did not intend it, stop — nothing else sees it."
+        echo "    The program fingerprint covers 8.1% of the shipped bytes;"
+        echo "    this covers all of it. A gfx or QSound member changed and"
+        echo "    NOTHING ELSE IN THE SUITE WOULD SEE IT. Re-freeze only with"
+        echo "    the change named and reviewed."
+        exit 1
     fi
 }
 
