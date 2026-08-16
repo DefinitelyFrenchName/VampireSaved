@@ -1096,6 +1096,20 @@ tests/test_effect_palette_table.sh    # 14z-76: the per-character palette POINTE
                                       # variant row, a build clobbering a base-half
                                       # row). tools/audit_effect_palette_table.py.
                                       # Static, seconds
+tests/test_fbneo_tree_integrity.sh    # 14z-90 (issue #36): emu/fbneo must be
+                                      # EXACTLY the pinned commit + the two
+                                      # tracked patches. Reconstructs from
+                                      # `git archive PIN` + `git apply` and
+                                      # compares WHOLE FILES, because
+                                      # `git apply -R --check` only validates
+                                      # hunk context and accepts an edit a few
+                                      # lines away. Also checks the changed-file
+                                      # inventory, so drift in an untouched file
+                                      # is visible. Run it AFTER regenerating
+                                      # the patches, not before a build — a hard
+                                      # gate ahead of an untested change is rule
+                                      # 2 backwards. + _control.sh (5 cases)
+                                      # No ROMs, no emulator, ~5s / ~20s
 tests/test_audit_merged_dispatch.sh   # 14z-90 (issue #17): ground truth for the
                                       # expectation enumeration audit_merged_legacy.sh
                                       # runs before its leg-(a) glob. The glob
