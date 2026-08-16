@@ -210,7 +210,18 @@ P2-hover PORTRAIT side (NEXT_SESSION). See the registry rows. Previous batch (14
 authored vsavj ids 0x58-0xA6; WIDE v1.2 content members incl. packed
 samples in `vsw.21m`; the facing-alias thunk; per-tenant remaps + farm
 stubs; the whole batch PROFILE-GATED — the stock twin is bit-identical
-6c93cfa8, measured). **`build/m3b_merged8` is the current merged** — `merged-m1`,
+6c93cfa8, measured). **KNOWN-OPEN on `merged-m1` (14z-93, GitHub #91/#92): it carries a
+REACHABLE planted ILLEGAL.** `tests/audit_tripwire_reach.sh` measures
+`CRASH 8887 vec4 PC 456930` — the tripwire for unresolved vs2 `0x494de` —
+on the 40,620-frame arcade marathon with Huitzil forced. Deterministic and
+HUITZIL-ONLY (the Pyron and Donovan legs run `END 40620` clean on the same
+build). The reconciliation row that resolves it is COMMITTED but this
+fingerprint predates it; resolving it exposes a second crash (#92), so the
+re-freeze waits for #92 rather than shipping twice. **`run_suite` does not
+see this** — no suite replay is long enough, which is why the artifact was
+frozen green. Playtesting a long arcade run with Phobos is the field
+equivalent.
+**`build/m3b_merged8` is the current merged** — `merged-m1`,
 frozen 14z-92 (merged7 and merged6 superseded).
 The map: `docs/project/tables/qs_voice_map.md`. Superseded:
 hui38/pyron23/m5_wide (donovan-m3a — tag `freeze/donovan-m3a` is the
