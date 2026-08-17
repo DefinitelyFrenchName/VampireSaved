@@ -33,6 +33,7 @@
 # the repo. They stay local-only by design, not by oversight.
 test_attribute_ramdiff
 test_audit_merged_dispatch
+test_baseset_mask_invariant
 test_build_gate_status
 test_classify_hitclass_probe
 test_classify_pool_spawns

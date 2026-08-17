@@ -138,6 +138,44 @@ for rpl in "$REPO"/tests/replays/*.rpl; do
         spec=$(cat "$EXPDIR/$name.masked")
         class=${spec%% *}; rest=${spec#* }; base=${rest%% *}; args=${rest#* }
         baselog="$REPO/tests/expected/$base/logs/$name.log"
+        # ENFORCE THE BASESET/MASK INVARIANT (14z-94, GitHub #62). It was
+        # stated in prose at the top of this file and checked nowhere: the RUN
+        # mask comes from the expectation set, the BASE comes from the spec,
+        # and nothing compared them. Masked bytes are SKIPPED from the
+        # checksum, so a basis frozen under a different mask is not comparable
+        # — the numbers would simply be over different byte sets.
+        # freeze_masked_basis.sh built this guard for the WRITE side in
+        # 14z-89 ("REFUSING: $DEST is frozen under a DIFFERENT mask"); this is
+        # the read side. The hazard is live, not theoretical: a THIRD basis
+        # (vsavj/masked-v3, ratified and withdrawn the same day, STATE 14z-88)
+        # is on disk with a different mask, and retargeting a spec to it is a
+        # one-token edit.
+        basemask="$REPO/tests/expected/$base/MASK"
+        if [ -f "$basemask" ]; then
+            if [ "$RUNMASK" != "$(cat "$basemask")" ]; then
+                echo "FAIL mask mismatch: this set runs"
+                echo "        $RUNMASK"
+                echo "      but $base was frozen under"
+                echo "        $(cat "$basemask")"
+                echo "      Masked bytes are skipped from the checksum, so the two"
+                echo "      are not comparable. Fix the spec's baseset or the set's"
+                echo "      mask file — do NOT re-freeze to make this green."
+                fail=1
+                continue
+            fi
+        elif [ -f "$EXPDIR/mask" ]; then
+            # A record-less basis is the v1 one, which predates the MASK
+            # record (freeze_masked_basis.sh acknowledges the same gap). It is
+            # only safe for sets on the BUILT-IN default; a set carrying its
+            # own mask file citing it is exactly the untracked pairing.
+            echo "FAIL mask mismatch: $base has no MASK record (it predates them)"
+            echo "      but this set overrides the default with its own mask:"
+            echo "        $RUNMASK"
+            echo "      Cite a basis with a recorded mask, or regenerate one"
+            echo "      with tools/freeze_masked_basis.sh."
+            fail=1
+            continue
+        fi
         case "$class" in
         exact)
             if cmp -s "$baselog" "$WORK/$name.1.log"; then
