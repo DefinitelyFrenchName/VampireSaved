@@ -46,9 +46,14 @@ independently; the gate cross-checks the two and fails if they disagree).
 Fetus of God, take the one that implies the least impact". Applied.
 `tools/decode_stage_banners.py` names the twelve vsav stages, and poking the
 word changes the venue on screen (measured: same match, same frame, different
-stage). Once chosen: patch `huitzil.toml` + `pyron.toml` -> gate green ->
-re-run `audit_tripwire_reach` -> **the single re-freeze of huitzil +
-merged**, which also clears #91.
+stage). Chosen on three measured grounds — ABARAYA is one of only four values
+already reachable in every affected group (so no rung gains a stage it could
+not already produce), it is not another character's venue in these ladders
+(`0x14` is Pyron's, `0x16` Jedah's), and it is the shortest banner record in
+the family at 7 glyph sprites. **DONE:** `huitzil.toml` + `pyron.toml` patched
+via the data_port `fixes` key, gate green, crash gone on the marathon with a
+live control. **REMAINING:** the merged op-count constant, the merged gates,
+then the single re-freeze of huitzil + merged.
 
 **CORRECTED 14z-94 — the 14z-93 close called this "a voice, so it is
 audible" and predicted the round-end flashing would correlate with voice
