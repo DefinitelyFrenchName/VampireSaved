@@ -81,26 +81,34 @@ W = sys.argv[1]
 # attempts at f3416/f4216): event ids inside the two attempt windows,
 # ambient 0x049A excluded. Native re-derives the reference every run.
 WINDOWS = [(3400, 3900), (4200, 4700)]
-# RED SINCE 14z-94, AND DELIBERATELY NOT RE-FROZEN (GitHub #10). Unifying the
-# input-staging convention moved every scripted press one frame earlier, and
-# on this rig that does not merely re-date events — it changes WHAT THE GAME
-# DOES. Measured both ways on build/m3b_merged9, same rig, same build:
+# RE-FROZEN 14z-94 (GitHub #10, maintainer-ruled). Unifying the input-staging
+# convention moved every scripted press one frame earlier, and on this rig that
+# does not merely re-date events — it changes WHAT THE GAME DOES, because a
+# one-frame shift changes which move comes out. Measured both ways on
+# build/m3b_merged9, same rig, same build:
 #   old staging: ring id 0621 fires ZERO times in the whole 5000-frame run
 #   new staging: ring id 0621 fires at frame 4322, mid-window
-# so `ours` gains one id over the frozen inventory. The NATIVE leg is
-# unaffected.
 #
-# This inventory was EAR-CONFIRMED by the maintainer (2026-08-14, "the trap
-# mine ejection sound is indeed there"), so re-freezing it is a maintainer
-# decision, not a re-measurement anyone may take. The standing watch applies:
-# a frozen inventory that GROWS means stop and root-cause — done, above — not
-# widen. Until it is ruled on, this gate stays RED and names why.
+# WHAT ACTUALLY MOVED, re-measured on build/hui38 (the build this inventory was
+# frozen against at 14z-86) under the corrected timing:
+#   ours  window 1  unchanged
+#   ours  window 2  + 0621, nothing lost
+#   native both     unchanged, both windows
+# So exactly one id, on our leg only. 0621 is a VANILLA vsavj id (outside the
+# authored 0x58-0xA6 voice range) and fires on NEITHER leg natively — which is
+# the same category as the 0117/00f3 pair this inventory already carries and
+# already documents as "an ordinary engine event on that leg's timeline".
+#
+# The ear-confirmation this inventory rests on (maintainer, 2026-08-14, "the
+# trap mine ejection sound is indeed there") concerns 00d8, which is UNCHANGED
+# in both windows. The standing watch was honoured: the growth was root-caused
+# before it was absorbed, and the re-freeze was a maintainer ruling.
 # Per-window frozen inventories (both windows measured, not assumed
 # equal — ours' attempt 2 also carries an 0117/00f3 pair, an ordinary
 # engine event on that leg's timeline).
 NATIVE_EXPECT = [["0739", "010b", "073a"], ["0739", "010b", "073a"]]
 OURS_EXPECT   = [["00d8", "010a", "0199"],
-                 ["00d8", "010a", "0199", "0117", "00f3"]]
+                 ["00d8", "010a", "0199", "0117", "00f3", "0621"]]
 # ours: 00d8 = the RESTORED ejection (14z-86 authored Z80 song, the
 # 0739 slot); 0199 = the RESTORED detonation chirp (vsavj id for
 # 0x73A's content); 010a-vs-010b is the recorded per-char-row
