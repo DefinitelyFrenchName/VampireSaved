@@ -21,9 +21,10 @@
 | `hui41` pre-fix (FROZEN) | **CRASH 18337** `vec4 PC 0fb6e0` — #91 |
 | `hui43` post-fix | **END 40620** |
 
-The probe fired 3 times per leg, so it is armed rather than dead. New builds
-`hui43` `da734d49` / `pyron27` `e29cac23`, both UNREGISTERED and UNFROZEN;
-`hui41`/`pyron26` are untouched.
+The probe fired on every leg, so it is armed rather than dead: 3 hits on the
+three legs that ran to 40,620, and 2 on `hui41` — which crashed at 18337,
+before the third firing. New builds `hui43` `da734d49` / `pyron27`
+`e29cac23`, both UNREGISTERED and UNFROZEN; `hui41`/`pyron26` are untouched.
 
 `tests/test_voice_row_range.sh` is now GREEN on the new builds (it stays RED
 on the frozen ones, correctly). The historical shape it caught:
