@@ -13,10 +13,10 @@ index 3bf65bd..0de57a1 100644
  alldir	+= 	intf/audio/linux
 diff --git a/src/burner/sdl/harness.cpp b/src/burner/sdl/harness.cpp
 new file mode 100644
-index 0000000..b31c0e2
+index 0000000..0351239
 --- /dev/null
 +++ b/src/burner/sdl/harness.cpp
-@@ -0,0 +1,586 @@
+@@ -0,0 +1,632 @@
 +// harness.cpp — Vampire Saved test harness for the SDL2 frontend.
 +// FRONTEND-ONLY: no emulation-core file is touched by this feature.
 +//
@@ -147,24 +147,70 @@ index 0000000..b31c0e2
 +static UINT32* held = NULL;
 +static UINT32 nScriptFrames = 0;
 +
++// Operational cap on replay length (14z-94, GitHub #77). ~46 hours of
++// emulated play at 60 fps; the longest replay in tests/replays is the
++// 40,620-frame arcade marathon. Its job is to keep the frame arithmetic
++// below from wrapping, not to constrain any real script.
++#define HARNESS_MAX_FRAMES 10000000u
++
 +static int parse_script(const char* path)
 +{
 +    FILE* f = fopen(path, "r");
 +    if (!f) { printf("harness: cannot open %s\n", path); return 1; }
 +
 +    // pass 1: find last frame
++    //
++    // BOUNDED (14z-94, GitHub #77). Frame numbers came in as unrestricted
++    // UINT32 and were then used in unchecked arithmetic. Two ways that ends
++    // badly, and the second is the dangerous one:
++    //
++    //   last + nHarnessTailFrames   wraps -> nScriptFrames becomes SMALL, and
++    //                               the replay silently truncates instead of
++    //                               reporting a bad script
++    //   nScriptFrames + 2           wraps at 0xFFFFFFFF -> calloc(1, 4), while
++    //                               pass 2 still writes held[fr] for every
++    //                               fr <= nScriptFrames. That is an
++    //                               out-of-bounds write of ~4 GB.
++    //
++    // A mistyped frame in a hand-edited .rpl is all it takes. The cap is an
++    // operational bound, not a guess at a limit: the longest replay in
++    // tests/replays is the 40,620-frame arcade marathon, and 10,000,000
++    // frames is ~46 hours of emulated play, so nothing legitimate is near it
++    // while the arithmetic below cannot wrap.
 +    char line[512];
 +    UINT32 last = 0;
++    int lineno1 = 0;
 +    while (fgets(line, sizeof(line), f)) {
++        lineno1++;
 +        UINT32 a = 0, b = 0;
 +        if (sscanf(line, "%u-%u", &a, &b) == 2 || sscanf(line, "%u", &a) == 1) {
 +            if (b < a) b = a;
++            if (a > HARNESS_MAX_FRAMES || b > HARNESS_MAX_FRAMES) {
++                printf("harness: %s:%d frame %u exceeds the %u-frame cap "
++                       "(mistyped?)\n", path, lineno1,
++                       b > a ? b : a, HARNESS_MAX_FRAMES);
++                fclose(f); return 1;
++            }
 +            if (b > last) last = b;
 +        }
 +    }
++    // Both addends are now bounded, so neither sum can wrap.
 +    nScriptFrames = last + (UINT32)nHarnessTailFrames;
-+    if (nHarnessFrames > 0) nScriptFrames = (UINT32)nHarnessFrames;
-+    held = (UINT32*)calloc(nScriptFrames + 2, sizeof(UINT32));
++    if (nHarnessFrames > 0) {
++        if ((UINT32)nHarnessFrames > HARNESS_MAX_FRAMES) {
++            printf("harness: FRAMES=%d exceeds the %u-frame cap\n",
++                   nHarnessFrames, HARNESS_MAX_FRAMES);
++            fclose(f); return 1;
++        }
++        nScriptFrames = (UINT32)nHarnessFrames;
++    }
++    if (nScriptFrames > HARNESS_MAX_FRAMES) {
++        printf("harness: %u frames (last input %u + %d tail) exceeds the "
++               "%u-frame cap\n", nScriptFrames, last, nHarnessTailFrames,
++               HARNESS_MAX_FRAMES);
++        fclose(f); return 1;
++    }
++    held = (UINT32*)calloc((size_t)nScriptFrames + 2, sizeof(UINT32));
 +    if (!held) { printf("harness: out of memory for %u frames\n",
 +                        nScriptFrames + 2); fclose(f); return 1; }
 +
