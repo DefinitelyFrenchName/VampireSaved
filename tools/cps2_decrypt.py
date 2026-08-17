@@ -372,7 +372,24 @@ class Cipher:
 # differing only in extension CONTENT hashed identically — the same blind
 # spot 14z-54 found for gfx/QSound. Ordering still works: int("41") sorts
 # after int("10"), which is the load order.
-_PRG_RE = re.compile(r"\.(0[3-9]|10|4[1-4])[a-z]?$")
+# PROGRAM members: .03-.10 (vsavj/vsav2/vhunt2, with revision suffixes a/b/d)
+# and .41-.44 (the WIDE extension, unsuffixed).
+#
+# THE SUFFIX CLASS EXCLUDES 'm' ON PURPOSE (GitHub #19). Gfx members are
+# always 'm'-suffixed, and the gfx namer emits vsw.{31+2i}m — which at the
+# documented `--gfx 8` growth path (docs/project/M3b_plan.md:219) produces
+# vsw.39m, vsw.41m, vsw.43m, vsw.45m. With a bare [a-z]? the middle two
+# matched as PROGRAM: load_set/load_stored would concatenate two 4 MB GFX
+# members into the 68k blob (every logical word past ~0x400000 wrong),
+# build_fingerprint would hash gfx into the dispatch fingerprint, and since
+# int('41') is the sort key for BOTH 'vsw.41' and 'vsw.41m' the member ORDER
+# would come from namelist order rather than load order. Inert at --gfx 4,
+# silently wrong at the next member count the project has already written
+# down. No real program member is m-suffixed — measured across all five
+# reference sets and a packed vsavjw (suffixes in use: a, b, d, bare).
+# build_fingerprint.py:83 already classified 'vsw.NNm' as gfx BEFORE
+# consulting this regex; the two classifiers now agree instead.
+_PRG_RE = re.compile(r"\.(0[3-9]|10|4[1-4])[a-ln-z]?$")
 
 
 def words_from_file_bytes(blob):

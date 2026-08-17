@@ -59,6 +59,17 @@ if [ -n "${FBNEO_ROMPATH:-}" ]; then
     for z in "$ROMDIR"/*.zip; do ln -sf "$z" "$WORK/roms/$(basename "$z")"; done
     for z in "$FBNEO_ROMPATH"/*.zip; do ln -sf "$z" "$WORK/roms/$(basename "$z")"; done
 else
+    # 14z-94 (#38): CLEAR IT FIRST. `ln -sfn` cannot replace a real
+    # DIRECTORY — on BSD/macOS it creates "$WORK/roms/$(basename $ROMDIR)"
+    # inside it instead — so a REUSED sandbox that previously ran WITH
+    # FBNEO_ROMPATH kept its overlay directory, and this branch went on
+    # serving the PREVIOUS run's patched zips while the caller believed it
+    # was running against pristine $ROMDIR. Silent, and exactly backwards
+    # from what a non-overlay run is for.
+    # No trailing slash, for the same reason the overlay branch says so: if
+    # this path is already a symlink to $ROMDIR, `rm -rf "$WORK/roms/"`
+    # would follow it and empty the reference sets.
+    rm -rf "$WORK/roms"
     ln -sfn "$ROMDIR" "$WORK/roms"
 fi
 
