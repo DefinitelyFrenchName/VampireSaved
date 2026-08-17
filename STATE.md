@@ -1,5 +1,175 @@
 # STATE — living progress log
 
+## Session 14z-94 — #92 ROOT-CAUSE CORRECTED, FIXED AND VERIFIED: it was
+## never a voice. It is the ARCADE-LADDER STAGE, and the value vsav cannot
+## service is REVENGER'S ROOST. Both #91 and #92 clear on the rig that
+## found them, each against a LIVE crash on its pre-fix build.
+
+**THE HEADLINE, and the first half of it is a correction of my own
+predecessor entry.** 14z-93 closed with "#92 is root-caused to an 8-byte data
+defect in OUR OWN authored voice rows" and told the next session the value
+"selects a voice, so it is audible". The bytes were right. The reading was
+not: `$FF8100` is the **arcade-ladder stage index**, and the four offsets per
+tenant are the entries that schedule the **Donovan** match. vs2 puts that
+match at stage `0x18` = **REVENGER'S ROOST**, its thirteenth stage. Vsav ships
+twelve. Selecting the thirteenth walks off the banner family into its own
+`0x00400000` terminator and dies at vec3.
+
+**MEASURED, NOT INFERRED — I read the consumer instead of assuming it.**
+`0x05ffa6` is `move.w $100(a5),d0; add.w d0,d0; movea.l #$26775a,a0;
+lea -4(a0,d0.w),a0` and then STORES a0; the deref of the following row is
+downstream. Its targets are fmt-4 glyph records — stage-name banners. Decoded
+both games with the new `tools/decode_stage_banners.py`:
+
+    vsavj  anchor 0x26775a (table+0x3C)  12 stages, v = 0x00..0x16
+    vsav2  anchor 0x2a0a96 (table+0x4C)  13 stages, v = 0x00..0x18
+
+**Both games number `v=0x00` at their OWN first row, so the twelve shared
+stages are identical at identical values and the port owes NO renumber.** That
+is why the defect is four bytes rather than a whole table.
+
+**THE PAIRING IS THE PROOF.** Table A (candidate CLASS) and table B (its
+STAGE) are scanned at ONE index by `0x00aeca`, so they are pairs. Every one of
+the eight bad bytes sits opposite class `0x13` (Donovan) — 4/4 on both
+tenants, 0/12 elsewhere — and across vs2's 32 rows `0x18` appears 50 times,
+**all 50** opposite `0x13`. Donovan's own row is clean because it never lists
+his own class.
+
+**CONFIRMED ON SCREEN, which is what turned a table into a fact.** The arcade
+map screen at frame 2560 prints the pick as a banner. The engine's own choice
+for that rung wrote `0x0e` and the banner read WAR AGONY. Poking the word to
+`0x16` gave FETUS OF GOD — and the match that followed was fought in Jedah's
+stage instead of the shanty town, same matchup, same frame. So the value is
+the **venue**, not a caption; three readers use it (the banner record, a
+`0xA0`-strided palette upload into `$90C2C0` at `0x01bf5e`, and a dispatch at
+`0x004daa`).
+
+**RULED 2026-08-17 (maintainer): "any stage EXCEPT Fetus of God, take the one
+that implies the least impact." APPLIED as `0x0a` = ABARAYA**, on three
+measured grounds rather than taste:
+- it is already reachable at a scanned index in ALL FOUR affected groups on
+  BOTH tenants, so no rung gains a stage it could not already produce (only
+  `0x00`/`0x0a`/`0x14`/`0x16` have that property);
+- of those, `0x16` is excluded by the ruling and `0x14` is where Pyron is
+  fought in every one of these ladders — it would put two tenants at one venue;
+- against the remaining `0x00`, ABARAYA is the SHORTEST banner record in the
+  family, 7 glyph sprites against 16, so it adds least to the map screen.
+
+Applied through the manifest's existing flat `fixes = "off:old:new,..."` key
+(old bytes verified at generate time), NOT a new mechanism.
+
+**THE DELTA IS EXACTLY THE EIGHT BYTES.** hui42->hui43 and pyron26->pyron27
+each carry 323/258 ops with ONE op differing, and that op's blob differs at
+exactly `+0x01/+0x1a/+0x29/+0x31`, `18 -> 0a`.
+
+**VERIFIED WITH LIVE POSITIVE CONTROLS** — the 40,620-frame arcade marathon
+`26_don_arcade_mash`, tenant forced, sparse probe at `0x05ffb6`:
+
+| leg | verdict |
+|---|---|
+| `pyron26` pre-fix (FROZEN) | **CRASH 15079** `vec3 PC 01afb6` — #92 |
+| `pyron27` post-fix | **END 40620** |
+| `hui41` pre-fix (FROZEN) | **CRASH 18337** `vec4 PC 0fb6e0` — #91 |
+| `hui43` post-fix | **END 40620** |
+| `m3b_merged8` + Huitzil (FROZEN) | **CRASH 8887** `vec4 PC 456930` — #91 |
+| `m3b_merged9`, all three tenants | **END 40620** |
+
+Probe hits 3 per completed leg, 2 on `hui41` (it died before the third) — armed
+on every leg, which is the liveness criterion.
+
+**THE MERGED BUILD IS GREEN ON THE WHOLE merged-m1 GATE SET.**
+`build/m3b_merged9`, fingerprint `081e2e53c5debff6d2d5bb4d4376d2a1ef6be842`,
+752 ops: `audit_merged_legacy` **AUDIT-EXIT 0 (leg a 47/47, 0
+NOT-EVALUATED; leg b 6/6 guard-clean)**, `test_merged_render_content` PASS,
+`audit_trap_parity` PASS, `audit_fg_parity` PASS, `audit_select_bank_gates`
+PASS, `verify_gfx_build` + `check_tenant_hud` PASS on all three tenants (the
+#75 abort did not recur).
+
+**NOTHING IS FROZEN.** hui43 `da734d49`, pyron27 `e29cac23`, merged
+`081e2e53` are all UNREGISTERED; `hui41`/`pyron26`/`m3b_merged8` are
+untouched. The re-freeze and its registry rows remain a maintainer decision.
+
+**ONE NUMBER WAS COPIED SIX TIMES, and it cost two false starts.** The frozen
+3-tenant op count moved 753 -> 752 (attributed: #91's reconciliation row
+retires one planted ILLEGAL; a content-multiset diff shows the only blob lost
+is `4afc` x1, everything else a uniform 0x10 allocator shift). Re-freezing
+`test_tenant_loop.sh` was not enough — `build_merged.sh` held three literals
+and `audit_merged_legacy.sh` three more, each printing "re-freeze
+test_tenant_loop FIRST" at someone who had just done exactly that. Both now
+DERIVE it from the owning gate and hard-fail on a non-numeric read; a fallback
+literal is how that drift returns quietly. Same class as GitHub #43.
+
+**RE-FROZEN, and the shape of the delta is the evidence:** donovan 285 -> 285
+UNCHANGED, huitzil 324 -> 323, pyron 258 -> 258 UNCHANGED, N=2 553 -> 552,
+N=3 753 -> 752. Minus one exactly where huitzil is included and nowhere else,
+which is what a huitzil-scoped reconciliation row must look like.
+
+**A REFERENCE-ROT FIX ON THE WAY PAST.** `audit_merged_legacy` leg (b)
+hardcoded `build/hui41` / `build/pyron26` — the PRE-FIX solos — so run as-is
+it would have compared a fixed merged build against unfixed solos and reported
+the fix itself as a tenant-content divergence. Now `LEGB_DON/LEGB_HUI/LEGB_PYR`
+with a hard refusal on a reference that has no rompath, and the resolved paths
+are echoed. Fourth instance of this class here (hui31, pyron20, pyron17).
+
+**HONESTY LEDGER — my own errors this session, all caught by measurement or by
+a control I had just written:**
+
+| I believed | what killed it |
+|---|---|
+| "vsavj value V == vs2 value V+8" — a clean renumber between the games | reading BOTH code sites: each anchors at its own family's first row, so the numbering is IDENTICAL. The "+8" was my wrong anchor |
+| the introduced table-A class set is `{0x11, 0x13}` | Donovan's row failed on `0x10` — each tenant's ladder names the OTHER tenants |
+| "3 probe hits per leg" | `hui41` fired 2; it crashed before the third |
+| the op-count derivation was fine where I put it | it landed INSIDE the `MERGED_PREBUILT` branch, so the ordinary path would have compared against an empty string and read as a drifted generator |
+
+**SUITE (+3 gates, +1 instrument, +1 tool):**
+- `tools/decode_stage_banners.py` + `tests/test_decode_stage_banners.sh` (6
+  sections, 3 verdict controls). **The anchor control is the one that matters**:
+  decoding vs2 from its table BASE reproduces my "+8" error and must FAIL
+  LOUDLY — the tool exits nonzero naming the anchor, because an empty family
+  that merely omits the names reads as "no match" and is right by accident.
+- `tests/test_voice_row_range.sh` **section B**: the table-A half, which
+  section A explicitly did not audit. Two derived bounds (36 rows
+  structurally; 32 by the in-use mask's `btst` MOD 32) and both marker values
+  asserted (`0x18` at index 7 of all 36 rows; `0xff` only as whole rows
+  `0x0b`/`0x1b`). Runs BEFORE the verdict combines, or it would never execute
+  while section A is red. Table A is CLEAN.
+- `tests/lua/record_window.lua` + `tests/test_record_window.sh` (4/4).
+  EMULATOR-SIDE recording, at the maintainer's request over screen capture.
+  `-aviwrite` DOES work headless but writes uncompressed video for the whole
+  run — **measured 5.7 GB in two minutes of wall time** — so this records only
+  a named window and defaults to MNG: 2.4 MB for 120 frames, run 4.5 s. Its
+  gate checks what watching a movie cannot: EXTENT, byte-identical
+  DETERMINISM across two runs, and LIVENESS (a window `VIDEO_OUT` says CHANGES
+  must not compress like a STILL one — catches a recorder reproducibly
+  emitting blank frames). Windows chosen from the measured checksum stream at
+  run time, so no frame constant is baked in to rot.
+
+**DOCS (§5 retraction pass — grepped the CLAIM, fixed headers first,
+re-grepped clean):** `ram.md:73`'s "`0x18` TERMINATOR ... consumers must treat
+it as end-of-list" RETRACTED (the selector has no such test); `ram.md:89`'s
+"THE LIST IS TERMINATOR-DELIMITED BY `0x18`" RETRACTED (two tables conflated —
+table A's index-7 `0x18` is real and universal but never scanned, the crash
+pool is a table-B group); `engine_internals` gains **"The ARCADE LADDER"**,
+which it never had, naming its atlas rows per §5.
+
+**GOTCHAS filed (3):** a per-value table's ANCHOR is not its table base
+[game]; `replay.lua` has NO frame cap and `FRAMES` is not one of its variables
+[project]; `-aviwrite` is headless-capable but uncompressed and will fill a
+disk [platform].
+
+**DELIVERABLE FOR THE MAINTAINER:** a venue-picker page with all twelve
+candidate stages, each captured on the SAME frame of the SAME match with only
+that one word changed — published as an artifact so the choice was made
+against screenshots rather than a name list.
+
+**OPEN:** the re-freeze + registry rows (maintainer); a playtest of merged9
+through a tenant arcade ladder to the Donovan match (it should announce
+ABARAYA and fight there); and the round-end flashing, which is now
+UNSUPPORTED-not-refuted — 14z-93 predicted it correlates with voice events on
+the strength of the voice reading, and that reading is gone. The recorder is
+ready to aim at it once there is a rough "when in the round".
+
+
 ## Session 14z-93 CLOSE — ritual complete
 
 **THE HEADLINE: #92 is root-caused to an 8-byte data defect in OUR OWN

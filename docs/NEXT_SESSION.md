@@ -1,16 +1,14 @@
 # NEXT SESSION — orientation (written at the close of 14z-94, 2026-08-17)
 
-> ## **#91 AND #92 ARE FIXED ON THE SOLOS (14z-94), each verified against a
-> ## LIVE CRASH on its pre-fix build.** The 8 bytes scheduled the Donovan
-> ## match at **REVENGER'S ROOST**, vsav2's thirteenth stage, which vsav does
-> ## not have; retargeted to **`0x0a` ABARAYA** on the maintainer's ruling.
+> ## **#91 AND #92 ARE FIXED AND FULLY GATED (14z-94)** — on the solos AND on
+> ## the merged image, each verified against a LIVE crash on its pre-fix
+> ## build. The 8 bytes scheduled the Donovan match at **REVENGER'S ROOST**,
+> ## vsav2's thirteenth stage, which vsav does not have; retargeted to
+> ## **`0x0a` ABARAYA** on the maintainer's ruling.
 > ##
-> ## **STILL OPEN: the merged build and the re-freeze.** `build_merged.sh`
-> ## stops at its own guard — 752 ops against the frozen 753 — and the delta
-> ## is attributed to ONE `4afc` ILLEGAL, #91's tripwire disappearing.
-> ## `tests/test_tenant_loop.sh:217` needs 753 -> 752, a frozen merge-gate
-> ## constant, so it is a maintainer call. Then the merged gates, then the
-> ## single re-freeze of huitzil + merged.
+> ## **THE ONLY THING LEFT IS THE RE-FREEZE**, which is a maintainer
+> ## decision: registry rows for `hui43` `da734d49`, `pyron27` `e29cac23`
+> ## and merged `081e2e53` (752 ops). Every gate is green — see the table.
 
 ## Where it stands
 
@@ -20,6 +18,15 @@
 | `pyron27` post-fix | **END 40620** |
 | `hui41` pre-fix (FROZEN) | **CRASH 18337** `vec4 PC 0fb6e0` — #91 |
 | `hui43` post-fix | **END 40620** |
+| `m3b_merged8` + Huitzil (FROZEN) | **CRASH 8887** `vec4 PC 456930` — #91 |
+| `m3b_merged9`, all three tenants | **END 40620** |
+
+**MERGED GATE SET, all green on `m3b_merged9` (752 ops, `081e2e53`):**
+`audit_merged_legacy` AUDIT-EXIT 0 (leg a 47/47 with 0 NOT-EVALUATED, leg b
+6/6 guard-clean), `test_merged_render_content` PASS,
+`audit_trap_parity` PASS, `audit_fg_parity` PASS,
+`audit_select_bank_gates` PASS, `verify_gfx_build` + `check_tenant_hud` PASS
+on all three tenants.
 
 The probe fired on every leg, so it is armed rather than dead: 3 hits on the
 three legs that ran to 40,620, and 2 on `hui41` — which crashed at 18337,
@@ -53,8 +60,9 @@ not already produce), it is not another character's venue in these ladders
 (`0x14` is Pyron's, `0x16` Jedah's), and it is the shortest banner record in
 the family at 7 glyph sprites. **DONE:** `huitzil.toml` + `pyron.toml` patched
 via the data_port `fixes` key, gate green, crash gone on the marathon with a
-live control. **REMAINING:** the merged op-count constant, the merged gates,
-then the single re-freeze of huitzil + merged.
+live control; the merged op-count constant re-frozen (-1, attributed) and
+every merged gate green. **REMAINING:** only the re-freeze itself — registry
+rows for huitzil + pyron + merged, which is a STATE decision.
 
 **CORRECTED 14z-94 — the 14z-93 close called this "a voice, so it is
 audible" and predicted the round-end flashing would correlate with voice
