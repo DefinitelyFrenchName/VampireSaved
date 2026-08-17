@@ -1128,7 +1128,16 @@ dst = 0xBFA8          # vsavj 0xBB68 + 0x11*0x40 (variant row, alias of 0x01)
 dst_end = 0xBFE8
 dst_old_head = "061012021416000a0e1204021416000a0c1012021416000a080e12021416000a120610021416000a060812021416000a100c12021416000a101202061416000a"
 only_variant_slot = true
-note = "14z-87 option (c): vs2's Pyron row of the paired voice-number table (feeds $FF8100 via the borrow)"
+# THE #92 FIX (14z-94, maintainer-decided) — the twin of huitzil.toml's row;
+# the full rationale lives there. Pyron's ported ladder carries the SAME four
+# class-0x13 (Donovan) entries at the SAME offsets, each pairing him with
+# vs2-only stage 0x18 = REVENGER'S ROOST, which vsav does not have.
+# Retargeted to 0x0a = ABARAYA on the same three measured grounds (already
+# reachable in every affected group; not another character's stage in these
+# ladders; the shortest banner record in the family).
+# Maintainer ruling 2026-08-17: any stage but FETUS OF GOD, least impact.
+fixes = "0x01:18:0a,0x1a:18:0a,0x29:18:0a,0x31:18:0a"
+note = "14z-87 option (c): vs2's Pyron row of the paired arcade-ladder stage table (feeds $FF8100 via the borrow); 14z-94 retargets the four class-0x13 entries off vs2-only stage 0x18 (#92)"
 
 # THE VOICE ALIAS THUNK (14z-86, shared by all tenants — identical
 # rows dedupe on merge). A range-gated clone of the per-node sfx

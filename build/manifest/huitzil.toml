@@ -2180,7 +2180,29 @@ dst = 0xBF68          # vsavj 0xBB68 + 0x10*0x40 (variant row, alias of 0x00)
 dst_end = 0xBFA8
 dst_old_head = "06120e0a1416100a080c120a1416100a0a0c120e1416100a120408021416100a040c0e121416100a080c120a1416100a0a04120c1416100a0e0608021416100a"
 only_variant_slot = true
-note = "14z-87 option (c): vs2's Huitzil row of the paired voice-number table (feeds $FF8100 via the borrow)"
+# THE #92 FIX (14z-94, maintainer-decided). This is the ARCADE-LADDER stage
+# table: the selector at 0x00aeca takes one index across this row and the
+# candidate-class row above it, so each byte here is "the stage you fight
+# that class at". vs2 pairs class 0x13 (Donovan) with stage 0x18 =
+# REVENGER'S ROOST, vs2's thirteenth stage. Vsav has twelve; 0x18 walks off
+# the banner family into its 0x00400000 terminator and dies at vec3 (#92) —
+# deterministic in a rig, a race in the field, and invisible to run_suite
+# because no suite replay is long enough to advance the ladder this far.
+#
+# Retargeted to 0x0a = ABARAYA, chosen on three measured grounds:
+#   * it is ALREADY reachable at a scanned index in all four affected
+#     groups on both tenants, so no ladder rung gains a stage it could not
+#     already produce (only 0x00/0x0a/0x14/0x16 have that property);
+#   * it is not spoken for by another character in these same ladders —
+#     0x14 is where Pyron is fought in every one, 0x16 is Jedah's;
+#   * it is the SHORTEST banner record in the family, 7 glyph sprites
+#     against 16 for 0x00 and 20 for 0x14, so it adds least to the map
+#     screen's sprite list.
+# Maintainer ruling 2026-08-17: any stage but FETUS OF GOD, least impact.
+# Names decode with tools/decode_stage_banners.py; gated by
+# tests/test_voice_row_range.sh (section A) and test_decode_stage_banners.sh.
+fixes = "0x01:18:0a,0x1a:18:0a,0x29:18:0a,0x31:18:0a"
+note = "14z-87 option (c): vs2's Huitzil row of the paired arcade-ladder stage table (feeds $FF8100 via the borrow); 14z-94 retargets the four class-0x13 entries off vs2-only stage 0x18 (#92)"
 
 # THE VOICE ALIAS THUNK (14z-86, shared by all tenants — identical
 # rows dedupe on merge). A range-gated clone of the per-node sfx
