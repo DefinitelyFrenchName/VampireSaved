@@ -47,11 +47,13 @@ test_freeze_basis_sandbox
 test_gfx_collision_gate
 test_hex_lengths
 test_m2a_flicker_gate
+test_m2a_mask_pin
 test_manifest_merge
 test_minitoml_subset
 test_obj_record_walk
 test_phasea_a3_liveness
 test_qs_window_law
+test_record_walk_bounds
 test_replay_stage_census
 test_s4_thresholds
 test_shell_portability

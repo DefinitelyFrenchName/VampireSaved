@@ -54,7 +54,16 @@ python3 tools/gen_donovan_patch.py "$D_EX" "$OUT/patch" \
         echo "FAIL: generation errored"; tail -15 "$OUT/gen.log"; exit 1; }
 grep -q '^GENERATION OK' "$OUT/gen.log" || {
     echo "FAIL: no GENERATION OK"; tail -15 "$OUT/gen.log"; exit 1; }
-NOPS="$(python3 -c "import json;print(len(json.load(open('$OUT/patch/patch.json'))['ops']))")"
+# The path goes in as sys.argv, not interpolated into the SOURCE (14z-94,
+# GitHub #66). <outbase> is a CLI argument: a path containing a quote or an
+# apostrophe broke the program text, and this file already used the correct
+# pattern four lines later. The inconsistency is what made it likely to be
+# copied forward.
+NOPS="$(python3 - "$OUT/patch/patch.json" <<'PYOPS'
+import json, sys
+print(len(json.load(open(sys.argv[1]))["ops"]))
+PYOPS
+)"
 # THE EXPECTED COUNT IS DERIVED, NOT COPIED (14z-94). This guard used to
 # carry its own literal while its comment said "Matches test_tenant_loop's
 # frozen 3-tenant count" — two copies of one fact, and they drifted the first

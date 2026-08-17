@@ -83,6 +83,15 @@ m2a_legacy_gate() {
 #            offset propagates (persistent, benign, hook-caused — stage-3
 #            hook-free builds run 06 bit-identical)
 # Hook-free builds keep m2a_legacy_gate (unmasked) above.
+# THE V1 MASK, AND IT IS A SECOND COPY OF ONE (14z-94, GitHub #70).
+# run_suite.sh carries the same string as its built-in default for sets that
+# ship no mask file. #70 proposed reading tests/expected/<set>/mask here
+# instead — but that would RE-POINT this battery from the donovan-m2c
+# generation it deliberately targets to whatever set is current, which is
+# exactly the open maintainer question recorded below and in STATE.md. So the
+# pin stays, and the DUPLICATION is what gets fixed: tests/test_m2a_mask_pin.sh
+# asserts this string still equals run_suite.sh's default, so the two copies
+# cannot drift apart silently while both claim to be V1.
 M2A_MASK="043c-043d,4182-41a2,7f00-8000"
 M2A_MASKED_EXP="tests/expected/vsavj/masked"   # relative to $REPO
 # 14z-90 (issue #2): where this track's FROZEN flicker inventories live. The
