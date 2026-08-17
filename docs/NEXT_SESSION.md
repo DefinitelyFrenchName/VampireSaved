@@ -1,14 +1,67 @@
 # NEXT SESSION — orientation (written at the close of 14z-94, 2026-08-17)
 
-> ## **#91 AND #92 ARE FIXED AND FULLY GATED (14z-94)** — on the solos AND on
-> ## the merged image, each verified against a LIVE crash on its pre-fix
-> ## build. The 8 bytes scheduled the Donovan match at **REVENGER'S ROOST**,
-> ## vsav2's thirteenth stage, which vsav does not have; retargeted to
-> ## **`0x0a` ABARAYA** on the maintainer's ruling.
+> ## **THE #74 REVIEW TRIAGE IS CLOSED OUT (14z-94).** Thirteen issues this
+> ## pass — every HIGH and every MEDIUM in the #76-#89 batch, plus #77 —
+> ## fixed, gated, committed. **38 portable gates green**, run them with:
 > ##
-> ## **THE ONLY THING LEFT IS THE RE-FREEZE**, which is a maintainer
-> ## decision: registry rows for `hui43` `da734d49`, `pyron27` `e29cac23`
-> ## and merged `081e2e53` (752 ops). Every gate is green — see the table.
+> ##     while read g; do tests/$g.sh </dev/null; done < tests/ci_portable.txt
+> ##
+> ## **Close stdin.** A gate that reads it swallows the rest of the list —
+> ## that is how a 32-entry run silently became 28.
+> ##
+> ## **#91 AND #92 REMAIN FIXED AND FULLY GATED**, on the solos and on the
+> ## merged image, each verified against a LIVE crash on its pre-fix build.
+> ## **THE RE-FREEZE IS STILL THE MAINTAINER'S CALL**: registry rows for
+> ## `hui43` `da734d49`, `pyron27` `e29cac23`, merged `081e2e53` (752 ops).
+
+## What changed in the triage, in one screen
+
+Almost none of these were wrong logic. They were **checks that stopped
+existing** under an ordinary condition — an env var, a wrong argument, a
+phantom CLI option, a stale marker file, a literal constant — and in each case
+the thing that should have caught it was disabled by the same stroke.
+
+| # | the switch | what it turned off |
+|---|---|---|
+| 79 | `python -O` | `assert` is REMOVED, not weakened. Six tools, incl. the cipher round-trip self-check. |
+| 76 | a wrong 2nd argument | `outdir == romdir` deletes the reference set. No undo (rule 7). |
+| 80 | `MAME_BUILD_ROOT` | `rsync --delete` into any caller-supplied path. |
+| 86 | a late replay failure | the oracle trust root left half old, half new. |
+| 89 | `--dry-run`, which never existed | voice ids rebuilt from `wide0`, reported as a verdict on another build. |
+| 88 | a leftover `.diverge` | the freeze you just took, silently ungoverned. |
+| 85 | the literal `60` | 2.03 s drift by voice 79, against a 3.35 s window. |
+| 83 | an absent TSV row | meter, which CLAUDE.md §4 names explicitly. |
+| 81 | SIGKILL / a second terminal | tracked `gen_donovan_patch.py`, left perturbed. |
+| 87 | nothing reading the field | `gfx_layout3.toml`'s bank words, collision rule and scatter bounds. |
+| 77 | one mistyped `.rpl` frame | `nScriptFrames + 2` wraps -> `calloc(1,4)` with a ~4 GB write past it. |
+
+**Three were hiding a second defect** — #87's scatter bound had already
+drifted (huitzil: 246 codes outside it, re-measured to `0x0AF5`), #85's
+control was aimed at the one window where the drift is smallest, #81's
+self-check compared against a snapshot it took itself. **Two were latent**
+(#89, #51): real defects that currently produce right answers, which is
+exactly why they needed gates and not rebuilds.
+
+**THE ONE RED THING, and it is NOT from this session's work: `test_dualtrack`
+FAILS** — 732 bytes outside its named windows, against a 14z-59j baseline of
+57. Isolated across THREE harness builds (pre-#59, pre-#77, current) with
+byte-identical counts each time, so the harness is not the variable. Its two
+legs are different generations: `build/m5_stock` is Aug 7, `build/m5_wide` is
+Aug 14 and carries the post-14z-86 M5 voice content. Filed as **#95**.
+**Do not widen a window to green it** — rebuild both legs from one commit and
+re-measure. Until then its verdict means nothing either way.
+
+**Three new tickets, deliberately NOT folded in:** **#93**
+`audit_qs_voice_batch`'s keyon failure (proven pre-existing — identical under
+both input stagings), **#94** `audit_pyron_ring`'s dead `build/pyron22` (the
+FOURTH reference-rot instance, so it asks for a standing check rather than a
+fourth one-line repair), and **#95** above. #94 and #95 are the same class:
+untracked build dirs drifting with nothing to notice.
+
+**Start here next time:** #95 if you want the suite fully green, since it is
+the only red. The 15 other open issues are maintainer-owned (#30/#24/#29,
+#27, #43, #52, #57) or architecture backlog (#47/#48/#49/#50, #69, #71, #46).
+None blocks the re-freeze.
 
 ## Where it stands
 

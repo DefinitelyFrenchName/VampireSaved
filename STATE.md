@@ -1,5 +1,72 @@
 # STATE — living progress log
 
+## Session 14z-94 (7) — THE #74 REVIEW TRIAGE IS CLOSED OUT. Twelve issues
+## this pass; three of them were hiding a second defect underneath.
+
+`#79 #76 #80 #86 #89 #88 #83 #85 #81 #87 #77` fixed and gated, `#10` and
+`#82` verified-and-closed. 38 portable gates green.
+
+**ONE RED, AND IT IS NOT OURS: `test_dualtrack`.** 732 bytes outside its
+named windows against a 14z-59j baseline of 57. Isolated across THREE harness
+builds — pre-#59, pre-#77, current — with byte-identical counts and identical
+first addresses each time, so the harness is not the variable. Its two legs
+are different GENERATIONS: `build/m5_stock` is Aug 7, `build/m5_wide` is
+Aug 14 and carries the post-14z-86 M5 voice content. Filed **#95**; the fix is
+to rebuild both legs from one commit and re-measure, NOT to widen a window.
+
+**THE PATTERN ACROSS THE BATCH.** Almost none of these were wrong logic. They
+were checks that stopped existing under an ordinary condition — an env var, a
+wrong argument, a phantom CLI option, a marker file, a literal constant — and
+in every case the thing that should have caught it was disabled by the same
+stroke. The recurring fix is not "add a check", it is **make the check
+impossible to switch off, and give it a control that fails when it is**.
+
+**THREE FINDINGS WERE HIDING A SECOND DEFECT:**
+
+- **#87** named inert manifest fields. The moment the builder started checking
+  `scatter_hi`, huitzil's row FAILED: 246 placed codes outside the declared
+  bound. His out-of-band inventory is 270 codes in two parts — 24 singleton
+  effect tiles ending exactly at the old bound `0x06D8` (which is why it
+  looked right), plus one contiguous run `0x0A00-0x0AF5` that arrived later
+  and ends at `band_lo - 1`. Re-measured, not widened. **The safety argument
+  was never affected** — `test_gfx_layout3.sh` proves H/P codes stay below
+  `SAFE_LO` independently — and keeping those two apart is now section 5 of
+  the new gate.
+- **#85** named a 60 Hz conversion. The deeper problem was that its **control
+  could not have caught it**: truncating index 0 aims the check at the one
+  window where the drift is smallest. The literal was also duplicated into the
+  control, so the control agreed with the bug instead of catching it.
+- **#81** named tests mutating tracked source. The sharper half was the
+  self-check: it compared the file against a snapshot *that same run* had
+  taken, so a concurrent clobber and a silently-reverted real edit both read
+  as "restored". It asks `git` now.
+
+**TWO DEFECTS WERE LATENT, WHICH IS WHY NOTHING CAUGHT THEM.** #89's fallback
+happened to produce correct ids on every current build (hui43, pyron27,
+m3b_merged9 all carry QSound members byte-identical to a fresh build,
+fingerprint `28912fa5ab1f`), and #51's walker bound was inert on all three
+tenants. Both are real and both currently produce right answers — only one of
+those two facts survives the next placement change.
+
+**MEASURED, NOT ASSUMED, before each landed:** the real `freeze_masked_basis`
+on real MAME reproduces the frozen `masked-v2` log bit-for-bit through the new
+staged publish (#86); the real stage-4 dual-emulator run passes with the four
+meter fields added (#83, MAME anchor 2363 / FBNeo 2364); both delta-0 tenants
+rebuild byte-identical against HEAD and `test_m3a_reproducible` passes all
+four frozen references (#87); both real MAME mirrors are accepted by the new
+guard (#80); all 10 liveness sites and all 5 loop controls still fire on the
+shadow copy (#81).
+
+**THREE NEW TICKETS FILED** for defects found while isolating, rather than
+folded in — #94 and #95 are the same class (untracked build dirs drifting with
+nothing to notice): **#95** the dualtrack generation mismatch above, **#93** `audit_qs_voice_batch`'s keyon-multiset failure (proven
+PRE-EXISTING — identical verdict under both input stagings, missing native
+signature `(13, 20481)`), and **#94** `audit_pyron_ring`'s dead `build/pyron22`
+reference — the FOURTH reference-rot instance this session, so the ticket asks
+for a standing check rather than a fourth one-line repair.
+
+---
+
 ## Session 14z-94 (6) — THE FOUR HIGH-SEVERITY REVIEW FINDINGS CLOSED. Three
 ## of them were switches: an env var, a wrong argument, a phantom CLI option.
 
