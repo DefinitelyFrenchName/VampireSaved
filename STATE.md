@@ -1,5 +1,67 @@
 # STATE — living progress log
 
+## Session 14z-94 (4) — #10 APPLIED, and the blast radius MEASURED: correcting
+## the harness changes what ONE rig makes the game do. One decision pending.
+
+The ten deviant instruments now follow replay.lua (parse `held[fr]`, stage
+`held[frame + 1]`); the census asserts 0 deviant / 22 canonical and still
+carries both deviant-flavour controls. `replay.lua` and `replay_guard.lua`
+were already canonical and are untouched, so NO frozen run_suite expectation
+moves.
+
+**BLAST RADIUS, measured across every gate that drives a changed instrument:**
+
+| gate | instrument | result |
+|---|---|---|
+| test_beam_variants | obj_records_dump | PASS unchanged |
+| test_hui_df_style | obj_records_dump | PASS unchanged |
+| test_tenant_hud | obj_records_dump | PASS unchanged |
+| audit_empty_tiles | obj_records_dump | PASS unchanged |
+| audit_trap_sound | ring_tap | PASS unchanged |
+| audit_voice_borrow | ring_tap + read_tap | RE-DATED -1, then PASS |
+| **audit_trap_parity** | ring_tap | **RED — rig BEHAVIOUR changed** |
+| audit_pyron_ring | ring_tap | cannot run — PRE-EXISTING rot |
+| test_don_sound | ring_tap | PRE-EXISTING MAME teardown segfault |
+| audit_wide_phase_a, audit_qs_voice_batch/wav | objy_bits/unmapped_probe/qs_sweep | NOT RUN (expensive) |
+
+**THE FINDING, and it is why #10 was never cosmetic.** Same rig, same build
+(m3b_merged9), measured both ways:
+
+    old staging: ring id 0621 fires ZERO times in the whole 5000-frame run
+    new staging: ring id 0621 fires at frame 4322, mid-window
+
+A one-frame shift in when a press lands changes which move comes out, so the
+corrected harness produces a DIFFERENT event sequence — not merely different
+timestamps. Every rig authored under the old convention was driving the game
+one frame off what replay.lua-based expectations assume. The native leg is
+unaffected, so this is our side only.
+
+**audit_voice_borrow's re-date was the predicted kind** and is measured, not
+assumed: the plant-end voice 0x6A now fires at 3974, one below the old bound
+3975 — which is exactly what made section 2 report "rig dead". Window widths
+unchanged, both verdict controls still fire.
+
+**DECISION PENDING (maintainer):** re-measure and re-freeze
+`audit_trap_parity`'s inventory under the corrected timing? It was EAR-CONFIRMED
+2026-08-14 ("the trap mine ejection sound is indeed there"), and the standing
+watch says a frozen inventory that GROWS means stop and root-cause — done —
+not widen. The gate stays RED and names the reason in its own source. The
+alternative is to revert #10 and return it to deferred-with-reason, which this
+measurement would at least make evidence-based rather than precautionary.
+
+**TWO PRE-EXISTING FAILURES FOUND WHILE MEASURING, both isolated to NOT be
+mine:**
+- `audit_pyron_ring`'s solo reference `build/pyron22` lacks `vsw.z01/z02`, so
+  MAME refuses it — the FOURTH instance of "a frozen build stops being a usable
+  REFERENCE when the profile bumps" (after hui31, pyron20, pyron17). The gate
+  has been unable to run its solo leg since WIDE v1.1, i.e. since 14z-86.
+  Re-pointing it at a current solo is not a like-for-like swap: pyron22 is
+  pyron-m4 and pyron27 is pyron-m10, so the ring ids legitimately differ and a
+  re-point needs a re-measurement.
+- `test_don_sound` dies on a MAME teardown SIGSEGV. Reproduced IDENTICALLY with
+  the old staging stashed back in, so it predates this work.
+
+
 ## Session 14z-94 (3) — THE CONTESTED PASS: nine closed, two corrected on the
 ## merits, and the rest assessed rather than force-fixed
 
