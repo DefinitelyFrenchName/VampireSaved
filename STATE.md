@@ -1,5 +1,60 @@
 # STATE — living progress log
 
+## Session 14z-94 (9) — #30 CLOSED: there is now ONE pre-commit command, and
+## on its first run it found three gates that had been stale for weeks.
+
+`tests/run_all_static.sh` — 82 gates, **PASS 82 / SKIP 0 / FAIL 0**. ~8 min
+with ROMDIR, ~1 min without. Documented in HANDOFF as THE PRE-COMMIT COMMAND.
+
+**THE GAP WAS NARROWER THAN THE TITLE**, and #30's own handoff said so: not
+"101 orphans" but "no static-gate aggregator". Most orphans are emulator
+soaks and one-off rigs that SHOULD stay manual. What was missing is one
+command for the emulator-free set.
+
+| piece | why |
+|---|---|
+| two tiers — `ci_portable.txt` (39) / `ci_static.txt` (44) | portable runs anywhere; static needs ROMDIR or a build dir, never an emulator |
+| PASS/SKIP/FAIL counted separately, `--strict` | **#29.** A gate whose build dir is absent prints SKIP and exits 0 — counting that as a pass is how a fresh checkout reports green while asserting nothing |
+| registry-coverage check | the actual anti-orphan mechanism. Without it this script just becomes a smaller thing to forget to update |
+| `test_static_runner.sh` | §4: verdict logic is itself tested. Sharpest case: output containing the word SKIP in PROSE must still count PASS |
+
+**THE CLASSIFIER HAD TO BE TRANSITIVE.** `test_fbneo_smoke` reaches FBNeo via
+`tools/run_fbneo.sh`; `test_m2a_stage4_code` reaches MAME by SOURCING
+`tests/lib/m2a_common.sh`. Both were mis-registered as static, and the second
+ran 208 s inside a chain advertised as emulator-free before that was caught.
+
+**THREE STALE GATES FOUND ON THE FIRST FULL RUN** — all red or meaningless
+long before today, all invisible because nothing ran them:
+
+- **`test_census_regions`** — one new `data_in_code` reader, `0x08C038` in the
+  x088512 pod zone, measured `covered=1` AND `raw_emitted=1`: the same benign
+  mechanism as the seven x06cac0 tables that gate already accepts. Re-frozen
+  under its own name (different host region — lumping it in would hide which
+  zone grew) and held to the same covered+raw bar.
+- **`test_voice_row_range`** — defaulted to the PRE-FIX builds, so it asserted
+  *"the frozen builds still carry #92"*. That is history, not a regression
+  check, and it made the gate permanently red — precisely what trains people
+  to ignore a chain. Re-pointed at the shipping builds; the pre-fix pair is
+  kept as the ground-truth control and still FAILS on demand; absent builds
+  now SKIP.
+- **`test_phasec_spaces`** — two stale pins. The stock fingerprint sat at
+  `ae701ffb`, superseded TWICE (14z-64 → `6c93cfa8`, the 2-byte mirror fix;
+  14z-91 → `a054de5c`, which HANDOFF:184 documents as the current stock twin).
+  And it grepped the LITERAL `wide_ext 0x400010` — the extension's allocation
+  CURSOR, not its base — so it reported "extension not available" about an
+  extension with `0x1F9FC0` free. The invariant is the `0x600000` ceiling; the
+  cursor moves as the port grows.
+
+**A FOURTH IS NOT FIXED AND IS FILED AS #96:** `test_m2a_stage4_code`'s
+`06_test_mode` divergence **disappeared** (expected 700, got none) while the
+other two expectations in that section still hold exactly. A build that is
+*more* vanilla-identical than its expectation is not automatically right —
+either the constant is stale or something that should be live went inert, and
+nothing currently distinguishes those. The mechanism gets named before that
+number is touched.
+
+---
+
 ## Session 14z-94 (8) — #95 ROOT-CAUSED: `test_dualtrack` was asserting two
 ## things the project had DELIBERATELY made false, and no runner ran it.
 

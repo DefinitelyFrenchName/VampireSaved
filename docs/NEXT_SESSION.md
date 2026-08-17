@@ -79,11 +79,22 @@ FOURTH reference-rot instance, so it asks for a standing check rather than a
 fourth one-line repair), and **#95**, now CLOSED. #94 remains: audits pinned to
 untracked build dirs with nothing to notice.
 
-**Start here next time: #30** — "50 test scripts are invoked by nothing".
-#95 just showed what that costs: a CLAUDE.md guarantee resting on an
-unexecuted gate that had been red for 11 days. The other open issues are
-maintainer-owned (#24/#29, #27, #43, #52, #57) or architecture backlog
-(#47/#48/#49/#50, #69, #71, #46, #93, #94). None blocks the re-freeze.
+**#30 IS DONE.** There is now ONE pre-commit command:
+
+    ROMDIR=... tests/run_all_static.sh        # 82 gates, PASS 82 / FAIL 0
+
+It counts PASS/SKIP/FAIL separately (#29 — a SKIP is not a pass) and names any
+emulator-free gate that is in neither registry, so the orphan problem cannot
+regrow. On its FIRST full run it found three gates stale for weeks
+(`test_census_regions`, `test_voice_row_range`, `test_phasec_spaces` — all
+fixed, all detailed in STATE 14z-94 (9)) and a fourth now filed as **#96**.
+
+**Start here next time: #96** — `test_m2a_stage4_code`'s `06_test_mode`
+divergence disappeared (expected 700, got none). Either a stale constant or
+something live gone inert; name the mechanism before touching the number.
+The other open issues are maintainer-owned (#24, #27, #43, #52, #57) or
+architecture backlog (#47/#48/#49/#50, #69, #71, #46, #93, #94). None blocks
+the re-freeze.
 
 ## Where it stands
 
