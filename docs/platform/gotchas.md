@@ -928,3 +928,26 @@ Corollary: `alloc(..., fallback=False)` is NOT the way to keep a
 pc-relative table out of raw space. There is nothing to keep it out of —
 `code` is correct in raw space too. Forcing no-fallback instead makes
 every 3-tenant merge fail to generate, because hole_a is full.
+
+## MAME `-aviwrite` is headless-capable but uncompressed (14z-94)
+
+Recording from inside MAME is the right instrument for dating a visual
+event — the captured frames are EMULATED frames, so window frame k is
+replay frame START+k by construction, and the file is reproducible run to
+run. A host screen recorder gives neither.
+
+But `-aviwrite` records the whole run, uncompressed. Measured on the
+arcade rig at CPS-2 resolution: **5.7 GB after roughly two minutes of wall
+time**, still growing, and it slows the run enough that a frame cap you
+believed in stops arriving.
+
+Use `tests/lua/record_window.lua`, which calls
+`manager.machine.video:begin_recording(path, format)` at a named frame and
+`end_recording()` at another. Defaults to MNG (losslessly compressed):
+2.4 MB for 120 frames, whole run 4.5 s. Pass an ABSOLUTE `REC_OUT` —
+a relative name goes through MAME's snapshot-filename substitution and
+lands in the snapshot directory, not where you ran from.
+
+Ground-truth it before reading anything off a recording
+(`tests/test_record_window.sh`): a recorder that drops, duplicates or
+blanks frames still produces a file that plays.
