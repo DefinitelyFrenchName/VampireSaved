@@ -1,5 +1,67 @@
 # STATE — living progress log
 
+## Session 14z-94 FREEZE RECORD — huitzil-m16 / pyron-m10 / merged-m2, the
+## first builds on which no planted tripwire is reachable in extended play
+
+Maintainer authorised the re-freeze and delegated the names ("descriptive" was
+the only constraint), so the existing convention continues: huitzil-m15 ->
+**huitzil-m16**, pyron-m9 -> **pyron-m10**, merged-m1 -> **merged-m2**.
+**donovan-m7 does NOT move** — his manifest never changed and his generator op
+count is unmoved at 285, which is also the control that proves the huitzil
+delta is huitzil-scoped.
+
+| build | fingerprint | dir |
+|---|---|---|
+| huitzil-m16 | `da734d490a4498580ab8ecd1b8709676d6a9e117` | `build/hui43` |
+| pyron-m10 | `e29cac231b1357c87df62a3a278091caad5f7d53` | `build/pyron27` |
+| merged-m2 | `081e2e53c5debff6d2d5bb4d4376d2a1ef6be842` | `build/m3b_merged9` |
+
+**GATES AT FREEZE.** Both solo suites **SUITE GREEN**. Merged:
+`audit_tripwire_reach` END 40620 on all three tenants (with `m3b_merged8` in
+the same run as a LIVE control, CRASH 8887), `audit_merged_legacy`
+**AUDIT-EXIT 0** (leg a 47/47 with 0 NOT-EVALUATED, leg b 6/6 guard-clean),
+`test_merged_render_content`, `audit_trap_parity`, `audit_fg_parity`,
+`audit_select_bank_gates`, `verify_gfx_build` + `check_tenant_hud` on all
+three tenants.
+
+**EXACTLY ONE REPLAY MOVED PER SOLO SET**, and it was attributed before it was
+re-frozen: `37_pick_huitzil_cell` and `40_pick_pyron_cell`, both
+tenant-content self-frozen `.sha1`s. Every legacy `.masked` spec passed
+untouched. Attribution, measured three ways:
+- `hui42` (#91's reconciliation row ALONE) is **byte-identical** to the frozen
+  huitzil-m15 log on that replay — so the entire movement is #92's four bytes
+  and #91's allocator shift costs the replay nothing;
+- at the onset frame 2414, **exactly one byte of 65,536 differs on both
+  tenants: `$FF1E52`, `0x18` -> `0x0a`** — pool index 2, precisely offset
+  `+0x1a`, the group-3 entry;
+- by 2420 it has propagated to two derived bytes (`$FFBC8A`, `$FFBC9F`).
+
+**THIS CORRECTS WHY THE SUITE COULD NOT SEE #92.** The standing explanation
+was "no suite replay is long enough to advance the ladder". It reaches the
+ladder on an ordinary pick replay every run and loads the poisoned value into
+the live pool; what it never does is run long enough for anything to
+DEREFERENCE the resulting pointer. Right about the consequence, wrong about
+the cause.
+
+**Re-freeze was TARGETED, not a blanket `--freeze`:** the two replays only,
+using run_suite's own semantics (two runs, determinism required, whole-log
+sha1 + log copy), with the blast radius verified afterwards as exactly four
+files plus the registry.
+
+**A METHOD TRAP PAID FOR HERE:** my first attribution pass tapped the pool
+with `read_tap.lua` and concluded the two builds were identical. `read_tap` is
+one of the ten `+1` input-staging deviants (GitHub #10), so its "frame 2414"
+is not `replay.lua`'s; the canonical `DUMPS` diff is what settled it. The
+existing gotcha says do not cross-reference frames between the two
+conventions — this is what that costs when you forget.
+
+**OPEN AFTER THE FREEZE:** merged-m2 is **not yet playtested** (the arcade
+ladder is the surface that changed — a run to the Donovan match should
+announce ABARAYA and fight there); #91 and #92 are ready to close on the
+tracker; and the 14z-85f flaky crash reset is newly testable now that #92,
+which Pyron reproduced, is fixed.
+
+
 ## Session 14z-94 — #92 ROOT-CAUSE CORRECTED, FIXED AND VERIFIED: it was
 ## never a voice. It is the ARCADE-LADDER STAGE, and the value vsav cannot
 ## service is REVENGER'S ROOST. Both #91 and #92 clear on the rig that
