@@ -44,14 +44,30 @@ python3 tools/gen_donovan_patch.py "$D_EX" "$OUT/patch" \
 grep -q '^GENERATION OK' "$OUT/gen.log" || {
     echo "FAIL: no GENERATION OK"; tail -15 "$OUT/gen.log"; exit 1; }
 NOPS="$(python3 -c "import json;print(len(json.load(open('$OUT/patch/patch.json'))['ops']))")"
-# RE-FROZEN 14z-86 (was 678): +51 = the M5 voice batch (15 shared
-# alias-thunk pokes + the restored voice farm stubs across the three
-# recon maps). Matches test_tenant_loop's frozen 3-tenant count.
-[ "$NOPS" = 753 ] || {
-    echo "FAIL: $NOPS ops, frozen fixture is 753 (re-freeze"
+# THE EXPECTED COUNT IS DERIVED, NOT COPIED (14z-94). This guard used to
+# carry its own literal while its comment said "Matches test_tenant_loop's
+# frozen 3-tenant count" — two copies of one fact, and they drifted the first
+# time the count moved: re-freezing test_tenant_loop for #91 left this
+# builder still demanding the old number, so the merge stayed blocked with a
+# message telling you to do the thing you had just done. Read it from the
+# gate that owns it, and hard-fail if it cannot be read rather than falling
+# back to a literal — a default here would re-create the drift silently.
+# History: 14z-86 678 -> 729 (the M5 voice batch), 14z-91 -> 753 (the walker
+# relocation), 14z-94 -> 752 (#91's reconciliation row retires one planted
+# ILLEGAL; see test_tenant_loop's RE-FROZEN note for the attribution).
+EXPECT_OPS="$(awk '/^check_n "3 tenants"/ {print $5; exit}' "$REPO/tests/test_tenant_loop.sh")"
+case "$EXPECT_OPS" in
+    ''|*[!0-9]*)
+        echo "FAIL: could not read the frozen 3-tenant op count from"
+        echo "      tests/test_tenant_loop.sh (got '$EXPECT_OPS'). That gate"
+        echo "      owns the number; fix the read rather than hardcoding one."
+        exit 1;;
+esac
+[ "$NOPS" = "$EXPECT_OPS" ] || {
+    echo "FAIL: $NOPS ops, frozen fixture is $EXPECT_OPS (re-freeze"
     echo "      test_tenant_loop FIRST if the merge legitimately changed)"
     exit 1; }
-echo "  ok: 753 ops (the frozen test_tenant_loop fixture; 14z-91 walker relocation)"
+echo "  ok: $NOPS ops (the frozen test_tenant_loop fixture, read from it)"
 python3 tools/patch_prg.py "$ROMDIR/vsavj.zip" "$OUT/prg" \
     --patch "$OUT/patch/patch.json" > "$OUT/patch_prg.log" 2>&1 || {
         echo "FAIL: patch_prg refused the merged patch"

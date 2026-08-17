@@ -141,7 +141,17 @@ echo "== 1: one tenant per run — the frozen op counts =="
 # voice_borrow_site_pad code_word (1 op: the stolen 4th word -> nop) + the
 # two per-tenant [[data_port]] candidate/voice-number table rows (2 ops).
 # All only_variant_slot-gated; the stock twin measured BIT-IDENTICAL.
-FROZEN_1="donovan:285 huitzil:324 pyron:258"
+# RE-FROZEN 14z-94, -1 ON EVERY COUNT THAT INCLUDES HUITZIL (H 324 -> 323,
+# N=2 553 -> 552, N=3 753 -> 752; donovan 285 and pyron 258 UNCHANGED, which
+# is the confirmation that the delta is huitzil-scoped). Cause: GitHub #91's
+# reconciliation row resolves vs2 `0x494de` — a 32-bit divide helper vsavj
+# carries byte-identical at `0x47fb6` — so the planted ILLEGAL tripwire that
+# stood in for it is no longer emitted. Attributed by a content-multiset diff
+# of the merged image before and after: the ONLY blob lost is `4afc` x1, the
+# 68000 ILLEGAL opcode; every other difference is a uniform 0x10 allocator
+# shift as the hole packs tighter. The second number in each check_n (570,
+# 785) is unchanged and was not touched.
+FROZEN_1="donovan:285 huitzil:323 pyron:258"
 for row in $FROZEN_1; do
     who="${row%%:*}"; want="${row##*:}"
     case "$who" in donovan) ex="$D_EX" ;; huitzil) ex="$H_EX" ;; *) ex="$P_EX" ;; esac
@@ -213,8 +223,8 @@ check_n() {  # check_n <label> <dir> <want ops> <sum of 1-tenant counts>
 # +7 at N=2 (3 shared thunk/pad ops deduped + 2 data_port ops per tenant)
 # and +9 at N=3 (3 shared + 2x3 per-tenant), matching the +5-per-solo
 # delta above with the shared rows counted once.
-check_n "2 tenants" "$WORK/two"   553 570
-check_n "3 tenants" "$WORK/three" 753 785
+check_n "2 tenants" "$WORK/two"   552 570
+check_n "3 tenants" "$WORK/three" 752 785
 
 # ── 3: every tenant's own content is present ────────────────────────────
 # An op count alone cannot tell "both tenants ran" from "tenant 0 ran twice".
