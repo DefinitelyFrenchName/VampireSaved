@@ -15,10 +15,11 @@
 # Deterministic and re-derivable from $ROMDIR: each replay runs TWICE on
 # vanilla vsavj and the pair must be bit-identical before it is written.
 #
-# THREE GUARDS, all added 14z-89 when this tool was first used to EXTEND an
-# existing basis rather than create a new one (the legacy-pairing promotion).
-# Extending is the dangerous direction: the names already frozen are not
-# re-run, so nothing else would notice a mask that does not match them.
+# FOUR GUARDS. 1-3 were added 14z-89 when this tool was first used to EXTEND
+# an existing basis rather than create a new one (the legacy-pairing
+# promotion). Extending is the dangerous direction: the names already frozen
+# are not re-run, so nothing else would notice a mask that does not match
+# them. Guard 4 arrived 14z-94 (GitHub #86).
 #   1. MASK RECORD. A basis dir carries its mask in $DEST/MASK. If one is
 #      present and differs from the argument, this REFUSES — the result
 #      would be a silently MIXED basis (some logs under mask A, some under
@@ -33,6 +34,11 @@
 #   3. ENVIRONMENT SCRUB. POKES/DUMPS/SNAP_FRAMES/TAIL_FRAMES/VIDEO_OUT/
 #      INPUT_OUT left exported in a shell would silently change what gets
 #      frozen; they are cleared for the runs.
+#   4. ALL-OR-NOTHING PUBLICATION. The candidate is built in a sibling
+#      staging dir and swapped in by rename only after EVERY requested
+#      replay has passed. A late failure leaves an existing basis
+#      byte-identical and an absent one absent — no mixed generation, which
+#      is the very condition guards 1 and 2 exist to prevent.
 #
 # Usage: ROMDIR=... [JOBS=1] [VERIFY_BASIS=<name>] [BASIS_FORCE_MASK=1] \
 #          tools/freeze_masked_basis.sh <basis-dir> <mask> <replay-name>...
@@ -128,12 +134,39 @@ if [ -n "${VERIFY_BASIS:-}" ]; then
     fi
 fi
 
-mkdir -p "$DEST/logs"
-printf '%s\n' "$MASK" > "$DEST/MASK"
+# guard 4: STAGE, THEN PUBLISH ATOMICALLY (14z-94, GitHub #86).
+#
+# This directory is the oracle trust root: every masked expectation in the
+# suite is compared against it. Writing each log into it as that log passed
+# meant a failure on replay 5 of 8 left FOUR new logs, four old ones and a new
+# MASK behind, under a command that exited 1 — a MIXED-GENERATION basis, which
+# is the exact condition guards 1 and 2 exist to prevent, arriving by a route
+# neither could see. For a new destination it left a partial basis that looks
+# usable.
+#
+# The candidate is built in a SIBLING staging dir (same filesystem, so the
+# final swap is a rename, not a copy) and published only once every requested
+# replay has passed. An existing basis is seeded into staging first, because
+# extending must keep the names that are not being re-frozen.
+STAGE="$(dirname "$DEST")/.$(basename "$DEST").staging.$$"
+mkdir -p "$(dirname "$DEST")"
+rm -rf "$STAGE"
+# On failure the staging dir goes and DEST is never touched. Registered after
+# $WORK's trap so both run; single-quoted so it expands at trap time.
+trap 'rm -rf "$WORK" "$STAGE"' EXIT
+
+if [ -d "$DEST" ]; then
+    cp -R "$DEST" "$STAGE"          # seed: keep names we are not re-freezing
+else
+    mkdir -p "$STAGE"
+fi
+mkdir -p "$STAGE/logs"
+printf '%s\n' "$MASK" > "$STAGE/MASK"
+
 names="$*"
 pool=0
 for name in $names; do
-    freeze_one "$name" "$DEST" &
+    freeze_one "$name" "$STAGE" &
     pool=$((pool + 1))
     if [ "$pool" -ge "$JOBS" ]; then wait; pool=0; fi
 done
@@ -144,4 +177,32 @@ for name in $names; do
     if [ -f "$WORK/out_$name" ]; then cat "$WORK/out_$name"; fi
     if [ -f "$WORK/fail_$name" ]; then fail=1; fi
 done
-[ "$fail" = 0 ] && echo "BASIS FROZEN: $DEST" || { echo "BASIS INCOMPLETE"; exit 1; }
+
+if [ "$fail" != 0 ]; then
+    rm -rf "$STAGE"
+    echo "BASIS INCOMPLETE — nothing published."
+    if [ -d "$DEST" ]; then
+        echo "  $DEST is untouched (still the previous generation)."
+    else
+        echo "  $DEST was not created."
+    fi
+    exit 1
+fi
+
+# Publish. Two renames rather than one because POSIX rename() will not
+# replace a non-empty directory; the old generation is moved aside first and
+# restored if the swap fails, so a crash here cannot leave DEST missing.
+if [ -d "$DEST" ]; then
+    OLD="$DEST.replaced.$$"
+    mv "$DEST" "$OLD"
+    if mv "$STAGE" "$DEST"; then
+        rm -rf "$OLD"
+    else
+        mv "$OLD" "$DEST"
+        echo "PUBLISH FAILED — $DEST restored to the previous generation." >&2
+        exit 1
+    fi
+else
+    mv "$STAGE" "$DEST"
+fi
+echo "BASIS FROZEN: $DEST"
