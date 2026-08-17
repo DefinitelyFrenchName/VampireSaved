@@ -1,13 +1,20 @@
 #!/bin/sh
 # test_m3a_reproducible.sh — the M3b Phase 0 reproducibility gate (14z-65).
 #
-# EVERY frozen reference must rebuild BIT-EXACT from the current tree
-# (the CURRENT four live in the EXPECT_* lines below — this header names
-# them; the dated ladder of superseded fingerprints follows there too):
-#   donovan-m5 (WIDE)   3c599fb676de518606a60b2b4a4c42f80aa7c97b
-#   m5_stock            6c93cfa8a8a80ae2303d3acaf8c7bff487f369c5
-#   huitzil-m13 (WIDE)  2629561cdc50ecd6ca443510a6d96e1116d7a939
-#   pyron-m7   (WIDE)   94ce9a48e0cc8c89a69dd72a58669b072e379988
+# EVERY frozen reference must rebuild BIT-EXACT from the current tree. The
+# CURRENT values live in the EXPECT_* lines below — READ THOSE, not this
+# header: the four names it used to list carried fingerprints superseded
+# several freezes ago (donovan-m5 3c599fb6, m5_stock 6c93cfa8, huitzil-m13
+# 2629561c, pyron-m7 94ce9a48), which is the same stale-copy trap 14z-94
+# found in three other gates. The set is now FIVE:
+#
+#   donovan-m7 (WIDE) | m5_stock2 | huitzil-m16 | pyron-m10   — the solos
+#   merged-m2                                                 — added 14z-94
+#
+# THE MERGED IMAGE IS THE ONE THAT GETS PLAYED. Until 14z-94 nothing asserted
+# that it rebuilds at all, so a playtest bug report would have been about an
+# artifact we could not regenerate. It is skipped, and says so, when its
+# untracked inputs are absent (GitHub #27).
 #
 # EXTENDED 14z-76 from the original pair to all four. This is the standing
 # gate for the M3b multi-tenant refactor and its value scales with the count:
@@ -205,6 +212,53 @@ m3a_manifest m5_stock    "$WORK/m3a_stock/rompath" "$MANI_STOCK"
 m3a_manifest huitzil     "$WORK/huitzil/rompath"   "$MANI_HUI"
 m3a_manifest pyron       "$WORK/pyron/rompath"     "$MANI_PYR"
 
-echo "PASS: all four frozen references rebuild with bit-exact PROGRAM images"
+# ── THE MERGED IMAGE (added 14z-94, at the maintainer's request) ─────────
+# The four verticals above are SOLOS. The merged image — all three tenants in
+# one ROM — is what actually gets played, and until now NOTHING asserted that
+# it rebuilds. It is the artifact a playtest bug report would be about, so
+# being unable to regenerate it byte-for-byte is the expensive gap.
+#
+# Measured 14z-94 before freezing these constants: a scratch rebuild and the
+# shipped build/m3b_merged9 agree on the program fingerprint AND on all 42
+# members (904d432f...), i.e. the merged image reproduces across the whole
+# artifact, not just the 8.1% the program fingerprint covers.
+#
+# SKIPPED, NOT FAILED, when its inputs are absent. build_merged.sh reads three
+# UNTRACKED extract dirs plus the canonical WIDE overlay (GitHub #27: it
+# cannot run from a clean checkout), so on a fresh machine this leg has
+# nothing to check. It says so in the final line rather than staying silent —
+# a section that quietly checks nothing is the SKIP-as-PASS shape (GitHub
+# #29). The gate does NOT print a bare "SKIP:" marker here, because the other
+# four legs did run and tests/run_all_static.sh would otherwise classify the
+# whole gate as skipped.
+EXPECT_MERGED="081e2e53c5debff6d2d5bb4d4376d2a1ef6be842"   # merged-m2, 14z-94
+MANI_MERGED="904d432f6918af045d29bdea8f53420c4de5f87e 42"
+
+MERGED_NEEDS="build/m5_wide/extract build/hui32/extract build/pyron21/extract
+build/wide0/rompath/vsavjw.zip"
+_absent=""
+for _d in $MERGED_NEEDS; do [ -e "$_d" ] || _absent="$_absent $_d"; done
+
+if [ -n "$_absent" ]; then
+    MERGED_STATUS="NOT CHECKED — inputs absent (GitHub #27):$_absent"
+    echo "== merged image: NOT CHECKED"
+    echo "   build_merged.sh needs these and they are missing:$_absent"
+else
+    echo "== rebuild the MERGED image (all three tenants)"
+    tools/build_merged.sh "$WORK/merged" > "$WORK/merged.log" 2>&1 \
+        || { tail -20 "$WORK/merged.log"; echo "FAIL: merged rebuild errored"; exit 1; }
+    _fp="$(python3 tools/build_fingerprint.py "$WORK/merged/rompath;$ROMDIR" \
+        --set vsavjw --sha-only)"
+    [ "$_fp" = "$EXPECT_MERGED" ] || {
+        echo "FAIL: merged fingerprint $_fp != $EXPECT_MERGED"
+        echo "  (the tree no longer reproduces the frozen merged image — the"
+        echo "   build the maintainer playtests cannot be regenerated)"; exit 1; }
+    echo "  ok: merged reproduced ($_fp)"
+    m3a_manifest merged "$WORK/merged/rompath" "$MANI_MERGED"
+    MERGED_STATUS="CHECKED"
+fi
+
+echo "PASS: every frozen reference rebuilds with bit-exact PROGRAM images"
 echo "      (gfx/QSound/key members and the second packed zip are covered by"
 echo "      the manifests above — HARD on content and inventory since 14z-91)"
+echo "      merged image: $MERGED_STATUS"
