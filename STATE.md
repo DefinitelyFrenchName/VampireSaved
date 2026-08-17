@@ -1,5 +1,87 @@
 # STATE — living progress log
 
+## Session 14z-94 (3) — THE CONTESTED PASS: nine closed, two corrected on the
+## merits, and the rest assessed rather than force-fixed
+
+Maintainer: "most of them are low severity and contested on the basis of
+disagreeing on the nature of the issue or the solution." That turned out to be
+exactly right, and the split is the useful output.
+
+**CLOSED — the finding was real and the fix was clear (9):**
+
+| # | verdict |
+|---|---|
+| 61 | CONFIRMED. The mask reader rewound `pos` on a NESTED window and silently UNMASKED bytes. Inert on all seven frozen masks (disjoint+ascending), proven by `test_hui_boot` still reporting masked-v2 EXACT |
+| 62 | CONFIRMED. The baseset/mask invariant was prose only; now enforced per replay AND tree-wide (371 specs, 11 sets) |
+| 51 | CONFIRMED. All three record-walker bounds skipped their last long. Inert on every tenant (15612/15034/14225 tiles, none gained or lost) |
+| 22 | The verifier really was run by nothing — see the correction below |
+| 60 | The census sample was `pairs()`-ordered, i.e. non-reproducible |
+| 66 | A CLI path interpolated into `python3 -c` source |
+| 67 | The last tracked source leaking a personal absolute path |
+| 68 | Nine scripts using a predictable temp dir |
+| 70 | Real duplication — see the correction below |
+
+**TWO FINDINGS CORRECTED ON THE MERITS, and both corrections mattered:**
+
+- **#22 proposed wiring `verify_pcrel_data.py` into the battery. Measurement
+  says that cannot be done.** All three shipping builds report 69/69, 10/10
+  and 10/10 escapes NOT resolving. An escape whose table did not travel with
+  its region resolves elsewhere BY CONSTRUCTION, so a 100% rate on
+  field-confirmed builds means accepted dead paths, not 89 live bugs. Wired in
+  as pass/fail it would be permanently red, i.e. ignored. Frozen as an
+  inventory instead (`build/manifest/pcrel_escapes.toml`), with x06cac0 — the
+  one its docstring records as fixed in 14z-69i — asserted ABSENT, which is
+  what keeps a frozen all-broken list from being a dead one.
+- **#70 proposed making `m2a_common.sh` read the per-set mask. That would
+  answer an open maintainer question by side effect** — it would re-point the
+  M2 battery off the donovan-m2c generation it deliberately targets. The
+  duplication (the same V1 string in two files) is gated instead.
+
+**#20's stated mechanism was also wrong** (recorded in the earlier entry): the
+slice is sized by `len(new)`, so nothing resizes and nothing overruns.
+
+**NOT TAKEN, WITH REASONS — these need either a ruling or a budget:**
+
+- **#52 (compare_flicker's end-of-log exemption) NEEDS A RULING, and the cost
+  of answering it is the finding.** It is a deviation between code+test and
+  the ratified §4 text, so tightening it is a TOLERANCE change — the one thing
+  §4 says may not happen without measured mechanism and sign-off. I tried to
+  measure the blast radius and COULD NOT: masked specs compare a fresh run
+  against the BASIS log, so a set stores no masked log of its own (188 of 188
+  unmeasurable statically). Answering it costs a full suite pass per set.
+  Note also §4 v5 already engaged with the >=60 rule's scope
+  (`--min-converge-flicker`, default-off), so the ratified text is more
+  nuanced than "no end-of-log exception".
+- **#50 (gen_donovan_patch.main is 5,408 lines) is TRUE and is not a
+  late-session job.** It is the most load-bearing file in the tree; extracting
+  ~15 op-kind handlers deserves its own session with m3a_reproducible run
+  between each extraction.
+- **#46, #47, #48, #49, #69, #71** — all real duplication/architecture debt,
+  all requiring a rebuild + reproducibility pass per change. Ranked by value:
+  #48 (the untested copies WRITE a proposed wheel table) > #49 (three
+  implementations of the paid-for byte-order lesson) > #47 (19 copies of the
+  cell formula) > #71 > #46 > #69.
+- **#57 (integrity baseline read from live ports)** — real: an input stuck
+  from boot leaves no divergence signature and is the one pattern the check
+  cannot see. Wants a known-idle reference frame; doable, needs care.
+- **#59 (FBNeo applies POKES before the frame, MAME after)** — real, and it
+  matters because the dual-emulator oracle only means anything if both
+  harnesses present identical inputs at identical emulated frames. Touches the
+  FBNeo harness patch (frontend-only, so inside Rule 1) and needs the xemu
+  gates re-run.
+
+**SUITE: +7 gates**, four of them ROM-free and in ci_portable
+(test_baseset_mask_invariant, test_m2a_mask_pin, test_record_walk_bounds, plus
+the earlier batch). Tracker **48 -> 30 open** across the whole session.
+
+**A GOTCHA THAT COST REAL TIME HERE:** a SAME-LENGTH source edit can leave
+Python running stale bytecode — CPython keys `__pycache__` on (mtime, size),
+and `end - 2` -> `end - 4` changes neither within the same second. Three
+consecutive runs measured pre-edit bytecode while the source on disk read the
+fix, and it cleared only when a probe changed the file's LENGTH.
+`PYTHONDONTWRITEBYTECODE=1` does not help: it stops writing, not reading.
+
+
 ## Session 14z-94 (2) — THE NO-RULING BACKLOG CLEARED: eight findings fixed
 ## and gated, tracker 48 -> 38 open
 
