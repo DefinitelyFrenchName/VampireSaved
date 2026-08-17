@@ -2159,6 +2159,11 @@ swallows the rest of the list, which is how a 32-entry run silently became 28.
 | `test_mame_mirror_guard.sh` | #80 | `rsync --delete` runs only in a directory `setup_mame.sh` owns. Guard is EXTRACTED from the shipped script between markers, never copied. |
 | `test_basis_publish_atomic.sh` | #86 | A masked basis publishes whole or not at all. Drives the REAL script symlinked into a fake repo with a stubbed MAME runner. |
 | `test_qs_ledger_binding.sh` | #89 | QSound audit ids come from a ledger fingerprint-bound to the artifact under test, never rebuilt from `build/wide0`. |
+| `test_freeze_retires_diverge.sh` | #88 | `--freeze` retires a superseded `.diverge` instead of leaving it to shadow the new `.sha1`. |
+| `test_meter_in_field_map.sh` | #83 | The dual-emulator oracle actually compares meter, bound to `ram.md`. |
+| `test_qs_wav_timebase.sh` | #85 | The WAV audit converts frames at the CPS rate (59.6374 Hz), not 60. |
+| `test_no_tracked_mutation.sh` | #81 | No test writes into `tools/`; controls perturb a `shadow_tools.sh` copy. |
+| `test_gfx_layout_fields_live.sh` | #87 | `gfx_layout3.toml`'s profile/scatter fields are enforced, not decorative. |
 | `test_record_walk_bounds.sh` | #51 | Both record walkers examine the last long that fits. |
 | `test_pcrel_escapes.sh` | #22 | The pc-rel DATA-escape set is unchanged since reviewed. **Not portable** — needs builds + `vsav2_data.bin`. |
 | `test_baseset_mask_invariant.sh` | #62 | Every `.masked` spec cites a basis frozen under its own mask. |
@@ -2174,6 +2179,13 @@ swallows the rest of the list, which is how a 32-entry run silently became 28.
 | `test_fbneo_overlay_hygiene{,_control}.sh` | 14z-94 | FBNeo overlay hygiene (`_control` is its must-fire control) |
 | `test_record_window.sh` | 14z-94 | the windowed MNG recorder (2.4 MB/120 frames vs `-aviwrite`'s 5.7 GB/2 min). **Not portable.** |
 | `test_decode_stage_banners.sh` | #92 | the stage-banner decoder — incl. the control requiring a base-as-ANCHOR decode to FAIL LOUDLY. **Not portable.** |
+
+**One helper worth knowing about:** `tests/lib/shadow_tools.sh` gives a test a
+WRITABLE copy of a tool inside a throwaway repo ROOT. The root matters —
+`gen_donovan_patch.py` resolves the repo from `Path(__file__).parent.parent`
+and imports its siblings off its own directory, so a bare `/tmp` copy finds
+neither its manifests nor `cps2_decrypt`. Use it for any control that must
+perturb a tool; never edit tracked source from a test.
 
 **Two tools that now exist because of this batch:** `tools/qs_ledger.py`
 (resolve the voice ledger BOUND to a romset — the audits call it instead of
