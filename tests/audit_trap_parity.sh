@@ -81,6 +81,20 @@ W = sys.argv[1]
 # attempts at f3416/f4216): event ids inside the two attempt windows,
 # ambient 0x049A excluded. Native re-derives the reference every run.
 WINDOWS = [(3400, 3900), (4200, 4700)]
+# RED SINCE 14z-94, AND DELIBERATELY NOT RE-FROZEN (GitHub #10). Unifying the
+# input-staging convention moved every scripted press one frame earlier, and
+# on this rig that does not merely re-date events — it changes WHAT THE GAME
+# DOES. Measured both ways on build/m3b_merged9, same rig, same build:
+#   old staging: ring id 0621 fires ZERO times in the whole 5000-frame run
+#   new staging: ring id 0621 fires at frame 4322, mid-window
+# so `ours` gains one id over the frozen inventory. The NATIVE leg is
+# unaffected.
+#
+# This inventory was EAR-CONFIRMED by the maintainer (2026-08-14, "the trap
+# mine ejection sound is indeed there"), so re-freezing it is a maintainer
+# decision, not a re-measurement anyone may take. The standing watch applies:
+# a frozen inventory that GROWS means stop and root-cause — done, above — not
+# widen. Until it is ruled on, this gate stays RED and names why.
 # Per-window frozen inventories (both windows measured, not assumed
 # equal — ours' attempt 2 also carries an 0117/00f3 pair, an ordinary
 # engine event on that leg's timeline).

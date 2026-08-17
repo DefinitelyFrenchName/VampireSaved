@@ -4,20 +4,16 @@
 -- index_watch.lua. Needs `-debug -debugger none` (run_mame.sh passes extra
 -- args through).
 --
--- INPUT-STAGING CONVENTION (banner added 14z-93, GitHub issue #10). This
--- header used to say it "Combines tap_writes.lua's replay/POKES playback",
--- which is NOT TRUE of the input timing and is one of the three claims the
--- issue asks to be retracted: tap_writes.lua parses `held[fr]` (:83) while
--- this file parses `held[fr + 1]` (:89-90). Both then stage
--- `held[frame + 1]`, so a script line N is live during emulated frame N+1
--- here and during frame N under replay.lua — a ONE-FRAME LATE shift.
--- DO NOT cross-reference a frame number from this log with a compare_*
--- first-divergence, a masked window onset, or replay.lua's checksum log:
--- they are one frame apart and nothing else says so.
--- The fix is one line (parse `held[fr]`), but it must move together with
--- re-deriving the frame constants of every consuming gate, which were
--- tuned UNDER this convention — see docs/project/gotchas.md, "Half the Lua
--- instruments stage inputs one frame off replay.lua".
+-- INPUT STAGING IS CANONICAL (GitHub #10, unified 14z-94). This instrument
+-- follows tests/lua/replay.lua exactly: parse `held[fr]`, stage for the NEXT
+-- frame (`held[frame + 1]`). So a frame number in this log IS a replay.lua
+-- frame number and CAN be cross-referenced with a compare_* first divergence,
+-- a masked window onset or a checksum log.
+--
+-- It was one of the ten `+1` deviants until 14z-94. The split is now pinned
+-- at ZERO by tests/test_replay_stage_census.sh, which fails any new
+-- instrument that copies the old flavour — that is how the drift spread:
+-- one variant, then every later file copying the copy.
 --
 --   env REPLAY     input script (replay.lua format)
 --   env POKES      "frame:addr:hexbytes;..." (same as replay.lua)
@@ -101,8 +97,8 @@ if replay_path then
                             local fldo = FIELDS[who][toks:sub(i, i + step - 1)]
                             if fldo then
                                 for fr = tonumber(a), tonumber(b) do
-                                    held[fr + 1] = held[fr + 1] or {}
-                                    table.insert(held[fr + 1], fldo)
+                                    held[fr] = held[fr] or {}
+                                    table.insert(held[fr], fldo)
                                 end
                             end
                         end

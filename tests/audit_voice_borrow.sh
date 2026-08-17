@@ -96,7 +96,7 @@ print("  static facts hold; node-13 family:", ' '.join(f'{x:04x}' for x in sorte
 EOF
 
 echo "== section 1: serialized borrow write + dispatcher read (one run)"
-REPLAY="$RPL" POKES="$PK" RTAP="ff8782,2" WINDOW="3985,4005" FRAMES=4050 \
+REPLAY="$RPL" POKES="$PK" RTAP="ff8782,2" WINDOW="3984,4004" FRAMES=4050 \
 TRACE_OUT="$WORK/rt.txt" MAME_SANDBOX="$WORK/sbx1" \
 MAME_ROMPATH="$PWD/$BUILD/rompath;$ROMDIR" \
   tools/run_mame.sh vsavjw -autoboot_script tests/lua/read_tap.lua \
@@ -140,6 +140,13 @@ else:  # own-class (the shipped option-(b) fix, 14z-87)
     print(f"  own-class shape holds (no borrow; {len(R)} window reads all 0x13). OK")
 EOF
 
+# FRAME CONSTANTS RE-DATED -1 (14z-94, GitHub #10). Both windows here were
+# tuned while ring_tap.lua and read_tap.lua staged inputs one frame off
+# replay.lua; unifying the convention moved every scripted press one frame
+# earlier, so the events they bracket moved with it. MEASURED, not assumed:
+# the plant-end voice id 0x6A now fires at frame 3974, one frame below the
+# old lower bound 3975 — which is what made section 2 report "rig dead".
+# The window WIDTHS are unchanged; only the origin moved.
 echo "== section 2: output level — ring window membership"
 REPLAY="$RPL" POKES="$PK" FULL=1 FRAMES=4100 TRACE_OUT="$WORK/ring.txt" \
 MAME_SANDBOX="$WORK/sbx2" MAME_ROMPATH="$PWD/$BUILD/rompath;$ROMDIR" \
@@ -152,7 +159,7 @@ def check(path, fam, expect):
     ids=[]
     for ln in open(path):
         m=re.match(r'f(\d+) id (\w+)',ln)
-        if m and 3975<=int(m.group(1))<=4030:
+        if m and 3974<=int(m.group(1))<=4029:
             i=int(m.group(2),16)
             if i not in (0x498,0x49A,0,0xFFFF): ids.append(i)
     assert ids, "no ids in the plant-end window — rig dead (liveness)"

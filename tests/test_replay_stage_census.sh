@@ -42,13 +42,22 @@ fail=0
 python3 - <<'PY' || fail=1
 import glob, os, re, sys
 
-# The frozen split (measured 14z-93; identical to the census in GitHub #10).
-DEVIANT = {
+# UNIFIED 14z-94: the split is now ZERO. Every replay-driving instrument
+# parses `held[fr]` and stages `held[frame + 1]`, so a frame number from any
+# of their logs is a replay.lua frame number.
+#
+# The ten that were deviant, kept as history so a REGRESSION names itself
+# rather than appearing as an anonymous new file: bp_regs, obj_records_dump,
+# objy_bits, qs_sweep, qs_table_trace, qs_z80_trace, read_tap, ring_tap,
+# snapshot_frames, unmapped_probe. Eight staged `held[frame]`; two parsed
+# `held[fr + 1]`.
+FORMERLY_DEVIANT = {
     "bp_regs.lua", "obj_records_dump.lua", "objy_bits.lua", "qs_sweep.lua",
     "qs_table_trace.lua", "qs_z80_trace.lua", "read_tap.lua", "ring_tap.lua",
     "snapshot_frames.lua", "unmapped_probe.lua",
 }
-EXPECT_DEVIANT = int(os.environ.get("EXPECT_DEVIANT", str(len(DEVIANT))))
+DEVIANT = set()
+EXPECT_DEVIANT = int(os.environ.get("EXPECT_DEVIANT", "0"))
 
 
 def strip_comments(s):

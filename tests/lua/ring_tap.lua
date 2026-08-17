@@ -1,20 +1,16 @@
 -- log every sound id enqueued into the 68k ring (FF0E0E, 16B entries),
 -- with frame + PC of the writer. env: REPLAY, FRAMES, TRACE_OUT, WINDOW
 --
--- INPUT-STAGING CONVENTION (banner added 14z-93, GitHub issue #10). This
--- instrument stages inputs at the START of the frame callback
--- (`prev = held[frame]`, :90), whereas tests/lua/replay.lua stages for the
--- NEXT frame at the END (`held[frame + 1]`). A script line N is therefore
--- live during emulated frame N+1 here and during frame N there — a
--- ONE-FRAME LATE shift. It matters for this instrument because its output
--- IS frame-addressed (WINDOW=a,b) and audit_pyron_ring / audit_trap_sound /
--- audit_voice_borrow pin windows against it. DO NOT cross-reference a frame
--- number from this log with a compare_* first-divergence, a masked window
--- onset, or replay.lua's checksum log.
--- The fix is one line (stage `held[frame + 1]`), but it must move together
--- with re-deriving those pinned windows, which were tuned UNDER this
--- convention — see docs/project/gotchas.md, "Half the Lua instruments stage
--- inputs one frame off replay.lua".
+-- INPUT STAGING IS CANONICAL (GitHub #10, unified 14z-94). This instrument
+-- follows tests/lua/replay.lua exactly: parse `held[fr]`, stage for the NEXT
+-- frame (`held[frame + 1]`). So a frame number in this log IS a replay.lua
+-- frame number and CAN be cross-referenced with a compare_* first divergence,
+-- a masked window onset or a checksum log.
+--
+-- It was one of the ten `+1` deviants until 14z-94. The split is now pinned
+-- at ZERO by tests/test_replay_stage_census.sh, which fails any new
+-- instrument that copies the old flavour — that is how the drift spread:
+-- one variant, then every later file copying the copy.
 local out_path=os.getenv("TRACE_OUT") or "ring.txt"
 local max_frames=tonumber(os.getenv("FRAMES") or "3600")
 local wa,wb=(os.getenv("WINDOW") or "0,99999999"):match("^(%d+),(%d+)$")
@@ -102,7 +98,7 @@ emu.register_frame_done(function()
         end
     end
     for _,fo in ipairs(prev) do fo:set_value(0) end
-    prev=held[frame] or {}
+    prev=held[frame + 1] or {}
     for _,fo in ipairs(prev) do fo:set_value(1) end
     if frame>=max_frames then f:write("END\n"); f:close(); manager.machine:exit() end
 end)

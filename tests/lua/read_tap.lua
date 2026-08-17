@@ -72,19 +72,16 @@ space:add_change_notifier(function()
 end)
 
 -- replay + pokes playback.
--- INPUT-STAGING CONVENTION (14z-90, GitHub issue #10; direction corrected
--- and marker added 14z-93). NOT a verbatim subset of tap_writes.lua — that
--- claim is RETRACTED: tap_writes.lua parses `held[fr]` and stages
--- `held[frame + 1]` like replay.lua, whereas this file parses into
--- `held[fr + 1]` and then stages `held[frame + 1]`.
--- THE EFFECT IS ONE FRAME LATE, not early: a script line N is live during
--- emulated frame N+1 here and during frame N under replay.lua. (The
--- previous wording, "parses and stages one frame earlier", described where
--- the value is written rather than when the press lands, and reads as the
--- opposite of what happens.)
--- Its consumer audit_voice_borrow pins WINDOW="3985,4005", measured under
--- THIS convention — so the one-line fix (parse `held[fr]`) must move
--- together with re-deriving that window.
+-- INPUT STAGING IS CANONICAL (GitHub #10, unified 14z-94). This instrument
+-- follows tests/lua/replay.lua exactly: parse `held[fr]`, stage for the NEXT
+-- frame (`held[frame + 1]`). So a frame number in this log IS a replay.lua
+-- frame number and CAN be cross-referenced with a compare_* first divergence,
+-- a masked window onset or a checksum log.
+--
+-- It was one of the ten `+1` deviants until 14z-94. The split is now pinned
+-- at ZERO by tests/test_replay_stage_census.sh, which fails any new
+-- instrument that copies the old flavour — that is how the drift spread:
+-- one variant, then every later file copying the copy.
 local held = {}
 local replay_path = os.getenv("REPLAY")
 local FIELDS = nil
@@ -121,8 +118,8 @@ if replay_path then
                             local fldo = FIELDS[who][toks:sub(i, i + step - 1)]
                             if fldo then
                                 for fr = tonumber(a), tonumber(b) do
-                                    held[fr + 1] = held[fr + 1] or {}
-                                    table.insert(held[fr + 1], fldo)
+                                    held[fr] = held[fr] or {}
+                                    table.insert(held[fr], fldo)
                                 end
                             end
                         end

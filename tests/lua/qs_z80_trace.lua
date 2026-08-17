@@ -29,17 +29,16 @@
 --   env DASM     "file:start:len" (hex start/len) — also emit a decrypted
 --                disassembly of the Z80 fixed ROM, e.g. "zdasm.txt:0:8000"
 --   env FRAMES   hard stop (default 3600)
--- INPUT-STAGING CONVENTION (14z-90, GitHub issue #10). This instrument
--- stages inputs at the START of the frame callback (`prev = held[frame]`),
--- whereas tests/lua/replay.lua stages for the NEXT frame at the END
--- (`held[frame + 1]`). The two therefore land a given press on DIFFERENT
--- frames. That is tolerable here only because this instrument is a PASSIVE
--- OBSERVER — a tap/census whose output is "what happened", not "what
--- happened at replay.lua's frame N". DO NOT cross-reference a frame number
--- from this log with a compare_* first-divergence, a masked window onset, or
--- replay.lua's checksum log: they are one frame apart. Unifying the two
--- conventions would re-date the frozen frame constants in this instrument's
--- consuming gates and is deferred until after the legacy re-freeze.
+-- INPUT STAGING IS CANONICAL (GitHub #10, unified 14z-94). This instrument
+-- follows tests/lua/replay.lua exactly: parse `held[fr]`, stage for the NEXT
+-- frame (`held[frame + 1]`). So a frame number in this log IS a replay.lua
+-- frame number and CAN be cross-referenced with a compare_* first divergence,
+-- a masked window onset or a checksum log.
+--
+-- It was one of the ten `+1` deviants until 14z-94. The split is now pinned
+-- at ZERO by tests/test_replay_stage_census.sh, which fails any new
+-- instrument that copies the old flavour — that is how the drift spread:
+-- one variant, then every later file copying the copy.
 
 local ids = {}
 for tok in (os.getenv("IDLIST") or "119"):gmatch("[^,]+") do
@@ -138,7 +137,7 @@ local prev = {}
 emu.register_frame_done(function()
     frame = frame + 1
     for _, fo in ipairs(prev) do fo:set_value(0) end
-    prev = held[frame] or {}
+    prev = held[frame + 1] or {}
     for _, fo in ipairs(prev) do fo:set_value(1) end
     local k = n + 1
     if k <= #ids then
