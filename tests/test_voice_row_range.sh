@@ -42,7 +42,8 @@ cd "$REPO"
 [ -f build/out/vsavj_data.bin ] || { echo "SKIP: need build/out/vsavj_data.bin"; exit 0; }
 BUILDS="${BUILDS:-build/hui41:0x10 build/pyron26:0x11 build/don_m7:0x13 build/hui42:0x10}"
 
-BUILDS="$BUILDS" python3 - <<'PY' || exit 1
+rc_b=0
+BUILDS="$BUILDS" python3 - <<'PY' || rc_b=$?
 import json, os, sys
 
 VD = open("build/out/vsavj_data.bin", "rb").read()
@@ -120,6 +121,143 @@ if seen == 0:
     rc = 1
 sys.exit(rc)
 PY
+
+# ── SECTION B — TABLE A, the CLASS half ────────────────────────────────────
+# Added 14z-94. The section above audits table B only, on the stated ground
+# that "table A holds class ids, a different space". True, and it left that
+# space unaudited — while the authored rows introduce classes 0x11 and 0x13,
+# which vanilla vsavj never emits. That is the same shape as #92 (a vs2 value
+# in a vsavj table), so it gets measured rather than assumed benign.
+#
+# It runs BEFORE the verdict is combined, and its own status is separate:
+# while #92 is open section A is RED BY DESIGN, and a section that only ran
+# on section A's success would never execute at all.
+#
+# THE BOUNDS ARE DERIVED, and they are two different bounds:
+#   structural — the ladder tables are (TB - TA) / 0x40 rows; a class C
+#                indexes row C of BOTH (C<<6), so C outside that count reads
+#                another table's bytes;
+#   mask       — the selector does `btst d1,d2` with d2 = $FF8110.l, and a
+#                data-register btst takes the bit number MOD 32, so a class
+#                >= 32 silently aliases another class's in-use bit.
+# The mask bound is the tighter one and is the one that matters.
+#
+# TWO MARKER VALUES ARE NOT CLASSES, both measured over all 36 vanilla rows:
+#   0x18 at group index 7 — universal, every row, every group. Never scanned
+#        (the bound $FF8138 measured 6), so it is a sentinel, not a class.
+#   0xff — appears ONLY as entire rows 0x0b and 0x1b (56 bytes each, all of
+#        indices 0-6), never mixed into a real ladder. An empty-slot marker.
+#        Class 0x0b is also absent from every other row's candidates.
+rc_a=0
+BUILDS="$BUILDS" python3 - <<'PY' || rc_a=$?
+import json, os, sys
+
+VD = open("build/out/vsavj_data.bin", "rb").read()
+TA, TB = 0x00B268, 0x00BB68
+NROWS = (TB - TA) // 0x40        # structural bound, derived
+MASKW = 32                       # btst Dn,Dm is mod 32
+SENTINEL, EMPTY = 0x18, 0xFF
+
+# The set of classes the port INTRODUCES, frozen. A pass means "unchanged
+# since reviewed" (the shared_writes doctrine), not "any new class is safe":
+# a new entry here forces someone to establish what it indexes.
+#
+# It is the three TENANT classes, and it is three rather than two because
+# this check caught its author: the set was first frozen as {0x11, 0x13}
+# from the Huitzil and Pyron rows alone, and Donovan's row introduces 0x10
+# (he schedules Phobos). Each tenant's ladder names the OTHER tenants, so
+# any subset smaller than the roster is an accident of which rows you read.
+INTRODUCED = {0x10, 0x11, 0x13}
+
+print()
+print(f"  derived: {NROWS} ladder rows ({NROWS:#04x}); mask width {MASKW}")
+
+rc = 0
+# ---- vanilla's own shape, as the cross-check ------------------------------
+van = {}
+for c in range(NROWS):
+    r = VD[TA + (c << 6): TA + (c << 6) + 64]
+    for g in range(8):
+        for i in range(8):
+            van.setdefault(i, set()).add(r[g * 8 + i])
+if van[7] != {SENTINEL}:
+    print(f"  FAIL: index 7 is not uniformly {SENTINEL:#04x} across vanilla "
+          f"({sorted(van[7])}) — the sentinel model is wrong")
+    rc = 1
+else:
+    print(f"  ok: vanilla index 7 is {SENTINEL:#04x} in all {NROWS} rows")
+
+ff_rows = [c for c in range(NROWS)
+           if all(VD[TA + (c << 6) + g * 8 + i] == EMPTY
+                  for g in range(8) for i in range(7))]
+ff_total = sum(VD[TA + (c << 6): TA + (c << 6) + 64].count(EMPTY)
+               for c in range(NROWS))
+if ff_total != len(ff_rows) * 56:
+    print(f"  FAIL: {EMPTY:#04x} appears outside whole-empty rows "
+          f"({ff_total} bytes vs {len(ff_rows)} full rows) — it is not just "
+          "an empty-slot marker, so the exemption below is unsafe")
+    rc = 1
+else:
+    print(f"  ok: {EMPTY:#04x} confined to whole rows "
+          f"{[hex(c) for c in ff_rows]} — empty-slot marker")
+
+# ---- every authored table-A row must obey both bounds ---------------------
+seen = 0
+for spec in os.environ["BUILDS"].split():
+    d, cls = spec.rsplit(":", 1)
+    cls = int(cls, 16)
+    pj = os.path.join(d, "patch", "patch.json")
+    if not os.path.exists(pj):
+        continue
+    want = TA + (cls << 6)
+    for o in json.load(open(pj))["ops"]:
+        a = o.get("addr")
+        if not isinstance(a, str) or int(a, 16) != want:
+            continue
+        h = bytes.fromhex(o["hex"])
+        seen += 1
+        bad_sent = [g for g in range(8) if h[g * 8 + 7] != SENTINEL]
+        over = [(i, v) for i, v in enumerate(h)
+                if v != EMPTY and i % 8 != 7 and v >= MASKW]
+        new = {v for i, v in enumerate(h)
+               if i % 8 != 7 and v != EMPTY and v not in van[i % 8]}
+        if bad_sent:
+            print(f"  FAIL {d} row {cls:#04x}: groups {bad_sent} do not end "
+                  f"in the {SENTINEL:#04x} sentinel")
+            rc = 1
+        if over:
+            print(f"  FAIL {d} row {cls:#04x}: {len(over)} class(es) >= "
+                  f"{MASKW} — the in-use bit aliases another class")
+            print("        " + ", ".join(f"+{i:#04x}={v:#04x}" for i, v in over[:8]))
+            rc = 1
+        if new - INTRODUCED:
+            print(f"  FAIL {d} row {cls:#04x}: introduces class(es) "
+                  f"{sorted(hex(v) for v in new - INTRODUCED)} that vanilla "
+                  "never emits and that are NOT in the reviewed set")
+            rc = 1
+        if not (bad_sent or over or (new - INTRODUCED)):
+            extra = sorted(hex(v) for v in new)
+            print(f"  ok   {d} row {cls:#04x}: sentinels intact, all classes "
+                  f"< {MASKW} with rows in both tables; introduces {extra}")
+
+if seen == 0:
+    print("  FAIL: no authored table-A rows found — nothing measured")
+    rc = 1
+sys.exit(rc)
+PY
+
+echo
+if [ "${rc_a:-0}" -ne 0 ]; then
+  echo "FAIL (table A): see section B above."
+fi
+if [ "${rc_b:-0}" -ne 0 ]; then
+  echo "FAIL (table B): the #92 stage values are still out of range."
+  echo "  Those four offsets per tenant select class 0x13 (Donovan) at stage"
+  echo "  0x18 = REVENGER'S ROOST, which vsav does not have. The value space"
+  echo "  is named by tools/decode_stage_banners.py; the replacement is a"
+  echo "  maintainer decision because the stage is visible in arcade mode."
+fi
+[ "${rc_a:-0}" -eq 0 ] && [ "${rc_b:-0}" -eq 0 ] || exit 1
 
 echo
 echo "PASS: every authored voice row stays inside vanilla's value range."
