@@ -1,29 +1,53 @@
-# NEXT SESSION — orientation (written at the close of 14z-94, 2026-08-17)
+# NEXT SESSION — orientation (written at the close of 14z-94, 2026-08-18)
 
-> ## **THE #74 REVIEW TRIAGE IS CLOSED OUT (14z-94).** Thirteen issues this
-> ## pass — every HIGH and every MEDIUM in the #76-#89 batch, plus #77 —
-> ## fixed, gated, committed. **38 portable gates green**, run them with:
+> ## **THE MERGED-M2 PLAYTEST IS IN: NO REGRESSION — and ONE CRASH.**
+> ## Maintainer, 2026-08-18, `build/m3b_merged9` on MAME.
 > ##
-> ##     while read g; do tests/$g.sh </dev/null; done < tests/ci_portable.txt
+> ## **START HERE: GitHub #99**, a crash-reset in the 5th arcade match —
+> ## Donovan vs Phobos (CPU), at fight start, reached by continuing with a
+> ## character switch after losing as Phobos. HUD was up; it died at or
+> ## around the round-1 announce, so MATCH SETUP COMPLETED.
 > ##
-> ## **Close stdin.** A gate that reads it swallows the rest of the list —
-> ## that is how a 32-entry run silently became 28.
+> ## The issue carries a DESIGNED EXPERIMENT, not a hunt: force
+> ## `$FF8114`=2 (Donovan's row group 0 index 2 = Phobos) to schedule the
+> ## matchup in match 1 and see whether it crashes WITHOUT the continue
+> ## history. Cheap test first; the five-match path only if that is clean.
 > ##
-> ## **#91 AND #92 REMAIN FIXED AND FULLY GATED**, on the solos and on the
-> ## merged image, each verified against a LIVE crash on its pre-fix build.
-> ##
-> ## **THE FREEZE IS DONE — what remains is the PLAYTEST.** Corrected
-> ## 14z-94: earlier notes called this "the re-freeze is still the
-> ## maintainer's call", which understated it. `huitzil-m16` (`da734d49`)
-> ## and `pyron-m10` (`e29cac23`) have registry rows, expectation sets AND
-> ## freeze tags; `merged-m2` (`081e2e53`) has its tag and NO registry row
-> ## ON PURPOSE (same as merged-m1). HANDOFF's row says **NOT YET
-> ## PLAYTESTED**, and that is the only open item.
-> ##
-> ## Nothing is at risk while it waits: all five references rebuild
-> ## BIT-EXACT, merged included since 14z-94 — program fingerprint AND all
-> ## 42 members (`904d432f`). A bug found in play can be bisected against
-> ## the exact artifact.
+> ## **Already excluded by measurement, do not re-derive:** the ladder
+> ## schedules Phobos BY DESIGN, and the sfx table's tenant rows are
+> ## present and well-formed in the WIDE extension. This is NOT the
+> ## #91/#92 out-of-range shape.
+
+## What the playtest confirmed
+
+- **#92's fix landed as designed in the field** — "Donovan is met on
+  Bishamon's stage", and `v=0x0a` decodes to ABARAYA, the ratified retarget.
+- **The round-end flicker was NOT observed.** That question was open from
+  before this session.
+- No regression otherwise.
+
+## The other two findings
+
+- **#100 (LOW, cosmetic):** the next-stage screen shows Donovan with a Victor
+  name and a blank portrait. `0x13 & 0x0F == 0x03` — a 4-bit mask on the
+  class would do exactly that, and `ram.md:89` already records the ladder's
+  in-use mask aliasing MOD 32, so MOD 16 in the display path is plausible
+  rather than coincidental. **Unmeasured.** May share a mechanism with #99,
+  and it is observable ON DEMAND, which usually makes it the cheaper end to
+  pull first.
+- **Phobos' electrocuted sfx "might be wrong"** — the maintainer's own caveat
+  is that it needs checking against vs2 and is likely not a regression. It
+  lines up with **#93** and **#98**, both already open and both "a sound that
+  should fire does not". Check natively before treating it as a third
+  finding.
+
+## Coverage gap the crash exposed
+
+`tests/replays/` has **no tenant-vs-tenant replay at all**, while CLAUDE.md §4
+mandates "vs each of the 18 (both sides)" for a ported character. The arcade
+marathon is a SINGLE-CREDIT Donovan soak, so it cannot reach a continue, a
+character switch, or a tenant opponent. That rig belongs in the suite whatever
+#99 turns out to be.
 
 ## What changed in the triage, in one screen
 
