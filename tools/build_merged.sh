@@ -19,6 +19,17 @@ REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"
 WIDE_ZIP="${WIDE_ROMSET:-$PWD/build/wide0/rompath/vsavjw.zip}"
 
+# CLAUDE.md §3 IS NOT OPTIONAL FOR THE SECOND BUILDER EITHER (14z-94,
+# GitHub #28). This script reads $ROMDIR at five points — the generator's
+# --vsavj, patch_prg, build_gfx_donovan and pack_build — and used to run no
+# checksum gate at all, so pointing ROMDIR at a different vsav revision or a
+# re-dumped/renamed zip produced a complete 3-tenant artifact with no
+# complaint. The only downstream tell was a fingerprint matching nothing, and
+# this script prints that as information rather than checking it. Same guard
+# tools/build_donovan.sh:81 already carried; it was simply never carried over.
+python3 tools/audit_roms.py "$ROMDIR" > /dev/null || {
+    echo "ROM audit FAILED — stop (CLAUDE.md §3)"; exit 1; }
+
 # the three frozen verticals' extracts are the generator's inputs
 # (extraction is deterministic — test_m3a_reproducible re-extracts and
 # all four fingerprints are bit-exact, so these dirs ARE the bytes)

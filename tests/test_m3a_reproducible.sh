@@ -76,7 +76,10 @@ EXPECT_STOCK="a054de5c0cfe868cb0aa9722abebdffd9dfcdb0d"
 # the stock twin is BIT-IDENTICAL, measured)
 # EXPECT_HUI="e1f598d6113f32ed5bda66a684e53d30b36447e9"  # git tag freeze/huitzil-m12
 # 14z-87 (the VOICE-CLASS BORROW fix — huitzil-m13, same batch as donovan-m5)
-EXPECT_HUI="4531af1e49b9c8c4b820229aba598e3eca444fc7"
+# EXPECT_HUI="4531af1e49b9c8c4b820229aba598e3eca444fc7"  # git tag freeze/huitzil-m15
+# 14z-94 (#91 + #92): + the reconciliation row resolving vs2 0x494de (one
+# planted ILLEGAL retired) and the four arcade-ladder stage bytes 0x18 -> 0x0a
+EXPECT_HUI="da734d490a4498580ab8ecd1b8709676d6a9e117"
 # pyron-m3 (14z-82c: + the ADOPTED hitclass_map_extend thunk — the f7997 fix)
 # EXPECT_PYR="6c7f7322da793c12b3681dd3ef5a76b3792ae5d0"  # git tag freeze/pyron-m3
 # pyron-m4 (14z-85b, maintainer-ruled: + pyr_sfx_records — kills the merged
@@ -87,7 +90,10 @@ EXPECT_HUI="4531af1e49b9c8c4b820229aba598e3eca444fc7"
 # 14z-86 (the M5 VOICE BATCH — see EXPECT_HUI)
 # EXPECT_PYR="4c6e3fb6785cc9b418dd52744c7046a6a459f71e"  # git tag freeze/pyron-m6
 # 14z-87 (the VOICE-CLASS BORROW fix — pyron-m7, same batch as donovan-m5)
-EXPECT_PYR="fac4a77739ff9e29e23a8deb234dc0cb2c891dd8"
+# EXPECT_PYR="fac4a77739ff9e29e23a8deb234dc0cb2c891dd8"  # git tag freeze/pyron-m9
+# 14z-94 (#92): + the same four arcade-ladder stage bytes. He declares no
+# 0x494de reference, so he takes no reconciliation row (op count unchanged).
+EXPECT_PYR="e29cac231b1357c87df62a3a278091caad5f7d53"
 
 # The WIDE overlay romset (deterministic from the audited reference sets;
 # built into scratch so the canonical build/wide0 is never clobbered).
@@ -157,8 +163,16 @@ done
 # program fingerprints exactly.
 MANI_WIDE="bf3606e48400afbe296abca31642d02dc9fe502d 42"
 MANI_STOCK="9d30e409b0b1de3df87c1ff360f238cc48c311dc 30"
-MANI_HUI="7f4d52a330abf73df298b638dbca099ce3135541 42"
-MANI_PYR="d12d0c6a86bce271d6b7f59ccf6e0c3d98bc9393 42"
+# 14z-94 (#91 + #92). Attributed per member before re-pinning: exactly FOUR
+# members moved — vm3j.03d, vm3j.04d, vm3j.10b and vsw.41, all PROGRAM
+# members. No gfx member and no QSound member changed, which is what a
+# program-image edit must look like. (m15 was 7f4d52a330abf73df298b638dbca099ce3135541.)
+MANI_HUI="593bb750f70be457ae2911b4d1106540840e072b 42"
+# 14z-94 (#92 only — he takes no reconciliation row). Exactly ONE member
+# moved: vm3j.03d, which carries table B at PRG:0x00BB68. Huitzil moved four
+# because #91's row also relocated code; Pyron's four bytes are a pure data
+# edit inside one member. (m9 was d12d0c6a86bce271d6b7f59ccf6e0c3d98bc9393.)
+MANI_PYR="e5a01be1ac6e6a202d384c6753eff5bd224ee762 42"
 
 m3a_manifest() {   # m3a_manifest <label> <rompath> <"digest count">
     _got="$(python3 tools/artifact_manifest.py "$2")" || {

@@ -2564,6 +2564,19 @@ def main():
                         fail.append(f"port_patch {pp['note']}: bytes at "
                                     f"{name}+{off:#x} != {pp['old_hex']}")
                         continue
+                    # LENGTHS MUST MATCH (GitHub #20). The write below is sized
+                    # by len(new) while only len(old) bytes were VERIFIED, so a
+                    # hex-count typo either clobbers unverified bytes past the
+                    # checked window or leaves a tail of the old ones — and the
+                    # note/atlas line records the wrong span either way (rule 4).
+                    # (The bytearray does NOT resize here: the slice is sized by
+                    # len(new), so the issue's "grows the region blob" mechanism
+                    # is not what happens. The defect is the unverified write.)
+                    if len(new) != len(old):
+                        fail.append(f"port_patch {pp['note']}: new_hex is "
+                                    f"{len(new)} bytes, old_hex is {len(old)} — "
+                                    f"lengths must match")
+                        continue
                     blob[off:off + len(new)] = new
                     notes.append(f"# {name}+{off:#x}: port_patch {pp['old_hex']} "
                                  f"-> {_nh} ({pp['note']})")
@@ -4447,6 +4460,15 @@ def main():
                     if bytes(blob[off:off + len(old)]) != old:
                         fail.append(f"data_port {nm}: fix@{off:#x} old bytes "
                                     f"mismatch ({bytes(blob[off:off+len(old)]).hex()})")
+                        ok = False
+                        break
+                    if len(new) != len(old):
+                        # Same law as port_patch above (GitHub #20). This is the
+                        # key the #92 arcade-ladder fix rides, so it is now a
+                        # guarded path rather than a hypothetical one.
+                        fail.append(f"data_port {nm}: fix@{off:#x} new is "
+                                    f"{len(new)} bytes, old is {len(old)} — "
+                                    f"lengths must match")
                         ok = False
                         break
                     blob[off:off + len(new)] = new
