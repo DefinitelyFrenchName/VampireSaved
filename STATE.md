@@ -1,5 +1,65 @@
 # STATE — living progress log
 
+## Session 14z-94 (6) — THE FOUR HIGH-SEVERITY REVIEW FINDINGS CLOSED. Three
+## of them were switches: an env var, a wrong argument, a phantom CLI option.
+
+`#79`, `#76`, `#80`, `#86`, `#89` — five issues, four HIGH. What they share is
+that each defeated a check **without anything looking wrong**: the check did
+not fail, it stopped existing.
+
+| # | the switch | what it turned off |
+|---|---|---|
+| 79 | `python -O` | `assert` statements are REMOVED, not weakened. Every safety check written as one — and the gate whose must-fail signal is that raise — vanishes together, exit 0. |
+| 76 | a wrong 2nd argument | `outdir == romdir` deletes every source zip, then symlinks each to itself. |
+| 80 | `MAME_BUILD_ROOT` | `rsync --delete` into any caller-supplied path. |
+| 86 | a late replay failure | the oracle trust root left half old, half new, under a command that exited 1. |
+| 89 | `--dry-run`, which never existed | argparse exited 2, `\|\| true` swallowed it, and voice ids were rebuilt from `build/wide0` and reported as a verdict on a different artifact. |
+
+**THREE FINDINGS WERE WIDER THAN THE TICKET SAID, and the gates found that,
+not me:**
+
+- **#79 named two files; there are six.** The systemic section ("any
+  assert-using tool a builder invokes must carry the guard") caught
+  `cps2_decrypt.py` — whose **cipher round-trip self-check** is all that
+  stands between a wrong key schedule and a silently corrupt shipped ROM —
+  plus `select_port.py`'s conflicting-tile-placement check, `extract_char.py`
+  and `verify_pcrel_data.py`'s census key.
+- **#89's premise was wrong in a way that changes the fix.** A "ledger-only
+  mode" is impossible: a finished artifact's spans are already filled, so
+  re-deriving through the build path refuses by construction. The ledger must
+  be written AT BUILD TIME — and neither builder passed `--ledger`, so **no
+  build in the tree carried one**. The fallback was not the exceptional path,
+  it was the only path.
+- **#80 would have broken the maintainer's working setup.** Both real mirrors
+  predate the sentinel. A guard that refuses a working setup is a guard that
+  gets disabled, so an existing MAME tree self-claims on `makefile` +
+  `src/mame` + `src/emu` **together** — and the gate proves two of the three
+  is not enough.
+
+**TWO WERE LATENT, WHICH IS WHY NOTHING CAUGHT THEM.** #89's fallback happened
+to produce correct ids on every current build (hui43, pyron27, m3b_merged9 all
+carry QSound members byte-identical to a fresh build, fingerprint
+`28912fa5ab1f`). #51's walker bound, earlier this session, was inert on all
+three tenants. Both needed a gate rather than a rebuild — the defect is real
+and the output is currently right, and only one of those two facts survives
+the next placement change.
+
+**Verified, not assumed:** the real `freeze_masked_basis.sh` running real MAME
+reproduces the frozen `masked-v2` log **bit-for-bit** through the new staged
+publish path; both real MAME mirrors are accepted by the new guard; the whole
+tool graph imports clean under normal Python. 32 portable gates green.
+
+**Docs:** `HANDOFF.md` gained THE REVIEW-TRIAGE GATES table — 22 gates from
+this session were in the tree and in none of the documentation. Its
+portability column was wrong in six rows on first write and is now checked
+against `ci_portable.txt` rather than asserted.
+
+**Open, unchanged by this pass:** #10 and #82 are both fixed but still open
+(see below); #81/#83/#85/#87/#88 remain in the triage batch; the
+maintainer-owned cluster is unchanged.
+
+---
+
 ## Session 14z-94 (5) — audit_trap_parity RE-FROZEN, and every remaining #10
 ## consumer isolated. The staging change touched ONE gate; two other failures
 ## were pre-existing and are now proven so.

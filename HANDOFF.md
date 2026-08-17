@@ -2142,6 +2142,44 @@ tests/audit_voice_borrow.sh [bd]      # 14z-87 (~6 min, 2 MAME runs): THE
                                       # failing pre-fix pair
 ```
 
+### THE REVIEW-TRIAGE GATES (14z-94, GitHub #74's index)
+
+Every one of these was written while closing a finding from the adversarial
+review. They are ROM-free and in `tests/ci_portable.txt` unless the row says
+otherwise (a "not portable" gate needs ROMDIR, a build dir, or a MAME
+binary, and would SKIP on a clean checkout — which `ci_portable` treats as
+failure). The portable set runs in seconds: `while read g; do tests/$g.sh </dev/null; done <
+tests/ci_portable.txt` (32 gates). **Close stdin** — a gate that reads it
+swallows the rest of the list, which is how a 32-entry run silently became 28.
+
+| gate | issue | what it locks |
+|---|---|---|
+| `test_optimize_guard.sh` | #79 | Six tools refuse `python -O`, which REMOVES asserts rather than weakening them. Its systemic section — any assert-using tool a builder invokes must carry the guard — is what found four of the six; #79 named two. |
+| `test_romset_path_guard.sh` | #76 | `build_wide_romset` cannot take the reference set as its own output. The one failure in that file with **no undo** (rule 7 forbids in-tree romset copies). |
+| `test_mame_mirror_guard.sh` | #80 | `rsync --delete` runs only in a directory `setup_mame.sh` owns. Guard is EXTRACTED from the shipped script between markers, never copied. |
+| `test_basis_publish_atomic.sh` | #86 | A masked basis publishes whole or not at all. Drives the REAL script symlinked into a fake repo with a stubbed MAME runner. |
+| `test_qs_ledger_binding.sh` | #89 | QSound audit ids come from a ledger fingerprint-bound to the artifact under test, never rebuilt from `build/wide0`. |
+| `test_record_walk_bounds.sh` | #51 | Both record walkers examine the last long that fits. |
+| `test_pcrel_escapes.sh` | #22 | The pc-rel DATA-escape set is unchanged since reviewed. **Not portable** — needs builds + `vsav2_data.bin`. |
+| `test_baseset_mask_invariant.sh` | #62 | Every `.masked` spec cites a basis frozen under its own mask. |
+| `test_mask_ranges_reader.sh` | #61 | The mask reader masks exactly the spec and refuses nonsense. **Not portable** — needs ROMDIR + a WIDE build. |
+| `test_patch_source_identity.sh` | #18 | A patch applies only to the source set it was verified against. **Not portable.** |
+| `test_guard_integrity.sh` | #31 | The crash guard checks inputs and refuses what it cannot honour. **Not portable.** |
+| `test_phasea_a3_liveness.sh` | #25 | A3 cannot decide gfx growth on a measurement it never made. |
+| `test_hex_lengths.sh` | #20 | Generated hex writes are length-checked. |
+| `test_minitoml_subset.sh` | #42 | The TOML subset refuses dotted headers/keys, duplicates, signed hex. |
+| `test_member_classify.sh` | #19 | The PRG suffix class excludes `m` members. **Not portable.** |
+| `test_builder_rom_audit.sh` | #38 | Builders audit the ROMs they read. **Not portable.** |
+| `test_m2a_mask_pin.sh` | 14z-93 | the mask pin |
+| `test_fbneo_overlay_hygiene{,_control}.sh` | 14z-94 | FBNeo overlay hygiene (`_control` is its must-fire control) |
+| `test_record_window.sh` | 14z-94 | the windowed MNG recorder (2.4 MB/120 frames vs `-aviwrite`'s 5.7 GB/2 min). **Not portable.** |
+| `test_decode_stage_banners.sh` | #92 | the stage-banner decoder — incl. the control requiring a base-as-ANCHOR decode to FAIL LOUDLY. **Not portable.** |
+
+**Two tools that now exist because of this batch:** `tools/qs_ledger.py`
+(resolve the voice ledger BOUND to a romset — the audits call it instead of
+carrying their own rule) and `tools/decode_stage_banners.py` (names the #92
+value space).
+
 ### THE OUT-OF-RANGE INDEX TOOLKIT (14z-78) — three instruments, one class
 
 `audit_index_space.py` names the DANGER WINDOWS (entries vsavj's table cannot
