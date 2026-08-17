@@ -87,12 +87,27 @@ _G.s3_stop_sub = emu.add_machine_stop_notifier(function()
     table.sort(bl)
     rep:write(string.format("SCROLL3SUMMARY maxcode=%04x danger_frames=%d bases=%s\n",
                             max_code, danger_frames, table.concat(bl, ",")))
-    local hl, n = {}, 0
+    -- DETERMINISTIC SAMPLE, AND IT SAYS IT IS ONE (14z-94, GitHub #60).
+    -- This used to take the first 12 codes in `pairs()` ORDER and sort those,
+    -- so the printed set was an arbitrary 12 that could differ between two
+    -- runs of the same rig — in a project whose comparisons rest on
+    -- run-to-run determinism — and a reader had no way to tell the list was
+    -- truncated at all. Collect every code, sort, THEN cut, and name what was
+    -- cut. `distinct_high` was already the complete count and still is; only
+    -- the sample was arbitrary.
+    local all, n = {}, 0
     for c, k in pairs(s3_high_codes) do
         n = n + 1
-        if n <= 12 then hl[#hl + 1] = string.format("%04x:%d", c, k) end
+        all[#all + 1] = { c, k }
     end
-    table.sort(hl)
+    table.sort(all, function(x, y) return x[1] < y[1] end)
+    local hl = {}
+    for i = 1, math.min(#all, 12) do
+        hl[#hl + 1] = string.format("%04x:%d", all[i][1], all[i][2])
+    end
+    if #all > 12 then
+        hl[#hl + 1] = string.format("+%d more", #all - 12)
+    end
     rep:write(string.format(
         "SCROLL3CENSUS max_real=%04x high_cells=%d distinct_high=%d blank_cells=%d high=%s\n",
         s3_max_real, s3_high_cells, n, s3_blank_cells, table.concat(hl, ",")))
