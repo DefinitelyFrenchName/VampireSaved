@@ -97,7 +97,14 @@ def walk(dat, base, start, end, cptr_ok, sweep_lo=0x8000, sweep_hi=0xEEBB,
     a build where nothing coincides and 1 on merged Huitzil."""
     tiles, entries, records = set(), 0, 0
     seen = set()
-    for a in range(start, end - 4, 2):
+    # A 4-byte long at offset end-4 lies WHOLLY inside [start,end), but
+    # range(start, end-4, 2) stops at end-6 and never examines it
+    # (14z-94, GitHub #51). A record pointer in the last long of a
+    # region would be omitted from the tile inventory — and that
+    # inventory is what build_gfx_donovan places, so the art would
+    # never be copied and the record would draw whatever occupies the
+    # destination band. Silent: no builder errors, the sprite is wrong.
+    for a in range(start, end - 2, 2):
         i = a - base
         v = int.from_bytes(dat[i:i + 4], "big")
         if not (start <= v < end) or v in seen:
@@ -169,7 +176,10 @@ def walk(dat, base, start, end, cptr_ok, sweep_lo=0x8000, sweep_hi=0xEEBB,
     # heuristic passes therefore verify the source's structure
     # (sweep_allow / ptr_allow) rather than trusting a false-positive rate
     # that nobody re-measures.
-    for a in range(start, end - 10, 2):
+    # Same bound bug, one read-width along (GitHub #51): this pass reads
+    # 10 bytes at `a`, so the last address that FITS is end-10, and the
+    # stop must be end-8 to include it.
+    for a in range(start, end - 8, 2):
         if a in seen:
             continue
         if sweep_allow is not None and (a - start) not in sweep_allow:

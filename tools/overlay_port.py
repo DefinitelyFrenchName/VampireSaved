@@ -123,7 +123,10 @@ def walk_records(img, base, lo, hi, cptr_ok):
     fmt4 has no cptr and a single packed tile long; fmtA is a composite
     sub-dispatch and is skipped (counted)."""
     recs, skipped_a = {}, 0
-    for i in range(lo - base, hi - base - 4, 2):
+    # GitHub #51: the long at hi-4 lies wholly inside [lo,hi) but the old
+    # stop (hi-base-4) excluded it. Same off-by-one as obj_records.walk,
+    # copy-pasted — fixing one would have left the other wrong.
+    for i in range(lo - base, hi - base - 2, 2):
         v = int.from_bytes(img[i:i + 4], "big")
         if not (lo <= v < hi) or v in recs:
             continue
