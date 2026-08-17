@@ -11,8 +11,19 @@
 > ##
 > ## **#91 AND #92 REMAIN FIXED AND FULLY GATED**, on the solos and on the
 > ## merged image, each verified against a LIVE crash on its pre-fix build.
-> ## **THE RE-FREEZE IS STILL THE MAINTAINER'S CALL**: registry rows for
-> ## `hui43` `da734d49`, `pyron27` `e29cac23`, merged `081e2e53` (752 ops).
+> ##
+> ## **THE FREEZE IS DONE — what remains is the PLAYTEST.** Corrected
+> ## 14z-94: earlier notes called this "the re-freeze is still the
+> ## maintainer's call", which understated it. `huitzil-m16` (`da734d49`)
+> ## and `pyron-m10` (`e29cac23`) have registry rows, expectation sets AND
+> ## freeze tags; `merged-m2` (`081e2e53`) has its tag and NO registry row
+> ## ON PURPOSE (same as merged-m1). HANDOFF's row says **NOT YET
+> ## PLAYTESTED**, and that is the only open item.
+> ##
+> ## Nothing is at risk while it waits: all five references rebuild
+> ## BIT-EXACT, merged included since 14z-94 — program fingerprint AND all
+> ## 42 members (`904d432f`). A bug found in play can be bisected against
+> ## the exact artifact.
 
 ## What changed in the triage, in one screen
 
