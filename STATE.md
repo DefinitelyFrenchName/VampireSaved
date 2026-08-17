@@ -1,5 +1,51 @@
 # STATE — living progress log
 
+## Session 14z-94 (5) — audit_trap_parity RE-FROZEN, and every remaining #10
+## consumer isolated. The staging change touched ONE gate; two other failures
+## were pre-existing and are now proven so.
+
+**RE-FROZEN on the maintainer's ruling**, growth root-caused before absorbed.
+Re-measured on build/hui38 — the build the inventory was frozen against at
+14z-86 — under the corrected timing:
+
+    ours   window 1 (3400-3900)  unchanged
+    ours   window 2 (4200-4700)  + 0621, nothing lost
+    native both windows          unchanged
+
+Exactly one id, our leg only. **0621 is a VANILLA vsavj id** (outside the
+authored 0x58-0xA6 range) that fires on NEITHER leg natively — the same
+category as the 0117/00f3 pair the inventory already carried and already
+documented as "an ordinary engine event on that leg's timeline". And the
+ear-confirmation the inventory rests on concerns **00d8, which is unchanged in
+both windows**. PASS verified on hui38, hui43 and m3b_merged9.
+
+**THE REMAINING CONSUMERS, ISOLATED — and the isolation method mattered:**
+
+| gate | verdict |
+|---|---|
+| audit_wide_phase_a | PASS both ways, same three DECISION lines, EXIT=0 (its 7-8 MAME teardown segfaults are tolerated and occur under BOTH stagings) |
+| audit_qs_voice_batch | FAILS IDENTICALLY under both — `FAIL: keyon multiset A/B`, same missing signature (13, 20481). PRE-EXISTING, not #10 |
+| test_don_sound | MAME teardown SIGSEGV under both. PRE-EXISTING |
+| audit_pyron_ring | cannot run: `build/pyron22` lacks vsw.z01/z02 (4th reference-rot instance) |
+
+**A METHOD ERROR WORTH KEEPING.** My first isolation attempt used
+`git stash push <files>` — but those files were already COMMITTED, so the
+stash took nothing and BOTH runs measured the new code while I believed one
+was the control. Caught because `git stash list` read 0. The correct move is
+`git checkout <commit>^ -- <files>`. A control that silently tests the same
+thing twice agrees with itself perfectly, which is exactly what it looked
+like.
+
+**#10 IS NOW GREEN ACROSS EVERY RUNNABLE CONSUMER.** Final tally of the
+staging unification: one gate genuinely changed behaviour (trap_parity, now
+re-frozen), one needed a -1 re-date (voice_borrow), six unchanged, and three
+failures that predate the work.
+
+**NEWLY VISIBLE, not caused by this session:** `audit_qs_voice_batch` is
+failing its keyon multiset A/B, and nothing in the tree flags it. Worth a
+ticket.
+
+
 ## Session 14z-94 (4) — #10 APPLIED, and the blast radius MEASURED: correcting
 ## the harness changes what ONE rig makes the game do. One decision pending.
 
@@ -22,7 +68,9 @@ moves.
 | **audit_trap_parity** | ring_tap | **RED — rig BEHAVIOUR changed** |
 | audit_pyron_ring | ring_tap | cannot run — PRE-EXISTING rot |
 | test_don_sound | ring_tap | PRE-EXISTING MAME teardown segfault |
-| audit_wide_phase_a, audit_qs_voice_batch/wav | objy_bits/unmapped_probe/qs_sweep | NOT RUN (expensive) |
+| audit_wide_phase_a | objy_bits + unmapped_probe | PASS both ways (same 3 decisions) |
+| audit_qs_voice_batch | qs_sweep | PRE-EXISTING failure — identical under both |
+| audit_qs_voice_wav | qs_sweep | not run |
 
 **THE FINDING, and it is why #10 was never cosmetic.** Same rig, same build
 (m3b_merged9), measured both ways:
@@ -41,8 +89,8 @@ assumed: the plant-end voice 0x6A now fires at 3974, one below the old bound
 3975 — which is exactly what made section 2 report "rig dead". Window widths
 unchanged, both verdict controls still fire.
 
-**DECISION PENDING (maintainer):** re-measure and re-freeze
-`audit_trap_parity`'s inventory under the corrected timing? It was EAR-CONFIRMED
+**RULED 2026-08-17 (maintainer): re-measure and re-freeze. DONE — see the
+14z-94 (5) entry.** The original brief follows. It was EAR-CONFIRMED
 2026-08-14 ("the trap mine ejection sound is indeed there"), and the standing
 watch says a frozen inventory that GROWS means stop and root-cause — done —
 not widen. The gate stays RED and names the reason in its own source. The
