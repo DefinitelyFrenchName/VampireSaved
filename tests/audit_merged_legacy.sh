@@ -123,16 +123,32 @@ abspath() { case "$1" in /*) echo "$1";; *) echo "$PWD/$1";; esac; }
 # needed the same classifier — one set of thresholds, one place to correct;
 # extraction verified output-identical on six real log pairs).
 
+# THE EXPECTED OP COUNT IS DERIVED, NOT COPIED (14z-94). This file carried
+# the literal 753 at three sites while build_merged.sh carried it at three
+# more — six copies of one fact owned by test_tenant_loop.sh. They drifted
+# the first time the count moved (#91 retires one planted ILLEGAL, so the
+# merge is 752), and each copy in turn printed "re-freeze test_tenant_loop
+# FIRST" at someone who had just done exactly that. Read it from the gate
+# that owns it; hard-fail if it cannot be read, because a fallback literal
+# would silently re-create the drift.
+EXPECT_OPS="$(awk '/^check_n "3 tenants"/ {print $5; exit}' "$REPO/tests/test_tenant_loop.sh")"
+case "$EXPECT_OPS" in
+    ''|*[!0-9]*)
+        echo "FAIL: could not read the frozen 3-tenant op count from"
+        echo "      tests/test_tenant_loop.sh (got '$EXPECT_OPS')."
+        exit 1;;
+esac
+
 if [ "$PREBUILT" = 1 ]; then
     echo "== B: PREBUILT merged artifact at $OUT (build skipped; shape"
-    echo "      asserted below — 753 ops, member identity) =="
+    echo "      asserted below — $EXPECT_OPS ops, member identity) =="
     [ -f "$OUT/rompath/vsavjw.zip" ] || {
         echo "FAIL: MERGED_PREBUILT=1 but no $OUT/rompath/vsavjw.zip"; exit 1; }
     [ -f "$OUT/patch/patch.json" ] || {
         echo "FAIL: MERGED_PREBUILT=1 but no $OUT/patch/patch.json"; exit 1; }
     NOPS="$(python3 -c "import json;print(len(json.load(open('$OUT/patch/patch.json'))['ops']))")"
-    [ "$NOPS" = 753 ] || { echo "FAIL: $NOPS ops, frozen fixture is 753"; exit 1; }
-    echo "  ok: 753 ops (the frozen test_tenant_loop fixture; 14z-91 walker relocation)"
+    [ "$NOPS" = "$EXPECT_OPS" ] || { echo "FAIL: $NOPS ops, frozen fixture is $EXPECT_OPS"; exit 1; }
+    echo "  ok: $NOPS ops (the frozen test_tenant_loop fixture, read from it)"
     python3 tools/audit_romset_identity.py "$OUT/rompath" || {
         echo "  FAIL: member-identity audit"; exit 1; }
     FP="$(python3 tools/build_fingerprint.py "$OUT/rompath;$ROMDIR" --set vsavjw --sha-only || true)"
@@ -167,10 +183,10 @@ NOPS="$(python3 -c "import json;print(len(json.load(open('$OUT/patch/patch.json'
 # operand repoint per caller, 2 + 21 = 23; so -6 +25);
 # 738 since 14z-87 (the voice-borrow fix: shared keep-tenant thunk 2 +
 # site-pad code_word 1, deduped once, + 2 data_port table rows x3 tenants).
-if [ "$NOPS" = 753 ]; then
-    echo "  ok: 753 ops (the frozen test_tenant_loop fixture — same merge)"
+if [ "$NOPS" = "$EXPECT_OPS" ]; then
+    echo "  ok: $NOPS ops (the frozen test_tenant_loop fixture — same merge)"
 else
-    echo "  FAIL: $NOPS ops, frozen fixture is 753 — the generator drifted;"
+    echo "  FAIL: $NOPS ops, frozen fixture is $EXPECT_OPS — the generator drifted;"
     echo "        re-freeze test_tenant_loop.sh FIRST, then revisit this audit"
     exit 1
 fi
