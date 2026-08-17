@@ -1,5 +1,54 @@
 # STATE — living progress log
 
+## Session 14z-94 (10) — three low-hanging issues cleared while the
+## maintainer playtests: #69, #94, and the merged reproducibility gap.
+
+Chain: **PASS 85 / SKIP 0 / FAIL 0**, tree clean, coverage clean.
+
+**#69 — the decrypt cache.** 22 sites across 18 scripts re-ran the 10.7 s
+pure-Python decrypt for an artifact `build/out` already held.
+`tests/lib/decrypt_cache.sh` reads the cache and decrypts only on a miss.
+Static tier **506 s → 413 s**; verdicts unchanged everywhere
+(`test_index_space` 16→1, `test_variant_dispatch` 15→1, `test_id_space`
+16→1). **The correctness half is the part worth keeping**: the replaced
+pattern discarded errors with `|| true` and fell back on `[ -f ]`, so a
+half-written decrypt left a file that EXISTS and the test read a TRUNCATED
+image and passed. Generation is now atomic and both cache and delivered copy
+are size-checked. Two scripts are exempt BY DESIGN and asserted as such —
+`test_decrypt_oracle` (re-decrypting is its purpose) and `test_hui_walk`
+(decrypts a build, not a reference set) — so a stale exemption surfaces.
+
+**#94 — the rotted-reference class, and it was bigger than the ticket.**
+`audit_pyron_ring` had TWO rotted defaults, not one. The standing check
+`tests/test_build_ref_rot.sh` then found **nine** rotted references across the
+suite, not the four known; all re-pointed, now 21 live / 0 rotted. Two design
+points: it considers **what the script reads** (`build_merged`'s `hui32` is
+read for `extract/` and is fine; `audit_df_gold`'s `hui32` loads the romset
+and was not), and **absent is reported, never failed** — unbuilt is not stale.
+
+**The merged image joined the reproducibility gate** (maintainer request).
+It is the artifact that gets PLAYED and nothing asserted it rebuilt. Measured
+before freezing: a scratch rebuild and the shipped `build/m3b_merged9` agree
+on the program fingerprint `081e2e53` AND all 42 members (`904d432f`) — the
+whole artifact, not the 8.1 % the program fingerprint covers. That gate grew
+165 s → 221 s to carry it, which is why the chain total moved less than the
+decrypt saving alone.
+
+**NOT ABSORBED, filed instead:** **#98** — `audit_pyron_ring` now RUNS for the
+first time in months and reports ring-id drift against an inventory frozen for
+the superseded pair. Three solo ids are missing on merged, "a family path
+stopped sounding" in the gate's own words: new-generation difference or merge
+regression, undistinguished. Its own rule is "re-measure, never absorb", so
+the inventory is untouched and the known-red state is recorded in its header.
+Possibly the same subsystem as **#93**.
+
+**Also found and fixed while there:** `test_m3a_reproducible`'s HEADER named
+four references with fingerprints superseded several freezes ago, while its
+live `EXPECT_*` lines were current — the fourth instance this session of a
+stale claim sitting where a reader trusts it.
+
+---
+
 ## Session 14z-94 (9) — #30 CLOSED: there is now ONE pre-commit command, and
 ## on its first run it found three gates that had been stale for weeks.
 
