@@ -1,17 +1,32 @@
 # NEXT SESSION — orientation (written at the close of 14z-94, 2026-08-17)
 
-> ## **BLOCKED (rule 6): #92 — a crash reachable in ordinary play, present
-> ## on the FROZEN, field-played `merged-m1`.** ROOT-CAUSED to 8 bytes of
-> ## OUR OWN authored ARCADE-LADDER rows: they schedule the Donovan match
-> ## at **REVENGER'S ROOST**, vsav2's thirteenth stage, which vsav does not
-> ## have. **The fix needs one decision — which vsav stage stands in.**
+> ## **#91 AND #92 ARE FIXED ON THE SOLOS (14z-94), each verified against a
+> ## LIVE CRASH on its pre-fix build.** The 8 bytes scheduled the Donovan
+> ## match at **REVENGER'S ROOST**, vsav2's thirteenth stage, which vsav does
+> ## not have; retargeted to **`0x0a` ABARAYA** on the maintainer's ruling.
 > ##
-> ## `run_suite` CANNOT SEE IT — no suite replay is long enough. That is
-> ## why the build froze green and the playtest missed it.
+> ## **STILL OPEN: the merged build and the re-freeze.** `build_merged.sh`
+> ## stops at its own guard — 752 ops against the frozen 753 — and the delta
+> ## is attributed to ONE `4afc` ILLEGAL, #91's tripwire disappearing.
+> ## `tests/test_tenant_loop.sh:217` needs 753 -> 752, a frozen merge-gate
+> ## constant, so it is a maintainer call. Then the merged gates, then the
+> ## single re-freeze of huitzil + merged.
 
-## Start here — the fix is 8 bytes and it is blocked on a choice
+## Where it stands
 
-`tests/test_voice_row_range.sh` is **RED by design** and names them:
+| leg (40,620-frame arcade marathon, forced pick, sparse probe at `0x05ffb6`) | verdict |
+|---|---|
+| `pyron26` pre-fix (FROZEN) | **CRASH 15079** `vec3 PC 01afb6` — #92 |
+| `pyron27` post-fix | **END 40620** |
+| `hui41` pre-fix (FROZEN) | **CRASH 18337** `vec4 PC 0fb6e0` — #91 |
+| `hui43` post-fix | **END 40620** |
+
+The probe fired 3 times per leg, so it is armed rather than dead. New builds
+`hui43` `da734d49` / `pyron27` `e29cac23`, both UNREGISTERED and UNFROZEN;
+`hui41`/`pyron26` are untouched.
+
+`tests/test_voice_row_range.sh` is now GREEN on the new builds (it stays RED
+on the frozen ones, correctly). The historical shape it caught:
 
 ```
 hui41/hui42 row 0x10: 0x18 at +0x01, +0x1a, +0x29, +0x31
@@ -27,7 +42,8 @@ Vanilla never emits above **`0x16`** across all 1024 bytes of table B, and
 `0x16` is exactly what the downstream table can service (derived
 independently; the gate cross-checks the two and fails if they disagree).
 
-**The value is the arcade-mode STAGE, and the choice is not mine** —
+**DECIDED 2026-08-17 (maintainer): ABARAYA (`0x0a`)** — "any stage except
+Fetus of God, take the one that implies the least impact". Applied.
 `tools/decode_stage_banners.py` names the twelve vsav stages, and poking the
 word changes the venue on screen (measured: same match, same frame, different
 stage). Once chosen: patch `huitzil.toml` + `pyron.toml` -> gate green ->
