@@ -65,6 +65,108 @@ case "$MIRROR" in
     exit 1 ;;
 esac
 
+# >>> MIRROR GUARD (GitHub #80) >>>   [extracted verbatim by
+#     tests/test_mame_mirror_guard.sh — keep both markers, and keep this block
+#     self-contained: it may read only MIRROR, REPO, SRC and HOME]
+# MIRROR GUARD (14z-94, GitHub #80). Below, this script runs
+#
+#     rsync -a --delete "$SRC/" "$MIRROR/"
+#
+# and --delete removes everything in $MIRROR that is not in the MAME source.
+# $MIRROR came from an environment variable whose only validation was "no
+# spaces", so a typo or a stale export in a shell — `MAME_BUILD_ROOT=$HOME`,
+# or a work directory reused while troubleshooting a build location — deletes
+# unrelated files. No malicious input required; this is a normal-use hazard.
+#
+# TWO INDEPENDENT CHECKS, because either alone leaves a hole:
+#
+#   1. CANONICAL PATH. Reject the filesystem root, $HOME itself, any ANCESTOR
+#      of the repo or of $HOME, and the repo/source trees in either direction.
+#      realpath resolves `..` spellings and symlink aliases, which is what a
+#      string comparison misses. Note $HOME/.cache/... is fine — it is a
+#      descendant of $HOME, not $HOME.
+#
+#   2. OWNERSHIP SENTINEL. Canonical checks cannot know that
+#      ~/projects/scratch is precious. So --delete only ever runs inside a
+#      directory this script has claimed. A NEW or EMPTY target is claimed
+#      automatically (initialization stays one command); a pre-existing
+#      NON-EMPTY directory without the sentinel is refused, and the operator
+#      is told exactly how to opt in. That is the case that eats data.
+#
+# The sentinel names the tool and the mirrored source so a stray file cannot
+# accidentally read as one.
+MIRROR_SENTINEL=".vampire-saved-mame-mirror"
+
+canon() { python3 -c 'import os,sys; print(os.path.realpath(sys.argv[1]))' "$1"; }
+MIRROR_C="$(canon "$MIRROR")"
+REPO_C="$(canon "$REPO")"
+SRC_C="$(canon "$SRC")"
+HOME_C="$(canon "$HOME")"
+
+refuse() {
+    echo "REFUSING to mirror into '$MIRROR'" >&2
+    echo "  resolves to: $MIRROR_C" >&2
+    echo "  reason: $1" >&2
+    echo "" >&2
+    echo "  This script runs 'rsync --delete' into that directory, which" >&2
+    echo "  would remove everything there that is not part of MAME." >&2
+    echo "  Set MAME_BUILD_ROOT to a dedicated path, e.g." >&2
+    echo "    MAME_BUILD_ROOT=\$HOME/.cache/vampire-saved/mame" >&2
+    exit 1
+}
+
+[ "$MIRROR_C" = "/" ]      && refuse "that is the filesystem root"
+[ "$MIRROR_C" = "$HOME_C" ] && refuse "that is your home directory itself"
+[ "$MIRROR_C" = "$REPO_C" ] && refuse "that is this repository"
+[ "$MIRROR_C" = "$SRC_C" ]  && refuse "that is the pinned MAME submodule (the mirror SOURCE)"
+
+# An ancestor of the repo, the source, or $HOME. The trailing separator is
+# what keeps /Users/koneko-backup from matching /Users/koneko.
+for descendant in "$REPO_C" "$SRC_C" "$HOME_C"; do
+    case "$descendant" in
+    "$MIRROR_C"/*) refuse "that directory CONTAINS $descendant" ;;
+    esac
+done
+# ...and inside the repo or the source tree, which --delete would gut.
+case "$MIRROR_C" in
+"$REPO_C"/*) refuse "that is inside this repository" ;;
+"$SRC_C"/*)  refuse "that is inside the pinned MAME submodule" ;;
+esac
+
+# Ownership sentinel: --delete only runs where this script has claimed.
+if [ ! -e "$MIRROR_C" ]; then
+    :                                  # new target — claimed on creation below
+elif [ ! -d "$MIRROR_C" ]; then
+    refuse "that path exists and is not a directory"
+elif [ -f "$MIRROR_C/$MIRROR_SENTINEL" ]; then
+    :                                  # ours already
+elif [ -z "$(ls -A "$MIRROR_C" 2>/dev/null)" ]; then
+    :                                  # empty — safe to claim
+elif [ -f "$MIRROR_C/makefile" ] && [ -d "$MIRROR_C/src/mame" ] \
+                                 && [ -d "$MIRROR_C/src/emu" ]; then
+    # MIGRATION (14z-94): mirrors created before the sentinel existed carry
+    # no marker, and refusing them would break working setups for a guard
+    # that is supposed to be invisible in normal use. All three of makefile +
+    # src/mame + src/emu together is a MAME source tree and nothing else —
+    # a scratch or documents directory does not accidentally have them — so
+    # such a directory is adopted and claimed below.
+    :
+else
+    echo "REFUSING to mirror into '$MIRROR'" >&2
+    echo "  resolves to: $MIRROR_C" >&2
+    echo "  reason: it already exists, is NOT empty, and carries no" >&2
+    echo "          $MIRROR_SENTINEL marker — so this script has never" >&2
+    echo "          owned it and cannot know what is in it." >&2
+    echo "" >&2
+    echo "  'rsync --delete' would remove every file there that is not part" >&2
+    echo "  of MAME. If this directory really is a disposable build mirror," >&2
+    echo "  say so explicitly:" >&2
+    echo "    touch '$MIRROR_C/$MIRROR_SENTINEL'" >&2
+    echo "  Otherwise point MAME_BUILD_ROOT somewhere dedicated." >&2
+    exit 1
+fi
+# <<< MIRROR GUARD <<<
+
 # The pinned revision, stated here as well as in the gitlink, because
 # `submodule update` silently checks out whatever the INDEX says. Paid for:
 # `git submodule add` staged the default branch (master, 0.289) while the
@@ -103,7 +205,23 @@ fi
 # Mirror. Anchored excludes only: an unanchored '/build/' would also drop
 # scripts/build/, whose complay.py the layout rules need (paid for once).
 mkdir -p "$MIRROR"
-rsync -a --delete --exclude '/.git' --exclude '/build/' "$SRC/" "$MIRROR/"
+
+# Claim the target BEFORE the destructive step, so an interrupted first run
+# leaves an owned mirror rather than a half-populated unowned one that the
+# guard above would then refuse forever (GitHub #80). Excluded from the rsync
+# below for the same reason --delete would otherwise remove it on every run.
+if [ ! -f "$MIRROR/$MIRROR_SENTINEL" ]; then
+    {
+        echo "VampireSaved MAME build mirror."
+        echo "Written by tools/setup_mame.sh; source: $SRC_C"
+        echo "This directory is DISPOSABLE: setup_mame.sh runs 'rsync --delete'"
+        echo "into it. Do not keep anything here you want to survive."
+    } > "$MIRROR/$MIRROR_SENTINEL"
+    echo "claimed build mirror: $MIRROR_C"
+fi
+
+rsync -a --delete --exclude '/.git' --exclude '/build/' \
+      --exclude "/$MIRROR_SENTINEL" "$SRC/" "$MIRROR/"
 
 # CPS-2 WIDE profile patch (docs/project/cps2_wide.md), the MAME twin of
 # emu/fbneo-patches/0002. Governed by Rule 1 v2: a new driver entry carrying

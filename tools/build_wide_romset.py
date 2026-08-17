@@ -25,6 +25,51 @@ MEMBER = 0x400000  # every appended member is exactly one 4MB unit: the gfx
                    # they differ, and QSound's mask needs a power of two.
 
 
+def check_disjoint(romdir, outdir):
+    """The input directory is NEVER modified (this file's docstring, and rule
+    7: ROMDIR holds reference dumps that live outside the tree). That promise
+    is enforced here, at the CLI boundary, BEFORE any mutation (14z-94,
+    GitHub #76).
+
+    Without it, `outdir == romdir` is quietly destructive rather than a no-op:
+    the cleanup loop below calls os.remove() on every `.zip` it finds — which
+    are the SOURCE dumps — and then os.symlink(src, dst) with src == dst
+    leaves a self-referential link where the reference set used to be. The
+    zips are irreplaceable-by-us (rule 7 forbids keeping copies in the tree),
+    so this is the one failure in this file with no undo.
+
+    Rejected: identity, `..` spellings of the same directory, symlink
+    aliases (realpath resolves all three), and containment in EITHER
+    direction — output beneath the reference set writes into the immutable
+    input, and input beneath the output means the build links into a tree it
+    is itself mutating.
+
+    realpath() is used rather than abspath() precisely because the alias
+    cases are the ones a string comparison misses, and it does not require
+    outdir to exist yet.
+    """
+    ir = os.path.realpath(romdir)
+    orl = os.path.realpath(outdir)
+    if ir == orl:
+        raise SystemExit(
+            f"refusing to build in place: romdir and outdir are the same "
+            f"directory ({ir}).\n"
+            f"  Given romdir={romdir!r} outdir={outdir!r}.\n"
+            f"  The cleanup pass would DELETE the source zips it is meant to "
+            f"read. Give outdir a separate path (build/<name>/rompath).")
+    for parent, child, why in (
+            (ir, orl, "the output would be written INSIDE the reference set, "
+                      "which this tool promises never to modify"),
+            (orl, ir, "the reference set is INSIDE the output directory, so "
+                      "the build would link into a tree it is mutating")):
+        if child.startswith(parent + os.sep):
+            raise SystemExit(
+                f"refusing to build: {why}.\n"
+                f"  romdir={romdir!r} -> {ir}\n"
+                f"  outdir={outdir!r} -> {orl}\n"
+                f"  Give the two paths disjoint locations.")
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("romdir")
@@ -45,6 +90,8 @@ def main():
     if a.gfx % 4:
         raise SystemExit("--gfx must be a multiple of 4 (the loader consumes "
                          "gfx members in groups of four)")
+
+    check_disjoint(a.romdir, a.outdir)
 
     os.makedirs(a.outdir, exist_ok=True)
     for z in sorted(os.listdir(a.romdir)):
