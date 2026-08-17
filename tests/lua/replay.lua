@@ -298,6 +298,22 @@ if INTEGRITY then
     end
 end
 
+-- NO IN-EMULATOR CONTROL EXISTS FOR THE FRAME-1 BRANCH, and that is a
+-- measured fact rather than an omission (14z-94, GitHub #57). MAME samples
+-- the input ports BEFORE the frame_done callback runs, so a Lua
+-- `set_value` cannot make frame 1's own read dirty: tried at script load and
+-- again at the top of frame 1, and both land at frame 2. The existing
+-- INPUT_INJECT_TEST cannot reach it either — its condition is
+-- `(frame + 1) == inject_frame`, so INPUT_INJECT_TEST=1 would need frame 0.
+--
+-- The real scenario — a HOST key physically held before the run — IS in that
+-- read, because MAME samples host input ahead of the frame. So the branch is
+-- reachable in the field and not from Lua.
+--
+-- The fix does not depend on a control to be correct: all-ones is the KNOWN
+-- idle of active-low controls, so this asserts a constant rather than
+-- inferring a baseline. That is the whole point of the change.
+
 -- Expected port values for a given frame's held set: start from the idle
 -- baseline and clear each pressed field's mask (CPS-2 inputs are active
 -- low). Returns nil until the baseline has been captured on frame 1.
@@ -355,8 +371,34 @@ emu.register_frame_done(function()
         -- — nothing runs before frame 1 — so frame 1 is always idle and is
         -- where the baseline is captured.)
         if frame == 1 then
+            -- THE BASELINE IS ASSERTED, NOT ADOPTED (14z-94, GitHub #57).
+            -- This used to take whatever the ports read on frame 1 as "idle".
+            -- CPS-2 inputs are ACTIVE LOW, so the true idle value of the
+            -- controlled bits is all-ones — and a host key held from before
+            -- frame 1 through the whole run reads as baseline on frame 1 and
+            -- then matches `exp` on every later frame. Zero violations, a
+            -- clean log, and a run whose P1 direction was pressed for its
+            -- entire length.
+            --
+            -- That is the one input pattern with NO divergence signature, and
+            -- the positive control cannot reach it: INPUT_INJECT_TEST injects
+            -- at a frame > 1, so "tested in both directions" only ever held
+            -- for presses that START after frame 1.
+            --
+            -- So: compare frame 1 against the KNOWN idle, and use the known
+            -- idle as the baseline thereafter — a dirty frame 1 must not
+            -- become the yardstick for the rest of the run.
             for _, tag in ipairs(PORT_TAGS) do
-                baseline[tag] = integ_ports[tag]:read() & controlled[tag]
+                local got = integ_ports[tag]:read() & controlled[tag]
+                if got ~= controlled[tag] then
+                    violations = violations + 1
+                    first_violation = first_violation or string.format(
+                        "frame 1 port %s: controlled bits %04x are already LOW "..
+                        "(active low = HELD before the replay started; stuck "..
+                        "host key or modifier?) read %04x, idle %04x",
+                        tag, controlled[tag] & ~got, got, controlled[tag])
+                end
+                baseline[tag] = controlled[tag]
             end
         else
             local exp = expected_ports(held[frame])

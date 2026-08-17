@@ -74,7 +74,42 @@ else
     fi
 fi
 
+echo "== the frame-1 baseline is ASSERTED, not adopted (GitHub #57) =="
+# The one input pattern with NO divergence signature is a key held from
+# BEFORE frame 1 through the whole run: the old code took frame 1's port read
+# as "idle", so such a press became the baseline and matched every later
+# frame. Zero violations, clean log, P1 direction pressed for the entire run.
+#
+# This is a STRUCTURAL check on purpose. MAME samples the ports before the
+# frame_done callback, so no Lua injection can dirty frame 1's own read —
+# measured twice (script load, and the top of frame 1; both land at frame 2),
+# and INPUT_INJECT_TEST=1 cannot fire at all since its condition needs frame
+# 0. The branch is reachable in the FIELD (a host key held physically is in
+# that read) and not from here, so the gate asserts the code shape rather
+# than pretending to exercise it.
+if grep -q 'baseline\[tag\] = integ_ports\[tag\]:read()' tests/lua/replay.lua; then
+    echo "  FAIL: replay.lua still ADOPTS frame 1's reading as the idle"
+    echo "        baseline — a control held from boot is invisible to the guard"
+    fail=1
+elif grep -q 'baseline\[tag\] = controlled\[tag\]' tests/lua/replay.lua; then
+    echo "  ok: the baseline is the known active-low idle (all controlled bits)"
+else
+    echo "  FAIL: cannot find the baseline assignment in replay.lua at all"; fail=1
+fi
+if grep -q 'are already LOW' tests/lua/replay.lua; then
+    echo "  ok: and frame 1 is compared against it, with a named diagnosis"
+else
+    echo "  FAIL: frame 1 sets a baseline but never CHECKS it"; fail=1
+fi
+# Corroboration from the run above, not from reading the source: the injected
+# violation printed `expected 7f7f ... (mask 7f7f)` — expected == mask, i.e.
+# the idle really is all-ones for the controlled bits.
+if [ -f "$WORK/e2" ] && grep -qE 'expected ([0-9a-f]+) got [0-9a-f]+ \(mask \1\)' "$WORK/e2"; then
+    echo "  ok: the live control corroborates it — expected == mask == all-ones"
+fi
+
 echo
 [ "$fail" = 0 ] || { echo "FAIL: input-integrity self-check"; exit 1; }
 echo "PASS: input-integrity self-check — silent on clean runs, non-perturbing,"
-echo "      and it catches a single-frame un-scripted press at the right frame."
+echo "      it catches a single-frame un-scripted press at the right frame, and"
+echo "      the frame-1 idle baseline is asserted rather than adopted."
