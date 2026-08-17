@@ -22,8 +22,16 @@ set -eu
 
 ROMDIR="${ROMDIR:?set ROMDIR}"
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
-OUTBASE="${1:-$REPO/build/donovan_stage4_gate}"
 WORK="$(mktemp -d)"
+# BUILDS TO A SCRATCH DIR BY DEFAULT (14z-94, GitHub #97). This defaulted to
+# build/donovan_stage4_gate, which carries SEVEN TRACKED files — so every run
+# of this gate rewrote committed artifacts, and `git status` after a test run
+# showed a diff. A pre-commit chain whose own side effect is a diff is one
+# people learn to scroll past, and that is how a real unexpected modification
+# gets missed. Nothing READS that path (it is this gate's build target and
+# nothing else), so the tracked copies stay as history and are no longer
+# overwritten. Pass an outbase explicitly to keep the build for inspection.
+OUTBASE="${1:-$WORK/stage4_build}"
 trap 'rm -rf "$WORK"' EXIT
 cd "$REPO"
 . "$REPO/tests/lib/m2a_common.sh"
