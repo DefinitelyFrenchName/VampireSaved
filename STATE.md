@@ -1,9 +1,31 @@
 # STATE — living progress log
 
-## Session 14z-94 (10) — SEVEN issues cleared while the maintainer
-## playtests: #69, #94, #71, #46, #24, #29, plus the merged reproducibility
-## gap — and #96 root-caused. Most turned out bigger or different than their
-## ticket said.
+## Session 14z-94 (10) — EIGHT issues cleared while the maintainer
+## playtests: #69, #94, #71, #46, #24, #29, #57, plus the merged
+## reproducibility gap — and #96 root-caused, #97 half-fixed. Most turned out
+## bigger or different than their ticket said.
+
+**#57 — the input guard was measuring against itself.** CPS-2 inputs are
+ACTIVE LOW, so the true idle of the controlled bits is all-ones; the guard
+instead adopted whatever frame 1 read as "idle". A host key held from before
+frame 1 therefore BECAME the baseline and matched every later frame: zero
+violations, a clean log, and a run whose P1 direction was pressed for its
+whole length. That is the one input pattern with NO divergence signature —
+and this guard exists because host input already cost ~2,400 runs of
+statistics once. Frame 1 is now compared against the known idle, and the
+known idle is the baseline thereafter.
+
+**The part worth remembering is what could NOT be tested.** MAME samples the
+ports BEFORE the frame_done callback, so no Lua `set_value` can dirty frame
+1's own read — measured twice (script load, top of frame 1), both landing at
+frame 2 — and `INPUT_INJECT_TEST=1` cannot fire at all, since its condition
+needs frame 0. That is exactly why the hole survived. I built the boot-hold
+control, watched it miss, and REMOVED it rather than leave something in the
+canonical instrument implying coverage it does not have; the gate asserts the
+code shape and says why. The fix does not need a control to be correct —
+all-ones is a known constant, so it asserts a value instead of inferring one.
+Corroborated independently by the existing control's own output: `expected
+7f7f ... (mask 7f7f)`.
 
 **#24 + #29 — the SKIP-as-PASS family, closed together.** `run_battery_m2.sh`
 printed an unconditional `BATTERY GREEN` while up to nine of its 24 gates
