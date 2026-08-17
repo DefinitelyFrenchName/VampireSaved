@@ -32,6 +32,16 @@ p1_ptr64	p1	0x64	4	stable	per-character ptr (table PRG:0x0BD9FA)
 p2_ptr64	p2	0x64	4	stable	per-character ptr
 p1_word132	p1	0x132	2	stable	per-character word (table PRG:0x0BE17A)
 p2_word132	p2	0x132	2	stable	per-character word
+# METER (14z-94, GitHub #83). CLAUDE.md §4 names meter in the dual-emulator
+# protocol's mapped set — "character IDs, HP, positions, timer, meter, and the
+# other fields in ram.md" — and this map omitted both halves of it, so a
+# cross-emulator meter regression passed the stage-4 oracle while every
+# mapped field agreed. ram.md:113-114. The existing dump windows already
+# cover $FF8509/$FF8909, so nothing else had to change.
+p1_meter_stock	p1	0x109	1	stable	banked stock count (cap 0x63; the displayed stocks)
+p2_meter_stock	p2	0x109	1	stable	banked stock count
+p1_meter_frac	p1	0x10A	2	stable	meter-bar fraction (full bar 0x90 -> +1 stock)
+p2_meter_frac	p2	0x10A	2	stable	meter-bar fraction
 p1_x	p1	0x10	2	settled	X position (start position once idle)
 p2_x	p2	0x10	2	settled	X position
 p1_y	p1	0x14	2	settled	Y position

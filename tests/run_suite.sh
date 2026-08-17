@@ -38,7 +38,10 @@
 #   <name>.sha1 expectation: whole-log SHA-1 equality (the default).
 #   --freeze: write sha1 + full log copies instead of comparing. Replays
 #     carrying .skip or .masked are left untouched (those expectations are
-#     authored from the gate inventory, not self-frozen).
+#     authored from the gate inventory, not self-frozen). A SELF-FROZEN
+#     .diverge, however, is RETIRED to .diverge.superseded and reported —
+#     dispatch consults .diverge before .sha1, so leaving it would make the
+#     freeze unreachable while printing "frozen" (14z-94, GitHub #88).
 set -eu
 
 FREEZE=0
@@ -133,6 +136,23 @@ for rpl in "$REPO"/tests/replays/*.rpl; do
         echo "$sha" > "$EXPDIR/$name.sha1"
         mkdir -p "$EXPDIR/logs"
         cp "$WORK/$name.1.log" "$EXPDIR/logs/$name.log"
+        # RETIRE A SUPERSEDED .diverge (14z-94, GitHub #88). Dispatch below
+        # consults .diverge BEFORE .sha1, so freezing a replay that still
+        # carries one wrote an expectation that could never be reached: the
+        # command printed "frozen <sha>" while the replay stayed governed by
+        # the OLD divergence allowance. Exactly the case this happens in — a
+        # replay that was allowed to diverge and has since been FIXED — is the
+        # one where continuing to accept a divergence is worst.
+        #
+        # Retired, not deleted: a .diverge is a ratified allowance and the
+        # frame it names is evidence. Freeze already documents itself as
+        # preserving only the AUTHORED .skip and .masked expectations, so
+        # superseding a self-frozen class here is the documented intent.
+        if [ -f "$EXPDIR/$name.diverge" ]; then
+            mv "$EXPDIR/$name.diverge" "$EXPDIR/$name.diverge.superseded"
+            echo "  RETIRED $name.diverge ($(cat "$EXPDIR/$name.diverge.superseded"))"
+            echo "  -> kept as $name.diverge.superseded; the new .sha1 now governs."
+        fi
         echo "frozen $sha"
     elif [ -n "$RUNMASK" ]; then
         spec=$(cat "$EXPDIR/$name.masked")
