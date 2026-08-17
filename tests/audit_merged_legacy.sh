@@ -472,12 +472,29 @@ PY
         "$W/b_${nm}_new.log" 2>&1 | sed 's/^/        /'
     echo "        (classified REPORT for the maintainer, not a gate — see header)"
 }
-legb 12_donovan_vs_cpu      build/don_m7  "$POK13"     "donovan/12_vs_cpu"
-legb 20_don_round2          build/don_m7  "$POK13"     "donovan/20_round2"
-legb hui/70_hui_mash        build/hui41    "$HUI_SOAK"  "huitzil/70_mash"
-legb hui/83_hui_fx          build/hui41    "$HUI_FX"    "huitzil/83_fx"
-legb pyron/70_pyron_mash    build/pyron26  "$PYR_SOAK"  "pyron/70_mash"
-legb pyron/72_pyron_cosmo_2p build/pyron26 "$PYR_COSMO" "pyron/72_cosmo_2p"
+# THE SOLO REFERENCES ARE PARAMETERS, NOT LITERALS (14z-94). Leg (b) asks
+# "does the merged build's tenant content behave like the solo's", so BOTH
+# sides must carry the same fixes — a hardcoded path silently compares a
+# fixed merged build against a pre-fix solo and reports the fix itself as a
+# divergence. Three references have already rotted this way in this repo
+# (hui31, pyron20, pyron17; docs/project/gotchas.md). Re-point these at each
+# re-freeze; the defaults are the currently-frozen solos.
+LEGB_DON="${LEGB_DON:-build/don_m7}"
+LEGB_HUI="${LEGB_HUI:-build/hui41}"
+LEGB_PYR="${LEGB_PYR:-build/pyron26}"
+for _d in "$LEGB_DON" "$LEGB_HUI" "$LEGB_PYR"; do
+    [ -f "$_d/rompath/vsavjw.zip" ] || {
+        echo "FAIL: leg (b) reference $_d has no rompath/vsavjw.zip — a dead"
+        echo "      reference is not a passing comparison. Re-point it."
+        exit 1; }
+done
+echo "  leg (b) references: D=$LEGB_DON H=$LEGB_HUI P=$LEGB_PYR"
+legb 12_donovan_vs_cpu      "$LEGB_DON"  "$POK13"     "donovan/12_vs_cpu"
+legb 20_don_round2          "$LEGB_DON"  "$POK13"     "donovan/20_round2"
+legb hui/70_hui_mash        "$LEGB_HUI"  "$HUI_SOAK"  "huitzil/70_mash"
+legb hui/83_hui_fx          "$LEGB_HUI"  "$HUI_FX"    "huitzil/83_fx"
+legb pyron/70_pyron_mash    "$LEGB_PYR"  "$PYR_SOAK"  "pyron/70_mash"
+legb pyron/72_pyron_cosmo_2p "$LEGB_PYR" "$PYR_COSMO" "pyron/72_cosmo_2p"
 
 echo
 if [ "$fail" != 0 ]; then
