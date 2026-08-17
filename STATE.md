@@ -1,5 +1,69 @@
 # STATE — living progress log
 
+## Session 14z-94 (2) — THE NO-RULING BACKLOG CLEARED: eight findings fixed
+## and gated, tracker 48 -> 38 open
+
+Maintainer authorised "the open items that don't require rulings". All eight
+are closed, each with a gate whose controls demonstrably fire.
+
+| # | what it was | shape of the fix |
+|---|---|---|
+| 20 | byte edits wrote `len(new)` after verifying `len(old)` | assert equality at BOTH generator sites + a static scanner |
+| 28 | `build_merged.sh` read `$ROMDIR` with no checksum gate | the §3 gate, above every write |
+| 42 | `_minitoml` switched parsers by host Python, silently | REFUSE the four divergent constructs |
+| 19 | `_PRG_RE` matched gfx `vsw.41m`/`43m` | exclude `m` from the suffix class |
+| 38 | a non-overlay FBNeo run inherited the previous overlay | clear before symlinking |
+| 31 | the crash guard ignored MASK_RANGES, had no input check | refuse the first, implement the second |
+| 25 | phase-A A3 published its decision on a dead measurement | hard-fail + count contributors |
+| 18 | a patch could be applied to any romset | record and verify a source identity |
+
+**THREE CORRECTIONS TO THE FINDINGS AS FILED**, all recorded in the fixes:
+- **#20's mechanism is wrong.** It says the mismatch "changes the bytearray's
+  length" and overruns the next allocation. It does not — the slice is sized
+  by `len(new)`, so the assignment is length-preserving. The real defect is an
+  unverified write plus a provenance note recording the wrong span. Fixed
+  anyway; the resize story is now explicitly retracted in the tool.
+- **#42 could not be fixed the obvious way here.** A "both parsers agree"
+  gate would SKIP on this host (Python 3.9.6, no tomllib) — the rot mode #29
+  describes. Fixed by REFUSAL instead: anything the subset parser accepts,
+  tomllib parses identically, and that property holds without tomllib present.
+- **#18 did not need per-op old bytes.** A source-set identity gives the same
+  guarantee for a fraction of the change.
+
+**FOUR TIMES A GATE CAUGHT ITS OWN AUTHOR THIS SESSION**, which is the part
+worth keeping:
+1. `test_phasea_a3_liveness` **first draft passed vacuously** — it stubbed the
+   `run_one()` helper, but A1's instrument ground-truth calls the runner
+   DIRECTLY, so the audit died in A1 and A3 never executed. Its own section 3
+   (require the refusal to NAME the scroll3 measurement) is what caught it.
+2. `test_replay_stage_census` went red on **record_window.lua**, the recorder
+   written earlier the same session: copied from snapshot_frames.lua, one of
+   the ten `+1` deviants. Fixed the file rather than the list — free here
+   because nothing consumes its frame constants yet, which is precisely why
+   #10 stays deferred for the existing ten.
+3. `test_fbneo_overlay_hygiene`'s first run measured a directory the script
+   never touched: **SANDBOX is the fourth POSITIONAL**, not an env var, and
+   `SANDBOX="${4:-}"` overwrites any exported value.
+4. The table-A frozen set in `test_voice_row_range` was `{0x11, 0x13}` until
+   Donovan's row failed on `0x10` — each tenant's ladder names the OTHERS.
+
+**INERTNESS PROVEN, NOT ASSUMED:** `test_m3a_reproducible` green after the
+generator and patch_prg changes (all four frozen references bit-exact,
+whole-artifact manifests matching), `test_tenant_loop` green end to end,
+`test_crash_guard` green with checksums IDENTICAL to frozen vanilla after the
+guard port, and the three synthetic-patch gates green on #18's warning path.
+
+**CI PORTABLE +5**, each verified to complete with ROMDIR and MAME_BIN unset
+and without printing SKIP. Exclusions documented with reasons — including
+`test_member_classify`, which passes here only because local build dirs feed
+its fallback and would SKIP on a genuinely clean checkout.
+
+**STILL OPEN AND STILL YOURS:** #30 (+#24/#29, one cluster — what runs the
+suite), #27 (build_merged from a clean checkout), #43 (the drifted matcher,
+flagged as possibly load-bearing), #10 (deferred-with-reason, ripe), and the
+21 `contested` items left deliberately alone.
+
+
 ## Session 14z-94 FREEZE RECORD — huitzil-m16 / pyron-m10 / merged-m2, the
 ## first builds on which no planted tripwire is reachable in extended play
 
