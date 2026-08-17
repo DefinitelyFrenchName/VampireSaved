@@ -47,6 +47,7 @@ test_fbneo_overlay_hygiene_control
 test_freeze_basis_sandbox
 test_freeze_retires_diverge
 test_gfx_collision_gate
+test_gfx_layout_fields_live
 test_hex_lengths
 test_m2a_flicker_gate
 test_m2a_mask_pin

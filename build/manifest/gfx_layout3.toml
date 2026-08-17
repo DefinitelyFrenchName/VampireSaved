@@ -53,8 +53,22 @@ anim_len  = 0x1E800
 band_lo = 0x0AF6
 band_hi = 0x4EFC
 delta = 0                   # native codes — no record remap
-scatter_lo = 0x0000         # 25 low shared-effect tiles, native codes
-scatter_hi = 0x06D8
+# SCATTER = everything placed OUTSIDE the band. RE-MEASURED 14z-94 (GitHub
+# #87) when this field stopped being inert and the builder began checking it:
+# the old 0x0000-0x06D8 / "25 low shared-effect tiles" described huitzil
+# before the 246-code block below arrived, and nothing consumed the field, so
+# nothing noticed. Measured on build/hui43 (15,603 tiles), out-of-band codes
+# are 270 in TWO parts:
+#   * 24 singleton shared-effect tiles, 0x0057 .. 0x06D8 (the old bound was
+#     this part's true ceiling, which is why it looked right)
+#   * ONE contiguous run 0x0A00-0x0AF5 (246 codes) ending at band_lo - 1, i.e.
+#     immediately adjacent to the band rather than scattered at all
+# The bound is widened to cover both because that is what is placed. The
+# SAFETY property is unaffected and independently proven: tests/
+# test_gfx_layout3.sh asserts every H/P native code incl. extras stays below
+# Donovan's SAFE_LO (0xA42C), and 0x0AF5 is far below it.
+scatter_lo = 0x0000
+scatter_hi = 0x0AF5
 sweep_lo = 0x0AF6           # walker sweep-pass coherence = his own band
 sweep_hi = 0x4EFC
 
@@ -67,8 +81,13 @@ anim_len  = 0x1B500         # oracle-clean, 0 variant-site bytes)
 band_lo = 0x4ED5
 band_hi = 0x8647
 delta = 0                   # native codes — no record remap
-scatter_lo = 0x003F         # 51 scattered tiles incl. 0xA42C (the
-scatter_hi = 0xA42C         # highest H∪P native code)
+scatter_lo = 0x003F         # 54 scattered tiles incl. 0xA42C (the
+scatter_hi = 0xA42C         # highest H∪P native code). Count corrected
+#                             from 51 at 14z-94 (GitHub #87) — measured on
+#                             build/pyron27: 54 out-of-band codes, ALL
+#                             singletons, all inside these bounds. Unlike
+#                             huitzil's row the BOUNDS were already right;
+#                             only the count had gone stale.
 sweep_lo = 0x4ED5           # walker sweep-pass coherence = his own band
 sweep_hi = 0x8647
 

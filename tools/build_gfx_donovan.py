@@ -73,6 +73,82 @@ SAFE_LO, SAFE_HI = 0xAD80, 0xEEBB          # writable window in Jedah band
 # tests/test_gfx_layout3.sh invariant).
 
 
+def check_profile_fields(prof, path):
+    """The [profile] block must AGREE with what this builder implements
+    (14z-94, GitHub #87).
+
+    bank4_word/bank5_word/collision_rule read as executable layout policy and
+    were consumed by nothing: the bank words are computed by
+    gfx_tiles.bank_word() and the collision rule is hardcoded in place() —
+    whose docstring even cites "gfx_layout3.toml's collision_rule" while not
+    reading it. Editing any of them changed no output and invalidated no
+    build, so the repository recorded policy the artifact producer did not
+    enforce.
+
+    These are checked rather than obeyed, deliberately. The values are baked
+    into frozen references (the m3a/stock fingerprints), so making them
+    genuinely settable would be a way to silently produce a non-reproducible
+    build. Asserting instead makes the manifest TRUE — an edit now fails
+    loudly rather than doing nothing — without giving it the power to move a
+    frozen byte. If a value here ever needs to change, the change belongs in
+    both places, with a re-measure.
+    """
+    for bank, key in ((4, "bank4_word"), (5, "bank5_word")):
+        if key in prof and int(prof[key]) != bank_word(bank):
+            sys.exit(
+                f"{path}: [profile].{key} = {int(prof[key]):#06x} but this "
+                f"build emits {bank_word(bank):#06x} for bank {bank} "
+                f"(gfx_tiles.bank_word). The manifest and the builder "
+                f"disagree about the OBJ y-word; fix both together — bit 15 "
+                f"is the sprite-list terminator, so a wrong bank word ends "
+                f"the list at the first tenant sprite.")
+    rule = prof.get("collision_rule")
+    if rule is not None and rule != "same-source-or-fail":
+        sys.exit(
+            f"{path}: [profile].collision_rule = {rule!r}, but place() "
+            f"implements 'same-source-or-fail' and nothing else. Selecting "
+            f"another policy here would change no behaviour, so it is "
+            f"refused rather than ignored.")
+    print(f"  profile fields agree with the builder "
+          f"(bank4 {bank_word(4):#06x}, bank5 {bank_word(5):#06x}, "
+          f"collision {rule or 'same-source-or-fail'})")
+
+
+def check_scatter_bounds(codes, row, path):
+    """A delta-0 tenant's native codes must lie inside the bounds its layout
+    row DECLARES (14z-94, GitHub #87).
+
+    scatter_lo/scatter_hi documented the tenant's scattered low tiles — 25
+    for huitzil, 51 for pyron including 0xA42C, "the highest H∪P native
+    code" — and were read by nothing: the delta-0 path places every
+    inventoried tile at its native code without consulting them. So the
+    numbers could be wrong, or the inventory could grow past them, with
+    nothing to notice.
+
+    The union with the main band is the actual claim the layout makes: every
+    placed code is either in the tenant's band or in its declared scatter.
+    """
+    if "scatter_lo" not in row or "scatter_hi" not in row:
+        return
+    slo, shi = int(row["scatter_lo"]), int(row["scatter_hi"])
+    blo, bhi = int(row["band_lo"]), int(row["band_hi"])
+    stray = [c for c in codes
+             if not (slo <= c <= shi or blo <= c <= bhi)]
+    if stray:
+        sys.exit(
+            f"{path}: tenant {row['name']} places {len(stray)} tile code(s) "
+            f"outside BOTH its band {blo:#06x}-{bhi:#06x} and its declared "
+            f"scatter {slo:#06x}-{shi:#06x}: "
+            + ", ".join(f"{c:#06x}" for c in sorted(stray)[:8])
+            + ("..." if len(stray) > 8 else "")
+            + f"\n  The layout row no longer describes what is placed. "
+              f"Re-measure the scatter bounds rather than widening them to "
+              f"fit — they are what the disjointness argument rests on.")
+    n_scatter = sum(1 for c in codes if slo <= c <= shi and not blo <= c <= bhi)
+    print(f"  scatter bounds hold: {n_scatter} code(s) in "
+          f"{slo:#06x}-{shi:#06x}, the rest inside the band")
+
+
 def load_group(z, prefix, group):
     out = []
     for n in group:
@@ -231,6 +307,7 @@ def main():
                 "layout safe window drifted from the frozen constants"
             SAFE_LO = int(layout_row["safe_lo"])
             SAFE_HI = int(layout_row["safe_hi"])
+        check_profile_fields(lay.get("profile") or {}, args.layout)
     # WIDE group C (banks 4-5): the tenant's band+shelf keep their in-group
     # tile indices (code+DELTA, unchanged from the host-band layout, so the
     # RECORDS need no rewrite at all) but the tile DATA goes into the four
@@ -250,6 +327,8 @@ def main():
               f"(delta-0 tenant)")
         assert not args.effects, \
             "delta-0 tenant: an effect map must not exist (nothing moves)"
+        if layout_row is not None:
+            check_scatter_bounds(band, layout_row, args.layout)
     else:
         band = sorted(t for t in inv if BAND_LO <= t <= BAND_HI)
         skipped = len(inv) - len(band)
