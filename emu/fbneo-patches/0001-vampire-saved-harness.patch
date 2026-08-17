@@ -13,10 +13,10 @@ index 3bf65bd..0de57a1 100644
  alldir	+= 	intf/audio/linux
 diff --git a/src/burner/sdl/harness.cpp b/src/burner/sdl/harness.cpp
 new file mode 100644
-index 0000000..72d3743
+index 0000000..b31c0e2
 --- /dev/null
 +++ b/src/burner/sdl/harness.cpp
-@@ -0,0 +1,567 @@
+@@ -0,0 +1,586 @@
 +// harness.cpp — Vampire Saved test harness for the SDL2 frontend.
 +// FRONTEND-ONLY: no emulation-core file is touched by this feature.
 +//
@@ -495,10 +495,18 @@ index 0000000..72d3743
 +
 +    for (UINT32 f = 1; f <= nScriptFrames; f++) {
 +        nHarnessFrame = f;
-+        harness_apply_pokes(f);   // FBNEO_HPOKE (no-op unless set)
 +
-+        // scripted inputs for frame f, active while frame f emulates
-+        UINT32 mask = held[f];
++        // scripted inputs for frame f, active while frame f emulates.
++        // FRAME 1 IS DELIBERATELY EMPTY (14z-94, GitHub #59): replay.lua
++        // stages inputs from inside register_frame_done, so its first
++        // opportunity is at the END of frame 1 — frame 1 therefore emulates
++        // with NO inputs on MAME and `held[1]` is dead there. Honouring it
++        // here made a .rpl line at frame 1 live on FBNeo and dead on MAME.
++        // No replay in the corpus uses frame 1, so this is inert today; it
++        // is the asymmetry that matters, because the dual-emulator oracle
++        // only means anything if both harnesses present identical inputs at
++        // identical emulated frames.
++        UINT32 mask = (f == 1) ? 0 : held[f];
 +        for (int t = 0; t < NTOKENS; t++)
 +            *token_pval[t] = (mask >> t) & 1;
 +
@@ -506,6 +514,17 @@ index 0000000..72d3743
 +        nCurrentFrame++;
 +        pBurnDraw = pHarnessFB;   // NULL unless video mode is on
 +        BurnDrvFrame();
++
++        // POKES ARE APPLIED AFTER THE FRAME (14z-94, GitHub #59), which is
++        // what replay.lua does: its poke loop runs inside frame_done, i.e.
++        // after frame N has emulated and just before N's checksum is written.
++        // So a poke scheduled for frame N is VISIBLE in frame N's checksum
++        // but only INFLUENCES emulation from N+1. Applying it before
++        // BurnDrvFrame() made the same POKES string land one emulated frame
++        // apart between the two emulators — and every tenant rig in the repo
++        // is a poke rig, so a cross-emulator disagreement would have read as
++        // an engine bug rather than a harness one.
++        harness_apply_pokes(f);   // FBNEO_HPOKE (no-op unless set)
 +
 +        fprintf(out, "%u %016llx\n", f, (unsigned long long)fnv1a64_workram());
 +        if (vout)
