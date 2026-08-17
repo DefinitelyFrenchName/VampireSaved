@@ -54,6 +54,7 @@ test_mame_mirror_guard
 test_manifest_merge
 test_meter_in_field_map
 test_minitoml_subset
+test_no_tracked_mutation
 test_obj_record_walk
 test_optimize_guard
 test_phasea_a3_liveness

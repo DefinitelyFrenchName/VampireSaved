@@ -49,16 +49,21 @@ if [ ! -d "$EXTRACT" ]; then
     exit 0
 fi
 
-# This gate PERTURBS tools/gen_donovan_patch.py in place, so restoring it is
-# the trap's FIRST act and section 3 asserts it independently. An interrupted
-# run must not leave the generator edited.
+# This gate PERTURBS the generator to prove a substitution site is live. It
+# does so on a SHADOW COPY, never on tracked source (14z-94, GitHub #81): an
+# exit trap covers an ordinary Ctrl-C and nothing else — not SIGKILL, not two
+# runs sharing a checkout, not a legitimate edit saved during a long run, all
+# of which previously ended with tools/gen_donovan_patch.py either perturbed
+# or silently reverted. See tests/lib/shadow_tools.sh for why the shadow is a
+# repo ROOT and not just a copy of the file.
 WORK="$(mktemp -d)"
-cp tools/gen_donovan_patch.py "$WORK.gen"
-trap 'cp "$WORK.gen" tools/gen_donovan_patch.py 2>/dev/null || true; rm -rf "$WORK" "$WORK.gen"' EXIT INT TERM
-restore() { cp "$WORK.gen" tools/gen_donovan_patch.py; }
+trap 'rm -rf "$WORK"' EXIT INT TERM
+. "$REPO/tests/lib/shadow_tools.sh"
+GEN="$(shadow_tool "$WORK" gen_donovan_patch.py)"; export GEN
+restore() { shadow_restore "$WORK" gen_donovan_patch.py; }
 
 gen() {  # gen <outdir> -> generator run, exit code swallowed (fails are data)
-    python3 tools/gen_donovan_patch.py "$EXTRACT" "$1" \
+    python3 "$GEN" "$EXTRACT" "$1" \
         --vsavj "$ROMDIR/vsavj.zip" --stage 6 \
         --port build/manifest/donovan.toml --profile cps2-wide-v1 \
         --allow-plausible --tripwire-open > "$1.log" 2>&1 || true
@@ -97,8 +102,8 @@ fi
 # slice C/D made at that site is decoration.
 control() {  # control <label> <anchor> <replacement>
     python3 - "$2" "$3" <<'PY' || { echo "  FAIL: anchor not found (site moved?)"; return 1; }
-import sys, pathlib
-p = pathlib.Path("tools/gen_donovan_patch.py")
+import os, sys, pathlib
+p = pathlib.Path(os.environ["GEN"])
 s = p.read_text(); a, b = sys.argv[1], sys.argv[2]
 if s.count(a) != 1:
     sys.exit("anchor appears %d times" % s.count(a))
@@ -176,8 +181,8 @@ control "site_thunk TT/TU + row_subst (slice E)" \
 # itself tested; SMS shipped a wrong conclusion from a verdict bug once).
 echo "== 2: negative control — an UNUSED binding must be called DEAD =="
 python3 - <<'PY'
-import pathlib
-p = pathlib.Path("tools/gen_donovan_patch.py"); s = p.read_text()
+import os, pathlib
+p = pathlib.Path(os.environ["GEN"]); s = p.read_text()
 a = '            prow, _pvar, _pmir = row_ident(owner_of(pal))'
 assert s.count(a) == 1
 p.write_text(s.replace(a, a + '; _pvar ^= 1'))
@@ -194,11 +199,20 @@ else
     fail=1
 fi
 
-echo "== 3: the tree is restored =="
-if cmp -s "$WORK.gen" tools/gen_donovan_patch.py; then
-    echo "  ok: tools/gen_donovan_patch.py is byte-identical to the start"
+echo "== 3: TRACKED SOURCE WAS NEVER WRITTEN =="
+# Stronger than the old check, which compared against a snapshot taken by
+# THIS run: that passes even when a concurrent run has clobbered the file,
+# and it passes on a restore that silently reverted someone's real edit.
+# Asking git makes the claim absolute.
+if git -C "$REPO" diff --quiet -- tools/gen_donovan_patch.py 2>/dev/null; then
+    echo "  ok: tools/gen_donovan_patch.py is unmodified against git"
+elif ! git -C "$REPO" rev-parse --git-dir >/dev/null 2>&1; then
+    echo "  note: not a git checkout — cannot assert tracked-source integrity"
 else
-    echo "  FAIL: the generator was left perturbed — restore it from git"
+    echo "  FAIL: tools/gen_donovan_patch.py differs from git. This gate no"
+    echo "        longer writes it, so either something else did, or a"
+    echo "        perturbation escaped the shadow copy:"
+    git -C "$REPO" diff --stat -- tools/gen_donovan_patch.py | sed 's/^/        /'
     fail=1
 fi
 

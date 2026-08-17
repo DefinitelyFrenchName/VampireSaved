@@ -52,9 +52,19 @@ WORK="$(mktemp -d)"
 trap 'rm -rf "$WORK"' EXIT INT TERM
 fail=0
 
+# Section 6's verdict controls PERTURB the generator. They do so on a SHADOW
+# COPY, never on tracked source (14z-94, GitHub #81) — an exit trap covers an
+# ordinary Ctrl-C and nothing else, so the old mutate-run-restore left
+# tools/gen_donovan_patch.py perturbed on SIGKILL, clobbered between two runs
+# sharing a checkout, and silently reverted a legitimate edit saved during a
+# run. tests/lib/shadow_tools.sh explains why the shadow is a repo ROOT.
+# Every gen*() below runs the shadow, so the controls perturb what they run.
+. "$REPO/tests/lib/shadow_tools.sh"
+GEN="$(shadow_tool "$WORK" gen_donovan_patch.py)"; export GEN
+
 gen1() {  # gen1 <out> <extract> <manifest>  — one tenant
     rm -rf "$1"; mkdir -p "$1"
-    python3 tools/gen_donovan_patch.py "$2" "$1" \
+    python3 "$GEN" "$2" "$1" \
         --vsavj "$ROMDIR/vsavj.zip" --stage 6 --port "$3" \
         --profile cps2-wide-v1 --allow-plausible --tripwire-open \
         > "$1.log" 2>&1 || true
@@ -62,7 +72,7 @@ gen1() {  # gen1 <out> <extract> <manifest>  — one tenant
 }
 gen2() {  # gen2 <out> — donovan + huitzil
     rm -rf "$1"; mkdir -p "$1"
-    python3 tools/gen_donovan_patch.py "$D_EX" "$1" --extract "$H_EX" \
+    python3 "$GEN" "$D_EX" "$1" --extract "$H_EX" \
         --vsavj "$ROMDIR/vsavj.zip" --stage 6 \
         --port build/manifest/donovan.toml --port build/manifest/huitzil.toml \
         --profile cps2-wide-v1 --allow-plausible --tripwire-open \
@@ -70,7 +80,7 @@ gen2() {  # gen2 <out> — donovan + huitzil
 }
 gen3() {  # gen3 <out> — all three
     rm -rf "$1"; mkdir -p "$1"
-    python3 tools/gen_donovan_patch.py "$D_EX" "$1" \
+    python3 "$GEN" "$D_EX" "$1" \
         --extract "$H_EX" --extract "$P_EX" \
         --vsavj "$ROMDIR/vsavj.zip" --stage 6 \
         --port build/manifest/donovan.toml --port build/manifest/huitzil.toml \
@@ -278,9 +288,9 @@ PY
 # have caught it. It is measured directly now.
 echo "== 4: shared region-scoped rows applied to every tenant's copy =="
 python3 - "$WORK/three" <<'PY' || fail=1
-import importlib.util, json, sys
+import os, importlib.util, json, sys
 from pathlib import Path
-spec = importlib.util.spec_from_file_location("g", "tools/gen_donovan_patch.py")
+spec = importlib.util.spec_from_file_location("g", os.environ["GEN"])
 g = importlib.util.module_from_spec(spec); spec.loader.exec_module(g)
 out = Path(sys.argv[1])
 
@@ -643,13 +653,11 @@ fi
 # The control forces the body to one iteration and requires the counts to
 # go back to Donovan's, i.e. requires section 2 to notice.
 echo "== 6: verdict controls =="
-cp tools/gen_donovan_patch.py "$WORK/gen.bak"
-restore() { cp "$WORK/gen.bak" tools/gen_donovan_patch.py; }
-trap 'restore; rm -rf "$WORK"' EXIT INT TERM
+restore() { shadow_restore "$WORK" gen_donovan_patch.py; }
 
 python3 - <<'PY'
-import pathlib
-p = pathlib.Path("tools/gen_donovan_patch.py")
+import os, pathlib
+p = pathlib.Path(os.environ["GEN"])
 s = p.read_text()
 a = "    for _ti, T in enumerate(_tenant_list):"
 assert s.count(a) == 1, "loop header moved"
@@ -680,8 +688,8 @@ fi
 # The second control is the side-file guard: two tenants writing one name.
 # Disabling side_name() must be CAUGHT by write_out(), not silently clobber.
 python3 - <<'PY'
-import pathlib
-p = pathlib.Path("tools/gen_donovan_patch.py")
+import os, pathlib
+p = pathlib.Path(os.environ["GEN"])
 s = p.read_text()
 a = "        if _ti == 0:\n            return name\n"
 assert s.count(a) == 1, "side_name() moved"
@@ -703,8 +711,8 @@ fi
 # CAUGHT — that rule left Huitzil's and Pyron's copies of the shared regions
 # holding vs2's OBJ bank, and every other section stayed green through it.
 python3 - <<'PY'
-import pathlib
-p = pathlib.Path("tools/gen_donovan_patch.py")
+import os, pathlib
+p = pathlib.Path(os.environ["GEN"])
 s = p.read_text()
 a = '        if any(k in row for k in ("region", "regions", "slot_table")):'
 assert s.count(a) == 1, "row_here()'s shared-row rule moved"
@@ -721,9 +729,9 @@ sys.exit(0 if b.is_file() else 1)
 PY
 then
     if tests_out=$(python3 - "$WORK/ctl3" 2>&1 <<'PY'
-import importlib.util, json, sys
+import os, importlib.util, json, sys
 from pathlib import Path
-spec = importlib.util.spec_from_file_location("g", "tools/gen_donovan_patch.py")
+spec = importlib.util.spec_from_file_location("g", os.environ["GEN"])
 g = importlib.util.module_from_spec(spec); spec.loader.exec_module(g)
 docs = []
 for p in ("donovan", "huitzil", "pyron"):
@@ -753,8 +761,8 @@ fi
 # The fourth control is section 4b's: forcing the engine union back onto
 # iteration 0 must send Huitzil's twelve handlers to tripwires again.
 python3 - <<'PY'
-import pathlib
-p = pathlib.Path("tools/gen_donovan_patch.py")
+import os, pathlib
+p = pathlib.Path(os.environ["GEN"])
 s = p.read_text()
 a = "        return _ti == len(_tenant_list) - 1\n"
 assert s.count(a) == 1, "engine_here() moved"
@@ -778,8 +786,8 @@ fi
 # there must be no N-way chain to decode AND the ops must collide. If this
 # control passes silently, neither section is measuring anything.
 python3 - <<'PY'
-import pathlib
-p = pathlib.Path("tools/gen_donovan_patch.py")
+import os, pathlib
+p = pathlib.Path(os.environ["GEN"])
 s = p.read_text()
 a = "    _st_multi = {a for a in\n"
 assert s.count(a) == 1, "_st_multi moved"
