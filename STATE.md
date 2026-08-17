@@ -1,5 +1,62 @@
 # STATE — living progress log
 
+## Session 14z-94 (11) — THE MERGED-M2 PLAYTEST RESULT (maintainer,
+## 2026-08-18, build/m3b_merged9 on MAME). NO REGRESSION — and one CRASH.
+
+**Verbatim, because it is the primary artifact:**
+
+- No regression observed.
+- A few of Phobos' voice sfx might be wrong (e.g. his electrocuted sfx) but
+  that has to be checked against VS2 and would likely not be a regression.
+- Donovan's name and portrait in the "next stage" screen of arcade mode is a
+  blank portrait and a Victor name (not a regression, cosmetic, minor).
+- **Did not observe the flicker previously observed at round end.**
+- Donovan is met on Bishamon's stage, very fitting.
+- **A crash-reset in the fifth match of arcade mode**: first matches as
+  Phobos, lost the 4th against Bishamon, switched character to Donovan,
+  resulting in a 5th match Donovan vs Phobos; crashed right after the
+  character's intro at fight start. Reproducibility being explored.
+
+**CONFIRMED BY THE FIELD:** "Donovan on Bishamon's stage" IS the #92 fix
+landing as designed — `v=0x0a` decodes to ABARAYA, the ratified retarget.
+And the round-end flicker, open since before this session, was NOT seen.
+
+**#99 (HIGH) — THE CRASH. Every gate missed it because THREE elements of that
+path are uncovered, and one of them is mandated:**
+
+| uncovered | evidence |
+|---|---|
+| tenant vs tenant | NO replay in tests/replays pits a ported character against another ported one — while CLAUDE.md §4 requires "vs each of the 18 (both sides)" |
+| continue + character switch | `26_don_arcade_mash` is SINGLE CREDIT, so it cannot reach the continue path at all |
+| playing AS Phobos in arcade | the marathon plays Donovan |
+
+**Excluded already, so the search can skip them:** Donovan's ladder row
+schedules class `0x10` (Phobos) BY DESIGN (group 0 idx 2, stage `0x02`
+CONCRETECAVE, decoded on the shipping image); and the per-node sfx dispatcher
+table `0x0BF41A` HAS real tenant rows — `0x10`/`0x11`/`0x13` point into the
+WIDE extension (`0x0045ce30`/`0x004acc80`/`0x00400e60`), so this is NOT the
+#91/#92 out-of-range shape.
+
+**Lead, explicitly unmeasured:** the voice-class borrow (`ram.md:87`) writes a
+class from the OPPONENT'S candidate row into `+0x382` at match start. A tenant
+opponent makes that a tenant class, and the crash timing — right after the
+intro — is when the dispatcher first fires. It is the one mechanism whose
+input changes specifically in a tenant-vs-tenant match.
+
+**#100 (LOW) — the "Victor name" is arithmetic worth noticing:** Donovan's
+class is `0x13`, Victor's is `0x03`, and `0x13 & 0x0F == 0x03`. A 4-bit mask
+in the next-stage display path would produce exactly what was seen. Plausible
+rather than coincidental because `ram.md:89` already records the ladder's
+in-use mask as `btst`, i.e. MOD 32 — the same defect one bit wider. May share
+a mechanism with #99; unmeasured either way.
+
+**The Phobos voice-sfx doubt lines up with two OPEN tickets** — #93
+(`audit_qs_voice_batch` keyon multiset, missing native signature
+`(13, 20481)`) and #98 (`audit_pyron_ring`, three solo ids MISSING on merged,
+"a family path stopped sounding"). Both are "a sound that should fire does
+not", same subsystem. Worth checking against vs2 natively before treating the
+ear report as a third finding.
+
 ## Session 14z-94 (10) — EIGHT issues cleared while the maintainer
 ## playtests: #69, #94, #71, #46, #24, #29, #57, plus the merged
 ## reproducibility gap — and #96 root-caused, #97 half-fixed. Most turned out
