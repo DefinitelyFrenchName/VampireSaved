@@ -202,10 +202,18 @@ else
     if [ "$tree_before" = "$tree_after" ]; then
         echo "  ok: no tracked file changed during the run"
     else
+        # Diff via files. `grep -vxF "$tree_before"` was wrong: it treats the
+        # whole multi-line string as a pattern LIST, and a blank line in it
+        # matches everything — so a real change printed an EMPTY list, which
+        # reads as a mystery rather than a finding.
+        printf '%s\n' "$tree_before" | awk 'NF' > "$WORK/tree_before.txt"
+        printf '%s\n' "$tree_after"  | awk 'NF' > "$WORK/tree_after.txt"
         echo "  DIRTIED by the run — these gates write into TRACKED paths"
         echo "  instead of a temp dir; restore with 'git checkout --' on them:"
-        printf '%s\n' "$tree_after" | grep -vxF "$tree_before" 2>/dev/null \
-            | sed 's/^/      /' | head -12
+        diff "$WORK/tree_before.txt" "$WORK/tree_after.txt" \
+            | grep '^[<>]' | sed 's/^/      /' | head -12
+        echo "      (before: $(wc -l < "$WORK/tree_before.txt" | tr -d ' ') entries," \
+             "after: $(wc -l < "$WORK/tree_after.txt" | tr -d ' '))"
     fi
 fi
 
