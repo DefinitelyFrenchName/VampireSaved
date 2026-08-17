@@ -1,6 +1,13 @@
--- replay_guard.lua — replay.lua plus crash detection. Same env contract and
--- identical checksum-log output, so it can substitute for replay.lua in any
--- gate; adds CRASH/PCWEEDS/SOFTRESET lines when the game leaves the rails.
+-- replay_guard.lua — replay.lua plus crash detection: identical checksum-log
+-- output, plus CRASH/PCWEEDS/SOFTRESET lines when the game leaves the rails.
+--
+-- SUBSTITUTABILITY, STATED HONESTLY (corrected 14z-94, GitHub #31). The
+-- header used to claim "same env contract ... can substitute for replay.lua
+-- in ANY gate". It does not implement MASK_RANGES, and it did not implement
+-- the input-integrity assertion. It now REFUSES to run when MASK_RANGES or
+-- NO_INPUT_CHECK is set rather than ignoring them, and it carries the
+-- integrity check. So: substitutable for UNMASKED comparisons; for a masked
+-- one, use replay.lua.
 --
 -- Two modes, auto-selected:
 --   * authoritative (run with -debug -debugger none): breakpoints on the 68k
@@ -47,11 +54,17 @@ local tail_frames = tonumber(os.getenv("TAIL_FRAMES") or "") or 120
 -- ── field lookup (identical to replay.lua) ───────────────────────────────────
 
 local ioport = manager.machine.ioport
+-- FIELD_INFO[field] = { port tag, bit mask }, recorded at construction so the
+-- input-integrity check below never re-derives which port a field belongs to
+-- (MAME may hand out a fresh wrapper per lookup, so identity matching against
+-- port.fields later is unreliable). Same construction as replay.lua.
+local FIELD_INFO = {}
 local function field_of(port, name)
     local p = ioport.ports[port]
     assert(p, "no port " .. port)
     local f = p.fields[name]
     assert(f, "no field '" .. name .. "' in " .. port)
+    FIELD_INFO[f] = { port, f.mask }
     return f
 end
 
@@ -76,6 +89,24 @@ local FIELDS = {
         SV = field_of(":IN2", "Service 1"), TS = field_of(":IN2", "Service Mode"),
     },
 }
+
+-- ── WHAT THIS SCRIPT DOES NOT IMPLEMENT, STATED LOUDLY (GitHub #31) ──────
+-- The header used to advertise "same env contract ... can substitute for
+-- replay.lua in any gate". It could not: MASK_RANGES was read by nobody here,
+-- so a masked comparison run through the guard produced a WHOLE-work-RAM log
+-- with the ratified windows still in it — compared against a masked basis
+-- that diverges in the dead-stack window on every hooked build, i.e. a
+-- phantom legacy regression with no reachable green state. Silently ignoring
+-- an env var that changes what a log MEANS is worse than not supporting it.
+if os.getenv("MASK_RANGES") then
+    error("replay_guard.lua does not implement MASK_RANGES. Its log would be "
+       .. "unmasked and would not be comparable to a masked basis. Use "
+       .. "tests/lua/replay.lua for masked comparisons.", 0)
+end
+if os.getenv("NO_INPUT_CHECK") then
+    error("NO_INPUT_CHECK is replay.lua's opt-out; setting it here implies an "
+       .. "integrity check you did not get. Remove it, or use replay.lua.", 0)
+end
 
 local function split_tokens(who, s)
     local toks, step = {}, (who == "sys") and 2 or 1
@@ -424,6 +455,45 @@ for spec in (os.getenv("POKES") or ""):gmatch("[^;]+") do
     if fr then pokes[#pokes + 1] = { tonumber(fr), tonumber(addr, 16), hexs } end
 end
 
+-- ── INPUT INTEGRITY ASSERTION (GitHub #31) ───────────────────────────────
+-- Ported from replay.lua, where it is "deliberately not opt-in". ~17 gates
+-- drive replays through this script — test_hui_grab, audit_merged_legacy leg
+-- b, audit_objhook_owner_census and the rest — and every one of them ran with
+-- no such check, while tools/run_replay_guarded.sh greps only for
+-- CRASH/PCWEEDS/SOFTRESET/END. A stray host press therefore produced a clean
+-- PASS on a run that was no longer a replay of anything. MAME's window takes
+-- focus even under -video none (tests/test_input_integrity.sh).
+local PORT_TAGS = { ":IN0", ":IN1", ":IN2" }
+local integ_ports, baseline, controlled = {}, {}, {}
+local violations, first_violation = 0, nil
+for _, tag in ipairs(PORT_TAGS) do
+    integ_ports[tag] = assert(ioport.ports[tag], "no port " .. tag)
+    controlled[tag] = 0
+end
+-- Compare ONLY the bits this harness can drive: :IN2 also carries the EEPROM
+-- data line, which legitimately toggles during boot. Host keystrokes land on
+-- controller bits, so masking to them loses no detection power.
+for _, group in pairs(FIELDS) do
+    for _, field in pairs(group) do
+        local info = FIELD_INFO[field]
+        controlled[info[1]] = controlled[info[1]] | info[2]
+    end
+end
+local inject_frame = tonumber(os.getenv("INPUT_INJECT_TEST") or "")
+
+-- Expected port values for a frame's held set: the idle baseline with each
+-- pressed field's mask cleared (CPS-2 inputs are active low).
+local function expected_ports(frame_held)
+    if not baseline[PORT_TAGS[1]] then return nil end
+    local exp = {}
+    for _, tag in ipairs(PORT_TAGS) do exp[tag] = baseline[tag] end
+    for _, field in ipairs(frame_held or {}) do
+        local info = FIELD_INFO[field]
+        if info then exp[info[1]] = exp[info[1]] & ~info[2] end
+    end
+    return exp
+end
+
 emu.register_frame_done(function()
     if crashed then return end
     frame = frame + 1
@@ -486,7 +556,35 @@ emu.register_frame_done(function()
         end
     end
 
+    -- integrity: frame 1 captures the idle baseline (nothing staged yet);
+    -- afterwards the live ports must equal what THIS script staged.
+    if not baseline[PORT_TAGS[1]] then
+        for _, tag in ipairs(PORT_TAGS) do
+            baseline[tag] = integ_ports[tag]:read() & controlled[tag]
+        end
+    else
+        local exp = expected_ports(held[frame])
+        for _, tag in ipairs(PORT_TAGS) do
+            local live = integ_ports[tag]:read() & controlled[tag]
+            if inject_frame and frame == inject_frame and tag == ":IN0" then
+                live = live & ~0x01          -- ground truth: a phantom press
+            end
+            if exp and live ~= (exp[tag] & controlled[tag]) then
+                violations = violations + 1
+                if not first_violation then
+                    first_violation = string.format(
+                        "INPUT-VIOLATION %d %s live %04x expected %04x",
+                        frame, tag, live, exp[tag] & controlled[tag])
+                    f:write(first_violation .. "\n")
+                end
+            end
+        end
+    end
+
     if frame >= total_frames then
+        if violations > 0 then
+            f:write(string.format("INPUT-VIOLATIONS %d\n", violations))
+        end
         f:write(string.format("END %d\n", frame))
         f:close()
         machine:exit()

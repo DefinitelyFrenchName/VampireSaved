@@ -41,9 +41,15 @@ REPLAY="$RPL" CHECKSUM_OUT="$OUT" MAME_SANDBOX="$WORK" \
     "$REPO/tools/run_mame.sh" "$@" > "$WORK/mame_guard.log" 2>&1 \
     || { cat "$WORK/mame_guard.log"; exit 1; }
 
-if grep -Eq "^(CRASH|PCWEEDS|SOFTRESET|END-CRASH) " "$OUT"; then
+# INPUT-VIOLATION joins the trip set (14z-94, GitHub #31). The guard now
+# carries replay.lua's input-integrity assertion, and a violation means the
+# run stopped being a replay of the script — a stray host press, a joystick, a
+# stuck modifier. MAME's window takes focus even under -video none. Without it
+# in this grep the line would be written to the log and never read, which is
+# the same silent PASS the check exists to remove.
+if grep -Eq "^(CRASH|PCWEEDS|SOFTRESET|END-CRASH|INPUT-VIOLATION) " "$OUT"; then
     echo "GUARD TRIPPED:"
-    grep -E "^(CRASH|STACK|PCWEEDS|SOFTRESET|END-CRASH) " "$OUT"
+    grep -E "^(CRASH|STACK|PCWEEDS|SOFTRESET|END-CRASH|INPUT-VIOLATION) " "$OUT"
     exit 2
 fi
 grep -q "^END " "$OUT" || { echo "replay did not complete (no END line)"; cat "$WORK/mame_guard.log"; exit 1; }
