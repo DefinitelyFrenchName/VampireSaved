@@ -46,6 +46,7 @@
 set -eu
 ROMDIR="${ROMDIR:?set ROMDIR}"
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
+. "$REPO/tests/lib/decrypt_cache.sh"   # GitHub #69
 cd "$REPO"
 WORK="$(mktemp -d)"
 trap 'rm -rf "$WORK"' EXIT
@@ -73,8 +74,7 @@ print(';'.join(['%d:ff8400-ff87ff'%f for f in (3200,3400,3600)]
              + ['%d:90c140-90c15f'%f for f in range($LO,$HI)]))")"
 
 VAN="$WORK/vsavj_data.bin"
-python3 tools/cps2_decrypt.py "$ROMDIR/vsavj.zip" "$WORK/vsavj_op.bin" \
-    --data-out "$VAN" > /dev/null
+decrypt_view vsavj "$WORK/vsavj_op.bin" "$VAN"
 
 if [ "${SKIP_RUNTIME:-0}" = 1 ]; then
     echo "== 1. native vs ours: SKIPPED (SKIP_RUNTIME=1)"

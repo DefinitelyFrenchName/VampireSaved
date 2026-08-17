@@ -33,7 +33,11 @@ set -eu
 ROMDIR="${ROMDIR:?set ROMDIR}"
 REPO="$(cd "$(dirname "$0")/.." && pwd)"; cd "$REPO"
 WORK="$(mktemp -d)"; trap 'rm -rf "$WORK"' EXIT
-BUILD="${1:-build/hui25}"; case "$BUILD" in /*) ;; *) BUILD="$REPO/$BUILD";; esac
+   # RE-POINTED 14z-94 (GitHub #94): was build/hui25, a pre-WIDE-v1.1 set
+   # (19 members, no vsw.z01/z02) — the script could not run at all.
+   # Its frozen inventory may still describe the OLD build: run it
+   # before trusting a green, and re-measure rather than absorb.
+BUILD="${1:-build/hui43}"; case "$BUILD" in /*) ;; *) BUILD="$REPO/$BUILD";; esac
 [ -f "$BUILD/rompath/vsavjw.zip" ] || { echo "FAIL: no $BUILD/rompath/vsavjw.zip"; exit 1; }
 REF_BIN="${MAME_REF_BIN:-$HOME/.cache/vampire-saved/mame-ref/cps2}"
 RPL="$REPO/tests/replays/hui/86_hui_beam_variants.rpl"

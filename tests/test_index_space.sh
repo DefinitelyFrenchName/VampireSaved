@@ -20,6 +20,7 @@
 set -eu
 ROMDIR="${ROMDIR:?set ROMDIR}"
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
+. "$REPO/tests/lib/decrypt_cache.sh"   # GitHub #69
 cd "$REPO"
 WORK="$(mktemp -d)"
 trap 'rm -rf "$WORK"' EXIT
@@ -31,8 +32,8 @@ EXP_TWINNED=81
 EXP_UNJUDGED=29
 EXP_RISKY=3
 
-python3 tools/cps2_decrypt.py "$ROMDIR/vsavj.zip" "$WORK/vj.bin" > /dev/null
-python3 tools/cps2_decrypt.py "$ROMDIR/vsav2.zip" "$WORK/v2.bin" > /dev/null
+decrypt_view vsavj "$WORK/vj.bin"
+decrypt_view vsav2 "$WORK/v2.bin"
 
 echo "== 1. the sweep + its positive control (the known Cosmo table)"
 if python3 tools/audit_index_space.py "$WORK/vj.bin" "$WORK/v2.bin" \

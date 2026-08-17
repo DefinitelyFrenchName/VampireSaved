@@ -32,6 +32,7 @@
 set -eu
 ROMDIR="${ROMDIR:?set ROMDIR}"
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
+. "$REPO/tests/lib/decrypt_cache.sh"   # GitHub #69
 cd "$REPO"
 WORK="$(mktemp -d)"        # GitHub #68: not a predictable name
 trap 'rm -rf "$WORK"' EXIT
@@ -52,8 +53,7 @@ python3 tools/audit_roms.py "$ROMDIR" >"$WORK/audit.txt" 2>&1 || {
 echo "  PASS  ROM audit"
 
 for s in vsavj vsav2; do
-    python3 tools/cps2_decrypt.py "$ROMDIR/$s.zip" "$WORK/${s}_op.bin" \
-        --data-out "$WORK/${s}_dat.bin" >"$WORK/dec.txt" 2>&1 || {
+    decrypt_view $s "$WORK/${s}_op.bin" "$WORK/${s}_dat.bin" || {
         echo "  FAIL  decrypt $s"; tail -5 "$WORK/dec.txt"; exit 1; }
     python3 tools/audit_id_space.py --set "$s" --op "$WORK/${s}_op.bin" \
         --dat "$WORK/${s}_dat.bin" >"$WORK/$s.txt" 2>&1 || {

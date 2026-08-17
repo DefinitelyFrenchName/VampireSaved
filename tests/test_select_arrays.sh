@@ -24,14 +24,14 @@
 set -eu
 ROMDIR="${ROMDIR:?set ROMDIR}"
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
+. "$REPO/tests/lib/decrypt_cache.sh"   # GitHub #69
 cd "$REPO"
 WORK="$(mktemp -d)"
 trap 'rm -rf "$WORK"' EXIT
 fail=0
 
 DATA="$WORK/vsavj_data.bin"
-python3 tools/cps2_decrypt.py "$ROMDIR/vsavj.zip" "$WORK/vsavj_op.bin" \
-    --data-out "$DATA" > /dev/null
+decrypt_view vsavj "$WORK/vsavj_op.bin" "$DATA"
 
 echo "== 1. static: the measured model holds =="
 if python3 tools/select_arrays.py "$DATA" --id 0x13 > "$WORK/static.txt" 2>&1; then

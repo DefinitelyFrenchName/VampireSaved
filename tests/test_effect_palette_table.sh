@@ -19,6 +19,7 @@
 set -eu
 ROMDIR="${ROMDIR:?set ROMDIR}"
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
+. "$REPO/tests/lib/decrypt_cache.sh"   # GitHub #69
 cd "$REPO"
 WORK="$(mktemp -d)"
 trap 'rm -rf "$WORK"' EXIT
@@ -30,8 +31,7 @@ case "$BUILD" in /*) ;; *) BUILD="$REPO/$BUILD" ;; esac
 OPIMG="$BUILD/verify_op.bin"
 [ -f "$OPIMG" ] || { echo "FAIL: no $OPIMG"; exit 1; }
 
-python3 tools/cps2_decrypt.py "$ROMDIR/vsavj.zip" "$WORK/vj.bin" \
-    --data-out "$WORK/vjd.bin" > /dev/null
+decrypt_view vsavj "$WORK/vj.bin" "$WORK/vjd.bin"
 
 AUDIT="python3 $REPO/tools/audit_effect_palette_table.py"
 

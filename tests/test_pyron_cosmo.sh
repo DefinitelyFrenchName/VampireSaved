@@ -37,14 +37,18 @@
 set -eu
 ROMDIR="${ROMDIR:?set ROMDIR}"
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
+. "$REPO/tests/lib/decrypt_cache.sh"   # GitHub #69
 cd "$REPO"
 WORK="$(mktemp -d)"; trap 'rm -rf "$WORK"' EXIT
-BUILD="${1:-build/pyron18}"
+   # RE-POINTED 14z-94 (GitHub #94): was build/pyron18, a pre-WIDE-v1.1 set
+   # (19 members, no vsw.z01/z02) — the script could not run at all.
+   # Its frozen inventory may still describe the OLD build: run it
+   # before trusting a green, and re-measure rather than absorb.
+BUILD="${1:-build/pyron27}"
 case "$BUILD" in /*) ;; *) BUILD="$REPO/$BUILD" ;; esac
 fail=0
 
-python3 tools/cps2_decrypt.py "$ROMDIR/vsavj.zip" "$WORK/vj.bin" \
-    --data-out "$WORK/vjd.bin" > /dev/null
+decrypt_view vsavj "$WORK/vj.bin" "$WORK/vjd.bin"
 
 echo "== 1. the withdrawn word must be VANILLA in the build"
 python3 - "$BUILD/verify_op.bin" "$WORK/vj.bin" <<'PY' || fail=1

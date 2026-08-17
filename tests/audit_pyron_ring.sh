@@ -29,8 +29,23 @@ set -eu
 ROMDIR="${ROMDIR:?set ROMDIR}"
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"
-MERGED="${1:-build/m3b_merged}"
-SOLO="${2:-build/pyron22}"   # pyron-m4 (14z-85b: solo carries pyr_sfx_records)
+# RE-POINTED 14z-94 (GitHub #94). Both defaults had rotted: build/m3b_merged
+# and build/pyron22 are pre-WIDE-v1.1 sets (19 members, no vsw.z01/z02), so
+# this audit could not run at all — it died before measuring anything. Build
+# dirs are untracked by design (rule 7), which makes every hardcoded default
+# a pointer with a shelf life; tests/test_build_ref_rot.sh is the standing
+# check that now catches this class instead of a person tripping over it.
+# KNOWN-RED AS OF 14z-94, and deliberately so. Re-pointing the defaults made
+# this audit RUNNABLE for the first time in months, and it immediately
+# reports ring-id drift — which is expected: the frozen inventory was
+# measured against the SUPERSEDED pair (build/m3b_merged + build/pyron22),
+# so it describes builds that no longer exist. Re-measuring it is real work
+# with an audio ground truth, and this gate's own rule is "re-measure, never
+# absorb", so the inventory is NOT touched here. Tracked as GitHub #98.
+# Runnable-and-red-for-a-named-reason is strictly better than unrunnable.
+MERGED="${1:-build/m3b_merged9}"
+SOLO="${2:-build/pyron27}"    # pyron-m10, the shipping solo (carries
+                              # pyr_sfx_records, as pyron-m4 did at 14z-85b)
 [ -f "$MERGED/rompath/vsavjw.zip" ] || { echo "SKIP: no $MERGED"; exit 0; }
 [ -f "$SOLO/rompath/vsavjw.zip" ] || { echo "SKIP: no $SOLO"; exit 0; }
 MAME_BIN="${MAME_BIN:-$HOME/.cache/vampire-saved/mame/cps2}"

@@ -26,6 +26,7 @@
 set -eu
 ROMDIR="${ROMDIR:?set ROMDIR}"
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
+. "$REPO/tests/lib/decrypt_cache.sh"   # GitHub #69
 cd "$REPO"
 WORK="$(mktemp -d)"
 trap 'rm -rf "$WORK"' EXIT
@@ -44,7 +45,7 @@ if [ -z "$OUTBASE" ]; then
 fi
 
 OPC="$WORK/vsavj_op.bin"
-python3 tools/cps2_decrypt.py "$ROMDIR/vsavj.zip" "$OPC" > /dev/null
+decrypt_view vsavj "$OPC"
 
 echo "== 1. static census: family-base + slot references =="
 python3 - "$OPC" > "$WORK/census.txt" <<'PY' || {

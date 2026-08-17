@@ -34,6 +34,7 @@
 set -eu
 ROMDIR="${ROMDIR:?set ROMDIR}"
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
+. "$REPO/tests/lib/decrypt_cache.sh"   # GitHub #69
 cd "$REPO"
 WORK="$(mktemp -d)"
 trap 'rm -rf "$WORK"' EXIT
@@ -56,8 +57,7 @@ fi
 
 OPC="$WORK/vsavj_op.bin"
 VAN="$WORK/vsavj_data.bin"
-python3 tools/cps2_decrypt.py "$ROMDIR/vsavj.zip" "$OPC" \
-    --data-out "$VAN" > /dev/null
+decrypt_view vsavj "$OPC" "$VAN"
 LAYOUT="build/manifest/wheel_layout_proposed.json"
 
 echo "== 1. static: site + inventory + group C member bytes =="

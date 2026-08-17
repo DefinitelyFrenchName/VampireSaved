@@ -14,6 +14,7 @@
 set -eu
 ROMDIR="${ROMDIR:?set ROMDIR}"
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
+. "$REPO/tests/lib/decrypt_cache.sh"   # GitHub #69
 W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT
 fail=0
 
@@ -46,8 +47,7 @@ fi
 #    the battery). Re-frozen 18094/16707 with the drift attributed by
 #    measurement (818bae7^ reproduces 17763 exactly; the walker's
 #    14z-67 entry-bounds fix changes NOTHING on this call).
-python3 tools/cps2_decrypt.py "$ROMDIR/vsavj.zip" "$W/vsavj_op.bin" \
-    --data-out "$W/vsavj_data.bin" > /dev/null 2>&1 || true
+decrypt_view vsavj "$W/vsavj_op.bin" "$W/vsavj_data.bin"
 JIMG="$W/vsavj_data.bin"; [ -f "$JIMG" ] || JIMG="$REPO/build/out/vsavj_data.bin"
 jout=$(python3 "$REPO/tools/obj_records.py" "$JIMG" --base 0 \
     --start 0x248B88 --end 0x26AB88)

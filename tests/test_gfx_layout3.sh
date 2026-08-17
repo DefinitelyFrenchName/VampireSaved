@@ -23,10 +23,10 @@
 set -eu
 ROMDIR="${ROMDIR:?set ROMDIR}"
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
+. "$REPO/tests/lib/decrypt_cache.sh"   # GitHub #69
 W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT
 
-python3 "$REPO/tools/cps2_decrypt.py" "$ROMDIR/vsav2.zip" "$W/vs2_op.bin" \
-    --data-out "$W/vs2_data.bin" > /dev/null 2>&1
+decrypt_view vsav2 "$W/vs2_op.bin" "$W/vs2_data.bin"
 
 python3 - "$REPO" "$W" <<'PY'
 import json, sys, os

@@ -37,8 +37,12 @@ REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"
 WORK="$(mktemp -d)"
 trap 'rm -rf "$WORK"' EXIT
+   # RE-POINTED 14z-94 (GitHub #94): was build/hui25, a pre-WIDE-v1.1 set
+   # (19 members, no vsw.z01/z02) — the script could not run at all.
+   # Its frozen inventory may still describe the OLD build: run it
+   # before trusting a green, and re-measure rather than absorb.
 
-BUILD="${1:-build/hui25}"
+BUILD="${1:-build/hui43}"
 EXPECT="${GRAB_VICTIM_EXPECT:-differs}"
 case "$BUILD" in /*) ;; *) BUILD="$REPO/$BUILD" ;; esac
 [ -f "$BUILD/rompath/vsavjw.zip" ] || {

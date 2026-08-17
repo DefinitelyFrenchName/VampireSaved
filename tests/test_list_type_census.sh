@@ -32,14 +32,14 @@
 set -eu
 ROMDIR="${ROMDIR:?set ROMDIR}"
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
+. "$REPO/tests/lib/decrypt_cache.sh"   # GitHub #69
 cd "$REPO"
 WORK="$(mktemp -d)"
 trap 'rm -rf "$WORK"' EXIT
 
 echo "== decrypt vs2 data view"
-python3 tools/cps2_decrypt.py "$ROMDIR/vsav2.zip" "$WORK/op.bin" \
-    --data-out "$WORK/dat.bin" > "$WORK/dec.log" 2>&1 \
-    || { tail -3 "$WORK/dec.log"; echo "FAIL: decrypt"; exit 1; }
+decrypt_view vsav2 "$WORK/op.bin" "$WORK/dat.bin" \
+    || { echo "FAIL: decrypt"; exit 1; }
 
 fail=0
 run() {  # label start len expect

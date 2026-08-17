@@ -31,6 +31,7 @@
 set -eu
 ROMDIR="${ROMDIR:?set ROMDIR}"
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
+. "$REPO/tests/lib/decrypt_cache.sh"   # GitHub #69
 cd "$REPO"
 WORK="$(mktemp -d)"
 trap 'rm -rf "$WORK"' EXIT
@@ -48,8 +49,7 @@ if [ -z "$OUTBASE" ]; then
     tail -2 "$WORK/build.log" | sed 's/^/  /'
 fi
 
-python3 tools/cps2_decrypt.py "$ROMDIR/vsav2.zip" "$WORK/vs2_op.bin" \
-    --data-out "$WORK/vs2_data.bin" > /dev/null
+decrypt_view vsav2 "$WORK/vs2_op.bin" "$WORK/vs2_data.bin"
 
 echo "== 1. static: site + thunk + sparse block re-derived =="
 python3 - "$OUTBASE" "$WORK/vs2_data.bin" > "$WORK/static.txt" <<'PY' || {

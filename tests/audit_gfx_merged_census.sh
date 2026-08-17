@@ -29,13 +29,13 @@
 set -eu
 ROMDIR="${ROMDIR:?set ROMDIR}"
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
+. "$REPO/tests/lib/decrypt_cache.sh"   # GitHub #69
 cd "$REPO"
 W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT
 fail=0
 
 echo "== 0: decrypt vs2 once (shared by all census runs) =="
-python3 tools/cps2_decrypt.py "$ROMDIR/vsav2.zip" "$W/vs2_op.bin" \
-    --data-out "$W/vs2_data.bin" > /dev/null 2>&1
+decrypt_view vsav2 "$W/vs2_op.bin" "$W/vs2_data.bin"
 
 echo "== 1: the census on the real inputs =="
 python3 tools/audit_gfx_merged.py "$ROMDIR" --vs2-data "$W/vs2_data.bin" \

@@ -35,6 +35,7 @@
 set -eu
 ROMDIR="${ROMDIR:?set ROMDIR}"
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
+. "$REPO/tests/lib/decrypt_cache.sh"   # GitHub #69
 cd "$REPO"
 WORK="$(mktemp -d)"
 trap 'rm -rf "$WORK"' EXIT
@@ -55,10 +56,8 @@ fi
 
 VAN="$WORK/vsavj_data.bin"
 VS2="$WORK/vsav2_data.bin"
-python3 tools/cps2_decrypt.py "$ROMDIR/vsavj.zip" "$WORK/vsavj_op.bin" \
-    --data-out "$VAN" > /dev/null
-python3 tools/cps2_decrypt.py "$ROMDIR/vsav2.zip" "$WORK/vsav2_op.bin" \
-    --data-out "$VS2" > /dev/null
+decrypt_view vsavj "$WORK/vsavj_op.bin" "$VAN"
+decrypt_view vsav2 "$WORK/vsav2_op.bin" "$VS2"
 
 echo "== 1. static: composition + host de-substitution =="
 if python3 tools/check_tenant_select.py "$OUTBASE/prg" "$VAN" "$VS2" \
