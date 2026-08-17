@@ -1,8 +1,45 @@
 # STATE — living progress log
 
-## Session 14z-94 (10) — five low-hanging issues cleared while the
-## maintainer playtests: #69, #94, #71, #46, and the merged reproducibility
-## gap. Four of the five turned out bigger or different than their ticket.
+## Session 14z-94 (10) — SEVEN issues cleared while the maintainer
+## playtests: #69, #94, #71, #46, #24, #29, plus the merged reproducibility
+## gap — and #96 root-caused. Most turned out bigger or different than their
+## ticket said.
+
+**#24 + #29 — the SKIP-as-PASS family, closed together.** `run_battery_m2.sh`
+printed an unconditional `BATTERY GREEN` while up to nine of its 24 gates
+self-skipped: four exit 0 on a missing prerequisite, and FIVE sit inside an
+`if [ -x <wide mame> ]` branch whose else-arm printed a note and counted
+nothing. That sentence is what a session records in STATE.md under rule 2. It
+now tallies PASS/SKIP, counts branch skips by group size (the WIDE-MAME arm
+measures 5, matching the five #24 named by hand), and prints GREEN only at
+zero skips. A FAIL still aborts, and now names the gate.
+
+#29's second half — "no runner counts skips" — was already answered by
+`run_all_static.sh` (#30). Its first half (gates exit 0 when inputs are
+absent) is the CORRECT design once a runner counts them: a gate with no
+inputs has nothing to assert, and failing would make a fresh clone
+permanently red. #29's own example no longer reproduces either — 14z-90 (#9)
+taught `test_region_overlap` to separate an unbuilt tree (skip) from a stale
+pin (hard fail).
+
+**#96 ROOT-CAUSED, and it is not a defect.** Measured first: the gate fails
+BYTE-IDENTICALLY at the session-start commit `dda2901` in a clean worktree, so
+nothing in 14z-94 caused it. Reading its full output rather than the tail, it
+reports SIX divergences that VANISHED and two that grew — and three of the
+six are at frame **829**, which CLAUDE.md §4 v5 names as the obj_hook
+cycle-skew **14z-91 removed**. `m2a_common.sh`'s own comment says the 700
+constant is "hook-caused — stage-3 hook-free builds run 06 bit-identical",
+i.e. the same mechanism.
+
+The two "growths" are ratified elsewhere: huitzil-m16's specs name frame
+**2009** as a flicker frame (`composite … 2009 889-1104`) and **3807** as a
+window start (`… 3807-4610`), and both shipping sets mark `06_test_mode`
+`exact`. So every phenomenon the stage-4 gate calls a failure is one the §4
+v3 window / v4 composite classes already ratify — the gate compares with its
+own hardcoded constants, a vocabulary that predates those classes. Fix is to
+re-plumb it onto `compare_window`/`compare_composite`; NOT done, because the
+standing watch says root-cause before widening and two items are not yet
+attributed frame-by-frame. Full evidence posted to the issue.
 
 Chain: **PASS 85 / SKIP 0 / FAIL 0**, tree clean, coverage clean.
 
