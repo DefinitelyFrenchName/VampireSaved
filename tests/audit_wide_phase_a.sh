@@ -92,23 +92,44 @@ fi
 echo "== A3: scroll3 tile-address wrap (decides gfx-growth inertness) =="
 # scroll3 absolute tile index = 0x10000 + 4*code; it exceeds the 0x40000-tile
 # region (and today WRAPS via nCpsGfxMask) once code >= 0xC000.
+# A DEAD MEASUREMENT IS NOT A NULL RESULT (14z-94, GitHub #25). This section
+# used to print a `note` and `continue` when a replay produced no summary, so
+# a corpus that measured NOTHING — a renamed Lua script, a MAME that aborts at
+# boot, a wrong ROMDIR — left a3_max at 0, passed the `-lt 49152` test, and
+# published "gfx growth is inert for scroll3" on zero measurements. That is
+# the permissive direction, and it gates whether gfx groups may be appended at
+# all. A1 and A2 already hard-fail on a missing summary; A3 now matches them,
+# and additionally counts contributors so a silently SHORTENED corpus (some
+# replays skipped, the rest fine) cannot publish the decision either. The
+# file's own A1 comment states the rule: "a null result is only evidence if
+# the probe can demonstrably see a real access".
 a3_max=0
+a3_seen=0
+a3_want=0
+for rp in $CORPUS; do a3_want=$((a3_want + 1)); done
 for rp in $CORPUS; do
     SCROLL3_OUT="$WORK/a3_$rp.txt" run_one scroll3_watch.lua "$rp" "$WORK/a3_t_$rp.txt" 3600 || true
     line=$(grep SCROLL3SUMMARY "$WORK/a3_$rp.txt" 2>/dev/null || echo "")
-    [ -n "$line" ] || { echo "  note: $rp produced no scroll3 summary"; continue; }
+    [ -n "$line" ] || { echo "  FAIL $rp: no scroll3 summary — the probe produced"
+                        echo "        no measurement, which is not the same as a zero"; exit 1; }
     # Use the CENSUS max, which excludes the 0xFFFF blank/uninitialised
     # sentinel. Raw maxcode is always 0xFFFF because unused tilemap cells
     # hold it, and that would report a permanent false BLOCKED.
     cen=$(grep SCROLL3CENSUS "$WORK/a3_$rp.txt" 2>/dev/null || echo "")
-    [ -n "$cen" ] || { echo "  note: $rp produced no scroll3 census"; continue; }
+    [ -n "$cen" ] || { echo "  FAIL $rp: no scroll3 census — see above"; exit 1; }
+    a3_seen=$((a3_seen + 1))
     mc=$(echo "$cen" | sed -E 's/.*max_real=([0-9a-f]+).*/\1/')
     hc=$(echo "$cen" | sed -E 's/.*high_cells=([0-9]+).*/\1/')
     mcd=$((0x$mc))
     [ "$mcd" -gt "$a3_max" ] && a3_max=$mcd
     [ "$hc" -eq 0 ] || echo "  $rp: $cen"
 done
-printf '  corpus max REAL scroll3 code: 0x%x (wrap threshold 0xC000; 0xFFFF blanks excluded)\n' "$a3_max"
+if [ "$a3_seen" -ne "$a3_want" ]; then
+    echo "  FAIL: only $a3_seen of $a3_want replays contributed a measurement."
+    echo "        A decision about gfx growth may not rest on a partial corpus."
+    exit 1
+fi
+printf '  corpus max REAL scroll3 code: 0x%x (from %d/%d replays; wrap threshold 0xC000; 0xFFFF blanks excluded)\n' "$a3_max" "$a3_seen" "$a3_want"
 if [ "$a3_max" -lt 49152 ]; then
     echo "  DECISION A3: no real legacy code reaches the wrap point -> gfx growth is"
     echo "               inert for scroll3. (Blank 0xFFFF cells still nominally address"
