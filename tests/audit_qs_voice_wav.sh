@@ -24,8 +24,14 @@ W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT
 fail() { echo "FAIL: $*"; exit 1; }
 
 mkdir -p "$W/rp" "$W/ours" "$W/native"
+# Same binding rule as audit_qs_voice_batch.sh — see tools/qs_ledger.py and
+# GitHub #89. This audit had the identical build/wide0 fallback: a supplied
+# build with no ledger got its voice id list rebuilt from the canonical
+# overlay, i.e. from current manifest state, and the WAV verdict was then
+# attributed to the supplied artifact.
 if [ -n "${1:-}" ]; then
     cp "$1/rompath/vsavjw.zip" "$W/rp/vsavjw.zip" || fail "no romset in $1"
+    LEDGER="$1/rompath/vsavjw.zip.ledger.json"
 else
     [ -f "$REPO/build/wide0/rompath/vsavjw.zip" ] || {
         echo "SKIP: no canonical overlay"; exit 0; }
@@ -33,19 +39,12 @@ else
     python3 "$REPO/tools/build_qs_songs.py" "$W/rp/vsavjw.zip" \
         "$ROMDIR/vsav2.zip" --vsav "$ROMDIR/vsav.zip" \
         --ledger "$W/ledger.json" > "$W/build.log" || fail "builder errored"
+    LEDGER="$W/ledger.json"
 fi
-[ -f "$W/ledger.json" ] || {
-    cp "$REPO/build/wide0/rompath/vsavjw.zip" "$W/scratch.zip"
-    python3 "$REPO/tools/build_qs_songs.py" "$W/scratch.zip" \
-        "$ROMDIR/vsav2.zip" --vsav "$ROMDIR/vsav.zip" \
-        --ledger "$W/ledger.json" > /dev/null || fail "ledger derivation"
-}
-OURS="$(python3 -c "
-import json; l = json.load(open('$W/ledger.json'))
-print(','.join('%x' % v['id'] for v in l['voices']))")"
-NATIVE="$(python3 -c "
-import json; l = json.load(open('$W/ledger.json'))
-print(','.join('%x' % v['vs2_id'] for v in l['voices']))")"
+python3 "$REPO/tools/qs_ledger.py" "$W/rp/vsavjw.zip" --ledger "$LEDGER" \
+    --print both > "$W/ids.txt" || fail "ledger not bound to the artifact"
+OURS="$(sed -n '1p' "$W/ids.txt")"
+NATIVE="$(sed -n '2p' "$W/ids.txt")"
 
 ( cd "$W/ours" && MAME_BIN="$WIDE_BIN" MAME_ROMPATH="$W/rp;$ROMDIR" \
   MAME_SANDBOX="$W/ours/sb" REPLAY="$REPO/tests/replays/06_test_mode.rpl" \

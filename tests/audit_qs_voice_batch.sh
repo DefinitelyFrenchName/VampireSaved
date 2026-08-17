@@ -28,8 +28,16 @@ W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT
 fail() { echo "FAIL: $*"; exit 1; }
 
 mkdir -p "$W/rp" "$W/ours" "$W/native"
+# THE ID INVENTORY MUST COME FROM THE ARTIFACT UNDER TEST (14z-94, GitHub
+# #89). It used to attempt `build_qs_songs.py --dry-run` — an option that has
+# never existed, so argparse exited 2 — suppress that with `|| true`, and then
+# rebuild a ledger from the canonical build/wide0 overlay. That sweeps TODAY'S
+# manifest ids against a possibly older supplied build and reports the result
+# as a verdict on it. tools/qs_ledger.py now refuses unless the ledger's
+# fingerprint matches the romset it is handed.
 if [ -n "${1:-}" ]; then
     cp "$1/rompath/vsavjw.zip" "$W/rp/vsavjw.zip" || fail "no romset in $1"
+    LEDGER="$1/rompath/vsavjw.zip.ledger.json"
 else
     [ -f "$REPO/build/wide0/rompath/vsavjw.zip" ] || {
         echo "SKIP: no canonical overlay"; exit 0; }
@@ -38,24 +46,13 @@ else
         "$ROMDIR/vsav2.zip" --vsav "$ROMDIR/vsav.zip" \
         --ledger "$W/ledger.json" > "$W/build.log" || {
         tail -5 "$W/build.log"; fail "builder errored"; }
+    LEDGER="$W/ledger.json"
 fi
-# the id lists come from the manifest-driven builder ledger (or re-derive)
-[ -f "$W/ledger.json" ] || python3 "$REPO/tools/build_qs_songs.py" \
-    "$W/rp/vsavjw.zip" "$ROMDIR/vsav2.zip" --vsav "$ROMDIR/vsav.zip" \
-    --ledger "$W/ledger.json" --dry-run > /dev/null 2>&1 || true
-if [ ! -f "$W/ledger.json" ]; then
-    # verify-in-place path: rebuild the ledger from a scratch overlay
-    cp "$REPO/build/wide0/rompath/vsavjw.zip" "$W/scratch.zip"
-    python3 "$REPO/tools/build_qs_songs.py" "$W/scratch.zip" \
-        "$ROMDIR/vsav2.zip" --vsav "$ROMDIR/vsav.zip" \
-        --ledger "$W/ledger.json" > /dev/null || fail "ledger derivation"
-fi
-OURS="$(python3 -c "
-import json; l = json.load(open('$W/ledger.json'))
-print(','.join('%x' % v['id'] for v in l['voices']))")"
-NATIVE="$(python3 -c "
-import json; l = json.load(open('$W/ledger.json'))
-print(','.join('%x' % v['vs2_id'] for v in l['voices']))")"
+python3 "$REPO/tools/qs_ledger.py" "$W/rp/vsavjw.zip" --ledger "$LEDGER" \
+    --print both > "$W/ids.txt" || fail "ledger not bound to the artifact"
+sed -n '2p' "$W/ids.txt" > "$W/native.txt"; sed -n '1p' "$W/ids.txt" > "$W/ours.txt"
+OURS="$(cat "$W/ours.txt")"
+NATIVE="$(cat "$W/native.txt")"
 
 ( cd "$W/ours" && ROMDIR="$ROMDIR" MAME_BIN="$WIDE_BIN" \
   MAME_ROMPATH="$W/rp;$ROMDIR" MAME_SANDBOX="$W/ours/sb" \

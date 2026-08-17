@@ -124,8 +124,29 @@ def main():
     ap.add_argument("vs2_zip")
     ap.add_argument("--vsav", help="vsav.zip (needed for [voice_batch])")
     ap.add_argument("--manifest", default="build/manifest/qs_songs.toml")
-    ap.add_argument("--ledger")
+    ap.add_argument("--ledger",
+                    help="where to write the ledger (default: "
+                         "<vsavjw_zip>.ledger.json, so it travels with the "
+                         "artifact — see --no-ledger)")
+    ap.add_argument("--no-ledger", action="store_true",
+                    help="do not emit a ledger. The QSound audits then REFUSE "
+                         "this build rather than sweeping ids derived from "
+                         "some other overlay (GitHub #89)")
     a = ap.parse_args()
+
+    # THE LEDGER IS EMITTED BY DEFAULT (14z-94, GitHub #89). The voice ids the
+    # QSound audits sweep come from the MANIFEST, not from the romset — and
+    # they cannot be re-derived from a finished artifact, because this
+    # builder's spans are already filled by the time one exists ("extension
+    # span not zero"). So a ledger that is not written AT BUILD TIME cannot be
+    # reconstructed later, and an audit handed a build without one was
+    # silently falling back to ids rebuilt from build/wide0: current
+    # manifest state, attributed to a possibly older supplied artifact.
+    #
+    # Emitting it by default is the whole fix. Neither builder passed
+    # --ledger, so no build in the tree carried one.
+    if not a.ledger and not a.no_ledger:
+        a.ledger = a.vsavjw_zip + ".ledger.json"
 
     with open(a.manifest) as f:
         man = _minitoml.loads(f.read())
@@ -371,8 +392,26 @@ def main():
           f"{Z02} sha1 {sha1(out[Z02])}"
           + (f", {EXT} sha1 {sha1(out[EXT])}" if ext_packed else ""))
     if a.ledger:
+        # BIND THE LEDGER TO THE ARTIFACT (14z-94, GitHub #89). The
+        # fingerprint covers exactly the members this builder writes — the
+        # sound driver and the packed sample extension — which are what
+        # determine voice playback. An audit recomputes it from the romset it
+        # was handed and refuses on mismatch, so a ledger can never be read
+        # as describing a different build's voices.
+        #
+        # Scoped to these three members rather than the whole zip on purpose:
+        # a later build step touching an unrelated member must not invalidate
+        # a ledger that is still accurate, while a step that rewrites the
+        # driver or the extension genuinely DOES make it stale.
+        fp_members = [Z01, Z02] + ([EXT] if ext_packed else [])
+        ledger["artifact"] = {
+            "members": fp_members,
+            "member_sha1": {n: sha1(out[n]) for n in fp_members},
+            "fingerprint": sha1(b"".join(out[n] for n in fp_members)),
+        }
         json.dump(ledger, open(a.ledger, "w"), indent=1)
-        print(f"wrote {a.ledger}")
+        print(f"wrote {a.ledger} (artifact fingerprint "
+              f"{ledger['artifact']['fingerprint'][:12]})")
 
 
 if __name__ == "__main__":

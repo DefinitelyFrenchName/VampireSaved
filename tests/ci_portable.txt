@@ -55,6 +55,7 @@ test_minitoml_subset
 test_obj_record_walk
 test_optimize_guard
 test_phasea_a3_liveness
+test_qs_ledger_binding
 test_qs_window_law
 test_record_walk_bounds
 test_replay_stage_census
