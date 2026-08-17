@@ -10,12 +10,35 @@
 # — no frozen expectations involved, so it is machine-independent and needs
 # no freeze decision:
 #
-#   1. LEGACY IDENTICAL. On replays that never reach the patched slot, the
-#      WIDE build must be bit-identical to the stock build. Legacy
-#      characters never execute ported code, so anything else means the
-#      profile leaked into vanilla behaviour. This is what lets every gate
-#      that passes on the stock build transfer to the WIDE build without
-#      re-plumbing each one for the vsavjw set.
+#   1. LEGACY IDENTICAL UP TO SELECT ENTRY.
+#
+#      **RETRACTED 14z-94 (GitHub #95): this said "the WIDE build must be
+#      bit-identical to the stock build" on legacy replays, full stop.**
+#      That was true at 14z-59g and the project deliberately made it false
+#      at 14z-64 (the M3a de-substitution, maintainer-ratified). The two
+#      builds now have DIFFERENT ROSTERS BY CONSTRUCTION —
+#
+#          build/m5_stock   patch/tenant.json  id 15 (0x0F), mirror_variant
+#                           true  -> Donovan SUBSTITUTED over Jedah
+#          build/m5_wide    patch/tenant.json  id 19 (0x13), mirror_variant
+#                           false -> Donovan native, JEDAH RESTORED
+#
+#      — so every replay that reaches the character-select screen must
+#      differ there. Measured over all 11 legacy replays: 10 diverge, and
+#      every onset is a select-entry frame (890, or 3190 for the one that
+#      starts mid-attract); `06_test_mode`, which never reaches select, is
+#      bit-identical for its whole 3,120 frames.
+#
+#      WHAT SURVIVES, and is what section 1 now asserts: everything BEFORE
+#      select entry — boot, attract, engine init — must still be
+#      bit-identical, and the onset frame is frozen per replay. That keeps
+#      the original claim exactly where it is still true, and it is
+#      falsifiable: an onset moving EARLIER means the profile reached
+#      something it must not.
+#
+#      Note the frozen onsets are the same constants CLAUDE.md §4 v3
+#      ratifies for the bounded re-convergent window class, which is
+#      independent corroboration that this is select entry.
 #
 #   2. PATCHED-SLOT CONTENT DIFFERS, AND THE DIFFERENCE IS ATTRIBUTED. On
 #      Donovan replays the two MUST diverge — the sfx helper is live on WIDE
@@ -25,13 +48,40 @@
 #
 #      01_attract_long belongs in THIS group, not group 1: the attract demo
 #      features the patched slot, which is why the stock build already
-#      carries `diverge vsavj/masked 4278` for it. Measured 14z-59j, its
-#      stock-vs-WIDE difference is 57 bytes and EVERY ONE is either the
-#      dead-stack window $FF7F00-$FF7FFF (a CLAUDE.md §4 masked window --
-#      hook cycle skew, not live state) or the $FF05xx sound-driver work
-#      area (docs/game/atlas/ram.md), which is precisely what a live sfx helper
-#      is supposed to touch. ZERO bytes of gameplay state. Section 3 asserts
-#      that attribution rather than accepting "it differs".
+#      carries `diverge vsavj/masked 4278` for it.
+#
+#   3. THE DIFFERENCE STARTS IN SOUND, AND IS DATA, NOT CONTROL FLOW.
+#      Section 3 attributes the ONSET, measured 14z-94 (GitHub #95).
+#
+#      **RETRACTED 14z-94: this block used to say "Measured 14z-59j, its
+#      stock-vs-WIDE difference is 57 bytes ... ZERO bytes of gameplay
+#      state", and section 3 asserted that at a fixed frame 4400.** That
+#      expectation was measured before 14z-86's M5 voice block enlarged
+#      what the WIDE track's sound side does, and it has been false since.
+#      Re-measured: the tracks are BIT-IDENTICAL through frame 4266, and
+#      after the onset the divergence GROWS — 3 bytes at 4267, then 84,
+#      260, 538, 759 at 4270/4280/4300/4400. A late fixed frame therefore
+#      measures accumulated propagation, which is unbounded by design and
+#      says nothing about correctness.
+#
+#      WHY IT PROPAGATES, and why that is not a defect: `ram.md:89` records
+#      the arcade-ladder in-use mask `$FF8110.l` as SOUND-STATE-FED — "the
+#      run-to-run lottery". Once the live sfx helper makes the sound state
+#      differ, the attract demo's own selection differs, and the whole
+#      machine follows. That is the documented mechanism, not a leak.
+#
+#      SO THE ONSET IS WHAT CARRIES INFORMATION, and it is tight:
+#        * first divergent frame 4267, frozen;
+#        * every differing byte in $FF87A4-$FF87A7 — the P1 effect-channel
+#          record pointer (`ram.md:192`, the +0x3n0 per-fighter sub-structs);
+#        * stock writes 0x000CEAF0 there, WIDE writes 0x00390CA0 — the
+#          ported effect record, which is exactly the content the extension
+#          exists to carry;
+#        * and the WRITER IS THE SAME on both legs, `PRG:0x01C186`, with
+#          identical write counts and PC distribution. That is the load-
+#          bearing assertion: same code, different DATA. A WIDE build that
+#          had taken a different BRANCH would show a different writer set,
+#          and that is what would mean the profile leaked into engine flow.
 #
 # Usage: ROMDIR=... tests/test_dualtrack.sh [stock_rompath] [wide_rompath]
 set -eu
@@ -46,9 +96,17 @@ WORK="$(mktemp -d)"
 trap 'rm -rf "$WORK"' EXIT
 fail=0
 
-LEGACY="02_demitri_vs_cpu 03_two_player_vs 04_select_fuzz \
-05_timeout_idle 06_test_mode 07_mash_storm 08_challenger_join 09_mirror_pick \
-10_midattract_start 29_felicia_walljump 30_demitri_throw"
+# FROZEN SELECT-ENTRY ONSETS (14z-94, GitHub #95). `none` = never reaches the
+# select screen and must be bit-identical for its whole length. See the header
+# for why this replaced a blanket bit-identity requirement. The two values are
+# the SAME select-entry constants CLAUDE.md §4 v3 ratifies for the bounded
+# re-convergent window class — 890, and 3190 for the one replay that starts
+# mid-attract — which is independent corroboration that what is being measured
+# here is select entry and not something else.
+LEGACY_ONSETS="02_demitri_vs_cpu:890 03_two_player_vs:890 04_select_fuzz:890 \
+05_timeout_idle:890 06_test_mode:none 07_mash_storm:890 08_challenger_join:890 \
+09_mirror_pick:890 10_midattract_start:3190 29_felicia_walljump:890 \
+30_demitri_throw:890"
 DONOVAN="01_attract_long 12_donovan_vs_cpu 19_don_dp_spam 25_don_darkforce 56_don_es_ls"
 
 run() {  # run <tag> <set> <rompath> <replay>
@@ -56,15 +114,32 @@ run() {  # run <tag> <set> <rompath> <replay>
         "$REPO/tests/replays/$4.rpl" "$WORK/$1.log" "$WORK/sb_$1" >/dev/null 2>&1
 }
 
-echo "== 1. LEGACY must be bit-identical (the profile must not touch vanilla) =="
-for rp in $LEGACY; do
+echo "== 1. LEGACY must be identical UP TO select entry =="
+for spec in $LEGACY_ONSETS; do
+    rp="${spec%%:*}"; want="${spec##*:}"
     run "s_$rp" vsavj  "$STOCK" "$rp"
     run "w_$rp" vsavjw "$WIDE"  "$rp"
-    if cmp -s "$WORK/s_$rp.log" "$WORK/w_$rp.log"; then
-        echo "  ok: $rp identical"
+    got=$(diff "$WORK/s_$rp.log" "$WORK/w_$rp.log" | awk '/^< [0-9]/{print $2; exit}')
+    [ -z "$got" ] && got=none
+    if [ "$got" = "$want" ]; then
+        if [ "$want" = none ]; then
+            echo "  ok: $rp identical throughout (never reaches select)"
+        else
+            echo "  ok: $rp identical through frame $((want - 1)); diverges at $want"
+        fi
+    elif [ "$want" = none ]; then
+        echo "  FAIL: $rp now diverges at frame $got — it reached select where it"
+        echo "        never did, or the profile touched pre-select behaviour"
+        fail=1
+    elif [ "$got" = none ]; then
+        echo "  FAIL: $rp is now IDENTICAL where it diverged at $want. The two"
+        echo "        tracks are supposed to have DIFFERENT rosters; identical"
+        echo "        here means one of the builds is not what it claims to be"
+        fail=1
     else
-        echo "  FAIL: $rp — the WIDE build changed LEGACY behaviour"
-        diff "$WORK/s_$rp.log" "$WORK/w_$rp.log" | head -3
+        echo "  FAIL: $rp onset moved $want -> $got. Anything before select"
+        echo "        entry is boot/attract/engine init, where the WIDE profile"
+        echo "        must not reach. Root-cause it; do not re-freeze."
         fail=1
     fi
 done
@@ -82,17 +157,108 @@ for rp in $DONOVAN; do
     fi
 done
 
-echo "== 3. the attract difference must be ATTRIBUTABLE, byte for byte =="
-FBNEO_DUMPS="4400:ff0000-ffffff" FBNEO_ROMPATH="$STOCK" \
+# The frozen onset expectation (14z-94, GitHub #95). See the header for why
+# this replaced a fixed late frame. Growth in ONSET or WINDOW means stop and
+# root-cause, exactly as the CLAUDE.md §4 standing watch requires — do NOT
+# widen either to make this pass.
+ONSET_EXPECT=4267
+ONSET_WINDOW_LO=0x87A4
+ONSET_WINDOW_HI=0x87A7
+
+echo "== 3. the attract divergence must START in the effect channel =="
+# The onset comes from the per-frame checksums section 2 already produced, so
+# no extra emulator run is needed to find it.
+onset=$(diff "$WORK/sd_01_attract_long.log" "$WORK/wd_01_attract_long.log" \
+        | awk '/^< [0-9]/{print $2; exit}')
+if [ -z "$onset" ]; then
+    echo "  FAIL: the two tracks never diverge on 01_attract_long — section 2"
+    echo "        should already have caught that"
+    fail=1
+elif [ "$onset" != "$ONSET_EXPECT" ]; then
+    echo "  FAIL: onset moved to frame $onset (frozen: $ONSET_EXPECT)."
+    echo "        The frame the live sfx helper first perturbs state is a"
+    echo "        measured constant; a move means the helper fires elsewhere."
+    fail=1
+else
+    echo "  ok: onset at frame $onset (frozen)"
+fi
+
+if [ -n "$onset" ]; then
+    FBNEO_DUMPS="$onset:ff0000-ffffff" FBNEO_ROMPATH="$STOCK" \
+        tools/run_replay_fbneo.sh vsavj "$REPO/tests/replays/01_attract_long.rpl" \
+        "$WORK/on_s.log" "$WORK/sb_on_s" >/dev/null 2>&1
+    FBNEO_DUMPS="$onset:ff0000-ffffff" FBNEO_ROMPATH="$WIDE" \
+        tools/run_replay_fbneo.sh vsavjw "$REPO/tests/replays/01_attract_long.rpl" \
+        "$WORK/on_w.log" "$WORK/sb_on_w" >/dev/null 2>&1
+    python3 - "$WORK" "$onset" "$ONSET_WINDOW_LO" "$ONSET_WINDOW_HI" <<'PY' || fail=1
+import sys
+W, fr, lo, hi = sys.argv[1], int(sys.argv[2]), int(sys.argv[3], 16), int(sys.argv[4], 16)
+try:
+    a = open(f"{W}/on_s.log.dump_{fr}_ff0000.bin", "rb").read()
+    b = open(f"{W}/on_w.log.dump_{fr}_ff0000.bin", "rb").read()
+except FileNotFoundError as e:
+    print(f"  FAIL: onset dump missing ({e})"); sys.exit(1)
+d = [i for i in range(min(len(a), len(b))) if a[i] != b[i]]
+if not d:
+    print(f"  FAIL: the dumps at the onset frame are IDENTICAL, so this"
+          f"        section is not measuring the divergence it named")
+    sys.exit(1)
+stray = [i for i in d if not (lo <= i <= hi)]
+print(f"  {len(d)} byte(s) differ at the onset: "
+      + ", ".join(f"$FF{i:04X} {a[i]:02x}->{b[i]:02x}" for i in d))
+if stray:
+    print(f"  FAIL: {len(stray)} byte(s) OUTSIDE the effect-channel pointer"
+          f" $FF{lo:04X}-$FF{hi:04X}: " + ", ".join(f"$FF{i:04X}" for i in stray[:8]))
+    print( "        The divergence no longer STARTS in the effect channel."
+           " Identify what")
+    print( "        moved (docs/game/atlas/ram.md) before touching this window"
+           " — widening it")
+    print( "        is how a real engine-flow leak would get absorbed.")
+    sys.exit(1)
+sw = int.from_bytes(a[lo:hi+1].rjust(4, b"\0"), "big")
+ww = int.from_bytes(b[lo:hi+1].rjust(4, b"\0"), "big")
+print(f"  ok: all inside the P1 effect-channel record pointer "
+      f"(stock {sw:#08x} -> WIDE {ww:#08x})")
+PY
+fi
+
+echo "== 4. and it must be DATA, not a different code path =="
+# The load-bearing check. Same writer PC on both legs means the WIDE build
+# ran the SAME engine code and fed it a different record; a different writer
+# set would mean the profile changed engine control flow, which is what
+# Rule 1 exists to prevent.
+FBNEO_HTAP="ff87a4-ff87a7" FBNEO_HTAP_OUT="$WORK/s.tap" FBNEO_ROMPATH="$STOCK" \
     tools/run_replay_fbneo.sh vsavj "$REPO/tests/replays/01_attract_long.rpl" \
-    "$WORK/at_s.log" "$WORK/sb_at_s" >/dev/null 2>&1
-FBNEO_DUMPS="4400:ff0000-ffffff" FBNEO_ROMPATH="$WIDE" \
+    "$WORK/tp_s.log" "$WORK/sb_tp_s" >/dev/null 2>&1
+FBNEO_HTAP="ff87a4-ff87a7" FBNEO_HTAP_OUT="$WORK/w.tap" FBNEO_ROMPATH="$WIDE" \
     tools/run_replay_fbneo.sh vsavjw "$REPO/tests/replays/01_attract_long.rpl" \
-    "$WORK/at_w.log" "$WORK/sb_at_w" >/dev/null 2>&1
-python3 tools/attribute_ramdiff.py "$WORK/at_s.log" "$WORK/at_w.log" 4400 \
-    --window 7F00-7FFF:dead-stack --window 0500-05FF:sound-driver || fail=1
+    "$WORK/tp_w.log" "$WORK/sb_tp_w" >/dev/null 2>&1
+if [ ! -s "$WORK/s.tap" ] || [ ! -s "$WORK/w.tap" ]; then
+    echo "  FAIL: the write tap produced nothing — a dead instrument, not a"
+    echo "        clean result (FBNEO_HTAP)"
+    fail=1
+else
+    # Only the pc= lines: the tap file carries a header and an "END <n>"
+    # trailer, and counting those as writers made the comparison noisy.
+    pcs_s=$(awk '/pc=/{print $NF}' "$WORK/s.tap" | sort | uniq -c | sort -k2 | tr -s ' ')
+    pcs_w=$(awk '/pc=/{print $NF}' "$WORK/w.tap" | sort | uniq -c | sort -k2 | tr -s ' ')
+    if [ "$pcs_s" = "$pcs_w" ]; then
+        echo "  ok: identical writer set and counts on both legs —"
+        printf '%s\n' "$pcs_s" | sed 's/^ */      /'
+        echo "      same engine code, different record: a DATA difference"
+    else
+        echo "  FAIL: the two tracks write $FF87A4-A7 from DIFFERENT code."
+        echo "        That is engine control flow diverging, not content:"
+        printf '%s\n' "$pcs_s" > "$WORK/pcs_s.txt"
+        printf '%s\n' "$pcs_w" > "$WORK/pcs_w.txt"
+        diff "$WORK/pcs_s.txt" "$WORK/pcs_w.txt" | sed 's/^/          /'
+        fail=1
+    fi
+fi
 
 echo
 [ "$fail" = 0 ] || { echo "FAIL: dual-track gate"; exit 1; }
-echo "PASS: dual-track — WIDE is legacy-identical to stock and differs only"
-echo "      on Donovan, so the stock build's gates transfer to it."
+echo "PASS: dual-track — the two tracks are bit-identical up to select entry"
+echo "      (frozen onsets), and past it they differ only as their DIFFERENT"
+echo "      ROSTERS require; the attract divergence starts in the effect"
+echo "      channel and is written by the SAME engine code on both legs."

@@ -42,26 +42,47 @@ self-check compared against a snapshot it took itself. **Two were latent**
 (#89, #51): real defects that currently produce right answers, which is
 exactly why they needed gates and not rebuilds.
 
-**THE ONE RED THING, and it is NOT from this session's work: `test_dualtrack`
-FAILS** — 732 bytes outside its named windows, against a 14z-59j baseline of
-57. Isolated across THREE harness builds (pre-#59, pre-#77, current) with
-byte-identical counts each time, so the harness is not the variable. Its two
-legs are different generations: `build/m5_stock` is Aug 7, `build/m5_wide` is
-Aug 14 and carries the post-14z-86 M5 voice content. Filed as **#95**.
-**Do not widen a window to green it** — rebuild both legs from one commit and
-re-measure. Until then its verdict means nothing either way.
+**THE SUITE IS GREEN.** `test_dualtrack` — the one red thing — is fixed and
+is now a STRONGER gate (**#95**, closed). It was never a regression: it
+asserted two things the project had *deliberately* made false, and **no
+runner ran it**, so nobody saw it go red 11 days ago.
+
+| its claim | what invalidated it |
+|---|---|
+| 11 legacy replays bit-identical stock↔WIDE | **14z-64 M3a de-substitution** — the two builds carry DIFFERENT ROSTERS by construction (`m5_stock` id 0x0F over Jedah; `m5_wide` id 0x13, Jedah restored), so every select-reaching replay must differ |
+| attract diff = 57 bytes, 0 gameplay, at frame 4400 | **14z-86 M5 voice block** — the WIDE sound delta grew and now propagates |
+
+Re-derived: section 1 asserts **bit-identical up to select entry** with the
+onset frozen per replay (890 ×9, 3190 for the mid-attract one, none for
+`06_test_mode`) — the same constants §4 v3 ratifies, which corroborates that
+it is select entry. Section 3 attributes the **onset**, not a late frame:
+3 bytes at 4267, all in the P1 effect-channel record pointer. New section 4
+is the load-bearing one — **the same writer PC on both legs**, so it is DATA,
+not control flow; a different writer set is what would mean the profile
+leaked into engine flow.
+
+**ONE THING WANTS YOUR SIGN-OFF:** the re-scoped section 1. Full cross-track
+bit-identity is not just stale, it is unachievable by construction (Donovan
+on a stock-size ROM requires substituting over someone — that is why WIDE
+exists). "Identical up to select entry" is the strongest form still true.
+
+**AND THE REAL LESSON, worth more than the fix:** `grep -rn test_dualtrack`
+finds no runner — only docs and **CLAUDE.md:112, which names it as one of
+FBNeo's three guarantees.** A rule was resting on a gate nobody executed.
+That is GitHub #30, and it is now the highest-value open issue.
 
 **Three new tickets, deliberately NOT folded in:** **#93**
 `audit_qs_voice_batch`'s keyon failure (proven pre-existing — identical under
 both input stagings), **#94** `audit_pyron_ring`'s dead `build/pyron22` (the
 FOURTH reference-rot instance, so it asks for a standing check rather than a
-fourth one-line repair), and **#95** above. #94 and #95 are the same class:
-untracked build dirs drifting with nothing to notice.
+fourth one-line repair), and **#95**, now CLOSED. #94 remains: audits pinned to
+untracked build dirs with nothing to notice.
 
-**Start here next time:** #95 if you want the suite fully green, since it is
-the only red. The 15 other open issues are maintainer-owned (#30/#24/#29,
-#27, #43, #52, #57) or architecture backlog (#47/#48/#49/#50, #69, #71, #46).
-None blocks the re-freeze.
+**Start here next time: #30** — "50 test scripts are invoked by nothing".
+#95 just showed what that costs: a CLAUDE.md guarantee resting on an
+unexecuted gate that had been red for 11 days. The other open issues are
+maintainer-owned (#24/#29, #27, #43, #52, #57) or architecture backlog
+(#47/#48/#49/#50, #69, #71, #46, #93, #94). None blocks the re-freeze.
 
 ## Where it stands
 

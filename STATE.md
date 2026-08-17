@@ -1,5 +1,63 @@
 # STATE — living progress log
 
+## Session 14z-94 (8) — #95 ROOT-CAUSED: `test_dualtrack` was asserting two
+## things the project had DELIBERATELY made false, and no runner ran it.
+
+The suite's only red is green, and it is a stronger gate than before.
+
+**IT WAS NEVER A REGRESSION.** Both of its expectations were correct when
+taken at 14z-59g/14z-59j, and each was invalidated by a later
+maintainer-ratified decision:
+
+| section | claim | what invalidated it |
+|---|---|---|
+| 1 | 11 legacy replays **bit-identical** stock↔WIDE | **14z-64, the M3a de-substitution.** The two builds carry DIFFERENT ROSTERS by construction — `m5_stock/patch/tenant.json` is id 15 (0x0F), `mirror_variant: true` (Donovan over Jedah); `m5_wide` is id 19 (0x13), `mirror_variant: false` (Jedah restored). Every select-reaching replay MUST differ. |
+| 3 | attract diff = **57 bytes, 0 gameplay**, at frame 4400 | **14z-86, the M5 voice block.** The WIDE sound delta grew; the divergence now propagates. |
+
+**HOW IT STAYED RED FOR 11 DAYS: nothing runs it.** `grep -rn test_dualtrack`
+finds only docs, one comment in `test_fbneo_legacy_oracle.sh`, and
+**CLAUDE.md:112, which cites it as one of FBNeo's three guarantees.** That is
+GitHub #30's class exactly ("50 test scripts are invoked by nothing"), and it
+is the reason this is worth more than its severity suggests: a rule in
+CLAUDE.md was resting on a gate nobody executed.
+
+**THE RE-DERIVATION, measured not assumed:**
+
+- Section 1 → **bit-identical UP TO SELECT ENTRY**, onset frozen per replay.
+  All 11 measured: 9 at frame **890**, `10_midattract_start` at **3190**,
+  `06_test_mode` identical for its whole 3,120 frames (it never reaches
+  select). Those are the SAME constants CLAUDE.md §4 v3 ratifies for the
+  bounded re-convergent window class — independent corroboration that what
+  is being measured is select entry. The surviving claim is falsifiable and
+  load-bearing: an onset moving EARLIER means the profile reached boot,
+  attract or engine init, where it must not.
+- Section 3 → attributed at the **ONSET, not a fixed late frame**. The tracks
+  are bit-identical through 4266; at **4267 exactly 3 bytes differ**, all
+  inside `$FF87A4-$FF87A7`, the P1 effect-channel record pointer
+  (`ram.md:192`). Stock writes `0x000CEAF0`, WIDE `0x00390CA0` — the ported
+  effect record. Growth after that is 3 → 84 → 260 → 538 → 759 bytes at
+  4267/4268/4280/4300/4400, so a late fixed frame measures accumulated
+  propagation and says nothing about correctness.
+- **Why it propagates is already in the atlas:** `ram.md:89` records the
+  arcade-ladder in-use mask `$FF8110.l` as SOUND-STATE-FED, "the run-to-run
+  lottery". Live sfx helper → different sound state → different demo
+  selection → whole machine. Documented mechanism, not a leak.
+- Section 4 is NEW and is the load-bearing one: **the writer is the same on
+  both legs** — `PRG:0x01C186`, identical write counts and PC distribution
+  over the whole replay (36×`016e4e`, 6×`01bee2`, 4×`01c186`, …). Same engine
+  code, different DATA. A WIDE build that had taken a different BRANCH would
+  show a different writer set, and THAT is what would mean the profile leaked
+  into engine control flow — which is what Rule 1 exists to prevent.
+
+**NEEDS A RULING (one item):** the re-scoped section 1. Full cross-track
+bit-identity is not merely stale, it is **unachievable by construction** —
+Donovan on a stock-size ROM requires substituting over someone, which is the
+entire reason WIDE exists. "Identical up to select entry" is the strongest
+form still true. Recorded here as a correction rather than a weakening, but
+it changes what a ratified gate asserts, so it wants sign-off.
+
+---
+
 ## Session 14z-94 (7) — THE #74 REVIEW TRIAGE IS CLOSED OUT. Twelve issues
 ## this pass; three of them were hiding a second defect underneath.
 
@@ -12335,6 +12393,13 @@ unplayable rather than merely ugly. Next investigative step.
 > at the top of this file.
 
 ## Session 14z-59j (dual-track invariant ESTABLISHED, byte-attributed)
+## — **SUPERSEDED 14z-94 (GitHub #95). The measurements below were correct
+## when taken and BOTH have since been invalidated by ratified decisions:**
+## 14z-64's M3a de-substitution gave the two builds DIFFERENT ROSTERS, so
+## "11 legacy replays bit-identical" holds only UP TO SELECT ENTRY; and
+## 14z-86's M5 voice block enlarged the WIDE sound delta, so the "57 bytes,
+## 0 gameplay" attract attribution is no longer the shape. See the 14z-94
+## (8) entry for the re-derivation. Historical entry, not rewritten.
 
 The dual-track decision is only coherent if the WIDE build is a genuine
 SUPERSET of the stock one. `tests/test_dualtrack.sh` establishes that as a
