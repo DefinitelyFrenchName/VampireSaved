@@ -71,27 +71,52 @@ python3 "$REPO/tools/check_qs_voice_wav.py" "$W/ours/voices.wav" \
 # and a tail-zeroing control barely moves the metric — the first version
 # of this control could not fail (RH-9; caught by its own dead-control
 # check on the first shipped-artifact run, 14z-86)
+#
+# RUN AT BOTH ENDS OF THE SWEEP (14z-94, GitHub #85). It used to truncate
+# index 0 only — the window where frame->time conversion error is smallest,
+# so it could not detect late-window misalignment at all. With the 60 Hz
+# literal that error reached 2.03 s by index 79 against a 3.35 s window, and
+# this control would still have gone green. The window maths now comes from
+# check_qs_voice_wav.window() rather than a second copy of the constants,
+# so the control cannot compute a different window than the checker.
 python3 - "$W" <<'PY' || exit 1
-import json, os, subprocess, sys, wave, struct
+import json, os, subprocess, sys, wave
 w = sys.argv[1]
 repo = os.environ["REPO"]
+sys.path.insert(0, os.path.join(repo, "tools"))
+from check_qs_voice_wav import window, CPS_HZ
+
+led = json.load(open(f"{w}/ledger.json"))
+n = len(led["voices"])
 src = wave.open(f"{w}/ours/voices.wav")
 params = src.getparams()
-raw = bytearray(src.readframes(src.getnframes()))
+base = bytearray(src.readframes(src.getnframes()))
 rate, nch = params.framerate, params.nchannels
-led = json.load(open(f"{w}/ledger.json"))
-f0 = 1050 + 240 * 0
-a = int(f0 / 60 * rate) * nch * 2
-b = int((f0 + 160) / 60 * rate) * nch * 2
-raw[a:b] = bytes(b - a)
-out = wave.open(f"{w}/bad.wav", "wb")
-out.setparams(params); out.writeframes(bytes(raw)); out.close()
-r = subprocess.run([sys.executable, f"{repo}/tools/check_qs_voice_wav.py",
-                    f"{w}/bad.wav", f"{w}/native/voices.wav",
-                    f"{w}/ledger.json"], capture_output=True, text=True)
-if r.returncode == 0:
-    print("  CONTROL DEAD: truncated window not flagged"); sys.exit(1)
-print("  ok: verdict control fired (synthetic truncation -> suspect)")
+print(f"  (control at {CPS_HZ:.4f} Hz; sweep has {n} voices)")
+
+bad = 0
+for tag, i in (("first", 0), ("last", n - 1)):
+    raw = bytearray(base)
+    a, b = window(i, rate, frames=160)
+    a, b = a * nch * 2, b * nch * 2
+    if b > len(raw):
+        print(f"  CONTROL UNRUNNABLE ({tag}, voice {i}): window ends at sample"
+              f" {b//(nch*2)} but the capture is only {len(raw)//(nch*2)} —"
+              f" the capture is too short for the sweep it claims to cover")
+        bad = 1; continue
+    raw[a:b] = bytes(b - a)
+    wf = f"{w}/bad_{tag}.wav"
+    out = wave.open(wf, "wb")
+    out.setparams(params); out.writeframes(bytes(raw)); out.close()
+    r = subprocess.run([sys.executable, f"{repo}/tools/check_qs_voice_wav.py",
+                        wf, f"{w}/native/voices.wav", f"{w}/ledger.json"],
+                       capture_output=True, text=True)
+    if r.returncode == 0:
+        print(f"  CONTROL DEAD ({tag}, voice {i}): truncated window not flagged")
+        bad = 1
+    else:
+        print(f"  ok: verdict control fired at the {tag} voice (index {i})")
+sys.exit(bad)
 PY
 [ $? -eq 0 ] || exit 1
 

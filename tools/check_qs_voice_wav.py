@@ -13,6 +13,40 @@ the records and bytes were all "correct").
 """
 import json, math, struct, sys, wave
 
+# CPS-2 DOES NOT RUN AT 60 Hz (14z-94, GitHub #85). The sweep schedules its
+# injections by emulated FRAME (tests/lua/qs_sweep.lua: frame >= firstf and
+# (frame - firstf) % stepf == 0); this file converts those frames to WAV
+# sample offsets. Doing that at a literal 60 accumulates error against the
+# real cadence, and the error is one-directional:
+#
+#     voice  0  frame  1050   60Hz 17.500s   real 17.606s   drift +0.106s
+#     voice 40  frame 10650   60Hz 177.500s  real 178.579s  drift +1.079s
+#     voice 79  frame 20010   60Hz 333.500s  real 335.528s  drift +2.028s
+#
+# The window is 200 frames = 3.354s wide, so by the end of an 80-id sweep the
+# examined window has slipped more than HALF A WINDOW off the injection it is
+# supposed to measure. A late voice that is shortened, delayed or missing can
+# then be "verified" against residual audio from a neighbouring event.
+#
+# Derived from MAME's own constants (emu/mame/src/mame/capcom/cps1.h:39-45,
+# used by cps2.cpp:1765 set_raw) rather than pasted as 59.637405, so the
+# derivation is checkable and a re-pin of the emulator is visible here.
+CPS_PIXEL_CLOCK = 16_000_000 / 2
+CPS_HTOTAL, CPS_VTOTAL = 512, 262
+CPS_HZ = CPS_PIXEL_CLOCK / (CPS_HTOTAL * CPS_VTOTAL)   # 59.637405...
+
+# The sweep's schedule, matching tests/lua/qs_sweep.lua's defaults and the
+# STEP=240 the audits pass. Shared so the audit's verdict control cannot
+# compute a different window than the checker it is testing — which is
+# exactly what a second literal 60 did.
+FIRST_FRAME, STEP_FRAMES, WINDOW_FRAMES = 1050, 240, 200
+
+
+def window(i, rate, frames=WINDOW_FRAMES):
+    """(start, end) sample offsets of voice `i`'s window at WAV rate `rate`."""
+    f0 = FIRST_FRAME + STEP_FRAMES * i
+    return int(f0 / CPS_HZ * rate), int((f0 + frames) / CPS_HZ * rate)
+
 
 def load(path):
     w = wave.open(path)
@@ -37,11 +71,17 @@ def metrics(s, a, b):
 def main():
     ro, so = load(sys.argv[1])
     rn, sn = load(sys.argv[2])
+    # Both windows are computed at `ro` below, so a rate mismatch would slice
+    # the native leg at the wrong place and compare unrelated audio. Same
+    # class as the frame-rate drift above, so it is checked rather than
+    # assumed (both legs come from MAME -wavwrite today).
+    if ro != rn:
+        sys.exit(f"sample-rate mismatch: ours {ro} Hz, native {rn} Hz — the "
+                 f"window for one leg would be wrong")
     led = json.load(open(sys.argv[3]))
     sus, rows = [], 0
     for i, v in enumerate(led["voices"]):
-        f0 = 1050 + 240 * i
-        a, b = int(f0 / 60 * ro), int((f0 + 200) / 60 * ro)
+        a, b = window(i, ro)
         mo, mn = metrics(so, a, b), metrics(sn, a, b)
         if mo[0] < 50 and mn[0] < 50:
             continue
