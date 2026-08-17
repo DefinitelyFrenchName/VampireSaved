@@ -1,0 +1,133 @@
+# pcrel_escapes.toml — THE FROZEN pc-relative DATA-ESCAPE INVENTORY
+# (14z-94, GitHub #22).
+#
+# WHAT THIS IS. census_regions.py census 3 reports every `lea (d16,pc),An`
+# whose target leaves its region; verify_pcrel_data.py then reads the BUILT
+# image and asks whether that pointer still lands on its table. An escape
+# whose table did NOT travel with the region resolves somewhere else by
+# construction — so a "BROKEN" line is not automatically a defect, it is a
+# pointer whose target moved out from under it.
+#
+# WHY THE TOOL IS NOT A PASS/FAIL GATE. Measured 14z-94 on all three shipping
+# builds: 69/69, 10/10 and 10/10 escapes do not resolve. A 100% rate on
+# field-confirmed builds is the signature of ACCEPTED escapes (dead paths the
+# port never executes), not of 89 live defects. Wiring the tool into the
+# battery as-is — which is what #22 proposed — would make it permanently red
+# and therefore ignored.
+#
+# SO IT IS FROZEN INSTEAD, on the shared_writes doctrine: a pass means the set
+# is UNCHANGED SINCE REVIEWED, not that these pointers are safe. Any addition,
+# removal or change FAILS, which forces someone to establish what a new escape
+# reads before it ships.
+#
+# THE POSITIVE CONTROL that says the tool still works: region x06cac0 — the
+# one verify_pcrel_data's own docstring records as BROKEN on build/hui11 and
+# fixed in 14z-69i — is absent from this inventory. The instrument
+# distinguishes fixed from broken; it is the VERDICT that needed a baseline.
+
+[hui43]
+unresolved = 69
+resolved = 0
+escapes = [
+  "x022400 0x02245e -> 0x027fd8",
+  "x022400 0x022576 -> 0x027fd8",
+  "x022400 0x02264a -> 0x027fd8",
+  "x022400 0x022694 -> 0x027fd8",
+  "x022400 0x0226d4 -> 0x027fd8",
+  "x022400 0x02271c -> 0x027fd8",
+  "x022400 0x022750 -> 0x027fd8",
+  "x022400 0x022798 -> 0x027fd8",
+  "x022400 0x0227f0 -> 0x027fd8",
+  "x022400 0x022830 -> 0x027fd8",
+  "x022400 0x02286e -> 0x027fd8",
+  "x022400 0x02289a -> 0x027fd8",
+  "x022400 0x0228c0 -> 0x027fd8",
+  "x022400 0x0228ec -> 0x027fd8",
+  "x022400 0x02290c -> 0x027fd8",
+  "x022400 0x022936 -> 0x027fd8",
+  "x022400 0x022960 -> 0x027fd8",
+  "x022400 0x022994 -> 0x027fd8",
+  "x022400 0x0229ce -> 0x027fd8",
+  "x022400 0x0229f8 -> 0x027fd8",
+  "x022400 0x022a42 -> 0x027fd8",
+  "x022400 0x022aaa -> 0x027fd8",
+  "x022400 0x022ad2 -> 0x027fd8",
+  "x022400 0x022af4 -> 0x027fd8",
+  "x022400 0x022b2a -> 0x027fd8",
+  "x022400 0x022b74 -> 0x027fd8",
+  "x022400 0x022ba2 -> 0x027fd8",
+  "x022400 0x022bec -> 0x027fd8",
+  "x022400 0x022c14 -> 0x027fd8",
+  "x022400 0x022c36 -> 0x027fd8",
+  "x022400 0x022c52 -> 0x027fd8",
+  "x022400 0x022c90 -> 0x027fd8",
+  "x022400 0x022cc0 -> 0x027fd8",
+  "x022400 0x022cfa -> 0x027fd8",
+  "x022400 0x022d26 -> 0x027fd8",
+  "x022400 0x022d4e -> 0x027fd8",
+  "x022400 0x022d74 -> 0x027fd8",
+  "x022400 0x022db0 -> 0x027fd8",
+  "x022400 0x022dd4 -> 0x027fd8",
+  "x022400 0x022dea -> 0x027fd8",
+  "x022400 0x022e00 -> 0x027fd8",
+  "x022400 0x022e3c -> 0x027df8",
+  "x022400 0x022e8c -> 0x027fd8",
+  "x022400 0x022eb2 -> 0x027fd8",
+  "x022400 0x022ef8 -> 0x027fd8",
+  "x022400 0x022f0e -> 0x027fd8",
+  "x022400 0x022f30 -> 0x027fd8",
+  "x022400 0x022f58 -> 0x027fd8",
+  "x022400 0x022fbc -> 0x027fd8",
+  "x022400 0x022ffa -> 0x027fd8",
+  "x022400 0x02300c -> 0x027d78",
+  "x022400 0x0230a4 -> 0x027e38",
+  "x022400 0x0230ea -> 0x027e38",
+  "x022400 0x0231ae -> 0x027d78",
+  "x022400 0x02320a -> 0x027fd8",
+  "x022400 0x02328e -> 0x027d78",
+  "x022400 0x0232e6 -> 0x027e18",
+  "x022400 0x02356e -> 0x027fd8",
+  "x022400 0x023624 -> 0x027fd8",
+  "x022400 0x02380e -> 0x027fd8",
+  "x022400 0x0238a0 -> 0x027fd8",
+  "x022400 0x02395a -> 0x027fd8",
+  "x026142 0x026f80 -> 0x027f78",
+  "x026142 0x026f8a -> 0x027eb8",
+  "x026142 0x026f94 -> 0x027f18",
+  "x026142 0x027044 -> 0x02783c",
+  "x026142 0x02708e -> 0x02797a",
+  "x028122 0x028c76 -> 0x028ff4",
+  "x028122 0x028c98 -> 0x029034",
+]
+
+[pyron27]
+unresolved = 10
+resolved = 0
+escapes = [
+  "x026142 0x026f80 -> 0x027f78",
+  "x026142 0x026f8a -> 0x027eb8",
+  "x026142 0x026f94 -> 0x027f18",
+  "x026142 0x027044 -> 0x02783c",
+  "x026142 0x02708e -> 0x02797a",
+  "x028122 0x028c76 -> 0x028ff4",
+  "x028122 0x028c98 -> 0x029034",
+  "x088512 0x08c014 -> 0x08c08a",
+  "x088512 0x08c026 -> 0x08c09a",
+  "x088512 0x08c038 -> 0x08c0a2",
+]
+
+[don_m7]
+unresolved = 10
+resolved = 0
+escapes = [
+  "x026142 0x026f80 -> 0x027f78",
+  "x026142 0x026f8a -> 0x027eb8",
+  "x026142 0x026f94 -> 0x027f18",
+  "x026142 0x027044 -> 0x02783c",
+  "x026142 0x02708e -> 0x02797a",
+  "x028122 0x028c76 -> 0x028ff4",
+  "x028122 0x028c98 -> 0x029034",
+  "x065c22 0x065c98 -> 0x065dfa",
+  "x0905ae 0x0907f6 -> 0x08b61e",
+  "x0905ae 0x0908a0 -> 0x09098a",
+]

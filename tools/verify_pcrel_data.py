@@ -80,11 +80,28 @@ def main():
     _, built_da = decrypted_views(os.path.join(a.build_dir, "rompath", zips[0]))
     src_da = open(a.src_data, "rb").read()
 
-    findings = census.get("pcrel_data_escapes", [])
+    # AN ABSENT KEY IS NOT AN EMPTY ONE (14z-94, GitHub #22). This used to be
+    # `census.get("pcrel_data_escapes", [])`, so a renamed or missing key made
+    # the tool print "nothing to verify" and exit 0 having checked zero
+    # pointers — the permissive direction, and indistinguishable from a clean
+    # result. The census is generated a few lines above, so the key's absence
+    # means the census format moved, not that the build is clean.
+    if "pcrel_data_escapes" not in census:
+        print("FAIL: the census has no 'pcrel_data_escapes' key — the census "
+              "format changed, so this tool verified NOTHING. Fix the key "
+              "rather than reading the silence as a pass.", file=sys.stderr)
+        return 2
+    findings = census["pcrel_data_escapes"]
+    total = len(findings)
     if a.region:
         findings = [f for f in findings if f["region"] == a.region]
+        if total and not findings:
+            print(f"FAIL: --region {a.region} matched none of the {total} "
+                  f"escapes in the census; check the region name.",
+                  file=sys.stderr)
+            return 2
     if not findings:
-        print("no pcrel data-pointer escapes to verify")
+        print("no pcrel data-pointer escapes in the census (0 to verify)")
         return 0
 
     bad, checked, skipped = [], 0, 0
