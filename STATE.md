@@ -1,7 +1,8 @@
 # STATE — living progress log
 
-## Session 14z-94 (10) — three low-hanging issues cleared while the
-## maintainer playtests: #69, #94, and the merged reproducibility gap.
+## Session 14z-94 (10) — five low-hanging issues cleared while the
+## maintainer playtests: #69, #94, #71, #46, and the merged reproducibility
+## gap. Four of the five turned out bigger or different than their ticket.
 
 Chain: **PASS 85 / SKIP 0 / FAIL 0**, tree clean, coverage clean.
 
@@ -41,6 +42,31 @@ stopped sounding" in the gate's own words: new-generation difference or merge
 regression, undistinguished. Its own rule is "re-measure, never absorb", so
 the inventory is untouched and the known-red state is recorded in its header.
 Possibly the same subsystem as **#93**.
+
+**#71 — five copies, not six.** The block inlined stage `6`, `--profile
+cps2-wide-v1` and `--tenant-id 0x13` in five gates; `test_tenant_id.sh`
+mentions the flag in prose but is a pure-function gate and was never a copy.
+Factored to `tests/lib/tenant_build.sh`. The ticket's second cost is fixed
+too: `TENANT13_OUTBASE` lets a battery build ONCE and share it — VALIDATED,
+not trusted, since a stale path would otherwise be read as a legitimate build
+by five gates at once. Measured: the four others then run in 3/21/26/12 s
+instead of rebuilding.
+
+**#46 — fixed although dormant, deliberately.** `select_port` runs only for a
+base-half tenant (`TEN_ID < 16`) and all three live tenants are variant-half,
+which the ticket's verifier established. But `check_tenant_select.py` imports
+it for `PLACEMENTS` and it returns for any future base-half tenant, so a
+broken contract there is a trap for whoever re-enables it. Now `(src, out)`
+via `--out`, atomic across the whole member set (staged, then renamed once
+all exist), and a stamp refuses a second in-place run — which is the fix for
+the subtle half: `assert dsize <= jsize` re-parses the TARGET, so a second
+pass measured the record it had just written. The ~40 unreachable
+`WINPAL_ENABLE` lines are deleted and **the analysis is kept verbatim** — the
+round-22 timeline convicting the block copies of the throw victim-teleport
+bug is evidence, not implementation, and the gate asserts three phrases of it
+survived. Left undone and said so: the embedded hex tables are still a rule-5
+gap, but moving them changes what `check_tenant_select` imports and wants its
+own measured pass.
 
 **Also found and fixed while there:** `test_m3a_reproducible`'s HEADER named
 four references with fingerprints superseded several freezes ago, while its
