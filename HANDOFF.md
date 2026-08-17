@@ -508,6 +508,41 @@ python3 tools/cps2_decrypt.py "$ROMDIR/vsavj.zip" build/out/vsavj_opcodes.bin --
 
 ## How to test
 
+### THE PRE-COMMIT COMMAND (14z-94, GitHub #30) — run this, not a filename
+
+```sh
+tests/run_all_static.sh                    # portable tier: ROM-free, ~1 min
+ROMDIR=... tests/run_all_static.sh         # + the static tier, ~8 min
+ROMDIR=... tests/run_all_static.sh --strict   # SKIP counts as failure too
+tests/run_all_static.sh --list             # what is registered
+```
+
+**One command, every gate that does not need an emulator.** Until 14z-94 there
+was no CI and no aggregator, and 101 of 130 test scripts had no shell caller —
+so running the reproducibility gate depended on somebody remembering its
+filename. What that cost, measured: `test_dualtrack.sh` sat RED for 11 days
+(GitHub #95) while CLAUDE.md §4 cited it as one of FBNeo's three guarantees.
+
+It reports **PASS / SKIP / FAIL separately, because SKIP is not PASS**
+(GitHub #29): a gate whose build dir is absent prints `SKIP:` and exits 0, and
+counting that as a pass is how a fresh checkout reports green while asserting
+nothing. `--strict` makes skips fatal.
+
+It also prints a **registry-coverage check** — any emulator-free gate in
+neither `tests/ci_portable.txt` nor `tests/ci_static.txt` is named. That check
+is the anti-orphan mechanism; without it the runner would just become a
+smaller thing to forget to update. Its classifier is TRANSITIVE (follows
+`tests/lib/*.sh` sources), because two gates reach an emulator indirectly and
+were mis-registered on the first pass.
+
+Emulator gates, soaks and one-off rigs are deliberately NOT here — they stay
+manual, and this file is their index. This is also not `run_battery_m2.sh`,
+which builds a ROM and is the stage-6 dev-build chain.
+
+Ground truth for the runner itself: `tests/test_static_runner.sh`.
+
+### Individual gates
+
 ```sh
 export ROMDIR=...
 tests/test_decrypt_oracle.sh          # decryption == MAME's, both byte orders sane

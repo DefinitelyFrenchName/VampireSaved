@@ -26,7 +26,23 @@ set -eu
 ROMDIR="${ROMDIR:?set ROMDIR}"
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"
-EXPECT="${1:-ae701ffb06d0cbf3462cad1a9faa47534a3c00e4}"
+# THE STOCK TWIN'S CURRENT FINGERPRINT. Re-pinned 14z-94 (GitHub #30) from
+# ae701ffb, which two maintainer-ratified freezes had superseded while this
+# gate ran under no runner and so never said so:
+#
+#   ae701ffb  the original stock twin
+#   6c93cfa8  14z-64 — ae701ffb + EXACTLY the 2-byte mirror-victim fix
+#             (PRG:0x0B1A16, byte-attributed) — HANDOFF "m5_stock"
+#   a054de5c  14z-91 — the legacy-regression fix, which is NOT profile-gated,
+#             so all four builds moved — HANDOFF:184 "stock twin
+#             build/m5_stock2 (a054de5c)"
+#
+# The gate's standing warning below — "The refactor MOVED PORTED BYTES. Do NOT
+# re-freeze to pass" — is aimed at a refactor silently moving bytes, which is
+# NOT what happened here: a054de5c is the value HANDOFF documents as the
+# current stock twin, reached by two ratified changes. The warning stays,
+# because the next mismatch may well be the real thing.
+EXPECT="${1:-a054de5c0cfe868cb0aa9722abebdffd9dfcdb0d}"
 WORK="$(mktemp -d)"
 trap 'rm -rf "$WORK"' EXIT
 fail=0
@@ -57,8 +73,17 @@ GEN_FLAGS="--allow-plausible --tripwire-open --profile cps2-wide-v1" \
 if grep -q "Traceback" "$WORK/wide.log"; then
     echo "  FAIL: crashed instead of diagnosing"; grep -A3 Traceback "$WORK/wide.log" | head -5
     fail=1
-elif grep -q "wide_ext 0x400010/0x600000" "$WORK/wide.log"; then
-    echo "  ok: extension declared and available (2MB) under the profile"
+elif grep -qE "wide_ext 0x[0-9a-f]+/0x600000" "$WORK/wide.log"; then
+    # CORRECTED 14z-94 (GitHub #30): this grepped the LITERAL
+    # "wide_ext 0x400010/0x600000". That number is the extension's current
+    # ALLOCATION POINTER, not its base — so it moved to 0x406040 the moment
+    # real content occupied the first 0x6030 bytes, and the gate started
+    # reporting "extension not available" about an extension that was
+    # available with 0x1F9FC0 free. The invariant is the 0x600000 CEILING and
+    # the fact that the space is declared at all; the cursor is expected to
+    # move as the port grows.
+    _we="$(grep -oE 'wide_ext [^,)]*\)' "$WORK/wide.log" | head -1)"
+    echo "  ok: extension declared and available under the profile — $_we"
     if grep -q "lies beyond the .* program image" "$WORK/wide.log"; then
         echo "  ok: allocating into it fails with the precise next-step diagnosis"
     else

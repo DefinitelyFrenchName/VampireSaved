@@ -68,4 +68,5 @@ test_replay_stage_census
 test_romset_path_guard
 test_s4_thresholds
 test_shell_portability
+test_static_runner
 test_tenant_id

@@ -40,7 +40,32 @@ set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"
 [ -f build/out/vsavj_data.bin ] || { echo "SKIP: need build/out/vsavj_data.bin"; exit 0; }
-BUILDS="${BUILDS:-build/hui41:0x10 build/pyron26:0x11 build/don_m7:0x13 build/hui42:0x10}"
+# DEFAULT = THE SHIPPING BUILDS (re-pointed 14z-94, GitHub #30). It used to
+# default to build/hui41 + build/pyron26 + build/hui42 — the PRE-FIX builds —
+# so the gate asserted "the frozen builds still carry #92". That is history,
+# not a regression check, and it made the gate permanently RED: once
+# tests/run_all_static.sh started running the suite, a gate that can never go
+# green is exactly what trains people to ignore the chain.
+#
+# The pre-fix builds remain the GROUND-TRUTH CONTROL and are worth keeping —
+# run them explicitly to confirm this gate can still fail:
+#
+#   BUILDS="build/hui41:0x10 build/pyron26:0x11" tests/test_voice_row_range.sh
+#     -> must FAIL with 4 bytes > 0x16 per tenant
+#
+# A build dir that is absent is SKIPPED, not failed, so a fresh checkout does
+# not red (GitHub #29: the skip is reported, never counted as a pass).
+BUILDS="${BUILDS:-build/hui43:0x10 build/pyron27:0x11 build/don_m7:0x13}"
+
+_present=""
+for _b in $BUILDS; do
+    [ -d "${_b%%:*}" ] && _present="$_present $_b"
+done
+if [ -z "$_present" ]; then
+    echo "SKIP: none of the named tenant builds are on disk ($BUILDS)"
+    exit 0
+fi
+BUILDS="$_present"
 
 rc_b=0
 BUILDS="$BUILDS" python3 - <<'PY' || rc_b=$?

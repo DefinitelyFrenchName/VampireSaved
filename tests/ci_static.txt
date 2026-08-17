@@ -1,0 +1,78 @@
+# ci_static.txt — gates that need ROMDIR and/or a build dir, but NO emulator.
+# Run by tests/run_all_static.sh (14z-94, GitHub #30). One name per line.
+#
+# MEMBERSHIP RULE: no MAME, no FBNeo, no soak. If a gate boots an emulator it
+# belongs in HANDOFF.md's manual index, not here — this file is the set cheap
+# enough to run before a commit.
+#
+# Companion: tests/ci_portable.txt, the ROM-free tier that needs no inputs at
+# all. A gate that needs neither ROMDIR nor a build dir belongs there instead.
+#
+# SKIP IS EXPECTED HERE and is NOT a pass (GitHub #29). Several of these read
+# an untracked build/<name> dir, so on a fresh checkout they print
+# `SKIP: no build at ...` and exit 0. run_all_static counts those separately;
+# `--strict` makes them fatal.
+
+# --- the set GitHub #30's handoff named, minus test_manifest_merge which is
+#     already ROM-free and lives in ci_portable ---
+test_m3a_reproducible
+test_patch_overlap
+test_region_overlap
+test_region_overlap_control
+test_romset_identity
+test_shared_writes
+test_tenant_loop
+test_tenant_row_owner
+test_thunk_addr_literal
+
+# --- ADDED 14z-94: the rest of the emulator-free population. #30 counted 101
+#     orphans of 130 scripts; the coverage check below found 38 that are
+#     emulator-free and were in no registry. Registered here so they run,
+#     rather than left to a future session remembering a filename. Several
+#     read an untracked build/<name> dir and will SKIP on a fresh checkout —
+#     that is reported, never counted as a pass (GitHub #29).
+audit_gfx_merged_census
+audit_select_bank_gates
+test_accent_census
+test_beam_list_type6
+test_builder_rom_audit
+test_census_regions
+test_crypt_boundary
+test_decode_stage_banners
+test_effect_palette_table
+test_extract_hp
+test_fbneo_tree_integrity
+test_fbneo_tree_integrity_control
+test_frozen_rompath_guard
+test_gfx_chain
+test_gfx_layout3
+test_gfx_menus_guard
+test_gfx_tiles
+test_hitclass_map_thunk
+test_hui_winscreen
+test_id_space
+test_index_space
+test_index_window_thunk
+test_list_type_census
+test_member_classify
+test_null_build
+test_obj_walker_relocation
+test_patch_source_identity
+test_pcrel_escapes
+test_phasec_spaces
+test_qs_id_table
+test_qs_songs
+test_suite_dispatch_selftest
+test_type_stamp_census
+test_variant_dispatch
+test_voice_row_range
+
+# NOT HERE, and why (14z-94): three gates were registered above on a first
+# pass and REMOVED when the coverage check was made transitive — each
+# reaches an emulator indirectly and so belongs to HANDOFF.md's manual
+# index, not to a chain advertised as emulator-free:
+#   test_crash_guard      -> tools/run_replay_guarded.sh
+#   test_m2a_stage4_code  -> sources tests/lib/m2a_common.sh (run_replay_mame)
+#   test_m2b_stage6       -> same route
+# test_m2a_stage4_code ran for 208s inside the 'static' tier before this was
+# caught, which is how the indirection was found.

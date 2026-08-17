@@ -68,13 +68,35 @@ want_rows = {0x056020, 0x05604C, 0x056458, 0x056484, 0x08BFF6}
 # confirm all seven byte-for-byte.
 want_raw = {0x06CD5E, 0x06CFDC, 0x06D206, 0x06D542, 0x06D594, 0x06D5E0,
             0x06D628}
-assert set(dc) == want_rows | want_raw, \
+# RE-FROZEN 14z-94 (GitHub #30), +1 site: 0x08C038, an `indexed-far` reader
+# in the x088512 pod zone whose table sits at 0x08C0A2 (walk distance 0x54).
+# Measured covered=1 AND raw_emitted=1 — i.e. the SAME benign mechanism as
+# the x06cac0 seven above: the region's forced tail is emitted RAW, so the
+# read returns the bytes verbatim and no manifest row is wanted.
+#
+# It is a SEPARATE name rather than an addition to want_raw because it has a
+# different host region; lumping it in would hide which zone grew.
+#
+# This gate has gone stale-red this way before and the precedent is recorded
+# a few lines down (x022400, "caught by the 14z-68 end-of-session sweep, not
+# by a run at the time"). This time it was caught by tests/run_all_static.sh
+# on its first full execution — which is the entire point of #30. Growth
+# BEYOND this set still means stop and root-cause.
+want_raw_x088512 = {0x08C038}
+assert set(dc) == want_rows | want_raw | want_raw_x088512, \
     f"data_in_code readers drifted: {sorted(map(hex, dc))}"
 assert all(dc[r]["covered"] and not dc[r].get("raw_emitted")
            for r in want_rows), "a manifest-row reader lost coverage"
 assert all(dc[r]["raw_emitted"] for r in want_raw), \
     "an x06cac0 table left the raw-emitted tail"
-print("  ok: data_in_code = 5 row-covered sites + 7 raw-emitted (x06cac0)")
+# The new site is held to the same bar it was admitted on: covered AND raw.
+# If it ever stops being raw-emitted it needs a manifest row, and this is
+# where that must surface.
+assert all(dc[r]["raw_emitted"] and dc[r]["covered"] for r in want_raw_x088512), \
+    "the x088512 reader is no longer covered+raw-emitted — it now needs a " \
+    "[[data_in_code]] manifest row, not a re-freeze"
+print("  ok: data_in_code = 5 row-covered sites + 7 raw-emitted (x06cac0)"
+      " + 1 raw-emitted (x088512)")
 
 e = c["escapes"]
 EXPECT = {  # region: (count, n_unique, covered)
