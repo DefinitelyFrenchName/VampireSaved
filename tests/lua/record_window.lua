@@ -41,15 +41,19 @@
 --   env TRACE_OUT  index log path (default record_window.txt)
 --   env POKES      "frame:addr:hexbytes;..." scheduled writes (replay grammar)
 --
--- INPUT-STAGING CONVENTION (GitHub #10). This instrument stages inputs at the
--- START of the frame callback (`prev = held[frame]`), whereas
--- tests/lua/replay.lua stages for the NEXT frame at the END
--- (`held[frame + 1]`). The two therefore land a given press on DIFFERENT
--- frames. That is tolerable here only because this instrument is a PASSIVE
--- OBSERVER — it records what happened, not "what happened at replay.lua's
--- frame N". DO NOT cross-reference a frame number from this log with a
--- compare_* first divergence or a masked window onset: they are one frame
--- apart. Unifying the conventions is deferred with the rest of #10.
+-- INPUT STAGING IS CANONICAL (GitHub #10). This instrument follows
+-- replay.lua exactly: parse `held[fr]`, stage for the NEXT frame at the END
+-- of the callback. So a frame number here IS a replay.lua frame number, and
+-- a window recorded from a compare_* first divergence or a masked window
+-- onset lands where you asked for it.
+--
+-- It was written the other way first — copied from snapshot_frames.lua, one
+-- of the ten `+1` deviants — and tests/test_replay_stage_census.sh caught it
+-- as a NEW deviant on the same day. That gate's instruction is "fix the file,
+-- do not extend the frozen list", and it is free to obey here: nothing
+-- consumes this instrument's frame constants yet, so there is no
+-- re-measurement to pay for (which is the whole reason #10 is deferred for
+-- the existing ten).
 
 local out_path = os.getenv("TRACE_OUT") or "record_window.txt"
 local rec_from = tonumber(os.getenv("REC_FROM") or "")
@@ -130,9 +134,6 @@ emu.register_frame_done(function()
             end
         end
     end
-    for _, fo in ipairs(prev) do fo:set_value(0) end
-    prev = held[frame] or {}
-    for _, fo in ipairs(prev) do fo:set_value(1) end
 
     if frame == rec_from then
         machine.video:begin_recording(rec_out, rec_format)
@@ -145,6 +146,14 @@ emu.register_frame_done(function()
         stopped = frame - 1
         f:write(string.format("RECSTOP frame %d\n", stopped))
     end
+
+    -- CANONICAL INPUT STAGING (replay.lua's convention): parse `held[fr]`,
+    -- stage for the NEXT frame at the END of the callback. Done here rather
+    -- than at the top so a frame number in this instrument's output IS a
+    -- replay.lua frame number — see the note in the header.
+    for _, fo in ipairs(prev) do fo:set_value(0) end
+    prev = held[frame + 1] or {}
+    for _, fo in ipairs(prev) do fo:set_value(1) end
 
     if frame >= max_frames then
         -- A window that never closed would leave a truncated file with no

@@ -21,6 +21,14 @@
 #   test_shared_writes          needs the three tenant build dirs
 #   test_select_wheel           drives MAME
 #   test_fbneo_tree_integrity*  needs the emu/fbneo submodule checked out
+#   test_decode_stage_banners   needs build/out/{vsavj,vsav2}_data.bin
+#   test_voice_row_range        needs the DATA view + tenant build dirs
+#   test_member_classify        section 1 reads the real romsets or a packed
+#                               build; it PASSES here only because build dirs
+#                               exist locally, and would SKIP on a clean one
+#   test_builder_rom_audit      its positive control needs a clean $ROMDIR
+#   test_patch_source_identity  compares two real reference sets
+#   test_guard_integrity        drives MAME
 # Every one of those is derived from ROM content, which rule 7 keeps out of
 # the repo. They stay local-only by design, not by oversight.
 test_attribute_ramdiff
@@ -32,11 +40,16 @@ test_compare_composite
 test_compare_flicker
 test_compare_window
 test_describe_masked_shape
+test_fbneo_overlay_hygiene
+test_fbneo_overlay_hygiene_control
 test_freeze_basis_sandbox
 test_gfx_collision_gate
+test_hex_lengths
 test_m2a_flicker_gate
 test_manifest_merge
+test_minitoml_subset
 test_obj_record_walk
+test_phasea_a3_liveness
 test_qs_window_law
 test_replay_stage_census
 test_s4_thresholds
