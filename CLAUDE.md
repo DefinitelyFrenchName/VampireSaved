@@ -109,7 +109,16 @@ legacy behavior is a failed change.
   (`tests/lib/m2a_common.sh`, the frozen `.masked` classes below). FBNeo
   carries: the **emulator superset invariant** on pristine `vsavj`
   (`test_wide_profile.sh`, reference vs patched binary), **dual-track**
-  inertness on one binary (`test_dualtrack.sh`), and since 14z-92 a
+  inertness on one binary (`test_dualtrack.sh` — **SCOPE CORRECTED 14z-94,
+  maintainer-ratified 2026-08-17, GitHub #95: "inertness" here means
+  bit-identical UP TO SELECT ENTRY, not for the whole replay.** The stock
+  and WIDE builds carry DIFFERENT ROSTERS by construction — a stock-size
+  ROM can only hold Donovan by substituting over someone, which is the
+  reason WIDE exists — so every select-reaching replay must differ, and
+  full cross-track bit-identity was never achievable once M3a
+  de-substituted at 14z-64. Onsets are frozen per replay; an onset moving
+  EARLIER is the failure. **This clause previously rested on a gate no
+  runner executed** — see GitHub #30), and since 14z-92 a
   **sampled** hacked-build-vs-vanilla legacy check
   (`test_fbneo_legacy_oracle.sh` — 4 replays × 5 frames, chosen clear of every
   ratified divergence). The **full** FBNeo legacy track is

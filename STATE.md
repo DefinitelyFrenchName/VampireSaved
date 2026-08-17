@@ -49,12 +49,22 @@ CLAUDE.md was resting on a gate nobody executed.
   show a different writer set, and THAT is what would mean the profile leaked
   into engine control flow — which is what Rule 1 exists to prevent.
 
-**NEEDS A RULING (one item):** the re-scoped section 1. Full cross-track
-bit-identity is not merely stale, it is **unachievable by construction** —
-Donovan on a stock-size ROM requires substituting over someone, which is the
-entire reason WIDE exists. "Identical up to select entry" is the strongest
-form still true. Recorded here as a correction rather than a weakening, but
-it changes what a ratified gate asserts, so it wants sign-off.
+**DECIDED 2026-08-17 (maintainer):** the re-scoped section 1 is RATIFIED —
+*"agreed this is why wide exists and now that it exists we must take it into
+account."* Full cross-track bit-identity is not merely stale, it is
+**unachievable by construction**: Donovan on a stock-size ROM requires
+substituting over someone, which is the entire reason WIDE exists. So there
+is no version of this gate that could assert the old claim against a
+correctly-built pair — it is a correction, not a weakening. "Identical up to
+select entry", onsets frozen per replay, is the standing form.
+
+**Propagated the same day** (retraction discipline, the claim not the files):
+`CLAUDE.md`'s FBNeo clause — which cites this gate as one of FBNeo's three
+guarantees and said "dual-track **inertness**" without qualification — now
+carries the scope and the ratification; the gate's own top summary said
+"same legacy behaviour", which was the central mistake and is rewritten;
+HANDOFF's registry row corrected; STATE's 14z-59j entry marked SUPERSEDED
+with its historical measurements intact.
 
 ---
 

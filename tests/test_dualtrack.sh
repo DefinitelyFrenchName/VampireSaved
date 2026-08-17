@@ -3,14 +3,27 @@
 #
 # The dual-track decision (14z-59g) keeps a stock-size build alongside the
 # CPS-2 WIDE roster build. That is only coherent if the WIDE build is a
-# SUPERSET of the stock one: same engine, same legacy behaviour, plus the
-# content the extension made possible.
+# SUPERSET of the stock one: same ENGINE, and the content the extension made
+# possible on top.
+#
+# "Same legacy BEHAVIOUR" is NOT the test, and saying so was this file's
+# central mistake for 11 days (re-scoped 14z-94, maintainer-ratified
+# 2026-08-17, GitHub #95). The stock build can only carry Donovan by
+# SUBSTITUTING him over a legacy character — that is the whole reason the
+# WIDE profile exists — so the two tracks have different rosters and their
+# behaviour must diverge the moment a roster surface is on screen. What the
+# superset claim actually rests on is: identical everywhere the roster is not
+# yet involved, and past that, differences that are DATA fed to the same
+# engine code rather than a different code path. Sections 1 and 4.
 #
 # This gate establishes that directly, as a live A/B between the two builds
 # — no frozen expectations involved, so it is machine-independent and needs
 # no freeze decision:
 #
 #   1. LEGACY IDENTICAL UP TO SELECT ENTRY.
+#      **RE-SCOPED 14z-94, MAINTAINER-RATIFIED 2026-08-17 (GitHub #95):
+#      "agreed this is why wide exists and now that it exists we must take
+#      it into account."**
 #
 #      **RETRACTED 14z-94 (GitHub #95): this said "the WIDE build must be
 #      bit-identical to the stock build" on legacy replays, full stop.**
@@ -35,6 +48,13 @@
 #      the original claim exactly where it is still true, and it is
 #      falsifiable: an onset moving EARLIER means the profile reached
 #      something it must not.
+#
+#      NOT A WEAKENING, and the ruling turned on this: full cross-track
+#      bit-identity is UNACHIEVABLE BY CONSTRUCTION, not merely stale. A
+#      stock-size ROM can hold Donovan only by substituting over someone —
+#      that is the reason the WIDE profile exists at all. So there is no
+#      version of this gate that could assert the old claim against a
+#      correctly-built pair.
 #
 #      Note the frozen onsets are the same constants CLAUDE.md §4 v3
 #      ratifies for the bounded re-convergent window class, which is

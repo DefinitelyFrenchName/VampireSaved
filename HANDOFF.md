@@ -546,7 +546,8 @@ tests/test_mame_determinism.sh        # RUNS=/JOBS=/PROBE= repetitions; measures
                                       # assumes is zero (see STATE 14z-59)
 tests/test_crypt_boundary.sh          # code above the encryption window is stored RAW
                                       # (load-bearing: character code in the extension)
-tests/test_dualtrack.sh               # dual-track. CORRECTED 14z-94 (GitHub #95):
+tests/test_dualtrack.sh               # dual-track. RE-SCOPED 14z-94, MAINTAINER-
+                                      # RATIFIED 2026-08-17 (GitHub #95):
                                       # this row said "WIDE is legacy-IDENTICAL to
                                       # stock", which 14z-64's M3a de-substitution
                                       # made false — the two builds carry DIFFERENT

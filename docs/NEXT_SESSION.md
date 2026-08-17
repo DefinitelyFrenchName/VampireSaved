@@ -61,10 +61,11 @@ is the load-bearing one — **the same writer PC on both legs**, so it is DATA,
 not control flow; a different writer set is what would mean the profile
 leaked into engine flow.
 
-**ONE THING WANTS YOUR SIGN-OFF:** the re-scoped section 1. Full cross-track
-bit-identity is not just stale, it is unachievable by construction (Donovan
-on a stock-size ROM requires substituting over someone — that is why WIDE
-exists). "Identical up to select entry" is the strongest form still true.
+**DECIDED 2026-08-17 (maintainer):** the re-scoped section 1 is ratified —
+*"agreed this is why wide exists and now that it exists we must take it into
+account."* Nothing about it is open. `CLAUDE.md`'s FBNeo clause was updated
+the same day, since it names this gate as one of FBNeo's three guarantees
+and said "dual-track inertness" with no scope.
 
 **AND THE REAL LESSON, worth more than the fix:** `grep -rn test_dualtrack`
 finds no runner — only docs and **CLAUDE.md:112, which names it as one of
