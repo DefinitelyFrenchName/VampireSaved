@@ -51,6 +51,7 @@ test_m2a_mask_pin
 test_manifest_merge
 test_minitoml_subset
 test_obj_record_walk
+test_optimize_guard
 test_phasea_a3_liveness
 test_qs_window_law
 test_record_walk_bounds

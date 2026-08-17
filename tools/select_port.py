@@ -35,6 +35,16 @@ import sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import cps2_decrypt as cps  # noqa: E402
 
+# REFUSE TO RUN WITH ASSERTIONS DISABLED (14z-94, GitHub #79). The record-format, size-bound, anchor-presence and CONFLICTING TILE
+# PLACEMENT checks are the select screen's only placement safety net.
+# These are `assert` statements, and `python -O` / PYTHONOPTIMIZE=1 removes
+# assert statements ENTIRELY — so under that mode the check does not weaken,
+# it VANISHES, and a bad result exits 0. Gated by tests/test_optimize_guard.sh.
+if not __debug__:
+    raise SystemExit(
+        f"{__file__}: refusing to run under python -O / PYTHONOPTIMIZE — its "
+        f"safety checks are assertions and would be stripped (GitHub #79)")
+
 # (piece, vsavj_record, vs2_record) — in-place record replacements.
 # The cursor highlight (vsavj 0x2724A2) is deliberately NOT replaced:
 # its vs2 coordinates assume vsav2's wheel geometry (displaced label).

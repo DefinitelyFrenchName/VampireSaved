@@ -36,6 +36,16 @@ import zipfile
 from array import array
 from pathlib import Path
 
+# REFUSE TO RUN WITH ASSERTIONS DISABLED (14z-94, GitHub #79). The cipher round-trip self-checks (decrypt(encrypt(x)) == x) are what
+# stand between a wrong key schedule and a silently corrupt shipped ROM.
+# These are `assert` statements, and `python -O` / PYTHONOPTIMIZE=1 removes
+# assert statements ENTIRELY — so under that mode the check does not weaken,
+# it VANISHES, and a bad result exits 0. Gated by tests/test_optimize_guard.sh.
+if not __debug__:
+    raise SystemExit(
+        f"{__file__}: refusing to run under python -O / PYTHONOPTIMIZE — its "
+        f"safety checks are assertions and would be stripped (GitHub #79)")
+
 # ── bit-group permutations ────────────────────────────────────────────────────
 
 FN1_GROUPA = (10, 4, 6, 7, 2, 13, 15, 14)

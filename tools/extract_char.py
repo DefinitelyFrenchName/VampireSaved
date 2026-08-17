@@ -51,6 +51,16 @@ import cps2_decrypt as cps  # noqa: E402
 import scan_code_refs  # noqa: E402
 from _minitoml import loads as toml_loads  # noqa: E402
 
+# REFUSE TO RUN WITH ASSERTIONS DISABLED (14z-94, GitHub #79). The extracted-footprint length check is what catches a region whose two
+# halves disagree before those bytes are written into a build.
+# These are `assert` statements, and `python -O` / PYTHONOPTIMIZE=1 removes
+# assert statements ENTIRELY — so under that mode the check does not weaken,
+# it VANISHES, and a bad result exits 0. Gated by tests/test_optimize_guard.sh.
+if not __debug__:
+    raise SystemExit(
+        f"{__file__}: refusing to run under python -O / PYTHONOPTIMIZE — its "
+        f"safety checks are assertions and would be stripped (GitHub #79)")
+
 VSAVJ_ORIGIN = 0x0BD0FA
 # The appended newcomer handler window. 0x057000 was Donovan-era triage:
 # HUITZIL'S handler zone starts at 0x054xxx (13 of his dispatch rows target

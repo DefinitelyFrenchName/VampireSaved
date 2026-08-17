@@ -34,6 +34,16 @@ import subprocess
 import sys
 import tempfile
 
+# REFUSE TO RUN WITH ASSERTIONS DISABLED (14z-94, GitHub #79). The `zips` check is this instrument's census key: with it stripped, an
+# empty rompath verifies NOTHING while still reporting success.
+# These are `assert` statements, and `python -O` / PYTHONOPTIMIZE=1 removes
+# assert statements ENTIRELY — so under that mode the check does not weaken,
+# it VANISHES, and a bad result exits 0. Gated by tests/test_optimize_guard.sh.
+if not __debug__:
+    raise SystemExit(
+        f"{__file__}: refusing to run under python -O / PYTHONOPTIMIZE — its "
+        f"safety checks are assertions and would be stripped (GitHub #79)")
+
 
 def decrypted_views(zip_path):
     """decrypt a built romset to (opcode, data) byte images"""

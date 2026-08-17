@@ -34,6 +34,19 @@ import os
 import sys
 import zipfile
 
+
+# REFUSE TO RUN WITH ASSERTIONS DISABLED (14z-94, GitHub #79). This file's
+# collision, band-bound and placement checks are `assert` statements, and
+# `python -O` / PYTHONOPTIMIZE=1 removes them ENTIRELY — an invalid graphics
+# placement would then exit 0, and the gate that is supposed to catch it would
+# print PASS because the expected raise never happened. Converting each assert
+# would fix today's checks and not tomorrow's; refusing the mode fixes the
+# class. A safety check that can be switched off by an environment variable is
+# not a safety check.
+if not __debug__:
+    raise SystemExit(
+        f"{__file__}: refusing to run under python -O / PYTHONOPTIMIZE — its "
+        f"safety checks are assertions and would be stripped (GitHub #79)")
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from gfx_tiles import GROUP_A, GROUP_B, GROUP_C, bank_word, \
     tile_bytes, write_tile  # noqa: E402
