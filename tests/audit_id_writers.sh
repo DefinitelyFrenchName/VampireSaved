@@ -36,7 +36,7 @@ set -eu
 ROMDIR="${ROMDIR:?set ROMDIR}"
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"
-OUT="${1:-${TMPDIR:-/tmp}/id_writers_$$}"
+OUT="${1:-$(mktemp -d)}"   # GitHub #68: not a predictable default
 mkdir -p "$OUT"
 
 REPLAYS="01_attract_long 02_demitri_vs_cpu 03_two_player_vs 04_select_fuzz

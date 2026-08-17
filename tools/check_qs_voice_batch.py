@@ -13,11 +13,20 @@ priority-suppressed track echo — measured moving with injection
 timing), and no signature's count drifts by more than 2.
 """
 import os, re, sys, zipfile
-_rd = '/Users/koneko/Developer/Vampire_Saved/ROMS'
+# NO HARDCODED ROMDIR (14z-94, GitHub #67). This was the maintainer's own
+# absolute path, and the only tracked source file leaking one — which made the
+# tool unrunnable-with-a-confusing-error for anyone else, and pinned a path
+# that is itself stale in this repo's history ('Vampire Saved' predates the
+# 2026-08-05 rename to 'Vampire_Saved'). Resolution order is now --romdir,
+# then $ROMDIR, then a NAMED failure: guessing is what produced the papercut.
+_rd = None
 if '--romdir' in sys.argv:
     i = sys.argv.index('--romdir'); _rd = sys.argv[i+1]; del sys.argv[i:i+2]
 elif os.environ.get('ROMDIR'):
     _rd = os.environ['ROMDIR']
+if not _rd:
+    sys.exit('set ROMDIR (or pass --romdir <dir>) — the reference-set '
+             'directory holding vsav.zip / vsav2.zip')
 
 zv = zipfile.ZipFile(f'{_rd}/vsav.zip')
 z2 = zipfile.ZipFile(f'{_rd}/vsav2.zip')

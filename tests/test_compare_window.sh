@@ -16,8 +16,7 @@
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"
-W="${TMPDIR:-/tmp}/cmpwin_$$"
-mkdir -p "$W"
+W="$(mktemp -d)"           # GitHub #68: not a predictable name
 trap 'rm -rf "$W"' EXIT
 fail=0
 

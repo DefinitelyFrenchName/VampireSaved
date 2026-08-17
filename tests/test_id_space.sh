@@ -33,8 +33,7 @@ set -eu
 ROMDIR="${ROMDIR:?set ROMDIR}"
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"
-WORK="${TMPDIR:-/tmp}/id_space_$$"
-mkdir -p "$WORK"
+WORK="$(mktemp -d)"        # GitHub #68: not a predictable name
 trap 'rm -rf "$WORK"' EXIT
 fail=0
 

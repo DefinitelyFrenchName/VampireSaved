@@ -49,8 +49,7 @@ REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"
 MERGED="${1:-build/merged1}"
 REF=build/hui30
-W="${TMPDIR:-/tmp}/type_dispatch_$$"
-mkdir -p "$W"
+W="$(mktemp -d)"           # GitHub #68: not a predictable name
 trap 'rm -rf "$W"' EXIT
 fail=0
 

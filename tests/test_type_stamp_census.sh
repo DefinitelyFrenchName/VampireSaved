@@ -25,8 +25,7 @@
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"
-WORK="${TMPDIR:-/tmp}/type_stamp_census_$$"
-mkdir -p "$WORK"
+WORK="$(mktemp -d)"        # GitHub #68: not a predictable name
 trap 'rm -rf "$WORK"' EXIT
 fail=0
 

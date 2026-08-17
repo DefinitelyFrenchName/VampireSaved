@@ -176,8 +176,28 @@ local frame = 0
 -- expectations. Used for the dead-stack-window analysis (docs/GOTCHAS.md:
 -- engine hooks skew interrupt timing; ghost bytes below resting SP differ).
 local mask_ranges = {}
-for a, b in (os.getenv("MASK_RANGES") or ""):gmatch("(%x+)%-(%x+)") do
-    mask_ranges[#mask_ranges + 1] = { tonumber(a, 16), tonumber(b, 16) }
+local mask_spec = os.getenv("MASK_RANGES") or ""
+for a, b in mask_spec:gmatch("(%x+)%-(%x+)") do
+    local lo, hi = tonumber(a, 16), tonumber(b, 16)
+    -- VALIDATE, do not just parse (GitHub #61). The mask string IS the
+    -- definition of the ratified comparison basis (CLAUDE.md §4,
+    -- docs/game/atlas/ram.md), so a malformed one makes every expectation
+    -- citing it meaningless. freeze_masked_basis.sh grew three guards in
+    -- 14z-89 for exactly this reason while the READER validated nothing.
+    if lo > hi then
+        error(string.format("MASK_RANGES: %04x-%04x is inverted", lo, hi), 0)
+    end
+    if hi > 0x10000 then
+        error(string.format("MASK_RANGES: %04x-%04x runs past work RAM "
+                            .. "(offsets from $FF0000, end EXCLUSIVE)", lo, hi), 0)
+    end
+    mask_ranges[#mask_ranges + 1] = { lo, hi }
+end
+-- A non-empty spec that parsed to nothing is a typo, not "no mask": it would
+-- silently produce a WHOLE-RAM checksum under a name that promises a masked
+-- one. Catch it rather than comparing the wrong basis.
+if mask_spec:match("%S") and #mask_ranges == 0 then
+    error("MASK_RANGES is set but parsed to no ranges: " .. mask_spec, 0)
 end
 table.sort(mask_ranges, function(x, y) return x[1] < y[1] end)
 
@@ -191,7 +211,14 @@ local function read_workram_masked()
             parts[#parts + 1] = program:read_range(0xff0000 + pos,
                                                    0xff0000 + r[1] - 1, 8)
         end
-        pos = r[2]
+        -- NEVER MOVE POS BACKWARDS (GitHub #61). Ranges are sorted by START,
+        -- so a NESTED or overlapping window can have a smaller end than the
+        -- one before it — e.g. 1000-2000 then 1500-1800. A bare `pos = r[2]`
+        -- rewinds to 0x1800 and the tail read then re-includes 0x1800-0x2000,
+        -- silently UNMASKING bytes the spec asked to exclude. The mask would
+        -- still look right in the log line and the comparison would be
+        -- against a basis nobody ratified.
+        if r[2] > pos then pos = r[2] end
     end
     if pos <= 0xFFFF then
         parts[#parts + 1] = program:read_range(0xff0000 + pos, 0xffffff, 8)

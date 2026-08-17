@@ -23,8 +23,7 @@ set -eu
 ROMDIR="${ROMDIR:?set ROMDIR}"
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"
-W="${TMPDIR:-/tmp}/ff0460_$$"
-mkdir -p "$W"
+W="$(mktemp -d)"           # GitHub #68: not a predictable name
 trap 'rm -rf "$W"' EXIT
 
 FBNEO_HTAP="ff0460-ff0463" tools/run_replay_fbneo.sh vsavj \

@@ -33,7 +33,7 @@ set -eu
 ROMDIR="${ROMDIR:?set ROMDIR}"
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"
-OUT="${1:-${TMPDIR:-/tmp}/type_writes_$$}"
+OUT="${1:-$(mktemp -d)}"   # GitHub #68: not a predictable default
 mkdir -p "$OUT"
 MAME_BIN="${MAME_BIN:-$HOME/.cache/vampire-saved/mame/cps2}"
 [ -x "$MAME_BIN" ] || { echo "SKIP: no WIDE MAME binary ($MAME_BIN)"; exit 0; }
