@@ -1,9 +1,10 @@
-# NEXT SESSION — orientation (written at the close of 14z-93, 2026-08-17)
+# NEXT SESSION — orientation (written at the close of 14z-94, 2026-08-17)
 
 > ## **BLOCKED (rule 6): #92 — a crash reachable in ordinary play, present
-> ## on the FROZEN, field-played `merged-m1`.** ROOT-CAUSED to an 8-byte
-> ## data defect in OUR OWN authored voice rows. **The fix needs one
-> ## decision from the maintainer and nothing else.**
+> ## on the FROZEN, field-played `merged-m1`.** ROOT-CAUSED to 8 bytes of
+> ## OUR OWN authored ARCADE-LADDER rows: they schedule the Donovan match
+> ## at **REVENGER'S ROOST**, vsav2's thirteenth stage, which vsav does not
+> ## have. **The fix needs one decision — which vsav stage stands in.**
 > ##
 > ## `run_suite` CANNOT SEE IT — no suite replay is long enough. That is
 > ## why the build froze green and the playtest missed it.
@@ -15,34 +16,54 @@
 ```
 hui41/hui42 row 0x10: 0x18 at +0x01, +0x1a, +0x29, +0x31
 pyron26     row 0x11: 0x18 at +0x01, +0x1a, +0x29, +0x31
-don_m7      row 0x13: clean
+don_m7      row 0x13: clean  (his row never lists his own class 0x13)
 ```
 
+All eight are ONE shape: the paired table-A byte is class `0x13` (Donovan)
+every time, 4/4 on both tenants and 0/12 elsewhere. Across vs2's 32 rows,
+`0x18` appears 50 times and **all 50** sit opposite class `0x13`.
+
 Vanilla never emits above **`0x16`** across all 1024 bytes of table B, and
-`0x16` is exactly what the downstream pointer table can service (derived
+`0x16` is exactly what the downstream table can service (derived
 independently; the gate cross-checks the two and fails if they disagree).
 
-**The constraint is measured; the VALUE is not mine to pick** — it selects a
-voice, so it is audible. Once chosen: patch `huitzil.toml` + `pyron.toml` ->
-gate green -> re-run `audit_tripwire_reach` -> **the single re-freeze of
-huitzil + merged**, which also clears #91.
+**The value is the arcade-mode STAGE, and the choice is not mine** —
+`tools/decode_stage_banners.py` names the twelve vsav stages, and poking the
+word changes the venue on screen (measured: same match, same frame, different
+stage). Once chosen: patch `huitzil.toml` + `pyron.toml` -> gate green ->
+re-run `audit_tripwire_reach` -> **the single re-freeze of huitzil +
+merged**, which also clears #91.
 
-**When the maintainer's round-end flashing recording arrives:** this predicts
-the flashing correlates with **voice events**, not round transitions as such.
+**CORRECTED 14z-94 — the 14z-93 close called this "a voice, so it is
+audible" and predicted the round-end flashing would correlate with voice
+events.** It is not a voice. `$FF8100` is the ladder's STAGE index: it drives
+the stage-name banner on the arcade map screen AND the venue you then fight
+in. The flashing prediction rested on the voice reading and does not follow
+from the corrected one — treat it as open, not as supported.
 
 ## The chain, if you need to re-derive it
 
 ```
-authored table-B row (0x18) -> voice pool $FF1E50
+authored table-B row (0x18) -> stage list $FF1E50
   -> selector loop (0x00aee2) picks index 2 -> $FF8100 = 24
-  -> 0x05ffb6: A0 = 0x26775A + 2*24 - 4 = ptr-table row 0x1A
+  -> 0x05ffa6: A0 = 0x26775A + 2*24 - 4 = banner-table row 0x1A, STORED to $1c(a6)
   -> consumer derefs the FOLLOWING row = 0x00400000, that table's TERMINATOR
   -> [0x400000] reads 0x7080 -> jmp (4,PC,D0.w) -> vec3
 ```
 
-Two terminators dereferenced as data, in series. Every ENGINE site is vanilla
-and unpatched; only the authored ROW is ours. `atlas/ram.md` carries
-`$FF8100`, `$FF8114` and the terminator law.
+vsav's banner family is rows `0x0F..0x1A` (12 stages, values `0x00..0x16`);
+vs2's is rows `0x13..0x1F` (13, values `0x00..0x18`). **Both games number
+`v=0x00` at their own first row, so the twelve shared stages are identical at
+identical values and the port owes NO renumber** — which is why the defect is
+four bytes and not a whole table. Every ENGINE site is vanilla and unpatched;
+only the authored ROW is ours.
+
+**THE ANCHOR IS THE TRAP.** Each game's site anchors at the address of its
+family's FIRST ROW, not the pointer table base (vsavj `0x26775a` = table+0x3C;
+vs2 `0x2a0a96` = table+0x4C). Decoding vs2 from its base invents a tidy "+8
+renumber between the games" that does not exist — believed for part of 14z-94
+until both code sites were read. `tests/test_decode_stage_banners.sh` section
+3 reproduces that mistake and requires it to fail loudly.
 
 ## Do not repeat these — five of my conclusions died by measurement
 

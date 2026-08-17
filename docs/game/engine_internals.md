@@ -278,6 +278,69 @@ palettes, vsavj 0x3B5988/0x3BAEA8 family), the attract palette path
 (0xB0AC/0x3A3CA0), and the x2b7ef4 engine-effect tail (385 non-same-idx
 tiles — minor effect artifacts if any).
 
+## The ARCADE LADDER: who you fight next, and where (14z-94, measured on
+## the #92 crash; decoded end to end and confirmed on screen)
+
+Depends on `atlas/ram.md` rows: `$FF8100` (stage index), `$FF1E48`/`$FF1E50`
+(the pick block), `$FF8110` (in-use mask), `$FF8114` (chosen index),
+`$FF8121` (venue byte), `$FF8138` (scan bound), `$FF8782`/`+0x382` (voice
+class).
+
+**Two parallel 36-row tables drive it.** `PRG:0x00B268` (table A) holds
+candidate CLASSES; `PRG:0x00BB68` (table B) holds the STAGE for each. Each
+row is 8 groups of 8 bytes; a row is one character's ladder and a group is
+one rung.
+
+`0x00af16` copies 8 bytes from each table into `$FF1E48` and `$FF1E50`, at
+offset `($382(a0) << 6) + $FF8121` — the row is the character's voice class,
+the group is the venue byte. `0x00aeca` then scans **one index across both
+lists**: it walks until it finds a candidate whose class bit is clear in the
+in-use mask `$FF8110.l`, or until the index reaches the bound `$FF8138`
+(measured 6), whichever comes first. It writes the chosen CLASS to the
+opponent's `$382` and table B's byte **at the same index** to `$FF8100`. So a
+ladder entry is a PAIR: *fight this class, at this stage.*
+
+That structure is why the two tables cannot be reasoned about separately, and
+why the in-use mask makes the pick a lottery — the same rig can take a
+different branch run to run, which is what made #92 present as a race.
+
+**`$FF8100` is the stage, and it is not just a caption.** Three readers,
+measured:
+
+| PC | what it does with `v` |
+|---|---|
+| `0x05ffa6` | `A0 = 0x26775A + 2v - 4`, stored to `$1c(a6)` — the stage-name banner record |
+| `0x01bf5e` | indexes a `0xA0`-strided palette block into palette RAM `$90C2C0` |
+| `0x004daa` | `v/2 + 9`, into a dispatch at `0x31da` |
+
+Confirmed on screen: poking `$FF8100` after the selector runs changes both
+the banner on the arcade map screen and the venue the following match is
+fought in — same rig, same frame, same matchup, different stage.
+
+**The banner family is a run of fmt-4 glyph records**, addressed from an
+ANCHOR that is the family's first row, not the pointer table's base:
+
+    vsavj  anchor 0x26775a = table 0x26771e row 0x0f   12 stages, v = 0x00..0x16
+    vsav2  anchor 0x2a0a96 = table 0x2a0a4a row 0x13   13 stages, v = 0x00..0x18
+
+Both games number `v=0x00` at their own first row, so **the twelve shared
+stages are identical at identical values** — a port owes no renumber. vs2's
+thirteenth, `v=0x18`, is REVENGER'S ROOST, which vsav does not have; selecting
+it walks off the family into the `0x00400000` terminator (#92). Decode either
+game with `tools/decode_stage_banners.py`, and read the anchor out of the code
+rather than assuming the table base — assuming it invents a "+8 renumber"
+between the games that does not exist.
+
+**Two marker values in table A are not classes**, measured over all 36 rows:
+`0x18` sits at group index 7 of every row (never scanned — the bound is 6),
+and `0xff` fills rows `0x0b` and `0x1b` entirely, an empty-ladder marker.
+Class `0x0b` correspondingly never appears as anyone's candidate.
+
+**Legacy rows never reference a tenant class** (0 occurrences over classes
+`0x00-0x0F`), so in arcade mode the fifteen original characters never
+schedule Donovan, Phobos or Pyron. Extending that is a content decision
+nobody has taken, not a defect.
+
 ## Select-screen (portrait/name) pipeline — mapped (session 14c)
 
 Decoded via read/write/breakpoint traces on the live pick replay

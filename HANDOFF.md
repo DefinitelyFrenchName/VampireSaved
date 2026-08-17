@@ -1664,31 +1664,99 @@ tests/test_replay_stage_census.sh      # 14z-93 (GitHub #10): FREEZES the
                                       # as canonical (measured: 10 -> 3).
                                       # 4 verdict controls. No ROMs, ~1s;
                                       # in ci_portable
-tests/test_voice_row_range.sh          # 14z-93 (GitHub #92): the AUTHORED
-                                      # voice-class rows must stay inside
+tests/test_voice_row_range.sh          # 14z-93 (GitHub #92), TABLE-A SECTION
+                                      # ADDED 14z-94: the AUTHORED
+                                      # ARCADE-LADDER rows must stay inside
                                       # VANILLA's value range. Each tenant
                                       # build authors a 64-byte row in
-                                      # table A (0x00B268) and table B
-                                      # (0x00BB68) at its own voice class;
-                                      # a table-B value reaches $FF8100 and
-                                      # is used as a ROW of the per-char
-                                      # pointer table 0x26771E whose
+                                      # table A (0x00B268, candidate
+                                      # CLASSES) and table B (0x00BB68, the
+                                      # STAGE for each) at its own class;
+                                      # the selector scans ONE index across
+                                      # both, so they are pairs. A table-B
+                                      # value reaches $FF8100 and indexes
+                                      # the stage-banner family whose
                                       # FOLLOWING row is dereferenced.
                                       # Vanilla emits only even 0x00..0x16
                                       # over all 1024 bytes; 0x16 is also
-                                      # what the pointer table can service.
+                                      # what the banner table can service.
                                       # RED BY DESIGN (rule 6): huitzil and
                                       # pyron rows carry 0x18 at four
-                                      # offsets each; donovan's is clean.
+                                      # offsets each — all eight are class
+                                      # 0x13 (Donovan) at REVENGER'S ROOST,
+                                      # vs2's 13th stage, which vsav lacks;
+                                      # donovan's row is clean because it
+                                      # never lists his own class.
                                       # DERIVES the bound from the tables
                                       # and CROSS-CHECKS it against
                                       # vanilla's range — that cross-check
                                       # caught an off-by-one in its author's
                                       # derivation that had declared the
-                                      # defect legal. NOT in ci_portable:
-                                      # needs the DATA view + build dirs, so
-                                      # a clean checkout would SKIP and that
-                                      # job fails on SKIP. ~2s
+                                      # defect legal. SECTION B (14z-94)
+                                      # audits table A, which section A
+                                      # explicitly did not: two derived
+                                      # bounds (36 rows structurally; 32 by
+                                      # the in-use mask's `btst` MOD 32) and
+                                      # the two marker values asserted
+                                      # (0x18 at index 7 of all 36 rows;
+                                      # 0xff only as whole rows 0x0b/0x1b).
+                                      # It runs BEFORE the verdict combines,
+                                      # or it would never execute while
+                                      # section A is red. Table A is CLEAN.
+                                      # NOT in ci_portable: needs the DATA
+                                      # view + build dirs, so a clean
+                                      # checkout would SKIP and that job
+                                      # fails on SKIP. ~2s
+tests/test_decode_stage_banners.sh    # 14z-94 (GitHub #92): ground truth for
+                                      # tools/decode_stage_banners.py, which
+                                      # NAMES the #92 value space — the
+                                      # replacement stage is a maintainer
+                                      # decision and must be taken against
+                                      # names, not numbers. 6 sections:
+                                      # both families enumerate to their
+                                      # measured sizes (vsavj 12, vs2 13),
+                                      # known records decode to known text,
+                                      # the 12 shared stages agree 1:1 in
+                                      # order (so the port owes NO renumber),
+                                      # and every out-of-range authored entry
+                                      # is #92's single known shape.
+                                      # 3 VERDICT CONTROLS, one of which is
+                                      # the trap: decoding vs2 from its table
+                                      # BASE instead of the ANCHOR read out
+                                      # of its code site manufactures a "+8
+                                      # renumber between the games" that does
+                                      # not exist. The tool exits nonzero
+                                      # naming the anchor, because an empty
+                                      # family that merely omits the names
+                                      # reads as "no match" and is right by
+                                      # accident. Static, ~2s
+tests/test_record_window.sh           # 14z-94: ground truth for
+                                      # tests/lua/record_window.lua, the
+                                      # in-emulator WINDOWED movie recorder.
+                                      # `-aviwrite` works headless but writes
+                                      # UNCOMPRESSED video for the whole run
+                                      # — measured 5.7 GB in two minutes of
+                                      # wall time — so the recorder starts
+                                      # and stops on named frames and
+                                      # defaults to MNG (2.4 MB for 120
+                                      # frames). 4 assertions: EXTENT (the
+                                      # movie covers exactly the window),
+                                      # DETERMINISM (same window twice is
+                                      # byte-identical — the whole reason to
+                                      # prefer this over a screen capture),
+                                      # LIVENESS (a window VIDEO_OUT says
+                                      # CHANGES must not compress like a
+                                      # STILL one — catches a recorder
+                                      # reproducibly emitting blank frames,
+                                      # which determinism cannot), and 2
+                                      # controls. The busy/still windows are
+                                      # CHOSEN FROM the measured checksum
+                                      # stream at run time, so no frame
+                                      # constant is baked in to rot. NOTE
+                                      # replay.lua has NO frame cap — it runs
+                                      # to the script's last line, so the
+                                      # gate truncates the rig instead.
+                                      # ROMDIR + a WIDE build, ~90s
 tests/test_s4_thresholds.sh           # 14z-93 (GitHub #44): the ratified §4
                                       # thresholds (FLICKER_MAX, RECONVERGE)
                                       # are declared ONCE in
