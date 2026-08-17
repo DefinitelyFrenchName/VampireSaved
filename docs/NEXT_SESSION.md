@@ -1,34 +1,79 @@
-# NEXT SESSION — orientation (written at the close of 14z-93, 2026-08-16)
+# NEXT SESSION — orientation (written at the close of 14z-93, 2026-08-17)
 
-> ## `merged-m1` IS FROZEN AND FIELD-CONFIRMED. All 18 characters in one
-> ## image (`build/m3b_merged8`, `952fc731`, 753 ops); every merged gate
-> ## green; the maintainer played it — "no obvious regression", beam
-> ## "100% clean, as is its sound", Phobos' historically-broken moveset
-> ## incl. ES variants all good. **S6 IS CLOSED.**
+> ## **BLOCKED (rule 6): #92 — a crash reachable in ordinary play, present
+> ## on the FROZEN, field-played `merged-m1`.** ROOT-CAUSED to an 8-byte
+> ## data defect in OUR OWN authored voice rows. **The fix needs one
+> ## decision from the maintainer and nothing else.**
 > ##
-> ## **BLOCKED (rule 6): #91 — a planted ILLEGAL is REACHABLE on
-> ## `merged-m1`.** The TRIPWIRE (#91) is Huitzil-only; the vec3 it
-> ## unmasks (#92) is NOT — Pyron reproduces it. Deterministic, a missing
-> ## reconciliation row (vs2 `0x494de`, a divide helper vsavj
-> ## already has at `0x47fb6`). No build byte moved in 14z-93 —
-> ## the fix is a re-freeze, so it is the maintainer's call.
+> ## `run_suite` CANNOT SEE IT — no suite replay is long enough. That is
+> ## why the build froze green and the playtest missed it.
 
-## What 14z-93 was, in one line
+## Start here — the fix is 8 bytes and it is blocked on a choice
 
-**The M4 keep-or-drop question is measured and RULED, and the answer needed a
-second number.** The tenant enters the hit-class map **0 times** over all 37
-rigs — which alone reads like "drop it" — but the same corpus puts **121
-objects of type >= 64 into the projectile pool**. The gap is CONTACT, not
-absence. **Maintainer ruled KEEP on 2026-08-16** ("more to lose by dropping
-it than keeping it"); the row stays and no build moved. What is missing is a
-pool-vs-pool contact RIG, which is now coverage work rather than a blocker.
-A zero measured against no denominator is the same shape that produced the
-retracted "legacy never enters the map" claim.
+`tests/test_voice_row_range.sh` is **RED by design** and names them:
 
-Also: the 14z-92 retraction had **not** fully propagated — the retracted
-sentence was still live in `engine_internals.md` four lines below its own
-retraction. Fixed, plus patch_notes, registry.tsv, and a `patch_index.md`
-row that had never existed for a shipped patch.
+```
+hui41/hui42 row 0x10: 0x18 at +0x01, +0x1a, +0x29, +0x31
+pyron26     row 0x11: 0x18 at +0x01, +0x1a, +0x29, +0x31
+don_m7      row 0x13: clean
+```
+
+Vanilla never emits above **`0x16`** across all 1024 bytes of table B, and
+`0x16` is exactly what the downstream pointer table can service (derived
+independently; the gate cross-checks the two and fails if they disagree).
+
+**The constraint is measured; the VALUE is not mine to pick** — it selects a
+voice, so it is audible. Once chosen: patch `huitzil.toml` + `pyron.toml` ->
+gate green -> re-run `audit_tripwire_reach` -> **the single re-freeze of
+huitzil + merged**, which also clears #91.
+
+**When the maintainer's round-end flashing recording arrives:** this predicts
+the flashing correlates with **voice events**, not round transitions as such.
+
+## The chain, if you need to re-derive it
+
+```
+authored table-B row (0x18) -> voice pool $FF1E50
+  -> selector loop (0x00aee2) picks index 2 -> $FF8100 = 24
+  -> 0x05ffb6: A0 = 0x26775A + 2*24 - 4 = ptr-table row 0x1A
+  -> consumer derefs the FOLLOWING row = 0x00400000, that table's TERMINATOR
+  -> [0x400000] reads 0x7080 -> jmp (4,PC,D0.w) -> vec3
+```
+
+Two terminators dereferenced as data, in series. Every ENGINE site is vanilla
+and unpatched; only the authored ROW is ours. `atlas/ram.md` carries
+`$FF8100`, `$FF8114` and the terminator law.
+
+## Do not repeat these — five of my conclusions died by measurement
+
+| published | killed by |
+|---|---|
+| "element-table base is 4 bytes low" | a probe at that writer got ZERO hits while the crash reproduced |
+| "0x400000 is a stock sentinel WIDE makes live" | stock and WIDE both read `0x7080` |
+| "the crash is HUITZIL-ONLY" | **Pyron crashes identically** under a sparse probe — it is a RACE |
+| "the selector loop exhausts" | selector 2 < bound 6; it found a real candidate |
+| "the value is tenant-specific" | Pyron computes the same pointer; the SLOT differs |
+
+**Method traps that produced those, all now in GOTCHAS:** probes must stay
+SPARSE (one firing 17,616 times made the crash vanish); `l@()` memory
+conditions silently do not work in `GUARD_PROBE_COND`; never cross-correlate
+frames between `-debug` and non-debug runs; do not use `bp_regs.lua` on a
+timing question (it is a #10 +1 staging deviant); An-relative reads inside the
+crypt window need the DATA view.
+
+**"Huitzil-only" was also my argument for retracting the 14z-85f Sasquatch
+link. Since Pyron IS in that recipe, that link is OPEN again.**
+
+## Also settled in 14z-93
+
+- **hitclass thunk: KEEP** (maintainer). Tenant census: **0 map entries over
+  37 rigs against 121 pooled type >= 64 objects** — the gap is CONTACT.
+- **#78 ratified**, **#90 fixed**, **#44 fixed**, **#41 CI added**, **#82
+  fixed**, **#84 closed**, **H-vs-P stuck direction closed**.
+- **#10** re-verified: NOT fixed, deliberately, now `deferred-with-reason`
+  and gated. Its precondition (the legacy re-freeze) HAS been met, so it is
+  ripe. Budget the RE-MEASUREMENT of five gates' frame constants, not the
+  one-line edits. **Re-freeze nothing** — replay.lua is untouched.
 
 ## What 14z-92 was, in one line
 

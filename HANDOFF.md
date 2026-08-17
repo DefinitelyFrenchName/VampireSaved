@@ -1664,6 +1664,73 @@ tests/test_replay_stage_census.sh      # 14z-93 (GitHub #10): FREEZES the
                                       # as canonical (measured: 10 -> 3).
                                       # 4 verdict controls. No ROMs, ~1s;
                                       # in ci_portable
+tests/test_voice_row_range.sh          # 14z-93 (GitHub #92): the AUTHORED
+                                      # voice-class rows must stay inside
+                                      # VANILLA's value range. Each tenant
+                                      # build authors a 64-byte row in
+                                      # table A (0x00B268) and table B
+                                      # (0x00BB68) at its own voice class;
+                                      # a table-B value reaches $FF8100 and
+                                      # is used as a ROW of the per-char
+                                      # pointer table 0x26771E whose
+                                      # FOLLOWING row is dereferenced.
+                                      # Vanilla emits only even 0x00..0x16
+                                      # over all 1024 bytes; 0x16 is also
+                                      # what the pointer table can service.
+                                      # RED BY DESIGN (rule 6): huitzil and
+                                      # pyron rows carry 0x18 at four
+                                      # offsets each; donovan's is clean.
+                                      # DERIVES the bound from the tables
+                                      # and CROSS-CHECKS it against
+                                      # vanilla's range — that cross-check
+                                      # caught an off-by-one in its author's
+                                      # derivation that had declared the
+                                      # defect legal. NOT in ci_portable:
+                                      # needs the DATA view + build dirs, so
+                                      # a clean checkout would SKIP and that
+                                      # job fails on SKIP. ~2s
+tests/test_s4_thresholds.sh           # 14z-93 (GitHub #44): the ratified §4
+                                      # thresholds (FLICKER_MAX, RECONVERGE)
+                                      # are declared ONCE in
+                                      # tools/s4_thresholds.py and every
+                                      # comparator imports them. Asserts the
+                                      # values, that all four consumers
+                                      # import, that none re-declares a
+                                      # local literal, that none hardcodes
+                                      # an argparse default, + a verdict
+                                      # control both ways (a re-introduced
+                                      # literal caught; a COMMENT not
+                                      # flagged). ROM-free, ~1s; ci_portable
+tests/test_qs_window_law.sh           # 14z-93 (GitHub #82): the QSound
+                                      # sample-window endpoint is INCLUSIVE
+                                      # (packing law #3). The builder was
+                                      # corrected at 14z-87b; both AUDIT
+                                      # paths were not, and went on
+                                      # justifying the exclusive slice with
+                                      # the superseded belief — so the byte
+                                      # that caused the sword-plant beep sat
+                                      # OUTSIDE the audit surface. Law now
+                                      # in tools/qs_window.py, bounds
+                                      # CHECKED not clamped. 14 cases incl.
+                                      # a terminal-byte corruption control
+                                      # and a control REPRODUCING the old
+                                      # blindness. ROM-free, ~1s; ci_portable
+tests/test_replay_stage_census.sh     # 14z-93 (GitHub #10): FREEZES the
+                                      # input-staging split (10 deviant / 11
+                                      # canonical). NOT a fix — the
+                                      # consuming gates' frame constants
+                                      # were tuned UNDER the drift, so the
+                                      # staging fix and the re-measurement
+                                      # are ONE change. Pins it so it cannot
+                                      # GROW, requires every deviant to
+                                      # carry its banner, and requires
+                                      # replay.lua to stay canonical.
+                                      # EXPECT_DEVIANT=0 flips it to
+                                      # asserting uniformity once fixed.
+                                      # STRIP LUA COMMENTS when censusing —
+                                      # the banners quote `held[frame + 1]`
+                                      # (measured: a naive grep turned 10
+                                      # deviants into 3). ROM-free, ~1s
 tests/test_classify_hitclass_probe.sh # 14z-93: ground truth for the
                                       # hit-class probe's VERDICT LOGIC
                                       # (tools/classify_hitclass_probe.py),

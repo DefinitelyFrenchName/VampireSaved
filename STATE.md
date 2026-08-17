@@ -1,5 +1,97 @@
 # STATE — living progress log
 
+## Session 14z-93 CLOSE — ritual complete
+
+**THE HEADLINE: #92 is root-caused to an 8-byte data defect in OUR OWN
+authored voice rows, and the fix is one maintainer decision away.** Huitzil's
+and Pyron's authored table-B rows carry the value `0x18` at four offsets
+each; vanilla never emits above `0x16`, and `0x16` is exactly what the
+downstream per-char pointer table can service. Donovan's row is clean — and
+he is the one tenant that does not crash at `0x1afb6`. 22 commits.
+
+**WHAT THIS SESSION WAS ACTUALLY ABOUT: a crash nobody could see.** It is
+reachable in ordinary play, deterministic in a rig, present on the FROZEN and
+field-played `merged-m1`, and **invisible to `run_suite` because no suite
+replay is long enough**. It was found by accident — the KEEP ruling left
+"author a pool-vs-pool contact rig" as coverage work, and rather than author
+a trade blind I reused the rig already known to produce 228 pool-vs-pool
+contacts with the tenant forced. It produced no map entries and crashed
+instead.
+
+**THE CHAIN, END TO END, ALL MEASURED:**
+
+    authored table-B row (0x18)  ->  voice pool $FF1E50
+      -> selector loop picks index 2  ->  $FF8100 = 0x18 = 24
+      -> 0x05ffb6: A0 = 0x26775A + 2*24 - 4 = 0x267786 = ptr-table row 0x1A
+      -> consumer derefs the FOLLOWING row = 0x00400000, that table's own
+         TERMINATOR  ->  [0x400000] reads 0x7080  ->  jmp (4,PC,D0.w) -> vec3
+
+Two terminators dereferenced as data, in series. Every ENGINE site in the
+chain is vanilla and unpatched on all four builds; `0x400000` reads
+identically on stock. Only the authored ROW is ours.
+
+**THE ORIGINAL TASK ALSO LANDED.** The M4 tenant-side hit-class measurement:
+**0 map entries over all 37 tenant rigs against 121 pooled objects of type
+>= 64** — the gap is CONTACT, not absence. Maintainer ruled **KEEP** the
+thunk on that asymmetry.
+
+**HONESTY LEDGER — five of my own conclusions died by measurement:**
+
+| I published | what killed it |
+|---|---|
+| "the element-table base is 4 bytes low" | a probe at that writer got ZERO hits while the crash reproduced |
+| "0x400000 is a stock sentinel that WIDE makes live" | stock and WIDE both read `0x7080` — identical |
+| "the crash is HUITZIL-ONLY" | under a sparse probe **Pyron crashes identically**; it is a RACE |
+| "the selector loop exhausts and stores the count" | selector 2 < bound 6 — the loop found a real candidate |
+| "the value is tenant-specific" | Pyron computes the same pointer; the SLOT differs, not the value |
+
+Each was plausible enough to write up. None survived. The one that would
+have done real damage is the third: "Huitzil-only" was also the argument I
+used to retract the 14z-85f Sasquatch link, and since Pyron IS in that
+recipe, that retraction is now **amended — a 14z-85f/#92 link is OPEN**.
+
+**RULINGS APPLIED (maintainer, in order):** hitclass thunk **KEEP**; **#78**
+ratified (two FBNeo phase classes, frozen offset inventory — measured, not
+transcribed: the 14z-92 note had recorded only the first byte of each run);
+**#90** fixed (Pyron ladder's boot probe moved to a stage-6 rung, which
+builds `fac4a777` = frozen pyron-m9); **#44** fixed (one §4 threshold
+declaration + a drift gate); **#41** CI added (19 ROM-free gates, fail on
+SKIP). **#82** fixed (the QSound terminal byte was outside the audit
+surface). **#84** closed, residue split to **#90**. **H-vs-P stuck
+direction** closed on the maintainer's evidence.
+
+**#10 RE-VERIFIED AND RULED deferred-with-reason.** Not fixed, deliberately:
+the consuming gates' frame constants were tuned UNDER the drift. But the
+mitigation it promised was FALSE for three of ten instruments (`bp_regs`
+had none and asserted the opposite; `ring_tap` had none; `read_tap`'s was
+backwards). Fixed, and the split is now pinned by a gate. **Its precondition
+has been met** — it waited on the legacy re-freeze, which completed at
+14z-91 — so it is ripe, not blocked.
+
+**SUITE (+6 gates, +2 audit sections, 5 tools):**
+`test_classify_hitclass_probe` (15 controls), `test_classify_pool_spawns`
+(12), `test_qs_window_law` (14), `test_s4_thresholds`,
+`test_replay_stage_census`, `test_voice_row_range` (**RED by design, rule
+6**), plus `audit_tripwire_reach` and `audit_hitclass_map_cost` sections 3-4.
+**Three gates caught their own author before any measurement was believed:**
+the classifier's index WIDTH, the QSound drift guard passing on a COMMENT
+rather than an import, and the voice-row gate's cross-check catching an
+off-by-one that had declared the defect legal.
+
+**GOTCHAS filed (4):** a PASS line that hard-codes its control's conclusion;
+`DUMPS` land next to the LOG not the sandbox; a `|| fallback` after a
+pipeline reads the LAST command's status; the input-staging split frozen.
+
+**TRACKER: 50 -> 48 open.** Closed #84, #78, #90, #44, #41; opened #90, #91,
+#92. Eleven requalified findings triaged into the open list by severity, with
+#30+#24+#29 identified as ONE cluster and #43 flagged as possibly
+load-bearing on #91.
+
+**NOTHING WAS FROZEN.** No build byte moved except the reconciliation row,
+which is committed but unfrozen: `hui42` is unregistered, and `merged-m1`
+and the three frozen solos are untouched. One re-freeze at the end, after
+#92 — maintainer-agreed.
+
 ## Session 14z-93 (3) — #10 RE-VERIFIED AND RULED: correct finding,
 ## mitigated, fix DEFERRED WITH A REASON, precondition now met.
 
@@ -16441,7 +16533,10 @@ Original write-up kept below.
   (tests/audit_hitclass_map_cost.sh, rerunnable): fix holds through the
   11,017-frame soak that crashes the frozen build; LEGACY BIT-IDENTICAL
   over 30,284 frames on four replays, with a fire census showing legacy
-  never enters the map at all. Cost of adoption: the row goes in
+  never enters the map at all [**THAT FIGURE IS RETRACTED — 14z-92 M4
+  measured 230 legacy entries corpus-wide; the adoption still stands and
+  the argument is "legacy enters and gets vanilla answers"**]. Cost of
+  adoption: the row goes in
   huitzil.toml + pyron.toml (shared, dedups on the merge) → BOTH
   verticals re-freeze (new fingerprints; registry rows; their frozen
   masked legacy self-logs re-measured — expected unchanged given the
