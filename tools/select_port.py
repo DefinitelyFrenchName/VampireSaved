@@ -182,7 +182,36 @@ def main():
     ap.add_argument("prg_dir")
     ap.add_argument("--vs2", required=True)
     ap.add_argument("--tiles-out", required=True)
+    ap.add_argument("--out", metavar="DIR",
+                    help="write the patched members HERE instead of rewriting "
+                         "prg_dir in place. This is the (src, out) form every "
+                         "other builder takes (CLAUDE.md 5) and the only one "
+                         "that is chainable and idempotent (GitHub #46)")
+    ap.add_argument("--force", action="store_true",
+                    help="re-run in place over an already-ported directory. "
+                         "Refused by default: the size guard below re-parses "
+                         "the TARGET image, so on a second pass it measures "
+                         "the ALREADY-REPLACED record and asserts nothing")
     args = ap.parse_args()
+
+    # IN-PLACE IS THE EXCEPTION HERE, AND IT IS GUARDED (14z-94, GitHub #46).
+    # This tool's docstring says "modifies the loose program members in
+    # place", which makes it the one builder that is not (src, out) — so it
+    # cannot be chained, and re-running it is not a no-op: `assert dsize <=
+    # jsize` re-parses the target, so the second pass measures the record it
+    # already overwrote and the guard becomes meaningless.
+    #
+    # --out gives it the normal form. Without --out it still writes in place,
+    # but now atomically and only once: a stamp records the port, and a second
+    # run is refused rather than silently double-porting.
+    _sp_stamp = os.path.join(args.prg_dir, ".select_port.done")
+    if not args.out and os.path.exists(_sp_stamp) and not args.force:
+        sys.exit(f"select_port: {args.prg_dir} already carries a select port "
+                 f"({_sp_stamp}).\n"
+                 f"  Re-running in place would replace ALREADY-REPLACED "
+                 f"records, and the size guard would measure them rather than "
+                 f"the originals. Rebuild the directory, use --out DIR, or "
+                 f"--force if you know why.")
 
     words, _, _, _ = cps.load_set(args.vs2)
     vs2 = bytes(cps.words_to_logical_bytes(words))
@@ -306,18 +335,17 @@ def main():
     # (coverage gap now closed by 30_demitri_throw). The palettes the
     # copies served never visibly improved (the quote/HUD rows come
     # from a still-undecoded path), so nothing is lost.
-    WINPAL_ENABLE = False
-    BLK = 0x1B20
-    JP1, JP2 = 0x39FDC0, 0x3A18E0
-    DP1, DP2 = 0x3B727C, 0x3B8EDC
-    COPY_A1, COPY_A2, COPY_B = 0x248D80, 0x24A8A0, 0x24C3C0
-    for dst, srcblk, sl_off, don_off in (() if not WINPAL_ENABLE else (
-            (COPY_A1, JP1, 0x960, DP1 + 0xBE0),
-            (COPY_A2, JP2, 0x960, DP2 + 0xBE0),
-            (COPY_B,  JP1, 0x5A0, DP1 + 0x720))):
-        img[dst:dst + BLK] = img[srcblk:srcblk + BLK]
-        img[dst + sl_off:dst + sl_off + 0x140] = \
-            vs2[don_off:don_off + 0x140]
+    # THE CODE IS GONE, THE FINDING IS NOT (14z-94, GitHub #46). The block
+    # copies above were guarded by a hardcoded `WINPAL_ENABLE = False`, so
+    # roughly forty lines of assignments and a copy loop could never execute
+    # — and a reader grepping 0x248D80 found live-looking statements for a
+    # mechanism disabled FOR GOOD. That is the dead-code-shadowing-live-code
+    # class, so the statements are deleted; the analysis above and below is
+    # kept verbatim because it is the evidence, not the implementation.
+    # The constants it used (BLK 0x1B20, JP1/JP2 0x39FDC0/0x3A18E0,
+    # DP1/DP2 0x3B727C/0x3B8EDC, COPY_A1/A2/B 0x248D80/0x24A8A0/0x24C3C0,
+    # PRIV_TAB 0x24DE00) are recorded here and recoverable from git for the
+    # "next attempt" the 14t post-mortem below anticipates.
     # v3 (the 14u gate iteration): the shared table 0x38C298 must stay
     # VANILLA — site 0x1BF56 is a select-time BULK PRELOADER that
     # stages every char's slice through work RAM on legacy paths
@@ -327,12 +355,7 @@ def main():
     # the copy addresses goes at 0x24DE00, and the gen pokes the three
     # quote-time reader sites (0x1C1FA/0x1C5CE/0x7D4FC) to it.
     PRIV_TAB = 0x24DE00
-    if WINPAL_ENABLE:
-        img[PRIV_TAB:PRIV_TAB + 4] = COPY_A1.to_bytes(4, "big")
-        img[PRIV_TAB + 4:PRIV_TAB + 8] = COPY_A2.to_bytes(4, "big")
-        print(f"win/quote palettes: 3 block copies at 0x{COPY_A1:06X}+")
-    else:
-        print("win/quote palettes: DISABLED (no safe home; 14w)")
+    print("win/quote palettes: DISABLED (no safe home; 14w, code removed 14z-94)")
 
     # (14t post-mortem kept for the record:) The
     # per-side blocks (0x39FDC0/0x3A18E0, char*0xA0 slices) are BULK-
@@ -355,12 +378,29 @@ def main():
     print(f"wrote {args.tiles_out}: {len(pairs)} bank-1 tile placements")
 
     out_blob = cps.words_to_file_bytes(cps.words_from_logical_bytes(bytes(img)))
+    _sp_dir = args.out or args.prg_dir
+    if args.out:
+        os.makedirs(args.out, exist_ok=True)
+    # ATOMIC ACROSS THE WHOLE SET (14z-94, GitHub #46). This loop used to
+    # write each member directly, so a crash partway left a HALF-PORTED
+    # program image on disk with nothing to distinguish it from a finished
+    # one. Every segment is staged first; the renames only start once all of
+    # them exist.
+    _sp_staged = []
     pos = 0
     for n, ln in zip(tgt_prgs, lengths):
         seg = out_blob[pos:pos + ln]
-        open(os.path.join(args.prg_dir, n), "wb").write(seg)
-        print(f"  wrote {n} sha1 {hashlib.sha1(seg).hexdigest()}")
+        tmp = os.path.join(_sp_dir, n + ".select_port.tmp")
+        open(tmp, "wb").write(seg)
+        _sp_staged.append((tmp, os.path.join(_sp_dir, n), n, seg))
         pos += ln
+    for tmp, dst, n, seg in _sp_staged:
+        os.replace(tmp, dst)
+        print(f"  wrote {n} sha1 {hashlib.sha1(seg).hexdigest()}")
+    if not args.out:
+        with open(_sp_stamp, "w") as f:
+            f.write("select_port ran in place here; see GitHub #46.\n"
+                    "A second in-place run is refused (use --out or --force).\n")
 
 
 if __name__ == "__main__":

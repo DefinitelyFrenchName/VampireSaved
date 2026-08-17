@@ -26,23 +26,17 @@
 set -eu
 ROMDIR="${ROMDIR:?set ROMDIR}"
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
+. "$REPO/tests/lib/tenant_build.sh"    # GitHub #71
 . "$REPO/tests/lib/decrypt_cache.sh"   # GitHub #69
 cd "$REPO"
 WORK="$(mktemp -d)"
 trap 'rm -rf "$WORK"' EXIT
 fail=0
 
-OUTBASE="${1:-}"
-if [ -z "$OUTBASE" ]; then
-    OUTBASE="$WORK/build"
-    echo "== 0. building at --tenant-id 0x13 (fresh) =="
-    KEY_SET=vsavj GEN_FLAGS="--allow-plausible --tripwire-open \
---profile cps2-wide-v1 --tenant-id 0x13" \
-        tools/build_donovan.sh 6 "$OUTBASE" > "$WORK/build.log" 2>&1 || {
-        echo "FAIL: build did not complete"; tail -20 "$WORK/build.log"
-        exit 1; }
-    tail -2 "$WORK/build.log" | sed 's/^/  /'
-fi
+# The build shape lives in tests/lib/tenant_build.sh (GitHub #71): stage,
+# profile and tenant id were inline in five gates and all three have moved
+# before.
+tenant_build_13 "$WORK" "${1:-}" || exit 1
 
 OPC="$WORK/vsavj_op.bin"
 decrypt_view vsavj "$OPC"
