@@ -75,6 +75,18 @@ WORK="$(mktemp -d)"; trap 'rm -rf "$WORK"' EXIT INT TERM
 n_pass=0; n_skip=0; n_fail=0; n_miss=0
 failed=""; skipped=""
 
+# WORKING-TREE SNAPSHOT (14z-94). This is the PRE-COMMIT command, so it must
+# not leave the tree dirty — and it did on the first full run: several gates
+# build into tracked paths (build/donovan6, build/donovan_stage4_gate) rather
+# than a temp dir, so running the chain rewrote committed artifacts. A
+# pre-commit check whose own side effect is a diff will get its output
+# ignored, so the run reports it. Reported, not failed: the gates are correct,
+# their output location is not, and that is its own fix.
+tree_before=""
+if git rev-parse --git-dir >/dev/null 2>&1; then
+    tree_before="$(git status --porcelain -- . 2>/dev/null | grep -v '^??' || true)"
+fi
+
 run_tier() {  # run_tier <label> <names>
     _label="$1"; _names="$2"
     [ -n "$_names" ] || return 0
@@ -180,6 +192,22 @@ if unreg:
 else:
     print("  ok: every emulator-free gate is registered")
 PY
+
+echo
+echo "== working tree (a pre-commit command must not dirty it) =="
+if [ -z "$tree_before" ] && ! git rev-parse --git-dir >/dev/null 2>&1; then
+    echo "  note: not a git checkout — not checked"
+else
+    tree_after="$(git status --porcelain -- . 2>/dev/null | grep -v '^??' || true)"
+    if [ "$tree_before" = "$tree_after" ]; then
+        echo "  ok: no tracked file changed during the run"
+    else
+        echo "  DIRTIED by the run — these gates write into TRACKED paths"
+        echo "  instead of a temp dir; restore with 'git checkout --' on them:"
+        printf '%s\n' "$tree_after" | grep -vxF "$tree_before" 2>/dev/null \
+            | sed 's/^/      /' | head -12
+    fi
+fi
 
 echo
 echo "======================================================================"
