@@ -150,6 +150,36 @@ def main():
     # silently substitutes 0xFF fill — docs/GOTCHAS.md). Verified, not assumed:
     # tests/test_phasec_image.sh.
     spec = json.loads(args.patch.read_text()) if args.patch else {}
+
+    # ── SOURCE-SET IDENTITY (14z-94, GitHub #18) ─────────────────────────────
+    # A generated patch.json carries only {op, addr, val|hex|path}: no
+    # expected-old bytes and, until now, no statement of what it was generated
+    # AGAINST. Every old-byte check lives in the generator and runs against the
+    # CACHED decrypted views, so nothing joined the verified image to the one
+    # written here — these ops would apply at these offsets to ANY zip with one
+    # .key and a program member. This docstring even advertises chaining onto
+    # "a PREVIOUS BUILDER'S OUTPUT", which is precisely where the generator's
+    # premises (0xFF fill at the allocation, dst_old_head at the destination)
+    # no longer hold.
+    #
+    # A MISMATCH IS FATAL. An ABSENT identity is only a warning, because
+    # hand-written synthetic patches are legitimate (several gates build one
+    # inline) — but every generator-produced patch carries the field, so the
+    # real pipeline is covered and the warning names what is unprotected.
+    want = spec.get("src_program_identity")
+    if want:
+        got = cps.program_identity(args.src)
+        if got != want:
+            raise SystemExit(
+                f"{args.src}: source-set mismatch — this patch was generated "
+                f"against program identity {want[:16]}..., this zip is "
+                f"{got[:16]}.... The old-byte verification behind every op was "
+                f"done against a DIFFERENT image; applying it would write "
+                f"verified-nowhere bytes. Re-generate against this source, or "
+                f"patch the source it was generated from.")
+    elif args.patch:
+        print(f"  warning: {args.patch} carries no src_program_identity — "
+              f"applying it UNVERIFIED against {args.src}", file=sys.stderr)
     image = spec.get("image")
     if image:
         base = sum(lengths)

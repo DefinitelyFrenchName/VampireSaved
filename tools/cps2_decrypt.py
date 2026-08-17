@@ -392,6 +392,32 @@ class Cipher:
 _PRG_RE = re.compile(r"\.(0[3-9]|10|4[1-4])[a-ln-z]?$")
 
 
+def program_identity(zpath):
+    """Stable identity of a romset zip's PROGRAM members (14z-94, GitHub #18).
+
+    SHA-1 over each program member's NAME, LENGTH and raw bytes, in the same
+    load order load_set/load_stored use. Both the generator and patch_prg
+    compute it from here so the two can never drift into disagreeing about
+    what "the same source set" means.
+
+    Why it exists: a generated patch.json carries only {op, addr, val|hex|path}
+    — no expected-old bytes and no source identity — so patch_prg would apply
+    those offsets to ANY zip with one .key and at least one program member.
+    All the old-byte verification in this project happens in the GENERATOR,
+    against the cached decrypted views, and nothing joined that image to the
+    one actually patched.
+    """
+    h = hashlib.sha1()
+    with zipfile.ZipFile(zpath) as zf:
+        prgs = sorted((n for n in zf.namelist() if _PRG_RE.search(n)),
+                      key=lambda n: int(_PRG_RE.search(n).group(1)))
+        for n in prgs:
+            b = zf.read(n)
+            h.update(f"{n}:{len(b)}:".encode())
+            h.update(b)
+    return h.hexdigest()
+
+
 def words_from_file_bytes(blob):
     """File storage -> word values: each word is the LE read of its 2 bytes."""
     words = array("H", blob)

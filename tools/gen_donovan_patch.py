@@ -6380,6 +6380,15 @@ def main():
                      f"({count} x {msize:#x} member(s): "
                      f"{', '.join(image['member_names'])})")
     spec = {"ops": ops}
+    # THE SOURCE SET THE OPS WERE VERIFIED AGAINST (14z-94, GitHub #18).
+    # Every old-byte check in this generator runs against the CACHED decrypted
+    # views; nothing joined that image to the one patch_prg later writes into,
+    # so the ops would apply to any zip with a .key and a program member —
+    # including a previous builder's output, which is exactly the case where
+    # the generator's premises (0xFF fill at the allocation, dst_old_head at
+    # the data_port destination) no longer hold. Recording it here lets the
+    # apply step refuse.
+    spec["src_program_identity"] = cps.program_identity(args.vsavj)
     if image:
         spec["image"] = image
     (out / "patch.json").write_text(json.dumps(spec, indent=1))
