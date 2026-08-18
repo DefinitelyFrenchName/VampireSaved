@@ -10,8 +10,8 @@
 > ## ready the moment the hold lifts.
 > ##
 > ## **START HERE INSTEAD — the ruled work, in the maintainer's order:**
-> ## **(1) #27** — `build_merged.sh` regenerates its own inputs; ruled ONE
-> ## COMMAND. **(2) #43(a)** — the inert matcher refactor, split-ratified,
+> ## **(1) #27 — DONE 14z-95.** **(2) #43(a)** — the inert matcher
+> ## refactor, split-ratified,
 > ## `allow_fallback=False` reproducing all 271 rows as the control.
 > ## **#52 is DONE (14z-95)** and **#24 is CLOSED**.
 > ##

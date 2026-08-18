@@ -76,3 +76,10 @@ test_voice_row_range
 #   test_m2b_stage6       -> same route
 # test_m2a_stage4_code ran for 208s inside the 'static' tier before this was
 # caught, which is how the indirection was found.
+
+# --- ADDED 14z-95 ---
+# Ground truth for tools/ensure_merged_inputs.sh: the merged build's four
+# ROM-derived inputs are PRODUCED, not demanded (GitHub #27, maintainer-ruled
+# 2026-08-18 "it should be one command"). Needs ROMDIR + the pinned build
+# dirs; SKIPs without them.
+test_merged_inputs

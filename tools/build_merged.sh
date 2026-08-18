@@ -36,10 +36,18 @@ python3 tools/audit_roms.py "$ROMDIR" > /dev/null || {
 D_EX="build/m5_wide/extract"
 H_EX="build/hui32/extract"
 P_EX="build/pyron21/extract"
-missing=""
-for d in "$D_EX" "$H_EX" "$P_EX"; do [ -d "$d" ] || missing="$missing $d"; done
-[ -f "$WIDE_ZIP" ] || missing="$missing $WIDE_ZIP"
-[ -z "$missing" ] || { echo "FAIL: missing$missing"; exit 1; }
+
+# RULE 3 IS ONE COMMAND (14z-95, GitHub #27, maintainer-ruled 2026-08-18).
+# These four inputs are ROM-derived and therefore untracked by rule 7, and
+# until now NOTHING IN THE TREE KNEW HOW TO MAKE THEM — the recipe was prose
+# in HANDOFF.md and an `echo` on audit_merged_legacy's SKIP path. So the
+# milestone deliverable was reproducible on one machine only, which is
+# precisely what rule 3 forbids. The helper CREATES only what is absent and
+# never touches what exists, so it does not collide with the #26 guard that
+# protects these same dirs.
+echo "== 0: inputs (regenerated only if absent) =="
+WIDE_ZIP="$WIDE_ZIP" ROMDIR="$ROMDIR" tools/ensure_merged_inputs.sh || {
+    echo "FAIL: could not resolve the merged build's inputs"; exit 1; }
 
 rm -rf "$OUT"; mkdir -p "$OUT"
 

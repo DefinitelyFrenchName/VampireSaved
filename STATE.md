@@ -91,6 +91,80 @@ Phobos and a crash at the moment the dispatcher first fires are the same
 subsystem. If that holds, the sfx capture belongs inside the #99 rig rather
 than as separate work — but both are on hold, so this is a note, not a plan.
 
+### #27 — DONE. Rule 3 is one command, and it is measured rather than asserted
+
+`tools/ensure_merged_inputs.sh` produces the merged build's four ROM-derived
+inputs — `build/{m5_wide,hui32,pyron21}/extract` and `build/wide0` — and both
+`tools/build_merged.sh` and `tests/audit_merged_legacy.sh` call it instead of
+carrying their own copy of a prose recipe. Extraction routes through
+`build_donovan.sh EXTRACT_ONLY=1`, so the ~170-line per-character root census
+stays in exactly one place; restating it here is the drift this project keeps
+paying for.
+
+**Create-if-absent, which is what dissolves the #26 conflict.** #27 wanted
+these dirs regenerable while #26 wanted them protected from being rebuilt
+over — opposite policies on the same objects, and the reason #27 stayed open.
+They stop being opposite at that rule: an existing input is used untouched and
+only a missing one is produced, so nothing here can replace a frozen artifact.
+
+**MEASURED, not asserted — and the measurement changed the design.** The
+obvious gate would assert that a regenerated extract is byte-equal to the
+pinned one. That is the wrong property AND it is false:
+`build/m5_wide/extract/regions.json` predates two `extract_char.py` changes —
+it carries `null` where the tool now writes `[]`, and it lacks one `values`
+row (`jump_params`) — while `build/hui32` and `build/pyron21` regenerate
+byte-identical. So the gate asserts what rule 3 actually needs, that the
+ARTIFACT reproduces:
+
+| measured | result |
+|---|---|
+| merged `patch.json` from pinned vs regenerated extracts | **byte-identical**, 752 ops, same order (`6966e649…`) |
+| every emitted region blob | identical |
+| only difference anywhere | one doc line in `patch_notes_fragment.md` (`# jump_params: velocity pair NOT ported`) — reaches no ROM byte |
+| WIDE overlay regenerated | **byte-identical, 21/21 members** |
+| end-to-end: `build/hui32/extract` moved aside, one command run | regenerated **in place, byte-identical**, then restored |
+
+The stale `regions.json` is left alone deliberately: the ruling is
+create-if-absent, and rewriting an existing input to make a gate tidier is the
+opposite of that. It is recorded here and in the gate header so it is known
+rather than rediscovered as a scare.
+
+Gate `tests/test_merged_inputs.sh` (registered in `ci_static.txt`, ~80 s):
+`--check` reports without creating; the regenerated set produces the identical
+merged patch; the overlay regenerates byte-identical; an existing input is
+provably untouched; and four verdict controls, two of which must FIRE (a
+`--check` from an empty tree must name what is missing; a caller-supplied
+overlay path must be REFUSED rather than produced). Chain after landing:
+**PASS 89 / SKIP 0 / FAIL 0.**
+
+Repaired in passing: `audit_merged_legacy`'s SKIP recipe named `build/hui30`
+while its own pin is `build/hui32` — a wrong recipe, which is what a prose
+recipe decays into.
+
+### #43(a) — the inertness claim is now MEASURED, ahead of the refactor
+
+Before writing any of it, the drifted `reconcile_batch.masked_search` was run
+against a canonical matcher pinned to the batch parameters
+(`hit_cap=64, allow_fallback=False`) over all 328 reconciliation rows × the
+5 retry windows:
+
+| probe | result |
+|---|---|
+| drifted copy vs canonical @ batch params | **1640 of 1640 IDENTICAL** |
+| same, with the flags freed (`hit_cap=None, allow_fallback=True`) | **183 of 1640 CHANGE** |
+
+The first line is the proof the refactor cannot move a row — it is the
+271-row control the maintainer's ruling asked for, measured at a finer grain
+(every (addr, window) probe, not just the emitted verdict). The second is what
+stops the parameterisation being decorative: the flags demonstrably decide
+results, so a gate can require them to.
+
+Note the trap in the obvious control: `reconcile_batch` KEEPS existing rows
+("existing rows win"), so re-running it against the committed manifest
+reproduces all 328 rows regardless of which matcher is installed. A green
+re-emit would prove nothing. The comparison has to be at the matcher, which is
+why it is done this way.
+
 ### What #27 and #43 now require, recorded before the work starts
 
 **#27 — the constraint that is easy to miss.** Making `build_merged.sh`

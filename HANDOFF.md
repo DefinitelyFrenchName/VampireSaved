@@ -270,6 +270,16 @@ do not boot on current binaries without member injection. The pre-fix
 `build/m3b_merged` (FG) and `build/hui34`/`hui36` (chirp/shock) are
 kept as the parity audits' known-bad references (same injection
 caveat). Rebuild: `ROMDIR=... tools/build_merged.sh build/m3b_merged9`
+**— and that is now genuinely ONE COMMAND from a clean checkout (14z-95,
+GitHub #27, maintainer-ruled).** It used to require three untracked
+`build/*/extract` dirs plus `build/wide0` that NOTHING IN THE TREE KNEW HOW
+TO MAKE — the recipe was this file's prose and an `echo` on
+`audit_merged_legacy`'s SKIP path — so rule 3 was false for the milestone
+deliverable. `tools/ensure_merged_inputs.sh` now produces whatever is
+absent and touches nothing that exists (create-if-absent, so it does not
+collide with #26's guard on the same dirs). Measured before landing: a
+regenerated input set yields a BYTE-IDENTICAL merged `patch.json` (752
+ops, same order) and a byte-identical WIDE overlay (21/21 members).
 (~1 min, 753-op fixture); its fingerprint moves with the generator — do
 not pin it.
 **#75 CLOSED 14z-92, and read the second half of that sentence:** the
@@ -2234,6 +2244,7 @@ swallows the rest of the list, which is how a 32-entry run silently became 28.
 | `test_builder_rom_audit.sh` | #38 | Builders audit the ROMs they read. **Not portable.** |
 | `test_m2a_mask_pin.sh` | 14z-93 | the mask pin |
 | `test_fbneo_overlay_hygiene{,_control}.sh` | 14z-94 | FBNeo overlay hygiene (`_control` is its must-fire control) |
+| `test_merged_inputs.sh` | #27 | the merged build's four ROM-derived inputs are PRODUCED, not demanded — and a regenerated set yields the identical merged patch. Asserts the ARTIFACT is reproducible rather than that the input dirs are byte-equal, because the latter is false and cosmetic: `build/m5_wide/extract/regions.json` predates two `extract_char.py` changes. **Not portable.** |
 | `test_record_window.sh` | 14z-94 | the windowed MNG recorder (2.4 MB/120 frames vs `-aviwrite`'s 5.7 GB/2 min). **Not portable.** |
 | `test_decode_stage_banners.sh` | #92 | the stage-banner decoder — incl. the control requiring a base-as-ANCHOR decode to FAIL LOUDLY. **Not portable.** |
 

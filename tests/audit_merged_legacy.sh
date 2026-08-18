@@ -92,20 +92,26 @@ D_EX="build/m5_wide/extract"
 H_EX="build/hui32/extract"
 P_EX="build/pyron21/extract"
 
+# THE EXTRACTS AND THE OVERLAY ARE NOW PRODUCED, NOT DEMANDED (14z-95,
+# GitHub #27). This block used to print a five-line RECIPE and exit 0 — the
+# same prose that lived in HANDOFF.md, and the reason rule 3 ("reproduce the
+# output set from pristine inputs at any commit") was false for the merged
+# artifact: nothing executable knew how to make its inputs. Two further
+# reasons this had to move rather than be re-typed here: the recipe was
+# ALREADY WRONG (it named `build/hui30`, while the pin above is
+# `build/hui32`), and a second copy of it in tools/build_merged.sh is exactly
+# the drift this project keeps paying for.
+#
+# The helper creates only what is ABSENT and never touches what exists, so it
+# cannot collide with the #26 guard protecting these same dirs. $MAME_BIN is
+# still a SKIP, not a build: an emulator is not ours to produce.
+WIDE_ZIP="$WIDE_ZIP" ROMDIR="$ROMDIR" "$REPO/tools/ensure_merged_inputs.sh" || {
+    echo "SKIP: could not resolve the merged inputs (see above)"; exit 0; }
+
 missing=""
-[ -d "$D_EX" ]      || missing="$missing $D_EX"
-[ -d "$H_EX" ]      || missing="$missing $H_EX"
-[ -d "$P_EX" ]      || missing="$missing $P_EX"
 [ -x "$MAME_BIN" ]  || missing="$missing $MAME_BIN"
-[ -f "$WIDE_ZIP" ]  || missing="$missing $WIDE_ZIP"
 if [ -n "$missing" ]; then
     echo "SKIP: missing$missing"
-    echo "      extract dirs come from the frozen verticals (HANDOFF.md registry):"
-    echo "        KEY_SET=vsavj WIDE_ROMSET=... GEN_FLAGS=\"--allow-plausible \\"
-    echo "          --tripwire-open --profile cps2-wide-v1\" tools/build_donovan.sh 6 build/m5_wide"
-    echo "        (+ TENANT_MANIFEST/TENANT_CHAR for build/hui30 and build/pyron21)"
-    echo "      overlay: python3 tools/build_wide_romset.py \"\$ROMDIR\" build/wide0/rompath \\"
-    echo "               --qsound 2 --gfx 4 --prg 4"
     exit 0
 fi
 

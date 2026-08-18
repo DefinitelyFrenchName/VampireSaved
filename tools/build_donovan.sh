@@ -3,6 +3,9 @@
 # (vhunt2 oracle) -> generate staged patch -> apply -> pack runnable rompath.
 #
 # Usage: ROMDIR=... tools/build_donovan.sh <stage 1-5> [outbase=build/donovan]
+#        ROMDIR=... EXTRACT_ONLY=1 TENANT_CHAR=0x10 \
+#          TENANT_MANIFEST=build/manifest/huitzil.toml \
+#          tools/build_donovan.sh 6 <outbase>     # just <outbase>/extract
 #
 # Output: <outbase>/rompath/vsavj.zip — run with
 #   MAME_ROMPATH="<outbase>/rompath;$ROMDIR" tools/run_mame.sh vsavj ...
@@ -266,6 +269,27 @@ python3 tools/extract_char.py "$ROMDIR/vsav2.zip" "$OUTBASE/extract" \
     --char "$TENANT_CHAR" --oracle "$ROMDIR/vhunt2.zip" \
     --extra-roots "${EXTRA_ROOTS-$DEFAULT_ROOTS}" > "$OUTBASE/extract.log" 2>&1 \
     || { tail -20 "$OUTBASE/extract.log"; exit 1; }
+
+# EXTRACT_ONLY (14z-95, GitHub #27): stop here with just <outbase>/extract.
+#
+# WHY IT IS A MODE OF THIS SCRIPT AND NOT A NEW ONE. The per-character root
+# census above — ~170 lines of MEASURED extra-roots with the reasoning for
+# every span — is the real input to extraction, and it is the thing that must
+# not exist twice. tools/build_merged.sh needs three extracts and had been
+# taking them from three pinned build dirs that nothing in the tree knew how
+# to make; the recipe lived as prose in HANDOFF and in an `echo` inside
+# audit_merged_legacy.sh. Giving that script a way to CALL this one keeps one
+# copy of the census and makes rule 3 one command, which is the maintainer's
+# 2026-08-18 ruling on #27 ("it should be one command; the procedure should be
+# considered only if a single command cannot work").
+#
+# The cut is here rather than later because everything above is exactly the
+# extraction's precondition set — the cross-track guard, the CLAUDE.md §3 ROM
+# audit, and the decrypted views — and everything below writes a build.
+if [ "${EXTRACT_ONLY:-0}" = "1" ]; then
+    echo "EXTRACT ONLY: $OUTBASE/extract (char $TENANT_CHAR)"
+    exit 0
+fi
 
 # GEN_FLAGS: extra generator flags (e.g. "--allow-plausible --tripwire-open"
 # for stage-4 experiment builds while the R1 map converges)
