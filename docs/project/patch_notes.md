@@ -3302,3 +3302,66 @@ tenant_loop counts UNCHANGED (region_fix = region rewrite);
 m3a_reproducible on the new EXPECT_HUI; run_suite on the
 carried-renamed set. Build: huitzil-m10 = build/hui37 (9a948a11),
 merged = build/m3b_merged4.
+
+## 14z-96 — the kernel voice-table port (GitHub #101, maintainer-ruled
+## option (a): native-exact, incl. two new authored Phobos songs)
+
+**The defect (maintainer video-confirmed, replay 95, audit_hui_grunt):**
+the sound kernel's per-class voice tables — events .0-.3, vsavj bases
+`PRG:0x3BCE/0x3C3A/0x3CA6/0x3D10`, each a 16-entry base + 16-entry
+VARIANT half at +0x20, indexed by the fighter's `+0x382` byte with NO
+fold, read through the OPCODE view — ship the variant half as a byte-copy
+of the base half on vsavj. A tenant class therefore fired the LEGACY
+row-copy alias: Phobos (0x10) fired Bulleta's `0x1d2` (the electrocute
+grunt, every other hit), Donovan (0x13) fired VICTOR's `0x322`, where
+native vs2 fires the newcomer's own row — and Phobos' hurt entries there
+are `0x2a1/0x2a2`, FREE Z80 rows: the robot is silent by design.
+
+**Every byte, and why:**
+- **12 code_word ops** (4 per tenant, `{don,pyr,hui}_kernel_voice_e0-e3`,
+  all `only_variant_slot`): this tenant's word of each variant half.
+  - donovan: `0x3BF4/0x3C60/0x3CCC/0x3D36`: `0320/0321/0322/0323` →
+    `00d9/00da/00db/00dc` (vs2 `0x700-0x703` via authored pairs).
+  - pyron: `0x3BF0/0x3C5C/0x3CC8/0x3D32`: `0200/0201/0202/0203` →
+    `0341/02a1/02a2/0342` (vs2 `0x720/0x2a1/0x2a2/0x723`).
+  - huitzil: `0x3BEE/0x3C5A/0x3CC6/0x3D30`: `01d0/01d1/01d2/01d3` →
+    `01a2/02a1/02a2/01c1` (vs2 `0x730/0x2a1/0x2a2/0x733`).
+- **16 authored Z80 songs** (`qs_songs.toml` `[[song]]` rows, verbatim vs2
+  streams at 0x3E000-0x3E440 of the same zero run as the ejection pilot):
+  six (base, +0x300 alias) pairs — this path calls the REAL helper
+  `0x4CE2`, so the facing alias applies and both ids of a voiced pair
+  must be live, exactly as native backs `0x700` with `0xA00`. Pairs:
+  D `0xd9-0xdc/0x3d9-0x3dc`, P `0x341/0x641 + 0x342/0x642`,
+  H `0x1a2/0x4a2 + 0x1c1/0x4c1` — all chosen (base, alias) BOTH free in
+  vsavj's Z80 id table. The silent words (`0x2a1/0x2a2`) have free
+  aliases too (`0x5a1/0x5a2`) — no songs, silence is the port.
+- **2 batch scope ids** (`0x730,0x733` appended — APPEND-ONLY, inserting
+  mid-list renumbers every later voice): authors 0x733's T7 entry 34
+  (vs2 sample 461 — in no other scoped song) and keeps the audit sweep
+  symmetric. Their batch ids `0xa7/0xa8` are fired by nothing.
+
+**Measured before/after (the A/B that proves identity-only):** the engine
+firing pattern is UNTOUCHED — pre-fix merged-m2 fired the WRONG voice at
+exactly the frames the post-fix build fires the RIGHT one (Donovan victim:
+`0x322`@f4102/f5402 → `0x00db`@f4102/f5402; Phobos victim: `0x1d2`@f4102 →
+`0x2a2`@f4102). Native vs2 with a Donovan victim fires nothing at those
+frames — a cross-game firing-phase difference (the alternation bit;
+vsav/vs2 balance feeds it) that predates and is untouched by this change.
+The Phobos attempt-4 drop likewise predates the fix and is audibly
+nothing (the fired sound is the null song).
+
+**Superset controls:** stock twin `build/m5_stock3` fingerprint
+`a054de5c` = m5_stock2 BIT-IDENTICAL (only_variant_slot proven); the
+variant rows are read only under tenant classes (legacy classes are
+0x00-0x0F, and the table's base half is untouched).
+
+**Gates:** audit_hui_grunt (per-build frozen expectations, merged-m2 AND
+merged10 both green; must-fire verified), test_kernel_voice_tables
+(reference-ROM facts, unchanged by the port, green),
+test_hui_electrocute green on merged10, test_tenant_loop RE-FROZEN
+(+4/tenant: D 289 / H 327 / P 262; N=2 560/578, N=3 764/797),
+test_shared_writes green (variant-row class), audit_merged_legacy +
+run_all_static in flight at writing. **Builds (UNREGISTERED, awaiting
+the freeze decision):** `build/don_m8` `d038553d`, `build/hui44`
+`bfd819a0`, `build/pyron28` `738bcfc2`, `build/m3b_merged10` `ac3d0618`
+(764 ops), stock twin `build/m5_stock3` (= m5_stock2).

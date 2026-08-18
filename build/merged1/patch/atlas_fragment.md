@@ -115,6 +115,10 @@
 | `PRG:0x05F24C` | 0x2 | GEN | code_word win_pos_x_slot |
 | `PRG:0x05F24E` | 0x2 | GEN | code_word win_pos_y_slot |
 | `PRG:0x00AEF8` | 0x2 | GEN | code_word voice_borrow_site_pad |
+| `PRG:0x003BF4` | 0x2 | GEN | code_word don_kernel_voice_e0 |
+| `PRG:0x003C60` | 0x2 | GEN | code_word don_kernel_voice_e1 |
+| `PRG:0x003CCC` | 0x2 | GEN | code_word don_kernel_voice_e2 |
+| `PRG:0x003D36` | 0x2 | GEN | code_word don_kernel_voice_e3 |
 | `PRG:0x401440` | 0x27C6 | VS2 | donovan code (grouped, vsav2 0x054C90) |
 | `PRG:0x403C06` | 0x5200 | VS2 | donovan x057456 (grouped, vsav2 0x057456) |
 | `PRG:0x408E10` | 0x1780 | VS2 | donovan x022400 (vsav2 0x022400) |
@@ -249,6 +253,10 @@
 | `PRG:0x05F240` | 0x2 | GEN | code_word win_pos_x_slot |
 | `PRG:0x05F242` | 0x2 | GEN | code_word win_pos_y_slot |
 | `PRG:0x02A8C4` | 0x2 | GEN | code_word df_seq_entry_10 |
+| `PRG:0x003BEE` | 0x2 | GEN | code_word hui_kernel_voice_e0 |
+| `PRG:0x003C5A` | 0x2 | GEN | code_word hui_kernel_voice_e1 |
+| `PRG:0x003CC6` | 0x2 | GEN | code_word hui_kernel_voice_e2 |
+| `PRG:0x003D30` | 0x2 | GEN | code_word hui_kernel_voice_e3 |
 | `PRG:0x080AEC` | 0x4 | GEN | code_ptr beam_effect_class16 |
 | `PRG:0x45DB70` | 0x5200 | VS2 | donovan code (vsav2 0x0574C0) |
 | `PRG:0x462D70` | 0x14A0 | VS2 | donovan x026142 (vsav2 0x026142) |
@@ -396,3 +404,7 @@
 | `PRG:0x02A8C6` | 0x2 | GEN | code_word palette_routine_row_11 |
 | `PRG:0x02B672` | 0x2 | GEN | code_word palette_routine_row_11_b |
 | `PRG:0x0737B2` | 0x2 | GEN | code_word palette_routine_row_11_c |
+| `PRG:0x003BF0` | 0x2 | GEN | code_word pyr_kernel_voice_e0 |
+| `PRG:0x003C5C` | 0x2 | GEN | code_word pyr_kernel_voice_e1 |
+| `PRG:0x003CC8` | 0x2 | GEN | code_word pyr_kernel_voice_e2 |
+| `PRG:0x003D32` | 0x2 | GEN | code_word pyr_kernel_voice_e3 |

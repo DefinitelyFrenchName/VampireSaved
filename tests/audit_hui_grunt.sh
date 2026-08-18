@@ -60,18 +60,36 @@ mkdir -p "$W/ours" "$W/native"
   "$REPO/tests/lua/ring_tap.lua" >out 2>&1 ) &
 wait
 
-python3 - "$W" "${GRUNT_OURS_A2:-01d2}" <<'PY' || fail=1
+python3 - "$W" "${GRUNT_OURS_A2:-}" "$(basename "$BUILD")" <<'PY' || fail=1
 import re, sys
-W, ours_a2 = sys.argv[1], sys.argv[2].lower()
+W, ours_a2, bld = sys.argv[1], sys.argv[2].lower(), sys.argv[3]
 ATT = [3400, 4050, 4700, 5350, 6000]
-# frozen 14z-96 on merged-m2 vs native vsav2: per-attempt extra-voice slot
-# (the id landing ~f+45..f+60, between the electric burst and the 010x
-# recovery pair). None = the attempt fires no kernel voice.
+# frozen per BUILD vs native vsav2: per-attempt extra-voice slot (the id
+# landing ~f+45..f+60, between the electric burst and the 010x recovery
+# pair). None = the attempt fires no kernel voice.
 # 00f3 at attempt 1 is shared by both legs (first-hit family) and is NOT
 # the kernel .2 event; it is asserted in the common prefix instead.
+#   m3b_merged9  = merged-m2, PRE-fix: the defect (legacy alias 01d2).
+#   m3b_merged10 = the #101 kernel port: 02a2, vs2's deliberate-silence id
+#                  — the 68k enqueue is still observable in the ring, which
+#                  is what makes silence assertable at all.
+# The attempt-4 drop is on BOTH (68k alternation phase, predates the fix;
+# audibly nothing for Phobos since the fired sound is the null song).
+OURS_BY_BUILD = {
+    "m3b_merged9":  [None, "01d2", None, None, None],
+    "m3b_merged10": [None, "02a2", None, None, None],
+}
+if ours_a2:
+    ours = [None, ours_a2, None, None, None]
+elif bld in OURS_BY_BUILD:
+    ours = OURS_BY_BUILD[bld]
+else:
+    sys.exit(f"FAIL: no frozen ours-expectation for build '{bld}' — freeze "
+             f"a row in OURS_BY_BUILD (measure first), or rehearse with "
+             f"GRUNT_OURS_A2")
 EXPECT = {
     "native": [None, "02a2", None, "02a2", None],
-    "ours":   [None, ours_a2, None, None,  None],
+    "ours":   ours,
 }
 PREFIX = ["0625", "0419", "0402"]          # the electric burst, every attempt
 rc = 0

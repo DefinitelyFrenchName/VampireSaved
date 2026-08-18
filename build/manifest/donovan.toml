@@ -1965,6 +1965,58 @@ new_hex = "4e71"
 only_variant_slot = true
 note = "14z-87: the stolen site's 4th word (tail of move.b d1,(0x382,a1)) -> nop; pairs with voice_borrow_keep_tenant"
 
+# ── THE KERNEL VOICE-TABLE ROWS (14z-96, GitHub #101, option (a)) ─────────
+# The sound kernel's per-class voice tables (events .0-.3, engine_internals
+# "The KERNEL per-class voice tables"; vsavj bases 0x3BCE/0x3C3A/0x3CA6/
+# 0x3D10, variant halves at +0x20) index the fighter's +0x382 byte with NO
+# fold — vsavj ships the variant rows as byte-copies of the base rows, so a
+# tenant class fired the LEGACY alias voice (the merged-m2 electrocute
+# grunt, measured on class 0x10; every tenant row shares the shape). These
+# rows write THIS tenant's word of each variant half with the vs2 voice,
+# translated to a (base, +0x300 alias) pair authored in qs_songs.toml —
+# this path calls the REAL helper 0x4CE2, so the facing alias applies and
+# both ids of the pair must be live (the batch's alias-skip thunk covers
+# only unstubbed call sites, not this one). Donovan: vs2 0x700-0x703 →
+# authored pairs 0xd9-0xdc / 0x3d9-0x3dc. Rows 0x10-0x1F are read only
+# under tenant classes (legacy classes are 0x00-0x0F), so the stock-superset
+# argument is by construction; only_variant_slot skips them on the stock
+# track, where the tenant sits at 0x0F and reads the legacy row anyway.
+[[code_word]]
+stage = 6
+name = "don_kernel_voice_e0"
+addr = 0x003BF4
+old_hex = "0320"
+new_hex = "00d9"
+only_variant_slot = true
+note = "14z-96 #101: kernel voice table .0, row 0x13 — vs2 0x700 via authored pair 0xd9/0x3d9"
+
+[[code_word]]
+stage = 6
+name = "don_kernel_voice_e1"
+addr = 0x003C60
+old_hex = "0321"
+new_hex = "00da"
+only_variant_slot = true
+note = "14z-96 #101: kernel voice table .1, row 0x13 — vs2 0x701 via authored pair 0xda/0x3da"
+
+[[code_word]]
+stage = 6
+name = "don_kernel_voice_e2"
+addr = 0x003CCC
+old_hex = "0322"
+new_hex = "00db"
+only_variant_slot = true
+note = "14z-96 #101: kernel voice table .2, row 0x13 — vs2 0x702 via authored pair 0xdb/0x3db"
+
+[[code_word]]
+stage = 6
+name = "don_kernel_voice_e3"
+addr = 0x003D36
+old_hex = "0323"
+new_hex = "00dc"
+only_variant_slot = true
+note = "14z-96 #101: kernel voice table .3, row 0x13 — vs2 0x703 via authored pair 0xdc/0x3dc"
+
 # (c) the candidate-table port: vs2's rows for THIS tenant into vsavj's
 #     variant rows (today pure aliases of the base half — verified — and
 #     read ONLY when the OPPONENT's (0x382) byte is 0x10/0x11/0x13, which

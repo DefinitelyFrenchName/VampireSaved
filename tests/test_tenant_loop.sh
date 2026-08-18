@@ -161,7 +161,13 @@ echo "== 1: one tenant per run — the frozen op counts =="
 # 68000 ILLEGAL opcode; every other difference is a uniform 0x10 allocator
 # shift as the hole packs tighter. The second number in each check_n (570,
 # 785) is unchanged and was not touched.
-FROZEN_1="donovan:285 huitzil:323 pyron:258"
+# RE-FROZEN 14z-96 (+4 per tenant, uniformly): the GitHub #101 kernel
+# voice-table rows — four code_word ops per tenant (events .0-.3, that
+# tenant's word of each variant half; {don,pyr,hui}_kernel_voice_e0-e3).
+# Per-tenant names, so nothing dedupes: N=2 +8, N=3 +12. The stock twin
+# measured BIT-IDENTICAL under the change (a054de5c, = m5_stock2), which
+# is the only_variant_slot confirmation.
+FROZEN_1="donovan:289 huitzil:327 pyron:262"
 for row in $FROZEN_1; do
     who="${row%%:*}"; want="${row##*:}"
     case "$who" in donovan) ex="$D_EX" ;; huitzil) ex="$H_EX" ;; *) ex="$P_EX" ;; esac
@@ -233,8 +239,11 @@ check_n() {  # check_n <label> <dir> <want ops> <sum of 1-tenant counts>
 # +7 at N=2 (3 shared thunk/pad ops deduped + 2 data_port ops per tenant)
 # and +9 at N=3 (3 shared + 2x3 per-tenant), matching the +5-per-solo
 # delta above with the shared rows counted once.
-check_n "2 tenants" "$WORK/two"   552 570
-check_n "3 tenants" "$WORK/three" 752 785
+# RE-FROZEN 14z-96 (#101 kernel voice rows): +8 at N=2 and +12 at N=3
+# applied AND declared (4 per-tenant-named code_word rows per manifest,
+# nothing dedupes).
+check_n "2 tenants" "$WORK/two"   560 578
+check_n "3 tenants" "$WORK/three" 764 797
 
 # ── 3: every tenant's own content is present ────────────────────────────
 # An op count alone cannot tell "both tenants ran" from "tenant 0 ran twice".

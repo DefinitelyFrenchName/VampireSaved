@@ -99,6 +99,34 @@ allocation, not sound content).
 | 0x72d | 0xa4 | 0x3dae3 | 0x3f | verbatim |
 | 0x72e | 0xa5 | 0x3db22 | 0x3f | verbatim |
 | 0x72f | 0xa6 | 0x3db61 | 0x4c | verbatim |
+| 0x730 | 0xa7 | 0x3dbad | 0x33 | verbatim; batch-scoped 14z-96 (#101) for its T7/record authoring — FIRED BY NOTHING (the kernel word fires the pair id 0x1a2, see below) |
+| 0x733 | 0xa8 | 0x3dbe0 | 0x31 | verbatim; batch-scoped 14z-96 (#101) — fired by nothing (kernel pair id 0x1c1 below) |
+
+## The kernel voice pairs (14z-96, GitHub #101 — `[[song]]` rows, not batch)
+
+The sound kernel's per-class voice tables (events .0-.3, engine_internals
+"The KERNEL per-class voice tables") fire through the REAL helper `0x4CE2`,
+so the `+0x300` facing alias applies — each VOICED kernel word needs a
+(base, alias) id pair with both songs authored, mirroring native's own
+`0x700→0xA00`-style twins. The SILENT words (Phobos/Pyron events .1/.2)
+port vs2's `0x2a1`/`0x2a2` verbatim — free Z80 rows in BOTH games with free
+aliases (`0x5a1`/`0x5a2`): deliberate silence, no songs. Consumers: the 12
+`*_kernel_voice_e*` code_word rows in the tenant manifests.
+
+| tenant.event | vs2 id (alias) | pair | song @flat | len |
+|---|---|---|---|---|
+| donovan.0 | 0x700 (0xa00) | **0xd9** / 0x3d9 | 0x3e000 / 0x3e050 | 0x4e |
+| donovan.1 | 0x701 (0xa01) | **0xda** / 0x3da | 0x3e0a0 / 0x3e0e0 | 0x31 |
+| donovan.2 | 0x702 (0xa02) | **0xdb** / 0x3db | 0x3e120 / 0x3e160 | 0x31 |
+| donovan.3 | 0x703 (0xa03) | **0xdc** / 0x3dc | 0x3e1a0 / 0x3e1e0 | 0x31 |
+| pyron.0 | 0x720 (0xa20) | **0x341** / 0x641 | 0x3e220 / 0x3e270 | 0x4e |
+| pyron.1 | 0x2a1 | — (silent, verbatim) | — | — |
+| pyron.2 | 0x2a2 | — (silent, verbatim) | — | — |
+| pyron.3 | 0x723 (0xa23) | **0x342** / 0x642 | 0x3e2c0 / 0x3e300 | 0x31 |
+| huitzil.0 | 0x730 (0xa30) | **0x1a2** / 0x4a2 | 0x3e340 / 0x3e380 | 0x33 |
+| huitzil.1 | 0x2a1 | — (silent, verbatim) | — | — |
+| huitzil.2 | 0x2a2 | — (silent, verbatim — THE GRUNT WORD) | — | — |
+| huitzil.3 | 0x733 (0xa33) | **0x1c1** / 0x4c1 | 0x3e3c0 / 0x3e400 | 0x31 |
 
 ## Authored sample records (new index -> source)
 

@@ -178,6 +178,17 @@ tools/run_wide.sh build/don_m7 fbneo       # or the solo builds (hui41,
                                            # pyron-m9 since the 14z-91 fix)
 ```
 
+**THE 14z-96 #101 BATCH — BUILT, UNREGISTERED, AWAITING THE FREEZE
+DECISION:** `build/don_m8` (`d038553d`, 289 ops), `build/hui44`
+(`bfd819a0`), `build/pyron28` (`738bcfc2`), `build/m3b_merged10`
+(`ac3d0618`, 764 ops), stock twin `build/m5_stock3` (`a054de5c` =
+m5_stock2 BIT-IDENTICAL). = the frozen batch + the kernel voice-table
+port (GitHub #101, maintainer-ruled option (a)): 12 variant-half words +
+16 authored (base,alias) Z80 song pairs + 2 batch scope ids. The grunt
+fix, measured identity-only. Detail: patch_notes 14z-96, STATE 14z-96 (2).
+`run_suite`/`test_fbneo_legacy_oracle` refuse these until registered —
+that refusal is the freeze gate working, not a defect.
+
 **Current WIDE builds (14z-91, THE LEGACY-REGRESSION FIX):**
 `build/don_m7` = **`donovan-m7` (`c90b60c3`)**, `build/hui41` =
 **`huitzil-m15` (`4531af1e`)**, `build/pyron26` = **`pyron-m9`
@@ -1640,12 +1651,14 @@ tests/audit_hui_grunt.sh              # 14z-96: THE ELECTROCUTE-GRUNT A/B over
                                       # cry) where native vs2 fires his own
                                       # row's 0x2a2 — a FREE Z80 id, i.e.
                                       # DELIBERATE SILENCE (the robot does
-                                      # not grunt). Freezes today's
-                                      # per-attempt inventories on BOTH legs
-                                      # (incl. the defect, as a regression
-                                      # lock pointing at the issue);
-                                      # GRUNT_OURS_A2 rehearses the post-fix
-                                      # state and any other value must-fires.
+                                      # not grunt). PER-BUILD frozen
+                                      # expectations since the 14z-96 port:
+                                      # merged-m2 = the defect (regression
+                                      # lock), m3b_merged10 = the fix (02a2,
+                                      # the deliberate-silence id) — both
+                                      # green; an unknown build REFUSES
+                                      # until a row is frozen;
+                                      # GRUNT_OURS_A2 rehearses.
                                       # Static half: test_kernel_voice_tables
                                       # (ci_static). ~3 min, 2 MAME runs
 tests/test_hui_boot.sh                # Huitzil stage-4 BOOT gate (14z-65): the

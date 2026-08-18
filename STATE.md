@@ -1,5 +1,84 @@
 # STATE — living progress log
 
+## Session 14z-96 (2) — #101 OPTION (a) IMPLEMENTED AND MEASURED:
+## the grunt is GONE, and the port is provably identity-only
+
+**Maintainer input (2026-08-18): the isolated grunt clips CONFIRMED as the
+reported sound, and option (a) ruled** (full native-exact port, incl. the
+two new authored Phobos songs). Implemented same session.
+
+### What landed (byte detail: patch_notes 14z-96; registry: patch_index)
+
+- **12 `code_word` ops** — `{don,pyr,hui}_kernel_voice_e0-e3`, each
+  tenant's word of the four kernel voice tables' variant halves, all
+  `only_variant_slot`.
+- **16 authored Z80 songs** — six (base, +0x300 alias) pairs at free id
+  pairs (D `0xd9-0xdc/0x3d9-0x3dc`, P `0x341/0x641+0x342/0x642`,
+  H `0x1a2/0x4a2+0x1c1/0x4c1`), verbatim vs2 streams at 0x3E000-0x3E440.
+  NEEDED because the kernel path calls the REAL `0x4CE2` — the facing
+  alias applies, so a voiced id must have a live twin (native's own
+  `0x700→0xA00` doctrine). The silent words port vs2's `0x2a1/0x2a2`
+  verbatim (free rows both games, free aliases).
+- **Batch scope +`0x730,0x733`** (APPEND-ONLY — mid-list insertion
+  renumbers everything): authors 0x733's T7 entry 34; batch ids
+  `0xa7/0xa8` fired by nothing.
+
+### Measured, in order of importance
+
+1. **The grunt is gone, native-exact:** merged10/hui44 fire `0x2a2`
+   (vs2's deliberate-silence id) at electrocute attempt 2 — where
+   merged-m2 fired Bulleta's `0x1d2`. Same frame, silence for sound.
+2. **Identity-only, frame-exact:** pre-fix Donovan-victim fired VICTOR's
+   `0x322`@f4102/f5402; post-fix fires his own `0x00db` at the SAME
+   frames. The engine's firing pattern is untouched.
+3. **Stock superset:** `build/m5_stock3` = `a054de5c` — BIT-IDENTICAL to
+   m5_stock2. only_variant_slot proven, not assumed.
+4. **Cross-game firing phase (named, not chased):** native vs2 fires a
+   Donovan victim's .2 event at NO attempt where vsavj fires 2+4, and
+   native-Phobos fires 2+4 where ours fires 2 only — victim-data-fed
+   `btst #0,d0` phase, predates the port, unchanged by it. For Phobos
+   the drop is audibly nothing (the fired sound is the null song). On
+   #101 as a residual.
+
+### Gates
+
+audit_hui_grunt now carries PER-BUILD frozen expectations (merged-m2 =
+the defect as regression lock; merged10 = the fix) — both green, unknown
+build refuses. test_tenant_loop RE-FROZEN +4/tenant (D 289 / H 327 /
+P 262; N=2 560/578, N=3 764/797). test_manifest_merge RE-FROZEN
+(code_word (5,5,7)/13 → (9,9,11)/25, shared unchanged 3 — the
+per-tenant names are what keep the shared count pinned).
+test_hui_electrocute green on merged10; test_shared_writes green
+(variant-row class); test_kernel_voice_tables + test_qs_songs green.
+
+**audit_merged_legacy: PASS on the 764-op image** — leg a lands on the
+ratified legacy classes (tests/expected/merged1), leg b's tenant matches
+form and survive the crash guard. Leg b's merged-vs-solo REPORT shows
+divergence from select entry — expected: the solos it compares against
+are the FROZEN OLD builds (don_m7/hui41/pyron26-era), which do not carry
+the kernel words; the report re-baselines at the freeze.
+
+**THE ONE RED, red BY DESIGN: `test_m3a_reproducible`** — the
+reproducibility pin now measures the tree building `d038553d` (don_m8)
+against the registered donovan-m7 `c90b60c3`. That is the gate doing its
+job between a landed fix and its freeze (the 14z-94 pattern); it
+re-points with the registry row. Chain: **PASS 90 / SKIP 0 / FAIL 1**,
+the FAIL being exactly this pin.
+
+### NEW BUILDS, ALL UNREGISTERED — the freeze is the maintainer's call
+
+| build | fingerprint | dir |
+|---|---|---|
+| donovan-m8 candidate | `d038553d` | `build/don_m8` (289 ops) |
+| huitzil-m17 candidate | `bfd819a0` | `build/hui44` |
+| pyron-m11 candidate | `738bcfc2` | `build/pyron28` |
+| merged-m3 candidate | `ac3d0618` | `build/m3b_merged10` (764 ops) |
+| stock twin | `a054de5c` (= m5_stock2) | `build/m5_stock3` |
+
+**Decisions pending (maintainer):** (1) freeze the batch above (rides
+with #43(b) and possibly the #93 endpoint byte, or alone — their call);
+(2) #93's own fix (endpoint byte vs frozen expectation) still open.
+
 ## Session 14z-96 — THE GRUNT ROOT-CAUSED FROM THE MAINTAINER'S VIDEOS:
 ## a whole UNPORTED voice family in the sound kernel, filed as #101
 

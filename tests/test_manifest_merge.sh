@@ -73,7 +73,12 @@ FROZEN = [
     ("pcrel_escape_fix", (0, 5, 2),  5,  2),   # the H<->P shared-source pair
     # 14z-87: +1 shared voice_borrow_site_pad in all three manifests
     # (H was already 4, not the frozen 3 — accrued staleness, see above)
-    ("code_word",        (5, 5, 7),  13, 3),
+    # RE-FROZEN 14z-96 (+4 per file, +12 merged, shared unchanged): the
+    # GitHub #101 kernel voice-table rows — four PER-TENANT-NAMED
+    # code_word rows per manifest ({don,pyr,hui}_kernel_voice_e0-e3),
+    # deliberately tenant-prefixed so nothing dedupes and the shared
+    # count cannot move.
+    ("code_word",        (9, 9, 11), 25, 3),
     # RE-FROZEN 14z-87 (was (21,55,14),87,3 — STALE since 14z-85f: the FG
     # damage fix propagated Donovan's six x028122 work-var port_patch rows
     # to huitzil+pyron verbatim (+6 each, +6 shared) and this gate was not

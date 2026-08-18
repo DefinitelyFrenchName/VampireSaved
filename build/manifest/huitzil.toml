@@ -2167,6 +2167,54 @@ new_hex = "4e71"
 only_variant_slot = true
 note = "14z-87: the stolen site's 4th word (tail of move.b d1,(0x382,a1)) -> nop; pairs with voice_borrow_keep_tenant"
 
+# ── THE KERNEL VOICE-TABLE ROWS (14z-96, GitHub #101, option (a)) ─────────
+# Phobos' word of each kernel per-class voice table's variant half (full
+# narrative + address derivation: donovan.toml's block of the same name).
+# THIS IS THE MEASURED GRUNT FIX: event .2 fired vsavj's row-copy alias
+# 0x1d2 (a legacy hurt cry) on every other electrocution where native vs2
+# fires 0x2a2 — a free Z80 row, i.e. the robot is silent by design
+# (maintainer video-confirmed, replay 95, audit_hui_grunt). Events .1/.2
+# are vs2's own 0x2a1/0x2a2 ported verbatim (free in BOTH games' Z80
+# tables, aliases 0x5a1/0x5a2 also free); events .0/.3 are real voices
+# (vs2 0x730/0x733) via authored (base,alias) pairs 0x1a2/0x4a2 and
+# 0x1c1/0x4c1 — this path calls the REAL helper 0x4CE2, so the facing
+# alias applies and both ids of each pair must be live.
+[[code_word]]
+stage = 6
+name = "hui_kernel_voice_e0"
+addr = 0x003BEE
+old_hex = "01d0"
+new_hex = "01a2"
+only_variant_slot = true
+note = "14z-96 #101: kernel voice table .0, row 0x10 — vs2 0x730 via authored pair 0x1a2/0x4a2"
+
+[[code_word]]
+stage = 6
+name = "hui_kernel_voice_e1"
+addr = 0x003C5A
+old_hex = "01d1"
+new_hex = "02a1"
+only_variant_slot = true
+note = "14z-96 #101: kernel voice table .1, row 0x10 — vs2's 0x2a1, the deliberate-silence row"
+
+[[code_word]]
+stage = 6
+name = "hui_kernel_voice_e2"
+addr = 0x003CC6
+old_hex = "01d2"
+new_hex = "02a2"
+only_variant_slot = true
+note = "14z-96 #101: kernel voice table .2, row 0x10 — vs2's 0x2a2, the deliberate-silence row. THE GRUNT WORD"
+
+[[code_word]]
+stage = 6
+name = "hui_kernel_voice_e3"
+addr = 0x003D30
+old_hex = "01d3"
+new_hex = "01c1"
+only_variant_slot = true
+note = "14z-96 #101: kernel voice table .3, row 0x10 — vs2 0x733 via authored pair 0x1c1/0x4c1"
+
 [[data_port]]
 stage = 6
 name = "voice_borrow_candidates_a"

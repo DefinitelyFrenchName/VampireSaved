@@ -37,6 +37,154 @@ vs2_src = 0x35ACD                   # byte-identical stream, slot 12 instead of 
 len = 0x33
 provenance = "VS2"
 
+# THE KERNEL VOICE PAIRS (14z-96, GitHub #101, maintainer-ruled option (a)).
+# The sound kernel's per-class voice tables (events .0-.3, engine_internals
+# "The KERNEL per-class voice tables") fire through the REAL helper 0x4CE2,
+# which applies the +0x300 facing alias — the batch's alias-skip thunk does
+# NOT cover this path (it is reached only from unstubbed call sites). So
+# every VOICED kernel word needs a (base, base+0x300) id pair with BOTH
+# songs authored, the ejection-pilot doctrine above — native backs each
+# newcomer kernel voice with a twin at +0x300 (0x700->0xA00 etc.), and we
+# mirror that at free vsavj pairs. The SILENT kernel words (Phobos/Pyron
+# events .1/.2) are vs2's own 0x2a1/0x2a2, free rows in BOTH games' Z80
+# tables WITH free aliases (0x5a1/0x5a2) — ported verbatim, no songs.
+# Consumers: the 12 kernel_voice code_word rows in the three tenant
+# manifests. Sample/T7 coverage: every stream below references a table-7
+# entry the batch already authors (0x730/0x733 are batch-scoped for exactly
+# that — see the ids line).
+# Placements 0x3E000-0x3E440: the same 0x3C977-0x40000 zero run as the
+# pilot, ABOVE the batch's sequential region (songs_base 0x3CA00, measured
+# end ~0x3DC00 with the two added scope ids) — the builder's zero-span
+# check fires on any collision.
+
+[[song]]
+name = "don_kernel_v0"             # vs2 id 0x700 — Donovan kernel event .0
+id = 0x0D9
+place = 0x3E000
+vs2_src = 0x336A7
+len = 0x4E
+provenance = "VS2"
+
+[[song]]
+name = "don_kernel_v0_alt"         # vs2 id 0xA00 (= 0x700 + 0x300)
+id = 0x3D9
+place = 0x3E050
+vs2_src = 0x34E42
+len = 0x4E
+provenance = "VS2"
+
+[[song]]
+name = "don_kernel_v1"             # vs2 id 0x701 — Donovan kernel event .1
+id = 0x0DA
+place = 0x3E0A0
+vs2_src = 0x336F5
+len = 0x31
+provenance = "VS2"
+
+[[song]]
+name = "don_kernel_v1_alt"         # vs2 id 0xA01
+id = 0x3DA
+place = 0x3E0E0
+vs2_src = 0x34E90
+len = 0x31
+provenance = "VS2"
+
+[[song]]
+name = "don_kernel_v2"             # vs2 id 0x702 — Donovan kernel event .2
+id = 0x0DB
+place = 0x3E120
+vs2_src = 0x33726
+len = 0x31
+provenance = "VS2"
+
+[[song]]
+name = "don_kernel_v2_alt"         # vs2 id 0xA02
+id = 0x3DB
+place = 0x3E160
+vs2_src = 0x34EC1
+len = 0x31
+provenance = "VS2"
+
+[[song]]
+name = "don_kernel_v3"             # vs2 id 0x703 — Donovan kernel event .3
+id = 0x0DC
+place = 0x3E1A0
+vs2_src = 0x33757
+len = 0x31
+provenance = "VS2"
+
+[[song]]
+name = "don_kernel_v3_alt"         # vs2 id 0xA03
+id = 0x3DC
+place = 0x3E1E0
+vs2_src = 0x34EF2
+len = 0x31
+provenance = "VS2"
+
+[[song]]
+name = "pyr_kernel_v0"             # vs2 id 0x720 — Pyron kernel event .0
+id = 0x341
+place = 0x3E220
+vs2_src = 0x33DCF
+len = 0x4E
+provenance = "VS2"
+
+[[song]]
+name = "pyr_kernel_v0_alt"         # vs2 id 0xA20
+id = 0x641
+place = 0x3E270
+vs2_src = 0x3556A
+len = 0x4E
+provenance = "VS2"
+
+[[song]]
+name = "pyr_kernel_v3"             # vs2 id 0x723 — Pyron kernel event .3
+id = 0x342
+place = 0x3E2C0
+vs2_src = 0x33E69
+len = 0x31
+provenance = "VS2"
+
+[[song]]
+name = "pyr_kernel_v3_alt"         # vs2 id 0xA23
+id = 0x642
+place = 0x3E300
+vs2_src = 0x35604
+len = 0x31
+provenance = "VS2"
+
+[[song]]
+name = "hui_kernel_v0"             # vs2 id 0x730 — Phobos kernel event .0
+id = 0x1A2
+place = 0x3E340
+vs2_src = 0x3414F
+len = 0x33
+provenance = "VS2"
+
+[[song]]
+name = "hui_kernel_v0_alt"         # vs2 id 0xA30
+id = 0x4A2
+place = 0x3E380
+vs2_src = 0x358EA
+len = 0x33
+provenance = "VS2"
+
+[[song]]
+name = "hui_kernel_v3"             # vs2 id 0x733 — Phobos kernel event .3
+id = 0x1C1
+place = 0x3E3C0
+vs2_src = 0x341CE
+len = 0x31
+provenance = "VS2"
+
+[[song]]
+name = "hui_kernel_v3_alt"         # vs2 id 0xA33
+id = 0x4C1
+place = 0x3E400
+vs2_src = 0x35969
+len = 0x31
+provenance = "VS2"
+
 # THE VOICE-BLOCK BATCH (14z-86, maintainer GO "do it!"). Fully derived:
 # every scoped vs2 song copied VERBATIM; its voice note table (vs2's 8th
 # pointer-array slot, which vsavj lacks) authored at t7_base and reached
@@ -55,7 +203,14 @@ provenance = "VS2"
 # allocation, not sound content; STATE 14z-86 decision note).
 [voice_batch]
 enable = true
-ids = "0x700-0x71f,0x750-0x757,0x735-0x74e,0x720-0x72f"
+# 0x730,0x733 appended 14z-96 (GitHub #101): scoped for their T7-entry /
+# sample-record / packed-sample authoring (0x733's T7 entry 34 existed in
+# no other scoped song). Their batch ids (0xa7/0xa8, sequential after
+# 0x72f's 0xa6) are FIRED BY NOTHING on the 68k side — the kernel words
+# fire the paired [[song]] ids above instead (the +0x300 alias reasoning
+# there). APPEND-ONLY: inserting mid-list renumbers every later voice and
+# invalidates all remap_ids literals in the tenant manifests.
+ids = "0x700-0x71f,0x750-0x757,0x735-0x74e,0x720-0x72f,0x730,0x733"
 exclude = "0x739,0x73a"       # ported at m11/m9 (ejection/chirp)
 id_base = 0x058               # sequential rows in the 0x58-0xD7 free block
 songs_base = 0x3CA00          # banked free run, after the ejection pair

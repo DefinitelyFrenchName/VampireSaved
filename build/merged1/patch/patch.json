@@ -1171,6 +1171,26 @@
    "hex": "4e71"
   },
   {
+   "op": "code",
+   "addr": "0x3bf4",
+   "hex": "00d9"
+  },
+  {
+   "op": "code",
+   "addr": "0x3c60",
+   "hex": "00da"
+  },
+  {
+   "op": "code",
+   "addr": "0x3ccc",
+   "hex": "00db"
+  },
+  {
+   "op": "code",
+   "addr": "0x3d36",
+   "hex": "00dc"
+  },
+  {
    "op": "data_file",
    "addr": "0x41a6e0",
    "path": "fixed_anim.huitzil.bin"
@@ -2384,6 +2404,26 @@
    "op": "code",
    "addr": "0x2a8c4",
    "hex": "0032"
+  },
+  {
+   "op": "code",
+   "addr": "0x3bee",
+   "hex": "01a2"
+  },
+  {
+   "op": "code",
+   "addr": "0x3c5a",
+   "hex": "02a1"
+  },
+  {
+   "op": "code",
+   "addr": "0x3cc6",
+   "hex": "02a2"
+  },
+  {
+   "op": "code",
+   "addr": "0x3d30",
+   "hex": "01c1"
   },
   {
    "op": "code",
@@ -3759,8 +3799,29 @@
    "op": "code",
    "addr": "0x737b2",
    "hex": "0040"
+  },
+  {
+   "op": "code",
+   "addr": "0x3bf0",
+   "hex": "0341"
+  },
+  {
+   "op": "code",
+   "addr": "0x3c5c",
+   "hex": "02a1"
+  },
+  {
+   "op": "code",
+   "addr": "0x3cc8",
+   "hex": "02a2"
+  },
+  {
+   "op": "code",
+   "addr": "0x3d32",
+   "hex": "0342"
   }
  ],
+ "src_program_identity": "af7c585f2ee888b0e456de53d09d5bb95ebfa5cd",
  "image": {
   "extend_to": 6291456,
   "member_size": 524288,

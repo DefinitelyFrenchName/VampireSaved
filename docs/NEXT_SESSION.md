@@ -6,15 +6,17 @@
 > ## **ONE STANDING HOLD — do not start it:**
 > ## **#99** is PARKED (maintainer): blocked on a RIG, not on ideas. The full
 > ## measured state is on the issue; do not re-derive it.
-> ## **The Phobos sfx (grunt) is ROOT-CAUSED — GitHub #101 (14z-96):** the
-> ## sound kernel's per-class voice tables were NEVER PORTED; vsavj's
-> ## variant rows alias legacy rows, so Phobos' every-other-hit voice
-> ## fires a legacy hurt cry (0x1d2) where native vs2 fires 0x2a2 — a
-> ## FREE Z80 id, i.e. the robot is silent BY DESIGN. All three tenants
-> ## are affected at FOUR kernel voice events. Fix plan on #101, awaiting
-> ## the maintainer's option pick; rides the next re-freeze window.
-> ## Instruments: test_kernel_voice_tables (ci_static), audit_hui_grunt +
-> ## replay 95 (on-demand).
+> ## **The grunt (#101) is ROOT-CAUSED, maintainer-confirmed, and FIXED
+> ## (14z-96, option (a) ruled):** the kernel per-class voice tables'
+> ## variant rows aliased legacy rows; the port gives each tenant its
+> ## own vs2 voice (or vs2's deliberate-silence 0x2a1/0x2a2) via 12
+> ## code_word rows + 16 authored (base,alias) song pairs. Measured
+> ## identity-only (same frames, right voice; stock twin bit-identical
+> ## a054de5c). **NEW BUILDS AWAIT THE FREEZE DECISION:** don_m8
+> ## d038553d / hui44 bfd819a0 / pyron28 738bcfc2 / m3b_merged10
+> ## ac3d0618 (764 ops). Instruments: test_kernel_voice_tables
+> ## (ci_static), audit_hui_grunt (per-build frozen expectations) +
+> ## replay 95. Full detail: STATE 14z-96 (2), patch_notes 14z-96.
 > ##
 > ## **FOUR THINGS WAIT ON A MAINTAINER RULING** (nothing else is blocked):
 > ## 1. **#96** — what GENERATION and STAGE does the m2a/m2b battery target?
@@ -33,8 +35,11 @@
 > ## (vsav `0xFF`, vsav2 `0x00`; the games' ORIGINAL sample ROMs — nothing
 > ## we packed). Fourth instance of the packing-law-#3 endpoint class.
 > ## `huitzil.toml:2108`'s "byte-identical" adoption claim was wrong at
-> ## that byte — retraction pass done 14z-96. Whether this is ALSO the
-> ## maintainer's grunt report is being tested against their videos.
+> ## that byte — retraction pass done 14z-96. **SETTLED: it is NOT the
+> ## grunt** (that is #101, root-caused and fixed separately) — a
+> ## one-sample discontinuity predicts a click and cannot alternate.
+> ## #93's remaining question is the fix choice: patch the endpoint
+> ## byte vs freeze the expectation as a known source difference.
 
 ## What 14z-95 did
 

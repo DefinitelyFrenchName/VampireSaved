@@ -1108,6 +1108,49 @@ new_hex = "4e71"
 only_variant_slot = true
 note = "14z-87: the stolen site's 4th word (tail of move.b d1,(0x382,a1)) -> nop; pairs with voice_borrow_keep_tenant"
 
+# ── THE KERNEL VOICE-TABLE ROWS (14z-96, GitHub #101, option (a)) ─────────
+# Pyron's word of each kernel per-class voice table's variant half (full
+# narrative + address derivation: donovan.toml's block of the same name).
+# Events .0/.3 are real voices (vs2 0x720/0x723) via authored (base,alias)
+# pairs 0x341/0x641 and 0x342/0x642; events .1/.2 are vs2's OWN 0x2a1/0x2a2
+# — free rows in BOTH games' Z80 tables with free aliases (0x5a1/0x5a2):
+# native voices these events with deliberate silence, ported verbatim.
+[[code_word]]
+stage = 6
+name = "pyr_kernel_voice_e0"
+addr = 0x003BF0
+old_hex = "0200"
+new_hex = "0341"
+only_variant_slot = true
+note = "14z-96 #101: kernel voice table .0, row 0x11 — vs2 0x720 via authored pair 0x341/0x641"
+
+[[code_word]]
+stage = 6
+name = "pyr_kernel_voice_e1"
+addr = 0x003C5C
+old_hex = "0201"
+new_hex = "02a1"
+only_variant_slot = true
+note = "14z-96 #101: kernel voice table .1, row 0x11 — vs2's 0x2a1, the deliberate-silence row"
+
+[[code_word]]
+stage = 6
+name = "pyr_kernel_voice_e2"
+addr = 0x003CC8
+old_hex = "0202"
+new_hex = "02a2"
+only_variant_slot = true
+note = "14z-96 #101: kernel voice table .2, row 0x11 — vs2's 0x2a2, the deliberate-silence row"
+
+[[code_word]]
+stage = 6
+name = "pyr_kernel_voice_e3"
+addr = 0x003D32
+old_hex = "0203"
+new_hex = "0342"
+only_variant_slot = true
+note = "14z-96 #101: kernel voice table .3, row 0x11 — vs2 0x723 via authored pair 0x342/0x642"
+
 [[data_port]]
 stage = 6
 name = "voice_borrow_candidates_a"

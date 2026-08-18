@@ -1196,8 +1196,27 @@ reading. A tenant class therefore fires the row-copy alias — the
 LEGACY character's voice (class 0x10 → row 0x00 = Bulleta) — which is
 the merged-m2 "grunt after the electrocution, every other time"
 defect. The M5 voice batch never touched this family: it ported the
-0x0BF41A per-node RECORD arrays; these kernel tables are a separate
-consumer that no manifest row names.
+0x0BF41A per-node RECORD arrays; these kernel tables were a separate
+consumer no manifest row named until the 14z-96 port (GitHub #101, the
+`*_kernel_voice_e*` rows + the qs_voice_map "kernel voice pairs" table).
+
+Three more measured facts about the family (14z-96):
+- **The dispatch calls the REAL helper `0x4CE2`** (`bsr` at each event
+  site), so the `+0x300` facing alias applies on this path — the
+  batch's alias-skip thunk covers only unstubbed call sites. Native
+  accordingly backs every newcomer kernel voice with a `+0x300` twin
+  song (`0x700→0xA00` etc.); the port mirrors that with authored
+  (base, alias) pairs.
+- **The firing PATTERN is engine-side and victim-data-fed**: each event
+  site gates on `btst #0,d0` before the table read, and the phase
+  differs across victims and across the two games (vsavj fires a
+  Donovan victim's .2 event at attempts 2+4 of 5 where native vs2
+  fires none; ours-Phobos fires attempt 2 only where native-Phobos
+  fires 2+4). Measured identical PRE- and POST-port on our side —
+  the port changes voice IDENTITY only, at the exact same frames.
+- **Silence can be the authored sound**: vs2 voices Phobos' hurt
+  events with `0x2a1/0x2a2` — free Z80 id rows (null songs), with
+  free `+0x300` aliases (`0x5a1/0x5a2`), in BOTH games' tables.
 
 ## The sprite-list DRAWER: how an object becomes sprite entries
 ## (measured 14z-71 on the Huitzil beam; the layer ABOVE the OBJ entry)
