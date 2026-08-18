@@ -78,10 +78,11 @@ m2a_legacy_gate() {
 #   flicker  03/10/16: isolated <=2-frame divergent stretches that fully
 #            re-converge (tools/compare_flicker.py, ground-truthed) — the
 #            input-accept/spawn boundary phase artifact
-#   diverge  06_test_mode: first divergence exactly at the TS press (700);
-#            service-mode code reads the phase-shifted QSound latch and the
-#            offset propagates (persistent, benign, hook-caused — stage-3
-#            hook-free builds run 06 bit-identical)
+#   exact    06_test_mode: bit-identical since 14z-91 (GitHub #96). It used
+#            to diverge at the TS press (700) — service-mode code read the
+#            phase-shifted QSound latch and the offset propagated — but that
+#            was HOOK-CAUSED, and 14z-91 deleted the hooks responsible. See
+#            M2A_TESTMODE_DIVERGE below for the corroboration.
 # Hook-free builds keep m2a_legacy_gate (unmasked) above.
 # THE V1 MASK, AND IT IS A SECOND COPY OF ONE (14z-94, GitHub #70).
 # run_suite.sh carries the same string as its built-in default for sets that
@@ -127,7 +128,32 @@ M2A_MASKED_FLICKER="03_two_player_vs 10_midattract_start 16_xemu_2p 04_select_fu
 # the gate when it was rebuilt): pure flicker class — isolated single-frame
 # re-converging divergences (04@1525/2009/2195, 08@3507, 09@829), no
 # persistent hover divergence.
-M2A_TESTMODE_DIVERGE=700                       # 06: the TS-press frame
+# 06_test_mode's frozen masked first-divergence. WAS 700 UNTIL 14z-95
+# (GitHub #96), and the change is a RATIFIED TRANSITION, not a stale number
+# quietly re-frozen.
+#
+# The header above already predicted it: "hook-caused — stage-3 hook-free
+# builds run 06 bit-identical". 14z-91's legacy-regression fix DELETED the two
+# fixture_row0f_override site_thunks (which legacy executed at every venue
+# load) and left the obj_hook dispatch sites vanilla, so the cycles that
+# phase-shifted the QSound latch are gone and this replay is bit-identical.
+#
+# THE ISSUE'S SECOND READING — "something that should be live is now inert" —
+# IS ELIMINATED BY CORROBORATION, not by assertion. The same transition was
+# measured independently into FOUR expectation sets at that generation, by
+# commit 271838e ("the corpus re-measured and re-frozen — 139 specs, ZERO
+# not-expressible, and the specs got STRICTER"):
+#     donovan-m2/m2b/m2c/m5/m5w, huitzil-m13, pyron-m7 -> diverge ... 700
+#     donovan-m7, huitzil-m16, pyron-m10, merged1      -> exact
+# This helper missed that re-freeze because it holds the fact as a CONSTANT
+# rather than as an expectation file — the "second copy of one fact" class,
+# exactly like the mask string two blocks below (GitHub #70).
+#
+# NOTE THE DIRECTION: `none` is STRICTER than a frozen divergence frame, so
+# this cannot hide a regression. A build that re-introduces the divergence now
+# FAILS, which is the property that made re-freezing safe here and would not
+# have been true the other way round.
+M2A_TESTMODE_DIVERGE=none                      # 06: bit-identical since 14z-91
 M2A_PICK_DIVERGE_MASKED=1080                   # select-screen anim hover
 
 # m2a_run_masked <rompath> <replay.rpl> <out.log> <sandbox>
@@ -235,7 +261,16 @@ PY
         "$_mg_w/06_test_mode.log" "$_mg_w/06box"
     _mg_div=$(m2a_first_divergence "$_mg_exp/logs/06_test_mode.log" \
         "$_mg_w/06_test_mode.log")
-    if [ "$_mg_div" = "$M2A_TESTMODE_DIVERGE" ]; then
+    if [ "$M2A_TESTMODE_DIVERGE" = none ]; then
+        if [ "$_mg_div" = NONE ]; then
+            echo "  ok: 06_test_mode masked bit-identical (hook-free since 14z-91)"
+        else
+            echo "FAIL: 06_test_mode masked diverges at $_mg_div — it has been"
+            echo "      bit-identical since 14z-91, so this is a REGRESSION:"
+            echo "      something re-introduced legacy-visible hook cycles."
+            gate_fail=1
+        fi
+    elif [ "$_mg_div" = "$M2A_TESTMODE_DIVERGE" ]; then
         echo "  ok: 06_test_mode masked first-divergence exactly $M2A_TESTMODE_DIVERGE (TS press; latch-phase propagation)"
     else
         echo "FAIL: 06_test_mode masked first-divergence $_mg_div (expected $M2A_TESTMODE_DIVERGE)"; gate_fail=1

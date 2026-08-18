@@ -19,6 +19,55 @@ reproduction protocol"* for the **#99 crash** — both are explicitly
 14z-94 close named #99 as the start point, and a future session reading only
 that would walk straight into work the maintainer has taken back.
 
+### #96 — the named symptom is FIXED by corroboration; TWO further failures
+### in the same gate are now separated, and one needs root-causing
+
+**06_test_mode: fixed, and it was a RATIFIED TRANSITION rather than a stale
+number.** `m2a_common.sh`'s own header predicted it — "hook-caused —
+stage-3 hook-free builds run 06 bit-identical" — and 14z-91's
+legacy-regression fix deleted the two `fixture_row0f_override` site_thunks
+(which legacy ran at every venue load) and left the obj_hook dispatch sites
+vanilla. The cycles that phase-shifted the QSound latch are gone.
+
+The issue's second reading — "something that should be live is now inert" —
+is eliminated by CORROBORATION, not assertion. The same transition was
+measured independently into FOUR expectation sets at that generation, by
+commit `271838e` ("the corpus re-measured and re-frozen — 139 specs, ZERO
+not-expressible, and the specs got STRICTER"):
+
+| generation | 06_test_mode |
+|---|---|
+| donovan-m2/m2b/m2c/m5/m5w, huitzil-m13, pyron-m7 | `diverge … 700` |
+| donovan-m7, huitzil-m16, pyron-m10, merged1 | **`exact`** |
+
+This helper missed that re-freeze because it holds the fact as a CONSTANT
+rather than an expectation file — the "second copy of one fact" class, the
+same shape GitHub #70 records about the mask string a few lines below it.
+**Direction matters:** `none` is STRICTER than a frozen divergence frame, so
+the change cannot hide a regression — a build re-introducing the divergence
+now FAILS with that named.
+
+**THE GATE IS STILL RED, on two failures that are NOT #96's symptom and were
+already red at the session-start commit (measured 14z-94).** Separated here so
+they stop being one blob:
+
+- **`08_challenger_join`** — measured `2/6920 frames differ in 2 runs, 3507
+  and 3807, then 3113 identical`, which `describe_masked_shape` proposes as
+  `flicker 2 3507,3807`. That is *donovan-m2b's* frozen shape; the gate pins
+  `M2A_FLICKER_SPECS=tests/expected/donovan-m2c`, whose spec is `1 3507`. So
+  this is a GENERATION MISMATCH — the gate builds a CURRENT stage-4 image and
+  judges it against m2c-generation specs — not a growth. It is the same
+  targeting tension GitHub #70 records about the mask pin.
+- **`04_select_fuzz`** — measured `1512/3520 frames differ in ONE run, first
+  at 2009, running to the END, then 0 identical`. The project's own describer
+  REFUSES it: *"does not re-converge (>=60 identical tail required); this is
+  not expressible in the ratified vocabulary and must be root-caused"*. That
+  is the one shape §4 has no class for, and re-freezing it is exactly what the
+  standing watch forbids. **NOT absorbed, and flagged as the item worth a
+  session.**
+
+Both remain on #96, which stays OPEN with the three items now distinguished.
+
 ### #98 CLOSED — and it was never a sound defect. The COMPARISON was invalid
 
 `audit_pyron_ring` reported, after 14z-94 re-pointed its rotted defaults:
