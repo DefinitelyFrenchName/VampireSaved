@@ -37,6 +37,7 @@ test_baseset_mask_invariant
 test_basis_publish_atomic
 test_battery_accounting
 test_build_gate_status
+test_build_identity_distinct
 test_build_ref_rot
 test_classify_hitclass_probe
 test_classify_pool_spawns

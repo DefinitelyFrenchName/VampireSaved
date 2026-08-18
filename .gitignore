@@ -78,3 +78,10 @@ vsw.*
 /fbneo/
 /mame/
 /.claude/worktrees/
+
+# Harness output dropped at the repo root when CHECKSUM_OUT is unset
+# (tests/lua/replay.lua:50, replay_guard.lua:51 default to this name). It is
+# a run artifact, not source — untracked and unignored it sat as permanent
+# `??` noise, which is the same disease as GitHub #97: a test run should not
+# leave the tree looking dirty, or people learn to scroll past git status.
+replay_checksums.txt

@@ -1,5 +1,79 @@
 # patch_notes — per-change detail: every byte, and why
 
+## 14z-94 — the arcade-ladder stage retarget (#92), and one manifest bound
+## re-measured (#87): byte detail
+
+**Recorded late, and that is the finding.** CLAUDE.md §5 requires this page
+and `patch_index.md` to be updated "in the same commit as any patch change".
+Neither `891b36c` (the #92 fix) nor `b1a9522` (the #87 bound) touched either
+page; the session-close audit caught it. The detail below is reconstructed
+from the manifests and the registry rows, both of which carried it.
+
+### A. Eight arcade-ladder STAGE bytes, `0x18` -> `0x0a` — SHIPPED BYTES
+
+`build/manifest/huitzil.toml` and `build/manifest/pyron.toml`, in the
+`voice_borrow_voicenums_b` data_port rows:
+
+```
+fixes = "0x01:18:0a,0x1a:18:0a,0x29:18:0a,0x31:18:0a"
+```
+
+Four offsets per tenant, into that tenant's **table-B** row at
+`PRG:0x00BB68 + class*0x40` (huitzil class `0x10`, pyron `0x11`). Eight bytes
+total, all authored by this project — no vanilla byte moves.
+
+**Why they were wrong.** Table B holds the STAGE for each candidate in the
+paired table-A row. `0x18` is vs2's THIRTEENTH stage, REVENGER'S ROOST;
+vsavj ships twelve. Selecting it indexed the banner pointer family past its
+last row and dereferenced that table's own `0x00400000` terminator as data —
+`vec3`. All eight sit opposite candidate class `0x13`, i.e. they are exactly
+the ladder entries that schedule the **Donovan** match.
+
+**Why `0x0a`.** ABARAYA, maintainer-ruled 2026-08-17 ("any stage except Fetus
+of God, least impact"), on three measured grounds: already reachable at a
+scanned index in all four affected groups; not another character's venue in
+these ladders (`0x14` is Pyron's, `0x16` Jedah's); and the shortest banner
+record in the family at 7 glyph sprites.
+
+**Verified against LIVE crashes on the predecessors**, not against a theory:
+huitzil-m15 CRASH 18337 (`vec4 PC 0fb6e0`), pyron-m9 CRASH 15079
+(`vec3 PC 01afb6`), merged-m1 CRASH 8887 — all three successors END 40620 on
+the 40,620-frame arcade marathon with the tenant forced.
+
+**FIELD-CONFIRMED 2026-08-18**: the maintainer's playtest met Donovan on
+Bishamon's stage, and `tools/decode_stage_banners.py` decodes `v=0x0a` to
+ABARAYA. The retarget landed exactly as designed.
+
+**Gates:** `test_voice_row_range.sh` (both table halves; its default now
+points at the SHIPPING builds, with the pre-fix pair kept as the
+ground-truth control), `test_decode_stage_banners.sh`.
+
+### B. `gfx_layout3.toml` huitzil `scatter_hi` `0x06D8` -> `0x0AF5` — NO
+### SHIPPED BYTE MOVES
+
+Not a patch row: a layout-table bound that had never been consumed. When
+`build_gfx_donovan.py` started asserting it (#87), huitzil's row failed —
+246 placed codes outside the declared range.
+
+**Measured on build/hui43**: his out-of-band inventory is 270 codes in TWO
+parts — 24 singleton shared-effect tiles ending at exactly `0x06D8` (which is
+why the old bound looked right), plus ONE contiguous run `0x0A00-0x0AF5`
+(246 codes) ending at `band_lo - 1`, i.e. adjacent to the band rather than
+scattered. The run arrived after the row was written and nothing could
+notice. Bound RE-MEASURED, not widened to fit. Pyron's bounds were already
+correct; only his count comment was stale (51 -> 54, all singletons).
+
+**The safety argument is untouched and proved elsewhere**:
+`test_gfx_layout3.sh` asserts every H/P native code stays below Donovan's
+`SAFE_LO` (`0xA42C`), and `0x0AF5` is far below it. A scatter bound documents
+what IS placed, not what is SAFE.
+
+**Output-inert, proven twice**: both delta-0 tenants rebuilt against HEAD with
+identical arguments (10/10 files byte-identical each), and
+`test_m3a_reproducible` passes — all five frozen references rebuild bit-exact,
+including huitzil's and pyron's 42-member whole-artifact manifests.
+
+
 ## 14z-91 — THE LEGACY REGRESSION FIX (m5/m13/m7 -> m7/m15/m9): byte detail
 
 Three changes, one re-freeze. All three were measured causes of the open

@@ -57,6 +57,43 @@ a mechanism with #99; unmeasured either way.
 not", same subsystem. Worth checking against vs2 natively before treating the
 ear report as a third finding.
 
+**SESSION CLOSE — 14z-94, the ledger.** MEASURED, not counted from memory —
+my first draft of this paragraph said "15 closed, 7 filed" and both were
+wrong. **42 issues closed** since the session opened (#10 #18 #19 #20 #22 #24
+#25 #28 #29 #30 #31 #38 #42 #46 #51 #57 #59 #60 #61 #62 #66 #67 #68 #69 #70
+#71 #76 #77 #79 #80 #81 #82 #83 #85 #86 #87 #88 #89 #91 #92 #94 #95), **8
+filed** (#93 #94 #95 #96 #97 #98 #99 #100 — #94 and #95 were filed and closed
+in the same session), **14 open**, and the merged-m2 playtest returned NO
+REGRESSION with one crash.
+
+**What this session was actually about, in one line:** almost none of the
+defects were wrong logic — they were CHECKS THAT STOPPED EXISTING under an
+ordinary condition (an env var, a wrong argument, a phantom CLI option, a
+stale marker, a literal constant, a rotted pointer), and in nearly every case
+the thing that should have caught it was disabled by the same stroke.
+
+**The three structural outcomes, which outlive the individual fixes:**
+
+1. **One pre-commit command.** `tests/run_all_static.sh` — 86 gates, PASS 86 /
+   SKIP 0 / FAIL 0, with skips counted separately (a SKIP is not a PASS) and a
+   registry-coverage check so the orphan population cannot regrow. Before it,
+   101 of 130 test scripts had no caller at all.
+2. **Reproducibility now covers what gets PLAYED.** The merged image joined
+   `test_m3a_reproducible` — program fingerprint AND all 42 members — so a
+   playtest bug report can be bisected against the exact artifact.
+3. **Stale expectations are the dominant failure mode in this suite.** SIX
+   gates were found asserting something a ratified decision had already made
+   false: `test_dualtrack` (twice over), `test_census_regions`,
+   `test_voice_row_range`, `test_phasec_spaces` (twice), and
+   `test_m3a_reproducible`'s own header. Every one was invisible because
+   nothing ran it.
+
+**The standing risk, stated plainly:** #99 is a crash the whole suite could
+not have caught, because tenant-vs-tenant — mandated by §4 — has no replay at
+all. That gap is now the most valuable single thing to close.
+
+---
+
 ## Session 14z-94 (10) — EIGHT issues cleared while the maintainer
 ## playtests: #69, #94, #71, #46, #24, #29, #57, plus the merged
 ## reproducibility gap — and #96 root-caused, #97 half-fixed. Most turned out

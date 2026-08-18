@@ -951,3 +951,49 @@ lands in the snapshot directory, not where you ran from.
 Ground-truth it before reading anything off a recording
 (`tests/test_record_window.sh`): a recorder that drops, duplicates or
 blanks frames still produces a file that plays.
+
+---
+
+## 14z-94: TWO BUILDS CAN SHARE A PROGRAM FINGERPRINT — the merged build and
+## its legacy-only instrument do, deliberately
+
+The maintainer asked to confirm which merged build to playtest, fearing they
+had tested the wrong one. They were right to ask, and the fingerprint would
+NOT have settled it:
+
+```
+build/m3b_merged9   program fingerprint 081e2e53...   <- the playtest build
+build/merged1       program fingerprint 081e2e53...   <- the legacy instrument
+```
+
+Identical, and the repo says why: *"the merged build is frozen by TAG +
+HANDOFF row and deliberately gets NO registry.tsv row, because the
+legacy-only instrument shares its fingerprint"* (14z-92, d716e49).
+
+**Three ways this bites:**
+
+1. `merged1` is **NEWER by 8 minutes**, so "the most recent merged build"
+   picks the wrong one.
+2. `build_fingerprint.py` covers only the PROGRAM members — 12 of 21,
+   8.1% of the shipped bytes — so it cannot see the difference at all.
+3. There is **no in-game version string** to A/B by (HANDOFF says so
+   explicitly; the CLAUDE.md §5 convention has never been implemented —
+   open item since 14z-92).
+
+**What actually distinguishes them**, and what to check instead:
+
+| | m3b_merged9 | merged1 |
+|---|---|---|
+| zips in rompath | **2** (`vsavjw` + patched `vsav`) | 1 (`vsavjw` only) |
+| whole-artifact manifest | `904d432f`, 42 members | `d7a5145c`, 21 members |
+| `vsw.31m/33m/35m/37m` | tenant graphics | **zero-filled** |
+| `vsw.21m` | packed QSound samples | **zero-filled** |
+| `vsw.z01/z02` | M5-song driver | stock Z80 driver |
+
+So `merged1` is playable and shows all 18 characters — the program image is
+identical — but the tenants render **blank/garbled with no ported voices**.
+
+**Use `tools/artifact_manifest.py` (whole artifact), not
+`build_fingerprint.py` (program only), whenever the question is "which build
+is this?"** The program fingerprint answers "which code", which is a
+different question and, for these two, has the same answer.

@@ -2378,3 +2378,85 @@ Two rules out of it, and the second is the general one:
 Worth knowing when triaging: the crash had been invisible because the gate
 that runs this probe was itself building the wrong tenant (#84), so the
 probe's own defect and the crash it was hiding surfaced in the same run.
+
+---
+
+## 14z-94: five shell/tooling traps, each paid for in this session
+
+Grouped because they share a shape: **a construct that fails SILENTLY and
+leaves a plausible result behind.** None produced an error message.
+
+### 1. Backticks inside a double-quoted shell string are command substitution
+
+Paid for TWICE in one session. Writing a gate's help text:
+
+```sh
+fail "      Add the `if not __debug__: raise SystemExit(...)` guard"
+```
+
+the shell ran `if not __debug__: raise SystemExit(...)` as a command. The
+second time was a `gh issue create --body "...`single credit, P1 Donovan`..."`,
+which died with `command not found: P1`.
+
+**Rule: never put backticks in a double-quoted shell string.** Use single
+quotes for the string, or `'...'` around the code sample, or — for anything
+long — write the body to a file and pass `--body-file`. The file route also
+sidesteps `$`, `!` and newline quoting in one move.
+
+### 2. `VAR=value funcname` PERSISTS after a shell function returns
+
+For an external command, `VAR=x cmd` scopes the assignment to that command.
+For a **shell function**, POSIX keeps it set afterwards. A test harness did:
+
+```sh
+STUB_FAIL=r3 freeze ...      # section 1
+STUB_NONDET=r2 freeze ...    # section 3
+... freeze ...               # section 6: STILL has STUB_NONDET=r2
+```
+
+so every section's failure injection leaked into the next, and the
+clean-run control ran with a stale injection. **Set the variables explicitly
+and clear them in the function**, or pass them as arguments.
+
+Caught by the control that existed precisely to catch a vacuous pass — which
+is the argument for writing that control every time.
+
+### 3. `grep -vxF "$multiline_string"` matches EVERYTHING if any line is blank
+
+Used to compute "lines in AFTER that are not in BEFORE":
+
+```sh
+printf '%s\n' "$after" | grep -vxF "$before"
+```
+
+`-F` treats the string as a *list* of patterns, one per line, and a blank
+line is a pattern that matches every input line. The filter therefore removed
+all output and printed an EMPTY diff under a heading that said the tree had
+been dirtied — an accusation with no evidence attached.
+
+**Diff via files** (`diff a.txt b.txt`), and print the counts either side so
+an empty diff cannot masquerade as a mystery.
+
+### 4. `git tag -l "pattern" | tail -N` sorts LEXICALLY
+
+`git tag -l "freeze/*" | tail -6` showed `pyron-m3 … pyron-m8` and I concluded
+three freeze tags were missing and that HANDOFF was asserting tags that did
+not exist. They existed. Lexical order puts `pyron-m8` after `merged-m2` and
+after `huitzil-m16`.
+
+**Ask about the tag you mean** (`git rev-parse -q --verify refs/tags/<tag>`),
+never `| tail`. Same family as the long-standing "pipe hides the exit status"
+entry: `tail` answers a different question than the one asked.
+
+### 5. MAME samples the input ports BEFORE `frame_done`
+
+A Lua `set_value` cannot make frame 1's own port read dirty — measured twice
+(at script load, and at the top of frame 1); both land at **frame 2**. This
+is why the input-integrity guard's frame-1 branch (GitHub #57) has no
+in-emulator positive control, and why the control built for it was REMOVED
+rather than kept: a control that implies coverage it does not have is worse
+than an honest structural assertion.
+
+The real scenario it guards — a host key physically held before the run — IS
+in that read, because MAME samples host input ahead of the frame. Reachable
+in the field, not from the harness.

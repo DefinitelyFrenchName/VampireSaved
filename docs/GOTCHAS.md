@@ -229,3 +229,12 @@ is a GAME gotcha if it is true of the game regardless of the port.
 - `tests/lua/replay.lua` has NO frame cap. `FRAMES` is honoured by `snapshot_frames.lua` and `record_window.lua` and is not a replay.lua variable at all — replay.lua runs to the script's last line plus `TAIL_FRAMES`. Pointing it at `26_don_arcade_mash` therefore runs all 40,620 frames whatever you set; truncate the .rpl instead. Cost: a gate that looked hung (14z-94) [project]
 - MAME's `-aviwrite` DOES work headless (the bitmap is internal — same reason `snapshot_frames.lua` and `VIDEO_OUT` work), but it writes UNCOMPRESSED video for the WHOLE run: measured **5.7 GB in two minutes of wall time** at CPS-2 resolution, and it will fill a disk on a long rig. Record a named window from Lua instead (`video:begin_recording(file, "mng")` / `end_recording()`, `tests/lua/record_window.lua`) — 2.4 MB for 120 frames. MNG is losslessly compressed; `avi` is only for tools that will not read MNG (14z-94) [platform]
 - A SAME-LENGTH source edit can leave Python running STALE BYTECODE, and the symptom is "my fix did nothing". CPython keys `__pycache__` on the source's (mtime, size); flipping `end - 2` to `end - 4` changes neither the size nor, within the same second, the mtime — so a verdict control that perturbs a constant and re-runs can measure the PRE-EDIT code, and the restore afterwards is equally invisible. Observed 14z-94 while ground-truthing #51: the same source read `end - 2` while the loaded function behaved like `end - 4`, for three consecutive runs, and cleared only when a probe edit changed the file's LENGTH. `PYTHONDONTWRITEBYTECODE=1` does not help — it stops writing, not reading. Use `python3 -B`, delete `__pycache__`, or make control edits that change the byte count (14z-94) [project]
+- **14z-94, project:** five shell/tooling traps that all fail SILENTLY —
+  backticks inside a double-quoted string are command substitution;
+  `VAR=val funcname` PERSISTS for shell functions; `grep -vxF` with a
+  multi-line pattern matches everything if any line is blank; `git tag -l |
+  tail` sorts lexically; MAME samples input ports BEFORE `frame_done`.
+- **14z-94, platform:** TWO BUILDS CAN SHARE A PROGRAM FINGERPRINT — the
+  merged build and its legacy-only instrument do, by design. Use
+  `artifact_manifest.py` (whole artifact), not `build_fingerprint.py`
+  (program only, 8.1% of the bytes), to answer "which build is this?"
