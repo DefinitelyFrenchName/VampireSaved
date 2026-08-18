@@ -19,6 +19,48 @@ reproduction protocol"* for the **#99 crash** — both are explicitly
 14z-94 close named #99 as the start point, and a future session reading only
 that would walk straight into work the maintainer has taken back.
 
+### #93 — TWO INSTRUMENT FINDINGS BEFORE THE AUDIT EVEN RAN, and the
+### issue's own first step is malformed
+
+Not yet resolved (the audit needs a build carrying a voice ledger, and
+merged-m2 predates that builder — a probe build is running). But reading the
+checker produced two things the ticket needs regardless.
+
+**1. `13` IS A QSOUND CHANNEL, NOT A SOUND ID.** The issue records the failing
+signature as *"`(13, 20481)` = `0x0D`, `0x5001` — a native signature our leg
+does not produce"* and proposes, as the first step, *"run the sweep for id
+`0x0D` alone on both legs"*. But `check_qs_voice_batch.keyons()` computes
+`v = reg >> 3` with `reg < 0x80`, so **`v` is the hardware channel 0-15**.
+There is no id `0x0D` in that tuple, and that first step cannot be executed as
+written. Signature = `(channel, inclusive length, content hash)`.
+
+**2. THE CHECKER IS ONE-SIDED, and that is a live hypothesis for the whole
+failure.** For OURS-only signatures it has a content-based escape — if the
+blob exists in vs2's image it is a "suppressed-track echo" and forgiven. For
+NATIVE-only signatures there is **no such escape**: `missing = [s for s in cn
+if s not in co]`, full stop. Since the signature includes the CHANNEL, our
+build playing the same sample content on a DIFFERENT channel lands in
+`missing` with no content check to rescue it.
+That matters because 14z-86 already measured the facing-alias thunk
+(`@0x5FFF00`, voice ids skipping `+0x300`) as **"channel-allocation-only"**.
+So #93 may be a channel-allocation difference reported as a missing sound —
+**structurally identical to what #98 turned out to be this session** (the
+comparison was invalid, not the build). Unproven: confirming it means checking
+whether the missing signature's CONTENT appears on our leg under another
+channel, which needs the audit to run.
+
+**3. A PHANTOM SWITCH, fixed.** `tools/qs_ledger.py`'s no-ledger refusal ended
+with *"to audit a pre-existing build with ids that are NOT bound to it, say so
+explicitly: `QS_LEDGER_UNBOUND=1`"* — and that branch raises
+**unconditionally**; `unbound` is only consulted for a ledger that EXISTS but
+carries no fingerprint. The honest reading is that the CODE is right and the
+MESSAGE was wrong: with no ledger file there are no ids to accept, so
+honouring the override would mean deriving them from `build/wide0`, which is
+the exact substitution #89 exists to prevent. Fixed as text.
+**Note what it is an instance of:** an error message naming a switch the code
+ignores is the #89 shape itself — the phantom `--dry-run` — recurring inside
+the tool #89 produced.
+
 ### THE #99 PROBE IS NOW AN INSTRUMENT — and section 2 locks a hypothesis
 ### that DIED, which is the part worth keeping
 

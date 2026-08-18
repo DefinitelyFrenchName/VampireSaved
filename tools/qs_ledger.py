@@ -75,10 +75,19 @@ def resolve(zpath, ledger_path=None):
             f"  from build/wide0 instead would sweep today's ids against this\n"
             f"  artifact and report the result as a verdict on it (GitHub #89).\n"
             f"\n"
-            f"  Rebuild so the ledger is emitted alongside the romset — it is\n"
-            f"  written by default now — or, to audit a pre-existing build with\n"
-            f"  ids that are NOT bound to it, say so explicitly:\n"
-            f"      QS_LEDGER_UNBOUND=1 <the audit command>")
+            f"  Rebuild so the ledger is emitted alongside the romset — it\n"
+            f"  is written by default now. THAT IS THE ONLY ROUTE for a build\n"
+            f"  with no ledger at all.\n"
+            f"\n"
+            f"  QS_LEDGER_UNBOUND=1 DOES NOT HELP HERE, and this message used\n"
+            f"  to offer it (corrected 14z-95). With no ledger file there are\n"
+            f"  no ids to accept — honouring the override would mean deriving\n"
+            f"  them from build/wide0, which is the exact substitution #89\n"
+            f"  exists to prevent. The override applies only to a ledger that\n"
+            f"  EXISTS but predates the artifact fingerprint.\n"
+            f"  (An error message naming a switch the code ignores is the #89\n"
+            f"  shape itself — a phantom --dry-run — so it is fixed as text,\n"
+            f"  not by making the switch work.)")
 
     with open(ledger_path) as f:
         led = json.load(f)
