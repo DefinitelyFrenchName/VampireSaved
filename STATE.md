@@ -19,6 +19,55 @@ reproduction protocol"* for the **#99 crash** — both are explicitly
 14z-94 close named #99 as the start point, and a future session reading only
 that would walk straight into work the maintainer has taken back.
 
+### #96's ESCALATED ITEM IS DE-ESCALATED BY MEASUREMENT: `04_select_fuzz`
+### is a BUILD-STAGE mismatch, and both remaining items share one root cause
+
+The 14z-95 handoff flagged `04_select_fuzz` as the item that "could be hiding
+something" — 1512 of 3520 frames diverging in ONE run from 2009 to the end,
+which `describe_masked_shape` refuses as "not expressible in the ratified
+vocabulary and must be root-caused". Root-caused, in four steps:
+
+**1. NOT the mask.** The gate uses the V1 mask
+(`043c-043d,4182-41a2,7f00-8000`) while the shipping sets use V2, which adds
+the palette-staging windows `41c2-41e2` and `4222-4262`. Since the select
+screen is where palette staging happens, that looked decisive. Re-run under
+V2 against the masked-v2 basis: **identical shape**. Hypothesis dead.
+
+**2. Not the roster track, and not a shipping defect.** Same replay, same V2
+basis, on the frozen builds:
+
+| build | shape |
+|---|---|
+| the gate's **stage-4** build | 1512 frames, ONE run, never re-converges |
+| **`m5_stock2`** (stock, stage 6) | `flicker 2 1525,2009` — clean |
+| **`don_m7`** (WIDE, stage 6) | `composite 2009 889-1104` — exactly its shipping spec |
+
+So every shipping artifact is fine. The divergence belongs to the BUILD the
+gate makes, not to the port.
+
+**3. It is the STAGE, and the boundary is 5→6.** Stage 5 ("select plumbing")
+still shows the permanent divergence; stage 6 is clean. Attribution at the
+byte level supports it: at f2200 there are 134 unmasked differing bytes spread
+across live work RAM (a regular 8-stride family at `$FF5DF9-$FF5EC9` plus
+`$FF06C5`, `$FF06D1`, `$FF1E79`, `$FF1EA7` and ~112 more), and NO match has
+formed — both legs read character class 00 and hitbox base `0x00091f98`. It is
+the SELECT SCREEN in a half-ported state, which is what an incomplete stage
+is.
+
+**4. AND IT EXPLAINS THE OTHER ITEM TOO.** `tests/lib/m2a_common.sh` is
+sourced by BOTH `test_m2a_stage4_code.sh` (builds **stage 4**) and
+`test_m2b_stage6.sh` (builds **stage 6**), and they share ONE expectation set
+— `M2A_FLICKER_SPECS=tests/expected/donovan-m2c`, which is a stage-6,
+pre-M3a generation. So the stage-4 caller inherits stage-6 expectations. That
+is the same mechanism as the `08_challenger_join` "growth", which measures as
+donovan-m2b's shape against m2c's spec.
+
+**So #96's three items reduce to ONE question, and it is the one already put
+to the maintainer:** what generation — and now also what STAGE — does this
+battery target? Nothing here is a defect in a shipping build; the gate applies
+one set of constants across two stages and two generations. **Nothing
+re-frozen**, because the answer changes which constants are even correct.
+
 ### A GATE I WROTE THIS SESSION DISARMED ITSELF ON COMMIT — caught only
 ### because the runner counts SKIP separately
 
