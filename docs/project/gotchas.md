@@ -2091,7 +2091,11 @@ The 14z-65 silencing sweep classed every vs2 sound-farm stub playing a
 0x7xx id as "newcomer voice-bank range, keep silent pending M5" — a
 NUMBER-based rule. For 0x73A (the trap detonation chirp) it was wrong:
 the sample bytes are byte-identical in vsav's own QSound image at the
-same address (0x6C0000), keyed there as the 0x198/0x199 family — the
+same address (0x6C0000), keyed there as the 0x198/0x199 family
+[CORRECTED 14z-95, GitHub #93: for 20,480 of 20,481 bytes — the
+INCLUSIVE endpoint 0x6C5000, the played byte, differs: vsav 0xFF,
+vsav2 0x00; the gotcha's lesson stands, but "identical" claims must
+include the inclusive endpoint] — the
 maintainer could HEAR the sound existed in the build while the docs
 said it needed a sample port. Cost: the item shipped through two
 closure attempts (14z-84 "proximity not-a-bug", 14z-85g first reading

@@ -41,10 +41,12 @@ note = "H KEPT SILENT (14z-65): sfx id 0x74f — newcomer voice-bank range (0x7x
 
 # 14z-85g RESTORED (the trap timer-detonation chirp — maintainer field
 # report "the sound IS in the build" proven right): vs2 stub 0x4F2E
-# plays id 0x73A, whose SAMPLE CONTENT is byte-identical in both
-# games' QSound images at the same address (0x6C0000, bank 108,
-# 0-20480, pitch 12548) — vsavj keys it as the 0x198/0x199 family
-# (0x499 alias). The 14z-65 blanket "0x7xx = voice bank, silence"
+# plays id 0x73A. CORRECTED 14z-95 (GitHub #93): its sample content
+# is byte-identical in both games' QSound images (0x6C0000, bank 108,
+# 0-20480, pitch 12548) for 20,480 of 20,481 bytes — the INCLUSIVE
+# endpoint 0x6C5000, the byte packing law #3 says is PLAYED, differs
+# (vsav 0xFF, vsav2 0x00; the two games' ORIGINAL sample ROMs).
+# vsavj keys the span as the 0x198/0x199 family (0x499 alias). The 14z-65 blanket "0x7xx = voice bank, silence"
 # call was wrong for THIS id (content measured 14z-85g). kind
 # sound_stub synthesizes the vsavj twin stub playing 0x199 (base id;
 # the helper's own (0x70,a6) flag aliases to 0x499 — both key the

@@ -4254,7 +4254,9 @@ curation, restoration = M5" — was HALF wrong, and the maintainer's
 correction drove the second measurement: 0x73A's SAMPLE CONTENT is
 byte-identical in vsav's own QSound image (0x6C0000, bank 108,
 0-20480, pitch 12548), keyed natively as vsavj 0x198/0x199 (+0x300
-alias 0x499). And the detonation is NOT a record dispatch at all —
+alias 0x499). [CORRECTED 14z-95, GitHub #93: identical for 20,480 of
+20,481 bytes — the INCLUSIVE endpoint 0x6C5000, the played byte per
+packing law #3, differs: vsav 0xFF, vsav2 0x00.] And the detonation is NOT a record dispatch at all —
 bp-attributed to **sound-farm stub vs2 0x4F2E** (`move.l #$73A,d1`
 farm around 0x4EE0-0x4F60), jsr'd from the mine handler x068458+0x120,
 which the 14z-65 blanket "0x7xx = voice bank" policy had silenced to

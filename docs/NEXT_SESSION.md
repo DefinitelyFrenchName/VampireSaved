@@ -3,12 +3,15 @@
 > ## **THE SUITE IS GREEN: `ROMDIR=... tests/run_all_static.sh` -> PASS 90 /
 > ## SKIP 0 / FAIL 0.** Nine issues open, down from fourteen.
 > ##
-> ## **TWO STANDING HOLDS — do not start either:**
+> ## **ONE STANDING HOLD — do not start it:**
 > ## **#99** is PARKED (maintainer): blocked on a RIG, not on ideas. The full
 > ## measured state is on the issue; do not re-derive it.
-> ## **The Phobos sfx** is awaiting the maintainer's own VIDEO — my capture
-> ## does NOT match what they heard, confirmed 2026-08-18, so the two extra
-> ## voices I measured (`0x8e`/`0x91`, pre-match) are NOT the defect.
+> ## **The Phobos sfx hold is LIFTED (2026-08-18):** the maintainer delivered
+> ## the A/B videos to `../Videos/grunt/` — VS2 vs merged-m2, Victor's
+> ## charged 5HP electrocuting Phobos, a grunt after the electrocution
+> ## EVERY OTHER time on ours only. Analysis in progress (14z-96). The two
+> ## extra voices measured earlier (`0x8e`/`0x91`, pre-match) remain NOT
+> ## the defect (confirmed 2026-08-18).
 > ##
 > ## **FOUR THINGS WAIT ON A MAINTAINER RULING** (nothing else is blocked):
 > ## 1. **#96** — what GENERATION and STAGE does the m2a/m2b battery target?
@@ -20,14 +23,15 @@
 > ## 4. Should the remaining ~200 tracked build dirs stay in git? Step 4 of
 > ##    the cleanup was declined deliberately, not overlooked.
 > ##
-> ## **START HERE otherwise: #93** — `audit_qs_voice_batch`'s keyon failure,
-> ## the last unblocked open item with a live lead. Its missing native
-> ## signature is `(voice 13, length 20481)`, and 20481 = an inclusive span
-> ## of `0..20480` — a number that appears verbatim in `huitzil.toml:2108`
-> ## as the trap sample at bank 108, i.e. PHOBOS' sound family. If that
-> ## holds, #93 and the maintainer's sfx report are ONE investigation.
-> ## Unverified: the length alone could coincide; only the content hash
-> ## settles it, and that needs the audit run.
+> ## **START HERE otherwise: #93 — ROOT-CAUSED 14z-95** (the audit ran on
+> ## `build/qs93_probe`): same channel 13, same length 20481, DIFFERENT
+> ## content hash — ours plays different BYTES over the same span, i.e. a
+> ## WRONG sound. Localised to ONE byte: the INCLUSIVE endpoint `0x6C5000`
+> ## (vsav `0xFF`, vsav2 `0x00`; the games' ORIGINAL sample ROMs — nothing
+> ## we packed). Fourth instance of the packing-law-#3 endpoint class.
+> ## `huitzil.toml:2108`'s "byte-identical" adoption claim was wrong at
+> ## that byte — retraction pass done 14z-96. Whether this is ALSO the
+> ## maintainer's grunt report is being tested against their videos.
 
 ## What 14z-95 did
 

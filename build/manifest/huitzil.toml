@@ -2104,9 +2104,16 @@ new_hex = "06"
 note = "trap dome hit record 2: class 0x52 -> 0x06 (vs2-alias-proven)"
 
 # 14z-85g REMAP: record node 11 (id 0x73A) remapped to vsavj 0x199
-# instead of zeroed — measured content-equivalent (sample bytes
-# IDENTICAL in both games' QSound images at 0x6C0000, bank 108,
-# 0-20480, pitch 12548; vsavj keys them as the 0x198/0x199 family,
+# instead of zeroed. CORRECTED 14z-95 (GitHub #93): the adoption
+# claim "sample bytes IDENTICAL in both games' QSound images at
+# 0x6C0000, bank 108, 0-20480" holds for 20,480 of 20,481 bytes and
+# is WRONG at the INCLUSIVE endpoint — the byte packing law #3 says
+# is PLAYED: 0x6C5000 reads 0xFF in vsav, 0x00 in vsav2 (a
+# maximal-amplitude discontinuity at the sample's end, in the two
+# games' ORIGINAL sample ROMs, not anything we packed). Fourth
+# instance of the inclusive-endpoint class (#82/14z-87b). So the
+# remap is content-equivalent for all but the final played byte
+# (pitch 12548; vsavj keys the span as the 0x198/0x199 family,
 # already in the keep set). NOTE (measured same session): the trap's
 # TIMER DETONATION does NOT flow through this record — it is the
 # sound-farm stub vs2 0x4F2E jsr'd from the mine handler

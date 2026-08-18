@@ -12,7 +12,11 @@
 # OUR build (huitzil-m9+):
 #  - DETONATION RESTORED: 0x73A's sample content is byte-identical in
 #    both games' QSound images (0x6C0000, bank 108, 0-20480, pitch
-#    12548) — vsavj keys it as 0x199/0x499. The hui recon overlay's
+#    12548) FOR 20,480 OF 20,481 BYTES — CORRECTED 14z-95 (GitHub
+#    #93): the INCLUSIVE endpoint 0x6C5000, the byte packing law #3
+#    says is PLAYED, differs (vsav 0xFF, vsav2 0x00; the two games'
+#    original sample ROMs). vsavj keys it as 0x199/0x499. The hui
+#    recon overlay's
 #    0x4F2E row (was stubbed_sound -> rts, the 14z-65 blanket 0x7xx
 #    silence) is now kind=sound_stub sfx_id=0x199: a synthesized
 #    vsavj twin stub. The detonation chirp fires SYSTEMATICALLY.

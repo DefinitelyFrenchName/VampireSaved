@@ -3202,7 +3202,11 @@ attribution retracted); the real delta is native firing
 maintainer's field observation and the content check: **vs2 0x73A's
 sample bytes are BYTE-IDENTICAL in vsav's own QSound image**
 (0x6C0000, bank 108, 0-20480, pitch 12548; vsavj ids 0x198/0x199
-family, +0x300 alias 0x498/0x499). And the detonation call is not the
+family, +0x300 alias 0x498/0x499). **[CORRECTED 14z-95, GitHub #93:
+identical for 20,480 of 20,481 bytes — the INCLUSIVE endpoint
+0x6C5000, the byte packing law #3 says is PLAYED, differs between the
+two games' original sample ROMs (vsav 0xFF, vsav2 0x00). Fourth
+instance of the inclusive-endpoint class (#82/14z-87b).]** And the detonation call is not the
 record path: bp-attributed (USP-top return — the bp_regs A7-first fix)
 to **sound-farm stub vs2 0x4F2E** (`jsr $330E; move.l #$73A,d1;
 moveq 0,d2/d3; bsr $5122; jmp $3306` — a farm of such one-id stubs at

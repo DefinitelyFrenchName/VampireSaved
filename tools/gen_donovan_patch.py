@@ -2193,7 +2193,13 @@ def main():
                 vs2 ID has no faithful same-id vsavj meaning, but whose
                 SAMPLE CONTENT exists on vsavj under a different id (the
                 trap-detonation precedent: vs2 0x73A == vsavj 0x199 —
-                identical bytes at the same QSound address, same pitch).
+                identical bytes at the same QSound address, same pitch;
+                CORRECTED 14z-95/GitHub #93: identical for 20,480 of
+                20,481 bytes — the INCLUSIVE endpoint 0x6C5000, which
+                packing law #3 says is PLAYED, differs between the two
+                games' original sample ROMs, vsav 0xFF vs vsav2 0x00.
+                Content checks behind future sound_stub rows must
+                include the endpoint byte).
                 Synthesize the vsavj twin of the vs2 stub shape with the
                 row's `sfx_id`: save-regs / move.l #id,d1 / clr d2,d3 /
                 jsr helper / jmp restore. The save (0x330E) and restore

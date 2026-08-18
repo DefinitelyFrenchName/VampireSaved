@@ -882,7 +882,11 @@ that is ported into our build at ~`PRG:0xCE3B8` (vanilla twin
   carries a FARM of such one-id stubs around 0x4EE0-0x4F60. vsavj
   keys MUSIC-family content at the same 0x7xx ids — but 0x73A's
   SAMPLE CONTENT is byte-identical in vsav's own QSound image
-  (0x6C0000), keyed as the 0x198/0x199 family: the restoration is a
+  (0x6C0000), keyed as the 0x198/0x199 family [CORRECTED 14z-95,
+  GitHub #93: identical for 20,480 of 20,481 bytes — the INCLUSIVE
+  endpoint 0x6C5000, the byte packing law #3 says is PLAYED, differs
+  between the two games' original sample ROMs (vsav 0xFF, vsav2
+  0x00)]: the restoration is a
   synthesized vsavj twin stub playing 0x199 (kind=sound_stub recon
   row, huitzil-m9), no sample port needed. ~~0x739 has no vsavj
   equivalent~~ CORRECTED 14z-86: 0x739's sample content, sample
