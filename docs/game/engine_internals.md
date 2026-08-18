@@ -1154,6 +1154,51 @@ $FF8110 mask, fighter +0x382), `bank_map.toml` `tail_data_ptr`
   (own-class default; lottery mode = the ground-truth-failing pair vs
   build/don_m4).
 
+### The KERNEL per-class voice tables (14z-96) — a SECOND voice family,
+### in the sound kernel itself, NOT the 0x0BF41A record path
+
+**Atlas rows this section depends on:** `atlas/ram.md` fighter +0x382
+(the voice-flavor class), `atlas/id_space.md` (the fold-site table —
+this family is the id_space "rows 0x10-0x1F are copies" shape, not an
+`andi` fold).
+
+Distinct from BOTH per-node record dispatch (0x0BF41A) and the voice
+borrow: the sound KERNEL (the low-PRG region around the enqueue
+`0x31EE` / save-restore `$330E/$3306` / helper `$4CE2`) carries **four
+per-class voice-id word tables**, one per voice EVENT, each as a
+16-entry base table + a 16-entry VARIANT table directly after it
+(reads go through the OPCODE view — the tables sit inside the crypt
+window and the data view shows ciphertext at the same offsets):
+
+| event | vsavj base | vsavj variant rows (0x10-0x1F) | vs2 twin |
+|---|---|---|---|
+| .0 | `PRG:0x3BCE` | `PRG:0x3BEE` | `PRG:0x3C04`/`0x3C24` |
+| .1 | `PRG:0x3C3A` | `PRG:0x3C5A` | `PRG:0x3C70`/`0x3C90` |
+| .2 | `PRG:0x3CA6` | `PRG:0x3CC6` | `PRG:0x3CDC`/`0x3CFC` |
+| .3 | `PRG:0x3D10` | `PRG:0x3D30` | `PRG:0x3D46`/`0x3D66` |
+
+The event suffix is literal: every entry of event .N ends in nibble N
+(class 0's row is `0x1d0/0x1d1/0x1d2/0x1d3`), so an id names
+(character, event) in one word. **On vsavj the variant half is a
+byte-identical COPY of the base half; on vs2 it carries the
+newcomers' real voices** — Phobos `0x730/0x2a1/0x2a2/0x733`, Pyron
+`0x720/0x2a1/0x2a2/0x723`, Donovan `0x700/0x701/0x702/0x703` (rows
+0x12 keep the copy). **`0x2a1`/`0x2a2` are FREE rows in the Z80 id
+table of BOTH games** — Capcom voices the robot's hurt events with a
+deliberately silent id.
+
+Measured mechanism (x4 electrocute rig, replay 95): the .2 event
+fires on EVERY OTHER electrocution (engine-side alternation, both
+games); the fired id follows the victim's +0x382 class through the
+variant table — poking class 0x01 moved the fired id `0x1d2 → 0x202`
+(= row 0x01), which is what pins "table row" over any arithmetic
+reading. A tenant class therefore fires the row-copy alias — the
+LEGACY character's voice (class 0x10 → row 0x00 = Bulleta) — which is
+the merged-m2 "grunt after the electrocution, every other time"
+defect. The M5 voice batch never touched this family: it ported the
+0x0BF41A per-node RECORD arrays; these kernel tables are a separate
+consumer that no manifest row names.
+
 ## The sprite-list DRAWER: how an object becomes sprite entries
 ## (measured 14z-71 on the Huitzil beam; the layer ABOVE the OBJ entry)
 

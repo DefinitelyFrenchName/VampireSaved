@@ -87,3 +87,9 @@ test_reconcile_matcher
 # 2026-08-18 "it should be one command"). Needs ROMDIR + the pinned build
 # dirs; SKIPs without them.
 test_merged_inputs
+
+# The KERNEL per-class voice tables (14z-96): vsavj's variant halves are
+# byte-copies (the merged-m2 electrocute-grunt alias), vs2's carry the
+# newcomers' real rows, and 0x2a1/0x2a2 are FREE Z80 rows in both games
+# (Phobos' hurt events are voiced with deliberate silence). Needs ROMDIR.
+test_kernel_voice_tables

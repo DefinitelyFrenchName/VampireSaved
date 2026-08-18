@@ -1627,6 +1627,27 @@ tests/test_hui_electrocute.sh         # 14z-95: PHOBOS AS THE ELECTROCUTE
                                       # confound is open on the native leg,
                                       # so freezing them would ratify a
                                       # possible rig artifact. ~2 min
+tests/audit_hui_grunt.sh              # 14z-96: THE ELECTROCUTE-GRUNT A/B over
+                                      # FIVE electrocutions (replay 95, the x4
+                                      # rig) — the maintainer's grunt report
+                                      # ROOT-CAUSED: the sound KERNEL's
+                                      # per-class voice tables (events .0-.3,
+                                      # PRG:0x3BCE/3C3A/3CA6/3D10 + variant
+                                      # halves at +0x20) have vsavj rows
+                                      # 0x10-0x1F as COPIES of 0x00-0x0F, so
+                                      # Phobos' every-other-hit voice fires
+                                      # row 0x00's id 0x1d2 (a LEGACY hurt
+                                      # cry) where native vs2 fires his own
+                                      # row's 0x2a2 — a FREE Z80 id, i.e.
+                                      # DELIBERATE SILENCE (the robot does
+                                      # not grunt). Freezes today's
+                                      # per-attempt inventories on BOTH legs
+                                      # (incl. the defect, as a regression
+                                      # lock pointing at the issue);
+                                      # GRUNT_OURS_A2 rehearses the post-fix
+                                      # state and any other value must-fires.
+                                      # Static half: test_kernel_voice_tables
+                                      # (ci_static). ~3 min, 2 MAME runs
 tests/test_hui_boot.sh                # Huitzil stage-4 BOOT gate (14z-65): the
                                       # forced-pick match forms with HIS data
                                       # (base read from the build's own patch),

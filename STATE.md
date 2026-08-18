@@ -1,5 +1,101 @@
 # STATE — living progress log
 
+## Session 14z-96 — THE GRUNT ROOT-CAUSED FROM THE MAINTAINER'S VIDEOS:
+## a whole UNPORTED voice family in the sound kernel, filed as #101
+
+**The session in one line:** the #93 retraction pass landed (every carrier
+of the bank-108 "byte-identical" claim corrected, root cause posted to the
+issue), and the maintainer's grunt videos (`../Videos/grunt`) were analysed,
+reproduced in-emulator, and root-caused to a family-level port gap — **the
+sound kernel's per-class voice tables were never ported**, so all three
+tenants fire LEGACY characters' voices at four kernel voice events.
+
+### The grunt chain, each step measured
+
+1. **Video analysis** (envelope diff, 4 electrocutions on ours vs 2 on
+   native): electrocutions 2 and 4 carry an extra sustained ~250-350 ms
+   broadband voiced event ~0.4-0.6 s after the burst — 1 and 3 do not.
+   "Every other", confirmed. Clips + isolated WAVs sent for the
+   confirmation loop.
+2. **The x4 rig** (`tests/replays/hui/95_hui_electrocuted_x4.rpl`, new):
+   FIVE held-HP electrocutions in one run, every attempt verified class
+   0x07 freeze 0x30 on both legs. Replay 93's one-electrocute rig cannot
+   show a period-2 phenomenon; this can.
+3. **Ring A/B**: native fires an extra `02a2` mid-shake at attempts 2 and 4
+   ONLY; ours fires `01d2` at attempt 2 and NOTHING at attempt 4.
+4. **Same class both legs** (`+0x382` dumped through all five attempts:
+   P1=0x10, P2=0x03 throughout) — so the difference is TABLE CONTENT, not
+   the voice-class borrow.
+5. **vs2 `0x2a2` is a FREE row in its Z80 id table** (bytes 00000000) —
+   native's "no grunt" is DELIBERATE SILENCE, the robot does not cry.
+   **vsavj `0x1d2` is LIVE** (priority 0x30, slot 11) — a legacy hurt cry.
+6. **The class poke pins the mechanism**: poking the victim's class
+   0x10→0x01 moved the fired id `0x1d2 → 0x202` — a per-class WORD TABLE,
+   row-indexed, not arithmetic.
+7. **The tables found**: FOUR per-event tables in the sound kernel
+   (`PRG:0x3BCE/0x3C3A/0x3CA6/0x3D10`, events .0-.3, each base+variant
+   16-entry halves, read through the OPCODE view — inside the crypt
+   window, data view is ciphertext there). vsavj's variant halves are
+   byte-copies of the base halves; vs2's carry the newcomers' real rows
+   (Phobos `0730/02a1/02a2/0733`, Pyron `0720/02a1/02a2/0723`, Donovan
+   `0700/0701/0702/0703`). The event-nibble law (every entry of event .N
+   ends in nibble N) held on all 256 entries.
+
+**Scope: this is not one wrong sound.** The M5 voice batch ported the
+`0x0BF41A` per-node RECORD arrays; the kernel tables are a separate
+consumer no manifest row names, so all three tenants fire legacy-alias
+voices at all four kernel events. Full fix plan (12 words, 10 with
+existing authored ids, 2 needing new authored Phobos songs 0x730/0x733)
+is on **GitHub #101** with options (a)/(b)/(c) and a recommendation.
+
+### Instruments landed (suite doctrine — the probes became cases)
+
+- `tests/test_kernel_voice_tables.sh` (**ci_static**): vsavj alias shape +
+  vs2 newcomer rows frozen verbatim + nibble law + the Z80 silence
+  premise (0x2a1/0x2a2 FREE both games); 2 verdict controls. This is the
+  re-freeze site when the port lands (section 1 flips).
+- `tests/audit_hui_grunt.sh` (on-demand, ~3 min): the 5-electrocution
+  ring A/B, per-attempt inventories frozen on BOTH legs including the
+  defect (a regression lock pointing at #101, the #98 discipline);
+  `GRUNT_OURS_A2` rehearses the post-fix state, must-fire verified.
+- Attempt-4 anomaly parked IN the audit header: ours drops the voice
+  entirely where native fires 0x2a2 again — candidate is slot-state
+  collision from 0x1d2 being a real song; the fix moots it.
+
+### #93 — retraction pass done; and the grunt is NOT the endpoint byte
+
+All carriers of the "sample bytes IDENTICAL ... 0-20480" claim corrected
+(commit 857bd35: manifest comments, patch_notes, gate header, registry
+row, sfx_records, engine_internals, both gotchas files, generator
+docstring, STATE 14z-85g; re-grep clean). Root cause posted to #93, which
+had zero comments. **The two threads the 14z-95 close suspected were one
+investigation are TWO** (posted to #93): the endpoint byte predicts a
+CLICK and cannot alternate; the grunt is #101. #93's audit red stands on
+its own and its fix decision (patch the endpoint byte vs freeze the
+expectation as a known source difference) rides the next re-freeze.
+
+### The suite was red for two environmental reasons — both fixed
+
+`ROMDIR=../ROMS` (relative) failed `audit_gfx_merged_census` (symlink
+target resolved at the symlink's dir) and `test_harness_frame_bound`
+(FBNeo overlay + cd). `run_all_static.sh` now canonicalises ROMDIR at the
+entrance (commit 7d5ef7e); chain measured PASS 90/0/0 under the relative
+spelling. The third red was my own uncommitted edit tripping
+`test_tenant_row_owner` section 3 — cleared by the commit.
+
+### Decisions pending (maintainer)
+
+1. **#101 fix option** — (a) full port incl. two new authored Phobos
+   songs (recommended, native-exact), (b) 10 words now + Phobos .0/.3
+   stay legacy-alias, (c) 10 words + Phobos .0/.3 silenced. Any option
+   moves shipped bytes on all three tenants + merged → rides the next
+   re-freeze window (with #43(b) and possibly the #93 endpoint byte).
+2. **#93 fix** — patch the remapped record's endpoint byte to vs2's 0x00
+   (one byte in an authored member) vs re-freeze the audit expectation
+   as a known one-byte source difference. Same re-freeze window.
+3. Carried from 14z-95: #96's battery generation/stage target; whether a
+   red DEV-BUILD gate triggers rule 6; the ~200 tracked build dirs.
+
 ## Session 14z-95 — FOUR MAINTAINER RULINGS TAKEN, #52 LANDED, and the
 ## Phobos sfx report corrected from "a sound missing" to "a WRONG sound"
 

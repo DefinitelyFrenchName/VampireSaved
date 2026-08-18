@@ -6,12 +6,15 @@
 > ## **ONE STANDING HOLD — do not start it:**
 > ## **#99** is PARKED (maintainer): blocked on a RIG, not on ideas. The full
 > ## measured state is on the issue; do not re-derive it.
-> ## **The Phobos sfx hold is LIFTED (2026-08-18):** the maintainer delivered
-> ## the A/B videos to `../Videos/grunt/` — VS2 vs merged-m2, Victor's
-> ## charged 5HP electrocuting Phobos, a grunt after the electrocution
-> ## EVERY OTHER time on ours only. Analysis in progress (14z-96). The two
-> ## extra voices measured earlier (`0x8e`/`0x91`, pre-match) remain NOT
-> ## the defect (confirmed 2026-08-18).
+> ## **The Phobos sfx (grunt) is ROOT-CAUSED — GitHub #101 (14z-96):** the
+> ## sound kernel's per-class voice tables were NEVER PORTED; vsavj's
+> ## variant rows alias legacy rows, so Phobos' every-other-hit voice
+> ## fires a legacy hurt cry (0x1d2) where native vs2 fires 0x2a2 — a
+> ## FREE Z80 id, i.e. the robot is silent BY DESIGN. All three tenants
+> ## are affected at FOUR kernel voice events. Fix plan on #101, awaiting
+> ## the maintainer's option pick; rides the next re-freeze window.
+> ## Instruments: test_kernel_voice_tables (ci_static), audit_hui_grunt +
+> ## replay 95 (on-demand).
 > ##
 > ## **FOUR THINGS WAIT ON A MAINTAINER RULING** (nothing else is blocked):
 > ## 1. **#96** — what GENERATION and STAGE does the m2a/m2b battery target?
