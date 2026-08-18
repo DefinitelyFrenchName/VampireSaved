@@ -41,6 +41,20 @@
 # script would simply become a new, smaller thing to forget to update.
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
+
+# ROMDIR must be ABSOLUTE for the gates: at least two resolve it from a
+# DIFFERENT working directory than the caller's — audit_gfx_merged_census
+# symlinks $ROMDIR/vsav.zip into a temp dir (a relative target dangles at
+# the symlink's own directory), test_harness_frame_bound builds an overlay
+# and cd's into it. Measured 14z-96: both red under ROMDIR=../ROMS, green
+# under the absolute twin — 2 of the 3 "failures" that looked like a broken
+# suite. Canonicalise at the entrance, BEFORE the cd below, so the
+# documented pre-commit command is robust to how the caller spells it.
+if [ -n "${ROMDIR:-}" ]; then
+    ROMDIR="$(CDPATH= cd "$ROMDIR" && pwd)" || {
+        echo "ROMDIR '$ROMDIR' does not resolve from $(pwd)" >&2; exit 2; }
+    export ROMDIR
+fi
 cd "$REPO"
 
 STRICT=0; TIER=all; LIST=0
