@@ -19,6 +19,55 @@ reproduction protocol"* for the **#99 crash** — both are explicitly
 14z-94 close named #99 as the start point, and a future session reading only
 that would walk straight into work the maintainer has taken back.
 
+### THE TRACKED-BUILD CLEANUP — steps 1-3 applied, step 4 declined by the
+### maintainer, and one thing nearly deleted documented tooling
+
+Maintainer ruling 2026-08-18: do (1) untrack emulator state, (2) untrack
+`build/scratch/**`, (3) keep metadata for builds with a registry row or freeze
+tag — and explicitly **NOT** (4) untrack the rest. So everything outside (1)
+and (2) stays.
+
+**Result: 2,750 -> 1,969 tracked files under `build/` (781 removed).**
+
+**(1) Emulator state, 90 files** — `vsavjw.nv` x25, `vsavjw.ini` x25,
+`guard_go.dbs` x18, `vsav2.nv`/`vsav2.ini` x11 each. Verified GENERATED before
+removing: `tools/run_replay_guarded.sh:36` writes the debugger script itself
+(`printf 'go\n' > "$WORK/guard_go.dbs"`), so the committed copies were stale
+artifacts of old runs.
+
+**(2) `build/scratch/**` — AND THIS IS THE ONE THAT NEEDED CARE.** A blanket
+untrack would have deleted **four tracked analysis tools**, two of them
+DOCUMENTED as runnable commands in `docs/game/atlas/venue_assets.md:96-97`.
+They were moved to where tools belong first, then the doc was repointed and
+both were re-run from their new home to prove the move:
+
+| was | now |
+|---|---|
+| `build/scratch/venue.py` | `tools/audit_venue_consumers.py` |
+| `build/scratch/palptr.py` | `tools/audit_palette_ptr_rows.py` |
+| `build/scratch/pal.py` | `tools/audit_palette_block_width.py` |
+| `build/scratch/slotaudit.py` | `tools/audit_slot0f_assumptions.py` |
+
+**A nice corroboration fell out of it:** `audit_venue_consumers.py` prints
+`reads of $130(a5): 14` with per-site mask/scale/table columns — independently
+reproducing the #100 finding I derived by static scan the same session (14
+readers, `01BF94` masking `#$0f` and scaling `ror #6` into table `3A4400`).
+Its docstring already named `PRG:0x00A43E` as the fold site. The tool had the
+answer and was sitting in a scratch directory nothing indexed.
+
+**(3) The keep set, recorded so it is not re-litigated:** 16 registry
+fingerprints and 34 `freeze/*` tags. Spot-checked intact after the removal —
+`hui12` 15 files, `pyron19` 15, `m3b_merged5` 38, `donovan5` 9. The rationale
+is the one measured earlier: for superseded builds whose manifests have moved
+on, that metadata is the only record of what the build WAS, and
+rebuild-from-tag is UNTESTED.
+
+**Step 4 declined**, so the ~225 unreferenced entries stay tracked. Recorded
+as a deliberate maintainer decision rather than an oversight. If it is ever
+revisited, the cheap way to settle it properly is to pick ONE superseded build
+and try rebuilding it from its tag — that converts the hedge into a measured
+fact instead of an assumption.
+
 ### MAINTAINER RULINGS 2026-08-18 (second batch)
 
 | item | ruling |

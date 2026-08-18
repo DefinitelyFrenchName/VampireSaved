@@ -70,6 +70,32 @@ build/donovan/
 build/donovan6/
 build/donovan_stage4_gate/
 
+# EMULATOR STATE AND SCRATCH (14z-95, maintainer-ruled 2026-08-18 after the
+# tracked-build-dir measurement: 2,754 files / 304 MB, 225 of 284 top-level
+# entries referenced by nothing).
+#
+# (1) Emulator state — MAME nvram, config and debugger scripts. Machine-local
+#     and GENERATED: run_replay_guarded.sh writes guard_go.dbs itself
+#     (`printf 'go\n' > "$WORK/guard_go.dbs"`), so the committed copies were
+#     stale artifacts of old runs with no evidentiary value.
+# (2) build/scratch/** — scratch by name. Its FOUR real tools were moved to
+#     tools/ first (audit_venue_consumers, audit_palette_ptr_rows,
+#     audit_palette_block_width, audit_slot0f_assumptions); two of them are
+#     documented as runnable commands in docs/game/atlas/venue_assets.md, so
+#     untracking scratch blindly would have deleted documented tooling.
+#
+# DELIBERATELY NOT IGNORED: the per-build patch.json/placements.json/
+# regions.json of the other ~200 dirs. For SUPERSEDED builds whose manifests
+# have moved on, that metadata is the only record of what the build WAS —
+# HANDOFF calls the freeze tags "the only way back" while also noting nobody
+# has re-verified the older ones, so rebuild-from-tag is UNTESTED and this is
+# the hedge. Maintainer ruled: keep them.
+build/**/*.nv
+build/**/*.ini
+build/**/*.dbs
+build/**/*.cfg
+build/scratch/
+
 # Generated CPS-2 WIDE romset overlays: directories of ABSOLUTE symlinks into
 # $ROMDIR plus one clone zip, rebuilt in one command (HANDOFF). Tracking them
 # put a stale absolute symlink in git, which dangled the moment the repo path

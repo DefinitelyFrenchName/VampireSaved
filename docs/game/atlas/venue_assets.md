@@ -93,8 +93,8 @@ speculative block into it is the Felicia wall-jump trap in a new costume.
 ## Re-measuring
 
 ```sh
-python3 build/scratch/venue.py  build/out/vsavj_opcodes.bin   # the 14 consumers
-python3 build/scratch/palptr.py build/out/vsavj_data.bin      # the 32-row table
+python3 tools/audit_venue_consumers.py build/out/vsavj_opcodes.bin   # the 14 consumers
+python3 tools/audit_palette_ptr_rows.py build/out/vsavj_data.bin     # the 32-row table
 ```
 
 (Scratch analysis scripts, not build tools — regenerate them from this page

@@ -1,2 +1,0 @@
-SNAP 0000 frame 5700
-SNAPSUMMARY frames=5750 taken=1 wanted=1
