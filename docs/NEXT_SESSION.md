@@ -616,7 +616,13 @@ decision, not by neglect.
   than a decision blocker.
 - The M5 sfx odds (0x112/0x14a/0x173/0x31B family — machinery ready).
 - FLAKY CRASH RESET (Sasquatch intro; rig designed, STATE 14z-85f).
-- Round-end flicker (parked; needs the maintainer's recording).
+- ~~Round-end flicker~~ **CLOSED 2026-08-18 (maintainer).** It was carried
+  as "parked, needs the maintainer's recording"; the merged-m2 playtest
+  did NOT observe it and the maintainer ruled it closed. Not carried
+  forward. If it ever resurfaces the first question is which build and
+  which emulator — the 14z-93 prediction that it would correlate with
+  voice events rested on the `$FF8100`-is-a-voice reading, which 14z-94
+  corrected to the ladder STAGE index, so that link does not follow.
 - OPTIONAL / cosmetic (maintainer 2026-08-15): the merged-only
   P2-ring-on-Donovan medallion whitening; win-screen QUOTE (both tenants);
   region_space re-freeze; op-tagging for test_shared_writes. **Donovan's
@@ -634,6 +640,15 @@ decision, not by neglect.
   ever resurfaces, the first question is which emulator, and the second is
   whether any shared-resolver path has been reintroduced.
 - Then MiSTer core surgery (stretch, DECIDED) — after the roster.
+- **BEYOND MiSTer (scope extension, maintainer 2026-08-18):** **GitHub
+  #100**, the next-stage screen showing Donovan with a Victor name and a
+  blank portrait. Closed WON'T FIX for now under the standing cosmetic
+  ruling (cosmetic + single-player-only surfaces are nice-to-have) and
+  re-scoped to after MiSTer. **The mechanism is already measured, so
+  whoever picks it up starts from the fix, not the hunt:** one writer
+  (`PRG:0x00A446`, `andi.w #$000F` at `0x00A442`) feeding `RAM:$FF8130`,
+  and FOURTEEN readers — eight of which RE-FOLD, so widening the writer
+  alone changes nothing. Full detail on the issue and in STATE 14z-95.
 
 ## Build / validate
 

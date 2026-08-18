@@ -19,6 +19,53 @@ reproduction protocol"* for the **#99 crash** — both are explicitly
 14z-94 close named #99 as the start point, and a future session reading only
 that would walk straight into work the maintainer has taken back.
 
+### MAINTAINER RULINGS 2026-08-18 (second batch)
+
+| item | ruling |
+|---|---|
+| **Round-end flicker** | **CLOSED.** Carried as "parked, needs the maintainer's recording"; the merged-m2 playtest did not observe it. Not carried forward. |
+| **#100** (next-stage Victor name) | **WON'T FIX for now**, re-scoped as a scope extension **beyond MiSTer**, under the standing cosmetic ruling (cosmetic + single-player-only = nice-to-have). Closed with the mechanism measured so it resumes from the fix, not the hunt. |
+| **Phobos sfx** | **My capture does NOT match what the maintainer heard** — they have offered their own clips. So the two extra voices I measured (`0x8e`/`0x91`, pre-match) are NOT the reported defect, and the `+0x382` confound no longer needs resolving to know that. Await their recording. |
+| **~200 tracked build dirs** | maintainer asked "is there any benefit?" — measured below. |
+
+**THE SFX RESULT IS THE VALUABLE ONE, because it is a negative that saves
+work.** I had two candidate readings: either the pre-match extras were the
+bug reported at the electrocute's end, or my rig had not reproduced the
+maintainer's event. It is the second. `tests/test_hui_electrocute.sh` was
+deliberately written NOT to freeze those two ids (the confound), so nothing
+has to be un-ratified — the gate stands as a regression lock on what it does
+assert, and the sfx question reopens from the maintainer's own capture.
+
+### The ~200 tracked build dirs — MEASURED, and it is not a rule-7 issue
+
+| measure | value |
+|---|---|
+| tracked files under `build/` | **2,754** |
+| working-tree size | **304 MB** |
+| top-level entries referenced by ANY script/doc | **59** |
+| referenced NOWHERE | **225** |
+| emulator STATE files tracked (`.nv`/`.ini`/`.dbs`/`.cfg`) | **90** |
+| file kinds | 1516 json, 598 log, 270 md, 178 txt |
+
+**RULE 7 CHECKED FIRST, and it is clean.** 134 tracked `patch.json` files
+carry **12,930** ops with hex payloads over 4 bytes, 2,024 of them over 100
+bytes — i.e. literal ported content. That looked like a breach, but rule 7
+explicitly permits *"patches (xdelta/BPS against named reference dumps)"*, and
+an xdelta stores literal runs too, so `patch.json` is the same class of
+artifact the rule allows. **Not a violation** — recorded so the question is
+not re-opened on sight of the hex.
+
+**The benefit, stated honestly rather than dismissed:** for SUPERSEDED builds
+whose manifests have moved on, the committed `patch.json`/`placements.json` is
+the only record of what that build WAS. HANDOFF's registry says the freeze
+tags are "the only way back" while also noting "no one has re-verified the
+older ones since" — so rebuild-from-tag is untested, and the committed output
+is the hedge against it not working.
+
+That benefit does not extend to: the 90 emulator-state files (MAME nvram and
+config — machine state, no evidentiary value), `build/scratch/**` (named
+scratch), or the 225 entries nothing references.
+
 ### #100 — MECHANISM FOUND STATICALLY, and it is a SINGLE-WRITER defect.
 ### Scoped, not patched (shipped bytes need the plan shown first)
 
