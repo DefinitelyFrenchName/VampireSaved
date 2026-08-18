@@ -19,6 +19,54 @@ reproduction protocol"* for the **#99 crash** — both are explicitly
 14z-94 close named #99 as the start point, and a future session reading only
 that would walk straight into work the maintainer has taken back.
 
+### THE SUITE DEBT IS PAID — tenant-vs-tenant and the electrocute both have
+### gates now, and both carry the control that makes them mean something
+
+Maintainer-agreed priority 2026-08-18: suite debt before the stale-expectation
+cleanups. Two gates, both green, both cheap.
+
+**`tests/test_tenant_pairings.sh` — the §4 coverage the suite never had.**
+CLAUDE.md §4 mandates "vs each of the 18 (both sides)" for a ported character
+and `tests/replays/` contained NO pairing of two ported characters at all —
+the gap #99 walked through. Six orderings of three tenants on the merged
+build, ~10 s:
+
+| ordering | verdict |
+|---|---|
+| donovan vs phobos / phobos vs donovan | match formed, both loaded, no crash |
+| donovan vs pyron / pyron vs donovan | ditto |
+| phobos vs pyron / pyron vs phobos | ditto |
+
+**The signature choice is the load-bearing part.** Identity is checked on the
+per-character hitbox base `+0x60.l`, NOT `+0x382` — 14z-87 proved that byte is
+the VOICE-FLAVOR class in match (`ram.md:85`), and GitHub #16 records a live
+gate (`test_pyron_blink`) that can false-REFUSE on it. Measured 14z-95 and
+frozen: donovan `0x3fa9d0`, phobos `0x4477b0`, pyron `0x49ab7c` — **identical
+as P1 and as P2**, so one value serves both orderings. Verdict control: an
+UNPOKED run must be REFUSED, or every pass is vacuous (it is, and it is).
+
+Replay 94 is deliberately character-AGNOSTIC — no tenant-specific motion — so
+a fourth tenant is a row in `CLASSES` plus its frozen base, not a new replay.
+
+**`tests/test_hui_electrocute.sh` — the consumer for replay 93.** Asserts the
+shake installs on BOTH legs (class 0x07, freeze 0x2f native / 0x30 ours),
+that the quick 6+HP control does NOT install it, and freezes the ring
+inventory across the electrocute window per leg.
+
+**What it deliberately does NOT freeze, and why that is the honest call:** the
+two extra Phobos voices (`0x8e`/`0x91`) land PRE-MATCH, not at the
+electrocute's end where the report puts them, and the native leg reaches
+Huitzil through a `+0x382` poke that 14z-87 showed is the voice-flavor class
+in match. So "native fires neither" may mean the native leg is not voicing as
+Huitzil at all. Freezing those ids would ratify a possible rig artifact.
+Section 3 covers the electrocute window only, where the sole cross-leg delta
+is the `010a`/`010b` pair `audit_trap_parity` already records as cosmetic —
+and that delta is asserted BY NAME, so it cannot silently become two.
+
+Both gates boot an emulator, so per `ci_static.txt`'s own membership rule they
+belong in HANDOFF's manual index, not the pre-commit tier. The anti-orphan
+coverage check agrees (clean).
+
 ### AN ARCADE-PROGRESSION RIG IS THE BLOCKER FOR #99, and it does not exist
 ### yet — four attempts, each one narrowing why
 

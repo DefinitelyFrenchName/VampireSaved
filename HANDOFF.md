@@ -1534,6 +1534,61 @@ tests/test_describe_masked_shape.sh   # 14z-89: ground truth for
                                       # root-caused) + both threshold boundaries
                                       # (flicker<=2 frames, re-convergence>60) +
                                       # the length-mismatch report. Static, ~1 s
+tests/test_tenant_pairings.sh          # 14z-95: TWO PORTED CHARACTERS IN ONE
+                                      # MATCH, all six orderings. The
+                                      # CLAUDE.md §4 coverage the suite did
+                                      # NOT have — "vs each of the 18 (both
+                                      # sides)" — and the gap GitHub #99
+                                      # walked through. The arcade marathon
+                                      # cannot close it: single-credit, ONE
+                                      # character, and (measured 14z-95) only
+                                      # two ladder rungs. Asserts per
+                                      # ordering: no crash (guarded) + BOTH
+                                      # characters loaded, checked on the
+                                      # per-character hitbox base +0x60.l.
+                                      # THE SIGNATURE CHOICE IS LOAD-BEARING:
+                                      # +0x382 is the VOICE-FLAVOR class in
+                                      # match, not the id (14z-87,
+                                      # ram.md:85) — GitHub #16 records a
+                                      # live gate that false-REFUSEs on it.
+                                      # Frozen bases: donovan 0x3fa9d0,
+                                      # phobos 0x4477b0, pyron 0x49ab7c,
+                                      # measured identical as P1 and as P2.
+                                      # Replay 94 is character-AGNOSTIC, so
+                                      # adding a tenant is a row in CLASSES,
+                                      # not a new replay. Verdict control: an
+                                      # UNPOKED run must be REFUSED, else
+                                      # every ok is vacuous. Needs the MERGED
+                                      # build by construction. ~10s, 7 runs
+tests/test_hui_electrocute.sh         # 14z-95: PHOBOS AS THE ELECTROCUTE
+                                      # VICTIM, ours vs native vsav2 — the
+                                      # consumer for replay 93. STATE said
+                                      # TWICE (14z-74/76) that no replay
+                                      # produced an electrocute; this is the
+                                      # first. TRIGGER FROM THE MAINTAINER,
+                                      # not derivable from the tree: Victor's
+                                      # HELD HP, a CHARGEABLE NORMAL.
+                                      # TWO PAID-FOR TRAPS ENCODED: (a) the
+                                      # class is 0x07, NOT 0x06 — 0x06 is the
+                                      # remapped TRAP DOME's route into the
+                                      # same shake handler (14z-85g(2)), so a
+                                      # gate on 0x06 reports "no electrocute"
+                                      # while producing one; (b) a SHORT
+                                      # press is the QUICK version — the
+                                      # rig's first draft landed a hit
+                                      # (288->275 both legs) and produced an
+                                      # ordinary reaction, so the quick 6+HP
+                                      # is kept as a standing NEGATIVE
+                                      # control. Section 3 freezes the ring
+                                      # inventory across the electrocute
+                                      # window only, where the sole delta is
+                                      # the documented 010a/010b cosmetic
+                                      # pair. DELIBERATELY NOT ASSERTED: the
+                                      # two extra Phobos voices (0x8e/0x91)
+                                      # measured PRE-match — a +0x382 poke
+                                      # confound is open on the native leg,
+                                      # so freezing them would ratify a
+                                      # possible rig artifact. ~2 min
 tests/test_hui_boot.sh                # Huitzil stage-4 BOOT gate (14z-65): the
                                       # forced-pick match forms with HIS data
                                       # (base read from the build's own patch),

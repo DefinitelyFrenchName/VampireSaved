@@ -66,13 +66,20 @@
   capture belongs in the #99 rig rather than in a separate pass. Capture the
   native vs2 leg first and show it before measuring on either.
 
-## Coverage gap the crash exposed
+## ~~Coverage gap the crash exposed~~ CLOSED 14z-95
 
-`tests/replays/` has **no tenant-vs-tenant replay at all**, while CLAUDE.md §4
-mandates "vs each of the 18 (both sides)" for a ported character. The arcade
-marathon is a SINGLE-CREDIT Donovan soak, so it cannot reach a continue, a
-character switch, or a tenant opponent. That rig belongs in the suite whatever
-#99 turns out to be.
+`tests/replays/` had **no tenant-vs-tenant replay at all** while CLAUDE.md §4
+mandates "vs each of the 18 (both sides)". **Now covered:**
+`tests/test_tenant_pairings.sh` runs all SIX orderings of the three tenants on
+the merged build (~10s), asserting no crash plus both characters actually
+loaded on the per-character hitbox base `+0x60.l` — not `+0x382`, which
+14z-87 proved is the voice-flavor class in match. Replay 94 is
+character-agnostic, so a fourth tenant is a row in `CLASSES`, not a new
+replay. All six pass on merged-m2.
+
+**The DEEPER gap is still open and is now #99's blocker:** arcade progression
+itself. Measured 14z-95 — the 40,620-frame marathon reaches **two ladder rungs
+of eight** and spends its remaining ~29,000 frames in attract.
 
 ## What changed in the triage, in one screen
 
