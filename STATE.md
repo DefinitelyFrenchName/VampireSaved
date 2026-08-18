@@ -1,5 +1,77 @@
 # STATE — living progress log
 
+## Session 14z-96 (3) — THE #101 FREEZE (maintainer-ruled 2026-08-18) and
+## the FIELD CONFIRMATION: "grunt gone, sfx corrected, all seems
+## perfectly good on the sound front for the 3 VS2 characters"
+
+**#101 is CLOSED** on the maintainer's early in-depth playtest of
+merged-m3. The freeze, executed same day:
+
+| frozen as | fingerprint | dir | expectation set |
+|---|---|---|---|
+| donovan-m8 | `d038553d` | `build/don_m8` | carried-renamed from donovan-m7 |
+| huitzil-m17 | `bfd819a0` | `build/hui44` | carried-renamed from huitzil-m16 |
+| pyron-m11 | `738bcfc2` | `build/pyron28` | carried-renamed from pyron-m10 |
+| merged-m3 | `ac3d0618` (764 ops) | `build/m3b_merged10` | tag + HANDOFF row, NO registry.tsv row (the merged convention) |
+
+Repointed at the freeze (the reference-rot discipline): m3a_reproducible
+pins (all five: EXPECT_WIDE/HUI/PYR/MERGED + MANI_* — MANI_STOCK
+unchanged, the member-level stock proof), audit_merged_legacy leg-b
+solos → don_m8/hui44/pyron28, test_merged_render_content D/H/P rows →
+don_m8/hui44/pyron28 (D was m5_wide, pre-voice-batch — the exact rot
+class the 14z-92 gotcha names), audit_hui_grunt default BUILD →
+m3b_merged10, HANDOFF run_wide pointer + registry table.
+
+Suite evidence on the new builds: every legacy masked replay lands on
+its EXACT frozen class (windows/composites/flickers unchanged — the
+superset invariant holding across the port); tenant-content .sha1s
+re-frozen where the kernel voices fire (inventory below).
+
+**Suite evidence, final:** the three suites ran on the new builds
+BEFORE any re-freeze — every legacy masked replay landed on its EXACT
+frozen class (windows/composites/flickers byte-frozen; the superset
+invariant across the port), and the ONLY failures were each build's OWN
+tenant-content .sha1s: donovan 61_tenant_2pwin + 62_tenant_2plose,
+huitzil 37_pick_huitzil_cell, pyron 40_pick_pyron_cell — the replays
+where that tenant's kernel voices fire. --freeze re-froze exactly those
+four (+ logs), plus replay 94_tenant_vs_tenant gained its FIRST frozen
+spec in each set (it was added 14z-95 with no expectation — an accrued
+gap the freeze closed). Verification re-runs: SUITE GREEN ×3, 0 FAILs.
+
+### The pool-vs-pool contact rig — three geometries tried, event still
+### unproduced, and the PROBE AMBIGUITY is now closed
+
+Coverage work while the freeze ran (the 14z-93 optional item: no rig
+produces a pool-vs-pool contact, so the tenant hitclass census has no
+denominator). Progress, honestly stated:
+
+- **`tests/replays/pyron/83_pyron_cosmo_contact.rpl` (new):** Pyron EX
+  cosmo vs Demitri Chaos Flare. BOTH moves verified firing (meter drop;
+  snapshots) — and the rig paid for an INPUT-GRAMMAR trap now in its
+  header: a special's button press must OVERLAP the final direction
+  (`p2=L1`); a separated press after the motion produced NO special at
+  all. Measured outcome: the flare dies on PYRON THE FIGHTER before
+  reaching the cloud (the cloud hugs his body) — the pool-vs-FIGHTER
+  path again, by geometry.
+- Two scratch variants (mine-vs-flare: height mismatch, the flare
+  passes over the ground mine; mine-into-cosmo: Phobos' UR throw jump
+  CROSSES OVER Pyron and wrecks the geometry) — both zero.
+- **The zeros are now interpretable, which they were not before:**
+  GUARD_PROBE proven LIVE by a hot-address control (0x31ee: 40 hits),
+  and the map body (merged10 `0x3ffc20`) + engine site (`0x1a888`)
+  both measured ZERO through matches full of projectiles — so the site
+  is reached only on an actual colliding pool pair, and no geometry
+  tried produces one. ALSO: `24_don_winmash`'s corpus-measured "2 map
+  entries" does NOT reproduce under a forced-Donovan pick (0 entries) —
+  the corpus ran it as a legacy pairing; the two measurements are not
+  the same rig.
+
+Still open (unchanged verdict, better instruments): a rig that overlaps
+two pool objects away from both owners. Next candidate when picked up:
+neutral-jump mine placement (no crossup) + a low/ground projectile, or
+native-vs2 reconnaissance of whether the mine is projectile-clashable
+at all.
+
 ## Session 14z-96 (2) — #101 OPTION (a) IMPLEMENTED AND MEASURED:
 ## the grunt is GONE, and the port is provably identity-only
 

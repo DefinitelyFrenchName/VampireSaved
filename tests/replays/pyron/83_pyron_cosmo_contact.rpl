@@ -1,0 +1,99 @@
+# pyron COSMO vs DEMITRI FIREBALL — the POOL-vs-POOL CONTACT rig (14z-96).
+#
+# WHY. The hit-class map census (audit_hitclass_map_cost section 3, 14z-93)
+# reads ZERO tenant map entries over all 37 hui+pyron rigs — not because the
+# thunk is dead but because NO RIG PRODUCES THE EVENT: the sweep is
+# POOL-vs-POOL, and a tenant projectile hitting a walking FIGHTER never
+# transits the map. 88_hui_plasma_trap_contact's header names the missing
+# ingredient: "an opposing PROJECTILE to clash with — not a walking
+# fighter". This is that rig: Pyron's EX Cosmo Disruption (the corpus'
+# richest pool source, 17-28 type-66 spawns per rig) against Demitri's
+# 236+P Chaos Flare fired INTO the cloud from the right.
+#
+# THE MOVE COSTS A METER STOCK (71_pyron_cosmo's lesson, paid for three
+# times before it): with an empty meter the EX pair downgrades and nothing
+# fires, so the runner MUST poke the stock count before EVERY attempt.
+# POKES (both picks + P1 meter before each attempt):
+#   1400:ff8782:11;1450:ff8782:11;1500:ff8782:11;1400:ff8b82:01;1450:ff8b82:01;1500:ff8b82:01;3300:ff8509:03;3320:ff8509:03;4100:ff8509:03;4120:ff8509:03;4900:ff8509:03;4920:ff8509:03
+#
+# P1 starts LEFT facing right: 41236 = L,DL,D,DR,R then hold/release 45
+# (2K). P2 starts RIGHT facing left: 236 = D,DL,L; button 1 = LP. Fireball
+# timing brackets the cosmo release (~f+55 after the motion) so at least
+# one flare is IN FLIGHT while the cloud is live; two more follow because
+# the flare's travel time is unmeasured. INPUT GRAMMAR, paid for in v1:
+# the punch must OVERLAP the final direction (p2=L1) — a button pressed
+# on its own frames after the motion produced NO special at all (measured
+# by snapshot; the bare separated press did not even jab) and a single-shot rig that misses
+# is a legitimate-looking zero (the #84 class).
+#
+# VERDICT INSTRUMENT: run guarded with GUARD_PROBE at the build's
+# hitclass_map_extend body (merged-m3: 0x3ffc20, from the patch fragment —
+# re-derive per build, the address moves with the allocator). SUCCESS = a
+# PROBE line during a contact window; a clean run with ZERO probe lines is
+# a DEAD RIG, not a pass (87's rule).
+300-305 sys=C1
+420-425 sys=C2
+800-803 sys=S1
+940-943 sys=S2
+1100-1102 p2=R
+1160-1162 p2=R
+1300-1302 p1=1
+1360-1362 p2=1
+# ── attempt 1: cosmo at 3400; flares timed to cross the cloud
+3400-3402 p1=L
+3403-3405 p1=DL
+3406-3408 p1=D
+3409-3411 p1=DR
+3412-3414 p1=R
+3415-3455 p1=45
+3400-3404 p2=D
+3405-3409 p2=DL
+3410-3414 p2=L
+3415-3419 p2=L1
+3490-3494 p2=D
+3495-3499 p2=DL
+3500-3504 p2=L
+3505-3509 p2=L1
+3580-3584 p2=D
+3585-3589 p2=DL
+3590-3594 p2=L
+3595-3599 p2=L1
+# ── attempt 2: same pairing at 4200
+4200-4202 p1=L
+4203-4205 p1=DL
+4206-4208 p1=D
+4209-4211 p1=DR
+4212-4214 p1=R
+4215-4255 p1=45
+4200-4204 p2=D
+4205-4209 p2=DL
+4210-4214 p2=L
+4215-4219 p2=L1
+4290-4294 p2=D
+4295-4299 p2=DL
+4300-4304 p2=L
+4305-4309 p2=L1
+4380-4384 p2=D
+4385-4389 p2=DL
+4390-4394 p2=L
+4395-4399 p2=L1
+# ── attempt 3: same pairing at 5000
+5000-5002 p1=L
+5003-5005 p1=DL
+5006-5008 p1=D
+5009-5011 p1=DR
+5012-5014 p1=R
+5015-5055 p1=45
+5000-5004 p2=D
+5005-5009 p2=DL
+5010-5014 p2=L
+5015-5019 p2=L1
+5090-5094 p2=D
+5095-5099 p2=DL
+5100-5104 p2=L
+5105-5109 p2=L1
+5180-5184 p2=D
+5185-5189 p2=DL
+5190-5194 p2=L
+5195-5199 p2=L1
+5600 wait

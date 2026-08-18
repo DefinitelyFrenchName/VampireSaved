@@ -146,50 +146,48 @@ rendering change. Ground truth: `tests/test_replay_video_selfcheck.sh`.
 
 ```sh
 export ROMDIR=/path/to/reference/sets
-tools/run_wide.sh build/m3b_merged9 fbneo  # THE 3-TENANT BUILD (all 18
+tools/run_wide.sh build/m3b_merged10 fbneo # THE 3-TENANT BUILD (all 18
                                            # selectable, art included) =
-                                           # merged-m1, FROZEN 14z-92 and
-                                           # AWAITING ITS PLAYTEST — frozen
-                                           # on gate evidence first by
-                                           # maintainer decision, so this
-                                           # is the build to play. It is
-                                           # merged7 + the whole 14z-91
-                                           # legacy fix. Carries the trap +
-                                           # M5 voices (field-confirmed
-                                           # 14z-85f..86) and the 14z-87
-                                           # voice-borrow fix.
-                                           # WHAT TO LOOK AT FIRST: the
-                                           # beam visual confirm (the S6
-                                           # carry-forward, never done on a
-                                           # merged build) and all three
-                                           # tenants' art/sound in one
-                                           # image.
+                                           # merged-m3, FROZEN 14z-96 —
+                                           # merged-m2 + the #101 kernel
+                                           # voice-table port (the grunt
+                                           # fix, maintainer-ruled option
+                                           # (a); measured identity-only).
+                                           # WHAT TO LOOK AT FIRST: Phobos
+                                           # electrocuted by Victor's
+                                           # charged 5HP — the every-other
+                                           # grunt must be GONE (silence,
+                                           # as native); and all three
+                                           # tenants' hurt/kernel voices
+                                           # are now their OWN.
                                            # NOTE there is no in-game
                                            # version string to A/B by — the
                                            # CLAUDE.md §5 convention has
                                            # never been implemented here
                                            # (open item, 14z-92); tell the
                                            # builds apart by directory.
-tools/run_wide.sh build/don_m7 fbneo       # or the solo builds (hui41,
-                                           # pyron26); ... mame
-                                           # (dirs reused; the registry row
-                                           # names the CURRENT fingerprints
-                                           # — donovan-m7/huitzil-m15/
-                                           # pyron-m9 since the 14z-91 fix)
+tools/run_wide.sh build/don_m8 fbneo       # or the solo builds (hui44,
+                                           # pyron28); ... mame
+                                           # (registry rows name the CURRENT
+                                           # fingerprints — donovan-m8/
+                                           # huitzil-m17/pyron-m11 since the
+                                           # 14z-96 #101 freeze)
 ```
 
-**THE 14z-96 #101 BATCH — BUILT, UNREGISTERED, AWAITING THE FREEZE
-DECISION:** `build/don_m8` (`d038553d`, 289 ops), `build/hui44`
-(`bfd819a0`), `build/pyron28` (`738bcfc2`), `build/m3b_merged10`
-(`ac3d0618`, 764 ops), stock twin `build/m5_stock3` (`a054de5c` =
-m5_stock2 BIT-IDENTICAL). = the frozen batch + the kernel voice-table
-port (GitHub #101, maintainer-ruled option (a)): 12 variant-half words +
-16 authored (base,alias) Z80 song pairs + 2 batch scope ids. The grunt
-fix, measured identity-only. Detail: patch_notes 14z-96, STATE 14z-96 (2).
-`run_suite`/`test_fbneo_legacy_oracle` refuse these until registered —
-that refusal is the freeze gate working, not a defect.
+**Current WIDE builds — THE 14z-96 #101 FREEZE (maintainer-ruled,
+2026-08-18): donovan-m8 / huitzil-m17 / pyron-m11 / merged-m3.**
+`build/don_m8` (`d038553d`, 289 ops), `build/hui44` (`bfd819a0`),
+`build/pyron28` (`738bcfc2`), `build/m3b_merged10` (`ac3d0618`, 764
+ops), stock twin `build/m5_stock3` (`a054de5c` = m5_stock2
+BIT-IDENTICAL, whole-artifact digest also unchanged). = the 14z-94
+batch + the kernel voice-table port (GitHub #101, option (a)): 12
+variant-half words + 16 authored (base,alias) Z80 song pairs + 2 batch
+scope ids. The grunt fix, measured identity-only. Registered (registry
+rows d038553d/bfd819a0/738bcfc2); merged-m3 = tag + this row, NO
+registry.tsv row per the merged convention. Detail: patch_notes 14z-96,
+STATE 14z-96 (2)/(3).
 
-**Current WIDE builds (14z-91, THE LEGACY-REGRESSION FIX):**
+**Previous batch (14z-91, THE LEGACY-REGRESSION FIX):**
 `build/don_m7` = **`donovan-m7` (`c90b60c3`)**, `build/hui41` =
 **`huitzil-m15` (`4531af1e`)**, `build/pyron26` = **`pyron-m9`
 (`fac4a777`)**, stock twin `build/m5_stock2` (`a054de5c`). All four moved
@@ -2455,6 +2453,7 @@ reproducible AT THAT TIME; no one has re-verified the older ones since.
 
 | Build | SHA-1 (zip) | Notes |
 |---|---|---|
+| **THE #101 KERNEL VOICE-TABLE PORT — donovan-m8 / huitzil-m17 / pyron-m11 / merged-m3 (FROZEN 14z-96, maintainer-ruled option (a) + freeze 2026-08-18). The grunt fix.** | `d038553d` / `bfd819a0` / `738bcfc2` / merged program fingerprint `ac3d06184f8c248717ba754275d5ab0147c69f07` | `build/don_m8` / `build/hui44` / `build/pyron28` / `build/m3b_merged10`; tags `freeze/{donovan-m8,huitzil-m17,pyron-m11,merged-m3}`. = the 14z-94 batch + each tenant's four `kernel_voice_e0-e3` words (the kernel per-class voice tables' variant halves — vsavj ships them as byte-copies of the base halves, so tenants fired LEGACY voices: Phobos fired Bulleta's `0x1d2` = the maintainer's video-confirmed electrocute grunt, Donovan fired VICTOR's `0x322`) + 16 authored (base,+0x300 alias) Z80 song pairs (the kernel path calls the REAL `0x4CE2`, so the facing alias applies — native's own `0x700→0xA00` twin doctrine) + batch scope `0x730,0x733`. Phobos/Pyron hurt events now port vs2's `0x2a1/0x2a2` — FREE Z80 rows both games, deliberate silence. Measured identity-only: same frames, right voice (or native silence); firing pattern untouched. Stock twin `build/m5_stock3` BIT-IDENTICAL `a054de5c` incl. whole-artifact digest. Gates at freeze: audit_hui_grunt per-build rows green, audit_merged_legacy PASS on the 764-op image, tenant_loop 289/327/262 + 764, manifest_merge (9,9,11)/25, m3a pins re-pointed. merged-m3: NO registry.tsv row per the merged convention (tag + this row). |
 | **THE #91+#92 FIX BATCH — huitzil-m16 / pyron-m10 / merged-m2 (FROZEN 14z-94). The first builds on which a planted tripwire is NOT reachable in extended play.** | `da734d49` / `e29cac23` / merged program fingerprint `081e2e53c5debff6d2d5bb4d4376d2a1ef6be842` | `build/hui43` / `build/pyron27` / `build/m3b_merged9`; tags `freeze/{huitzil-m16,pyron-m10,merged-m2}`. **donovan-m7 is UNCHANGED** — his manifest never moved and his op count is unmoved at 285. = the previous batch + (A) the reconciliation row resolving vs2 `0x494de`, a 32-bit divide helper vsavj carries byte-identical at `0x47fb6` (huitzil only; 52 tripwires -> 51, and the merge op count 753 -> 752) and (B) **the four arcade-ladder stage bytes** at `+0x01/+0x1a/+0x29/+0x31` of each tenant's table-B row (`0x00BB68 + class*0x40`) retargeted `0x18` -> `0x0a`. `0x18` is **REVENGER'S ROOST**, vs2's THIRTEENTH stage; vsav ships twelve, so selecting it walked off the banner family into its own `0x00400000` terminator and died at vec3 (#92). All eight sit opposite candidate class `0x13` (Donovan) — they are the ladder entries scheduling the Donovan match. `0x0a` = ABARAYA, maintainer-ruled 2026-08-17 ("any stage except Fetus of God, least impact"). **VERIFIED AGAINST LIVE CRASHES ON THE PREDECESSORS**, 40,620-frame arcade marathon with the tenant forced: huitzil-m15 CRASH 18337, pyron-m9 CRASH 15079, merged-m1 CRASH 8887 — all three successors END 40620. Suites SUITE GREEN on both solos; exactly one replay moved per set (the tenant pick), attributed to ONE byte at `$FF1E52` in the live ladder pool. Merged gates all green (audit_merged_legacy AUDIT-EXIT 0, leg a 47/47, leg b 6/6; render-content; trap and FG parity; select-bank gates). **merged-m2 has NO registry.tsv row on purpose** — same reason as merged-m1, see that row and the registry header. **PLAYTESTED 2026-08-18 (maintainer, MAME, `build/m3b_merged9`): NO REGRESSION.** #92's fix confirmed in the field — Donovan is met on Bishamon's stage, and `v=0x0a` decodes to ABARAYA, the ratified retarget. The round-end flicker was NOT observed. **One crash-reset, GitHub #99**: 5th arcade match, Donovan vs Phobos (CPU) at fight start, reached by continuing with a character switch after losing as Phobos; HUD was up, so match setup completed. Two lesser findings: #100 (next-stage screen shows Donovan as Victor, blank portrait — cosmetic) and a doubt about Phobos' electrocuted sfx. **CORRECTED 14z-95 (maintainer): that sfx report is a WRONG sound, not a MISSING one, so the "lines up with the already-open #93/#98" reading here was mine and is RETRACTED** — both of those are absence shapes, and a wrong id at the right moment points at the id-mapping layer (per-tenant voice remaps / `voice_borrow_keep_tenant` / the ruled shock remap `audit_trap_shock` locks at class 0x06). The maintainer is investigating it and #99 themselves: **both are HANDS-OFF pending their feedback.** **The crash is NOT a regression against a prior build — it is a path no gate covers: `tests/replays` has no tenant-vs-tenant replay at all, though §4 mandates one.** |
 | **merged-m1 — THE FIRST FROZEN MERGED BUILD (14z-92, maintainer-decided). All 18 characters, one image.** | program fingerprint `952fc73138b93e2024516872b95ddc615694d900` | `build/m3b_merged8`; tag `freeze/merged-m1`. **NO `registry.tsv` ROW, ON PURPOSE — see the header of `tests/expected/registry.tsv` before you add one.** The dispatch fingerprint covers PROGRAM members only, and the LEGACY-ONLY instrument `build/merged1` (tenants draw BLANKS, zero-filled overlay) is generated from the same inputs and fingerprints IDENTICALLY (952fc731…, measured) — so a registry row would register the instrument too, and the absence of that row is exactly what keeps it out of run_suite. merged-m1 is therefore frozen by TAG + this row, and validated by the merged-specific gates rather than by run_suite dispatch. = the 753-op 3-tenant program image (owner tag + sfx records + damage work-var rows + chirp/shock + the M5 VOICE BATCH + the 14z-91 walker relocation / fixture deletion / type-6 change) + the S2 gfx chain (D → H → P, group B pristine) + the authored Z80/sample members. GATES AT FREEZE: `test_merged_render_content` PASS (all three bands + the relocated strip byte-equal to the frozen solos, de-substitution held, 4-window poison control fired, 3 pick replays live), `audit_trap_parity` PASS, `audit_fg_parity` PASS, `audit_select_bank_gates` PASS, `verify_gfx_build` + `check_tenant_hud` PASS on all three tenants, and `audit_merged_legacy` **AUDIT-EXIT 0 — leg (a) 47/47 with 0 NOT-EVALUATED, leg (b) all six guard-clean** (it rebuilt its instrument from scratch and reproduced 753 ops and the same fingerprint, so the merged program build is deterministic end to end). **PLAYTEST FIELD-CONFIRMED (maintainer, 2026-08-16): "no obvious regression"** — frozen on gate evidence first and played after, by decision. The maintainer added that the game "may even feel better", explicitly flagged as feeling rather than fact: recorded as an IMPRESSION only (a plausible mechanism exists — 14z-91 removed thunk cycles from a path dispatching 279,577 times per corpus, which widens main-loop headroom and would read as less slowdown — but it is UNMEASURED, see the STATE freeze record). **FIELD-CONFIRMED ON THE MERGED IMAGE (maintainer, 2026-08-16): the BEAM visual "100% clean, as is its sound"** (the S6 carry-forward — the effect family, three root causes across 14z-70/71, is now closed end to end on the shipping artifact), **and Phobos' historically-defective moveset**: 236+P, 236+K, jump214+K, 236+2K, 214+2K "in the variants that broke or were incomplete in the past and their ES variants". That covers out-of-range entry 82 (the Plasma Trap, LOUD) in the field; entry 83 (Reflect Wall, SILENT) is guard-cancel-only and therefore rig-only — `test_hui_pairs` PASSES on merged8. Coverage boundary as stated by the maintainer: all MOVES on the three tenants, not every L/M/H strength of each; measured as unknown-unknowns rather than a named mechanism (STATE 14z-92 (4)). A freeze is reversible; m6/m14/m8 were withdrawn in 14z-88. Rebuild: `ROMDIR=... tools/build_merged.sh <dir>` (~1 min; the fingerprint moves with the generator — do not pin it). |
 | ~~donovan-m6 / huitzil-m14 / pyron-m8 — THE 14z-87b BATCH (beep fix + medallion fix)~~ **WITHDRAWN 14z-88 (maintainer-decided revert): the medallion row move cost a legacy pairing (replay 38) one main-loop frame at the select→VS fade on the H/P/merged builds (never re-converges vs vanilla); the beep fix stays (sound members, no program change) — the CURRENT builds are donovan-m5 / huitzil-m13 / pyron-m7 again (row below)** | `57754602` / `66feb5e8` / `fab92eb7` | `build/don_m5` / `build/hui40` / `build/pyron25` (dirs reused); REGISTERED (sets carried-renamed; work-RAM streams unchanged by both fixes — CORRECTED 14z-88: the medallion move moved its STAGING slot to $FF42A2, so the sets moved to the V3 masked basis and the tenant-content .sha1s were re-frozen after attribution). = the voice-borrow builds + (1) QSOUND PACKING LAW #3 (the record `end` byte plays INCLUSIVE; packer copied exclusive — 3 of 57 packed records held a foreign end byte; rec#0x3C8 = the sword-plant BEEP, ear-confirmed from a byte-synthesized prediction, fixed in build_qs_songs.py + law-3 gate in test_qs_songs.sh; sound members only) and (2) THE MEDALLION FIX (Pyron wheel-medallion pal_row 0x1A->0x1D, one layout field: Donovan's P2-hover portrait draws row 0x1A by vs2-heritage attr — the collision exists only MERGED; snapshot-verified both directions, maintainer-confirmed). Stock twin BIT-IDENTICAL 6c93cfa8 through both. |

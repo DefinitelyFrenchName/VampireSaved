@@ -13,16 +13,14 @@
 # 0x1d2, the audible grunt. Native vs2 fires Phobos' own row = 0x2a2, a
 # FREE Z80 id = deliberate silence.
 #
-# WHAT IS FROZEN, and why the defect is froze-able: the per-attempt ring
-# inventories BELOW record today's measured reality on merged-m2 —
-# INCLUDING the wrong 0x1d2 at attempt 2 and the dropped voice at attempt
-# 4. That is a REGRESSION LOCK, not an endorsement: the defect itself is
-# GitHub #101, and when the voice-table port lands,
-# EXPECT["ours"] below is re-frozen deliberately (the #98 discipline: frozen
-# expectation + must-fire control, never a set-compare that cries wolf).
-# GRUNT_OURS_A2 overrides the attempt-2 extra id so the post-fix state can
-# be rehearsed; no shipped caller sets it, and setting it to the current
-# 01d2 must stay green while any other value goes red with the right name.
+# WHAT IS FROZEN: per-BUILD ring inventories (OURS_BY_BUILD below) — the
+# #98 discipline, frozen expectation + must-fire control, never a
+# set-compare that cries wolf. merged-m2's row records the DEFECT (the
+# wrong 0x1d2) as a regression lock; merged10's row records the FIX
+# (0x2a2, vs2's deliberate-silence id — the 68k enqueue is still ring-
+# observable, which is what makes silence assertable). An unregistered
+# build REFUSES until measured. GRUNT_OURS_A2 overrides attempt 2 to
+# rehearse a new expectation before freezing it.
 #
 # ATTEMPT-4 NOTE (measured 14z-96, unexplained): ours drops the voice
 # entirely at attempt 4 where native fires 0x2a2 again. Candidate: 0x1d2
@@ -32,13 +30,13 @@
 # attempt 4 ever GAINS an id while 2 keeps one, re-measure before
 # re-freezing: that would be the alternation phase moving, not noise.
 #
-# Usage: ROMDIR=... [BUILD=build/m3b_merged9] tests/audit_hui_grunt.sh
+# Usage: ROMDIR=... [BUILD=build/m3b_merged10] tests/audit_hui_grunt.sh
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"
 ROMDIR="${ROMDIR:?set ROMDIR}"
 ROMDIR="$(CDPATH= cd "$ROMDIR" && pwd)"
-BUILD="${BUILD:-build/m3b_merged9}"
+BUILD="${BUILD:-build/m3b_merged10}"   # merged-m3 since the 14z-96 freeze
 [ -d "$BUILD/rompath" ] || { echo "SKIP: no build at $BUILD"; exit 0; }
 MAME_BIN="${MAME_BIN:-$HOME/.cache/vampire-saved/mame/cps2}"
 [ -x "$MAME_BIN" ] || { echo "SKIP: no WIDE MAME binary"; exit 0; }

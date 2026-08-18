@@ -53,7 +53,13 @@ trap 'rm -rf "$WORK"' EXIT
 # deleted and the obj_hook dispatch sites are left vanilla, with each
 # object-pool walker relocated instead. Previous batch:
 # 3c599fb6 / 6c93cfa8 / 2629561c / 94ce9a48 (14z-87, tags freeze/*).
-EXPECT_WIDE="c90b60c3a59ca8268e4910fbb2e612e390668c79"
+# EXPECT_WIDE="c90b60c3a59ca8268e4910fbb2e612e390668c79"  # git tag freeze/donovan-m7
+# 14z-96 (GitHub #101, THE KERNEL VOICE-TABLE PORT, maintainer-ruled option
+# (a) + freeze 2026-08-18): + his four kernel_voice code_words (variant-half
+# words -> authored (base,alias) song pairs 0xd9-0xdc/0x3d9-0x3dc) + the
+# shared qs_songs additions. Stock twin UNCHANGED (only_variant_slot,
+# measured bit-identical).
+EXPECT_WIDE="d038553dec5b8a7759e96f46b2fa0964c652a21b"
 EXPECT_STOCK="a054de5c0cfe868cb0aa9722abebdffd9dfcdb0d"
 # huitzil-m3 (14z-79, maintainer-ratified). Supersedes huitzil-m2
 # (9deda0808e87601b10e2171405805d4669ba2624), which can no longer be
@@ -86,7 +92,10 @@ EXPECT_STOCK="a054de5c0cfe868cb0aa9722abebdffd9dfcdb0d"
 # EXPECT_HUI="4531af1e49b9c8c4b820229aba598e3eca444fc7"  # git tag freeze/huitzil-m15
 # 14z-94 (#91 + #92): + the reconciliation row resolving vs2 0x494de (one
 # planted ILLEGAL retired) and the four arcade-ladder stage bytes 0x18 -> 0x0a
-EXPECT_HUI="da734d490a4498580ab8ecd1b8709676d6a9e117"
+# EXPECT_HUI="da734d490a4498580ab8ecd1b8709676d6a9e117"  # git tag freeze/huitzil-m16
+# 14z-96 (#101): + his four kernel_voice code_words (the .2 word is THE
+# GRUNT FIX: 01d2 -> 02a2, vs2's deliberate-silence id) — huitzil-m17
+EXPECT_HUI="bfd819a012218b9e8022be17b0747319a76f3140"
 # pyron-m3 (14z-82c: + the ADOPTED hitclass_map_extend thunk — the f7997 fix)
 # EXPECT_PYR="6c7f7322da793c12b3681dd3ef5a76b3792ae5d0"  # git tag freeze/pyron-m3
 # pyron-m4 (14z-85b, maintainer-ruled: + pyr_sfx_records — kills the merged
@@ -100,7 +109,9 @@ EXPECT_HUI="da734d490a4498580ab8ecd1b8709676d6a9e117"
 # EXPECT_PYR="fac4a77739ff9e29e23a8deb234dc0cb2c891dd8"  # git tag freeze/pyron-m9
 # 14z-94 (#92): + the same four arcade-ladder stage bytes. He declares no
 # 0x494de reference, so he takes no reconciliation row (op count unchanged).
-EXPECT_PYR="e29cac231b1357c87df62a3a278091caad5f7d53"
+# EXPECT_PYR="e29cac231b1357c87df62a3a278091caad5f7d53"  # git tag freeze/pyron-m10
+# 14z-96 (#101): + his four kernel_voice code_words — pyron-m11
+EXPECT_PYR="738bcfc2c06b008d7d4cef61f31faf74df784206"
 
 # The WIDE overlay romset (deterministic from the audited reference sets;
 # built into scratch so the canonical build/wide0 is never clobbered).
@@ -168,18 +179,22 @@ done
 #     HARD FAIL too. All eight constants moved together in one event.
 # Digests frozen 2026-08-16 from the pre-fix tree, which reproduced all four
 # program fingerprints exactly.
-MANI_WIDE="bf3606e48400afbe296abca31642d02dc9fe502d 42"
+# RE-FROZEN 14z-96 (#101): program members + vsw.z01/z02 moved (the four
+# kernel words; the 16 pair songs + 2 batch voices in the Z80 members).
+# MANI_STOCK is UNCHANGED — the member-level proof the stock track is
+# untouched.
+MANI_WIDE="660b5c6d92e0e4da9773bdd5ff65331ba376b915 42"
 MANI_STOCK="9d30e409b0b1de3df87c1ff360f238cc48c311dc 30"
 # 14z-94 (#91 + #92). Attributed per member before re-pinning: exactly FOUR
 # members moved — vm3j.03d, vm3j.04d, vm3j.10b and vsw.41, all PROGRAM
 # members. No gfx member and no QSound member changed, which is what a
 # program-image edit must look like. (m15 was 7f4d52a330abf73df298b638dbca099ce3135541.)
-MANI_HUI="593bb750f70be457ae2911b4d1106540840e072b 42"
+MANI_HUI="dd20fa9da6b65c3c7f24d9c8b7ef39877650cee3 42"   # 14z-96 #101
 # 14z-94 (#92 only — he takes no reconciliation row). Exactly ONE member
 # moved: vm3j.03d, which carries table B at PRG:0x00BB68. Huitzil moved four
 # because #91's row also relocated code; Pyron's four bytes are a pure data
 # edit inside one member. (m9 was d12d0c6a86bce271d6b7f59ccf6e0c3d98bc9393.)
-MANI_PYR="e5a01be1ac6e6a202d384c6753eff5bd224ee762 42"
+MANI_PYR="8aabb913b2a16bc75c2ad86b6debcb9383c9b69d 42"   # 14z-96 #101
 
 m3a_manifest() {   # m3a_manifest <label> <rompath> <"digest count">
     _got="$(python3 tools/artifact_manifest.py "$2")" || {
@@ -231,8 +246,8 @@ m3a_manifest pyron       "$WORK/pyron/rompath"     "$MANI_PYR"
 # #29). The gate does NOT print a bare "SKIP:" marker here, because the other
 # four legs did run and tests/run_all_static.sh would otherwise classify the
 # whole gate as skipped.
-EXPECT_MERGED="081e2e53c5debff6d2d5bb4d4376d2a1ef6be842"   # merged-m2, 14z-94
-MANI_MERGED="904d432f6918af045d29bdea8f53420c4de5f87e 42"
+EXPECT_MERGED="ac3d06184f8c248717ba754275d5ab0147c69f07"   # merged-m3, 14z-96 (#101; was 081e2e53 merged-m2)
+MANI_MERGED="36714570fe95d390e299725ed853e91dd534976d 42"   # 14z-96 #101
 
 MERGED_NEEDS="build/m5_wide/extract build/hui32/extract build/pyron21/extract
 build/wide0/rompath/vsavjw.zip"

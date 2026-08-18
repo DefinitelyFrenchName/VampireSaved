@@ -6,17 +6,15 @@
 > ## **ONE STANDING HOLD — do not start it:**
 > ## **#99** is PARKED (maintainer): blocked on a RIG, not on ideas. The full
 > ## measured state is on the issue; do not re-derive it.
-> ## **The grunt (#101) is ROOT-CAUSED, maintainer-confirmed, and FIXED
-> ## (14z-96, option (a) ruled):** the kernel per-class voice tables'
-> ## variant rows aliased legacy rows; the port gives each tenant its
-> ## own vs2 voice (or vs2's deliberate-silence 0x2a1/0x2a2) via 12
-> ## code_word rows + 16 authored (base,alias) song pairs. Measured
-> ## identity-only (same frames, right voice; stock twin bit-identical
-> ## a054de5c). **NEW BUILDS AWAIT THE FREEZE DECISION:** don_m8
-> ## d038553d / hui44 bfd819a0 / pyron28 738bcfc2 / m3b_merged10
-> ## ac3d0618 (764 ops). Instruments: test_kernel_voice_tables
-> ## (ci_static), audit_hui_grunt (per-build frozen expectations) +
-> ## replay 95. Full detail: STATE 14z-96 (2), patch_notes 14z-96.
+> ## **#101 (the grunt) is CLOSED — fixed, FROZEN, and FIELD-CONFIRMED**
+> ## ("grunt gone, sfx corrected, all seems perfectly good on the sound
+> ## front for the 3 VS2 characters", maintainer 2026-08-18). THE FROZEN
+> ## BUILDS ARE NOW **donovan-m8 / huitzil-m17 / pyron-m11 / merged-m3**
+> ## (don_m8 d038553d / hui44 bfd819a0 / pyron28 738bcfc2 / m3b_merged10
+> ## ac3d0618, 764 ops). The build to play: `tools/run_wide.sh
+> ## build/m3b_merged10 fbneo`. Instruments: test_kernel_voice_tables
+> ## (ci_static), audit_hui_grunt (per-build frozen rows) + replay 95.
+> ## Detail: STATE 14z-96 (2)/(3), patch_notes 14z-96.
 > ##
 > ## **FOUR THINGS WAIT ON A MAINTAINER RULING** (nothing else is blocked):
 > ## 1. **#96** — what GENERATION and STAGE does the m2a/m2b battery target?
