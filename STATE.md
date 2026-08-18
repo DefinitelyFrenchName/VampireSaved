@@ -19,6 +19,47 @@ reproduction protocol"* for the **#99 crash** — both are explicitly
 14z-94 close named #99 as the start point, and a future session reading only
 that would walk straight into work the maintainer has taken back.
 
+### #97 CLOSED — with a NARROWER rule than the issue proposed, because the
+### problem turned out to be repo-wide and only part of it is mine to fix
+
+The issue asked two questions first: should `build/donovan6` and
+`build/donovan_stage4_gate` be tracked at all, and if they are references
+should the gates use `mktemp`? Measuring before answering changed the shape.
+
+**What the evidence says.** Nothing REQUIRES the tracked copies. The 19
+tracked files are generator output (JSON, logs, markdown — no ROM bytes, so
+rule 7 was never breached), committed at 14z-47/48/49 alongside real changes.
+Of ~10 gates naming `build/donovan6`, all but one read its **rompath**, which
+was NEVER tracked and is regenerated. The single hardcoded reference to a
+tracked file is `tools/overlay_port.py:599` — an optional `if exists` read —
+and that tool **has no caller**.
+
+**But the framing did not survive.** `git ls-files build/` returns roughly TWO
+HUNDRED tracked build directories: `hui1..hui42`, `pyron5..pyron26`,
+`m3b_merged*`, `m5_*`, an entire `build/scratch/**` tree. So "build outputs
+should not be tracked" is a repo-wide question with a large blast radius, and
+it is not mine to settle unilaterally.
+
+**THE RULE I APPLIED IS NARROWER AND, I think, the right one:** *a directory a
+GATE WRITES TO on every run cannot also be a TRACKED reference.* Exactly two
+dirs qualify — `run_battery_m2.sh` builds into `build/donovan6`, and
+`test_m2a_stage4_code.sh` used to build into `build/donovan_stage4_gate`
+(already fixed at 14z-94, the "half" of this issue). The other ~200 are frozen
+historical builds that nothing overwrites; they are untouched, and whether
+they belong in git is recorded as an open question rather than acted on.
+
+Applied: the 19 files are untracked (working copies preserved on disk) and
+both dirs are `.gitignore`d, so the battery keeps building where every other
+gate expects to read from and `git status` stays clean.
+
+**Gated, in the thematically correct place:** `test_no_tracked_mutation.sh`
+(#81, "tests perturb copies, never tracked source") gains the sibling
+assertion — no gate-written dir may carry tracked files, plus a check that
+`run_battery_m2`'s default target is still one of the ignored dirs, so the
+condition cannot be re-introduced by re-pointing the WRITER instead of
+re-adding the files. Would have fired before the fix: 12 and 7 tracked files
+at HEAD, 0 and 0 after.
+
 ### #96's ESCALATED ITEM IS DE-ESCALATED BY MEASUREMENT: `04_select_fuzz`
 ### is a BUILD-STAGE mismatch, and both remaining items share one root cause
 

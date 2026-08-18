@@ -139,6 +139,39 @@ else
     fail "      which passes even when a concurrent run clobbered the file"
 fi
 
+echo "== a directory a GATE WRITES TO must not be a TRACKED reference =="
+# 14z-95 (GitHub #97). The sibling of the defect above: not a test editing
+# tracked SOURCE, but a test building over tracked OUTPUT. run_battery_m2.sh
+# builds into build/donovan6 and test_m2a_stage4_code.sh used to build into
+# build/donovan_stage4_gate; both carried tracked generator artifacts
+# committed at 14z-47/48/49, so every suite run rewrote committed files and
+# left a diff. A pre-commit chain whose own side effect is a diff is one
+# people learn to scroll past — which is how a REAL unexpected modification
+# gets missed.
+#
+# SCOPE, deliberately narrow: this checks only the dirs a gate WRITES. The
+# other ~200 tracked build dirs are frozen historical builds that nothing
+# overwrites; whether they belong in git is a separate repo-wide question and
+# is NOT what this asserts.
+for _d in build/donovan6 build/donovan_stage4_gate; do
+    _n=$(git ls-files "$_d" | wc -l | tr -d ' ')
+    if [ "$_n" = 0 ]; then
+        echo "  ok: $_d has no tracked files"
+    else
+        fail "$_d has $_n TRACKED file(s) — a gate builds here, so every run"
+        fail "      rewrites committed artifacts. Untrack them (they are"
+        fail "      generator output) or point the gate elsewhere."
+    fi
+done
+# and the battery's default target must remain one of those ignored dirs, so
+# the tracked-ness above cannot be re-introduced by re-pointing the writer
+_ob=$(grep -m1 '^OUTBASE=' "$REPO/tests/run_battery_m2.sh" 2>/dev/null || true)
+case "$_ob" in
+    *build/donovan6*) echo "  ok: run_battery_m2 still targets an ignored dir" ;;
+    *) fail "run_battery_m2's default OUTBASE changed ($_ob) — re-check that"
+       fail "      its target is git-ignored before trusting the check above" ;;
+esac
+
 echo
 [ "$rc" = 0 ] && echo "PASS: tests perturb copies, never tracked source." \
              || echo "FAIL: see above."
