@@ -19,6 +19,58 @@ reproduction protocol"* for the **#99 crash** — both are explicitly
 14z-94 close named #99 as the start point, and a future session reading only
 that would walk straight into work the maintainer has taken back.
 
+### #93 ROOT-CAUSED — ONE BYTE, the INCLUSIVE ENDPOINT, and it is the
+### FOURTH instance of the packing-law-#3 class. Possibly the maintainer's
+### Phobos sfx report.
+
+Ran against a fresh ledger-carrying probe build (`build/qs93_probe`, which
+also reproduced merged-m2's fingerprint `081e2e53` exactly — an independent
+confirmation that the #27 input-regeneration change moves no artifact byte):
+
+    whole-run signatures: ours 78 distinct / native 77 distinct
+    foreign (ours-only):   (13, 20481, -3769789239839886937)
+    missing (native-only): (13, 20481, -1400235268439195045)
+
+**SAME channel, SAME length, DIFFERENT content hash.** So my channel-allocation
+hypothesis is dead — this is not allocation drift, it is our build playing
+different BYTES over the same span. That is a WRONG sound, which is the class
+the maintainer reported.
+
+**Localised to one byte.** The span is bank 108, `0..20480` inclusive:
+
+| | byte at `0x6C5000` (the inclusive endpoint) |
+|---|---|
+| vsav (what our build plays from) | **`0xFF`** |
+| vsav2 (what native plays) | **`0x00`** |
+| the first 20,480 bytes | **identical** |
+
+**AND IT IS NOT SOMETHING WE PACKED WRONG.** The window `0x6C0000-0x6C5000`
+lies inside vsav's OWN unmodified `vm3.11m`/`vm3.12m`. The one-byte difference
+is between the two GAMES' original sample ROMs.
+
+**WHAT IS ACTUALLY WRONG IS A DOCUMENTED CLAIM.** `huitzil.toml:2108`
+justifies the trap remap `0x73A -> 0x199` with *"sample bytes IDENTICAL in
+both games' QSound images at 0x6C0000, bank 108, 0-20480"*. That is right for
+20,480 of 20,481 bytes and wrong about the ONE byte packing law #3 says is
+PLAYED. The remap was adopted on an identity that does not hold at the
+endpoint.
+
+**FOURTH INSTANCE OF A KNOWN CLASS.** #82 / 14z-87b found the endpoint is
+inclusive and that 3 of 57 packed records carried a foreign end byte — one of
+them `rec#0x3C8`, the sword-plant BEEP, ear-confirmed by the maintainer. This
+is the same shape at a different record, and `0xFF` against `0x00` is a
+maximal-amplitude discontinuity: a click at the END of the sample.
+
+**THE LEAD, stated as a lead and not a conclusion:** the maintainer reports
+*"a grunt kind of noise at the END of the state"* on Phobos, and this is
+Phobos' trap sample family, differing only in its final played byte. Those
+line up. NOT PROVEN — I have not confirmed it audibly, and the maintainer has
+already said my earlier capture did not match, so the honest status is a
+strong candidate awaiting their video or a WAV A/B on this specific record.
+
+**Also corrected on the way (see the previous entry):** the issue's own first
+step was malformed — `13` is a QSound CHANNEL, not sound id `0x0D`.
+
 ### #93 — TWO INSTRUMENT FINDINGS BEFORE THE AUDIT EVEN RAN, and the
 ### issue's own first step is malformed
 
