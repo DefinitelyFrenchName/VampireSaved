@@ -2244,6 +2244,7 @@ swallows the rest of the list, which is how a 32-entry run silently became 28.
 | `test_builder_rom_audit.sh` | #38 | Builders audit the ROMs they read. **Not portable.** |
 | `test_m2a_mask_pin.sh` | 14z-93 | the mask pin |
 | `test_fbneo_overlay_hygiene{,_control}.sh` | 14z-94 | FBNeo overlay hygiene (`_control` is its must-fire control) |
+| `test_reconcile_matcher.sh` | #43(a) | ONE matcher, two callers. `reconcile_batch`'s drifted copy of `find_equiv`'s core is deleted; the three drifts survive as parameters pinned to the batch tool's MEASURED values. Section 2 proves the refactor inert against the pre-refactor copy reconstructed from git (1640/1640 probes), with a must-fire control; section 3 proves the parameters load-bearing (183/1640 change when freed), so #43(b) is a real change and section 2 is not vacuous. **Not portable.** |
 | `test_merged_inputs.sh` | #27 | the merged build's four ROM-derived inputs are PRODUCED, not demanded — and a regenerated set yields the identical merged patch. Asserts the ARTIFACT is reproducible rather than that the input dirs are byte-equal, because the latter is false and cosmetic: `build/m5_wide/extract/regions.json` predates two `extract_char.py` changes. **Not portable.** |
 | `test_record_window.sh` | 14z-94 | the windowed MNG recorder (2.4 MB/120 frames vs `-aviwrite`'s 5.7 GB/2 min). **Not portable.** |
 | `test_decode_stage_banners.sh` | #92 | the stage-banner decoder — incl. the control requiring a base-as-ANCHOR decode to FAIL LOUDLY. **Not portable.** |

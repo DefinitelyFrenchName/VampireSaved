@@ -10,7 +10,8 @@
 > ## ready the moment the hold lifts.
 > ##
 > ## **START HERE INSTEAD — the ruled work, in the maintainer's order:**
-> ## **(1) #27 — DONE 14z-95.** **(2) #43(a)** — the inert matcher
+> ## **(1) #27 — DONE 14z-95.** **(2) #43(a) — DONE 14z-95;** #43(b), the
+> ## row movement, still rides the next re-freeze. The inert matcher
 > ## refactor, split-ratified,
 > ## `allow_fallback=False` reproducing all 271 rows as the control.
 > ## **#52 is DONE (14z-95)** and **#24 is CLOSED**.

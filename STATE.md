@@ -141,7 +141,67 @@ Repaired in passing: `audit_merged_legacy`'s SKIP recipe named `build/hui30`
 while its own pin is `build/hui32` — a wrong recipe, which is what a prose
 recipe decays into.
 
-### #43(a) — the inertness claim is now MEASURED, ahead of the refactor
+### #43(a) — DONE. One matcher, two callers, and the split held
+
+`tools/find_equiv.py` now owns `masked_search`, parameterised by
+`hit_cap`/`allow_fallback`; `reconcile_batch`'s drifted copy is deleted and it
+imports the canonical one through a thin `_batch_search` binding — deliberately
+not named `masked_search`, because it is a parameter binding and the point of
+#43 is that there is one algorithm.
+
+The three drifts survive as arguments rather than being "fixed", because the
+batch tool's values are what 357 committed rows were generated under:
+`HIT_CAP = 64` (and the cap lands BEFORE the score sort, so it keeps the first
+N by ADDRESS, not the best N — that is why it is a cap and not a `--top`),
+`ALLOW_FALLBACK = False`, and the unusable-window case now RAISES
+`WindowUnusable` in `find_equiv` while `_batch_search` absorbs it as `[]`
+(the caller retries other window sizes, so it is "try the next one", not a
+verdict).
+
+**Gate `tests/test_reconcile_matcher.sh` (ci_static, ~40 s), five sections:**
+one implementation (including a check that the algorithm has not been pasted
+back under another name); inertness vs the pre-refactor copy reconstructed
+from git; the parameters load-bearing; the unusable-window signal
+distinguishable from "no candidate"; and the `--allow-plausible` claim
+matching reality.
+
+**TWO BUGS IN MY OWN GATE, caught by running it.** The load-bearing check had
+its exit-code sense INVERTED — it would have passed while asserting the
+opposite — and the unusable-window fixture never reached the path it tested
+(`4eb9 00112233` × 8 leaves 16 hard bytes, comfortably over the 8-byte floor).
+The fixture is now sized deliberately at three `jsr $00028DD8`: 18 bytes, 12
+wildcarded, 6 hard. A fourth would leave exactly 8 and NOT trip it, which is
+the kind of fixture that looks operand-heavy and tests nothing.
+
+**THE TRAP IN THE OBVIOUS CONTROL, worth recording.** `reconcile_batch` KEEPS
+existing rows ("existing rows win"), so re-running it against the committed
+manifest reproduces all 328 rows no matter which matcher is installed. A green
+re-emit is not evidence of anything. The comparison has to be made at the
+MATCHER, against the pre-refactor copy — which is why the gate reconstructs it
+from git rather than re-running the tool.
+
+**Measured for #43(b), so it can be scheduled on numbers rather than the
+ticket's:** exactly **2 of the 41 `open` rows** change status under the freed
+parameters, and **both land on `plausible`, not `verified`** — `0x028122 ->
+0x28e42` (0.90-w0x40) and `0x1e744e -> 0x1cf6e0` (1.00-w0x40, but NOT unique:
+419 candidates tie at 1.00, so `pattern_resolve`'s uniqueness test declines to
+call it verified). Since `build_merged.sh` hardcodes `--allow-plausible`, both
+would ship.
+**One discrepancy against the issue, unresolved and flagged rather than
+quietly overwritten:** the ticket reports `0x1e744e -> 0x1CF1E0`; today's tree
+measures `0x1cf6e0`. Not chased — that is (b)'s work — but the ticket's
+address should not be trusted as-is when (b) is scheduled. Note also that
+`0x028122` is the object-hit damage work-var span `audit_fg_parity` locks, so
+resolving it touches something already gated.
+
+**Corrected in place:** `reconcile_batch.py:14` said `--allow-plausible`
+"exists for experiment builds only" while `tools/build_merged.sh:41` hardcodes
+it. Plausible rows SHIP in the artifact that gets played, and the gate now
+fails if that claim comes back.
+
+Chain: **PASS 90 / SKIP 0 / FAIL 0.**
+
+### (was) #43(a) — the inertness claim measured ahead of the refactor
 
 Before writing any of it, the drifted `reconcile_batch.masked_search` was run
 against a canonical matcher pinned to the batch parameters

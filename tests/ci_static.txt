@@ -78,6 +78,10 @@ test_voice_row_range
 # caught, which is how the indirection was found.
 
 # --- ADDED 14z-95 ---
+# Ground truth for the ONE reconciliation matcher (GitHub #43(a)): the
+# refactor is pinned INERT against the pre-refactor copy, and its parameters
+# are proven load-bearing so #43(b) is a real change. Needs ROMDIR + git.
+test_reconcile_matcher
 # Ground truth for tools/ensure_merged_inputs.sh: the merged build's four
 # ROM-derived inputs are PRODUCED, not demanded (GitHub #27, maintainer-ruled
 # 2026-08-18 "it should be one command"). Needs ROMDIR + the pinned build
