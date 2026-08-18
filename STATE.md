@@ -19,6 +19,58 @@ reproduction protocol"* for the **#99 crash** — both are explicitly
 14z-94 close named #99 as the start point, and a future session reading only
 that would walk straight into work the maintainer has taken back.
 
+### #100 — MECHANISM FOUND STATICALLY, and it is a SINGLE-WRITER defect.
+### Scoped, not patched (shipped bytes need the plan shown first)
+
+The maintainer's report: the arcade "next stage" screen shows Donovan with a
+Victor name and a blank portrait; `0x13 & 0x0F == 0x03` is Victor, so a 4-bit
+mask was the hypothesis. **Confirmed, and localised to one instruction.**
+
+`tests/test_id_space.sh` already freezes "the 5 register-path folding sites":
+`003E40 004082 00A43E 0409EC 04FAC4`. All five share one shape — read the
+class from `$0382(An)`, `andi.w #$000F`. `0x00A43E` is the one in the
+arcade-ladder code region (the selector traced for #99 sits at
+`0x00AECA`-`0x00AF16`):
+
+    00A428: 41ED 0400       lea    $0400(A5),A0      ; P1 struct
+    00A42C: 082D 0000 00AC  btst   #0,$00AC(A5)
+    00A432: 6604            bne    .p2
+    00A434: 41ED 0800       lea    $0800(A5),A0      ; P2 struct
+    00A43E: 1028 0382       move.b $0382(A0),D0      ; character class
+    00A442: 0240 000F       andi.w #$000F,D0         ; <<< THE FOLD
+    00A446: 1B40 0130       move.b D0,$0130(A5)      ; -> RAM:$FF8130
+
+**A static scan of the whole opcode image settles the shape: `$FF8130` has
+exactly ONE WRITER (`0x00A446`) and FOURTEEN READERS.** So the fold happens
+once, and every consumer downstream sees Victor for a class-0x13 tenant. That
+is the whole defect, and `$FF8130` is **undocumented in `ram.md`** — a
+game-state byte with fourteen consumers and no atlas row.
+
+**WHY THIS IS NOT A ONE-WORD FIX, which is the part worth having measured.**
+The readers split:
+
+| readers | shape | consequence of widening the writer |
+|---|---|---|
+| 8 (`01BF94`, `01BFEE`, `01C076`, `01C0E4`, `01C238`, `01C292`, `01C31A`, `01C388`) | `andi.w #$000F` AGAIN, then `ror.w #6`, then `lea` | **RE-FOLD** — still show Victor. Widening the writer alone changes nothing here |
+| 6 (`00CD9C`, `021AC8`, `021C12`, `021C64`, `021C8E`, `06C494`) | use it RAW (`lsl.w #2` + `jsr (A0)`; `ror.w #6` + `lea $003A4400`) | would index with **0x13** into tables that may hold 16 rows — the out-of-range class this project already has a toolkit for |
+
+So the fix is the familiar variant-row shape, not a byte: widen the writer AND
+the eight re-folds, then prove each of the six raw consumers' tables has a row
+at 0x13. `tests/test_variant_dispatch.sh` and
+`tests/test_effect_palette_table.sh` are the existing instruments for exactly
+that question.
+
+**NOT MEASURED YET, and it bounds the above:** which screen each reader draws.
+`$FF8130` stayed `0x00` for the entire 40,620-frame marathon with Donovan
+forced, so that rig never reaches the writer — consistent with #99's finding
+that the marathon covers two ladder rungs and then drops to attract. Naming
+the readers' screens needs a rig that reaches the next-stage screen, which is
+the same missing capability #99 is parked on.
+
+**Deliberately not patched.** Shipped bytes get the extent measured and the
+plan shown first; this is a LOW/cosmetic item and it would move a byte that
+fourteen readers depend on.
+
 ### #97 CLOSED — with a NARROWER rule than the issue proposed, because the
 ### problem turned out to be repo-wide and only part of it is mine to fix
 
