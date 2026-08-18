@@ -3,18 +3,20 @@
 > ## **THE MERGED-M2 PLAYTEST IS IN: NO REGRESSION — and ONE CRASH.**
 > ## Maintainer, 2026-08-18, `build/m3b_merged9` on MAME.
 > ##
-> ## **#99 IS HANDS-OFF (maintainer, 2026-08-18): they have a possible
-> ## reproduction protocol and asked to wait for their feedback before it
-> ## is tackled. The same hold applies to the Phobos sfx report.** Do not
-> ## start either; the standing analysis for both is kept below so it is
-> ## ready the moment the hold lifts.
+> ## **#99 IS PARKED (maintainer, 2026-08-18) — blocked on a RIG, not on
+> ## ideas.** The full measured state is on the issue; do not re-derive it.
+> ## **THE BLOCKER, and it is answerable: no rig in this corpus reaches
+> ## arcade rung 3, and the crash is reported at rung 5.** Every negative
+> ## result about #99 — the tenant-vs-tenant legs, the FBNeo marathon, the
+> ## mask experiments — is bounded by that.
 > ##
-> ## **START HERE INSTEAD — the ruled work, in the maintainer's order:**
-> ## **(1) #27 — DONE 14z-95.** **(2) #43(a) — DONE 14z-95;** #43(b), the
-> ## row movement, still rides the next re-freeze. The inert matcher
-> ## refactor, split-ratified,
-> ## `allow_fallback=False` reproducing all 271 rows as the control.
-> ## **#52 is DONE (14z-95)** and **#24 is CLOSED**.
+> ## **RESUME #99 HERE:** instrument what writes `$FF8138` to zero at
+> ## ~f13940, i.e. why the ladder resets after rung 2 even with Donovan
+> ## unkillable and winning legitimately. Input exhaustion is EXCLUDED
+> ## (the rig feeds inputs to f39999 over 19,155 lines).
+> ##
+> ## **#52 / #24 / #27 / #43(a) are all DONE (14z-95).** #43(b), the row
+> ## movement, still rides the next re-freeze.
 > ##
 > ## #99 background, for when the hold lifts: a crash-reset in the 5th
 > ## arcade match — Donovan vs Phobos (CPU), at fight start, reached by
@@ -158,8 +160,10 @@ procedure only if a single command cannot work; **#43 ruled — SPLIT**, land
 the inert refactor now and ship the row movement at the next re-freeze.
 Remaining maintainer-owned: **#57**. Architecture backlog:
 #47/#48/#49/#50, #69, #71, #46, #93, #94. None blocks the re-freeze.
-**#99 and the Phobos sfx are HANDS-OFF pending the maintainer's own
-reproduction protocol — do not start either.**
+**#99 is PARKED (see the banner). The Phobos sfx thread is measured but
+NOT closed** — the extra voices found are at the PRE-MATCH phase, not at the
+end of the electrocute where the report puts them, and a `+0x382` poke
+confound is open. Both are on the issue and in STATE 14z-95.
 
 ## Where it stands
 
