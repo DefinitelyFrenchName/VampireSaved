@@ -19,6 +19,45 @@ reproduction protocol"* for the **#99 crash** — both are explicitly
 14z-94 close named #99 as the start point, and a future session reading only
 that would walk straight into work the maintainer has taken back.
 
+### AN ARCADE-PROGRESSION RIG IS THE BLOCKER FOR #99, and it does not exist
+### yet — four attempts, each one narrowing why
+
+#99 is reported at the FIFTH arcade match. Nothing in this corpus reaches rung
+three. Four attempts to build one, in order, with what each eliminated:
+
+| attempt | result | what it eliminates |
+|---|---|---|
+| marathon as-is | 2 selections, then reset at f13980 | the baseline |
+| force wins by zeroing P2 HP | 7 selections, but mask NEVER updates | KO-by-poke skips the in-use bookkeeping |
+| heal P1 every 120f | reset at f13980 unchanged | not simply "Donovan dies" |
+| heal P1 every 20f | heal HOLDS (288 in 570/575 samples), CPU genuinely KO'd (P2 underflows to 65535 at f6960, resets to 288 at f7460) — **ladder still resets at f13940** | the win path works and is not the limit |
+
+**Input exhaustion is EXCLUDED by measurement:** the rig feeds inputs to
+f39999 across 19,155 lines, so the stall at ~f13940 is the GAME changing
+state, not the script running out.
+
+**The signature of the reset is `mask=0 AND bound=0 AND stage=0`, after which
+selections alternate `bound 0 <-> 6` with the mask permanently 0** — the shape
+of ATTRACT-mode demo matches rather than arcade progression. On that reading
+the 40,620-frame marathon is ~11,500 frames of arcade and ~29,000 frames of
+attract, which is the real content of the "rig-bounded" caveat in
+`audit_tripwire_reach`'s header.
+
+**What the forced-win variant DID reproduce, and it is the maintainer's
+symptom:** with the in-use mask never updated, selected stages walk
+BACKWARDS — 0x10, 0x0c, 0x08, 0x04, 0x02, 0x00 — i.e. later matches landing
+on earlier venues. That is the "the fight appears earlier on the spiral map,
+and the venue follows" report, produced on demand. It is a POKE ARTIFACT and
+not proof of the field mechanism, but it does establish the causal link the
+report implies: **mask bookkeeping missed -> earlier stage selected**, with
+everything else held.
+
+**NEXT, and it is now a prerequisite rather than an option:** find why the
+ladder resets after rung 2 under a held heal. Until that is answered there is
+no way to reach the state #99 needs, and every negative result about #99 —
+including my own tenant-vs-tenant legs and the FBNeo run — is bounded by a rig
+that stops three rungs short of the report.
+
 ### THE ARCADE MARATHON REACHES TWO LADDER RUNGS OF ~EIGHT — the coverage
 ### number nobody had, and it re-scopes what audit_tripwire_reach proves
 
