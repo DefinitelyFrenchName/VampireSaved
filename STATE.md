@@ -19,6 +19,73 @@ reproduction protocol"* for the **#99 crash** — both are explicitly
 14z-94 close named #99 as the start point, and a future session reading only
 that would walk straight into work the maintainer has taken back.
 
+### THE ELECTROCUTE RIG EXISTS — first in the project's history, and it
+### already retires two wrong beliefs
+
+`tests/replays/hui/93_hui_electrocuted.rpl`. STATE recorded TWICE (14z-74,
+14z-76) that "no existing replay produces an electrocute", which is why the
+effect-palette block's visibility had to be settled by playtest. There is one
+now, and it runs on BOTH games from one script (P1=0x10 Phobos victim,
+P2=0x03 Victor attacker — 0x03 is Victor on vsav and vsav2).
+
+**THE TRIGGER WAS NOT DERIVABLE FROM THE TREE and came from the maintainer**
+(2026-08-18): Victor's **HELD HP / 6+HP**, "the electrocuting version of his
+HP" — a CHARGEABLE NORMAL, not a special. Also supplied: Donovan's 214+P
+electrocute does NOT produce the reported sound, so the trigger is
+Victor-specific rather than "any electrocute".
+
+**Two beliefs died on the way:**
+1. **`32_victor_shock_vsav2.rpl` does not produce a shock** — measured on
+   NATIVE vs2: victim classes 0x00/0x05, freeze 0x0b, zero shake rows. Its
+   name is aspirational. This CORROBORATES the "no replay produces one"
+   record rather than contradicting it.
+2. **The electrocute class is 0x07, not 0x06.** I inherited 0x06 from the
+   trap work, where it is the *remapped dome's* route into vsavj's
+   electric-shake handler (14z-85g(2)). Victor's own electrocuting HP carries
+   **class 0x07 with freeze 0x2f (native) / 0x30 (ours)**. A rig asserting
+   0x06 would have reported "no electrocute" forever while producing one.
+
+**The rig's own control is load-bearing and is why the first version was
+caught.** v1 fired 236+HP as a 5-frame press. It CONNECTED on both legs —
+identical HP 288->275 at f3416 — and produced an ordinary hit (classes
+0x00/0x04/0x05, freeze 0x0a, zero shake rows). A short press is the QUICK
+version of the same normal. The rig now fires three attempts and the quick
+6+HP is retained as the negative control: it must NOT install the shake.
+
+| attempt | native | ours |
+|---|---|---|
+| held HP, neutral | class 0x05+**0x07**, freeze **0x2f** | class 0x05+**0x07**, freeze **0x30** |
+| 6+HP held | 0x05, freeze 0x0a | 0x05, freeze 0x0a |
+| 6+HP quick (control) | 0x05, freeze 0x0a | 0x05, freeze 0x0a |
+
+**THE SOUND RESULT DOES NOT LAND WHERE THE REPORT PUTS IT — stated plainly
+rather than massaged.** Whole-run ring A/B (ambient 0x049A excluded, 53
+native / 55 ours):
+
+  EXTRA ON OURS   : 008e, 0091, 010a, 010c x2, 01d2
+  MISSING ON OURS : 010b, 010d x2, 02a2
+
+Pairing them by frame, four are SUBSTITUTIONS (010b->010a at the electrocute,
+02a2->01d2, 010d->010c twice) and **only two are genuinely EXTRA**: `0091` at
+f2362 and `008e` at f2442 — both PRE-MATCH, not at the end of the electrocute.
+Inside the electrocute window (f3380-3700) the only delta is the 010a/010b
+pair `audit_trap_parity` already records as cosmetic (same content, relocated
+banks, defense-rows class).
+
+**Both extras are Phobos' OWN authored voices**: `0x8e` <- vs2 `0x746` and
+`0x91` <- vs2 `0x749`, both "verbatim" rows in `docs/project/tables/
+qs_voice_map.md`. Ours fires them; native fires neither.
+
+**THE CONFOUND, unresolved and NOT to be reported as a defect until it is
+closed.** The native leg reaches Huitzil by poking `+0x382`, and 14z-87
+established that IN MATCH that byte is the VOICE-FLAVOR class which the
+engine reassigns (`ram.md:85`). So "native fires neither" may mean the native
+leg is not voicing as Huitzil at all, rather than that vs2 is silent there.
+Until that is separated, these two ids are a MEASUREMENT, not a finding.
+The clean way to close it is the `+0x60.l` hitbox-base signature
+`audit_legacy_pairings` uses, which does not have this problem — the same
+weakness GitHub #16 already records against `test_pyron_blink`'s guard.
+
 ### #52 — the terminal-stretch exemption is gone (and the `END` off-by-one with it)
 
 `compare_flicker.py` exempted the LAST divergent stretch from the
