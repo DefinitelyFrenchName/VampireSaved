@@ -54,19 +54,36 @@ formed — both legs read character class 00 and hitbox base `0x00091f98`. It is
 the SELECT SCREEN in a half-ported state, which is what an incomplete stage
 is.
 
-**4. AND IT EXPLAINS THE OTHER ITEM TOO.** `tests/lib/m2a_common.sh` is
-sourced by BOTH `test_m2a_stage4_code.sh` (builds **stage 4**) and
-`test_m2b_stage6.sh` (builds **stage 6**), and they share ONE expectation set
-— `M2A_FLICKER_SPECS=tests/expected/donovan-m2c`, which is a stage-6,
-pre-M3a generation. So the stage-4 caller inherits stage-6 expectations. That
-is the same mechanism as the `08_challenger_join` "growth", which measures as
-donovan-m2b's shape against m2c's spec.
+**4. CONFIRMED by running the STAGE-6 caller of the same shared gate** —
+`tests/lib/m2a_common.sh` is sourced by both `test_m2a_stage4_code.sh`
+(**stage 4**) and `test_m2b_stage6.sh` (**stage 6**) with ONE expectation set
+between them (`M2A_FLICKER_SPECS=tests/expected/donovan-m2c`). At stage 6:
 
-**So #96's three items reduce to ONE question, and it is the one already put
-to the maintainer:** what generation — and now also what STAGE — does this
-battery target? Nothing here is a defect in a shipping build; the gate applies
-one set of constants across two stages and two generations. **Nothing
-re-frozen**, because the answer changes which constants are even correct.
+    ok: 04_select_fuzz masked FLICKER 2 1525,2009  (within frozen 1525,2009,2195)
+    ok: 06_test_mode masked bit-identical (hook-free since 14z-91)
+
+So `04_select_fuzz` is a **stage** artifact, exactly as measured, and the 06
+fix holds at both stages.
+
+**RETRACTED, same measurement — I claimed this "explains the other item too"
+and it does NOT.** `08_challenger_join` FAILS AT STAGE 6 AS WELL:
+
+    FAIL: 08_challenger_join masked FLICKER 2 3507,3807 — flicker GREW
+          beyond the frozen inventory (3507): new frame(s) 3807.
+
+so it is not stage-dependent. Its explanation stays the narrower one: the
+current build measures donovan-**m2b**'s shape (`2 3507,3807`) against
+donovan-**m2c**'s spec (`1 3507`) — a GENERATION mismatch, independent of
+stage. Worth noting where 3807 went in the current vocabulary: the shipping
+sets express this replay as `composite … 3507 889-1675;3807-4610`, i.e. 3807
+is a WINDOW START, not a flicker frame. The m2c-era expectation predates that
+class existing.
+
+**Net, after the 06 fix: BOTH batteries are now red on exactly ONE thing —
+`08_challenger_join`'s 3807.** One constant, two gates, and the question it
+turns on is the one already with the maintainer: what generation does this
+battery target? **Nothing re-frozen**, because the answer decides which
+constant is correct.
 
 ### A GATE I WROTE THIS SESSION DISARMED ITSELF ON COMMIT — caught only
 ### because the runner counts SKIP separately
