@@ -19,6 +19,39 @@ reproduction protocol"* for the **#99 crash** — both are explicitly
 14z-94 close named #99 as the start point, and a future session reading only
 that would walk straight into work the maintainer has taken back.
 
+### A GATE I WROTE THIS SESSION DISARMED ITSELF ON COMMIT — caught only
+### because the runner counts SKIP separately
+
+`test_reconcile_matcher` found its reference implementation with
+`git log -S 'def masked_search' -- tools/reconcile_batch.py | head -1` and read
+that commit's blob. `-S` reports the commit where the string COUNT CHANGED —
+which, once #43(a) landed, is the commit that DELETED the function. Its blob
+no longer contains it, so the lookup returned a useless reference and section 2
+printed `SKIP:`.
+
+**The gate therefore passed while the refactor was uncommitted and skipped
+itself the moment the refactor was committed** — a gate that disarms on
+exactly the change it exists to police, and it did so silently: exit 0, no
+red, the assertion simply stopped running.
+
+**It was caught by `run_all_static` counting SKIP as a THIRD outcome
+(GitHub #29/#30).** Under the old "a skip exits 0, therefore green" behaviour
+this would have read PASS 90 and nobody would have looked. That is the second
+time this session the SKIP-is-not-PASS work paid for itself, and the first
+where the defect was MINE.
+
+Two fixes: the lookup now walks the `-S` candidates **and their parents**,
+taking the first blob that really carries the function; and the failure branch
+no longer prints the token `SKIP:` — with no reference implementation the
+gate's central assertion cannot run, which is a FAILURE of the gate, not an
+absent optional input. Re-verified: reconstructs from `4239a73^`, 1640/1640
+identical, control fires at 117/1640, exit 0, and its output contains no skip
+token at all.
+
+**Worth generalising:** any gate that reconstructs a "before" state from git
+is dated by its own commit. `-S` is the wrong primitive for "the last version
+that HAD this"; it answers "where did this change".
+
 ### #96 — the named symptom is FIXED by corroboration; TWO further failures
 ### in the same gate are now separated, and one needs root-causing
 

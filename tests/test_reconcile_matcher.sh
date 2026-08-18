@@ -63,12 +63,32 @@ echo "== 2: pinned parameters are INERT vs the pre-refactor copy"
 # Reconstruct the drifted copy from the last commit that still had it. The
 # revision is DERIVED, not pinned to a hash, so this keeps working as history
 # grows; RECONCILE_BASE_REV overrides it.
+# THE LOOKUP MUST TOLERATE ITS OWN COMMIT (14z-95). The first version took
+# `git log -S ... | head -1` and used that commit's blob. `-S` reports the
+# commit where the string COUNT CHANGED — which, once the refactor landed, is
+# the commit that DELETED the function, whose blob no longer contains it. So
+# the gate passed while the removal was uncommitted and SKIPPED itself the
+# moment it was committed: a gate that disarms on the change it exists to
+# police. Caught by run_all_static counting SKIP separately (GitHub #29) —
+# had SKIP been folded into PASS, this would have read green.
+# Fix: walk the candidates AND their parents, take the first blob that really
+# carries the function.
 if [ -z "$BASE" ]; then
-    BASE="$(git log --format=%H -S 'def masked_search' -- tools/reconcile_batch.py \
-            | head -1)"
+    for _c in $(git log --format=%H -S 'def masked_search' -- tools/reconcile_batch.py); do
+        for _rev in "$_c" "$_c^"; do
+            if git show "$_rev:tools/reconcile_batch.py" 2>/dev/null \
+                 | grep -q "^def masked_search"; then
+                BASE="$_rev"; break
+            fi
+        done
+        [ -n "$BASE" ] && break
+    done
 fi
 if [ -z "$BASE" ] || ! git show "$BASE:tools/reconcile_batch.py" > "$W/rb_old.py" 2>/dev/null; then
-    echo "  SKIP: cannot reconstruct the pre-refactor copy from git"
+    # Deliberately NOT the token a runner classifies as a skip: with no
+    # reference implementation this gate's central assertion cannot run, and
+    # that is a failure of the gate, not an absent optional input.
+    bad "cannot reconstruct the pre-refactor copy from git — section 2 cannot run"
 else
     git show "$BASE:tools/reconcile_batch.py" > "$W/rb_old.py"
     if grep -q "^def masked_search" "$W/rb_old.py"; then
@@ -88,7 +108,8 @@ else
             bad "control did not fire — section 2's result proves nothing"
         fi
     else
-        echo "  SKIP: $BASE has no masked_search to compare against"
+        bad "$BASE carries no masked_search — the reference is wrong, so"
+        echo "     section 2 would be comparing against nothing"
     fi
 fi
 
