@@ -19,6 +19,71 @@ reproduction protocol"* for the **#99 crash** — both are explicitly
 14z-94 close named #99 as the start point, and a future session reading only
 that would walk straight into work the maintainer has taken back.
 
+### #99 — THE LADDER SELECTOR IS NOW DRIVABLE ON DEMAND, and one clean
+### hypothesis is DEAD
+
+**Maintainer answers 2026-08-18 that reshaped this:** both crashes involved
+**Donovan**; the crash **never happens between two vanilla characters**; both
+were on **MAME**, so emulator-specificity is not excluded; a Phobos->Donovan
+switch alone is NOT sufficient; the match count is NOT sufficient; and — the
+load-bearing one — when the map showed an earlier fight, **the VENUE was wrong
+too**. One position variable drives both, which puts it in `$FF8100`'s
+subsystem, the same one #92 lived in. Also: there is no known case of Donovan
+being *simply picked* and crashing, so "Donovan arrived by an unusual route"
+survives while "Donovan" alone does not.
+
+**TENANT-VS-TENANT IS EXCLUDED BY MEASUREMENT, not just by report.** Three
+guarded legs on merged-m2, forced picks, replay 92: Phobos vs Donovan
+**END 4020**, Donovan vs Pyron (the 14z-85f pairing) **END 4020**, Phobos vs
+Victor (legacy control) **END 4020**. My "two tenants in one match" thread is
+therefore falsified by my own control, and the maintainer independently
+corrected the same reading. Recorded because it was the most attractive
+hypothesis available and it cost three runs to kill.
+
+**THE SELECTOR IS NOW A DRIVABLE INSTRUMENT.** Sampling
+`$FF8100/$FF8110/$FF8114/$FF8138` through `26_don_arcade_mash` with Donovan
+forced shows the ladder working in the clear:
+
+| frame | stage | in-use mask | idx | bound |
+|---|---|---|---|---|
+| 2430 | 0x0012 | 0x00000000 | 0 | 6 |
+| 7264 | 0x0012 | 0x00001000 | 1 | 6 |
+| 7340 | **0x0002** | 0x00001000 | 1 | 6 |
+
+so match-2 selection sets the match-1 opponent's class bit (12 = class 0x0C)
+and advances the index, and the stage follows the index.
+
+**HYPOTHESIS TESTED AND DEAD: the scan does NOT reach table A's `0x18`.**
+`ram.md:89` records `0x18` at index 7 of all 36 table-A rows, and the scan
+bound `$FF8138` measures 6 — so the obvious crash shape was "perturb the mask
+until nothing in-bound is free, the scan overruns onto index 7, and class 0x18
+(=24, a character that does not exist) reaches the opponent's `$382` at
+character load". That would have explained the intro-timed crash, the
+flakiness (the mask is sound-state-fed per `ram.md`), the 2P non-reproduction
+and the wrong venue in one stroke.
+**Measured: it does not happen.** With `$FF8110` poked to `0xffffffff` across
+the whole pre-selection window the scan **clamps at the bound**: idx 0x06,
+opponent class 0x0f, stage 0x0016 — a legal pair, `END 40620`, no crash. The
+control leg (unpoked) gives idx 0x01, class 0x0e, stage 0x0002.
+Note the edge it does reach: **0x16 is exactly the maximum legal stage value**
+("vanilla never emits above 0x16"), so the clamp lands on the last legal entry
+rather than past it.
+
+**WHAT THE SAME EXPERIMENT DID ESTABLISH, and it is the maintainer's
+symptom:** the in-use mask demonstrably controls BOTH the opponent class AND
+the stage — poking it moved the stage 0x0002 -> 0x0016 with everything else
+held. So a switch that perturbs that mask produces exactly the COUPLED
+"wrong map position + wrong venue" the field report describes. The specific
+*earlier*-position case is NOT yet reproduced: clearing the mask before the
+match-3 selection left the sampled window before the selection fired
+(both legs `END 40620`), so that variant is untested rather than negative.
+
+**NEXT, in order:** (1) find the match-3/4 selection frames and re-run the
+CLEAR variant — an earlier index is the direct analogue of the report;
+(2) run the crash scenarios on FBNeo, since the maintainer flags MAME-only as
+possible and every FBNeo gate is a live A/B, so the answer decides which half
+of the project the bug is in.
+
 ### THE ELECTROCUTE RIG EXISTS — first in the project's history, and it
 ### already retires two wrong beliefs
 
