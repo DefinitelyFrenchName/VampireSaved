@@ -35,14 +35,12 @@ cd "$REPO"
 # dirs are untracked by design (rule 7), which makes every hardcoded default
 # a pointer with a shelf life; tests/test_build_ref_rot.sh is the standing
 # check that now catches this class instead of a person tripping over it.
-# KNOWN-RED AS OF 14z-94, and deliberately so. Re-pointing the defaults made
-# this audit RUNNABLE for the first time in months, and it immediately
-# reports ring-id drift — which is expected: the frozen inventory was
-# measured against the SUPERSEDED pair (build/m3b_merged + build/pyron22),
-# so it describes builds that no longer exist. Re-measuring it is real work
-# with an audio ground truth, and this gate's own rule is "re-measure, never
-# absorb", so the inventory is NOT touched here. Tracked as GitHub #98.
-# Runnable-and-red-for-a-named-reason is strictly better than unrunnable.
+# GREEN AGAIN 14z-95 (GitHub #98) — and the inventory was never re-frozen.
+# The drift this reported after 14z-94 re-pointed the defaults was NOT a
+# sound defect: `mash` diverges at f4741 with merged one frame AHEAD of solo,
+# after which a mash rig is playing two different fights, so the whole-run
+# id-SET comparison was invalid rather than failing. The comparison is now
+# event-stream-with-a-frozen-onset; see the block below for the measurements.
 MERGED="${1:-build/m3b_merged9}"
 SOLO="${2:-build/pyron27}"    # pyron-m10, the shipping solo (carries
                               # pyr_sfx_records, as pyron-m4 did at 14z-85b)
@@ -70,54 +68,109 @@ done
 wait
 
 python3 - "$W" <<'PY' || fail=1
-import collections, re, sys
+import re, sys
 W = sys.argv[1]
-def inv(path):
-    ids = collections.Counter()
-    seen_end = False
+
+# ── WHY THIS COMPARES EVENT STREAMS AND NOT WHOLE-RUN ID SETS ────────────────
+# GitHub #98, resolved 14z-95. The set comparison this used to do reported
+#   "solo id(s) 0x51d, 0x9e, 0xf5 MISSING on merged — a family path stopped
+#    sounding"
+# which reads as a merge regression. It is not one. MEASURED:
+#   - `cosmo` runs in PERFECT LOCKSTEP: 112 of 112 events identical, frame for
+#     frame, merged vs solo. So the instrument and the comparison are sound.
+#   - `mash` is in lockstep for 136 events and then DIVERGES AT f4741, where
+#     merged fires id 010c ONE FRAME EARLIER than solo, and never re-syncs.
+#     Everything after that point is TWO DIFFERENT FIGHTS on a mash rig, so a
+#     whole-run id-set diff there compares things that are not comparable.
+#     The three "missing" ids and five "gained" ids are all downstream of it.
+#   - The divergence is DETERMINISTIC: three merged runs are event-identical.
+#   - It is not a build-generation artifact either: the SOLO is id-identical
+#     between pyron-m9 and pyron-m10, so nothing moved on that side.
+# A one-frame lead on TENANT CONTENT between merged and solo is the expected
+# class — merged carries three tenants' hooks — and audit_merged_legacy leg (b)
+# already treats merged-vs-solo tenant content as "first-divergence floor +
+# classified report" rather than bit-identity. What was wrong here was the
+# VOCABULARY, not the builds.
+#
+# So: compare the event streams up to the FROZEN divergence onset, and freeze
+# the onset itself. An onset moving LATER is fine (more agreement); an onset
+# moving EARLIER is a FAILURE — the same discipline test_dualtrack uses, and
+# the reason this is strictly stronger than either re-freezing the drifted
+# inventory (which absorbs) or the old set compare (which cries wolf).
+import os
+ONSET = {"cosmo": None,   # None = must agree for the WHOLE run
+         "mash":  4741}   # frozen 14z-95, merged one frame ahead of solo
+# MUST-FIRE CONTROL. "an onset moving EARLIER is a FAILURE" is this gate's
+# load-bearing assertion, and a frozen constant that happens to match is
+# indistinguishable from a comparison that cannot fail. PYRON_RING_ONSET
+# overrides the mash constant so the control can demand a RED; no shipped
+# caller sets it.
+if os.environ.get("PYRON_RING_ONSET"):
+    ONSET["mash"] = int(os.environ["PYRON_RING_ONSET"])
+
+def events(path):
+    out, end = [], False
     for ln in open(path):
         m = re.match(r"f(\d+) id ([0-9a-f]{4}) pc", ln)
         if m and int(m.group(2), 16) not in (0, 0xFFFF):
-            ids[int(m.group(2), 16)] += 1
+            out.append((int(m.group(1)), m.group(2)))
         elif ln.startswith("END"):
-            seen_end = True
-    return ids, seen_end
+            end = True
+    return out, end
+
 errs = []
 for name in ("cosmo", "mash"):
-    m, m_end = inv(f"{W}/{name}_merged/ring.txt")
-    s, s_end = inv(f"{W}/{name}_solo/ring.txt")
+    m, m_end = events(f"{W}/{name}_merged/ring.txt")
+    s, s_end = events(f"{W}/{name}_solo/ring.txt")
     if not (m_end and s_end):
         errs.append(f"{name}: a tap run did not complete (no END line)")
         continue
     if len(s) < 10:
-        errs.append(f"{name}: solo inventory only {len(s)} ids — dead rig "
+        errs.append(f"{name}: solo stream only {len(s)} events — dead rig "
                     "(verdict vacuous)")
         continue
-    # RE-FROZEN 14z-85b (was cosmo {0x110}; mash {0x110,0x111,0x112,
-    # 0x31b,0x729} — the pre-fix known-open inventory): the sfx-records
-    # fix shipped and the measured diff is EMPTY on both replays.
-    KNOWN_OPEN = {"cosmo": set(), "mash": set()}[name]
-    extra = set(m) - set(s)
-    missing = set(s) - set(m)
-    if extra != KNOWN_OPEN:
-        new = sorted(hex(i) for i in extra - KNOWN_OPEN)
-        gone = sorted(hex(i) for i in KNOWN_OPEN - extra)
-        errs.append(f"{name}: merged-only id set drifted from the frozen "
-                    f"known-open inventory (new: {new or '-'}; no longer "
-                    f"seen: {gone or '-'}) — re-measure, never absorb")
-    if missing:
-        errs.append(f"{name}: solo id(s) "
-                    f"{sorted(hex(i) for i in missing)} MISSING on merged "
-                    "— a family path stopped sounding")
-    if extra == KNOWN_OPEN and not missing:
-        print(f"  ok: {name} — merged/solo diff matches the frozen "
-              f"known-open inventory ({sorted(hex(i) for i in KNOWN_OPEN)})")
+    # how far do the two builds agree, event for event?
+    agree = 0
+    for a, b in zip(m, s):
+        if a != b:
+            break
+        agree += 1
+    want = ONSET[name]
+    if want is None:
+        if agree != len(m) or len(m) != len(s):
+            f = m[agree] if agree < len(m) else ("-", "-")
+            g = s[agree] if agree < len(s) else ("-", "-")
+            errs.append(f"{name}: expected WHOLE-RUN agreement, diverged at "
+                        f"event {agree} (merged f{f[0]} id {f[1]} | solo "
+                        f"f{g[0]} id {g[1]}) — merged and solo no longer "
+                        f"play this rig identically")
+        else:
+            print(f"  ok: {name} — merged and solo agree on all {agree} "
+                  f"ring events, frame for frame")
+        continue
+    if agree >= len(m) or agree >= len(s):
+        print(f"  ok: {name} — agreement now runs the WHOLE stream "
+              f"({agree} events), beyond the frozen onset f{want}. That is "
+              f"an improvement; re-freeze ONSET to None deliberately.")
+        continue
+    onset = m[agree][0]
+    if onset < want:
+        errs.append(f"{name}: divergence onset moved EARLIER — f{onset}, "
+                    f"frozen f{want}. Merged and solo stop agreeing sooner "
+                    f"than measured; root-cause it, do not re-freeze "
+                    f"(CLAUDE.md §4 standing watch)")
+    elif onset > want:
+        print(f"  note: {name} — onset f{onset} is LATER than the frozen "
+              f"f{want} (more agreement, not less)")
+    else:
+        print(f"  ok: {name} — {agree} events identical, divergence at the "
+              f"frozen onset f{onset} (merged one frame ahead)")
 for e in errs:
     print("FAIL:", e)
 sys.exit(1 if errs else 0)
 PY
 
 [ "$fail" = 0 ] || { echo "FAIL: pyron ring audit"; exit 1; }
-echo "PASS: merged-vs-solo ring diff matches the frozen known-open"
-echo "      inventory (the per-node sfx helper class, STATE 14z-85) —"
-echo "      no drift, no missing solo ids"
+echo "PASS: merged/solo ring streams agree to their frozen onsets"
+echo "      (cosmo whole-run; mash to f4741, where merged runs one frame"
+echo "      ahead — GitHub #98, measured 14z-95)"

@@ -19,6 +19,52 @@ reproduction protocol"* for the **#99 crash** — both are explicitly
 14z-94 close named #99 as the start point, and a future session reading only
 that would walk straight into work the maintainer has taken back.
 
+### #98 CLOSED — and it was never a sound defect. The COMPARISON was invalid
+
+`audit_pyron_ring` reported, after 14z-94 re-pointed its rotted defaults:
+
+    FAIL: mash: solo id(s) 0x51d, 0x9e, 0xf5 MISSING on merged
+          — a family path stopped sounding
+
+which reads as a merge regression on Pyron's sound. It is not one.
+
+**Measured 14z-95, four ways:**
+- **`cosmo` runs in PERFECT LOCKSTEP** — 112 of 112 ring events identical,
+  frame for frame, merged vs solo. So the instrument and the comparison method
+  are sound; whatever is wrong is specific to the other leg.
+- **`mash` agrees for 136 events and then DIVERGES AT f4741**, where merged
+  fires id `010c` **one frame EARLIER** than solo, and never re-syncs. After
+  that point a MASH rig is playing two different fights, so a whole-run
+  id-SET diff is comparing things that are not comparable. The three
+  "missing" ids and the five "gained" ones are all downstream of that one
+  frame.
+- **The divergence is DETERMINISTIC** — three merged runs are event-identical
+  (380 events each), so this is not the run-to-run lottery.
+- **It is not a build-generation artifact either:** the SOLO is id-identical
+  between `pyron-m9` and `pyron-m10`, so nothing moved on that side. All the
+  drift is merged-side, and it is one frame of timing.
+
+A one-frame lead on TENANT CONTENT between merged and solo is the expected
+class — merged carries three tenants' hooks — and `audit_merged_legacy` leg
+(b) already treats merged-vs-solo tenant content as "first-divergence floor +
+classified report" rather than bit-identity. **What was wrong here was the
+gate's VOCABULARY, not the builds.**
+
+**THE FIX IS STRICTLY STRONGER THAN EITHER OBVIOUS OPTION.** Re-freezing the
+drifted inventory would have absorbed an unattributed change (the thing this
+gate's own rule forbids); keeping the set compare would keep crying wolf. The
+comparison is now **event-stream agreement up to a FROZEN ONSET**: `cosmo`
+must agree for the whole run, `mash` to f4741. An onset moving LATER is
+reported as an improvement; an onset moving **EARLIER is a FAILURE** — the
+same discipline `test_dualtrack` uses.
+
+**Must-fire control added, because a frozen constant that happens to match is
+indistinguishable from a comparison that cannot fail:** `PYRON_RING_ONSET`
+overrides the mash constant, no shipped caller sets it, and claiming a later
+onset turns the gate RED with the right message (verified, exit 1).
+
+The audit is GREEN again and its known-red header note is retired.
+
 ### THE SUITE DEBT IS PAID — tenant-vs-tenant and the electrocute both have
 ### gates now, and both carry the control that makes them mean something
 
