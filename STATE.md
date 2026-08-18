@@ -19,6 +19,42 @@ reproduction protocol"* for the **#99 crash** — both are explicitly
 14z-94 close named #99 as the start point, and a future session reading only
 that would walk straight into work the maintainer has taken back.
 
+### THE #99 PROBE IS NOW AN INSTRUMENT — and section 2 locks a hypothesis
+### that DIED, which is the part worth keeping
+
+`tests/audit_ladder_selector.sh`. CLAUDE.md §4 requires every in-emulator
+probe to become a scripted, rerunnable case before the session ends; the
+ladder work for #99 was a shell history, and #99's resume instruction pointed
+at a tool that did not exist. Green on first run, reproducing every
+measurement:
+
+| section | asserts | measured |
+|---|---|---|
+| 0 | rig liveness — both legs END, probe fires | ok |
+| 1 | the coverage number | **1 ladder advance in 40,620 frames** |
+| 2 | the scan cannot overrun its bound | clamps at idx 6, stage 0x0016 |
+| 3 | the mask is load-bearing | control stages {0,0x12,0x2} vs saturated {0,0x2,0x4,0x8,0xc,0x10,0x12,0x16} |
+
+**Section 1 turns the #99 blocker into a gate.** More advances than measured
+is reported as an IMPROVEMENT wanting a deliberate re-freeze — so the day a
+rig finally reaches rung 3, this says so instead of silently passing. Fewer is
+a regression.
+
+**SECTION 2 IS THE ONE WORTH ARGUING FOR, because it locks a hypothesis I
+DISPROVED.** The attractive #99 shape was "perturb the mask until nothing
+in-bound is free, the scan overruns onto table A's `0x18` at index 7, and
+class 0x18 (=24, a character that does not exist) reaches the opponent's
+`$382` at character load". Measured: it clamps. That kills the hypothesis —
+but it does NOT make the property uninteresting, because if a future change
+ever lifted the clamp, the result would be a crash of exactly the reported
+shape. A dead hypothesis with a live failure mode is precisely what deserves a
+permanent gate rather than a STATE paragraph.
+
+**Section 3 exists so 1 and 2 cannot be vacuous.** If poking `$FF8110`
+changed nothing, both would be measuring a dead input while reporting
+reassurance. It moves the stage across eight distinct values, so the input is
+connected.
+
 ### THE TRACKED-BUILD CLEANUP — steps 1-3 applied, step 4 declined by the
 ### maintainer, and one thing nearly deleted documented tooling
 

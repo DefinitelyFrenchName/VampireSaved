@@ -771,6 +771,44 @@ tests/audit_hitclass_map_cost.sh      # 14z-82b ON-DEMAND (NO minute figure
                                       # HITCLASS_TENANT_ONLY=1 skips 1+2.
                                       # Verdict logic ground-truthed by
                                       # tests/test_classify_hitclass_probe.sh
+tests/audit_ladder_selector.sh         # 14z-95 (GitHub #99) ON-DEMAND (~12 min,
+                                      # 2 marathon runs): THE ARCADE-LADDER
+                                      # SELECTOR, made rerunnable. #99 is a
+                                      # crash at the FIFTH arcade match and
+                                      # the investigation's probe lived only
+                                      # in a shell history; this is it, and
+                                      # it is what #99 resumes from.
+                                      # Watches $FF8100 (stage) / $FF8110
+                                      # (in-use mask, btst so MOD 32, and
+                                      # "sound-state-fed, the run-to-run
+                                      # lottery" — why 14z-85f was flaky) /
+                                      # $FF8114 (chosen index) / $FF8138
+                                      # (bound=6) / $FF8121 (venue).
+                                      # SECTION 1 quantifies the #99 BLOCKER:
+                                      # ONE ladder advance in 40,620 frames,
+                                      # i.e. the marathon exercises TWO rungs
+                                      # of eight and then drops to attract.
+                                      # MORE advances is reported as an
+                                      # IMPROVEMENT wanting a deliberate
+                                      # re-freeze; fewer is a regression.
+                                      # SECTION 2 is a REGRESSION LOCK ON A
+                                      # DEAD HYPOTHESIS, which is why it is
+                                      # worth keeping: ram.md:89 records 0x18
+                                      # at index 7 of all 36 table-A rows and
+                                      # the bound is 6, so if the scan ever
+                                      # overran onto index 7, class 0x18 (=24,
+                                      # a character that does not exist) would
+                                      # reach the opponent's $382 at character
+                                      # load — a crash of exactly #99's shape.
+                                      # Measured: with the mask saturated to
+                                      # 0xffffffff it CLAMPS at idx 6, stage
+                                      # 0x0016 (the maximum LEGAL stage), not
+                                      # past it. SECTION 3 proves the mask is
+                                      # LOAD-BEARING (poking it moves the
+                                      # stage) — without that, 1 and 2 would
+                                      # be measuring a dead input and every
+                                      # reassurance would be vacuous.
+                                      # LADDER_FRAMES/LADDER_BUILD override
 tests/audit_tripwire_reach.sh          # 14z-93 (GitHub #91) ON-DEMAND (~15 min,
                                       # JOBS=3): DO ANY PLANTED TRIPWIRES
                                       # FIRE IN EXTENDED PLAY? Every build
