@@ -19,6 +19,56 @@ reproduction protocol"* for the **#99 crash** — both are explicitly
 14z-94 close named #99 as the start point, and a future session reading only
 that would walk straight into work the maintainer has taken back.
 
+### THE ARCADE MARATHON REACHES TWO LADDER RUNGS OF ~EIGHT — the coverage
+### number nobody had, and it re-scopes what audit_tripwire_reach proves
+
+Sparse sweep of `$FF8100/$FF8110/$FF8114/$FF8138/$FF8121` every 60 frames
+across the WHOLE of `26_don_arcade_mash` (637 samples, Donovan forced,
+`END 40620`):
+
+| frame | stage | in-use mask | idx |
+|---|---|---|---|
+| 2460 | 0x0012 | 0x00000000 | 0 |
+| 7320 | 0x0012 | 0x00001000 | 1 |
+| 7380 | 0x0002 | 0x00001000 | 1 |
+
+**and then nothing changes for the remaining 33,240 frames.** The ladder
+advances TWICE and stops. So the 40,620-frame "arcade marathon" — the longest
+rig in the corpus, the one `audit_tripwire_reach` runs and the one that found
+#91 and #92 — exercises **two rungs of an eight-entry ladder**.
+
+`audit_tripwire_reach`'s header already says "a PASS is RIG-BOUNDED", which is
+honest; what nobody had was the NUMBER. It is 2. That matters directly for
+#99, which the maintainer reports at the **fifth** match: **no rig in this
+corpus has ever reached ladder rung 3**, let alone rung 5 with a continue and
+a character switch. The coverage gap recorded at 14z-94 was "no
+tenant-vs-tenant replay"; the deeper one is that arcade progression itself is
+almost entirely unrun.
+
+It also explains a puzzle in the #92 record: the crash frames (8887 / 15079 /
+18337) all sit AFTER the last selection at 7380, which is consistent with the
+banner pointer being computed at selection and DEREFERENCED much later, not
+with the ladder advancing to a bad rung.
+
+### FBNeo — the marathon runs there too, and it is the first time
+
+`26_don_arcade_mash` with Donovan forced, on merged-m2, patched FBNeo:
+**`END 40620`**, matching MAME. `audit_tripwire_reach` is MAME-only, so this
+rig had never run on the second emulator at all.
+
+So **emulator-specificity is NOT demonstrated on this rig** — which is a weak
+negative, because the rig does not reach the state the maintainer's crash
+needs (see the two-rung finding above). It does establish the FBNeo leg works
+end-to-end with forced picks, which it had not before.
+
+**Method note worth keeping:** `FBNEO_HPOKE` is an ENV VAR read via `getenv`
+inside the harness, not a CLI flag — `tools/run_replay_fbneo.sh` forwards
+nothing and does not need to, since the child inherits it. Scanning the binary
+for a `-hpoke` flag finds nothing and reads as "pokes are unsupported on
+FBNeo", which is wrong. The emulator prints `harness: poke frame N @addr = v`
+per poke, so the poke is self-confirming — check that line rather than
+assuming.
+
 ### #99 — THE LADDER SELECTOR IS NOW DRIVABLE ON DEMAND, and one clean
 ### hypothesis is DEAD
 
