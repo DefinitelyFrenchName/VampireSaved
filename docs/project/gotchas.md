@@ -1,5 +1,40 @@
 # GOTCHAS (project) — traps in OUR pipeline and method
 
+## A comparator's own ground-truth test can RATIFY a deviation from the governing spec (paid: 14z-95, GitHub #52)
+
+`tools/compare_flicker.py` exempted the LAST divergent stretch from the
+`>=60` re-convergence requirement entirely. CLAUDE.md §4 v2 has no
+end-of-log clause — but the code, its docstring ("end of log ok") and
+`tests/test_compare_flicker.sh` (`ok: end-of-log flicker -> FLICKER (no
+converge window needed)`) all agreed **with each other**. Three artifacts
+agreeing looks exactly like a validated behaviour, and CLAUDE.md §4's
+"verdict logic is itself tested" is satisfied on its face.
+
+**The trap:** ground truth validates a comparator against ITS AUTHOR'S
+INTENT, not against the ratified text. When the two diverge, the test is
+what makes the deviation durable — it converts "nobody noticed" into
+"someone asserted this on purpose", and the next reader stops there. The
+drift direction is what makes it worth catching: this one WIDENED a
+tolerance, which is the single thing §4 says may not happen without a
+measured mechanism and sign-off.
+
+Two things it cost beyond the exemption itself:
+- **The width was mis-stated in the ticket and in my own first reading.**
+  It was filed as "the final one or two frames". It is as wide as
+  `min-converge` — the check is SKIPPED, not narrowed, so any stretch
+  ending within 60 frames of the log's end was exempt.
+- **A `len(log)` sentinel is off by the trailer.** These logs end with an
+  `END <n>` row, so measuring the tail to `len(a)` counts it as one
+  converged frame. Measure to the last row that starts with a digit.
+
+**And the blast-radius measurement that "could not be done" could.** The
+14z-94 pass concluded it was unmeasurable statically ("188 of 188"),
+having scanned every flicker+composite spec. `compare_flicker` governs
+only the **19 `flicker`-kind** specs, and each has a basis log whose tail
+after the last frozen flicker frame is a `wc -l` away. Smallest live tail:
+**1325 frames**. Scope the population to the instrument before concluding
+a question is unanswerable.
+
 ## Half the Lua instruments stage inputs one frame off replay.lua — a frame number from one is not a frame number from the other (paid: 14z-90, GitHub issue #10)
 
 `tests/lua/replay.lua` writes its checksum for frame N and THEN stages

@@ -3,15 +3,25 @@
 > ## **THE MERGED-M2 PLAYTEST IS IN: NO REGRESSION — and ONE CRASH.**
 > ## Maintainer, 2026-08-18, `build/m3b_merged9` on MAME.
 > ##
-> ## **START HERE: GitHub #99**, a crash-reset in the 5th arcade match —
-> ## Donovan vs Phobos (CPU), at fight start, reached by continuing with a
-> ## character switch after losing as Phobos. HUD was up; it died at or
-> ## around the round-1 announce, so MATCH SETUP COMPLETED.
+> ## **#99 IS HANDS-OFF (maintainer, 2026-08-18): they have a possible
+> ## reproduction protocol and asked to wait for their feedback before it
+> ## is tackled. The same hold applies to the Phobos sfx report.** Do not
+> ## start either; the standing analysis for both is kept below so it is
+> ## ready the moment the hold lifts.
 > ##
-> ## The issue carries a DESIGNED EXPERIMENT, not a hunt: force
-> ## `$FF8114`=2 (Donovan's row group 0 index 2 = Phobos) to schedule the
-> ## matchup in match 1 and see whether it crashes WITHOUT the continue
-> ## history. Cheap test first; the five-match path only if that is clean.
+> ## **START HERE INSTEAD — the ruled work, in the maintainer's order:**
+> ## **(1) #27** — `build_merged.sh` regenerates its own inputs; ruled ONE
+> ## COMMAND. **(2) #43(a)** — the inert matcher refactor, split-ratified,
+> ## `allow_fallback=False` reproducing all 271 rows as the control.
+> ## **#52 is DONE (14z-95)** and **#24 is CLOSED**.
+> ##
+> ## #99 background, for when the hold lifts: a crash-reset in the 5th
+> ## arcade match — Donovan vs Phobos (CPU), at fight start, reached by
+> ## continuing with a character switch after losing as Phobos. HUD was up,
+> ## so MATCH SETUP COMPLETED. The issue carries a DESIGNED EXPERIMENT, not
+> ## a hunt: force `$FF8114`=2 (Donovan's row group 0 index 2 = Phobos) to
+> ## schedule the matchup in match 1 and see whether it crashes WITHOUT the
+> ## continue history.
 > ##
 > ## **Already excluded by measurement, do not re-derive:** the ladder
 > ## schedules Phobos BY DESIGN, and the sfx table's tenant rows are
@@ -35,11 +45,23 @@
   rather than coincidental. **Unmeasured.** May share a mechanism with #99,
   and it is observable ON DEMAND, which usually makes it the cheaper end to
   pull first.
-- **Phobos' electrocuted sfx "might be wrong"** — the maintainer's own caveat
-  is that it needs checking against vs2 and is likely not a regression. It
-  lines up with **#93** and **#98**, both already open and both "a sound that
-  should fire does not". Check natively before treating it as a third
-  finding.
+- **Phobos' electrocuted sfx "might be wrong" — DO NOT START ON THIS.** The
+  maintainer is investigating it themselves and asked for the hands-off until
+  they report back; the open question on their side is whether the wrong sound
+  plays INSTEAD of the correct one or RIGHT AFTER it.
+  **CORRECTED 14z-95 (maintainer): it is a WRONG sfx, not a missing one — so
+  the "#93/#98" reading below was mine and is RETRACTED.** Both of those are
+  absence shapes (#93: a native keyon signature missing from ours; #98: three
+  solo ring ids gone on merged); a wrong id at the right moment is the
+  opposite failure and points at the ID-MAPPING layer, not playback: the M5
+  batch's per-tenant voice REMAPS (H has 14 rows), the
+  `voice_borrow_keep_tenant` thunk (whose whole job is "tenants keep their OWN
+  voice class"), and — for *electrocuted* specifically — the ruled shock remap
+  `audit_trap_shock.sh` locks at class `0x06` against native's `0x52`.
+  Note the subsystem overlap with #99's one unmeasured lead (`ram.md:87`, the
+  borrow writing the OPPONENT'S class into `+0x382`): if that holds, the sfx
+  capture belongs in the #99 rig rather than in a separate pass. Capture the
+  native vs2 leg first and show it before measuring on either.
 
 ## Coverage gap the crash exposed
 
@@ -116,7 +138,9 @@ untracked build dirs with nothing to notice.
 
 **#30 IS DONE.** There is now ONE pre-commit command:
 
-    ROMDIR=... tests/run_all_static.sh        # 82 gates, PASS 82 / FAIL 0
+    ROMDIR=... tests/run_all_static.sh        # PASS 88 / SKIP 0 / FAIL 0
+                                              # (measured 2026-08-18; the count
+                                              #  moves — read the runner, not this)
 
 It counts PASS/SKIP/FAIL separately (#29 — a SKIP is not a pass) and names any
 emulator-free gate that is in neither registry, so the orphan problem cannot
@@ -127,9 +151,14 @@ fixed, all detailed in STATE 14z-94 (9)) and a fourth now filed as **#96**.
 **Start here next time: #96** — `test_m2a_stage4_code`'s `06_test_mode`
 divergence disappeared (expected 700, got none). Either a stale constant or
 something live gone inert; name the mechanism before touching the number.
-The other open issues are maintainer-owned (#24, #27, #43, #52, #57) or
-architecture backlog (#47/#48/#49/#50, #69, #71, #46, #93, #94). None blocks
-the re-freeze.
+**RULED 2026-08-18 (maintainer), so this list has moved:** **#24 CLOSED**;
+**#52 fixed and landed** (14z-95); **#27 ruled — ONE COMMAND**, a documented
+procedure only if a single command cannot work; **#43 ruled — SPLIT**, land
+the inert refactor now and ship the row movement at the next re-freeze.
+Remaining maintainer-owned: **#57**. Architecture backlog:
+#47/#48/#49/#50, #69, #71, #46, #93, #94. None blocks the re-freeze.
+**#99 and the Phobos sfx are HANDS-OFF pending the maintainer's own
+reproduction protocol — do not start either.**
 
 ## Where it stands
 
@@ -291,9 +320,14 @@ Eleven findings from the 2026-08-15 adversarial review are now ACCEPTED.
 Ordered by severity, and split by whether they can be started without a
 ruling. The 21 still carrying `contested` are NOT in this list.
 
-**NEEDS A RULING FIRST — 3 items, and two of them are one decision**
+**~~NEEDS A RULING FIRST — 3 items~~ ALL THREE RULED 2026-08-18 (maintainer).
+The rulings are inline below; nothing in this block is open.**
 
-- **#30 + #24 + #29 ARE ONE CLUSTER, not three tickets.** #29 (~28 gates
+- ~~**#30 + #24 + #29 ARE ONE CLUSTER, not three tickets.**~~ **ALL THREE
+  CLOSED** — #30 and #29 in 14z-94, **#24 closed 2026-08-17 (maintainer)**.
+  `tests/run_all_static.sh` is the runner the cluster needed, and
+  `run_battery_m2.sh` now tallies PASS/SKIP and refuses GREEN at any skip.
+  The original analysis, kept because the eliminations stay valid: #29 (~28 gates
   `exit 0` when their build inputs are absent) and #24 (the battery prints
   `BATTERY GREEN` anyway) are the same defect seen from both ends, which is
   why #24 carries `duplicate`; and BOTH fixes need the thing #30 says does
@@ -306,23 +340,43 @@ ruling. The 21 still carrying `contested` are NOT in this list.
   run. Note the blast radius both handoffs flag: flipping `exit 0` -> 77
   changes the contract for every existing caller, including HANDOFF's own
   documented command lines.
-- **#27 — `build_merged.sh` cannot run from a clean checkout** (needs three
-  untracked `build/*/extract` dirs). Rule 3 says the output set must be
-  reproducible from pristine inputs at any commit; today the merged artifact
-  is reproducible only on this machine. The ruling is what the recipe should
-  be, since the script never calls `build_donovan.sh` and the knowledge
-  lives as prose in HANDOFF.
-- **#43 — `reconcile_batch.masked_search` is a drifted copy of
-  `find_equiv`'s core.** Needs a ruling because the fix MOVES ROWS: the
-  handoff measured several currently-`verified` rows becoming `plausible`
-  under the canonical (uncapped) matcher. 357 rows across the three
-  reconciliation manifests were generated by the drifted copy.
-  **READ THIS AGAINST #91/#92 BEFORE SCHEDULING ANYTHING ELSE:** the handoff
-  states at least TWO of the 41 `open` rows resolve with the canonical
-  matcher, one at score 1.00. #91 was a missing reconciliation row that
-  crashed the shipping build, and #92 is what resolving it exposed. So #43
-  is not backlog hygiene here — it may be load-bearing on the current
-  blocker.
+- **#27 — RULED 2026-08-18 (maintainer): ONE COMMAND.** *"It should be one
+  command; the procedure should be considered only if a single command cannot
+  work."* So rule 3's "reproduce from pristine inputs" is NOT satisfied by a
+  documented procedure a human follows. `build_merged.sh` regenerates its own
+  missing inputs — the three `build/*/extract` dirs and `build/wide0` — and
+  keeps using existing ones when present so the common path stays fast. No
+  ROM-derived byte gets tracked, so rule 7 is untouched.
+  **The constraint to respect while implementing:** this direction unfreezes
+  the same pinned dirs #26's track-mismatch guard protects, so regeneration
+  must be CREATE-IF-ABSENT and never rebuild-over, and the regenerated extract
+  must be proven byte-identical to the pinned one — otherwise the merged
+  fingerprint moves and that is rule 6, not a build convenience.
+- **#43 — RULED 2026-08-18 (maintainer): SPLIT IT, land the inert half now.**
+  The ticket bundles two things with different risk, and only one of them is
+  rule-6 territory:
+  **(a) the refactor** — move the matcher into `find_equiv.py` with
+  `hit_cap`/`allow_fallback`, delete `reconcile_batch.masked_search`, import
+  it. With `allow_fallback=False` it must reproduce all 271 rows exactly, so
+  ZERO built bytes move. Rule 6 does not reach a change that provably moves
+  nothing, which is why a clean freeze is not a precondition for it.
+  **(b) flipping the fallback on** — moves 3 rows (`0x028122`, `0x1e744e`,
+  `0x0448a6`) and therefore built bytes. Rides the next re-freeze.
+  Why (a) goes first rather than after: #91 was a missing reconciliation row
+  that crashed the shipping build in extended play, every build ships planted
+  tripwires standing in for unresolved rows (merged-m2 ~69), and #99 is a
+  crash on a path no rig has executed — so if #99 is a tripwire fire, the
+  canonical matcher is what names the row. Waiting is also circular: the
+  freeze waits on the crash, and the tool that may diagnose the crash would
+  wait on the freeze.
+  **Honest condition on (a):** it is inert *if* the 271-row control holds. If
+  reproducing them exactly turns out to need drifted behaviour not yet
+  enumerated, that is a finding — stop and report, do not nudge rows to make
+  the control green.
+  **Lands regardless of timing:** `reconcile_batch.py:14` says
+  `--allow-plausible` is "for experiment builds only" while
+  `tools/build_merged.sh:41` hardcodes it, so plausible rows ship in the
+  artifact that gets played.
 
 **MEDIUM — no ruling needed**
 

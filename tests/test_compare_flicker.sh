@@ -57,11 +57,34 @@ out=$(CF "$W/base.log" "$W/persist.log") && bad "persistent divergence accepted"
     || case "$out" in FAIL*) ok "persistent divergence -> FAIL";; \
        *) bad "persistent wrong reason: '$out'";; esac
 
+# GitHub #52 — THE TERMINAL-STRETCH EXEMPTION IS GONE. This case asserted the
+# opposite until 14z-95: the last stretch escaped the re-convergence check
+# entirely, so a divergence occupying the final frames was called FLICKER with
+# ZERO evidence of re-convergence — indistinguishable from the first frames of
+# a permanent divergence the replay simply ends before showing. CLAUDE.md §4 v2
+# has no end-of-log clause. Verdict is FAIL-SHORT, not FAIL: "the replay is too
+# short to prove re-convergence" is a different bug report from "the build
+# diverged", and the two want different fixes.
 mklog "$W/tail.log" 500 499
-out=$(CF "$W/base.log" "$W/tail.log") \
-    && case "$out" in FLICKER*) ok "end-of-log flicker -> FLICKER (no converge window needed)";; \
-       *) bad "tail flicker: got '$out'";; esac \
-    || bad "tail flicker: exit nonzero ('$out')"
+out=$(CF "$W/base.log" "$W/tail.log") && bad "end-of-log flicker accepted: '$out'" \
+    || case "$out" in FAIL-SHORT*) ok "end-of-log flicker -> FAIL-SHORT";; \
+       *) bad "tail flicker wrong reason: '$out'";; esac
+
+# The min-converge BOUNDARY, both sides. Frames run 1..500, so a flip at frame
+# f leaves exactly 500-f frame rows after it.
+mklog "$W/tail60.log" 500 440          # tail = 60, exactly min-converge
+out=$(CF "$W/base.log" "$W/tail60.log") \
+    && case "$out" in FLICKER\ 1\ 440) ok "tail == min-converge -> FLICKER";; \
+       *) bad "tail==60: got '$out'";; esac \
+    || bad "tail==60: exit nonzero ('$out')"
+
+# ALSO THE `END` OFF-BY-ONE CONTROL. tail is 59 real frame rows, but the log
+# carries a trailing `END <n>` row: an implementation measuring to len(log)
+# counts 60 and PASSES this case. It must FAIL.
+mklog "$W/tail59.log" 500 441          # tail = 59, one short
+out=$(CF "$W/base.log" "$W/tail59.log") && bad "tail of 59 accepted (END row counted?): '$out'" \
+    || case "$out" in FAIL-SHORT*) ok "tail == min-converge-1 -> FAIL-SHORT (END row not counted)";; \
+       *) bad "tail==59 wrong reason: '$out'";; esac
 
 mklog "$W/short.log" 499
 out=$(CF "$W/base.log" "$W/short.log") && bad "length mismatch accepted" \

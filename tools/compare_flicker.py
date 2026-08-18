@@ -16,10 +16,14 @@ Verdicts (stdout, exit 0/1):
   EXACT                 logs identical
   FLICKER <n> <frames>  divergent stretches within tolerance, else identical
   FAIL <reason>         tolerance exceeded / persistent divergence / length
+  FAIL-SHORT <reason>   the log ENDS before re-convergence can be proved --
+                        a replay-length problem, not a behavioural divergence,
+                        and a different bug report (GitHub #52)
 
 Tolerance (defaults from the session-7 measurements, deliberately tight):
   --max-stretch  2   max consecutive divergent frames per stretch
-  --min-converge 60  frames that must match after a stretch (end of log ok)
+  --min-converge 60  frames that must match after a stretch (NO end-of-log
+                     exemption — see GitHub #52)
   --max-total    8   max divergent frames overall
 """
 
@@ -76,10 +80,33 @@ def main():
             print(f"FAIL stretch of {e - s + 1} frames at frame "
                   f"{a[s].split()[0]} > max-stretch {args.max_stretch}")
             return 1
-    for (s, e), nxt in zip(stretches, stretches[1:] + [[len(a), len(a)]]):
-        if nxt[0] - e - 1 < args.min_converge and nxt[0] != len(a):
-            print(f"FAIL only {nxt[0] - e - 1} converged frames after frame "
-                  f"{a[e].split()[0]} < min-converge {args.min_converge}")
+    # 14z-95 (GitHub #52): the LAST stretch used to be exempt from the
+    # re-convergence requirement entirely — the sentinel was [len(a), len(a)]
+    # and the `nxt[0] != len(a)` guard skipped the check for whichever stretch
+    # came last. CLAUDE.md §4 v2 has no end-of-log clause, and the exemption
+    # was as wide as min-converge itself, not one or two frames: a PERMANENT
+    # divergence whose replay simply ends before it can propagate was
+    # indistinguishable from a flicker. Two corrections here:
+    #   - the tail is measured to the last FRAME row, not to len(a). The log's
+    #     trailing `END <n>` row would otherwise count as one converged frame.
+    #   - a short tail is FAIL-SHORT, a distinct verdict, because "the replay
+    #     is too short to prove re-convergence" and "the build diverged" are
+    #     different findings and want different fixes.
+    # Measured before landing: every live flicker spec's tail is >= 1325
+    # frames, so no frozen expectation depends on the exemption.
+    end_of_frames = max(i for i, l in enumerate(a)
+                        if l.split() and l.split()[0].isdigit()) + 1
+    for (s, e), nxt in zip(stretches, stretches[1:] + [[end_of_frames] * 2]):
+        conv = nxt[0] - e - 1
+        if conv < args.min_converge:
+            if nxt[0] == end_of_frames:
+                print(f"FAIL-SHORT only {conv} frames of log after frame "
+                      f"{a[e].split()[0]} < min-converge "
+                      f"{args.min_converge} — the log ends too soon to prove "
+                      f"re-convergence")
+            else:
+                print(f"FAIL only {conv} converged frames after frame "
+                      f"{a[e].split()[0]} < min-converge {args.min_converge}")
             return 1
 
     print(f"FLICKER {len(bad)} {','.join(frames)}")

@@ -1,5 +1,121 @@
 # STATE — living progress log
 
+## Session 14z-95 — FOUR MAINTAINER RULINGS TAKEN, #52 LANDED, and the
+## Phobos sfx report corrected from "a sound missing" to "a WRONG sound"
+
+**The rulings, verbatim in effect (maintainer, 2026-08-18):**
+
+| # | ruling |
+|---|---|
+| **#24** | **CLOSED** (2026-08-17). |
+| **#52** | *"I agree with your proposed fix."* — landed this session. |
+| **#27** | *"It should be one command; the procedure should be considered only if a single command cannot work."* So rule 3 is NOT satisfied by a documented human procedure. |
+| **#43** | **SPLIT RATIFIED** — land the inert refactor now, ship the row movement at the next re-freeze. |
+
+**AND TWO STANDING HOLDS, which govern what may be worked on:** the
+maintainer is investigating the **Phobos sfx** themselves and *"might have a
+reproduction protocol"* for the **#99 crash** — both are explicitly
+**wait-for-feedback**. Neither is to be started. Recorded here because the
+14z-94 close named #99 as the start point, and a future session reading only
+that would walk straight into work the maintainer has taken back.
+
+### #52 — the terminal-stretch exemption is gone (and the `END` off-by-one with it)
+
+`compare_flicker.py` exempted the LAST divergent stretch from the
+re-convergence requirement entirely: the sentinel was `[len(a), len(a)]` and
+the `nxt[0] != len(a)` guard short-circuited the check. CLAUDE.md §4 v2 has no
+end-of-log clause, and the exemption was **as wide as `min-converge` itself**,
+not one or two frames — a permanent divergence whose replay simply ends before
+it can propagate was indistinguishable from a flicker.
+
+Two corrections landed together:
+- the tail is measured to the last **frame row**, not to `len(log)`. The
+  trailing `END <n>` row was otherwise counted as one converged frame.
+- a short tail is **`FAIL-SHORT`**, a distinct verdict. "The replay is too
+  short to prove re-convergence" and "the build diverged" are different bug
+  reports and want different fixes; collapsing them into `FAIL` was the thing
+  the issue's own handoff asked to avoid.
+
+Ground truth (`tests/test_compare_flicker.sh`) gained the boundary on both
+sides, and **both new cases are real controls** — the pre-fix comparator
+passes all three:
+
+| case | pre-fix | post-fix |
+|---|---|---|
+| flip at frame 499 (tail 1) | `FLICKER 1 499` rc=0 | `FAIL-SHORT` rc=1 |
+| flip at frame 441 (tail 59) | `FLICKER 1 441` rc=0 | `FAIL-SHORT` rc=1 |
+| flip at frame 440 (tail 60) | `FLICKER 1 440` rc=0 | `FLICKER 1 440` rc=0 |
+
+The 441 case is specifically the `END` control: an implementation measuring to
+`len(log)` counts 60 there and passes it.
+
+**THE BLAST-RADIUS CLAIM FROM 14z-94 (3) IS CORRECTED, not just closed.** That
+entry said the radius could not be measured statically — "188 of 188
+unmeasurable". It scanned all flicker+composite specs, but `compare_flicker`
+governs only the **19 `flicker`-kind** specs, and each has a basis log whose
+tail after the last frozen flicker frame is directly countable. Measured: the
+smallest tail is **1325 frames** (`04_select_fuzz`, last flick 2195 of 3520
+rows). Nothing was near the exemption. The four string-matching consumers were
+checked too — `run_suite.sh` and `audit_merged_legacy.sh` compare against
+`FLICKER <inventory>`, `m2a_common.sh` branches on the exit code, and
+`test_hui_boot`/`test_pyron_ladder` require `^EXACT` — so `FAIL-SHORT` fails
+loudly everywhere and silently nowhere.
+
+Gate after landing: `ROMDIR=... tests/run_all_static.sh` **PASS 88 / SKIP 0 /
+FAIL 0**, working tree clean, registry coverage clean.
+
+### The Phobos sfx report — my triage of it was WRONG, and the correction matters
+
+The 14z-94 close filed the maintainer's *"a few of Phobos' voice sfx might be
+wrong (e.g. his electrocuted sfx)"* alongside **#93** and **#98** as "a sound
+that should fire does not". The maintainer has corrected the premise: the
+observation is a **WRONG sfx**, and the open question on their side is whether
+it plays **instead of** the correct one or **right after** it.
+
+That moves it out of the #93/#98 bucket entirely. Both of those are ABSENCE
+shapes (#93: a native keyon signature missing from ours; #98: three solo ring
+ids gone on merged). A wrong id at the right moment is the opposite failure,
+and it points at the **id-mapping** layer rather than playback:
+- the M5 batch's per-tenant voice **remaps** (D36 / **H14** / P10) — a wrong
+  row gives a wrong sound at exactly the right instant;
+- the `voice_borrow_keep_tenant` thunk, whose entire job is "tenants keep
+  their OWN voice class";
+- and for *electrocuted* specifically there is already a ruled remap —
+  `audit_trap_shock.sh` locks shock class `0x06` against native's `0x52`.
+
+**Worth carrying forward past the ticket:** the voice-class borrow is also the
+one unmeasured lead on **#99** (`ram.md:87` — the borrow writes a class taken
+from the OPPONENT'S candidate row into `+0x382` at match start, and a tenant
+opponent makes that a tenant class for the first time). A wrong voice on
+Phobos and a crash at the moment the dispatcher first fires are the same
+subsystem. If that holds, the sfx capture belongs inside the #99 rig rather
+than as separate work — but both are on hold, so this is a note, not a plan.
+
+### What #27 and #43 now require, recorded before the work starts
+
+**#27 — the constraint that is easy to miss.** Making `build_merged.sh`
+regenerate its inputs unfreezes the same pinned dirs **#26's track-mismatch
+guard protects**; those are opposite policies on the same objects, which is
+the conflict that kept #27 open. Regeneration must therefore be
+CREATE-IF-ABSENT and never rebuild-over. And because extraction feeds the
+merged program image, the regenerated extract must be proven **byte-identical**
+to the pinned one — otherwise the merged fingerprint moves, and that is rule 6
+rather than a build convenience. Note the same three dirs are pinned a second
+time in `tests/audit_merged_legacy.sh:91-93`, so the fix wants one shared
+helper, not two copies. (Its SKIP message also names `build/hui30` in prose
+while the pin is `build/hui32` — fix in passing.)
+
+**#43(a) — the control is the whole point.** `allow_fallback=False` must
+reproduce all 271 rows exactly; that is what makes the refactor provably
+zero-byte and takes it out of rule 6's reach. If reproducing them needs
+drifted behaviour not yet enumerated, that is a FINDING — stop and report,
+never nudge rows to make a control green. Landing regardless of timing:
+`reconcile_batch.py:14` says `--allow-plausible` is "for experiment builds
+only" while `tools/build_merged.sh:41` hardcodes it, so plausible rows ship in
+the artifact that gets played.
+
+---
+
 ## Session 14z-94 (11) — THE MERGED-M2 PLAYTEST RESULT (maintainer,
 ## 2026-08-18, build/m3b_merged9 on MAME). NO REGRESSION — and one CRASH.
 
@@ -630,7 +746,18 @@ slice is sized by `len(new)`, so nothing resizes and nothing overruns.
 
 **NOT TAKEN, WITH REASONS — these need either a ruling or a budget:**
 
-- **#52 (compare_flicker's end-of-log exemption) NEEDS A RULING, and the cost
+- **#52 — RESOLVED 14z-95: ruled by the maintainer and LANDED.** The
+  blast-radius measurement below is also **CORRECTED** — it *was* statically
+  measurable, and the reason the first attempt failed is instructive: it
+  scanned all 188 flicker+composite specs, but `compare_flicker` governs only
+  the **19 `flicker`-kind** ones, and each of those has a basis log whose tail
+  after the last frozen flicker frame is directly countable. Measured 14z-95:
+  the smallest tail is **1325 frames**, so no frozen expectation sat anywhere
+  near the exemption and the fix could not red the suite. The §4 v5 note below
+  also does not license this: v5 scopes the >=60 rule ACROSS TWO ATTRIBUTED
+  MECHANISMS, which is a different question from the end of the log.
+  Original entry follows.
+  **(was) #52 NEEDS A RULING, and the cost
   of answering it is the finding.** It is a deviation between code+test and
   the ratified §4 text, so tightening it is a TOLERANCE change — the one thing
   §4 says may not happen without measured mechanism and sign-off. I tried to

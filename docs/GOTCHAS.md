@@ -14,6 +14,10 @@ one your current task belongs to. A trap you hit while porting Huitzil
 is a GAME gotcha if it is true of the game regardless of the port.
 
 
+### appended 14z-95 (project bucket)
+- A comparator's own ground truth can RATIFY a deviation from the spec (#52)
+- A `len(log)` tail sentinel counts the trailing `END` row as a converged frame
+- Scope the population to the instrument before calling a question unmeasurable
 ### appended 14z-93 (project bucket)
 - The input-staging split is FROZEN and gated (10 deviant / 11 canonical, #10)
 - A `|| fallback` after a pipeline reads the LAST command's status
