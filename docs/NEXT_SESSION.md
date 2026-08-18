@@ -1,85 +1,86 @@
-# NEXT SESSION — orientation (written at the close of 14z-94, 2026-08-18)
+# NEXT SESSION — orientation (written at the close of 14z-95, 2026-08-18)
 
-> ## **THE MERGED-M2 PLAYTEST IS IN: NO REGRESSION — and ONE CRASH.**
-> ## Maintainer, 2026-08-18, `build/m3b_merged9` on MAME.
+> ## **THE SUITE IS GREEN: `ROMDIR=... tests/run_all_static.sh` -> PASS 90 /
+> ## SKIP 0 / FAIL 0.** Nine issues open, down from fourteen.
 > ##
-> ## **#99 IS PARKED (maintainer, 2026-08-18) — blocked on a RIG, not on
-> ## ideas.** The full measured state is on the issue; do not re-derive it.
-> ## **THE BLOCKER, and it is answerable: no rig in this corpus reaches
-> ## arcade rung 3, and the crash is reported at rung 5.** Every negative
-> ## result about #99 — the tenant-vs-tenant legs, the FBNeo marathon, the
-> ## mask experiments — is bounded by that.
+> ## **TWO STANDING HOLDS — do not start either:**
+> ## **#99** is PARKED (maintainer): blocked on a RIG, not on ideas. The full
+> ## measured state is on the issue; do not re-derive it.
+> ## **The Phobos sfx** is awaiting the maintainer's own VIDEO — my capture
+> ## does NOT match what they heard, confirmed 2026-08-18, so the two extra
+> ## voices I measured (`0x8e`/`0x91`, pre-match) are NOT the defect.
 > ##
-> ## **RESUME #99 HERE:** instrument what writes `$FF8138` to zero at
-> ## ~f13940, i.e. why the ladder resets after rung 2 even with Donovan
-> ## unkillable and winning legitimately. Input exhaustion is EXCLUDED
-> ## (the rig feeds inputs to f39999 over 19,155 lines).
+> ## **FOUR THINGS WAIT ON A MAINTAINER RULING** (nothing else is blocked):
+> ## 1. **#96** — what GENERATION and STAGE does the m2a/m2b battery target?
+> ##    Both batteries are now red on exactly ONE constant,
+> ##    `08_challenger_join`'s 3807. Nothing re-frozen pending the answer.
+> ## 2. **#43(b)** — when is the next re-freeze window? It moves 2 of the 41
+> ##    `open` rows, so it rides a freeze rather than landing alone.
+> ## 3. Does a red DEV-BUILD gate trigger rule 6? Shipping evidence is green.
+> ## 4. Should the remaining ~200 tracked build dirs stay in git? Step 4 of
+> ##    the cleanup was declined deliberately, not overlooked.
 > ##
-> ## **#52 / #24 / #27 / #43(a) are all DONE (14z-95).** #43(b), the row
-> ## movement, still rides the next re-freeze.
-> ##
-> ## #99 background, for when the hold lifts: a crash-reset in the 5th
-> ## arcade match — Donovan vs Phobos (CPU), at fight start, reached by
-> ## continuing with a character switch after losing as Phobos. HUD was up,
-> ## so MATCH SETUP COMPLETED. The issue carries a DESIGNED EXPERIMENT, not
-> ## a hunt: force `$FF8114`=2 (Donovan's row group 0 index 2 = Phobos) to
-> ## schedule the matchup in match 1 and see whether it crashes WITHOUT the
-> ## continue history.
-> ##
-> ## **Already excluded by measurement, do not re-derive:** the ladder
-> ## schedules Phobos BY DESIGN, and the sfx table's tenant rows are
-> ## present and well-formed in the WIDE extension. This is NOT the
-> ## #91/#92 out-of-range shape.
+> ## **START HERE otherwise: #93** — `audit_qs_voice_batch`'s keyon failure,
+> ## the last unblocked open item with a live lead. Its missing native
+> ## signature is `(voice 13, length 20481)`, and 20481 = an inclusive span
+> ## of `0..20480` — a number that appears verbatim in `huitzil.toml:2108`
+> ## as the trap sample at bank 108, i.e. PHOBOS' sound family. If that
+> ## holds, #93 and the maintainer's sfx report are ONE investigation.
+> ## Unverified: the length alone could coincide; only the content hash
+> ## settles it, and that needs the audit run.
 
-## What the playtest confirmed
+## What 14z-95 did
 
-- **#92's fix landed as designed in the field** — "Donovan is met on
-  Bishamon's stage", and `v=0x0a` decodes to ABARAYA, the ratified retarget.
-- **The round-end flicker was NOT observed.** That question was open from
-  before this session.
-- No regression otherwise.
+**Closed: #24, #27, #43(a), #52, #97, #98, #100.** Advanced: #96 (symptom
+fixed, three items separated, root-caused to one constant), #99 (parked with a
+cold-resume record), #100 (mechanism localised, then closed WON'T FIX under
+the standing cosmetic ruling and re-scoped beyond MiSTer).
 
-## The other two findings
+**Five new gates**, all with must-fire controls:
 
-- **#100 (LOW, cosmetic):** the next-stage screen shows Donovan with a Victor
-  name and a blank portrait. `0x13 & 0x0F == 0x03` — a 4-bit mask on the
-  class would do exactly that, and `ram.md:89` already records the ladder's
-  in-use mask aliasing MOD 32, so MOD 16 in the display path is plausible
-  rather than coincidental. **Unmeasured.** May share a mechanism with #99,
-  and it is observable ON DEMAND, which usually makes it the cheaper end to
-  pull first.
-- **Phobos' electrocuted sfx "might be wrong" — DO NOT START ON THIS.** The
-  maintainer is investigating it themselves and asked for the hands-off until
-  they report back; the open question on their side is whether the wrong sound
-  plays INSTEAD of the correct one or RIGHT AFTER it.
-  **CORRECTED 14z-95 (maintainer): it is a WRONG sfx, not a missing one — so
-  the "#93/#98" reading below was mine and is RETRACTED.** Both of those are
-  absence shapes (#93: a native keyon signature missing from ours; #98: three
-  solo ring ids gone on merged); a wrong id at the right moment is the
-  opposite failure and points at the ID-MAPPING layer, not playback: the M5
-  batch's per-tenant voice REMAPS (H has 14 rows), the
-  `voice_borrow_keep_tenant` thunk (whose whole job is "tenants keep their OWN
-  voice class"), and — for *electrocuted* specifically — the ruled shock remap
-  `audit_trap_shock.sh` locks at class `0x06` against native's `0x52`.
-  Note the subsystem overlap with #99's one unmeasured lead (`ram.md:87`, the
-  borrow writing the OPPONENT'S class into `+0x382`): if that holds, the sfx
-  capture belongs in the #99 rig rather than in a separate pass. Capture the
-  native vs2 leg first and show it before measuring on either.
+| gate | what it locks |
+|---|---|
+| `test_tenant_pairings.sh` | tenant-vs-tenant, all SIX orderings — the CLAUDE.md §4 coverage the suite never had, and the gap #99 walked through |
+| `test_hui_electrocute.sh` | the FIRST electrocute rig in the project's history (STATE said twice no replay produced one) |
+| `test_merged_inputs.sh` | the merged build's inputs are PRODUCED, not demanded — rule 3 is one command |
+| `test_reconcile_matcher.sh` | one matcher, pinned inert (1640/1640 probes), parameters proven load-bearing |
+| `audit_ladder_selector.sh` | the #99 ladder probe, and a regression lock on a hypothesis that DIED |
 
-## ~~Coverage gap the crash exposed~~ CLOSED 14z-95
+**THE SESSION'S REAL LESSON, worth more than any single fix: FOUR separate
+defects were checks that had STOPPED CHECKING**, and each read as green or
+quiet rather than red —
 
-`tests/replays/` had **no tenant-vs-tenant replay at all** while CLAUDE.md §4
-mandates "vs each of the 18 (both sides)". **Now covered:**
-`tests/test_tenant_pairings.sh` runs all SIX orderings of the three tenants on
-the merged build (~10s), asserting no crash plus both characters actually
-loaded on the per-character hitbox base `+0x60.l` — not `+0x382`, which
-14z-87 proved is the voice-flavor class in match. Replay 94 is
-character-agnostic, so a fourth tenant is a row in `CLASSES`, not a new
-replay. All six pass on merged-m2.
+| what | how it hid |
+|---|---|
+| `test_dualtrack` | red for 11 days; no runner executed it |
+| `audit_pyron_ring` | compared two builds that stop being comparable at f4741 |
+| `test_m2a_stage4_code` | asserted a constant a ratified change had invalidated |
+| `test_reconcile_matcher` | **mine** — disarmed itself the moment I committed the change it polices |
 
-**The DEEPER gap is still open and is now #99's blocker:** arcade progression
-itself. Measured 14z-95 — the 40,620-frame marathon reaches **two ladder rungs
-of eight** and spends its remaining ~29,000 frames in attract.
+The last was caught ONLY because `run_all_static` counts SKIP as a third
+outcome (#29/#30). That is an argument for spending time on gate
+VERIFICATION, not only on gate COVERAGE.
+
+**Generalise from the fourth:** any gate that reconstructs a "before" state
+from git is dated by its own commit. `git log -S` answers "where did this
+change", NOT "the last version that HAD this".
+
+## Where the tenants stand
+
+Unchanged this session — no build byte moved. `build/m3b_merged9` =
+**merged-m2** (`081e2e53`, 752 ops), solos `hui43` = huitzil-m16
+(`da734d49`) and `pyron27` = pyron-m10 (`e29cac23`), `build/don_m7` =
+donovan-m7 (`c90b60c3`, unchanged since 14z-91). Maintainer playtest of
+merged-m2: **no regression**, one crash (#99), one cosmetic (#100, now
+won't-fix).
+
+---
+
+# HISTORY BELOW — carried for reference, not current
+
+Everything from here down was written at the close of 14z-92/93/94. It is
+kept because the eliminations and traps stay valid, but read the section
+above for the current state.
 
 ## What changed in the triage, in one screen
 
@@ -158,7 +159,7 @@ regrow. On its FIRST full run it found three gates stale for weeks
 (`test_census_regions`, `test_voice_row_range`, `test_phasec_spaces` — all
 fixed, all detailed in STATE 14z-94 (9)) and a fourth now filed as **#96**.
 
-**Start here next time: #96** — `test_m2a_stage4_code`'s `06_test_mode`
+**(history) Start here next time: #96** — [14z-95: the named symptom is FIXED; two items remain, see the top] — `test_m2a_stage4_code`'s `06_test_mode`
 divergence disappeared (expected 700, got none). Either a stale constant or
 something live gone inert; name the mechanism before touching the number.
 **RULED 2026-08-18 (maintainer), so this list has moved:** **#24 CLOSED**;
@@ -172,7 +173,7 @@ NOT closed** — the extra voices found are at the PRE-MATCH phase, not at the
 end of the electrocute where the report puts them, and a `+0x382` poke
 confound is open. Both are on the issue and in STATE 14z-95.
 
-## Where it stands
+## (HISTORY, 14z-94) Where it stood then
 
 | leg (40,620-frame arcade marathon, forced pick, sparse probe at `0x05ffb6`) | verdict |
 |---|---|
@@ -324,7 +325,7 @@ three references rotted this session (`hui31`, `pyron20`, `pyron17`).
 - "It may feel better" was **emulator-sided**. The project has NO measured
   performance-positive result. Do not cite the obj_hook cycles for it.
 
-## START HERE — the open list, in order
+## (HISTORY, 14z-94) The open list as it stood then — SEE THE TOP FOR THE CURRENT ONE
 
 ### THE REQUALIFIED AUDIT BACKLOG (maintainer cleared `contested`, 2026-08-16)
 
