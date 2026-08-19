@@ -98,3 +98,10 @@ test_kernel_voice_tables
 # build, and an unregistered image stops it. Needs ROMDIR (it builds a
 # one-poke image to be 'not any frozen build'), no emulator.
 test_m2a_target_resolution
+
+# 14z-99 (GitHub #104): the option-(a) fix premises — the capture positioner's
+# id-unmasked read, the 5-consumer set of 0xBE27A, the 14+2 alias shapes, the
+# stride-equal cross-oracle twins, base-half byte-identity vsavj==vs2, the
+# signed-16-bit bound, and the 15-block/0x11bd0 port inventory. Needs ROMDIR
+# (decrypt cache), no emulator.
+test_capture_pose_sources

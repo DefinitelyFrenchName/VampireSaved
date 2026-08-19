@@ -87,25 +87,31 @@
 > ## section 0 (if the engines ever disagree there, the premise is dead).
 > ## **MECHANISM LOCATED — seven instructions at PRG:0x02802E.** The
 > ## first 32 words of EVERY attacker's keyframe block are a per-victim
-> ## offset table indexed by the victim's id UNMASKED, and in vsavj all
-> ## sixteen blocks have that table's variant half 0x10-0x1F byte-aliasing
-> ## 0x00-0x0F. The tenant lands in the base character's capture
-> ## sub-block and takes BOTH its position keyframes and its record index.
-> ## vs2's twin blocks are NOT aliased and already carry real newcomer
-> ## rows — the data exists verbatim.
-> ## **FIX + ITS BINDING CONSTRAINT:** 3 sub-blocks per attacker (~12.75
-> ## KB over all sixteen), but the offset is a WORD used via
-> ## `lea (a0,d0.w)` = SIGNED 16-BIT, so a sub-block must sit within
-> ## +/-32 KB of its block base — it CANNOT go in wide_ext and be pointed
-> ## at. Blocks are packed with no gaps, so each affected block must be
-> ## RELOCATED with its table + sub-blocks contiguous and 0xBE27A[attacker]
-> ## repointed (the throw_victim_keyframes / grab_hold_keyframes
-> ## mechanism, applied to LEGACY attackers' rows).
-> ## **AWAITING A RULING — scope, because this touches legacy pointers:**
-> ## (a) full, all 16 attackers / 48 sub-blocks (RECOMMENDED); (b) scoped
-> ## to common 2P grabs; (c) defer. Options + recommendation in STATE
-> ## 14z-99. Not yet measured, and it sizes (b): how many of the sixteen
-> ## attackers actually REACH this path.
+> ## offset table indexed by the victim's id UNMASKED, and in vsavj ALL
+> ## SIXTEEN blocks alias the variant half onto the base half — fourteen
+> ## by OFFSET, two (Zabel 0x04, special 0x0B) by MATERIALIZED byte-copies
+> ## (the "populated 32-entry shape / read that pair first" reading is
+> ## RETRACTED: same defect, stored differently). The tenant lands in the
+> ## base character's capture sub-block and takes BOTH its position
+> ## keyframes and its record index. vs2's twin blocks are NOT aliased and
+> ## carry real newcomer rows — the data exists verbatim.
+> ## **RULED 2026-08-19 (maintainer): option (a) — full — IS THE GOAL,
+> ## measured first. THE MEASUREMENTS CAME BACK CLEAN ON EVERY AXIS; (a)
+> ## PROCEEDS.** Premises frozen in test_capture_pose_sources.sh (NEW,
+> ## ci_static): source twins for all 16 attackers in BOTH vs2 and vhunt2
+> ## (tenant rows distinct, stride-equal, vs2==vh2 cross-oracle); every
+> ## BASE sub-block byte-identical vsavj==vs2 (a wholesale port is
+> ## legacy-safe by CONTENT; addresses never enter work RAM); the
+> ## signed-16-bit bound holds (worst 0x3730, `lea (a0,d0.w)`); exactly 5
+> ## consumers of 0xBE27A, all via the table.
+> ## **IMPLEMENTATION (rides the re-freeze window):** the shipped
+> ## throw_victim_keyframes mechanism, 15x — port the 15 distinct vs2
+> ## blocks (Zabel+special share 0x0ABC56) into wide_ext (0x11BD0 bytes,
+> ## ~71 KiB), repoint 0xBE27A rows 0x00-0x0F + 0x18 (Oboro is a real
+> ## attacker id). Legacy-dereferenced pointers: the 14z-91
+> ## walker-relocation precedent; the probe build must produce the legacy
+> ## A/B proof. Open observation: row 0x11 (Pyron-as-attacker) still
+> ## aliases Demitri's block.
 > ## **#105** (AUTO-mode win screens: white shapes, all tenants): AUTO
 > ## selection SOLVED + PROVEN (1P mode menu overlays the wheel
 > ## ~f1250-2100: D,D -> AUTO, confirm; menu times out into NORMAL) —

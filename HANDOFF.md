@@ -919,6 +919,27 @@ tests/test_kernel_voice_tables.sh     # 14z-96 (GitHub #101, ci_static): the
                                       # premise). 2 verdict controls. Static,
                                       # ~5 s warm. Dynamic half:
                                       # audit_hui_grunt + replay 95
+tests/test_capture_pose_sources.sh    # 14z-99 (GitHub #104, ci_static):
+                                      # THE OPTION-(a) FIX PREMISES,
+                                      # frozen — the ruling was "measure
+                                      # first" and this gate IS the
+                                      # measurement, rerunnable. Locks:
+                                      # the positioner's id-unmasked read
+                                      # (byte-exact at PRG:0x028058);
+                                      # exactly 5 consumers of 0xBE27A;
+                                      # the 14-offset-alias + 2-material-
+                                      # ized-alias block shapes; source
+                                      # twins for all 16 attackers in
+                                      # BOTH vs2 and vhunt2 (tenant rows
+                                      # distinct, stride-equal, vs2==vh2
+                                      # cross-oracle); every BASE
+                                      # sub-block byte-identical
+                                      # vsavj==vs2 (the legacy-safety
+                                      # premise of the wholesale port);
+                                      # the signed-16-bit bound (worst
+                                      # 0x3730); the 15-block/0x11BD0
+                                      # port inventory. 2 verdict
+                                      # controls. Static, ~5 s warm
 tests/test_qs_songs.sh                # 14z-86: the authored-Z80-song machinery
                                       # (WIDE v1.1 vsw.z01/z02 content members;
                                       # tools/build_qs_songs.py). Placements ==
@@ -1365,9 +1386,15 @@ tests/audit_don_grab_pose.sh          # 14z-98 (6), REBUILT 14z-99,
                                       # offset table indexed by the
                                       # victim's id UNMASKED, and vsavj
                                       # aliases its 0x10-0x1F half onto
-                                      # 0x00-0x0F (vs2's are real). Fix +
-                                      # the signed-16-bit constraint and
-                                      # the SCOPE RULING: STATE 14z-99.
+                                      # 0x00-0x0F in ALL 16 blocks (14 by
+                                      # offset, Zabel/special by
+                                      # materialized copies; vs2's are
+                                      # real). RULED option (a) full,
+                                      # feasibility MEASURED CLEAN —
+                                      # premises frozen in
+                                      # test_capture_pose_sources.sh;
+                                      # implementation + inventory:
+                                      # STATE 14z-99.
                                       # Donovan 0x13->0x03
                                       # gets Victor's index 6 (native 11);
                                       # Phobos 0x10->0x00 gets Bulleta's 12

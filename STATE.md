@@ -1,8 +1,10 @@
 # STATE — living progress log
 
-## Session 14z-99 — #102 CLOSED; #104 RE-MEASURED AND RE-ROOT-CAUSED: it is
-## the VARIANT-ROW ALIAS class, not an index-space generation drift. Two of
-## my own 14z-98 claims retracted, one of them an instrument bug.
+## Session 14z-99 — #102 CLOSED; #104 RE-ROOT-CAUSED (the variant-row
+## alias class, not an index-space drift), its mechanism LOCATED at
+## PRG:0x02802E, the fix RULED option (a) and MEASURED FEASIBLE on every
+## axis (premises frozen in test_capture_pose_sources.sh). Three of my own
+## claims retracted along the way, one an instrument bug.
 
 **#102 CLOSED** (maintainer-ruled 2026-08-19, not ours). The discriminator
 had already answered in 14z-98 (4); the ruling was taken and executed:
@@ -71,9 +73,14 @@ The resolving structure is the head of the ATTACKER's own keyframe block,
 and the defect is seven instructions at `PRG:0x02802E`:
 `move.b $382(a4),d1 ; add.w d1,d1 ; add.w (a0,d1.w),d0 ; lea (a0,d0.w),a0`
 — **the first 32 words of every attacker's keyframe block are a per-victim
-offset table indexed by the victim's char id UNMASKED**, and in vsavj all
-sixteen blocks have that table's variant half `0x10-0x1F` byte-aliasing
-`0x00-0x0F`. The tenant lands in the base character's capture sub-block and
+offset table indexed by the victim's char id UNMASKED**, and in vsavj
+**all sixteen blocks alias the variant half onto the base half** —
+fourteen by OFFSET, two (Zabel `0x04`, special `0x0B`) by MATERIALIZATION
+(32 distinct offsets whose variant CONTENT byte-copies the base
+sub-blocks, 15/16 rows, `0x1F` the exception both times — measured after
+the "the two exceptions are the useful part / populated 32-entry shape"
+reading, which is RETRACTED: they are the same defect stored differently,
+not tenant data). The tenant lands in the base character's capture sub-block and
 takes BOTH its position keyframes and its record index — exactly the "half
 right, half knocked-down, very horizontal" the field reported.
 Static and dynamic agree five for five: Victor's block `0x098C28` has
@@ -84,9 +91,40 @@ Static and dynamic agree five for five: Victor's block `0x098C28` has
 real rows for the newcomers (vs2 Victor `0x0A8824`: 0x10=`0x1A08`,
 0x11=`0x1BC0`, 0x13=`0x1D78`).
 
-**FIX SHAPE AND ITS BINDING CONSTRAINT.** Cost is 3 sub-blocks per
-attacker, stride per attacker (Victor `0x1B8`, Felicia `0x2B0`, Anakaris
-`0x30`, …) — ~12.75 KB over all sixteen. The offset is added as a WORD and
+**FEASIBILITY MEASURED (post-ruling, same session) — CLEAN ON EVERY
+AXIS; option (a) proceeds. Premises frozen in
+`tests/test_capture_pose_sources.sh` (NEW, ci_static):**
+1. Source data exists for ALL 16 attackers in BOTH vs2 and vhunt2:
+   tenant rows `0x10/0x11/0x13` distinct, sub-block stride EQUAL to
+   vsavj's per attacker, vs2 == vhunt2 on every tenant sub-block
+   (cross-oracle: the content is real and stable).
+2. Every BASE sub-block is BYTE-IDENTICAL vsavj vs vs2, 16/16 —
+   legacy capture data never changed between generations. (Zabel's
+   table LAYOUT differs — vs2 merges Zabel+special into one shared
+   block `0x0ABC56` — but the content each game's offsets reach is
+   equal.) A wholesale vs2 port is therefore legacy-safe by CONTENT,
+   and the addresses never enter work RAM (the positioner emits
+   VALUES; the victim's `+0x1C` comes from anim_index_c, untouched).
+3. The signed-16-bit bound holds everywhere (worst extended blob
+   `0x3730` < `0x8000`).
+4. All 1,632 tenant keyframe record-words are sane.
+5. Exactly FIVE code sites consume `0xBE27A`, all through the table
+   (`0x02804e/0x0280c6/0x028140` the positioner family +
+   `0x05316c/0x06e78a`), so repointing rows covers every consumer.
+**IMPLEMENTATION = the shipped `throw_victim_keyframes` mechanism, 15
+times:** port the 15 DISTINCT vs2 blocks (Zabel+special share one) into
+`wide_ext` — `0x11BD0` bytes, ~71 KiB — and repoint `0xBE27A` rows
+`0x00-0x0F` + `0x18` (Oboro is a real attacker id; his row must follow
+`0x08`'s new block). Rows `0x10/0x13` are already tenant-ported;
+**row `0x11` (Pyron-as-attacker) still aliases Demitri's block** — open
+observation for the window (matters only if Pyron has a capture move).
+The repointed rows are LEGACY-DEREFERENCED — the 14z-91 walker
+relocation is the precedent; the probe build's legacy A/B is the proof
+the window must produce.
+
+**The superseded sizing note, kept for the record:** cost was first
+stated as 3 sub-blocks for each of "the FOURTEEN aliasing attackers"
+(~10.4 KB) under the stitch shape. The offset is added as a WORD and
 consumed by `lea (a0,d0.w)`, i.e. **signed 16-bit**, so a sub-block must
 sit within ±32 KB of its block base: it CANNOT simply be placed in
 `wide_ext` and pointed at. The blocks are packed with no gaps, so each
@@ -95,11 +133,15 @@ and `0xBE27A[attacker]` repointed — the same mechanism
 `throw_victim_keyframes` / `grab_hold_keyframes` already use, but applied
 to LEGACY attackers' rows.
 
-**DECISION PENDING (maintainer) — scope, because this touches legacy
-pointers.** Options:
- (a) **Full**: relocate all 16 legacy attacker blocks, port 48 tenant
-     sub-blocks from vs2. Every legacy grab holds every tenant correctly;
-     16 legacy rows repointed (base halves byte-identical, so legacy work
+**DECIDED 2026-08-19 (maintainer): "the ideal goal is option (a),
+measure first: if option (a) is not feasible, then we reassess our
+options."** So the scope question is closed in favor of (a) full,
+CONDITIONED on the feasibility measurements below coming back clean —
+infeasibility reopens the options, nothing else does. The original
+options, kept for the record:
+ (a) **Full**: relocate the 14 aliasing legacy attacker blocks, port 42
+     tenant sub-blocks from vs2. Every legacy grab holds every tenant
+     correctly; 14 legacy rows repointed (base halves byte-identical, so legacy work
      RAM should stay bit-identical — that must be MEASURED, not assumed).
  (b) **Scoped**: only the attackers whose capture is common in 2P play.
      Smaller legacy surface, but leaves a defect whose trigger is "which
@@ -154,9 +196,15 @@ verdict-logic doctrine.
 **No shipped byte moved.** The 14z-96 freeze stands.
 
 **Decisions pending (maintainer):** unchanged from the 14z-98 list except
-that #102 is now closed and #104's fix shape is no longer "table reorder" —
-its row set waits on the open measurement above and still rides the same
-re-freeze window.
+that #102 is now closed and #104 is fully resolved to a ruled, measured,
+feasible fix — RULED option (a) 2026-08-19 ("the ideal goal is option (a),
+measure first: if option (a) is not feasible, then we reassess"), the
+feasibility measurements came back clean and are frozen in
+test_capture_pose_sources.sh, and the 15-block port + 17-row repoint rides
+the same re-freeze window as #103's staged rows. What remains for #104 is
+window WORK, not a decision: author the 15 data_port rows + the 0xBE27A
+repoints, probe-build, flip audit_don_grab_pose to EXPECT_MATCH=1, and
+produce the legacy A/B proof.
 
 
 ## Session 14z-98 CLOSE — ritual complete (the full session: (1)-(9))

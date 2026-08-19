@@ -56,20 +56,24 @@
 #     add.w (a0,d1.w),d0          ; += block[VICTIM id, UNMASKED]
 #     lea (a0,d0.w),a0            ; block + block[victim] + keyframe*8
 # THE FIRST 32 WORDS OF EVERY ATTACKER'S KEYFRAME BLOCK ARE A PER-VICTIM
-# OFFSET TABLE, and in vsavj all sixteen blocks have its variant half
-# 0x10-0x1F byte-aliasing 0x00-0x0F. The tenant lands in the base
+# OFFSET TABLE, and in vsavj ALL SIXTEEN blocks alias its variant half
+# onto the base half — fourteen by OFFSET, two (Zabel 0x04, special 0x0B)
+# by MATERIALIZED byte-copies (measured 14z-99; the earlier "populated
+# 32-entry shape" reading of that pair is RETRACTED). The tenant lands in the base
 # character's capture sub-block and takes BOTH its position keyframes and
 # its record index. Victor's block 0x098C28: block[0x13]==block[0x03]
 # ==0x0568, block[0x10]==block[0x00]==0x0040, block[0x11]==block[0x01]
 # ==0x01F8, and every measured A0 is block+block[victim]+0x106.
 # vs2's twin blocks are NOT aliased and already carry real newcomer rows
 # (vs2 Victor 0x0A8824: 0x10=0x1A08, 0x11=0x1BC0, 0x13=0x1D78).
-# FIX + CONSTRAINT: 3 sub-blocks per attacker (~12.75 KB over sixteen),
-# but the offset is a WORD used via `lea (a0,d0.w)` = SIGNED 16-BIT, so a
-# sub-block must live within +/-32 KB of its block base — NOT placeable in
-# wide_ext. Each affected block relocates with its table + sub-blocks
-# contiguous and 0xBE27A[attacker] repointed. SCOPE IS A MAINTAINER
-# RULING (it touches legacy pointers) — options in STATE 14z-99.
+# FIX: RULED 2026-08-19 (maintainer) — option (a), full, measured first;
+# THE FEASIBILITY MEASUREMENTS CAME BACK CLEAN and are frozen in
+# test_capture_pose_sources.sh (ci_static). Implementation = the shipped
+# throw_victim_keyframes mechanism 15x: port the 15 distinct vs2 blocks
+# (Zabel+special share one) into wide_ext (0x11BD0 bytes) and repoint
+# 0xBE27A rows 0x00-0x0F + 0x18 (Oboro). Every BASE sub-block is
+# byte-identical vsavj==vs2, so the port is legacy-safe by CONTENT; the
+# probe build's legacy A/B is the proof the window must produce.
 # Eliminated on the way, with controls: on merged-m3 the anim_index family
 # (a/a2/b/c/proj) and all 14 per-character dispatch tables have rows
 # 0x10/0x11/0x13 MOVED OFF the vanilla alias for all three tenants, so

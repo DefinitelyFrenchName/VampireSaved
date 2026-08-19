@@ -2092,8 +2092,12 @@ instructions at `PRG:0x02802E`:
 
 So **the first 32 words of every attacker's keyframe block are a
 per-victim offset table, indexed by the victim's char id UNMASKED** — and
-in vsavj all sixteen blocks have that table's variant half `0x10-0x1F`
-byte-aliasing `0x00-0x0F`. A tenant victim therefore lands in the base
+in vsavj **all sixteen blocks alias their variant half onto the base half**:
+fourteen by OFFSET (rows `0x10-0x1F` are word-copies of `0x00-0x0F`) and
+two — Zabel `0x04` and the special slot `0x0B` — by MATERIALIZATION (32
+distinct offsets whose variant sub-block CONTENT byte-copies the base
+sub-blocks, 15/16 rows; row `0x1F` is the known exception in both). A
+tenant victim therefore lands in the base
 character's capture sub-block and takes BOTH its position keyframes and
 its record index, which is precisely the "half right, half a knocked-down
 sprite, very horizontal" the field reported.
@@ -2110,16 +2114,46 @@ real, distinct rows for the newcomers (vs2 Victor `0x0A8824`: row 0x10 =
 because vs2 has no character there). The port gap is that vsavj's blocks
 have no tenant sub-blocks at all.
 
-**Sub-block stride is per attacker** (Victor `0x1B8`, Felicia `0x2B0`,
-Anakaris `0x30`, …), so a fix costs 3 sub-blocks per attacker — about
-12.75 KB over all sixteen. **Constraint that shapes it:** the offset is
-added as a WORD and consumed by `lea (a0,d0.w)`, i.e. SIGNED 16-BIT, so a
-sub-block must sit within ±32 KB of its block base — it cannot simply be
-placed in `wide_ext` and pointed at. The blocks are packed back to back
-with no gaps, so each affected block must be RELOCATED with its table and
-sub-blocks contiguous, and `0xBE27A[attacker]` repointed. That is the same
-mechanism `throw_victim_keyframes` / `grab_hold_keyframes` already use —
-but on LEGACY attackers' rows, which is a scope decision (STATE).
+**(A superseded reading, kept for the record: "the two exceptions are the
+useful part / read them first — their 32-entry tables are the shape the
+fix needs" — RETRACTED the same session, 14z-99.** Zabel `0x04` and the
+special slot `0x0B` do carry 32 distinct offsets at uniform `0x190`
+stride, but their variant-half sub-blocks measure as BYTE-COPIES of the
+base sub-blocks, 15/16 rows with `0x1F` the exception — the SAME defect
+stored as materialized content, not populated tenant data.)
+
+**THE FIX IS MEASURED FEASIBLE AND ITS SHAPE IS SETTLED (14z-99;
+maintainer-ruled option (a) — full — conditioned on these measurements,
+which came back clean; every premise below is frozen in
+`tests/test_capture_pose_sources.sh`):**
+- **Source data exists for all 16 attackers in BOTH source games**, with
+  distinct tenant rows (`0x10/0x11/0x13`), sub-block stride EQUAL to
+  vsavj's per attacker (the keyframe-index-space compatibility signal),
+  and vs2 == vhunt2 on every tenant sub-block (cross-oracle).
+- **Every BASE sub-block is byte-identical between vsavj and vs2**, all
+  16 attackers — the capture keyframe data for legacy victims never
+  changed between generations. (Zabel's table LAYOUT differs — vs2
+  merges Zabel+special into one shared block `0x0ABC56` — but the
+  content each game's offsets reach is equal.) This is what makes a
+  wholesale vs2 port legacy-safe by CONTENT; and the addresses never
+  enter work RAM — the positioner emits VALUES (keyframes and a record
+  index), and the victim's `+0x1C` comes from `anim_index_c`, untouched.
+- **The signed-16-bit bound holds everywhere**: the offset is a WORD
+  consumed by `lea (a0,d0.w)`, so sub-blocks must sit within ±32 KB of
+  the block base; the worst extended blob reaches `0x3730`.
+- **Implementation = the shipped `throw_victim_keyframes` mechanism, 15
+  times**: port each of the 15 DISTINCT vs2 blocks (Zabel+special share
+  one) into `wide_ext` — `0x11BD0` bytes, ~71 KiB — and repoint `0xBE27A`
+  rows `0x00-0x0F` plus `0x18` (Oboro Bishamon is a real attacker id and
+  must follow row `0x08`'s new block). Exactly 5 code sites consume
+  `0xBE27A`, all through the table, so the repoint covers every consumer.
+  Rows `0x10/0x13` are already tenant-ported; **row `0x11`
+  (Pyron-as-attacker) still aliases Demitri's block** — an open
+  observation for the window (it matters only if Pyron has a capture
+  move that runs this positioner).
+- The repointed rows are LEGACY-DEREFERENCED pointers — the 14z-91
+  walker relocation is the precedent (byte-identical content at a new
+  address, proven by legacy A/B at the probe build).
 
 Gate: `tests/audit_don_grab_pose.sh` (legacy-victim control in section 0).
 
