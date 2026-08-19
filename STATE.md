@@ -28,9 +28,13 @@ reconciliation_donovan.toml + the commented donovan.toml block
 (inertness proven by test_m3a_reproducible).
 
 **Decisions pending (maintainer), the complete list:**
-1. The re-freeze window (#43(b) + #103's staged rows + #104's table
-   reorder once derived) — scheduling is yours.
+1. The re-freeze window (#43(b) + #103's staged rows + #104's fix rows
+   once derived) — scheduling is yours.
+   [14z-99: the "#104 table reorder" shape named here is WITHDRAWN — its
+   premise measures false; see the 14z-99 entry.]
 2. #102's close ruling (the discriminator answered "not ours").
+   **DECIDED 2026-08-19 (maintainer): CLOSE IT — NOT OURS.** Executed
+   14z-99; audit_continue_ladder.sh stays as the regression lock.
 3. The two battery-target registry rows (14z-97, proposed).
 4. The ~200 tracked build dirs (carried).
 5. #105: your captures of the white-portrait screens (offered — bring

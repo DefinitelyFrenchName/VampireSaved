@@ -4,6 +4,11 @@
 # pure-legacy character? On-demand, ~20 min (2 full-marathon MAME runs,
 # parallel: pristine vsavj + the merged build).
 #
+# #102 IS CLOSED — maintainer-ruled 2026-08-19, NOT OURS (the answer this
+# gate produced). It is now a REGRESSION LOCK, not an open investigation:
+# leg A red means vanilla stopped resetting, i.e. the behavior was ours
+# after all, and #102 reopens. Keep running it; do not retire it.
+#
 # THE QUESTION (#102, filed 14z-97 (3)): "later matches land on earlier
 # venues, and the total number of matches can exceed the arcade norm" —
 # observed by the maintainer around tenant continue/switch chains. The

@@ -1362,7 +1362,10 @@ tests/audit_don_grab_pose.sh          # 14z-98 (6), GitHub #104: Victor's
                                       # Rig: replays/96_don_victor_grab.rpl
                                       # (4 connects/run, no HP pokes).
                                       # ~5 min, 2 parallel MAME runs.
-tests/audit_continue_ladder.sh        # 14z-98 (4), GitHub #102: THE
+tests/audit_continue_ladder.sh        # 14z-98 (4), GitHub #102 (CLOSED
+                                      # 2026-08-19, maintainer-ruled NOT
+                                      # OURS — this is now the REGRESSION
+                                      # LOCK, keep running it): THE
                                       # DISCRIMINATOR — does a loss+continue
                                       # reset the arcade ladder's in-use
                                       # mask ON PRISTINE VANILLA with a

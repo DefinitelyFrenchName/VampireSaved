@@ -2,13 +2,16 @@
 
 > ## **THE SUITE IS GREEN: `ROMDIR=... tests/run_all_static.sh` -> PASS 93 /
 > ## SKIP 0 / FAIL 0.** Open: #99 (parked), #43 ((b) awaits a window),
-> ## #50 (parked), **#102 (ANSWERED 14z-98 (4): the venue drift is the
-> ## ENGINE'S OWN CONTINUE BEHAVIOR, measured on pristine vanilla with a
-> ## legacy character — the continue clears the in-use mask and the pool
-> ## restarts; audit_continue_ladder.sh locks both legs; awaiting the
-> ## maintainer's close ruling)**, **#103 (ROOT-CAUSED AND CAUSALLY
-> ## CONFIRMED 14z-98 — the fix is STAGED and waits on the re-freeze
-> ## window; read below)**.
+> ## #50 (parked), **#103 (ROOT-CAUSED AND CAUSALLY CONFIRMED 14z-98 —
+> ## the fix is STAGED and waits on the re-freeze window; read below)**.
+> ##
+> ## **#102 IS CLOSED — RULED 2026-08-19 (maintainer): NOT OURS.** The
+> ## venue drift is the ENGINE'S OWN CONTINUE BEHAVIOR, measured on
+> ## pristine vanilla with a legacy character (14z-98 (4)): the continue
+> ## clears the in-use mask and the venue pool restarts.
+> ## `audit_continue_ladder.sh` stays as the REGRESSION LOCK — leg A
+> ## going red would mean the behavior was ours after all, and #102
+> ## reopens.
 > ##
 > ## **THE FROZEN BUILDS ARE UNCHANGED — donovan-m8 / huitzil-m17 /
 > ## pyron-m11 / merged-m3** (`build/don_m8` d038553d / `build/hui44`
@@ -83,9 +86,9 @@
 > ## **TWO STANDING HOLDS — do not start:** #99 (parked; blocked by #103's
 > ## fix — and now field-clean on BOTH emulators), #50 (parked behind
 > ## #99). **AWAITING (maintainer):** the re-freeze window (#43(b) +
-> ## #103's staged rows + #104's table reorder once derived); #102's
-> ## close ruling; the two battery-target registry rows; the ~200
-> ## tracked build dirs; the #105 captures. The MAME retest is DONE and
+> ## #103's staged rows + #104's fix rows once derived); the two
+> ## battery-target registry rows; the ~200 tracked build dirs; the
+> ## #105 captures. The MAME retest is DONE and
 > ## processed (14z-98 (5)) — do not re-request it.
 
 ## What 14z-98 did
