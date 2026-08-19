@@ -7,6 +7,10 @@
 # EVERY authored voice id on ours and every scoped vs2 id on native
 # vsav2 (test-mode venue, 240-frame isolation spacing) and compares the
 # whole-run keyon multisets via tools/check_qs_voice_batch.py: no native
+# (FROZEN EXCEPTION, GitHub #93, maintainer-ruled 2026-08-19: the bank-108
+# inclusive-endpoint source difference — vsav 0xFF / vsav2 0x00 at 0x6C5000,
+# byte-verified per run, QS_BATCH_STRICT=1 re-arms; upgrade path = the
+# tenant-only authored copy, option C on the issue)
 # signature missing, nothing ours plays foreign to vs2's sample library,
 # counts within tolerance. Static-side correctness (verbatim songs,
 # authored records/T7, vanilla-span identity) is build_qs_songs.py's own
@@ -72,6 +76,22 @@ done
 python3 "$REPO/tools/check_qs_voice_batch.py" "$W/ours/sweep.txt" \
     "$W/native/sweep.txt" "$W/rp/vsavjw.zip" --romdir "$ROMDIR" \
     || fail "keyon multiset A/B"
+
+# THE FROZEN #93 EXCEPTION IS LOAD-BEARING (maintainer-ruled 2026-08-19):
+# QS_BATCH_STRICT=1 disarms it, and on today's builds that MUST go red on
+# exactly the known bank-108 endpoint pair — a strict run that passes would
+# mean the exception is forgiving nothing, i.e. either the source
+# difference vanished (re-measure, then retire the exception) or the
+# checker stopped seeing it (instrument decay). Either way: stop and look.
+QS_BATCH_STRICT=1 python3 "$REPO/tools/check_qs_voice_batch.py" \
+    "$W/ours/sweep.txt" "$W/native/sweep.txt" "$W/rp/vsavjw.zip" \
+    --romdir "$ROMDIR" > "$W/strict.txt" 2>&1 && {
+    cat "$W/strict.txt"
+    fail "STRICT control did not fire — the frozen #93 exception is forgiving nothing (see header)"; }
+grep -q "foreign (ours-only): 1  missing (native-only): 1" "$W/strict.txt" || {
+    cat "$W/strict.txt"
+    fail "STRICT control fired on something OTHER than the known #93 pair"; }
+echo "  ok: strict control fired on exactly the frozen #93 pair"
 
 # verdict control: corrupt one packed sample byte -> must flip to foreign
 python3 - "$W" <<'PY' || exit 1

@@ -1,5 +1,76 @@
 # STATE — living progress log
 
+## Session 14z-96 (5) — #96 RULED: option (a), the battery targets the
+## CURRENT frozen generation. Scheduled for NEXT SESSION.
+
+**The ruling (maintainer, 2026-08-19):** the m2a/m2b battery asserts
+"the pipeline, built fresh, reproduces the CURRENT freeze" — its specs
+re-point at each freeze (donovan-m8 is current), as a POLICY rather than
+a constant. This also dissolves the standing "does a red DEV-BUILD gate
+trigger rule 6?" question: under (a) a red battery means the pipeline
+cannot reproduce the current freeze — unambiguously rule 6 — while
+today's red was an artifact of the dated donovan-m2c pin, not a build
+defect.
+
+**Why the pin dated (the reconciliation, for the record):** the battery
+builds from TODAY's manifests but compared against donovan-m2c
+expectations (frozen 2026-08-02) in a vocabulary predating the §4 v3/v4
+window/composite classes. Its one remaining red — `08_challenger_join`'s
+3807 — is the challenger-join select-window ONSET, which today's tree
+correctly produces (`composite … 3507 889-1675;3807-4610` in every
+shipping set) and the m2c-era flicker-only spec cannot express.
+
+**Next-session work list (~one session, also on the issue):**
+1. Re-point `M2A_FLICKER_SPECS` + the battery mask pin (#70's other
+   half) at the current frozen set, as latest-frozen POLICY.
+2. Teach `tests/lib/m2a_common.sh` the composite/window vocabulary.
+3. Decide the stage-4 replay list (`04_select_fuzz` diverges permanently
+   on a stage-4/5 build — measured 14z-95).
+4. Both batteries green; the 06/700 and 08/3807 constants disappear as
+   constants.
+
+## Session 14z-96 (4) — #93 RULED AND CLOSED: the expectation frozen,
+## the byte NOT patched — and the census that decided it
+
+**The ruling (maintainer, 2026-08-19):** freeze the audit expectation for
+the bank-108 endpoint byte as a known source difference; record option C
+(the tenant-only authored copy) as the upgrade path if the chirp tail
+ever becomes audible in the field.
+
+**The census that decided it, measured before the ruling:** the endpoint
+byte belongs to vsavj sample record **#506**, keyed by **twelve vanilla
+ids** — 0x118/0x119, 0x198/0x199, 0x27e/0x29b + their +0x300 aliases.
+It is a sample VANILLA VSAV ITSELF PLAYS, endpoint 0xFF included, for
+six legacy-shared base sounds. Patching the byte would therefore deviate
+LEGACY audio from vanilla — the superset invariant outranks tenant
+tail-byte exactness — and the maintainer's own ear-check of the restored
+chirp (14z-85g) passed with the 0xFF playing.
+
+**How the freeze avoids being a tolerance:** the exception in
+`tools/check_qs_voice_batch.py` byte-verifies, on EVERY run, that the
+divergence is exactly the known shape — one foreign + one missing
+signature, same channel, length 20481, prefixes identical, endpoints
+exactly (0xFF, 0x00). Anything else stays red. `QS_BATCH_STRICT=1`
+disarms it, and the audit now runs that as a MUST-FIRE control on the
+same sweep logs: a strict pass would mean the exception forgives
+nothing (source difference vanished, or instrument decay) — stop and
+look either way.
+
+**Instrument honesty fix, found while implementing:** the checker's
+printed "content hash" was Python's built-in `hash()` — randomized per
+process — so two runs of the SAME builds printed different values,
+reading as "the content moved" when nothing did. Signatures now carry
+sha1-derived digests: identical semantics in-run, meaningful across
+runs.
+
+**Option C, recorded verbatim as the upgrade path** (in the checker
+comment, the audit header, huitzil.toml, and on the closed issue):
+author a tenant-only 20,481-byte copy with the 0x00 endpoint into
+vsw.21m and remap ONLY the tenant's 0x199 references to it —
+native-exact for the tenant, vanilla untouched for legacy.
+
+#93 CLOSED with the ruling. No shipped byte moved; no re-freeze needed.
+
 ## Session 14z-96 (3) — THE #101 FREEZE (maintainer-ruled 2026-08-18) and
 ## the FIELD CONFIRMATION: "grunt gone, sfx corrected, all seems
 ## perfectly good on the sound front for the 3 VS2 characters"

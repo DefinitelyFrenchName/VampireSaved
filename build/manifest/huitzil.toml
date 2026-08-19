@@ -2114,7 +2114,19 @@ note = "trap dome hit record 2: class 0x52 -> 0x06 (vs2-alias-proven)"
 # instance of the inclusive-endpoint class (#82/14z-87b). So the
 # remap is content-equivalent for all but the final played byte
 # (pitch 12548; vsavj keys the span as the 0x198/0x199 family,
-# already in the keep set). NOTE (measured same session): the trap's
+# already in the keep set).
+# RULED 2026-08-19 (maintainer): the expectation is FROZEN, the byte
+# is NOT patched. Census (14z-96): the sample is vsavj record #506,
+# keyed by TWELVE vanilla ids (0x118/0x119, 0x198/0x199, 0x27e/0x29b
+# + their +0x300 aliases) — patching would deviate LEGACY audio from
+# vanilla vsav for all six base ids, and the maintainer's ear-check
+# of the restored chirp (14z-85g) passed WITH the 0xFF playing. The
+# frozen exception lives in tools/check_qs_voice_batch.py and
+# byte-verifies the exact one-byte shape per run (QS_BATCH_STRICT=1
+# re-arms). UPGRADE PATH if the tail ever becomes audible (option C
+# on GitHub #93): author a tenant-only 20,481-byte copy with the
+# 0x00 endpoint into vsw.21m and remap ONLY the tenant's 0x199
+# references to it — native-exact for the tenant, vanilla untouched. NOTE (measured same session): the trap's
 # TIMER DETONATION does NOT flow through this record — it is the
 # sound-farm stub vs2 0x4F2E jsr'd from the mine handler
 # (x068458+0x120), restored by the kind=sound_stub row in

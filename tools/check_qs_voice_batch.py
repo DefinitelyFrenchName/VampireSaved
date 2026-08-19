@@ -12,7 +12,7 @@ signature ours-only but whose content exists in vs2's image is a
 priority-suppressed track echo — measured moving with injection
 timing), and no signature's count drifts by more than 2.
 """
-import os, re, sys, zipfile
+import hashlib, os, re, sys, zipfile
 # NO HARDCODED ROMDIR (14z-94, GitHub #67). This was the maintainer's own
 # absolute path, and the only tracked source file leaking one — which made the
 # tool unrunnable-with-a-confusing-error for anyone else, and pinned a path
@@ -78,6 +78,16 @@ def _win(img, bb, s, e):
     return try_window(img, (bb << 16) | s, (bb << 16) | e)
 
 
+# STABLE DIGESTS (14z-96): the content field used to be Python's built-in
+# hash(), which is RANDOMIZED PER PROCESS (PYTHONHASHSEED) — fine for the
+# in-run multiset compare, but the printed values looked like durable
+# identifiers and were not: two runs of the SAME builds print different
+# numbers, which reads as "the content moved" when nothing did. sha1-derived
+# digests compare identically in-run and stay meaningful across runs.
+def _digest(b):
+    return hashlib.sha1(b).hexdigest()[:16]
+
+
 def sig(img, k, bank_or=0):
     fr, v, b, s, e, p = k
     b &= 0xFF
@@ -85,8 +95,8 @@ def sig(img, k, bank_or=0):
     for bb in ((b, b | 0x80) if bank_or else (b,)):
         w = _win(img, bb, s, e)
         if any(w):
-            return (v, n, hash(bytes(w)))
-    return (v, n, hash(b''))
+            return (v, n, _digest(bytes(w)))
+    return (v, n, _digest(b''))
 
 from collections import Counter
 co, co_blobs = Counter(), {}
@@ -98,7 +108,14 @@ for k in keyons(sys.argv[1]):
         w = _win(ours_img, bb, st, e)   # INCLUSIVE, same law as sig()
         if any(w):
             co_blobs[s] = bytes(w); break
-cn = Counter(sig(nat_img, k) for k in keyons(sys.argv[2]))
+cn, cn_blobs = Counter(), {}
+for k in keyons(sys.argv[2]):
+    s = sig(nat_img, k)
+    cn[s] += 1
+    fr, v, b, st, e, p = k
+    w = _win(nat_img, b & 0xFF, st, e)
+    if any(w):
+        cn_blobs[s] = bytes(w)
 foreign = []
 echo = 0
 for s in co:
@@ -114,6 +131,42 @@ for s in co:
         continue
     foreign.append(s)
 missing = [s for s in cn if s not in co]
+
+# THE FROZEN SOURCE DIFFERENCE (GitHub #93, maintainer-ruled 2026-08-19).
+# Bank 108's trap-family sample (vsavj record #506, keyed by 12 vanilla ids:
+# 0x118/0x119, 0x198/0x199, 0x27e/0x29b + their +0x300 aliases) differs
+# between the two GAMES' original sample ROMs at exactly its INCLUSIVE
+# endpoint: vsav 0x6C5000 = 0xFF, vsav2 = 0x00. The byte is Capcom's own,
+# vanilla vsav has always played it, and the maintainer's ear-check of the
+# restored chirp (14z-85g) passed WITH it — so the expectation is FROZEN
+# rather than the byte patched (patching would deviate LEGACY audio from
+# vanilla for all six base ids; the superset invariant outranks tenant
+# tail-byte exactness). THE FREEZE IS NOT A WINDOW: the exception below
+# byte-verifies, on every run, that the divergence is EXACTLY the known
+# shape — one foreign + one missing, same channel, length 20481, prefixes
+# identical, endpoints exactly (0xFF, 0x00). Anything else stays red.
+# QS_BATCH_STRICT=1 disarms the exception for anyone wanting bit-exactness
+# (the audit runs that as a must-fire control).
+# UPGRADE PATH if the chirp tail ever becomes audible in the field
+# (option C on the issue, maintainer-recorded): author a tenant-only copy
+# of the 20,481 bytes with the 0x00 endpoint into vsw.21m and remap ONLY
+# the tenant's 0x199 references to it — native-exact for the tenant,
+# vanilla untouched for legacy.
+if not os.environ.get('QS_BATCH_STRICT') and len(foreign) == 1 \
+        and len(missing) == 1:
+    fs, ms = foreign[0], missing[0]
+    bo, bn = co_blobs.get(fs), cn_blobs.get(ms)
+    if (fs[0] == ms[0] and fs[1] == ms[1] == 20481
+            and bo is not None and bn is not None
+            and len(bo) == len(bn) == 20481
+            and bo[:-1] == bn[:-1]
+            and bo[-1] == 0xFF and bn[-1] == 0x00):
+        print('  known: (v%d, 20481) ours %s / native %s — the bank-108 '
+              'inclusive-endpoint source difference (vsav 0xFF / vsav2 '
+              '0x00; GitHub #93, frozen by maintainer ruling 2026-08-19; '
+              'QS_BATCH_STRICT=1 re-arms)' % (fs[0], fs[2], ms[2]))
+        foreign, missing = [], []
+
 drift = {s: (co[s], cn[s]) for s in cn if s in co and abs(co[s]-cn[s]) > 2}
 print('whole-run signatures: ours %d distinct / native %d distinct' %
       (len(co), len(cn)))

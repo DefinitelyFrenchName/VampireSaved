@@ -16,28 +16,35 @@
 > ## (ci_static), audit_hui_grunt (per-build frozen rows) + replay 95.
 > ## Detail: STATE 14z-96 (2)/(3), patch_notes 14z-96.
 > ##
-> ## **FOUR THINGS WAIT ON A MAINTAINER RULING** (nothing else is blocked):
-> ## 1. **#96** — what GENERATION and STAGE does the m2a/m2b battery target?
-> ##    Both batteries are now red on exactly ONE constant,
-> ##    `08_challenger_join`'s 3807. Nothing re-frozen pending the answer.
-> ## 2. **#43(b)** — when is the next re-freeze window? It moves 2 of the 41
-> ##    `open` rows, so it rides a freeze rather than landing alone.
-> ## 3. Does a red DEV-BUILD gate trigger rule 6? Shipping evidence is green.
-> ## 4. Should the remaining ~200 tracked build dirs stay in git? Step 4 of
-> ##    the cleanup was declined deliberately, not overlooked.
+> ## **START HERE: #96 — RULED option (a) (maintainer, 2026-08-19),
+> ## scheduled for THIS session:** the m2a/m2b battery targets the
+> ## CURRENT frozen generation as POLICY. Work list on the issue and in
+> ## STATE 14z-96 (5): re-point M2A_FLICKER_SPECS + the mask pin at the
+> ## latest frozen set, teach m2a_common.sh the composite/window
+> ## vocabulary, decide the stage-4 replay list (04_select_fuzz diverges
+> ## permanently at stage 4/5), both batteries green. The ruling also
+> ## DISSOLVES the "red dev-build gate = rule 6?" question (under (a):
+> ## yes, because red then means the pipeline cannot reproduce the
+> ## current freeze).
 > ##
-> ## **START HERE otherwise: #93 — ROOT-CAUSED 14z-95** (the audit ran on
-> ## `build/qs93_probe`): same channel 13, same length 20481, DIFFERENT
-> ## content hash — ours plays different BYTES over the same span, i.e. a
-> ## WRONG sound. Localised to ONE byte: the INCLUSIVE endpoint `0x6C5000`
-> ## (vsav `0xFF`, vsav2 `0x00`; the games' ORIGINAL sample ROMs — nothing
-> ## we packed). Fourth instance of the packing-law-#3 endpoint class.
-> ## `huitzil.toml:2108`'s "byte-identical" adoption claim was wrong at
-> ## that byte — retraction pass done 14z-96. **SETTLED: it is NOT the
-> ## grunt** (that is #101, root-caused and fixed separately) — a
-> ## one-sample discontinuity predicts a click and cannot alternate.
-> ## #93's remaining question is the fix choice: patch the endpoint
-> ## byte vs freeze the expectation as a known source difference.
+> ## **STILL WAITING ON A MAINTAINER RULING:**
+> ## 1. **#43(b)** — its ruled window ("next re-freeze") was deliberately
+> ##    NOT the 14z-96 #101 freeze (the maintainer was playtesting those
+> ##    exact bytes); needs a call: own small freeze, or the next window.
+> ## 2. Should the remaining ~200 tracked build dirs stay in git? Step 4
+> ##    of the cleanup was declined deliberately, not overlooked.
+> ##
+> ## **#93 is CLOSED — RULED 2026-08-19 (maintainer): the expectation is
+> ## FROZEN, the byte NOT patched.** The census decided it: the endpoint
+> ## byte lives in vsavj sample record #506, keyed by TWELVE vanilla ids
+> ## (0x118/0x119, 0x198/0x199, 0x27e/0x29b + aliases) — patching would
+> ## deviate LEGACY audio from vanilla vsav, and the maintainer's ear
+> ## already approved the chirp WITH the 0xFF (14z-85g). The frozen
+> ## exception (tools/check_qs_voice_batch.py) BYTE-VERIFIES the exact
+> ## one-byte shape per run; QS_BATCH_STRICT=1 re-arms and the audit
+> ## runs it as a must-fire control. audit_qs_voice_batch is GREEN.
+> ## **UPGRADE PATH if the chirp tail ever becomes audible (option C,
+> ## recorded on the issue): tenant-only authored copy in vsw.21m.**
 
 ## What 14z-95 did
 
