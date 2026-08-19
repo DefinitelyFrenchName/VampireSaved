@@ -1,5 +1,49 @@
 # STATE — living progress log
 
+## Session 14z-97 (9) — CORRECTION: the stall is OPPONENT-INDEPENDENT for
+## Donovan; the native leg names the missing step; the parked rows are
+## confirmed aliased where vs2 authored real ones
+
+**A control of mine collapsed under the proper signal, and the record is
+corrected in all carriers (issue #103, this file).** "Donovan KO'd by Q-Bee →
+judged fine" was read off ladder-mask movement under continuous 100f-cadence
+HP pokes. Re-measured with `+0x1C` + HP-reset as the signal (kill pokes at
+round start, hands off 500f before the KO): **the Q-Bee KO also parks
+un-judged** on the same record for 2,300+ frames. "KO'd by Victor → fine"
+rests on the same weak reading — UNVERIFIED. What stands: Victor (legacy)
+flows in 580f on merged AND vanilla; Donovan parks ~8,000f whoever KO'd him.
+**The stall is deterministic and opponent-independent — this REPLACES the
+race reading for the stall itself** (whether #99's crash is separately racy
+stays open; my one-mechanism speculation there is weakened and said so).
+
+**The native vs2 leg (14z-69 procedure) answers the mechanism question:**
+Donovan KO'd on native walks `+0x1C` through `0x2873A0 → … → 0x287BA8` —
+EXACTLY the record our build parks on (`0x287BA8` = our `0x0DB6D0`, same
+anim-region offset) — **and clears it to 0 at KO+240**, settling. The ported
+record chain is right; the missing piece is the engine-side settle trigger.
+
+**The parked bank-tail data rows are confirmed aliased, with vs2 holding
+real rows:** merged rows 0x13 of `0x0BF01A/09A/11A/19A` all equal row 0x03
+(Victor's `0x1031FC…` — the variant-copies-base pattern, unported); row 0x10
+aliases the Bulleta family. vs2's parallel tables (bank shift +0x1A19E,
+derived from the hitbox-table pair) give Donovan DISTINCT rows —
+`0x101ACA/0x101BC8/0x102674/0x102B82`. Honest caveat: these are engine-anim
+pointers and native's parked record is per-char anim, so the death path does
+NOT compare them against `+0x1C` directly; whether they are the settle
+mechanism (the record the fighter is SWITCHED to?) needs the consumer trace
+— read-watch on `0x0BF066`, BOTH data and opcodes spaces (crypt-window
+wpset blindness).
+
+**Severity: likely UP** — "lose any round as Donovan in arcade" (probably
+Phobos too; his Bishamon stall fits) → ~2-minute freeze. Fix shape if the
+trace confirms: author the per-char rows for both tenants (the work the
+manifest parked as "Donovan's vs2 rows point OUTSIDE his regions"); moves
+shipped bytes on all tenants + merged → rides a re-freeze window.
+
+Instrument note for whoever runs the trace: the round-end phase writer
+inventory is in (8); the healthy-Donovan-death +0x1C trajectory and the
+native clearing frame (KO+240) are the two anchors to reproduce first.
+
 ## Session 14z-97 (8) — #103's MECHANISM NARROWED THREE LEVELS: the stuck
 ## sequencer walks a PORTED anim record and the round-over trigger never
 ## fires from the ordinary in-match phase
