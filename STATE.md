@@ -1,5 +1,82 @@
 # STATE — living progress log
 
+## Session 14z-97 (5) — THE §4 COVERAGE MANDATE IS MET: every tenant against
+## every character, both sides, 111 pairings GREEN on the shipping build
+
+Chosen over the #102 ladder work and the reference triage because it is the
+MUST-HAVE scope (2P versus) and because it is the gap **#99 walked through** —
+a crash reported in a pairing no rig had ever run. CLAUDE.md §4 mandates "vs
+each of the 18 (both sides)" for a ported character; the suite has never had
+it. `test_tenant_pairings` (14z-95) covered six tenant-vs-tenant orderings and
+its own header said why the rest was missing.
+
+### Result
+
+`tests/audit_roster_pairings.sh` on `build/m3b_merged10` (merged-m3):
+**111 pairings formed cleanly with both characters loaded, 0 failures**, and
+the no-poke verdict control correctly rejected. **No crash anywhere in the
+matrix.**
+
+**Runtime: ~5 minutes at JOBS=6, not the ~1 hour budgeted.** Recorded because
+the estimate was wrong by an order of magnitude in the direction that matters:
+this is cheap enough to run at every re-freeze, which changes what it is for.
+
+### The expectations are DERIVED, and that produced a free result
+
+The per-class hitbox base is read out of the merged image's own table at
+`PRG:0x0BD97A` (`character_tables.md:30`) rather than harvested from a run —
+an expectation taken from the run it polices cannot fail.
+
+**The two-source check passed and is a superset-invariant result in itself:
+all 16 legacy bases plus `0x18` are BYTE-IDENTICAL between vanilla vsavj and
+the merged build.** The port has not moved a legacy character's hitbox base.
+Only the three tenant rows differ, and they differ correctly — vsavj's variant
+half is a copy of the base half (`0x10`→Bulleta, `0x11`→Demitri,
+`0x13`→Victor), and the merged build points them at the ported tables in the
+WIDE extension. Those three values independently reproduce the constants
+`test_tenant_pairings` froze by measurement at 14z-95: two routes, same
+numbers.
+
+### Roster decisions, recorded rather than silent
+
+`0x0B` EXCLUDED — the slot map calls it "special: 1898 B … Shadow/Marionette
+machinery?", not one of the 18 and not selectable. `0x18` (Oboro Bishamon)
+INCLUDED — it is the "+1", a variant class like the tenants. Both are written
+into `tests/expected/roster_pairings/README.md` so neither reads as an
+oversight.
+
+### Three controls, because a matrix that can only pass is not evidence
+
+1. **Must-fire:** a deliberately corrupted expected base FAILS both orderings
+   involving that character and names the mismatch
+   (`P1 +0x60.l=['0xb0d2e'] want 0xbadf0`).
+2. **No-poke:** the unpoked run is still rejected, so the pokes are what
+   select the characters and the passes are not vacuous.
+3. **Dead leg:** a missing log, and a log with no `END`, both FAIL rather than
+   counting as nothing-to-report (#29).
+
+### One trap paid for before it cost anything
+
+`replay.lua` parses POKES with `^(%d+):(%x+):(%x+)$` and **silently skips** a
+spec that does not match — and `0x13` does not match, because `x` is not a hex
+digit. A class written the readable way would have produced NO POKE, the run
+would have used whatever the replay picks on its own, and the failure would
+have surfaced as "the character did not load": a true statement about the
+wrong cause. `pairing_hex` now normalises and REFUSES anything that is not
+bare hex.
+
+### Shared, not copied
+
+`tests/lib/pairing.sh` holds the runner and the `+0x60.l` check; both
+`test_tenant_pairings` (fast, six orderings, ~1 min) and the new matrix source
+it — the same one-source move `masked_compare.sh` made earlier today. The fast
+gate is NOT redundant and both are labelled so neither gets deleted as a
+duplicate.
+
+Also re-pointed: `test_tenant_pairings` `m3b_merged9` → `m3b_merged10`, one of
+the 16 superseded references the new currency report flags, re-run green on
+the current build.
+
 ## Session 14z-97 (4) — REFERENCE CURRENCY: the gate that catches rotted
 ## build references could not see 11 of them, and cannot see STALENESS at all
 

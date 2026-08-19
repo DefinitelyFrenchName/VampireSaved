@@ -18,6 +18,12 @@
 > ## one already in the record and the two must not be conflated. FOUR issues
 > ## open again: #99, #43, #50, #102.**
 > ##
+> ## **14z-97 ALSO CLOSED THE §4 COVERAGE MANDATE** (5): every tenant vs
+> ## every character, BOTH SIDES — 111 pairings green on merged-m3, no crash
+> ## anywhere, via `tests/audit_roster_pairings.sh`. It runs in ~5 MINUTES,
+> ## so run it at every re-freeze. Free result on the way: all 16 legacy
+> ## hitbox bases are byte-identical vanilla vs merged.
+> ##
 > ## **START HERE: there is no assigned task.** Ranked, if no field report
 > ## is waiting:
 > ## 1. **#43(b)** — ruled SPLIT, (a) landed 14z-95; (b) moves 3

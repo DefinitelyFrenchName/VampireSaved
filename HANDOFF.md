@@ -1306,6 +1306,24 @@ tools/probe_hook_removal.sh           # 14z-89: CAUSAL attribution for a
                                       # extensions. Control in the header:
                                       # the unmodified build must still FAIL
                                       # the same replay. ~5 min per probe
+tests/audit_roster_pairings.sh        # 14z-97: EVERY TENANT vs EVERY CHARACTER,
+                                      # BOTH SIDES — the CLAUDE.md §4 mandate
+                                      # ("vs each of the 18, both sides") that
+                                      # the suite never had, and the gap #99
+                                      # walked through. 111 pairings + a
+                                      # no-poke verdict control, guarded, on
+                                      # the merged build. MEASURED ~5 min at
+                                      # JOBS=6 (not the hour it looks like).
+                                      # Expectations are DERIVED from the
+                                      # merged image's own table at
+                                      # PRG:0x0BD97A, not harvested from a run
+                                      # — tests/expected/roster_pairings/.
+                                      # ONLY=<class> reproduces one tenant's
+                                      # row; BASES=<file> one pairing.
+                                      # NOT a replacement for
+                                      # test_tenant_pairings: that stays as the
+                                      # ~1 min six-ordering gate for routine
+                                      # use, and shares tests/lib/pairing.sh.
 tests/audit_legacy_pairings.sh        # 14z-89: WHICH REPLAYS ARE LEGACY
                                       # CONTENT — and is each one compared
                                       # against VANILLA rather than against
