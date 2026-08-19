@@ -41,9 +41,19 @@ import json
 import math
 import sys
 
-TABLE_B = 0x0211E4
-NDIR, NCELL = 8, 32
-DIR_ORDER = ["R", "L", "D", "U", "DR", "DL", "UR", "UL"]
+# TABLE B's address and column order come from select_wheel.wheel_facts
+# (GitHub #48): this tool used to restate both as literals with no --set
+# argument, so pointed at a vsav2 image it would silently have read TABLE B
+# at vsavj's address (vsav2's is 0x01588E) and emitted a plausible-looking
+# garbage proposal. wheel_facts also runs the KNOWN_PATHS ground truth
+# (vsavj), so a wrong labelling REFUSES instead of proposing a table wired
+# to the wrong stick directions. The two module globals below are BOUND in
+# main() from wheel_facts; draft_adjacency/validate read them.
+import select_wheel as _sw
+
+NDIR, NCELL = _sw.NDIR, _sw.NCELL
+TABLE_B = None                      # bound from wheel_facts in main()
+DIR_ORDER = None                    # bound from wheel_facts in main()
 DIRV = {"R": (1, 0), "L": (-1, 0), "D": (0, 1), "U": (0, -1),
         "DR": (1, 1), "DL": (-1, 1), "UR": (1, -1), "UL": (-1, -1)}
 
@@ -140,10 +150,13 @@ def draft_adjacency(pos, cell):
     return out
 
 
-def load_rows(data_path):
-    d = open(data_path, "rb").read()
-    return [list(d[TABLE_B + c * NDIR: TABLE_B + (c + 1) * NDIR])
-            for c in range(NCELL)]
+def load_rows(data_path, set_name):
+    """All 32 TABLE B rows + binding of TABLE_B/DIR_ORDER (GitHub #48)."""
+    global TABLE_B, DIR_ORDER
+    dat = open(data_path, "rb").read()
+    cfg, rows, order = _sw.wheel_facts(dat, set_name)
+    TABLE_B, DIR_ORDER = cfg["table_b"], order
+    return rows
 
 
 def validate(rows, new_cells):
@@ -197,6 +210,9 @@ def main():
     ap.add_argument("--refs")
     ap.add_argument("--data")
     ap.add_argument("--layout")
+    ap.add_argument("--set", default="vsavj", choices=sorted(_sw.SETS),
+                    help="which game's tables to read (GitHub #48: was "
+                         "hardcoded vsavj)")
     args = ap.parse_args()
 
     if args.mode == "fit":
@@ -219,7 +235,7 @@ def main():
             print("  new cell %s -> arcade (%.1f, %.1f)" % (k, x, y))
         return 0
 
-    rows = load_rows(args.data)
+    rows = load_rows(args.data, args.set)
     lay = json.load(open(args.layout))
     pos = dict(KNOWN)
     new_cells = []

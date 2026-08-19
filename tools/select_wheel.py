@@ -149,6 +149,39 @@ def check_known_paths(rows, names):
     return errs
 
 
+def wheel_facts(dat, set_name="vsavj"):
+    """THE SINGLE SOURCE for (set config, TABLE B rows, column names) —
+    GitHub #48. The direction labelling is NOT derivable from TABLE A
+    alone (see BIT_NAMES above), so any tool that labels TABLE B columns
+    must inherit the labelling THIS module pins with KNOWN_PATHS — not
+    restate it as a literal. Before this existed, wheel_positions.py and
+    wheel_layout.py hardcoded the vsavj address AND the 8-name order a
+    second and third time, with no --set argument at all: pointed at a
+    vsav2 image they would silently have read TABLE B at vsavj's address
+    and emitted a plausible-looking garbage proposal.
+
+    Where ground truth exists (vsavj KNOWN_PATHS) this REFUSES rather
+    than returning an unvalidated labelling, so a wrong labelling fails
+    in every consumer, not just this tool (CLAUDE.md §4: verdict logic
+    is itself tested). Returns (cfg, rows, order) with order[i] = the
+    name of TABLE B column i."""
+    cfg = SETS[set_name]
+    raw_a, fwd_a, rev_a = decode_table_a(dat, cfg["table_a"])
+    names = dir_names(rev_a)
+    if sorted(names) != list(range(NDIR)):
+        raise SystemExit("wheel_facts: TABLE A yields %d direction columns, "
+                         "expected %d" % (len(names), NDIR))
+    rows = decode_table_b(dat, cfg["table_b"])
+    if set_name == "vsavj":
+        errs = check_known_paths(rows, names)
+        if errs:
+            raise SystemExit(
+                "wheel_facts: the known-path ground truth FAILED — the "
+                "direction labelling is wrong and every consumer would "
+                "mislabel TABLE B columns:\n  " + "\n  ".join(errs))
+    return cfg, rows, [names[d] for d in range(NDIR)]
+
+
 def decode_table_b(dat, base):
     rows = []
     for c in range(NCELL):

@@ -1,5 +1,31 @@
 # STATE — living progress log
 
+## Session 14z-96 (6) — #48 CLOSED: one wheel-table source, and the
+## latent vsav2 address bug with it
+
+Maintainer confirmed low-stakes 2026-08-19; done solo. The finding's
+verifier was right that "triplicated ordering" overstated it (the 4-bit
+BIT_NAMES and the 8-column order are related facts, not one literal) —
+the real value was the latent bug its handoff named: neither wheel tool
+had a `--set` argument, so pointed at a vsav2 image they would silently
+read TABLE B at vsavj's `0x0211E4` (vsav2's is `0x01588E`) and emit a
+plausible-looking garbage proposal.
+
+**Landed:** `select_wheel.wheel_facts(dat, set)` is THE single source
+for (set config, TABLE B rows, column names) — it derives the labelling
+from TABLE A and runs the KNOWN_PATHS ground truth (vsavj) as a
+precondition, REFUSING rather than returning an unvalidated labelling,
+so a wrong labelling now fails in all three tools instead of one.
+`wheel_positions.py` and `wheel_layout.py` gained `--set` and lost
+their restated literals.
+
+**Controls, all measured:** vsavj outputs byte-identical pre/post
+(tour.rpl, tour.json, both stdout captures — 4/4); `--set vsav2` on a
+vsav2 image reads `0x01588E` (the issue's own proof); the OLD failure
+mode (vsavj addresses on a vsav2 image) now REFUSES rc=1 with a named
+error instead of emitting garbage; `test_select_wheel.sh` fully green
+including the measured MAME sections.
+
 ## Session 14z-96 (5) — #96 RULED: option (a), the battery targets the
 ## CURRENT frozen generation. Scheduled for NEXT SESSION.
 
