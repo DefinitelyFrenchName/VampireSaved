@@ -1358,7 +1358,17 @@ tests/audit_don_grab_pose.sh          # 14z-98 (6), REBUILT 14z-99,
                                       # 32-row structures whose rows
                                       # 0x10-0x1F copy 0x00-0x0F, so a
                                       # tenant is served the base character
-                                      # it folds onto. Donovan 0x13->0x03
+                                      # it folds onto. MECHANISM LOCATED
+                                      # 14z-99 at PRG:0x02802E: the first
+                                      # 32 words of EVERY attacker's
+                                      # keyframe block are a per-victim
+                                      # offset table indexed by the
+                                      # victim's id UNMASKED, and vsavj
+                                      # aliases its 0x10-0x1F half onto
+                                      # 0x00-0x0F (vs2's are real). Fix +
+                                      # the signed-16-bit constraint and
+                                      # the SCOPE RULING: STATE 14z-99.
+                                      # Donovan 0x13->0x03
                                       # gets Victor's index 6 (native 11);
                                       # Phobos 0x10->0x00 gets Bulleta's 12
                                       # (native 26); PYRON 0x11->0x01 gets

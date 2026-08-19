@@ -48,20 +48,34 @@
 #     placement. Through anim@pyron, Pyron's held record maps to 0x26614C —
 #     identical to native. The region is now resolved per victim.
 #
-# STILL OPEN (the fix needs it): WHICH structure performs the victim-id ->
-# capture-set resolution. Eliminated with controls: on merged-m3 the
-# anim_index family (a/a2/b/c/proj) and all 14 per-character dispatch
-# tables have rows 0x10/0x11/0x13 MOVED OFF the vanilla alias for all
-# three tenants (built-vs-vanilla diff of every such row), so none of
-# them is handing a tenant its fold row — which is the elimination this
-# needs; it is NOT a claim that each points at the right target. And
-# 0xBE27A is
+# THE RESOLVING STRUCTURE, located 14z-99 — seven instructions at
+# PRG:0x02802E (engine_internals "THE CAPTURE-POSE INSTALLER"):
+#     move.b $382(a6),d1 ; lsl.w #2,d1 ; movea.l #$be27a,a0
+#     movea.l (a0,d1.w),a0        ; the ATTACKER's keyframe BLOCK
+#     move.b $382(a4),d1 ; add.w d1,d1
+#     add.w (a0,d1.w),d0          ; += block[VICTIM id, UNMASKED]
+#     lea (a0,d0.w),a0            ; block + block[victim] + keyframe*8
+# THE FIRST 32 WORDS OF EVERY ATTACKER'S KEYFRAME BLOCK ARE A PER-VICTIM
+# OFFSET TABLE, and in vsavj all sixteen blocks have its variant half
+# 0x10-0x1F byte-aliasing 0x00-0x0F. The tenant lands in the base
+# character's capture sub-block and takes BOTH its position keyframes and
+# its record index. Victor's block 0x098C28: block[0x13]==block[0x03]
+# ==0x0568, block[0x10]==block[0x00]==0x0040, block[0x11]==block[0x01]
+# ==0x01F8, and every measured A0 is block+block[victim]+0x106.
+# vs2's twin blocks are NOT aliased and already carry real newcomer rows
+# (vs2 Victor 0x0A8824: 0x10=0x1A08, 0x11=0x1BC0, 0x13=0x1D78).
+# FIX + CONSTRAINT: 3 sub-blocks per attacker (~12.75 KB over sixteen),
+# but the offset is a WORD used via `lea (a0,d0.w)` = SIGNED 16-BIT, so a
+# sub-block must live within +/-32 KB of its block base — NOT placeable in
+# wide_ext. Each affected block relocates with its table + sub-blocks
+# contiguous and 0xBE27A[attacker] repointed. SCOPE IS A MAINTAINER
+# RULING (it touches legacy pointers) — options in STATE 14z-99.
+# Eliminated on the way, with controls: on merged-m3 the anim_index family
+# (a/a2/b/c/proj) and all 14 per-character dispatch tables have rows
+# 0x10/0x11/0x13 MOVED OFF the vanilla alias for all three tenants, so
+# none of them is handing a tenant its fold row; and 0xBE27A itself is
 # ATTACKER-indexed (A0 sat in Victor's block while row 0x13 pointed at
-# 0x400010). The selector is reached inside the attacker's own anim node
-# walk (0x27F70 walker -> the capture positioner at 0x028072, whose tail
-# `move.w (A0),D0; bra $27fa0` supplies the index). Next measurement is
-# named in STATE 14z-99: bisect where A0 first differs between a
-# Demitri-victim and a Donovan-victim run.
+# the tenant's own placed block).
 #
 # LEG A (the build) freezes the DEFECT per tenant while EXPECT_MATCH=0 (the
 # #98 discipline — flip to 1 when the fix lands). LEG B (native vsav2) is

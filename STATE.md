@@ -66,8 +66,53 @@ window, so there is one less victim-specific constant to rot. A modal that
 is not a strict majority reports NO-HOLD — a split reading is not a
 measurement. AUDIT PASS on merged-m3.
 
-**STILL OPEN — and it is what the fix needs: WHICH structure resolves
-victim-id → capture set.** Eliminated with controls, not by assumption:
+**LOCATED — the mechanism is CLOSED end to end (later the same session).**
+The resolving structure is the head of the ATTACKER's own keyframe block,
+and the defect is seven instructions at `PRG:0x02802E`:
+`move.b $382(a4),d1 ; add.w d1,d1 ; add.w (a0,d1.w),d0 ; lea (a0,d0.w),a0`
+— **the first 32 words of every attacker's keyframe block are a per-victim
+offset table indexed by the victim's char id UNMASKED**, and in vsavj all
+sixteen blocks have that table's variant half `0x10-0x1F` byte-aliasing
+`0x00-0x0F`. The tenant lands in the base character's capture sub-block and
+takes BOTH its position keyframes and its record index — exactly the "half
+right, half knocked-down, very horizontal" the field reported.
+Static and dynamic agree five for five: Victor's block `0x098C28` has
+`block[0x13]==block[0x03]=0x0568`, `block[0x10]==block[0x00]=0x0040`,
+`block[0x11]==block[0x01]=0x01F8`, and every measured A0 is
+`block + block[victim] + 0x106`.
+**vs2 already holds the data**: its twin blocks are NOT aliased and carry
+real rows for the newcomers (vs2 Victor `0x0A8824`: 0x10=`0x1A08`,
+0x11=`0x1BC0`, 0x13=`0x1D78`).
+
+**FIX SHAPE AND ITS BINDING CONSTRAINT.** Cost is 3 sub-blocks per
+attacker, stride per attacker (Victor `0x1B8`, Felicia `0x2B0`, Anakaris
+`0x30`, …) — ~12.75 KB over all sixteen. The offset is added as a WORD and
+consumed by `lea (a0,d0.w)`, i.e. **signed 16-bit**, so a sub-block must
+sit within ±32 KB of its block base: it CANNOT simply be placed in
+`wide_ext` and pointed at. The blocks are packed with no gaps, so each
+affected block must be RELOCATED with its table and sub-blocks contiguous
+and `0xBE27A[attacker]` repointed — the same mechanism
+`throw_victim_keyframes` / `grab_hold_keyframes` already use, but applied
+to LEGACY attackers' rows.
+
+**DECISION PENDING (maintainer) — scope, because this touches legacy
+pointers.** Options:
+ (a) **Full**: relocate all 16 legacy attacker blocks, port 48 tenant
+     sub-blocks from vs2. Every legacy grab holds every tenant correctly;
+     16 legacy rows repointed (base halves byte-identical, so legacy work
+     RAM should stay bit-identical — that must be MEASURED, not assumed).
+ (b) **Scoped**: only the attackers whose capture is common in 2P play.
+     Smaller legacy surface, but leaves a defect whose trigger is "which
+     character grabbed you".
+ (c) **Defer**: in-scope 2P visual, not game-breaking.
+**Recommendation: (a)** — the mechanism is uniform, the data exists
+verbatim in vs2, and a partial fix leaves a defect that is hard to reason
+about later. It rides the same re-freeze window.
+**Not yet measured, and it sizes (b):** how many of the sixteen attackers
+actually reach this path (a block exists for all 16; that is not the same
+as all 16 having a live capture move). Measure before choosing (b).
+
+**Eliminated on the way** (controls, not assumption):
 - the `anim_index` family (a/a2/b/c/proj) **and all 14 per-character
   dispatch tables** have rows 0x10/0x11/0x13 MOVED OFF the vanilla alias
   for all three tenants on merged-m3 (built-vs-vanilla diff of every such
@@ -78,15 +123,17 @@ victim-id → capture set.** Eliminated with controls, not by assumption:
   Victor's block while row 0x13 pointed at the tenant's own `0x400010`.
 The selector is reached inside the ATTACKER's own anim node walk —
 `0x27F70` (node walker, `($1c,A6)`, 0x18 stride) → the capture positioner
-at `0x028072`, whose tail `move.w (A0),D0; bra $27fa0` supplies the index
-to the shared installer at `0x27FA0`. A0 is per-victim and IDENTICAL for
-Victor and Donovan (`0x099296`), for Bulleta and Phobos (`0x098d6e`), and
-Demitri's is `0x098f26`.
-**NEXT MEASUREMENT (named, cheap):** bisect where A0 first diverges between
-a Demitri-victim and a Donovan-victim run — `GUARD_PROBE_TRACE` between two
-consecutive hits at `0x27FA0`, or a probe on the node-install site
-`0x27EE8` with history. That names the fold site, and the fix follows its
-shape (a repointed row if it is a table, a widened mask if it is code).
+at `0x02802E..0x0280A0`, whose tail `move.w (A0),D0; bra $27fa0` supplies
+the index to the shared installer at `0x27FA0`. A0 is per-victim and
+IDENTICAL for Victor and Donovan (`0x099296`), for Bulleta and Phobos
+(`0x098d6e`), and Demitri's is `0x098f26` — [ANSWERED above: A0 =
+block + block[victim] + keyframe*8, and block[] is the aliased table].
+**The bisect that was planned here is superseded** — the node-sequence
+diff is confounded (the whole match diverges from the frame the opponent
+differs: first differing attacker node install is f2807, long before the
+grab). Reading the positioner backwards from `0x028072` answered it in one
+disassembly instead. Recorded because "diff the two runs" looked like the
+obvious move and is the wrong one when the runs differ in an input.
 
 **Two probe facts worth keeping.** `0x27FAA` (the four-sibling selector
 entry) is NEVER executed — 0 hits over a full replay while `0x27FA0`

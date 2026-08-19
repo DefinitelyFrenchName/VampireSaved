@@ -85,12 +85,27 @@
 > ## through Donovan's anim placement on a merged build. Fixed: the
 > ## region is resolved per victim, and a LEGACY-VICTIM CONTROL is now
 > ## section 0 (if the engines ever disagree there, the premise is dead).
-> ## **STILL OPEN — what the fix needs:** WHICH structure resolves
-> ## victim-id -> capture set. Eliminated with controls: the anim_index
-> ## family and all 14 per-character dispatch tables have rows
-> ## 0x10/0x11/0x13 MOVED OFF the vanilla alias for all three tenants (so
-> ## none hands a tenant its fold row), and 0xBE27A is ATTACKER-indexed.
-> ## Next measurement named in STATE 14z-99.
+> ## **MECHANISM LOCATED — seven instructions at PRG:0x02802E.** The
+> ## first 32 words of EVERY attacker's keyframe block are a per-victim
+> ## offset table indexed by the victim's id UNMASKED, and in vsavj all
+> ## sixteen blocks have that table's variant half 0x10-0x1F byte-aliasing
+> ## 0x00-0x0F. The tenant lands in the base character's capture
+> ## sub-block and takes BOTH its position keyframes and its record index.
+> ## vs2's twin blocks are NOT aliased and already carry real newcomer
+> ## rows — the data exists verbatim.
+> ## **FIX + ITS BINDING CONSTRAINT:** 3 sub-blocks per attacker (~12.75
+> ## KB over all sixteen), but the offset is a WORD used via
+> ## `lea (a0,d0.w)` = SIGNED 16-BIT, so a sub-block must sit within
+> ## +/-32 KB of its block base — it CANNOT go in wide_ext and be pointed
+> ## at. Blocks are packed with no gaps, so each affected block must be
+> ## RELOCATED with its table + sub-blocks contiguous and 0xBE27A[attacker]
+> ## repointed (the throw_victim_keyframes / grab_hold_keyframes
+> ## mechanism, applied to LEGACY attackers' rows).
+> ## **AWAITING A RULING — scope, because this touches legacy pointers:**
+> ## (a) full, all 16 attackers / 48 sub-blocks (RECOMMENDED); (b) scoped
+> ## to common 2P grabs; (c) defer. Options + recommendation in STATE
+> ## 14z-99. Not yet measured, and it sizes (b): how many of the sixteen
+> ## attackers actually REACH this path.
 > ## **#105** (AUTO-mode win screens: white shapes, all tenants): AUTO
 > ## selection SOLVED + PROVEN (1P mode menu overlays the wheel
 > ## ~f1250-2100: D,D -> AUTO, confirm; menu times out into NORMAL) —

@@ -2072,16 +2072,54 @@ Bulleta's 12 where native gives 26. **Pyron `0x11`->`0x01` gets Demitri's
 11, which is also his correct value** — right by coincidence, and exactly
 why the field report named Donovan and Phobos and not him.
 
-**Which structure performs that resolution is still open**, and these are
-eliminated with controls rather than assumption: on merged-m3 the
-`anim_index` family (a/a2/b/c/proj) and all 14 per-character dispatch
-tables have rows `0x10/0x11/0x13` MOVED OFF the vanilla alias for all three
-tenants, so none is handing a tenant its fold row, and `0xBE27A` (the keyframe
-block table, `throw_victim_keyframes`) is **ATTACKER-indexed** — A0 sat
-inside Victor's block while row `0x13` pointed at the tenant's own placed
-block. A0 is per-victim and identical for Victor and Donovan (`0x099296`),
-for Bulleta and Phobos (`0x098d6e`); Demitri's is `0x098f26`. Bisecting
-where A0 first diverges between two victims names the fold site.
+**THE RESOLVING STRUCTURE, located 14z-99 — it is the head of the
+attacker's own keyframe block**, and the whole defect is seven
+instructions at `PRG:0x02802E`:
+
+```
+02802E  movea.w $32(a6),a4        ; a4 = the VICTIM
+028032  tst.b $134(a4) ; beq      ; only while the victim is captured
+02803A  movea.l $1c(a6),a0        ; the ATTACKER's current anim node
+02803E  move.b $12(a0),d0 ; lsl.w #3,d0    ; keyframe index * 8
+028046  move.b $382(a6),d1 ; lsl.w #2,d1   ; the ATTACKER's id
+02804C  movea.l #$be27a,a0 ; movea.l (a0,d1.w),a0   ; -> his keyframe BLOCK
+028058  move.b $382(a4),d1 ; add.w d1,d1            ; the VICTIM's id, RAW
+02805E  add.w (a0,d1.w),d0        ; += block[victim]   <- THE PER-VICTIM TABLE
+028062  lea (a0,d0.w),a0          ; = block + block[victim] + keyframe*8
+028066  move.w (a0)+,d0 ; move.w (a0)+,d1  ; Xoff, Yoff -> victim +0x10/+0x14
+02809E  move.w (a0),d0 ; bra.w $27fa0      ; and the victim's RECORD INDEX
+```
+
+So **the first 32 words of every attacker's keyframe block are a
+per-victim offset table, indexed by the victim's char id UNMASKED** — and
+in vsavj all sixteen blocks have that table's variant half `0x10-0x1F`
+byte-aliasing `0x00-0x0F`. A tenant victim therefore lands in the base
+character's capture sub-block and takes BOTH its position keyframes and
+its record index, which is precisely the "half right, half a knocked-down
+sprite, very horizontal" the field reported.
+
+Static and dynamic agree exactly. Victor's block `0x098C28`:
+`block[0x13] == block[0x03] = 0x0568`, `block[0x10] == block[0x00] =
+0x0040`, `block[0x11] == block[0x01] = 0x01F8`; every measured A0 is
+`block + block[victim] + 0x106` — same keyframe, different sub-block, five
+victims for five.
+
+**vs2 is not aliased and already holds the answer.** Its twin blocks carry
+real, distinct rows for the newcomers (vs2 Victor `0x0A8824`: row 0x10 =
+`0x1A08`, 0x11 = `0x1BC0`, 0x13 = `0x1D78`; row 0x12 stays an alias
+because vs2 has no character there). The port gap is that vsavj's blocks
+have no tenant sub-blocks at all.
+
+**Sub-block stride is per attacker** (Victor `0x1B8`, Felicia `0x2B0`,
+Anakaris `0x30`, …), so a fix costs 3 sub-blocks per attacker — about
+12.75 KB over all sixteen. **Constraint that shapes it:** the offset is
+added as a WORD and consumed by `lea (a0,d0.w)`, i.e. SIGNED 16-BIT, so a
+sub-block must sit within ±32 KB of its block base — it cannot simply be
+placed in `wide_ext` and pointed at. The blocks are packed back to back
+with no gaps, so each affected block must be RELOCATED with its table and
+sub-blocks contiguous, and `0xBE27A[attacker]` repointed. That is the same
+mechanism `throw_victim_keyframes` / `grab_hold_keyframes` already use —
+but on LEGACY attackers' rows, which is a scope decision (STATE).
 
 Gate: `tests/audit_don_grab_pose.sh` (legacy-victim control in section 0).
 
