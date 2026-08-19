@@ -81,11 +81,12 @@
 > ## recorded: NO CRASH, NO REGRESSION across the whole MAME session.
 > ##
 > ## **TWO STANDING HOLDS — do not start:** #99 (parked; blocked by #103's
-> ## fix), #50 (parked behind #99). **AWAITING RULINGS:** #43(b)'s window
-> ## (now carrying #103's fix too); the two battery-target registry rows;
-> ## the ~200 tracked build dirs; the maintainer's MAME retest (sharpened:
-> ## a Phobos KO-tableau sit is instance 2 of the white-HP class — his
-> ## +0x52 at that moment decides it).
+> ## fix — and now field-clean on BOTH emulators), #50 (parked behind
+> ## #99). **AWAITING (maintainer):** the re-freeze window (#43(b) +
+> ## #103's staged rows + #104's table reorder once derived); #102's
+> ## close ruling; the two battery-target registry rows; the ~200
+> ## tracked build dirs; the #105 captures. The MAME retest is DONE and
+> ## processed (14z-98 (5)) — do not re-request it.
 
 ## What 14z-98 did
 

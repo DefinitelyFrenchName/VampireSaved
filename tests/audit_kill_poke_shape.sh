@@ -17,15 +17,17 @@
 # build defect — which is exactly why it is dangerous: a rig using the
 # 2-byte shape reads its own poke as a #103 reproduction.
 #
-# WHAT THIS RETRACTS/WEAKENS (recorded 14z-98, GitHub #103): the 14z-97
-# (7) continue rig produced "#103 instance 2" (Phobos KO'd by Bishamon)
+# WHAT THIS RETRACTED (recorded 14z-98, GitHub #103 — and SETTLED the
+# same day by the maintainer's no-poke MAME retest): the 14z-97 (7)
+# continue rig produced "#103 instance 2" (Phobos KO'd by Bishamon)
 # with "HP set to 1 at round start" pokes whose byte-width was never
-# committed. Instance 2 is therefore UNVERIFIED — possibly manufactured.
-# Independent evidence that Phobos' real losses judge: his natural
+# committed. Instance 2 is CLOSED AS THIS ARTIFACT: the retest showed
+# real tenant losses judge (14z-98 (5)), on top of his natural
 # early-round losses (14z-97 (7)), his near-death commits firing
-# healthily (14z-98 tap), his x026142 escapes are FIXED, and the
-# maintainer's real no-poke Bishamon loss reached the continue screen.
-# Donovan's #103 is UNAFFECTED: his stall reproduces with ZERO pokes.
+# healthily (14z-98 tap), his x026142 escapes being FIXED, and the
+# maintainer's earlier real no-poke Bishamon loss reaching the continue
+# screen. Donovan's #103 was UNAFFECTED: zero-poke repro (trigger
+# refined 14z-98 (5): the hp:=1 pin must fire in the round first).
 #
 # THE RULE THIS GATE ENFORCES BY EXISTING: kill/heal pokes write BOTH
 # words — `frame:ff8450:00010001` (P1) / `frame:ff8850:00010001` (P2).

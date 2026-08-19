@@ -1391,9 +1391,10 @@ tests/audit_kill_poke_shape.sh        # 14z-98 (2): a 2-byte HP kill poke
                                       # (00010001, hp AND white). BOTH
                                       # verdicts frozen — engine facts,
                                       # stable across builds. Exists because
-                                      # "#103 instance 2" may be exactly
-                                      # this artifact (the continue rig's
-                                      # poke width was never committed).
+                                      # "#103 instance 2" WAS this
+                                      # artifact (settled by the no-poke
+                                      # MAME retest, 14z-98 (5): real
+                                      # tenant losses judge).
                                       # THE RULE: kill pokes write both
                                       # words. ~7 min, 2 parallel MAME runs.
 tests/audit_roster_pairings.sh        # 14z-97: EVERY TENANT vs EVERY CHARACTER,
@@ -2647,7 +2648,7 @@ Their expectation sets are BATTERY-SCOPED and say so in their own READMEs.
 | Replay format + MAME runner | `.rpl` in `tests/replays/`, `tests/lua/replay.lua`, `tools/run_replay_mame.sh` |
 | FBNeo harness (patched frontend) | `emu/fbneo-patches/0001-…`, `tools/setup_fbneo.sh`, `tools/run_replay_fbneo.sh` |
 | Legacy suite (10 replays, frozen) | `tests/run_suite.sh`, `tests/expected/vsavj/` |
-| Watchpoint write-tracer | `tests/lua/trace_writes.lua` (needs `-debug -debugger none`) |
+| Watchpoint write-tracer | `tests/lua/trace_writes.lua` (needs `-debug -debugger none`; `WATCH=addr,len[,r\|w\|rw\|b][,p\|d\|o]`, + `DUMPS` since 14z-98 so a -debug trace run carries its OWN state anchors — every -debug watch configuration is its own timeline, docs/GOTCHAS.md) |
 | Pick probe (slot mapping) | `tools/pick_probe.sh` |
 | Forced-id boot probe (14z-65) | `tools/force_pick_probe.sh <rompath> <id> <out>` — pokes the commit field across commit->load; verdicts id-hold/load/guard. Validated: vanilla ids load, variant 0x10 wedges on the stage-4 ladder |
 | Structural diff | `tools/diff_sets.py` (`--mask-pointers`) |
