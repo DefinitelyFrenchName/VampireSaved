@@ -1313,14 +1313,38 @@ tests/audit_don_lilith_ko.sh          # 14z-97 (GitHub #103): a DONOVAN P1
                                       # the name is just the poke-free repro
                                       # his own ladder provides). Normal
                                       # flow: 580f, identical merged vs
-                                      # pristine vanilla for a legacy P1;
-                                      # native vs2 clears the SAME record at
-                                      # KO+240. Regression-locks the DEFECT
+                                      # pristine vanilla for a legacy P1.
+                                      # Regression-locks the DEFECT
                                       # (EXPECT_STALL=1, the #98 discipline)
                                       # + a Victor control leg. ~5 min, 2
-                                      # parallel MAME runs. Flip EXPECT_STALL
-                                      # when the fix lands; mechanism + trace
-                                      # plan on #103.
+                                      # parallel MAME runs. ROOT-CAUSED
+                                      # 14z-98 (see the next row); a probe
+                                      # with the x026142 pcrel_escape_fix
+                                      # flips this to FLOWED 560. Flip
+                                      # EXPECT_STALL when the fix ships.
+tests/audit_don_ko_writer.sh          # 14z-98 (GitHub #103): THE ROOT-CAUSE
+                                      # LOCK — who writes Donovan's HP at
+                                      # his arcade death, PC-attributed,
+                                      # NON-DEBUG (read_tap, canonical
+                                      # timeline). The judge kills on WHITE
+                                      # HP's sign (+0x52, engine_internals
+                                      # "THE ROUND JUDGE"); the x026142
+                                      # pc-rel escape (vs2 0x262A4 bra.w
+                                      # $25F9A) runs his child-object init
+                                      # on the FIGHTER and pins hp:=1 with
+                                      # white ~200 -> the next hit
+                                      # underflows hp, white stays
+                                      # positive, unjudgeable. Leg A locks
+                                      # that shape (EXPECT_DEFECT=1); leg B
+                                      # (Victor) must show the healthy kill
+                                      # commit (both HP words 0xFFFF in one
+                                      # frame) or nothing is trustworthy.
+                                      # EXPECT_DEFECT=0 rehearsed on the
+                                      # 14z-98 probe (his death then takes
+                                      # the kill commit, f12730) — that
+                                      # rehearsal caught the RH-19 window
+                                      # trap now documented at leg A.
+                                      # ~9 min, 2 parallel MAME runs.
 tests/audit_roster_pairings.sh        # 14z-97: EVERY TENANT vs EVERY CHARACTER,
                                       # BOTH SIDES — the CLAUDE.md §4 mandate
                                       # ("vs each of the 18, both sides") that

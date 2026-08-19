@@ -1,53 +1,84 @@
-# NEXT SESSION — orientation (written at the close of 14z-97, 2026-08-19; the banner updated through 14z-97 (9))
+# NEXT SESSION — orientation (written at the close of 14z-98, 2026-08-19)
 
 > ## **THE SUITE IS GREEN: `ROMDIR=... tests/run_all_static.sh` -> PASS 93 /
 > ## SKIP 0 / FAIL 0.** FOUR issues open: #99 (parked), #43 ((b) awaits a
-> ## window), #50 (parked), #102 (arcade ladder), **#103 (NEW, the big one
-> ## of 14z-97 — read below)**. #96 CLOSED.
+> ## window), #50 (parked), #102 (arcade ladder), **#103 (ROOT-CAUSED AND
+> ## CAUSALLY CONFIRMED 14z-98 — the fix is designed and waits on the
+> ## re-freeze window; read below)**.
 > ##
 > ## **THE FROZEN BUILDS ARE UNCHANGED — donovan-m8 / huitzil-m17 /
 > ## pyron-m11 / merged-m3** (`build/don_m8` d038553d / `build/hui44`
 > ## bfd819a0 / `build/pyron28` 738bcfc2 / `build/m3b_merged10` ac3d0618;
-> ## tags `freeze/*`). **NO BUILD BYTE MOVED IN 14z-97.** Play:
-> ## `tools/run_wide.sh build/m3b_merged10 fbneo` (the build argument is
-> ## REQUIRED since 14z-97 — bare invocation lists what is on disk).
+> ## tags `freeze/*`). **NO SHIPPED BYTE MOVED IN 14z-98.** Play:
+> ## `tools/run_wide.sh build/m3b_merged10 fbneo` (build argument REQUIRED).
 > ##
-> ## **START HERE: #103's CONSUMER TRACE — one measurement closes the
-> ## mechanism.** The state as of 14z-97 (9), all measured:
-> ## - ANY Donovan P1 death in arcade parks un-judged ~8,000 frames
-> ##   (~2 min) before an engine failsafe reaches game-over. Deterministic,
-> ##   OPPONENT-INDEPENDENT (the Lilith-only reading and the race reading
-> ##   for the stall are both CORRECTED in place). Phobos stalls too
-> ##   (Bishamon leg). Legacy loser: 580f, merged == vanilla.
-> ## - Native vs2 walks +0x1C to EXACTLY the record we park on (0x287BA8 =
-> ##   our 0x0DB6D0) and CLEARS it at KO+240. The ported chain is right;
-> ##   the engine-side settle trigger is what is missing.
-> ## - The parked bank-tail data tables 0x0BF01A/09A/11A/19A carry row
-> ##   0x13 == row 0x03 (Victor aliases) and row 0x10 == Bulleta family,
-> ##   while vs2's parallels (bank shift +0x1A19E) hold DISTINCT newcomer
-> ##   rows (0x101ACA/0x101BC8/0x102674/0x102B82).
-> ## THE TRACE: read-watch on 0x0BF066 (row 0x13 of 0x0BF01A) during a
-> ## stall, in BOTH data and opcodes spaces (crypt-window wpset blindness).
-> ## CAUTION: the -debug timeline diverges (mash outcomes differ — Donovan
-> ## WON match 2 under -debug), so force the KO with round-start kill pokes
-> ## tuned from a -debug probe run, and identify events by VALUE, not frame.
-> ## Anchors to reproduce first: the healthy-Donovan +0x1C trajectory into
-> ## 0xDB6D0, and native's clear at KO+240 (both in STATE 14z-97 (8)/(9)).
-> ## Instrument: tests/audit_don_lilith_ko.sh locks the defect
-> ## (EXPECT_STALL=1); its header carries the opponent-independence
-> ## correction already (14z-97 close ritual).
+> ## **#103 IS CLOSED AS A MECHANISM** (full chain: the 14z-98 comment on
+> ## the issue; STATE 14z-98; engine_internals "THE ROUND JUDGE"):
+> ## - The round judge kills on THE SIGN OF WHITE HP (+0x52), never +0x50;
+> ##   the pipeline keeps white <= hp so white crosses zero first.
+> ## - Donovan's ported x026142 carries a node op (vs2 0x262A4) whose tail
+> ##   `bra.w $25F9A` ESCAPES the region; the preserved displacement lands
+> ##   in the adjacent placed region — his CHILD-OBJECT INIT — run with
+> ##   A6 = the FIGHTER, pinning hp := 1 (a pool durability init) with
+> ##   white ~200. Next hit underflows hp; white stays positive;
+> ##   unjudgeable; the ~8,000f stall is the engine failsafe.
+> ## - The parked bank-tail tables are ELIMINATED with controls (the
+> ##   banner's named trace ran: no loser ever reads them, both spaces).
+> ## - CAUSALLY CONFIRMED: probe build (unregistered build/probe_103_don,
+> ##   scratch manifests) + [[pcrel_escape_fix]] x026142 -> the audit
+> ##   flips to FLOWED 560, and his death takes the KILL COMMIT.
+> ## - Defect locks: audit_don_lilith_ko (EXPECT_STALL=1) +
+> ##   audit_don_ko_writer (NEW, EXPECT_DEFECT=1, PC-attributed).
 > ##
-> ## **TWO STANDING HOLDS — do not start:** #99 (parked; the continue rig
-> ## now exists and runs to the exact screen — #103 blocks it), #50 (parked
-> ## behind #99). **AWAITING RULINGS:** #43(b)'s window; the two
-> ## battery-target registry rows (14z-97, proposed not ratified); the ~200
-> ## tracked build dirs.
+> ## **THE FIX (rides the re-freeze window with #43(b), maintainer's
+> ## call):** donovan.toml [[pcrel_escape_fix]] x026142 (7 overlay twins
+> ## already VERIFIED in reconciliation_huitzil.toml) + x05c800 (verified
+> ## too) + x028122/x065c22/x088512 (targets 0x2cc64/0x689fe/0x8b6ea need
+> ## site-twin work or ship as loud tripwires). Donovan census total: 14
+> ## escape sites / 5 regions + 10 lea DATA escapes + 4 data_in_code, all
+> ## uncovered (his extraction predates the 14z-66 census).
 > ##
-> ## **FIELD REPORT (2026-08-19): no crash on FBNeo over a wide array,
-> ## sound confirmed corrected, arcade quirks = #102. The maintainer's MAME
-> ## retest is pending — when they lose to Bishamon as Phobos, whether the
-> ## round judges promptly or sits on the KO tableau is a #103 data point
-> ## no rig can substitute.**
+> ## **NEXT MEASUREMENT if the machine is yours again: PHOBOS' STALL
+> ## (#103 instance 2, Bishamon leg) is NOT yet traced** — his x026142 IS
+> ## escape-fixed, so it is another region's escape or a second mechanism.
+> ## First run: his white-vs-hp state at the stall (audit_don_ko_writer's
+> ## classifier applies with his forced class; the #99 continue rig recipe
+> ## in 14z-97 (7) reaches the exact state). His answer decides whether
+> ## the fix window closes BOTH tenants' stalls or one.
+> ##
+> ## **TWO STANDING HOLDS — do not start:** #99 (parked; blocked by #103's
+> ## fix), #50 (parked behind #99). **AWAITING RULINGS:** #43(b)'s window
+> ## (now carrying #103's fix too); the two battery-target registry rows;
+> ## the ~200 tracked build dirs; the maintainer's MAME retest (sharpened:
+> ## a Phobos KO-tableau sit is instance 2 of the white-HP class — his
+> ## +0x52 at that moment decides it).
+
+## What 14z-98 did
+
+**#103 root-caused and causally confirmed; no shipped byte moved.** The
+banner's consumer trace ran and ELIMINATED its own suspect (both spaces,
+live controls), which moved the hunt one level up: the KO-recognition
+step (phase 6->8) never fires for a Donovan death because the judge
+tests WHITE HP's sign and his white never goes negative — a ported
+pc-rel escape pins his hp to 1 mid-match. Chain, instruments, fix design
+and rehearsals: STATE 14z-98; the issue carries the full write-up.
+
+**New instruments:** `tests/audit_don_ko_writer.sh` (the root-cause
+lock, both modes rehearsed); `trace_writes.lua` DUMPS (self-documenting
+-debug runs). **New gotchas (project bucket):** every -debug watch
+configuration is its own TIMELINE; GUARD_PROBE's RET (SP) lies for
+jmp-reached code. **Atlas:** +0x52 judge note, +0x54, +0x11F rows;
+engine_internals "THE ROUND JUDGE" section. **Retractions executed:**
+the "author the four per-char rows" fix shape (issue, STATE (9) marker,
+bank_map.toml trace note).
+
+---
+
+# HISTORY BELOW — carried for reference, not current
+
+Everything from here down was written at the close of 14z-97 and
+earlier. Kept because the eliminations and traps stay valid; read the
+section above for the current state.
 
 ## What 14z-97 did
 
@@ -107,14 +138,6 @@ in `test_baseset_mask_invariant.sh` was briefly passing because it CRASHED.
 
 **Where the tenants stand:** unchanged. No build moved; the 14z-96 freeze
 stands.
-
----
-
-# HISTORY BELOW — carried for reference, not current
-
-Everything from here down was written at the close of 14z-95 and
-earlier. Kept because the eliminations and traps stay valid; read the
-section above for the current state.
 
 ## What 14z-95 did
 

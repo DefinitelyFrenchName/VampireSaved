@@ -1,5 +1,114 @@
 # STATE — living progress log
 
+## Session 14z-98 — #103 ROOT-CAUSED AND CAUSALLY CONFIRMED: a pc-rel
+## escape in Donovan's x026142 pins his HP to 1, and the round judge
+## kills on WHITE HP's sign. The parked bank-tail rows are ELIMINATED.
+
+The banner's consumer trace ran and answered NO — and the hunt moved one
+level up and closed the mechanism end to end. **No shipped byte moved**;
+the fix is designed, probe-confirmed, and waits on the re-freeze window.
+Full measurement chain on GitHub #103 (14z-98 comment); the chronology:
+
+1. **Preflight + anchors reproduced exactly:** suite PASS 93/0/0;
+   audit_don_lilith_ko UNRESOLVED 8960 / Victor FLOWED 560 (merged-m3 AND
+   solo don_m8 — same KO frame, deterministic); native vs2 walk
+   0x2873A0→0x287BA8 + clear at KO+240 (poke-free — the natural mash
+   loses on vs2 too); NEW: native flips phase $FF800C 6→8 in the same
+   40f sample as the KO, and so does a legacy loser on OUR build (Victor,
+   f9960); Donovan's death never flips it — KO RECOGNITION, not
+   settle, was the missing step.
+2. **The banner's question answered with controls:** read-watches on
+   0x0BF01A-0x0BF21A and 0x0BF59A-0x0BF61A during a tuned -debug stall,
+   BOTH spaces. Opcodes: zero (wposet control 80b40,4,r,o = 1845 hits).
+   Program: sole consumer = PRG:0x02CCC4/F8/0x02CD4E (movea.l #$bf01a;
+   row = in-match $382<<2; feeds fighter +0x210/214/218/224) — fires
+   ONLY on the CPU-side struct, both legs, never a loser at death.
+   0x0BF59A unread. **The "author the four per-char rows" fix shape is
+   WITHDRAWN** (marked in 14z-97 (9), the issue, bank_map.toml).
+3. **The engine mechanism:** in-match machine PRG:0x93CE (table 0x93C0),
+   phase-6 handler 0x97DC tests THE SIGN OF +0x52 (white) at
+   0x97FC/0x9804 — never +0x50. vs2's twin 0x800C/0x8014: same offsets.
+   The pipeline keeps white <= hp (applier 0x18AB0, staged $FF3442/44),
+   so white crosses 0 first; kill commit (0x18A7C / 0x18B12 / live
+   0x2980A+0x29810) writes both -1 + deathflag +0x11F. Measured healthy:
+   Victor f9924 hp 17→6, white 15→-3, commit same frame. Atlas rows
+   added (+0x52 judge note, +0x54, +0x11F); engine_internals gained
+   "THE ROUND JUDGE" section.
+4. **The port defect:** non-debug read_tap (canonical timeline): W f8938
+   PC 0cd286 ff8450 := 0001 (white ~210), W f8951 the applier underflows
+   1-9 = fff8, white 210→196 stays positive → unjudgeable. PC 0x0CD286 =
+   region x066ec4 +0x1B2 = vs2 0x67076 — a POOL-OBJECT durability init.
+   GUARD_PROBE_HIST names the path: the ported walker's node op at
+   x026142+0x162 (vs2 0x262A4) ends `bra.w $25F9A` — target 0x1A8 BEFORE
+   the region start; the preserved displacement lands it at placed
+   0x0CD1E8 = x066ec4's child-object INIT, executed with A6 = the
+   FIGHTER (also clobbers +0x30 owner link, +0x39/98/B1, velocities).
+   NATIVE CONTROL: 13,400f on vsav2, same tap — vs2 0x67076 writes the
+   fighter's HP zero times. vs2's branch legitimately reaches 0x25F9A
+   (status-reset helper; vsavj twin PRG:0x26E16, 0x174 identical bytes,
+   unique — and ALREADY a verified 14z-66 row in reconciliation_huitzil).
+5. **Why only Donovan:** his extraction predates the 14z-66/67 escape
+   census — huitzil.toml has 5 [[pcrel_escape_fix]] rows, pyron.toml 2,
+   donovan.toml 0. Census rerun on his extract: 14 word-form escape
+   sites over 5 regions (x026142: 9 sites/6 targets incl. 0x25F9A) + 10
+   pcrel DATA escapes + 4 data_in_code — ALL uncovered.
+6. **Causal confirmation (probe build, throwaway, scratch manifests, no
+   tracked edits):** build/probe_103_don (fingerprint 8426ee14,
+   UNREGISTERED) = donovan.toml + [[pcrel_escape_fix]] x026142 pad 0x60
+   + a scratch overlay carrying H's 7 verified twins. Generator: 9
+   escapes → 6 trampolines, 0 tripwired. audit_don_lilith_ko
+   EXPECT_STALL=0: **leg A FLOWED 560** — the healthy legacy constant
+   (KO moves 8960→12760: the escape also perturbed ordinary play).
+   audit_don_ko_writer EXPECT_DEFECT=0: his death takes the KILL COMMIT
+   (f12730). Both rehearsals green; both defect-locks green on merged-m3.
+
+**Suite doctrine:** tests/audit_don_ko_writer.sh NEW (the root-cause
+lock: leg A = the defect shape PC-attributed, EXPECT_DEFECT=1; leg B =
+Victor kill-commit control; both modes rehearsed, incl. its own RH-19
+window trap caught by the EXPECT_DEFECT=0 rehearsal and documented in
+the leg-A window comment). trace_writes.lua gained DUMPS (self-
+documenting -debug runs — see the 14z-98 gotcha). Two gotchas appended
+(project bucket): every -debug watch configuration is its own TIMELINE;
+GUARD_PROBE's RET (SP) lies for jmp-reached code.
+
+**The fix, for the re-freeze window (decision pending, joins #43(b)):**
+donovan.toml [[pcrel_escape_fix]] rows — x026142 (closes #103; overlay
+rows exist verified in reconciliation_huitzil.toml: 0x210c0→0x226dc,
+0x219c4→0x22fc0, 0x21c64→0x23244, 0x22008→0x23500, 0x24cba→0x26058,
+0x25f9a→0x26e16, 0x27542→0x282ee) + x05c800 (0x635fc→0x5b25c verified
+there too) + x028122/x065c22/x088512 (targets 0x2cc64/0x689fe/0x8b6ea
+UNRESOLVED — site-twin work, or ship as loud tripwires; both strictly
+better than today's silent wrong-code execution). Donovan is the
+reference tenant (no recon_overlay): the rows land either in a new
+overlay or the shared map — his fingerprint moves either way. The
+probe's recipe is reproducible from this entry + the scratch manifests
+described in it.
+
+**Parked findings from the trace (recorded, not chased):**
+- x026142's 5 lea DATA escapes (+0xe3e/e48/e52/f02/f4c → 0x2783c-0x27f78
+  past region end) — the placed copy reads whatever follows it; separate
+  latent class, same fix window.
+- The 0x02CCxx consumer serves a tenant-as-P2 the ALIASED bank-tail rows
+  (content-wrong, measured non-crashing — Phobos vs CPU-Donovan match 3
+  completes).
+- **Phobos' Bishamon-leg stall (#103 instance 2) is NOT yet traced:** his
+  x026142 copy IS escape-fixed, so it is another region's escape or a
+  second mechanism. First measurement: his white-vs-hp state at the
+  stall (audit_don_ko_writer's classifier applies as-is with his class).
+
+**Decisions pending (maintainer), updated:**
+1. **#103's fix window** — unchanged in substance but the fix is now
+   AIMED: the pcrel_escape_fix row set above, probe-confirmed. Still
+   rides a re-freeze window with #43(b).
+2. #43(b) — unchanged.
+3. The two battery-target registry rows — carried (proposed, 14z-97).
+4. The ~200 tracked build dirs — carried.
+5. #99's rig protocol / the MAME retest datum — carried; note the retest
+   question is now sharper: a Phobos round that sits on the KO tableau
+   would be instance 2 of the WHITE-HP class, and his +0x52 at that
+   moment decides it.
+
+
 ## Session 14z-97 CLOSE — ritual complete (the full session: (1)-(9))
 
 The longest-scope session since 14z-96: **#96 closed** (option (a) executed
@@ -64,6 +173,13 @@ anything.
 ## Session 14z-97 (9) — CORRECTION: the stall is OPPONENT-INDEPENDENT for
 ## Donovan; the native leg names the missing step; the parked rows are
 ## confirmed aliased where vs2 authored real ones
+## [RESOLVED 14z-98: the consumer trace ELIMINATED the parked rows (no
+## loser ever reads them — healthy or stalled, both spaces, controls
+## live), so the "author the per-char rows" fix shape below is
+## WITHDRAWN. Root cause = a pc-rel escape in x026142 (vs2 0x262A4
+## `bra.w $25F9A`) landing in the child-object init with A6=fighter,
+## pinning hp:=1 while white stays positive — and the round judge kills
+## on WHITE's sign. Causally confirmed by probe build. See 14z-98.]
 
 **A control of mine collapsed under the proper signal, and the record is
 corrected in all carriers (issue #103, this file).** "Donovan KO'd by Q-Bee →

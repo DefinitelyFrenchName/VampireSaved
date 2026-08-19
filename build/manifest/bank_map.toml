@@ -487,3 +487,9 @@ stride = 0x80
 # 0x0BF59A (per-char ENGINE routine rows — vs2 0x25402 needs an R1
 # equivalent; unfired), 0x0BF51A (all-zero), 0x0BF69A (sentinel-like).
 # Triage WITH A CONSUMER TRACE if a soak fires there.
+# TRACED 14z-98 (#103): the sole consumer of 0x0BF01A/09A/11A is the
+# 0x02CCB6 family (row = in-match $382 << 2 -> fighter +0x210/214/218/
+# 224), CPU-side struct only, never a loser at death; 0x0BF59A unread
+# in both spaces (wposet control live). NOT the #103 mechanism — that
+# was the x026142 pc-rel escape. Latent note: a tenant as P2 reads the
+# ALIASED rows here (content-wrong, measured non-crashing).
