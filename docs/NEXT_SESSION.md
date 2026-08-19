@@ -1,4 +1,4 @@
-# NEXT SESSION — orientation (written at the close of 14z-98, 2026-08-19; updated through 14z-98 (8))
+# NEXT SESSION — orientation (written at the close of 14z-98, 2026-08-19; updated through 14z-98 (9))
 
 > ## **THE SUITE IS GREEN: `ROMDIR=... tests/run_all_static.sh` -> PASS 93 /
 > ## SKIP 0 / FAIL 0.** Open: #99 (parked), #43 ((b) awaits a window),
@@ -63,11 +63,14 @@
 > ## grabber-independent (Donovan ours 0x287370 vs native 0x287418;
 > ## Pyron ours 0x26654C vs native 0x26614C — different deltas);
 > ## locked by audit_don_grab_pose.sh (EXPECT_MATCH=0) on the committed
-> ## rig replays/96_don_victor_grab.rpl. Suspect class: reaction-id
-> ## generation drift (the electric-shake precedent). NEXT: trace the
-> ## reaction id at the victim's record selection, both legs (read_tap
-> ## on victim +0x54 family at the connect) — the fix is then per-row
-> ## remaps in the ported victim tables, riding the same window.
+> ## rig replays/96_don_victor_grab.rpl. MECHANISM CLOSED 14z-98 (9):
+> ## the anim_index table family is repointed CORRECTLY; the defect is
+> ## a GENERATION DRIFT IN THE REACTION-INDEX SPACE (vsavj passes idx 6
+> ## for the grab-hold where vs2 passes 11) — the ported tables are in
+> ## vs2's index order. FIX (same window as #103's rows): derive the
+> ## permutation from the legacy twins (Victor row 3, both games),
+> ## REORDER the tenants' ported offset tables (5 siblings x 3
+> ## tenants), probe with EXPECT_MATCH=1 + ordinary-hit no-regression.
 > ## **#105** (AUTO-mode win screens: white shapes, all tenants): AUTO
 > ## selection SOLVED + PROVEN (1P mode menu overlays the wheel
 > ## ~f1250-2100: D,D -> AUTO, confirm; menu times out into NORMAL) —

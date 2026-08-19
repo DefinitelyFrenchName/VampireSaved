@@ -1,5 +1,41 @@
 # STATE — living progress log
 
+## Session 14z-98 (9) — #104's MECHANISM CLOSED: a GENERATION DRIFT IN
+## THE VICTIM-REACTION INDEX SPACE. The tables were ported and repointed
+## RIGHT; the engine indexes them with the other generation's meanings.
+
+One tap pair finished it (read_tap ff881c both legs, PC-attributed):
+
+1. Install writers: ours PRG:0x27FCE, native vs2 0x27222 — the engine's
+   twin victim-record installers (0x27FA0/0x271F4 blocks, instruction-
+   parallel): per-char table from the anim_index family by victim
+   $382<<2, then record = table + word[REACTION INDEX from the
+   attacker], installed at +0x1C.
+2. The family is ALREADY KNOWN AND HANDLED: anim_index_a/b/c/proj +
+   0x0BCEFA (bank_map data_ptr rows, region anim; ram.md:189 calls it
+   the Midnight-Bliss/capture-pose family). All five row-0x13 entries
+   on the build are CORRECTLY repointed (anim_index_c -> 0x0DACBA =
+   the placed copy of vs2 0x287192; checked against verify_data.bin).
+   vs2's newcomer tables live INSIDE the ported anim regions (D
+   0x287192, P 0x265FD0, H 0x247E66) — nothing is missing.
+3. THE DEFECT IS THE INDEX: for Victor's grab-hold, vsavj's engine
+   passes index 6 where vs2's passes index 11 (ours installs
+   table+0x1DE = idx 6; native table+0x286 = idx 11). The ported
+   tables' CONTENTS are in vs2's index order; vsavj's engine reads
+   them with vsavj meanings — the electric-shake generation-drift
+   class (ram.md +0x5C), in the index space. Coinciding indices render
+   fine ("half right"); drifted ones select neighbors.
+
+FIX DESIGN (rides the re-freeze window, with #103's rows): derive the
+vs2->vsavj index permutation from the LEGACY twins (Victor row 3:
+vsavj 0x157A50 vs vs2 0x13FAA2 — matching record content across the
+two engines gives the map, measured); REORDER the tenants' ported
+offset tables (5 siblings x 3 tenants, data-only, inside the anim
+copies); probe with audit_don_grab_pose EXPECT_MATCH=1 + ordinary-hit
+no-regression legs. Open question for the derivation: whether all four
+sibling tables share one permutation, and whether it is a clean shift
+over a range (6->11 suggests +5 in the hold family) or per-index.
+
 ## Session 14z-98 (8) — #105's rig: AUTO selection SOLVED AND PROVEN;
 ## the scripted flow shows NO white surface; awaiting the maintainer's
 ## captures to name the screen. #104 capture pair CONFIRMED.
