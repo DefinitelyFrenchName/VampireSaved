@@ -1,5 +1,67 @@
 # STATE — living progress log
 
+## Session 14z-97 (7) — THE CONTINUE RIG EXISTS AND RUNS TO #99's EXACT
+## SCREEN; what blocks it is #103, and the working theory is now a RACE
+
+The #99 recipe needed: credits in reserve, a match-4 loss as Phobos to
+Bishamon, a Start press at the continue screen, a character switch. Built and
+measured, on merged-m3/MAME:
+
+1. **The 14z-95 blocker DISSOLVED on the way.** "Why does the ladder reset
+   after rung 2 under a held heal" — it never reset. The marathon LOSES its
+   third match (Donovan to Lilith, naturally), #103's stall makes the loss
+   look like a wedge, then the single credit runs out and the game-over →
+   attract flow is what the sparse probes read as "reset". Not a ladder
+   defect; a lost game plus a stall plus a one-coin rig.
+2. **Phobos' ladder naturally schedules CPU-DONOVAN at match 3** — the
+   tenant-vs-tenant CPU pairing arises with no continue-switch at all, from
+   his authored table-A row, and completes cleanly.
+3. **Match 4 vs Bishamon — the maintainer's exact #99 context — STALLS**
+   (#103 second instance): a clean KO (pokes 400f clear), the round never
+   judges, tableau frozen 9,500+ frames with THREE credits banked and the
+   mash's Start presses landing. The "PRESS START" in the corner is the
+   perpetual P2-join prompt, NOT a continue screen — the continue never
+   comes because the round never ends.
+
+### The race reading, and why it is now the working theory
+
+Two of five tenant-loss events stall; three judge fine (Donovan×Q-Bee,
+Donovan×Victor, Phobos' early rounds — and Victor×Lilith flows in 580f on
+merged AND vanilla). No clean deterministic discriminator survives: not "any
+tenant loss", not one winner, not credits, not match index. AND the
+maintainer's own Phobos-loses-to-Bishamon FLOWED on merged-m2/MAME (they
+reached the continue and switched) before the next match crashed. The #91/#92
+precedent — "clean legs are a TIMING accident" — plus both tenants spawning a
+companion child in their KO presentation (visible in both stall snapshots)
+points at one racy mechanism seen at three severities: #103's stall, #99's
+crash, #102's chaining quirks. HYPOTHESIS, recorded to aim the trace; the
+trace plan is on #103.
+
+### Two more rig traps paid for (now four this session)
+
+3. **The second kill burst hit round-2's KO freeze and un-KO'd the loser
+   mid-judge** — a poke-produced false stall that cost a full run to
+   diagnose. Kill pokes belong at ROUND START (+~100f), three pokes, then
+   hands off; round boundaries are measured from the previous iteration's
+   dumps, not guessed.
+4. **"PRESS START" on screen is not evidence of a continue screen** — the
+   P2-join prompt says the same words permanently during any 1P match.
+   Screen-reading needs the state words, not the banner.
+
+### Iteration ledger (the deterministic-rig discipline held)
+
+continue1: kill pokes collided with judge windows (trap 1) — discarded.
+continue2: NO pokes — clean natural flow map: match/selection frames, the
+CPU-Donovan pairing, Bishamon at match 4. continue3: second burst mid-round
+→ false stall (trap 3) — diagnosed, discarded. continue4: round-start
+schedule → clean KO → the REAL stall, snapshot-confirmed at two frames
+5,500 apart.
+
+Posted: #103 updated with instance 2 + the counterexample table + the race
+hypothesis + the trace plan; #99 updated — its "blocked on a RIG" framing has
+sharpened to "the rig exists and runs to the exact screen; a DEFECT blocks
+it".
+
 ## Session 14z-97 (6) — A NEW SHIPPING DEFECT FOUND, BOUNDED AND LOCKED:
 ## Donovan KO'd by Lilith stalls the arcade lose flow ~8,000 frames (#103)
 
