@@ -7,8 +7,13 @@
 #      moveset, DP spam, round-2, input chaos, 40K arcade marathon —
 #      the gfx remap touches anim data; these prove the state machine
 #      still runs it clean.
-#   3. Masked legacy gate (CLAUDE.md §4 v2) on the stage-6 build: the
-#      gfx work must not perturb one byte of legacy live RAM.
+#   3. Masked legacy gate (CLAUDE.md §4) on the stage-6 build: the gfx work
+#      must not perturb one byte of legacy live RAM beyond what the frozen
+#      generation already accounts for. RE-POINTED 14z-97 (GitHub #96): the
+#      target is resolved from the build's fingerprint — today
+#      `donovan-m8-stock`, the STOCK TWIN of the donovan-m8 freeze — so this
+#      leg now asserts "the pipeline, built fresh, reproduces the current
+#      freeze" (maintainer-ruled option (a), 2026-08-19).
 # Companion gates run separately against the same rompath:
 #   tests/test_m2a_stage4_oracle.sh build/donovan6/rompath
 #   tests/test_m2a_stage4_xemu.sh   build/donovan6/rompath
@@ -58,7 +63,7 @@ for gr in 12_donovan_vs_cpu 19_don_dp_spam 20_don_round2 21_don_mash \
     fi
 done
 
-echo "== 2. legacy gate, amended §4 basis (masked live-RAM) =="
+echo "== 2. legacy gate, §4 basis (masked live-RAM, current frozen generation) =="
 m2a_legacy_gate_masked "$RP" "$WORK"
 
 # pixel-level menu gate (session 14s): RAM/VRAM gates are blind to gfx

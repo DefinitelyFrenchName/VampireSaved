@@ -140,12 +140,21 @@ for k in $kinds; do
 done
 
 # And every .masked CLASS in use must be a class the runner implements.
+# THE OWNER MOVED (14z-97, GitHub #96): the dispatch was lifted out of
+# run_suite.sh into tests/lib/masked_compare.sh when the M2 battery became a
+# second caller. Grepping run_suite.sh for the case labels would now find
+# nothing and this check would go red on every class at once — which is the
+# correct failure for a moved implementation, and this is the follow-through.
+# Keep the pattern ANCHORED to the case label: a loose grep would match the
+# class name in a comment and green-light a class nobody implements.
+CLASS_OWNER="$REPO/tests/lib/masked_compare.sh"
 classes=$(cat "$REPO"/tests/expected/*/*.masked 2>/dev/null | awk '{print $1}' | sort -u)
 for c in $classes; do
-    if grep -q "^        $c)" "$REPO/tests/run_suite.sh"; then
+    if grep -q "^    $c)" "$CLASS_OWNER"; then
         echo "  ok: masked class '$c' is implemented"
     else
-        echo "FAIL: masked class '$c' is used in an expectation but not implemented"
+        echo "FAIL: masked class '$c' is used in an expectation but is not"
+        echo "      implemented in $CLASS_OWNER"
         fail=1
     fi
 done

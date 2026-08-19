@@ -9,13 +9,16 @@
 #   2. Bring-up: the full 12_donovan_vs_cpu moveset replay (9320 frames)
 #      runs END-clean under the -debug crash guard — no crash, no tripwire.
 #   3. Superset invariant per the amended CLAUDE.md §4 (masked live-RAM,
-#      maintainer-approved 2026-07-25) with the v2 per-replay classes
-#      (maintainer-approved 2026-07-27; standing watch on flicker growth):
-#      m2a_legacy_gate_masked runs the full legacy set against frozen
-#      masked vanilla logs — 02/05/07 exact; 03/10/16 flicker-tolerated
-#      (tools/compare_flicker.py, ground-truthed); 06 first-divergence
-#      exactly 700 (TS press; latch-phase propagation into service mode);
-#      attract exactly 4278 (Jedah demo); pick exactly 1080 (anim hover).
+#      maintainer-approved 2026-07-25) with the ratified per-replay classes.
+#      RE-POINTED 14z-97 (GitHub #96, maintainer-ruled option (a)): the
+#      target is resolved from THIS BUILD's fingerprint through
+#      tests/expected/registry.tsv — today `donovan-m8-stage4` — instead of
+#      the constants this header used to list (700 / 4278 / 1080 and a
+#      donovan-m2c class table frozen 2026-08-02). Every class now lives in
+#      the expectation set, in the same vocabulary run_suite.sh speaks, and
+#      an unregistered fingerprint stops the gate as a rule-6 signal.
+#      What the stage-4 set says, and why 04_select_fuzz is a `diverge`
+#      rather than a flicker: tests/expected/donovan-m8-stage4/README.md.
 #
 # Usage: ROMDIR=... tests/test_m2a_stage4_code.sh [outbase]
 set -eu

@@ -54,8 +54,9 @@ test_gfx_collision_gate
 test_gfx_layout_fields_live
 test_harness_frame_bound
 test_hex_lengths
+test_masked_compare
 test_m2a_flicker_gate
-test_m2a_mask_pin
+test_m2a_target_policy
 test_mame_mirror_guard
 test_manifest_merge
 test_meter_in_field_map

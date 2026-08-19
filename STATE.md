@@ -1,5 +1,167 @@
 # STATE — living progress log
 
+## Session 14z-97 — #96 CLOSED: the battery's target now FOLLOWS THE BUILD,
+## and the §4 vocabulary has exactly one implementation
+
+**The ruling executed** (maintainer, 2026-08-19, option (a)): the m2a/m2b
+battery asserts *"the pipeline, built fresh, reproduces the CURRENT freeze"*,
+with its specs re-pointing at each freeze as POLICY rather than as a constant.
+
+**The mechanism chosen is the one run_suite.sh has always used** — CLAUDE.md
+§4's auto-detecting runner. The battery resolves its legacy target from the
+BUILD's program fingerprint through `tests/expected/registry.tsv`; the set
+carries the mask and one `.masked` spec per replay in the ratified vocabulary.
+So nothing in the gate names a generation, and at the next freeze the registry
+row moves and the gate follows it with no edit. An unregistered fingerprint is
+the rule-6 signal by construction: it means the pipeline no longer reproduces
+the freeze.
+
+### The measurements, in the order they were made
+
+1. **The pipeline DOES reproduce the freeze.** Rebuilt from a clean tree:
+   stage 6 -> `a054de5c` (= `build/m5_stock3`, the stock twin named in the
+   donovan-m8 freeze record), stage 4 -> `22c804c8`. So every #96 symptom was
+   the dated pin, exactly as the ruling said — no build defect anywhere.
+2. **Instrument control first:** all 14 battery replays run on VANILLA under
+   the V2 mask reproduce `tests/expected/vsavj/masked-v2` bit-for-bit (14/14).
+   The shapes below are therefore differences, not noise.
+3. **Both stages measured** against that basis (`tools/propose_masked_specs.sh`).
+   Stage 6: 8 exact, 4 flicker, 2 diverge. Stage 4: 10 exact, 1 flicker,
+   3 diverge. Every shape is expressible in the ratified vocabulary.
+4. **`08_challenger_join`'s 3807 — the one item #96 left open — is
+   ATTRIBUTED, not absorbed.** Full-RAM dump diff, vanilla vs the stage-6
+   build, at both 3507 and 3807: the only differing LIVE byte is **`$FF06E1`**,
+   with everything else in the dead stack the mask already skips. That is the
+   byte `docs/game/atlas/ram.md:62` names verbatim — the OBJ-builder secondary
+   stack, *"execution POSITION, not state ... one byte at `$FF06E1`, one frame,
+   identical the next frame"*. Corroboration, and it reframes the ticket: **the PIN is the
+   outlier.** Every generation's expression of this replay carries 3807 except
+   `donovan-m2c` — m2 `flicker 2 3507,3807`, m2b the same, m2c `flicker 1
+   3507`, then m5/m5w/m8 `composite 3507 …;3807-4610`. The gate was pinned to
+   the one generation in which the frame was absent, so "the inventory grew"
+   was never the right reading. On the WIDE track that frame is the select
+   WINDOW ONSET (the challenger join re-enters select): same trigger, and the
+   wheel extension is what turns it into an 800-frame window there.
+
+### Two new expectation sets, and two registry rows that are NOT builds
+
+`donovan-m8-stock` (`a054de5c`) and `donovan-m8-stage4` (`22c804c8`), each
+with a README carrying its provenance and the mechanism attribution for every
+non-`exact` spec. They are BATTERY-SCOPED (the 14 legacy replays), which their
+READMEs state loudly, so `run_suite.sh` on those fingerprints reports
+`NO-EXPECTATION` for the rest — correct under the 14z-61 doctrine.
+
+**Why a separate set rather than pointing at `donovan-m8`:** the two tracks
+carry different rosters by construction. `donovan-m8`'s specs are dominated by
+`window`/`composite` at onset 889 — the 21-cell wheel — and the stock twin has
+no wheel extension, so it measures `exact`/`flicker` at the same replays.
+Pointing the battery at `donovan-m8` would red every select-reaching replay
+while nothing was wrong: the same generation-mismatch #96 was filed for, one
+track over.
+
+**`04_select_fuzz` at stage 4 is `diverge 2009`** — the ruling's item 3
+("stage-aware specs or a reduced list"). It diverges permanently there, which
+14z-95 root-caused to the half-ported select screen (stage 5 is "select
+plumbing"; 134 unmasked bytes at f2200, no match formed). `diverge` was chosen
+over dropping the replay because it asserts strictly more: bit-identity through
+2008 and a divergence at exactly 2009, so an onset moving EARLIER fails. The
+superset invariant is asserted on the COMPLETED artifact, not here.
+
+### What disappeared AS CONSTANTS
+
+`M2A_MASK` (the V1 string, second copy of run_suite's — #70's other half),
+`M2A_MASKED_EXP`, `M2A_FLICKER_SPECS=tests/expected/donovan-m2c`,
+`M2A_MASKED_EXACT`/`M2A_MASKED_FLICKER` (class membership is a property of the
+generation: `09_mirror_pick` was `flicker 1 829` at m2c and is `exact` now,
+because 14z-91 removed the hook that caused 829), and the three
+first-divergence constants 700 / 4278 / 1080. What replaced those three is
+STRICTER: they are `.masked` specs of class `diverge` now, and
+`check_diverge.py` also asserts line-identity BEFORE the frame, which the
+hand-rolled check did not. **Precisely:** they are gone from the MASKED gate.
+`M2A_ATTRACT_DIVERGE=4278` still stands in the UNMASKED `m2a_legacy_gate`
+(stages 1-3, hook-free builds), and it belongs there — that gate compares
+against VANILLA's own frozen logs, so 4278 is a fact about vsavj's attract
+demo reaching the patched slot, not a claim about a generation.
+
+### THE PREDICATE INVERTED, and the old reasoning is retracted by name
+
+14z-90 (GitHub #2) made the flicker check fail on GROWTH and merely ADVISE on
+shrink, on an explicit premise: *"this helper runs on UNFROZEN dev builds, so
+pinning one build's numbers manufactures false REDs"*. **That premise is gone**
+— the build under test is now asserted to reproduce a FROZEN generation, so a
+shrink means the fresh build is not the frozen one. Drift either way now fails,
+through the same comparators run_suite.sh uses. `test_m2a_flicker_gate.sh` was
+rewritten around the inverted predicate rather than deleted, and its header
+carries the retraction so nobody "fixes" case 2 back.
+
+### One implementation of the §4 vocabulary
+
+`tests/lib/masked_compare.sh` — exact / flicker / diverge / window / composite
+plus the #62 baseset-vs-mask guard — lifted out of `run_suite.sh` and now
+sourced by both it and the battery. Verified three ways: every checker call and
+verdict string is textually identical to the pre-lift block; a synthetic ground
+truth exercises all five classes in both directions
+(`tests/test_masked_compare.sh`); and `window` + `composite` were re-checked on
+REAL logs from the shipping WIDE build (`16_xemu_2p`, `03_two_player_vs` on
+`build/don_m8`, both PASS through the lifted code).
+
+### Two real defects found while doing it
+
+1. **`tools/propose_masked_specs.sh` measured VANILLA when given an absolute
+   builddir.** It tested `$BUILD/rompath` for existence but handed
+   `$PWD/$BUILD/rompath` to MAME and to build_fingerprint — correct only for a
+   repo-relative argument. With an absolute path MAME fell through the `;`
+   rompath to `$ROMDIR` and every shape was measured on the pristine set while
+   the header named the build. Caught by the fingerprint print I added in the
+   same edit (it printed `b0eb9ecd` — vanilla). Fixed by canonicalising first.
+   THIRD instance of the caller-environment class in two sessions.
+2. **The lifted `diverge` branch would have reported NO-BASE-LOG on every
+   diverge spec.** `check_diverge.py` derives the base log from the spec
+   FILE's stem; the lift wrote its temp spec to a fixed name. Caught by the
+   new ground truth before the gate ever ran, and locked by a case in it.
+
+### Gates
+
+| gate | what it locks |
+|---|---|
+| `tests/test_masked_compare.sh` (new, ci_portable) | the §4 dispatch: five classes both directions, both mask-mismatch branches, unknown class, the default-mask fallback |
+| `tests/test_m2a_target_resolution.sh` (new, ci_static) | the policy EXECUTED: registered -> set, unregistered -> a stop naming rule 6 before any replay runs, `M2A_EXPSET` announcing itself. The unregistered image is SYNTHESISED (one poke), not a build dir, so it cannot rot (#94) |
+| `tests/test_m2a_target_policy.sh` (was `test_m2a_mask_pin.sh`) | INVERTED: no literal mask, no set constant, target resolved, the V1 literal in exactly one file, the ruling still recorded |
+| `tests/test_m2a_flicker_gate.sh` | rewritten: growth AND shrink fail, a required replay with no spec fails, an unresolvable target names rule 6 |
+| `tests/test_baseset_mask_invariant.sh` | re-pointed at the new owner; its DEFAULT literal now READ from the lib. **Its verdict control was briefly passing because it CRASHED** (a relative path from a subshell in a temp cwd) — fixed, and re-proved live by flipping the fixture to well-paired and watching it complain |
+| `tests/test_suite_dispatch.sh` | the masked-class implementation check follows the moved owner |
+| `tests/test_freeze_retires_diverge.sh`, `tests/test_build_gate_status.sh` | their fake repos get the shared lib (both drive the REAL scripts) |
+
+### Results
+
+- `tests/test_m2a_stage4_code.sh` — **PASS**, target `donovan-m8-stage4`,
+  14/14 legacy replays on their frozen classes.
+- `tests/test_m2b_stage6.sh` — **PASS**, target `donovan-m8-stock`, 14/14
+  legacy replays on their frozen classes, five guarded soaks END-clean
+  (incl. the 40,620-frame arcade marathon) and the pixel menu gate green.
+- `tests/run_all_static.sh` — **PASS 93 / SKIP 0 / FAIL 0, GREEN**, the new
+  `test_m2a_target_resolution` among them at 1 s (it is in ci_static and must
+  never boot an emulator; that is now STRUCTURAL — it replaces
+  `m2a_run_masked` with a loud failure, rather than relying on today's paths
+  happening to stop early).
+  **One line in that run is a false alarm and is mine:** the working-tree
+  check reported `docs/GOTCHAS.md`, `docs/NEXT_SESSION.md` and
+  `docs/project/gotchas.md` "DIRTIED by the run". No gate touched them — I was
+  editing them while the chain ran. Re-verified on a quiet tree afterwards.
+- Real negative control, no MAME needed: `build/m5_stock` (`6c93cfa8`, a real
+  superseded stock build) trips the rule-6 stop with its fingerprint named.
+
+### Decisions pending (maintainer)
+
+1. **The two registry rows are mine to propose, not to ratify.** Registry rows
+   are added at freeze time as a STATE decision; these register two PIPELINE
+   images rather than shipping artifacts, because that is what the ruled policy
+   needs to dispatch on. Everything about them is measured and reversible (the
+   rows plus two directories); say the word if you want them named or scoped
+   differently, or kept out of `registry.tsv` in favour of a battery-local
+   table.
+2. Carried: **#43(b)**'s window, the ~200 tracked build dirs, **#99**'s rig.
+
 ## Session 14z-96 CLOSE — ritual complete
 
 The longest session on record by scope: **five issues closed (#47 #48

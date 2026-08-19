@@ -14,6 +14,10 @@ one your current task belongs to. A trap you hit while porting Huitzil
 is a GAME gotcha if it is true of the game regardless of the port.
 
 
+### appended 14z-97 (project bucket)
+- CANONICALISE a path argument before use — an absolute builddir made a tool measure PRISTINE VANILLA and print the build's name over it (3rd caller-environment instance in 2 sessions); print the resolved fingerprint
+- A chained `-rompath "a;b"` cannot fail loudly for a missing `a` — falling through IS the feature, so assert what resolved
+- A verdict control that CRASHES reads as one that fired; prove a control live by making its fixture GOOD and watching it complain
 ### appended 14z-96 (project bucket)
 - A gate must not depend on the CALLER'S environment — relative ROMDIR and an unexported $REPO both measured; gates take paths as ARGV, new gates first-run under env -i
 - Python hash() in printed output is PER-PROCESS random — print stable digests for anything compared across runs

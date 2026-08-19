@@ -26,8 +26,15 @@ logs checksummed under it (masked bytes are skipped from the checksum, so
 the two sides must share the mask; `tools/freeze_masked_basis.sh`):
 - **round 64 / v1** `043c-043d,4182-41a2,7f00-8000` — the original two
   windows (2026-07-25) + row 0x14's staging slot (2026-08-02); vanilla
-  logs `tests/expected/vsavj/masked/`; the STOCK-track basis
-  (`tests/lib/m2a_common.sh M2A_MASK`, `run_suite.sh` default).
+  logs `tests/expected/vsavj/masked/`; the fallback basis for expectation
+  sets that ship no `mask` file of their own. **The string has ONE home:
+  `MASKED_DEFAULT_MASK` in `tests/lib/masked_compare.sh`** (14z-97,
+  GitHub #70/#96 — it used to be written out again in `run_suite.sh` and a
+  third time in `tests/lib/m2a_common.sh`, where it also pinned the M2
+  battery to the donovan-m2c generation; both copies are gone and
+  `tests/test_m2a_target_policy.sh` fails if one returns). Note the
+  CURRENT stock-track sets are on **V2**, not this: `donovan-m8-stock`
+  and `donovan-m8-stage4` both ship a `mask` file.
 - **V2** `043c-043d,4182-41a2,41c2-41e2,4222-4262,7f00-8000` — + the
   medallion rows' slots 0x16 / 0x19+0x1A (14z-64, ratified with the
   donovan-m3a bundle 2026-08-06); `tests/expected/vsavj/masked-v2/`.

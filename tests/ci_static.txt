@@ -93,3 +93,8 @@ test_merged_inputs
 # newcomers' real rows, and 0x2a1/0x2a2 are FREE Z80 rows in both games
 # (Phobos' hurt events are voiced with deliberate silence). Needs ROMDIR.
 test_kernel_voice_tables
+
+# 14z-97 (GitHub #96): the M2 battery's legacy target is resolved from the
+# build, and an unregistered image stops it. Needs ROMDIR (it builds a
+# one-poke image to be 'not any frozen build'), no emulator.
+test_m2a_target_resolution

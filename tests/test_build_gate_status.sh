@@ -50,6 +50,10 @@ GATE_SRC="${GATE_SRC:-$REPO/tests}"
 cp "$GATE_SRC/test_m2b_stage6.sh"      "$R/tests/"
 cp "$GATE_SRC/test_m2a_stage4_code.sh" "$R/tests/"
 cp "$REPO/tests/lib/m2a_common.sh"     "$R/tests/lib/"
+# 14z-97: m2a_common.sh sources the shared §4 comparators, so the scratch
+# repo needs them too — without this the copied gates die at their first
+# line and this control would "pass" on a gate that never ran.
+cp "$REPO/tests/lib/masked_compare.sh" "$R/tests/lib/"
 chmod +x "$R/tests/test_m2b_stage6.sh" "$R/tests/test_m2a_stage4_code.sh"
 
 # $1 = mode: reject_after_pack | die_before_pack | ok

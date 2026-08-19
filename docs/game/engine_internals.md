@@ -679,8 +679,9 @@ the staged rows — so buffer content is display-only and transient.
 Consequence: any ROM-side select palette-block content change (the
 medallion recolor; future Huitzil/Pyron rows) surfaces in this buffer
 during fades in LEGACY replays. Handled by the third masked window
-(tests/lib/m2a_common.sh M2A_MASK + docs/game/atlas/ram.md; ratified
-round 64, STATE 14z-49b). The family is `slot(row) = $FF3F02 + row*0x20`
+(the per-set `mask` file, default in tests/lib/masked_compare.sh, +
+docs/game/atlas/ram.md; ratified round 64, STATE 14z-49b; the
+m2a_common.sh copy this line used to cite was removed 14z-97). The family is `slot(row) = $FF3F02 + row*0x20`
 (14z-64); the WIDE track masks the medallion rows' slots too — V2 rows
 0x16/0x19/0x1A (14z-64), V3 adds row 0x1D (14z-88, after the 14z-87b
 medallion move 0x1A→0x1D). **A palette-ROW move is a STAGING-SLOT move**

@@ -52,109 +52,99 @@ m2a_legacy_gate() {
 }
 
 # ── Masked legacy gate (CLAUDE.md §4 amendment, 2026-07-25) ──────────────────
-# For builds carrying ENGINE HOOKS: legacy comparison is live-RAM — all work
+# For builds carrying ENGINE HOOKS the legacy comparison is live-RAM: all work
 # RAM except the windows documented in docs/game/atlas/ram.md (dead stack
-# $FF7F00-$FF7FFF at frame-done + QSound handshake latch $FF043C + the
-# 14z-49 window below).
-# THIRD WINDOW $FF4182-$FF41A1 (added 14z-49, MAINTAINER-RATIFIED
-# 2026-08-02 round 64): the palette-fade staging buffer's slot for select
-# palette-block-A row 14. The 14z-49 medallion recolor (Donovan's icon on
-# the replaced Jedah slot) legitimately changes that ROM row; venue fades
-# (measured: the match->win fade, 05_timeout_idle f9126) stage block-A rows
-# through this work-RAM buffer, so the intended content difference surfaced
-# in a legacy replay. Mechanism fully attributed byte-for-byte (STATE
-# 14z-49b); display-only path (buffer -> 90C000; the win venue overwrites
-# row 14 with its own colors — win screens pixel-compare 0-diff vanilla vs
-# patched at f9200/f9400). Masking the 0x20-byte slot keeps 05 verified
-# full-length instead of demoting it to a first-divergence constant.
-# AUDIT ON SUSPICION: tests/audit_mask_window_ff4182.sh re-proves the
-# window's divergence is exactly the designed row content and nothing
-# else (full spec: docs/game/atlas/ram.md row + STATE 14z-49b).
-# Future slot ports (Huitzil/Pyron rows) must extend this window with THEIR
-# measured slots deliberately — do not pre-widen.
-# v2 semantics (maintainer-approved 2026-07-27, CLAUDE.md §4): per-replay
-# comparison classes against FROZEN masked vanilla logs:
-#   exact    02/05/07 + attract/pick diverge-constants: bit-identical
-#   flicker  03/10/16: isolated <=2-frame divergent stretches that fully
-#            re-converge (tools/compare_flicker.py, ground-truthed) — the
-#            input-accept/spawn boundary phase artifact
-#   exact    06_test_mode: bit-identical since 14z-91 (GitHub #96). It used
-#            to diverge at the TS press (700) — service-mode code read the
-#            phase-shifted QSound latch and the offset propagated — but that
-#            was HOOK-CAUSED, and 14z-91 deleted the hooks responsible. See
-#            M2A_TESTMODE_DIVERGE below for the corroboration.
-# Hook-free builds keep m2a_legacy_gate (unmasked) above.
-# THE V1 MASK, AND IT IS A SECOND COPY OF ONE (14z-94, GitHub #70).
-# run_suite.sh carries the same string as its built-in default for sets that
-# ship no mask file. #70 proposed reading tests/expected/<set>/mask here
-# instead — but that would RE-POINT this battery from the donovan-m2c
-# generation it deliberately targets to whatever set is current, which is
-# exactly the open maintainer question recorded below and in STATE.md. So the
-# pin stays, and the DUPLICATION is what gets fixed: tests/test_m2a_mask_pin.sh
-# asserts this string still equals run_suite.sh's default, so the two copies
-# cannot drift apart silently while both claim to be V1.
-M2A_MASK="043c-043d,4182-41a2,7f00-8000"
-M2A_MASKED_EXP="tests/expected/vsavj/masked"   # relative to $REPO
-# 14z-90 (issue #2): where this track's FROZEN flicker inventories live. The
-# gate reads field 4+ of `<replay>.masked` ("flicker vsavj/masked 2 829,2093")
-# and fails only on GROWTH beyond that set — see the note at the gate itself
-# for why equality is the wrong predicate on an unfrozen dev build.
-# NOTE this is the donovan-m2c generation, matching M2A_MASK (V1) and
-# M2A_MASKED_EXP above. Whether the M2 battery should still target that
-# generation, or be re-pointed at the current V2 basis and unified with
-# run_suite.sh's dispatch, is recorded in STATE.md as a maintainer question.
-M2A_FLICKER_SPECS="tests/expected/donovan-m2c"
-# What each legacy replay exercises (all vanilla-content; a gate name is
-# <NN>_<character>_<mechanic> — the character is the vanilla char driving
-# the scenario, NOT a porting target):
+# $FF7F00-$FF7FFF at frame-done, the QSound handshake latch $FF043C, and the
+# palette-fade staging slots of the rows this project's palette ports edit).
+# The mask STRING is no longer written here — see the next block.
+#
+# ══ THE TARGET IS RESOLVED FROM THE BUILD, NOT PINNED BY NAME ═══════════════
+# 14z-97, GitHub #96. RULED 2026-08-19 (maintainer), option (a): *"the battery
+# asserts 'the pipeline, built fresh, reproduces the CURRENT freeze'. Its
+# specs re-point at each freeze."*
+#
+# What this replaced, and why it had to go. This helper used to carry SIX
+# constants describing one generation:
+#
+#     M2A_MASK            the V1 mask string (a second copy of run_suite's)
+#     M2A_MASKED_EXP      tests/expected/vsavj/masked   (the V1 basis)
+#     M2A_FLICKER_SPECS   tests/expected/donovan-m2c    (frozen 2026-08-02)
+#     M2A_MASKED_EXACT    which replays were exact AT THAT GENERATION
+#     M2A_MASKED_FLICKER  which replays flickered AT THAT GENERATION
+#     M2A_TESTMODE_DIVERGE / M2A_PICK_DIVERGE_MASKED / M2A_ATTRACT_DIVERGE
+#
+# so it built a CURRENT image from today's manifests and judged it against a
+# five-generation-old expectation, in a vocabulary that predates the §4 v3/v4
+# `window` and `composite` classes. Every #96 symptom was that mismatch:
+# `06_test_mode`'s 700 (which 14z-91's hook removal legitimately retired) and
+# `08_challenger_join`'s 3807 (which today's tree expresses as a select-window
+# ONSET on the WIDE track). Neither was a build defect.
+#
+# THE MECHANISM IS THE ONE run_suite.sh HAS ALWAYS USED — CLAUDE.md §4's
+# auto-detecting runner. The build's program fingerprint is looked up in
+# tests/expected/registry.tsv; that names the expectation set; the set carries
+# the mask (tests/expected/<set>/mask) and one `.masked` spec per replay in
+# the ratified vocabulary. So "latest frozen" is a POLICY here, not a new
+# constant to go stale: at the next freeze the registry row moves and this
+# helper follows it with no edit.
+#
+# AND AN UNREGISTERED FINGERPRINT IS THE RULE-6 SIGNAL, not an inconvenience.
+# It means the pipeline no longer reproduces the current freeze, which is
+# exactly what the ruling says a red battery means. It must never be worked
+# around by pinning a set name back into this file.
+#
+# THE PREDICATE CHANGED WITH THE TARGET, AND THE OLD REASONING IS RETRACTED.
+# 14z-90 (GitHub #2) made the flicker check fail on GROWTH and merely ADVISE
+# on shrink, on the explicit grounds that "this helper runs on UNFROZEN dev
+# builds, so pinning one build's numbers manufactures false REDs". That
+# premise is gone: the build under test is now asserted to reproduce a
+# FROZEN generation, so its inventory must match that generation EXACTLY.
+# A shrink is no longer benign — it means the fresh build is not the frozen
+# one — and it now fails, via the same comparators run_suite.sh uses. The
+# growth-only predicate and its ground truth (tests/test_m2a_flicker_gate.sh)
+# were retired with this change, not lost: see that file.
+#
+# M2A_EXPSET=<set> overrides the resolution. It exists for ONE job — authoring
+# a new set for a build that is not registered yet — and it says so loudly on
+# every run, because a silent name pin is the defect this block replaced.
+#
+# The §4 comparison vocabulary itself lives in ONE place, shared with the
+# corpus runner: tests/lib/masked_compare.sh.
+. "$REPO/tests/lib/masked_compare.sh"
+
+# The replay names this gate REFUSES to run without. Names, not classes:
+# which class a replay lands in is a property of the generation (09_mirror_pick
+# was `flicker 1 829` at m2c and is `exact` now, because 14z-91 removed the
+# hook that caused 829), but WHICH REPLAYS THE BATTERY OWES is not. Without
+# this floor an expectation set that lost half its files would pass by
+# asserting less — the "a skipped gate asserts NOTHING" failure (#29) one
+# level down.
+M2A_MASKED_REQUIRED="01_attract_long 02_demitri_vs_cpu 03_two_player_vs \
+04_select_fuzz 05_timeout_idle 06_test_mode 07_mash_storm 08_challenger_join \
+09_mirror_pick 10_midattract_start 11_pick_donovan 16_xemu_2p \
+29_felicia_walljump 30_demitri_throw"
+# What each one exercises (all vanilla-content; a gate name is
+# <NN>_<character>_<mechanic> — the character is the vanilla char driving the
+# scenario, NOT a porting target):
+#   01_attract_long      attract demos, incl. the one that reaches the patched slot
 #   02_demitri_vs_cpu    baseline match: movement, normals, CPU rounds
-#   05_timeout_idle      timer expiry path, idle anims, timeout judging
-#   07_mash_storm        input-storm: simultaneous presses, frame-1 actions
-#   30_demitri_throw     THROW machinery: grab, victim-keyframe positioner
-#                        (0xBE27A table walk), cinematic, damage — added
-#                        14z after the throw-data blind spot let the
-#                        copies-era corruption through ungated
 #   03_two_player_vs     2P match: both input rows live, round handoffs
-#   10_midattract_start  Start pressed mid-attract: demo teardown path
-#   16_xemu_2p           2P pattern shared with the dual-emulator gate
 #   04_select_fuzz       select-screen cursor fuzzing, edge picks
-#   08_challenger_join   mid-match challenger interrupt path
+#   05_timeout_idle      timer expiry path, idle anims, timeout judging
+#   06_test_mode         service mode (the only replay that reads the sound latch)
+#   07_mash_storm        input-storm: simultaneous presses, frame-1 actions
+#   08_challenger_join   mid-match challenger interrupt path (re-enters select)
 #   09_mirror_pick       mirror-match pick (same-char palette side rules)
-#   29_felicia_walljump  wall-latch/triangle-jump physics — added 14w
-#                        after the gap-table collateral broke it ungated
-M2A_MASKED_EXACT="02_demitri_vs_cpu 05_timeout_idle 07_mash_storm 30_demitri_throw"
-M2A_MASKED_FLICKER="03_two_player_vs 10_midattract_start 16_xemu_2p 04_select_fuzz 08_challenger_join 09_mirror_pick 29_felicia_walljump"
-# 04/08/09 measured session 11 (playtest follow-up: they had fallen out of
-# the gate when it was rebuilt): pure flicker class — isolated single-frame
-# re-converging divergences (04@1525/2009/2195, 08@3507, 09@829), no
-# persistent hover divergence.
-# 06_test_mode's frozen masked first-divergence. WAS 700 UNTIL 14z-95
-# (GitHub #96), and the change is a RATIFIED TRANSITION, not a stale number
-# quietly re-frozen.
-#
-# The header above already predicted it: "hook-caused — stage-3 hook-free
-# builds run 06 bit-identical". 14z-91's legacy-regression fix DELETED the two
-# fixture_row0f_override site_thunks (which legacy executed at every venue
-# load) and left the obj_hook dispatch sites vanilla, so the cycles that
-# phase-shifted the QSound latch are gone and this replay is bit-identical.
-#
-# THE ISSUE'S SECOND READING — "something that should be live is now inert" —
-# IS ELIMINATED BY CORROBORATION, not by assertion. The same transition was
-# measured independently into FOUR expectation sets at that generation, by
-# commit 271838e ("the corpus re-measured and re-frozen — 139 specs, ZERO
-# not-expressible, and the specs got STRICTER"):
-#     donovan-m2/m2b/m2c/m5/m5w, huitzil-m13, pyron-m7 -> diverge ... 700
-#     donovan-m7, huitzil-m16, pyron-m10, merged1      -> exact
-# This helper missed that re-freeze because it holds the fact as a CONSTANT
-# rather than as an expectation file — the "second copy of one fact" class,
-# exactly like the mask string two blocks below (GitHub #70).
-#
-# NOTE THE DIRECTION: `none` is STRICTER than a frozen divergence frame, so
-# this cannot hide a regression. A build that re-introduces the divergence now
-# FAILS, which is the property that made re-freezing safe here and would not
-# have been true the other way round.
-M2A_TESTMODE_DIVERGE=none                      # 06: bit-identical since 14z-91
-M2A_PICK_DIVERGE_MASKED=1080                   # select-screen anim hover
+#   10_midattract_start  Start pressed mid-attract: demo teardown path
+#   11_pick_donovan      picking the patched slot itself
+#   16_xemu_2p           2P pattern shared with the dual-emulator gate
+#   29_felicia_walljump  wall-latch/triangle-jump physics — added 14w after
+#                        the gap-table collateral broke it ungated
+#   30_demitri_throw     THROW machinery: grab, victim-keyframe positioner
+#                        (0xBE27A table walk), cinematic, damage — added 14z
+#                        after the throw-data blind spot let the copies-era
+#                        corruption through ungated
+M2A_MASK=""      # RESOLVED per run from the expectation set; never pinned here
 
 # m2a_run_masked <rompath> <replay.rpl> <out.log> <sandbox>
 m2a_run_masked() {
@@ -162,151 +152,93 @@ m2a_run_masked() {
         "$REPO/tools/run_replay_mame.sh" vsavj "$2" "$3" "$4"
 }
 
-# m2a_first_divergence <log_a> <log_b> — prints first differing frame or NONE
-m2a_first_divergence() {
-    python3 - "$1" "$2" <<'PYEOF'
-import sys
-a = open(sys.argv[1]).read().splitlines()
-b = open(sys.argv[2]).read().splitlines()
-print(next((x.split()[0] for x, y in zip(a, b) if x != y), "NONE"))
-PYEOF
+# m2a_masked_target <rompath> — print the expectation set this build dispatches
+# to, or fail with the rule-6 message. Kept separate so a caller can report the
+# target before spending twenty minutes of MAME on it.
+m2a_masked_target() {
+    if [ -n "${M2A_EXPSET:-}" ]; then
+        echo "$M2A_EXPSET"
+        return 0
+    fi
+    # build_fingerprint.py prints the unregistered FINGERPRINT on stdout and
+    # exits 2, so "whatever it printed" is not the set. Contract here: print a
+    # set name and return 0, or print NOTHING and return 1 — a caller that
+    # forgets to check the status must not end up with a 40-hex "set name".
+    _mt_out=$(python3 "$REPO/tools/build_fingerprint.py" "$1" --set vsavj 2>/dev/null) \
+        || return 1
+    echo "$_mt_out"
 }
 
-# m2a_legacy_gate_masked <rompath> <workdir> — full legacy set against the
-# frozen masked vanilla logs (freeze with m2a_freeze_masked). gate_fail=1
-# on failure.
+# m2a_legacy_gate_masked <rompath> <workdir> — every replay the resolved
+# expectation set names, compared with the ratified §4 comparators.
+# Sets gate_fail=1 on failure.
 m2a_legacy_gate_masked() {
     _mg_rp="$1"; _mg_w="$2"
-    _mg_exp="$REPO/$M2A_MASKED_EXP"
-    _mg_exp_specs="$REPO/$M2A_FLICKER_SPECS"
     gate_fail=0
-    [ -d "$_mg_exp/logs" ] || { echo "FAIL: no frozen masked logs at $_mg_exp (run m2a_freeze_masked)"; gate_fail=1; return; }
     _mg_keep="$REPO/build/gate_failures"
-    for _mg_r in $M2A_MASKED_EXACT; do
+
+    _mg_set="$(m2a_masked_target "$_mg_rp")" || _mg_set=""
+    if [ -z "$_mg_set" ]; then
+        echo "FAIL: this build's fingerprint is not in tests/expected/registry.tsv."
+        echo "      The M2 battery targets the CURRENT frozen generation"
+        echo "      (GitHub #96, maintainer-ruled 2026-08-19), so an unregistered"
+        echo "      image means THE PIPELINE NO LONGER REPRODUCES THE FREEZE."
+        echo "      That is rule 6: stop and find out what moved. Do NOT pin a"
+        echo "      set name here to get past it."
+        echo "      fingerprint: $(python3 "$REPO/tools/build_fingerprint.py" \
+                                     "$_mg_rp" --set vsavj --sha-only 2>/dev/null)"
+        gate_fail=1
+        return
+    fi
+    if [ -n "${M2A_EXPSET:-}" ]; then
+        echo "  !! M2A_EXPSET=$_mg_set — the target is PINNED BY NAME, so this"
+        echo "     run does NOT assert the ruled policy (that the pipeline"
+        echo "     reproduces the current freeze). Authoring only."
+    fi
+    _mg_exp="$REPO/tests/expected/$_mg_set"
+    [ -d "$_mg_exp" ] || { echo "FAIL: no expectation dir $_mg_exp"; gate_fail=1; return; }
+    M2A_MASK="$(masked_mask_for "$_mg_exp")"
+    echo "  target: $_mg_set   mask: $M2A_MASK"
+
+    # The floor, before any measuring: a set that names fewer replays than the
+    # battery owes cannot pass by asserting less.
+    for _mg_r in $M2A_MASKED_REQUIRED; do
+        [ -f "$_mg_exp/$_mg_r.masked" ] || {
+            echo "FAIL: $_mg_set has no spec for $_mg_r, which this gate requires."
+            echo "      Author it (tools/propose_masked_specs.sh measures the"
+            echo "      shape; every non-exact class needs its mechanism named)."
+            gate_fail=1
+        }
+    done
+    [ "$gate_fail" = 0 ] || return
+
+    for _mg_r in $M2A_MASKED_REQUIRED; do
         m2a_run_masked "$_mg_rp" "$REPO/tests/replays/$_mg_r.rpl" \
             "$_mg_w/$_mg_r.log" "$_mg_w/${_mg_r}box"
-        if cmp -s "$_mg_exp/logs/$_mg_r.log" "$_mg_w/$_mg_r.log"; then
-            echo "  ok: $_mg_r masked bit-identical"
+        if _mg_v=$(masked_check "$_mg_exp" "$_mg_r" \
+                    "$(cat "$_mg_exp/$_mg_r.masked")" "$M2A_MASK" \
+                    "$_mg_w/$_mg_r.log"); then
+            echo "  ok: $_mg_r $_mg_v"
         else
             mkdir -p "$_mg_keep"
             cp "$_mg_w/$_mg_r.log" "$_mg_keep/$_mg_r.$(date +%s).log"
-            echo "FAIL: $_mg_r masked live-state diverged (log kept in build/gate_failures)"; gate_fail=1
-        fi
-    done
-    for _mg_r in $M2A_MASKED_FLICKER; do
-        m2a_run_masked "$_mg_rp" "$REPO/tests/replays/$_mg_r.rpl" \
-            "$_mg_w/$_mg_r.log" "$_mg_w/${_mg_r}box"
-        _mg_v=$(python3 "$REPO/tools/compare_flicker.py" \
-            "$_mg_exp/logs/$_mg_r.log" "$_mg_w/$_mg_r.log") || _mg_rc=$?
-        if [ "${_mg_rc:-0}" != 0 ]; then
-            mkdir -p "$REPO/build/gate_failures"
-            cp "$_mg_w/$_mg_r.log" "$REPO/build/gate_failures/$_mg_r.$(date +%s).log"
-            echo "FAIL: $_mg_r masked: $_mg_v (log kept in build/gate_failures)"
-            gate_fail=1
-        else
-            # 14z-90 (GitHub issue #2). compare_flicker's EXIT CODE cannot
-            # encode inventory equality — it has no inventory parameter — so
-            # this used to print "ok:" for ANY verdict inside the class
-            # thresholds, including a wholly different set of divergent frames.
-            # run_battery_m2.sh advertises a "frozen flicker inventory — watch
-            # for growth: standing maintainer watch" over that.
-            #
-            # The obvious fix (string-equality against a frozen inventory, as
-            # run_suite.sh does) is WRONG HERE and was refuted during judging:
-            # inventories legitimately move between builds on the same track —
-            # donovan-m2b 08_challenger_join is "2 3507,3807", donovan-m2c is
-            # "1 3507" — and this helper runs on UNFROZEN dev builds, so
-            # pinning one build's numbers manufactures false REDs on the gate
-            # that guards the superset invariant, which read as a rule-6 halt.
-            #
-            # So implement the standing watch's literal text instead: fail on
-            # GROWTH beyond the frozen inventory; ADVISE on shrink; and refuse
-            # to invent an inventory when none is frozen. A build that passes
-            # today cannot be reddened by this, by construction.
-            _mg_frozen=""
-            [ -f "$_mg_exp_specs/$_mg_r.masked" ] && _mg_frozen=$(
-                awk '{ for (i = 4; i <= NF; i++) printf "%s%s", $i, (i<NF?" ":"") }' \
-                    "$_mg_exp_specs/$_mg_r.masked")
-            if [ -z "$_mg_frozen" ]; then
-                echo "  ok: $_mg_r masked ${_mg_v}  [ADVISORY: no frozen"
-                echo "      inventory for this replay — growth cannot be checked]"
-            else
-                _mg_growth=$(FROZEN="$_mg_frozen" MEASURED="$_mg_v" python3 - <<'PY'
-import os, sys
-frozen = set(os.environ["FROZEN"].replace(",", " ").split())
-v = os.environ["MEASURED"].split()
-measured = set(v[2].split(",")) if len(v) >= 3 and v[0] == "FLICKER" else set()
-grown = sorted(measured - frozen, key=int)
-print(",".join(grown))
-PY
-)
-                if [ -n "$_mg_growth" ]; then
-                    mkdir -p "$REPO/build/gate_failures"
-                    cp "$_mg_w/$_mg_r.log" "$REPO/build/gate_failures/$_mg_r.$(date +%s).log"
-                    echo "FAIL: $_mg_r masked ${_mg_v} — flicker GREW beyond the"
-                    echo "      frozen inventory ($_mg_frozen): new frame(s) $_mg_growth."
-                    echo "      CLAUDE.md §4 standing watch: stop and root-cause."
-                    gate_fail=1
-                elif [ "$_mg_v" = "EXACT" ]; then
-                    echo "  ok: $_mg_r masked EXACT  [ADVISORY: frozen inventory"
-                    echo "      was $_mg_frozen — the divergence is GONE, not grown]"
-                else
-                    echo "  ok: $_mg_r masked ${_mg_v}  (within frozen $_mg_frozen)"
-                fi
-            fi
-        fi
-        _mg_rc=0
-    done
-    m2a_run_masked "$_mg_rp" "$REPO/tests/replays/06_test_mode.rpl" \
-        "$_mg_w/06_test_mode.log" "$_mg_w/06box"
-    _mg_div=$(m2a_first_divergence "$_mg_exp/logs/06_test_mode.log" \
-        "$_mg_w/06_test_mode.log")
-    if [ "$M2A_TESTMODE_DIVERGE" = none ]; then
-        if [ "$_mg_div" = NONE ]; then
-            echo "  ok: 06_test_mode masked bit-identical (hook-free since 14z-91)"
-        else
-            echo "FAIL: 06_test_mode masked diverges at $_mg_div — it has been"
-            echo "      bit-identical since 14z-91, so this is a REGRESSION:"
-            echo "      something re-introduced legacy-visible hook cycles."
+            printf 'FAIL: %s %s\n' "$_mg_r" "$_mg_v"
+            echo "      (log kept in build/gate_failures; spec is"
+            echo "       $_mg_exp/$_mg_r.masked)"
             gate_fail=1
         fi
-    elif [ "$_mg_div" = "$M2A_TESTMODE_DIVERGE" ]; then
-        echo "  ok: 06_test_mode masked first-divergence exactly $M2A_TESTMODE_DIVERGE (TS press; latch-phase propagation)"
-    else
-        echo "FAIL: 06_test_mode masked first-divergence $_mg_div (expected $M2A_TESTMODE_DIVERGE)"; gate_fail=1
-    fi
-    m2a_run_masked "$_mg_rp" "$REPO/tests/replays/01_attract_long.rpl" \
-        "$_mg_w/01_attract_long.log" "$_mg_w/01box"
-    _mg_div=$(m2a_first_divergence "$_mg_exp/logs/01_attract_long.log" \
-        "$_mg_w/01_attract_long.log")
-    if [ "$_mg_div" = "$M2A_ATTRACT_DIVERGE" ]; then
-        echo "  ok: attract masked first-divergence exactly $M2A_ATTRACT_DIVERGE (Jedah demo)"
-    else
-        echo "FAIL: attract masked first-divergence $_mg_div (expected $M2A_ATTRACT_DIVERGE)"; gate_fail=1
-    fi
-    m2a_run_masked "$_mg_rp" "$REPO/tests/replays/11_pick_donovan.rpl" \
-        "$_mg_w/11_pick_donovan.log" "$_mg_w/11box"
-    _mg_div=$(m2a_first_divergence "$_mg_exp/logs/11_pick_donovan.log" \
-        "$_mg_w/11_pick_donovan.log")
-    if [ "$_mg_div" = "$M2A_PICK_DIVERGE_MASKED" ]; then
-        echo "  ok: pick masked first-divergence exactly $M2A_PICK_DIVERGE_MASKED (anim hover)"
-    else
-        echo "FAIL: pick masked first-divergence $_mg_div (expected $M2A_PICK_DIVERGE_MASKED)"; gate_fail=1
-    fi
+    done
 }
 
-# m2a_freeze_masked <workdir> — one-time: freeze masked VANILLA logs for the
-# whole legacy set (+ sha1s for quick reference). Record the freeze in
-# STATE.md. Deterministic and re-derivable from $ROMDIR.
-m2a_freeze_masked() {
-    _mf_w="$1"
-    _mf_exp="$REPO/$M2A_MASKED_EXP"
-    mkdir -p "$_mf_exp/logs"
-    for _mf_r in $M2A_MASKED_EXACT $M2A_MASKED_FLICKER 06_test_mode 01_attract_long 11_pick_donovan; do
-        m2a_run_masked "$ROMDIR" "$REPO/tests/replays/$_mf_r.rpl" \
-            "$_mf_w/$_mf_r.log" "$_mf_w/${_mf_r}box"
-        cp "$_mf_w/$_mf_r.log" "$_mf_exp/logs/$_mf_r.log"
-        shasum "$_mf_w/$_mf_r.log" | cut -d' ' -f1 > "$_mf_exp/$_mf_r.sha1"
-        echo "froze $_mf_r (log + sha1)"
-    done
-}
+# RETIRED 14z-97 with the re-point above, recorded so neither comes back by
+# accident:
+#   m2a_first_divergence  — the hand-rolled "first differing frame" used by the
+#       three constant checks (06/01/11). Those are `.masked` specs of class
+#       `diverge` now, checked by tools/check_diverge.py through masked_check,
+#       which also asserts line-identity BEFORE the frame — the hand-rolled one
+#       did not.
+#   m2a_freeze_masked     — froze a vanilla masked basis from inside the gate
+#       library. tools/freeze_masked_basis.sh is the one freeze path now, and
+#       it carries the guards this did not: atomic publish (#86), a MASK record
+#       beside the logs (#62 pairs specs to it), and an environment scrub so
+#       nothing from the caller's shell reaches a frozen log.

@@ -2500,6 +2500,38 @@ The real scenario it guards — a host key physically held before the run — IS
 in that read, because MAME samples host input ahead of the frame. Reachable
 in the field, not from the harness.
 
+## 14z-97: two ways a tool measures the wrong thing and says nothing
+
+**A path argument must be CANONICALISED before anything uses it — the
+"correct only when called one way" trap, and this is its THIRD instance in
+two sessions.** `tools/propose_masked_specs.sh` existence-checked
+`$BUILD/rompath` but handed `$PWD/$BUILD/rompath` to MAME and to
+`build_fingerprint.py`. With a repo-relative builddir the two agree; with an
+ABSOLUTE one they do not — the checks pass, the emulator gets a path that
+cannot exist, and MAME falls through the `;`-separated rompath to `$ROMDIR`.
+The tool then measures PRISTINE VANILLA and prints the build's name over it.
+Measured live: an absolute-path run reported fingerprint `b0eb9ecd` (vanilla)
+for a stage-6 build. Two rules: `case "$X" in /*) ;; *) X="$PWD/$X" ;; esac`
+at the top (the convention `audit_mask_window_ff42a2.sh` already follows), and
+**print the resolved fingerprint of whatever you actually opened** — that
+print is what caught this, not the reasoning.
+
+**A chained rompath makes "file not found" look like "measurement complete".**
+This is the general shape and it is worth its own line: MAME's
+`-rompath "a;b"` cannot fail loudly for a missing `a`, because falling
+through to `b` IS the feature. Anything that builds such a path must assert
+what it resolved. Related and already recorded: FBNeo has no `-rompath` at
+all, so the same class there is an overlay dir silently left behind.
+
+**A verdict control that CRASHES reads as a control that fired.**
+`test_baseset_mask_invariant.sh`'s control runs from a temp cwd and expects
+its fixture to be REJECTED (nonzero). An edit gave it a repo-relative library
+path, so python raised FileNotFoundError, exited 1, and the block printed
+"ok: a mispaired spec is caught" over a traceback. Anything that reads an
+exit STATUS as a verdict must distinguish "rejected" from "died" — and the
+cheap proof that a control is live is to make the fixture GOOD and watch the
+control complain (done here; it does).
+
 ## 14z-96: three instrument traps, each paid for in this session
 
 **A gate must not depend on the CALLER'S environment — measured twice in

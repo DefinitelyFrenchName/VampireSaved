@@ -49,6 +49,7 @@ if [ "${1:-}" = "--freeze" ]; then FREEZE=1; shift; fi
 SET="${1:-vsavj}"
 ROMDIR="${ROMDIR:?set ROMDIR to the reference-set directory}"
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
+. "$REPO/tests/lib/masked_compare.sh"   # the §4 comparison vocabulary (14z-97)
 ROMPATH="${MAME_ROMPATH:-$ROMDIR}"
 WORK="$(mktemp -d)"
 trap 'rm -rf "$WORK"' EXIT
@@ -91,9 +92,8 @@ check_diverge() {
 # the SAME mask (masked bytes are skipped from the checksum, so v2 logs
 # cannot be compared under a v3 mask): tests/expected/vsavj/masked (v1),
 # masked-v2, masked-v3 — regenerate with tools/freeze_masked_basis.sh.
-MASK="043c-043d,4182-41a2,7f00-8000"
+MASK="$(masked_mask_for "$EXPDIR")"
 if [ -f "$EXPDIR/mask" ]; then
-    MASK="$(cat "$EXPDIR/mask")"
     echo "per-set mask: $MASK"
 fi
 
@@ -155,102 +155,20 @@ for rpl in "$REPO"/tests/replays/*.rpl; do
         fi
         echo "frozen $sha"
     elif [ -n "$RUNMASK" ]; then
-        spec=$(cat "$EXPDIR/$name.masked")
-        class=${spec%% *}; rest=${spec#* }; base=${rest%% *}; args=${rest#* }
-        baselog="$REPO/tests/expected/$base/logs/$name.log"
-        # ENFORCE THE BASESET/MASK INVARIANT (14z-94, GitHub #62). It was
-        # stated in prose at the top of this file and checked nowhere: the RUN
-        # mask comes from the expectation set, the BASE comes from the spec,
-        # and nothing compared them. Masked bytes are SKIPPED from the
-        # checksum, so a basis frozen under a different mask is not comparable
-        # — the numbers would simply be over different byte sets.
-        # freeze_masked_basis.sh built this guard for the WRITE side in
-        # 14z-89 ("REFUSING: $DEST is frozen under a DIFFERENT mask"); this is
-        # the read side. The hazard is live, not theoretical: a THIRD basis
-        # (vsavj/masked-v3, ratified and withdrawn the same day, STATE 14z-88)
-        # is on disk with a different mask, and retargeting a spec to it is a
-        # one-token edit.
-        basemask="$REPO/tests/expected/$base/MASK"
-        if [ -f "$basemask" ]; then
-            if [ "$RUNMASK" != "$(cat "$basemask")" ]; then
-                echo "FAIL mask mismatch: this set runs"
-                echo "        $RUNMASK"
-                echo "      but $base was frozen under"
-                echo "        $(cat "$basemask")"
-                echo "      Masked bytes are skipped from the checksum, so the two"
-                echo "      are not comparable. Fix the spec's baseset or the set's"
-                echo "      mask file — do NOT re-freeze to make this green."
-                fail=1
-                continue
-            fi
-        elif [ -f "$EXPDIR/mask" ]; then
-            # A record-less basis is the v1 one, which predates the MASK
-            # record (freeze_masked_basis.sh acknowledges the same gap). It is
-            # only safe for sets on the BUILT-IN default; a set carrying its
-            # own mask file citing it is exactly the untracked pairing.
-            echo "FAIL mask mismatch: $base has no MASK record (it predates them)"
-            echo "      but this set overrides the default with its own mask:"
-            echo "        $RUNMASK"
-            echo "      Cite a basis with a recorded mask, or regenerate one"
-            echo "      with tools/freeze_masked_basis.sh."
-            fail=1
-            continue
+        # THE VOCABULARY LIVES IN tests/lib/masked_compare.sh (14z-97, GitHub
+        # #96). It was inline here — exact/flicker/diverge/window/composite
+        # plus the #62 baseset/mask guard — until the M2 battery was
+        # re-pointed at the current frozen generation and needed to speak the
+        # same classes. The lib is a verbatim lift: these verdict lines are
+        # character-for-character what this loop printed before, which is how
+        # the extraction was verified (suite output diffed, both directions).
+        if verdict=$(masked_check "$EXPDIR" "$name" \
+                        "$(cat "$EXPDIR/$name.masked")" \
+                        "$RUNMASK" "$WORK/$name.1.log"); then
+            echo "$verdict"
+        else
+            echo "$verdict"; fail=1
         fi
-        case "$class" in
-        exact)
-            if cmp -s "$baselog" "$WORK/$name.1.log"; then
-                echo "PASS masked-exact"
-            else
-                echo "FAIL masked live-state diverged from $base"; fail=1
-            fi ;;
-        flicker)
-            verdict=$(python3 "$REPO/tools/compare_flicker.py" "$baselog" "$WORK/$name.1.log") || true
-            if [ "$verdict" = "FLICKER $args" ]; then
-                echo "PASS masked-flicker ($verdict — frozen inventory)"
-            else
-                echo "FAIL masked-flicker: got '$verdict' expected 'FLICKER $args' (frozen; drift either way is loud — CLAUDE.md §4 standing watch)"; fail=1
-            fi ;;
-        diverge)
-            printf '%s %s' "$base" "$args" > "$WORK/$name.mdiverge"
-            check_diverge "$WORK/$name.1.log" "$WORK/$name.mdiverge" || fail=1 ;;
-        window)
-            # CLAUDE.md §4 v3 "bounded re-convergent window", ratified
-            # 2026-08-05 for the select screen the roster work extends.
-            # args: "<onset> <end>". STRICTER than flicker and than the
-            # frozen first-divergence constant: one contiguous run, a fixed
-            # onset, full re-convergence, match state untouched. The checker
-            # also fails on a bit-IDENTICAL pair, because this expectation
-            # asserts the divergence exists.
-            wonset=${args%% *}; wend=${args##* }
-            if out=$(python3 "$REPO/tools/compare_window.py" "$baselog" \
-                        "$WORK/$name.1.log" --onset "$wonset" --end "$wend" 2>&1); then
-                echo "PASS masked-window ($(echo "$out" | head -1))"
-            else
-                echo "FAIL masked-window: $(echo "$out" | tr '\n' ' ')"; fail=1
-            fi ;;
-        composite)
-            # RATIFIED §4 v4 class (CLAUDE.md, maintainer-ratified
-            # 2026-08-06), strict conjunction of `flicker` and `window`:
-            # args "<flicker-csv> <window-list>".
-            # CORRECTED 14z-90: this said "PROPOSED (STATE 14z-61)" and
-            # "Nothing uses it until a .pending expectation is ratified into
-            # one" — while 121 of the 185 .masked specs use it. The issue-#4
-            # retraction fixed the identical claim in compare_composite.py's
-            # docstring and MISSED this copy, which is exactly the failure
-            # CLAUDE.md's retraction discipline describes: grep the CLAIM, not
-            # the file you remember writing it in. Found by an independent
-            # judge re-reading this file for a different issue.
-            # Ground truth: tests/test_compare_composite.sh.
-            cfl=${args%% *}; cwin=${args##* }
-            if out=$(python3 "$REPO/tools/compare_composite.py" "$baselog" \
-                        "$WORK/$name.1.log" --flicker "$cfl" --windows "$cwin" 2>&1); then
-                echo "PASS masked-composite ($(echo "$out" | head -1))"
-            else
-                echo "FAIL masked-composite: $(echo "$out" | tr '\n' ' ')"; fail=1
-            fi ;;
-        *)
-            echo "FAIL unknown .masked class '$class'"; fail=1 ;;
-        esac
     elif [ -f "$EXPDIR/$name.diverge" ]; then
         check_diverge "$WORK/$name.1.log" "$EXPDIR/$name.diverge" || fail=1
     elif [ ! -f "$EXPDIR/$name.sha1" ]; then

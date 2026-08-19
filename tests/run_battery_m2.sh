@@ -10,9 +10,13 @@
 #      self-builds at 0x13, needs the WIDE MAME binary)
 #   1. test_m2b_stage6.sh    — build (with dev GEN_FLAGS) + static gfx
 #                              verification, guarded soaks, MASKED LEGACY
-#                              GATE (frozen flicker inventory — watch for
-#                              growth: standing maintainer watch), pixel
-#                              gates, menu gfx, M2b records
+#                              GATE, pixel gates, menu gfx, M2b records.
+#                              14z-97 (GitHub #96): that gate now targets the
+#                              CURRENT frozen generation, resolved from the
+#                              build's fingerprint, and its classes are
+#                              EXACT — the old "watch for growth, advise on
+#                              shrink" predicate went with the dev-build
+#                              premise it rested on (see m2a_common.sh).
 #   2. test_don_sword.sh     — sword-swing behavior (frozen anim node)
 #   3. test_don_accent.sh    — palette locks: weapon accent steadiness,
 #                              Victor-accent legacy byte guard + cycle,

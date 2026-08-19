@@ -22,13 +22,23 @@ set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"
 rc=0
+MC_LIB="$REPO/tests/lib/masked_compare.sh"; export MC_LIB
 
 python3 - <<'PY' || rc=1
 import glob, os, sys
 
 EXP = "tests/expected"
-# run_suite's built-in default, used by sets that ship no mask file of their own
-DEFAULT = "043c-043d,4182-41a2,7f00-8000"
+# The built-in default, used by sets that ship no mask file of their own.
+# READ, not restated (14z-97, GitHub #70): the literal has exactly one home,
+# tests/lib/masked_compare.sh, and a fourth copy here would be the same defect
+# this project keeps paying for. If the parse below fails, the definition
+# moved — fix the parse, do not paste the string back.
+import re
+_lib = open(os.environ["MC_LIB"]).read()
+_m = re.search(r'^MASKED_DEFAULT_MASK="([^"]*)"', _lib, re.M)
+if not _m:
+    sys.exit("cannot read MASKED_DEFAULT_MASK from tests/lib/masked_compare.sh")
+DEFAULT = _m.group(1)
 
 def run_mask(setdir):
     p = os.path.join(setdir, "mask")
@@ -75,10 +85,16 @@ mkdir -p "$T/expected/setA" "$T/expected/vsavj/basisX"
 printf 'aaaa-bbbb\n' > "$T/expected/setA/mask"
 printf 'cccc-dddd\n' > "$T/expected/vsavj/basisX/MASK"
 printf 'exact vsavj/basisX\n' > "$T/expected/setA/01_x.masked"
+# The control runs from $T, so the library path must be ABSOLUTE. It was not,
+# for one edit: the reader raised FileNotFoundError, python exited 1, and this
+# block read that as "the mispairing was caught" — a control that passes
+# because it crashed is worse than no control (CLAUDE.md §4: verdict logic is
+# itself tested). MC_LIB is exported for that reason.
 if (cd "$T" && python3 - <<'PY'
-import glob, os, sys
+import glob, os, re, sys
 EXP = "expected"
-DEFAULT = "043c-043d,4182-41a2,7f00-8000"
+DEFAULT = re.search(r'^MASKED_DEFAULT_MASK="([^"]*)"',
+                    open(os.environ["MC_LIB"]).read(), re.M).group(1)
 bad = 0
 for spec_path in sorted(glob.glob(f"{EXP}/*/*.masked")):
     setdir = os.path.dirname(spec_path)
@@ -98,13 +114,26 @@ else
     echo "  ok: a mispaired spec is caught"
 fi
 
-echo "== run_suite carries the runtime half =="
-if grep -q "mask mismatch" tests/run_suite.sh; then
-    echo "  ok: run_suite.sh enforces it per replay at run time"
+echo "== the comparators carry the runtime half =="
+# THE OWNER MOVED 14z-97 (GitHub #96): the dispatch — and this guard with it —
+# was lifted out of run_suite.sh into tests/lib/masked_compare.sh when the M2
+# battery became a second caller. Both callers now get the guard; asserting it
+# in the LIBRARY is what covers both.
+if grep -q "mask mismatch" tests/lib/masked_compare.sh; then
+    echo "  ok: masked_compare.sh enforces it per replay at run time"
 else
-    echo "  FAIL: run_suite.sh no longer enforces the invariant"
+    echo "  FAIL: the runtime guard is gone from tests/lib/masked_compare.sh"
     rc=1
 fi
+for _caller in tests/run_suite.sh tests/lib/m2a_common.sh; do
+    if grep -q "masked_compare.sh" "$_caller"; then
+        echo "  ok: $_caller goes through it"
+    else
+        echo "  FAIL: $_caller no longer sources the shared comparators, so the"
+        echo "        invariant is unenforced on that path"
+        rc=1
+    fi
+done
 
 echo
 if [ "$rc" = 0 ]; then

@@ -569,8 +569,13 @@ tests/test_null_build.sh              # null build bit-identical + deterministic
 tests/test_attract_determinism.sh     # 60s attract, per-frame RAM checksums, 2 runs
 tests/test_fbneo_smoke.sh             # FBNeo headless boot + 15s crash-free soak
 tests/test_m2a_stage4_code.sh         # stage-4 gate: veto lock + guarded moveset
-                                      # + masked legacy gate (amended §4 basis;
-                                      # frozen masked exps in tests/expected/vsavj/masked/)
+                                      # + masked legacy gate. 14z-97 (#96):
+                                      # the legacy target is RESOLVED from the
+                                      # build's fingerprint (registry.tsv), so
+                                      # it follows each freeze — today
+                                      # donovan-m8-stage4, V2 basis. It used to
+                                      # pin donovan-m2c + the V1 basis + three
+                                      # first-divergence constants.
 tests/test_m2a_stage4_oracle.sh [rp]  # vsav2-as-oracle: anchors/neutral-exact/
                                       # HP-trajectory/comparative bound (17+18 replays)
 tests/test_m2a_stage4_xemu.sh  [rp]   # dual-emulator: MAME+FBNeo field agreement
@@ -1520,13 +1525,27 @@ tests/test_shell_portability.sh       # 14z-90 (issue #15): every #!/bin/sh
                                       # needs bash must say so in its shebang —
                                       # today exactly one does.
                                       # No ROMs, no emulator, ~1s
-tests/test_m2a_flicker_gate.sh        # 14z-90 (issue #2): ground truth that the
-                                      # battery's masked flicker gate watches
-                                      # GROWTH, not equality. 4 cases: growth
-                                      # FAILs; unchanged passes; a SHRINK does
-                                      # NOT fail (the m2b 2 3507,3807 -> m2c
-                                      # 1 3507 case, which is why equality was
-                                      # rejected); EXACT does not fail.
+tests/test_m2a_flicker_gate.sh        # ground truth for the battery's masked
+                                      # legacy gate. REWRITTEN 14z-97 (#96) AND
+                                      # ITS PREDICATE INVERTED: it locked
+                                      # "GROWTH fails, a SHRINK does not",
+                                      # which rested on the battery running on
+                                      # UNFROZEN dev builds. The target is a
+                                      # FROZEN generation now, so drift EITHER
+                                      # way fails. 5 cases: growth, shrink,
+                                      # the frozen shape, a required replay
+                                      # with no spec, and an unresolvable
+                                      # target (must name rule 6).
+                                      # No ROMs, no emulator, ~3s
+tests/test_masked_compare.sh          # 14z-97 (#96): ground truth for
+                                      # tests/lib/masked_compare.sh, the ONE
+                                      # implementation of the §4 vocabulary
+                                      # (exact/flicker/diverge/window/composite
+                                      # + the #62 baseset/mask guard) now shared
+                                      # by run_suite.sh and the M2 battery.
+                                      # Every class in both directions; it
+                                      # caught a real bug in the lift (the
+                                      # diverge spec's temp-file STEM).
                                       # No ROMs, no emulator, ~2s
 tests/test_gfx_menus_guard.sh         # 14z-90 (issue #6): ground truth for the
                                       # pixel gate's rompath guard. An absent
@@ -2378,7 +2397,7 @@ swallows the rest of the list, which is how a 32-entry run silently became 28.
 | `test_minitoml_subset.sh` | #42 | The TOML subset refuses dotted headers/keys, duplicates, signed hex. |
 | `test_member_classify.sh` | #19 | The PRG suffix class excludes `m` members. **Not portable.** |
 | `test_builder_rom_audit.sh` | #38 | Builders audit the ROMs they read. **Not portable.** |
-| `test_m2a_mask_pin.sh` | 14z-93 | the mask pin |
+| `test_m2a_target_policy.sh` (was `test_m2a_mask_pin.sh`) | #70 → #96 | **The assertion was INVERTED 14z-97.** It used to lock the battery's V1 mask copy against run_suite's, because the pin to the donovan-m2c generation was deliberate and re-pointing it was an open maintainer question. That question was ruled 2026-08-19 (option (a)), so the pin and the duplicate are gone and this now fails if either returns: no literal mask in `m2a_common.sh`, no expectation-set constant, the target resolved from the fingerprint, the V1 literal defined in exactly one file, and the ruling still written down. |
 | `test_fbneo_overlay_hygiene{,_control}.sh` | 14z-94 | FBNeo overlay hygiene (`_control` is its must-fire control) |
 | `test_reconcile_matcher.sh` | #43(a) | ONE matcher, two callers. `reconcile_batch`'s drifted copy of `find_equiv`'s core is deleted; the three drifts survive as parameters pinned to the batch tool's MEASURED values. Section 2 proves the refactor inert against the pre-refactor copy reconstructed from git (1640/1640 probes), with a must-fire control; section 3 proves the parameters load-bearing (183/1640 change when freed), so #43(b) is a real change and section 2 is not vacuous. **Not portable.** |
 | `test_merged_inputs.sh` | #27 | the merged build's four ROM-derived inputs are PRODUCED, not demanded — and a regenerated set yields the identical merged patch. Asserts the ARTIFACT is reproducible rather than that the input dirs are byte-equal, because the latter is false and cosmetic: `build/m5_wide/extract/regions.json` predates two `extract_char.py` changes. **Not portable.** |
@@ -2462,6 +2481,15 @@ NOTE: the tags mark the commit at which each build was frozen and was
 reproducible AT THAT TIME; no one has re-verified the older ones since.
 
 
+**TWO REGISTRY ROWS ARE NOT BUILDS** (14z-97, GitHub #96): `donovan-m8-stock`
+(`a054de5c`, the stock twin of the donovan-m8 freeze) and `donovan-m8-stage4`
+(`22c804c8`) are the M2 battery's two legs. They are registered so the battery
+can dispatch on the fingerprint instead of a pinned set name — an unregistered
+image there means the pipeline no longer reproduces the current freeze, which
+is the rule-6 signal the maintainer's ruling asks for. Neither is playtested,
+neither is a shipping artifact, and both carry-rename with the next freeze.
+Their expectation sets are BATTERY-SCOPED and say so in their own READMEs.
+
 | Build | SHA-1 (zip) | Notes |
 |---|---|---|
 | **THE #101 KERNEL VOICE-TABLE PORT — donovan-m8 / huitzil-m17 / pyron-m11 / merged-m3 (FROZEN 14z-96, maintainer-ruled option (a) + freeze 2026-08-18). The grunt fix.** | `d038553d` / `bfd819a0` / `738bcfc2` / merged program fingerprint `ac3d06184f8c248717ba754275d5ab0147c69f07` | `build/don_m8` / `build/hui44` / `build/pyron28` / `build/m3b_merged10`; tags `freeze/{donovan-m8,huitzil-m17,pyron-m11,merged-m3}`. = the 14z-94 batch + each tenant's four `kernel_voice_e0-e3` words (the kernel per-class voice tables' variant halves — vsavj ships them as byte-copies of the base halves, so tenants fired LEGACY voices: Phobos fired Bulleta's `0x1d2` = the maintainer's video-confirmed electrocute grunt, Donovan fired VICTOR's `0x322`) + 16 authored (base,+0x300 alias) Z80 song pairs (the kernel path calls the REAL `0x4CE2`, so the facing alias applies — native's own `0x700→0xA00` twin doctrine) + batch scope `0x730,0x733`. Phobos/Pyron hurt events now port vs2's `0x2a1/0x2a2` — FREE Z80 rows both games, deliberate silence. Measured identity-only: same frames, right voice (or native silence); firing pattern untouched. Stock twin `build/m5_stock3` BIT-IDENTICAL `a054de5c` incl. whole-artifact digest. Gates at freeze: audit_hui_grunt per-build rows green, audit_merged_legacy PASS on the 764-op image, tenant_loop 289/327/262 + 764, manifest_merge (9,9,11)/25, m3a pins re-pointed. merged-m3: NO registry.tsv row per the merged convention (tag + this row). |
@@ -2492,7 +2520,7 @@ reproducible AT THAT TIME; no one has re-verified the older ones since.
 | **m5_stock (the stock twin, re-frozen 2026-08-06)** | fingerprint `6c93cfa8a8a80ae2303d3acaf8c7bff487f369c5` | `build/m5_stock`; rebuilds bit-exact. = the former ae701ffb + EXACTLY the 2-byte mirror-victim fix (PRG:0x0B1A16, byte-attributed). Not registered — the dual-track partner and the rendering gate's reference. Full battery GREEN at freeze |
 | ~~m5w~~ **KNOWN-BAD, kept as evidence** | `ac52eeff` | the 14z-60y sprite garble: its `vsavjw.zip` carries group C as byte copies of group B, so the loader served pristine tiles for the patched group B. Do not playtest. `python3 tools/audit_romset_identity.py build/m5w/rompath` names all four shadows |
 | null vsavj | `12fbb0e1a137a1420824856d3efb0af8fff57be6` | == reference members; zip repacked deterministically |
-| **donovan-m2c (M2b+ASSETS FROZEN 2026-08-02)** | fingerprint `b91647c7da14ded6316cee8dc057c8daf1c3fb1e` | `tools/build_donovan.sh 6 build/donovan6`; REGISTERED `-> donovan-m2c`; the 14z-42..49 arc on top of M2b-CORE: LS hit-freeze thunks, full ES chain + meter decode, win screen, deity seq-states, accent owner-link fallback, HC motion farm_ports, HUD mugshot/name, select medallion; masked legacy basis = THREE windows (palette staging slot $FF4182-$FF41A1 ratified round 64; audit `tests/audit_mask_window_ff4182.sh`); gates: full battery GREEN (battery_49b) + `run_suite.sh` GREEN by fingerprint auto-detection; maintainer-confirmed rounds 52-64; gfx member sha1s in registry note |
+| **donovan-m2c (M2b+ASSETS FROZEN 2026-08-02)** | fingerprint `b91647c7da14ded6316cee8dc057c8daf1c3fb1e` | `tools/build_donovan.sh 6 build/donovan6` **AS OF 2026-08-02 — that command today produces `a054de5c` (`donovan-m8-stock`), not this fingerprint; the way back to a tree that builds it is the `freeze/donovan-m2c` tag**; REGISTERED `-> donovan-m2c`; the 14z-42..49 arc on top of M2b-CORE: LS hit-freeze thunks, full ES chain + meter decode, win screen, deity seq-states, accent owner-link fallback, HC motion farm_ports, HUD mugshot/name, select medallion; masked legacy basis = THREE windows (palette staging slot $FF4182-$FF41A1 ratified round 64; audit `tests/audit_mask_window_ff4182.sh`); gates: full battery GREEN (battery_49b) + `run_suite.sh` GREEN by fingerprint auto-detection; maintainer-confirmed rounds 52-64; gfx member sha1s in registry note |
 | **donovan-m2b-core (M2b-CORE FROZEN 2026-07-28)** | fingerprint `71601263474dfd7e4afd0741dae696cde22eda4e` | `tools/build_donovan.sh 6 build/donovan6`; REGISTERED `-> donovan-m2b`; sprites/palettes/effects in Jedah's gfx space; rompath carries patched vsav.zip (gfx sha1s in registry note); gates: tests/test_m2b_stage6.sh + oracle/xemu/flavor + tests/test_m2b_scroll3.sh — ALL PASS; select portrait/name/mugshot + attract palette remain (docs/game/engine_internals.md) |
 | **donovan-m2 (M2a FROZEN 2026-07-28)** | fingerprint `a02aeefff4c7a053337b10c923c8c328573788fa` | `tools/build_donovan.sh 5 build/donovan5`; all gates green (4 guarded soaks incl. ES-DP spam, round-2, input-chaos / 13-replay masked legacy / oracle / xemu / flavor); supersedes eda50a18 (214P/214K music: engine_data-masquerade farm rows + direct helper stubbed; farm-ref audit clean — 25 stubbed / 4 live); REGISTERED: `a02aeeff… -> donovan-m2` in tests/expected/registry.tsv; validate any build with `ROMDIR=... [MAME_ROMPATH="<rompath>;$ROMDIR"] tests/run_suite.sh` (fingerprint auto-detects the expectation set; masked legacy basis applied automatically) |
 

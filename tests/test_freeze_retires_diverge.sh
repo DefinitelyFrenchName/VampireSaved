@@ -34,8 +34,12 @@ fail() { echo "  FAIL: $*"; rc=1; }
 
 T="$(mktemp -d)"; trap 'rm -rf "$T"' EXIT INT TERM
 FR="$T/fakerepo"
-mkdir -p "$FR/tools" "$FR/tests/replays" "$FR/tests/expected" "$T/romdir"
+mkdir -p "$FR/tools" "$FR/tests/lib" "$FR/tests/replays" "$FR/tests/expected" "$T/romdir"
 ln -s "$REPO/tests/run_suite.sh" "$FR/tests/run_suite.sh"
+# 14z-97: run_suite.sh sources the shared §4 comparators, so the fake repo
+# needs them on the same relative path. Symlinked, like run_suite itself —
+# the point of this rig is that it drives the REAL scripts.
+ln -s "$REPO/tests/lib/masked_compare.sh" "$FR/tests/lib/masked_compare.sh"
 
 echo "0 none" > "$FR/tests/replays/91_fixed.rpl"
 cat > "$FR/tools/build_fingerprint.py" <<'PY'
