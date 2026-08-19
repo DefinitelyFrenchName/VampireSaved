@@ -41,7 +41,8 @@ import zipfile
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent))
-from gfx_tiles import GROUP_A, GROUP_C, tile_bytes, BLANK  # noqa: E402
+from gfx_tiles import GROUP_A, GROUP_C, tile_bytes, BLANK, cell_at, \
+    attr_block  # noqa: E402
 import hashlib  # noqa: E402
 
 SITE_OLD = bytes.fromhex("3d7c20000018")   # move.w #$2000,$18(a6)
@@ -58,11 +59,10 @@ def load_group_quiet(z, prefix, group):
 
 
 def block_tiles(t, at, into):
-    bx = ((at >> 8) & 15) + 1
-    by = ((at >> 12) & 15) + 1
+    bx, by = attr_block(at)
     for dy in range(by):
         for dx in range(bx):
-            into.add((t & ~0xF) + (dy << 4) + ((t + dx) & 0xF))
+            into.add(cell_at(t, dx, dy))
 
 
 def main():

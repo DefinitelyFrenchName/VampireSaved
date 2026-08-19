@@ -37,6 +37,7 @@ import struct
 import sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from gfx_tiles import attr_block  # noqa: E402  (GitHub #47)
 import cps2_decrypt as cps  # noqa: E402
 import select_port as sp    # noqa: E402  (PLACEMENTS is the single map)
 
@@ -159,7 +160,7 @@ def main():
                 f"{nm}/{side} coord list bytes != vs2's")
             for k in range(cnt):
                 t, at = u16(v2, vrec + 10 + 4 * k), u16(v2, vrec + 12 + 4 * k)
-                bx, by = ((at >> 8) & 15) + 1, ((at >> 12) & 15) + 1
+                bx, by = attr_block(at)
                 want = (t if art == "native"
                         else sp.PLACEMENTS.get((t, bx, by), t))
                 got = (u16(img, dst + 10 + 4 * k), u16(img, dst + 12 + 4 * k))

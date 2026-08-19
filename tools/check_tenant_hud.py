@@ -31,7 +31,7 @@ import zipfile
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent))
-from gfx_tiles import GROUP_A, tile_bytes, BLANK  # noqa: E402
+from gfx_tiles import GROUP_A, tile_bytes, BLANK, cell_at  # noqa: E402
 
 MUG_TABLE = 0x89884          # word per char, 32 rows
 NAME_TABLE = 0x898C4         # 8 bytes per char, 32 rows
@@ -69,7 +69,7 @@ def die(msg):
 def block(anchor, bx, by):
     for dy in range(by):
         for dx in range(bx):
-            yield (anchor & ~0xF) + (dy << 4) + ((anchor + dx) & 0xF)
+            yield cell_at(anchor, dx, dy)
 
 
 def main():

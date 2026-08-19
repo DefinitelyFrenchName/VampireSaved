@@ -26,7 +26,9 @@ Emit semantics (the R2 answer, atlas character_tables.md):
   - attr size bits: bx=(attr>>8&15)+1, by=(attr>>12&15)+1; block cell
     (dx,dy) uses tile (n & ~0xF) + (dy<<4) + ((n+dx) & 0xF)  — row
     stride 16 with within-row wrap, so any code remap must be 16-aligned
-    to preserve block geometry.
+    to preserve block geometry. Canonical implementation:
+    gfx_tiles.cell_at / block_cells / attr_block (GitHub #47) —
+    fact-locked in tests/test_gfx_tiles.sh; do not restate the formula.
 
 Usage:
   obj_records.py <image.bin> --base 0xADDR --start 0xADDR --end 0xADDR
@@ -44,6 +46,10 @@ import argparse
 import hashlib
 import json
 import sys
+import os as _os
+import sys as _sys
+_sys.path.insert(0, _os.path.dirname(_os.path.abspath(__file__)))
+from gfx_tiles import cell_at, attr_block  # noqa: E402  (GitHub #47)
 
 
 def walk(dat, base, start, end, cptr_ok, sweep_lo=0x8000, sweep_hi=0xEEBB,
@@ -152,12 +158,11 @@ def walk(dat, base, start, end, cptr_ok, sweep_lo=0x8000, sweep_hi=0xEEBB,
             ptr_seen[a - start] = v - start
         records += 1
         for t, at in ent:
-            bx = ((at >> 8) & 15) + 1
-            by = ((at >> 12) & 15) + 1
+            bx, by = attr_block(at)
             entries += 1
             for dy in range(by):
                 for dx in range(bx):
-                    tiles.add((t & ~0xF) + (dy << 4) + ((t + dx) & 0xF))
+                    tiles.add(cell_at(t, dx, dy))
     # SWEEP pass (session 14z-11): records reached by OFFSET COMPUTATION
     # (the aux/+0x64 chain — e.g. the electrocute X-ray overlays) have no
     # in-region pointer and the pass above misses them: their band words
@@ -218,20 +223,18 @@ def walk(dat, base, start, end, cptr_ok, sweep_lo=0x8000, sweep_hi=0xEEBB,
         _band = sum(1 for _t, _ in ent if sweep_lo <= _t <= sweep_hi)
         if _band * 2 < len(ent):
             continue
-        if any(((_a >> 8) & 15) + 1 > 8 or ((_a >> 12) & 15) + 1 > 8
-               for _, _a in ent):
+        if any(max(attr_block(_a)) > 8 for _, _a in ent):
             continue
         seen.add(a)
         if sweep_seen is not None:
             sweep_seen.append(a - start)
         records += 1
         for t, at in ent:
-            bx = ((at >> 8) & 15) + 1
-            by = ((at >> 12) & 15) + 1
+            bx, by = attr_block(at)
             entries += 1
             for dy in range(by):
                 for dx in range(bx):
-                    tiles.add((t & ~0xF) + (dy << 4) + ((t + dx) & 0xF))
+                    tiles.add(cell_at(t, dx, dy))
     return tiles, entries, records
 
 

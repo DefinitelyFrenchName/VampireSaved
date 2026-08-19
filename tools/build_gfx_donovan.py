@@ -48,7 +48,7 @@ if not __debug__:
         f"{__file__}: refusing to run under python -O / PYTHONOPTIMIZE — its "
         f"safety checks are assertions and would be stripped (GitHub #79)")
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from gfx_tiles import GROUP_A, GROUP_B, GROUP_C, bank_word, \
+from gfx_tiles import GROUP_A, GROUP_B, GROUP_C, bank_word, cell_at, \
     tile_bytes, write_tile  # noqa: E402
 from _minitoml import loads as toml_loads  # noqa: E402
 
@@ -628,8 +628,8 @@ def main():
             t = int(tt, 16); anchor = int(v, 16)
             for dy in range(int(by)):
                 for dx in range(int(bx)):
-                    s_ = (t & ~0xF) + (dy << 4) + ((t + dx) & 0xF)
-                    d_ = (anchor & ~0xF) + (dy << 4) + ((anchor + dx) & 0xF)
+                    s_ = cell_at(t, dx, dy)
+                    d_ = cell_at(anchor, dx, dy)
                     place(dstA0, writtenA, 0x10000 + d_,
                           tile_bytes(srcA0, 0x10000 + s_),
                           "vs2A", 0x10000 + s_, "effect-tail")
@@ -639,8 +639,8 @@ def main():
             t = int(tt, 16); anchor = int(v, 16)
             for dy in range(int(by)):
                 for dx in range(int(bx)):
-                    s_ = (t & ~0xF) + (dy << 4) + ((t + dx) & 0xF)
-                    d_ = (anchor & ~0xF) + (dy << 4) + ((anchor + dx) & 0xF)
+                    s_ = cell_at(t, dx, dy)
+                    d_ = cell_at(anchor, dx, dy)
                     assert tile_bytes(dstA0, 0x10000 + d_) == \
                         tile_bytes(srcA0, 0x10000 + s_)
         print(f"effect-tail: {n} bank-1 tiles placed")

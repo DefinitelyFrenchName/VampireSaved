@@ -37,6 +37,11 @@ Prints SHA-1 of all inputs. Deterministic; rerunnable.
 import argparse
 import collections
 import hashlib
+import os as _os
+import sys as _sys
+_sys.path.insert(0, _os.path.dirname(_os.path.abspath(__file__)))
+from gfx_tiles import cell_at, attr_block  # noqa: E402  (GitHub #47)
+import cps2_decrypt as cps
 import json
 import zipfile
 from pathlib import Path
@@ -237,10 +242,21 @@ def main():
     args = ap.parse_args()
     R = Path(args.romdir)
 
-    z2 = zipfile.ZipFile(R / "vsav2.zip")
-    raw2, vs2 = load_be(z2, [f"vs2j.{n:02d}" for n in range(3, 11)])
+    # GitHub #49: member discovery + byte order come from cps2_decrypt (the
+    # canonical enumerator, _PRG_RE + numeric sort) instead of a hardcoded
+    # vs2j.03-10 list — measured byte-identical to the old load, and a set
+    # whose program members are named differently or extended now loads
+    # correctly instead of being silently truncated/ignored.
+    words2, *_ = cps.load_set(str(R / "vsav2.zip"))
+    vs2 = bytearray(cps.words_to_logical_bytes(words2))
+    raw2 = bytes(cps.words_to_file_bytes(words2))
     print(f"vs2 prg sha1 {hashlib.sha1(raw2).hexdigest()}")
     za = zipfile.ZipFile(R / "vsav.zip")
+    # GitHub #49, DELIBERATELY NOT converted to cps.load_set: this list
+    # OMITS vm3.03a/04a on purpose, so this image's index 0 is NOT logical
+    # address 0 — every VERIFIED_SITES/PAD window below is relative to that
+    # base. cps.load_set would include the two members and silently shift
+    # every address in the walk.
     rawv, vandata = load_be(
         za, ["vm3.05a", "vm3.06a", "vm3.07b", "vm3.08a", "vm3.09b",
              "vm3.10b"])
@@ -557,14 +573,13 @@ def main():
             d = drawn_code(fmt, stored)
             at = attr if attr is not None else int.from_bytes(
                 vs2[eoff + 2:eoff + 4], "big")
-            bx = ((at >> 8) & 15) + 1
-            by = ((at >> 12) & 15) + 1
+            bx, by = attr_block(at)
             need.setdefault((d, bx, by), []).append((a, eoff - a, fmt))
     cells_needed = set()
     for (d, bx, by) in need:
         for dy in range(by):
             for dx in range(bx):
-                cells_needed.add((d & ~0xF) + (dy << 4) + ((d + dx) & 0xF))
+                cells_needed.add(cell_at(d, dx, dy))
     print(f"blocks: {len(need)}, unique cells {len(cells_needed)}")
 
     def j_cptr_ok(c):
@@ -586,11 +601,10 @@ def main():
             d = drawn_code(fmt, stored)
             at = attr if attr is not None else int.from_bytes(
                 vandata[eoff + 2:eoff + 4], "big")
-            bx = ((at >> 8) & 15) + 1
-            by = ((at >> 12) & 15) + 1
+            bx, by = attr_block(at)
             for dy in range(by):
                 for dx in range(bx):
-                    jfree.add((d & ~0xF) + (dy << 4) + ((d + dx) & 0xF))
+                    jfree.add(cell_at(d, dx, dy))
     for v, (fmt, cptr, ents) in jrecs.items():
         if v not in KEEP:
             continue
@@ -612,7 +626,7 @@ def main():
     def fits(base, bx, by):
         for dy in range(by):
             for dx in range(bx):
-                c = (base & ~0xF) + (dy << 4) + ((base + dx) & 0xF)
+                c = cell_at(base, dx, dy)
                 if c not in free or (base & 0xF) + dx > 0xF:
                     return False
         return True
@@ -625,8 +639,7 @@ def main():
                 place[key] = base
                 for dy in range(by):
                     for dx in range(bx):
-                        free.discard((base & ~0xF) + (dy << 4)
-                                     + ((base + dx) & 0xF))
+                        free.discard(cell_at(base, dx, dy))
                 break
         else:
             print(f"  !! no fit for block {d:04X} {bx}x{by}")
@@ -649,8 +662,8 @@ def main():
     for (d, bx, by), base in place.items():
         for dy in range(by):
             for dx in range(bx):
-                s_ = (d & ~0xF) + (dy << 4) + ((d + dx) & 0xF)
-                t_ = (base & ~0xF) + (dy << 4) + ((base + dx) & 0xF)
+                s_ = cell_at(d, dx, dy)
+                t_ = cell_at(base, dx, dy)
                 pairs.append([s_, t_])
     pairs = sorted({tuple(p) for p in pairs})
     print(f"tile pairs: {len(pairs)}")

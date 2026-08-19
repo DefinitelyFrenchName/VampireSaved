@@ -33,6 +33,7 @@ import os
 import sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from gfx_tiles import cell_at, attr_block  # noqa: E402  (GitHub #47)
 import cps2_decrypt as cps  # noqa: E402
 
 # REFUSE TO RUN WITH ASSERTIONS DISABLED (14z-94, GitHub #79). The record-format, size-bound, anchor-presence and CONFLICTING TILE
@@ -238,16 +239,15 @@ def main():
         # remap Donovan's entry tile codes to the placements
         new_ents = []
         for t, at in dents:
-            bx = ((at >> 8) & 15) + 1
-            by = ((at >> 12) & 15) + 1
+            bx, by = attr_block(at)
             anchor = PLACEMENTS.get((t, bx, by))
             assert anchor is not None, \
                 f"{name}: no placement for block (0x{t:04X},{bx},{by})"
             new_ents.append((anchor, at))
             for dy in range(by):
                 for dx in range(bx):
-                    src = (t & ~0xF) + (dy << 4) + ((t + dx) & 0xF)
-                    dst = (anchor & ~0xF) + (dy << 4) + ((anchor + dx) & 0xF)
+                    src = cell_at(t, dx, dy)
+                    dst = cell_at(anchor, dx, dy)
                     tile_pairs.append([src, dst])
         # Coordinate handling (session 14s, two hard-won rules):
         # 1. The record's CPTR must stay JEDAH'S — cptr values are

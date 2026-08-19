@@ -52,6 +52,7 @@ if not __debug__:
         f"{__file__}: refusing to run under python -O / PYTHONOPTIMIZE — its "
         f"safety checks are assertions and would be stripped (GitHub #79)")
 sys.path.insert(0, str(Path(__file__).resolve().parent))
+from gfx_tiles import cell_at, attr_block  # noqa: E402  (GitHub #47)
 import cps2_decrypt as cps  # noqa: E402
 from _minitoml import loads as toml_loads  # noqa: E402
 
@@ -3019,8 +3020,7 @@ def main():
                             _a = (_ha if _ha is not None else
                                   int.from_bytes(blob[_toff + 2:_toff + 4],
                                                  "big"))
-                            if (((_a >> 8) & 15) + 1 > 8
-                                    or ((_a >> 12) & 15) + 1 > 8):
+                            if max(attr_block(_a)) > 8:
                                 _ok = False
                                 break
                             _codes.append(_t)
@@ -3060,11 +3060,10 @@ def main():
                         _h = int(_v, 16)
                         for _dy in range(int(_by)):
                             for _dx in range(int(_bx)):
-                                free.discard((_h & ~0xF) + (_dy << 4)
-                                             + ((_h + _dx) & 0xF))
+                                free.discard(cell_at(_h, _dx, _dy))
 
                     def span_of(head, bx, by):
-                        return [(head & ~0xF) + (dy << 4) + ((head + dx) & 0xF)
+                        return [cell_at(head, dx, dy)
                                 for dy in range(by) for dx in range(bx)]
 
                     def fit_block(bx, by):
@@ -3087,8 +3086,7 @@ def main():
                             t = int.from_bytes(blob[toff:toff + 2], "big")
                             a = (hdr_attr if hdr_attr is not None else
                                  int.from_bytes(blob[toff + 2:toff + 4], "big"))
-                            bx = ((a >> 8) & 15) + 1
-                            by = ((a >> 12) & 15) + 1
+                            bx, by = attr_block(a)
                             if b_lo <= t <= b_hi:
                                 if any(c in protected
                                        for c in span_of(t + delta, bx, by)):
@@ -3120,8 +3118,7 @@ def main():
                             t = int.from_bytes(blob[toff:toff + 2], "big")
                             a = (hdr_attr if hdr_attr is not None else
                                  int.from_bytes(blob[toff + 2:toff + 4], "big"))
-                            bx = ((a >> 8) & 15) + 1
-                            by = ((a >> 12) & 15) + 1
+                            bx, by = attr_block(a)
                             if b_lo <= t <= b_hi:
                                 nt = blocks.get((t, bx, by, True))
                                 if nt is not None:
@@ -3272,7 +3269,7 @@ def main():
                             t = int.from_bytes(blob[toff:toff + 2], "big")
                             a_ = (hdr_at if hdr_at is not None else
                                   int.from_bytes(blob[toff + 2:toff + 4], "big"))
-                            key = (t, ((a_ >> 8) & 15) + 1, ((a_ >> 12) & 15) + 1)
+                            key = (t, *attr_block(a_))
                             if is_b2:
                                 nt = b2map.get(key)
                                 if nt is not None:
@@ -3282,10 +3279,8 @@ def main():
                                     for dy in range(by2):
                                         for dx in range(bx2):
                                             b2_pairs.append([
-                                                (t & ~0xF) + (dy << 4)
-                                                + ((t + dx) & 0xF),
-                                                (nt & ~0xF) + (dy << 4)
-                                                + ((nt + dx) & 0xF)])
+                                                cell_at(t, dx, dy),
+                                                cell_at(nt, dx, dy)])
                                 continue
                             if c5_mode:
                                 # native codes kept; art follows to bank 5
@@ -3294,8 +3289,7 @@ def main():
                                     for dy in range(by5):
                                         for dx in range(bx5):
                                             c5_tiles.add(
-                                                (t & ~0xF) + (dy << 4)
-                                                + ((t + dx) & 0xF))
+                                                cell_at(t, dx, dy))
                                 continue
                             nt = bmap.get(key)
                             if nt is not None:
@@ -4933,12 +4927,10 @@ def main():
                                     "hex": newhex})
 
                         def _blk(t, at, into):
-                            bx = ((at >> 8) & 15) + 1
-                            by = ((at >> 12) & 15) + 1
+                            bx, by = attr_block(at)
                             for dy in range(by):
                                 for dx in range(bx):
-                                    into.add((t & ~0xF) + (dy << 4)
-                                             + ((t + dx) & 0xF))
+                                    into.add(cell_at(t, dx, dy))
                         host_t, new_t = set(), set()
                         for k in range(nvan):
                             t5, at5 = struct.unpack(
@@ -5311,14 +5303,12 @@ def main():
                              _u16(src_data, vsrc + 12 + 4 * k)) for k in range(cnt)]
                     new_ents, holders = [], []
                     for t, at in ents:
-                        bx = ((at >> 8) & 15) + 1
-                        by = ((at >> 12) & 15) + 1
+                        bx, by = attr_block(at)
                         if _native:
                             new_ents.append((t, at))
                             for dy in range(by):
                                 for dx in range(bx):
-                                    sel_bank5.add((t & ~0xF) + (dy << 4)
-                                                  + ((t + dx) & 0xF))
+                                    sel_bank5.add(cell_at(t, dx, dy))
                             continue
                         anchor = _selp.PLACEMENTS.get((t, bx, by))
                         if anchor is None:
@@ -5333,8 +5323,8 @@ def main():
                         new_ents.append((anchor, at))
                         for dy in range(by):
                             for dx in range(bx):
-                                s = (t & ~0xF) + (dy << 4) + ((t + dx) & 0xF)
-                                d = (anchor & ~0xF) + (dy << 4) + ((anchor + dx) & 0xF)
+                                s = cell_at(t, dx, dy)
+                                d = cell_at(anchor, dx, dy)
                                 if sel_pairs.get(s, d) != d:
                                     fail.append(f"select_records {nm}/{side}: "
                                                 f"conflicting placement for tile "

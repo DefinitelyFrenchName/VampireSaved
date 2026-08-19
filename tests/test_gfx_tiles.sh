@@ -56,5 +56,33 @@ echo "$jout" | grep -q "unique expanded tiles 18094" \
     && echo "  ok: Jedah OBJ inventory locked (18094 tiles; main band 0xAD3D-0xEEBB)" \
     || { echo "FAIL: Jedah OBJ inventory drifted:"; echo "$jout" | head -3; fail=1; }
 
+# ── THE BLOCK-CELL GEOMETRY FACT-LOCK (GitHub #47) ──────────────────────
+# cell_at/block_cells/attr_block are now the ONE statement of the OBJ
+# block geometry (25 restated copies converted, all verified drift-free
+# first). Lock the helper against the raw hardware facts so a "cleanup"
+# of the formula fails here before it garbles sprites: 16-tile row
+# stride; WITHIN-ROW wrap (the column term must not carry into the next
+# row); attr nibbles are size MINUS ONE.
+python3 - "$REPO" <<'PYEOF' || fail=1
+import sys, os
+sys.path.insert(0, os.path.join(sys.argv[1], "tools"))
+from gfx_tiles import cell_at, block_cells, attr_block
+ok = True
+# row stride: cell (0, dy) of an aligned head advances 16 per row
+ok &= [cell_at(0x100, 0, dy) for dy in range(4)] == [0x100, 0x110, 0x120, 0x130]
+# WITHIN-ROW WRAP: head 0x3FE + dx 3 wraps to 0x3F1, NOT 0x401
+ok &= cell_at(0x3FE, 3, 0) == 0x3F1
+# the wrap never carries into the row term
+ok &= all((cell_at(0x3FE, dx, 1) & ~0xF) == 0x40E & ~0xF for dx in range(16))
+# block_cells is row-major and complete
+ok &= list(block_cells(0x200, 2, 2)) == [0x200, 0x201, 0x210, 0x211]
+ok &= len(set(block_cells(0x1F8, 16, 16))) == 256
+# attr nibbles are size-1: 0x0000 -> 1x1, 0xF400 -> 5x16
+ok &= attr_block(0x0000) == (1, 1) and attr_block(0xF400) == (5, 16)
+if not ok:
+    print("FAIL: block-cell geometry helper drifted"); sys.exit(1)
+print("  ok: block-cell geometry locked (stride 16, within-row wrap, attr size-1)")
+PYEOF
+
 [ "$fail" = 0 ] && echo "PASS: gfx tile layout fact-locks" || echo "FAIL: gfx tile layout fact-locks"
 exit "$fail"

@@ -24,6 +24,11 @@ build/manifest/effect_tail.json in place, else dry-run.
 """
 
 import hashlib
+import os as _os
+import sys as _sys
+_sys.path.insert(0, _os.path.dirname(_os.path.abspath(__file__)))
+from gfx_tiles import attr_block  # noqa: E402  (GitHub #47)
+import cps2_decrypt as cps
 import json
 import sys
 import zipfile
@@ -37,12 +42,18 @@ EXPECT_RECS = 54
 
 
 def load_vs2(path):
+    # GitHub #49: for a zip, member discovery + byte order come from
+    # cps2_decrypt (the canonical enumerator) instead of a hardcoded
+    # vs2j.03-10 list — measured byte-identical. The raw-file branch keeps
+    # the plain byte shuffle (host-endianness-independent, verifier-noted
+    # equally correct).
     p = Path(path)
     if p.suffix == ".zip":
-        z = zipfile.ZipFile(p)
-        raw = b"".join(z.read(f"vs2j.{n:02d}") for n in range(3, 11))
-    else:
-        raw = p.read_bytes()
+        words, *_ = cps.load_set(str(p))
+        raw = bytes(cps.words_to_file_bytes(words))
+        print(f"vs2 prg sha1 {hashlib.sha1(raw).hexdigest()}")
+        return bytearray(cps.words_to_logical_bytes(words))
+    raw = p.read_bytes()
     print(f"vs2 prg sha1 {hashlib.sha1(raw).hexdigest()}")
     img = bytearray(len(raw))
     img[0::2] = raw[1::2]
@@ -80,7 +91,7 @@ def main():
         for k in range(cnt + 1):
             t = int.from_bytes(vs2[ra + 10 + 4 * k:ra + 12 + 4 * k], "big")
             a = int.from_bytes(vs2[ra + 12 + 4 * k:ra + 14 + 4 * k], "big")
-            keys.add((t, ((a >> 8) & 15) + 1, ((a >> 12) & 15) + 1))
+            keys.add((t, *attr_block(a)))
             n_words += 1
         assert all(t < 0x2000 for t, _, _ in keys), "unexpected band code"
 

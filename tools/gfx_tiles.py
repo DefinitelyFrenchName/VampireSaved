@@ -49,6 +49,34 @@ GROUP_C = (31, 33, 35, 37)
 TILES_PER_GROUP = 0x20000
 
 
+# ── THE OBJ BLOCK-CELL GEOMETRY (GitHub #47) ────────────────────────────
+# One hardware fact, stated once: an OBJ block's tile codes advance with a
+# 16-TILE ROW STRIDE and WITHIN-ROW WRAP — row dy lives at (head & ~0xF) +
+# (dy << 4), and the column steps (head + dx) & 0xF, wrapping inside the
+# 16-tile row rather than carrying into it. Before this helper the formula
+# was restated 25 times across 7 files (verified byte-identical, zero
+# drift — the extraction is mechanical and any behavioural change means
+# the conversion is wrong). The attr decode below is its companion: the
+# OBJ attribute word carries the block size as two 4-bit fields, stored
+# MINUS ONE.
+
+def cell_at(head, dx, dy):
+    """Tile code of cell (dx, dy) of an OBJ block anchored at `head`."""
+    return (head & ~0xF) + (dy << 4) + ((head + dx) & 0xF)
+
+
+def block_cells(head, bx, by):
+    """Every cell of a bx x by block, row-major (dy outer, dx inner)."""
+    for dy in range(by):
+        for dx in range(bx):
+            yield cell_at(head, dx, dy)
+
+
+def attr_block(attr):
+    """OBJ attr word -> (bx, by), each 1..16 (stored as size-1 nibbles)."""
+    return ((attr >> 8) & 15) + 1, ((attr >> 12) & 15) + 1
+
+
 def bank_word(bank):
     """The OBJ y-word bank bits for a gfx bank — NOT `bank << 13`.
 

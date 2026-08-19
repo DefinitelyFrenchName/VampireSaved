@@ -1,5 +1,39 @@
 # STATE — living progress log
 
+## Session 14z-96 (7) — #47 and #49 CLOSED (maintainer-confirmed
+## low-stakes), #50 PARKED behind #99 by ruling
+
+**The rulings (maintainer, 2026-08-19):** #47 low risk — do now; #49
+near-zero risk — do now; #50 parked until after #99 (and the verifier
+had already refuted its core claim — mutation tests DO reach main(),
+the lift-on-demand extraction policy is documented — so parking is
+right on value grounds as much as risk; when picked up: allocator
+first, one handler per test that wants it).
+
+**#47 — ONE statement of the OBJ block-cell geometry.**
+`gfx_tiles.cell_at/block_cells/attr_block` now own the 16-tile row
+stride + within-row wrap + attr size-minus-one facts; 25 cell-formula
+sites and 30 attr-decode sites across 9 files converted (the verifier
+had proven all copies byte-identical first — zero drift — so the
+conversion is mechanical). The obj_records docstring copy stays as
+prose with a pointer. Fact-locked in `tests/test_gfx_tiles.sh`
+(stride, wrap-not-carry, row-major completeness, attr nibbles).
+**Proof: `test_m3a_reproducible` — all five frozen images rebuild
+BIT-EXACT through the converted generator/builders (donovan-m8,
+stock twin, huitzil-m17, pyron-m11, merged ac3d0618), whole-artifact
+manifests included.**
+
+**#49 — one member enumerator.** The two hardcoded `vs2j.03-10` loads
+(overlay_port, gen_anita_bank2) now go through `cps2_decrypt.load_set`
++ the canonical byte-order pair — measured byte-identical (raw AND
+logical sha1s) before converting. The verifier's two findings honored:
+the byteswap half was NOT sold as a correctness fix (the old shuffle
+was equally correct), and overlay_port's six-member vsav list is
+DELIBERATELY unconverted with a comment — it omits vm3.03a/04a on
+purpose, so converting it would silently shift every VERIFIED_SITES
+address. Neither tool is on any build path (the #97 measurement), so
+the load-identity proof is the whole exposure.
+
 ## Session 14z-96 (6) — #48 CLOSED: one wheel-table source, and the
 ## latent vsav2 address bug with it
 
