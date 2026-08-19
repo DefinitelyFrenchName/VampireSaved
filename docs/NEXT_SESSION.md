@@ -9,8 +9,11 @@
 > ## bfd819a0 / `build/pyron28` 738bcfc2 / `build/m3b_merged10` ac3d0618,
 > ## 764 ops; tags `freeze/*`). **NO BUILD BYTE MOVED IN 14z-97** — it was
 > ## gate work end to end. The build to play: `tools/run_wide.sh
-> ## build/m3b_merged10 fbneo`. The maintainer is MID in-depth playtest —
-> ## new field reports outrank everything below.
+> ## build/m3b_merged10 fbneo`. **FIELD REPORT IN (2026-08-19, after the
+> ## close): no crash on FBNeo over a wide array, sound confirmed corrected,
+> ## arcade-chaining quirks remain — see STATE 14z-97 (2). #99 STAYS PARKED
+> ## (no repro protocol), but that negative is much stronger than the rig
+> ## one already in the record and the two must not be conflated.**
 > ##
 > ## **START HERE: there is no assigned task.** Ranked, if no field report
 > ## is waiting:

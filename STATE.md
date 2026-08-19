@@ -1,5 +1,80 @@
 # STATE — living progress log
 
+## Session 14z-97 (2) — MAINTAINER FIELD REPORT on merged-m3: no crash on
+## FBNeo over a wide array, sound confirmed, arcade-chaining quirks remain
+
+Report, as given (2026-08-19, after the 14z-97 close):
+
+> No crash observed on FBNeo on a very wide array of tests (not conclusive as
+> to no crash possible, or MAME-specific, but it does lean towards emulator
+> specific). Sound issues corrected. Still some quirks in arcade mode chaining
+> of matches when switching characters to and from VS2 characters but no bug
+> or crash to report (plus arcade is extended scope as all must-have is 2P
+> versus).
+
+**#99 stays PARKED.** No reproduction protocol came with this, which is what
+it is parked on. But the report changes the evidence, and in a direction the
+record could easily get wrong, so:
+
+### THIS NEGATIVE IS MUCH STRONGER THAN THE ONE ALREADY IN THE RECORD — do not conflate them
+
+STATE 14z-95 records an FBNeo leg of `26_don_arcade_mash` coming back
+`END 40620` and calls it, correctly, **"a weak negative"** — because that rig
+reaches **two ladder rungs of about eight**, and #99 is reported at the
+**fifth** match after a continue and a character switch. No rig in this corpus
+has ever reached rung 3.
+
+**A human playing "a very wide array of tests" is not bounded that way.** The
+maintainer's hands reach rung 5, the continue path and the character switch,
+which is precisely the state no instrument can currently produce. So this is
+the first negative result about #99 that is actually taken in the state #99
+describes. It deserves more weight than the rig leg, and the two must not be
+summed as "FBNeo is clean twice".
+
+### TWO CONFOUNDS, both worth naming before anyone concludes "emulator-specific"
+
+1. **The build moved too.** #99 was seen on `build/m3b_merged9` (merged-m2,
+   `081e2e53`) **on MAME**; this testing is on merged-m3 (`ac3d0618`)
+   **on FBNeo** (assumed — worth confirming). Two variables changed at once,
+   so "MAME-specific" and "fixed between m2 and m3" are not yet separated.
+   Prior probability favours the maintainer's reading: the only delta is the
+   #101 kernel voice-table port, measured identity-only. But "unlikely to have
+   fixed a crash" is an argument, and this project does not ship arguments.
+2. **The #91/#92 precedent says absence is weak evidence for a RACE.** Both
+   were reproducible-but-timing-dependent: clean legs were retracted as
+   "a TIMING accident", and a sparse probe made one crash appear and a dense
+   one made it vanish. A single crash-reset seen once and not since is exactly
+   that shape.
+
+**The one-variable experiment, and it is the maintainer's to run because it
+needs hands the rigs do not have:** the same arcade path — tenant, loss,
+continue with a character switch to the other tenant — on **merged-m3 under
+MAME**. Crash there and it is emulator-specific; clean on both and either the
+build moved it or the race is not firing. Either answer is worth more than
+more FBNeo hours.
+
+### The arcade-chaining quirks may already be half-measured
+
+"Quirks in arcade mode chaining of matches when switching characters to and
+from VS2 characters" sits in the same path as #99 AND resonates with a
+measurement already on record (STATE 14z-95): with the ladder's in-use mask
+never updated, selected stages walk **backwards** — 0x10, 0x0c, 0x08, 0x04,
+0x02, 0x00 — later matches landing on earlier venues, which was reproduced on
+demand as a poke artifact and matched the maintainer's earlier "the fight
+appears earlier on the spiral map" report. The named prerequisite for #99 is
+the same thing: **why does the ladder reset after rung 2?**
+
+So the quirks are plausibly that known bookkeeping defect rather than
+something new — but "quirks" is not a symptom, and the shape decides whether
+there is a rig to build. Asked; not chased. **Scope is unchanged: arcade is
+extended scope, 2P versus is the must-have, and nothing here gates anything.**
+
+### Sound: confirmed a second time, on wider coverage
+
+The #101 kernel voice-table port was field-confirmed at the 14z-96 freeze on
+an early playtest; this confirms it across a wide array on the frozen
+artifact. Nothing to do — recorded so the confirmation is not re-litigated.
+
 ## Session 14z-97 CLOSE — ritual complete
 
 One issue closed (**#96**, the maintainer's option (a) executed end to end),
