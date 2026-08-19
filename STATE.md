@@ -1,5 +1,29 @@
 # STATE — living progress log
 
+## Session 14z-98 (8) — #105's rig: AUTO selection SOLVED AND PROVEN;
+## the scripted flow shows NO white surface; awaiting the maintainer's
+## captures to name the screen. #104 capture pair CONFIRMED.
+
+The maintainer answered both opens. #104: the capture pair is confirmed
+("this AND worse frames than these" — consistent with the hold cycling
+a record family and ours mis-selecting per phase; noted on the issue).
+#105: AUTO = character with LP, then at the play-mode list DOWN, DOWN
+(NORMAL -> TURBO -> AUTO; AUTO&TURBO exists below), confirm any button
+— numpad notation ("2,2") decoded after two literal-button misreads.
+
+Rig results (merged-m3): the 1P MODE MENU overlays the select wheel at
+~f1250-2100 — every earlier guess used the 2P timing (~f2800) and
+landed inside a running match; the menu TIMES OUT into NORMAL when
+unconfirmed; confirming at f1420 pulls the whole timeline ~600f
+earlier. With the cursor snapshot-PROVEN on AUTO and the match won in
+AUTO: every post-match surface in the fast-KO scripted flow renders
+CORRECTLY (paired same-frame MANUAL control identical). The
+white-portrait screen lives on a path the rig does not take — likely
+gated by real-KO/win-pose flow the 3-HP poke KOs skip, or a different
+surface entirely. THE MAINTAINER IS PROVIDING CAPTURES; the rig resumes
+from the named surface. All scratch (no tracked instrument yet — the
+event has not been produced; the #98 lock comes when it is).
+
 ## Session 14z-98 (7) — TWO MORE FIELD REPORTS PROCESSED: #104 extended
 ## to the Pyron victim (victim-side, grabber-independent), #105 filed
 ## (AUTO-mode win screens white) — and the wider field verdict recorded:

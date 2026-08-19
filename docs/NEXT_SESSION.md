@@ -1,4 +1,4 @@
-# NEXT SESSION — orientation (written at the close of 14z-98, 2026-08-19; updated through 14z-98 (7))
+# NEXT SESSION — orientation (written at the close of 14z-98, 2026-08-19; updated through 14z-98 (8))
 
 > ## **THE SUITE IS GREEN: `ROMDIR=... tests/run_all_static.sh` -> PASS 93 /
 > ## SKIP 0 / FAIL 0.** Open: #99 (parked), #43 ((b) awaits a window),
@@ -68,12 +68,14 @@
 > ## reaction id at the victim's record selection, both legs (read_tap
 > ## on victim +0x54 family at the connect) — the fix is then per-row
 > ## remaps in the ported victim tables, riding the same window.
-> ## **#105** (AUTO-mode win screens: white shapes, all tenants):
-> ## BLOCKED ON ONE FACT — how AUTO is selected (asked; kick-confirm
-> ## and speed-menu-DOWN produced no AUTO tell). Then adapt replay
-> ## 61/62 (the win-screen-reaching 2P victories) + the existing
-> ## win-screen palette instruments. Field addendum recorded: NO CRASH,
-> ## NO REGRESSION across the whole MAME session.
+> ## **#105** (AUTO-mode win screens: white shapes, all tenants): AUTO
+> ## selection SOLVED + PROVEN (1P mode menu overlays the wheel
+> ## ~f1250-2100: D,D -> AUTO, confirm; menu times out into NORMAL) —
+> ## but the scripted fast-KO flow shows NO white surface anywhere
+> ## (paired MANUAL control identical). AWAITING the maintainer's
+> ## captures naming the exact screen; resume the rig from there
+> ## (real-KO win-pose flow is the prime suspect gate). Field addendum
+> ## recorded: NO CRASH, NO REGRESSION across the whole MAME session.
 > ##
 > ## **TWO STANDING HOLDS — do not start:** #99 (parked; blocked by #103's
 > ## fix), #50 (parked behind #99). **AWAITING RULINGS:** #43(b)'s window
