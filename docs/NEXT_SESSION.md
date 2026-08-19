@@ -112,21 +112,38 @@
 > ## walker-relocation precedent; the probe build must produce the legacy
 > ## A/B proof. Open observation: row 0x11 (Pyron-as-attacker) still
 > ## aliases Demitri's block.
-> ## **#105** (AUTO-mode win screens: white shapes, all tenants): AUTO
-> ## selection SOLVED + PROVEN (1P mode menu overlays the wheel
-> ## ~f1250-2100: D,D -> AUTO, confirm; menu times out into NORMAL) —
-> ## but the scripted fast-KO flow shows NO white surface anywhere
-> ## (paired MANUAL control identical). AWAITING the maintainer's
-> ## captures naming the exact screen; resume the rig from there
-> ## (real-KO win-pose flow is the prime suspect gate). Field addendum
-> ## recorded: NO CRASH, NO REGRESSION across the whole MAME session.
+> ## **#105 REPRODUCED AND DISCRIMINATED (14z-99, from the maintainer's
+> ## captures — ../Images/white_win_portraits):** the surface is the 2P
+> ## VICTORY SCREEN (winner portrait + quote over the loser's CONTINUE
+> ## countdown), and the gate is AUTO SELECTED BY THE WINNER. Measured:
+> ## merged + tenant winner + no-AUTO = COLORED; merged + tenant winner
+> ## + AUTO = WHITE (the captures, pixel for pixel); PRISTINE VANILLA +
+> ## AUTO = COLORED (not the engine's own — the #102 discipline). A
+> ## merged+legacy+AUTO leg is INCONCLUSIVE BY FLOW (a legacy winner
+> ## goes win-pose -> next match, no portrait screen). RECORD-LEVEL:
+> ## the win-pal window 0x90C2A0 is all-0xFFFF DURING the screen and the
+> ## real colors arrive ~f5850 — AFTER it. The upload is LATE, not
+> ## absent: suspect the 0x5F1B6 win-pal path's schedule under the AUTO
+> ## flag. Locks: replays/103_tenant_2pwin_auto.rpl +
+> ## audit_win_pal_auto.sh (3 legs, EXPECT_WHITE=1; leg C whiting would
+> ## mean vanilla shows it and #105's not-ours premise dies; leg D =
+> ## the 1P-vs-COM flavor, replay 104, field-confirmed "one of the
+> ## offending screens"). Also measured: vsav's AUTO is AUTO-GUARD (a
+> ## handicap, human still plays), NOT autoplay. TWO RIG TRAPS, both
+> ## maintainer-corrected, now game gotchas: coarse post-KO sampling
+> ## lands on the MAP screen that comes AFTER the win screen, and
+> ## buttons pressed past the KO skip the victory surfaces — end rig
+> ## inputs at the KO. NEXT: probe 0x5F1B6 on the A/B legs for the
+> ## schedule difference. Field addendum stands:
+> ## NO CRASH, NO REGRESSION across the whole MAME session.
 > ##
 > ## **TWO STANDING HOLDS — do not start:** #99 (parked; blocked by #103's
 > ## fix — and now field-clean on BOTH emulators), #50 (parked behind
 > ## #99). **AWAITING (maintainer):** the re-freeze window (#43(b) +
-> ## #103's staged rows + #104's fix rows once derived); the two
-> ## battery-target registry rows; the ~200 tracked build dirs; the
-> ## #105 captures. The MAME retest is DONE and
+> ## #103's staged rows + #104's 15-block port); the two battery-target
+> ## registry rows; the ~200 tracked build dirs. The #105 captures
+> ## ARRIVED 14z-99 and are processed — the defect is reproduced and
+> ## locked; do not re-request them. The MAME retest is DONE and
 > ## processed (14z-98 (5)) — do not re-request it.
 
 ## What 14z-98 did

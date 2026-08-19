@@ -1,5 +1,95 @@
 # STATE — living progress log
 
+## Session 14z-99 (2) — #105 REPRODUCED from the maintainer's captures:
+## the 2P victory screen, and the gate is AUTO SELECTED BY THE WINNER.
+## Vanilla renders the same flow COLORED — the defect is ours.
+
+The captures landed (`../Images/white_win_portraits`, three screens:
+Phobos, Pyron-read, Donovan+Anita — all the same surface) and named it:
+the **2P victory screen** — winner portrait + win quote over the loser's
+CONTINUE countdown. Reproduced deterministically the same session.
+
+**The hunt, in order (each step measured, snapshots kept in scratch):**
+1. ~~The 1P arcade flow CANNOT show this screen~~ **RETRACTED SAME
+   SESSION, maintainer-corrected: the screen shows after match wins in
+   BOTH 1P-vs-COM and 2P** — reproduced in 1P (white Phobos portrait,
+   PRESS START corner, field-confirmed "one of the offending screens"),
+   frozen as replay 104 + audit leg D. The wrong reading came from two
+   rig traps, both now game gotchas: coarse post-KO sampling lands on
+   the MAP/tally screens that come AFTER the win screen ("the screen
+   you check after the round end is ALWAYS the map screen that comes
+   after the win screen" — maintainer), and buttons pressed past the KO
+   skip the victory surfaces. The 14z-98 (8) rig missed the surface for
+   the same reasons, not because the flow lacks it.
+2. **vsav's AUTO is AUTO-GUARD (a handicap; the human still plays), NOT
+   autoplay** — measured: an idle AUTO character auto-blocks and never
+   attacks (8,000+ frames, zero hits dealt). The menu cursor was
+   snapshot-PROVEN on AUTO before concluding anything.
+3. The discriminating triple, same replay skeleton, MAME:
+   - merged-m3 + tenant winner + no AUTO (replay 61): **COLORED**;
+   - merged-m3 + tenant winner + AUTO (replay 61 + D,D,confirm at the
+     2P mode menu, up ~f1950): **WHITE** — the maintainer's captures,
+     pixel for pixel (fade completes, portrait stays white, quote and
+     background correct);
+   - **pristine vsavj + AUTO winner, same replay: COLORED** — the #102
+     discipline (vanilla leg before blaming the port); NOT the engine's
+     own AUTO behavior.
+   - merged + LEGACY winner + AUTO: **UNMEASURED** — the leg's mash ran
+     past the KO and pressed through the win screen (the rig trap
+     above), so its "skips the portrait screen" reading is VOID, not a
+     flow fact. Re-measure with inputs ended at the KO if the fix needs
+     the legacy-AUTO datum.
+4. **Record-level:** the win-pal window `0x90C2A0` holds all-`0xFFFF`
+   DURING the screen, and the real colors arrive ~f5850 — AFTER the
+   screen has left. **The upload is LATE, not absent** — suspect the
+   `0x5F1B6` win-pal path's SCHEDULE under the AUTO flag, not a wrong
+   palette source.
+
+**Locks (the #98 discipline):** `tests/replays/103_tenant_2pwin_auto.rpl`
+(= 61 + three AUTO lines) + `tests/replays/104_1p_auto_ko_win.rpl` (the
+1P-vs-COM flavor, real-KO win, inputs ending at the KO) +
+`tests/audit_win_pal_auto.sh` (~10 min, 4 legs): A merged+AUTO 2P
+freezes the defect (EXPECT_WHITE=1, flip at the fix); B merged no-AUTO
+must stay COLORED (whiting = the defect grew past the AUTO gate); C
+vanilla+AUTO must stay COLORED (whiting = the not-ours premise is dead,
+re-derive); D merged+AUTO 1P freezes the maintainer's own flavor
+(field-confirmed against the rig's snapshot). Verdicts SCAN the dump
+window — no pinned frame constants (the #10 lesson). AUDIT PASS on
+merged-m3, all four legs.
+
+**Field-confirmed (maintainer, same session):** the capture triple is
+"exactly the auto mode bug vs the correct screen, as I experience it";
+the 1P leg's white snapshot is "one of the offending screens"; and their
+1P-vs-COM datum is what caught my flow claims (they also noted they
+never play or test in AUTO — why nobody saw this before).
+
+**NEW INFRASTRUCTURE (maintainer-requested, 14z-99):** MAME input
+recording wired into the playtest launcher — `WIDE_RECORD=<name>
+tools/run_wide.sh <build> mame` records the session as a `.inp` with a
+fresh NAMED nvram start state under `~/.cache/vampire-saved/inp/<name>/`
+(hand off the directory + the build name = a frame-exact replay protocol
+on the pinned binary; `WIDE_PLAYBACK=<name>` replays against a throwaway
+nvram COPY). Control mappings untouched; host keys never enter the .inp.
+Round-trip smoke-tested (8s attract, record + clean playback); the first
+real session file gets the instrumented frame-exactness validation.
+FBNeo's SDL frontend has no equivalent — record on MAME.
+
+**Next measurement (not started):** probe `0x5F1B6` on the A/B legs —
+same PC both legs? where does the AUTO flag defer the upload? The
+winner-id/TT path vs the schedule decides the fix shape.
+
+**Rig notes paid for (kept versus re-derivation):** the weakening poke
+is `ff8850:00050005` — BOTH words, never the 2-byte shape
+(audit_kill_poke_shape), and never re-poked on a corpse (a 300f cadence
+revived a dead body mid-settle once — visible as hp 0 -> 5 in the
+timeline); the 2P mode menu is up ~f1950 in the replay-61 skeleton (the
+1P menu is ~f1250-2100 and 14z-98 (8)'s "2P timing ~f2800" was this
+skeleton's IN-MATCH frame); heal pokes `ff8450:01200120` keep an idle
+auto-guard P1 alive through a timeout round.
+
+**No shipped byte moved.** The 14z-96 freeze stands.
+
+
 ## Session 14z-99 — #102 CLOSED; #104 RE-ROOT-CAUSED (the variant-row
 ## alias class, not an index-space drift), its mechanism LOCATED at
 ## PRG:0x02802E, the fix RULED option (a) and MEASURED FEASIBLE on every
@@ -246,6 +336,10 @@ reconciliation_donovan.toml + the commented donovan.toml block
 4. The ~200 tracked build dirs (carried).
 5. #105: your captures of the white-portrait screens (offered — bring
    them to the next session).
+   **DELIVERED 14z-99 (../Images/white_win_portraits) and PROCESSED:**
+   the defect is reproduced, discriminated (AUTO on the winner; vanilla
+   clean) and locked (audit_win_pal_auto.sh + replay 103). See the
+   14z-99 (2) entry.
 
 **For whoever opens next session:** read NEXT_SESSION's banner. Three
 ranked starts: (a) #105 from the maintainer's captures; (b) #104's fix

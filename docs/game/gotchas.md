@@ -583,3 +583,38 @@ engine-voice events play a VANILLA character's flavor — the sword-plant
 "ding". Full mechanism: engine_internals "The per-node sfx dispatch,
 third pass"; decision brief: STATE "Decisions pending — 14z-87";
 mechanism gate: tests/audit_voice_borrow.sh.
+
+## vsav's AUTO is AUTO-GUARD (a handicap), NOT autoplay — and the victory
+## portrait screen belongs to the 2P flow only (14z-99)
+
+Two facts about the game that cost a session-arc of wrong rigs (#105):
+
+**AUTO does not play the character.** The mode menu's AUTO row arms
+auto-blocking; the human still supplies every attack. Measured: an idle
+AUTO character auto-guards and deals ZERO hits over 8,000+ frames while
+the CPU chips it down (and auto-guard does not stop throws, so an idle
+AUTO character still loses). A rig that selects AUTO and then idles is a
+LOSING rig, not an autoplay rig. Prove the selection with a menu
+snapshot (the cursor lands on the gold AUTO row) before concluding
+anything about "AUTO behavior".
+
+**The victory portrait screen shows after match wins in BOTH 1P-vs-COM
+and 2P** (field-confirmed by the maintainer and rig-reproduced 14z-99;
+the corner carries PRESS START in the 1P flavor and the loser's
+CONTINUE countdown in 2P). TWO RIG TRAPS hid it for a whole arc, both
+mine and both corrected by the maintainer:
+1. **Coarse sampling after the round end lands on the MAP/tally screens
+   that come AFTER the win screen** — "the screen you check after the
+   round end is ALWAYS the map screen that comes after the win screen"
+   (maintainer, verbatim). Two flows were published as "never shows the
+   win screen" off exactly this: the 1P KO win and the legacy 2P win.
+   Sample the window BETWEEN the KO settle and the next screen, densely.
+2. **Buttons pressed past the KO skip (or cut short) the victory
+   surfaces.** A mash that runs past the match-winning KO presses
+   through the win screen — measured: the same 1P KO win shows the
+   portrait screen for >=900f with inputs ended at the KO, and no
+   portrait screen at 200f sampling with the mash running. END REPLAY
+   INPUTS AT THE KO when the post-match surfaces are the subject.
+Also: in the replay-61 skeleton the 2P mode menu is up at ~f1950 (the
+"~f2800" the 14z-98 (8) notes carried is an IN-MATCH frame of this
+skeleton, not the menu).

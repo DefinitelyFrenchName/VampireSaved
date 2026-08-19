@@ -1505,6 +1505,23 @@ scratch in 14z-68 and got TWO of three pieces wrong, because the prior
 analysis lived only in a session log. Everything a tenant needs is
 below, with both characters as worked instances.
 
+**WHICH FLOWS REACH IT (measured 14z-99, corrected by the maintainer the
+same session):** the screen shows after match wins in BOTH 1P-vs-COM
+(corner: PRESS START) and 2P (corner: the loser's CONTINUE countdown).
+An earlier same-session reading — "a 2P-flow surface; 1P never shows it;
+a legacy 2P winner skips it" — is RETRACTED: it came from two rig traps,
+(a) coarse post-KO sampling landing on the MAP/tally screens that come
+AFTER the win screen, and (b) mash inputs running past the KO pressing
+through it (game gotchas, 14z-99). Rigs for this screen must end their
+inputs at the KO and sample densely between the settle and the map.
+**KNOWN-OPEN ON IT (GitHub #105):** with AUTO (= auto-guard, a handicap
+mode — the human still plays) selected by the WINNER, a TENANT winner's
+portrait renders WHITE on the merged build: the `0x90C2A0` win-pal
+window holds all-0xFFFF during the screen and the real colors arrive
+AFTER it — the upload is LATE, not absent. Vanilla renders its AUTO
+winner colored (not the engine's own behavior). Locked by
+`tests/audit_win_pal_auto.sh` + `replays/103_tenant_2pwin_auto.rpl`.
+
 The victory screen draws from THREE independent per-winner tables, all
 indexed by the winner's char id from `+0x382(a4)`, all UNMASKED (so a
 variant id 0x10-0x1F reads its own row — which in vanilla vsavj is a

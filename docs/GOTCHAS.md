@@ -268,3 +268,9 @@ is a GAME gotcha if it is true of the game regardless of the port.
   never entered — 0 hits, while its sibling `0x27FA0` takes 904 on the same
   rig; and a control site must be reachable under the RIG's conditions, or
   "POKES disables GUARD_PROBE" looks true twice in a row).
+- **14z-99, game:** vsav's AUTO is AUTO-GUARD (a handicap; the human still
+  attacks), NOT autoplay — an idle AUTO character deals zero hits and loses.
+  The victory portrait screen shows after match wins in BOTH 1P-vs-COM and
+  2P; two rig traps hide it — coarse post-KO sampling lands on the MAP/tally
+  screens that come AFTER it, and buttons pressed past the KO skip it. End
+  replay inputs at the KO and sample densely between settle and map.

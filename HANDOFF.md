@@ -144,6 +144,22 @@ rendering change. Ground truth: `tests/test_replay_video_selfcheck.sh`.
 
 ## Running a CPS-2 WIDE build (playtest)
 
+**RECORD YOUR SESSION (14z-99, maintainer-requested):** on the MAME leg,
+`WIDE_RECORD=<name> tools/run_wide.sh <build> mame` records the whole
+session as a MAME `.inp` with a FRESH named nvram start state under
+`~/.cache/vampire-saved/inp/<name>/` — hand off that directory + the
+build name and the session reproduces frame-exact on the same pinned
+binary (`WIDE_PLAYBACK=<name>` replays it; playback runs against a
+throwaway COPY of the recorded nvram, never the canonical one). Your
+control mappings are untouched (cfg stays yours; host keys never enter
+the .inp — it records the emulated ports). A field report that comes
+with an .inp is a replay protocol: any instrument can ride the playback.
+Round-trip smoke-tested 14z-99; the first real session file gets the
+instrumented frame-exactness validation. FBNeo's SDL frontend has no
+equivalent (its record/replay UI is the Windows frontend's; our SDL
+build drives inputs through the 0001 harness instead), so record on MAME.
+
+
 ```sh
 export ROMDIR=/path/to/reference/sets
 tools/run_wide.sh build/m3b_merged10 fbneo # THE 3-TENANT BUILD (all 18
@@ -1422,6 +1438,44 @@ tests/audit_don_grab_pose.sh          # 14z-98 (6), REBUILT 14z-99,
                                       # Rig: replays/96_don_victor_grab.rpl
                                       # (4 connects/run, no HP pokes).
                                       # ~12 min, 8 MAME runs (2 at a time).
+tests/audit_win_pal_auto.sh           # 14z-99, GitHub #105: with AUTO
+                                      # selected by the WINNER, the 2P
+                                      # victory screen draws a TENANT
+                                      # winner's portrait WHITE (the
+                                      # maintainer's captured surface,
+                                      # reproduced from their captures).
+                                      # 3 legs: A merged+AUTO = the
+                                      # frozen defect (EXPECT_WHITE=1,
+                                      # flip at the fix); B merged
+                                      # no-AUTO must stay COLORED; C
+                                      # PRISTINE VANILLA + AUTO must
+                                      # stay COLORED (the not-ours
+                                      # control — vanilla renders its
+                                      # AUTO winner fine, so this is
+                                      # ours). Verdicts SCAN the dump
+                                      # window over 0x90C2A0 — no pinned
+                                      # frame constants. RECORD-LEVEL
+                                      # fact for the fix: the win-pal
+                                      # colors arrive AFTER the screen
+                                      # (late upload, not absent).
+                                      # LEG D = the 1P-vs-COM flavor
+                                      # (replay 104, real-KO win,
+                                      # field-confirmed "one of the
+                                      # offending screens") — the
+                                      # flavor the maintainer plays.
+                                      # Merged+legacy+AUTO is
+                                      # UNMEASURED (its one attempt
+                                      # mashed past the KO — void).
+                                      # AUTO is AUTO-GUARD, not
+                                      # autoplay; rigs for this screen
+                                      # END INPUTS AT THE KO and sample
+                                      # densely (the MAP screen comes
+                                      # AFTER the win screen — the two
+                                      # 14z-99 game gotchas). Rigs:
+                                      # replays/103_tenant_2pwin_auto
+                                      # (= 61 + three AUTO lines) +
+                                      # replays/104_1p_auto_ko_win.
+                                      # ~10 min, 4 MAME runs.
 tests/audit_continue_ladder.sh        # 14z-98 (4), GitHub #102 (CLOSED
                                       # 2026-08-19, maintainer-ruled NOT
                                       # OURS — this is now the REGRESSION

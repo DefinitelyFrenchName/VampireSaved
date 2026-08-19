@@ -134,6 +134,52 @@ mame)
         echo "Homebrew MAME never will — build ours: tools/setup_mame.sh" >&2; exit 1; }
     echo "MAME: $BIN"
     echo "set vsavjw, rompath $RP;\$ROMDIR"
+    # ── INPUT RECORDING / PLAYBACK (14z-99, maintainer-requested) ──────────
+    # WIDE_RECORD=<name>  records the session as a MAME .inp — a real replay
+    # protocol from real play. WIDE_PLAYBACK=<name> replays one.
+    #
+    # An .inp is only reproducible if PLAYBACK boots into the SAME machine
+    # state RECORDING booted into: the .inp stream is raw input-port state
+    # per frame, and any nvram/EEPROM difference (bookkeeping counters, test
+    # -menu settings) changes what the game does with the same inputs. So
+    # both modes run with a FRESH, named nvram sandbox under
+    # ~/.cache/vampire-saved/inp/<name>/ — created at record time, REUSED
+    # (pristine copy) at playback. Your control mappings are untouched: the
+    # cfg directory stays your normal one, and host-key bindings do not
+    # enter the .inp (it records the emulated ports, not your keys).
+    #
+    # Record:    WIDE_RECORD=mysession tools/run_wide.sh <build> mame
+    # Play back: WIDE_PLAYBACK=mysession tools/run_wide.sh <build> mame
+    # Hand off:  the whole ~/.cache/vampire-saved/inp/<name>/ directory
+    #            (inp file + nvram) + the build name. Same pinned binary +
+    #            same build => the session reproduces frame-exact.
+    INPROOT="$HOME/.cache/vampire-saved/inp"
+    if [ -n "${WIDE_RECORD:-}" ] && [ -n "${WIDE_PLAYBACK:-}" ]; then
+        echo "WIDE_RECORD and WIDE_PLAYBACK are mutually exclusive" >&2; exit 1
+    fi
+    if [ -n "${WIDE_RECORD:-}" ]; then
+        D="$INPROOT/$WIDE_RECORD"
+        [ -e "$D" ] && { echo "REFUSING: $D exists — pick a new name (a" >&2
+            echo "  re-record over an old session breaks its playback)" >&2; exit 1; }
+        mkdir -p "$D/nvram"
+        echo "RECORDING -> $D/$WIDE_RECORD.inp (fresh nvram: $D/nvram)"
+        echo "hand off the whole $D directory + the build name"
+        exec "$BIN" vsavjw -rompath "$RP;$ROMDIR" -skip_gameinfo \
+            -record "$WIDE_RECORD.inp" -input_directory "$D" \
+            -nvram_directory "$D/nvram" "$@"
+    fi
+    if [ -n "${WIDE_PLAYBACK:-}" ]; then
+        D="$INPROOT/$WIDE_PLAYBACK"
+        [ -f "$D/$WIDE_PLAYBACK.inp" ] || { echo "no $D/$WIDE_PLAYBACK.inp" >&2; exit 1; }
+        # play against a THROWAWAY COPY of the recorded nvram start state,
+        # so playback never mutates the session's canonical state.
+        PB="$(mktemp -d)"
+        cp -R "$D/nvram" "$PB/nvram"
+        echo "PLAYBACK <- $D/$WIDE_PLAYBACK.inp (nvram copy: $PB/nvram)"
+        exec "$BIN" vsavjw -rompath "$RP;$ROMDIR" -skip_gameinfo \
+            -playback "$WIDE_PLAYBACK.inp" -input_directory "$D" \
+            -nvram_directory "$PB/nvram" "$@"
+    fi
     # -verifyroms will call this set "bad" on CRC: expected for ANY patched
     # build, and it runs regardless (STATE 14z-59h).
     exec "$BIN" vsavjw -rompath "$RP;$ROMDIR" -skip_gameinfo "$@"
