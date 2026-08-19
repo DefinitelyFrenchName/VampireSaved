@@ -1,5 +1,76 @@
 # STATE — living progress log
 
+## Session 14z-97 (6) — A NEW SHIPPING DEFECT FOUND, BOUNDED AND LOCKED:
+## Donovan KO'd by Lilith stalls the arcade lose flow ~8,000 frames (#103)
+
+The crash hunt's first arc (maintainer: "the goal is still the crash but any
+test coverage we add while we hunt is good"). Started from the 14z-95 blocker
+— "why does the ladder reset after rung 2" — and found something else real on
+the way.
+
+### The finding, with its numbers
+
+P1 Donovan loses a round to CPU Lilith in arcade → HP underflows, he falls,
+Anita walks to his body, Lilith holds her win pose — and the round-end judge
+does not fire. Round timer frozen; the tableau holds **~7,980 frames
+(~2 min 14 s)** before a timeout path finally reaches game-over. The normal
+lose flow on the same rig is **580 frames**, measured IDENTICAL on the merged
+build and pristine vanilla for a legacy P1. Field-reachable with no pokes:
+Lilith is index 1 of Donovan's own ladder row — "lose your second arcade
+match as Donovan".
+
+Controls that bound it: Donovan KO'd by Q-Bee fine; by Victor
+(opponent-swapped into the same slot) fine; Victor KO'd by Lilith 580f on
+merged AND vanilla; merged-m2 ≡ merged-m3 (NOT a #101 regression). It needs
+BOTH halves: Donovan losing AND Lilith winning.
+
+**Phobos/Pyron × Lilith: UNKNOWN** — my two attempts were confounded by my
+own rig (below). **FBNeo: unproduced, not negative** — the sound-fed ladder
+lottery routed around Lilith in both attempts.
+
+### A retraction inside the finding — mine, same day
+
+First reading: "permanent hang, match frozen solid". WRONG — two stacked
+instrument artifacts: a too-narrow field tuple for "static" (the ladder-block
+fields I picked all sit still during a long slow sequence) and dump windows
+that ended INSIDE the stall. The wide-slice re-measure shows every run
+flowing on at ~KO+8000. Corrected before filing; the issue and the audit
+both carry the retraction so nobody inherits "hang".
+
+### Two rig traps paid for (both now in the record)
+
+1. **A blanket opponent-poke window that overlaps a LIVE match corrupts it.**
+   `+0x382` is in-match live state (`ram.md:85`); writing the next opponent's
+   class into it mid-match killed the running match at the poke onset and
+   read as a mysterious early game-over. The opponent poke must be windowed
+   BETWEEN matches.
+2. **Repeating HP pokes can mask judging.** A 100f-cadence HP=1 poke across a
+   KO can re-write "alive" over an underflow mid-judge. The heal-then-
+   single-kill schedule (heal window, then three 20f-spaced kill pokes,
+   then hands off) is the clean shape.
+
+### History and suspects (bug archaeology done first, per standing order)
+
+Session 13 (M2a) fixed a hang chain in exactly this territory — bank-tail
+per-char dispatch (`dispatch_15-19`), "Jedah's handlers ran on Donovan".
+**Verified today: those five tables ARE ported at variant row 0x13 on the
+merged image.** Prime unmeasured suspects are the PARKED bank-tail DATA
+tables (`0x0BF01A-0x0BF19A`, `0x0BF59A` — "unfired", rows 0x13 still vanilla,
+pointing into engine-anim space Donovan's records don't match); the manifest's
+own comment pre-registered the move: "Triage WITH A CONSUMER TRACE if a soak
+fires there". Lilith's win-over-Donovan may be the consumer no soak fired.
+Next measurement: watchpoints on the parked rows' 0x13 entries during the
+stall, remembering the crypt-window wpset blindness (use `,r,o` too).
+
+### Instrument (suite doctrine)
+
+`tests/audit_don_lilith_ko.sh` — regression-locks the DEFECT
+(`EXPECT_STALL=1`, the #98 discipline) with a Victor control leg; measured
+`UNRESOLVED >=8960` vs `FLOWED 560` on merged-m3. Derives its truncated
+replay from the committed marathon at run time (one source, the #48 lesson).
+HANDOFF manual index row added. Filed as **GitHub #103** with the full
+control table; kept separate from #99/#102 per the #93/#101 lesson.
+
 ## Session 14z-97 (5) — THE §4 COVERAGE MANDATE IS MET: every tenant against
 ## every character, both sides, 111 pairings GREEN on the shipping build
 
