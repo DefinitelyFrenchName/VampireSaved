@@ -2499,3 +2499,36 @@ than an honest structural assertion.
 The real scenario it guards — a host key physically held before the run — IS
 in that read, because MAME samples host input ahead of the frame. Reachable
 in the field, not from the harness.
+
+## 14z-96: three instrument traps, each paid for in this session
+
+**A gate must not depend on the CALLER'S environment — measured twice in
+one session.** (1) `ROMDIR=../ROMS` (relative) failed two gates that
+resolve the path from a different working directory — a symlink whose
+relative target dangles at the symlink's own dir, and an FBNeo overlay
+after a `cd` — while the absolute spelling was green; `run_all_static.sh`
+now canonicalises at the entrance. (2) A brand-new fact-lock read
+`$REPO` from `os.environ`, which its gate SETS but does not EXPORT —
+green under any shell that happened to export it (the author's), a
+KeyError under the chain. Caught by the chain's first run, i.e. the
+SKIP/FAIL discipline working on a gate written the same hour. The rule:
+a gate's python blocks take paths as ARGV, never from inherited
+environment, and a new gate's first run should be under `env -i`.
+
+**Python's `hash()` in printed output is PER-PROCESS random.** The voice
+audit printed `hash(bytes)` values as content signatures; two runs of
+the SAME builds printed different numbers, which reads as "the content
+moved" when nothing did (PYTHONHASHSEED). In-run comparison was always
+sound — only the PRINTED identifiers lied across runs. Fixed with
+sha1-derived digests. If a tool prints an identifier a human might
+compare across runs, it must be a stable digest.
+
+**A special-move button press must OVERLAP the final direction frames in
+a replay.** Rig 83 v1 fired 236+P as motion frames followed by a
+separated 4-frame button press — it produced NO special at all (measured
+by snapshot; not even the normal came out reliably), and the rig read as
+a legitimate-looking zero. The overlap grammar (`p2=L1`, direction+button
+held together) is what registers. The 71/73 rigs' separated presses work
+for SOME moves, so a motion that "does nothing" should try the overlap
+shape before concluding anything about the game. [game-adjacent; filed
+here because the trap is the REPLAY GRAMMAR, not the engine]

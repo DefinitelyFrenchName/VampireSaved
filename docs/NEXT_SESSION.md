@@ -1,50 +1,113 @@
-# NEXT SESSION — orientation (written at the close of 14z-95, 2026-08-18)
+# NEXT SESSION — orientation (written at the close of 14z-96, 2026-08-19)
 
-> ## **THE SUITE IS GREEN: `ROMDIR=... tests/run_all_static.sh` -> PASS 90 /
-> ## SKIP 0 / FAIL 0.** Nine issues open, down from fourteen.
+> ## **THE SUITE IS GREEN: `ROMDIR=... tests/run_all_static.sh` -> PASS 91 /
+> ## SKIP 0 / FAIL 0.** FOUR issues open, down from nine: #99 (parked),
+> ## #96 (ruled, THE start point), #43 ((b) awaits a window), #50 (parked).
 > ##
-> ## **ONE STANDING HOLD — do not start it:**
-> ## **#99** is PARKED (maintainer): blocked on a RIG, not on ideas. The full
-> ## measured state is on the issue; do not re-derive it.
-> ## **#101 (the grunt) is CLOSED — fixed, FROZEN, and FIELD-CONFIRMED**
-> ## ("grunt gone, sfx corrected, all seems perfectly good on the sound
-> ## front for the 3 VS2 characters", maintainer 2026-08-18). THE FROZEN
-> ## BUILDS ARE NOW **donovan-m8 / huitzil-m17 / pyron-m11 / merged-m3**
-> ## (don_m8 d038553d / hui44 bfd819a0 / pyron28 738bcfc2 / m3b_merged10
-> ## ac3d0618, 764 ops). The build to play: `tools/run_wide.sh
-> ## build/m3b_merged10 fbneo`. Instruments: test_kernel_voice_tables
-> ## (ci_static), audit_hui_grunt (per-build frozen rows) + replay 95.
-> ## Detail: STATE 14z-96 (2)/(3), patch_notes 14z-96.
+> ## **THE FROZEN BUILDS ARE donovan-m8 / huitzil-m17 / pyron-m11 /
+> ## merged-m3** (`build/don_m8` d038553d / `build/hui44` bfd819a0 /
+> ## `build/pyron28` 738bcfc2 / `build/m3b_merged10` ac3d0618, 764 ops;
+> ## tags `freeze/*`). The build to play: `tools/run_wide.sh
+> ## build/m3b_merged10 fbneo`. The maintainer is MID in-depth playtest —
+> ## new field reports may be waiting before anything else.
 > ##
-> ## **START HERE: #96 — RULED option (a) (maintainer, 2026-08-19),
-> ## scheduled for THIS session:** the m2a/m2b battery targets the
-> ## CURRENT frozen generation as POLICY. Work list on the issue and in
-> ## STATE 14z-96 (5): re-point M2A_FLICKER_SPECS + the mask pin at the
-> ## latest frozen set, teach m2a_common.sh the composite/window
-> ## vocabulary, decide the stage-4 replay list (04_select_fuzz diverges
-> ## permanently at stage 4/5), both batteries green. The ruling also
-> ## DISSOLVES the "red dev-build gate = rule 6?" question (under (a):
-> ## yes, because red then means the pipeline cannot reproduce the
-> ## current freeze).
+> ## **START HERE: #96, RULED option (a) (maintainer, 2026-08-19):** the
+> ## m2a/m2b battery targets the CURRENT frozen generation as POLICY.
+> ## Work list (~one session, on the issue + STATE 14z-96 (5)):
+> ## 1. re-point `M2A_FLICKER_SPECS` + the battery mask pin (#70's other
+> ##    half) at the latest frozen set — as latest-frozen POLICY, not a
+> ##    new constant;
+> ## 2. teach `tests/lib/m2a_common.sh` the §4 v3/v4 composite/window
+> ##    vocabulary (it predates both);
+> ## 3. decide the stage-4 replay list (04_select_fuzz diverges
+> ##    permanently on a stage-4/5 build — measured 14z-95);
+> ## 4. both batteries green; the 06/700 and 08/3807 constants disappear
+> ##    AS constants. The ruling also dissolves "does a red dev-build
+> ##    gate trigger rule 6?" — under (a), yes: red means the pipeline
+> ##    cannot reproduce the current freeze.
 > ##
-> ## **STILL WAITING ON A MAINTAINER RULING:**
-> ## 1. **#43(b)** — its ruled window ("next re-freeze") was deliberately
-> ##    NOT the 14z-96 #101 freeze (the maintainer was playtesting those
-> ##    exact bytes); needs a call: own small freeze, or the next window.
-> ## 2. Should the remaining ~200 tracked build dirs stay in git? Step 4
-> ##    of the cleanup was declined deliberately, not overlooked.
+> ## **TWO STANDING HOLDS — do not start either:**
+> ## **#99** is PARKED (maintainer): blocked on a RIG, not on ideas; they
+> ## may have a reproduction protocol. Full measured state on the issue.
+> ## **#50** is PARKED behind #99 (ruling 2026-08-19, grounds on the
+> ## issue): the silent-refusal class fingerprints cannot see + the
+> ## verifier refuted its core claim. Lift-on-demand stays available.
 > ##
-> ## **#93 is CLOSED — RULED 2026-08-19 (maintainer): the expectation is
-> ## FROZEN, the byte NOT patched.** The census decided it: the endpoint
-> ## byte lives in vsavj sample record #506, keyed by TWELVE vanilla ids
-> ## (0x118/0x119, 0x198/0x199, 0x27e/0x29b + aliases) — patching would
-> ## deviate LEGACY audio from vanilla vsav, and the maintainer's ear
-> ## already approved the chirp WITH the 0xFF (14z-85g). The frozen
-> ## exception (tools/check_qs_voice_batch.py) BYTE-VERIFIES the exact
-> ## one-byte shape per run; QS_BATCH_STRICT=1 re-arms and the audit
-> ## runs it as a must-fire control. audit_qs_voice_batch is GREEN.
-> ## **UPGRADE PATH if the chirp tail ever becomes audible (option C,
-> ## recorded on the issue): tenant-only authored copy in vsw.21m.**
+> ## **AWAITING A MAINTAINER RULING:** #43(b)'s window (it deliberately
+> ## did NOT ride the 14z-96 freeze — the maintainer was playtesting
+> ## those exact bytes) and the ~200 tracked build dirs question.
+
+## What 14z-96 did
+
+**Closed: #47, #48, #49, #93, #101.** Ruled: #96 (option (a), next
+session), #50 (parked). Frozen: the #101 batch. Three sub-arcs:
+
+**1. THE GRUNT (#101), end to end in one session:** the maintainer's A/B
+videos → isolated (every other electrocution, ~0.4-0.6 s after the
+burst) → reproduced in-emulator (replay 95, five electrocutions/run) →
+root-caused: the sound kernel's per-class voice tables (events .0-.3,
+PRG:0x3BCE/0x3C3A/0x3CA6/0x3D10 + variant halves at +0x20) ship vsavj's
+variant rows as COPIES of the base rows, so tenants fired LEGACY voices
+— Phobos fired Bulleta's `0x1d2` (the grunt), Donovan fired VICTOR's
+`0x322` — where native vs2 fires the tenant's own row, and Phobos' hurt
+entries are `0x2a1/0x2a2`: FREE Z80 rows, the robot silent BY DESIGN.
+Fixed per ruled option (a): 12 variant-half words + 16 authored
+(base,+0x300 alias) song pairs (the kernel path calls the REAL 0x4CE2,
+so the facing alias applies — native's own twin-song doctrine) + 2
+batch scope ids. Measured identity-only (same frames, right voice or
+native silence; stock twin bit-identical incl. whole-artifact digest).
+FIELD-CONFIRMED: "grunt gone, sfx corrected, all seems perfectly good
+on the sound front for the 3 VS2 characters." Instruments:
+test_kernel_voice_tables (ci_static), audit_hui_grunt (PER-BUILD frozen
+expectations; unknown builds refuse), replay 95.
+
+**2. #93 RULED AND CLOSED — the census beat the gut.** The maintainer's
+instinct was to patch the bank-108 endpoint byte; the census measured
+the byte belongs to vsavj record #506, keyed by TWELVE vanilla ids —
+a sample VANILLA VSAV ITSELF PLAYS — so patching would deviate LEGACY
+audio, and the expectation was frozen instead. The freeze is NOT a
+tolerance: the checker BYTE-VERIFIES the exact one-byte shape per run
+(prefixes identical, endpoints exactly 0xFF/0x00), QS_BATCH_STRICT=1
+re-arms, and the audit runs the strict leg as a MUST-FIRE control.
+Option C (tenant-only authored copy in vsw.21m) recorded in four places
+as the upgrade path if the chirp tail ever becomes audible.
+
+**3. THE ARCHITECTURE TRIO:** #48 (wheel tools: one address source +
+validated labelling via select_wheel.wheel_facts, and the latent
+no---set vsav2 bug fixed — mismatched set now REFUSES), #47 (the OBJ
+block-cell geometry stated ONCE: gfx_tiles.cell_at/block_cells/
+attr_block, 25+30 sites converted, fact-locked; PROOF: all five frozen
+images rebuild BIT-EXACT), #49 (one member enumerator via
+cps.load_set, measured byte-identical; the byteswap half deliberately
+NOT sold as a correctness fix, and overlay_port's six-member vsav list
+deliberately kept with a comment — it omits vm3.03a/04a on purpose).
+
+**Also:** run_all_static canonicalises ROMDIR (relative spelling failed
+2 gates from a different cwd); the #93 retraction pass corrected the
+"byte-identical ... 0-20480" claim in every carrier; three new gotchas
+(caller-environment dependence ×2, per-process hash() prints, the
+overlap input grammar); the pool-vs-pool contact rig
+(tests/replays/pyron/83) committed with three geometries eliminated and
+the probe ambiguity CLOSED (GUARD_PROBE proven live by a hot-address
+control — the zeros are real absences now, not maybe-dead instruments).
+
+## Where the tenants stand
+
+Frozen 14z-96: donovan-m8 / huitzil-m17 / pyron-m11 / merged-m3 (the
+#101 kernel voice-table port). Suite evidence at the freeze: every
+legacy masked replay landed on its EXACT frozen class on all three
+builds; only each build's own tenant-content sha1s moved (61/62 don,
+37 hui, 40 pyr) + replay 94 gained its first frozen spec per set.
+Maintainer in-depth playtest ONGOING; early result: sound front clean
+for all three tenants.
+
+---
+
+# HISTORY BELOW — carried for reference, not current
+
+Everything from here down was written at the close of 14z-95 and
+earlier. Kept because the eliminations and traps stay valid; read the
+section above for the current state.
 
 ## What 14z-95 did
 
@@ -93,11 +156,7 @@ won't-fix).
 
 ---
 
-# HISTORY BELOW — carried for reference, not current
-
-Everything from here down was written at the close of 14z-92/93/94. It is
-kept because the eliminations and traps stay valid, but read the section
-above for the current state.
+(Deeper history, 14z-92/93/94, follows — same caveat as above.)
 
 ## What changed in the triage, in one screen
 

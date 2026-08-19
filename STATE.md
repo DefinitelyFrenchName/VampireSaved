@@ -1,5 +1,43 @@
 # STATE — living progress log
 
+## Session 14z-96 CLOSE — ritual complete
+
+The longest session on record by scope: **five issues closed (#47 #48
+#49 #93 #101), two ruled (#96 option (a) → next session's start; #50
+parked behind #99), one freeze executed (donovan-m8 / huitzil-m17 /
+pyron-m11 / merged-m3), the #93 retraction pass, and the grunt taken
+from the maintainer's video to a field-confirmed fix in one arc.**
+Suite at close: **PASS 91 / SKIP 0 / FAIL 0**; working tree clean; all
+four freeze tags placed; every ruling recorded on its issue AND in the
+tree the same day it was made.
+
+**Ritual checklist:** NEXT_SESSION rewritten for this close (banner:
+the four open issues, the frozen builds, the #96 work list as the start
+point, both holds). HANDOFF: build registry row, run_wide pointer,
+audit_hui_grunt row, the current-builds paragraph — all updated at the
+freeze; test_kernel_voice_tables indexed via ci_static. GOTCHAS: three
+new entries (caller-environment dependence ×2 in one session,
+per-process hash() prints, the overlap input grammar), indexed in the
+appended-14z-96 block. Suite doctrine: replay 95 + audit_hui_grunt +
+test_kernel_voice_tables + the test_gfx_tiles fact-lock + rig 83 all
+committed; the three dead contact-rig geometries recorded with their
+eliminations in 14z-96 (3) rather than committed as
+legitimate-looking-zero rigs (the #84 class).
+
+**Decisions pending (maintainer), the complete list:**
+1. **#43(b)** — its ruled window ("next re-freeze") deliberately did
+   not ride the #101 freeze; needs a call: own small freeze or the
+   next natural window.
+2. **The ~200 tracked build dirs** (step 4 of the cleanup, declined
+   2026-08-18 — revisit only if desired; the cheap way to settle it is
+   still rebuild-one-from-its-tag).
+3. **#99's rig/protocol** — theirs; everything else about #99 is
+   parked on it.
+
+**For whoever opens next session:** read NEXT_SESSION's banner; the
+work is #96 option (a), and the maintainer's in-depth playtest of
+merged-m3 may have produced new field reports that outrank it.
+
 ## Session 14z-96 (7) — #47 and #49 CLOSED (maintainer-confirmed
 ## low-stakes), #50 PARKED behind #99 by ruling
 

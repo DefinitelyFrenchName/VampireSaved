@@ -895,6 +895,17 @@ tests/test_qs_id_table.sh             # 14z-86: the Z80 sound-id-table census
                                       # ejection content lock (vs2 0x255800 ==
                                       # vsav 0x18D800), + 2 verdict controls.
                                       # Static, ~5 s. tools/audit_qs_id_table.py
+tests/test_kernel_voice_tables.sh     # 14z-96 (GitHub #101, ci_static): the
+                                      # KERNEL per-class voice tables — vsavj's
+                                      # variant halves are byte-copies (the
+                                      # grunt's alias shape), vs2's carry the
+                                      # newcomers' real rows (frozen verbatim),
+                                      # the event-nibble law on all 256
+                                      # entries, and 0x2a1/0x2a2 FREE in both
+                                      # games' Z80 tables (the silence
+                                      # premise). 2 verdict controls. Static,
+                                      # ~5 s warm. Dynamic half:
+                                      # audit_hui_grunt + replay 95
 tests/test_qs_songs.sh                # 14z-86: the authored-Z80-song machinery
                                       # (WIDE v1.1 vsw.z01/z02 content members;
                                       # tools/build_qs_songs.py). Placements ==

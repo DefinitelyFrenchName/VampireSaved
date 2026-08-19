@@ -14,6 +14,10 @@ one your current task belongs to. A trap you hit while porting Huitzil
 is a GAME gotcha if it is true of the game regardless of the port.
 
 
+### appended 14z-96 (project bucket)
+- A gate must not depend on the CALLER'S environment — relative ROMDIR and an unexported $REPO both measured; gates take paths as ARGV, new gates first-run under env -i
+- Python hash() in printed output is PER-PROCESS random — print stable digests for anything compared across runs
+- A special's button press must OVERLAP the final direction frames (p2=L1); a separated press can produce NOTHING and reads as a legitimate zero
 ### appended 14z-95 (project bucket)
 - A comparator's own ground truth can RATIFY a deviation from the spec (#52)
 - A `len(log)` tail sentinel counts the trailing `END` row as a converged frame
