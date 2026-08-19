@@ -1,9 +1,12 @@
-# NEXT SESSION — orientation (written at the close of 14z-98, 2026-08-19; updated through 14z-98 (9))
+# NEXT SESSION — orientation (updated through 14z-99, 2026-08-20)
 
-> ## **THE SUITE IS GREEN: `ROMDIR=... tests/run_all_static.sh` -> PASS 93 /
-> ## SKIP 0 / FAIL 0.** Open: #99 (parked), #43 ((b) awaits a window),
-> ## #50 (parked), **#103 (ROOT-CAUSED AND CAUSALLY CONFIRMED 14z-98 —
-> ## the fix is STAGED and waits on the re-freeze window; read below)**.
+> ## **THE SUITE IS GREEN: `ROMDIR=... tests/run_all_static.sh` -> PASS 94 /
+> ## SKIP 0 / FAIL 0** (grew +1: test_capture_pose_sources, the #104
+> ## premises). Open: #99 (parked), #43 ((b) awaits a window), #50
+> ## (parked), **#103 (fix STAGED, waits on the window)**, **#104 (RULED
+> ## option (a), MEASURED FEASIBLE — the 15-block port rides the same
+> ## window)**, **#105 (reproduced + locked, 4-leg audit; fix hunt open:
+> ## the 0x5F1B6 probe)**.
 > ##
 > ## **#102 IS CLOSED — RULED 2026-08-19 (maintainer): NOT OURS.** The
 > ## venue drift is the ENGINE'S OWN CONTINUE BEHAVIOR, measured on
