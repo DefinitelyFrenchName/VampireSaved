@@ -2635,3 +2635,16 @@ engine) shows whatever the stack last held — measured: `RET 00ff02dc`,
 which is sound-task DATA, chased as "a RAM-resident caller" for a
 round. `GUARD_PROBE_HIST=N` gives the true path; prefer it whenever the
 callee could be branch-reached.
+
+**A kill/heal poke that writes ONLY the 2-byte HP word manufactures
+#103's unjudgeable state — on ANY character, vanilla engine included.**
+The round judge kills on WHITE HP's sign (+0x52, engine_internals "THE
+ROUND JUDGE") and the pipeline keeps white <= hp; `f:ff8450:0001`
+leaves white at ~288, so the next real hit underflows hp while white
+stays positive and the round can NEVER judge. Measured on a pure-legacy
+Victor leg: 2-byte shape UNRESOLVED >= 8,760f; the 4-byte idiom
+`f:ff8450:00010001` (hp AND white — test_don_column's shape) FLOWED 600.
+Frozen both ways in tests/audit_kill_poke_shape.sh. Consequence already
+paid: the 14z-97 (7) continue rig's "HP set to 1" pokes (byte-width not
+committed) mean "#103 instance 2" (Phobos x Bishamon) is UNVERIFIED —
+possibly the rig's own poke. Kill pokes write BOTH words, always.

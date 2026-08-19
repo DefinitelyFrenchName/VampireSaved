@@ -1345,6 +1345,21 @@ tests/audit_don_ko_writer.sh          # 14z-98 (GitHub #103): THE ROOT-CAUSE
                                       # rehearsal caught the RH-19 window
                                       # trap now documented at leg A.
                                       # ~9 min, 2 parallel MAME runs.
+tests/audit_kill_poke_shape.sh        # 14z-98 (2): a 2-byte HP kill poke
+                                      # (f:ff8450:0001) manufactures #103's
+                                      # unjudgeable state on ANY character
+                                      # (white stays ~288; the judge reads
+                                      # WHITE's sign) — measured on a pure-
+                                      # legacy Victor leg: UNRESOLVED 8760
+                                      # vs FLOWED 600 for the 4-byte idiom
+                                      # (00010001, hp AND white). BOTH
+                                      # verdicts frozen — engine facts,
+                                      # stable across builds. Exists because
+                                      # "#103 instance 2" may be exactly
+                                      # this artifact (the continue rig's
+                                      # poke width was never committed).
+                                      # THE RULE: kill pokes write both
+                                      # words. ~7 min, 2 parallel MAME runs.
 tests/audit_roster_pairings.sh        # 14z-97: EVERY TENANT vs EVERY CHARACTER,
                                       # BOTH SIDES — the CLAUDE.md §4 mandate
                                       # ("vs each of the 18, both sides") that

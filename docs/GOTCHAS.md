@@ -17,6 +17,7 @@ is a GAME gotcha if it is true of the game regardless of the port.
 ### appended 14z-98 (project bucket — the #103 close)
 - Every -debug watch configuration is its own TIMELINE — two -debug trace runs are not comparable either; trace_writes now takes DUMPS so a run carries its own anchors (and the wpset stop PC is the instruction AFTER the access)
 - GUARD_PROBE's RET (SP) is a caller only for jsr-reached code; a jmp/branch-reached routine shows stale stack — use GUARD_PROBE_HIST
+- A 2-byte HP kill poke manufactures #103's unjudgeable state on ANY character (the judge reads WHITE's sign); kill pokes write BOTH words (00010001) — audit_kill_poke_shape.sh freezes both shapes
 ### appended 14z-97b (project bucket — the #103 hunt)
 - An opponent-class poke window overlapping a LIVE match kills the match (+0x382 is live in-match); window it BETWEEN matches, aimed from a no-poke run
 - Repeating HP pokes across a KO can un-KO the loser mid-judge and wedge the round themselves; kill pokes = round start +100f, three pokes, hands off

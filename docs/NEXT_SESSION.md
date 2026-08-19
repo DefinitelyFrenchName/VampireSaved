@@ -1,4 +1,4 @@
-# NEXT SESSION — orientation (written at the close of 14z-98, 2026-08-19)
+# NEXT SESSION — orientation (written at the close of 14z-98, 2026-08-19; updated through 14z-98 (2))
 
 > ## **THE SUITE IS GREEN: `ROMDIR=... tests/run_all_static.sh` -> PASS 93 /
 > ## SKIP 0 / FAIL 0.** FOUR issues open: #99 (parked), #43 ((b) awaits a
@@ -38,13 +38,17 @@
 > ## escape sites / 5 regions + 10 lea DATA escapes + 4 data_in_code, all
 > ## uncovered (his extraction predates the 14z-66 census).
 > ##
-> ## **NEXT MEASUREMENT if the machine is yours again: PHOBOS' STALL
-> ## (#103 instance 2, Bishamon leg) is NOT yet traced** — his x026142 IS
-> ## escape-fixed, so it is another region's escape or a second mechanism.
-> ## First run: his white-vs-hp state at the stall (audit_don_ko_writer's
-> ## classifier applies with his forced class; the #99 continue rig recipe
-> ## in 14z-97 (7) reaches the exact state). His answer decides whether
-> ## the fix window closes BOTH tenants' stalls or one.
+> ## **"#103 INSTANCE 2" (Phobos x Bishamon) IS UNVERIFIED — possibly the
+> ## rig's own poke (14z-98 (2)).** A 2-byte HP kill poke manufactures the
+> ## unjudgeable state on ANY character (measured: legacy Victor,
+> ## UNRESOLVED 8760 vs FLOWED 600 for the 4-byte idiom; frozen in
+> ## audit_kill_poke_shape.sh), and the 14z-97 continue rig's poke width
+> ## was never committed. Phobos' independent evidence says his real
+> ## losses judge (natural early rounds; healthy near-death commits on
+> ## the 14z-98 tap; his x026142 escapes are FIXED; the maintainer's real
+> ## no-poke Bishamon loss reached the continue screen). THE MAINTAINER'S
+> ## MAME RETEST DECIDES IT — no pokes involved. Donovan is unaffected
+> ## (zero-poke repro). KILL POKES WRITE BOTH WORDS: f:ff8450:00010001.
 > ##
 > ## **TWO STANDING HOLDS — do not start:** #99 (parked; blocked by #103's
 > ## fix), #50 (parked behind #99). **AWAITING RULINGS:** #43(b)'s window

@@ -45,11 +45,17 @@
 #                              "judged fine" — RETRACTED: that verdict was
 #                              read off ladder-mask movement under continuous
 #                              100f-cadence HP pokes, instrument noise. The
-#                              defect is OPPONENT-INDEPENDENT for Donovan;
-#                              Phobos KO'd by Bishamon stalls too. So the
-#                              shape is "lose any round as a tenant in
-#                              arcade -> ~2-minute freeze", deterministic,
-#                              NOT a race (for the stall itself).
+#                              defect is OPPONENT-INDEPENDENT for Donovan
+#                              (the mechanism fires from HIS OWN move —
+#                              14z-98). "Phobos KO'd by Bishamon stalls
+#                              too" is RETRACTED TO UNVERIFIED (14z-98
+#                              (2)): that rig's HP poke may have
+#                              manufactured the state itself — see
+#                              audit_kill_poke_shape.sh. So the shape is
+#                              "lose any round AS DONOVAN in arcade ->
+#                              ~2-minute freeze", deterministic, NOT a
+#                              race; Phobos awaits the maintainer's
+#                              no-poke MAME retest.
 # FBNeo: NOT reproduced and NOT clean -- the in-use mask is sound-state-fed
 # ("the run-to-run lottery", ram.md), FBNeo's sound state differs, and its
 # ladder routed around Lilith in both attempts. Unproduced, not negative.

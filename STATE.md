@@ -1,5 +1,50 @@
 # STATE — living progress log
 
+## Session 14z-98 (2) — "#103 INSTANCE 2" IS NOW UNVERIFIED: a 2-byte HP
+## kill poke manufactures the unjudgeable state on ANY character, and the
+## continue rig's poke width was never committed
+
+Follow-on from the root cause. Since the judge kills on WHITE HP's sign
+and the pipeline keeps white <= hp, a poke writing ONLY the 2-byte hp
+word creates the hp<0/white>=0 state by instrument. MEASURED on a
+pure-legacy Victor leg (merged-m3, kill pokes at round-1 start +100f,
+three 20f apart, hands off):
+
+    2-byte  f:ff8450:0001      -> UNRESOLVED >= 8,760f (hp=-5, white=277,
+                                  phase pinned 6 — the exact #103 shape)
+    4-byte  f:ff8450:00010001  -> FLOWED 600 (kill commit, both -1)
+
+Frozen both ways in tests/audit_kill_poke_shape.sh (NEW; ~7 min; both
+verdicts are engine facts, stable across builds).
+
+**Consequences, each carried to its record:**
+- **"#103 instance 2" (Phobos KO'd by Bishamon, 14z-97 (7)) is
+  UNVERIFIED** — that rig "set HP to 1 at round start" and the poke's
+  byte-width was never committed, so the stall may have been the rig's
+  own. Independent evidence his real losses judge: his natural
+  early-round losses (14z-97 (7)); his near-death commits (0x18A54)
+  firing healthily on today's tap; his x026142 escapes are FIXED; and
+  the maintainer's real no-poke Bishamon loss reached the continue
+  screen. The maintainer's pending MAME retest decides it (no pokes
+  involved). Donovan's #103 is UNAFFECTED — reproduces with zero pokes.
+- **The 14z-97 (9) Q-Bee/opponent-independence RE-MEASURE is
+  CONTAMINATED** (RH-4): it used "kill pokes at round start" of
+  unrecorded width. Its CONCLUSION survives on other evidence — the
+  root cause fires from Donovan's own move during ordinary play, so
+  opponent-independence follows from the mechanism, and the natural
+  no-poke Lilith leg stands — but the (9) measurement itself is not to
+  be cited.
+- The #99 continue rig, when revived post-fix, must use the 4-byte
+  idiom (on #99's record via the #103 comment).
+
+**Escape-census sweep completed across all three tenants** (raw counts;
+adjacency-safe/benign triage belongs to the fix window): donovan 14
+sites/5 regions ALL uncovered (14z-98 (1)); huitzil UNCOVERED = x028122
+-> 0x2cc64, code -> 0x574b0/b6/bc/c2 (20 sites, consecutive — likely the
+adjacency class the census gate already reviews), x068c78 -> 0x6b644;
+pyron UNCOVERED = x028122 -> 0x2cc64, x068c78 -> 0x6b644. The fix window
+should sweep all three, not just Donovan.
+
 ## Session 14z-98 — #103 ROOT-CAUSED AND CAUSALLY CONFIRMED: a pc-rel
 ## escape in Donovan's x026142 pins his HP to 1, and the round judge
 ## kills on WHITE HP's sign. The parked bank-tail rows are ELIMINATED.
