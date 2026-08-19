@@ -1,5 +1,170 @@
 # STATE — living progress log
 
+## Session 14z-98 (5) — FIELD RESULTS (maintainer MAME retest, 2026-08-19):
+## no stall for EITHER tenant — instance 2 CLOSED as the rig artifact, the
+## Donovan trigger model refined — and a NEW defect: Victor's headbutt
+## grab garbles the tenant victim's pose
+
+**The retest, as given:** "Testing on mame did not yield any stalling at
+round lost for either Phobos or Donovan. It did however rise a Donovan
+and Phobos graphical issue that we never caught before: When Donovan or
+Phobos are the victim of Victor's headbutting grab (6+HP), their
+animation is partly wrong (seems like the sprites used are half right
+and half a knocked down or squished sprite as the position of the
+sprite is very horizontal). Not game-breaking per se but truly in scope."
+
+**Phobos: CLEAN.** Real no-poke losses judge on MAME — the outcome the
+(2) analysis predicted. "#103 instance 2" is CLOSED as the continue
+rig's own 2-byte-poke artifact (audit_kill_poke_shape is its mechanism
+lock). #103 is DONOVAN-ONLY; the staged x026142 fix closes the whole
+ticket at the window.
+
+**Donovan: no stall in ORGANIC play — the trigger model is refined, the
+root cause is untouched.** The stall needs the hp:=1 pin (his node-op
+escape) to fire in the round BEFORE the death. The mash arms it ~2x per
+9,000 frames (every rig loss stalled, deterministically — the audits
+stay as they are); the maintainer's organic losses never walked the
+culprit anim, so they judged. "Lose any round as Donovan" was
+mash-tuned phrasing — corrected in the audit header and the (9) marker
+(grep clean). Field frequency is therefore LOWER than the rig
+frequency; the defect and its fix are unchanged (causally proven both
+directions). OPTIONAL follow-up, not started: name the culprit move by
+scanning his anim region's node streams for records invoking the
+escaping op — would turn "some anim" into a named move for the field
+recipe.
+
+**NEW DEFECT, filed as its own issue (the #93/#101 discipline): Victor's
+headbutt grab (6+HP) victim pose on BOTH tenants** — half-correct,
+half knocked-down/squished sprite, very horizontal. In scope
+(2P-versus surface). PRIOR ART pointers for whoever rigs it:
+- the victim's pose during a legacy throw is driven per-char (the 14z-2
+  mirror-victim class — test_don_throw_mirror: "base-slot mirror throws
+  use the Donovan-victim block");
+- the variant-row alias class (rows 0x10-0x1F aliasing 0x00-0x0F) is
+  the most common defect shape in this port — a victim-pose table row
+  serving Bulleta/Victor data to a tenant would produce exactly
+  "half right, half wrong sprite assembly";
+- test_hui_grab_victim (14z-73) is the existing grab-victim instrument
+  family (that one is tenant-as-ATTACKER; this is tenant-as-VICTIM);
+- BOTH tenants affected -> a shared table/row family, not one tenant's
+  port rows.
+Next steps per the capture discipline (show captures BEFORE analysis):
+rig P1 Victor 6+HP grab on P2 tenant, snapshot ours AND native vs2
+(Victor exists in vs2 — the native leg is directly capturable), send
+the pair to the maintainer for the confirmation loop, THEN measure.
+
+## Session 14z-98 (4) — #102's DISCRIMINATOR RAN: the venue drift is the
+## ENGINE'S OWN CONTINUE BEHAVIOR, measured on pristine vanilla with a
+## legacy character. Locked as a two-leg audit.
+
+The ticket's pre-registered test ("run the loss/continue/switch chain
+with LEGACY characters only; drifts the same -> not ours") is built and
+measured — it became reachable the moment the natural mash + banked
+credits replaced the kill-poke rigs (no pokes touch HP: the (2) lesson).
+
+Rig: the committed marathon with 4 extra C1 presses spliced into the
+attract (derived at run time, #48 discipline), P1 Victor forced, MAME.
+
+**Pristine vsavj:** venues 06 -> 0E -> 12; P1 loses match 3 (healthy
+white-HP judge, phase 6->8 in-sample); CONTINUE (~960f KO->next match,
+$8004=000E continue mode observed — a restart would take far longer);
+**the in-use mask $FF8110 CLEARS 1 -> 0 at the continue**, and the pool
+restarts: 04 -> 0A -> 06 (a venue REPEAT). Later matches on earlier
+venues + more matches than the norm — ON VANILLA, LEGACY-ONLY.
+
+**Merged-m3, same rig:** frame-identical through match 3's start (the
+first three venues and their frames match vanilla exactly), then the
+lottery diverges (P1 WINS match 3 — the mask is sound-state-fed, the
+documented between-build lottery): 06 -> 0E -> 12 -> 02 with the mask
+healthily ACCUMULATING (1 -> 0x401) — **venue DOWN with NO continue: the
+ladder is not venue-monotonic even in healthy play** (the venue follows
+the scan index, not the match number) — then a loss at match 4,
+continue, **mask cleared 0x401 -> 0**, restart at 08. Same mechanism.
+
+**Verdict: both #102 symptoms are the vanilla envelope.** The tenant
+correlation in the field report is explained by "switching requires
+continuing". Posted to #102; severity collapses per the ticket's own
+framing. Honest bounds stated there: one loss point per leg, mash-driven
+picks, venue VALUES are lottery draws — the reset SHAPE is the finding.
+
+**Instrument:** `tests/audit_continue_ladder.sh` (on-demand, ~20 min,
+2 parallel marathons). Leg A asserts VANILLA shows the continue-reset —
+if that ever goes red, the behavior was ours after all and #102 reopens;
+leg B asserts the merged build shows the same mechanism. Its own FIRST
+run removed an over-engineered third assertion (post-continue mask
+re-accumulation) that refused real data in the safe direction — the
+80f dump cadence cannot reliably sample the short-lived post-continue
+mask states. The verdict-logic-is-tested doctrine working as designed;
+documented in the header. AUDIT PASS on the committed script.
+
+## Session 14z-98 (3) — THE FIX WINDOW IS STAGED AND FULLY PRE-FLIGHTED:
+## risks assessed per the maintainer's conditional ruling, every shipped
+## target verified, the window action reduced to "uncomment + battery"
+
+**Maintainer ruling taken (2026-08-19): the #103 fix rides the re-freeze
+with #43(b) "unless you see risks". Risks assessed, both retired:**
+1. **Attribution overlap** — x028122 is touched by both changes (#43(b)
+   moves its recon row; the census names an escape in the region).
+   Retired two ways: land as separate commits with per-change evidence,
+   AND the x028122 escape is now DEFERRED (below), so the two changes no
+   longer touch the same region at all.
+2. **Unresolved targets as tripwires** — retired by scoping the row set
+   to fully-resolved regions only: ZERO tripwires in the shipped shape.
+
+**The evidence-based window scope (donovan.toml, staged as comments):**
+- `[[pcrel_escape_fix]] x026142 pad 0x60` — the #103 closer (9 sites ->
+  6 trampolines, 0 tripwired).
+- `[[pcrel_escape_fix]] x05c800 pad 0x20` — H-proven sibling (same
+  source span; verified twin 0x635fc -> 0x5b25c; H ships this row).
+- `recon_overlay = build/manifest/reconciliation_donovan.toml` — NEW
+  tracked file, 8 verified rows carried verbatim from H's overlay.
+  INERT until declared (proven: test_m3a_reproducible PASS with the
+  file present and the block commented — all four frozen references +
+  merged ac3d0618 rebuild bit-exact).
+
+**REVIEWED AND DEFERRED, with the evidence in the manifest comment:**
+- **x065c22's "+0x5e escape" is a CENSUS FALSE POSITIVE** — the 0x6000
+  word is the immediate of `move.l #$6000,d3` (vs2 0x65C7C). A row here
+  would have the escape pass REWRITE THE IMMEDIATE (the 14z-74 D5 table
+  corruption class, documented in pyron.toml's HISTORY note). Recorded
+  loudly so the fix window does not add it.
+- x028122 "+0x112": the site sits in the (pc,d2) jump-table data at vs2
+  0x2822C (framing-ambiguous), and the object-hit damage path is HOT
+  and healthy across 17 sessions (audit_fg_parity) — no live branch
+  escapes. Byte-twin 0x2cc64 -> 0x2d478 (0x40 identical, unique)
+  recorded in case it is ever proven live.
+- x088512 "+0x2e1c" (`beq.w 0x8b6ea`): target is vs2 match-flow code
+  with NO vsavj byte-twin (generation drift; the anchor block
+  `546d0008 426d0010 4e75 302d0010` has zero vsavj hits); the site is
+  next-stage-screen territory (single-player, cosmetic scope), unfired
+  in every rig. Deferred with H/P's leftovers (0x6b644 likewise has no
+  byte twin).
+
+**The window rehearsal, run against the EXACT recipe** (scratch copy of
+donovan.toml with the three pieces mechanically uncommented ->
+build/probe_103_don2, fingerprint cb1b04c3, UNREGISTERED):
+- generator: x026142 9 escapes -> 6 trampolines, x05c800 2 -> 1, ZERO
+  tripwired (every target through the tracked overlay);
+- audit_don_lilith_ko EXPECT_STALL=0: **leg A FLOWED 560**, control 560;
+- audit_don_ko_writer EXPECT_DEFECT=0: **healthy kill commit f12730**;
+- **legacy A/B vs don_m8: BIT-IDENTICAL on all four legs** — replays
+  02/03/16 whole-run and the Victor-forced marathon head (18,122
+  frames). The fix is measurably legacy-invisible; the re-freeze's
+  legacy expectations are expected NOT to move (the cascade's ~83 moved
+  ops are free-space placements + operand values at unchanged sites).
+
+**The window action is now:** uncomment the three pieces in
+donovan.toml (move recon_overlay to the top-level keys), rebuild all
+four artifacts + merged, run the full battery + run_suite + the two
+flipped audits (EXPECT_STALL=0 / EXPECT_DEFECT=0 become the defaults),
+freeze, carry-rename expectation sets. #43(b) lands beside it as its
+own commit.
+
+**One correction to (1)'s fix-shape note:** it said x028122/x065c22/
+x088512 "need site-twin work or ship as loud tripwires". Superseded by
+the review above: x065c22 must NEVER get a row (false positive), and
+the other two are deferred-with-evidence rather than tripwired.
+
 ## Session 14z-98 (2) — "#103 INSTANCE 2" IS NOW UNVERIFIED: a 2-byte HP
 ## kill poke manufactures the unjudgeable state on ANY character, and the
 ## continue rig's poke width was never committed
@@ -224,7 +389,10 @@ anything.
 ## WITHDRAWN. Root cause = a pc-rel escape in x026142 (vs2 0x262A4
 ## `bra.w $25F9A`) landing in the child-object init with A6=fighter,
 ## pinning hp:=1 while white stays positive — and the round judge kills
-## on WHITE's sign. Causally confirmed by probe build. See 14z-98.]
+## on WHITE's sign. Causally confirmed by probe build. See 14z-98.
+## FIELD 2026-08-19 (14z-98 (5)): the retest judged fine for BOTH tenants
+## — "lose any round" was mash-tuned; the stall needs the pin armed in
+## that round, and Phobos' instance 2 is CLOSED as the rig-poke artifact.]
 
 **A control of mine collapsed under the proper signal, and the record is
 corrected in all carriers (issue #103, this file).** "Donovan KO'd by Q-Bee →

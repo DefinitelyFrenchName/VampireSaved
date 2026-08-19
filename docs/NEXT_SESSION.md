@@ -1,10 +1,14 @@
-# NEXT SESSION — orientation (written at the close of 14z-98, 2026-08-19; updated through 14z-98 (2))
+# NEXT SESSION — orientation (written at the close of 14z-98, 2026-08-19; updated through 14z-98 (5))
 
 > ## **THE SUITE IS GREEN: `ROMDIR=... tests/run_all_static.sh` -> PASS 93 /
-> ## SKIP 0 / FAIL 0.** FOUR issues open: #99 (parked), #43 ((b) awaits a
-> ## window), #50 (parked), #102 (arcade ladder), **#103 (ROOT-CAUSED AND
-> ## CAUSALLY CONFIRMED 14z-98 — the fix is designed and waits on the
-> ## re-freeze window; read below)**.
+> ## SKIP 0 / FAIL 0.** Open: #99 (parked), #43 ((b) awaits a window),
+> ## #50 (parked), **#102 (ANSWERED 14z-98 (4): the venue drift is the
+> ## ENGINE'S OWN CONTINUE BEHAVIOR, measured on pristine vanilla with a
+> ## legacy character — the continue clears the in-use mask and the pool
+> ## restarts; audit_continue_ladder.sh locks both legs; awaiting the
+> ## maintainer's close ruling)**, **#103 (ROOT-CAUSED AND CAUSALLY
+> ## CONFIRMED 14z-98 — the fix is STAGED and waits on the re-freeze
+> ## window; read below)**.
 > ##
 > ## **THE FROZEN BUILDS ARE UNCHANGED — donovan-m8 / huitzil-m17 /
 > ## pyron-m11 / merged-m3** (`build/don_m8` d038553d / `build/hui44`
@@ -30,25 +34,34 @@
 > ## - Defect locks: audit_don_lilith_ko (EXPECT_STALL=1) +
 > ##   audit_don_ko_writer (NEW, EXPECT_DEFECT=1, PC-attributed).
 > ##
-> ## **THE FIX (rides the re-freeze window with #43(b), maintainer's
-> ## call):** donovan.toml [[pcrel_escape_fix]] x026142 (7 overlay twins
-> ## already VERIFIED in reconciliation_huitzil.toml) + x05c800 (verified
-> ## too) + x028122/x065c22/x088512 (targets 0x2cc64/0x689fe/0x8b6ea need
-> ## site-twin work or ship as loud tripwires). Donovan census total: 14
-> ## escape sites / 5 regions + 10 lea DATA escapes + 4 data_in_code, all
-> ## uncovered (his extraction predates the 14z-66 census).
+> ## **THE FIX IS STAGED AND FULLY PRE-FLIGHTED (14z-98 (3); window
+> ## ratified by the maintainer 2026-08-19, rides with #43(b)).** The
+> ## window action = UNCOMMENT the three pieces at the END of
+> ## donovan.toml (recon_overlay -> top level + two pcrel_escape_fix
+> ## rows), rebuild, full battery, freeze; #43(b) lands beside it as its
+> ## own commit. Rehearsed against the exact recipe (probe cb1b04c3):
+> ## ZERO tripwires, FLOWED 560, healthy kill commit, and legacy A/B
+> ## BIT-IDENTICAL vs don_m8 on four legs. The staged files are proven
+> ## inert (test_m3a_reproducible PASS). DO NOT row x065c22 — its census
+> ## "escape" is operand data and a row would corrupt an immediate (the
+> ## 14z-74 D5 class); x028122/x088512 deferred with evidence (all in
+> ## the manifest comment + STATE 14z-98 (3)).
 > ##
-> ## **"#103 INSTANCE 2" (Phobos x Bishamon) IS UNVERIFIED — possibly the
-> ## rig's own poke (14z-98 (2)).** A 2-byte HP kill poke manufactures the
-> ## unjudgeable state on ANY character (measured: legacy Victor,
-> ## UNRESOLVED 8760 vs FLOWED 600 for the 4-byte idiom; frozen in
-> ## audit_kill_poke_shape.sh), and the 14z-97 continue rig's poke width
-> ## was never committed. Phobos' independent evidence says his real
-> ## losses judge (natural early rounds; healthy near-death commits on
-> ## the 14z-98 tap; his x026142 escapes are FIXED; the maintainer's real
-> ## no-poke Bishamon loss reached the continue screen). THE MAINTAINER'S
-> ## MAME RETEST DECIDES IT — no pokes involved. Donovan is unaffected
-> ## (zero-poke repro). KILL POKES WRITE BOTH WORDS: f:ff8450:00010001.
+> ## **FIELD-SETTLED (maintainer MAME retest, 2026-08-19, 14z-98 (5)):
+> ## NO STALL FOR EITHER TENANT in real play.** Phobos: "instance 2" is
+> ## CLOSED as the continue rig's own 2-byte-poke artifact
+> ## (audit_kill_poke_shape freezes the mechanism — kill pokes write BOTH
+> ## words: f:ff8450:00010001). #103 is DONOVAN-ONLY. Donovan's organic
+> ## no-stall refines the TRIGGER, not the root cause: the stall needs
+> ## the hp:=1 pin armed in the round before the death — the mash always
+> ## arms it (rig legs deterministic), organic play only via the culprit
+> ## anim. Root cause + staged fix unchanged (causally proven).
+> ##
+> ## **NEW ISSUE #104 (same retest): Victor's 6+HP headbutt grab garbles
+> ## BOTH tenants' victim pose** (half squished/knocked-down sprites,
+> ## very horizontal). In scope (2P versus). Prior-art pointers + the
+> ## capture-first plan are on the issue; rig + ours-vs-native captures
+> ## are the next step — SHOW CAPTURES BEFORE ANALYSIS.
 > ##
 > ## **TWO STANDING HOLDS — do not start:** #99 (parked; blocked by #103's
 > ## fix), #50 (parked behind #99). **AWAITING RULINGS:** #43(b)'s window

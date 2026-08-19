@@ -51,11 +51,16 @@
 #                              too" is RETRACTED TO UNVERIFIED (14z-98
 #                              (2)): that rig's HP poke may have
 #                              manufactured the state itself — see
-#                              audit_kill_poke_shape.sh. So the shape is
-#                              "lose any round AS DONOVAN in arcade ->
-#                              ~2-minute freeze", deterministic, NOT a
-#                              race; Phobos awaits the maintainer's
-#                              no-poke MAME retest.
+#                              audit_kill_poke_shape.sh. FIELD-REFINED
+#                              2026-08-19 (maintainer MAME retest): the
+#                              shape is "a Donovan round lost AFTER the
+#                              hp:=1 pin fired in that round" — the mash
+#                              always arms the pin (leg A here is
+#                              DETERMINISTIC), organic play arms it only
+#                              when the culprit anim is walked (the
+#                              maintainer's real losses judged fine).
+#                              NOT a race; Phobos is CLEAN (retest;
+#                              instance 2 = the rig-poke artifact).
 # FBNeo: NOT reproduced and NOT clean -- the in-use mask is sound-state-fed
 # ("the run-to-run lottery", ram.md), FBNeo's sound state differs, and its
 # ladder routed around Lilith in both attempts. Unproduced, not negative.

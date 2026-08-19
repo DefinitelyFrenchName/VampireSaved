@@ -1345,6 +1345,25 @@ tests/audit_don_ko_writer.sh          # 14z-98 (GitHub #103): THE ROOT-CAUSE
                                       # rehearsal caught the RH-19 window
                                       # trap now documented at leg A.
                                       # ~9 min, 2 parallel MAME runs.
+tests/audit_continue_ladder.sh        # 14z-98 (4), GitHub #102: THE
+                                      # DISCRIMINATOR — does a loss+continue
+                                      # reset the arcade ladder's in-use
+                                      # mask ON PRISTINE VANILLA with a
+                                      # legacy character? Measured YES:
+                                      # vanilla venues 06->0E->12, loss,
+                                      # continue (~960f, $8004=000E), mask
+                                      # 1->0, pool restarts 04->0A->06 (a
+                                      # repeat); merged same mechanism
+                                      # (0x401->0). Both #102 symptoms =
+                                      # the vanilla envelope; the tenant
+                                      # correlation = "switching requires
+                                      # continuing". Leg A red would mean
+                                      # the behavior was OURS — reopen
+                                      # #102. NO kill pokes by design
+                                      # (audit_kill_poke_shape). Venue
+                                      # VALUES are lottery draws; the
+                                      # RESET SHAPE is the assertion.
+                                      # ~20 min, 2 parallel marathons.
 tests/audit_kill_poke_shape.sh        # 14z-98 (2): a 2-byte HP kill poke
                                       # (f:ff8450:0001) manufactures #103's
                                       # unjudgeable state on ANY character
