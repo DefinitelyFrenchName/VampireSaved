@@ -2148,6 +2148,65 @@ deliberate vsavj approximation; the values and the would-be change
 recipe live in docs/project/tables/defense_rows.md. (Pyron's rows are
 identical between the games — unaffected either way.)
 
+## THE ROUND JUDGE: death is the SIGN OF WHITE HP, and the phase
+## machine that consumes it (14z-98, measured end to end on #103)
+
+Depends on atlas rows: fighter `+0x50` / `+0x52` (the judge tests
+`+0x52`) / `+0x54` / `+0x5C` / `+0x11F`, work vars `$FF3442/$FF3444`
+(staged damage — the "Same-value class #4" family), `$FF800C` (phase
+cursor), `$FF810C` (KO mask), `$FF8129` (judge gate byte, 14z-97 (8)).
+
+**The phase machine.** `$FF800C` is a jump-table CURSOR (0,2,4,…)
+advanced by `addq.w #2,$c(a5)` at the transition sites. Several outer
+modes each own a dispatcher + word table; the IN-MATCH one is
+`PRG:0x93CE` with table `0x93C0` (phase 6 = fighting -> handler
+`0x97DC`; phase 8 = KO/judge presentation -> `0x9A04`). (`0x9C9E`
+/table `0x9CCE` is a different mode's machine — its phase-6 handler is
+a press-or-timer screen; do not conflate, its round-over test `0xAD06`
+is an INPUT-EDGE test on `$FF8058-$FF8067`, which is the INPUT
+register block, not combat state.)
+
+**The death detect** (phase-6 handler `0x97DC`, every frame):
+
+    0x97FC  tst.w $852(a5)   ; P2 +0x52 (WHITE hp) < 0 -> d0 |= 1
+    0x9804  tst.w $452(a5)   ; P1 +0x52            < 0 -> d0 |= 2
+    0x980C  move.b d0,$10c(a5)  ; the KO mask
+    0x9840  beq rts / 0x9844 bsr $9880 (judge prep) / bsr $99a8
+    0x984C  addq.w #2,$c(a5)    ; PHASE 6 -> 8
+
+It reads **+0x52, never +0x50**. vs2's twin (`0x800C/0x8014`) tests
+the same offsets — NOT an engine-generation drift. The timeout path is
+the `$10A/$109` chain above it; `0x9880` resolves winner/loser structs
+and folds ids via `0x9996` (0x0B->0x04, 0x1B->0x14 — the Oboro fold).
+
+**Why testing white alone is sound (the invariant):** both appliers
+subtract the staged damage from BOTH words (`0x18AB0`: real from
+`$FF3442`, white gets real + the `$FF3444` extra), and white sits AT
+OR BELOW hp, so white crosses zero first. The death decision runs on
+white right after the subtract (`0x18A42-0x18A66`): `< 0` -> the KILL
+COMMIT `0x18A7C` (`hp := -1, white := -1`, death flag `+0x11F := 1`);
+`0 < white <= $138(a1)` -> the near-death commit `0x18B12` (also sets
+`+0x11F/+0x117`, writes `+0x54` from attack byte `$17(a3)`). Measured
+live on an arcade KO: applier writes hp 17->6 / white 15->**-3**, then
+`0x2980A/0x29810` write both `-1` in the same frame. The no-kill
+attack flags are `$8(a3)/$9(a3)` bit 7 (clamp real/white at the floor
+instead of killing).
+
+**The settle:** in phase 8 the loser's sequencer walks his death
+records and the settle helper `0x995A` (run for both structs) tests
+`+0x111` then `+0x11F` and dispatches the dead fighter PER-CHAR
+through `0x0BF61A` row `$382<<2` (dispatch_19 — ported at row 0x13);
+`+0x1C` is cleared ~KO+240, the stage word moves ~KO+560.
+
+**The failure mode this section exists for (#103):** any state with
+`hp < 0` while `white >= 0` is UNJUDGEABLE — the phase machine never
+leaves 6, the presentation runs (reactions key off +0x50) but the
+round never ends until an engine failsafe (~8,000f). No legacy path
+can produce that state (the appliers keep the invariant); Donovan's
+ported x026142 pc-rel escape did (a pool-object durability init
+`+0x50 := 1` running on the fighter — see docs/project/gotchas.md
+14z-98 and GitHub #103 for the port-side mechanism).
+
 ## Shadow / reflection servants (14z-66; premise CORRECTED 14z-68f)
 
 Per-player shadow servants (class-0x0C trio, vanilla spawner

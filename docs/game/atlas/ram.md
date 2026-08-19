@@ -108,7 +108,9 @@ is 0x400 bytes; combat struct at +0x000, further state above +0x100.
 | +0x32.w | attacker/owner attribution link (word addr, sign-extends to the player block; reaction handlers deref it for attacker-side writes) | [D: 14z-26/42] |
 | +0x5C | hit-freeze counter (blocks +0x20 decrement; set per hit on BOTH victim and attacker by the reaction handlers — electric-shake pair: vsavj 0x23AC8 writes 0x18/0x0B where vs2 0x226E0 writes 0x0C/0x04; engine-generation drift, see engine_internals) | [D: 14z-42] |
 | +0x50.w | current HP (round start = 0x120 = 288) | [D] |
-| +0x52.w | white/displayed HP (regenerating damage) | [D] |
+| +0x52.w | white/displayed HP (regenerating damage). **THE ROUND JUDGE KILLS ON THIS WORD'S SIGN, not +0x50's** (14z-98, GitHub #103): in-match phase-6 handler `PRG:0x97DC` tests `tst.w $852(a5)`/`tst.w $452(a5)` at `0x97FC/0x9804` (vs2 twin `0x800C/0x8014` — same offsets, not a generation drift). The damage pipeline keeps white <= hp (applier `0x18AB0` subtracts staged `$FF3442/44` from BOTH words), so white crosses zero FIRST; the death decision `0x18A46-0x18A66` then runs the kill commit. A state with hp < 0 and white >= 0 is UNJUDGEABLE — the engine never sees the death (#103's stall shape) | [D: 14z-98] |
+| +0x54.b | reaction/hit-state id written by the near-death commit `0x18B34` from attack byte `$17(a3)` (observed 0x11 during a death, 0x05 during regen) | [D: 14z-98] |
+| +0x11F.b | DEATH FLAG, set by the kill commits (`0x18A7C` hp:=-1+white:=-1 flavor; `0x18B12` near-death flavor; `0x2980A/0x29810` the arcade-KO instance measured live). Read with +0x111 by the settle helper `0x995A`, which dispatches the dead fighter per-char through `0x0BF61A` row `$382<<2` (dispatch_19, PORTED at row 0x13) | [D: 14z-98] |
 | +0x60.l | per-character hitbox data base (ROM ptr; Demitri 0x93B6A, Victor 0x9769E) | [T,D] |
 | +0x64.l | per-character ptr from table PRG:0x0BD9FA | [T] |
 | +0x80/84/88/8C/90.l | hitbox addr tables: base + word offsets base[0..8] (push=+0x90, vuln=+0x80/84/88, attack=+0x8C) | [C,T] |
