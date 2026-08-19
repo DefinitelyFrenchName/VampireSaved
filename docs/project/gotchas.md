@@ -2648,3 +2648,37 @@ Frozen both ways in tests/audit_kill_poke_shape.sh. Consequence already
 paid: the 14z-97 (7) continue rig's "HP set to 1" pokes (byte-width not
 committed) mean "#103 instance 2" (Phobos x Bishamon) is UNVERIFIED —
 possibly the rig's own poke. Kill pokes write BOTH words, always.
+
+## 14z-99: two traps from the #104 re-measurement — both produced a
+## CONFIDENT WRONG ANSWER from a working instrument
+
+**A placement lookup that hardcodes ONE region name is wrong on a MERGED
+build, and it fails by pointing somewhere plausible.** `placements.json`
+carries `anim` (Donovan), `anim@huitzil` and `anim@pyron`. A tenant
+verdict resolved through `placements["regions"]["anim"]` unconditionally
+therefore maps Huitzil and Pyron through DONOVAN's dst/src — arithmetic
+that succeeds and yields an address in the right ballpark. Measured cost:
+`audit_don_grab_pose.sh` reported "Pyron's held record mismatches too,
+ours 0x26654C vs native 0x26614C" in 14z-98 (7); through `anim@pyron` it
+maps to `0x26614C`, IDENTICAL to native. That false datum was published to
+the issue and then shaped a fix design ("a DIFFERENT delta than Donovan's
+-> per-victim wrong row selection"). Resolve the region PER TENANT, and
+treat "the delta is different for each tenant" as a smell that the mapping
+is wrong before it is a finding about the game.
+
+**A probe's zero is only as good as its SITE, and a plausible site can be
+dead code.** Chasing #104's index, `GUARD_PROBE=27faa` — the documented
+four-sibling selector entry, the address the static read points at —
+returned 0 hits over a full replay. The routine is real and its body is
+correct; it is simply never entered, because every live path enters its
+sibling `0x27FA0` (which loads `anim_index_c` directly). 904 hits there on
+the same rig. A dead site and a real zero are indistinguishable without a
+positive control AT THE SITE, not merely at the mechanism.
+Corollary paid for in the same hour: the control site must also be
+reachable UNDER THE RIG'S OWN CONDITIONS. `GUARD_PROBE=2ad82` (the
+palette-seq resolver) gives 501 hits unpoked and **0 with the forced-pick
+pokes**, which reproduced twice and looked exactly like "setting POKES
+disables GUARD_PROBE" — a serious instrument defect. It is not: the same
+poked run gives 904 hits at `0x27FA0`. The forced Donovan/Victor pick
+simply never requests a palette sequence. Test the scary instrument claim
+before writing it down.

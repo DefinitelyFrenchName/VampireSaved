@@ -61,19 +61,36 @@
 > ## anim. Root cause + staged fix unchanged (causally proven).
 > ##
 > ## **NEW ISSUES FROM THE RETEST — the natural next work:**
-> ## **#104** (legacy grabs mis-select EVERY tenant victim's hold
-> ## record): reproduced + capture-confirmed same day; victim-side and
-> ## grabber-independent (Donovan ours 0x287370 vs native 0x287418;
-> ## Pyron ours 0x26654C vs native 0x26614C — different deltas);
-> ## locked by audit_don_grab_pose.sh (EXPECT_MATCH=0) on the committed
-> ## rig replays/96_don_victor_grab.rpl. MECHANISM CLOSED 14z-98 (9):
-> ## the anim_index table family is repointed CORRECTLY; the defect is
-> ## a GENERATION DRIFT IN THE REACTION-INDEX SPACE (vsavj passes idx 6
-> ## for the grab-hold where vs2 passes 11) — the ported tables are in
-> ## vs2's index order. FIX (same window as #103's rows): derive the
-> ## permutation from the legacy twins (Victor row 3, both games),
-> ## REORDER the tenants' ported offset tables (5 siblings x 3
-> ## tenants), probe with EXPECT_MATCH=1 + ordinary-hit no-regression.
+> ## **#104** (a legacy grab holds a TENANT victim on the wrong capture
+> ## record): reproduced + capture-confirmed 14z-98; **MECHANISM
+> ## RE-MEASURED AND CLOSED 14z-99 — it is the VARIANT-ROW ALIAS class**,
+> ## the port's most common defect shape. The capture pose is selected
+> ## PER VICTIM through 32-row structures whose rows 0x10-0x1F are
+> ## byte-copies of 0x00-0x0F, so a tenant victim is served the BASE
+> ## character it folds onto. Measured index at victim +0x1C, ours vs
+> ## native, over seven victims on both engines:
+> ## Bulleta 12/12, Demitri 11/11, Victor 6/6, Lilith 9/9 (LEGACY —
+> ## the engines AGREE, so the convention is shared);
+> ## **Donovan 0x13->0x03 gets Victor's 6 where native gives 11 (WRONG)**;
+> ## **Phobos 0x10->0x00 gets Bulleta's 12 where native gives 26 (WRONG)**;
+> ## Pyron 0x11->0x01 gets Demitri's 11, which is ALSO native's — right
+> ## BY COINCIDENCE, and exactly why the field report named Donovan and
+> ## Phobos only.
+> ## **TWO 14z-98 CLAIMS ARE RETRACTED** (both measured false, both in
+> ## the audit header): (1) "generation drift in the reaction-index
+> ## space; reorder 5 sibling tables x 3 tenants" — the legacy twins the
+> ## permutation was to be derived FROM are BYTE-IDENTICAL, so it is the
+> ## identity and the reorder is a no-op; (2) "Pyron mismatches too
+> ## (0x26654C)" — that was the AUDIT'S OWN BUG, resolving every tenant
+> ## through Donovan's anim placement on a merged build. Fixed: the
+> ## region is resolved per victim, and a LEGACY-VICTIM CONTROL is now
+> ## section 0 (if the engines ever disagree there, the premise is dead).
+> ## **STILL OPEN — what the fix needs:** WHICH structure resolves
+> ## victim-id -> capture set. Eliminated with controls: the anim_index
+> ## family and all 14 per-character dispatch tables have rows
+> ## 0x10/0x11/0x13 MOVED OFF the vanilla alias for all three tenants (so
+> ## none hands a tenant its fold row), and 0xBE27A is ATTACKER-indexed.
+> ## Next measurement named in STATE 14z-99.
 > ## **#105** (AUTO-mode win screens: white shapes, all tenants): AUTO
 > ## selection SOLVED + PROVEN (1P mode menu overlays the wheel
 > ## ~f1250-2100: D,D -> AUTO, confirm; menu times out into NORMAL) —

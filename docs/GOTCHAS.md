@@ -260,3 +260,11 @@ is a GAME gotcha if it is true of the game regardless of the port.
   merged build and its legacy-only instrument do, by design. Use
   `artifact_manifest.py` (whole artifact), not `build_fingerprint.py`
   (program only, 8.1% of the bytes), to answer "which build is this?"
+- **14z-99, project:** two ways a WORKING instrument returns a confident
+  wrong answer — a `placements.json` lookup hardcoded to `"anim"` maps
+  Huitzil/Pyron through DONOVAN's placement on a merged build (it succeeds
+  and lands somewhere plausible; it published a false #104 datum), and a
+  probe's zero is only as good as its SITE (`0x27FAA` is real code that is
+  never entered — 0 hits, while its sibling `0x27FA0` takes 904 on the same
+  rig; and a control site must be reachable under the RIG's conditions, or
+  "POKES disables GUARD_PROBE" looks true twice in a row).

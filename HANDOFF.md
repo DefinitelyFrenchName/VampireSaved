@@ -1345,23 +1345,46 @@ tests/audit_don_ko_writer.sh          # 14z-98 (GitHub #103): THE ROOT-CAUSE
                                       # rehearsal caught the RH-19 window
                                       # trap now documented at leg A.
                                       # ~9 min, 2 parallel MAME runs.
-tests/audit_don_grab_pose.sh          # 14z-98 (6), GitHub #104: Victor's
-                                      # 6+HP headbutt grab holds a tenant
-                                      # victim on THE WRONG ANIM RECORD —
-                                      # ours maps to vs2 src 0x287370
-                                      # (renders horizontal/squished),
-                                      # native holds 0x287418 (upright).
-                                      # Selection defect, not content
-                                      # (release records mismatch by a
-                                      # DIFFERENT delta). Leg B anchors
-                                      # native + rig liveness; leg A
-                                      # freezes the defect
-                                      # (EXPECT_MATCH=0; flip at the fix).
-                                      # ours->vs2 mapping DERIVED from the
-                                      # build's placements.json anim row.
+tests/audit_don_grab_pose.sh          # 14z-98 (6), REBUILT 14z-99,
+                                      # GitHub #104: a legacy grab holds a
+                                      # TENANT victim on the wrong capture
+                                      # record. MECHANISM = THE VARIANT-ROW
+                                      # ALIAS class (re-measured 14z-99, NOT
+                                      # the "reaction-index generation
+                                      # drift" 14z-98 (9) claimed — that and
+                                      # its 5-table reorder are RETRACTED in
+                                      # the script header): the capture set
+                                      # is selected PER VICTIM through
+                                      # 32-row structures whose rows
+                                      # 0x10-0x1F copy 0x00-0x0F, so a
+                                      # tenant is served the base character
+                                      # it folds onto. Donovan 0x13->0x03
+                                      # gets Victor's index 6 (native 11);
+                                      # Phobos 0x10->0x00 gets Bulleta's 12
+                                      # (native 26); PYRON 0x11->0x01 gets
+                                      # Demitri's 11, which IS his correct
+                                      # one — right by coincidence, and why
+                                      # the field named D and P only.
+                                      # SECTION 0 IS A LEGACY-VICTIM
+                                      # CONTROL: both engines must install
+                                      # the SAME index for a legacy victim
+                                      # or the shared-convention premise is
+                                      # dead and every tenant verdict here
+                                      # is meaningless. The anim region is
+                                      # resolved PER VICTIM (anim /
+                                      # anim@huitzil / anim@pyron) — doing
+                                      # that unconditionally through
+                                      # "anim" is what produced the
+                                      # retracted 14z-98 (7) Pyron reading
+                                      # on the MERGED build. Hold detected
+                                      # from hp-DROP samples (no tuned pixel
+                                      # window); a non-majority modal is
+                                      # NO-HOLD. EXPECT_MATCH=0 freezes the
+                                      # defect; flip at the fix. VICTIMS=
+                                      # overrides the set.
                                       # Rig: replays/96_don_victor_grab.rpl
                                       # (4 connects/run, no HP pokes).
-                                      # ~5 min, 2 parallel MAME runs.
+                                      # ~12 min, 8 MAME runs (2 at a time).
 tests/audit_continue_ladder.sh        # 14z-98 (4), GitHub #102 (CLOSED
                                       # 2026-08-19, maintainer-ruled NOT
                                       # OURS — this is now the REGRESSION

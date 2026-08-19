@@ -2023,6 +2023,68 @@ in palette space, two rounds after the real mistake. Fix is a
 `[[port_patch]]` remapping 7 -> vsavj's last class 6 (for the shared
 `x088512` zone: `0x08B0F8`, `000e` -> `000c`).
 
+## THE CAPTURE-POSE INSTALLER (14z-99, measured on Victor's 6+HP grab)
+
+**Read this before touching any grab/capture surface for a tenant.** It is
+the site of GitHub #104 and it is a variant-row alias defect, not a data
+port problem — the ported data is correct.
+
+A held (captured) victim's pose is installed by a shared engine routine
+whose two entry points sit at `PRG:0x27FA0` and `PRG:0x27FAA`:
+
+```
+0x27FA0  moveq #0,d1 ; movea.l #$bcffa,a0   <- anim_index_c DIRECTLY
+0x27FAA  andi.w #$c,d1 ; movea.l $27fee(pc,d1.w),a0   <- one of FOUR siblings
+0x27FB2  movea.w $32(a6),a4        ; a4 = the VICTIM
+         move.b $382(a4),d1 ; lsl.w #2 ; movea.l (a0,d1.w),a0
+                                   ; a0 = the victim's per-char offset table
+         andi.w #$ff,d0 ; add.w d0,d0
+         move.w (a0,d0.w),d0 ; lea (a0,d0.w),a0     ; record = table + word[D0]
+0x27FCE  move.l a0,$1c(a4)         ; install on the victim
+```
+
+Two facts that cost time in 14z-98/99, both measured:
+
+- **`0x27FAA` is never executed.** It is real, correct code and the
+  four-sibling table at `0x27FEE` is real, but every live path enters
+  `0x27FA0` — 0 probe hits at `0x27FAA` against 904 at `0x27FA0` on the
+  same replay. The sibling in play is always `anim_index_c` (`0x0BCFFA`).
+- **`D0` — the capture index — is supplied by the CALLER**, and the caller
+  is the attacker's own anim-node walk: `0x27F70` advances the attacker's
+  node (`($1c,A6)`, 0x18 stride) into the capture positioner at
+  `0x028072`, which writes the victim's position from the node's keyframe
+  (`add.w ($10,A6),D0` / `add.w ($14,A6),D1` -> `($10,A4)`/`($14,A4)`) and
+  tail-branches `move.w (A0),D0 ; bra $27fa0`. So one node supplies BOTH
+  the victim's offset and its pose index.
+
+**The index is per VICTIM and the convention is SHARED between the
+engines** — this is the load-bearing measurement, and it is what refutes
+the "reaction-index generation drift" reading (STATE 14z-98 (9),
+retracted). Same rig, ours vs native vsav2, index installed at victim
+`+0x1C`: Bulleta 12/12, Demitri 11/11, Victor 6/6, Lilith 9/9.
+
+**The defect:** the victim's capture set resolves through 32-row
+per-character structures whose rows `0x10-0x1F` are byte-copies of
+`0x00-0x0F` (the port's most common defect shape), so a TENANT victim is
+served the base character it folds onto — Donovan `0x13`->`0x03` gets
+Victor's index 6 where native gives 11; Phobos `0x10`->`0x00` gets
+Bulleta's 12 where native gives 26. **Pyron `0x11`->`0x01` gets Demitri's
+11, which is also his correct value** — right by coincidence, and exactly
+why the field report named Donovan and Phobos and not him.
+
+**Which structure performs that resolution is still open**, and these are
+eliminated with controls rather than assumption: on merged-m3 the
+`anim_index` family (a/a2/b/c/proj) and all 14 per-character dispatch
+tables have rows `0x10/0x11/0x13` MOVED OFF the vanilla alias for all three
+tenants, so none is handing a tenant its fold row, and `0xBE27A` (the keyframe
+block table, `throw_victim_keyframes`) is **ATTACKER-indexed** — A0 sat
+inside Victor's block while row `0x13` pointed at the tenant's own placed
+block. A0 is per-victim and identical for Victor and Donovan (`0x099296`),
+for Bulleta and Phobos (`0x098d6e`); Demitri's is `0x098f26`. Bisecting
+where A0 first diverges between two victims names the fold site.
+
+Gate: `tests/audit_don_grab_pose.sh` (legacy-victim control in section 0).
+
 ## Throw / physics-arc tables (14z-67, measured on the command grab)
 
 The victim's launch physics come from a per-throw ROW installed by

@@ -189,6 +189,13 @@ starter bsr's (vsavj 0x27A34 / vs2 0x26C86). Capture-pose per-victim
 sets at `PRG:0x0BCE7A/0x0BCEFA/0x0BCF7A/0x0BCFFA` (the Midnight-Bliss
 family; 32 rows x 4 bytes each), read by the capture-victim installer
 (indexed by VICTIM id, seq id from the ATTACKER's code).
+**The installer is `PRG:0x27FA0` and it always uses `0x0BCFFA`
+(anim_index_c) — the sibling-selecting entry `0x27FAA` is never executed
+(0 hits vs 904, measured 14z-99). The index in D0 comes from the
+attacker's capture-positioner node (`0x028072`) and is PER VICTIM; the
+convention is shared between vsavj and vs2 (legacy victims install the
+same index on both engines). See engine_internals "THE CAPTURE-POSE
+INSTALLER" — this is the GitHub #104 surface.**
 
 ## Fighter + effect-pool fields (14z-67, measured on the H effect arc)
 

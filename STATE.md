@@ -1,5 +1,117 @@
 # STATE — living progress log
 
+## Session 14z-99 — #102 CLOSED; #104 RE-MEASURED AND RE-ROOT-CAUSED: it is
+## the VARIANT-ROW ALIAS class, not an index-space generation drift. Two of
+## my own 14z-98 claims retracted, one of them an instrument bug.
+
+**#102 CLOSED** (maintainer-ruled 2026-08-19, not ours). The discriminator
+had already answered in 14z-98 (4); the ruling was taken and executed:
+issue commented + closed, NEXT_SESSION banner moved it out of Open into a
+CLOSED block, STATE's pending item marked DECIDED in place,
+`audit_continue_ladder.sh` and its HANDOFF row re-scoped as the REGRESSION
+LOCK (leg A red ⇒ the behavior was ours after all ⇒ #102 reopens).
+
+**#104: the staged fix design was falsified BEFORE it was built.** The
+14z-98 (9) shape — "generation drift in the reaction-index space; derive
+the permutation from the legacy twins; REORDER 5 sibling tables x 3
+tenants" — rests on a premise that measures false, caught by a static
+pre-check that cost two commands:
+
+- The legacy twins the permutation was to be derived FROM are
+  **byte-identical**: `anim_index_c` row 3 (Victor), vsavj `0x157A50` vs
+  vs2 `0x13FAA2`, entry for entry over 32 entries; 10 of the 16 base rows
+  match the same way. A permutation derived from them is the IDENTITY, so
+  the reorder is a no-op.
+- One permutation could not explain both tenants anyway (Donovan resolved
+  to index 6, Pyron to a non-entry — the latter turned out to be my own
+  instrument bug, below).
+
+**THE REAL MECHANISM, measured over seven victims on both engines.** The
+capture pose is selected PER VICTIM, through 32-row per-character
+structures whose rows `0x10-0x1F` are byte-copies of `0x00-0x0F` (verbatim
+the variant-row alias class, `docs/game/atlas` passim). A tenant victim is
+served the BASE character it folds onto. Index installed at victim `+0x1C`,
+ours vs native vsav2:
+
+| victim | id → fold | ours | native | verdict |
+|---|---|---|---|---|
+| Bulleta | 0x00 | 12 | 12 | legacy — engines AGREE |
+| Demitri | 0x01 | 11 | 11 | legacy — engines AGREE |
+| Victor | 0x03 | 6 | 6 | legacy — engines AGREE |
+| Lilith | 0x0e | 9 | 9 | legacy — engines AGREE |
+| **Phobos** | 0x10 → 0x00 | **12** | 26 | **WRONG (Bulleta's)** |
+| Pyron | 0x11 → 0x01 | 11 | 11 | right BY COINCIDENCE |
+| **Donovan** | 0x13 → 0x03 | **6** | 11 | **WRONG (Victor's)** |
+
+The legacy rows are the load-bearing part: **the reaction-index convention
+is SHARED between the engines**, which is what kills the drift reading. And
+the fold predicts the field report exactly — the maintainer named Donovan
+and Phobos and not Pyron, because Pyron's fold value coincides with his
+correct one.
+
+**MY OWN INSTRUMENT WAS THE OTHER DEFECT.** `audit_don_grab_pose.sh`
+resolved every tenant's record through `placements["regions"]["anim"]`,
+which on a MERGED build is DONOVAN's placement — so the 14z-98 (7)
+"Pyron mismatches too, ours 0x26654C" was an artifact. Through
+`anim@pyron` his record maps to `0x26614C`, identical to native. Retracted
+at the issue, in STATE 14z-98 (7), in NEXT_SESSION and in the audit header.
+
+**The gate is rebuilt and stronger:** per-victim region resolution; a
+**LEGACY-VICTIM CONTROL as section 0** (if the two engines ever install
+different indices for a legacy victim, the shared-convention premise is
+dead and every tenant verdict in the file is meaningless — it fails loudly
+and says so); per-tenant frozen expectations including Pyron's coincidence;
+and the hold is now detected from hp-DROP samples rather than a tuned 48px
+window, so there is one less victim-specific constant to rot. A modal that
+is not a strict majority reports NO-HOLD — a split reading is not a
+measurement. AUDIT PASS on merged-m3.
+
+**STILL OPEN — and it is what the fix needs: WHICH structure resolves
+victim-id → capture set.** Eliminated with controls, not by assumption:
+- the `anim_index` family (a/a2/b/c/proj) **and all 14 per-character
+  dispatch tables** have rows 0x10/0x11/0x13 MOVED OFF the vanilla alias
+  for all three tenants on merged-m3 (built-vs-vanilla diff of every such
+  row). That is the elimination needed here — none of them is handing a
+  tenant its fold row. It is NOT a claim that each points at the right
+  target;
+- `0xBE27A` is **ATTACKER**-indexed, not victim-indexed: A0 sat inside
+  Victor's block while row 0x13 pointed at the tenant's own `0x400010`.
+The selector is reached inside the ATTACKER's own anim node walk —
+`0x27F70` (node walker, `($1c,A6)`, 0x18 stride) → the capture positioner
+at `0x028072`, whose tail `move.w (A0),D0; bra $27fa0` supplies the index
+to the shared installer at `0x27FA0`. A0 is per-victim and IDENTICAL for
+Victor and Donovan (`0x099296`), for Bulleta and Phobos (`0x098d6e`), and
+Demitri's is `0x098f26`.
+**NEXT MEASUREMENT (named, cheap):** bisect where A0 first diverges between
+a Demitri-victim and a Donovan-victim run — `GUARD_PROBE_TRACE` between two
+consecutive hits at `0x27FA0`, or a probe on the node-install site
+`0x27EE8` with history. That names the fold site, and the fix follows its
+shape (a repointed row if it is a table, a widened mask if it is code).
+
+**Two probe facts worth keeping.** `0x27FAA` (the four-sibling selector
+entry) is NEVER executed — 0 hits over a full replay while `0x27FA0`
+(which loads `anim_index_c` directly) takes 904. And the documented
+"RET (SP) lies for jmp-reached code" gotcha bit here exactly as written:
+every PROBE line reported `RET 00ff02dc`, a RAM address, because the
+positioner tail-branches into the installer; `GUARD_PROBE_HIST` is what
+named the caller.
+
+**A CLAIM I RAISED AND KILLED MYSELF, recorded so nobody re-derives it:**
+"setting POKES silently disables GUARD_PROBE". Reproduced twice at
+`0x2AD82` (501 hits without pokes, 0 with) and it looked like a serious
+instrument defect. It is not: at the LIVE site `0x27FA0` the same poked run
+gives 904 hits. The palette-seq resolver simply is not reached in a
+forced-pick Donovan/Victor run. Tested before publishing, per the
+verdict-logic doctrine.
+
+**No shipped byte moved.** The 14z-96 freeze stands.
+
+**Decisions pending (maintainer):** unchanged from the 14z-98 list except
+that #102 is now closed and #104's fix shape is no longer "table reorder" —
+its row set waits on the open measurement above and still rides the same
+re-freeze window.
+
+
 ## Session 14z-98 CLOSE — ritual complete (the full session: (1)-(9))
 
 The largest-yield session since the review triage: **#103 root-caused,
@@ -48,6 +160,17 @@ needed); (c) if the window is ruled open, the #103/#43(b) re-freeze.
 ## Session 14z-98 (9) — #104's MECHANISM CLOSED: a GENERATION DRIFT IN
 ## THE VICTIM-REACTION INDEX SPACE. The tables were ported and repointed
 ## RIGHT; the engine indexes them with the other generation's meanings.
+## [RETRACTED 14z-99 — the header above is WRONG and the fix it designs is
+## a no-op. The index space is NOT generation-drifted: the legacy twins
+## this entry proposes deriving the permutation FROM (Victor row 3,
+## vsavj 0x157A50 vs vs2 0x13FAA2) are BYTE-IDENTICAL entry for entry, and
+## a legacy victim installs the SAME index on both engines (measured over
+## Bulleta/Demitri/Victor/Lilith). The real mechanism is the VARIANT-ROW
+## ALIAS class — the capture set is selected PER VICTIM and a tenant folds
+## to its base character. Point 3 below is the measurement that misled:
+## "vsavj passes 6 where vs2 passes 11" is true, but 6 is VICTOR's value,
+## reached because Donovan 0x13 folds to 0x03 — not because the table is
+## ordered differently. See 14z-99.]
 
 One tap pair finished it (read_tap ff881c both legs, PC-attributed):
 
@@ -116,7 +239,16 @@ taken a full MAME field session clean (the earlier FBNeo wide-array
 report said the same). #99 remains parked-not-reproduced on both
 emulators' field sessions.
 
-**#104, extended and sharpened (same-day):** the Victor-grab rig run
+**#104, extended and sharpened (same-day):**
+[RETRACTED 14z-99: PYRON'S HELD RECORD IS CORRECT — ours maps to
+0x26614C, identical to native. The 0x26654C below is an INSTRUMENT
+ARTIFACT: audit_don_grab_pose.sh resolved every tenant through
+placements["regions"]["anim"], which on a MERGED build is DONOVAN's
+placement. Fixed 14z-99 (the region is resolved per victim). Pyron is
+right because his fold 0x11->0x01 lands on Demitri's index 11, which is
+also his correct one — which is why the field report named Donovan and
+Phobos and not him.]
+the Victor-grab rig run
 against P2 PYRON — his held record mismatches too: ours (mapped)
 vs2-src 0x26654C vs native 0x26614C, a DIFFERENT delta than Donovan's
 (-0xA8 vs +0x400) -> per-victim wrong row selection, victim-side and
