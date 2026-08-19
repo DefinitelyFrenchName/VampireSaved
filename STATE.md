@@ -1,5 +1,75 @@
 # STATE — living progress log
 
+## Session 14z-97 (3) — THE ARCADE QUIRKS ARE CONFIRMED AND FILED AS #102:
+## two symptoms, one already-measured mechanism, and one cheap test that
+## decides whether the defect is even ours
+
+**Maintainer, 2026-08-19, asked whether later matches land on earlier venues:**
+
+> yes, and the total number of matches can exceed the arcade norm
+
+The second half is NEW — nobody had looked for it — and it is what the first
+half ENTAILS, which is why the pair is worth more than either observation.
+
+### Both symptoms fall out of the in-use mask, which is already mapped
+
+`ram.md:96`: `0x00aeca` scans one index across the candidate-class pool
+`$FF1E48` and the stage list `$FF1E50`, takes the **first candidate whose
+class bit is FREE in `RAM:$FF8110.l`**, writes that class to the opponent's
+`$382` and table B's byte at the same index to `$FF8100` as the stage. The
+marathon measured the healthy shape: match-2 selection sets the match-1
+opponent's class bit and advances `$FF8114`, and the stage follows the index.
+
+So if bits that should be set are free: the scan picks a LOWER index →
+**earlier venue** (the stage follows the index), and the pool never exhausts →
+**more matches than the norm**. One mechanism, both symptoms.
+
+Consistent with "quirks, not a crash": poking `$FF8110` to all-ones does not
+crash — the scan clamps at bound `$FF8138`=6 onto a legal pair, `END 40620`.
+
+### The tenant-specificity hypothesis composes two documented facts
+
+`ram.md:96` records `$FF8110.l` as **"sound-state-fed, the run-to-run
+lottery"**, and 14z-94 already leaned on that as load-bearing: *"Live sfx
+helper → different sound state → different demo selection → whole machine.
+Documented mechanism, not a leak."* The tenants' sound differs from legacy by
+construction (authored voice tables, the M5 batch, the #101 kernel port). So
+switching to/from a VS2 character changes sound state → perturbs the mask →
+moves opponent AND venue. Tenant-specific with no index-width defect needed.
+
+**NOT the obvious guess, recorded so it is not re-proposed:** `btst` makes the
+mask MOD 32 and a class ≥ 32 aliases — but tenant classes are 0x10/0x11/0x13
+(16/17/19), all below 32. Aliasing is not it.
+
+Status: a hypothesis composing two measured facts, NOT measured for this
+symptom.
+
+### IS IT OURS? — the discriminator, and it is one sitting
+
+The atlas word is "lottery". If vanilla's ladder already varies with sound
+state, "later matches at earlier venues" may sit inside vanilla's own envelope
+— newly VISIBLE rather than newly BROKEN, since the superset invariant governs
+identical inputs and this path is documented sound-state-dependent in vanilla.
+
+**Run the same chain — loss, continue, character switch — with LEGACY
+characters only.** Drifts the same → not ours, severity collapses. Never
+drifts → ours, and the sound-state hypothesis is the first thing to measure.
+Requested alongside the MAME retest rather than built as a rig, because no
+instrument here can reach the state: `26_don_arcade_mash` is SINGLE-CREDIT so
+it cannot take the continue path, and it reaches two rungs of about eight.
+
+### Filed as #102, deliberately NOT folded into #99
+
+They share a road — #99's named prerequisite is "why does the ladder reset
+after rung 2", and #102 is a defect in exactly that bookkeeping — but they are
+different defects. The last time two threads in this area were assumed to be
+one investigation they turned out to be two (#93 / #101). What it changes for
+#99 is priority, not parking: the two-rung ceiling is why every negative about
+that crash is bounded, and #102 is plausibly the ceiling.
+
+**Scope unchanged:** arcade is extended scope, 2P versus is the must-have.
+Nothing here gates the roster.
+
 ## Session 14z-97 (2) — MAINTAINER FIELD REPORT on merged-m3: no crash on
 ## FBNeo over a wide array, sound confirmed, arcade-chaining quirks remain
 

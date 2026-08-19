@@ -10,19 +10,24 @@
 > ## 764 ops; tags `freeze/*`). **NO BUILD BYTE MOVED IN 14z-97** — it was
 > ## gate work end to end. The build to play: `tools/run_wide.sh
 > ## build/m3b_merged10 fbneo`. **FIELD REPORT IN (2026-08-19, after the
-> ## close): no crash on FBNeo over a wide array, sound confirmed corrected,
-> ## arcade-chaining quirks remain — see STATE 14z-97 (2). #99 STAYS PARKED
-> ## (no repro protocol), but that negative is much stronger than the rig
-> ## one already in the record and the two must not be conflated.**
+> ## close): no crash on FBNeo over a wide array, sound confirmed corrected —
+> ## and the arcade quirks CONFIRMED and filed as #102 (later matches at
+> ## earlier venues + the chain exceeding the arcade norm; one mechanism, the
+> ## in-use mask $FF8110). STATE 14z-97 (2) and (3). #99 STAYS PARKED (no
+> ## repro protocol), but its FBNeo negative is much stronger than the rig
+> ## one already in the record and the two must not be conflated. FOUR issues
+> ## open again: #99, #43, #50, #102.**
 > ##
 > ## **START HERE: there is no assigned task.** Ranked, if no field report
 > ## is waiting:
 > ## 1. **#43(b)** — ruled SPLIT, (a) landed 14z-95; (b) moves 3
 > ##    reconciliation rows and therefore built bytes, so it needs a
 > ##    re-freeze window the maintainer opens. ASK, do not assume.
-> ## 2. The architecture backlog: #69, #71, #46, #94 (the standing
+> ## 2. **#102** — but ask for the LEGACY-ONLY control first; it may show
+> ##    the defect is vanilla's own sound-state lottery, which collapses it.
+> ## 3. The architecture backlog: #69, #71, #46, #94 (the standing
 > ##    reference-rot check — see the note below, it has a fresh instance).
-> ## 3. Coverage: the pool-vs-pool contact rig (14z-96 (3) records three
+> ## 4. Coverage: the pool-vs-pool contact rig (14z-96 (3) records three
 > ##    eliminated geometries and the now-unambiguous probe).
 > ##
 > ## **TWO STANDING HOLDS — do not start either:**
