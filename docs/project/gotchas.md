@@ -2609,3 +2609,29 @@ held together) is what registers. The 71/73 rigs' separated presses work
 for SOME moves, so a motion that "does nothing" should try the overlap
 shape before concluding anything about the game. [game-adjacent; filed
 here because the trap is the REPLAY GRAMMAR, not the engine]
+
+## 14z-98: two traps from the #103 close — both are -debug INSTRUMENT
+## grammar, and both misread a measurement for a full round each
+
+**Every -debug watch configuration is its own TIMELINE, not just
+"different from non-debug".** Three trace_writes runs on the SAME rig
+with the SAME pokes — differing only in the WATCH argument — took three
+different match trajectories: one stalled at f3260, one drained the
+white bar to exactly 0 at ~f6957, one cycled round restarts through
+f8921. Reading run B's hit inventory against run A's state map produced
+"the kill commit never runs for Donovan" from a timeline that contained
+no Donovan death at all. The 14z-97b entry said "the -debug timeline is
+a different run"; the extension is that EACH -debug configuration is —
+two -debug runs are not comparable either. Remedy, now in the
+instrument: `trace_writes.lua` takes `DUMPS` (14z-98), so a trace run
+carries its own state anchors; interpret hits only against anchors from
+the SAME run. (Also worth knowing while reading its logs: the wpset
+stop PC is the instruction AFTER the access — the writer/reader is the
+instruction before the logged PC.)
+
+**`GUARD_PROBE`'s `RET <(SP)>` is a caller only for jsr-reached code.**
+A routine reached by `jmp`/`bra` (every jump-table dispatch in this
+engine) shows whatever the stack last held — measured: `RET 00ff02dc`,
+which is sound-task DATA, chased as "a RAM-resident caller" for a
+round. `GUARD_PROBE_HIST=N` gives the true path; prefer it whenever the
+callee could be branch-reached.

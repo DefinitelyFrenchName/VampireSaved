@@ -19,6 +19,14 @@
 --                    reads as "this table is never used" (14z-71).
 --   env TRACE_OUT    log path (default trace_writes.txt)
 --   env FRAMES       stop after this many frames (default 3600)
+--   env DUMPS        "frame:lo-hi;..." (replay.lua grammar) — RAM dumps
+--                    written next to TRACE_OUT as dump_<frame>_<lo>.bin.
+--                    ADDED 14z-98: every -debug watch configuration is
+--                    its own TIMELINE (three same-poke trace runs took
+--                    three different match trajectories — the 14z-97b
+--                    gotcha, extended), so state anchors must come from
+--                    the SAME run as the trace or the hits cannot be
+--                    interpreted. A trace run should be self-documenting.
 --
 -- Each hit logs: frame, PC, watched address, and D0/D1/A0-A6 — enough to
 -- identify the source table pointer for table-copy loops without a full
@@ -113,6 +121,15 @@ end
 -- POKES (14z-68): same grammar/application point as replay.lua, so the
 -- forced-pick rigs can be traced.
 local poke_space = cpu.spaces["program"]
+-- DUMPS (14z-98): see the header. Same grammar/application point as
+-- replay.lua's DUMPS; files land next to TRACE_OUT (the 14z-93 gotcha).
+local dumps = {}
+for spec in (os.getenv("DUMPS") or ""):gmatch("[^;]+") do
+    local fr, lo, hi = spec:match("^(%d+):(%x+)-(%x+)$")
+    assert(fr, "DUMPS spec must be frame:hexlo-hexhi — got " .. spec)
+    dumps[#dumps + 1] = { tonumber(fr), tonumber(lo, 16), tonumber(hi, 16) }
+end
+local dump_dir = out_path:match("^(.*)/") or "." 
 local pokes = {}
 for spec in (os.getenv("POKES") or ""):gmatch("[^;]+") do
     local fr, addr, hexs = spec:match("^(%d+):(%x+):(%x+)$")
@@ -129,6 +146,17 @@ emu.register_frame_done(function()
                 poke_space:write_u8(a, tonumber(b, 16))
                 a = a + 1
             end
+        end
+    end
+    for _, dm in ipairs(dumps) do
+        if dm[1] == frame then
+            local df = assert(io.open(string.format("%s/dump_%d_%x.bin",
+                                                    dump_dir, frame, dm[2]), "wb"))
+            local bytes = {}
+            for a = dm[2], dm[3] - 1 do
+                bytes[#bytes + 1] = string.char(poke_space:read_u8(a))
+            end
+            df:write(table.concat(bytes)); df:close()
         end
     end
     if FIELDS then
