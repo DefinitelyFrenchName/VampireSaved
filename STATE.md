@@ -1,5 +1,91 @@
 # STATE — living progress log
 
+## Session 14z-97 (4) — REFERENCE CURRENCY: the gate that catches rotted
+## build references could not see 11 of them, and cannot see STALENESS at all
+
+Picked up while the maintainer playtests, deliberately CPU-light so it does
+not compete with their MAME session. Two measured gaps in
+`tests/test_build_ref_rot.sh` (#94's gate), plus one live trap found on the
+way.
+
+### Gap 1 — coverage: 21 of 32 references
+
+Its pattern matched `VAR="${1:-build/x}"`, a POSITIONAL default. Eleven
+references use the named-env idiom `BUILD="${BUILD:-build/don_m7}"` and were
+invisible — in a gate whose entire purpose is to have no blind spot. None of
+the eleven is rotted today, which is the only time closing a hole is cheap.
+Coverage is now 32.
+
+### Gap 2 — currency, which rot cannot see, and it is a DIFFERENT failure
+
+Every reference reports `ok` the moment it LOADS, and **a superseded build
+loads perfectly**. That is exactly how #96 happened one level up: the M2
+battery judged today's build against `donovan-m2c`, five generations back, and
+was green about it for weeks. Same shape at 14z-92
+(`test_merged_render_content`'s huitzil leg produced NO measurement since
+14z-86 while printing a content mismatch) and at 14z-95 (`audit_pyron_ring`
+compared two builds that stop being comparable at f4741).
+
+Currency is now REPORTED by two signals that need no external source of truth:
+
+1. **Registry** — fingerprint the referenced build, look the set up in
+   `registry.tsv`, compare against the newest row of its family.
+2. **Family disagreement** — several gates naming different dirs for the same
+   role; at most one can be current. This is what catches the MERGED build,
+   which has no registry row by design.
+
+**Measured today: 3 current, 16 superseded**, and the three current ones are
+`audit_merged_legacy`'s leg-(b) solos — the references the 14z-96 freeze
+re-pointed. So the signal discriminates within a single run rather than
+condemning everything, which is the internal control on it.
+
+| family | referenced at |
+|---|---|
+| `build/don_m*` | don_m5, don_m7, **don_m8** |
+| `build/hui*` | hui25, hui30, hui31, hui37, hui38, hui41, hui43, **hui44** |
+| `build/m3b_merged*` | m3b_merged, m3b_merged9, **m3b_merged10** |
+| `build/pyron*` | pyron17, pyron21, pyron26, pyron27, **pyron28** |
+
+**IT REPORTS AND DOES NOT FAIL, deliberately.** A superseded reference is
+often CORRECT — the pre-fix build in an A/B audit, a known-bad ground-truth
+reference — and only the gate's author knows which. Failing would either be
+wrong or would force ~16 declarations written by somebody guessing at intent.
+**The report is the triage worksheet.** Re-pointing is a scheduled job, not a
+sweep: several of the 16 carry expectations MEASURED on the old build
+(`audit_flicker_attribution`'s frozen flicker frames are the clear case), so
+re-pointing them costs a re-measurement each — emulator time that would
+compete with a playtest.
+
+**Isolation proven, not asserted:** a synthetic exception injected into the
+currency body is reported as `(currency report failed: … — the ROT verdict
+below is unaffected)`, exit stays 0, and the rot verdict still prints. Written
+because today already produced one control that passed BY CRASHING.
+
+### The live trap found on the way: the playtest launcher's default
+
+`tools/run_wide.sh` defaulted its build argument to **`build/m5w`** — the one
+build HANDOFF says in capitals not to play (the 14z-60y sprite-garble
+artifact, kept as evidence). It is also pre-WIDE-v1.1 (19 members, no
+`vsw.z01/z02`), so a bare `tools/run_wide.sh` did not even launch it: it
+failed in a way that reads as "the WIDE track is broken" rather than "you
+forgot the argument" — the confusing-failure class that script's own header
+exists to prevent.
+
+Fixed WITHOUT a new pin, because a hardcoded "current build" re-dates itself
+at every freeze (the very class above): the build argument is now REQUIRED,
+and bare invocation LISTS the WIDE builds on disk newest-first, so the help
+stays correct without being maintained. `build/m5w` and `build/merged1` (the
+legacy-only instrument whose tenants draw BLANKS) are refused BY NAME with
+their reasons; `RUN_WIDE_ALLOW_KNOWN_BAD=1` overrides for deliberate
+garble reproduction. Exit codes: refusal 1, usage 2.
+
+### Also corrected: a stale claim I introduced earlier the same day
+
+`NEXT_SESSION` named "the architecture backlog: #69, #71, #46, #94". **All
+four are CLOSED** (14z-94's sweep); I carried the list forward without
+checking it. The tracker is #99, #43, #50, #102 and nothing else. Corrected in
+place with the correction visible, per the retraction discipline.
+
 ## Session 14z-97 (3) — THE ARCADE QUIRKS ARE CONFIRMED AND FILED AS #102:
 ## two symptoms, one already-measured mechanism, and one cheap test that
 ## decides whether the defect is even ours

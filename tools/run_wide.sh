@@ -15,13 +15,59 @@
 # hardware registers to the sound dispatcher as if they were sound records.
 #
 # Usage:
-#   tools/run_wide.sh [build_dir] [fbneo|mame] [extra args...]
-# Defaults: build/m5w, fbneo.
+#   tools/run_wide.sh <build_dir> [fbneo|mame] [extra args...]
+# The emulator defaults to fbneo. THE BUILD DOES NOT DEFAULT — see below.
+#
+# IT USED TO DEFAULT TO build/m5w (fixed 14z-97), and that is the one build in
+# the tree HANDOFF says in capitals not to play: the KNOWN-BAD artifact of the
+# 14z-60y sprite garble, kept as evidence. It is also pre-WIDE-v1.1 (19
+# members, no vsw.z01/z02), so a bare `tools/run_wide.sh` did not even launch
+# it — it failed in a way that reads as "the WIDE track is broken" rather than
+# "you forgot the argument", which is exactly the confusing-failure class this
+# script's own header exists to prevent.
+#
+# The replacement is NOT a new hardcoded default. A pinned "current build"
+# re-dates itself at every freeze — the class tests/test_build_ref_rot.sh now
+# reports on. Instead: no default, and the usage message LISTS the WIDE builds
+# actually on disk, newest first, so it stays correct without being updated.
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"
-BUILD="${1:-build/m5w}"; [ $# -gt 0 ] && shift || true
+
+if [ $# -lt 1 ]; then
+    echo "usage: tools/run_wide.sh <build_dir> [fbneo|mame] [extra args...]" >&2
+    echo >&2
+    echo "WIDE builds present here, newest first:" >&2
+    for _d in $(ls -dt build/*/ 2>/dev/null); do
+        _d="${_d%/}"
+        [ -f "$_d/rompath/vsavjw.zip" ] || continue
+        case "$_d" in
+            build/m5w) echo "  $_d   — KNOWN-BAD (14z-60y sprite garble); do not play" >&2 ;;
+            build/merged1) echo "  $_d  — legacy-only instrument, tenants draw BLANKS" >&2 ;;
+            *) echo "  $_d" >&2 ;;
+        esac
+    done
+    exit 2
+fi
+BUILD="$1"; shift
 EMU="${1:-fbneo}";       [ $# -gt 0 ] && shift || true
+
+# Two builds must never be launched by accident. Both are kept ON PURPOSE and
+# both look launchable; neither is something to playtest.
+case "$BUILD" in
+build/m5w|./build/m5w)
+    echo "REFUSING build/m5w: it is the KNOWN-BAD artifact of the 14z-60y" >&2
+    echo "  sprite garble, kept as evidence (HANDOFF build registry). Its" >&2
+    echo "  romset serves PRISTINE tiles for the members the build patched." >&2
+    echo "  Set RUN_WIDE_ALLOW_KNOWN_BAD=1 if you are deliberately" >&2
+    echo "  reproducing the garble." >&2
+    [ "${RUN_WIDE_ALLOW_KNOWN_BAD:-0}" = 1 ] || exit 1 ;;
+build/merged1|./build/merged1)
+    echo "REFUSING build/merged1: it is the MERGED-LEGACY INSTRUMENT — gfx" >&2
+    echo "  skipped, so all three tenants draw BLANK tiles by design" >&2
+    echo "  (see its README-LEGACY-ONLY.txt). Play build/m3b_merged*." >&2
+    [ "${RUN_WIDE_ALLOW_KNOWN_BAD:-0}" = 1 ] || exit 1 ;;
+esac
 ROMDIR="${ROMDIR:?set ROMDIR to the reference-set directory}"
 
 RP="$REPO/$BUILD/rompath"

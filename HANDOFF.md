@@ -147,6 +147,14 @@ rendering change. Ground truth: `tests/test_replay_video_selfcheck.sh`.
 ```sh
 export ROMDIR=/path/to/reference/sets
 tools/run_wide.sh build/m3b_merged10 fbneo # THE 3-TENANT BUILD (all 18
+                                           # (14z-97: the build argument is
+                                           # now REQUIRED. It used to default
+                                           # to build/m5w — the known-bad
+                                           # garble artifact this file says
+                                           # not to play. Bare invocation now
+                                           # lists the WIDE builds on disk,
+                                           # newest first; m5w and merged1 are
+                                           # refused by name.)
                                            # selectable, art included) =
                                            # merged-m3, FROZEN 14z-96 —
                                            # merged-m2 + the #101 kernel
@@ -2383,7 +2391,7 @@ swallows the rest of the list, which is how a 32-entry run silently became 28.
 | `test_static_runner.sh` | #30 | ground truth for `run_all_static.sh`'s PASS/SKIP/FAIL classifier. Sharpest case: SKIP in PROSE must still count PASS. |
 | `test_battery_accounting.sh` | #24 | `run_battery_m2.sh` cannot print BATTERY GREEN while gates self-skip; counts branch skips by group size. |
 | `test_decrypt_cache.sh` | #69 | the decrypt cache delivers full, correct images; a TRUNCATED cache is refused, not silently served. |
-| `test_build_ref_rot.sh` | #94 | no hardcoded `build/<name>` ROMSET default has rotted. Distinguishes what a script READS; absent is reported, never failed. |
+| `test_build_ref_rot.sh` | #94 → 14z-97 | A hardcoded `build/<name>` default must not have ROTTED (present, read as a romset, too old to carry the members the reader needs). **Extended 14z-97 twice:** the pattern matched POSITIONAL defaults only, so eleven named-env references (`BUILD="${BUILD:-build/don_m7}"`) were invisible — coverage 21 → 32; and it now REPORTS CURRENCY, which rot cannot see, because a superseded build loads perfectly (that is how #96 happened one level up). Currency reports and never fails: a superseded reference is often correct, and only the gate's author knows which. Today: 3 current, 16 superseded. |
 | `test_select_port_hygiene.sh` | #46 | `select_port` is chainable, idempotent, and free of unreachable code — while KEEPING the round-22 analysis. |
 | `test_build_identity_distinct.sh` | 14z-94 | the merged playtest build stays distinguishable from its legacy-only instrument, which SHARES its program fingerprint by design. |
 | `test_record_walk_bounds.sh` | #51 | Both record walkers examine the last long that fits. |

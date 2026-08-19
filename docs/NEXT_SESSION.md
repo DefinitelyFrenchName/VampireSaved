@@ -25,8 +25,13 @@
 > ##    re-freeze window the maintainer opens. ASK, do not assume.
 > ## 2. **#102** — but ask for the LEGACY-ONLY control first; it may show
 > ##    the defect is vanilla's own sound-state lottery, which collapses it.
-> ## 3. The architecture backlog: #69, #71, #46, #94 (the standing
-> ##    reference-rot check — see the note below, it has a fresh instance).
+> ## 3. **CORRECTED 14z-97: there is no "architecture backlog".** This line
+> ##    named #69/#71/#46/#94 — all four were CLOSED in 14z-94's sweep, and
+> ##    I carried the stale list forward earlier the same day. The tracker
+> ##    is #99, #43, #50, #102 and nothing else.
+> ##    What #94 left behind IS live work: `test_build_ref_rot` now reports
+> ##    16 superseded references (14z-97). Re-pointing them needs per-gate
+> ##    intent AND re-measurement, so it is a scheduled job, not a sweep.
 > ## 4. Coverage: the pool-vs-pool contact rig (14z-96 (3) records three
 > ##    eliminated geometries and the now-unambiguous probe).
 > ##
