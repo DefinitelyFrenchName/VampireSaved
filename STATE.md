@@ -1,5 +1,46 @@
 # STATE — living progress log
 
+## Session 14z-98 CLOSE — ritual complete (the full session: (1)-(9))
+
+The largest-yield session since the review triage: **#103 root-caused,
+causally confirmed, fix staged** (window = "uncomment + battery", rides
+#43(b)); **#102 answered** (vanilla's own continue resets the ladder;
+awaiting the close ruling); **#104 found, reproduced, capture-confirmed
+and mechanism-CLOSED same day** (reaction-index generation drift; fix
+designed, same window); **#105 filed** (AUTO win screens; AUTO
+selection solved+proven; awaiting the maintainer's captures naming the
+surface); "instance 2" retracted (the 2-byte-poke class, now a frozen
+audit); the maintainer's full MAME field session recorded clean (no
+crash, no regression — both emulators now). **NO SHIPPED BYTE MOVED
+ALL SESSION**; the 14z-96 freeze stands untouched.
+
+**Ritual state:** NEXT_SESSION current through (9) (rewritten
+incrementally at each arc); HANDOFF rows for all five new instruments;
+GOTCHAS 14z-98 block (3 entries) indexed; retraction passes run per
+arc (grep clean each time); suite green at every commit (full tier
+PASS 93/0/0 x4, portable after each close); memory extended
+(rig-must-produce-the-real-event: the poke-shape trap).
+
+**New instruments this session:** audit_don_ko_writer,
+audit_kill_poke_shape, audit_continue_ladder, audit_don_grab_pose (+
+replay 96), trace_writes DUMPS. **Staged for the window:**
+reconciliation_donovan.toml + the commented donovan.toml block
+(inertness proven by test_m3a_reproducible).
+
+**Decisions pending (maintainer), the complete list:**
+1. The re-freeze window (#43(b) + #103's staged rows + #104's table
+   reorder once derived) — scheduling is yours.
+2. #102's close ruling (the discriminator answered "not ours").
+3. The two battery-target registry rows (14z-97, proposed).
+4. The ~200 tracked build dirs (carried).
+5. #105: your captures of the white-portrait screens (offered — bring
+   them to the next session).
+
+**For whoever opens next session:** read NEXT_SESSION's banner. Three
+ranked starts: (a) #105 from the maintainer's captures; (b) #104's fix
+derivation (the legacy-twin permutation — pure measurement, no ruling
+needed); (c) if the window is ruled open, the #103/#43(b) re-freeze.
+
 ## Session 14z-98 (9) — #104's MECHANISM CLOSED: a GENERATION DRIFT IN
 ## THE VICTIM-REACTION INDEX SPACE. The tables were ported and repointed
 ## RIGHT; the engine indexes them with the other generation's meanings.
