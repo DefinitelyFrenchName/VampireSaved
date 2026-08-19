@@ -1,5 +1,48 @@
 # STATE — living progress log
 
+## Session 14z-97 (8) — #103's MECHANISM NARROWED THREE LEVELS: the stuck
+## sequencer walks a PORTED anim record and the round-over trigger never
+## fires from the ordinary in-match phase
+
+Object-level trace, run per the plan posted on #103. Three results, each a
+level deeper:
+
+1. **The stall is a steady closed loop; the healthy lose is nearly silent.**
+   Full-RAM diff pairs 20f apart: at the stall ~185 bytes cycle (nine
+   effect-pool slots, both fighters' sequencers, local-pool objects),
+   structurally identical at f12000 and f15000. During Victor's healthy lose
+   at KO+260: NINE live bytes total. The settle/teardown step is never
+   reached at the stall.
+
+2. **The phase machine never leaves the ordinary in-match phase.**
+   `$FF8004/8008` at in-match values, `$FF800C` phase = 6 (same as normal
+   fighting) for the whole stall. A `$FF8008` write-watch under `-debug`
+   (trace_writes, 25 hits/12,200 frames) inventoried the healthy transition
+   writers: the judge commit is `addq.w #2,$8(a5)` at `PRG:0x00A070`,
+   gated by `tst.b $129(a5)` at `0x00A03A` — and `$FF8129` is 0 throughout
+   the stall, so the gate would PASS if the handler ran. It is not reached:
+   the trigger upstream never fires.
+
+3. **The KO'd Donovan's sequencer walks a record WE placed.** His `+0x1C`
+   holds `PRG:0x0DB6D0` constant through the stall — 0xFF fill in vanilla,
+   data only on our builds: offset 0x8660 of `fixed_anim.bin`
+   (`anim@donovan`, placed 0x0D3070) = **vs2 source `0x287BA8`**. His anim
+   node timer `+0x20` cycles forever; the healthy loser's `+0x1C` is zeroed
+   by the settle step. Native vs2 terminates this same sequence; on our
+   build the "loser settled" signal never happens.
+
+**The next single most informative run (handed off, not started): the
+native-vs2 leg** — Donovan KO'd by Lilith on vsav2 (the 14z-69 poke
+procedure), tracing `+0x1C`: which frame clears it and what runs then. That
+names the terminator the port is missing — end-node op through per-char
+dispatch (the parked bank-tail data rows are still prime suspects) or a
+companion-object completion flag.
+
+Method notes: all state dumps non-debug (non-perturbing); the `-debug`
+writer inventory identified events by VALUE, never by frame (the standing
+cross-correlation gotcha); disassembly via capstone on the opcodes view
+(crypt window).
+
 ## Session 14z-97 (7) — THE CONTINUE RIG EXISTS AND RUNS TO #99's EXACT
 ## SCREEN; what blocks it is #103, and the working theory is now a RACE
 
