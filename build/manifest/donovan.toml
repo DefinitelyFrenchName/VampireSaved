@@ -2365,3 +2365,54 @@ addr = 0x5fff1c
 op = "poke16"
 only_variant_slot = true   # WIDE-only: stock builds have no 0x5FFFxx image
 val = 0x3316
+
+# ══════════════════════════════════════════════════════════════════════
+# THE #103 FIX — STAGED, COMMENTED OUT ON PURPOSE (14z-98). UNCOMMENT THE
+# THREE PIECES BELOW AT THE RE-FREEZE WINDOW (rides with #43(b),
+# maintainer-ratified 2026-08-19), THEN REBUILD + FULL BATTERY + FREEZE.
+# Landing them outside the window turns test_m3a_reproducible RED (rule 6):
+# the pad growth relocates ~83 ops (measured on the probe).
+#
+# WHAT IT FIXES (root cause, causally confirmed — GitHub #103, STATE
+# 14z-98): x026142's node op at +0x162 (vs2 0x262A4) ends `bra.w $25F9A`,
+# escaping the region backward; the preserved displacement lands in
+# x066ec4's placed copy — the child-object INIT — run with A6 = the
+# FIGHTER, pinning hp := 1 while white stays ~200. The round judge kills
+# on WHITE's sign (engine_internals "THE ROUND JUDGE"), so the next hit
+# underflows hp into an unjudgeable state = the ~8,000f arcade stall.
+# Probe evidence: [[pcrel_escape_fix]] x026142 alone -> 9 escapes, 6
+# trampolines, 0 tripwired; audit_don_lilith_ko FLOWED 560 and
+# audit_don_ko_writer shows the healthy kill commit. Flip BOTH audits'
+# EXPECT defaults when this lands.
+#
+# piece 1 — the overlay declaration (top-level key; move it up with the
+# other top-level keys when uncommenting):
+#recon_overlay = "build/manifest/reconciliation_donovan.toml"
+#
+# piece 2 — the #103 closer:
+#[[pcrel_escape_fix]]
+#stage = 4
+#region = "x026142"
+#pad = 0x60
+#
+# piece 3 — the H-proven sibling (same source span, same verified twin
+# 0x635fc -> 0x5b25c; H ships this exact row):
+#[[pcrel_escape_fix]]
+#stage = 4
+#region = "x05c800"
+#pad = 0x20
+#
+# REVIEWED AND DEFERRED, DO NOT ROW THESE (14z-98 (3) evidence):
+# - x065c22 "+0x5e escape" is a CENSUS FALSE POSITIVE — the 0x6000 word is
+#   the immediate inside `move.l #$6000,d3` (vs2 0x65C7C). A row here
+#   would let the escape pass REWRITE THE IMMEDIATE (the 14z-74 D5 table
+#   corruption class, pyron.toml HISTORY note). No escape exists.
+# - x028122 "+0x112 escape" sits inside the (pc,d2) jump-table data at
+#   vs2 0x2822C (framing-ambiguous), and the object-hit damage path it
+#   lives on is HOT and healthy across 17 sessions (audit_fg_parity) —
+#   no live branch escapes there. Byte-twin 0x2cc64 -> 0x2d478 (0x40
+#   identical) recorded in case it is ever proven live.
+# - x088512 "+0x2e1c" (`beq.w 0x8b6ea`): target is vs2 match-flow code
+#   with NO vsavj byte-twin (generation drift), site is next-stage-screen
+#   territory (single-player-only, cosmetic scope). Unfired in every rig.
+# ══════════════════════════════════════════════════════════════════════

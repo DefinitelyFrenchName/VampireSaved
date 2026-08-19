@@ -1,0 +1,70 @@
+# reconciliation_donovan.toml — PER-TENANT OVERLAY for Donovan (14z-98).
+# INERT UNTIL donovan.toml DECLARES `recon_overlay` (the commented #103 fix
+# block there does; uncommenting it is the fix-window action). Exists
+# because the SHARED map's rows are frozen for Donovan's reproducibility —
+# these rows must not enter it until the re-freeze window (GitHub #103,
+# rides with #43(b), maintainer-ratified 2026-08-19 "good unless risks";
+# the risks and their mitigations are in STATE 14z-98 (3)).
+#
+# Every row below is a VERIFIED twin carried VERBATIM from
+# reconciliation_huitzil.toml (14z-66/67 site-twin method), where the same
+# vs2 targets were resolved for H's copies of the same source regions.
+# 0x25f9a -> 0x26e16 was independently re-derived 14z-98 (0x174 identical
+# bytes, unique 0x20-byte prefix in vsavj) — the #103-critical row.
+
+[[map]]
+vsav2 = 0x0210c0
+vsavj = 0x0226dc
+kind = "engine_sub"
+status = "verified"
+note = "x026142 escape twin (14z-66 site-twin method); carried for donovan 14z-98"
+
+[[map]]
+vsav2 = 0x0219c4
+vsavj = 0x022fc0
+kind = "engine_sub"
+status = "verified"
+note = "x026142 escape twin (14z-66 site-twin method); carried for donovan 14z-98"
+
+[[map]]
+vsav2 = 0x021c64
+vsavj = 0x023244
+kind = "engine_sub"
+status = "verified"
+note = "x026142 escape twin (14z-66 site-twin method); carried for donovan 14z-98"
+
+[[map]]
+vsav2 = 0x022008
+vsavj = 0x023500
+kind = "engine_sub"
+status = "verified"
+note = "x026142 escape twin (14z-66 site-twin method); carried for donovan 14z-98"
+
+[[map]]
+vsav2 = 0x024cba
+vsavj = 0x026058
+kind = "engine_sub"
+status = "verified"
+note = "x026142 escape twin (14z-66 site-twin method); carried for donovan 14z-98"
+
+[[map]]
+vsav2 = 0x025f9a
+vsavj = 0x026e16
+kind = "engine_sub"
+status = "verified"
+note = "x026142 escape twin (14z-66 site-twin method); carried for donovan 14z-98"
+
+[[map]]
+vsav2 = 0x027542
+vsavj = 0x0282ee
+kind = "engine_sub"
+status = "verified"
+note = "x026142 escape twin (14z-66 site-twin method); carried for donovan 14z-98"
+
+[[map]]
+vsav2 = 0x0635fc
+vsavj = 0x05b25c
+kind = "engine_sub"
+status = "verified"
+note = "x05c800 tail-escape twin (14z-67 census find): subq.b #1,$149(a4) + jmp engine — UNIQUE vsavj pattern match, jmp targets twin-verified (vs2 0x15770 / vsavj 0x17028, 60/64 bytes, diffs = A5-operand drift); carried for donovan 14z-98"
+
