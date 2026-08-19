@@ -34,8 +34,8 @@
 > ## Anchors to reproduce first: the healthy-Donovan +0x1C trajectory into
 > ## 0xDB6D0, and native's clear at KO+240 (both in STATE 14z-97 (8)/(9)).
 > ## Instrument: tests/audit_don_lilith_ko.sh locks the defect
-> ## (EXPECT_STALL=1); its header needs the opponent-independence correction
-> ## when the trace lands.
+> ## (EXPECT_STALL=1); its header carries the opponent-independence
+> ## correction already (14z-97 close ritual).
 > ##
 > ## **TWO STANDING HOLDS — do not start:** #99 (parked; the continue rig
 > ## now exists and runs to the exact screen — #103 blocks it), #50 (parked

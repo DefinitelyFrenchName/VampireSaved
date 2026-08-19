@@ -2500,6 +2500,51 @@ The real scenario it guards — a host key physically held before the run — IS
 in that read, because MAME samples host input ahead of the frame. Reachable
 in the field, not from the harness.
 
+## 14z-97b: five traps from the #103 hunt — four are RIG grammar, one is a
+## classifier lying by omission
+
+**A blanket opponent-class poke window that overlaps a LIVE match kills the
+match.** `+0x382` is live in-match state (the voice-flavor class, ram.md:85);
+writing the next opponent's class into `$FF8B82` mid-match ended the running
+match at the poke onset and read as a mysterious early game-over — a full
+run lost to diagnosis. The opponent poke must be windowed BETWEEN matches,
+aimed with selection frames measured from a prior no-poke run of the same
+config.
+
+**Repeating HP pokes across a KO can un-KO the loser mid-judge and wedge the
+round THEMSELVES.** Two false stalls were produced this way (one with a
+100f-cadence HP=1 schedule, one with a burst that landed inside round-2's KO
+freeze). The clean shape: kill pokes at ROUND START (+~100f, before any
+contact can put a hit-freeze on screen), exactly three pokes 20f apart, then
+hands off. Round boundaries come from the previous iteration's dumps, never
+from guesses.
+
+**"PRESS START" on screen is not evidence of a continue screen.** The
+P2-join prompt prints the same words permanently during any 1P match. A
+screen must be identified from the STATE WORDS (`$FF8004/8008/800C`, the
+ladder block), never from the banner text — this misread nearly filed the
+Phobos stall as "a dead continue screen".
+
+**The `-debug` timeline is a DIFFERENT RUN, not a slower one.** Under
+`-debug` the mash's match outcomes changed (Donovan WON the match he loses
+non-debug), so frame-scheduled pokes tuned non-debug aim at the wrong
+events entirely. Cross-correlating frames was already banned (GOTCHAS);
+the extension is that EVENT PLANS must be re-tuned inside the -debug
+timeline too — identify events by VALUE, and expect the trajectory itself
+to differ.
+
+**A "static state" classifier is only as honest as its field tuple.** The
+#103 stall was first read as a PERMANENT hang because the chosen fields
+(stage/mask/idx/bound/timer/HP) all sit still during a long slow sequence,
+and the dump window ended inside it. A wide byte-slice re-measure showed
+every run flowing on at ~KO+8000. Rule: before declaring RAM "frozen",
+diff a WIDE slice at two distant times, and make sure the window extends
+past the longest plausible timeout. The same class then recurred at
+higher level: "Donovan KO'd by Q-Bee -> judged fine" was read off
+ladder-mask movement under continuous HP pokes — the strong signal
+(+0x1C record pointer + HP-reset) reversed it. A verdict is only as
+strong as the weakest signal it was read from.
+
 ## 14z-97: two ways a tool measures the wrong thing and says nothing
 
 **A path argument must be CANONICALISED before anything uses it — the

@@ -1,7 +1,10 @@
 #!/bin/sh
-# audit_don_lilith_ko.sh — DONOVAN KO'd BY LILITH IN ARCADE: the lose flow
-# STALLS ~8,000 FRAMES (14z-97, GitHub #103). On-demand, ~5 min (2 MAME runs,
-# parallel).
+# audit_don_lilith_ko.sh — A DONOVAN P1 DEATH IN ARCADE STALLS THE LOSE FLOW
+# ~8,000 FRAMES (14z-97, GitHub #103). On-demand, ~5 min (2 MAME runs,
+# parallel). The FILENAME keeps the Lilith pairing because that is the
+# natural, poke-free repro this audit runs (Lilith is index 1 of Donovan's
+# own ladder) — but the defect is NOT Lilith-specific; see the corrected
+# controls below.
 #
 # THE DEFECT, measured on merged-m3 AND merged-m2 (so it predates the #101
 # batch): P1 Donovan loses a round to CPU Lilith in arcade -> his HP
@@ -14,6 +17,11 @@
 # player-visible symptom is a two-minute freeze after losing to Lilith, which
 # any player reads as a hang and resets out of.
 #
+# NATIVE CONTROL (14z-97 (9)): vs2 walks the loser's +0x1C to EXACTLY the
+# record our build parks on (0x287BA8 = our 0x0DB6D0) and CLEARS it at
+# KO+240. The ported record chain is right; the engine-side settle trigger
+# is what is missing. Mechanism suspects + the consumer-trace plan: #103.
+#
 # ("Never judges" was this audit's first wording, and it is RETRACTED: two
 # stacked instrument artifacts -- a too-narrow field tuple and dumps ending
 # inside the stall -- read the long stall as a permanent freeze. The
@@ -24,11 +32,20 @@
 # ladder row, so "lose your second arcade match as Donovan" is the recipe.
 #
 # CONTROLS THAT BOUND IT (14z-97, all on the same rig):
-#   Donovan KO'd by Q-Bee   -> judged fine         (not "Donovan KO'd")
-#   Donovan KO'd by Victor  -> judged fine         (opponent-swapped, same slot)
 #   Victor KO'd by Lilith   -> 580-frame lose flow (not "losing to Lilith")
 #   ... on pristine vsavj   -> 580 frames, same    (vanilla never stalls here)
 #   merged-m2 vs merged-m3  -> identical stall     (not a #101 regression)
+#   Donovan KO'd by Q-Bee   -> ALSO PARKS UN-JUDGED 2,300+ frames on the
+#                              same record (measured 14z-97 (9) on the
+#                              +0x1C/HP-reset signal). This line FIRST said
+#                              "judged fine" — RETRACTED: that verdict was
+#                              read off ladder-mask movement under continuous
+#                              100f-cadence HP pokes, instrument noise. The
+#                              defect is OPPONENT-INDEPENDENT for Donovan;
+#                              Phobos KO'd by Bishamon stalls too. So the
+#                              shape is "lose any round as a tenant in
+#                              arcade -> ~2-minute freeze", deterministic,
+#                              NOT a race (for the stall itself).
 # FBNeo: NOT reproduced and NOT clean -- the in-use mask is sound-state-fed
 # ("the run-to-run lottery", ram.md), FBNeo's sound state differs, and its
 # ladder routed around Lilith in both attempts. Unproduced, not negative.

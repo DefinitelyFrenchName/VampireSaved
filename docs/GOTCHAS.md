@@ -14,6 +14,12 @@ one your current task belongs to. A trap you hit while porting Huitzil
 is a GAME gotcha if it is true of the game regardless of the port.
 
 
+### appended 14z-97b (project bucket — the #103 hunt)
+- An opponent-class poke window overlapping a LIVE match kills the match (+0x382 is live in-match); window it BETWEEN matches, aimed from a no-poke run
+- Repeating HP pokes across a KO can un-KO the loser mid-judge and wedge the round themselves; kill pokes = round start +100f, three pokes, hands off
+- "PRESS START" is the perpetual P2-join prompt, not a continue screen — identify screens from state words, never banner text
+- The -debug timeline is a DIFFERENT RUN (match outcomes change); re-tune event plans inside it, identify events by value
+- A "static state" classifier is only as honest as its field tuple — diff a WIDE slice at distant times before declaring RAM frozen; a verdict is only as strong as its weakest signal
 ### appended 14z-97 (project bucket)
 - CANONICALISE a path argument before use — an absolute builddir made a tool measure PRISTINE VANILLA and print the build's name over it (3rd caller-environment instance in 2 sessions); print the resolved fingerprint
 - A chained `-rompath "a;b"` cannot fail loudly for a missing `a` — falling through IS the feature, so assert what resolved

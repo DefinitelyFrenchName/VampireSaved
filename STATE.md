@@ -1,5 +1,66 @@
 # STATE — living progress log
 
+## Session 14z-97 CLOSE — ritual complete (the full session: (1)-(9))
+
+The longest-scope session since 14z-96: **#96 closed** (option (a) executed
+end to end — the battery resolves its target from the build fingerprint, the
+§4 vocabulary has one implementation), **the §4 coverage mandate met** (111
+roster pairings green, ~5 min), **#102 filed** (arcade ladder, from the
+maintainer's confirmed field report), **#103 found, bounded, mechanism
+90% named** (a tenant P1 death in arcade stalls the lose flow ~8,000 frames;
+native clears the same record at KO+240; the parked bank-tail rows are
+aliased where vs2 authored real ones), the #99 continue rig built and runs
+to the exact reported screen (#103 blocks it), reference currency reporting
+added, and the known-bad `run_wide` default removed. **No build byte moved
+all session**; the 14z-96 freeze stands untouched.
+
+**Ritual checklist:** NEXT_SESSION rewritten (banner through (9): #103's
+consumer trace is the start point, with anchors, cautions, and the -debug
+warning). HANDOFF: rows for audit_roster_pairings, audit_don_lilith_ko
+(corrected to opponent-independent), test_build_ref_rot (extended),
+test_masked_compare, the two battery-target registry-row notes, the
+run_wide required-argument note, the m2c stale-recipe note. GOTCHAS: two
+blocks appended (14z-97: path canonicalisation / chained rompath /
+crashing verdict control; 14z-97b: the five #103-hunt traps), both
+indexed. RETRACTION PASS run at close: the opponent-independence
+correction propagated to the audit HEADER and the HANDOFF row (grep
+clean); the "architecture backlog" stale list corrected in place; the
+race-reading and "judged fine" retractions carry status markers in their
+historical entries. Suite doctrine: audit_roster_pairings,
+audit_don_lilith_ko, test_masked_compare, test_m2a_target_policy,
+test_m2a_target_resolution, tests/lib/pairing.sh, tests/lib/
+masked_compare.sh all committed with controls.
+
+**One doctrine debt, recorded rather than hidden:** the #99 CONTINUE RIG
+(coins + forced match-4 loss + auto-continue + switch) is NOT committed as
+a scripted case — it cannot reach its goal state while #103 blocks the
+continue screen, and a rig frozen mid-defeat would lock poke frames that
+the #103 fix will move. Its full recipe (derived replay + poke schedules +
+the iteration ledger with what each attempt eliminated) is in 14z-97 (7)
+and on #99. Commit it as an audit when #103 is fixed.
+
+**Suite at close: PASS 93 / SKIP 0 / FAIL 0** (measured at (5); the
+portable tier re-verified green after every subsequent commit). Working
+tree clean but for the pre-existing `emu/fbneo` submodule pointer.
+
+**Decisions pending (maintainer), the complete list:**
+1. **#103's fix window** — any fix moves shipped bytes on the tenants +
+   merged (the parked per-char rows), so it rides a re-freeze window with
+   #43(b). The consumer trace should land first so the fix is aimed.
+2. **#43(b)** — unchanged, awaiting its window.
+3. **The two battery-target registry rows** (14z-97 (2)-era work) —
+   proposed, not ratified; reversible.
+4. **The ~200 tracked build dirs** — carried.
+5. **#99's rig protocol** — the rig now exists; what it needs from you is
+   the MAME retest datum: when you lose a round as a tenant, does the
+   round judge promptly or sit on the KO tableau (#103's field question).
+
+**For whoever opens next session:** read NEXT_SESSION's banner. The work
+is #103's consumer trace (read-watch 0x0BF066, data AND opcodes spaces,
+inside a -debug-retuned stall run); the maintainer's MAME retest may have
+produced the field datum first — it outranks the trace if it contradicts
+anything.
+
 ## Session 14z-97 (9) — CORRECTION: the stall is OPPONENT-INDEPENDENT for
 ## Donovan; the native leg names the missing step; the parked rows are
 ## confirmed aliased where vs2 authored real ones

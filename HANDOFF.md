@@ -1306,16 +1306,21 @@ tools/probe_hook_removal.sh           # 14z-89: CAUSAL attribution for a
                                       # extensions. Control in the header:
                                       # the unmodified build must still FAIL
                                       # the same replay. ~5 min per probe
-tests/audit_don_lilith_ko.sh          # 14z-97 (GitHub #103): DONOVAN KO'd BY
-                                      # LILITH stalls the lose flow ~8,000
-                                      # frames (normal: 580 — measured
-                                      # identical merged vs pristine vanilla
-                                      # for a legacy P1). Regression-locks the
-                                      # DEFECT (EXPECT_STALL=1, the #98
-                                      # discipline) + a Victor control leg
-                                      # proving a stall is distinguishable.
-                                      # ~5 min, 2 parallel MAME runs. Flip
-                                      # EXPECT_STALL when the fix lands.
+tests/audit_don_lilith_ko.sh          # 14z-97 (GitHub #103): a DONOVAN P1
+                                      # DEATH in arcade stalls the lose flow
+                                      # ~8,000 frames — OPPONENT-INDEPENDENT
+                                      # (corrected 14z-97 (9); the Lilith in
+                                      # the name is just the poke-free repro
+                                      # his own ladder provides). Normal
+                                      # flow: 580f, identical merged vs
+                                      # pristine vanilla for a legacy P1;
+                                      # native vs2 clears the SAME record at
+                                      # KO+240. Regression-locks the DEFECT
+                                      # (EXPECT_STALL=1, the #98 discipline)
+                                      # + a Victor control leg. ~5 min, 2
+                                      # parallel MAME runs. Flip EXPECT_STALL
+                                      # when the fix lands; mechanism + trace
+                                      # plan on #103.
 tests/audit_roster_pairings.sh        # 14z-97: EVERY TENANT vs EVERY CHARACTER,
                                       # BOTH SIDES — the CLAUDE.md §4 mandate
                                       # ("vs each of the 18, both sides") that
