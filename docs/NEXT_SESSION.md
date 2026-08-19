@@ -1,56 +1,53 @@
-# NEXT SESSION — orientation (written at the close of 14z-97, 2026-08-19)
+# NEXT SESSION — orientation (written at the close of 14z-97, 2026-08-19; the banner updated through 14z-97 (9))
 
 > ## **THE SUITE IS GREEN: `ROMDIR=... tests/run_all_static.sh` -> PASS 93 /
-> ## SKIP 0 / FAIL 0.** THREE issues open, down from four: #99
-> ## (parked), #43 ((b) awaits a window), #50 (parked). **#96 is CLOSED.**
+> ## SKIP 0 / FAIL 0.** FOUR issues open: #99 (parked), #43 ((b) awaits a
+> ## window), #50 (parked), #102 (arcade ladder), **#103 (NEW, the big one
+> ## of 14z-97 — read below)**. #96 CLOSED.
 > ##
 > ## **THE FROZEN BUILDS ARE UNCHANGED — donovan-m8 / huitzil-m17 /
 > ## pyron-m11 / merged-m3** (`build/don_m8` d038553d / `build/hui44`
-> ## bfd819a0 / `build/pyron28` 738bcfc2 / `build/m3b_merged10` ac3d0618,
-> ## 764 ops; tags `freeze/*`). **NO BUILD BYTE MOVED IN 14z-97** — it was
-> ## gate work end to end. The build to play: `tools/run_wide.sh
-> ## build/m3b_merged10 fbneo`. **FIELD REPORT IN (2026-08-19, after the
-> ## close): no crash on FBNeo over a wide array, sound confirmed corrected —
-> ## and the arcade quirks CONFIRMED and filed as #102 (later matches at
-> ## earlier venues + the chain exceeding the arcade norm; one mechanism, the
-> ## in-use mask $FF8110). STATE 14z-97 (2) and (3). #99 STAYS PARKED (no
-> ## repro protocol), but its FBNeo negative is much stronger than the rig
-> ## one already in the record and the two must not be conflated. FOUR issues
-> ## open again: #99, #43, #50, #102.**
+> ## bfd819a0 / `build/pyron28` 738bcfc2 / `build/m3b_merged10` ac3d0618;
+> ## tags `freeze/*`). **NO BUILD BYTE MOVED IN 14z-97.** Play:
+> ## `tools/run_wide.sh build/m3b_merged10 fbneo` (the build argument is
+> ## REQUIRED since 14z-97 — bare invocation lists what is on disk).
 > ##
-> ## **14z-97 ALSO CLOSED THE §4 COVERAGE MANDATE** (5): every tenant vs
-> ## every character, BOTH SIDES — 111 pairings green on merged-m3, no crash
-> ## anywhere, via `tests/audit_roster_pairings.sh`. It runs in ~5 MINUTES,
-> ## so run it at every re-freeze. Free result on the way: all 16 legacy
-> ## hitbox bases are byte-identical vanilla vs merged.
+> ## **START HERE: #103's CONSUMER TRACE — one measurement closes the
+> ## mechanism.** The state as of 14z-97 (9), all measured:
+> ## - ANY Donovan P1 death in arcade parks un-judged ~8,000 frames
+> ##   (~2 min) before an engine failsafe reaches game-over. Deterministic,
+> ##   OPPONENT-INDEPENDENT (the Lilith-only reading and the race reading
+> ##   for the stall are both CORRECTED in place). Phobos stalls too
+> ##   (Bishamon leg). Legacy loser: 580f, merged == vanilla.
+> ## - Native vs2 walks +0x1C to EXACTLY the record we park on (0x287BA8 =
+> ##   our 0x0DB6D0) and CLEARS it at KO+240. The ported chain is right;
+> ##   the engine-side settle trigger is what is missing.
+> ## - The parked bank-tail data tables 0x0BF01A/09A/11A/19A carry row
+> ##   0x13 == row 0x03 (Victor aliases) and row 0x10 == Bulleta family,
+> ##   while vs2's parallels (bank shift +0x1A19E) hold DISTINCT newcomer
+> ##   rows (0x101ACA/0x101BC8/0x102674/0x102B82).
+> ## THE TRACE: read-watch on 0x0BF066 (row 0x13 of 0x0BF01A) during a
+> ## stall, in BOTH data and opcodes spaces (crypt-window wpset blindness).
+> ## CAUTION: the -debug timeline diverges (mash outcomes differ — Donovan
+> ## WON match 2 under -debug), so force the KO with round-start kill pokes
+> ## tuned from a -debug probe run, and identify events by VALUE, not frame.
+> ## Anchors to reproduce first: the healthy-Donovan +0x1C trajectory into
+> ## 0xDB6D0, and native's clear at KO+240 (both in STATE 14z-97 (8)/(9)).
+> ## Instrument: tests/audit_don_lilith_ko.sh locks the defect
+> ## (EXPECT_STALL=1); its header needs the opponent-independence correction
+> ## when the trace lands.
 > ##
-> ## **START HERE: there is no assigned task.** Ranked, if no field report
-> ## is waiting:
-> ## 1. **#43(b)** — ruled SPLIT, (a) landed 14z-95; (b) moves 3
-> ##    reconciliation rows and therefore built bytes, so it needs a
-> ##    re-freeze window the maintainer opens. ASK, do not assume.
-> ## 2. **#102** — but ask for the LEGACY-ONLY control first; it may show
-> ##    the defect is vanilla's own sound-state lottery, which collapses it.
-> ## 3. **CORRECTED 14z-97: there is no "architecture backlog".** This line
-> ##    named #69/#71/#46/#94 — all four were CLOSED in 14z-94's sweep, and
-> ##    I carried the stale list forward earlier the same day. The tracker
-> ##    is #99, #43, #50, #102 and nothing else.
-> ##    What #94 left behind IS live work: `test_build_ref_rot` now reports
-> ##    16 superseded references (14z-97). Re-pointing them needs per-gate
-> ##    intent AND re-measurement, so it is a scheduled job, not a sweep.
-> ## 4. Coverage: the pool-vs-pool contact rig (14z-96 (3) records three
-> ##    eliminated geometries and the now-unambiguous probe).
+> ## **TWO STANDING HOLDS — do not start:** #99 (parked; the continue rig
+> ## now exists and runs to the exact screen — #103 blocks it), #50 (parked
+> ## behind #99). **AWAITING RULINGS:** #43(b)'s window; the two
+> ## battery-target registry rows (14z-97, proposed not ratified); the ~200
+> ## tracked build dirs.
 > ##
-> ## **TWO STANDING HOLDS — do not start either:**
-> ## **#99** is PARKED (maintainer): blocked on a RIG, not on ideas.
-> ## **#50** is PARKED behind #99. Lift-on-demand stays available.
-> ##
-> ## **ONE THING AWAITING YOUR RULING (14z-97):** the M2 battery now
-> ## dispatches on the build fingerprint, which needed TWO REGISTRY ROWS FOR
-> ## PIPELINE IMAGES rather than shipping artifacts — `donovan-m8-stock`
-> ## (`a054de5c`, the stock twin) and `donovan-m8-stage4` (`22c804c8`).
-> ## Registry rows are normally a freeze decision, so these are proposed,
-> ## not ratified. Reversible: two rows and two directories.
+> ## **FIELD REPORT (2026-08-19): no crash on FBNeo over a wide array,
+> ## sound confirmed corrected, arcade quirks = #102. The maintainer's MAME
+> ## retest is pending — when they lose to Bishamon as Phobos, whether the
+> ## round judges promptly or sits on the KO tableau is a #103 data point
+> ## no rig can substitute.**
 
 ## What 14z-97 did
 
