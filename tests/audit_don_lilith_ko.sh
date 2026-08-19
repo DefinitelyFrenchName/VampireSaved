@@ -19,8 +19,12 @@
 #
 # NATIVE CONTROL (14z-97 (9)): vs2 walks the loser's +0x1C to EXACTLY the
 # record our build parks on (0x287BA8 = our 0x0DB6D0) and CLEARS it at
-# KO+240. The ported record chain is right; the engine-side settle trigger
-# is what is missing. Mechanism suspects + the consumer-trace plan: #103.
+# KO+240. ROOT-CAUSED 14z-98 (#103 comment): the round judge kills on the
+# SIGN OF WHITE HP (+0x52); a pc-rel escape in Donovan's x026142 pins his
+# hp to 1 with white ~200, so the next hit underflows hp while white stays
+# positive — unjudgeable by construction. Kill-chain lock + PC attribution:
+# tests/audit_don_ko_writer.sh. Fix = [[pcrel_escape_fix]] x026142 (probe-
+# confirmed FLOWED 560); rides the re-freeze window.
 #
 # ("Never judges" was this audit's first wording, and it is RETRACTED: two
 # stacked instrument artifacts -- a too-narrow field tuple and dumps ending
