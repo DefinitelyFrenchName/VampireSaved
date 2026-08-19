@@ -1,7 +1,7 @@
 # NEXT SESSION — orientation (written at the close of 14z-97, 2026-08-19)
 
-> ## **THE SUITE IS GREEN: `ROMDIR=... tests/run_all_static.sh` -> PASS/SKIP/FAIL
-> ## recorded in STATE 14z-97.** THREE issues open, down from four: #99
+> ## **THE SUITE IS GREEN: `ROMDIR=... tests/run_all_static.sh` -> PASS 93 /
+> ## SKIP 0 / FAIL 0.** THREE issues open, down from four: #99
 > ## (parked), #43 ((b) awaits a window), #50 (parked). **#96 is CLOSED.**
 > ##
 > ## **THE FROZEN BUILDS ARE UNCHANGED — donovan-m8 / huitzil-m17 /

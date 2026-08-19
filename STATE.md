@@ -1,5 +1,34 @@
 # STATE — living progress log
 
+## Session 14z-97 CLOSE — ritual complete
+
+One issue closed (**#96**, the maintainer's option (a) executed end to end),
+no build byte moved, and the suite green at **PASS 93 / SKIP 0 / FAIL 0**
+(`test_m3a_reproducible` among them, so all five frozen images still rebuild
+bit-exact through the changed tree). Landed as `b3d1041`.
+
+**Ritual checklist:** NEXT_SESSION rewritten for this close (banner: three
+open issues, the unchanged freeze, no assigned task, both holds, and the one
+thing awaiting a ruling). HANDOFF: the two gate rows re-described, the
+renamed gate's row rewritten around its INVERTED assertion, the new
+ground-truth row added, the two non-build registry rows called out above the
+build table, and the `donovan-m2c` row marked with the fact that its recipe
+no longer produces it. GOTCHAS: three new entries (path canonicalisation, the
+chained-rompath fall-through, a verdict control that passes by crashing),
+indexed in an appended-14z-97 block. Retraction pass: `ram.md:30` and
+`engine_internals.md:682` both cited `m2a_common.sh M2A_MASK` as the mask's
+home and now name the real one; re-grepped clean. Suite doctrine: every
+probe used this session became a case — the dispatch ground truth, the
+resolution gate, and the two rewritten gates.
+
+**Open for the maintainer:** the two registry rows (proposed, not ratified —
+they register PIPELINE images, which is what the ruled policy needs to
+dispatch on); #43(b)'s window; the ~200 tracked build dirs; #99's rig.
+
+**For whoever opens next session:** read NEXT_SESSION's banner. There is no
+assigned task — the maintainer's playtest of merged-m3 outranks the ranked
+list there.
+
 ## Session 14z-97 — #96 CLOSED: the battery's target now FOLLOWS THE BUILD,
 ## and the §4 vocabulary has exactly one implementation
 
