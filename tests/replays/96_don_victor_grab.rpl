@@ -1,0 +1,29 @@
+# 14z-98 scratch rig (#104): P1 Victor walks in and attempts the 6+HP
+# headbutt grab on an idle P2 tenant, several spaced attempts. Skeleton
+# from replay 03 (coins/starts/select commits); identities come from the
+# forced-pick pokes, not the cursor.
+300-305 sys=C1
+330-335 sys=C2
+800-803 sys=S1
+830-833 sys=S2
+1120-1122 p1=1
+1140-1142 p2=1
+# speed menus (both players confirm)
+2800-2850 p1=1 p2=1
+# walk in and grab: R held, HP overlapping the hold at spaced attempts
+2950-3448 p1=R
+3100-3103 p1=3
+3250-3253 p1=3
+3400-3403 p1=3
+3500-3998 p1=R
+3600-3603 p1=3
+3750-3753 p1=3
+3900-3903 p1=3
+4050-4548 p1=R
+4150-4153 p1=3
+4300-4303 p1=3
+4450-4453 p1=3
+4600-4998 p1=R
+4700-4703 p1=3
+4850-4853 p1=3
+5400 p1=U

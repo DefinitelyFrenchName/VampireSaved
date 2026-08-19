@@ -1,4 +1,4 @@
-# NEXT SESSION — orientation (written at the close of 14z-98, 2026-08-19; updated through 14z-98 (5))
+# NEXT SESSION — orientation (written at the close of 14z-98, 2026-08-19; updated through 14z-98 (7))
 
 > ## **THE SUITE IS GREEN: `ROMDIR=... tests/run_all_static.sh` -> PASS 93 /
 > ## SKIP 0 / FAIL 0.** Open: #99 (parked), #43 ((b) awaits a window),
@@ -57,11 +57,23 @@
 > ## arms it (rig legs deterministic), organic play only via the culprit
 > ## anim. Root cause + staged fix unchanged (causally proven).
 > ##
-> ## **NEW ISSUE #104 (same retest): Victor's 6+HP headbutt grab garbles
-> ## BOTH tenants' victim pose** (half squished/knocked-down sprites,
-> ## very horizontal). In scope (2P versus). Prior-art pointers + the
-> ## capture-first plan are on the issue; rig + ours-vs-native captures
-> ## are the next step — SHOW CAPTURES BEFORE ANALYSIS.
+> ## **NEW ISSUES FROM THE RETEST — the natural next work:**
+> ## **#104** (legacy grabs mis-select EVERY tenant victim's hold
+> ## record): reproduced + capture-confirmed same day; victim-side and
+> ## grabber-independent (Donovan ours 0x287370 vs native 0x287418;
+> ## Pyron ours 0x26654C vs native 0x26614C — different deltas);
+> ## locked by audit_don_grab_pose.sh (EXPECT_MATCH=0) on the committed
+> ## rig replays/96_don_victor_grab.rpl. Suspect class: reaction-id
+> ## generation drift (the electric-shake precedent). NEXT: trace the
+> ## reaction id at the victim's record selection, both legs (read_tap
+> ## on victim +0x54 family at the connect) — the fix is then per-row
+> ## remaps in the ported victim tables, riding the same window.
+> ## **#105** (AUTO-mode win screens: white shapes, all tenants):
+> ## BLOCKED ON ONE FACT — how AUTO is selected (asked; kick-confirm
+> ## and speed-menu-DOWN produced no AUTO tell). Then adapt replay
+> ## 61/62 (the win-screen-reaching 2P victories) + the existing
+> ## win-screen palette instruments. Field addendum recorded: NO CRASH,
+> ## NO REGRESSION across the whole MAME session.
 > ##
 > ## **TWO STANDING HOLDS — do not start:** #99 (parked; blocked by #103's
 > ## fix), #50 (parked behind #99). **AWAITING RULINGS:** #43(b)'s window

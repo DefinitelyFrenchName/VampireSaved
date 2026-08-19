@@ -1,5 +1,87 @@
 # STATE — living progress log
 
+## Session 14z-98 (7) — TWO MORE FIELD REPORTS PROCESSED: #104 extended
+## to the Pyron victim (victim-side, grabber-independent), #105 filed
+## (AUTO-mode win screens white) — and the wider field verdict recorded:
+## NO CRASH, NO REGRESSION across the whole MAME session
+
+**The maintainer's addendum, recorded:** "no crash during all the
+testing on mame, no regression to report either." Merged-m3 has now
+taken a full MAME field session clean (the earlier FBNeo wide-array
+report said the same). #99 remains parked-not-reproduced on both
+emulators' field sessions.
+
+**#104, extended and sharpened (same-day):** the Victor-grab rig run
+against P2 PYRON — his held record mismatches too: ours (mapped)
+vs2-src 0x26654C vs native 0x26614C, a DIFFERENT delta than Donovan's
+(-0xA8 vs +0x400) -> per-victim wrong row selection, victim-side and
+grabber-independent; the field's Bulleta x Pyron pair is the same class.
+Bonus: the held-victim shake amplitude is per-victim (Donovan 32px,
+Pyron 43px) — audit_don_grab_pose's hold window widened to the measured
+48px (its 40px draft missed native-Pyron by 3px; all documented in the
+classifier comment). Bulleta-rig lesson recorded on the issue: her 6+HP
+is the universal throw with a tight range — the walk-in rig yields
+NORMALS (-13 each, measured both legs, v1 and the continuous-push v2);
+one grabber per victim suffices since the mechanism is victim-side.
+
+**#105 FILED (AUTO-mode win screens, all three tenants: correct shapes,
+white fill — the wrong/unloaded-palette signature).** Reproduction
+blocked on ONE fact: how AUTO is selected (kick-confirm and speed-menu-
+DOWN both produced no AUTO tell; asked the maintainer). Measured on the
+way: the 2P flow with the loser holding credits SKIPS the win screen
+(winner -> arcade map + loser continue), and the scripted 1P arcade
+flow also skipped it — replays 61/62 (real 2P victories, the
+tenant_winpal rigs) are the win-screen-reaching bases to adapt once the
+AUTO input is known. Prior art fenced on the issue (engine_internals
+WIN SCREEN section, test_hui_winscreen's 5*row marker,
+test_tenant_winpal).
+
+Rig notes paid for in this block (on the issues): the win screen does
+NOT appear in a 2P flow whose loser banks a continue, nor in the
+scripted 1P flow measured here; P2-side class pokes in 1P arcade do not
+survive the ladder's own opponent assignment (Q-Bee appeared where
+Victor was poked) — poke P1 only, let the ladder pick.
+
+## Session 14z-98 (6) — #104 REPRODUCED, CAPTURE-CONFIRMED, AND LOCATED
+## AT THE RECORD LEVEL within the hour: the tenant victim of Victor's
+## headbutt grab is held on THE WRONG ANIM RECORD
+
+Rig: NEW `tests/replays/96_don_victor_grab.rpl` (replay-03 skeleton;
+P1 Victor walks in, spaced 6+HP attempts on an idle P2 tenant) — FOUR
+grab connects per run, no HP pokes. Same replay on merged-m3 (MAME)
+and native vsav2; snapshots + dumps in one pass.
+
+**Captures (sent to the maintainer for the confirmation loop):** native
+holds Donovan UPRIGHT; ours lays him HORIZONTAL, upper body roughly
+right, the rest a lying/squished assembly — the report on sight.
+
+**The record level (from the same runs' dumps):** during the hold
+(victim stationary ~150f, hp ticking -2 per headbutt), victim +0x1C:
+    native:  0x287418 (upright held pose)
+    ours:    placed 0x0DAE98 = vs2 src 0x287370 (renders horizontal)
+Release records mismatch too (ours 0x2879C8 vs native 0x2873A0) — NOT a
+uniform shift, so the record CONTENT is fine (the #103 chain proved it
+byte-exact); the SELECTION is wrong. Suspect class: engine-generation
+drift in victim-reaction ids — vsavj's engine (Victor's grab is vsavj
+data) passes ITS generation's reaction id into the victim's ported
+vs2-shaped table (the electric-shake 0x18/0x0B vs 0x0C/0x04 precedent,
+ram.md +0x5C). Both tenants affected fits: every tenant's table is
+vs2-shaped.
+
+**Instrument:** `tests/audit_don_grab_pose.sh` (NEW, ~5 min, 2 parallel
+runs): leg B anchors native at 0x287418 + proves the rig makes the
+hold; leg A freezes the defect (ours maps to 0x287370, EXPECT_MATCH=0,
+the #98 discipline — flip when the fix lands). The ours->vs2 mapping is
+DERIVED from the build's own placements.json anim row, never hardcoded
+(placements move at every re-freeze, including the staged #103 window).
+
+**Next measurement (after the maintainer confirms the captures):** trace
+the reaction-id value at the victim's record selection on both legs
+(read_tap on the victim +0x54 family at the connect) — if native
+receives a different id for the same grab, the fix is a per-row remap
+in the ported victim tables (data rows, tenant-scoped, the Cosmo-81->79
+class) and rides the same re-freeze window as #103's rows.
+
 ## Session 14z-98 (5) — FIELD RESULTS (maintainer MAME retest, 2026-08-19):
 ## no stall for EITHER tenant — instance 2 CLOSED as the rig artifact, the
 ## Donovan trigger model refined — and a NEW defect: Victor's headbutt

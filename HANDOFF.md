@@ -1345,6 +1345,23 @@ tests/audit_don_ko_writer.sh          # 14z-98 (GitHub #103): THE ROOT-CAUSE
                                       # rehearsal caught the RH-19 window
                                       # trap now documented at leg A.
                                       # ~9 min, 2 parallel MAME runs.
+tests/audit_don_grab_pose.sh          # 14z-98 (6), GitHub #104: Victor's
+                                      # 6+HP headbutt grab holds a tenant
+                                      # victim on THE WRONG ANIM RECORD —
+                                      # ours maps to vs2 src 0x287370
+                                      # (renders horizontal/squished),
+                                      # native holds 0x287418 (upright).
+                                      # Selection defect, not content
+                                      # (release records mismatch by a
+                                      # DIFFERENT delta). Leg B anchors
+                                      # native + rig liveness; leg A
+                                      # freezes the defect
+                                      # (EXPECT_MATCH=0; flip at the fix).
+                                      # ours->vs2 mapping DERIVED from the
+                                      # build's placements.json anim row.
+                                      # Rig: replays/96_don_victor_grab.rpl
+                                      # (4 connects/run, no HP pokes).
+                                      # ~5 min, 2 parallel MAME runs.
 tests/audit_continue_ladder.sh        # 14z-98 (4), GitHub #102: THE
                                       # DISCRIMINATOR — does a loss+continue
                                       # reset the arcade ladder's in-use
