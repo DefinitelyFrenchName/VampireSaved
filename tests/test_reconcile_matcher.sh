@@ -11,13 +11,16 @@
 #
 # THE SPLIT THIS GATE POLICES. The maintainer split #43 on the line between
 # what moves bytes and what does not:
-#   (a) the refactor, pinned to the batch tool's measured parameters
-#       (HIT_CAP=64, ALLOW_FALLBACK=False) — provably inert, landed.
-#   (b) freeing those parameters — re-resolves rows, moves built bytes, rides
-#       the next re-freeze under rule 6. NOT landed.
-# So section 2 asserts inertness and section 3 asserts the parameters are
-# load-bearing. Both are required: without 2 the refactor could have moved a
-# row; without 3 the parameterisation could be decoration wired to nothing.
+#   (a) the refactor, pinned to the batch tool's then-measured parameters
+#       (HIT_CAP=64, ALLOW_FALLBACK=False) — provably inert, landed 14z-95.
+#   (b) flipping the fallback ON — re-resolves the three ruled rows and
+#       moves built bytes. LANDED at the 14z-99 RE-FREEZE WINDOW
+#       (maintainer "go", 2026-08-20). The tool now pins (64, True).
+# Section 2 STILL asserts the (a) inertness — cmp_matchers pins the rb side
+# at the HISTORICAL (64, False) for that comparison, so the proof stays
+# reproducible after the flip. Section 3 asserts the parameters are
+# load-bearing (the free comparison also runs from the historical pin, so
+# its delta stays the measured constant).
 #
 # WHY THE OBVIOUS CONTROL WOULD PROVE NOTHING. reconcile_batch KEEPS existing
 # rows ("existing rows win"), so re-running it against the committed manifest
@@ -129,8 +132,8 @@ import sys
 sys.path.insert(0, "tools")
 import reconcile_batch as rb
 assert rb.HIT_CAP == 64, rb.HIT_CAP
-assert rb.ALLOW_FALLBACK is False, rb.ALLOW_FALLBACK
-print("  ok: reconcile_batch pinned at HIT_CAP=64, ALLOW_FALLBACK=False")
+assert rb.ALLOW_FALLBACK is True, rb.ALLOW_FALLBACK
+print("  ok: reconcile_batch pinned at HIT_CAP=64, ALLOW_FALLBACK=True (#43(b), 14z-99)")
 PYCHK
 
 echo "== 4: an unusable window is DISTINGUISHABLE from no candidate (drift c)"

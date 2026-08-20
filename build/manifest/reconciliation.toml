@@ -751,10 +751,10 @@ note = "callsite-anchored-x2; refs: bare_long,jmp"
 
 [[map]]
 vsav2 = 0x028122
-vsavj = 0x000000
+vsavj = 0x028e42
 kind = "engine_sub"
-status = "open"
-note = "-; refs: jsr"
+status = "plausible"
+note = "pattern-0.90-w0x40; refs: jsr; 43b-fallback-resolution-14z-99 (the ONLY row the flip moved; 0x0448a6 re-resolved identically, 0x1e744e not in the donovan target list; hand-carried — a wholesale map regen is DESTRUCTIVE, see STATE 14z-99)"
 
 [[map]]
 vsav2 = 0x028332

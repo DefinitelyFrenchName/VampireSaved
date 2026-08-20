@@ -75,10 +75,18 @@ def main():
     import find_equiv
     import reconcile_batch as rb
 
+    # The rb side of every comparison is pinned EXPLICITLY (GitHub #81
+    # style: perturb the binding, never the tracked file). Since #43(b)
+    # landed (14z-99) the tool's own default is ALLOW_FALLBACK=True, so:
+    #  - the main mode pins the HISTORICAL (64, False) — the #43(a)
+    #    inertness proof stays reproducible forever;
+    #  - the control forces True — a change that MUST move results;
+    #  - the free mode also pins False on the rb side, so its delta stays
+    #    the measured 183-probe constant rather than a hit_cap-only rump.
     if control:
-        # perturb the binding, NOT the tracked file (GitHub #81: no test
-        # writes into tools/). _batch_search reads these at call time.
         rb.ALLOW_FALLBACK = True
+    else:
+        rb.ALLOW_FALLBACK = False
 
     src_pt, _ = rb.plaintext_image(f"{romdir}/vsav2.zip")
     dst_pt, _ = rb.plaintext_image(f"{romdir}/vsavj.zip")
