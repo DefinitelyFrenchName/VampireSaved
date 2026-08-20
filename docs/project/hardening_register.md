@@ -167,7 +167,14 @@ Re-point the `[merged_*]` sections at every merged freeze.
 - Shadow/Marionette with tenants (§4 names it "once enabled"; never
   exercised).
 - L/M/H strengths of Phobos' historically-broken moves (field covered
-  the moves, not every strength).
+  the moves, not every strength). **RECOMMENDED ROUTE (14z-101): the
+  maintainer's hands during the in-depth field pass, not rigs** — the
+  structural half is already covered (strength dispatchers travel
+  inside relocated regions pc-relatively; word-form escapes triaged
+  zero-live at H3.1; out-of-range indices frozen by test_index_space),
+  and the 87 rig's own header records that SCRIPTED strengths are not
+  authoritative for this family (its scripted LK crashes where the
+  real LK does not). Five moves × L/M/H by hand closes it.
 - **the authoritative-guard corpus soak: BUILT AND GREEN (14z-101)** —
   `tests/audit_guard_corpus.sh`: the whole replay corpus (79 rigs,
   ~472k script frames) under the crash guard on the build under test,
