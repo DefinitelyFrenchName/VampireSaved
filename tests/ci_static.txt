@@ -106,3 +106,4 @@ test_m2a_target_resolution
 # (decrypt cache), no emulator.
 test_capture_pose_sources
 test_pointer_flow
+test_escape_triage

@@ -58,12 +58,34 @@ three guards rotted across the freeze):**
   stamped "753-op / NOT REGISTERED" into every build dir forever);
   merged-m4's on-disk copy corrected.
 
-**H3 QUEUE (analysis next; fixes ride the next window):** the uncovered
-word-form escapes (the #103 class — hui x028122->0x2cc64 + the 20-site
-0x574b0 cluster + x068c78->0x6b644; pyr the same two; don's 14z-98 (1)
-residue), the 13 plausible reconciliation rows (start: 0x028122 at
-0.90, the two multi-candidate 1.00s), the 113 tripwires ranked by
-reachability. **H4:** pool-vs-pool contact rig, 2P rig diversity, one
+**H3 EXECUTED (same day) — the two candidate classes TRIAGED, one real
+finding (#107):**
+- **H3.1 escapes: CLOSED, ZERO LIVE.** `tools/triage_pcrel_escapes.py`
+  + `tests/test_escape_triage.sh` (ci_static; 25 verdicts frozen,
+  269-verdict must-fire control): the 20-site hui cluster is
+  ADJACENT-OK by construction (same-delta landing in x057456);
+  x028122+0x112 is the reviewed jump-table framing ambiguity (note
+  mirrored to H/P manifests); x068c78+0x1ca is a census FALSE POSITIVE
+  (the 0x6000 word is the immediate low-half in `move.l #$00026000,d3`
+  — frame-anchored; the x065c22 class).
+- **H3.2 plausible rows: 9 of 13 CONSUMER-LESS** (incl. the 0.90 and
+  both multi-candidate 1.00 data rows — score is not risk, CONSUMPTION
+  is; measured by reading the shipped longs at every consuming site).
+  Of the 4 live: three VERIFIED-BY-REVIEW (dispatch-family twins,
+  sparse table-word drift). **The fourth is #107: `0x0448a6→0x02563e`
+  is the WRONG SIBLING** — the 0.94 came from the batch's last-resort
+  0x20 window where FOUR candidates tie on the family prologue and the
+  first was taken (M2a-stage-4 era). Neighbor-anchoring gives the right
+  target: the farm's case-2 sibling is the VERIFIED `0x044860→0x043634`
+  and our source sits exactly 0x46 later → `0x04367A` (content-twin
+  0x45fcc; runtime trace picks at fix time). COLD on the corpus
+  (GUARD_PROBE zero fires over 21_don_mash + the 40,620f marathon —
+  lesson paid: the first probe sat MID-INSTRUCTION at +0x3088; the jmp
+  is at +0x308a, and a wrong probe PC measures nothing while looking
+  green). Fix rides the next window.
+- **H3.3 tripwires:** reach measured zero on the marathon (H2); further
+  ranking rides H4's rig growth.
+**H4 (next):** pool-vs-pool contact rig, 2P rig diversity, one
 authoritative-guard corpus soak. Full detail: hardening_register.md.
 
 ## Session 14z-100 (2026-08-20, same day as the freeze) — THE #99 RIG

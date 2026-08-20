@@ -38,26 +38,58 @@ data payloads whose values fall in WIDE range — packed non-pointer data
 
 ## The candidate classes for triage (H3 queue, priority order)
 
-### 1. Uncovered word-form pc-rel escapes — the #103 class (HIGH)
-Ported code branching outside its region; #103's arcade-death stall was
-one. The 14z-98 census (STATE 14z-98 (1)), minus the window's two fixes:
-- huitzil: `x028122 → 0x2cc64`; `0x574b0/b6/bc/c2` (20 consecutive
-  sites — suspected adjacency class); `x068c78 → 0x6b644`
-- pyron: `x028122 → 0x2cc64`; `x068c78 → 0x6b644`
-- donovan: the 14z-98 (1) residue (14 word-form sites/5 regions minus
-  x026142+x05c800; plus 10 pc-rel DATA escapes, 4 data_in_code)
-Reviewed-not-rowed precedent: `donovan.toml:2424-2437` (three sites,
-each with the reason). Any fix row = shipped bytes = the next window.
+### 1. Uncovered word-form pc-rel escapes — the #103 class: **CLOSED
+14z-100 H3.1, ZERO LIVE** (`tools/triage_pcrel_escapes.py`, verdicts
+frozen by `tests/test_escape_triage.sh`, 25 sites):
+- the 20-site huitzil `code` cluster: **ADJACENT-OK BY CONSTRUCTION** —
+  every branch lands inside `x057456` at the SAME merged delta, so the
+  pc-rel arithmetic resolves to the identical vs2 content;
+- `x028122+0x112` (all three tenants): the reviewed jump-table framing
+  ambiguity (donovan.toml note, mirrored to the H/P manifests); path
+  hot-and-healthy 17 sessions; byte-twin recorded if ever proven live;
+- `x068c78+0x1ca → 0x6b644` (hui/pyr): **census FALSE POSITIVE of the
+  x065c22 class** — the 0x6000 word is the LOW HALF of the immediate in
+  `move.l #$00026000,d3`, frame-anchored from +0x1c0 (a coherent
+  interpolation loop; evidence in the manifests' notes).
+The gate fails on any drift (a new escape, a placement turning
+ADJACENT-OK foreign, a lost pcrel row) and carries a 269-verdict
+must-fire control.
 
-### 2. The 13 plausible reconciliation rows (MEDIUM-HIGH)
-Guessed equivalences shipping in the played artifact
-(`--allow-plausible` hardcoded, `build_merged.sh:60`; enumerate with
-`grep -n -B4 'status = "plausible"' build/manifest/reconciliation.toml`).
-Top three for verification: `0x028122→0x028e42` (0.90 — and doubly soft:
-its census escape is a reviewed false positive), `0x130610→0x13dc36` and
-`0x13f64e→0x151fd8` (1.00 but multi-candidate). Path: byte/semantic
-comparison per row → promote to `verified` / re-match / demote to
-tripwire.
+### 2. The 13 plausible reconciliation rows — TRIAGED 14z-100 H3.2
+**Liveness measured first (the lesson: score is not risk; CONSUMPTION
+is).** Method: for every ref in the tenants' extracts targeting a
+plausible row's vs2 source, read the long actually SHIPPED at the
+consuming site in each artifact's patch payloads.
+- **9 of 13 rows are CONSUMER-LESS on all four artifacts** — including
+  the score-ordered "top three" (the 0.90 `0x028122` row, both
+  multi-candidate 1.00 data rows). Zero risk today; exposure is only a
+  future region whose refs resolve through them.
+- **4 rows are LIVE** (consumed by all three tenants — a per-strength
+  dispatch-handler family, the `102e0007 323b0006 4efb1002` prologue):
+  - `0x042e92→0x041c7e` (0.98), `0x042f3a→0x041d26` (0.98),
+    `0x043cba→0x042aa6` (0.98): **VERIFIED-BY-REVIEW** — identical
+    dispatch headers, diffs are sparse jump-table words + cross-game
+    body drift, candidates unique or clearly leading.
+  - `0x0448a6→0x02563e` (0.94): **SUSPECT — likely WRONG SIBLING.**
+    Archaeology: the row dates to M2a stage 4; the batch's window
+    ladder shows the match came from the LAST-RESORT 0x20 window where
+    FOUR candidates tie at 0.94 (family prologue only) and the first
+    was taken. Every richer window (0x40/0x60/0x80) unambiguously
+    prefers `0x45fcc`/`0x4367a` (mutual vsavj content-twins — the #91
+    twin-trap shape; first 24 bytes IDENTICAL to the vs2 source where
+    `0x2563e` diverges immediately, 11/32 bytes). Ships as one entry of
+    a `jmp abs.l` dispatch farm in all three tenants (donovan
+    code+0x3088; the sibling entry targets 0x43634 — the SAME
+    neighborhood as the better candidates). **Neighbor-anchoring settles
+    the target: the farm's case-2 sibling is the VERIFIED row
+    `0x044860→0x043634`; our source sits exactly 0x46 after 0x044860 and
+    `0x43634+0x46 = 0x4367A` — routine boundaries align at that spacing
+    in both games. Right answer: `0x04367A` (with 0x45fcc its vsavj
+    content-twin — the runtime trace picks between the twins at fix
+    time).** Reachability: COLD — GUARD_PROBE at the farm entry's PC
+    fired ZERO times over 21_don_mash + the full 40,620f marathon.
+    **GitHub #107**; the re-resolution moves shipped bytes → the next
+    window.
 
 ### 3. The 113 planted tripwires, ranked by reachability (MEDIUM)
 69 distinct unresolved vs2 targets (donovan 23 / huitzil 46 / pyron 44),

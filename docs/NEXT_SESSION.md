@@ -6,13 +6,18 @@
 > ## ci_static, 2 STRONG findings both reviewed-benign biased bases); H2
 > ## executed (tripwire-reach re-pointed + six legs green on the current
 > ## freeze; pcrel_escapes re-pointed, inventories identical; README
-> ## template fixed). **NEXT: H3 triage** — the uncovered word-form
-> ## escapes (the #103 class), the 13 plausible reconciliation rows,
-> ## tripwires ranked by reach; fixes STAGE for the next window. Then H4
-> ## rigs (pool-vs-pool contact, 2P diversity, authoritative-guard soak).
-> ## #99 CLOSED (maintainer-ruled: the previous setup doesn't reproduce);
-> ## #106 filed (merged image outside the pcrel-escape freeze). Open:
-> ## #106, #50, #10, the ~200 tracked build dirs.
+> ## template fixed). **H3 EXECUTED: escapes CLOSED zero-live**
+> ## (test_escape_triage, 25 frozen verdicts — the 20-site cluster is
+> ## adjacent-OK by construction, the rest are reviewed census false
+> ## positives) **and the 13 plausible rows triaged: 9 consumer-less, 3
+> ## verified twins, ONE REAL FINDING — #107, the 0x0448a6 row is the
+> ## WRONG SIBLING** (last-resort-window 4-way tie, session-4 era;
+> ## neighbor-anchored right answer 0x04367A; COLD on the corpus; fix
+> ## rides the next window). **NEXT: H4 rigs** (pool-vs-pool contact,
+> ## 2P diversity, authoritative-guard soak) + the next window bundle
+> ## (#107 re-resolution). #99 CLOSED (maintainer-ruled); #106 filed
+> ## (merged image outside the pcrel-escape freeze). Open: #106, #107,
+> ## #50, #10, the ~200 tracked build dirs.
 
 > ## **14z-100 (same day): THE #99 RIG IS COMMITTED AND CLEAN.**
 > ## `tests/audit_continue_switch.sh` — coin marathon, forced Phobos,

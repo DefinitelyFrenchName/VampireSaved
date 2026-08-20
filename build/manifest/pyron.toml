@@ -1543,3 +1543,18 @@ hole = "wide_ext"
 only_variant_slot = true
 
 # ══════════════════════════════════════════════════════════════════════
+
+# ══════════════════════════════════════════════════════════════════════
+# ESCAPE TRIAGE, REVIEWED AND NOT ROWED (14z-100 hardening H3.1 — the
+# full uncovered-escape sweep; verdicts frozen by test_escape_triage):
+# - x028122 "+0x112": the donovan.toml review applies verbatim (same
+#   source span) — jump-table DATA at vs2 0x2822C, framing-ambiguous,
+#   path hot-and-healthy across 17 sessions; byte-twin 0x2cc64 ->
+#   0x2d478 recorded there in case it is ever proven live.
+# - x068c78 "+0x1ca escape -> 0x6b644" is a CENSUS FALSE POSITIVE of the
+#   x065c22 class: the 0x6000 word is the LOW HALF of the immediate in
+#   `move.l #$00026000,d3` (frame anchored from +0x1c0:
+#   223c 00280000 / 263c 00026000 / 2800 4844 32c4 d082 ... 51cd ffee —
+#   a coherent interpolation loop). A pad row here would let the escape
+#   pass REWRITE THE IMMEDIATE (the 14z-74 D5 corruption class).
+# ══════════════════════════════════════════════════════════════════════
