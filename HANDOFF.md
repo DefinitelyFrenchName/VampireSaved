@@ -237,7 +237,10 @@ through the literal Donovan-vs-CPU-Phobos pairing, five assertions);
 `tests/audit_projectile_clash.sh` + replays 105/106 (the pool-vs-pool
 contact surface: must-fire control + — since 14z-101 — the frozen
 NATIVE-PARITY signature with a vsav2 anchor leg; the former fix mode
-is refused). Re-pointed to the current freeze
+is refused); `tests/audit_guard_corpus.sh` (14z-101 — the whole
+79-replay corpus × 4 legs under the crash guard on the build under
+test; first merged-m4 run 316/316 END-clean; the known hui41 0x494de
+crash is its must-fire control). Re-pointed to the current freeze
 the same session: `audit_tripwire_reach.sh` (six marathon legs green),
 `test_pcrel_escapes.sh` + `pcrel_escapes.toml`, `bases.tsv` (tenant
 hitbox bases MOVE with freezes — re-derive at every freeze, note in the

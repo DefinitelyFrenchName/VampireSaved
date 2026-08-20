@@ -168,6 +168,49 @@ the next window's `[merged]` coverage exists BEFORE the window, which
 was the point of doing #106 first. The window itself (#107 only) waits
 on the maintainer's in-depth field pass on merged-m4, per the ruling.
 
+## Session 14z-101 (continued) — while the maintainer field-tests:
+## a STALE roadmap claim retired (#10 was DONE at 14z-94), the
+## AUTHORITATIVE-GUARD CORPUS SOAK built and GREEN 316/316, and the
+## build-dir decision package delivered
+
+**#10 was already fully executed — the "ripe" carry was STALE.** The
+check-history discipline caught it one command into "going forward"
+with the item: commit `00b3777` (14z-94) unified the staging split
+10 → 0 and re-measured all five consuming gates, and `92d0266` is the
+maintainer-ruled 0621 trap-parity re-freeze — the tail included. The
+GitHub issue closed 2026-08-17; NEXT_SESSION's banner had carried
+"#10 ripe" forward from pre-14z-94 history (and my 14z-101 roadmap
+summary repeated it). Both stale copies corrected in place; grep clean.
+
+**The authoritative-guard corpus soak (hardening §5's queued item) is
+BUILT, CONTROLLED, AND GREEN:** `tests/audit_guard_corpus.sh` — every
+replay in tests/replays (79 rigs, ~472k script frames) under the crash
+guard on the build under test, FOUR legs each: unpoked + P1 forced to
+0x10/0x11/0x13 over the standard commit window (poking later frames is
+deliberately avoided — +0x382 is the voice-flavor class in match, the
+kill-poke lesson; a leg whose replay commits elsewhere degrades to a
+legacy run and the header says so). MUST-FIRE CONTROL before any green
+was trusted: the known 14z-93 crash reproduces on hui41 and is NAMED
+(CRASH 14767 vec4 PC 0fb6e0 → the 0x494de tripwire fragment line).
+**First full run on merged-m4: 316/316 END-clean, zero vectors, zero
+dead legs** — including 26_don_arcade_mash at END 40620 on all four
+legs. Verdict map kept: build/guard_corpus/m3b_merged11.1787265955.tsv.
+JOBS=2 + nice so a playtest can share the machine.
+
+**The ~200-build-dirs decision package is DELIVERED** (maintainer has
+the file; tracked copy: `docs/project/build_dir_triage.md`): 143 dirs,
+11.7 GB, classified — A1 current/operational 0.5 GB; A2 the pinned
+merged-pipeline extract inputs m5_wide/hui32/pyron21 (regenerable via
+ensure_merged_inputs but operationally live); A3 evidence/ground-truth
+references; A4 live-referenced pending role check (2.6 GB); B1 the
+previous freeze generation (tagged — suggest keep until the #107
+window lands); B2 probe evidence (reproducible from STATE, 0.8 GB);
+B3 scratch (1.9 GB); B4 doc/history-only (2.1 GB); C zero-reference
+(2.5 GB). **~7.3 GB reclaimable pending the ruling**; the proposed
+procedure is a reversible attic-move + `run_all_static --strict` +
+battery, so anything that quietly depended on a dir names itself.
+DECISION PENDING (maintainer): which classes go.
+
 ## Session 14z-100 CLOSE — ritual complete
 
 The session, in one line: the 14z-99 window went from freshly-frozen to

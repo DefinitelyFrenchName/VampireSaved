@@ -13,8 +13,17 @@
 > ## `ROMDIR=... tests/run_all_static.sh` -> PASS 96 / SKIP 0 / FAIL 0.
 > ## PLAY: `tools/run_wide.sh build/m3b_merged11 fbneo`.
 > ##
-> ## **OPEN: #106 #107** (+ #50 parked, #10 ripe, the ~200 tracked
-> ## build dirs). **#108 RESOLVED NOT-A-DEFECT 14z-101** (writer hunt:
+> ## **OPEN: #107** (+ #50 parked; the build-dir ruling — the decision
+> ## package is `docs/project/build_dir_triage.md`, ~7.3 GB reclaimable
+> ## pending which classes go). NEW INSTRUMENT 14z-101:
+> ## `audit_guard_corpus.sh` — the whole corpus × 4 legs under guard on
+> ## merged-m4, FIRST RUN GREEN 316/316 (must-fire control: the hui41
+> ## 0x494de crash reproduces and is named).
+> ## #106 CLOSED 14z-101; #108 CLOSED not-a-defect (maintainer,
+> ## 2026-08-21). **The "#10 ripe" this banner used to carry was STALE
+> ## — #10 was fully executed at 14z-94** (staging unified 10->0, five
+> ## gates re-measured, the 0621 trap-parity re-freeze maintainer-ruled
+> ## at 92d0266); it had been carried forward from pre-14z-94 history. **#108 RESOLVED NOT-A-DEFECT 14z-101** (writer hunt:
 > ## +0x18 is OUR OWN bank-word row, the sweep gate reads +0x94, and
 > ## native vs2's satellites are equally sweep-inert — close is the
 > ## maintainer's call). New standing instruments this session:
@@ -152,7 +161,9 @@
 > ## uppercase allocation cursor.
 > ##
 > ## Open: #99 (un-parks after the field pass), #50 (behind #99), #10
-> ## (ripe re-measurement), the ~200 tracked build dirs. DONE at the
+> ## (ripe re-measurement) [STALE — #10 was already DONE at 14z-94, see
+> ## the top banner; kept as written, this block is history], the ~200
+> ## tracked build dirs. DONE at the
 > ## post-freeze close: the two superseded battery-target registry rows
 > ## are annotated CARRIED->m9 in the TSV; patch_index/patch_notes caught
 > ## up with the window (the skipped ritual, executed one session late).

@@ -168,8 +168,18 @@ Re-point the `[merged_*]` sections at every merged freeze.
   exercised).
 - L/M/H strengths of Phobos' historically-broken moves (field covered
   the moves, not every strength).
-- 2P-diverse tripwire-reach rigs + an authoritative-guard corpus soak
-  (queued; the marathon legs are the current bound).
+- **the authoritative-guard corpus soak: BUILT AND GREEN (14z-101)** —
+  `tests/audit_guard_corpus.sh`: the whole replay corpus (79 rigs,
+  ~472k script frames) under the crash guard on the build under test,
+  four legs (unpoked + P1 forced per tenant over the standard
+  commit window; honest limits in the header). First full run on
+  merged-m4: **316/316 END-clean, zero vectors, zero dead legs** —
+  including 26_don_arcade_mash × 4 legs at END 40620. Must-fire
+  control: the known hui41 crash reproduces and is NAMED (vec4 →
+  unresolved 0x494de tripwire). Verdict maps kept under
+  build/guard_corpus/. 2P diversity is partially covered by the
+  forced legs + audit_continue_switch; dedicated 2P-diverse marathon
+  rigs remain queued behind the two items above.
 
 ## Guard currency (the H2 sweep, 2026-08-20)
 - `audit_tripwire_reach.sh` → current freeze artifacts; six legs green.
