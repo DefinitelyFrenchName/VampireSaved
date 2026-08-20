@@ -24,6 +24,15 @@ opcode and data views differ completely (docs/platform/gotchas.md).
 Usage:
   verify_pcrel_data.py <build_dir> --src-data <vsav2_data.bin>
                        [--census <census.json>] [--region NAME]
+                       [--extract <dir>] [--placement-suffix <@tenant>]
+
+MERGED BUILDS (14z-101, GitHub #106): a merged build carries no extract/
+of its own (it composes the solos' pinned extracts), and its placements
+key non-reference tenants' regions as "<region>@<tenant>". Cover it one
+tenant at a time with that tenant's own extract:
+
+  verify_pcrel_data.py build/m3b_merged11 --src-data ... \
+      --extract build/hui45/extract --placement-suffix @huitzil
 
 Exit 1 if any pointer resolves to bytes that do not match its table.
 """
@@ -67,10 +76,20 @@ def main():
     ap.add_argument("--region", help="check only this region")
     ap.add_argument("--window", type=lambda s: int(s, 0), default=0x20,
                     help="bytes compared per table (default 0x20)")
+    ap.add_argument("--extract", help="external extract dir (merged builds "
+                    "have none of their own — pass the tenant's, #106)")
+    ap.add_argument("--placement-suffix", default="",
+                    help="appended to each region name when resolving "
+                    "placements (merged builds key non-reference tenants' "
+                    "regions as '<region>@<tenant>')")
     a = ap.parse_args()
 
     repo = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-    extract = os.path.join(a.build_dir, "extract")
+    extract = a.extract or os.path.join(a.build_dir, "extract")
+    if not os.path.isdir(extract):
+        print(f"FAIL: no extract dir at {extract} — a merged build needs "
+              f"--extract <tenant's extract> (GitHub #106)", file=sys.stderr)
+        return 2
     if a.census:
         census = json.load(open(a.census))
     else:
@@ -84,10 +103,16 @@ def main():
 
     placements = json.load(open(os.path.join(a.build_dir, "patch",
                                              "placements.json")))["regions"]
-    zips = [f for f in os.listdir(os.path.join(a.build_dir, "rompath"))
-            if f.endswith(".zip")]
+    zips = sorted(f for f in os.listdir(os.path.join(a.build_dir, "rompath"))
+                  if f.endswith(".zip"))
     assert zips, "no romset zip in the build's rompath"
-    _, built_da = decrypted_views(os.path.join(a.build_dir, "rompath", zips[0]))
+    # The PROGRAM image is the set zip (vsavjw.zip on the WIDE track);
+    # vsav.zip is the pristine GFX DONOR, and verifying it would silently
+    # measure the wrong image. zips[0] of an unordered listdir happened to
+    # pick right on this filesystem — made deliberate 14z-101.
+    prog = [z for z in zips if z != "vsav.zip"]
+    _, built_da = decrypted_views(os.path.join(a.build_dir, "rompath",
+                                               (prog or zips)[0]))
     src_da = open(a.src_data, "rb").read()
 
     # AN ABSENT KEY IS NOT AN EMPTY ONE (14z-94, GitHub #22). This used to be
@@ -117,10 +142,11 @@ def main():
     bad, checked, skipped = [], 0, 0
     for f in findings:
         reg = f["region"]
-        if reg not in placements:
+        key = reg + a.placement_suffix
+        if key not in placements:
             skipped += 1
             continue
-        p = placements[reg]
+        p = placements[key]
         delta = p["dst"] - p["src"]
         resolved = f["target"] + delta
         want = src_da[f["target"]:f["target"] + a.window]

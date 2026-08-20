@@ -84,12 +84,28 @@ consuming site in each artifact's patch payloads.
     the target: the farm's case-2 sibling is the VERIFIED row
     `0x044860→0x043634`; our source sits exactly 0x46 after 0x044860 and
     `0x43634+0x46 = 0x4367A` — routine boundaries align at that spacing
-    in both games. Right answer: `0x04367A` (with 0x45fcc its vsavj
-    content-twin — the runtime trace picks between the twins at fix
-    time).** Reachability: COLD — GUARD_PROBE at the farm entry's PC
-    fired ZERO times over 21_don_mash + the full 40,620f marathon.
-    **GitHub #107**; the re-resolution moves shipped bytes → the next
-    window.
+    in both games. Right answer: `0x04367A`.** Reachability: COLD —
+    GUARD_PROBE at the farm entry's PC fired ZERO times over
+    21_don_mash + the full 40,620f marathon.
+    **PRE-WORK EXECUTED 14z-101 — the twin question is answered
+    STATICALLY, no rig needed:** both games carry the analogous farm
+    natively as `jmp abs.l` sequences (vs2 `0x5C508+` ↔ vsavj
+    `0x5436C+`, identical preludes/epilogues), and slot-for-slot vs2
+    `0x448A6` ↔ vsavj **`0x4367A`** (code ref `0x054380`). The data
+    tables (vsavj `0xBF330+` ↔ vs2 `0xD94D0+`) corroborate — and show
+    `0x45FCC` is NOT an interchangeable twin: it holds the NEXT slot
+    (pairs with vs2 `0x471E8`) and has zero vsavj code refs. Content:
+    6 diffs / 0x2E bytes vs `0x4367A` (all reconciled operands) vs 24
+    for the committed `0x2563E`. The adjacent OPEN row `0x448D4`
+    farm-aligns to `0x436A8` by role but the routines genuinely
+    drifted (22+ diffs) — it stays open, role-anchor recorded.
+    The matcher-hardening half is LANDED inert: `reconcile_batch`
+    refuses a tied top at any window (open + `TIE-Nxs.ss-wN` note;
+    gate `test_reconcile_matcher` §6; live control: fresh `0x448a6`
+    now returns open/TIE-4x0.94-w0x20; `test_m3a_reproducible` PASS —
+    build-inert). **GitHub #107**; the row flip to `0x04367A`
+    (verified, callsite-anchored) moves shipped bytes → the next
+    window, whose only content it now is.
 
 ### 3. The 113 planted tripwires, ranked by reachability (MEDIUM)
 69 distinct unresolved vs2 targets (donovan 23 / huitzil 46 / pyron 44),
@@ -104,31 +120,50 @@ with `dispatch_census.toml` + wider rigs (H4).
 escape whose table did not travel resolves elsewhere BY CONSTRUCTION" —
 accepted dead paths, frozen since 14z-94, inventories measured IDENTICAL
 on the m9/m18/m12 generation (14z-100 re-point). A pass means unchanged,
-not safe. **KNOWN GAP: the MERGED image is outside this freeze** —
-`verify_pcrel_data.py` needs `extract/`, which merged builds don't carry
-(they compose the solos' extracts). Extension = teach it an external
-extract + merged placements. Filed on GitHub.
+not safe. **THE MERGED GAP IS CLOSED (14z-101, GitHub #106):**
+`verify_pcrel_data.py` takes `--extract` (a tenant's pinned extract) +
+`--placement-suffix` (`@huitzil`/`@pyron` — merged placement keys), and
+the gate's three `[merged_*]` legs freeze the merged image BY REFERENCE
+to the solo sections (measured IDENTICAL on m3b_merged11, 89/89 still
+BROKEN on the merged placements too; wrong-suffix must-fire control).
+Also made deliberate on the way: the tool's program-zip choice (it
+picked `vsavjw.zip` over the gfx donor `vsav.zip` by listdir accident).
+Re-point the `[merged_*]` sections at every merged freeze.
 
 ### 5. Known-uncovered DYNAMIC surfaces (H4)
-- **pool-vs-pool projectile contact: RIG BUILT, AND IT FOUND #108**
-  (14z-100 H4). `tests/audit_projectile_clash.sh` + replays 105/106:
-  the CONTROL (Demitri-vs-Demitri head-on flares) proves the sweep path
-  alive (468 probe fires); the tenant leg (Pyron cosmo + a flare
-  through the field, clean of hitstun) shows **satellites carry
-  collision word `+0x18 = 0x1000` where native vs2 carries `0x6000`,
-  spawn-inherited from the fighter's own word (vanilla copier
-  `PRG:0x545F0`), and consequently NEVER enter the sweep** — clean-leg
-  A/B, confound removed (the first comparison was polluted by the rig's
-  own hitstun; retracted in place). The census's tenant-zero is thus
-  (at least for satellites) a defect artifact, not intrinsic safety.
-  Writer unresolved: the `-debug` trace shows only the vanilla per-class
-  init writing table[0x11]=0x6000 while non-debug dumps read 0x1000 by
-  f2400 — an instrument paradox of the "-debug is its own timeline"
-  class; the named next instrument is FBNEO_HTAP (non-debug write tap)
-  on `$FF8418` across f2300-2400. GitHub **#108**; the audit freezes
-  the defect signature (EXPECT_SAT_SWEEP=0) and carries the fix mode.
-  ALSO STILL OWED: the same `+0x18` steady-state measurement for
-  Huitzil and Donovan (the mine/missile exposure family).
+- **pool-vs-pool projectile contact: RIG BUILT — and #108 RESOLVED
+  NOT-A-DEFECT (14z-101 writer hunt; measured NATIVE PARITY).** The
+  14z-100 finding here read "satellites carry collision word `+0x18 =
+  0x1000` where native carries `0x6000` and consequently never enter
+  the sweep" — **the causal chain is RETRACTED on every link**:
+  - `+0x18` is the per-char **OBJ BANK WORD** (table `PRG:0x282D4`,
+    writer `PRG:0x282C0` — the 14z-62c row). Ours reads 0x1000 because
+    our own `obj_bank_word_slot` variant rows PATCH the table
+    (0x282F4/F6/FA := 0x1000, all three tenants — deliberate and
+    load-bearing: WIDE group C bank 4; 0x6000 there re-garbles tenant
+    sprites). The 14z-100 "no patch op covers the table" claim was
+    false — the -debug analysis read the PRISTINE table, and the
+    "instrument paradox" dissolves: the two instruments never
+    disagreed about the write; the -debug leg's "0x6000" was INFERRED
+    from the wrong image (trace_writes logs registers, not the datum).
+  - The sweep entry gate (vsavj `0x1A734` / vs2 twin `0x19144`,
+    instruction-identical) never reads `+0x18`. It requires alive
+    (+0x00==1) on both, team `+0x70` DIFFERING, and hit-row `+0x94`
+    NONZERO ON BOTH, then the box overlap via `+0x80`.
+  - **Native vs2's satellites also carry `+0x94 == 0`**, refreshed to
+    0 every live frame from their own record data (ours `PRG:0x545DC`,
+    native sibling `0x5C7BC`; whole-run FBNEO_HTAP on all 8 slots'
+    +0x94 lanes, both legs — only the flare control hit-activates,
+    `0x1f` in both games). Cosmo satellites are projectile-sweep-inert
+    NATIVELY; ours match native behavior at the deciding byte.
+  The Huitzil/Donovan `+0x18` breadth item is answered by inspection:
+  their words are their own bank rows by the same design (H row 0x10 and
+  D row 0x13 = 0x1000, documented in their manifests) — no exposure.
+  `tests/audit_projectile_clash.sh` now freezes the PARITY signature
+  (control >=100 fires; tenant word 0x1000 / +0x94==0 / 0 fires; a
+  NATIVE anchor leg proving vs2's satellites 0x6000 / +0x94==0) and
+  REFUSES the former fix mode. The census's tenant-zero remains a
+  contact-coverage fact, not a defect artifact.
 - Shadow/Marionette with tenants (§4 names it "once enabled"; never
   exercised).
 - L/M/H strengths of Phobos' historically-broken moves (field covered

@@ -1,5 +1,173 @@
 # STATE — living progress log
 
+## Session 14z-101 — THE #108 WRITER HUNT RAN AND INVERTED THE FINDING:
+## NOT A DEFECT. The satellites' +0x18 is OUR OWN bank-word row; the
+## sweep gate never reads it; and NATIVE vs2's satellites are equally
+## sweep-inert at the byte that decides (+0x94 == 0, both games).
+
+**The sequence banner's step 1 executed (the non-debug tap), and the
+measurement chain resolved #108 in the opposite direction from the
+ticket. No shipped byte moves; the next-window bundle drops #108.**
+
+The chain, each link measured this session:
+1. **The tap (FBNEO_HTAP `ff8418-ff841b`, rig 106, merged-m4, whole
+   run):** exactly ONE match-window writer of the fighter's `+0x18` —
+   f2363 `+0x18 := 0x1000` PC `0x0282C6`, `+0x1A := 0xe000` PC
+   `0x02831E`. The same vanilla per-class init the -debug trace saw.
+   No second writer exists.
+2. **The archaeology (one grep of patch.json — the check the 14z-100
+   hunt skipped):** the merged patch carries `code` ops
+   `0x282F4/0x282F6/0x282FA := 0x1000` — the three tenants'
+   **`obj_bank_word_slot`** variant rows (14z-62c). `PRG:0x282D4` is
+   the per-char OBJ BANK-WORD table; 0x1000 is the WIDE group-C bank-4
+   word, deliberate and LOAD-BEARING (its absence is the measured
+   grey-block garble that created the row). The ticket's "no patch op
+   covers the table" is FALSE; the "-debug instrument paradox" was
+   never a disagreement — the -debug "0x6000" was INFERRED from the
+   PRISTINE table (trace_writes logs registers, not the datum — the
+   14z-76 gotcha shape; project gotcha updated in place).
+3. **The sweep gate, disassembled in BOTH games (vsavj `0x1A734`, vs2
+   twin `0x19144` — instruction-identical):** entry requires alive
+   `+0x00==1` on both pool objects, team `+0x70` DIFFERING, and
+   hit-row `+0x94` NONZERO ON BOTH; boxes via `+0x80`. **`+0x18` is
+   not read anywhere in the gate.**
+4. **The deciding byte, A/B'd whole-run (FBNEO_HTAP on all 8 slots'
+   +0x94 lanes, rig 106, ours vs native vsav2):** cosmo satellites
+   carry `+0x94 == 0` in BOTH games, re-written to 0 every live frame
+   from their own record data (ours `PRG:0x545DC`, native sibling
+   `0x5C7BC`); only the legacy-flare control hit-activates (`0x1f`,
+   both games). **Native satellites cannot enter vs2's own sweep** —
+   ours match native at the mechanism level. The satellites' `+0x80`
+   box pointer is the ported region (`0x4ADDB2`), so the box TABLE
+   travelled fine; there is simply no hit-row to index it with, natively.
+5. **Breadth (the owed Huitzil/Donovan `+0x18` item): answered by
+   inspection** — H row 0x10 and D row 0x13 are the same documented
+   0x1000 bank rows; no mine/missile exposure through this word.
+
+**Consequences executed:**
+- `tests/audit_projectile_clash.sh` RE-FRAMED: the frozen signature is
+  NATIVE PARITY (control >=100 fires; tenant satellites word 0x1000 /
+  `+0x94==0` / zero fires) plus a NEW NATIVE ANCHOR leg (vsav2, same
+  replay: word 0x6000 / `+0x94==0` — if a native satellite ever reads
+  hit-active, the parity claim is dead and #108 reopens). The former
+  EXPECT_SAT_SWEEP=1 "fix mode" is REFUSED with the reason: word :=
+  0x6000 would regress rendering (the 14z-62c garble) and buy nothing.
+  AUDIT PASS on merged-m4 + refusal path verified. Note the anchor leg
+  runs on MAME while the writer hunt ran on FBNeo — the deciding byte
+  is confirmed on two emulators.
+- hardening_register.md §5 rewritten; STATE 14z-100 H4 header marked
+  RESOLVED in place; NEXT_SESSION banner corrected (the window bundle
+  is now #107 ONLY); gotchas (project + index) updated: the
+  "-debug/non-debug disagreement" instance resolved — new rule, grep
+  patch.json for the table's range BEFORE calling a table unpatched.
+- GitHub #108 carries the full chain; close is the maintainer's call
+  (recommended: NOT-A-DEFECT). The banner's field question (c) now has
+  an instrumented answer: the prediction is NO visible difference —
+  native satellites don't trade with projectiles either.
+
+**Method note, paid for again:** BUG ARCHAEOLOGY FIRST. The 14z-100
+hunt spent a -debug trace, dumps, and an "instrument paradox" write-up
+on a question one `grep patch.json 0x282f` answers. The write attribution
+was never the missing piece — the missing piece was checking what our
+own build does to the table before reasoning from the pristine one.
+
+## Session 14z-101 (continued) — #107 PRE-WORK EXECUTED: the twin trace
+## answered STATICALLY (the engines' own farms bind slot-for-slot), and
+## the tie-refusal policy is landed, gated, and proven build-inert
+
+**The twin question needed no rig.** Both games carry the ANALOGOUS farm
+natively, and it is a static `jmp abs.l` sequence — the operand IS the
+dispatch, nothing is computed:
+- vs2 farm `0x5C508+`: cases jmp `0x2711C / 0x271C4 / 0x44860 /
+  0x448A6 / 0x448D4`; vsavj farm `0x5436C+`: jmp `0x27EC8 / 0x27F70 /
+  0x43634 / 0x4367A / 0x436A8` — identical preludes (`move.b #1,$136(a6);
+  moveq #0x1d`) and epilogues (modulo one reconciled jsr,
+  0x156D6↔0x16F8E). Slot-for-slot: vs2 `0x448A6` ↔ vsavj **`0x4367A`**.
+  The verified sibling row (0x44860→0x43634) is the previous slot ✓.
+- The DATA tables corroborate independently: vsavj `0xBF330+` / vs2
+  `0xD94D0+` pointer rows slot-align the same way — and **`0x45FCC` is
+  NOT an interchangeable twin**: it occupies the NEXT slot, pairing
+  with vs2 `0x471E8`. It has ZERO code refs in vsavj (data refs only,
+  `0xBF3BE/0xBF3FE`); `0x4367A` has the farm's code ref at `0x054380`.
+- Content: `0x448A6` vs `0x4367A` = 6 diffs over the full 0x2E-byte
+  routine, EVERY one a reconciled operand (incl. `jmp 0x2711C→0x27EC8`
+  — farm case 0's own verified pair, internal cross-corroboration);
+  vs `0x45FCC` = 7; vs the committed `0x2563E` = 24. **The window row
+  is: `0x0448a6 → 0x04367A`, status verified, callsite-anchored.**
+- **Bonus, honestly negative:** the adjacent OPEN row `0x448D4` farm-
+  aligns to vsavj `0x436A8` by ROLE, but the routines genuinely drifted
+  (vs2's clears 2 fields and rts; vsavj's clears 9) — 22+ diffs
+  immediately, so it stays OPEN legitimately. Role-anchor recorded on
+  the issue for whenever it is wanted; NOT part of the #107 fix.
+
+**The matcher-hardening assertion landed (the inert half, pre-window):**
+- `tools/reconcile_batch.py`: the pattern ladder is module-level now
+  (`pick_window_hits` + `pattern_ladder`), and **a tied top is refused
+  at ANY window** — the ladder keeps trying richer windows; a target
+  whose usable windows all tie lands OPEN with the tie NAMED
+  (`TIE-4x0.94-w0x20`), which under --allow-plausible becomes a loud
+  tripwire instead of a silently-shipped wrong sibling. The other
+  plausible emitters (callsite-votes, farm-helper-xN) already disclose
+  ambiguity in their notes and are unchanged.
+- `test_reconcile_matcher.sh` section 6 (NEW): unit outcomes, ladder
+  behavior both directions, an end-to-end two-site tie through the
+  REAL matcher refused + a single-site must-fire control. Gate PASS.
+- **Live ground truth:** a fresh resolution of the real vs2 `0x448a6`
+  under the new policy returns `(None, open, TIE-4x0.94-w0x20)` — the
+  literal defect input is now refused with the tie named.
+- **Inertness proven, not argued:** existing rows win, and
+  `test_m3a_reproducible` PASS after the change — all five frozen
+  artifacts + merged rebuild bit-exact (2343607a).
+
+**What remains for #107 is WINDOW WORK only:** flip the row to
+`vsavj = 0x04367A, status = "verified", note = "callsite-anchored
+(farm 0x5C51A↔0x5437E + data-table slot + content 6/0x2E all-operand
+diffs; 14z-101)"`, rebuild, battery, re-freeze — bundled per the
+agreed sequence (now the window's ONLY content, #108 having resolved).
+
+## Session 14z-101 (continued) — #106 CLOSED: the merged image is INSIDE
+## the pcrel-escape freeze, per tenant, by reference — and the sequence's
+## windowless prep is COMPLETE
+
+**The tool extension (the issue's own fix shape, executed):**
+- `tools/verify_pcrel_data.py` gains `--extract <dir>` (a tenant's
+  pinned extract — merged builds carry none) and `--placement-suffix`
+  (`@huitzil`/`@pyron`: merged placements key non-reference tenants'
+  regions that way; donovan is the unsuffixed reference). An absent
+  extract dir is a named refusal, not a traceback.
+- **A latent instrument defect fixed on the way:** the tool took
+  `zips[0]` of an UNORDERED listdir from the rompath — on this
+  filesystem that happens to be `vsavjw.zip`, but `vsav.zip` (the
+  pristine GFX DONOR) sorts first alphabetically, so on another
+  machine the tool would have silently verified the WRONG image. The
+  program-zip choice is now deliberate (excludes `vsav.zip`).
+  Solo control after both edits: hui45 inventory IDENTICAL.
+
+**The measurement:** all three tenants' escape inventories on
+`build/m3b_merged11` (each through its own extract + suffix) are
+**IDENTICAL to the frozen solo sections** — 69/10/10, and all 89 are
+still BROKEN on the merged placements too (none accidentally resolves
+through a merged delta). The 14z-100 worry — "what each escape reads on
+the MERGED placements has never been measured" — is answered: same
+inventory, same accepted-dead status.
+
+**The freeze:** `pcrel_escapes.toml` gains `[merged_don]/[merged_hui]/
+[merged_pyr]` — frozen BY REFERENCE (`same_as` a solo section, no
+second copy to drift), each carrying its build/extract/suffix; the
+gate (`test_pcrel_escapes.sh`) runs the three merged legs, compares
+against the referenced solo inventory, keeps the x06cac0 regression
+control on the merged image, and carries a wrong-suffix MUST-FIRE
+control (0 escapes vs 69 frozen — a rotted suffix or extract cannot
+present as green). Gate PASS end to end. RE-POINT the `[merged_*]`
+sections at every merged freeze (noted in the manifest).
+
+**Sequence status: steps 1-3 all executed windowless, as agreed.**
+#108 resolved not-a-defect; #107's window action is mechanical
+(row → 0x04367A); #106 closed with the merged inventory frozen — so
+the next window's `[merged]` coverage exists BEFORE the window, which
+was the point of doing #106 first. The window itself (#107 only) waits
+on the maintainer's in-depth field pass on merged-m4, per the ruling.
+
 ## Session 14z-100 CLOSE — ritual complete
 
 The session, in one line: the 14z-99 window went from freshly-frozen to
@@ -39,6 +207,14 @@ Where the next session starts: NEXT_SESSION's SEQUENCE banner — the
 ## Session 14z-100 (continued) — HARDENING H4: THE CONTACT RIG IS BUILT,
 ## AND IT FOUND #108 — Pyron's satellites carry the WRONG COLLISION WORD
 ## and never enter the projectile sweep
+## [RESOLVED NOT-A-DEFECT 14z-101 — the header above is WRONG on both
+## counts: +0x18 is the OBJ BANK WORD and 0x1000 is OUR OWN deliberate
+## obj_bank_word_slot row (0x282F4/F6/FA, 14z-62c, load-bearing for
+## rendering); the sweep gate never reads +0x18 (the deciding byte is
+## +0x94, and NATIVE vs2's satellites carry +0x94==0 too — sweep-inert
+## in both games, whole-run taps both legs). The "instrument paradox"
+## below also dissolves: the -debug "0x6000" was inferred from the
+## PRISTINE table, not observed. See the 14z-101 entry.]
 
 **The census gap is closed as a rig and opened as a defect.**
 `tests/audit_projectile_clash.sh` + replays 105 (control) / 106 (tenant):

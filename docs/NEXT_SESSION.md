@@ -13,63 +13,76 @@
 > ## `ROMDIR=... tests/run_all_static.sh` -> PASS 96 / SKIP 0 / FAIL 0.
 > ## PLAY: `tools/run_wide.sh build/m3b_merged11 fbneo`.
 > ##
-> ## **OPEN: #106 #107 #108** (+ #50 parked, #10 ripe, the ~200 tracked
-> ## build dirs). New standing instruments this session:
+> ## **OPEN: #106 #107** (+ #50 parked, #10 ripe, the ~200 tracked
+> ## build dirs). **#108 RESOLVED NOT-A-DEFECT 14z-101** (writer hunt:
+> ## +0x18 is OUR OWN bank-word row, the sweep gate reads +0x94, and
+> ## native vs2's satellites are equally sweep-inert — close is the
+> ## maintainer's call). New standing instruments this session:
 > ## `audit_continue_switch` (the #99 lock, incl. the literal
 > ## Donovan-vs-CPU-Phobos pairing), `test_pointer_flow` +
 > ## `test_escape_triage` (ci_static), `audit_projectile_clash`
-> ## (EXPECT_SAT_SWEEP defect/fix modes), `triage_pcrel_escapes` +
+> ## (native-parity signature + anchor since 14z-101), `triage_pcrel_escapes` +
 > ## `audit_pointer_flow` tools; tripwire-reach + pcrel_escapes +
 > ## bases.tsv all re-pointed to the current freeze.
 
 > ## **THE SEQUENCE (maintainer-agreed 2026-08-20): #108 → #107 → #106,
-> ## all windowless, then ONE window bundling the two fixes.**
+> ## all windowless, then ONE window bundling the fixes.**
 > ##
-> ## 1. **#108 root-cause first (the priority — the only live, feelable
-> ##    divergence).** (a) THE WRITER HUNT with the NON-DEBUG instrument:
-> ##    FBNEO_HTAP write tap on `$FF8418`, f2300-2400, rig 106 — the
-> ##    -debug trace and non-debug dumps DISAGREE about this write
-> ##    (paradox detailed on the issue; do not re-trust -debug here).
-> ##    (b) BREADTH: measure steady-state fighter `+0x18` for HUITZIL and
-> ##    DONOVAN the same way (v4-pattern clean legs vs native) — the
-> ##    answer decides one-shared-mechanism vs a Pyron-only row.
-> ##    (c) Field input requested from the maintainer: projectiles into
-> ##    cosmo satellites in 2P, ours vs native vs2 — is the missing
-> ##    trade VISIBLE? Confirms (or demotes) priority.
-> ## 2. **#107 pre-work (small):** one-shot twin trace — GUARD_PROBE
-> ##    `0x4367a` AND `0x45fcc` during legacy play to see which twin
-> ##    vanilla dispatches in the analogous farm; cross-check vs2's
-> ##    callers of `0x448a6` on native. Makes the window action
-> ##    mechanical. ALSO (inert, anytime): the matcher-hardening gate
-> ##    assertion — a last-resort-window TIE must not ship as a silent
-> ##    plausible again (home: test_reconcile_matcher).
-> ## 3. **#106 (background, but BEFORE the window):** teach
-> ##    verify_pcrel_data an external extract + merged placements, so
-> ##    the `[merged]` inventory section freezes against the NEW
-> ##    artifacts the window produces (coverage for free at the freeze).
-> ## 4. **THE WINDOW (one, not three):** #107's row re-resolution +
-> ##    #108's fix together — both reconciliation/data-row class, both
-> ##    flip-mode audits ALREADY EXIST with frozen defect signatures
-> ##    (audit_projectile_clash EXPECT_SAT_SWEEP; the #107 lock rides
-> ##    test_reconcile_matcher + the farm bytes). One rebuild, one
-> ##    battery, one re-freeze, two defects retired — the 14z-99 window
-> ##    rhythm. TIMING: after the maintainer's in-depth field pass
-> ##    completes on merged-m4, so field findings attribute cleanly to
-> ##    this generation; nothing here is urgent (both defects cold or
-> ##    subtle).
+> ## 1. **#108 root-cause — EXECUTED 14z-101, and it INVERTED the
+> ##    ticket: NOT A DEFECT.** (a) The writer hunt ran: ONE writer
+> ##    (the vanilla init at 0x282C0) reading OUR OWN obj_bank_word_slot
+> ##    row (0x282F4/F6/FA := 0x1000 — deliberate, load-bearing WIDE
+> ##    bank word; "no patch op covers the table" was false and the
+> ##    -debug "paradox" was a pristine-table misread). The sweep gate
+> ##    (vsavj 0x1A734 / vs2 0x19144, identical) never reads +0x18 —
+> ##    the deciding byte is +0x94, and NATIVE satellites carry 0 there
+> ##    too (whole-run taps, both games): sweep-inert natively.
+> ##    (b) BREADTH answered by inspection: H/D rows are the same
+> ##    documented bank words. (c) The field question now has an
+> ##    instrumented answer: predict NO visible difference vs native.
+> ##    audit_projectile_clash re-framed to the PARITY signature + a
+> ##    native anchor leg; fix mode REFUSED. STATE 14z-101; close is
+> ##    the maintainer's call on the issue.
+> ## 2. **#107 pre-work — EXECUTED 14z-101, no rig needed:** both
+> ##    games' OWN farms are static `jmp abs.l` sequences that bind
+> ##    slot-for-slot (vs2 0x448A6 ↔ vsavj 0x4367A; code ref 0x054380;
+> ##    data tables corroborate; 0x45FCC is the NEXT slot's routine,
+> ##    not a live twin; content 6/0x2E all-operand diffs vs 24 for
+> ##    the committed 0x2563E). The window action is mechanical:
+> ##    row -> 0x04367A verified callsite-anchored. The tie-refusal
+> ##    policy is LANDED inert (reconcile_batch pick_window_hits/
+> ##    pattern_ladder; test_reconcile_matcher §6; live control: fresh
+> ##    0x448a6 resolves open/TIE-4x0.94-w0x20; m3a_reproducible PASS).
+> ##    Bonus recorded, honestly negative: open row 0x448D4 farm-aligns
+> ##    to 0x436A8 by role but content drifted — stays open.
+> ## 3. **#106 — EXECUTED AND CLOSED 14z-101:** verify_pcrel_data takes
+> ##    --extract + --placement-suffix; the merged image measured with
+> ##    each tenant's own extract — all three inventories IDENTICAL to
+> ##    the solo sections (89/89 still BROKEN on merged placements too);
+> ##    frozen by reference ([merged_*] same_as, re-point at every
+> ##    merged freeze) with a wrong-suffix must-fire control. Also
+> ##    fixed: the tool's program-zip pick was a listdir accident that
+> ##    could verify the gfx donor on another filesystem.
+> ## 4. **THE WINDOW (now #107 ONLY — #108 resolved with no fix to
+> ##    ship, 14z-101):** the 0x0448a6 row re-resolution to 0x04367A
+> ##    (or its content-twin 0x45fcc — the runtime trace picks); the
+> ##    #107 lock rides test_reconcile_matcher + the farm bytes. One
+> ##    rebuild, one battery, one re-freeze. TIMING: after the
+> ##    maintainer's in-depth field pass completes on merged-m4, so
+> ##    field findings attribute cleanly to this generation; nothing
+> ##    here is urgent (the row is COLD on the corpus).
 >
-> ## **H4's CONTACT RIG IS BUILT AND IT FOUND #108**: Pyron's cosmo
-> ## satellites carry collision word 0x1000 (native: 0x6000, clean A/B),
-> ## spawn-inherited from the fighter's +0x18, and never enter the
-> ## projectile sweep — while the Demitri-vs-Demitri control fires the
-> ## sweep 468 times (the census finally has a live denominator).
-> ## `tests/audit_projectile_clash.sh` freezes the defect signature
-> ## (EXPECT_SAT_SWEEP=0) + carries the fix mode. **START POINT NEXT
-> ## SESSION: the #108 writer hunt** — FBNEO_HTAP (non-debug tap) on
-> ## $FF8418 over f2300-2400; the -debug trace and non-debug dumps
-> ## DISAGREE about the same write (instrument paradox, on the issue).
-> ## Also owed: the same +0x18 measurement for Huitzil/Donovan. The next
-> ## window bundle now carries #107 (wrong-sibling row) + #108's fix.
+> ## **H4's CONTACT RIG IS BUILT — and #108 is RESOLVED NOT-A-DEFECT
+> ## (14z-101 writer hunt inverted the 14z-100 reading above).** The
+> ## rig's control half stands: Demitri-vs-Demitri fires the sweep 468
+> ## times (the census has a live denominator). The tenant half's
+> ## "wrong collision word" reading is RETRACTED: +0x18 is the OBJ BANK
+> ## word (our 0x1000 = our own load-bearing obj_bank_word_slot row),
+> ## the sweep gate keys on +0x94, and native vs2's satellites carry
+> ## +0x94==0 exactly as ours do — sweep-inert in both games.
+> ## `tests/audit_projectile_clash.sh` now freezes the PARITY signature
+> ## + a native anchor leg; there is no fix mode. The next window
+> ## bundle carries #107 (wrong-sibling row) only. Detail: STATE 14z-101.
 
 > ## **THE HARDENING PROGRAM IS OPEN (maintainer-directed) — START AT
 > ## `docs/project/hardening_register.md`.** H1 shipped (the pointer/flow

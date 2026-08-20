@@ -175,5 +175,65 @@ else
     ok "build_merged no longer hardcodes --allow-plausible"
 fi
 
+echo "== 6: a TIED top cannot ship as a silent plausible (GitHub #107, 14z-101)"
+# The 0x0448a6 row shipped as "plausible-0.94" for 96 sessions because the
+# ladder's last-resort 0x20 window had FOUR candidates tied at 0.94 and the
+# sort took the lowest address — the note recorded the score and hid the
+# tie. Policy now: pick_window_hits refuses a tied top at ANY window (the
+# ladder keeps trying richer ones); a target whose usable windows all tie
+# lands OPEN with the tie NAMED in its note. NB the other plausible
+# emitters (callsite-votes-{...}, farm-helper-xN) already disclose their
+# ambiguity in the note and are not this class.
+python3 - <<'PYCHK' || bad "the tie policy is missing or wrong"
+import sys
+sys.path.insert(0, "tools")
+import reconcile_batch as rb
+
+# unit outcomes of one window's decision
+r = rb.pick_window_hits([(1.0, 0x100)], 0x40)
+assert r == (0x100, "verified", "pattern-1.00-unique-w0x40"), r
+r = rb.pick_window_hits([(0.94, 0x100), (0.80, 0x300)], 0x40)
+assert r == (0x100, "plausible", "pattern-0.94-w0x40"), r
+r = rb.pick_window_hits([(0.94, 0x100), (0.94, 0x200), (0.94, 0x300),
+                         (0.94, 0x400)], 0x20)
+assert r == ("tie", "TIE-4x0.94-w0x20"), r          # the literal #107 shape
+r = rb.pick_window_hits([(1.0, 0x100), (1.0, 0x200)], 0x40)
+assert r == ("tie", "TIE-2x1.00-w0x40"), r          # a tied 1.00 is still a tie
+assert rb.pick_window_hits([(0.85, 0x100)], 0x40) is None
+assert rb.pick_window_hits([], 0x40) is None
+print("  ok: pick_window_hits — verified/plausible/tie/none all correct")
+
+# the ladder: an early tie must not stop richer windows from deciding...
+seq = {0x40: [(0.94, 0x100), (0.94, 0x200)], 0x30: [(0.97, 0x200)]}
+r = rb.pattern_ladder(lambda w: seq.get(w, []), (0x40, 0x30, 0x20))
+assert r == (0x200, "plausible", "pattern-0.97-w0x30"), r
+print("  ok: pattern_ladder — a richer window may still discriminate a tie")
+# ...and a target that ONLY ever ties lands OPEN with the tie named
+seq = {0x20: [(0.94, 0x100), (0.94, 0x200)]}
+r = rb.pattern_ladder(lambda w: seq.get(w, []), (0x40, 0x30, 0x20))
+assert r == (None, "open", "TIE-2x0.94-w0x20"), r
+print("  ok: pattern_ladder — an all-tie target is OPEN and says why")
+
+# end-to-end through the REAL matcher: a code window duplicated verbatim at
+# two dst sites must refuse; present once, it must resolve. The site is the
+# #107 family prologue padded with nops so every ladder window is covered
+# and the operand mask still leaves >=8 hard bytes.
+site = (bytes.fromhex("102e0007323b00064efb1002000400147032")
+        + b"\x4e\x71" * 0x40)
+src = site + b"\x00" * 0x40
+dst_tied = b"\x00" * 0x100 + site + b"\x00" * 0x100 + site + b"\x00" * 0x100
+dst_one  = b"\x00" * 0x100 + site + b"\x00" * 0x200
+ladder = (0x40, 0x30, 0x60, 0x80, 0x20)
+def resolve(dst):
+    return rb.pattern_ladder(
+        lambda w: rb._batch_search(src, dst, 0, w), ladder)
+cand, status, method = resolve(dst_tied)
+assert status == "open" and method.startswith("TIE-2x"), (status, method)
+print(f"  ok: end-to-end — a real two-site tie is refused ({method})")
+cand, status, method = resolve(dst_one)                 # must-fire control
+assert status == "verified" and cand == 0x100, (status, cand)
+print(f"  ok: control — the single-site case still resolves ({status})")
+PYCHK
+
 [ "$fail" = 0 ] && echo "PASS: one matcher, pinned inert, parameters load-bearing" \
     || { echo "FAIL: reconcile matcher"; exit 1; }

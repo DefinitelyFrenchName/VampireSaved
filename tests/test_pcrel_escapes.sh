@@ -85,6 +85,86 @@ for b in present:
               f" fix has REGRESSED (see verify_pcrel_data's docstring)")
         rc = 1
 
+# ── THE MERGED IMAGE (14z-101, GitHub #106) ──────────────────────────────
+# The shipping artifact was outside this freeze entirely: merged builds
+# carry no extract/ and key non-reference tenants' regions as
+# "<region>@<tenant>". The [merged_*] sections freeze it BY REFERENCE
+# (same_as a solo section — no second copy to drift), carrying the
+# extract + placement-suffix each leg needs.
+merged_secs = []
+cur = None
+for line in frozen_txt.splitlines():
+    m = re.match(r"^\[(merged_\w+)\]", line)
+    if m:
+        cur = {"name": m.group(1)}; merged_secs.append(cur); continue
+    if re.match(r"^\[", line):
+        cur = None; continue
+    m = re.match(r'^(\w+) = "(.*)"$', line)
+    if m and cur is not None:
+        cur[m.group(1)] = m.group(2)
+
+for sec in merged_secs:
+    name = sec["name"]
+    bdir = f"build/{sec['build']}"
+    if not os.path.isdir(f"{bdir}/rompath"):
+        print(f"  SKIP {name}: no merged build at {bdir}")
+        continue
+    if not os.path.isdir(sec["extract"]):
+        print(f"  SKIP {name}: no extract at {sec['extract']}")
+        continue
+    cmd = [sys.executable, "tools/verify_pcrel_data.py", bdir,
+           "--src-data", "build/out/vsav2_data.bin",
+           "--extract", sec["extract"]]
+    if sec.get("placement_suffix"):
+        cmd += ["--placement-suffix", sec["placement_suffix"]]
+    out = subprocess.run(cmd, capture_output=True, text=True)
+    if "verified NOTHING" in out.stderr or out.returncode == 2:
+        print(f"  FAIL {name}: instrument error — {out.stderr.strip()}")
+        rc = 1; continue
+    got = {f"{m.group(1)} {m.group(2)} -> {m.group(3)}" for m in
+           re.finditer(r"BROKEN (\S+): lea (0x[0-9a-f]+) -> table (0x[0-9a-f]+)",
+                       out.stdout)}
+    want = frozen.get(sec["same_as"], set())
+    added, gone = got - want, want - got
+    if added or gone:
+        print(f"  FAIL {name}: merged inventory differs from its reference "
+              f"[{sec['same_as']}] (+{len(added)}/-{len(gone)}) —")
+        for e in sorted(added)[:4]:
+            print(f"          + {e}")
+        for e in sorted(gone)[:4]:
+            print(f"          - {e}")
+        rc = 1
+    else:
+        print(f"  ok   {name}: {len(got)} escapes on the MERGED placements, "
+              f"identical to [{sec['same_as']}]")
+    if any(e.startswith("x06cac0 ") for e in got):
+        print(f"  FAIL {name}: x06cac0 broken on the merged image — 14z-69i "
+              f"regressed")
+        rc = 1
+
+# MUST-FIRE CONTROL for the merged comparison: the same leg with its
+# placement suffix deliberately WRONG must read zero escapes (every
+# region skipped) and therefore FAIL the reference comparison — proving
+# a wrong or rotted suffix/extract cannot present as green coverage.
+ctl = next((s for s in merged_secs
+            if s.get("placement_suffix") and os.path.isdir(f"build/{s['build']}/rompath")
+            and os.path.isdir(s["extract"])), None)
+if ctl is not None:
+    out = subprocess.run([sys.executable, "tools/verify_pcrel_data.py",
+                          f"build/{ctl['build']}",
+                          "--src-data", "build/out/vsav2_data.bin",
+                          "--extract", ctl["extract"],
+                          "--placement-suffix", "@wrong_on_purpose"],
+                         capture_output=True, text=True)
+    got = {m.group(0) for m in re.finditer(r"BROKEN \S+", out.stdout)}
+    if got or not frozen.get(ctl["same_as"]):
+        print("  FAIL control: the wrong-suffix leg still produced findings — "
+              "the must-fire premise is broken")
+        rc = 1
+    else:
+        print(f"  ok   control: a wrong placement suffix reads 0 escapes vs "
+              f"{len(frozen[ctl['same_as']])} frozen — the comparison would fire")
+
 if rc == 0:
     print("  ok   x06cac0 absent everywhere — the 14z-69i fix still holds")
 sys.exit(rc)

@@ -287,6 +287,9 @@ is a GAME gotcha if it is true of the game regardless of the port.
   every probe needs a must-fire control; rig iterations must not share
   a dump dir (overwrites destroy the prior iteration's evidence);
   `grep -c || echo 0` double-prints on zero; a -debug write-trace can
-  DISAGREE with non-debug state about the same write — attribute with
-  the non-debug tap (open instance: #108); zsh expands `=`-leading
+  SEEM to disagree with non-debug state about the same write — attribute
+  with the non-debug tap (the #108 instance RESOLVED 14z-101: no real
+  disagreement — the -debug "value" was inferred from the PRISTINE
+  table while our own ops patch that table; grep patch.json before
+  calling a table unpatched); zsh expands `=`-leading
   arguments as =cmd lookups.

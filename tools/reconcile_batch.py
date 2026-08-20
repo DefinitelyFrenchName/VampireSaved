@@ -95,6 +95,60 @@ def _batch_search(src_img, dst_img, addr, length):
         return []
 
 
+# A TIED TOP IS A LOTTERY, NOT A RESOLUTION (14z-101, GitHub #107).
+# The 0x0448a6 row shipped as "plausible-0.94" for 96 sessions because the
+# ladder fell to the last-resort 0x20 window, FOUR candidates tied at 0.94
+# on the family's shared prologue, and the sort took the lowest address.
+# The policy below refuses to emit a plausible row from a tied top at ANY
+# window: the ladder keeps trying richer windows, and if none discriminates
+# the target lands OPEN with the tie NAMED in its note — under
+# --allow-plausible an open row becomes a loud tripwire, which beats
+# silently executing a wrong sibling. Existing rows still win, so this
+# changes only how FUTURE targets resolve (inert on the committed maps —
+# proven by test_m3a_reproducible; gated by test_reconcile_matcher §6).
+TIE_EPS = 0.005
+
+
+def pick_window_hits(hits, win):
+    """One window's outcome under the batch policy.
+
+    Returns (cand, status, method) for an accepted resolution,
+    ("tie", note) when the top score is shared by 2+ candidates,
+    or None when the window discriminates nothing acceptable.
+    """
+    if not hits:
+        return None
+    top = hits[0]
+    unique = len(hits) == 1 or hits[1][0] < top[0] - 0.02
+    if top[0] >= 0.999 and unique:
+        return top[1], "verified", f"pattern-1.00-unique-w{win:#x}"
+    if top[0] >= 0.90:
+        tied = [h for h in hits if h[0] >= top[0] - TIE_EPS]
+        if len(tied) > 1:
+            return ("tie", f"TIE-{len(tied)}x{top[0]:.2f}-w{win:#x}")
+        return top[1], "plausible", f"pattern-{top[0]:.2f}-w{win:#x}"
+    return None
+
+
+def pattern_ladder(search, windows):
+    """Window-retry resolution. `search(win)` -> masked_search hit list.
+
+    Returns (cand, status, method); a target whose every usable window
+    ties lands ("open") carrying the LAST tie note, so the manifest row
+    records why it is open instead of silently reading like a miss.
+    """
+    tie_note = None
+    for win in windows:
+        got = pick_window_hits(search(win), win)
+        if got is None:
+            continue
+        if got[0] == "tie":
+            tie_note = got[1]
+            continue
+        return got
+    return None, "open", tie_note or "-"
+
+
 def _farm_entry(img, a):
     """Decode a `lea (d16,PC),A3; bra.w` stub at a -> (lea_target, bra_target)."""
     if int.from_bytes(img[a:a + 2], "big") == 0x47FA \
@@ -179,17 +233,9 @@ def main():
 
     def pattern_resolve(tgt):
         """Window-retry masked search. Returns (cand, status, method)."""
-        for win in (args.window, 0x30, 0x60, 0x80, 0x20):
-            hits = _batch_search(src_pt, dst_pt, tgt, win)
-            if not hits:
-                continue
-            top = hits[0]
-            unique = len(hits) == 1 or hits[1][0] < top[0] - 0.02
-            if top[0] >= 0.999 and unique:
-                return top[1], "verified", f"pattern-1.00-unique-w{win:#x}"
-            if top[0] >= 0.90:
-                return top[1], "plausible", f"pattern-{top[0]:.2f}-w{win:#x}"
-        return None, "open", "-"
+        return pattern_ladder(
+            lambda win: _batch_search(src_pt, dst_pt, tgt, win),
+            (args.window, 0x30, 0x60, 0x80, 0x20))
 
     rows = []
     stats = {"verified": 0, "plausible": 0, "open": 0, "kept": 0}

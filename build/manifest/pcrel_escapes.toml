@@ -138,3 +138,34 @@ escapes = [
   "x0905ae 0x0907f6 -> 0x08b61e",
   "x0905ae 0x0908a0 -> 0x09098a",
 ]
+
+# ── MERGED COVERAGE (14z-101, GitHub #106) ─────────────────────────────
+# The merged image is measured with each tenant's OWN pinned extract plus
+# verify_pcrel_data's --placement-suffix (merged placements key
+# non-reference tenants' regions as "<region>@<tenant>"). Measured on
+# build/m3b_merged11: all three inventories IDENTICAL to the solo
+# sections above — the escape keys are source-side, and none of the 89
+# accidentally RESOLVES on the merged placements either (89/89 BROKEN
+# there too). Frozen BY REFERENCE (same_as) so there is no second copy
+# to drift; the gate expands the reference at check time.
+# RE-POINT AT EVERY MERGED FREEZE: the build key below names the merged
+# dir, and same_as names the solo sections of the SAME generation — move
+# both together (the #94 reference-rot class).
+
+[merged_don]
+build = "m3b_merged11"
+extract = "build/don_m9/extract"
+placement_suffix = ""
+same_as = "don_m9"
+
+[merged_hui]
+build = "m3b_merged11"
+extract = "build/hui45/extract"
+placement_suffix = "@huitzil"
+same_as = "hui45"
+
+[merged_pyr]
+build = "m3b_merged11"
+extract = "build/pyron29/extract"
+placement_suffix = "@pyron"
+same_as = "pyron29"

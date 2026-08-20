@@ -235,15 +235,18 @@ the shipped image; frozen baselines in `tests/expected/pointer_flow/`);
 live); `tests/audit_continue_switch.sh` (the #99 lock: continue+switch
 through the literal Donovan-vs-CPU-Phobos pairing, five assertions);
 `tests/audit_projectile_clash.sh` + replays 105/106 (the pool-vs-pool
-contact surface: must-fire control + the frozen #108 defect signature,
-EXPECT_SAT_SWEEP flips at the fix). Re-pointed to the current freeze
+contact surface: must-fire control + — since 14z-101 — the frozen
+NATIVE-PARITY signature with a vsav2 anchor leg; the former fix mode
+is refused). Re-pointed to the current freeze
 the same session: `audit_tripwire_reach.sh` (six marathon legs green),
 `test_pcrel_escapes.sh` + `pcrel_escapes.toml`, `bases.tsv` (tenant
 hitbox bases MOVE with freezes — re-derive at every freeze, note in the
 file). Open findings: #106 (merged image outside the pcrel-escape
 freeze), #107 (wrong-sibling reconciliation row, fix staged for the
-next window), #108 (satellite collision word — the next session's
-start point). The agreed sequence: NEXT_SESSION banner.
+next window). **#108 RESOLVED NOT-A-DEFECT (14z-101):** the satellite
+word is our own load-bearing `obj_bank_word_slot` bank row, the sweep
+keys on `+0x94`, and native vs2's satellites are equally sweep-inert
+(STATE 14z-101). The agreed sequence: NEXT_SESSION banner.
 
 **Previous batch (14z-96, THE #101 KERNEL VOICE-TABLE PORT,
 maintainer-ruled 2026-08-18): donovan-m8 / huitzil-m17 / pyron-m11 /

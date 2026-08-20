@@ -2736,14 +2736,24 @@ One directory per iteration, always.
 second line and every `[ "$n" = 0 ]` comparison fails. Use
 `n="$(grep -c ... )" || true`. Cost the clash audit its first verdict run.
 
-## The -debug write-trace and non-debug dumps can DISAGREE about one write (14z-100, open on #108)
+## The -debug write-trace and non-debug dumps can DISAGREE about one write (14z-100; RESOLVED 14z-101 — they never disagreed)
 On the SAME build and replay, `trace_writes.lua` (-debug) recorded the
 fighter's `+0x18` receiving table[0x11]=0x6000 from the vanilla init,
-while non-debug dumps read 0x1000 at the same phase. This is the
-"-debug is its own timeline" class biting an ATTRIBUTION, not just a
-frame index: do not conclude "no other writer exists" from a -debug
-trace when the non-debug state disagrees — take the non-debug tap
-(FBNEO_HTAP) instead. Unresolved instance: GitHub #108.
+while non-debug dumps read 0x1000 at the same phase. **RESOLVED
+(14z-101, GitHub #108): there was no instrument disagreement.** The
+FBNEO_HTAP tap showed the same single writer (`PRG:0x282C0`) writing
+0x1000 on the canonical timeline — the -debug leg's "0x6000" was never
+OBSERVED, it was INFERRED by reading the table from the PRISTINE opcode
+view, and our own `obj_bank_word_slot` ops patch that table row
+(0x282F6 := 0x1000, deliberate). Two lessons, both old ones biting
+together: a MAME watchpoint logs REGISTERS, not the datum (14z-76), so
+any "value written" quoted from a -debug trace is a table lookup in
+disguise — and a table lookup must name WHICH IMAGE it read. Before
+declaring a table "not covered by any patch op", grep patch.json for
+the table's address range; that archaeology takes one command and would
+have skipped the whole paradox. The advice stands for real instances:
+when a -debug trace and non-debug state seem to disagree, take the
+non-debug tap (FBNEO_HTAP) — here it settled the question in one run.
 
 ## zsh: an argument beginning with `=` triggers =cmd expansion (14z-100)
 `echo ====` fails with "=== not found" in the Bash tool's zsh — `=word`
