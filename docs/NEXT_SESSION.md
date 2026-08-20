@@ -1,153 +1,56 @@
 # NEXT SESSION — orientation (updated through 14z-99, 2026-08-20)
 
 > ## **THE SUITE IS GREEN: `ROMDIR=... tests/run_all_static.sh` -> PASS 94 /
-> ## SKIP 0 / FAIL 0** (grew +1: test_capture_pose_sources, the #104
-> ## premises). Open: #99 (parked), #43 ((b) awaits a window), #50
-> ## (parked), **#103 (fix STAGED, waits on the window)**, **#104 (RULED
-> ## option (a), MEASURED FEASIBLE — the 15-block port rides the same
-> ## window)**, **#105 (reproduced + locked, 4-leg audit; fix hunt open:
-> ## the 0x5F1B6 probe)**.
+> ## SKIP 0 / FAIL 0.** Open: #99 (parked), #50 (parked behind #99), #43
+> ## ((b) awaits the window).
 > ##
-> ## **#102 IS CLOSED — RULED 2026-08-19 (maintainer): NOT OURS.** The
-> ## venue drift is the ENGINE'S OWN CONTINUE BEHAVIOR, measured on
-> ## pristine vanilla with a legacy character (14z-98 (4)): the continue
-> ## clears the in-use mask and the venue pool restarts.
-> ## `audit_continue_ladder.sh` stays as the REGRESSION LOCK — leg A
-> ## going red would mean the behavior was ours after all, and #102
-> ## reopens.
+> ## **THE WINDOW IS FULLY REHEARSED — #103 + #104 + #105 TOGETHER, ONE
+> ## COMBINED ARTIFACT (build/probe_window 2343607a, 14z-99 (9)):** all
+> ## four flip-audits GREEN on it (grab-pose all-tenants-native, win-pal
+> ## all-legs-colored, lilith-ko FLOWED, ko-writer HEALTHY commit), zero
+> ## tripwires, 807 ops, and the ENTIRE legacy cost vs frozen merged-m3
+> ## is ONE frame (f890, the ratified class-4 pointer cache) on every
+> ## select-reaching replay. THE WINDOW ACTION = uncomment #103's pieces
+> ## (recon_overlay INSIDE [[tenant]] — the "top-level" wording was a
+> ## measured trap) + uncomment the 15 capture_kf rows in all three
+> ## manifests + one sed (colors = 8 -> 10) + rebuild + flip the four
+> ## audit defaults (WEAKEN_P1=1 on the two #103 ones) + full battery +
+> ## freeze. The complete checklist: STATE 14z-99 (9).
+> ##
+> ## **#102 CLOSED** (maintainer-ruled: the engine's own continue
+> ## behavior; audit_continue_ladder stays as the regression lock).
+> ## **#104 fix STAGED + PREFLIGHTED** (the variant-row alias in every
+> ## attacker's keyframe block head; 15 slot_rows data_ports; premises
+> ## frozen in test_capture_pose_sources.sh). **#105 fix STAGED +
+> ## PREFLIGHTED** (colors = 10: sel 8/9 ARE the AUTO sets, both pools
+> ## carry 10; the whites were the sparse block running off its end;
+> ## renders verified on the full-gfx probe; 4-leg lock
+> ## audit_win_pal_auto + replays 103/104). **#103 unchanged** (staged
+> ## since 14z-98, now also rehearsed on the MERGED composition).
 > ##
 > ## **THE FROZEN BUILDS ARE UNCHANGED — donovan-m8 / huitzil-m17 /
-> ## pyron-m11 / merged-m3** (`build/don_m8` d038553d / `build/hui44`
-> ## bfd819a0 / `build/pyron28` 738bcfc2 / `build/m3b_merged10` ac3d0618;
-> ## tags `freeze/*`). **NO SHIPPED BYTE MOVED IN 14z-98.** Play:
-> ## `tools/run_wide.sh build/m3b_merged10 fbneo` (build argument REQUIRED).
+> ## pyron-m11 / merged-m3** (d038553d / bfd819a0 / 738bcfc2 /
+> ## ac3d0618; tags freeze/*). **NO SHIPPED BYTE MOVED IN 14z-98 OR
+> ## 14z-99.** Play: `tools/run_wide.sh build/m3b_merged10 fbneo`
+> ## (build argument REQUIRED). NEW: `WIDE_RECORD=<name> ... mame`
+> ## records any playtest as a frame-exact replay protocol
+> ## (~/.cache/vampire-saved/inp/<name>/; WIDE_PLAYBACK replays it).
 > ##
-> ## **#103 IS CLOSED AS A MECHANISM** (full chain: the 14z-98 comment on
-> ## the issue; STATE 14z-98; engine_internals "THE ROUND JUDGE"):
-> ## - The round judge kills on THE SIGN OF WHITE HP (+0x52), never +0x50;
-> ##   the pipeline keeps white <= hp so white crosses zero first.
-> ## - Donovan's ported x026142 carries a node op (vs2 0x262A4) whose tail
-> ##   `bra.w $25F9A` ESCAPES the region; the preserved displacement lands
-> ##   in the adjacent placed region — his CHILD-OBJECT INIT — run with
-> ##   A6 = the FIGHTER, pinning hp := 1 (a pool durability init) with
-> ##   white ~200. Next hit underflows hp; white stays positive;
-> ##   unjudgeable; the ~8,000f stall is the engine failsafe.
-> ## - The parked bank-tail tables are ELIMINATED with controls (the
-> ##   banner's named trace ran: no loser ever reads them, both spaces).
-> ## - CAUSALLY CONFIRMED: probe build (unregistered build/probe_103_don,
-> ##   scratch manifests) + [[pcrel_escape_fix]] x026142 -> the audit
-> ##   flips to FLOWED 560, and his death takes the KILL COMMIT.
-> ## - Defect locks: audit_don_lilith_ko (EXPECT_STALL=1) +
-> ##   audit_don_ko_writer (NEW, EXPECT_DEFECT=1, PC-attributed).
+> ## **AWAITING (maintainer):** the window SCHEDULING (everything in it
+> ## is rehearsed; freeze philosophy ruled 2026-08-20: a freeze = a
+> ## reference state, so the window lands with #103/#104/#105 fixed);
+> ## the two battery-target registry rows; the ~200 tracked build dirs.
+> ## The #105 captures and the MAME retest are DONE and processed — do
+> ## not re-request either.
 > ##
-> ## **THE FIX IS STAGED AND FULLY PRE-FLIGHTED (14z-98 (3); window
-> ## ratified by the maintainer 2026-08-19, rides with #43(b)).** The
-> ## window action = UNCOMMENT the three pieces at the END of
-> ## donovan.toml (recon_overlay -> top level + two pcrel_escape_fix
-> ## rows), rebuild, full battery, freeze; #43(b) lands beside it as its
-> ## own commit. Rehearsed against the exact recipe (probe cb1b04c3):
-> ## ZERO tripwires, FLOWED 560, healthy kill commit, and legacy A/B
-> ## BIT-IDENTICAL vs don_m8 on four legs. The staged files are proven
-> ## inert (test_m3a_reproducible PASS). DO NOT row x065c22 — its census
-> ## "escape" is operand data and a row would corrupt an immediate (the
-> ## 14z-74 D5 class); x028122/x088512 deferred with evidence (all in
-> ## the manifest comment + STATE 14z-98 (3)).
-> ##
-> ## **FIELD-SETTLED (maintainer MAME retest, 2026-08-19, 14z-98 (5)):
-> ## NO STALL FOR EITHER TENANT in real play.** Phobos: "instance 2" is
-> ## CLOSED as the continue rig's own 2-byte-poke artifact
-> ## (audit_kill_poke_shape freezes the mechanism — kill pokes write BOTH
-> ## words: f:ff8450:00010001). #103 is DONOVAN-ONLY. Donovan's organic
-> ## no-stall refines the TRIGGER, not the root cause: the stall needs
-> ## the hp:=1 pin armed in the round before the death — the mash always
-> ## arms it (rig legs deterministic), organic play only via the culprit
-> ## anim. Root cause + staged fix unchanged (causally proven).
-> ##
-> ## **NEW ISSUES FROM THE RETEST — the natural next work:**
-> ## **#104** (a legacy grab holds a TENANT victim on the wrong capture
-> ## record): reproduced + capture-confirmed 14z-98; **MECHANISM
-> ## RE-MEASURED AND CLOSED 14z-99 — it is the VARIANT-ROW ALIAS class**,
-> ## the port's most common defect shape. The capture pose is selected
-> ## PER VICTIM through 32-row structures whose rows 0x10-0x1F are
-> ## byte-copies of 0x00-0x0F, so a tenant victim is served the BASE
-> ## character it folds onto. Measured index at victim +0x1C, ours vs
-> ## native, over seven victims on both engines:
-> ## Bulleta 12/12, Demitri 11/11, Victor 6/6, Lilith 9/9 (LEGACY —
-> ## the engines AGREE, so the convention is shared);
-> ## **Donovan 0x13->0x03 gets Victor's 6 where native gives 11 (WRONG)**;
-> ## **Phobos 0x10->0x00 gets Bulleta's 12 where native gives 26 (WRONG)**;
-> ## Pyron 0x11->0x01 gets Demitri's 11, which is ALSO native's — right
-> ## BY COINCIDENCE, and exactly why the field report named Donovan and
-> ## Phobos only.
-> ## **TWO 14z-98 CLAIMS ARE RETRACTED** (both measured false, both in
-> ## the audit header): (1) "generation drift in the reaction-index
-> ## space; reorder 5 sibling tables x 3 tenants" — the legacy twins the
-> ## permutation was to be derived FROM are BYTE-IDENTICAL, so it is the
-> ## identity and the reorder is a no-op; (2) "Pyron mismatches too
-> ## (0x26654C)" — that was the AUDIT'S OWN BUG, resolving every tenant
-> ## through Donovan's anim placement on a merged build. Fixed: the
-> ## region is resolved per victim, and a LEGACY-VICTIM CONTROL is now
-> ## section 0 (if the engines ever disagree there, the premise is dead).
-> ## **MECHANISM LOCATED — seven instructions at PRG:0x02802E.** The
-> ## first 32 words of EVERY attacker's keyframe block are a per-victim
-> ## offset table indexed by the victim's id UNMASKED, and in vsavj ALL
-> ## SIXTEEN blocks alias the variant half onto the base half — fourteen
-> ## by OFFSET, two (Zabel 0x04, special 0x0B) by MATERIALIZED byte-copies
-> ## (the "populated 32-entry shape / read that pair first" reading is
-> ## RETRACTED: same defect, stored differently). The tenant lands in the
-> ## base character's capture sub-block and takes BOTH its position
-> ## keyframes and its record index. vs2's twin blocks are NOT aliased and
-> ## carry real newcomer rows — the data exists verbatim.
-> ## **RULED 2026-08-19 (maintainer): option (a) — full — IS THE GOAL,
-> ## measured first. THE MEASUREMENTS CAME BACK CLEAN ON EVERY AXIS; (a)
-> ## PROCEEDS.** Premises frozen in test_capture_pose_sources.sh (NEW,
-> ## ci_static): source twins for all 16 attackers in BOTH vs2 and vhunt2
-> ## (tenant rows distinct, stride-equal, vs2==vh2 cross-oracle); every
-> ## BASE sub-block byte-identical vsavj==vs2 (a wholesale port is
-> ## legacy-safe by CONTENT; addresses never enter work RAM); the
-> ## signed-16-bit bound holds (worst 0x3730, `lea (a0,d0.w)`); exactly 5
-> ## consumers of 0xBE27A, all via the table.
-> ## **IMPLEMENTATION (rides the re-freeze window):** the shipped
-> ## throw_victim_keyframes mechanism, 15x — port the 15 distinct vs2
-> ## blocks (Zabel+special share 0x0ABC56) into wide_ext (0x11BD0 bytes,
-> ## ~71 KiB), repoint 0xBE27A rows 0x00-0x0F + 0x18 (Oboro is a real
-> ## attacker id). Legacy-dereferenced pointers: the 14z-91
-> ## walker-relocation precedent; the probe build must produce the legacy
-> ## A/B proof. Open observation: row 0x11 (Pyron-as-attacker) still
-> ## aliases Demitri's block.
-> ## **#105 REPRODUCED AND DISCRIMINATED (14z-99, from the maintainer's
-> ## captures — ../Images/white_win_portraits):** the surface is the 2P
-> ## VICTORY SCREEN (winner portrait + quote over the loser's CONTINUE
-> ## countdown), and the gate is AUTO SELECTED BY THE WINNER. Measured:
-> ## merged + tenant winner + no-AUTO = COLORED; merged + tenant winner
-> ## + AUTO = WHITE (the captures, pixel for pixel); PRISTINE VANILLA +
-> ## AUTO = COLORED (not the engine's own — the #102 discipline). A
-> ## merged+legacy+AUTO leg is INCONCLUSIVE BY FLOW (a legacy winner
-> ## goes win-pose -> next match, no portrait screen). RECORD-LEVEL:
-> ## the win-pal window 0x90C2A0 is all-0xFFFF DURING the screen and the
-> ## real colors arrive ~f5850 — AFTER it. The upload is LATE, not
-> ## absent: suspect the 0x5F1B6 win-pal path's schedule under the AUTO
-> ## flag. Locks: replays/103_tenant_2pwin_auto.rpl +
-> ## audit_win_pal_auto.sh (3 legs, EXPECT_WHITE=1; leg C whiting would
-> ## mean vanilla shows it and #105's not-ours premise dies; leg D =
-> ## the 1P-vs-COM flavor, replay 104, field-confirmed "one of the
-> ## offending screens"). Also measured: vsav's AUTO is AUTO-GUARD (a
-> ## handicap, human still plays), NOT autoplay. TWO RIG TRAPS, both
-> ## maintainer-corrected, now game gotchas: coarse post-KO sampling
-> ## lands on the MAP screen that comes AFTER the win screen, and
-> ## buttons pressed past the KO skip the victory surfaces — end rig
-> ## inputs at the KO. NEXT: probe 0x5F1B6 on the A/B legs for the
-> ## schedule difference. Field addendum stands:
-> ## NO CRASH, NO REGRESSION across the whole MAME session.
-> ##
-> ## **TWO STANDING HOLDS — do not start:** #99 (parked; blocked by #103's
-> ## fix — and now field-clean on BOTH emulators), #50 (parked behind
-> ## #99). **AWAITING (maintainer):** the re-freeze window (#43(b) +
-> ## #103's staged rows + #104's 15-block port); the two battery-target
-> ## registry rows; the ~200 tracked build dirs. The #105 captures
-> ## ARRIVED 14z-99 and are processed — the defect is reproduced and
-> ## locked; do not re-request them. The MAME retest is DONE and
-> ## processed (14z-98 (5)) — do not re-request it.
+> ## **RIG LORE THAT SAVES A SESSION (14z-99, all measured):** vsav's
+> ## AUTO is AUTO-GUARD (human still attacks); the victory screen shows
+> ## after wins in BOTH 1P and 2P; post-KO sampling lands on the MAP
+> ## screen AFTER the win screen; buttons pressed past the KO skip the
+> ## victory surfaces; render verdicts from gfx-free probes are VOID;
+> ## the natural-mash Donovan death is lottery-bound per build (the FIX
+> ## makes him win — use WEAKEN_P1=1).
+
 
 ## What 14z-98 did
 

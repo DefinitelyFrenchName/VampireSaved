@@ -1382,6 +1382,18 @@ tests/audit_don_ko_writer.sh          # 14z-98 (GitHub #103): THE ROOT-CAUSE
                                       # rehearsal caught the RH-19 window
                                       # trap now documented at leg A.
                                       # ~9 min, 2 parallel MAME runs.
+                                      # WEAKEN_P1=1 (14z-99, both #103
+                                      # audits): the fix-verification
+                                      # mode — the natural-mash death is
+                                      # LOTTERY-BOUND per build and the
+                                      # FIXED build's mash-Donovan WINS,
+                                      # so EXPECT_*=0 legs read NO-KO/
+                                      # NEITHER without it. Cuts his
+                                      # inputs at f6100 + one both-words
+                                      # 5hp pin; the CPU's own hit kills
+                                      # through the real judge. REFUSED
+                                      # with the defect EXPECTs (the pin
+                                      # would mask the hp:=1 shape).
 tests/audit_don_grab_pose.sh          # 14z-98 (6), REBUILT 14z-99,
                                       # GitHub #104: a legacy grab holds a
                                       # TENANT victim on the wrong capture

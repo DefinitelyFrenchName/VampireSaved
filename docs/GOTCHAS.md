@@ -274,3 +274,10 @@ is a GAME gotcha if it is true of the game regardless of the port.
   2P; two rig traps hide it — coarse post-KO sampling lands on the MAP/tally
   screens that come AFTER it, and buttons pressed past the KO skip it. End
   replay inputs at the KO and sample densely between settle and map.
+- **14z-99 (2), project:** render verdicts from a GFX-FREE probe are void
+  (tenant art draws blank and reads as a new defect — palette/RAM verdicts
+  stay valid); `recon_overlay` at DOC ROOT works solo but hijacks EVERY
+  tenant's overlay on a merged build (put it inside [[tenant]]; rehearse
+  staged recipes on the MERGED composition); a staged VALUE swap cannot
+  ride the uncomment rule (duplicate key) — stage it as an edit
+  instruction.

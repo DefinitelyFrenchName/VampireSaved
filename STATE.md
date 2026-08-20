@@ -1,5 +1,220 @@
 # STATE — living progress log
 
+## Session 14z-99 (9) — THE WINDOW IS FULLY REHEARSED ON ONE COMBINED
+## ARTIFACT: #103 + #104 + #105 together, all four flip-audits green,
+## legacy cost = ONE frame. The window action is "uncomment + one sed +
+## battery + freeze".
+
+**build/probe_window (fingerprint 2343607a, UNREGISTERED)** = the EXACT
+window recipe on scratch copies of the tracked manifests: #103's staged
+pieces uncommented (recon_overlay INSIDE [[tenant]] + the two
+pcrel_escape_fix rows), #104's 15 capture_kf rows uncommented, #105's
+colors=10 sed applied. **807 ops** (764 + 32 #104 + 6 #105 + 5 #103),
+GENERATION OK, ZERO tripwires, merged-with-gfx built end to end.
+
+**The four flip-audits, all green on it:**
+| audit | mode | result |
+|---|---|---|
+| audit_don_grab_pose | EXPECT_MATCH=1 | all three tenants hold native's records (11/26/11) |
+| audit_win_pal_auto | EXPECT_WHITE=0 | all four legs COLORED |
+| audit_don_lilith_ko | WEAKEN_P1=1 EXPECT_STALL=0 | FLOWED 2880 (KO 6600 -> stage 9480); Victor control FLOWED 560 |
+| audit_don_ko_writer | WEAKEN_P1=1 EXPECT_DEFECT=0 | HEALTHY kill-commit f6561; Victor control healthy |
+
+**Legacy A/B vs frozen merged-m3** (replays 03/16/96 whole-run): **ONE
+differing frame — f890 — bit-identical from f891**, all three. The
+combined window's entire legacy cost is #104's class-4 pointer-cache
+frame; #103 and #105 contribute zero.
+
+**WEAKEN_P1 (NEW mode on both #103 audits, fix-verification only —
+refused with the defect EXPECTs):** the natural-mash death is
+LOTTERY-BOUND per build, and on the FIXED build the mash-Donovan WINS
+(measured: weakened to 30hp he still never took a hit — the CPU dies at
+f7000/f13900; his old losing trajectory WAS the escape's perturbation).
+The mode cuts his inputs at f6100 and pins hp/white to 5 once
+(both-words, no re-pin can land on a corpse); the CPU's own hit kills
+through the real judge. The natural-mash NO-KO on the fixed build is
+itself corroborating evidence for the fix, and it is also why the
+14z-98 audits' "flip the default when the fix lands" now reads: flip
+the default AND set WEAKEN_P1=1.
+
+**THE WINDOW CHECKLIST (supersedes the per-fix notes; everything below
+is rehearsed):**
+1. Uncomment #103's pieces in donovan.toml — recon_overlay goes INSIDE
+   [[tenant]] after src_char (the staged comment is now correct; the
+   old "top-level" wording was a MEASURED trap — doc-root placement
+   hijacks every tenant's overlay on a merged build).
+2. Uncomment the 15 capture_kf rows in ALL THREE manifests (bare-#
+   strip; the round-trip is byte-exact).
+3. `colors = 8` -> `colors = 10` in all three (one sed, staged comment
+   names it).
+4. Rebuild all four artifacts + merged (expect solo op counts +32+2
+   each; merged 764 -> 807 incl. donovan's #103 rows).
+5. Flip defaults: audit_don_grab_pose EXPECT_MATCH=1;
+   audit_win_pal_auto EXPECT_WHITE=0; audit_don_lilith_ko
+   EXPECT_STALL=0 (+WEAKEN_P1=1); audit_don_ko_writer EXPECT_DEFECT=0
+   (+WEAKEN_P1=1); audit_kill_poke_shape unchanged (engine facts).
+6. Full battery + run_suite + re-freeze expectation sets (the select
+   window class contents re-measure; the f890 window carries #104's
+   new pointer values) + registry rows + tags.
+7. One-look checks at the window: 0xBE27A row 0x11 (Pyron-as-attacker
+   aliases Demitri's block — fix only if he has a capture move);
+   re-point test_merged_render_content's D/P reference rows if those
+   tenants re-freeze.
+
+**No shipped byte moved.** The 14z-96 freeze stands. probe_104,
+probe_105, probe_105f, probe_window are UNREGISTERED probes (scratch
+recipes reproducible from STATE (7)-(9) + the staged blocks).
+
+
+## Session 14z-99 (8) — #105 ROOT-CAUSED AND FIXED: the port carried 8 of
+## the 10 color sets, and sel 8/9 ARE the AUTO sets. One constant. Probed
+## solo and in the COMBINED window rehearsal — which caught a staging bug
+## in #103's block that only a merged build could show.
+
+**THE MECHANISM, measured end to end (canonical-timeline instruments —
+the -debug legs diverged on the mash-driven AUTO match and were
+discarded per the 14z-98 gotcha):**
+1. The 0x5F1B6 win-pal thunk fires IDENTICALLY on both legs (same frame,
+   same registers) — the load call is not the difference.
+2. The staging loader (the engine copy helper `0x1C3A4`, writer PC
+   `0x1C3B6`) writes the staging buffer `$FF41A2+` at the SAME frame on
+   both legs — real colors on the no-AUTO leg, `0xFFFF` on the AUTO leg:
+   same code, different SOURCE.
+3. The winner-struct diff between legs is 7 bytes, and one is the
+   selector the vanilla source math consumes: **`+0x3AE` = 8 under AUTO,
+   0 without** (vsav encodes AUTO as +8 in the color-select byte).
+   Vanilla source = `0x3AD700 + (sel*0x11 + id)*0xA0` (site disasm at
+   0x5F1A6-0x5F1FA; note the *5 then *0x20 = *0xA0 per (sel,id)).
+4. **Both games' pools carry exactly TEN sets (sel 0-9)** — heads
+   identical across sets 0-9, garbage from 10; sets 8/9 are the AUTO
+   colors, real and distinct in both games. `win_pal_variant` ported
+   `colors = 8`, so an AUTO tenant winner indexed the sparse block at
+   `blk + 8*0xAA0` — past `blk_len = 7*0xAA0 + 0xA0` — into hole fill
+   = the white portraits. Vanilla covers sel 8/9 natively, which is why
+   vanilla+AUTO renders fine (the not-ours control).
+
+**THE FIX: `colors = 8 -> 10`** in all three tenants' win_pal_variant
+rows (pure data — vs2's own AUTO sets ride the existing port machinery;
++2 data ops per tenant; sparse blocks grow 0x4B20 -> 0x6040).
+
+**Probed solo (build/probe_105 gfx-free, then build/probe_105f FULL
+merged):** audit_win_pal_auto EXPECT_WHITE=0 — ALL FOUR legs COLORED on
+both probes; the win screen and the VS/challenger screen RENDER
+correctly on the full probe (Donovan+Anita in the AUTO color set;
+snapshots kept); the staging/palette timeline shows the full correct
+set from f5450. **Legacy A/B vs frozen merged-m3: BIT-IDENTICAL
+whole-run** (replays 03/16) — not even an f890 frame; nothing
+select-init caches moves under this fix.
+
+**AN INSTRUMENT ARTIFACT CAUGHT BEFORE PUBLICATION:** the first render
+check ran on the GFX-FREE probe — the portrait is TENANT ART, so it
+drew blank/pale and the VS-splash side art read "white", which briefly
+looked like a SECOND sel-indexed defect. Both observations were VOID
+(the full-gfx probe renders both correctly). Render verdicts need a
+build with gfx; palette/RAM verdicts do not. Recorded as a gotcha.
+
+**THE COMBINED WINDOW REHEARSAL (build/probe_window, fingerprint
+2343607a, UNREGISTERED — the exact window recipe: #103's two pieces +
+overlay, #104's 15 rows, #105's colors=10):** 807 ops, GENERATION OK,
+zero tripwires. **It caught a real staging bug on its FIRST build:**
+the #103 staged comment said recon_overlay is "a top-level key" —
+placed at DOC ROOT it works on a SOLO build but HIJACKS EVERY tenant's
+overlay on a MERGED build (`recon_for()` reads
+`port.get("recon_overlay")` FIRST and `port` is the merged doc), so
+huitzil lost its own overlay rows and generation died on
+`x022400+0xb74` — the EXACT failure the 14z-80 scoping fix quotes. The
+correct placement is INSIDE [[tenant]], like huitzil's; the staged
+comment in donovan.toml is corrected and the trap recorded. The 14z-98
+solo probe could never have seen this — solo builds read the root key
+fine. Window flip-audits on the combined probe: grab-pose
+EXPECT_MATCH=1 GREEN; win-pal / lilith-ko / ko-writer running at this
+entry's close (results in (9)).
+
+**STAGED IN THE TRACKED MANIFESTS (inert, parse-verified, colors still
+8):** the #105 window action as an edit instruction beside each
+`colors = 8` line (a staged VALUE swap cannot ride the uncomment rule —
+a duplicate key would refuse to parse; the window action is one sed,
+written in the comment).
+
+**No shipped byte moved.** The 14z-96 freeze stands.
+
+
+## Session 14z-99 (7) — #104's FIX IS AUTHORED, PROBED AND STAGED: the 15
+## capture-keyframe blocks port clean, all three tenants hold native's
+## records, and the legacy cost is ONE frame — the ratified class-4 cache
+
+Executed per the (6) directive. **No shipped byte moved** — the machinery
+landed inert, the rows are staged comments, and the probe is unregistered.
+
+**Generator machinery (landed, PROVEN INERT — test_m3a_reproducible green
+on all four frozen references + merged, twice, after each edit):**
+- `[[data_port]]` gains **`slot_rows`** — "row:expected_vanilla_ptr" pairs
+  naming EXPLICIT slot_ptr_table rows to repoint at the placed blob (the
+  owner-row branch serves only a tenant's own row and cannot express a
+  LEGACY-row repoint). Every entry is old-verified against the pristine
+  image (the #18 discipline); dst/dst_old_head anchor the superseded
+  vanilla block by content; dst_end is deliberately not checked (nothing
+  is written at dst, and the placed blob is LONGER by design).
+- The `_span_collisions` identity for a slot_rows row extends with its
+  slot_rows string — keying by dst alone made capture_kf_jedah "collide"
+  with throw_victim_keyframes (both ANCHOR 0xB19F8 while writing disjoint
+  bytes). Two slot_rows rows poking the same table row would dodge the
+  scan and die downstream at patch_prg's op-overlap assertion.
+
+**The 15 rows** (generated from the measured inventory, vs2 verbatim,
+vhunt2 as `orc` — every block byte-identical vs2==vh2 over its whole
+span, verified before authoring): capture_kf_{bulleta..jedah}, Zabel's
+blob serving rows 0x04+0x0B (vs2 shares one block where vsavj
+interleaves two tables), Bishamon's serving 0x08+0x18 (Oboro).
+`only_variant_slot` keeps the stock twin bit-identical by construction.
+
+**THE PROBE (build/probe_104, UNREGISTERED, scratch manifests =
+tracked + the rows uncommented; merged1-style gfx-free pack against
+wide0 — the audit reads RAM, not pixels):** 796 ops = 764 + 15 blobs +
+17 pokes, GENERATION OK, zero tripwires.
+- `audit_don_grab_pose EXPECT_MATCH=1`: **green on ALL THREE tenants** —
+  Donovan holds native's 0x287418 (idx 11), Phobos 0x2481EA (idx 26),
+  Pyron 0x26614C (idx 11) — with the legacy control agreeing (Demitri
+  11/11 both engines).
+- **Legacy A/B vs frozen merged-m3** (replays 03/16/96 whole-run,
+  MAME): **EXACTLY ONE differing frame — f890 — then bit-identical to
+  the end** (5,320/4,320/5,520 frames), including replay 96 UNPOKED — a
+  grab-heavy pure-legacy match whose captures execute through the
+  RELOCATED blocks. f890 is the ratified §4 class-4 mechanism
+  (select-init caches the record pointers the fix repoints); one sampled
+  frame, single contiguous run, full re-convergence, match state
+  untouched. At the re-freeze vs VANILLA this rides the existing
+  select-window class; the frozen window contents re-measure as always.
+- Ordinary hits: covered by the same A/B — non-capture reactions never
+  transit the positioner ($134(a4) gate), and replay 96's full match is
+  bit-identical from f891.
+
+**STAGED:** the rows sit COMMENTED at the end of all THREE manifests
+(the #103 bare-# convention; the mechanical uncomment reproduces the
+probed recipe byte-for-byte — round-trip asserted over all 180 row
+lines). Window action: uncomment in all three + flip
+audit_don_grab_pose's EXPECT_MATCH default to 1; expect +32 ops per
+artifact (merged 764 -> 796) and the select-window class contents to
+re-measure.
+
+**#104 is now window-ready end to end.** Remaining open on the ticket:
+nothing — the row 0x11 (Pyron-as-attacker) observation stays recorded on
+the issue as a separate check at the window.
+
+
+## Session 14z-99 (6) — THE FREEZE PHILOSOPHY, stated by the maintainer
+## (2026-08-20), and the directive: do #104 and #105
+
+**Maintainer, verbatim intent:** "a freeze should ideally reflect a
+reference state. It need not be perfect, but it needs to be good enough
+that it would be the reference for upcoming builds, reference against
+which to test." Consequence for the pending window: it should land with
+the KNOWN in-scope defects fixed — #103 (staged), #104 (ruled (a),
+feasibility measured), #105 (locked, fix hunt open) — rather than freeze
+around them. **Directive: do #104 and #105** (author + probe the fixes;
+input needed only where a real decision surfaces). They are also happy
+to test the record/playback system.
+
 ## Session 14z-99 (2) — #105 REPRODUCED from the maintainer's captures:
 ## the 2P victory screen, and the gate is AUTO SELECTED BY THE WINNER.
 ## Vanilla renders the same flow COLORED — the defect is ours.

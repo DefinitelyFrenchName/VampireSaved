@@ -90,6 +90,25 @@ MAME_BIN="${MAME_BIN:-$HOME/.cache/vampire-saved/mame/cps2}"
 [ -x "$MAME_BIN" ] || { echo "SKIP: no WIDE MAME binary"; exit 0; }
 export MAME_BIN
 EXPECT_STALL="${EXPECT_STALL:-1}"
+# WEAKEN_P1=1 (14z-99): make the P1 death PRODUCIBLE ON ANY BUILD by
+# holding P1's hp AND white low (both-words pokes — audit_kill_poke_shape;
+# never near a corpse: three pokes early in the sampled round only). The
+# natural-mash death is LOTTERY-BOUND per build (the mask is
+# sound-state-fed): the #103 FIX moves Donovan's fight trajectory, so on a
+# fixed build the mash may never kill him and leg A reads NO-KO — measured
+# on the 14z-99 combined window probe, where the natural leg died at
+# NO-KO while both #103 rehearsal audits were green on the solo probe.
+# ONLY MEANINGFUL WITH EXPECT_STALL=0: it verifies the JUDGE FLOW
+# (KO -> stage change vs the phase-6 pin). On a DEFECT build a weaken
+# poke can MASK the stall (it overwrites the hp:=1 pin with a sane
+# hp==white pair), so the gate REFUSES the combination.
+WEAKEN_P1="${WEAKEN_P1:-0}"
+if [ "$WEAKEN_P1" = 1 ] && [ "$EXPECT_STALL" = 1 ]; then
+    echo "REFUSING: WEAKEN_P1=1 with EXPECT_STALL=1 — the weaken poke"
+    echo "  overwrites the hp:=1 pin and can mask the very stall this"
+    echo "  mode asserts. Weaken only when verifying the FIX."
+    exit 1
+fi
 
 W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT
 fail=0
@@ -101,14 +120,31 @@ fail=0
 RPL="$W/marathon_head.rpl"
 awk -F'[- ]' '/^[0-9]/ { if ($1 + 0 > 18000) exit } { print }' \
     "$REPO/tests/replays/26_don_arcade_mash.rpl" > "$RPL"
+# WEAKEN mode leg-A rig: inputs CUT at f6100 (an idle P1 stops winning —
+# measured 14z-99: the FIXED build's mash-Donovan beats the CPU and a
+# 30hp weaken alone never produces his death because the CPU never lands
+# a hit while he attacks), then a 5hp both-words pin; the CPU's own hits
+# finish it. The single poke set needs no re-pinning, so no write can
+# land on the corpse (the revival hazard).
+RPL_W="$W/marathon_weaken.rpl"
+awk -F'[- ]' '/^[0-9]/ { if ($1 + 0 > 6100) exit } { print }' \
+    "$REPO/tests/replays/26_don_arcade_mash.rpl" > "$RPL_W"
+printf '17960 wait\n' >> "$RPL_W"
 
 run_leg() { # tag p1class
     d="$W/$1"; mkdir -p "$d/s1"
     PK="1704:ff8782:$2;1760:ff8782:$2;1900:ff8782:$2;2100:ff8782:$2;2400:ff8782:$2"
+    _rpl="$RPL"
+    if [ "$WEAKEN_P1" = 1 ] && [ "$1" = don ]; then
+        # both-words 5hp pin + the input cut above: the CPU's own hits
+        # finish it (a real KO through the real judge)
+        PK="$PK;6200:ff8450:00050005;6260:ff8450:00050005;6320:ff8450:00050005"
+        _rpl="$RPL_W"
+    fi
     DF="$(python3 -c "print(';'.join(f'{f}:ff8000-ff8180;{f}:ff8450-ff8456' for f in range(6000,17960,40)))")"
     ( cd "$d" && MAME_ROMPATH="$REPO/$BUILD/rompath;$ROMDIR" \
       POKES="$PK" DUMPS="$DF" GUARD_DEBUG=0 \
-      "$REPO/tools/run_replay_guarded.sh" vsavjw "$RPL" out.log s1 >emu 2>&1 ) &
+      "$REPO/tools/run_replay_guarded.sh" vsavjw "$_rpl" out.log s1 >emu 2>&1 ) &
 }
 run_leg don 13
 run_leg victor 03

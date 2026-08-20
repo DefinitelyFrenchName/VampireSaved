@@ -49,6 +49,20 @@ MAME_BIN="${MAME_BIN:-$HOME/.cache/vampire-saved/mame/cps2}"
 [ -x "$MAME_BIN" ] || { echo "SKIP: no WIDE MAME binary"; exit 0; }
 export MAME_BIN
 EXPECT_DEFECT="${EXPECT_DEFECT:-1}"
+# WEAKEN_P1=1 (14z-99): same mode and same reason as audit_don_lilith_ko —
+# on a FIXED build the mash-Donovan WINS (measured: the CPU never lands a
+# hit while he attacks), so his death is lottery-bound and leg A reads
+# NEITHER. The weaken leg cuts his inputs at f6100 and pins hp/white to 5
+# (both words, once — no re-pin can land on the corpse); the CPU's own hit
+# kills through the real judge and the kill commit is tappable. FIX
+# VERIFICATION ONLY: refused with EXPECT_DEFECT=1 (the pin overwrites the
+# defect's hp:=1 write and would mask the very shape leg A asserts).
+WEAKEN_P1="${WEAKEN_P1:-0}"
+if [ "$WEAKEN_P1" = 1 ] && [ "$EXPECT_DEFECT" = 1 ]; then
+    echo "REFUSING: WEAKEN_P1=1 with EXPECT_DEFECT=1 — the pin masks the"
+    echo "  defect shape. Weaken only when verifying the FIX."
+    exit 1
+fi
 
 W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT
 fail=0
@@ -57,12 +71,21 @@ fail=0
 RPL="$W/marathon_head.rpl"
 awk -F'[- ]' '/^[0-9]/ { if ($1 + 0 > 18000) exit } { print }' \
     "$REPO/tests/replays/26_don_arcade_mash.rpl" > "$RPL"
+RPL_W="$W/marathon_weaken.rpl"
+awk -F'[- ]' '/^[0-9]/ { if ($1 + 0 > 6100) exit } { print }' \
+    "$REPO/tests/replays/26_don_arcade_mash.rpl" > "$RPL_W"
+printf '17960 wait\n' >> "$RPL_W"
 
 run_leg() { # tag p1class frames
     d="$W/$1"; mkdir -p "$d/sbx"
     PK="1704:ff8782:$2;1760:ff8782:$2;1900:ff8782:$2;2100:ff8782:$2;2400:ff8782:$2"
+    _rpl="$RPL"
+    if [ "$WEAKEN_P1" = 1 ] && [ "$1" = don ]; then
+        PK="$PK;6200:ff8450:00050005;6260:ff8450:00050005;6320:ff8450:00050005"
+        _rpl="$RPL_W"
+    fi
     ( cd "$d" && RTAP="ff8450,4" WINDOW="0,0" TRACE_OUT="$d/tap.txt" FRAMES="$3" \
-      REPLAY="$RPL" POKES="$PK" MAME_SANDBOX="$d/sbx" \
+      REPLAY="$_rpl" POKES="$PK" MAME_SANDBOX="$d/sbx" \
       MAME_ROMPATH="$REPO/$BUILD/rompath;$ROMDIR" \
       "$REPO/tools/run_mame.sh" vsavjw \
       -autoboot_script "$REPO/tests/lua/read_tap.lua" > "$d/mame.log" 2>&1 ) &

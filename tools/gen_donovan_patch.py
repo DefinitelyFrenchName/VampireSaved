@@ -310,6 +310,18 @@ def _span_collisions(merged, all_variant=False):
                 continue
             ident = tuple(f"{r[k]:#x}" if isinstance(r[k], int) else str(r[k])
                           for k in keys)
+            # A slot_rows data_port (14z-99, #104) never writes its dst —
+            # dst is a content ANCHOR and the written surface is the placed
+            # blob + the named slot_ptr_table rows. Keying it by dst alone
+            # made capture_kf_jedah "collide" with throw_victim_keyframes
+            # (both anchor 0xB19F8 — Jedah's block — while writing disjoint
+            # bytes). Extend the identity with the slot_rows string; two
+            # slot_rows rows poking the SAME table row with different blobs
+            # would dodge this scan, and are caught downstream by
+            # patch_prg's op-overlap assertion (two ops on one word is a
+            # named build error).
+            if sect == "data_port" and str(r.get("slot_rows", "")).strip():
+                ident = ident + (str(r["slot_rows"]),)
             prev = seen.get(ident)
             if prev is None:
                 seen[ident] = r
@@ -4487,6 +4499,74 @@ def main():
                     blob[off:off + len(new)] = new
                     nfix += 1
                 if not ok:
+                    continue
+                # slot_rows (14z-99, GitHub #104): place the blob and repoint
+                # EXPLICIT rows of slot_ptr_table at it — the capture-keyframe
+                # fix, where the repointed rows are LEGACY attackers' (the
+                # owner-row branch below serves a tenant's own row and cannot
+                # express this). Every entry is "row:expected_vanilla_ptr",
+                # verified against the pristine image (the #18 discipline), so
+                # a drifted table, a wrong-table typo, or a row some other fix
+                # already moved dies loudly instead of silently double-poking.
+                # The rows are LEGACY-DEREFERENCED pointers: the licence is the
+                # 14z-91 walker-relocation precedent — byte-identical content
+                # at the new address (test_capture_pose_sources freezes that
+                # premise), proven by legacy A/B at the probe build.
+                # Declared identically by every tenant: merge dedup emits ONE
+                # blob on the merged build; each solo carries its own copy.
+                srows = str(dp.get("slot_rows", "")).strip()
+                if srows:
+                    if spt is None:
+                        fail.append(f"data_port {nm}: slot_rows needs "
+                                    f"slot_ptr_table")
+                        continue
+                    # anchor the DECLARED dst (the vanilla block this fix
+                    # supersedes) by content — dst_end is deliberately not
+                    # checked: nothing is written at dst in this mode, and the
+                    # placed blob is LONGER than the vanilla block by design.
+                    vdat = (root / "build/out/vsavj_data.bin").read_bytes()
+                    oh = bytes.fromhex(dp["dst_old_head"])
+                    if vdat[dst:dst + len(oh)] != oh:
+                        fail.append(f"data_port {nm}: dest old-content mismatch "
+                                    f"at {dst:#x} "
+                                    f"({vdat[dst:dst+len(oh)].hex()})")
+                        continue
+                    entries = []
+                    rows_ok = True
+                    for e in srows.split(","):
+                        r_s, exp_s = e.strip().split(":")
+                        r, exp = _int(r_s), _int(exp_s)
+                        got = vj_u32(spt + 4 * r)
+                        if got != exp:
+                            fail.append(f"data_port {nm}: slot_rows row "
+                                        f"{r:#x} holds {got:#x}, expected "
+                                        f"{exp:#x} — wrong table or drift")
+                            rows_ok = False
+                            break
+                        entries.append(r)
+                    if not rows_ok:
+                        continue
+                    pdst = alloc(dp.get("hole", "b"), ln,
+                                 f"data_port {nm} block")
+                    if pdst is None:
+                        continue
+                    ops.append({"op": "data", "addr": f"{pdst:#x}",
+                                "hex": bytes(blob).hex()})
+                    notes.append(f"data   {pdst:#08x} +{ln:#x}  data_port {nm} "
+                                 f"PLACED (slot_rows; vanilla block {dst:#x} "
+                                 f"untouched) <- {man['src_set']} {src:#08x} "
+                                 f"({nfix} fixes)")
+                    for r in entries:
+                        ra = spt + 4 * r
+                        ops.append({"op": "poke32", "addr": f"{ra:#x}",
+                                    "val": f"{pdst:#x}"})
+                        notes.append(f"poke32 {ra:#08x} <- {pdst:#x}  "
+                                     f"data_port {nm} ptr-table {spt:#x} "
+                                     f"row {r:#04x} (slot_rows)")
+                    fragments.append((pdst, ln, "VS2",
+                                      f"data_port {nm} placed block "
+                                      f"({man['src_set']} {src:#06x}, "
+                                      f"slot_rows)"))
                     continue
                 if spt is not None and _ovar:
                     # Slice D: the repointed row is the OWNER's.

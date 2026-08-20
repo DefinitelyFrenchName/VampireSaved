@@ -67,13 +67,16 @@
 # vs2's twin blocks are NOT aliased and already carry real newcomer rows
 # (vs2 Victor 0x0A8824: 0x10=0x1A08, 0x11=0x1BC0, 0x13=0x1D78).
 # FIX: RULED 2026-08-19 (maintainer) — option (a), full, measured first;
-# THE FEASIBILITY MEASUREMENTS CAME BACK CLEAN and are frozen in
-# test_capture_pose_sources.sh (ci_static). Implementation = the shipped
-# throw_victim_keyframes mechanism 15x: port the 15 distinct vs2 blocks
-# (Zabel+special share one) into wide_ext (0x11BD0 bytes) and repoint
-# 0xBE27A rows 0x00-0x0F + 0x18 (Oboro). Every BASE sub-block is
-# byte-identical vsavj==vs2, so the port is legacy-safe by CONTENT; the
-# probe build's legacy A/B is the proof the window must produce.
+# feasibility frozen in test_capture_pose_sources.sh (ci_static), and the
+# fix is NOW STAGED AND FULLY PRE-FLIGHTED (14z-99, build/probe_104):
+# 15 [[data_port]] slot_rows rows commented at the END of ALL THREE
+# tenant manifests (uncomment at the re-freeze window; +32 ops per
+# artifact). Probed: EXPECT_MATCH=1 green on all three tenants (Donovan
+# idx 11, Phobos 26, Pyron 11 — native's exact records), legacy control
+# agreeing, and legacy A/B vs frozen merged-m3 = ONE differing frame
+# (f890, the ratified class-4 select-init pointer cache), bit-identical
+# from f891 through full matches. FLIP EXPECT_MATCH's default TO 1 when
+# the rows land.
 # Eliminated on the way, with controls: on merged-m3 the anim_index family
 # (a/a2/b/c/proj) and all 14 per-character dispatch tables have rows
 # 0x10/0x11/0x13 MOVED OFF the vanilla alias for all three tenants, so

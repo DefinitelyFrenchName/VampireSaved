@@ -2682,3 +2682,34 @@ disables GUARD_PROBE" — a serious instrument defect. It is not: the same
 poked run gives 904 hits at `0x27FA0`. The forced Donovan/Victor pick
 simply never requests a palette sequence. Test the scary instrument claim
 before writing it down.
+
+## 14z-99 (2): three traps from the #105 fix arc
+
+**A RENDER verdict from a gfx-free build is void — and it fails by
+looking like a new defect.** The merged1-style pack (program image over
+the zero-filled overlay) is the right probe for RAM-level questions and
+the WRONG one for anything drawn from tenant art: the win-screen
+portrait and the VS-splash side art drew blank/pale on the #105 fix
+probe, which read as "the fix half-works" and "a SECOND sel-indexed
+surface is white" — both observations were VOID (the full-gfx probe
+renders both correctly). Ask what the verdict READS: palette/work-RAM
+dumps are program-data-driven and gfx-free-safe; pixels are not.
+
+**`recon_overlay` placement is load-bearing, and only a MERGED build can
+tell you.** Inside `[[tenant]]` it scopes to that tenant (the 14z-80
+fix). At DOC ROOT it still works on a SOLO build — `recon_for()` reads
+`port.get("recon_overlay")` first, and on a solo build the doc IS the
+tenant's — but on a merged build that same read makes it GLOBAL: it
+overrides every other tenant's overlay, huitzil loses its own rows, and
+generation dies on `x022400+0xb74 bank_ref 0xd96b8` (the exact failure
+quoted in the 14z-80 scoping comment). The #103 staged block said
+"top-level key" because its probe was solo; a window that uncommented it
+as written would have hit this. Rehearse staged recipes on the MERGED
+composition, not only on the vertical they were probed on.
+
+**A staged VALUE swap cannot ride the uncomment convention.** The
+bare-# uncomment rule reproduces staged ROWS byte-for-byte, but staging
+`#colors = 10` beside a live `colors = 8` would uncomment into a
+DUPLICATE KEY, which the manifest parser refuses. Stage value swaps as
+an edit instruction in a comment (one sed, written next to the line),
+and put the swap in the window checklist.
