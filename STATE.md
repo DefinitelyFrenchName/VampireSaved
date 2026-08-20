@@ -17,6 +17,34 @@ older session lives verbatim in `STATE_HISTORY.md`.** How to work with it:
   never roll to the archive; entries within them are marked DECIDED/FIXED
   in place, as always.
 
+## 14z-99 FIELD RESULTS (maintainer, 2026-08-20) — THE WHOLE WINDOW IS
+## FIELD-CONFIRMED: #103 + #104 + #105 all CLOSED; #99 UN-PARKED
+
+Maintainer's early field pass of merged-m4 (`build/m3b_merged11`):
+- **#105 CONFIRMED**: AUTO-mode tenant portraits colored. CLOSED.
+- **#103 CONFIRMED on its exact scenario**: no stalling/freeze at win or
+  lose with ANY VS2 character, including Donovan losing to Lilith. No
+  crash. CLOSED. (Its audits stay as regression locks; #99's rig is now
+  unblocked in fact, not just on paper.)
+- **#104 CONFIRMED, broader than asked**: all three VS2 characters show
+  correct sprites during Victor's AND Bulleta's 6+HP throws. Bulleta was
+  never named in the ticket — her grab holding correctly is the ruled
+  option (a) ("all sixteen" attackers ported) paying off on a surface no
+  rig targeted. CLOSED.
+- **The window is therefore field-confirmed END TO END** and **#99
+  UN-PARKS** (comment posted): the continue rig's blocker is gone in
+  fact; next concrete step is re-running the rig to the exact
+  continue+switch → match-5 context. Held loosely: if the racy-lose-flow
+  hypothesis was #99's mechanism, #103's fix may have removed its
+  trigger — the clean pass is weak evidence for that, not proof.
+- **Sound observation, recorded and attributed**: Phobos's boy-sidekick
+  voice at fight start/end reported better/tighter, more faithful to
+  VS2. The 14z-99 window shipped ZERO audio-affecting rows (#103
+  relocations / #104 keyframes / #105 palettes), so this is anterior to
+  the window as the maintainer suspected — most plausibly the 14z-96
+  #101 kernel voice port noticed in new contexts. Nothing to chase; NOT
+  evidence of a window-induced audio change.
+
 ## 14z-99 CLOSE (executed post-freeze, 2026-08-20) — the skipped ritual,
 ## caught up while the maintainer field-passes merged-m4
 
@@ -128,8 +156,9 @@ m3b_merged11 frozen row (kernel rows untouched by the window);
 registry.tsv +5 rows; expectation sets carried-renamed (m8->m9,
 m17->m18, m11->m12, + the two battery rows).
 
-**Issues:** #103, #104, #105 are FIXED ON THE SHIPPING ARTIFACTS —
-close after the maintainer's field pass on merged-m4. #43 CLOSED
+**Issues:** #103, #104, #105 — **ALL THREE FIELD-CONFIRMED AND CLOSED
+(2026-08-20, see the FIELD RESULTS entry above); #99 un-parked.**
+#43 CLOSED
 ((a) 14z-95, (b) here; the thread carries the (b) write-up). Play:
 `tools/run_wide.sh build/m3b_merged11 fbneo` — or record the session:
 `WIDE_RECORD=<name> tools/run_wide.sh build/m3b_merged11 mame`.

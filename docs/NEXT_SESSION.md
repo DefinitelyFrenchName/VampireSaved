@@ -23,10 +23,17 @@
 > ## `ROMDIR=... tests/run_all_static.sh` -> PASS 94 / SKIP 0 / FAIL 0.
 > ##
 > ## **PLAY: `tools/run_wide.sh build/m3b_merged11 fbneo`** (or record a
-> ## session: `WIDE_RECORD=<name> ... mame`). THE FIELD PASS IS THE NEXT
-> ## MAINTAINER ACTION: #103/#104/#105 are fixed on the shipping
-> ## artifacts and close on it; #43 CLOSED at the window; then #99
-> ## un-parks (its blocker was #103's fix).
+> ## session: `WIDE_RECORD=<name> ... mame`). **FIELD PASS COMPLETE
+> ## (2026-08-20): THE WHOLE WINDOW IS CONFIRMED — #103 + #104 + #105
+> ## ALL CLOSED** (no stall on any VS2 win/lose incl. Donovan vs
+> ## Lilith; correct grab sprites under Victor AND Bulleta's 6+HP
+> ## throws, all tenants — Bulleta = the "all sixteen" ruling paying
+> ## off unprompted; AUTO portraits colored; no crash). #43 CLOSED at
+> ## the window. **#99 IS UN-PARKED** — the continue rig's blocker is
+> ## gone in fact; next concrete step is re-running the rig to the
+> ## continue+switch → match-5 context (comment on the issue). The
+> ## sidekick-voice observation is attributed anterior (window carried
+> ## zero audio rows) — STATE "14z-99 FIELD RESULTS".
 > ##
 > ## **THE WINDOW ALSO SURFACED AND FIXED SIX LATENT INSTRUMENT DEFECTS,
 > ## none a window regression** (each A/B'd on pre-window bytes): the
