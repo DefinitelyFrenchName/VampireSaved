@@ -1,7 +1,10 @@
 # HANDOFF — operational map
 
 First read of any session after CLAUDE.md and STATE.md. Keep current in the
-same commit as anything it describes.
+same commit as anything it describes. (Since 2026-08-20 STATE.md holds only
+the recent session groups + a ledger; the full session archive is
+`STATE_HISTORY.md` — "STATE 14z-XX" references resolve there when the
+session has rolled off.)
 
 ## What exists (M0 bench, 2026-07-25)
 

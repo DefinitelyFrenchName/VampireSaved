@@ -1,5 +1,10 @@
 # NEXT SESSION — orientation (written at the close of 14z-99, 2026-08-20)
 
+> **STATE.md WAS SPLIT at the post-freeze close (maintainer-approved):
+> recent sessions + THE LEDGER stay in STATE.md; everything older is
+> verbatim in `STATE_HISTORY.md`. The rollover rule is in STATE.md's
+> header; claim-greps must include the archive (CLAUDE.md §5 updated).**
+
 > ## **THE WINDOW IS EXECUTED AND FROZEN: donovan-m9 / huitzil-m18 /
 > ## pyron-m12 / merged-m4** (`build/don_m9` 428fc0c9 / `build/hui45`
 > ## c4bbb375 / `build/pyron29` 4c3c072b / `build/m3b_merged11` 2343607a

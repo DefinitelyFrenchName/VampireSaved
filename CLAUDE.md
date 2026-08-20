@@ -271,7 +271,15 @@ legacy behavior is a failed change.
 
 - Sessions begin by reading `STATE.md` (current milestone, open bugs, decisions
   pending) and end by updating it. STATE.md is the single source of truth for
-  progress; do not rely on chat memory.
+  progress; do not rely on chat memory. **SPLIT 2026-08-20
+  (maintainer-approved): STATE.md holds the newest ~3 session groups, THE
+  LEDGER (one line per archived session), and the standing sections;
+  `STATE_HISTORY.md` holds every older session record VERBATIM.** The
+  rollover procedure lives in STATE.md's own header and is part of the
+  session-close ritual. "STATE 14z-XX" references resolve in STATE.md
+  first, then STATE_HISTORY.md — section names are preserved in the
+  archive, and archived entries are never rewritten (corrections are
+  marked in place, as always).
 - Address notation: 68k addresses as `PRG:0x0F1234` (program ROM offset) or
   `CPU:$0F1234` (address-space); tiles as `GFX:tile 0x1A2B3`; RAM as
   `RAM:$FF8000`. Never bare hex without a namespace.
@@ -314,8 +322,11 @@ legacy behavior is a failed change.
   and a corrected effect-family finding survived in five other places
   including a registry row written *after* the correction started.
   The procedure, in order:
-  1. `grep -rn "<the old claim>" docs HANDOFF.md STATE.md tests build/manifest`
+  1. `grep -rn "<the old claim>" docs HANDOFF.md STATE.md STATE_HISTORY.md tests build/manifest`
      — search the assertion's WORDING, and its paraphrases, across the repo.
+     STATE_HISTORY.md is in the list on purpose: archived entries are not
+     rewritten, but a claim that ONLY survives there must still be found so
+     its live carriers can be traced.
   2. Fix the **HEADER and the summary line** first. A skimmer reads those;
      an appended "actually, it turned out…" subsection does not reach them.
   3. Re-grep afterwards and show the empty result. The pass is not done
@@ -331,7 +342,8 @@ legacy behavior is a failed change.
 - **BUG ARCHAEOLOGY FIRST (standing order, 14z-75): before fixing a bug,
   check whether it has already been fixed once — and if you are unsure, ASK
   THE MAINTAINER.** They were there and will usually remember.
-  1. `git log --oneline --grep="<symptom>"` and `git log -S "<manifest row>"`
+  1. `git log --oneline --grep="<symptom>"`, `git log -S "<manifest row>"`,
+     and `grep STATE_HISTORY.md` for the symptom's wording
      BEFORE forming a theory. A defect the maintainer reports may be a
      REGRESSION of something already solved, and the old fix (or its
      withdrawal) is the fastest route to the mechanism.
