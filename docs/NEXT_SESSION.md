@@ -8,7 +8,7 @@
 > ## COMBINED ARTIFACT (build/probe_window 2343607a, 14z-99 (9)):** all
 > ## four flip-audits GREEN on it (grab-pose all-tenants-native, win-pal
 > ## all-legs-colored, lilith-ko FLOWED, ko-writer HEALTHY commit), zero
-> ## tripwires, 807 ops, and the ENTIRE legacy cost vs frozen merged-m3
+> ## tripwires, 802 ops, and the ENTIRE legacy cost vs frozen merged-m3
 > ## is ONE frame (f890, the ratified class-4 pointer cache) on every
 > ## select-reaching replay. THE WINDOW ACTION = uncomment #103's pieces
 > ## (recon_overlay INSIDE [[tenant]] — the "top-level" wording was a

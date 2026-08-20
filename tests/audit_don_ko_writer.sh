@@ -48,7 +48,7 @@ BUILD="${BUILD:-build/m3b_merged10}"
 MAME_BIN="${MAME_BIN:-$HOME/.cache/vampire-saved/mame/cps2}"
 [ -x "$MAME_BIN" ] || { echo "SKIP: no WIDE MAME binary"; exit 0; }
 export MAME_BIN
-EXPECT_DEFECT="${EXPECT_DEFECT:-1}"
+EXPECT_DEFECT="${EXPECT_DEFECT:-0}"   # flipped at the 14z-99 window (#103 landed)
 # WEAKEN_P1=1 (14z-99): same mode and same reason as audit_don_lilith_ko —
 # on a FIXED build the mash-Donovan WINS (measured: the CPU never lands a
 # hit while he attacks), so his death is lottery-bound and leg A reads
@@ -57,7 +57,8 @@ EXPECT_DEFECT="${EXPECT_DEFECT:-1}"
 # kills through the real judge and the kill commit is tappable. FIX
 # VERIFICATION ONLY: refused with EXPECT_DEFECT=1 (the pin overwrites the
 # defect's hp:=1 write and would mask the very shape leg A asserts).
-WEAKEN_P1="${WEAKEN_P1:-0}"
+if [ "$EXPECT_DEFECT" = 0 ]; then _wdef=1; else _wdef=0; fi
+WEAKEN_P1="${WEAKEN_P1:-$_wdef}"
 if [ "$WEAKEN_P1" = 1 ] && [ "$EXPECT_DEFECT" = 1 ]; then
     echo "REFUSING: WEAKEN_P1=1 with EXPECT_DEFECT=1 — the pin masks the"
     echo "  defect shape. Weaken only when verifying the FIX."

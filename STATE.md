@@ -9,7 +9,7 @@
 window recipe on scratch copies of the tracked manifests: #103's staged
 pieces uncommented (recon_overlay INSIDE [[tenant]] + the two
 pcrel_escape_fix rows), #104's 15 capture_kf rows uncommented, #105's
-colors=10 sed applied. **807 ops** (764 + 32 #104 + 6 #105 + 5 #103),
+colors=10 sed applied. **802 ops** (764 + 32 #104 + 6 #105; #103's pieces net 0 — its relocations move ops, not add them) [CORRECTED from "807": that count was the FAILED first build with the doc-root overlay hijack],
 GENERATION OK, ZERO tripwires, merged-with-gfx built end to end.
 
 **The four flip-audits, all green on it:**
@@ -48,7 +48,7 @@ is rehearsed):**
 3. `colors = 8` -> `colors = 10` in all three (one sed, staged comment
    names it).
 4. Rebuild all four artifacts + merged (expect solo op counts +32+2
-   each; merged 764 -> 807 incl. donovan's #103 rows).
+   each; merged 764 -> 802 (#103's pieces relocate, net 0)).
 5. Flip defaults: audit_don_grab_pose EXPECT_MATCH=1;
    audit_win_pal_auto EXPECT_WHITE=0; audit_don_lilith_ko
    EXPECT_STALL=0 (+WEAKEN_P1=1); audit_don_ko_writer EXPECT_DEFECT=0

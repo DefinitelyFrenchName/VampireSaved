@@ -89,7 +89,7 @@ BUILD="${BUILD:-build/m3b_merged10}"
 MAME_BIN="${MAME_BIN:-$HOME/.cache/vampire-saved/mame/cps2}"
 [ -x "$MAME_BIN" ] || { echo "SKIP: no WIDE MAME binary"; exit 0; }
 export MAME_BIN
-EXPECT_STALL="${EXPECT_STALL:-1}"
+EXPECT_STALL="${EXPECT_STALL:-0}"   # flipped at the 14z-99 window (#103 landed)
 # WEAKEN_P1=1 (14z-99): make the P1 death PRODUCIBLE ON ANY BUILD by
 # holding P1's hp AND white low (both-words pokes — audit_kill_poke_shape;
 # never near a corpse: three pokes early in the sampled round only). The
@@ -102,7 +102,10 @@ EXPECT_STALL="${EXPECT_STALL:-1}"
 # (KO -> stage change vs the phase-6 pin). On a DEFECT build a weaken
 # poke can MASK the stall (it overwrites the hp:=1 pin with a sane
 # hp==white pair), so the gate REFUSES the combination.
-WEAKEN_P1="${WEAKEN_P1:-0}"
+# Default tied to the EXPECT: fix-verification needs the producible death
+# (the fixed build's mash-Donovan WINS), defect mode forbids the pin.
+if [ "$EXPECT_STALL" = 0 ]; then _wdef=1; else _wdef=0; fi
+WEAKEN_P1="${WEAKEN_P1:-$_wdef}"
 if [ "$WEAKEN_P1" = 1 ] && [ "$EXPECT_STALL" = 1 ]; then
     echo "REFUSING: WEAKEN_P1=1 with EXPECT_STALL=1 — the weaken poke"
     echo "  overwrites the hp:=1 pin and can mask the very stall this"

@@ -53,7 +53,7 @@ BUILD="${BUILD:-build/m3b_merged10}"
 MAME_BIN="${MAME_BIN:-$HOME/.cache/vampire-saved/mame/cps2}"
 [ -x "$MAME_BIN" ] || { echo "SKIP: no WIDE MAME binary"; exit 0; }
 export MAME_BIN
-EXPECT_WHITE="${EXPECT_WHITE:-1}"
+EXPECT_WHITE="${EXPECT_WHITE:-0}"   # flipped at the 14z-99 window (#105 landed)
 
 W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT
 fail=0

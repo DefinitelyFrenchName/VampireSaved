@@ -775,7 +775,7 @@ site_old = "207c003ad700"
 pool_base = 0x3AD700
 pool_color_stride = 0xAA0
 unit = 0xA0
-colors = 8    # <- WINDOW ACTION (#105, 14z-99): make this 10. Sets 8/9 are
+colors = 10   # 8 -> 10 AT THE 14z-99 WINDOW (#105 fix, landed). Sets 8/9 are
               # the AUTO color sets (+0x3AE gains +8 under AUTO); both pools
               # carry 10 real sets and the port took 8, so an AUTO winner's
               # sparse block ran off the end into fill = the WHITE portraits.
@@ -1347,199 +1347,199 @@ val = 0x3316
 # being pointed at. Rows 0x10/0x13 are already tenant-ported; 0x11 is the
 # recorded Pyron-as-attacker observation; 0x18 (Oboro) follows 0x08.
 
-#[[data_port]]
-#stage = 6
-#name = "capture_kf_bulleta"
-#src = 0x0A1DBE
-#len = 0x0EE0
-#orc = 0x0A1650
-#dst = 0x092C4A
-#dst_old_head = "0040011001e002b003800450052005f0"
-#slot_ptr_table = 0xBE27A
-#slot_rows = "0x00:0x092c4a"
-#hole = "wide_ext"
-#only_variant_slot = true
+[[data_port]]
+stage = 6
+name = "capture_kf_bulleta"
+src = 0x0A1DBE
+len = 0x0EE0
+orc = 0x0A1650
+dst = 0x092C4A
+dst_old_head = "0040011001e002b003800450052005f0"
+slot_ptr_table = 0xBE27A
+slot_rows = "0x00:0x092c4a"
+hole = "wide_ext"
+only_variant_slot = true
 
-#[[data_port]]
-#stage = 6
-#name = "capture_kf_demitri"
-#src = 0x0A3D88
-#len = 0x1240
-#orc = 0x0A361A
-#dst = 0x094954
-#dst_old_head = "00400140024003400440054006400740"
-#slot_ptr_table = 0xBE27A
-#slot_rows = "0x01:0x094954"
-#hole = "wide_ext"
-#only_variant_slot = true
+[[data_port]]
+stage = 6
+name = "capture_kf_demitri"
+src = 0x0A3D88
+len = 0x1240
+orc = 0x0A361A
+dst = 0x094954
+dst_old_head = "00400140024003400440054006400740"
+slot_ptr_table = 0xBE27A
+slot_rows = "0x01:0x094954"
+hole = "wide_ext"
+only_variant_slot = true
 
-#[[data_port]]
-#stage = 6
-#name = "capture_kf_gallon"
-#src = 0x0A61D2
-#len = 0x0DC0
-#orc = 0x0A5A64
-#dst = 0x0968DE
-#dst_old_head = "0040010001c002800340040004c00580"
-#slot_ptr_table = 0xBE27A
-#slot_rows = "0x02:0x0968de"
-#hole = "wide_ext"
-#only_variant_slot = true
+[[data_port]]
+stage = 6
+name = "capture_kf_gallon"
+src = 0x0A61D2
+len = 0x0DC0
+orc = 0x0A5A64
+dst = 0x0968DE
+dst_old_head = "0040010001c002800340040004c00580"
+slot_ptr_table = 0xBE27A
+slot_rows = "0x02:0x0968de"
+hole = "wide_ext"
+only_variant_slot = true
 
-#[[data_port]]
-#stage = 6
-#name = "capture_kf_victor"
-#src = 0x0A8824
-#len = 0x1F30
-#orc = 0x0A80B6
-#dst = 0x098C28
-#dst_old_head = "004001f803b00568072008d80a900c48"
-#slot_ptr_table = 0xBE27A
-#slot_rows = "0x03:0x098c28"
-#hole = "wide_ext"
-#only_variant_slot = true
+[[data_port]]
+stage = 6
+name = "capture_kf_victor"
+src = 0x0A8824
+len = 0x1F30
+orc = 0x0A80B6
+dst = 0x098C28
+dst_old_head = "004001f803b00568072008d80a900c48"
+slot_ptr_table = 0xBE27A
+slot_rows = "0x03:0x098c28"
+hole = "wide_ext"
+only_variant_slot = true
 
-#[[data_port]]
-#stage = 6
-#name = "capture_kf_zabel"
-#src = 0x0ABC56
-#len = 0x1DF0
-#orc = 0x0AB4E8
-#dst = 0x09BAEA
-#dst_old_head = "0080021003a0053006c0085009e00b70"
-#slot_ptr_table = 0xBE27A
-#slot_rows = "0x04:0x09baea,0x0b:0x09bb2a"
-#hole = "wide_ext"
-#only_variant_slot = true
+[[data_port]]
+stage = 6
+name = "capture_kf_zabel"
+src = 0x0ABC56
+len = 0x1DF0
+orc = 0x0AB4E8
+dst = 0x09BAEA
+dst_old_head = "0080021003a0053006c0085009e00b70"
+slot_ptr_table = 0xBE27A
+slot_rows = "0x04:0x09baea,0x0b:0x09bb2a"
+hole = "wide_ext"
+only_variant_slot = true
 
-#[[data_port]]
-#stage = 6
-#name = "capture_kf_morrigan"
-#src = 0x0AEDB4
-#len = 0x12A8
-#orc = 0x0AE646
-#dst = 0x0A0010
-#dst_old_head = "00400138023003280420051806100708"
-#slot_ptr_table = 0xBE27A
-#slot_rows = "0x05:0x0a0010"
-#hole = "wide_ext"
-#only_variant_slot = true
+[[data_port]]
+stage = 6
+name = "capture_kf_morrigan"
+src = 0x0AEDB4
+len = 0x12A8
+orc = 0x0AE646
+dst = 0x0A0010
+dst_old_head = "00400138023003280420051806100708"
+slot_ptr_table = 0xBE27A
+slot_rows = "0x05:0x0a0010"
+hole = "wide_ext"
+only_variant_slot = true
 
-#[[data_port]]
-#stage = 6
-#name = "capture_kf_anakaris"
-#src = 0x0B119A
-#len = 0x03A0
-#orc = 0x0B0A2C
-#dst = 0x0A204E
-#dst_old_head = "0040007000a000d00100013001600190"
-#slot_ptr_table = 0xBE27A
-#slot_rows = "0x06:0x0a204e"
-#hole = "wide_ext"
-#only_variant_slot = true
+[[data_port]]
+stage = 6
+name = "capture_kf_anakaris"
+src = 0x0B119A
+len = 0x03A0
+orc = 0x0B0A2C
+dst = 0x0A204E
+dst_old_head = "0040007000a000d00100013001600190"
+slot_ptr_table = 0xBE27A
+slot_rows = "0x06:0x0a204e"
+hole = "wide_ext"
+only_variant_slot = true
 
-#[[data_port]]
-#stage = 6
-#name = "capture_kf_felicia"
-#src = 0x0B2BAC
-#len = 0x30A0
-#orc = 0x0B243E
-#dst = 0x0A3990
-#dst_old_head = "004002f005a008500b000db010601310"
-#slot_ptr_table = 0xBE27A
-#slot_rows = "0x07:0x0a3990"
-#hole = "wide_ext"
-#only_variant_slot = true
+[[data_port]]
+stage = 6
+name = "capture_kf_felicia"
+src = 0x0B2BAC
+len = 0x30A0
+orc = 0x0B243E
+dst = 0x0A3990
+dst_old_head = "004002f005a008500b000db010601310"
+slot_ptr_table = 0xBE27A
+slot_rows = "0x07:0x0a3990"
+hole = "wide_ext"
+only_variant_slot = true
 
-#[[data_port]]
-#stage = 6
-#name = "capture_kf_bishamon"
-#src = 0x0B6F22
-#len = 0x0940
-#orc = 0x0B67B4
-#dst = 0x0A74AA
-#dst_old_head = "004000c0014001c0024002c0034003c0"
-#slot_ptr_table = 0xBE27A
-#slot_rows = "0x08:0x0a74aa,0x18:0x0a74aa"
-#hole = "wide_ext"
-#only_variant_slot = true
+[[data_port]]
+stage = 6
+name = "capture_kf_bishamon"
+src = 0x0B6F22
+len = 0x0940
+orc = 0x0B67B4
+dst = 0x0A74AA
+dst_old_head = "004000c0014001c0024002c0034003c0"
+slot_ptr_table = 0xBE27A
+slot_rows = "0x08:0x0a74aa,0x18:0x0a74aa"
+hole = "wide_ext"
+only_variant_slot = true
 
-#[[data_port]]
-#stage = 6
-#name = "capture_kf_aulbath"
-#src = 0x0B8724
-#len = 0x0A60
-#orc = 0x0B7FB6
-#dst = 0x0A8AEC
-#dst_old_head = "004000d0016001f00280031003a00430"
-#slot_ptr_table = 0xBE27A
-#slot_rows = "0x09:0x0a8aec"
-#hole = "wide_ext"
-#only_variant_slot = true
+[[data_port]]
+stage = 6
+name = "capture_kf_aulbath"
+src = 0x0B8724
+len = 0x0A60
+orc = 0x0B7FB6
+dst = 0x0A8AEC
+dst_old_head = "004000d0016001f00280031003a00430"
+slot_ptr_table = 0xBE27A
+slot_rows = "0x09:0x0a8aec"
+hole = "wide_ext"
+only_variant_slot = true
 
-#[[data_port]]
-#stage = 6
-#name = "capture_kf_sasquatch"
-#src = 0x0BA152
-#len = 0x1510
-#orc = 0x0B99E4
-#dst = 0x0AA2E2
-#dst_old_head = "00400168029003b804e0060807300858"
-#slot_ptr_table = 0xBE27A
-#slot_rows = "0x0a:0x0aa2e2"
-#hole = "wide_ext"
-#only_variant_slot = true
+[[data_port]]
+stage = 6
+name = "capture_kf_sasquatch"
+src = 0x0BA152
+len = 0x1510
+orc = 0x0B99E4
+dst = 0x0AA2E2
+dst_old_head = "00400168029003b804e0060807300858"
+slot_ptr_table = 0xBE27A
+slot_rows = "0x0a:0x0aa2e2"
+hole = "wide_ext"
+only_variant_slot = true
 
-#[[data_port]]
-#stage = 6
-#name = "capture_kf_qbee"
-#src = 0x0BCBB6
-#len = 0x0B80
-#orc = 0x0BC448
-#dst = 0x0AC9CE
-#dst_old_head = "004000e00180022002c00360040004a0"
-#slot_ptr_table = 0xBE27A
-#slot_rows = "0x0c:0x0ac9ce"
-#hole = "wide_ext"
-#only_variant_slot = true
+[[data_port]]
+stage = 6
+name = "capture_kf_qbee"
+src = 0x0BCBB6
+len = 0x0B80
+orc = 0x0BC448
+dst = 0x0AC9CE
+dst_old_head = "004000e00180022002c00360040004a0"
+slot_ptr_table = 0xBE27A
+slot_rows = "0x0c:0x0ac9ce"
+hole = "wide_ext"
+only_variant_slot = true
 
-#[[data_port]]
-#stage = 6
-#name = "capture_kf_leilei"
-#src = 0x0BE728
-#len = 0x0618
-#orc = 0x0BDFBA
-#dst = 0x0AE324
-#dst_old_head = "0040009800f0014801a001f8025002a8"
-#slot_ptr_table = 0xBE27A
-#slot_rows = "0x0d:0x0ae324"
-#hole = "wide_ext"
-#only_variant_slot = true
+[[data_port]]
+stage = 6
+name = "capture_kf_leilei"
+src = 0x0BE728
+len = 0x0618
+orc = 0x0BDFBA
+dst = 0x0AE324
+dst_old_head = "0040009800f0014801a001f8025002a8"
+slot_ptr_table = 0xBE27A
+slot_rows = "0x0d:0x0ae324"
+hole = "wide_ext"
+only_variant_slot = true
 
-#[[data_port]]
-#stage = 6
-#name = "capture_kf_lilith"
-#src = 0x0C010E
-#len = 0x11B0
-#orc = 0x0BF9A0
-#dst = 0x0AFBFE
-#dst_old_head = "00400138023003280420051806100708"
-#slot_ptr_table = 0xBE27A
-#slot_rows = "0x0e:0x0afbfe"
-#hole = "wide_ext"
-#only_variant_slot = true
+[[data_port]]
+stage = 6
+name = "capture_kf_lilith"
+src = 0x0C010E
+len = 0x11B0
+orc = 0x0BF9A0
+dst = 0x0AFBFE
+dst_old_head = "00400138023003280420051806100708"
+slot_ptr_table = 0xBE27A
+slot_rows = "0x0e:0x0afbfe"
+hole = "wide_ext"
+only_variant_slot = true
 
-#[[data_port]]
-#stage = 6
-#name = "capture_kf_jedah"
-#src = 0x0C2430
-#len = 0x1CF0
-#orc = 0x0C1CC2
-#dst = 0x0B19F8
-#dst_old_head = "004001d80370050806a0083809d00b68"
-#slot_ptr_table = 0xBE27A
-#slot_rows = "0x0f:0x0b19f8"
-#hole = "wide_ext"
-#only_variant_slot = true
+[[data_port]]
+stage = 6
+name = "capture_kf_jedah"
+src = 0x0C2430
+len = 0x1CF0
+orc = 0x0C1CC2
+dst = 0x0B19F8
+dst_old_head = "004001d80370050806a0083809d00b68"
+slot_ptr_table = 0xBE27A
+slot_rows = "0x0f:0x0b19f8"
+hole = "wide_ext"
+only_variant_slot = true
 
 # ══════════════════════════════════════════════════════════════════════
