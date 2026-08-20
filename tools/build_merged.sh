@@ -248,11 +248,16 @@ for T in donovan:$D_EX huitzil:$H_EX pyron:$P_EX; do
 done
 
 FP="$(python3 tools/build_fingerprint.py "$OUT/rompath;$ROMDIR" --set vsavjw --sha-only)"
+# Generation-neutral README (14z-100: the old template said "753-op" and
+# "NOT REGISTERED" forever — a stale literal shipping in every build dir).
+NOPS="$(python3 -c "import json,sys;print(len(json.load(open('$OUT/patch/patch.json'))['ops']))" 2>/dev/null || echo '?')"
 cat > "$OUT/README.txt" <<EOF
-3-TENANT MERGED BUILD WITH GFX (tools/build_merged.sh, 14z-83 S4).
-Program: the 753-op merged image. Gfx: the S2 chain (D -> H -> P), last
+3-TENANT MERGED BUILD WITH GFX (tools/build_merged.sh).
+Program: the $NOPS-op merged image. Gfx: the S2 chain (D -> H -> P), last
 link's members packed; group B pristine.
-NOT REGISTERED (S6 decision) — run_suite refuses it until frozen.
+Registration is a STATE decision: merged builds get NO registry.tsv row by
+convention (tag + HANDOFF row when frozen) — check HANDOFF's build registry
+for whether this fingerprint is a frozen generation.
 fingerprint: $FP
 EOF
 echo "build fingerprint: $FP"

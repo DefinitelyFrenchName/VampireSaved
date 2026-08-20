@@ -105,3 +105,4 @@ test_m2a_target_resolution
 # signed-16-bit bound, and the 15-block/0x11bd0 port inventory. Needs ROMDIR
 # (decrypt cache), no emulator.
 test_capture_pose_sources
+test_pointer_flow

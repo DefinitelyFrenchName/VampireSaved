@@ -1,0 +1,7 @@
+# pointer-flow baseline for merged-m4 (build/m3b_merged11), frozen 14z-100.
+# STRONG lines are REVIEWED findings (see hardening_register.md);
+# WEAK-COUNT lines freeze the noise volume — growth = investigate.
+STRONG	code:movea_imm	0x4d0c60+0x16	0x4c41e0	WIDE-HOLE
+STRONG	code:movea_imm	0x4d0c60+0x24	0x4ca180	WIDE-HOLE
+WEAK-COUNT	code:move_imm	3
+WEAK-COUNT	data:long	1127

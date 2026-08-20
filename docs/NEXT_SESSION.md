@@ -1,5 +1,19 @@
 # NEXT SESSION — orientation (updated 14z-100, 2026-08-20)
 
+> ## **THE HARDENING PROGRAM IS OPEN (maintainer-directed) — START AT
+> ## `docs/project/hardening_register.md`.** H1 shipped (the pointer/flow
+> ## comb: `tools/audit_pointer_flow.py`, gate `test_pointer_flow` in
+> ## ci_static, 2 STRONG findings both reviewed-benign biased bases); H2
+> ## executed (tripwire-reach re-pointed + six legs green on the current
+> ## freeze; pcrel_escapes re-pointed, inventories identical; README
+> ## template fixed). **NEXT: H3 triage** — the uncovered word-form
+> ## escapes (the #103 class), the 13 plausible reconciliation rows,
+> ## tripwires ranked by reach; fixes STAGE for the next window. Then H4
+> ## rigs (pool-vs-pool contact, 2P diversity, authoritative-guard soak).
+> ## #99 CLOSED (maintainer-ruled: the previous setup doesn't reproduce);
+> ## #106 filed (merged image outside the pcrel-escape freeze). Open:
+> ## #106, #50, #10, the ~200 tracked build dirs.
+
 > ## **14z-100 (same day): THE #99 RIG IS COMMITTED AND CLEAN.**
 > ## `tests/audit_continue_switch.sh` — coin marathon, forced Phobos,
 > ## natural loss (JUDGES — the #103 lock on the once-blocked path),

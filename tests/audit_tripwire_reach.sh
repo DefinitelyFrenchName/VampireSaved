@@ -52,7 +52,12 @@ export MAME_BIN
 JOBS="${JOBS:-3}"
 RPL="${TRIPWIRE_REPLAY:-26_don_arcade_mash}"
 # dir:tenant-id. Frozen builds by default — this asks about what SHIPS.
-BUILDS="${TRIPWIRE_BUILDS:-build/hui41:10 build/pyron26:11 build/don_m7:13 build/m3b_merged8:10 build/m3b_merged8:11 build/m3b_merged8:13}"
+# Defaults re-pointed 14z-100 to the CURRENT freeze (donovan-m9 /
+# huitzil-m18 / pyron-m12 / merged-m4). They were still the pre-14z-94
+# artifacts, so the 113 tripwires in the shipping merged build had ZERO
+# reachability measurement — the exact staleness class this audit was
+# built to catch (#91). RE-POINT AT EVERY FREEZE.
+BUILDS="${TRIPWIRE_BUILDS:-build/hui45:10 build/pyron29:11 build/don_m9:13 build/m3b_merged11:10 build/m3b_merged11:11 build/m3b_merged11:13}"
 
 [ -x "$MAME_BIN" ] || { echo "SKIP: no WIDE MAME binary at $MAME_BIN"; exit 0; }
 [ -f "tests/replays/$RPL.rpl" ] || { echo "FAIL: no replay $RPL"; exit 1; }

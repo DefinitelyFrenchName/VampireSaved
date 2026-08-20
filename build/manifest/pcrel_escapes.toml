@@ -25,7 +25,14 @@
 # fixed in 14z-69i — is absent from this inventory. The instrument
 # distinguishes fixed from broken; it is the VERDICT that needed a baseline.
 
-[hui43]
+# RE-POINTED 14z-100 (2026-08-20): sections renamed hui43/pyron27/don_m7 ->
+# hui45/pyron29/don_m9 at the hardening pass. MEASURED before renaming: the
+# three inventories are IDENTICAL on the new builds (69/10/10, zero added,
+# zero gone — the keys are source-side addresses, stable across placements).
+# KNOWN GAP, recorded: the MERGED image is outside this freeze entirely
+# (no build/m3b_merged11/extract; verify_pcrel_data needs an external
+# extract + merged placements to cover it). See hardening_register.md.
+[hui45]
 unresolved = 69
 resolved = 0
 escapes = [
@@ -100,7 +107,7 @@ escapes = [
   "x028122 0x028c98 -> 0x029034",
 ]
 
-[pyron27]
+[pyron29]
 unresolved = 10
 resolved = 0
 escapes = [
@@ -116,7 +123,7 @@ escapes = [
   "x088512 0x08c038 -> 0x08c0a2",
 ]
 
-[don_m7]
+[don_m9]
 unresolved = 10
 resolved = 0
 escapes = [

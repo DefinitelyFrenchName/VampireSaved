@@ -17,6 +17,55 @@ older session lives verbatim in `STATE_HISTORY.md`.** How to work with it:
   never roll to the archive; entries within them are marked DECIDED/FIXED
   in place, as always.
 
+## Session 14z-100 (continued) — THE HARDENING PROGRAM OPENED
+## (maintainer-directed): the pointer/flow comb built and frozen, three
+## stale guards re-pointed, the risk register written. #99 CLOSED
+## (maintainer-ruled); #106 filed.
+
+**The maintainer's ask:** comb the merged image for crash candidates
+(vanilla code -> non-vanilla targets, tenant overrides, bad pointers),
+partition by risk, triage candidates. **Program plan: 4 phases (H1-H4),
+docs/project/hardening_register.md is the living deliverable.**
+
+**H1 SHIPPED — `tools/audit_pointer_flow.py` + `tests/test_pointer_flow.sh`
+(ci_static) + `tests/expected/pointer_flow/` baselines.** The comb
+classifies every address the patch introduces (~166k on merged-m4: op
+extents, poke32 repoint values, code abs.l operands via scan_code_refs,
+data bare longs) against the op map AND the shipped image bytes.
+Findings: **2 STRONG, both reviewed BENIGN** — the win_pal thunk's
+sparse-block BIASED BASES (`a0 = block - id*0xA0`; verified via the
+5*row markers on the shipped image: hui 0x37, pyr 0x50). ~1,130 WEAK
+(packed-data noise, frozen by count). Verdict logic ground-truthed both
+directions (synthetic hole-pointer + off-image op must fail; clean
+synthetic must not). TWO comb lessons paid for and encoded: (a) the
+vsw.* members carry gfx-channel PRG content patch.json never writes, so
+"hole" must be decided on the ARTIFACT's bytes; (b) poke32 values with
+a nonzero high byte are packed data (hud_name_entry pairs), not
+addresses.
+
+**H2 EXECUTED — the stale-guard sweep (the sharpest survey finding:
+three guards rotted across the freeze):**
+- `audit_tripwire_reach.sh` re-pointed (was hui41/pyron26/don_m7/
+  m3b_merged8 — so the shipping build's 113 tripwires had ZERO
+  reachability measurement). Run on the current freeze: SIX marathon
+  legs END 40620, zero fires.
+- `test_pcrel_escapes.sh` + `pcrel_escapes.toml` re-pointed to
+  hui45/pyron29/don_m9 — inventories MEASURED IDENTICAL (69/10/10,
+  zero drift; source-side keys). **The merged image remains outside
+  this freeze — filed as GitHub #106** (verify_pcrel_data needs
+  extract/, merged builds have none).
+- `build_merged.sh`'s README template made generation-neutral (it
+  stamped "753-op / NOT REGISTERED" into every build dir forever);
+  merged-m4's on-disk copy corrected.
+
+**H3 QUEUE (analysis next; fixes ride the next window):** the uncovered
+word-form escapes (the #103 class — hui x028122->0x2cc64 + the 20-site
+0x574b0 cluster + x068c78->0x6b644; pyr the same two; don's 14z-98 (1)
+residue), the 13 plausible reconciliation rows (start: 0x028122 at
+0.90, the two multi-candidate 1.00s), the 113 tripwires ranked by
+reachability. **H4:** pool-vs-pool contact rig, 2P rig diversity, one
+authoritative-guard corpus soak. Full detail: hardening_register.md.
+
 ## Session 14z-100 (2026-08-20, same day as the freeze) — THE #99 RIG
 ## RUNS END TO END: continue + switch + tenant-vs-tenant, 2x 40,620
 ## guarded frames, ZERO trips. And a live reference-rot catch: the

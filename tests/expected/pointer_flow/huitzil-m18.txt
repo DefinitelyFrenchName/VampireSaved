@@ -1,0 +1,5 @@
+# pointer-flow baseline for huitzil-m18 (build/hui45), frozen 14z-100.
+# STRONG lines are REVIEWED findings (see hardening_register.md);
+# WEAK-COUNT lines freeze the noise volume — growth = investigate.
+WEAK-COUNT	code:move_imm	1
+WEAK-COUNT	data:long	1282
