@@ -1,4 +1,26 @@
-# NEXT SESSION — orientation (updated 14z-100, 2026-08-20)
+# NEXT SESSION — orientation (rewritten at the 14z-100 close, 2026-08-20)
+
+> ## **THE STATE IN ONE BREATH:** the 14z-99 window freeze
+> ## (donovan-m9 / huitzil-m18 / pyron-m12 / **merged-m4** =
+> ## `build/m3b_merged11`, `2343607a`; stock twin m5_stock4 16da59b6) is
+> ## **FIELD-CONFIRMED END TO END** — #43/#99/#102/#103/#104/#105 all
+> ## CLOSED; the maintainer's in-depth pass also cleared DF and ALL
+> ## throws incl. transformation throws. The 14z-100 HARDENING PROGRAM
+> ## then ran H1-H4 (`docs/project/hardening_register.md` is the living
+> ## register): the pointer/flow comb + escape triage CLOSED the escape
+> ## and plausible-row classes with two real findings filed, and the
+> ## pool-vs-pool contact rig found a live behavioral divergence.
+> ## `ROMDIR=... tests/run_all_static.sh` -> PASS 96 / SKIP 0 / FAIL 0.
+> ## PLAY: `tools/run_wide.sh build/m3b_merged11 fbneo`.
+> ##
+> ## **OPEN: #106 #107 #108** (+ #50 parked, #10 ripe, the ~200 tracked
+> ## build dirs). New standing instruments this session:
+> ## `audit_continue_switch` (the #99 lock, incl. the literal
+> ## Donovan-vs-CPU-Phobos pairing), `test_pointer_flow` +
+> ## `test_escape_triage` (ci_static), `audit_projectile_clash`
+> ## (EXPECT_SAT_SWEEP defect/fix modes), `triage_pcrel_escapes` +
+> ## `audit_pointer_flow` tools; tripwire-reach + pcrel_escapes +
+> ## bases.tsv all re-pointed to the current freeze.
 
 > ## **THE SEQUENCE (maintainer-agreed 2026-08-20): #108 → #107 → #106,
 > ## all windowless, then ONE window bundling the two fixes.**
@@ -68,20 +90,6 @@
 > ## (merged image outside the pcrel-escape freeze). Open: #106, #107,
 > ## #50, #10, the ~200 tracked build dirs.
 
-> ## **14z-100 (same day): THE #99 RIG IS COMMITTED AND CLEAN.**
-> ## `tests/audit_continue_switch.sh` — coin marathon, forced Phobos,
-> ## natural loss (JUDGES — the #103 lock on the once-blocked path),
-> ## continue + forced switch to Donovan, tenant-vs-tenant CPU match at
-> ## match 5, END 40620, zero guard trips, twice. The exact
-> ## Donovan-vs-CPU-Phobos pairing is NOT steered ($FF8114 pokes inert;
-> ## read_tap serialization is the named next step). ALSO: tenant hitbox
-> ## bases MOVED with the window (phobos/pyron; donovan held) —
-> ## bases.tsv re-derived + re-derive-at-every-freeze note;
-> ## test_tenant_pairings green on the fix; the audit self-derives bases
-> ## from the build's own table. In-depth field pass so far: DF + ALL
-> ## throws incl. transformations (Midnight Bliss, Hell Dunk) clean.
-> ## Detail: STATE 14z-100.
-
 > **STATE.md WAS SPLIT at the post-freeze close (maintainer-approved):
 > recent sessions + THE LEDGER stay in STATE.md; everything older is
 > verbatim in `STATE_HISTORY.md`. The rollover rule is in STATE.md's
@@ -102,7 +110,8 @@
 > ## audit_merged_legacy 47/47); all four flip-audits green at their new
 > ## defaults; M2 battery 23/23 + the structural wide-render skip
 > ## covered directly on the window pair.
-> ## `ROMDIR=... tests/run_all_static.sh` -> PASS 94 / SKIP 0 / FAIL 0.
+> ## `ROMDIR=... tests/run_all_static.sh` -> PASS 96 / SKIP 0 / FAIL 0
+> ## (94 at the freeze; +test_pointer_flow +test_escape_triage, 14z-100).
 > ##
 > ## **PLAY: `tools/run_wide.sh build/m3b_merged11 fbneo`** (or record a
 > ## session: `WIDE_RECORD=<name> ... mame`). **FIELD PASS COMPLETE

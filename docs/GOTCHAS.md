@@ -281,3 +281,12 @@ is a GAME gotcha if it is true of the game regardless of the port.
   staged recipes on the MERGED composition); a staged VALUE swap cannot
   ride the uncomment rule (duplicate key) — stage it as an edit
   instruction.
+
+- **14z-100 (project):** probe PCs must sit on instruction boundaries
+  (a mid-operand probe reads 0-fires-green while measuring nothing) and
+  every probe needs a must-fire control; rig iterations must not share
+  a dump dir (overwrites destroy the prior iteration's evidence);
+  `grep -c || echo 0` double-prints on zero; a -debug write-trace can
+  DISAGREE with non-debug state about the same write — attribute with
+  the non-debug tap (open instance: #108); zsh expands `=`-leading
+  arguments as =cmd lookups.

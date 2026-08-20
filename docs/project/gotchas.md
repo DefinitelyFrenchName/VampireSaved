@@ -2713,3 +2713,39 @@ bare-# uncomment rule reproduces staged ROWS byte-for-byte, but staging
 DUPLICATE KEY, which the manifest parser refuses. Stage value swaps as
 an edit instruction in a comment (one sed, written next to the line),
 and put the swap in the window checklist.
+
+## A probe PC that is not an instruction boundary measures NOTHING while looking green (14z-100)
+`GUARD_PROBE`/breakpoint addresses must sit on the OPCODE word, not inside
+an operand: the #107 reachability probe first sat at farm entry +0x3088 —
+the middle of the previous `jmp abs.l`'s operand — and produced a clean
+"0 fires / END clean" run that measured nothing. A dispatch-farm entry is
+6 bytes (`4ef9` + long); compute the entry PC from the FARM BASE, and when
+a zero surprises you, re-derive the PC from the bytes before trusting it.
+The same session's second instance: the hitclass-map probe only became
+meaningful after the Demitri-vs-Demitri control proved 468 fires — a
+probe with no must-fire control is not an instrument.
+
+## Rig iterations must NOT share a dump directory (14z-100)
+`DUMPS` files are named `dump_<frame>_<lo>.bin` — a second iteration with
+overlapping frames silently OVERWRITES the first's evidence. v3 of the
+contact rig destroyed v2's satellite-bearing frames and cost a re-run.
+One directory per iteration, always.
+
+## `grep -c pattern file || echo 0` DOUBLE-PRINTS on zero (14z-100)
+`grep -c` prints "0" itself AND exits 1, so the `|| echo 0` appends a
+second line and every `[ "$n" = 0 ]` comparison fails. Use
+`n="$(grep -c ... )" || true`. Cost the clash audit its first verdict run.
+
+## The -debug write-trace and non-debug dumps can DISAGREE about one write (14z-100, open on #108)
+On the SAME build and replay, `trace_writes.lua` (-debug) recorded the
+fighter's `+0x18` receiving table[0x11]=0x6000 from the vanilla init,
+while non-debug dumps read 0x1000 at the same phase. This is the
+"-debug is its own timeline" class biting an ATTRIBUTION, not just a
+frame index: do not conclude "no other writer exists" from a -debug
+trace when the non-debug state disagrees — take the non-debug tap
+(FBNEO_HTAP) instead. Unresolved instance: GitHub #108.
+
+## zsh: an argument beginning with `=` triggers =cmd expansion (14z-100)
+`echo ====` fails with "=== not found" in the Bash tool's zsh — `=word`
+expands as "path of command word". Quote it or avoid `=`-leading args in
+generated command lines.
