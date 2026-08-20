@@ -1,55 +1,45 @@
-# NEXT SESSION — orientation (updated through 14z-99, 2026-08-20)
+# NEXT SESSION — orientation (written at the close of 14z-99, 2026-08-20)
 
-> ## **THE SUITE IS GREEN: `ROMDIR=... tests/run_all_static.sh` -> PASS 94 /
-> ## SKIP 0 / FAIL 0.** Open: #99 (parked), #50 (parked behind #99), #43
-> ## ((b) awaits the window).
+> ## **THE WINDOW IS EXECUTED AND FROZEN: donovan-m9 / huitzil-m18 /
+> ## pyron-m12 / merged-m4** (`build/don_m9` 428fc0c9 / `build/hui45`
+> ## c4bbb375 / `build/pyron29` 4c3c072b / `build/m3b_merged11` 2343607a
+> ## — BIT-FOR-BIT the rehearsed probe_window; stock twin
+> ## `build/m5_stock4` 16da59b6, MOVED for the first time since 14z-91
+> ## because #103's fix is not profile-gated, by design; tags freeze/*).
+> ## LANDED: #43(b) (fallback ON; the ruled 3-row movement measured as
+> ## ONE row with ZERO build effect) + #103 (the arcade-death stall) +
+> ## #104 (native capture records, all tenants) + #105 (the AUTO win
+> ## palettes). Suite GREEN x3 on re-frozen sets; every legacy masked
+> ## replay on its EXACT frozen class; merged gates ALL green
+> ## (select-bank, trap parity, FG parity, render-content,
+> ## audit_merged_legacy 47/47); all four flip-audits green at their new
+> ## defaults; M2 battery 23/23 + the structural wide-render skip
+> ## covered directly on the window pair.
+> ## `ROMDIR=... tests/run_all_static.sh` -> PASS 94 / SKIP 0 / FAIL 0.
 > ##
-> ## **THE WINDOW IS FULLY REHEARSED — #103 + #104 + #105 TOGETHER, ONE
-> ## COMBINED ARTIFACT (build/probe_window 2343607a, 14z-99 (9)):** all
-> ## four flip-audits GREEN on it (grab-pose all-tenants-native, win-pal
-> ## all-legs-colored, lilith-ko FLOWED, ko-writer HEALTHY commit), zero
-> ## tripwires, 802 ops, and the ENTIRE legacy cost vs frozen merged-m3
-> ## is ONE frame (f890, the ratified class-4 pointer cache) on every
-> ## select-reaching replay. THE WINDOW ACTION = uncomment #103's pieces
-> ## (recon_overlay INSIDE [[tenant]] — the "top-level" wording was a
-> ## measured trap) + uncomment the 15 capture_kf rows in all three
-> ## manifests + one sed (colors = 8 -> 10) + rebuild + flip the four
-> ## audit defaults (WEAKEN_P1=1 on the two #103 ones) + full battery +
-> ## freeze. The complete checklist: STATE 14z-99 (9).
+> ## **PLAY: `tools/run_wide.sh build/m3b_merged11 fbneo`** (or record a
+> ## session: `WIDE_RECORD=<name> ... mame`). THE FIELD PASS IS THE NEXT
+> ## MAINTAINER ACTION: #103/#104/#105 are fixed on the shipping
+> ## artifacts and close on it; #43 can close outright; then #99
+> ## un-parks (its blocker was #103's fix).
 > ##
-> ## **#102 CLOSED** (maintainer-ruled: the engine's own continue
-> ## behavior; audit_continue_ladder stays as the regression lock).
-> ## **#104 fix STAGED + PREFLIGHTED** (the variant-row alias in every
-> ## attacker's keyframe block head; 15 slot_rows data_ports; premises
-> ## frozen in test_capture_pose_sources.sh). **#105 fix STAGED +
-> ## PREFLIGHTED** (colors = 10: sel 8/9 ARE the AUTO sets, both pools
-> ## carry 10; the whites were the sparse block running off its end;
-> ## renders verified on the full-gfx probe; 4-leg lock
-> ## audit_win_pal_auto + replays 103/104). **#103 unchanged** (staged
-> ## since 14z-98, now also rehearsed on the MERGED composition).
+> ## **THE WINDOW ALSO SURFACED AND FIXED SIX LATENT INSTRUMENT DEFECTS,
+> ## none a window regression** (each A/B'd on pre-window bytes): the
+> ## build's prg/ lifecycle (in-place stock rebuilds tripped the #46
+> ## stamp); THREE copies of a 14z-91-stale row-0x0F literal
+> ## (test_don_accent x2, test_don_colors — fixed file-by-file at first,
+> ## the third caught only by the next battery run: GREP THE CLAIM);
+> ## test_don_sound's inventories frozen NINE generations back (the
+> ## music-range tripwire was green throughout); a MAME teardown
+> ## segfault now tolerated ONLY behind ring_tap's END marker; and
+> ## test_phasec_spaces' lowercase-only hex class meeting its first
+> ## uppercase allocation cursor.
 > ##
-> ## **THE FROZEN BUILDS ARE UNCHANGED — donovan-m8 / huitzil-m17 /
-> ## pyron-m11 / merged-m3** (d038553d / bfd819a0 / 738bcfc2 /
-> ## ac3d0618; tags freeze/*). **NO SHIPPED BYTE MOVED IN 14z-98 OR
-> ## 14z-99.** Play: `tools/run_wide.sh build/m3b_merged10 fbneo`
-> ## (build argument REQUIRED). NEW: `WIDE_RECORD=<name> ... mame`
-> ## records any playtest as a frame-exact replay protocol
-> ## (~/.cache/vampire-saved/inp/<name>/; WIDE_PLAYBACK replays it).
-> ##
-> ## **AWAITING (maintainer):** the window SCHEDULING (everything in it
-> ## is rehearsed; freeze philosophy ruled 2026-08-20: a freeze = a
-> ## reference state, so the window lands with #103/#104/#105 fixed);
-> ## the two battery-target registry rows; the ~200 tracked build dirs.
-> ## The #105 captures and the MAME retest are DONE and processed — do
-> ## not re-request either.
-> ##
-> ## **RIG LORE THAT SAVES A SESSION (14z-99, all measured):** vsav's
-> ## AUTO is AUTO-GUARD (human still attacks); the victory screen shows
-> ## after wins in BOTH 1P and 2P; post-KO sampling lands on the MAP
-> ## screen AFTER the win screen; buttons pressed past the KO skip the
-> ## victory surfaces; render verdicts from gfx-free probes are VOID;
-> ## the natural-mash Donovan death is lottery-bound per build (the FIX
-> ## makes him win — use WEAKEN_P1=1).
+> ## Open: #99 (un-parks after the field pass), #50 (behind #99), #10
+> ## (ripe re-measurement), the two battery-target registry rows
+> ## (superseded by this freeze's rows), the ~200 tracked build dirs.
+> ## Probe dirs probe_103_don/probe_104/probe_105/probe_105f/
+> ## probe_window are UNREGISTERED evidence, reproducible from STATE.
 
 
 ## What 14z-98 did

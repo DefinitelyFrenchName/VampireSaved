@@ -1,5 +1,99 @@
 # STATE — living progress log
 
+## Session 14z-99 FREEZE — THE WINDOW EXECUTED END TO END: donovan-m9 /
+## huitzil-m18 / pyron-m12 / merged-m4. #43(b) + #103 + #104 + #105 all
+## landed; every gate that saw the new artifacts is green.
+
+**Maintainer "go" 2026-08-20; every piece was rehearsed before landing
+(14z-99 (9)); the merged artifact is BIT-FOR-BIT the rehearsal
+(2343607a == build/probe_window).**
+
+**The new reference state:**
+| artifact | build dir | fingerprint | ops |
+|---|---|---|---|
+| donovan-m9 | build/don_m9 | 428fc0c9 | 323 |
+| donovan-m9-stock | build/m5_stock4 | 16da59b6 | — |
+| donovan-m9-stage4 | build/don_m9_s4 | 35e948a1 | — |
+| huitzil-m18 | build/hui45 | c4bbb375 | 361 |
+| pyron-m12 | build/pyron29 | 4c3c072b | 296 |
+| merged-m4 | build/m3b_merged11 | 2343607a | 802 |
+
+**THE STOCK TWIN MOVED for the first time since 14z-91** (a054de5c ->
+16da59b6): #103's pcrel rows are not profile-gated — the stock track
+gets the stall fix too, by design. #104/#105 rows are variant-gated.
+
+**What landed (each its own commit):**
+- W1 #43(b): ALLOW_FALLBACK=True; the ruled 3-row movement measured as
+  ONE row (0x028122 -> 0x028e42 plausible-0.90) with ZERO build effect
+  (no live consumer; merged patch bit-identical). Wholesale map regen
+  measured DESTRUCTIVE and avoided (gotcha in the row note).
+- W2 #103+#104+#105: manifests uncommented + colors sed; the tracked
+  manifests regenerate the rehearsed patch BYTE-IDENTICALLY; audit
+  defaults flipped with WEAKEN_P1 tied to the EXPECTs.
+
+**The freeze verification, all green:**
+- test_m3a_reproducible: all five artifacts rebuild bit-exact from the
+  tree (pins re-pointed; whole-artifact manifests updated).
+- run_suite x3, freeze + verify passes: every legacy masked replay on
+  its EXACT frozen class (the f890 content change sits inside the
+  ratified select windows); the moved self-frozen tenant/select .sha1s
+  re-frozen (60 across the sets); SUITE GREEN x3.
+- NEW REPLAYS CLASSIFIED (the 14z-78 "replay added after a freeze"
+  ruling honoured at the freeze itself): 96_don_victor_grab and
+  104_1p_auto_ko_win measure as PURE LEGACY pairings unpoked (Demitri
+  vs Morrigan / Demitri vs Lilith — signature-checked on +0x60.l), so
+  per the audit_legacy_pairings doctrine they got MASKED classes vs the
+  vanilla basis, not self-frozen sha1s: window 889..1871 and 889..1494
+  (the ratified §4 v3 select-window class, onset matching all nine
+  siblings; identical measurements on all three builds; vanilla basis
+  logs frozen with the 16_xemu_2p instrument control).
+  103_tenant_2pwin_auto is tenant content (Donovan cell) -> .sha1.
+- tenant_loop re-frozen 323/361/296 + 596/646 + 802/899, every delta
+  attributed; manifest_merge pcrel tuple re-frozen (2,5,2)/5/2 measured.
+- Merged gates: select-bank PASS (thunks at their new window
+  addresses), trap parity PASS, FG parity PASS (native-exact staircase
+  — the x028122-adjacent damage path, extra assurance for #43(b)),
+  render-content PASS (bands byte-equal to the NEW solos,
+  de-substitution held, poison controls fired), audit_merged_legacy
+  PASS (leg a 47/47 on the ratified classes, leg b guard-clean).
+- The four flip-audits green at their new defaults (and previously on
+  the identical rehearsal bytes).
+- M2 battery: 23/23 gates PASS + the structural wide-render skip on a
+  stock-track run, covered by direct invocation on the window pair
+  (m5_stock4 + don_m9): PASS incl. the de-substitution invariant.
+  Getting there surfaced and fixed FOUR latent instrument defects, none
+  a window regression (each A/B'd against pre-window bytes):
+  1. build_donovan.sh never cleared prg/ before patch_prg, so any
+     in-place STOCK rebuild tripped select_port's #46 idempotence stamp
+     — fixed at the root (rm -rf prg/ like rompath).
+  2-3. THREE copies of a stale row-0x0F literal (test_don_accent x2,
+     test_don_colors) frozen before 14z-91's ratified fixture-override
+     deletion — re-frozen to the measured post-14z-91 value; the first
+     fix missed the copies because I fixed files instead of GREPPING THE
+     CLAIM (the 14z-71 standing order, re-learned live).
+  4. test_don_sound's id inventories were frozen on ae701ffb (14z-52,
+     NINE generations stale; drift identical on pre-window bytes) —
+     re-frozen; the music-range tripwire (the gate's real property) was
+     green throughout. Also: a deterministic MAME TEARDOWN segfault
+     (host-side, after ring_tap's END marker, pre-window builds too) is
+     now tolerated ONLY behind the instrument's own completion marker —
+     a mid-run death still fails.
+
+**Pins re-pointed (the reference-rot discipline):** m3a_reproducible
+EXPECT_*/MANI_*; test_merged_render_content D/H/P rows -> don_m9/hui45/
+pyron29; audit_merged_legacy leg-b solos; the nine audits' BUILD
+defaults m3b_merged10 -> m3b_merged11; audit_hui_grunt gains the
+m3b_merged11 frozen row (kernel rows untouched by the window);
+registry.tsv +5 rows; expectation sets carried-renamed (m8->m9,
+m17->m18, m11->m12, + the two battery rows).
+
+**Issues:** #103, #104, #105 are FIXED ON THE SHIPPING ARTIFACTS —
+close after the maintainer's field pass on merged-m4. #43 can close
+outright ((a) 14z-95, (b) here). Play:
+`tools/run_wide.sh build/m3b_merged11 fbneo` — or record the session:
+`WIDE_RECORD=<name> tools/run_wide.sh build/m3b_merged11 mame`.
+
+
 ## Session 14z-99 (9) — THE WINDOW IS FULLY REHEARSED ON ONE COMBINED
 ## ARTIFACT: #103 + #104 + #105 together, all four flip-audits green,
 ## legacy cost = ONE frame. The window action is "uncomment + one sed +
@@ -115,7 +209,8 @@ build with gfx; palette/RAM verdicts do not. Recorded as a gotcha.
 
 **THE COMBINED WINDOW REHEARSAL (build/probe_window, fingerprint
 2343607a, UNREGISTERED — the exact window recipe: #103's two pieces +
-overlay, #104's 15 rows, #105's colors=10):** 807 ops, GENERATION OK,
+overlay, #104's 15 rows, #105's colors=10):** ~~807~~ **802 ops**
+[corrected at W2: 807 was the FAILED doc-root build], GENERATION OK,
 zero tripwires. **It caught a real staging bug on its FIRST build:**
 the #103 staged comment said recon_overlay is "a top-level key" —
 placed at DOC ROOT it works on a SOLO build but HIJACKS EVERY tenant's

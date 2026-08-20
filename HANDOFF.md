@@ -162,7 +162,7 @@ build drives inputs through the 0001 harness instead), so record on MAME.
 
 ```sh
 export ROMDIR=/path/to/reference/sets
-tools/run_wide.sh build/m3b_merged10 fbneo # THE 3-TENANT BUILD (all 18
+tools/run_wide.sh build/m3b_merged11 fbneo # THE 3-TENANT BUILD (all 18
                                            # (14z-97: the build argument is
                                            # now REQUIRED. It used to default
                                            # to build/m5w — the known-bad
@@ -198,8 +198,26 @@ tools/run_wide.sh build/don_m8 fbneo       # or the solo builds (hui44,
                                            # 14z-96 #101 freeze)
 ```
 
-**Current WIDE builds — THE 14z-96 #101 FREEZE (maintainer-ruled,
-2026-08-18): donovan-m8 / huitzil-m17 / pyron-m11 / merged-m3.**
+**Current WIDE builds — THE 14z-99 WINDOW FREEZE (maintainer "go"
+2026-08-20): donovan-m9 / huitzil-m18 / pyron-m12 / merged-m4.**
+`build/don_m9` (`428fc0c9`, 323 ops), `build/hui45` (`c4bbb375`, 361),
+`build/pyron29` (`4c3c072b`, 296), `build/m3b_merged11` (`2343607a`,
+802 ops — BIT-FOR-BIT the rehearsed build/probe_window), stock twin
+`build/m5_stock4` (`16da59b6` — THE STOCK TWIN MOVED for the first
+time since 14z-91: #103's fix is not profile-gated, by design). = the
+14z-96 batch + (#43(b)) the fallback flip (one map row, zero build
+effect) + (#103) the x026142/x05c800 pcrel escape fixes + the donovan
+reconciliation overlay (the arcade-death stall) + (#104) the 15
+capture_kf blocks (every attacker's keyframe block ported whole from
+vs2; tenants hold NATIVE capture records — Victor's grab holds them
+upright) + (#105) win_pal colors 8->10 (the AUTO sets; AUTO winners'
+portraits colored). Every piece was REHEARSED on probe_window before
+landing; suite GREEN x3 on re-frozen sets; merged gates all green.
+Detail: STATE 14z-99 FREEZE.
+
+**Previous batch (14z-96, THE #101 KERNEL VOICE-TABLE PORT,
+maintainer-ruled 2026-08-18): donovan-m8 / huitzil-m17 / pyron-m11 /
+merged-m3.**
 `build/don_m8` (`d038553d`, 289 ops), `build/hui44` (`bfd819a0`),
 `build/pyron28` (`738bcfc2`), `build/m3b_merged10` (`ac3d0618`, 764
 ops), stock twin `build/m5_stock3` (`a054de5c` = m5_stock2

@@ -39,7 +39,7 @@ fail=0
 # A real replay, a real set, a real basis: the specs under test are the ones
 # the battery actually enforces, not a fixture that can drift away from them.
 RPL=03_two_player_vs
-SET=donovan-m8-stock
+SET=donovan-m9-stock   # re-pointed 14z-99 (window freeze carry-rename)
 SPEC="$REPO/tests/expected/$SET/$RPL.masked"
 [ -f "$SPEC" ] || { echo "FAIL: no frozen spec at $SPEC"; exit 1; }
 BASE=$(awk '{print $2}' "$SPEC")

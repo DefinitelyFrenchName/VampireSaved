@@ -47,13 +47,19 @@ ALT = {  # native vs2 kick-color rows (frozen 14z-21)
     0x0c: 'f000ffffffefffcffc9cf758f536ffeafdb8fa86f864f653fdadf768fe00f00e',
     0x0d: 'f000fffffdbbfa77f844f600ff00ffdcfeb9fd87f754f432fd66fb44f922f00f',
 }
+# MIR row 0x0f RE-FROZEN 14z-99: the THIRD copy of the stale row-0x0F
+# literal (the 14z-91 fixture-override deletion traded vs2's red statue
+# ramp for vsavj's own row content, recorded then as an accepted
+# cosmetic; test_don_accent carried two more copies, all three surfaced
+# by the window battery). Measured identical on the pre- and post-window
+# stock twins, so it is the 14z-91 state, not a window change.
 MIR = {  # native vs2 Donovan-mirror rows (frozen 14z-21; replay 43 oracle)
     0x0a: 'f000fffffeb8fd97fb76f853f530fff4fec4f46bff00fc00fa00f700f500f000',
     0x0b: 'fd00ff40ff70ff90ffb0ffd0fff0fffafffff0aff0cff0effafffdfff111f001',
     0x0c: 'f000fffffdfffcdff9adf87af635ffeafdb8fa86f864f653fbcef88bfe00f002',
     0x0d: 'f000fffffcdff9adf87af635ff00ffdbfeb9fd87fa66f744ff89fd68fb46f003',
     0x0e: 'fd00fffffdddfbbbf33bf54ff65ff76ff216f111f112f113f115f216f228f000',
-    0x0f: 'f01dfffffdddfbbbfa22fe32fe43fe54f500f000f100f200f400f500f611f001',
+    0x0f: 'fd00fffffdddfbbbf33bf54ff65ff76ffd00f111f112f113f115f216f228f001',
     0x10: 'f000fffffeb8fd97fb76f853f530ffc0ffa0fb45f45ff14cf00af007f005f004',
     0x11: 'fd00ff40ff70ff90ffb0ffd0fff0fffafffff0aff0cff0effafffdfff111f005',
     0x12: 'f000fffffceff9bef78df46af238ffeafdb8fa86f864f653f79ef56afe00f006',

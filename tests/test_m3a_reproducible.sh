@@ -59,8 +59,13 @@ trap 'rm -rf "$WORK"' EXIT
 # words -> authored (base,alias) song pairs 0xd9-0xdc/0x3d9-0x3dc) + the
 # shared qs_songs additions. Stock twin UNCHANGED (only_variant_slot,
 # measured bit-identical).
-EXPECT_WIDE="d038553dec5b8a7759e96f46b2fa0964c652a21b"
-EXPECT_STOCK="a054de5c0cfe868cb0aa9722abebdffd9dfcdb0d"
+# EXPECT_WIDE="d038553dec5b8a7759e96f46b2fa0964c652a21b"  # git tag freeze/donovan-m8
+EXPECT_WIDE="428fc0c9421cb5ba96db040bae0fc4935a3f5228"   # 14z-99 window
+# EXPECT_STOCK="a054de5c0cfe868cb0aa9722abebdffd9dfcdb0d"  # unchanged 14z-86..14z-96
+# 14z-99: THE STOCK TWIN MOVED for the first time since 14z-91 — #103's
+# pcrel_escape_fix rows are not profile-gated (the stock track gets the
+# stall fix too, by design). #104/#105 rows are variant-gated: no effect.
+EXPECT_STOCK="16da59b6b29f4082b69c06d3e662843af4d00cc3"
 # huitzil-m3 (14z-79, maintainer-ratified). Supersedes huitzil-m2
 # (9deda0808e87601b10e2171405805d4669ba2624), which can no longer be
 # produced from the tree: huitzil.toml gained the (b') index-window thunk
@@ -95,7 +100,8 @@ EXPECT_STOCK="a054de5c0cfe868cb0aa9722abebdffd9dfcdb0d"
 # EXPECT_HUI="da734d490a4498580ab8ecd1b8709676d6a9e117"  # git tag freeze/huitzil-m16
 # 14z-96 (#101): + his four kernel_voice code_words (the .2 word is THE
 # GRUNT FIX: 01d2 -> 02a2, vs2's deliberate-silence id) — huitzil-m17
-EXPECT_HUI="bfd819a012218b9e8022be17b0747319a76f3140"
+# EXPECT_HUI="bfd819a012218b9e8022be17b0747319a76f3140"  # git tag freeze/huitzil-m17
+EXPECT_HUI="c4bbb3752cc93494455bfebb83fff801051c7fec"   # 14z-99 window
 # pyron-m3 (14z-82c: + the ADOPTED hitclass_map_extend thunk — the f7997 fix)
 # EXPECT_PYR="6c7f7322da793c12b3681dd3ef5a76b3792ae5d0"  # git tag freeze/pyron-m3
 # pyron-m4 (14z-85b, maintainer-ruled: + pyr_sfx_records — kills the merged
@@ -111,7 +117,8 @@ EXPECT_HUI="bfd819a012218b9e8022be17b0747319a76f3140"
 # 0x494de reference, so he takes no reconciliation row (op count unchanged).
 # EXPECT_PYR="e29cac231b1357c87df62a3a278091caad5f7d53"  # git tag freeze/pyron-m10
 # 14z-96 (#101): + his four kernel_voice code_words — pyron-m11
-EXPECT_PYR="738bcfc2c06b008d7d4cef61f31faf74df784206"
+# EXPECT_PYR="738bcfc2c06b008d7d4cef61f31faf74df784206"  # git tag freeze/pyron-m11
+EXPECT_PYR="4c3c072bfe7a7b422d27194c986b27f53238f554"   # 14z-99 window
 
 # The WIDE overlay romset (deterministic from the audited reference sets;
 # built into scratch so the canonical build/wide0 is never clobbered).
@@ -183,18 +190,18 @@ done
 # kernel words; the 16 pair songs + 2 batch voices in the Z80 members).
 # MANI_STOCK is UNCHANGED — the member-level proof the stock track is
 # untouched.
-MANI_WIDE="660b5c6d92e0e4da9773bdd5ff65331ba376b915 42"
-MANI_STOCK="9d30e409b0b1de3df87c1ff360f238cc48c311dc 30"
+MANI_WIDE="53b7a65fb27039d6ef6e80f6450bb78933691096 42"   # 14z-99 window
+MANI_STOCK="08aac0881648185a9487230a3ac5fe19b78408d3 30"   # 14z-99 window (stock moved: #103)
 # 14z-94 (#91 + #92). Attributed per member before re-pinning: exactly FOUR
 # members moved — vm3j.03d, vm3j.04d, vm3j.10b and vsw.41, all PROGRAM
 # members. No gfx member and no QSound member changed, which is what a
 # program-image edit must look like. (m15 was 7f4d52a330abf73df298b638dbca099ce3135541.)
-MANI_HUI="dd20fa9da6b65c3c7f24d9c8b7ef39877650cee3 42"   # 14z-96 #101
+MANI_HUI="b496dec55439b11f3fe78eadc40a98e039a8bb80 42"   # 14z-99 window
 # 14z-94 (#92 only — he takes no reconciliation row). Exactly ONE member
 # moved: vm3j.03d, which carries table B at PRG:0x00BB68. Huitzil moved four
 # because #91's row also relocated code; Pyron's four bytes are a pure data
 # edit inside one member. (m9 was d12d0c6a86bce271d6b7f59ccf6e0c3d98bc9393.)
-MANI_PYR="8aabb913b2a16bc75c2ad86b6debcb9383c9b69d 42"   # 14z-96 #101
+MANI_PYR="0bcffc87f6d3b43fdabb76a39810bb94a54e57a8 42"   # 14z-99 window
 
 m3a_manifest() {   # m3a_manifest <label> <rompath> <"digest count">
     _got="$(python3 tools/artifact_manifest.py "$2")" || {
@@ -246,8 +253,8 @@ m3a_manifest pyron       "$WORK/pyron/rompath"     "$MANI_PYR"
 # #29). The gate does NOT print a bare "SKIP:" marker here, because the other
 # four legs did run and tests/run_all_static.sh would otherwise classify the
 # whole gate as skipped.
-EXPECT_MERGED="ac3d06184f8c248717ba754275d5ab0147c69f07"   # merged-m3, 14z-96 (#101; was 081e2e53 merged-m2)
-MANI_MERGED="36714570fe95d390e299725ed853e91dd534976d 42"   # 14z-96 #101
+EXPECT_MERGED="2343607a4c5b0f0451bbfc6bcb3d9969eb2343c5"   # merged-m4, 14z-99 window (was ac3d0618 merged-m3) — == the rehearsed probe_window, bit-for-bit
+MANI_MERGED="59f3b42e7f0022f509c3cc912abc54f159183688 42"   # 14z-99 window
 
 MERGED_NEEDS="build/m5_wide/extract build/hui32/extract build/pyron21/extract
 build/wide0/rompath/vsavjw.zip"

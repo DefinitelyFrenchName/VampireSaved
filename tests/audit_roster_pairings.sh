@@ -31,13 +31,13 @@
 # and report it — do not keep batching for a completeness number. The matrix
 # below prints as it goes so a stopped run is still evidence.
 #
-# Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged10] [JOBS=6]
+# Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged11] [JOBS=6]
 #        [ONLY=0x13] [BASES=...] tests/audit_roster_pairings.sh
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"
 ROMDIR="${ROMDIR:?set ROMDIR}"
-BUILD="${BUILD:-build/m3b_merged10}"
+BUILD="${BUILD:-build/m3b_merged11}"
 JOBS="${JOBS:-6}"
 [ -d "$BUILD/rompath" ] || { echo "SKIP: no merged build at $BUILD"; exit 0; }
 MAME_BIN="${MAME_BIN:-$HOME/.cache/vampire-saved/mame/cps2}"

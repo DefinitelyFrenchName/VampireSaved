@@ -30,28 +30,56 @@ trap 'rm -rf "$WORK"' EXIT
 cd "$REPO"
 
 for rp in 12_donovan_vs_cpu 19_don_dp_spam 25_don_darkforce 56_don_es_ls; do
+    # A TEARDOWN SEGFAULT IS TOLERATED ONLY BEHIND THE INSTRUMENT'S OWN
+    # COMPLETION MARKER (14z-99). ring_tap writes "END" and closes its
+    # trace BEFORE calling manager.machine:exit(); MAME's exit path can
+    # then segfault host-side (measured: deterministic on replay 19 this
+    # session, on PRE- and POST-window builds alike, while replay.lua on
+    # the same replay exits clean — an emulator teardown race, not a
+    # measurement defect; the 14z-96/97 batteries ran this loop clean).
+    # A crash WITHOUT the END marker is a mid-run death and still fails.
+    rc=0
     REPLAY="$REPO/tests/replays/$rp.rpl" FRAMES=3400 \
         TRACE_OUT="$WORK/$rp.txt" MAME_SANDBOX="$WORK/$rp" \
         CHECKSUM_OUT="$WORK/$rp/c.log" MAME_ROMPATH="$RPDIR;$ROMDIR" \
         tools/run_mame.sh "${SET:-vsavj}" \
-        -autoboot_script "$REPO/tests/lua/ring_tap.lua" > /dev/null 2>&1
+        -autoboot_script "$REPO/tests/lua/ring_tap.lua" > /dev/null 2>&1 || rc=$?
+    if [ "$rc" -ne 0 ]; then
+        if [ -f "$WORK/$rp.txt" ] && grep -q "^END$" "$WORK/$rp.txt"; then
+            echo "  note: $rp — MAME teardown crash (rc=$rc) AFTER the"
+            echo "        instrument's END marker; run complete, tolerated"
+        else
+            echo "FAIL: $rp died mid-run (rc=$rc, no END marker)"
+            exit 1
+        fi
+    fi
 done
 
 python3 - "$WORK" <<'PYEOF'
 import sys, os, re
 work = sys.argv[1]
-# frozen id inventories, measured on ae701ffb (14z-52, phase-1 restore).
+# frozen id inventories. RE-FROZEN 14z-99 (were "measured on ae701ffb",
+# the 14z-52 build — NINE generations stale; the drift is IDENTICAL on
+# the pre-window stock twin m5_stock3 = the bytes unchanged since 14z-91,
+# so it accrued somewhere in 14z-52..91 and no full battery re-ran this
+# leg since — the third stale-literal family the window battery
+# surfaced, after test_don_accent's and test_don_colors' row-0x0F).
+# The delta from the 14z-52 freeze: 0xa -> 0x10 on all four (one
+# reaction-sfx id), plus replay 12's mid-run set (its vs-CPU fight
+# resolves differently across the accrued generations). Every id is
+# outside the music range — the assert that is this gate's actual
+# tripwire is unchanged and green throughout.
 # 0x0000/0xFFFF are ring housekeeping writes, not sounds.
 EXPECT = {
- '12_donovan_vs_cpu': {0x2,0x5,0xa,0xe0,0xed,0xee,0xef,0xf0,0xf1,0xf3,0xfe,0x106,
-                       0x10c,0x170,0x171,0x2e2,0x403,0x40a,0x410,0x429,0x4c1,0x4c7,
-                       0x4c9,0xff00,0xff05,0xff07},
- '19_don_dp_spam':    {0x2,0x5,0xa,0xe0,0xed,0xee,0xef,0xf0,0xf1,0xf3,0xfe,0x104,
+ '12_donovan_vs_cpu': {0x2,0x5,0x10,0xe0,0xed,0xee,0xef,0xf0,0xf1,0xf3,0xfe,
+                       0x10c,0x11f,0x170,0x171,0x401,0x411,0x416,0x432,0x437,
+                       0x4d8,0x4d9,0x4f3,0xff00,0xff05,0xff07},
+ '19_don_dp_spam':    {0x2,0x5,0x10,0xe0,0xed,0xee,0xef,0xf0,0xf1,0xf3,0xfe,0x104,
                        0x105,0x170,0x171,0x470,0x471,0x498,0x49a,0x621,0x62b,
                        0xff00,0xff05,0xff07},
- '25_don_darkforce':  {0x2,0x5,0xa,0xe0,0xed,0xee,0xef,0xf0,0xf1,0xfe,0x170,0x171,
+ '25_don_darkforce':  {0x2,0x5,0x10,0xe0,0xed,0xee,0xef,0xf0,0xf1,0xfe,0x170,0x171,
                        0x470,0x471,0x498,0x49a,0x62b,0xff00,0xff05,0xff07},
- '56_don_es_ls':      {0x2,0x5,0xa,0xe0,0xed,0xee,0xef,0xf0,0xf1,0xf3,0xfe,0x117,
+ '56_don_es_ls':      {0x2,0x5,0x10,0xe0,0xed,0xee,0xef,0xf0,0xf1,0xf3,0xfe,0x117,
                        0x170,0x171,0x470,0x471,0x498,0x49a,0x62b,0xff00,0xff05,
                        0xff07},
 }

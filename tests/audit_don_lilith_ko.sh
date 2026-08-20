@@ -76,7 +76,7 @@
 # inventory: Donovan/Lilith 7,980; Victor/Lilith 580 on both merged and
 # vanilla. Threshold 3000 -- over 5x the healthy flow, under half the stall.
 #
-# Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged10]
+# Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged11]
 #        [EXPECT_STALL=1] tests/audit_don_lilith_ko.sh
 #   EXPECT_STALL=0 rehearses the post-fix state: leg A's gap must then be
 #   under the threshold like leg B's. Flip the default when the fix lands.
@@ -84,7 +84,7 @@ set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"
 ROMDIR="${ROMDIR:?set ROMDIR}"
-BUILD="${BUILD:-build/m3b_merged10}"
+BUILD="${BUILD:-build/m3b_merged11}"
 [ -d "$BUILD/rompath" ] || { echo "SKIP: no build at $BUILD"; exit 0; }
 MAME_BIN="${MAME_BIN:-$HOME/.cache/vampire-saved/mame/cps2}"
 [ -x "$MAME_BIN" ] || { echo "SKIP: no WIDE MAME binary"; exit 0; }

@@ -70,7 +70,12 @@ FROZEN = [
     # regression root cause; their venue fixture-load sites are shared
     # by match intro AND attract). huitzil/pyron are unchanged.
     ("site_thunk",       (19, 14, 6), 30, 5),
-    ("pcrel_escape_fix", (0, 5, 2),  5,  2),   # the H<->P shared-source pair
+    # RE-FROZEN 14z-99 (was (0,5,2),5,2): the WINDOW landed donovan's two
+    # #103 rows. MEASURED merged=5 shared=2: his x05c800 row dedupes into
+    # the existing H<->P shared-source pair (one merged row, shared count
+    # unchanged at 2 rows) and his x026142 row is unique — 9 declared,
+    # 5 merged.
+    ("pcrel_escape_fix", (2, 5, 2),  5,  2),
     # 14z-87: +1 shared voice_borrow_site_pad in all three manifests
     # (H was already 4, not the frozen 3 — accrued staleness, see above)
     # RE-FROZEN 14z-96 (+4 per file, +12 merged, shared unchanged): the

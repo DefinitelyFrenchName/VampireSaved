@@ -65,14 +65,25 @@ assert rowc == {NATIVE_C}, \
     f"row 0x0C not steady/native ({len(rowc)} variants): " + \
     "; ".join(v.hex() for v in sorted(rowc)[:3])
 print(f"  ok: row 0x0C steady over {len(frames)} frames, native-vs2 content")
-# rows 0x0E/0x0F: the 14z-20 fixture-override thunk must yield native
-# content (row 0x0F = the statue red ramp; measured live on vs2).
-# GOTCHA guarded here: a hole-"a" thunk placement stores embedded data
-# as ciphertext (crypt range) — this catches any regression to garbage.
+# rows 0x0E/0x0F under the venue fixture load.
+# RE-FROZEN 14z-99 — THE ROW-0x0F LITERAL WAS STALE SINCE 14z-91, and
+# this gate surfaced it only at the window because no full battery ran
+# between: 14z-91 DELETED the two fixture_row0f_override site_thunks (a
+# legacy-regression root cause — their venue fixture-load sites are
+# shared with attract), which traded vs2's red statue ramp for vsavj's
+# own row-0x0F content — RECORDED at the time as an accepted cosmetic
+# (NEXT_SESSION's optional list: "Donovan's venue palette row 0x0F ...
+# change A traded vs2's red statue ramp for vsavj's"), but this literal
+# kept demanding the pre-deletion ramp. Measured 14z-99: the settled
+# value below is IDENTICAL on the pre-window and post-window stock
+# twins (m5_stock3/m5_stock4) over this gate's own frame window, so it
+# is the 14z-91 state, not a window change.
+# GOTCHA still guarded: a hole-"a" thunk placement stores embedded data
+# as ciphertext (crypt range) — a regression to garbage still fails.
 NATIVE_E = bytes.fromhex(
     'fd00fffffdddfbbbf33bf54ff65ff76ff216f111f112f113f115f216f228f000')
 NATIVE_F = bytes.fromhex(
-    'f01dfffffdddfbbbfa22fe32fe43fe54f500f000f100f200f400f500f611f001')
+    'fd00fffffdddfbbbf33bf54ff65ff76ffd00f111f112f113f115f216f228f001')
 rowe = {dumps[f][0x40:0x60] for f in frames}
 rowf = {dumps[f][0x60:0x80] for f in frames}
 assert rowe == {NATIVE_E}, f"row 0x0E wrong: {sorted(rowe)[0].hex()}"
@@ -119,8 +130,12 @@ assert e8 <= VAN_RAMP and len(e8) >= 3, \
     f"row-0 pulse not vsavj-native ramp: {sorted(e8)}"
 NATIVE_E = bytes.fromhex(
     'fd00fffffdddfbbbf33bf54ff65ff76ff216f111f112f113f115f216f228f000')
+# RE-FROZEN 14z-99: the SECOND copy of the stale row-0x0F literal (same
+# 14z-91 fixture-deletion attribution as section 2's — grep found only
+# one; the shock section's copy was caught by the battery on the next
+# run). Same measured post-14z-91 value.
 NATIVE_F = bytes.fromhex(
-    'f01dfffffdddfbbbfa22fe32fe43fe54f500f000f100f200f400f500f611f001')
+    'fd00fffffdddfbbbf33bf54ff65ff76ffd00f111f112f113f115f216f228f001')
 assert {d[f][0x1c0:0x1e0] for f in frames} == {NATIVE_E}, "row 0x0E drifted under shock"
 assert {d[f][0x1e0:0x200] for f in frames} == {NATIVE_F}, "row 0x0F drifted under shock"
 print(f"  ok: shock arcs vanilla-locked ({len(frames)} frames), pulse in-ramp, override rows hold")

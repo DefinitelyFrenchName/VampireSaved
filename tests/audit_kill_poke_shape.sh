@@ -37,13 +37,13 @@
 # full stop) and the 4-byte leg must flow (if it stalls, the kill commit
 # broke). A NO-KO on either leg is a dead rig, not a pass.
 #
-# Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged10]
+# Usage: ROMDIR=... [MAME_BIN=...] [BUILD=build/m3b_merged11]
 #        tests/audit_kill_poke_shape.sh
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"
 ROMDIR="${ROMDIR:?set ROMDIR}"
-BUILD="${BUILD:-build/m3b_merged10}"
+BUILD="${BUILD:-build/m3b_merged11}"
 [ -d "$BUILD/rompath" ] || { echo "SKIP: no build at $BUILD"; exit 0; }
 MAME_BIN="${MAME_BIN:-$HOME/.cache/vampire-saved/mame/cps2}"
 [ -x "$MAME_BIN" ] || { echo "SKIP: no WIDE MAME binary"; exit 0; }

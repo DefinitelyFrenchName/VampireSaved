@@ -298,6 +298,14 @@ python3 tools/gen_donovan_patch.py "$OUTBASE/extract" "$OUTBASE/patch" \
     --vsavj "$ROMDIR/vsavj.zip" --stage "$STAGE" \
     --port "$TENANT_MANIFEST" ${GEN_FLAGS:-}
 
+# 14z-99: clear the prg dir BEFORE patching, like rompath below. patch_prg
+# overwrites members but leaves everything else — including select_port's
+# .select_port.done idempotence stamp — so a rebuild into an existing
+# STOCK-track outbase re-patched fresh members and then select_port
+# refused the "second" in-place run it was actually seeing for the first
+# time on those bytes (measured: the M2 battery, the only flow that
+# rebuilds a stock outbase in place since the #46 guard landed).
+rm -rf "$OUTBASE/prg"
 python3 tools/patch_prg.py "$ROMDIR/vsavj.zip" "$OUTBASE/prg" \
     --patch "$OUTBASE/patch/patch.json" | tail -3
 

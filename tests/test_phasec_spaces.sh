@@ -42,7 +42,13 @@ cd "$REPO"
 # NOT what happened here: a054de5c is the value HANDOFF documents as the
 # current stock twin, reached by two ratified changes. The warning stays,
 # because the next mismatch may well be the real thing.
-EXPECT="${1:-a054de5c0cfe868cb0aa9722abebdffd9dfcdb0d}"
+# EXPECT="${1:-a054de5c...}"  # 14z-91..14z-96 (the stock constant era)
+# RE-POINTED 14z-99: the WINDOW moved the stock twin for the first time
+# since 14z-91 — #103's pcrel_escape_fix rows are deliberately NOT
+# profile-gated (the stock track carries donovan's regions and gets the
+# arcade-death-stall fix too). Ratified byte movement, not a refactor —
+# the "do NOT re-freeze to pass" warning above targets inert refactors.
+EXPECT="${1:-16da59b6b29f4082b69c06d3e662843af4d00cc3}"
 WORK="$(mktemp -d)"
 trap 'rm -rf "$WORK"' EXIT
 fail=0
@@ -73,7 +79,11 @@ GEN_FLAGS="--allow-plausible --tripwire-open --profile cps2-wide-v1" \
 if grep -q "Traceback" "$WORK/wide.log"; then
     echo "  FAIL: crashed instead of diagnosing"; grep -A3 Traceback "$WORK/wide.log" | head -5
     fail=1
-elif grep -qE "wide_ext 0x[0-9a-f]+/0x600000" "$WORK/wide.log"; then
+# 14z-99: [0-9a-fA-F] — the generator prints UPPERCASE hex, and the
+# allocation cursor contained a letter (0x4191F0) for the first time at
+# the window, so the lowercase-only class missed it and this gate
+# reported "extension not available" about an available extension.
+elif grep -qE "wide_ext 0x[0-9a-fA-F]+/0x600000" "$WORK/wide.log"; then
     # CORRECTED 14z-94 (GitHub #30): this grepped the LITERAL
     # "wide_ext 0x400010/0x600000". That number is the extension's current
     # ALLOCATION POINTER, not its base — so it moved to 0x406040 the moment
