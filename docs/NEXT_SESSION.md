@@ -1,4 +1,18 @@
-# NEXT SESSION — orientation (written at the close of 14z-99, 2026-08-20)
+# NEXT SESSION — orientation (updated 14z-100, 2026-08-20)
+
+> ## **14z-100 (same day): THE #99 RIG IS COMMITTED AND CLEAN.**
+> ## `tests/audit_continue_switch.sh` — coin marathon, forced Phobos,
+> ## natural loss (JUDGES — the #103 lock on the once-blocked path),
+> ## continue + forced switch to Donovan, tenant-vs-tenant CPU match at
+> ## match 5, END 40620, zero guard trips, twice. The exact
+> ## Donovan-vs-CPU-Phobos pairing is NOT steered ($FF8114 pokes inert;
+> ## read_tap serialization is the named next step). ALSO: tenant hitbox
+> ## bases MOVED with the window (phobos/pyron; donovan held) —
+> ## bases.tsv re-derived + re-derive-at-every-freeze note;
+> ## test_tenant_pairings green on the fix; the audit self-derives bases
+> ## from the build's own table. In-depth field pass so far: DF + ALL
+> ## throws incl. transformations (Midnight Bliss, Hell Dunk) clean.
+> ## Detail: STATE 14z-100.
 
 > **STATE.md WAS SPLIT at the post-freeze close (maintainer-approved):
 > recent sessions + THE LEDGER stay in STATE.md; everything older is

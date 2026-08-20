@@ -3,6 +3,14 @@
 # (docs/game/atlas/character_tables.md:30), NOT observed in a run.
 # The 16 legacy rows are byte-identical in vanilla vsavj — measured
 # 14z-97, and that agreement is a superset-invariant check in itself.
+# TENANT ROWS MOVE WITH FREEZES (measured 2026-08-20, the #94
+# reference-rot class caught live): the 14z-99 window's capture_kf
+# insertions relocated the H/P blocks (phobos 0x4477b0 -> 0x4594a0,
+# pyron 0x49ab7c -> 0x4ac7dc; donovan held at 0x3fa9d0). Rows below are
+# merged-m4 (build/m3b_merged11, 2343607a). RE-DERIVE the three tenant
+# rows at every freeze — 8 lines of python in audit_continue_switch.sh
+# do it from prg/vm3j.04d @ 0x3D97A (LE-word swapped, 32 .l entries),
+# verified against live +0x60.l observations this session.
 0x00	bulleta	0x00091f98
 0x01	demitri	0x00093b6a
 0x02	gallon	0x00095b54
@@ -19,6 +27,6 @@
 0x0E	lilith	0x000ae9d4
 0x0F	jedah	0x000b0d2e
 0x18	oboro	0x000b3450
-0x10	phobos	0x004477b0
-0x11	pyron	0x0049ab7c
+0x10	phobos	0x004594a0
+0x11	pyron	0x004ac7dc
 0x13	donovan	0x003fa9d0

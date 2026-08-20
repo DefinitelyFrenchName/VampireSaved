@@ -17,6 +17,65 @@ older session lives verbatim in `STATE_HISTORY.md`.** How to work with it:
   never roll to the archive; entries within them are marked DECIDED/FIXED
   in place, as always.
 
+## Session 14z-100 (2026-08-20, same day as the freeze) — THE #99 RIG
+## RUNS END TO END: continue + switch + tenant-vs-tenant, 2x 40,620
+## guarded frames, ZERO trips. And a live reference-rot catch: the
+## TENANT HITBOX BASES MOVED with the window.
+
+**The 14z-97 (7) doctrine debt is PAID: `tests/audit_continue_switch.sh`
+is committed** — the #99 continue-with-switch rig as a guarded audit.
+Measured on merged-m4 (two identical runs, deterministic):
+
+- **Phase 1 (mapping, replay.lua)**: forced Phobos, coin-boosted
+  marathon, no HP pokes. His natural mash loss at f15540 **JUDGES** (KO
+  -> mode 6 f15780 -> mode 8 f15860 -> new match f16420, ~880f end to
+  end) — the SAME rig froze 9,500+ frames at that KO before the window
+  (14z-97 (7)). Instrument-level #103 confirmation on the path it used
+  to block. A natural continue+switch also occurred (the mash re-picked
+  Bishamon), full 40,620 frames clean.
+- **Phase 2 (guarded, GUARD_DEBUG=0)**: same rig + forced switch to
+  DONOVAN at the measured re-select window (ff8782:13 @ f16100-16280 —
+  LANDED: match 3 plays P1=Donovan). Trajectory: Phobos (L1 Bulleta W,
+  L2 Q-Bee LOSS) -> continue+SWITCH -> Donovan vs Bishamon (LOSS) ->
+  continue + mash switch -> Pyron vs Anakaris (W) -> **match 5: PYRON vs
+  CPU-DONOVAN — a tenant-vs-tenant CPU match at fight start reached
+  through continue-with-switch, the #99 context shape — WON, clean** ->
+  Victor -> **END 40620, zero CRASH/PCWEEDS/SOFTRESET**. Two continues,
+  two switches. Run 2 bit-identical (checksums match).
+- **THE LITERAL #99 PAIRING WAS EXERCISED AND PLAYED CLEAN.** The
+  committed audit drops the $FF8114 pokes (measured: they do not STEER
+  the opponent — two different poke sets gave bit-identical runs — but
+  they DO perturb the lottery, because removing them changed the
+  trajectory), and the poke-free trajectory delivers **match 4 = P1
+  DONOVAN vs CPU-PHOBOS (f22420) — the exact reported #99 context,
+  reached through continue-with-switch — and the run continues past it
+  to END 40620 with zero trips.** Frozen as the audit's assertion 5.
+  (If a future freeze's lottery loses the pairing, the fallback is the
+  read_tap.lua loader/consumer serialization from issue #99 — header.)
+- **#99 status after this**: the reported crash context — 5th-match-era
+  tenant-vs-tenant CPU fight at fight start, reached by
+  continue-with-switch after losing as Phobos, INCLUDING the literal
+  Donovan-vs-CPU-Phobos pairing — is exercised clean under guard, and
+  the maintainer's field pass is clean. The crash has not reproduced
+  since the #103 fix; the evidence now strongly leans "the racy
+  lose-flow trigger was removed with #103." Closing is the maintainer's
+  call (the original was intermittent, so clean runs are evidence, not
+  proof).
+
+**THE REFERENCE-ROT CATCH (the #94 class, live): tenant hitbox bases
+moved with the 14z-99 window and `bases.tsv` still carried merged-m3
+values.** Observed in the rig (+0x60.l): phobos `0x4477b0 -> 0x4594a0`,
+pyron `0x49ab7c -> 0x4ac7dc`, donovan HELD `0x3fa9d0` (his #103 rows
+relocate net-zero; the H/P moves are the capture_kf insertions shifting
+their placements). Verified against the image's own table
+(PRG:0x0BD97A, member `prg/vm3j.04d` @ 0x3D97A) — exact match, legacy
+rows untouched. `bases.tsv` re-derived + a RE-DERIVE-AT-EVERY-FREEZE
+note added; `test_tenant_pairings` re-run green on the corrected rows;
+the new audit derives bases from the BUILD'S OWN table at runtime so it
+can never rot this way. The freeze itself never caught it because
+test_tenant_pairings was not in the freeze battery — only its BUILD
+default was re-pointed.
+
 ## 14z-99 FIELD RESULTS (maintainer, 2026-08-20) — THE WHOLE WINDOW IS
 ## FIELD-CONFIRMED: #103 + #104 + #105 all CLOSED; #99 UN-PARKED
 
@@ -37,6 +96,13 @@ Maintainer's early field pass of merged-m4 (`build/m3b_merged11`):
   continue+switch → match-5 context. Held loosely: if the racy-lose-flow
   hypothesis was #99's mechanism, #103's fix may have removed its
   trigger — the clean pass is weak evidence for that, not proof.
+- **In-depth pass, later the same day (maintainer):** Dark Force
+  activation AND end clean for all three VS2 characters (§4 coverage
+  item, field-confirmed). **All throws on the VS2 characters confirmed
+  good — INCLUDING the transformation throws (Demitri's Midnight Bliss,
+  Zabel's Hell Dunk).** The transformation class is a notably strong
+  #104 corroboration: those swap the victim's ART entirely through
+  per-victim records, exactly the record family capture_kf ported.
 - **Sound observation, recorded and attributed**: Phobos's boy-sidekick
   voice at fight start/end reported better/tighter, more faithful to
   VS2. The 14z-99 window shipped ZERO audio-affecting rows (#103
