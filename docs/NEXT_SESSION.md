@@ -1,5 +1,54 @@
 # NEXT SESSION — orientation (updated 14z-100, 2026-08-20)
 
+> ## **THE SEQUENCE (maintainer-agreed 2026-08-20): #108 → #107 → #106,
+> ## all windowless, then ONE window bundling the two fixes.**
+> ##
+> ## 1. **#108 root-cause first (the priority — the only live, feelable
+> ##    divergence).** (a) THE WRITER HUNT with the NON-DEBUG instrument:
+> ##    FBNEO_HTAP write tap on `$FF8418`, f2300-2400, rig 106 — the
+> ##    -debug trace and non-debug dumps DISAGREE about this write
+> ##    (paradox detailed on the issue; do not re-trust -debug here).
+> ##    (b) BREADTH: measure steady-state fighter `+0x18` for HUITZIL and
+> ##    DONOVAN the same way (v4-pattern clean legs vs native) — the
+> ##    answer decides one-shared-mechanism vs a Pyron-only row.
+> ##    (c) Field input requested from the maintainer: projectiles into
+> ##    cosmo satellites in 2P, ours vs native vs2 — is the missing
+> ##    trade VISIBLE? Confirms (or demotes) priority.
+> ## 2. **#107 pre-work (small):** one-shot twin trace — GUARD_PROBE
+> ##    `0x4367a` AND `0x45fcc` during legacy play to see which twin
+> ##    vanilla dispatches in the analogous farm; cross-check vs2's
+> ##    callers of `0x448a6` on native. Makes the window action
+> ##    mechanical. ALSO (inert, anytime): the matcher-hardening gate
+> ##    assertion — a last-resort-window TIE must not ship as a silent
+> ##    plausible again (home: test_reconcile_matcher).
+> ## 3. **#106 (background, but BEFORE the window):** teach
+> ##    verify_pcrel_data an external extract + merged placements, so
+> ##    the `[merged]` inventory section freezes against the NEW
+> ##    artifacts the window produces (coverage for free at the freeze).
+> ## 4. **THE WINDOW (one, not three):** #107's row re-resolution +
+> ##    #108's fix together — both reconciliation/data-row class, both
+> ##    flip-mode audits ALREADY EXIST with frozen defect signatures
+> ##    (audit_projectile_clash EXPECT_SAT_SWEEP; the #107 lock rides
+> ##    test_reconcile_matcher + the farm bytes). One rebuild, one
+> ##    battery, one re-freeze, two defects retired — the 14z-99 window
+> ##    rhythm. TIMING: after the maintainer's in-depth field pass
+> ##    completes on merged-m4, so field findings attribute cleanly to
+> ##    this generation; nothing here is urgent (both defects cold or
+> ##    subtle).
+>
+> ## **H4's CONTACT RIG IS BUILT AND IT FOUND #108**: Pyron's cosmo
+> ## satellites carry collision word 0x1000 (native: 0x6000, clean A/B),
+> ## spawn-inherited from the fighter's +0x18, and never enter the
+> ## projectile sweep — while the Demitri-vs-Demitri control fires the
+> ## sweep 468 times (the census finally has a live denominator).
+> ## `tests/audit_projectile_clash.sh` freezes the defect signature
+> ## (EXPECT_SAT_SWEEP=0) + carries the fix mode. **START POINT NEXT
+> ## SESSION: the #108 writer hunt** — FBNEO_HTAP (non-debug tap) on
+> ## $FF8418 over f2300-2400; the -debug trace and non-debug dumps
+> ## DISAGREE about the same write (instrument paradox, on the issue).
+> ## Also owed: the same +0x18 measurement for Huitzil/Donovan. The next
+> ## window bundle now carries #107 (wrong-sibling row) + #108's fix.
+
 > ## **THE HARDENING PROGRAM IS OPEN (maintainer-directed) — START AT
 > ## `docs/project/hardening_register.md`.** H1 shipped (the pointer/flow
 > ## comb: `tools/audit_pointer_flow.py`, gate `test_pointer_flow` in

@@ -109,14 +109,32 @@ not safe. **KNOWN GAP: the MERGED image is outside this freeze** —
 (they compose the solos' extracts). Extension = teach it an external
 extract + merged placements. Filed on GitHub.
 
-### 5. Known-uncovered DYNAMIC surfaces (H4 rigs, not pointer bugs)
-- pool-vs-pool projectile contact (121 type≥64 objects one collision
-  away from the hit-class map; no rig produces a clash — the census
-  denominator is 0 by rig failure, not absence).
+### 5. Known-uncovered DYNAMIC surfaces (H4)
+- **pool-vs-pool projectile contact: RIG BUILT, AND IT FOUND #108**
+  (14z-100 H4). `tests/audit_projectile_clash.sh` + replays 105/106:
+  the CONTROL (Demitri-vs-Demitri head-on flares) proves the sweep path
+  alive (468 probe fires); the tenant leg (Pyron cosmo + a flare
+  through the field, clean of hitstun) shows **satellites carry
+  collision word `+0x18 = 0x1000` where native vs2 carries `0x6000`,
+  spawn-inherited from the fighter's own word (vanilla copier
+  `PRG:0x545F0`), and consequently NEVER enter the sweep** — clean-leg
+  A/B, confound removed (the first comparison was polluted by the rig's
+  own hitstun; retracted in place). The census's tenant-zero is thus
+  (at least for satellites) a defect artifact, not intrinsic safety.
+  Writer unresolved: the `-debug` trace shows only the vanilla per-class
+  init writing table[0x11]=0x6000 while non-debug dumps read 0x1000 by
+  f2400 — an instrument paradox of the "-debug is its own timeline"
+  class; the named next instrument is FBNEO_HTAP (non-debug write tap)
+  on `$FF8418` across f2300-2400. GitHub **#108**; the audit freezes
+  the defect signature (EXPECT_SAT_SWEEP=0) and carries the fix mode.
+  ALSO STILL OWED: the same `+0x18` steady-state measurement for
+  Huitzil and Donovan (the mine/missile exposure family).
 - Shadow/Marionette with tenants (§4 names it "once enabled"; never
   exercised).
 - L/M/H strengths of Phobos' historically-broken moves (field covered
   the moves, not every strength).
+- 2P-diverse tripwire-reach rigs + an authoritative-guard corpus soak
+  (queued; the marathon legs are the current bound).
 
 ## Guard currency (the H2 sweep, 2026-08-20)
 - `audit_tripwire_reach.sh` → current freeze artifacts; six legs green.

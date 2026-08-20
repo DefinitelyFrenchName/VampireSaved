@@ -1,5 +1,42 @@
 # STATE — living progress log
 
+## Session 14z-100 (continued) — HARDENING H4: THE CONTACT RIG IS BUILT,
+## AND IT FOUND #108 — Pyron's satellites carry the WRONG COLLISION WORD
+## and never enter the projectile sweep
+
+**The census gap is closed as a rig and opened as a defect.**
+`tests/audit_projectile_clash.sh` + replays 105 (control) / 106 (tenant):
+
+- **The control proves the path**: Demitri-vs-Demitri head-on flares on
+  the merged build fire the hitclass-map thunk probe **468 times** —
+  pool-vs-pool projectile interaction transits the map every frame of
+  coexistence. The old census-zero readings now have a live denominator.
+- **The tenant leg found #108**: Pyron cosmo satellites (type 0x42)
+  never fire the probe even with a legacy flare passing ~10px through
+  the field. Root: the satellites inherit collision word `+0x18` from
+  the SPAWNING FIGHTER (vanilla copier `PRG:0x545F0`,
+  `move.l $18(A6),$18(A4)`), and our Pyron's word reads **0x1000 where
+  native vs2 reads 0x6000** — clean-leg A/B with P1 untouched (the
+  FIRST comparison was polluted by the rig's own hitstun and is
+  RETRACTED; the v4 legs have no interference).
+- **An instrument paradox, recorded not hidden**: on the same build and
+  replay, the -debug write-trace shows exactly ONE write to the
+  fighter's word (f2365, the vanilla per-class init at `PRG:0x282C0`,
+  index 0x22 → the PRISTINE table says 0x6000; no patch op covers the
+  table) — while non-debug dumps read 0x1000 by f2400. Two instruments
+  disagree about one event; the "-debug is its own TIMELINE" class.
+  Named next instrument: FBNEO_HTAP (non-debug write tap, PC
+  attribution) on `$FF8418` over f2300-2400. On the issue.
+- The audit freezes the defect signature (EXPECT_SAT_SWEEP=0: word
+  0x1000, zero tenant fires, control >=100) and carries the fix mode
+  (=1: word 0x6000, fires >=1) — the #103-audit flip pattern.
+- Rig traps paid: probe PCs must sit on INSTRUCTION boundaries (the
+  first reachability probe sat mid-operand and measured nothing while
+  green); shared dump dirs between rig iterations destroy the previous
+  iteration's evidence (v3 overwrote v2's satellite frames);
+  `grep -c || echo 0` double-prints on zero (the audit's first verdict
+  run failed on its own counter).
+
 **SPLIT 2026-08-20 (14z-99 post-freeze close, maintainer-approved): this
 file holds the RECENT session groups + THE LEDGER; the full detail of every
 older session lives verbatim in `STATE_HISTORY.md`.** How to work with it:
