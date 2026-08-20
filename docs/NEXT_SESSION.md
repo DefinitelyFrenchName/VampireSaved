@@ -20,7 +20,7 @@
 > ## **PLAY: `tools/run_wide.sh build/m3b_merged11 fbneo`** (or record a
 > ## session: `WIDE_RECORD=<name> ... mame`). THE FIELD PASS IS THE NEXT
 > ## MAINTAINER ACTION: #103/#104/#105 are fixed on the shipping
-> ## artifacts and close on it; #43 can close outright; then #99
+> ## artifacts and close on it; #43 CLOSED at the window; then #99
 > ## un-parks (its blocker was #103's fix).
 > ##
 > ## **THE WINDOW ALSO SURFACED AND FIXED SIX LATENT INSTRUMENT DEFECTS,
@@ -36,8 +36,10 @@
 > ## uppercase allocation cursor.
 > ##
 > ## Open: #99 (un-parks after the field pass), #50 (behind #99), #10
-> ## (ripe re-measurement), the two battery-target registry rows
-> ## (superseded by this freeze's rows), the ~200 tracked build dirs.
+> ## (ripe re-measurement), the ~200 tracked build dirs. DONE at the
+> ## post-freeze close: the two superseded battery-target registry rows
+> ## are annotated CARRIED->m9 in the TSV; patch_index/patch_notes caught
+> ## up with the window (the skipped ritual, executed one session late).
 > ## Probe dirs probe_103_don/probe_104/probe_105/probe_105f/
 > ## probe_window are UNREGISTERED evidence, reproducible from STATE.
 
@@ -748,22 +750,26 @@ decision, not by neglect.
 
 ## Build / validate
 
+(paths refreshed to the 14z-99 freeze generation at the post-freeze close —
+the commands are operational, not historical, even though they sit below the
+history marker)
+
 ```sh
 export ROMDIR=/path/to/reference/sets
 export MAME_BIN=~/.cache/vampire-saved/mame/cps2
 
 # the canary — safe as written since 14z-91
 VERIFY_BASIS=16_xemu_2p tools/freeze_masked_basis.sh \
-  tests/expected/vsavj/masked-v2 "$(cat tests/expected/donovan-m7/mask)" 16_xemu_2p
+  tests/expected/vsavj/masked-v2 "$(cat tests/expected/donovan-m9/mask)" 16_xemu_2p
 
-MAME_ROMPATH="$PWD/build/don_m7/rompath;$ROMDIR" tests/run_suite.sh vsavjw
-tests/test_m3a_reproducible.sh                 # ~6 min, all four, now hard on content
+MAME_ROMPATH="$PWD/build/don_m9/rompath;$ROMDIR" tests/run_suite.sh vsavjw
+tests/test_m3a_reproducible.sh                 # ~6 min, all five, hard on content
 tests/audit_walker_ghost.sh                    # ~5 min — the mask assumption
-tests/audit_walker_repoint.sh build/don_m7     # ~5 min — caller completeness
-tests/test_obj_walker_relocation.sh build/don_m7   # seconds, ROM-free
+tests/audit_walker_repoint.sh build/don_m9     # ~5 min — caller completeness
+tests/test_obj_walker_relocation.sh build/don_m9   # seconds, ROM-free
 tests/audit_legacy_pairings.sh                 # ~30 min — the coverage gate
 tests/test_obj_record_walk.sh                  # seconds, ROM-free — the #75 gate
-tools/build_merged.sh build/m3b_merged9        # ~1 min; m3b_merged8 already built
+tools/build_merged.sh build/m3b_merged11       # ~1 min
 ```
 
 ## Rebuild recipes
@@ -771,8 +777,8 @@ tools/build_merged.sh build/m3b_merged9        # ~1 min; m3b_merged8 already bui
 ```sh
 KEY_SET=vsavj WIDE_ROMSET="$PWD/build/wide0/rompath/vsavjw.zip" \
   GEN_FLAGS="--allow-plausible --tripwire-open --profile cps2-wide-v1" \
-  tools/build_donovan.sh 6 build/don_m7
-TENANT_MANIFEST=build/manifest/huitzil.toml TENANT_CHAR=0x10 ... build/hui41
-TENANT_MANIFEST=build/manifest/pyron.toml   TENANT_CHAR=0x11 ... build/pyron26
-GEN_FLAGS="--allow-plausible --tripwire-open" tools/build_donovan.sh 6 build/m5_stock2
+  tools/build_donovan.sh 6 build/don_m9
+TENANT_MANIFEST=build/manifest/huitzil.toml TENANT_CHAR=0x10 ... build/hui45
+TENANT_MANIFEST=build/manifest/pyron.toml   TENANT_CHAR=0x11 ... build/pyron29
+GEN_FLAGS="--allow-plausible --tripwire-open" tools/build_donovan.sh 6 build/m5_stock4
 ```

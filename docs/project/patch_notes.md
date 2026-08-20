@@ -1,5 +1,146 @@
 # patch_notes — per-change detail: every byte, and why
 
+## 14z-99 — the window (#43(b) + #103 + #104 + #105): byte detail
+
+**Recorded at the post-freeze close (the session ended before the ritual;
+this section and patch_index's 14z-99 rows were caught up one session
+later, same class as the 14z-94 header above).** Everything below was
+rehearsed on `build/probe_window` (fingerprint `2343607a`, UNREGISTERED)
+before landing; the shipped merged artifact is BIT-FOR-BIT that rehearsal.
+Freeze: **donovan-m9** `428fc0c9` (`build/don_m9`, 323 ops) /
+**huitzil-m18** `c4bbb375` (`build/hui45`, 361) / **pyron-m12** `4c3c072b`
+(`build/pyron29`, 296) / **merged-m4** `2343607a` (`build/m3b_merged11`,
+802 ops); stock twin `build/m5_stock4` `16da59b6`; battery legs
+donovan-m9-stock `16da59b6` / donovan-m9-stage4 `35e948a1`. Tags
+`freeze/{donovan-m9,huitzil-m18,pyron-m12,merged-m4}`. Maintainer "go"
+2026-08-20.
+
+**#103 — the Donovan arcade lose-flow stall (donovan.toml only, NOT
+profile-gated):**
+- `recon_overlay` moved INSIDE `[[tenant]]` (after `src_char`). The staged
+  comment's original "top-level key" wording was a MEASURED trap: at doc
+  root it works on a solo build but hijacks every tenant's overlay on a
+  merged build (`recon_for()` reads `port.get("recon_overlay")` first, and
+  `port` is the merged doc) — huitzil loses its own rows and generation
+  dies on `x022400+0xb74`.
+- Two `[[pcrel_escape_fix]]` rows: **`x026142` pad `0x60`** (the closer —
+  the ported pc-rel escape that pinned Donovan's WHITE HP to 1 mid-match,
+  so the round judge's sign test at phase 6->8 never fired on his death
+  and the lose flow stalled ~8,000 frames) and **`x05c800` pad `0x20`**
+  (the H-proven sibling, same shape).
+- Op effect: relocations, **net 0 ops**. Because these rows are not
+  profile-gated, THE STOCK TWIN MOVED for the first time since 14z-91
+  (`a054de5c` -> `16da59b6`) — deliberate: the stall fix ships on the
+  stock track too.
+
+**#104 — native capture keyframes (15 `capture_kf` slot_rows data_ports,
+ALL THREE manifests):** Victor's 6+HP headbutt grab garbled tenant victim
+poses because the per-victim capture table at the head of every attacker's
+keyframe block ALIASES ITS VARIANT HALF (the variant-row alias class; the
+14z-98 "index-space drift" reading was retracted 14z-99 (2)). Each
+attacker's keyframe block is ported whole from vs2 (maintainer-ruled
+option (a): "all sixteen", not fourteen), so tenants hold NATIVE capture
+records. **+32 ops per solo** (merged +32 after dedup). Legacy cost:
+exactly ONE frame — f890, the ratified class-4 select-screen
+pointer-cache — bit-identical from f891 (measured on replays 03/16/96,
+whole-run, vs frozen merged-m3).
+
+**#105 — AUTO win palettes (`colors = 8` -> `10`, all three manifests):**
+AUTO mode's winner uses win-palette sets 8/9, which `colors = 8` did not
+port — tenant victory portraits rendered as pure white shapes (correct
+shapes, no fill; OUR defect, not the engine's — locked 4 ways 14z-99
+(5)). `colors = 10` ports the AUTO sets. **+2 ops per solo, +6 merged.**
+
+**#43(b) — `ALLOW_FALLBACK=True` (tool state; ZERO ROM bytes):** the
+ruled 3-row movement had decayed to ONE row, `0x028122` -> `0x028e42`
+plausible-0.90, with zero build effect (no live consumer; the merged
+patch regenerates bit-identical). Wholesale regen of the shared map
+measured DESTRUCTIVE (drops rows other extracts own); the row was
+hand-carried. `test_reconcile_matcher.sh` polices the flipped state.
+
+**Verification at the window (all green):** the four flip-audits at their
+new defaults — `audit_don_grab_pose` EXPECT_MATCH=1 (native records
+11/26/11, all tenants), `audit_win_pal_auto` EXPECT_WHITE=0 (four legs
+COLORED), `audit_don_lilith_ko` WEAKEN_P1=1 EXPECT_STALL=0 (FLOWED 2880:
+KO 6600 -> stage 9480; Victor control 560), `audit_don_ko_writer`
+WEAKEN_P1=1 EXPECT_DEFECT=0 (HEALTHY kill-commit f6561). WEAKEN_P1 is
+fix-verification only (refused with the defect EXPECTs): inputs cut at
+f6100 + one both-words 5hp pin, the CPU's own hit kills through the real
+judge — needed because on the FIXED build natural-mash Donovan WINS (the
+escape's perturbation WAS his losing trajectory). Suite GREEN x3 on
+re-frozen sets; every legacy masked replay on its EXACT frozen class; 60
+moved self-frozen tenant/select .sha1s re-frozen and attributed; new
+replays classified at the freeze (96/104 = masked §4 v3 select-window
+classes vs the vanilla basis, 103 = tenant .sha1); M2 battery 23/23.
+Full record: STATE 14z-99 FREEZE; the six latent instrument defects fixed
+en route (none a window regression) are detailed there and in the fixed
+gates' headers.
+
+## 14z-96 — the kernel voice-table port (GitHub #101, maintainer-ruled
+## option (a): native-exact, incl. two new authored Phobos songs)
+
+**The defect (maintainer video-confirmed, replay 95, audit_hui_grunt):**
+the sound kernel's per-class voice tables — events .0-.3, vsavj bases
+`PRG:0x3BCE/0x3C3A/0x3CA6/0x3D10`, each a 16-entry base + 16-entry
+VARIANT half at +0x20, indexed by the fighter's `+0x382` byte with NO
+fold, read through the OPCODE view — ship the variant half as a byte-copy
+of the base half on vsavj. A tenant class therefore fired the LEGACY
+row-copy alias: Phobos (0x10) fired Bulleta's `0x1d2` (the electrocute
+grunt, every other hit), Donovan (0x13) fired VICTOR's `0x322`, where
+native vs2 fires the newcomer's own row — and Phobos' hurt entries there
+are `0x2a1/0x2a2`, FREE Z80 rows: the robot is silent by design.
+
+**Every byte, and why:**
+- **12 code_word ops** (4 per tenant, `{don,pyr,hui}_kernel_voice_e0-e3`,
+  all `only_variant_slot`): this tenant's word of each variant half.
+  - donovan: `0x3BF4/0x3C60/0x3CCC/0x3D36`: `0320/0321/0322/0323` →
+    `00d9/00da/00db/00dc` (vs2 `0x700-0x703` via authored pairs).
+  - pyron: `0x3BF0/0x3C5C/0x3CC8/0x3D32`: `0200/0201/0202/0203` →
+    `0341/02a1/02a2/0342` (vs2 `0x720/0x2a1/0x2a2/0x723`).
+  - huitzil: `0x3BEE/0x3C5A/0x3CC6/0x3D30`: `01d0/01d1/01d2/01d3` →
+    `01a2/02a1/02a2/01c1` (vs2 `0x730/0x2a1/0x2a2/0x733`).
+- **16 authored Z80 songs** (`qs_songs.toml` `[[song]]` rows, verbatim vs2
+  streams at 0x3E000-0x3E440 of the same zero run as the ejection pilot):
+  six (base, +0x300 alias) pairs — this path calls the REAL helper
+  `0x4CE2`, so the facing alias applies and both ids of a voiced pair
+  must be live, exactly as native backs `0x700` with `0xA00`. Pairs:
+  D `0xd9-0xdc/0x3d9-0x3dc`, P `0x341/0x641 + 0x342/0x642`,
+  H `0x1a2/0x4a2 + 0x1c1/0x4c1` — all chosen (base, alias) BOTH free in
+  vsavj's Z80 id table. The silent words (`0x2a1/0x2a2`) have free
+  aliases too (`0x5a1/0x5a2`) — no songs, silence is the port.
+- **2 batch scope ids** (`0x730,0x733` appended — APPEND-ONLY, inserting
+  mid-list renumbers every later voice): authors 0x733's T7 entry 34
+  (vs2 sample 461 — in no other scoped song) and keeps the audit sweep
+  symmetric. Their batch ids `0xa7/0xa8` are fired by nothing.
+
+**Measured before/after (the A/B that proves identity-only):** the engine
+firing pattern is UNTOUCHED — pre-fix merged-m2 fired the WRONG voice at
+exactly the frames the post-fix build fires the RIGHT one (Donovan victim:
+`0x322`@f4102/f5402 → `0x00db`@f4102/f5402; Phobos victim: `0x1d2`@f4102 →
+`0x2a2`@f4102). Native vs2 with a Donovan victim fires nothing at those
+frames — a cross-game firing-phase difference (the alternation bit;
+vsav/vs2 balance feeds it) that predates and is untouched by this change.
+The Phobos attempt-4 drop likewise predates the fix and is audibly
+nothing (the fired sound is the null song).
+
+**Superset controls:** stock twin `build/m5_stock3` fingerprint
+`a054de5c` = m5_stock2 BIT-IDENTICAL (only_variant_slot proven); the
+variant rows are read only under tenant classes (legacy classes are
+0x00-0x0F, and the table's base half is untouched).
+
+**Gates:** audit_hui_grunt (per-build frozen expectations, merged-m2 AND
+merged10 both green; must-fire verified), test_kernel_voice_tables
+(reference-ROM facts, unchanged by the port, green),
+test_hui_electrocute green on merged10, test_tenant_loop RE-FROZEN
+(+4/tenant: D 289 / H 327 / P 262; N=2 560/578, N=3 764/797),
+test_shared_writes green (variant-row class), audit_merged_legacy +
+run_all_static in flight at writing. **Builds (UNREGISTERED, awaiting
+the freeze decision):** `build/don_m8` `d038553d`, `build/hui44`
+`bfd819a0`, `build/pyron28` `738bcfc2`, `build/m3b_merged10` `ac3d0618`
+(764 ops), stock twin `build/m5_stock3` (= m5_stock2).
+
+**[STATUS ADDED AT THE 14z-99 CLOSE: the freeze decision landed — registered `d038553d`/`bfd819a0`/`738bcfc2` at the 14z-96 close (merged-m3 by tag + HANDOFF row), then superseded by the 14z-99 window batch above.]**
+
 ## 14z-94 — the arcade-ladder stage retarget (#92), and one manifest bound
 ## re-measured (#87): byte detail
 
@@ -3302,66 +3443,3 @@ tenant_loop counts UNCHANGED (region_fix = region rewrite);
 m3a_reproducible on the new EXPECT_HUI; run_suite on the
 carried-renamed set. Build: huitzil-m10 = build/hui37 (9a948a11),
 merged = build/m3b_merged4.
-
-## 14z-96 — the kernel voice-table port (GitHub #101, maintainer-ruled
-## option (a): native-exact, incl. two new authored Phobos songs)
-
-**The defect (maintainer video-confirmed, replay 95, audit_hui_grunt):**
-the sound kernel's per-class voice tables — events .0-.3, vsavj bases
-`PRG:0x3BCE/0x3C3A/0x3CA6/0x3D10`, each a 16-entry base + 16-entry
-VARIANT half at +0x20, indexed by the fighter's `+0x382` byte with NO
-fold, read through the OPCODE view — ship the variant half as a byte-copy
-of the base half on vsavj. A tenant class therefore fired the LEGACY
-row-copy alias: Phobos (0x10) fired Bulleta's `0x1d2` (the electrocute
-grunt, every other hit), Donovan (0x13) fired VICTOR's `0x322`, where
-native vs2 fires the newcomer's own row — and Phobos' hurt entries there
-are `0x2a1/0x2a2`, FREE Z80 rows: the robot is silent by design.
-
-**Every byte, and why:**
-- **12 code_word ops** (4 per tenant, `{don,pyr,hui}_kernel_voice_e0-e3`,
-  all `only_variant_slot`): this tenant's word of each variant half.
-  - donovan: `0x3BF4/0x3C60/0x3CCC/0x3D36`: `0320/0321/0322/0323` →
-    `00d9/00da/00db/00dc` (vs2 `0x700-0x703` via authored pairs).
-  - pyron: `0x3BF0/0x3C5C/0x3CC8/0x3D32`: `0200/0201/0202/0203` →
-    `0341/02a1/02a2/0342` (vs2 `0x720/0x2a1/0x2a2/0x723`).
-  - huitzil: `0x3BEE/0x3C5A/0x3CC6/0x3D30`: `01d0/01d1/01d2/01d3` →
-    `01a2/02a1/02a2/01c1` (vs2 `0x730/0x2a1/0x2a2/0x733`).
-- **16 authored Z80 songs** (`qs_songs.toml` `[[song]]` rows, verbatim vs2
-  streams at 0x3E000-0x3E440 of the same zero run as the ejection pilot):
-  six (base, +0x300 alias) pairs — this path calls the REAL helper
-  `0x4CE2`, so the facing alias applies and both ids of a voiced pair
-  must be live, exactly as native backs `0x700` with `0xA00`. Pairs:
-  D `0xd9-0xdc/0x3d9-0x3dc`, P `0x341/0x641 + 0x342/0x642`,
-  H `0x1a2/0x4a2 + 0x1c1/0x4c1` — all chosen (base, alias) BOTH free in
-  vsavj's Z80 id table. The silent words (`0x2a1/0x2a2`) have free
-  aliases too (`0x5a1/0x5a2`) — no songs, silence is the port.
-- **2 batch scope ids** (`0x730,0x733` appended — APPEND-ONLY, inserting
-  mid-list renumbers every later voice): authors 0x733's T7 entry 34
-  (vs2 sample 461 — in no other scoped song) and keeps the audit sweep
-  symmetric. Their batch ids `0xa7/0xa8` are fired by nothing.
-
-**Measured before/after (the A/B that proves identity-only):** the engine
-firing pattern is UNTOUCHED — pre-fix merged-m2 fired the WRONG voice at
-exactly the frames the post-fix build fires the RIGHT one (Donovan victim:
-`0x322`@f4102/f5402 → `0x00db`@f4102/f5402; Phobos victim: `0x1d2`@f4102 →
-`0x2a2`@f4102). Native vs2 with a Donovan victim fires nothing at those
-frames — a cross-game firing-phase difference (the alternation bit;
-vsav/vs2 balance feeds it) that predates and is untouched by this change.
-The Phobos attempt-4 drop likewise predates the fix and is audibly
-nothing (the fired sound is the null song).
-
-**Superset controls:** stock twin `build/m5_stock3` fingerprint
-`a054de5c` = m5_stock2 BIT-IDENTICAL (only_variant_slot proven); the
-variant rows are read only under tenant classes (legacy classes are
-0x00-0x0F, and the table's base half is untouched).
-
-**Gates:** audit_hui_grunt (per-build frozen expectations, merged-m2 AND
-merged10 both green; must-fire verified), test_kernel_voice_tables
-(reference-ROM facts, unchanged by the port, green),
-test_hui_electrocute green on merged10, test_tenant_loop RE-FROZEN
-(+4/tenant: D 289 / H 327 / P 262; N=2 560/578, N=3 764/797),
-test_shared_writes green (variant-row class), audit_merged_legacy +
-run_all_static in flight at writing. **Builds (UNREGISTERED, awaiting
-the freeze decision):** `build/don_m8` `d038553d`, `build/hui44`
-`bfd819a0`, `build/pyron28` `738bcfc2`, `build/m3b_merged10` `ac3d0618`
-(764 ops), stock twin `build/m5_stock3` (= m5_stock2).

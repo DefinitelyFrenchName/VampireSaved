@@ -1,5 +1,29 @@
 # STATE — living progress log
 
+## 14z-99 CLOSE (executed post-freeze, 2026-08-20) — the skipped ritual,
+## caught up while the maintainer field-passes merged-m4
+
+The freeze session ended without the end-of-session ritual; this pass
+(same day, next session) executed it. **No shipped byte moved.**
+- **patch_index.md + patch_notes.md caught up** with the window (the
+  CLAUDE.md §5 "same commit" rule was missed at W1/W2/FREEZE — same
+  class as the 14z-94 late-recording finding): new 14z-99 rows/section
+  (#103 / #104 / #105 / #43(b)), bundle-row statuses moved off their
+  2026-08-06-era fingerprints, patch_notes' misfiled 14z-96 section
+  moved up to restore newest-first.
+- **HANDOFF.md**: run_wide "WHAT TO LOOK AT FIRST" block rewritten for
+  merged-m4 (was still narrating the 14z-96 grunt fix); the 14z-99
+  window row added to the build-registry table; the battery-rows
+  paragraph and stray command comments moved m8 -> m9.
+- **registry.tsv**: the two superseded battery rows (donovan-m8-stock/
+  -stage4) annotated CARRIED->m9 (notes column only; no dispatch field
+  moved).
+- **Issues**: #99 got the status comment (blocker #103 landed; the #102
+  branch resolved NOT-OURS) — it un-parks after the field pass.
+  #103/#104/#105 stay OPEN awaiting that pass; #43 already CLOSED.
+- Verification: retraction-discipline grep sweep clean (remaining hits
+  are marked history); `run_all_static.sh` re-run green before commit.
+
 ## Session 14z-99 FREEZE — THE WINDOW EXECUTED END TO END: donovan-m9 /
 ## huitzil-m18 / pyron-m12 / merged-m4. #43(b) + #103 + #104 + #105 all
 ## landed; every gate that saw the new artifacts is green.
@@ -88,8 +112,8 @@ registry.tsv +5 rows; expectation sets carried-renamed (m8->m9,
 m17->m18, m11->m12, + the two battery rows).
 
 **Issues:** #103, #104, #105 are FIXED ON THE SHIPPING ARTIFACTS —
-close after the maintainer's field pass on merged-m4. #43 can close
-outright ((a) 14z-95, (b) here). Play:
+close after the maintainer's field pass on merged-m4. #43 CLOSED
+((a) 14z-95, (b) here; the thread carries the (b) write-up). Play:
 `tools/run_wide.sh build/m3b_merged11 fbneo` — or record the session:
 `WIDE_RECORD=<name> tools/run_wide.sh build/m3b_merged11 mame`.
 

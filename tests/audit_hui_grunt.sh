@@ -36,7 +36,7 @@ REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"
 ROMDIR="${ROMDIR:?set ROMDIR}"
 ROMDIR="$(CDPATH= cd "$ROMDIR" && pwd)"
-BUILD="${BUILD:-build/m3b_merged11}"   # merged-m3 since the 14z-96 freeze
+BUILD="${BUILD:-build/m3b_merged11}"   # merged-m4 since the 14z-99 freeze
 [ -d "$BUILD/rompath" ] || { echo "SKIP: no build at $BUILD"; exit 0; }
 MAME_BIN="${MAME_BIN:-$HOME/.cache/vampire-saved/mame/cps2}"
 [ -x "$MAME_BIN" ] || { echo "SKIP: no WIDE MAME binary"; exit 0; }
