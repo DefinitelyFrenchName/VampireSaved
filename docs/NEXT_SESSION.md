@@ -29,10 +29,18 @@
 > ##    keep vs neuter (probe `build/hui_probe_tint` 90e2982e,
 > ##    manifest edit reverted; one-line re-apply); (b) go on the
 > ##    palette-event hunt as the #109 fix path.
-> ## 2. THE HUNT: native stepper's caller chain during the beam
-> ##    (bp 0x1282C-family over rig df/102 attack window) -> the
-> ##    request site -> the vsavj/ours twin -> why ours drops it.
-> ##    Expected: a portable script-event/id row.
+> ## 2. THE HUNT: native stepper's caller chain during the beam.
+> ##    Measured 14z-102 already: the four page-slot POINTERS
+> ##    ($7404-$7410(A5) = $FFF404-1F; vsavj scheduler 0x142C2 reads
+> ##    them, vs2 twin ~0x1297A) are set at SETUP only (native
+> ##    beam-window writes: zero) — the beam trigger is the fade
+> ##    mode/count state ($7400-$7402(A5), cf. clr.b $7401(a5) at vs2
+> ##    0x12826) or the pointed target-table CONTENT. Next instrument:
+> ##    a caller-logging bp (log (SP) at vs2 stepper entry 0x1297A/
+> ##    0x12820 — trace_writes 'b' mode lacks stack reads, extend or
+> ##    scratch-copy it) over df/102's beam window -> request site ->
+> ##    vsavj/ours twin -> why ours drops it. Expected: a portable
+> ##    script-event/id row (the #101 class).
 > ## 3. Fix + VERIFY: rig df/100 flips (palette-line sweep present +
 > ##    burst visible + close-range damage A/B vs df/102).
 > ## 4. THEN the deferred window tail: rebuild all four + merged, full
