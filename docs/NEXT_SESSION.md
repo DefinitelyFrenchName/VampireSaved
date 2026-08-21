@@ -24,6 +24,17 @@
 > ## `freeze/{donovan-m10,huitzil-m19,pyron-m13,merged-m5}` + the
 > ## freeze commit are in. Nothing pushed.
 >
+> ## **POST-FREEZE RULINGS ALL LANDED (2026-08-21):** DF durations
+> ## DECIDED (keep vsavj, categorically); tint CONFIRMED GOOD; **#50
+> ## CLOSED as standing policy** (opportunistic extraction only, on
+> ## the issue); **the build-dir triage EXECUTED** (85 dirs / 8.1 GB
+> ## -> ../build_attic_14z102, reversible; strict tier 97/0/0 zero
+> ## skips + battery green on the pruned tree; delete the attic after
+> ## the next playtest cycle). **REMAINING NEW-SESSION ITEM: the A4
+> ## pin-cleanup pass** (~34 dirs, retire/re-point stale references,
+> ## then mechanical deletion at the next census) + the N-2
+> ## generation-roll policy now applies at every freeze.
+>
 > ## **PUSHED 2026-08-21 (maintainer's word, frozen build confirmed
 > ## "feels good"):** main + all four freeze tags are on origin (one
 > ## trivial merge folded in the maintainer's README edit ee9b0ff —

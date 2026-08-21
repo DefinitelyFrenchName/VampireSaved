@@ -1,3 +1,0 @@
-huitzil freeze exit=0
-donovan freeze exit=0
-pyron freeze exit=0

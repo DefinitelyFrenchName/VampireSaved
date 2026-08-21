@@ -1,0 +1,44 @@
+  tenant pyron id 0x11 -> gfx bank 4 (bank word 0x1000)
+  layout row pyron: band 0x4ed5-0x8647 delta +0x0 src bank 3
+inventory: 14225 tiles, all placed at native codes (delta-0 tenant)
+  read vs2.14m sha1 e582b20a948ae54f52590496051688dbfae2bc9c
+  read vs2.16m sha1 a924d53ab39f4d85173bdb92a197dde2db0dc3f7
+  read vs2.18m sha1 8d0cd1c387b4b6ac7f92bb2e5a25983856328cdc
+  read vs2.20m sha1 99bc27557741527ca678d7b6307164bc04ebedc6
+  chain build/m3b_merged9/gfx_huitzil/gfx_written.json sha1 08e909b8785270f3d2448adfd1082af7c9d8ae17
+  chain vsw.31m sha1 ec474b193177f66376ad408fadc531efbd4c49f4
+  chain vsw.33m sha1 be1727765646cd0cf5d6a3658eb53678394f7efd
+  chain vsw.35m sha1 476b66cca5f2762507af73feeb87f0e5679c0974
+  chain vsw.37m sha1 d13c34254ffe47517352ce8656d82ea021a06d5d
+  read vs2.13m sha1 528ce7fc9a0451e2e2d221dbf5e4a5796584e053
+  read vs2.15m sha1 e873ad3e0fc8a06a5029113faf991f5c1b765316
+  read vs2.17m sha1 da94f1529da82a6bf2129f51548412e1ab2b001a
+  read vs2.19m sha1 0ff528e12e255ebf699101ac71f05b1f6bef7165
+effect-c5: 5714 native bank-1 tiles copied to group C upper bank
+select bank-5: 287 native tiles copied to group C upper bank
+verified: 14225 tiles placed at codes 0x003F-0xA42C (bank 4); all other tiles byte-identical
+  wrote vsw.31m sha1 8cd62e18a53892799ff591de20f077f771f1ed51
+  wrote vsw.33m sha1 0fadd158240e65be41d03453140168ff4d889e12
+  wrote vsw.35m sha1 20a8f1844208f6325fe2b289121d8c22ff8a84ff
+  wrote vsw.37m sha1 119e9861179123727225a7127f766f0e92dec156
+group C mode: vsav group B NOT written — the host band stays pristine
+  chain: prior link's group-A members carried forward
+  read vs2.13m sha1 528ce7fc9a0451e2e2d221dbf5e4a5796584e053
+  read vs2.15m sha1 e873ad3e0fc8a06a5029113faf991f5c1b765316
+  read vs2.17m sha1 da94f1529da82a6bf2129f51548412e1ab2b001a
+  read vs2.19m sha1 0ff528e12e255ebf699101ac71f05b1f6bef7165
+effect-tail: 2 host-slot place(s) SKIPPED (variant-id tenant)
+effect-tail: 1 variant-slot place(s) added (free-pool anchors)
+effect-tail: 2 place_variant_slot_pyron place(s) added
+effect-tail: 276 bank-1 tiles placed
+  read vs2.13m sha1 528ce7fc9a0451e2e2d221dbf5e4a5796584e053
+  read vs2.15m sha1 e873ad3e0fc8a06a5029113faf991f5c1b765316
+  read vs2.17m sha1 da94f1529da82a6bf2129f51548412e1ab2b001a
+  read vs2.19m sha1 0ff528e12e255ebf699101ac71f05b1f6bef7165
+select: 0 bank-1 tiles placed
+  wrote vm3.13m sha1 969485a0d225d15e5d04b19c9fd12e609b56f712
+  wrote vm3.15m sha1 3b2138eaf7866ae6e14cc52b2d63a093e249143a
+  wrote vm3.17m sha1 93171644bfa7219a8197937a54ecb1a3a8be364d
+  wrote vm3.19m sha1 8d4b6106831dbf3096898a302c878ba09148053c
+wrote gfx_written.json (52347 group-C + 282 group-A entries)
+wrote remap_spec.json: {'delta': 0, 'band_lo': 20181, 'band_hi': 34375, 'dst_bank_word': 4096, 'src_bank_word': 24576, 'placed': [63, 42028]}

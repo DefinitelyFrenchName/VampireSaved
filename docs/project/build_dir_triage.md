@@ -1,5 +1,33 @@
 # BUILD-DIR DECISION PACKAGE — 14z-101 (2026-08-21)
 
+## RULED AND EXECUTED 14z-102 (maintainer, 2026-08-21)
+
+**The ruling:** delete C + B2 + B3 + B4 + B1, plus the 14z-102 probe
+duplicates (hui_probe_row31 / merged_probe_row31 / probe_window — each
+bit-identical to a kept frozen build — and hui_probe_tint, a
+one-line-delta rehearsal with its recipe in the records). Keep A1
+(rolled to the m10 generation at the 14z-102 freeze), A2, A3, and the
+m9 generation as the one-back safety net. **A4 is NOT bulk-ruled**: it
+gets a pin-cleanup pass in a fresh session — retire/re-point each
+stale reference first, then the dirs fall to zero-reference and are
+deleted mechanically at the next census.
+
+**STANDING POLICY adopted with the ruling:** at every freeze, the N-2
+generation's build dirs are deleted (keep current + one back). That is
+what prevents this package from regrowing.
+
+**Executed:** 85 dirs (8.1 GB) moved to `../build_attic_14z102`
+(REVERSIBLE — outside the repo; delete the attic after the maintainer's
+next playtest cycle confirms nothing is missed). build/ 13 GB -> 4.4 GB.
+Verification on the pruned tree: `run_all_static --strict` **PASS
+97/0/0 with ZERO skips** (strict makes a lost input fatal — nothing
+anywhere depended on a moved dir) + the M2 battery re-run green.
+Tracked metadata inside the moved dirs is deleted from the working tree
+in the same commit; it remains recoverable from git history and the
+freeze tags, which is the B4 classification's meaning.
+
+The original decision input follows, unchanged.
+
 143 dirs under build/, 11.7 GB total.
 Classification: A = keep, B = candidate (judgement attached), C = delete-safe.
 Nothing has been moved or deleted; this is the decision input only.

@@ -1,5 +1,33 @@
 # STATE — living progress log
 
+## Session 14z-102 (post-freeze rulings) — #50 CLOSED AS POLICY, the
+## BUILD-DIR TRIAGE RULED AND EXECUTED (8.1 GB atticked, both green
+## gates clean), the DF-duration and tint threads closed
+
+- **#50 CLOSED (maintainer-ruled):** the issue's own handoff adopted as
+  STANDING POLICY — lift a generator handler to module level only when
+  a test wants to drive it (unit test in the same change; the six
+  existing extractions are the template), byte-identity as the refactor
+  gate (m3a_reproducible + phasec — re-proven real at this freeze), the
+  allocator (~1401-1552) the named first candidate whenever allocator
+  work happens for its own reasons. No refactor is ever scheduled
+  absent a new measured cost. Full policy on the issue.
+- **BUILD-DIR TRIAGE RULED AND EXECUTED (maintainer-agreed):** C + B2 +
+  B3 + B4 + B1 + the 14z-102 probe duplicates = 85 dirs, 8.1 GB, moved
+  to `../build_attic_14z102` (REVERSIBLE; delete after the next
+  playtest cycle). build/ 13 GB -> 4.4 GB. Verified on the pruned
+  tree: `run_all_static --strict` PASS 97/0/0 with ZERO skips (strict
+  = a lost input is fatal, and none was), battery 23 PASS + the known
+  wide-render self-skip (that gate ran green directly at the freeze).
+  Tracked metadata in the moved dirs is deleted in this commit —
+  recoverable from git history + the freeze tags (the B4 meaning).
+  **STANDING POLICY adopted: at every freeze, the N-2 generation's
+  dirs are deleted (keep current + one back).**
+  **A4 (34 dirs, 2.56 GB) is deliberately NOT bulk-ruled** — a fresh
+  session does the pin-cleanup pass (retire/re-point stale references;
+  the dirs then fall to zero-reference and go mechanically). Full
+  ruling: docs/project/build_dir_triage.md header.
+
 ## Session 14z-102 FREEZE — THE #107+#109 WINDOW EXECUTED END TO END:
 ## donovan-m10 / huitzil-m19 / pyron-m13 / merged-m5. Every gate that
 ## has finished is GREEN; the corpus soak and battery tail run at close.

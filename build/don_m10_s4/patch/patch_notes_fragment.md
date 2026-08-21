@@ -1,0 +1,271 @@
+# donovan-m2 stage 4 — generated op notes
+
+# stage 1: Jedah hitbox block 0x0B0C2E+0x0 (base 0xb0d2e comp 0xb0c2e)
+# layout group at 0xbf6a0+0xdcec: code@0xbf6a0, x05c800@0xc2a10, x065952@0xcbb62, x065c22@0xcbe32, x065e5a@0xcc06a, x066ec4@0xcd0d4; 0x29cc gap bytes recycled
+# layout group at 0xcd390+0x2de0: x026142@0xcd390, x028122@0xcf370; 0x354c gap bytes recycled
+data_file 0x0d3070 +0x20f00  donovan anim (from vsav2 0x27F548)
+data_file 0x0c9430 +0xf10  donovan aux0_0 (from vsav2 0x334B80)
+data_file 0x0ca340 +0x190  donovan aux0_1 (from vsav2 0x337460)
+data_file 0x0ca4d0 +0x1a0  donovan aux0_2 (from vsav2 0x33CCF0)
+data_file 0x0ca670 +0x190  donovan aux0_3 (from vsav2 0x34CB60)
+data_file 0x3ec720 +0xe070  donovan aux0_4 (from vsav2 0x352120)
+code   0x0cb800 slot-clearing alloc wrapper for 0x15702 -> 0x16fba (0x80 cleared, +8 preserved)
+code   0x0c2a00 farm-port stub for 0x2916c (param at 0x0cb830, common 0x29f4a)
+code   0x0cb860 farm-port stub for 0x2915c (param at 0x0cb850, common 0x29f4a)
+code   0x0cb880 farm-port stub for 0x29164 (param at 0x0cb870, common 0x29f4a)
+code   0x0cb8a0 farm-port stub for 0x29184 (param at 0x0cb890, common 0x29f4a)
+code   0x0cb8c0 farm-port stub for 0x2918c (param at 0x0cb8b0, common 0x29f4a)
+code   0x0cb8d0 slot-clearing alloc wrapper for 0x1572e -> 0x16fe6 (0x80 cleared, +8 preserved)
+code   0x0cb900 ILLEGAL  TRIPWIRE for unresolved 0x4223c
+# code+0x1b08: unresolved 0x4223c -> tripwire 0xcb900
+code   0x0cb910 ILLEGAL  TRIPWIRE for unresolved 0x42cee
+# code+0x21e0: unresolved 0x42cee -> tripwire 0xcb910
+code   0x0cb920 ILLEGAL  TRIPWIRE for unresolved 0x448d4
+# code+0x3092: unresolved 0x448d4 -> tripwire 0xcb920
+code_file 0x0bf6a0 +0x3200  donovan code (from vsav2 0x059490)
+data_file 0x3fa790 +0x25c2  donovan hitbox (from vsav2 0x0C8BB8)
+data_file 0x0ca800 +0x1000  donovan hitbox_proj (from vsav2 0x0D0CA8)
+# bank_ref 0xd7a18 -> 0xbd87a (delta rule, 16B byte-identical)
+# bank_ref 0xd8358 -> 0xbe1ba (delta rule, 16B byte-identical)
+# bank_ref 0xd8358 -> 0xbe1ba (delta rule, 16B byte-identical)
+# bank_ref 0xd7798 -> 0xbd5fa (delta rule, known table base)
+# bank_ref 0xd7798 -> 0xbd5fa (delta rule, known table base)
+# bank_ref 0xd7798 -> 0xbd5fa (delta rule, known table base)
+# bank_ref 0xd7798 -> 0xbd5fa (delta rule, known table base)
+# bank_ref 0xd7798 -> 0xbd5fa (delta rule, known table base)
+# bank_ref 0xd7d18 -> 0xbdb7a (delta rule, 16B byte-identical)
+# bank_ref 0xd7698 -> 0xbd4fa (delta rule, known table base)
+# bank_ref 0xd7718 -> 0xbd57a (delta rule, known table base)
+# bank_ref 0xd83d8 -> 0xbe23a (delta rule, 16B byte-identical)
+# bank_ref 0xd6e3e -> 0xbcca0 (delta rule, 16B byte-identical)
+# bank_ref 0xd9438 -> 0xbf29a (delta rule, known table base)
+# bank_ref 0xd8a38 -> 0xbe89a (delta rule, 16B byte-identical)
+# bank_ref 0xd8df8 -> 0xbec5a (delta rule, 16B byte-identical)
+# bank_ref 0xd7098 -> 0xbcefa (delta rule, known table base)
+# bank_ref 0xd7118 -> 0xbcf7a (delta rule, known table base)
+# bank_ref 0xd7018 -> 0xbce7a (delta rule, known table base)
+# bank_ref 0xd95b8 -> 0xbf41a (delta rule, known table base)
+# bank_ref 0xd7198 -> 0xbcffa (delta rule, known table base)
+# bank_ref 0xd7018 -> 0xbce7a (delta rule, known table base)
+# bank_ref 0xd7098 -> 0xbcefa (delta rule, known table base)
+# bank_ref 0xd7118 -> 0xbcf7a (delta rule, known table base)
+# bank_ref 0xd7198 -> 0xbcffa (delta rule, known table base)
+# pcrel_escape_fix x026142: 9 escapes -> 6 trampolines (0 tripwired), pad 0x1400..0x1460
+code_file 0x0cd390 +0x1460  donovan x026142 (from vsav2 0x026142)
+# bank_ref 0xd6ebe -> 0xbcd20 (delta rule, 16B byte-identical)
+# bank_ref 0xd699e -> 0xbc800 (delta rule, 16B byte-identical)
+# bank_ref 0xd671e -> 0xbc580 (delta rule, 16B byte-identical)
+# bank_ref 0xd671e -> 0xbc580 (delta rule, 16B byte-identical)
+# bank_ref 0xd679e -> 0xbc600 (delta rule, 16B byte-identical)
+# bank_ref 0xd679e -> 0xbc600 (delta rule, 16B byte-identical)
+code_file 0x0cf370 +0xe00  donovan x028122 (from vsav2 0x028122)
+code   0x0cb930 ILLEGAL  TRIPWIRE for unresolved 0x12f484
+# x05c800+0x152a: unresolved 0x12f484 -> tripwire 0xcb930
+# x05c800+0x16a4: unresolved 0x12f484 -> tripwire 0xcb930
+code   0x0cb940 ILLEGAL  TRIPWIRE for unresolved 0x167bf4
+# x05c800+0x2622: unresolved 0x167bf4 -> tripwire 0xcb940
+# x05c800+0x2a20: unresolved 0x167bf4 -> tripwire 0xcb940
+code   0x0cb950 ILLEGAL  TRIPWIRE for unresolved 0x17f176
+# x05c800+0x2ae4: unresolved 0x17f176 -> tripwire 0xcb950
+# x05c800+0x3034: unresolved 0x17f176 -> tripwire 0xcb950
+code   0x0cb960 ILLEGAL  TRIPWIRE for unresolved 0x181592
+# x05c800+0x3072: unresolved 0x181592 -> tripwire 0xcb960
+# pcrel_escape_fix x05c800: 2 escapes -> 1 trampolines (0 tripwired), pad 0x6a00..0x6a20
+code_file 0x0c2a10 +0x6a20  donovan x05c800 (from vsav2 0x05C800)
+code_file 0x0cbb62 +0x2d0  donovan x065952 (from vsav2 0x065952)
+code_file 0x0cbe32 +0x100  donovan x065c22 (from vsav2 0x065C22)
+code   0x0cb970 +0x40  patched clone of 0x5459a for vs2 0x5c77e (unmasked set-anim entry; false byte-matc)
+code_file 0x0cc06a +0x106a  donovan x065e5a (from vsav2 0x065E5A)
+code_file 0x0cd0d4 +0x2b8  donovan x066ec4 (from vsav2 0x066EC4)
+code_file 0x0c28a0 +0x154  donovan x06717c (from vsav2 0x06717C)
+code   0x0cb9b0 ILLEGAL  TRIPWIRE for unresolved 0x24edd4
+# x088512+0x1362: unresolved 0x24edd4 -> tripwire 0xcb9b0
+# x088512+0x13a0: unresolved 0x24edd4 -> tripwire 0xcb9b0
+# x088512+0x13e4: unresolved 0x24edd4 -> tripwire 0xcb9b0
+# x088512+0x1428: unresolved 0x24edd4 -> tripwire 0xcb9b0
+# x088512+0x1464: unresolved 0x24edd4 -> tripwire 0xcb9b0
+# x088512+0x14a2: unresolved 0x24edd4 -> tripwire 0xcb9b0
+# x088512+0x150a: unresolved 0x24edd4 -> tripwire 0xcb9b0
+# x088512+0x154e: unresolved 0x24edd4 -> tripwire 0xcb9b0
+# x088512+0x1590: unresolved 0x24edd4 -> tripwire 0xcb9b0
+# x088512+0x15f0: unresolved 0x24edd4 -> tripwire 0xcb9b0
+# x088512+0x1670: unresolved 0x24edd4 -> tripwire 0xcb9b0
+code   0x0cb9c0 ILLEGAL  TRIPWIRE for unresolved 0x24a3ce
+# x088512+0x16d8: unresolved 0x24a3ce -> tripwire 0xcb9c0
+# x088512+0x1732: unresolved 0x24edd4 -> tripwire 0xcb9b0
+# x088512+0x1796: unresolved 0x24edd4 -> tripwire 0xcb9b0
+# x088512+0x17fa: unresolved 0x24edd4 -> tripwire 0xcb9b0
+# x088512+0x18ee: unresolved 0x24edd4 -> tripwire 0xcb9b0
+# x088512+0x191c: unresolved 0x24edd4 -> tripwire 0xcb9b0
+# x088512+0x194a: unresolved 0x24edd4 -> tripwire 0xcb9b0
+# x088512+0x1994: unresolved 0x24edd4 -> tripwire 0xcb9b0
+# x088512+0x1cd2: unresolved 0x24edd4 -> tripwire 0xcb9b0
+# x088512+0x1d1a: unresolved 0x24edd4 -> tripwire 0xcb9b0
+code   0x0cb9d0 ILLEGAL  TRIPWIRE for unresolved 0x36784a
+# x088512+0x1dee: unresolved 0x36784a -> tripwire 0xcb9d0
+code   0x0cb9e0 ILLEGAL  TRIPWIRE for unresolved 0x25111e
+# x088512+0x2156: unresolved 0x25111e -> tripwire 0xcb9e0
+# x088512+0x21d2: unresolved 0x25111e -> tripwire 0xcb9e0
+# x088512+0x26e2: unresolved 0x25111e -> tripwire 0xcb9e0
+code   0x0cb9f0 ILLEGAL  TRIPWIRE for unresolved 0x2695d0
+# x088512+0x2894: unresolved 0x2695d0 -> tripwire 0xcb9f0
+# x088512+0x28ce: unresolved 0x24edd4 -> tripwire 0xcb9b0
+# x088512+0x290c: unresolved 0x24edd4 -> tripwire 0xcb9b0
+# x088512+0x294a: unresolved 0x24edd4 -> tripwire 0xcb9b0
+# x088512+0x2986: unresolved 0x24edd4 -> tripwire 0xcb9b0
+# x088512+0x29c4: unresolved 0x24edd4 -> tripwire 0xcb9b0
+# x088512+0x2a2c: unresolved 0x24edd4 -> tripwire 0xcb9b0
+# x088512+0x2a6a: unresolved 0x24edd4 -> tripwire 0xcb9b0
+# x088512+0x209c: char-id imm 0x13 -> 0xf
+code   0x0ceaf0 ILLEGAL  shared pcrel TRIPWIRE for x088512
+# x088512: 9 pcrel escape entries rewritten (tripwire at 0xceaf0)
+# x088512+0x2be6: port_patch 000e -> 000c (companion queue class 7 (vs2-only) -> vsavj class 6)
+code_file 0x0d0170 +0x2f00  donovan x088512 (from vsav2 0x088512)
+code   0x0ceb00 ILLEGAL  shared pcrel TRIPWIRE for x0905ae
+# x0905ae: 2 pcrel escape entries rewritten (tripwire at 0xceb00)
+code_file 0x0ce7f0 +0x300  donovan x0905ae (from vsav2 0x0905AE)
+code   0x0cba00 ILLEGAL  TRIPWIRE for unresolved 0x2c3136
+# x2b7ef4+0xb0c9: unresolved 0x2c3136 -> tripwire 0xcba00
+code   0x0cba10 ILLEGAL  TRIPWIRE for unresolved 0x2c3170
+# x2b7ef4+0xb0d1: unresolved 0x2c3170 -> tripwire 0xcba10
+code   0x0cba20 ILLEGAL  TRIPWIRE for unresolved 0x2c31aa
+# x2b7ef4+0xb0d9: unresolved 0x2c31aa -> tripwire 0xcba20
+code   0x0cba30 ILLEGAL  TRIPWIRE for unresolved 0x2c31e4
+# x2b7ef4+0xb0fd: unresolved 0x2c31e4 -> tripwire 0xcba30
+code   0x0cba40 ILLEGAL  TRIPWIRE for unresolved 0x2c3236
+# x2b7ef4+0xb105: unresolved 0x2c3236 -> tripwire 0xcba40
+code   0x0cba50 ILLEGAL  TRIPWIRE for unresolved 0x2c325c
+# x2b7ef4+0xb10d: unresolved 0x2c325c -> tripwire 0xcba50
+code   0x0cba60 ILLEGAL  TRIPWIRE for unresolved 0x2c3272
+# x2b7ef4+0xb115: unresolved 0x2c3272 -> tripwire 0xcba60
+code   0x0cba70 ILLEGAL  TRIPWIRE for unresolved 0x2c3280
+# x2b7ef4+0xb11d: unresolved 0x2c3280 -> tripwire 0xcba70
+code   0x0cba80 ILLEGAL  TRIPWIRE for unresolved 0x2c3296
+# x2b7ef4+0xb125: unresolved 0x2c3296 -> tripwire 0xcba80
+code   0x0cba90 ILLEGAL  TRIPWIRE for unresolved 0x2c32a4
+# x2b7ef4+0xb12d: unresolved 0x2c32a4 -> tripwire 0xcba90
+code   0x0cbaa0 ILLEGAL  TRIPWIRE for unresolved 0x2c32b2
+# x2b7ef4+0xb135: unresolved 0x2c32b2 -> tripwire 0xcbaa0
+data_file 0x0f3f70 +0xb20c  donovan x2b7ef4 (from vsav2 0x2B7EF4)
+poke32 0x0bceb6 <- 0x000d3070  anim_index_a[0xf] donovan anim
+poke32 0x0bcef6 <- 0x000d3070  anim_index_a[0x1f] variant mirror
+poke32 0x0bcf36 <- 0x000d51be  anim_index_a2[0xf] donovan anim
+poke32 0x0bcf76 <- 0x000d51be  anim_index_a2[0x1f] variant mirror
+poke32 0x0bcfb6 <- 0x000dabc4  anim_index_b[0xf] donovan anim
+poke32 0x0bcff6 <- 0x000dabc4  anim_index_b[0x1f] variant mirror
+poke32 0x0bd036 <- 0x000dacba  anim_index_c[0xf] donovan anim
+poke32 0x0bd076 <- 0x000dacba  anim_index_c[0x1f] variant mirror
+poke32 0x0bd0b6 <- 0x000dda1e  anim_index_proj[0xf] donovan anim
+poke32 0x0bd0f6 <- 0x000dda1e  anim_index_proj[0x1f] variant mirror
+# param32_a: velocity pair NOT ported (14w-b crash guard; Jedah speeds retained)
+# jump_params: velocity pair NOT ported (14w-b crash guard; Jedah speeds retained)
+poke32 0x0bd9b6 <- 0x003fa9d0  hitbox_base[0xf] donovan hitbox
+poke32 0x0bd9f6 <- 0x003fa9d0  hitbox_base[0x1f] variant mirror
+poke32 0x0bda36 <- 0x003fa790  hitbox_comp[0xf] donovan hitbox
+poke32 0x0bda76 <- 0x003fa790  hitbox_comp[0x1f] variant mirror
+poke32 0x0bdab6 <- 0x000ca800  proj_hitbox_base[0xf] donovan hitbox_proj
+poke32 0x0bdaf6 <- 0x000ca800  proj_hitbox_base[0x1f] variant mirror
+poke32 0x0bdb36 <- 0x000cab5a  proj_hitbox_comp[0xf] donovan hitbox_proj
+poke32 0x0bdb76 <- 0x000cab5a  proj_hitbox_comp[0x1f] variant mirror
+data   0x0bdbf2 +0x8  rec8_a[0xf] value
+data   0x0bdc72 +0x8  rec8_a[0x1f] mirror
+data   0x0be198 +0x2  word132[0xf] value
+data   0x0be1b8 +0x2  word132[0x1f] mirror
+data   0x0be1d8 +0x2  word_pos_a[0xf] value
+data   0x0be1f8 +0x2  word_pos_a[0x1f] mirror
+data   0x0be218 +0x2  word_pos_b[0xf] value
+data   0x0be238 +0x2  word_pos_b[0x1f] mirror
+# param32_b: velocity pair NOT ported (14w-b crash guard; Jedah speeds retained)
+data   0x0be472 +0x8  rec8_b[0xf] value
+data   0x0be4f2 +0x8  rec8_b[0x1f] mirror
+data   0x0be818 +0x2  word_y_off[0xf] value
+data   0x0be838 +0x2  word_y_off[0x1f] mirror
+data   0x0be858 +0x2  word_range[0xf] value
+data   0x0be878 +0x2  word_range[0x1f] mirror
+data   0x0be888 +0x2  byte15b[0xf] value
+data   0x0be898 +0x2  byte15b[0x1f] mirror
+data   0x0bea5c +0x1e  byte2d_a[0xf] value
+data   0x0bec3c +0x1e  byte2d_a[0x1f] mirror
+data   0x0bee1c +0x1e  byte2d_b[0xf] value
+data   0x0beffc +0x1e  byte2d_b[0x1f] mirror
+poke32 0x0bf2d6 <- 0x000bfcec  tail_code_ptr[0xf] donovan code
+poke32 0x0bf316 <- 0x000bfcec  tail_code_ptr[0x1f] variant mirror
+poke32 0x0bf456 <- 0x003fcbf2  tail_data_ptr[0xf] donovan hitbox
+poke32 0x0bf496 <- 0x003fcbf2  tail_data_ptr[0x1f] variant mirror
+code   0x0cbab0 ILLEGAL  TRIPWIRE for unresolved 0x672d0
+# obj_hook@0x54470 type 64: unresolved 0x672d0 -> tripwire 0xcbab0
+code   0x0cbac0 ILLEGAL  TRIPWIRE for unresolved 0x67550
+# obj_hook@0x54470 type 65: unresolved 0x67550 -> tripwire 0xcbac0
+code   0x0cbad0 ILLEGAL  TRIPWIRE for unresolved 0x67846
+# obj_hook@0x54470 type 66: unresolved 0x67846 -> tripwire 0xcbad0
+code   0x0cbae0 ILLEGAL  TRIPWIRE for unresolved 0x67a00
+# obj_hook@0x54470 type 67: unresolved 0x67a00 -> tripwire 0xcbae0
+code   0x0cbaf0 ILLEGAL  TRIPWIRE for unresolved 0x6800c
+# obj_hook@0x54470 type 68: unresolved 0x6800c -> tripwire 0xcbaf0
+code   0x0cbb00 ILLEGAL  TRIPWIRE for unresolved 0x68458
+# obj_hook@0x54470 type 69: unresolved 0x68458 -> tripwire 0xcbb00
+code   0x0cbb10 ILLEGAL  TRIPWIRE for unresolved 0x68768
+# obj_hook@0x54470 type 70: unresolved 0x68768 -> tripwire 0xcbb10
+code   0x0cbb20 ILLEGAL  TRIPWIRE for unresolved 0x689cc
+# obj_hook@0x54470 type 71: unresolved 0x689cc -> tripwire 0xcbb20
+code   0x0cbb30 ILLEGAL  TRIPWIRE for unresolved 0x68c78
+# obj_hook@0x54470 type 72: unresolved 0x68c78 -> tripwire 0xcbb30
+code   0x0cbb40 ILLEGAL  TRIPWIRE for unresolved 0x69046
+# obj_hook@0x54470 type 73: unresolved 0x69046 -> tripwire 0xcbb40
+code   0x0cbb50 ILLEGAL  TRIPWIRE for unresolved 0x692f6
+# obj_hook@0x54470 type 74: unresolved 0x692f6 -> tripwire 0xcbb50
+code   0x0cbb60 ILLEGAL  TRIPWIRE for unresolved 0x6965e
+# obj_hook@0x54470 type 75: unresolved 0x6965e -> tripwire 0xcbb60
+code   0x0ceb10 +0x15c  obj_walker: 0x54458 relocated verbatim + its extended type table at +0x2c (59 vanilla + 17 ported, 5 placed); dispatch site 0x54470 left VANILLA
+code   2 caller operand(s) of jsr 0x54458 -> 0x0ceb10 (0x009436, 0x020310)
+code   0x0cbf40 ILLEGAL  TRIPWIRE for unresolved 0x6a70c
+# obj_hook@0x5e542 type 121: unresolved 0x6a70c -> tripwire 0xcbf40
+# obj_hook@0x5e542 type 122: unresolved 0x6a70c -> tripwire 0xcbf40
+# obj_hook@0x5e542 type 123: unresolved 0x6a70c -> tripwire 0xcbf40
+code   0x0cec70 +0x21c  obj_walker: 0x5e52a relocated verbatim + its extended type table at +0x2c (114 vanilla + 10 ported, 7 placed); dispatch site 0x5e542 left VANILLA
+code   21 caller operand(s) of jsr 0x5e52a -> 0x0cec70 (0x0053f6, 0x005410, 0x00577c, 0x0057a8, 0x00590a, 0x005ebc, 0x00943c, 0x009caa, 0x009f36, 0x00a188, 0x00a804, 0x00abcc, 0x010dfa, 0x012a3e, 0x012d16, 0x012e4c, 0x012e66, 0x020316, 0x021638, 0x021ada, 0x021dea)
+data   0x0cee90 +0x180  state_hook palette-seq records (ids 0x2cd-0x2d8)
+code   0x0cbf50 state_hook private seq entry (records base 0x0cee90 - 0x2cd*32 -> engine 0x2ad9a)
+code   0x02a7c8 ENGINE HOOK: +0x14e state dispatch -> thunk 0x0cbf90 (vanilla ids ghost-clean via jmp-back; ids 0xb2-0xc8 -> 12 synthesized stubs at 0x0cf010, ext table 0x0cbf60)
+code   0x018458 ENGINE HOOK: hit-reaction dispatch -> thunk 0x0cc010 (vanilla ids jmp back to untouched 0x18460; ids 0xa0-0xa6 -> 4 verbatim vs2 cases at 0x0cbfd0)
+code   0x0cf190 init shim (pool latch A5+0x7966, seeder 0x16c64; flavor (A6+0x3c2) donovan<-0x01/held 0x00 [Start bitmask 0xff8060, bit=player]) -> handler 0x0c1030
+poke32 0x0bd136 <- 0x000cf190  dispatch_00[0xf] donovan handler via seed shim
+poke32 0x0bd176 <- 0x000cf190  dispatch_00[0x1f] variant mirror
+poke32 0x0bd1b6 <- 0x000bf6aa  dispatch_01[0xf] donovan handler
+poke32 0x0bd1f6 <- 0x000bf6aa  dispatch_01[0x1f] variant mirror
+poke32 0x0bd236 <- 0x000bff64  dispatch_02[0xf] donovan handler
+poke32 0x0bd276 <- 0x000bff64  dispatch_02[0x1f] variant mirror
+poke32 0x0bd2b6 <- 0x000bff64  dispatch_03[0xf] donovan handler
+poke32 0x0bd2f6 <- 0x000bff64  dispatch_03[0x1f] variant mirror
+poke32 0x0bd336 <- 0x000bff64  dispatch_04[0xf] donovan handler
+poke32 0x0bd376 <- 0x000bff64  dispatch_04[0x1f] variant mirror
+poke32 0x0bd3b6 <- 0x000c0a12  dispatch_05[0xf] donovan handler
+poke32 0x0bd3f6 <- 0x000c0a12  dispatch_05[0x1f] variant mirror
+poke32 0x0bd436 <- 0x000bfa9c  dispatch_06[0xf] donovan handler
+poke32 0x0bd476 <- 0x000bfa9c  dispatch_06[0x1f] variant mirror
+poke32 0x0bd4b6 <- 0x000c0cb0  dispatch_07[0xf] donovan handler
+poke32 0x0bd4f6 <- 0x000c0cb0  dispatch_07[0x1f] variant mirror
+poke32 0x0bd536 <- 0x000bfb30  dispatch_08[0xf] donovan handler
+poke32 0x0bd576 <- 0x000bfb30  dispatch_08[0x1f] variant mirror
+poke32 0x0bd5b6 <- 0x000bfc32  dispatch_09[0xf] donovan handler
+poke32 0x0bd5f6 <- 0x000bfc32  dispatch_09[0x1f] variant mirror
+poke32 0x0bd636 <- 0x000bf9d2  dispatch_10[0xf] donovan handler
+poke32 0x0bd676 <- 0x000bf9d2  dispatch_10[0x1f] variant mirror
+poke32 0x0bd6b6 <- 0x000c0dfa  dispatch_11[0xf] donovan handler
+poke32 0x0bd6f6 <- 0x000c0dfa  dispatch_11[0x1f] variant mirror
+poke32 0x0bd736 <- 0x000c0f9c  dispatch_12[0xf] donovan handler
+poke32 0x0bd776 <- 0x000c0f9c  dispatch_12[0x1f] variant mirror
+poke32 0x0bd7b6 <- 0x000c0fe6  dispatch_13[0xf] donovan handler
+poke32 0x0bd7f6 <- 0x000c0fe6  dispatch_13[0x1f] variant mirror
+poke32 0x0bd836 <- 0x000c0d74  dispatch_14[0xf] donovan handler
+poke32 0x0bd876 <- 0x000c0d74  dispatch_14[0x1f] variant mirror
+poke32 0x0bf256 <- 0x000bfb54  dispatch_15[0xf] donovan handler
+poke32 0x0bf296 <- 0x000bfb54  dispatch_15[0x1f] variant mirror
+poke32 0x0bf356 <- 0x000c109c  dispatch_16[0xf] donovan handler
+poke32 0x0bf396 <- 0x000c109c  dispatch_16[0x1f] variant mirror
+poke32 0x0bf3d6 <- 0x000c10d8  dispatch_17[0xf] donovan handler
+poke32 0x0bf416 <- 0x000c10d8  dispatch_17[0x1f] variant mirror
+poke32 0x0bf4d6 <- 0x000c1124  dispatch_18[0xf] donovan handler
+poke32 0x0bf516 <- 0x000c1124  dispatch_18[0x1f] variant mirror
+poke32 0x0bf656 <- 0x000c1106  dispatch_19[0xf] donovan handler
+poke32 0x0bf696 <- 0x000c1106  dispatch_19[0x1f] variant mirror
