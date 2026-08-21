@@ -10,59 +10,43 @@
 > ## artifacts until the window's rebuild+re-freeze** — do not "fix"
 > ## that; it is the 14z-99 W-commit rhythm, paused on a ruling.
 >
-> ## **#109 WAS RE-DERIVED AND THE PREP'S A1/A2 ARE RETRACTED**
-> ## (STATE 14z-102 + the issue's 14z-102 comment — read BOTH before
-> ## touching anything): the "segments" were the two games' STOCK
-> ## PIPS (red herring); the "pointer-selected art" lists are the
-> ## beam's PALETTE RAMPS. Ours emits the full native burst set
-> ## correctly (group C, tiles byte-identical); the missing beam =
-> ## (1) **the full-screen PALETTE-LINE SWEEP never runs on ours**
-> ## (native writes a +0x20-row word series at $90C73E+; writers =
-> ## the fade stepper vs2 0x1282C / vsavj twin ~0x14168 — machinery
-> ## present, REQUEST dropped; the #101 script-carried-id class), and
-> ## (2) the burst is DF-gold-tinted (our 14z-84 block; native's EX
-> ## never tints) + drawn behind the 4-copy train (CPS-2 renders the
-> ## list back-to-front).
+> ## **#109 IS ROOT-CAUSED AND FIXED, REHEARSED THROUGH THE MERGED
+> ## PROBE** (STATE 14z-102 (2)/(3) + the issue's two 14z-102
+> ## comments — the prep's A1/A2 AND the intermediate palette-sweep
+> ## reading are all RETRACTED there): the defect was **vsavj
+> ## shipping effect-class ROW 31 as a stub**, and row 31 is the
+> ## clone-mode per-frame beam emitter ($FFD600-family objects,
+> ## alternating-frame strobe). Fix = the 14z-71 row-16 pattern:
+> ## root `0x926e4:0x11e:t0x922f0` (vh2-oracled, 6/0x11E
+> ## operand-only diffs) + `beam_effect_class31` code_ptr at
+> ## PRG:0x080B28 (slot measured DEAD in vanilla incl. both long
+> ## marathons, 2418-hit control). Beams RENDER (captures sent).
+> ## Gold tint KEPT (maintainer default ruling 2026-08-21; the
+> ## rehearsed neuter = build/hui_probe_tint's one-line edit if
+> ## community research says otherwise).
 >
-> ## **14z-102 LATE UPDATE — THE FIX IS IN AND REHEARSED THROUGH THE
-> ## MERGED PROBE** (`build/merged_probe_row31` 393f92a5, 804 ops;
-> ## beam audit fix-mode PASS on merged; hui32 extract regenerated
-> ## with the root, old kept as extract.pre-14z102; op-count
-> ## constants re-frozen 363/598/648/804/901, tenant-loop PASS).
-> ## **REMAINING = THE FREEZE ONLY** (step 4 below), on the
-> ## maintainer's go after they see the beams in their own playtest:
+> ## **REHEARSED THROUGH THE MERGED PROBE** (`build/merged_probe_row31`
+> ## 393f92a5, 804 ops; beam audit fix-mode PASS on merged AND on the
+> ## solo probe hui_probe_row31 1a7249d6, defect-mode frozen on
+> ## merged-m4; hui32 extract REGENERATED with the root — old kept as
+> ## extract.pre-14z102; op-count constants re-frozen
+> ## 363/598/648/804/901, tenant-loop PASS end to end).
+> ## **REMAINING = THE FREEZE ONLY**, on the maintainer's go after
+> ## they see the beams in their own playtest:
 > ## `tools/run_wide.sh build/merged_probe_row31 fbneo` — Phobos DF
 > ## (HP+HK, stocks), move, attack: the beams strobe green/blue.
 > ##
-> ## **NEXT ACTIONS, in order (steps 1-3 DONE 14z-102):**
-> ## 1. RULINGS — BOTH DECIDED 2026-08-21 (maintainer): (a) DF gold
-> ##    tint during his clone mode — **KEEP (default ruling; the
-> ##    maintainer may revisit after community research** — if that
-> ##    lands "no tint", the rehearsed one-line neuter is
-> ##    `build/hui_probe_tint` 90e2982e's manifest edit); (b) the
-> ##    palette-event hunt IS the #109 fix path — **GO given.**
-> ## 2. THE HUNT: native stepper's caller chain during the beam.
-> ##    Measured 14z-102 already: the four page-slot POINTERS
-> ##    ($7404-$7410(A5) = $FFF404-1F; vsavj scheduler 0x142C2 reads
-> ##    them, vs2 twin ~0x1297A) are set at SETUP only (native
-> ##    beam-window writes: zero) — the beam trigger is the fade
-> ##    mode/count state ($7400-$7402(A5), cf. clr.b $7401(a5) at vs2
-> ##    0x12826) or the pointed target-table CONTENT. Next instrument:
-> ##    a caller-logging bp (log (SP) at vs2 stepper entry 0x1297A/
-> ##    0x12820 — trace_writes 'b' mode lacks stack reads, extend or
-> ##    scratch-copy it) over df/102's beam window -> request site ->
-> ##    vsavj/ours twin -> why ours drops it. Expected: a portable
-> ##    script-event/id row (the #101 class).
-> ## 3. Fix + VERIFY: rig df/100 flips (palette-line sweep present +
-> ##    burst visible + close-range damage A/B vs df/102).
-> ## 4. THEN the deferred window tail: rebuild all four + merged, full
-> ##    battery, run_suite, re-freeze (m10/m19/m13/merged-m5),
-> ##    registry rows, tags; re-point pcrel_escapes [merged_*],
-> ##    bases.tsv, render-content rows, audits' BUILD defaults.
-> ## 5. #109 B carry: x2b7ef4 strips 0x2BC09A/0x2BC0F8 (real type-4,
-> ##    reachability open) + don's 1; anim rows 0x2499F0/0x249B18 are
-> ##    census FPs (verdicts in STATE 14z-102) — freeze the inventory
-> ##    as a gate with the fix.
+> ## **THE FREEZE (the 14z-99 rhythm):** rebuild the four named
+> ## artifacts + stock twin from the tree, full battery, run_suite
+> ## re-freeze (hui/merged expectation sets MOVE — the root shifts
+> ## every hui placement), registry rows m10/m19/m13/merged-m5 +
+> ## tags, re-point pcrel_escapes [merged_*] + bases.tsv +
+> ## render-content rows + audit BUILD defaults, and the B-sweep
+> ## inventory gate (x2b7ef4 strips 0x2BC09A/0x2BC0F8 reachability
+> ## open + don's 1; anim rows 0x2499F0/0x249B18 = census FPs).
+> ## Also owed on #109: a positive-contact damage leg (P2 jumped
+> ## into the beam band — df/103/104 measured zero-zero parity at
+> ## standing geometry, both games).
 >
 > ## **ALSO WAITING ON THE MAINTAINER:** the build-dir ruling
 > ## (`docs/project/build_dir_triage.md`, ~7.3 GB), the DF-duration
