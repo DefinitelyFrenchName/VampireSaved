@@ -1,6 +1,6 @@
 # patch_notes — per-change detail: every byte, and why
 
-## 14z-102 — #109 THE CLONE-BEAM FIX (row 31; probe-verified, freeze pending)
+## 14z-102 — #109 THE CLONE-BEAM FIX (row 31) — FROZEN as huitzil-m19/merged-m5 (bit-for-bit the probes), field-confirmed, #109 CLOSED
 
 **`tools/build_donovan.sh`** — huitzil census root added:
 `0x926e4:0x11e:t0x922f0` — vs2's effect-class ROW-31 handler family
@@ -38,7 +38,7 @@ root changes EXTRACTION, so the merged pipeline's pinned extract inputs
 must be regenerated deliberately (create-if-absent will NOT pick it up).
 
 
-## 14z-102 — the #107 row flip (window step 1; freeze pending)
+## 14z-102 — the #107 row flip — FROZEN in donovan-m10 + every tenant + stock (the shared map), #107 CLOSED
 
 **`build/manifest/reconciliation.toml`, ONE row:** `vsav2 0x0448a6` ->
 `vsavj 0x04367a`, status `plausible` -> `verified` (was `0x02563e`, the
@@ -51,12 +51,11 @@ displacement); 24 diffs vs the old `0x2563e`; 7 vs the eliminated
 next-slot twin `0x45fcc`; farm callsites unique in both games
 (vs2 `jmp` at `0x5c51a` <-> vsavj at `0x5437e`).
 
-**No artifact rebuilt with it yet — deliberate.** The rebuild +
-re-freeze (m10/m19/m13/merged-m5) rides the #109 resolution so the
-window freezes once; until then `test_m3a_reproducible` measures the
-manifest ahead of the frozen artifacts and is EXPECTED RED (the 14z-99
-W-commit rhythm, paused mid-window on the maintainer's #109 ruling —
-see NEXT_SESSION).
+**[RESOLVED at the freeze, same session: the rebuild+re-freeze
+executed (m10/m19/m13/merged-m5) and both formerly-expected-red gates
+are green on their re-frozen pins.]** Original mid-window note: the
+window froze once, after the #109 resolution, per the 14z-99 W-commit
+rhythm.
 
 ## 14z-99 — the window (#43(b) + #103 + #104 + #105): byte detail
 

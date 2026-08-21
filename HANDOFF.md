@@ -268,14 +268,12 @@ crash is its must-fire control). Re-pointed to the current freeze
 the same session: `audit_tripwire_reach.sh` (six marathon legs green),
 `test_pcrel_escapes.sh` + `pcrel_escapes.toml`, `bases.tsv` (tenant
 hitbox bases MOVE with freezes — re-derive at every freeze, note in the
-file). Open findings (updated 14z-102): #106 CLOSED (14z-101); #107 row
-FLIPPED and committed 14z-102 (`0x0448a6 -> 0x04367a`, re-derived at
-the flip) — **the rebuild/re-freeze rides the #109 resolution, so
-`test_m3a_reproducible` AND `test_phasec_spaces` are EXPECTED RED (both measure the manifest ahead of the frozen artifacts; phasec's stock rebuild now yields 883e7d17 vs the pinned 16da59b6 — the flip moves STOCK bytes too, the shared-map/#103 class) vs the frozen artifacts until
-the window closes**; #109 RE-DERIVED 14z-102 (the prepped A1/A2
-mechanisms retracted — the real defect is the never-invoked screen
-palette-line sweep + the DF-tint/occlusion compound; STATE 14z-102 +
-the issue). **#108 RESOLVED NOT-A-DEFECT (14z-101):** the satellite
+file). Open findings (final 14z-102): #106 CLOSED (14z-101); **#107 and #109
+both SHIPPED AND CLOSED at the 14z-102 freeze** (the mid-window
+expected-red state resolved — both gates green on re-frozen pins; the
+#109 mechanism went through two more retractions before landing on
+effect-class ROW 31, see STATE 14z-102 (2) and the issue).
+**#108 RESOLVED NOT-A-DEFECT (14z-101):** the satellite
 word is our own load-bearing `obj_bank_word_slot` bank row, the sweep
 keys on `+0x94`, and native vs2's satellites are equally sweep-inert
 (STATE 14z-101). The window state: NEXT_SESSION banner.
