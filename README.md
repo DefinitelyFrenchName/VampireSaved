@@ -1,4 +1,4 @@
-# Vampire Saved: Full-Roster Vampire Savior (CPS-2, emulator-target, MiSTer as extended scope, EXPLORATORY PROOF OF CONCEPT, FULLY EXPERIMENTAL, NOT FOR ACTUAL USE)
+# Vampire Saved: Full-Roster Vampire Savior (CPS-2, emulator-target, MiSTer as extended scope, EXPLORATORY, NOT FOR COMPETITIVE USE)
 
 ## Goal
 
