@@ -29,11 +29,17 @@
 > ## trivial merge folded in the maintainer's README edit ee9b0ff —
 > ## merged, NOT rebased, to keep the tagged commits reachable).
 > ## **#107 AND #109 CLOSED on GitHub.** OPEN/CARRIED: #50 parked;
-> ## maintainer-owned: the build-dir ruling
-> ## (`docs/project/build_dir_triage.md`), the DF-duration fidelity
-> ## ruling (360/377/360 vs uniform 332), the community tint research
+> ## maintainer-owned: the build-dir ruling (still open) and
+> ## (`docs/project/build_dir_triage.md`), the community tint research
 > ## (gold default stands; the rehearsed neuter is
-> ## build/hui_probe_tint's one-line manifest edit). The
+> ## build/hui_probe_tint's one-line manifest edit — AND the tint is
+> ## now CONFIRMED GOOD, 2026-08-21: that thread is CLOSED). **The
+> ## DF-DURATION RULING IS DECIDED 2026-08-21 (maintainer):** keep
+> ## vsavj durations "absolutely, categorically" — per-character,
+> ## 1 stock, as shipped (360/377/360); any future doubt about exact
+> ## per-tenant lengths is the maintainer's to research from period
+> ## sources (Vampire Hunter / Vampire Collection). No item remains.
+> ## The
 > ## positive-contact beam-damage leg stays a nice-to-have (df/103/104
 > ## measured zero-zero parity at standing geometry).
 >

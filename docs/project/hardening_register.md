@@ -215,9 +215,8 @@ Re-point the `[merged_*]` sections at every merged freeze.
   and the palette-event hunt. (History: the earlier intermediate
   readings — "drawn-but-invisible markers", "never drawn", "0xA00
   low" — are all retracted in place in STATE 14z-101 (5)/(7)/(8).)
-  OPEN DECISION queued: keep vsavj-framework DF durations for the
-  tenants (currently their per-class values: 360/377/360) or port
-  vs2 fidelity — a gameplay ruling. Field pass still ongoing:
+  ~~OPEN DECISION queued~~ DECIDED 2026-08-21 (maintainer, verbatim intent): "we absolutely, categorically, keep vsavj DF durations" — per-character, 1 stock, the vsavj framework as-is. If doubts ever arise about the exact per-tenant lengths, the MAINTAINER researches the period sources (Vampire Hunter, Vampire Collection, etc.); nothing is ours to retune.
+  (The queued alternative — porting vs2's uniform 332 — is REJECTED.) Field pass still ongoing:
   projectile collisions.
 - **the authoritative-guard corpus soak: BUILT AND GREEN (14z-101)** —
   `tests/audit_guard_corpus.sh`: the whole replay corpus (79 rigs,

@@ -455,7 +455,7 @@ signature — every leg verified loading its own character).
 - **vsavj durations are PER-CHARACTER** (legacy sweep, all 16 ids:
   269/360/377/383/398/411/540 — e.g. 0x0a=540, 0x0d=411, 0x02=269),
   where vs2 measures uniform 332 across four characters. The tenants
-  read 360/377/360 on ours. **Fidelity question for the ruling queue:
+  read 360/377/360 on ours. **[DECIDED 2026-08-21 (maintainer, verbatim intent): "we absolutely, categorically, keep vsavj DF durations" — per-character, 1 stock, the vsavj framework as-is. If doubts ever arise about the exact per-tenant lengths, the MAINTAINER researches the period sources (Vampire Hunter, Vampire Collection, etc.); nothing is ours to retune.]** Original queue entry: **Fidelity question for the ruling queue:
   keep vsavj-framework durations or port vs2's 332.**
 - **Phobos' 0x16→0x18 is a LEGITIMATE vsavj DF class**: legacy ids
   0x0C and 0x0F (Jedah) also enter 0x18, both at dur 377 — exactly his
