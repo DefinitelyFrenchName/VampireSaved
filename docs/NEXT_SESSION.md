@@ -15,19 +15,14 @@
 > ## merged gates green; pcrel inventories held across the extraction
 > ## shift. PLAY: `tools/run_wide.sh build/m3b_merged12 fbneo`.
 >
-> ## **CLOSE-OUT ITEMS (check these landed green before new work):**
-> ## 1. The freeze-tail gates that were RUNNING at the close:
-> ##    test_dualtrack (m5_stock5 + don_m10 pair),
-> ##    test_fbneo_legacy_oracle (re-pointed to don_m10),
-> ##    run_battery_m2, audit_merged_legacy (real coverage this time —
-> ##    merged ops moved), and the guard-corpus soak
-> ##    (`audit_guard_corpus.sh`, BUILD default m3b_merged12 — the
-> ##    overnight leg; the hui41 must-fire control is its liveness).
-> ## 2. `run_all_static.sh` full tier must read GREEN (the two
-> ##    formerly-expected-red gates re-pinned at the freeze).
-> ## 3. Tags `freeze/{donovan-m10,huitzil-m19,pyron-m13,merged-m5}` +
-> ##    the freeze commit (single commit, the 14z-99 style) if the
-> ##    session ended before they landed — check `git log`/`git tag`.
+> ## **EVERY FREEZE VERIFICATION LANDED GREEN** (all in-session):
+> ## dualtrack + FBNeo legacy oracle PASS on the new pair; battery
+> ## 23 PASS + wide-render direct PASS; audit_merged_legacy exit 0;
+> ## run_all_static **97/0/0**; the guard-corpus soak **316/316
+> ## clean, zero vectors** on merged-m5 (verdict map
+> ## build/guard_corpus/m3b_merged12.1787322215.tsv). Tags
+> ## `freeze/{donovan-m10,huitzil-m19,pyron-m13,merged-m5}` + the
+> ## freeze commit are in. Nothing pushed.
 >
 > ## **OPEN / CARRIED:** #109 closes on the maintainer's word (the fix
 > ## is field-confirmed; a positive-contact damage leg — P2 jumped into

@@ -70,8 +70,10 @@ held again), and m5_stock5 reproduces the phasec measurement exactly.
   formerly-expected-red gates (m3a_reproducible, phasec) are green on
   their re-frozen pins; the suite grew 96 -> 97
   (test_biased_list_inventory).
-- The guard-corpus soak (79 replays x 4 legs on merged-m5) runs
-  post-freeze — the overnight leg, kicked at the close.
+- The guard-corpus soak COMPLETED GREEN: **316/316 guarded runs,
+  zero vectors** on merged-m5 under every tenant forcing (verdict map
+  build/guard_corpus/m3b_merged12.1787322215.tsv). Every planned
+  verification of the 14z-102 freeze is now green.
 
 **Re-points executed with the freeze** (the #94 class, swept): pcrel
 [solo+merged] sections, bases.tsv, render-content D/H/P rows,
