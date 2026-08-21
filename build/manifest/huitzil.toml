@@ -1442,6 +1442,47 @@ old_hex = "00080b44"
 region = "x093460:0x0"
 note = "effect-class row 16 -> the ported vs2 row-16 handler family (the beam)"
 
+# ── 14z-102 THE CLONE-BEAM (GitHub #109): effect-class ROW 31 ───────────
+#
+# The 14z-71 header above says vsav ships rows 16/17/19/31 as stubs and
+# "vs2/vh2 fill 16/17/19" — CORRECTED 14z-102: vs2 AND vh2 both also
+# fill row 31 (vs2 0x0926E4, vh2 0x922F0). Row 31 is the DF clone-mode
+# BEAM EMITTER: the clone attack spawns per-frame beam objects
+# ($FFD600-family, alternating slots = the strobe that fakes
+# translucency) whose class-31 dispatch builds the beam-line composite
+# (16x1+4x1 strips, raw 0x0CD0, pal 05) + the dot pieces. Measured on
+# both legs with the same instrument as row 16 (o-space watch on each
+# leg's own slot): ours reads THE STUB at PC 0x080A9C constantly through
+# the mode; native reads its handler 405x/run, 34 in the beam window.
+# The sound fires and the muzzle-burst draws because those ride other
+# paths; ONLY this emitter is missing — which is why the maintainer
+# hears the beam and sees nothing (GitHub #109; the two intermediate
+# mechanism readings are retracted on the issue).
+#
+# SUPERSET-SAFE the same way row 16 was, and measured harder: 0 reads
+# of slot PRG:0x080B28 across 02/07/09/30 AND the two long mash
+# marathons 21_don_mash + 26_don_arcade_mash (the replays that broke
+# the type-6 deadness claim, 14z-89 — included on purpose), against a
+# 2418-hit row-0 control with the same instrument. old_hex pins the
+# slot to the stub so a moved table fails the build loudly.
+#
+# Everything downstream already ships: the line strips (anim 0x25201C
+# family), their composite (retyped 000C->0006), the frame table, the
+# line TILES (vs2 bank-1 0x14ED0 inside the 14z-83 strip_tiles span ->
+# group C), and palette row 05 (measured byte-identical to native at
+# beam time, untouched by the DF gold tint). The root's oracle: vh2
+# twin 0x922F0, 6/0x11E diff bytes, all reconciled operands (the anim
+# pointer + three +6 engine deltas). Gate:
+# tests/audit_clone_beam_lines.sh (EXPECT_LINES follows the fix;
+# burst-control must-fire in both modes).
+[[code_ptr]]
+stage = 4
+name = "beam_effect_class31"
+addr = 0x080B28
+old_hex = "00080b44"
+region = "x0926e4:0x0"
+note = "effect-class row 31 -> the ported vs2 row-31 handler family (the clone-mode beam emitter, GitHub #109)"
+
 # ── 14z-71 THE BEAM, stage 2: vsav's sprite-list drawer has no LIST TYPE 12
 #
 # Fixing the class-16 dispatch above exposed a SECOND, independent defect

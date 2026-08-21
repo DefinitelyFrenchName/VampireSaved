@@ -1,5 +1,43 @@
 # patch_notes — per-change detail: every byte, and why
 
+## 14z-102 — #109 THE CLONE-BEAM FIX (row 31; probe-verified, freeze pending)
+
+**`tools/build_donovan.sh`** — huitzil census root added:
+`0x926e4:0x11e:t0x922f0` — vs2's effect-class ROW-31 handler family
+(the DF clone-mode per-frame beam emitter, [0x926E4,0x92802) measured
+exactly; vh2 twin 0x922F0 diffs 6/0x11E bytes, all reconciled operands:
+the per-game anim pointer #$24EDD4 + engine helpers 0x13778/0x13724/
+0x1581A at the vh2 +6 delta — all three already verified reconciliation
+rows).
+
+**`build/manifest/huitzil.toml`** — `[[code_ptr]] beam_effect_class31`:
+4 bytes at vsavj `PRG:0x080B28` (effect-class table row 31), old
+`00080B44` (the stub) -> the placed root. The exact 14z-71
+beam_effect_class16 pattern. Superset evidence: 0 vanilla reads of the
+slot across 02/07/09/30 + BOTH long mash marathons (21_don_mash,
+26_don_arcade_mash — the replays that broke the type-6 deadness claim),
+2418-hit row-0 positive control, same instrument (o-space watch; the
+table is read pc-relatively).
+
+**Also corrected in place:** the 14z-71 claim "vs2/vh2 fill 16/17/19"
+(both manifests' comments) — vs2 AND vh2 also fill row 31.
+
+**Gate:** `tests/audit_clone_beam_lines.sh` (NEW) — df/100 every-frame
+dump over the beam window; EXPECT_LINES=0 froze the defect signature on
+merged-m4 (PASS before the fix landed), EXPECT_LINES=1 verifies the fix
+(16x1 line entries at pal 05/0c, group C 0x486D0/0x48790 = raw
+0x0CD0/0x0D90 + the takeover strip compose; burst-control must-fire in
+both modes; the every-frame dump is load-bearing — the lines strobe on
+alternating frames and single-frame dumps miss them).
+
+**Probe:** `build/hui_probe_row31` (`1a7249d6`) — beams VISIBLE
+(snapshots sent to the maintainer, green/blue strobe phases matching
+native). No other tenant moves. The rebuild of the four artifacts +
+merged and the re-freeze ride the window tail; NOTE FOR THE FREEZE: the
+root changes EXTRACTION, so the merged pipeline's pinned extract inputs
+must be regenerated deliberately (create-if-absent will NOT pick it up).
+
+
 ## 14z-102 — the #107 row flip (window step 1; freeze pending)
 
 **`build/manifest/reconciliation.toml`, ONE row:** `vsav2 0x0448a6` ->

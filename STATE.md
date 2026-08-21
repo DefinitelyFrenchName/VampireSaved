@@ -1,5 +1,69 @@
 # STATE — living progress log
 
+## Session 14z-102 (2) — #109 ROOT-CAUSED TO THE ROW AND FIXED AT PROBE
+## LEVEL: vsavj ships effect-class ROW 31 as a STUB, and row 31 is the
+## DF clone-mode BEAM EMITTER. One ported root + one code_ptr — the
+## 14z-71 row-16 pattern, second verse — and the beams RENDER.
+
+**The maintainer's rulings opened the work** (2026-08-21): gold tint
+KEPT (default; community research may revisit — the rehearsed neuter
+stays one line away), and GO on the palette-event hunt.
+
+**The hunt's own reversals, honestly:** the palette-line/fade theory
+DIED first (the "sweep" was the native stage's ambient palette cycler
+— writer 0x13AB4, 64 words/10 frames; ours runs a near-static venue;
+the fade steppers' beam-frame writes were boot-time screen fades; the
+$FFF400 header change was a red herring both instruments refused to
+attribute). What replaced it, each link measured:
+- The visible beams = 4px LINES that STROBE (on 3722/3728/3730, off
+  between — CPS-2 alternating-frame translucency), drawn by transient
+  **16x1+4x1 sprites `code=4ED0 pal 05 bank 1`** (raw 0x0CD0 + vs2
+  bias) — invisible to single-frame dumps because the dump reads the
+  LIVE list while the screen shows the LATCHED one (phase gotcha #2).
+- The line sprites are drawn by BEAM OBJECTS at $FFD600/$FFD700
+  (alternating slots, respawned per frame = the strobe), dispatched
+  through the effect-class pool with **class 31**. vs2 row 31 =
+  0x0926E4 (the emitter); **vsavj row 31 = THE STUB 0x080B44** — and
+  ours dispatches class 31 INTO IT constantly through the mode
+  (measured: slot reads at PC 0x080A9C, D0=0x7C, objects live;
+  native control: 405 reads/run, 34 in-beam). The 14z-101 "no new
+  pool objects" was wrong about this pool. Also corrected in place:
+  14z-71's "vs2/vh2 fill 16/17/19" — both also fill 31 (vh2 0x922F0).
+- Everything downstream ALREADY SHIPPED: the line strips (anim
+  0x25201C family), their composite (retyped 000C->0006, sweep-listed
+  as covered-children all along), the frame table with the strobe
+  flags, the line TILES (vs2 bank-1 0x14ED0, inside the 14z-83
+  strip_tiles span -> group C 0x86D0-region), palette row 05
+  (byte-identical to native at beam time, untouched by the DF tint).
+
+**The fix (committed; freeze rides the window tail):**
+`tools/build_donovan.sh` root `0x926e4:0x11e:t0x922f0` (vh2 oracle:
+6/0x11E diffs, ALL reconciled operands — the anim pointer + three +6
+engine deltas; helpers 0x13778/0x13724/0x1581A already mapped) +
+`huitzil.toml [[code_ptr]] beam_effect_class31` at PRG:0x080B28.
+Superset: slot measured DEAD in vanilla — 0 reads over 02/07/09/30
+**+ 21_don_mash + 26_don_arcade_mash** (the type-6-lesson marathons,
+included on purpose), 2418-hit row-0 control.
+
+**Verification (RH-43 order respected):**
+`tests/audit_clone_beam_lines.sh` (NEW) built FIRST and PASSED in
+defect mode on merged-m4 (burst-control 20, lines 0 — the frozen
+defect signature); probe `build/hui_probe_row31` (1a7249d6) built;
+fix mode PASS (14 line entries, group C 0x486D0/0x48790 = raw
+0x0CD0/0x0D90 + the takeover compose — the strip band already held
+the tiles); **snapshots show the beams RENDERING** (green/blue strobe
+phases, sent to the maintainer). Defect mode re-verified still-PASS
+on merged-m4 after the predicate fix (two line families: pal 05 AND
+pal 0c — the audit's first fix-mode run taught it).
+
+**Remaining for the window tail:** the close-range damage/hitstun A/B
+(the issue's verification pair — needs a close-range rig variant);
+rebuild all four + merged (**the root changes EXTRACTION — the merged
+pipeline's pinned extract inputs must be REGENERATED deliberately;
+create-if-absent will not pick the new root up**); full battery,
+run_suite, re-freeze m10/m19/m13/merged-m5 with the standard
+re-pointing; the B-sweep inventory freeze.
+
 ## Session 14z-102 — THE #107+#109 WINDOW OPENED ON THE MAINTAINER'S GO
 ## ("follow the plan"), AND #109's PREPPED MECHANISMS DIED BY MEASUREMENT
 ## IN THE FIRST INSTRUMENT RUN: the defect re-derived from scratch is a

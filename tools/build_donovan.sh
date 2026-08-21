@@ -204,6 +204,31 @@ case "$TENANT_CHAR" in
         # vhunt2 at the twin and carrying no pointer field, which is the
         # only condition under which `:f` copies unvalidated bytes safely.
         DEFAULT_ROOTS="$DEFAULT_ROOTS,0x93460:0x306:t0x9306c:f"
+        # 14z-102 THE CLONE-BEAM (GitHub #109): effect-class ROW 31's
+        # handler — the per-frame beam-object emitter Phobos' DF
+        # clone-mode attack dispatches ($FFD600-family objects, class 31,
+        # measured on both legs: ours reads the vsavj stub 0x080B44 at
+        # PC 0x080A9C constantly through the mode; native reads its
+        # 0x0926E4 405x/run, 34 in the beam window). The 14z-71 row-16
+        # comment above says "vs2 and vh2 fill 16/17/19" — CORRECTED
+        # 14z-102: both ALSO fill row 31 (vs2 0x0926E4, vh2 0x922F0);
+        # the row-16 census simply had no reason to look. Bound
+        # MEASURED: [0x926E4, 0x92802) = the family exactly — the
+        # 2-state head table (0x926F4), the velocity words
+        # (0x92750-56), the 2-way sub-table (0x9276A), every pc-rel
+        # target inside the span, ending on `jmp 0x1581A.l` with row
+        # 32's identically-shaped head (`movea.w $30(a6),a4`) at
+        # 0x92802. External refs: engine helpers 0x13778/0x13724/
+        # 0x1581A (all verified reconciliation rows) + anim operand
+        # #$24EDD4 (inside the ported anim region — placed-fixup).
+        # Twin 0x922F0 = vh2's OWN row-31 entry: 6/0x11E diff bytes,
+        # every one an operand (the anim pointer + three +6 engine
+        # deltas) — no `:f` needed, the boundary is clean.
+        # Downstream content pre-existing in the port: the line strips
+        # (anim 0x25201C family), the composite (retyped), the frame
+        # table, and the 16x1 line TILES (vs2 bank-1 0x14ED0, inside
+        # the 14z-83 strip_tiles span 0x4EA0-0x4FBF -> group C).
+        DEFAULT_ROOTS="$DEFAULT_ROOTS,0x926e4:0x11e:t0x922f0"
         # 14z-66 item 3: the vs2 JUMP-SEQ HANDLER BODY (sub-state
         # dispatcher 0x2592A + table 0x25936 + all five bodies, ends
         # before the 0x25D80 handler). vs2 rewrote the bodies into the
