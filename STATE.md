@@ -1,5 +1,35 @@
 # STATE — living progress log
 
+## Session 14z-102 (4) — #109-B CLOSED: every sweep candidate has a
+## measured verdict and the inventory is FROZEN AS A GATE. The
+## maintainer field-confirmed the beams on the merged probe.
+
+- **Field confirmation (maintainer, 2026-08-21):** the beams on
+  `build/merged_probe_row31` are good in hand — the freeze is
+  unblocked on their side.
+- **The B-sweep candidates, all dispositioned (their question):**
+  - hui anim `0x2499F0/0x249B18` — **FP** (anim-node stream misread
+    as list heads; the 0x25729A frame pointers run through them).
+  - don anim `0x28A300` — **FP**, same node-stream class
+    (0x29AF78/0x29AF34 pointers, zero-entry "head").
+  - `x2b7ef4 0x2BC09A/0x2BC0F8` — ONE shared item, not per-tenant
+    (the region ships in every tenant): REAL type-4 strips (11x tile
+    0x0090, flip pair) on a looping 6-node effect anim with no
+    static referent. **ACCEPTED-WITH-EVIDENCE:** reachability
+    measured — 321 type-4 dispatches on hui/83_hui_fx serve ONLY
+    vanilla lists 0x269034/0x2693AA; zero in-match dispatches on
+    df/100; zero on the pyron cosmo rig. If ever reached, the
+    failure is a bounded wrong-art draw at vanilla bank-1 0x13890
+    (valid list type — no over-index, no crash surface).
+  - The remaining "22 uncovered" were the tool's documented
+    hitbox/aux FP families; the covered-children include the
+    clone-beam line strips, which the row-31 fix now actually draws.
+- **The gate:** `tests/test_biased_list_inventory.sh` (NEW,
+  ci_static) — the filtered per-tenant inventory frozen with the
+  verdicts in its header; a new row or a status change fails loudly
+  (must-fire control verified: wrong placements -> exit 1, drift
+  named). BUILD_H defaults to the probe — re-point at the freeze.
+
 ## Session 14z-102 (3) — the window tail REHEARSED to the merged probe:
 ## the fix works on the merged composition; the freeze awaits the
 ## maintainer's in-hand beam confirmation
