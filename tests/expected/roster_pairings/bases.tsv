@@ -6,8 +6,12 @@
 # TENANT ROWS MOVE WITH FREEZES (measured 2026-08-20, the #94
 # reference-rot class caught live): the 14z-99 window's capture_kf
 # insertions relocated the H/P blocks (phobos 0x4477b0 -> 0x4594a0,
-# pyron 0x49ab7c -> 0x4ac7dc; donovan held at 0x3fa9d0). Rows below are
-# merged-m4 (build/m3b_merged11, 2343607a). RE-DERIVE the three tenant
+# pyron 0x49ab7c -> 0x4ac7dc; donovan held at 0x3fa9d0). RE-DERIVED
+# 14z-102 (the #109 row-31 root shifted every hui placement, and pyron
+# sits after huitzil in the merged layout: phobos -> 0x4595a0, pyron ->
+# 0x4ac8dc, both +0x100; donovan held; legacy rows byte-identical
+# again). Rows below are merged-m5 (build/m3b_merged12, 393f92a5).
+# RE-DERIVE the three tenant
 # rows at every freeze — 8 lines of python in audit_continue_switch.sh
 # do it from prg/vm3j.04d @ 0x3D97A (LE-word swapped, 32 .l entries),
 # verified against live +0x60.l observations this session.
@@ -27,6 +31,6 @@
 0x0E	lilith	0x000ae9d4
 0x0F	jedah	0x000b0d2e
 0x18	oboro	0x000b3450
-0x10	phobos	0x004594a0
-0x11	pyron	0x004ac7dc
+0x10	phobos	0x004595a0
+0x11	pyron	0x004ac8dc
 0x13	donovan	0x003fa9d0

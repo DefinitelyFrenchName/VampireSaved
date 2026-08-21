@@ -1,5 +1,87 @@
 # STATE — living progress log
 
+## Session 14z-102 FREEZE — THE #107+#109 WINDOW EXECUTED END TO END:
+## donovan-m10 / huitzil-m19 / pyron-m13 / merged-m5. Every gate that
+## has finished is GREEN; the corpus soak and battery tail run at close.
+
+**Maintainer "go" 2026-08-21 ("tint is good, projectile collisions seem
+good, we can freeze"); the #109 fix was FIELD-CONFIRMED on the
+rehearsal probe BEFORE the freeze; gold tint KEPT (their ruling).**
+
+**The new reference state:**
+| artifact | build dir | fingerprint | ops |
+|---|---|---|---|
+| donovan-m10 | build/don_m10 | c6a02cb0 | 323 |
+| donovan-m10-stock | build/m5_stock5 | 883e7d17 | — |
+| donovan-m10-stage4 | build/don_m10_s4 | d32059e1 | — |
+| huitzil-m19 | build/hui46 | 1a7249d6 | 363 |
+| pyron-m13 | build/pyron30 | dbce705b | 296 |
+| merged-m5 | build/m3b_merged12 | 393f92a5 | 804 |
+
+**hui46 and m3b_merged12 are BIT-FOR-BIT the rehearsed probes**
+(hui_probe_row31 / merged_probe_row31 — the 14z-99 rehearsal pattern
+held again), and m5_stock5 reproduces the phasec measurement exactly.
+
+**What landed (both committed pre-freeze as W1/W2/W3):**
+- (#107) reconciliation row 0x0448a6 -> 0x04367a — verified,
+  callsite-anchored, re-derived at the flip. Rides the SHARED map:
+  every tenant + stock moved (delta per artifact: vm3j.04d only).
+- (#109) THE CLONE-BEAM FIX — effect-class ROW 31 (vsavj stub; the DF
+  clone-mode per-frame beam emitter) ported: root 0x926e4:0x11e:t0x922f0
+  + beam_effect_class31 code_ptr at PRG:0x080B28. The root changed
+  EXTRACTION (hui32/extract regenerated, old kept extract.pre-14z102;
+  hui placements shifted; op counts re-frozen 363 / 598/648 / 804/901;
+  tenant bases re-derived phobos 0x4595a0 / pyron 0x4ac8dc, +0x100).
+
+**The freeze verification, everything finished so far GREEN:**
+- run_suite x6 (freeze + verify for don_m10 / hui46 / pyron30): SUITE
+  GREEN every pass — every legacy masked replay on its EXACT frozen
+  class, including hui46 whose placements all moved.
+- test_m3a_reproducible: all five artifacts rebuild bit-exact;
+  whole-artifact manifests re-frozen AFTER member-digest diffs named
+  every delta (program members only — no gfx/QSound member moved).
+- Merged gates: trap parity, FG parity, select-bank gates,
+  render-content (bands byte-equal to the NEW solos, poison controls
+  fired) — all PASS.
+- audit_clone_beam_lines: defect signature was frozen on merged-m4
+  BEFORE the fix; fix-mode PASS on hui46-class and merged-m5-class
+  images; default now EXPECT_LINES=1.
+- test_pcrel_escapes: 69/10/10 inventories UNCHANGED across the
+  extraction shift (source-side keys held); merged legs identical to
+  solos; wrong-suffix must-fire control alive.
+- test_tenant_loop: PASS end to end on the re-frozen op counts.
+- test_biased_list_inventory (NEW, ci_static): the #109-B sweep
+  verdicts frozen; must-fire control verified.
+- test_dualtrack PASS on the new pair (m5_stock5 + don_m10; frozen
+  onsets held); test_fbneo_legacy_oracle PASS on don_m10 (frozen
+  offset inventories held).
+- run_battery_m2: FAILED FIRST at test_thunk_addr_literal — the gate's
+  huitzil leg pinned build/hui27/extract (ancient; predates the #109
+  root's region -> generation refuses). THE #94 ROT CLASS, caught by
+  the battery exactly as designed; re-pointed to hui46/extract with a
+  re-point-on-new-root note, gate PASS. Battery rerun: 23 PASS + the
+  wide-render gate (self-skips on the stock outbase) run directly on
+  the m5_stock5/don_m10 pair — PASS. Effective 24/24.
+- audit_merged_legacy: exit 0 with the pass epilogue (leg a on the
+  merged1 class table, leg b guard-clean vs the frozen solos). The
+  per-leg counts were lost to a tail-only capture — honest limit of
+  this record; the audit's own exit is the verdict.
+- run_all_static FULL: **PASS 97 / SKIP 0 / FAIL 0** — the two
+  formerly-expected-red gates (m3a_reproducible, phasec) are green on
+  their re-frozen pins; the suite grew 96 -> 97
+  (test_biased_list_inventory).
+- The guard-corpus soak (79 replays x 4 legs on merged-m5) runs
+  post-freeze — the overnight leg, kicked at the close.
+
+**Re-points executed with the freeze** (the #94 class, swept): pcrel
+[solo+merged] sections, bases.tsv, render-content D/H/P rows,
+tripwire-reach builds, guard-corpus/projectile-clash/beam-lines BUILD
+defaults, biased-list BUILD defaults, the FBNeo oracle build, phasec's
+stock pin, m3a pins + whole-artifact manifests, HANDOFF (current-builds
+block + registry-table row + run_wide line), patch_index rows.
+
+**PLAY: `tools/run_wide.sh build/m3b_merged12 fbneo`.**
+
 ## Session 14z-102 (4) — #109-B CLOSED: every sweep candidate has a
 ## measured verdict and the inventory is FROZEN AS A GATE. The
 ## maintainer field-confirmed the beams on the merged probe.

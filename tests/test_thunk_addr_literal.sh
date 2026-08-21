@@ -78,7 +78,11 @@ PY
 echo "== section 0: the guard is QUIET on all three real manifests =="
 # The load-bearing half. A guard that fires on correct input is worse than no
 # guard, and the three frozen tenants are the only real corpus there is.
-for t in donovan:build/m5_wide huitzil:build/hui27 pyron:build/pyron21; do
+# huitzil re-pointed hui27 -> hui46 at 14z-102: the #109 root added region
+# x0926e4 to extraction, and an extract that predates a manifest's regions
+# fails generation outright (the battery caught it — the #94 rot class).
+# RE-POINT the huitzil leg whenever the census gains a root.
+for t in donovan:build/m5_wide huitzil:build/hui46 pyron:build/pyron21; do
     nm=${t%%:*}; bd=${t##*:}
     if [ ! -d "$bd/extract" ]; then
         echo "  SKIP: $nm (no $bd/extract)"; continue

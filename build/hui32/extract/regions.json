@@ -36,6 +36,7 @@
   "x0692f6": 52,
   "x06965e": 52,
   "x093460": -1012,
+  "x0926e4": -1012,
   "x02592a": 46,
   "x022400": 46,
   "x06cac0": 372,
@@ -65759,6 +65760,42 @@
    "variant_sites": [],
    "charid_sites": [],
    "sha1": "bee6f889170d0c7fc42cf558f7da7eab337efbdc"
+  },
+  "x0926e4": {
+   "src": 599780,
+   "orc": 598768,
+   "len": 256,
+   "grow": 286,
+   "kind": "code",
+   "shift": "x0926e4",
+   "refs": [
+    {
+     "off": 178,
+     "width": 32,
+     "target": 2420180,
+     "shift": "anim",
+     "class": "internal"
+    },
+    {
+     "off": 184,
+     "width": 32,
+     "target": 79736,
+     "orc_target": 79742,
+     "shift": "engine",
+     "class": "engine"
+    },
+    {
+     "off": 232,
+     "width": 32,
+     "target": 79652,
+     "orc_target": 79658,
+     "shift": "engine",
+     "class": "engine"
+    }
+   ],
+   "variant_sites": [],
+   "charid_sites": [],
+   "sha1": "2b32c68ce506a1e90d2c205c2440c201f3920a75"
   },
   "x02592a": {
    "src": 153898,

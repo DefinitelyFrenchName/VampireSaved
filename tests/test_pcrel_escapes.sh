@@ -36,7 +36,7 @@ rc=0
 python3 - <<'PY' || rc=1
 import os, re, subprocess, sys
 
-BUILDS = ["hui45", "pyron29", "don_m9"]  # re-pointed 14z-100 (inventories measured identical)
+BUILDS = ["hui46", "pyron30", "don_m10"]  # re-pointed 14z-102 (the window freeze; hui re-measured across the #109 extraction shift — inventory unchanged, source-side keys)
 present = [b for b in BUILDS if os.path.isdir(f"build/{b}/rompath")]
 if not present:
     print("SKIP: none of the three tenant builds are on disk")

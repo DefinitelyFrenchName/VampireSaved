@@ -36,6 +36,9 @@ cd "$REPO"
 #   a054de5c  14z-91 — the legacy-regression fix, which is NOT profile-gated,
 #             so all four builds moved — HANDOFF:184 "stock twin
 #             build/m5_stock2 (a054de5c)"
+#   16da59b6  14z-99 — #103's pcrel rows, not profile-gated
+#   883e7d17  14z-102 — #107's reconciliation row flip, shared map, not
+#             profile-gated (donovan-m10-stock, build/m5_stock5)
 #
 # The gate's standing warning below — "The refactor MOVED PORTED BYTES. Do NOT
 # re-freeze to pass" — is aimed at a refactor silently moving bytes, which is
@@ -48,7 +51,7 @@ cd "$REPO"
 # profile-gated (the stock track carries donovan's regions and gets the
 # arcade-death-stall fix too). Ratified byte movement, not a refactor —
 # the "do NOT re-freeze to pass" warning above targets inert refactors.
-EXPECT="${1:-16da59b6b29f4082b69c06d3e662843af4d00cc3}"
+EXPECT="${1:-883e7d17405baf462c9763eccde4e35bf93adecb}"
 WORK="$(mktemp -d)"
 trap 'rm -rf "$WORK"' EXIT
 fail=0

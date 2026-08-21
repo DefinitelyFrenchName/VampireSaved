@@ -25,6 +25,11 @@
 # fixed in 14z-69i — is absent from this inventory. The instrument
 # distinguishes fixed from broken; it is the VERDICT that needed a baseline.
 
+# RE-POINTED 14z-102 (the window freeze): hui45/pyron29/don_m9 ->
+# hui46/pyron30/don_m10, merged m3b_merged11 -> m3b_merged12. The hui
+# inventory is re-measured at this freeze (the #109 root shifted every
+# hui placement; keys are source-side so the expectation is UNCHANGED —
+# the gate verifies).
 # RE-POINTED 14z-100 (2026-08-20): sections renamed hui43/pyron27/don_m7 ->
 # hui45/pyron29/don_m9 at the hardening pass. MEASURED before renaming: the
 # three inventories are IDENTICAL on the new builds (69/10/10, zero added,
@@ -32,7 +37,7 @@
 # KNOWN GAP, recorded: the MERGED image is outside this freeze entirely
 # (no build/m3b_merged11/extract; verify_pcrel_data needs an external
 # extract + merged placements to cover it). See hardening_register.md.
-[hui45]
+[hui46]
 unresolved = 69
 resolved = 0
 escapes = [
@@ -107,7 +112,7 @@ escapes = [
   "x028122 0x028c98 -> 0x029034",
 ]
 
-[pyron29]
+[pyron30]
 unresolved = 10
 resolved = 0
 escapes = [
@@ -123,7 +128,7 @@ escapes = [
   "x088512 0x08c038 -> 0x08c0a2",
 ]
 
-[don_m9]
+[don_m10]
 unresolved = 10
 resolved = 0
 escapes = [
@@ -153,19 +158,19 @@ escapes = [
 # both together (the #94 reference-rot class).
 
 [merged_don]
-build = "m3b_merged11"
-extract = "build/don_m9/extract"
+build = "m3b_merged12"
+extract = "build/don_m10/extract"
 placement_suffix = ""
-same_as = "don_m9"
+same_as = "don_m10"
 
 [merged_hui]
-build = "m3b_merged11"
-extract = "build/hui45/extract"
+build = "m3b_merged12"
+extract = "build/hui46/extract"
 placement_suffix = "@huitzil"
-same_as = "hui45"
+same_as = "hui46"
 
 [merged_pyr]
-build = "m3b_merged11"
-extract = "build/pyron29/extract"
+build = "m3b_merged12"
+extract = "build/pyron30/extract"
 placement_suffix = "@pyron"
-same_as = "pyron29"
+same_as = "pyron30"

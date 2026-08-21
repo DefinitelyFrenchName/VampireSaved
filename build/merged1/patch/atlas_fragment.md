@@ -155,114 +155,115 @@
 | `PRG:0x427500` | 0x100 | VS2 | donovan x06965e (vsav2 0x06965E) |
 | `PRG:0x427600` | 0xF1C | VS2 | donovan x06cac0 (vsav2 0x06CAC0) |
 | `PRG:0x428520` | 0x3B98 | VS2 | donovan x088512 (vsav2 0x088512) |
-| `PRG:0x42C0C0` | 0x306 | VS2 | donovan x093460 (vsav2 0x093460) |
-| `PRG:0x42C3D0` | 0x1E800 | VS2 | donovan anim (vsav2 0x245872) |
-| `PRG:0x44ABD0` | 0x190 | VS2 | donovan aux0_0 (vsav2 0x334170) |
-| `PRG:0x44AD60` | 0xE620 | VS2 | donovan aux0_1 (vsav2 0x336560) |
-| `PRG:0x459380` | 0x32B2 | VS2 | donovan hitbox (vsav2 0x0C4250) |
-| `PRG:0x45C640` | 0x3C6 | VS2 | donovan hitbox_proj (vsav2 0x0D05C0) |
-| `PRG:0x45CA10` | 0x900 | VS2 | donovan x0d143e (vsav2 0x0D143E) |
-| `PRG:0x45D310` | 0xB20C | VS2 | donovan x2b7ef4 (vsav2 0x2B7EF4) |
+| `PRG:0x42C0C0` | 0x100 | VS2 | donovan x0926e4 (vsav2 0x0926E4) |
+| `PRG:0x42C1C0` | 0x306 | VS2 | donovan x093460 (vsav2 0x093460) |
+| `PRG:0x42C4D0` | 0x1E800 | VS2 | donovan anim (vsav2 0x245872) |
+| `PRG:0x44ACD0` | 0x190 | VS2 | donovan aux0_0 (vsav2 0x334170) |
+| `PRG:0x44AE60` | 0xE620 | VS2 | donovan aux0_1 (vsav2 0x336560) |
+| `PRG:0x459480` | 0x32B2 | VS2 | donovan hitbox (vsav2 0x0C4250) |
+| `PRG:0x45C740` | 0x3C6 | VS2 | donovan hitbox_proj (vsav2 0x0D05C0) |
+| `PRG:0x45CB10` | 0x900 | VS2 | donovan x0d143e (vsav2 0x0D143E) |
+| `PRG:0x45D410` | 0xB20C | VS2 | donovan x2b7ef4 (vsav2 0x2B7EF4) |
 | `PRG:0x3FFF90` | 0xC | GEN | farm-port stub 0x2916c |
 | `PRG:0x3FFFB0` | 0xC | GEN | farm-port stub 0x29184 |
 | `PRG:0x3FFFD0` | 0xC | GEN | farm-port stub 0x2918c |
-| `PRG:0x468520` | 0x2C | GEN | alloc wrapper 0x15702 |
+| `PRG:0x468620` | 0x2C | GEN | alloc wrapper 0x15702 |
 | `PRG:0x3FFFE0` | 0x1C | GEN | sound stub 0x4ddc id 0x84 |
-| `PRG:0x468550` | 0x1C | GEN | sound stub 0x4f48 id 0x8b |
-| `PRG:0x468570` | 0x1C | GEN | sound stub 0x4e92 id 0x93 |
-| `PRG:0x468590` | 0x1C | GEN | sound stub 0x4ec6 id 0x95 |
-| `PRG:0x4685B0` | 0x1C | GEN | sound stub 0x4e10 id 0x85 |
-| `PRG:0x4685D0` | 0x1C | GEN | sound stub 0x4e5e id 0x91 |
-| `PRG:0x4685F0` | 0x1C | GEN | sound stub 0x4e78 id 0x92 |
-| `PRG:0x468610` | 0xE | GEN | owner-tag thunk huitzil |
-| `PRG:0x468620` | 0xE | GEN | owner-tag thunk huitzil |
-| `PRG:0x468630` | 0xE | GEN | owner-tag thunk huitzil |
-| `PRG:0x468640` | 0xE | GEN | owner-tag thunk huitzil |
-| `PRG:0x468650` | 0xE | GEN | owner-tag thunk huitzil |
-| `PRG:0x468660` | 0x10 | VS2 | data_in_code table (FG capture-pose random table (native draws seqs 1/3/5)) |
-| `PRG:0x468670` | 0xC | GEN | data_in_code helper (FG capture-pose random table (native draws seqs 1/3/5)) |
-| `PRG:0x468680` | 0x10 | VS2 | data_in_code table (FG capture-pose table 2 (seqs 0x56-0x59)) |
-| `PRG:0x468690` | 0xC | GEN | data_in_code helper (FG capture-pose table 2 (seqs 0x56-0x59)) |
-| `PRG:0x4686A0` | 0x10 | VS2 | data_in_code table (capture-pose table 3 (seqs 0x56-0x59 twin)) |
-| `PRG:0x4686B0` | 0xC | GEN | data_in_code helper (capture-pose table 3 (seqs 0x56-0x59 twin)) |
-| `PRG:0x4686C0` | 0x10 | VS2 | data_in_code table (capture-pose table 4 (01/03/05 twin)) |
-| `PRG:0x4686D0` | 0xC | GEN | data_in_code helper (capture-pose table 4 (01/03/05 twin)) |
-| `PRG:0x468810` | 0x2C | GEN | alloc wrapper 0x1572e |
-| `PRG:0x468850` | 0xC | GEN | farm-port stub 0x2915c |
-| `PRG:0x468870` | 0xC | GEN | farm-port stub 0x29164 |
-| `PRG:0x468880` | 0x1C | GEN | sound stub 0x4f96 id 0xa1 |
-| `PRG:0x4688D0` | 0xE | GEN | owner-tag thunk huitzil |
-| `PRG:0x4688E0` | 0xE | GEN | owner-tag thunk huitzil |
-| `PRG:0x4688F0` | 0xE | GEN | owner-tag thunk huitzil |
-| `PRG:0x468900` | 0xE | GEN | owner-tag thunk huitzil |
-| `PRG:0x468910` | 0xE | GEN | owner-tag thunk huitzil |
-| `PRG:0x468920` | 0xE | GEN | owner-tag thunk huitzil |
-| `PRG:0x468930` | 0xE | GEN | owner-tag thunk huitzil |
-| `PRG:0x468940` | 0xE | GEN | owner-tag thunk huitzil |
-| `PRG:0x468950` | 0xE | GEN | owner-tag thunk huitzil |
-| `PRG:0x468960` | 0xE | GEN | owner-tag thunk huitzil |
-| `PRG:0x468970` | 0xE | GEN | owner-tag thunk huitzil |
-| `PRG:0x4689C0` | 0xE | GEN | owner-tag thunk huitzil |
-| `PRG:0x4689D0` | 0x1C | GEN | sound stub 0x4fb0 id 0xa0 |
-| `PRG:0x4689F0` | 0x1C | GEN | sound stub 0x4fca id 0xa5 |
-| `PRG:0x468A10` | 0x1C | GEN | sound stub 0x4f2e id 0x199 |
-| `PRG:0x468A30` | 0x1C | GEN | sound stub 0x4efa id 0x90 |
-| `PRG:0x468A50` | 0x40 | GEN | patched clone 0x5459a (vs2 0x5c77e) |
-| `PRG:0x468A90` | 0x1C | GEN | sound stub 0x4f62 id 0x7f |
-| `PRG:0x468AB0` | 0xE | GEN | owner-tag thunk huitzil |
+| `PRG:0x468650` | 0x1C | GEN | sound stub 0x4f48 id 0x8b |
+| `PRG:0x468670` | 0x1C | GEN | sound stub 0x4e92 id 0x93 |
+| `PRG:0x468690` | 0x1C | GEN | sound stub 0x4ec6 id 0x95 |
+| `PRG:0x4686B0` | 0x1C | GEN | sound stub 0x4e10 id 0x85 |
+| `PRG:0x4686D0` | 0x1C | GEN | sound stub 0x4e5e id 0x91 |
+| `PRG:0x4686F0` | 0x1C | GEN | sound stub 0x4e78 id 0x92 |
+| `PRG:0x468710` | 0xE | GEN | owner-tag thunk huitzil |
+| `PRG:0x468720` | 0xE | GEN | owner-tag thunk huitzil |
+| `PRG:0x468730` | 0xE | GEN | owner-tag thunk huitzil |
+| `PRG:0x468740` | 0xE | GEN | owner-tag thunk huitzil |
+| `PRG:0x468750` | 0xE | GEN | owner-tag thunk huitzil |
+| `PRG:0x468760` | 0x10 | VS2 | data_in_code table (FG capture-pose random table (native draws seqs 1/3/5)) |
+| `PRG:0x468770` | 0xC | GEN | data_in_code helper (FG capture-pose random table (native draws seqs 1/3/5)) |
+| `PRG:0x468780` | 0x10 | VS2 | data_in_code table (FG capture-pose table 2 (seqs 0x56-0x59)) |
+| `PRG:0x468790` | 0xC | GEN | data_in_code helper (FG capture-pose table 2 (seqs 0x56-0x59)) |
+| `PRG:0x4687A0` | 0x10 | VS2 | data_in_code table (capture-pose table 3 (seqs 0x56-0x59 twin)) |
+| `PRG:0x4687B0` | 0xC | GEN | data_in_code helper (capture-pose table 3 (seqs 0x56-0x59 twin)) |
+| `PRG:0x4687C0` | 0x10 | VS2 | data_in_code table (capture-pose table 4 (01/03/05 twin)) |
+| `PRG:0x4687D0` | 0xC | GEN | data_in_code helper (capture-pose table 4 (01/03/05 twin)) |
+| `PRG:0x468910` | 0x2C | GEN | alloc wrapper 0x1572e |
+| `PRG:0x468950` | 0xC | GEN | farm-port stub 0x2915c |
+| `PRG:0x468970` | 0xC | GEN | farm-port stub 0x29164 |
+| `PRG:0x468980` | 0x1C | GEN | sound stub 0x4f96 id 0xa1 |
+| `PRG:0x4689D0` | 0xE | GEN | owner-tag thunk huitzil |
+| `PRG:0x4689E0` | 0xE | GEN | owner-tag thunk huitzil |
+| `PRG:0x4689F0` | 0xE | GEN | owner-tag thunk huitzil |
+| `PRG:0x468A00` | 0xE | GEN | owner-tag thunk huitzil |
+| `PRG:0x468A10` | 0xE | GEN | owner-tag thunk huitzil |
+| `PRG:0x468A20` | 0xE | GEN | owner-tag thunk huitzil |
+| `PRG:0x468A30` | 0xE | GEN | owner-tag thunk huitzil |
+| `PRG:0x468A40` | 0xE | GEN | owner-tag thunk huitzil |
+| `PRG:0x468A50` | 0xE | GEN | owner-tag thunk huitzil |
+| `PRG:0x468A60` | 0xE | GEN | owner-tag thunk huitzil |
+| `PRG:0x468A70` | 0xE | GEN | owner-tag thunk huitzil |
 | `PRG:0x468AC0` | 0xE | GEN | owner-tag thunk huitzil |
+| `PRG:0x468AD0` | 0x1C | GEN | sound stub 0x4fb0 id 0xa0 |
+| `PRG:0x468AF0` | 0x1C | GEN | sound stub 0x4fca id 0xa5 |
+| `PRG:0x468B10` | 0x1C | GEN | sound stub 0x4f2e id 0x199 |
+| `PRG:0x468B30` | 0x1C | GEN | sound stub 0x4efa id 0x90 |
+| `PRG:0x468B50` | 0x40 | GEN | patched clone 0x5459a (vs2 0x5c77e) |
+| `PRG:0x468B90` | 0x1C | GEN | sound stub 0x4f62 id 0x7f |
+| `PRG:0x468BB0` | 0xE | GEN | owner-tag thunk huitzil |
+| `PRG:0x468BC0` | 0xE | GEN | owner-tag thunk huitzil |
 | `PRG:0x4282A8` | 0x274 | VS2 | x06cac0 raw pc-rel data tables |
-| `PRG:0x468B60` | 0x1C | GEN | sound stub 0x50ee id 0x7e |
-| `PRG:0x468B80` | 0x1C | GEN | sound stub 0x50a0 id 0x7b |
-| `PRG:0x468BA0` | 0x1C | GEN | sound stub 0x50d4 id 0x7d |
-| `PRG:0x468BC0` | 0x1C | GEN | sound stub 0x50ba id 0x7c |
-| `PRG:0x468BE0` | 0x1C | GEN | sound stub 0x4e2a id 0x8f |
-| `PRG:0x468C00` | 0x1C | GEN | sound stub 0x4df6 id 0x86 |
-| `PRG:0x468C40` | 0xE | GEN | owner-tag thunk huitzil |
-| `PRG:0x468C50` | 0xE | GEN | owner-tag thunk huitzil |
-| `PRG:0x468C60` | 0x100 | VS2 | data_in_code table (pod-zone word offset/record table (a3 re-derived from it; self-relative)) |
-| `PRG:0x468D60` | 0xC | GEN | data_in_code helper (pod-zone word offset/record table (a3 re-derived from it; self-relative)) |
+| `PRG:0x468C60` | 0x1C | GEN | sound stub 0x50ee id 0x7e |
+| `PRG:0x468C80` | 0x1C | GEN | sound stub 0x50a0 id 0x7b |
+| `PRG:0x468CA0` | 0x1C | GEN | sound stub 0x50d4 id 0x7d |
+| `PRG:0x468CC0` | 0x1C | GEN | sound stub 0x50ba id 0x7c |
+| `PRG:0x468CE0` | 0x1C | GEN | sound stub 0x4e2a id 0x8f |
+| `PRG:0x468D00` | 0x1C | GEN | sound stub 0x4df6 id 0x86 |
+| `PRG:0x468D40` | 0xE | GEN | owner-tag thunk huitzil |
+| `PRG:0x468D50` | 0xE | GEN | owner-tag thunk huitzil |
+| `PRG:0x468D60` | 0x100 | VS2 | data_in_code table (pod-zone word offset/record table (a3 re-derived from it; self-relative)) |
+| `PRG:0x468E60` | 0xC | GEN | data_in_code helper (pod-zone word offset/record table (a3 re-derived from it; self-relative)) |
 | `PRG:0x42C098` | 0x20 | VS2 | x088512 raw pc-rel data tables |
-| `PRG:0x468E00` | 0x2C48 | VS2 | companion-effect coord lists |
-| `PRG:0x46BA50` | 0x500 | VS2 | sprite palette block |
-| `PRG:0x46BF50` | 0xDC0 | VS2 | effect palette block |
-| `PRG:0x46CD10` | 0x1D80 | VS2 | data_port grab_hold_keyframes placed block (vsav2 0xc56aa) |
+| `PRG:0x468F00` | 0x2C48 | VS2 | companion-effect coord lists |
+| `PRG:0x46BB50` | 0x500 | VS2 | sprite palette block |
+| `PRG:0x46C050` | 0xDC0 | VS2 | effect palette block |
+| `PRG:0x46CE10` | 0x1D80 | VS2 | data_port grab_hold_keyframes placed block (vsav2 0xc56aa) |
 | `PRG:0x00B668` | 0x40 | VS2 | data_port voice_borrow_candidates_a (vsav2 0x9f2a) |
 | `PRG:0x00BF68` | 0x40 | VS2 | data_port voice_borrow_voicenums_b (vsav2 0xa82a) |
-| `PRG:0x46EA90` | 0xC0 | VS2 | sound_table hui_sfx_records (vsav2 0xc742a, id-allowlisted) |
-| `PRG:0x46EB50` | 0x1C | VS2 | select_records portrait/p1 coord list |
-| `PRG:0x46EB70` | 0x26 | VS2 | select_records portrait/p1 record |
-| `PRG:0x46EBA0` | 0x1C | VS2 | select_records portrait/p2 coord list |
-| `PRG:0x46EBC0` | 0x26 | VS2 | select_records portrait/p2 record |
-| `PRG:0x46EBF0` | 0x4 | VS2 | select_records name_banner/p1 coord list |
-| `PRG:0x46EC00` | 0xE | VS2 | select_records name_banner/p1 record |
-| `PRG:0x46EC10` | 0x8 | VS2 | select_records name_banner/p2 coord list |
-| `PRG:0x46EC20` | 0x12 | VS2 | select_records name_banner/p2 record |
-| `PRG:0x46EC40` | 0x14 | VS2 | select_records splash_p1/p1 coord list |
-| `PRG:0x46EC60` | 0x1E | VS2 | select_records splash_p1/p1 record |
-| `PRG:0x46EC80` | 0x14 | VS2 | select_records splash_p2/p1 coord list |
-| `PRG:0x46ECA0` | 0x1E | VS2 | select_records splash_p2/p1 record |
-| `PRG:0x46ECC0` | 0x84 | VS2 | select_records win_quote/p1 coord list |
-| `PRG:0x46ED50` | 0x8E | VS2 | select_records win_quote/p1 record |
-| `PRG:0x46EDE0` | 0x1A | GEN | site_thunk tenant_jump_seq |
+| `PRG:0x46EB90` | 0xC0 | VS2 | sound_table hui_sfx_records (vsav2 0xc742a, id-allowlisted) |
+| `PRG:0x46EC50` | 0x1C | VS2 | select_records portrait/p1 coord list |
+| `PRG:0x46EC70` | 0x26 | VS2 | select_records portrait/p1 record |
+| `PRG:0x46ECA0` | 0x1C | VS2 | select_records portrait/p2 coord list |
+| `PRG:0x46ECC0` | 0x26 | VS2 | select_records portrait/p2 record |
+| `PRG:0x46ECF0` | 0x4 | VS2 | select_records name_banner/p1 coord list |
+| `PRG:0x46ED00` | 0xE | VS2 | select_records name_banner/p1 record |
+| `PRG:0x46ED10` | 0x8 | VS2 | select_records name_banner/p2 coord list |
+| `PRG:0x46ED20` | 0x12 | VS2 | select_records name_banner/p2 record |
+| `PRG:0x46ED40` | 0x14 | VS2 | select_records splash_p1/p1 coord list |
+| `PRG:0x46ED60` | 0x1E | VS2 | select_records splash_p1/p1 record |
+| `PRG:0x46ED80` | 0x14 | VS2 | select_records splash_p2/p1 coord list |
+| `PRG:0x46EDA0` | 0x1E | VS2 | select_records splash_p2/p1 record |
+| `PRG:0x46EDC0` | 0x84 | VS2 | select_records win_quote/p1 coord list |
+| `PRG:0x46EE50` | 0x8E | VS2 | select_records win_quote/p1 record |
+| `PRG:0x46EEE0` | 0x1A | GEN | site_thunk tenant_jump_seq |
 | `PRG:0x022A0E` | 0x6 | GEN | site_thunk tenant_jump_seq engine site |
-| `PRG:0x46EE00` | 0xE | GEN | site_thunk shadow_seq_guard |
+| `PRG:0x46EF00` | 0xE | GEN | site_thunk shadow_seq_guard |
 | `PRG:0x08245C` | 0x6 | GEN | site_thunk shadow_seq_guard engine site |
-| `PRG:0x46EE10` | 0x140 | VS2 | site_thunk select_pal_variant_id data block |
-| `PRG:0x46EF50` | 0x54 | VS2 | site_thunk throw_arc_tables data block |
-| `PRG:0x46EFB0` | 0x370 | VS2 | site_thunk throw_arc_tables data block |
-| `PRG:0x46F320` | 0x42 | GEN | site_thunk throw_arc_tables |
+| `PRG:0x46EF10` | 0x140 | VS2 | site_thunk select_pal_variant_id data block |
+| `PRG:0x46F050` | 0x54 | VS2 | site_thunk throw_arc_tables data block |
+| `PRG:0x46F0B0` | 0x370 | VS2 | site_thunk throw_arc_tables data block |
+| `PRG:0x46F420` | 0x42 | GEN | site_thunk throw_arc_tables |
 | `PRG:0x028386` | 0x6 | GEN | site_thunk throw_arc_tables engine site |
-| `PRG:0x46F370` | 0xE | GEN | site_thunk idmask_victim_spawn |
+| `PRG:0x46F470` | 0xE | GEN | site_thunk idmask_victim_spawn |
 | `PRG:0x060EF0` | 0x6 | GEN | site_thunk idmask_victim_spawn engine site |
-| `PRG:0x46F380` | 0x10 | GEN | site_thunk idmask_piece_subtype |
+| `PRG:0x46F480` | 0x10 | GEN | site_thunk idmask_piece_subtype |
 | `PRG:0x05E7D6` | 0x6 | GEN | site_thunk idmask_piece_subtype engine site |
-| `PRG:0x46F390` | 0x100 | VS2 | site_thunk df_gold_variant_id data block |
-| `PRG:0x46F490` | 0x54 | GEN | site_thunk df_gold_variant_id |
+| `PRG:0x46F490` | 0x100 | VS2 | site_thunk df_gold_variant_id data block |
+| `PRG:0x46F590` | 0x54 | GEN | site_thunk df_gold_variant_id |
 | `PRG:0x02A8D6` | 0x6 | GEN | site_thunk df_gold_variant_id engine site |
-| `PRG:0x46F4F0` | 0xFE | GEN | site_thunk beam_list_type6 |
+| `PRG:0x46F5F0` | 0xFE | GEN | site_thunk beam_list_type6 |
 | `PRG:0x01B6AA` | 0x6 | GEN | site_thunk beam_list_type6 engine site |
-| `PRG:0x46F5F0` | 0x1D6 | GEN | site_thunk index_window_018468 |
+| `PRG:0x46F6F0` | 0x1D6 | GEN | site_thunk index_window_018468 |
 | `PRG:0x018460` | 0x6 | GEN | site_thunk index_window_018468 engine site |
 | `PRG:0x0282F4` | 0x2 | GEN | code_word obj_bank_word_slot |
 | `PRG:0x05F240` | 0x2 | GEN | code_word win_pos_x_slot |
@@ -273,94 +274,95 @@
 | `PRG:0x003CC6` | 0x2 | GEN | code_word hui_kernel_voice_e2 |
 | `PRG:0x003D30` | 0x2 | GEN | code_word hui_kernel_voice_e3 |
 | `PRG:0x080AEC` | 0x4 | GEN | code_ptr beam_effect_class16 |
-| `PRG:0x46F7D0` | 0x5200 | VS2 | donovan code (vsav2 0x0574C0) |
-| `PRG:0x4749D0` | 0x14A0 | VS2 | donovan x026142 (vsav2 0x026142) |
-| `PRG:0x475E70` | 0xE00 | VS2 | donovan x028122 (vsav2 0x028122) |
-| `PRG:0x476C70` | 0x6A20 | VS2 | donovan x05c800 (vsav2 0x05C800) |
-| `PRG:0x47D690` | 0x280 | VS2 | donovan x0672d0 (vsav2 0x0672D0) |
-| `PRG:0x47D910` | 0x2F6 | VS2 | donovan x067550 (vsav2 0x067550) |
-| `PRG:0x47DC10` | 0x1BA | VS2 | donovan x067846 (vsav2 0x067846) |
-| `PRG:0x47DDD0` | 0x60C | VS2 | donovan x067a00 (vsav2 0x067A00) |
-| `PRG:0x47E3E0` | 0x44C | VS2 | donovan x06800c (vsav2 0x06800C) |
-| `PRG:0x47E830` | 0x310 | VS2 | donovan x068458 (vsav2 0x068458) |
-| `PRG:0x47EB40` | 0x264 | VS2 | donovan x068768 (vsav2 0x068768) |
-| `PRG:0x47EDB0` | 0x2AC | VS2 | donovan x0689cc (vsav2 0x0689CC) |
-| `PRG:0x47F060` | 0x3CE | VS2 | donovan x068c78 (vsav2 0x068C78) |
-| `PRG:0x47F430` | 0x2B0 | VS2 | donovan x069046 (vsav2 0x069046) |
-| `PRG:0x47F6E0` | 0x368 | VS2 | donovan x0692f6 (vsav2 0x0692F6) |
-| `PRG:0x47FA50` | 0x100 | VS2 | donovan x06965e (vsav2 0x06965E) |
-| `PRG:0x47FB50` | 0x3B40 | VS2 | donovan x088512 (vsav2 0x088512) |
-| `PRG:0x483690` | 0x1B500 | VS2 | donovan anim (vsav2 0x264086) |
-| `PRG:0x49EB90` | 0x190 | VS2 | donovan aux0_0 (vsav2 0x334170) |
-| `PRG:0x49ED20` | 0x190 | VS2 | donovan aux0_1 (vsav2 0x33CD00) |
-| `PRG:0x49EEB0` | 0xD830 | VS2 | donovan aux0_2 (vsav2 0x344A60) |
-| `PRG:0x4AC6E0` | 0x16B6 | VS2 | donovan hitbox (vsav2 0x0C7502) |
-| `PRG:0x4ADDA0` | 0x322 | VS2 | donovan hitbox_proj (vsav2 0x0D0986) |
-| `PRG:0x4AE0D0` | 0x900 | VS2 | donovan x0d143e (vsav2 0x0D143E) |
-| `PRG:0x4AE9D0` | 0xB20C | VS2 | donovan x2b7ef4 (vsav2 0x2B7EF4) |
-| `PRG:0x4B9C00` | 0xC | GEN | farm-port stub 0x2916c |
-| `PRG:0x4B9C20` | 0xC | GEN | farm-port stub 0x2915c |
-| `PRG:0x4B9C40` | 0xC | GEN | farm-port stub 0x29164 |
-| `PRG:0x4B9C60` | 0xC | GEN | farm-port stub 0x29184 |
-| `PRG:0x4B9C80` | 0xC | GEN | farm-port stub 0x2918c |
-| `PRG:0x4B9C90` | 0x1C | GEN | sound stub 0x4f96 id 0xa1 |
-| `PRG:0x4B9CB0` | 0x2C | GEN | alloc wrapper 0x15702 |
-| `PRG:0x4B9CE0` | 0x2C | GEN | alloc wrapper 0x1572e |
-| `PRG:0x4B9D40` | 0xE | GEN | owner-tag thunk pyron |
-| `PRG:0x4B9D50` | 0xE | GEN | owner-tag thunk pyron |
-| `PRG:0x4B9D60` | 0xE | GEN | owner-tag thunk pyron |
-| `PRG:0x4B9D70` | 0xE | GEN | owner-tag thunk pyron |
-| `PRG:0x4B9D80` | 0xE | GEN | owner-tag thunk pyron |
-| `PRG:0x4B9D90` | 0xE | GEN | owner-tag thunk pyron |
-| `PRG:0x4B9DA0` | 0xE | GEN | owner-tag thunk pyron |
-| `PRG:0x4B9DB0` | 0xE | GEN | owner-tag thunk pyron |
-| `PRG:0x4B9DC0` | 0xE | GEN | owner-tag thunk pyron |
-| `PRG:0x4B9DD0` | 0xE | GEN | owner-tag thunk pyron |
-| `PRG:0x4B9DE0` | 0xE | GEN | owner-tag thunk pyron |
-| `PRG:0x4B9DF0` | 0xC | VS2 | data_in_code table (air-dive per-strength (xv,yv) rows; a2 re-derived by `lea (a2,d2.w),a2`) |
+| `PRG:0x080B28` | 0x4 | GEN | code_ptr beam_effect_class31 |
+| `PRG:0x46F8D0` | 0x5200 | VS2 | donovan code (vsav2 0x0574C0) |
+| `PRG:0x474AD0` | 0x14A0 | VS2 | donovan x026142 (vsav2 0x026142) |
+| `PRG:0x475F70` | 0xE00 | VS2 | donovan x028122 (vsav2 0x028122) |
+| `PRG:0x476D70` | 0x6A20 | VS2 | donovan x05c800 (vsav2 0x05C800) |
+| `PRG:0x47D790` | 0x280 | VS2 | donovan x0672d0 (vsav2 0x0672D0) |
+| `PRG:0x47DA10` | 0x2F6 | VS2 | donovan x067550 (vsav2 0x067550) |
+| `PRG:0x47DD10` | 0x1BA | VS2 | donovan x067846 (vsav2 0x067846) |
+| `PRG:0x47DED0` | 0x60C | VS2 | donovan x067a00 (vsav2 0x067A00) |
+| `PRG:0x47E4E0` | 0x44C | VS2 | donovan x06800c (vsav2 0x06800C) |
+| `PRG:0x47E930` | 0x310 | VS2 | donovan x068458 (vsav2 0x068458) |
+| `PRG:0x47EC40` | 0x264 | VS2 | donovan x068768 (vsav2 0x068768) |
+| `PRG:0x47EEB0` | 0x2AC | VS2 | donovan x0689cc (vsav2 0x0689CC) |
+| `PRG:0x47F160` | 0x3CE | VS2 | donovan x068c78 (vsav2 0x068C78) |
+| `PRG:0x47F530` | 0x2B0 | VS2 | donovan x069046 (vsav2 0x069046) |
+| `PRG:0x47F7E0` | 0x368 | VS2 | donovan x0692f6 (vsav2 0x0692F6) |
+| `PRG:0x47FB50` | 0x100 | VS2 | donovan x06965e (vsav2 0x06965E) |
+| `PRG:0x47FC50` | 0x3B40 | VS2 | donovan x088512 (vsav2 0x088512) |
+| `PRG:0x483790` | 0x1B500 | VS2 | donovan anim (vsav2 0x264086) |
+| `PRG:0x49EC90` | 0x190 | VS2 | donovan aux0_0 (vsav2 0x334170) |
+| `PRG:0x49EE20` | 0x190 | VS2 | donovan aux0_1 (vsav2 0x33CD00) |
+| `PRG:0x49EFB0` | 0xD830 | VS2 | donovan aux0_2 (vsav2 0x344A60) |
+| `PRG:0x4AC7E0` | 0x16B6 | VS2 | donovan hitbox (vsav2 0x0C7502) |
+| `PRG:0x4ADEA0` | 0x322 | VS2 | donovan hitbox_proj (vsav2 0x0D0986) |
+| `PRG:0x4AE1D0` | 0x900 | VS2 | donovan x0d143e (vsav2 0x0D143E) |
+| `PRG:0x4AEAD0` | 0xB20C | VS2 | donovan x2b7ef4 (vsav2 0x2B7EF4) |
+| `PRG:0x4B9D00` | 0xC | GEN | farm-port stub 0x2916c |
+| `PRG:0x4B9D20` | 0xC | GEN | farm-port stub 0x2915c |
+| `PRG:0x4B9D40` | 0xC | GEN | farm-port stub 0x29164 |
+| `PRG:0x4B9D60` | 0xC | GEN | farm-port stub 0x29184 |
+| `PRG:0x4B9D80` | 0xC | GEN | farm-port stub 0x2918c |
+| `PRG:0x4B9D90` | 0x1C | GEN | sound stub 0x4f96 id 0xa1 |
+| `PRG:0x4B9DB0` | 0x2C | GEN | alloc wrapper 0x15702 |
+| `PRG:0x4B9DE0` | 0x2C | GEN | alloc wrapper 0x1572e |
 | `PRG:0x4B9E40` | 0xE | GEN | owner-tag thunk pyron |
-| `PRG:0x4B9E50` | 0x1C | GEN | sound stub 0x4fb0 id 0xa0 |
-| `PRG:0x4B9E70` | 0x1C | GEN | sound stub 0x4fca id 0xa5 |
-| `PRG:0x4B9E90` | 0x1C | GEN | sound stub 0x4efa id 0x90 |
-| `PRG:0x4B9EB0` | 0x40 | GEN | patched clone 0x5459a (vs2 0x5c77e) |
-| `PRG:0x4B9EF0` | 0x1C | GEN | sound stub 0x4f62 id 0x7f |
-| `PRG:0x4B9F10` | 0xE | GEN | owner-tag thunk pyron |
-| `PRG:0x4B9F20` | 0xE | GEN | owner-tag thunk pyron |
-| `PRG:0x4B9F90` | 0x1C | GEN | sound stub 0x50ee id 0x7e |
-| `PRG:0x4B9FB0` | 0x1C | GEN | sound stub 0x50a0 id 0x7b |
-| `PRG:0x4B9FD0` | 0x1C | GEN | sound stub 0x50d4 id 0x7d |
-| `PRG:0x4B9FF0` | 0x1C | GEN | sound stub 0x50ba id 0x7c |
-| `PRG:0x4BA020` | 0x1C | GEN | sound stub 0x4e2a id 0x8f |
-| `PRG:0x4BA040` | 0x1C | GEN | sound stub 0x4df6 id 0x86 |
-| `PRG:0x4BA070` | 0xE | GEN | owner-tag thunk pyron |
-| `PRG:0x4BA080` | 0xE | GEN | owner-tag thunk pyron |
-| `PRG:0x4BA090` | 0x100 | VS2 | data_in_code table (pod-zone word offset/record table (a3 re-derived from it; self-relative; shared-zone copy)) |
-| `PRG:0x4BA190` | 0xC | GEN | data_in_code helper (pod-zone word offset/record table (a3 re-derived from it; self-relative; shared-zone copy)) |
-| `PRG:0x4BA250` | 0x2C48 | VS2 | companion-effect coord lists |
-| `PRG:0x4BCEA0` | 0x500 | VS2 | sprite palette block |
-| `PRG:0x4BD3A0` | 0xDC0 | VS2 | effect palette block |
-| `PRG:0x4BE170` | 0x18 | GEN | obj_hook owner stub type 59 |
-| `PRG:0x4BE1A0` | 0x18 | GEN | obj_hook owner stub type 61 |
-| `PRG:0x4BE1D0` | 0x18 | GEN | obj_hook owner stub type 62 |
-| `PRG:0x4BE200` | 0x18 | GEN | obj_hook owner stub type 63 |
-| `PRG:0x4BE230` | 0x2A | GEN | obj_hook owner stub type 64 |
-| `PRG:0x4BE270` | 0x2A | GEN | obj_hook owner stub type 65 |
-| `PRG:0x4BE2B0` | 0x2A | GEN | obj_hook owner stub type 66 |
-| `PRG:0x4BE2F0` | 0x2A | GEN | obj_hook owner stub type 67 |
-| `PRG:0x4BE330` | 0x2A | GEN | obj_hook owner stub type 68 |
-| `PRG:0x4BE370` | 0x2A | GEN | obj_hook owner stub type 69 |
-| `PRG:0x4BE3B0` | 0x2A | GEN | obj_hook owner stub type 70 |
-| `PRG:0x4BE3F0` | 0x2A | GEN | obj_hook owner stub type 71 |
-| `PRG:0x4BE430` | 0x2A | GEN | obj_hook owner stub type 72 |
-| `PRG:0x4BE470` | 0x2A | GEN | obj_hook owner stub type 73 |
-| `PRG:0x4BE4B0` | 0x2A | GEN | obj_hook owner stub type 74 |
-| `PRG:0x4BE4F0` | 0x2A | GEN | obj_hook owner stub type 75 |
-| `PRG:0x4BE520` | 0x2C | GEN | obj_walker relocated walker |
-| `PRG:0x4BE54C` | 0x130 | GEN | obj_walker ext type table |
+| `PRG:0x4B9E50` | 0xE | GEN | owner-tag thunk pyron |
+| `PRG:0x4B9E60` | 0xE | GEN | owner-tag thunk pyron |
+| `PRG:0x4B9E70` | 0xE | GEN | owner-tag thunk pyron |
+| `PRG:0x4B9E80` | 0xE | GEN | owner-tag thunk pyron |
+| `PRG:0x4B9E90` | 0xE | GEN | owner-tag thunk pyron |
+| `PRG:0x4B9EA0` | 0xE | GEN | owner-tag thunk pyron |
+| `PRG:0x4B9EB0` | 0xE | GEN | owner-tag thunk pyron |
+| `PRG:0x4B9EC0` | 0xE | GEN | owner-tag thunk pyron |
+| `PRG:0x4B9ED0` | 0xE | GEN | owner-tag thunk pyron |
+| `PRG:0x4B9EE0` | 0xE | GEN | owner-tag thunk pyron |
+| `PRG:0x4B9EF0` | 0xC | VS2 | data_in_code table (air-dive per-strength (xv,yv) rows; a2 re-derived by `lea (a2,d2.w),a2`) |
+| `PRG:0x4B9F40` | 0xE | GEN | owner-tag thunk pyron |
+| `PRG:0x4B9F50` | 0x1C | GEN | sound stub 0x4fb0 id 0xa0 |
+| `PRG:0x4B9F70` | 0x1C | GEN | sound stub 0x4fca id 0xa5 |
+| `PRG:0x4B9F90` | 0x1C | GEN | sound stub 0x4efa id 0x90 |
+| `PRG:0x4B9FB0` | 0x40 | GEN | patched clone 0x5459a (vs2 0x5c77e) |
+| `PRG:0x4B9FF0` | 0x1C | GEN | sound stub 0x4f62 id 0x7f |
+| `PRG:0x4BA010` | 0xE | GEN | owner-tag thunk pyron |
+| `PRG:0x4BA020` | 0xE | GEN | owner-tag thunk pyron |
+| `PRG:0x4BA090` | 0x1C | GEN | sound stub 0x50ee id 0x7e |
+| `PRG:0x4BA0B0` | 0x1C | GEN | sound stub 0x50a0 id 0x7b |
+| `PRG:0x4BA0D0` | 0x1C | GEN | sound stub 0x50d4 id 0x7d |
+| `PRG:0x4BA0F0` | 0x1C | GEN | sound stub 0x50ba id 0x7c |
+| `PRG:0x4BA120` | 0x1C | GEN | sound stub 0x4e2a id 0x8f |
+| `PRG:0x4BA140` | 0x1C | GEN | sound stub 0x4df6 id 0x86 |
+| `PRG:0x4BA170` | 0xE | GEN | owner-tag thunk pyron |
+| `PRG:0x4BA180` | 0xE | GEN | owner-tag thunk pyron |
+| `PRG:0x4BA190` | 0x100 | VS2 | data_in_code table (pod-zone word offset/record table (a3 re-derived from it; self-relative; shared-zone copy)) |
+| `PRG:0x4BA290` | 0xC | GEN | data_in_code helper (pod-zone word offset/record table (a3 re-derived from it; self-relative; shared-zone copy)) |
+| `PRG:0x4BA350` | 0x2C48 | VS2 | companion-effect coord lists |
+| `PRG:0x4BCFA0` | 0x500 | VS2 | sprite palette block |
+| `PRG:0x4BD4A0` | 0xDC0 | VS2 | effect palette block |
+| `PRG:0x4BE270` | 0x18 | GEN | obj_hook owner stub type 59 |
+| `PRG:0x4BE2A0` | 0x18 | GEN | obj_hook owner stub type 61 |
+| `PRG:0x4BE2D0` | 0x18 | GEN | obj_hook owner stub type 62 |
+| `PRG:0x4BE300` | 0x18 | GEN | obj_hook owner stub type 63 |
+| `PRG:0x4BE330` | 0x2A | GEN | obj_hook owner stub type 64 |
+| `PRG:0x4BE370` | 0x2A | GEN | obj_hook owner stub type 65 |
+| `PRG:0x4BE3B0` | 0x2A | GEN | obj_hook owner stub type 66 |
+| `PRG:0x4BE3F0` | 0x2A | GEN | obj_hook owner stub type 67 |
+| `PRG:0x4BE430` | 0x2A | GEN | obj_hook owner stub type 68 |
+| `PRG:0x4BE470` | 0x2A | GEN | obj_hook owner stub type 69 |
+| `PRG:0x4BE4B0` | 0x2A | GEN | obj_hook owner stub type 70 |
+| `PRG:0x4BE4F0` | 0x2A | GEN | obj_hook owner stub type 71 |
+| `PRG:0x4BE530` | 0x2A | GEN | obj_hook owner stub type 72 |
+| `PRG:0x4BE570` | 0x2A | GEN | obj_hook owner stub type 73 |
+| `PRG:0x4BE5B0` | 0x2A | GEN | obj_hook owner stub type 74 |
+| `PRG:0x4BE5F0` | 0x2A | GEN | obj_hook owner stub type 75 |
+| `PRG:0x4BE620` | 0x2C | GEN | obj_walker relocated walker |
+| `PRG:0x4BE64C` | 0x130 | GEN | obj_walker ext type table |
 | `PRG:0x009438` | 0x4 | GEN | obj_walker caller repoint |
 | `PRG:0x020312` | 0x4 | GEN | obj_walker caller repoint |
-| `PRG:0x4BE690` | 0x2C | GEN | obj_walker relocated walker |
-| `PRG:0x4BE6BC` | 0x220 | GEN | obj_walker ext type table |
+| `PRG:0x4BE790` | 0x2C | GEN | obj_walker relocated walker |
+| `PRG:0x4BE7BC` | 0x220 | GEN | obj_walker ext type table |
 | `PRG:0x0053F8` | 0x4 | GEN | obj_walker caller repoint |
 | `PRG:0x005412` | 0x4 | GEN | obj_walker caller repoint |
 | `PRG:0x00577E` | 0x4 | GEN | obj_walker caller repoint |
@@ -384,35 +386,35 @@
 | `PRG:0x021DEC` | 0x4 | GEN | obj_walker caller repoint |
 | `PRG:0x00B6A8` | 0x40 | VS2 | data_port voice_borrow_candidates_a (vsav2 0x9f6a) |
 | `PRG:0x00BFA8` | 0x40 | VS2 | data_port voice_borrow_voicenums_b (vsav2 0xa86a) |
-| `PRG:0x4BE8E0` | 0xB8 | VS2 | sound_table pyr_sfx_records (vsav2 0xc8b18, id-allowlisted) |
-| `PRG:0x4BE9A0` | 0x20 | VS2 | select_records portrait/p1 coord list |
-| `PRG:0x4BE9C0` | 0x2A | VS2 | select_records portrait/p1 record |
-| `PRG:0x4BE9F0` | 0x20 | VS2 | select_records portrait/p2 coord list |
-| `PRG:0x4BEA10` | 0x2A | VS2 | select_records portrait/p2 record |
-| `PRG:0x4BEA40` | 0x4 | VS2 | select_records name_banner/p1 coord list |
-| `PRG:0x4BEA50` | 0xE | VS2 | select_records name_banner/p1 record |
-| `PRG:0x4BEA60` | 0x8 | VS2 | select_records name_banner/p2 coord list |
-| `PRG:0x4BEA70` | 0x12 | VS2 | select_records name_banner/p2 record |
-| `PRG:0x4BEA90` | 0x14 | VS2 | select_records splash_p1/p1 coord list |
-| `PRG:0x4BEAB0` | 0x1E | VS2 | select_records splash_p1/p1 record |
-| `PRG:0x4BEAD0` | 0x14 | VS2 | select_records splash_p2/p1 coord list |
-| `PRG:0x4BEAF0` | 0x1E | VS2 | select_records splash_p2/p1 record |
-| `PRG:0x4BEB10` | 0x38 | VS2 | select_records win_quote/p1 coord list |
-| `PRG:0x4BEB50` | 0x42 | VS2 | select_records win_quote/p1 record |
-| `PRG:0x4BEBA0` | 0x6040 | VS2 | win_pal_variant don_win_pal sparse block |
-| `PRG:0x4C4BE0` | 0x6040 | VS2 | win_pal_variant hui_win_pal sparse block |
-| `PRG:0x4CAC20` | 0x6040 | VS2 | win_pal_variant pyr_win_pal sparse block |
-| `PRG:0x4D0C60` | 0x32 | NEW | win_pal_variant 3-way thunk |
-| `PRG:0x4D0CA0` | 0x140 | VS2 | site_thunk select_pal_variant_id data block |
-| `PRG:0x4D0DE0` | 0x7C | GEN | site_thunk 3-way chain |
+| `PRG:0x4BE9E0` | 0xB8 | VS2 | sound_table pyr_sfx_records (vsav2 0xc8b18, id-allowlisted) |
+| `PRG:0x4BEAA0` | 0x20 | VS2 | select_records portrait/p1 coord list |
+| `PRG:0x4BEAC0` | 0x2A | VS2 | select_records portrait/p1 record |
+| `PRG:0x4BEAF0` | 0x20 | VS2 | select_records portrait/p2 coord list |
+| `PRG:0x4BEB10` | 0x2A | VS2 | select_records portrait/p2 record |
+| `PRG:0x4BEB40` | 0x4 | VS2 | select_records name_banner/p1 coord list |
+| `PRG:0x4BEB50` | 0xE | VS2 | select_records name_banner/p1 record |
+| `PRG:0x4BEB60` | 0x8 | VS2 | select_records name_banner/p2 coord list |
+| `PRG:0x4BEB70` | 0x12 | VS2 | select_records name_banner/p2 record |
+| `PRG:0x4BEB90` | 0x14 | VS2 | select_records splash_p1/p1 coord list |
+| `PRG:0x4BEBB0` | 0x1E | VS2 | select_records splash_p1/p1 record |
+| `PRG:0x4BEBD0` | 0x14 | VS2 | select_records splash_p2/p1 coord list |
+| `PRG:0x4BEBF0` | 0x1E | VS2 | select_records splash_p2/p1 record |
+| `PRG:0x4BEC10` | 0x38 | VS2 | select_records win_quote/p1 coord list |
+| `PRG:0x4BEC50` | 0x42 | VS2 | select_records win_quote/p1 record |
+| `PRG:0x4BECA0` | 0x6040 | VS2 | win_pal_variant don_win_pal sparse block |
+| `PRG:0x4C4CE0` | 0x6040 | VS2 | win_pal_variant hui_win_pal sparse block |
+| `PRG:0x4CAD20` | 0x6040 | VS2 | win_pal_variant pyr_win_pal sparse block |
+| `PRG:0x4D0D60` | 0x32 | NEW | win_pal_variant 3-way thunk |
+| `PRG:0x4D0DA0` | 0x140 | VS2 | site_thunk select_pal_variant_id data block |
+| `PRG:0x4D0EE0` | 0x7C | GEN | site_thunk 3-way chain |
 | `PRG:0x05F146` | 0x6 | GEN | site_thunk chain engine site |
-| `PRG:0x4D0E60` | 0x32 | GEN | site_thunk 3-way chain |
+| `PRG:0x4D0F60` | 0x32 | GEN | site_thunk 3-way chain |
 | `PRG:0x05F328` | 0x6 | GEN | site_thunk chain engine site |
-| `PRG:0x4D0EA0` | 0x3E | GEN | site_thunk 3-way chain |
+| `PRG:0x4D0FA0` | 0x3E | GEN | site_thunk 3-way chain |
 | `PRG:0x05FCE0` | 0x6 | GEN | site_thunk chain engine site |
-| `PRG:0x4D0EE0` | 0x3E | GEN | site_thunk 3-way chain |
+| `PRG:0x4D0FE0` | 0x3E | GEN | site_thunk 3-way chain |
 | `PRG:0x06C0E0` | 0x6 | GEN | site_thunk chain engine site |
-| `PRG:0x4D0F30` | 0x94 | GEN | merged pool-seed + flavor init shim (F2) |
+| `PRG:0x4D1030` | 0x94 | GEN | merged pool-seed + flavor init shim (F2) |
 | `PRG:0x0282F6` | 0x2 | GEN | code_word obj_bank_word_slot |
 | `PRG:0x05F244` | 0x2 | GEN | code_word win_pos_x_slot |
 | `PRG:0x05F246` | 0x2 | GEN | code_word win_pos_y_slot |

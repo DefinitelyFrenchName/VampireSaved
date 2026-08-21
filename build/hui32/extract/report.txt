@@ -24,6 +24,7 @@ extra region x0692f6: twin 0x06932A (shift +0x34), len 0x368
 extra region x06965e: twin 0x069692 (shift +0x34), len 0x100
   x093460: forced tail +0x300..+0x306 (0x6 bytes) marked dead — unvalidated, copied verbatim (`:f`)
 extra region x093460: twin 0x09306C (shift -0x3f4), len 0x306
+extra region x0926e4: twin 0x0922F0 (shift -0x3f4), len 0x100
 extra region x02592a: twin 0x025958 (shift +0x2e), len 0x456
 extra region x022400: twin 0x02242E (shift +0x2e), len 0x1600
   x06cac0: raw DATA tail from +0xca8 (0x214 bytes emitted unencrypted for runtime DATA reads)
@@ -53,6 +54,7 @@ region x069046: vsav2 0x069046+0x2B0 (code, shift x069046)
 region x0692f6: vsav2 0x0692F6+0x368 (code, shift x0692f6)
 region x06965e: vsav2 0x06965E+0x100 (code, shift x06965e)
 region x093460: vsav2 0x093460+0x306 (code, shift x093460)
+region x0926e4: vsav2 0x0926E4+0x100 (code, shift x0926e4)
 region x02592a: vsav2 0x02592A+0x456 (code, shift x02592a)
 region x022400: vsav2 0x022400+0x1600 (code, shift x022400)
 region x06cac0: vsav2 0x06CAC0+0xEBC (code, shift x06cac0)
@@ -101,6 +103,8 @@ region x06cac0: vsav2 0x06CAC0+0xEBC (code, shift x06cac0)
   x06965e: non-internal refs {'engine': 6}
   x093460: 5 pointer fields, 0 variant-site bytes (0.00%)
   x093460: non-internal refs {'engine': 4}
+  x0926e4: 3 pointer fields, 0 variant-site bytes (0.00%)
+  x0926e4: non-internal refs {'engine': 2}
   x02592a: 6 pointer fields, 0 variant-site bytes (0.00%)
   x02592a: non-internal refs {'engine': 6}
   x022400: 38 pointer fields, 0 variant-site bytes (0.00%)

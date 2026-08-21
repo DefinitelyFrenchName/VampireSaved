@@ -1,59 +1,49 @@
-# NEXT SESSION — orientation (rewritten mid-window 14z-102, 2026-08-21)
+# NEXT SESSION — orientation (rewritten at the 14z-102 FREEZE, 2026-08-21)
 
-> ## **THE STATE IN ONE BREATH:** the 14z-99 freeze (donovan-m9 /
-> ## huitzil-m18 / pyron-m12 / **merged-m4** = `build/m3b_merged11`,
-> ## `2343607a`; stock twin m5_stock4) remains the PLAYABLE reference
-> ## (`tools/run_wide.sh build/m3b_merged11 fbneo`). **THE #107+#109
-> ## WINDOW IS OPEN AND PAUSED MID-WAY:** #107's row flip is COMMITTED
-> ## (reconciliation.toml `0x0448a6` -> `0x04367a`, re-derived at the
-> ## flip), so **`test_m3a_reproducible` AND `test_phasec_spaces` are EXPECTED RED (both measure the manifest ahead of the frozen artifacts; phasec's stock rebuild now yields 883e7d17 vs the pinned 16da59b6 — the flip moves STOCK bytes too, the shared-map/#103 class) vs the frozen
-> ## artifacts until the window's rebuild+re-freeze** — do not "fix"
-> ## that; it is the 14z-99 W-commit rhythm, paused on a ruling.
+> ## **THE STATE IN ONE BREATH: THE 14z-102 WINDOW FREEZE IS THE
+> ## REFERENCE** — donovan-m10 / huitzil-m19 / pyron-m13 / **merged-m5**
+> ## (= `build/m3b_merged12`, `393f92a5`, 804 ops; stock twin
+> ## m5_stock5 `883e7d17`). #107 (the verified reconciliation row) and
+> ## #109 (THE CLONE-BEAM FIX — effect-class ROW 31, vsavj's stub,
+> ## ported via root `0x926e4:0x11e:t0x922f0` + code_ptr at
+> ## PRG:0x080B28) both shipped; the beams were FIELD-CONFIRMED on the
+> ## rehearsal probe before the freeze; gold tint KEPT (maintainer
+> ## ruling 2026-08-21). hui46 and m3b_merged12 are bit-for-bit the
+> ## rehearsed probes. run_suite GREEN x6 (freeze+verify, all three
+> ## WIDE builds); m3a_reproducible all five bit-exact with
+> ## whole-artifact manifests re-frozen and member-deltas named;
+> ## merged gates green; pcrel inventories held across the extraction
+> ## shift. PLAY: `tools/run_wide.sh build/m3b_merged12 fbneo`.
 >
-> ## **#109 IS ROOT-CAUSED AND FIXED, REHEARSED THROUGH THE MERGED
-> ## PROBE** (STATE 14z-102 (2)/(3) + the issue's two 14z-102
-> ## comments — the prep's A1/A2 AND the intermediate palette-sweep
-> ## reading are all RETRACTED there): the defect was **vsavj
-> ## shipping effect-class ROW 31 as a stub**, and row 31 is the
-> ## clone-mode per-frame beam emitter ($FFD600-family objects,
-> ## alternating-frame strobe). Fix = the 14z-71 row-16 pattern:
-> ## root `0x926e4:0x11e:t0x922f0` (vh2-oracled, 6/0x11E
-> ## operand-only diffs) + `beam_effect_class31` code_ptr at
-> ## PRG:0x080B28 (slot measured DEAD in vanilla incl. both long
-> ## marathons, 2418-hit control). Beams RENDER (captures sent).
-> ## Gold tint KEPT (maintainer default ruling 2026-08-21; the
-> ## rehearsed neuter = build/hui_probe_tint's one-line edit if
-> ## community research says otherwise).
+> ## **CLOSE-OUT ITEMS (check these landed green before new work):**
+> ## 1. The freeze-tail gates that were RUNNING at the close:
+> ##    test_dualtrack (m5_stock5 + don_m10 pair),
+> ##    test_fbneo_legacy_oracle (re-pointed to don_m10),
+> ##    run_battery_m2, audit_merged_legacy (real coverage this time —
+> ##    merged ops moved), and the guard-corpus soak
+> ##    (`audit_guard_corpus.sh`, BUILD default m3b_merged12 — the
+> ##    overnight leg; the hui41 must-fire control is its liveness).
+> ## 2. `run_all_static.sh` full tier must read GREEN (the two
+> ##    formerly-expected-red gates re-pinned at the freeze).
+> ## 3. Tags `freeze/{donovan-m10,huitzil-m19,pyron-m13,merged-m5}` +
+> ##    the freeze commit (single commit, the 14z-99 style) if the
+> ##    session ended before they landed — check `git log`/`git tag`.
 >
-> ## **REHEARSED THROUGH THE MERGED PROBE** (`build/merged_probe_row31`
-> ## 393f92a5, 804 ops; beam audit fix-mode PASS on merged AND on the
-> ## solo probe hui_probe_row31 1a7249d6, defect-mode frozen on
-> ## merged-m4; hui32 extract REGENERATED with the root — old kept as
-> ## extract.pre-14z102; op-count constants re-frozen
-> ## 363/598/648/804/901, tenant-loop PASS end to end).
-> ## **REMAINING = THE FREEZE ONLY**, on the maintainer's go after
-> ## they see the beams in their own playtest:
-> ## `tools/run_wide.sh build/merged_probe_row31 fbneo` — Phobos DF
-> ## (HP+HK, stocks), move, attack: the beams strobe green/blue.
-> ##
-> ## **THE FREEZE (the 14z-99 rhythm):** rebuild the four named
-> ## artifacts + stock twin from the tree, full battery, run_suite
-> ## re-freeze (hui/merged expectation sets MOVE — the root shifts
-> ## every hui placement), registry rows m10/m19/m13/merged-m5 +
-> ## tags, re-point pcrel_escapes [merged_*] + bases.tsv +
-> ## render-content rows + audit BUILD defaults, and the B-sweep
-> ## inventory gate (x2b7ef4 strips 0x2BC09A/0x2BC0F8 reachability
-> ## open + don's 1; anim rows 0x2499F0/0x249B18 = census FPs).
-> ## Also owed on #109: a positive-contact damage leg (P2 jumped
-> ## into the beam band — df/103/104 measured zero-zero parity at
-> ## standing geometry, both games).
+> ## **OPEN / CARRIED:** #109 closes on the maintainer's word (the fix
+> ## is field-confirmed; a positive-contact damage leg — P2 jumped into
+> ## the beam band — stays a nice-to-have; rigs df/103/104 measured
+> ## zero-zero parity at standing geometry). #50 parked. Maintainer-
+> ## owned: the build-dir ruling (`docs/project/build_dir_triage.md`),
+> ## the DF-duration fidelity ruling (360/377/360 vs uniform 332), the
+> ## community tint research (gold default stands; the rehearsed neuter
+> ## is build/hui_probe_tint's one-line manifest edit), and the PUSH
+> ## (everything local; push only on their word).
 >
-> ## **ALSO WAITING ON THE MAINTAINER:** the build-dir ruling
-> ## (`docs/project/build_dir_triage.md`, ~7.3 GB), the DF-duration
-> ## fidelity ruling (360/377/360 vs uniform 332), and the PUSH
-> ## (commits local; push only on their word).
->
-> ## **OPEN: #107 (flipped, freeze pending) #109** (+ #50 parked).
+> ## **NEW STANDING INSTRUMENTS from 14z-102:**
+> ## `audit_clone_beam_lines.sh` (EXPECT_LINES=1 default; strobe-phase
+> ## gotcha in the header), `test_biased_list_inventory.sh` (ci_static,
+> ## #109-B verdicts frozen), rigs df/103/104 (contact A/B pair),
+> ## the WPCOND scratch pattern (value-conditioned write watch).
 
 ## What 14z-101 did (the whole arc, one screen)
 

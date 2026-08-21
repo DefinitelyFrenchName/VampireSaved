@@ -63,9 +63,9 @@ MAME_WIDE_BIN="${MAME_WIDE_BIN:-$HOME/.cache/vampire-saved/mame/cps2}"
 # WHEN A TENANT IS RE-FROZEN, RE-POINT ITS ROW HERE. D and P still name
 # older builds (donovan-m3a / pyron-m3); those boot and pass today, but
 # they are one profile bump away from the same failure.
-D_RP="$REPO/build/don_m9/rompath"    # re-pointed 14z-99 (window freeze; was don_m8)
-H_RP="$REPO/build/hui45/rompath"    # re-pointed 14z-99 (window freeze)
-P_RP="$REPO/build/pyron29/rompath"  # re-pointed 14z-99 (window freeze)
+D_RP="$REPO/build/don_m10/rompath"   # re-pointed 14z-102 (window freeze)
+H_RP="$REPO/build/hui46/rompath"    # re-pointed 14z-102 (window freeze)
+P_RP="$REPO/build/pyron30/rompath"  # re-pointed 14z-102 (window freeze)
 
 [ -f "$MERGED/vsavjw.zip" ] || {
     echo "SKIP: no merged build at $MERGED (tools/build_merged.sh)"; exit 0; }
@@ -152,10 +152,10 @@ chk() {  # chk <label> <got> <want>
         echo "  FAIL: $1 — merged $2 != solo $3"; fail=1
     fi
 }
-chk "D band  0x4AD8F == don_m9"  "$m_d" "$s_d"
-chk "H band  0x40AF6 == hui45"    "$m_h" "$s_h"
-chk "P band  0x45000 == pyron29"  "$m_p" "$s_p"
-chk "strip   0x486A0 == hui45 (the S3 relocation, live)" "$m_s" "$s_s"
+chk "D band  0x4AD8F == don_m10"  "$m_d" "$s_d"
+chk "H band  0x40AF6 == hui46"    "$m_h" "$s_h"
+chk "P band  0x45000 == pyron30"  "$m_p" "$s_p"
+chk "strip   0x486A0 == hui46 (the S3 relocation, live)" "$m_s" "$s_s"
 chk "bank 2  0x2AD8F == PRISTINE (de-substitution held)" "$m_b2" "$prist"
 distinct="$(printf '%s\n%s\n%s\n%s\n' "$m_d" "$m_h" "$m_p" "$m_s" | sort -u | wc -l | tr -d ' ')"
 if [ "$distinct" = 4 ]; then

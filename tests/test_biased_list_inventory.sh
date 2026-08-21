@@ -38,9 +38,9 @@
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"
-BUILD_D="${BUILD_D:-build/don_m9}"
-BUILD_H="${BUILD_H:-build/hui_probe_row31}"   # re-point at each freeze
-BUILD_P="${BUILD_P:-build/pyron29}"
+BUILD_D="${BUILD_D:-build/don_m10}"
+BUILD_H="${BUILD_H:-build/hui46}"   # re-pointed 14z-102 (the freeze)
+BUILD_P="${BUILD_P:-build/pyron30}"
 W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT
 
 # the vs2 data view (logical byte order); derive it if no cached copy exists

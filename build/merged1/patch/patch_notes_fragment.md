@@ -448,9 +448,9 @@ code   0x003d36 +0x2  code_word don_kernel_voice_e3 (0323 -> 00dc)
 # anim+0xc6bc: port_patch 000c -> 0006 (composite list 251F2E: list-type 12 -> the taken-over type 6)
 # anim+0xc6d0: port_patch 000c -> 0006 (composite list 251F42: list-type 12 -> the taken-over type 6)
 # anim+0xc6e4: port_patch 000c -> 0006 (composite list 251F56: list-type 12 -> the taken-over type 6)
-data_file 0x42c3d0 +0x1e800  donovan anim (from vsav2 0x245872)
-data_file 0x44abd0 +0x190  donovan aux0_0 (from vsav2 0x334170)
-data_file 0x44ad60 +0xe620  donovan aux0_1 (from vsav2 0x336560)
+data_file 0x42c4d0 +0x1e800  donovan anim (from vsav2 0x245872)
+data_file 0x44acd0 +0x190  donovan aux0_0 (from vsav2 0x334170)
+data_file 0x44ae60 +0xe620  donovan aux0_1 (from vsav2 0x336560)
 # code+0x9c: pcrel16 -> x057456@0x574b0 (disp 0x2784 -> 0x2784 after placement)
 # code+0x102: pcrel16 -> x057456@0x574b0 (disp 0x271e -> 0x271e after placement)
 # code+0x15a: pcrel16 -> x057456@0x574b6 (disp 0x26cc -> 0x26cc after placement)
@@ -459,19 +459,19 @@ data_file 0x44ad60 +0xe620  donovan aux0_1 (from vsav2 0x336560)
 code   0x3fff90 farm-port stub for 0x2916c (param at 0x3fff70, common 0x29f4a)
 code   0x3fffb0 farm-port stub for 0x29184 (param at 0x3fffa0, common 0x29f4a)
 code   0x3fffd0 farm-port stub for 0x2918c (param at 0x3fffc0, common 0x29f4a)
-code   0x468520 slot-clearing alloc wrapper for 0x15702 -> 0x16fba (0x80 cleared, +8 preserved)
+code   0x468620 slot-clearing alloc wrapper for 0x15702 -> 0x16fba (0x80 cleared, +8 preserved)
 # code+0x9ac: pcrel16 -> x057456@0x574b0 (disp 0x1e74 -> 0x1e74 after placement)
 # code+0xd3a: pcrel16 -> x057456@0x574b0 (disp 0x1ae6 -> 0x1ae6 after placement)
 # code+0xfe2: pcrel16 -> x057456@0x574b0 (disp 0x183e -> 0x183e after placement)
 # code+0x10da: pcrel16 -> x057456@0x574b0 (disp 0x1746 -> 0x1746 after placement)
 code   0x3fffe0 sound stub for 0x4ddc (vsavj sfx id 0x84)
-code   0x468550 sound stub for 0x4f48 (vsavj sfx id 0x8b)
+code   0x468650 sound stub for 0x4f48 (vsavj sfx id 0x8b)
 # code+0x141a: pcrel16 -> x057456@0x574b0 (disp 0x1406 -> 0x1406 after placement)
 # code+0x142a: pcrel16 -> x057456@0x574b0 (disp 0x13f6 -> 0x13f6 after placement)
 # code+0x151a: pcrel16 -> x057456@0x574b0 (disp 0x1306 -> 0x1306 after placement)
 # code+0x18d0: pcrel16 -> x057456@0x574b0 (disp 0xf50 -> 0xf50 after placement)
 # code+0x18e0: pcrel16 -> x057456@0x574b0 (disp 0xf40 -> 0xf40 after placement)
-code   0x468570 sound stub for 0x4e92 (vsavj sfx id 0x93)
+code   0x468670 sound stub for 0x4e92 (vsavj sfx id 0x93)
 # code+0x197c: pcrel16 -> x057456@0x574b0 (disp 0xea4 -> 0xea4 after placement)
 # code+0x1a38: pcrel16 -> x057456@0x574c2 (disp 0xdfa -> 0xdfa after placement)
 # code+0x1a46: pcrel16 -> x057456@0x574c2 (disp 0xdec -> 0xdec after placement)
@@ -479,16 +479,16 @@ code   0x468570 sound stub for 0x4e92 (vsavj sfx id 0x93)
 # code+0x1b94: pcrel16 -> x057456@0x574b0 (disp 0xc8c -> 0xc8c after placement)
 # code+0x1c94: pcrel16 -> x057456@0x574b0 (disp 0xb8c -> 0xb8c after placement)
 # code+0x1f06: pcrel16 -> x057456@0x574bc (disp 0x926 -> 0x926 after placement)
-code   0x468590 sound stub for 0x4ec6 (vsavj sfx id 0x95)
-code   0x4685b0 sound stub for 0x4e10 (vsavj sfx id 0x85)
+code   0x468690 sound stub for 0x4ec6 (vsavj sfx id 0x95)
+code   0x4686b0 sound stub for 0x4e10 (vsavj sfx id 0x85)
 # code+0x20de: pcrel16 -> x057456@0x574b0 (disp 0x742 -> 0x742 after placement)
 # code+0x2192: pcrel16 -> x057456@0x574b0 (disp 0x68e -> 0x68e after placement)
 # code+0x21aa: pcrel16 -> x057456@0x574b0 (disp 0x676 -> 0x676 after placement)
 # code+0x2226: pcrel16 -> x057456@0x574b0 (disp 0x5fa -> 0x5fa after placement)
 # code+0x2392: pcrel16 -> code@0x57024 (disp 0x2 -> 0x2 after placement)
 # code+0x249c: pcrel16 -> x057456@0x574b0 (disp 0x384 -> 0x384 after placement)
-code   0x4685d0 sound stub for 0x4e5e (vsavj sfx id 0x91)
-code   0x4685f0 sound stub for 0x4e78 (vsavj sfx id 0x92)
+code   0x4686d0 sound stub for 0x4e5e (vsavj sfx id 0x91)
+code   0x4686f0 sound stub for 0x4e78 (vsavj sfx id 0x92)
 # code+0x253c: pcrel16 -> x057456@0x574b0 (disp 0x2e4 -> 0x2e4 after placement)
 # code+0x2546: pcrel16 -> code@0x571d8 (disp 0x2 -> 0x2 after placement)
 # code+0x990: type_renumber stamp_b_d16 type 115 -> 126 (huitzil's own number; site 0x5e542)
@@ -511,78 +511,78 @@ code   0x4685f0 sound stub for 0x4e78 (vsavj sfx id 0x92)
 # code+0x26ca: type_renumber stamp_b_d16 type 115 -> 126 (huitzil's own number; site 0x5e542)
 # code+0x26f4: type_renumber stamp_b_d16 type 115 -> 126 (huitzil's own number; site 0x5e542)
 # code+0x273e: type_renumber stamp_b_d16 type 115 -> 126 (huitzil's own number; site 0x5e542)
-code   0x468610 owner-tag thunk (huitzil id 0x10 -> (+0x7f,A4), then stamp_b_d16 197c00440002, rts)
-# code+0x966: owner_tag stamp_b_d16 type 68 -> jsr 0x468610 (huitzil id 0x10)
-# code+0xa22: owner_tag stamp_b_d16 type 68 -> jsr 0x468610 (huitzil id 0x10)
-code   0x468620 owner-tag thunk (huitzil id 0x10 -> (+0x7f,A4), then stamp_b_d16 197c00450002, rts)
-# code+0xdf0: owner_tag stamp_b_d16 type 69 -> jsr 0x468620 (huitzil id 0x10)
-# code+0xe20: owner_tag stamp_b_d16 type 69 -> jsr 0x468620 (huitzil id 0x10)
-code   0x468630 owner-tag thunk (huitzil id 0x10 -> (+0x7f,A4), then stamp_b_d16 197c00460002, rts)
-# code+0x1070: owner_tag stamp_b_d16 type 70 -> jsr 0x468630 (huitzil id 0x10)
-# code+0x14b0: owner_tag stamp_b_d16 type 70 -> jsr 0x468630 (huitzil id 0x10)
-code   0x468640 owner-tag thunk (huitzil id 0x10 -> (+0x7f,A4), then stamp_b_d16 197c00470002, rts)
-# code+0x1950: owner_tag stamp_b_d16 type 71 -> jsr 0x468640 (huitzil id 0x10)
-code   0x468650 owner-tag thunk (huitzil id 0x10 -> (+0x7f,A4), then stamp_b_d16 197c00480002, rts)
-# code+0x2026: owner_tag stamp_b_d16 type 72 -> jsr 0x468650 (huitzil id 0x10)
-# code+0x2048: owner_tag stamp_b_d16 type 72 -> jsr 0x468650 (huitzil id 0x10)
-# code+0x13bc: data_in_code reroute -> helper 0x468670, table 0x468660 (DATA view of vsav2 0x056074; FG capture-pose random table (native draws seqs 1/3/5))
-# code+0x1390: data_in_code reroute -> helper 0x468690, table 0x468680 (DATA view of vsav2 0x056064; FG capture-pose table 2 (seqs 0x56-0x59))
-# code+0x17c8: data_in_code reroute -> helper 0x4686b0, table 0x4686a0 (DATA view of vsav2 0x05649c; capture-pose table 3 (seqs 0x56-0x59 twin))
-# code+0x17f4: data_in_code reroute -> helper 0x4686d0, table 0x4686c0 (DATA view of vsav2 0x0564ac; capture-pose table 4 (01/03/05 twin))
+code   0x468710 owner-tag thunk (huitzil id 0x10 -> (+0x7f,A4), then stamp_b_d16 197c00440002, rts)
+# code+0x966: owner_tag stamp_b_d16 type 68 -> jsr 0x468710 (huitzil id 0x10)
+# code+0xa22: owner_tag stamp_b_d16 type 68 -> jsr 0x468710 (huitzil id 0x10)
+code   0x468720 owner-tag thunk (huitzil id 0x10 -> (+0x7f,A4), then stamp_b_d16 197c00450002, rts)
+# code+0xdf0: owner_tag stamp_b_d16 type 69 -> jsr 0x468720 (huitzil id 0x10)
+# code+0xe20: owner_tag stamp_b_d16 type 69 -> jsr 0x468720 (huitzil id 0x10)
+code   0x468730 owner-tag thunk (huitzil id 0x10 -> (+0x7f,A4), then stamp_b_d16 197c00460002, rts)
+# code+0x1070: owner_tag stamp_b_d16 type 70 -> jsr 0x468730 (huitzil id 0x10)
+# code+0x14b0: owner_tag stamp_b_d16 type 70 -> jsr 0x468730 (huitzil id 0x10)
+code   0x468740 owner-tag thunk (huitzil id 0x10 -> (+0x7f,A4), then stamp_b_d16 197c00470002, rts)
+# code+0x1950: owner_tag stamp_b_d16 type 71 -> jsr 0x468740 (huitzil id 0x10)
+code   0x468750 owner-tag thunk (huitzil id 0x10 -> (+0x7f,A4), then stamp_b_d16 197c00480002, rts)
+# code+0x2026: owner_tag stamp_b_d16 type 72 -> jsr 0x468750 (huitzil id 0x10)
+# code+0x2048: owner_tag stamp_b_d16 type 72 -> jsr 0x468750 (huitzil id 0x10)
+# code+0x13bc: data_in_code reroute -> helper 0x468770, table 0x468760 (DATA view of vsav2 0x056074; FG capture-pose random table (native draws seqs 1/3/5))
+# code+0x1390: data_in_code reroute -> helper 0x468790, table 0x468780 (DATA view of vsav2 0x056064; FG capture-pose table 2 (seqs 0x56-0x59))
+# code+0x17c8: data_in_code reroute -> helper 0x4687b0, table 0x4687a0 (DATA view of vsav2 0x05649c; capture-pose table 3 (seqs 0x56-0x59 twin))
+# code+0x17f4: data_in_code reroute -> helper 0x4687d0, table 0x4687c0 (DATA view of vsav2 0x0564ac; capture-pose table 4 (01/03/05 twin))
 code_file 0x413030 +0x27c6  donovan code (from vsav2 0x054C90)
-data_file 0x459380 +0x32b2  donovan hitbox (from vsav2 0x0C4250)
+data_file 0x459480 +0x32b2  donovan hitbox (from vsav2 0x0C4250)
 # hitbox_proj+0x17d: region_fix 52 -> 06 (trap dome hit record 1: class 0x52 -> 0x06 (vs2-alias-proven; routes vsavj electric-shake 0x23AC8))
 # hitbox_proj+0x19d: region_fix 52 -> 06 (trap dome hit record 2: class 0x52 -> 0x06 (vs2-alias-proven))
-data_file 0x45c640 +0x3c6  donovan hitbox_proj (from vsav2 0x0D05C0)
-code   0x4686e0 ILLEGAL  TRIPWIRE for unresolved 0x2cd38
-# x022400+0x112: unresolved 0x2cd38 -> tripwire 0x4686e0
+data_file 0x45c740 +0x3c6  donovan hitbox_proj (from vsav2 0x0D05C0)
+code   0x4687e0 ILLEGAL  TRIPWIRE for unresolved 0x2cd38
+# x022400+0x112: unresolved 0x2cd38 -> tripwire 0x4687e0
 # bank_ref 0xd8998 -> 0xbe7fa (delta rule, 16B byte-identical)
-code   0x4686f0 ILLEGAL  TRIPWIRE for unresolved 0x7f5f4
-# x022400+0xa82: unresolved 0x7f5f4 -> tripwire 0x4686f0
-code   0x468700 ILLEGAL  TRIPWIRE for unresolved 0x82480
-# x022400+0xada: unresolved 0x82480 -> tripwire 0x468700
+code   0x4687f0 ILLEGAL  TRIPWIRE for unresolved 0x7f5f4
+# x022400+0xa82: unresolved 0x7f5f4 -> tripwire 0x4687f0
+code   0x468800 ILLEGAL  TRIPWIRE for unresolved 0x82480
+# x022400+0xada: unresolved 0x82480 -> tripwire 0x468800
 # bank_ref 0xd9638 -> 0xbf49a (delta rule, known table base)
-code   0x468710 ILLEGAL  TRIPWIRE for unresolved 0x828fe
-# x022400+0xb66: unresolved 0x828fe -> tripwire 0x468710
+code   0x468810 ILLEGAL  TRIPWIRE for unresolved 0x828fe
+# x022400+0xb66: unresolved 0x828fe -> tripwire 0x468810
 # bank_ref 0xd8998 -> 0xbe7fa (delta rule, 16B byte-identical)
-code   0x468720 ILLEGAL  TRIPWIRE for unresolved 0xbdb0
-# x022400+0x12ac: unresolved 0xbdb0 -> tripwire 0x468720
-# x022400+0x12fa: unresolved 0x2cd38 -> tripwire 0x4686e0
-code   0x468730 ILLEGAL  TRIPWIRE for unresolved 0x8278c
-# x022400+0x14c0: unresolved 0x8278c -> tripwire 0x468730
-code   0x468740 ILLEGAL  TRIPWIRE for unresolved 0x7b368
-# x022400+0x15c8: unresolved 0x7b368 -> tripwire 0x468740
-code   0x468750 ILLEGAL  TRIPWIRE for unresolved 0x3d1c
-# x022400+0x662: unresolved 0x3d1c -> tripwire 0x468750
-code   0x468760 ILLEGAL  TRIPWIRE for unresolved 0x3dc6
-# x022400+0x696: unresolved 0x3dc6 -> tripwire 0x468760
-code   0x468770 ILLEGAL  TRIPWIRE for unresolved 0x3e70
-# x022400+0x80c: unresolved 0x3e70 -> tripwire 0x468770
-# x022400+0x86c: unresolved 0x3d1c -> tripwire 0x468750
-code   0x468780 ILLEGAL  TRIPWIRE for unresolved 0x3c44
-# x022400+0x1078: unresolved 0x3c44 -> tripwire 0x468780
-code   0x468790 ILLEGAL  TRIPWIRE for unresolved 0x3cb0
-# x022400+0x13a0: unresolved 0x3cb0 -> tripwire 0x468790
-code   0x4687a0 ILLEGAL  TRIPWIRE for unresolved 0x3a28
-# x022400+0x13e0: unresolved 0x3a28 -> tripwire 0x4687a0
-# x022400+0x13ee: unresolved 0x3a28 -> tripwire 0x4687a0
-code   0x4687b0 ILLEGAL  TRIPWIRE for unresolved 0x3980
-# x022400+0x1404: unresolved 0x3980 -> tripwire 0x4687b0
-code   0x4687c0 ILLEGAL  TRIPWIRE for unresolved 0x41be
-# x022400+0x14ce: unresolved 0x41be -> tripwire 0x4687c0
+code   0x468820 ILLEGAL  TRIPWIRE for unresolved 0xbdb0
+# x022400+0x12ac: unresolved 0xbdb0 -> tripwire 0x468820
+# x022400+0x12fa: unresolved 0x2cd38 -> tripwire 0x4687e0
+code   0x468830 ILLEGAL  TRIPWIRE for unresolved 0x8278c
+# x022400+0x14c0: unresolved 0x8278c -> tripwire 0x468830
+code   0x468840 ILLEGAL  TRIPWIRE for unresolved 0x7b368
+# x022400+0x15c8: unresolved 0x7b368 -> tripwire 0x468840
+code   0x468850 ILLEGAL  TRIPWIRE for unresolved 0x3d1c
+# x022400+0x662: unresolved 0x3d1c -> tripwire 0x468850
+code   0x468860 ILLEGAL  TRIPWIRE for unresolved 0x3dc6
+# x022400+0x696: unresolved 0x3dc6 -> tripwire 0x468860
+code   0x468870 ILLEGAL  TRIPWIRE for unresolved 0x3e70
+# x022400+0x80c: unresolved 0x3e70 -> tripwire 0x468870
+# x022400+0x86c: unresolved 0x3d1c -> tripwire 0x468850
+code   0x468880 ILLEGAL  TRIPWIRE for unresolved 0x3c44
+# x022400+0x1078: unresolved 0x3c44 -> tripwire 0x468880
+code   0x468890 ILLEGAL  TRIPWIRE for unresolved 0x3cb0
+# x022400+0x13a0: unresolved 0x3cb0 -> tripwire 0x468890
+code   0x4688a0 ILLEGAL  TRIPWIRE for unresolved 0x3a28
+# x022400+0x13e0: unresolved 0x3a28 -> tripwire 0x4688a0
+# x022400+0x13ee: unresolved 0x3a28 -> tripwire 0x4688a0
+code   0x4688b0 ILLEGAL  TRIPWIRE for unresolved 0x3980
+# x022400+0x1404: unresolved 0x3980 -> tripwire 0x4688b0
+code   0x4688c0 ILLEGAL  TRIPWIRE for unresolved 0x41be
+# x022400+0x14ce: unresolved 0x41be -> tripwire 0x4688c0
 # x022400+0x82: char-id imm 0x10 -> 0x10
 # x022400+0x1618: ESCAPE TRIPWIRE for unresolved pcrel target 0x24d12
 # x022400+0x1624: ESCAPE TRIPWIRE for unresolved pcrel target 0x275e4
 # pcrel_escape_fix x022400: 118 escapes -> 11 trampolines (2 tripwired), pad 0x1600..0x1780
 code_file 0x41aa00 +0x1780  donovan x022400 (from vsav2 0x022400)
-code   0x4687d0 ILLEGAL  TRIPWIRE for unresolved 0x2cbde
-# x02592a+0x16e: unresolved 0x2cbde -> tripwire 0x4687d0
-code   0x4687e0 ILLEGAL  TRIPWIRE for unresolved 0x2ce0a
-# x02592a+0x18a: unresolved 0x2ce0a -> tripwire 0x4687e0
-code   0x4687f0 ILLEGAL  TRIPWIRE for unresolved 0x2ce3e
-# x02592a+0x368: unresolved 0x2ce3e -> tripwire 0x4687f0
-code   0x468800 ILLEGAL  TRIPWIRE for unresolved 0x364a
-# x02592a+0x44a: unresolved 0x364a -> tripwire 0x468800
+code   0x4688d0 ILLEGAL  TRIPWIRE for unresolved 0x2cbde
+# x02592a+0x16e: unresolved 0x2cbde -> tripwire 0x4688d0
+code   0x4688e0 ILLEGAL  TRIPWIRE for unresolved 0x2ce0a
+# x02592a+0x18a: unresolved 0x2ce0a -> tripwire 0x4688e0
+code   0x4688f0 ILLEGAL  TRIPWIRE for unresolved 0x2ce3e
+# x02592a+0x368: unresolved 0x2ce3e -> tripwire 0x4688f0
+code   0x468900 ILLEGAL  TRIPWIRE for unresolved 0x364a
+# x02592a+0x44a: unresolved 0x364a -> tripwire 0x468900
 # pcrel_escape_fix x02592a: 89 escapes -> 35 trampolines (0 tripwired), pad 0x456..0x576
 code_file 0x41c180 +0x576  donovan x02592a (from vsav2 0x02592A)
 # x026142+0x1414: bank table row 0x13 <- 0x1000 (bank 4, WIDE encoding; vanilla row was 0x2000) — tenant-driven
@@ -637,16 +637,16 @@ code_file 0x41c700 +0x14a0  donovan x026142 (from vsav2 0x026142)
 # x028122+0x9c0: port_patch 426db496 -> 426db444 (obj-hit dmg: clr white var -> vsavj layout (-0x4BBC))
 # x028122+0x9d0: port_patch 3b42b496 -> 3b42b444 (obj-hit dmg: white damage -> vsavj layout (-0x4BBC))
 code_file 0x41dba0 +0xe00  donovan x028122 (from vsav2 0x028122)
-code   0x468810 slot-clearing alloc wrapper for 0x1572e -> 0x16fe6 (0x80 cleared, +8 preserved)
-code   0x468850 farm-port stub for 0x2915c (param at 0x468840, common 0x29f4a)
-code   0x468870 farm-port stub for 0x29164 (param at 0x468860, common 0x29f4a)
-code   0x468880 sound stub for 0x4f96 (vsavj sfx id 0xa1)
-code   0x4688a0 ILLEGAL  TRIPWIRE for unresolved 0x4223c
-# x057456+0x3b42: unresolved 0x4223c -> tripwire 0x4688a0
-code   0x4688b0 ILLEGAL  TRIPWIRE for unresolved 0x42cee
-# x057456+0x421a: unresolved 0x42cee -> tripwire 0x4688b0
-code   0x4688c0 ILLEGAL  TRIPWIRE for unresolved 0x448d4
-# x057456+0x50cc: unresolved 0x448d4 -> tripwire 0x4688c0
+code   0x468910 slot-clearing alloc wrapper for 0x1572e -> 0x16fe6 (0x80 cleared, +8 preserved)
+code   0x468950 farm-port stub for 0x2915c (param at 0x468940, common 0x29f4a)
+code   0x468970 farm-port stub for 0x29164 (param at 0x468960, common 0x29f4a)
+code   0x468980 sound stub for 0x4f96 (vsavj sfx id 0xa1)
+code   0x4689a0 ILLEGAL  TRIPWIRE for unresolved 0x4223c
+# x057456+0x3b42: unresolved 0x4223c -> tripwire 0x4689a0
+code   0x4689b0 ILLEGAL  TRIPWIRE for unresolved 0x42cee
+# x057456+0x421a: unresolved 0x42cee -> tripwire 0x4689b0
+code   0x4689c0 ILLEGAL  TRIPWIRE for unresolved 0x448d4
+# x057456+0x50cc: unresolved 0x448d4 -> tripwire 0x4689c0
 # x057456+0x418e: char-id imm 0x10 -> 0x10
 # x057456+0x1f36: port_patch 397c60000018 -> 397c10000018 (OBJ bank setter (H own zone): vs2 bank 3 -> WIDE bank 4)
 # x057456+0x2468: type_renumber stamp_l_ind type 114 -> 124 (huitzil's own number; site 0x5e542)
@@ -663,52 +663,52 @@ code   0x4688c0 ILLEGAL  TRIPWIRE for unresolved 0x448d4
 # x057456+0x3c: type_renumber stamp_l_ind type 115 -> 126 (huitzil's own number; site 0x5e542)
 # x057456+0x1f2a: type_renumber stamp_b_d16 type 115 -> 126 (huitzil's own number; site 0x5e542)
 # x057456+0x2014: type_renumber stamp_l_ind type 118 -> 132 (huitzil's own number; site 0x5e542)
-code   0x4688d0 owner-tag thunk (huitzil id 0x10 -> (+0x7f,A4), then stamp_b_d16 197c00400002, rts)
-# x057456+0x8fc: owner_tag stamp_b_d16 type 64 -> jsr 0x4688d0 (huitzil id 0x10)
-code   0x4688e0 owner-tag thunk (huitzil id 0x10 -> (+0x7f,A4), then stamp_b_d16 197c00410002, rts)
-# x057456+0xa24: owner_tag stamp_b_d16 type 65 -> jsr 0x4688e0 (huitzil id 0x10)
-code   0x4688f0 owner-tag thunk (huitzil id 0x10 -> (+0x7f,A4), then stamp_b_d16 197c00420002, rts)
-# x057456+0x14ce: owner_tag stamp_b_d16 type 66 -> jsr 0x4688f0 (huitzil id 0x10)
-code   0x468900 owner-tag thunk (huitzil id 0x10 -> (+0x7f,A4), then stamp_b_d16 197c00430002, rts)
-# x057456+0x18f6: owner_tag stamp_b_d16 type 67 -> jsr 0x468900 (huitzil id 0x10)
-code   0x468910 owner-tag thunk (huitzil id 0x10 -> (+0x7f,A4), then stamp_b_d16 197c003e0002, rts)
-# x057456+0x29c4: owner_tag stamp_b_d16 type 62 -> jsr 0x468910 (huitzil id 0x10)
-code   0x468920 owner-tag thunk (huitzil id 0x10 -> (+0x7f,A4), then stamp_b_d16 197c003f0002, rts)
-# x057456+0x2b4a: owner_tag stamp_b_d16 type 63 -> jsr 0x468920 (huitzil id 0x10)
-code   0x468930 owner-tag thunk (huitzil id 0x10 -> (+0x7f,A4), then stamp_b_d16 197c004b0002, rts)
-# x057456+0x2b56: owner_tag stamp_b_d16 type 75 -> jsr 0x468930 (huitzil id 0x10)
-code   0x468940 owner-tag thunk (huitzil id 0x10 -> (+0x7f,A4), then stamp_b_d16 197c003d0002, rts)
-# x057456+0x39fe: owner_tag stamp_b_d16 type 61 -> jsr 0x468940 (huitzil id 0x10)
-code   0x468950 owner-tag thunk (huitzil id 0x10 -> (+0x7f,A4), then stamp_b_d16 197c00490002, rts)
-# x057456+0x4624: owner_tag stamp_b_d16 type 73 -> jsr 0x468950 (huitzil id 0x10)
-code   0x468960 owner-tag thunk (huitzil id 0x10 -> (+0x7f,A4), then stamp_l_ind 28bc01014200, rts)
-# x057456+0x4d12: owner_tag stamp_l_ind type 66 -> jsr 0x468960 (huitzil id 0x10)
-code   0x468970 owner-tag thunk (huitzil id 0x10 -> (+0x7f,A4), then stamp_l_ind 28bc01004202, rts)
-# x057456+0x4ddc: owner_tag stamp_l_ind type 66 -> jsr 0x468970 (huitzil id 0x10)
+code   0x4689d0 owner-tag thunk (huitzil id 0x10 -> (+0x7f,A4), then stamp_b_d16 197c00400002, rts)
+# x057456+0x8fc: owner_tag stamp_b_d16 type 64 -> jsr 0x4689d0 (huitzil id 0x10)
+code   0x4689e0 owner-tag thunk (huitzil id 0x10 -> (+0x7f,A4), then stamp_b_d16 197c00410002, rts)
+# x057456+0xa24: owner_tag stamp_b_d16 type 65 -> jsr 0x4689e0 (huitzil id 0x10)
+code   0x4689f0 owner-tag thunk (huitzil id 0x10 -> (+0x7f,A4), then stamp_b_d16 197c00420002, rts)
+# x057456+0x14ce: owner_tag stamp_b_d16 type 66 -> jsr 0x4689f0 (huitzil id 0x10)
+code   0x468a00 owner-tag thunk (huitzil id 0x10 -> (+0x7f,A4), then stamp_b_d16 197c00430002, rts)
+# x057456+0x18f6: owner_tag stamp_b_d16 type 67 -> jsr 0x468a00 (huitzil id 0x10)
+code   0x468a10 owner-tag thunk (huitzil id 0x10 -> (+0x7f,A4), then stamp_b_d16 197c003e0002, rts)
+# x057456+0x29c4: owner_tag stamp_b_d16 type 62 -> jsr 0x468a10 (huitzil id 0x10)
+code   0x468a20 owner-tag thunk (huitzil id 0x10 -> (+0x7f,A4), then stamp_b_d16 197c003f0002, rts)
+# x057456+0x2b4a: owner_tag stamp_b_d16 type 63 -> jsr 0x468a20 (huitzil id 0x10)
+code   0x468a30 owner-tag thunk (huitzil id 0x10 -> (+0x7f,A4), then stamp_b_d16 197c004b0002, rts)
+# x057456+0x2b56: owner_tag stamp_b_d16 type 75 -> jsr 0x468a30 (huitzil id 0x10)
+code   0x468a40 owner-tag thunk (huitzil id 0x10 -> (+0x7f,A4), then stamp_b_d16 197c003d0002, rts)
+# x057456+0x39fe: owner_tag stamp_b_d16 type 61 -> jsr 0x468a40 (huitzil id 0x10)
+code   0x468a50 owner-tag thunk (huitzil id 0x10 -> (+0x7f,A4), then stamp_b_d16 197c00490002, rts)
+# x057456+0x4624: owner_tag stamp_b_d16 type 73 -> jsr 0x468a50 (huitzil id 0x10)
+code   0x468a60 owner-tag thunk (huitzil id 0x10 -> (+0x7f,A4), then stamp_l_ind 28bc01014200, rts)
+# x057456+0x4d12: owner_tag stamp_l_ind type 66 -> jsr 0x468a60 (huitzil id 0x10)
+code   0x468a70 owner-tag thunk (huitzil id 0x10 -> (+0x7f,A4), then stamp_l_ind 28bc01004202, rts)
+# x057456+0x4ddc: owner_tag stamp_l_ind type 66 -> jsr 0x468a70 (huitzil id 0x10)
 code_file 0x4157f6 +0x5200  donovan x057456 (from vsav2 0x057456)
-code   0x468980 ILLEGAL  TRIPWIRE for unresolved 0x12f484
-# x05c800+0x152a: unresolved 0x12f484 -> tripwire 0x468980
-# x05c800+0x16a4: unresolved 0x12f484 -> tripwire 0x468980
-code   0x468990 ILLEGAL  TRIPWIRE for unresolved 0x167bf4
-# x05c800+0x2622: unresolved 0x167bf4 -> tripwire 0x468990
-# x05c800+0x2a20: unresolved 0x167bf4 -> tripwire 0x468990
-code   0x4689a0 ILLEGAL  TRIPWIRE for unresolved 0x17f176
-# x05c800+0x2ae4: unresolved 0x17f176 -> tripwire 0x4689a0
-# x05c800+0x3034: unresolved 0x17f176 -> tripwire 0x4689a0
-code   0x4689b0 ILLEGAL  TRIPWIRE for unresolved 0x181592
-# x05c800+0x3072: unresolved 0x181592 -> tripwire 0x4689b0
+code   0x468a80 ILLEGAL  TRIPWIRE for unresolved 0x12f484
+# x05c800+0x152a: unresolved 0x12f484 -> tripwire 0x468a80
+# x05c800+0x16a4: unresolved 0x12f484 -> tripwire 0x468a80
+code   0x468a90 ILLEGAL  TRIPWIRE for unresolved 0x167bf4
+# x05c800+0x2622: unresolved 0x167bf4 -> tripwire 0x468a90
+# x05c800+0x2a20: unresolved 0x167bf4 -> tripwire 0x468a90
+code   0x468aa0 ILLEGAL  TRIPWIRE for unresolved 0x17f176
+# x05c800+0x2ae4: unresolved 0x17f176 -> tripwire 0x468aa0
+# x05c800+0x3034: unresolved 0x17f176 -> tripwire 0x468aa0
+code   0x468ab0 ILLEGAL  TRIPWIRE for unresolved 0x181592
+# x05c800+0x3072: unresolved 0x181592 -> tripwire 0x468ab0
 # x05c800+0x1456: char-id imm 0x10 -> 0x10
 # x05c800+0x738: port_patch 3d7c60000018 -> 3d7c10000018 (OBJ bank setter: vs2 bank 3 -> vsav bank 2 (Jedah band) / WIDE bank 4)
 # x05c800+0x58d4: port_patch 397c60000018 -> 397c10000018 (OBJ bank setter (a4 form): vs2 bank 3 -> vsav bank 2 / WIDE bank 4)
 # x05c800+0x5994: port_patch 397c60000018 -> 397c10000018 (OBJ bank setter (a4 form): vs2 bank 3 -> vsav bank 2 / WIDE bank 4)
-code   0x4689c0 owner-tag thunk (huitzil id 0x10 -> (+0x7f,A4), then stamp_l_ind 28bc01003b22, rts)
-# x05c800+0x83a: owner_tag stamp_l_ind type 59 -> jsr 0x4689c0 (huitzil id 0x10)
+code   0x468ac0 owner-tag thunk (huitzil id 0x10 -> (+0x7f,A4), then stamp_l_ind 28bc01003b22, rts)
+# x05c800+0x83a: owner_tag stamp_l_ind type 59 -> jsr 0x468ac0 (huitzil id 0x10)
 # pcrel_escape_fix x05c800: 2 escapes -> 1 trampolines (0 tripwired), pad 0x6a00..0x6a20
 code_file 0x41e9a0 +0x6a20  donovan x05c800 (from vsav2 0x05C800)
 code_file 0x3ffcf0 +0x280  donovan x0672d0 (from vsav2 0x0672D0)
 code_file 0x4253c0 +0x2f6  donovan x067550 (from vsav2 0x067550)
-code   0x4689d0 sound stub for 0x4fb0 (vsavj sfx id 0xa0)
-code   0x4689f0 sound stub for 0x4fca (vsavj sfx id 0xa5)
+code   0x468ad0 sound stub for 0x4fb0 (vsavj sfx id 0xa0)
+code   0x468af0 sound stub for 0x4fca (vsavj sfx id 0xa5)
 code_file 0x4256c0 +0x1ba  donovan x067846 (from vsav2 0x067846)
 code_file 0x425880 +0x60c  donovan x067a00 (from vsav2 0x067A00)
 # x06800c+0x354: port_patch 397c60000018 -> 397c10000018 (OBJ bank setter (H farm zone): vs2 bank 3 -> WIDE bank 4)
@@ -720,62 +720,62 @@ code_file 0x425880 +0x60c  donovan x067a00 (from vsav2 0x067A00)
 # x06800c+0x3d2: type_renumber stamp_b_d16 type 115 -> 126 (huitzil's own number; site 0x5e542)
 # x06800c+0x416: type_renumber stamp_b_d16 type 115 -> 126 (huitzil's own number; site 0x5e542)
 code_file 0x425e90 +0x44c  donovan x06800c (from vsav2 0x06800C)
-code   0x468a10 sound stub for 0x4f2e (vsavj sfx id 0x199)
+code   0x468b10 sound stub for 0x4f2e (vsavj sfx id 0x199)
 code_file 0x4262e0 +0x310  donovan x068458 (from vsav2 0x068458)
 code_file 0x4265f0 +0x264  donovan x068768 (from vsav2 0x068768)
-code   0x468a30 sound stub for 0x4efa (vsavj sfx id 0x90)
+code   0x468b30 sound stub for 0x4efa (vsavj sfx id 0x90)
 code_file 0x426860 +0x2ac  donovan x0689cc (from vsav2 0x0689CC)
-code   0x468a50 +0x40  patched clone of 0x5459a for vs2 0x5c77e (unmasked set-anim entry; false byte-matc)
-code   0x468a90 sound stub for 0x4f62 (vsavj sfx id 0x7f)
+code   0x468b50 +0x40  patched clone of 0x5459a for vs2 0x5c77e (unmasked set-anim entry; false byte-matc)
+code   0x468b90 sound stub for 0x4f62 (vsavj sfx id 0x7f)
 code_file 0x426b10 +0x3ce  donovan x068c78 (from vsav2 0x068C78)
 # x069046+0x260: type_renumber stamp_l_ind type 114 -> 124 (huitzil's own number; site 0x5e542)
-code   0x468ab0 owner-tag thunk (huitzil id 0x10 -> (+0x7f,A4), then stamp_l_ind 28bc01004206, rts)
-# x069046+0x4a: owner_tag stamp_l_ind type 66 -> jsr 0x468ab0 (huitzil id 0x10)
-code   0x468ac0 owner-tag thunk (huitzil id 0x10 -> (+0x7f,A4), then stamp_l_ind 28bc01004204, rts)
-# x069046+0x130: owner_tag stamp_l_ind type 66 -> jsr 0x468ac0 (huitzil id 0x10)
+code   0x468bb0 owner-tag thunk (huitzil id 0x10 -> (+0x7f,A4), then stamp_l_ind 28bc01004206, rts)
+# x069046+0x4a: owner_tag stamp_l_ind type 66 -> jsr 0x468bb0 (huitzil id 0x10)
+code   0x468bc0 owner-tag thunk (huitzil id 0x10 -> (+0x7f,A4), then stamp_l_ind 28bc01004204, rts)
+# x069046+0x130: owner_tag stamp_l_ind type 66 -> jsr 0x468bc0 (huitzil id 0x10)
 code_file 0x426ee0 +0x2b0  donovan x069046 (from vsav2 0x069046)
 # x0692f6+0x19a: port_patch 397c60000018 -> 397c10000018 (OBJ bank setter (H farm zone): vs2 bank 3 -> WIDE bank 4)
 # x0692f6+0x18e: type_renumber stamp_b_d16 type 115 -> 126 (huitzil's own number; site 0x5e542)
 code_file 0x427190 +0x368  donovan x0692f6 (from vsav2 0x0692F6)
 # x06965e+0xac: type_renumber stamp_l_ind type 114 -> 124 (huitzil's own number; site 0x5e542)
 code_file 0x427500 +0x100  donovan x06965e (from vsav2 0x06965E)
-code   0x468ad0 ILLEGAL  TRIPWIRE for unresolved 0x22f2d2
-# x06cac0+0x546: unresolved 0x22f2d2 -> tripwire 0x468ad0
-code   0x468ae0 ILLEGAL  TRIPWIRE for unresolved 0x4cb0
-# x06cac0+0x552: unresolved 0x4cb0 -> tripwire 0x468ae0
-code   0x468af0 ILLEGAL  TRIPWIRE for unresolved 0x4c96
-# x06cac0+0x586: unresolved 0x4c96 -> tripwire 0x468af0
-# x06cac0+0x58e: unresolved 0x22f2d2 -> tripwire 0x468ad0
+code   0x468bd0 ILLEGAL  TRIPWIRE for unresolved 0x22f2d2
+# x06cac0+0x546: unresolved 0x22f2d2 -> tripwire 0x468bd0
+code   0x468be0 ILLEGAL  TRIPWIRE for unresolved 0x4cb0
+# x06cac0+0x552: unresolved 0x4cb0 -> tripwire 0x468be0
+code   0x468bf0 ILLEGAL  TRIPWIRE for unresolved 0x4c96
+# x06cac0+0x586: unresolved 0x4c96 -> tripwire 0x468bf0
+# x06cac0+0x58e: unresolved 0x22f2d2 -> tripwire 0x468bd0
 # bank_ref 0xd7118 -> 0xbcf7a (delta rule, known table base)
 # bank_ref 0xd7118 -> 0xbcf7a (delta rule, known table base)
-code   0x468b00 ILLEGAL  TRIPWIRE for unresolved 0x3a90
-# x06cac0+0xacc: unresolved 0x3a90 -> tripwire 0x468b00
-code   0x468b10 ILLEGAL  TRIPWIRE for unresolved 0x3a76
-# x06cac0+0xb18: unresolved 0x3a76 -> tripwire 0x468b10
-# x06cac0+0xb60: unresolved 0x3a76 -> tripwire 0x468b10
-# x06cac0+0xbac: unresolved 0x3a76 -> tripwire 0x468b10
+code   0x468c00 ILLEGAL  TRIPWIRE for unresolved 0x3a90
+# x06cac0+0xacc: unresolved 0x3a90 -> tripwire 0x468c00
+code   0x468c10 ILLEGAL  TRIPWIRE for unresolved 0x3a76
+# x06cac0+0xb18: unresolved 0x3a76 -> tripwire 0x468c10
+# x06cac0+0xb60: unresolved 0x3a76 -> tripwire 0x468c10
+# x06cac0+0xbac: unresolved 0x3a76 -> tripwire 0x468c10
 # pcrel_escape_fix x06cac0: 0 escapes -> 0 trampolines (0 tripwired), pad 0xebc..0xf1c
 code_file 0x427600 +0xca8  donovan x06cac0 code (from vsav2 0x06CAC0)
 data_file 0x4282a8 +0x274  donovan x06cac0 RAW TABLES (unencrypted; vs2 0x06D768)
-code   0x468b20 ILLEGAL  TRIPWIRE for unresolved 0x281696
-# x088512+0x348: unresolved 0x281696 -> tripwire 0x468b20
-code   0x468b30 ILLEGAL  TRIPWIRE for unresolved 0x289b14
-# x088512+0x126a: unresolved 0x289b14 -> tripwire 0x468b30
-# x088512+0x127c: unresolved 0x289b14 -> tripwire 0x468b30
-code   0x468b40 ILLEGAL  TRIPWIRE for unresolved 0x28ed08
-# x088512+0x1de2: unresolved 0x28ed08 -> tripwire 0x468b40
-code   0x468b50 ILLEGAL  TRIPWIRE for unresolved 0x36784a
-# x088512+0x1dee: unresolved 0x36784a -> tripwire 0x468b50
-code   0x468b60 sound stub for 0x50ee (vsavj sfx id 0x7e)
-code   0x468b80 sound stub for 0x50a0 (vsavj sfx id 0x7b)
-code   0x468ba0 sound stub for 0x50d4 (vsavj sfx id 0x7d)
-code   0x468bc0 sound stub for 0x50ba (vsavj sfx id 0x7c)
-code   0x468be0 sound stub for 0x4e2a (vsavj sfx id 0x8f)
-code   0x468c00 sound stub for 0x4df6 (vsavj sfx id 0x86)
-code   0x468c20 ILLEGAL  TRIPWIRE for unresolved 0x2695d0
-# x088512+0x2894: unresolved 0x2695d0 -> tripwire 0x468c20
-code   0x468c30 ILLEGAL  TRIPWIRE for unresolved 0x2abd58
-# x088512+0x359c: unresolved 0x2abd58 -> tripwire 0x468c30
+code   0x468c20 ILLEGAL  TRIPWIRE for unresolved 0x281696
+# x088512+0x348: unresolved 0x281696 -> tripwire 0x468c20
+code   0x468c30 ILLEGAL  TRIPWIRE for unresolved 0x289b14
+# x088512+0x126a: unresolved 0x289b14 -> tripwire 0x468c30
+# x088512+0x127c: unresolved 0x289b14 -> tripwire 0x468c30
+code   0x468c40 ILLEGAL  TRIPWIRE for unresolved 0x28ed08
+# x088512+0x1de2: unresolved 0x28ed08 -> tripwire 0x468c40
+code   0x468c50 ILLEGAL  TRIPWIRE for unresolved 0x36784a
+# x088512+0x1dee: unresolved 0x36784a -> tripwire 0x468c50
+code   0x468c60 sound stub for 0x50ee (vsavj sfx id 0x7e)
+code   0x468c80 sound stub for 0x50a0 (vsavj sfx id 0x7b)
+code   0x468ca0 sound stub for 0x50d4 (vsavj sfx id 0x7d)
+code   0x468cc0 sound stub for 0x50ba (vsavj sfx id 0x7c)
+code   0x468ce0 sound stub for 0x4e2a (vsavj sfx id 0x8f)
+code   0x468d00 sound stub for 0x4df6 (vsavj sfx id 0x86)
+code   0x468d20 ILLEGAL  TRIPWIRE for unresolved 0x2695d0
+# x088512+0x2894: unresolved 0x2695d0 -> tripwire 0x468d20
+code   0x468d30 ILLEGAL  TRIPWIRE for unresolved 0x2abd58
+# x088512+0x359c: unresolved 0x2abd58 -> tripwire 0x468d30
 # x088512+0x22c: port_patch 3d7c60000018 -> 3d7c10000018 (OBJ bank setter: vs2 bank 3 -> vsav bank 2 / WIDE bank 4)
 # x088512+0x1814: port_patch 3d7c60000018 -> 3d7c10000018 (OBJ bank setter: vs2 bank 3 -> vsav bank 2 / WIDE bank 4)
 # x088512+0x2bee: port_patch 3d7c60000018 -> 3d7c10000018 (OBJ bank setter: vs2 bank 3 -> vsav bank 2 / WIDE bank 4)
@@ -787,63 +787,64 @@ code   0x468c30 ILLEGAL  TRIPWIRE for unresolved 0x2abd58
 # x088512+0x27ce: type_renumber stamp_l_ind type 117 -> 130 (huitzil's own number; site 0x5e542)
 # x088512+0x1dc4: type_renumber stamp_l_ind type 119 -> 134 (huitzil's own number; site 0x5e542)
 # x088512+0x2138: type_renumber stamp_l_ind type 119 -> 134 (huitzil's own number; site 0x5e542)
-code   0x468c40 owner-tag thunk (huitzil id 0x10 -> (+0x7f,A4), then stamp_l_ind 28bc01014102, rts)
-# x088512+0x2ebc: owner_tag stamp_l_ind type 65 -> jsr 0x468c40 (huitzil id 0x10)
-code   0x468c50 owner-tag thunk (huitzil id 0x10 -> (+0x7f,A4), then stamp_l_ind 28bc01014100, rts)
-# x088512+0x2f54: owner_tag stamp_l_ind type 65 -> jsr 0x468c50 (huitzil id 0x10)
-# x088512+0x3034: owner_tag stamp_l_ind type 65 -> jsr 0x468c50 (huitzil id 0x10)
-# x088512+0x305e: owner_tag stamp_l_ind type 65 -> jsr 0x468c50 (huitzil id 0x10)
-# x088512+0x3088: owner_tag stamp_l_ind type 65 -> jsr 0x468c50 (huitzil id 0x10)
-# x088512+0x30b2: owner_tag stamp_l_ind type 65 -> jsr 0x468c50 (huitzil id 0x10)
-# x088512+0x30dc: owner_tag stamp_l_ind type 65 -> jsr 0x468c50 (huitzil id 0x10)
-# x088512+0x3106: owner_tag stamp_l_ind type 65 -> jsr 0x468c50 (huitzil id 0x10)
-# x088512+0x3130: owner_tag stamp_l_ind type 65 -> jsr 0x468c50 (huitzil id 0x10)
-# x088512+0x329a: owner_tag stamp_l_ind type 65 -> jsr 0x468c50 (huitzil id 0x10)
-# x088512+0x32c4: owner_tag stamp_l_ind type 65 -> jsr 0x468c50 (huitzil id 0x10)
-# x088512+0x32ee: owner_tag stamp_l_ind type 65 -> jsr 0x468c50 (huitzil id 0x10)
-# x088512+0x3318: owner_tag stamp_l_ind type 65 -> jsr 0x468c50 (huitzil id 0x10)
-# x088512+0x3342: owner_tag stamp_l_ind type 65 -> jsr 0x468c50 (huitzil id 0x10)
-# x088512+0x336c: owner_tag stamp_l_ind type 65 -> jsr 0x468c50 (huitzil id 0x10)
-# x088512+0x3396: owner_tag stamp_l_ind type 65 -> jsr 0x468c50 (huitzil id 0x10)
-# x088512+0x33c0: owner_tag stamp_l_ind type 65 -> jsr 0x468c50 (huitzil id 0x10)
-# x088512+0x3ae4: data_in_code reroute -> helper 0x468d60, table 0x468c60 (DATA view of vsav2 0x08c042; pod-zone word offset/record table (a3 re-derived from it; self-relative))
+code   0x468d40 owner-tag thunk (huitzil id 0x10 -> (+0x7f,A4), then stamp_l_ind 28bc01014102, rts)
+# x088512+0x2ebc: owner_tag stamp_l_ind type 65 -> jsr 0x468d40 (huitzil id 0x10)
+code   0x468d50 owner-tag thunk (huitzil id 0x10 -> (+0x7f,A4), then stamp_l_ind 28bc01014100, rts)
+# x088512+0x2f54: owner_tag stamp_l_ind type 65 -> jsr 0x468d50 (huitzil id 0x10)
+# x088512+0x3034: owner_tag stamp_l_ind type 65 -> jsr 0x468d50 (huitzil id 0x10)
+# x088512+0x305e: owner_tag stamp_l_ind type 65 -> jsr 0x468d50 (huitzil id 0x10)
+# x088512+0x3088: owner_tag stamp_l_ind type 65 -> jsr 0x468d50 (huitzil id 0x10)
+# x088512+0x30b2: owner_tag stamp_l_ind type 65 -> jsr 0x468d50 (huitzil id 0x10)
+# x088512+0x30dc: owner_tag stamp_l_ind type 65 -> jsr 0x468d50 (huitzil id 0x10)
+# x088512+0x3106: owner_tag stamp_l_ind type 65 -> jsr 0x468d50 (huitzil id 0x10)
+# x088512+0x3130: owner_tag stamp_l_ind type 65 -> jsr 0x468d50 (huitzil id 0x10)
+# x088512+0x329a: owner_tag stamp_l_ind type 65 -> jsr 0x468d50 (huitzil id 0x10)
+# x088512+0x32c4: owner_tag stamp_l_ind type 65 -> jsr 0x468d50 (huitzil id 0x10)
+# x088512+0x32ee: owner_tag stamp_l_ind type 65 -> jsr 0x468d50 (huitzil id 0x10)
+# x088512+0x3318: owner_tag stamp_l_ind type 65 -> jsr 0x468d50 (huitzil id 0x10)
+# x088512+0x3342: owner_tag stamp_l_ind type 65 -> jsr 0x468d50 (huitzil id 0x10)
+# x088512+0x336c: owner_tag stamp_l_ind type 65 -> jsr 0x468d50 (huitzil id 0x10)
+# x088512+0x3396: owner_tag stamp_l_ind type 65 -> jsr 0x468d50 (huitzil id 0x10)
+# x088512+0x33c0: owner_tag stamp_l_ind type 65 -> jsr 0x468d50 (huitzil id 0x10)
+# x088512+0x3ae4: data_in_code reroute -> helper 0x468e60, table 0x468d60 (DATA view of vsav2 0x08c042; pod-zone word offset/record table (a3 re-derived from it; self-relative))
 code_file 0x428520 +0x3b78  donovan x088512 code (from vsav2 0x088512)
 data_file 0x42c098 +0x20  donovan x088512 RAW TABLES (unencrypted; vs2 0x08C08A)
-code_file 0x42c0c0 +0x306  donovan x093460 (from vsav2 0x093460)
-data_file 0x45ca10 +0x900  donovan x0d143e (from vsav2 0x0D143E)
-code   0x468d70 ILLEGAL  TRIPWIRE for unresolved 0x2c31aa
-# x2b7ef4+0xb0d9: unresolved 0x2c31aa -> tripwire 0x468d70
-code   0x468d80 ILLEGAL  TRIPWIRE for unresolved 0x2c31e4
-# x2b7ef4+0xb0fd: unresolved 0x2c31e4 -> tripwire 0x468d80
-code   0x468d90 ILLEGAL  TRIPWIRE for unresolved 0x2c3236
-# x2b7ef4+0xb105: unresolved 0x2c3236 -> tripwire 0x468d90
-code   0x468da0 ILLEGAL  TRIPWIRE for unresolved 0x2c325c
-# x2b7ef4+0xb10d: unresolved 0x2c325c -> tripwire 0x468da0
-code   0x468db0 ILLEGAL  TRIPWIRE for unresolved 0x2c3272
-# x2b7ef4+0xb115: unresolved 0x2c3272 -> tripwire 0x468db0
-code   0x468dc0 ILLEGAL  TRIPWIRE for unresolved 0x2c3280
-# x2b7ef4+0xb11d: unresolved 0x2c3280 -> tripwire 0x468dc0
-code   0x468dd0 ILLEGAL  TRIPWIRE for unresolved 0x2c3296
-# x2b7ef4+0xb125: unresolved 0x2c3296 -> tripwire 0x468dd0
-code   0x468de0 ILLEGAL  TRIPWIRE for unresolved 0x2c32a4
-# x2b7ef4+0xb12d: unresolved 0x2c32a4 -> tripwire 0x468de0
-code   0x468df0 ILLEGAL  TRIPWIRE for unresolved 0x2c32b2
-# x2b7ef4+0xb135: unresolved 0x2c32b2 -> tripwire 0x468df0
+code_file 0x42c0c0 +0x100  donovan x0926e4 (from vsav2 0x0926E4)
+code_file 0x42c1c0 +0x306  donovan x093460 (from vsav2 0x093460)
+data_file 0x45cb10 +0x900  donovan x0d143e (from vsav2 0x0D143E)
+code   0x468e70 ILLEGAL  TRIPWIRE for unresolved 0x2c31aa
+# x2b7ef4+0xb0d9: unresolved 0x2c31aa -> tripwire 0x468e70
+code   0x468e80 ILLEGAL  TRIPWIRE for unresolved 0x2c31e4
+# x2b7ef4+0xb0fd: unresolved 0x2c31e4 -> tripwire 0x468e80
+code   0x468e90 ILLEGAL  TRIPWIRE for unresolved 0x2c3236
+# x2b7ef4+0xb105: unresolved 0x2c3236 -> tripwire 0x468e90
+code   0x468ea0 ILLEGAL  TRIPWIRE for unresolved 0x2c325c
+# x2b7ef4+0xb10d: unresolved 0x2c325c -> tripwire 0x468ea0
+code   0x468eb0 ILLEGAL  TRIPWIRE for unresolved 0x2c3272
+# x2b7ef4+0xb115: unresolved 0x2c3272 -> tripwire 0x468eb0
+code   0x468ec0 ILLEGAL  TRIPWIRE for unresolved 0x2c3280
+# x2b7ef4+0xb11d: unresolved 0x2c3280 -> tripwire 0x468ec0
+code   0x468ed0 ILLEGAL  TRIPWIRE for unresolved 0x2c3296
+# x2b7ef4+0xb125: unresolved 0x2c3296 -> tripwire 0x468ed0
+code   0x468ee0 ILLEGAL  TRIPWIRE for unresolved 0x2c32a4
+# x2b7ef4+0xb12d: unresolved 0x2c32a4 -> tripwire 0x468ee0
+code   0x468ef0 ILLEGAL  TRIPWIRE for unresolved 0x2c32b2
+# x2b7ef4+0xb135: unresolved 0x2c32b2 -> tripwire 0x468ef0
 # x2b7ef4: effect-c5 — 5714 bank-1 codes kept NATIVE (art -> group C bank 5); 114 coord lists matched, 617 ported (11336B fragment)
-data_file 0x45d310 +0xb20c  donovan x2b7ef4 (from vsav2 0x2B7EF4)
-data     0x46ba50 +0x500  sprite palette block (vsav2 0x39BC9C); poke32 0x38c1d8 (table 0x38c198 row 0x10)
-data     0x46bf50 +0xdc0  effect palette block (vsav2 0x3AB69C); poke32 0x38c258 (table 0x38c218 row 0x10)
-poke32 0x0bceba <- 0x0042c3d0  anim_index_a[0x10] donovan anim
-poke32 0x0bcf3a <- 0x00430f2c  anim_index_a2[0x10] donovan anim
-poke32 0x0bcfba <- 0x0042ea3a  anim_index_b[0x10] donovan anim
-poke32 0x0bd03a <- 0x0042e9c4  anim_index_c[0x10] donovan anim
-poke32 0x0bd0ba <- 0x00436a34  anim_index_proj[0x10] donovan anim
+data_file 0x45d410 +0xb20c  donovan x2b7ef4 (from vsav2 0x2B7EF4)
+data     0x46bb50 +0x500  sprite palette block (vsav2 0x39BC9C); poke32 0x38c1d8 (table 0x38c198 row 0x10)
+data     0x46c050 +0xdc0  effect palette block (vsav2 0x3AB69C); poke32 0x38c258 (table 0x38c218 row 0x10)
+poke32 0x0bceba <- 0x0042c4d0  anim_index_a[0x10] donovan anim
+poke32 0x0bcf3a <- 0x0043102c  anim_index_a2[0x10] donovan anim
+poke32 0x0bcfba <- 0x0042eb3a  anim_index_b[0x10] donovan anim
+poke32 0x0bd03a <- 0x0042eac4  anim_index_c[0x10] donovan anim
+poke32 0x0bd0ba <- 0x00436b34  anim_index_proj[0x10] donovan anim
 data   0x0bd8fa +0x8  param32_a[0x10] value
 data   0x0bde7a +0x30  jump_params[0x10] value
-poke32 0x0bd9ba <- 0x004594a0  hitbox_base[0x10] donovan hitbox
-poke32 0x0bda3a <- 0x00459380  hitbox_comp[0x10] donovan hitbox
-poke32 0x0bdaba <- 0x0045c674  proj_hitbox_base[0x10] donovan hitbox_proj
-poke32 0x0bdb3a <- 0x0045c640  proj_hitbox_comp[0x10] donovan hitbox_proj
+poke32 0x0bd9ba <- 0x004595a0  hitbox_base[0x10] donovan hitbox
+poke32 0x0bda3a <- 0x00459480  hitbox_comp[0x10] donovan hitbox
+poke32 0x0bdaba <- 0x0045c774  proj_hitbox_base[0x10] donovan hitbox_proj
+poke32 0x0bdb3a <- 0x0045c740  proj_hitbox_comp[0x10] donovan hitbox_proj
 data   0x0bdbfa +0x8  rec8_a[0x10] value
 data   0x0be19a +0x2  word132[0x10] value
 data   0x0be1da +0x2  word_pos_a[0x10] value
@@ -882,33 +883,33 @@ poke32 0x089948 <- 0xffe80002  aux hud_name_entry_10_lo
 poke16 0x028d4e <- 0xf1b  aux effect_map_4e4f
 poke16 0x028d50 <- 0x1f19  aux effect_map_5051
 poke16 0x028d52 <- 0xf03  aux effect_map_5253
-data   0x46cd10 +0x1d80  data_port grab_hold_keyframes PLACED (tenant at 0x10; host block 0x92c4a untouched) <- vsav2 0x0c56aa (0 fixes)
-poke32 0x0be2ba <- 0x46cd10  data_port grab_hold_keyframes ptr-table 0xbe27a row 0x10
+data   0x46ce10 +0x1d80  data_port grab_hold_keyframes PLACED (tenant at 0x10; host block 0x92c4a untouched) <- vsav2 0x0c56aa (0 fixes)
+poke32 0x0be2ba <- 0x46ce10  data_port grab_hold_keyframes ptr-table 0xbe27a row 0x10
 data   0x00b668 +0x40  data_port voice_borrow_candidates_a <- vsav2 0x009f2a (0 fixes)
 data   0x00bf68 +0x40  data_port voice_borrow_voicenums_b <- vsav2 0x00a82a (4 fixes)
-data   0x46ea90 +0xc0  sound_table hui_sfx_records <- vsav2 0x0c742a (24 entries; kept ['0x110@1', '0x111@2', '0x112@3', '0x08d@5', '0x07f@6', '0x080@7', '0x081@8', '0x082@9', '0x0d8@10', '0x199@11', '0x083@12', '0x088@13', '0x089@14', '0x08a@15', '0x08b@16', '0x08c@17', '0x08e@18', '0x096@19', '0x094@20', '0x199@21', '0x198@22']; zeroed 2 unplayable ids; remapped [(5, '0x745', '0x8d'), (6, '0x735', '0x7f'), (7, '0x736', '0x80'), (8, '0x737', '0x81'), (9, '0x738', '0x82'), (10, '0x739', '0xd8'), (11, '0x73a', '0x199'), (12, '0x73b', '0x83'), (13, '0x740', '0x88'), (14, '0x741', '0x89'), (15, '0x742', '0x8a'), (16, '0x743', '0x8b'), (17, '0x744', '0x8c'), (18, '0x746', '0x8e'), (19, '0x74e', '0x96'), (20, '0x74c', '0x94')])
-poke32 0x0bf45a <- 0x46ea90  sound_table hui_sfx_records per-char ptr row 0x10 (was 0x938ba)
-data   0x46eb50 +0x1c  select_records portrait/p1 coord list (7 pairs, vs2 0x303238)
-data   0x46eb70 +0x26  select_records portrait/p1 record (vs2 0x2a5e4a, 7 entries, budget 0x5b = vs2's own)
-poke32 0x26746a <- 0x46eb70  select_records portrait/p1 array row 0x10 (was 0x271924, the base-half alias)
-data   0x46eba0 +0x1c  select_records portrait/p2 coord list (7 pairs, vs2 0x3035a8)
-data   0x46ebc0 +0x26  select_records portrait/p2 record (vs2 0x2a625a, 7 entries, budget 0x5b = vs2's own)
-poke32 0x2674ea <- 0x46ebc0  select_records portrait/p2 array row 0x10 (was 0x271d36, the base-half alias)
-data   0x46ebf0 +0x4  select_records name_banner/p1 coord list (1 pairs, vs2 0x303730)
-data   0x46ec00 +0xe  select_records name_banner/p1 record (vs2 0x2a64d6, 1 entries, budget 0x8 = vs2's own)
-poke32 0x2675ea <- 0x46ec00  select_records name_banner/p1 array row 0x10 (was 0x272148, the base-half alias)
-data   0x46ec10 +0x8  select_records name_banner/p2 coord list (2 pairs, vs2 0x303d9c)
-data   0x46ec20 +0x12  select_records name_banner/p2 record (vs2 0x2a7506, 2 entries, budget 0x3 = vs2's own)
-poke32 0x26766a <- 0x46ec20  select_records name_banner/p2 array row 0x10 (was 0x273052, the base-half alias)
-data   0x46ec40 +0x14  select_records splash_p1/p1 coord list (5 pairs, vs2 0x304028)
-data   0x46ec60 +0x1e  select_records splash_p1/p1 record (vs2 0x2a7b06, 5 entries, budget 0x4c = vs2's own)
-poke32 0x2672ea <- 0x46ec60  select_records splash_p1/p1 array row 0x10 (was 0x273462, the base-half alias)
-data   0x46ec80 +0x14  select_records splash_p2/p1 coord list (5 pairs, vs2 0x3042b8)
-data   0x46eca0 +0x1e  select_records splash_p2/p1 record (vs2 0x2a7e36, 5 entries, budget 0x4c = vs2's own)
-poke32 0x26736a <- 0x46eca0  select_records splash_p2/p1 array row 0x10 (was 0x2737a8, the base-half alias)
-data   0x46ecc0 +0x84  select_records win_quote/p1 coord list (33 pairs, vs2 0x304bd8)
-data   0x46ed50 +0x8e  select_records win_quote/p1 record (vs2 0x2a881e, 33 entries, budget 0x8a = vs2's own)
-poke32 0x2673ea <- 0x46ed50  select_records win_quote/p1 array row 0x10 (was 0x273aee, the base-half alias)
+data   0x46eb90 +0xc0  sound_table hui_sfx_records <- vsav2 0x0c742a (24 entries; kept ['0x110@1', '0x111@2', '0x112@3', '0x08d@5', '0x07f@6', '0x080@7', '0x081@8', '0x082@9', '0x0d8@10', '0x199@11', '0x083@12', '0x088@13', '0x089@14', '0x08a@15', '0x08b@16', '0x08c@17', '0x08e@18', '0x096@19', '0x094@20', '0x199@21', '0x198@22']; zeroed 2 unplayable ids; remapped [(5, '0x745', '0x8d'), (6, '0x735', '0x7f'), (7, '0x736', '0x80'), (8, '0x737', '0x81'), (9, '0x738', '0x82'), (10, '0x739', '0xd8'), (11, '0x73a', '0x199'), (12, '0x73b', '0x83'), (13, '0x740', '0x88'), (14, '0x741', '0x89'), (15, '0x742', '0x8a'), (16, '0x743', '0x8b'), (17, '0x744', '0x8c'), (18, '0x746', '0x8e'), (19, '0x74e', '0x96'), (20, '0x74c', '0x94')])
+poke32 0x0bf45a <- 0x46eb90  sound_table hui_sfx_records per-char ptr row 0x10 (was 0x938ba)
+data   0x46ec50 +0x1c  select_records portrait/p1 coord list (7 pairs, vs2 0x303238)
+data   0x46ec70 +0x26  select_records portrait/p1 record (vs2 0x2a5e4a, 7 entries, budget 0x5b = vs2's own)
+poke32 0x26746a <- 0x46ec70  select_records portrait/p1 array row 0x10 (was 0x271924, the base-half alias)
+data   0x46eca0 +0x1c  select_records portrait/p2 coord list (7 pairs, vs2 0x3035a8)
+data   0x46ecc0 +0x26  select_records portrait/p2 record (vs2 0x2a625a, 7 entries, budget 0x5b = vs2's own)
+poke32 0x2674ea <- 0x46ecc0  select_records portrait/p2 array row 0x10 (was 0x271d36, the base-half alias)
+data   0x46ecf0 +0x4  select_records name_banner/p1 coord list (1 pairs, vs2 0x303730)
+data   0x46ed00 +0xe  select_records name_banner/p1 record (vs2 0x2a64d6, 1 entries, budget 0x8 = vs2's own)
+poke32 0x2675ea <- 0x46ed00  select_records name_banner/p1 array row 0x10 (was 0x272148, the base-half alias)
+data   0x46ed10 +0x8  select_records name_banner/p2 coord list (2 pairs, vs2 0x303d9c)
+data   0x46ed20 +0x12  select_records name_banner/p2 record (vs2 0x2a7506, 2 entries, budget 0x3 = vs2's own)
+poke32 0x26766a <- 0x46ed20  select_records name_banner/p2 array row 0x10 (was 0x273052, the base-half alias)
+data   0x46ed40 +0x14  select_records splash_p1/p1 coord list (5 pairs, vs2 0x304028)
+data   0x46ed60 +0x1e  select_records splash_p1/p1 record (vs2 0x2a7b06, 5 entries, budget 0x4c = vs2's own)
+poke32 0x2672ea <- 0x46ed60  select_records splash_p1/p1 array row 0x10 (was 0x273462, the base-half alias)
+data   0x46ed80 +0x14  select_records splash_p2/p1 coord list (5 pairs, vs2 0x3042b8)
+data   0x46eda0 +0x1e  select_records splash_p2/p1 record (vs2 0x2a7e36, 5 entries, budget 0x4c = vs2's own)
+poke32 0x26736a <- 0x46eda0  select_records splash_p2/p1 array row 0x10 (was 0x2737a8, the base-half alias)
+data   0x46edc0 +0x84  select_records win_quote/p1 coord list (33 pairs, vs2 0x304bd8)
+data   0x46ee50 +0x8e  select_records win_quote/p1 record (vs2 0x2a881e, 33 entries, budget 0x8a = vs2's own)
+poke32 0x2673ea <- 0x46ee50  select_records win_quote/p1 array row 0x10 (was 0x273aee, the base-half alias)
 poke32 0x268a42 <- 0x2724a2  select_records highlight/p1 array row 0x10 = the HOST row 0x0f ring record VERBATIM (host_ring; was 0x272554)
 poke32 0x268ac2 <- 0x2726ce  select_records highlight/p2 array row 0x10 = the HOST row 0x0f ring record VERBATIM (host_ring; was 0x272780)
 # select_records: 0 bank-1 tile placements -> select_tiles.json (only the composed records' art; the slot-0x0F splash/win-quote families are NOT placed, so that Jedah art stays vanilla)
@@ -916,19 +917,19 @@ poke32 0x268ac2 <- 0x2726ce  select_records highlight/p2 array row 0x10 = the HO
 # site_thunk name_bank_variant_id: body deferred to the 0x05fce0 chain (30 bytes)
 # site_thunk splash_bank_variant_id: body deferred to the 0x06c0e0 chain (30 bytes)
 # site_thunk winquote_bank_variant_id: body deferred to the 0x05f328 chain (22 bytes)
-code   0x46ede0 +0x1a  site_thunk tenant_jump_seq; site 0x022a0e jmp-routed
-code   0x46ee00 +0xe  site_thunk shadow_seq_guard; site 0x08245c jmp-routed
-data   0x46ee10 +0x140  site_thunk select_pal_variant_id data block <- vsav2 0x3c12dc
+code   0x46eee0 +0x1a  site_thunk tenant_jump_seq; site 0x022a0e jmp-routed
+code   0x46ef00 +0xe  site_thunk shadow_seq_guard; site 0x08245c jmp-routed
+data   0x46ef10 +0x140  site_thunk select_pal_variant_id data block <- vsav2 0x3c12dc
 # site_thunk select_pal_variant_id: body deferred to the 0x05f146 chain (56 bytes)
-data   0x46ef50 +0x54  site_thunk throw_arc_tables data block <- vsav2 0x0279b4
-data   0x46efb0 +0x370  site_thunk throw_arc_tables data block <- vsav2 0x027a08
-code   0x46f320 +0x42  site_thunk throw_arc_tables; site 0x028386 jmp-routed
-code   0x46f370 +0xe  site_thunk idmask_victim_spawn; site 0x060ef0 jmp-routed
-code   0x46f380 +0x10  site_thunk idmask_piece_subtype; site 0x05e7d6 jmp-routed
-data   0x46f390 +0x100  site_thunk df_gold_variant_id data block <- vsav2 0x3abedc
-code   0x46f490 +0x54  site_thunk df_gold_variant_id; site 0x02a8d6 jmp-routed
-code   0x46f4f0 +0xfe  site_thunk beam_list_type6; site 0x01b6aa jmp-routed
-code   0x46f5f0 +0x1d6  site_thunk index_window_018468; site 0x018460 jmp-routed
+data   0x46f050 +0x54  site_thunk throw_arc_tables data block <- vsav2 0x0279b4
+data   0x46f0b0 +0x370  site_thunk throw_arc_tables data block <- vsav2 0x027a08
+code   0x46f420 +0x42  site_thunk throw_arc_tables; site 0x028386 jmp-routed
+code   0x46f470 +0xe  site_thunk idmask_victim_spawn; site 0x060ef0 jmp-routed
+code   0x46f480 +0x10  site_thunk idmask_piece_subtype; site 0x05e7d6 jmp-routed
+data   0x46f490 +0x100  site_thunk df_gold_variant_id data block <- vsav2 0x3abedc
+code   0x46f590 +0x54  site_thunk df_gold_variant_id; site 0x02a8d6 jmp-routed
+code   0x46f5f0 +0xfe  site_thunk beam_list_type6; site 0x01b6aa jmp-routed
+code   0x46f6f0 +0x1d6  site_thunk index_window_018468; site 0x018460 jmp-routed
 code   0x0282f4 +0x2  code_word obj_bank_word_slot (slot entry -> 1000)
 code   0x05f240 +0x2  code_word win_pos_x_slot (slot entry -> 00c0)
 code   0x05f242 +0x2  code_word win_pos_y_slot (slot entry -> 0080)
@@ -937,27 +938,28 @@ code   0x003bee +0x2  code_word hui_kernel_voice_e0 (01d0 -> 01a2)
 code   0x003c5a +0x2  code_word hui_kernel_voice_e1 (01d1 -> 02a1)
 code   0x003cc6 +0x2  code_word hui_kernel_voice_e2 (01d2 -> 02a2)
 code   0x003d30 +0x2  code_word hui_kernel_voice_e3 (01d3 -> 01c1)
-code   0x080aec +0x4  code_ptr beam_effect_class16 (00080b44 -> 0042c0c0 = x093460+0x0)
+code   0x080aec +0x4  code_ptr beam_effect_class16 (00080b44 -> 0042c1c0 = x093460+0x0)
+code   0x080b28 +0x4  code_ptr beam_effect_class31 (00080b44 -> 0042c0c0 = x0926e4+0x0)
 # stage 1: Jedah hitbox block 0x093AAA+0x0 (base 0x93b6a comp 0x93aaa)
 # table_fix: region x026142 len 0x1400 -> 0x1440 (merged vanilla bank table; tenant rows written per tenant)
-data_file 0x483690 +0x1b500  donovan anim (from vsav2 0x264086)
-data_file 0x49eb90 +0x190  donovan aux0_0 (from vsav2 0x334170)
-data_file 0x49ed20 +0x190  donovan aux0_1 (from vsav2 0x33CD00)
-data_file 0x49eeb0 +0xd830  donovan aux0_2 (from vsav2 0x344A60)
-code   0x4b9c00 farm-port stub for 0x2916c (param at 0x4b9be0, common 0x29f4a)
-code   0x4b9c20 farm-port stub for 0x2915c (param at 0x4b9c10, common 0x29f4a)
-code   0x4b9c40 farm-port stub for 0x29164 (param at 0x4b9c30, common 0x29f4a)
-code   0x4b9c60 farm-port stub for 0x29184 (param at 0x4b9c50, common 0x29f4a)
-code   0x4b9c80 farm-port stub for 0x2918c (param at 0x4b9c70, common 0x29f4a)
-code   0x4b9c90 sound stub for 0x4f96 (vsavj sfx id 0xa1)
-code   0x4b9cb0 slot-clearing alloc wrapper for 0x15702 -> 0x16fba (0x80 cleared, +8 preserved)
-code   0x4b9ce0 slot-clearing alloc wrapper for 0x1572e -> 0x16fe6 (0x80 cleared, +8 preserved)
-code   0x4b9d10 ILLEGAL  TRIPWIRE for unresolved 0x4223c
-# code+0x3ad8: unresolved 0x4223c -> tripwire 0x4b9d10
-code   0x4b9d20 ILLEGAL  TRIPWIRE for unresolved 0x42cee
-# code+0x41b0: unresolved 0x42cee -> tripwire 0x4b9d20
-code   0x4b9d30 ILLEGAL  TRIPWIRE for unresolved 0x448d4
-# code+0x5062: unresolved 0x448d4 -> tripwire 0x4b9d30
+data_file 0x483790 +0x1b500  donovan anim (from vsav2 0x264086)
+data_file 0x49ec90 +0x190  donovan aux0_0 (from vsav2 0x334170)
+data_file 0x49ee20 +0x190  donovan aux0_1 (from vsav2 0x33CD00)
+data_file 0x49efb0 +0xd830  donovan aux0_2 (from vsav2 0x344A60)
+code   0x4b9d00 farm-port stub for 0x2916c (param at 0x4b9ce0, common 0x29f4a)
+code   0x4b9d20 farm-port stub for 0x2915c (param at 0x4b9d10, common 0x29f4a)
+code   0x4b9d40 farm-port stub for 0x29164 (param at 0x4b9d30, common 0x29f4a)
+code   0x4b9d60 farm-port stub for 0x29184 (param at 0x4b9d50, common 0x29f4a)
+code   0x4b9d80 farm-port stub for 0x2918c (param at 0x4b9d70, common 0x29f4a)
+code   0x4b9d90 sound stub for 0x4f96 (vsavj sfx id 0xa1)
+code   0x4b9db0 slot-clearing alloc wrapper for 0x15702 -> 0x16fba (0x80 cleared, +8 preserved)
+code   0x4b9de0 slot-clearing alloc wrapper for 0x1572e -> 0x16fe6 (0x80 cleared, +8 preserved)
+code   0x4b9e10 ILLEGAL  TRIPWIRE for unresolved 0x4223c
+# code+0x3ad8: unresolved 0x4223c -> tripwire 0x4b9e10
+code   0x4b9e20 ILLEGAL  TRIPWIRE for unresolved 0x42cee
+# code+0x41b0: unresolved 0x42cee -> tripwire 0x4b9e20
+code   0x4b9e30 ILLEGAL  TRIPWIRE for unresolved 0x448d4
+# code+0x5062: unresolved 0x448d4 -> tripwire 0x4b9e30
 # code+0x1ecc: port_patch 397c60000018 -> 397c10000018 (OBJ bank setter (P own code zone): vs2 bank 3 -> WIDE bank 4)
 # code+0x23fe: type_renumber stamp_l_ind type 114 -> 125 (pyron's own number; site 0x5e542)
 # code+0x2b14: type_renumber stamp_l_ind type 114 -> 125 (pyron's own number; site 0x5e542)
@@ -972,33 +974,33 @@ code   0x4b9d30 ILLEGAL  TRIPWIRE for unresolved 0x448d4
 # code+0x3a5c: type_renumber stamp_l_ind type 114 -> 125 (pyron's own number; site 0x5e542)
 # code+0x1ec0: type_renumber stamp_b_d16 type 115 -> 127 (pyron's own number; site 0x5e542)
 # code+0x1faa: type_renumber stamp_l_ind type 118 -> 133 (pyron's own number; site 0x5e542)
-code   0x4b9d40 owner-tag thunk (pyron id 0x11 -> (+0x7f,A4), then stamp_b_d16 197c00400002, rts)
-# code+0x892: owner_tag stamp_b_d16 type 64 -> jsr 0x4b9d40 (pyron id 0x11)
-code   0x4b9d50 owner-tag thunk (pyron id 0x11 -> (+0x7f,A4), then stamp_b_d16 197c00410002, rts)
-# code+0x9ba: owner_tag stamp_b_d16 type 65 -> jsr 0x4b9d50 (pyron id 0x11)
-code   0x4b9d60 owner-tag thunk (pyron id 0x11 -> (+0x7f,A4), then stamp_b_d16 197c00420002, rts)
-# code+0x1464: owner_tag stamp_b_d16 type 66 -> jsr 0x4b9d60 (pyron id 0x11)
-code   0x4b9d70 owner-tag thunk (pyron id 0x11 -> (+0x7f,A4), then stamp_b_d16 197c00430002, rts)
-# code+0x188c: owner_tag stamp_b_d16 type 67 -> jsr 0x4b9d70 (pyron id 0x11)
-code   0x4b9d80 owner-tag thunk (pyron id 0x11 -> (+0x7f,A4), then stamp_b_d16 197c003e0002, rts)
-# code+0x295a: owner_tag stamp_b_d16 type 62 -> jsr 0x4b9d80 (pyron id 0x11)
-code   0x4b9d90 owner-tag thunk (pyron id 0x11 -> (+0x7f,A4), then stamp_b_d16 197c003f0002, rts)
-# code+0x2ae0: owner_tag stamp_b_d16 type 63 -> jsr 0x4b9d90 (pyron id 0x11)
-code   0x4b9da0 owner-tag thunk (pyron id 0x11 -> (+0x7f,A4), then stamp_b_d16 197c004b0002, rts)
-# code+0x2aec: owner_tag stamp_b_d16 type 75 -> jsr 0x4b9da0 (pyron id 0x11)
-code   0x4b9db0 owner-tag thunk (pyron id 0x11 -> (+0x7f,A4), then stamp_b_d16 197c003d0002, rts)
-# code+0x3994: owner_tag stamp_b_d16 type 61 -> jsr 0x4b9db0 (pyron id 0x11)
-code   0x4b9dc0 owner-tag thunk (pyron id 0x11 -> (+0x7f,A4), then stamp_b_d16 197c00490002, rts)
-# code+0x45ba: owner_tag stamp_b_d16 type 73 -> jsr 0x4b9dc0 (pyron id 0x11)
-code   0x4b9dd0 owner-tag thunk (pyron id 0x11 -> (+0x7f,A4), then stamp_l_ind 28bc01014200, rts)
-# code+0x4ca8: owner_tag stamp_l_ind type 66 -> jsr 0x4b9dd0 (pyron id 0x11)
-code   0x4b9de0 owner-tag thunk (pyron id 0x11 -> (+0x7f,A4), then stamp_l_ind 28bc01004202, rts)
-# code+0x4d72: owner_tag stamp_l_ind type 66 -> jsr 0x4b9de0 (pyron id 0x11)
-# code+0x1ee: data_in_code [pointer-inline] lea.l #0x4b9df0,a2 in place (DATA view of vsav2 0x0576f4; air-dive per-strength (xv,yv) rows; a2 re-derived by `lea (a2,d2.w),a2`)
-code_file 0x46f7d0 +0x5200  donovan code (from vsav2 0x0574C0)
-data_file 0x4ac6e0 +0x16b6  donovan hitbox (from vsav2 0x0C7502)
+code   0x4b9e40 owner-tag thunk (pyron id 0x11 -> (+0x7f,A4), then stamp_b_d16 197c00400002, rts)
+# code+0x892: owner_tag stamp_b_d16 type 64 -> jsr 0x4b9e40 (pyron id 0x11)
+code   0x4b9e50 owner-tag thunk (pyron id 0x11 -> (+0x7f,A4), then stamp_b_d16 197c00410002, rts)
+# code+0x9ba: owner_tag stamp_b_d16 type 65 -> jsr 0x4b9e50 (pyron id 0x11)
+code   0x4b9e60 owner-tag thunk (pyron id 0x11 -> (+0x7f,A4), then stamp_b_d16 197c00420002, rts)
+# code+0x1464: owner_tag stamp_b_d16 type 66 -> jsr 0x4b9e60 (pyron id 0x11)
+code   0x4b9e70 owner-tag thunk (pyron id 0x11 -> (+0x7f,A4), then stamp_b_d16 197c00430002, rts)
+# code+0x188c: owner_tag stamp_b_d16 type 67 -> jsr 0x4b9e70 (pyron id 0x11)
+code   0x4b9e80 owner-tag thunk (pyron id 0x11 -> (+0x7f,A4), then stamp_b_d16 197c003e0002, rts)
+# code+0x295a: owner_tag stamp_b_d16 type 62 -> jsr 0x4b9e80 (pyron id 0x11)
+code   0x4b9e90 owner-tag thunk (pyron id 0x11 -> (+0x7f,A4), then stamp_b_d16 197c003f0002, rts)
+# code+0x2ae0: owner_tag stamp_b_d16 type 63 -> jsr 0x4b9e90 (pyron id 0x11)
+code   0x4b9ea0 owner-tag thunk (pyron id 0x11 -> (+0x7f,A4), then stamp_b_d16 197c004b0002, rts)
+# code+0x2aec: owner_tag stamp_b_d16 type 75 -> jsr 0x4b9ea0 (pyron id 0x11)
+code   0x4b9eb0 owner-tag thunk (pyron id 0x11 -> (+0x7f,A4), then stamp_b_d16 197c003d0002, rts)
+# code+0x3994: owner_tag stamp_b_d16 type 61 -> jsr 0x4b9eb0 (pyron id 0x11)
+code   0x4b9ec0 owner-tag thunk (pyron id 0x11 -> (+0x7f,A4), then stamp_b_d16 197c00490002, rts)
+# code+0x45ba: owner_tag stamp_b_d16 type 73 -> jsr 0x4b9ec0 (pyron id 0x11)
+code   0x4b9ed0 owner-tag thunk (pyron id 0x11 -> (+0x7f,A4), then stamp_l_ind 28bc01014200, rts)
+# code+0x4ca8: owner_tag stamp_l_ind type 66 -> jsr 0x4b9ed0 (pyron id 0x11)
+code   0x4b9ee0 owner-tag thunk (pyron id 0x11 -> (+0x7f,A4), then stamp_l_ind 28bc01004202, rts)
+# code+0x4d72: owner_tag stamp_l_ind type 66 -> jsr 0x4b9ee0 (pyron id 0x11)
+# code+0x1ee: data_in_code [pointer-inline] lea.l #0x4b9ef0,a2 in place (DATA view of vsav2 0x0576f4; air-dive per-strength (xv,yv) rows; a2 re-derived by `lea (a2,d2.w),a2`)
+code_file 0x46f8d0 +0x5200  donovan code (from vsav2 0x0574C0)
+data_file 0x4ac7e0 +0x16b6  donovan hitbox (from vsav2 0x0C7502)
 # hitbox_proj+0x2f8: port_patch 0151 -> 014f (Cosmo Disruption sub-state 81 -> 79: vsavj's dispatch table has 80 entries, so 81 read past its end into the next dispatcher's operand and jumped into the table (watchdog reset). 79's entry is already 0x0224 = the same handler vs2 uses.)
-data_file 0x4adda0 +0x322  donovan hitbox_proj (from vsav2 0x0D0986)
+data_file 0x4adea0 +0x322  donovan hitbox_proj (from vsav2 0x0D0986)
 # x026142+0x1414: bank table row 0x13 <- 0x1000 (bank 4, WIDE encoding; vanilla row was 0x2000) — tenant-driven
 # x026142+0x140e: bank table row 0x10 <- 0x1000 (bank 4, WIDE encoding; vanilla row was 0x6000) — tenant-driven
 # x026142+0x1410: bank table row 0x11 <- 0x1000 (bank 4, WIDE encoding; vanilla row was 0x6000) — tenant-driven
@@ -1029,7 +1031,7 @@ data_file 0x4adda0 +0x322  donovan hitbox_proj (from vsav2 0x0D0986)
 # bank_ref 0xd7118 -> 0xbcf7a (delta rule, known table base)
 # bank_ref 0xd7198 -> 0xbcffa (delta rule, known table base)
 # pcrel_escape_fix x026142: 9 escapes -> 6 trampolines (0 tripwired), pad 0x1440..0x14a0
-code_file 0x4749d0 +0x14a0  donovan x026142 (from vsav2 0x026142)
+code_file 0x474ad0 +0x14a0  donovan x026142 (from vsav2 0x026142)
 # bank_ref 0xd6ebe -> 0xbcd20 (delta rule, 16B byte-identical)
 # bank_ref 0xd699e -> 0xbc800 (delta rule, 16B byte-identical)
 # bank_ref 0xd671e -> 0xbc580 (delta rule, 16B byte-identical)
@@ -1042,31 +1044,31 @@ code_file 0x4749d0 +0x14a0  donovan x026142 (from vsav2 0x026142)
 # x028122+0x9ba: port_patch 3b7c0000b498 -> 3b7c0000b446 (obj-hit dmg: flag clear -> vsavj layout (-0x4BBA))
 # x028122+0x9c0: port_patch 426db496 -> 426db444 (obj-hit dmg: clr white var -> vsavj layout (-0x4BBC))
 # x028122+0x9d0: port_patch 3b42b496 -> 3b42b444 (obj-hit dmg: white damage -> vsavj layout (-0x4BBC))
-code_file 0x475e70 +0xe00  donovan x028122 (from vsav2 0x028122)
-code   0x4b9e00 ILLEGAL  TRIPWIRE for unresolved 0x12f484
-# x05c800+0x152a: unresolved 0x12f484 -> tripwire 0x4b9e00
-# x05c800+0x16a4: unresolved 0x12f484 -> tripwire 0x4b9e00
-code   0x4b9e10 ILLEGAL  TRIPWIRE for unresolved 0x167bf4
-# x05c800+0x2622: unresolved 0x167bf4 -> tripwire 0x4b9e10
-# x05c800+0x2a20: unresolved 0x167bf4 -> tripwire 0x4b9e10
-code   0x4b9e20 ILLEGAL  TRIPWIRE for unresolved 0x17f176
-# x05c800+0x2ae4: unresolved 0x17f176 -> tripwire 0x4b9e20
-# x05c800+0x3034: unresolved 0x17f176 -> tripwire 0x4b9e20
-code   0x4b9e30 ILLEGAL  TRIPWIRE for unresolved 0x181592
-# x05c800+0x3072: unresolved 0x181592 -> tripwire 0x4b9e30
+code_file 0x475f70 +0xe00  donovan x028122 (from vsav2 0x028122)
+code   0x4b9f00 ILLEGAL  TRIPWIRE for unresolved 0x12f484
+# x05c800+0x152a: unresolved 0x12f484 -> tripwire 0x4b9f00
+# x05c800+0x16a4: unresolved 0x12f484 -> tripwire 0x4b9f00
+code   0x4b9f10 ILLEGAL  TRIPWIRE for unresolved 0x167bf4
+# x05c800+0x2622: unresolved 0x167bf4 -> tripwire 0x4b9f10
+# x05c800+0x2a20: unresolved 0x167bf4 -> tripwire 0x4b9f10
+code   0x4b9f20 ILLEGAL  TRIPWIRE for unresolved 0x17f176
+# x05c800+0x2ae4: unresolved 0x17f176 -> tripwire 0x4b9f20
+# x05c800+0x3034: unresolved 0x17f176 -> tripwire 0x4b9f20
+code   0x4b9f30 ILLEGAL  TRIPWIRE for unresolved 0x181592
+# x05c800+0x3072: unresolved 0x181592 -> tripwire 0x4b9f30
 # x05c800+0x738: port_patch 3d7c60000018 -> 3d7c10000018 (OBJ bank setter: vs2 bank 3 -> vsav bank 2 (Jedah band) / WIDE bank 4)
 # x05c800+0x58d4: port_patch 397c60000018 -> 397c10000018 (OBJ bank setter (a4 form): vs2 bank 3 -> vsav bank 2 / WIDE bank 4)
 # x05c800+0x5994: port_patch 397c60000018 -> 397c10000018 (OBJ bank setter (a4 form): vs2 bank 3 -> vsav bank 2 / WIDE bank 4)
-code   0x4b9e40 owner-tag thunk (pyron id 0x11 -> (+0x7f,A4), then stamp_l_ind 28bc01003b22, rts)
-# x05c800+0x83a: owner_tag stamp_l_ind type 59 -> jsr 0x4b9e40 (pyron id 0x11)
+code   0x4b9f40 owner-tag thunk (pyron id 0x11 -> (+0x7f,A4), then stamp_l_ind 28bc01003b22, rts)
+# x05c800+0x83a: owner_tag stamp_l_ind type 59 -> jsr 0x4b9f40 (pyron id 0x11)
 # pcrel_escape_fix x05c800: 2 escapes -> 1 trampolines (0 tripwired), pad 0x6a00..0x6a20
-code_file 0x476c70 +0x6a20  donovan x05c800 (from vsav2 0x05C800)
-code_file 0x47d690 +0x280  donovan x0672d0 (from vsav2 0x0672D0)
-code_file 0x47d910 +0x2f6  donovan x067550 (from vsav2 0x067550)
-code   0x4b9e50 sound stub for 0x4fb0 (vsavj sfx id 0xa0)
-code   0x4b9e70 sound stub for 0x4fca (vsavj sfx id 0xa5)
-code_file 0x47dc10 +0x1ba  donovan x067846 (from vsav2 0x067846)
-code_file 0x47ddd0 +0x60c  donovan x067a00 (from vsav2 0x067A00)
+code_file 0x476d70 +0x6a20  donovan x05c800 (from vsav2 0x05C800)
+code_file 0x47d790 +0x280  donovan x0672d0 (from vsav2 0x0672D0)
+code_file 0x47da10 +0x2f6  donovan x067550 (from vsav2 0x067550)
+code   0x4b9f50 sound stub for 0x4fb0 (vsavj sfx id 0xa0)
+code   0x4b9f70 sound stub for 0x4fca (vsavj sfx id 0xa5)
+code_file 0x47dd10 +0x1ba  donovan x067846 (from vsav2 0x067846)
+code_file 0x47ded0 +0x60c  donovan x067a00 (from vsav2 0x067A00)
 # x06800c+0x354: port_patch 397c60000018 -> 397c10000018 (OBJ bank setter (shared zone): vs2 bank 3 -> WIDE bank 4)
 # x06800c+0x396: port_patch 397c60000018 -> 397c10000018 (OBJ bank setter (shared zone): vs2 bank 3 -> WIDE bank 4)
 # x06800c+0x3de: port_patch 397c60000018 -> 397c10000018 (OBJ bank setter (shared zone): vs2 bank 3 -> WIDE bank 4)
@@ -1075,76 +1077,76 @@ code_file 0x47ddd0 +0x60c  donovan x067a00 (from vsav2 0x067A00)
 # x06800c+0x38a: type_renumber stamp_b_d16 type 115 -> 127 (pyron's own number; site 0x5e542)
 # x06800c+0x3d2: type_renumber stamp_b_d16 type 115 -> 127 (pyron's own number; site 0x5e542)
 # x06800c+0x416: type_renumber stamp_b_d16 type 115 -> 127 (pyron's own number; site 0x5e542)
-code_file 0x47e3e0 +0x44c  donovan x06800c (from vsav2 0x06800C)
-code_file 0x47e830 +0x310  donovan x068458 (from vsav2 0x068458)
-code_file 0x47eb40 +0x264  donovan x068768 (from vsav2 0x068768)
-code   0x4b9e90 sound stub for 0x4efa (vsavj sfx id 0x90)
-code_file 0x47edb0 +0x2ac  donovan x0689cc (from vsav2 0x0689CC)
-code   0x4b9eb0 +0x40  patched clone of 0x5459a for vs2 0x5c77e (unmasked set-anim entry; false byte-matc)
-code   0x4b9ef0 sound stub for 0x4f62 (vsavj sfx id 0x7f)
-code_file 0x47f060 +0x3ce  donovan x068c78 (from vsav2 0x068C78)
+code_file 0x47e4e0 +0x44c  donovan x06800c (from vsav2 0x06800C)
+code_file 0x47e930 +0x310  donovan x068458 (from vsav2 0x068458)
+code_file 0x47ec40 +0x264  donovan x068768 (from vsav2 0x068768)
+code   0x4b9f90 sound stub for 0x4efa (vsavj sfx id 0x90)
+code_file 0x47eeb0 +0x2ac  donovan x0689cc (from vsav2 0x0689CC)
+code   0x4b9fb0 +0x40  patched clone of 0x5459a for vs2 0x5c77e (unmasked set-anim entry; false byte-matc)
+code   0x4b9ff0 sound stub for 0x4f62 (vsavj sfx id 0x7f)
+code_file 0x47f160 +0x3ce  donovan x068c78 (from vsav2 0x068C78)
 # x069046+0x260: type_renumber stamp_l_ind type 114 -> 125 (pyron's own number; site 0x5e542)
-code   0x4b9f10 owner-tag thunk (pyron id 0x11 -> (+0x7f,A4), then stamp_l_ind 28bc01004206, rts)
-# x069046+0x4a: owner_tag stamp_l_ind type 66 -> jsr 0x4b9f10 (pyron id 0x11)
-code   0x4b9f20 owner-tag thunk (pyron id 0x11 -> (+0x7f,A4), then stamp_l_ind 28bc01004204, rts)
-# x069046+0x130: owner_tag stamp_l_ind type 66 -> jsr 0x4b9f20 (pyron id 0x11)
-code_file 0x47f430 +0x2b0  donovan x069046 (from vsav2 0x069046)
+code   0x4ba010 owner-tag thunk (pyron id 0x11 -> (+0x7f,A4), then stamp_l_ind 28bc01004206, rts)
+# x069046+0x4a: owner_tag stamp_l_ind type 66 -> jsr 0x4ba010 (pyron id 0x11)
+code   0x4ba020 owner-tag thunk (pyron id 0x11 -> (+0x7f,A4), then stamp_l_ind 28bc01004204, rts)
+# x069046+0x130: owner_tag stamp_l_ind type 66 -> jsr 0x4ba020 (pyron id 0x11)
+code_file 0x47f530 +0x2b0  donovan x069046 (from vsav2 0x069046)
 # x0692f6+0x19a: port_patch 397c60000018 -> 397c10000018 (OBJ bank setter (shared zone): vs2 bank 3 -> WIDE bank 4)
 # x0692f6+0x18e: type_renumber stamp_b_d16 type 115 -> 127 (pyron's own number; site 0x5e542)
-code_file 0x47f6e0 +0x368  donovan x0692f6 (from vsav2 0x0692F6)
+code_file 0x47f7e0 +0x368  donovan x0692f6 (from vsav2 0x0692F6)
 # x06965e+0xac: type_renumber stamp_l_ind type 114 -> 125 (pyron's own number; site 0x5e542)
-code_file 0x47fa50 +0x100  donovan x06965e (from vsav2 0x06965E)
-code   0x4b9f30 ILLEGAL  TRIPWIRE for unresolved 0x281696
-# x088512+0x348: unresolved 0x281696 -> tripwire 0x4b9f30
-code   0x4b9f40 ILLEGAL  TRIPWIRE for unresolved 0x289b14
-# x088512+0x126a: unresolved 0x289b14 -> tripwire 0x4b9f40
-# x088512+0x127c: unresolved 0x289b14 -> tripwire 0x4b9f40
-code   0x4b9f50 ILLEGAL  TRIPWIRE for unresolved 0x24edd4
-# x088512+0x1362: unresolved 0x24edd4 -> tripwire 0x4b9f50
-# x088512+0x13a0: unresolved 0x24edd4 -> tripwire 0x4b9f50
-# x088512+0x13e4: unresolved 0x24edd4 -> tripwire 0x4b9f50
-# x088512+0x1428: unresolved 0x24edd4 -> tripwire 0x4b9f50
-# x088512+0x1464: unresolved 0x24edd4 -> tripwire 0x4b9f50
-# x088512+0x14a2: unresolved 0x24edd4 -> tripwire 0x4b9f50
-# x088512+0x150a: unresolved 0x24edd4 -> tripwire 0x4b9f50
-# x088512+0x154e: unresolved 0x24edd4 -> tripwire 0x4b9f50
-# x088512+0x1590: unresolved 0x24edd4 -> tripwire 0x4b9f50
-# x088512+0x15f0: unresolved 0x24edd4 -> tripwire 0x4b9f50
-# x088512+0x1670: unresolved 0x24edd4 -> tripwire 0x4b9f50
-code   0x4b9f60 ILLEGAL  TRIPWIRE for unresolved 0x24a3ce
-# x088512+0x16d8: unresolved 0x24a3ce -> tripwire 0x4b9f60
-# x088512+0x1732: unresolved 0x24edd4 -> tripwire 0x4b9f50
-# x088512+0x1796: unresolved 0x24edd4 -> tripwire 0x4b9f50
-# x088512+0x17fa: unresolved 0x24edd4 -> tripwire 0x4b9f50
-# x088512+0x18ee: unresolved 0x24edd4 -> tripwire 0x4b9f50
-# x088512+0x191c: unresolved 0x24edd4 -> tripwire 0x4b9f50
-# x088512+0x194a: unresolved 0x24edd4 -> tripwire 0x4b9f50
-# x088512+0x1994: unresolved 0x24edd4 -> tripwire 0x4b9f50
-# x088512+0x1cd2: unresolved 0x24edd4 -> tripwire 0x4b9f50
-# x088512+0x1d1a: unresolved 0x24edd4 -> tripwire 0x4b9f50
-code   0x4b9f70 ILLEGAL  TRIPWIRE for unresolved 0x28ed08
-# x088512+0x1de2: unresolved 0x28ed08 -> tripwire 0x4b9f70
-code   0x4b9f80 ILLEGAL  TRIPWIRE for unresolved 0x36784a
-# x088512+0x1dee: unresolved 0x36784a -> tripwire 0x4b9f80
-code   0x4b9f90 sound stub for 0x50ee (vsavj sfx id 0x7e)
-code   0x4b9fb0 sound stub for 0x50a0 (vsavj sfx id 0x7b)
-code   0x4b9fd0 sound stub for 0x50d4 (vsavj sfx id 0x7d)
-code   0x4b9ff0 sound stub for 0x50ba (vsavj sfx id 0x7c)
-code   0x4ba010 ILLEGAL  TRIPWIRE for unresolved 0x25111e
-# x088512+0x2156: unresolved 0x25111e -> tripwire 0x4ba010
-# x088512+0x21d2: unresolved 0x25111e -> tripwire 0x4ba010
-# x088512+0x26e2: unresolved 0x25111e -> tripwire 0x4ba010
-code   0x4ba020 sound stub for 0x4e2a (vsavj sfx id 0x8f)
-code   0x4ba040 sound stub for 0x4df6 (vsavj sfx id 0x86)
-# x088512+0x28ce: unresolved 0x24edd4 -> tripwire 0x4b9f50
-# x088512+0x290c: unresolved 0x24edd4 -> tripwire 0x4b9f50
-# x088512+0x294a: unresolved 0x24edd4 -> tripwire 0x4b9f50
-# x088512+0x2986: unresolved 0x24edd4 -> tripwire 0x4b9f50
-# x088512+0x29c4: unresolved 0x24edd4 -> tripwire 0x4b9f50
-# x088512+0x2a2c: unresolved 0x24edd4 -> tripwire 0x4b9f50
-# x088512+0x2a6a: unresolved 0x24edd4 -> tripwire 0x4b9f50
-code   0x4ba060 ILLEGAL  TRIPWIRE for unresolved 0x2abd58
-# x088512+0x359c: unresolved 0x2abd58 -> tripwire 0x4ba060
+code_file 0x47fb50 +0x100  donovan x06965e (from vsav2 0x06965E)
+code   0x4ba030 ILLEGAL  TRIPWIRE for unresolved 0x281696
+# x088512+0x348: unresolved 0x281696 -> tripwire 0x4ba030
+code   0x4ba040 ILLEGAL  TRIPWIRE for unresolved 0x289b14
+# x088512+0x126a: unresolved 0x289b14 -> tripwire 0x4ba040
+# x088512+0x127c: unresolved 0x289b14 -> tripwire 0x4ba040
+code   0x4ba050 ILLEGAL  TRIPWIRE for unresolved 0x24edd4
+# x088512+0x1362: unresolved 0x24edd4 -> tripwire 0x4ba050
+# x088512+0x13a0: unresolved 0x24edd4 -> tripwire 0x4ba050
+# x088512+0x13e4: unresolved 0x24edd4 -> tripwire 0x4ba050
+# x088512+0x1428: unresolved 0x24edd4 -> tripwire 0x4ba050
+# x088512+0x1464: unresolved 0x24edd4 -> tripwire 0x4ba050
+# x088512+0x14a2: unresolved 0x24edd4 -> tripwire 0x4ba050
+# x088512+0x150a: unresolved 0x24edd4 -> tripwire 0x4ba050
+# x088512+0x154e: unresolved 0x24edd4 -> tripwire 0x4ba050
+# x088512+0x1590: unresolved 0x24edd4 -> tripwire 0x4ba050
+# x088512+0x15f0: unresolved 0x24edd4 -> tripwire 0x4ba050
+# x088512+0x1670: unresolved 0x24edd4 -> tripwire 0x4ba050
+code   0x4ba060 ILLEGAL  TRIPWIRE for unresolved 0x24a3ce
+# x088512+0x16d8: unresolved 0x24a3ce -> tripwire 0x4ba060
+# x088512+0x1732: unresolved 0x24edd4 -> tripwire 0x4ba050
+# x088512+0x1796: unresolved 0x24edd4 -> tripwire 0x4ba050
+# x088512+0x17fa: unresolved 0x24edd4 -> tripwire 0x4ba050
+# x088512+0x18ee: unresolved 0x24edd4 -> tripwire 0x4ba050
+# x088512+0x191c: unresolved 0x24edd4 -> tripwire 0x4ba050
+# x088512+0x194a: unresolved 0x24edd4 -> tripwire 0x4ba050
+# x088512+0x1994: unresolved 0x24edd4 -> tripwire 0x4ba050
+# x088512+0x1cd2: unresolved 0x24edd4 -> tripwire 0x4ba050
+# x088512+0x1d1a: unresolved 0x24edd4 -> tripwire 0x4ba050
+code   0x4ba070 ILLEGAL  TRIPWIRE for unresolved 0x28ed08
+# x088512+0x1de2: unresolved 0x28ed08 -> tripwire 0x4ba070
+code   0x4ba080 ILLEGAL  TRIPWIRE for unresolved 0x36784a
+# x088512+0x1dee: unresolved 0x36784a -> tripwire 0x4ba080
+code   0x4ba090 sound stub for 0x50ee (vsavj sfx id 0x7e)
+code   0x4ba0b0 sound stub for 0x50a0 (vsavj sfx id 0x7b)
+code   0x4ba0d0 sound stub for 0x50d4 (vsavj sfx id 0x7d)
+code   0x4ba0f0 sound stub for 0x50ba (vsavj sfx id 0x7c)
+code   0x4ba110 ILLEGAL  TRIPWIRE for unresolved 0x25111e
+# x088512+0x2156: unresolved 0x25111e -> tripwire 0x4ba110
+# x088512+0x21d2: unresolved 0x25111e -> tripwire 0x4ba110
+# x088512+0x26e2: unresolved 0x25111e -> tripwire 0x4ba110
+code   0x4ba120 sound stub for 0x4e2a (vsavj sfx id 0x8f)
+code   0x4ba140 sound stub for 0x4df6 (vsavj sfx id 0x86)
+# x088512+0x28ce: unresolved 0x24edd4 -> tripwire 0x4ba050
+# x088512+0x290c: unresolved 0x24edd4 -> tripwire 0x4ba050
+# x088512+0x294a: unresolved 0x24edd4 -> tripwire 0x4ba050
+# x088512+0x2986: unresolved 0x24edd4 -> tripwire 0x4ba050
+# x088512+0x29c4: unresolved 0x24edd4 -> tripwire 0x4ba050
+# x088512+0x2a2c: unresolved 0x24edd4 -> tripwire 0x4ba050
+# x088512+0x2a6a: unresolved 0x24edd4 -> tripwire 0x4ba050
+code   0x4ba160 ILLEGAL  TRIPWIRE for unresolved 0x2abd58
+# x088512+0x359c: unresolved 0x2abd58 -> tripwire 0x4ba160
 # x088512+0x22c: port_patch 3d7c60000018 -> 3d7c10000018 (OBJ bank setter: vs2 bank 3 -> vsav bank 2 / WIDE bank 4)
 # x088512+0x1814: port_patch 3d7c60000018 -> 3d7c10000018 (OBJ bank setter: vs2 bank 3 -> vsav bank 2 / WIDE bank 4)
 # x088512+0x2bee: port_patch 3d7c60000018 -> 3d7c10000018 (OBJ bank setter: vs2 bank 3 -> vsav bank 2 / WIDE bank 4)
@@ -1153,65 +1155,65 @@ code   0x4ba060 ILLEGAL  TRIPWIRE for unresolved 0x2abd58
 # x088512+0x27ce: type_renumber stamp_l_ind type 117 -> 131 (pyron's own number; site 0x5e542)
 # x088512+0x1dc4: type_renumber stamp_l_ind type 119 -> 135 (pyron's own number; site 0x5e542)
 # x088512+0x2138: type_renumber stamp_l_ind type 119 -> 135 (pyron's own number; site 0x5e542)
-code   0x4ba070 owner-tag thunk (pyron id 0x11 -> (+0x7f,A4), then stamp_l_ind 28bc01014102, rts)
-# x088512+0x2ebc: owner_tag stamp_l_ind type 65 -> jsr 0x4ba070 (pyron id 0x11)
-code   0x4ba080 owner-tag thunk (pyron id 0x11 -> (+0x7f,A4), then stamp_l_ind 28bc01014100, rts)
-# x088512+0x2f54: owner_tag stamp_l_ind type 65 -> jsr 0x4ba080 (pyron id 0x11)
-# x088512+0x3034: owner_tag stamp_l_ind type 65 -> jsr 0x4ba080 (pyron id 0x11)
-# x088512+0x305e: owner_tag stamp_l_ind type 65 -> jsr 0x4ba080 (pyron id 0x11)
-# x088512+0x3088: owner_tag stamp_l_ind type 65 -> jsr 0x4ba080 (pyron id 0x11)
-# x088512+0x30b2: owner_tag stamp_l_ind type 65 -> jsr 0x4ba080 (pyron id 0x11)
-# x088512+0x30dc: owner_tag stamp_l_ind type 65 -> jsr 0x4ba080 (pyron id 0x11)
-# x088512+0x3106: owner_tag stamp_l_ind type 65 -> jsr 0x4ba080 (pyron id 0x11)
-# x088512+0x3130: owner_tag stamp_l_ind type 65 -> jsr 0x4ba080 (pyron id 0x11)
-# x088512+0x329a: owner_tag stamp_l_ind type 65 -> jsr 0x4ba080 (pyron id 0x11)
-# x088512+0x32c4: owner_tag stamp_l_ind type 65 -> jsr 0x4ba080 (pyron id 0x11)
-# x088512+0x32ee: owner_tag stamp_l_ind type 65 -> jsr 0x4ba080 (pyron id 0x11)
-# x088512+0x3318: owner_tag stamp_l_ind type 65 -> jsr 0x4ba080 (pyron id 0x11)
-# x088512+0x3342: owner_tag stamp_l_ind type 65 -> jsr 0x4ba080 (pyron id 0x11)
-# x088512+0x336c: owner_tag stamp_l_ind type 65 -> jsr 0x4ba080 (pyron id 0x11)
-# x088512+0x3396: owner_tag stamp_l_ind type 65 -> jsr 0x4ba080 (pyron id 0x11)
-# x088512+0x33c0: owner_tag stamp_l_ind type 65 -> jsr 0x4ba080 (pyron id 0x11)
-# x088512+0x3ae4: data_in_code reroute -> helper 0x4ba190, table 0x4ba090 (DATA view of vsav2 0x08c042; pod-zone word offset/record table (a3 re-derived from it; self-relative; shared-zone copy))
-code_file 0x47fb50 +0x3b40  donovan x088512 (from vsav2 0x088512)
-data_file 0x4ae0d0 +0x900  donovan x0d143e (from vsav2 0x0D143E)
-code   0x4ba1a0 ILLEGAL  TRIPWIRE for unresolved 0x2c3136
-# x2b7ef4+0xb0c9: unresolved 0x2c3136 -> tripwire 0x4ba1a0
-code   0x4ba1b0 ILLEGAL  TRIPWIRE for unresolved 0x2c3170
-# x2b7ef4+0xb0d1: unresolved 0x2c3170 -> tripwire 0x4ba1b0
-code   0x4ba1c0 ILLEGAL  TRIPWIRE for unresolved 0x2c31aa
-# x2b7ef4+0xb0d9: unresolved 0x2c31aa -> tripwire 0x4ba1c0
-code   0x4ba1d0 ILLEGAL  TRIPWIRE for unresolved 0x2c31e4
-# x2b7ef4+0xb0fd: unresolved 0x2c31e4 -> tripwire 0x4ba1d0
-code   0x4ba1e0 ILLEGAL  TRIPWIRE for unresolved 0x2c3236
-# x2b7ef4+0xb105: unresolved 0x2c3236 -> tripwire 0x4ba1e0
-code   0x4ba1f0 ILLEGAL  TRIPWIRE for unresolved 0x2c325c
-# x2b7ef4+0xb10d: unresolved 0x2c325c -> tripwire 0x4ba1f0
-code   0x4ba200 ILLEGAL  TRIPWIRE for unresolved 0x2c3272
-# x2b7ef4+0xb115: unresolved 0x2c3272 -> tripwire 0x4ba200
-code   0x4ba210 ILLEGAL  TRIPWIRE for unresolved 0x2c3280
-# x2b7ef4+0xb11d: unresolved 0x2c3280 -> tripwire 0x4ba210
-code   0x4ba220 ILLEGAL  TRIPWIRE for unresolved 0x2c3296
-# x2b7ef4+0xb125: unresolved 0x2c3296 -> tripwire 0x4ba220
-code   0x4ba230 ILLEGAL  TRIPWIRE for unresolved 0x2c32a4
-# x2b7ef4+0xb12d: unresolved 0x2c32a4 -> tripwire 0x4ba230
-code   0x4ba240 ILLEGAL  TRIPWIRE for unresolved 0x2c32b2
-# x2b7ef4+0xb135: unresolved 0x2c32b2 -> tripwire 0x4ba240
+code   0x4ba170 owner-tag thunk (pyron id 0x11 -> (+0x7f,A4), then stamp_l_ind 28bc01014102, rts)
+# x088512+0x2ebc: owner_tag stamp_l_ind type 65 -> jsr 0x4ba170 (pyron id 0x11)
+code   0x4ba180 owner-tag thunk (pyron id 0x11 -> (+0x7f,A4), then stamp_l_ind 28bc01014100, rts)
+# x088512+0x2f54: owner_tag stamp_l_ind type 65 -> jsr 0x4ba180 (pyron id 0x11)
+# x088512+0x3034: owner_tag stamp_l_ind type 65 -> jsr 0x4ba180 (pyron id 0x11)
+# x088512+0x305e: owner_tag stamp_l_ind type 65 -> jsr 0x4ba180 (pyron id 0x11)
+# x088512+0x3088: owner_tag stamp_l_ind type 65 -> jsr 0x4ba180 (pyron id 0x11)
+# x088512+0x30b2: owner_tag stamp_l_ind type 65 -> jsr 0x4ba180 (pyron id 0x11)
+# x088512+0x30dc: owner_tag stamp_l_ind type 65 -> jsr 0x4ba180 (pyron id 0x11)
+# x088512+0x3106: owner_tag stamp_l_ind type 65 -> jsr 0x4ba180 (pyron id 0x11)
+# x088512+0x3130: owner_tag stamp_l_ind type 65 -> jsr 0x4ba180 (pyron id 0x11)
+# x088512+0x329a: owner_tag stamp_l_ind type 65 -> jsr 0x4ba180 (pyron id 0x11)
+# x088512+0x32c4: owner_tag stamp_l_ind type 65 -> jsr 0x4ba180 (pyron id 0x11)
+# x088512+0x32ee: owner_tag stamp_l_ind type 65 -> jsr 0x4ba180 (pyron id 0x11)
+# x088512+0x3318: owner_tag stamp_l_ind type 65 -> jsr 0x4ba180 (pyron id 0x11)
+# x088512+0x3342: owner_tag stamp_l_ind type 65 -> jsr 0x4ba180 (pyron id 0x11)
+# x088512+0x336c: owner_tag stamp_l_ind type 65 -> jsr 0x4ba180 (pyron id 0x11)
+# x088512+0x3396: owner_tag stamp_l_ind type 65 -> jsr 0x4ba180 (pyron id 0x11)
+# x088512+0x33c0: owner_tag stamp_l_ind type 65 -> jsr 0x4ba180 (pyron id 0x11)
+# x088512+0x3ae4: data_in_code reroute -> helper 0x4ba290, table 0x4ba190 (DATA view of vsav2 0x08c042; pod-zone word offset/record table (a3 re-derived from it; self-relative; shared-zone copy))
+code_file 0x47fc50 +0x3b40  donovan x088512 (from vsav2 0x088512)
+data_file 0x4ae1d0 +0x900  donovan x0d143e (from vsav2 0x0D143E)
+code   0x4ba2a0 ILLEGAL  TRIPWIRE for unresolved 0x2c3136
+# x2b7ef4+0xb0c9: unresolved 0x2c3136 -> tripwire 0x4ba2a0
+code   0x4ba2b0 ILLEGAL  TRIPWIRE for unresolved 0x2c3170
+# x2b7ef4+0xb0d1: unresolved 0x2c3170 -> tripwire 0x4ba2b0
+code   0x4ba2c0 ILLEGAL  TRIPWIRE for unresolved 0x2c31aa
+# x2b7ef4+0xb0d9: unresolved 0x2c31aa -> tripwire 0x4ba2c0
+code   0x4ba2d0 ILLEGAL  TRIPWIRE for unresolved 0x2c31e4
+# x2b7ef4+0xb0fd: unresolved 0x2c31e4 -> tripwire 0x4ba2d0
+code   0x4ba2e0 ILLEGAL  TRIPWIRE for unresolved 0x2c3236
+# x2b7ef4+0xb105: unresolved 0x2c3236 -> tripwire 0x4ba2e0
+code   0x4ba2f0 ILLEGAL  TRIPWIRE for unresolved 0x2c325c
+# x2b7ef4+0xb10d: unresolved 0x2c325c -> tripwire 0x4ba2f0
+code   0x4ba300 ILLEGAL  TRIPWIRE for unresolved 0x2c3272
+# x2b7ef4+0xb115: unresolved 0x2c3272 -> tripwire 0x4ba300
+code   0x4ba310 ILLEGAL  TRIPWIRE for unresolved 0x2c3280
+# x2b7ef4+0xb11d: unresolved 0x2c3280 -> tripwire 0x4ba310
+code   0x4ba320 ILLEGAL  TRIPWIRE for unresolved 0x2c3296
+# x2b7ef4+0xb125: unresolved 0x2c3296 -> tripwire 0x4ba320
+code   0x4ba330 ILLEGAL  TRIPWIRE for unresolved 0x2c32a4
+# x2b7ef4+0xb12d: unresolved 0x2c32a4 -> tripwire 0x4ba330
+code   0x4ba340 ILLEGAL  TRIPWIRE for unresolved 0x2c32b2
+# x2b7ef4+0xb135: unresolved 0x2c32b2 -> tripwire 0x4ba340
 # x2b7ef4: effect-c5 — 5714 bank-1 codes kept NATIVE (art -> group C bank 5); 114 coord lists matched, 617 ported (11336B fragment)
-data_file 0x4ae9d0 +0xb20c  donovan x2b7ef4 (from vsav2 0x2B7EF4)
-data     0x4bcea0 +0x500  sprite palette block (vsav2 0x39C19C); poke32 0x38c1dc (table 0x38c198 row 0x11)
-data     0x4bd3a0 +0xdc0  effect palette block (vsav2 0x3AC45C); poke32 0x38c25c (table 0x38c218 row 0x11)
-poke32 0x0bcebe <- 0x00483690  anim_index_a[0x11] donovan anim
-poke32 0x0bcf3e <- 0x00488bda  anim_index_a2[0x11] donovan anim
-poke32 0x0bcfbe <- 0x00485b5e  anim_index_b[0x11] donovan anim
-poke32 0x0bd03e <- 0x004855da  anim_index_c[0x11] donovan anim
-poke32 0x0bd0be <- 0x0048cbbe  anim_index_proj[0x11] donovan anim
+data_file 0x4aead0 +0xb20c  donovan x2b7ef4 (from vsav2 0x2B7EF4)
+data     0x4bcfa0 +0x500  sprite palette block (vsav2 0x39C19C); poke32 0x38c1dc (table 0x38c198 row 0x11)
+data     0x4bd4a0 +0xdc0  effect palette block (vsav2 0x3AC45C); poke32 0x38c25c (table 0x38c218 row 0x11)
+poke32 0x0bcebe <- 0x00483790  anim_index_a[0x11] donovan anim
+poke32 0x0bcf3e <- 0x00488cda  anim_index_a2[0x11] donovan anim
+poke32 0x0bcfbe <- 0x00485c5e  anim_index_b[0x11] donovan anim
+poke32 0x0bd03e <- 0x004856da  anim_index_c[0x11] donovan anim
+poke32 0x0bd0be <- 0x0048ccbe  anim_index_proj[0x11] donovan anim
 data   0x0bd902 +0x8  param32_a[0x11] value
 data   0x0bdeaa +0x30  jump_params[0x11] value
-poke32 0x0bd9be <- 0x004ac7dc  hitbox_base[0x11] donovan hitbox
-poke32 0x0bda3e <- 0x004ac6e0  hitbox_comp[0x11] donovan hitbox
-poke32 0x0bdabe <- 0x004adda8  proj_hitbox_base[0x11] donovan hitbox_proj
-poke32 0x0bdb3e <- 0x004adda0  proj_hitbox_comp[0x11] donovan hitbox_proj
+poke32 0x0bd9be <- 0x004ac8dc  hitbox_base[0x11] donovan hitbox
+poke32 0x0bda3e <- 0x004ac7e0  hitbox_comp[0x11] donovan hitbox
+poke32 0x0bdabe <- 0x004adea8  proj_hitbox_base[0x11] donovan hitbox_proj
+poke32 0x0bdb3e <- 0x004adea0  proj_hitbox_comp[0x11] donovan hitbox_proj
 data   0x0bdc02 +0x8  rec8_a[0x11] value
 data   0x0be19c +0x2  word132[0x11] value
 data   0x0be1dc +0x2  word_pos_a[0x11] value
@@ -1223,67 +1225,67 @@ data   0x0be85c +0x2  word_range[0x11] value
 data   0x0be88a +0x2  byte15b[0x11] value
 data   0x0bea98 +0x1e  byte2d_a[0x11] value
 data   0x0bee58 +0x1e  byte2d_b[0x11] value
-poke32 0x0bf2de <- 0x0046fdc2  tail_code_ptr[0x11] donovan code
+poke32 0x0bf2de <- 0x0046fec2  tail_code_ptr[0x11] donovan code
 # tail_data_ptr: ptr row owned by sound_table pyr_sfx_records — generic repoint suppressed (14z-65)
 poke32 0x0bd4be <- 0x00024ea4  dispatch_07[0x11] engine twin of 0x23afe (alias char row 0x30b9a differs)
-code   0x4be160 ILLEGAL  TRIPWIRE for unresolved 0x65c22
-# obj_hook@0x54470 type 59 owner-dispatch fallback: unresolved 0x65c22 -> tripwire 0x4be160
-code   0x4be170 obj_hook type 59 OWNER-DISPATCH (tag; donovan 0xcbe32; unknown owner -> tripwire 0x4be160)
+code   0x4be260 ILLEGAL  TRIPWIRE for unresolved 0x65c22
+# obj_hook@0x54470 type 59 owner-dispatch fallback: unresolved 0x65c22 -> tripwire 0x4be260
+code   0x4be270 obj_hook type 59 OWNER-DISPATCH (tag; donovan 0xcbe32; unknown owner -> tripwire 0x4be260)
 #   obj_hook@0x54470 type 59: stamp sites also exist in huitzil, pyron (no handler copy placed) — a live spawn there would tripwire under its OWN tag; solo builds already tripwire this type for them and playtest green (dead paths)
-code   0x4be190 ILLEGAL  TRIPWIRE for unresolved 0x65e5a
-# obj_hook@0x54470 type 61 owner-dispatch fallback: unresolved 0x65e5a -> tripwire 0x4be190
-code   0x4be1a0 obj_hook type 61 OWNER-DISPATCH (tag; donovan 0xcc06a; unknown owner -> tripwire 0x4be190)
+code   0x4be290 ILLEGAL  TRIPWIRE for unresolved 0x65e5a
+# obj_hook@0x54470 type 61 owner-dispatch fallback: unresolved 0x65e5a -> tripwire 0x4be290
+code   0x4be2a0 obj_hook type 61 OWNER-DISPATCH (tag; donovan 0xcc06a; unknown owner -> tripwire 0x4be290)
 #   obj_hook@0x54470 type 61: stamp sites also exist in huitzil, pyron (no handler copy placed) — a live spawn there would tripwire under its OWN tag; solo builds already tripwire this type for them and playtest green (dead paths)
-code   0x4be1c0 ILLEGAL  TRIPWIRE for unresolved 0x66ec4
-# obj_hook@0x54470 type 62 owner-dispatch fallback: unresolved 0x66ec4 -> tripwire 0x4be1c0
-code   0x4be1d0 obj_hook type 62 OWNER-DISPATCH (tag; donovan 0xcd0d4; unknown owner -> tripwire 0x4be1c0)
+code   0x4be2c0 ILLEGAL  TRIPWIRE for unresolved 0x66ec4
+# obj_hook@0x54470 type 62 owner-dispatch fallback: unresolved 0x66ec4 -> tripwire 0x4be2c0
+code   0x4be2d0 obj_hook type 62 OWNER-DISPATCH (tag; donovan 0xcd0d4; unknown owner -> tripwire 0x4be2c0)
 #   obj_hook@0x54470 type 62: stamp sites also exist in huitzil, pyron (no handler copy placed) — a live spawn there would tripwire under its OWN tag; solo builds already tripwire this type for them and playtest green (dead paths)
-code   0x4be1f0 ILLEGAL  TRIPWIRE for unresolved 0x6717c
-# obj_hook@0x54470 type 63 owner-dispatch fallback: unresolved 0x6717c -> tripwire 0x4be1f0
-code   0x4be200 obj_hook type 63 OWNER-DISPATCH (tag; donovan 0xc28a0; unknown owner -> tripwire 0x4be1f0)
+code   0x4be2f0 ILLEGAL  TRIPWIRE for unresolved 0x6717c
+# obj_hook@0x54470 type 63 owner-dispatch fallback: unresolved 0x6717c -> tripwire 0x4be2f0
+code   0x4be300 obj_hook type 63 OWNER-DISPATCH (tag; donovan 0xc28a0; unknown owner -> tripwire 0x4be2f0)
 #   obj_hook@0x54470 type 63: stamp sites also exist in huitzil, pyron (no handler copy placed) — a live spawn there would tripwire under its OWN tag; solo builds already tripwire this type for them and playtest green (dead paths)
-code   0x4be220 ILLEGAL  TRIPWIRE for unresolved 0x672d0
-# obj_hook@0x54470 type 64 owner-dispatch fallback: unresolved 0x672d0 -> tripwire 0x4be220
-code   0x4be230 obj_hook type 64 OWNER-DISPATCH (tag; huitzil 0x3ffcf0, pyron 0x47d690; unknown owner -> tripwire 0x4be220)
-code   0x4be260 ILLEGAL  TRIPWIRE for unresolved 0x67550
-# obj_hook@0x54470 type 65 owner-dispatch fallback: unresolved 0x67550 -> tripwire 0x4be260
-code   0x4be270 obj_hook type 65 OWNER-DISPATCH (tag; huitzil 0x4253c0, pyron 0x47d910; unknown owner -> tripwire 0x4be260)
+code   0x4be320 ILLEGAL  TRIPWIRE for unresolved 0x672d0
+# obj_hook@0x54470 type 64 owner-dispatch fallback: unresolved 0x672d0 -> tripwire 0x4be320
+code   0x4be330 obj_hook type 64 OWNER-DISPATCH (tag; huitzil 0x3ffcf0, pyron 0x47d790; unknown owner -> tripwire 0x4be320)
+code   0x4be360 ILLEGAL  TRIPWIRE for unresolved 0x67550
+# obj_hook@0x54470 type 65 owner-dispatch fallback: unresolved 0x67550 -> tripwire 0x4be360
+code   0x4be370 obj_hook type 65 OWNER-DISPATCH (tag; huitzil 0x4253c0, pyron 0x47da10; unknown owner -> tripwire 0x4be360)
 #   obj_hook@0x54470 type 65: stamp sites also exist in donovan (no handler copy placed) — a live spawn there would tripwire under its OWN tag; solo builds already tripwire this type for them and playtest green (dead paths)
-code   0x4be2a0 ILLEGAL  TRIPWIRE for unresolved 0x67846
-# obj_hook@0x54470 type 66 owner-dispatch fallback: unresolved 0x67846 -> tripwire 0x4be2a0
-code   0x4be2b0 obj_hook type 66 OWNER-DISPATCH (tag; huitzil 0x4256c0, pyron 0x47dc10; unknown owner -> tripwire 0x4be2a0)
+code   0x4be3a0 ILLEGAL  TRIPWIRE for unresolved 0x67846
+# obj_hook@0x54470 type 66 owner-dispatch fallback: unresolved 0x67846 -> tripwire 0x4be3a0
+code   0x4be3b0 obj_hook type 66 OWNER-DISPATCH (tag; huitzil 0x4256c0, pyron 0x47dd10; unknown owner -> tripwire 0x4be3a0)
 #   obj_hook@0x54470 type 66: stamp sites also exist in donovan (no handler copy placed) — a live spawn there would tripwire under its OWN tag; solo builds already tripwire this type for them and playtest green (dead paths)
-code   0x4be2e0 ILLEGAL  TRIPWIRE for unresolved 0x67a00
-# obj_hook@0x54470 type 67 owner-dispatch fallback: unresolved 0x67a00 -> tripwire 0x4be2e0
-code   0x4be2f0 obj_hook type 67 OWNER-DISPATCH (tag; huitzil 0x425880, pyron 0x47ddd0; unknown owner -> tripwire 0x4be2e0)
-code   0x4be320 ILLEGAL  TRIPWIRE for unresolved 0x6800c
-# obj_hook@0x54470 type 68 owner-dispatch fallback: unresolved 0x6800c -> tripwire 0x4be320
-code   0x4be330 obj_hook type 68 OWNER-DISPATCH (tag; huitzil 0x425e90, pyron 0x47e3e0; unknown owner -> tripwire 0x4be320)
-code   0x4be360 ILLEGAL  TRIPWIRE for unresolved 0x68458
-# obj_hook@0x54470 type 69 owner-dispatch fallback: unresolved 0x68458 -> tripwire 0x4be360
-code   0x4be370 obj_hook type 69 OWNER-DISPATCH (tag; huitzil 0x4262e0, pyron 0x47e830; unknown owner -> tripwire 0x4be360)
-code   0x4be3a0 ILLEGAL  TRIPWIRE for unresolved 0x68768
-# obj_hook@0x54470 type 70 owner-dispatch fallback: unresolved 0x68768 -> tripwire 0x4be3a0
-code   0x4be3b0 obj_hook type 70 OWNER-DISPATCH (tag; huitzil 0x4265f0, pyron 0x47eb40; unknown owner -> tripwire 0x4be3a0)
-code   0x4be3e0 ILLEGAL  TRIPWIRE for unresolved 0x689cc
-# obj_hook@0x54470 type 71 owner-dispatch fallback: unresolved 0x689cc -> tripwire 0x4be3e0
-code   0x4be3f0 obj_hook type 71 OWNER-DISPATCH (tag; huitzil 0x426860, pyron 0x47edb0; unknown owner -> tripwire 0x4be3e0)
-code   0x4be420 ILLEGAL  TRIPWIRE for unresolved 0x68c78
-# obj_hook@0x54470 type 72 owner-dispatch fallback: unresolved 0x68c78 -> tripwire 0x4be420
-code   0x4be430 obj_hook type 72 OWNER-DISPATCH (tag; huitzil 0x426b10, pyron 0x47f060; unknown owner -> tripwire 0x4be420)
-code   0x4be460 ILLEGAL  TRIPWIRE for unresolved 0x69046
-# obj_hook@0x54470 type 73 owner-dispatch fallback: unresolved 0x69046 -> tripwire 0x4be460
-code   0x4be470 obj_hook type 73 OWNER-DISPATCH (tag; huitzil 0x426ee0, pyron 0x47f430; unknown owner -> tripwire 0x4be460)
+code   0x4be3e0 ILLEGAL  TRIPWIRE for unresolved 0x67a00
+# obj_hook@0x54470 type 67 owner-dispatch fallback: unresolved 0x67a00 -> tripwire 0x4be3e0
+code   0x4be3f0 obj_hook type 67 OWNER-DISPATCH (tag; huitzil 0x425880, pyron 0x47ded0; unknown owner -> tripwire 0x4be3e0)
+code   0x4be420 ILLEGAL  TRIPWIRE for unresolved 0x6800c
+# obj_hook@0x54470 type 68 owner-dispatch fallback: unresolved 0x6800c -> tripwire 0x4be420
+code   0x4be430 obj_hook type 68 OWNER-DISPATCH (tag; huitzil 0x425e90, pyron 0x47e4e0; unknown owner -> tripwire 0x4be420)
+code   0x4be460 ILLEGAL  TRIPWIRE for unresolved 0x68458
+# obj_hook@0x54470 type 69 owner-dispatch fallback: unresolved 0x68458 -> tripwire 0x4be460
+code   0x4be470 obj_hook type 69 OWNER-DISPATCH (tag; huitzil 0x4262e0, pyron 0x47e930; unknown owner -> tripwire 0x4be460)
+code   0x4be4a0 ILLEGAL  TRIPWIRE for unresolved 0x68768
+# obj_hook@0x54470 type 70 owner-dispatch fallback: unresolved 0x68768 -> tripwire 0x4be4a0
+code   0x4be4b0 obj_hook type 70 OWNER-DISPATCH (tag; huitzil 0x4265f0, pyron 0x47ec40; unknown owner -> tripwire 0x4be4a0)
+code   0x4be4e0 ILLEGAL  TRIPWIRE for unresolved 0x689cc
+# obj_hook@0x54470 type 71 owner-dispatch fallback: unresolved 0x689cc -> tripwire 0x4be4e0
+code   0x4be4f0 obj_hook type 71 OWNER-DISPATCH (tag; huitzil 0x426860, pyron 0x47eeb0; unknown owner -> tripwire 0x4be4e0)
+code   0x4be520 ILLEGAL  TRIPWIRE for unresolved 0x68c78
+# obj_hook@0x54470 type 72 owner-dispatch fallback: unresolved 0x68c78 -> tripwire 0x4be520
+code   0x4be530 obj_hook type 72 OWNER-DISPATCH (tag; huitzil 0x426b10, pyron 0x47f160; unknown owner -> tripwire 0x4be520)
+code   0x4be560 ILLEGAL  TRIPWIRE for unresolved 0x69046
+# obj_hook@0x54470 type 73 owner-dispatch fallback: unresolved 0x69046 -> tripwire 0x4be560
+code   0x4be570 obj_hook type 73 OWNER-DISPATCH (tag; huitzil 0x426ee0, pyron 0x47f530; unknown owner -> tripwire 0x4be560)
 #   obj_hook@0x54470 type 73: stamp sites also exist in donovan (no handler copy placed) — a live spawn there would tripwire under its OWN tag; solo builds already tripwire this type for them and playtest green (dead paths)
-code   0x4be4a0 ILLEGAL  TRIPWIRE for unresolved 0x692f6
-# obj_hook@0x54470 type 74 owner-dispatch fallback: unresolved 0x692f6 -> tripwire 0x4be4a0
-code   0x4be4b0 obj_hook type 74 OWNER-DISPATCH (tag; huitzil 0x427190, pyron 0x47f6e0; unknown owner -> tripwire 0x4be4a0)
-code   0x4be4e0 ILLEGAL  TRIPWIRE for unresolved 0x6965e
-# obj_hook@0x54470 type 75 owner-dispatch fallback: unresolved 0x6965e -> tripwire 0x4be4e0
-code   0x4be4f0 obj_hook type 75 OWNER-DISPATCH (tag; huitzil 0x427500, pyron 0x47fa50; unknown owner -> tripwire 0x4be4e0)
+code   0x4be5a0 ILLEGAL  TRIPWIRE for unresolved 0x692f6
+# obj_hook@0x54470 type 74 owner-dispatch fallback: unresolved 0x692f6 -> tripwire 0x4be5a0
+code   0x4be5b0 obj_hook type 74 OWNER-DISPATCH (tag; huitzil 0x427190, pyron 0x47f7e0; unknown owner -> tripwire 0x4be5a0)
+code   0x4be5e0 ILLEGAL  TRIPWIRE for unresolved 0x6965e
+# obj_hook@0x54470 type 75 owner-dispatch fallback: unresolved 0x6965e -> tripwire 0x4be5e0
+code   0x4be5f0 obj_hook type 75 OWNER-DISPATCH (tag; huitzil 0x427500, pyron 0x47fb50; unknown owner -> tripwire 0x4be5e0)
 #   obj_hook@0x54470 type 75: stamp sites also exist in donovan (no handler copy placed) — a live spawn there would tripwire under its OWN tag; solo builds already tripwire this type for them and playtest green (dead paths)
-code   0x4be520 +0x15c  obj_walker: 0x54458 relocated verbatim + its extended type table at +0x2c (59 vanilla + 17 ported, 17 placed); dispatch site 0x54470 left VANILLA
-code   2 caller operand(s) of jsr 0x54458 -> 0x4be520 (0x009436, 0x020310)
+code   0x4be620 +0x15c  obj_walker: 0x54458 relocated verbatim + its extended type table at +0x2c (59 vanilla + 17 ported, 17 placed); dispatch site 0x54470 left VANILLA
+code   2 caller operand(s) of jsr 0x54458 -> 0x4be620 (0x009436, 0x020310)
 #   obj_hook@0x5e542 type 114 original entry serves FIRST resolver donovan 0xd0170 by design (14z-82); renumbered: huitzil->124, pyron->125
 #   obj_hook@0x5e542 type 115 original entry serves FIRST resolver donovan 0xd142a by design (14z-82); renumbered: huitzil->126, pyron->127
 #   obj_hook@0x5e542 type 116 original entry serves FIRST resolver donovan 0xd1ecc by design (14z-82); renumbered: huitzil->128, pyron->129
@@ -1291,94 +1293,94 @@ code   2 caller operand(s) of jsr 0x54458 -> 0x4be520 (0x009436, 0x020310)
 #   obj_hook@0x5e542 type 118 original entry serves FIRST resolver donovan 0xd2956 by design (14z-82); renumbered: huitzil->132, pyron->133
 #   obj_hook@0x5e542 type 119 original entry serves FIRST resolver donovan 0xd2d38 by design (14z-82); renumbered: huitzil->134, pyron->135
 #   obj_hook@0x5e542 type 120 MULTI-RESOLVER (donovan, huitzil, pyron) with no measured owner-read -> FIRST-WINS (donovan 0xd2e5a); order-dependent — measure it (tests/audit_objhook_owner_census.sh) and extend OBJ_HOOK_OWNER_READ
-code   0x4be680 ILLEGAL  TRIPWIRE for unresolved 0x6a70c
-# obj_hook@0x5e542 type 121: unresolved 0x6a70c -> tripwire 0x4be680
-# obj_hook@0x5e542 type 122: unresolved 0x6a70c -> tripwire 0x4be680
-# obj_hook@0x5e542 type 123: unresolved 0x6a70c -> tripwire 0x4be680
+code   0x4be780 ILLEGAL  TRIPWIRE for unresolved 0x6a70c
+# obj_hook@0x5e542 type 121: unresolved 0x6a70c -> tripwire 0x4be780
+# obj_hook@0x5e542 type 122: unresolved 0x6a70c -> tripwire 0x4be780
+# obj_hook@0x5e542 type 123: unresolved 0x6a70c -> tripwire 0x4be780
 #   obj_hook renumbered type 124 = huitzil's 114 -> 0x428520 (its OWN copy; stamps rewritten in-region, 14z-82)
-#   obj_hook renumbered type 125 = pyron's 114 -> 0x47fb50 (its OWN copy; stamps rewritten in-region, 14z-82)
+#   obj_hook renumbered type 125 = pyron's 114 -> 0x47fc50 (its OWN copy; stamps rewritten in-region, 14z-82)
 #   obj_hook renumbered type 126 = huitzil's 115 -> 0x4297da (its OWN copy; stamps rewritten in-region, 14z-82)
-#   obj_hook renumbered type 127 = pyron's 115 -> 0x480e0a (its OWN copy; stamps rewritten in-region, 14z-82)
+#   obj_hook renumbered type 127 = pyron's 115 -> 0x480f0a (its OWN copy; stamps rewritten in-region, 14z-82)
 #   obj_hook renumbered type 128 = huitzil's 116 -> 0x42a27c (its OWN copy; stamps rewritten in-region, 14z-82)
-#   obj_hook renumbered type 129 = pyron's 116 -> 0x4818ac (its OWN copy; stamps rewritten in-region, 14z-82)
+#   obj_hook renumbered type 129 = pyron's 116 -> 0x4819ac (its OWN copy; stamps rewritten in-region, 14z-82)
 #   obj_hook renumbered type 130 = huitzil's 117 -> 0x42a5fa (its OWN copy; stamps rewritten in-region, 14z-82)
-#   obj_hook renumbered type 131 = pyron's 117 -> 0x481c2a (its OWN copy; stamps rewritten in-region, 14z-82)
+#   obj_hook renumbered type 131 = pyron's 117 -> 0x481d2a (its OWN copy; stamps rewritten in-region, 14z-82)
 #   obj_hook renumbered type 132 = huitzil's 118 -> 0x42ad06 (its OWN copy; stamps rewritten in-region, 14z-82)
-#   obj_hook renumbered type 133 = pyron's 118 -> 0x482336 (its OWN copy; stamps rewritten in-region, 14z-82)
+#   obj_hook renumbered type 133 = pyron's 118 -> 0x482436 (its OWN copy; stamps rewritten in-region, 14z-82)
 #   obj_hook renumbered type 134 = huitzil's 119 -> 0x42b0e8 (its OWN copy; stamps rewritten in-region, 14z-82)
-#   obj_hook renumbered type 135 = pyron's 119 -> 0x482718 (its OWN copy; stamps rewritten in-region, 14z-82)
-code   0x4be690 +0x24c  obj_walker: 0x5e52a relocated verbatim + its extended type table at +0x2c (114 vanilla + 10 ported, 7 placed, 12 renumbered); dispatch site 0x5e542 left VANILLA
-code   21 caller operand(s) of jsr 0x5e52a -> 0x4be690 (0x0053f6, 0x005410, 0x00577c, 0x0057a8, 0x00590a, 0x005ebc, 0x00943c, 0x009caa, 0x009f36, 0x00a188, 0x00a804, 0x00abcc, 0x010dfa, 0x012a3e, 0x012d16, 0x012e4c, 0x012e66, 0x020316, 0x021638, 0x021ada, 0x021dea)
-poke32 0x0bd13e <- 0x00471734  dispatch_00[0x11] donovan handler
-poke32 0x0bd1be <- 0x0046f7de  dispatch_01[0x11] donovan handler
-poke32 0x0bd23e <- 0x00470000  dispatch_02[0x11] donovan handler
-poke32 0x0bd2be <- 0x00470000  dispatch_03[0x11] donovan handler
-poke32 0x0bd33e <- 0x00470000  dispatch_04[0x11] donovan handler
-poke32 0x0bd3be <- 0x004710e2  dispatch_05[0x11] donovan handler
-poke32 0x0bd43e <- 0x0046fb62  dispatch_06[0x11] donovan handler
-poke32 0x0bd53e <- 0x0046ff84  dispatch_08[0x11] donovan handler
-poke32 0x0bd5be <- 0x0046fcd2  dispatch_09[0x11] donovan handler
-poke32 0x0bd63e <- 0x0046fad0  dispatch_10[0x11] donovan handler
-poke32 0x0bd6be <- 0x0047152c  dispatch_11[0x11] donovan handler
-poke32 0x0bd73e <- 0x0047164a  dispatch_12[0x11] donovan handler
-poke32 0x0bd7be <- 0x004716fe  dispatch_13[0x11] donovan handler
-poke32 0x0bd83e <- 0x004712ec  dispatch_14[0x11] donovan handler
-poke32 0x0bf25e <- 0x0046fc50  dispatch_15[0x11] donovan handler
-poke32 0x0bf35e <- 0x00471038  dispatch_16[0x11] donovan handler
-poke32 0x0bf3de <- 0x004710a0  dispatch_17[0x11] donovan handler
-poke32 0x0bf4de <- 0x00471772  dispatch_18[0x11] donovan handler
-poke32 0x0bf65e <- 0x004710d6  dispatch_19[0x11] donovan handler
+#   obj_hook renumbered type 135 = pyron's 119 -> 0x482818 (its OWN copy; stamps rewritten in-region, 14z-82)
+code   0x4be790 +0x24c  obj_walker: 0x5e52a relocated verbatim + its extended type table at +0x2c (114 vanilla + 10 ported, 7 placed, 12 renumbered); dispatch site 0x5e542 left VANILLA
+code   21 caller operand(s) of jsr 0x5e52a -> 0x4be790 (0x0053f6, 0x005410, 0x00577c, 0x0057a8, 0x00590a, 0x005ebc, 0x00943c, 0x009caa, 0x009f36, 0x00a188, 0x00a804, 0x00abcc, 0x010dfa, 0x012a3e, 0x012d16, 0x012e4c, 0x012e66, 0x020316, 0x021638, 0x021ada, 0x021dea)
+poke32 0x0bd13e <- 0x00471834  dispatch_00[0x11] donovan handler
+poke32 0x0bd1be <- 0x0046f8de  dispatch_01[0x11] donovan handler
+poke32 0x0bd23e <- 0x00470100  dispatch_02[0x11] donovan handler
+poke32 0x0bd2be <- 0x00470100  dispatch_03[0x11] donovan handler
+poke32 0x0bd33e <- 0x00470100  dispatch_04[0x11] donovan handler
+poke32 0x0bd3be <- 0x004711e2  dispatch_05[0x11] donovan handler
+poke32 0x0bd43e <- 0x0046fc62  dispatch_06[0x11] donovan handler
+poke32 0x0bd53e <- 0x00470084  dispatch_08[0x11] donovan handler
+poke32 0x0bd5be <- 0x0046fdd2  dispatch_09[0x11] donovan handler
+poke32 0x0bd63e <- 0x0046fbd0  dispatch_10[0x11] donovan handler
+poke32 0x0bd6be <- 0x0047162c  dispatch_11[0x11] donovan handler
+poke32 0x0bd73e <- 0x0047174a  dispatch_12[0x11] donovan handler
+poke32 0x0bd7be <- 0x004717fe  dispatch_13[0x11] donovan handler
+poke32 0x0bd83e <- 0x004713ec  dispatch_14[0x11] donovan handler
+poke32 0x0bf25e <- 0x0046fd50  dispatch_15[0x11] donovan handler
+poke32 0x0bf35e <- 0x00471138  dispatch_16[0x11] donovan handler
+poke32 0x0bf3de <- 0x004711a0  dispatch_17[0x11] donovan handler
+poke32 0x0bf4de <- 0x00471872  dispatch_18[0x11] donovan handler
+poke32 0x0bf65e <- 0x004711d6  dispatch_19[0x11] donovan handler
 poke16 0x0898a6 <- 0x869c  aux hud_mug_entry_11
 poke32 0x08994c <- 0x86940102  aux hud_name_entry_11_hi
 poke32 0x089950 <- 0xfff00002  aux hud_name_entry_11_lo
 data   0x00b6a8 +0x40  data_port voice_borrow_candidates_a <- vsav2 0x009f6a (0 fixes)
 data   0x00bfa8 +0x40  data_port voice_borrow_voicenums_b <- vsav2 0x00a86a (4 fixes)
-data   0x4be8e0 +0xb8  sound_table pyr_sfx_records <- vsav2 0x0c8b18 (23 entries; kept ['0x110@1', '0x111@3', '0x112@4', '0x0a4@5', '0x0a5@6', '0x097@7', '0x0a0@8', '0x0a1@9', '0x0a2@10', '0x0a1@11', '0x0a3@12', '0x09e@13', '0x0a6@16', '0x09a@18', '0x202@21']; zeroed 6 unplayable ids; remapped [(5, '0x72d', '0xa4'), (6, '0x72e', '0xa5'), (7, '0x720', '0x97'), (8, '0x729', '0xa0'), (9, '0x72a', '0xa1'), (10, '0x72b', '0xa2'), (11, '0x72a', '0xa1'), (12, '0x72c', '0xa3'), (13, '0x727', '0x9e'), (16, '0x72f', '0xa6'), (18, '0x723', '0x9a')])
-poke32 0x0bf45e <- 0x4be8e0  sound_table pyr_sfx_records per-char ptr row 0x11 (was 0x95894)
-data   0x4be9a0 +0x20  select_records portrait/p1 coord list (8 pairs, vs2 0x3036b8)
-data   0x4be9c0 +0x2a  select_records portrait/p1 record (vs2 0x2a639c, 8 entries, budget 0x61 = vs2's own)
-poke32 0x26746e <- 0x4be9c0  select_records portrait/p1 array row 0x11 (was 0x27195e, the base-half alias)
-data   0x4be9f0 +0x20  select_records portrait/p2 coord list (8 pairs, vs2 0x3036d8)
-data   0x4bea10 +0x2a  select_records portrait/p2 record (vs2 0x2a63c6, 8 entries, budget 0x61 = vs2's own)
-poke32 0x2674ee <- 0x4bea10  select_records portrait/p2 array row 0x11 (was 0x271d70, the base-half alias)
-data   0x4bea40 +0x4  select_records name_banner/p1 coord list (1 pairs, vs2 0x2fd9b4)
-data   0x4bea50 +0xe  select_records name_banner/p1 record (vs2 0x2a6570, 1 entries, budget 0x6 = vs2's own)
-poke32 0x2675ee <- 0x4bea50  select_records name_banner/p1 array row 0x11 (was 0x272156, the base-half alias)
-data   0x4bea60 +0x8  select_records name_banner/p2 coord list (2 pairs, vs2 0x303d9c)
-data   0x4bea70 +0x12  select_records name_banner/p2 record (vs2 0x2a7680, 2 entries, budget 0x3 = vs2's own)
-poke32 0x26766e <- 0x4bea70  select_records name_banner/p2 array row 0x11 (was 0x273060, the base-half alias)
-data   0x4bea90 +0x14  select_records splash_p1/p1 coord list (5 pairs, vs2 0x30437c)
-data   0x4beab0 +0x1e  select_records splash_p1/p1 record (vs2 0x2a7f2c, 5 entries, budget 0x4f = vs2's own)
-poke32 0x2672ee <- 0x4beab0  select_records splash_p1/p1 array row 0x11 (was 0x273494, the base-half alias)
-data   0x4bead0 +0x14  select_records splash_p2/p1 coord list (5 pairs, vs2 0x304390)
-data   0x4beaf0 +0x1e  select_records splash_p2/p1 record (vs2 0x2a7f4a, 5 entries, budget 0x4f = vs2's own)
-poke32 0x26736e <- 0x4beaf0  select_records splash_p2/p1 array row 0x11 (was 0x2737da, the base-half alias)
-data   0x4beb10 +0x38  select_records win_quote/p1 coord list (14 pairs, vs2 0x305034)
-data   0x4beb50 +0x42  select_records win_quote/p1 record (vs2 0x2a8cb6, 14 entries, budget 0xb5 = vs2's own)
-poke32 0x2673ee <- 0x4beb50  select_records win_quote/p1 array row 0x11 (was 0x273b68, the base-half alias)
+data   0x4be9e0 +0xb8  sound_table pyr_sfx_records <- vsav2 0x0c8b18 (23 entries; kept ['0x110@1', '0x111@3', '0x112@4', '0x0a4@5', '0x0a5@6', '0x097@7', '0x0a0@8', '0x0a1@9', '0x0a2@10', '0x0a1@11', '0x0a3@12', '0x09e@13', '0x0a6@16', '0x09a@18', '0x202@21']; zeroed 6 unplayable ids; remapped [(5, '0x72d', '0xa4'), (6, '0x72e', '0xa5'), (7, '0x720', '0x97'), (8, '0x729', '0xa0'), (9, '0x72a', '0xa1'), (10, '0x72b', '0xa2'), (11, '0x72a', '0xa1'), (12, '0x72c', '0xa3'), (13, '0x727', '0x9e'), (16, '0x72f', '0xa6'), (18, '0x723', '0x9a')])
+poke32 0x0bf45e <- 0x4be9e0  sound_table pyr_sfx_records per-char ptr row 0x11 (was 0x95894)
+data   0x4beaa0 +0x20  select_records portrait/p1 coord list (8 pairs, vs2 0x3036b8)
+data   0x4beac0 +0x2a  select_records portrait/p1 record (vs2 0x2a639c, 8 entries, budget 0x61 = vs2's own)
+poke32 0x26746e <- 0x4beac0  select_records portrait/p1 array row 0x11 (was 0x27195e, the base-half alias)
+data   0x4beaf0 +0x20  select_records portrait/p2 coord list (8 pairs, vs2 0x3036d8)
+data   0x4beb10 +0x2a  select_records portrait/p2 record (vs2 0x2a63c6, 8 entries, budget 0x61 = vs2's own)
+poke32 0x2674ee <- 0x4beb10  select_records portrait/p2 array row 0x11 (was 0x271d70, the base-half alias)
+data   0x4beb40 +0x4  select_records name_banner/p1 coord list (1 pairs, vs2 0x2fd9b4)
+data   0x4beb50 +0xe  select_records name_banner/p1 record (vs2 0x2a6570, 1 entries, budget 0x6 = vs2's own)
+poke32 0x2675ee <- 0x4beb50  select_records name_banner/p1 array row 0x11 (was 0x272156, the base-half alias)
+data   0x4beb60 +0x8  select_records name_banner/p2 coord list (2 pairs, vs2 0x303d9c)
+data   0x4beb70 +0x12  select_records name_banner/p2 record (vs2 0x2a7680, 2 entries, budget 0x3 = vs2's own)
+poke32 0x26766e <- 0x4beb70  select_records name_banner/p2 array row 0x11 (was 0x273060, the base-half alias)
+data   0x4beb90 +0x14  select_records splash_p1/p1 coord list (5 pairs, vs2 0x30437c)
+data   0x4bebb0 +0x1e  select_records splash_p1/p1 record (vs2 0x2a7f2c, 5 entries, budget 0x4f = vs2's own)
+poke32 0x2672ee <- 0x4bebb0  select_records splash_p1/p1 array row 0x11 (was 0x273494, the base-half alias)
+data   0x4bebd0 +0x14  select_records splash_p2/p1 coord list (5 pairs, vs2 0x304390)
+data   0x4bebf0 +0x1e  select_records splash_p2/p1 record (vs2 0x2a7f4a, 5 entries, budget 0x4f = vs2's own)
+poke32 0x26736e <- 0x4bebf0  select_records splash_p2/p1 array row 0x11 (was 0x2737da, the base-half alias)
+data   0x4bec10 +0x38  select_records win_quote/p1 coord list (14 pairs, vs2 0x305034)
+data   0x4bec50 +0x42  select_records win_quote/p1 record (vs2 0x2a8cb6, 14 entries, budget 0xb5 = vs2's own)
+poke32 0x2673ee <- 0x4bec50  select_records win_quote/p1 array row 0x11 (was 0x273b68, the base-half alias)
 poke32 0x268a46 <- 0x2724a2  select_records highlight/p1 array row 0x11 = the HOST row 0x0f ring record VERBATIM (host_ring; was 0x2725dc)
 poke32 0x268ac6 <- 0x2726ce  select_records highlight/p2 array row 0x11 = the HOST row 0x0f ring record VERBATIM (host_ring; was 0x272800)
 # select_records: 0 bank-1 tile placements -> select_tiles.json (only the composed records' art; the slot-0x0F splash/win-quote families are NOT placed, so that Jedah art stays vanilla)
 # select_records: 287 native bank-1 tiles -> select_bank5.json (copied vs2 -> group C bank 5 by build_gfx; the drawer's bank is thunk-gated per hover)
-data   0x4beba0 +0x6040  win_pal_variant don_win_pal: sparse block, 10 sets of 0xa0 at stride 0xaa0 (vs2 0x3c365c stride 0xb40)
-data   0x4c4be0 +0x6040  win_pal_variant hui_win_pal: sparse block, 10 sets of 0xa0 at stride 0xaa0 (vs2 0x3c329c stride 0xb40)
-data   0x4cac20 +0x6040  win_pal_variant pyr_win_pal: sparse block, 10 sets of 0xa0 at stride 0xaa0 (vs2 0x3c35bc stride 0xb40)
-code   0x4d0c60 +0x32  win_pal_variant thunk, 3-way: don_win_pal d6==0x13 -> a0=0x4bdfc0, hui_win_pal d6==0x10 -> a0=0x4c41e0, pyr_win_pal d6==0x11 -> a0=0x4ca180; else vanilla pool 0x3ad700
-code   0x05f1b6 +6     win_pal_variant: movea.l #pool -> jsr 0x4d0c60
+data   0x4beca0 +0x6040  win_pal_variant don_win_pal: sparse block, 10 sets of 0xa0 at stride 0xaa0 (vs2 0x3c365c stride 0xb40)
+data   0x4c4ce0 +0x6040  win_pal_variant hui_win_pal: sparse block, 10 sets of 0xa0 at stride 0xaa0 (vs2 0x3c329c stride 0xb40)
+data   0x4cad20 +0x6040  win_pal_variant pyr_win_pal: sparse block, 10 sets of 0xa0 at stride 0xaa0 (vs2 0x3c35bc stride 0xb40)
+code   0x4d0d60 +0x32  win_pal_variant thunk, 3-way: don_win_pal d6==0x13 -> a0=0x4be0c0, hui_win_pal d6==0x10 -> a0=0x4c42e0, pyr_win_pal d6==0x11 -> a0=0x4ca280; else vanilla pool 0x3ad700
+code   0x05f1b6 +6     win_pal_variant: movea.l #pool -> jsr 0x4d0d60
 # site_thunk name_bank_variant_id: body deferred to the 0x05fce0 chain (30 bytes)
 # site_thunk splash_bank_variant_id: body deferred to the 0x06c0e0 chain (30 bytes)
 # site_thunk winquote_bank_variant_id: body deferred to the 0x05f328 chain (22 bytes)
-data   0x4d0ca0 +0x140  site_thunk select_pal_variant_id data block <- vsav2 0x3c28fc
+data   0x4d0da0 +0x140  site_thunk select_pal_variant_id data block <- vsav2 0x3c28fc
 # site_thunk select_pal_variant_id: body deferred to the 0x05f146 chain (56 bytes)
-code   0x4d0de0 +0x7c  site_thunk 3-way chain at 0x05f146: select_pal_variant_id, select_pal_variant_id, select_pal_variant_id (22 shared tail bytes)
-code   0x4d0e60 +0x32  site_thunk 3-way chain at 0x05f328: winquote_bank_variant_id, winquote_bank_variant_id, winquote_bank_variant_id (2 shared tail bytes)
-code   0x4d0ea0 +0x3e  site_thunk 3-way chain at 0x05fce0: name_bank_variant_id, name_bank_variant_id, name_bank_variant_id (8 shared tail bytes)
-code   0x4d0ee0 +0x3e  site_thunk 3-way chain at 0x06c0e0: splash_bank_variant_id, splash_bank_variant_id, splash_bank_variant_id (8 shared tail bytes)
-code   0x4d0f20 ILLEGAL  TRIPWIRE for unresolved 0xf2f2f2
-# init_shim chain fall-through (an id no declaring tenant claims): unresolved 0xf2f2f2 -> tripwire 0x4d0f20
-code   0x4d0f30 MERGED init shim (pool latch A5+0x7966, seeder 0x16c64, phase-gated; flavor (A6+0x3c2) donovan<-0x01/held 0x00->handler 0xc1030, huitzil<-0x00/held 0x01->handler 0x4157f0 [Start bitmask 0xff8060]; unmatched id -> tripwire 0x4d0f20) planted on 2 dispatch rows (F2 fix)
-poke32 0x0bd146 <- 0x004d0f30  dispatch_00[0x13] donovan handler via MERGED seed shim (F2)
-poke32 0x0bd13a <- 0x004d0f30  dispatch_00[0x10] huitzil handler via MERGED seed shim (F2)
+code   0x4d0ee0 +0x7c  site_thunk 3-way chain at 0x05f146: select_pal_variant_id, select_pal_variant_id, select_pal_variant_id (22 shared tail bytes)
+code   0x4d0f60 +0x32  site_thunk 3-way chain at 0x05f328: winquote_bank_variant_id, winquote_bank_variant_id, winquote_bank_variant_id (2 shared tail bytes)
+code   0x4d0fa0 +0x3e  site_thunk 3-way chain at 0x05fce0: name_bank_variant_id, name_bank_variant_id, name_bank_variant_id (8 shared tail bytes)
+code   0x4d0fe0 +0x3e  site_thunk 3-way chain at 0x06c0e0: splash_bank_variant_id, splash_bank_variant_id, splash_bank_variant_id (8 shared tail bytes)
+code   0x4d1020 ILLEGAL  TRIPWIRE for unresolved 0xf2f2f2
+# init_shim chain fall-through (an id no declaring tenant claims): unresolved 0xf2f2f2 -> tripwire 0x4d1020
+code   0x4d1030 MERGED init shim (pool latch A5+0x7966, seeder 0x16c64, phase-gated; flavor (A6+0x3c2) donovan<-0x01/held 0x00->handler 0xc1030, huitzil<-0x00/held 0x01->handler 0x4157f0 [Start bitmask 0xff8060]; unmatched id -> tripwire 0x4d1020) planted on 2 dispatch rows (F2 fix)
+poke32 0x0bd146 <- 0x004d1030  dispatch_00[0x13] donovan handler via MERGED seed shim (F2)
+poke32 0x0bd13a <- 0x004d1030  dispatch_00[0x10] huitzil handler via MERGED seed shim (F2)
 code   0x0282f6 +0x2  code_word obj_bank_word_slot (slot entry -> 1000)
 code   0x05f244 +0x2  code_word win_pos_x_slot (slot entry -> 00c0)
 code   0x05f246 +0x2  code_word win_pos_y_slot (slot entry -> 0094)
