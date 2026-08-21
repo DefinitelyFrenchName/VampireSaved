@@ -2775,3 +2775,30 @@ maintainer BEFORE building on the identification — one reply named three
 moves this session. Related trap, same family: the 87 rig's scripted-LK
 "crashes where the real LK does not" (scripted strengths are not
 authoritative either).
+
+## An "attack-only" entry-set A/B needs a QUIET-FRAME presence profile, or a constant fixture becomes your defect (14z-102)
+The 14z-101 (8) #109 A/B compared per-clone OBJ entry sets "at the
+attack" on both legs and read the cycling `0x4302/0A/0C` vs
+`0x4D00-0x4D0C` pieces as the beam segments 0xA00 low. They were the two
+games' STOCK-METER PIP animations — present at EVERY frame of both runs,
+and the piece counts even matched the rigs' poked stock counts (ours 3,
+native 5). One dump at quiet frames (pre-attack, post-cooldown) would
+have excluded them in seconds; instead the misread survived into the
+window prep as located sub-defect "A1" and cost the window session its
+first hours. The rule: before attributing any entry to an EVENT, profile
+its presence across frames far from the event on BOTH legs — an entry
+present in quiet frames is scenery, whatever its codes suggest. (Same
+family as "the observation window bounds the claim", RH-19 — here the
+window was only ever placed ON the event.)
+
+## MAME palette RAM ($90C000) takes Lua pokes for READBACK but not for RENDERING (14z-102)
+Poking palette rows from a frame_done hook (POKES or space:write) lands
+in the bytes — a later DUMPS readback shows the poked values sticking —
+but the rendered frame never changes; only the GAME's own writes
+recolor. Two magenta-row controls proved it (poked row read back intact
+at the next frames, snapshot unchanged, while the DF seq's writes to the
+same row visibly recolor). Do not build a palette A/B on pokes: it is a
+dead instrument that passes its own readback liveness check. Use a probe
+BUILD (or poke the game's staging buffer, once its per-frame copy source
+is measured), and treat any poke-based "no visual change" as
+unmeasured.

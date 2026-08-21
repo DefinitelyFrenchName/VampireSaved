@@ -297,3 +297,10 @@ is a GAME gotcha if it is true of the game regardless of the port.
   named — the buffer folds leading directions (6236 reads as 236);
   identify an activated move by measured effects (cost, seq, objects),
   never by the script's name for the input.
+- **14z-102 (project):** an "attack-only" entry-set A/B needs a
+  QUIET-FRAME presence profile — a constant fixture (the stock pips)
+  read as the #109 beam defect for a whole prep because no dump ever
+  looked away from the event; MAME palette RAM ($90C000) takes Lua
+  pokes for readback but NOT for rendering — a poke-based palette A/B
+  is a dead instrument that passes its own liveness check; use a probe
+  build.

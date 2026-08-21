@@ -201,18 +201,20 @@ Re-point the `[merged_*]` sections at every merged freeze.
   332f uniform, maintainer-confirmed; vsavj = 1-stock per-character
   modes — ours == pristine vsavj exactly on the legacy control).
   D/P DF field-confirmed correct; Phobos' clone train + movement
-  ruled "excellent". ONE defect found and filed — **GitHub #109,
-  mechanism MEASURED against the true native reference (rig df/102,
-  clone-mode EX = 263+2P per the maintainer): ours draws the
-  per-clone beam pieces 0xA00 LOW** (0x43xx where native uses 0x4Dxx,
-  + one mis-familied body piece; 0x4DA7 already correct) — the
-  14z-71 "art 0xA00 low" bias class through a path the ray fix's
-  per-child dispatch never covered. Sound and mechanics fire; the
-  low codes land on blank tiles. Fix + verification pair on the
-  issue; window candidate beside #107. (History: two intermediate
-  readings — "drawn-but-invisible markers", then "never drawn" —
-  are retracted in place in STATE 14z-101 (5)/(7); the pal-00
-  marker-train fixture both games share stays a recorded curiosity.)
+  ruled "excellent". ONE defect found and filed — **GitHub #109.
+  [THE 0xA00-LOW MECHANISM RETRACTED 14z-102: the compared "segment"
+  rows were the two games' STOCK-METER PIPS, constant fixtures. The
+  re-derived mechanism (STATE 14z-102 + the issue's 14z-102 comment):
+  ours emits the full native burst set CORRECTLY (group C, tiles
+  byte-identical); the missing beam = the full-screen palette-line
+  sweep never invoked on ours (the vsavj fade-stepper twin ~0x14168
+  exists; the script's screen-palette event is dropped — the #101
+  script-carried-id class) + the DF gold tint (our 14z-84 block;
+  native's EX never tints) + burst occlusion behind the 4-copy train
+  (CPS-2 back-to-front list render).]** Fix waits on the tint ruling
+  and the palette-event hunt. (History: the earlier intermediate
+  readings — "drawn-but-invisible markers", "never drawn", "0xA00
+  low" — are all retracted in place in STATE 14z-101 (5)/(7)/(8).)
   OPEN DECISION queued: keep vsavj-framework DF durations for the
   tenants (currently their per-class values: 360/377/360) or port
   vs2 fidelity — a gameplay ruling. Field pass still ongoing:

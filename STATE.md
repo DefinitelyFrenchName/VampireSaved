@@ -1,5 +1,80 @@
 # STATE — living progress log
 
+## Session 14z-102 — THE #107+#109 WINDOW OPENED ON THE MAINTAINER'S GO
+## ("follow the plan"), AND #109's PREPPED MECHANISMS DIED BY MEASUREMENT
+## IN THE FIRST INSTRUMENT RUN: the defect re-derived from scratch is a
+## MISSING SCREEN-PALETTE EVENT plus a tint/occlusion compound — no
+## missing art, no bias defect, no data_port. The fix now waits on the
+## ruling; #107's row flip is COMMITTED (window step 1).
+
+**#107 executed and re-derived first (RH-2):** the twin claim was
+re-measured this session before the flip — vs2 `0x448a6` vs vsavj
+`0x4367A` = 6/0x2E diffs, every one inside a verified reconciled
+operand pair (`0x2711c->0x27ec8`, `0x25eba->0x26d36` + the local bpl);
+vs `0x2563e` = 24 diffs; vs `0x45fcc` = 7; farm callsites unique both
+games (`0x5c51a`/`0x5437e`). Row flipped to `0x04367a`
+status=verified. **The rebuild/re-freeze DELIBERATELY rides the #109
+resolution so the window freezes once — until then
+`test_m3a_reproducible` AND `test_phasec_spaces` are EXPECTED RED (both measure the manifest ahead of the frozen artifacts; phasec's stock rebuild now yields 883e7d17 vs the pinned 16da59b6 — the flip moves STOCK bytes too, the shared-map/#103 class) vs the frozen artifacts (the
+14z-99 W-commit rhythm, paused mid-window on a ruling).**
+
+**#109: the prep's A1 and A2 both RETRACTED by measurement** (full
+chain on the issue, 14z-102 comment). The load-bearing links, each
+measured on merged-m4 (df/100) vs native vsav2 (df/102):
+- The shared table `0x89CF8`'s ONLY consumer is the per-fighter HUD
+  stager `PRG:0x89608+` (whole-run read tap, both address spaces);
+  the "cycling segments" rows of the 14z-101 (8) A/B were the two
+  games' STOCK-PIP animations — the piece counts match the rigs'
+  poked stocks (3 vs 5). Red herring.
+- A2's "pointer lists to art" are 16-color PALETTE RAMP rows — the
+  beam's row-0 ramp (ours warm, native BLUE; live palette dumps match
+  the ROM lists exactly).
+- Ours EMITS THE FULL NATIVE BURST SET correctly (piece-for-piece,
+  group C `a19 0x44xxx`, tiles byte-identical to vs2) — the drawing
+  side has no defect. It is (a) rendered BEHIND the 4-copy train
+  (CPS-2 draws the list back-to-front; MAME cps2_render_sprites
+  iterates last->0) and (b) repainted by the DF GOLD TINT: our own
+  14z-84 df_gold_variant_id block rewrites P1 row 0A at activation
+  (pre-DF row is byte-identical to native's; native's clone-mode EX
+  never touches the row — in vs2 the DF gold and the EX clones never
+  coexist). Tint-off probe rehearsed: `build/hui_probe_tint`
+  (90e2982e, thunk upload-tail -> rts, manifest edit REVERTED after
+  the measurement); it recolors P1 but does not alone surface the
+  beam.
+- **The visually dominant beam = full-screen PALETTE-LINE SWEEP** —
+  native writes a +0x20-stepped word series across consecutive rows
+  ($90C73E..$90C9xx, 258 words vs ours' 2) at beam time; writers =
+  the engine palette fade stepper (vs2 `0x1282C`, PCs 012852/0129b6)
+  whose vsavj twin EXISTS (`~0x14168`, content-identical). **Ours
+  never invokes it** — the vs2 clone-attack script's screen-palette
+  event is dropped on our leg (the #101 script-carried-id class).
+  THE REMAINING HUNT: the native stepper's caller chain during the
+  beam -> the twin comparison on ours.
+- Bonus finds: a live 0xA00-bias pair at the attack (ours 0x3CE0/E2
+  vs native 0x46E0/E4, raw 0x04E0-family ground flashes) — real but
+  small; the constant mode-ornament strips (raw 0x0490/0x0698) COMPOSE
+  ONTO ART VSAVJ CARRIES at its biased positions (same streak shapes)
+  — benign on both legs.
+- **B sweep reviewed by bytes:** anim rows 0x2499F0/0x249B18 = census
+  FPs (anim-node stream); x2b7ef4 0x2BC09A/0x2BC0F8 = real type-4
+  strips (11x tile 0x0090, flip pair) on a looping 6-node effect anim,
+  no data-scan referent — reachability open, carried as review items.
+
+**Decisions pending (maintainer):** (1) the DF gold tint during his
+clone mode — keep (vsavj-DF identity) vs neuter (native-EX look;
+one-line change in OUR thunk, rehearsed); (2) go/no-go on the
+palette-event hunt as the #109 fix path. Captures sent in-session
+(native blue beams vs ours).
+
+**Method gotchas paid (in docs/project/gotchas.md this commit):**
+attack-window entry-set A/Bs MUST be presence-profiled over quiet
+frames too (the pip red herring survived one session because the
+14z-101 (8) A/B never checked the pieces' presence OUTSIDE the
+attack); MAME palette RAM at $90C000 ignores Lua/space pokes for
+RENDERING while accepting them for readback (game writes recolor,
+poked bytes read back but never reach the screen — a poke-based
+palette A/B is a dead instrument, use a probe build).
+
 ## Session 14z-101 CLOSE — ritual complete
 
 The session, in one line: the agreed #108→#107→#106 sequence executed
@@ -35,6 +110,14 @@ window, after the maintainer's projectile-collision pass and their go.
 ## decomposes into TWO located sub-defects, the fix designs are chosen,
 ## and the sweep tool is committed. The window session starts from the
 ## issue's prep comment.
+## [A1 AND A2 BOTH RETRACTED 14z-102, measured in the window's first
+## instrument runs: the "segments" were the two games' STOCK PIPS
+## (constant fixtures — presence-profiling gotcha), the "pointer
+## lists" are the beam's PALETTE RAMPS, and the burst draws correctly
+## from group C. The real defect = the screen palette-line sweep never
+## invoked on ours + the DF tint/occlusion compound. See 14z-102 and
+## the issue's 14z-102 comment; the sweep-tool (B) findings below
+## stand.]
 
 **A1 (segments): a SHARED ENGINE emitter, art simply absent.** The
 cycling pieces come from a byte-identical shared table — **vsavj
@@ -75,6 +158,12 @@ window. Full design: the #109 prep comment.
 ## Session 14z-101 (8) — #109's MECHANISM FINALLY MEASURED against the
 ## TRUE native clone-mode reference: ours draws the clone beams 0xA00
 ## LOW — the 14z-71 bias class through a path the ray fix never covered
+## [RETRACTED 14z-102: the A/B table below compared CONSTANT FIXTURES —
+## the "cycling segments" rows are the two games' STOCK-METER PIPS
+## (counts match the rigs' poked stocks, 3 vs 5), the "body" 0x3D6x is
+## an always-on fixture, and the one "partially correct" muzzle row was
+## the only actual beam piece. No 0xA00 defect exists in the beam
+## family. The real mechanism: STATE 14z-102.]
 
 **The identification chain (maintainer + sweep):** the clone-mode EX
 is **263+2P** (any two punches, 1 stock — sweep attempt B, seq 0x12,
