@@ -70,6 +70,14 @@ the confirmed reading.
 ## Session 14z-101 (continued) — THE CLONE-BEAM QUESTION ANSWERED IN
 ## ONE ARC: the beams are DRAWN-BUT-INVISIBLE (bank 0 / pal 0 / vs2-raw
 ## code 0x3e00 — the 14z-71 strip-handler class). GitHub #109 filed.
+## [MECHANISM RETRACTED same session, 14z-101 (7): the 0x3e00/0x4800
+## marker trains are INVISIBLE ON NATIVE TOO (pal-00 blank markers,
+## a pulsing in-mode fixture both games share — even during the
+## visible ray, even post-DF). NOT the beams. The defect stands
+## sharper: sound fires per clone, NO beam visual is EVER drawn on
+## ours; mechanism open pending the true native clone-mode leg. The
+## bias/bank arithmetic below is real about the MARKERS, wrong about
+## the defect. See (7) and the corrected #109.]
 
 **The maintainer's precise question** ("I can hear some beam sound but
 don't see the beams — graphically unrendered, or fully missing except
@@ -102,6 +110,17 @@ damage/hitstun/chip check. All on GitHub #109.
 
 ## Session 14z-101 (continued) — THE HYPOTHESIS CONFIRMED TO THE BYTE
 ## and the NATIVE EX REFERENCE MEASURED (maintainer supplied the input)
+## [PARTIALLY RETRACTED same session, 14z-101 (7): "236+2P = the EX
+## clone mode" is WRONG — the maintainer corrected it (236+2P is the
+## ES: transform + massive freezing beam) and the activation snapshots
+## confirm ("3 HIT" massive beam, clone-form transform). So the
+## "native EX reference" below actually measured THE ES, and the
+## beam-train byte arithmetic is about the shared INVISIBLE markers,
+## not the visible beams. What survives: the t48 clone-object type
+## identity, the marker composition delta, and the ES observations
+## (1 stock, 3-tick hit, no freeze on that leg). The true native
+## clone-mode leg is still to be produced — three candidate moves
+## captured (seq 0x10 / 0x12 / 0x18), maintainer identifying.]
 
 The maintainer's read ("the clone rays are likely the same sprite
 tiles as 236+P/K's — the ray fix missed that they were missing for ALL

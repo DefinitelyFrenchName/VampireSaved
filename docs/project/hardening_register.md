@@ -182,12 +182,17 @@ Re-point the `[merged_*]` sections at every merged freeze.
   332f uniform, maintainer-confirmed; vsavj = 1-stock per-character
   modes — ours == pristine vsavj exactly on the legacy control).
   D/P DF field-confirmed correct; Phobos' clone train + movement
-  ruled "excellent". ONE defect found and filed — **GitHub #109: the
-  clone BEAMS are drawn-but-invisible** (strip segments at bank 0 /
-  pal 0 / vs2-raw code 0x3e00 — the 14z-71 strip-handler class; the
-  per-clone sound fires, two 9-segment trains emit, art resolves to
-  blank bank-0 space). Fix = the ray treatment; window candidate
-  beside #107. Damage half needs visible beams or the native EX leg.
+  ruled "excellent". ONE defect found and filed — **GitHub #109: in
+  clone mode the per-clone beam SOUND fires (0x7F ×2) but NO beam
+  visual is ever drawn.** Mechanism OPEN — the first reading ("strip
+  segments drawn-but-invisible at bank 0 / code 0x3e00") was
+  RETRACTED same session: those pal-00 marker trains are invisible
+  on NATIVE too (a fixture both games share; their 0x3e00-vs-0x4800
+  composition delta is recorded but is not the defect). Window
+  candidate beside #107 once the mechanism lands. The native
+  clone-mode reference leg is still to be produced (my scripted
+  "236+2P reference" was actually the ES, maintainer-corrected;
+  three candidate activations captured, identification pending).
   OPEN DECISION queued: keep vsavj-framework DF durations for the
   tenants (currently their per-class values: 360/377/360) or port
   vs2 fidelity — a gameplay ruling. Field pass still ongoing:
