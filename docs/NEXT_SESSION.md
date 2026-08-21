@@ -1,176 +1,110 @@
-# NEXT SESSION — orientation (rewritten at the 14z-100 close, 2026-08-20)
+# NEXT SESSION — orientation (rewritten at the 14z-101 close, 2026-08-21)
 
 > ## **THE STATE IN ONE BREATH:** the 14z-99 window freeze
 > ## (donovan-m9 / huitzil-m18 / pyron-m12 / **merged-m4** =
-> ## `build/m3b_merged11`, `2343607a`; stock twin m5_stock4 16da59b6) is
-> ## **FIELD-CONFIRMED END TO END** — #43/#99/#102/#103/#104/#105 all
-> ## CLOSED; the maintainer's in-depth pass also cleared DF and ALL
-> ## throws incl. transformation throws. The 14z-100 HARDENING PROGRAM
-> ## then ran H1-H4 (`docs/project/hardening_register.md` is the living
-> ## register): the pointer/flow comb + escape triage CLOSED the escape
-> ## and plausible-row classes with two real findings filed, and the
-> ## pool-vs-pool contact rig found a live behavioral divergence.
-> ## `ROMDIR=... tests/run_all_static.sh` -> PASS 96 / SKIP 0 / FAIL 0.
+> ## `build/m3b_merged11`, `2343607a`; stock twin m5_stock4 16da59b6)
+> ## remains the reference and is FIELD-CONFIRMED broadly: the 14z-101
+> ## field passes closed the Phobos five-moves × ALL STRENGTHS item,
+> ## timeout wins, and D/P DF; Phobos' DF clone mode ruled "excellent"
+> ## except its ONE defect, #109. The whole 79-replay corpus is
+> ## guard-clean under every tenant forcing (`audit_guard_corpus.sh`,
+> ## 316/316). `ROMDIR=... tests/run_all_static.sh` -> PASS 96/0/0.
 > ## PLAY: `tools/run_wide.sh build/m3b_merged11 fbneo`.
-> ##
-> ## **OPEN: #107** (+ #50 parked; the build-dir ruling — the decision
-> ## package is `docs/project/build_dir_triage.md`, ~7.3 GB reclaimable
-> ## pending which classes go). NEW INSTRUMENT 14z-101:
-> ## `audit_guard_corpus.sh` — the whole corpus × 4 legs under guard on
-> ## merged-m4, FIRST RUN GREEN 316/316 (must-fire control: the hui41
-> ## 0x494de crash reproduces and is named).
-> ## #106 CLOSED 14z-101; #108 CLOSED not-a-defect (maintainer,
-> ## 2026-08-21). **The "#10 ripe" this banner used to carry was STALE
-> ## — #10 was fully executed at 14z-94** (staging unified 10->0, five
-> ## gates re-measured, the 0621 trap-parity re-freeze maintainer-ruled
-> ## at 92d0266); it had been carried forward from pre-14z-94 history. **#108 RESOLVED NOT-A-DEFECT 14z-101** (writer hunt:
-> ## +0x18 is OUR OWN bank-word row, the sweep gate reads +0x94, and
-> ## native vs2's satellites are equally sweep-inert — close is the
-> ## maintainer's call). New standing instruments this session:
-> ## `audit_continue_switch` (the #99 lock, incl. the literal
-> ## Donovan-vs-CPU-Phobos pairing), `test_pointer_flow` +
-> ## `test_escape_triage` (ci_static), `audit_projectile_clash`
-> ## (native-parity signature + anchor since 14z-101), `triage_pcrel_escapes` +
-> ## `audit_pointer_flow` tools; tripwire-reach + pcrel_escapes +
-> ## bases.tsv all re-pointed to the current freeze.
-
-> ## **THE SEQUENCE (maintainer-agreed 2026-08-20): #108 → #107 → #106,
-> ## all windowless, then ONE window bundling the fixes.**
-> ##
-> ## 1. **#108 root-cause — EXECUTED 14z-101, and it INVERTED the
-> ##    ticket: NOT A DEFECT.** (a) The writer hunt ran: ONE writer
-> ##    (the vanilla init at 0x282C0) reading OUR OWN obj_bank_word_slot
-> ##    row (0x282F4/F6/FA := 0x1000 — deliberate, load-bearing WIDE
-> ##    bank word; "no patch op covers the table" was false and the
-> ##    -debug "paradox" was a pristine-table misread). The sweep gate
-> ##    (vsavj 0x1A734 / vs2 0x19144, identical) never reads +0x18 —
-> ##    the deciding byte is +0x94, and NATIVE satellites carry 0 there
-> ##    too (whole-run taps, both games): sweep-inert natively.
-> ##    (b) BREADTH answered by inspection: H/D rows are the same
-> ##    documented bank words. (c) The field question now has an
-> ##    instrumented answer: predict NO visible difference vs native.
-> ##    audit_projectile_clash re-framed to the PARITY signature + a
-> ##    native anchor leg; fix mode REFUSED. STATE 14z-101; close is
-> ##    the maintainer's call on the issue.
-> ## 2. **#107 pre-work — EXECUTED 14z-101, no rig needed:** both
-> ##    games' OWN farms are static `jmp abs.l` sequences that bind
-> ##    slot-for-slot (vs2 0x448A6 ↔ vsavj 0x4367A; code ref 0x054380;
-> ##    data tables corroborate; 0x45FCC is the NEXT slot's routine,
-> ##    not a live twin; content 6/0x2E all-operand diffs vs 24 for
-> ##    the committed 0x2563E). The window action is mechanical:
-> ##    row -> 0x04367A verified callsite-anchored. The tie-refusal
-> ##    policy is LANDED inert (reconcile_batch pick_window_hits/
-> ##    pattern_ladder; test_reconcile_matcher §6; live control: fresh
-> ##    0x448a6 resolves open/TIE-4x0.94-w0x20; m3a_reproducible PASS).
-> ##    Bonus recorded, honestly negative: open row 0x448D4 farm-aligns
-> ##    to 0x436A8 by role but content drifted — stays open.
-> ## 3. **#106 — EXECUTED AND CLOSED 14z-101:** verify_pcrel_data takes
-> ##    --extract + --placement-suffix; the merged image measured with
-> ##    each tenant's own extract — all three inventories IDENTICAL to
-> ##    the solo sections (89/89 still BROKEN on merged placements too);
-> ##    frozen by reference ([merged_*] same_as, re-point at every
-> ##    merged freeze) with a wrong-suffix must-fire control. Also
-> ##    fixed: the tool's program-zip pick was a listdir accident that
-> ##    could verify the gfx donor on another filesystem.
-> ## 4. **THE WINDOW (now #107 + #109 — the clone-beam 0xA00-low fix
-> ##    joined 14z-101; #108 resolved with no fix to
-> ##    ship, 14z-101):** the 0x0448a6 row re-resolution to 0x04367A
-> ##    (or its content-twin 0x45fcc — the runtime trace picks); the
-> ##    #107 lock rides test_reconcile_matcher + the farm bytes. One
-> ##    rebuild, one battery, one re-freeze. TIMING: after the
-> ##    maintainer's in-depth field pass completes on merged-m4, so
-> ##    field findings attribute cleanly to this generation; nothing
-> ##    here is urgent (the row is COLD on the corpus).
 >
-> ## **H4's CONTACT RIG IS BUILT — and #108 is RESOLVED NOT-A-DEFECT
-> ## (14z-101 writer hunt inverted the 14z-100 reading above).** The
-> ## rig's control half stands: Demitri-vs-Demitri fires the sweep 468
-> ## times (the census has a live denominator). The tenant half's
-> ## "wrong collision word" reading is RETRACTED: +0x18 is the OBJ BANK
-> ## word (our 0x1000 = our own load-bearing obj_bank_word_slot row),
-> ## the sweep gate keys on +0x94, and native vs2's satellites carry
-> ## +0x94==0 exactly as ours do — sweep-inert in both games.
-> ## `tests/audit_projectile_clash.sh` now freezes the PARITY signature
-> ## + a native anchor leg; there is no fix mode. The next window
-> ## bundle carries #107 (wrong-sibling row) only. Detail: STATE 14z-101.
+> ## **THE NEXT SESSION IS THE WINDOW: #107 + #109, prep COMPLETE —
+> ## start from GitHub #109's prep comment (14z-101 (5)) and STATE
+> ## 14z-101 (11).**
+> ## 1. **#107** (mechanical): reconciliation.toml row `0x0448a6` ->
+> ##    `0x04367A`, status verified, note callsite-anchored (farm
+> ##    0x5C51A<->0x5437E + data-table slot + content 6/0x2E
+> ##    all-operand diffs; 14z-101).
+> ## 2. **#109 A1** (segments): owner-tag-gated compose thunk at the
+> ##    shared emitter (table vsavj 0x89CF8 == vs2 0x99542; engine
+> ##    bias +0x3800 composes ours to BLANK 0x43xx) -> tenant object
+> ##    composes group-C bank + shifted codes; + strip-tiles copy of
+> ##    vs2's 0x4D00-0x4D0D span. Remaining unknowns: the compose-site
+> ##    PC (ref-scan 0x89CF8 + read tap during rig df/100) + the bank
+> ##    word. NEVER write art into vsav.zip's own banks (rejected —
+> ##    pristine-vsav.zip).
+> ## 3. **#109 A2** (body/muzzle): each game's emitter follows ITS OWN
+> ##    pointer list (vj 0x39A7E0/0x3A94E0-family vs v2 0x3B091C/
+> ##    0x3BDC1C-family — the twin blocks' divergence) to its era's
+> ##    art. data_port the consumed rows (identify by read tap).
+> ## 4. **#109 B** (the maintainer-confirmed ALL-SITES sweep):
+> ##    `tools/enum_biased_lists.py` (FP caveats in header) — filter
+> ##    hui's 22 UNCOVERED (real reviews: anim 0x2499F0/0x249B18,
+> ##    x2b7ef4 0x2BC09A/0x2BC0F8) + don's 1, resolve each, freeze as
+> ##    a gate. Pyron 0 by census.
+> ## 5. VERIFY: rig df/100 flips (native-family codes + VISIBLE +
+> ##    close-range damage/hitstun/no-freeze A/B vs the native
+> ##    reference rig df/102); build the paired-draw census (the
+> ##    queued foreign-draw instrument) as the generalized check.
+> ## 6. Then: rebuild all four + merged, full battery, run_suite,
+> ##    re-freeze (m10/m19/m13/merged-m5), registry rows, tags — the
+> ##    14z-99 window rhythm. Re-point pcrel_escapes [merged_*],
+> ##    bases.tsv, render-content rows, the audits' BUILD defaults.
+>
+> ## **GATING: the window runs after the maintainer's field pass
+> ## completes (projectile collisions still open on their side) and
+> ## on their "go".** Also waiting on them: the build-dir ruling
+> ## (`docs/project/build_dir_triage.md`, ~7.3 GB reclaimable), the
+> ## queued DF-duration fidelity ruling (tenants at vsavj per-class
+> ## 360/377/360 vs vs2's uniform 332 — gameplay call, no urgency),
+> ## and the PUSH (nothing pushed; commit freely, push only on their
+> ## word).
+>
+> ## **OPEN: #107 #109** (+ #50 parked, the build-dir ruling). CLOSED
+> ## this session: #106 (merged escape coverage), #108 (not-a-defect:
+> ## +0x18 is our own bank-word row; native satellites equally
+> ## sweep-inert — parity frozen with a native anchor in
+> ## audit_projectile_clash). The "#10 ripe" the old banner carried
+> ## was STALE — #10 was done at 14z-94.
 
-> ## **THE HARDENING PROGRAM IS OPEN (maintainer-directed) — START AT
-> ## `docs/project/hardening_register.md`.** H1 shipped (the pointer/flow
-> ## comb: `tools/audit_pointer_flow.py`, gate `test_pointer_flow` in
-> ## ci_static, 2 STRONG findings both reviewed-benign biased bases); H2
-> ## executed (tripwire-reach re-pointed + six legs green on the current
-> ## freeze; pcrel_escapes re-pointed, inventories identical; README
-> ## template fixed). **H3 EXECUTED: escapes CLOSED zero-live**
-> ## (test_escape_triage, 25 frozen verdicts — the 20-site cluster is
-> ## adjacent-OK by construction, the rest are reviewed census false
-> ## positives) **and the 13 plausible rows triaged: 9 consumer-less, 3
-> ## verified twins, ONE REAL FINDING — #107, the 0x0448a6 row is the
-> ## WRONG SIBLING** (last-resort-window 4-way tie, session-4 era;
-> ## neighbor-anchored right answer 0x04367A; COLD on the corpus; fix
-> ## rides the next window). **NEXT: H4 rigs** (pool-vs-pool contact,
-> ## 2P diversity, authoritative-guard soak) + the next window bundle
-> ## (#107 re-resolution). #99 CLOSED (maintainer-ruled); #106 filed
-> ## (merged image outside the pcrel-escape freeze). Open: #106, #107,
-> ## #50, #10, the ~200 tracked build dirs.
+## What 14z-101 did (the whole arc, one screen)
 
-> **STATE.md WAS SPLIT at the post-freeze close (maintainer-approved):
-> recent sessions + THE LEDGER stay in STATE.md; everything older is
-> verbatim in `STATE_HISTORY.md`. The rollover rule is in STATE.md's
-> header; claim-greps must include the archive (CLAUDE.md §5 updated).**
+**The agreed #108→#107→#106 sequence, all executed windowless:** #108
+INVERTED by the writer hunt (not-a-defect; the -debug "paradox" was a
+pristine-table misread; audit re-framed to NATIVE PARITY + anchor leg);
+#107 twin-anchored statically (both games' own farms bind slot-for-slot;
+0x45FCC eliminated — next slot's routine; tie-refusal policy landed in
+reconcile_batch + gate §6, live control: fresh 0x448a6 refuses as
+TIE-4x0.94-w0x20; m3a bit-exact); #106 closed (verify_pcrel_data
+--extract/--placement-suffix; merged inventories IDENTICAL to solos,
+frozen by reference with a must-fire control; also fixed the tool's
+listdir-accident zip pick).
 
-> ## **THE WINDOW IS EXECUTED AND FROZEN: donovan-m9 / huitzil-m18 /
-> ## pyron-m12 / merged-m4** (`build/don_m9` 428fc0c9 / `build/hui45`
-> ## c4bbb375 / `build/pyron29` 4c3c072b / `build/m3b_merged11` 2343607a
-> ## — BIT-FOR-BIT the rehearsed probe_window; stock twin
-> ## `build/m5_stock4` 16da59b6, MOVED for the first time since 14z-91
-> ## because #103's fix is not profile-gated, by design; tags freeze/*).
-> ## LANDED: #43(b) (fallback ON; the ruled 3-row movement measured as
-> ## ONE row with ZERO build effect) + #103 (the arcade-death stall) +
-> ## #104 (native capture records, all tenants) + #105 (the AUTO win
-> ## palettes). Suite GREEN x3 on re-frozen sets; every legacy masked
-> ## replay on its EXACT frozen class; merged gates ALL green
-> ## (select-bank, trap parity, FG parity, render-content,
-> ## audit_merged_legacy 47/47); all four flip-audits green at their new
-> ## defaults; M2 battery 23/23 + the structural wide-render skip
-> ## covered directly on the window pair.
-> ## `ROMDIR=... tests/run_all_static.sh` -> PASS 96 / SKIP 0 / FAIL 0
-> ## (94 at the freeze; +test_pointer_flow +test_escape_triage, 14z-100).
-> ##
-> ## **PLAY: `tools/run_wide.sh build/m3b_merged11 fbneo`** (or record a
-> ## session: `WIDE_RECORD=<name> ... mame`). **FIELD PASS COMPLETE
-> ## (2026-08-20): THE WHOLE WINDOW IS CONFIRMED — #103 + #104 + #105
-> ## ALL CLOSED** (no stall on any VS2 win/lose incl. Donovan vs
-> ## Lilith; correct grab sprites under Victor AND Bulleta's 6+HP
-> ## throws, all tenants — Bulleta = the "all sixteen" ruling paying
-> ## off unprompted; AUTO portraits colored; no crash). #43 CLOSED at
-> ## the window. **#99 IS UN-PARKED** — the continue rig's blocker is
-> ## gone in fact; next concrete step is re-running the rig to the
-> ## continue+switch → match-5 context (comment on the issue). The
-> ## sidekick-voice observation is attributed anterior (window carried
-> ## zero audio rows) — STATE "14z-99 FIELD RESULTS".
-> ##
-> ## **THE WINDOW ALSO SURFACED AND FIXED SIX LATENT INSTRUMENT DEFECTS,
-> ## none a window regression** (each A/B'd on pre-window bytes): the
-> ## build's prg/ lifecycle (in-place stock rebuilds tripped the #46
-> ## stamp); THREE copies of a 14z-91-stale row-0x0F literal
-> ## (test_don_accent x2, test_don_colors — fixed file-by-file at first,
-> ## the third caught only by the next battery run: GREP THE CLAIM);
-> ## test_don_sound's inventories frozen NINE generations back (the
-> ## music-range tripwire was green throughout); a MAME teardown
-> ## segfault now tolerated ONLY behind ring_tap's END marker; and
-> ## test_phasec_spaces' lowercase-only hex class meeting its first
-> ## uppercase allocation cursor.
-> ##
-> ## Open: #99 (un-parks after the field pass), #50 (behind #99), #10
-> ## (ripe re-measurement) [STALE — #10 was already DONE at 14z-94, see
-> ## the top banner; kept as written, this block is history], the ~200
-> ## tracked build dirs. DONE at the
-> ## post-freeze close: the two superseded battery-target registry rows
-> ## are annotated CARRIED->m9 in the TSV; patch_index/patch_notes caught
-> ## up with the window (the skipped ritual, executed one session late).
-> ## Probe dirs probe_103_don/probe_104/probe_105/probe_105f/
-> ## probe_window are UNREGISTERED evidence, reproducible from STATE.
+**New standing instruments:** `audit_guard_corpus.sh` (79 replays × 4
+legs under guard, 316/316 green, hui41-crash must-fire control);
+`tools/enum_biased_lists.py`; rigs `df/97-102` (DF framework mechanics,
+clone-attack discriminators, the NATIVE clone-mode reference).
 
+**DF mechanics measured** (the field pass's named unknown): the GAMES'
+DF frameworks differ by design — vs2 = 2-stock universal buff, uniform
+332f (maintainer-confirmed); vsavj = 1-stock per-character modes
+(legacy sweep spans 269-540f); ours == pristine vsavj EXACTLY on the
+legacy control. Phobos' 0x18 clone-train mode is a legitimate vsavj DF
+class (legacy 0x0C/0x0F use it at the same 377).
+
+**#109 found and fully root-caused through the confirmation loop** (two
+intermediate readings retracted in place — the layered-correction arc is
+itself instructive: identify moves by measured EFFECTS, never the
+script's input name — vs2's buffer folds 6236 to 236; gotcha paid).
+The clone-mode EX = 263+2P (1 stock); the ES = 236+2P.
+
+**The FOREIGN-DRAW class named** (register §5): audit_empty_tiles
+measured PASSING on the #109 event — it audits group-C blanks, this
+class draws from the WRONG SPACE; exposure census-bounded 26/1/0, the
+paired-draw census queued as the instrument.
+
+**Also:** the ~200-build-dirs decision package delivered
+(`docs/project/build_dir_triage.md`); the stale "#10 ripe" banner claim
+retired; strengths/timeout-wins field items closed.
+
+# HISTORY BELOW — carried for reference, not current
+
+Everything from here down was written at the close of 14z-98 and
+earlier. Kept because the eliminations and traps stay valid; read the
+section above for the current state.
 
 ## What 14z-98 did
 
