@@ -53,17 +53,52 @@ instrument-verified DF-ACTIVE with stocks spent):**
   ordinary grounded states (walk 0x4, same rays at the same frames),
   no clones, no visible mode** — cost 2, dur 332, mechanically
   passive as far as these rigs can see.
-- **HELD OPEN, deliberately:** if vs2's Phobos DF should show the
-  clone train, my native leg may be activating something other than
-  the real vs2 DF (the flag+cost fired, but the maintainer's reference
-  decides). Captures sent (ours train / native walk / native single
-  beam); the loop is open on their answer. Everything above the table
-  is measured; the INTERPRETATION of the native leg is not settled.
+- ~~HELD OPEN~~ **RESOLVED BY THE MAINTAINER (2026-08-21, the
+  confirmation loop working as designed):** vs2's 2-meter DF IS a
+  universal buff — my native leg measured vs2's real DF correctly —
+  and "what used to be characters' DF in VS is now an EX move" in
+  vs2. So Phobos' clone train is his vs2 EX-move content correctly
+  living on our vsavj DF activation: **clones + movement buff ruled
+  "excellent in our build."** The framework table above stands as the
+  cross-game fact it measured.
 
 **No shipped byte moved.** The pool censuses (types 0x48×2 + 0x82 ours
 vs 0x75 native mid-DF) are recorded in the scratch logs; instrument
-promotion (an audit freezing the framework table) waits on the
-confirmation loop so it freezes the right reading.
+promotion (an audit freezing the framework table) can now proceed on
+the confirmed reading.
+
+## Session 14z-101 (continued) — THE CLONE-BEAM QUESTION ANSWERED IN
+## ONE ARC: the beams are DRAWN-BUT-INVISIBLE (bank 0 / pal 0 / vs2-raw
+## code 0x3e00 — the 14z-71 strip-handler class). GitHub #109 filed.
+
+**The maintainer's precise question** ("I can hear some beam sound but
+don't see the beams — graphically unrendered, or fully missing except
+the sound?") **is answered on merged-m4** with rig
+`tests/replays/df/100_df_clone_beams.rpl` (DF → clone train → whiffed
+normals at range) instrumented on three layers in parallel:
+- **ring_tap:** the in-mode attack enqueues id `0x7F` TWICE — one per
+  clone — the beam event fires;
+- **obj_records_dump (decisive):** f3585 carries TWO 9-segment
+  horizontal beam trains at the clones' altitude, one per clone
+  (left / X-flipped right) — every segment
+  `code=3e00 attr-bank=0 pal=00 → a18=a19=0x13E00`: **bank bits zero,
+  palette zero, vs2-raw code — resolves to blank vanilla bank-0
+  space. Drawn, invisible.** Gone by f3620 (the cooldown).
+- **pools:** no new pool objects — the beams ride the clones' own
+  procedural strip lists, like the 236P ray (whose visible beam also
+  never transits those pools — measured in the same session, so the
+  pool-blindness is a property of beams, not evidence of absence).
+**The class is the 14z-71 strip family** (a strip handler composing
+its own bank word instead of the object's; the ray's fix never
+covered this handler). Fix = the ray treatment: tenant strip-handler
+copy with correct bank/bias + segment tiles into group C + palette —
+shipped bytes, rides a window (natural bundle with #107).
+**Damage half deliberately unresolved:** zero P2 contact in every rig,
+but the trains span ~144px at flying-clone altitude over a standing
+opponent at 176-278px — geometry excuses it; "no damage" is NOT
+evidence of "no hitbox". Needs visible beams or the native EX leg
+(the vs2 EX-move input is the maintainer's to supply) for the
+damage/hitstun/chip check. All on GitHub #109.
 
 ## Session 14z-101 — THE #108 WRITER HUNT RAN AND INVERTED THE FINDING:
 ## NOT A DEFECT. The satellites' +0x18 is OUR OWN bank-word row; the

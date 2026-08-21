@@ -176,12 +176,22 @@ Re-point the `[merged_*]` sections at every merged freeze.
   three tenants. The rigs-vs-hands routing argument above held: the
   structural half was already closed by H1/H3 + test_index_space, and
   the hands closed the behavioral half in one pass.
-- **DF MECHANICAL ACCURACY vs VS2 — the field pass's named open
-  surface (maintainer, 2026-08-21):** DF works graphically for all
-  three tenants and activation/end is clean, but mechanical accuracy
-  (duration, cost, per-character effect) is UNKNOWN against native.
-  Instrument in progress 14z-101: the native-leg A/B on the DF
-  observables. Field pass still ongoing: DF + projectile collisions.
+- **DF MECHANICAL ACCURACY vs VS2 — MEASURED 14z-101** (rigs
+  tests/replays/df/97-100; framework table in STATE 14z-101): the
+  GAMES' DF systems differ by design (vs2 = 2-stock universal buff,
+  332f uniform, maintainer-confirmed; vsavj = 1-stock per-character
+  modes — ours == pristine vsavj exactly on the legacy control).
+  D/P DF field-confirmed correct; Phobos' clone train + movement
+  ruled "excellent". ONE defect found and filed — **GitHub #109: the
+  clone BEAMS are drawn-but-invisible** (strip segments at bank 0 /
+  pal 0 / vs2-raw code 0x3e00 — the 14z-71 strip-handler class; the
+  per-clone sound fires, two 9-segment trains emit, art resolves to
+  blank bank-0 space). Fix = the ray treatment; window candidate
+  beside #107. Damage half needs visible beams or the native EX leg.
+  OPEN DECISION queued: keep vsavj-framework DF durations for the
+  tenants (currently their per-class values: 360/377/360) or port
+  vs2 fidelity — a gameplay ruling. Field pass still ongoing:
+  projectile collisions.
 - **the authoritative-guard corpus soak: BUILT AND GREEN (14z-101)** —
   `tests/audit_guard_corpus.sh`: the whole replay corpus (79 rigs,
   ~472k script frames) under the crash guard on the build under test,
