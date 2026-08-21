@@ -24,15 +24,18 @@
 > ## `freeze/{donovan-m10,huitzil-m19,pyron-m13,merged-m5}` + the
 > ## freeze commit are in. Nothing pushed.
 >
-> ## **OPEN / CARRIED:** #109 closes on the maintainer's word (the fix
-> ## is field-confirmed; a positive-contact damage leg — P2 jumped into
-> ## the beam band — stays a nice-to-have; rigs df/103/104 measured
-> ## zero-zero parity at standing geometry). #50 parked. Maintainer-
-> ## owned: the build-dir ruling (`docs/project/build_dir_triage.md`),
-> ## the DF-duration fidelity ruling (360/377/360 vs uniform 332), the
-> ## community tint research (gold default stands; the rehearsed neuter
-> ## is build/hui_probe_tint's one-line manifest edit), and the PUSH
-> ## (everything local; push only on their word).
+> ## **PUSHED 2026-08-21 (maintainer's word, frozen build confirmed
+> ## "feels good"):** main + all four freeze tags are on origin (one
+> ## trivial merge folded in the maintainer's README edit ee9b0ff —
+> ## merged, NOT rebased, to keep the tagged commits reachable).
+> ## **#107 AND #109 CLOSED on GitHub.** OPEN/CARRIED: #50 parked;
+> ## maintainer-owned: the build-dir ruling
+> ## (`docs/project/build_dir_triage.md`), the DF-duration fidelity
+> ## ruling (360/377/360 vs uniform 332), the community tint research
+> ## (gold default stands; the rehearsed neuter is
+> ## build/hui_probe_tint's one-line manifest edit). The
+> ## positive-contact beam-damage leg stays a nice-to-have (df/103/104
+> ## measured zero-zero parity at standing geometry).
 >
 > ## **NEW STANDING INSTRUMENTS from 14z-102:**
 > ## `audit_clone_beam_lines.sh` (EXPECT_LINES=1 default; strobe-phase
