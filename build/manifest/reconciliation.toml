@@ -1807,10 +1807,10 @@ note = "codebytes-unique-w0x18; refs: jmp"
 
 [[map]]
 vsav2 = 0x0448a6
-vsavj = 0x02563e
+vsavj = 0x04367a
 kind = "engine_sub"
-status = "plausible"
-note = "pattern-0.94-w0x20; refs: jmp"
+status = "verified"
+note = "callsite-anchored (farm 0x5C51A<->0x5437E + data-table slot + content 6/0x2E all-operand diffs, each operand a verified pair: 0x2711c->0x27ec8, 0x25eba->0x26d36; 14z-101, re-derived at flip 14z-102). Was 0x02563e plausible-0.94 — the #107 wrong sibling (4-way tie, first taken)"
 
 [[map]]
 vsav2 = 0x0448d4
