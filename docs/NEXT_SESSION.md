@@ -24,11 +24,23 @@
 > ## never tints) + drawn behind the 4-copy train (CPS-2 renders the
 > ## list back-to-front).
 >
-> ## **NEXT ACTIONS, in order:**
-> ## 1. RULINGS (maintainer): (a) DF gold tint during his clone mode —
-> ##    keep vs neuter (probe `build/hui_probe_tint` 90e2982e,
-> ##    manifest edit reverted; one-line re-apply); (b) go on the
-> ##    palette-event hunt as the #109 fix path.
+> ## **14z-102 LATE UPDATE — THE FIX IS IN AND REHEARSED THROUGH THE
+> ## MERGED PROBE** (`build/merged_probe_row31` 393f92a5, 804 ops;
+> ## beam audit fix-mode PASS on merged; hui32 extract regenerated
+> ## with the root, old kept as extract.pre-14z102; op-count
+> ## constants re-frozen 363/598/648/804/901, tenant-loop PASS).
+> ## **REMAINING = THE FREEZE ONLY** (step 4 below), on the
+> ## maintainer's go after they see the beams in their own playtest:
+> ## `tools/run_wide.sh build/merged_probe_row31 fbneo` — Phobos DF
+> ## (HP+HK, stocks), move, attack: the beams strobe green/blue.
+> ##
+> ## **NEXT ACTIONS, in order (steps 1-3 DONE 14z-102):**
+> ## 1. RULINGS — BOTH DECIDED 2026-08-21 (maintainer): (a) DF gold
+> ##    tint during his clone mode — **KEEP (default ruling; the
+> ##    maintainer may revisit after community research** — if that
+> ##    lands "no tint", the rehearsed one-line neuter is
+> ##    `build/hui_probe_tint` 90e2982e's manifest edit); (b) the
+> ##    palette-event hunt IS the #109 fix path — **GO given.**
 > ## 2. THE HUNT: native stepper's caller chain during the beam.
 > ##    Measured 14z-102 already: the four page-slot POINTERS
 > ##    ($7404-$7410(A5) = $FFF404-1F; vsavj scheduler 0x142C2 reads

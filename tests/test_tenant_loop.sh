@@ -171,7 +171,7 @@ echo "== 1: one tenant per run — the frozen op counts =="
 # 15 capture_kf slot_rows blobs + 17 table pokes, declared by every
 # manifest) + 2 (#105's colors 8->10 grows each win_pal sparse block by
 # the two AUTO sets). Donovan's #103 pcrel relocations move ops, net 0.
-FROZEN_1="donovan:323 huitzil:361 pyron:296"
+FROZEN_1="donovan:323 huitzil:363 pyron:296"  # hui 361->363 RE-FROZEN 14z-102: +2 = the #109 row-31 fix (code_ptr + region op)
 for row in $FROZEN_1; do
     who="${row%%:*}"; want="${row##*:}"
     case "$who" in donovan) ex="$D_EX" ;; huitzil) ex="$H_EX" ;; *) ex="$P_EX" ;; esac
@@ -250,8 +250,12 @@ check_n() {  # check_n <label> <dir> <want ops> <sum of 1-tenant counts>
 # are declared by EVERY tenant and dedupe to one set (+64 declared/+32
 # emitted at N=2; +96/+32 at N=3); #105 adds 2 per tenant, nothing
 # dedupes (+4/+4 at N=2; +6/+6 at N=3).
-check_n "2 tenants" "$WORK/two"   596 646
-check_n "3 tenants" "$WORK/three" 802 899
+# RE-FROZEN 14z-102 (was 596/646 and 802/899): the #109 clone-beam fix —
+# huitzil-only, +2 emitted AND +2 declared wherever hui is in the combo
+# (the beam_effect_class31 code_ptr + the x0926e4 region op; nothing
+# dedupes, nothing reaches the solo-donovan or donovan+pyron rows).
+check_n "2 tenants" "$WORK/two"   598 648
+check_n "3 tenants" "$WORK/three" 804 901
 
 # ── 3: every tenant's own content is present ────────────────────────────
 # An op count alone cannot tell "both tenants ran" from "tenant 0 ran twice".

@@ -1,5 +1,45 @@
 # STATE — living progress log
 
+## Session 14z-102 (3) — the window tail REHEARSED to the merged probe:
+## the fix works on the merged composition; the freeze awaits the
+## maintainer's in-hand beam confirmation
+
+- **Rulings recorded (maintainer, 2026-08-21):** gold tint KEPT
+  (default; community research may revisit — the neuter stays a
+  one-line manifest edit, rehearsed as build/hui_probe_tint); the
+  palette-event hunt = the fix path (executed, see (2)).
+- **Contact A/B (the issue's damage half):** rigs df/103 (ours,
+  HP+HK activation) / df/104 (native, 263+2P) authored — the pair
+  splits on activation exactly as df/100/df/102 do. Measured
+  non-debug both legs: P2 HP 288->288 UNCHANGED through all three
+  close-range attacks on BOTH games — zero-zero parity at standing
+  geometry (the 14z-101 "flying-clone altitude" geometry note holds
+  natively too). A positive-contact leg (P2 jumped into the beam
+  band) stays owed on #109. Instrument gotcha re-paid: the first
+  A/B ran -debug and measured a NON-EVENT on both legs (hp=0 until
+  f3720 — the -debug timeline shifts the match start; both legs
+  "agreeing" was two dead rigs agreeing).
+- **The window tail, executed to rehearsal depth:**
+  `build/hui32/extract` REGENERATED with the new root (old kept as
+  `extract.pre-14z102`; ensure_merged_inputs did the make);
+  op-count constants RE-FROZEN with attribution (solo hui 361->363,
+  2T 596/646->598/648, 3T 802/899->804/901 — the +2 = code_ptr +
+  region op, huitzil-only, nothing dedupes) and
+  `test_tenant_loop.sh` PASS end to end on the new constants;
+  merged probe `build/merged_probe_row31` (`393f92a5`, 804 ops)
+  built with every internal verification green;
+  **`audit_clone_beam_lines.sh` fix-mode PASS on the MERGED probe**
+  (lines at group C 0x486D0, burst control fired).
+- **What the freeze still needs** (the 14z-99 rhythm, on the
+  maintainer's go after they see the beams in hand): build the four
+  named artifacts + stock twin from the tree, full battery +
+  run_suite re-freeze (hui/merged expectation sets MOVE — the new
+  root shifts every hui placement), registry rows m10/m19/m13/
+  merged-m5 + tags, re-point pcrel_escapes [merged_*] + bases.tsv +
+  render-content rows + audit BUILD defaults, and the B-sweep
+  inventory gate. Note test_m3a_reproducible/test_phasec_spaces stay
+  EXPECTED RED until then.
+
 ## Session 14z-102 (2) — #109 ROOT-CAUSED TO THE ROW AND FIXED AT PROBE
 ## LEVEL: vsavj ships effect-class ROW 31 as a STUB, and row 31 is the
 ## DF clone-mode BEAM EMITTER. One ported root + one code_ptr — the

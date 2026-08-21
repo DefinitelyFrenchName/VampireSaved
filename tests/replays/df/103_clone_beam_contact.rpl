@@ -1,0 +1,33 @@
+# CLONE-BEAM CONTACT A/B (14z-102, GitHub #109 verification pair, half 2):
+# the close-range damage/hitstun leg. Same shape as df/100 but P2 is NOT
+# parked — both fighters stay near center, P1 activates the clone mode and
+# attacks with the opponent inside plausible beam reach. OURS leg (vsavj DF
+# activation, HP+HK); the native leg is df/104 (same shape, 263+2P EX
+# activation) — the pair splits on activation exactly as df/100/df/102 do,
+# because the frameworks' inputs differ by design. Measure P2 HP
+# (+0x52/+0x50) and
+# hitstun seq across the attack windows on both legs; the claim is
+# damage + hitstun + NO freeze on BOTH, not a specific number — the two
+# frameworks differ by design (STATE 14z-101).
+#
+# Pokes: POKES="1400:ff8782:10;1450:ff8782:10;1500:ff8782:10;1400:ff8b82:03;1450:ff8b82:03;1500:ff8b82:03;3100:ff8509:03;3120:ff8509:03"
+300-305 sys=C1
+420-425 sys=C2
+800-803 sys=S1
+940-943 sys=S2
+1100-1102 p2=R
+1160-1162 p2=R
+1300-1302 p1=1
+1360-1362 p2=1
+# walk P1 toward center; P2 stays put (close range)
+2800-2950 p1=R
+# activate Dark Force: HP+HK with stocks poked (the df/100 shape)
+3260-3263 p1=36
+# brief movement so the mode forms
+3340-3400 p1=R
+3405-3450 p1=L
+# attacks at close range, spaced past the cooldown
+3550-3552 p1=1
+3700-3702 p1=1
+3850-3852 p1=2
+4100 wait
