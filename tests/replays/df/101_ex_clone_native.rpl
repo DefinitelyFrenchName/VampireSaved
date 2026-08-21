@@ -1,0 +1,40 @@
+# NATIVE vs2 EX CLONE-MODE rig (14z-101) — the maintainer's input: in VS2
+# the clone mode is an EX move triggered by 623+2P (or 263+2P; "both done
+# fast enough work"), similar to our DF mode but with no background change;
+# the clone rays share the freeze-beam sfx and tiles but inflict
+# damage/hitstun WITHOUT the frozen state.
+#
+# This rig is the NATIVE REFERENCE leg: activate the EX move on vsav2,
+# move so the clones form, then attack — the obj dump of the native beam
+# trains is the fix's ground truth (segment tile codes, banks, palette,
+# reach), and P2's HP/seq answers damage+hitstun-no-freeze.
+#
+# 623 = F, D, DF + both punches. Two spaced attempts (seq-thunk rule), a
+# movement phase, then whiffed/ranged normals to trigger clone beams.
+# Pokes as the df/9x family (P1 Phobos 0x10, P2 Victor, stocks banked —
+# EX moves consume meter):
+# POKES="1400:ff8782:10;1450:ff8782:10;1500:ff8782:10;1400:ff8b82:03;1450:ff8b82:03;1500:ff8b82:03;3100:ff8509:03;3120:ff8509:03"
+300-305 sys=C1
+420-425 sys=C2
+800-803 sys=S1
+940-943 sys=S2
+1100-1102 p2=R
+1160-1162 p2=R
+1300-1302 p1=1
+1360-1362 p2=1
+# EX activation attempt 1: 623+2P, fast
+3260-3261 p1=R
+3262-3263 p1=D
+3264-3267 p1=DR12
+# attempt 2, spaced (in case the first is eaten)
+3360-3361 p1=R
+3362-3363 p1=D
+3364-3367 p1=DR12
+# movement so the clones form
+3450-3530 p1=R
+3535-3600 p1=L
+# attacks: clone beams expected per attack
+3650-3652 p1=1
+3800-3802 p1=1
+3950-3952 p1=2
+4400 wait

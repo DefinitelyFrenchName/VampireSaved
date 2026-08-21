@@ -100,6 +100,33 @@ evidence of "no hitbox". Needs visible beams or the native EX leg
 (the vs2 EX-move input is the maintainer's to supply) for the
 damage/hitstun/chip check. All on GitHub #109.
 
+## Session 14z-101 (continued) — THE HYPOTHESIS CONFIRMED TO THE BYTE
+## and the NATIVE EX REFERENCE MEASURED (maintainer supplied the input)
+
+The maintainer's read ("the clone rays are likely the same sprite
+tiles as 236+P/K's — the ray fix missed that they were missing for ALL
+uses") is EXACT: native segments = `0x4800` = raw `0x0600` + vs2 bias
+`0x4200`; ours = `0x3e00` = **the same raw `0x0600`** + vanilla bias
+`0x3800` + self-composed bank 0. The 14z-71 ported handler is
+dispatched per-child to the RAY's objects only; clone strips fall
+through to vanilla. Even pal 00 is correct (native uses it). Fix =
+widen the tenant strip-handler dispatch to the clone children + settle
+the segment tile's composed group-C address (0x5800 is currently band
+content, `vs2B` src 0x15800 — the ray machinery's strip-tiles/bias
+negotiation, at the window).
+
+**Native EX reference (rig `tests/replays/df/101_ex_clone_native.rpl`
++ a scratch input sweep):** activation is **236+2P** (623/263 shapes
+whiffed in-script; the maintainer's "both work done fast" presumably
+folds through the same accept window); clone objects = **2× type 0x48
+in $FF9400 — identical to ours**; cost 1 stock; the activation itself
+hits (~13 over three ticks, hitstun, NO freeze — the maintainer's
+spec); **native beams are short too** (no contact at 320px), so the
+earlier no-damage results match native geometry. vs2 has no background
+change — framework, not defect. Full table on #109; verification pair
+for the window written there (composed 0x5800-family codes + bank-4
+attrs + visible render + close-range damage A/B).
+
 ## Session 14z-101 — THE #108 WRITER HUNT RAN AND INVERTED THE FINDING:
 ## NOT A DEFECT. The satellites' +0x18 is OUR OWN bank-word row; the
 ## sweep gate never reads it; and NATIVE vs2's satellites are equally
