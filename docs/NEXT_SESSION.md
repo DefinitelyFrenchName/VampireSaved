@@ -72,7 +72,8 @@
 > ##    merged freeze) with a wrong-suffix must-fire control. Also
 > ##    fixed: the tool's program-zip pick was a listdir accident that
 > ##    could verify the gfx donor on another filesystem.
-> ## 4. **THE WINDOW (now #107 ONLY — #108 resolved with no fix to
+> ## 4. **THE WINDOW (now #107 + #109 — the clone-beam 0xA00-low fix
+> ##    joined 14z-101; #108 resolved with no fix to
 > ##    ship, 14z-101):** the 0x0448a6 row re-resolution to 0x04367A
 > ##    (or its content-twin 0x45fcc — the runtime trace picks); the
 > ##    #107 lock rides test_reconcile_matcher + the farm bytes. One

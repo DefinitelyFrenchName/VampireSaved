@@ -105,7 +105,7 @@ consuming site in each artifact's patch payloads.
     now returns open/TIE-4x0.94-w0x20; `test_m3a_reproducible` PASS —
     build-inert). **GitHub #107**; the row flip to `0x04367A`
     (verified, callsite-anchored) moves shipped bytes → the next
-    window, whose only content it now is.
+    window, alongside #109 (the clone-beam 0xA00-low fix).
 
 ### 3. The 113 planted tripwires, ranked by reachability (MEDIUM)
 69 distinct unresolved vs2 targets (donovan 23 / huitzil 46 / pyron 44),

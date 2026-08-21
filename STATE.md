@@ -356,7 +356,8 @@ sections at every merged freeze (noted in the manifest).
 #108 resolved not-a-defect; #107's window action is mechanical
 (row → 0x04367A); #106 closed with the merged inventory frozen — so
 the next window's `[merged]` coverage exists BEFORE the window, which
-was the point of doing #106 first. The window itself (#107 only) waits
+was the point of doing #106 first. The window itself (#107 only —
+GREW to #107 + #109 later in 14z-101, see the (8) entry) waits
 on the maintainer's in-depth field pass on merged-m4, per the ruling.
 
 ## Session 14z-101 (continued) — while the maintainer field-tests:
