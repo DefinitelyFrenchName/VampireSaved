@@ -164,6 +164,25 @@ Re-point the `[merged_*]` sections at every merged freeze.
   NATIVE anchor leg proving vs2's satellites 0x6000 / +0x94==0) and
   REFUSES the former fix mode. The census's tenant-zero remains a
   contact-coverage fact, not a defect artifact.
+- **THE FOREIGN-DRAW CLASS (named at #109, 14z-101) — the instrument
+  gap behind "why did only Phobos' beams break".** Two sprite-defect
+  classes exist and only ONE has an instrument: (a) remapped-but-
+  uncopied (bank rewritten, tile empty → solid rectangle) — caught by
+  `audit_empty_tiles`, complete over what its replays draw; (b)
+  **never-remapped procedural codes** (a self-composing list handler
+  emits vanilla-bias/vanilla-bank codes for ported art → draws from
+  the WRONG SPACE, structurally healthy-looking) — #109's class, and
+  `audit_empty_tiles` PASSES on the defect event (measured 14z-101,
+  all three tenants on rig df/100). Exposure is census-bounded:
+  Phobos 26 type-4 procedural lists / Donovan 1 / Pyron 0
+  (`test_list_type_census`), which is WHY the class bit him
+  exclusively. QUEUED INSTRUMENT: the paired-draw census — ours-vs-
+  native drawn-code-family A/B at anchors (the manual method that
+  caught #109, generalized); natural home = the #109 fix's
+  verification. The #109 window should cover ALL 26 sites'
+  composition, not the beam family alone (the maintainer's "missing
+  for ALL their uses" instinct, now the fix requirement), plus
+  Donovan's single site.
 - Shadow/Marionette with tenants (§4 names it "once enabled"; never
   exercised).
 - ~~L/M/H strengths of Phobos' historically-broken moves~~
