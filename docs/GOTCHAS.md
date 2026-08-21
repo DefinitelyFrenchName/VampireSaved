@@ -304,3 +304,10 @@ is a GAME gotcha if it is true of the game regardless of the port.
   pokes for readback but NOT for rendering — a poke-based palette A/B
   is a dead instrument that passes its own liveness check; use a probe
   build.
+- **14z-103 (project):** a self-test that drives a gate through
+  deliberate failures litters the gate's EVIDENCE directory — the
+  flicker-gate fixture wrote a stub `03_two_player_vs.<epoch>.log` into
+  `build/gate_failures/` on every static-tier run (141 accumulated, one
+  presenting as a post-close gate failure); fixtures must redirect the
+  keep path (`M2A_KEEP_DIR`), and litter is identified by content
+  (basis-identical or `ffffffffffffffff` lines), not by name.

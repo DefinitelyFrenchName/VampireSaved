@@ -1,64 +1,81 @@
-# NEXT SESSION — orientation (rewritten at the 14z-102 FREEZE, 2026-08-21)
+# NEXT SESSION — orientation (rewritten at the 14z-103 close, 2026-08-21)
 
-> ## **THE STATE IN ONE BREATH: THE 14z-102 WINDOW FREEZE IS THE
-> ## REFERENCE** — donovan-m10 / huitzil-m19 / pyron-m13 / **merged-m5**
-> ## (= `build/m3b_merged12`, `393f92a5`, 804 ops; stock twin
-> ## m5_stock5 `883e7d17`). #107 (the verified reconciliation row) and
-> ## #109 (THE CLONE-BEAM FIX — effect-class ROW 31, vsavj's stub,
-> ## ported via root `0x926e4:0x11e:t0x922f0` + code_ptr at
-> ## PRG:0x080B28) both shipped; the beams were FIELD-CONFIRMED on the
-> ## rehearsal probe before the freeze; gold tint KEPT (maintainer
-> ## ruling 2026-08-21). hui46 and m3b_merged12 are bit-for-bit the
-> ## rehearsed probes. run_suite GREEN x6 (freeze+verify, all three
-> ## WIDE builds); m3a_reproducible all five bit-exact with
-> ## whole-artifact manifests re-frozen and member-deltas named;
-> ## merged gates green; pcrel inventories held across the extraction
-> ## shift. PLAY: `tools/run_wide.sh build/m3b_merged12 fbneo`.
+> ## **THE STATE IN ONE BREATH: the 14z-102 window freeze remains the
+> ## reference** — donovan-m10 / huitzil-m19 / pyron-m13 / **merged-m5**
+> ## (`build/m3b_merged12`, 804 ops; stock twin m5_stock5). No shipped
+> ## byte moved in 14z-103. PLAY: `tools/run_wide.sh build/m3b_merged12
+> ## fbneo`.
 >
-> ## **EVERY FREEZE VERIFICATION LANDED GREEN** (all in-session):
-> ## dualtrack + FBNeo legacy oracle PASS on the new pair; battery
-> ## 23 PASS + wide-render direct PASS; audit_merged_legacy exit 0;
-> ## run_all_static **97/0/0**; the guard-corpus soak **316/316
-> ## clean, zero vectors** on merged-m5 (verdict map
-> ## build/guard_corpus/m3b_merged12.1787322215.tsv). Tags
-> ## `freeze/{donovan-m10,huitzil-m19,pyron-m13,merged-m5}` + the
-> ## freeze commit are in. Nothing pushed.
+> ## **14z-103 = THE A4 PIN-CLEANUP PASS, executed end to end.** Every
+> ## A4 reference dispositioned (re-pointed + run green / ruled a
+> ## deliberate pin / reclassed operational) — the full table is in
+> ## `docs/project/build_dir_triage.md` "A4 PIN-CLEANUP PASS EXECUTED".
+> ## Acceptance all GREEN: every re-pointed emulator gate run
+> ## in-session; run_suite GREEN x3 (don_m10 / hui46 / pyron30);
+> ## audit_legacy_pairings PASS; strict static tier at close. The A4
+> ## dirs now at zero live reference fall MECHANICALLY at the next
+> ## census; don_m5 + pyron26 stay (deliberate evidence pins, annotated
+> ## in their gates); build/donovan, donovan_stage4_gate, hui4 are
+> ## operational, not pins.
 >
-> ## **POST-FREEZE RULINGS ALL LANDED (2026-08-21):** DF durations
-> ## DECIDED (keep vsavj, categorically); tint CONFIRMED GOOD; **#50
-> ## CLOSED as standing policy** (opportunistic extraction only, on
-> ## the issue); **the build-dir triage EXECUTED** (85 dirs / 8.1 GB
-> ## -> ../build_attic_14z102, reversible; strict tier 97/0/0 zero
-> ## skips + battery green on the pruned tree; delete the attic after
-> ## the next playtest cycle). **REMAINING NEW-SESSION ITEM: the A4
-> ## pin-cleanup pass** (~34 dirs, retire/re-point stale references,
-> ## then mechanical deletion at the next census) + the N-2
-> ## generation-roll policy now applies at every freeze.
+> ## **THE PASS'S FINDINGS:**
+> ## (1) the git-status "gate failure" was SELF-TEST LITTER — the
+> ## flicker-gate fixture wrote its deliberate-FAIL stubs into
+> ## build/gate_failures on every static run (141 files); fixed at the
+> ## root (M2A_KEEP_DIR), litter purged by content signature, gotcha
+> ## paid.
+> ## (2) **GitHub #110 (OPEN, the next real work item):** audit_fg_damage
+> ## + audit_pool_free_byte RED on every build since 14z-87 — bisected
+> ## on the attic pair merged6 (PASS) / merged7 (FAIL), stable 24/0 and
+> ## pcosmo-vacuous ever since. NOT read as gameplay regression
+> ## (audit_fg_parity native-anchored + test_pyron_cosmo are green);
+> ## both audits annotated known-red; constants NOT absorbed. The diff
+> ## pair lives in ../build_attic_14z102 — COPY IT OUT before the attic
+> ## is deleted after the playtest cycle, or rebuild from freeze tags.
+> ## (3) the 14z-88 self-frozen-sha1 hole was LIVE again: replays
+> ## 94/103/105/106 (all authored after audit_legacy_pairings' last
+> ## run) promoted — 94/105/106 = `window vsavj/masked-v2 889 2091` on
+> ## all three sets (measured, the ratified select-window class);
+> ## 103 = tenant on don (sha1 stays) / `.legacy-exempt` on hui+pyron
+> ## (commits the unbacked cell 0x13; the 61/62 precedent, measured
+> ## +0x60==0). Vanilla basis masked-v2 EXTENDED by the four logs
+> ## (instrument control green).
+> ## (4) test_hui_grab_victim's default was the PRE-14z-73-fix
+> ## expectation since birth — now `matches` (measured Δ=0 on hui46).
+> ## (5) audit_flicker_attribution had been SKIPping since the
+> ## donovan-m7 set dir was removed — now fingerprint-resolved (#96
+> ## mechanism), PASS on don_m10.
 >
-> ## **PUSHED 2026-08-21 (maintainer's word, frozen build confirmed
-> ## "feels good"):** main + all four freeze tags are on origin (one
-> ## trivial merge folded in the maintainer's README edit ee9b0ff —
-> ## merged, NOT rebased, to keep the tagged commits reachable).
-> ## **#107 AND #109 CLOSED on GitHub.** OPEN/CARRIED: #50 parked;
-> ## maintainer-owned: the build-dir ruling (still open) and
-> ## (`docs/project/build_dir_triage.md`), the community tint research
-> ## (gold default stands; the rehearsed neuter is
-> ## build/hui_probe_tint's one-line manifest edit — AND the tint is
-> ## now CONFIRMED GOOD, 2026-08-21: that thread is CLOSED). **The
-> ## DF-DURATION RULING IS DECIDED 2026-08-21 (maintainer):** keep
-> ## vsavj durations "absolutely, categorically" — per-character,
-> ## 1 stock, as shipped (360/377/360); any future doubt about exact
-> ## per-tenant lengths is the maintainer's to research from period
-> ## sources (Vampire Hunter / Vampire Collection). No item remains.
-> ## The
-> ## positive-contact beam-damage leg stays a nice-to-have (df/103/104
-> ## measured zero-zero parity at standing geometry).
+> ## **CARRY TO THE NEXT FREEZE'S RE-POINT SWEEP:** the m3b_merged11
+> ## one-back audit defaults (continue_ladder/switch, don_grab_pose,
+> ## don_ko_writer, don_lilith_ko, hui_grunt, kill_poke_shape,
+> ## roster_pairings, win_pal_auto, tenant_pairings) — correct today,
+> ## rotted by the N-2 deletion policy at the next freeze if not swept.
+> ## Also roll: test_m2a_flicker_gate's SET pin, the hui46/pyron30/
+> ## don_m10/m3b_merged12 defaults this pass just set, and
+> ## test_region_overlap section-5 constants (re-measure the trio).
 >
-> ## **NEW STANDING INSTRUMENTS from 14z-102:**
-> ## `audit_clone_beam_lines.sh` (EXPECT_LINES=1 default; strobe-phase
-> ## gotcha in the header), `test_biased_list_inventory.sh` (ci_static,
-> ## #109-B verdicts frozen), rigs df/103/104 (contact A/B pair),
-> ## the WPCOND scratch pattern (value-conditioned write watch).
+> ## Commits are LOCAL — push on the maintainer's word. The attic
+> ## deletion stays the maintainer's playtest-cycle call (but see #110's
+> ## diff pair caveat above).
+
+## What 14z-102 did (the whole arc, one screen)
+
+**The #107+#109 window frozen end to end** as donovan-m10 / huitzil-m19
+/ pyron-m13 / merged-m5 (maintainer "go"; beams field-confirmed on the
+rehearsal probe first; gold tint KEPT). #107 = the verified
+reconciliation row 0x0448a6 -> 0x04367a (shared map — stock moved too).
+#109 = the clone-beam fix: vsavj ships effect-class ROW 31 as a stub
+(the DF clone-mode beam emitter); ported root 0x926e4:0x11e:t0x922f0 +
+code_ptr at PRG:0x080B28; the root changed extraction (hui placements
+shifted, op counts re-frozen 363/804, tenant bases re-derived). Every
+verification green: run_suite x6, battery effectively 24/24,
+guard-corpus soak 316/316 zero vectors, statics 97/0/0 strict.
+PUSHED with #107/#109/#50 closed. Post-freeze rulings: DF durations
+kept categorically (vsavj per-character, 1 stock); tint confirmed good;
+#50 closed as standing policy; build-dir triage EXECUTED (85 dirs /
+8.1 GB -> ../build_attic_14z102, reversible; N-2 generation-roll now
+standing policy at every freeze).
 
 ## What 14z-101 did (the whole arc, one screen)
 

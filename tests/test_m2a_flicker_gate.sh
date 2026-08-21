@@ -39,7 +39,7 @@ fail=0
 # A real replay, a real set, a real basis: the specs under test are the ones
 # the battery actually enforces, not a fixture that can drift away from them.
 RPL=03_two_player_vs
-SET=donovan-m9-stock   # re-pointed 14z-99 (window freeze carry-rename)
+SET=donovan-m10-stock  # re-pointed 14z-103; roll at each freeze
 SPEC="$REPO/tests/expected/$SET/$RPL.masked"
 [ -f "$SPEC" ] || { echo "FAIL: no frozen spec at $SPEC"; exit 1; }
 BASE=$(awk '{print $2}' "$SPEC")
@@ -74,6 +74,8 @@ run_gate() {
         REPO="$REPO"
         . "$REPO/tests/lib/m2a_common.sh"
         M2A_EXPSET="$SET"
+        M2A_KEEP_DIR="$WORK/keep"   # NOT build/gate_failures — these FAILs
+                                    # are the fixture, not evidence
         M2A_MASKED_REQUIRED="$_req"
         # stub the emulator: hand the gate the log under test
         m2a_run_masked() {

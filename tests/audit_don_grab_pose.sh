@@ -68,7 +68,7 @@
 # (vs2 Victor 0x0A8824: 0x10=0x1A08, 0x11=0x1BC0, 0x13=0x1D78).
 # FIX: RULED 2026-08-19 (maintainer) — option (a), full, measured first;
 # feasibility frozen in test_capture_pose_sources.sh (ci_static), and the
-# fix is NOW STAGED AND FULLY PRE-FLIGHTED (14z-99, build/probe_104):
+# fix SHIPPED at the 14z-99 freeze (#104; rehearsed on build/probe_104):
 # 15 [[data_port]] slot_rows rows commented at the END of ALL THREE
 # tenant manifests (uncomment at the re-freeze window; +32 ops per
 # artifact). Probed: EXPECT_MATCH=1 green on all three tenants (Donovan

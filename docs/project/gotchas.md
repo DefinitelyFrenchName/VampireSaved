@@ -2802,3 +2802,23 @@ dead instrument that passes its own readback liveness check. Use a probe
 BUILD (or poke the game's staging buffer, once its per-frame copy source
 is measured), and treat any poke-based "no visual change" as
 unmeasured.
+
+## A self-test that drives a gate through DELIBERATE failures litters the gate's evidence directory (14z-103)
+`test_m2a_flicker_gate.sh` (portable tier, so it runs on every
+`run_all_static` pass) stubs the emulator and feeds
+`m2a_legacy_gate_masked` logs that MUST fail — and the gate's failure
+path faithfully preserved each one to `build/gate_failures/` as
+`03_two_player_vs.<epoch>.log`, exactly where a REAL masked-gate failure
+leaves its evidence. 141 stub logs accumulated over five days (140 of
+them committed), and the newest — written by the close's own portable
+re-verify, 30 seconds before the 14z-102 close commit — presented in
+`git status` as a post-close gate failure and cost a session-open triage
+to clear. The stubs are indistinguishable from evidence by name and
+shape (the shrink-case stub is bit-identical to the frozen vanilla
+basis). The rule: a fixture's deliberate FAIL must never write into the
+shared evidence path — `m2a_common.sh` now honors `M2A_KEEP_DIR` and the
+self-test points it at its own workdir. When auditing
+`build/gate_failures/`, the four July-29 `03_two_player_vs` logs and the
+`merged1_*` logs are real evidence; anything bit-identical to
+`tests/expected/vsavj/masked-v2/logs/03_two_player_vs.log` or carrying
+`ffffffffffffffff` lines was flicker-gate litter (removed 14z-103).

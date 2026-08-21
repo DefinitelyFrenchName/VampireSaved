@@ -164,11 +164,11 @@ bat tests/test_m2a_flavor_selector.sh "$OUTBASE/rompath"
 # Donovan shipped rendering as garbage with a green battery (14z-60z).
 # Needs the stock-track twin as its reference, so it runs only when both
 # tracks are present.
-if [ -f "$OUTBASE/rompath/vsavjw.zip" ] && [ -f "$REPO/build/m5_stock/rompath/vsavj.zip" ]; then
-    bat tests/test_wide_render_content.sh "$REPO/build/m5_stock/rompath" "$OUTBASE/rompath"
+if [ -f "$OUTBASE/rompath/vsavjw.zip" ] && [ -f "$REPO/build/m5_stock5/rompath/vsavj.zip" ]; then
+    bat tests/test_wide_render_content.sh "$REPO/build/m5_stock5/rompath" "$OUTBASE/rompath"
 else
     echo "note: WIDE rendering gate skipped (not a WIDE build, or no stock twin"
-    echo "      at build/m5_stock — tests/test_wide_render_content.sh)"
+    echo "      at build/m5_stock5 — tests/test_wide_render_content.sh)"
     bat_group_skip wide-render 1
 fi
 if [ "$_bat_skip" = 0 ]; then

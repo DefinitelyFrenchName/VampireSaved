@@ -1,5 +1,96 @@
 # STATE — living progress log
 
+## Session 14z-103 — THE A4 PIN-CLEANUP PASS EXECUTED (every stale
+## reference re-pointed, run green, or ruled a deliberate pin), plus
+## three findings the pass surfaced: the gate_failures litter class,
+## GitHub #110 (two audits red since 14z-87), and four LEGACY replays
+## promoted off self-frozen .sha1 (the 14z-88 class, caught by the
+## re-pointed audit_legacy_pairings on its first current-set run)
+
+**The opening triage first:** the untracked
+`build/gate_failures/03_two_player_vs.<epoch>.log` in git status was
+NOT a real gate failure — `test_m2a_flicker_gate.sh` (portable tier)
+stubs the emulator and REQUIRES the masked gate to fail, and the gate's
+failure path preserved each stub into the shared evidence directory:
+141 litter files over five days (140 committed), the newest written by
+the 14z-102 close's own portable re-verify 30 seconds before the close
+commit. Fixed at the root (`M2A_KEEP_DIR` override in m2a_common.sh;
+the self-test points it at its workdir), litter removed by content
+signature (basis-identical or ffff-flip lines; the four real July-29
+logs and merged1_* evidence kept), gotcha paid (project bucket +
+index).
+
+**The A4 pass (docs/project/build_dir_triage.md carries the full
+disposition table):**
+- Re-pointed to the m10/m19/m13/merged-m5 generation and RUN GREEN
+  in-session, each: the hui43 seven (mask_ranges_reader, beam_anim_walk,
+  guard_integrity, df_gold, beam_variants, hui_df_style,
+  hui_grab_victim) + gfx_layout_fields_live + member_classify +
+  voice_row_range; trap_shock/trap_parity (hui37/38 -> hui46);
+  variant_dispatch (pyron17 -> pyron30); pyron_blink/pyron_cosmo/
+  pyron_ring; flicker_attribution + obj_walker_relocation (don_m7 ->
+  don_m10); voice_borrow + gfx_menus pair + legacy_pairings trio +
+  frozen_rompath_guard (don_m5 -> don_m10); fg_parity, ladder_selector,
+  hui_electrocute, select_bank_gates, merged_render_content,
+  build_identity_distinct (m3b_merged/9 -> m3b_merged12); dualtrack
+  STOCK/WIDE -> m5_stock5/don_m10 + battery leg + wide_render_content +
+  tenant_row_owner; gfx_chain + audit_gfx_merged --build-h (hui31 ->
+  hui32, the A2 pipeline input); record_window (hui41 -> hui46);
+  m2a_flicker_gate SET pin -> donovan-m10-stock.
+- `test_region_overlap` section 5 RE-MEASURED on the current trio:
+  2012 -> 2033 conflicting bytes (raw 7603 -> 7624), unique regions
+  13 -> 14 — the new huitzil-only #109 row-31 root region; per-span
+  (53,54)/(39,50)/(461,368)/(1063,1561); control re-anchored, both
+  gates PASS with the must-fire control alive.
+- `audit_flicker_attribution` had been SKIPping quietly — its mask pin
+  named the REMOVED donovan-m7 set dir. Re-derived to fingerprint
+  resolution (the #96 mechanism); PASS on don_m10 (both frozen frames
+  still attributed: 41@2313 row-0x0C, 37@7168 row-0x0A).
+- `test_hui_grab_victim`: default expectation flipped `differs` ->
+  `matches` — the 14z-73 grab_hold_keyframes fix is what it guards
+  (patch_index says so; measured Δ=0 on hui46); the default had been
+  the PRE-FIX shape since the gate's birth because every freeze ran it
+  with explicit =matches. HANDOFF row corrected.
+- DELIBERATE PINS ruled and annotated in place: don_m5
+  (audit_walker_repoint's un-relocated negative control — nothing newer
+  can serve), pyron26 + hui41 (decode_stage_banners' frozen #92 defect
+  carriers; only the donovan clean-leg re-pointed to don_m10).
+  OPERATIONAL reclassed: build/donovan, donovan_stage4_gate, hui4
+  (gates build into them / print the rebuild recipe).
+
+**Finding: GitHub #110 — audit_fg_damage + audit_pool_free_byte RED on
+every build since 14z-87**, surfaced by the re-point, bisected on the
+attic dirs: merged6 (14z-86) PASS both, merged7 (14z-87 voice-borrow +
+beep batch) FAIL both, values stable across five generations since
+(fgA 24 vs frozen 10; fgC 0 = the close-range rig no longer contacts;
+pcosmo 0 family slots in the frozen window). NOT read as a gameplay
+regression: the native-anchored invariants are green on current builds
+(audit_fg_parity's staircase, test_pyron_cosmo). Both audits annotated
+known-red; constants NOT absorbed — the issue carries the diff pair and
+the re-derivation handoff.
+
+**Finding: the 14z-88 class, live again** — `audit_legacy_pairings` on
+its first run against current sets flagged 94_tenant_vs_tenant,
+103_tenant_2pwin_auto, 105_projectile_clash_ctl, 106_pyron_cosmo_clash
+as LEGACY on bare `.sha1` (all four authored AFTER the audit's last
+run; under bare suite dispatch their tenant content comes from
+gate-supplied pokes that run_suite never applies). Executed the audit's
+own fix: vanilla basis EXTENDED (freeze_masked_basis, instrument
+control green, all-or-nothing publish) and the shapes measured on all
+three builds — 94/105/106 = `window vsavj/masked-v2 889 2091` on every
+build (single run, the ratified select-window class, thousands of
+identical match frames after); specs authored, .sha1s dropped
+(STRICTER: vanilla-anchored where self-frozen saw nothing). 103 is
+replay 61 + AUTO: measured per-leg — donovan-m10 loads the TENANT
+(+0x60 = 0x3fa9d0, .sha1 stays); hui/pyron sets commit the UNBACKED
+cell 0x13 and no fighter record forms (+0x60 == 0 at f5000) —
+`.legacy-exempt` authored per the 61/62 precedent.
+
+**Carried forward:** the m3b_merged11 one-back audit defaults must join
+the freeze re-point sweep or the N-2 deletion policy rots them at the
+next freeze (list in the triage doc). A4 dirs now at zero live
+reference fall mechanically at the next census.
+
 ## Session 14z-102 CLOSE — ritual complete
 
 The session, in one line: the #107+#109 window opened on the

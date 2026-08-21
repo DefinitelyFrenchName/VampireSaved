@@ -36,10 +36,17 @@ set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"; cd "$REPO"
 ROMDIR="${ROMDIR:?set ROMDIR}"
 MAME_BIN="${MAME_BIN:-$HOME/.cache/vampire-saved/mame/cps2}"; export MAME_BIN
-BUILD="${BUILD:-build/don_m7}"
+BUILD="${BUILD:-build/don_m10}"
 [ -f "$BUILD/rompath/vsavjw.zip" ] || { echo "SKIP: no $BUILD/rompath/vsavjw.zip"; exit 0; }
-MASKF="tests/expected/donovan-m7/mask"
-[ -f "$MASKF" ] || { echo "SKIP: no $MASKF"; exit 0; }
+# The mask comes from the BUILD's own expectation set, resolved through
+# registry.tsv (the #96 mechanism) — 14z-103: this was pinned to
+# tests/expected/donovan-m7/mask, whose set dir no longer exists, so the
+# audit had been SKIPping quietly while the m10 specs still carry both
+# frozen frames (41: 2313; 37: 6962,7168).
+SET="$(python3 tools/build_fingerprint.py "$BUILD/rompath;$ROMDIR" --set vsavjw 2>/dev/null)" \
+    || { echo "FAIL: $BUILD's fingerprint is not in tests/expected/registry.tsv"; exit 1; }
+MASKF="tests/expected/$SET/mask"
+[ -f "$MASKF" ] || { echo "FAIL: no $MASKF (set resolved as $SET)"; exit 1; }
 MASK="$(cat "$MASKF")"
 W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT
 fail=0

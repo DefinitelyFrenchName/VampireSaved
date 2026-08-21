@@ -74,7 +74,7 @@ export MAME_BIN
 JOBS="${JOBS:-6}"
 OUT="${PAIRINGS_OUT:-build/legacy_pairings}"
 CHK="python3 $REPO/tools/check_legacy_pairings.py"
-BUILDS="${*:-build/don_m5:13 build/hui40:10 build/pyron25:11}"
+BUILDS="${*:-build/don_m10:13 build/hui46:10 build/pyron30:11}"
 FIELDS="ff8782:b:p1id,ff8b82:b:p2id,ff8460:l:p1hb,ff8860:l:p2hb"
 
 W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT

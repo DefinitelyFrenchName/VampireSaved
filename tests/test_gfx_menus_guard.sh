@@ -11,7 +11,7 @@
 # vanilla against vanilla-frozen goldens: a permanent pass proving nothing.
 #
 # The guard tests the SET ZIP, not the directory, and that distinction is the
-# whole point: build/don_m5/rompath and build/hui40/rompath EXIST and contain
+# whole point: build/don_m10/rompath and build/hui46/rompath EXIST and contain
 # vsavjw.zip only, so a `[ -d ]` check passes and falls straight through.
 #
 # These three cases run WITHOUT the emulator (the guard fires first); the
@@ -36,7 +36,7 @@ fi
 echo "== 2. a rompath that EXISTS but holds no vsavj.zip =="
 # This is the case a directory-existence check cannot catch. Use a real WIDE
 # build dir if present, else synthesise the same shape.
-WIDE_RP="$REPO/build/don_m5/rompath"
+WIDE_RP="$REPO/build/don_m10/rompath"
 if [ ! -f "$WIDE_RP/vsavjw.zip" ] || [ -f "$WIDE_RP/vsavj.zip" ]; then
     WIDE_RP="$(mktemp -d)/rompath"; mkdir -p "$WIDE_RP"; : > "$WIDE_RP/vsavjw.zip"
 fi

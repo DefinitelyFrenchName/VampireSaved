@@ -41,7 +41,7 @@ REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"
 [ -f build/out/vsavj_data.bin ] || { echo "SKIP: need build/out/vsavj_data.bin"; exit 0; }
 # DEFAULT = THE SHIPPING BUILDS (re-pointed 14z-94, GitHub #30). It used to
-# default to build/hui41 + build/pyron26 + build/hui42 — the PRE-FIX builds —
+# defaulted to the PRE-FIX builds (hui41/pyron26/hui42) before 14z-94; the
 # so the gate asserted "the frozen builds still carry #92". That is history,
 # not a regression check, and it made the gate permanently RED: once
 # tests/run_all_static.sh started running the suite, a gate that can never go
@@ -55,7 +55,7 @@ cd "$REPO"
 #
 # A build dir that is absent is SKIPPED, not failed, so a fresh checkout does
 # not red (GitHub #29: the skip is reported, never counted as a pass).
-BUILDS="${BUILDS:-build/hui43:0x10 build/pyron27:0x11 build/don_m7:0x13}"
+BUILDS="${BUILDS:-build/hui46:0x10 build/pyron30:0x11 build/don_m10:0x13}"
 
 _present=""
 for _b in $BUILDS; do

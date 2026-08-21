@@ -2110,7 +2110,7 @@ tests/test_pyron_blink.sh      [bd]   # 14z-75: the sprite/HUD BLINK. Palette ro
                                       # value). PYRON_BLINK_EXPECT=fixed (default) |
                                       # blinks (reproduces the pre-fix shape on pyron15).
                                       # Checker tools/check_pyron_blink.py. Defaults
-                                      # build/pyron17
+                                      # build/pyron30 (14z-103; roll at each freeze)
 tests/test_hui_grab_victim.sh  [bd]   # grab-victim placement A/B (14z-73): native
                                       # vsav2 vs the build, replay 80 through
                                       # field_trace.lua, comparing the victim offset
@@ -2118,10 +2118,12 @@ tests/test_hui_grab_victim.sh  [bd]   # grab-victim placement A/B (14z-73): nati
                                       # the ~21px global camera shift, so NO corner rig
                                       # is needed). Refuses to judge unless both legs
                                       # grabbed (seq 0x0E + 0x13 dmg); 2 verdict controls.
-                                      # GRAB_VICTIM_EXPECT=differs (default) freezes the
-                                      # OPEN teleport (~109px, victim placed behind not
-                                      # in front); =matches is the post-fix target.
-                                      # Checker tools/check_grab_victim.py. Defaults hui25
+                                      # GRAB_VICTIM_EXPECT=matches (default since
+                                      # 14z-103; the 14z-73 grab_hold_keyframes fix is
+                                      # what it guards, Δ=0) | =differs reproduces the
+                                      # pre-fix ~109px teleport (needs a pre-14z-73
+                                      # build). Checker tools/check_grab_victim.py.
+                                      # Defaults hui46
 tests/test_hui_air.sh          [bd]   # Huitzil air-movement gate (14z-66): the
                                       # float hovers (Y pinned) and the air dash
                                       # engages (seq 0x14, flat advance) — mode
@@ -2592,7 +2594,8 @@ tests/test_hui_df_style.sh     [bd]   # the DARK FORCE gate (14z-69): replay 85
                                       # (--expect differs: purple row 0x0A vs native
                                       # gold, his art drawn ~4x over); set
                                       # DF_STYLE_EXPECT=matches when fixed. Three
-                                      # verdict controls. Defaults to build/hui25
+                                      # verdict controls. Defaults to build/hui46
+                                      # (14z-103; roll at each freeze)
 tests/audit_empty_tiles.sh    [bd]     # 14z-69o: does the build DRAW any sprite whose
                                       # group-C tile is BLANK? A remapped-but-uncopied
                                       # tile renders as a SOLID RECTANGLE and no other
@@ -2629,7 +2632,7 @@ tests/test_beam_anim_walk.sh   [bd]   # 14z-70: does the build ever WALK the ani
                                       # native leg, our leg, 3 verdict controls).
                                       # BEAM_WALK_EXPECT=walks (default since 14z-71) |
                                       # absent reproduces the pre-fix state.
-                                      # Defaults to build/hui25. ~2 min
+                                      # Defaults to build/hui46 (14z-103). ~2 min
 tests/test_beam_list_type6.sh         # 14z-71: the list-type 6 TAKEOVER gate. The
                                       # thunk body must be Capcom's composite handler
                                       # (vs2 0x01A1FC) with EXACTLY six scratch
@@ -2682,7 +2685,8 @@ tests/audit_voice_borrow.sh [bd]      # 14z-87 (~6 min, 2 MAME runs): THE
                                       # the ring-window membership over the
                                       # WHOLE candidate family. 2 verdict
                                       # controls. Default: own-class on
-                                      # build/don_m5 (the SHIPPED b+c fix);
+                                      # build/don_m10 (14z-103; the b+c fix
+                                      # ships in every current build);
                                       # VOICE_BORROW_EXPECT=lottery vs
                                       # build/don_m4 = the ground-truth-
                                       # failing pre-fix pair

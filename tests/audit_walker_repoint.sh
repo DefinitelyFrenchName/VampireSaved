@@ -28,6 +28,11 @@ REPO="$(cd "$(dirname "$0")/.." && pwd)"; cd "$REPO"
 ROMDIR="${ROMDIR:?set ROMDIR}"
 MAME_BIN="${MAME_BIN:-$HOME/.cache/vampire-saved/mame/cps2}"; export MAME_BIN
 BUILD="${1:?usage: audit_walker_repoint.sh <builddir>}"
+# DELIBERATE PIN (do not "fix" at a freeze, 14z-103): the negative control
+# must be a build WITHOUT the 14z-91 walker relocation, and don_m5 (14z-87)
+# is the newest such build. Every current build is relocated, so this can
+# never re-point forward; the dir is classed EVIDENCE in the build-dir
+# census for exactly this reason.
 REF_BUILD="${REF_BUILD:-build/don_m5}"
 JOBS="${JOBS:-6}"
 # a legacy pair, a long mash rig (the only family that reaches walker A), and

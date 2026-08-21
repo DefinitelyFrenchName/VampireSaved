@@ -100,7 +100,12 @@ say "== 6. the authored ladder rows are judged against the RIGHT image =="
 # Every out-of-range entry on the shipped tenants must be class 0x13 wanting
 # stage 0x18. If a NEW out-of-range shape appears, this gate says so rather
 # than letting it ride under the #92 headline.
-for spec in build/hui41:0x10 build/pyron26:0x11 build/don_m7:0x13; do
+# hui41/pyron26 are DELIBERATE PINS (14z-103): the frozen PRE-fix builds
+# that still carry #92's four authored bytes — the defect this section
+# measures. The fix landed hui43/pyron27 (14z-94), so these can never
+# re-point forward; both dirs are classed EVIDENCE in the build-dir census.
+# The donovan leg is the clean control and follows the current freeze.
+for spec in build/hui41:0x10 build/pyron26:0x11 build/don_m10:0x13; do
   d=${spec%:*}; cls=${spec#*:}
   [ -f "$d/patch/patch.json" ] || { say "  (skip $d: no patch.json)"; continue; }
   python3 - "$d" "$cls" > "$T/row" <<'PY'
@@ -123,7 +128,7 @@ PY
   say "  $d class $cls: $n out of range, $other not the known class-0x13/stage-0x18 shape"
   [ "$other" = 0 ] || fail "$d carries an out-of-range entry that is NOT #92's shape"
   case "$d" in
-    build/don_m7) [ "$n" = 0 ] || fail "donovan must be clean, got $n" ;;
+    build/don_m10) [ "$n" = 0 ] || fail "donovan must be clean, got $n" ;;
     *)            [ "$n" = 4 ] || fail "$d: expected 4 (the #92 bytes), got $n" ;;
   esac
 done

@@ -49,8 +49,8 @@ RPDIR="${1:-$REPO/build/donovan6/rompath}"
 if [ "$FREEZE" = 1 ]; then
     ROMPATH="$ROMDIR"
 else
-    # The check is on the SET ZIP, not the directory. build/don_m5/rompath and
-    # build/hui40/rompath both EXIST and hold vsavjw.zip only, so a -d test
+    # The check is on the SET ZIP, not the directory. build/don_m10/rompath and
+    # build/hui46/rompath both EXIST and hold vsavjw.zip only, so a -d test
     # passes and drops straight into run_mame.sh's chained-rompath fall-through,
     # where MAME resolves the members by hash out of $ROMDIR and this gate
     # compares vanilla against vanilla-frozen goldens — a permanent pass that

@@ -6,7 +6,7 @@
 # build/hui30 + build/pyron21 — a trio that has been superseded 2-9 freezes
 # over. It exited 0 while asserting facts about builds nobody ships, which is a
 # false green whether or not anyone runs it. Section 5 now also asserts the
-# shipped trio (2012 bytes, 7603 raw).
+# shipped trio (2033 bytes, 7624 raw — re-measured 14z-103 on the m10/m19/m13 trio).
 #
 # The 2000 figure was NOT overwritten. STATE.md records it as the evidence that
 # deleted the shared-span dedup work item, so re-freezing it would detach a
@@ -30,9 +30,9 @@ COPY="$REPO/tests/.regoverlap_control_copy.sh"
 
 # --- 1. the current-trio constants must be able to FAIL ------------------
 # Point section 5 at the SUPERSEDED trio: its real figure is 2000, so the
-# 2012 assertion must reject it. This is the 2000-vs-2012 delta, asserted.
+# 2033 assertion must reject it. This is the 2000-vs-2033 delta, asserted.
 echo "== 1. current-trio section pointed at the superseded trio =="
-sed 's|^CUR_BUILDS="build/don_m5 build/hui40 build/pyron25"|CUR_BUILDS="build/m5_wide build/hui30 build/pyron21"|' \
+sed 's|^CUR_BUILDS="build/don_m10 build/hui46 build/pyron30"|CUR_BUILDS="build/m5_wide build/hui30 build/pyron21"|' \
     "$REPO/tests/test_region_overlap.sh" > "$COPY"
 chmod +x "$COPY"
 grep -q 'CUR_BUILDS="build/m5_wide' "$COPY" || {

@@ -24,14 +24,14 @@
 #   4 CONTROLS    an inverted window must abort, and a window still open at
 #                 FRAMES must report a FORCED stop rather than a clean one.
 #
-# Usage: ROMDIR=... [MAME_BIN=...] [REC_BUILD=build/hui41] tests/test_record_window.sh
+# Usage: ROMDIR=... [MAME_BIN=...] [REC_BUILD=build/hui46] tests/test_record_window.sh
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"
 ROMDIR="${ROMDIR:?set ROMDIR}"
 MAME_BIN="${MAME_BIN:-$HOME/.cache/vampire-saved/mame/cps2}"
 export MAME_BIN
-BUILD="${REC_BUILD:-build/hui41}"
+BUILD="${REC_BUILD:-build/hui46}"
 RPL="${REC_REPLAY:-tests/replays/26_don_arcade_mash.rpl}"  # truncated in section 0
 
 [ -x "$MAME_BIN" ] || { echo "SKIP: no WIDE MAME binary at $MAME_BIN"; exit 0; }

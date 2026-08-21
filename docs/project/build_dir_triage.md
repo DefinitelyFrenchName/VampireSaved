@@ -26,6 +26,70 @@ Tracked metadata inside the moved dirs is deleted from the working tree
 in the same commit; it remains recoverable from git history and the
 freeze tags, which is the B4 classification's meaning.
 
+## A4 PIN-CLEANUP PASS EXECUTED 14z-103 (2026-08-21)
+
+Every A4 reference was read for intent and dispositioned ("re-point the
+ones that meant 'the current build', leave the ones that meant 'that
+build'" — the rot gate's own rule). Verification: every re-pointed gate
+was RUN GREEN on its new default in-session (the emulator audits
+included); `test_build_ref_rot.sh` PASS; the full strict static tier at
+the close.
+
+**Re-pointed to the m10/m19/m13/merged-m5 generation (the dirs fall to
+zero-live-reference and go mechanically at the next census):**
+hui43 (7 gates + 3 shared files), hui42/hui40 (region_overlap trio +
+prose), hui37/hui38 (trap audits), hui31 (gfx_chain -> hui32, the A2
+pipeline input; audit_gfx_merged.py --build-h likewise), don_m7,
+m3b_merged + m3b_merged9 (8 gates + identity/member gates), m5_stock ->
+m5_stock5 (dualtrack STOCK + battery leg + wide_render_content +
+tenant_row_owner), m5_wide -> don_m10 (dualtrack WIDE default only; the
+dir itself stays A2), pyron17/pyron25/pyron26-default/pyron27,
+don_m5-defaults (voice_borrow, gfx_menus pair, legacy_pairings trio,
+frozen_rompath_guard SRC -> don_m10). `test_region_overlap` section 5
+constants re-measured on the new trio (2012 -> 2033, unique 13 -> 14 =
+the #109 row-31 huitzil-only region; control's sed re-anchored).
+`audit_flicker_attribution` re-derived: its mask pin named the REMOVED
+donovan-m7 set dir, so it had been SKIPping quietly — now resolves the
+set from the build fingerprint (the #96 mechanism) and PASSES on m10.
+`test_m2a_flicker_gate` SET pin rolled to donovan-m10-stock.
+
+**Kept as DELIBERATE EVIDENCE PINS (reclassify A4 -> A3; annotated in
+the gates themselves):** `don_m5` (audit_walker_repoint's REQUIRED
+un-relocated negative control — nothing newer can serve), `pyron26`
+(test_decode_stage_banners' frozen #92 defect carrier, with hui41).
+
+**Reclassified OPERATIONAL (gates build into them; not stale pins):**
+`donovan` (m2a stage 1-4 pipeline output), `donovan_stage4_gate` (the
+stage-4 gate's own build target), `hui4` (regenerable stage-4 dir; its
+gate prints the rebuild recipe on absence).
+
+**Zero-live-reference already (prose/registry/README mentions only):**
+probe_window, hui26, don_m8, m5_stock2, m5_stock3, pyron16, pyron18,
+pyron22, hui9/hui11/hui12/hui13/hui14/hui17/hui20 (run_hui_behavior's
+PING-ladder history), probe_104 (its stale "fix NOW STAGED" comment
+corrected to SHIPPED-14z-99).
+
+**Found by the pass, beyond the pins:**
+- GitHub #110: audit_fg_damage + audit_pool_free_byte RED on every
+  build since 14z-87 (bisected merged6 PASS / merged7 FAIL on attic
+  dirs); both annotated known-red, constants not absorbed.
+- audit_legacy_pairings surfaced four LEGACY-verdict replays on
+  self-frozen .sha1 (94/103/105/106 — all authored after its last run):
+  promoted to `window vsavj/masked-v2 889 2091` on all three sets
+  (measured; the ratified select-window class), except 103 on the
+  hui/pyron sets (picks the unbacked cell 0x13, no vanilla oracle —
+  .legacy-exempt per the 61/62 precedent) and 103 on donovan-m10
+  (measured TENANT, +0x60 = the ported record; .sha1 correct).
+- test_hui_grab_victim's default expectation had been the PRE-FIX
+  `differs` since the gate's birth (the 14z-73 fix landed the same
+  session; freezes always passed =matches explicitly) — default now
+  `matches`, measured Δ=0 on hui46.
+- The m3b_merged11 (one-back) audit defaults — continue_ladder/switch,
+  don_grab_pose, don_ko_writer, don_lilith_ko, hui_grunt,
+  kill_poke_shape, roster_pairings, win_pal_auto, tenant_pairings —
+  are correct TODAY but must join the freeze re-point sweep, or the
+  N-2 deletion policy will rot them at the next freeze.
+
 The original decision input follows, unchanged.
 
 143 dirs under build/, 11.7 GB total.

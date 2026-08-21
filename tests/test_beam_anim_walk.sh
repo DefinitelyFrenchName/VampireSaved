@@ -72,7 +72,7 @@ trap 'rm -rf "$WORK"' EXIT
    # Its frozen inventory may still describe the OLD build: run it
    # before trusting a green, and re-measure rather than absorb.
 
-BUILD="${1:-build/hui43}"
+BUILD="${1:-build/hui46}"
 EXPECT="${BEAM_WALK_EXPECT:-walks}"
 case "$BUILD" in /*) ;; *) BUILD="$REPO/$BUILD" ;; esac
 [ -f "$BUILD/rompath/vsavjw.zip" ] || {

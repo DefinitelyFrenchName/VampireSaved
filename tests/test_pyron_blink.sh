@@ -52,12 +52,10 @@ WORK="$(mktemp -d)"
 trap 'rm -rf "$WORK"' EXIT
 fail=0
 
-# DEFAULT RE-POINTED 14z-92: was build/pyron17, which predates WIDE v1.1/v1.2
-# and is REFUSED by MAME today ("vsw.z01 NOT FOUND") — the same stale-reference
-# class as hui31 in test_merged_render_content and pyron20 in
-# audit_hitclass_map_cost, all three found the same session. pyron-m9 carries
-# the same blink fix pyron17 did. RE-POINT THIS WHEN PYRON IS RE-FROZEN.
-BUILD="${1:-build/pyron26}"
+# DEFAULT RE-POINTED 14z-92 (pyron17, pre-v1.1, MAME-refused) -> pyron26,
+# and 14z-103 -> pyron30 (pyron-m13, the current freeze). Every generation
+# carries the same blink fix pyron17 introduced. Re-point at each freeze.
+BUILD="${1:-build/pyron30}"
 case "$BUILD" in /*) ;; *) BUILD="$REPO/$BUILD" ;; esac
 EXPECT="${PYRON_BLINK_EXPECT:-fixed}"
 export MAME_BIN="${MAME_BIN:-$HOME/.cache/vampire-saved/mame/cps2}"

@@ -175,7 +175,12 @@ m2a_masked_target() {
 m2a_legacy_gate_masked() {
     _mg_rp="$1"; _mg_w="$2"
     gate_fail=0
-    _mg_keep="$REPO/build/gate_failures"
+    # M2A_KEEP_DIR: where failing replays' logs are preserved. The default is
+    # the shared evidence directory; a SELF-TEST that drives this gate through
+    # deliberate failures MUST override it (test_m2a_flicker_gate.sh does) —
+    # otherwise every static-tier run plants a stub log indistinguishable from
+    # real failure evidence there (141 accumulated before this was caught).
+    _mg_keep="${M2A_KEEP_DIR:-$REPO/build/gate_failures}"
 
     _mg_set="$(m2a_masked_target "$_mg_rp")" || _mg_set=""
     if [ -z "$_mg_set" ]; then

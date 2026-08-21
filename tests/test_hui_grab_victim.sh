@@ -1,9 +1,12 @@
 #!/bin/sh
 # test_hui_grab_victim.sh — the GRAB-VICTIM placement A/B gate (14z-73).
 #
-# THE DEFECT. During Phobos' grab the VICTIM's sprite teleports mid-
-# animation. The victim is placed every frame by the attacker's capture-pose
-# data; the endpoints look right but the held phase does not.
+# THE DEFECT — FIXED 14z-73 (grab_hold_keyframes: H's own vs2 keyframe
+# block 0x0C56AA ported, row 0xBE2BA repointed; patch_index documents this
+# gate guarding it at `matches`, peak Δ=0). Historical shape: during
+# Phobos' grab the VICTIM's sprite teleported mid-animation — the victim
+# is placed every frame by the attacker's capture-pose data; the endpoints
+# looked right but the held phase did not.
 #
 # WHY THIS RIG WORKS WITHOUT CORNERING (retires the 14z-72 blocker). The two
 # legs are different games (native vsav2 vs our vsavjw), so their ABSOLUTE
@@ -18,9 +21,13 @@
 #   1. BOTH legs actually grabbed (P1 seq 0x0E + victim took 0x13 damage).
 #      A rig that whiffed measures nothing — the checker refuses to judge it.
 #   2. The relative-offset A/B verdict via tools/check_grab_victim.py:
-#      --expect differs (default) freezes the OPEN defect (victim mis-placed
-#      ~100px horizontally at grab onset); GRAB_VICTIM_EXPECT=matches asserts
-#      the post-fix target (ours tracks native through the hold).
+#      --expect matches (DEFAULT SINCE 14z-103; measured Δ=0 on hui46)
+#      asserts ours tracks native through the hold. The default had stayed
+#      on the PRE-FIX `differs` since the gate's birth at 14z-73 — the fix
+#      landed the same session and every freeze ran the gate with explicit
+#      =matches, so the stale default was never hit until the 14z-103
+#      re-point. GRAB_VICTIM_EXPECT=differs reproduces the pre-fix defect
+#      (needs a pre-14z-73 build).
 #   3. VERDICT-LOGIC CONTROLS (each MUST be rejected): a "fixed" leg (ours ==
 #      native) must fail --expect differs, proving the checker is not blind to
 #      the divergence it claims to measure; and a "never grabbed" leg must be
@@ -42,8 +49,8 @@ trap 'rm -rf "$WORK"' EXIT
    # Its frozen inventory may still describe the OLD build: run it
    # before trusting a green, and re-measure rather than absorb.
 
-BUILD="${1:-build/hui43}"
-EXPECT="${GRAB_VICTIM_EXPECT:-differs}"
+BUILD="${1:-build/hui46}"
+EXPECT="${GRAB_VICTIM_EXPECT:-matches}"
 case "$BUILD" in /*) ;; *) BUILD="$REPO/$BUILD" ;; esac
 [ -f "$BUILD/rompath/vsavjw.zip" ] || {
     echo "FAIL: no $BUILD/rompath/vsavjw.zip (WIDE tenant build required)"; exit 1; }

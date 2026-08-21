@@ -25,7 +25,7 @@ ROMDIR="${ROMDIR:?set ROMDIR}"
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"
 W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT
-HUI="${HUI:-build/hui31}"
+HUI="${HUI:-build/hui32}"
 
 for d in build/m5_wide "$HUI" build/pyron21; do
     [ -d "$d/patch" ] || { echo "SKIP: missing $d (frozen build inputs)"; exit 0; }

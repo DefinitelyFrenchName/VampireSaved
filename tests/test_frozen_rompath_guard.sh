@@ -37,7 +37,7 @@ WORK="$(mktemp -d)"
 trap 'rm -rf "$WORK"' EXIT
 fail=0
 
-SRC=build/don_m5/rompath
+SRC=build/don_m10/rompath
 if [ ! -f "$SRC/vsavjw.zip" ]; then
     # Never silently green: without a frozen reference to copy, this control
     # would assert nothing at all.
