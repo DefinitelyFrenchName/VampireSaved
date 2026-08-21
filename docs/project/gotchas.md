@@ -2759,3 +2759,19 @@ non-debug tap (FBNEO_HTAP) — here it settled the question in one run.
 `echo ====` fails with "=== not found" in the Bash tool's zsh — `=word`
 expands as "path of command word". Quote it or avoid `=`-leading args in
 generated command lines.
+
+## A scripted motion input is NOT the move you named — the buffer FOLDS leading directions, so identify by effects, never by the script (14z-101)
+The #109 native-reference hunt scripted "6236+2P" and confidently called
+the result the clone-mode EX; it was the ES — vs2's buffer reader kept
+the identified pattern 236+2P and IGNORED the leading 6 (the maintainer
+named the mechanism). Meanwhile a dp-shaped attempt whiffed entirely and
+a 263 shape fired the real EX. Motion parsers are lenient in ways that
+make the SCRIPT'S name for an input worthless as an identification: two
+different scripted shapes can land the same move, and the shape you
+intended can land a different one. The rule: identify an activated move
+by its measured EFFECTS (stock cost, seq id, spawned objects, the
+screen), and when captures disagree with expectations, send them to the
+maintainer BEFORE building on the identification — one reply named three
+moves this session. Related trap, same family: the 87 rig's scripted-LK
+"crashes where the real LK does not" (scripted strengths are not
+authoritative either).

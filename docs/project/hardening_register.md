@@ -179,10 +179,10 @@ Re-point the `[merged_*]` sections at every merged freeze.
   exclusively. QUEUED INSTRUMENT: the paired-draw census — ours-vs-
   native drawn-code-family A/B at anchors (the manual method that
   caught #109, generalized); natural home = the #109 fix's
-  verification. The #109 window should cover ALL 26 sites'
-  composition, not the beam family alone (the maintainer's "missing
-  for ALL their uses" instinct, now the fix requirement), plus
-  Donovan's single site.
+  verification. **CONFIRMED BY THE MAINTAINER (2026-08-21): the #109
+  window covers ALL 26 sites' composition plus Donovan's single site
+  — the class retires by enumeration, not just the beam symptom.
+  Pyron safe by census (0 sites).**
 - Shadow/Marionette with tenants (§4 names it "once enabled"; never
   exercised).
 - ~~L/M/H strengths of Phobos' historically-broken moves~~

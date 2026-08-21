@@ -293,3 +293,7 @@ is a GAME gotcha if it is true of the game regardless of the port.
   table while our own ops patch that table; grep patch.json before
   calling a table unpatched); zsh expands `=`-leading
   arguments as =cmd lookups.
+- **14z-101 (project):** a scripted motion input is NOT the move you
+  named — the buffer folds leading directions (6236 reads as 236);
+  identify an activated move by measured effects (cost, seq, objects),
+  never by the script's name for the input.
