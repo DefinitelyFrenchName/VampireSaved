@@ -1,5 +1,70 @@
 # STATE — living progress log
 
+## Session 14z-101 (continued) — DF MECHANICS MEASURED ours-vs-native
+## (the field pass's named unknown): the GAMES' DF FRAMEWORKS DIFFER
+## (cost 1 vs 2 stocks, per-char durations vs uniform 332, activation
+## seq vs none) — proven on the LEGACY CONTROL — and Phobos' clone
+## train exists ONLY on our leg; the native reading AWAITS THE
+## MAINTAINER'S CONFIRMATION (captures sent, loop open)
+
+**Field results recorded first (maintainer, 2026-08-21):** the five
+historically-broken Phobos moves × EVERY strength confirmed correct by
+hand (closes the hardening §5 strengths item); all moves correct except
+guard-cancel exclusives (rig-only by setup); timeout wins correct for
+all three tenants; Donovan's and Pyron's DF correct; Phobos' DF correct
+for movement and clones, **clone ATTACKS unclear** (mechanical vs
+beams-not-rendering — their investigation ongoing, and the measurement
+below is aimed at exactly that).
+
+**Instruments: rigs `tests/replays/df/97_df_mech.rpl` (idle-expiry),
+`98_df_attack.rpl` (stationary ray), `99_df_move_attack.rpl` (walk
+then ray)** — all replay-85-doctrine (run unchanged on native vsav2
+and the merged build; tenant chosen by pokes; stocks poked so DF is
+never the seq-0x0A downgrade). Traced with field_trace (df flag
+$FF802E, stocks +0x109, p1seq +0x06, +0x60 base as the rig-liveness
+signature — every leg verified loading its own character).
+
+**THE FRAMEWORK TABLE (df/97, idle to natural expiry):**
+| leg | cost | duration | activation seq |
+|---|---|---|---|
+| native vs2 — Demitri/Phobos/Pyron/Donovan | **2 stocks** | **332** (uniform) | none visible |
+| ours (merged-m4) — same four | **1 stock** | 360/377/360/360 | 0x16 (+0x18 Phobos) |
+| pristine vsavj Demitri | 1 | 360 | 0x16 |
+- **Ours == pristine vsavj EXACTLY on the legacy control** (same
+  onset/dur/cost/seq) — the deltas vs native are CROSS-GAME framework
+  differences, not porting defects, by construction.
+- **vsavj durations are PER-CHARACTER** (legacy sweep, all 16 ids:
+  269/360/377/383/398/411/540 — e.g. 0x0a=540, 0x0d=411, 0x02=269),
+  where vs2 measures uniform 332 across four characters. The tenants
+  read 360/377/360 on ours. **Fidelity question for the ruling queue:
+  keep vsavj-framework durations or port vs2's 332.**
+- **Phobos' 0x16→0x18 is a LEGITIMATE vsavj DF class**: legacy ids
+  0x0C and 0x0F (Jedah) also enter 0x18, both at dur 377 — exactly his
+  numbers. His activation-window flag flicker (3289-3307) remains his
+  one unique tell.
+
+**THE CLONE QUESTION (df/98 + df/99, snapshots + seq traces, both legs
+instrument-verified DF-ACTIVE with stocks spent):**
+- Stationary: NO clones on either game; the DF-window ray is a single
+  beam on both.
+- Walking (df/99): **OURS enters and STAYS IN seq 0x18 — an AIRBORNE
+  4-copy clone-train formation** (the maintainer's "clones"), firing
+  rays from the mode (seq 0xE at f3476/f3636); **NATIVE stays in
+  ordinary grounded states (walk 0x4, same rays at the same frames),
+  no clones, no visible mode** — cost 2, dur 332, mechanically
+  passive as far as these rigs can see.
+- **HELD OPEN, deliberately:** if vs2's Phobos DF should show the
+  clone train, my native leg may be activating something other than
+  the real vs2 DF (the flag+cost fired, but the maintainer's reference
+  decides). Captures sent (ours train / native walk / native single
+  beam); the loop is open on their answer. Everything above the table
+  is measured; the INTERPRETATION of the native leg is not settled.
+
+**No shipped byte moved.** The pool censuses (types 0x48×2 + 0x82 ours
+vs 0x75 native mid-DF) are recorded in the scratch logs; instrument
+promotion (an audit freezing the framework table) waits on the
+confirmation loop so it freezes the right reading.
+
 ## Session 14z-101 — THE #108 WRITER HUNT RAN AND INVERTED THE FINDING:
 ## NOT A DEFECT. The satellites' +0x18 is OUR OWN bank-word row; the
 ## sweep gate never reads it; and NATIVE vs2's satellites are equally

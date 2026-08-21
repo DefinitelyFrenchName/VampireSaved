@@ -166,15 +166,22 @@ Re-point the `[merged_*]` sections at every merged freeze.
   contact-coverage fact, not a defect artifact.
 - Shadow/Marionette with tenants (§4 names it "once enabled"; never
   exercised).
-- L/M/H strengths of Phobos' historically-broken moves (field covered
-  the moves, not every strength). **RECOMMENDED ROUTE (14z-101): the
-  maintainer's hands during the in-depth field pass, not rigs** — the
-  structural half is already covered (strength dispatchers travel
-  inside relocated regions pc-relatively; word-form escapes triaged
-  zero-live at H3.1; out-of-range indices frozen by test_index_space),
-  and the 87 rig's own header records that SCRIPTED strengths are not
-  authoritative for this family (its scripted LK crashes where the
-  real LK does not). Five moves × L/M/H by hand closes it.
+- ~~L/M/H strengths of Phobos' historically-broken moves~~
+  **FIELD-CONFIRMED CLOSED (maintainer, 2026-08-21):** the five moves
+  (236+P, 236+K, j.214+K, 236+2K, 214+2K) worked through EACH button
+  strength by hand — correct; "as are all moves except guard cancel
+  exclusives" (GC-exclusives are rig-only by the maintainer's setup —
+  Phobos' Reflect Wall is covered by test_hui_pairs; see the GC
+  coverage note below). Timeout wins also field-confirmed for all
+  three tenants. The rigs-vs-hands routing argument above held: the
+  structural half was already closed by H1/H3 + test_index_space, and
+  the hands closed the behavioral half in one pass.
+- **DF MECHANICAL ACCURACY vs VS2 — the field pass's named open
+  surface (maintainer, 2026-08-21):** DF works graphically for all
+  three tenants and activation/end is clean, but mechanical accuracy
+  (duration, cost, per-character effect) is UNKNOWN against native.
+  Instrument in progress 14z-101: the native-leg A/B on the DF
+  observables. Field pass still ongoing: DF + projectile collisions.
 - **the authoritative-guard corpus soak: BUILT AND GREEN (14z-101)** —
   `tests/audit_guard_corpus.sh`: the whole replay corpus (79 rigs,
   ~472k script frames) under the crash guard on the build under test,

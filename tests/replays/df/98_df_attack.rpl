@@ -1,0 +1,41 @@
+# DF CLONE-ATTACK rig (14z-101) — the maintainer's field question: Phobos'
+# DF clones appear and move correctly, but do they properly ATTACK
+# (mechanical issue vs beams not rendering)? This rig activates DF with
+# poked stocks and then fires the 236+LP freeze ray TWICE inside the DF
+# window (the 83b spacing — the seq-D thunk shifts frame-pinned inputs, so
+# two spaced attempts guarantee one lands while DF is live), plus one
+# PRE-DF control ray so the non-DF projectile shape is in the same run.
+#
+# Runs unchanged on native vsav2 and the merged build (replay-85 doctrine);
+# tenant/leg chosen by POKES:
+# POKES="1400:ff8782:10;1450:ff8782:10;1500:ff8782:10;1400:ff8b82:03;1450:ff8b82:03;1500:ff8b82:03;3100:ff8509:03;3120:ff8509:03"
+# (P2 = Victor 0x03, same id both games; stocks poked so DF is not the
+#  seq-0x0A downgrade.)
+#
+# Measure with DUMPS over both pools + obj_records_dump at the ray windows:
+# native clones firing = extra beam objects per attempt vs the pre-DF
+# control; ours must match at the object level (mechanical) AND draw them
+# (graphical — the OBJ dump is the render-layer check).
+300-305 sys=C1
+420-425 sys=C2
+800-803 sys=S1
+940-943 sys=S2
+1100-1102 p2=R
+1160-1162 p2=R
+1300-1302 p1=1
+1360-1362 p2=1
+# PRE-DF control ray (the 83b measured-good input)
+2900-2902 p1=D
+2903-2905 p1=DR
+2906-2908 p1=R1
+# activate Dark Force: HP+HK with stocks poked at f3100/f3120
+3260-3263 p1=36
+# DF ray #1 (well inside the ~360f window opening at ~3288)
+3400-3402 p1=D
+3403-3405 p1=DR
+3406-3408 p1=R1
+# DF ray #2
+3540-3542 p1=D
+3543-3545 p1=DR
+3546-3548 p1=R1
+5000 wait

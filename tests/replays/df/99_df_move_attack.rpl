@@ -1,0 +1,33 @@
+# DF MOVE-THEN-ATTACK rig (14z-101) — the clone-attack question, take 2.
+# The 98 rig proved a STATIONARY DF Phobos fires a single beam with no
+# clones visible on EITHER game: the clones are movement-coupled (the
+# check_df_style note — afterimages appear "whenever he MOVES"). So this
+# rig activates DF, WALKS FORWARD so the clones materialize, stops, and
+# fires the freeze ray while the clones are live — the frame window where
+# "do the clones attack too?" is actually answerable.
+#
+# Same POKES as rig 98 (P1 char under test, P2 Victor, stocks banked):
+# POKES="1400:ff8782:10;1450:ff8782:10;1500:ff8782:10;1400:ff8b82:03;1450:ff8b82:03;1500:ff8b82:03;3100:ff8509:03;3120:ff8509:03"
+300-305 sys=C1
+420-425 sys=C2
+800-803 sys=S1
+940-943 sys=S2
+1100-1102 p2=R
+1160-1162 p2=R
+1300-1302 p1=1
+1360-1362 p2=1
+# activate Dark Force: HP+HK with stocks poked at f3100/f3120
+3260-3263 p1=36
+# DF walk — the clones trail the movement (rig-85 pattern)
+3340-3450 p1=R
+# plant, then the freeze ray while clones are live
+3470-3472 p1=D
+3473-3475 p1=DR
+3476-3478 p1=R1
+# a second walk + ray inside the window, in case ray 1 lands during
+# clone despawn
+3560-3620 p1=R
+3630-3632 p1=D
+3633-3635 p1=DR
+3636-3638 p1=R1
+5000 wait
