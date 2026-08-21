@@ -1,5 +1,45 @@
 # STATE — living progress log
 
+## Session 14z-101 (8) — #109's MECHANISM FINALLY MEASURED against the
+## TRUE native clone-mode reference: ours draws the clone beams 0xA00
+## LOW — the 14z-71 bias class through a path the ray fix never covered
+
+**The identification chain (maintainer + sweep):** the clone-mode EX
+is **263+2P** (any two punches, 1 stock — sweep attempt B, seq 0x12,
+the PINK transform); my earlier "236+2P reference" was the ES (the
+buffer folds 6236 to 236, exactly as the maintainer explained); sweep
+A (green orbs) = the ES's charge; C (DF,DF+2P, seq 0x18 multi-body,
+no stock) remains unidentified/possibly a state interaction — not
+needed further.
+
+**The native reference (rig `tests/replays/df/102_clone_mode_native.rpl`
+— activation, movement, three spaced attacks):** 1 stock at
+activation; 2× type-0x48 clones PERSIST without movement (the
+263-entry differs from ours' DF in that respect); the clones VISIBLY
+fire on Phobos' attacks (snapshots: segmented green bursts, then a
+long solid beam — sent to the maintainer), with cooldown across the
+attack spacing.
+
+**The sprite-level A/B (per-clone ×2 entry sets at the attack):**
+| piece | native | ours | verdict |
+|---|---|---|---|
+| cycling segments 2x1 pal 03 | 0x4D00/02/06/08/0C | 0x4302/0A/0C | **0xA00 LOW** |
+| muzzle 2x1 pal 0A | 0x4DA7, 0x4DB0 | 0x4DA7 | partially correct |
+| beam body | 0x4DD0 pal 0A 6x2 | 0x3D64/6C pal 03 2x3 | wrong family+size |
+`-0xA00` is the project's NAMED signature (14z-71: "ported vs2 data
+drew art 0xA00 low", vsav bias 0x3800 vs vs2 0x4200). The pieces
+reach the drawer through a path the ray fix's per-child dispatch
+never covered; 0x4DA7 being already-correct shows the existing remap
+machinery grazes the family. Fix + verification pair on #109 (window
+work, beside #107): ours' codes must match native's family, render
+visibly, and the close-range damage A/B (damage+hitstun, no freeze,
+cooldown) must agree.
+
+**Retraction bookkeeping:** (5)'s "drawn-but-invisible markers" and
+(7)'s "never drawn" were each half-right; both carry in-place marks
+pointing here. The marker-train fixture (pal-00, both games) stays a
+recorded curiosity. #109 retitled to the measured mechanism.
+
 ## Session 14z-101 (continued) — DF MECHANICS MEASURED ours-vs-native
 ## (the field pass's named unknown): the GAMES' DF FRAMEWORKS DIFFER
 ## (cost 1 vs 2 stocks, per-char durations vs uniform 332, activation
@@ -78,6 +118,11 @@ the confirmed reading.
 ## ours; mechanism open pending the true native clone-mode leg. The
 ## bias/bank arithmetic below is real about the MARKERS, wrong about
 ## the defect. See (7) and the corrected #109.]
+## [AND (7)'s "no beam visual is EVER drawn" OVER-CORRECTED — final
+## mechanism at (8): ours DOES emit the per-clone beam pieces at the
+## attack, with codes 0xA00 LOW (0x43xx where native uses 0x4Dxx) +
+## one mis-familied body piece — the 14z-71 "art 0xA00 low" bias
+## class through a path the ray fix never covered. See (8).]
 
 **The maintainer's precise question** ("I can hear some beam sound but
 don't see the beams — graphically unrendered, or fully missing except
