@@ -1,5 +1,46 @@
 # STATE — living progress log
 
+## Session 14z-101 (11) — #109 WINDOW PREP COMPLETE: the defect
+## decomposes into TWO located sub-defects, the fix designs are chosen,
+## and the sweep tool is committed. The window session starts from the
+## issue's prep comment.
+
+**A1 (segments): a SHARED ENGINE emitter, art simply absent.** The
+cycling pieces come from a byte-identical shared table — **vsavj
+`0x89CF8` == vs2 `0x99542`** (seven `(0x0B00..0x0B0C, 0x0103)`
+entries, twin blocks identical 0x2B7 bytes around the anchor,
+diverging only at the per-game pointer lists that follow). The engine
+applies its generation bias at draw (+0x3800 → ours 0x43xx; +0x4200 →
+native 0x4Dxx); vsavj ships NO art at its composed positions (the
+measured invisibility is the blank-occupancy proof). FIX: the 14z-85
+owner-tag-gated compose thunk (tenant object → group-C bank + shifted
+codes; else vanilla byte-for-byte) + the 14z-71 strip-tiles copy.
+REJECTED by default: writing art into vsav.zip's own banks (fixed
+positions; would regress pristine-vsav.zip). Remaining: the compose
+site's PC (ref-scan 0x89CF8 + read tap during df/100), bank word.
+
+**A2 (body/muzzle): pointer-selected art, a separate sub-defect.**
+Native `0x4DD0 pal0A 6x2` vs ours `0x3D64/6C pal03 2x3` is NOT bias:
+each game's emitter follows ITS OWN pointer list (vj 0x39A7E0/
+0x3A94E0-family vs v2 0x3B091C/0x3BDC1C-family — the twin blocks'
+exact divergence point) to its own era's art. FIX: standard data_port
+(identify consumed rows by read tap, port rows + art to group C).
+Also explains ours' one already-correct piece (0x4DA7).
+
+**B (the confirmed all-sites sweep): `tools/enum_biased_lists.py`
+COMMITTED** — every type-4/6/8/12 list across ALL placed regions,
+classified against the retype machinery; FP caveats in the header
+(hitbox/aux hits are census-heuristic FPs). hui45: 24 covered children
+(matches the takeover's own count) + 22 UNCOVERED of which anim
+0x2499F0/0x249B18 and x2b7ef4 0x2BC09A/0x2BC0F8 are the real review
+items; don_m9: the known 1 + FP noise. Window: filter, resolve, freeze
+as a gate.
+
+**C (verification, already built):** rig df/100 flips (native-family
+codes + visible + close-range damage A/B vs df/102); the paired-draw
+census as the generalized instrument; #107's row flip rides the same
+window. Full design: the #109 prep comment.
+
 ## Session 14z-101 (8) — #109's MECHANISM FINALLY MEASURED against the
 ## TRUE native clone-mode reference: ours draws the clone beams 0xA00
 ## LOW — the 14z-71 bias class through a path the ray fix never covered
