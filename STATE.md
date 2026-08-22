@@ -935,7 +935,62 @@ Original write-up kept below.
 
 ## Decisions pending (human)
 
-- **MiSTer ALIGNMENT (14z-106) — five questions before any RTL.** Built
+- ~~**MiSTer ALIGNMENT (14z-106) — five questions before any RTL.**~~
+  **ALL FIVE RULED (maintainer, 2026-08-22).** Rulings, then what each
+  one commits us to; the original brief follows unchanged.
+  1. **Base tree — RULED: a SEPARATE CORE**, so the reference CPS-II
+     core stays separately usable; ours respects Jotego's licence(s) and
+     is FOSS "if the licensing scheme allows"; the exact fork mechanism
+     is left to my proposal. **Facts (jtcores README, checked
+     2026-08-22):** jtcores and jtframe are **GPL-3.0** ("you are
+     obliged to publish your code if you use mine") — so our core is
+     FOSS by obligation, not just preference, and must ship its source.
+     **PROPOSAL (my recommendation, open to veto):** (a) a PUBLIC fork of
+     `jotego/jtcores` under the maintainer's GitHub, GPL-3.0 retained,
+     branched from a pinned upstream tag; (b) a NEW core directory
+     (working name `cores/cps2w`, final name TBD) that reuses the cps2
+     RTL the way cps1/cps15/cps2 already share it through jtframe
+     macros, producing its OWN RBF (`jtcps2w.rbf`) — the stock
+     `jtcps2.rbf` is never rebuilt or touched; (c) pinned here as
+     submodule `emu/jtcores` on the fork branch, with the fork's diff
+     mirrored as `emu/jtcores-patches/0001-*.patch` for review — the
+     MAME/FBNeo pattern, and what keeps Rule 1 v2's "small,
+     human-reviewable set of declarative lines" honest on a third
+     implementation; (d) upstream PR later, at the maintainer's
+     discretion — the separate-core shape is what makes one possible.
+     FIRST TASK of the arc: read the fork and VERIFY (b)'s sharing
+     mechanism — it is my reading of the tree layout, not a measurement.
+     **LICENCE GAP SURFACED:** this repository carries NO LICENSE file.
+     The core fork is GPL-3.0 by obligation; the licence of THIS tree
+     (tools, patches, docs, authored assets) is the maintainer's call and
+     is now a pending decision (below).
+  2. **Profile shape — RULED: measure first, choose on numbers** (the
+     recommendation adopted). Arc task: merged-m6 GFX occupancy per
+     group/bank + the real PRG extent, then the fit options.
+  3. **Governance/oracle — RULED: the recommendation adopted** — Rule 1
+     v2 extends verbatim; jtframe/Verilator SIMULATION is the gate,
+     HARDWARE is the field test (the MAME-oracle / playtest split).
+  4. **Environment — RULED: MiSTer with a single SDRAM module, plus a
+     Jammix extension card** (CRT at original resolution/frequencies —
+     the field test can be made on real video timing). **OPEN DETAIL:
+     which module size?** jtcps2's own docs: CPS2 games with >= 16 MB GFX
+     need a 64 MB module; a MiSTer-shaped WIDE (GFX up to 32 MB + PRG +
+     QSound 16 MB) needs at least 64 MB and likely 128 MB
+     (JTFRAME_SDRAM_LARGE). Confirm before the profile numbers are fixed.
+  5. **Distribution — RULED: MRA + RBF over the same release members**,
+     covered by the tagged release; stock `vsavj` in the MRA "if
+     necessary and/or makes sense — argue for/against". **ARGUMENT:**
+     an MRA binds one romset to one RBF, so a stock-`vsavj` MRA aimed at
+     OUR RBF is not redundant with the official core's — it is the
+     STOCK LEG of the emulator superset invariant on FPGA (the patched
+     core running unmodified vsavj must behave as the reference core
+     does), i.e. a test instrument that must exist in-tree regardless.
+     Shipping it in the release too costs one small XML and buys players
+     a same-RBF A/B and a sanity check that their dump is good. Against:
+     a second menu entry people may pick by mistake. RECOMMENDATION:
+     ship BOTH, the stock one labelled "(stock vsavj — reference leg)".
+
+  ORIGINAL BRIEF: **MiSTer ALIGNMENT (14z-106) — five questions before any RTL.** Built
   only from what the record already measured (`docs/project/cps2_wide.md`
   "Known limits", source-verified 14z-86 at jtcores @1ae053f3 + jtdsp16
   @71fa564a; STATE_HISTORY 14z-85/86). The facts: jtcps15 QSound is LLE
@@ -1354,6 +1409,16 @@ Original write-up kept below.
   altered select screen keeping the existing cells and appending the three
   newcomers; hold-Start alternates are the fallback. See 14z-59l.**
 - See SPEC §7 for the rest. Nothing blocks current work.
+
+- **THE REPOSITORY LICENCE (14z-106).** The tree has no LICENSE file.
+  The jtcores fork is GPL-3.0 by obligation; the licence of THIS tree
+  (tools, patches, docs, authored assets — never ROM bytes, rule 7) is
+  undecided. Options: GPL-3.0 across the board (simplest, one licence
+  for the whole deliverable); MIT/BSD for tools + GPL-3.0 only for the
+  core fork (more permissive tooling, two licences to explain); CC for
+  docs/assets on top of either. RECOMMENDATION: GPL-3.0 for the whole
+  tree — one licence, compatible with the core by construction, and the
+  maintainer's stated wish is FOSS. Maintainer's call.
 
 ## THE DEADNESS REGISTER (opened 14z-71, maintainer's standing instruction)
 

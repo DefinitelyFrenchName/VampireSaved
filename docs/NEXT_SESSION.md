@@ -60,7 +60,11 @@
 > ## verified = patches 0001+0002). **MiSTer FRAMING RECORDED (maintainer):
 > ## the deliverable is an EXTENSION OF JOTEGO'S jtcps CORE, not an FPGA
 > ## re-implementation of the MAME emulation.** Before any RTL: the
-> ## alignment questions in STATE "Decisions pending — MiSTer alignment".
+> ## alignment questions in STATE "Decisions pending — MiSTer alignment"
+> ## — ALL FIVE RULED 2026-08-22: separate core (GPL-3.0 fork of jtcores,
+> ## own RBF), measure-then-choose profile, sim = gate / hardware = field
+> ## test, MiSTer + Jammix available (SDRAM SIZE TO CONFIRM), MRA+RBF with
+> ## a stock-vsavj reference-leg MRA. OPEN: the repo's own LICENSE.
 > ## The N-2 build-dir
 > ## deletion policy applies at the NEXT freeze (m10/m19/m13/merged-m5
 > ## dirs are now one-back; m9/m18/m12/merged-m4 + m5_stock4 are N-2 and
