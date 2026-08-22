@@ -1,5 +1,43 @@
 # STATE — living progress log
 
+## Session 14z-104 (4) CLOSE — COVERAGE GAP 2 CLOSED (the §4 matrix is
+## fully green), THE WINDOW PREPPED (Oboro hook + version string, the
+## complete spec in NEXT_SESSION), session closes on the maintainer's
+## instruction with the window as the next session's opening arc.
+
+**Rulings recorded (maintainer, 2026-08-22):** coverage items 1+2 GO
+(both now done); Shadow/Marionette OUT OF SCOPE for now; the OBORO
+HOOK + the VERSION STRING ride ONE window with whatever select-spec
+movement they cause; vanilla-vsavj Oboro confirmed as the want ("we
+indeed have nothing to port... if and only if it can be selected" —
+answered with the live demonstration, 14z-104 (3)).
+
+**Gap 2 (audit_edge_cases.sh, 15 legs green on merged-m5):**
+- KO DURING CAPTURE both directions: every tenant kills mid-throw and
+  dies mid-capture with the judge settling (winner 0xFF) — EXCEPT
+  PHOBOS AS THROWER: his throw CANNOT kill — the would-be KO converts
+  to a transient death flag + an HP RESTORE to exactly half (144/144)
+  with no round transition, and NATIVE vsav2 measures the IDENTICAL
+  frame shape. The third native-anchored grab-family property (beside
+  his untechable sweep and Donovan's tech-neutral throw).
+- DOUBLE KO: mirror matches at 1 HP with same-frame jabs TRADE, and
+  the judge writes the DRAW code — $FF8120 == 0x00 measured, the
+  winner byte's third value (atlas row updated).
+- FRAME-1 EX: the DP+2K input on the first live frame — Phobos and
+  Pyron FIRE their EX from frame one (stock decrements); Demitri and
+  Donovan produce an action without a spend (their EX grammars
+  differ); frozen per leg.
+
+**The window prep (complete spec in NEXT_SESSION):** W1 the Oboro hook
+(Gallon-path template PRG:0x020B9C, Start source $FF8060 with a
+verify-at-select first measurement, profile-gated site-thunk, probe
+rehearsal, 0x18 QA legs); W2 the version string (select-screen
+placement inside the ratified window; wheel-record extension via the
+existing [[select_wheel]] copy machinery; vanilla-font-tile hunt vs
+authored group-C blob; manifest knob; the exact text is the
+maintainer's call at the window). The freeze tail moves every WIDE
+artifact; stock must stay bit-identical (both features profile-gated).
+
 ## Session 14z-104 (3) — COVERAGE GAP 1 CLOSED (tech roll + throw
 ## tech, both directions, native-anchored where the answer surprised),
 ## and THE OBORO QUESTION ANSWERED WITH A LIVE DEMONSTRATION.

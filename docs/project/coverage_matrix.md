@@ -36,10 +36,14 @@ judged on the 2P-competitive surface.
 1b. **Pursuit CONNECT (the hit half)** — still open: needs a rig where
    the flat window outlasts the flight on both games; the whiff half
    (roll evasion) is now measured and gated.
-2. **KO-frame / corner / frame-1 edge cases per tenant** — §4's
-   edge-case bias is served incidentally (mash/fuzz rigs, the guard
-   corpus) but no tenant rig deliberately targets KO-frame events or
-   corner interactions.
+2. ~~KO-frame / corner / frame-1 edge cases~~ **CLOSED 14z-104 (4)** —
+   `audit_edge_cases.sh` (15 legs green on merged-m5): KO-during-capture
+   both directions (Phobos' NO-KILL half-restore throw frozen
+   native-anchored — vsav2 measures the identical frame shape); mirror
+   double-KO trades draw (the winner byte's third value, 0x00); frame-1
+   EX inputs serve (hui/pyr fire, ctl/don act without a stock spend).
+   Corner interactions are additionally covered by the pursuit corner
+   measurement and the tech-roll wall-block leg.
 3. Shadow/Marionette interaction rigs — only if the modes are ever
    enabled (see the measurement note).
 

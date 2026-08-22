@@ -5,50 +5,79 @@
 > ## stock twin m5_stock5). No shipped byte has moved since. PLAY:
 > ## `tools/run_wide.sh build/m3b_merged12 fbneo`.
 >
-> ## **14z-104 = THE §4 COVERAGE DEBT TACKLED (maintainer-directed).**
-> ## The mandate is now a measured, maintained matrix —
-> ## `docs/project/coverage_matrix.md` — and SIX new audits are green
-> ## on merged-m5: audit_df_framework (the ruled DF table),
-> ## audit_tenant_timeout + audit_tenant_downwin (the judge both
-> ## entrances, every tenant as winner AND victim — the #103-class
-> ## lock), audit_tenant_throws (both directions),
-> ## audit_down_attack (the "pursuit" cell, both directions),
-> ## audit_stage_sweep (every tenant x 12 stages with contact).
-> ## audit_roster_pairings re-ran 111/111 on merged-m5 (~5 min — run
-> ## at every freeze). New atlas rows: $FF8120 round-winner code,
-> ## $FF810E rounds counter, $FF8109 timer poke recipe, the $FF8100
-> ## stage-poke window (f2150-2250).
+> ## **THE NEXT SESSION IS A WINDOW SESSION (maintainer-directed
+> ## 2026-08-22): THREE items ride ONE freeze — (1) the OBORO SELECTION
+> ## HOOK, (2) the IN-GAME VERSION STRING, (3) any select-spec movement
+> ## they cause. Both changes live INSIDE the ratified select-window
+> ## divergence class, which is what makes them cheap. The plan below is
+> ## the complete spec; implement on probes, rehearse, then the 14z-99
+> ## freeze rhythm.**
 >
-> ## **RULINGS RECORDED (maintainer, 2026-08-22):** cosmetic /
-> ## single-player DEFERRED INDEFINITELY; beam + DF/clone colors GOOD,
-> ## DF time GOOD; the IN-GAME VERSION STRING is APPROVED — it moves
-> ## shipped bytes, so it RIDES THE NEXT FREEZE WINDOW (queued work
-> ## item, CLAUDE.md §5 convention, open since 14z-92); release
-> ## packaging is real but its before/after-MiSTer ordering is the
-> ## maintainer's open question.
+> ## **W1 — THE OBORO HOOK (maintainer-ruled: vanilla vsavj Oboro, not
+> ## a vs2 port).** vsavj ships Oboro complete at variant id 0x18 (base
+> ## 0x0B3450); the commit path accepts the id end-to-end TODAY
+> ## (demonstrated live 14z-104 (3), snapshot confirmed). The hook =
+> ## Bishamon's cell + START held at confirm -> commit 0x18 instead of
+> ## 0x08. THE TEMPLATE IS VANILLA'S OWN: the Gallon-variant path at
+> ## PRG:0x020B9C writes id 0x12 as an immediate on cursor+input
+> ## conditions (select_screen.md decodes the whole confirm path,
+> ## incl. the $43/$45 override and the shared-scratch caution).
+> ## Start-held source: the per-player Start bitmask $FF8060 (the
+> ## flavor latch's byte — VERIFY IT IS LIVE AT SELECT TIME first, it
+> ## was measured through char-init). Emission: a profile-gated
+> ## site-thunk in the confirm path (the generator's site_thunk
+> ## machinery); superset: the hook's cycles land inside the select
+> ## window, and without Start it must be branch-inert. Rehearse on a
+> ## probe; the naked-eye tell is picking Oboro by hand.
+> ## First QA: extend the poke-generic audits with 0x18-as-P1 legs
+> ## (roster_pairings already covers him both sides).
 >
-> ## **THE PURSUIT QUESTION IS ANSWERED (maintainer, 2026-08-22):**
-> ## vsav retains the NW leaping pursuit (universal U + any P/K; ES on
-> ## two buttons; tech roll counters it). Found and instrumented same
-> ## session — the input registers during the knockdown FALL (my first
-> ## screen was too late), and `audit_pursuit_leap.sh` is green 8/8:
-> ## every tenant's ported pursuit fires with its own arc, every downed
-> ## tenant accepts targeting, no-knockdown control clean. Mechanics in
-> ## engine_internals "THE LEAPING PURSUIT". OPEN REFINEMENT: pursuit
-> ## CONNECT (a wake-vs-flight knife edge even on the all-legacy
-> ## control) — coupled to the tech-roll rig family in the matrix.
+> ## **W2 — THE VERSION STRING (CLAUDE.md §5, open since 14z-92;
+> ## maintainer-approved).** Placement: the SELECT SCREEN (the one
+> ## roster-owned always-visited surface — attract/title would violate
+> ## the superset invariant, select already diverges under the ratified
+> ## window). Mechanism: EXTEND THE COPIED WHEEL RECORD — the
+> ## [[select_wheel]] machinery already copies the one static OBJ
+> ## record (0x272A68) to group C with 21 cells and repoints it
+> ## (gen_donovan_patch.py:4731+); append N glyph sprites at a screen
+> ## corner. Tiles: EITHER vanilla font tiles addressed at their
+> ## vanilla codes (the record's per-entry attr can address vanilla
+> ## banks — hunt the OBJ font first, e.g. the "FIRST ATTACK" glyphs)
+> ## OR a small authored tile blob into group C (precedent:
+> ## effect_tail.json is authored gfx content). Manifest knob (e.g.
+> ## version_text under [[select_wheel]]) so the string moves with the
+> ## registry generation, not with a hex edit. The string should name
+> ## the freeze generation (e.g. "M6") — decide the exact text with
+> ## the maintainer at the window.
 >
-> ## **REMAINING COVERAGE GAPS (the matrix's list):** tech-hit (throw
-> ## escape) AND tech-roll rigs both directions (the roll also unlocks
-> ## pursuit-connect); deliberate KO-frame/corner/frame-1 edge rigs per
-> ## tenant; Shadow/Marionette N/A-until-enabled.
+> ## **THE FREEZE TAIL (the 14z-99/102 rhythm):** both changes move
+> ## every WIDE artifact (the wheel record is in every build) ->
+> ## rebuild don_m11-class / hui47 / pyron31 / merged13 + stock twin
+> ## (stock UNTOUCHED by construction — both features are
+> ## profile-gated; verify bit-identity); run_suite freeze+verify x3
+> ## (select-window specs MOVE: more sprites/cycles shift the window
+> ## end — expected, re-freeze within the ratified class); battery;
+> ## merged gates; registry rows + tags; the STANDING RE-POINT SWEEP
+> ## (now including: the m3b_merged11 one-back audit defaults, the
+> ## 14z-103/104 audit BUILD defaults incl. the seven new coverage
+> ## audits, m2a_flicker_gate SET pin, region_overlap trio constants,
+> ## test_build_identity_distinct PLAY pin).
 >
-> ## **CARRY TO THE NEXT FREEZE'S RE-POINT SWEEP** (unchanged from
-> ## 14z-103): the m3b_merged11 one-back audit defaults, the defaults
-> ## 14z-103 set, the flicker-gate SET pin, region_overlap's trio
-> ## constants — PLUS the six new audits' BUILD defaults and the
-> ## version-string item above. Commits LOCAL — push on the
-> ## maintainer's word.
+> ## **COVERAGE IS RETIRED (14z-104, both gaps closed):** the §4
+> ## matrix (docs/project/coverage_matrix.md) is green on every cell —
+> ## seven new audits at 14z-104 (df_framework, tenant_timeout,
+> ## tenant_downwin, tenant_throws, down_attack, pursuit_leap,
+> ## stage_sweep) + tech_roll + throw_tech + edge_cases (gap 1+2).
+> ## Native-anchored discoveries en route: Phobos' untechable sweep,
+> ## his NO-KILL half-restore throw (144/144, native-identical),
+> ## Donovan's tech-neutral 5/5 throw, the draw code $FF8120=0x00.
+> ## Remaining opens: pursuit-connect's hit half (knife-edge, coupled
+> ## to a longer-knockdown rig) and Shadow/Marionette
+> ## (N/A-until-enabled, out of scope by ruling 2026-08-22).
+>
+> ## **AFTER THE WINDOW, the roadmap forks on the maintainer's open
+> ## question: release packaging before or after MiSTer core surgery.**
+> ## Commits are LOCAL — push on the maintainer's word.
 
 ## What 14z-103 did (the whole arc, one screen)
 

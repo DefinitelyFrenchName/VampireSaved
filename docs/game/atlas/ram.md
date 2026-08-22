@@ -81,7 +81,7 @@ measured mechanism + maintainer sign-off.
 | `RAM:$FF8114` | the SELECTOR into the voice-class borrow pool (`0x00af10` reads `pool[$FF8114]`). **Nothing measured yet bounds it below the terminator index** — at the #92 crash it was 2 and the pool's terminator was at index 2 | [D: 14z-93] |
 | `RAM:$FF8109` | round timer (counts down ~1/sec during match) | [D] |
 | `RAM:$FF810E` | rounds-completed counter (0 at match start; +1 per settled down, KO and timeout paths both) | [D: 14z-104, timeout+KO probes on merged-m5] |
-| `RAM:$FF8120` | ROUND WINNER code, written when a down settles: 0xFF = P1 won the down, 0x01 = P2 won. Verified DISCRIMINATING both directions (P1-lead and P2-lead timeouts judged opposite ways). Consumed by audit_tenant_timeout / audit_tenant_downwin | [D: 14z-104] |
+| `RAM:$FF8120` | ROUND WINNER code, written when a down settles: 0xFF = P1 won the down, 0x01 = P2 won, **0x00 = DRAW (double KO — measured on mirror trades, 14z-104 (4))**. Verified discriminating in all three directions. Consumed by audit_tenant_timeout / audit_tenant_downwin / audit_edge_cases | [D: 14z-104] |
 | `RAM:$FF8127` | P1 downs-won counter (0->1 seen on a P1 win; P2 twin not yet located — do not assume adjacency) | [D: 14z-104, single probe — weakest of the three rows] |
 | `RAM:$FF05xx` | sound-driver work area (differs between MAME/FBNeo boot phase). **RATIFIED §4 phase class 14z-93 (GitHub #78, maintainer 2026-08-16)** for the FBNeo legacy oracle: the window `$FF0500-$FF05FF` may differ on FBNeo where MAME shows zero at the same frame, bounded by the FROZEN inventory `$FF055B-$FF055D` in `tests/test_fbneo_legacy_oracle.sh`. Not gameplay state; growth outside the inventory FAILS rather than widening | [D] |
 
