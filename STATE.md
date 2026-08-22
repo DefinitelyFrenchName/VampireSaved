@@ -27,8 +27,9 @@ fix".
   damage 19+8), ours lagging by the documented few-frame skew only.
   Full-throw side-by-side contact sheets (every 4th frame, 3152-3268)
   sent to the maintainer. Strength and mashing change nothing on
-  either game. NOT REPRODUCED; awaiting scenario detail (opponent,
-  state, emulator) if the maintainer still sees it in hand.
+  either game. NOT REPRODUCED — and CLOSED by the maintainer
+  (2026-08-22, "Circuit Scrapper seems fine indeed") after reviewing
+  the contact sheets. No item remains.
 
 **#110 fixed (the full chain on the issue, closed):**
 - The bisect sharpened by measurement: field-level A/B m6-vs-m7 on the

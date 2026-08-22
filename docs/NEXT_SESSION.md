@@ -57,15 +57,11 @@
 > ## don_m10/m3b_merged12 defaults this pass just set, and
 > ## test_region_overlap section-5 constants (re-measure the trio).
 >
-> ## **OPEN CONFIRMATION LOOP — the Circuit Scrapper report (14z-103
-> ## (2)):** the maintainer might have seen a missing opening slam
-> ## cycle vs VS2. MEASURED NOT REPRODUCED: rig 80 at MP, HP, and with
-> ## mashing, native-vs-merged-m5 — all six runs structurally identical
-> ## (one slam, same hold, same launch, damage identical), contact
-> ## sheets sent. If they still see it in hand, the next question is
-> ## their exact scenario: opponent, character state, emulator
-> ## (FBNeo?), and whether a WIDE_RECORD .inp can be taken (14z-99
-> ## protocol) — an .inp reproduces the exact event for any instrument.
+> ## **The Circuit Scrapper report is CLOSED (maintainer, 2026-08-22:
+> ## "seems fine indeed")** after the measurement: rig 80 at MP, HP,
+> ## and with mashing, native-vs-merged-m5 — all six runs structurally
+> ## identical (one slam, same hold, same launch, damage identical),
+> ## contact sheets confirmed in hand. No item remains.
 > ##
 > ## Commits are LOCAL — push on the maintainer's word. The attic
 > ## deletion stays the maintainer's playtest-cycle call (the #110 diff
