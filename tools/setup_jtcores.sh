@@ -14,6 +14,8 @@
 # in-tree file (CLAUDE.md rule 1 v2) — tests/test_jtcores_twin.sh holds
 # the patch, the submodule and the core twin to each other.
 #
+# Simulation lane deps (brew): go coreutils gnu-sed xmlstarlet verilator
+# imagemagick — docs/platform/mister.md "Recipe".
 # NEVER init modules/jtframe/target/pocket: it is a PRIVATE ssh submodule
 # (git@github.com:jotego/pocket.git) and `--init --recursive` aborts on it.
 #
@@ -42,7 +44,9 @@ if [ -n "$(git -C "$SRC" status --porcelain --ignore-submodules=all)" ]; then
     echo "branch and move PINNED, or \`git -C emu/jtcores checkout .\`" >&2
     exit 1
 fi
-git -C "$SRC" submodule update --init modules/jtdsp16
+# The modules the cps2 yaml chain pulls (cps1/common.yaml, cps15/qsound.yaml):
+# fx68k (68000), jt12/jt51 (via common.yaml), jteeprom, jtdsp16 (QSound DSP).
+git -C "$SRC" submodule update --init modules/fx68k modules/jt12 modules/jt51 modules/jteeprom modules/jtdsp16
 echo "jtcores @ $HEAD (fork of v1.7.3 $UPSTREAM_TAG_SHA); jtdsp16 $(git -C "$SRC" submodule status modules/jtdsp16 | cut -c2-41)"
 
 # The reviewable mirror of the fork's delta.

@@ -126,6 +126,51 @@ cps2w differs by `CORENAME=JTCPS2W` only.
 - jtframe's MiSTer *target* does not simulate cleanly (sys files); the
   Verilator path simulates the game top, which is what we need.
 
+## Recipe: the simulation lane on macOS (measured 14z-106, works)
+
+1. `brew install go coreutils gnu-sed xmlstarlet verilator imagemagick`
+   (jtframe's bash tooling needs GNU `realpath --relative-to`, `sed -i`,
+   `stat -c`, `date -d`; `getset.sh` needs xmlstarlet; frame output needs
+   ImageMagick `convert`).
+2. `tools/setup_jtcores.sh` — pins `emu/jtcores`, inits the modules the
+   cps2 yaml chain pulls (`fx68k jt12 jt51 jteeprom jtdsp16`; never the
+   private `pocket` target), builds the Go tool. **Simulate in a SCRATCH
+   CLONE of the fork, never inside `emu/jtcores`** — jtsim writes
+   `obj_dir/`, `sdram_bank?.bin`, `frames/`, `rom.bin` into
+   `cores/<core>/ver/game/`, which would dirty the pinned submodule.
+3. ROM access for the MRA tool: `mkdir -p ~/.mame/roms` and SYMLINK
+   `vsav.zip`, `vsavj.zip` and `qsound.zip -> qsound_hle.zip` (it holds
+   `dl-1425.bin`) from `$ROMDIR`. Outside the tree; nothing copied.
+4. Environment (what `setprj.sh` exports; it needs `python`, so export by
+   hand): `JTROOT=<clone> JTFRAME=$JTROOT/modules/jtframe CORES=$JTROOT/cores
+   ROM=$JTROOT/rom RLS=$JTROOT/release JTBIN=$RLS MRA=$RLS/mra
+   POCKET=$JTFRAME/target/pocket MODULES=$JTROOT/modules MAME=$JTROOT/doc/mame`
+   and `PATH=<gnubin dirs>:$PATH:.:$JTFRAME/bin`.
+5. `jtframe mra cps2w` (binary at `$JTFRAME/src/jtframe/jtframe`) → the
+   MRAs in `release/mra/` AND `rom/vsavj.rom` (46,407,744 bytes, sha1
+   `f9dc2987…`) — the `.rom` is ROM content: scratch only.
+6. First run, from `cores/cps2/ver/game`:
+   `jtsim -verilator -sysname cps2 -setname vsavj -load -video 3` —
+   Verilator builds the core and the ROM download runs in simulated time
+   (`ROM file transfered (frame 462)`), dumping `sdram_bank0-3.bin`
+   (4 × 16 MB). **10'43" wall on this machine**, once. Later runs drop
+   `-load` and start from the dumps. The harness prints `ERROR: SDRAM
+   rd/wr inputs should be zero during initialization` at start and
+   continues — upstream's own runs show it too; not ours to chase unless
+   it correlates with a divergence.
+7. **Per-frame cost, measured:** a second run (`-video 30`, no `-load`)
+   STILL re-ran the download (`ROM file transfered (frame 462)` again —
+   `-setname` re-links `rom.bin`; whether dropping `-setname` reuses the
+   `sdram_bank?.bin` dumps is the first thing to check next time) and
+   finished in 11'20" for 492 simulated frames → **~1.4 s per frame**
+   on this machine (Apple Silicon, Verilator 5.050). Budget: a
+   select-reaching 1,000-frame run ≈ 25 min; `05_timeout_idle` (12,000
+   frames) ≈ 4.6 h. Fine for a gate that dumps at a few §4 anchors; not a
+   per-frame sweep of the 46-replay corpus. Frames: `frames/frame_00480.jpg`
+   shows sprites on screen by frame 480 (18 frames after the load) — the
+   core runs vsavj. Logs: scratchpad `jtsim_fourth.log` / `jtsim_fifth.log`
+   (not committed; they carry no ROM bytes but are run litter).
+
 ## Measured 14z-106: the twin proof
 
 `jtframe mra cps2` emits 316 MRAs; `jtframe mra cps2w` emits 7 — the

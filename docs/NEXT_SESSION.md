@@ -75,7 +75,11 @@
 > ## REQUIRED; PRG needs 4.82 MB (+ a 30-B pin at 0x5FFF00); QSound ext =
 > ## banks 0x80-0x8E (all aliasing → width fix required). PENDING RULING:
 > ## WIDE v1 VERBATIM on a 128 MB tier (recommended) vs a tighter MiSTer
-> ## profile. NEXT: slice C (Verilator oracle proof on the STOCK core).**
+> ## profile. **SLICE C: THE SIM LANE WORKS** (stock jtcps2 + vsavj under
+> ## Verilator on this Mac, ~1.4 s/frame, recipe in mister.md; `.rpl` →
+> ## `sim_inputs.hex` translator gated). NEXT OPENER: the RAM comparison
+> ## at a §4 anchor (05_timeout_idle translates; check whether dropping
+> ## `-setname` reuses the sdram dumps first), then the pending ruling.**
 > ## The N-2 build-dir
 > ## deletion policy applies at the NEXT freeze (m10/m19/m13/merged-m5
 > ## dirs are now one-back; m9/m18/m12/merged-m4 + m5_stock4 are N-2 and

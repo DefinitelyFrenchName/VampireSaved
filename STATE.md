@@ -1,5 +1,36 @@
 # STATE — living progress log
 
+## Session 14z-106 (4) — SLICE C: THE SIMULATION LANE WORKS ON macOS
+## (stock jtcps2 running vsavj under Verilator, frames rendered, ~1.4 s
+## per frame); the translator + its gate landed; the oracle COMPARISON
+## itself is the next session's opener
+
+- **Recipe proven** (`docs/platform/mister.md` "Recipe"): brew go coreutils
+  gnu-sed xmlstarlet verilator imagemagick; modules fx68k/jt12/jt51/
+  jteeprom/jtdsp16 (setup_jtcores.sh now inits all five); `~/.mame/roms`
+  symlinks to `$ROMDIR` (outside the tree); `jtframe mra cps2w` builds
+  `rom/vsavj.rom` (scratch only); `jtsim -verilator -sysname cps2 -setname
+  vsavj -load -video N` from `cores/cps2/ver/game` IN A SCRATCH CLONE
+  (never inside `emu/jtcores` — jtsim litters the core dir). Four
+  attempts to get there, each a missing GNU tool or module, all recorded.
+- **Measured:** Verilator builds the core; the ROM download takes 462
+  simulated frames (10'43" wall, once — dumps `sdram_bank0-3.bin`); a
+  492-frame run = 11'20" → **~1.4 s/frame**; `frame_00480.jpg` shows
+  sprites — vsavj runs. The harness prints `ERROR: SDRAM rd/wr inputs
+  should be zero during initialization` every run and continues (upstream
+  behaviour; noted, not chased).
+- **`tools/rpl2siminputs.py` + `tests/test_rpl2siminputs.sh`** (ci_
+  portable): `.rpl` → jtframe v1.7.3 `sim_inputs.hex` (one hex word per
+  frame, applied entering blanking; P1 + 3 usable buttons — button 4
+  doubles as dip_test; NO P2). Refuses what the harness cannot express,
+  loudly. Of the legacy replays, `01_attract_long` and `05_timeout_idle`
+  translate; `04_select_fuzz` / `02_demitri_vs_cpu` refuse on button 4.
+  Extending `test.cpp` (P2, 6 buttons) is fork work when needed.
+- **NOT DONE — the comparison:** running a translated replay to a §4 sync
+  anchor with `JTFRAME_SIM_IODUMP`, extracting the 68k work-RAM window
+  and comparing against the MAME expectation. Hours of simulation; it is
+  the next opener, with the `-setname`/reload question first.
+
 ## Session 14z-106 (3) — THE MiSTer ARC OPENED: slice A (fork scaffold +
 ## licence) DONE and gated; the twin proof measured; no RTL touched
 
