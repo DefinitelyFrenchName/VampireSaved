@@ -1,5 +1,44 @@
 # STATE — living progress log
 
+## Session 14z-104 (3) — COVERAGE GAP 1 CLOSED (tech roll + throw
+## tech, both directions, native-anchored where the answer surprised),
+## and THE OBORO QUESTION ANSWERED WITH A LIVE DEMONSTRATION.
+
+**Tech roll (audit_tech_roll.sh, 9/9 green on merged-m5):** the roll =
+HELD direction+button through the knockdown landing (a tap does NOT
+register — control leg); every tenant rolls out of a knockdown
+(147/120/120px — their ported recovery states executing); the legacy
+roll works off don/pyr knockdowns; **Phobos' crouch-HK knockdown is
+UNTECHABLE — and native vsav2 measures the identical 14dmg/no-roll**,
+so it is a ported design property, frozen native-anchored; the
+maintainer-described PURSUIT-VS-ROLL counter measured working (leap
+fires, victim rolls 144px, the strike whiffs the vacated spot) — the
+WHIFF half of the pursuit-connect question is now gated.
+
+**Throw tech (audit_throw_tech.sh, 8/8 green):** the tech = the
+victim's own throw input held from grab-connect+2 (same-frame input is
+the separate throw-vs-throw whiff event, deliberately excluded);
+damage halves — every tenant escapes Demitri's throw at the uniform 7;
+Victor techs Phobos 14->7 and Pyron 12->2; **Donovan's throw measures
+5/5 IDENTICAL with and without the tech — and native vsav2 measures
+the same identity**, frozen as the native-anchored tdon expectation.
+No-tech control at the full 13.
+
+**Oboro (maintainer question "can it be selected?", answered live):**
+vsavj has NO player-facing select path (the atlas's unlocated-entry
+hole = the boss-encounter logic), BUT the commit path accepts 0x18
+end-to-end TODAY: poked at select on merged-m5, Oboro loads his own
+native dataset (+0x60 = 0x0B3450, the bases.tsv row) and fights
+(snapshot sent — the pale colorway). The Start-hold hook is exactly
+the existing flavor-latch idiom writing 0x18 on Bishamon's cell —
+selection is OURS to add and is small, profile-gated, freeze-window
+work. vs2's Oboro dataset diffs vsavj's by only 685/8192 sampled bytes
+(the cross-game operand-shift shape) — vanilla-Oboro-as-shipped is the
+fidelity-default recommendation.
+
+Remaining coverage: item 2 only (deliberate KO-frame/corner/frame-1
+edge rigs — next stretch); pursuit-connect's hit half.
+
 ## Session 14z-104 (2) — THE PURSUIT ANSWERED AND INSTRUMENTED: the
 ## maintainer confirmed the NW leaping pursuit (U + any P/K), the
 ## mechanic was found and measured (my earlier screen missed it by

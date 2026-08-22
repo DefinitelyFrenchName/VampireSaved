@@ -23,20 +23,19 @@ judged on the 2P-competitive surface.
 | timeout | **legacy covered; tenants were FIELD-ONLY → rigs 14z-104** | legacy: `05_timeout_idle` (masked). Tenants: field-confirmed 14z-101 but no instrument — now `audit_tenant_timeout.sh` (HP-lead timeout via the $FF8109 timer poke; the judge must award the down to the leader on $FF8120; lead-existence asserted; inverted control judged the other way; green on merged-m5). |
 | throw/tech: tenant as attacker | **D/H covered; P GAP → rig 14z-104** | D: `65_don_mirror_throw`, `27_don_throw_*`; H: `80_hui_grab_2p` + `test_hui_grab_victim`. P: nothing existed — now `audit_tenant_throws.sh` (rig `judge/02_throw.rpl`): every tenant THROWS the dummy (strength-independent toss verified as the throw discriminator vs the groundbound strike) — green on merged-m5. |
 | throw/tech: tenant as victim | **D covered; H/P thin** | D: `96_don_victor_grab` + `audit_don_grab_pose` (#104). H/P as victims of a legacy command grab: #104 ported every attacker's capture_kf block and the maintainer field-confirmed Victor's grab on tenants; instrument legs for ALL tenants as victims are `audit_tenant_throws.sh`'s v-legs (Victor throws each tenant; capture pose + thrown reaction), green on merged-m5. |
-| tech-hit (throw escape) | **GAP — OPEN** | no rig anywhere produces a throw tech. Needs a 2P rig with simultaneous-window inputs on both sides (edge-case-bias class). Queued; see "Remaining gaps". |
+| tech-hit (throw escape) + tech roll | **COVERED 14z-104 (3)** | `audit_throw_tech.sh`: the tech (victim's throw input held from grab-connect+2) halves damage — every tenant escapes (uniform 7) and every tenant is teched (thui 14->7, tpyr 12->2; tdon = the native-anchored 5/5 identity — vsav2 measures the same); no-tech control at full 13. `audit_tech_roll.sh`: the roll (held direction+button through landing) — every tenant rolls (147/120/120px), the legacy roll works off tenant knockdowns, Phobos' crouch-HK knockdown is UNTECHABLE (native-anchored: vsav2 identical), the PURSUIT-VS-ROLL counter behaves as designed (leap whiffs the vacated spot), tap control clean. |
 | pursuit attacks | **COVERED as DOWN-ATTACKS 14z-104 — naming question OPEN** | zero coverage existed. `audit_down_attack.sh` (rig `judge/03_down_attack.rpl`): every tenant hits a downed victim and every tenant IS hit while downed (8 legs + early-invuln control, green on merged-m5). MEASURED: the engine serves grounded heavies on downed opponents (11-14 dmg, per-character windows: Phobos wakes in 24f); a 12-candidate input screen produced NO leaping Night-Warriors-style pursuit. MAINTAINER QUESTION: does vsav carry a distinct leaping pursuit under some other grammar? If yes it gets its own rig; if no, this cell is closed as-is. |
 | Shadow/Marionette | **N/A-until-enabled (recorded decision, not new measurement)** | class 0x0B is engine machinery, excluded from the roster matrix (`tests/expected/roster_pairings/README.md`). See the measurement note below. |
 
 ## Remaining gaps, in priority order
 
-1. **Tech-hit (throw escape) rigs** — both directions (tenant teches a
-   legacy throw; legacy teches a tenant throw). Simultaneous-press
-   windows; the edge-case-bias class §4 calls out. No instrument yet.
-   The TECH ROLL (moving recovery on knockdown — maintainer 2026-08-22)
-   belongs to the same family and would also unlock the pursuit-connect
-   refinement (a rolled victim is the pursuit's whiff case).
-1b. **Pursuit CONNECT** — see the pursuit row: needs a rig where the
-   flat window outlasts the flight on both games.
+1. ~~Tech-hit + tech-roll rigs~~ **CLOSED 14z-104 (3)** — see the
+   matrix row (audit_throw_tech + audit_tech_roll, incl. the
+   pursuit-vs-roll counter, which settles the WHIFF half of the
+   pursuit-connect question).
+1b. **Pursuit CONNECT (the hit half)** — still open: needs a rig where
+   the flat window outlasts the flight on both games; the whiff half
+   (roll evasion) is now measured and gated.
 2. **KO-frame / corner / frame-1 edge cases per tenant** — §4's
    edge-case bias is served incidentally (mash/fuzz rigs, the guard
    corpus) but no tenant rig deliberately targets KO-frame events or
