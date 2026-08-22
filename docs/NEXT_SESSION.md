@@ -51,8 +51,9 @@
 > ## applier, README; gate `test_release_roundtrip.sh` (round trip
 > ## byte-identical, applier refusals, rule-7 scan). Re-package at every
 > ## freeze with `tools/package_release.py build/<merged>/rompath release
-> ## --romdir $ROMDIR --name merged-mN --version <mark>`. Open: whether to
-> ## publish it as a GitHub release (maintainer's call) — MiSTer comes next.
+> ## --romdir $ROMDIR --name merged-mN --version <mark>`. RULED
+> ## (maintainer, 2026-08-22): stays IN-TREE until MiSTer; a tagged GitHub
+> ## release is cut then, covering both. MiSTer core surgery is next.
 > ## Next: then the roadmap forks on the open question — release
 > ## packaging before or after MiSTer core surgery. The N-2 build-dir
 > ## deletion policy applies at the NEXT freeze (m10/m19/m13/merged-m5

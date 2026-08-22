@@ -30,6 +30,8 @@ Dependency: `xdelta3` (brew install xdelta) — the gate SKIPs without it.
 
 **Release unit decision (mine, open to veto):** merged-m6 only — the
 solos are instruments, the stock twin is never distributed.
+**RULED (maintainer, 2026-08-22): the package stays IN-TREE until
+MiSTer; a tagged GitHub release then covers both.** Pushed.
 
 ## Session 14z-105 CLOSE — the freeze is GREEN end to end; commits
 ## LOCAL, awaiting the maintainer's field test before push
