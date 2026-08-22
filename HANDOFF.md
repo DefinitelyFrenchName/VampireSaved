@@ -170,19 +170,53 @@ must-fire control). Needs `xdelta3` (`brew install xdelta`).
 MiSTer later adds a DISTRIBUTION layer (MRA/core) over the SAME members —
 the patch artifact does not change shape for it.
 
-## MiSTer (14z-106) — the jtcps2w core, scaffolded
+## MiSTer (14z-106/107) — the jtcps2w core + the simulation oracle
 
 Read `docs/platform/mister.md` first. The deliverable is a SEPARATE core
 `jtcps2w` in a public GPL-3.0 fork of jotego/jtcores
 (https://github.com/DefinitelyFrenchName/jtcores, branch `vampire-saved`
 from v1.7.3), pinned as submodule `emu/jtcores` with the delta mirrored
-in `emu/jtcores-patches/`. `tools/setup_jtcores.sh` checks the pin, inits
-`modules/jtdsp16` only, builds jtframe's Go tool and regenerates the
-patch; `tests/test_jtcores_twin.sh` (ci_portable) locks the twin. No RTL
-differs yet. The stock-vsavj reference-leg MRA is produced by `jtframe mra
-cps2w` (byte-identical to stock cps2's except `<rbf>`). Next: slice B
-(`docs/project/mister_fit.md`, the numbers) and slice C (the Verilator
-oracle proof) — STATE 14z-106 (3).
+in `emu/jtcores-patches/` as a PATCH SERIES, one file per fork commit.
+`tools/setup_jtcores.sh` checks the pin, inits the five modules the cps2
+yaml chain pulls, builds jtframe's Go tool and regenerates the series;
+`tests/test_jtcores_twin.sh` (ci_portable) locks pin, twin and series.
+**No RTL differs yet** — the two fork commits are `b9d0565` (the `cps2w`
+cfg scaffold) and `553dd56` (`JTFRAME_SIM_WRAMDUMP`, a 64-line macro-gated
+hook in the Verilator TESTBENCH `modules/jtframe/hdl/ver/test.cpp`). The
+stock-vsavj reference-leg MRA is produced by `jtframe mra cps2w`
+(byte-identical to stock cps2's except `<rbf>`). The fit numbers are in
+`docs/project/mister_fit.md`.
+
+**Running the simulation lane** (14z-107; needs `brew install go coreutils
+gnu-sed xmlstarlet verilator imagemagick`, ~1.0-1.2 s per simulated frame):
+
+```sh
+export ROMDIR=/path/to/reference/sets
+export JTSIM_SCRATCH=/tmp/vampire-saved-jtsim   # NEVER inside the repo
+tools/run_sim_jtcps2.sh tests/replays/05_timeout_idle.rpl /tmp/out107 \
+    --frames 2880 --wram 2540 2880     # ~47 min; run it detached, poll the PID
+python3 tools/compare_fields.py <mame_dumps> /tmp/out107/wram \
+    --fields tests/fields_m2a.tsv --follow 0,60,180 --label-a mame --label-b jtcps2
+```
+
+**Every run pays the ROM download** — 462 simulated frames, ~7-8 min. It is
+not skippable on CPS-2: the transfer also latches the decryption key into
+core registers, so a run with the SDRAM banks preloaded boots into ciphertext
+and work RAM stays all zeros (measured 14z-107). Because the download is
+simulated, it also consumes `sim_inputs.hex` lines, so `--frames`, `--wram`
+and the dump file names are ABSOLUTE (download included) and the `.rpl` is
+shifted by `--offset` (default 462): **a MAME frame `f` sits at simulated
+frame `f + 460`**. `--wram FIRST LAST` writes `wram/dump_<frame>_ff0000.bin`,
+64 KB of 68k work RAM in 68k byte order — the same files the MAME harness's
+`DUMPS=` produces. Nothing ROM-derived may land in the tree: the tool REFUSES
+an out-dir inside the repo (rule 7).
+
+| gate | tier | what it locks |
+|---|---|---|
+| `tests/test_jtcores_twin.sh` | ci_portable | pin, cps2w-vs-cps2 twin, the patch SERIES == `format-patch` per commit |
+| `tests/test_sim_wram_contract.sh` | ci_portable | dump naming + 68k byte order + skew absorption, two must-fire controls, the rule-7 refusals, and a static proof that every line the harness patch adds sits inside `#ifdef _JTFRAME_SIM_WRAMDUMP` |
+| `tests/test_rpl2siminputs.sh` | ci_portable | `.rpl` -> `sim_inputs.hex` bit map, frozen translation, refusals |
+| `tests/test_mister_sim_anchor.sh` | **manual/emulator (~50 min)** | THE ORACLE: MAME and jtcps2 agree on every mapped §4 field at the round-1 match-start anchor of `05_timeout_idle` (MAME 2146 / sim 2606, skew 460 ± 30); asserts the dump window is NON-CONSTANT first, then the byte-swap and hook-inertness controls |
 
 ## Running a CPS-2 WIDE build (playtest)
 

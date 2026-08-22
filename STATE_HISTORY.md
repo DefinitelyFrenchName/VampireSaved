@@ -19,6 +19,365 @@ Rules of this file:
 - References of the form "STATE 14z-XX": look in STATE.md first, then here
   — section names are preserved verbatim, so the reference always resolves.
 
+## Session 14z-104 CLOSE — ritual complete
+
+The session, in one line: the §4 coverage debt was RETIRED end to end
+on the maintainer's direction (ten new audits, every matrix cell green
+on merged-m5, four native-anchored mechanics discovered — Phobos'
+untechable sweep, his no-kill half-restore throw, Donovan's
+tech-neutral throw, the draw code 0x00), the pursuit mechanic was
+found+instrumented after the maintainer supplied the grammar, the
+Oboro question was answered with a live demonstration (vanilla vsavj
+ships him complete at 0x18; selection is one profile-gated hook), and
+the next session's WINDOW (Oboro hook + version string, one freeze)
+is completely specified in NEXT_SESSION.
+
+The ritual's items, each done this close:
+- **STATE**: this entry; the ROLLOVER executed (the 14z-101 group, 10
+  entries, and the 14z-100 group, 4 entries — 41.6 KB — moved verbatim
+  to STATE_HISTORY with ledger lines; verified lossless: the rolled
+  blob is byte-verbatim in the archive and a line-multiset diff against
+  the pre-rollover file accounts for every line; STATE 133 KB -> 92 KB;
+  the SPLIT convention paragraph re-homed between the groups and THE
+  LEDGER).
+- **NEXT_SESSION**: rewritten at the (4) close — the banner is the
+  complete window spec (W1 Oboro hook, W2 version string, the freeze
+  tail incl. the standing re-point sweep additions).
+- **HANDOFF**: the §4 coverage-program block current (all ten audits).
+- **GOTCHAS**: three paid this session-pair (gate_failures self-test
+  litter; the arcade-draw pin class; per-character rig geometry).
+- **patch docs**: untouched — no shipped byte moved in 14z-103/104.
+- **Issues**: #110 opened, fixed, closed within the pair; tracker
+  clean (zero open).
+- **Suite**: full strict static tier green at this close (see the
+  commit); every new audit green on merged-m5 in-session.
+- Commits LOCAL from 6d80e72 onward — push on the maintainer's word.
+
+Where the next session starts: NEXT_SESSION's banner — the window.
+
+## Session 14z-104 (4) CLOSE — COVERAGE GAP 2 CLOSED (the §4 matrix is
+## fully green), THE WINDOW PREPPED (Oboro hook + version string, the
+## complete spec in NEXT_SESSION), session closes on the maintainer's
+## instruction with the window as the next session's opening arc.
+
+**Rulings recorded (maintainer, 2026-08-22):** coverage items 1+2 GO
+(both now done); Shadow/Marionette OUT OF SCOPE for now; the OBORO
+HOOK + the VERSION STRING ride ONE window with whatever select-spec
+movement they cause; vanilla-vsavj Oboro confirmed as the want ("we
+indeed have nothing to port... if and only if it can be selected" —
+answered with the live demonstration, 14z-104 (3)).
+
+**Gap 2 (audit_edge_cases.sh, 15 legs green on merged-m5):**
+- KO DURING CAPTURE both directions: every tenant kills mid-throw and
+  dies mid-capture with the judge settling (winner 0xFF) — EXCEPT
+  PHOBOS AS THROWER: his throw CANNOT kill — the would-be KO converts
+  to a transient death flag + an HP RESTORE to exactly half (144/144)
+  with no round transition, and NATIVE vsav2 measures the IDENTICAL
+  frame shape. The third native-anchored grab-family property (beside
+  his untechable sweep and Donovan's tech-neutral throw).
+- DOUBLE KO: mirror matches at 1 HP with same-frame jabs TRADE, and
+  the judge writes the DRAW code — $FF8120 == 0x00 measured, the
+  winner byte's third value (atlas row updated).
+- FRAME-1 EX: the DP+2K input on the first live frame — Phobos and
+  Pyron FIRE their EX from frame one (stock decrements); Demitri and
+  Donovan produce an action without a spend (their EX grammars
+  differ); frozen per leg.
+
+**The window prep (complete spec in NEXT_SESSION):** W1 the Oboro hook
+(Gallon-path template PRG:0x020B9C, Start source $FF8060 with a
+verify-at-select first measurement, profile-gated site-thunk, probe
+rehearsal, 0x18 QA legs); W2 the version string (select-screen
+placement inside the ratified window; wheel-record extension via the
+existing [[select_wheel]] copy machinery; vanilla-font-tile hunt vs
+authored group-C blob; manifest knob; the exact text is the
+maintainer's call at the window). The freeze tail moves every WIDE
+artifact; stock must stay bit-identical (both features profile-gated).
+
+## Session 14z-104 (3) — COVERAGE GAP 1 CLOSED (tech roll + throw
+## tech, both directions, native-anchored where the answer surprised),
+## and THE OBORO QUESTION ANSWERED WITH A LIVE DEMONSTRATION.
+
+**Tech roll (audit_tech_roll.sh, 9/9 green on merged-m5):** the roll =
+HELD direction+button through the knockdown landing (a tap does NOT
+register — control leg); every tenant rolls out of a knockdown
+(147/120/120px — their ported recovery states executing); the legacy
+roll works off don/pyr knockdowns; **Phobos' crouch-HK knockdown is
+UNTECHABLE — and native vsav2 measures the identical 14dmg/no-roll**,
+so it is a ported design property, frozen native-anchored; the
+maintainer-described PURSUIT-VS-ROLL counter measured working (leap
+fires, victim rolls 144px, the strike whiffs the vacated spot) — the
+WHIFF half of the pursuit-connect question is now gated.
+
+**Throw tech (audit_throw_tech.sh, 8/8 green):** the tech = the
+victim's own throw input held from grab-connect+2 (same-frame input is
+the separate throw-vs-throw whiff event, deliberately excluded);
+damage halves — every tenant escapes Demitri's throw at the uniform 7;
+Victor techs Phobos 14->7 and Pyron 12->2; **Donovan's throw measures
+5/5 IDENTICAL with and without the tech — and native vsav2 measures
+the same identity**, frozen as the native-anchored tdon expectation.
+No-tech control at the full 13.
+
+**Oboro (maintainer question "can it be selected?", answered live):**
+vsavj has NO player-facing select path (the atlas's unlocated-entry
+hole = the boss-encounter logic), BUT the commit path accepts 0x18
+end-to-end TODAY: poked at select on merged-m5, Oboro loads his own
+native dataset (+0x60 = 0x0B3450, the bases.tsv row) and fights
+(snapshot sent — the pale colorway). The Start-hold hook is exactly
+the existing flavor-latch idiom writing 0x18 on Bishamon's cell —
+selection is OURS to add and is small, profile-gated, freeze-window
+work. vs2's Oboro dataset diffs vsavj's by only 685/8192 sampled bytes
+(the cross-game operand-shift shape) — vanilla-Oboro-as-shipped is the
+fidelity-default recommendation.
+
+Remaining coverage: item 2 only (deliberate KO-frame/corner/frame-1
+edge rigs — next stretch); pursuit-connect's hit half.
+
+## Session 14z-104 (2) — THE PURSUIT ANSWERED AND INSTRUMENTED: the
+## maintainer confirmed the NW leaping pursuit (U + any P/K), the
+## mechanic was found and measured (my earlier screen missed it by
+## inputting AFTER the flat window opened — the input registers during
+## the FALL), and audit_pursuit_leap is green on merged-m5: every
+## tenant's ported pursuit fires with its own arc, every downed tenant
+## accepts targeting.
+
+**Why the 12-candidate screen missed it:** the pursuit input registers
+during the victim's knockdown FALL and the first flat frames; my
+screen's attempts (3086/3098) came after that window closed for the
+sweep knockdown. With the input at f3072 (mid-fall) the leap fires on
+every button (U1/U2/U4/U6 identical — universal, as the maintainer
+said).
+
+**Mechanics measured (engine_internals "THE LEAPING PURSUIT"):** aim is
+captured at INPUT time (proven with a mid-flight victim-position poke);
+per-character arcs (Demitri 33f/y100, Donovan 27f/y102, Phobos 42f/y88,
+Pyron 39f/y88 — the ported vs2 content executing); corner pursuits peak
+over the body then the wall pushbox shoves the attacker off during
+descent (measured on the ALL-LEGACY control = vanilla behavior by the
+superset invariant).
+
+**The instrument (audit_pursuit_leap.sh, green 8/8):** every tenant as
+pursuer (leap fires, airborne, per-char duration band), Demitri
+pursuing every downed tenant (their down state accepts targeting), and
+the no-knockdown control (the same input with the victim recovered must
+NOT enter 0x0E — proves the signature is knockdown-gated).
+
+**The honest open piece — pursuit CONNECT:** a wake-vs-flight knife
+edge in every geometry tried (sweep and throw knockdowns, chases,
+midscreen and corner, victim-position alignment), INCLUDING the
+all-legacy control — so the non-connect is a rig fact, not a port
+defect, and asserting damage needs a knockdown whose flat window
+outlasts the flight on both games. Carried in the matrix (1b), coupled
+to the tech-roll rig family (the roll is the pursuit's designed whiff).
+
+## Session 14z-104 — THE §4 COVERAGE DEBT TACKLED (maintainer-directed):
+## the mandate measured cell by cell, six new audits built and green on
+## merged-m5, and the matrix documented as a maintained artifact. Four
+## rulings recorded. One maintainer question open (the pursuit grammar).
+
+**Rulings recorded at session open (maintainer, 2026-08-22):** cosmetic
+/ single-player deferred INDEFINITELY (the matrix judges cells on the
+2P-competitive surface); beam color + DF/clone colors GOOD, DF time
+GOOD (threads stay closed); the in-game VERSION STRING is APPROVED for
+convenience — it moves shipped bytes, so it rides the next natural
+freeze window (queued, NEXT_SESSION); release packaging is a real topic
+whose before/after-MiSTer ordering stays the maintainer's open
+question.
+
+**The census (docs/project/coverage_matrix.md, the maintained
+artifact):** measured, not recalled. Found: pursuit attacks had ZERO
+coverage anywhere; tenant timeout was field-confirmed only; life-marker
+rigs existed for Donovan only; Pyron had no throw rig; tech-hit has no
+instrument anywhere. Well-covered: vs-18-both-sides
+(audit_roster_pairings, re-run 14z-104: 111/111 on merged-m5), DF
+(rigs; the audit was the missing promotion).
+
+**Six instruments built, each with legacy controls + discriminating
+negative controls, all green on merged-m5:**
+- `audit_df_framework.sh` — the ruled DF table frozen (1 stock,
+  360/360/377/360; span-based duration with Phobos' documented
+  activation flicker bounded to onset+24).
+- `audit_tenant_timeout.sh` — timer poked to 3 ($FF8109), the judge
+  must award the down to the HP LEADER: $FF8120 (NEW atlas row —
+  round-winner code 0xFF=P1/0x01=P2, verified discriminating both
+  directions) + $FF810E (rounds counter). Lead-existence asserted
+  (the Phobos jab-whiff would have passed vacuously without it).
+- `audit_tenant_downwin.sh` — the KO-path life-marker transition,
+  every tenant as WINNER and as VICTIM (the victim legs are the
+  direct #103-class lock: a tenant's death must be judgeable); 8 legs
+  + no-poke control.
+- `audit_tenant_throws.sh` — normal throw both directions; the throw
+  discriminator measured (strength-independent 5-dmg toss for Donovan
+  vs his 24-dmg groundbound strike); Victor throwing each tenant
+  exercises the #104 capture keyframes.
+- `audit_down_attack.sh` — the §4 "pursuit" cell: hitting a downed
+  opponent, both directions. MEASURED: grounded heavies serve
+  (11-14 dmg); per-character windows both sides (Phobos wakes in 24f);
+  a 12-candidate input screen produced NO leaping NW-style pursuit —
+  the naming question is the maintainer's (a distinct leaping pursuit
+  under another grammar gets its own rig if it exists).
+- `audit_stage_sweep.sh` — every tenant x all 12 stages WITH contact:
+  the $FF8100 poke window measured (f2150/2200 sticks AND the venue
+  assets follow; f2450+ sticks without following); 36/36 + no-poke
+  + palette-distinctness controls.
+
+**Rigs:** `tests/replays/judge/01_timeout_lead.rpl`, `02_throw.rpl`,
+`03_down_attack.rpl` — poke-generic, subdir (gate-owned, outside the
+suite's account, so no expectation-set cost).
+
+**Method paid (gotcha, project + index):** per-character rig geometry —
+three instances in one session each first misread as a finding (Phobos'
+LP whiff; heavies cannot be mashed into a down window; Victor's sweep
+throws the victim out of reach). All four combat audits REFUSE to judge
+a leg whose setup event did not happen.
+
+**Remaining open cells (the matrix's gap list):** tech-hit (throw
+escape) rigs both directions; deliberate KO-frame/corner/frame-1 edge
+rigs per tenant; Shadow/Marionette N/A-until-enabled (recorded roster
+decision cited, not re-measured).
+
+## Session 14z-103 (2) — #110 FIXED AND CLOSED (maintainer-directed):
+## the mechanism was the ARCADE DRAW, not cycle drift; both audits
+## re-derived on pinned-opponent rigs and GREEN on merged-m5. The
+## Circuit Scrapper report MEASURED: not reproduced on any variant —
+## captures sent, awaiting the maintainer's scenario detail.
+
+**Maintainer feedback opened the session** (2026-08-22): projectile
+collisions confirmed in line with expectations (closes the freeze's
+standing watch item); a POSSIBLE Circuit Scrapper (63214+HP/MP)
+animation discrepancy vs VS2 ("might be missing a slam cycle at the
+start"), unconfirmed, not gameplay-adverse; and #110 ruled "definitely
+fix".
+
+**The Scrapper measurement (confirmation loop, captures sent):**
+- Archaeology first: the hold placement is the 14z-73
+  grab_hold_keyframes fix (native-exact then); the throw arcs are the
+  ported throw_arc_tables superset rows; replay 80's header carries an
+  old "throw-arc HEIGHT differs, queued" note that predates the arc
+  port. Note test_hui_grab_victim gates only HOLD_LEN=12 frames — a
+  missing later cycle would be invisible to it, so the green gate does
+  not contradict the report.
+- Measured: rig 80 (MP), an HP variant, and a MASH variant, each on
+  native vsav2 AND merged-m5 — all six runs STRUCTURALLY IDENTICAL
+  (grab f3152, one slam spike y40->180, hold, launch peak y=318,
+  damage 19+8), ours lagging by the documented few-frame skew only.
+  Full-throw side-by-side contact sheets (every 4th frame, 3152-3268)
+  sent to the maintainer. Strength and mashing change nothing on
+  either game. NOT REPRODUCED — and CLOSED by the maintainer
+  (2026-08-22, "Circuit Scrapper seems fine indeed") after reviewing
+  the contact sheets. No item remains.
+
+**#110 fixed (the full chain on the issue, closed):**
+- The bisect sharpened by measurement: field-level A/B m6-vs-m7 on the
+  fgA rig diverges at MATCH START (opponent spawn X), and the state
+  check names it — merged6 fights char 0x0C on stage 0x12; merged7 and
+  every build since fight char 0x00 on stage 0x0E ($FF8B82/$FF8100).
+  The 14z-87 batch re-rolled the ARCADE DRAW; the audits' frozen
+  values described a match no current build runs. The pcosmo leg was
+  doubly dead: against the new opponent the rig spends its stock on a
+  DIFFERENT move and zero satellites enter $FF9400 (measured).
+- The fix removes the class: audit_fg_damage now rides NEW 2P-dummy
+  rigs hui/74 + hui/75 (replay-80 scaffolding; opponent+stage pinned;
+  EX fires 3/3, damage 69 both legs, bit-identical run-to-run AND
+  across merged-m4/merged-m5; EXPECT re-frozen 69/69 with
+  attribution). audit_pool_free_byte's pcosmo leg rides
+  106_pyron_cosmo_clash (215/215 family slots tagged, vs 0); one
+  liveness floor re-calibrated with attribution (b8 +0x00 100->10; the
+  +0x20 lane proves the tap). Both audits PASS on merged-m5. The old
+  1P rigs are untouched (their other consumers unperturbed).
+- Gotcha paid (project + index): a 1P-arcade rig is pinned to the
+  arcade draw; frozen-value audits must pin the opponent. The attic
+  diff pair is no longer load-bearing.
+
+## Session 14z-103 — THE A4 PIN-CLEANUP PASS EXECUTED (every stale
+## reference re-pointed, run green, or ruled a deliberate pin), plus
+## three findings the pass surfaced: the gate_failures litter class,
+## GitHub #110 (two audits red since 14z-87), and four LEGACY replays
+## promoted off self-frozen .sha1 (the 14z-88 class, caught by the
+## re-pointed audit_legacy_pairings on its first current-set run)
+
+**The opening triage first:** the untracked
+`build/gate_failures/03_two_player_vs.<epoch>.log` in git status was
+NOT a real gate failure — `test_m2a_flicker_gate.sh` (portable tier)
+stubs the emulator and REQUIRES the masked gate to fail, and the gate's
+failure path preserved each stub into the shared evidence directory:
+141 litter files over five days (140 committed), the newest written by
+the 14z-102 close's own portable re-verify 30 seconds before the close
+commit. Fixed at the root (`M2A_KEEP_DIR` override in m2a_common.sh;
+the self-test points it at its workdir), litter removed by content
+signature (basis-identical or ffff-flip lines; the four real July-29
+logs and merged1_* evidence kept), gotcha paid (project bucket +
+index).
+
+**The A4 pass (docs/project/build_dir_triage.md carries the full
+disposition table):**
+- Re-pointed to the m10/m19/m13/merged-m5 generation and RUN GREEN
+  in-session, each: the hui43 seven (mask_ranges_reader, beam_anim_walk,
+  guard_integrity, df_gold, beam_variants, hui_df_style,
+  hui_grab_victim) + gfx_layout_fields_live + member_classify +
+  voice_row_range; trap_shock/trap_parity (hui37/38 -> hui46);
+  variant_dispatch (pyron17 -> pyron30); pyron_blink/pyron_cosmo/
+  pyron_ring; flicker_attribution + obj_walker_relocation (don_m7 ->
+  don_m10); voice_borrow + gfx_menus pair + legacy_pairings trio +
+  frozen_rompath_guard (don_m5 -> don_m10); fg_parity, ladder_selector,
+  hui_electrocute, select_bank_gates, merged_render_content,
+  build_identity_distinct (m3b_merged/9 -> m3b_merged12); dualtrack
+  STOCK/WIDE -> m5_stock5/don_m10 + battery leg + wide_render_content +
+  tenant_row_owner; gfx_chain + audit_gfx_merged --build-h (hui31 ->
+  hui32, the A2 pipeline input); record_window (hui41 -> hui46);
+  m2a_flicker_gate SET pin -> donovan-m10-stock.
+- `test_region_overlap` section 5 RE-MEASURED on the current trio:
+  2012 -> 2033 conflicting bytes (raw 7603 -> 7624), unique regions
+  13 -> 14 — the new huitzil-only #109 row-31 root region; per-span
+  (53,54)/(39,50)/(461,368)/(1063,1561); control re-anchored, both
+  gates PASS with the must-fire control alive.
+- `audit_flicker_attribution` had been SKIPping quietly — its mask pin
+  named the REMOVED donovan-m7 set dir. Re-derived to fingerprint
+  resolution (the #96 mechanism); PASS on don_m10 (both frozen frames
+  still attributed: 41@2313 row-0x0C, 37@7168 row-0x0A).
+- `test_hui_grab_victim`: default expectation flipped `differs` ->
+  `matches` — the 14z-73 grab_hold_keyframes fix is what it guards
+  (patch_index says so; measured Δ=0 on hui46); the default had been
+  the PRE-FIX shape since the gate's birth because every freeze ran it
+  with explicit =matches. HANDOFF row corrected.
+- DELIBERATE PINS ruled and annotated in place: don_m5
+  (audit_walker_repoint's un-relocated negative control — nothing newer
+  can serve), pyron26 + hui41 (decode_stage_banners' frozen #92 defect
+  carriers; only the donovan clean-leg re-pointed to don_m10).
+  OPERATIONAL reclassed: build/donovan, donovan_stage4_gate, hui4
+  (gates build into them / print the rebuild recipe).
+
+**Finding: GitHub #110 — audit_fg_damage + audit_pool_free_byte RED on
+every build since 14z-87**, surfaced by the re-point, bisected on the
+attic dirs: merged6 (14z-86) PASS both, merged7 (14z-87 voice-borrow +
+beep batch) FAIL both, values stable across five generations since
+(fgA 24 vs frozen 10; fgC 0 = the close-range rig no longer contacts;
+pcosmo 0 family slots in the frozen window). NOT read as a gameplay
+regression: the native-anchored invariants are green on current builds
+(audit_fg_parity's staircase, test_pyron_cosmo). Both audits annotated
+known-red; constants NOT absorbed — the issue carries the diff pair and
+the re-derivation handoff.
+
+**Finding: the 14z-88 class, live again** — `audit_legacy_pairings` on
+its first run against current sets flagged 94_tenant_vs_tenant,
+103_tenant_2pwin_auto, 105_projectile_clash_ctl, 106_pyron_cosmo_clash
+as LEGACY on bare `.sha1` (all four authored AFTER the audit's last
+run; under bare suite dispatch their tenant content comes from
+gate-supplied pokes that run_suite never applies). Executed the audit's
+own fix: vanilla basis EXTENDED (freeze_masked_basis, instrument
+control green, all-or-nothing publish) and the shapes measured on all
+three builds — 94/105/106 = `window vsavj/masked-v2 889 2091` on every
+build (single run, the ratified select-window class, thousands of
+identical match frames after); specs authored, .sha1s dropped
+(STRICTER: vanilla-anchored where self-frozen saw nothing). 103 is
+replay 61 + AUTO: measured per-leg — donovan-m10 loads the TENANT
+(+0x60 = 0x3fa9d0, .sha1 stays); hui/pyron sets commit the UNBACKED
+cell 0x13 and no fighter record forms (+0x60 == 0 at f5000) —
+`.legacy-exempt` authored per the 61/62 precedent.
+
+**Carried forward:** the m3b_merged11 one-back audit defaults must join
+the freeze re-point sweep or the N-2 deletion policy rots them at the
+next freeze (list in the triage doc). A4 dirs now at zero live
+reference fall mechanically at the next census.
 ## 14z-99 FIELD RESULTS (maintainer, 2026-08-20) — THE WHOLE WINDOW IS
 ## FIELD-CONFIRMED: #103 + #104 + #105 all CLOSED; #99 UN-PARKED
 

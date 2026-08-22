@@ -325,3 +325,24 @@ is a GAME gotcha if it is true of the game regardless of the port.
   throws the victim out of reach); multi-character audits need per-leg
   measured (input, frame) pairs and a refuse-to-judge on setup-event
   failure.
+- **14z-107 (platform):** `jtsim -setname` ALWAYS re-downloads the ROM
+  (10'43" on jtcps2) and `enable_load()` moves your `sdram_bank?.bin`
+  into `sdram.old/` — the guard compares a RELATIVE `readlink rom.bin`
+  against an ABSOLUTE `$ROMFILE`, so it never matches. Drop `-setname`,
+  but **KEEP `-load`**: on CPS-2 the transfer also latches the
+  decryption key into core registers, so a preloaded run boots into
+  ciphertext and work RAM stays ALL ZEROS (measured over 1,841 frames)
+  — and the all-zero dumps still agreed with MAME on 99.2% of sampled
+  bytes, so check that a new dump path is NON-CONSTANT before believing
+  any agreement number. The download also burns `sim_inputs.hex` lines,
+  so scripted inputs need `--offset 462`.
+- **14z-107 (platform):** `JTFRAME_SIM_IODUMP` on CPS-2 dumps the
+  128-byte EEPROM, not work RAM, and `JTFRAME_SAVESDRAM` exists only in
+  the Verilog SDRAM model the Verilator lane never instantiates — a
+  macro named for what you want is not evidence that it does it; read
+  the module that consumes it.
+- **14z-107 (platform):** editing a shell script WHILE it runs corrupts
+  the running execution — `sh` keeps a byte offset into the file, so a
+  comment-only edit shifted a 55-minute gate into `syntax error near
+  unexpected token` after its simulation had already finished; `sh -n`
+  passes throughout. Queue edits to scripts a long job is executing.

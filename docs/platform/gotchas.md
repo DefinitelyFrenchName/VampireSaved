@@ -1024,3 +1024,90 @@ DISAGREE on an asymmetric tile). Rule: any synthesized tile is verified
 at the RENDER layer against its intended bitmap (`test_version_string.sh`
 §2) — a byte round-trip proves the codec is self-consistent, not that it
 matches the hardware.
+
+## `jtsim -setname` re-downloads every run — and on CPS-2 you must download anyway (14z-107)
+
+The ROM download costs **10'43"** of simulated time on jtcps2, and the
+obvious way to avoid paying it twice — keep `sdram_bank?.bin` and drop
+`-load` — does not work, for TWO independent reasons. `modules/jtframe/bin/jtsim:503-506` guards the
+re-link with
+
+    if [[ ! -e rom.bin || `readlink rom.bin` != "$ROMFILE" ]]; then
+        ln -srf $ROMFILE rom.bin
+        enable_load()
+
+`ln -srf` writes a **relative** symlink while `$ROMFILE` is `$ROM/<set>.rom`,
+**absolute** — so the comparison is true on EVERY run, `-setname` always
+re-links, and `enable_load()` (`jtsim:249-258`) both defines `LOADROM` and
+**`mv sdram_bank?.* sdram.old`**. 14z-106 measured "the second run re-ran the
+download" and filed it against `-load`; the flag responsible is `-setname`.
+
+**Drop `-setname`, KEEP `-load` — and this is the second half of the trap.**
+It is tempting to drop `-load` too: `test.cpp:611-651` then preloads the four
+banks at t=0 and the download is shortened to 32 bytes (`test.cpp:263-281`,
+log lines `ROM download shortened to 32 bytes` / `ROM file transfered (frame
+0)`), which looks like a free 10 minutes. **It is not.** On CPS-2 the
+transfer also latches the DECRYPTION KEY into core registers
+(`jtcps1_prom_we` → `cps2_key_we` → `jtcps2_keyload`) and no SDRAM image can
+restore that, so a preloaded run boots into ciphertext. **Measured 14z-107:
+1,841 simulated frames with the banks preloaded, and 68k work RAM was ALL
+ZEROS at every frame** — a dead 68k. The download is mandatory on this core,
+which also means the `sdram_bank?.bin` dumps have no use at all.
+
+**AND THE DOWNLOAD BURNS INPUT LINES.** `sim_inputs.next()` fires on every
+LVBL fall from t=0, download frames included, while the core is held in reset
+— so a scripted input meant for the game's frame 300 lands during the
+transfer unless the script is shifted by the download length
+(`rpl2siminputs.py --offset 462`).
+
+**THE NEAR-MISS WORTH RECORDING:** the preloaded run's all-zero dumps agreed
+with MAME's work RAM on **99.2% of sampled bytes**, because most of a 64 KB
+work-RAM image is zero. "High agreement" is not evidence of a live oracle;
+the first check on any new dump path is **is it non-constant** — two frames
+of the same run must differ. (CLAUDE.md §4: verdict logic is itself tested.)
+
+Two knock-on facts worth having: `rom.bin` must exist and be non-empty
+(`jtsim` errors otherwise), and `$ROM/<set>.dip` / `<set>.mod` are only
+consulted under `-setname` — for `vsavj` the `.dip` file is EMPTY, so
+dropping the flag changes no DIP setting, and `core.mod` can simply be
+copied.
+
+## `JTFRAME_SIM_IODUMP` on CPS-2 dumps the EEPROM, not RAM (14z-107)
+
+`jtframe`'s "state out" macro writes `scenes/<frame>/dump.bin` over the
+**IOCTL read** path, whose width is `JTFRAME_IOCTL_RD`. On cps2 that is 128
+— the 64 words of the serial EEPROM — because cps2 has no `cfg/mem.yaml` and
+`ioctl_din` is driven only by `jteeprom` (`cores/cps1/hdl/jtcps1_sdram.v:
+462-478`). The companion macro `JTFRAME_SAVESDRAM` looks like the answer and
+is not: it exists only inside the **Verilog** SDRAM model
+(`modules/jtframe/hdl/ver/mt48lc16m16a2.v:193-209`), which the Verilator lane
+never instantiates — there the C++ `SDRAM` class IS the SDRAM, and its
+`dump()` fires exactly once, right after a full ROM download.
+
+Reading emulated work RAM out of a Verilator run therefore needs a harness
+hook, not a macro that already exists (ours: `JTFRAME_SIM_WRAMDUMP`, fork
+commit `553dd56`, `docs/platform/mister.md`). The general lesson is the
+14z-71 one in a new place: **a macro named for what you want is not evidence
+that it does it — read the module that consumes it.**
+
+## Editing a shell script WHILE it runs corrupts the running execution (14z-107)
+
+`sh` reads a script incrementally and keeps a BYTE OFFSET into the file. Edit
+the file while it is executing and the offset now points into the middle of a
+different line: the still-running shell resumes at a token boundary that never
+existed. Paid for here on a 55-minute gate — `tools/run_sim_jtcps2.sh` had run
+its 2,880-frame Verilator simulation to completion, and then died on
+
+    run_sim_jtcps2.sh: line 242: syntax error near unexpected token `('
+
+because the header comment had been rewritten mid-run (a pure comment edit —
+the bytes moved, and that was enough). `sh -n` passes on the file the whole
+time; the corruption exists only in the running process.
+
+Cost was recoverable only by luck: the collection step is the LAST thing the
+script does, so the RAM dumps were still sitting in the scratch clone's
+`cores/<core>/ver/game/wram/` and the measurement was salvaged from there
+rather than re-simulated. **Rule: while a long job is running, do not edit the
+scripts it is executing** — queue the edits, or work on a copy. It applies to
+`tests/*.sh` gates too, which is exactly when the temptation is highest (an
+hour of waiting with the file open).

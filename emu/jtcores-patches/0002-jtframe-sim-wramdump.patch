@@ -1,0 +1,138 @@
+From 553dd56f64ed51aedd10be63e20f075bc4c10de2 Mon Sep 17 00:00:00 2001
+From: Chaton <alexthemagicalcat@gmail.com>
+Date: Sat, 22 Aug 2026 23:28:23 +0200
+Subject: [PATCH] jtframe/sim: optional work-RAM dumps out of the Verilator
+ SDRAM model
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Adds JTFRAME_SIM_WRAMDUMP to modules/jtframe/hdl/ver/test.cpp: at the VS
+rising edge, for frames FIRST..END, write one byte range of one simulated
+SDRAM bank to wram/dump_<frame>_<addr>.bin, applying the same j^1 byte swap
+SDRAM::dump() applies so the file comes out in the CPU's own byte order.
+
+Why: there was no way to read emulated work RAM out of a Verilator run.
+JTFRAME_SIM_IODUMP goes through the IOCTL read path, which on CPS-2 is
+driven only by the serial EEPROM (cores/cps1/hdl/jtcps1_sdram.v:462-478;
+cps2 has no cfg/mem.yaml), so it dumps 128 bytes of NVRAM; JTFRAME_SAVESDRAM
+exists only in the Verilog SDRAM model (modules/jtframe/hdl/ver/
+mt48lc16m16a2.v:193-209), which the Verilator lane never instantiates.
+
+The block to dump is described entirely by macros — bank, byte offset,
+length, and the logical CPU address that names the file — so the hook stays
+core-agnostic and the per-core numbers live in the caller. For jtcps2 that
+is bank 0, offset 0x600000, 0x10000 bytes, address 0xff0000
+(jtcps1_sdram.v WRAM_OFFSET = 23'h30_0000 words; jtcps2_main.v ram_cs =>
+addr = {2'b0, A[15:1]}).
+
+Inert unless the macro is defined: without -d JTFRAME_SIM_WRAMDUMP=<frame>
+every line added here compiles out and the harness is upstream's.
+
+Example:
+  jtsim -verilator -sysname cps2 -inputs -frame 2400 \
+     -d JTFRAME_SIM_WRAMDUMP=1900 -d JTFRAME_SIM_WRAMDUMP_END=2400 \
+     -d JTFRAME_SIM_WRAMDUMP_OFF=0x600000 -d JTFRAME_SIM_WRAMDUMP_ADDR=0xff0000
+---
+ modules/jtframe/hdl/ver/test.cpp | 64 ++++++++++++++++++++++++++++++++
+ 1 file changed, 64 insertions(+)
+
+diff --git a/modules/jtframe/hdl/ver/test.cpp b/modules/jtframe/hdl/ver/test.cpp
+index 3595ae4ce..0901d4103 100644
+--- a/modules/jtframe/hdl/ver/test.cpp
++++ b/modules/jtframe/hdl/ver/test.cpp
+@@ -62,6 +62,32 @@ using namespace std;
+     #define _JTFRAME_SIM_DIPS 0xffffffff
+ #endif
+ 
++// Vampire Saved (VS fork): scripted RAM dumps out of the simulated SDRAM.
++// Enabled ONLY when _JTFRAME_SIM_WRAMDUMP is defined (jtsim -d
++// JTFRAME_SIM_WRAMDUMP=<first frame>); absent, every line below compiles out
++// and the harness is byte-for-byte upstream's. The block to dump is described
++// entirely by macros so the hook stays core-agnostic: the caller supplies the
++// bank, the byte offset inside it, the length and the LOGICAL cpu address
++// that names the file. See docs/platform/mister.md.
++#ifdef _JTFRAME_SIM_WRAMDUMP
++    #include <sys/stat.h>
++    #ifndef _JTFRAME_SIM_WRAMDUMP_END
++        #define _JTFRAME_SIM_WRAMDUMP_END _JTFRAME_SIM_WRAMDUMP
++    #endif
++    #ifndef _JTFRAME_SIM_WRAMDUMP_BANK
++        #define _JTFRAME_SIM_WRAMDUMP_BANK 0
++    #endif
++    #ifndef _JTFRAME_SIM_WRAMDUMP_OFF
++        #define _JTFRAME_SIM_WRAMDUMP_OFF 0
++    #endif
++    #ifndef _JTFRAME_SIM_WRAMDUMP_LEN
++        #define _JTFRAME_SIM_WRAMDUMP_LEN 0x10000
++    #endif
++    #ifndef _JTFRAME_SIM_WRAMDUMP_ADDR
++        #define _JTFRAME_SIM_WRAMDUMP_ADDR 0
++    #endif
++#endif
++
+ #define ANSI_COLOR_RED     "\x1b[31m"
+ #define ANSI_COLOR_GREEN   "\x1b[32m"
+ #define ANSI_COLOR_YELLOW  "\x1b[33m"
+@@ -102,6 +128,9 @@ public:
+     ~SDRAM();
+     void update();
+     void dump();
++#ifdef _JTFRAME_SIM_WRAMDUMP
++    void dump_range( int bank, int offset, int len, int frame, int logical );
++#endif
+ };
+ 
+ class SimInputs {
+@@ -498,6 +527,35 @@ void SDRAM::dump() {
+     delete[] aux;
+ }
+ 
++#ifdef _JTFRAME_SIM_WRAMDUMP
++// Dump one byte range of one SDRAM bank to wram/dump_<frame>_<logical>.bin.
++// The byte swap is the same one SDRAM::dump() applies, so the file comes out
++// in the CPU's own byte order (big endian on 68000 cores) and can be compared
++// directly against a dump taken from another implementation.
++void SDRAM::dump_range( int bank, int offset, int len, int frame, int logical ) {
++    if( bank<0 || bank>3 || offset<0 || len<=0 || (offset&1)!=0 || (len&1)!=0
++        || offset+len>BANK_LEN ) {
++        fprintf(stderr,"ERROR: (test.cpp) bad WRAMDUMP range: bank %d offset %X len %X\n",
++            bank, offset, len );
++        return;
++    }
++    static bool made_dir=false;
++    if( !made_dir ) { mkdir("wram",0777); made_dir=true; }
++    char fname[64];
++    snprintf(fname,64,"wram/dump_%d_%06x.bin", frame, logical );
++    ofstream fout(fname,ios_base::binary);
++    if( !fout.good() ) {
++        fprintf(stderr,"ERROR: (test.cpp) creating %s\n", fname );
++        return;
++    }
++    char *aux=new char[len];
++    for( int j=0;j<len;j++) aux[j] = banks[bank][(offset+j)^1];
++    fout.write(aux,len);
++    if( !fout.good() ) fprintf(stderr,"ERROR: (test.cpp) saving to %s\n", fname );
++    delete[] aux;
++}
++#endif
++
+ void SDRAM::change_burst() {
+     int mode = dut.SDRAM_A;
+     burst_len = 1 << (mode&3);
+@@ -817,6 +875,12 @@ void JTSim::clock(int n) {
+             frame_cnt++;
+ #ifdef _JTFRAME_SIM_IODUMP
+             if( frame_cnt==_JTFRAME_SIM_IODUMP ) dwn.iodump_start();
++#endif
++#ifdef _JTFRAME_SIM_WRAMDUMP
++            if( frame_cnt>=_JTFRAME_SIM_WRAMDUMP && frame_cnt<=_JTFRAME_SIM_WRAMDUMP_END )
++                sdram.dump_range( _JTFRAME_SIM_WRAMDUMP_BANK, _JTFRAME_SIM_WRAMDUMP_OFF,
++                                  _JTFRAME_SIM_WRAMDUMP_LEN, frame_cnt,
++                                  _JTFRAME_SIM_WRAMDUMP_ADDR );
+ #endif
+             if( frame_cnt == _DUMP_START && !dump_ok ) {
+                 dump_ok = 1;
+-- 
+2.50.1 (Apple Git-155)
+

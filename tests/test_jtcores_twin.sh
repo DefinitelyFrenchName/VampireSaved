@@ -10,9 +10,13 @@
 #     list) must be IDENTICAL — that is what makes "no RTL differs yet"
 #     true by construction, and any later RTL override must move this gate
 #     deliberately.
-#  3. emu/jtcores-patches/0001-cps2w-scaffold.patch reproduces
-#     `git format-patch <v1.7.3>..<pin>` of the submodule byte-for-byte —
-#     the in-tree reviewable mirror cannot drift from the fork.
+#  3. emu/jtcores-patches/ reproduces the fork's commits as a PATCH SERIES,
+#     byte-for-byte: file i == `git format-patch -1 <i-th commit after
+#     v1.7.3>`, the directory holds EXACTLY the declared names, and the
+#     series length equals the commit count. The in-tree reviewable mirror
+#     cannot drift from the fork, and a new fork commit cannot land
+#     unmirrored (14z-107: it was a single hardcoded file until the sim
+#     work-RAM hook became commit 2).
 #  4. Must-fire control: a perturbed copy of game.yaml FAILS section 2.
 # Usage: tests/test_jtcores_twin.sh
 set -u
@@ -34,8 +38,24 @@ d="$(diff "$A/mame2mra.toml" "$B/mame2mra.toml" | grep '^[<>]' | grep -v '^> #' 
 [ "$d" = '> mustbe.machines=[ "vsav" ]|' ] && ok "2c mame2mra.toml differs by the vsav mustbe only" || bad "2c mame2mra.toml delta: $d"
 [ -f "$B/msg" ] && ok "2d msg present" || bad "2d msg missing"
 
-P="$REPO/emu/jtcores-patches/0001-cps2w-scaffold.patch"
-if git -C "$SRC" format-patch --stdout "$UP..$PIN" | cmp -s - "$P"; then ok "3 patch mirror == format-patch $UP..$PIN"; else bad "3 patch mirror drifted"; fi
+NAMES="$(sed -n 's/^PATCH_NAMES="\(.*\)".*/\1/p' "$REPO/tools/setup_jtcores.sh")"
+[ -n "$NAMES" ] || bad "3 cannot read PATCH_NAMES from tools/setup_jtcores.sh"
+i=1
+for name in $NAMES; do
+    sha="$(git -C "$SRC" rev-list --reverse "$UP..$PIN" | sed -n "${i}p")"
+    if [ -z "$sha" ]; then bad "3 no fork commit $i for $name"; break; fi
+    if git -C "$SRC" format-patch --stdout -1 "$sha" | cmp -s - "$REPO/emu/jtcores-patches/$name"
+    then ok "3.$i $name == format-patch -1 $(echo "$sha" | cut -c1-8)"
+    else bad "3.$i $name drifted from commit $(echo "$sha" | cut -c1-8)"; fi
+    i=$((i + 1))
+done
+extra="$(git -C "$SRC" rev-list --reverse "$UP..$PIN" | sed -n "${i}p")"
+[ -z "$extra" ] && ok "3z series length == commit count ($((i - 1)))" \
+                || bad "3z fork commit $(echo "$extra" | cut -c1-8) is NOT mirrored — add a PATCH_NAMES entry"
+onfile="$(ls "$REPO/emu/jtcores-patches" | tr '\n' ' ')"
+want="$(printf '%s ' $NAMES)"
+[ "$onfile" = "$want" ] && ok "3y patches dir holds exactly the declared series" \
+                        || bad "3y patches dir holds [$onfile], declared [$want]"
 
 # 4 must-fire control (pure-text twin of check 2a).
 T="$(mktemp)"; { cat "$A/game.yaml"; echo "      - jtcps2_extra.v"; } > "$T"

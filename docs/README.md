@@ -36,7 +36,7 @@ Entry points at this level, deliberately not in a bucket:
 - [`gotchas.md`](game/gotchas.md) — traps in the game itself
 
 **`platform/`**
-- [`mister.md`](platform/mister.md) — the jtcps2 core (jtcores fork, bus widths, SDRAM tier, the simulation lane)
+- [`mister.md`](platform/mister.md) — the jtcps2 core (jtcores fork, bus widths, SDRAM tier, the simulation lane, and the work-RAM oracle `JTFRAME_SIM_WRAMDUMP`)
 - [`gotchas.md`](platform/gotchas.md) — traps in CPS-2 and the emulators
 
 **`project/`**

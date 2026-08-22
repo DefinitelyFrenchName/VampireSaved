@@ -1,5 +1,174 @@
 # STATE — living progress log
 
+## Session 14z-107 — THE MiSTer ORACLE IS REAL: stock jtcps2 under
+## Verilator and MAME compared at a §4 sync anchor on the same legacy
+## replay, on a work-RAM path that had to be BUILT (two 14z-106 claims
+## retracted); no RTL touched
+
+**The one line:** the CLAUDE.md §4 dual-emulator protocol now runs on a
+THIRD implementation — Jotego's RTL — and it agrees.
+
+**THE TWO RETRACTIONS FIRST** (docs/platform/mister.md "State out", marked
+in place; STATE 14z-106 (4) annotated):
+- `JTFRAME_SIM_IODUMP` does **not** reach work RAM on CPS-2. It writes over
+  the IOCTL READ path, which on cps2 is driven only by the serial EEPROM
+  (`cores/cps1/hdl/jtcps1_sdram.v:462-478`; cps2 has no `cfg/mem.yaml`), and
+  `JTFRAME_IOCTL_RD=128` is the 64 EEPROM words — `dump.bin` is a 128-byte
+  NVRAM image.
+- `JTFRAME_SAVESDRAM` exists **only** in the Verilog SDRAM model
+  (`modules/jtframe/hdl/ver/mt48lc16m16a2.v:193-209`). The Verilator harness
+  never references it: there the C++ `SDRAM` class IS the SDRAM and its
+  `dump()` fires once, right after a full ROM download.
+So "the per-frame 68k work-RAM window the MAME oracle checksums is
+reachable" was false in both halves. It had to be built.
+
+**FORK COMMIT 2 — `JTFRAME_SIM_WRAMDUMP`** (`553dd56`, pushed;
+`emu/jtcores` pin bumped `b9d0565` → `553dd56`). 64 added lines in
+`modules/jtframe/hdl/ver/test.cpp` — the Verilator TESTBENCH, not RTL and
+not a core file — adding `SDRAM::dump_range()` and one call at the VS
+rising edge next to the IODUMP hook. Writes `wram/dump_<frame>_<addr6>.bin`
+with the same `j^1` swap `SDRAM::dump()` applies, i.e. **68k big-endian**,
+i.e. exactly the glob `tools/compare_fields.py` already consumes. **Inert
+unless `_JTFRAME_SIM_WRAMDUMP` is defined** (the emulator-superset shape in
+its simulation edition), and the block to dump is fully macro-parameterised
+(`_BANK/_OFF/_LEN/_ADDR/_END`) so jtframe stays core-agnostic and the CPS-2
+numbers live in `tools/run_sim_jtcps2.sh`.
+- Work RAM's address, read from the RTL: `jtcps1_sdram.v:158-164`
+  `WRAM_OFFSET = 23'h30_0000` **words** and `jtcps2_main.v:127,185`
+  `addr = ram_cs ? {2'b0,A[15:1]}` → **`RAM:$FF0000-$FFFFFF` = bank 0 byte
+  `0x600000`, 64 KB**.
+- `tools/setup_jtcores.sh` and `tests/test_jtcores_twin.sh` now mirror the
+  fork as a **patch SERIES** (one file per commit, names declared once in
+  `PATCH_NAMES`, the gate checking each against `format-patch -1`, the
+  series length against the commit count, and the directory contents against
+  the declared list). `0001-cps2w-scaffold.patch` came out **byte-identical**
+  through the new path. Gate PASS 10/10.
+
+**THE `-setname` QUESTION, ANSWERED — AND THE TRAP UNDERNEATH IT.**
+`-setname` IS the re-download (`jtsim:503-506` compares a RELATIVE `readlink
+rom.bin`, made with `ln -srf`, against an ABSOLUTE `$ROMFILE`, so the test is
+true on every run; it re-links and calls `enable_load()`, which defines
+`LOADROM` **and moves `sdram_bank?.bin` into `sdram.old/`**). But the obvious
+follow-on — drop `-load` too and preload the banks — **is wrong on CPS-2, and
+it cost a 1,841-frame run to find out.** The transfer also latches the
+DECRYPTION KEY into core registers (`jtcps1_prom_we` → `cps2_key_we` →
+`jtcps2_keyload`); no SDRAM image restores that, so a preloaded run boots into
+ciphertext. Measured: **68k work RAM ALL ZEROS at every one of 1,841
+frames**. The plan's premise ("drop both") is RETRACTED; 14z-106's own note
+("CPS-2 DOES transform — the encryption key load — so use `-load`") was right.
+So the recipe is **`-load`, no `-setname`**, ~462 simulated download frames
+(~7-11 min) on every run, and the bank dumps are useless on this core.
+
+**THE NEAR-MISS, RECORDED AS A GOTCHA:** those all-zero dumps agreed with
+MAME's work RAM on **99.2% of sampled bytes** — because most of a 64 KB
+work-RAM image is zero. That number was the first "byte-order proof" I wrote
+down, and it was worthless. **The first check on any new dump path is that it
+is NON-CONSTANT** (two frames of one run must differ), before any agreement
+number means anything. `tests/test_mister_sim_anchor.sh` now asserts exactly
+that, before it compares anything.
+
+**WHERE WORK RAM ACTUALLY IS, CONFIRMED AGAINST THE RUNNING CORE** (not just
+read off the RTL): the whole 16 MB of bank 0 was dumped at a boot frame and
+diffed against the post-download image — the only regions the 68k had touched
+were `0x400000-0x42FFFF` (VRAM/ORAM) and **exactly 297 bytes at `0x600000`**,
+the same 297 bytes MAME's `$FF0000-$FFFFFF` carries at the same point of the
+boot memory test.
+
+**BYTE ORDER, PROVEN ON LIVE DATA:** the sim's work RAM at game frames
+74/76/78 differs from MAME's at frames 76/78/80 in **1-2 bytes of 65,536**;
+the byte-SWAPPED comparison differs in **416**.
+
+**THE BOOT SKEW, MEASURED AT THE RAM-TEST ONSET:** MAME first writes work RAM
+at frame 73, the core at GAME frame 71 — so **simulated ABSOLUTE frame = MAME
+frame + 460** (462 download frames minus a 2-frame lead).
+
+**AND THE DOWNLOAD BURNS INPUT LINES.** `sim_inputs.next()` fires on every
+LVBL fall from t=0, download frames included, while the core is held in reset
+— so the `.rpl` must be shifted by the download length
+(`rpl2siminputs.py --offset 462`, which is what that flag was added for and
+what `run_sim_jtcps2.sh` defaults to). Everything else (`--wram`, dump names,
+anchors) uses the ABSOLUTE frame counter, so a MAME frame `f` sits near
+simulated frame `f + 462`.
+
+**`tools/run_sim_jtcps2.sh`** — the whole lane as one idempotent command
+(scratch clone at the pin, `~/.mame/roms` symlinks, jtframe env + Go build,
+MRA/.rom, `rom.bin`/`core.mod` by hand instead of `-setname`, `.rpl`
+translation with the download offset, the run, collection). `--frames` and
+`--wram` are ABSOLUTE (download included); `--no-load` and
+`--region BANK OFF LEN ADDR` exist for diagnostics. Prints the sha1 of
+everything it reads; **REFUSES an out-dir inside the repo (rule 7) and a
+scratch clone inside it**.
+
+**THE MEASUREMENT (stock `cps2` core, stock `vsavj`, `05_timeout_idle`):**
+| | MAME | jtcps2 (Verilator) |
+|---|---|---|
+| round-1 match-start anchor | frame **2146** | frame **2507** (absolute) |
+| skew (sim − MAME) | — | **+361** |
+- **THE SKEW IS NOT THE BOOT OFFSET.** At the RAM-test onset the two are
+  **+460** apart; by the match start they are **+361** — the
+  attract/select/VS path costs ~99 fewer frames on the core. That is §4's
+  own rationale, measured on a third implementation.
+- **EVERY COMPARED FIELD AGREES** at the anchor and at +60/+180 (and at
+  +33/+240, checked): `timer` 0x63, both HP 0x120, both white HP, both meter
+  fields, **`p1_hitbox_base` $093B6A on BOTH** (Demitri — P1's pick matches),
+  `p1_ptr64`, `p1/p2_word132`, `p1_x/y/flip/attack_id`, and even the `phase`
+  field `p1_anim_ptr` ($12CDF6 on both). 0 disagreements.
+- **THE ONE DISAGREEMENT IS THE GAME'S OWN LOTTERY, NOT A DEFECT.** The CPU
+  opponent differs: MAME drew record base **$0AE9D4**, jtcps2 **$0A9518**.
+  `05_timeout_idle` is a 1P ARCADE match and the ladder's in-use mask
+  `RAM:$FF8110.l` is SOUND-STATE-FED (`atlas/ram.md:99` — the run-to-run draw
+  that cost GitHub #110 two frozen audits in 14z-103), so the opponent is
+  implementation-dependent by construction. Every field that is a function of
+  WHICH character P2 is (`p2_hitbox_base`, `p2_ptr64`, `p2_word132`,
+  `p2_x/y`, `p2_attack_id`, `p2_flip`) is excluded BY NAME in the gate, with
+  the mechanism in its header; `p2_hp`, `p2_white_hp` and the p2 meter fields
+  stay compared and agree. **Pinning the opponent needs a 2P replay → P2 in
+  `SimInputs` → the queued fork commit, which now has a concrete motivation.**
+- Informational (never a verdict — §4 says whole-RAM equality across
+  codebases is unachievable): the full 64 KB at anchor+60 differs in **1,511
+  of 65,536** bytes, nearly all of it the other opponent's state
+  (`$FF41xx-$FF44xx` 491 bytes, `$FF57xx-$FF58xx` 96).
+
+**GATES**
+- `tests/test_sim_wram_contract.sh` (**ci_portable**, ROM-free, ~1 s): dump
+  naming, the 68k byte-order contract, anchor-mode skew absorption, TWO
+  must-fire controls (a byte-swapped side must be rejected; a perturbed
+  non-predicate field must be reported), the two rule-7 refusals, a static
+  proof that every code line the harness patch adds sits inside the
+  `#ifdef` — with its OWN control (a hoisted line must be rejected) — and an
+  RTL cross-check of the CPS-2 constants against the pinned submodule.
+- `tests/test_mister_sim_anchor.sh` (**emulator tier, ~55 min**, indexed in
+  HANDOFF): the live oracle above with the anchors (2146/2507) and the skew
+  band (361 ± 30) frozen and the P2-identity exclusion named, and THREE
+  controls — the dumped window must be **NON-CONSTANT** before anything is
+  compared (the near-miss, made into a gate), a byte-swapped sim side must be
+  rejected, and a run WITHOUT `--wram` must produce no `wram/` at all.
+
+**TIMES on this machine** (Apple Silicon, Verilator 5.050): the ROM download
+is **462 simulated frames on EVERY run** (~7-8 min); incremental rebuild after
+a `test.cpp` edit or a macro change **~4 s** (only `test.cpp` includes
+`defmacros.h` — the model is not re-verilated, so a new dump window is cheap);
+simulation **~0.98 s per frame** (540 frames incl. download in 8'50"; the
+2,800-frame gate run is ~47 min). A 12,120-frame replay is ~3.4 h.
+
+**A GOTCHA PAID FOR IN 55 MINUTES:** editing a shell script WHILE it runs
+corrupts the running execution — `sh` keeps a byte offset into the file, so a
+COMMENT-ONLY rewrite of `run_sim_jtcps2.sh`'s header turned the first gate run
+into `syntax error near unexpected token '('` **after** its 2,880-frame
+simulation had finished. `sh -n` passes throughout; the corruption lives only
+in the running process. Recovered only because collection is the last step, so
+the dumps were still in the scratch clone. Filed in platform gotchas.
+
+**NOT DONE, and why**
+- Phase B (the full 12,120-frame run with windows at the round-1 timeout and
+  the fade, for the round-transition anchor §4 also names) — ~3.5 h; phase A
+  had to agree first and it only just did.
+- P2 / buttons 5-6 in `SimInputs` (would un-refuse `02_demitri_vs_cpu` and
+  `04_select_fuzz`) — recommended as its own fork commit later; this session
+  was about the oracle, not input coverage.
+- The MiSTer PROFILE SHAPE ruling is still **pending** (recommendation
+  unchanged: WIDE v1 verbatim on a 128 MB tier). No RTL was touched.
+
 ## Session 14z-106 CLOSE — ritual complete
 
 The session, in one line: housekeeping executed (evidence committed,
@@ -59,6 +228,11 @@ waits on the ruling anyway.
   anchor with `JTFRAME_SIM_IODUMP`, extracting the 68k work-RAM window
   and comparing against the MAME expectation. Hours of simulation; it is
   the next opener, with the `-setname`/reload question first.
+  **CORRECTED 14z-107 (in place, entry not rewritten): `JTFRAME_SIM_IODUMP`
+  does NOT reach work RAM on CPS-2 — it dumps the 128-byte EEPROM. The
+  comparison needed a new harness hook (`JTFRAME_SIM_WRAMDUMP`, fork
+  commit 2). Both the `-setname` question and the comparison are ANSWERED
+  in the 14z-107 entry; `docs/platform/mister.md` carries the retraction.**
 
 ## Session 14z-106 (3) — THE MiSTer ARC OPENED: slice A (fork scaffold +
 ## licence) DONE and gated; the twin proof measured; no RTL touched
@@ -398,366 +572,6 @@ is unlocated" qualified in id_space.md / select_screen.md — VANILLA's
 stays unlocated and irrelevant; the port has its own. 0x18 stays
 RESERVED for tenants (it is Oboro's).
 
-## Session 14z-104 CLOSE — ritual complete
-
-The session, in one line: the §4 coverage debt was RETIRED end to end
-on the maintainer's direction (ten new audits, every matrix cell green
-on merged-m5, four native-anchored mechanics discovered — Phobos'
-untechable sweep, his no-kill half-restore throw, Donovan's
-tech-neutral throw, the draw code 0x00), the pursuit mechanic was
-found+instrumented after the maintainer supplied the grammar, the
-Oboro question was answered with a live demonstration (vanilla vsavj
-ships him complete at 0x18; selection is one profile-gated hook), and
-the next session's WINDOW (Oboro hook + version string, one freeze)
-is completely specified in NEXT_SESSION.
-
-The ritual's items, each done this close:
-- **STATE**: this entry; the ROLLOVER executed (the 14z-101 group, 10
-  entries, and the 14z-100 group, 4 entries — 41.6 KB — moved verbatim
-  to STATE_HISTORY with ledger lines; verified lossless: the rolled
-  blob is byte-verbatim in the archive and a line-multiset diff against
-  the pre-rollover file accounts for every line; STATE 133 KB -> 92 KB;
-  the SPLIT convention paragraph re-homed between the groups and THE
-  LEDGER).
-- **NEXT_SESSION**: rewritten at the (4) close — the banner is the
-  complete window spec (W1 Oboro hook, W2 version string, the freeze
-  tail incl. the standing re-point sweep additions).
-- **HANDOFF**: the §4 coverage-program block current (all ten audits).
-- **GOTCHAS**: three paid this session-pair (gate_failures self-test
-  litter; the arcade-draw pin class; per-character rig geometry).
-- **patch docs**: untouched — no shipped byte moved in 14z-103/104.
-- **Issues**: #110 opened, fixed, closed within the pair; tracker
-  clean (zero open).
-- **Suite**: full strict static tier green at this close (see the
-  commit); every new audit green on merged-m5 in-session.
-- Commits LOCAL from 6d80e72 onward — push on the maintainer's word.
-
-Where the next session starts: NEXT_SESSION's banner — the window.
-
-## Session 14z-104 (4) CLOSE — COVERAGE GAP 2 CLOSED (the §4 matrix is
-## fully green), THE WINDOW PREPPED (Oboro hook + version string, the
-## complete spec in NEXT_SESSION), session closes on the maintainer's
-## instruction with the window as the next session's opening arc.
-
-**Rulings recorded (maintainer, 2026-08-22):** coverage items 1+2 GO
-(both now done); Shadow/Marionette OUT OF SCOPE for now; the OBORO
-HOOK + the VERSION STRING ride ONE window with whatever select-spec
-movement they cause; vanilla-vsavj Oboro confirmed as the want ("we
-indeed have nothing to port... if and only if it can be selected" —
-answered with the live demonstration, 14z-104 (3)).
-
-**Gap 2 (audit_edge_cases.sh, 15 legs green on merged-m5):**
-- KO DURING CAPTURE both directions: every tenant kills mid-throw and
-  dies mid-capture with the judge settling (winner 0xFF) — EXCEPT
-  PHOBOS AS THROWER: his throw CANNOT kill — the would-be KO converts
-  to a transient death flag + an HP RESTORE to exactly half (144/144)
-  with no round transition, and NATIVE vsav2 measures the IDENTICAL
-  frame shape. The third native-anchored grab-family property (beside
-  his untechable sweep and Donovan's tech-neutral throw).
-- DOUBLE KO: mirror matches at 1 HP with same-frame jabs TRADE, and
-  the judge writes the DRAW code — $FF8120 == 0x00 measured, the
-  winner byte's third value (atlas row updated).
-- FRAME-1 EX: the DP+2K input on the first live frame — Phobos and
-  Pyron FIRE their EX from frame one (stock decrements); Demitri and
-  Donovan produce an action without a spend (their EX grammars
-  differ); frozen per leg.
-
-**The window prep (complete spec in NEXT_SESSION):** W1 the Oboro hook
-(Gallon-path template PRG:0x020B9C, Start source $FF8060 with a
-verify-at-select first measurement, profile-gated site-thunk, probe
-rehearsal, 0x18 QA legs); W2 the version string (select-screen
-placement inside the ratified window; wheel-record extension via the
-existing [[select_wheel]] copy machinery; vanilla-font-tile hunt vs
-authored group-C blob; manifest knob; the exact text is the
-maintainer's call at the window). The freeze tail moves every WIDE
-artifact; stock must stay bit-identical (both features profile-gated).
-
-## Session 14z-104 (3) — COVERAGE GAP 1 CLOSED (tech roll + throw
-## tech, both directions, native-anchored where the answer surprised),
-## and THE OBORO QUESTION ANSWERED WITH A LIVE DEMONSTRATION.
-
-**Tech roll (audit_tech_roll.sh, 9/9 green on merged-m5):** the roll =
-HELD direction+button through the knockdown landing (a tap does NOT
-register — control leg); every tenant rolls out of a knockdown
-(147/120/120px — their ported recovery states executing); the legacy
-roll works off don/pyr knockdowns; **Phobos' crouch-HK knockdown is
-UNTECHABLE — and native vsav2 measures the identical 14dmg/no-roll**,
-so it is a ported design property, frozen native-anchored; the
-maintainer-described PURSUIT-VS-ROLL counter measured working (leap
-fires, victim rolls 144px, the strike whiffs the vacated spot) — the
-WHIFF half of the pursuit-connect question is now gated.
-
-**Throw tech (audit_throw_tech.sh, 8/8 green):** the tech = the
-victim's own throw input held from grab-connect+2 (same-frame input is
-the separate throw-vs-throw whiff event, deliberately excluded);
-damage halves — every tenant escapes Demitri's throw at the uniform 7;
-Victor techs Phobos 14->7 and Pyron 12->2; **Donovan's throw measures
-5/5 IDENTICAL with and without the tech — and native vsav2 measures
-the same identity**, frozen as the native-anchored tdon expectation.
-No-tech control at the full 13.
-
-**Oboro (maintainer question "can it be selected?", answered live):**
-vsavj has NO player-facing select path (the atlas's unlocated-entry
-hole = the boss-encounter logic), BUT the commit path accepts 0x18
-end-to-end TODAY: poked at select on merged-m5, Oboro loads his own
-native dataset (+0x60 = 0x0B3450, the bases.tsv row) and fights
-(snapshot sent — the pale colorway). The Start-hold hook is exactly
-the existing flavor-latch idiom writing 0x18 on Bishamon's cell —
-selection is OURS to add and is small, profile-gated, freeze-window
-work. vs2's Oboro dataset diffs vsavj's by only 685/8192 sampled bytes
-(the cross-game operand-shift shape) — vanilla-Oboro-as-shipped is the
-fidelity-default recommendation.
-
-Remaining coverage: item 2 only (deliberate KO-frame/corner/frame-1
-edge rigs — next stretch); pursuit-connect's hit half.
-
-## Session 14z-104 (2) — THE PURSUIT ANSWERED AND INSTRUMENTED: the
-## maintainer confirmed the NW leaping pursuit (U + any P/K), the
-## mechanic was found and measured (my earlier screen missed it by
-## inputting AFTER the flat window opened — the input registers during
-## the FALL), and audit_pursuit_leap is green on merged-m5: every
-## tenant's ported pursuit fires with its own arc, every downed tenant
-## accepts targeting.
-
-**Why the 12-candidate screen missed it:** the pursuit input registers
-during the victim's knockdown FALL and the first flat frames; my
-screen's attempts (3086/3098) came after that window closed for the
-sweep knockdown. With the input at f3072 (mid-fall) the leap fires on
-every button (U1/U2/U4/U6 identical — universal, as the maintainer
-said).
-
-**Mechanics measured (engine_internals "THE LEAPING PURSUIT"):** aim is
-captured at INPUT time (proven with a mid-flight victim-position poke);
-per-character arcs (Demitri 33f/y100, Donovan 27f/y102, Phobos 42f/y88,
-Pyron 39f/y88 — the ported vs2 content executing); corner pursuits peak
-over the body then the wall pushbox shoves the attacker off during
-descent (measured on the ALL-LEGACY control = vanilla behavior by the
-superset invariant).
-
-**The instrument (audit_pursuit_leap.sh, green 8/8):** every tenant as
-pursuer (leap fires, airborne, per-char duration band), Demitri
-pursuing every downed tenant (their down state accepts targeting), and
-the no-knockdown control (the same input with the victim recovered must
-NOT enter 0x0E — proves the signature is knockdown-gated).
-
-**The honest open piece — pursuit CONNECT:** a wake-vs-flight knife
-edge in every geometry tried (sweep and throw knockdowns, chases,
-midscreen and corner, victim-position alignment), INCLUDING the
-all-legacy control — so the non-connect is a rig fact, not a port
-defect, and asserting damage needs a knockdown whose flat window
-outlasts the flight on both games. Carried in the matrix (1b), coupled
-to the tech-roll rig family (the roll is the pursuit's designed whiff).
-
-## Session 14z-104 — THE §4 COVERAGE DEBT TACKLED (maintainer-directed):
-## the mandate measured cell by cell, six new audits built and green on
-## merged-m5, and the matrix documented as a maintained artifact. Four
-## rulings recorded. One maintainer question open (the pursuit grammar).
-
-**Rulings recorded at session open (maintainer, 2026-08-22):** cosmetic
-/ single-player deferred INDEFINITELY (the matrix judges cells on the
-2P-competitive surface); beam color + DF/clone colors GOOD, DF time
-GOOD (threads stay closed); the in-game VERSION STRING is APPROVED for
-convenience — it moves shipped bytes, so it rides the next natural
-freeze window (queued, NEXT_SESSION); release packaging is a real topic
-whose before/after-MiSTer ordering stays the maintainer's open
-question.
-
-**The census (docs/project/coverage_matrix.md, the maintained
-artifact):** measured, not recalled. Found: pursuit attacks had ZERO
-coverage anywhere; tenant timeout was field-confirmed only; life-marker
-rigs existed for Donovan only; Pyron had no throw rig; tech-hit has no
-instrument anywhere. Well-covered: vs-18-both-sides
-(audit_roster_pairings, re-run 14z-104: 111/111 on merged-m5), DF
-(rigs; the audit was the missing promotion).
-
-**Six instruments built, each with legacy controls + discriminating
-negative controls, all green on merged-m5:**
-- `audit_df_framework.sh` — the ruled DF table frozen (1 stock,
-  360/360/377/360; span-based duration with Phobos' documented
-  activation flicker bounded to onset+24).
-- `audit_tenant_timeout.sh` — timer poked to 3 ($FF8109), the judge
-  must award the down to the HP LEADER: $FF8120 (NEW atlas row —
-  round-winner code 0xFF=P1/0x01=P2, verified discriminating both
-  directions) + $FF810E (rounds counter). Lead-existence asserted
-  (the Phobos jab-whiff would have passed vacuously without it).
-- `audit_tenant_downwin.sh` — the KO-path life-marker transition,
-  every tenant as WINNER and as VICTIM (the victim legs are the
-  direct #103-class lock: a tenant's death must be judgeable); 8 legs
-  + no-poke control.
-- `audit_tenant_throws.sh` — normal throw both directions; the throw
-  discriminator measured (strength-independent 5-dmg toss for Donovan
-  vs his 24-dmg groundbound strike); Victor throwing each tenant
-  exercises the #104 capture keyframes.
-- `audit_down_attack.sh` — the §4 "pursuit" cell: hitting a downed
-  opponent, both directions. MEASURED: grounded heavies serve
-  (11-14 dmg); per-character windows both sides (Phobos wakes in 24f);
-  a 12-candidate input screen produced NO leaping NW-style pursuit —
-  the naming question is the maintainer's (a distinct leaping pursuit
-  under another grammar gets its own rig if it exists).
-- `audit_stage_sweep.sh` — every tenant x all 12 stages WITH contact:
-  the $FF8100 poke window measured (f2150/2200 sticks AND the venue
-  assets follow; f2450+ sticks without following); 36/36 + no-poke
-  + palette-distinctness controls.
-
-**Rigs:** `tests/replays/judge/01_timeout_lead.rpl`, `02_throw.rpl`,
-`03_down_attack.rpl` — poke-generic, subdir (gate-owned, outside the
-suite's account, so no expectation-set cost).
-
-**Method paid (gotcha, project + index):** per-character rig geometry —
-three instances in one session each first misread as a finding (Phobos'
-LP whiff; heavies cannot be mashed into a down window; Victor's sweep
-throws the victim out of reach). All four combat audits REFUSE to judge
-a leg whose setup event did not happen.
-
-**Remaining open cells (the matrix's gap list):** tech-hit (throw
-escape) rigs both directions; deliberate KO-frame/corner/frame-1 edge
-rigs per tenant; Shadow/Marionette N/A-until-enabled (recorded roster
-decision cited, not re-measured).
-
-## Session 14z-103 (2) — #110 FIXED AND CLOSED (maintainer-directed):
-## the mechanism was the ARCADE DRAW, not cycle drift; both audits
-## re-derived on pinned-opponent rigs and GREEN on merged-m5. The
-## Circuit Scrapper report MEASURED: not reproduced on any variant —
-## captures sent, awaiting the maintainer's scenario detail.
-
-**Maintainer feedback opened the session** (2026-08-22): projectile
-collisions confirmed in line with expectations (closes the freeze's
-standing watch item); a POSSIBLE Circuit Scrapper (63214+HP/MP)
-animation discrepancy vs VS2 ("might be missing a slam cycle at the
-start"), unconfirmed, not gameplay-adverse; and #110 ruled "definitely
-fix".
-
-**The Scrapper measurement (confirmation loop, captures sent):**
-- Archaeology first: the hold placement is the 14z-73
-  grab_hold_keyframes fix (native-exact then); the throw arcs are the
-  ported throw_arc_tables superset rows; replay 80's header carries an
-  old "throw-arc HEIGHT differs, queued" note that predates the arc
-  port. Note test_hui_grab_victim gates only HOLD_LEN=12 frames — a
-  missing later cycle would be invisible to it, so the green gate does
-  not contradict the report.
-- Measured: rig 80 (MP), an HP variant, and a MASH variant, each on
-  native vsav2 AND merged-m5 — all six runs STRUCTURALLY IDENTICAL
-  (grab f3152, one slam spike y40->180, hold, launch peak y=318,
-  damage 19+8), ours lagging by the documented few-frame skew only.
-  Full-throw side-by-side contact sheets (every 4th frame, 3152-3268)
-  sent to the maintainer. Strength and mashing change nothing on
-  either game. NOT REPRODUCED — and CLOSED by the maintainer
-  (2026-08-22, "Circuit Scrapper seems fine indeed") after reviewing
-  the contact sheets. No item remains.
-
-**#110 fixed (the full chain on the issue, closed):**
-- The bisect sharpened by measurement: field-level A/B m6-vs-m7 on the
-  fgA rig diverges at MATCH START (opponent spawn X), and the state
-  check names it — merged6 fights char 0x0C on stage 0x12; merged7 and
-  every build since fight char 0x00 on stage 0x0E ($FF8B82/$FF8100).
-  The 14z-87 batch re-rolled the ARCADE DRAW; the audits' frozen
-  values described a match no current build runs. The pcosmo leg was
-  doubly dead: against the new opponent the rig spends its stock on a
-  DIFFERENT move and zero satellites enter $FF9400 (measured).
-- The fix removes the class: audit_fg_damage now rides NEW 2P-dummy
-  rigs hui/74 + hui/75 (replay-80 scaffolding; opponent+stage pinned;
-  EX fires 3/3, damage 69 both legs, bit-identical run-to-run AND
-  across merged-m4/merged-m5; EXPECT re-frozen 69/69 with
-  attribution). audit_pool_free_byte's pcosmo leg rides
-  106_pyron_cosmo_clash (215/215 family slots tagged, vs 0); one
-  liveness floor re-calibrated with attribution (b8 +0x00 100->10; the
-  +0x20 lane proves the tap). Both audits PASS on merged-m5. The old
-  1P rigs are untouched (their other consumers unperturbed).
-- Gotcha paid (project + index): a 1P-arcade rig is pinned to the
-  arcade draw; frozen-value audits must pin the opponent. The attic
-  diff pair is no longer load-bearing.
-
-## Session 14z-103 — THE A4 PIN-CLEANUP PASS EXECUTED (every stale
-## reference re-pointed, run green, or ruled a deliberate pin), plus
-## three findings the pass surfaced: the gate_failures litter class,
-## GitHub #110 (two audits red since 14z-87), and four LEGACY replays
-## promoted off self-frozen .sha1 (the 14z-88 class, caught by the
-## re-pointed audit_legacy_pairings on its first current-set run)
-
-**The opening triage first:** the untracked
-`build/gate_failures/03_two_player_vs.<epoch>.log` in git status was
-NOT a real gate failure — `test_m2a_flicker_gate.sh` (portable tier)
-stubs the emulator and REQUIRES the masked gate to fail, and the gate's
-failure path preserved each stub into the shared evidence directory:
-141 litter files over five days (140 committed), the newest written by
-the 14z-102 close's own portable re-verify 30 seconds before the close
-commit. Fixed at the root (`M2A_KEEP_DIR` override in m2a_common.sh;
-the self-test points it at its workdir), litter removed by content
-signature (basis-identical or ffff-flip lines; the four real July-29
-logs and merged1_* evidence kept), gotcha paid (project bucket +
-index).
-
-**The A4 pass (docs/project/build_dir_triage.md carries the full
-disposition table):**
-- Re-pointed to the m10/m19/m13/merged-m5 generation and RUN GREEN
-  in-session, each: the hui43 seven (mask_ranges_reader, beam_anim_walk,
-  guard_integrity, df_gold, beam_variants, hui_df_style,
-  hui_grab_victim) + gfx_layout_fields_live + member_classify +
-  voice_row_range; trap_shock/trap_parity (hui37/38 -> hui46);
-  variant_dispatch (pyron17 -> pyron30); pyron_blink/pyron_cosmo/
-  pyron_ring; flicker_attribution + obj_walker_relocation (don_m7 ->
-  don_m10); voice_borrow + gfx_menus pair + legacy_pairings trio +
-  frozen_rompath_guard (don_m5 -> don_m10); fg_parity, ladder_selector,
-  hui_electrocute, select_bank_gates, merged_render_content,
-  build_identity_distinct (m3b_merged/9 -> m3b_merged12); dualtrack
-  STOCK/WIDE -> m5_stock5/don_m10 + battery leg + wide_render_content +
-  tenant_row_owner; gfx_chain + audit_gfx_merged --build-h (hui31 ->
-  hui32, the A2 pipeline input); record_window (hui41 -> hui46);
-  m2a_flicker_gate SET pin -> donovan-m10-stock.
-- `test_region_overlap` section 5 RE-MEASURED on the current trio:
-  2012 -> 2033 conflicting bytes (raw 7603 -> 7624), unique regions
-  13 -> 14 — the new huitzil-only #109 row-31 root region; per-span
-  (53,54)/(39,50)/(461,368)/(1063,1561); control re-anchored, both
-  gates PASS with the must-fire control alive.
-- `audit_flicker_attribution` had been SKIPping quietly — its mask pin
-  named the REMOVED donovan-m7 set dir. Re-derived to fingerprint
-  resolution (the #96 mechanism); PASS on don_m10 (both frozen frames
-  still attributed: 41@2313 row-0x0C, 37@7168 row-0x0A).
-- `test_hui_grab_victim`: default expectation flipped `differs` ->
-  `matches` — the 14z-73 grab_hold_keyframes fix is what it guards
-  (patch_index says so; measured Δ=0 on hui46); the default had been
-  the PRE-FIX shape since the gate's birth because every freeze ran it
-  with explicit =matches. HANDOFF row corrected.
-- DELIBERATE PINS ruled and annotated in place: don_m5
-  (audit_walker_repoint's un-relocated negative control — nothing newer
-  can serve), pyron26 + hui41 (decode_stage_banners' frozen #92 defect
-  carriers; only the donovan clean-leg re-pointed to don_m10).
-  OPERATIONAL reclassed: build/donovan, donovan_stage4_gate, hui4
-  (gates build into them / print the rebuild recipe).
-
-**Finding: GitHub #110 — audit_fg_damage + audit_pool_free_byte RED on
-every build since 14z-87**, surfaced by the re-point, bisected on the
-attic dirs: merged6 (14z-86) PASS both, merged7 (14z-87 voice-borrow +
-beep batch) FAIL both, values stable across five generations since
-(fgA 24 vs frozen 10; fgC 0 = the close-range rig no longer contacts;
-pcosmo 0 family slots in the frozen window). NOT read as a gameplay
-regression: the native-anchored invariants are green on current builds
-(audit_fg_parity's staircase, test_pyron_cosmo). Both audits annotated
-known-red; constants NOT absorbed — the issue carries the diff pair and
-the re-derivation handoff.
-
-**Finding: the 14z-88 class, live again** — `audit_legacy_pairings` on
-its first run against current sets flagged 94_tenant_vs_tenant,
-103_tenant_2pwin_auto, 105_projectile_clash_ctl, 106_pyron_cosmo_clash
-as LEGACY on bare `.sha1` (all four authored AFTER the audit's last
-run; under bare suite dispatch their tenant content comes from
-gate-supplied pokes that run_suite never applies). Executed the audit's
-own fix: vanilla basis EXTENDED (freeze_masked_basis, instrument
-control green, all-or-nothing publish) and the shapes measured on all
-three builds — 94/105/106 = `window vsavj/masked-v2 889 2091` on every
-build (single run, the ratified select-window class, thousands of
-identical match frames after); specs authored, .sha1s dropped
-(STRICTER: vanilla-anchored where self-frozen saw nothing). 103 is
-replay 61 + AUTO: measured per-leg — donovan-m10 loads the TENANT
-(+0x60 = 0x3fa9d0, .sha1 stays); hui/pyron sets commit the UNBACKED
-cell 0x13 and no fighter record forms (+0x60 == 0 at f5000) —
-`.legacy-exempt` authored per the 61/62 precedent.
-
-**Carried forward:** the m3b_merged11 one-back audit defaults must join
-the freeze re-point sweep or the N-2 deletion policy rots them at the
-next freeze (list in the triage doc). A4 dirs now at zero live
-reference fall mechanically at the next census.
-
 **SPLIT 2026-08-20 (14z-99 post-freeze close, maintainer-approved): this
 file holds the RECENT session groups + THE LEDGER; the full detail of every
 older session lives verbatim in `STATE_HISTORY.md`.** How to work with it:
@@ -781,6 +595,8 @@ Full detail for every line: `STATE_HISTORY.md` (verbatim; grep the session
 tag or any phrase below). `[+N more entries]` = the group has N further
 session records in the archive beyond the headline shown.
 
+- Session 14z-104 CLOSE — THE §4 COVERAGE DEBT TACKLED end to end (maintainer-directed): the mandate measured cell by cell, six new audits built and green on merged-m5 and the matrix documented as a maintained artifact; THE PURSUIT answered and instrumented (audit_pursuit_leap); coverage gap 1 (tech roll + throw tech, both directions) and gap 2 closed; THE OBORO QUESTION answered with a live demonstration; the 14z-105 window (Oboro hook + version string) prepped in NEXT_SESSION  [+4 more entries]  [rolled 14z-107 close]
+- Session 14z-103 — THE A4 PIN-CLEANUP PASS EXECUTED (every stale reference re-pointed, run green, or ruled a deliberate pin) plus the three findings it surfaced (the gate_failures litter class, GitHub #110, four LEGACY replays promoted off self-frozen .sha1); #110 FIXED AND CLOSED — the mechanism was the ARCADE DRAW, not cycle drift, both audits re-derived on pinned-opponent rigs and green on merged-m5; the Circuit Scrapper report measured and not reproduced  [+1 more entry]  [rolled 14z-107 close]
 - Session 14z-102 CLOSE — THE #107+#109 WINDOW frozen as donovan-m10/huitzil-m19/pyron-m13/merged-m5 (#109 re-derived from scratch to effect-class ROW 31, the DF clone-mode beam emitter vsavj stubbed; #107 row flip; gold tint kept; build-dir triage 8.1 GB atticked; N-2 deletion policy adopted)  [+6 more entries]  [rolled 14z-105 close]
 - Session 14z-101 CLOSE — the agreed #108->#107->#106 sequence executed windowless (#108 INVERTED to not-a-defect: the satellite word is our own bank row, native satellites equally sweep-inert; #107 twin-anchored statically + tie-refusal landed; #106 closed via verify_pcrel_data --extract); guard-corpus built 316/316; DF mechanics measured ours-vs-native (frameworks differ BY DESIGN; ours == pristine vsavj on the legacy control); #109 found, root-caused through two in-place retractions, and fully prepped  [+9 more entries]  [rolled 14z-104 close]
 - Session 14z-100 CLOSE — THE HARDENING PROGRAM opened and executed same-session (pointer/flow comb H1, escape triage H2, the #99 continue-switch lock H3, the contact rig H4 with the -debug/non-debug instrument paradox left to 14z-101); #99 CLOSED (maintainer); #106/#107/#108 filed; the build-dir decision package delivered  [+3 more entries]  [rolled 14z-104 close]
@@ -1060,6 +876,20 @@ docs/project/playtest_m3a_interims.md so the report can classify against it.
 Original write-up kept below.
 
 ## Decisions pending (human)
+
+- **THE SIM HARNESS'S P2 / 6-BUTTON EXTENSION (14z-107, NOT blocking).**
+  jtframe v1.7.3's `SimInputs` is P1-only with 4 buttons (bit 11 doubles as
+  `dip_test`), so `02_demitri_vs_cpu` and `04_select_fuzz` still REFUSE
+  translation — and 14z-107 gave the question a concrete cost: the only §4
+  field disagreement on the MiSTer oracle is the 1P ARCADE DRAW picking a
+  different CPU opponent (sound-state-fed, `atlas/ram.md:99`), which a 2P
+  replay would pin. Options: **(A) extend `test.cpp`'s `SimInputs` in the
+  fork now** (a third commit, same macro-gated shape as the WRAM hook — P2
+  joystick + buttons 5/6, and a bit for `dip_test` that is not button 4);
+  **(B) leave it and keep excluding the P2-identity fields by name**, as the
+  gate does today. **RECOMMENDATION: A, but AFTER the profile-shape ruling
+  lands** — it is input coverage, not the oracle, and the oracle is green.
+  Gameplay consequence: none (test harness only).
 
 - **THE MiSTer PROFILE SHAPE (14z-106, slice B measured).** The numbers
   (`docs/project/mister_fit.md`) remove the roster trade-off: the group-C

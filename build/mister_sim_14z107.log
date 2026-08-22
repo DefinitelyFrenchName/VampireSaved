@@ -1,0 +1,43 @@
+# 14z-107 — MiSTer simulation oracle, the measured anchor comparison
+# stock jtcps2 (fork pin 553dd56) under Verilator vs MAME 0.288 (pinned cps2 build)
+# replay tests/replays/05_timeout_idle.rpl on stock vsavj; no ROM bytes (rule 7).
+# MAME anchor 2146 / sim anchor 2507 (ABSOLUTE, 462 download frames included); skew +361.
+# Fields per tests/fields_m2a.tsv at anchor+60 (mame 2206 / sim 2567):
+field                    mame     jtcps2  phase   verdict
+timer                      63         63  stable  agree
+p1_hp                     120        120  stable  agree
+p2_hp                     120        120  stable  agree
+p1_white_hp               120        120  stable  agree
+p2_white_hp               120        120  stable  agree
+p1_hitbox_base          93b6a      93b6a  stable  agree
+p2_hitbox_base          ae9d4      a9518  stable  EXCLUDED (arcade-draw opponent, ram.md:99)
+p1_ptr64                93aaa      93aaa  stable  agree
+p2_ptr64                ae8d4      a946c  stable  EXCLUDED (arcade-draw opponent, ram.md:99)
+p1_word132                 18         18  stable  agree
+p2_word132                 18         18  stable  EXCLUDED (arcade-draw opponent, ram.md:99)
+p1_meter_stock              0          0  stable  agree
+p2_meter_stock              0          0  stable  agree
+p1_meter_frac               0          0  stable  agree
+p2_meter_frac               0          0  stable  agree
+p1_x                      22a        22a  settled agree
+p2_x                      2d8        2d8  settled EXCLUDED (arcade-draw opponent, ram.md:99)
+p1_y                       28         28  settled agree
+p2_y                       50         28  settled EXCLUDED (arcade-draw opponent, ram.md:99)
+p1_attack_id                0          0  settled agree
+p2_attack_id                0          0  settled EXCLUDED (arcade-draw opponent, ram.md:99)
+p1_flip                     1          1  settled agree
+p2_flip                     0          0  settled EXCLUDED (arcade-draw opponent, ram.md:99)
+p1_anim_ptr            12cdf6     12cdf6  phase   not compared in anchor mode
+p2_anim_ptr            232190     1f23c6  phase   not compared in anchor mode
+p1_box_ids                  0          0  phase   not compared in anchor mode
+p2_box_ids                  0          0  phase   not compared in anchor mode
+p1_throw_box                0          0  phase   not compared in anchor mode
+p2_throw_box                0          0  phase   not compared in anchor mode
+
+anchor+33  mame 2179 / sim 2540: 12 fields compared, 0 disagreements
+anchor+60  mame 2206 / sim 2567: 12 fields compared, 0 disagreements
+anchor+120 mame 2266 / sim 2627: 16 fields compared, 0 disagreements
+anchor+180 mame 2326 / sim 2687: 16 fields compared, 0 disagreements
+anchor+240 mame 2386 / sim 2747: 16 fields compared, 0 disagreements
+
+informational (never a verdict): whole 64 KB at anchor+60 differs in 1511 of 65536 bytes

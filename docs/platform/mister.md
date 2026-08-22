@@ -21,7 +21,8 @@ field test. Distribution = MRA + RBF over the same release members as
 | thing | where |
 |---|---|
 | the fork | https://github.com/DefinitelyFrenchName/jtcores, branch `vampire-saved`, from upstream tag `v1.7.3` = `63688ce5` |
-| pinned here | submodule `emu/jtcores` (branch `vampire-saved`); `tools/setup_jtcores.sh` checks the pin and inits ONLY `modules/jtdsp16` (`modules/jtframe/target/pocket` is a PRIVATE ssh submodule — never init it) |
+| pinned here | submodule `emu/jtcores` (branch `vampire-saved`); `tools/setup_jtcores.sh` checks the pin, inits the five modules the cps2 yaml chain pulls, and regenerates `emu/jtcores-patches/` as a PATCH SERIES, one file per fork commit (`modules/jtframe/target/pocket` is a PRIVATE ssh submodule — never init it) |
+| the fork's commits | `b9d0565` `cores/cps2w` scaffold (14z-106) · `553dd56` `jtframe/sim: optional work-RAM dumps out of the Verilator SDRAM model` (14z-107). No RTL touched by either |
 | the new core | `cores/cps2w/` in the fork → RBF `jtcps2w.rbf` (jtframe names the RBF `"jt" + <core dir>`; `CORENAME=JTCPS2W` is what the MRA's `<rbf>` is matched against, upper-cased) |
 | the reference core | `cores/cps2/` — untouched, by design |
 | jtframe | `modules/jtframe` is VENDORED in the jtcores tree at v1.7.3 (not a submodule); its Go tool builds with `cd modules/jtframe/src/jtframe && go build -o jtframe .` (Go ≥ 1.2x; `brew install go`). The `bin/jtframe` wrapper uses GNU `date -d` / `stat -c` and needs coreutils on macOS — call the built binary directly instead |
@@ -110,13 +111,23 @@ cps2w differs by `CORENAME=JTCPS2W` only.
   `02_demitri_vs_cpu` REFUSE on P1 button 4). Gate
   `tests/test_rpl2siminputs.sh`. Extending the harness (P2, 6 buttons) is fork
   work on `test.cpp`, to be done when a refused replay is needed.
-- **State out:** `JTFRAME_SIM_IODUMP=<frame>` (the `.cab` `dump` word is
-  post-pin)
-  writes `scenes/<frame>/dump.bin` over the IOCTL read path
-  (`JTFRAME_IOCTL_RD` set — cps2 has 128); `JTFRAME_SAVESDRAM` (+
-  `DUMP_START`) dumps the whole SDRAM at each frame's VBL. Work RAM lives
-  in SDRAM bank 0 on this core ("RAM/VRAM/M68000 ROM"), so the per-frame
-  68k work-RAM window the MAME oracle checksums is reachable.
+- **State out — RETRACTED AND REPLACED 14z-107.** This bullet used to say
+  that `JTFRAME_SIM_IODUMP` plus `JTFRAME_SAVESDRAM` made "the per-frame 68k
+  work-RAM window the MAME oracle checksums" reachable out of the box. **Both
+  halves are false on this core and on this simulator**, measured 14z-107:
+  * `JTFRAME_SIM_IODUMP=<frame>` writes `scenes/<frame>/dump.bin` over the
+    IOCTL READ path. On CPS-2 that path is driven only by the serial EEPROM
+    (`cores/cps1/hdl/jtcps1_sdram.v:462-478`; cps2 has no `cfg/mem.yaml`), and
+    `JTFRAME_IOCTL_RD=128` is the 64 EEPROM words — so `dump.bin` is a
+    **128-byte NVRAM image**, not RAM.
+  * `JTFRAME_SAVESDRAM` exists ONLY in the Verilog SDRAM model
+    (`modules/jtframe/hdl/ver/mt48lc16m16a2.v:193-209`, iverilog/ModelSim).
+    The Verilator harness `modules/jtframe/hdl/ver/test.cpp` never references
+    it: in a Verilator run the C++ `SDRAM` class IS the SDRAM, and its
+    `dump()` (`test.cpp:474-499`) fires exactly once, right after a full ROM
+    download.
+  The true statement that survives: work RAM DOES live in SDRAM bank 0 on this
+  core. Getting it out needs the harness hook below.
 - **jtcores' own regression:** `cores/cps2/cfg/reg.yaml` lists
   `vsav: video: 2200` (frames to render) and sets like `dstlk` carry
   `ver/dstlk/reg.cab` (`1330 / 1 coin / 6 / 1 1P`); `run_regression.sh
@@ -153,23 +164,161 @@ cps2w differs by `CORENAME=JTCPS2W` only.
    `jtsim -verilator -sysname cps2 -setname vsavj -load -video 3` —
    Verilator builds the core and the ROM download runs in simulated time
    (`ROM file transfered (frame 462)`), dumping `sdram_bank0-3.bin`
-   (4 × 16 MB). **10'43" wall on this machine**, once. Later runs drop
-   `-load` and start from the dumps. The harness prints `ERROR: SDRAM
+   (4 × 16 MB). **10'43" wall on this machine.** **CORRECTED 14z-107: it is
+   NOT "once".** The transfer also latches the CPS-2 decryption key into core
+   registers, so it must run on EVERY simulation; the bank dumps are useless
+   on this core. Drop `-setname` (it only re-links and re-runs `getset.sh`),
+   keep `-load`. The harness prints `ERROR: SDRAM
    rd/wr inputs should be zero during initialization` at start and
    continues — upstream's own runs show it too; not ours to chase unless
    it correlates with a divergence.
 7. **Per-frame cost, measured:** a second run (`-video 30`, no `-load`)
-   STILL re-ran the download (`ROM file transfered (frame 462)` again —
-   `-setname` re-links `rom.bin`; whether dropping `-setname` reuses the
-   `sdram_bank?.bin` dumps is the first thing to check next time) and
-   finished in 11'20" for 492 simulated frames → **~1.4 s per frame**
-   on this machine (Apple Silicon, Verilator 5.050). Budget: a
-   select-reaching 1,000-frame run ≈ 25 min; `05_timeout_idle` (12,000
-   frames) ≈ 4.6 h. Fine for a gate that dumps at a few §4 anchors; not a
-   per-frame sweep of the 46-replay corpus. Frames: `frames/frame_00480.jpg`
-   shows sprites on screen by frame 480 (18 frames after the load) — the
-   core runs vsavj. Logs: scratchpad `jtsim_fourth.log` / `jtsim_fifth.log`
-   (not committed; they carry no ROM bytes but are run litter).
+   STILL re-ran the download (`ROM file transfered (frame 462)` again) and
+   finished in 11'20" for 492 simulated frames → ~1.4 s per frame on this
+   machine (Apple Silicon, Verilator 5.050). Frames:
+   `frames/frame_00480.jpg` shows sprites on screen by frame 480 (18 frames
+   after the load) — the core runs vsavj. **ANSWERED 14z-107: the re-download
+   is `-setname`, not `-load`** — see "The work-RAM oracle" below for the
+   mechanism (`ln -srf` vs an absolute `$ROMFILE`) and for the current
+   numbers (~0.98 s/frame). Logs: scratchpad
+   `jtsim_fourth.log` / `jtsim_fifth.log` (not committed; they carry no ROM
+   bytes but are run litter).
+8. **Since 14z-107 you do not run jtsim by hand:**
+   `ROMDIR=... JTSIM_SCRATCH=... tools/run_sim_jtcps2.sh
+   tests/replays/05_timeout_idle.rpl <outdir> --frames 2900 --wram 2500 2900`
+   performs steps 2-7 idempotently and collects `wram/`, the log and
+   `sim_inputs.hex` into `<outdir>`. `--frames` and `--wram` are ABSOLUTE
+   (the 462 download frames included) and the `.rpl` is shifted by
+   `--offset` (default 462). Run it detached and poll the PID; ~1 s per
+   simulated frame.
+
+## The work-RAM oracle: `JTFRAME_SIM_WRAMDUMP` (measured 14z-107)
+
+**Where 68k work RAM is, read from the RTL and then CONFIRMED against the
+running core.** `jtcps1_sdram.v:158-164` `WRAM_OFFSET = 23'h30_0000` in 16-bit
+WORDS; `jtcps2_main.v:127,185` `pre_ram_cs = &A[23:16]` (i.e. `$FFxxxx`) and
+`addr = ram_cs ? {2'b0,A[15:1]} : A[17:1]`; `jtframe_ram_rq.v:94` composes
+`sdram_addr = addr + offset`. So **`RAM:$FF0000-$FFFFFF` = SDRAM bank 0 byte
+offset `0x600000`, 64 KB**. Confirmed by dumping the WHOLE 16 MB bank at a
+boot frame and diffing it against the post-download image: the only regions
+the 68k had touched were `0x400000-0x42FFFF` (VRAM/ORAM) and **exactly 297
+bytes at `0x600000`** — the same 297 bytes MAME's `$FF0000-$FFFFFF` carries at
+the same point of the boot memory test.
+
+**Byte order, proven on live data.** `test.cpp` swaps bytes symmetrically: the
+SDRAM constructor loads `banks[k][j] = file[j^1]` and `SDRAM::dump()` writes
+`out[j^1] = banks[k][j]`, so the dump is **big-endian 68k order** — the same
+byte string `tests/lua/replay.lua:206` hashes on MAME. Measured: the sim's
+work RAM at game frame 74/76/78 differs from MAME's at frame 76/78/80 in
+**1-2 bytes of 65,536**, while the byte-SWAPPED comparison differs in **416**.
+(A weaker cross-check that also holds: `sdram_bank0.bin` equals
+`byteswap(rom/vsavj.rom @ offset 64)`, the CPS-2 `ROM_LOAD16_WORD_SWAP`
+convention.) **What does NOT prove byte order:** an early attempt reported
+99.2% agreement on sampled bytes from a dump path that was emitting a
+CONSTANT all-zero buffer — most of a work-RAM image is zero. Check
+non-constancy first; `tests/test_mister_sim_anchor.sh` does.
+
+**The boot skew.** MAME first writes work RAM at frame 73 (0 -> 257 bytes);
+the simulated core does it at GAME frame 71, i.e. absolute frame 533. So
+**simulated absolute frame = MAME frame + 460** (the 462 download frames minus
+a 2-frame lead), and the round-1 match-start anchor of `05_timeout_idle` sits
+at MAME **2146** / sim **2606**.
+
+**The hook.** Fork commit 2 (`emu/jtcores-patches/0002-jtframe-sim-wramdump.patch`,
+64 added lines in `modules/jtframe/hdl/ver/test.cpp`, no RTL) adds
+`SDRAM::dump_range()` and calls it at the VS rising edge next to the IODUMP
+hook, writing `wram/dump_<frame>_<addr6>.bin` — exactly the glob
+`tools/compare_fields.py` consumes. It is **inert unless
+`_JTFRAME_SIM_WRAMDUMP` is defined**, which is the emulator-superset shape in
+its simulation edition, and the block to dump is described entirely by macros
+(`..._BANK/_OFF/_LEN/_ADDR`, plus `..._END` for the last frame) so jtframe
+stays core-agnostic and the CPS-2 numbers live in `tools/run_sim_jtcps2.sh`.
+Gates: `tests/test_sim_wram_contract.sh` (ROM-free — naming, byte order,
+skew-absorption, the two must-fire controls, the rule-7 refusals, and a
+static proof that every added code line sits inside the `#ifdef`) and
+`tests/test_mister_sim_anchor.sh` (the live end-to-end oracle).
+
+**THE DOWNLOAD IS NOT SKIPPABLE ON CPS-2 — and the SDRAM dumps are a trap.**
+Two facts, both measured 14z-107, and the second cost a 1,841-frame run:
+1. **`-setname` always re-downloads AND moves your dumps away.**
+   `jtsim:503-506` tests `` `readlink rom.bin` != "$ROMFILE" ``; `rom.bin` is
+   made with `ln -srf` so `readlink` returns a RELATIVE path while `$ROMFILE`
+   is absolute — the test is true on every run. It re-links and calls
+   `enable_load()` (`jtsim:249-258`), which defines `LOADROM` **and moves
+   `sdram_bank?.bin` into `sdram.old/`**. That is why 14z-106 saw the
+   462-frame download twice.
+2. **Dropping `-load` gives you the ROM content and a DEAD 68k.** Without it
+   `test.cpp:611-651` preloads the four banks at t=0 and shortens the
+   download to 32 bytes (`test.cpp:263-281`) — but the CPS-2 **decryption key
+   is not in SDRAM**. It is latched into core REGISTERS while the transfer
+   streams (`jtcps1_prom_we` → `cps2_key_we` → `jtcps2_keyload`), so a
+   preloaded run boots into ciphertext. **Measured: 1,841 frames with the
+   banks preloaded, 68k work RAM ALL ZEROS at every single frame** — a
+   constant, which is exactly what a dead CPU writes. (14z-106's own note
+   "CPS-2 DOES transform — the encryption key load — so use `-load`" was
+   right, and the 14z-107 plan's "drop both" was wrong.)
+
+So the recipe is **`-load`, no `-setname`**: `tools/run_sim_jtcps2.sh` makes
+the `rom.bin` symlink and copies `core.mod` itself, deletes the useless bank
+dumps, and pays the transfer every run (**462 simulated frames, ~7-8 min**).
+
+**THE DOWNLOAD CONSUMES INPUT LINES.** `sim_inputs.next()` fires on every
+LVBL fall from t=0, download frames included, while the core is held in reset
+until the transfer ends — so line 1 of `sim_inputs.hex` is burnt on sim frame
+0, not on the game's first frame. The `.rpl` must be shifted by the download
+length: `rpl2siminputs.py --offset 462` (that is what `--offset` was added
+for, and `run_sim_jtcps2.sh` defaults it to the download length). Everything
+else — `--wram FIRST LAST`, the dump file names, the anchors below — uses the
+ABSOLUTE frame counter, so a MAME frame `f` corresponds to a simulated frame
+near `f + 462`.
+
+**Rule-7 note:** with the download mandatory the `sdram_bank?.bin` files have
+no purpose at all; the tool removes them, so a long series of runs no longer
+accumulates 64 MB of ROM-derived litter per run.
+
+**THE ANCHOR MEASUREMENT (stock `cps2` core, stock `vsavj`,
+`05_timeout_idle`, 14z-107).** Round-1 match start: MAME frame **2146**,
+simulated frame **2507** — skew **+361**. Note that this is NOT the boot
+offset (+460): the attract/select/VS path costs ~99 fewer frames on the core
+than on MAME, which is exactly why CLAUDE.md §4 compares mapped state at
+ANCHORS rather than at fixed frame indices. At the anchor and at +60/+180,
+every compared field agrees: `timer` 0x63, both HP 0x120, both white HP, both
+meter fields, `p1_hitbox_base` **$093B6A on both** (Demitri — P1's pick
+matches), `p1_ptr64`, `p1_word132`, `p1_x/y/flip/attack_id`, and even the
+`phase` field `p1_anim_ptr` ($12CDF6 on both).
+
+**THE ONE DISAGREEMENT, AND IT IS THE GAME'S OWN LOTTERY.** The CPU opponent
+differs: MAME drew the character whose record base is **$0AE9D4**, jtcps2 drew
+**$0A9518**. `05_timeout_idle` is a 1P arcade match and the ladder's in-use
+mask `RAM:$FF8110.l` is SOUND-STATE-FED (`docs/game/atlas/ram.md:99` — the
+run-to-run draw that cost GitHub #110 two frozen audits in 14z-103), so the
+opponent is implementation-dependent by construction. Every field that is a
+function of WHICH character P2 is (`p2_hitbox_base`, `p2_ptr64`,
+`p2_word132`, `p2_x/y`, `p2_attack_id`, `p2_flip`) is therefore excluded BY
+NAME in `tests/test_mister_sim_anchor.sh`; `p2_hp`, `p2_white_hp` and the two
+p2 meter fields stay compared and agree. Pinning the opponent needs a 2P
+replay, which needs P2 in the v1.7.3 `SimInputs` harness — a queued fork
+commit. Informational, never a verdict: the whole 64 KB differs in ~1,500 of
+65,536 bytes at anchor+60, nearly all of it the other opponent's state
+(`$FF41xx-$FF44xx`, `$FF57xx-$FF58xx`).
+
+**The lane as one command:** `tools/run_sim_jtcps2.sh <replay.rpl> <outdir>
+[--frames N] [--wram FIRST LAST] [--core cps2|cps2w]`, with `ROMDIR` and
+`JTSIM_SCRATCH` in the environment. Every step is idempotent (clone, symlinks,
+Go build, MRA, seed), it prints the sha1 of everything it reads, and it
+REFUSES an out-dir inside the repo (rule 7) or a scratch clone inside it.
+
+**Times measured on this machine (Apple Silicon, Verilator 5.050):**
+
+| step | wall |
+|---|---|
+| ROM download (`-load`), EVERY run, 462 simulated frames | ~7-11' |
+| incremental rebuild after a `test.cpp` edit or a macro change | ~4 s |
+| simulation | **~0.98 s per frame** (540 frames incl. download in 8'50"; 330 frames in 5'41" on the preloaded path) |
+
+Only `test.cpp` includes `defmacros.h`, so changing the dump window rebuilds
+one object and relinks — it does NOT re-verilate the model. A per-window
+rebuild is ~4 s, not minutes.
 
 ## Measured 14z-106: the twin proof
 
@@ -181,7 +330,15 @@ shown in STATE 14z-106 (3)). Gate: `tests/test_jtcores_twin.sh`.
 
 ## Open / to verify in the arc
 
-- Whether `jtsim` runs at all on macOS (the wrappers are bash + GNU
-  coreutils; Verilator via brew) or needs a Linux box/container — decide
-  from the first attempt, record the recipe here.
-- Time per simulated CPS-2 frame → the gate's budget.
+- ~~Whether `jtsim` runs at all on macOS~~ — ANSWERED 14z-106: it does, with
+  the brew deps in the Recipe above.
+- ~~Time per simulated CPS-2 frame~~ — ANSWERED: ~1.0-1.2 s/frame, so a
+  select-reaching 2,600-frame run is ~45 min and the 12,120-frame
+  `05_timeout_idle` is ~3.5-4 h. Fine for a gate that dumps at a few §4
+  anchors; not a per-frame sweep of the 46-replay corpus.
+- Input coverage: the v1.7.3 harness is P1-only with 4 buttons, so
+  `02_demitri_vs_cpu` and `04_select_fuzz` still refuse. Extending
+  `test.cpp`'s `SimInputs` (P2, buttons 5/6) is a further fork commit —
+  recommended once the anchor gate has run a while, not before.
+- The width surgery itself (SDRAMW 23 -> 24 and the bank/prog/ioctl bit)
+  waits on the profile-shape ruling in STATE "Decisions pending".

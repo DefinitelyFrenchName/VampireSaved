@@ -79,3 +79,4 @@ test_tenant_id
 test_gfx_tile_codec
 test_jtcores_twin
 test_rpl2siminputs
+test_sim_wram_contract

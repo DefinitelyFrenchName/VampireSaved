@@ -32,9 +32,15 @@ hand-edited; bundles chain builders and diff once against clean.
 | `emu/fbneo-patches/0001-vampire-saved-harness.patch` | active | FBNeo | frontend ONLY | Replay harness + instruments (`-hinput/-hout/-hframes/-hdump`, `FBNEO_HVIDEO/HGFX/HTAP/HPOKE`). Touches no emulation; kept separate from 0002 so the trust surfaces stay separable. Gate: `tests/test_fbneo_instruments.sh`. |
 | `emu/fbneo-patches/0002-cps2-wide-v1.patch` | active | FBNeo | 5 CPS-2 driver files | The `vsavjw` descriptor + ONE widened condition in `cps_obj.cpp` (bit-12 promote) gated on `Cps2Wide` (file-scope global — MUST clear in `DrvExit`). Gate: `tests/test_wide_profile.sh` (needs `FBNEO_REF`). |
 | `emu/mame-patches/0002-cps2-wide-v1.patch` | active | MAME 0.288 (submodule, tag mame0288) | cps2.cpp + one mame.lst row | The MAME twin: 164 lines added, exactly ONE removed (sprite tile-code composition, gated on `m_cps2_wide`, a driver member — no reset needed). Gates: `tests/test_mame_parity.sh` (prerequisite, unpatched build) then `tests/test_mame_wide.sh`. |
+| `emu/jtcores-patches/0001-cps2w-scaffold.patch` | active | jtcores (MiSTer, fork `vampire-saved`) | `cores/cps2w/cfg` only | The SEPARATE core scaffold (14z-106): `game.yaml` VERBATIM from cps2, `CORENAME=JTCPS2W`, the MRA set restricted to the vsav family. **No RTL.** Gate: `tests/test_jtcores_twin.sh`. |
+| `emu/jtcores-patches/0002-jtframe-sim-wramdump.patch` | active | jtcores (MiSTer, fork `vampire-saved`) | `modules/jtframe/hdl/ver/test.cpp` — the Verilator TESTBENCH, not RTL and not a core file | `JTFRAME_SIM_WRAMDUMP` (14z-107): 64 added lines, all inside `#ifdef _JTFRAME_SIM_WRAMDUMP`, writing `wram/dump_<frame>_<addr>.bin` in CPU byte order at the VS rising edge. Inert unless the macro is defined; the block to dump is fully macro-parameterised so jtframe stays core-agnostic. Gates: `tests/test_sim_wram_contract.sh` (ROM-free, incl. a static proof of the guard) and `tests/test_mister_sim_anchor.sh` (the live oracle). |
 
-The two 0002 patches are ONE profile expressed twice; their descriptors
-stay member-for-member identical (one romset zip feeds both).
+The two `0002-cps2-wide-v1` patches (FBNeo + MAME) are ONE profile
+expressed twice; their descriptors stay member-for-member identical (one
+romset zip feeds both). The jtcores pair is a different axis: a core
+SCAFFOLD and a SIMULATION-HARNESS hook, neither of which touches RTL —
+the MiSTer profile itself is not yet expressed (STATE "Decisions
+pending: THE MiSTer PROFILE SHAPE").
 Deprecation candidates: none. `CPS2_WIDE_CANARY` stays as the B4
 positive control.
 

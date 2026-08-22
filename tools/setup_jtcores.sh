@@ -9,10 +9,12 @@
 # (maintainer ruling 2026-08-22; docs/platform/mister.md). The gitlink AND
 # this literal SHA pin it — the MAME lesson (setup_mame.sh): a submodule
 # add once staged the default branch while the tag sat only in the
-# worktree. emu/jtcores-patches/0001-*.patch is the fork's diff against
-# upstream v1.7.3, regenerated here, so the change stays a reviewable
-# in-tree file (CLAUDE.md rule 1 v2) — tests/test_jtcores_twin.sh holds
-# the patch, the submodule and the core twin to each other.
+# worktree. emu/jtcores-patches/ mirrors the fork's diff against
+# upstream v1.7.3 as a PATCH SERIES — one file per fork commit, regenerated
+# here — so the change stays a reviewable in-tree file (CLAUDE.md rule 1 v2)
+# and each commit can be read on its own; tests/test_jtcores_twin.sh holds
+# the series, the submodule and the core twin to each other. It was a single
+# file until 14z-107 added the second commit (the sim work-RAM hook).
 #
 # Simulation lane deps (brew): go coreutils gnu-sed xmlstarlet verilator
 # imagemagick — docs/platform/mister.md "Recipe".
@@ -25,7 +27,7 @@ set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 SRC="$REPO/emu/jtcores"
 UPSTREAM_TAG_SHA="63688ce5f4de9b92ac4d2ea4b306009b8ba4bcdb"   # jotego/jtcores v1.7.3
-PINNED="b9d0565f372c8ae6921d95c67eae517d6e6b4816"             # fork branch vampire-saved
+PINNED="553dd56f64ed51aedd10be63e20f075bc4c10de2"             # fork branch vampire-saved
 FORK_URL="https://github.com/DefinitelyFrenchName/jtcores"
 
 if [ ! -f "$SRC/.gitmodules" ]; then
@@ -49,9 +51,24 @@ fi
 git -C "$SRC" submodule update --init modules/fx68k modules/jt12 modules/jt51 modules/jteeprom modules/jtdsp16
 echo "jtcores @ $HEAD (fork of v1.7.3 $UPSTREAM_TAG_SHA); jtdsp16 $(git -C "$SRC" submodule status modules/jtdsp16 | cut -c2-41)"
 
-# The reviewable mirror of the fork's delta.
-git -C "$SRC" format-patch --stdout "$UPSTREAM_TAG_SHA..$PINNED" \
-    > "$REPO/emu/jtcores-patches/0001-cps2w-scaffold.patch"
+# The reviewable mirror of the fork's delta, one file per commit IN ORDER.
+# The names are declared here (not derived from the commit subject) so the
+# in-tree filenames stay stable and greppable; the gate reads this same list.
+PATCH_NAMES="0001-cps2w-scaffold.patch 0002-jtframe-sim-wramdump.patch"
+i=1
+for name in $PATCH_NAMES; do
+    sha="$(git -C "$SRC" rev-list --reverse "$UPSTREAM_TAG_SHA..$PINNED" | sed -n "${i}p")"
+    if [ -z "$sha" ]; then
+        echo "the fork has fewer commits than PATCH_NAMES lists (missing $name)" >&2
+        exit 1
+    fi
+    git -C "$SRC" format-patch --stdout -1 "$sha" > "$REPO/emu/jtcores-patches/$name"
+    i=$((i + 1))
+done
+if [ -n "$(git -C "$SRC" rev-list --reverse "$UPSTREAM_TAG_SHA..$PINNED" | sed -n "${i}p")" ]; then
+    echo "the fork has MORE commits than PATCH_NAMES lists — add the new name" >&2
+    exit 1
+fi
 
 if [ "${JTCORES_SKIP_GO:-0}" != "1" ]; then
     command -v go >/dev/null 2>&1 || { echo "go not found (brew install go)" >&2; exit 1; }

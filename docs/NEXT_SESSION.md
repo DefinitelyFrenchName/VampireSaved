@@ -1,4 +1,4 @@
-# NEXT SESSION — orientation (rewritten at the 14z-105 close, 2026-08-22)
+# NEXT SESSION — orientation (rewritten at the 14z-107 close, 2026-08-23)
 
 > ## **THE STATE IN ONE BREATH: the 14z-105 window is FROZEN as
 > ## donovan-m11 / huitzil-m20 / pyron-m14 / merged-m6 (stock twin
@@ -76,10 +76,36 @@
 > ## banks 0x80-0x8E (all aliasing → width fix required). PENDING RULING:
 > ## WIDE v1 VERBATIM on a 128 MB tier (recommended) vs a tighter MiSTer
 > ## profile. **SLICE C: THE SIM LANE WORKS** (stock jtcps2 + vsavj under
-> ## Verilator on this Mac, ~1.4 s/frame, recipe in mister.md; `.rpl` →
-> ## `sim_inputs.hex` translator gated). NEXT OPENER: the RAM comparison
-> ## at a §4 anchor (05_timeout_idle translates; check whether dropping
-> ## `-setname` reuses the sdram dumps first), then the pending ruling.**
+> ## Verilator on this Mac, ~1 s/frame, recipe in mister.md; `.rpl` →
+> ## `sim_inputs.hex` translator gated).**
+> ## **14z-107 (2026-08-23): THE MiSTer ORACLE IS REAL — the §4
+> ## dual-emulator protocol now runs on a THIRD implementation and
+> ## AGREES.** Fork commit 2 `553dd56` = `JTFRAME_SIM_WRAMDUMP`, 64
+> ## macro-gated lines in the Verilator TESTBENCH `test.cpp` (no RTL);
+> ## `emu/jtcores` pin bumped and the patch mirror is now a SERIES.
+> ## `tools/run_sim_jtcps2.sh` is the whole lane in one command; gates
+> ## `test_sim_wram_contract` (ci_portable) + `test_mister_sim_anchor`
+> ## (emulator tier, ~55 min). MEASURED: work RAM = SDRAM bank 0 byte
+> ## `0x600000`, 64 KB, 68k byte order; `05_timeout_idle` round-1
+> ## match-start anchor MAME **2146** / sim **2507**, skew **+361**
+> ## (NOT the +460 boot offset — the attract/select/VS path costs ~99
+> ## fewer frames on the core, which is why §4 anchors exist). Every
+> ## compared field agrees, P1 = Demitri `$093B6A` on both.
+> ## **THE ONE DISAGREEMENT IS THE GAME'S OWN LOTTERY:** the 1P arcade
+> ## draw is sound-state-fed (`ram.md:99`, the #110 mechanism), so the
+> ## CPU opponent differs (`$0AE9D4` MAME vs `$0A9518` core) and the
+> ## P2-identity fields are excluded BY NAME. Pinning it needs a 2P
+> ## replay -> P2 in `SimInputs` -> a queued fork commit.
+> ## **TWO RETRACTIONS:** `JTFRAME_SIM_IODUMP` dumps the EEPROM on CPS-2
+> ## and `JTFRAME_SAVESDRAM` is Verilog-model-only — work RAM was never
+> ## "reachable"; and **`-load` is MANDATORY** (the download latches the
+> ## decryption key into core registers, so a preloaded run boots into
+> ## ciphertext — 1,841 frames of ALL-ZERO RAM that still "agreed" with
+> ## MAME on 99.2% of sampled bytes. Check NON-CONSTANCY first.)
+> ## NEXT OPENER: the profile-shape ruling (still pending), then the
+> ## width surgery; phase B (the round-transition anchor on the full
+> ## 12,120-frame replay, ~3.5 h) and P2/6-button `SimInputs` are the
+> ## queued follow-ups.
 > ## The N-2 build-dir
 > ## deletion policy applies at the NEXT freeze (m10/m19/m13/merged-m5
 > ## dirs are now one-back; m9/m18/m12/merged-m4 + m5_stock4 are N-2 and
