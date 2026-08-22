@@ -278,6 +278,29 @@ word is our own load-bearing `obj_bank_word_slot` bank row, the sweep
 keys on `+0x94`, and native vs2's satellites are equally sweep-inert
 (STATE 14z-101). The window state: NEXT_SESSION banner.
 
+**THE §4 COVERAGE PROGRAM (14z-104, maintainer-directed "tackle the
+coverage debt") — the census and its instruments live in
+`docs/project/coverage_matrix.md` (maintained in the same commit as any
+change to what it names).** Six new on-demand audits, all green on
+merged-m5, all poke-generic (legs choose characters by the replay-85
+doctrine) with legacy controls + discriminating negative controls:
+`audit_df_framework.sh` (the ruled DF table: cost 1 stock, durations
+360/360/377/360); `audit_tenant_timeout.sh` (the timeout judge awards
+the down to the HP leader — $FF8120/$FF810E, atlas rows added);
+`audit_tenant_downwin.sh` (KO-path life-marker transition, every tenant
+as winner AND victim — the direct #103-class lock);
+`audit_tenant_throws.sh` (normal throw both directions; the throw
+discriminator is the strength-independent toss); `audit_down_attack.sh`
+(hitting a downed opponent both directions — per-character windows,
+Phobos wakes in 24f; the §4 "pursuit" cell, naming question with the
+maintainer); `audit_stage_sweep.sh` (every tenant x all 12 stages with
+contact; the $FF8100 poke at f2150/2200 is measured load-bearing on the
+venue assets). Rigs: `tests/replays/judge/01-03` (subdir = gate-owned,
+outside the suite's account). `audit_roster_pairings` re-ran 111/111 on
+merged-m5 (~5 min — run it at every freeze). Open cells: tech-hit
+(throw escape) rigs; KO-frame/corner edge cases; Shadow/Marionette
+(N/A-until-enabled).
+
 **Previous batch (14z-96, THE #101 KERNEL VOICE-TABLE PORT,
 maintainer-ruled 2026-08-18): donovan-m8 / huitzil-m17 / pyron-m11 /
 merged-m3.**

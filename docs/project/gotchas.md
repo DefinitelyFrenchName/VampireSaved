@@ -2842,3 +2842,18 @@ build its own generation column says was green, check WHICH match it
 is measuring before checking how the fight went. Re-derived rigs:
 hui/74, hui/75 (2P dummy, bit-identical across generations), pcosmo ->
 106_pyron_cosmo_clash.
+
+## A fixed-frame rig verified on ONE character whiffs on another — reach, knockdown arcs, down windows and wake timing are ALL per-character, on BOTH sides (14z-104)
+Three instances in one session, each first misread as a build finding:
+Phobos' standing LP WHIFFS at the spacing where Demitri's connects (the
+downwin audit's first red); heavies cannot be mashed into a down window
+(each whiff's recovery eats the next attempt — the "wider mash" fix made
+even the control red); and Victor's sweep throws the victim clear out of
+down-attack reach while Demitri's keeps them close. On the VICTIM side
+the same applies: Phobos wakes from a knockdown in 24 frames (window
+f3086-3092) where Victor lies until ~f3145. The rule extends
+rig-must-produce-the-real-event: a multi-character audit needs per-leg
+(input, frame) pairs MEASURED per character, and its checker must REFUSE
+to judge a leg whose setup event did not happen (whiff/no-knockdown),
+never pass it and never report it as the surface failing. All four new
+combat audits (timeout/downwin/throws/down_attack) carry that refusal.

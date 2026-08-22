@@ -1,0 +1,26 @@
+# DOWN-ATTACK rig (14z-104, coverage matrix): P1 (poke-chosen) walks to
+# point-blank, KNOCKS DOWN with a crouching HK sweep, then attacks the
+# fallen victim with a heavy. THE ATTACK LINE IS INSERTED PER LEG by
+# audit_down_attack.sh — measured 14z-104: the working (input, frame)
+# pair is per-CHARACTER on both sides (Phobos' heavy needs D6@3110 as
+# attacker; his own down window as VICTIM is only f3086-3092; Victor's
+# sweep throws the victim out of reach entirely, so Demitri is the
+# legacy attacker for every victim leg). Lights never connect; the
+# attacker stays GROUNDED throughout. Victim is a
+# no-input dummy. Used by audit_down_attack.sh for every tenant
+# attacking a downed victim AND being the downed victim.
+# NAMING NOTE: CLAUDE.md §4 says "pursuit attacks"; what the engine
+# measurably provides here is the grounded hit-on-downed-opponent. A
+# distinct leaping pursuit (the Night Warriors mechanic) did not answer
+# any input in the 12-candidate screen — maintainer question pending.
+300-305 sys=C1
+420-425 sys=C2
+800-803 sys=S1
+940-943 sys=S2
+1100-1102 p2=R
+1160-1162 p2=R
+1300-1302 p1=1
+1360-1362 p2=1
+2860-3005 p1=R
+3010-3014 p1=D6
+5000 wait

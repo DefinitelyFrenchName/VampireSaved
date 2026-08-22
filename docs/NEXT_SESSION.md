@@ -1,71 +1,74 @@
-# NEXT SESSION — orientation (updated at 14z-103 (2), 2026-08-22)
+# NEXT SESSION — orientation (rewritten at the 14z-104 close, 2026-08-22)
 
 > ## **THE STATE IN ONE BREATH: the 14z-102 window freeze remains the
-> ## reference** — donovan-m10 / huitzil-m19 / pyron-m13 / **merged-m5**
-> ## (`build/m3b_merged12`, 804 ops; stock twin m5_stock5). No shipped
-> ## byte moved in 14z-103. PLAY: `tools/run_wide.sh build/m3b_merged12
-> ## fbneo`.
+> ## reference** (donovan-m10 / huitzil-m19 / pyron-m13 / merged-m5;
+> ## stock twin m5_stock5). No shipped byte has moved since. PLAY:
+> ## `tools/run_wide.sh build/m3b_merged12 fbneo`.
 >
-> ## **14z-103 = THE A4 PIN-CLEANUP PASS, executed end to end.** Every
-> ## A4 reference dispositioned (re-pointed + run green / ruled a
-> ## deliberate pin / reclassed operational) — the full table is in
-> ## `docs/project/build_dir_triage.md` "A4 PIN-CLEANUP PASS EXECUTED".
-> ## Acceptance all GREEN: every re-pointed emulator gate run
-> ## in-session; run_suite GREEN x3 (don_m10 / hui46 / pyron30);
-> ## audit_legacy_pairings PASS; strict static tier at close. The A4
-> ## dirs now at zero live reference fall MECHANICALLY at the next
-> ## census; don_m5 + pyron26 stay (deliberate evidence pins, annotated
-> ## in their gates); build/donovan, donovan_stage4_gate, hui4 are
-> ## operational, not pins.
+> ## **14z-104 = THE §4 COVERAGE DEBT TACKLED (maintainer-directed).**
+> ## The mandate is now a measured, maintained matrix —
+> ## `docs/project/coverage_matrix.md` — and SIX new audits are green
+> ## on merged-m5: audit_df_framework (the ruled DF table),
+> ## audit_tenant_timeout + audit_tenant_downwin (the judge both
+> ## entrances, every tenant as winner AND victim — the #103-class
+> ## lock), audit_tenant_throws (both directions),
+> ## audit_down_attack (the "pursuit" cell, both directions),
+> ## audit_stage_sweep (every tenant x 12 stages with contact).
+> ## audit_roster_pairings re-ran 111/111 on merged-m5 (~5 min — run
+> ## at every freeze). New atlas rows: $FF8120 round-winner code,
+> ## $FF810E rounds counter, $FF8109 timer poke recipe, the $FF8100
+> ## stage-poke window (f2150-2250).
 >
-> ## **THE PASS'S FINDINGS:**
-> ## (1) the git-status "gate failure" was SELF-TEST LITTER — the
-> ## flicker-gate fixture wrote its deliberate-FAIL stubs into
-> ## build/gate_failures on every static run (141 files); fixed at the
-> ## root (M2A_KEEP_DIR), litter purged by content signature, gotcha
-> ## paid.
-> ## (2) **GitHub #110 — FIXED AND CLOSED 14z-103 (2), maintainer-
-> ## directed:** the mechanism was the ARCADE DRAW — the 14z-87 batch
-> ## re-rolled the CPU opponent/stage (m6: char 0x0C/stage 0x12; m7+:
-> ## char 0x00/stage 0x0E), so both audits' frozen values described a
-> ## match no build runs. Fixed by removing the class: fg_damage rides
-> ## new 2P-dummy rigs hui/74+75 (EXPECT 69/69, bit-identical across
-> ## generations); pool_free_byte's pcosmo leg rides
-> ## 106_pyron_cosmo_clash (215/215 tagged). Both PASS on merged-m5.
-> ## The attic diff pair is NO LONGER load-bearing — the attic deletes
-> ## on the normal schedule.
-> ## (3) the 14z-88 self-frozen-sha1 hole was LIVE again: replays
-> ## 94/103/105/106 (all authored after audit_legacy_pairings' last
-> ## run) promoted — 94/105/106 = `window vsavj/masked-v2 889 2091` on
-> ## all three sets (measured, the ratified select-window class);
-> ## 103 = tenant on don (sha1 stays) / `.legacy-exempt` on hui+pyron
-> ## (commits the unbacked cell 0x13; the 61/62 precedent, measured
-> ## +0x60==0). Vanilla basis masked-v2 EXTENDED by the four logs
-> ## (instrument control green).
-> ## (4) test_hui_grab_victim's default was the PRE-14z-73-fix
-> ## expectation since birth — now `matches` (measured Δ=0 on hui46).
-> ## (5) audit_flicker_attribution had been SKIPping since the
-> ## donovan-m7 set dir was removed — now fingerprint-resolved (#96
-> ## mechanism), PASS on don_m10.
+> ## **RULINGS RECORDED (maintainer, 2026-08-22):** cosmetic /
+> ## single-player DEFERRED INDEFINITELY; beam + DF/clone colors GOOD,
+> ## DF time GOOD; the IN-GAME VERSION STRING is APPROVED — it moves
+> ## shipped bytes, so it RIDES THE NEXT FREEZE WINDOW (queued work
+> ## item, CLAUDE.md §5 convention, open since 14z-92); release
+> ## packaging is real but its before/after-MiSTer ordering is the
+> ## maintainer's open question.
 >
-> ## **CARRY TO THE NEXT FREEZE'S RE-POINT SWEEP:** the m3b_merged11
-> ## one-back audit defaults (continue_ladder/switch, don_grab_pose,
-> ## don_ko_writer, don_lilith_ko, hui_grunt, kill_poke_shape,
-> ## roster_pairings, win_pal_auto, tenant_pairings) — correct today,
-> ## rotted by the N-2 deletion policy at the next freeze if not swept.
-> ## Also roll: test_m2a_flicker_gate's SET pin, the hui46/pyron30/
-> ## don_m10/m3b_merged12 defaults this pass just set, and
-> ## test_region_overlap section-5 constants (re-measure the trio).
+> ## **OPEN MAINTAINER QUESTION (the one §4 cell needing their word):**
+> ## does vsav carry a distinct LEAPING pursuit attack (the Night
+> ## Warriors mechanic) under some input grammar? Measured 14z-104: a
+> ## 12-candidate input screen over a downed victim produced only
+> ## GROUNDED heavy down-attacks (11-14 dmg, per-character windows) —
+> ## covered by audit_down_attack. If a leaping pursuit exists, it gets
+> ## its own rig; if not, the cell is closed as-is.
 >
-> ## **The Circuit Scrapper report is CLOSED (maintainer, 2026-08-22:
-> ## "seems fine indeed")** after the measurement: rig 80 at MP, HP,
-> ## and with mashing, native-vs-merged-m5 — all six runs structurally
-> ## identical (one slam, same hold, same launch, damage identical),
-> ## contact sheets confirmed in hand. No item remains.
-> ##
-> ## Commits are LOCAL — push on the maintainer's word. The attic
-> ## deletion stays the maintainer's playtest-cycle call (the #110 diff
-> ## pair is no longer load-bearing).
+> ## **REMAINING COVERAGE GAPS (the matrix's list):** tech-hit (throw
+> ## escape) rigs both directions; deliberate KO-frame/corner/frame-1
+> ## edge rigs per tenant; Shadow/Marionette N/A-until-enabled.
+>
+> ## **CARRY TO THE NEXT FREEZE'S RE-POINT SWEEP** (unchanged from
+> ## 14z-103): the m3b_merged11 one-back audit defaults, the defaults
+> ## 14z-103 set, the flicker-gate SET pin, region_overlap's trio
+> ## constants — PLUS the six new audits' BUILD defaults and the
+> ## version-string item above. Commits LOCAL — push on the
+> ## maintainer's word.
+
+## What 14z-103 did (the whole arc, one screen)
+
+**The A4 pin-cleanup pass executed end to end** — every stale build-dir
+reference re-pointed and run green, ruled a deliberate pin (don_m5 =
+walker_repoint's un-relocated negative control; pyron26 + hui41 =
+decode_stage_banners' frozen #92 carriers), or reclassed operational;
+disposition table in `docs/project/build_dir_triage.md`. Findings: the
+gate_failures litter class (the flicker-gate fixture wrote deliberate-
+FAIL stubs into the evidence dir on every static run — fixed at the
+root with M2A_KEEP_DIR, 141 files purged by content signature);
+**GitHub #110** — audit_fg_damage + audit_pool_free_byte red since
+14z-87 because that batch RE-ROLLED THE ARCADE DRAW (m6: char 0x0C /
+stage 0x12; m7+: char 0x00 / 0x0E) — fixed by pinning the opponent
+(2P-dummy rigs hui/74+75, EXPECT 69/69 bit-identical across
+generations; pcosmo -> 106_pyron_cosmo_clash) and CLOSED; the 14z-88
+self-frozen-sha1 hole live again on replays 94/103/105/106 — promoted
+to `window vsavj/masked-v2 889 2091` (103 per-leg: tenant on don,
+.legacy-exempt on hui/pyron); grab_victim's default was the pre-14z-73
+expectation since birth (now `matches`, Δ=0); flicker_attribution had
+been SKIPping on a removed set dir (now fingerprint-resolved). The
+Circuit Scrapper report was measured NOT REPRODUCED (six-run A/B, MP/
+HP/mash) and the maintainer confirmed it fine. Everything pushed
+(bb79e18); suites GREEN x3, statics 97/0/0 strict.
 
 ## What 14z-102 did (the whole arc, one screen)
 

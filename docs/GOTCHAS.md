@@ -317,3 +317,9 @@ is a GAME gotcha if it is true of the game regardless of the port.
   (GitHub #110); frozen-value audits must pin the opponent (2P +
   early-window pokes), and a red frozen value means first check WHICH
   match was measured.
+- **14z-104 (project):** fixed-frame rigs verified on one character whiff
+  on another — reach, knockdown arcs, down windows, and wake timing are
+  per-character on BOTH sides (Phobos wakes in 24f; Victor's sweep
+  throws the victim out of reach); multi-character audits need per-leg
+  measured (input, frame) pairs and a refuse-to-judge on setup-event
+  failure.

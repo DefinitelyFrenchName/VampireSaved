@@ -1,5 +1,71 @@
 # STATE — living progress log
 
+## Session 14z-104 — THE §4 COVERAGE DEBT TACKLED (maintainer-directed):
+## the mandate measured cell by cell, six new audits built and green on
+## merged-m5, and the matrix documented as a maintained artifact. Four
+## rulings recorded. One maintainer question open (the pursuit grammar).
+
+**Rulings recorded at session open (maintainer, 2026-08-22):** cosmetic
+/ single-player deferred INDEFINITELY (the matrix judges cells on the
+2P-competitive surface); beam color + DF/clone colors GOOD, DF time
+GOOD (threads stay closed); the in-game VERSION STRING is APPROVED for
+convenience — it moves shipped bytes, so it rides the next natural
+freeze window (queued, NEXT_SESSION); release packaging is a real topic
+whose before/after-MiSTer ordering stays the maintainer's open
+question.
+
+**The census (docs/project/coverage_matrix.md, the maintained
+artifact):** measured, not recalled. Found: pursuit attacks had ZERO
+coverage anywhere; tenant timeout was field-confirmed only; life-marker
+rigs existed for Donovan only; Pyron had no throw rig; tech-hit has no
+instrument anywhere. Well-covered: vs-18-both-sides
+(audit_roster_pairings, re-run 14z-104: 111/111 on merged-m5), DF
+(rigs; the audit was the missing promotion).
+
+**Six instruments built, each with legacy controls + discriminating
+negative controls, all green on merged-m5:**
+- `audit_df_framework.sh` — the ruled DF table frozen (1 stock,
+  360/360/377/360; span-based duration with Phobos' documented
+  activation flicker bounded to onset+24).
+- `audit_tenant_timeout.sh` — timer poked to 3 ($FF8109), the judge
+  must award the down to the HP LEADER: $FF8120 (NEW atlas row —
+  round-winner code 0xFF=P1/0x01=P2, verified discriminating both
+  directions) + $FF810E (rounds counter). Lead-existence asserted
+  (the Phobos jab-whiff would have passed vacuously without it).
+- `audit_tenant_downwin.sh` — the KO-path life-marker transition,
+  every tenant as WINNER and as VICTIM (the victim legs are the
+  direct #103-class lock: a tenant's death must be judgeable); 8 legs
+  + no-poke control.
+- `audit_tenant_throws.sh` — normal throw both directions; the throw
+  discriminator measured (strength-independent 5-dmg toss for Donovan
+  vs his 24-dmg groundbound strike); Victor throwing each tenant
+  exercises the #104 capture keyframes.
+- `audit_down_attack.sh` — the §4 "pursuit" cell: hitting a downed
+  opponent, both directions. MEASURED: grounded heavies serve
+  (11-14 dmg); per-character windows both sides (Phobos wakes in 24f);
+  a 12-candidate input screen produced NO leaping NW-style pursuit —
+  the naming question is the maintainer's (a distinct leaping pursuit
+  under another grammar gets its own rig if it exists).
+- `audit_stage_sweep.sh` — every tenant x all 12 stages WITH contact:
+  the $FF8100 poke window measured (f2150/2200 sticks AND the venue
+  assets follow; f2450+ sticks without following); 36/36 + no-poke
+  + palette-distinctness controls.
+
+**Rigs:** `tests/replays/judge/01_timeout_lead.rpl`, `02_throw.rpl`,
+`03_down_attack.rpl` — poke-generic, subdir (gate-owned, outside the
+suite's account, so no expectation-set cost).
+
+**Method paid (gotcha, project + index):** per-character rig geometry —
+three instances in one session each first misread as a finding (Phobos'
+LP whiff; heavies cannot be mashed into a down window; Victor's sweep
+throws the victim out of reach). All four combat audits REFUSE to judge
+a leg whose setup event did not happen.
+
+**Remaining open cells (the matrix's gap list):** tech-hit (throw
+escape) rigs both directions; deliberate KO-frame/corner/frame-1 edge
+rigs per tenant; Shadow/Marionette N/A-until-enabled (recorded roster
+decision cited, not re-measured).
+
 ## Session 14z-103 (2) — #110 FIXED AND CLOSED (maintainer-directed):
 ## the mechanism was the ARCADE DRAW, not cycle drift; both audits
 ## re-derived on pinned-opponent rigs and GREEN on merged-m5. The
