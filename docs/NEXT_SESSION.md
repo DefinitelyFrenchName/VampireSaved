@@ -41,12 +41,11 @@
 > ## re-init, not the sprite count.
 >
 > ## **THE NEXT SESSION starts from the maintainer's field test of
-> ## merged-m6.** Nothing is queued ahead of it. Two long soaks were
-> ## NOT run at this freeze (both green at 14z-102 on a tree that
-> ## differs only by the two profile-gated select changes): run
-> ## `tests/audit_guard_corpus.sh` (316 runs, hours) and
-> ## `tests/audit_merged_legacy.sh` (~2 h) before the push if the field
-> ## test is clean. After the test: push on their word; then the roadmap forks on the open question — release
+> ## merged-m6.** Nothing is queued ahead of it — every verification
+> ## the 14z-102 freeze had is green on 14z-105 (incl. audit_merged_
+> ## legacy 47/47 + leg b, and the guard-corpus soak 316/316, run while
+> ## the maintainer tested; the Oboro pick also agrees on FBNeo, leg F).
+> ## After the test: push on their word; then the roadmap forks on the open question — release
 > ## packaging before or after MiSTer core surgery. The N-2 build-dir
 > ## deletion policy applies at the NEXT freeze (m10/m19/m13/merged-m5
 > ## dirs are now one-back; m9/m18/m12/merged-m4 + m5_stock4 are N-2 and

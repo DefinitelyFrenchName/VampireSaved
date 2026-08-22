@@ -31,18 +31,16 @@
 - run_battery_m2: 23 PASS + the wide-render self-skip, which was then
   run directly on the m5_stock6/don_m11 pair: PASS (the 14z-102 shape —
   effectively 24/24).
-- NOT run this session: audit_guard_corpus (the 316-run soak, hours) and
-  audit_merged_legacy (~2 h). Both ran green at 14z-102 on a tree that
-  differs from this one by the two profile-gated select-screen changes;
-  the maintainer's field test comes first. Queue them before the push if
-  the test is clean.
+- audit_guard_corpus and audit_merged_legacy: run AFTER the close entry
+  while the maintainer tested — both PASS (see the post-freeze note).
 
 **Post-freeze, while the maintainer tests (2026-08-22):** the Oboro pick
 measured on FBNeo too — id 0x18 / base 0x0B3450 with Start, 0x08 /
 0x0A6418 without, field-for-field what MAME reads (the §4 dual-emulator
 agreement for new content); frozen as leg F of test_oboro_select.sh.
-The two long soaks (audit_merged_legacy, audit_guard_corpus) were
-started in the background — results appended below when they finish.
+The two long soaks were then run: **audit_merged_legacy PASS (rc=0)** —
+leg a 47/47 legacy replays on their exact frozen classes, leg b guard-
+clean vs the new solos; **audit_guard_corpus PASS — 316/316 guarded runs, zero vectors** on merged-m6 under every tenant forcing. Every verification the 14z-102 freeze had is now green on 14z-105 too.
 
 **Where the maintainer looks:** `tools/run_wide.sh build/m3b_merged13
 fbneo` — "M6" bottom-right on select; Bishamon + Start held -> Oboro.
