@@ -25,7 +25,7 @@ set -eu
 ROMDIR="${ROMDIR:?set ROMDIR}"
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"
-BUILD="${1:-build/hui46}"
+BUILD="${1:-build/hui47}"
 [ -d "$BUILD/rompath" ] || { echo "SKIP: no build at $BUILD"; exit 0; }
 WIDE_BIN="${MAME_BIN:-$HOME/.cache/vampire-saved/mame/cps2}"
 [ -x "$WIDE_BIN" ] || { echo "SKIP: no WIDE MAME binary"; exit 0; }

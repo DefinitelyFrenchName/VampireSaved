@@ -98,8 +98,17 @@ if [ -f "$EXPDIR/mask" ]; then
 fi
 
 fail=0
+# SUITE_ONLY="<name> <name>..." (14z-105): run ONLY the named replays. An
+# AUTHORING aid for the freeze — the self-frozen .sha1 replays can be
+# re-frozen without the ~3 h full pass — and NEVER a verdict: a filtered
+# run prints FILTERED on its summary line and the acceptance of a freeze
+# remains the unfiltered verify run.
+[ -n "${SUITE_ONLY:-}" ] && echo "FILTERED RUN (SUITE_ONLY) — not a suite verdict"
 for rpl in "$REPO"/tests/replays/*.rpl; do
     name="$(basename "$rpl" .rpl)"
+    if [ -n "${SUITE_ONLY:-}" ]; then
+        case " $SUITE_ONLY " in *" $name "*) ;; *) continue ;; esac
+    fi
     printf '%-24s ' "$name"
     if [ -f "$EXPDIR/$name.skip" ]; then
         echo "SKIP ($(cat "$EXPDIR/$name.skip"))"

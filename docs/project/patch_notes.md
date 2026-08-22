@@ -3500,3 +3500,100 @@ tenant_loop counts UNCHANGED (region_fix = region rewrite);
 m3a_reproducible on the new EXPECT_HUI; run_suite on the
 carried-renamed set. Build: huitzil-m10 = build/hui37 (9a948a11),
 merged = build/m3b_merged4.
+
+## 14z-105 — THE OBORO + VERSION-STRING WINDOW (donovan-m11 / huitzil-m20 /
+## pyron-m14 / merged-m6; maintainer "happy with the plan" 2026-08-22,
+## field test before push)
+
+Two roster-UX changes, both living INSIDE the ratified §4 v3 select-window
+divergence class, both PROFILE-GATED (the stock twin rebuilt under the new
+rows is bit-identical: `883e7d17` = `m5_stock5`, measured).
+
+### W1 — `oboro_select_hook` (`[[site_thunk]]`, every tenant manifest, deduped)
+
+**What:** vanilla vsavj ships Oboro Bishamon complete at variant id 0x18
+(base `0x0B3450`) and the commit path accepts the id end-to-end — it only
+lacks a player-facing way to pick him (maintainer-ruled: vanilla's Oboro,
+not a vs2 port). The hook is vanilla's own Gallon-variant idiom
+(`PRG:0x020B9C`: on Gallon's cell + `btst #7,$394(a6)` + a 2-3-button
+confirm -> id 0x12) one cell over: Bishamon's cell + the same bit -> 0x18.
+
+**The bit is START — measured before anything was written:** with P1's
+Start held on the select screen the struct's input word `+0x394` reads
+`$8000` (`$0000` without), and `RAM:$FF8060` reads 1 at the same time
+(the 14z-104 question "is the bitmask live at select?" answered yes; the
+hook uses vanilla's own source).
+
+**Every byte:** the 6-byte site `0c2e00020382` (`cmpi.b #$2,$382(a6)`)
+becomes `jsr <thunk>`; the 30-byte body (hole a, placed by the allocator):
+`0c2e00080382 660e 082e00070394 6706 1d7c00180382 0c2e00020382 4e75` —
+Bishamon? / Start? / commit 0x18 / re-execute the displaced cmpi (its flags
+feed vanilla's `bne` at `0x020BA2`: 0x18 != 2 skips the Gallon block like
+any non-Gallon id) / rts. Without Start, or on another cell, the body is
+branch-inert and the flags are vanilla's. `id_literal_ok = "0x08,0x02"`
+(the body compares the id field on purpose). +2 ops per build.
+
+**Measured (gate `tests/test_oboro_select.sh`, five legs, MAME, no
+pokes):** P1 Start-held Bishamon -> id 0x18, base `0x0B3450` in-match;
+no-hold -> 0x08 / `0x0A6418`; Start on Demitri's cell -> 0x01; P2 side
+(default cell 0x05, path D D L L) -> P2 0x18 / `0x0B3450` with P1
+untouched; the STOCK twin under the same inputs -> 0x08. Verdict control:
+a wrong expectation is refused. Name/portrait rows for 0x18 alias
+Bishamon's (32-row arrays) — the naked-eye tell is the pale colorway.
+
+### W2 — the select-screen version string (`version_*` knobs on `[[select_wheel]] roster21`)
+
+**What (CLAUDE.md §5, open since 14z-92):** N authored glyph sprites
+appended to the SAME copied wheel record the roster extension already
+repoints, so the string costs no new divergence class. Knobs, identical in
+all three manifests (ENGINE-SITE row, emitted once): `version_text =
+"M6"` (names the freeze generation — CHANGE IT AT EVERY FREEZE),
+`version_font = build/manifest/version_font.json` (authored 5x7 glyphs,
+0-9 A-Z - . space, provenance NEW), `version_x/y = 340/202` (screen
+position of the first glyph's top-left; OBJ = screen + (64, 16),
+measured on the live OBJ list), `version_pal = 0x19` (Phobos' medallion
+row — thunk-re-asserted every select frame, so stable by construction;
+ink = pen 7 = 0xFF8), `version_base = 0x1FE40` (group C upper-bank codes,
+one per glyph; chosen from the merged-m5 ledger's free rows).
+
+**Bytes:** the record's count word 20 -> 22 (two entries `FE40 0019`,
+`FE41 0019`), the coord list +2 pairs (`+148,+42` / `+164,+42` relative
+to the drawer base (256,176)); budget word 0x55 still CARRIED OVER
+(>= 23 entries, asserted). Tiles: `wheel_bank5.json` gained an
+`"authored"` map (code -> 128B canonical tile); `build_gfx_donovan.py`
+places them with the same same-source-or-fail rule; `audit_gfx_merged.py`
+and `check_wheel_bank5.py` know the "authored" kind. 0 ops.
+
+**The codec finding on the way (docs/platform/gotchas.md):** the first
+probe drew every 8-pixel half MIRRORED and pen 0 as an opaque black box —
+`gfx_tiles.decode` had mapped plane bit i to pixel i since it was written
+(nothing had ever consumed pixel ORDER); fixed both ways (bit i = pixel
+7-i, transparent pen 15), gate `tests/test_gfx_tile_codec.sh`.
+
+**Measured (gate `tests/test_version_string.sh`):** the built record's
+last 2 entries/coords match the knobs; packed group C tiles byte-identical
+to the generator's, non-blank, pen-15 background, font-exact; the live OBJ
+list on select carries exactly the 2 glyph sprites at OBJ (404+16i, 218),
+bank 5, pal 0x19; a MAME snapshot pixel-matches the intended bitmap with
+ZERO mismatches and zero opaque pen-0 pixels; controls: a 1-px shift does
+not match, a corrupted tile is refused.
+
+### The freeze
+
+| artifact | dir | fingerprint | ops |
+|---|---|---|---|
+| donovan-m11 | `build/don_m11` | `1de9a027` | 325 |
+| donovan-m11-stock | `build/m5_stock6` | `883e7d17` (= m5_stock5, UNCHANGED) | — |
+| huitzil-m20 | `build/hui47` | `24a27940` | 365 |
+| pyron-m14 | `build/pyron31` | `6bf265ab` | 298 |
+| merged-m6 | `build/m3b_merged13` | `64426955` (= the rehearsed `build/merged_probe_w6` bit-for-bit) | 806 |
+
+Op counts re-frozen in `tests/test_tenant_loop.sh` with attribution
+(325/365/298; 600/652; 806/907). **The select-window specs were PREDICTED
+to move (NEXT_SESSION at the 14z-104 close: "more sprites/cycles shift the
+window end") and MEASURED NOT TO: `tools/propose_masked_specs.sh` over all
+148 window/composite specs of the three carried sets proposed the frozen
+line verbatim in every case** — the window's end is the VS-phase re-init
+that re-converges the select state, not a function of how many sprites
+the wheel record draws. Only the self-frozen `.sha1` replays were
+re-frozen (`run_suite --freeze`), see STATE 14z-105.

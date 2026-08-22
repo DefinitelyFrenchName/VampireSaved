@@ -165,7 +165,7 @@ build drives inputs through the 0001 harness instead), so record on MAME.
 
 ```sh
 export ROMDIR=/path/to/reference/sets
-tools/run_wide.sh build/m3b_merged12 fbneo # THE 3-TENANT BUILD (all 18
+tools/run_wide.sh build/m3b_merged13 fbneo # THE 3-TENANT BUILD (all 18
                                            # (14z-97: the build argument is
                                            # now REQUIRED. It used to default
                                            # to build/m5w — the known-bad
@@ -175,38 +175,51 @@ tools/run_wide.sh build/m3b_merged12 fbneo # THE 3-TENANT BUILD (all 18
                                            # newest first; m5w and merged1 are
                                            # refused by name.)
                                            # selectable, art included) =
-                                           # merged-m4, FROZEN 14z-99 —
-                                           # merged-m3 + the window batch:
-                                           # #103 + #104 + #105 (+ #43(b),
-                                           # tool-state only).
+                                           # merged-m6, FROZEN 14z-105 —
+                                           # merged-m5 + the window batch:
+                                           # W1 the OBORO SELECT HOOK + W2
+                                           # the VERSION STRING.
                                            # WHAT TO LOOK AT FIRST:
-                                           # (1) lose an arcade round as
-                                           # Donovan — the round must JUDGE
-                                           # and the lose flow must run (no
-                                           # ~2-min stall, #103);
-                                           # (2) Victor's 6+HP headbutt
-                                           # grab on any tenant — the
-                                           # victim holds native's upright
-                                           # capture pose (#104);
-                                           # (3) a tenant win in AUTO mode
-                                           # — the victory portrait is
-                                           # COLORED, not a white shape
-                                           # (#105).
-                                           # NOTE there is no in-game
-                                           # version string to A/B by — the
-                                           # CLAUDE.md §5 convention has
-                                           # never been implemented here
-                                           # (open item, 14z-92); tell the
-                                           # builds apart by directory.
-tools/run_wide.sh build/don_m9 fbneo       # or the solo builds (hui45,
-                                           # pyron29); ... mame
+                                           # (1) the select screen shows
+                                           # "M6" bottom-right — THE NAKED-
+                                           # EYE A/B TELL (CLAUDE.md §5,
+                                           # finally implemented; the text
+                                           # names the freeze generation and
+                                           # is bumped at every freeze);
+                                           # (2) cursor on BISHAMON, hold
+                                           # START, confirm with any button
+                                           # -> OBORO (vanilla vsavj's, pale
+                                           # colorway; HUD name stays
+                                           # "Bishamon" — aliased rows).
+                                           # Works for P1 and P2. Without
+                                           # Start it is plain Bishamon.
+tools/run_wide.sh build/don_m11 fbneo      # or the solo builds (hui47,
+                                           # pyron31); ... mame
                                            # (registry rows name the CURRENT
-                                           # fingerprints — donovan-m9/
-                                           # huitzil-m18/pyron-m12 since the
-                                           # 14z-99 window freeze)
+                                           # fingerprints — donovan-m11/
+                                           # huitzil-m20/pyron-m14 since the
+                                           # 14z-105 window freeze)
 ```
 
-**Current WIDE builds — THE 14z-102 WINDOW FREEZE (maintainer "go"
+**Current WIDE builds — THE 14z-105 WINDOW FREEZE (maintainer "happy with
+the plan" 2026-08-22; field test before push): donovan-m11 / huitzil-m20 /
+pyron-m14 / merged-m6.**
+`build/don_m11` (`1de9a027`, 325 ops), `build/hui47` (`24a27940`, 365),
+`build/pyron31` (`6bf265ab`, 298), `build/m3b_merged13` (`64426955`, 806
+ops — BIT-FOR-BIT the rehearsed build/merged_probe_w6), stock twin
+`build/m5_stock6` (`883e7d17` — UNCHANGED from m5_stock5: both features
+are profile-gated, measured by rebuild). = the 14z-102 batch + (W1) the
+`oboro_select_hook` site_thunk at PRG:0x020B9C — Bishamon's cell + START
+held at confirm commits vanilla vsavj's Oboro 0x18 (vanilla's Gallon-
+variant idiom one cell over; the Start bit MEASURED: +0x394 = $8000) +
+(W2) the select-screen version string "M6" (two authored glyph sprites on
+the roster21 wheel record, group C 0x1FE40+, pal row 0x19, pixel-exact
+gate). Gates: `test_oboro_select.sh` (5 legs incl. P2 + stock),
+`test_version_string.sh`, `test_gfx_tile_codec.sh` (the codec half-mirror
+found on the way — docs/platform/gotchas.md). Detail: STATE 14z-105;
+patch_notes 14z-105.
+
+**Previous batch (14z-102 WINDOW FREEZE (maintainer "go"
 2026-08-21; beams field-confirmed on the rehearsal probe): donovan-m10 /
 huitzil-m19 / pyron-m13 / merged-m5.**
 `build/don_m10` (`c6a02cb0`, 323 ops), `build/hui46` (`1a7249d6`, 363),
@@ -2696,6 +2709,45 @@ tests/test_wide_render_content.sh     # the WIDE track must SERVE the ported con
                                       # reach a playtest — AND the gate that sat
                                       # stale-red from 14z-64 to 14z-67 (GOTCHAS:
                                       # the not-in-the-battery class)
+tests/run_suite.sh [--freeze] [set]   # SUITE_ONLY="<name> ..." (14z-105): run
+                                      # only the named replays — an AUTHORING
+                                      # aid (re-freeze the .sha1 replays in
+                                      # minutes instead of the ~3 h full pass);
+                                      # prints FILTERED and is never a verdict
+tests/test_oboro_select.sh [wide stock] # 14z-105 (W1, ~4 min, 5 MAME runs): THE
+                                      # OBORO SELECT HOOK — Bishamon's cell +
+                                      # START held at confirm commits vanilla
+                                      # vsavj's Oboro (0x18) and the match
+                                      # loads base 0x0B3450. Legs: P1 hold /
+                                      # no-hold control / Start on Demitri
+                                      # (cell-gated) / P2 side / the STOCK
+                                      # twin (profile-gated => 0x08). Every
+                                      # leg asserts id AND loaded base. No
+                                      # pokes — the pick is made with the
+                                      # sticks. Verdict control. Defaults
+                                      # build/m3b_merged13 + build/m5_stock6
+tests/test_version_string.sh [outbase] # 14z-105 (W2, ~2 min, 2 MAME runs): the
+                                      # select-screen VERSION STRING — the
+                                      # wheel record's last N entries are the
+                                      # glyph codes at the declared pal row
+                                      # and screen position; authored tiles
+                                      # packed byte-identical, non-blank,
+                                      # pen-15 background, font-exact; the
+                                      # LIVE OBJ list carries exactly N glyph
+                                      # sprites at OBJ (x+64, y+16); a MAME
+                                      # snapshot pixel-matches the intended
+                                      # bitmap with ZERO mismatches (this is
+                                      # what caught the codec half-mirror).
+                                      # Controls: 1px shift, corrupted tile.
+                                      # Knobs read from the manifests and
+                                      # asserted identical across them.
+tests/test_gfx_tile_codec.sh          # 14z-105 (ci_portable, ~1s): the CPS-2
+                                      # OBJ tile bit law (plane bit i = pixel
+                                      # 7-i within each 8-px half, pen 15
+                                      # transparent), round trips both ways,
+                                      # and the PRE-FIX mirrored mapping
+                                      # reconstructed inline and required to
+                                      # DISAGREE on an asymmetric tile.
 tests/audit_voice_borrow.sh [bd]      # 14z-87 (~6 min, 2 MAME runs): THE
                                       # VOICE-CLASS BORROW mechanism gate —
                                       # the sword-plant "ding" frozen as its
@@ -2859,6 +2911,7 @@ Their expectation sets are BATTERY-SCOPED and say so in their own READMEs.
 
 | Build | SHA-1 (zip) | Notes |
 |---|---|---|
+| **THE 14z-105 WINDOW FREEZE — donovan-m11 / huitzil-m20 / pyron-m14 / merged-m6 (FROZEN 14z-105, maintainer "happy with the plan" 2026-08-22; FIELD TEST BEFORE PUSH). W1 the Oboro select hook + W2 the version string in one window.** | `1de9a027` / `24a27940` / `6bf265ab` / merged program fingerprint `64426955` | `build/don_m11` (325 ops) / `build/hui47` (365) / `build/pyron31` (298) / `build/m3b_merged13` (806 ops = 804 + the one deduped thunk's body + site); stock twin `build/m5_stock6` **`883e7d17` UNCHANGED** (both features profile-gated — measured by rebuild, whole-artifact manifest identical 30/30); tags `freeze/{donovan-m11,huitzil-m20,pyron-m14,merged-m6}`; merged-m6 = tag + this row, NO registry.tsv row per the merged convention. **m3b_merged13 is BIT-FOR-BIT the rehearsed `build/merged_probe_w6`.** = the 14z-102 batch + **(W1)** `oboro_select_hook` — a profile-gated `site_thunk` at `PRG:0x020B9C` (every manifest, deduped): Bishamon's cell + START held at confirm commits vanilla vsavj's Oboro `0x18` (base `0x0B3450`), vanilla's own Gallon-variant idiom one cell over; the Start bit MEASURED (`+0x394` = `$8000`) before authoring; gate `test_oboro_select.sh` (P1, P2, other-cell, no-hold and STOCK legs) + **(W2)** the select-screen VERSION STRING "M6" — two AUTHORED glyph sprites appended to the roster21 wheel record (group C `0x1FE40/41`, pal row 0x19, screen (340,202)); gate `test_version_string.sh` (static + live OBJ list + pixel-exact snapshot). On the way: `gfx_tiles.decode` had every 8-pixel half MIRRORED since it was written (first authored tile exposed it; fixed both ways, gate `test_gfx_tile_codec.sh`, platform gotcha). Placements: huitzil +0x10, pyron +0x30 (the thunk allocates ahead of the regions) — bases.tsv, pcrel [merged_*], pointer_flow baselines re-derived. Whole-artifact manifests: program members + the four GROUP C members (the glyph tiles) moved; no QSound member. Gates at freeze: see STATE 14z-105. |
 | **THE 14z-102 WINDOW FREEZE — donovan-m10 / huitzil-m19 / pyron-m13 / merged-m5 (FROZEN 14z-102, maintainer "go" 2026-08-21). #107 + #109 in one window; the #109 fix field-confirmed on the rehearsal probe BEFORE the freeze.** | `c6a02cb0` / `1a7249d6` / `dbce705b` / merged program fingerprint `393f92a5` | `build/don_m10` (323 ops) / `build/hui46` (363 = 361 + the row-31 code_ptr + region op) / `build/pyron30` (296) / `build/m3b_merged12` (804 ops); stock twin `build/m5_stock5` `883e7d17` (#107 rides the shared map — not profile-gated); battery legs donovan-m10-stock `883e7d17` / donovan-m10-stage4 `d32059e1`; tags `freeze/{donovan-m10,huitzil-m19,pyron-m13,merged-m5}`; merged-m5 = tag + this row, NO registry.tsv row per the merged convention. **hui46 and m3b_merged12 are BIT-FOR-BIT the rehearsed probes (`build/hui_probe_row31` / `build/merged_probe_row31`).** = the 14z-99 batch + **(#107)** reconciliation row `0x0448a6 -> 0x04367a` (verified, callsite-anchored, re-derived at the flip: 6/0x2E all-operand diffs, farm callsites unique both games) + **(#109)** THE CLONE-BEAM FIX: vsavj ships effect-class ROW 31 as a stub and row 31 is the DF clone-mode per-frame beam emitter — ported root `0x926e4:0x11e:t0x922f0` (vh2-oracled, 6/0x11E operand-only diffs) + `beam_effect_class31` code_ptr at `PRG:0x080B28` (slot 0 vanilla reads incl. both long mash marathons, 2418-hit control). THE ROOT CHANGED EXTRACTION: `build/hui32/extract` regenerated (old kept `extract.pre-14z102`), hui placements shifted, op counts re-frozen (363; 598/648; 804/901), tenant bases re-derived (phobos `0x4595a0`, pyron `0x4ac8dc`). Gold tint KEPT (maintainer ruling). Gate: `audit_clone_beam_lines.sh` default EXPECT_LINES=1 (defect signature was frozen on merged-m4 BEFORE the fix; fix-mode PASS solo + merged; strobe phase gotcha in the header). #109-B closed: sweep inventory frozen (`test_biased_list_inventory.sh`, ci_static). Detail: patch_notes 14z-102; STATE 14z-102. |
 | **THE 14z-99 WINDOW FREEZE — donovan-m9 / huitzil-m18 / pyron-m12 / merged-m4 (FROZEN 14z-99, maintainer "go" 2026-08-20). #43(b) + #103 + #104 + #105 in one rehearsed window.** | `428fc0c9` / `c4bbb375` / `4c3c072b` / merged program fingerprint `2343607a` | `build/don_m9` (323 ops) / `build/hui45` (361) / `build/pyron29` (296) / `build/m3b_merged11` (802 ops = 764 + 32 #104 + 6 #105; #103's pieces relocate, net 0); tags `freeze/{donovan-m9,huitzil-m18,pyron-m12,merged-m4}`; merged-m4 = tag + this row, NO registry.tsv row per the merged convention. **The merged artifact is BIT-FOR-BIT the rehearsed `build/probe_window` (`2343607a`).** = the 14z-96 batch + **(#103)** the Donovan lose-flow fix (recon_overlay INSIDE `[[tenant]]` + pcrel_escape_fix `x026142` pad 0x60 / `x05c800` pad 0x20 — a ported pc-rel escape pinned his WHITE HP to 1 so the round judge's sign test never fired on his death; **NOT profile-gated by design, so the STOCK TWIN MOVED for the first time since 14z-91**: `build/m5_stock4` `16da59b6`) + **(#104)** the 15 capture_kf slot_rows per manifest (attackers' per-victim capture keyframe blocks ported whole from vs2 — the variant-row alias class; tenants hold NATIVE capture records, Victor's grab holds them upright) + **(#105)** win_pal `colors = 8 -> 10` all three (the AUTO sets port; AUTO winners' portraits colored) + **(#43(b))** `ALLOW_FALLBACK=True` (tool state: the ruled movement decayed to ONE row `0x028122 -> 0x028e42` plausible-0.90, ZERO build effect). Gates at freeze: suite GREEN x3 on re-frozen sets (every legacy masked replay on its EXACT frozen class; combined legacy cost = the single f890 class-4 select pointer-cache frame); all four flip-audits green at their new defaults (grab_pose EXPECT_MATCH=1 11/26/11; win_pal_auto EXPECT_WHITE=0; don_lilith_ko EXPECT_STALL=0 + WEAKEN_P1=1 FLOWED 2880; don_ko_writer EXPECT_DEFECT=0 + WEAKEN_P1=1 kill-commit f6561); merged gates all green (select-bank, trap parity, FG parity native-exact, render-content bands byte-equal to the new solos, audit_merged_legacy leg a 47/47 leg b guard-clean); m3a_reproducible all five artifacts bit-exact; M2 battery 23/23. New replays classified at the freeze per the 14z-78 ruling (96/104 masked §4 v3 window classes; 103 tenant .sha1). Byte detail: patch_notes 14z-99; full record STATE 14z-99 FREEZE. **Field pass COMPLETE (2026-08-20): #103 + #104 + #105 ALL CONFIRMED AND CLOSED (no stall any VS2 win/lose incl. Donovan-vs-Lilith; correct grab sprites under Victor AND Bulleta 6+HP throws, all tenants; AUTO portraits colored; no crash). #99 un-parked.** |
 | **THE #101 KERNEL VOICE-TABLE PORT — donovan-m8 / huitzil-m17 / pyron-m11 / merged-m3 (FROZEN 14z-96, maintainer-ruled option (a) + freeze 2026-08-18). The grunt fix.** | `d038553d` / `bfd819a0` / `738bcfc2` / merged program fingerprint `ac3d06184f8c248717ba754275d5ab0147c69f07` | `build/don_m8` / `build/hui44` / `build/pyron28` / `build/m3b_merged10`; tags `freeze/{donovan-m8,huitzil-m17,pyron-m11,merged-m3}`. = the 14z-94 batch + each tenant's four `kernel_voice_e0-e3` words (the kernel per-class voice tables' variant halves — vsavj ships them as byte-copies of the base halves, so tenants fired LEGACY voices: Phobos fired Bulleta's `0x1d2` = the maintainer's video-confirmed electrocute grunt, Donovan fired VICTOR's `0x322`) + 16 authored (base,+0x300 alias) Z80 song pairs (the kernel path calls the REAL `0x4CE2`, so the facing alias applies — native's own `0x700→0xA00` twin doctrine) + batch scope `0x730,0x733`. Phobos/Pyron hurt events now port vs2's `0x2a1/0x2a2` — FREE Z80 rows both games, deliberate silence. Measured identity-only: same frames, right voice (or native silence); firing pattern untouched. Stock twin `build/m5_stock3` BIT-IDENTICAL `a054de5c` incl. whole-artifact digest. Gates at freeze: audit_hui_grunt per-build rows green, audit_merged_legacy PASS on the 764-op image, tenant_loop 289/327/262 + 764, manifest_merge (9,9,11)/25, m3a pins re-pointed. merged-m3: NO registry.tsv row per the merged convention (tag + this row). |

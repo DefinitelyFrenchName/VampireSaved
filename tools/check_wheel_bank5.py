@@ -207,6 +207,23 @@ def main():
         if hashlib.sha1(want).digest() not in BLANK:
             nonblank_vs2 += 1
 
+    # 3b. authored version glyphs (14z-105): every tile the generator
+    # authored is in the built group C byte-for-byte, and none is blank
+    # (a blank glyph would mean the font encode produced nothing)
+    n_auth = 0
+    for k, h in built.get("authored", {}).items():
+        c = int(k, 0)
+        if c in host or (c - 0x10000) in host or (c - 0x10000) in vs2:
+            die(f"authored glyph {k} collides with a wheel tile")
+        want = bytes.fromhex(h)
+        if tile_bytes(gc, c) != want:
+            die(f"authored glyph {k}: group C bytes differ from the "
+                f"generator's tile")
+        if hashlib.sha1(want).digest() in BLANK:
+            die(f"authored glyph {k} is BLANK")
+        n_auth += 1
+    print(f"AUTHORED {n_auth}")
+
     # 4. the instrument is grounded
     if not nonblank_host or not nonblank_vs2:
         die(f"blank-source degeneracy: {nonblank_host} non-blank host / "

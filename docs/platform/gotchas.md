@@ -976,9 +976,12 @@ legacy-only instrument shares its fingerprint"* (14z-92, d716e49).
    picks the wrong one.
 2. `build_fingerprint.py` covers only the PROGRAM members — 12 of 21,
    8.1% of the shipped bytes — so it cannot see the difference at all.
-3. There is **no in-game version string** to A/B by (HANDOFF says so
-   explicitly; the CLAUDE.md §5 convention has never been implemented —
-   open item since 14z-92).
+3. ~~There is **no in-game version string** to A/B by~~ **CLOSED 14z-105:
+   the select screen now shows the freeze generation ("M6" bottom-right,
+   `test_version_string.sh`) — but it names the GENERATION, not the
+   instrument-vs-shippable distinction, and `merged1` shows the same
+   string (same program image), so this point still stands for that
+   pair.** (Was: open since 14z-92.)
 
 **What actually distinguishes them**, and what to check instead:
 
@@ -997,3 +1000,27 @@ identical — but the tenants render **blank/garbled with no ported voices**.
 `build_fingerprint.py` (program only), whenever the question is "which build
 is this?"** The program fingerprint answers "which code", which is a
 different question and, for these two, has the same answer.
+
+## `gfx_tiles.decode` had every 8-pixel half MIRRORED, and nothing noticed for 14 sessions (14z-105)
+
+Within each 8-pixel half of a CPS-2 OBJ tile row, plane bit `i` is pixel
+`7-i`. `decode()` mapped bit `i` to pixel `i` from the day it was written,
+and its inverse (`encode`, new 14z-105) inherited that — the first tiles
+this project ever AUTHORED (the select-screen version glyphs) drew each
+half mirrored on the real OBJ path. Caught only because "M6" is not
+symmetric: a MAME snapshot pixel-compared against the intended bitmap
+showed the "6" scrambled while the near-symmetric "M" looked right.
+
+Why it hid: every consumer of the module compares RAW BYTES (`cmd_match`,
+the `BLANK` hashes, every readback assertion). Pixel ORDER had never been
+load-bearing; the first authored tile made it so. Also measured on the way:
+the transparent pen is **15**, not 0 (pen 0 drew an opaque black box), and
+an OBJ entry at `(x, y)` lands at **screen `(x - 64, y - 16)`** on this
+screen — the wheel's `_coord_note` had the x half only.
+
+Gate: `tests/test_gfx_tile_codec.sh` (the bit law on single pixels, round
+trips both ways, the pre-fix mapping reconstructed and required to
+DISAGREE on an asymmetric tile). Rule: any synthesized tile is verified
+at the RENDER layer against its intended bitmap (`test_version_string.sh`
+§2) — a byte round-trip proves the codec is self-consistent, not that it
+matches the hardware.

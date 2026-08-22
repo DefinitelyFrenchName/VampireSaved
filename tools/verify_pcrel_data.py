@@ -31,8 +31,8 @@ of its own (it composes the solos' pinned extracts), and its placements
 key non-reference tenants' regions as "<region>@<tenant>". Cover it one
 tenant at a time with that tenant's own extract:
 
-  verify_pcrel_data.py build/m3b_merged11 --src-data ... \
-      --extract build/hui45/extract --placement-suffix @huitzil
+  verify_pcrel_data.py build/m3b_merged13 --src-data ... \
+      --extract build/hui47/extract --placement-suffix @huitzil
 
 Exit 1 if any pointer resolves to bytes that do not match its table.
 """

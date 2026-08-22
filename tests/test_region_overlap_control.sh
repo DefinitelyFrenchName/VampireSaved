@@ -32,7 +32,7 @@ COPY="$REPO/tests/.regoverlap_control_copy.sh"
 # Point section 5 at the SUPERSEDED trio: its real figure is 2000, so the
 # 2033 assertion must reject it. This is the 2000-vs-2033 delta, asserted.
 echo "== 1. current-trio section pointed at the superseded trio =="
-sed 's|^CUR_BUILDS="build/don_m10 build/hui46 build/pyron30"|CUR_BUILDS="build/m5_wide build/hui30 build/pyron21"|' \
+sed 's|^CUR_BUILDS="build/don_m11 build/hui47 build/pyron31"|CUR_BUILDS="build/m5_wide build/hui30 build/pyron21"|' \
     "$REPO/tests/test_region_overlap.sh" > "$COPY"
 chmod +x "$COPY"
 grep -q 'CUR_BUILDS="build/m5_wide' "$COPY" || {

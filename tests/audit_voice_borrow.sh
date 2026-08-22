@@ -40,7 +40,7 @@
 # Default build: build/don_m5. ~6 min (2 MAME runs).
 set -eu
 
-BUILD="${1:-build/don_m10}"
+BUILD="${1:-build/don_m11}"
 EXPECT="${VOICE_BORROW_EXPECT:-own-class}"
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"

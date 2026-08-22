@@ -142,7 +142,14 @@ def write_tile(simms, t2, tile):
 
 
 def decode(tile):
-    """Canonical 128B -> 256 pixel values 0-15 (row-major 16x16)."""
+    """Canonical 128B -> 256 pixel values 0-15 (row-major 16x16, SCREEN
+    order). Plane bit i of a half's row byte is pixel 7-i of that half —
+    MEASURED 14z-105: an authored tile encoded with bit i = pixel i drew
+    each 8-pixel half mirrored on the real OBJ path (the select-screen
+    version glyphs, pixel-compared against a MAME snapshot). Before that
+    this function mapped bit i to pixel i; nothing consumed its pixel
+    ORDER (cmd_match compares raw bytes, BLANK hashes raw bytes), so the
+    mirror was invisible. Transparent pen is 15, not 0."""
     px = bytearray(256)
     L01, L23, R01, R23 = (tile[0:32], tile[32:64], tile[64:96], tile[96:128])
     for r in range(16):
@@ -151,9 +158,29 @@ def decode(tile):
         rw = (SEP[R01[2*r]] | SEP[R01[2*r+1]] << 1
               | SEP[R23[2*r]] << 2 | SEP[R23[2*r+1]] << 3)
         for x in range(8):
-            px[r * 16 + x] = (lw >> (4 * x)) & 0xF
-            px[r * 16 + 8 + x] = (rw >> (4 * x)) & 0xF
+            px[r * 16 + 7 - x] = (lw >> (4 * x)) & 0xF
+            px[r * 16 + 15 - x] = (rw >> (4 * x)) & 0xF
     return px
+
+
+def encode(px):
+    """Inverse of decode: 256 pixel values 0-15 (row-major 16x16) ->
+    canonical 128B tile. Round-trip gated by tests/test_gfx_tile_codec.sh
+    (14z-105, the select-screen version string's authored glyphs)."""
+    assert len(px) == 256
+    L01, L23, R01, R23 = bytearray(32), bytearray(32), bytearray(32), bytearray(32)
+    for r in range(16):
+        for half, (b01, b23) in ((0, (L01, L23)), (8, (R01, R23))):
+            p0 = p1 = p2 = p3 = 0
+            for x in range(8):
+                v = px[r * 16 + half + 7 - x] & 0xF   # bit x = pixel 7-x
+                p0 |= (v & 1) << x
+                p1 |= ((v >> 1) & 1) << x
+                p2 |= ((v >> 2) & 1) << x
+                p3 |= ((v >> 3) & 1) << x
+            b01[2 * r], b01[2 * r + 1] = p0, p1
+            b23[2 * r], b23[2 * r + 1] = p2, p3
+    return bytes(L01 + L23 + R01 + R23)
 
 
 def cmd_match(spec_a, spec_b):

@@ -4840,6 +4840,84 @@ def main():
                     x, y = spec["pos"]
                     cl += struct.pack(">hh", int(x) + int(_cx) - int(_bx),
                                       int(y) + int(_cy) - int(_by))
+                # --- 2b. VERSION STRING (14z-105, CLAUDE.md §5's "visible
+                # in-game version string", maintainer-approved 14z-104): N
+                # authored glyph sprites appended to the SAME record — the
+                # select screen is the one roster-owned always-visited
+                # surface, and it already diverges under the ratified §4 v3
+                # window, so the string costs no new divergence class. Tiles
+                # are AUTHORED (provenance NEW — the effect_tail precedent),
+                # encoded by gfx_tiles.encode from build/manifest/
+                # version_font.json, placed in group C's upper bank by
+                # build_gfx --wheel-bank5 (the "authored" list). Gated on
+                # bank5 being active: without group C there is nowhere to
+                # put a glyph. Knobs (all under [[select_wheel]]):
+                #   version_text  the string (chars must exist in the font)
+                #   version_x/y   screen position of the first glyph's
+                #                 top-left (screen = OBJ - (64, 16), measured)
+                #   version_pal   select palette row (must be one of the
+                #                 thunk-re-asserted medallion rows — stable
+                #                 by construction; the font's `ink` index)
+                #   version_base  group C upper-bank code of the first
+                #                 glyph (row-aligned; one cell per glyph)
+                vt_entries = []        # (tile, attr) per glyph
+                vt_tiles = {}          # code -> 128B canonical tile (hex)
+                vt_text = str(sw.get("version_text", ""))
+                if vt_text and not bank5_active:
+                    notes.append(f"# select_wheel {nm}: version_text "
+                                 f"{vt_text!r} SKIPPED — bank5 inactive (no "
+                                 f"group C to hold the glyphs)")
+                elif vt_text:
+                    from gfx_tiles import encode as _enc_tile
+                    _font = json.loads((root / sw["version_font"]).read_text())
+                    _ink = int(_font["ink"])
+                    _vb = _int(sw["version_base"])
+                    _vp = _int(sw["version_pal"])
+                    if _vb & 0xF:
+                        fail.append(f"select_wheel {nm}: version_base "
+                                    f"{_vb:#x} must be row-aligned (low "
+                                    f"nibble 0)")
+                    if _vb < 0x10000 or _vb + len(vt_text) > 0x20000:
+                        fail.append(f"select_wheel {nm}: version_base "
+                                    f"{_vb:#x}+{len(vt_text)} is outside "
+                                    f"group C's upper bank")
+                    _sx, _sy = _int(sw["version_x"]), _int(sw["version_y"])
+                    for _i, _ch in enumerate(vt_text):
+                        if _ch not in _font["glyphs"]:
+                            fail.append(f"select_wheel {nm}: version_text "
+                                        f"char {_ch!r} has no glyph in "
+                                        f"{sw['version_font']}")
+                            continue
+                        _g = _font["glyphs"][_ch]
+                        if len(_g) != 7 or any(len(r) != 5 for r in _g):
+                            fail.append(f"select_wheel {nm}: glyph {_ch!r} "
+                                        f"is not 5x7")
+                            continue
+                        _px = bytearray([15] * 256)   # pen 15 = transparent
+                        # 2x scale, 10x14 ink box centred in the 16x16 cell
+                        for _r, _row in enumerate(_g):
+                            for _cx, _v in enumerate(_row):
+                                if _v == "#":
+                                    for _dy in (0, 1):
+                                        for _dx in (0, 1):
+                                            _px[(1 + 2 * _r + _dy) * 16
+                                                + 3 + 2 * _cx + _dx] = _ink
+                        _code = _vb + _i
+                        vt_tiles[_code] = _enc_tile(_px).hex()
+                        vt_entries.append((_code & 0xFFFF, _vp & 0x1F))
+                        # coords are RELATIVE to the drawer base, like the
+                        # cells above; OBJ x = screen x + 64
+                        # OBJ (x, y) -> screen (x - 64, y - 16): measured
+                        # 14z-105 on the live OBJ list (x=0x194/y=0xCA drew
+                        # at screen (340, 186))
+                        cl += struct.pack(">hh",
+                                          _sx + 64 + 16 * _i - int(_bx),
+                                          _sy + 16 - int(_by))
+                    notes.append(f"# select_wheel {nm}: version_text "
+                                 f"{vt_text!r} -> {len(vt_entries)} glyph "
+                                 f"entries at screen ({_sx},{_sy}), pal row "
+                                 f"{_vp:#04x}, codes {_vb:#x}+ (authored "
+                                 f"tiles via wheel_bank5.json)")
                 cl_dst = alloc(sw.get("hole", "a"), len(cl),
                                f"select_wheel {nm} coords")
                 if cl_dst is None:
@@ -4847,10 +4925,19 @@ def main():
 
                 # --- 3. record: copy + append + repoint ------------------------
                 body = bytearray(vj[rec:rec + 10 + nvan * 4])
-                struct.pack_into(">H", body, 4, nvan + len(newcells) - 1)  # count
+                struct.pack_into(">H", body, 4,
+                                 nvan + len(newcells) + len(vt_entries) - 1)  # count
                 struct.pack_into(">I", body, 6, cl_dst)                    # cptr
                 for _c, spec in newcells:
                     body += struct.pack(">HH", _int(spec["tile"]), _int(spec["attr"]))
+                for _t, _a in vt_entries:
+                    body += struct.pack(">HH", _t, _a)
+                if budget < nvan + len(newcells) + len(vt_entries):
+                    fail.append(f"select_wheel {nm}: record budget {budget} "
+                                f"< {nvan + len(newcells) + len(vt_entries)} "
+                                f"entries — the carried-over budget word no "
+                                f"longer covers the record")
+                    continue
                 rec_dst = alloc(sw.get("hole", "a"), len(body),
                                 f"select_wheel {nm} record")
                 if rec_dst is None:
@@ -4860,15 +4947,18 @@ def main():
                 ops.append({"op": "data", "addr": f"{rec_dst:#x}", "hex": bytes(body).hex()})
                 ops.append({"op": "poke32", "addr": f"{recptr:#x}", "val": f"{rec_dst:#x}"})
                 notes.append(f"data   {cl_dst:#08x} +{len(cl):#x}  select_wheel {nm} "
-                             f"coord list ({nvan} vanilla + {len(newcells)} new)")
+                             f"coord list ({nvan} vanilla + {len(newcells)} new "
+                             f"+ {len(vt_entries)} version glyphs)")
                 notes.append(f"data   {rec_dst:#08x} +{len(body):#x}  select_wheel {nm} "
-                             f"record (count {count}->{nvan + len(newcells) - 1}, "
+                             f"record (count {count}->"
+                             f"{nvan + len(newcells) + len(vt_entries) - 1}, "
                              f"budget {budget:#x} CARRIED OVER, cptr -> {cl_dst:#x})")
                 notes.append(f"poke32 {recptr:#08x} <- {rec_dst:#x}  select_wheel "
                              f"{nm} record ptr (was {rec:#x}; the record's ONLY "
                              f"referrer — vanilla record and list are untouched)")
                 fragments.append((rec_dst, len(body), "NEW",
-                                  f"select_wheel {nm} record (21 cells)"))
+                                  f"select_wheel {nm} record ({nvan + len(newcells)} "
+                                  f"cells + {len(vt_entries)} version glyphs)"))
                 fragments.append((cl_dst, len(cl), "NEW",
                                   f"select_wheel {nm} coord list"))
 
@@ -5023,8 +5113,20 @@ def main():
                             fail.append(f"select_wheel {nm}: host/new tile "
                                         f"overlap {sorted(hex(x) for x in both)}")
                             continue
-                        write_out(side_name("wheel_bank5.json"), json.dumps(
-                            {"host": sorted(host_t), "vs2": sorted(new_t)}))
+                        _vt_c = {c - 0x10000 for c in vt_tiles}
+                        if _vt_c & (host_t | new_t):
+                            fail.append(f"select_wheel {nm}: version glyph "
+                                        f"codes overlap wheel tiles "
+                                        f"{sorted(hex(x) for x in _vt_c & (host_t | new_t))}")
+                            continue
+                        _wb5 = {"host": sorted(host_t), "vs2": sorted(new_t)}
+                        if vt_tiles:
+                            # authored glyphs: code (group C index, 0x10000+)
+                            # -> canonical 128B tile hex; build_gfx places
+                            # them verbatim (provenance "authored")
+                            _wb5["authored"] = {f"{c:#x}": h
+                                                for c, h in sorted(vt_tiles.items())}
+                        write_out(side_name("wheel_bank5.json"), json.dumps(_wb5))
                         notes.append(f"code   {site:#08x} +6     select_wheel "
                                      f"{nm}: drawer bank word #$2000 -> "
                                      f"#${_bw5(5):04x} (bank 5) in the select "
@@ -5599,6 +5701,14 @@ def main():
                 if args.stage < _int(st.get("stage", 6)):
                     continue
                 nm = st["name"]
+                # profile (14z-105): a thunk that exists only under a build
+                # profile (the Oboro select hook — roster UX, so WIDE-only by
+                # construction; the stock twin must stay bit-identical). Same
+                # key and semantics as [[select_wheel]]/[[sound_table]].
+                if st.get("profile") and st["profile"] != args.profile:
+                    notes.append(f"# site_thunk {nm}: SKIPPED (profile "
+                                 f"{st['profile']!r} != {args.profile!r})")
+                    continue
                 # only_variant_slot (14z-62e), by the row's OWNER (slice C): a
                 # thunk that exists only for the de-substituted tenant (e.g. the
                 # select-palette redirect, whose block lives in profile-gated

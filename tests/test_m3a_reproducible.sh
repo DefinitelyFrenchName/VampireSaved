@@ -61,7 +61,8 @@ trap 'rm -rf "$WORK"' EXIT
 # measured bit-identical).
 # EXPECT_WIDE="d038553dec5b8a7759e96f46b2fa0964c652a21b"  # git tag freeze/donovan-m8
 # EXPECT_WIDE="428fc0c9421cb5ba96db040bae0fc4935a3f5228"  # git tag freeze/donovan-m9
-EXPECT_WIDE="c6a02cb01b0eb7c80cdd22cba8796030677ae706"   # 14z-102 window (#107 flip)
+# EXPECT_WIDE="c6a02cb01b0eb7c80cdd22cba8796030677ae706"  # git tag freeze/donovan-m10
+EXPECT_WIDE="1de9a027d86c5a87dccb36c8ad3fbaa03fe17126"   # 14z-105 window (oboro hook + version string)
 # EXPECT_STOCK="a054de5c0cfe868cb0aa9722abebdffd9dfcdb0d"  # unchanged 14z-86..14z-96
 # 14z-99: THE STOCK TWIN MOVED for the first time since 14z-91 — #103's
 # pcrel_escape_fix rows are not profile-gated (the stock track gets the
@@ -104,7 +105,8 @@ EXPECT_STOCK="883e7d17405baf462c9763eccde4e35bf93adecb"  # 14z-102 (#107 moves s
 # GRUNT FIX: 01d2 -> 02a2, vs2's deliberate-silence id) — huitzil-m17
 # EXPECT_HUI="bfd819a012218b9e8022be17b0747319a76f3140"  # git tag freeze/huitzil-m17
 # EXPECT_HUI="c4bbb3752cc93494455bfebb83fff801051c7fec"  # git tag freeze/huitzil-m18
-EXPECT_HUI="1a7249d68d1ce8472c5a25ab6bd05ef099c2ff29"   # 14z-102 window (#109 row-31 fix; extraction changed)
+# EXPECT_HUI="1a7249d68d1ce8472c5a25ab6bd05ef099c2ff29"  # git tag freeze/huitzil-m19
+EXPECT_HUI="24a27940656c160c909de3a690e74da8aa7e9432"   # 14z-105 window (oboro hook + version string; placements +0x10)
 # pyron-m3 (14z-82c: + the ADOPTED hitclass_map_extend thunk — the f7997 fix)
 # EXPECT_PYR="6c7f7322da793c12b3681dd3ef5a76b3792ae5d0"  # git tag freeze/pyron-m3
 # pyron-m4 (14z-85b, maintainer-ruled: + pyr_sfx_records — kills the merged
@@ -122,7 +124,8 @@ EXPECT_HUI="1a7249d68d1ce8472c5a25ab6bd05ef099c2ff29"   # 14z-102 window (#109 r
 # 14z-96 (#101): + his four kernel_voice code_words — pyron-m11
 # EXPECT_PYR="738bcfc2c06b008d7d4cef61f31faf74df784206"  # git tag freeze/pyron-m11
 # EXPECT_PYR="4c3c072bfe7a7b422d27194c986b27f53238f554"  # git tag freeze/pyron-m12
-EXPECT_PYR="dbce705b0cf92f93103da73da35b55a75f05b666"   # 14z-102 window (#107 via the shared map)
+# EXPECT_PYR="dbce705b0cf92f93103da73da35b55a75f05b666"  # git tag freeze/pyron-m13
+EXPECT_PYR="6bf265abc5b8e0980f7f8b29fd39b64814af8a86"   # 14z-105 window (oboro hook + version string; placements +0x30)
 
 # The WIDE overlay romset (deterministic from the audited reference sets;
 # built into scratch so the canonical build/wide0 is never clobbered).
@@ -195,7 +198,8 @@ done
 # MANI_STOCK is UNCHANGED — the member-level proof the stock track is
 # untouched.
 # MANI_WIDE="53b7a65fb27039d6ef6e80f6450bb78933691096 42"  # 14z-99 window
-MANI_WIDE="3a67825670ebd764cdf104f8f23293ffbe2b9732 42"   # 14z-102 (delta: vm3j.04d only — the #107 row)
+# MANI_WIDE="3a67825670ebd764cdf104f8f23293ffbe2b9732 42"  # 14z-102 window
+MANI_WIDE="6b746e17cc8421bd308c5fad6862760209b58093 42"   # 14z-105 (delta: vm3j.03d/07b/10b + vsw.41 PROGRAM + vsw.31m/33m/35m/37m GROUP C — the version glyphs; no QSound member moved)
 # MANI_STOCK="08aac0881648185a9487230a3ac5fe19b78408d3 30"  # 14z-99 window (#103)
 MANI_STOCK="23314532b00a77adaed4bda4b9e52155ad209252 30"   # 14z-102 (delta: vm3j.04d only — #107 rides the shared map on stock too)
 # 14z-94 (#91 + #92). Attributed per member before re-pinning: exactly FOUR
@@ -203,13 +207,15 @@ MANI_STOCK="23314532b00a77adaed4bda4b9e52155ad209252 30"   # 14z-102 (delta: vm3
 # members. No gfx member and no QSound member changed, which is what a
 # program-image edit must look like. (m15 was 7f4d52a330abf73df298b638dbca099ce3135541.)
 # MANI_HUI="b496dec55439b11f3fe78eadc40a98e039a8bb80 42"  # 14z-99 window
-MANI_HUI="7552d03cefe69ae48d7a0c1da540643d0f44e02a 42"   # 14z-102 (delta: vm3j.03d/04d/10b + vsw.41 — #109 row-31 code_ptr + placed root + shifted placements; all PROGRAM members, no gfx/QSound moved)
+# MANI_HUI="7552d03cefe69ae48d7a0c1da540643d0f44e02a 42"  # 14z-102 window
+MANI_HUI="548af9ffb25ef6732bc468b1d168b1f7d975f328 42"   # 14z-105 (delta: vm3j.03d/04d/07b + vsw.41 PROGRAM + vsw.31m/33m/35m/37m GROUP C — the two AUTHORED version-glyph tiles at 0x1FE40/41; no QSound member moved)
 # 14z-94 (#92 only — he takes no reconciliation row). Exactly ONE member
 # moved: vm3j.03d, which carries table B at PRG:0x00BB68. Huitzil moved four
 # because #91's row also relocated code; Pyron's four bytes are a pure data
 # edit inside one member. (m9 was d12d0c6a86bce271d6b7f59ccf6e0c3d98bc9393.)
 # MANI_PYR="0bcffc87f6d3b43fdabb76a39810bb94a54e57a8 42"  # 14z-99 window
-MANI_PYR="673038986c05d4dca0b0e9451bc1608df6d59a18 42"   # 14z-102 (delta: vm3j.04d only — #107)
+# MANI_PYR="673038986c05d4dca0b0e9451bc1608df6d59a18 42"  # 14z-102 window
+MANI_PYR="8e8329cf7756834f2359d067ce1e7a18f87002b6 42"   # 14z-105 (delta: vm3j.03d/04d/07b + vsw.41 PROGRAM + vsw.31m/33m/35m/37m GROUP C — the version glyphs; no QSound member moved)
 
 m3a_manifest() {   # m3a_manifest <label> <rompath> <"digest count">
     _got="$(python3 tools/artifact_manifest.py "$2")" || {
@@ -262,9 +268,11 @@ m3a_manifest pyron       "$WORK/pyron/rompath"     "$MANI_PYR"
 # four legs did run and tests/run_all_static.sh would otherwise classify the
 # whole gate as skipped.
 # EXPECT_MERGED="2343607a4c5b0f0451bbfc6bcb3d9969eb2343c5"  # merged-m4, git tag freeze/merged-m4
-EXPECT_MERGED="393f92a5e2ab2dfd3ed3d4a9d50acfc06c8fe19f"   # merged-m5, 14z-102 window — == the rehearsed merged_probe_row31, bit-for-bit (the 14z-99 pattern again)
+# EXPECT_MERGED="393f92a5e2ab2dfd3ed3d4a9d50acfc06c8fe19f"  # merged-m5, git tag freeze/merged-m5
+EXPECT_MERGED="64426955bf7877908a1014f134040c9672bddf5a"   # merged-m6, 14z-105 window — == the rehearsed merged_probe_w6, bit-for-bit
 # MANI_MERGED="59f3b42e7f0022f509c3cc912abc54f159183688 42"  # 14z-99 window
-MANI_MERGED="22092b65fd9db2f5b79f211afb51625a542cd45c 42"   # 14z-102 (delta: vm3j.03d/04d/07b/10b + vsw.41/42 — #107 + #109; all PROGRAM members)
+# MANI_MERGED="22092b65fd9db2f5b79f211afb51625a542cd45c 42"  # 14z-102 window
+MANI_MERGED="efea5e9d0bd9590383eb614016eed1c388bf9c2b 42"   # 14z-105 (delta: vm3j.03d/04d/07b/10b + vsw.41/42 PROGRAM + vsw.31m/33m/35m/37m GROUP C — the version glyphs; no QSound member moved)
 
 MERGED_NEEDS="build/m5_wide/extract build/hui32/extract build/pyron21/extract
 build/wide0/rompath/vsavjw.zip"

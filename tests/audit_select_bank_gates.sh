@@ -19,7 +19,7 @@
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"
-BUILD="${1:-build/m3b_merged12}"
+BUILD="${1:-build/m3b_merged13}"
 [ -f "$BUILD/patch/patch.json" ] || { echo "SKIP: no $BUILD/patch"; exit 0; }
 
 python3 - "$BUILD" <<'PY'

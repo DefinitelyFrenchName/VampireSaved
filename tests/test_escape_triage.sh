@@ -24,8 +24,8 @@
 set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"
-for d in build/don_m9/extract build/hui45/extract build/pyron29/extract \
-         build/m3b_merged11/patch/placements.json; do
+for d in build/don_m11/extract build/hui47/extract build/pyron31/extract \
+         build/m3b_merged13/patch/placements.json; do
     [ -e "$d" ] || { echo "SKIP: $d absent"; exit 0; }
 done
 fail=0

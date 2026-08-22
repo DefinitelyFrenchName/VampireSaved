@@ -1,0 +1,8 @@
+# pointer-flow baseline for merged-m6 (build/m3b_merged13), frozen 14z-105 (the Oboro+version window;
+# the two merged STRONG lines are the 14z-100-reviewed win_pal sparse-block biased bases,
+# re-placed by the window's allocation shift; WEAK volume re-counted).
+# STRONG lines are REVIEWED findings (see hardening_register.md);
+# WEAK-COUNT lines freeze the noise volume — growth = investigate.
+STRONG	code:movea_imm	0x4d0d90+0x16	0x4c4310	WIDE-HOLE
+STRONG	code:movea_imm	0x4d0d90+0x24	0x4ca2b0	WIDE-HOLE
+WEAK-COUNT	data:long	1131

@@ -810,6 +810,21 @@ ring_rows = true
 ring_ref_cell = 0x0F
 highlight_array = 0x268A02
 march_retarget_mid = true
+# version string (W2, 14z-105, CLAUDE.md §5; maintainer-approved 14z-104):
+# appended glyph sprites on this same record, authored tiles in group C's
+# upper bank, pal row 0x19 = Phobos' medallion row (thunk-re-asserted every
+# select frame, so its content is stable by construction; font ink index 7
+# = 0xFF8 near-white there). version_base chosen from the merged-m5 group C
+# ledger's free upper-bank rows (0x1FE40+ unused; build_gfx's
+# same-source-or-fail names any future collision). Screen position =
+# the empty bottom-right corner (measured on merged-m5 snapshots, 14z-105).
+# THE TEXT NAMES THE FREEZE GENERATION — change it at every freeze.
+version_text = "M6"
+version_font = "build/manifest/version_font.json"
+version_x = 340
+version_y = 202
+version_pal = 0x19
+version_base = 0x1FE40
 
 # ── COSMO DISRUPTION: the dead sub-state row (14z-74) ────────────────────
 # THE DEFECT (maintainer playtest): the EX (41236 + hold/release 2P/2K)
@@ -1558,3 +1573,39 @@ only_variant_slot = true
 #   a coherent interpolation loop). A pad row here would let the escape
 #   pass REWRITE THE IMMEDIATE (the 14z-74 D5 corruption class).
 # ══════════════════════════════════════════════════════════════════════
+
+# ── THE OBORO SELECT HOOK (W1, 14z-105; maintainer-ruled 2026-08-22:
+# vanilla vsavj Oboro, not a vs2 port). vsavj ships Oboro Bishamon COMPLETE
+# at variant id 0x18 (base 0x0B3450) and the commit path accepts the id
+# end-to-end (demonstrated live 14z-104 (3)) — it only lacks a player-
+# facing select path. This hook IS that path, and it is vanilla's own
+# Gallon-variant idiom one cell over: at PRG:0x020B9C the confirm
+# subroutine tests `cmpi.b #$2,$382(a6)` (on Gallon?) then
+# `btst #7,$394(a6)` (START held — MEASURED 14z-105: with P1 Start held on
+# the select screen the struct's input word reads $8000, $0000 without)
+# and commits 0x12. Displacing that first cmpi with a jsr, the thunk
+# tests Bishamon (0x08) + the same Start bit and commits 0x18, then
+# re-executes the displaced cmpi so the vanilla `bne` at 0x020BA2 sees the
+# flags it expects (0x18 != 2 -> the Gallon block is skipped, exactly as
+# for any non-Gallon id). Without Start held, or on any other cell, the
+# body is branch-inert and the cmpi's flags are the vanilla ones. The
+# $bf(a5) gate that precedes the site in vanilla precedes the hook too.
+# Declared identically by every tenant: ENGINE-SITE, emitted once.
+# profile-gated: roster UX, WIDE-only by construction (stock twin
+# bit-identical). id_literal_ok: the body compares the char id against
+# Bishamon's 0x08 ON PURPOSE (and re-executes vanilla's own #$2 test).
+#   0c2e00080382  cmpi.b #$8,$382(a6)
+#   660e          bne.s  .van
+#   082e00070394  btst   #7,$394(a6)
+#   6706          beq.s  .van
+#   1d7c00180382  move.b #$18,$382(a6)
+#   0c2e00020382  .van: cmpi.b #$2,$382(a6)   (the displaced instruction)
+#   4e75          rts
+[[site_thunk]]
+stage = 6
+profile = "cps2-wide-v1"
+name = "oboro_select_hook"
+site = 0x020B9C
+old_hex = "0c2e00020382"
+thunk_hex = "0c2e00080382660e082e0007039467061d7c001803820c2e000203824e75"
+id_literal_ok = "0x08,0x02"

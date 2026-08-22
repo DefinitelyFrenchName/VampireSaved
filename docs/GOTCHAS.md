@@ -14,6 +14,8 @@ one your current task belongs to. A trap you hit while porting Huitzil
 is a GAME gotcha if it is true of the game regardless of the port.
 
 
+### appended 14z-105 (platform bucket — the window: Oboro hook + version string)
+- `gfx_tiles.decode` mirrored every 8-pixel half (plane bit i = pixel 7-i, not i) and no consumer had ever read pixel ORDER; the first AUTHORED tile exposed it — verify synthesized tiles at the RENDER layer, the byte round-trip only proves self-consistency. Transparent pen is 15. OBJ (x,y) -> screen (x-64, y-16)
 ### appended 14z-98 (project bucket — the #103 close)
 - Every -debug watch configuration is its own TIMELINE — two -debug trace runs are not comparable either; trace_writes now takes DUMPS so a run carries its own anchors (and the wpset stop PC is the instruction AFTER the access)
 - GUARD_PROBE's RET (SP) is a caller only for jsr-reached code; a jmp/branch-reached routine shows stale stack — use GUARD_PROBE_HIST

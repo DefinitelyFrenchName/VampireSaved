@@ -784,6 +784,21 @@ over N consecutive frames), never frame-indexed — the two games are not
 on the same frame, and a frame-indexed diff produced a confounded figure
 that stood for a whole session (STATE 14z-74/75 retraction).
 
+### 14z-105: two more things the select screen carries (atlas: select_screen.md)
+
+- **The wheel record now draws the VERSION STRING.** The copied roster21
+  record (21 cells) gained N 1x1 glyph entries — authored tiles in group
+  C's upper bank (`0x1FE40+`), pal row 0x19 (thunk-re-asserted every
+  select frame), placed at screen (340,202) = OBJ (404,218). Measured on
+  the live OBJ list and pixel-exact against the intended bitmap. The
+  OBJ->screen transform on this screen is `(x-64, y-16)`; the transparent
+  pen is 15; plane bit i is pixel 7-i within each 8-px half
+  (`gfx_tiles` was mirrored until 14z-105 — docs/platform/gotchas.md).
+- **Oboro is hand-pickable.** Bishamon's cell + Start held at confirm ->
+  id 0x18, vanilla's Gallon-variant idiom at `PRG:0x020B9C` one cell over
+  (`btst #7,$394(a6)` IS the Start test, measured). Profile-gated
+  `oboro_select_hook`; gate `tests/test_oboro_select.sh`.
+
 ## Sound subsystem: the QSound command path (session 14z-51, measured)
 
 Architecture (all measured live, both games):

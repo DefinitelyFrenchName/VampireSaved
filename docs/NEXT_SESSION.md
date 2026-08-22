@@ -1,83 +1,87 @@
-# NEXT SESSION — orientation (rewritten at the 14z-104 close, 2026-08-22)
+# NEXT SESSION — orientation (rewritten at the 14z-105 close, 2026-08-22)
 
-> ## **THE STATE IN ONE BREATH: the 14z-102 window freeze remains the
-> ## reference** (donovan-m10 / huitzil-m19 / pyron-m13 / merged-m5;
-> ## stock twin m5_stock5). No shipped byte has moved since. PLAY:
-> ## `tools/run_wide.sh build/m3b_merged12 fbneo`.
+> ## **THE STATE IN ONE BREATH: the 14z-105 window is FROZEN as
+> ## donovan-m11 / huitzil-m20 / pyron-m14 / merged-m6 (stock twin
+> ## m5_stock6 = `883e7d17`, UNCHANGED). PLAY:
+> ## `tools/run_wide.sh build/m3b_merged13 fbneo`. Commits are LOCAL —
+> ## the maintainer TESTS BEFORE PUSH (their words at the window open).**
 >
-> ## **THE NEXT SESSION IS A WINDOW SESSION (maintainer-directed
-> ## 2026-08-22): THREE items ride ONE freeze — (1) the OBORO SELECTION
-> ## HOOK, (2) the IN-GAME VERSION STRING, (3) any select-spec movement
-> ## they cause. Both changes live INSIDE the ratified select-window
-> ## divergence class, which is what makes them cheap. The plan below is
-> ## the complete spec; implement on probes, rehearse, then the 14z-99
-> ## freeze rhythm.**
+> ## **WHAT THE WINDOW SHIPPED (both profile-gated, both inside the
+> ## ratified select-window class):**
+> ## **W1 — THE OBORO SELECT HOOK:** cursor on BISHAMON, hold START,
+> ## confirm with any button -> vanilla vsavj's Oboro (id 0x18, base
+> ## 0x0B3450; the pale colorway; HUD name stays "Bishamon" — aliased
+> ## rows). P1 and P2. Without Start: plain Bishamon. The mechanism is
+> ## vanilla's own Gallon-variant idiom at PRG:0x020B9C one cell over
+> ## (`btst #7,$394(a6)` IS the Start test — measured before authoring).
+> ## Gate `tests/test_oboro_select.sh` (5 legs incl. P2 and the stock
+> ## twin). Atlas: select_screen.md "The Oboro select hook".
+> ## **W2 — THE VERSION STRING:** "M6" at the select screen's bottom-
+> ## right — THE NAKED-EYE A/B TELL (CLAUDE.md §5, open since 14z-92,
+> ## now implemented). Two authored glyph sprites on the roster21 wheel
+> ## record, tiles in group C 0x1FE40/41, pal row 0x19. Knobs on
+> ## `[[select_wheel]] roster21` in all three manifests — **BUMP
+> ## `version_text` AT EVERY FREEZE** (it names the generation). Gate
+> ## `tests/test_version_string.sh` (pixel-exact snapshot). Font:
+> ## `build/manifest/version_font.json` (0-9 A-Z - . space; add glyphs
+> ## there if the text needs more).
 >
-> ## **W1 — THE OBORO HOOK (maintainer-ruled: vanilla vsavj Oboro, not
-> ## a vs2 port).** vsavj ships Oboro complete at variant id 0x18 (base
-> ## 0x0B3450); the commit path accepts the id end-to-end TODAY
-> ## (demonstrated live 14z-104 (3), snapshot confirmed). The hook =
-> ## Bishamon's cell + START held at confirm -> commit 0x18 instead of
-> ## 0x08. THE TEMPLATE IS VANILLA'S OWN: the Gallon-variant path at
-> ## PRG:0x020B9C writes id 0x12 as an immediate on cursor+input
-> ## conditions (select_screen.md decodes the whole confirm path,
-> ## incl. the $43/$45 override and the shared-scratch caution).
-> ## Start-held source: the per-player Start bitmask $FF8060 (the
-> ## flavor latch's byte — VERIFY IT IS LIVE AT SELECT TIME first, it
-> ## was measured through char-init). Emission: a profile-gated
-> ## site-thunk in the confirm path (the generator's site_thunk
-> ## machinery); superset: the hook's cycles land inside the select
-> ## window, and without Start it must be branch-inert. Rehearse on a
-> ## probe; the naked-eye tell is picking Oboro by hand.
-> ## First QA: extend the poke-generic audits with 0x18-as-P1 legs
-> ## (roster_pairings already covers him both sides).
+> ## **THE FINDING ON THE WAY — the tile codec was mirrored.**
+> ## `gfx_tiles.decode` had mapped plane bit i to pixel i since it was
+> ## written; the hardware draws bit i at pixel 7-i of each 8-px half,
+> ## and the transparent pen is 15. Nothing had ever consumed pixel
+> ## ORDER until the first authored tile. Fixed both ways, gate
+> ## `tests/test_gfx_tile_codec.sh`, platform gotcha. RULE: a
+> ## synthesized tile is verified at the RENDER layer, never by a byte
+> ## round-trip alone.
 >
-> ## **W2 — THE VERSION STRING (CLAUDE.md §5, open since 14z-92;
-> ## maintainer-approved).** Placement: the SELECT SCREEN (the one
-> ## roster-owned always-visited surface — attract/title would violate
-> ## the superset invariant, select already diverges under the ratified
-> ## window). Mechanism: EXTEND THE COPIED WHEEL RECORD — the
-> ## [[select_wheel]] machinery already copies the one static OBJ
-> ## record (0x272A68) to group C with 21 cells and repoints it
-> ## (gen_donovan_patch.py:4731+); append N glyph sprites at a screen
-> ## corner. Tiles: EITHER vanilla font tiles addressed at their
-> ## vanilla codes (the record's per-entry attr can address vanilla
-> ## banks — hunt the OBJ font first, e.g. the "FIRST ATTACK" glyphs)
-> ## OR a small authored tile blob into group C (precedent:
-> ## effect_tail.json is authored gfx content). Manifest knob (e.g.
-> ## version_text under [[select_wheel]]) so the string moves with the
-> ## registry generation, not with a hex edit. The string should name
-> ## the freeze generation (e.g. "M6") — decide the exact text with
-> ## the maintainer at the window.
+> ## **A PREDICTION THAT DIED:** the 14z-104 close said the select-window
+> ## specs would MOVE with two more sprites. Measured over all 148
+> ## window/composite specs: UNCHANGED. The window end is the VS-phase
+> ## re-init, not the sprite count.
 >
-> ## **THE FREEZE TAIL (the 14z-99/102 rhythm):** both changes move
-> ## every WIDE artifact (the wheel record is in every build) ->
-> ## rebuild don_m11-class / hui47 / pyron31 / merged13 + stock twin
-> ## (stock UNTOUCHED by construction — both features are
-> ## profile-gated; verify bit-identity); run_suite freeze+verify x3
-> ## (select-window specs MOVE: more sprites/cycles shift the window
-> ## end — expected, re-freeze within the ratified class); battery;
-> ## merged gates; registry rows + tags; the STANDING RE-POINT SWEEP
-> ## (now including: the m3b_merged11 one-back audit defaults, the
-> ## 14z-103/104 audit BUILD defaults incl. the seven new coverage
-> ## audits, m2a_flicker_gate SET pin, region_overlap trio constants,
-> ## test_build_identity_distinct PLAY pin).
->
-> ## **COVERAGE IS RETIRED (14z-104, both gaps closed):** the §4
-> ## matrix (docs/project/coverage_matrix.md) is green on every cell —
-> ## seven new audits at 14z-104 (df_framework, tenant_timeout,
-> ## tenant_downwin, tenant_throws, down_attack, pursuit_leap,
-> ## stage_sweep) + tech_roll + throw_tech + edge_cases (gap 1+2).
-> ## Native-anchored discoveries en route: Phobos' untechable sweep,
-> ## his NO-KILL half-restore throw (144/144, native-identical),
-> ## Donovan's tech-neutral 5/5 throw, the draw code $FF8120=0x00.
-> ## Remaining opens: pursuit-connect's hit half (knife-edge, coupled
-> ## to a longer-knockdown rig) and Shadow/Marionette
-> ## (N/A-until-enabled, out of scope by ruling 2026-08-22).
->
-> ## **AFTER THE WINDOW, the roadmap forks on the maintainer's open
-> ## question: release packaging before or after MiSTer core surgery.**
-> ## Commits are LOCAL — push on the maintainer's word.
+> ## **THE NEXT SESSION starts from the maintainer's field test of
+> ## merged-m6.** Nothing is queued ahead of it. Two long soaks were
+> ## NOT run at this freeze (both green at 14z-102 on a tree that
+> ## differs only by the two profile-gated select changes): run
+> ## `tests/audit_guard_corpus.sh` (316 runs, hours) and
+> ## `tests/audit_merged_legacy.sh` (~2 h) before the push if the field
+> ## test is clean. After the test: push on their word; then the roadmap forks on the open question — release
+> ## packaging before or after MiSTer core surgery. The N-2 build-dir
+> ## deletion policy applies at the NEXT freeze (m10/m19/m13/merged-m5
+> ## dirs are now one-back; m9/m18/m12/merged-m4 + m5_stock4 are N-2 and
+> ## fall).
+
+## What 14z-105 did (the whole arc, one screen)
+
+**Measure first:** Start held on the vanilla select screen -> struct
+`+0x394` = `$8000`, `$FF8060` = 1 (both live at select; the template
+bit is Start). **W1** authored as a 30-byte profile-gated site_thunk
+(every manifest, deduped; +2 ops), rehearsed on a merged probe, gated
+five ways. Stock twin rebuilt = `883e7d17` bit-identical (the profile
+gate measured, not argued). **W2** authored as `version_*` knobs + a
+5x7 font + `gfx_tiles.encode` + an `"authored"` list in
+`wheel_bank5.json`; the first probe rendered mirrored glyphs in a black
+box -> the OBJ list proved the sprites right and the TILE BYTES wrong ->
+codec fixed both ways -> re-probe pixel-exact (0 mismatches). **The
+freeze:** tenant_loop op counts re-frozen (325/365/298; 600/652;
+806/907), five artifacts built from the tree (merged13 bit-for-bit the
+probe), sets carried-renamed + registry rows, m3a pins + whole-artifact
+manifests moved with member attribution (program + the four GROUP C
+members = the glyph tiles; no QSound), the standing re-point sweep
+executed (~70 defaults), placements +0x10 (hui) / +0x30 (pyron) ->
+bases.tsv, pcrel [merged_*], pointer_flow baselines re-derived;
+region_overlap section 5 still 2033. Every gate run at the freeze:
+STATE 14z-105 CLOSE.
+
+## What 14z-103/104 did — see STATE; the coverage matrix is fully green
+(docs/project/coverage_matrix.md), #110 fixed, the A4 pin-cleanup done.
+
+# HISTORY BELOW — carried for reference, not current
+
+Everything from here down was written at the close of 14z-104 and
+earlier. Kept because the eliminations and traps stay valid; read the
+section above for the current state.
 
 ## What 14z-103 did (the whole arc, one screen)
 

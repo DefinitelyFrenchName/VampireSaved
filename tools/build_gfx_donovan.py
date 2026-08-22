@@ -493,8 +493,18 @@ def main():
         for c in wb5["vs2"]:
             place(dst, written, 0x10000 + c, tile_bytes(srcA5, 0x10000 + c),
                   "vs2A", 0x10000 + c, "wheel-vs2")
+        # authored glyphs (14z-105, the select-screen VERSION STRING): the
+        # generator encodes build/manifest/version_font.json into canonical
+        # 128B tiles and hands them over verbatim — NEW content, no ROM
+        # source. Same-source-or-fail applies like every other pass.
+        for k, h in wb5.get("authored", {}).items():
+            c = int(k, 0)
+            tile = bytes.fromhex(h)
+            assert len(tile) == 128, f"authored tile {k}: {len(tile)} bytes"
+            place(dst, written, c, tile, "authored", c, "wheel-version")
         print(f"wheel bank-5: {len(wb5['host'])} host tiles (byte-identical "
               f"vsav group A) + {len(wb5['vs2'])} vs2 medallion tiles "
+              f"+ {len(wb5.get('authored', {}))} authored version glyphs "
               f"copied to group C upper bank")
     elif args.wheel_bank5:
         wj = json.load(open(args.wheel_bank5))
@@ -522,6 +532,9 @@ def main():
         assert tile_bytes(dst, 0x10000 + c) == \
             tile_bytes(srcA5, 0x10000 + c), \
             f"effect-c5 readback mismatch at 0x{c:04X}"
+    for k, h in wb5.get("authored", {}).items():
+        assert tile_bytes(dst, int(k, 0)) == bytes.fromhex(h), \
+            f"wheel authored glyph readback mismatch at {k}"
     for c in wb5["host"]:
         assert tile_bytes(dst, 0x10000 + c) == \
             tile_bytes(srcA_host, 0x10000 + c), \

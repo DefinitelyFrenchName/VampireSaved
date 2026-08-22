@@ -136,6 +136,13 @@ artifact is BIT-FOR-BIT the rehearsal. Byte detail: patch_notes 14z-99.
 | **#105 win_pal colors 8→10** (one value, all three manifests) | **SHIPPED 14z-99; FIELD-CONFIRMED 2026-08-20 (AUTO portraits colored), issue CLOSED** | win_pal_variant (the M2b family) | variant-gated | AUTO mode's winner used palette sets 8/9, which the port did not carry at `colors = 8` — tenant victory portraits rendered as pure white shapes (correct shapes, no fill; ours, not the engine's). `colors = 10` ports the AUTO sets. +6 ops. Gate: `audit_win_pal_auto` EXPECT_WHITE=0 (all four legs COLORED). |
 | **#43(b) `ALLOW_FALLBACK=True`** (`tools/find_equiv.py` matcher state — tool behavior, not ROM bytes) | **LANDED 14z-99 W1; #43 CLOSED** | the #43(a) refactor (14z-95: one matcher, parameters pinned) | — | The ruled 3-row movement had decayed to ONE row: `0x028122` → `0x028e42` plausible-0.90, with **ZERO build effect** (no live consumer; the merged patch regenerates bit-identical). Wholesale map regen measured DESTRUCTIVE (drops rows other extracts own) — the row was hand-carried; trap recorded at the row note. Gate: `test_reconcile_matcher.sh` now polices the FLIPPED state. |
 
+## 14z-105 additions — the window (W1 Oboro hook + W2 version string)
+
+| item | status | depends on | exclusivity | notes |
+|---|---|---|---|---|
+| **W1 `oboro_select_hook`** (`[[site_thunk]]` at `PRG:0x020B9C`, all three manifests, deduped, `profile = "cps2-wide-v1"`) | **SHIPPED 14z-105 (donovan-m11 `1de9a027` / huitzil-m20 `24a27940` / pyron-m14 `6bf265ab` / merged-m6 `64426955`; stock twin unchanged `883e7d17`)** | the roster wheel (Bishamon's cell is a vanilla cell; nothing else) | profile-gated; WIDE-only | Bishamon's cell + START held at confirm commits vanilla vsavj's Oboro (0x18) — the Gallon-variant idiom one cell over. Start bit MEASURED (`+0x394` = $8000). +2 ops. Gate `test_oboro_select.sh` (5 legs incl. P2 + stock). Naked-eye tell: the pale colorway. |
+| **W2 version string** (`version_text/font/x/y/pal/base` on `[[select_wheel]] roster21`; `build/manifest/version_font.json`; `gfx_tiles.encode`; `wheel_bank5.json "authored"`) | **SHIPPED 14z-105 (same builds)** | select_wheel bank5 (group C must exist — skipped with a note otherwise) | profile-gated by the wheel row | "M6" at screen (340,202), pal row 0x19, codes 0x1FE40+. 0 ops (record/coord data grow). Pixel-exact gate `test_version_string.sh`; codec law `test_gfx_tile_codec.sh`. THE TEXT NAMES THE FREEZE GENERATION — bump it at every freeze. |
+
 ## Tooling
 
 `tools/patch_prg.py` applies the JSON op-list in 68k word-value space

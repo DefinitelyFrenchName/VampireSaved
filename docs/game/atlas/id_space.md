@@ -224,6 +224,13 @@ harder. Nothing static was found that sets bit 4 of the id directly. **The
 (`select_screen.md`): `$45` can only hold `$ff` or a copy of the current
 cursor cell, so it cannot introduce a variant id. Oboro's entry path is
 still unlocated, and it is the one remaining hole in this argument.
+**14z-105 note: that sentence is about VANILLA's own route to `0x18`
+(the boss-encounter logic), which stays unlocated and no longer matters
+for the port — the WIDE build now carries ITS OWN player-facing path,
+the profile-gated `oboro_select_hook` (Bishamon's cell + Start held at
+confirm, vanilla's Gallon-variant idiom at `PRG:0x020B9C` one cell over;
+`select_screen.md`, gate `tests/test_oboro_select.sh`). The id stays
+RESERVED for tenants exactly as before: it is Oboro's.**
 
 The audit's verdict logic is ground-truthed in both directions: an injected
 variant-half write from a gameplay PC fails it, and a tap log missing its
@@ -315,7 +322,8 @@ is trusted.
 above `0x0F`":
 
 - **taken:** `0x00-0x0F` (the wheel), `0x12` (Gallon variant), `0x18`
-  (Oboro — vanilla uses it, entry path still unlocated)
+  (Oboro — vanilla uses it; vanilla's entry path still unlocated, the
+  port's own is the 14z-105 `oboro_select_hook`)
 - **free, and what the plan targets:** `0x10`, `0x11`, `0x13`
 
 The plan survives unchanged, but only because it happened to pick around

@@ -171,7 +171,7 @@ echo "== 1: one tenant per run — the frozen op counts =="
 # 15 capture_kf slot_rows blobs + 17 table pokes, declared by every
 # manifest) + 2 (#105's colors 8->10 grows each win_pal sparse block by
 # the two AUTO sets). Donovan's #103 pcrel relocations move ops, net 0.
-FROZEN_1="donovan:323 huitzil:363 pyron:296"  # hui 361->363 RE-FROZEN 14z-102: +2 = the #109 row-31 fix (code_ptr + region op)
+FROZEN_1="donovan:325 huitzil:365 pyron:298"  # RE-FROZEN 14z-105 (was 323/363/296): +2 EVERY tenant = the profile-gated oboro_select_hook site_thunk (body + site); version_text adds 0 ops (it grows the wheel record/coord DATA ops). 14z-102: hui 361->363 = the #109 row-31 fix
 for row in $FROZEN_1; do
     who="${row%%:*}"; want="${row##*:}"
     case "$who" in donovan) ex="$D_EX" ;; huitzil) ex="$H_EX" ;; *) ex="$P_EX" ;; esac
@@ -254,8 +254,12 @@ check_n() {  # check_n <label> <dir> <want ops> <sum of 1-tenant counts>
 # huitzil-only, +2 emitted AND +2 declared wherever hui is in the combo
 # (the beam_effect_class31 code_ptr + the x0926e4 region op; nothing
 # dedupes, nothing reaches the solo-donovan or donovan+pyron rows).
-check_n "2 tenants" "$WORK/two"   598 648
-check_n "3 tenants" "$WORK/three" 804 901
+# RE-FROZEN 14z-105 (was 598/648 and 804/901): the Oboro select hook —
+# ONE site_thunk (2 ops) declared identically by every tenant, ENGINE-SITE
+# so it dedupes to one: +2 emitted at every N, +2 per declaring tenant
+# declared (+4/+6). The version string (W2) is 0 ops at every N.
+check_n "2 tenants" "$WORK/two"   600 652
+check_n "3 tenants" "$WORK/three" 806 907
 
 # ── 3: every tenant's own content is present ────────────────────────────
 # An op count alone cannot tell "both tenants ran" from "tenant 0 ran twice".

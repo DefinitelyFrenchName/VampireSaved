@@ -36,7 +36,7 @@ REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"
 ROMDIR="${ROMDIR:?set ROMDIR}"
 ROMDIR="$(CDPATH= cd "$ROMDIR" && pwd)"
-BUILD="${BUILD:-build/m3b_merged11}"   # merged-m4 since the 14z-99 freeze
+BUILD="${BUILD:-build/m3b_merged13}"   # merged-m6 since the 14z-105 freeze
 [ -d "$BUILD/rompath" ] || { echo "SKIP: no build at $BUILD"; exit 0; }
 MAME_BIN="${MAME_BIN:-$HOME/.cache/vampire-saved/mame/cps2}"
 [ -x "$MAME_BIN" ] || { echo "SKIP: no WIDE MAME binary"; exit 0; }
@@ -79,6 +79,7 @@ OURS_BY_BUILD = {
     # 14z-99 window (merged-m4): the kernel rows are untouched by the
     # window's fixes — same deliberate-silence id.
     "m3b_merged11": [None, "02a2", None, None, None],
+    "m3b_merged13": [None, "02a2", None, None, None],   # 14z-105 (kernel rows untouched by the window)
 }
 if ours_a2:
     ours = [None, ours_a2, None, None, None]

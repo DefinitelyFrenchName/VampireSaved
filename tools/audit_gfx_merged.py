@@ -171,6 +171,7 @@ def main():
 
     # bank-5 passes, per tenant, in build_gfx pass order
     b5_sets = {}
+    authored = {}
     for name, bdir in (("donovan", args.build_d), ("huitzil", args.build_h),
                        ("pyron", args.build_p)):
         e5p = os.path.join(bdir, "patch/effect_c5.json")
@@ -184,6 +185,9 @@ def main():
             place(name, 0x10000 + c, "vsavA", 0x10000 + c)
         for c in wb["vs2"]:
             place(name, 0x10000 + c, "vs2A", 0x10000 + c)
+        for k, h in wb.get("authored", {}).items():   # 14z-105 version glyphs
+            authored[int(k, 0)] = bytes.fromhex(h)
+            place(name, int(k, 0), "authored", int(k, 0))
         b5_sets[name] = wb
 
     # -- 3. byte-compare every collision at its sources --------------------
@@ -194,6 +198,8 @@ def main():
               "vsavA": load_group(za, "vm3", GROUP_A, "vsav")}
 
     def src_bytes(kind, sidx):
+        if kind == "authored":          # NEW content: bytes ride the json
+            return authored[sidx]
         return tile_bytes(groups[kind], sidx)
 
     def classify(pairs):

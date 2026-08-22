@@ -108,8 +108,8 @@ set -eu
 ROMDIR="${ROMDIR:?set ROMDIR}"
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"
-STOCK="${1:-$REPO/build/m5_stock5/rompath}"
-WIDE="${2:-$REPO/build/don_m10/rompath}"
+STOCK="${1:-$REPO/build/m5_stock6/rompath}"
+WIDE="${2:-$REPO/build/don_m11/rompath}"
 [ -f "$STOCK/vsavj.zip"  ] || { echo "no stock build at $STOCK";  exit 1; }
 [ -f "$WIDE/vsavjw.zip" ] || { echo "no WIDE build at $WIDE";     exit 1; }
 WORK="$(mktemp -d)"

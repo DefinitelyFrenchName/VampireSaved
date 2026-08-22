@@ -37,7 +37,7 @@
 # KNOWN GAP, recorded: the MERGED image is outside this freeze entirely
 # (no build/m3b_merged11/extract; verify_pcrel_data needs an external
 # extract + merged placements to cover it). See hardening_register.md.
-[hui46]
+[hui47]
 unresolved = 69
 resolved = 0
 escapes = [
@@ -112,7 +112,7 @@ escapes = [
   "x028122 0x028c98 -> 0x029034",
 ]
 
-[pyron30]
+[pyron31]
 unresolved = 10
 resolved = 0
 escapes = [
@@ -128,7 +128,7 @@ escapes = [
   "x088512 0x08c038 -> 0x08c0a2",
 ]
 
-[don_m10]
+[don_m11]
 unresolved = 10
 resolved = 0
 escapes = [
@@ -158,19 +158,19 @@ escapes = [
 # both together (the #94 reference-rot class).
 
 [merged_don]
-build = "m3b_merged12"
-extract = "build/don_m10/extract"
+build = "m3b_merged13"
+extract = "build/don_m11/extract"
 placement_suffix = ""
-same_as = "don_m10"
+same_as = "don_m11"
 
 [merged_hui]
-build = "m3b_merged12"
-extract = "build/hui46/extract"
+build = "m3b_merged13"
+extract = "build/hui47/extract"
 placement_suffix = "@huitzil"
-same_as = "hui46"
+same_as = "hui47"
 
 [merged_pyr]
-build = "m3b_merged12"
-extract = "build/pyron30/extract"
+build = "m3b_merged13"
+extract = "build/pyron31/extract"
 placement_suffix = "@pyron"
-same_as = "pyron30"
+same_as = "pyron31"

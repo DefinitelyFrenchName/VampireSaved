@@ -46,8 +46,8 @@ echo "$CLEAN" | grep -q "FLAGGED: 0" \
     || { echo "FAIL: clean synthetic produced flags"; fail=1; }
 
 echo "== section 1: frozen baselines on the current freeze artifacts"
-for pair in "build/m3b_merged11:merged-m4" "build/don_m9:donovan-m9" \
-            "build/hui45:huitzil-m18" "build/pyron29:pyron-m12"; do
+for pair in "build/m3b_merged13:merged-m6" "build/don_m11:donovan-m11" \
+            "build/hui47:huitzil-m20" "build/pyron31:pyron-m14"; do   # re-pointed 14z-105
     b="${pair%%:*}"; n="${pair##*:}"
     if [ ! -f "$b/patch/patch.json" ]; then
         echo "   SKIP: $b absent"

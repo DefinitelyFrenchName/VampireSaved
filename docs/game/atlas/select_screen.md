@@ -224,7 +224,9 @@ Both inputs are produced on the select screen, and both are now decoded:
 TABLE B constrains that to `0x00-0x0F`. So this override — the one dynamic
 id-rewrite in the select code — **cannot introduce a variant-half id**. It
 is therefore *not* the route by which vanilla reaches `0x18` (Oboro
-Bishamon), and that entry path remains unlocated.
+Bishamon), and that entry path remains unlocated. **(14z-105: vanilla's
+route stays unlocated; the PORT now reaches `0x18` through its own hook —
+see "The Oboro select hook" below.)**
 
 Measured alongside: across `03`/`04`/`09` neither `0x020CB8` nor
 `0x020CFE` ever fires — no replay holds a button on the select screen long
@@ -243,7 +245,10 @@ enough — so the mechanism is present but unexercised by the corpus.
 ## The Gallon variant path — vanilla's one immediate variant-half id
 
 `PRG:0x020B9C`, on the select screen: with the cursor on Gallon (id `0x02`),
-an input bit held (`btst #$7,$394(a6)`), and a confirm of **2-3 punches**
+**START held** (`btst #$7,$394(a6)` — MEASURED 14z-105: the struct's input
+word `+0x394` reads `$8000` with that player's Start held on the select
+screen and `$0000` without; the per-player Start bitmask `RAM:$FF8060`
+reads `1` at the same time), and a confirm of **2-3 punches**
 (`d0` in `300/500/600/700`) or **2-3 kicks** (`3000/5000/6000/7000`), the id
 is overwritten with **`0x12`** — Gallon's variant — with `d1` recording
 which of the two. Id `0x12`'s per-character data rows are byte-identical to
@@ -254,6 +259,38 @@ and it makes `0x12` **reserved**: no tenant may take it
 (`docs/game/atlas/id_space.md`). It is also the likely resolution of the
 "Dark Talbain rides a different mechanism" open item in
 `character_tables.md`.
+
+## The Oboro select hook (14z-105, the port's own path to `0x18`)
+
+Maintainer-ruled 2026-08-22: Oboro is **vanilla vsavj's** Oboro (complete
+at `0x18`, base `0x0B3450`; the commit path accepts the id end-to-end —
+demonstrated 14z-104 (3)), so the only thing to add was a way to pick him.
+The hook is the Gallon-variant idiom above, one cell over: the `site_thunk`
+`oboro_select_hook` (every tenant manifest, `profile = "cps2-wide-v1"`)
+displaces the `cmpi.b #$2,$382(a6)` at `PRG:0x020B9C` with a `jsr` and its
+body is
+
+```
+0c2e00080382  cmpi.b #$8,$382(a6)     ; on Bishamon's cell?
+660e          bne.s  .van
+082e00070394  btst   #7,$394(a6)      ; START held (vanilla's own test)
+6706          beq.s  .van
+1d7c00180382  move.b #$18,$382(a6)    ; commit Oboro
+0c2e00020382  .van: cmpi.b #$2,$382(a6)   ; the displaced instruction —
+4e75          rts                     ;   the bne at 0x020BA2 sees its flags
+```
+
+Measured (gate `tests/test_oboro_select.sh`, five legs): Start held on
+Bishamon commits `0x18` and the match loads base `0x0B3450` for P1 AND for
+P2 (`a6` is the confirming player's struct); without Start `0x08` /
+`0x0A6418`; Start held on Demitri's cell leaves `0x01`; the STOCK twin
+(no profile) keeps `0x08` under the same inputs — the stock fingerprint
+is bit-identical (`883e7d17`, rebuilt under the new rows). The `$bf(a5)`
+gate that precedes the site in vanilla precedes the hook too. Cursor path
+from the defaults: P1 `0x01 D-> 0x06 D-> 0x08`; P2 starts on `0x05`:
+`D-> 0x0A D-> 0x09 L-> 0x0B L-> 0x08`. The name/portrait rows for `0x18`
+alias Bishamon's (the 32-row arrays) — the naked-eye tell is his pale
+colorway in the match.
 
 ## Consuming a console capture: `tools/wheel_layout.py`
 

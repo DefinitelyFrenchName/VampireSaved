@@ -16,8 +16,9 @@
 #   * merged1 is NEWER by 8 minutes, so "the latest merged build" is wrong;
 #   * build_fingerprint.py covers PROGRAM members only — 12 of 21, 8.1% of
 #     the shipped bytes — so it cannot see the difference at all;
-#   * there is no in-game version string to A/B by (HANDOFF says so; the
-#     CLAUDE.md 5 convention has never been implemented, open since 14z-92).
+#   * the in-game version string (14z-105, select screen) names the freeze
+#     GENERATION and is in the shared program image, so it shows on BOTH
+#     builds — it does not tell them apart either.
 #
 # And the wrong one is PLAYABLE: same program image, all 18 characters
 # selectable, but the tenants render blank with no ported voices, because its
@@ -32,7 +33,7 @@ cd "$REPO"
 rc=0
 fail() { echo "  FAIL: $*"; rc=1; }
 
-PLAY="build/m3b_merged12"     # the frozen merged-m5 playtest build
+PLAY="build/m3b_merged13"     # the frozen merged-m6 playtest build (14z-105)
 INSTR="build/merged1"         # the legacy-only instrument that shares its fp
 
 for d in "$PLAY" "$INSTR"; do

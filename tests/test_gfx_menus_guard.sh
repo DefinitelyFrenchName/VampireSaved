@@ -36,7 +36,7 @@ fi
 echo "== 2. a rompath that EXISTS but holds no vsavj.zip =="
 # This is the case a directory-existence check cannot catch. Use a real WIDE
 # build dir if present, else synthesise the same shape.
-WIDE_RP="$REPO/build/don_m10/rompath"
+WIDE_RP="$REPO/build/don_m11/rompath"
 if [ ! -f "$WIDE_RP/vsavjw.zip" ] || [ -f "$WIDE_RP/vsavj.zip" ]; then
     WIDE_RP="$(mktemp -d)/rompath"; mkdir -p "$WIDE_RP"; : > "$WIDE_RP/vsavjw.zip"
 fi
