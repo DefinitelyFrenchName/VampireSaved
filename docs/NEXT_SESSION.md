@@ -3,8 +3,9 @@
 > ## **THE STATE IN ONE BREATH: the 14z-105 window is FROZEN as
 > ## donovan-m11 / huitzil-m20 / pyron-m14 / merged-m6 (stock twin
 > ## m5_stock6 = `883e7d17`, UNCHANGED). PLAY:
-> ## `tools/run_wide.sh build/m3b_merged13 fbneo`. Commits are LOCAL —
-> ## the maintainer TESTS BEFORE PUSH (their words at the window open).**
+> ## `tools/run_wide.sh build/m3b_merged13 fbneo`. FIELD-CONFIRMED and
+> ## PUSHED 2026-08-22 (Oboro + the M6 mark both confirmed; Oboro's long
+> ## intro is vanilla's own boss intro — accepted, not tournament-legal).**
 >
 > ## **WHAT THE WINDOW SHIPPED (both profile-gated, both inside the
 > ## ratified select-window class):**
@@ -40,12 +41,12 @@
 > ## window/composite specs: UNCHANGED. The window end is the VS-phase
 > ## re-init, not the sprite count.
 >
-> ## **THE NEXT SESSION starts from the maintainer's field test of
-> ## merged-m6.** Nothing is queued ahead of it — every verification
+> ## **THE NEXT SESSION starts clean — the field test passed and the
+> ## push is done.** Nothing is queued — every verification
 > ## the 14z-102 freeze had is green on 14z-105 (incl. audit_merged_
 > ## legacy 47/47 + leg b, and the guard-corpus soak 316/316, run while
 > ## the maintainer tested; the Oboro pick also agrees on FBNeo, leg F).
-> ## After the test: push on their word; then the roadmap forks on the open question — release
+> ## Next: then the roadmap forks on the open question — release
 > ## packaging before or after MiSTer core surgery. The N-2 build-dir
 > ## deletion policy applies at the NEXT freeze (m10/m19/m13/merged-m5
 > ## dirs are now one-back; m9/m18/m12/merged-m4 + m5_stock4 are N-2 and

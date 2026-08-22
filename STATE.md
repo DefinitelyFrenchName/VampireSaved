@@ -42,6 +42,12 @@ The two long soaks were then run: **audit_merged_legacy PASS (rc=0)** —
 leg a 47/47 legacy replays on their exact frozen classes, leg b guard-
 clean vs the new solos; **audit_guard_corpus PASS — 316/316 guarded runs, zero vectors** on merged-m6 under every tenant forcing. Every verification the 14z-102 freeze had is now green on 14z-105 too.
 
+**FIELD-CONFIRMED AND PUSHED (maintainer, 2026-08-22):** "Tests confirm
+Oboro Bishamon and the M6 mark." Observation recorded: Oboro's pre-match
+INTRO is very long — vanilla vsavj's own boss intro, not ours, and he is
+not tournament-legal, so accepted as-is (no item). main + the four
+freeze tags pushed (cfb6bd3..f1db172).
+
 **Where the maintainer looks:** `tools/run_wide.sh build/m3b_merged13
 fbneo` — "M6" bottom-right on select; Bishamon + Start held -> Oboro.
 
