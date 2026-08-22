@@ -1,5 +1,36 @@
 # STATE — living progress log
 
+## Session 14z-105 (2) — RELEASE PACKAGING (maintainer: packaging
+## before MiSTer; "why not this session") — `release/merged-m6/` built,
+## gated, deterministic; no ROM byte in the package
+
+**The design constraint first (rule 7):** the WIDE members (`vsw.*`) are
+NEW files made largely of vs2/vhunt2 content, so a patch "against
+nothing" would embed ROM bytes. Every delta is therefore computed by
+xdelta3 against ONE source blob — the four reference dumps' members
+concatenated in a fixed documented order (sha1 954d883c…) — so copies
+out of any dump are copy instructions and only generated/authored bytes
+are literal. Secondary compression OFF so the scan below sees the
+payload. Measured: 20 patched members (the four vm3j program members,
+the twelve vsw.* WIDE members, and vm3.13m/15m/17m/19m — four GROUP-A
+gfx members the effect-tail anchors write, so the rompath `vsav.zip` is
+NOT entirely pristine; the 14z-62e option-A prose that said so is
+corrected in place) + 22 pristine copies; 2,592,654 patch bytes total.
+
+**Tools:** `tools/package_release.py` (deterministic — two runs byte-
+identical), `tools/apply_release.py` (shipped in the package; verifies
+every reference member, rebuilds the source, applies, refuses to write
+unless every target sha1 matches). **Gate `tests/test_release_roundtrip.sh`
+(ci_static) PASS:** 42/42 members byte-identical after the round trip,
+fingerprint 64426955 + whole-artifact manifest reproduced; corrupted
+patch / wrong target sha1 / one-bit-wrong dump each REFUSED with nothing
+written; rule-7 scan: 2.59 MB of patch bytes against 1,384,723 indexed
+64-byte reference chunks, zero hits, must-fire control caught (2 hits).
+Dependency: `xdelta3` (brew install xdelta) — the gate SKIPs without it.
+
+**Release unit decision (mine, open to veto):** merged-m6 only — the
+solos are instruments, the stock twin is never distributed.
+
 ## Session 14z-105 CLOSE — the freeze is GREEN end to end; commits
 ## LOCAL, awaiting the maintainer's field test before push
 
@@ -1179,7 +1210,9 @@ window per measured slot, never pre-widen.
 
 Option A of the 14z-62e write-up: the per-hover bank thunk for the
 portrait-record object + the tenant's select art in WIDE group C at
-native codes; `vsav.zip` leaves the rompath entirely pristine. Blank-pool
+native codes; `vsav.zip` leaves the rompath entirely pristine [**14z-105:
+not quite — the later effect-tail pass writes four GROUP-A members
+(vm3.13m/15m/17m/19m); measured by the release packager**]. Blank-pool
 relocation (option B) remains the fallback if the measured hook cost
 violates the standing flicker watch. Maintainer also flagged suspected
 graphical corruption in the session captures — playtest of `39597268`

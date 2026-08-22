@@ -145,6 +145,13 @@ artifact is BIT-FOR-BIT the rehearsal. Byte detail: patch_notes 14z-99.
 
 ## Tooling
 
+**Release packaging (14z-105 (2)):** `tools/package_release.py` turns a
+frozen rompath into `release/<name>/` — xdelta3 deltas against the four
+reference dumps' concatenated members (no ROM bytes; rule-7 scan),
+`manifest.json`, the verifying `apply_release.py`, README. Deterministic.
+`release/merged-m6/` is the shipped 14z-105 package; gate
+`tests/test_release_roundtrip.sh` (ci_static). Re-run at every freeze.
+
 `tools/patch_prg.py` applies the JSON op-list in 68k word-value space
 (`code` re-encrypts; op-overlap is a NAMED build error since 14z-65).
 `tools/pack_build.sh` packs a runnable rompath (WIDE builds merge the

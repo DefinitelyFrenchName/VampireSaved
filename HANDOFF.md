@@ -145,6 +145,31 @@ separate file so no frozen RAM expectation moves). MAME's harness had the
 same video blind spot FBNeo did, and the WIDE change is entirely a
 rendering change. Ground truth: `tests/test_replay_video_selfcheck.sh`.
 
+## RELEASE PACKAGING (14z-105) — `release/<name>/`, no ROM bytes
+
+`tools/package_release.py <rompath> <out> --romdir $ROMDIR --name merged-m6
+--version M6` turns a frozen build's two zips into a distributable package:
+xdelta3 deltas per modified/new member against ONE source blob (the four
+reference dumps' members concatenated in a fixed order — so a new WIDE
+member is expressed as copies out of vsav2/vhunt2 and only the bytes the
+port GENERATES or AUTHORS are literal), `manifest.json` (every target
+member's sha1/size, which members are copied pristine and from where, the
+source recipe + sha1, the fingerprint, the version string), the community
+applier `apply_release.py` (pure python + xdelta3; verifies every reference
+member, rebuilds the source blob, applies, and refuses to write unless
+EVERY member's sha1 matches), and a README. Secondary compression is OFF so
+the rule-7 scan sees the payload. **Deterministic** (two runs byte-identical).
+**`release/merged-m6/`** is the shipped package for the 14z-105 freeze
+(20 patched + 22 pristine members, 2.5 MB, fingerprint 64426955).
+**Gate: `tests/test_release_roundtrip.sh`** (ci_static) — package -> apply to
+pristine dumps -> all 42 members byte-identical + fingerprint + whole-
+artifact manifest; the applier refuses a corrupted patch / wrong target
+sha1 / one-bit-wrong dump WITHOUT writing; rule 7: no 64-byte-aligned
+reference-ROM chunk appears verbatim anywhere in the patches (rolling scan,
+must-fire control). Needs `xdelta3` (`brew install xdelta`).
+MiSTer later adds a DISTRIBUTION layer (MRA/core) over the SAME members —
+the patch artifact does not change shape for it.
+
 ## Running a CPS-2 WIDE build (playtest)
 
 **RECORD YOUR SESSION (14z-99, maintainer-requested):** on the MAME leg,
@@ -2709,6 +2734,14 @@ tests/test_wide_render_content.sh     # the WIDE track must SERVE the ported con
                                       # reach a playtest — AND the gate that sat
                                       # stale-red from 14z-64 to 14z-67 (GOTCHAS:
                                       # the not-in-the-battery class)
+tests/test_release_roundtrip.sh [rp nm] # 14z-105 (ci_static, ~40 s): THE RELEASE
+                                      # PACKAGE GATE — package, apply to the
+                                      # pristine dumps, byte-identical x42 +
+                                      # fingerprint + manifest; the applier
+                                      # refuses corrupted patch / wrong sha1 /
+                                      # wrong dump without writing; rule 7
+                                      # verbatim-chunk scan with a must-fire
+                                      # control. Needs xdelta3.
 tests/run_suite.sh [--freeze] [set]   # SUITE_ONLY="<name> ..." (14z-105): run
                                       # only the named replays — an AUTHORING
                                       # aid (re-freeze the .sha1 replays in

@@ -110,3 +110,4 @@ test_escape_triage
 
 # 14z-102: the #109-B sweep inventory (filtered, verdicts frozen in header)
 test_biased_list_inventory
+test_release_roundtrip
