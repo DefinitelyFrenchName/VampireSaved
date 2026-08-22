@@ -1,0 +1,11 @@
+== don_m11 FREEZE
+build fingerprint -> expectation set 'donovan-m11'
+per-set mask: 043c-043d,4182-41a2,41c2-41e2,4222-4262,7f00-8000
+01_attract_long          authored .masked expectation — not self-frozen
+02_demitri_vs_cpu        authored .masked expectation — not self-frozen
+03_two_player_vs         authored .masked expectation — not self-frozen
+04_select_fuzz           authored .masked expectation — not self-frozen
+05_timeout_idle          authored .masked expectation — not self-frozen
+06_test_mode             authored .masked expectation — not self-frozen
+07_mash_storm            authored .masked expectation — not self-frozen
+08_challenger_join       tests/run_suite.sh: line 101: 93401 Terminated: 15          MASK_RANGES="$RUNMASK" "$REPO/tools/run_replay_mame.sh" "$SET" "$rpl" "$WORK/$name.1.log"

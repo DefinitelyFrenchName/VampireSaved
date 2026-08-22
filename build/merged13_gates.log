@@ -1,0 +1,56 @@
+== test_version_string
+  knobs: {'version_text': 'M6', 'version_font': 'build/manifest/version_font.json', 'version_x': 340, 'version_y': 202, 'version_pal': 25, 'version_base': 130624}
+== 1. static: record entries, coords, packed group C tiles ==
+  ok: record has 23 entries, the last 2 = 'M6' glyphs at pal 0x19, screen (340,202)+16i
+  ok: 2 authored glyph tiles packed byte-identical, non-blank, pen-15 background, font-exact
+== 2. runtime: the live OBJ list and a pixel-exact snapshot ==
+  ok: frame 1150: 2 glyph sprites at OBJ x=404+16i y=218, bank 5, pal 0x19
+  ok: frame 1151: 2 glyph sprites at OBJ x=404+16i y=218, bank 5, pal 0x19
+  ok: snapshot pixel-exact (0 mismatches, 0 opaque pen-0 pixels; ink (255,)
+== 3. verdict controls ==
+  ok: a 1px-shifted expectation does not match (100 mismatches)
+  ok: a corrupted glyph tile is refused (differs)
+PASS: version string — record + coords + authored tiles static-exact,
+      live OBJ entries at the declared position, snapshot pixel-exact
+rc=0
+== test_oboro_select
+== A/B: P1 Start-held pick on Bishamon vs the no-hold control (WIDE) ==
+  ok: A side 0 -> id 0x18, base 0xb3450
+  ok: B side 0 -> id 0x08, base 0xa6418
+== C: Start held on another cell is inert ==
+  ok: C side 0 -> id 0x01, base 0x93b6a
+== D: the P2 side ==
+  ok: D side 1 -> id 0x18, base 0xb3450
+  ok: D side 0 -> id 0x01, base 0x93b6a
+== E: the STOCK twin carries no hook (profile-gated) ==
+  ok: E side 0 -> id 0x08, base 0xa6418
+  ok: verdict control — a wrong expectation is refused
+PASS: Oboro select hook — Start-held Bishamon commits 0x18 and loads
+      Oboro's dataset (both sides); no-hold / other-cell / stock inert
+rc=0
+== test_wheel_bank5
+== 1. static: site + inventory + group C member bytes ==
+  ok: SITE 0x5f8b2 3d7c20000018 -> 3d7c30000018
+  ok: HBROWS 3
+  ok: TILES host 85 vs2 18
+  ok: PALROWS 3
+  ok: AUTHORED 2
+  ok: NONBLANK host 85 vs2 18
+  ok: OK
+== 2. negative controls: the verdict logic is itself tested ==
+  ok: one corrupted tile byte is caught
+  ok: a stripped code op is caught
+== 3. runtime: the wheel record is walked from bank 5 ==
+  ok: $FFB800 walks the relocated record (412c00) with bank 0x3000
+  ok: all three medallion rows hold across both stress protocols (15 samples) — the white-out is retired
+PASS: wheel bank-5 gate (site + re-derived inventory + group C
+      member identity + negative controls + the engine's own walk
+      from bank 5)
+rc=0
+== audit_select_bank_gates
+  ok: name_bank_variant_id @0x4d0fd0 (62 bytes) gates all 3 declarers: ['donovan:0x13', 'huitzil:0x10', 'pyron:0x11']
+  ok: splash_bank_variant_id @0x4d1010 (62 bytes) gates all 3 declarers: ['donovan:0x13', 'huitzil:0x10', 'pyron:0x11']
+  ok: winquote_bank_variant_id @0x4d0f90 (50 bytes) gates all 3 declarers: ['donovan:0x53', 'huitzil:0x50', 'pyron:0x51']
+PASS: merged drawer bank gates cover every declarer
+rc=0
+== GATES DONE

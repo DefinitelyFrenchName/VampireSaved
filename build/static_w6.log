@@ -1,0 +1,141 @@
+== portable tier ==
+  test_attribute_ramdiff             PASS    0s
+  test_audit_merged_dispatch         PASS    0s
+  test_baseset_mask_invariant        PASS    0s
+  test_basis_publish_atomic          PASS    2s
+  test_battery_accounting            PASS    1s
+  test_build_gate_status             PASS    0s
+  test_build_identity_distinct       PASS    1s
+  test_build_ref_rot                 PASS    0s
+  test_classify_hitclass_probe       PASS    1s
+  test_classify_pool_spawns          PASS    0s
+  test_compare_composite             PASS    1s
+  test_compare_flicker               PASS    0s
+  test_compare_window                PASS    1s
+  test_decrypt_cache                 PASS    0s
+  test_describe_masked_shape         PASS    1s
+  test_fbneo_overlay_hygiene         PASS    0s
+  test_fbneo_overlay_hygiene_control PASS    1s
+  test_freeze_basis_sandbox          PASS    1s
+  test_freeze_retires_diverge        PASS    0s
+  test_gfx_collision_gate            PASS    0s
+  test_gfx_layout_fields_live        PASS    0s
+  test_harness_frame_bound           PASS    3s
+  test_hex_lengths                   PASS    1s
+  test_masked_compare                PASS    0s
+  test_m2a_flicker_gate              PASS    1s
+  test_m2a_target_policy             PASS    1s
+  test_mame_mirror_guard             PASS    2s
+  test_manifest_merge                PASS    0s
+  test_meter_in_field_map            PASS    0s
+  test_minitoml_subset               PASS    0s
+  test_no_tracked_mutation           PASS    3s
+  test_obj_record_walk               PASS    0s
+  test_optimize_guard                PASS    1s
+  test_phasea_a3_liveness            PASS    1s
+  test_qs_ledger_binding             PASS    0s
+  test_qs_wav_timebase               PASS    1s
+  test_qs_window_law                 PASS    0s
+  test_record_walk_bounds            PASS    0s
+  test_replay_stage_census           PASS    0s
+  test_romset_path_guard             PASS    0s
+  test_s4_thresholds                 PASS    1s
+  test_select_port_hygiene           PASS    0s
+  test_shell_portability             PASS    0s
+  test_static_runner                 PASS    1s
+  test_tenant_id                     PASS    1s
+  test_gfx_tile_codec                PASS    0s
+== static tier ==
+  test_m3a_reproducible              PASS  230s
+  test_patch_overlap                 PASS    2s
+  test_region_overlap                PASS    1s
+  test_region_overlap_control        PASS    3s
+  test_romset_identity               PASS    2s
+  test_shared_writes                 PASS    1s
+  test_tenant_loop                   PASS   15s
+  test_tenant_row_owner              PASS   11s
+  test_thunk_addr_literal            PASS    5s
+  audit_gfx_merged_census            PASS    5s
+  audit_select_bank_gates            PASS    0s
+  test_accent_census                 PASS   38s
+  test_beam_list_type6               PASS    0s
+  test_builder_rom_audit             PASS    1s
+  test_census_regions                PASS   66s
+  test_crypt_boundary                PASS    1s
+  test_decode_stage_banners          PASS    0s
+  test_effect_palette_table          PASS    1s
+  test_extract_hp                    PASS   10s
+  test_fbneo_tree_integrity          PASS    1s
+  test_fbneo_tree_integrity_control  PASS    6s
+  test_frozen_rompath_guard          PASS   38s
+  test_gfx_chain                     PASS   19s
+  test_gfx_layout3                   PASS    0s
+  test_gfx_menus_guard               PASS   10s
+  test_gfx_tiles                     PASS   12s
+  test_hitclass_map_thunk            PASS    0s
+  test_hui_winscreen                 PASS   54s
+  test_id_space                      PASS    1s
+  test_index_space                   PASS    2s
+  test_index_window_thunk            PASS    0s
+  test_list_type_census              PASS    0s
+  test_member_classify               PASS    0s
+  test_null_build                    PASS    0s
+  test_obj_walker_relocation         PASS    1s
+  test_patch_source_identity         PASS    1s
+  test_pcrel_escapes                 PASS   56s
+  test_phasec_spaces                 PASS   73s
+  test_qs_id_table                   PASS    0s
+  test_qs_songs                      PASS    1s
+  test_suite_dispatch_selftest       PASS   13s
+  test_type_stamp_census             PASS    5s
+  test_variant_dispatch              PASS    0s
+  test_voice_row_range               PASS    0s
+  test_reconcile_matcher             PASS   40s
+  test_merged_inputs                 PASS   80s
+  test_kernel_voice_tables           PASS    0s
+  test_m2a_target_resolution         PASS    1s
+  test_capture_pose_sources          PASS    0s
+  test_pointer_flow                  PASS    1s
+  test_escape_triage                 PASS    1s
+  test_biased_list_inventory         PASS    0s
+
+== registry coverage (the anti-orphan check) ==
+  ok: every emulator-free gate is registered
+
+== working tree (a pre-commit command must not dirty it) ==
+  DIRTIED by the run — these gates write into TRACKED paths
+  instead of a temp dir; restore with 'git checkout --' on them:
+      <  M HANDOFF.md
+      <  M STATE.md
+      <  M build/manifest/donovan.toml
+      <  M build/manifest/huitzil.toml
+      <  M build/manifest/pcrel_escapes.toml
+      <  M build/manifest/pyron.toml
+      <  M docs/GOTCHAS.md
+      <  M docs/NEXT_SESSION.md
+      <  M docs/game/atlas/id_space.md
+      <  M docs/game/atlas/select_screen.md
+      <  M docs/game/engine_internals.md
+      <  M docs/platform/gotchas.md
+      (before: 388 entries, after: 567)
+
+======================================================================
+PASS 98    SKIP 0     FAIL 0     MISSING 0
+GREEN — every registered emulator-free gate passed.
+   <  M build/manifest/huitzil.toml
+      <  M build/manifest/pcrel_escapes.toml
+      <  M build/manifest/pyron.toml
+      <  M docs/GOTCHAS.md
+      <  M docs/game/atlas/id_space.md
+      <  M docs/game/atlas/select_screen.md
+      <  M docs/platform/gotchas.md
+      <  M docs/project/patch_index.md
+      <  M docs/project/patch_notes.md
+      (before: 381 entries, after: 567)
+
+======================================================================
+PASS 96    SKIP 0     FAIL 2     MISSING 0
+failed:  test_manifest_merge test_tenant_row_owner
+NOT GREEN — see above. Rule 6: fixing this is the only task.
+rc=1
+rc=0

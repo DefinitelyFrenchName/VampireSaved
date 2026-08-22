@@ -1,5 +1,41 @@
 # STATE — living progress log
 
+## Session 14z-106 — HOUSEKEEPING (maintainer-ruled), then the MiSTer
+## alignment brief (no core work until the questions below are answered)
+
+**Housekeeping, each item ruled by the maintainer 2026-08-22:**
+- The 14z-105 verification evidence committed: 15 `build/*_w6*.log` +
+  `merged13_gates*.log` (suite x3, static x3, battery, soak, m3a,
+  propose, freeze builds) and `build/guard_corpus/m3b_merged13.
+  1787401830.tsv` (the 316/316 soak) — precedent: freeze-evidence logs
+  and the merged11/12 guard TSVs are tracked.
+- The rehearsal probes `build/merged_probe_w6` (155 MB) +
+  `build/probe_stock_w6` (71 MB) moved to **`../build_attic_14z105`**
+  (reversible; 0 tracked files inside; every reference is prose and now
+  annotated — HANDOFF x2, patch_notes, test_m3a_reproducible's comment).
+- **`../build_attic_14z102` (8.1 GB) DELETED** — the 14z-102 policy
+  condition ("after the next playtest cycle confirms nothing is missed")
+  was met twice (14z-103, 14z-105). Recoverable via git history + tags.
+- `emu/fbneo` "modified content" is NOT litter: `git apply --check -R`
+  reverses both `emu/fbneo-patches/0001` and `0002` cleanly, so the
+  submodule carries exactly the applied harness + WIDE patches.
+- One-back dirs (don_m10 / hui46 / pyron30 / m3b_merged12 / m5_stock5)
+  stay — the N-2 policy fires at the NEXT freeze.
+- Tracker check: every ticket the NEXT_SESSION history tail still lists
+  as open backlog (#10/#18/#19/#20/#22/#25/#28/#31/#38/#42/#77/#93/#94/
+  #100) is CLOSED on GitHub; `gh issue list` is empty. Nothing queued.
+- Verification: ROM audit 76/76 clean; `run_all_static --strict` on the
+  pruned tree **PASS 99 / SKIP 0 / FAIL 0** (strict makes a lost input
+  fatal — nothing depended on either attic). Log: `build/static_14z106.log`.
+
+**DECIDED (maintainer, 2026-08-22): THE MiSTer FRAMING.** The MiSTer
+deliverable is an **EXTENSION OF JOTEGO'S jtcps CORE** — not an FPGA
+re-implementation of the MAME emulation. This agrees with and sharpens
+the 2026-08-15 ruling (STATE_HISTORY "MiSTer = CORE SURGERY ONLY": PRG-cap
+lift + the QSound width fix + a MiSTer-shaped WIDE profile, GFX <= 32 MB).
+The alignment questions are under "Decisions pending — MiSTer alignment";
+no RTL is touched before they are answered.
+
 ## Session 14z-105 CLOSE (final) — ritual complete
 
 The session, in one line: the maintainer-directed window executed end to
@@ -227,7 +263,8 @@ metadata removed in this commit; recoverable via git history + the
 freeze tags); every live reference had been re-pointed first (only a
 per-build history row in audit_hui_grunt and a docstring still name
 them). The rehearsal probes merged_probe_w6 / probe_stock_w6 stay
-(evidence; the next attic pass takes them).
+(evidence; the next attic pass takes them). [DONE 14z-106: moved to
+`../build_attic_14z105`.]
 
 **Retractions executed (grep'd):** "no in-game version string" (platform
 gotcha §3 + test_build_identity_distinct header); "Oboro's entry path
@@ -897,6 +934,49 @@ docs/project/playtest_m3a_interims.md so the report can classify against it.
 Original write-up kept below.
 
 ## Decisions pending (human)
+
+- **MiSTer ALIGNMENT (14z-106) — five questions before any RTL.** Built
+  only from what the record already measured (`docs/project/cps2_wide.md`
+  "Known limits", source-verified 14z-86 at jtcores @1ae053f3 + jtdsp16
+  @71fa564a; STATE_HISTORY 14z-85/86). The facts: jtcps15 QSound is LLE
+  (jtdsp16 + the real dl-1425), but its sample path is 23-bit with a
+  7-bit bank latch, so content in our QSound extension (banks 0x80+)
+  would ALIAS onto legacy samples — a ~4-line RTL width fix; the stock
+  core caps 68k PRG at 4 MB and GFX at 32 MB (2 x 16 MB) inside a 64 MB
+  SDRAM_LARGE map, so WIDE v1 (PRG 6 / GFX 48 / QS 16) does NOT fit and a
+  MiSTer-shaped profile is required; a 17-character variant is impossible
+  (ruled 2026-08-15 — full roster or nothing).
+  1. **Base tree.** Fork jotego/jtcores at which tag/commit, and is the
+     intent an upstreamable separate machine (the `vsavjw` pattern — a
+     new MRA/core variant leaving stock `vsav` untouched) or a private
+     fork? RECOMMENDATION: pin a tag as a submodule under `emu/jtcores`
+     exactly as MAME/FBNeo are pinned, carry our change as a patch file
+     in `emu/jtcores-patches/`, and shape it as a separate machine so
+     the emulator superset invariant has a stock leg to compare against.
+  2. **Profile shape (gameplay-visible, yours).** PRG target: 6 MB as
+     WIDE v1, or the measured minimum (D+H alone overflow 4 MB by ~310 KB;
+     the three-tenant merged image's real extent should be re-measured
+     before picking)? GFX must come back from 48 MB to <= 32 MB: which
+     tenant tiles get per-slot exclusivity/banking, i.e. what art may
+     not coexist on screen? RECOMMENDATION: measure the merged-m6 GFX
+     occupancy per group/bank first (the 14z-62/66 census tooling) and
+     present the fit options with numbers; do not choose blind.
+  3. **Governance and the oracle.** Rule 1 v2 (profile-gated, stock
+     `vsavj` bit-identical on the patched core, ratified per profile
+     version) should extend verbatim — but MiSTer has no headless
+     per-frame work-RAM harness. Is the gate a Verilator/jtframe
+     simulation of the core (slow but deterministic and scriptable), a
+     hardware capture protocol (the maintainer plays; no RAM checksum),
+     or both? RECOMMENDATION: simulation as the gate, hardware as the
+     field test — same split as MAME (oracle) vs playtest today.
+  4. **Environment.** Does the maintainer have a MiSTer (with the 128 MB
+     SDRAM module — JTFRAME_SDRAM_LARGE needs it) and the Quartus
+     toolchain, or is simulation the only lane this side? This decides
+     who builds the RBF and how fast the confirmation loop is.
+  5. **Distribution.** MRA + RBF over the SAME release members as
+     `release/merged-m6/` (the patch artifact does not change shape); the
+     tagged GitHub release ruled 14z-105 then covers both. Confirm, and
+     whether the MRA should also carry the stock-profile `vsavj` entry.
 
 - ~~**ADOPT THE HIT-CLASS MAP EXTENSION + RE-FREEZE huitzil & pyron
   (14z-82b).**~~ **DECIDED 2026-08-12 (maintainer): ADOPTED** — shipped as

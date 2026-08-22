@@ -1,0 +1,299 @@
+  PASS  ROM audit
+== vsavj: every id has storage, and the folding set is known ==
+  PASS  no variant row is out-of-range
+  PASS  the 5 register-path folding sites
+  PASS  the 2 direct-to-memory folds (id cycling)
+  PASS  7 folding sites in total
+  PASS  variant rows with own data: 0x18 only, in the bank
+  PASS  the Anakaris variant outlier word_pos_a[0x16]
+  PASS  vsavj reserves id 0x12 (two hardcoded writes)
+  PASS    the two 0x12 sites are where they were
+== vsav2: the roster-on-variant-ids reference ==
+  PASS  bank rows distinct at 10 11 13 18 19
+  PASS  folds at only 2 sites (widened elsewhere)
+  PASS  vs2 widened the id-cycling mask to #$1f
+  PASS  vs2 reserves 0x19 (its second Oboro dataset)
+ID SPACE: PASS
+== section 1: static decode and structure ==
+  PASS  ROM audit (reference sets match docs/checksums.txt)
+  PASS  vsavj tables decode and verify
+  PASS  vsav2 tables decode and verify
+  PASS  frozen facts: vsavj paths + alias half; vsav2 navigates 10/11/13
+== section 2: generate the full-coverage walk ==
+  PASS  generated walk covers all 128 (cell,direction) pairs
+== section 3: MEASURED — the walk, tapped in MAME ==
+  PASS  measured walk reproduces TABLE B (all 128 pairs)
+  PASS  negative control 'cell' is caught
+  PASS  negative control 'count' is caught
+  PASS  negative control 'pc' is caught
+  PASS  negative control 'frame' is caught
+== section 4: MEASURED — where each cell sits on screen ==
+  PASS  all 16 cell positions match the frozen map
+== section 5: the layout proposer refuses an unsound wheel ==
+  PASS  the snapped layout validates
+  PASS  an 0xFF in a live row is REJECTED
+  PASS  the self-reference idiom is documented at the fallback
+SELECT WHEEL: PASS
+== ground truth for the member-identity audit ==
+  ok: patched member, no duplicate anywhere -> pass
+  ok: patched member + its pristine bytes under another name -> fail
+  ok: patched member + byte-identical placeholders (shadow nothing) -> pass
+  ok: nothing patched -> pass
+  ok: the failure names both the patched member and its shadow
+  ok: harmless duplicates are reported, not hidden
+PASS: romset member-identity audit ground truth (4 cases + 2 message checks)
+== tenant id resolution ==
+  ok: default, no profile -> 0x0f True
+  ok: WIDE profile, no override -> 0x13 False
+  ok: --tenant-id 0x13 on WIDE -> 0x13 False
+  ok: variant id without a profile -> REFUSED gen_donovan_patch: tenant id 0x13 is a VARIANT id, which requires a build profile — its tiles cannot share the host character's gfx band, and a stock build has nowhere else to put them. Build with --profile, or declare a base-half id for the stock track via [tenant.id_by_profile].
+  ok: id_by_profile declares the WIDE default 0x13 (M3a landed)
+== row ownership ==
+  ok: stamping, row_owner, row_applies, row_hex, and the
+      multi-tenant acceptance (count, order, port[0])
+PASS: tenant id gate (resolution, the variant-id refusal, the
+      frozen-reference reproducibility guard, and row ownership)
+== section 0: the guard is QUIET on all three real manifests ==
+  ok: donovan generates clean, 0 guard messages
+  ok: huitzil generates clean, 0 guard messages
+  ok: pyron generates clean, 0 guard messages
+== section 1: a re-staled literal FAILS the build, naming the region ==
+  ok: caught, and the message names the region and the fix:
+      body bakes 0x0dda1e (movea.l ->A0) at hex offset 36, which is inside placed region 'anim'
+      ok: suggests region_subst = "<ph>=anim:0xa9ae" (offset re-derived)
+== section 2: addr_literal_ok silences it (the escape hatch) ==
+  ok: an explicitly-declared fixed address is allowed through
+== section 3: verdict controls — what must NOT fire ==
+  ok: the vanilla lea 0x2083bc in the same body does NOT fire
+  ok: an unanchored longword does not fire (documented boundary)
+  note: raw longwords in embedded data are OUT OF SCOPE by design (3b)
+
+PASS: a placed address baked into a thunk body is a BUILD error; the
+      three real manifests are clean; the escape hatch and the anchor
+      requirement both behave.
+== decrypting reference images
+== 1. the site is jmp-routed and the body reconstructs from the ROMs
+  site 0x018460 -> jmp 0x0fceb0   body 470 bytes
+  ok: body byte-identical to the ROM-derived reconstruction (23 trampolines, table +0x50)
+  ok: placed inside the crypt window (0x0fceb0); the pc-relative table read decrypts
+== 2. the engine around the site is VANILLA
+  0x018466-0x018508  the index table (+ the orphaned ext word): vanilla
+  0x018508-0x0185b0  the sibling dispatcher and its table: vanilla
+  0x01867a-0x0187bc  the shared handler pool: vanilla
+  0x01850A (the WITHDRAWN 14z-74 word) = 0006
+== 3. the table is still exactly 80 entries
+  dispatcher shape at 0x018460 and 0x018508: True;  entries = 80
+== 4. verdict controls — the checker must FAIL on a corrupted body
+  control: a trampoline target (silent wrong-routine dispatch): CAUGHT
+  control: an index-table word (wrong trampoline chosen): CAUGHT
+  control: a danger body byte (entry 82's class 0x52): CAUGHT
+  control: the UNPERTURBED body still matches: True
+== 5. verdict controls on the PLACEMENT predicate (14z-92)
+  control: the real merged placement (raw, views agree): ok (raw-ok)
+  control: the real solo placement (inside the crypt window): ok (crypt-ok)
+  control: STRADDLING the boundary — must be caught: ok (straddle)
+  control: above the window but views DIFFER — region is not raw, must be caught: ok (not-raw)
+  control: body ending exactly at the boundary is NOT a straddle: ok (crypt-ok)
+PASS: (b') index-window thunk — body reconstructs from the ROMs, engine vanilla
+== 1. each tenant build matches its frozen inventory
+  ok: matches the frozen inventory for 'donovan' (90 writes)
+  ok: matches the frozen inventory for 'huitzil' (87 writes)
+  ok: matches the frozen inventory for 'pyron' (76 writes)
+== 2. positive control — the instrument sees the real defect
+  ok: 0x39acc0 +128 (the withdrawn DF-palette row that broke
+      Bulleta) IS flagged as a shared-surface write on hui27
+== 3. verdict controls (each MUST be caught)
+  control: an ADDED shared write (a new byte poked into vanilla space): CAUGHT
+  control: a REMOVED shared write (an engine hook silently dropped): CAUGHT
+  control: the UNMUTATED build still passes: True
+PASS: shared-surface writes match the frozen, reviewed inventory
+== 0. building at --tenant-id 0x13 (fresh) ==
+  build fingerprint: 1de9a027d86c5a87dccb36c8ad3fbaa03fe17126
+  OK: stage 6 build at /var/folders/m7/v33ds745313314_cz_z2jghw0000gn/T/tmp.3rUXYv5npC/build/rompath (fingerprint above; register in tests/expected/registry.tsv at freeze time)
+== 1. static: composition + host de-substitution ==
+  ok: 9 rows, 9 composed records, host bytes vanilla
+== 2. negative controls: the verdict logic is itself tested ==
+  ok: a pristine image (nothing repointed) is caught
+  ok: one flipped byte in a composed record is caught
+  ok: one flipped byte in the host record block is caught
+== 3. runtime: the engine fetches the tenant's rows on cell 0x13 ==
+  ok: big_portrait — vanilla rows then the tenant's record
+  ok: name_banner — vanilla rows then the tenant's record
+  ok: highlight — vanilla rows then the tenant's record
+  ok: p2_portrait — vanilla rows then the tenant's record
+  ok: p2_highlight — vanilla rows then the tenant's record
+  ok: p2_name_via_p1 — vanilla rows then the tenant's record
+  (RNG draw: vanilla record 00273a02)
+  ok: splash — vanilla rows then the tenant's record
+  ok: p2 name array (+0x80) unconsumed, as measured
+== 4. de-substitution acceptance: picking the HOST re-converges ==
+  ok: host pick = bounded window 889-2415, fully re-convergent
+PASS: tenant select-records gate (static composition + negative
+      controls + the engine's own row sequence onto cell 0x13 +
+      the host-pick re-convergence window)
+== 0. building at --tenant-id 0x13 (fresh) ==
+  build fingerprint: 1de9a027d86c5a87dccb36c8ad3fbaa03fe17126
+  OK: stage 6 build at /var/folders/m7/v33ds745313314_cz_z2jghw0000gn/T/tmp.9r88sksKut/build/rompath (fingerprint above; register in tests/expected/registry.tsv at freeze time)
+== 1. static: site + inventory + group C member bytes ==
+  ok: SITE 0x5f8b2 3d7c20000018 -> 3d7c30000018
+  ok: HBROWS 3
+  ok: TILES host 85 vs2 18
+  ok: PALROWS 3
+  ok: AUTHORED 2
+  ok: NONBLANK host 85 vs2 18
+  ok: OK
+== 2. negative controls: the verdict logic is itself tested ==
+  ok: one corrupted tile byte is caught
+  ok: a stripped code op is caught
+== 3. runtime: the wheel record is walked from bank 5 ==
+  ok: $FFB800 walks the relocated record (412c00) with bank 0x3000
+  ok: all three medallion rows hold across both stress protocols (15 samples) — the white-out is retired
+PASS: wheel bank-5 gate (site + re-derived inventory + group C
+      member identity + negative controls + the engine's own walk
+      from bank 5)
+== 0. building at --tenant-id 0x13 (fresh) ==
+  build fingerprint: 1de9a027d86c5a87dccb36c8ad3fbaa03fe17126
+  OK: stage 6 build at /var/folders/m7/v33ds745313314_cz_z2jghw0000gn/T/tmp.g4LB5YXIyc/build/rompath (fingerprint above; register in tests/expected/registry.tsv at freeze time)
+== 1. static: tables + pokes + art + host pristineness ==
+  ok: TABLES aliased
+  ok: POKES 3
+  ok: ART mugshot@0xbe90 name@0xbe8c nonblank 7; host cells pristine
+  ok: OK
+== 2. negative control: the verdict logic is itself tested ==
+  ok: a stripped mugshot poke is caught
+== 3. runtime: the HUD stages the tenant's codes in a real match ==
+  ok: tenant mugshot + name staged (code=be90 attr=112a); opponent vanilla 3Dxx
+PASS: tenant HUD gate (32-row-alias mechanism + pokes + art +
+      host pristineness + the engine's own staging in-match)
+== 0. building at --tenant-id 0x13 (fresh) ==
+  build fingerprint: 1de9a027d86c5a87dccb36c8ad3fbaa03fe17126
+  OK: stage 6 build at /var/folders/m7/v33ds745313314_cz_z2jghw0000gn/T/tmp.rVwG65KjU9/build/rompath (fingerprint above; register in tests/expected/registry.tsv at freeze time)
+== 1. static: site + thunk + sparse block re-derived ==
+  ok: SITE 0x5f1b6 -> thunk 0x3ffdd0 rebase 0x412330 block 0x412f10
+  ok: SLICES 8
+  ok: OK
+== 2. negative control ==
+  ok: a stripped site op is caught
+== 3. runtime: both thunk paths on real 2P victories ==
+  ok: tenant win = vs2 set (f5500+f5700); vanilla win = untouched pool (f5300)
+PASS: tenant win-pal gate (site/thunk/sparse-block re-derived +
+      negative control + both thunk paths measured on real 2P
+      victories)
+== 0. building at --tenant-id 0x13 (fresh) ==
+  build fingerprint: 1de9a027d86c5a87dccb36c8ad3fbaa03fe17126
+  OK: stage 6 build at /var/folders/m7/v33ds745313314_cz_z2jghw0000gn/T/tmp.pG7pzJpn6E/build/rompath (fingerprint above; register in tests/expected/registry.tsv at freeze time)
+== 1. static census: family-base + slot references ==
+  ok: CENSUS 4 family-base sites (frozen), 0 direct slot refs
+== 2. variant routing: all four sites thunked ==
+  ok: ROUTES 4/4 jsr-routed
+== 3. negative control ==
+  ok: a stripped route is caught
+PASS: accent census gate (4 frozen family-base sites, 0 direct
+      slot refs, all four jsr-routed on the variant build)
+== build stage 6 (static output verification inside) ==
+PASS: no member shadows a patched member
+build fingerprint: 883e7d17405baf462c9763eccde4e35bf93adecb
+OK: stage 6 build at /Users/koneko/Developer/Vampire_Saved/VampireSaved/build/donovan6/rompath (fingerprint above; register in tests/expected/registry.tsv at freeze time)
+== 1. guarded soaks on stage 6 ==
+  ok: 12_donovan_vs_cpu END-clean under guard
+  ok: 19_don_dp_spam END-clean under guard
+  ok: 20_don_round2 END-clean under guard
+  ok: 21_don_mash END-clean under guard
+  ok: 26_don_arcade_mash END-clean under guard
+== 2. legacy gate, §4 basis (masked live-RAM, current frozen generation) ==
+  target: donovan-m10-stock   mask: 043c-043d,4182-41a2,41c2-41e2,4222-4262,7f00-8000
+  ok: 01_attract_long PASS (diverges from vsavj/masked-v2 at exactly 4278)
+  ok: 02_demitri_vs_cpu PASS masked-exact
+  ok: 03_two_player_vs PASS masked-flicker (FLICKER 1 2093 — frozen inventory)
+  ok: 04_select_fuzz PASS masked-flicker (FLICKER 2 1525,2009 — frozen inventory)
+  ok: 05_timeout_idle PASS masked-exact
+  ok: 06_test_mode PASS masked-exact
+  ok: 07_mash_storm PASS masked-exact
+  ok: 08_challenger_join PASS masked-flicker (FLICKER 2 3507,3807 — frozen inventory)
+  ok: 09_mirror_pick PASS masked-exact
+  ok: 10_midattract_start PASS masked-exact
+  ok: 11_pick_donovan PASS (diverges from vsavj/masked-v2 at exactly 1080)
+  ok: 16_xemu_2p PASS masked-exact
+  ok: 29_felicia_walljump PASS masked-flicker (FLICKER 1 2436 — frozen inventory)
+  ok: 30_demitri_throw PASS masked-exact
+  ok: frame 650 pixel-identical
+  ok: frame 950 pixel-identical (medallion box masked)
+  ok: frame 1250 pixel-identical (medallion box masked)
+PASS: menu gfx gate
+PASS: M2b stage-6 gate
+  rompath  /Users/koneko/Developer/Vampire_Saved/VampireSaved/build/donovan6/rompath
+  romdir   /Users/koneko/Developer/Vampire_Saved/ROMS
+  members  30 in 2 zips
+  patched  13: vm3.13m, vm3.14m, vm3.15m, vm3.16m, vm3.17m, vm3.18m, vm3.19m, vm3.20m, vm3j.03d, vm3j.04d, vm3j.07b, vm3j.09b, vm3j.10b
+PASS: no member shadows a patched member
+  ok: sword swing commanded (node 0xE1A20, idx 0 at frame 2614)
+PASS: Donovan sword-swing gate
+  ok: static — T0==T1==vs2 rowC, rowD slot, Victor accent pristine
+  ok: row 0x0C steady over 40 frames, native-vs2 content
+  ok: rows 0x0E/0x0F native (fixture override live, data readable)
+  ok: Victor row 0x10 glow cycling (legacy behavior alive)
+  ok: shock arcs vanilla-locked (41 frames), pulse in-ramp, override rows hold
+PASS: Donovan weapon-accent + Victor-accent gate
+  ok: kick-color pick rows match frozen native set (4 rows)
+  ok: kick-color sword row steady (color-aware accent)
+  ok: Donovan mirror rows match frozen native set (10 rows)
+  ok: select post-confirm accents steady + native-locked (rows 0x0A-0x0D)
+  ok: select medallion native-locked (row 14 + wheel record + Gallon intact)
+PASS: Donovan color-set gate (alt + mirror native-locked)
+  ok: select sword composed behind the body (20 entries, order SSSSSSSSSSSS...)
+PASS: select companion sword gate
+  ok: 421P multi-hits (6 steps, 10 total, last at f2690) native-class, no knockdown on a standing opponent
+  ok: deity KO runs the full native electric death (grounded at 0x158210)
+  ok: MATCH-END deity KO chains to the grounded death (0x158210)
+  ok: win screen native-locked (palette rows 15-19 + composition base)
+  ok: ES 421P native-class (9 steps, 13 total)
+  ok: HUD mugshot + name plate ride the 14z-49 cells (0x3DC8 / 0xBE8C)
+  ok: ES kill chains to the grounded death (the round-52 fix holds)
+  ok: half-circle commands accept (Blizzard 41236 + Grapple 63214)
+PASS: Donovan hit-class reaction gate
+  ok: column KO END-clean under guard (no vec3)
+  ok: swordless-deity palette rows native-locked (0x0B/0x0C)
+PASS: Donovan column-KO crash gate
+tests/test_don_sound.sh: line 32: 14633 Segmentation fault: 11  REPLAY="$REPO/tests/replays/$rp.rpl" FRAMES=3400 TRACE_OUT="$WORK/$rp.txt" MAME_SANDBOX="$WORK/$rp" CHECKSUM_OUT="$WORK/$rp/c.log" MAME_ROMPATH="$RPDIR;$ROMDIR" tools/run_mame.sh "${SET:-vsavj}" -autoboot_script "$REPO/tests/lua/ring_tap.lua" > /dev/null 2>&1
+  note: 19_don_dp_spam — MAME teardown crash (rc=139) AFTER the
+        instrument's END marker; run complete, tolerated
+  ok: 12_donovan_vs_cpu — 26 ids, none in the music range
+  ok: 19_don_dp_spam — 24 ids, none in the music range
+  ok: 25_don_darkforce — 20 ids, none in the music range
+  ok: 56_don_es_ls — 22 ids, none in the music range
+PASS: Donovan sound gate (no music-range ids; inventories frozen)
+== 1. static: the fixed word in the built image ==
+  ok: vs2 blob in place, entry [0x0F] fixed 0b30 -> 0d88
+== 2. runtime: the mirror throw walks the fixed block ==
+  ok: victim walker reads the FIXED block (206 reads), old block untouched
+PASS: mirror-victim gate (the 2-byte fix, static + a matched
+      runtime control on the mirror throw)
+== dumps: native vsav2 / ported vsavj / veteran controls ==
+== 1. anchors ==
+  ok: match-start anchors equal (2363)
+== 2. neutral window: exact field agreement ==
+  ok: exact mode: 210 frames compared
+== 3a. HP-decrease sanity (battery) ==
+  ok: P2 HP trajectories equal and decreasing (288,277,266)
+== 3b. comparative bound vs native-veteran control ==
+  ok: ported-Donovan battery mismatches (890) <= veteran control (2383)
+PASS: M2a stage-4 oracle gate
+== MAME (patched) wide window ==
+  ok: MAME anchor at frame 2363
+== FBNeo (patched) anchor scan ==
+  ok: FBNeo anchor at frame 2364 (skew 1)
+== FBNeo full-field dumps at follow offsets ==
+== field agreement at anchors (follow 0,60,180) ==
+  ok: MAME/FBNeo agree on the patched build (anchors: mame=[2363] fbneo=[2364])
+PASS: M2a stage-4 dual-emulator gate
+  ok: plain -> P1 latch 01, P2 latch 00
+  ok: p1-held -> P1 latch 00, P2 latch 00
+  ok: p2-held -> P1 latch 01, P2 latch 00
+PASS: Start-hold flavor selector
+note: WIDE rendering gate skipped (not a WIDE build, or no stock twin
+      at build/m5_stock6 — tests/test_wide_render_content.sh)
+BATTERY INCOMPLETE — 23 passed, 1 SKIPPED: wide-render(x1)
+  A skipped gate asserts NOTHING. 'BATTERY GREEN' is the sentence a
+  session records under rule 2, so it is not printed here. Supply the
+  missing prerequisites (WIDE MAME binary, build dirs) and re-run.
+rc=1

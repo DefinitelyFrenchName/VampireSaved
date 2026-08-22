@@ -54,8 +54,14 @@
 > ## --romdir $ROMDIR --name merged-mN --version <mark>`. RULED
 > ## (maintainer, 2026-08-22): stays IN-TREE until MiSTer; a tagged GitHub
 > ## release is cut then, covering both. MiSTer core surgery is next.
-> ## Next: then the roadmap forks on the open question — release
-> ## packaging before or after MiSTer core surgery. The N-2 build-dir
+> ## **14z-106 (2026-08-22): housekeeping DONE** (w6 evidence logs +
+> ## guard-corpus TSV committed; probes attic'd to `../build_attic_14z105`;
+> ## `../build_attic_14z102` DELETED per policy; fbneo submodule content
+> ## verified = patches 0001+0002). **MiSTer FRAMING RECORDED (maintainer):
+> ## the deliverable is an EXTENSION OF JOTEGO'S jtcps CORE, not an FPGA
+> ## re-implementation of the MAME emulation.** Before any RTL: the
+> ## alignment questions in STATE "Decisions pending — MiSTer alignment".
+> ## The N-2 build-dir
 > ## deletion policy applies at the NEXT freeze (m10/m19/m13/merged-m5
 > ## dirs are now one-back; m9/m18/m12/merged-m4 + m5_stock4 are N-2 and
 > ## fall).

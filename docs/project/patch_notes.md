@@ -3586,7 +3586,7 @@ not match, a corrupted tile is refused.
 | donovan-m11-stock | `build/m5_stock6` | `883e7d17` (= m5_stock5, UNCHANGED) | — |
 | huitzil-m20 | `build/hui47` | `24a27940` | 365 |
 | pyron-m14 | `build/pyron31` | `6bf265ab` | 298 |
-| merged-m6 | `build/m3b_merged13` | `64426955` (= the rehearsed `build/merged_probe_w6` bit-for-bit) | 806 |
+| merged-m6 | `build/m3b_merged13` | `64426955` (= the rehearsed `build/merged_probe_w6` bit-for-bit; probe attic'd 14z-106) | 806 |
 
 Op counts re-frozen in `tests/test_tenant_loop.sh` with attribution
 (325/365/298; 600/652; 806/907). **The select-window specs were PREDICTED

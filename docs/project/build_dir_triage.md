@@ -19,6 +19,13 @@ what prevents this package from regrowing.
 **Executed:** 85 dirs (8.1 GB) moved to `../build_attic_14z102`
 (REVERSIBLE — outside the repo; delete the attic after the maintainer's
 next playtest cycle confirms nothing is missed). build/ 13 GB -> 4.4 GB.
+**DELETED 2026-08-22 (14z-106, maintainer-ruled):** two playtest cycles
+(14z-103, 14z-105) passed green with nothing missed; the attic is gone
+and its contents are recoverable only via git history + freeze tags.
+**Second attic, `../build_attic_14z105`** (created 14z-106, REVERSIBLE):
+the 14z-105 rehearsal probes `merged_probe_w6` (155 MB) +
+`probe_stock_w6` (71 MB) — merged-m6 is bit-for-bit the first, recorded
+in HANDOFF / patch_notes / test_m3a_reproducible. Same deletion rule.
 Verification on the pruned tree: `run_all_static --strict` **PASS
 97/0/0 with ZERO skips** (strict makes a lost input fatal — nothing
 anywhere depended on a moved dir) + the M2 battery re-run green.

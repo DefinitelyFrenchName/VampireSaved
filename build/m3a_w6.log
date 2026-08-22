@@ -1,0 +1,22 @@
+== WIDE overlay romset (scratch)
+== rebuild donovan-m3a (WIDE)
+  ok: donovan-m3a reproduced (1de9a027d86c5a87dccb36c8ad3fbaa03fe17126)
+== rebuild m5_stock
+  ok: m5_stock reproduced (883e7d17405baf462c9763eccde4e35bf93adecb)
+== rebuild huitzil (0x10)
+  ok: huitzil reproduced (24a27940656c160c909de3a690e74da8aa7e9432)
+== rebuild pyron (0x11)
+  ok: pyron reproduced (6bf265abc5b8e0980f7f8b29fd39b64814af8a86)
+== whole-artifact manifests (HARD on content and inventory, 14z-91)
+  ok: donovan-m3a whole-artifact manifest matches (42 members)
+  ok: m5_stock whole-artifact manifest matches (30 members)
+  ok: huitzil whole-artifact manifest matches (42 members)
+  ok: pyron whole-artifact manifest matches (42 members)
+== rebuild the MERGED image (all three tenants)
+  ok: merged reproduced (64426955bf7877908a1014f134040c9672bddf5a)
+  ok: merged whole-artifact manifest matches (42 members)
+PASS: every frozen reference rebuilds with bit-exact PROGRAM images
+      (gfx/QSound/key members and the second packed zip are covered by
+      the manifests above — HARD on content and inventory since 14z-91)
+      merged image: CHECKED
+rc=0

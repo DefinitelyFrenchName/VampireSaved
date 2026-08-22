@@ -1,0 +1,120 @@
+== don_m11 FREEZE (SUITE_ONLY)
+build fingerprint -> expectation set 'donovan-m11'
+per-set mask: 043c-043d,4182-41a2,41c2-41e2,4222-4262,7f00-8000
+FILTERED RUN (SUITE_ONLY) — not a suite verdict
+103_tenant_2pwin_auto    frozen d181e840333b1bfa44b265d2abdbd5af083fe6a2
+36_pick_tenant_cell      frozen 472768bbb5aa7e515932aa86a9c709d9d2b6974e
+37_p2_pick_tenant        frozen 3c98a3b8bb5f20a39ad0e965a8b83b562e51da14
+44_don_select_hover      frozen 65fcc7e8f6c563f3c5423778dd44fa94dbd3c3a6
+58_don_select_confirm    frozen 1087e546d7240a086e60c19704b8d3028b1754ab
+61_tenant_2pwin          frozen b0008eb36e50b783c9d6c268683cf2063321f50d
+62_tenant_2plose         frozen 5690fcc100827502477d7f79a4439390bc4c4747
+64_select_mashright      frozen 8f2b4c7d3aee0b8667f1ee1e0d8ac5cc4155a336
+92_p2_ring_walk          frozen 0206fd91dc17aabba3abda5780db79fa784b3f40
+SUITE GREEN
+rc=0
+== don_m11 VERIFY (full)
+build fingerprint -> expectation set 'donovan-m11'
+per-set mask: 043c-043d,4182-41a2,41c2-41e2,4222-4262,7f00-8000
+01_attract_long          PASS masked-exact
+02_demitri_vs_cpu        PASS masked-window (divergent frames 787, runs 1, window 889..1675, 3845 identical after)
+03_two_player_vs         PASS masked-composite (divergent frames 984 in 2 run(s): flicker 2093, windows 889-1871, 3227 identical after)
+04_select_fuzz           PASS masked-composite (divergent frames 217 in 2 run(s): flicker 2009, windows 889-1104, 1511 identical after)
+05_timeout_idle          PASS masked-window (divergent frames 787, runs 1, window 889..1675, 10445 identical after)
+06_test_mode             PASS masked-exact
+07_mash_storm            PASS masked-window (divergent frames 787, runs 1, window 889..1675, 2645 identical after)
+08_challenger_join       PASS masked-composite (divergent frames 1592 in 3 run(s): flicker 3507, windows 889-1675;3807-4610, 2310 identical after)
+09_mirror_pick           PASS masked-window (divergent frames 1063, runs 1, window 889..1951, 2769 identical after)
+103_tenant_2pwin_auto    PASS
+104_1p_auto_ko_win       PASS masked-window (divergent frames 606, runs 1, window 889..1494, 12126 identical after)
+105_projectile_clash_ctl PASS masked-window (divergent frames 1203, runs 1, window 889..2091, 3529 identical after)
+106_pyron_cosmo_clash    PASS masked-window (divergent frames 1203, runs 1, window 889..2091, 4029 identical after)
+10_midattract_start      PASS masked-window (divergent frames 2577, runs 1, window 3189..5765, 355 identical after)
+11_pick_donovan          PASS masked-window (divergent frames 1527, runs 1, window 889..2415, 1305 identical after)
+12_donovan_vs_cpu        PASS masked-window (divergent frames 1527, runs 1, window 889..2415, 6905 identical after)
+16_xemu_2p               PASS masked-window (divergent frames 1203, runs 1, window 889..2091, 2229 identical after)
+17_don_oracle_vsav2      SKIP (targets the vsav2 romset; covered by tests/test_m2a_stage4_oracle.sh)
+17_don_oracle_vsavj      PASS masked-window (divergent frames 1203, runs 1, window 889..2091, 2329 identical after)
+18_veteran_ctl_vsav2     SKIP (targets the vsav2 romset; covered by tests/test_m2a_stage4_oracle.sh)
+18_veteran_ctl_vsavj     PASS masked-window (divergent frames 1203, runs 1, window 889..2091, 2329 identical after)
+19_don_dp_spam           PASS masked-window (divergent frames 1203, runs 1, window 889..2091, 3839 identical after)
+20_don_round2            PASS masked-window (divergent frames 1203, runs 1, window 889..2091, 10029 identical after)
+21_don_mash              PASS masked-composite (divergent frames 1204 in 2 run(s): flicker 11777, windows 889-2091, 2343 identical after)
+22_don_dualmash          PASS masked-composite (divergent frames 1205 in 3 run(s): flicker 11862,11918, windows 889-2091, 2002 identical after)
+23_don_matchwin          PASS masked-composite (divergent frames 1205 in 3 run(s): flicker 12313,12733, windows 889-2091, 5387 identical after)
+24_don_winmash           PASS masked-composite (divergent frames 1205 in 3 run(s): flicker 12313,12733, windows 889-2091, 5787 identical after)
+25_don_darkforce         PASS masked-window (divergent frames 1203, runs 1, window 889..2091, 7029 identical after)
+26_don_arcade_mash       PASS masked-composite (divergent frames 1529 in 3 run(s): flicker 8744,36857, windows 889-2415, 3763 identical after)
+27_don_throw_vsav2       SKIP (targets the vsav2 romset; throw oracle pair, see tests/replays/27_*)
+27_don_throw_vsavj       SKIP (added post-freeze (session 14n throw fix); validated by the throw oracle measurement + the m2b gate line)
+28_don_quotewin          PASS masked-composite (divergent frames 1205 in 3 run(s): flicker 12407,12827, windows 889-2091, 1793 identical after)
+29_felicia_walljump      PASS masked-composite (divergent frames 1128 in 2 run(s): flicker 2436, windows 889-2015, 1884 identical after)
+30_demitri_throw         PASS masked-window (divergent frames 1127, runs 1, window 889..2015, 2705 identical after)
+31_don_6hp_vsav2         SKIP (targets the vsav2 romset; native ground-truth half of an oracle pair (see the matching _vsavj replay / its gate))
+31_don_6hp_vsavj         PASS masked-window (divergent frames 1203, runs 1, window 889..2091, 2129 identical after)
+32_victor_shock_vsav2    SKIP (targets the vsav2 romset; native ground-truth half of an oracle pair (see the matching _vsavj replay / its gate))
+32_victor_shock_vsavj    PASS masked-window (divergent frames 1203, runs 1, window 889..2091, 1729 identical after)
+33_victor_6hp_vsav2      SKIP (targets the vsav2 romset; native ground-truth half of an oracle pair (see the matching _vsavj replay / its gate))
+33_victor_6hp_vsavj      PASS masked-window (divergent frames 1203, runs 1, window 889..2091, 1129 identical after)
+34_victor_5hp_vsav2      SKIP (targets the vsav2 romset; native ground-truth half of an oracle pair (see the matching _vsavj replay / its gate))
+34_victor_5hp_vsavj      PASS masked-window (divergent frames 1203, runs 1, window 889..2091, 1229 identical after)
+35_victor_kd_vsav2       SKIP (targets the vsav2 romset; native ground-truth half of an oracle pair (see the matching _vsavj replay / its gate))
+35_victor_kd_vsavj       PASS masked-window (divergent frames 1203, runs 1, window 889..2091, 1179 identical after)
+36_pick_tenant_cell      PASS
+36_victor_kd2_vsav2      SKIP (targets the vsav2 romset; native ground-truth half of an oracle pair (see the matching _vsavj replay / its gate))
+36_victor_kd2_vsavj      PASS masked-window (divergent frames 1203, runs 1, window 889..2091, 1179 identical after)
+37_p2_pick_tenant        PASS
+37_pick_huitzil_cell     SKIP (picks the HUITZIL cell (id 0x10), which this build does not back (donovan-m3a
+backs only Donovan at 0x13). The exact twin of huitzil-m2's 11_pick_donovan
+skip. The tenant pick on this build is covered by 11_pick_donovan; the replay
+itself is NOT dead — huitzil-m2 and pyron-m2 both carry a real .sha1 for it.
+
+Added 14z-78 (maintainer sign-off). The replay landed in 14z-67, after this
+set was frozen in 14z-64, so the set had no entry for it and the suite went
+red on an unaccounted replay — with zero divergences, so never a regression.
+A replay added after a freeze may invalidate that freeze; the truthful
+classification here is "not applicable to this build", not a frozen checksum.)
+37_victor_ko_vsav2       SKIP (targets the vsav2 romset; native ground-truth half of an oracle pair (see the matching _vsavj replay / its gate))
+37_victor_ko_vsavj       PASS masked-composite (divergent frames 1205 in 3 run(s): flicker 6962,7168, windows 889-2091, 2512 identical after)
+38_victor_p1_vsavj       PASS masked-window (divergent frames 1203, runs 1, window 889..2091, 2909 identical after)
+39_victor_cross_vsavj    PASS masked-window (divergent frames 1203, runs 1, window 889..2091, 2739 identical after)
+40_pick_pyron_cell       SKIP (picks the PYRON cell (id 0x11), which this build does not back (donovan-m3a
+backs only Donovan at 0x13). The exact twin of huitzil-m2's 11_pick_donovan
+skip. The tenant pick on this build is covered by 11_pick_donovan; the replay
+itself is NOT dead — pyron-m2 carries a real .sha1 for it, where the cell IS
+backed.
+
+Added 14z-78 (maintainer sign-off). The replay landed in 14z-75, three days
+after this set was frozen in 14z-64, so the set had no entry for it and the
+suite went red on an unaccounted replay — with zero divergences, so never a
+regression. A replay added after a freeze may invalidate that freeze; the
+truthful classification here is "not applicable to this build", not a frozen
+checksum.)
+40_victor_5hp_defaultchar_vsavj PASS masked-window (divergent frames 1203, runs 1, window 889..2091, 1229 identical after)
+41_don_altcolor_vsav2    SKIP (targets the vsav2 romset; native ground-truth half of an oracle pair (see the matching _vsavj replay / its gate))
+41_don_altcolor_vsavj    PASS masked-composite (divergent frames 1204 in 2 run(s): flicker 2313, windows 889-2091, 1907 identical after)
+42_don_mirror_vsavj      PASS masked-window (divergent frames 1203, runs 1, window 889..2091, 2129 identical after)
+43_don_mirror_vsav2      SKIP (targets the vsav2 romset; native ground-truth half of an oracle pair (see the matching _vsavj replay / its gate))
+44_don_select_hover      PASS
+48_don_immortal_ko       PASS masked-window (divergent frames 1203, runs 1, window 889..2091, 1429 identical after)
+50_don_column_ko         PASS masked-window (divergent frames 1203, runs 1, window 889..2091, 1429 identical after)
+51_vs2_immortal_native   SKIP (targets the vsav2 romset; native no-mash Lightning Sword ground truth (datums frozen in the replay header + test_don_reactions))
+52_vs2_immortal_mash     SKIP (targets the vsav2 romset; native mash ground truth of the 52/53 pair (test_don_reactions datums))
+53_don_immortal_mash     PASS masked-window (divergent frames 1203, runs 1, window 889..2091, 1429 identical after)
+54_don_matchend_ko       PASS masked-window (divergent frames 1203, runs 1, window 889..2091, 1829 identical after)
+56_don_es_ls             PASS masked-window (divergent frames 1203, runs 1, window 889..2091, 1429 identical after)
+57_vs2_plant_native      SKIP (targets the vsav2 romset; native Killshread Plant ground truth (14z-39 reference data))
+58_don_select_confirm    PASS
+59_don_blizzard_hcf      PASS masked-window (divergent frames 1203, runs 1, window 889..2091, 1129 identical after)
+60_don_grapple_hcb       PASS masked-window (divergent frames 1203, runs 1, window 889..2091, 1229 identical after)
+61_tenant_2pwin          PASS
+62_tenant_2plose         PASS
+63_idle_select           PASS masked-composite (divergent frames 2578 in 2 run(s): flicker 3886, windows 889-3465, 434 identical after)
+64_select_mashright      PASS
+65_don_mirror_throw      PASS masked-window (divergent frames 1203, runs 1, window 889..2091, 2429 identical after)
+92_p2_ring_walk          PASS
+94_tenant_vs_tenant      PASS masked-window (divergent frames 1203, runs 1, window 889..2091, 2429 identical after)
+96_don_victor_grab       PASS masked-window (divergent frames 983, runs 1, window 889..1871, 3649 identical after)
+SUITE GREEN
+rc=0
+== DONE

@@ -1,0 +1,166 @@
+== tests/audit_roster_pairings.sh
+build   build/m3b_merged13
+roster  19 classes; tenants under test: 0x13 0x10 0x11
+jobs    6
+
+  ... 6/112 runs done
+  ... 12/112 runs done
+  ... 18/112 runs done
+  ... 24/112 runs done
+  ... 30/112 runs done
+  ... 36/112 runs done
+  ... 42/112 runs done
+  ... 48/112 runs done
+  ... 54/112 runs done
+  ... 60/112 runs done
+  ... 66/112 runs done
+  ... 72/112 runs done
+  ... 78/112 runs done
+  ... 84/112 runs done
+  ... 90/112 runs done
+  ... 96/112 runs done
+  ... 102/112 runs done
+  ... 108/112 runs done
+
+  ok: control — the unpoked run is correctly rejected
+
+  111 pairing(s) formed cleanly with both characters loaded
+PASS: roster pairings — every tenant vs every character, both sides
+rc=0
+== tests/test_tenant_pairings.sh
+== six orderings of three tenants, on build/m3b_merged13
+  ok: donovan vs phobos — match formed, both loaded, no crash
+  ok: donovan vs pyron — match formed, both loaded, no crash
+  ok: phobos vs donovan — match formed, both loaded, no crash
+  ok: phobos vs pyron — match formed, both loaded, no crash
+  ok: pyron vs donovan — match formed, both loaded, no crash
+  ok: pyron vs phobos — match formed, both loaded, no crash
+== verdict control: without the forced picks the check must REFUSE
+  ok: control: the unpoked run is correctly rejected
+PASS: tenant-vs-tenant, all six orderings (CLAUDE.md §4 coverage)
+rc=0
+== tests/audit_trap_parity.sh
+  ok: native fires 0739/010b/073a per attempt; ours fires the
+      RESTORED ejection 00d8 (the 0739 slot, authored Z80 song)
+      + 010a + the RESTORED detonation chirp 0199
+  ok: verdict control — mutation fails as designed
+audit_trap_parity: PASS (restored ejection+detonation state holds)
+rc=0
+== tests/audit_fg_parity.sh
+  ok: native — 5 EX firings, staircase [(23, 12), (23, 12), (23, 12), (23, 12), (52, 12)]
+  ok: ours — 5 EX firings, staircase [(23, 12), (23, 12), (23, 12), (23, 12), (52, 12)]
+  ok: verdict controls — both mutations fail as designed
+PASS: Final Guardian damage is NATIVE-PARITY on this build —
+      both legs match the frozen staircase 23/23/23/23/52 with the
+      per-attempt EX-liveness tells (14z-85f fix: the x028122
+      object-hit damage work-var reconciliation)
+rc=0
+== tests/audit_clone_beam_lines.sh
+  burst-control entries (4dd0 6x2): 20
+  16x1 line entries: 14
+    F3576 code=8790 pal=0c a19=48790
+    F3576 code=8790 pal=0c a19=48790
+    F3577 code=8790 pal=0c a19=48790
+    F3577 code=8790 pal=0c a19=48790
+    F3578 code=86d0 pal=05 a19=486d0
+    F3578 code=86d0 pal=05 a19=486d0
+    F3579 code=86d0 pal=05 a19=486d0
+    F3579 code=86d0 pal=05 a19=486d0
+PASS: beam lines present at pal 05 (fix verified; burst control fired)
+rc=0
+== tests/audit_hui_grunt.sh
+  ok: native — 5/5 attempts formed; kernel-voice pattern matches frozen (['-', '02a2', '-', '02a2', '-'])
+  ok: ours — 5/5 attempts formed; kernel-voice pattern matches frozen (['-', '02a2', '-', '-', '-'])
+PASS: electrocute-grunt A/B — the alternating kernel voice matches the frozen inventory on both legs
+rc=0
+== tests/test_dualtrack.sh
+== 1. LEGACY must be identical UP TO select entry ==
+  ok: 02_demitri_vs_cpu identical through frame 889; diverges at 890
+  ok: 03_two_player_vs identical through frame 889; diverges at 890
+  ok: 04_select_fuzz identical through frame 889; diverges at 890
+  ok: 05_timeout_idle identical through frame 889; diverges at 890
+  ok: 06_test_mode identical throughout (never reaches select)
+  ok: 07_mash_storm identical through frame 889; diverges at 890
+  ok: 08_challenger_join identical through frame 889; diverges at 890
+  ok: 09_mirror_pick identical through frame 889; diverges at 890
+  ok: 10_midattract_start identical through frame 3189; diverges at 3190
+  ok: 29_felicia_walljump identical through frame 889; diverges at 890
+  ok: 30_demitri_throw identical through frame 889; diverges at 890
+== 2. patched-slot content must differ (else it does nothing) ==
+  ok: 01_attract_long diverges from frame 4267 (sfx helper live on WIDE)
+  ok: 12_donovan_vs_cpu diverges from frame 890 (sfx helper live on WIDE)
+  ok: 19_don_dp_spam diverges from frame 890 (sfx helper live on WIDE)
+  ok: 25_don_darkforce diverges from frame 890 (sfx helper live on WIDE)
+  ok: 56_don_es_ls diverges from frame 890 (sfx helper live on WIDE)
+== 3. the attract divergence must START in the effect channel ==
+  ok: onset at frame 4267 (frozen)
+  3 byte(s) differ at the onset: $FF87A5 0c->39, $FF87A6 eb->0c, $FF87A7 50->a0
+  ok: all inside the P1 effect-channel record pointer (stock 0x0ceb50 -> WIDE 0x390ca0)
+== 4. and it must be DATA, not a different code path ==
+  ok: identical writer set and counts on both legs —
+      4 pc=000d36
+      4 pc=000d3c
+      2 pc=000ddc
+      36 pc=016e4e
+      6 pc=01bee2
+      4 pc=01c186
+      same engine code, different record: a DATA difference
+
+PASS: dual-track — the two tracks are bit-identical up to select entry
+      (frozen onsets), and past it they differ only as their DIFFERENT
+      ROSTERS require; the attract divergence starts in the effect
+      channel and is written by the SAME engine code on both legs.
+rc=0
+== tests/test_fbneo_legacy_oracle.sh
+== build build/don_m11 -> expectation set donovan-m11; mask 043c-043d,4182-41a2,41c2-41e2,4222-4262,7f00-8000
+== leg A on the PATCHED binary (composition: test_wide_profile.sh)
+  phase: 01_attract_long f4026 — 3 byte(s) differ, all in the FROZEN inventory of the ratified FBNeo phase classes: +0x055b,+0x055c,+0x055d
+  phase: 01_attract_long f6734 — 3 byte(s) differ, all in the FROZEN inventory of the ratified FBNeo phase classes: +0x055b,+0x055c,+0x055d
+  ok: 01_attract_long — 5 sampled frames compared, 2 with a ratified FBNeo phase deviation (frames 1098, 2562, 4026, 5490, 6734)
+  ok: 06_test_mode — 5 sampled frames compared (frames 468, 1092, 1716, 2340, 2870)
+  phase: 21_don_mash f2118 — 3 byte(s) differ, all in the FROZEN inventory of the ratified FBNeo phase classes: +0x06db,+0x06dc,+0x06dd
+  phase: 21_don_mash f4942 — 1 byte(s) differ, all in the FROZEN inventory of the ratified FBNeo phase classes: +0x06d1
+  ok: 21_don_mash — 5 sampled frames compared, 2 with a ratified FBNeo phase deviation (frames 2118, 4942, 7766, 10590, 12990)
+  phase: 26_don_arcade_mash f6093 — 3 byte(s) differ, all in the FROZEN inventory of the ratified FBNeo phase classes: +0x06d4,+0x06d5,+0x06dd
+  phase: 26_don_arcade_mash f14217 — 3 byte(s) differ, all in the FROZEN inventory of the ratified FBNeo phase classes: +0x06d4,+0x06d5,+0x06d9
+  ok: 26_don_arcade_mash — 5 sampled frames compared, 2 with a ratified FBNeo phase deviation (frames 6093, 14217, 22341, 30465, 37370)
+== verdict controls on the comparator ==
+  control: byte outside the mask (+0x8000) CAUGHT: True
+  control: byte inside the mask (+0x043c) ignored: True
+  control: identical buffers report no difference: True
+PASS: FBNeo legacy oracle (partial) — every sampled frame is either
+      masked-identical to vanilla under FBNeo, or differs ONLY at
+      offsets in the FROZEN inventory of the two ratified phase
+      classes. Any byte outside them FAILS. Lines marked
+      'phase:' are the RATIFIED FBNeo-only phase classes
+      (maintainer 2026-08-16, GitHub #78): the sound-driver work area
+      $FF0500-$FF05FF and the OBJ-builder secondary stack
+      $FF06D0-$FF06EF, each bounded by a FROZEN offset inventory —
+      a byte inside a window but outside the inventory FAILS as
+      GROWTH. Set FBNEO_ORACLE_EXPECT=exact to require bit-identity.
+rc=0
+== tests/test_merged_render_content.sh
+== 1. member identity on the merged rompath ==
+  ok: no member shadows a patched member
+== 2. band equivalence: merged vs the frozen solo builds ==
+  ok: D band  0x4AD8F == don_m11 (fnv=60da4df960bffd6f)
+  ok: H band  0x40AF6 == hui47 (fnv=1060dc5353bfd8c9)
+  ok: P band  0x45000 == pyron31 (fnv=e6222280f7373063)
+  ok: strip   0x486A0 == hui47 (the S3 relocation, live) (fnv=82bfc63fce99efbc)
+  ok: bank 2  0x2AD8F == PRISTINE (de-substitution held) (fnv=86a167c67d20463d)
+  ok: the four tenant windows are pairwise distinct (not a blind dump)
+== 3. poison control: zeroed group C + one shadow member ==
+  ok: the member-identity audit rejects the shadow
+  ok: poisoned D window differs — instrument live
+  ok: poisoned H window differs — instrument live
+  ok: poisoned P window differs — instrument live
+  ok: poisoned strip window differs — instrument live
+== 4. liveness: the three real pick replays on the merged build ==
+  ok: 36_pick_tenant_cell completed, live framebuffer (1686 distinct frames)
+  ok: 37_pick_huitzil_cell completed, live framebuffer (1749 distinct frames)
+  ok: 40_pick_pyron_cell completed, live framebuffer (1676 distinct frames)
+PASS: merged content-rendering gate — all three tenants' bands + the
+      relocated strip serve the frozen solo art; de-substitution held;
+      poison control fired on all four windows; three pick replays live
+rc=0
+== GATES2 DONE

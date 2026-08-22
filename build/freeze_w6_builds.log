@@ -1,0 +1,311 @@
+== don_m11
+stage 6: 325 ops, hole_a 0x0FFFF0/0x100000 (free 0x10), hole_b 0x3FFFF0/0x400000 (free 0x10), wide_ext 0x419220/0x600000 (free 0x1E6DE0)
+GENERATION OK
+  vsw.43  sha1 13a184ec9e176371808938015111f8918cb4df7d
+  vsw.44  sha1 739ad1d33c279d69588cfe8e184ce49ab150684c  CHANGED
+6 member(s) changed
+select: tenant at variant id 19 — records generated (select_port skipped; the host's select records stay vanilla)
+WIDE build: packing as vsavjw (merging /Users/koneko/Developer/Vampire_Saved/VampireSaved/build/wide0/rompath/vsavjw.zip)
+read /Users/koneko/Developer/Vampire_Saved/ROMS/vsav2.zip:vs2.01+.02 sha1 a715ff504eda9f9bc4da4d603f3dc8a37b6f21c1
+read build/don_m11/rompath/vsavjw.zip:vsw.z01+vsw.z02 sha1 f6036f53e1826839c1304baac27f49ae23c9eb8d
+  hui_trap_eject: id 0xd8 -> 0x3c980 (0x33 B)
+  hui_trap_eject_alt: id 0x3d8 -> 0x3c9c0 (0x33 B)
+  don_kernel_v0: id 0xd9 -> 0x3e000 (0x4e B)
+  don_kernel_v0_alt: id 0x3d9 -> 0x3e050 (0x4e B)
+  don_kernel_v1: id 0xda -> 0x3e0a0 (0x31 B)
+  don_kernel_v1_alt: id 0x3da -> 0x3e0e0 (0x31 B)
+  don_kernel_v2: id 0xdb -> 0x3e120 (0x31 B)
+  don_kernel_v2_alt: id 0x3db -> 0x3e160 (0x31 B)
+  don_kernel_v3: id 0xdc -> 0x3e1a0 (0x31 B)
+  don_kernel_v3_alt: id 0x3dc -> 0x3e1e0 (0x31 B)
+  pyr_kernel_v0: id 0x341 -> 0x3e220 (0x4e B)
+  pyr_kernel_v0_alt: id 0x641 -> 0x3e270 (0x4e B)
+  pyr_kernel_v3: id 0x342 -> 0x3e2c0 (0x31 B)
+  pyr_kernel_v3_alt: id 0x642 -> 0x3e300 (0x31 B)
+  hui_kernel_v0: id 0x1a2 -> 0x3e340 (0x33 B)
+  hui_kernel_v0_alt: id 0x4a2 -> 0x3e380 (0x33 B)
+  hui_kernel_v3: id 0x1c1 -> 0x3e3c0 (0x31 B)
+  hui_kernel_v3_alt: id 0x4c1 -> 0x3e400 (0x31 B)
+read /Users/koneko/Developer/Vampire_Saved/ROMS/vsav.zip:vm3.11m+12m sha1 3f18141caa841963af17def1da09130d7c807fd0
+read /Users/koneko/Developer/Vampire_Saved/ROMS/vsav2.zip:vs2.11m+12m sha1 73658b7e1cac65e23925f197b9af9adff9ec908c
+  voice_batch: 81 songs, 58 records (58 packed into vsw.21m, 940032 ext bytes), T7 58 entries (max 0x41), ids 0x58-0xa8
+diff accounted: 7223 declared bytes, rest untouched
+wrote build/don_m11/rompath/vsavjw.zip: vsw.z01 sha1 255e3523b5fc49b63d420c04547a69784eb5171f, vsw.z02 sha1 9f113542d7bc75de01d62743af489e8ccc0559d8, vsw.21m sha1 6ce098a5ef0d4e03e47ed5b3422fb99f0992152d
+wrote build/don_m11/rompath/vsavjw.zip.ledger.json (artifact fingerprint 52a019fe19d4)
+  read vs2.15m sha1 e873ad3e0fc8a06a5029113faf991f5c1b765316
+  read vs2.17m sha1 da94f1529da82a6bf2129f51548412e1ab2b001a
+  read vs2.19m sha1 0ff528e12e255ebf699101ac71f05b1f6bef7165
+select: 0 bank-1 tiles placed
+  wrote vm3.13m sha1 323f55e0828ac1ac5a7ec924f6d35dbb672875c2
+  wrote vm3.15m sha1 89fec8d983cbfe4e191b705de999a8060fe3f5a9
+  wrote vm3.17m sha1 1b4c5ffcb7e899e714e910f3eb9b28e2838487cc
+  wrote vm3.19m sha1 6be2e9224ede5614aabdd8e853394e9c426a177c
+wrote gfx_written.json (16038 group-C + 270 group-A entries)
+wrote remap_spec.json: {'delta': 10064, 'band_lo': 34367, 'band_hi': 49903, 'dst_bank_word': 4096, 'src_bank_word': 24576, 'placed': [44431, 59967]}
+gfx: patched vsav.zip in rompath (ROMDIR untouched)
+gfx: group C members injected into vsavjw.zip (host group B pristine)
+  verified: group B members pristine in the packed vsav.zip
+  ok: record parity (1160 records, 14764 entries)
+  ok: no tile codes on protected positions (358 protected)
+  ok: all 15612 tile codes within [0xAD8F,0xEE73]
+  ok: placed bank table row 0x13 = 0x1000
+PASS: gfx build output verification
+  rompath  build/don_m11/rompath
+  romdir   /Users/koneko/Developer/Vampire_Saved/ROMS
+  members  42 in 2 zips
+  patched  8: vm3.13m, vm3.15m, vm3.17m, vm3.19m, vm3j.03d, vm3j.04d, vm3j.07b, vm3j.10b
+  note: byte-identical members (harmless — shadow nothing): vsavjw.zip:vsw.42, vsavjw.zip:vsw.43
+PASS: no member shadows a patched member
+build fingerprint: 1de9a027d86c5a87dccb36c8ad3fbaa03fe17126
+OK: stage 6 build at build/don_m11/rompath (fingerprint above; register in tests/expected/registry.tsv at freeze time)
+rc=0
+== hui47
+stage 6: 365 ops, hole_a 0x0FD500/0x100000 (free 0x2B00), hole_b 0x3FE020/0x400000 (free 0x1FE0), wide_ext 0x4255F0/0x600000 (free 0x1DAA10)
+GENERATION OK
+  vsw.43  sha1 13a184ec9e176371808938015111f8918cb4df7d
+  vsw.44  sha1 739ad1d33c279d69588cfe8e184ce49ab150684c  CHANGED
+6 member(s) changed
+select: tenant at variant id 16 — records generated (select_port skipped; the host's select records stay vanilla)
+WIDE build: packing as vsavjw (merging /Users/koneko/Developer/Vampire_Saved/VampireSaved/build/wide0/rompath/vsavjw.zip)
+read /Users/koneko/Developer/Vampire_Saved/ROMS/vsav2.zip:vs2.01+.02 sha1 a715ff504eda9f9bc4da4d603f3dc8a37b6f21c1
+read build/hui47/rompath/vsavjw.zip:vsw.z01+vsw.z02 sha1 f6036f53e1826839c1304baac27f49ae23c9eb8d
+  hui_trap_eject: id 0xd8 -> 0x3c980 (0x33 B)
+  hui_trap_eject_alt: id 0x3d8 -> 0x3c9c0 (0x33 B)
+  don_kernel_v0: id 0xd9 -> 0x3e000 (0x4e B)
+  don_kernel_v0_alt: id 0x3d9 -> 0x3e050 (0x4e B)
+  don_kernel_v1: id 0xda -> 0x3e0a0 (0x31 B)
+  don_kernel_v1_alt: id 0x3da -> 0x3e0e0 (0x31 B)
+  don_kernel_v2: id 0xdb -> 0x3e120 (0x31 B)
+  don_kernel_v2_alt: id 0x3db -> 0x3e160 (0x31 B)
+  don_kernel_v3: id 0xdc -> 0x3e1a0 (0x31 B)
+  don_kernel_v3_alt: id 0x3dc -> 0x3e1e0 (0x31 B)
+  pyr_kernel_v0: id 0x341 -> 0x3e220 (0x4e B)
+  pyr_kernel_v0_alt: id 0x641 -> 0x3e270 (0x4e B)
+  pyr_kernel_v3: id 0x342 -> 0x3e2c0 (0x31 B)
+  pyr_kernel_v3_alt: id 0x642 -> 0x3e300 (0x31 B)
+  hui_kernel_v0: id 0x1a2 -> 0x3e340 (0x33 B)
+  hui_kernel_v0_alt: id 0x4a2 -> 0x3e380 (0x33 B)
+  hui_kernel_v3: id 0x1c1 -> 0x3e3c0 (0x31 B)
+  hui_kernel_v3_alt: id 0x4c1 -> 0x3e400 (0x31 B)
+read /Users/koneko/Developer/Vampire_Saved/ROMS/vsav.zip:vm3.11m+12m sha1 3f18141caa841963af17def1da09130d7c807fd0
+read /Users/koneko/Developer/Vampire_Saved/ROMS/vsav2.zip:vs2.11m+12m sha1 73658b7e1cac65e23925f197b9af9adff9ec908c
+  voice_batch: 81 songs, 58 records (58 packed into vsw.21m, 940032 ext bytes), T7 58 entries (max 0x41), ids 0x58-0xa8
+diff accounted: 7223 declared bytes, rest untouched
+wrote build/hui47/rompath/vsavjw.zip: vsw.z01 sha1 255e3523b5fc49b63d420c04547a69784eb5171f, vsw.z02 sha1 9f113542d7bc75de01d62743af489e8ccc0559d8, vsw.21m sha1 6ce098a5ef0d4e03e47ed5b3422fb99f0992152d
+wrote build/hui47/rompath/vsavjw.zip.ledger.json (artifact fingerprint 52a019fe19d4)
+  extra tiles: +569 (0x0A00 0x0A01 0x0A02 0x0A03 0x0A04 0x0A05 0x0A06 0x0A07 0x0A08 0x0A09 0x0A0A 0x0A0B 0x0A0C 0x0A0D 0x0A0E 0x0A0F 0x0A10 0x0A11 0x0A12 0x0A13 0x0A14 0x0A15 0x0A16 0x0A17 0x0A18 0x0A19 0x0A1A 0x0A1B 0x0A1C 0x0A1D 0x0A1E 0x0A1F 0x0A20 0x0A21 0x0A22 0x0A23 0x0A24 0x0A25 0x0A26 0x0A27 0x0A28 0x0A29 0x0A2A 0x0A2B 0x0A2C 0x0A2D 0x0A2E 0x0A2F 0x0A30 0x0A31 0x0A32 0x0A33 0x0A34 0x0A35 0x0A36 0x0A37 0x0A38 0x0A39 0x0A3A 0x0A3B 0x0A3C 0x0A3D 0x0A3E 0x0A3F 0x0A40 0x0A41 0x0A42 0x0A43 0x0A44 0x0A45 0x0A46 0x0A47 0x0A48 0x0A49 0x0A4A 0x0A4B 0x0A4C 0x0A4D 0x0A4E 0x0A4F 0x0A50 0x0A51 0x0A52 0x0A53 0x0A54 0x0A55 0x0A56 0x0A57 0x0A58 0x0A59 0x0A5A 0x0A5B 0x0A5C 0x0A5D 0x0A5E 0x0A5F 0x0A60 0x0A61 0x0A62 0x0A63 0x0A64 0x0A65 0x0A66 0x0A67 0x0A68 0x0A69 0x0A6A 0x0A6B 0x0A6C 0x0A6D 0x0A6E 0x0A6F 0x0A70 0x0A71 0x0A72 0x0A73 0x0A74 0x0A75 0x0A76 0x0A77 0x0A78 0x0A79 0x0A7A 0x0A7B 0x0A7C 0x0A7D 0x0A7E 0x0A7F 0x0A80 0x0A81 0x0A82 0x0A83 0x0A84 0x0A85 0x0A86 0x0A87 0x0A88 0x0A89 0x0A8A 0x0A8B 0x0A8C 0x0A8D 0x0A8E 0x0A8F 0x0A90 0x0A91 0x0A92 0x0A93 0x0A94 0x0A95 0x0A96 0x0A97 0x0A98 0x0A99 0x0A9A 0x0A9B 0x0A9C 0x0A9D 0x0A9E 0x0A9F 0x0AA0 0x0AA1 0x0AA2 0x0AA3 0x0AA4 0x0AA5 0x0AA6 0x0AA7 0x0AA8 0x0AA9 0x0AAA 0x0AAB 0x0AAC 0x0AAD 0x0AAE 0x0AAF 0x0AB0 0x0AB1 0x0AB2 0x0AB3 0x0AB4 0x0AB5 0x0AB6 0x0AB7 0x0AB8 0x0AB9 0x0ABA 0x0ABB 0x0ABC 0x0ABD 0x0ABE 0x0ABF 0x0AC0 0x0AC1 0x0AC2 0x0AC3 0x0AC4 0x0AC5 0x0AC6 0x0AC7 0x0AC8 0x0AC9 0x0ACA 0x0ACB 0x0ACC 0x0ACD 0x0ACE 0x0ACF 0x0AD0 0x0AD1 0x0AD2 0x0AD3 0x0AD4 0x0AD5 0x0AD6 0x0AD7 0x0AD8 0x0AD9 0x0ADA 0x0ADB 0x0ADC 0x0ADD 0x0ADE 0x0ADF 0x0AE0 0x0AE1 0x0AE2 0x0AE3 0x0AE4 0x0AE5 0x0AE6 0x0AE7 0x0AE8 0x0AE9 0x0AEA 0x0AEB 0x0AEC 0x0AED 0x0AEE 0x0AEF 0x0AF0 0x0AF1 0x0AF2 0x0AF3 0x0AF4 0x0AF5 0x0AF7 0x0AF8 0x0AF9 0x0AFA 0x0AFB 0x0AFC 0x0AFD 0x0AFE 0x0AFF 0x0B00 0x0B01 0x0B02 0x0B03 0x0B04 0x0B05 0x0B06 0x0B07 0x0B08 0x0B09 0x0B0A 0x0B0B 0x0B0C 0x0B0D 0x0B0E 0x0B0F 0x0B10 0x0B11 0x0B12 0x0B13 0x0B14 0x0B15 0x0B16 0x0B17 0x0B18 0x0B19 0x0B1A 0x0B1C 0x0B1D 0x0B1E 0x0B1F 0x0B20 0x0B21 0x0B22 0x0B23 0x0B24 0x0B25 0x0B26 0x0B27 0x0B28 0x0B29 0x0B2A 0x0B2B 0x0B2C 0x0B2D 0x0B2E 0x0B2F 0x0B30 0x0B31 0x0B32 0x0B33 0x0B34 0x0B35 0x0B36 0x0B37 0x0B38 0x0B39 0x0B3A 0x0B3B 0x0B3C 0x0B3D 0x0B3E 0x0B40 0x0B41 0x0B42 0x0B43 0x0B44 0x0B45 0x0B46 0x0B47 0x0B48 0x0B49 0x0B4B 0x0B4C 0x0B4D 0x0B4E 0x0B4F 0x0B50 0x0B51 0x0B52 0x0B53 0x0B54 0x0B55 0x0B56 0x0B57 0x0B58 0x0B59 0x0B5A 0x0B5B 0x0B5C 0x0B5D 0x0B5E 0x0B5F 0x0B60 0x0B61 0x0B62 0x0B63 0x0B64 0x0B65 0x0B66 0x0B67 0x0B68 0x0B69 0x0B6A 0x0B6B 0x0B6C 0x0B6D 0x0B6E 0x0B6F 0x0B70 0x0B71 0x0B72 0x0B73 0x0B74 0x0B75 0x0B76 0x0B77 0x0B78 0x0B79 0x0B7A 0x0B7B 0x0B7C 0x0B7D 0x0B7E 0x0B7F 0x0B80 0x0B81 0x0B82 0x0B83 0x0B84 0x0B85 0x0B86 0x0B87 0x0B88 0x0B89 0x0B8A 0x0B8B 0x0B8C 0x0B8D 0x0B8E 0x0B8F 0x0B90 0x0B91 0x0B92 0x0B94 0x0B95 0x0B96 0x0B97 0x0B98 0x0B99 0x0B9A 0x0B9B 0x0B9C 0x0B9D 0x0B9E 0x0B9F 0x0BA1 0x0BA3 0x0BA4 0x0BA5 0x0BA6 0x0BA7 0x0BA8 0x0BA9 0x0BAA 0x0BAB 0x0BAC 0x0BAD 0x0BAE 0x0BAF 0x0BB0 0x0BB1 0x0BB2 0x0BB3 0x0BB4 0x0BB5 0x0BB6 0x0BB7 0x0BB8 0x0BB9 0x0BBB 0x0BBC 0x0BBD 0x0BBE 0x0BBF 0x0BC0 0x0BC1 0x0BC2 0x0BC3 0x0BC4 0x0BC5 0x0BC6 0x0BC7 0x0BC8 0x0BC9 0x0BCA 0x0BCB 0x0BCC 0x0BCD 0x0BCE 0x0BCF 0x0BD0 0x0BD1 0x0BD2 0x0BD3 0x0BD4 0x0BD5 0x0BD6 0x0BD7 0x0BD8 0x0BD9 0x0BDA 0x0BDB 0x0BDC 0x0BDD 0x0BDE 0x0BDF 0x0BE0 0x0BE1 0x0BE2 0x0BE3 0x0BE4 0x0BE5 0x0BE6 0x0BE7 0x0BE8 0x0BE9 0x0BEA 0x0BEB 0x0BEC 0x0BED 0x0BEE 0x0BEF 0x0BF0 0x0BF1 0x0BF2 0x0BF3 0x0BF4 0x0BF5 0x0BF6 0x0BF7 0x0BF8 0x0BFA 0x0BFB 0x0BFC 0x0BFD 0x0BFE 0x0BFF 0x0C00 0x0C01 0x0C02 0x0C03 0x0C04 0x0C05 0x0C06 0x0C07 0x0C08 0x0C09 0x0C0A 0x0C0B 0x0C0C 0x0C0D 0x0C0E 0x0C0F 0x0C10 0x0C11 0x0C12 0x0C13 0x0C14 0x0C15 0x0C16 0x0C17 0x0C18 0x0C19 0x0C1A 0x0C1B 0x0C1C 0x0C1D 0x0C1E 0x0C1F 0x0C20 0x0C21 0x0C22 0x0C23 0x0C24 0x0C25 0x0C26 0x0C27 0x0C28 0x0C29 0x0C2A 0x0C2B 0x0C2C 0x0C2D 0x0C2E 0x0C2F 0x0C30 0x0C31 0x0C32 0x0C33 0x0C34 0x0C35 0x0C36 0x0C37 0x0C38 0x0C39 0x0C3A 0x0C3B 0x0C3C 0x0C3D 0x0C3E 0x0C3F 0x0F8B 0x0F8C), inventory 15034 -> 15603
+  read vs2.15m sha1 e873ad3e0fc8a06a5029113faf991f5c1b765316
+  read vs2.17m sha1 da94f1529da82a6bf2129f51548412e1ab2b001a
+  read vs2.19m sha1 0ff528e12e255ebf699101ac71f05b1f6bef7165
+select: 0 bank-1 tiles placed
+  wrote vm3.13m sha1 aee4fd1761caab000153629726dfb584bb79ba0d
+  wrote vm3.15m sha1 85a9b203bddc4b0831c77a2b3393e0b7b7272ac1
+  wrote vm3.17m sha1 275f8edfe757bbe0eaaccdfda6623fc6f74f21ca
+  wrote vm3.19m sha1 1be1fa0b2f4c6d4a8ea03d8e24a13258152489ad
+wrote gfx_written.json (21946 group-C + 276 group-A entries)
+wrote remap_spec.json: {'delta': 0, 'band_lo': 2806, 'band_hi': 20220, 'dst_bank_word': 4096, 'src_bank_word': 24576, 'placed': [87, 20220]}
+gfx: patched vsav.zip in rompath (ROMDIR untouched)
+gfx: group C members injected into vsavjw.zip (host group B pristine)
+  verified: group B members pristine in the packed vsav.zip
+  ok: record parity (1374 records, 14911 entries)
+  ok: no tile codes on protected positions (358 protected)
+  ok: all 15034 tile codes within [0x0057,0x4EFC]
+  ok: placed bank table row 0x10 = 0x1000
+PASS: gfx build output verification
+  rompath  build/hui47/rompath
+  romdir   /Users/koneko/Developer/Vampire_Saved/ROMS
+  members  42 in 2 zips
+  patched  8: vm3.13m, vm3.15m, vm3.17m, vm3.19m, vm3j.03d, vm3j.04d, vm3j.07b, vm3j.10b
+  note: byte-identical members (harmless — shadow nothing): vsavjw.zip:vsw.42, vsavjw.zip:vsw.43
+PASS: no member shadows a patched member
+build fingerprint: 24a27940656c160c909de3a690e74da8aa7e9432
+OK: stage 6 build at build/hui47/rompath (fingerprint above; register in tests/expected/registry.tsv at freeze time)
+rc=0
+== pyron31
+stage 6: 298 ops, hole_a 0x0FF290/0x100000 (free 0xD70), hole_b 0x3FB960/0x400000 (free 0x46A0), wide_ext 0x418100/0x600000 (free 0x1E7F00)
+GENERATION OK
+  vsw.43  sha1 13a184ec9e176371808938015111f8918cb4df7d
+  vsw.44  sha1 739ad1d33c279d69588cfe8e184ce49ab150684c  CHANGED
+6 member(s) changed
+select: tenant at variant id 17 — records generated (select_port skipped; the host's select records stay vanilla)
+WIDE build: packing as vsavjw (merging /Users/koneko/Developer/Vampire_Saved/VampireSaved/build/wide0/rompath/vsavjw.zip)
+read /Users/koneko/Developer/Vampire_Saved/ROMS/vsav2.zip:vs2.01+.02 sha1 a715ff504eda9f9bc4da4d603f3dc8a37b6f21c1
+read build/pyron31/rompath/vsavjw.zip:vsw.z01+vsw.z02 sha1 f6036f53e1826839c1304baac27f49ae23c9eb8d
+  hui_trap_eject: id 0xd8 -> 0x3c980 (0x33 B)
+  hui_trap_eject_alt: id 0x3d8 -> 0x3c9c0 (0x33 B)
+  don_kernel_v0: id 0xd9 -> 0x3e000 (0x4e B)
+  don_kernel_v0_alt: id 0x3d9 -> 0x3e050 (0x4e B)
+  don_kernel_v1: id 0xda -> 0x3e0a0 (0x31 B)
+  don_kernel_v1_alt: id 0x3da -> 0x3e0e0 (0x31 B)
+  don_kernel_v2: id 0xdb -> 0x3e120 (0x31 B)
+  don_kernel_v2_alt: id 0x3db -> 0x3e160 (0x31 B)
+  don_kernel_v3: id 0xdc -> 0x3e1a0 (0x31 B)
+  don_kernel_v3_alt: id 0x3dc -> 0x3e1e0 (0x31 B)
+  pyr_kernel_v0: id 0x341 -> 0x3e220 (0x4e B)
+  pyr_kernel_v0_alt: id 0x641 -> 0x3e270 (0x4e B)
+  pyr_kernel_v3: id 0x342 -> 0x3e2c0 (0x31 B)
+  pyr_kernel_v3_alt: id 0x642 -> 0x3e300 (0x31 B)
+  hui_kernel_v0: id 0x1a2 -> 0x3e340 (0x33 B)
+  hui_kernel_v0_alt: id 0x4a2 -> 0x3e380 (0x33 B)
+  hui_kernel_v3: id 0x1c1 -> 0x3e3c0 (0x31 B)
+  hui_kernel_v3_alt: id 0x4c1 -> 0x3e400 (0x31 B)
+read /Users/koneko/Developer/Vampire_Saved/ROMS/vsav.zip:vm3.11m+12m sha1 3f18141caa841963af17def1da09130d7c807fd0
+read /Users/koneko/Developer/Vampire_Saved/ROMS/vsav2.zip:vs2.11m+12m sha1 73658b7e1cac65e23925f197b9af9adff9ec908c
+  voice_batch: 81 songs, 58 records (58 packed into vsw.21m, 940032 ext bytes), T7 58 entries (max 0x41), ids 0x58-0xa8
+diff accounted: 7223 declared bytes, rest untouched
+wrote build/pyron31/rompath/vsavjw.zip: vsw.z01 sha1 255e3523b5fc49b63d420c04547a69784eb5171f, vsw.z02 sha1 9f113542d7bc75de01d62743af489e8ccc0559d8, vsw.21m sha1 6ce098a5ef0d4e03e47ed5b3422fb99f0992152d
+wrote build/pyron31/rompath/vsavjw.zip.ledger.json (artifact fingerprint 52a019fe19d4)
+  read vs2.15m sha1 e873ad3e0fc8a06a5029113faf991f5c1b765316
+  read vs2.17m sha1 da94f1529da82a6bf2129f51548412e1ab2b001a
+  read vs2.19m sha1 0ff528e12e255ebf699101ac71f05b1f6bef7165
+select: 0 bank-1 tiles placed
+  wrote vm3.13m sha1 ded4ec21076be6a7ad97ba1c7ec6832d40dbcc82
+  wrote vm3.15m sha1 8fa5fd7bb70446a7ac06174f662e6f52abbffeae
+  wrote vm3.17m sha1 888727cc58b30fdc265d86180fac61d20b06237b
+  wrote vm3.19m sha1 b5c7885b13626e4d399c804cedfb3479a27bf566
+wrote gfx_written.json (20331 group-C + 276 group-A entries)
+wrote remap_spec.json: {'delta': 0, 'band_lo': 20181, 'band_hi': 34375, 'dst_bank_word': 4096, 'src_bank_word': 24576, 'placed': [63, 42028]}
+gfx: patched vsav.zip in rompath (ROMDIR untouched)
+gfx: group C members injected into vsavjw.zip (host group B pristine)
+  verified: group B members pristine in the packed vsav.zip
+  ok: record parity (745 records, 14992 entries)
+  ok: no tile codes on protected positions (358 protected)
+  ok: all 14224 tile codes within [0x003F,0xA42C]
+  ok: placed bank table row 0x11 = 0x1000
+PASS: gfx build output verification
+  rompath  build/pyron31/rompath
+  romdir   /Users/koneko/Developer/Vampire_Saved/ROMS
+  members  42 in 2 zips
+  patched  8: vm3.13m, vm3.15m, vm3.17m, vm3.19m, vm3j.03d, vm3j.04d, vm3j.07b, vm3j.10b
+  note: byte-identical members (harmless — shadow nothing): vsavjw.zip:vsw.42, vsavjw.zip:vsw.43
+PASS: no member shadows a patched member
+build fingerprint: 6bf265abc5b8e0980f7f8b29fd39b64814af8a86
+OK: stage 6 build at build/pyron31/rompath (fingerprint above; register in tests/expected/registry.tsv at freeze time)
+rc=0
+== m5_stock6
+stage 6: 241 ops, hole_a 0x0FFFF0/0x100000 (free 0x10), hole_b 0x3FFEB0/0x400000 (free 0x150)
+GENERATION OK
+  vm3j.09b  sha1 09f77f7b466c147a5d894a4ec3b40bd068dfab26
+  vm3j.10b  sha1 835f960639702b97e020b0def89f91944e74679e  CHANGED
+3 member(s) changed
+  wrote vm3j.06b sha1 3a7103456ba3937f63c28dd42020cac1955b5741
+  wrote vm3j.07b sha1 2823418f03d67c6a752e24d5925058fa9c6017f3
+  wrote vm3j.08a sha1 551afc5d921f9ef1fe928ca83d072b6a6105ab0e
+  wrote vm3j.09b sha1 e0aa680c11e94cb7501e6a821c8e1611aafb7ed8
+  wrote vm3j.10b sha1 4a67727d9033fd85e5f8f1a1cc1836380946cfbc
+  read vs2.15m sha1 e873ad3e0fc8a06a5029113faf991f5c1b765316
+  read vs2.17m sha1 da94f1529da82a6bf2129f51548412e1ab2b001a
+  read vs2.19m sha1 0ff528e12e255ebf699101ac71f05b1f6bef7165
+select: 268 bank-1 tiles placed
+  wrote vm3.13m sha1 52dd7aedf60aba0dde5bff41ed192c0ba653da8d
+  wrote vm3.15m sha1 f09160d7724140ab14c83e25a9584876f5c08b38
+  wrote vm3.17m sha1 ff77743111081f9386934fd15ce058746426233c
+  wrote vm3.19m sha1 d5cfc4ae37acdc422a813f971ef44325d5a78d48
+wrote gfx_written.json (15662 group-B + 544 group-A entries)
+wrote remap_spec.json: {'delta': 10064, 'band_lo': 34367, 'band_hi': 49903, 'dst_bank_word': 16384, 'src_bank_word': 24576, 'placed': [44431, 59967]}
+gfx: patched vsav.zip in rompath (ROMDIR untouched)
+  ok: record parity (1160 records, 14764 entries)
+  ok: no tile codes on protected positions (358 protected)
+  ok: all 15612 tile codes within [0xAD8F,0xEE73]
+  ok: placed bank table row 0x0f = 0x4000
+PASS: gfx build output verification
+  rompath  build/m5_stock6/rompath
+  romdir   /Users/koneko/Developer/Vampire_Saved/ROMS
+  members  30 in 2 zips
+  patched  13: vm3.13m, vm3.14m, vm3.15m, vm3.16m, vm3.17m, vm3.18m, vm3.19m, vm3.20m, vm3j.03d, vm3j.04d, vm3j.07b, vm3j.09b, vm3j.10b
+PASS: no member shadows a patched member
+build fingerprint: 883e7d17405baf462c9763eccde4e35bf93adecb
+OK: stage 6 build at build/m5_stock6/rompath (fingerprint above; register in tests/expected/registry.tsv at freeze time)
+rc=0
+== m3b_merged13
+== 0: inputs (regenerated only if absent) ==
+  ok (present, untouched): build/m5_wide/extract
+  ok (present, untouched): build/hui32/extract
+  ok (present, untouched): build/pyron21/extract
+  ok (present, untouched): /Users/koneko/Developer/Vampire_Saved/VampireSaved/build/wide0/rompath/vsavjw.zip
+INPUTS OK: three extracts + the WIDE overlay
+== 1: merged program image (3 tenants, one generator process) ==
+  ok: 806 ops (the frozen test_tenant_loop fixture, read from it)
+== 2: gfx chain — one link per tenant over the prior link ==
+  -- link donovan
+     wrote gfx_written.json (16038 group-C + 270 group-A entries)
+     wrote remap_spec.json: {'delta': 10064, 'band_lo': 34367, 'band_hi': 49903, 'dst_bank_word': 4096, 'src_bank_word': 24576, 'placed': [44431, 59967]}
+  extra tiles: +569, inventory 15034 -> 15603
+  -- link huitzil
+     wrote gfx_written.json (37879 group-C + 276 group-A entries)
+     wrote remap_spec.json: {'delta': 0, 'band_lo': 2806, 'band_hi': 20220, 'dst_bank_word': 4096, 'src_bank_word': 24576, 'placed': [87, 20220]}
+  -- link pyron
+     wrote gfx_written.json (52349 group-C + 282 group-A entries)
+     wrote remap_spec.json: {'delta': 0, 'band_lo': 20181, 'band_hi': 34375, 'dst_bank_word': 4096, 'src_bank_word': 24576, 'placed': [63, 42028]}
+== 3: pack (program + LAST link's members) ==
+  ok: group-A members + group-C simms from the last link (build/m3b_merged13/gfx_pyron)
+read /Users/koneko/Developer/Vampire_Saved/ROMS/vsav2.zip:vs2.01+.02 sha1 a715ff504eda9f9bc4da4d603f3dc8a37b6f21c1
+read /Users/koneko/Developer/Vampire_Saved/VampireSaved/build/m3b_merged13/rompath/vsavjw.zip:vsw.z01+vsw.z02 sha1 f6036f53e1826839c1304baac27f49ae23c9eb8d
+  hui_trap_eject: id 0xd8 -> 0x3c980 (0x33 B)
+  hui_trap_eject_alt: id 0x3d8 -> 0x3c9c0 (0x33 B)
+  don_kernel_v0: id 0xd9 -> 0x3e000 (0x4e B)
+  don_kernel_v0_alt: id 0x3d9 -> 0x3e050 (0x4e B)
+  don_kernel_v1: id 0xda -> 0x3e0a0 (0x31 B)
+  don_kernel_v1_alt: id 0x3da -> 0x3e0e0 (0x31 B)
+  don_kernel_v2: id 0xdb -> 0x3e120 (0x31 B)
+  don_kernel_v2_alt: id 0x3db -> 0x3e160 (0x31 B)
+  don_kernel_v3: id 0xdc -> 0x3e1a0 (0x31 B)
+  don_kernel_v3_alt: id 0x3dc -> 0x3e1e0 (0x31 B)
+  pyr_kernel_v0: id 0x341 -> 0x3e220 (0x4e B)
+  pyr_kernel_v0_alt: id 0x641 -> 0x3e270 (0x4e B)
+  pyr_kernel_v3: id 0x342 -> 0x3e2c0 (0x31 B)
+  pyr_kernel_v3_alt: id 0x642 -> 0x3e300 (0x31 B)
+  hui_kernel_v0: id 0x1a2 -> 0x3e340 (0x33 B)
+  hui_kernel_v0_alt: id 0x4a2 -> 0x3e380 (0x33 B)
+  hui_kernel_v3: id 0x1c1 -> 0x3e3c0 (0x31 B)
+  hui_kernel_v3_alt: id 0x4c1 -> 0x3e400 (0x31 B)
+read /Users/koneko/Developer/Vampire_Saved/ROMS/vsav.zip:vm3.11m+12m sha1 3f18141caa841963af17def1da09130d7c807fd0
+read /Users/koneko/Developer/Vampire_Saved/ROMS/vsav2.zip:vs2.11m+12m sha1 73658b7e1cac65e23925f197b9af9adff9ec908c
+  voice_batch: 81 songs, 58 records (58 packed into vsw.21m, 940032 ext bytes), T7 58 entries (max 0x41), ids 0x58-0xa8
+diff accounted: 7223 declared bytes, rest untouched
+wrote /Users/koneko/Developer/Vampire_Saved/VampireSaved/build/m3b_merged13/rompath/vsavjw.zip: vsw.z01 sha1 255e3523b5fc49b63d420c04547a69784eb5171f, vsw.z02 sha1 9f113542d7bc75de01d62743af489e8ccc0559d8, vsw.21m sha1 6ce098a5ef0d4e03e47ed5b3422fb99f0992152d
+wrote /Users/koneko/Developer/Vampire_Saved/VampireSaved/build/m3b_merged13/rompath/vsavjw.zip.ledger.json (artifact fingerprint 52a019fe19d4)
+  ok: group B pristine in the packed vsav.zip
+  rompath  build/m3b_merged13/rompath
+  romdir   /Users/koneko/Developer/Vampire_Saved/ROMS
+  members  42 in 2 zips
+  patched  8: vm3.13m, vm3.15m, vm3.17m, vm3.19m, vm3j.03d, vm3j.04d, vm3j.07b, vm3j.10b
+PASS: no member shadows a patched member
+== 4: per-tenant static verification ==
+  -- verify_gfx_build --tenant donovan
+       ok: record parity (1160 records, 14764 entries)
+       ok: no tile codes on protected positions (358 protected)
+       ok: all 15612 tile codes within [0xAD8F,0xEE73]
+       ok: placed bank table row 0x13 = 0x1000
+     PASS: gfx build output verification
+  -- check_tenant_hud --tenant donovan
+     TABLES aliased
+     POKES 3
+     ART mugshot@0xbe90 name@0xbe8c nonblank 7; host cells pristine
+     OK
+  -- verify_gfx_build --tenant huitzil
+       ok: record parity (1374 records, 14911 entries)
+       ok: no tile codes on protected positions (358 protected)
+       ok: all 15034 tile codes within [0x0057,0x4EFC]
+       ok: placed bank table row 0x10 = 0x1000
+     PASS: gfx build output verification
+  -- check_tenant_hud --tenant huitzil
+     TABLES aliased
+     POKES 3
+     ART mugshot@0xbe9a name@0xbe92 nonblank 6; host cells pristine
+     OK
+  -- verify_gfx_build --tenant pyron
+       ok: record parity (745 records, 14992 entries)
+       ok: no tile codes on protected positions (358 protected)
+       ok: all 14224 tile codes within [0x003F,0xA42C]
+       ok: placed bank table row 0x11 = 0x1000
+     PASS: gfx build output verification
+  -- check_tenant_hud --tenant pyron
+     TABLES aliased
+     POKES 3
+     ART mugshot@0xbe9c name@0xbe94 nonblank 6; host cells pristine
+     OK
+build fingerprint: 64426955bf7877908a1014f134040c9672bddf5a
+OK: merged build with gfx at build/m3b_merged13/rompath (register at S6 freeze time)
+rc=0
+== ALL DONE
