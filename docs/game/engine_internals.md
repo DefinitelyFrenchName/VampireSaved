@@ -3550,3 +3550,38 @@ row scoped to a region you are pulling in, BEFORE the first probe run.
   negative index reaches the RESERVED CpsFrg window `$400000-$40000F`,
   which the two emulators read DIFFERENTLY. Leave headroom below any
   region whose consumers index negatively.
+
+## THE LEAPING PURSUIT ATTACK (measured 14z-104, maintainer-confirmed mechanic)
+
+vsav retains Night Warriors' pursuit: with the opponent knocked down,
+U + any single P/K leaps onto them (ES variant on two buttons, meter).
+Measured on the merged build's legacy pairings (= vanilla by the
+superset invariant), rig `tests/replays/judge/03_down_attack.rpl`:
+
+- **Input window:** the command REGISTERS during the victim's knockdown
+  FALL and the first frames of lying flat; a later input during the
+  flat period is ignored (a sweep victim lies only ~20-45 frames — the
+  window is genuinely brief, as players know it).
+- **Button-independent:** U1/U2/U4/U6 produce the identical leap
+  (seq 0x0E) — the strength choice is cosmetic for the standard
+  pursuit, per the universal-command design.
+- **Aim is captured at INPUT time:** the leap targets the victim's
+  position when the command registered, not at landing (measured with
+  a mid-flight victim-position poke: the arc still aimed at the
+  pre-poke spot).
+- **Per-character arcs** (tenants run their PORTED vs2 content):
+  Demitri 33-34f to y=100; Donovan 27f to y=102; Phobos 42f to y=88;
+  Pyron 39f to y=88.
+- **Corner behavior:** a pursuit at a cornered victim peaks directly
+  over the body, then the wall pushbox shoves the attacker off during
+  the descent and the strike lands beside them — measured on the
+  all-legacy control, i.e. vanilla behavior, not a port artifact.
+- **The connect race:** with a sweep or throw knockdown, the victim's
+  auto-wake and the pursuit's flight time run neck-and-neck (a Victor
+  dummy woke at ~+22-45f; every rig geometry tried landed 1-10 frames
+  late or beside the body). Connecting cleanly likely needs a longer
+  knockdown than these rigs produce — carried as the pursuit-connect
+  refinement in docs/project/coverage_matrix.md.
+
+Gate: `tests/audit_pursuit_leap.sh` (leap fires per tenant both
+directions + the no-knockdown discriminator).

@@ -1,5 +1,42 @@
 # STATE — living progress log
 
+## Session 14z-104 (2) — THE PURSUIT ANSWERED AND INSTRUMENTED: the
+## maintainer confirmed the NW leaping pursuit (U + any P/K), the
+## mechanic was found and measured (my earlier screen missed it by
+## inputting AFTER the flat window opened — the input registers during
+## the FALL), and audit_pursuit_leap is green on merged-m5: every
+## tenant's ported pursuit fires with its own arc, every downed tenant
+## accepts targeting.
+
+**Why the 12-candidate screen missed it:** the pursuit input registers
+during the victim's knockdown FALL and the first flat frames; my
+screen's attempts (3086/3098) came after that window closed for the
+sweep knockdown. With the input at f3072 (mid-fall) the leap fires on
+every button (U1/U2/U4/U6 identical — universal, as the maintainer
+said).
+
+**Mechanics measured (engine_internals "THE LEAPING PURSUIT"):** aim is
+captured at INPUT time (proven with a mid-flight victim-position poke);
+per-character arcs (Demitri 33f/y100, Donovan 27f/y102, Phobos 42f/y88,
+Pyron 39f/y88 — the ported vs2 content executing); corner pursuits peak
+over the body then the wall pushbox shoves the attacker off during
+descent (measured on the ALL-LEGACY control = vanilla behavior by the
+superset invariant).
+
+**The instrument (audit_pursuit_leap.sh, green 8/8):** every tenant as
+pursuer (leap fires, airborne, per-char duration band), Demitri
+pursuing every downed tenant (their down state accepts targeting), and
+the no-knockdown control (the same input with the victim recovered must
+NOT enter 0x0E — proves the signature is knockdown-gated).
+
+**The honest open piece — pursuit CONNECT:** a wake-vs-flight knife
+edge in every geometry tried (sweep and throw knockdowns, chases,
+midscreen and corner, victim-position alignment), INCLUDING the
+all-legacy control — so the non-connect is a rig fact, not a port
+defect, and asserting damage needs a knockdown whose flat window
+outlasts the flight on both games. Carried in the matrix (1b), coupled
+to the tech-roll rig family (the roll is the pursuit's designed whiff).
+
 ## Session 14z-104 — THE §4 COVERAGE DEBT TACKLED (maintainer-directed):
 ## the mandate measured cell by cell, six new audits built and green on
 ## merged-m5, and the matrix documented as a maintained artifact. Four

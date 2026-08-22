@@ -32,6 +32,11 @@ judged on the 2P-competitive surface.
 1. **Tech-hit (throw escape) rigs** — both directions (tenant teches a
    legacy throw; legacy teches a tenant throw). Simultaneous-press
    windows; the edge-case-bias class §4 calls out. No instrument yet.
+   The TECH ROLL (moving recovery on knockdown — maintainer 2026-08-22)
+   belongs to the same family and would also unlock the pursuit-connect
+   refinement (a rolled victim is the pursuit's whiff case).
+1b. **Pursuit CONNECT** — see the pursuit row: needs a rig where the
+   flat window outlasts the flight on both games.
 2. **KO-frame / corner / frame-1 edge cases per tenant** — §4's
    edge-case bias is served incidentally (mash/fuzz rigs, the guard
    corpus) but no tenant rig deliberately targets KO-frame events or

@@ -27,17 +27,21 @@
 > ## packaging is real but its before/after-MiSTer ordering is the
 > ## maintainer's open question.
 >
-> ## **OPEN MAINTAINER QUESTION (the one §4 cell needing their word):**
-> ## does vsav carry a distinct LEAPING pursuit attack (the Night
-> ## Warriors mechanic) under some input grammar? Measured 14z-104: a
-> ## 12-candidate input screen over a downed victim produced only
-> ## GROUNDED heavy down-attacks (11-14 dmg, per-character windows) —
-> ## covered by audit_down_attack. If a leaping pursuit exists, it gets
-> ## its own rig; if not, the cell is closed as-is.
+> ## **THE PURSUIT QUESTION IS ANSWERED (maintainer, 2026-08-22):**
+> ## vsav retains the NW leaping pursuit (universal U + any P/K; ES on
+> ## two buttons; tech roll counters it). Found and instrumented same
+> ## session — the input registers during the knockdown FALL (my first
+> ## screen was too late), and `audit_pursuit_leap.sh` is green 8/8:
+> ## every tenant's ported pursuit fires with its own arc, every downed
+> ## tenant accepts targeting, no-knockdown control clean. Mechanics in
+> ## engine_internals "THE LEAPING PURSUIT". OPEN REFINEMENT: pursuit
+> ## CONNECT (a wake-vs-flight knife edge even on the all-legacy
+> ## control) — coupled to the tech-roll rig family in the matrix.
 >
 > ## **REMAINING COVERAGE GAPS (the matrix's list):** tech-hit (throw
-> ## escape) rigs both directions; deliberate KO-frame/corner/frame-1
-> ## edge rigs per tenant; Shadow/Marionette N/A-until-enabled.
+> ## escape) AND tech-roll rigs both directions (the roll also unlocks
+> ## pursuit-connect); deliberate KO-frame/corner/frame-1 edge rigs per
+> ## tenant; Shadow/Marionette N/A-until-enabled.
 >
 > ## **CARRY TO THE NEXT FREEZE'S RE-POINT SWEEP** (unchanged from
 > ## 14z-103): the m3b_merged11 one-back audit defaults, the defaults

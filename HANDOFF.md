@@ -295,11 +295,16 @@ discriminator is the strength-independent toss); `audit_down_attack.sh`
 Phobos wakes in 24f; the §4 "pursuit" cell, naming question with the
 maintainer); `audit_stage_sweep.sh` (every tenant x all 12 stages with
 contact; the $FF8100 poke at f2150/2200 is measured load-bearing on the
-venue assets). Rigs: `tests/replays/judge/01-03` (subdir = gate-owned,
-outside the suite's account). `audit_roster_pairings` re-ran 111/111 on
-merged-m5 (~5 min — run it at every freeze). Open cells: tech-hit
-(throw escape) rigs; KO-frame/corner edge cases; Shadow/Marionette
-(N/A-until-enabled).
+venue assets). `audit_pursuit_leap.sh` (the maintainer-confirmed NW leaping pursuit:
+fires per tenant both directions, per-char arcs frozen loosely,
+no-knockdown discriminator; CONNECT is the documented open refinement —
+a wake-vs-flight knife edge even on the all-legacy control; mechanics
+in engine_internals "THE LEAPING PURSUIT"). Rigs:
+`tests/replays/judge/01-03` (subdir = gate-owned, outside the suite's
+account). `audit_roster_pairings` re-ran 111/111 on merged-m5 (~5 min —
+run it at every freeze). Open cells: tech-hit/tech-roll rigs (also
+unlocks pursuit-connect); KO-frame/corner edge cases;
+Shadow/Marionette (N/A-until-enabled).
 
 **Previous batch (14z-96, THE #101 KERNEL VOICE-TABLE PORT,
 maintainer-ruled 2026-08-18): donovan-m8 / huitzil-m17 / pyron-m11 /
