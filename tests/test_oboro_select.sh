@@ -25,6 +25,9 @@
 #      0x0B3450; P1 (Demitri, no hold) untouched             [per-player]
 #   E  STOCK build, leg A's inputs              -> id 0x08 (the row is
 #      profile-gated; the stock twin carries no hook)        [superset]
+#   F  legs A and B again on FBNeo — the dual-emulator agreement for
+#      new-character content (CLAUDE.md §4); skipped with a note when
+#      the FBNeo binary is absent                            [dual-emu]
 # Every leg asserts BOTH the committed id (+0x382 at confirm+10) and the
 # loaded hitbox base (+0x60 in-match), so a passing leg proves the pick
 # produced the CHARACTER, not just a byte.
@@ -99,6 +102,14 @@ print(f"{b[o + 0x382]:#04x}" if sys.argv[3] == "id"
       else f"{int.from_bytes(b[o + 0x60:o + 0x64], 'big'):#x}")
 PY
 }
+fbfield() { # fbfield <dumpfile> <id|base>  (P1 struct at the dump's start)
+    python3 - "$1" "$2" <<'PY'
+import sys
+b = open(sys.argv[1], "rb").read()
+print(f"{b[0x382]:#04x}" if sys.argv[2] == "id"
+      else f"{int.from_bytes(b[0x60:0x64], 'big'):#x}")
+PY
+}
 check() { # check <label> <frame> <side> <want_id> <want_base>
     i="$(field "$1" "$2" "$3" id)"; b="$(field "$1" 3000 "$3" base)"
     if [ "$i" = "$4" ] && [ "$b" = "$5" ]; then
@@ -123,6 +134,26 @@ check D 1260 0 0x01 0x93b6a
 echo "== E: the STOCK twin carries no hook (profile-gated) =="
 run E "$STOCK" vsavj "$WORK/p1.rpl" 1210
 check E 1210 0 0x08 0xa6418
+
+echo "== F: dual-emulator agreement — the same pick on FBNeo (CLAUDE.md §4) =="
+# Measured 14z-105: FBNeo agrees with MAME field-for-field on both legs.
+if [ -x "$REPO/emu/fbneo/fbneo" ]; then
+    for leg in p1:0x18:0xb3450 p1_nohold:0x08:0xa6418; do
+        r="${leg%%:*}"; rest="${leg#*:}"; wi="${rest%%:*}"; wb="${rest#*:}"
+        mkdir -p "$WORK/fb_$r"
+        ( cd "$WORK/fb_$r" && FBNEO_DUMPS="1210:ff8400-ff8800;3000:ff8400-ff8800"             FBNEO_ROMPATH="$WIDE" "$REPO/tools/run_replay_fbneo.sh" vsavjw             "$WORK/$r.rpl" "$WORK/fb_$r/c.log" "$WORK/fb_$r/box" > run.log 2>&1 ) || {
+            echo "FAIL: FBNeo leg $r did not run"; fail=1; continue; }
+        fi_="$(fbfield "$WORK/fb_$r/c.log.dump_1210_ff8400.bin" id)"
+        fb_="$(fbfield "$WORK/fb_$r/c.log.dump_3000_ff8400.bin" base)"
+        if [ "$fi_" = "$wi" ] && [ "$fb_" = "$wb" ]; then
+            echo "  ok: FBNeo $r -> id $fi_, base $fb_ (agrees with MAME)"
+        else
+            echo "FAIL: FBNeo $r -> id $fi_ base $fb_ (want $wi / $wb)"; fail=1
+        fi
+    done
+else
+    echo "  (FBNeo binary absent — leg F not run; MAME legs stand alone)"
+fi
 
 # verdict control: the checker must be able to fail — a deliberately wrong
 # expectation against leg A's real dump must print FAIL (run in a subshell

@@ -37,6 +37,13 @@
   the maintainer's field test comes first. Queue them before the push if
   the test is clean.
 
+**Post-freeze, while the maintainer tests (2026-08-22):** the Oboro pick
+measured on FBNeo too — id 0x18 / base 0x0B3450 with Start, 0x08 /
+0x0A6418 without, field-for-field what MAME reads (the §4 dual-emulator
+agreement for new content); frozen as leg F of test_oboro_select.sh.
+The two long soaks (audit_merged_legacy, audit_guard_corpus) were
+started in the background — results appended below when they finish.
+
 **Where the maintainer looks:** `tools/run_wide.sh build/m3b_merged13
 fbneo` — "M6" bottom-right on select; Bishamon + Start held -> Oboro.
 
