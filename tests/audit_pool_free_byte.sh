@@ -49,12 +49,15 @@ cd "$REPO"
    # (19 members, no vsw.z01/z02) — the script could not run at all.
    # Its frozen inventory may still describe the OLD build: run it
    # before trusting a green, and re-measure rather than absorb.
-# KNOWN RED ON EVERY BUILD SINCE 14z-87 (GitHub #110, found 14z-103).
-# The frozen rig constants were measured on the pre-beep-fix platform;
-# bisected: attic m3b_merged6 PASS, m3b_merged7 FAIL, stable thereafter.
-# The native-anchored invariants are elsewhere and GREEN (audit_fg_parity,
-# test_pyron_cosmo). Do NOT absorb the current values without attributing
-# the 14z-87 mechanism — see the issue.
+# PCOSMO LEG RE-POINTED 14z-103 (GitHub #110). Its old rig
+# (pyron/71_pyron_cosmo, 1P arcade) was authored against the pre-14z-87
+# arcade draw; against the post-14z-87 opponent the scripted motions
+# spend a stock on a DIFFERENT move and no satellite ever enters the
+# pool (measured: seq 0x12 + stock decrement at f3815/f4215, zero live
+# $FF9400 slots after). The leg now rides 106_pyron_cosmo_clash — the
+# 2P poked rig the projectile-clash audit already proves forms
+# satellites on the shipping build (measured here: 215 family-typed
+# slot observations from f3496 on merged-m5).
 BUILD="${1:-build/m3b_merged12}"
 [ -f "$BUILD/rompath/vsavjw.zip" ] || { echo "SKIP: no $BUILD"; exit 0; }
 MAME_BIN="${MAME_BIN:-$HOME/.cache/vampire-saved/mame/cps2}"
@@ -93,10 +96,10 @@ run_leg() {
 }
 
 PK10="1400:ff8782:10;1450:ff8782:10;1500:ff8782:10"
-PK11="1400:ff8782:11;1450:ff8782:11;1500:ff8782:11;3000:ff8509:03;3020:ff8509:03"
+PK11="1400:ff8782:11;1450:ff8782:11;1500:ff8782:11;1400:ff8b82:01;1450:ff8b82:01;1500:ff8b82:01;3300:ff8509:03"
 run_leg hfx    hui/83_hui_fx          "$PK10" 3620 3100 3608 &
 run_leg htrap  hui/87_hui_plasma_trap "$PK10" 4810 3300 4800 &
-run_leg pcosmo pyron/71_pyron_cosmo   "$PK11" 5200 3300 5150 &
+run_leg pcosmo 106_pyron_cosmo_clash  "$PK11" 5150 3400 5100 &
 wait
 
 MODE="$MODE" BUILD="$BUILD" python3 - "$W" <<'PY' || fail=1
@@ -222,7 +225,12 @@ for leg, tid in LEGS.items():
 print(f"  liveness: b8 +0x00={agg['b8_00']} +0x20={agg['b8_20']} "
       f"+0x7C/7E={agg['b8_7c7e']} | 94 +0x01={agg['94_01']} "
       f"+0x20={agg['94_20']} | tag writes={agg['tag_hits']}")
-if agg["b8_00"] < 100 or agg["b8_20"] < 100:
+# +0x00 floor re-calibrated 14z-103 with the pcosmo leg change: the old
+# arcade rig's long CPU fight produced 100+ effect-pool activations; the
+# 106-based leg measures 31 across the leg set. Tap LIVENESS is already
+# proven by +0x20 (thousands of hits through the same tap); +0x00 >= 10
+# still requires real spawn traffic.
+if agg["b8_00"] < 10 or agg["b8_20"] < 100:
     errs.append("busy $FFB800 fields quiet — the tap is not live")
 if agg["94_01"] < 100 or agg["94_20"] < 100:
     errs.append("busy $FF9400 fields quiet — the tap is not live")

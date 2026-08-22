@@ -1,4 +1,4 @@
-# NEXT SESSION — orientation (rewritten at the 14z-103 close, 2026-08-21)
+# NEXT SESSION — orientation (updated at 14z-103 (2), 2026-08-22)
 
 > ## **THE STATE IN ONE BREATH: the 14z-102 window freeze remains the
 > ## reference** — donovan-m10 / huitzil-m19 / pyron-m13 / **merged-m5**
@@ -24,14 +24,16 @@
 > ## build/gate_failures on every static run (141 files); fixed at the
 > ## root (M2A_KEEP_DIR), litter purged by content signature, gotcha
 > ## paid.
-> ## (2) **GitHub #110 (OPEN, the next real work item):** audit_fg_damage
-> ## + audit_pool_free_byte RED on every build since 14z-87 — bisected
-> ## on the attic pair merged6 (PASS) / merged7 (FAIL), stable 24/0 and
-> ## pcosmo-vacuous ever since. NOT read as gameplay regression
-> ## (audit_fg_parity native-anchored + test_pyron_cosmo are green);
-> ## both audits annotated known-red; constants NOT absorbed. The diff
-> ## pair lives in ../build_attic_14z102 — COPY IT OUT before the attic
-> ## is deleted after the playtest cycle, or rebuild from freeze tags.
+> ## (2) **GitHub #110 — FIXED AND CLOSED 14z-103 (2), maintainer-
+> ## directed:** the mechanism was the ARCADE DRAW — the 14z-87 batch
+> ## re-rolled the CPU opponent/stage (m6: char 0x0C/stage 0x12; m7+:
+> ## char 0x00/stage 0x0E), so both audits' frozen values described a
+> ## match no build runs. Fixed by removing the class: fg_damage rides
+> ## new 2P-dummy rigs hui/74+75 (EXPECT 69/69, bit-identical across
+> ## generations); pool_free_byte's pcosmo leg rides
+> ## 106_pyron_cosmo_clash (215/215 tagged). Both PASS on merged-m5.
+> ## The attic diff pair is NO LONGER load-bearing — the attic deletes
+> ## on the normal schedule.
 > ## (3) the 14z-88 self-frozen-sha1 hole was LIVE again: replays
 > ## 94/103/105/106 (all authored after audit_legacy_pairings' last
 > ## run) promoted — 94/105/106 = `window vsavj/masked-v2 889 2091` on
@@ -55,9 +57,19 @@
 > ## don_m10/m3b_merged12 defaults this pass just set, and
 > ## test_region_overlap section-5 constants (re-measure the trio).
 >
+> ## **OPEN CONFIRMATION LOOP — the Circuit Scrapper report (14z-103
+> ## (2)):** the maintainer might have seen a missing opening slam
+> ## cycle vs VS2. MEASURED NOT REPRODUCED: rig 80 at MP, HP, and with
+> ## mashing, native-vs-merged-m5 — all six runs structurally identical
+> ## (one slam, same hold, same launch, damage identical), contact
+> ## sheets sent. If they still see it in hand, the next question is
+> ## their exact scenario: opponent, character state, emulator
+> ## (FBNeo?), and whether a WIDE_RECORD .inp can be taken (14z-99
+> ## protocol) — an .inp reproduces the exact event for any instrument.
+> ##
 > ## Commits are LOCAL — push on the maintainer's word. The attic
-> ## deletion stays the maintainer's playtest-cycle call (but see #110's
-> ## diff pair caveat above).
+> ## deletion stays the maintainer's playtest-cycle call (the #110 diff
+> ## pair is no longer load-bearing).
 
 ## What 14z-102 did (the whole arc, one screen)
 

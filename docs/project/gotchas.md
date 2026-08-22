@@ -2822,3 +2822,23 @@ self-test points it at its own workdir. When auditing
 `merged1_*` logs are real evidence; anything bit-identical to
 `tests/expected/vsavj/masked-v2/logs/03_two_player_vs.log` or carrying
 `ffffffffffffffff` lines was flicker-gate litter (removed 14z-103).
+
+## A 1P-arcade rig is silently pinned to the ARCADE DRAW — any timing change re-rolls its opponent and stage (14z-103, GitHub #110)
+`audit_fg_damage`'s frozen 10/10 and `audit_pool_free_byte`'s pcosmo
+formation window were measured on 1P rigs whose opponent came from the
+arcade CPU draw. The 14z-87 batch (voice-borrow + beep sound members)
+shifted match-setup state enough to re-roll that draw — merged6 fights
+char 0x0C on stage 0x12, merged7 and every build since fight char 0x00
+on stage 0x0E — so both audits' constants silently described a fight
+nobody's build has run for five generations (fgA measured 24-vs-10
+against a DIFFERENT victim; the cosmo rig's scripted motions spent the
+stock on a different move against the new opponent and formed zero
+satellites). The behavioral first-divergence was at MATCH START
+(opponent spawn X), not mid-fight cycle skew — a draw change, not
+drift. The rule: an audit that freezes fight-derived values must PIN
+the opponent (2P + early-window pokes, the replay-80 shape), never
+inherit the arcade draw; and when a frozen-value audit goes red on a
+build its own generation column says was green, check WHICH match it
+is measuring before checking how the fight went. Re-derived rigs:
+hui/74, hui/75 (2P dummy, bit-identical across generations), pcosmo ->
+106_pyron_cosmo_clash.

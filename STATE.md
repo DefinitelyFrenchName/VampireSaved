@@ -1,5 +1,57 @@
 # STATE — living progress log
 
+## Session 14z-103 (2) — #110 FIXED AND CLOSED (maintainer-directed):
+## the mechanism was the ARCADE DRAW, not cycle drift; both audits
+## re-derived on pinned-opponent rigs and GREEN on merged-m5. The
+## Circuit Scrapper report MEASURED: not reproduced on any variant —
+## captures sent, awaiting the maintainer's scenario detail.
+
+**Maintainer feedback opened the session** (2026-08-22): projectile
+collisions confirmed in line with expectations (closes the freeze's
+standing watch item); a POSSIBLE Circuit Scrapper (63214+HP/MP)
+animation discrepancy vs VS2 ("might be missing a slam cycle at the
+start"), unconfirmed, not gameplay-adverse; and #110 ruled "definitely
+fix".
+
+**The Scrapper measurement (confirmation loop, captures sent):**
+- Archaeology first: the hold placement is the 14z-73
+  grab_hold_keyframes fix (native-exact then); the throw arcs are the
+  ported throw_arc_tables superset rows; replay 80's header carries an
+  old "throw-arc HEIGHT differs, queued" note that predates the arc
+  port. Note test_hui_grab_victim gates only HOLD_LEN=12 frames — a
+  missing later cycle would be invisible to it, so the green gate does
+  not contradict the report.
+- Measured: rig 80 (MP), an HP variant, and a MASH variant, each on
+  native vsav2 AND merged-m5 — all six runs STRUCTURALLY IDENTICAL
+  (grab f3152, one slam spike y40->180, hold, launch peak y=318,
+  damage 19+8), ours lagging by the documented few-frame skew only.
+  Full-throw side-by-side contact sheets (every 4th frame, 3152-3268)
+  sent to the maintainer. Strength and mashing change nothing on
+  either game. NOT REPRODUCED; awaiting scenario detail (opponent,
+  state, emulator) if the maintainer still sees it in hand.
+
+**#110 fixed (the full chain on the issue, closed):**
+- The bisect sharpened by measurement: field-level A/B m6-vs-m7 on the
+  fgA rig diverges at MATCH START (opponent spawn X), and the state
+  check names it — merged6 fights char 0x0C on stage 0x12; merged7 and
+  every build since fight char 0x00 on stage 0x0E ($FF8B82/$FF8100).
+  The 14z-87 batch re-rolled the ARCADE DRAW; the audits' frozen
+  values described a match no current build runs. The pcosmo leg was
+  doubly dead: against the new opponent the rig spends its stock on a
+  DIFFERENT move and zero satellites enter $FF9400 (measured).
+- The fix removes the class: audit_fg_damage now rides NEW 2P-dummy
+  rigs hui/74 + hui/75 (replay-80 scaffolding; opponent+stage pinned;
+  EX fires 3/3, damage 69 both legs, bit-identical run-to-run AND
+  across merged-m4/merged-m5; EXPECT re-frozen 69/69 with
+  attribution). audit_pool_free_byte's pcosmo leg rides
+  106_pyron_cosmo_clash (215/215 family slots tagged, vs 0); one
+  liveness floor re-calibrated with attribution (b8 +0x00 100->10; the
+  +0x20 lane proves the tap). Both audits PASS on merged-m5. The old
+  1P rigs are untouched (their other consumers unperturbed).
+- Gotcha paid (project + index): a 1P-arcade rig is pinned to the
+  arcade draw; frozen-value audits must pin the opponent. The attic
+  diff pair is no longer load-bearing.
+
 ## Session 14z-103 — THE A4 PIN-CLEANUP PASS EXECUTED (every stale
 ## reference re-pointed, run green, or ruled a deliberate pin), plus
 ## three findings the pass surfaced: the gate_failures litter class,

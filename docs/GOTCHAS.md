@@ -311,3 +311,9 @@ is a GAME gotcha if it is true of the game regardless of the port.
   presenting as a post-close gate failure); fixtures must redirect the
   keep path (`M2A_KEEP_DIR`), and litter is identified by content
   (basis-identical or `ffffffffffffffff` lines), not by name.
+- **14z-103 (project):** a 1P-arcade rig is pinned to the ARCADE DRAW —
+  the 14z-87 batch re-rolled the CPU opponent/stage and two audits'
+  frozen fight-values silently described a match no build runs anymore
+  (GitHub #110); frozen-value audits must pin the opponent (2P +
+  early-window pokes), and a red frozen value means first check WHICH
+  match was measured.

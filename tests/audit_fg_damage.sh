@@ -34,12 +34,16 @@ cd "$REPO"
    # (19 members, no vsw.z01/z02) — the script could not run at all.
    # Its frozen inventory may still describe the OLD build: run it
    # before trusting a green, and re-measure rather than absorb.
-# KNOWN RED ON EVERY BUILD SINCE 14z-87 (GitHub #110, found 14z-103).
-# The frozen rig constants were measured on the pre-beep-fix platform;
-# bisected: attic m3b_merged6 PASS, m3b_merged7 FAIL, stable thereafter.
-# The native-anchored invariants are elsewhere and GREEN (audit_fg_parity,
-# test_pyron_cosmo). Do NOT absorb the current values without attributing
-# the 14z-87 mechanism — see the issue.
+# RE-DERIVED 14z-103 (GitHub #110). The original legs (hui/71, hui/73)
+# were 1P ARCADE rigs: the opponent was the arcade CPU draw, and the
+# 14z-87 batch moved that draw (merged6 fought char 0x0C on stage 0x12;
+# merged7 and every build since fight char 0x00 on stage 0x0E — measured
+# at $FF8B82/$FF8100), so the frozen 10/10 compared damage against a
+# DIFFERENT opponent and was red for five generations before anyone
+# re-ran the audit. The legs are now 2P-DUMMY rigs (hui/74, hui/75):
+# opponent and stage pinned by construction — measured bit-identical
+# run-to-run AND across merged-m4/merged-m5. The per-hit damage
+# invariant lives in audit_fg_parity.sh (native-anchored), as ever.
 BUILD="${1:-build/m3b_merged12}"
 [ -f "$BUILD/rompath/vsavjw.zip" ] || { echo "SKIP: no $BUILD"; exit 0; }
 MAME_BIN="${MAME_BIN:-$HOME/.cache/vampire-saved/mame/cps2}"
@@ -47,9 +51,9 @@ export MAME_BIN
 W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT
 fail=0
 
-PK="1400:ff8782:10;1450:ff8782:10;1500:ff8782:10;3000:ff8509:03;3020:ff8509:03"
+PK="1400:ff8782:10;1450:ff8782:10;1500:ff8782:10;1400:ff8b82:03;1450:ff8b82:03;1500:ff8b82:03;3000:ff8509:03;3020:ff8509:03"
 DF=$(python3 -c "print(';'.join(f'{f}:ff8850-ff8853;{f}:ff8509-ff850a' for f in range(2900,4500,4)))")
-for leg in fgA:71_hui_ex_fg fgC:73_hui_ex_fg_close; do
+for leg in fgA:74_hui_ex_fg_2p fgC:75_hui_ex_fg_close_2p; do
     name="${leg%%:*}"; rp="${leg#*:}"
     d="$W/$name"; mkdir -p "$d"
     ( cd "$d" && MAME_ROMPATH="$REPO/$BUILD/rompath;$ROMDIR" \
@@ -64,10 +68,12 @@ wait
 python3 - "$W" <<'PY' || fail=1
 import glob, sys
 W = sys.argv[1]
-# FROZEN (14z-85e, re-verified UNCHANGED on the fixed build 14z-85f):
-# total P2 damage per leg — fighter-path contact damage on these
-# CPU-opponent rigs. The parity number lives in audit_fg_parity.sh.
-EXPECT = {"fgA": 10, "fgC": 10}
+# FROZEN 14z-103 (GitHub #110 re-derivation): total P2 damage per leg —
+# fighter-path contact damage on the 2P-DUMMY rigs (all three casts
+# connect; identical totals at both spacings is the measured fact, and
+# the two legs stay because their geometry differs — spawn spacing vs
+# walked point-blank). Measured bit-identical on merged-m4 and merged-m5.
+EXPECT = {"fgA": 69, "fgC": 69}
 errs = []
 for leg, want in EXPECT.items():
     hp, stock = [], []
@@ -107,5 +113,5 @@ PY
 
 [ "$fail" = 0 ] || { echo "FAIL: FG damage audit"; exit 1; }
 echo "PASS: Final Guardian fires as the real EX and deals the frozen"
-echo "      fighter-path damage (10 HP) on both CPU-opponent rigs —"
-echo "      the parity gate is audit_fg_parity.sh (14z-85f)"
+echo "      fighter-path damage (69 HP) on both 2P-dummy rigs —"
+echo "      the parity gate is audit_fg_parity.sh (14z-85f; rigs 14z-103)"
