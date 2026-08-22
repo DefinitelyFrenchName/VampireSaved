@@ -1,5 +1,38 @@
 # STATE — living progress log
 
+## Session 14z-105 CLOSE (final) — ritual complete
+
+The session, in one line: the maintainer-directed window executed end to
+end — the Oboro select hook (vanilla's Gallon-variant idiom one cell
+over; the Start bit measured before authoring) and the "M6" version mark
+(authored glyphs, pixel-exact; the tile codec's 14-session half-mirror
+found and fixed on the way) — frozen as donovan-m11 / huitzil-m20 /
+pyron-m14 / merged-m6 with every gate and both soaks green, field-
+confirmed ("Tests confirm Oboro Bishamon and the M6 mark") and pushed;
+then RELEASE PACKAGING landed the same session (`release/merged-m6/`, no
+ROM bytes, deterministic, verifying applier, gated), ruled in-tree until
+MiSTer, pushed.
+
+The ritual's items, each done this close:
+- **STATE**: this entry; the ROLLOVER executed (the 14z-102 group, 7
+  entries, moved verbatim to STATE_HISTORY with a ledger line; verified
+  lossless by byte-verbatim + size accounting).
+- **NEXT_SESSION**: rewritten (the window shipped, the codec finding, the
+  dead prediction, packaging done + the in-tree ruling; MiSTer next).
+- **HANDOFF**: current-builds block, registry row, gate rows, the release
+  packaging section, SUITE_ONLY.
+- **GOTCHAS**: one paid (platform: the gfx_tiles half-mirror / pen 15 /
+  OBJ->screen offsets).
+- **patch docs**: patch_notes 14z-105 section; patch_index rows + the
+  packaging tooling paragraph.
+- **Issues**: none opened; tracker clean.
+- **Suite**: run_all_static --strict PASS 99/0/0 at close (97 -> 99:
+  test_gfx_tile_codec, test_release_roundtrip).
+- Everything pushed; the tree is clean.
+
+Where the next session starts: NEXT_SESSION's banner — MiSTer core
+surgery (the maintainer's sequencing: packaging first, done).
+
 ## Session 14z-105 (2) — RELEASE PACKAGING (maintainer: packaging
 ## before MiSTer; "why not this session") — `release/merged-m6/` built,
 ## gated, deterministic; no ROM byte in the package
@@ -562,366 +595,6 @@ the freeze re-point sweep or the N-2 deletion policy rots them at the
 next freeze (list in the triage doc). A4 dirs now at zero live
 reference fall mechanically at the next census.
 
-## Session 14z-102 CLOSE — ritual complete
-
-The session, in one line: the #107+#109 window opened on the
-maintainer's go, #109's prepped mechanisms DIED BY MEASUREMENT and the
-defect was re-derived from scratch to effect-class ROW 31 (a vsavj
-stub — the clone-mode beam emitter), fixed with the ratified row-16
-pattern, field-confirmed on the rehearsal probe, FROZEN as
-donovan-m10 / huitzil-m19 / pyron-m13 / merged-m5 with every gate
-green (suite x6, battery, corpus soak 316/316, statics 97/0/0),
-PUSHED with #107/#109/#50 closed on GitHub, and the post-freeze
-rulings all taken (DF durations kept categorically, tint confirmed,
-build-dir triage executed: 8.1 GB atticked, strict tier zero-skip
-green).
-
-The ritual's items, each done this close:
-- **STATE**: this entry; the ROLLOVER executed (the 14z-99 group moved
-  verbatim to STATE_HISTORY + ledger line; diff-verified lossless).
-- **NEXT_SESSION**: rewritten at the freeze and again at each ruling —
-  the banner carries the frozen state, the A4 pin-cleanup pass as the
-  named next item, and the attic-deletion hand-off.
-- **HANDOFF**: current-builds block, registry-table row, and run_wide
-  line all moved to the m10 generation at the freeze.
-- **GOTCHAS**: two paid in this session (quiet-frame presence
-  profiling for event-scoped OBJ A/Bs; MAME palette RAM is poke-blind
-  for rendering).
-- **patch docs**: patch_notes 14z-102 sections (the #107 flip, the
-  row-31 fix, both updated to frozen state this close); patch_index
-  rows current.
-- **Issues**: #107 CLOSED, #109 CLOSED (fix shipped+field-confirmed),
-  #50 CLOSED as standing policy. Open: the A4 pin-cleanup (new
-  session), the attic deletion (maintainer's playtest-cycle call).
-- **Suite**: 97/0/0 strict at the triage check; portable tier
-  re-verified at this close. The 4f1a519+ commits are LOCAL — push on
-  the maintainer's word.
-
-Where the next session starts: NEXT_SESSION's banner — the A4
-pin-cleanup pass, plus whatever the maintainer's continued testing
-surfaces.
-
-## Session 14z-102 (post-freeze rulings) — #50 CLOSED AS POLICY, the
-## BUILD-DIR TRIAGE RULED AND EXECUTED (8.1 GB atticked, both green
-## gates clean), the DF-duration and tint threads closed
-
-- **#50 CLOSED (maintainer-ruled):** the issue's own handoff adopted as
-  STANDING POLICY — lift a generator handler to module level only when
-  a test wants to drive it (unit test in the same change; the six
-  existing extractions are the template), byte-identity as the refactor
-  gate (m3a_reproducible + phasec — re-proven real at this freeze), the
-  allocator (~1401-1552) the named first candidate whenever allocator
-  work happens for its own reasons. No refactor is ever scheduled
-  absent a new measured cost. Full policy on the issue.
-- **BUILD-DIR TRIAGE RULED AND EXECUTED (maintainer-agreed):** C + B2 +
-  B3 + B4 + B1 + the 14z-102 probe duplicates = 85 dirs, 8.1 GB, moved
-  to `../build_attic_14z102` (REVERSIBLE; delete after the next
-  playtest cycle). build/ 13 GB -> 4.4 GB. Verified on the pruned
-  tree: `run_all_static --strict` PASS 97/0/0 with ZERO skips (strict
-  = a lost input is fatal, and none was), battery 23 PASS + the known
-  wide-render self-skip (that gate ran green directly at the freeze).
-  Tracked metadata in the moved dirs is deleted in this commit —
-  recoverable from git history + the freeze tags (the B4 meaning).
-  **STANDING POLICY adopted: at every freeze, the N-2 generation's
-  dirs are deleted (keep current + one back).**
-  **A4 (34 dirs, 2.56 GB) is deliberately NOT bulk-ruled** — a fresh
-  session does the pin-cleanup pass (retire/re-point stale references;
-  the dirs then fall to zero-reference and go mechanically). Full
-  ruling: docs/project/build_dir_triage.md header.
-
-## Session 14z-102 FREEZE — THE #107+#109 WINDOW EXECUTED END TO END:
-## donovan-m10 / huitzil-m19 / pyron-m13 / merged-m5. Every gate that
-## has finished is GREEN; the corpus soak and battery tail run at close.
-
-**Maintainer "go" 2026-08-21 ("tint is good, projectile collisions seem
-good, we can freeze"); the #109 fix was FIELD-CONFIRMED on the
-rehearsal probe BEFORE the freeze; gold tint KEPT (their ruling).**
-
-**The new reference state:**
-| artifact | build dir | fingerprint | ops |
-|---|---|---|---|
-| donovan-m10 | build/don_m10 | c6a02cb0 | 323 |
-| donovan-m10-stock | build/m5_stock5 | 883e7d17 | — |
-| donovan-m10-stage4 | build/don_m10_s4 | d32059e1 | — |
-| huitzil-m19 | build/hui46 | 1a7249d6 | 363 |
-| pyron-m13 | build/pyron30 | dbce705b | 296 |
-| merged-m5 | build/m3b_merged12 | 393f92a5 | 804 |
-
-**hui46 and m3b_merged12 are BIT-FOR-BIT the rehearsed probes**
-(hui_probe_row31 / merged_probe_row31 — the 14z-99 rehearsal pattern
-held again), and m5_stock5 reproduces the phasec measurement exactly.
-
-**What landed (both committed pre-freeze as W1/W2/W3):**
-- (#107) reconciliation row 0x0448a6 -> 0x04367a — verified,
-  callsite-anchored, re-derived at the flip. Rides the SHARED map:
-  every tenant + stock moved (delta per artifact: vm3j.04d only).
-- (#109) THE CLONE-BEAM FIX — effect-class ROW 31 (vsavj stub; the DF
-  clone-mode per-frame beam emitter) ported: root 0x926e4:0x11e:t0x922f0
-  + beam_effect_class31 code_ptr at PRG:0x080B28. The root changed
-  EXTRACTION (hui32/extract regenerated, old kept extract.pre-14z102;
-  hui placements shifted; op counts re-frozen 363 / 598/648 / 804/901;
-  tenant bases re-derived phobos 0x4595a0 / pyron 0x4ac8dc, +0x100).
-
-**The freeze verification, everything finished so far GREEN:**
-- run_suite x6 (freeze + verify for don_m10 / hui46 / pyron30): SUITE
-  GREEN every pass — every legacy masked replay on its EXACT frozen
-  class, including hui46 whose placements all moved.
-- test_m3a_reproducible: all five artifacts rebuild bit-exact;
-  whole-artifact manifests re-frozen AFTER member-digest diffs named
-  every delta (program members only — no gfx/QSound member moved).
-- Merged gates: trap parity, FG parity, select-bank gates,
-  render-content (bands byte-equal to the NEW solos, poison controls
-  fired) — all PASS.
-- audit_clone_beam_lines: defect signature was frozen on merged-m4
-  BEFORE the fix; fix-mode PASS on hui46-class and merged-m5-class
-  images; default now EXPECT_LINES=1.
-- test_pcrel_escapes: 69/10/10 inventories UNCHANGED across the
-  extraction shift (source-side keys held); merged legs identical to
-  solos; wrong-suffix must-fire control alive.
-- test_tenant_loop: PASS end to end on the re-frozen op counts.
-- test_biased_list_inventory (NEW, ci_static): the #109-B sweep
-  verdicts frozen; must-fire control verified.
-- test_dualtrack PASS on the new pair (m5_stock5 + don_m10; frozen
-  onsets held); test_fbneo_legacy_oracle PASS on don_m10 (frozen
-  offset inventories held).
-- run_battery_m2: FAILED FIRST at test_thunk_addr_literal — the gate's
-  huitzil leg pinned build/hui27/extract (ancient; predates the #109
-  root's region -> generation refuses). THE #94 ROT CLASS, caught by
-  the battery exactly as designed; re-pointed to hui46/extract with a
-  re-point-on-new-root note, gate PASS. Battery rerun: 23 PASS + the
-  wide-render gate (self-skips on the stock outbase) run directly on
-  the m5_stock5/don_m10 pair — PASS. Effective 24/24.
-- audit_merged_legacy: exit 0 with the pass epilogue (leg a on the
-  merged1 class table, leg b guard-clean vs the frozen solos). The
-  per-leg counts were lost to a tail-only capture — honest limit of
-  this record; the audit's own exit is the verdict.
-- run_all_static FULL: **PASS 97 / SKIP 0 / FAIL 0** — the two
-  formerly-expected-red gates (m3a_reproducible, phasec) are green on
-  their re-frozen pins; the suite grew 96 -> 97
-  (test_biased_list_inventory).
-- The guard-corpus soak COMPLETED GREEN: **316/316 guarded runs,
-  zero vectors** on merged-m5 under every tenant forcing (verdict map
-  build/guard_corpus/m3b_merged12.1787322215.tsv). Every planned
-  verification of the 14z-102 freeze is now green.
-
-**Re-points executed with the freeze** (the #94 class, swept): pcrel
-[solo+merged] sections, bases.tsv, render-content D/H/P rows,
-tripwire-reach builds, guard-corpus/projectile-clash/beam-lines BUILD
-defaults, biased-list BUILD defaults, the FBNeo oracle build, phasec's
-stock pin, m3a pins + whole-artifact manifests, HANDOFF (current-builds
-block + registry-table row + run_wide line), patch_index rows.
-
-**PLAY: `tools/run_wide.sh build/m3b_merged12 fbneo`.**
-
-## Session 14z-102 (4) — #109-B CLOSED: every sweep candidate has a
-## measured verdict and the inventory is FROZEN AS A GATE. The
-## maintainer field-confirmed the beams on the merged probe.
-
-- **Field confirmation (maintainer, 2026-08-21):** the beams on
-  `build/merged_probe_row31` are good in hand — the freeze is
-  unblocked on their side.
-- **The B-sweep candidates, all dispositioned (their question):**
-  - hui anim `0x2499F0/0x249B18` — **FP** (anim-node stream misread
-    as list heads; the 0x25729A frame pointers run through them).
-  - don anim `0x28A300` — **FP**, same node-stream class
-    (0x29AF78/0x29AF34 pointers, zero-entry "head").
-  - `x2b7ef4 0x2BC09A/0x2BC0F8` — ONE shared item, not per-tenant
-    (the region ships in every tenant): REAL type-4 strips (11x tile
-    0x0090, flip pair) on a looping 6-node effect anim with no
-    static referent. **ACCEPTED-WITH-EVIDENCE:** reachability
-    measured — 321 type-4 dispatches on hui/83_hui_fx serve ONLY
-    vanilla lists 0x269034/0x2693AA; zero in-match dispatches on
-    df/100; zero on the pyron cosmo rig. If ever reached, the
-    failure is a bounded wrong-art draw at vanilla bank-1 0x13890
-    (valid list type — no over-index, no crash surface).
-  - The remaining "22 uncovered" were the tool's documented
-    hitbox/aux FP families; the covered-children include the
-    clone-beam line strips, which the row-31 fix now actually draws.
-- **The gate:** `tests/test_biased_list_inventory.sh` (NEW,
-  ci_static) — the filtered per-tenant inventory frozen with the
-  verdicts in its header; a new row or a status change fails loudly
-  (must-fire control verified: wrong placements -> exit 1, drift
-  named). BUILD_H defaults to the probe — re-point at the freeze.
-
-## Session 14z-102 (3) — the window tail REHEARSED to the merged probe:
-## the fix works on the merged composition; the freeze awaits the
-## maintainer's in-hand beam confirmation
-
-- **Rulings recorded (maintainer, 2026-08-21):** gold tint KEPT
-  (default; community research may revisit — the neuter stays a
-  one-line manifest edit, rehearsed as build/hui_probe_tint); the
-  palette-event hunt = the fix path (executed, see (2)).
-- **Contact A/B (the issue's damage half):** rigs df/103 (ours,
-  HP+HK activation) / df/104 (native, 263+2P) authored — the pair
-  splits on activation exactly as df/100/df/102 do. Measured
-  non-debug both legs: P2 HP 288->288 UNCHANGED through all three
-  close-range attacks on BOTH games — zero-zero parity at standing
-  geometry (the 14z-101 "flying-clone altitude" geometry note holds
-  natively too). A positive-contact leg (P2 jumped into the beam
-  band) stays owed on #109. Instrument gotcha re-paid: the first
-  A/B ran -debug and measured a NON-EVENT on both legs (hp=0 until
-  f3720 — the -debug timeline shifts the match start; both legs
-  "agreeing" was two dead rigs agreeing).
-- **The window tail, executed to rehearsal depth:**
-  `build/hui32/extract` REGENERATED with the new root (old kept as
-  `extract.pre-14z102`; ensure_merged_inputs did the make);
-  op-count constants RE-FROZEN with attribution (solo hui 361->363,
-  2T 596/646->598/648, 3T 802/899->804/901 — the +2 = code_ptr +
-  region op, huitzil-only, nothing dedupes) and
-  `test_tenant_loop.sh` PASS end to end on the new constants;
-  merged probe `build/merged_probe_row31` (`393f92a5`, 804 ops)
-  built with every internal verification green;
-  **`audit_clone_beam_lines.sh` fix-mode PASS on the MERGED probe**
-  (lines at group C 0x486D0, burst control fired).
-- **What the freeze still needs** (the 14z-99 rhythm, on the
-  maintainer's go after they see the beams in hand): build the four
-  named artifacts + stock twin from the tree, full battery +
-  run_suite re-freeze (hui/merged expectation sets MOVE — the new
-  root shifts every hui placement), registry rows m10/m19/m13/
-  merged-m5 + tags, re-point pcrel_escapes [merged_*] + bases.tsv +
-  render-content rows + audit BUILD defaults, and the B-sweep
-  inventory gate. Note test_m3a_reproducible/test_phasec_spaces stay
-  EXPECTED RED until then.
-
-## Session 14z-102 (2) — #109 ROOT-CAUSED TO THE ROW AND FIXED AT PROBE
-## LEVEL: vsavj ships effect-class ROW 31 as a STUB, and row 31 is the
-## DF clone-mode BEAM EMITTER. One ported root + one code_ptr — the
-## 14z-71 row-16 pattern, second verse — and the beams RENDER.
-
-**The maintainer's rulings opened the work** (2026-08-21): gold tint
-KEPT (default; community research may revisit — the rehearsed neuter
-stays one line away), and GO on the palette-event hunt.
-
-**The hunt's own reversals, honestly:** the palette-line/fade theory
-DIED first (the "sweep" was the native stage's ambient palette cycler
-— writer 0x13AB4, 64 words/10 frames; ours runs a near-static venue;
-the fade steppers' beam-frame writes were boot-time screen fades; the
-$FFF400 header change was a red herring both instruments refused to
-attribute). What replaced it, each link measured:
-- The visible beams = 4px LINES that STROBE (on 3722/3728/3730, off
-  between — CPS-2 alternating-frame translucency), drawn by transient
-  **16x1+4x1 sprites `code=4ED0 pal 05 bank 1`** (raw 0x0CD0 + vs2
-  bias) — invisible to single-frame dumps because the dump reads the
-  LIVE list while the screen shows the LATCHED one (phase gotcha #2).
-- The line sprites are drawn by BEAM OBJECTS at $FFD600/$FFD700
-  (alternating slots, respawned per frame = the strobe), dispatched
-  through the effect-class pool with **class 31**. vs2 row 31 =
-  0x0926E4 (the emitter); **vsavj row 31 = THE STUB 0x080B44** — and
-  ours dispatches class 31 INTO IT constantly through the mode
-  (measured: slot reads at PC 0x080A9C, D0=0x7C, objects live;
-  native control: 405 reads/run, 34 in-beam). The 14z-101 "no new
-  pool objects" was wrong about this pool. Also corrected in place:
-  14z-71's "vs2/vh2 fill 16/17/19" — both also fill 31 (vh2 0x922F0).
-- Everything downstream ALREADY SHIPPED: the line strips (anim
-  0x25201C family), their composite (retyped 000C->0006, sweep-listed
-  as covered-children all along), the frame table with the strobe
-  flags, the line TILES (vs2 bank-1 0x14ED0, inside the 14z-83
-  strip_tiles span -> group C 0x86D0-region), palette row 05
-  (byte-identical to native at beam time, untouched by the DF tint).
-
-**The fix (committed; freeze rides the window tail):**
-`tools/build_donovan.sh` root `0x926e4:0x11e:t0x922f0` (vh2 oracle:
-6/0x11E diffs, ALL reconciled operands — the anim pointer + three +6
-engine deltas; helpers 0x13778/0x13724/0x1581A already mapped) +
-`huitzil.toml [[code_ptr]] beam_effect_class31` at PRG:0x080B28.
-Superset: slot measured DEAD in vanilla — 0 reads over 02/07/09/30
-**+ 21_don_mash + 26_don_arcade_mash** (the type-6-lesson marathons,
-included on purpose), 2418-hit row-0 control.
-
-**Verification (RH-43 order respected):**
-`tests/audit_clone_beam_lines.sh` (NEW) built FIRST and PASSED in
-defect mode on merged-m4 (burst-control 20, lines 0 — the frozen
-defect signature); probe `build/hui_probe_row31` (1a7249d6) built;
-fix mode PASS (14 line entries, group C 0x486D0/0x48790 = raw
-0x0CD0/0x0D90 + the takeover compose — the strip band already held
-the tiles); **snapshots show the beams RENDERING** (green/blue strobe
-phases, sent to the maintainer). Defect mode re-verified still-PASS
-on merged-m4 after the predicate fix (two line families: pal 05 AND
-pal 0c — the audit's first fix-mode run taught it).
-
-**Remaining for the window tail:** the close-range damage/hitstun A/B
-(the issue's verification pair — needs a close-range rig variant);
-rebuild all four + merged (**the root changes EXTRACTION — the merged
-pipeline's pinned extract inputs must be REGENERATED deliberately;
-create-if-absent will not pick the new root up**); full battery,
-run_suite, re-freeze m10/m19/m13/merged-m5 with the standard
-re-pointing; the B-sweep inventory freeze.
-
-## Session 14z-102 — THE #107+#109 WINDOW OPENED ON THE MAINTAINER'S GO
-## ("follow the plan"), AND #109's PREPPED MECHANISMS DIED BY MEASUREMENT
-## IN THE FIRST INSTRUMENT RUN: the defect re-derived from scratch is a
-## MISSING SCREEN-PALETTE EVENT plus a tint/occlusion compound — no
-## missing art, no bias defect, no data_port. The fix now waits on the
-## ruling; #107's row flip is COMMITTED (window step 1).
-
-**#107 executed and re-derived first (RH-2):** the twin claim was
-re-measured this session before the flip — vs2 `0x448a6` vs vsavj
-`0x4367A` = 6/0x2E diffs, every one inside a verified reconciled
-operand pair (`0x2711c->0x27ec8`, `0x25eba->0x26d36` + the local bpl);
-vs `0x2563e` = 24 diffs; vs `0x45fcc` = 7; farm callsites unique both
-games (`0x5c51a`/`0x5437e`). Row flipped to `0x04367a`
-status=verified. **The rebuild/re-freeze DELIBERATELY rides the #109
-resolution so the window freezes once — until then
-`test_m3a_reproducible` AND `test_phasec_spaces` are EXPECTED RED (both measure the manifest ahead of the frozen artifacts; phasec's stock rebuild now yields 883e7d17 vs the pinned 16da59b6 — the flip moves STOCK bytes too, the shared-map/#103 class) vs the frozen artifacts (the
-14z-99 W-commit rhythm, paused mid-window on a ruling).**
-
-**#109: the prep's A1 and A2 both RETRACTED by measurement** (full
-chain on the issue, 14z-102 comment). The load-bearing links, each
-measured on merged-m4 (df/100) vs native vsav2 (df/102):
-- The shared table `0x89CF8`'s ONLY consumer is the per-fighter HUD
-  stager `PRG:0x89608+` (whole-run read tap, both address spaces);
-  the "cycling segments" rows of the 14z-101 (8) A/B were the two
-  games' STOCK-PIP animations — the piece counts match the rigs'
-  poked stocks (3 vs 5). Red herring.
-- A2's "pointer lists to art" are 16-color PALETTE RAMP rows — the
-  beam's row-0 ramp (ours warm, native BLUE; live palette dumps match
-  the ROM lists exactly).
-- Ours EMITS THE FULL NATIVE BURST SET correctly (piece-for-piece,
-  group C `a19 0x44xxx`, tiles byte-identical to vs2) — the drawing
-  side has no defect. It is (a) rendered BEHIND the 4-copy train
-  (CPS-2 draws the list back-to-front; MAME cps2_render_sprites
-  iterates last->0) and (b) repainted by the DF GOLD TINT: our own
-  14z-84 df_gold_variant_id block rewrites P1 row 0A at activation
-  (pre-DF row is byte-identical to native's; native's clone-mode EX
-  never touches the row — in vs2 the DF gold and the EX clones never
-  coexist). Tint-off probe rehearsed: `build/hui_probe_tint`
-  (90e2982e, thunk upload-tail -> rts, manifest edit REVERTED after
-  the measurement); it recolors P1 but does not alone surface the
-  beam.
-- **The visually dominant beam = full-screen PALETTE-LINE SWEEP** —
-  native writes a +0x20-stepped word series across consecutive rows
-  ($90C73E..$90C9xx, 258 words vs ours' 2) at beam time; writers =
-  the engine palette fade stepper (vs2 `0x1282C`, PCs 012852/0129b6)
-  whose vsavj twin EXISTS (`~0x14168`, content-identical). **Ours
-  never invokes it** — the vs2 clone-attack script's screen-palette
-  event is dropped on our leg (the #101 script-carried-id class).
-  THE REMAINING HUNT: the native stepper's caller chain during the
-  beam -> the twin comparison on ours.
-- Bonus finds: a live 0xA00-bias pair at the attack (ours 0x3CE0/E2
-  vs native 0x46E0/E4, raw 0x04E0-family ground flashes) — real but
-  small; the constant mode-ornament strips (raw 0x0490/0x0698) COMPOSE
-  ONTO ART VSAVJ CARRIES at its biased positions (same streak shapes)
-  — benign on both legs.
-- **B sweep reviewed by bytes:** anim rows 0x2499F0/0x249B18 = census
-  FPs (anim-node stream); x2b7ef4 0x2BC09A/0x2BC0F8 = real type-4
-  strips (11x tile 0x0090, flip pair) on a looping 6-node effect anim,
-  no data-scan referent — reachability open, carried as review items.
-
-**Decisions pending (maintainer):** (1) the DF gold tint during his
-clone mode — keep (vsavj-DF identity) vs neuter (native-EX look;
-one-line change in OUR thunk, rehearsed); (2) go/no-go on the
-palette-event hunt as the #109 fix path. Captures sent in-session
-(native blue beams vs ours).
-
-**Method gotchas paid (in docs/project/gotchas.md this commit):**
-attack-window entry-set A/Bs MUST be presence-profiled over quiet
-frames too (the pip red herring survived one session because the
-14z-101 (8) A/B never checked the pieces' presence OUTSIDE the
-attack); MAME palette RAM at $90C000 ignores Lua/space pokes for
-RENDERING while accepting them for readback (game writes recolor,
-poked bytes read back but never reach the screen — a poke-based
-palette A/B is a dead instrument, use a probe build).
-
 **SPLIT 2026-08-20 (14z-99 post-freeze close, maintainer-approved): this
 file holds the RECENT session groups + THE LEDGER; the full detail of every
 older session lives verbatim in `STATE_HISTORY.md`.** How to work with it:
@@ -945,6 +618,7 @@ Full detail for every line: `STATE_HISTORY.md` (verbatim; grep the session
 tag or any phrase below). `[+N more entries]` = the group has N further
 session records in the archive beyond the headline shown.
 
+- Session 14z-102 CLOSE — THE #107+#109 WINDOW frozen as donovan-m10/huitzil-m19/pyron-m13/merged-m5 (#109 re-derived from scratch to effect-class ROW 31, the DF clone-mode beam emitter vsavj stubbed; #107 row flip; gold tint kept; build-dir triage 8.1 GB atticked; N-2 deletion policy adopted)  [+6 more entries]  [rolled 14z-105 close]
 - Session 14z-101 CLOSE — the agreed #108->#107->#106 sequence executed windowless (#108 INVERTED to not-a-defect: the satellite word is our own bank row, native satellites equally sweep-inert; #107 twin-anchored statically + tie-refusal landed; #106 closed via verify_pcrel_data --extract); guard-corpus built 316/316; DF mechanics measured ours-vs-native (frameworks differ BY DESIGN; ours == pristine vsavj on the legacy control); #109 found, root-caused through two in-place retractions, and fully prepped  [+9 more entries]  [rolled 14z-104 close]
 - Session 14z-100 CLOSE — THE HARDENING PROGRAM opened and executed same-session (pointer/flow comb H1, escape triage H2, the #99 continue-switch lock H3, the contact rig H4 with the -debug/non-debug instrument paradox left to 14z-101); #99 CLOSED (maintainer); #106/#107/#108 filed; the build-dir decision package delivered  [+3 more entries]  [rolled 14z-104 close]
 - Session 14z-99 FREEZE + field-confirmation — THE WINDOW EXECUTED END TO END (donovan-m9/huitzil-m18/pyron-m12/merged-m4; #43(b)+#103+#104+#105; merged BIT-FOR-BIT the rehearsal; stock twin moved by design); field pass CLOSED all three tickets same day (incl. transformation throws) and un-parked #99; the skipped close ritual caught up post-freeze  [+7 more entries]  [rolled 14z-102 close]
