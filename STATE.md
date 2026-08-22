@@ -1,5 +1,34 @@
 # STATE — living progress log
 
+## Session 14z-106 CLOSE — ritual complete
+
+The session, in one line: housekeeping executed (evidence committed,
+probes attic'd, the 14z-102 attic deleted); the MiSTer framing and all
+five alignment questions ruled and recorded; the arc OPENED with no RTL
+touched — GPL-3.0 licence, the public jtcores fork with the separate
+`jtcps2w` core pinned and gated (twin proof: the vsavj MRA identical to
+stock except `<rbf>`), the fit numbers measured (a wider GFX tier is
+unavoidable: 6.39 MB of roster art vs 0.49 MB blank in vanilla; no XL
+tier exists — retracted), and the Verilator lane proven on macOS at
+~1.4 s/frame with the `.rpl` translator gated.
+
+Ritual: STATE (this + entries (2)-(4)); NEXT_SESSION rewritten (banner
+carries the whole arc state + the opener); HANDOFF MiSTer block + docs
+index; GOTCHAS: none paid beyond what mister.md's recipe records
+(four failed sim attempts, each a missing GNU tool or module — recorded
+there rather than as a gotcha because the recipe IS the fix); suite
+`run_all_static --strict` PASS 100/0/0 at the slice-A commit (the
+translator gate registered after that run; it passes alone — counts
+next run, 101). Four commits LOCAL (b4a7d15, 1622522, 0d16a0b, ad25cdc);
+PUSH pending the maintainer's word.
+
+**Decisions pending for the maintainer:** THE MiSTer PROFILE SHAPE
+(recommendation: WIDE v1 verbatim on a 128 MB tier). Next opener: the
+RAM comparison at a §4 anchor on the STOCK core (mister.md recipe; the
+`-setname`/sdram-reuse question first). Model note (maintainer asked):
+the opener is mechanical — any current model; the RTL width surgery
+waits on the ruling anyway.
+
 ## Session 14z-106 (4) — SLICE C: THE SIMULATION LANE WORKS ON macOS
 ## (stock jtcps2 running vsavj under Verilator, frames rendered, ~1.4 s
 ## per frame); the translator + its gate landed; the oracle COMPARISON
