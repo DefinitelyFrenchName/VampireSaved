@@ -444,9 +444,14 @@ bank-1 codes (374 codes as of m3a) — not a constraint.
   - **The full WIDE set does not fit MiSTer regardless**: GFX is
     architecturally capped at 32 MB (two 16 MB banks), 68k PRG at
     4 MB, and the 64 MB JTFRAME_SDRAM_LARGE ceiling (+26-bit ioctl)
-    excludes ~70 MB; the bigger JTFRAME_SDRAM_XL tier exists in
-    jtframe but no shipped core uses it — adopting it is core
-    surgery, not a descriptor tweak. A MiSTer-shaped variant still
+    excludes ~70 MB. **RETRACTED 14z-106 (measured against jtframe RTL at
+    v1.7.3): there is NO `JTFRAME_SDRAM_XL` tier** — the only tier macro is
+    `JTFRAME_SDRAM_LARGE`, a `localparam SDRAMW=23` (64 MB) vs 22 (32 MB)
+    in `target/mister/jtframe_emu.sv` and the matching `[22:0]` bank ports
+    in `hdl/inc/jtframe_mem_ports.inc`; the MiSTer HPS side already carries
+    `ioctl_addr[26:0]` ("up to 128MB"). A 128 MB tier is therefore a WIDTH
+    change through jtframe + the core, not a switch — core surgery, sized
+    in `docs/platform/mister.md`. A MiSTer-shaped variant still
     means pulling GFX back toward 32 MB (per-slot exclusivity) and
     PRG within 4 MB.
   - Consequence for M5: sfx restored at banks < 0x80 (the 14z-86

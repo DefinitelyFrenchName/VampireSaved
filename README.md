@@ -18,6 +18,15 @@ and MAME (verification target), with a MiSTer CPS-2 core patch as a stretch goal
 - Story-mode completeness for the ported three (endings, arcade-run cutscene
   parity) is a fully-optional stretch item within v1 polish, not a gate.
 
+## Licence
+
+Everything in this tree — tools, build manifests, patches, documentation
+and authored assets — is released under the **GNU GPL v3.0** (`LICENSE`;
+maintainer-ruled 2026-08-22). The MiSTer core is a fork of Jotego's
+jtcores, itself GPL-3.0, so one licence covers the whole deliverable.
+The licence covers OUR work only: no Capcom ROM content is in this tree
+or in any artifact we distribute (next section, and CLAUDE.md rule 7).
+
 ## Legal and distribution stance
 
 No ROM content is committed or distributed, ever. Deliverables are patches

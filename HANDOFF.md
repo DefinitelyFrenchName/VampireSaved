@@ -170,6 +170,20 @@ must-fire control). Needs `xdelta3` (`brew install xdelta`).
 MiSTer later adds a DISTRIBUTION layer (MRA/core) over the SAME members —
 the patch artifact does not change shape for it.
 
+## MiSTer (14z-106) — the jtcps2w core, scaffolded
+
+Read `docs/platform/mister.md` first. The deliverable is a SEPARATE core
+`jtcps2w` in a public GPL-3.0 fork of jotego/jtcores
+(https://github.com/DefinitelyFrenchName/jtcores, branch `vampire-saved`
+from v1.7.3), pinned as submodule `emu/jtcores` with the delta mirrored
+in `emu/jtcores-patches/`. `tools/setup_jtcores.sh` checks the pin, inits
+`modules/jtdsp16` only, builds jtframe's Go tool and regenerates the
+patch; `tests/test_jtcores_twin.sh` (ci_portable) locks the twin. No RTL
+differs yet. The stock-vsavj reference-leg MRA is produced by `jtframe mra
+cps2w` (byte-identical to stock cps2's except `<rbf>`). Next: slice B
+(`docs/project/mister_fit.md`, the numbers) and slice C (the Verilator
+oracle proof) — STATE 14z-106 (3).
+
 ## Running a CPS-2 WIDE build (playtest)
 
 **RECORD YOUR SESSION (14z-99, maintainer-requested):** on the MAME leg,

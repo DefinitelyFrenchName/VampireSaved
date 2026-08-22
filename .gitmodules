@@ -4,3 +4,7 @@
 [submodule "emu/mame"]
 	path = emu/mame
 	url = https://github.com/mamedev/mame.git
+[submodule "emu/jtcores"]
+	path = emu/jtcores
+	url = https://github.com/DefinitelyFrenchName/jtcores
+	branch = vampire-saved

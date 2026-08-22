@@ -64,7 +64,18 @@
 > ## — ALL FIVE RULED 2026-08-22: separate core (GPL-3.0 fork of jtcores,
 > ## own RBF), measure-then-choose profile, sim = gate / hardware = field
 > ## test, MiSTer + Jammix available (SDRAM SIZE TO CONFIRM), MRA+RBF with
-> ## a stock-vsavj reference-leg MRA. OPEN: the repo's own LICENSE.
+> ## a stock-vsavj reference-leg MRA. LICENSE: GPL-3.0 (done).
+> ## **14z-106 (3): MiSTer SLICE A DONE** — fork `DefinitelyFrenchName/
+> ## jtcores@vampire-saved` (core `cores/cps2w` → `jtcps2w.rbf`), submodule
+> ## `emu/jtcores` + `tools/setup_jtcores.sh` + gate `test_jtcores_twin`;
+> ## the vsavj reference-leg MRA measured byte-identical to stock except
+> ## `<rbf>`. NO XL SDRAM tier exists (retracted in cps2_wide.md).
+> ## **SLICE B MEASURED (`docs/project/mister_fit.md`): the roster's art
+> ## is 6.39 MB vs 0.49 MB blank in vanilla's 32 MB — a wider GFX tier is
+> ## REQUIRED; PRG needs 4.82 MB (+ a 30-B pin at 0x5FFF00); QSound ext =
+> ## banks 0x80-0x8E (all aliasing → width fix required). PENDING RULING:
+> ## WIDE v1 VERBATIM on a 128 MB tier (recommended) vs a tighter MiSTer
+> ## profile. NEXT: slice C (Verilator oracle proof on the STOCK core).**
 > ## The N-2 build-dir
 > ## deletion policy applies at the NEXT freeze (m10/m19/m13/merged-m5
 > ## dirs are now one-back; m9/m18/m12/merged-m4 + m5_stock4 are N-2 and

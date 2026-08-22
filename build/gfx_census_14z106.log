@@ -1,0 +1,28 @@
+== 0: decrypt vs2 once (shared by all census runs) ==
+== 1: the census on the real inputs ==
+  walk donovan: span 0x27f548+0x20f00 -> 1162 records, 14768 entries, 15612 unique tiles
+  walk huitzil: span 0x245872+0x1e800 -> 1374 records, 14911 entries, 15034 unique tiles
+  walk pyron: span 0x264086+0x1b500 -> 746 records, 14994 entries, 14225 unique tiles
+  donovan∩huitzil: 103 shared dsts (0 bank-4, 103 bank-5) -> 103 same-source benign, 0 REAL
+  donovan∩pyron: 103 shared dsts (0 bank-4, 103 bank-5) -> 103 same-source benign, 0 REAL
+  huitzil∩pyron: 5859 shared dsts (41 bank-4, 5818 bank-5) -> 5859 same-source benign, 0 REAL
+  intra-tenant collisions: 0 (0 same-source benign, 0 REAL)
+  bank 4 union: 45737/65536 codes (69.8%), 19799 free
+  bank 5 union: 6610/65536 codes
+  manifest pool 0x8648-0x869f: EMPTY
+  manifest pool 0x87c0-0xa42b: EMPTY
+  manifest pool 0xa42d-0xad7f: EMPTY
+  manifest pool 0xee74-0xffff: EMPTY
+CENSUS: 0 REAL collision(s) across the 3-tenant merged group-C write set
+  ok: ZERO real collisions; occupancy frozen (bank4 45737, four pools empty)
+== 2: control A — shift-0 strip must produce intra REAL collisions ==
+  ok: control A fired (72 intra REAL collisions on the doctored shift)
+== 3: control B — the OLD shift reproduces the historical 288 ==
+  ok: control B fired (old shift reproduces 288 REAL at 0x5EA0-0x5FBF)
+== 4: control C — one byte-identical tile drops the fixture to 287 ==
+  doctored vs2 group A: tile 0x4ea0 := group-B bytes of 0x5ea0
+  ok: control C fired (fixture REAL 288 -> 287 on the doctored source)
+
+PASS: merged group-C write-set census — ZERO real collisions since
+      the S3 strip relocation; occupancy frozen; all three
+      comparator controls fired

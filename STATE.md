@@ -1,5 +1,71 @@
 # STATE — living progress log
 
+## Session 14z-106 (3) — THE MiSTer ARC OPENED: slice A (fork scaffold +
+## licence) DONE and gated; the twin proof measured; no RTL touched
+
+**Slice A, executed (maintainer rulings 2026-08-22: 128 MB SDRAM; GPL-3.0
+for everything; fork under their GitHub; core name `jtcps2w`):**
+- `LICENSE` (GPL-3.0, FSF text) + README "Licence"; the pending decision
+  marked DECIDED.
+- **The fork:** https://github.com/DefinitelyFrenchName/jtcores (public,
+  GPL-3.0), branch `vampire-saved` from upstream tag `v1.7.3` =
+  `63688ce5`; one commit `b9d0565` = `cores/cps2w/` — `cfg/` a twin of
+  `cores/cps2/cfg` with `CORENAME=JTCPS2W`, `game.yaml` VERBATIM (every
+  `from: cps2` still resolves to cps2's hdl — the cps15 precedent), the
+  MRA set restricted by `mustbe.machines=["vsav"]`, msg + README.
+- **Pinned here:** submodule `emu/jtcores` (branch `vampire-saved`, 235 MB;
+  jtdsp16 `87fef51d` inited; `modules/jtframe/target/pocket` is a PRIVATE
+  ssh submodule — never init it); `tools/setup_jtcores.sh` (literal pin +
+  pristine check + jtdsp16 init + Go build + regenerates the mirror
+  `emu/jtcores-patches/0001-cps2w-scaffold.patch` = `format-patch
+  v1.7.3..pin`); gate `tests/test_jtcores_twin.sh` (ci_portable: pin,
+  game.yaml identical, macros/toml deltas EXACT, patch mirror == format-
+  patch, must-fire control) PASS 7/7.
+- **THE TWIN PROOF (measured):** jtframe's Go tool built (`go build`;
+  the bash wrapper needs GNU coreutils — call the binary; env JTROOT/
+  JTFRAME/JTBIN/CORES/ROM). `jtframe mra cps2` → 316 MRAs; `jtframe mra
+  cps2w` → 7 (the vsav family only). The `vsavj` MRA from the two cores
+  is byte-identical except `<rbf>jtcps2</rbf>` → `<rbf>jtcps2w</rbf>` —
+  the reference-leg MRA exists and binds stock vsavj to OUR rbf, which is
+  the stock leg of the emulator superset invariant on FPGA.
+- **Facts read from the tree** (`docs/platform/mister.md`, new; indexed in
+  docs/README.md): jtframe is VENDORED at v1.7.3 (not a submodule); the
+  RBF name is `"jt"+<core dir>`; `JTFRAME_SDRAM_LARGE` = `SDRAMW=23` (64 MB)
+  and **there is NO XL tier** (RTL grep, 0 hits — the cps2_wide.md claim
+  RETRACTED in place); MiSTer's HPS exposes `ioctl_addr[26:0]` (128 MB)
+  while the core-facing port is `[25:0]`; 68k ROM bus `[20:0]` = 4 MB;
+  stock vsav already uses the full 32 MB GFX on jtcps2; the sim lane has
+  per-frame `.cab` input scripts + IOCTL/SDRAM dumps (the `.rpl`/RAM-
+  checksum twin) and jtcores' own `reg.yaml` regression lists `vsav`.
+- Go installed (`brew install go`, 1.27). Static suite re-run at close.
+
+**SLICE B EXECUTED — `docs/project/mister_fit.md`, the numbers:**
+- PRG: live extension `0x400010-0x4D10F3` (+ the 30-byte facing-alias
+  thunk PINNED at `0x5FFF00`, which is why `vsw.44` is written while
+  `vsw.43` is empty) → the image needs **4.82 MB**, deficit vs jtcps2's
+  4 MB bus **836 KB**.
+- QSound: extension content 918 KB = banks **0x80-0x8E**, all in the
+  jtcps15 aliasing class → the width fix is REQUIRED, not optional.
+- GFX — **THE DECISIVE NUMBER:** the roster's group C is **52,347 live
+  codes = 6.39 MB** (bank 4 45,737 + bank 5 6,610, `audit_gfx_merged_
+  census` PASS); vanilla's entire 32 MB holds **4,028 blank tiles =
+  0.49 MB** (per-bank census via `gfx_tiles.BLANK`; bank 1's 2,917
+  reproduces the 14z-62e figure). 13x short — and no tenant-dropping
+  variant fits either (the smallest band alone is 3.5x the blank total).
+  **A MiSTer build of this roster REQUIRES a GFX tier wider than 32 MB.**
+- Recommendation (Decisions pending below): **WIDE v1 VERBATIM on MiSTer**
+  on the 128 MB module — the MiSTer work becomes pure WIDTH (SDRAMW
+  23→24 + bank/prog/ioctl +1 bit + the core's buses), no content
+  re-layout, one romset for all three implementations, zero gameplay
+  consequence.
+
+Instruments the exploration located, for the record: `tests/audit_gfx_merged_
+census.sh` (as-built bank4 45,737 / bank5 6,610 of 65,536; all four pools
+empty), `build/m3b_merged13/gen.log` (wide_ext high-water `0x4D1100`,
+1.24 MB spare — but `vsw.44` is WRITTEN while `vsw.43` is empty, so the
+extent is NOT the cursor; measure before quoting 5 MB), `tools/obj_
+records.py` / `build/manifest/gfx_layout3.toml` for the static bands.
+
 ## Session 14z-106 — HOUSEKEEPING (maintainer-ruled), then the MiSTer
 ## alignment brief (no core work until the questions below are answered)
 
@@ -935,6 +1001,24 @@ Original write-up kept below.
 
 ## Decisions pending (human)
 
+- **THE MiSTer PROFILE SHAPE (14z-106, slice B measured).** The numbers
+  (`docs/project/mister_fit.md`) remove the roster trade-off: the group-C
+  art (6.39 MB) cannot fit vanilla's 32 MB GFX (0.49 MB blank, upper
+  bound), so any MiSTer build needs a wider GFX tier than jtcps2's
+  documented 64 MB `JTFRAME_SDRAM_LARGE`. Options: **(A) WIDE v1 verbatim
+  (PRG 6 / GFX 48 / QSound 16 MB) on a 128 MB SDRAM tier** — one profile
+  and one romset across FBNeo/MAME/MiSTer, MiSTer work = width plumbing
+  only (jtframe `SDRAMW` 23→24 and +1 bank/prog/ioctl bit, the core's
+  `main_rom_addr`/gfx/`qsnd_addr` buses, the 14z-86 QSound latch fix), no
+  content change; cost: framework surgery, profile-gated in the fork,
+  ONE hardware requirement (the 128 MB module the maintainer has — users
+  with 32/64 MB modules cannot run it, which the README must say). **(B)
+  a tighter MiSTer-only profile** (e.g. PRG 5 MB / GFX 40 MB / QS 9 MB):
+  saves nothing architecturally — every bus still widens by one bit, and
+  it forks the romset/manifests/tests into a second generation for no
+  gain. **RECOMMENDATION: A.** Gameplay-visible consequence: none; the
+  only player-facing fact is the 128 MB requirement.
+
 - ~~**MiSTer ALIGNMENT (14z-106) — five questions before any RTL.**~~
   **ALL FIVE RULED (maintainer, 2026-08-22).** Rulings, then what each
   one commits us to; the original brief follows unchanged.
@@ -1410,7 +1494,9 @@ Original write-up kept below.
   newcomers; hold-Start alternates are the fallback. See 14z-59l.**
 - See SPEC §7 for the rest. Nothing blocks current work.
 
-- **THE REPOSITORY LICENCE (14z-106).** The tree has no LICENSE file.
+- ~~**THE REPOSITORY LICENCE (14z-106).**~~ **DECIDED (maintainer,
+  2026-08-22): GPL-3.0 for everything** — `LICENSE` added (the FSF text
+  verbatim), README "Licence" section. Original entry: The tree has no LICENSE file.
   The jtcores fork is GPL-3.0 by obligation; the licence of THIS tree
   (tools, patches, docs, authored assets — never ROM bytes, rule 7) is
   undecided. Options: GPL-3.0 across the board (simplest, one licence
