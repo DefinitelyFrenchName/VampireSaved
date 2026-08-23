@@ -1,0 +1,104 @@
+From 4f25cc74e23bc8d1343e23ff75de84d7090ecd2c Mon Sep 17 00:00:00 2001
+From: Chaton <definitelyfrenchname@gmail.com>
+Date: Sun, 23 Aug 2026 09:22:57 +0200
+Subject: [PATCH] jtframe/sim: advance the model's own clock, so `#` delays
+ fire under Verilator
+
+`jtsim -verilator -stats` is inert at v1.7.3, for three independent reasons.
+This commit fixes the one that lives in test.cpp.
+
+hdl/ver/test.cpp keeps a private `simtime` counter and never calls
+VerilatedContext::time(). VerilatedContext::time() therefore stays 0 for the
+whole run -- and that is the clock $time reads and the clock the --timing
+delay scheduler compares its deadlines against. So every `#` delay in the
+design has a deadline that never arrives. The SDRAM usage reporter
+(hdl/sdram/jtframe_sdram_stats_sim.v:112, and the identical construct in
+hdl/sdram/jtframe_romrq_bcache.v:266) is an `initial forever #16_666_667`,
+so it compiles, elaborates, and prints nothing.
+
+Fixed by advancing the context clock alongside simtime, in JTSim::advance_time().
+Naively assigning time()+=semi_period is NOT enough and was measured to abort
+the run: a delay deadline lands wherever the design put it, not on the
+half-period grid, and Verilator fatals with "Encountered process that
+should've been resumed at an earlier simulation time. Missed a time slot?"
+(verilated_timing.cpp:85). So the step lands on every pending time slot on
+the way, using the model's own eventsPending()/nextTimeSlot(). eval() at an
+intermediate time changes no input, hence creates no clock edge; it only
+lets the delayed process resume.
+
+semi_period is in picoseconds and the sim is built with
+--timescale-override 1ns/1ps, so the arithmetic is exact. This is not gated:
+it changes no DUT behaviour, and without --timing eventsPending() is always
+false, so it costs one predictable branch per half cycle.
+
+The other two reasons are caller-side and are handled in this project's
+tools/run_sim_jtcps2.sh rather than here, since they are command-line
+plumbing:
+  * bin/jtsim:416-418 defines JTFRAME_SDRAM_STATS but nothing ever puts
+    hdl/sdram/jtframe_sdram_stats_sim.v on the compile list, so
+    game_test.v:380-392 instantiates a module Verilator cannot find;
+  * Verilator 5 refuses `#` delays without --timing (%Error-NEEDTIMINGOPT),
+    and --no-timing would compile the reporter into silence.
+
+All three are upstream bugs rather than fork artifacts. Not filed as an
+issue/PR from here.
+---
+ modules/jtframe/hdl/ver/test.cpp | 28 ++++++++++++++++++++++++++++
+ 1 file changed, 28 insertions(+)
+
+diff --git a/modules/jtframe/hdl/ver/test.cpp b/modules/jtframe/hdl/ver/test.cpp
+index cec143d8c..ab4139636 100644
+--- a/modules/jtframe/hdl/ver/test.cpp
++++ b/modules/jtframe/hdl/ver/test.cpp
+@@ -453,6 +453,32 @@ class JTSim {
+         }
+     }
+     void reset(int r);
++    // Keep the MODEL's clock in step with ours. simtime is a private counter;
++    // VerilatedContext::time() is what $time reads and what the --timing delay
++    // scheduler compares its deadlines against, and upstream never advances
++    // it -- so under Verilator every `#` delay in the design has a deadline
++    // that never arrives. That is why `jtsim -verilator -stats` reports
++    // nothing: the reporter in jtframe_sdram_stats_sim.v is an
++    // `initial forever #16_666_667`.
++    //
++    // A delay deadline lands wherever the design put it, NOT on our
++    // half-period grid, so stepping blindly by semi_period jumps over it and
++    // Verilator aborts with "Encountered process that should've been resumed
++    // at an earlier simulation time. Missed a time slot?" (measured). Land on
++    // each pending slot on the way. eval() at an intermediate time changes no
++    // input, so it creates no clock edge -- it only lets the delayed process
++    // resume. semi_period is in ps and the sim is built 1ns/1ps, so the
++    // arithmetic is exact; without --timing eventsPending() is always false
++    // and this costs one predictable branch per half cycle.
++    void advance_time() {
++        vluint64_t target = game.contextp()->time() + semi_period;
++        int guard = 1000; // a `#0` re-arming forever must not hang the sim
++        while( game.eventsPending() && game.nextTimeSlot() <= target && guard-- ) {
++            game.contextp()->time( game.nextTimeSlot() );
++            game.eval();
++        }
++        game.contextp()->time( target );
++    }
+ public:
+     int finish_time, finish_frame, totalh, totalw, activeh, activew;
+     bool done() {
+@@ -879,6 +905,7 @@ void JTSim::clock(int n) {
+ #endif
+         last_dwnd = cur_dwn;
+         simtime += semi_period;
++        advance_time();
+ #ifdef _DUMP
+         if( tracer && dump_ok ) tracer->dump(simtime);
+ #endif
+@@ -890,6 +917,7 @@ void JTSim::clock(int n) {
+         if( game.contextp()->gotFinish() ) return;
+         sdram.update();
+         simtime += semi_period;
++        advance_time();
+         ticks++;
+ 
+ #ifdef _DUMP
+-- 
+2.50.1 (Apple Git-155)
+

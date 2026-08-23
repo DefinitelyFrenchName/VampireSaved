@@ -1,0 +1,68 @@
+# 14z-107 (3) — the Verilator SDRAM model fix (fork commit 3), BOTH CONTROLS.
+# Stock cps2 core, stock vsavj, tests/replays/05_timeout_idle.rpl, 620
+# ABSOLUTE frames (the 462 download frames included), --video.
+# BEFORE = fork pin 553dd56 (the model as upstream wrote it).
+# AFTER  = fork pin 6c32be8 (+the two -stats fixes, which touch no addressing).
+# No ROM bytes here (CLAUDE.md rule 7): pixel counts and occupancy statistics
+# only. Re-derivable with tools/run_sim_jtcps2.sh ... --frames 620 --video.
+
+== THE DERIVATION (jtframe_sdram64_bank.v, AW = SDRAMW = 23) ==
+  :75-76  localparam ROW=13, COW= AW==22 ? 9 : 10;
+  :127    addr_row = AW==22 ? addr[AW-1:AW-ROW] : addr[AW-2:AW-1-ROW];
+  :219    sdram_a[10:0] = { precharge_flag, addr[AW-1], addr[8:0] };
+  => row    (ACTIVE)      = addr[21:9]              13 bits
+  => column (READ/WRITE)  = { addr[22], addr[8:0] } 10 bits, and sdram_a[9]
+     carries addr[22] -- the TOP address bit. addr[9] is a ROW bit.
+  Upstream test.cpp rebuilt only (SDRAM_A & 0x1ff) on READ/WRITE, so addr[22]
+  was dropped and ba_addr could never exceed 0x3fffff: the upper 8 MB of every
+  bank was NEVER ADDRESSED (it stayed at the constructor's memset(0)) and the
+  lower 8 MB was overwritten by the upper half's content during the download.
+  The "widen the column mask to 0x3ff" fix recorded in 14z-107 (2) would have
+  folded addr[22] onto addr[9] and made a different wrong map.
+
+== CONTROL 1 (regression): the anchor did NOT move ==
+tests/test_mister_sim_anchor.sh, same frozen numbers:
+  MAME anchor 2146 | sim anchor 2507 | skew +361 (band 361 +/- 30)  PASS
+Proved, not lucky: every bank-0 region is below WORD address 0x400000 --
+PRG 0, VRAM 0x200000, ORAM 0x280000, WRAM 0x300000, SND 0x380000
+(jtcps1_sdram.v:158-164, 16-bit words), 68k window main_rom_addr[20:0].
+Measured on the post-download bank images of the FIXED run:
+  bank0: 16 MB   low-half non-zero 39.3%   HIGH-half non-zero  0.0%
+  bank1: 16 MB   low-half non-zero 92.7%   HIGH-half non-zero  0.0%
+  bank2: 16 MB   low-half non-zero 89.7%   HIGH-half non-zero 87.6%
+  bank3: 16 MB   low-half non-zero 82.0%   HIGH-half non-zero 90.1%
+Banks 0 and 1 never use the upper 8 MB at all -> work RAM (bank 0 byte
+0x600000) was never aliased and the oracle could not move. Banks 2 and 3 DO,
+so all of GFX was affected. (Bank 1's empty upper 8 MB is also the space the
+BANK REPACK ruling wants: PCM occupies the lower half alone.)
+
+== CONTROL 2 (must-fire): the rendered frames CHANGED ==
+Same replay, same window, before vs after. 384x224 = 86,016 px per frame.
+"inked" = non-black pixels of the AFTER frame (the boot self-test screen is
+mostly black, so the whole-frame percentage understates the change).
+
+  frame_00001   byte-identical   0 px        (pre-download black screen:
+                                              the run's own negative control)
+  frame_00466   DIFFERS          106 px  0.12%   78% of the 135 inked px
+  frame_00480   DIFFERS          311 px  0.36%   72% of the 431 inked px
+  frame_00494   DIFFERS          526 px  0.61%   74% of the 715 inked px
+  frame_00508   DIFFERS          731 px  0.85%   72% of the 1018 inked px
+  frame_00522   DIFFERS          980 px  1.14%   71% of the 1382 inked px
+  frame_00524   DIFFERS         1241 px  1.44%   71% of the 1757 inked px
+  frame_00527   DIFFERS         1361 px  1.58%   71% of the 1928 inked px
+  frames 00465 / 00543 / 00544 / 00547 / 00548 exist in only ONE of the two
+  runs: test.cpp writes a jpg only when the frame CHANGED, so even the set of
+  rendered frames differs.
+
+WHAT IS ON THOSE FRAMES. The CPS-2 boot self-test. BEFORE the fix it is
+garbled glyphs; AFTER it reads, legibly:
+      WORK    RAM OK        CPS2    RAM OK
+      CPS0    RAM OK        OBJECT  RAM OK
+      CPS1    RAM OK        Q SOUND RAM OK
+i.e. ~71-78% of every inked pixel changed, and the change is text becoming
+readable. 14z-106 slice C's "frame_00480.jpg shows sprites" is now retired:
+it was rendering from a corrupt tile map.
+
+== WALL TIME (Apple Silicon, Verilator 5.050, two sims in parallel) ==
+  620-frame run incl. the 462-frame ROM download: 14m56s (before),
+  12m40s (after).

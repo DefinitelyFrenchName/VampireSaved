@@ -14,7 +14,14 @@
 # here — so the change stays a reviewable in-tree file (CLAUDE.md rule 1 v2)
 # and each commit can be read on its own; tests/test_jtcores_twin.sh holds
 # the series, the submodule and the core twin to each other. It was a single
-# file until 14z-107 added the second commit (the sim work-RAM hook).
+# file until 14z-107 added the second commit (the sim work-RAM hook), and
+# 14z-107 (3) added two more — both Verilator-harness bug fixes, no RTL:
+# 0003 the SDRAM model's dropped top address bit at AW=23 (the upper 8MB of
+# every bank aliased onto the lower 8MB) and 0004 the model clock that never
+# advanced (so no `#` delay in the design ever fired, which is why
+# `jtsim -verilator -stats` reported nothing) and 0005 raw machine-readable
+# counters in the SDRAM usage reporter, whose two existing lines are
+# cumulative and rounded and cannot be differenced per phase.
 #
 # Simulation lane deps (brew): go coreutils gnu-sed xmlstarlet verilator
 # imagemagick — docs/platform/mister.md "Recipe".
@@ -27,7 +34,7 @@ set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 SRC="$REPO/emu/jtcores"
 UPSTREAM_TAG_SHA="63688ce5f4de9b92ac4d2ea4b306009b8ba4bcdb"   # jotego/jtcores v1.7.3
-PINNED="553dd56f64ed51aedd10be63e20f075bc4c10de2"             # fork branch vampire-saved
+PINNED="74ed17dfcc55b5558d31466494a4d5da9bd4d9b8"             # fork branch vampire-saved
 FORK_URL="https://github.com/DefinitelyFrenchName/jtcores"
 
 if [ ! -f "$SRC/.gitmodules" ]; then
@@ -54,7 +61,7 @@ echo "jtcores @ $HEAD (fork of v1.7.3 $UPSTREAM_TAG_SHA); jtdsp16 $(git -C "$SRC
 # The reviewable mirror of the fork's delta, one file per commit IN ORDER.
 # The names are declared here (not derived from the commit subject) so the
 # in-tree filenames stay stable and greppable; the gate reads this same list.
-PATCH_NAMES="0001-cps2w-scaffold.patch 0002-jtframe-sim-wramdump.patch"
+PATCH_NAMES="0001-cps2w-scaffold.patch 0002-jtframe-sim-wramdump.patch 0003-jtframe-sim-sdram-top-address-bit.patch 0004-jtframe-sim-advance-model-time.patch 0005-jtframe-sim-sdram-stats-raw.patch"
 i=1
 for name in $PATCH_NAMES; do
     sha="$(git -C "$SRC" rev-list --reverse "$UPSTREAM_TAG_SHA..$PINNED" | sed -n "${i}p")"

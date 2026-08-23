@@ -164,9 +164,13 @@ import glob, os, re, sys
 # reported as static, and the second one then ran for 208s inside a chain
 # advertised as emulator-free. So: match every wrapper name, and follow
 # sourced libs one level.
+# run_sim_jtcps2.sh is the THIRD implementation's wrapper (Jotego's RTL under
+# Verilator, 14z-107): a gate that calls it costs ~50 min and needs Verilator
+# plus ROMDIR, so it belongs in the manual/emulator tier exactly like the MAME
+# and FBNeo wrappers.
 EMU = re.compile(r'run_(replay_)?(mame|fbneo)\.sh|run_replay_guarded\.sh'
                  r'|MAME_BIN|FBNEO_BIN|autoboot_script|emu/fbneo/fbneo'
-                 r'|run_battery')
+                 r'|run_battery|run_sim_jtcps2\.sh')
 SRC = re.compile(r'^\s*\.\s+"?\$(?:REPO|\{REPO\})"?/(tests/lib/[a-z0-9_]+\.sh)',
                  re.M)
 
