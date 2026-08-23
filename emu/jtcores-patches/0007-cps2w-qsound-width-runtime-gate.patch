@@ -1,0 +1,1732 @@
+From 4840df8a80734d50bbeb13243db42eb17eea393e Mon Sep 17 00:00:00 2001
+From: Chaton <definitelyfrenchname@gmail.com>
+Date: Sun, 23 Aug 2026 14:56:54 +0200
+Subject: [PATCH] cps2w: the QSound sample-bank width fix, gated by a RUNTIME
+ profile bit
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Slice D1 of the Vampire Saved MiSTer arc, and the first commit in which
+cores/cps2w carries RTL. cores/cps2, cores/cps15 and cores/cps1 stay
+BYTE-UNTOUCHED; the diff between the core directories is the trust surface.
+
+THE DEFECT. cores/cps15/hdl/jtcps15_sound.v latches only seven QSound
+sample-bank bits (`qsnd_addr[22:16] <= dsp_ab[6:0]`), so DSP sample banks
+0x80 and up alias onto 0x00-0x7F and MIS-PLAY existing audio rather than
+going silent. The CPS-2 WIDE romset puts its QSound extension in banks
+0x80-0x8E.
+
+THE BANK BIT IS dsp_ab[7], MEASURED. The commented-out alternative ordering
+left at jtcps15_sound.v:416-417 shows the original author was unsure. MAME's
+low-level QSound device settles it: the DSP16A external ROM space is mapped
+`map(0x0000,0x7fff).mirror(0x8000)` and the bank latch is
+`m_rom_bank = (m_rom_bank & 0x8000U) | offset;` with the sample byte read at
+`(u32(m_rom_bank) << 16) | m_rom_offset` — a straight binary bank number in
+ab[14:0], no permutation. So widening the latch one bit at a time is correct.
+
+RUNTIME, NOT `ifdef`. The profile is decoded from header byte 41 of the ROM
+download (jtcps1_prom_we.v ignores bytes 41-43; its own comment at :52-54
+records ten reserved header bytes). ACTIVE LOW, because `[header] fill=0xff`
+means an unwritten byte is 0xFF and every stock MRA this core emits must stay
+byte-identical to cores/cps2's; jtframe's own JOY_BYTE has the same shape. So
+a stock MRA runs jtcps2w.rbf as a stock machine BY CONSTRUCTION.
+
+WHAT IS HERE
+  hdl/jtcps2w_profile.v     new — the header-byte decode -> wide_en
+  hdl/jtcps2w_qsnd_bank.v   new — the gated bank latch; with wide_en low it
+                            is bit-for-bit the stock expression, reset value
+                            included
+  hdl/jtcps15_sound.v       override — qsnd_addr 23 -> 24 bits, the latch
+                            replaced by the module above, new wide_en input
+  hdl/jtcps2_game.v         override — 24-bit qsnd_addr, the profile
+                            instance, wide_en routed, PCM slot fed
+                            qsnd_addr[22:0]
+  hdl/pal_lut.hex           the palette brightness LUT, copied verbatim from
+                            cores/cps2/hdl and force-added (*.hex is in this
+                            repo's .gitignore, which is why a new core can
+                            lose it silently). EVERY core that instantiates
+                            jtcps1_pal carries its own copy — cps1, cps15 and
+                            cps2 all do — because jtframe_ram resolves
+                            SYNFILE by bare name and jtsim symlinks
+                            $CORES/<core>/hdl/*.hex into the sim directory.
+                            Without it the core RENDERS A BLACK SCREEN:
+                            $readmemh fails with a warning, the LUT reads
+                            back zero and red/green/blue are pinned to 0.
+                            Measured on the Verilator lane before the fix:
+                            cps2 rendered 12 changed frames in 640 (frame 465
+                            mean brightness 146), cps2w rendered exactly one,
+                            mean 0.
+  cfg/game.yaml             pulls the four .v files from cps2w and drops the
+                            two shared originals (jtframe dedups by path, so
+                            both copies would otherwise compile)
+  cfg/mame2mra.toml         the setname="vsavjw" header row, offset 41 = 0xFE
+  ver/game/                 the Verilator sim lane's entry point
+
+PCM_AW STAYS 23, AND THE DESIGN NOTE THAT SAID 24 IS WRONG. jtframe's 8-bit
+SDRAM slot cannot be widened past SDRAMW: jtframe_romrq_bcache.v:74
+`{SDRAMW-AW{1'b0}}` becomes a replication of -1 at AW=24, SDRAMW=23, which
+Verilator rejects outright. That is also why the placement map splits QSound
+across two banks instead of growing one slot. Until slice D2 places the
+extension, qsnd_addr[23] is produced and gated but not routed; with wide_en
+low it is constant 0, so the address the PCM slot sees is bit-for-bit the
+reference core's.
+
+MEASURED INERT. cps2 and cps2w run the same stock vsavj download under
+Verilator with BIT-IDENTICAL 68k work RAM across 101 consecutive frames, and
+with pal_lut.hex in place cps2w reproduces the reference core's match-start
+anchor exactly (simulated frame 2502).
+
+Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_01C93kTvSDUfHLL5sbjrArzn
+---
+ cores/cps2w/README.md               |  40 +-
+ cores/cps2w/cfg/game.yaml           |  45 +-
+ cores/cps2w/cfg/mame2mra.toml       |  24 +
+ cores/cps2w/hdl/jtcps15_sound.v     | 689 ++++++++++++++++++++++++++++
+ cores/cps2w/hdl/jtcps2_game.v       | 586 +++++++++++++++++++++++
+ cores/cps2w/hdl/jtcps2w_profile.v   |  75 +++
+ cores/cps2w/hdl/jtcps2w_qsnd_bank.v |  66 +++
+ cores/cps2w/hdl/pal_lut.hex         |  16 +
+ cores/cps2w/ver/game/Makefile       |   1 +
+ cores/cps2w/ver/game/rom2hex.cc     |   1 +
+ 10 files changed, 1531 insertions(+), 12 deletions(-)
+ create mode 100644 cores/cps2w/hdl/jtcps15_sound.v
+ create mode 100644 cores/cps2w/hdl/jtcps2_game.v
+ create mode 100644 cores/cps2w/hdl/jtcps2w_profile.v
+ create mode 100644 cores/cps2w/hdl/jtcps2w_qsnd_bank.v
+ create mode 100644 cores/cps2w/hdl/pal_lut.hex
+ create mode 120000 cores/cps2w/ver/game/Makefile
+ create mode 120000 cores/cps2w/ver/game/rom2hex.cc
+
+diff --git a/cores/cps2w/README.md b/cores/cps2w/README.md
+index 240e58c17..f5ef483ba 100644
+--- a/cores/cps2w/README.md
++++ b/cores/cps2w/README.md
+@@ -5,12 +5,38 @@ untouched and separately usable. It is the MiSTer target of the
+ **Vampire Saved** project (full-roster Vampire Savior on the real CPS-2
+ engine): https://github.com/DefinitelyFrenchName/VampireSaved
+ 
+-Status: SCAFFOLD. `cfg/` is a twin of `cores/cps2/cfg` with only
+-`CORENAME=JTCPS2W` changed and the MRA set restricted to the Vampire
+-Savior family (the stock reference leg — the patched core running the
+-unmodified game must behave exactly as `jtcps2` does). No RTL differs
+-yet; every RTL change that follows is profile-gated and documented in the
+-Vampire Saved repository (`docs/platform/mister.md`,
+-`docs/project/cps2_wide.md`).
++## The profile is selected at RUNTIME, from the MRA
++
++`cores/cps2` and `cores/cps15` are **byte-untouched**. This core reaches the
++widened behaviour through **header byte 41 of the ROM download**, decoded by
++`hdl/jtcps2w_profile.v` into a `wide_en` wire that gates every widened site.
++The byte is ACTIVE LOW because jtframe fills the header with `0xFF`
++(`[header] fill=0xff`), so an MRA that says nothing runs this RBF as a
++**stock machine** — the stock `vsavj` MRA emitted here is byte-identical to
++`cores/cps2`'s except `<rbf>`. That is the emulator superset invariant made
++structural rather than argued.
++
++## What differs from `cores/cps2`, and why each file had to
++
++`cfg/game.yaml` pulls a file from `cores/cps2w/hdl` only when it must differ;
++everything else still resolves to `cores/cps2`, `cores/cps1` and
++`cores/cps15`.
++
++| file | why |
++|---|---|
++| `hdl/jtcps2w_profile.v` (new) | decodes the profile bit out of the ROM header |
++| `hdl/jtcps2w_qsnd_bank.v` (new) | the QSound sample-bank latch, gated: 8 bank bits when `wide_en`, the stock 7 otherwise |
++| `hdl/jtcps15_sound.v` (override) | `qsnd_addr` 23 → 24 bits and the latch above; the file is SHARED with `cores/cps15` |
++| `hdl/jtcps2_game.v` (override) | 24-bit `qsnd_addr`, the profile instance, `wide_en` routed; the file is SHARED with `cores/cps2` |
++| `hdl/pal_lut.hex` | the palette brightness LUT. NOT optional and NOT cosmetic-only: every core instantiating `jtcps1_pal` carries its own copy, `jtframe_ram` resolves `SYNFILE` by bare name, and `*.hex` is in this repo's `.gitignore` — so a new core loses it silently and RENDERS A BLACK SCREEN |
++| `cfg/mame2mra.toml` | the `cps2w.cpp` sourcefile opt-in, the Vampire Savior `mustbe`, the mandatory QSound trim, and the profile header byte |
++| `cfg/macros.def` | `CORENAME=JTCPS2W` |
++
++Status: **slice D1** — the QSound sample-bank width, runtime-gated. The
++placement work (SDRAM bank split, the group-C GFX redirect), the object
++tile-code promote and the 68k PRG window are slices D2-D4 and are not here
++yet. The design, the arithmetic and the gates live in the Vampire Saved
++repository: `docs/project/mister_map.md`, `docs/platform/mister.md`,
++`docs/project/cps2_wide.md`.
+ 
+ Licence: GPL-3.0, as jtcores. See the repository LICENSE.
+diff --git a/cores/cps2w/cfg/game.yaml b/cores/cps2w/cfg/game.yaml
+index 6271ac102..e03d1f8cd 100644
+--- a/cores/cps2w/cfg/game.yaml
++++ b/cores/cps2w/cfg/game.yaml
+@@ -1,7 +1,35 @@
++# jtcps2w — the CPS-2 WIDE (Vampire Saved) file list.
++#
++# THIS FILE IS NO LONGER cores/cps2/cfg/game.yaml VERBATIM, and the delta IS
++# the core's trust surface. Since slice D1 (14z-107) cps2w carries RTL: a file
++# is copied into cores/cps2w/hdl ONLY when it must differ, and it is then
++# pulled from `cps2w` here and REMOVED from the reference core's list, because
++# jtframe deduplicates by full path and would otherwise compile both copies of
++# the same module. Everything else still resolves to cores/cps2, cores/cps1
++# and cores/cps15, which stay BYTE-UNTOUCHED.
++#
++# THE OVERRIDES, and why each one has to differ (docs/project/mister_map.md):
++#   jtcps2_game.v    — the game top: 24-bit qsnd_addr, the profile gate
++#                      instance, wide_en routed to the sound block.
++#   jtcps15_sound.v  — the QSound block: 24-bit qsnd_addr and the sample-bank
++#                      latch replaced by the gated jtcps2w_qsnd_bank.
++# THE NEW FILES:
++#   jtcps2w_profile.v    — decodes the CPS-2 WIDE bit out of the ROM header.
++#   jtcps2w_qsnd_bank.v  — the gated sample-bank latch (the D1 trust surface).
++#
++# The `qsound.yaml` block below is cores/cps15/cfg/qsound.yaml INLINED minus
++# jtcps15_sound.v: that yaml pulls the shared file, so cps2w cannot include it
++# and override the file at the same time. Keep the two in step by hand if the
++# pin ever moves; tests/test_jtcores_twin.sh freezes this list.
+ game:
++  - from: cps2w
++    get:
++      - jtcps2_game.v          # OVERRIDE of cores/cps2/hdl
++      - jtcps15_sound.v        # OVERRIDE of cores/cps15/hdl
++      - jtcps2w_profile.v      # new
++      - jtcps2w_qsnd_bank.v    # new
+   - from: cps2
+     get:
+-      - jtcps2_game.v
+       - jtcps2_main.v
+       - jtcps2_obj.v
+       - jtcps2_objram.v
+@@ -21,11 +49,18 @@ game:
+   - from: cps1
+     get:
+       - common.yaml
+-  - from: cps15
+-    get:
+-      - qsound.yaml
+ jtframe:
+   - from: ram
+     get:
+       - jtframe_dual_ram16.v
+-
++  # --- from cores/cps15/cfg/qsound.yaml, minus the overridden game file ---
++  - from: cpu
++    get:
++      - jtframe_kabuki.v
++  - from: sound
++    get:
++      - jtframe_fir.v
++      - jtframe_uprate2_fir.v
++modules:
++  jt:
++    - name: jtdsp16
+diff --git a/cores/cps2w/cfg/mame2mra.toml b/cores/cps2w/cfg/mame2mra.toml
+index 9d1b3066d..9d607a50e 100644
+--- a/cores/cps2w/cfg/mame2mra.toml
++++ b/cores/cps2w/cfg/mame2mra.toml
+@@ -85,6 +85,30 @@ data=[
+     # Spinner games:
+     { machine="pzloop2",  offset=40, data="fd" },
+     { machine="ecofghtr", offset=40, data="fe" },
++
++    # ── CPS-2 WIDE v1: THE RUNTIME PROFILE BIT (14z-107 slice D1) ─────────
++    # docs/project/mister_map.md §9 Q8, ruled by the maintainer 2026-08-23:
++    # the profile is selected at RUNTIME from a spare header bit, NOT by an
++    # `ifdef`. The MRA is therefore the profile selector, and stock `vsavj`
++    # on jtcps2w.rbf runs as a stock machine BY CONSTRUCTION — which is what
++    # makes CLAUDE.md rule 1 v2's "profile-gated so stock vsavj is untouched"
++    # a fact on FPGA rather than an inertness argument.
++    #
++    # BYTE 41 (0x29). jtcps1_prom_we.v consumes header bytes 0-7 (region
++    # starts), 8-39 (`is_cps`, the CPS config registers) and 40 (JOY_BYTE);
++    # 41-43 fall through every branch and are ignored, and 44-63 are the
++    # CPS-2 key. The header's own comment (jtcps1_prom_we.v:52-54, "6 are
++    # actually used and 10 are reserved") is the licence to use it.
++    #
++    # ACTIVE LOW, and that is forced, not chosen: `fill=0xff` above means an
++    # unwritten byte is 0xFF, and every stock MRA this core emits must stay
++    # byte-identical to cores/cps2's. Only a polarity where the FILL means
++    # "profile off" can do that. jtframe's own JOY_BYTE is the same shape
++    # (0xFF = mode 3; games wanting mode 0 write 0xFC).
++    #
++    # setname="vsavjw" scores 3 in Selectable.Match, so this row applies to
++    # the WIDE set and to nothing else — no other MRA gains a byte.
++    { setname="vsavjw",   offset=41, data="fe" },
+ ]
+ 
+ [rom]
+diff --git a/cores/cps2w/hdl/jtcps15_sound.v b/cores/cps2w/hdl/jtcps15_sound.v
+new file mode 100644
+index 000000000..86bfdb777
+--- /dev/null
++++ b/cores/cps2w/hdl/jtcps15_sound.v
+@@ -0,0 +1,689 @@
++/*  This file is part of JTCORES1.
++    JTCORES1 program is free software: you can redistribute it and/or modify
++    it under the terms of the GNU General Public License as published by
++    the Free Software Foundation, either version 3 of the License, or
++    (at your option) any later version.
++
++    JTCORES1 program is distributed in the hope that it will be useful,
++(*keep*)     but WITHOUT ANY WARRANTY; without even the implied warranty of
++    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++    GNU General Public License for more details.
++
++    You should have received a copy of the GNU General Public License
++    along with JTCORES1.  If not, see <http://www.gnu.org/licenses/>.
++
++    Author: Jose Tejada Gomez. Twitter: @topapate
++    Version: 1.0
++    Date: 19-9-2020 */
++
++// ---------------------------------------------------------------------------
++// CPS-2 WIDE (Vampire Saved) OVERRIDE of cores/cps15/hdl/jtcps15_sound.v.
++// Copied at jtcores v1.7.3 because the QSound sample-bank latch has to differ
++// and the file is SHARED with cores/cps15 and cores/cps2 — editing it in place
++// would change the reference cores. The diff against the original IS the trust
++// surface (CLAUDE.md rule 1 v2) and is frozen by
++// tests/test_mister_wide_gate.sh. THREE deltas, all of them the QSound
++// address width and its runtime gate:
++//   1. `qsnd_addr` 23 -> 24 bits, and it is now a wire built from the two
++//      halves rather than a single `output reg`;
++//   2. the low half keeps its own register `qsnd_lo` (was qsnd_addr[15:0]);
++//   3. the bank latch moved into `jtcps2w_qsnd_bank`, gated by the new
++//      `wide_en` input. With wide_en LOW that module is bit-for-bit the
++//      expression this file used to carry, reset value included.
++// Nothing else in this file is touched.
++// ---------------------------------------------------------------------------
++
++module jtcps15_sound(
++    input             rst,
++    input             clk96,
++    input             clk48,
++    input             cen8,
++    input             vol_up,
++    input             vol_down,
++    output reg [12:0] volume, // volume moves in 2dB steps
++    // Decode keys
++    input             kabuki_we,
++    input             kabuki_en,
++    // CPS-2 WIDE profile gate (jtcps2w_profile.v)
++    input             wide_en,
++
++    // Interface with main CPU
++    input      [23:1] main_addr,
++    input      [ 7:0] main_dout,
++    output reg [ 7:0] main_din,
++    input             main_ldswn,
++    input             main_buse_n,
++    output            main_busakn,
++    output            main_waitn,
++
++    // ROM
++    output reg [18:0] rom_addr, // 512 kByte
++    output reg        rom_cs,
++    input      [ 7:0] rom_data,
++    input             rom_ok,
++
++    // QSound sample ROM
++    output     [23:0] qsnd_addr, // 16 MB. Bit 23 is the CPS-2 WIDE
++                                 // extension and is 0 unless wide_en.
++    output            qsnd_cs,
++    input      [ 7:0] qsnd_data,
++    input             qsnd_ok,
++
++    // ROM programming interface
++    input      [12:0] prog_addr,
++    input      [ 7:0] prog_data,
++    input             prog_we,
++
++    // Sound output
++    output signed [15:0] left,
++    output signed [15:0] right,
++    output               sample
++);
++
++wire        cpu_cen, cen_extra;
++wire [ 7:0] dec_dout, ram_dout, cpu_dout, bus_din;
++wire [15:0] A, bus_A;
++reg  [ 3:0] bank;
++reg  [ 7:0] cpu_din;
++reg         rstn;
++reg         ram_cs, bank_cs, qsnd_wr, qsnd_rd;
++wire        ram_we, int_n, mreq_n, wr_n, rd_n, m1_n, iorq_n;
++wire        busrq_n, busak_n, halt_n, z80_buswn;
++wire        bus_wrn, bus_mreqn, main_busn;
++reg         main_busn_dly;
++
++// QSound registers
++reg         [23:0] cpu2dsp;
++reg                dsp_irq; // UR6B in schematics
++reg         [ 1:0] dsp_datasel;
++reg  signed [15:0] reg_left, reg_right, pre_l, pre_r;
++wire signed [15:0] fxd_l, fxd_r;
++wire               resample48;
++
++// DSP16 wires
++wire [15:0] dsp_ab, dsp_pbus_out;
++reg  [15:0] dsp_pbus_in;
++wire        dsp_pods_n, dsp_pids_n;
++wire        dsp_do, dsp_ock, dsp_doen;
++wire        dsp_iack, dsp_ext_rq;
++reg         dsp_rst;
++wire        dsp_psel, dsp_sadd, dsp_rdy_n;
++wire        dsp_cen_cko;
++wire        cen_dsp;
++reg         base_sample;
++
++reg         last_pids_n;
++reg         rom_okl, last_romcs;
++
++// CPS-2 WIDE: the sample address is now two pieces — the low 16 bits
++// latched from the DSP's parallel port here, the 8 bank bits latched
++// from dsp_ab by jtcps2w_qsnd_bank below.
++reg  [15:0] qsnd_lo;
++wire [ 7:0] qsnd_bank;
++
++assign qsnd_addr = { qsnd_bank, qsnd_lo };
++
++`ifndef NOSOUND
++assign      dsp_rdy_n = ~(dsp_irq | dsp_iack);
++assign      dsp_doen  = 1; // ignored by dsp16
++
++jtcps15_qsnd_cen u_dspcen(
++    .clk96       ( clk96       ),
++    .clk48       ( clk48       ),
++    .rst         ( rst         ),
++    .base_sample ( base_sample ),
++    .qsnd_ok     ( qsnd_ok     ),
++    .ext_rq      ( dsp_ext_rq  ),
++    .qsnd_cen    ( cen_dsp     ),
++    // sound resample
++    .l_in        ( pre_l       ),
++    .r_in        ( pre_r       ),
++    .l_out       ( fxd_l       ),
++    .r_out       ( fxd_r       ),
++    .resample48  ( resample48  )
++);
++
++`else
++reg rdy_reads, last_rd;
++assign      dsp_rdy_n = rdy_reads;
++
++always @(posedge clk48, posedge rst) begin
++    if( rst ) begin
++        rdy_reads <= 0;
++        last_rd   <= 0;
++    end else begin
++        last_rd <= qsnd_rd;
++        if( !qsnd_rd && last_rd ) rdy_reads <= ~rdy_reads;
++    end
++end
++`endif
++
++`ifdef SIMULATION
++wire bank_access = rom_cs & A[15];
++`endif
++
++reg [1:0] ram_ok;
++reg  main_busnl;
++wire bus_equ;
++
++assign bus_equ     = main_busn == main_busnl;
++assign ram_we      = ram_cs && !bus_wrn;
++assign bus_A       = main_busn ?        A : main_addr[16:1];
++assign bus_wrn     = main_busn ?     wr_n : main_ldswn;
++assign bus_din     = main_busn ? cpu_dout : main_dout;
++assign bus_mreqn   = main_busn ?   mreq_n : main_buse_n;
++assign main_busakn = main_busn_dly | main_busn | busrq_n |
++    //(rom_cs & ~(rom_ok & rom_okl)) |
++    (rom_cs & ~last_romcs);
++assign main_waitn  = rom_cs ? rom_ok & rom_okl : bus_equ & ram_ok[0];
++
++always @(posedge clk48) begin
++    main_busnl <= main_busn;
++    ram_ok <= { ram_ok[0] & bus_equ, bus_equ };
++    if(!main_busn) main_din <= cpu_din; // bus output
++    main_busn_dly <= main_busn;
++    rom_okl    <= rom_ok;
++    last_romcs <= rom_cs;
++end
++
++always @(negedge clk48) begin
++    rstn <= ~rst;
++end
++
++//always @(posedge clk48, posedge rst) begin
++always @(*) begin
++    //if ( rst ) begin
++    //    rom_cs    <= 0;
++    //    rom_addr  <= 16'd0;
++    //    ram_cs    <= 0;
++    //    bank_cs   <= 0;
++    //    qsnd_wr   <= 0;
++    //    qsnd_rd   <= 0;
++    //end else begin
++        rom_cs  = !bus_mreqn && (!bus_A[15] || bus_A[15:14]==2'b10);
++        //if(!bus_mreqn) begin
++        rom_addr = (bus_A[15] ? ({ 1'b0, bank, bus_A[13:0] } + 19'h8000) : { 4'b0, bus_A[14:0] });
++//            rom_addr = (~mreq_n & main_busakn) ?
++//                // Z80
++//                (bus_A[15] ? ({ 1'b0, bank, bus_A[13:0] } + 19'h8000) : { 4'b0, bus_A[14:0] }) :
++//                // M68000
++//                main_addr[19:1];
++        //end
++        ram_cs   = !bus_mreqn && (bus_A[15:12] == 4'hc || bus_A[15:12]==4'hf);
++        qsnd_wr  = !bus_mreqn && !bus_wrn && (bus_A[15:12] == 4'hd && bus_A[2:0]<=3'd2);
++        bank_cs  = !bus_mreqn && !bus_wrn && (bus_A[15:12] == 4'hd && bus_A[2:0]==3'd3);
++        qsnd_rd  = !bus_mreqn && !rd_n && (bus_A[15:12] == 4'hd && bus_A[2:0]==3'd7);
++   // end
++end
++
++// wire qs0l_w = qsnd_wr && A[2:0]==2'd0;
++// wire qs0h_w = qsnd_wr && A[2:0]==2'd1;
++wire qs1l_w = qsnd_wr && A[2:0]==2;
++reg [23:0] cpu2dsp_s;
++
++always @(posedge clk48, posedge rst) begin
++    if ( rst ) begin
++        bank    <= 4'd0;
++        cpu2dsp <= 24'd0;
++        dsp_rst <= 1;
++    end else begin
++        if( bank_cs ) begin
++            bank    <= bus_din[3:0];
++            dsp_rst <= ~bus_din[7];
++        end
++        if( qsnd_wr ) begin
++            case( A[2:0] )
++                0: cpu2dsp[15: 8] <= bus_din; // data word MSB
++                1: cpu2dsp[ 7: 0] <= bus_din; // data word LSB
++                2: cpu2dsp[23:16] <= bus_din; // address
++                default:;
++            endcase // A[2:0]
++        end
++    end
++end
++
++always @(*) begin
++    cpu_din =  rom_cs ? ( A[15] ? rom_data : dec_dout ) : (
++               ram_cs ? ram_dout : (
++              qsnd_rd ? { dsp_rdy_n, 3'b111, bank } : 8'hff
++              ));
++end
++
++assign busrq_n = main_buse_n;
++assign main_busn = busak_n;
++
++jtcps15_z80int u_z80int(
++    .clk    ( clk48     ),
++    .rst    ( rst       ),
++    .cen8   ( cen8      ),
++    .m1_n   ( m1_n      ),
++    .iorq_n ( iorq_n    ),
++    .int_n  ( int_n     )
++);
++
++jtcps15_z80wait u_extrawait(
++    .clk    ( clk48     ),
++    .rst    ( rst       ),
++    .cen8   ( cen8      ),
++    .m1_n   ( m1_n      ),
++    .addr   ( A[15:12]  ),
++    .cen_cpu( cen_extra )
++);
++
++jtframe_ram #(.AW(13)) u_z80ram( // 8 kB!
++    .clk    ( clk48         ),
++    .cen    ( 1'b1          ),
++    .data   ( bus_din       ),
++    .addr   ( bus_A[12:0]   ),
++    .we     ( ram_we        ),
++    .q      ( ram_dout      )
++);
++
++jtframe_kabuki u_kabuki(
++    .clk        ( clk48       ),    // Uses same clock as u_prom_we
++    .m1_n       ( m1_n        ),
++    .mreq_n     ( mreq_n      ),
++    .rd_n       ( rd_n        ),
++    .addr       ( A           ),
++    .din        ( rom_data    ),
++    .en         ( kabuki_en   ),
++    // Decode keys
++    .prog_data  ( prog_data   ),
++    .prog_we    ( kabuki_we   ),
++    .dout       ( dec_dout    )
++);
++
++jtframe_z80_romwait u_cpu(
++    .rst_n      ( rstn        ),
++    .clk        ( clk48       ),
++    .cen        ( cen_extra   ),
++    .cpu_cen    ( cpu_cen     ),
++    .int_n      ( int_n       ),
++    .nmi_n      ( 1'b1        ),
++    .busrq_n    ( busrq_n     ),
++    .m1_n       ( m1_n        ),
++    .mreq_n     ( mreq_n      ),
++    .iorq_n     ( iorq_n      ),
++    .rd_n       ( rd_n        ),
++    .wr_n       ( wr_n        ),
++    .rfsh_n     (             ),
++    .halt_n     ( halt_n      ),
++    .busak_n    ( busak_n     ),
++    .A          ( A           ),
++    .din        ( cpu_din     ),
++    .dout       ( cpu_dout    ),
++    // manage access to ROM data from SDRAM
++    .rom_cs     ( rom_cs      ),
++    .rom_ok     ( rom_ok      )
++);
++
++reg last_vol_up, last_vol_down;
++reg last_sadd, last_pods_n;
++reg audio_ws;
++reg dsp_dsel96;
++
++// DSP16 glue logic
++always @(posedge clk48, posedge rst) begin
++    if ( rst ) begin
++        dsp_irq    <= 0;
++        dsp_datasel<= 2'd0;
++    end else begin
++        last_pids_n <= dsp_pids_n;
++        if( qs1l_w ) begin
++            dsp_irq <= 1; // read MSB
++            dsp_datasel <= 2'b11;
++        end else begin
++            if( dsp_pids_n && !last_pids_n ) begin
++                dsp_irq <= 0; // read LSB
++                dsp_datasel <= dsp_datasel>>1;
++            end
++        end
++    end
++end
++
++// The uprate filter runs at 48MHz to ease synthesis
++`ifndef NOFIR
++jtframe_uprate2_fir uprate(
++    .rst     ( dsp_rst       ),
++    .clk     ( clk48         ),
++    .sample  ( resample48    ),
++    .upsample( sample        ),
++    .l_in    ( fxd_l         ),
++    .r_in    ( fxd_r         ),
++    .l_out   ( left          ),
++    .r_out   ( right         )
++);
++`else
++assign sample = resample48;
++assign left   = fxd_l;
++assign right  = fxd_r;
++`endif
++
++reg [12:0] vol_lut[0:39];
++reg [ 5:0] vol_st;
++
++initial begin
++    vol_lut[ 0]=13'h1010; vol_lut[ 1]=13'h1008; vol_lut[ 2]=13'h1004; vol_lut[ 3]=13'h1002;
++    vol_lut[ 4]=13'h1001; vol_lut[ 5]=13'h0810; vol_lut[ 6]=13'h0808; vol_lut[ 7]=13'h0804;
++    vol_lut[ 8]=13'h0802; vol_lut[ 9]=13'h0801; vol_lut[10]=13'h0410; vol_lut[11]=13'h0408;
++    vol_lut[12]=13'h0404; vol_lut[13]=13'h0402; vol_lut[14]=13'h0401; vol_lut[15]=13'h0210;
++    vol_lut[16]=13'h0208; vol_lut[17]=13'h0204; vol_lut[18]=13'h0202; vol_lut[19]=13'h0201;
++    vol_lut[20]=13'h0110; vol_lut[21]=13'h0108; vol_lut[22]=13'h0104; vol_lut[23]=13'h0102;
++    vol_lut[24]=13'h0101; vol_lut[25]=13'h0090; vol_lut[26]=13'h0088; vol_lut[27]=13'h0084;
++    vol_lut[28]=13'h0082; vol_lut[29]=13'h0081; vol_lut[30]=13'h0050; vol_lut[31]=13'h0048;
++    vol_lut[32]=13'h0044; vol_lut[33]=13'h0042; vol_lut[34]=13'h0041; vol_lut[35]=13'h0030;
++    vol_lut[36]=13'h0028; vol_lut[37]=13'h0024; vol_lut[38]=13'h0022; vol_lut[39]=13'h0021;
++end
++
++// volume control
++always @(posedge clk48, posedge rst) begin
++    if ( rst ) begin
++        volume     <= 13'b0;   // I think the volume is never actually read by the DSP
++        vol_st     <= 6'd39;   // Max
++    end else begin
++        last_vol_up   <= vol_up;
++        last_vol_down <= vol_down;
++        if( vol_up && !last_vol_up ) begin
++            if( vol_st < 6'd39 ) vol_st <= vol_st+6'd1;
++        end else if( vol_down && !last_vol_down ) begin
++            if( vol_st != 6'd0 ) vol_st <= vol_st-6'd1;
++        end
++        volume <= vol_lut[vol_st];
++    end
++end
++
++reg [15:0] ser_cnt;
++reg        dsp_ockl;
++reg        left_done, right_done;
++
++always @(posedge clk96, posedge rst) begin
++    if ( rst ) begin
++        audio_ws   <= 0;
++        qsnd_lo    <= 16'd0;
++        base_sample<= 0;
++        dsp_dsel96 <= 0;
++        pre_l      <= 16'd0;
++        pre_r      <= 16'd0;
++        cpu2dsp_s  <= 24'd0;
++    end else begin
++        last_pods_n <= dsp_pods_n;
++        dsp_dsel96  <= dsp_datasel[1];
++        dsp_ockl    <= dsp_ock;
++
++        // latch sound data like the TDA1543 would
++        last_sadd <= dsp_sadd;
++        if( dsp_irq ) cpu2dsp_s <= cpu2dsp;
++        if( !dsp_sadd && last_sadd ) begin
++            audio_ws <= dsp_psel;
++            ser_cnt  <= 16'hffff;
++        end
++        if( dsp_ockl & ~dsp_ock & ser_cnt[15] ) begin
++            ser_cnt <= ser_cnt << 1;
++            if( audio_ws ) begin
++                reg_right <= { reg_right[14:0], dsp_do };
++                if( !ser_cnt[14] ) right_done <= 1;
++            end else begin
++                reg_left <= { reg_left[14:0], dsp_do };
++                if( !ser_cnt[14] ) left_done <= 1;
++            end
++        end
++        if( left_done & right_done ) begin
++            pre_l <= reg_left;
++            pre_r <= reg_right;
++            base_sample <= 1;
++            left_done  <= 0;
++            right_done <= 0;
++        end else begin
++            base_sample <= 0;
++        end
++        // latch QSound ROM address (low half; the bank half is in
++        // jtcps2w_qsnd_bank, instantiated below)
++        if( dsp_pods_n && !last_pods_n) begin
++            qsnd_lo <= dsp_pbus_out;
++        end
++    end
++end
++
++// CPS-2 WIDE: the sample-bank latch. wide_en LOW reproduces the stock
++// `qsnd_addr[22:16] <= dsp_ab[6:0]` exactly, bit 23 pinned to 0.
++jtcps2w_qsnd_bank u_qsnd_bank(
++    .rst        ( rst           ),
++    .clk        ( clk96         ),
++    .cen_cko    ( dsp_cen_cko   ),
++    .wide_en    ( wide_en       ),
++    .dsp_ab     ( dsp_ab        ),
++    .bank       ( qsnd_bank     )
++);
++
++always @(*) begin
++    dsp_pbus_in = dsp_dsel96 ? {8'd0, cpu2dsp_s[23:16]} : cpu2dsp_s[15:0];
++end
++
++`ifndef NOSOUND
++wire        dsp_fault;
++
++assign qsnd_cs = 1;
++
++jtdsp16 u_dsp16(
++    .rst        ( dsp_rst       ),
++    .clk        ( clk96         ),
++    .clk_en     ( cen_dsp       ),
++
++    .cen_cko    ( dsp_cen_cko   ),
++    .ab         ( dsp_ab        ),  // address bus
++    .rb_din     ( { qsnd_data, 8'h0 } ),  // ROM data bus
++    .ext_rq     ( dsp_ext_rq    ),
++    .ext_ok     ( qsnd_ok       ),
++    // Parallel I/O
++    .pbus_in    ( dsp_pbus_in   ),
++    .pbus_out   ( dsp_pbus_out  ),
++    .pods_n     ( dsp_pods_n    ),  // parallel output data strobe
++    .pids_n     ( dsp_pids_n    ),  // parallel input  data strobe
++    // Serial output
++    .sdo        ( dsp_do        ),  // serial data output
++    .ock        ( dsp_ock       ),  // output clock
++    .doen       ( dsp_doen      ),  // data output enable
++    .sadd       ( dsp_sadd      ),  // serial address
++    .psel       ( dsp_psel      ),  // peripheral select
++    .ser_out    (               ),  // debug output to bypass the serial register
++        // Unused by QSound firmware:
++    .ose        (               ),  // output shift register empty
++    .old        (               ),  // output load
++    .ibf        (               ),  // input buffer full
++    .di         (               ),  // serial data input
++    .ick        (               ),  // serial data input clock
++    .ild        (               ),  // serial data input load
++    // interrupts
++    .irq        ( dsp_irq       ),  // interrupt
++    .iack       ( dsp_iack      ),  // interrupt acknowledgement
++    // ROM programming interface
++    .prog_addr  ( prog_addr     ),
++    .prog_data  ( prog_data     ),
++    .prog_we    ( prog_we       ),
++    // Debug
++    .fault      ( dsp_fault     )
++);
++`else
++assign dsp_pbus_out = 16'd0;
++assign dsp_pods_n   = 1;
++assign dsp_pids_n   = 1;
++assign dsp_do       = 1;
++assign dsp_ock      = 1;
++assign dsp_doen     = 0;
++assign dsp_sadd     = 0;
++assign dsp_psel     = 0;
++assign dsp_ab       = 16'd0;
++assign qsnd_cs      = 0;
++`endif
++
++endmodule
++
++//////////////////////////// Small modules only instantiated by jtcps15_sound
++
++module jtcps15_z80int(
++    input      clk,
++    input      rst,
++    input      cen8,
++    input      m1_n,
++    input      iorq_n,
++    output reg int_n
++);
++
++reg  [14:0] cnt;
++wire        cntover = cnt==15'd31999;
++
++always @(posedge clk, posedge rst) begin
++    if( rst ) begin
++        cnt   <= 15'd0;
++        int_n <= 1;
++    end else if(cen8) begin
++        cnt <= cntover ? 15'd0 : (cnt+15'd1);
++        if( !m1_n && !iorq_n )
++            int_n <= 1;
++        else
++            if( cntover ) int_n <= 0;
++
++    end
++end
++
++endmodule
++
++// There is an extra cycle for
++// -OP access above C000
++// -All data access
++// This could be to give extra time to Kabuki decode logic
++
++module jtcps15_z80wait(
++    input         clk,
++    input         rst,
++    input         cen8,
++    input         m1_n,
++    input [15:12] addr,
++    output        cen_cpu
++);
++
++assign cen_cpu = cen8;
++
++// It slows down music, I think this isn't correct
++// I have to check the PAL output with Loic.
++/*
++reg idle;
++
++assign cen_cpu = cen8 & ~idle;
++
++always @(posedge clk, posedge rst) begin
++    if( rst )
++        idle <= 0;
++    else if(cen8) begin
++        if( (addr[15:14]==2'b11 || m1_n) && !idle )
++            idle <= 1;
++        else
++            idle <= 0;
++    end
++end
++*/
++endmodule
++
++// M68000 requests and gets the bus in a synchronous way
++
++module jtcps15_z80buslock(
++    input         clk,
++    input         rst,
++    input         cen8,
++    output  reg   busrq_n,  // to Z80
++    input         busak_n,  // from Z80
++    // Signals from M68000
++    input         buse_n,   // request from M68000
++    input [23:12] m68_addr,
++    input         m68_buswen,
++    output        z80_buswn,
++    output  reg   m68_busakn    // to M68
++);
++
++parameter CPS2=0;
++
++wire shared_addr = CPS2 ? m68_addr[23:16]==8'h61 : (
++                   (m68_addr[23:12]>=12'hf18 && m68_addr[23:12]<12'hf1a ) ||
++                   (m68_addr[23:12]>=12'hf1e && m68_addr[23:12]<12'hf20 ) );
++
++assign z80_buswn = m68_buswen | m68_busakn;
++
++reg last_busen, last_busakn;
++reg preqrqn;
++
++always @(posedge clk, posedge rst) begin
++    if( rst ) begin
++        m68_busakn <= 1'b1;
++        busrq_n    <= 1'b1;
++        preqrqn    <= 1'b1;
++    end else if(cen8) begin
++        // to Z80
++        last_busen <= buse_n;
++        if( !buse_n && last_busen)
++            preqrqn <= 1'b0;
++        else if( buse_n ) begin
++            preqrqn <= 1'b1;
++            busrq_n <= 1;
++        end
++        if( !preqrqn && busak_n ) busrq_n <= 0;
++
++        // to M68
++        last_busakn <= busak_n;
++        m68_busakn  <= busak_n | last_busakn | buse_n;
++    end
++end
++
++endmodule
++
++module jtcps15_qsnd_cen(
++    input       clk96,
++    input       clk48,
++    input       rst,
++    input       base_sample,
++    input       qsnd_ok,
++    input       ext_rq,
++    // resample
++    input signed [15:0] l_in,
++    input signed [15:0] r_in,
++    output reg signed [15:0] l_out,
++    output reg signed [15:0] r_out,
++    output reg  resample48,
++    // clock enable
++    output reg  qsnd_cen
++);
++
++wire [13:0] MAXCNT = 14'd3999;
++
++reg [13:0] cnt;
++reg        sleep;
++reg [ 1:0] resample;
++
++always @(posedge clk96, posedge rst) begin
++    if( rst ) begin
++        cnt      <= 14'd0;
++        sleep    <= 0;
++        qsnd_cen <= 1;
++        resample <= 0;
++        l_out    <= 16'd0;
++        r_out    <= 16'd0;
++    end else begin
++        qsnd_cen <= ~sleep & qsnd_ok;
++        if( cnt == MAXCNT ) begin
++            sleep    <= 0;
++            cnt      <= 14'd0;
++            resample <= 2'b11;
++            l_out    <= l_in;
++            r_out    <= r_in;
++        end else begin
++            cnt      <= cnt + 14'd1;
++            resample <= resample<<1;
++            if( base_sample ) sleep <= 1;
++        end
++    end
++end
++
++always @(posedge clk48) begin
++    resample48 <= resample[1];
++end
++
++endmodule
+\ No newline at end of file
+diff --git a/cores/cps2w/hdl/jtcps2_game.v b/cores/cps2w/hdl/jtcps2_game.v
+new file mode 100644
+index 000000000..2106ec531
+--- /dev/null
++++ b/cores/cps2w/hdl/jtcps2_game.v
+@@ -0,0 +1,586 @@
++/*  This file is part of JTCORES1.
++    JTCORES1 program is free software: you can redistribute it and/or modify
++    it under the terms of the GNU General Public License as published by
++    the Free Software Foundation, either version 3 of the License, or
++    (at your option) any later version.
++
++    JTCORES1 program is distributed in the hope that it will be useful,
++    but WITHOUT ANY WARRANTY; without even the implied warranty of
++    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++    GNU General Public License for more details.
++
++    You should have received a copy of the GNU General Public License
++    along with JTCORES1.  If not, see <http://www.gnu.org/licenses/>.
++
++    Author: Jose Tejada Gomez. Twitter: @topapate
++    Version: 1.0
++    Date: 18-9-2021 */
++
++module jtcps2_game(
++    `include "jtframe_game_ports.inc" // see $JTFRAME/hdl/inc/jtframe_game_ports.inc
++);
++
++// ---------------------------------------------------------------------------
++// CPS-2 WIDE (Vampire Saved) OVERRIDE of cores/cps2/hdl/jtcps2_game.v.
++// Copied at jtcores v1.7.3 because the game top has to carry the profile gate
++// and the widened QSound address, and the file is SHARED with cores/cps2 —
++// editing it in place would change the reference core. The diff against the
++// original IS the trust surface (CLAUDE.md rule 1 v2) and is frozen by
++// tests/test_mister_wide_gate.sh. FOUR deltas:
++//   1. `qsnd_addr` 23 -> 24 bits;
++//   2. `wide_en` decoded from the ROM header by jtcps2w_profile;
++//   3. that wire routed into jtcps15_sound;
++//   4. the PCM slot fed with qsnd_addr[22:0].
++// On (4) — and it CORRECTS the design note that said `PCM_AW` 23 -> 24:
++// jtframe's 8-bit SDRAM slot CANNOT be widened past SDRAMW. `sdram_addr =
++// offset + { {SDRAMW-AW{1'b0}}, addr_req>>(DW==8) }`
++// (jtframe_romrq_bcache.v:74) becomes a replication of -1 at AW=24, SDRAMW=23,
++// which is a hard Verilator error, not a warning. That is also why the
++// placement map splits QSound across two banks rather than growing one slot:
++// bank 1 keeps the stock 8 MB at 23 bits and the 0x80+ extension gets its own
++// 1 MB window in bank 0 (slice D2). Until then bit 23 is produced, gated and
++// unrouted; with wide_en LOW it is constant 0, so the PCM address the slot
++// sees is bit-for-bit the reference core's.
++// ---------------------------------------------------------------------------
++
++wire        clk_gfx, rst_gfx;
++wire        snd_cs, qsnd_cs,
++            main_ram_cs, main_vram_cs, main_oram_cs, main_rom_cs,
++            rom0_cs, rom1_cs,
++            vram_dma_cs;
++wire        obank;  // OBJ bank
++wire [15:0] oram_base;
++wire [18:0] snd_addr;
++wire [23:0] qsnd_addr;   // CPS-2 WIDE: [23] = DSP sample bank 0x80+
++wire        prog_qsnd;
++wire [ 7:0] snd_data, qsnd_data;
++wire [17:1] ram_addr;
++wire [21:1] main_rom_addr;
++wire [15:0] main_ram_data, main_rom_data, main_dout, mmr_dout;
++wire        main_rom_ok, main_ram_ok;
++wire        ppu1_cs, ppu2_cs, ppu_rstn, objcfg_cs;
++wire        raster;
++wire [19:0] rom1_addr, rom0_addr;
++wire [ 1:0] rom0_bank;
++wire [31:0] rom0_data, rom1_data;
++// Video RAM interface
++wire [17:1] vram_dma_addr;
++wire [15:0] vram_dma_data;
++wire        vram_dma_ok, rom0_ok, rom1_ok, snd_ok, qsnd_ok;
++wire [15:0] cpu_dout;
++wire        cpu_speed;
++wire        z80_rstn, star_bank;
++
++wire        main_rnw, busreq, busack;
++
++wire        vram_clr, vram_rfsh_en;
++wire [ 8:0] hdump;
++wire [ 8:0] vdump, vrender;
++
++wire        rom0_half, rom1_half;
++wire        cfg_we, key_we;
++wire [ 1:0] joymode;
++wire        wide_en;   // CPS-2 WIDE profile, from the ROM header
++
++// CPS2 Objects
++wire [12:0] gfx_oram_addr;
++wire [15:0] gfx_oram_data;
++wire        gfx_oram_ok, gfx_oram_clr, gfx_oram_cs;
++
++// M68k - Sound subsystem communication
++wire [ 7:0] main2qs_din;
++wire [23:1] main2qs_addr;
++wire        main2qs_cs, main_busakn, main_waitn;
++wire [12:0] volume;
++
++// EEPROM
++wire        sclk, sdi, sdo, scs;
++
++wire [ 1:0] dsn;
++wire        cen16, cen16b, cen12, cen8, cen10b;
++wire        cpu_cen, cpu_cenb;
++wire        turbo, skip_en, video_flip;
++
++`ifdef JTCPS_TURBO
++assign turbo = 1;
++`else
++assign turbo = status[6];
++`endif
++
++assign skip_en = status[7];
++
++assign ba1_din=0, ba2_din=0, ba3_din=0,
++       ba1_dsn=3, ba2_dsn=3, ba3_dsn=3;
++
++// CPU clock enable signals come from 48MHz domain
++jtframe_cen48 u_cen48(
++    .clk        ( clk48         ),
++    .cen16      (               ),
++    .cen16b     (               ),
++    .cen12      ( cen12         ),
++    .cen8       ( cen8          ),
++    .cen6       (               ),
++    .cen4       (               ),
++    .cen4_12    (               ),
++    .cen3       (               ),
++    .cen3q      (               ),
++    .cen1p5     (               ),
++    // 180 shifted signals
++    .cen12b     (               ),
++    .cen6b      (               ),
++    .cen3b      (               ),
++    .cen3qb     (               ),
++    .cen1p5b    (               )
++);
++
++jtframe_cen96 u_pxl_cen(
++    .clk    ( clk96     ),    // 96 MHz
++    .cen16  ( pxl2_cen  ),
++    .cen12  (           ),
++    .cen8   ( pxl_cen   ),
++    // Unused:
++    .cen6   (           ),
++    .cen6b  (           )
++);
++
++assign clk_gfx = clk96;
++assign rst_gfx = rst96;
++// reg [1:0] aux;
++// assign cpu_cen = cen12;
++// always @(posedge clk48 ) aux<={ aux[0], cen12};
++// assign cpu_cenb = aux==2'b10;
++
++
++localparam REGSIZE=24;
++
++// Turbo speed disables DMA
++wire busreq_cpu = busreq & ~turbo;
++wire busack_cpu;
++
++`ifndef NOMAIN
++jtcps2_main u_main(
++    .rst        ( rst48             ),
++    .clk_rom    ( clk96             ),
++    .clk        ( clk48             ),
++    .cpu_cen    ( cpu_cen           ),
++    // Timing
++    .V          ( vdump             ),
++    .LVBL       ( LVBL              ),
++    .LHBL       ( LHBL              ),
++    .skip_en    ( skip_en           ),
++    // PPU
++    .ppu1_cs    ( ppu1_cs           ),
++    .ppu2_cs    ( ppu2_cs           ),
++    .objcfg_cs  ( objcfg_cs         ),
++    .ppu_rstn   ( ppu_rstn          ),
++    .mmr_dout   ( mmr_dout          ),
++    .raster     ( raster            ),
++    //.raster     ( 1'b0            ),
++    // Keys
++    .prog_din   ( prog_data[7:0]    ),
++    .key_we     ( key_we            ),
++    // Sound
++    .z80_rstn    ( z80_rstn         ),
++    .main2qs_din ( main2qs_din      ),
++    .main2qs_addr( main2qs_addr     ),
++    .main2qs_cs  ( main2qs_cs       ),
++    .main2qs_busakn( main_busakn    ),
++    .main2qs_waitn( main_waitn      ),
++    .UDSWn      ( dsn[1]            ),
++    .LDSWn      ( dsn[0]            ),
++    .volume     ( volume            ),
++    // cabinet I/O
++    // Cabinet input
++    .cab_1p      ( cab_1p           ),
++    .coin        ( coin             ),
++    .joymode     ( joymode          ),
++    .joystick1   ( joystick1        ),
++    .joystick2   ( joystick2        ),
++    .joystick3   ( joystick3        ),
++    .joystick4   ( joystick4        ),
++    .service     ( service          ),
++    .tilt        ( 1'b1             ),
++    .dipsw       ( dipsw            ),
++    .dial_x      ( dial_x           ),
++    .dial_y      ( dial_y           ),
++    // BUS sharing
++    .busreq      ( busreq_cpu       ),
++    .busack      ( busack_cpu       ),
++    .RnW         ( main_rnw         ),
++    // RAM/VRAM access
++    .addr        ( ram_addr         ),
++    .cpu_dout    ( main_dout        ),
++    .ram_cs      ( main_ram_cs      ),
++    .vram_cs     ( main_vram_cs     ),
++    .oram_cs     ( main_oram_cs     ),
++    .obank       ( obank            ),
++    .oram_base   ( oram_base        ),
++    .ram_data    ( main_ram_data    ),
++    .ram_ok      ( main_ram_ok      ),
++    // ROM access
++    .rom_cs      ( main_rom_cs      ),
++    .rom_addr    ( main_rom_addr    ),
++    .rom_data    ( main_rom_data    ),
++    .rom_ok      ( main_rom_ok      ),
++    // DIP switches
++    .dip_pause   ( dip_pause        ),
++    .dip_test    ( dip_test         ),
++    // EEPROM
++    .eeprom_sclk ( sclk             ),
++    .eeprom_sdi  ( sdi              ),
++    .eeprom_sdo  ( sdo              ),
++    .eeprom_scs  ( scs              ),
++    // Debug
++    .debug_bus   ( debug_bus        ),
++    .st_dout     ( debug_view       )
++);
++
++assign busack = busack_cpu | turbo;
++
++`else
++    assign ram_addr      = 0;
++    assign main_ram_cs   = 0;
++    assign main_vram_cs  = 0;
++    assign main_rom_cs   = 0;
++    assign oram_base     = 0;
++    assign main_oram_cs  = 0;
++    assign main_rom_addr = 0;
++    assign main_dout     = 0;
++    assign z80_rstn      = 1;
++    assign dsn           = 2'b11;
++    assign main_rnw      = 1;
++    assign sclk          = 0;
++    assign sdi           = 0;
++    assign scs           = 0;
++    assign obank         = 0;
++    assign busack        = 1;
++    assign ppu1_cs       = 0;
++    assign ppu2_cs       = 0;
++    assign objcfg_cs     = 0;
++    assign ppu_rstn      = 1;
++    assign cpu_dout      = 0;
++`endif
++
++reg rst_video, rst_sdram;
++
++always @(negedge clk_gfx) begin
++    rst_video <= rst_gfx;
++end
++
++always @(negedge clk) begin
++    rst_sdram <= rst;
++end
++
++assign dip_flip = video_flip;
++
++jtcps1_video #(REGSIZE) u_video(
++    .rst            ( rst_video     ),
++    .clk            ( clk_gfx       ),
++    .clk_cpu        ( clk48         ),
++    .pxl2_cen       ( pxl2_cen      ),
++    .pxl_cen        ( pxl_cen       ),
++
++    .hdump          ( hdump         ),
++    .vdump          ( vdump         ),
++    .vrender        ( vrender       ),
++    .gfx_en         ( gfx_en        ),
++    .debug_bus      ( debug_bus     ),
++    .cpu_speed      ( cpu_speed     ),
++    .charger        (               ),
++    .kabuki_en      (               ),
++    .raster         ( raster        ),
++
++    // CPU interface
++    .ppu_rstn       ( ppu_rstn      ),
++    .ppu1_cs        ( ppu1_cs       ),
++    .ppu2_cs        ( ppu2_cs       ),
++    .addr           ( ram_addr[12:1]),
++    .dsn            ( dsn           ),      // data select, active low
++    .cpu_dout       ( main_dout     ),
++    .mmr_dout       ( mmr_dout      ),
++    // BUS sharing
++    .busreq         ( busreq        ),
++    .busack         ( busack        ),
++
++    // Object RAM
++    .obank          ( obank         ),
++    .oram_addr      ( gfx_oram_addr ),
++    .oram_ok        ( gfx_oram_ok   ),
++    .oram_data      ( gfx_oram_data ),
++    .oram_clr       ( gfx_oram_clr  ),
++    .oram_cs        ( gfx_oram_cs   ),
++    .objcfg_cs      ( objcfg_cs     ),
++
++    // Video signal
++    .HS             ( HS            ),
++    .VS             ( VS            ),
++    .LHBL           ( LHBL          ),
++    .LVBL           ( LVBL          ),
++    .red            ( red           ),
++    .green          ( green         ),
++    .blue           ( blue          ),
++    .flip           ( video_flip    ),
++
++    // CPS-B Registers
++    .cfg_we         ( cfg_we        ),
++    .cfg_data       ( prog_data[7:0]),
++
++    // Extra inputs read through the C-Board
++    .cab_1p   ( cab_1p  ),
++    .coin     ( coin    ),
++    .joystick1      ( 10'h3ff       ),
++    .joystick2      ( 10'h3ff       ),
++    .joystick3      ( 10'h3ff       ),
++    .joystick4      ( 10'h3ff       ),
++
++    // Video RAM interface
++    .vram_dma_addr  ( vram_dma_addr ),
++    .vram_dma_data  ( vram_dma_data ),
++    .vram_dma_ok    ( vram_dma_ok   ),
++    .vram_dma_cs    ( vram_dma_cs   ),
++    .vram_dma_clr   ( vram_clr      ),
++    .vram_rfsh_en   ( vram_rfsh_en  ),
++
++    // GFX ROM interface
++    .rom1_addr      ( rom1_addr     ),
++    .rom1_half      ( rom1_half     ),
++    .rom1_data      ( rom1_data     ),
++    .rom1_cs        ( rom1_cs       ),
++    .rom1_ok        ( rom1_ok       ),
++    .rom0_addr      ( rom0_addr     ),
++    .rom0_bank      ( rom0_bank     ),
++    .rom0_half      ( rom0_half     ),
++    .rom0_data      ( rom0_data     ),
++    .rom0_cs        ( rom0_cs       ),
++    .rom0_ok        ( rom0_ok       ),
++
++    .star_bank      ( star_bank     ),
++    .star0_addr     (               ),
++    .star0_data     ( 0             ),
++    .star0_cs       (               ),
++    .star0_ok       ( 1'b1          ),
++
++    .star1_addr     (               ),
++    .star1_data     ( 0             ),
++    .star1_cs       (               ),
++    .star1_ok       ( 1'b1          ),
++
++    // Watched signals
++    .watch_vram_cs  ( main_vram_cs  ),
++    .watch          ( game_led      )
++);
++
++// Sound CPU cannot be disabled as there is
++// interaction between both CPUs at power up
++reg qsnd_rst;
++
++always @(posedge clk48, posedge rst) begin
++    if( rst )
++        qsnd_rst  <= 1;
++    else
++        qsnd_rst  <= ~z80_rstn;
++end
++
++wire vol_up   = ~(coin[0] | joystick1[3]);
++wire vol_down = ~(coin[0] | joystick1[2]);
++
++`ifndef NOMAIN
++jtcps15_sound u_sound(
++    .rst        ( qsnd_rst          ),
++    .clk48      ( clk48             ),
++    .clk96      ( clk96             ),
++    .cen8       ( cen8              ),
++    .vol_up     ( vol_up            ),
++    .vol_down   ( vol_down          ),
++    .volume     ( volume            ),
++    // Decode keys
++    .kabuki_we  ( 1'b0              ),
++    .kabuki_en  ( 1'b0              ),
++    .wide_en    ( wide_en           ),
++
++    // Interface with main CPU
++    .main_addr  ( main2qs_addr      ),
++    .main_dout  ( main_dout[7:0]    ),
++    .main_din   ( main2qs_din       ),
++    .main_ldswn ( dsn[0]            ),
++    .main_buse_n( ~main2qs_cs       ),
++    .main_busakn( main_busakn       ),
++    .main_waitn ( main_waitn        ),
++
++    // ROM
++    .rom_addr   ( snd_addr          ),
++    .rom_cs     ( snd_cs            ),
++    .rom_data   ( snd_data          ),
++    .rom_ok     ( snd_ok            ),
++
++    // QSound sample ROM
++    .qsnd_addr  ( qsnd_addr         ), // max 8 MB.
++    .qsnd_cs    ( qsnd_cs           ),
++    .qsnd_data  ( qsnd_data         ),
++    .qsnd_ok    ( qsnd_ok           ),
++
++    // ROM programming interface
++    .prog_addr  ( prog_addr[12:0]   ),
++    .prog_data  ( prog_data[7:0]    ),
++    .prog_we    ( prog_qsnd         ),
++
++    // Sound output
++    .left       ( snd_left          ),
++    .right      ( snd_right         ),
++    .sample     ( sample            )
++);
++`else
++    assign snd_left  = 0;
++    assign snd_right = 0;
++    assign sample    = 0;
++    assign snd_cs    = 0;
++    assign snd_addr  = 0;
++    assign qsnd_cs   = 0;
++    assign qsnd_addr = 0;
++`endif
++
++// CPS-2 WIDE: the runtime profile gate. Header byte 41, ACTIVE LOW, so a
++// stock MRA (whose header is 0xFF-filled) runs this RBF as a stock machine.
++jtcps2w_profile u_profile(
++    .clk        ( clk           ),
++    .ioctl_addr ( ioctl_addr    ),
++    .ioctl_dout ( ioctl_dout    ),
++    .ioctl_wr   ( ioctl_wr      ),
++    .ioctl_ram  ( ioctl_ram     ),
++    .wide_en    ( wide_en       )
++);
++
++jtcps1_sdram #(.CPS(2), .REGSIZE(REGSIZE)) u_sdram (
++    .rst         ( rst_sdram     ),
++    .clk         ( clk           ),
++    .clk_gfx     ( clk_gfx       ),
++    .clk_cpu     ( clk48         ),
++    .LVBL        ( LVBL          ),
++
++    .ioctl_rom   ( ioctl_rom     ),
++    .dwnld_busy  ( dwnld_busy    ),
++    .cfg_we      ( cfg_we        ),
++
++    // ROM LOAD
++    .ioctl_addr  ( ioctl_addr    ),
++    .ioctl_dout  ( ioctl_dout    ),
++    .ioctl_din   ( ioctl_din     ),
++    .ioctl_wr    ( ioctl_wr      ),
++    .ioctl_ram   ( ioctl_ram     ),
++    .prog_addr   ( prog_addr     ),
++    .prog_data   ( prog_data     ),
++    .prog_mask   ( prog_mask     ),
++    .prog_ba     ( prog_ba       ),
++    .prog_we     ( prog_we       ),
++    .prog_rd     ( prog_rd       ),
++    .prog_rdy    ( prog_rdy      ),
++    .prog_qsnd   ( prog_qsnd     ),
++    .kabuki_we   (               ), // disabled for CPS2
++    .cps2_key_we ( key_we        ),
++    .cps2_joymode( joymode       ),
++    // joystick type
++
++
++    // EEPROM
++    .sclk           ( sclk          ),
++    .sdi            ( sdi           ),
++    .sdo            ( sdo           ),
++    .scs            ( scs           ),
++    .dump_flag      (               ),
++
++    // Main CPU
++    .main_rom_cs    ( main_rom_cs   ),
++    .main_rom_ok    ( main_rom_ok   ),
++    .main_rom_addr  ( main_rom_addr ),
++    .main_rom_data  ( main_rom_data ),
++
++    // VRAM
++    .vram_clr       ( vram_clr      ),
++    .vram_dma_cs    ( vram_dma_cs   ),
++    .main_ram_cs    ( main_ram_cs   ),
++    .main_vram_cs   ( main_vram_cs  ),
++    .main_oram_cs   ( main_oram_cs  ),
++    .obank          ( obank         ),
++    .oram_base      ( oram_base     ),
++    .vram_rfsh_en   ( vram_rfsh_en  ),
++
++    .dsn            ( dsn           ),
++    .main_dout      ( main_dout     ),
++    .main_rnw       ( main_rnw      ),
++
++    .main_ram_ok    ( main_ram_ok   ),
++    .vram_dma_ok    ( vram_dma_ok   ),
++
++    .main_ram_addr  ( ram_addr      ),
++    .vram_dma_addr  ( vram_dma_addr ),
++
++    .main_ram_data  ( main_ram_data ),
++    .vram_dma_data  ( vram_dma_data ),
++
++    .gfx_oram_addr  ( gfx_oram_addr ),
++    .gfx_oram_data  ( gfx_oram_data ),
++    .gfx_oram_ok    ( gfx_oram_ok   ),
++    .gfx_oram_clr   ( gfx_oram_clr  ),
++    .gfx_oram_cs    ( gfx_oram_cs   ),
++
++    // Sound CPU and PCM
++    .snd_cs      ( snd_cs        ),
++    .pcm_cs      ( qsnd_cs       ),
++
++    .snd_ok      ( snd_ok        ),
++    .pcm_ok      ( qsnd_ok       ),
++
++    .snd_addr    ( snd_addr      ),
++    // [23] is the WIDE extension bank bit; the split that consumes it is
++    // slice D2. It is 0 whenever wide_en is 0.
++    .pcm_addr    ( qsnd_addr[22:0] ),
++
++    .snd_data    ( snd_data      ),
++    .pcm_data    ( qsnd_data     ),
++
++    // Graphics
++    .rom0_cs     ( rom0_cs       ),
++    .rom1_cs     ( rom1_cs       ),
++
++    .rom0_ok     ( rom0_ok       ),
++    .rom1_ok     ( rom1_ok       ),
++
++    .rom0_addr   ( rom0_addr     ),
++    .rom0_bank   ( rom0_bank     ),
++    .rom1_addr   ( rom1_addr     ),
++
++    .rom0_half   ( rom0_half     ),
++    .rom1_half   ( rom1_half     ),
++
++    .rom0_data   ( rom0_data     ),
++    .rom1_data   ( rom1_data     ),
++
++    .star_bank   ( star_bank     ),
++    .star0_addr  ( 13'd0         ),
++    .star0_data  (               ),
++    .star0_ok    (               ),
++    .star0_cs    ( 1'b0          ),
++
++    .star1_addr  ( 13'd0         ),
++    .star1_data  (               ),
++    .star1_ok    (               ),
++    .star1_cs    ( 1'b0          ),
++
++    // Bank 0: allows R/W
++    .ba0_addr    ( ba0_addr      ),
++    .ba1_addr    ( ba1_addr      ),
++    .ba2_addr    ( ba2_addr      ),
++    .ba3_addr    ( ba3_addr      ),
++    .ba_rd       ( ba_rd         ),
++    .ba_wr       ( ba_wr         ),
++    .ba_ack      ( ba_ack        ),
++    .ba_dst      ( ba_dst        ),
++    .ba_dok      ( ba_dok        ),
++    .ba_rdy      ( ba_rdy        ),
++    .ba0_din     ( ba0_din       ),
++    .ba0_dsn     ( ba0_dsn       ),
++
++    .data_read   ( data_read     )
++);
++
++endmodule
+diff --git a/cores/cps2w/hdl/jtcps2w_profile.v b/cores/cps2w/hdl/jtcps2w_profile.v
+new file mode 100644
+index 000000000..0604fa701
+--- /dev/null
++++ b/cores/cps2w/hdl/jtcps2w_profile.v
+@@ -0,0 +1,75 @@
++/*  This file is part of JTCORES1.
++    JTCORES1 program is free software: you can redistribute it and/or modify
++    it under the terms of the GNU General Public License as published by
++    the Free Software Foundation, either version 3 of the License, or
++    (at your option) any later version.
++
++    JTCORES1 program is distributed in the hope that it will be useful,
++    but WITHOUT ANY WARRANTY; without even the implied warranty of
++    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++    GNU General Public License for more details.
++
++    You should have received a copy of the GNU General Public License
++    along with JTCORES1.  If not, see <http://www.gnu.org/licenses/>.
++
++    Author: the Vampire Saved project (CPS-2 WIDE), 2026
++    Date: 23-8-2026 */
++
++// jtcps2w_profile — THE RUNTIME PROFILE GATE OF THE CPS-2 WIDE CORE.
++//
++// WHY THIS MODULE EXISTS AT ALL. jtcps2w is a SEPARATE core from jtcps2, but
++// it must still run the STOCK, unmodified romsets exactly as the reference
++// core does — that is the emulator superset invariant, and on FPGA the only
++// way to have it BY CONSTRUCTION (rather than as an inertness argument about
++// bits that "should" never be set) is for the widened behaviour to be OFF
++// unless the download says otherwise. So the profile is selected at RUNTIME,
++// from the MRA, not by an `ifdef` at synthesis time. A stock MRA on this RBF
++// is a stock machine.
++//
++// WHERE THE BIT LIVES. jtframe's ROM header is 44 bytes on CPS-2
++// (JTFRAME_HEADER=44). jtcps1_prom_we.v consumes bytes 0-7 (the four region
++// start words), 8-39 (the CPS config registers, `is_cps`) and 40 (JOY_BYTE);
++// bytes 41-43 fall through every branch of its decoder and are IGNORED, and
++// bytes 44-63 are the CPS-2 key. Byte 41 is therefore free at this pin, and
++// the header comment at jtcps1_prom_we.v:52-54 ("6 are actually used and 10
++// are reserved") is the licence to use it.
++//
++// WHY ACTIVE LOW — this is not a style choice. `cores/cps2/cfg/mame2mra.toml`
++// declares `[header] fill=0xff`, so every byte a machine does not explicitly
++// write is 0xFF, and the stock `vsavj` MRA emitted by this core has to stay
++// BYTE-IDENTICAL to the reference core's (tests/test_mister_mra_map.sh). The
++// only polarity that leaves stock MRAs untouched is one where the FILL means
++// "profile off". jtframe's own JOY_BYTE works exactly this way: 0xFF is
++// joystick mode 3 and the games that want mode 0 write 0xFC.
++//
++// So: header byte 41 bit 0 CLEAR = CPS-2 WIDE. The WIDE MRA writes 0xFE.
++//
++// The bit is written once, during the ROM download, while the core is held in
++// reset; it is constant for the whole of play. It is re-defaulted at the first
++// header byte of EVERY download, so a second download cannot inherit the
++// previous one's profile.
++
++module jtcps2w_profile #( parameter [5:0] PROFILE_BYTE = 6'd41 ) (
++    input             clk,
++    // ROM download stream (jtframe_mem_ports.inc)
++    input      [25:0] ioctl_addr,
++    input      [ 7:0] ioctl_dout,
++    input             ioctl_wr,
++    input             ioctl_ram,   // 1 = NVRAM download, not the ROM header
++    output            wide_en
++);
++
++localparam [25:0] FULL_HEADER = 26'd64;   // jtcps1_prom_we.v:58, 44 + 20 key
++
++reg [7:0] profile = 8'hff;                // = the header fill, i.e. profile off
++
++assign wide_en = ~profile[0];
++
++always @(posedge clk) begin
++    if( ioctl_wr && !ioctl_ram && ioctl_addr < FULL_HEADER ) begin
++        if( ioctl_addr[5:0] == 6'd0         ) profile <= 8'hff;
++        if( ioctl_addr[5:0] == PROFILE_BYTE ) profile <= ioctl_dout;
++    end
++end
++
++endmodule
+diff --git a/cores/cps2w/hdl/jtcps2w_qsnd_bank.v b/cores/cps2w/hdl/jtcps2w_qsnd_bank.v
+new file mode 100644
+index 000000000..3afa83882
+--- /dev/null
++++ b/cores/cps2w/hdl/jtcps2w_qsnd_bank.v
+@@ -0,0 +1,66 @@
++/*  This file is part of JTCORES1.
++    JTCORES1 program is free software: you can redistribute it and/or modify
++    it under the terms of the GNU General Public License as published by
++    the Free Software Foundation, either version 3 of the License, or
++    (at your option) any later version.
++
++    JTCORES1 program is distributed in the hope that it will be useful,
++    but WITHOUT ANY WARRANTY; without even the implied warranty of
++    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++    GNU General Public License for more details.
++
++    You should have received a copy of the GNU General Public License
++    along with JTCORES1.  If not, see <http://www.gnu.org/licenses/>.
++
++    Author: the Vampire Saved project (CPS-2 WIDE), 2026
++    Date: 23-8-2026 */
++
++// jtcps2w_qsnd_bank — THE QSOUND SAMPLE-BANK LATCH, PROFILE-GATED.
++//
++// THE DEFECT IT FIXES. `cores/cps15/hdl/jtcps15_sound.v` latches
++//
++//     qsnd_addr[22:16] <= dsp_ab[6:0];
++//
++// i.e. SEVEN bank bits, so DSP sample bank 0x8N aliases onto 0x0N. The CPS-2
++// WIDE profile puts its QSound extension in banks 0x80-0x8E, which on the
++// stock core would therefore MIS-PLAY legacy audio rather than go silent.
++//
++// THE BANK BIT IS `dsp_ab[7]`, AND THAT IS MEASURED, NOT ASSUMED. The
++// commented-out alternative left in jtcps15_sound.v:416-417 shows the original
++// author was unsure of the permutation. MAME's low-level QSound device settles
++// it: `emu/mame/src/devices/sound/qsound.cpp` maps the DSP16A external ROM
++// space as `map(0x0000, 0x7fff).mirror(0x8000)` and then latches
++// `m_rom_bank = (m_rom_bank & 0x8000U) | offset;`, where `offset` is the
++// external-space address with the mirror bit removed — a STRAIGHT BINARY
++// bank number in ab[14:0], no permutation and no gaps. Sample bytes are then
++// read at `(u32(m_rom_bank) << 16) | m_rom_offset`. So bank bit 7 is ab[7],
++// bank bit 8 would be ab[8], and the latch can be widened one bit at a time.
++// `dsp_ab` is 16 bits and only `dsp_ab[15]` is consumed elsewhere (as the
++// external-space strobe), so bits 7..14 are free.
++//
++// WHY IT IS ITS OWN MODULE. It is the whole of the D1 trust surface: one
++// gated expression, exhaustively testable on its own over all 65,536 values
++// of `dsp_ab` in both profile states (tests/test_mister_wide_gate.sh). With
++// `wide_en` LOW the expression is bit-for-bit the stock one, including the
++// reset value, so the reference behaviour is preserved BY CONSTRUCTION and
++// not by measurement.
++
++module jtcps2w_qsnd_bank(
++    input             rst,
++    input             clk,        // clk96, as in jtcps15_sound
++    input             cen_cko,    // dsp_cen_cko
++    input             wide_en,    // the profile gate; see jtcps2w_profile.v
++    input      [15:0] dsp_ab,
++    output reg [ 7:0] bank        // qsnd_addr[23:16]
++);
++
++always @(posedge clk, posedge rst) begin
++    if( rst ) begin
++        bank <= 8'd0;
++    end else if( dsp_ab[15] && cen_cko ) begin
++        bank <= wide_en ? dsp_ab[7:0]      // 16 MB: banks 0x00-0xFF
++                        : { 1'b0, dsp_ab[6:0] };  // stock: 8 MB, banks 0x00-0x7F
++    end
++end
++
++endmodule
+diff --git a/cores/cps2w/hdl/pal_lut.hex b/cores/cps2w/hdl/pal_lut.hex
+new file mode 100644
+index 000000000..cc8bfced1
+--- /dev/null
++++ b/cores/cps2w/hdl/pal_lut.hex
+@@ -0,0 +1,16 @@
++00 05 0B 10 17 1C 22 27 2E 33 39 3E 45 4A 50 55 
++00 05 0B 11 18 1D 23 29 30 35 3C 41 48 4D 54 59 
++00 05 0C 12 19 1F 25 2B 32 38 3F 44 4C 51 58 5E 
++00 05 0C 12 1A 20 27 2D 35 3B 42 48 50 56 5D 62 
++00 06 0D 14 1C 22 29 30 38 3E 46 4C 54 5A 62 68 
++00 06 0E 15 1D 24 2C 32 3B 42 4A 50 59 60 67 6E 
++00 07 0F 16 1F 26 2F 36 3F 46 4E 55 5F 66 6E 75 
++00 07 10 17 21 29 32 39 43 4B 53 5B 65 6C 75 7D 
++00 07 11 19 23 2B 34 3C 46 4E 58 60 6A 72 7B 83 
++00 08 12 1A 26 2E 38 40 4C 54 5E 66 72 7A 84 8C 
++00 09 13 1D 29 32 3D 46 52 5B 66 6F 7B 84 8F 98 
++00 0A 15 1F 2C 36 42 4C 59 63 6F 79 85 8F 9B A5 
++00 0B 17 22 31 3C 48 53 62 6D 79 85 93 9E AB B6 
++00 0C 1A 26 36 42 50 5C 6C 78 86 92 A2 AE BC C8 
++00 0D 1D 2B 3C 4A 5A 67 79 87 97 A4 B6 C3 D3 E1 
++00 0F 21 30 44 54 66 75 89 98 AA BA CE DD EF FF 
+diff --git a/cores/cps2w/ver/game/Makefile b/cores/cps2w/ver/game/Makefile
+new file mode 120000
+index 000000000..5340a11d7
+--- /dev/null
++++ b/cores/cps2w/ver/game/Makefile
+@@ -0,0 +1 @@
++../../../cps15/ver/game/Makefile
+\ No newline at end of file
+diff --git a/cores/cps2w/ver/game/rom2hex.cc b/cores/cps2w/ver/game/rom2hex.cc
+new file mode 120000
+index 000000000..14f7157d8
+--- /dev/null
++++ b/cores/cps2w/ver/game/rom2hex.cc
+@@ -0,0 +1 @@
++../../../cps15/ver/game/rom2hex.cc
+\ No newline at end of file
+-- 
+2.50.1 (Apple Git-155)
+

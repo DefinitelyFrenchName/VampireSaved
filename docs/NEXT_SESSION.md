@@ -1,4 +1,55 @@
-# NEXT SESSION — orientation (rewritten at the 14z-107 (5) close, 2026-08-23)
+# NEXT SESSION — orientation (rewritten at the 14z-107 (6) close, 2026-08-23)
+
+> ## **NEWEST FIRST — 14z-107 (6): MiSTer SLICE D1 IS DONE, and it is the
+> ## slice where `cores/cps2w` STOPS BEING cfg-ONLY.** The QSound
+> ## sample-bank width fix ships behind a **RUNTIME** profile gate: **MRA
+> ## header byte 41, bit 0, ACTIVE LOW** (`0xFF` fill = profile OFF, the
+> ## WIDE MRA writes `0xFE`). So stock `vsavj` on `jtcps2w.rbf` is a STOCK
+> ## MACHINE by construction, which is what makes rule 1 v2's
+> ## "profile-gated" a fact on FPGA rather than an inertness argument.
+> ## Fork commit `4840df8a` — **LOCAL ONLY, NOT PUSHED** (the maintainer has
+> ## not re-confirmed push authorisation; every other fork commit is
+> ## public).
+> ## **`cores/cps2w/hdl` now holds FOUR files** — two new
+> ## (`jtcps2w_profile.v`, `jtcps2w_qsnd_bank.v`) and two OVERRIDES of
+> ## SHARED files (`jtcps15_sound.v` from cps15, `jtcps2_game.v` from
+> ## cps2). `cores/cps1`, `cores/cps2` and `cores/cps15` are BYTE-UNTOUCHED
+> ## and that is now a `git diff` assertion (`test_jtcores_twin` 2e).
+> ## **THREE THINGS THAT CHANGE HOW TO WORK HERE:**
+> ## **(1) `PCM_AW` 23 → 24 DOES NOT COMPILE** and three documents said it
+> ## did. `jtframe_romrq_bcache.v:74` replicates `SDRAMW-AW` zeroes, which
+> ## goes NEGATIVE past `AW = SDRAMW = 23` — Verilator refuses to elaborate.
+> ## An 8-bit jtframe slot reaches **8 MB of a 16 MB bank**, which is why
+> ## the map splits QSound across two banks. Struck in place everywhere.
+> ## **(2) `jtframe files` DEDUPS BY FULL PATH**, so overriding a shared
+> ## file means DELETING it from the original core's list — and a `.yaml`
+> ## pulled with `get:` drags the shared file with it, so cps2w had to
+> ## INLINE cps15's `qsound.yaml` instead of pulling it.
+> ## **(3) The bank bit IS `dsp_ab[7]`, validated against MAME's LLE
+> ## qsound device** (`map(0x0000,0x7fff).mirror(0x8000)` +
+> ## `m_rom_bank = (m_rom_bank & 0x8000U) | offset`), not against the
+> ## commented-out permutation jtcps15 carries.
+> ## **NEXT: slice D2** — the placement: bank-0 repack, the group-C GFX
+> ## redirect in `jtcps1_prom_we`, the QSound bank split on
+> ## `qsnd_addr[23]` (already produced and gated, just unrouted),
+> ## `jtframe_ram1_7slots.v` (maintainer-ruled option A) and the two new
+> ## GFX slots.
+> ## **(4) A NEW CORE WITHOUT `hdl/pal_lut.hex` RENDERS A BLACK SCREEN**,
+> ## `*.hex` is gitignored in jtcores so `git add` refuses it silently, and
+> ## — through the Verilator harness's per-changed-frame `fork()` — that
+> ## VIDEO defect MOVED the simulated match-start anchor by 107 frames and
+> ## turned `test_mister_sim_anchor` RED. Four 50-minute runs to find. A
+> ## 2x2 factorial put the whole effect on the `.hex` and none on the RTL.
+> ## **So: never blame a red anchor on RTL until a core-vs-core RAM
+> ## comparison says so** — that is what `test_mister_wide_inert` is for.
+> ## **Gates:** `test_mister_wide_gate` (ci_portable, 22 s) is the RTL
+> ## trust surface — a frozen line-by-line override delta, the missing-asset
+> ## check that would have caught pal_lut, and two Verilator benches with
+> ## four must-fire controls; `test_mister_wide_inert` (emulator, ~22 min) is
+> ## the INERTNESS instrument (cps2 vs cps2w, bit-identical work RAM);
+> ## `test_mister_sim_anchor` runs on **cps2w** by default
+> ## (`SIM_CORE=cps2` for the reference leg) and is a cross-IMPLEMENTATION
+> ## oracle, not an inertness test.
 
 > ## **NEWEST FIRST — 14z-107 (5): MiSTer SLICE D0 IS DONE.** The MRA that
 > ## makes the WIDE image downloadable at all is written, pushed to the fork
@@ -27,8 +78,9 @@
 > ## pristine dump (the merged build patches `vm3.13m/15m/17m/19m`), and
 > ## `jtframe mra` reads a hard-coded `$HOME/.mame/roms/` — hence the
 > ## private-`$HOME` staging in `tools/mister_mra.sh`.
-> ## **NEXT: slice D1** (the QSound width fix, `jtcps15_sound.v:47,416` +
-> ## `PCM_AW` 24) — unchanged by D0, and the first slice that touches RTL.
+> ## ~~**NEXT: slice D1** (the QSound width fix, `jtcps15_sound.v:47,416` +
+> ## `PCM_AW` 24)~~ — **DONE, see the 14z-107 (6) block above; and `PCM_AW`
+> ## 24 was wrong.**
 > ## Two SHIPPING questions D0 surfaced, for the maintainer, in STATE
 > ## "Decisions pending": which MRA is the core's MAIN one, and how a
 > ## release carries both `vsav.zip` flavours.

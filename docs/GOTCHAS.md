@@ -408,3 +408,27 @@ is a GAME gotcha if it is true of the game regardless of the port.
   produce no `.rom` at all. Ceilings: the GAME-side `ioctl_addr` is `[25:0]`
   = 64 MB even though the MiSTer target has 27 bits, and each header start
   word is 16 bits in KiB units.
+- **14z-107 (6) (platform):** jtframe's RTL plumbing has three traps that
+  cost real time in slice D1. An 8-bit SDRAM slot **cannot** be widened past
+  `SDRAMW` — `{SDRAMW-AW{1'b0}}` (`jtframe_romrq_bcache.v:74`) is a
+  replication count that goes NEGATIVE and stops elaboration, so a
+  byte-addressed slot reaches 8 MB of a 16 MB bank and "just widen `PCM_AW`
+  to 24" (which this project's docs said in three places) is a build
+  failure, not a trade. `jtframe files` dedups by FULL PATH, so overriding a
+  shared file means deleting it from the original core's list — and a
+  `.yaml` pulled with `get:` drags the shared file with it, so an overriding
+  core must inline that yaml instead. And a scratch clone re-pointed at a
+  public `origin` cannot check out a LOCAL-ONLY fork commit: fetch the local
+  submodule path first.
+- **14z-107 (6) (platform), and it cost four 50-minute runs:** a new jtcores
+  core that does not carry `hdl/pal_lut.hex` **renders a black screen** —
+  `jtframe_ram` resolves `SYNFILE` by bare name, jtsim supplies it by
+  symlinking `$CORES/<core>/hdl/*.hex`, and `*.hex` is in jtcores'
+  `.gitignore` so `git add` refuses it silently. Worse, that VIDEO defect
+  MOVED THE SIMULATED MATCH-START ANCHOR by 107 frames and turned the anchor
+  gate red, because `test.cpp` forks a child per CHANGED frame with no
+  `wait()`. Two lessons: check the picture, and **never blame the RTL for a
+  red anchor until a core-vs-core RAM comparison says so** — a 2x2 factorial
+  showed the RTL axis changed nothing and the missing `.hex` changed
+  everything.
+

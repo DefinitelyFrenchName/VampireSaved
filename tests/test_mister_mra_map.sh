@@ -36,6 +36,14 @@
 #  5. The stock `vsavj.rom` built from the pristine sets is BIT-IDENTICAL to
 #     the 14z-106 measurement — 46,407,744 B, sha1 `f9dc2987…`. Size alone
 #     would not notice a remapped region.
+#  6. THE PROFILE BIT (slice D1, 14z-107 (6)). Header byte 41 is 0xFE in the
+#     WIDE MRA and 0xFF — the generator's own fill — in every stock one, in
+#     the MRA and in the `.rom` alike. This is the MiSTer half of "profile-
+#     gated so stock vsavj is untouched BY CONSTRUCTION": the RTL reads that
+#     byte at download time (cores/cps2w/hdl/jtcps2w_profile.v), so a stock
+#     MRA on jtcps2w.rbf is a stock machine. Control A doubles as this check's
+#     own control — it disables the setname="vsavjw" match, and the bit must
+#     go back to 0xFF.
 #
 # MUST-FIRE CONTROLS (a layout check with no control asserts nothing)
 #  A. THE UNTRIMMED MAPPING MUST BE REJECTED. Put the QSound extension back
@@ -195,6 +203,13 @@ def header_words(path):
     return {n: by[2 * i] | (by[2 * i + 1] << 8)
             for i, n in enumerate(("audiocpu", "qsound", "gfx", "firmware"))}
 
+PROFILE_BYTE = 41
+def header_bytes(path):
+    t = open(path).read()
+    m = re.search(r'asm_md5="[0-9a-f]*">\s*<part>(.*?)</part>', t, re.S) \
+        or re.search(r'md5="None"[^>]*>\s*<part>(.*?)</part>', t, re.S)
+    return None if not m else bytes(int(x, 16) for x in m.group(1).split())
+
 def check_table(path):
     starts, total = region_table(path)
     bad_here = []
@@ -227,6 +242,23 @@ else:
     ok("WIDE region table == mister_map.md §3 (starts, total %#x, header "
        "words %s), every region 1 KiB-aligned" % (TOTAL, list(HDR.values())))
 
+# ── 2b. the profile bit, in the MRAs ───────────────────────────────────────
+for label, path, want in (("stock vsavj (from cps2)",  a, 0xFF),
+                          ("stock vsavj (from cps2w)", b, 0xFF),
+                          ("the WIDE set",             w, 0xFE)):
+    if not path:
+        continue
+    hb = header_bytes(path)
+    if hb is None or len(hb) <= PROFILE_BYTE:
+        bad("%s: no readable header in the MRA" % label)
+    elif hb[PROFILE_BYTE] != want:
+        bad("%s: header byte %d is 0x%02X, want 0x%02X — the CPS-2 WIDE "
+            "profile bit is wrong (0xFF = off, 0xFE = on)"
+            % (label, PROFILE_BYTE, hb[PROFILE_BYTE], want))
+    else:
+        ok("%-26s header byte %d = 0x%02X (profile %s)"
+           % (label, PROFILE_BYTE, want, "OFF" if want == 0xFF else "ON"))
+
 # ── 3. control A: the untrimmed mapping must be refused ────────────────────
 u = find(WORK + "/untrimmed", WIDE)
 if not u:
@@ -249,6 +281,19 @@ else:
             ok("...and the generator SILENTLY WRITES THE WRAPPED WORD %d — "
                "which is why the trim is a gate, not a preference"
                % words["firmware"])
+    # control A also un-matches the setname="vsavjw" HEADER row, so the
+    # profile bit must revert to the fill. That makes it the profile check's
+    # own control: if byte 41 were 0xFE here, the row would not be gated by
+    # setname at all and every stock MRA would be carrying it.
+    hb = header_bytes(u)
+    if hb is None or len(hb) <= PROFILE_BYTE:
+        bad("control A: no readable header")
+    elif hb[PROFILE_BYTE] != 0xFF:
+        bad("control A: header byte %d is 0x%02X with setname un-matched — "
+            "the profile row is NOT setname-gated" % (PROFILE_BYTE, hb[PROFILE_BYTE]))
+    else:
+        ok("control A doubles as the profile control: un-match the setname and "
+           "byte %d returns to the 0xFF fill" % PROFILE_BYTE)
     # mister_map.md §3 "Mapped verbatim": firmware at bulk_addr 73,662,464
     # and 70.26 MB total. Derived on paper there; reproduced here.
     if fw != 73662464 or size != 73670720:
@@ -288,6 +333,13 @@ if ROMRUNS:
             bad(".rom header words %s, map says %s" % (words, HDR))
         else:
             ok(".rom header words %s" % words)
+        if data[PROFILE_BYTE] != 0xFE:
+            bad("the WIDE .rom's header byte %d is 0x%02X, want 0xFE — the "
+                "core would download this image and run it as STOCK"
+                % (PROFILE_BYTE, data[PROFILE_BYTE]))
+        else:
+            ok("the WIDE .rom carries the profile bit: byte %d = 0xFE"
+               % PROFILE_BYTE)
 
         rp = os.path.join(REPO, BUILD, "rompath")
         zw = zipfile.ZipFile(os.path.join(rp, "vsavjw.zip"))
@@ -384,6 +436,14 @@ if ROMRUNS:
         else:
             ok("stock vsavj.rom 46,407,744 B sha1 f9dc2987… — the reference "
                "download image is BIT-IDENTICAL, not merely the same size")
+        sb = open(stock, "rb").read(64)
+        if sb[PROFILE_BYTE] != 0xFF:
+            bad("the stock .rom's header byte %d is 0x%02X, not the 0xFF fill "
+                "— a stock download would arm the WIDE profile"
+                % (PROFILE_BYTE, sb[PROFILE_BYTE]))
+        else:
+            ok("the stock .rom leaves byte %d at the 0xFF fill: stock vsavj on "
+               "jtcps2w.rbf is a STOCK MACHINE" % PROFILE_BYTE)
 
 if errs:
     print("\nFAIL: MiSTer MRA map — %d problem(s)" % len(errs))

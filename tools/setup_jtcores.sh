@@ -25,7 +25,14 @@
 # 14z-107 (5) added 0006, SLICE D0 — the `vsavjw` machine entry in
 # doc/mame.xml plus the MANDATORY QSound trim in cores/cps2w/cfg/mame2mra.toml
 # (the WIDE image is 70.26 MB mapped verbatim, which overflows both the 26-bit
-# ioctl_addr and the 16-bit header start word). Still NO RTL in any commit.
+# ioctl_addr and the 16-bit header start word).
+# 14z-107 (6) added 0007, SLICE D1 — THE FIRST RTL COMMIT. cores/cps2w stops
+# being cfg-only: it gains hdl/ with two new files (the runtime profile gate
+# and the gated QSound sample-bank latch) and OVERRIDES of two SHARED files
+# (jtcps15_sound.v, jtcps2_game.v) that could not be edited in place without
+# changing the reference cores. cores/cps2 and cores/cps15 remain
+# BYTE-UNTOUCHED against upstream v1.7.3, which tests/test_jtcores_twin.sh
+# now asserts directly.
 #
 # Simulation lane deps (brew): go coreutils gnu-sed xmlstarlet verilator
 # imagemagick — docs/platform/mister.md "Recipe".
@@ -38,7 +45,7 @@ set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 SRC="$REPO/emu/jtcores"
 UPSTREAM_TAG_SHA="63688ce5f4de9b92ac4d2ea4b306009b8ba4bcdb"   # jotego/jtcores v1.7.3
-PINNED="38acc638c1b5c2ba7937135fedc1be141993ffcd"             # fork branch vampire-saved
+PINNED="4840df8a80734d50bbeb13243db42eb17eea393e"             # fork branch vampire-saved
 FORK_URL="https://github.com/DefinitelyFrenchName/jtcores"
 
 if [ ! -f "$SRC/.gitmodules" ]; then
@@ -65,7 +72,7 @@ echo "jtcores @ $HEAD (fork of v1.7.3 $UPSTREAM_TAG_SHA); jtdsp16 $(git -C "$SRC
 # The reviewable mirror of the fork's delta, one file per commit IN ORDER.
 # The names are declared here (not derived from the commit subject) so the
 # in-tree filenames stay stable and greppable; the gate reads this same list.
-PATCH_NAMES="0001-cps2w-scaffold.patch 0002-jtframe-sim-wramdump.patch 0003-jtframe-sim-sdram-top-address-bit.patch 0004-jtframe-sim-advance-model-time.patch 0005-jtframe-sim-sdram-stats-raw.patch 0006-cps2w-wide-mra-trim.patch"
+PATCH_NAMES="0001-cps2w-scaffold.patch 0002-jtframe-sim-wramdump.patch 0003-jtframe-sim-sdram-top-address-bit.patch 0004-jtframe-sim-advance-model-time.patch 0005-jtframe-sim-sdram-stats-raw.patch 0006-cps2w-wide-mra-trim.patch 0007-cps2w-qsound-width-runtime-gate.patch"
 i=1
 for name in $PATCH_NAMES; do
     sha="$(git -C "$SRC" rev-list --reverse "$UPSTREAM_TAG_SHA..$PINNED" | sed -n "${i}p")"

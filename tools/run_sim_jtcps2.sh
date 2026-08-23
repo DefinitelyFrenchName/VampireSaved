@@ -156,7 +156,14 @@ if [ ! -d "$SCRATCH/.git" ]; then
 fi
 if [ "$(git -C "$SCRATCH" rev-parse HEAD)" != "$PIN" ]; then
     say "checking out the pin $PIN in the scratch clone"
-    git -C "$SCRATCH" fetch --quiet origin || true
+    # THE LOCAL SUBMODULE IS FETCHED FIRST, and it has to be: fork commits are
+    # LOCAL-ONLY until the maintainer authorises a push, while `origin` here is
+    # the public GitHub URL the clone is re-pointed at (so `jtsim` reports a
+    # sane remote). Fetching only origin would leave the scratch clone unable
+    # to reach a pin that exists nowhere but emu/jtcores — measured 14z-107 (6).
+    git -C "$SCRATCH" fetch --quiet "$REPO/emu/jtcores" \
+        '+refs/heads/*:refs/remotes/local/*' 2>/dev/null || true
+    git -C "$SCRATCH" fetch --quiet origin 2>/dev/null || true
     git -C "$SCRATCH" checkout --quiet "$PIN" || {
         echo "scratch clone cannot reach the pin $PIN — delete $SCRATCH and rerun" >&2; exit 1; }
 fi
@@ -205,12 +212,17 @@ fi
 
 # -------------------------------------------------------- 4. MRA + the .rom
 GAME="$CORES/$CORE/ver/game"
-# cps2w is a cfg-only scaffold at the current pin (no ver/ dir), so --core
-# cps2w cannot simulate yet; it will once the core carries its own RTL.
-[ -d "$GAME" ] || { echo "no $GAME — core '$CORE' has no ver/game dir (cps2w is cfg-only at this pin)" >&2; exit 1; }
-if [ ! -s "$ROM/vsavj.rom" ]; then
+[ -d "$GAME" ] || { echo "no $GAME — core '$CORE' has no ver/game dir" >&2; exit 1; }
+# THE .rom IS REBUILT WHEN THE CORE CHANGES, and that is not paranoia: since
+# slice D1 the two cores' TOMLs differ, so a `.rom` cached from the other core
+# would hide exactly the kind of bug this lane exists to catch (a stock header
+# that is not what cores/cps2 emits). The stamp costs one `jtframe mra` run
+# (~15 s) per core change and nothing at all on a repeat run.
+if [ ! -s "$ROM/vsavj.rom" ] || [ "$(cat "$ROM/.built_by" 2>/dev/null || true)" != "$CORE" ]; then
     say "jtframe mra $CORE (builds $ROM/vsavj.rom — scratch only, rule 7)"
+    rm -f "$ROM/vsavj.rom"
     ( cd "$JTROOT" && "$JTF" mra "$CORE" >/dev/null )
+    mkdir -p "$ROM" && printf '%s\n' "$CORE" > "$ROM/.built_by"
 fi
 [ -s "$ROM/vsavj.rom" ] || { echo "jtframe mra did not produce $ROM/vsavj.rom" >&2; exit 1; }
 say "rom  $ROM/vsavj.rom sha1 $(shasum "$ROM/vsavj.rom" | cut -c1-40)"

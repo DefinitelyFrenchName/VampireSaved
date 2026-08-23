@@ -22,7 +22,7 @@ field test. Distribution = MRA + RBF over the same release members as
 |---|---|
 | the fork | https://github.com/DefinitelyFrenchName/jtcores, branch `vampire-saved`, from upstream tag `v1.7.3` = `63688ce5` |
 | pinned here | submodule `emu/jtcores` (branch `vampire-saved`); `tools/setup_jtcores.sh` checks the pin, inits the five modules the cps2 yaml chain pulls, and regenerates `emu/jtcores-patches/` as a PATCH SERIES, one file per fork commit (`modules/jtframe/target/pocket` is a PRIVATE ssh submodule — never init it) |
-| the fork's commits | `b9d0565` `cores/cps2w` scaffold (14z-106) · `553dd56` sim work-RAM dumps · `6c32be8` sim SDRAM top address bit · `4f25cc7` sim model clock · `74ed17d` sim SDRAM stats · `38acc638` **the WIDE machine entry + the MANDATORY QSound trim in the MRA** (14z-107 (5), slice D0). **No RTL touched by any of them.** The mirrored series is `emu/jtcores-patches/0001`-`0006` |
+| the fork's commits | `b9d0565` `cores/cps2w` scaffold (14z-106) · `553dd56` sim work-RAM dumps · `6c32be8` sim SDRAM top address bit · `4f25cc7` sim model clock · `74ed17d` sim SDRAM stats · `38acc638` the WIDE machine entry + the MANDATORY QSound trim in the MRA (14z-107 (5), slice D0) · `4840df8a` **THE FIRST RTL COMMIT — the QSound sample-bank width, RUNTIME-GATED** (14z-107 (6), slice D1). Commits 1-6 touched no RTL. The mirrored series is `emu/jtcores-patches/0001`-`0007` |
 | the new core | `cores/cps2w/` in the fork → RBF `jtcps2w.rbf` (jtframe names the RBF `"jt" + <core dir>`; `CORENAME=JTCPS2W` is what the MRA's `<rbf>` is matched against, upper-cased) |
 | the reference core | `cores/cps2/` — untouched, by design |
 | jtframe | `modules/jtframe` is VENDORED in the jtcores tree at v1.7.3 (not a submodule); its Go tool builds with `cd modules/jtframe/src/jtframe && go build -o jtframe .` (Go ≥ 1.2x; `brew install go`). The `bin/jtframe` wrapper uses GNU `date -d` / `stat -c` and needs coreutils on macOS — call the built binary directly instead |
@@ -38,16 +38,83 @@ SDRAM/tilemap/object pipeline, `jtcps1_sdram.v` included) and
 `from: cps15 → qsound.yaml` (`jtcps15_sound.v` + jtdsp16). **That is the
 separate-core mechanism**: `cores/cps15` exists exactly this way (its
 `game.yaml` pulls `jtcps1_obj.v`, `jtcps1_main.v`, `common.yaml` from cps1),
-and `cores/cps2w/cfg/game.yaml` is cps2's verbatim — every `from: cps2`
-entry still resolves to `cores/cps2/hdl`. A file is copied into
-`cores/cps2w/hdl` only when it must differ; the diff between the two core
-dirs IS the trust surface.
+and a file is copied into `cores/cps2w/hdl` only when it must differ; the
+diff between the two core dirs IS the trust surface.
+
+**SINCE SLICE D1 (14z-107 (6)) cps2w EXERCISES THAT MECHANISM.** Its
+`game.yaml` was cps2's verbatim through D0; it now pulls FOUR files from
+`cores/cps2w/hdl` — two overrides of SHARED files (`jtcps2_game.v` from
+cps2, `jtcps15_sound.v` from cps15) and two new ones — and DROPS those two
+from the reference cores' lists, because `jtframe files` deduplicates by
+full path and would otherwise compile both copies of the same module
+(measured: `jtframe files sim cps2w` lists ours and neither original;
+`... cps2` lists the originals and none of ours; the two lists differ in
+exactly six entries). `cores/cps1`, `cores/cps2` and `cores/cps15` are
+BYTE-UNTOUCHED against upstream `v1.7.3` — `tests/test_jtcores_twin.sh` 2e
+asserts it with `git diff`, and `tests/test_mister_wide_gate.sh` freezes the
+override delta line by line.
 
 `cfg/macros.def` (cps2): `include ../../cps1/cfg/common.def`, `CPS2`,
 `GAMETOP=jtcps2_game`, `CORENAME=JTCPS2`, `JTFRAME_SDRAM_LARGE`,
 `JTFRAME_HEADER=44`, `JTFRAME_IOCTL_RD=128`, `JTFRAME_DIPBASE=16`,
 `JTFRAME_DIAL`, `CPS1_NOOBJ`, `JTFRAME_OSD_TEST`, MiSTer: `JTFRAME_MR_DDRLOAD`.
-cps2w differs by `CORENAME=JTCPS2W` only.
+cps2w's `macros.def` differs by `CORENAME=JTCPS2W` only — and it stays that
+way ON PURPOSE: **the WIDE profile is NOT a macro.** See "The runtime profile
+gate" below.
+
+## The runtime profile gate: MRA header byte 41 (slice D1, 14z-107 (6))
+
+Maintainer ruling, 2026-08-23: the profile is selected at RUNTIME from a
+spare MRA header bit, not by an `ifdef`. The consequence is the point —
+**stock `vsavj` on `jtcps2w.rbf` runs with the widened behaviour CLEAR**, so
+CLAUDE.md rule 1 v2's "profile-gated so stock `vsavj` is untouched BY
+CONSTRUCTION" is a fact on FPGA rather than an inertness argument.
+
+- **Which byte, and why it is free.** `jtcps1_prom_we.v` consumes header
+  bytes 0-7 (the four region start words), 8-39 (`is_cps`, the CPS config
+  registers, `REGSIZE=24` + `START_HEADER=16`) and 40 (`JOY_BYTE = 6'h28`);
+  44-63 are the CPS-2 key (`CPS2_KEYS = 26'd44`). Bytes **41-43 fall through
+  every branch of its decoder and are ignored**, which is what the file's own
+  comment at `:52-54` ("6 are actually used and 10 are reserved") is
+  describing. `JTFRAME_HEADER=44`, so byte 41 exists in every CPS-2 `.rom`.
+- **ACTIVE LOW, and that is forced rather than chosen.**
+  `cores/cps2/cfg/mame2mra.toml` declares `[header] fill=0xff`, so an
+  unwritten header byte is `0xFF`; the stock `vsavj` MRA emitted by cps2w has
+  to stay byte-identical to cps2's. Only a polarity in which the FILL means
+  "profile off" can do that. jtframe's own `JOY_BYTE` has exactly this shape
+  (0xFF = joystick mode 3; the games that want mode 0 write `fc`).
+  So: **byte 41 bit 0 CLEAR = CPS-2 WIDE**, and the WIDE MRA writes `fe`.
+- **How the row is scoped.** `RawData` embeds `Selectable`
+  (`src/jtframe/mra/types.go`), so `{ setname="vsavjw", offset=41, data="fe" }`
+  scores 3 for that set and 0 for everything else — no other MRA gains a byte.
+  Measured end to end: the stock `.rom` byte 41 is `0xFF` and the WIDE
+  `.rom`'s is `0xFE` (`tests/test_mister_mra_map.sh`).
+- **Where it lands in RTL.** `cores/cps2w/hdl/jtcps2w_profile.v` snoops the
+  ioctl stream in the game top and outputs `wide_en`; it re-defaults at the
+  first byte of every download, ignores `ioctl_ram`, and is inert for every
+  address but 41. Every gated site takes that wire — in D1 the QSound bank
+  latch (`jtcps2w_qsnd_bank.v`), later the group-C redirect, the obj promote
+  and the PRG window.
+- **THE LANE'S ANCHOR IS VIDEO-SENSITIVE, and D1 paid for the lesson.**
+  `tests/test_mister_sim_anchor.sh` went RED on cps2w at 2609/463 for a
+  reason that had nothing to do with the profile: `cores/cps2w/hdl` was
+  missing `pal_lut.hex`, the core rendered a black screen, and
+  `test.cpp:989-1005` forks a child per CHANGED frame (no `wait()`), so the
+  number of forks — and, somehow, the 68k's timing — followed the picture. A
+  2x2 factorial over {stock RTL, D1 RTL} x {LUT present, absent} put the
+  whole effect on the LUT axis and none on the RTL axis. Consequence for how
+  to work here: the anchor gate is a cross-IMPLEMENTATION oracle, and
+  `tests/test_mister_wide_inert.sh` (cps2 vs cps2w, bit-identical work RAM
+  frame by frame) is the inertness instrument. Details:
+  `docs/platform/gotchas.md`.
+- **Clock domains, so it is not asked later.** The decoder runs on the game
+  port's `clk`, which jtframe documents as "always matched to the SDRAM
+  clock" (`jtframe_common_ports.inc:5`) and which on a `JTFRAME_CLK96` core
+  like CPS-2 is the same 96 MHz net the QSound block's `clk96` is. Even if it
+  were not, `wide_en` is a STATIC configuration bit: it is written only while
+  the ROM streams, with the core (and the QSound DSP, `qsnd_rst`) held in
+  reset, and is constant for the whole of play. There is nothing to
+  synchronise.
 
 ## The numbers that bound a MiSTer-shaped profile
 
@@ -84,9 +151,45 @@ cps2w differs by `CORENAME=JTCPS2W` only.
   so banks ≥ 0x80 ALIAS onto 0x00-0x7F. ~4-line RTL width fix; content
   restored below bank 0x80 (the 14z-86 pilot at bank 0x18) is MiSTer-
   compatible as-is. 16 MB QSound is also MAME's ceiling (cps2_wide.md).
-  **Re-verified 14z-107 against the v1.7.3 pin, and with one addition that
-  matters: 16 MB of QSound FITS SDRAM bank 1 on the EXISTING 64 MB tier** —
-  PCM is alone in that 16 MB bank. See "What the CPS-2 core caps" below.
+  **Re-verified 14z-107 against the v1.7.3 pin. FIXED 14z-107 (6) (slice
+  D1): the latch is now 8 bits behind `wide_en`.** The bank bit is
+  `dsp_ab[7]` — validated against MAME's LLE device, not assumed; see "The
+  QSound bank bit" below. ~~16 MB of QSound FITS SDRAM bank 1 on the
+  EXISTING 64 MB tier — PCM is alone in that 16 MB bank.~~ **RETRACTED:** the
+  BANK has the room, the SLOT does not (8 MB cap, "jtframe's 8-bit SDRAM slot
+  CAPS AT SDRAMW" below).
+
+## The QSound bank bit IS `dsp_ab[7]` — validated 14z-107 (6)
+
+The width fix rests on this and `jtcps15_sound.v:416-417` shows the original
+author was unsure: it carries a commented-out alternative
+`{ dsp_ab[2:0], dsp_ab[4], dsp_ab[5], dsp_ab[6], dsp_ab[7] }`, a 7-bit
+permutation that drops `ab[3]` entirely. MAME's low-level QSound device
+settles it (`emu/mame/src/devices/sound/qsound.cpp`, the `QSOUND_LLE` build
+this project's oracle uses):
+
+- `dsp_io_map`: `map(0x0000, 0x7fff).mirror(0x8000).r(dsp_sample_r)` — the
+  DSP16A external ROM space is decoded on `ab[14:0]` with `ab[15]` as the
+  mirror bit, which is the same qualifier jtcps15 uses;
+- `dsp_sample_r`: `m_rom_bank = (m_rom_bank & 0x8000U) | offset;` — the bank
+  register is loaded with that address STRAIGHT, no permutation and no gaps;
+- the sample byte is `read_byte((u32(m_rom_bank) << 16) | m_rom_offset)`.
+
+So the bank is a plain binary number in `ab[14:0]`, bit 7 is `ab[7]`, and the
+latch can be widened one bit at a time. `dsp_ab` is 16 bits and only
+`dsp_ab[15]` is consumed elsewhere, so bits 7..14 are all free — 8 bank bits
+is not close to a limit. `tests/test_mister_wide_gate.sh` check 4 re-reads
+those three MAME lines every run, so the evidence cannot rot silently.
+
+**Recorded, NOT fixed, because it is pre-existing and out of D1's scope:**
+MAME documents a ONE-READ LATENCY ("the bank applies to the next read, not
+the current read... you need to set it on the channel before the desired
+channel") and models it by updating `m_rom_bank` AFTER the fetch. jtcps15
+latches the bank from `ab` on the cycle the external read is presented, i.e.
+with no latency. That is a difference in the REFERENCE core, it is unchanged
+by the width fix (which is bit-for-bit stock when `wide_en` is low), and
+touching it would alter stock behaviour — so it is a finding for the audio
+comparison to settle later, not a D1 edit.
 
 ## The SDRAM ceiling at our pin: 64 MB is PHYSICAL (measured 14z-107)
 
@@ -269,13 +372,35 @@ itself, and three of them are FORMAT, not memory.
   `jtcps1_sdram.v:121` `input [19:0] rom1_addr`, `:209`
   `gfx1_addr = {rom1_addr, rom1_half, 1'b0}` (22 bits), and `:179`
   `SCR_OFFSET = 23'h00_0000` anchors it at bank-3 offset 0.
-- **QSound is exactly as this project documented it.**
+- **QSound's bank latch is exactly as this project documented it — but
+  `PCM_AW` 23 -> 24 IS NOT PART OF THE FIX, and that half is RETRACTED
+  (measured 14z-107 (6); see "jtframe's 8-bit slot caps at SDRAMW" below).**
   `cores/cps15/hdl/jtcps15_sound.v:416` `qsnd_addr[22:16] <= dsp_ab[6:0];`
-  discards `dsp_ab[14:7]`, so banks >= 0x80 alias onto 0x00-0x7F. The fix is
-  one bit (`qsnd_addr[23:16] <= dsp_ab[7:0]`) plus `qsnd_addr` -> `[23:0]`
-  and `PCM_AW` 23 -> 24 (`jtcps1_sdram.v:23`). **16 MB of QSound fits SDRAM
-  bank 1 on the EXISTING 64 MB tier**: PCM is alone in that 16 MB bank
-  (`jtcps1_sdram.v:332-345`, `jtframe_rom_1slot`, `SLOT0_AW = PCM_AW`).
+  discards `dsp_ab[14:7]`, so banks >= 0x80 alias onto 0x00-0x7F. The fix
+  that stands is one bit (`qsnd_addr[23:16] <= dsp_ab[7:0]`) plus
+  `qsnd_addr` -> `[23:0]`; it shipped in slice D1, gated by `wide_en`.
+  ~~**16 MB of QSound fits SDRAM bank 1 on the EXISTING 64 MB tier**: PCM is
+  alone in that 16 MB bank (`jtcps1_sdram.v:332-345`, `jtframe_rom_1slot`,
+  `SLOT0_AW = PCM_AW`).~~ **FALSE.** The bank has the room, but the SLOT
+  cannot address it: an 8-bit `jtframe_rom_1slot` is capped at
+  `AW <= SDRAMW = 23`, i.e. 8 MB. That is why the placement map splits
+  QSound across two banks instead of growing one slot.
+
+## jtframe's 8-bit SDRAM slot CAPS AT SDRAMW — measured 14z-107 (6)
+
+`modules/jtframe/hdl/sdram/jtframe_romrq_bcache.v:74`:
+
+    assign sdram_addr = offset + { {SDRAMW-AW{1'b0}}, addr_req>>(DW==8)};
+
+`SDRAMW-AW` is a REPLICATION COUNT. At `SDRAMW=23` it is legal for
+`AW <= 23` and NEGATIVE for anything wider, which is a hard error, not a
+warning: Verilator 5.050 says *"Replication value of < 0 or X/Z not legal
+(IEEE 1800-2023 11.4.12.1): '32'hffffffff'"* and exits 1 (`AW=24` and
+`AW=25` both measured, `jtframe_rom_1slot` -> `rom_2slots` -> `romrq_bcache`
+at `SDRAMW=23`, `DW=8`). So a byte-addressed slot reaches at most 2^23 = 8 MB
+of a 16 MB bank, and every "just widen `PCM_AW`" plan is a build failure
+rather than a design trade. `tests/test_mister_wide_gate.sh` 3d/3e keeps this
+from being re-proposed.
 - **A free resource, for the record.** `cores/cps2/hdl/jtcps2_game.v:521-528`
   ties BOTH star slots off (`star0_addr = 13'd0`, `star0_cs = 1'b0`, likewise
   star1), so bank 3's `jtframe_rom_4slots` carries two 22-bit slots
@@ -672,6 +797,16 @@ shown in STATE 14z-106 (3)). Gate: `tests/test_jtcores_twin.sh`.
 and the twin claim above is now a live gate rather than a one-off
 measurement: `tests/test_mister_mra_map.sh` re-generates both cores' MRAs
 and diffs them.
+**Since 14z-107 (6) the twin is a TWO-PART claim and both parts are gated.**
+The MRA twin above is unchanged and still exact. What changed is the CORE
+DIR: cps2w carries RTL, so "identical modulo CORENAME" became "identical
+modulo an ENUMERATED delta" — four files in `cores/cps2w/hdl`, a frozen
+line-by-line diff for the two that override shared files
+(`tests/test_mister_wide_gate.sh` check 1), and `git diff` proving
+`cores/cps1`, `cores/cps2`, `cores/cps15` never moved
+(`tests/test_jtcores_twin.sh` 2e). The gate that used to say "game.yaml
+identical (no RTL override)" was moved DELIBERATELY, the way check 2c was
+moved at D0.
 
 ## HOW THE MRA AND THE `.rom` ARE MADE (measured 14z-107 (5))
 

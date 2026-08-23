@@ -1,0 +1,104 @@
+# FROZEN RTL DELTA — cores/cps2w/hdl vs the SHARED files it overrides.
+# Regenerate deliberately; tests/test_mister_wide_gate.sh compares against it.
+=== jtcps2_game.v : cores/cps2/hdl -> cores/cps2w/hdl ===
++
++// ---------------------------------------------------------------------------
++// CPS-2 WIDE (Vampire Saved) OVERRIDE of cores/cps2/hdl/jtcps2_game.v.
++// Copied at jtcores v1.7.3 because the game top has to carry the profile gate
++// and the widened QSound address, and the file is SHARED with cores/cps2 —
++// editing it in place would change the reference core. The diff against the
++// original IS the trust surface (CLAUDE.md rule 1 v2) and is frozen by
++// tests/test_mister_wide_gate.sh. FOUR deltas:
++//   1. `qsnd_addr` 23 -> 24 bits;
++//   2. `wide_en` decoded from the ROM header by jtcps2w_profile;
++//   3. that wire routed into jtcps15_sound;
++//   4. the PCM slot fed with qsnd_addr[22:0].
++// On (4) — and it CORRECTS the design note that said `PCM_AW` 23 -> 24:
++// jtframe's 8-bit SDRAM slot CANNOT be widened past SDRAMW. `sdram_addr =
++// offset + { {SDRAMW-AW{1'b0}}, addr_req>>(DW==8) }`
++// (jtframe_romrq_bcache.v:74) becomes a replication of -1 at AW=24, SDRAMW=23,
++// which is a hard Verilator error, not a warning. That is also why the
++// placement map splits QSound across two banks rather than growing one slot:
++// bank 1 keeps the stock 8 MB at 23 bits and the 0x80+ extension gets its own
++// 1 MB window in bank 0 (slice D2). Until then bit 23 is produced, gated and
++// unrouted; with wide_en LOW it is constant 0, so the PCM address the slot
++// sees is bit-for-bit the reference core's.
++// ---------------------------------------------------------------------------
+-wire [22:0] qsnd_addr;
++wire [23:0] qsnd_addr;   // CPS-2 WIDE: [23] = DSP sample bank 0x80+
++wire        wide_en;   // CPS-2 WIDE profile, from the ROM header
++    .wide_en    ( wide_en           ),
++
++// CPS-2 WIDE: the runtime profile gate. Header byte 41, ACTIVE LOW, so a
++// stock MRA (whose header is 0xFF-filled) runs this RBF as a stock machine.
++jtcps2w_profile u_profile(
++    .clk        ( clk           ),
++    .ioctl_addr ( ioctl_addr    ),
++    .ioctl_dout ( ioctl_dout    ),
++    .ioctl_wr   ( ioctl_wr      ),
++    .ioctl_ram  ( ioctl_ram     ),
++    .wide_en    ( wide_en       )
++);
+-    .pcm_addr    ( qsnd_addr     ),
++    // [23] is the WIDE extension bank bit; the split that consumes it is
++    // slice D2. It is 0 whenever wide_en is 0.
++    .pcm_addr    ( qsnd_addr[22:0] ),
+=== jtcps15_sound.v : cores/cps15/hdl -> cores/cps2w/hdl ===
++
++// ---------------------------------------------------------------------------
++// CPS-2 WIDE (Vampire Saved) OVERRIDE of cores/cps15/hdl/jtcps15_sound.v.
++// Copied at jtcores v1.7.3 because the QSound sample-bank latch has to differ
++// and the file is SHARED with cores/cps15 and cores/cps2 — editing it in place
++// would change the reference cores. The diff against the original IS the trust
++// surface (CLAUDE.md rule 1 v2) and is frozen by
++// tests/test_mister_wide_gate.sh. THREE deltas, all of them the QSound
++// address width and its runtime gate:
++//   1. `qsnd_addr` 23 -> 24 bits, and it is now a wire built from the two
++//      halves rather than a single `output reg`;
++//   2. the low half keeps its own register `qsnd_lo` (was qsnd_addr[15:0]);
++//   3. the bank latch moved into `jtcps2w_qsnd_bank`, gated by the new
++//      `wide_en` input. With wide_en LOW that module is bit-for-bit the
++//      expression this file used to carry, reset value included.
++// Nothing else in this file is touched.
++// ---------------------------------------------------------------------------
++    // CPS-2 WIDE profile gate (jtcps2w_profile.v)
++    input             wide_en,
+-    output reg [22:0] qsnd_addr, // max 8 MB.
++    output     [23:0] qsnd_addr, // 16 MB. Bit 23 is the CPS-2 WIDE
++                                 // extension and is 0 unless wide_en.
++
++// CPS-2 WIDE: the sample address is now two pieces — the low 16 bits
++// latched from the DSP's parallel port here, the 8 bank bits latched
++// from dsp_ab by jtcps2w_qsnd_bank below.
++reg  [15:0] qsnd_lo;
++wire [ 7:0] qsnd_bank;
++
++assign qsnd_addr = { qsnd_bank, qsnd_lo };
+-        qsnd_addr  <= 23'd0;
++        qsnd_lo    <= 16'd0;
+-        // latch QSound ROM address
++        // latch QSound ROM address (low half; the bank half is in
++        // jtcps2w_qsnd_bank, instantiated below)
+-            qsnd_addr[15:0] <= dsp_pbus_out;
+-        end
+-        if( dsp_ab[15] && dsp_cen_cko ) begin
+-            qsnd_addr[22:16] <= dsp_ab[6:0];/*{ dsp_ab[2:0], dsp_ab[4], dsp_ab[5],
+-                dsp_ab[6], dsp_ab[7] };*/
+-        end
+-    end
+-end
++            qsnd_lo <= dsp_pbus_out;
++        end
++    end
++end
++
++// CPS-2 WIDE: the sample-bank latch. wide_en LOW reproduces the stock
++// `qsnd_addr[22:16] <= dsp_ab[6:0]` exactly, bit 23 pinned to 0.
++jtcps2w_qsnd_bank u_qsnd_bank(
++    .rst        ( rst           ),
++    .clk        ( clk96         ),
++    .cen_cko    ( dsp_cen_cko   ),
++    .wide_en    ( wide_en       ),
++    .dsp_ab     ( dsp_ab        ),
++    .bank       ( qsnd_bank     )
++);

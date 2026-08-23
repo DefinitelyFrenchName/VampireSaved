@@ -1343,3 +1343,74 @@ port is `input [25:0] ioctl_addr` (**64 MB**,
 `modules/jtframe/hdl/inc/jtframe_mem_ports.inc:1`) even though the MiSTer
 target carries 27 bits (`jtframe_emu.sv:334`), and each header start word is
 **16 bits in KiB units**, i.e. 65,535 KiB max.
+
+## jtframe's RTL plumbing (added 14z-107 (6), slice D1)
+
+- **An 8-bit SDRAM slot CANNOT be widened past `SDRAMW`, and the failure is
+  a BUILD failure.** `modules/jtframe/hdl/sdram/jtframe_romrq_bcache.v:74` is
+
+      assign sdram_addr = offset + { {SDRAMW-AW{1'b0}}, addr_req>>(DW==8)};
+
+  where `SDRAMW-AW` is a REPLICATION COUNT. At `SDRAMW=23` anything with
+  `AW > 23` makes it negative and Verilator refuses to elaborate:
+  *"Replication value of < 0 or X/Z not legal (IEEE 1800-2023 11.4.12.1):
+  '32'hffffffff'"*, exit 1 (measured at AW=24 and AW=25 on
+  `jtframe_rom_1slot`, `DW=8`). **So a byte-addressed slot reaches 8 MB of a
+  16 MB bank.** This project's own documents carried "the QSound fix is
+  `qsnd_addr` 23→24, the latch [6:0]→[7:0] and `PCM_AW` 23→24" in three
+  places for two sessions; the third clause would have stopped the build. If
+  a region needs more than a slot can address, it needs ANOTHER SLOT, which
+  is why the CPS-2 WIDE map splits QSound across two banks.
+- **`jtframe files` deduplicates by FULL PATH, so overriding a shared file
+  means REMOVING it from the original list.** `files.go collect_files` sorts
+  the collected paths and drops adjacent duplicates — `cores/cps2/hdl/x.v`
+  and `cores/cps2w/hdl/x.v` are different strings, so both survive and the
+  compiler sees the same module twice. A core that copies a shared file into
+  its own `hdl/` must also delete that entry from the `from: <other core>`
+  block of its `game.yaml`. Same trap one level up: a `.yaml` pulled with
+  `get:` (e.g. cps15's `qsound.yaml`) brings the shared file WITH it, so a
+  core that overrides a file inside such a yaml cannot pull that yaml at all
+  — inline what it provides, minus the override.
+- **A NEW CORE WITHOUT `hdl/pal_lut.hex` RENDERS A BLACK SCREEN, AND
+  NOTHING WARNS.** `cores/cps2w` shipped without it and cost four
+  50-minute simulation runs to find. The chain: `jtcps1_pal.v:62`
+  instantiates `jtframe_ram #(.SYNFILE("pal_lut.hex"))`; `jtframe_ram`
+  resolves that by BARE NAME, and `jtsim` supplies it by symlinking
+  `$CORES/<core>/hdl/*.hex` into the sim directory — so every core that
+  instantiates `jtcps1_pal` carries its own copy (cps1, cps15 and cps2 all
+  do). Missing, `$readmemh` fails with a `%Warning` in a wall of warnings,
+  the LUT reads back zero and `red/green/blue` are pinned to 0. Measured:
+  the reference core rendered 12 changed frames in 640 (frame 465 mean
+  brightness 146); the new core rendered exactly one, mean 0.
+  **And `*.hex` is in jtcores' own `.gitignore`**, so `git add` refuses it
+  silently — the file must be force-added. Gate:
+  `tests/test_mister_wide_gate.sh` 3g requires every `hdl/*.hex` the
+  reference cores carry to exist in the new core's `hdl/`, byte-identical.
+- **THE VERILATOR LANE'S ANCHOR IS VIDEO-SENSITIVE — a core whose PICTURE
+  is wrong can move the simulated MATCH-START FRAME.** Measured 14z-107 (6)
+  as a 2x2 factorial over {stock RTL, D1 RTL} x {pal_lut.hex present,
+  absent}, work RAM compared frame by frame at 2490-2620: the RTL axis
+  changed NOTHING (the two variants were bit-identical to each other), the
+  pal_lut axis changed EVERYTHING (present -> bit-identical to the
+  reference core; absent -> all 131 frames differ, and the match-start
+  anchor moved 2502 -> 2609). **The mechanism is not in the design** — that
+  LUT feeds only `red/green/blue` (`jtcps1_pal.v:105-122`) and there is no
+  path back into the CPU. It is in the HARNESS: `test.cpp:989-1005` forks a
+  child per CHANGED frame to run ImageMagick, with **no `wait()`**, so a
+  black-screen core forks about once where a live one forks hundreds of
+  times, and those children share the parent's file table. The exact path
+  from that to a one-byte divergence at `RAM:$FF8060` on frame 2051 is NOT
+  yet pinned down and is OPEN. The practical consequences are already
+  clear: `tests/test_mister_sim_anchor.sh` is a cross-IMPLEMENTATION oracle
+  and NOT a clean inertness instrument, and a red anchor must be
+  root-caused with a core-vs-core comparison
+  (`tests/test_mister_wide_inert.sh`) before anything is blamed on the RTL.
+- **A scratch clone re-pointed at a public `origin` cannot reach a
+  LOCAL-ONLY commit.** `tools/run_sim_jtcps2.sh` clones from
+  `emu/jtcores` and then sets `origin` to the GitHub fork URL, so
+  `git fetch origin` succeeds, fetches nothing useful, and the following
+  `git checkout <pin>` fails with a pin that exists only in the submodule.
+  Fetch the LOCAL path first (`git fetch "$REPO/emu/jtcores"
+  '+refs/heads/*:refs/remotes/local/*'`). It only bites when fork commits are
+  held back from a push — which is exactly when RTL is being developed.
+

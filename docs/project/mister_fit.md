@@ -182,8 +182,13 @@ CURRENT 64 MB map:
   instead of at its ceiling.) What this needs is the core-side 68k decode
   change — `jtcps2_main.v:184` `rom_cs <= A[23:22] == 2'b00;` and the
   `0x400000` objcfg collision — **not** a wider SDRAM.
-- **QSound 16 MB FITS BANK 1 TODAY.** PCM is alone in a 16 MB bank; only
-  `PCM_AW` 23 -> 24 and the 14z-86 latch fix are needed. Live content is
+- ~~**QSound 16 MB FITS BANK 1 TODAY.** PCM is alone in a 16 MB bank; only
+  `PCM_AW` 23 -> 24 and the 14z-86 latch fix are needed.~~ **BOTH HALVES
+  CORRECTED.** `PCM_AW` 23 -> 24 does not compile at all: the 8-bit slot's
+  address arithmetic is `{SDRAMW-AW{1'b0}}` and goes negative past
+  `AW = SDRAMW = 23` (measured 14z-107 (6), `docs/platform/mister.md`
+  "jtframe's 8-bit SDRAM slot CAPS AT SDRAMW"), so one slot reaches 8 MB and
+  the extension needs a SECOND slot in another bank. Live content is
   8.9 MB, leaving **~7.1 MB spare at the top of bank 1**.
   **CORRECTED 14z-107 (4): 16 MB of QSound must NOT be placed** — the WIDE
   `.rom` mapped verbatim is 70.26 MB, which overflows both the 26-bit

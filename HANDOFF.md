@@ -180,12 +180,26 @@ in `emu/jtcores-patches/` as a PATCH SERIES, one file per fork commit.
 `tools/setup_jtcores.sh` checks the pin, inits the five modules the cps2
 yaml chain pulls, builds jtframe's Go tool and regenerates the series;
 `tests/test_jtcores_twin.sh` (ci_portable) locks pin, twin and series.
-**No RTL differs yet** — the SIX fork commits are `b9d0565` (the `cps2w` cfg
-scaffold), four Verilator-TESTBENCH fixes (`553dd56` `JTFRAME_SIM_WRAMDUMP`,
-`6c32be8` the SDRAM model's dropped top address bit, `4f25cc7` the model
-clock, `74ed17d` raw SDRAM stats) and `38acc638` (**slice D0**: the `vsavjw`
-machine entry in `doc/mame.xml` + the QSound trim in
-`cores/cps2w/cfg/mame2mra.toml`). The stock-vsavj reference-leg MRA is
+**SINCE SLICE D1 (14z-107 (6)) cps2w CARRIES RTL** — the SEVEN fork commits
+are `b9d0565` (the `cps2w` cfg scaffold), four Verilator-TESTBENCH fixes
+(`553dd56` `JTFRAME_SIM_WRAMDUMP`, `6c32be8` the SDRAM model's dropped top
+address bit, `4f25cc7` the model clock, `74ed17d` raw SDRAM stats),
+`38acc638` (**slice D0**: the `vsavjw` machine entry in `doc/mame.xml` + the
+QSound trim in `cores/cps2w/cfg/mame2mra.toml`) and `4840df8a` (**slice D1**,
+THE FIRST RTL COMMIT: the QSound sample-bank width, gated at RUNTIME by a
+spare MRA header byte). **`cores/cps2` and `cores/cps15` are still
+BYTE-UNTOUCHED** — that is now a `git diff` assertion
+(`test_jtcores_twin` 2e), and the four files in `cores/cps2w/hdl` are
+enumerated with a frozen line-by-line delta (`test_mister_wide_gate`).
+**Fork commits `4840df8a` and later are LOCAL-ONLY until the maintainer
+re-confirms push authorisation.**
+The RTL benches live in **`tests/rtl/*.v`** (this repo, not the fork) and the
+frozen override delta in **`tests/expect/cps2w_rtl_delta.txt`**;
+`tests/test_mister_wide_gate.sh` compiles the benches against the fork's real
+module sources with Verilator and skips that half cleanly when Verilator is
+absent. The MiSTer edition of Rule 1 v2 — what "bounded / profile-gated /
+superset / mirrored / ratified" each mean on FPGA, and which check enforces
+each — is `docs/project/cps2_wide.md` "THE MiSTer EDITION OF THE SAME RULE". The stock-vsavj reference-leg MRA is
 produced by `jtframe mra cps2w` (byte-identical to stock cps2's except
 `<rbf>` — now gated, not just measured). The fit numbers are in
 `docs/project/mister_fit.md`; the placement map is
@@ -280,7 +294,9 @@ see `docs/platform/gotchas.md` "`jtsim -verilator -stats` reports nothing".
 | `tests/audit_sdram_bank_load.sh` | **manual/emulator (~65 min)** | the per-bank SDRAM traffic profile of stock `vsavj` (ACTIVE counts, share, kiB/s, same-row hit rate and mean run, clash warnings) split into attract / select / in-match — the evidence for the MiSTer BANK REPACK ruling. `--log FILE` re-analyses `build/sdram_bank_load_14z107.log` offline |
 | `tests/audit_mister_map_fit.sh` | ci_static (~5 s) | the SDRAM PLACEMENT MAP fits the 64 MB tier by 0.708 MB, and the four extents it rests on are frozen: group-C obj bank 4 ceiling `0xEE73`, obj bank 5 ceiling `0xFFDB`, QSound live `0x8E57F0`, PRG live `0x5FFF1E`. Also checks the `.rom` against the 26-bit `ioctl_addr` and the 16-bit header words. Re-checks the "tile code IS its SDRAM address" scramble identity §1 rests on. THREE must-fire controls (untrimmed QSound must be rejected; +1 MB of obj-bank-5 must overflow bank 0; the identity must fail without the scramble). Design: `docs/project/mister_map.md` |
 | `tests/test_mister_mra_map.sh` | ci_static (~15 s) | **SLICE D0**: the WIDE `.rom` is EXACTLY `mister_map.md` §3 — 66,265,152 B, header words 6144/6400/15552/64704, every region 1 KiB-aligned and byte-for-byte the romset's, the trimmed QSound region a PURE truncation. Also: the stock `vsavj` MRA from `cps2w` == `cps2`'s except `<rbf>`, `cps2` emits NO WIDE MRA (the `cps2w.cpp` sourcefile gate), stock `vsavj.rom` still BIT-IDENTICAL (46,407,744 B, sha1 `f9dc2987…`), and the fork's catalogue entry names the CURRENT build's CRCs. TWO must-fire controls: untrimmed -> 73,670,720 B / `qsnd_start` 71,936 KiB (and the generator SILENTLY writes the wrapped word); `length` +0x400 -> the frozen table fails |
-| `tests/test_mister_sim_anchor.sh` | **manual/emulator (~50 min)** | THE ORACLE: MAME and jtcps2 agree on every mapped §4 field at the round-1 match-start anchor of `05_timeout_idle` (MAME **2146** / sim **2502**, skew **356 ± 30** — re-measured 14z-107 (3) on the fixed SDRAM model; it was 2507/361 on the broken one, and 2606/460 before that, which was the BOOT offset rather than the anchor. The gate freezes 2146/356 at `:87-89`); asserts the dump window is NON-CONSTANT first, then the byte-swap and hook-inertness controls |
+| `tests/test_mister_wide_gate.sh` | ci_portable (~30 s with Verilator, seconds without) | **SLICE D1, the RTL trust surface.** The frozen line-by-line delta of the two OVERRIDDEN files vs the shared originals (`tests/expect/cps2w_rtl_delta.txt`); the profile byte agreeing in all three copies (TOML `offset=41 data="fe"`, RTL `PROFILE_BYTE=6'd41`, `~profile[0]`) plus the `fill=0xff` and `JOY_BYTE` facts the polarity rests on; the widths, and that `PCM_AW` is NOT widened (it cannot be — `jtframe_romrq_bcache.v:74`); MAME's three qsound.cpp lines that validate `dsp_ab[7]`; and `jtframe files` resolving cps2w to OUR four and cps2 to NEITHER of ours. Then Verilator: `jtcps2w_qsnd_bank` over **all 65,536 `dsp_ab` values in both profile states** (bank[7] stuck at 0 with `wide_en` low, moving 16,384 times with it high) and `jtcps2w_profile` over a real 64-byte header stream. FOUR must-fire controls: gate bypassed; profile byte moved to 40; polarity flipped; an override perturbed by one width |
+| `tests/test_mister_wide_inert.sh` | **manual/emulator (~22 min)** | **THE FPGA SUPERSET INVARIANT, MEASURED DIRECTLY**: `cps2` and `cps2w` run the SAME stock `vsavj` download under Verilator and their 68k work RAM must be BIT-IDENTICAL at every frame of the window (default 540-640, `WINDOW_FIRST`/`WINDOW_LAST` to move it). Asserts the window is NON-CONSTANT first; control = the same dumps compared against themselves SHIFTED BY ONE FRAME, which must FAIL, proving the comparison would catch a one-frame timing skew. This is the inertness instrument; the anchor gate below is a cross-IMPLEMENTATION oracle and is a poor substitute for it |
+| `tests/test_mister_sim_anchor.sh` | **manual/emulator (~50 min)** | THE ORACLE: MAME and the core under test (**`cps2w` since D1**, `SIM_CORE=cps2` for the reference leg) agree on every mapped §4 field at the round-1 match-start anchor of `05_timeout_idle` (MAME **2146** / sim **2502**, skew **356 ± 30** — re-measured 14z-107 (3) on the fixed SDRAM model; it was 2507/361 on the broken one, and 2606/460 before that, which was the BOOT offset rather than the anchor. The gate freezes 2146/356 at `:87-89`); asserts the dump window is NON-CONSTANT first, then the byte-swap and hook-inertness controls |
 
 ## Running a CPS-2 WIDE build (playtest)
 

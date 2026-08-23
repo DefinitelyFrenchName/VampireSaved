@@ -11,6 +11,21 @@ the profile itself is `docs/project/cps2_wide.md`.
 four things hold at once.** It does not fit the way the route was framed.
 See §1 for the correction, §5 for the map, §9 for what is still open.
 
+**SLICE D1 IS DONE (14z-107 (6)): the QSound sample-bank width, RUNTIME-
+GATED, and `cores/cps2w` now carries RTL.** Fork commit `4840df8a`. The
+maintainer ruled 2026-08-23 that the profile is selected from a spare MRA
+header bit rather than by `ifdef` (open question 8, below, is answered), so
+stock `vsavj` on our own RBF runs with the widened behaviour CLEAR. Two
+things the slice contradicted, both corrected in place below: **`PCM_AW`
+23 → 24 DOES NOT COMPILE** (§7, §10 D1 row) and **the bank bit `dsp_ab[7]`
+is now VALIDATED rather than assumed** (§9 Q3). Everything else in the map
+stands. A third thing D1 found belongs to the LANE rather than the map and
+is filed in `docs/platform/gotchas.md`: a new core missing `hdl/pal_lut.hex`
+renders a BLACK SCREEN, and through the Verilator harness's
+per-changed-frame `fork()` that video defect MOVED the simulated match-start
+anchor by 107 frames — so a red anchor is not evidence about RTL until a
+core-vs-core RAM comparison says it is.
+
 **SLICE D0 IS DONE (14z-107 (5)) AND THE MAP SURVIVED IT.** The MRA that
 trims the image is written, the fork carries it (commit `38acc638`), and the
 `.rom` it produces is **exactly** the §3 table — 66,265,152 B with header
@@ -297,7 +312,8 @@ That binds the ROMSET, which remains 4 × 4 MB = 16 MB. It does not bind
 MiSTer: `jtcps2` has **no mask of any kind** on the sample path — the size is
 set purely by an address width (`PCM_AW`, `jtcps1_sdram.v:23`, feeding
 `jtframe_rom_1slot` at `:334`), and `grep mask cores/cps15/hdl/jtcps15_sound.v`
-is empty. See §7.
+is empty. That width is capped at `SDRAMW = 23` = 8 MB PER SLOT, though, so
+the placed 8.9375 MB has to be two slots in two banks (§5, §7). See §7.
 
 ---
 
@@ -499,18 +515,37 @@ members.
   `jtframe_rom_1slot`, which computes `offset + (addr >> 1)`
   (`jtframe_romrq_bcache.v:74`). `grep -n "mask" cores/cps15/hdl/jtcps15_sound.v`
   returns nothing. The 8 MB cap is an **address width**, not a mask, so any
-  placed length works and 8.9375 MB is conformant.
+  placed length works and 8.9375 MB is conformant — **provided no SINGLE
+  8-bit slot is asked to address more than 8 MB**, which it cannot be
+  (measured 14z-107 (6): that same `:74` expression does not ELABORATE at
+  `AW > SDRAMW`; see the retraction below). 8.9375 MB is reached by TWO slots
+  in two banks, §5.
 
 **Do banks `0x80-0x8E` stay addressable after the width fix?** Yes.
 
 - The defect: `jtcps15_sound.v:416` `qsnd_addr[22:16] <= dsp_ab[6:0];`
   keeps 7 bank bits, so bank `0x8N` aliases onto `0x0N` and *mis-plays legacy
   audio* rather than going silent (14z-86).
-- The fix: `qsnd_addr` `[22:0] → [23:0]`, the latch `[6:0] → [7:0]`, and
-  `PCM_AW` `23 → 24` (`jtcps1_sdram.v:23`). `dsp_ab` is 16 bits
-  (`jtcps15_sound.v:84`) and only `dsp_ab[15]` is consumed as the
-  latch strobe (`:415`), so bits 7..14 are free — 8 bank bits is not close to
-  a limit.
+- The fix, **AS SHIPPED in slice D1** (fork `4840df8a`): `qsnd_addr`
+  `[22:0] → [23:0]` and the latch `[6:0] → [7:0]`, the latter lifted into
+  `cores/cps2w/hdl/jtcps2w_qsnd_bank.v` and gated by `wide_en` so that with
+  the profile clear it is bit-for-bit the stock expression, reset value
+  included. `dsp_ab` is 16 bits (`jtcps15_sound.v:84`) and only `dsp_ab[15]`
+  is consumed as the latch strobe (`:415`), so bits 7..14 are free — 8 bank
+  bits is not close to a limit.
+- ~~and `PCM_AW` `23 → 24` (`jtcps1_sdram.v:23`)~~ — **WRONG, AND IT IS A
+  BUILD FAILURE, NOT A TRADE (measured 14z-107 (6)).** jtframe's 8-bit SDRAM
+  slot cannot be widened past `SDRAMW`: `jtframe_romrq_bcache.v:74` is
+  `sdram_addr = offset + { {SDRAMW-AW{1'b0}}, addr_req>>(DW==8) }`, and
+  `SDRAMW-AW` is a REPLICATION COUNT that goes negative at `AW=24`,
+  `SDRAMW=23`. Verilator: *"Replication value of < 0 or X/Z not legal"*,
+  exit 1 (AW=24 and AW=25 both measured on `jtframe_rom_1slot`). So a
+  byte-addressed slot reaches 8 MB of a 16 MB bank — which is exactly WHY §5
+  splits QSound across two banks rather than growing one slot, and the two
+  halves of this document were inconsistent until now. D1 therefore leaves
+  `PCM_AW` at 23 and feeds the slot `qsnd_addr[22:0]`; bit 23 is produced,
+  gated, and routed by D2. `tests/test_mister_wide_gate.sh` 3d/3e keeps the
+  wrong version from being re-proposed.
 - After the fix, bank `0x80+` means `qsnd_addr[23] = 1`, which is precisely
   the split bit routing to bank 0's PCM-high window. Banks `0x80-0x8F` are
   addressable; **banks `0x90-0xFF` are placed nowhere**, and with a widened
@@ -599,10 +634,20 @@ slice as the decode.
    all (§3, corrected in place); with the extension split into its own
    `qsoundw` region the single-part window IS a pure truncation, measured
    byte-for-byte against the zip. Gate `tests/test_mister_mra_map.sh`.
-3. **Does `dsp_ab[7]` actually carry sample-bank bit 7 in the real
-   `dl-1425.bin` program?** The width fix assumes it. Must-fire control: a
-   sample placed at bank `0x80` must play the extension content, not bank
-   `0x00`'s.
+3. ~~**Does `dsp_ab[7]` actually carry sample-bank bit 7 in the real
+   `dl-1425.bin` program?**~~ **ANSWERED YES, 14z-107 (6), from MAME's
+   low-level QSound device** (`emu/mame/src/devices/sound/qsound.cpp`): the
+   DSP16A external ROM space is `map(0x0000,0x7fff).mirror(0x8000)`, the bank
+   register is loaded `m_rom_bank = (m_rom_bank & 0x8000U) | offset;` — the
+   external-space address STRAIGHT, no permutation, no gaps — and the sample
+   byte is `read_byte((u32(m_rom_bank) << 16) | m_rom_offset)`. So the bank is
+   a plain binary number in `ab[14:0]` and bit 7 is `ab[7]`. The commented-out
+   permutation at `jtcps15_sound.v:416-417` (which also drops `ab[3]`) is a
+   guess and is not what the hardware does. `tests/test_mister_wide_gate.sh`
+   check 4 re-reads those three MAME lines on every run. *Recorded while
+   there and NOT fixed: MAME models a ONE-READ bank latency that jtcps15 does
+   not — a pre-existing difference in the reference core, unchanged by the
+   width fix, out of D1's scope (`docs/platform/mister.md`).*
 4. **`jtframe_ram1_7slots` (new fork file) or move the Z80 to bank 1?**
    §5 option A vs B. This is a maintainer call about fork surface.
 5. **The fit has 0.708 MB of slack in 64 MB and depends on four frozen
@@ -616,14 +661,21 @@ slice as the decode.
    `address="0x30000000"`, `corerom.go:23-35`) impose its own size limit at
    63.2 MB?** Unread.
 7. **Does widening `main_rom_addr` interact with `jtcps2_dtack.v`?** Unread.
-8. **Should the profile be selected at RUNTIME from a spare header byte
-   rather than by `ifdef` in `cps2w`?** A compile-time gate means stock
-   `vsavj` on our RBF gets the widened PRG decode and the 3-bit obj bank. Both
-   are provably inert for stock content (`cps2_wide.md` A1/A2 measured zero
-   reads above 4 MB and `bit12` never set), but a runtime bit from the header
-   would make the *MRA* the profile selector and restore
-   gating-by-construction. The header has reserved bytes
-   (`jtcps1_prom_we.v:52-54`, "6 are actually used and 10 are reserved").
+8. ~~**Should the profile be selected at RUNTIME from a spare header byte
+   rather than by `ifdef` in `cps2w`?**~~ **RULED YES (maintainer,
+   2026-08-23) AND IMPLEMENTED IN D1.** The gate is **header byte 41, bit 0,
+   ACTIVE LOW** — `0xFF` (the generator's own `[header] fill`) means profile
+   OFF, and the WIDE MRA writes `0xFE`. The polarity is forced, not chosen:
+   any other one would change every stock MRA this core emits, and the twin
+   assertion forbids that. `jtcps1_prom_we.v` ignores bytes 41-43 (0-7 are
+   the region starts, 8-39 `is_cps`, 40 `JOY_BYTE`, 44-63 the CPS-2 key), so
+   byte 41 is free at this pin. RTL: `cores/cps2w/hdl/jtcps2w_profile.v`,
+   instantiated in the game top, output `wide_en`, taken by every gated site.
+   Measured end to end: the stock `.rom`'s byte 41 is `0xFF` and the WIDE
+   `.rom`'s is `0xFE` (`tests/test_mister_mra_map.sh`); the decode is
+   exhaustively simulated with three must-fire controls
+   (`tests/test_mister_wide_gate.sh`). Full argument:
+   `docs/platform/mister.md` "The runtime profile gate".
 
 ---
 
@@ -654,8 +706,8 @@ self-contained piece. Two changes:
 | # | scope | smallest thing that proves it | must-fire control | superset leg |
 |---|---|---|---|---|
 | **D0 — DONE 14z-107 (5)**, fork commit `38acc638` | `cores/cps2w/cfg/mame2mra.toml`: the `qsoundw` trim region + the `cps2w.cpp` sourcefile opt-in, and the `vsavjw` entry in `doc/mame.xml`. **No RTL.** | DONE: `rom/vsavjw.rom` = **66,265,152 B**, header words **6144 / 6400 / 15552 / 64704**, every region start 1 KiB-aligned, every region byte-for-byte the romset's. | BOTH FIRED. (A) untrimmed → 73,670,720 B and `qsnd_start` 71,936 KiB, and the generator **silently writes the wrapped word 6400**. (B) `length` +0x400 → the frozen table fails. | HELD: stock `vsavj` MRA from `cps2w` is byte-identical to `cps2`'s except `<rbf>`, `cps2` emits **no** WIDE MRA at all, and stock `vsavj.rom` is still 46,407,744 B. Gates `test_jtcores_twin` + `test_mister_mra_map`. |
-| **D1** | QSound width: `jtcps15_sound.v:47,416` (`qsnd_addr[23:0]`, latch `[7:0]`) + `PCM_AW` 24. No format change, no placement change. | A sim run of a replay that triggers an M5 voice from DSP bank `0x80` fetches from PCM byte `0x800000`, not `0x000000`. | The same run on the *unfixed* core must fetch `0x000000` — the aliasing defect reproduced as a fixture (this is what makes the pass mean something). | anchor gate unchanged on stock `vsavj`. |
-| **D2** | Placement: bank-0 offsets re-packed for PRG 6 MB, the group-C redirect in `jtcps1_prom_we`, the QSound bank split, the two new GFX slots + the PCM-high slot, `jtframe_ram1_7slots`. | An SDRAM image census after download: dump all four banks and assert every region begins at its §5 offset, that banks 2+3 are **byte-identical to the stock `cps2` core's** on the same romset, and that the group-C obj banks are non-zero where the manifests say tiles are. | Perturb one offset constant by 1 KiB → the census must fail. And: zero-fill group C in the romset → banks 2+3 must still be byte-identical (isolates the redirect from the content). | anchor gate unchanged on stock `vsavj`; banks 2+3 byte-identical is itself the structural leg. |
+| **D1 — DONE 14z-107 (6)**, fork commit `4840df8a` | QSound sample-bank width, RUNTIME-GATED. `cores/cps2w/hdl/` gains `jtcps2w_profile.v` (header byte 41 → `wide_en`) and `jtcps2w_qsnd_bank.v` (the gated latch), plus OVERRIDES of the two SHARED files it needs (`jtcps15_sound.v` from cps15, `jtcps2_game.v` from cps2). `PCM_AW` STAYS 23 — 24 does not compile (§7). No placement change. | DONE, and stronger than the row planned: the gated latch is simulated over **all 65,536 values of `dsp_ab` in both profile states** — with `wide_en` low `qsnd_addr[23]` is stuck at 0 and bits [22:16] equal the stock expression; with it high, bit 23 moves (16,384 vectors). Plus: `jtframe files` resolves cps2w to our four files and to NEITHER shared original, and the frozen line-by-line override delta. | FOUR FIRED. (A) the latch with the gate bypassed fails the `wide_en`-low leg; (B) the profile byte moved to 40 (jtframe's `JOY_BYTE`) fails; (C) the polarity flipped — so a 0xFF-filled stock header would arm the profile — fails; (D) a one-width perturbation of an override breaks the frozen delta. Gate `test_mister_wide_gate` (ci_portable). | `tests/test_mister_sim_anchor.sh` runs on **cps2w**, stock `vsavj`, against the cps2 expectations. It went RED first, at 2609/463, and root-causing it is the story of the slice: a 2x2 factorial over {stock RTL, D1 RTL} x {`pal_lut.hex` present, absent} showed the RTL axis changes NOTHING and the missing palette LUT changes EVERYTHING. The new instrument is `tests/test_mister_wide_inert.sh` — cps2 vs cps2w, same download, BIT-IDENTICAL work RAM frame by frame. See STATE 14z-107 (6) G4-G7. |
+| **D2** | Placement: bank-0 offsets re-packed for PRG 6 MB, the group-C redirect in `jtcps1_prom_we`, the QSound bank split on the ALREADY-GATED `qsnd_addr[23]` (D1 produces it; D2 routes it), the two new GFX slots + the PCM-high slot, `jtframe_ram1_7slots` (maintainer-ruled option A, 2026-08-23 — not written yet, D1 needed no new slot). **Every gated site takes the `wide_en` wire D1 built; `jtcps1_prom_we.v` and `jtcps1_sdram.v` are SHARED with the reference cores, so D2 is where they get copied into `cores/cps2w/hdl` and the frozen delta grows.** | An SDRAM image census after download: dump all four banks and assert every region begins at its §5 offset, that banks 2+3 are **byte-identical to the stock `cps2` core's** on the same romset, and that the group-C obj banks are non-zero where the manifests say tiles are. | Perturb one offset constant by 1 KiB → the census must fail. And: zero-fill group C in the romset → banks 2+3 must still be byte-identical (isolates the redirect from the content). | anchor gate unchanged on stock `vsavj`; banks 2+3 byte-identical is itself the structural leg. |
 | **D3** | The obj promote: `jtcps2_obj_scan.v:152` `st3_bank <= {table_y[12], table_y[14:13]}` (the CPS-2 Turbo rule, applied *after* the `:141` terminator check), `dr_bank`/`obj_bank`/`rom_bank`/`rom0_bank` widened to 3 bits, `rom0_bank[2]` routed to the group-C slots. | **The MiSTer twin of the FBNeo B4 canary**: a test-only flag that ORs `0x1000` into the y-word of bank-2/3 sprites, with group C loaded as a byte copy of group B, running the STOCK rom. Work RAM is bit-identical by construction; the *frames* must be pixel-identical. | Zero-fill group C → the frames must DIFFER. (`cps2_wide.md` records that FBNeo's first attempt passed this test vacuously because the member never arrived; the control is the whole point.) | RAM identity is guaranteed by the canary design; the anchor gate still runs. |
 | **D4** | The PRG window: `rom_cs`/`rom_addr`/`one_wait` (§8), `main_rom_addr`, `SLOT3_AW` 22. | Relocate a real data block above `CPU:$400000` and repoint one pointer — RAM must stay identical, and the zeros variant must diverge (the B4-prg discipline: a pass with no negative control is not evidence). | The same rows pointed at zero fill → RAM MUST diverge. | anchor gate unchanged on stock `vsavj` — this is the slice where a widened decode could most easily perturb legacy behaviour. |
 

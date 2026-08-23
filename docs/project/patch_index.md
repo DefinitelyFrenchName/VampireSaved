@@ -34,13 +34,22 @@ hand-edited; bundles chain builders and diff once against clean.
 | `emu/mame-patches/0002-cps2-wide-v1.patch` | active | MAME 0.288 (submodule, tag mame0288) | cps2.cpp + one mame.lst row | The MAME twin: 164 lines added, exactly ONE removed (sprite tile-code composition, gated on `m_cps2_wide`, a driver member — no reset needed). Gates: `tests/test_mame_parity.sh` (prerequisite, unpatched build) then `tests/test_mame_wide.sh`. |
 | `emu/jtcores-patches/0001-cps2w-scaffold.patch` | active | jtcores (MiSTer, fork `vampire-saved`) | `cores/cps2w/cfg` only | The SEPARATE core scaffold (14z-106): `game.yaml` VERBATIM from cps2, `CORENAME=JTCPS2W`, the MRA set restricted to the vsav family. **No RTL.** Gate: `tests/test_jtcores_twin.sh`. |
 | `emu/jtcores-patches/0002-jtframe-sim-wramdump.patch` | active | jtcores (MiSTer, fork `vampire-saved`) | `modules/jtframe/hdl/ver/test.cpp` — the Verilator TESTBENCH, not RTL and not a core file | `JTFRAME_SIM_WRAMDUMP` (14z-107): 64 added lines, all inside `#ifdef _JTFRAME_SIM_WRAMDUMP`, writing `wram/dump_<frame>_<addr>.bin` in CPU byte order at the VS rising edge. Inert unless the macro is defined; the block to dump is fully macro-parameterised so jtframe stays core-agnostic. Gates: `tests/test_sim_wram_contract.sh` (ROM-free, incl. a static proof of the guard) and `tests/test_mister_sim_anchor.sh` (the live oracle). |
+| `emu/jtcores-patches/0003-jtframe-sim-sdram-top-address-bit.patch` | active | jtcores (MiSTer, fork `vampire-saved`) | `modules/jtframe/hdl/ver/test.cpp` — TESTBENCH | 14z-107 (3): the Verilator SDRAM model decoded only 22 of 23 address bits at `JTFRAME_SDRAM_LARGE`, so the upper 8 MB of every bank aliased. The dropped bit is `addr[22]` riding on `sdram_a[9]`, NOT `addr[9]`. `#ifdef _JTFRAME_SDRAM_LARGE`, so 32 MB-module cores are byte-for-byte unaffected. |
+| `emu/jtcores-patches/0004-jtframe-sim-advance-model-time.patch` | active | jtcores (MiSTer, fork `vampire-saved`) | `modules/jtframe/hdl/ver/test.cpp` — TESTBENCH | 14z-107 (3): the model's own clock never advanced, so no `#` delay in the design ever fired and `jtsim -verilator -stats` reported nothing. |
+| `emu/jtcores-patches/0005-jtframe-sim-sdram-stats-raw.patch` | active | jtcores (MiSTer, fork `vampire-saved`) | `modules/jtframe/hdl/sdram/jtframe_sdram_stats_sim.v` — a SIMULATION-ONLY reporter | 14z-107 (3): raw machine-readable per-bank counters; the two existing lines are cumulative and rounded and cannot be differenced per phase. Consumer: `tests/audit_sdram_bank_load.sh`. |
+| `emu/jtcores-patches/0006-cps2w-wide-mra-trim.patch` | active | jtcores (MiSTer, fork `vampire-saved`) | `cores/cps2w/cfg/mame2mra.toml` + `doc/mame.xml` | **Slice D0** (14z-107 (5)): the `vsavjw` machine entry (tagged `sourcefile="capcom/cps2w.cpp"`, which is the profile gate — the reference core cannot see the set) and the MANDATORY QSound trim, without which the WIDE `.rom` is 70.26 MB and overflows both the 26-bit `ioctl_addr` and the 16-bit header start word. **No RTL.** Gate: `tests/test_mister_mra_map.sh`. |
+| `emu/jtcores-patches/0007-cps2w-qsound-width-runtime-gate.patch` | active, **LOCAL-ONLY (not pushed)** | jtcores (MiSTer, fork `vampire-saved`) | `cores/cps2w/hdl` (4 files) + `cfg/game.yaml` + `cfg/mame2mra.toml` + `ver/game` | **Slice D1** (14z-107 (6)) — **THE FIRST RTL COMMIT.** The QSound sample-bank latch widened to 8 bits, gated by `wide_en` decoded at RUNTIME from MRA header byte 41 (ACTIVE LOW; `0xFF` fill = profile off). Two NEW files (`jtcps2w_profile.v`, `jtcps2w_qsnd_bank.v`) and two OVERRIDES of files shared with the reference cores (`jtcps15_sound.v`, `jtcps2_game.v`), which stay BYTE-UNTOUCHED. `PCM_AW` is NOT widened — it cannot be (`jtframe_romrq_bcache.v:74`). Gates: `tests/test_mister_wide_gate.sh` (frozen delta, the profile byte in three copies, two exhaustive Verilator benches, four must-fire controls), `tests/test_jtcores_twin.sh` (the enumerated override set + `git diff` on the reference cores), `tests/test_mister_mra_map.sh` (the bit in both MRAs and both `.rom`s), `tests/test_mister_sim_anchor.sh` (the FPGA superset leg, run on `cps2w`). |
 
 The two `0002-cps2-wide-v1` patches (FBNeo + MAME) are ONE profile
 expressed twice; their descriptors stay member-for-member identical (one
-romset zip feeds both). The jtcores pair is a different axis: a core
-SCAFFOLD and a SIMULATION-HARNESS hook, neither of which touches RTL —
-the MiSTer profile itself is not yet expressed (STATE "Decisions
-pending: THE MiSTer PROFILE SHAPE").
+romset zip feeds both). The jtcores series is a different axis and now has
+three strands: a core SCAFFOLD (0001), FOUR Verilator-testbench fixes
+(0002-0005, none of them RTL and none of them a core file), and the MiSTer
+profile itself — the MRA layer (0006, slice D0) and, since 14z-107 (6),
+RTL (0007, slice D1). The MiSTer edition of Rule 1 v2 is specified in
+`docs/project/cps2_wide.md` "THE MiSTer EDITION OF THE SAME RULE"; the
+slice plan and its per-slice ratification are `docs/project/mister_map.md`
+§10.
 Deprecation candidates: none. `CPS2_WIDE_CANARY` stays as the B4
 positive control.
 

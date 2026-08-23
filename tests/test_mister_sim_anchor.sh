@@ -1,8 +1,18 @@
 #!/bin/sh
 # test_mister_sim_anchor.sh — THE MiSTer LEG OF THE §4 DUAL-EMULATOR ORACLE
-# (14z-107). Stock jtcps2 under Verilator and MAME run the same legacy replay
+# (14z-107). A jtcps2 core under Verilator and MAME run the same legacy replay
 # on the same stock vsavj romset; the mapped gameplay fields must agree at the
 # round-1 match-start anchor and at the follow offsets.
+#
+# SINCE SLICE D1 THE CORE UNDER TEST IS `cps2w`, NOT `cps2`, AND THAT IS THE
+# POINT (14z-107 (6)). cores/cps2w now carries RTL, and the profile it adds is
+# selected at RUNTIME from a spare MRA header byte — so a STOCK vsavj MRA runs
+# our RBF with `wide_en` LOW. Pointing this gate at cps2w therefore turns the
+# frozen numbers below into the FPGA edition of the emulator superset
+# invariant: our core, running the unmodified game, must reproduce the
+# REFERENCE core's measurement. The expectations are NOT re-measured on cps2w
+# — they stay the cps2 numbers, which is what makes the comparison mean
+# something. `SIM_CORE=cps2` re-runs the reference leg itself.
 #
 # WHY IT MATTERS. CLAUDE.md §4 compares mapped state at sync anchors because
 # two codebases traverse identical states on different frame indices. jtcps2
@@ -77,6 +87,7 @@ MAME_BIN="${MAME_BIN:-$HOME/.cache/vampire-saved/mame/cps2}"
 command -v "$MAME_BIN" >/dev/null 2>&1 || [ -x "$MAME_BIN" ] || { echo "SKIP: no MAME at $MAME_BIN (tools/setup_mame.sh)"; exit 77; }
 export MAME_BIN
 
+SIM_CORE="${SIM_CORE:-cps2w}"   # the core under test; the EXPECTATIONS are cps2's
 RPL="$REPO/tests/replays/05_timeout_idle.rpl"
 FIELDS="$REPO/tests/fields_m2a.tsv"
 FOLLOW="0,60,180"
@@ -107,8 +118,8 @@ AM="$(cf "$W/mame" --list-anchors --fields "$FIELDS" 2>/dev/null | head -1)"
 [ "$AM" = "$EXP_AM" ] && ok "MAME anchor at the frozen frame $AM" \
                       || bad "MAME anchor is [$AM], frozen $EXP_AM"
 
-echo "== sim leg (stock jtcps2 under Verilator; ~45 min) =="
-"$REPO/tools/run_sim_jtcps2.sh" "$RPL" "$W/sim" --core cps2 \
+echo "== sim leg (core $SIM_CORE under Verilator, stock vsavj; ~45 min) =="
+"$REPO/tools/run_sim_jtcps2.sh" "$RPL" "$W/sim" --core "$SIM_CORE" \
     --frames "$SIM_FRAMES" --wram "$SIM_LO" "$SIM_HI" || { echo "FAIL: sim leg did not complete"; exit 1; }
 # NON-CONSTANCY FIRST (the 14z-107 near-miss): an all-zero dump path agreed
 # with MAME on 99.2% of sampled bytes, because most of a work-RAM image is
@@ -128,7 +139,7 @@ fi
 
 echo "== field agreement at the anchor (follow $FOLLOW) =="
 if cf "$W/mame" "$W/sim/wram" --fields "$FIELDS" --follow "$FOLLOW" \
-        --skip-fields "$SKIP" --label-a mame --label-b jtcps2 > "$W/agree.out" 2>&1; then
+        --skip-fields "$SKIP" --label-a mame --label-b "jt$SIM_CORE" > "$W/agree.out" 2>&1; then
     ok "MAME and jtcps2 agree on every mapped field ($(grep '^anchors:' "$W/agree.out" || true))"
 else
     bad "dual-implementation disagreement:"; sed 's/^/      /' "$W/agree.out"
@@ -144,8 +155,8 @@ def base(p, addr):
     b = open(p, "rb").read(); o = addr - 0xFF0000
     return int.from_bytes(b[o:o + 4], "big")
 m, s = sys.argv[1], sys.argv[2]
-print(f"  note: P1 record base mame ${base(m,0xFF8460):06X} / jtcps2 ${base(s,0xFF8460):06X}"
-      f"   P2 (the arcade draw) mame ${base(m,0xFF8860):06X} / jtcps2 ${base(s,0xFF8860):06X}")
+print(f"  note: P1 record base mame ${base(m,0xFF8460):06X} / sim ${base(s,0xFF8460):06X}"
+      f"   P2 (the arcade draw) mame ${base(m,0xFF8860):06X} / sim ${base(s,0xFF8860):06X}")
 PY
 
 echo "== control: byte-swapped sim dumps must FAIL =="
@@ -166,7 +177,7 @@ echo "== control: the harness hook is inert without --wram =="
 # run that proves it is a 5-frame one with no ROM transfer (~30 s including
 # the rebuild). The 68k does not run in such a run, which is fine here and
 # nowhere else.
-"$REPO/tools/run_sim_jtcps2.sh" "$RPL" "$W/inert" --core cps2 --no-load --frames 5 > "$W/inert.log" 2>&1 \
+"$REPO/tools/run_sim_jtcps2.sh" "$RPL" "$W/inert" --core "$SIM_CORE" --no-load --frames 5 > "$W/inert.log" 2>&1 \
     || { bad "the inertness control run failed"; tail -5 "$W/inert.log" | sed 's/^/      /'; }
 [ -d "$W/inert/wram" ] && bad "CONTROL DID NOT FIRE: wram/ produced with the macro absent" \
                        || ok "control fired: no wram/ when JTFRAME_SIM_WRAMDUMP is undefined"
