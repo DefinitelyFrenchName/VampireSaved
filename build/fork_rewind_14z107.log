@@ -91,3 +91,25 @@ So the re-frozen 2609 / skew 463 IS the reference core's number, which is
 what test_mister_sim_anchor's design requires; and the 681-frame
 bit-identity is the FPGA superset invariant over a window that INCLUDES
 the match start (test_mister_wide_inert's own window is 540-640).
+
+=== tests/test_mister_sim_anchor.sh ON THE RE-FROZEN EXPECTATION (clean run) ===
+== MAME leg (stock vsavj, whole 68k work RAM, frames 2100-2400) ==
+  PASS MAME dump set is COMPLETE (2100-2400, no holes, uniform size)
+  PASS MAME anchor at the frozen frame 2146
+== sim leg (core cps2w under Verilator, stock vsavj; ~45 min) ==
+  PASS the sim leg ran with HOST FRAME OUTPUT DISABLED (the frozen configuration)
+  PASS no frames/ produced (no fork, no ImageMagick, nothing reads the pixels)
+  PASS sim dump set is COMPLETE (2400-2800, 64 KB each)
+  PASS the dumped window is NON-CONSTANT (the instrument is live)
+  PASS sim anchor at frame 2609, skew 463 (frozen 463 +/- 30)
+== field agreement at the anchor (follow 0,60,180) ==
+  PASS MAME and jtcps2 agree on every mapped field (anchors: mame=[2146] jtcps2w=[2609])
+  note: whole 64 KB at anchor+60 differs in 1544 of 65536 bytes (informational;
+  note: P1 record base mame $093B6A / sim $093B6A   P2 (the arcade draw) mame $0AE9D4 / sim $0A9518
+== control: byte-swapped sim dumps must FAIL ==
+  PASS control fired: byte-swapped sim dumps rejected
+== control: a hole in the dump set must be REJECTED ==
+  PASS control fired: a lost dump is rejected before any anchor is computed
+== control: the harness hook is inert without --wram ==
+  PASS control fired: no wram/ when JTFRAME_SIM_WRAMDUMP is undefined
+PASS test_mister_sim_anchor

@@ -203,6 +203,19 @@ RAM **BIT-IDENTICAL to `cps2w`'s in all 681 frames**. That last number is
 the FPGA superset invariant over a window that INCLUDES the match start;
 `test_mister_wide_inert`'s own window is 540-640.
 
+**G3. AND THE GATE ITSELF IS GREEN ON THE RE-FROZEN NUMBER.** A clean
+`tests/test_mister_sim_anchor.sh` run on `cps2w` (the whole tree frozen for
+its duration — see H): MAME dump set complete and anchor **2146**; the sim
+leg reporting **HOST FRAME OUTPUT DISABLED** and producing no `frames/` at
+all, both asserted; its dump set complete (2400-2800, 64 KB each) and
+NON-CONSTANT; **sim anchor 2609, skew 463 (frozen 463 +/- 30)**; MAME and
+jtcps2w agreeing on **every mapped §4 field** at the anchor and at +60/+180,
+with P1's record base `$093B6A` on both sides; and all three controls
+firing — byte-swapped dumps rejected, a punched hole in the dump set
+rejected before any anchor is computed, and no `wram/` when the hook macro
+is absent. The only disagreement is the documented one, the 1P arcade draw
+(`$0AE9D4` vs `$0A9518`), whose fields are excluded by name.
+
 **H. A SELF-INFLICTED LESSON, RECORDED BECAUSE IT COST THREE RUNS.** The
 runner's header was rewritten WHILE three 45-minute simulations and the
 anchor gate were mid-flight. `sh` reads a script by BYTE OFFSET, so a
