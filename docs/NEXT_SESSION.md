@@ -33,7 +33,7 @@
 > ## from an `ofstream` opened and closed inside one call, with no
 > ## descriptor open across the fork. The INPUTS were.
 > ## **AND ONE NEW FINDING, RECORDED NOT FIXED: v1.7.3's `SimInputs` HOLDS
-> ## P1 BUTTONS 5 AND 6 DOWN** (`test.cpp:200`'s `& 0xf0` drops bits 9:8;
+> ## P1 BUTTONS 5 AND 6 DOWN** (`test.cpp:201`'s `& 0xf0` drops bits 9:8;
 > ## active low; `jtcps2_main.v:266` wires them in). The MAME and sim legs
 > ## are therefore not running identical inputs. The one-line fix moves the
 > ## anchor again, so it belongs with the queued P2/6-button fork commit —

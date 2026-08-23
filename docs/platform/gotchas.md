@@ -1438,7 +1438,7 @@ target carries 27 bits (`jtframe_emu.sv:334`), and each header start word is
   to cope — `tests/audit_sdram_bank_load.sh` de-duplicates by the
   reporter's own `t=` timestamp and requires it to be strictly increasing.
 - **jtframe v1.7.3's `SimInputs` HOLDS P1 BUTTONS 5 AND 6 DOWN for the
-  whole run — they are not "absent", they are stuck ON.** `test.cpp:199-200`
+  whole run — they are not "absent", they are stuck ON.** `test.cpp:199-201`
   first builds `joystick1 = 0x30f | ((v>>4)&0xf0)` (bits 9:8 = 1 = released)
   and then overwrites it with `(joystick1 & 0xf0) | (v & 0xf)`, and `& 0xf0`
   throws bits 9:8 away. joystick is ACTIVE LOW and `jtcps2_main.v:266` wires

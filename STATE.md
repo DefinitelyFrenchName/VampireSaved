@@ -171,7 +171,7 @@ consequences:
 
 **F. AND ONE MORE HARNESS DEFECT, FOUND WHILE AUDITING, RECORDED NOT
 FIXED: jtframe v1.7.3's `SimInputs` HOLDS P1 BUTTONS 5 AND 6 DOWN.**
-`test.cpp:200` is
+`test.cpp:201` is
 `dut.joystick1 = (dut.joystick1&0xf0) | (v&0xf);` and `&0xf0` discards bits
 9:8, which the line above had just set to 1. Joystick is ACTIVE LOW and
 `jtcps2_main.v:266` wires `joystick1[9:7]` into `in1`, so from the first
@@ -2026,7 +2026,7 @@ Original write-up kept below.
   **DECIDED (maintainer, 2026-08-23): option A, LATER** — *"agreed, we can
   do it later"*. **UPGRADED 14z-107 (7) FROM COVERAGE TO FIDELITY, and the
   maintainer may want to re-time it: `SimInputs` does not merely LACK
-  buttons 5 and 6, it HOLDS THEM DOWN.** `test.cpp:200` is
+  buttons 5 and 6, it HOLDS THEM DOWN.** `test.cpp:201` is
   `dut.joystick1 = (dut.joystick1&0xf0) | (v&0xf);` and `&0xf0` discards
   bits 9:8 that the line above had just released; joystick is ACTIVE LOW and
   `jtcps2_main.v:266` wires `joystick1[9:7]` into `in1`. So every simulated

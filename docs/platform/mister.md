@@ -214,8 +214,19 @@ written by the PARENT, in `SDRAM::dump_range`, from a local `ofstream`
 constructed and destroyed inside one call at the VS rising edge in
 `clock()`. No dump descriptor is ever open across the `fork()`, so no dump
 can be interleaved, truncated or written by a child. The corruption was of
-the run's INPUT, not of its output — see "Do the earlier numbers stand"
-below.
+the run's INPUT, not of its output.
+
+**Which of the earlier numbers stand, then.** The §4 field agreement stands
+(nothing was ever read from a corrupted file); the ANCHOR FRAME INDEX did
+not, and is re-frozen above. `tests/test_mister_wide_inert.sh` stands by a
+stronger argument still — it compares two cores rendering the SAME picture,
+so both legs fork at the same frames and the comparison is invariant to the
+corruption; only a gate whose other leg is MAME could see it. The per-bank
+SDRAM traffic profile stands, and was audited rather than assumed: it is the
+one instrument that parses a LOG, `build/sdram_bank_load_14z107.log` carries
+zero duplicated stats rows, and its phase boundaries — which are keyed to
+the anchor — were moved and the table re-derived from the same log, shifting
+every figure by well under 1%. Full statement: STATE 14z-107 (7) section D.
 
 **And the palette LUT itself is innocent.** `jtcps1_pal.v:62` instantiates
 it with `we` tied low; `q` feeds `lut_r/g/b` and those feed
@@ -541,7 +552,7 @@ blocked only by bank PLACEMENT — is worked out in
   start1/2, bits4-7 P1 U/D/L/R, bits8-11 P1 buttons 1-4 (bit11 doubles as
   dip_test). **P1 only, 4 buttons** — P2 does not exist in that harness.
   **CORRECTED 14z-107 (7): buttons 5 and 6 do not "not exist" — THEY ARE
-  HELD DOWN.** `test.cpp:200` is
+  HELD DOWN.** `test.cpp:201` is
   `dut.joystick1 = (dut.joystick1&0xf0) | (v&0xf);`, and `&0xf0` discards
   bits 9:8 that the line above had just set to 1 in `0x30f`. joystick is
   ACTIVE LOW and `jtcps2_main.v:266` wires `joystick1[9:7]` into `in1`, so
@@ -1055,7 +1066,7 @@ any core.
   `test.cpp`'s `SimInputs` (P2, buttons 5/6) is a further fork commit —
   recommended once the anchor gate has run a while, not before.
   **UPGRADED 14z-107 (7) from coverage to FIDELITY: buttons 5 and 6 are not
-  absent, they are stuck ON** (`test.cpp:200` masks bits 9:8 away — see
+  absent, they are stuck ON** (`test.cpp:201` masks bits 9:8 away — see
   "Scripted inputs" above). The same one-line commit fixes both, and it
   re-freezes the anchor, so it is a deliberate slice rather than a drive-by.
 - ~~The width surgery itself (SDRAMW 23 -> 24 and the bank/prog/ioctl bit)

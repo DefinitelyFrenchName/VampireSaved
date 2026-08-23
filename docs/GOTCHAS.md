@@ -458,7 +458,7 @@ is a GAME gotcha if it is true of the game regardless of the port.
 
 - **14z-107 (7) (platform):** jtframe v1.7.3's Verilator input harness
   **HOLDS P1 BUTTONS 5 AND 6 DOWN** for every frame `sim_inputs.hex` drives
-  — `test.cpp:200`'s `& 0xf0` throws away the two bits the line above had
+  — `test.cpp:201`'s `& 0xf0` throws away the two bits the line above had
   just released, and joystick is active low. So "the harness has 4 buttons"
   was half right: the other two are not missing, they are pressed. Only
   running the file out releases them, which means a shorter input file
