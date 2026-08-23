@@ -16,10 +16,24 @@
 # EMULATOR-tier gate: it is NOT in ci_portable/ci_static, and HANDOFF.md
 # indexes it with the other manual gates.
 #
-# FROZEN EXPECTATIONS (measured 14z-107, stock cps2 core, fork pin 553dd56):
+# FROZEN EXPECTATIONS (re-measured 14z-107 (3), stock cps2 core, fork pin
+# 74ed17d — the pin with the FIXED Verilator SDRAM model):
 #   MAME anchor              frame 2146   (05_timeout_idle, stock vsavj)
-#   sim anchor (ABSOLUTE)    frame 2507   (the 462 download frames included)
-#   skew (sim - MAME)        361
+#   sim anchor (ABSOLUTE)    frame 2502   (the 462 download frames included)
+#   skew (sim - MAME)        356
+#
+# THE SIM ANCHOR MOVED 2507 -> 2502 WHEN THE SDRAM MODEL WAS FIXED, and the
+# mechanism is real rather than noise. `cores/cps1/hdl/jtcps1_obj_draw.v:137`
+# is `if( &rom_data ) begin // skip blank pixels` — the object pipeline SKIPS
+# its 8-pixel draw loop when the fetched GFX word is all-ones. So OBJECT
+# TIMING IS A FUNCTION OF GFX ROM CONTENT. Before fork commit 3 the upper
+# 8 MB of each GFX bank aliased, so the core skipped whichever tiles the
+# corrupt map happened to make blank; now it skips the ones that really are.
+# Different skip pattern -> different SDRAM contention -> a few frames of
+# drift over 2,500. Five frames in 2,502 is 0.2%, it is inside the frozen
+# band, every mapped field still agrees exactly, and the P1/P2 record bases
+# are identical to the 14z-107 measurement. 361 was the value on the BROKEN
+# model and is retracted, not widened: the band is still +/- 30.
 #
 # THE SKEW IS NOT THE BOOT OFFSET, and that is worth knowing: at the RAM-test
 # onset the two are 460 frames apart (462 download frames minus a 2-frame
@@ -71,7 +85,8 @@ FOLLOW="0,60,180"
 # function of WHICH character P2 is would assert a disagreement.
 SKIP="p2_hitbox_base,p2_ptr64,p2_word132,p2_x,p2_y,p2_attack_id,p2_flip"
 EXP_AM=2146          # frozen MAME anchor
-EXP_SKEW=361         # frozen sim-minus-MAME skew (see the header)
+EXP_SKEW=356         # frozen sim-minus-MAME skew (see the header; was 361 on
+                     # the pre-fork-commit-3 SDRAM model)
 SKEW_TOL=30          # boot-phase band; the FIELDS are compared exactly
 MAME_LO=2100; MAME_HI=2400
 # ABSOLUTE frames (download included). The window mirrors the MAME leg's

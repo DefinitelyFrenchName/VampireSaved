@@ -1,5 +1,152 @@
 # STATE — living progress log
 
+## Session 14z-107 (3) — THE SIM LANE'S SDRAM MODEL WAS WRONG AND IS NOW
+## RIGHT (it dropped `addr[22]`, not `addr[9]` — the "~3 constants" fix
+## would have made a DIFFERENT wrong map), `jtsim -stats` made to work at
+## all, and THE BANK-REPACK MEASUREMENT: **GO**, with the headroom bounded
+## rather than the design proven
+
+**The one line:** the maintainer ruled "attempt repack (measuring first)";
+the measuring is done, the answer is GO — bank 1's PCM stream is already at
+a **98.8% row-miss rate**, so it has no locality left to lose, and the
+worst-case repacked bank 1 would run at **26.3%** of a single bank's
+capacity against the **32.9% that bank 0 already sustains today**.
+
+**DECIDED (maintainer, 2026-08-23), marked in Decisions pending:** the
+MiSTer memory-map route is the **BANK REPACK** at our `v1.7.3` pin —
+vanilla's 32 MB of GFX stays exactly where it is in banks 2+3, the ~6.4 MB
+of tenant art goes into bank 1 alongside the QSound PCM, reached by the
+profile-gated promoted tile-code bit; `JTFRAME_SDRAM_XL` (two chips,
+128 MB) is the FALLBACK if the repack fails.
+
+**A. THE MODEL FIX (fork commit 3) — AND 14z-107 (2)'s PROPOSED FIX WAS
+WRONG, which is the part worth keeping.** That entry recorded "13 row +
+9 column = 22 bits" and "~3 constants: `<< 10`, `0x7fffff`, `0x3ff`", i.e.
+it assumed the missing bit was `addr[9]`. Derived from the RTL instead
+(`jtframe_sdram64_bank.v:75-76,127,219`): at AW=23 the row is `addr[21:9]`
+— exactly what `SDRAM_A << 9` already reconstructed — and the column is
+`{ addr[22], addr[8:0] }`. **The tenth column bit is the TOP ADDRESS BIT
+riding on `sdram_a[9]`; `addr[9]` is a ROW bit.** Widening the column mask
+would have folded `addr[22]` onto `addr[9]`. The fix rebuilds bit 22 from
+`sdram_a[9]` on READ/WRITE, `#ifdef _JTFRAME_SDRAM_LARGE` (at AW=22 that
+pin carries `addr[21]`, already a row bit and a don't-care at COW=9, so
+32 MB-module cores are byte-for-byte unaffected), and leaves the burst
+column counter 9-bit. **A SIZE tells you how many bits are missing, never
+which one.**
+
+**B. BOTH CONTROLS FIRED** (`build/sdram_model_fix_14z107.log`).
+- **Must-fire:** same replay, same 620-frame window, before vs after —
+  **71-78% of every INKED pixel changed** on frames 466/480/494/508/522/
+  524/527, and the SET of rendered frames differs (`test.cpp` writes a jpg
+  only when the frame changed). The CPS-2 boot self-test went from garbled
+  glyphs to legible `WORK / CPS0 / CPS1 / CPS2 / OBJECT / Q SOUND ... RAM
+  OK`. Frame 1 (pre-download black) stayed byte-identical — the run's own
+  negative control. Banks 2/3's upper 8 MB measure 87.6% / 90.1% non-zero,
+  memory the old model could not address at all.
+- **Regression: the oracle is GREEN but the ANCHOR MOVED FIVE FRAMES**,
+  2507 -> 2502, skew +361 -> +356. **Reported rather than absorbed**, and
+  the mechanism is source-verified: `cores/cps1/hdl/jtcps1_obj_draw.v:137`
+  `if( &rom_data ) begin // skip blank pixels` — the object pipeline skips
+  its 8-pixel draw loop when the fetched GFX word is all-ones, so **OBJECT
+  TIMING IS A FUNCTION OF GFX ROM CONTENT**. With the aliased map the core
+  skipped whichever tiles the corruption made blank. Five frames in 2,502
+  is 0.2%, it is INSIDE the frozen +/- 30 band (nothing widened — the band
+  is unchanged and the centre re-measured), every mapped field agrees
+  exactly at the anchor and at +60/+180, and the P1/P2 record bases are
+  identical to 14z-107's ($093B6A; $0AE9D4 vs $0A9518). `EXP_SKEW` moved
+  to 356 with the pin named. **Carry this into the WIDE arc: tenant art can
+  shift core timing by the same route.**
+- Bank 0's and bank 1's upper 8 MB measure **0.0% non-zero** — never
+  addressed — which is why the work-RAM oracle could not have moved for the
+  addressing reason, and is also the empty space the repack wants.
+
+**C. `jtsim -verilator -stats` DID NOT WORK AT ALL, for THREE stacked
+reasons**, each hiding the next, all upstream: nothing puts
+`hdl/sdram/jtframe_sdram_stats_sim.v` on the compile list although the macro
+is defined and the module instantiated; Verilator 5 refuses `#` delays
+without `--timing`; and `test.cpp` never advanced
+`VerilatedContext::time()`, so `$time` read 0 forever and no delay deadline
+was reachable (fork commit 4 — **and the naive form of that fix ABORTS the
+run**, because a delay deadline is not on the clock grid, so the step must
+land on each pending slot via `eventsPending()`/`nextTimeSlot()`). **A
+feature with a flag, a help line and an instantiation is not necessarily a
+feature that works.**
+
+**D. THE REPORTER COUNTED THE WRONG THING (fork commit 5).** Its two lines
+are truncated deltas and cumulative running percentages, so no log of them
+can be differenced per phase — and it counted only ACTIVE commands. Only
+bank 0 sets `JTFRAME_BA0_AUTOPRECH`; on banks 1-3
+`jtframe_sdram64_bank.v:170` skips both PRECHARGE and ACTIVE on a row hit,
+so **ACTIVE is the ROW MISS count and the reporter's "Data ... kiB/s" line
+is a row-miss figure wearing bandwidth units.** READ/WRITE are now counted
+per bank, so the denominator exists.
+
+**E. THE MEASUREMENT** (`tests/audit_sdram_bank_load.sh`, new manual/
+emulator gate; evidence `build/sdram_bank_load_14z107.log`, 2,800 frames of
+`05_timeout_idle` on the stock `cps2` core, 63m36s). Per VIDEO FRAME:
+
+| phase | ba0 | ba1 (PCM) | ba2 (obj) | ba3 (obj+scroll) | bus |
+|---|---|---|---|---|---|
+| attract | 38,278 acc | 3,464 acc / 78.6% miss | 0 | 9,453 acc / 25.2% miss | 12.7% |
+| select+VS | 39,635 acc | 13,856 / **99.0%** miss | 261 | 12,079 / 36.8% miss | 16.4% |
+| in-match | 40,797 acc | 14,132 / **98.8%** miss | 1,017 / 42.6% | 17,467 / **28.8%** miss | 18.2% |
+
+30.2 MB/s of useful data in-match; **zero** `SDRAM reads clashed` warnings
+in 2,800 frames.
+
+**F. THE VERDICT: GO.**
+1. A repack moves WHICH bank serves a fetch; it creates none. **Total bus
+   load is invariant by construction** — 18.2% before and after.
+2. **The row-thrash risk in bank 1 is empirically void: the PCM stream has
+   no locality to lose** (98.8% row-miss in-match — QSound round-robins 16
+   channels at unrelated addresses).
+3. What the repack costs is the OBJECT stream's locality (28.8% miss in
+   bank 3 today, degrading toward 100% beside PCM). Priced at STW-HIT = 6
+   clocks per lost hit: **4.9% of a frame** even charging ALL of banks 2+3.
+4. **Worst case** (both fighters tenants AND all of banks 2+3 redirects,
+   scroll included, AND every access a miss): bank 1 = 32,616 accesses/
+   frame = 424,008 of 1,609,728 clocks = **26.3%** of the single-bank
+   all-miss ceiling (123,825/frame at STW=13 @ 96 MHz). **Existence proof:
+   bank 0 already carries 40,797 all-miss accesses/frame = 32.9%, i.e.
+   1.25x that, in stock shipping configuration.** Per scanline the worst
+   case is 1,618 of 6,144 clocks (26%).
+5. **Watch items for the bring-up:** `jtframe_sdram64.v:536-542` with
+   `BAPRIO=1` grants strictly ba0 > ba1 > ba2 > ba3, so obj moved into
+   bank 1 gains priority OVER the scroll left in bank 3 — a scheduling
+   change, not just a placement one; and bank 2 is nearly idle today
+   (1.4% share), vsav's obj art sitting overwhelmingly in the
+   `rom0_bank[0]=1` half.
+
+**THE ASSUMPTION, STATED PLAINLY.** Only STOCK traffic is measurable — a
+WIDE romset does not load on the stock core. **This BOUNDS THE HEADROOM; it
+does not prove the repacked design.** Proven: the traffic that would be
+relocated, its locality, and that one bank on this core already sustains
+more than the relocation's worst case. Not proven: arbitration once bank 1
+carries two streams. Structurally reassuring on fetch COUNT: at most two
+fighters are on screen either way, so a 21-character roster does not raise
+the per-match sprite count, and the promoted tile-code bit adds address
+bits, not fetches. What would prove it: this same instrument on a `cps2w`
+core carrying the repacked map — i.e. this measurement is the go/no-go the
+ruling asked for AND the gate for the repack itself.
+
+**WRITTEN:** `tests/audit_sdram_bank_load.sh` (new gate, manual/emulator
+tier, indexed in HANDOFF); `tools/run_sim_jtcps2.sh` `--video` / `--stats`
+(plus the `-e`-not-`-d` submodule-gitfile fix); `tests/run_all_static.sh`
+learns `run_sim_jtcps2.sh` marks a gate emulator-tier;
+`tests/test_mister_sim_anchor.sh` re-frozen at 2502/356 with the mechanism;
+fork commits 3/4/5 pushed and mirrored as patches 0003-0005, pin
+`74ed17d`; `build/sdram_model_fix_14z107.log` +
+`build/sdram_bank_load_14z107.log`; `docs/platform/mister.md`,
+`docs/platform/gotchas.md` (+2 entries), `docs/GOTCHAS.md`,
+`HANDOFF.md`, `docs/NEXT_SESSION.md`.
+
+**UPSTREAM-WORTHY, DELIBERATELY NOT FILED** (recorded in each fork commit
+message): all four defects are jtframe's, not the fork's, and affect every
+`JTFRAME_SDRAM_LARGE` core simulated under Verilator.
+
+**NOT DONE:** no RTL, no repack. The ruling was "measure first" and that is
+what this is.
+
 ## Session 14z-107 (2) — THE MEMORY-MAP TRUTH: at our pin 64 MB is
 ## PHYSICAL, the 128 MB tier is REAL but UPSTREAM-ONLY and not a flag,
 ## and the CPS-2 core caps GFX/PRG/scroll/QSound in FORMAT regardless —
@@ -134,10 +281,13 @@ only 22 bits, with 9-bit column masks at `:609-610` and `:642`/`:646`.
   video/sprite result from this lane is trustworthy for wide GFX, and
   14z-106 slice C's "frames showed sprites" is **weaker evidence than it
   read** — it proves the core runs, not that GFX addressing is faithful.
-- Fixing it is ~3 constants (`<< 10`, `0x7fffff`, `0x3ff`) and is a
-  PREREQUISITE to simulating any widened set. **Not done — no code was
-  touched this session.** Filed as a platform gotcha and as a caveat next to
-  the recipe in `docs/platform/mister.md`.
+- ~~Fixing it is ~3 constants (`<< 10`, `0x7fffff`, `0x3ff`)~~ **CORRECTED
+  AND FIXED 14z-107 (3): NOT those constants, and they would have made a
+  DIFFERENT wrong map.** The dropped bit is `addr[22]`, which
+  `jtframe_sdram64_bank.v:219` puts on `sdram_a[9]` as the tenth COLUMN bit;
+  `addr[9]` is a ROW bit. Fork commit 3 rebuilds bit 22, LARGE-gated. It was
+  a PREREQUISITE to simulating any widened set and is now done — see
+  14z-107 (3) at the top of this file.
 
 **WRITTEN:** `docs/platform/mister.md` (five new sections: the v1.7.3 ceiling
 incl. the dual-SDRAM/analog pin conflict; the upstream XL tier + its two-chip
@@ -154,7 +304,9 @@ MEMORY-MAP ROUTE**; `docs/NEXT_SESSION.md`; `HANDOFF.md`.
 **CORRECTED IN PASSING (retraction discipline, found while writing):**
 `HANDOFF.md`'s gate table and one paragraph of `docs/platform/mister.md` still
 carried **"MAME 2146 / sim 2606, skew 460 ± 30"** for
-`test_mister_sim_anchor.sh`. The gate freezes **2146 / 2507, skew 361 ± 30**
+`test_mister_sim_anchor.sh`. The gate froze **2146 / 2507, skew 361 ± 30**
+(**RE-MEASURED 14z-107 (3) on the fixed SDRAM model: 2146 / 2502, skew
+356 ± 30** — the object pipeline's blank-tile skip reacts to GFX content)
 (`tests/test_mister_sim_anchor.sh:73-75`) — +460 is the BOOT offset, not the
 match-start anchor, and the 14z-107 entry above has it right. Both fixed in
 place.
@@ -276,6 +428,11 @@ scratch clone inside it**.
 |---|---|---|
 | round-1 match-start anchor | frame **2146** | frame **2507** (absolute) |
 | skew (sim − MAME) | — | **+361** |
+
+**RE-MEASURED 14z-107 (3): sim 2502, skew +356** on the fixed Verilator
+SDRAM model — `jtcps1_obj_draw.v:137` skips a tile whose fetched GFX word is
+all-ones, so object timing is a function of GFX ROM CONTENT and the corrupt
+map was skipping the wrong tiles. Band unchanged at ± 30.
 - **THE SKEW IS NOT THE BOOT OFFSET.** At the RAM-test onset the two are
   **+460** apart; by the match start they are **+361** — the
   attract/select/VS path costs ~99 fewer frames on the core. That is §4's
@@ -1061,8 +1218,23 @@ Original write-up kept below.
 
 ## Decisions pending (human)
 
-- **THE MiSTer MEMORY-MAP ROUTE (14z-107 (2)) — NEW, and it is the arc's
-  next fork in the road.** The profile ruling (WIDE v1 verbatim, one romset)
+- ~~**THE MiSTer MEMORY-MAP ROUTE (14z-107 (2)) — NEW, and it is the arc's
+  next fork in the road.**~~ **DECIDED (maintainer, 2026-08-23): option (2),
+  the BANK REPACK, measuring first; XL is the FALLBACK** — the ruling was
+  *"attempt repack (measuring first)"*, with `JTFRAME_SDRAM_XL` (two chips,
+  128 MB) kept in reserve if the repack fails. Vanilla's 32 MB of GFX stays
+  exactly where it is in banks 2+3 and the ~6.4 MB of tenant art goes into
+  bank 1 alongside the QSound PCM, reached by the profile-gated promoted
+  tile-code bit. **The measurement the ruling required was taken the same
+  day and says GO** — bank 1's PCM is already at a 98.8% row-miss rate so it
+  has no locality to lose, and the worst case runs at 26.3% of a single
+  bank against the 32.9% bank 0 already sustains
+  (`tests/audit_sdram_bank_load.sh`, `build/sdram_bank_load_14z107.log`,
+  verdict in STATE 14z-107 (3)). It bounds the headroom; it does not prove
+  the repacked design. Original text kept below.
+
+  **THE MiSTer MEMORY-MAP ROUTE (14z-107 (2)) — the arc's next fork in the
+  road.** The profile ruling (WIDE v1 verbatim, one romset)
   is NOT in question here; only HOW the bytes reach the FPGA. The facts that
   opened it (all measured 14z-107, `docs/platform/mister.md`): at our pin
   `v1.7.3` **64 MB is PHYSICAL**, not a default — jtframe's own table stops
@@ -1106,6 +1278,10 @@ Original write-up kept below.
   "to increase object throughput"), and it is **UNMEASURED**. Measuring it
   also needs the Verilator SDRAM model fixed first (it decodes 8 MB per bank,
   so bank 1 above 8 MB currently aliases in simulation — ~3 constants).
+  **BOTH DONE 14z-107 (3): the model is fixed (fork commit 3 — and it was NOT
+  ~3 constants; the dropped bit is `addr[22]` on `sdram_a[9]`, not
+  `addr[9]`), and the traffic IS now measured** —
+  `tests/audit_sdram_bank_load.sh`, `build/sdram_bank_load_14z107.log`.
 
   **RECOMMENDATION: (2)**, with (1) as the long-term path if upstream ever
   tags again. Rationale: (2) keeps a pinned, reproducible framework and a
@@ -1242,7 +1418,22 @@ Original write-up kept below.
      v2 extends verbatim; jtframe/Verilator SIMULATION is the gate,
      HARDWARE is the field test (the MAME-oracle / playtest split).
   4. **Environment — RULED: MiSTer with a single SDRAM module, plus a
-     Jammix extension card** (CRT at original resolution/frequencies —
+     Jammix extension card**
+     **AMENDED (maintainer, 2026-08-23): DUAL SDRAM IS OFF THE TABLE** —
+     *"I don't own any nor plan to"*. This forecloses MiSTer's DUAL-SLOT
+     path (`SDRAM2_*` / `sys_dual_sdram.tcl`), which was already
+     unreachable in jtframe (no `SDRAM2_*` ports on `jtframe_emu`) and
+     which conflicts on pins with the analog I/O board the Jammix CRT
+     field test needs. **It does NOT foreclose the upstream XL tier:**
+     XL is TWO CHIPS INSIDE ONE MODULE in the ONE slot, selected by the
+     top address bit with chip-select carried on nCS POLARITY
+     (`jtframe_burst_io.v:158`) — i.e. exactly what a standard MiSTer
+     128 MB module is (doc/sdram.md catalogue IDs 1/4/8/9 = 2 units).
+     Caveat carried: that the module inverts chip 1's /CS is INFERRED
+     from the RTL, never measured — so if the XL fallback is ever taken,
+     confirm WHICH 128 MB module is in hand first. The chosen primary
+     route (the bank repack) needs no such confirmation: it fits a
+     64 MB tier and is module-agnostic. (CRT at original resolution/frequencies —
      the field test can be made on real video timing). **OPEN DETAIL:
      which module size?** jtcps2's own docs: CPS2 games with >= 16 MB GFX
      need a 64 MB module; a MiSTer-shaped WIDE (GFX up to 32 MB + PRG +

@@ -1139,29 +1139,118 @@ driven onto the bus and every address aliases with `addr ^ 0x200`. Per-512-
 word corruption, no error message. **A tier macro is not a tier** — check
 which controller the macro's logic actually lives in before setting it.
 
-## The Verilator SDRAM model is a 32 MB module, whatever the macro says (14z-107)
+## The Verilator SDRAM model dropped the TOP address bit — and the obvious fix was wrong (14z-107)
+
+**FIXED 14z-107 (3)** (fork commit 3,
+`emu/jtcores-patches/0003-jtframe-sim-sdram-top-address-bit.patch`). The
+symptom and the eliminations stand; the MECHANISM recorded here first was
+wrong, and so was the fix it implied. That is the reusable part.
 
 `modules/jtframe/hdl/ver/test.cpp` sizes its bank BUFFERS from the tier macro
-but decodes the PINS at a fixed 22 bits per bank:
+(`:54-58` `BANK_LEN = 0x100'0000` = 16 MB under `_JTFRAME_SDRAM_LARGE`) but
+reconstructed only 22 of the 23 address bits from the PINS, so **anything a
+core placed above 8 MB within a bank aliased in simulation, quietly** — and
+the ROM download aliased with it, so the upper half was never written at all
+and the lower half was overwritten by the upper half's content. On jtcps2
+that is all of GFX: banks 2 and 3 are 16 MB each and stock `vsav` fills both,
+so a Verilator run rendered from a corrupt tile map. Bank 0 (PRG 0-4 MB, VRAM
+@4, ORAM @5, work RAM @6, sound @7) is entirely below WORD address
+`0x400000`, which is why the 14z-107 work-RAM anchor oracle was unaffected —
+but "the frames showed sprites" was NOT evidence that GFX addressing was
+faithful.
 
-- `:54-58` `BANK_LEN = 0x100'0000` (16 MB) under `_JTFRAME_SDRAM_LARGE`,
-  `0x080'0000` (8 MB) otherwise — correct.
-- `:605-606` `ba_addr[cur_ba] = dut.SDRAM_A << 9; // 32MB module` then
-  `ba_addr[cur_ba] &= 0x3fffff` — the row is shifted by a **9-bit** column
-  width and masked to 22 bits.
-- `:609-610` and `:642`/`:646` mask the column with `0x1ff` — 9 bits again.
+**THE TRAP, and it is the general lesson: the missing bit was NOT the one the
+size arithmetic points at.** "13 row + 9 column = 22 bits, so widen the column
+to 10 bits (`<< 10`, `& 0x7fffff`, `0x3ff`)" is the natural reading, and it
+would have folded the TOP address bit onto `addr[9]` and produced a
+different wrong map. `jtframe_sdram64_bank.v` maps the address like this:
 
-13 row + 9 column = 22 bits = **8 MB per bank**, against the 13 + 10 = 23 bits
-= 16 MB per bank that `JTFRAME_SDRAM_LARGE` declares. **Anything a core places
-above 8 MB within a bank aliases in simulation, quietly.** On jtcps2 that is
-all of GFX: banks 2 and 3 are 16 MB each and stock `vsav` fills both, so a
-Verilator run renders from a half-aliased tile map. Bank 0 (PRG 0-4 MB, VRAM
-@4, ORAM @5, work RAM @6, sound @7) is entirely under the line, which is why
-the 14z-107 work-RAM anchor oracle is unaffected — but "the frames showed
-sprites" is NOT evidence that GFX addressing is faithful.
+    :75-76  localparam ROW=13, COW= AW==22 ? 9 : 10;
+    :127    addr_row = AW==22 ? addr[AW-1:AW-ROW] : addr[AW-2:AW-1-ROW];
+    :219    sdram_a[10:0] = { precharge_flag, addr[AW-1], addr[8:0] };
 
-The fix is three constants (`<< 10`, `& 0x7fffff`, `0x3ff`) gated on the same
-macro the buffer size already follows. **The general trap: a simulation model
-can be a DIFFERENT PART from the one the design targets, and it will not tell
-you** — check the testbench's own geometry before trusting any result that
-depends on the far end of a bank.
+At AW=23: row = `addr[21:9]`, column = `{ addr[22], addr[8:0] }`. The tenth
+column bit is **`addr[22]`, the top of the address**, not `addr[9]` —
+`addr[9]` is a row bit. So the fix is to rebuild bit 22 from `sdram_a[9]` on
+the READ/WRITE command, gated `#ifdef _JTFRAME_SDRAM_LARGE` (at AW=22 that
+pin carries `addr[21]`, already a row bit and a don't-care), and to leave the
+burst column counter 9-bit (bursts wrap inside the aligned block and never
+carry into column bit 9).
+
+**Two general traps, both paid here:**
+1. **A simulation model can be a DIFFERENT PART from the one the design
+   targets, and it will not tell you** — check the testbench's own geometry
+   before trusting any result that depends on the far end of a bank.
+2. **Do not infer a bit-level fix from a SIZE.** "22 bits where 23 are
+   needed" tells you how many bits are missing, never which one. Read the
+   line that drives the pins.
+
+## On jtcps1/jtcps2, GFX ROM CONTENT changes object TIMING (14z-107)
+
+`cores/cps1/hdl/jtcps1_obj_draw.v:137`:
+
+    if( &rom_data ) begin
+        // skip blank pixels
+
+The object pipeline SKIPS its 8-pixel draw loop when the fetched GFX word is
+all-ones. So the number of cycles the object engine spends, and therefore its
+SDRAM request pattern, is a function of the DATA in the GFX ROM — not just of
+the object table.
+
+Paid for as a five-frame surprise. Fixing the Verilator SDRAM model
+(fork commit 3) changed nothing the 68k can see: bank 0 is untouched, and its
+upper 8 MB measures 0.0% non-zero, i.e. it was never even addressed. Yet the
+`05_timeout_idle` match-start anchor moved from simulated frame 2507 to 2502.
+The chain is: correct GFX -> a different set of tiles is genuinely blank ->
+a different skip pattern -> slightly different SDRAM contention -> the 68k
+gets a marginally different cycle budget -> five frames of drift over 2,500.
+
+**Consequences worth carrying:**
+- an "identical inputs, identical RAM" expectation across two builds that
+  differ ONLY in GFX content is not safe on this core;
+- the CPS-2 WIDE arc should expect tenant art to shift core timing by the
+  same route, and should freeze anchors per build rather than assume they
+  travel;
+- more generally: **on a shared-bus system, changing the CONTENT of a
+  read-only memory can change TIMING**, because content can gate work.
+
+## `jtsim -verilator -stats` reports nothing, for THREE independent reasons (14z-107)
+
+Upstream's SDRAM usage analysis (`jtsim -stats`) is dead on the Verilator
+lane at v1.7.3, and each cause hides the next:
+
+1. **The module is never compiled in.** `bin/jtsim:416-418` defines
+   `JTFRAME_SDRAM_STATS` and `hdl/ver/game_test.v:380-392` instantiates
+   `jtframe_sdram_stats_sim`, but nothing puts
+   `hdl/sdram/jtframe_sdram_stats_sim.v` on the compile list — Verilator
+   dies with "Cannot find file containing module". Workaround, caller-side:
+   `jtsim ... -args <path to the .v>` (`bin/jtsim:289` appends to the
+   simulator command line).
+2. **Verilator 5 refuses `#` delays without `--timing`** (%Error-NEEDTIMINGOPT)
+   — the reporter is an `initial forever #16_666_667`. `--no-timing` compiles
+   it into silence, so `--timing` is the only useful answer; also caller-side
+   via `-args`.
+3. **The model's clock never advances.** `hdl/ver/test.cpp` keeps a private
+   `simtime` and never calls `VerilatedContext::time()`, so `$time` reads 0
+   forever and every delay deadline is unreachable. Fork commit 4 advances
+   it. **And the naive form of that fix aborts the run**: a delay deadline
+   lands wherever the design put it, not on the half-period grid, so
+   assigning `time() += semi_period` steps over it and Verilator fatals with
+   "Encountered process that should've been resumed at an earlier simulation
+   time. Missed a time slot?" (`verilated_timing.cpp:85`). The step has to
+   land on each pending slot on the way, via the model's own
+   `eventsPending()` / `nextTimeSlot()`.
+
+**The general shape: a feature that has a command-line flag is not
+necessarily a feature that works.** `-stats` had a documented flag, a help
+line and an instantiation, and produced nothing on this simulator.
+
+## The `-stats` reporter's own numbers cannot be differenced (14z-107)
+
+`jtframe_sdram_stats_sim` prints kiB/s figures that are integer-TRUNCATED
+deltas and same-row figures that are CUMULATIVE running percentages with the
+denominator never printed. Neither can be turned back into "what did ONE
+PHASE of the run do". Fork commit 5 adds a raw counter line
+(`SDRAM_STATS_RAW`) next to them. **When an instrument reports a rounded
+rate and a running average, it is a dashboard, not a measurement** — check
+that the raw counters are reachable before planning an analysis on it.

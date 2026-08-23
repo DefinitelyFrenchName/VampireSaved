@@ -74,7 +74,9 @@ done
 # included), for tests/replays/05_timeout_idle.rpl at --offset 462. The replay
 # is: coin at MAME frame 300, start at 800, one button press at 960, then
 # nothing. The round-1 match start is the frozen anchor of
-# tests/test_mister_sim_anchor.sh: MAME 2146 / sim 2507.
+# tests/test_mister_sim_anchor.sh: MAME 2146 / sim 2502 on the fixed SDRAM
+# model (2507 before it). MATCH_START stays 2507 deliberately — a few frames
+# INSIDE the match is a safe phase boundary, a few frames before it is not.
 DL_END=462          # "ROM file transfered (frame 462)"
 ATTRACT_END=1265    # MAME 800-803 start press + 462
 SELECT_END=2506     # one frame before the match-start anchor
@@ -144,8 +146,18 @@ for r in rows:
     r["frame"] = r["t"] / FRAME_PS
 
 # --- consistency check: the reporter cadence against the video clock -------
-fin = re.findall(r"- \x1b\[33m *(\d+)\n", raw) or re.findall(r"-  *(\d+)\n", raw)
-last_frame = int(fin[-1]) if fin else None
+# test.cpp prints one COLOURED hex digit per frame (":874") and a full count
+# every 64 frames (":890"), so the last count is a multiple of 64 and the
+# frames after it exist only in the digit stream. Both are needed or the
+# implied frame period comes out long. The colour codes are what make either
+# pattern unambiguous -- the log also carries the reporter's own
+# "... - 12345 (12%)" text, which a colour-blind regex matches by the
+# thousand.
+fin = re.findall(r"- \x1b\[33m *(\d+)\n", raw)
+last_frame = None
+if fin:
+    tail = raw.rsplit("\x1b[33m%4d\n" % int(fin[-1]), 1)[-1]
+    last_frame = int(fin[-1]) + len(re.findall(r"\x1b\[31m[0-9A-F]\x1b\[0m", tail))
 print("== instrument check ==")
 print(f"  {len(rows)} well-formed reporter intervals of {seen} emitted "
       f"({100.0*(seen-len(rows))/seen:.1f}% lost). THE LOSS IS EXPECTED: the "
@@ -240,6 +252,9 @@ print("    burst; it is still a FLOOR — turnaround and refresh are not counted
 print("  * The ROM download is WRITES, one command per byte, and it is the")
 print("    only phase where ACTIVE tracks traffic (the prog path passes")
 print("    match=0, jtframe_sdram64.v:331, so every byte re-activates).")
+print("    Its kiB/s and data-bus figures are therefore INFLATED — they charge")
+print("    each single-byte write a full 4-word burst. Read the download row")
+print("    as a command-rate baseline, not as bandwidth.")
 
 if tsv:
     with open(tsv, "w") as f:

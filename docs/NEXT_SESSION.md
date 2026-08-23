@@ -89,7 +89,7 @@
 > ## `test_sim_wram_contract` (ci_portable) + `test_mister_sim_anchor`
 > ## (emulator tier, ~55 min). MEASURED: work RAM = SDRAM bank 0 byte
 > ## `0x600000`, 64 KB, 68k byte order; `05_timeout_idle` round-1
-> ## match-start anchor MAME **2146** / sim **2507**, skew **+361**
+> ## match-start anchor MAME **2146** / sim **2502**, skew **+356**
 > ## (NOT the +460 boot offset — the attract/select/VS path costs ~99
 > ## fewer frames on the core, which is why §4 anchors exist). Every
 > ## compared field agrees, P1 = Demitri `$093B6A` on both.
@@ -130,12 +130,15 @@
 > ## MEMORY-MAP ROUTE** — (1) uprev to untagged master + XL + `mem.yaml`
 > ## cache lanes, or (2) stay at the pin and BANK-REPACK inside 64 MB.
 > ## **Recommendation (2)**; both still need the core-side format work.
-> ## **CAVEAT ON OUR SIM LANE:** the Verilator SDRAM model is an
-> ## 8 MB-per-bank / 32 MB module (`test.cpp:605-606`), so GFX banks 2/3
-> ## are HALF-ALIASED — the work-RAM anchor oracle is UNAFFECTED (bank 0 is
-> ## entirely under 8 MB), but "the frames showed sprites" is weaker
-> ## evidence than it read. ~3 constants to fix; prerequisite to simulating
-> ## any widened set.
+> ## **THE SIM LANE'S SDRAM MODEL IS FIXED (14z-107 (3), fork commit 3).**
+> ## It dropped `addr[22]` — which rides on `sdram_a[9]` as the tenth COLUMN
+> ## bit, NOT `addr[9]` — so GFX banks 2/3 were half-aliased. The "~3
+> ## constants / widen the column to 0x3ff" fix named earlier was WRONG.
+> ## The anchor oracle never moved (bank 0 is entirely below WORD 0x400000)
+> ## and still passes; the anchor moved 2507 -> 2502 (skew 361 -> 356)
+> ## because `jtcps1_obj_draw.v:137` skips blank tiles, so OBJECT TIMING
+> ## DEPENDS ON GFX CONTENT. Two more harness bugs had to be
+> ## fixed before `-stats` produced anything (commits 4 and 5).
 > ## NEXT OPENER: **the MEMORY-MAP ROUTE ruling**, then the core-side format
 > ## work; phase B (the round-transition anchor on the full 12,120-frame
 > ## replay, ~3.5 h), the Verilator 8 MB-per-bank fix and P2/6-button

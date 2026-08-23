@@ -231,20 +231,27 @@ why the oracle compares at §4 ANCHORS and not at fixed indices. `--wram FIRST L
 `DUMPS=` produces. Nothing ROM-derived may land in the tree: the tool REFUSES
 an out-dir inside the repo (rule 7).
 
-**CAVEAT (14z-107 (2)): the Verilator SDRAM model is an 8 MB-per-bank,
-32 MB module** (`hdl/ver/test.cpp:605-606,609-610` — 13 row + 9 column),
-whatever `JTFRAME_SDRAM_LARGE` says about the buffer size. Bank 0 (PRG,
-VRAM, ORAM, **work RAM**, sound) is entirely under 8 MB, so the anchor oracle
-is unaffected; the 16 MB GFX banks 2/3 are HALF-ALIASED, so **no video or
-sprite result from this lane is trustworthy**. Fixing it (~3 constants) is a
-prerequisite to simulating any widened set.
+~~**CAVEAT (14z-107 (2)): the Verilator SDRAM model is an 8 MB-per-bank,
+32 MB module**~~ — **FIXED 14z-107 (3)** (fork commit 3). The model dropped
+`addr[22]`, which `jtframe_sdram64_bank.v:219` puts on `sdram_a[9]` as the
+tenth COLUMN bit; it is NOT `addr[9]` (a row bit), so the "~3 constants,
+widen the column to `0x3ff`" fix this row used to name would have produced a
+different wrong map. Video from this lane is now trustworthy for GFX; the
+anchor oracle never moved (bank 0 is entirely below WORD address `0x400000`)
+and `test_mister_sim_anchor.sh` is still green — with the anchor RE-MEASURED
+to MAME 2146 / sim **2502** / skew **356** (was 2507/361 on the broken model;
+the band is unchanged at +/- 30). The five frames are real:
+`jtcps1_obj_draw.v:137` skips a tile whose fetched GFX word is all-ones, so
+OBJECT TIMING IS A FUNCTION OF GFX ROM CONTENT. Two further harness bugs had to be fixed to measure SDRAM load at all —
+see `docs/platform/gotchas.md` "`jtsim -verilator -stats` reports nothing".
 
 | gate | tier | what it locks |
 |---|---|---|
 | `tests/test_jtcores_twin.sh` | ci_portable | pin, cps2w-vs-cps2 twin, the patch SERIES == `format-patch` per commit |
 | `tests/test_sim_wram_contract.sh` | ci_portable | dump naming + 68k byte order + skew absorption, two must-fire controls, the rule-7 refusals, and a static proof that every line the harness patch adds sits inside `#ifdef _JTFRAME_SIM_WRAMDUMP` |
 | `tests/test_rpl2siminputs.sh` | ci_portable | `.rpl` -> `sim_inputs.hex` bit map, frozen translation, refusals |
-| `tests/test_mister_sim_anchor.sh` | **manual/emulator (~50 min)** | THE ORACLE: MAME and jtcps2 agree on every mapped §4 field at the round-1 match-start anchor of `05_timeout_idle` (MAME **2146** / sim **2507**, skew **361 ± 30** — corrected 14z-107 (2); this row said "2606 / 460 ± 30", which is the BOOT offset, not the anchor. The gate freezes 2146/361 at `:73-75`); asserts the dump window is NON-CONSTANT first, then the byte-swap and hook-inertness controls |
+| `tests/audit_sdram_bank_load.sh` | **manual/emulator (~65 min)** | the per-bank SDRAM traffic profile of stock `vsavj` (ACTIVE counts, share, kiB/s, same-row hit rate and mean run, clash warnings) split into attract / select / in-match — the evidence for the MiSTer BANK REPACK ruling. `--log FILE` re-analyses `build/sdram_bank_load_14z107.log` offline |
+| `tests/test_mister_sim_anchor.sh` | **manual/emulator (~50 min)** | THE ORACLE: MAME and jtcps2 agree on every mapped §4 field at the round-1 match-start anchor of `05_timeout_idle` (MAME **2146** / sim **2502**, skew **356 ± 30** — re-measured 14z-107 (3) on the fixed SDRAM model; it was 2507/361 on the broken one, and 2606/460 before that, which was the BOOT offset rather than the anchor. The gate freezes 2146/356 at `:87-89`); asserts the dump window is NON-CONSTANT first, then the byte-swap and hook-inertness controls |
 
 ## Running a CPS-2 WIDE build (playtest)
 

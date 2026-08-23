@@ -357,9 +357,32 @@ is a GAME gotcha if it is true of the game regardless of the port.
   controller a macro's logic lives in before setting it.
 - **14z-107 (platform):** the Verilator SDRAM model
   (`hdl/ver/test.cpp`) sizes its BUFFERS from `JTFRAME_SDRAM_LARGE`
-  (16 MB/bank) but decodes the PINS at a fixed 22 bits — `SDRAM_A << 9`,
-  `& 0x3fffff`, 9-bit column masks — i.e. an **8 MB/bank, 32 MB module**.
-  Anything above 8 MB in a bank aliases in simulation with no warning, so
-  jtcps2's 16 MB GFX banks are half-aliased and "the frames showed
-  sprites" proves the core runs, not that GFX addressing is right. A
-  simulation model can be a DIFFERENT PART from the design's target.
+  (16 MB/bank) but reconstructed only 22 of the 23 address bits from the
+  PINS, so anything above 8 MB in a bank aliased in simulation with no
+  warning — jtcps2's 16 MB GFX banks were half-aliased and "the frames
+  showed sprites" proved the core runs, not that GFX addressing is right.
+  **FIXED 14z-107 (3), and the obvious fix was WRONG:** the missing bit is
+  `addr[22]`, which rides on `sdram_a[9]` as the tenth COLUMN bit
+  (`jtframe_sdram64_bank.v:219`), not `addr[9]`, which is a row bit —
+  so "widen the column mask to `0x3ff`" would have produced a different
+  wrong map. Two lessons: a simulation model can be a DIFFERENT PART from
+  the design's target, and **a SIZE tells you how many bits are missing,
+  never which one**.
+- **14z-107 (platform):** on jtcps1/jtcps2, **GFX ROM CONTENT changes
+  object TIMING** — `jtcps1_obj_draw.v:137` `if( &rom_data )` skips the
+  8-pixel draw loop for an all-ones (blank) tile word, so the object
+  engine's cycle cost and SDRAM request pattern depend on the data, not
+  just on the object table. Measured: fixing the Verilator SDRAM model
+  touched no bank-0 byte, yet the match-start anchor moved 2507 -> 2502.
+  Expect tenant art to shift core timing the same way; freeze anchors per
+  build. On a shared-bus system, changing the CONTENT of a read-only
+  memory can change TIMING.
+- **14z-107 (platform):** `jtsim -verilator -stats` reports nothing for
+  THREE stacked reasons — the stats module is never put on the compile
+  list, Verilator 5 refuses `#` delays without `--timing`, and
+  `test.cpp` never advances `VerilatedContext::time()` so no delay
+  deadline is ever reached. **A feature with a command-line flag, a help
+  line and an instantiation is not necessarily a feature that works.**
+  Bonus: advancing the model clock naively (`time() += semi_period`)
+  aborts the run — a delay deadline is not on the clock grid, so the step
+  must land on each pending slot via `eventsPending()`/`nextTimeSlot()`.

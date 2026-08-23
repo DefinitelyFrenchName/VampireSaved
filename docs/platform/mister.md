@@ -392,35 +392,92 @@ blocked only by bank PLACEMENT — is worked out in
    `--offset` (default 462). Run it detached and poll the PID; ~1 s per
    simulated frame.
 
-**CAVEAT ON THIS LANE: the Verilator SDRAM model is a 32 MB MODULE
-(measured 14z-107 (2)).** The C++ SDRAM in
-`modules/jtframe/hdl/ver/test.cpp` decodes only **22 address bits per bank =
-8 MB**, even though the buffer it allocates follows the macro correctly:
-`:54-58` `BANK_LEN = 0x100'0000` (16 MB) under `_JTFRAME_SDRAM_LARGE`, but
-`:605-606` `ba_addr[cur_ba] = dut.SDRAM_A << 9; // 32MB module` then
-`ba_addr[cur_ba] &= 0x3fffff`, with a **9-bit** column at `:609-610`
-(`&= ~0x1ff` / `|= (dut.SDRAM_A & 0x1ff)`) and the same 9-bit mask in the
-burst increment (`:642`, `:646`). 13 row + 9 column = 22 bits = 8 MB per
-bank; the 64 MB tier the core declares is 13 + 10 = 23 bits = 16 MB per bank.
-**Anything a core places above 8 MB WITHIN a bank ALIASES in simulation.**
+## THE LANE'S SDRAM MODEL WAS WRONG — FIXED 14z-107 (3), fork commit 3
 
-What that does and does not touch:
+**RESOLVED.** The caveat this section used to carry ("the Verilator SDRAM
+model is a 32 MB MODULE", 14z-107 (2)) was RIGHT about the symptom and WRONG
+about the mechanism, and the fix it proposed would have broken the map in a
+new way. Both are recorded below because the eliminations still hold.
 
-- **The 14z-107 anchor oracle is UNAFFECTED, and precisely so.** Everything
-  it reads lives in SDRAM bank 0, whose entire content sits under the 8 MB
-  line: PRG `0-4 MB`, VRAM at 4 MB, ORAM at 5 MB, **work RAM at 6 MB**, sound
-  at 7 MB (`jtcps1_sdram.v:158-164`, offsets in 16-bit WORDS). The dumped
-  window is bank 0 byte `0x600000` = 6 MB, comfortably inside.
-- **VIDEO results from this lane are NOT trustworthy for GFX.** Banks 2 and 3
-  are 16 MB each and are therefore HALF-ALIASED, and stock `vsav` already
-  fills both. That makes 14z-106 slice C's "`frame_00480.jpg` shows sprites"
-  **weaker evidence than it read**: it proves the core runs and the pipeline
-  moves pixels, not that GFX addressing is faithful.
-- **Fixing it is a prerequisite to simulating ANY widened set**, and it is
-  three constants — `<< 10`, `& 0x7fffff`, and a 10-bit column mask
-  (`0x3ff`) — gated on the same `_JTFRAME_SDRAM_LARGE` the buffer size
-  already follows. NOT DONE (14z-107 (2) was a recording pass, no code
-  touched). Filed in `docs/platform/gotchas.md`.
+**The symptom, unchanged:** at `JTFRAME_SDRAM_LARGE` the C++ SDRAM in
+`modules/jtframe/hdl/ver/test.cpp` decoded only 22 of the 23 address bits,
+so **the upper 8 MB of every bank aliased onto the lower 8 MB** — including
+during the ROM download, which therefore never wrote the upper half at all
+(it stayed at the constructor's `memset(0)`) and overwrote the lower half
+with the upper half's content.
+
+**The mechanism, corrected.** 14z-107 (2) recorded "13 row + 9 column =
+22 bits" and "the fix is three constants: `<< 10`, `& 0x7fffff`, `0x3ff`",
+i.e. it assumed the missing bit was `addr[9]`. **It is not.**
+`modules/jtframe/hdl/sdram/jtframe_sdram64_bank.v`:
+
+    :75-76  localparam ROW=13, COW= AW==22 ? 9 : 10;
+    :127    addr_row = AW==22 ? addr[AW-1:AW-ROW] : addr[AW-2:AW-1-ROW];
+    :219    sdram_a[10:0] = { precharge_flag, addr[AW-1], addr[8:0] };
+
+At AW=23 the row is `addr[21:9]` — 13 bits, which is exactly what
+`SDRAM_A << 9` already reconstructed — and the column is
+`{ addr[22], addr[8:0] }`. **The TOP address bit rides on `sdram_a[9]`;
+`addr[9]` is a ROW bit.** Widening the column mask to `0x3ff` would have
+folded `addr[22]` onto `addr[9]` and produced a different wrong map.
+
+**The fix** (`emu/jtcores-patches/0003-jtframe-sim-sdram-top-address-bit.patch`):
+rebuild bit 22 from `sdram_a[9]` on the READ/WRITE command, `#ifdef
+_JTFRAME_SDRAM_LARGE`. LARGE-only is not a convenience — at AW=22 that same
+pin carries `addr[AW-1] = addr[21]`, which is already part of `addr_row` and
+is a don't-care at COW=9, so 32 MB-module cores must keep ignoring it and are
+byte-for-byte unaffected. The burst column counter stays 9-bit on purpose:
+SDRAM burst addressing wraps inside the burst-length-aligned block and never
+carries into column bit 9. No allocation change was needed — `BANK_LEN` is
+already 16 MB under the macro and `read_bank`/`write_bank16` already mask
+with `(BANK_LEN>>1)-1 = 0x7fffff`.
+
+**BOTH CONTROLS, measured (`build/sdram_model_fix_14z107.log`):**
+
+- **Regression — the oracle still passes, and the anchor moved FIVE FRAMES
+  (2507 -> 2502, skew +361 -> +356), which is a real finding.**
+  `tests/test_mister_sim_anchor.sh` is GREEN: the shift is inside the frozen
+  +/- 30 band (not widened — the band is unchanged and the centre was
+  re-measured), every mapped field agrees exactly at the anchor and at
+  +60/+180, and the P1/P2 record bases are identical to the 14z-107
+  measurement ($093B6A / $0AE9D4 vs $0A9518). **The mechanism is
+  source-verified, not noise:** `cores/cps1/hdl/jtcps1_obj_draw.v:137`
+  `if( &rom_data ) begin // skip blank pixels` — the object pipeline SKIPS
+  its 8-pixel draw loop when the fetched GFX word is all-ones, so **OBJECT
+  TIMING IS A FUNCTION OF GFX ROM CONTENT.** With the aliased map the core
+  skipped whichever tiles the corruption made blank; now it skips the ones
+  that really are, the SDRAM contention pattern differs slightly, and 2,500
+  frames of that is worth five. Worth carrying into the WIDE arc: tenant art
+  can shift core timing by the same route.
+  What did NOT move is the part that matters: every bank-0
+  region sits below word address `0x400000`, i.e. bit 22 is 0 for all of it
+  — PRG `0`, VRAM `0x200000`, ORAM `0x280000`, WRAM `0x300000`, SND
+  `0x380000` (`jtcps1_sdram.v:158-164`, offsets in 16-bit WORDS), and the
+  68k ROM window is `main_rom_addr[20:0]`. Work RAM at bank 0 byte
+  `0x600000` was never aliased, so the oracle was never affected — which is
+  exactly what 14z-107 (2) predicted.
+- **Must-fire — the rendered frames CHANGED.** Same replay, same 620-frame
+  window, stock `cps2` core, before and after the fix.
+  Frame 1 (the pre-download black screen) is BYTE-IDENTICAL — the
+  run's own negative control. Frames 466 / 480 / 494 / 508 / 522 / 524 / 527
+  all DIFFER, in 106 / 311 / 526 / 731 / 980 / 1241 / 1361 pixels of 86,016
+  — 0.12-1.58% of the frame, but **71-78% of every INKED (non-black) pixel**,
+  because what is on screen there is the mostly-black CPS-2 boot self-test.
+  The SET of rendered frames differs too (`test.cpp` writes a jpg only when
+  the frame CHANGED): 465 appears only in the fixed run, 543/544/547/548 only
+  in the broken one. And the change is legibility — the self-test went from
+  garbled glyphs to `WORK / CPS0 / CPS1 / CPS2 / OBJECT / Q SOUND ... RAM OK`.
+- **And the SDRAM image itself:** the post-download bank images of the FIXED run measure bank 0
+  and bank 1's upper 8 MB at **0.0% non-zero** — never addressed, which is
+  the regression control above turned into a measurement — and banks 2 and 3's
+  upper 8 MB at **87.6% / 90.1% non-zero**, memory the old model could not
+  reach at all. (Bank 1's empty upper half is, incidentally, exactly the space
+  the BANK REPACK ruling wants for tenant art.)
+
+**What this retires.** 14z-106 slice C's "`frame_00480.jpg` shows sprites"
+was weaker evidence than it read, and 14z-107 (2) said so; now the lane
+actually renders from a faithful tile map, and simulating a widened set is
+no longer blocked on this.
 
 ## The work-RAM oracle: `JTFRAME_SIM_WRAMDUMP` (measured 14z-107)
 
@@ -454,8 +511,11 @@ the simulated core does it at GAME frame 71, i.e. absolute frame 533. So
 a 2-frame lead) — but that is the BOOT-PHASE offset only. **CORRECTED
 14z-107 (2): the round-1 match-start anchor of `05_timeout_idle` sits at MAME
 **2146** / sim **2507**, i.e. skew +361, not +460** — the attract/select/VS
-path costs ~99 fewer frames on the core. 2507/361 is what the gate freezes
-(`tests/test_mister_sim_anchor.sh:73-75`) and what "THE ANCHOR MEASUREMENT"
+path costs ~99 fewer frames on the core. (**RE-MEASURED 14z-107 (3) on the
+FIXED SDRAM model: 2502 / +356**; the five frames are the object pipeline's
+blank-tile skip reacting to correct GFX, see the fix section above.)
+2502/356 is what the gate freezes
+(`tests/test_mister_sim_anchor.sh:87-89`) and what "THE ANCHOR MEASUREMENT"
 below reports; an earlier "sim 2606 / skew 460" in this paragraph was the
 boot offset applied to the wrong frame and is retracted.
 
@@ -513,7 +573,8 @@ accumulates 64 MB of ROM-derived litter per run.
 
 **THE ANCHOR MEASUREMENT (stock `cps2` core, stock `vsavj`,
 `05_timeout_idle`, 14z-107).** Round-1 match start: MAME frame **2146**,
-simulated frame **2507** — skew **+361**. Note that this is NOT the boot
+simulated frame **2507** — skew **+361** (**2502 / +356 since the SDRAM
+model fix, 14z-107 (3)**). Note that this is NOT the boot
 offset (+460): the attract/select/VS path costs ~99 fewer frames on the core
 than on MAME, which is exactly why CLAUDE.md §4 compares mapped state at
 ANCHORS rather than at fixed frame indices. At the anchor and at +60/+180,
@@ -555,6 +616,45 @@ Only `test.cpp` includes `defmacros.h`, so changing the dump window rebuilds
 one object and relinks — it does NOT re-verilate the model. A per-window
 rebuild is ~4 s, not minutes.
 
+## The per-bank SDRAM traffic profile (measured 14z-107 (3))
+
+Stock `vsavj` on the stock `cps2` core, `05_timeout_idle`, 2,800 frames,
+`tests/audit_sdram_bank_load.sh`; full table and verdict in
+`build/sdram_bank_load_14z107.log`. Figures are PER VIDEO FRAME.
+
+| phase | ba0 (68k+VRAM+ORAM+WRAM+snd) | ba1 (QSound PCM) | ba2 (obj) | ba3 (obj+scroll) | data bus |
+|---|---|---|---|---|---|
+| attract | 38,278 acc | 3,464 acc / 78.6% row miss | 0 | 9,453 / 25.2% | 12.7% |
+| select+VS | 39,635 acc | 13,856 / **99.0%** | 261 / 82.7% | 12,079 / 36.8% | 16.4% |
+| in-match | 40,797 acc | 14,132 / **98.8%** | 1,017 / 42.6% | 17,467 / **28.8%** | 18.2% |
+
+**Read "acc" as READ+WRITE commands and the percentage as the ROW MISS
+rate.** They are different quantities because only bank 0 sets
+`JTFRAME_BA0_AUTOPRECH`: on banks 1-3 `jtframe_sdram64_bank.v:170`
+(`row_match = match && actd && !AUTOPRECH[0]`) skips both the PRECHARGE and
+the ACTIVE when a request hits the open row, so an ACTIVE there means a row
+MISS. Bank 0's 100% is by construction, not by thrashing.
+
+Facts that matter to the bank-repack arc:
+- **QSound has essentially no row locality** — 98.8% miss in-match. It
+  round-robins 16 channels at unrelated addresses, so nearly every fetch
+  opens a new row. There is no locality in bank 1 for a repack to spoil.
+- **Object/scroll traffic does** — 28.8% miss in bank 3. Tile fetches come in
+  runs; that is what a repack into bank 1 would put at risk.
+- **The bus is at 18.2%** of 96 MHz x 16 bit (30.2 MB/s useful) at the
+  busiest measured point, and a repack cannot change it: it moves which bank
+  serves a fetch, not how many fetches happen.
+- **A single bank's all-miss ceiling is 123,825 transactions/frame**
+  (STW = 13 clocks at 96 MHz), and **bank 0 already sustains 40,797 of them
+  every frame** in stock configuration — more than any repack worst case.
+- `WARNING: (test.cpp) SDRAM reads clashed`: **zero** in 2,800 frames.
+- Bank 2 is nearly idle (1.4% share): vsav's object art sits overwhelmingly
+  in the `rom0_bank[0]=1` half, i.e. bank 3.
+- `jtframe_sdram64.v:536-542` with `BAPRIO=1` grants strictly
+  ba0 > ba1 > ba2 > ba3, so objects moved into bank 1 would gain priority
+  OVER the scroll left in bank 3 — a scheduling change, not just a
+  placement change.
+
 ## Measured 14z-106: the twin proof
 
 `jtframe mra cps2` emits 316 MRAs; `jtframe mra cps2w` emits 7 — the
@@ -589,6 +689,13 @@ shown in STATE 14z-106 (3)). Gate: `tests/test_jtcores_twin.sh`.
   (2) stay at the pin and BANK-REPACK inside 64 MB (tenant art into bank 1
   beside the PCM, reached by the promoted tile-code bit). Either way the
   core-side format work of "What the CPS-2 CORE caps" is required.
-- **The Verilator SDRAM model's 8 MB-per-bank decode** (the caveat next to
+- ~~**The Verilator SDRAM model's 8 MB-per-bank decode** (the caveat next to
   the Recipe) is a prerequisite for simulating any widened set, and is
-  three constants. Not started.
+  three constants. Not started.~~ **DONE 14z-107 (3), fork commit 3** — and
+  it was NOT three constants: the dropped bit is `addr[22]` riding on
+  `sdram_a[9]`, not `addr[9]`. See "THE LANE'S SDRAM MODEL WAS WRONG" above.
+- **The bank-repack question is MEASURED and the answer is GO** — see "The
+  per-bank SDRAM traffic profile" above and
+  `build/sdram_bank_load_14z107.log`. It bounds the headroom; proving the
+  repacked design needs the same instrument on a `cps2w` core carrying the
+  repacked map.
