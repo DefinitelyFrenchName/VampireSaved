@@ -2095,6 +2095,28 @@ Original write-up kept below.
 
 ## Decisions pending (human)
 
+- ~~**MiSTer SOURCE SEPARATION — how far does "unmixed" reach? (14z-107 (8))**~~
+  **DECIDED (maintainer, 2026-08-23): the CORE stays unmixed; SHARED
+  `tools/` and `tests/` STAY AS THEY ARE** — *"shared /tools and /tests are
+  a bit messy but acceptable, especially since it's not 100% risk-free."*
+  The standing rule the maintainer set: the MiSTer core must not be MIXED
+  with the other sources — same repo is fine, same subfolder is not.
+  **Already satisfied, and asserted rather than claimed:** our RTL lives in
+  `cores/cps2w/hdl` while `cores/cps1`, `cores/cps2` and `cores/cps15` are
+  BYTE-UNTOUCHED (`tests/test_jtcores_twin.sh` check 2e is a `git diff`
+  assertion, added in D1 — the slice that first added RTL); in this tree
+  `emu/fbneo`, `emu/mame` and `emu/jtcores` are separate submodules with
+  their patch mirrors in parallel `emu/*-patches/` dirs.
+  **NOT to be "tidied" later:** the MiSTer tools (`run_sim_jtcps2.sh`,
+  `setup_jtcores.sh`, `mister_mra.sh`, `gen_vsavjw_xml.py`,
+  `rpl2siminputs.py`, `check_wram_dumps.py`) and gates (`test_mister_*`,
+  `test_jtcores_twin`, `audit_sdram_bank_load`, `test_sim_wram_contract`)
+  STAY in the shared `tools/` and `tests/`. A move would touch
+  `tests/ci_portable.txt`, `tests/ci_static.txt`, `run_all_static.sh`'s
+  orphan check and every doc path naming them — i.e. it risks the
+  "checks that stopped checking" class (14z-95, four instances) for zero
+  functional gain. Ruled acceptable-as-is; do not re-open it as housekeeping.
+
 - **MiSTer PACKAGING — two questions slice D0 surfaced (14z-107 (5), NEW).**
   Neither blocks D1-D4; both must be answered before a release.
   1. **Which MRA is the core's MAIN one?** `jtframe mra cps2w` puts the Euro
