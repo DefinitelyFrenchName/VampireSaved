@@ -1,0 +1,66 @@
+fork_rewind_14z107.log — 14z-107 (7), the control that root-caused the
+MiSTer lane's "video-sensitive anchor".
+
+SETUP. cores/cps2w, stock vsavj, tests/replays/05_timeout_idle.rpl,
+--frames 2700 --wram 2000 2680, one scratch clone per leg at fork pin
+692ba4d6 (before the _exit fix). Held constant in all four legs:
+  rom/vsavj.rom      sha1 f9dc29870c871355c5c0fa06c6ad8bea9236ba28
+  sim_inputs.hex     sha1 1d6f841895f3c99cbf817508de001750f98213da
+  ROM download       462 simulated frames
+  RTL file list      identical (filtered.f byte-identical)
+  macro set          identical apart from JTFRAME_SIM_NOVIDEO and the
+                     build TIMESTAMP (which reaches only jtframe_cheat.v)
+
+AXES.  pal_lut.hex present/absent in cores/cps2w/hdl (the D1 axis);
+       host frame output off (-d JTFRAME_SIM_NOVIDEO=1) / fork (upstream).
+
+=== jpgs written, i.e. the number of fork()+ImageMagick children ===
+lutON_fbOFF      0
+lutOFF_fbOFF     0
+lutON_fbFORK     1348
+lutOFF_fbFORK    1
+
+=== dump-set integrity (tools/check_wram_dumps.py) ===
+lutON_fbOFF      dump integrity OK: 681 frames 2000..2680, 65536 bytes each addr $FF0000
+lutOFF_fbOFF     dump integrity OK: 681 frames 2000..2680, 65536 bytes each addr $FF0000
+lutON_fbFORK     dump integrity OK: 681 frames 2000..2680, 65536 bytes each addr $FF0000
+lutOFF_fbFORK    dump integrity OK: 681 frames 2000..2680, 65536 bytes each addr $FF0000
+
+=== match-start anchors (tools/compare_fields.py --list-anchors) ===
+MAME (frames 2100-2400, 301 dumps): 2146
+lutON_fbOFF      2609 
+lutOFF_fbOFF     2609 
+lutON_fbFORK     2502 
+lutOFF_fbFORK    2609 
+
+=== pairwise 68k work-RAM comparison, frames 2000-2680 ===
+--- lutON_fbOFF  vs  lutOFF_fbOFF
+A=out_lutON_fbOFF (681 dumps)  B=out_lutOFF_fbOFF (681 dumps)
+  common 681 frames: identical 681, differing 0
+  BIT-IDENTICAL on every common frame
+--- lutON_fbFORK  vs  lutOFF_fbFORK
+A=out_lutON_fbFORK (681 dumps)  B=out_lutOFF_fbFORK (681 dumps)
+  common 681 frames: identical 198, differing 483
+  FIRST DIVERGENCE frame 2051: 1 byte(s)
+    RAM:$FF8060  A=0x41  B=0x40
+--- lutON_fbOFF  vs  lutON_fbFORK
+A=out_lutON_fbOFF (681 dumps)  B=out_lutON_fbFORK (681 dumps)
+  common 681 frames: identical 198, differing 483
+  FIRST DIVERGENCE frame 2051: 1 byte(s)
+    RAM:$FF8060  A=0x40  B=0x41
+--- lutOFF_fbOFF  vs  lutOFF_fbFORK
+A=out_lutOFF_fbOFF (681 dumps)  B=out_lutOFF_fbFORK (681 dumps)
+  common 681 frames: identical 681, differing 0
+  BIT-IDENTICAL on every common frame
+
+=== determinism control: fork mode run TWICE (independent scratch clones) ===
+lutON_fbFORK2   1348 jpgs, anchor 2502, dump integrity OK
+A=out_lutON_fbFORK (681 dumps)  B=out_lutON_fbFORK2 (681 dumps)
+  common 681 frames: identical 681, differing 0
+  BIT-IDENTICAL on every common frame
+
+=== the LOG side of the same cleanup: copies of one $display line ===
+lutON_fbFORK    (pin 692ba4d6, child exit(0)):  1349 copies of
+                'INFO: Read pal_lut.hex for TOP...u_lut' = 1348 children + 1 parent
+lutON_fbFORK_fixed (pin 7cf1eedb, child _exit(0)): 0 per-fork copies
+                (the parent's own single copy lands at exit)

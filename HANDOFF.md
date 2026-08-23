@@ -254,6 +254,8 @@ export ROMDIR=/path/to/reference/sets
 export JTSIM_SCRATCH=/tmp/vampire-saved-jtsim   # NEVER inside the repo
 tools/run_sim_jtcps2.sh tests/replays/05_timeout_idle.rpl /tmp/out107 \
     --frames 2880 --wram 2540 2880     # ~47 min; run it detached, poll the PID
+#   host frame output is OFF by default (--frame-output off); `fork` is
+#   upstream's behaviour and `collect` also gathers <outdir>/frames
 python3 tools/compare_fields.py <mame_dumps> /tmp/out107/wram \
     --fields tests/fields_m2a.tsv --follow 0,60,180 --label-a mame --label-b jtcps2
 ```
@@ -266,8 +268,10 @@ simulated, it also consumes `sim_inputs.hex` lines, so `--frames`, `--wram`
 and the dump file names are ABSOLUTE (download included) and the `.rpl` is
 shifted by `--offset` (default 462): **a MAME frame `f` sits NEAR simulated
 frame `f + 462`** — but the offset is not constant across the boot: it is
-+460 at the RAM-test onset and **+361 by the round-1 match start**, which is
-why the oracle compares at §4 ANCHORS and not at fixed indices. `--wram FIRST LAST` writes `wram/dump_<frame>_ff0000.bin`,
++460 at the RAM-test onset and **+463 by the round-1 match start**
+(re-measured 14z-107 (7); it read +361 and then +356 on runs whose input
+script the harness's frame writer was replaying), which is why the oracle
+compares at §4 ANCHORS and not at fixed indices. `--wram FIRST LAST` writes `wram/dump_<frame>_ff0000.bin`,
 64 KB of 68k work RAM in 68k byte order — the same files the MAME harness's
 `DUMPS=` produces. Nothing ROM-derived may land in the tree: the tool REFUSES
 an out-dir inside the repo (rule 7).
@@ -281,7 +285,10 @@ different wrong map. Video from this lane is now trustworthy for GFX; the
 anchor oracle never moved (bank 0 is entirely below WORD address `0x400000`)
 and `test_mister_sim_anchor.sh` is still green — with the anchor RE-MEASURED
 to MAME 2146 / sim **2502** / skew **356** (was 2507/361 on the broken model;
-the band is unchanged at +/- 30). The five frames are real:
+the band is unchanged at +/- 30). **BOTH SUPERSEDED 14z-107 (7): the clean
+anchor is 2609 / skew 463** — 2507 and 2502 were measured while jtframe's
+frame writer was rewinding `sim_inputs.hex`. The object-timing MECHANISM in
+this paragraph still stands; the absolutes do not. The five frames are real:
 `jtcps1_obj_draw.v:137` skips a tile whose fetched GFX word is all-ones, so
 OBJECT TIMING IS A FUNCTION OF GFX ROM CONTENT. Two further harness bugs had to be fixed to measure SDRAM load at all —
 see `docs/platform/gotchas.md` "`jtsim -verilator -stats` reports nothing".
@@ -289,14 +296,14 @@ see `docs/platform/gotchas.md` "`jtsim -verilator -stats` reports nothing".
 | gate | tier | what it locks |
 |---|---|---|
 | `tests/test_jtcores_twin.sh` | ci_portable | pin, cps2w-vs-cps2 twin, the patch SERIES == `format-patch` per commit |
-| `tests/test_sim_wram_contract.sh` | ci_portable | dump naming + 68k byte order + skew absorption, two must-fire controls, the rule-7 refusals, and a static proof that every line the harness patch adds sits inside `#ifdef _JTFRAME_SIM_WRAMDUMP` |
+| `tests/test_sim_wram_contract.sh` | ci_portable | dump naming + 68k byte order + skew absorption, two must-fire controls, the rule-7 refusals, a static proof that every line the harness patch adds sits inside `#ifdef _JTFRAME_SIM_WRAMDUMP` — and since 14z-107 (7) the DUMP-INTEGRITY assertion (`tools/check_wram_dumps.py`, six checks: a hole, a truncated file, a stray frame, a wrong address, `--contiguous` and its hole) plus the lane's frame-output default (`--frame-output off` -> `-d JTFRAME_SIM_NOVIDEO=1`) with a flipped-default control and the shape of fork patch 0008 |
 | `tests/test_rpl2siminputs.sh` | ci_portable | `.rpl` -> `sim_inputs.hex` bit map, frozen translation, refusals |
 | `tests/audit_sdram_bank_load.sh` | **manual/emulator (~65 min)** | the per-bank SDRAM traffic profile of stock `vsavj` (ACTIVE counts, share, kiB/s, same-row hit rate and mean run, clash warnings) split into attract / select / in-match — the evidence for the MiSTer BANK REPACK ruling. `--log FILE` re-analyses `build/sdram_bank_load_14z107.log` offline |
 | `tests/audit_mister_map_fit.sh` | ci_static (~5 s) | the SDRAM PLACEMENT MAP fits the 64 MB tier by 0.708 MB, and the four extents it rests on are frozen: group-C obj bank 4 ceiling `0xEE73`, obj bank 5 ceiling `0xFFDB`, QSound live `0x8E57F0`, PRG live `0x5FFF1E`. Also checks the `.rom` against the 26-bit `ioctl_addr` and the 16-bit header words. Re-checks the "tile code IS its SDRAM address" scramble identity §1 rests on. THREE must-fire controls (untrimmed QSound must be rejected; +1 MB of obj-bank-5 must overflow bank 0; the identity must fail without the scramble). Design: `docs/project/mister_map.md` |
 | `tests/test_mister_mra_map.sh` | ci_static (~15 s) | **SLICE D0**: the WIDE `.rom` is EXACTLY `mister_map.md` §3 — 66,265,152 B, header words 6144/6400/15552/64704, every region 1 KiB-aligned and byte-for-byte the romset's, the trimmed QSound region a PURE truncation. Also: the stock `vsavj` MRA from `cps2w` == `cps2`'s except `<rbf>`, `cps2` emits NO WIDE MRA (the `cps2w.cpp` sourcefile gate), stock `vsavj.rom` still BIT-IDENTICAL (46,407,744 B, sha1 `f9dc2987…`), and the fork's catalogue entry names the CURRENT build's CRCs. TWO must-fire controls: untrimmed -> 73,670,720 B / `qsnd_start` 71,936 KiB (and the generator SILENTLY writes the wrapped word); `length` +0x400 -> the frozen table fails |
 | `tests/test_mister_wide_gate.sh` | ci_portable (~30 s with Verilator, seconds without) | **SLICE D1, the RTL trust surface.** The frozen line-by-line delta of the two OVERRIDDEN files vs the shared originals (`tests/expect/cps2w_rtl_delta.txt`); the profile byte agreeing in all three copies (TOML `offset=41 data="fe"`, RTL `PROFILE_BYTE=6'd41`, `~profile[0]`) plus the `fill=0xff` and `JOY_BYTE` facts the polarity rests on; the widths, and that `PCM_AW` is NOT widened (it cannot be — `jtframe_romrq_bcache.v:74`); MAME's three qsound.cpp lines that validate `dsp_ab[7]`; and `jtframe files` resolving cps2w to OUR four and cps2 to NEITHER of ours. Then Verilator: `jtcps2w_qsnd_bank` over **all 65,536 `dsp_ab` values in both profile states** (bank[7] stuck at 0 with `wide_en` low, moving 16,384 times with it high) and `jtcps2w_profile` over a real 64-byte header stream. FOUR must-fire controls: gate bypassed; profile byte moved to 40; polarity flipped; an override perturbed by one width |
-| `tests/test_mister_wide_inert.sh` | **manual/emulator (~22 min)** | **THE FPGA SUPERSET INVARIANT, MEASURED DIRECTLY**: `cps2` and `cps2w` run the SAME stock `vsavj` download under Verilator and their 68k work RAM must be BIT-IDENTICAL at every frame of the window (default 540-640, `WINDOW_FIRST`/`WINDOW_LAST` to move it). Asserts the window is NON-CONSTANT first; control = the same dumps compared against themselves SHIFTED BY ONE FRAME, which must FAIL, proving the comparison would catch a one-frame timing skew. This is the inertness instrument; the anchor gate below is a cross-IMPLEMENTATION oracle and is a poor substitute for it |
-| `tests/test_mister_sim_anchor.sh` | **manual/emulator (~50 min)** | THE ORACLE: MAME and the core under test (**`cps2w` since D1**, `SIM_CORE=cps2` for the reference leg) agree on every mapped §4 field at the round-1 match-start anchor of `05_timeout_idle` (MAME **2146** / sim **2502**, skew **356 ± 30** — re-measured 14z-107 (3) on the fixed SDRAM model; it was 2507/361 on the broken one, and 2606/460 before that, which was the BOOT offset rather than the anchor. The gate freezes 2146/356 at `:87-89`); asserts the dump window is NON-CONSTANT first, then the byte-swap and hook-inertness controls |
+| `tests/test_mister_wide_inert.sh` | **manual/emulator (~22 min)** | **THE FPGA SUPERSET INVARIANT, MEASURED DIRECTLY**: `cps2` and `cps2w` run the SAME stock `vsavj` download under Verilator and their 68k work RAM must be BIT-IDENTICAL at every frame of the window (default 540-640, `WINDOW_FIRST`/`WINDOW_LAST` to move it). Asserts the window is NON-CONSTANT first; control = the same dumps compared against themselves SHIFTED BY ONE FRAME, which must FAIL, proving the comparison would catch a one-frame timing skew. Both legs run with host frame output OFF (the default since 14z-107 (7)) and their dump sets are asserted complete by the producer. This is the inertness instrument; the anchor gate below is a cross-IMPLEMENTATION oracle and is a poor substitute for it |
+| `tests/test_mister_sim_anchor.sh` | **manual/emulator (~50 min)** | THE ORACLE: MAME and the core under test (**`cps2w` since D1**, `SIM_CORE=cps2` for the reference leg) agree on every mapped §4 field at the round-1 match-start anchor of `05_timeout_idle` (MAME **2146** / sim **2609**, skew **463 ± 30** — RE-MEASURED 14z-107 (7) with host frame output OFF. It read 2502/356 and 2507/361 on runs whose input script the harness's frame writer was replaying, and 2606/460 before that, which was the BOOT offset rather than the anchor). Runs with `--frame-output off` and ASSERTS that mode from the run's own log banner; asserts BOTH dump sets are COMPLETE (`tools/check_wram_dumps.py`) and the sim window NON-CONSTANT before computing any anchor; then the byte-swap, hook-inertness and punched-hole controls |
 
 ## Running a CPS-2 WIDE build (playtest)
 
@@ -3178,6 +3185,7 @@ canonical whole-RAM checksums, bit-identical to frozen expectations.
 | Crash-guard ground truth | `tests/test_crash_guard.sh` (clean negative + vec4/vec3 positive controls) |
 | Dual-emulator field comparator | `tools/compare_fields.py` + `tests/fields_m2a.tsv` (debounced anchors; stable/settled/phase field classes; `--exact` for same-emulator) |
 | Comparator ground truth | `tests/test_compare_fields_selfcheck.sh` (§4 protocol exercised: MAME/FBNeo agree on `16_xemu_2p`, 1-frame skew) |
+| Dump-set completeness | `tools/check_wram_dumps.py` — `compare_fields.py` GLOBS, so a lost dump silently moves the anchor instead of failing. Asserts a per-frame dump directory is complete: `--first/--last`, `--size`, `--addr`, or `--contiguous` for a directory of unknown extent. Run by `tools/run_sim_jtcps2.sh` on every `--wram` run and by `test_mister_sim_anchor` on BOTH legs (14z-107 (7)) |
 | Dual-emulator-safe replay template | `tests/replays/16_xemu_2p.rpl` (authoring rules in docs/GOTCHAS.md — vs-CPU replays have emulator-divergent content!) |
 | Slot-0x0F pick replay | `tests/replays/11_pick_donovan.rpl` (Jedah on vanilla; per-build expectations via fingerprint dispatch) |
 | Auto-detecting suite runner | `tests/run_suite.sh` — `MAME_ROMPATH` fronting, fingerprint → `tests/expected/<expset>/`, `.diverge` expectation kind (exact-frame divergence vs frozen full logs under `expected/<set>/logs/`) |

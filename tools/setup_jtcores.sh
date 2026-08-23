@@ -45,7 +45,7 @@ set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 SRC="$REPO/emu/jtcores"
 UPSTREAM_TAG_SHA="63688ce5f4de9b92ac4d2ea4b306009b8ba4bcdb"   # jotego/jtcores v1.7.3
-PINNED="4840df8a80734d50bbeb13243db42eb17eea393e"             # fork branch vampire-saved
+PINNED="7cf1eedb24d8d34647f9ae041ecc8d9a899205d6"             # fork branch vampire-saved
 FORK_URL="https://github.com/DefinitelyFrenchName/jtcores"
 
 if [ ! -f "$SRC/.gitmodules" ]; then
@@ -72,7 +72,7 @@ echo "jtcores @ $HEAD (fork of v1.7.3 $UPSTREAM_TAG_SHA); jtdsp16 $(git -C "$SRC
 # The reviewable mirror of the fork's delta, one file per commit IN ORDER.
 # The names are declared here (not derived from the commit subject) so the
 # in-tree filenames stay stable and greppable; the gate reads this same list.
-PATCH_NAMES="0001-cps2w-scaffold.patch 0002-jtframe-sim-wramdump.patch 0003-jtframe-sim-sdram-top-address-bit.patch 0004-jtframe-sim-advance-model-time.patch 0005-jtframe-sim-sdram-stats-raw.patch 0006-cps2w-wide-mra-trim.patch 0007-cps2w-qsound-width-runtime-gate.patch"
+PATCH_NAMES="0001-cps2w-scaffold.patch 0002-jtframe-sim-wramdump.patch 0003-jtframe-sim-sdram-top-address-bit.patch 0004-jtframe-sim-advance-model-time.patch 0005-jtframe-sim-sdram-stats-raw.patch 0006-cps2w-wide-mra-trim.patch 0007-cps2w-qsound-width-runtime-gate.patch 0008-jtframe-sim-optional-frame-writer.patch 0009-jtframe-sim-child-must-exit-hard.patch"
 i=1
 for name in $PATCH_NAMES; do
     sha="$(git -C "$SRC" rev-list --reverse "$UPSTREAM_TAG_SHA..$PINNED" | sed -n "${i}p")"

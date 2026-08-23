@@ -26,6 +26,14 @@
 # which is the smallest divergence the D1 change could plausibly cause.
 # Plus: the window must be NON-CONSTANT, or a dead run would compare equal.
 #
+# COMPLETENESS is asserted by the PRODUCER (14z-107 (7)):
+# tools/run_sim_jtcps2.sh runs tools/check_wram_dumps.py on every --wram run
+# and refuses to return a dump set with a hole, a short file or a stray
+# frame. That matters here because the loop below walks the cps2 side and a
+# dump missing from THAT side would silently shrink the comparison rather
+# than fail it. Both legs also run with host frame output OFF (the default),
+# so nothing either core puts on screen can reach the measurement.
+#
 # COST: two Verilator runs of the same length, each paying the 462-frame ROM
 # download. The default window is early boot (~11 min per core on Apple
 # Silicon); WINDOW_LAST further out costs ~1 s per extra frame per core.

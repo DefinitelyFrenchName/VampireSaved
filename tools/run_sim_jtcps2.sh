@@ -48,6 +48,25 @@
 # held in reset until the transfer ends. So the .rpl must be SHIFTED by the
 # download length — that is what --offset is for (default DWNLD_FRAMES).
 #
+# FRAME OUTPUT IS OFF BY DEFAULT, AND THAT IS A CORRECTNESS DECISION
+# (14z-107 (7)). jtframe's Verilator harness forks a child per CHANGED frame to
+# run ImageMagick -- ALWAYS, `-video` is not what enables it -- and until fork
+# commit 9 that child ended with exit(0). exit() runs the C stdio cleanup;
+# libc++'s basic_filebuf is a FILE*; and fclose() on a seekable read stream
+# repositions the SHARED file description back to the stream's logical
+# position. So every forked child REWOUND the parent's sim_inputs.hex and the
+# simulated CONTROLLER was replayed at the next buffer refill -- and since the
+# number of forks follows the PICTURE, so did the simulated 68k's state. That
+# is the whole of slice D1's "the anchor is video-sensitive": measured, a core
+# rendering black and a core rendering the game diverge at frame 2051 in one
+# byte, RAM:$FF8060, the START bitmask.
+# Fork commit 9 fixes it at the root (_exit(0), no cleanup, no rewind). This
+# default is the belt to that fix's braces: a run being used as a STATE oracle
+# should not be doing anything with the pixels in the first place, and with
+# JTFRAME_SIM_NOVIDEO it provably is not. `off` vs `fork` is the control that
+# proved the mechanism, and tests/test_mister_sim_anchor.sh asserts the mode
+# its numbers were frozen under.
+#
 # RULE 7. The .rom, the SDRAM banks and the RAM dumps are ROM-derived: they
 # live in the scratch clone and in an out-dir OUTSIDE this repo, never in it.
 # This script refuses an out-dir inside the tree.
@@ -55,7 +74,7 @@
 # Usage:
 #   ROMDIR=... tools/run_sim_jtcps2.sh <replay.rpl> <outdir> \
 #       [--frames N] [--wram FIRST LAST] [--core cps2|cps2w] [--offset K] \
-#       [--no-load] [--region BANK OFF LEN ADDR] [--video] [--stats]
+#       [--no-load] [--region BANK OFF LEN ADDR] [--frame-output MODE] [--stats]
 #   --frames N   ABSOLUTE frames to simulate, the ~462 download frames
 #                INCLUDED — as are --wram and the dump file names. (jtsim's
 #                own -frame counts from the end of the transfer; this script
@@ -63,10 +82,20 @@
 #   --no-load    skip the ROM download. DIAGNOSTICS ONLY — the 68k will not
 #                run (see above); it is also the inertness control's cheap run.
 #   --region     override the dumped block (default: the CPS-2 68k work RAM).
-#   --video      jtsim -video: render every CHANGED frame to frames/frame_%05d.jpg
-#                (ImageMagick fork per frame) and collect them into <outdir>/frames.
-#                Cheap for a few hundred frames; jtsim itself builds an mp4 once
-#                more than 250 jpgs exist, so keep the window short.
+#   --frame-output MODE   what the HOST does with the pixels. This is part of
+#                the run's identity, not a cosmetic choice -- see
+#                "FRAME OUTPUT IS OFF BY DEFAULT" below.
+#                  off     (DEFAULT) -d JTFRAME_SIM_NOVIDEO=1: the harness's
+#                          per-frame image writer is compiled out. No fork, no
+#                          ImageMagick, no frames/. The lane's state oracle
+#                          runs in this mode.
+#                  fork    upstream's behaviour: one fork()+ImageMagick child
+#                          per CHANGED frame, jpgs left in the core's ver/game.
+#                          The control leg, and what a picture is debugged in.
+#                  collect fork, plus jtsim -video, plus collecting
+#                          <outdir>/frames. jtsim builds an mp4 once more than
+#                          250 jpgs exist, so keep the window short.
+#   --video      alias for --frame-output collect.
 #   --stats      jtsim -stats: instantiate jtframe_sdram_stats_sim, which prints
 #                per-bank ACTIVE counts, kiB/s, per-bank share and per-bank
 #                same-row hit rate + longest same-row run every 16.667 ms of
@@ -89,7 +118,7 @@ REPO="$(cd "$(dirname "$0")/.." && pwd)"
 # log line "ROM file transfered (frame 462)", measured 14z-106 and 14z-107.
 DWNLD_FRAMES=462
 RPL=""; OUTDIR=""; FRAMES=""; WFIRST=""; WLAST=""; CORE=cps2; OFFSET=""; LOAD=1
-RBANK=""; ROFF=""; RLEN=""; RADDR=""; VIDEO=0; STATS=0
+RBANK=""; ROFF=""; RLEN=""; RADDR=""; FRAMEOUT=off; STATS=0
 while [ $# -gt 0 ]; do
     case "$1" in
     --frames) shift; FRAMES="${1:?--frames needs N}" ;;
@@ -97,13 +126,14 @@ while [ $# -gt 0 ]; do
     --core)   shift; CORE="${1:?--core needs cps2|cps2w}" ;;
     --offset) shift; OFFSET="${1:?--offset needs K}" ;;
     --no-load) LOAD=0 ;;
-    --video)  VIDEO=1 ;;
+    --video)  FRAMEOUT=collect ;;
+    --frame-output) shift; FRAMEOUT="${1:?--frame-output needs off|fork|collect}" ;;
     --stats)  STATS=1 ;;
     --region) shift; RBANK="${1:?--region needs BANK OFF LEN ADDR}"; shift
               ROFF="${1:?--region needs BANK OFF LEN ADDR}"; shift
               RLEN="${1:?--region needs BANK OFF LEN ADDR}"; shift
               RADDR="${1:?--region needs BANK OFF LEN ADDR}" ;;
-    -h|--help) sed -n '2,84p' "$0"; exit 0 ;;
+    -h|--help) sed -n '2,113p' "$0"; exit 0 ;;
     -*) echo "unknown option '$1' (try --help)" >&2; exit 2 ;;
     *)  if [ -z "$RPL" ]; then RPL="$1"; elif [ -z "$OUTDIR" ]; then OUTDIR="$1";
         else echo "unexpected argument '$1'" >&2; exit 2; fi ;;
@@ -115,6 +145,7 @@ ROMDIR="${ROMDIR:?set ROMDIR to the reference-set directory}"
 ROMDIR="$(CDPATH= cd "$ROMDIR" && pwd)"
 RPL="$(CDPATH= cd "$(dirname "$RPL")" && pwd)/$(basename "$RPL")"
 case "$CORE" in cps2|cps2w) ;; *) echo "--core must be cps2 or cps2w" >&2; exit 2 ;; esac
+case "$FRAMEOUT" in off|fork|collect) ;; *) echo "--frame-output must be off, fork or collect" >&2; exit 2 ;; esac
 
 # THE CPS-2 CONSTANTS live here (a CPS-2 tool), not in jtframe: the harness
 # hook is core-agnostic and takes them as macros.
@@ -264,7 +295,10 @@ if [ "$STATS" = 1 ]; then
 fi
 # NOTE the ordering: jtsim's -video consumes the NEXT word as a frame count
 # unless it starts with '-' (bin/jtsim:422-428), so -video is never last.
-if [ "$VIDEO" = 1 ]; then SIMARGS="$SIMARGS -video"; fi
+case "$FRAMEOUT" in
+    off)     SIMARGS="$SIMARGS -d JTFRAME_SIM_NOVIDEO=1" ;;
+    collect) SIMARGS="$SIMARGS -video" ;;
+esac
 SIMARGS="$SIMARGS -inputs"
 if [ "$LOAD" = 1 ]; then SIMARGS="$SIMARGS -load"; fi
 if [ -n "$FRAMES" ]; then
@@ -301,7 +335,19 @@ if [ -d "$GAME/wram" ]; then
 else
     say "no wram/ produced"
 fi
-if [ "$VIDEO" = 1 ] && [ -d "$GAME/frames" ]; then
+# ---------------------------------------------------- 7b. dump INTEGRITY
+# A LOST OR SHORT DUMP MUST BE LOUD (14z-107 (7)). tools/compare_fields.py GLOBS a
+# directory: it compares whatever frames it finds, so a missing file does not
+# fail, it silently changes WHICH frames exist -- and on an anchor search that
+# means a different anchor, reported as a disagreement between
+# implementations. The producer is the only place that knows what SHOULD be
+# there, so it is checked here: every frame in [FIRST..LAST], each exactly
+# WRAM_LEN bytes, nothing extra.
+if [ -n "$WFIRST" ]; then
+    python3 "$REPO/tools/check_wram_dumps.py" "$OUTDIR/wram" \
+        --first "$WFIRST" --last "$WLAST" --size "$WRAM_LEN" --addr "$WRAM_ADDR" || exit 1
+fi
+if [ "$FRAMEOUT" = collect ] && [ -d "$GAME/frames" ]; then
     rm -rf "$OUTDIR/frames"; mv "$GAME/frames" "$OUTDIR/frames"
     say "collected $(ls "$OUTDIR/frames" | wc -l | tr -d ' ') rendered frames into $OUTDIR/frames"
 fi

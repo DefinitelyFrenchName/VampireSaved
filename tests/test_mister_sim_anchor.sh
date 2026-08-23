@@ -26,13 +26,31 @@
 # EMULATOR-tier gate: it is NOT in ci_portable/ci_static, and HANDOFF.md
 # indexes it with the other manual gates.
 #
-# FROZEN EXPECTATIONS (re-measured 14z-107 (3), stock cps2 core, fork pin
-# 74ed17d — the pin with the FIXED Verilator SDRAM model):
+# FROZEN EXPECTATIONS (RE-MEASURED 14z-107 (7) on a run whose input script is
+# no longer being corrupted — see "THE RE-FREEZE" below):
 #   MAME anchor              frame 2146   (05_timeout_idle, stock vsavj)
-#   sim anchor (ABSOLUTE)    frame 2502   (the 462 download frames included)
-#   skew (sim - MAME)        356
+#   sim anchor (ABSOLUTE)    frame 2609   (the 462 download frames included)
+#   skew (sim - MAME)        463
 #
-# THE SIM ANCHOR MOVED 2507 -> 2502 WHEN THE SDRAM MODEL WAS FIXED, and the
+# THE RE-FREEZE, 14z-107 (7) — AND IT INVERTS A VERDICT. The old expectation
+# was sim 2502 / skew 356, and it was measured on a run in which jtframe's
+# frame writer was REWINDING sim_inputs.hex (see below): every forked child's
+# exit(0) fclose()d the inherited FILE* behind the parent's input stream, and
+# POSIX repositions the SHARED offset, so the simulated controller was
+# replayed once per fork. With the host doing nothing with the pixels
+# (--frame-output off, the lane's default since fork commit 8) the same core,
+# the same ROM and the same input file put the round-1 match start at
+# **2609**, skew **463**. Measured four ways in one 2x2 (14z-107 (7)):
+# {pal_lut.hex present, absent} x {frame output off, fork}. All three legs
+# that fork ONCE OR NOT AT ALL agree on 2609; the single leg that forks
+# hundreds of times — live picture, frame output on — is the one that says
+# 2502. So slice D1's "RED" anchor of 2609 was the CORRECT measurement and
+# the green 2502 was the artifact, which is exactly why the standing watch
+# says root-cause rather than widen. The band is UNCHANGED at +/- 30; only
+# the centre moved, and it moved onto a measurement with a named mechanism.
+#
+# HISTORICAL, kept because the eliminations still hold: the sim anchor also
+# moved 2507 -> 2502 when the SDRAM model was fixed, and the
 # mechanism is real rather than noise. `cores/cps1/hdl/jtcps1_obj_draw.v:137`
 # is `if( &rom_data ) begin // skip blank pixels` — the object pipeline SKIPS
 # its 8-pixel draw loop when the fetched GFX word is all-ones. So OBJECT
@@ -44,14 +62,19 @@
 # band, every mapped field still agrees exactly, and the P1/P2 record bases
 # are identical to the 14z-107 measurement. 361 was the value on the BROKEN
 # model and is retracted, not widened: the band is still +/- 30.
+# (Both 2507 and 2502 were measured with the input script being replayed;
+# the object-timing mechanism above is real and independent of that, but the
+# ABSOLUTE numbers in this paragraph are superseded by the re-freeze.)
 #
 # THE SKEW IS NOT THE BOOT OFFSET, and that is worth knowing: at the RAM-test
 # onset the two are 460 frames apart (462 download frames minus a 2-frame
-# lead), but by the round-1 match start they are 361 apart — the sim reaches
-# the match ~99 frames earlier RELATIVE to its own boot. The attract/select/VS
-# path costs different numbers of frames in the two implementations, which is
-# precisely why CLAUDE.md §4 compares mapped state at ANCHORS and not at fixed
-# frame indices.
+# lead), and by the round-1 match start they are 463 apart on a clean run —
+# so the sim reaches the match ~3 frames LATER relative to its own boot. (On
+# the corrupted runs it looked like ~99 frames EARLIER, which was the
+# replayed input script hurrying the select screen along.) The
+# attract/select/VS path still costs different numbers of frames in the two
+# implementations, which is why CLAUDE.md §4 compares mapped state at ANCHORS
+# and not at fixed frame indices.
 #
 # THE CPU OPPONENT IS A LOTTERY, AND IT IS NOT OURS TO FIX. `05_timeout_idle`
 # is a 1P arcade match, and the ladder's in-use mask `RAM:$FF8110.l` is
@@ -68,11 +91,32 @@
 # gameplay state; the FIELDS are compared exactly. A skew outside the band is
 # a finding: stop and root-cause, do not widen (the standing watch).
 #
+# FRAME OUTPUT IS OFF, AND THE GATE ASSERTS IT (14z-107 (7)). Slice D1 found
+# this gate moving 2502 -> 2609 for a reason that had nothing to do with the
+# RTL, and 14z-107 (7) root-caused it: jtframe's Verilator harness forks an
+# ImageMagick child per CHANGED frame, that child ended with exit(0), and
+# exit() fclose()s the FILE* behind the parent's sim_inputs.hex stream —
+# which POSIX makes rewind the SHARED file offset, so the parent re-read
+# input lines it had already consumed. The SIMULATED CONTROLLER was being
+# replayed, once per fork, and the number of forks follows the PICTURE. The
+# first divergent byte was RAM:$FF8060, the per-player START bitmask, which
+# is the mechanism signing its own work.
+# Fork commit 9 fixes it at the root (_exit(0)); fork commit 8 adds
+# JTFRAME_SIM_NOVIDEO and tools/run_sim_jtcps2.sh passes it by default, so
+# the run under test does nothing with the pixels at all. Neither is a
+# tolerance, so the band below was NOT widened. The mode is part of the run's
+# identity and is asserted from the log — the two can never silently differ
+# again. Full chain and controls: docs/platform/mister.md, "THE HARNESS'S
+# FRAME WRITER CORRUPTED THE SIMULATED INPUT SCRIPT".
+#
 # CONTROLS (a gate without one asserts nothing):
 #   * byte-swapped sim dumps must FAIL the comparison — the one mistake that
 #     would otherwise fabricate a "the core disagrees with MAME" report;
 #   * a sim run WITHOUT --wram must produce no wram/ at all — the harness hook
-#     is inert unless asked (the emulator-superset shape, sim edition).
+#     is inert unless asked (the emulator-superset shape, sim edition);
+#   * both dump directories are asserted COMPLETE before anything is compared,
+#     and a hole punched in a copy must be rejected — compare_fields.py globs,
+#     so a lost dump would otherwise just move the anchor (14z-107 (7)).
 #
 # Usage: ROMDIR=... [JTSIM_SCRATCH=...] tests/test_mister_sim_anchor.sh
 set -u
@@ -96,8 +140,9 @@ FOLLOW="0,60,180"
 # function of WHICH character P2 is would assert a disagreement.
 SKIP="p2_hitbox_base,p2_ptr64,p2_word132,p2_x,p2_y,p2_attack_id,p2_flip"
 EXP_AM=2146          # frozen MAME anchor
-EXP_SKEW=356         # frozen sim-minus-MAME skew (see the header; was 361 on
-                     # the pre-fork-commit-3 SDRAM model)
+EXP_SKEW=463         # frozen sim-minus-MAME skew, RE-MEASURED 14z-107 (7)
+                     # with the input script no longer replayed (was 356, and
+                     # before that 361 on the pre-fork-commit-3 SDRAM model)
 SKEW_TOL=30          # boot-phase band; the FIELDS are compared exactly
 MAME_LO=2100; MAME_HI=2400
 # ABSOLUTE frames (download included). The window mirrors the MAME leg's
@@ -114,13 +159,29 @@ mkdir -p "$W/mame"
 DUMPS="$(python3 -c "print(';'.join(f'{f}:ff0000-ffffff' for f in range($MAME_LO,$MAME_HI+1)))")" \
     MAME_ROMPATH="$ROMDIR" "$REPO/tools/run_replay_mame.sh" vsavj "$RPL" \
     "$W/mame/out.log" "$W/mbox" || { echo "FAIL: MAME leg did not complete"; exit 1; }
+python3 "$REPO/tools/check_wram_dumps.py" "$W/mame" --first "$MAME_LO" --last "$MAME_HI" \
+    && ok "MAME dump set is COMPLETE ($MAME_LO-$MAME_HI, no holes, uniform size)" \
+    || bad "MAME dump set is INCOMPLETE — the anchor below would be an artefact"
 AM="$(cf "$W/mame" --list-anchors --fields "$FIELDS" 2>/dev/null | head -1)"
 [ "$AM" = "$EXP_AM" ] && ok "MAME anchor at the frozen frame $AM" \
                       || bad "MAME anchor is [$AM], frozen $EXP_AM"
 
 echo "== sim leg (core $SIM_CORE under Verilator, stock vsavj; ~45 min) =="
-"$REPO/tools/run_sim_jtcps2.sh" "$RPL" "$W/sim" --core "$SIM_CORE" \
+# --frame-output off is the DEFAULT and is passed explicitly anyway: these
+# numbers were frozen under it, and a gate must state the configuration it
+# was frozen under rather than inherit it (14z-107 (7)).
+"$REPO/tools/run_sim_jtcps2.sh" "$RPL" "$W/sim" --core "$SIM_CORE" --frame-output off \
     --frames "$SIM_FRAMES" --wram "$SIM_LO" "$SIM_HI" || { echo "FAIL: sim leg did not complete"; exit 1; }
+# the run's own report of what it did with the pixels, asserted
+grep -aq "frame output DISABLED (JTFRAME_SIM_NOVIDEO)" "$W/sim/jtsim.log" \
+    && ok "the sim leg ran with HOST FRAME OUTPUT DISABLED (the frozen configuration)" \
+    || bad "the sim leg did NOT report JTFRAME_SIM_NOVIDEO — the run is not the frozen configuration"
+[ -d "$W/sim/frames" ] && bad "frames/ was collected — this run did work that follows the PICTURE" \
+                       || ok "no frames/ produced (no fork, no ImageMagick, nothing reads the pixels)"
+python3 "$REPO/tools/check_wram_dumps.py" "$W/sim/wram" --first "$SIM_LO" --last "$SIM_HI" \
+    --size 0x10000 --addr 0xff0000 \
+    && ok "sim dump set is COMPLETE ($SIM_LO-$SIM_HI, 64 KB each)" \
+    || bad "sim dump set is INCOMPLETE — the anchor below would be an artefact"
 # NON-CONSTANCY FIRST (the 14z-107 near-miss): an all-zero dump path agreed
 # with MAME on 99.2% of sampled bytes, because most of a work-RAM image is
 # zero. A dump window whose frames are all identical is a dead instrument, and
@@ -172,12 +233,21 @@ if cf "$W/mame" "$W/swap" --fields "$FIELDS" --follow 0 --skip-fields "$SKIP" > 
 then bad "CONTROL DID NOT FIRE: byte-swapped sim dumps compared equal"
 else ok "control fired: byte-swapped sim dumps rejected"; fi
 
+echo "== control: a hole in the dump set must be REJECTED =="
+mkdir -p "$W/holed"
+cp "$W/sim/wram/"*.bin "$W/holed/"
+rm -f "$W/holed/dump_$((SIM_LO + 7))_ff0000.bin"
+if python3 "$REPO/tools/check_wram_dumps.py" "$W/holed" --first "$SIM_LO" --last "$SIM_HI" \
+        --size 0x10000 > "$W/hole.out" 2>&1
+then bad "CONTROL DID NOT FIRE: a dump set with a hole passed the integrity check"
+else ok "control fired: a lost dump is rejected before any anchor is computed"; fi
+
 echo "== control: the harness hook is inert without --wram =="
 # --no-load: the macro's absence is a COMPILE-time property, so the cheapest
 # run that proves it is a 5-frame one with no ROM transfer (~30 s including
 # the rebuild). The 68k does not run in such a run, which is fine here and
 # nowhere else.
-"$REPO/tools/run_sim_jtcps2.sh" "$RPL" "$W/inert" --core "$SIM_CORE" --no-load --frames 5 > "$W/inert.log" 2>&1 \
+"$REPO/tools/run_sim_jtcps2.sh" "$RPL" "$W/inert" --core "$SIM_CORE" --frame-output off --no-load --frames 5 > "$W/inert.log" 2>&1 \
     || { bad "the inertness control run failed"; tail -5 "$W/inert.log" | sed 's/^/      /'; }
 [ -d "$W/inert/wram" ] && bad "CONTROL DID NOT FIRE: wram/ produced with the macro absent" \
                        || ok "control fired: no wram/ when JTFRAME_SIM_WRAMDUMP is undefined"

@@ -1,4 +1,47 @@
-# NEXT SESSION — orientation (rewritten at the 14z-107 (6) close, 2026-08-23)
+# NEXT SESSION — orientation (rewritten at the 14z-107 (7) close, 2026-08-23)
+
+> ## **NEWEST FIRST — 14z-107 (7): THE "VIDEO-SENSITIVE ANCHOR" IS
+> ## ROOT-CAUSED, AND IT INVERTED A VERDICT.** The picture never touched
+> ## the CPU. jtframe's Verilator harness forks an ImageMagick child per
+> ## CHANGED frame — ALWAYS, `-video` is not what enables it — and that
+> ## child ended with **`exit(0)`**, which runs the C stdio cleanup.
+> ## **libc++'s `basic_filebuf` is a `FILE*`**, so the child `fclose()`d the
+> ## copy it inherited of the parent's `sim_inputs.hex` stream, and POSIX
+> ## makes `fclose()` on a read stream REWIND THE SHARED FILE OFFSET. The
+> ## parent then re-read input lines it had already consumed: **the
+> ## simulated CONTROLLER was being replayed, once per fork** — and the
+> ## number of forks follows the PICTURE.
+> ## **THE 2x2 (681 dumps per leg, all four sets asserted complete):** frame
+> ## output OFF, LUT present vs absent → **bit-identical 681/681**; same
+> ## core, frame output OFF vs FORK → **483 of 681 differ**, first at frame
+> ## **2051**, ONE byte, `RAM:$FF8060`, the **START bitmask**; black-screen
+> ## core OFF vs FORK → bit-identical (it forks once, not 1,348 times); fork
+> ## mode run twice → bit-identical, so the corruption is DETERMINISTIC.
+> ## **THE FROZEN ANCHOR WAS THE ARTIFACT: re-measured MAME 2146 / sim
+> ## 2609 / skew 463**, and every leg that does not fork agrees on 2609.
+> ## D1's RED 2609/463 was right; the green 2502/356 was the corrupted run.
+> ## Band unchanged at +/- 30 — the centre moved onto a named mechanism.
+> ## **FIXES (fork, LOCAL ONLY):** `7cf1eedb` the child now `_exit(0)`s (the
+> ## real repair, one word); `692ba4d6` adds `JTFRAME_SIM_NOVIDEO` + reaps
+> ## the children, and `tools/run_sim_jtcps2.sh --frame-output off` is the
+> ## lane's DEFAULT so a state oracle does nothing with the pixels at all.
+> ## **INTEGRITY:** `tools/check_wram_dumps.py` — `compare_fields.py` GLOBS,
+> ## so a lost dump used to just move the anchor. Every `--wram` run now
+> ## asserts its set is complete, and the anchor gate checks BOTH legs and
+> ## asserts the frame-output mode from the run's own log banner.
+> ## **THE DUMPS WERE NEVER CORRUPTED** — they are written by the PARENT
+> ## from an `ofstream` opened and closed inside one call, with no
+> ## descriptor open across the fork. The INPUTS were.
+> ## **AND ONE NEW FINDING, RECORDED NOT FIXED: v1.7.3's `SimInputs` HOLDS
+> ## P1 BUTTONS 5 AND 6 DOWN** (`test.cpp:200`'s `& 0xf0` drops bits 9:8;
+> ## active low; `jtcps2_main.v:266` wires them in). The MAME and sim legs
+> ## are therefore not running identical inputs. The one-line fix moves the
+> ## anchor again, so it belongs with the queued P2/6-button fork commit —
+> ## that pending item is upgraded from COVERAGE to FIDELITY.
+> ## **NEXT: slice D2** (bank-0 repack, the group-C GFX redirect, the QSound
+> ## bank split on `qsnd_addr[23]`, `jtframe_ram1_7slots`, the two new GFX
+> ## slots) — and it can now change video output without the anchor going
+> ## ambiguous, which was the whole point of this session.
 
 > ## **NEWEST FIRST — 14z-107 (6): MiSTer SLICE D1 IS DONE, and it is the
 > ## slice where `cores/cps2w` STOPS BEING cfg-ONLY.** The QSound
@@ -207,7 +250,7 @@
 > ## `test_sim_wram_contract` (ci_portable) + `test_mister_sim_anchor`
 > ## (emulator tier, ~55 min). MEASURED: work RAM = SDRAM bank 0 byte
 > ## `0x600000`, 64 KB, 68k byte order; `05_timeout_idle` round-1
-> ## match-start anchor MAME **2146** / sim **2502**, skew **+356**
+> ## match-start anchor MAME **2146** / sim **2502**, skew **+356** [RETRACTED 14z-107 (7): 2609 / +463]
 > ## (NOT the +460 boot offset — the attract/select/VS path costs ~99
 > ## fewer frames on the core, which is why §4 anchors exist). Every
 > ## compared field agrees, P1 = Demitri `$093B6A` on both.
@@ -253,7 +296,7 @@
 > ## bit, NOT `addr[9]` — so GFX banks 2/3 were half-aliased. The "~3
 > ## constants / widen the column to 0x3ff" fix named earlier was WRONG.
 > ## The anchor oracle never moved (bank 0 is entirely below WORD 0x400000)
-> ## and still passes; the anchor moved 2507 -> 2502 (skew 361 -> 356)
+> ## and still passes; the anchor moved 2507 -> 2502 (skew 361 -> 356) [both absolutes RETRACTED 14z-107 (7): the clean anchor is 2609]
 > ## because `jtcps1_obj_draw.v:137` skips blank tiles, so OBJECT TIMING
 > ## DEPENDS ON GFX CONTENT. Two more harness bugs had to be
 > ## fixed before `-stats` produced anything (commits 4 and 5).

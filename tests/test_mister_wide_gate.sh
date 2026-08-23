@@ -44,10 +44,15 @@
 #
 # CHECK 3g EXISTS BECAUSE OF A REAL FAILURE. `cores/cps2w/hdl` shipped without
 # `pal_lut.hex` and the core rendered a BLACK SCREEN — and, through the
-# Verilator harness's per-changed-frame `fork()` (test.cpp:989-1005), that
-# moved the simulated match-start anchor by 107 frames and turned
-# test_mister_sim_anchor RED. `*.hex` is gitignored in jtcores, so nothing
-# warned. See docs/platform/gotchas.md.
+# Verilator harness's per-changed-frame `fork()`, that moved the simulated
+# match-start anchor by 107 frames and turned test_mister_sim_anchor RED.
+# `*.hex` is gitignored in jtcores, so nothing warned.
+# (ROOT-CAUSED 14z-107 (7): the fork's child called `exit(0)`, which
+# `fclose()`d the inherited `FILE*` behind the parent's `sim_inputs.hex`
+# stream and rewound the SHARED offset — so the simulated CONTROLLER was
+# replayed once per fork, and the number of forks follows the picture. Fixed
+# by fork commits 8 and 9. This check stands on its own merits regardless:
+# a core that renders black is a broken core.) See docs/platform/gotchas.md.
 #
 # Usage: tests/test_mister_wide_gate.sh     (no ROMs; Verilator optional)
 set -u

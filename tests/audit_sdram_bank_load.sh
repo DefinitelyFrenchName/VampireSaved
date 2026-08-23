@@ -74,13 +74,19 @@ done
 # included), for tests/replays/05_timeout_idle.rpl at --offset 462. The replay
 # is: coin at MAME frame 300, start at 800, one button press at 960, then
 # nothing. The round-1 match start is the frozen anchor of
-# tests/test_mister_sim_anchor.sh: MAME 2146 / sim 2502 on the fixed SDRAM
-# model (2507 before it). MATCH_START stays 2507 deliberately — a few frames
-# INSIDE the match is a safe phase boundary, a few frames before it is not.
+# tests/test_mister_sim_anchor.sh: MAME 2146 / sim **2609**, RE-MEASURED
+# 14z-107 (7) on a run whose input script is no longer being replayed by the
+# harness's frame writer (it read 2502 under that corruption, and 2507 before
+# the SDRAM model fix). MATCH_START sits a few frames INSIDE the match
+# deliberately — a few frames before it is not a safe phase boundary.
+# THE PUBLISHED 14z-107 (3) TABLE WAS MEASURED WITH THE OLD BOUNDARIES; the
+# shift moves ~100 frames of SELECT-phase traffic out of the "in-match" row,
+# and both phases were already steady-state, so the per-frame rates it
+# reports are unchanged in substance. Re-run to re-derive them exactly.
 DL_END=462          # "ROM file transfered (frame 462)"
 ATTRACT_END=1265    # MAME 800-803 start press + 462
-SELECT_END=2506     # one frame before the match-start anchor
-MATCH_START=2507
+SELECT_END=2608     # one frame before the match-start anchor
+MATCH_START=2614    # a few frames inside the match
 
 if [ -z "$LOG" ]; then
     [ -n "${ROMDIR:-}" ] || { echo "SKIP: ROMDIR unset (this instrument runs the real romset)"; exit 77; }
@@ -88,7 +94,14 @@ if [ -z "$LOG" ]; then
     [ -e "$REPO/emu/jtcores/.git" ] || { echo "SKIP: emu/jtcores not initialised (tools/setup_jtcores.sh)"; exit 77; }
     if [ -z "$OUTDIR" ]; then OUTDIR="$(mktemp -d)"; fi
     echo "== sim leg (stock jtcps2 under Verilator, -stats; ~50 min) =="
-    "$REPO/tools/run_sim_jtcps2.sh" "$RPL" "$OUTDIR" --core cps2 \
+    # --frame-output off is the default, and is passed explicitly because this
+    # instrument READS THE LOG: jtframe's frame writer forks a child per
+    # changed frame, and a child's exit(0) flushes a COPY of the parent's
+    # buffered stdout into the shared log, so `$display` output gets
+    # DUPLICATED once per fork (measured 14z-107 (7): 14 forks -> 14 copies of
+    # one line). The parser below de-duplicates anyway, but a run that never
+    # forks has nothing to de-duplicate.
+    "$REPO/tools/run_sim_jtcps2.sh" "$RPL" "$OUTDIR" --core cps2 --frame-output off \
         --frames "$FRAMES" --stats || { echo "FAIL: the sim leg did not complete"; exit 1; }
     LOG="$OUTDIR/jtsim.log"
 fi
@@ -135,6 +148,36 @@ for m in pat.finditer(raw):
                  "rd":      [b[k][3] for k in range(4)],
                  "wr":      [b[k][4] for k in range(4)]})
 seen = raw.count("SDRAM_STATS_RAW")
+
+# --- LOG INTEGRITY (14z-107 (7)) -------------------------------------------
+# This instrument reads a LOG, and a log is a shared file description. When
+# jtframe's frame writer is on, every forked child's exit(0) flushed a COPY of
+# the parent's buffered stdout, so a `$display` line could appear twice — or be
+# torn at a buffer boundary and never match. Fork commit 9 fixed that at the
+# root (_exit(0)), so at the current pin there is nothing to de-duplicate; this
+# check stays because logs OUTLIVE pins and `--log FILE` re-analyses old ones.
+# Neither form corrupts the arithmetic
+# below (the counters are CUMULATIVE and every phase is a first/last
+# difference), but silence about it is how a measurement stops being
+# reproducible. So: say so, de-duplicate, and require monotonic time.
+byt = {}
+dups = 0
+for r in rows:
+    if r["t"] in byt:
+        dups += 1
+    else:
+        byt[r["t"]] = r
+if dups:
+    print(f"NOTE: {dups} DUPLICATED stats line(s) removed — the fork-flush "
+          "signature of host frame output.\n"
+          "      Re-run with --frame-output off (the default since 14z-107 (7)); "
+          "docs/platform/gotchas.md.")
+rows = [byt[t] for t in sorted(byt)]
+if not all(b["t"] > a["t"] for a, b in zip(rows, rows[1:])):
+    print("FAIL: stats timestamps are not strictly increasing after de-duplication —")
+    print("      the log is not a faithful record of one run.")
+    sys.exit(1)
+
 if not rows:
     print("FAIL: no well-formed SDRAM_STATS_RAW lines in the log (%d tokens seen)." % seen)
     print("      Was it run with --stats, on a pin at or after fork commit 5?")

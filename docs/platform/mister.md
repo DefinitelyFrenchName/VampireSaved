@@ -95,18 +95,26 @@ CONSTRUCTION" is a fact on FPGA rather than an inertness argument.
   address but 41. Every gated site takes that wire — in D1 the QSound bank
   latch (`jtcps2w_qsnd_bank.v`), later the group-C redirect, the obj promote
   and the PRG window.
-- **THE LANE'S ANCHOR IS VIDEO-SENSITIVE, and D1 paid for the lesson.**
-  `tests/test_mister_sim_anchor.sh` went RED on cps2w at 2609/463 for a
-  reason that had nothing to do with the profile: `cores/cps2w/hdl` was
-  missing `pal_lut.hex`, the core rendered a black screen, and
-  `test.cpp:989-1005` forks a child per CHANGED frame (no `wait()`), so the
-  number of forks — and, somehow, the 68k's timing — followed the picture. A
-  2x2 factorial over {stock RTL, D1 RTL} x {LUT present, absent} put the
-  whole effect on the LUT axis and none on the RTL axis. Consequence for how
-  to work here: the anchor gate is a cross-IMPLEMENTATION oracle, and
-  `tests/test_mister_wide_inert.sh` (cps2 vs cps2w, bit-identical work RAM
-  frame by frame) is the inertness instrument. Details:
-  `docs/platform/gotchas.md`.
+- **THE LANE'S ANCHOR WAS VIDEO-SENSITIVE — ROOT-CAUSED AND FIXED
+  14z-107 (7).** `tests/test_mister_sim_anchor.sh` went RED on cps2w at
+  2609/463 for a reason that had nothing to do with the profile:
+  `cores/cps2w/hdl` was missing `pal_lut.hex`, the core rendered a black
+  screen, and `test.cpp` forks a child per CHANGED frame. D1's 2x2 factorial
+  put the whole effect on the LUT axis and none on the RTL axis, and left
+  the path from a black screen to one byte at `RAM:$FF8060` OPEN. **The path
+  is now closed and it is not "the picture moved the 68k's timing": the
+  forked child's `exit(0)` fclose()d the inherited `FILE*` behind the
+  parent's `sim_inputs.hex` stream, which rewound the SHARED file offset, so
+  the parent re-read input lines it had already consumed. The simulated
+  CONTROLLER was being replayed, once per fork — and `$FF8060` is the START
+  bitmask, an input-derived byte.** Fork commit 9 makes the child `_exit(0)`;
+  fork commit 8 makes the writer suppressible and `--frame-output off` the
+  lane's default. Full chain, controls and ground truth: "THE HARNESS'S
+  FRAME WRITER CORRUPTED THE SIMULATED INPUT SCRIPT" below. The other
+  consequence D1 drew still stands on its own merits: the anchor gate is a
+  cross-IMPLEMENTATION oracle and `tests/test_mister_wide_inert.sh` (cps2 vs
+  cps2w, bit-identical work RAM frame by frame) is the inertness
+  instrument.
 - **Clock domains, so it is not asked later.** The decoder runs on the game
   port's `clk`, which jtframe documents as "always matched to the SDRAM
   clock" (`jtframe_common_ports.inc:5`) and which on a `JTFRAME_CLK96` core
@@ -115,6 +123,109 @@ CONSTRUCTION" is a fact on FPGA rather than an inertness argument.
   the ROM streams, with the core (and the QSound DSP, `qsnd_rst`) held in
   reset, and is constant for the whole of play. There is nothing to
   synchronise.
+
+## THE HARNESS'S FRAME WRITER CORRUPTED THE SIMULATED INPUT SCRIPT
+
+**This is the root cause of "the anchor is video-sensitive" (opened D1,
+closed 14z-107 (7)), and it is not what it looked like.** The picture never
+reached the CPU. The HOST did: jtframe's Verilator harness forks a child per
+changed frame, the child ended with `exit(0)`, and `exit()` rewound the
+parent's *input script*.
+
+**The chain, each link measured:**
+
+1. **Frame output is ALWAYS ON upstream — `-video` is not what turns it on.**
+   `bin/jtsim:460` runs `mkdir -p frames` unconditionally and the fork in
+   `test.cpp`'s `video_dump()` is guarded by no macro; `-video` only defines
+   `DUMP_VIDEO`, which `test.cpp` never reads. A run that never asked for
+   pictures still forks once per CHANGED frame.
+2. **`exit(0)` in the child runs the C stdio cleanup**, which flushes and
+   closes every open C stream. **libc++'s `std::basic_filebuf` is a `FILE*`
+   underneath**, so that includes the copy the child inherited of the
+   parent's `sim_inputs.hex` stream.
+3. **`fclose()` on a seekable READ stream repositions the underlying file
+   description** to the stream's logical position (POSIX) — and that
+   description is SHARED with the parent after `fork()`.
+4. **So the parent's next buffer refill re-reads lines it had already
+   consumed.** The simulated controller script is REPLAYED, once per fork,
+   at every stdio buffer boundary.
+5. **And the number of forks follows the PICTURE.** A core rendering the
+   game forks hundreds of times; a core rendering black (the missing
+   `pal_lut.hex`) forks about once. That is the whole of the "video
+   sensitivity".
+
+**THE CONTROL — a 2x2 on `cps2w` + stock `vsavj` + `05_timeout_idle`, work
+RAM dumped every frame 2000-2680 (681 dumps per leg, every set asserted
+COMPLETE), everything else held: same `.rom` (sha1 `f9dc2987…`), same
+`sim_inputs.hex` (sha1 `1d6f8418…`), same 462-frame download, byte-identical
+RTL file list.** Full log: `build/fork_rewind_14z107.log`.
+
+| leg | fork()s (jpgs written) | match-start anchor |
+|---|---|---|
+| LUT present, frame output **OFF** | 0 | **2609** |
+| LUT absent, frame output **OFF** | 0 | **2609** |
+| LUT absent, frame output **FORK** | **1** | **2609** |
+| LUT present, frame output **FORK** | **1,348** | **2502** |
+
+- **OFF, LUT present vs absent: BIT-IDENTICAL, 681/681.** With the host doing
+  nothing with the pixels, a black-screen core and a working core are the
+  same machine — which is what the RTL says they must be.
+- **Same core, frame output OFF vs FORK: 483 of 681 frames DIFFER, first
+  divergence frame 2051, ONE byte, `RAM:$FF8060`, 0x40 vs 0x41.** That byte
+  is the game's per-player **START bitmask**
+  (`docs/game/atlas/character_tables.md:347`) — an INPUT-derived value, which
+  is the mechanism signing its own work.
+- **Black-screen core, OFF vs FORK: BIT-IDENTICAL, 681/681.** One fork, so
+  nothing accumulates.
+- **Fork mode run twice: BIT-IDENTICAL.** The corruption is DETERMINISTIC,
+  not noise: the same picture forks at the same frames and rewinds by the
+  same amounts. That is why D1's factorial reproduced so cleanly and looked
+  like a property of the design.
+- **AND IT INVERTS THE FROZEN NUMBER.** Every leg that forks once or not at
+  all puts the round-1 match start at **2609** (skew **+463** against MAME's
+  2146); only the 1,348-fork leg says 2502. So D1's RED anchor was the
+  correct measurement and the green 2502/356 was the artifact. The gate is
+  re-frozen at 2609/463, band unchanged at +/- 30.
+
+**Ground truth for the mechanism, independent of any core** (and a gate,
+`tests/test_sim_wram_contract.sh` 11/11c): a parent reading a 25 KB file
+line by line while forking one child per line reads 3,000 lines and ends at
+line 3000 with `_exit()` children — and ends at line **278**, with three
+backward jumps, with `exit()` children. Check 10 covers the same cleanup's
+other effect: N `exit()`ing children flush N copies of the parent's buffered
+`stdout`, so a `$display` line appears once per child (measured live: 212
+copies in a fork-mode log, one with frame output off).
+
+**THE FIXES, both in the fork, no RTL:**
+
+- **commit 9 — the child now `_exit(0)`s.** No stdio cleanup, no rewind, no
+  log duplication. This is the actual repair, and it is one word.
+- **commit 8 — `JTFRAME_SIM_NOVIDEO`** compiles the writer out entirely, and
+  `tools/run_sim_jtcps2.sh --frame-output off` is the lane's DEFAULT. A
+  state oracle should not be doing anything with the pixels in the first
+  place, and with the macro it provably is not. Commit 8 also reaps the
+  children (`waitpid(WNOHANG)`): upstream leaves one zombie per changed
+  frame, and at `RLIMIT_NPROC` (2666 on a stock macOS account) `fork()`
+  starts failing and frames stop being written with no diagnostic.
+
+**What was NEVER at risk, and it matters because the alternative would have
+been far worse:** the RAM dumps themselves. Every `wram/dump_*.bin` is
+written by the PARENT, in `SDRAM::dump_range`, from a local `ofstream`
+constructed and destroyed inside one call at the VS rising edge in
+`clock()`. No dump descriptor is ever open across the `fork()`, so no dump
+can be interleaved, truncated or written by a child. The corruption was of
+the run's INPUT, not of its output — see "Do the earlier numbers stand"
+below.
+
+**And the palette LUT itself is innocent.** `jtcps1_pal.v:62` instantiates
+it with `we` tied low; `q` feeds `lut_r/g/b` and those feed
+`red/green/blue` (`:105-122`), module outputs that `game_test.v` only wires
+out and `test.cpp` reads only in `video_dump()`. `LVBL`/`LHBL` — which clock
+`sim_inputs.next()` and the frame counter — come from `jtframe_sh` on
+`vb`/`hb`. Verilator's `$readmemh` on a missing file is a `%Warning` that
+leaves the array at zero (measured on 5.050), so a missing `pal_lut.hex`
+changes exactly one thing: the picture. It was a fair 2x2 axis and a
+completely misleading one.
 
 ## The numbers that bound a MiSTer-shaped profile
 
@@ -428,8 +539,23 @@ blocked only by bank PLACEMENT — is worked out in
   `SimInputs`: one hex word per line = one frame, applied when the core
   ENTERS blanking; active-high in the file; bit0/1 coin1/2, bit2/3
   start1/2, bits4-7 P1 U/D/L/R, bits8-11 P1 buttons 1-4 (bit11 doubles as
-  dip_test). **P1 only, 4 buttons** — P2 and buttons 5/6 do not exist in
-  that harness. `tools/rpl2siminputs.py` translates `.rpl` → `.hex` and
+  dip_test). **P1 only, 4 buttons** — P2 does not exist in that harness.
+  **CORRECTED 14z-107 (7): buttons 5 and 6 do not "not exist" — THEY ARE
+  HELD DOWN.** `test.cpp:200` is
+  `dut.joystick1 = (dut.joystick1&0xf0) | (v&0xf);`, and `&0xf0` discards
+  bits 9:8 that the line above had just set to 1 in `0x30f`. joystick is
+  ACTIVE LOW and `jtcps2_main.v:266` wires `joystick1[9:7]` into `in1`, so
+  from the first line of `sim_inputs.hex` onward the simulated P1 has
+  buttons 5 and 6 PRESSED — for every frame of every run this lane has ever
+  taken. (Only EOF releases them: `SimInputs::next()`'s else-branch restores
+  `0x3ff`.) It has not derailed `05_timeout_idle` — the MAME leg, which does
+  NOT hold them, agrees with the sim on every mapped field at the anchor and
+  picks the same P1 record base — but the two legs are not running identical
+  inputs, and that is worth knowing before a replay that uses HP/HK is
+  translated. The one-line fix (`& ~0xf` instead of `& 0xf0`) belongs with
+  the queued P2/6-button fork commit, because it WILL move the frozen
+  anchor and that has to be re-measured deliberately, not as a side effect.
+  `tools/rpl2siminputs.py` translates `.rpl` → `.hex` and
   REFUSES p2 / buttons 4-6 / service-test loudly (measured on four legacy
   replays: `01_attract_long` (7200 frames, no input) and `05_timeout_idle`
   (12000 frames, 13 active) translate; `04_select_fuzz` and
@@ -521,7 +647,12 @@ blocked only by bank PLACEMENT — is worked out in
    `sim_inputs.hex` into `<outdir>`. `--frames` and `--wram` are ABSOLUTE
    (the 462 download frames included) and the `.rpl` is shifted by
    `--offset` (default 462). Run it detached and poll the PID; ~1 s per
-   simulated frame.
+   simulated frame. **Since 14z-107 (7) it runs with HOST FRAME OUTPUT OFF
+   by default** (`--frame-output off|fork|collect`) and asserts the dump set
+   it produced is complete — see "THE HARNESS'S FRAME WRITER CORRUPTED THE
+   SIMULATED INPUT SCRIPT". Pass `--frame-output collect` when you actually
+   want to LOOK at the picture; that is now safe as well, since fork commit
+   9, but it is not what a state measurement should be doing.
 
 ## THE LANE'S SDRAM MODEL WAS WRONG — FIXED 14z-107 (3), fork commit 3
 
@@ -645,10 +776,17 @@ a 2-frame lead) — but that is the BOOT-PHASE offset only. **CORRECTED
 path costs ~99 fewer frames on the core. (**RE-MEASURED 14z-107 (3) on the
 FIXED SDRAM model: 2502 / +356**; the five frames are the object pipeline's
 blank-tile skip reacting to correct GFX, see the fix section above.)
-2502/356 is what the gate freezes
-(`tests/test_mister_sim_anchor.sh:87-89`) and what "THE ANCHOR MEASUREMENT"
-below reports; an earlier "sim 2606 / skew 460" in this paragraph was the
-boot offset applied to the wrong frame and is retracted.
+**BOTH OF THOSE NUMBERS ARE RETRACTED — RE-MEASURED 14z-107 (7): MAME 2146 /
+sim 2609, skew +463.** 2507 and 2502 were measured on runs whose input
+script the frame writer was replaying (see "THE HARNESS'S FRAME WRITER
+CORRUPTED THE SIMULATED INPUT SCRIPT"); with the host doing nothing with the
+pixels the anchor is 2609 in every leg that does not fork, and the "~99
+frames earlier" reading above was the replayed script hurrying the select
+screen along — the clean figure is 3 frames LATER than the boot offset, not
+99 earlier. 2609/463 is what the gate freezes
+(`tests/test_mister_sim_anchor.sh`) and what "THE ANCHOR MEASUREMENT" below
+reports; an earlier "sim 2606 / skew 460" in this paragraph was the boot
+offset applied to the wrong frame and is retracted.
 
 **The hook.** Fork commit 2 (`emu/jtcores-patches/0002-jtframe-sim-wramdump.patch`,
 64 added lines in `modules/jtframe/hdl/ver/test.cpp`, no RTL) adds
@@ -702,13 +840,16 @@ near `f + 462`.
 no purpose at all; the tool removes them, so a long series of runs no longer
 accumulates 64 MB of ROM-derived litter per run.
 
-**THE ANCHOR MEASUREMENT (stock `cps2` core, stock `vsavj`,
-`05_timeout_idle`, 14z-107).** Round-1 match start: MAME frame **2146**,
-simulated frame **2507** — skew **+361** (**2502 / +356 since the SDRAM
-model fix, 14z-107 (3)**). Note that this is NOT the boot
-offset (+460): the attract/select/VS path costs ~99 fewer frames on the core
-than on MAME, which is exactly why CLAUDE.md §4 compares mapped state at
-ANCHORS rather than at fixed frame indices. At the anchor and at +60/+180,
+**THE ANCHOR MEASUREMENT (stock `vsavj`, `05_timeout_idle`).** Round-1 match
+start: MAME frame **2146**, simulated frame **2609** — skew **+463**,
+RE-MEASURED 14z-107 (7) with host frame output OFF, and measured four ways in
+one 2x2: every leg that forks once or not at all reports 2609, and only the
+leg that forks 1,348 times reports 2502. ~~2507 / +361 (14z-107), 2502 / +356
+(14z-107 (3))~~ — both retracted; they were measured while the harness was
+replaying the input script. Note that 463 is close to but not equal to the
+boot offset (+460): the attract/select/VS path costs a few frames more on the
+core than on MAME, which is why CLAUDE.md §4 compares mapped state at ANCHORS
+rather than at fixed frame indices. At the anchor and at +60/+180,
 every compared field agrees: `timer` 0x63, both HP 0x120, both white HP, both
 meter fields, `p1_hitbox_base` **$093B6A on both** (Demitri — P1's pick
 matches), `p1_ptr64`, `p1_word132`, `p1_x/y/flip/attack_id`, and even the
@@ -730,10 +871,20 @@ commit. Informational, never a verdict: the whole 64 KB differs in ~1,500 of
 (`$FF41xx-$FF44xx`, `$FF57xx-$FF58xx`).
 
 **The lane as one command:** `tools/run_sim_jtcps2.sh <replay.rpl> <outdir>
-[--frames N] [--wram FIRST LAST] [--core cps2|cps2w]`, with `ROMDIR` and
+[--frames N] [--wram FIRST LAST] [--core cps2|cps2w]
+[--frame-output off|fork|collect]`, with `ROMDIR` and
 `JTSIM_SCRATCH` in the environment. Every step is idempotent (clone, symlinks,
 Go build, MRA, seed), it prints the sha1 of everything it reads, and it
 REFUSES an out-dir inside the repo (rule 7) or a scratch clone inside it.
+**Since 14z-107 (7) it also asserts the DUMP SET** — every `--wram` run ends
+with `tools/check_wram_dumps.py`, which requires every frame of
+[FIRST..LAST] to exist, at exactly the requested length, with the requested
+address in its name, and fails the run otherwise. That check exists because
+`tools/compare_fields.py` GLOBS a directory: a dump that is never written
+does not fail a comparison, it silently changes WHICH frames the anchor
+search sees. The gates run the same tool on any dump directory they did not
+produce (`test_mister_sim_anchor.sh` runs it on the MAME leg too,
+with `--contiguous` available for a directory of unknown extent).
 
 **Times measured on this machine (Apple Silicon, Verilator 5.050):**
 
@@ -755,9 +906,16 @@ Stock `vsavj` on the stock `cps2` core, `05_timeout_idle`, 2,800 frames,
 
 | phase | ba0 (68k+VRAM+ORAM+WRAM+snd) | ba1 (QSound PCM) | ba2 (obj) | ba3 (obj+scroll) | data bus |
 |---|---|---|---|---|---|
-| attract | 38,278 acc | 3,464 acc / 78.6% row miss | 0 | 9,453 / 25.2% | 12.7% |
-| select+VS | 39,635 acc | 13,856 / **99.0%** | 261 / 82.7% | 12,079 / 36.8% | 16.4% |
-| in-match | 40,797 acc | 14,132 / **98.8%** | 1,017 / 42.6% | 17,467 / **28.8%** | 18.2% |
+| attract | 38,377 acc | 3,511 acc / 78.5% row miss | 0 | 9,485 / 25.3% | 12.8% |
+| select+VS | 39,696 acc | 13,911 / **99.0%** | 303 / 74.6% | 12,348 / 36.1% | 16.5% |
+| in-match | 40,976 acc | 13,926 / **98.3%** | 1,096 / 42.2% | 18,438 / **28.9%** | 18.5% |
+
+**RE-DERIVED 14z-107 (7) from the SAME committed log**, after the match-start
+anchor was corrected 2502 -> 2609 (the phase boundaries are keyed to it). The
+figures moved by well under 1% — both phases were already steady-state — and
+no conclusion below changes. The pre-correction table read 38,278 / 3,464 /
+9,453 (attract), 39,635 / 13,856 / 261 / 12,079 (select+VS) and 40,797 /
+14,132 / 1,017 / 17,467 (in-match).
 
 **Read "acc" as READ+WRITE commands and the percentage as the ROW MISS
 rate.** They are different quantities because only bank 0 sets
@@ -767,16 +925,16 @@ the ACTIVE when a request hits the open row, so an ACTIVE there means a row
 MISS. Bank 0's 100% is by construction, not by thrashing.
 
 Facts that matter to the bank-repack arc:
-- **QSound has essentially no row locality** — 98.8% miss in-match. It
+- **QSound has essentially no row locality** — 98.3% miss in-match. It
   round-robins 16 channels at unrelated addresses, so nearly every fetch
   opens a new row. There is no locality in bank 1 for a repack to spoil.
-- **Object/scroll traffic does** — 28.8% miss in bank 3. Tile fetches come in
+- **Object/scroll traffic does** — 28.9% miss in bank 3. Tile fetches come in
   runs; that is what a repack into bank 1 would put at risk.
-- **The bus is at 18.2%** of 96 MHz x 16 bit (30.2 MB/s useful) at the
+- **The bus is at 18.5%** of 96 MHz x 16 bit (30.7 MB/s useful) at the
   busiest measured point, and a repack cannot change it: it moves which bank
   serves a fetch, not how many fetches happen.
 - **A single bank's all-miss ceiling is 123,825 transactions/frame**
-  (STW = 13 clocks at 96 MHz), and **bank 0 already sustains 40,797 of them
+  (STW = 13 clocks at 96 MHz), and **bank 0 already sustains 40,976 of them
   every frame** in stock configuration — more than any repack worst case.
 - `WARNING: (test.cpp) SDRAM reads clashed`: **zero** in 2,800 frames.
 - Bank 2 is nearly idle (1.4% share): vsav's object art sits overwhelmingly
@@ -878,6 +1036,14 @@ any core.
 
 ## Open / to verify in the arc
 
+- ~~**The Verilator lane's match-start anchor is VIDEO-SENSITIVE and the
+  path is not explained** (opened 14z-107 (6) G6).~~ **CLOSED 14z-107 (7):**
+  the forked frame writer's `exit(0)` rewound the parent's `sim_inputs.hex`,
+  so the simulated CONTROLLER was replayed once per fork. Fixed at the root
+  (fork commit 9, `_exit(0)`) and belt-and-braces (fork commit 8,
+  `JTFRAME_SIM_NOVIDEO`, `--frame-output off` by default). **The frozen
+  anchor was the artifact, not the red one: 2609 / skew 463.** Section
+  "THE HARNESS'S FRAME WRITER CORRUPTED THE SIMULATED INPUT SCRIPT".
 - ~~Whether `jtsim` runs at all on macOS~~ — ANSWERED 14z-106: it does, with
   the brew deps in the Recipe above.
 - ~~Time per simulated CPS-2 frame~~ — ANSWERED: ~1.0-1.2 s/frame, so a
@@ -888,6 +1054,10 @@ any core.
   `02_demitri_vs_cpu` and `04_select_fuzz` still refuse. Extending
   `test.cpp`'s `SimInputs` (P2, buttons 5/6) is a further fork commit —
   recommended once the anchor gate has run a while, not before.
+  **UPGRADED 14z-107 (7) from coverage to FIDELITY: buttons 5 and 6 are not
+  absent, they are stuck ON** (`test.cpp:200` masks bits 9:8 away — see
+  "Scripted inputs" above). The same one-line commit fixes both, and it
+  re-freezes the anchor, so it is a deliberate slice rather than a drive-by.
 - ~~The width surgery itself (SDRAMW 23 -> 24 and the bank/prog/ioctl bit)
   waits on the profile-shape ruling in STATE "Decisions pending".~~
   **SUPERSEDED 14z-107 (2).** The PROFILE ruling landed (WIDE v1 verbatim,

@@ -1200,7 +1200,7 @@ the object table.
 Paid for as a five-frame surprise. Fixing the Verilator SDRAM model
 (fork commit 3) changed nothing the 68k can see: bank 0 is untouched, and its
 upper 8 MB measures 0.0% non-zero, i.e. it was never even addressed. Yet the
-`05_timeout_idle` match-start anchor moved from simulated frame 2507 to 2502.
+`05_timeout_idle` match-start anchor moved from simulated frame 2507 to 2502. (Both figures superseded 14z-107 (7) — they were measured while the harness replayed the input script; the clean anchor is 2609. The object-timing mechanism this entry is about is unaffected: it was measured as a MOVE, not as an absolute.)
 The chain is: correct GFX -> a different set of tiles is genuinely blank ->
 a different skip pattern -> slightly different SDRAM contention -> the 68k
 gets a marginally different cycle budget -> five frames of drift over 2,500.
@@ -1386,25 +1386,72 @@ target carries 27 bits (`jtframe_emu.sv:334`), and each header start word is
   silently — the file must be force-added. Gate:
   `tests/test_mister_wide_gate.sh` 3g requires every `hdl/*.hex` the
   reference cores carry to exist in the new core's `hdl/`, byte-identical.
-- **THE VERILATOR LANE'S ANCHOR IS VIDEO-SENSITIVE — a core whose PICTURE
-  is wrong can move the simulated MATCH-START FRAME.** Measured 14z-107 (6)
-  as a 2x2 factorial over {stock RTL, D1 RTL} x {pal_lut.hex present,
-  absent}, work RAM compared frame by frame at 2490-2620: the RTL axis
-  changed NOTHING (the two variants were bit-identical to each other), the
-  pal_lut axis changed EVERYTHING (present -> bit-identical to the
-  reference core; absent -> all 131 frames differ, and the match-start
-  anchor moved 2502 -> 2609). **The mechanism is not in the design** — that
-  LUT feeds only `red/green/blue` (`jtcps1_pal.v:105-122`) and there is no
-  path back into the CPU. It is in the HARNESS: `test.cpp:989-1005` forks a
-  child per CHANGED frame to run ImageMagick, with **no `wait()`**, so a
-  black-screen core forks about once where a live one forks hundreds of
-  times, and those children share the parent's file table. The exact path
-  from that to a one-byte divergence at `RAM:$FF8060` on frame 2051 is NOT
-  yet pinned down and is OPEN. The practical consequences are already
-  clear: `tests/test_mister_sim_anchor.sh` is a cross-IMPLEMENTATION oracle
-  and NOT a clean inertness instrument, and a red anchor must be
-  root-caused with a core-vs-core comparison
-  (`tests/test_mister_wide_inert.sh`) before anything is blamed on the RTL.
+- **A FORKED CHILD THAT CALLS `exit()` REWINDS ITS PARENT'S INPUT FILE —
+  and that is how a Verilator core's PICTURE moved its simulated CPU
+  state.** RESOLVED 14z-107 (7); this entry used to say the path was open.
+  `exit()` runs the C stdio cleanup, which `fclose()`s every open C stream;
+  **libc++'s `std::basic_filebuf` is a `FILE*` underneath**, so a child
+  closes the copy it inherited of the parent's `std::ifstream`; and POSIX
+  makes `fclose()` on a seekable READ stream reposition the underlying file
+  description to the stream's logical position — a description SHARED with
+  the parent. The parent's next buffer refill then re-reads lines it had
+  already consumed. In jtframe's harness that stream is **`sim_inputs.hex`**,
+  the simulated controller, and `test.cpp`'s `video_dump()` forks one child
+  per CHANGED frame — so **the number of times the input script was replayed
+  followed the PICTURE.** That is the entire "video sensitivity": a core
+  missing `hdl/pal_lut.hex` renders black, forks about once, and therefore
+  runs a DIFFERENT input script from a core that renders the game.
+  **Controls, all measured** (cps2w, stock vsavj, `05_timeout_idle`, 681
+  dumps per leg, frames 2000-2680; full log `build/fork_rewind_14z107.log`):
+  frame output OFF, LUT present vs absent — **BIT-IDENTICAL, 681/681**.
+  Same core, frame output OFF vs FORK — **483 of 681 differ**, first
+  divergence frame **2051**, ONE byte, `RAM:$FF8060`, the per-player
+  **START bitmask**, an input-derived value. Black-screen core, OFF vs FORK
+  — bit-identical (it forks ONCE; the live-picture leg forks **1,348**
+  times). Fork mode run twice — bit-identical, so the corruption is
+  deterministic, not noise. **And the anchor inverts: every leg that forks
+  once or not at all reports 2609; only the 1,348-fork leg reports 2502, the
+  value that had been FROZEN.** The gate is re-frozen at 2609 / skew 463,
+  band unchanged. Ground truth, core-free and now a gate
+  (`test_sim_wram_contract` 11/11c): a parent reading a 25 KB file while
+  forking one child per line reads 3,000 lines and ends at line 3000 with
+  `_exit()` children, and at line **278** with `exit()` children.
+  **FIXED:** fork commit 9 makes the child `_exit(0)`; fork commit 8 adds
+  `JTFRAME_SIM_NOVIDEO` and `tools/run_sim_jtcps2.sh --frame-output off` is
+  the lane's default, so a state oracle does nothing with the pixels at all.
+  **The RAM DUMPS were never at risk** — they are written by the PARENT from
+  an `ofstream` opened and closed inside one call, with no descriptor open
+  across the fork. **And a CORE-VS-CORE comparison on the same replay is
+  invariant to the whole thing**: both legs render the same picture, so both
+  fork at the same frames and get the identical corruption. That is why
+  `tests/test_mister_wide_inert.sh` was unaffected while
+  `tests/test_mister_sim_anchor.sh` — whose other leg is MAME — was not.
+  Two rules survive from the original entry: a red anchor
+  must be root-caused with a core-vs-core comparison
+  (`tests/test_mister_wide_inert.sh`) before anything is blamed on RTL, and
+  `test_mister_sim_anchor.sh` is a cross-IMPLEMENTATION oracle, not an
+  inertness instrument.
+- **The same cleanup DUPLICATES LOG LINES.** `exit()` in the child also
+  flushes a COPY of the parent's buffered `stdout`, so a `$display` line
+  appears once per child (measured: 212 copies in a fork-mode jtsim log
+  against one with frame output off). Anything that PARSES a jtsim log has
+  to cope — `tests/audit_sdram_bank_load.sh` de-duplicates by the
+  reporter's own `t=` timestamp and requires it to be strictly increasing.
+- **jtframe v1.7.3's `SimInputs` HOLDS P1 BUTTONS 5 AND 6 DOWN for the
+  whole run — they are not "absent", they are stuck ON.** `test.cpp:199-200`
+  first builds `joystick1 = 0x30f | ((v>>4)&0xf0)` (bits 9:8 = 1 = released)
+  and then overwrites it with `(joystick1 & 0xf0) | (v & 0xf)`, and `& 0xf0`
+  throws bits 9:8 away. joystick is ACTIVE LOW and `jtcps2_main.v:266` wires
+  `joystick1[9:7]` into `in1`, so the simulated P1 has buttons 5 and 6 held
+  from the first line of `sim_inputs.hex` to the last. Only EOF releases
+  them (`next()`'s else-branch restores `0x3ff`), which means a SHORTER
+  input file changes the inputs — the opposite of what a truncation should
+  do. Found 14z-107 (7) while auditing the lane; NOT fixed there, because
+  the one-line fix moves the frozen §4 anchor and that has to be
+  re-measured on purpose. Consequence today: the MAME leg and the sim leg of
+  `test_mister_sim_anchor.sh` are not running identical inputs. They still
+  agree on every mapped field at the anchor and pick the same P1 record
+  base, but do not translate a replay that uses HP/HK until this is fixed.
 - **A scratch clone re-pointed at a public `origin` cannot reach a
   LOCAL-ONLY commit.** `tools/run_sim_jtcps2.sh` clones from
   `emu/jtcores` and then sets `origin` to the GitHub fork URL, so

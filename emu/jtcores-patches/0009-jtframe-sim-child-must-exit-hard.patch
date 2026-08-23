@@ -1,0 +1,80 @@
+From 7cf1eedb24d8d34647f9ae041ecc8d9a899205d6 Mon Sep 17 00:00:00 2001
+From: Chaton <definitelyfrenchname@gmail.com>
+Date: Sun, 23 Aug 2026 20:08:37 +0200
+Subject: [PATCH] jtframe/sim: the frame writer's child must _exit, not exit
+
+THE FRAME WRITER WAS CORRUPTING THE SIMULATED INPUT SCRIPT, and this is the
+one-word fix.
+
+video_dump() forks a child per CHANGED frame and the child ends with
+exit(0). exit() runs the C stdio cleanup, which flushes and closes every
+open C stream. libc++'s std::basic_filebuf is a FILE* underneath, so that
+includes the COPY the child inherited of the parent's sim_inputs.hex
+stream -- and POSIX requires fclose() on a seekable read stream to
+reposition the underlying file description to the stream's logical
+position. That description is SHARED with the parent. The parent's next
+buffer refill therefore re-reads input lines it had already consumed: the
+simulated controller script is REPLAYED, once per fork.
+
+Because the number of forks follows the PICTURE, so did the simulated 68k's
+state. Measured on jtcps2 running vsavj: two builds of the same core, same
+ROM, same input file, differing only in whether the harness wrote frames,
+diverge at frame 2051 in exactly one byte -- the game's per-player START
+bitmask, an input-derived value.
+
+Ground truth for the mechanism, independent of any core: a parent reading a
+25 KB file line by line while forking one child per line reads 3000 lines
+and ends at line 3000 when the children call _exit(), and ends at line 278
+with three backward jumps when they call exit().
+
+The same cleanup also flushed a COPY of the parent's buffered stdout, so a
+$display line appeared once per child in the log. _exit() ends that too. The
+child's only diagnostic moves to stderr, which is unbuffered.
+
+Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_01C93kTvSDUfHLL5sbjrArzn
+---
+ modules/jtframe/hdl/ver/test.cpp | 25 +++++++++++++++++++++++--
+ 1 file changed, 23 insertions(+), 2 deletions(-)
+
+diff --git a/modules/jtframe/hdl/ver/test.cpp b/modules/jtframe/hdl/ver/test.cpp
+index 184d76b52..dd6452e73 100644
+--- a/modules/jtframe/hdl/ver/test.cpp
++++ b/modules/jtframe/hdl/ver/test.cpp
+@@ -1019,10 +1019,31 @@ void JTSim::video_dump() {
+                                 (coremod&1) ? (CCW ? "-rotate -90" : "-rotate 90") : "", // rotate vertical games
+                                 convert_options.c_str(), frame_cnt);
+                             if( system(exes) ) {
+-                                printf("WARNING: (test.cpp) convert tool did not succeed\n");
++                                // stderr, not stdout: _exit() below skips the
++                                // stdio cleanup on purpose, so a BUFFERED
++                                // warning would simply be lost.
++                                fputs("WARNING: (test.cpp) convert tool did not succeed\n",stderr);
+                             }
+                         }
+-                        exit(0);
++                        // Vampire Saved (VS fork): _exit, NOT exit. exit()
++                        // runs the C stdio cleanup, which fclose()s every
++                        // open C stream -- and libc++'s basic_filebuf IS a
++                        // FILE*, so the child closes the COPY of the parent's
++                        // sim_inputs.hex stream it inherited. POSIX requires
++                        // fclose() on a seekable read stream to reposition
++                        // the underlying file description to the stream's
++                        // logical position, and that description is SHARED
++                        // with the parent -- so the parent's next buffer
++                        // refill re-reads input lines it had already
++                        // consumed. Measured: the simulated controller script
++                        // is replayed, once per fork, and since the number of
++                        // forks follows the PICTURE the simulated 68k's state
++                        // followed the picture too (14z-107 (7)). exit() also
++                        // flushed a COPY of the parent's buffered stdout,
++                        // duplicating log lines once per child. _exit() does
++                        // neither: it is the correct call for a forked child
++                        // that has nothing of its own to flush.
++                        _exit(0);
+                     }
+                 }
+                 // ...and REAP them. Upstream never wait()s, so a long run
+-- 
+2.50.1 (Apple Git-155)
+

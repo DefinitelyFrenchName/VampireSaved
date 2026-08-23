@@ -1,5 +1,198 @@
 # STATE — living progress log
 
+## Session 14z-107 (7) — THE "VIDEO-SENSITIVE ANCHOR" ROOT-CAUSED: THE
+## FORKED FRAME WRITER WAS REWINDING THE SIMULATED CONTROLLER. Not a
+## timing mystery, not a dump problem — `exit(0)` in a child `fclose()`s
+## the parent's `sim_inputs.hex` and POSIX rewinds the SHARED offset. Fork
+## commits `692ba4d6` + `7cf1eedb`, **LOCAL ONLY** (push authorisation
+## still held). The lane now runs with host frame output OFF by default and
+## asserts its own dump sets.
+
+**The one line:** the picture never touched the CPU — the HOST did, and the
+byte that gave it away was `RAM:$FF8060`, the START bitmask.
+
+**A. THE MECHANISM, LINK BY LINK.**
+1. `bin/jtsim:460` runs `mkdir -p frames` unconditionally and the `fork()`
+   in `test.cpp`'s `video_dump()` is guarded by NO macro — **frame output is
+   always on, `-video` is not what enables it** (it only defines
+   `DUMP_VIDEO`, which `test.cpp` never reads).
+2. The child ended with `exit(0)`. `exit()` runs the C stdio cleanup, which
+   flushes and closes every open C stream — and **libc++'s
+   `std::basic_filebuf` is a `FILE*` underneath**, so that includes the copy
+   the child inherited of the parent's `sim_inputs.hex` `ifstream`.
+3. **POSIX makes `fclose()` on a seekable READ stream reposition the
+   underlying file description to the stream's logical position** — and that
+   description is SHARED with the parent after `fork()`.
+4. So the parent's next stdio buffer refill re-read lines it had already
+   consumed. **The simulated controller script was being REPLAYED, once per
+   fork, at every buffer boundary.**
+5. And the number of forks follows the PICTURE. A core rendering the game
+   forks hundreds of times; a core rendering black (D1's missing
+   `pal_lut.hex`) forks about once. That is the entire "video sensitivity".
+
+**B. THE CONTROL — a 2x2, work RAM compared frame by frame from frame 2000,
+`cps2w` + stock `vsavj` + `05_timeout_idle`, everything else pinned
+(`.rom` sha1 `f9dc2987…` and `sim_inputs.hex` sha1 `1d6f8418…` identical in
+all legs, download 462 frames in all legs).**
+
+| | `pal_lut.hex` present | `pal_lut.hex` absent |
+|---|---|---|
+| frame output **OFF** | A | B |
+| frame output **FORK** | C | D |
+
+- **A vs B: BIT-IDENTICAL, 681 of 681 frames.** With the host doing nothing
+  with the pixels, a black-screen core and a working core are the same
+  machine — which is what the RTL says they must be.
+- **C vs D: 483 of 681 frames DIFFER**, first divergence frame **2051**, ONE
+  byte, **`RAM:$FF8060`, 0x41 vs 0x40** — D1's report reproduced exactly.
+- **A vs C (same core, ONLY the host's frame output differs): 483 of 681
+  differ, same first divergence.** This is the pair that names the culprit:
+  the RTL, the ROM and the input file are identical, and the ONLY difference
+  is what the host does with the pixels.
+- **B vs D: BIT-IDENTICAL, 681 of 681.** ~1 fork, nothing accumulates.
+- **C vs a repeat of C: BIT-IDENTICAL.** The corruption is DETERMINISTIC —
+  same picture, same fork frames, same rewinds — which is why D1's factorial
+  reproduced so cleanly and looked like a property of the design.
+- `RAM:$FF8060` is the per-player **START bitmask**
+  (`docs/game/atlas/character_tables.md:347`), i.e. an INPUT-derived byte.
+  The mechanism signed its own work.
+
+**B2. THE FOUR LEGS, AS NUMBERS.** 681 dumps each, every set asserted
+COMPLETE by `tools/check_wram_dumps.py`; `.rom` sha1 `f9dc2987…` and
+`sim_inputs.hex` sha1 `1d6f8418…` identical in all four; download 462 frames
+in all four; jpgs written: **1,348** (LUT present + fork) vs **1** (LUT
+absent + fork) vs 0 / 0 (frame output off).
+
+| leg | jpgs | match-start anchor | vs the clean pair |
+|---|---|---|---|
+| LUT present, frame output OFF | 0 | **2609** | — |
+| LUT absent, frame output OFF | 0 | **2609** | bit-identical, 681/681 |
+| LUT absent, frame output FORK | 1 | **2609** | bit-identical, 681/681 |
+| LUT present, frame output FORK | **1,348** | **2502** | 483 of 681 differ |
+
+**Only the leg that forks 1,348 times deviates.** MAME's anchor is 2146 in
+both this session's measurement and the frozen one, so the clean skew is
+**463** — and slice D1's "RED" 2609/463 was the CORRECT reading while the
+"green" 2502/356 was the artifact. The gate is re-frozen at 2609/463 with
+the band UNCHANGED at +/- 30: the centre moved onto a measurement with a
+named mechanism, which is what the standing watch asks for.
+
+**C. GROUND TRUTH, core-free, and now a gate.** A parent reading a 25 KB
+file line by line while forking one child per line reads 3,000 lines and
+ends at line **3000** when the children call `_exit()` — and ends at line
+**278**, with three backward jumps, when they call `exit()`.
+`tests/test_sim_wram_contract.sh` 11/11c. Check 10 covers the same cleanup's
+other effect: N `exit()`ing children flush N copies of the parent's buffered
+`stdout` (3→4, 7→8), which is why a fork-mode jtsim log carried **212**
+copies of one `$display` line against **one** with frame output off.
+
+**D. DO THE EARLIER DUMP-BASED NUMBERS STAND? THE DUMPS WERE NEVER AT RISK —
+THE INPUTS WERE.** Stated precisely, because the two have very different
+consequences:
+- **Not a dump problem.** Every `wram/dump_*.bin` is written by the PARENT,
+  in `SDRAM::dump_range`, from a local `ofstream` constructed and destroyed
+  inside one call at the VS rising edge in `clock()`. No dump descriptor is
+  ever open across the `fork()`, so no dump can be interleaved, truncated or
+  written by a child. Nothing that was ever reported from a dump file was
+  reading a corrupted file.
+- **`tests/test_mister_wide_inert.sh` STANDS**, and the argument does not
+  depend on how far the rewind had got: it compares `cps2` against `cps2w`
+  on the SAME replay, both rendering the SAME picture, so both legs fork at
+  the same frames and suffer the IDENTICAL corruption. A cross-core
+  comparison is invariant to it by construction — which is not true of the
+  anchor gate, whose other leg is MAME. Its verdict was also re-measured
+  this session from the other direction: with frame output off, two cps2w
+  builds that render completely different pictures are bit-identical over
+  681 frames. And it now runs with frame output off by default anyway.
+- **The §4 anchor oracle: the FIELD AGREEMENT stands, the FRAME INDEX was
+  measured on a run whose input script was being replayed.** MAME 2146 is
+  re-measured this session and unchanged, on a dump set now asserted
+  complete (301 frames). The FROZEN NUMBER, however, was measured under
+  the corruption and is now RETRACTED: **sim 2502 / skew 356 -> sim 2609 /
+  skew 463**, re-measured four ways (B2). Slice D1's red anchor was right and
+  the green one was the artifact. Every downstream carrier of 2502/356 was
+  re-pointed (`mister.md` x3, `mister_map.md`, `cps2_wide.md`, `HANDOFF.md`,
+  `NEXT_SESSION.md`, the gate). `tests/audit_sdram_bank_load.sh`'s phase
+  boundaries are keyed to that anchor, so they moved too, and the per-bank
+  table was RE-DERIVED from the same committed log: every figure shifted by
+  well under 1% and no conclusion changed.
+- **The per-bank SDRAM traffic profile (14z-107 (3)) stands, and was
+  audited rather than assumed.** It is the one instrument that parses a LOG,
+  which is exactly what the fork duplicates. `build/sdram_bank_load_14z107.log`
+  carries 350 well-formed `SDRAM_STATS_RAW` rows, **zero duplicates**,
+  strictly increasing timestamps; re-analysing it reproduces the published
+  table. The audit now de-duplicates by `t=` and requires monotonic time
+  anyway, and passes `--frame-output off`.
+
+**E. THE HARDENING.**
+- **Fork commit `7cf1eedb` — THE ACTUAL REPAIR, and it is one word.** The
+  forked child now calls **`_exit(0)`** instead of `exit(0)`: no stdio
+  cleanup, so no `fclose()`, so no rewind of the parent's input stream and
+  no duplicated log lines. The child's one diagnostic moves to stderr, which
+  is unbuffered and therefore survives `_exit`. This is upstream-worthy on
+  its own.
+- **Fork commit `692ba4d6`** (`emu/jtcores-patches/0008-…`, pin bumped,
+  **LOCAL ONLY**), 26 added lines in `test.cpp`, no RTL:
+  `JTFRAME_SIM_NOVIDEO` skips the per-frame image writer entirely (no
+  `dump.diff()` scan, no `fork()`, no ImageMagick), the children are reaped
+  with `waitpid(WNOHANG)`, and the run states its frame-output mode on
+  stderr so a gate can assert it. Absent the macro the writer is upstream's
+  code byte for byte — the patch DELETES no line, which
+  `test_sim_wram_contract` 9b checks.
+- **`tools/run_sim_jtcps2.sh --frame-output off|fork|collect`, default
+  `off`.** Every state measurement in the lane now runs with the host doing
+  nothing at all with the pixels. `--video` is an alias for `collect`.
+- **`tools/check_wram_dumps.py`** — the integrity assertion the task asked
+  for. `compare_fields.py` GLOBS, so a dump that is never written does not
+  fail a comparison, it silently changes WHICH frames the anchor search
+  sees. The new tool requires every frame of a range, at an exact length,
+  with an exact address in the name (or `--contiguous` for a directory of
+  unknown extent), and `run_sim_jtcps2.sh` runs it on every `--wram` run —
+  the producer is the only place that knows what SHOULD be there.
+- **`tests/test_mister_sim_anchor.sh`** now asserts the frame-output
+  configuration it was frozen under (the log banner, plus "no frames/ was
+  produced"), runs the integrity check on BOTH legs before computing any
+  anchor, and carries a control that a hole punched in a copy of the sim
+  dumps is rejected.
+- **`tests/test_sim_wram_contract.sh`** gained checks 8 (integrity, six
+  cases: hole, truncation, stray frame, wrong address, `--contiguous` and
+  its hole), 9 (the lane's frame-output default with a flipped-default
+  control, the shape of patch 0008, that the PINNED `test.cpp` has no plain
+  `exit(0)` left in a forked child, and a control that a softened copy is
+  detected), 10 (the fork-flush ground truth, N→N+1 copies) and 11 (the
+  REWIND ground truth, `exit()` vs `_exit()`, with its control).
+- **`tests/audit_sdram_bank_load.sh`** is the one instrument that READS a
+  log, so it now de-duplicates the reporter's lines by their own `t=`
+  timestamp, says so loudly when it has to, and requires the timestamps to
+  be strictly increasing. It also passes `--frame-output off` explicitly.
+  Re-analysing the committed `build/sdram_bank_load_14z107.log` reproduces
+  the published table exactly, and that log carries **zero** duplicated
+  stats lines.
+
+**F. AND ONE MORE HARNESS DEFECT, FOUND WHILE AUDITING, RECORDED NOT
+FIXED: jtframe v1.7.3's `SimInputs` HOLDS P1 BUTTONS 5 AND 6 DOWN.**
+`test.cpp:200` is
+`dut.joystick1 = (dut.joystick1&0xf0) | (v&0xf);` and `&0xf0` discards bits
+9:8, which the line above had just set to 1. Joystick is ACTIVE LOW and
+`jtcps2_main.v:266` wires `joystick1[9:7]` into `in1`, so from the first
+line of `sim_inputs.hex` the simulated P1 has buttons 5 and 6 pressed — and
+only EOF releases them, so a SHORTER input file changes the inputs. It has
+not derailed `05_timeout_idle` (the MAME leg, which does not hold them,
+agrees on every mapped field and picks the same P1 record base), but the two
+legs of the oracle are not running identical inputs. The one-line fix
+(`& ~0xf`) moves the frozen anchor, so it belongs with the already-queued
+P2/6-button fork commit — that pending item is upgraded from COVERAGE to
+FIDELITY.
+
+**PUSH PENDING:** `4840df8a`, `692ba4d6` and `7cf1eedb` are all local-only;
+`origin/vampire-saved` still ends at `38acc638`.
+
+**HOUSEKEEPING NOTE for the next CLOSE:** STATE.md is ~176 KB, past the
+~150 KB the rollover rule names — it was already over before this entry.
+Three groups are kept (14z-107, 14z-106, 14z-105), so no rollover is DUE by
+the group rule; the size rule says roll the oldest kept group early at the
+next close.
+
 ## Session 14z-107 (6) — MiSTer SLICE D1 DONE, and it is a GOVERNANCE
 ## MILESTONE: `cores/cps2w` STOPS BEING cfg-ONLY. The QSound sample-bank
 ## width fix ships behind a **RUNTIME** profile gate — MRA header byte 41 —
@@ -151,7 +344,12 @@ ONE, mean 0. **And `*.hex` is in jtcores' own `.gitignore`, so `git add`
 refused it silently** — it is force-added in the amended commit.
 
 **G6. HOW A PALETTE LUT MOVED THE 68k's TIMING — ATTRIBUTED, NOT YET
-EXPLAINED, AND RECORDED AS OPEN.** The LUT feeds only `red/green/blue`
+EXPLAINED, AND RECORDED AS OPEN.** *[RESOLVED 14z-107 (7), marked in place:
+the forked child's `exit(0)` `fclose()`d the inherited `FILE*` behind the
+parent's `sim_inputs.hex` stream, and POSIX rewinds the SHARED offset — so
+the simulated CONTROLLER was replayed once per fork. The attribution below
+is correct; the missing link was the file descriptor. And the verdict
+inverts: **2609 was the CLEAN anchor and 2502 was the artifact.**]* The LUT feeds only `red/green/blue`
 (`jtcps1_pal.v:105-122`) and there is no path back into the CPU, so the
 perturbation is not in the design — the factorial says so directly. It is in
 the HARNESS: `modules/jtframe/hdl/ver/test.cpp:989-1005` forks a child per
@@ -212,6 +410,10 @@ byte at `RAM:$FF8060` on frame 2051 is not explained. Worth an hour when the
 arc allows, because it bounds how far `test_mister_sim_anchor` can ever be
 trusted as an inertness signal — and the honest answer today is "not at all;
 that is `test_mister_wide_inert`'s job".
+*[CLOSED 14z-107 (7), marked in place: the mechanism is the forked child's
+`exit(0)` rewinding the parent's `sim_inputs.hex`; fixed in the fork
+(`_exit(0)` + `JTFRAME_SIM_NOVIDEO`, frame output off by default). And the
+frozen anchor was WRONG, not the red one: 2609/463 is the clean value.]*
 **PUSH PENDING: `4840df8a` is the only fork commit that is not public.** The
 brief for this slice held outward pushes until the maintainer re-confirms
 authorisation, so the fork's `origin/vampire-saved` still ends at `38acc638`.
@@ -1822,7 +2024,20 @@ Original write-up kept below.
 
 - ~~**THE SIM HARNESS'S P2 / 6-BUTTON EXTENSION (14z-107, NOT blocking).**~~
   **DECIDED (maintainer, 2026-08-23): option A, LATER** — *"agreed, we can
-  do it later"*. So the fork's third commit is queued, not open: extend
+  do it later"*. **UPGRADED 14z-107 (7) FROM COVERAGE TO FIDELITY, and the
+  maintainer may want to re-time it: `SimInputs` does not merely LACK
+  buttons 5 and 6, it HOLDS THEM DOWN.** `test.cpp:200` is
+  `dut.joystick1 = (dut.joystick1&0xf0) | (v&0xf);` and `&0xf0` discards
+  bits 9:8 that the line above had just released; joystick is ACTIVE LOW and
+  `jtcps2_main.v:266` wires `joystick1[9:7]` into `in1`. So every simulated
+  run this lane has taken had P1 holding buttons 5 and 6 from the first
+  input line to the last — and only EOF releases them, so a SHORTER input
+  file changes the inputs. The MAME leg does not do this, so the two legs of
+  `test_mister_sim_anchor` are not running identical inputs; they still
+  agree on every mapped field and pick the same P1 record base, so nothing
+  measured is invalidated. The fix is one line (`& ~0xf`) in the SAME commit
+  as the P2/6-button work, and it WILL move the frozen anchor again — which
+  is why it is a deliberate slice and was not done in 14z-107 (7). So the fork's third commit is queued, not open: extend
   `test.cpp`'s `SimInputs` (P2 joystick + buttons 5/6, `dip_test` off
   button 4) when a refused replay is actually needed — the motivating one
   being a 2P replay that pins the arcade-draw opponent and retires the

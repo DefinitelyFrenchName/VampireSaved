@@ -26,6 +26,36 @@
 #  7. The CPS-2 constants in run_sim_jtcps2.sh agree with the pinned RTL
 #     (jtcps1_sdram.v WRAM_OFFSET, jtcps2_main.v ram_cs) — noted, not run,
 #     when emu/jtcores is not initialised.
+#  8. A LOST OR SHORT DUMP IS LOUD (14z-107 (7)). compare_fields.py GLOBS a
+#     directory, so a dump that never gets written does not fail a
+#     comparison — it silently changes WHICH frames exist, and on an anchor
+#     search that is indistinguishable from the two implementations
+#     disagreeing about when the match starts. tools/check_wram_dumps.py is
+#     the assertion, and it is itself controlled here: a hole, a truncated
+#     file, a stray frame and a wrong address must each FAIL it.
+#  9. FRAME OUTPUT IS OFF BY DEFAULT in the lane (14z-107 (7)). jtframe's
+#     harness forks an ImageMagick child per CHANGED frame, so the host work
+#     a run does follows the PICTURE; fork commit 8 makes that suppressible
+#     and run_sim_jtcps2.sh suppresses it for every state measurement. The
+#     default is asserted, with the flipped-default control.
+# 10. THE FORK-FLUSH MECHANISM, GROUND-TRUTHED (14z-107 (7)). The gotcha
+#     entry claims that a forked child's exit(0) flushes a COPY of the
+#     PARENT's buffered stdout into the shared file description, so a line
+#     printed once appears once per child. That is the whole reason a run's
+#     LOG is not trustworthy with frame output on, and it is asserted here
+#     rather than believed: N children that call exit() and N that call
+#     _exit() must give exactly N+1 copies. Skipped where there is no C++
+#     compiler.
+# 11. THE INPUT-SCRIPT REWIND, GROUND-TRUTHED (14z-107 (7)) — the defect
+#     fork commit 9 fixes, and the reason a rendering difference could reach
+#     the simulated CPU at all. A forked child's exit(0) fclose()s the COPY
+#     it inherited of the parent's read stream; POSIX makes fclose()
+#     reposition the SHARED file description back to the stream's logical
+#     position, so the parent's next buffer refill re-reads lines it had
+#     already consumed. In test.cpp that stream is sim_inputs.hex, i.e. the
+#     simulated controller. Asserted here on a file large enough to force
+#     refills: with exit() children the read sequence goes BACKWARDS; with
+#     _exit() children (what the fork now does) it does not.
 # Usage: tests/test_sim_wram_contract.sh   (no ROMs, no emulator, ~5s)
 set -u
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
@@ -188,6 +218,178 @@ if [ -f "$SRC/cores/cps1/hdl/jtcps1_sdram.v" ]; then
         || bad "7 run_sim_jtcps2.sh constants no longer match the pinned RTL"
 else
     echo "  note: emu/jtcores not initialised — RTL cross-check not run"
+fi
+
+# 8 the dump-integrity assertion, with its four must-fire controls
+CK="$REPO/tools/check_wram_dumps.py"
+mkdir -p "$T/int"
+i=100
+while [ $i -le 120 ]; do
+    dd if=/dev/zero of="$T/int/dump_${i}_ff0000.bin" bs=1024 count=64 2>/dev/null
+    i=$((i + 1))
+done
+python3 "$CK" "$T/int" --first 100 --last 120 --size 0x10000 --addr 0xff0000 >/dev/null 2>&1 \
+    && ok "8 a complete 21-frame dump set passes the integrity check" \
+    || bad "8 a complete dump set was rejected"
+cp -R "$T/int" "$T/int_hole" && rm -f "$T/int_hole/dump_110_ff0000.bin"
+if python3 "$CK" "$T/int_hole" --first 100 --last 120 --size 0x10000 > "$T/o8a" 2>&1
+then bad "8a CONTROL DID NOT FIRE: a missing dump passed"
+else grep -q "MISSING frame(s)" "$T/o8a" && ok "8a control fired: a lost dump is a LOUD failure" \
+     || { bad "8a wrong failure:"; sed 's/^/      /' "$T/o8a"; }; fi
+cp -R "$T/int" "$T/int_short" && dd if=/dev/zero of="$T/int_short/dump_110_ff0000.bin" bs=1024 count=17 2>/dev/null
+if python3 "$CK" "$T/int_short" --first 100 --last 120 --size 0x10000 > "$T/o8b" 2>&1
+then bad "8b CONTROL DID NOT FIRE: a truncated dump passed"
+else grep -q "not 65536 bytes" "$T/o8b" && ok "8b control fired: a short dump is a LOUD failure" \
+     || { bad "8b wrong failure:"; sed 's/^/      /' "$T/o8b"; }; fi
+cp -R "$T/int" "$T/int_stray" && cp "$T/int/dump_100_ff0000.bin" "$T/int_stray/dump_999_ff0000.bin"
+if python3 "$CK" "$T/int_stray" --first 100 --last 120 --size 0x10000 > "$T/o8c" 2>&1
+then bad "8c CONTROL DID NOT FIRE: a stray out-of-range dump passed"
+else ok "8c control fired: a dump outside the requested window is rejected"; fi
+cp -R "$T/int" "$T/int_addr" && mv "$T/int_addr/dump_110_ff0000.bin" "$T/int_addr/dump_110_ff8000.bin"
+if python3 "$CK" "$T/int_addr" --first 100 --last 120 --size 0x10000 --addr 0xff0000 > "$T/o8d" 2>&1
+then bad "8d CONTROL DID NOT FIRE: a dump of the wrong window passed"
+else ok "8d control fired: a dump naming another address is rejected"; fi
+# --contiguous is what a directory of unknown extent (the MAME leg) gets
+python3 "$CK" "$T/int" --contiguous --size 0x10000 >/dev/null 2>&1 \
+    && ok "8e --contiguous accepts an unbroken run" || bad "8e --contiguous rejected an unbroken run"
+if python3 "$CK" "$T/int_hole" --contiguous > "$T/o8f" 2>&1
+then bad "8f CONTROL DID NOT FIRE: --contiguous passed a run with a hole"
+else grep -q "HOLE" "$T/o8f" && ok "8f control fired: --contiguous reports the hole" \
+     || { bad "8f wrong failure:"; sed 's/^/      /' "$T/o8f"; }; fi
+
+# 9 the lane suppresses host frame output by default
+RS="$REPO/tools/run_sim_jtcps2.sh"
+checkdefault() {   # $1 = script to inspect
+    grep -q 'FRAMEOUT=off; STATS=0' "$1" || return 1
+    grep -q 'off)     SIMARGS="$SIMARGS -d JTFRAME_SIM_NOVIDEO=1" ;;' "$1" || return 1
+    return 0
+}
+checkdefault "$RS" && ok "9 run_sim_jtcps2.sh defaults to --frame-output off (-d JTFRAME_SIM_NOVIDEO=1)" \
+                   || bad "9 the lane no longer suppresses host frame output by default"
+sed 's/FRAMEOUT=off; STATS=0/FRAMEOUT=fork; STATS=0/' "$RS" > "$T/flipped.sh"
+if checkdefault "$T/flipped.sh"
+then bad "9c CONTROL DID NOT FIRE: a flipped default passed the check"
+else ok "9c control fired: a flipped frame-output default is rejected"; fi
+# and the fork commit that makes it possible wraps upstream's writer without
+# deleting a line of it
+P8="$REPO/emu/jtcores-patches/0008-jtframe-sim-optional-frame-writer.patch"
+if [ -f "$P8" ]; then
+    del="$(sed -n '/^diff --git/,$p' "$P8" | grep -c '^-[^-]' || true)"
+    files="$(grep -c '^diff --git' "$P8")"
+    grep -q '^+#ifndef _JTFRAME_SIM_NOVIDEO' "$P8" \
+        && grep -q '^+                while( waitpid(-1,nullptr,WNOHANG) > 0 ) ;' "$P8" \
+        && [ "$del" = 0 ] && [ "$files" = 1 ] \
+        && ok "9b patch 0008 wraps upstream's frame writer (0 deleted lines, 1 file) and reaps" \
+        || bad "9b patch 0008 is not the declared shape (deleted lines $del, files $files)"
+fi
+# and the child must END HARD: exit() is what corrupted the input script
+P9="$REPO/emu/jtcores-patches/0009-jtframe-sim-child-must-exit-hard.patch"
+if [ -f "$P9" ]; then
+    grep -q '^+                        _exit(0);' "$P9" \
+        && grep -q '^-                        exit(0);' "$P9" \
+        && ok "9d patch 0009 replaces the child's exit(0) with _exit(0)" \
+        || bad "9d patch 0009 no longer turns the child's exit(0) into _exit(0)"
+    TCPP="$REPO/emu/jtcores/modules/jtframe/hdl/ver/test.cpp"
+    if [ -f "$TCPP" ]; then
+        # the child must end HARD. `[^_]exit(0)` catches a plain exit(0) at
+        # any indentation while allowing _exit(0); BSD grep has no \s, so the
+        # class is spelled out.
+        n_hard="$(grep -c '_exit(0);' "$TCPP" || true)"
+        n_soft="$(grep -cE '(^|[^_[:alnum:]])exit\(0\);' "$TCPP" || true)"
+        [ "$n_hard" -ge 1 ] && [ "$n_soft" = 0 ] \
+            && ok "9e the pinned test.cpp's forked child ends with _exit, not exit ($n_hard _exit, $n_soft exit)" \
+            || bad "9e the pinned test.cpp still has $n_soft plain exit(0) in a forked child — that rewinds sim_inputs.hex"
+        # and the checker is controlled: a copy with _exit softened must fail
+        sed 's/_exit(0);/exit(0);/' "$TCPP" > "$T/soft.cpp"
+        [ "$(grep -cE '(^|[^_[:alnum:]])exit\(0\);' "$T/soft.cpp")" -ge 1 ] \
+            && ok "9f control fired: a copy with _exit softened back to exit is detected" \
+            || bad "9f CONTROL DID NOT FIRE: the exit(0) detector matches nothing"
+    else
+        echo "  note: emu/jtcores not initialised — 9e not run"
+    fi
+fi
+
+# 10 the fork-flush mechanism the gotcha entry rests on
+if command -v c++ >/dev/null 2>&1; then
+    cat > "$T/ft.cpp" <<'FTCPP'
+#include <cstdio>
+#include <cstdlib>
+#include <unistd.h>
+#include <sys/wait.h>
+// N children that call _exit() (no flush) and N that call exit() (flush the
+// inherited COPY of the parent's buffered stdout). Redirected stdout is
+// block-buffered, so the line below is still in the buffer when they fork.
+int main(int argc, char **argv) {
+    int n = argc > 1 ? atoi(argv[1]) : 3;
+    printf("PARENT PRINTED THIS ONCE\n");
+    for (int i = 0; i < n; i++) if (fork() == 0) _exit(0);
+    for (int i = 0; i < n; i++) if (fork() == 0) exit(0);
+    while (waitpid(-1, nullptr, 0) > 0) ;
+    return 0;
+}
+FTCPP
+    if c++ -O0 -o "$T/ft" "$T/ft.cpp" 2>"$T/ft.err"; then
+        c3="$("$T/ft" 3 > "$T/ft3.txt"; grep -c 'PARENT PRINTED THIS ONCE' "$T/ft3.txt")"
+        c7="$("$T/ft" 7 > "$T/ft7.txt"; grep -c 'PARENT PRINTED THIS ONCE' "$T/ft7.txt")"
+        [ "$c3" = 4 ] && [ "$c7" = 8 ] \
+            && ok "10 fork-flush ground truth: N exiting children duplicate the parent's buffered stdout N times (3->4, 7->8 copies)" \
+            || bad "10 fork-flush ground truth got $c3 and $c7 copies, expected 4 and 8 — the gotcha's mechanism claim needs re-measuring"
+    else
+        echo "  note: c++ present but the ground-truth program did not build — check 10 not run"
+    fi
+else
+    echo "  note: no c++ compiler — the fork-flush ground truth (check 10) not run"
+fi
+
+# 11 the input-script rewind: the defect fork commit 9 fixes
+if command -v c++ >/dev/null 2>&1; then
+    python3 -c "open('$T/big.txt','w').write(''.join('%05d\n'%i for i in range(1,5001)))"
+    cat > "$T/rw.cpp" <<'RWCPP'
+// A parent reading a file line by line while forking one child per line.
+// libc++'s basic_filebuf is a FILE*; exit() fcloses it in the child, and
+// fclose() on a seekable read stream repositions the SHARED file description
+// to the stream's logical position -- so the parent's next buffer refill
+// re-reads consumed lines. _exit() skips the stdio cleanup and does not.
+#include <fstream>
+#include <iostream>
+#include <string>
+#include <unistd.h>
+#include <sys/wait.h>
+#include <cstdlib>
+int main(int argc, char **argv) {
+    std::string mode = argc > 1 ? argv[1] : "exit";
+    std::ifstream fin("big.txt");
+    std::string s, prev;
+    int n = 0, back = 0;
+    while (std::getline(fin, s) && n < 3000) {
+        n++;
+        if (!prev.empty() && std::stoi(s) <= std::stoi(prev)) back++;
+        prev = s;
+        if (mode != "nofork") {
+            if (fork() == 0) { if (mode == "_exit") _exit(0); else exit(0); }
+        }
+        while (waitpid(-1, nullptr, WNOHANG) > 0) ;
+    }
+    std::cout << n << " " << prev << " " << back << "\n";
+    return 0;
+}
+RWCPP
+    if ( cd "$T" && c++ -O0 -o rw rw.cpp 2>/dev/null ); then
+        r_no="$( cd "$T" && ./rw nofork )"
+        r_hard="$( cd "$T" && ./rw _exit )"
+        r_soft="$( cd "$T" && ./rw exit )"
+        b_no="$(echo "$r_no" | awk '{print $3}')"
+        b_hard="$(echo "$r_hard" | awk '{print $3}')"
+        b_soft="$(echo "$r_soft" | awk '{print $3}')"
+        [ "$b_no" = 0 ] && [ "$b_hard" = 0 ] \
+            && ok "11 _exit() children leave the parent's read stream INTACT (0 backward steps, as with no fork at all)" \
+            || bad "11 _exit() children perturbed the read stream ($r_hard) — the fork-commit-9 fix does not hold"
+        [ "$b_soft" -gt 0 ] \
+            && ok "11c control fired: exit() children REWIND the shared read offset ($b_soft backward steps; the parent ended at line $(echo "$r_soft" | awk '{print $2}') of 3000)" \
+            || bad "11c CONTROL DID NOT FIRE: exit() children did not rewind — re-derive the mechanism before trusting the gotcha"
+    else
+        echo "  note: the rewind ground-truth program did not build — check 11 not run"
+    fi
 fi
 
 rm -rf "$T"

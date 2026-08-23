@@ -374,6 +374,8 @@ is a GAME gotcha if it is true of the game regardless of the port.
   engine's cycle cost and SDRAM request pattern depend on the data, not
   just on the object table. Measured: fixing the Verilator SDRAM model
   touched no bank-0 byte, yet the match-start anchor moved 2507 -> 2502.
+  (Both absolutes superseded 14z-107 (7) — the clean anchor is 2609; the
+  MOVE, which is what this entry is about, still stands.)
   Expect tenant art to shift core timing the same way; freeze anchors per
   build. On a shared-bus system, changing the CONTENT of a read-only
   memory can change TIMING.
@@ -430,5 +432,36 @@ is a GAME gotcha if it is true of the game regardless of the port.
   `wait()`. Two lessons: check the picture, and **never blame the RTL for a
   red anchor until a core-vs-core RAM comparison says so** — a 2x2 factorial
   showed the RTL axis changed nothing and the missing `.hex` changed
-  everything.
+  everything. **[ROOT-CAUSED 14z-107 (7) — see the next entry: the picture
+  never touched the CPU; the forked child's `exit(0)` rewound the parent's
+  `sim_inputs.hex` and the simulated CONTROLLER was replayed.]**
+- **14z-107 (7) (platform), and it is the mechanism the entry above left
+  open:** **a forked child that calls `exit()` REWINDS ITS PARENT'S INPUT
+  FILE.** `exit()` runs the C stdio cleanup, libc++'s `basic_filebuf` is a
+  `FILE*`, and `fclose()` on a seekable read stream repositions the SHARED
+  file description back to the stream's logical position — so the parent
+  re-reads consumed lines at its next buffer refill. jtframe's Verilator
+  harness forks one such child per CHANGED frame (always — `-video` is not
+  what enables it), so the number of times the simulated controller was
+  replayed FOLLOWED THE PICTURE. 2x2 measured (681 dumps per leg): frame
+  output off, LUT present vs absent = bit-identical 681/681; same core,
+  frame output off vs fork = 483 of 681 frames differ, first at frame 2051
+  in one byte, `RAM:$FF8060`, the START bitmask. **And the frozen anchor was
+  the artifact**: every leg that forks once or not at all reports 2609, only
+  the 1,348-fork leg reports the frozen 2502, so the gate was re-frozen at
+  2609 / skew 463. Fixed by fork commit 9 (`_exit(0)`) and
+  fork commit 8 (`JTFRAME_SIM_NOVIDEO`, now the lane's default). The RAM
+  dumps were never at risk — the parent writes them from an `ofstream`
+  opened and closed inside one call. **The general lesson: a `fork()` in a
+  measuring harness shares FILE DESCRIPTIONS, and `exit()` in the child is
+  a write to them.**
 
+- **14z-107 (7) (platform):** jtframe v1.7.3's Verilator input harness
+  **HOLDS P1 BUTTONS 5 AND 6 DOWN** for every frame `sim_inputs.hex` drives
+  — `test.cpp:200`'s `& 0xf0` throws away the two bits the line above had
+  just released, and joystick is active low. So "the harness has 4 buttons"
+  was half right: the other two are not missing, they are pressed. Only
+  running the file out releases them, which means a shorter input file
+  changes the inputs. Not fixed there (the one-line fix moves the frozen §4
+  anchor); the MAME and sim legs of the anchor gate are therefore not
+  running identical inputs today.
