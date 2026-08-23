@@ -238,6 +238,106 @@ leaves the array at zero (measured on 5.050), so a missing `pal_lut.hex`
 changes exactly one thing: the picture. It was a fair 2x2 axis and a
 completely misleading one.
 
+## `SimInputs` HELD BUTTONS 5 AND 6 DOWN — FIXED 14z-107 (8), fork commit 10
+
+**The second harness defect of the same family as the frame writer, and the
+one that made the two legs of the §4 oracle run DIFFERENT INPUTS.** Found
+while auditing in 14z-107 (7), recorded there and deliberately not fixed
+(the fix moves the frozen anchor); measured and fixed here.
+
+**The bug, both halves.** `joystick1..4` are declared `[9:0]` in
+`modules/jtframe/hdl/ver/game_test.v:51-54` and are ACTIVE LOW.
+`SimInputs` treats them as 8-bit in two places:
+
+1. `parse_inputs()` builds the word correctly —
+   `dut.joystick1 = 0x30f | ((v>>4)&0xf0);` releases bits 9:8 (buttons 6
+   and 5) — and throws it away on the next line,
+   `dut.joystick1 = (dut.joystick1&0xf0) | (v&0xf);`. `&0xf0` keeps only
+   buttons 1-4; bits 9:8 go to 0, which on an active-low port means
+   PRESSED. All five `JTFRAME_JOY_*` orderings carry the same mask. Only
+   EOF releases them (`next()`'s else-branch restores `0x3ff`), so a
+   SHORTER input file changes the inputs — the opposite of what truncation
+   should do.
+2. The constructor seeds `joystick1..4` with `0xff` — bits 9:8 low again.
+   `parse_inputs()` never writes `joystick2..4`, so **P2's buttons 5 and 6
+   were held for the whole run on every core, with or without `-inputs`.**
+
+Cores with 4 buttons or fewer never see it: `game_test.v:557-561` passes
+`joystick*[GAME_BUTTONS+3:0]` to the game, so the bad bits are not wired.
+On a 6-button core they are — `cores/cps2/hdl/jtcps2_main.v:266-268` wires
+`joystick1[9:7]` into `in1[2:0]`, `joystick2[8:7]` into `in1[5:4]` and
+`joystick2[9]` into `in2[14]`, which is exactly MAME's cps2 input map
+(`tests/lua/replay.lua:76-85`: P1 buttons 5/6 in `:IN1`, P2 button 5 in
+`:IN1`, P2 button 6 in `:IN2`).
+
+**MEASURED AT THE PIN, NOT DEDUCED FROM THE SOURCE.** The observable is the
+game's own input mirror, located by a MAME differential rather than
+assumed: run `05_timeout_idle` twice, once with `p1=56` held for six
+frames, and diff whole work RAM at the onset. 36 bytes move at frame 1000
+and among them are **`RAM:$FF8058` (P1 held-buttons high byte) and
+`RAM:$FF805A` (P1 new-press)**; the P2 twins are **`$FF805C`/`$FF805E`**
+(same experiment with `p2=56`). Bit 0x40 = button 6, 0x20 = button 5. The
+block goes live at MAME frame ~92-96, right after the RAM test — so a
+~620-frame simulation reaches it, and a whole run is not needed to see it.
+
+| leg (block `$FF8040-$FF8070`, aligned frames) | `$FF8058` | `$FF805A` | `$FF805C` | `$FF805E` |
+|---|---|---|---|---|
+| MAME, `05_timeout_idle` verbatim (nothing held) | 00 | 00 | 00 | 00 |
+| MAME, same + `p1=56` held | **60** | **60** | 00 | 00 |
+| MAME, same + `p2=56` held | 00 | 00 | **60** | **60** |
+| MAME, same + `p1=56 p2=56` held | **60** | **60** | **60** | **60** |
+| **sim BEFORE the fix** (cps2, stock `vsavj`, script presses nothing) | **60** | **60** | **60** | **60** |
+| **sim AFTER fork commit 10** | 00 | 00 | 00 | 00 |
+
+The before-fix simulation's whole 49-byte block is **byte-identical to the
+MAME leg that physically holds P1 AND P2 buttons 5+6**, and differs from
+the MAME leg running the same script. That is the defect end to end: the
+harness, the port, the RTL and the game agree on what was pressed, and
+nothing in `sim_inputs.hex` asked for it. After the fix the block is
+byte-identical to MAME's no-input leg.
+
+**And the fix's whole footprint at boot is those inputs.** Two otherwise
+identical `cores/cps2` runs (stock `vsavj`, frames 560-620, frame output
+off), one at each pin, differ in **8 bytes of 65,536** in every frame of
+the window: `$FF8058`, `$FF805A`, `$FF805C`, `$FF805E` (0x60 -> 0x00) and
+`$FF8060-$FF8063` (0x40 -> 0x00). Nothing else in work RAM moves that
+early — which is exactly what a corrected INPUT should look like before the
+game has had a chance to act on it. Downstream, at the match, it moves the
+anchor: see `tests/test_mister_sim_anchor.sh`.
+
+**AND AT THE MATCH, THE FOUR BUTTONS WERE DOING NOTHING BUT SITTING IN THE
+INPUT WORDS.** The §4 window was re-run at BOTH pins — `cores/cps2`, stock
+`vsavj`, the same `sim_inputs.hex` (sha1 `931e6caf…`), frames 2400-2800,
+frame output off. Both reach the round-1 match start at **2609**, and over
+all 401 frames the two runs differ in **29 addresses of 65,536**:
+
+| what | addresses | frames it differs in |
+|---|---|---|
+| raw input mirror + its `$FF806x` derivative | `$FF8058/5A/5C/5E`, `$FF8060-63` | 401/401 |
+| per-player struct input word (`+0x394`) | `$FF8794/96`, `$FF8B94/96` | 401/401 |
+| in-match per-player input copies (`+0x122/124/12A/12C`) | `$FF8522/24/2A/2C`, `$FF8922/24/2A/2C` | ~190/401, from the match on |
+| one-frame companions of the same words | `$FF8526`, `$FF85AC`, `$FF8926`, `$FF89AC` | 1/401 each |
+| OBJ-builder secondary stack / dead-stack window (`atlas/ram.md`, the two documented phase classes) | `$FF06B0/B5/B9`, `$FF7FC4/C8` | 8/5/5, 1/1 |
+
+No HP, position, timer, meter, character identity or anim cursor differs —
+which is why the anchor did not move and why the §4 field verdict is
+unchanged.
+
+**THE FIX (fork commit `519aff8b`, `emu/jtcores-patches/0010-…`, pin
+bumped, LOCAL ONLY):** `& ~0xf` instead of `& 0xf0` — keep every button bit
+the port has, whatever `JTFRAME_BUTTONS` is — and `0x3ff` instead of `0xff`
+for the four seeds. Unconditional, no macro, 1 file: this is a plain
+upstream bug, not a profile change, and it would be a clean upstream report.
+`tests/test_sim_wram_contract.sh` check 12 holds the pinned `test.cpp` to it
+with a must-fire control.
+
+**WHAT IT IS NOT.** It does not add P2 or button 5/6 SCRIPTING —
+`tools/rpl2siminputs.py` still refuses `p2=` and `p1=4/5/6` loudly, and
+`02_demitri_vs_cpu` / `04_select_fuzz` still do not translate. The
+maintainer ruled that COVERAGE half "later" (STATE "Decisions pending"); the
+FIDELITY half is what shipped here, because it is a bug and it was making
+the oracle's two legs run different inputs.
+
 ## The numbers that bound a MiSTer-shaped profile
 
 - **SDRAM tier.** `JTFRAME_SDRAM_LARGE` "enables 64 MB access" is the only
@@ -551,23 +651,22 @@ blocked only by bank PLACEMENT — is worked out in
   ENTERS blanking; active-high in the file; bit0/1 coin1/2, bit2/3
   start1/2, bits4-7 P1 U/D/L/R, bits8-11 P1 buttons 1-4 (bit11 doubles as
   dip_test). **P1 only, 4 buttons** — P2 does not exist in that harness.
-  **CORRECTED 14z-107 (7): buttons 5 and 6 do not "not exist" — THEY ARE
-  HELD DOWN.** `test.cpp:201` is
-  `dut.joystick1 = (dut.joystick1&0xf0) | (v&0xf);`, and `&0xf0` discards
-  bits 9:8 that the line above had just set to 1 in `0x30f`. joystick is
-  ACTIVE LOW and `jtcps2_main.v:266` wires `joystick1[9:7]` into `in1`, so
-  from the first line of `sim_inputs.hex` onward the simulated P1 has
-  buttons 5 and 6 PRESSED — for every frame of every run this lane has ever
-  taken. (Only EOF releases them: `SimInputs::next()`'s else-branch restores
-  `0x3ff`.) It has not derailed `05_timeout_idle` — the MAME leg, which does
-  NOT hold them, agrees with the sim on every mapped field at the anchor and
-  picks the same P1 record base — but the two legs are not running identical
-  inputs, and that is worth knowing before a replay that uses HP/HK is
-  translated. The one-line fix (`& ~0xf` instead of `& 0xf0`) belongs with
-  the queued P2/6-button fork commit, because it WILL move the frozen
-  anchor and that has to be re-measured deliberately, not as a side effect.
+  **CORRECTED 14z-107 (7), FIXED 14z-107 (8): buttons 5 and 6 did not "not
+  exist" — THEY WERE HELD DOWN, and so were P2's.** `test.cpp`'s `&0xf0`
+  direction mask and its `0xff` joystick seeds treated a `[9:0]` ACTIVE-LOW
+  port as 8-bit, so from the first line of `sim_inputs.hex` the simulated P1
+  had buttons 5 and 6 pressed and P2 had them pressed for the whole run.
+  Fork commit 10 fixes both (`& ~0xf`, `0x3ff`); the measurement, the MAME
+  differential that located the game's input mirror, and the before/after
+  table are in "`SimInputs` HELD BUTTONS 5 AND 6 DOWN" above. It re-froze
+  the §4 anchor, which is why it was its own slice.
+  **What is STILL true after the fix: the harness can express P1 only, with
+  buttons 1-3** (bit 11 doubles as `dip_test`, so button 4 is refused).
+  Buttons 5/6 and P2 are now RELEASED rather than held — they are still not
+  SCRIPTABLE.
   `tools/rpl2siminputs.py` translates `.rpl` → `.hex` and
-  REFUSES p2 / buttons 4-6 / service-test loudly (measured on four legacy
+  REFUSES p2 / buttons 4-6 / service-test loudly (unchanged by commit 10 —
+  releasing a button is not scripting it) (measured on four legacy
   replays: `01_attract_long` (7200 frames, no input) and `05_timeout_idle`
   (12000 frames, 13 active) translate; `04_select_fuzz` and
   `02_demitri_vs_cpu` REFUSE on P1 button 4). Gate
@@ -788,7 +887,8 @@ path costs ~99 fewer frames on the core. (**RE-MEASURED 14z-107 (3) on the
 FIXED SDRAM model: 2502 / +356**; the five frames are the object pipeline's
 blank-tile skip reacting to correct GFX, see the fix section above.)
 **BOTH OF THOSE NUMBERS ARE RETRACTED — RE-MEASURED 14z-107 (7): MAME 2146 /
-sim 2609, skew +463.** 2507 and 2502 were measured on runs whose input
+sim 2609, skew +463** — and re-measured a second time in 14z-107 (8), after
+the harness stopped holding four buttons down, with the same answer.** 2507 and 2502 were measured on runs whose input
 script the frame writer was replaying (see "THE HARNESS'S FRAME WRITER
 CORRUPTED THE SIMULATED INPUT SCRIPT"); with the host doing nothing with the
 pixels the anchor is 2609 in every leg that does not fork, and the "~99
@@ -857,7 +957,14 @@ RE-MEASURED 14z-107 (7) with host frame output OFF, and measured four ways in
 one 2x2: every leg that forks once or not at all reports 2609, and only the
 leg that forks 1,348 times reports 2502. ~~2507 / +361 (14z-107), 2502 / +356
 (14z-107 (3))~~ — both retracted; they were measured while the harness was
-replaying the input script. Note that 463 is close to but not equal to the
+replaying the input script. **RE-MEASURED AGAIN 14z-107 (8) after the
+joystick fix — 2146 / 2609 / +463, UNCHANGED**, and that is the result: every
+earlier reading of this anchor was taken with the harness holding four
+buttons down (P1's and P2's 5 and 6), and correcting them moves nothing here.
+Mechanism, not luck: a button held from before boot produces no PRESS EDGE,
+and this replay's only inputs are a coin, a start and one button-1 tap. The
+re-measurement searched 2100-3000 rather than the gate's 2400-2800 so the
+answer could not be boxed in by the window, and reports 2609 either way. Note that 463 is close to but not equal to the
 boot offset (+460): the attract/select/VS path costs a few frames more on the
 core than on MAME, which is why CLAUDE.md §4 compares mapped state at ANCHORS
 rather than at fixed frame indices. At the anchor and at +60/+180,
@@ -1064,11 +1171,12 @@ any core.
 - Input coverage: the v1.7.3 harness is P1-only with 4 buttons, so
   `02_demitri_vs_cpu` and `04_select_fuzz` still refuse. Extending
   `test.cpp`'s `SimInputs` (P2, buttons 5/6) is a further fork commit —
-  recommended once the anchor gate has run a while, not before.
-  **UPGRADED 14z-107 (7) from coverage to FIDELITY: buttons 5 and 6 are not
-  absent, they are stuck ON** (`test.cpp:201` masks bits 9:8 away — see
-  "Scripted inputs" above). The same one-line commit fixes both, and it
-  re-freezes the anchor, so it is a deliberate slice rather than a drive-by.
+  **DECIDED (maintainer, 2026-08-23): later.**
+  **THE FIDELITY HALF IS DONE (14z-107 (8), fork commit 10)** — buttons 5
+  and 6 were not absent, they were stuck ON, and so were P2's; that was a
+  BUG, it made the oracle's two legs run different inputs, and it is fixed
+  and re-frozen. What remains deferred is the COVERAGE half: making them
+  SCRIPTABLE so a 2P replay can pin the arcade-draw opponent.
 - ~~The width surgery itself (SDRAMW 23 -> 24 and the bank/prog/ioctl bit)
   waits on the profile-shape ruling in STATE "Decisions pending".~~
   **SUPERSEDED 14z-107 (2).** The PROFILE ruling landed (WIDE v1 verbatim,

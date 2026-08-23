@@ -1,4 +1,43 @@
-# NEXT SESSION — orientation (rewritten at the 14z-107 (7) close, 2026-08-23)
+# NEXT SESSION — orientation (rewritten at the 14z-107 (8) close, 2026-08-23)
+
+> ## **NEWEST FIRST — 14z-107 (8): THE SIMULATED CONTROLLER WAS PRESSING
+> ## FOUR BUTTONS NOBODY SCRIPTED.** jtframe v1.7.3's `SimInputs` held
+> ## **P1's AND P2's buttons 5 and 6 DOWN** on every 6-button core — two
+> ## 8-bit constants on a `[9:0]` **ACTIVE-LOW** port: `parse_inputs()`
+> ## masks with `&0xf0` (throwing away the bits the line above released) and
+> ## the constructor seeds `joystick1..4 = 0xff`, which `parse_inputs()`
+> ## never corrects for players 2-4. So the MAME leg and the sim leg of the
+> ## §4 oracle had never been running the same inputs — a FIDELITY defect in
+> ## the instrument, recorded in 14z-107 (7) and FIXED here.
+> ## **VERIFIED BEFORE IT WAS FIXED, AGAINST A SECOND IMPLEMENTATION, NOT
+> ## AGAINST THE SOURCE.** A MAME hold-vs-not differential located the
+> ## game's own input mirror — `RAM:$FF8058`/`$FF805A` (P1 held / new-press)
+> ## and `$FF805C`/`$FF805E` (P2), 0x40 = button 6, 0x20 = button 5, live
+> ## from MAME frame ~92. The **pre-fix sim's `$FF8040-$FF8070` block is
+> ## byte-identical to MAME running the same ROM with P1 AND P2 buttons 5+6
+> ## physically held**; after the fix it is byte-identical to MAME's
+> ## no-input leg. The fix's whole boot footprint is **8 bytes of 65,536**
+> ## (`$FF8058/5A/5C/5E` 0x60→0x00, `$FF8060-63` 0x40→0x00).
+> ## **FIX: fork commit `519aff8b` — `& ~0xf` and `0x3ff`, one file, no RTL,
+> ## no macro, LOCAL ONLY** (push authorisation still held). It is a plain
+> ## upstream bug and the commit reads as a clean upstream report; nothing
+> ## was filed. Gate: `test_sim_wram_contract` check 12 (+ its control).
+> ## **THE RE-FREEZE: NOTHING MOVED, AND THAT IS THE RESULT.** MAME 2146 /
+> ## sim **2609** / skew **463**, re-measured on the REFERENCE core over
+> ## 2100-3000 so the window could not box the answer in; band untouched at
+> ## ±30. Mechanism: a button held from before boot produces no PRESS EDGE,
+> ## and this replay's only inputs are a coin, a start and one button-1 tap.
+> ## Every §4 field still agrees, and the sound-state-fed arcade draw is the
+> ## same pair as before (MAME `$0AE9D4` / sim `$0A9518`).
+> ## **`audit_sdram_bank_load`'s phase boundaries are keyed to the anchor
+> ## and therefore did NOT move** (2608 / 2614); re-deriving the table from
+> ## `build/sdram_bank_load_14z107.log` reproduces it exactly.
+> ## **STILL DEFERRED (maintainer): the COVERAGE half** — making buttons 5/6
+> ## and P2 SCRIPTABLE. `tools/rpl2siminputs.py` still refuses them loudly.
+> ## **NEXT: slice D2** (bank-0 repack, the group-C GFX redirect, the QSound
+> ## bank split on `qsnd_addr[23]`, `jtframe_ram1_7slots`, the two new GFX
+> ## slots).
+
 
 > ## **NEWEST FIRST — 14z-107 (7): THE "VIDEO-SENSITIVE ANCHOR" IS
 > ## ROOT-CAUSED, AND IT INVERTED A VERDICT.** The picture never touched
@@ -38,6 +77,8 @@
 > ## are therefore not running identical inputs. The one-line fix moves the
 > ## anchor again, so it belongs with the queued P2/6-button fork commit —
 > ## that pending item is upgraded from COVERAGE to FIDELITY.
+> ## **[FIXED 14z-107 (8), fork commit `519aff8b` — and P2's buttons 5/6
+> ## were held too. The anchor did NOT move. See the newest block above.]**
 > ## **NEXT: slice D2** (bank-0 repack, the group-C GFX redirect, the QSound
 > ## bank split on `qsnd_addr[23]`, `jtframe_ram1_7slots`, the two new GFX
 > ## slots) — and it can now change video output without the anchor going
@@ -258,7 +299,9 @@
 > ## draw is sound-state-fed (`ram.md:99`, the #110 mechanism), so the
 > ## CPU opponent differs (`$0AE9D4` MAME vs `$0A9518` core) and the
 > ## P2-identity fields are excluded BY NAME. Pinning it needs a 2P
-> ## replay -> P2 in `SimInputs` -> a queued fork commit.
+> ## replay -> P2 SCRIPTING in `SimInputs` -> a queued fork commit
+> ## [still queued at 14z-107 (8): commit 10 RELEASED P2's buttons, it did
+> ## not make P2 scriptable; the draw is the same pair after the fix].
 > ## **TWO RETRACTIONS:** `JTFRAME_SIM_IODUMP` dumps the EEPROM on CPS-2
 > ## and `JTFRAME_SAVESDRAM` is Verilog-model-only — work RAM was never
 > ## "reachable"; and **`-load` is MANDATORY** (the download latches the
@@ -303,7 +346,8 @@
 > ## NEXT OPENER: **the MEMORY-MAP ROUTE ruling**, then the core-side format
 > ## work; phase B (the round-transition anchor on the full 12,120-frame
 > ## replay, ~3.5 h), the Verilator 8 MB-per-bank fix and P2/6-button
-> ## `SimInputs` are the queued follow-ups.
+> ## `SimInputs` are the queued follow-ups. [8 MB-per-bank done 14z-107 (3);
+> ## `SimInputs` FIDELITY done 14z-107 (8), COVERAGE still queued.]
 > ## The N-2 build-dir
 > ## deletion policy applies at the NEXT freeze (m10/m19/m13/merged-m5
 > ## dirs are now one-back; m9/m18/m12/merged-m4 + m5_stock4 are N-2 and

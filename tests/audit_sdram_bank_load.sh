@@ -83,6 +83,15 @@ done
 # shift moves ~100 frames of SELECT-phase traffic out of the "in-match" row,
 # and both phases were already steady-state, so the per-frame rates it
 # reports are unchanged in substance. Re-run to re-derive them exactly.
+# RE-CHECKED 14z-107 (8): the joystick fix (fork commit 10 — the harness had
+# been holding P1's and P2's buttons 5 and 6 down) re-froze the anchor at the
+# SAME 2609, so these four boundaries did not move and the published table
+# re-derives from build/sdram_bank_load_14z107.log unchanged. Note the log's
+# provenance for the record: it was produced BEFORE that fix, i.e. with those
+# four buttons held. That is not a caveat on the traffic numbers — the run
+# reaches the same anchor, agrees on every mapped field and draws the same
+# arcade opponent — but it is why the boundaries were re-checked rather than
+# assumed.
 DL_END=462          # "ROM file transfered (frame 462)"
 ATTRACT_END=1265    # MAME 800-803 start press + 462
 SELECT_END=2608     # one frame before the match-start anchor

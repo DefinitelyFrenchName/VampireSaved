@@ -56,6 +56,16 @@
 #     simulated controller. Asserted here on a file large enough to force
 #     refills: with exit() children the read sequence goes BACKWARDS; with
 #     _exit() children (what the fork now does) it does not.
+# 12. THE SIMULATED CONTROLLER PRESSES ONLY WHAT THE SCRIPT SAYS (14z-107 (8)).
+#     At v1.7.3 SimInputs held buttons 5 and 6 DOWN: parse_inputs() masked
+#     the joystick word with `&0xf0` on a port that is [9:0] and ACTIVE LOW,
+#     and the constructor seeded joystick1..4 with 0xff, which
+#     parse_inputs() never corrects for players 2-4. On a 6-button core those
+#     bits are wired (jtcps2_main.v:266-268), so the MAME leg and the sim leg
+#     of the anchor oracle were not running the same inputs. Fork commit 10
+#     fixes it; this check holds the PINNED test.cpp to it, with the control
+#     that a softened copy is detected. Measured evidence:
+#     docs/platform/mister.md "SimInputs HELD BUTTONS 5 AND 6 DOWN".
 # Usage: tests/test_sim_wram_contract.sh   (no ROMs, no emulator, ~5s)
 set -u
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
@@ -389,6 +399,37 @@ RWCPP
             || bad "11c CONTROL DID NOT FIRE: exit() children did not rewind — re-derive the mechanism before trusting the gotcha"
     else
         echo "  note: the rewind ground-truth program did not build — check 11 not run"
+    fi
+fi
+
+# 12 the harness must not assert buttons the input script never pressed
+P10="$REPO/emu/jtcores-patches/0010-jtframe-sim-joystick-top-bits.patch"
+if [ -f "$P10" ]; then
+    files="$(grep -c '^diff --git' "$P10")"
+    grep -q '^-        dut.joystick1    = (dut.joystick1&0xf0) | (v&0xf);' "$P10" \
+        && grep -q '^+        dut.joystick1    = (dut.joystick1&~0xf) | (v&0xf);' "$P10" \
+        && grep -q '^-        dut.joystick2 = 0xff;' "$P10" \
+        && grep -q '^+        dut.joystick2 = 0x3ff;' "$P10" \
+        && [ "$files" = 1 ] \
+        && ok "12a patch 0010 widens the direction mask AND the 4 joystick seeds (1 file)" \
+        || bad "12a patch 0010 is not the declared shape (files $files)"
+    TCPP="$REPO/emu/jtcores/modules/jtframe/hdl/ver/test.cpp"
+    if [ -f "$TCPP" ]; then
+        # THE TWO WAYS THE 8-BIT ASSUMPTION SHOWS UP, both must be gone:
+        # a direction mask that keeps only bits 7:0, and a seed that is 0xff
+        # rather than 0x3ff on a [9:0] ACTIVE-LOW port.
+        n_mask="$(grep -c 'dut.joystick1&0xf0' "$TCPP" || true)"
+        n_seed="$(grep -cE 'dut\.joystick[1-4] = 0xff;' "$TCPP" || true)"
+        n_good="$(grep -c 'dut.joystick1&~0xf' "$TCPP" || true)"
+        [ "$n_mask" = 0 ] && [ "$n_seed" = 0 ] && [ "$n_good" -ge 1 ] \
+            && ok "12b the pinned test.cpp releases buttons 5 and 6 ($n_good widened masks, 0 8-bit masks, 0 8-bit seeds)" \
+            || bad "12b the pinned test.cpp still holds buttons 5/6 ($n_mask 8-bit masks, $n_seed 8-bit seeds)"
+        sed 's/dut.joystick1&~0xf/dut.joystick1\&0xf0/' "$TCPP" > "$T/soft8.cpp"
+        [ "$(grep -c 'dut.joystick1&0xf0' "$T/soft8.cpp")" -ge 1 ] \
+            && ok "12c control fired: a copy with the mask narrowed back to 8 bits is detected" \
+            || bad "12c CONTROL DID NOT FIRE: the 8-bit-mask detector matches nothing"
+    else
+        echo "  note: emu/jtcores not initialised — 12b not run"
     fi
 fi
 

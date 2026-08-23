@@ -26,11 +26,36 @@
 # EMULATOR-tier gate: it is NOT in ci_portable/ci_static, and HANDOFF.md
 # indexes it with the other manual gates.
 #
-# FROZEN EXPECTATIONS (RE-MEASURED 14z-107 (7) on a run whose input script is
-# no longer being corrupted — see "THE RE-FREEZE" below):
+# FROZEN EXPECTATIONS (re-measured 14z-107 (7), RE-MEASURED AGAIN 14z-107 (8)
+# on a run whose simulated controller is no longer pressing four buttons
+# nobody scripted — see "THE SECOND RE-FREEZE" below):
 #   MAME anchor              frame 2146   (05_timeout_idle, stock vsavj)
 #   sim anchor (ABSOLUTE)    frame 2609   (the 462 download frames included)
 #   skew (sim - MAME)        463
+#
+# THE SECOND RE-FREEZE, 14z-107 (8) — AND THIS TIME NOTHING MOVED, WHICH IS
+# ITSELF THE RESULT. Every number above was previously measured on a lane in
+# which jtframe's `SimInputs` HELD FOUR BUTTONS DOWN: `test.cpp` masked the
+# joystick word with `&0xf0` and seeded `joystick1..4 = 0xff` on a `[9:0]`
+# ACTIVE-LOW port, so P1's buttons 5 and 6 AND P2's were pressed from the
+# first line of `sim_inputs.hex` to the last while MAME's leg held nothing.
+# The two legs of this oracle were not running identical inputs — a FIDELITY
+# defect in the instrument, found 14z-107 (7) and fixed in fork commit
+# `519aff8b` (14z-107 (8)). Re-measured afterwards on the REFERENCE core
+# (`cores/cps2`, stock `vsavj`, frame output off, frames 2100-3000 so the
+# search could not be boxed in): **MAME 2146, sim 2609, skew 463 — the same
+# numbers**, and the anchor is 2609 whether the search window starts at 2100
+# or at 2400. So the expectations are re-frozen at their existing values,
+# measured for the first time on inputs that match the MAME leg's.
+# WHY IT DID NOT MOVE, mechanism rather than luck: a button held from before
+# the game boots produces no PRESS EDGE, and this replay's only inputs are a
+# coin, a start and one button-1 tap. The boot-phase footprint of the fix is
+# 8 bytes of 65,536 in every frame of 560-620 — `RAM:$FF8058/5A/5C/5E`
+# (0x60 -> 0x00, the game's own P1/P2 input mirror) and `$FF8060-$FF8063`
+# — and nothing downstream of them changed at the match. Full before/after,
+# including the MAME differential that located that mirror:
+# docs/platform/mister.md, "`SimInputs` HELD BUTTONS 5 AND 6 DOWN".
+# The band stays +/- 30 and was not touched.
 #
 # THE RE-FREEZE, 14z-107 (7) — AND IT INVERTS A VERDICT. The old expectation
 # was sim 2502 / skew 356, and it was measured on a run in which jtframe's
@@ -85,8 +110,13 @@
 # every character-independent field agrees exactly. So the fields that are a
 # FUNCTION OF WHICH CHARACTER P2 IS are excluded BY NAME below; p2_hp,
 # p2_white_hp and the two p2 meter fields stay compared. Pinning the opponent
-# needs a 2P replay, which needs P2 in the v1.7.3 `SimInputs` harness — a
-# queued fork commit (docs/platform/mister.md "Open / to verify").
+# needs a 2P replay, which needs P2 SCRIPTING in the `SimInputs` harness —
+# still a queued fork commit, maintainer-ruled "later"
+# (docs/platform/mister.md "Open / to verify"). Note what fork commit 10 did
+# and did NOT do: it stopped the harness ASSERTING P2's buttons 5 and 6, it
+# did not make P2 scriptable, so this exclusion stands. Measured after the
+# fix, the draw is unchanged — MAME $0AE9D4, jtcps2 $0A9518, the same pair as
+# before, on the field the record calls the run-to-run lottery.
 # The skew is frozen with a tolerance because it is a boot-phase property, not
 # gameplay state; the FIELDS are compared exactly. A skew outside the band is
 # a finding: stop and root-cause, do not widen (the standing watch).
@@ -140,9 +170,13 @@ FOLLOW="0,60,180"
 # function of WHICH character P2 is would assert a disagreement.
 SKIP="p2_hitbox_base,p2_ptr64,p2_word132,p2_x,p2_y,p2_attack_id,p2_flip"
 EXP_AM=2146          # frozen MAME anchor
-EXP_SKEW=463         # frozen sim-minus-MAME skew, RE-MEASURED 14z-107 (7)
+EXP_SKEW=463         # frozen sim-minus-MAME skew. RE-MEASURED 14z-107 (7)
                      # with the input script no longer replayed (was 356, and
-                     # before that 361 on the pre-fork-commit-3 SDRAM model)
+                     # before that 361 on the pre-fork-commit-3 SDRAM model),
+                     # and RE-MEASURED AGAIN 14z-107 (8) with the harness no
+                     # longer holding P1's and P2's buttons 5 and 6 down:
+                     # unchanged at 463, now measured on inputs that match
+                     # the MAME leg's. See "THE SECOND RE-FREEZE" above.
 SKEW_TOL=30          # boot-phase band; the FIELDS are compared exactly
 MAME_LO=2100; MAME_HI=2400
 # ABSOLUTE frames (download included). The window mirrors the MAME leg's

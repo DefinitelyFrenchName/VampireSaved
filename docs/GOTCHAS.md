@@ -456,15 +456,20 @@ is a GAME gotcha if it is true of the game regardless of the port.
   measuring harness shares FILE DESCRIPTIONS, and `exit()` in the child is
   a write to them.**
 
-- **14z-107 (7) (platform):** jtframe v1.7.3's Verilator input harness
-  **HOLDS P1 BUTTONS 5 AND 6 DOWN** for every frame `sim_inputs.hex` drives
-  — `test.cpp:201`'s `& 0xf0` throws away the two bits the line above had
-  just released, and joystick is active low. So "the harness has 4 buttons"
-  was half right: the other two are not missing, they are pressed. Only
-  running the file out releases them, which means a shorter input file
-  changes the inputs. Not fixed there (the one-line fix moves the frozen §4
-  anchor); the MAME and sim legs of the anchor gate are therefore not
-  running identical inputs today.
+- **14z-107 (7) (platform), FIXED 14z-107 (8):** jtframe v1.7.3's Verilator
+  input harness **HELD BUTTONS 5 AND 6 DOWN — P1's AND P2's** for every
+  frame of every run. `test.cpp`'s `& 0xf0` threw away the two bits the line
+  above had just released, and the constructor seeded `joystick1..4 = 0xff`;
+  the port is `[9:0]` and ACTIVE LOW, so both constants ASSERT the top two
+  buttons. "The harness has 4 buttons" was half right: the other two were
+  not missing, they were pressed. **The general lesson: a harness that
+  drives a port asserts every bit of it, including the ones it does not
+  model.** Verified against a SECOND implementation rather than against the
+  source — the pre-fix sim's input mirror (`RAM:$FF8058/$FF805A` P1,
+  `$FF805C/$FF805E` P2, located by a MAME hold-vs-not differential) is
+  byte-identical to MAME with those four buttons physically held. Fork
+  commit 10 (`& ~0xf`, `0x3ff`) fixes it and re-freezes the §4 anchor; the
+  COVERAGE half (scripting them) stays deferred by maintainer ruling.
 - **14z-107 (7) (project):** **editing a shell script while it is running
   derails it** — `sh` reads by BYTE OFFSET, so even a comment-only edit
   moves the ground under the interpreter. Three 45-minute simulations and a

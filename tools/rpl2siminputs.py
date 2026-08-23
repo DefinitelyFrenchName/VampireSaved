@@ -9,10 +9,20 @@ bits in the file (test.cpp inverts): bit0 coin1, bit1 coin2, bit2 start1,
 bit3 start2, bits4-7 P1 directions in JTFRAME_JOY order (default UDLR:
 bit4=Up bit5=Down bit6=Left bit7=Right), bits8-11 P1 buttons 1-4, bit11 is
 ALSO dip_test in that harness (so button 4 = test switch — refused here).
-There is NO P2 and NO button 5/6 in that harness: a replay that uses them
-is refused LOUDLY rather than silently truncated (the 14z-102 gotcha:
+P2 and buttons 5/6 are NOT EXPRESSIBLE in that harness: a replay that uses
+them is refused LOUDLY rather than silently truncated (the 14z-102 gotcha:
 identify moves by measured effects, never by what the script was meant
-to say). Extending the harness is fork work and a separate change.
+to say). Extending the harness is fork work and a separate change —
+maintainer-ruled "later" (STATE, Decisions pending).
+
+NOT EXPRESSIBLE IS NOT THE SAME AS NOT PRESSED, and at v1.7.3 they were
+PRESSED: `test.cpp` masked the joystick word with `&0xf0` and seeded
+`joystick1..4 = 0xff` on a `[9:0]` ACTIVE-LOW port, so P1's buttons 5 and 6
+and P2's were held DOWN for every frame of every run. Fork commit 10
+(14z-107 (8)) releases them; measured before/after in
+docs/platform/mister.md, "`SimInputs` HELD BUTTONS 5 AND 6 DOWN". This
+translator is unchanged by that fix — releasing a button is not scripting
+it, and the refusals below still fire.
 
 .rpl grammar (tests/lua/replay.lua): `<frame>[-<end>] who=tokens ...`,
 who in p1/p2/sys; p1 tokens U D L R 1-6; sys S1 S2 C1 C2 SV TS; lines OR

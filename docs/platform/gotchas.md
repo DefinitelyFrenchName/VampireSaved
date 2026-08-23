@@ -1437,21 +1437,42 @@ target carries 27 bits (`jtframe_emu.sv:334`), and each header start word is
   against one with frame output off). Anything that PARSES a jtsim log has
   to cope — `tests/audit_sdram_bank_load.sh` de-duplicates by the
   reporter's own `t=` timestamp and requires it to be strictly increasing.
-- **jtframe v1.7.3's `SimInputs` HOLDS P1 BUTTONS 5 AND 6 DOWN for the
-  whole run — they are not "absent", they are stuck ON.** `test.cpp:199-201`
-  first builds `joystick1 = 0x30f | ((v>>4)&0xf0)` (bits 9:8 = 1 = released)
-  and then overwrites it with `(joystick1 & 0xf0) | (v & 0xf)`, and `& 0xf0`
-  throws bits 9:8 away. joystick is ACTIVE LOW and `jtcps2_main.v:266` wires
-  `joystick1[9:7]` into `in1`, so the simulated P1 has buttons 5 and 6 held
-  from the first line of `sim_inputs.hex` to the last. Only EOF releases
-  them (`next()`'s else-branch restores `0x3ff`), which means a SHORTER
-  input file changes the inputs — the opposite of what a truncation should
-  do. Found 14z-107 (7) while auditing the lane; NOT fixed there, because
-  the one-line fix moves the frozen §4 anchor and that has to be
-  re-measured on purpose. Consequence today: the MAME leg and the sim leg of
-  `test_mister_sim_anchor.sh` are not running identical inputs. They still
-  agree on every mapped field at the anchor and pick the same P1 record
-  base, but do not translate a replay that uses HP/HK until this is fixed.
+- **jtframe v1.7.3's `SimInputs` HELD BUTTONS 5 AND 6 DOWN — P1's AND P2's
+  — for the whole run. They were not "absent", they were stuck ON.
+  FIXED 14z-107 (8), fork commit `519aff8b`.** Two 8-bit constants on a
+  `[9:0]` ACTIVE-LOW port (`game_test.v:51-54`): `parse_inputs()` builds
+  `joystick1 = 0x30f | ((v>>4)&0xf0)` (bits 9:8 = 1 = released) and then
+  overwrites it with `(joystick1 & 0xf0) | (v & 0xf)`, throwing bits 9:8
+  away — and the constructor seeds `joystick1..4 = 0xff`, which
+  `parse_inputs()` never corrects for players 2-4. `jtcps2_main.v:266-268`
+  wires `joystick1[9:7]` into `in1[2:0]`, `joystick2[8:7]` into `in1[5:4]`
+  and `joystick2[9]` into `in2[14]`, so on any 6-button core all four of
+  those buttons were pressed from the first line of `sim_inputs.hex` to the
+  last. Only EOF released P1's (`next()`'s else-branch restores `0x3ff`),
+  which meant a SHORTER input file changed the inputs — the opposite of
+  what a truncation should do; P2's were never released at all.
+  **THE GENERAL LESSON: a harness that DRIVES a port is asserting every bit
+  of it, including the ones it does not model — and an active-low port
+  defaults to PRESSED.** "The harness has 4 buttons" was the natural
+  reading and it was wrong by two buttons per player.
+  **How it was measured, and this is the reusable part:** a MAME
+  differential located the game's own input mirror (hold `p1=56` for six
+  frames on `05_timeout_idle`, diff whole work RAM at the onset →
+  `RAM:$FF8058`/`$FF805A` for P1 and `$FF805C`/`$FF805E` for P2, bit 0x40 =
+  button 6, 0x20 = button 5, live from MAME frame ~92). The pre-fix
+  simulation's `$FF8040-$FF8070` block is **byte-identical to MAME running
+  the same ROM with P1 and P2 buttons 5+6 physically held**, and to MAME's
+  no-input leg after the fix. Do not verify a harness against its own
+  source; verify it against a second implementation running a known input.
+  Found 14z-107 (7) while auditing the lane and deliberately NOT fixed
+  there (the fix moves the frozen §4 anchor, which has to be re-measured on
+  purpose); fixed and re-frozen 14z-107 (8). Historical consequence, now
+  closed: the MAME leg and the sim leg of `test_mister_sim_anchor.sh` were
+  not running identical inputs. They still agreed on every mapped field and
+  picked the same P1 record base — see the anchor gate's header for what
+  moved when the inputs were corrected. The COVERAGE half (making buttons
+  5/6 and P2 SCRIPTABLE) stays deferred by maintainer ruling;
+  `tools/rpl2siminputs.py` still refuses them loudly.
 - **A scratch clone re-pointed at a public `origin` cannot reach a
   LOCAL-ONLY commit.** `tools/run_sim_jtcps2.sh` clones from
   `emu/jtcores` and then sets `origin` to the GitHub fork URL, so

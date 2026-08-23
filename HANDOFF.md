@@ -287,7 +287,10 @@ and `test_mister_sim_anchor.sh` is still green — with the anchor RE-MEASURED
 to MAME 2146 / sim **2502** / skew **356** (was 2507/361 on the broken model;
 the band is unchanged at +/- 30). **BOTH SUPERSEDED 14z-107 (7): the clean
 anchor is 2609 / skew 463** — 2507 and 2502 were measured while jtframe's
-frame writer was rewinding `sim_inputs.hex`. The object-timing MECHANISM in
+frame writer was rewinding `sim_inputs.hex`. **Re-measured a second time
+14z-107 (8), after fork commit 10 stopped `SimInputs` holding P1's and P2's
+buttons 5 and 6 down: 2609 / 463, UNCHANGED** — the first reading of this
+anchor taken on inputs that match the MAME leg's. The object-timing MECHANISM in
 this paragraph still stands; the absolutes do not. The five frames are real:
 `jtcps1_obj_draw.v:137` skips a tile whose fetched GFX word is all-ones, so
 OBJECT TIMING IS A FUNCTION OF GFX ROM CONTENT. Two further harness bugs had to be fixed to measure SDRAM load at all —
