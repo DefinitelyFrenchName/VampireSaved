@@ -1,5 +1,112 @@
 # STATE — living progress log
 
+## Session 14z-107 (5) — MiSTer SLICE D0 DONE: the MRA that makes the WIDE
+## image DOWNLOADABLE AT ALL. `rom/vsavjw.rom` = **66,265,152 B**, header
+## words **6144 / 6400 / 15552 / 64704** — the placement map's numbers, to
+## the byte, verified region by region against the romset rather than
+## recomputed. Stock leg untouched. **No RTL.**
+
+**The one line:** the trim works, the map survived contact with the real
+generator (its "mapped verbatim" table was reproduced too, by the control),
+and the ONE thing that turned out wrong was the map's own proposed TOML row
+— which fails SILENTLY, so finding it here rather than at a bring-up is the
+point of putting D0 first.
+
+**A. WHAT SHIPPED.** Fork commit `38acc638` (pushed,
+`DefinitelyFrenchName/jtcores@vampire-saved`; mirrored as
+`emu/jtcores-patches/0006-cps2w-wide-mra-trim.patch`, pin bumped):
+- `doc/mame.xml` gains a `vsavjw` machine entry — `vsavj`'s VERBATIM except
+  the ROM map, the description, and `sourcefile="capcom/cps2w.cpp"`;
+- `cores/cps2w/cfg/mame2mra.toml` gains `sourcefile=[ "cps2.cpp",
+  "cps2w.cpp" ]`, a `qsoundw` region (`skip=true` generically, a one-part
+  `parts=` byte window for `setname="vsavjw"`), and `"qsoundw"` in `order`
+  right after `"qsound"`.
+```toml
+{ name="qsoundw", skip=true },
+{ name="qsoundw", width=16, setname="vsavjw", parts=[
+    { name="vsw.21m", crc="f6c937e1", map="12", length=0x0F0000, offset=0 },
+] },
+```
+
+**B. THE MAP'S OWN TOML ROW WAS WRONG, AND WRONG SILENTLY.**
+`mister_map.md` §3 proposed one `parts=` row carrying all THREE qsound
+members. `parse_parts` puts every part of a region inside **ONE**
+`<interleave>` when `width>8` (`corerom.go:462-479`), and `interleave2rom`
+resolves each output lane to the FIRST finger claiming it
+(`mra2rom.go:238-249`) — so three members all carrying `map="12"` collapse
+to `vm3.11m` alone, truncated to the shortest finger. No error. The one
+in-tree user of `parts=` (Pang!3) has four DISJOINT maps, which is why the
+limitation had never been hit. **The fix is a SEPARATE REGION**, which also
+leaves the stock 8 MB on the generic path where it is emitted exactly as
+`cores/cps2` emits it. Corrected in place in the map, with the wrong row
+kept and labelled so it is not re-proposed.
+
+**C. THE MEASUREMENT.** `.rom` = **66,265,152 B** (63.196 MB), 843,712 B
+under the 64 MB `ioctl_addr` ceiling; header words **6144 / 6400 / 15552 /
+64704**, all < 65,536; every region start 1 KiB-aligned in `bulk_addr`
+terms. Every region compared byte-for-byte against the zips —
+key / maincpu 0x600000 / audiocpu 0x40000 / qsound+qsoundw 0x8F0000 /
+gfx 0x3000000 / firmware 0x2000 — all equal, **and the trimmed QSound region
+is a PURE TRUNCATION of the untrimmed one** (`mister_map.md` open question
+**Q2: ANSWERED YES**). QSound live to `0x8E57F0`, placed to `0x8F0000`.
+
+**D. BOTH CONTROLS FIRED, AND CONTROL A CROSS-CHECKED THE MAP.** Undo the
+trim (extension back in `qsound`, `vsw.22m` too — exactly
+`ROM_START(vsavjw)`): the image is **73,670,720 B and the firmware start is
+73,662,464 = 71,936 KiB** — which is `mister_map.md` §3's "mapped verbatim"
+table exactly, derived on paper and now reproduced by the real generator.
+**And the generator writes the WRAPPED word 6400 and says nothing** — the
+same value `qsound` carries. A `.rom` that overflows the header does not
+fail to build; it builds wrong. Control B: `length` +0x400 → the frozen
+region table fails.
+
+**E. THREE PLATFORM FINDINGS, all in `docs/platform/mister.md` "How the MRA
+and the `.rom` are made".**
+1. **jtframe locates zip members by CRC32 and by NOTHING ELSE**
+   (`mra2rom.go:163-172`). FBNeo and MAME resolve by NAME and only warn,
+   which is why our WIDE members carry SENTINEL CRCs in both drivers
+   (`dec0de41`, `dec0de3a`, …). On MiSTer a sentinel is `cannot find file …
+   in zip` and no `.rom` at all. **So the MiSTer MRA is pinned to the exact
+   bytes of one romset build** — a genuine three-way divergence, and the
+   reason `tools/gen_vsavjw_xml.py` generates the catalogue entry from the
+   zip and a gate fails when it goes stale.
+2. **The WIDE set's PARENT is the BUILD's `vsav.zip`, not the pristine
+   dump** — `build/m3b_merged13/rompath/vsav.zip` differs in
+   `vm3.13m/15m/17m/19m`. Since `jtframe mra` reads a hard-coded
+   `$HOME/.mame/roms/<name>.zip` (`mrazip.go:23`), the stock leg and the
+   WIDE leg cannot share one `$HOME`; `tools/mister_mra.sh` stages a private
+   one per run rather than writing into the user's.
+3. **`[parse] sourcefile` is the profile gate.** Tagging the entry
+   `capcom/cps2w.cpp` makes it INVISIBLE to `cores/cps2`
+   (`sourcefile=["cps2.cpp"]`, regex-matched on the basename), so the
+   reference core needed no edit at all. Measured: `jtframe mra cps2` → 316
+   MRAs, **none WIDE**; `jtframe mra cps2w` → 8.
+
+**F. THE STOCK LEG IS UNTOUCHED, now as a GATE rather than a 14z-106
+measurement:** the `vsavj` MRA from `cps2w` is byte-identical to `cps2`'s
+except `<rbf>`, `cps2` emits no WIDE MRA, and the stock `vsavj.rom` built
+from the pristine sets is **BIT-IDENTICAL** to the 14z-106 image —
+46,407,744 B, sha1 `f9dc29870c871355c5c0fa06c6ad8bea9236ba28`. (Size alone
+would not have noticed a remapped region; the gate checks the hash.)
+
+**G. WRITTEN:** `tools/gen_vsavjw_xml.py` (generates/`--check`s the
+catalogue entry from a built zip), `tools/mister_mra.sh` (the whole MRA lane
+as one idempotent command, private `$HOME`, refuses a `.rom` out-dir inside
+the repo), `tests/test_mister_mra_map.sh` (new gate, ci_static, ~15 s, five
+generator runs + two must-fire controls), `tests/ci_static.txt`. **Moved
+deliberately:** `tests/test_jtcores_twin.sh` check 2c — the declared cfg
+delta grew from "the vsav mustbe only" to the D0 set, comments and blanks
+filtered and the build CRC normalised away (that CRC is
+`test_mister_mra_map`'s job, not the twin's).
+
+**NOT DONE / STILL OPEN.** No RTL — D1 (QSound width) is next and is
+unchanged. Two things D0 surfaced that are shipping decisions, not code:
+the WIDE MRA lands in `_alternatives/` (the Euro parent is still the "main"
+MRA for the core), and a released romset cannot carry both the pristine
+`vsav.zip` and the build's under one name — the same overlay question
+`run_wide.sh` already answers for FBNeo/MAME, but the MiSTer packaging has
+not been designed. Recorded here, not guessed at.
+
 ## Session 14z-107 (4) — THE MiSTer SDRAM PLACEMENT MAP: it FITS, by
 ## **0.708 MB of 64**, but NOT the way the route was framed — "6.39 MB of
 ## tenant art into bank 1's 7.1 MB spare" is a LIVE-BYTE count against an
@@ -1332,6 +1439,30 @@ docs/project/playtest_m3a_interims.md so the report can classify against it.
 Original write-up kept below.
 
 ## Decisions pending (human)
+
+- **MiSTer PACKAGING — two questions slice D0 surfaced (14z-107 (5), NEW).**
+  Neither blocks D1-D4; both must be answered before a release.
+  1. **Which MRA is the core's MAIN one?** `jtframe mra cps2w` puts the Euro
+     `vsav` parent at `release/mra/` and everything else — including the
+     WIDE set — under `_alternatives/`. For a core whose whole purpose is
+     the WIDE set that is backwards. *Recommendation: make the WIDE MRA the
+     main one and keep the stock `vsavj` reference leg in `_alternatives/`;*
+     it is a `[parse] main_setnames` change in the fork's toml, and it moves
+     nothing in the images.
+  2. **How does a release carry BOTH `vsav.zip` flavours?** The WIDE romset
+     is a CLONE set whose parent is the BUILD's `vsav.zip` (the merged build
+     patches `vm3.13m/15m/17m/19m`), while the stock reference-leg MRA needs
+     the PRISTINE dump — and both MRAs name the parent zip `vsav.zip`. On
+     FBNeo/MAME `run_wide.sh` resolves this by OVERLAYING a rompath, a
+     runtime notion MiSTer's MRA does not have. *Options: (a) ship only the
+     WIDE MRA and drop the reference leg from the MiSTer package (it lives
+     on in the sim gate either way); (b) rename the WIDE parent to a
+     distinct set (`vsavw.zip`) via `[parse] parents`, which costs a
+     zip-name divergence from the FBNeo/MAME package; (c) make the WIDE
+     romset self-contained by carrying its own copies of the eight GFX and
+     two QSound parent members — +40 MB of zip, and it stops being a clone
+     set. Recommendation: (b), which keeps one romset directory able to feed
+     all three emulators. NOT decided; it is a distribution-shape call.*
 
 - **THE BANK-0 SLOT COUNT — a fork-surface call (14z-107 (4), NEW).** The
   placement map (`docs/project/mister_map.md` §5) puts seven consumers in

@@ -1,6 +1,40 @@
-# NEXT SESSION — orientation (rewritten at the 14z-107 (4) close, 2026-08-23)
+# NEXT SESSION — orientation (rewritten at the 14z-107 (5) close, 2026-08-23)
 
-> ## **NEWEST FIRST — 14z-107 (4): THE MiSTer SDRAM PLACEMENT MAP EXISTS
+> ## **NEWEST FIRST — 14z-107 (5): MiSTer SLICE D0 IS DONE.** The MRA that
+> ## makes the WIDE image downloadable at all is written, pushed to the fork
+> ## (`38acc638`) and gated. `rom/vsavjw.rom` = **66,265,152 B**, header
+> ## words **6144 / 6400 / 15552 / 64704** — `docs/project/mister_map.md`
+> ## §3 to the byte, verified region by region against the romset. The
+> ## stock leg is untouched and now GATED: the `vsavj` MRA from `cps2w` is
+> ## byte-identical to `cps2`'s except `<rbf>`, `cps2` emits NO WIDE MRA,
+> ## and stock `vsavj.rom` is still 46,407,744 B.
+> ## **Build it:** `ROMDIR=... tools/mister_mra.sh --core cps2w --wide
+> ## build/m3b_merged13 --out <dir OUTSIDE the repo>`.
+> ## **THREE THINGS D0 FOUND, all of which change how to work here:**
+> ## **(1) The map's own proposed TOML row was WRONG and wrong SILENTLY** —
+> ## `parts=` collapses a whole region into ONE `<interleave>`, so three
+> ## QSound members all mapping "12" become the first one truncated. The
+> ## fix is a SEPARATE `qsoundw` region (with a generic `skip=true` row, or
+> ## the stock MRAs gain a comment line and the twin breaks). Corrected in
+> ## place in §3, wrong row kept and labelled.
+> ## **(2) jtframe finds zip members by CRC32 ALONE** (`mra2rom.go:163-172`)
+> ## — FBNeo and MAME resolve by NAME and only warn, which is why our WIDE
+> ## members carry SENTINEL CRCs there. **So the MiSTer MRA is pinned to one
+> ## romset BUILD**: `tools/gen_vsavjw_xml.py` generates the fork's
+> ## catalogue entry from the zip, and a romset rebuild that moves a CRC
+> ## needs a new fork commit. `tests/test_mister_mra_map.sh` says so loudly.
+> ## **(3) The WIDE set's PARENT is the BUILD's `vsav.zip`,** not the
+> ## pristine dump (the merged build patches `vm3.13m/15m/17m/19m`), and
+> ## `jtframe mra` reads a hard-coded `$HOME/.mame/roms/` — hence the
+> ## private-`$HOME` staging in `tools/mister_mra.sh`.
+> ## **NEXT: slice D1** (the QSound width fix, `jtcps15_sound.v:47,416` +
+> ## `PCM_AW` 24) — unchanged by D0, and the first slice that touches RTL.
+> ## Two SHIPPING questions D0 surfaced, for the maintainer, in STATE
+> ## "Decisions pending": which MRA is the core's MAIN one, and how a
+> ## release carries both `vsav.zip` flavours.
+
+
+> ## **14z-107 (4): THE MiSTer SDRAM PLACEMENT MAP EXISTS
 > ## AND IT FITS, by 0.708 MB of 64.** Read `docs/project/mister_map.md`
 > ## before any MiSTer RTL. Three things in it change what earlier
 > ## entries below say:
@@ -15,7 +49,8 @@
 > ## (`jtframe_mem_ports.inc:1`) AND the 16-bit header start word. The
 > ## MRA must trim QSound to 8.9375 MB; `mra2rom.go:177-196` +
 > ## `parts=[...]` do that from the MRA alone, so the ONE-ROMSET ruling
-> ## holds. QSound is then SPLIT across SDRAM banks 0 and 1 on
+> ## holds. **DONE in D0 — but NOT with the row §3 proposed; see the
+> ## 14z-107 (5) block above.** QSound is then SPLIT across SDRAM banks 0 and 1 on
 > ## `pcm_addr[23]` — without that split the map overflows bank 1 by
 > ## 0.39 MB and nothing else closes it.
 > ## **(3) THE PRG WINDOW IS RESOLVED:** `objcfg_cs` is WRITE-ONLY

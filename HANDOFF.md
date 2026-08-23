@@ -180,12 +180,39 @@ in `emu/jtcores-patches/` as a PATCH SERIES, one file per fork commit.
 `tools/setup_jtcores.sh` checks the pin, inits the five modules the cps2
 yaml chain pulls, builds jtframe's Go tool and regenerates the series;
 `tests/test_jtcores_twin.sh` (ci_portable) locks pin, twin and series.
-**No RTL differs yet** — the two fork commits are `b9d0565` (the `cps2w`
-cfg scaffold) and `553dd56` (`JTFRAME_SIM_WRAMDUMP`, a 64-line macro-gated
-hook in the Verilator TESTBENCH `modules/jtframe/hdl/ver/test.cpp`). The
-stock-vsavj reference-leg MRA is produced by `jtframe mra cps2w`
-(byte-identical to stock cps2's except `<rbf>`). The fit numbers are in
-`docs/project/mister_fit.md`.
+**No RTL differs yet** — the SIX fork commits are `b9d0565` (the `cps2w` cfg
+scaffold), four Verilator-TESTBENCH fixes (`553dd56` `JTFRAME_SIM_WRAMDUMP`,
+`6c32be8` the SDRAM model's dropped top address bit, `4f25cc7` the model
+clock, `74ed17d` raw SDRAM stats) and `38acc638` (**slice D0**: the `vsavjw`
+machine entry in `doc/mame.xml` + the QSound trim in
+`cores/cps2w/cfg/mame2mra.toml`). The stock-vsavj reference-leg MRA is
+produced by `jtframe mra cps2w` (byte-identical to stock cps2's except
+`<rbf>` — now gated, not just measured). The fit numbers are in
+`docs/project/mister_fit.md`; the placement map is
+`docs/project/mister_map.md`.
+
+**BUILDING THE MRAs AND THE `.rom` (slice D0, 14z-107 (5)):**
+
+```sh
+export ROMDIR=/path/to/reference/sets
+tools/mister_mra.sh --core cps2w --wide build/m3b_merged13 --out /tmp/mra107
+#   -> /tmp/mra107/vsavjw.rom  66,265,152 B  (the WIDE download image)
+tools/mister_mra.sh --core cps2w --out /tmp/mra107stock   # the stock leg
+#   -> /tmp/mra107stock/vsavj.rom  46,407,744 B
+tools/mister_mra.sh --core cps2w --no-rom --out /tmp/mraonly   # MRAs only
+```
+
+`--wide` is not cosmetic: the WIDE romset is a CLONE set whose parent is the
+BUILD's `vsav.zip` (the merged build patches `vm3.13m/15m/17m/19m`), while
+the stock leg needs the pristine dump — and `jtframe mra` reads a hard-coded
+`$HOME/.mame/roms/<name>.zip`, so the tool stages a PRIVATE `$HOME` per run.
+`.rom` files are ROM content: `--out` inside the repo is refused (rule 7).
+**And the MiSTer MRA is pinned to ONE romset build's CRCs** — jtframe
+resolves zip members by CRC32 alone, unlike FBNeo/MAME which resolve by name
+and only warn (which is why the WIDE members carry sentinel hashes there).
+`tools/gen_vsavjw_xml.py <zip> --check emu/jtcores/doc/mame.xml` says whether
+the fork's entry is the current build's; a rebuild that moves a CRC needs a
+new fork commit.
 
 **THE MEMORY MAP, corrected 14z-107 (2) — read this before sizing any RTL.**
 The PROFILE ruling (WIDE v1 verbatim, one romset) stands; the implementation
@@ -252,6 +279,7 @@ see `docs/platform/gotchas.md` "`jtsim -verilator -stats` reports nothing".
 | `tests/test_rpl2siminputs.sh` | ci_portable | `.rpl` -> `sim_inputs.hex` bit map, frozen translation, refusals |
 | `tests/audit_sdram_bank_load.sh` | **manual/emulator (~65 min)** | the per-bank SDRAM traffic profile of stock `vsavj` (ACTIVE counts, share, kiB/s, same-row hit rate and mean run, clash warnings) split into attract / select / in-match — the evidence for the MiSTer BANK REPACK ruling. `--log FILE` re-analyses `build/sdram_bank_load_14z107.log` offline |
 | `tests/audit_mister_map_fit.sh` | ci_static (~5 s) | the SDRAM PLACEMENT MAP fits the 64 MB tier by 0.708 MB, and the four extents it rests on are frozen: group-C obj bank 4 ceiling `0xEE73`, obj bank 5 ceiling `0xFFDB`, QSound live `0x8E57F0`, PRG live `0x5FFF1E`. Also checks the `.rom` against the 26-bit `ioctl_addr` and the 16-bit header words. Re-checks the "tile code IS its SDRAM address" scramble identity §1 rests on. THREE must-fire controls (untrimmed QSound must be rejected; +1 MB of obj-bank-5 must overflow bank 0; the identity must fail without the scramble). Design: `docs/project/mister_map.md` |
+| `tests/test_mister_mra_map.sh` | ci_static (~15 s) | **SLICE D0**: the WIDE `.rom` is EXACTLY `mister_map.md` §3 — 66,265,152 B, header words 6144/6400/15552/64704, every region 1 KiB-aligned and byte-for-byte the romset's, the trimmed QSound region a PURE truncation. Also: the stock `vsavj` MRA from `cps2w` == `cps2`'s except `<rbf>`, `cps2` emits NO WIDE MRA (the `cps2w.cpp` sourcefile gate), stock `vsavj.rom` still BIT-IDENTICAL (46,407,744 B, sha1 `f9dc2987…`), and the fork's catalogue entry names the CURRENT build's CRCs. TWO must-fire controls: untrimmed -> 73,670,720 B / `qsnd_start` 71,936 KiB (and the generator SILENTLY writes the wrapped word); `length` +0x400 -> the frozen table fails |
 | `tests/test_mister_sim_anchor.sh` | **manual/emulator (~50 min)** | THE ORACLE: MAME and jtcps2 agree on every mapped §4 field at the round-1 match-start anchor of `05_timeout_idle` (MAME **2146** / sim **2502**, skew **356 ± 30** — re-measured 14z-107 (3) on the fixed SDRAM model; it was 2507/361 on the broken one, and 2606/460 before that, which was the BOOT offset rather than the anchor. The gate freezes 2146/356 at `:87-89`); asserts the dump window is NON-CONSTANT first, then the byte-swap and hook-inertness controls |
 
 ## Running a CPS-2 WIDE build (playtest)

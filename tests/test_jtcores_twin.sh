@@ -4,12 +4,13 @@
 #
 # WHAT IT LOCKS (ROM-free, no emulator, seconds; ci_portable):
 #  1. emu/jtcores sits at the pin tools/setup_jtcores.sh names.
-#  2. cores/cps2w/cfg is cores/cps2/cfg modulo EXACTLY the lines the
-#     scaffold is allowed to change: CORENAME in macros.def, the mustbe
-#     block in mame2mra.toml, and the msg banner. game.yaml (the RTL pull
-#     list) must be IDENTICAL — that is what makes "no RTL differs yet"
-#     true by construction, and any later RTL override must move this gate
-#     deliberately.
+#  2. cores/cps2w/cfg is cores/cps2/cfg modulo EXACTLY the lines the core is
+#     DECLARED to change (check 2c carries the list verbatim): CORENAME in
+#     macros.def, and in mame2mra.toml the `vsav` mustbe, the cps2w.cpp
+#     sourcefile opt-in and the `qsoundw` trim region of slice D0. game.yaml
+#     (the RTL pull list) must be IDENTICAL — that is what makes "no RTL
+#     differs yet" true by construction, and any later RTL override must move
+#     this gate deliberately.
 #  3. emu/jtcores-patches/ reproduces the fork's commits as a PATCH SERIES,
 #     byte-for-byte: file i == `git format-patch -1 <i-th commit after
 #     v1.7.3>`, the directory holds EXACTLY the declared names, and the
@@ -34,8 +35,26 @@ A="$SRC/cores/cps2/cfg"; B="$SRC/cores/cps2w/cfg"
 cmp -s "$A/game.yaml" "$B/game.yaml" && ok "2a game.yaml identical (no RTL override)" || bad "2a game.yaml differs"
 d="$(diff "$A/macros.def" "$B/macros.def" | grep '^[<>]' | tr '\n' '|')"
 [ "$d" = "< CORENAME=JTCPS2|> CORENAME=JTCPS2W|" ] && ok "2b macros.def differs by CORENAME only" || bad "2b macros.def delta: $d"
-d="$(diff "$A/mame2mra.toml" "$B/mame2mra.toml" | grep '^[<>]' | grep -v '^> #' | tr '\n' '|')"
-[ "$d" = '> mustbe.machines=[ "vsav" ]|' ] && ok "2c mame2mra.toml differs by the vsav mustbe only" || bad "2c mame2mra.toml delta: $d"
+# 2c THE DECLARED cfg DELTA. Comments and blank lines on the cps2w side are
+# filtered out (prose is meant to be edited); every SUBSTANTIVE line is frozen
+# below, so a region row, an order entry or a parse key that nobody declared
+# fails here. The `parts=` CRC is normalised away on purpose — it is the built
+# romset's identity, not the core's structure, and tests/test_mister_mra_map.sh
+# is what checks it is the CURRENT build's. MOVED DELIBERATELY 14z-107 (5)
+# when slice D0 added the MiSTer QSound trim; it was "the vsav mustbe only".
+d="$(diff "$A/mame2mra.toml" "$B/mame2mra.toml" | grep '^[<>]' \
+     | grep -v '^> *#' | grep -v '^> *$' | sed 's/crc="[0-9a-f]*"/crc="<build>"/')"
+want='< sourcefile=[ "cps2.cpp" ]
+> sourcefile=[ "cps2.cpp", "cps2w.cpp" ]
+> mustbe.machines=[ "vsav" ]
+>     { name="qsoundw", skip=true },
+>     { name="qsoundw", width=16, setname="vsavjw", parts=[
+>         { name="vsw.21m", crc="<build>", map="12", length=0x0F0000, offset=0 },
+>     ] },
+<     "audiocpu", "qsound",
+>     "audiocpu", "qsound", "qsoundw",'
+if [ "$d" = "$want" ]; then ok "2c mame2mra.toml delta is exactly the declared D0 set"
+else bad "2c mame2mra.toml delta drifted:"; printf '%s\n' "$d" | sed 's/^/       /'; fi
 [ -f "$B/msg" ] && ok "2d msg present" || bad "2d msg missing"
 
 NAMES="$(sed -n 's/^PATCH_NAMES="\(.*\)".*/\1/p' "$REPO/tools/setup_jtcores.sh")"

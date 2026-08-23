@@ -395,11 +395,16 @@ is a GAME gotcha if it is true of the game regardless of the port.
   tiles where the canonical `tools/gfx_tiles.py` gives the frozen
   418/2917/51/642. **Reproduce a number somebody already measured before
   trusting a new address map.**
-- **14z-107 (platform):** jtframe's MRA generator — `rom_len` smaller than
-  the file truncates the bytes but still advances `pos` by the full size,
-  desynchronising every later header word (use `parts=` to shorten); and on
-  CPS-2 the generator's `pos` counts the 20-byte key while the RTL's
-  `bulk_addr` does not, so header words are correct **only** while every
-  region start is 1 KiB-aligned. Ceilings: the GAME-side `ioctl_addr` is
-  `[25:0]` = 64 MB even though the MiSTer target has 27 bits, and each
-  header start word is 16 bits in KiB units.
+- **14z-107 (platform), extended 14z-107 (5):** jtframe's MRA generator has
+  FOUR silent traps — `rom_len` smaller than the file truncates the bytes but
+  still advances `pos` by the full size (use `parts=` to shorten); on CPS-2
+  the generator's `pos` counts the 20-byte key while the RTL's `bulk_addr`
+  does not, so header words are correct **only** while every region start is
+  1 KiB-aligned; `parts=` collapses a whole region into ONE `<interleave>`,
+  so it can only express a multi-member 16-bit region if the maps are
+  disjoint; and a region start too big for the 16-bit header word is written
+  **wrapped**, silently. Plus: `mra2rom` finds zip members by **CRC32 alone**
+  — unlike FBNeo/MAME, which resolve by name and only warn — so sentinel CRCs
+  produce no `.rom` at all. Ceilings: the GAME-side `ioctl_addr` is `[25:0]`
+  = 64 MB even though the MiSTer target has 27 bits, and each header start
+  word is 16 bits in KiB units.

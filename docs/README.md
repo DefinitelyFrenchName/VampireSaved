@@ -36,7 +36,7 @@ Entry points at this level, deliberately not in a bucket:
 - [`gotchas.md`](game/gotchas.md) — traps in the game itself
 
 **`platform/`**
-- [`mister.md`](platform/mister.md) — the jtcps2 core (jtcores fork, bus widths, the SDRAM ceiling at our pin vs upstream's 128 MB XL tier, the CPS-2 core's own format caps, the simulation lane, and the work-RAM oracle `JTFRAME_SIM_WRAMDUMP`)
+- [`mister.md`](platform/mister.md) — the jtcps2 core (jtcores fork, bus widths, the SDRAM ceiling at our pin vs upstream's 128 MB XL tier, the CPS-2 core's own format caps, the simulation lane, the work-RAM oracle `JTFRAME_SIM_WRAMDUMP`, and how the MRA and the `.rom` download image are actually generated)
 - [`gotchas.md`](platform/gotchas.md) — traps in CPS-2 and the emulators
 
 **`project/`**
@@ -56,7 +56,8 @@ Entry points at this level, deliberately not in a bucket:
 - [`mister_map.md`](project/mister_map.md) — the MiSTer SDRAM PLACEMENT MAP:
   which region lands in which bank at which offset and why it fits, the
   `.rom` layout against the 26-bit `ioctl_addr`, the QSound split, the 6 MB
-  PRG decode proposal, and the RTL slice plan D0-D4
+  PRG decode proposal, and the RTL slice plan D0-D4 (**D0 done 14z-107 (5)**
+  — the MRA trim, with §3's proposed TOML row corrected in place)
 - `tenant_manifest.md`, `tables/` — port config; community-reviewable
   behavioural tables
 - `M1_acceptance.md`, `M2_feasibility.md`, `M3b_plan.md` — milestones

@@ -1284,10 +1284,10 @@ Two consequences that are easy to get wrong, and both were:
    address map is worth nothing until it reproduces a number somebody already
    measured.** Run the known census first, then trust the derivation.
 
-## jtframe `mame2mra`: `rom_len` cannot SHRINK, and region starts must be 1 KiB-aligned (14z-107)
+## jtframe `mame2mra`: four silent traps in the MRA generator (14z-107, extended 14z-107 (5))
 
-Two traps in the MRA generator (`modules/jtframe/src/jtframe/mra/`), both
-silent:
+Four traps in the MRA generator (`modules/jtframe/src/jtframe/mra/`), every
+one of them silent — the `.rom` builds, it is just wrong:
 
 - **`rom_len` smaller than the file truncates the emitted bytes but still
   advances `pos` by the FULL file size** (`corerom.go:562-577` — the option
@@ -1302,6 +1302,41 @@ silent:
   `bulk_addr[25:10]`; the two agree **only because 20 < 1024 and every region
   start is 1 KiB-aligned**. A CPS-2 region that starts at a non-1 KiB body
   offset puts its header word off by one KiB block, with no warning.
+
+- **`parts=` collapses a multi-member region into ONE `<interleave>`**
+  (added 14z-107 (5)). `parse_parts` opens a single `<interleave
+  output=W>` when `width>8` and hangs every part off it (`corerom.go:462-479`);
+  `interleave2rom` then binds each output byte lane to the FIRST finger whose
+  map claims it and stops when the SHORTEST finger runs out
+  (`mra2rom.go:238-249`). So `parts=` can express a multi-member 16-bit
+  region only if the members' maps are DISJOINT. Three CPS-2 QSound members
+  all carrying `map="12"` silently become the first one, truncated. (The one
+  in-tree user, Pang!3 at `cores/cps1/cfg/mame2mra.toml:165-173`, has four
+  disjoint 64-bit lanes, which is why nobody had hit this.) The way out is
+  one REGION per differently-mapped group — and give the extra region a
+  generic `{ name=…, skip=true }` row, because **a region with no config at
+  all still emits its `<!-- … starts at … -->` comment**, which is enough to
+  break a byte-identity twin.
+- **An oversized region start is written WRAPPED, with no warning** (added
+  14z-107 (5)). `set_header_offset` stores the low 16 bits of `start >> 10`.
+  Measured on an untrimmed CPS-2 WIDE image: a firmware start of 71,936 KiB
+  came out as **6400** — the same value the `qsound` word carried. Nothing
+  in the tool checks the ceiling.
+- **`mra2rom` locates zip members by CRC32 and by NOTHING ELSE** (added
+  14z-107 (5)). `mra2rom.go:163-172` walks the zips comparing `file.CRC32`;
+  the `name` attribute appears only in the warning text. **This diverges
+  from FBNeo and MAME**, which resolve by NAME and merely warn on a hash
+  mismatch — so a driver that uses SENTINEL CRCs for authored members (as
+  this project's WIDE profile does) works there and produces NO `.rom` here.
+  An MRA is pinned to the exact bytes of one romset build.
+
+Two more facts about where the tool reads and writes: the zip search path is
+a hard-coded `$HOME/.mame/roms/<name>.zip` (`mrazip.go:23`, no flag), so the
+output is a function of the invoking user's home directory — stage a private
+`$HOME` rather than writing into the real one. And a set must exist in
+`$JTROOT/doc/mame.xml`, jtframe's own REDUCED machine catalogue (not a MAME
+`-listxml` dump); `[parse] sourcefile` is a REGEX list matched against that
+entry's basename, which makes it a usable per-core profile gate.
 
 Related hard ceilings worth knowing before sizing a `.rom`: the GAME-side
 port is `input [25:0] ioctl_addr` (**64 MB**,

@@ -117,3 +117,12 @@ test_release_roundtrip
 # the built WIDE romset + manifests (build/m3b_merged13 by default,
 # MAP_FIT_BUILD to override), no emulator. docs/project/mister_map.md
 audit_mister_map_fit
+
+# 14z-107 (5): MiSTer slice D0 — the MRA that TRIMS the WIDE image so it can be
+# downloaded at all. Runs the real jtframe generator over the real romset and
+# asserts the .rom is byte-for-byte the placement map's, that the stock vsavj
+# MRA is still the reference core's twin, and that cores/cps2 cannot see the
+# WIDE set. Two must-fire controls (untrimmed => overflow; +1 KiB => table
+# breaks). Needs emu/jtcores, go and ROMDIR; ~15 s.
+# docs/project/mister_map.md §3, docs/platform/mister.md
+test_mister_mra_map

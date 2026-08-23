@@ -11,6 +11,16 @@ the profile itself is `docs/project/cps2_wide.md`.
 four things hold at once.** It does not fit the way the route was framed.
 See §1 for the correction, §5 for the map, §9 for what is still open.
 
+**SLICE D0 IS DONE (14z-107 (5)) AND THE MAP SURVIVED IT.** The MRA that
+trims the image is written, the fork carries it (commit `38acc638`), and the
+`.rom` it produces is **exactly** the §3 table — 66,265,152 B with header
+words 6144 / 6400 / 15552 / 64704 — verified region by region against the
+romset rather than recomputed. The §3 "mapped verbatim" numbers were
+reproduced too, by the control: 73,670,720 B and a 71,936 KiB start word.
+The stock `vsavj.rom` is BIT-IDENTICAL to the 14z-106 image (sha1
+`f9dc2987…`). Nothing in the map moved. What DID change is §3's proposed TOML row, which
+was wrong in a way that fails silently — corrected in place there.
+
 ---
 
 ## 0. The one-paragraph answer
@@ -103,7 +113,10 @@ only the MRA honours it. Read from
   which bypasses MAME's file list entirely; it is already used in-tree to
   map the SAME file twice at two offsets (`cores/cps1/cfg/mame2mra.toml:165-173`,
   Pang!3). `splits`, `singleton`, the automatic interleave chunker and
-  `rom_len` are the other four.
+  `rom_len` are the other four. **QUALIFIED 14z-107 (5): `parts=` puts every
+  part of a region inside ONE `<interleave>` when `width>8`, so it can only
+  express a MULTI-member 16-bit region if the members' maps are disjoint —
+  which for CPS-2 QSound they are not. See §3.**
 - **Region configs are per-setname.** `RegCfg` embeds `Selectable`
   (`types.go:83`) and `find_region_cfg` (`corerom.go:390-412`) scores
   setname 3 / cloneof 2 / generic 1 — so a `{ name="qsound", setname="vsavjw",
@@ -185,29 +198,98 @@ boundary, and is 1 KiB-aligned as §2 requires.
 - file size = 44 + 20 + 66,265,088 = **66,265,152 B = 63.196 MB**, i.e.
   843,712 B (0.80 MB) under the 64 MB `ioctl_addr` ceiling.
 - every header word < 65,536 ✔ ; every region start is 1 KiB-aligned ✔ .
+- **MEASURED, not derived: this is byte-for-byte the `.rom` slice D0
+  produces** (`tests/test_mister_mra_map.sh`). In the MRA the QSound row
+  above is TWO adjacent regions, `qsound` (8 MB) then `qsoundw`
+  (`0xF0000`) — only `qsound`'s start reaches the header, so the RTL sees
+  the single 8.9375 MB region this table describes.
 
-### The QSound trim, concretely
+### The QSound trim, concretely — **AS BUILT, slice D0 landed 14z-107 (5)**
 
 The QSound region is `{ name="qsound", width=16, reverse=true }`
 (`mame2mra.toml:97`). Members: `vm3.11m` + `vm3.12m` (stock, 4 MB each) then
-the profile's `vsw.21m` + `vsw.22m` (4 MB each, sentinel CRCs
-`0xdec0de3a/3b`). `vsw.22m` is empty and `vsw.21m` is live only to
-`0xE57F0`. The WIDE-set row becomes:
+the profile's `vsw.21m` + `vsw.22m` (4 MB each). `vsw.22m` is empty and
+`vsw.21m` is live only to `0xE57F0`.
+
+**CORRECTED 14z-107 (5) — the row this section originally proposed does not
+work, and it fails SILENTLY.** It read:
 
 ```toml
+# WRONG — kept so it is not re-proposed. Do not use.
 { name="qsound", width=16, setname="vsavjw", parts=[
     { name="vm3.11m", crc="…", map="12", length=0x400000, offset=0 },
     { name="vm3.12m", crc="…", map="12", length=0x400000, offset=0 },
-    { name="vsw.21m", crc="dec0de3a", map="12", length=0x0F0000, offset=0 },
+    { name="vsw.21m", crc="…",  map="12", length=0x0F0000, offset=0 },
 ] },
 ```
+
+`parse_parts` puts **every** part of a region inside **one**
+`<interleave output="16">` when `width > 8` (`corerom.go:462-479`), and
+`interleave2rom` then resolves each output byte lane to the FIRST finger
+whose map claims it (`mra2rom.go:238-249`). Three members that all carry
+`map="12"` therefore collapse to `vm3.11m` alone, truncated to the shortest
+finger — 0xF0000 bytes of the wrong file, no error. (The one in-tree user of
+`parts=`, Pang!3 at `cores/cps1/cfg/mame2mra.toml:165-173`, has four
+DISJOINT maps, which is why the limitation had never been hit.)
+
+**What shipped instead: the extension gets its OWN REGION.** The stock 8 MB
+stays on the generic path, where it is emitted exactly as `cores/cps2` emits
+it, and the trimmed member sits alone in a region where a single-part
+`parts=` is correct:
+
+```toml
+{ name="qsoundw", skip=true },                       # every other set
+{ name="qsoundw", width=16, setname="vsavjw", parts=[
+    { name="vsw.21m", crc="f6c937e1", map="12", length=0x0F0000, offset=0 },
+] },
+```
+with `"qsoundw"` inserted into `order` immediately after `"qsound"`. The
+generic `skip=true` row is what keeps every stock MRA byte-identical: a
+region with NO config at all is not skipped — it still emits its
+`<!-- qsoundw - starts at 0x… -->` comment node into every MRA, which is
+enough on its own to break the twin.
 
 `vsw.22m` is simply not mapped; it stays in the romset for FBNeo and MAME.
 `map="12"` is the reversed 16-bit map string the generic path produces for a
 `wlen=2` member under `reverse=true` (`corerom.go:911-947` builds `"21"`,
 `:842-857` reverses it) — **`parse_parts` does not apply `Reverse`, so the
-TOML must spell the final map**. Confirming that byte-for-byte is open
-question Q2 (§9).
+TOML must spell the final map**.
+
+**Q2 (§9) IS ANSWERED, MEASURED:** the trimmed region is a byte-for-byte
+PURE TRUNCATION of the untrimmed one, and every other region of the produced
+`.rom` equals the zips' content exactly. `tests/test_mister_mra_map.sh`
+re-checks all of it.
+
+### Three things D0 found that the design above did not know
+
+1. **jtframe locates zip members by CRC32 and by NOTHING ELSE**
+   (`mra2rom.go:163-172` — it walks the zips comparing `file.CRC32`, with no
+   fallback to the name). FBNeo and MAME resolve by NAME and only warn on a
+   hash mismatch, which is exactly why the WIDE members carry SENTINEL CRCs
+   in both drivers (`vsw.41` = `dec0de41`, `vsw.21m` = `dec0de3a`, …). On
+   MiSTer a sentinel is not a warning: it is `Warning: cannot find file … in
+   zip` and no `.rom` at all. **So the MiSTer leg — unlike the other two —
+   is pinned to the CRCs of one built romset**, and a rebuild that moves one
+   must move the fork's catalogue entry and the `parts=` row with it.
+   `tools/gen_vsavjw_xml.py` regenerates the entry from a zip and
+   `tests/test_mister_mra_map.sh` fails if it is stale.
+2. **The WIDE set's PARENT is the BUILD's `vsav.zip`, not the pristine
+   dump.** `build/m3b_merged13/rompath/vsav.zip` differs from `$ROMDIR`'s in
+   `vm3.13m/15m/17m/19m` (the option-B tenant art inside vanilla's own
+   32 MB), and `run_wide.sh` overlays it the same way for FBNeo and MAME.
+   Since `jtframe mra` reads a HARD-CODED `$HOME/.mame/roms/<name>.zip`
+   (`mrazip.go:23`), the stock leg and the WIDE leg cannot share one `$HOME`
+   — `tools/mister_mra.sh` stages a PRIVATE one per run rather than writing
+   into the user's.
+3. **`jtframe mra` needs the set to exist in `doc/mame.xml`**, which is
+   jtframe's own reduced machine catalogue, not a MAME dump. The `vsavjw`
+   entry added to the fork is `vsavj`'s verbatim except for the ROM map, the
+   description and `sourcefile="capcom/cps2w.cpp"` — and that tag is the
+   PROFILE GATE: `cores/cps2` parses `sourcefile=["cps2.cpp"]`, which does
+   not match it, so the reference core cannot see the WIDE set at all.
+   Measured: `jtframe mra cps2` → 316 MRAs, none WIDE; `jtframe mra cps2w`
+   → 8, and the stock `vsavj` MRA is still byte-identical to `cps2`'s except
+   `<rbf>`.
 
 **This does not violate the profile.** `cps2_wide.md` requires QSound length
 to stay a power of two because *FBNeo* does `rom_mask = nCpsQSamLen - 1`.
@@ -324,6 +406,12 @@ at the top).
 ### The two moves that make it fit, stated plainly
 
 1. **The QSound region is SPLIT across two SDRAM banks on `pcm_addr[23]`.**
+   *(D0 note, 14z-107 (5): the shipped MRA splits the region in TWO for the
+   generator's sake — `qsound` then `qsoundw` — but they are adjacent and
+   only `qsound`'s start goes in the header, so the RTL sees ONE region of
+   0x8F0000 bytes and the extension lands at `pcm_addr` `0x800000`-`0x8EFFFF`,
+   i.e. exactly `pcm_addr[23] = 1`. The split bit below works against the
+   image D0 actually produces.)*
    DSP sample banks `0x00-0x7F` (the stock 8 MB) stay at bank 1 offset 0 —
    *byte-identical to stock jtcps2* — and banks `0x80+` (the WIDE extension,
    which is the part the profile added) go to bank 0. This is not cosmetic:
@@ -505,9 +593,12 @@ slice as the decode.
    accesses/frame = 32.9% of its all-miss ceiling, and the select+VS phase
    adds up to ~12k obj accesses/frame. Unmeasured. The instrument exists; it
    needs a `cps2w` core carrying the map.
-2. **Does `parts=` with `map="12"` reproduce the untrimmed qsound region
-   byte-for-byte?** The trim must be a pure truncation. Provable before any
-   RTL: generate both MRAs and diff the leading bytes of the `.rom`.
+2. ~~**Does `parts=` with `map="12"` reproduce the untrimmed qsound region
+   byte-for-byte?**~~ **ANSWERED YES, 14z-107 (5), and it cost a design
+   change on the way.** `parts=` on the WHOLE qsound region does not work at
+   all (§3, corrected in place); with the extension split into its own
+   `qsoundw` region the single-part window IS a pure truncation, measured
+   byte-for-byte against the zip. Gate `tests/test_mister_mra_map.sh`.
 3. **Does `dsp_ab[7]` actually carry sample-bank bit 7 in the real
    `dl-1425.bin` program?** The width fix assumes it. Must-fire control: a
    sample placed at bank `0x80` must play the extension content, not bank
@@ -562,7 +653,7 @@ self-contained piece. Two changes:
 
 | # | scope | smallest thing that proves it | must-fire control | superset leg |
 |---|---|---|---|---|
-| **D0** | `cores/cps2w/cfg/mame2mra.toml`: the `vsavjw` region rows (QSound `parts` trim). **No RTL.** | Generate the MRA + `.rom` for the WIDE set: file size < 64 MB, all four header words < 65,536, every region start 1 KiB-aligned, and each word equals the §3 table. | Restore the untrimmed row → generation must produce a `qsnd_start` that does **not** fit 16 bits (i.e. the gate must be able to fail). | `test_jtcores_twin`: the stock `vsavj` MRA from `cps2w` stays byte-identical to stock `cps2`'s except `<rbf>`. |
+| **D0 — DONE 14z-107 (5)**, fork commit `38acc638` | `cores/cps2w/cfg/mame2mra.toml`: the `qsoundw` trim region + the `cps2w.cpp` sourcefile opt-in, and the `vsavjw` entry in `doc/mame.xml`. **No RTL.** | DONE: `rom/vsavjw.rom` = **66,265,152 B**, header words **6144 / 6400 / 15552 / 64704**, every region start 1 KiB-aligned, every region byte-for-byte the romset's. | BOTH FIRED. (A) untrimmed → 73,670,720 B and `qsnd_start` 71,936 KiB, and the generator **silently writes the wrapped word 6400**. (B) `length` +0x400 → the frozen table fails. | HELD: stock `vsavj` MRA from `cps2w` is byte-identical to `cps2`'s except `<rbf>`, `cps2` emits **no** WIDE MRA at all, and stock `vsavj.rom` is still 46,407,744 B. Gates `test_jtcores_twin` + `test_mister_mra_map`. |
 | **D1** | QSound width: `jtcps15_sound.v:47,416` (`qsnd_addr[23:0]`, latch `[7:0]`) + `PCM_AW` 24. No format change, no placement change. | A sim run of a replay that triggers an M5 voice from DSP bank `0x80` fetches from PCM byte `0x800000`, not `0x000000`. | The same run on the *unfixed* core must fetch `0x000000` — the aliasing defect reproduced as a fixture (this is what makes the pass mean something). | anchor gate unchanged on stock `vsavj`. |
 | **D2** | Placement: bank-0 offsets re-packed for PRG 6 MB, the group-C redirect in `jtcps1_prom_we`, the QSound bank split, the two new GFX slots + the PCM-high slot, `jtframe_ram1_7slots`. | An SDRAM image census after download: dump all four banks and assert every region begins at its §5 offset, that banks 2+3 are **byte-identical to the stock `cps2` core's** on the same romset, and that the group-C obj banks are non-zero where the manifests say tiles are. | Perturb one offset constant by 1 KiB → the census must fail. And: zero-fill group C in the romset → banks 2+3 must still be byte-identical (isolates the redirect from the content). | anchor gate unchanged on stock `vsavj`; banks 2+3 byte-identical is itself the structural leg. |
 | **D3** | The obj promote: `jtcps2_obj_scan.v:152` `st3_bank <= {table_y[12], table_y[14:13]}` (the CPS-2 Turbo rule, applied *after* the `:141` terminator check), `dr_bank`/`obj_bank`/`rom_bank`/`rom0_bank` widened to 3 bits, `rom0_bank[2]` routed to the group-C slots. | **The MiSTer twin of the FBNeo B4 canary**: a test-only flag that ORs `0x1000` into the y-word of bank-2/3 sprites, with group C loaded as a byte copy of group B, running the STOCK rom. Work RAM is bit-identical by construction; the *frames* must be pixel-identical. | Zero-fill group C → the frames must DIFFER. (`cps2_wide.md` records that FBNeo's first attempt passed this test vacuously because the member never arrived; the control is the whole point.) | RAM identity is guaranteed by the canary design; the anchor gate still runs. |

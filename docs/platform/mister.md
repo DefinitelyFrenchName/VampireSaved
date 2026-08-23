@@ -22,7 +22,7 @@ field test. Distribution = MRA + RBF over the same release members as
 |---|---|
 | the fork | https://github.com/DefinitelyFrenchName/jtcores, branch `vampire-saved`, from upstream tag `v1.7.3` = `63688ce5` |
 | pinned here | submodule `emu/jtcores` (branch `vampire-saved`); `tools/setup_jtcores.sh` checks the pin, inits the five modules the cps2 yaml chain pulls, and regenerates `emu/jtcores-patches/` as a PATCH SERIES, one file per fork commit (`modules/jtframe/target/pocket` is a PRIVATE ssh submodule — never init it) |
-| the fork's commits | `b9d0565` `cores/cps2w` scaffold (14z-106) · `553dd56` `jtframe/sim: optional work-RAM dumps out of the Verilator SDRAM model` (14z-107). No RTL touched by either |
+| the fork's commits | `b9d0565` `cores/cps2w` scaffold (14z-106) · `553dd56` sim work-RAM dumps · `6c32be8` sim SDRAM top address bit · `4f25cc7` sim model clock · `74ed17d` sim SDRAM stats · `38acc638` **the WIDE machine entry + the MANDATORY QSound trim in the MRA** (14z-107 (5), slice D0). **No RTL touched by any of them.** The mirrored series is `emu/jtcores-patches/0001`-`0006` |
 | the new core | `cores/cps2w/` in the fork → RBF `jtcps2w.rbf` (jtframe names the RBF `"jt" + <core dir>`; `CORENAME=JTCPS2W` is what the MRA's `<rbf>` is matched against, upper-cased) |
 | the reference core | `cores/cps2/` — untouched, by design |
 | jtframe | `modules/jtframe` is VENDORED in the jtcores tree at v1.7.3 (not a submodule); its Go tool builds with `cd modules/jtframe/src/jtframe && go build -o jtframe .` (Go ≥ 1.2x; `brew install go`). The `bin/jtframe` wrapper uses GNU `date -d` / `stat -c` and needs coreutils on macOS — call the built binary directly instead |
@@ -359,7 +359,13 @@ blocked only by bank PLACEMENT — is worked out in
    and `PATH=<gnubin dirs>:$PATH:.:$JTFRAME/bin`.
 5. `jtframe mra cps2w` (binary at `$JTFRAME/src/jtframe/jtframe`) → the
    MRAs in `release/mra/` AND `rom/vsavj.rom` (46,407,744 bytes, sha1
-   `f9dc2987…`) — the `.rom` is ROM content: scratch only.
+   `f9dc2987…`) — the `.rom` is ROM content: scratch only. **Since
+   14z-107 (5) do not do this by hand either:** `ROMDIR=...
+   tools/mister_mra.sh --core cps2w [--wide build/m3b_merged13] --out <dir
+   outside the repo>` does the clone, the private `$HOME` staging and the
+   run, and prints the size + sha1 of every `.rom` it makes. `--wide` is
+   what selects the BUILD's `vsav.zip` as the parent instead of the pristine
+   one; without it you get the stock reference leg.
 6. First run, from `cores/cps2/ver/game`:
    `jtsim -verilator -sysname cps2 -setname vsavj -load -video 3` —
    Verilator builds the core and the ROM download runs in simulated time
@@ -662,6 +668,78 @@ Vampire Savior family only (Euro parent + Japan/USA/Asia/Brazil/Hispanic
 + the Phoenix bootleg). The `vsavj` MRA from the two cores is
 BYTE-IDENTICAL except `<rbf>jtcps2</rbf>` → `<rbf>jtcps2w</rbf>` (diff
 shown in STATE 14z-106 (3)). Gate: `tests/test_jtcores_twin.sh`.
+**Since 14z-107 (5) `cps2w` emits EIGHT** — the WIDE set joined the family —
+and the twin claim above is now a live gate rather than a one-off
+measurement: `tests/test_mister_mra_map.sh` re-generates both cores' MRAs
+and diffs them.
+
+## HOW THE MRA AND THE `.rom` ARE MADE (measured 14z-107 (5))
+
+Everything here was learned building the WIDE download image
+(`docs/project/mister_map.md` slice D0). It is platform behaviour, true of
+any core.
+
+- **A set must exist in `$JTROOT/doc/mame.xml`** — jtframe's own REDUCED
+  machine catalogue, committed in the repo, not a MAME `-listxml` dump.
+  `jtframe mra` streams it (`mamegame.go:167-250`) and everything else keys
+  off what it finds there. A romset with no machine entry produces no MRA,
+  whatever the TOML says. **Hazard worth naming: that catalogue is a
+  GENERATED file upstream** (`jtframe mra --reduce <mame.xml>`), so a future
+  uprev or regeneration can drop an entry we added. Nothing warns; the MRA
+  simply stops being emitted. `tests/test_mister_mra_map.sh` fails with
+  "cores/cps2w did not emit the WIDE MRA at all" if that happens, and
+  `tools/gen_vsavjw_xml.py` re-emits the entry.
+- **`[parse] sourcefile` is a REGEX list matched against
+  `filepath.Base(machine.sourcefile)`.** That makes it a usable PROFILE
+  GATE: an entry tagged `sourcefile="capcom/cps2w.cpp"` is invisible to a
+  core declaring `sourcefile=["cps2.cpp"]` (the `.` matches any character,
+  but the string is one char short and never aligns). This is how the WIDE
+  set is reachable from `cores/cps2w` and unreachable from `cores/cps2`
+  without editing the reference core at all.
+- **`mra2rom` locates every zip member by CRC32 and by NOTHING ELSE**
+  (`mra2rom.go:163-172`: it walks the zips comparing `file.CRC32`; the
+  `name` attribute is used only in the warning text). **This is a real
+  divergence from FBNeo and MAME**, which resolve by name and merely warn on
+  a hash mismatch — which is why this project's WIDE members carry SENTINEL
+  CRCs in both of those drivers and why content there can change freely. On
+  MiSTer a sentinel means `Warning: cannot find file … in zip` and no `.rom`.
+  Consequence: **an MRA is pinned to the exact bytes of one romset build.**
+- **The zip search path is a HARD-CODED `$HOME/.mame/roms/<name>.zip`**
+  (`mrazip.go:23`), so the tool's output is a function of the invoking
+  user's home directory and there is no flag for it. `tools/mister_mra.sh`
+  stages a PRIVATE `$HOME` per run instead of writing into the user's — and
+  it has to, because the stock leg and the WIDE leg need DIFFERENT
+  `vsav.zip` files: the WIDE romset is a clone set whose parent is the
+  BUILD's `vsav.zip` (the merged build patches `vm3.13m/15m/17m/19m`), while
+  the stock `vsavj` reference leg needs the pristine dump.
+- **`jtframe mra -n` skips ROM generation entirely** — no zips are opened,
+  `md5="None"`, and the MRA XML becomes a pure function of `doc/mame.xml`
+  plus the core's TOML. That is the ROM-free mode a structural gate wants.
+- **`parts=` puts EVERY part of a region inside ONE `<interleave>` when
+  `width > 8`** (`corerom.go:462-479`), and `interleave2rom` resolves each
+  output byte lane to the FIRST finger claiming it (`mra2rom.go:238-249`).
+  So `parts=` can express a multi-member 16-bit region only if the members'
+  maps are DISJOINT (Pang!3's four 64-bit lanes are; three CPS-2 QSound
+  members all carrying `map="12"` are not — they silently collapse to the
+  first, truncated to the shortest). The way out is one region per
+  differently-mapped group, with a generic `{ name=…, skip=true }` row so
+  every other set skips it — **a region with no config at all still emits
+  its `<!-- … starts at … -->` comment**, which is enough to break a
+  byte-identity twin.
+- **Region starts in the MRA comments are the generator's `pos`, which
+  INCLUDES the 20-byte `key` region; the RTL's `bulk_addr` does not.** On
+  CPS-2 every region therefore starts at `<1 KiB-aligned> + 0x14`, and the
+  `>> 10` header word is right only because `0x14 < 1024`. Measured on the
+  stock `vsavj` MRA: `maincpu` at `0x14`, `audiocpu` at `0x400014`,
+  `qsound` at `0x440014`, `gfx` at `0xC40014`, `firmware` at `0x2C40014`.
+- **An oversized region start is written WRAPPED, with no warning.**
+  `set_header_offset` stores the low 16 bits of `start >> 10`. Measured on
+  the untrimmed WIDE image: a firmware start of 71,936 KiB was emitted as
+  **6400** — the same value as `qsound`'s. A `.rom` that overflows the
+  header does not fail to build; it builds wrong.
+- **Reference numbers, this machine, 14z-107 (5):** stock `vsavj.rom`
+  46,407,744 B; WIDE `vsavjw.rom` 66,265,152 B; a full `jtframe mra cps2`
+  run (316 sets, `-n`) plus a `cps2w` run and two `.rom` builds is ~15 s.
 
 ## Open / to verify in the arc
 
