@@ -78,3 +78,16 @@ A=out_lutON_fbFORK (681 dumps)  B=out_lutON_fbFORK_fixed (681 dumps)
   FIRST DIVERGENCE frame 2051: 1 byte(s)
     RAM:$FF8060  A=0x41  B=0x40
 --- copies of one $display line in the log: 1 (was 1349)
+
+=== THE EXPECTATION MEASURED ON THE REFERENCE CORE (cps2), frame output OFF ===
+=== REFERENCE CORE cps2, frame output OFF ===
+dump integrity OK: 681 frames 2000..2680, 65536 bytes each addr $FF0000
+anchor: 2609
+--- vs cps2w frame output off (must be BIT-IDENTICAL: the FPGA superset invariant):
+A=out_ref_cps2 (681 dumps)  B=out_lutON_fbOFF (681 dumps)
+  common 681 frames: identical 681, differing 0
+  BIT-IDENTICAL on every common frame
+So the re-frozen 2609 / skew 463 IS the reference core's number, which is
+what test_mister_sim_anchor's design requires; and the 681-frame
+bit-identity is the FPGA superset invariant over a window that INCLUDES
+the match start (test_mister_wide_inert's own window is 540-640).

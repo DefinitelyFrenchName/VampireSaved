@@ -194,6 +194,15 @@ in 483 of 681 starting at frame 2051. The log-side effect is gone with it:
 (= 1,348 children + the parent). So the repair restores the simulation
 while leaving the frame writer doing its job.
 
+**G2. AND THE RE-FREEZE IS THE REFERENCE CORE'S NUMBER, not cps2w's.**
+`test_mister_sim_anchor`'s design says the expectations are measured on the
+REFERENCE core and never re-measured on `cps2w` — reproducing them is the
+whole assertion — so a sixth run measured it there: **`cores/cps2`, stock
+`vsavj`, frame output OFF: anchor 2609**, dump set complete, and its work
+RAM **BIT-IDENTICAL to `cps2w`'s in all 681 frames**. That last number is
+the FPGA superset invariant over a window that INCLUDES the match start;
+`test_mister_wide_inert`'s own window is 540-640.
+
 **H. A SELF-INFLICTED LESSON, RECORDED BECAUSE IT COST THREE RUNS.** The
 runner's header was rewritten WHILE three 45-minute simulations and the
 anchor gate were mid-flight. `sh` reads a script by BYTE OFFSET, so a
