@@ -36,7 +36,7 @@ Entry points at this level, deliberately not in a bucket:
 - [`gotchas.md`](game/gotchas.md) — traps in the game itself
 
 **`platform/`**
-- [`mister.md`](platform/mister.md) — the jtcps2 core (jtcores fork, bus widths, SDRAM tier, the simulation lane, and the work-RAM oracle `JTFRAME_SIM_WRAMDUMP`)
+- [`mister.md`](platform/mister.md) — the jtcps2 core (jtcores fork, bus widths, the SDRAM ceiling at our pin vs upstream's 128 MB XL tier, the CPS-2 core's own format caps, the simulation lane, and the work-RAM oracle `JTFRAME_SIM_WRAMDUMP`)
 - [`gotchas.md`](platform/gotchas.md) — traps in CPS-2 and the emulators
 
 **`project/`**
@@ -50,6 +50,9 @@ Entry points at this level, deliberately not in a bucket:
   from. Read with `game/atlas/sprite_lists.md`.
 - `patch_notes.md` / `patch_index.md` — per-change detail; the registry
 - `cps2_wide.md` — the extended hardware profile we defined
+- [`mister_fit.md`](project/mister_fit.md) — what merged-m6 needs vs what
+  jtcps2 offers, per region; the bank-occupancy arithmetic (§6) behind the
+  MiSTer memory-map route
 - `tenant_manifest.md`, `tables/` — port config; community-reviewable
   behavioural tables
 - `M1_acceptance.md`, `M2_feasibility.md`, `M3b_plan.md` — milestones

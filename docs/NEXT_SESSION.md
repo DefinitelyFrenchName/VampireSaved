@@ -1,4 +1,4 @@
-# NEXT SESSION — orientation (rewritten at the 14z-107 close, 2026-08-23)
+# NEXT SESSION — orientation (rewritten at the 14z-107 (2) close, 2026-08-23)
 
 > ## **THE STATE IN ONE BREATH: the 14z-105 window is FROZEN as
 > ## donovan-m11 / huitzil-m20 / pyron-m14 / merged-m6 (stock twin
@@ -69,13 +69,15 @@
 > ## jtcores@vampire-saved` (core `cores/cps2w` → `jtcps2w.rbf`), submodule
 > ## `emu/jtcores` + `tools/setup_jtcores.sh` + gate `test_jtcores_twin`;
 > ## the vsavj reference-leg MRA measured byte-identical to stock except
-> ## `<rbf>`. NO XL SDRAM tier exists (retracted in cps2_wide.md).
+> ## `<rbf>`. ("NO XL SDRAM tier exists" — TRUE OF OUR PIN ONLY; see
+> ## the 14z-107 (2) block below.)
 > ## **SLICE B MEASURED (`docs/project/mister_fit.md`): the roster's art
 > ## is 6.39 MB vs 0.49 MB blank in vanilla's 32 MB — a wider GFX tier is
 > ## REQUIRED; PRG needs 4.82 MB (+ a 30-B pin at 0x5FFF00); QSound ext =
-> ## banks 0x80-0x8E (all aliasing → width fix required). PENDING RULING:
+> ## banks 0x80-0x8E (all aliasing → width fix required). ~~PENDING RULING:
 > ## WIDE v1 VERBATIM on a 128 MB tier (recommended) vs a tighter MiSTer
-> ## profile. **SLICE C: THE SIM LANE WORKS** (stock jtcps2 + vsavj under
+> ## profile.~~ **RULED 2026-08-23: WIDE v1 VERBATIM. The "128 MB tier"
+> ## half is superseded — see 14z-107 (2) below.** **SLICE C: THE SIM LANE WORKS** (stock jtcps2 + vsavj under
 > ## Verilator on this Mac, ~1 s/frame, recipe in mister.md; `.rpl` →
 > ## `sim_inputs.hex` translator gated).**
 > ## **14z-107 (2026-08-23): THE MiSTer ORACLE IS REAL — the §4
@@ -102,10 +104,42 @@
 > ## decryption key into core registers, so a preloaded run boots into
 > ## ciphertext — 1,841 frames of ALL-ZERO RAM that still "agreed" with
 > ## MAME on 99.2% of sampled bytes. Check NON-CONSTANCY first.)
-> ## NEXT OPENER: the profile-shape ruling (still pending), then the
-> ## width surgery; phase B (the round-transition anchor on the full
-> ## 12,120-frame replay, ~3.5 h) and P2/6-button `SimInputs` are the
-> ## queued follow-ups.
+> ## **14z-107 (2) — THE MEMORY-MAP TRUTH (docs + STATE only; no code, no
+> ## RTL). The profile ruling STANDS (WIDE v1 verbatim, one romset); the
+> ## implementation assumption attached to it is RETRACTED: "MiSTer work =
+> ## width plumbing only" is FALSE and the 128 MB tier is NOT a flag away.**
+> ## At our pin `v1.7.3` **64 MB is PHYSICAL** — jtframe's table stops at
+> ## `AW 23`, the bank geometry has no AW=24 arm (`addr[9]` would never be
+> ## driven, aliasing with `addr ^ 0x200`), and only 13 A / 2 BA / 1 nCS
+> ## pins are assigned. **`JTFRAME_SDRAM_XL` (128 MB) IS real — UPSTREAM,
+> ## 3057 commits away, untagged** — as TWO CHIPS on one module with chip
+> ## select on **nCS POLARITY**, and reachable ONLY inside the
+> ## `JTFRAME_SDRAM_CACHE` branch: setting it on `cps2w` today would
+> ## compile, validate and silently alias (platform gotcha). That
+> ## **partially UN-RETRACTS** 14z-106's "no XL tier" — true of the pin,
+> ## false of jtframe; `cps2_wide.md` now carries the version qualifier.
+> ## **The CPS-2 CORE caps GFX at 32 MB in the OBJECT FORMAT** (16-bit code
+> ## + 2-bit bank — the SAME 19-bit promote WIDE v1 already makes on FBNeo),
+> ## the 68k at a flat 4 MB `rom_cs` (with a real collision against the
+> ## objcfg window at `0x400000`), scroll at 8 MB, QSound at a 7-bit latch.
+> ## No SDRAM tier lifts any of them.
+> ## **AND THE ROSTER FITS 64 MB BY TOTAL — ~56.1 MB** (`mister_fit.md` §6):
+> ## PRG 6 MB fits bank 0 TODAY, QSound 16 MB fits bank 1 TODAY (PCM is
+> ## alone in a 16 MB bank), and ONLY GFX overflows, by ~6.4 MB — into
+> ## bank 1's ~7.1 MB of spare. **NEW PENDING DECISION: THE MiSTer
+> ## MEMORY-MAP ROUTE** — (1) uprev to untagged master + XL + `mem.yaml`
+> ## cache lanes, or (2) stay at the pin and BANK-REPACK inside 64 MB.
+> ## **Recommendation (2)**; both still need the core-side format work.
+> ## **CAVEAT ON OUR SIM LANE:** the Verilator SDRAM model is an
+> ## 8 MB-per-bank / 32 MB module (`test.cpp:605-606`), so GFX banks 2/3
+> ## are HALF-ALIASED — the work-RAM anchor oracle is UNAFFECTED (bank 0 is
+> ## entirely under 8 MB), but "the frames showed sprites" is weaker
+> ## evidence than it read. ~3 constants to fix; prerequisite to simulating
+> ## any widened set.
+> ## NEXT OPENER: **the MEMORY-MAP ROUTE ruling**, then the core-side format
+> ## work; phase B (the round-transition anchor on the full 12,120-frame
+> ## replay, ~3.5 h), the Verilator 8 MB-per-bank fix and P2/6-button
+> ## `SimInputs` are the queued follow-ups.
 > ## The N-2 build-dir
 > ## deletion policy applies at the NEXT freeze (m10/m19/m13/merged-m5
 > ## dirs are now one-back; m9/m18/m12/merged-m4 + m5_stock4 are N-2 and

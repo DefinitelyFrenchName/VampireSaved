@@ -1,5 +1,177 @@
 # STATE — living progress log
 
+## Session 14z-107 (2) — THE MEMORY-MAP TRUTH: at our pin 64 MB is
+## PHYSICAL, the 128 MB tier is REAL but UPSTREAM-ONLY and not a flag,
+## and the CPS-2 core caps GFX/PRG/scroll/QSound in FORMAT regardless —
+## "MiSTer work = width plumbing only" RETRACTED. Docs + STATE only; no
+## code, no RTL, no tools touched
+
+**The one line:** the 128 MB tier that the profile ruling assumed was a
+flag away does not exist at our pin at all, exists upstream 3057 commits
+away as a TWO-CHIP scheme, and would not by itself be enough anyway — so
+the roster's route through memory is now its own pending decision, and the
+numbers say it may not need 128 MB.
+
+**THE PROFILE RULING IS NOT REOPENED.** WIDE v1 verbatim, one romset across
+FBNeo/MAME/MiSTer (maintainer, 2026-08-23) STANDS. What is retracted is the
+IMPLEMENTATION ASSUMPTION that travelled with it. Marked in place in the
+Decisions entry below.
+
+**A. AT `v1.7.3` THE 64 MB CEILING IS PHYSICAL, not a default.**
+- `jtframe_sdram_bank_core.v:32-34` — the tree's own table stops at
+  `AW 23 | 8 MBx2 = 16MB | 64 MB`. No row 24.
+- `jtframe_sdram64_bank.v:75-76` `localparam ROW=13, COW= AW==22 ? 9 : 10;`
+  (a two-arm ternary), `:127` addr_row, `:219` `{..., addr[AW-1], addr[8:0]}`
+  — at AW=24 the row would be `addr[22:10]` and the column
+  `{addr[23], addr[8:0]}`, so **`addr[9]` is never driven** and every address
+  aliases with `addr ^ 0x200`.
+- `target/mister/jtframe_emu.sv:101-106` = `SDRAM_A[12:0]`, `SDRAM_BA[1:0]`,
+  ONE `SDRAM_nCS`; `sys/sys.tcl` assigns exactly 13 A pins, 2 BA, one nCS
+  (`:60-72,73-74,97`). 13 + 10 + 4 banks = 64 MB. Saturated.
+- `modules/jtframe/doc/sdram.md` "SDRAM Catalogue" (`:222-233`): every 128 MB
+  module is **2 or 4 UNITS**; no single chip above 64 MB.
+- **The vendored dual-SDRAM support is UNREACHABLE**: `jtframe_emu.sv`
+  declares no `SDRAM2_*` port (grep = 0), and `mister.qsf:51-52` sources
+  `sys.tcl` + `sys_analog.tcl`, NOT `sys_dual_sdram.tcl` — which it could not,
+  because those two CONFLICT ON PINS: PIN_Y15 `LED_USER`/`SDRAM2_DQ[0]`,
+  PIN_AG28 `LED_POWER`/`DQ[4]`, PIN_AH27 `VGA_EN`/`DQ[15]`, PIN_AG25
+  `BTN_OSD`/`DQ[13]`. **Consequence: on a DE10-Nano the dual-CHIP path and
+  the ANALOG I/O board are mutually exclusive — and the field-test plan is
+  Jammix -> CRT, i.e. analog video.** (The two-chips-on-ONE-module scheme
+  below does not have this problem; it uses the single socket.)
+
+**B. THE 128 MB TIER IS REAL UPSTREAM — PARTIAL UN-RETRACTION.**
+`jotego/jtcores` master:
+`modules/jtframe/target/mister/hdl/jtframe_emu.sv:175-181`
+`` `ifdef JTFRAME_SDRAM_XL / localparam SDRAMW=24; // 128 MB ``.
+**Mechanism = TWO CHIPS on one module, selected by the top address bit, with
+chip select carried on nCS POLARITY**: `jtframe_burst_io.v:158`
+`{sdram_ncs,...} <= { sel_cmd_r[3] ^ sel_chip_r, sel_cmd_r[2:0] };` (the other
+chip sees DESELECT); `jtframe_burst_sdram.v:70-71` `localparam XL = AW == 24;
+localparam PAW = XL ? 23 : AW;` (64 MB per chip), `:103` `prog_chip = XL ?
+prog_addr[AW-1] : 1'b0`; `jtframe_sdram64_init.v` inits twice; the Verilator
+model instantiates a second SDRAM with `invert_ncs`. **INFERRED (no schematic
+in-repo): that the physical module inverts chip 1's /CS.** Real consumer:
+`cores/cps3/cfg/macros.def:6` sets XL, `cores/cps3/cfg/mem.yaml` places lanes
+`at: { chip: 1, bank: 3 }`, CPS-3 README = 128 MB / sfiii3n ~80 MB.
+**RETRACTION-OF-A-RETRACTION:** 14z-106 (3) and `cps2_wide.md` recorded "NO XL
+SDRAM tier exists (grep, 0 hits) — the cps2_wide.md claim RETRACTED". That is
+**TRUE of our pin and FALSE of jtframe**; the original cps2_wide.md claim was
+right about the framework and wrong about the version we pinned. Both
+documents now carry the version qualifier. A grep proves a fact about the
+tree you grepped, and a pin is a tree.
+
+**C. XL IS NOT REACHABLE BY A FLAG, AND THERE IS A SILENT TRAP.** XL logic
+lives ONLY in the burst/cache branch: `jtframe_board_sdram.v:158` forks on
+`JTFRAME_SDRAM_CACHE` -> `jtframe_burst_sdram` (`:164`, XL-aware) else
+`jtframe_sdram64` (`:225`, never taught XL — `.chip()` unconnected). The
+validator `src/jtframe/macros/public.go:131-140` rejects XL+LARGE and
+XL+`BAx_START` but **nothing requires `JTFRAME_SDRAM_CACHE` alongside XL**.
+CPS-2 has no `cfg/mem.yaml` (explicit slot modules), so setting
+`JTFRAME_SDRAM_XL` on `cps2w` today would compile, validate and silently
+produce the bit-9-aliased map of A. **Filed as a platform gotcha.**
+
+**D. UPSTREAM DISTANCE.** `gh api .../compare/v1.7.3...master` -> **ahead_by
+3057**, behind_by 0. **No TAG carries XL**: `v1.7.3` (2024-01-18) is the
+newest version tag of the repo's 532, while XL is `5981db26` "feat(jtframe):
+add SDRAM XL support" (2026-06-19) + `e555e01a` (validation fix, 2026-06-20)
+— adopting it means pinning a BARE MASTER COMMIT. Paths we depend on moved:
+`hdl/ver/test.cpp` -> `verilator/test.cpp` (split into sdram.cpp/.h,
+cabinet.cpp/.h, ...); `target/mister/jtframe_emu.sv` -> `target/mister/hdl/`;
+`bin/jtsim` rewritten (848 -> 658 lines); `cores/cps2/cfg/game.yaml` ->
+`files.yaml` (changed schema); `mame2mra.toml` `mraauthor` -> `author`;
+**`-inputs` now takes a `.cab` cabinet script — `sim_inputs.hex` is ORPHANED
+upstream** — and input bit 1 changed coin2 -> service. So the mister.md
+recipe, `rpl2siminputs.py`, `run_sim_jtcps2.sh`, fork commit 2 and both sim
+gates are all uprev work. **And upstream never widened CPS-1/2's own
+`jtcps1_sdram.v`** — the `[22:0]` literals and `// change this when moving to
+8MB+ GFX` are still there on master.
+
+**E. THE CORE-SIDE CAPS THAT SURVIVE ANY SDRAM TIER — this is what kills
+"MiSTer work = width plumbing only".**
+- **GFX is capped at 32 MB by the OBJECT FORMAT**: 16-bit tile code + a 2-bit
+  bank from `table_y[14:13]` (`jtcps2_obj_scan.v:47,152`) = 2^18 codes x
+  128 B. Spare bits exist (`table_y[12:10]`, `table_x[12:10]` — positions are
+  only 10 bits). **This is the SAME extension WIDE v1 already makes on
+  FBNeo** (the ratified 19-bit promote in `Cps2ObjDraw`, rule 1 v2) — on
+  MiSTer it is the profile expressed in RTL, not a new invention.
+- **The 68k map has no 6 MB ROM window**: `jtcps2_main.v:184`
+  `rom_cs <= A[23:22] == 2'b00;` (flat 4 MB), with objcfg at
+  `0x400000-0x4FFFFF`, QSound `0x600000`, ORAM `0x700000`, I/O `0x800000`.
+  WIDE's `wide_ext` lives at `0x400000+` -> same profile-gated remap the
+  emulators got, and **the collision with the objcfg window is a real design
+  question for the RTL arc**.
+- **Scroll: 8 MB, no bank input anywhere** (`jtcps1_sdram.v:121` `[19:0]`,
+  `:209`, `:179` `SCR_OFFSET` at bank-3 offset 0).
+- **QSound is exactly as documented**: `jtcps15_sound.v:416`
+  `qsnd_addr[22:16] <= dsp_ab[6:0];` discards `dsp_ab[14:7]`. One-bit fix +
+  `qsnd_addr[23:0]` + `PCM_AW` 23->24. **16 MB of QSound fits bank 1 on the
+  EXISTING 64 MB tier** (PCM is alone in that 16 MB bank).
+- Free resource: both star slots are tied off (`jtcps2_game.v:521-528`), so
+  two 22-bit slots of bank 3 are available.
+
+**F. THE FIT THAT CHANGES THE OPTIONS — the roster FITS 64 MB by TOTAL; the
+constraint is bank PLACEMENT** (`docs/project/mister_fit.md` section 6).
+Bank map (`jtcps1_sdram.v:158-164` offsets in WORDS; slots `:258-282`,
+`:332-345`, `:365-381`, `:403-426`): bank 0 = PRG 0-4 MB + VRAM@4 + ORAM@5 +
+WRAM@6 + SND@7 = ~8 of 16 MB; bank 1 = PCM ALONE, 8 of 16; banks 2+3 = GFX,
+32 of 32. Content (this project's own measurements): PRG live **4.82 MB** +
+RAM/VRAM/ORAM/SND windows **4 MB** + QSound **8.9 MB** (8 stock + 0.918 ext)
++ GFX **38.4 MB** (32 stock + 6.39 group C) = **~56.1 MB against a 64 MB
+tier**. So: **PRG 6 MB fits bank 0 today** (bank 0 goes to ~10 of 16),
+**QSound 16 MB fits bank 1 today**, and **ONLY GFX overflows, by ~6.4 MB**.
+
+**G. A CAVEAT ON OUR OWN SIM LANE (affects trust in a shipped gate).** The
+Verilator SDRAM model at our pin is a **32 MB module — 8 MB per bank**, not
+the 64 MB tier cps2 declares: `hdl/ver/test.cpp:54-58` sizes the BUFFER from
+the macro (`BANK_LEN = 0x100'0000` = 16 MB) but `:605-606`
+`ba_addr[cur_ba] = dut.SDRAM_A << 9; // 32MB module` / `&= 0x3fffff` decodes
+only 22 bits, with 9-bit column masks at `:609-610` and `:642`/`:646`.
+- **The 14z-107 anchor oracle is UNAFFECTED, precisely**: bank 0 holds PRG
+  0-4 MB, VRAM@4, ORAM@5, work RAM@6, sound@7 — the whole bank is under the
+  8 MB line, and the dumped window is bank 0 byte `0x600000`.
+- **What IS affected: GFX.** Banks 2/3 are 16 MB each and HALF-ALIASED, so no
+  video/sprite result from this lane is trustworthy for wide GFX, and
+  14z-106 slice C's "frames showed sprites" is **weaker evidence than it
+  read** — it proves the core runs, not that GFX addressing is faithful.
+- Fixing it is ~3 constants (`<< 10`, `0x7fffff`, `0x3ff`) and is a
+  PREREQUISITE to simulating any widened set. **Not done — no code was
+  touched this session.** Filed as a platform gotcha and as a caveat next to
+  the recipe in `docs/platform/mister.md`.
+
+**WRITTEN:** `docs/platform/mister.md` (five new sections: the v1.7.3 ceiling
+incl. the dual-SDRAM/analog pin conflict; the upstream XL tier + its two-chip
+mechanism with the INFERRED part flagged; the XL-without-cache trap; the
+uprev cost table; the core-side format caps — plus the sim-model caveat next
+to the Recipe); `docs/project/mister_fit.md` section 6 (the bank-occupancy
+table and the arithmetic, with sections 3 and 5's superseded claims marked in
+place); `docs/project/cps2_wide.md` "Known limits" (the retraction-of-a-
+retraction with the version qualifier, and the format-vs-tier refinement);
+`docs/platform/gotchas.md` + `docs/GOTCHAS.md` (two entries); this entry; the
+profile-shape Decisions correction; the new pending decision **THE MiSTer
+MEMORY-MAP ROUTE**; `docs/NEXT_SESSION.md`; `HANDOFF.md`.
+
+**CORRECTED IN PASSING (retraction discipline, found while writing):**
+`HANDOFF.md`'s gate table and one paragraph of `docs/platform/mister.md` still
+carried **"MAME 2146 / sim 2606, skew 460 ± 30"** for
+`test_mister_sim_anchor.sh`. The gate freezes **2146 / 2507, skew 361 ± 30**
+(`tests/test_mister_sim_anchor.sh:73-75`) — +460 is the BOOT offset, not the
+match-start anchor, and the 14z-107 entry above has it right. Both fixed in
+place.
+
+**TWO SMALL FACT CORRECTIONS to the brief this session recorded** (measured
+while writing, both harmless to the conclusions): jtcores has **532 tags**,
+not three — the load-bearing fact is that `v1.7.3` is the NEWEST version tag
+and predates XL by ~2.4 years; and in `sys_dual_sdram.tcl` the analog-pin
+collisions are `SDRAM2_DQ[0]/[4]/[15]/[13]` (lines 4/8/13/15), not
+`[0]/[2]/[4]/[15]/[13]` — `DQ[2]` is PIN_AA15, which `sys_analog.tcl` does
+not claim. Four conflicting pins, not five.
+
+**NOT DONE, deliberately:** no RTL, no code, no new tools — this was a
+recording pass on findings already measured. The Verilator 8 MB-per-bank fix,
+the core-side format work, and the route choice are all queued behind the
+pending decision.
+
 ## Session 14z-107 — THE MiSTer ORACLE IS REAL: stock jtcps2 under
 ## Verilator and MAME compared at a §4 sync anchor on the same legacy
 ## replay, on a work-RAM path that had to be BUILT (two 14z-106 claims
@@ -272,7 +444,13 @@ for everything; fork under their GitHub; core name `jtcps2w`):**
   docs/README.md): jtframe is VENDORED at v1.7.3 (not a submodule); the
   RBF name is `"jt"+<core dir>`; `JTFRAME_SDRAM_LARGE` = `SDRAMW=23` (64 MB)
   and **there is NO XL tier** (RTL grep, 0 hits — the cps2_wide.md claim
-  RETRACTED in place); MiSTer's HPS exposes `ioctl_addr[26:0]` (128 MB)
+  RETRACTED in place)
+  **[CORRECTED 14z-107 (2), in place, entry not rewritten: TRUE OF THE PIN,
+  and 64 MB there is PHYSICAL — but FALSE as a claim about jtframe.
+  Upstream master carries `JTFRAME_SDRAM_XL` / `SDRAMW=24` (two chips on one
+  module, nCS polarity), so the cps2_wide.md claim is PARTIALLY
+  UN-RETRACTED with a version qualifier. See 14z-107 (2).]**;
+  MiSTer's HPS exposes `ioctl_addr[26:0]` (128 MB)
   while the core-facing port is `[25:0]`; 68k ROM bus `[20:0]` = 4 MB;
   stock vsav already uses the full 32 MB GFX on jtcps2; the sim lane has
   per-frame `.cab` input scripts + IOCTL/SDRAM dumps (the `.rpl`/RAM-
@@ -883,7 +1061,71 @@ Original write-up kept below.
 
 ## Decisions pending (human)
 
-- **THE SIM HARNESS'S P2 / 6-BUTTON EXTENSION (14z-107, NOT blocking).**
+- **THE MiSTer MEMORY-MAP ROUTE (14z-107 (2)) — NEW, and it is the arc's
+  next fork in the road.** The profile ruling (WIDE v1 verbatim, one romset)
+  is NOT in question here; only HOW the bytes reach the FPGA. The facts that
+  opened it (all measured 14z-107, `docs/platform/mister.md`): at our pin
+  `v1.7.3` **64 MB is PHYSICAL**, not a default — jtframe's own table stops
+  at `AW 23 = 64 MB`, the bank geometry `COW = AW==22 ? 9 : 10` has no AW=24
+  arm (an AW=24 build never drives `addr[9]`, aliasing every address with
+  `addr ^ 0x200`), and `sys.tcl` assigns exactly 13 A pins, 2 BA and one nCS.
+  The `JTFRAME_SDRAM_XL` 128 MB tier IS real, but UPSTREAM only (added
+  2026-06-19, `5981db26`), implemented as **two chips on one module selected
+  by the top address bit with chip select on nCS POLARITY**, and reachable
+  only inside the `JTFRAME_SDRAM_CACHE` branch. Meanwhile the fit numbers
+  (`docs/project/mister_fit.md` §6) say the roster's **total is ~56.1 MB
+  against a 64 MB tier** — PRG 6 MB fits bank 0 today, QSound 16 MB fits
+  bank 1 today, and only GFX overflows, by ~6.4 MB. The question is
+  placement, not capacity.
+
+  **(1) UPREV to upstream master + `JTFRAME_SDRAM_XL` + convert CPS-2 to
+  `cfg/mem.yaml` cache lanes.** The architecturally "correct" long-term path:
+  the tier is real, CPS-3 already ships on it at ~80 MB, and it leaves room
+  for anything later. Cost: a **3057-commit** jump to an **UNTAGGED moving
+  target** (v1.7.3, 2024-01-18, is the newest version tag and predates XL by
+  ~2.4 years); re-basing our two fork commits; rewriting the whole simulation
+  recipe (`test.cpp` -> `verilator/test.cpp` split, `bin/jtsim` rewritten,
+  `game.yaml` -> `files.yaml`, `-inputs` now a `.cab` script so
+  `sim_inputs.hex` and `tools/rpl2siminputs.py` are orphaned, input bit 1
+  coin2 -> service); converting CPS-2 to `mem.yaml`; and **widening the
+  shared CPS-1/2 `jtcps1_sdram.v` `[22:0]` code that upstream never widened**
+  (its `// change this when moving to 8MB+ GFX` comment is still there on
+  master). Requires the 128 MB module.
+
+  **(2) STAY at the `v1.7.3` pin and fit inside 64 MB by BANK REPACK.**
+  Vanilla's 32 MB of GFX stays exactly where it is in banks 2+3, so the
+  superset invariant is untouched by construction, and the ~6.4 MB of tenant
+  art goes into **bank 1, above the PCM** — which after a 16 MB-capable
+  QSound carrying 8.9 MB of real content has **~7.1 MB spare** — reached by
+  the promoted tile-code bit, i.e. the RTL expression of the profile-gated
+  19-bit promote WIDE v1 already makes on FBNeo. No framework uprev, no
+  second chip, no `mem.yaml` conversion, and it would run on a 64 MB module
+  as well as on the maintainer's 128 MB one. **Risk, named honestly:** object
+  reads would share bank 1 with PCM streaming, on the throughput path jtframe
+  hand-tunes per target (`jtcps1_sdram.v:167-175`, `OBJ_LATCH` 0 on MiSTer
+  "to increase object throughput"), and it is **UNMEASURED**. Measuring it
+  also needs the Verilator SDRAM model fixed first (it decodes 8 MB per bank,
+  so bank 1 above 8 MB currently aliases in simulation — ~3 constants).
+
+  **RECOMMENDATION: (2)**, with (1) as the long-term path if upstream ever
+  tags again. Rationale: (2) keeps a pinned, reproducible framework and a
+  working simulation gate, needs no dual-chip inference, and widens the
+  hardware audience rather than narrowing it; (1) trades all of that for
+  headroom we do not need at 56.1 MB. **Both options still require the
+  core-side FORMAT work either way** — the GFX tile-code promote, the 68k
+  `rom_cs` window (including the `0x400000` objcfg collision), and the
+  QSound latch/width fix. Gameplay-visible consequence: none under either
+  option; the only player-facing difference is that (2) may drop the 128 MB
+  hardware requirement to 64 MB.
+
+- ~~**THE SIM HARNESS'S P2 / 6-BUTTON EXTENSION (14z-107, NOT blocking).**~~
+  **DECIDED (maintainer, 2026-08-23): option A, LATER** — *"agreed, we can
+  do it later"*. So the fork's third commit is queued, not open: extend
+  `test.cpp`'s `SimInputs` (P2 joystick + buttons 5/6, `dip_test` off
+  button 4) when a refused replay is actually needed — the motivating one
+  being a 2P replay that pins the arcade-draw opponent and retires the
+  P2-identity exclusion in `test_mister_sim_anchor.sh`. Original entry:
+  **THE SIM HARNESS'S P2 / 6-BUTTON EXTENSION (14z-107, NOT blocking).**
   jtframe v1.7.3's `SimInputs` is P1-only with 4 buttons (bit 11 doubles as
   `dip_test`), so `02_demitri_vs_cpu` and `04_select_fuzz` still REFUSE
   translation — and 14z-107 gave the question a concrete cost: the only §4
@@ -897,7 +1139,56 @@ Original write-up kept below.
   lands** — it is input coverage, not the oracle, and the oracle is green.
   Gameplay consequence: none (test harness only).
 
-- **THE MiSTer PROFILE SHAPE (14z-106, slice B measured).** The numbers
+- ~~**THE MiSTer PROFILE SHAPE (14z-106, slice B measured).**~~
+  **DECIDED (maintainer, 2026-08-23): OPTION A — WIDE v1 VERBATIM on the
+  128 MB tier.** *"verbatim indeed: 128MB always was the target."* So there
+  is ONE profile and ONE romset across FBNeo / MAME / MiSTer, and the MiSTer
+  work is width plumbing only; the 128 MB module is a stated hardware
+  requirement in the README.
+  **CORRECTION 14z-107 (2), MARKED IN PLACE — THE RULING STANDS, THE
+  IMPLEMENTATION ASSUMPTION DOES NOT.** The PROFILE decision above (WIDE v1
+  verbatim, one romset, one release artifact) is unchanged and is not
+  reopened. Two things attached to it are now measured false:
+  (a) ~~"the MiSTer work is width plumbing only"~~ — the CPS-2 core caps GFX
+  at 32 MB in the OBJECT FORMAT (16-bit code + 2-bit bank,
+  `jtcps2_obj_scan.v:47,152`), the 68k at a flat 4 MB
+  (`jtcps2_main.v:184`), scroll at 8 MB with no bank input, and QSound at a
+  7-bit latch. **No SDRAM tier lifts any of them**; the GFX one is the same
+  19-bit tile promote WIDE v1 already ratified on FBNeo, so it is the
+  profile in RTL rather than a new invention — but it is core work, not
+  plumbing. (b) ~~the 128 MB tier being a bit-width away~~ — at our pin
+  (`v1.7.3`) 64 MB is PHYSICAL (table, row/column geometry, and pin
+  assignments all saturate; `docs/platform/mister.md` "The SDRAM ceiling at
+  our pin"), and the `JTFRAME_SDRAM_XL` tier exists only upstream, 3057
+  commits away, in a branch that also requires `JTFRAME_SDRAM_CACHE`.
+  The route is now its own pending decision, **THE MiSTer MEMORY-MAP
+  ROUTE**, above. Option B (a tighter MiSTer-only profile) was
+  killed by measurement, not preference: 14z-107 read the bank allocation
+  (`jtcps1_sdram.v:158-164`, `:332-410`) and GFX ALONE forces the tier —
+  bank 0 has ~8 MB spare (so PRG 6 MB fits the CURRENT tier) and bank 1
+  holds PCM alone in 16 MB (so QSound 16 MB fits too), while banks 2+3 are
+  full at 32 MB. Any GFX above 32 MB needs banks > 16 MB = `SDRAMW` 24 =
+  the same 128 MB module, so B buys zero hardware compatibility while
+  forking the romset into a second generation. The only route that would
+  keep a 64 MB module is a bank-1 repack (GFX sharing the PCM bank, ~6.4 MB
+  of its 8 MB spare) — rejected as arbiter surgery on the object-throughput
+  path jtframe already hand-tunes per target (`jtcps1_sdram.v:167-175`),
+  and it drags a MiSTer-only layout back in anyway. **That repack, not B,
+  is the fallback if the 128 MB tier proves unreachable.** ~~OPEN AND BEING
+  MEASURED (14z-107, maintainer: *"as to IF we can address... only one way
+  to find out!"*): whether `SDRAMW` 24 is parameter plumbing or controller
+  surgery in jtframe at v1.7.3, and whether the physical 128 MB module is
+  addressable by its SDRAM controller.~~ **ANSWERED 14z-107 (2): NEITHER —
+  at `v1.7.3` `SDRAMW=24` is not reachable at all** (no table row, no AW=24
+  arm in the bank geometry, `addr[9]` undriven, 13 A pins / 2 BA / 1 nCS
+  assigned); the 128 MB tier is upstream-only, is TWO CHIPS on one module
+  selected by nCS polarity, and lives only in the cache-lane controller.
+  Two knock-ons for the reasoning above: the repack fallback is now a
+  first-class option rather than a last resort (**the total FITS 64 MB** —
+  ~56.1 MB measured, `mister_fit.md` §6), and the "arbiter surgery"
+  objection to it is still the right one to weigh, but so is a 3057-commit
+  uprev to an untagged master. Original entry:
+  **THE MiSTer PROFILE SHAPE (14z-106, slice B measured).** The numbers
   (`docs/project/mister_fit.md`) remove the roster trade-off: the group-C
   art (6.39 MB) cannot fit vanilla's 32 MB GFX (0.49 MB blank, upper
   bound), so any MiSTer build needs a wider GFX tier than jtcps2's

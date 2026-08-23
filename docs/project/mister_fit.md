@@ -75,8 +75,13 @@ is not a trade-off to present — it is impossible without overwriting
 legacy art, which the superset invariant forbids. There is no
 tenant-dropping variant either: the smallest single band (Pyron, 14,037
 codes = 1.7 MB) is 3.5x the blank total on its own. **A MiSTer build of
-this roster REQUIRES a GFX tier wider than 32 MB** — i.e. the maintainer's
-128 MB module plus the width change through jtframe + the core.
+this roster REQUIRES a GFX tier wider than 32 MB** — ~~i.e. the maintainer's
+128 MB module plus the width change through jtframe + the core~~.
+**CORRECTED 14z-107 (2): the GFX conclusion STANDS (the art does not fit
+vanilla's 32 MB), but "i.e. the 128 MB module" does not follow.** Section 6
+shows the ~6.4 MB overflow also fits the SPARE of the existing 64 MB map
+(bank 1, above the PCM), and `docs/platform/mister.md` shows the 128 MB tier
+is not at our pin and is not a flag. Two routes, one pending decision.
 
 ## 4. Z80
 
@@ -94,19 +99,111 @@ numbers say "the minimum that holds merged-m6 with headroom":
 | GFX | 32 MB (2 × 16 MB banks, `[22:0]` words) | 32 MB stock + 6.39 MB group C (16 MB of members as shipped) | **48 MB** as WIDE v1 (bank bus +1 bit): banks 2/3 stay stock, group C lands in a third 16 MB window — again the SAME member set the emulators load |
 | QSound | 8 MB (23-bit path, 7-bit latch) | 8 MB + 0.9 MB | **16 MB** as WIDE v1 = the 14z-86 width fix |
 | Z80 | 256 KB | 256 KB | unchanged |
-| SDRAM total | 64 MB (LARGE) | ~70 MB + work RAM/VRAM | **128 MB tier** (`SDRAMW` 23 → 24, bank/prog/ioctl ports +1 bit; the HPS side already carries `ioctl_addr[26:0]`) |
+| SDRAM total | 64 MB (LARGE) | ~~~70 MB + work RAM/VRAM~~ **56.1 MB measured, §6** | ~~**128 MB tier** (`SDRAMW` 23 → 24, bank/prog/ioctl ports +1 bit)~~ **RETRACTED 14z-107 (2) — see §6.** The total FITS 64 MB; only bank PLACEMENT blocks it, and `SDRAMW` 23→24 is not reachable at our pin at all |
 
-**Recommendation: WIDE v1 verbatim on MiSTer** — one profile, one
-romset, one release artifact for all three implementations, and the
+**Recommendation: WIDE v1 verbatim on MiSTer** — **RULED (maintainer,
+2026-08-23); section 6 does NOT reopen the profile, only the implementation
+route.** One profile, one
+romset, one release artifact for all three implementations, and ~~the
 MiSTer-specific work is purely WIDTH (no content re-layout, no per-slot
-exclusivity, no second manifest). The alternative "MiSTer-shaped" profile
-(squeeze to the 64 MB tier) is ruled out by section 3 for GFX and would
-only have saved the PRG and QSound widenings, which are the smallest of
-the three. What this costs: the SDRAM tier change is FRAMEWORK surgery
+exclusivity, no second manifest)~~ **[RETRACTED 14z-107 (2) — see the block
+below and section 6: it is core FORMAT work, not width]**. The "no content
+re-layout / no second manifest" half stands. ~~The alternative
+"MiSTer-shaped" profile (squeeze to the 64 MB tier) is ruled out by section
+3 for GFX and would only have saved the PRG and QSound widenings, which are
+the smallest of the three.~~ **REFINED 14z-107 (2): section 3's GFX finding
+stands, but "squeeze to the 64 MB tier" was never the only 64 MB option —
+section 6 keeps the profile IDENTICAL and repacks the BANKS instead, which
+changes no content and no manifest.** ~~What this costs: the SDRAM tier change is FRAMEWORK surgery
 (jtframe's `SDRAMW`/`AW` plumbing + the MiSTer target's download path),
 to be done profile-gated in the fork and sized in the next slice — it is
-the one part of the arc that is not a descriptor.
+the one part of the arc that is not a descriptor.~~ **RETRACTED 14z-107 (2):
+"the MiSTer-specific work is purely WIDTH" is FALSE.** The CPS-2 core carries
+FORMAT caps that no SDRAM tier lifts — a 16-bit tile code + 2-bit bank
+(32 MB of GFX), a flat 4 MB `rom_cs`, an 8 MB scroll path with no bank input,
+and the 7-bit QSound latch. See `docs/platform/mister.md` "What the CPS-2
+CORE caps" and section 6 below.
 
 Gameplay-visible consequence: none — every character and every byte of
 art ships exactly as on FBNeo/MAME. That is why this can be a
 recommendation rather than a roster decision.
+
+## 6. THE FIT THAT CHANGES THE OPTIONS (measured 14z-107, added 14z-107 (2))
+
+**The roster FITS 64 MB by TOTAL. The constraint is bank PLACEMENT, not
+capacity.** Section 5 above concluded "128 MB tier" from a total that was
+never computed; 14z-107 read the bank allocation out of
+`cores/cps1/hdl/jtcps1_sdram.v` and the total lands under 64 MB. What
+follows does NOT change the profile ruling (WIDE v1 verbatim, one romset —
+maintainer, 2026-08-23); it changes what implementing it costs, and it makes
+a 64 MB route real enough to put on the table. The platform facts behind it
+are in `docs/platform/mister.md` ("What the CPS-2 CORE caps", "The SDRAM
+ceiling at our pin").
+
+### The bank map jtcps2 actually uses (v1.7.3, `SDRAM_LARGE` = 4 x 16 MB)
+
+Offsets are `jtcps1_sdram.v:158-164`, in 16-bit WORDS — doubled below to
+bytes. Slot geometry: `:258-282` (bank 0), `:332-345` (bank 1), `:365-381`
+(bank 2), `:403-426` (bank 3).
+
+| bank | contents | occupied | of | spare |
+|---|---|---|---|---|
+| 0 | 68k PRG `0-4 MB`; VRAM @4 MB; ORAM @5 MB; **work RAM @6 MB**; sound @7 MB | ~8 MB | 16 MB | **~8 MB** |
+| 1 | QSound PCM, ALONE (`SLOT0_AW = PCM_AW = 23`) | 8 MB | 16 MB | **8 MB** |
+| 2 | GFX (objects) | 16 MB | 16 MB | 0 |
+| 3 | GFX (scroll) + two DEAD star slots (`jtcps2_game.v:521-528`) | 16 MB | 16 MB | 0 |
+| | | **48 MB** | **64 MB** | 16 MB |
+
+### The arithmetic, with the numbers used
+
+Content figures are this document's own measurements (sections 1-4):
+
+| region | live content | source |
+|---|---|---|
+| 68k PRG | **4.82 MB** (4 MB + `0xD10F4`) | section 1 |
+| VRAM + ORAM + work RAM + sound windows | 4 x 1 MB = **4 MB** | bank map above |
+| QSound | 8 MB stock + **0.918 MB** extension = **8.9 MB** | section 2 |
+| GFX | 32 MB stock + **6.39 MB** group C = **38.4 MB** | section 3 |
+| Z80 | 256 KB (inside the 1 MB sound window) | section 4 |
+| **total live content** | **~56.1 MB** | vs a **64 MB** tier |
+
+So the tier is not the binding constraint. Region by region against the
+CURRENT 64 MB map:
+
+- **PRG 6 MB FITS BANK 0 TODAY.** Pushing the PRG window from 4 MB to 6 MB
+  moves VRAM/ORAM/WRAM/SND up by 2 MB, filling bank 0 to ~10 of 16 MB. (The
+  30-byte pin at `0x5FFF00` from section 1 then sits inside the window
+  instead of at its ceiling.) What this needs is the core-side 68k decode
+  change — `jtcps2_main.v:184` `rom_cs <= A[23:22] == 2'b00;` and the
+  `0x400000` objcfg collision — **not** a wider SDRAM.
+- **QSound 16 MB FITS BANK 1 TODAY.** PCM is alone in a 16 MB bank; only
+  `PCM_AW` 23 -> 24 and the 14z-86 latch fix are needed. Live content is
+  8.9 MB, leaving **~7.1 MB spare at the top of bank 1**.
+- **ONLY GFX OVERFLOWS, by ~6.4 MB.** Banks 2+3 are exactly full at 32 MB
+  with vanilla's own art, and the roster adds 6.39 MB.
+
+### What that opens
+
+A 64 MB route exists that was previously written off: **leave vanilla's
+32 MB of GFX exactly where it is in banks 2+3** (so the superset invariant is
+untouched by construction) and put the ~6.4 MB of group-C art in **bank 1,
+above the PCM**, reached by the promoted tile-code bit — which is the RTL
+expression of the profile-gated 19-bit promote CPS-2 WIDE v1 already makes on
+FBNeo. 6.39 MB into ~7.1 MB of spare.
+
+Named honestly, the risk is throughput, not capacity: object reads would then
+share bank 1 with PCM streaming, on exactly the path jtframe hand-tunes per
+target (`jtcps1_sdram.v:167-175`, `OBJ_LATCH` 0 on MiSTer "to increase object
+throughput"). **It is UNMEASURED.**
+
+The alternative — upstream's `JTFRAME_SDRAM_XL` 128 MB tier — is real but is
+not at our pin and is not a flag (`docs/platform/mister.md`). Both options,
+with their costs, are the pending decision **THE MiSTer MEMORY-MAP ROUTE** in
+STATE. **Either route still requires the core-side format work**: the GFX
+tile-code promote, the 68k `rom_cs` window, and the QSound latch/width fix.
+
+**Superseded here, kept for the record:** section 5's SDRAM row ("**128 MB
+tier** (`SDRAMW` 23 -> 24, bank/prog/ioctl ports +1 bit)") and its closing
+paragraph ("the MiSTer-specific work is purely WIDTH") described neither the
+framework nor the core correctly. The PROFILE recommendation in that section
+— WIDE v1 verbatim, one romset — stands and was ruled.

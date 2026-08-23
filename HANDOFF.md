@@ -187,6 +187,24 @@ stock-vsavj reference-leg MRA is produced by `jtframe mra cps2w`
 (byte-identical to stock cps2's except `<rbf>`). The fit numbers are in
 `docs/project/mister_fit.md`.
 
+**THE MEMORY MAP, corrected 14z-107 (2) — read this before sizing any RTL.**
+The PROFILE ruling (WIDE v1 verbatim, one romset) stands; the implementation
+assumption that went with it does not. **"MiSTer work = width plumbing only"
+is RETRACTED.** At our pin `v1.7.3` **64 MB is PHYSICAL** (jtframe's table
+stops at `AW 23`, the bank geometry has no AW=24 arm and would leave
+`addr[9]` undriven, and only 13 A / 2 BA / 1 nCS pins are assigned);
+`JTFRAME_SDRAM_XL` (128 MB) exists **upstream only**, 3057 commits away, as
+TWO CHIPS on one module with chip select on nCS polarity, and only inside the
+`JTFRAME_SDRAM_CACHE` branch — setting it on `cps2w` as it stands would
+silently alias (platform gotcha). Independently, the CPS-2 core caps GFX at
+32 MB in the OBJECT FORMAT, the 68k at a flat 4 MB `rom_cs`, scroll at 8 MB
+and QSound at a 7-bit latch — **no SDRAM tier lifts any of those**. And the
+roster's total is **~56.1 MB against a 64 MB tier**: PRG 6 MB fits bank 0
+today, QSound 16 MB fits bank 1 today, only GFX overflows by ~6.4 MB. The
+route (uprev to master + XL, vs bank-repack inside the pin) is a pending
+decision in STATE, **THE MiSTer MEMORY-MAP ROUTE**. Full argument with every
+file:line: `docs/platform/mister.md`; the arithmetic: `mister_fit.md` §6.
+
 **Running the simulation lane** (14z-107; needs `brew install go coreutils
 gnu-sed xmlstarlet verilator imagemagick`, ~1.0-1.2 s per simulated frame):
 
@@ -205,18 +223,28 @@ core registers, so a run with the SDRAM banks preloaded boots into ciphertext
 and work RAM stays all zeros (measured 14z-107). Because the download is
 simulated, it also consumes `sim_inputs.hex` lines, so `--frames`, `--wram`
 and the dump file names are ABSOLUTE (download included) and the `.rpl` is
-shifted by `--offset` (default 462): **a MAME frame `f` sits at simulated
-frame `f + 460`**. `--wram FIRST LAST` writes `wram/dump_<frame>_ff0000.bin`,
+shifted by `--offset` (default 462): **a MAME frame `f` sits NEAR simulated
+frame `f + 462`** — but the offset is not constant across the boot: it is
++460 at the RAM-test onset and **+361 by the round-1 match start**, which is
+why the oracle compares at §4 ANCHORS and not at fixed indices. `--wram FIRST LAST` writes `wram/dump_<frame>_ff0000.bin`,
 64 KB of 68k work RAM in 68k byte order — the same files the MAME harness's
 `DUMPS=` produces. Nothing ROM-derived may land in the tree: the tool REFUSES
 an out-dir inside the repo (rule 7).
+
+**CAVEAT (14z-107 (2)): the Verilator SDRAM model is an 8 MB-per-bank,
+32 MB module** (`hdl/ver/test.cpp:605-606,609-610` — 13 row + 9 column),
+whatever `JTFRAME_SDRAM_LARGE` says about the buffer size. Bank 0 (PRG,
+VRAM, ORAM, **work RAM**, sound) is entirely under 8 MB, so the anchor oracle
+is unaffected; the 16 MB GFX banks 2/3 are HALF-ALIASED, so **no video or
+sprite result from this lane is trustworthy**. Fixing it (~3 constants) is a
+prerequisite to simulating any widened set.
 
 | gate | tier | what it locks |
 |---|---|---|
 | `tests/test_jtcores_twin.sh` | ci_portable | pin, cps2w-vs-cps2 twin, the patch SERIES == `format-patch` per commit |
 | `tests/test_sim_wram_contract.sh` | ci_portable | dump naming + 68k byte order + skew absorption, two must-fire controls, the rule-7 refusals, and a static proof that every line the harness patch adds sits inside `#ifdef _JTFRAME_SIM_WRAMDUMP` |
 | `tests/test_rpl2siminputs.sh` | ci_portable | `.rpl` -> `sim_inputs.hex` bit map, frozen translation, refusals |
-| `tests/test_mister_sim_anchor.sh` | **manual/emulator (~50 min)** | THE ORACLE: MAME and jtcps2 agree on every mapped §4 field at the round-1 match-start anchor of `05_timeout_idle` (MAME 2146 / sim 2606, skew 460 ± 30); asserts the dump window is NON-CONSTANT first, then the byte-swap and hook-inertness controls |
+| `tests/test_mister_sim_anchor.sh` | **manual/emulator (~50 min)** | THE ORACLE: MAME and jtcps2 agree on every mapped §4 field at the round-1 match-start anchor of `05_timeout_idle` (MAME **2146** / sim **2507**, skew **361 ± 30** — corrected 14z-107 (2); this row said "2606 / 460 ± 30", which is the BOOT offset, not the anchor. The gate freezes 2146/361 at `:73-75`); asserts the dump window is NON-CONSTANT first, then the byte-swap and hook-inertness controls |
 
 ## Running a CPS-2 WIDE build (playtest)
 

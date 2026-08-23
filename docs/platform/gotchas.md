@@ -1111,3 +1111,57 @@ rather than re-simulated. **Rule: while a long job is running, do not edit the
 scripts it is executing** — queue the edits, or work on a copy. It applies to
 `tests/*.sh` gates too, which is exactly when the temptation is highest (an
 hour of waiting with the file open).
+
+## `JTFRAME_SDRAM_XL` without `JTFRAME_SDRAM_CACHE` aliases SILENTLY (14z-107)
+
+Upstream jtframe's 128 MB tier is real (`SDRAMW=24`,
+`modules/jtframe/target/mister/hdl/jtframe_emu.sv:175-181`), but the
+controller that KNOWS about it exists only on one side of a fork.
+`hdl/jtframe_board_sdram.v:158` branches on `JTFRAME_SDRAM_CACHE`: the
+`ifdef` arm instantiates `jtframe_burst_sdram` (`:164`), which carries the XL
+logic (`localparam XL = AW == 24`, the two-chip select on nCS polarity); the
+`else` arm instantiates `jtframe_sdram64` (`:225`), which was **never taught
+XL** — its `init`/`rfsh` instances leave `.chip()` unconnected
+(`jtframe_sdram64.v:265,279`), and its bank
+module's geometry is `localparam ROW=13, COW = AW==22 ? 9 : 10;` — a two-arm
+ternary with **no arm for AW=24**.
+
+The macro validator does not catch it. `src/jtframe/macros/public.go:131-140`
+rejects `JTFRAME_SDRAM_XL` with `JTFRAME_SDRAM_LARGE`, and rejects
+`JTFRAME_SDRAM_XL` with any `JTFRAME_BAx_START` — but **nothing requires
+`JTFRAME_SDRAM_CACHE` alongside XL.**
+
+So on a core with explicit slot modules and no `cfg/mem.yaml` — which is
+exactly CPS-1/CPS-2 — adding `JTFRAME_SDRAM_XL` to `cfg/macros.def`
+**compiles, validates, and produces a broken map**: at AW=24 the row becomes
+`addr[22:10]` and the column `{addr[23], addr[8:0]}`, so `addr[9]` is never
+driven onto the bus and every address aliases with `addr ^ 0x200`. Per-512-
+word corruption, no error message. **A tier macro is not a tier** — check
+which controller the macro's logic actually lives in before setting it.
+
+## The Verilator SDRAM model is a 32 MB module, whatever the macro says (14z-107)
+
+`modules/jtframe/hdl/ver/test.cpp` sizes its bank BUFFERS from the tier macro
+but decodes the PINS at a fixed 22 bits per bank:
+
+- `:54-58` `BANK_LEN = 0x100'0000` (16 MB) under `_JTFRAME_SDRAM_LARGE`,
+  `0x080'0000` (8 MB) otherwise — correct.
+- `:605-606` `ba_addr[cur_ba] = dut.SDRAM_A << 9; // 32MB module` then
+  `ba_addr[cur_ba] &= 0x3fffff` — the row is shifted by a **9-bit** column
+  width and masked to 22 bits.
+- `:609-610` and `:642`/`:646` mask the column with `0x1ff` — 9 bits again.
+
+13 row + 9 column = 22 bits = **8 MB per bank**, against the 13 + 10 = 23 bits
+= 16 MB per bank that `JTFRAME_SDRAM_LARGE` declares. **Anything a core places
+above 8 MB within a bank aliases in simulation, quietly.** On jtcps2 that is
+all of GFX: banks 2 and 3 are 16 MB each and stock `vsav` fills both, so a
+Verilator run renders from a half-aliased tile map. Bank 0 (PRG 0-4 MB, VRAM
+@4, ORAM @5, work RAM @6, sound @7) is entirely under the line, which is why
+the 14z-107 work-RAM anchor oracle is unaffected — but "the frames showed
+sprites" is NOT evidence that GFX addressing is faithful.
+
+The fix is three constants (`<< 10`, `& 0x7fffff`, `0x3ff`) gated on the same
+macro the buffer size already follows. **The general trap: a simulation model
+can be a DIFFERENT PART from the one the design targets, and it will not tell
+you** — check the testbench's own geometry before trusting any result that
+depends on the far end of a bank.

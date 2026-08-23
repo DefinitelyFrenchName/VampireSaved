@@ -441,19 +441,44 @@ bank-1 codes (374 codes as of m3a) — not a constraint.
     bank latch [6:0]→[7:0], PCM_AW 23→24): SDRAM bank 1 already
     holds 16 MB under JTFRAME_SDRAM_LARGE and the loader path is
     [23:1] — region sizes are header-driven, no MRA/toml change.
-  - **The full WIDE set does not fit MiSTer regardless**: GFX is
-    architecturally capped at 32 MB (two 16 MB banks), 68k PRG at
-    4 MB, and the 64 MB JTFRAME_SDRAM_LARGE ceiling (+26-bit ioctl)
-    excludes ~70 MB. **RETRACTED 14z-106 (measured against jtframe RTL at
-    v1.7.3): there is NO `JTFRAME_SDRAM_XL` tier** — the only tier macro is
-    `JTFRAME_SDRAM_LARGE`, a `localparam SDRAMW=23` (64 MB) vs 22 (32 MB)
-    in `target/mister/jtframe_emu.sv` and the matching `[22:0]` bank ports
-    in `hdl/inc/jtframe_mem_ports.inc`; the MiSTer HPS side already carries
-    `ioctl_addr[26:0]` ("up to 128MB"). A 128 MB tier is therefore a WIDTH
-    change through jtframe + the core, not a switch — core surgery, sized
-    in `docs/platform/mister.md`. A MiSTer-shaped variant still
-    means pulling GFX back toward 32 MB (per-slot exclusivity) and
-    PRG within 4 MB.
+  - **The full WIDE set does not fit stock jtcps2**: GFX is capped at
+    32 MB, 68k PRG at 4 MB, scroll at 8 MB, QSound at 8 MB with a 7-bit
+    bank latch. **REFINED 14z-107 (2): three of those four are the OBJECT/
+    ADDRESS FORMAT in the CPS-2 core, not the memory tier** — a 16-bit tile
+    code plus a 2-bit bank from `table_y[14:13]`
+    (`cores/cps2/hdl/jtcps2_obj_scan.v:47,152`) = 2^18 codes x 128 B = 32 MB;
+    `jtcps2_main.v:184` `rom_cs <= A[23:22] == 2'b00;` = a flat 4 MB;
+    `jtcps1_sdram.v:121,179,209` = 8 MB of scroll with no bank input. **No
+    SDRAM tier lifts any of them**, and the GFX one is the SAME 19-bit tile
+    promote this profile already ratified on FBNeo (Correction A2 above).
+    Details and the fit arithmetic: `docs/platform/mister.md` "What the
+    CPS-2 CORE caps" and `docs/project/mister_fit.md` section 6.
+  - **THE `JTFRAME_SDRAM_XL` STATUS — RETRACTED 14z-106, PARTIALLY
+    UN-RETRACTED 14z-107 (2). Read the version qualifier, it is the whole
+    point.**
+    - **At our pin (`jtcores` v1.7.3, the submodule `emu/jtcores`) there is
+      NO XL tier, and 64 MB is PHYSICAL** — not a default with something
+      behind it. `grep -rn SDRAM_XL modules/jtframe` = 0 hits; the only tier
+      macro is `JTFRAME_SDRAM_LARGE` (`localparam SDRAMW=23` vs 22,
+      `target/mister/jtframe_emu.sv:168-172`); the bank-core table stops at
+      `AW 23 = 64 MB`; row/column geometry (`ROW=13`, `COW = AW==22 ? 9 : 10`)
+      has no AW=24 arm and would leave `addr[9]` undriven; and `sys.tcl`
+      assigns exactly 13 A pins, 2 BA pins and one nCS. The 14z-106
+      measurement is CONFIRMED, not withdrawn.
+    - **As a claim about jtframe, the original sentence in this document was
+      RIGHT.** Upstream `jotego/jtcores` master DOES carry a 128 MB tier —
+      `` `ifdef JTFRAME_SDRAM_XL / localparam SDRAMW=24; `` in
+      `modules/jtframe/target/mister/hdl/jtframe_emu.sv:175-181`, added
+      2026-06-19 (`5981db26`), consumed for real by `cores/cps3`. Its
+      mechanism is TWO CHIPS on one module selected by the top address bit,
+      with chip select carried on nCS POLARITY.
+    - **So: right about the framework, wrong about the version we pinned.**
+      And XL is not a flag — it lives only in the `JTFRAME_SDRAM_CACHE`
+      branch, which nothing forces you to enable (a silent-aliasing trap,
+      filed in `docs/platform/gotchas.md`). The route question — uprev to
+      master, or bank-repack inside the 64 MB pin — is a pending decision in
+      STATE ("THE MiSTer MEMORY-MAP ROUTE"). Full argument, with every
+      file:line: `docs/platform/mister.md`.
   - Consequence for M5: sfx restored at banks < 0x80 (the 14z-86
     ejection pilot rides vsav's own image at bank 0x18) are
     MiSTer-compatible as-is; only content placed in the QSound

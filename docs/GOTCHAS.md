@@ -346,3 +346,20 @@ is a GAME gotcha if it is true of the game regardless of the port.
   comment-only edit shifted a 55-minute gate into `syntax error near
   unexpected token` after its simulation had already finished; `sh -n`
   passes throughout. Queue edits to scripts a long job is executing.
+- **14z-107 (platform):** a tier MACRO is not a tier —
+  `JTFRAME_SDRAM_XL` (128 MB) only works inside the
+  `JTFRAME_SDRAM_CACHE` branch of `jtframe_board_sdram.v`, and NOTHING
+  requires the two together (`macros/public.go:131-140` checks only
+  XL-vs-LARGE and XL-vs-`BAx_START`). On a core with explicit slot
+  modules and no `cfg/mem.yaml` — i.e. CPS-1/CPS-2 — setting XL
+  compiles, validates and silently produces a map where `addr[9]` is
+  never driven, aliasing every address with `addr ^ 0x200`. Check which
+  controller a macro's logic lives in before setting it.
+- **14z-107 (platform):** the Verilator SDRAM model
+  (`hdl/ver/test.cpp`) sizes its BUFFERS from `JTFRAME_SDRAM_LARGE`
+  (16 MB/bank) but decodes the PINS at a fixed 22 bits — `SDRAM_A << 9`,
+  `& 0x3fffff`, 9-bit column masks — i.e. an **8 MB/bank, 32 MB module**.
+  Anything above 8 MB in a bank aliases in simulation with no warning, so
+  jtcps2's 16 MB GFX banks are half-aliased and "the frames showed
+  sprites" proves the core runs, not that GFX addressing is right. A
+  simulation model can be a DIFFERENT PART from the design's target.
