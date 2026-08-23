@@ -143,6 +143,12 @@ scratch clone inside it**.
   controls — the dumped window must be **NON-CONSTANT** before anything is
   compared (the near-miss, made into a gate), a byte-swapped sim side must be
   rejected, and a run WITHOUT `--wram` must produce no `wram/` at all.
+  **RUN END TO END: PASS** (2026-08-23 02:24-03:17, sim wall 52'05";
+  `build/mister_sim_anchor_14z107.log`). The gate ran TWICE with a one-line
+  fix between (the inertness control had called the runner without
+  `--no-load`, so the tool rightly refused "--frames 5 is inside the
+  462-frame download"); **both runs produced the SAME sim anchor 2507 and the
+  SAME skew 361** — the lane is deterministic run to run.
 
 **TIMES on this machine** (Apple Silicon, Verilator 5.050): the ROM download
 is **462 simulated frames on EVERY run** (~7-8 min); incremental rebuild after

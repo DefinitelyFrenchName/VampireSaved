@@ -1,0 +1,28 @@
+# 14z-107 — tests/test_mister_sim_anchor.sh, the end-to-end run (2026-08-23 02:24-03:17)
+# stock cps2 core at fork pin 553dd56; MAME 0.288 pinned cps2 build; stock vsavj.
+# The two independent runs of this gate agreed exactly: sim anchor 2507, skew 361.
+
+== MAME leg (stock vsavj, whole 68k work RAM, frames 2100-2400) ==
+  PASS MAME anchor at the frozen frame 2146
+== sim leg (stock jtcps2 under Verilator; ~45 min) ==
+[run_sim_jtcps2] rom  <JTSIM_SCRATCH>/rom/vsavj.rom sha1 f9dc29870c871355c5c0fa06c6ad8bea9236ba28
+read /Users/koneko/Developer/Vampire_Saved/VampireSaved/tests/replays/05_timeout_idle.rpl sha1 7f7ea80172952646fe9071598189ab6cb602dd2c
+wrote <JTSIM_SCRATCH>/cores/cps2/ver/game/sim_inputs.hex sha1 931e6cafebf8644f04f4cbcc93ce46875c6a2236 frames=2800 active=13 offset=462
+[run_sim_jtcps2] RAM dump frames 2400..2800 (ABSOLUTE, download included) -> wram/dump_<frame>_ff0000.bin
+[run_sim_jtcps2] jtsim -verilator -sysname cps2 -inputs -load -frame 2338 -d JTFRAME_SIM_WRAMDUMP=2400 -d JTFRAME_SIM_WRAMDUMP_END=2800 -d JTFRAME_SIM_WRAMDUMP_BANK=0 -d JTFRAME_SIM_WRAMDUMP_OFF=0x600000 -d JTFRAME_SIM_WRAMDUMP_LEN=0x10000 -d JTFRAME_SIM_WRAMDUMP_ADDR=0xff0000
+[run_sim_jtcps2] jtsim wall 52m5s
+[run_sim_jtcps2] ROM file transfered (frame 462)
+[run_sim_jtcps2] collected 401 dumps into <tmp>
+[run_sim_jtcps2] done: <tmp>
+  PASS the dumped window is NON-CONSTANT (the instrument is live)
+  PASS sim anchor at frame 2507, skew 361 (frozen 361 +/- 30)
+== field agreement at the anchor (follow 0,60,180) ==
+  PASS MAME and jtcps2 agree on every mapped field (anchors: mame=[2146] jtcps2=[2507])
+  note: whole 64 KB at anchor+60 differs in 1511 of 65536 bytes (informational;
+        ~1,500 measured 14z-107, nearly all of it the other CPU opponent)
+  note: P1 record base mame $093B6A / jtcps2 $093B6A   P2 (the arcade draw) mame $0AE9D4 / jtcps2 $0A9518
+== control: byte-swapped sim dumps must FAIL ==
+  PASS control fired: byte-swapped sim dumps rejected
+== control: the harness hook is inert without --wram ==
+  PASS control fired: no wram/ when JTFRAME_SIM_WRAMDUMP is undefined
+PASS test_mister_sim_anchor

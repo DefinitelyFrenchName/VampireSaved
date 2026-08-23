@@ -147,7 +147,11 @@ then bad "CONTROL DID NOT FIRE: byte-swapped sim dumps compared equal"
 else ok "control fired: byte-swapped sim dumps rejected"; fi
 
 echo "== control: the harness hook is inert without --wram =="
-"$REPO/tools/run_sim_jtcps2.sh" "$RPL" "$W/inert" --core cps2 --frames 5 > "$W/inert.log" 2>&1 \
+# --no-load: the macro's absence is a COMPILE-time property, so the cheapest
+# run that proves it is a 5-frame one with no ROM transfer (~30 s including
+# the rebuild). The 68k does not run in such a run, which is fine here and
+# nowhere else.
+"$REPO/tools/run_sim_jtcps2.sh" "$RPL" "$W/inert" --core cps2 --no-load --frames 5 > "$W/inert.log" 2>&1 \
     || { bad "the inertness control run failed"; tail -5 "$W/inert.log" | sed 's/^/      /'; }
 [ -d "$W/inert/wram" ] && bad "CONTROL DID NOT FIRE: wram/ produced with the macro absent" \
                        || ok "control fired: no wram/ when JTFRAME_SIM_WRAMDUMP is undefined"
