@@ -465,3 +465,11 @@ is a GAME gotcha if it is true of the game regardless of the port.
   changes the inputs. Not fixed there (the one-line fix moves the frozen §4
   anchor); the MAME and sim legs of the anchor gate are therefore not
   running identical inputs today.
+- **14z-107 (7) (project):** **editing a shell script while it is running
+  derails it** — `sh` reads by BYTE OFFSET, so even a comment-only edit
+  moves the ground under the interpreter. Three 45-minute simulations and a
+  whole gate verdict were lost to a header rewrite mid-flight (`syntax
+  error near unexpected token 'else'`). The MEASUREMENTS survived because a
+  separate process had already written them; only the shell wrapper's
+  post-processing died. Freeze `tests/*.sh` and `tools/*.sh` before
+  launching a long run.

@@ -184,6 +184,27 @@ legs of the oracle are not running identical inputs. The one-line fix
 P2/6-button fork commit — that pending item is upgraded from COVERAGE to
 FIDELITY.
 
+**G. THE FIX VERIFIED IN THE LANE, not just in a toy.** A fifth run:
+`cps2w`, stock `vsavj`, **frame output FORK** (1,349 jpgs written — the
+picture is fully rendered), at the pin WITH commit 9's `_exit(0)`.
+Result: **anchor 2609** — the clean value — and **BIT-IDENTICAL to the
+no-fork leg in all 681 frames**, while differing from the UNFIXED fork leg
+in 483 of 681 starting at frame 2051. The log-side effect is gone with it:
+**1** copy of the `$display` line where the unfixed run had **1,349**
+(= 1,348 children + the parent). So the repair restores the simulation
+while leaving the frame writer doing its job.
+
+**H. A SELF-INFLICTED LESSON, RECORDED BECAUSE IT COST THREE RUNS.** The
+runner's header was rewritten WHILE three 45-minute simulations and the
+anchor gate were mid-flight. `sh` reads a script by BYTE OFFSET, so a
+comment-only edit is enough: all four died at their next statement with
+`syntax error near unexpected token 'else'`. The MEASUREMENTS survived —
+the Verilator sims are separate processes and had already written their
+dumps into the scratch clone, so each was recovered by copying
+`cores/<core>/ver/game/wram` out by hand — but the gate's verdict had to be
+discarded and the gate re-run from scratch on a frozen tree.
+`docs/project/gotchas.md` + the index.
+
 **PUSH PENDING:** `4840df8a`, `692ba4d6` and `7cf1eedb` are all local-only;
 `origin/vampire-saved` still ends at `38acc638`.
 

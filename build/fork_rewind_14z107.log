@@ -64,3 +64,17 @@ lutON_fbFORK    (pin 692ba4d6, child exit(0)):  1349 copies of
                 'INFO: Read pal_lut.hex for TOP...u_lut' = 1348 children + 1 parent
 lutON_fbFORK_fixed (pin 7cf1eedb, child _exit(0)): 0 per-fork copies
                 (the parent's own single copy lands at exit)
+
+=== THE FIX VERIFIED IN THE LANE: fork mode at pin 7cf1eedb (child _exit) ===
+1,349 jpgs written (the picture is still rendered), dump integrity OK,
+anchor 2609 — the CLEAN value.
+--- vs the clean NO-FORK leg:
+A=out_lutON_fbOFF (681 dumps)  B=out_lutON_fbFORK_fixed (681 dumps)
+  common 681 frames: identical 681, differing 0
+  BIT-IDENTICAL on every common frame
+--- vs the UNFIXED fork leg:
+A=out_lutON_fbFORK (681 dumps)  B=out_lutON_fbFORK_fixed (681 dumps)
+  common 681 frames: identical 198, differing 483
+  FIRST DIVERGENCE frame 2051: 1 byte(s)
+    RAM:$FF8060  A=0x41  B=0x40
+--- copies of one $display line in the log: 1 (was 1349)

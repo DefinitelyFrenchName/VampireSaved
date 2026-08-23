@@ -2857,3 +2857,20 @@ rig-must-produce-the-real-event: a multi-character audit needs per-leg
 to judge a leg whose setup event did not happen (whiff/no-knockdown),
 never pass it and never report it as the surface failing. All four new
 combat audits (timeout/downwin/throws/down_attack) carry that refusal.
+- **DO NOT EDIT A SHELL SCRIPT WHILE IT IS RUNNING — `sh` reads it by BYTE
+  OFFSET, so even a COMMENT-ONLY edit derails it.** Paid for in
+  14z-107 (7): `tools/run_sim_jtcps2.sh`'s header was rewritten while three
+  45-minute simulations were mid-flight, and each of them died at its
+  collection step with `syntax error near unexpected token 'else'` — the
+  interpreter resumed reading at an offset the edit had moved. The same
+  edit hit a running `tests/test_mister_sim_anchor.sh`, whose whole verdict
+  had to be discarded and re-run. **What survives is what a separate
+  PROCESS produced**: the Verilator sims had already written their dumps
+  into the scratch clone, so every measurement was recoverable by copying
+  `cores/<core>/ver/game/wram` out by hand — only the shell wrapper's
+  post-processing was lost. Rule: freeze `tests/*.sh` and `tools/*.sh`
+  before launching a long run, and if an edit cannot wait, copy the script
+  and run the copy. (This is why 14z-107's own brief says "run the legs
+  detached, poll the PID, and never edit a script while it is running" — it
+  is in the brief because it is easy to do by accident while filling the
+  wait productively.)
