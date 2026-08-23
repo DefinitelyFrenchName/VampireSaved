@@ -1254,3 +1254,57 @@ PHASE of the run do". Fork commit 5 adds a raw counter line
 (`SDRAM_STATS_RAW`) next to them. **When an instrument reports a rounded
 rate and a running average, it is a dashboard, not a measurement** — check
 that the raw counters are reachable before planning an analysis on it.
+
+## A CPS-2 tile code IS its SDRAM address — so LIVE BYTES are not a FOOTPRINT (14z-107)
+
+The `.rom` stores GFX in the MAME 4-way 64-bit interleave (`[rom] { name="gfx",
+width=64 }`), and `cores/cps1/hdl/jtcps1_prom_we.v:105` applies a CPS-2
+address scramble at download time:
+
+```verilog
+gfx_addr = { gfx_addr[25:21], gfx_addr[3], gfx_addr[20:4], gfx_addr[2:0] };
+```
+
+Composed, the two **cancel**: the SDRAM address of tile code `c` is exactly
+`c * 128 + (byte within tile)`, contiguous and monotonic in `c`. The scramble
+is not an obfuscation, it is the de-interleaver.
+
+Two consequences that are easy to get wrong, and both were:
+
+1. **You cannot cost a tile set by counting its bytes.** A roster occupying
+   6.39 MB of art scattered up to code `0xFFDB` needs **15.45 MB** of SDRAM,
+   because the code space between its tiles is address space it owns. Sparse
+   art cannot be compacted without renumbering tile codes — which is game
+   data, not a mapping choice.
+2. **Do not re-derive the tile→member mapping.** A plausible bit-level
+   derivation of "which member byte holds tile `t`" produced 978/722/775/977
+   blank tiles for vanilla `vsav`; `tools/gfx_tiles.py:112 tile_bytes()` — the
+   canonical one, which the whole project already uses — produces
+   418/2917/51/642, the figures every earlier census froze. **A derived
+   address map is worth nothing until it reproduces a number somebody already
+   measured.** Run the known census first, then trust the derivation.
+
+## jtframe `mame2mra`: `rom_len` cannot SHRINK, and region starts must be 1 KiB-aligned (14z-107)
+
+Two traps in the MRA generator (`modules/jtframe/src/jtframe/mra/`), both
+silent:
+
+- **`rom_len` smaller than the file truncates the emitted bytes but still
+  advances `pos` by the FULL file size** (`corerom.go:562-577` — the option
+  is designed to pad up, or to duplicate at exactly `2 x size`). Every later
+  region's header start word then disagrees with the real `.rom`. To shorten
+  a region use `parts=[{name,crc,map,length,offset}]` (`corerom.go:462-479`),
+  which is also the only route to a PARTIAL zip member — the reader
+  implements a real byte window at `mra2rom.go:177-196`.
+- **On CPS-2 the generator's `pos` counts the 20-byte `key` region while the
+  RTL's `bulk_addr` starts after it** (`FULL_HEADER = 26'd64` = 44 header +
+  20 key, `jtcps1_prom_we.v:58`). Header words are `pos >> 10`, RTL compares
+  `bulk_addr[25:10]`; the two agree **only because 20 < 1024 and every region
+  start is 1 KiB-aligned**. A CPS-2 region that starts at a non-1 KiB body
+  offset puts its header word off by one KiB block, with no warning.
+
+Related hard ceilings worth knowing before sizing a `.rom`: the GAME-side
+port is `input [25:0] ioctl_addr` (**64 MB**,
+`modules/jtframe/hdl/inc/jtframe_mem_ports.inc:1`) even though the MiSTer
+target carries 27 bits (`jtframe_emu.sv:334`), and each header start word is
+**16 bits in KiB units**, i.e. 65,535 KiB max.

@@ -1,4 +1,35 @@
-# NEXT SESSION — orientation (rewritten at the 14z-107 (2) close, 2026-08-23)
+# NEXT SESSION — orientation (rewritten at the 14z-107 (4) close, 2026-08-23)
+
+> ## **NEWEST FIRST — 14z-107 (4): THE MiSTer SDRAM PLACEMENT MAP EXISTS
+> ## AND IT FITS, by 0.708 MB of 64.** Read `docs/project/mister_map.md`
+> ## before any MiSTer RTL. Three things in it change what earlier
+> ## entries below say:
+> ## **(1) "6.39 MB of tenant art into bank 1's 7.1 MB spare" IS WRONG.**
+> ## 6.39 MB is a LIVE-BYTE count; a CPS-2 tile code IS its SDRAM address
+> ## (the download scramble at `jtcps1_prom_we.v:105` undoes the .rom's
+> ## 4-way interleave), and the roster runs to code `0xEE73` in group-C
+> ## obj bank 4 and `0xFFDB` in bank 5 -> **an ADDRESS FOOTPRINT of
+> ## 15.45 MB**, needing the spare of BOTH banks 0 and 1.
+> ## **(2) THE WIDE `.rom` DOES NOT DOWNLOAD AS DECLARED** — 70.26 MB
+> ## overflows the 26-bit `ioctl_addr` GAME port
+> ## (`jtframe_mem_ports.inc:1`) AND the 16-bit header start word. The
+> ## MRA must trim QSound to 8.9375 MB; `mra2rom.go:177-196` +
+> ## `parts=[...]` do that from the MRA alone, so the ONE-ROMSET ruling
+> ## holds. QSound is then SPLIT across SDRAM banks 0 and 1 on
+> ## `pcm_addr[23]` — without that split the map overflows bank 1 by
+> ## 0.39 MB and nothing else closes it.
+> ## **(3) THE PRG WINDOW IS RESOLVED:** `objcfg_cs` is WRITE-ONLY
+> ## (`jtcps2_main.v:190 && !RnW`), so a 6 MB `rom_cs` gated on `RnW`
+> ## has NO read collision; the 16-byte `$400000-$40000F` reservation is
+> ## enough. Bonus defect found: `:167` would leave `$500000-$5FFFFF`
+> ## ZERO-wait while all other ROM is one-wait.
+> ## **Slice plan D0-D4 with a gate + must-fire control each is in §10.**
+> ## New gate `tests/audit_mister_map_fit.sh` (ci_static, ~5 s) freezes
+> ## the four extents the fit rests on; **one new tenant tile above
+> ## `0xEE73`/`0xFFDB` breaks the map**, and this is what catches it.
+> ## **Open for the maintainer: the bank-0 slot count** (add
+> ## `jtframe_ram1_7slots` vs move the Z80 to bank 1) — Decisions
+> ## pending.
 
 > ## **THE STATE IN ONE BREATH: the 14z-105 window is FROZEN as
 > ## donovan-m11 / huitzil-m20 / pyron-m14 / merged-m6 (stock twin

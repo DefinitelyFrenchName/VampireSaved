@@ -79,9 +79,15 @@ this roster REQUIRES a GFX tier wider than 32 MB** — ~~i.e. the maintainer's
 128 MB module plus the width change through jtframe + the core~~.
 **CORRECTED 14z-107 (2): the GFX conclusion STANDS (the art does not fit
 vanilla's 32 MB), but "i.e. the 128 MB module" does not follow.** Section 6
-shows the ~6.4 MB overflow also fits the SPARE of the existing 64 MB map
-(bank 1, above the PCM), and `docs/platform/mister.md` shows the 128 MB tier
-is not at our pin and is not a flag. Two routes, one pending decision.
+shows the overflow also fits the SPARE of the existing 64 MB map, and
+`docs/platform/mister.md` shows the 128 MB tier is not at our pin and is not
+a flag. **ROUTE RULED 14z-107 (3): BANK REPACK.** ~~(bank 1, above the
+PCM)~~ **CORRECTED 14z-107 (4): not bank 1 alone.** The table above is a
+LIVE-BYTE count; the ADDRESS FOOTPRINT of group C is **15.45 MB** (up to
+code `0xEE73` in obj bank 4 and `0xFFDB` in obj bank 5 — a CPS-2 tile code
+IS its SDRAM address), so it takes the spare of banks 0 AND 1 plus the
+QSound extension moved out of bank 1. It still fits, by 0.708 MB of 64:
+`docs/project/mister_map.md`.
 
 ## 4. Z80
 
@@ -179,17 +185,34 @@ CURRENT 64 MB map:
 - **QSound 16 MB FITS BANK 1 TODAY.** PCM is alone in a 16 MB bank; only
   `PCM_AW` 23 -> 24 and the 14z-86 latch fix are needed. Live content is
   8.9 MB, leaving **~7.1 MB spare at the top of bank 1**.
+  **CORRECTED 14z-107 (4): 16 MB of QSound must NOT be placed** — the WIDE
+  `.rom` mapped verbatim is 70.26 MB, which overflows both the 26-bit
+  `ioctl_addr` game port and the 16-bit header start word. QSound is placed
+  at 8.9375 MB and SPLIT across banks 0 and 1. See `mister_map.md` §3, §5.
 - **ONLY GFX OVERFLOWS, by ~6.4 MB.** Banks 2+3 are exactly full at 32 MB
   with vanilla's own art, and the roster adds 6.39 MB.
+  ~~6.39 MB~~ **RETRACTED 14z-107 (4): 6.39 MB is a LIVE-BYTE count, not an
+  ADDRESS FOOTPRINT.** A CPS-2 tile code IS its SDRAM address (the download
+  scramble at `jtcps1_prom_we.v:105` undoes the `.rom`'s 4-way interleave),
+  and the tenant art is sparse across BOTH group-C obj banks — up to code
+  `0xEE73` in bank 4 and `0xFFDB` in bank 5. **The footprint is 15.45 MB**
+  (7.452 + 7.995), so the art cannot go into one bank's spare at all. Full
+  arithmetic and the map that does work: `docs/project/mister_map.md`.
 
 ### What that opens
 
 A 64 MB route exists that was previously written off: **leave vanilla's
 32 MB of GFX exactly where it is in banks 2+3** (so the superset invariant is
-untouched by construction) and put the ~6.4 MB of group-C art in **bank 1,
-above the PCM**, reached by the promoted tile-code bit — which is the RTL
+untouched by construction) and put the group-C art in the spare of the other
+two banks, reached by the promoted tile-code bit — which is the RTL
 expression of the profile-gated 19-bit promote CPS-2 WIDE v1 already makes on
-FBNeo. 6.39 MB into ~7.1 MB of spare.
+FBNeo. ~~6.39 MB into ~7.1 MB of spare.~~ **CORRECTED 14z-107 (4): the art's
+ADDRESS FOOTPRINT is 15.45 MB, not 6.39 MB, and it needs BOTH banks' spare —
+one group-C obj bank each, plus the QSound extension moved out of bank 1 into
+bank 0.** It still fits, by 0.708 MB of 64. The placement map, the
+arithmetic, the PRG decode proposal and the slice plan are
+`docs/project/mister_map.md`; the extents the fit depends on are frozen by
+`tests/audit_mister_map_fit.sh`.
 
 Named honestly, the risk is throughput, not capacity: object reads would then
 share bank 1 with PCM streaming, on exactly the path jtframe hand-tunes per

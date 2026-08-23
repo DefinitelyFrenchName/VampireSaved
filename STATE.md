@@ -1,5 +1,120 @@
 # STATE — living progress log
 
+## Session 14z-107 (4) — THE MiSTer SDRAM PLACEMENT MAP: it FITS, by
+## **0.708 MB of 64**, but NOT the way the route was framed — "6.39 MB of
+## tenant art into bank 1's 7.1 MB spare" is a LIVE-BYTE count against an
+## ADDRESS FOOTPRINT of **15.45 MB**; and the WIDE `.rom` mapped verbatim
+## does not download AT ALL. Design + measurement only; no RTL
+
+**The one line:** the repack works, but it takes the spare of BOTH banks 0
+and 1, it needs the QSound region trimmed at the MRA and SPLIT across two
+SDRAM banks, and the thing that decides all of it is that **a CPS-2 tile
+code IS its SDRAM address**.
+
+**A. THE PREMISE CORRECTION (`docs/project/mister_map.md` §1).**
+`jtcps1_prom_we.v:105`'s CPS-2 GFX scramble, composed with the `.rom`'s 4-way
+64-bit interleave, **undoes the interleave**: tile code `c` lands at
+`c*128` inside its obj bank, contiguous and monotonic. So the SDRAM cost is
+set by the HIGHEST code the roster uses, not by how many it uses. Measured on
+`build/m3b_merged13/rompath/vsavjw.zip`: group C obj bank 4 runs to `0xEE73`
+(= the top of Donovan's frozen band+shelf) and obj bank 5 to `0xFFDB`
+(`patch/effect_c5.*.json`) — **7.452 + 7.995 = 15.45 MB of address space
+holding 6.39 MB of art.** It cannot be compacted without renumbering tile
+codes, which is game data. **I got the tile↔member mapping wrong on the first
+derivation and the project's own blank-tile census caught it**: my mapping
+gave 978/722/775/977, `tools/gfx_tiles.py:112 tile_bytes()` gives
+**418/2917/51/642** — the exact figures `mister_fit.md` §3 froze. *A derived
+address map is worth nothing until it reproduces a number somebody already
+measured.*
+
+**B. THE WIDE `.rom` DOES NOT DOWNLOAD AS DECLARED — two independent
+overflows**, and neither is about SDRAM. Mapped verbatim the image is
+**70.26 MB**: (i) the GAME-side port is `input [25:0] ioctl_addr` = 64 MB
+(`modules/jtframe/hdl/inc/jtframe_mem_ports.inc:1` — the MiSTer target
+carries 27 bits at `jtframe_emu.sv:334`, the game port is the cap), and
+(ii) `qsnd_start` would be 71,936 KiB against a **16-bit** header word. So
+the MRA MUST trim, on any SDRAM tier.
+
+**C. THE MRA CAN DO IT WITHOUT TOUCHING THE ROMSET — read from the Go, not
+hoped.** `mra2rom.go:177-196` implements a byte window into a zip member
+(`offset`/`length`, no alignment constraint), reached from TOML by
+`parts=[{name,crc,map,length,offset}]` (`types.go:114-117`,
+`corerom.go:462-479`) — already used in-tree to map one file twice at two
+offsets (`cores/cps1/cfg/mame2mra.toml:165-173`, Pang!3). Region configs are
+`Selectable` by setname (`corerom.go:390-412`), so a `setname="vsavjw"` row
+retunes the WIDE mapping and leaves stock `vsavj` byte-identical. **The
+maintainer's one-romset ruling is honoured: the change is in the MRA.**
+Two traps recorded: `rom_len` must NOT be used to shrink (it advances `pos`
+by the full file size, desynchronising every later header word,
+`corerom.go:562-577`), and the generator's `pos` counts the 20-byte key while
+the RTL's `bulk_addr` does not — **they agree only because every CPS-2 region
+start is 1 KiB-aligned.**
+
+**D. THE MAP** (full table, arithmetic and every `file:line` in
+`docs/project/mister_map.md` §5). Banks 2+3 keep vanilla's 32 MB
+**byte-for-byte, by construction** — `GFX_OFFSET` is left at its `23'h0`
+default and `gfx_bank = {1'b1, gfx_addr[23]}`, so the redirect condition
+(`gfx_addr[25]`) is 0 across the whole stock region; verified against the
+placement code rather than asserted. The other two banks:
+- **bank 0** = PRG 6 MB, VRAM/ORAM/WRAM/Z80 windows (0.84 MB), **the QSound
+  EXTENSION (DSP sample banks 0x80-0x8F, 1 MB)**, and **group C obj bank 5**
+  (7.995 MB) — 16,608,768 of 16,777,216 B;
+- **bank 1** = QSound stock 8 MB at offset 0 (byte-identical to stock
+  jtcps2) and **group C obj bank 4** (7.452 MB) — 16,202,240 B.
+- `.rom` = 63.196 MB; header words 6144 / 6400 / 15552 / 64704, all legal.
+
+**E. THE MOVE THAT MAKES IT FIT, AND WHY THERE IS NO ALTERNATIVE.** With
+QSound whole in bank 1, bank 1's spare is 7.06 MB and the SMALLER group-C obj
+bank needs 7.452 — **an overflow of 0.39 MB that no rearrangement of PRG,
+Z80 or the RAM windows closes, because the deficit is strictly bank 1's and
+PCM is the only thing in bank 1.** So the QSound region is split on
+`pcm_addr[23]` — which is exactly the stock/WIDE boundary. Cost: bank 0 goes
+to **7 slots** and upstream's family stops at `jtframe_ram1_5slots`. Two
+ways out, both in Decisions pending.
+
+**F. THE PRG WINDOW, RESOLVED.** `jtcps2_main.v:190` decodes `objcfg_cs`
+over the WHOLE `$400000-$4FFFFF` (not 16 bytes) but qualifies it `&& !RnW`,
+so **there is no read collision at all**, and `$500000-$5FFFFF` is decoded by
+nothing. Minimal proposal: `rom_cs <= (A[23:22]==0) | (CPS2W & RnW &
+A[23:21]==3'b010)`, `rom_addr <= A[22:1]`, `SLOT3_AW` 22. The 16-byte
+reservation IS enough — and it is now load-bearing in a THIRD implementation.
+**Found while reading it:** `jtcps2_main.v:167` gives `A[23:20] < 4'h5` one
+wait state, so `$500000-$5FFFFF` would run **zero-wait** while every other
+byte of program ROM runs one-wait. Gated fix `4'h6` in the same slice.
+
+**G. QSOUND, ANSWERED.** The power-of-two rule is **FBNeo's**
+(`rom_mask = nCpsQSamLen - 1`) and binds the ROMSET, not the placement:
+jtcps2 has **no mask anywhere** on the sample path (`grep mask
+cores/cps15/hdl/jtcps15_sound.v` = 0 hits; the cap is the `PCM_AW` address
+width), so 8.9375 MB is conformant. After the width fix
+(`qsnd_addr[23:0]`, latch `dsp_ab[7:0]`, `PCM_AW` 24) banks `0x80-0x8E`
+are addressable — `qsnd_addr[23]` is precisely the split bit. Banks
+`0x90-0xFF` are placed nowhere; recommend masking the high window to 1 MB so
+a stray bank aliases inside the extension instead of reading GFX as PCM.
+
+**H. WRITTEN:** `docs/project/mister_map.md` (new — the map, the arithmetic,
+the `.rom` layout, the PRG decode proposal, the D0-D4 slice plan with a gate
+and a must-fire control each, and eight open questions);
+`tests/audit_mister_map_fit.sh` (new gate, ci_static, ~5 s — freezes the four
+extents, checks the `.rom` against the 26-bit `ioctl_addr` and the 16-bit
+header words, and carries two must-fire controls that both fire);
+`tests/ci_static.txt`, `HANDOFF.md` gate table, `docs/README.md`;
+retractions marked in place in `docs/project/mister_fit.md` §3/§6,
+`docs/project/cps2_wide.md` (three places) and STATE 14z-107 (2).
+
+**THE SLICE PLAN, in one line each** (§10): **D0** the MRA rows alone — the
+only slice that can fail for a reason no RTL can fix; **D1** the QSound
+width fix, with the aliasing defect reproduced as the must-fire fixture;
+**D2** placement (offsets, group-C redirect, QSound split, new slots), gated
+by an SDRAM image census whose control is a 1 KiB offset perturbation;
+**D3** the obj promote, gated by the MiSTer twin of the FBNeo B4 canary;
+**D4** the PRG window, gated by the B4-prg relocate-and-repoint control.
+Every slice re-runs `tests/test_mister_sim_anchor.sh` on stock `vsavj`
+(2146 / 2502 / 356 ± 30) as the emulator superset leg.
+
+**NOT DONE, deliberately:** no RTL, no MRA row written, no core built. The
+brief said design and measure.
+
 ## Session 14z-107 (3) — THE SIM LANE'S SDRAM MODEL WAS WRONG AND IS NOW
 ## RIGHT (it dropped `addr[22]`, not `addr[9]` — the "~3 constants" fix
 ## would have made a DIFFERENT wrong map), `jtsim -stats` made to work at
@@ -1218,6 +1333,32 @@ Original write-up kept below.
 
 ## Decisions pending (human)
 
+- **THE BANK-0 SLOT COUNT — a fork-surface call (14z-107 (4), NEW).** The
+  placement map (`docs/project/mister_map.md` §5) puts seven consumers in
+  SDRAM bank 0 (RAM/VRAM/ORAM, VRAM-DMA, gfx-ORAM, main ROM, Z80, the QSound
+  high window, group-C obj bank 5) and upstream's family stops at
+  `jtframe_ram1_5slots` (`ram2_4..6slots` are the only 6-slot variants and
+  they carry two write ports).
+  - **(A) add `jtframe_ram1_7slots.v` to the fork** — a mechanical member of
+    an existing formulaic family. Keeps SDRAM bank 1 to exactly the two
+    streams (PCM + obj) that `tests/audit_sdram_bank_load.sh` modelled when
+    it returned GO.
+  - **(B) move the Z80 program to bank 1** — bank 0 drops to six slots
+    (`jtframe_ram2_6slots`, second write port tied off) and bank 1 becomes
+    `jtframe_rom_3slots`. Zero new jtframe files, but bank 1 then carries
+    THREE streams, which is beyond what was measured, and bank 1 lands at
+    15.95 of 16 MB.
+  - **Recommendation: (A).** The GO verdict is a statement about a two-stream
+    bank 1; option (B) spends that evidence to save one boilerplate file.
+  Related and unresolved either way: **should the profile be selected at
+  RUNTIME from a spare header byte** (`jtcps1_prom_we.v:52-54` — "6 are
+  actually used and 10 are reserved") rather than by `ifdef` in `cps2w`? A
+  compile-time gate means stock `vsavj` on our RBF gets the widened PRG
+  decode and the 3-bit obj bank; both are provably inert for stock content
+  (`cps2_wide.md` A1/A2), but a header bit would restore
+  gating-by-construction and make the MRA the profile selector.
+
+
 - ~~**THE MiSTer MEMORY-MAP ROUTE (14z-107 (2)) — NEW, and it is the arc's
   next fork in the road.**~~ **DECIDED (maintainer, 2026-08-23): option (2),
   the BANK REPACK, measuring first; XL is the FALLBACK** — the ruling was
@@ -1269,7 +1410,10 @@ Original write-up kept below.
   superset invariant is untouched by construction, and the ~6.4 MB of tenant
   art goes into **bank 1, above the PCM** — which after a 16 MB-capable
   QSound carrying 8.9 MB of real content has **~7.1 MB spare** — reached by
-  the promoted tile-code bit, i.e. the RTL expression of the profile-gated
+  the promoted tile-code bit,
+  [**CORRECTED 14z-107 (4): "~6.4 MB into bank 1" is wrong — that is the
+  LIVE-BYTE count. The ADDRESS FOOTPRINT is 15.45 MB and needs BOTH banks'
+  spare; see `docs/project/mister_map.md` §1.**] i.e. the RTL expression of the profile-gated
   19-bit promote WIDE v1 already makes on FBNeo. No framework uprev, no
   second chip, no `mem.yaml` conversion, and it would run on a 64 MB module
   as well as on the maintainer's 128 MB one. **Risk, named honestly:** object

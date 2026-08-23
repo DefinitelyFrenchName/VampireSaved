@@ -18,7 +18,7 @@ Yes, about Vampire Savior -> `game/`. Yes, about CPS-2 or the emulators
 Entry points at this level, deliberately not in a bucket:
 - [`NEXT_SESSION.md`](NEXT_SESSION.md) — 60-second orientation, rewritten
   at session end. Session state, not knowledge.
-- [`GOTCHAS.md`](GOTCHAS.md) — the index of all 143 traps, grouped by
+- [`GOTCHAS.md`](GOTCHAS.md) — the index of all 145 traps, grouped by
   bucket, linking to `*/gotchas.md`. ~195 places in the repo cite
   `docs/GOTCHAS.md`; they all still land somewhere useful.
 - `checksums.txt` — machine-read by `tools/audit_roms.py`. A data
@@ -53,6 +53,10 @@ Entry points at this level, deliberately not in a bucket:
 - [`mister_fit.md`](project/mister_fit.md) — what merged-m6 needs vs what
   jtcps2 offers, per region; the bank-occupancy arithmetic (§6) behind the
   MiSTer memory-map route
+- [`mister_map.md`](project/mister_map.md) — the MiSTer SDRAM PLACEMENT MAP:
+  which region lands in which bank at which offset and why it fits, the
+  `.rom` layout against the 26-bit `ioctl_addr`, the QSound split, the 6 MB
+  PRG decode proposal, and the RTL slice plan D0-D4
 - `tenant_manifest.md`, `tables/` — port config; community-reviewable
   behavioural tables
 - `M1_acceptance.md`, `M2_feasibility.md`, `M3b_plan.md` — milestones

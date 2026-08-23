@@ -386,3 +386,20 @@ is a GAME gotcha if it is true of the game regardless of the port.
   Bonus: advancing the model clock naively (`time() += semi_period`)
   aborts the run — a delay deadline is not on the clock grid, so the step
   must land on each pending slot via `eventsPending()`/`nextTimeSlot()`.
+- **14z-107 (platform):** on CPS-2 a **tile code IS its SDRAM address** —
+  the download scramble (`jtcps1_prom_we.v:105`) exactly cancels the
+  `.rom`'s 4-way interleave, so code `c` lands at `c*128`. Therefore
+  **live bytes are not an address footprint**: 6.39 MB of art scattered up
+  to code `0xFFDB` costs 15.45 MB of SDRAM. And do not re-derive the
+  tile→member mapping — a plausible derivation gave 978/722/775/977 blank
+  tiles where the canonical `tools/gfx_tiles.py` gives the frozen
+  418/2917/51/642. **Reproduce a number somebody already measured before
+  trusting a new address map.**
+- **14z-107 (platform):** jtframe's MRA generator — `rom_len` smaller than
+  the file truncates the bytes but still advances `pos` by the full size,
+  desynchronising every later header word (use `parts=` to shorten); and on
+  CPS-2 the generator's `pos` counts the 20-byte key while the RTL's
+  `bulk_addr` does not, so header words are correct **only** while every
+  region start is 1 KiB-aligned. Ceilings: the GAME-side `ioctl_addr` is
+  `[25:0]` = 64 MB even though the MiSTer target has 27 bits, and each
+  header start word is 16 bits in KiB units.

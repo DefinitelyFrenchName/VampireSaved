@@ -40,6 +40,13 @@ Rules that are not negotiable, because the loaders depend on them:
 - GFX members come in groups of **4** and must all be the **same size**
   (`cps.cpp` consumes 4 at a time; `nGfxMaxSize` mis-sizes otherwise).
 - QSound length must stay a **power of two** (`rom_mask = nCpsQSamLen - 1`).
+  **SCOPE, 14z-107 (4): this binds the ROMSET because it is FBNeo's loader
+  rule.** MAME's ceiling is a 24-bit `device_rom_interface`, and jtcps2 has
+  **no mask at all** on the sample path (`PCM_AW` is an address width;
+  `grep mask cores/cps15/hdl/jtcps15_sound.v` is empty), so MiSTer may PLACE
+  a non-power-of-two slice of the same 16 MB region — and must, because the
+  verbatim `.rom` overflows the 26-bit `ioctl_addr`. See
+  `docs/project/mister_map.md` §3, §7.
 - Stock members are never resized or reordered — new capacity is appended,
   so all legacy provenance stays trivially valid.
 
@@ -368,6 +375,12 @@ into another game: MAME builds a fresh driver object per run.
    This is a genuine divergence and it is unobservable ONLY because the
    profile reserves that window. **Never allocate there** — the reservation
    is now load-bearing for dual-emulator agreement, not just tidiness.
+   **THIRD IMPLEMENTATION, 14z-107 (4): jtcps2 makes it a three-way
+   divergence.** `jtcps2_main.v:190` decodes `objcfg_cs` over the whole
+   `$400000-$4FFFFF` but qualifies it with `!RnW`, so today a READ there
+   asserts nothing; under the proposed 6 MB `rom_cs` it would return ROM.
+   The reservation is what keeps all three behaviours unobservable.
+   (`docs/project/mister_map.md` §8.)
 
 ### Gates added
 
@@ -441,6 +454,14 @@ bank-1 codes (374 codes as of m3a) — not a constraint.
     bank latch [6:0]→[7:0], PCM_AW 23→24): SDRAM bank 1 already
     holds 16 MB under JTFRAME_SDRAM_LARGE and the loader path is
     [23:1] — region sizes are header-driven, no MRA/toml change.
+    **CORRECTED 14z-107 (4): the WIDTH fix stands, but "no MRA/toml
+    change" is FALSE and 16 MB must NOT be placed.** The WIDE `.rom`
+    mapped verbatim is 70.26 MB, which overflows both the 26-bit
+    `ioctl_addr` game port (`jtframe_mem_ports.inc:1`) and the 16-bit
+    header start word; and bank 1's spare is needed for tenant art. The
+    MRA trims QSound to 8.9375 MB and the region is SPLIT across SDRAM
+    banks 0 and 1 on `pcm_addr[23]`. Map, arithmetic and slice plan:
+    `docs/project/mister_map.md`.
   - **The full WIDE set does not fit stock jtcps2**: GFX is capped at
     32 MB, 68k PRG at 4 MB, scroll at 8 MB, QSound at 8 MB with a 7-bit
     bank latch. **REFINED 14z-107 (2): three of those four are the OBJECT/
