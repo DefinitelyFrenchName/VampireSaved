@@ -2874,3 +2874,52 @@ combat audits (timeout/downwin/throws/down_attack) carry that refusal.
   detached, poll the PID, and never edit a script while it is running" — it
   is in the brief because it is easy to do by accident while filling the
   wait productively.)
+
+## THE INSTRUMENT PROTOCOL — adopted 14z-107 (11), maintainer-directed
+
+**Paid for six times in one arc, and the class is older than the arc** (see
+"half the Lua instruments stage inputs one frame off" and "success while the
+instrument was not the one being claimed", both above). The maintainer's
+direction, 2026-08-24: tighten how agent-driven instrumentation works, choose
+the mechanism on the facts, and prefer scoping for context and efficiency.
+
+**The facts it was chosen on.** Every instrument defect in the MiSTer arc was
+caught by a CHEAP MECHANICAL CHECK, not by review: an address contradicting
+its own label; a demanded comparison against the romset; a physically
+impossible percentage; a 2x2 factorial; a first real run. **None was caught by
+re-reading the work.** So a standing adversarial reviewer is the wrong buy —
+it spends context on the runs that are fine and would have missed most of
+these. Three rules instead, all mechanical:
+
+1. **SEPARATE THE AUTHOR FROM THE VERDICT.** The sharpest instance: the agent
+   that wrote the verdict tool also believed it, and reported **"D4 WORKS"
+   over ten opcode fetches the CPU received as garbage** — because the tool
+   judged the RAW word and never compared the LATCHED one. An author cannot
+   see the assumption they built in. Judging is small-context by nature (the
+   numbers, the control, the frozen expectation), so the split is nearly free:
+   measure in one scope, judge in another.
+2. **PROVE THE INSTRUMENT BEFORE ITS FIRST REAL USE**, not after a surprise —
+   it must FIRE on a known positive, FAIL on a known negative, and its
+   IMPLAUSIBLE VALUE must be named in advance. That last one is not
+   decoration: "13,624% of the physical ceiling" was caught only because a
+   percentage over 100 is obviously wrong, and naming the ceiling up front
+   turns that luck into a check. This is CLAUDE.md §4's "verdict logic is
+   itself tested" moved EARLIER — the rule existed; what failed was applying
+   it before trusting a first result.
+3. **AN INSTRUMENT THAT NAMES A PHYSICAL CONSTANT MUST ASSERT IT.** The
+   work-RAM dump hook kept reading byte `0x600000` after slice D2 moved work
+   RAM, and faithfully reported VRAM as a bit-identity failure in 101 of 101
+   frames. It should have derived the offset from the RTL constant rather than
+   carrying a literal. This generalises 14z-95's "checks that stopped
+   checking": a hardcoded address is a check with an expiry date nobody wrote
+   down.
+
+**Corollary for reading a green result:** ask what would have to be true for
+it to be green WRONGLY. Two of this arc's defects returned confident correct-
+looking answers, and the standing warning "suspect the instrument before the
+thing under test" is what a red result deserves — this is its mirror for a
+green one.
+
+Strong candidate for the skill distillation recorded under STATE "Decisions
+pending", since it is discipline rather than reference data.
+

@@ -551,3 +551,4 @@ is a GAME gotcha if it is true of the game regardless of the port.
   ever emitted. "The slice is inert" and "the slice cannot be exercised" look
   identical from the fetch side; check what the ROMSET needs before designing
   the demonstration.
+- **THE INSTRUMENT PROTOCOL** — the author of an instrument cannot judge its output; prove it fires AND fails before its first real use; a hardcoded physical constant is a check with an unwritten expiry date. [project](project/gotchas.md)
