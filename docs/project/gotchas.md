@@ -2961,3 +2961,30 @@ tenant one) and `tests/test_select_arrays.sh:85`, which says in words
 `36_pick_tenant_cell` (Donovan `0x13`), `37_pick_huitzil_cell` (`0x10`) or
 `40_pick_pyron_cell` (`0x11`). All three tenants carry `gfx_bank: 4`.
 
+## `pgrep -f` WAITERS MATCH THEMSELVES AND NEVER EXIT (paid: 2026-08-24, 14z-107, four times in one task)
+
+`until ! pgrep -f "<pattern>"; do sleep 30; done` **never terminates.** The
+shell running the loop has the pattern in its OWN command line, so `pgrep -f`
+finds it, and the waiter waits for itself forever. Long MiSTer simulation runs
+are exactly where this is reached for, and exactly where an unbounded hang is
+most expensive — one leg of a four-leg measurement can burn an hour before
+anyone notices the waiter, not the simulation, is what is stuck.
+
+**Use a recorded PID instead:** capture `$!` (or the pid from `ps`) when the
+job starts and poll `until ! kill -0 "$pid" 2>/dev/null; do sleep 30; done`.
+`kill -0` tests existence without signalling. Where a PID is not available,
+wait on a MARKER FILE the job itself writes on completion, never on a pattern
+match against process text.
+
+**Why this entry exists at all, which is the more useful half.** This trap was
+already known — it sat in the main session's own memory and never reached the
+repository, so every AGENT doing the work re-paid it from scratch. Knowledge
+that lives only in the orchestrator's context does not reach the hands. If a
+trap is worth knowing, it goes in the tree (and, once the skill distillation
+recorded under STATE "Decisions pending" happens, into a skill, which loads
+into an agent's context by construction rather than by someone remembering to
+mention it in a brief).
+
+**Sibling:** sweep leftover `obj_dir/sim` processes at session end — the
+simulation lane is the one thing here that reliably leaves orphans.
+
