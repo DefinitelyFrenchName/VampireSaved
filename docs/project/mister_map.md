@@ -46,9 +46,10 @@ the read probe counts **9,038,400 reads over 105 DISTINCT TILE CODES
 the control leg at zero. **§9 open question 1 is ANSWERED, YES, WITH ROOM.**
 **WHAT IS STILL NOT DONE, and it is not a slice: obj bank 4 — the FIGHTER
 art — has never been fetched, and the reason is the HARNESS.** The simulator's
-direction bits are TRANSPOSED (Left and Down swap, measured against the game's
-own `$FF8058` mirror), so the tenant-picking replay put the cursor on a legacy
-character. **No tenant has ever been in a match on the core, no frame has been
+direction bits were **REVERSED end for end** (measured on all four against the
+game's own `$FF8058` mirror, 14z-108: Up arrived as Right, Down as Left, Left
+as Down, Right as Up), so the tenant-picking replay put the cursor on a legacy
+character. **FIXED 14z-108** in `tools/rpl2siminputs.py`. **No tenant has ever been in a match on the core, no frame has been
 compared programmatically against MAME's, and nothing has run on hardware.**
 `docs/project/mister_core.md` §12 is the ledger of what has never been tried.
 **[SUPERSEDED, kept because its ELIMINATIONS stand — the state before D5:**
@@ -886,8 +887,8 @@ slice as the decode.
    1 — is therefore STILL UNMEASURED**, and it stays unmeasured until a
    tenant can be selected on the core (see the input defect in
    `docs/platform/mister.md`, "THE SIMULATED JOYSTICK'S DIRECTIONS ARE
-   TRANSPOSED" — the bits arrive and are PERMUTED, Left and Down swapping;
-   they are not lost).
+   REVERSED" — the bits arrive and are PERMUTED, the whole nibble end for
+   end; they are not lost. Fixed 14z-108).
    *(Superseded text kept below; its eliminations stand.)*
    **[14z-107 (10): THE INSTRUMENT NOW HAS ITS SECOND LEG
    (`--core cps2w --wide build/m3b_merged13`) AND THE QUESTION IS STILL

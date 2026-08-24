@@ -1635,52 +1635,73 @@ target carries 27 bits (`jtframe_emu.sv:334`), and each header start word is
   DIFF THE EXPRESSION, not the result — the two agreed on every game either had
   ever run, and disagreed on the first one that mattered.
 
-## THE SIM HARNESS'S DIRECTION BITS ARE TRANSPOSED — Left and Down swap (measured 2026-08-24, 14z-107)
+## THE SIM HARNESS'S DIRECTION BITS ARE REVERSED — all four, end for end (measured in full 2026-08-24, 14z-108)
 
-**Measured, on the core's own copy of the game's input mirror.** Leg E of the
-14z-107 tenant-match run dumped `RAM:$FF0000-$FFFFFF` across the cursor-press
-window (811 frames, 1640-2450 absolute, integrity-checked) while running
-`36_pick_tenant_cell` on `cps2w` + the WIDE romset:
+**`tools/rpl2siminputs.py` had the direction nibble backwards from birth.**
+`test.cpp:380` copies the file's bits 4-7 straight onto `joystick1[3:0]`, and
+jtframe's joystick port is **MSB-FIRST** — `joy[3]=Up [2]=Down [1]=Left
+[0]=Right` (`modules/jtframe/hdl/keyboard/jtframe_keyboard.v:107-110`). The
+translator read the macro NAME "UDLR" as "bit4=Up ... bit7=Right", so the real
+map is the reverse:
 
-| the replay asked for | MAME's `$FF8058.w` | the CORE's `$FF8058.w` |
-|---|---|---|
-| Left (replay frames 1000, 1040) | `0x0002` | **`0x0004`** |
-| Down (replay frames 1080, 1120) | `0x0004` | **`0x0002`** |
+    file bit4 = RIGHT   bit5 = LEFT   bit6 = DOWN   bit7 = UP
 
-The direction bits **arrive and are permuted** — they are not lost. Twelve of
-the 811 frames carry a direction bit, which is the expected count.
+**Measured on the game's own P1 input mirror `RAM:$FF8058.w`**, four
+single-direction presses on stock `vsavj`
+(`tests/replays/107_four_directions.rpl`, attract only), MAME vs `cps2w` under
+Verilator, both dump sets integrity-checked:
 
-**What it cost.** The MiSTer measurement built to prove obj bank 4 (the
-tenants' FIGHTER art) gets fetched returned **exactly zero** reads, in-match
-included. The RTL was innocent: the cursor moved on every press, just not in
-the direction requested, so it landed on Victor and the core drew the
-character it was handed. The rendered VS screen — Demitri vs Victor — is what
-cracked it; the counters alone read as "D3 does not fetch".
+| asked | MAME | core (pre-fix) | the core delivered |
+|---|---|---|---|
+| Up | `0x0008` | `0x0001` | Right |
+| Down | `0x0004` | `0x0002` | Left |
+| Left | `0x0002` | `0x0004` | Down |
+| Right | `0x0001` | `0x0008` | Up |
 
-**The likely cause, stated as INFERENCE from two data points.**
-`tools/rpl2siminputs.py` emits bits 4-7 as **U/D/L/R** on the strength of its
-own docstring, "P1 directions in JTFRAME_JOY order (default UDLR)". If the
-harness actually consumes **U/L/D/R**, Down and Left trade places while Up and
-Right are untouched — exactly the observed pattern. **Up and Right are NOT
-exercised by these samples and that half is untested.** Measure all four
-before fixing; do not swap two bits on the strength of two data points.
+**FIXED AND RE-MEASURED ON THE SAME RIG:** post-fix the core reads `0x0008` /
+`0x0004` / `0x0002` / `0x0001` for U/D/L/R — MAME's values exactly — with the
+same 20 nonzero frames as before, which is what shows the fix re-ordered the
+bits rather than losing or doubling a press.
 
-**The chain "checks out on paper", which is the point.** The translator's bit
-map matches `test.cpp`; neither `cps2` nor `cps2w` defines a `JTFRAME_JOY_*`
-override, so the default path applies; `in0 <= {joystick2[7:0],
-joystick1[7:0]}` puts directions on `in0[3:0]`. Every step reads correct and
-the result is still wrong — which is why an input path is measured against the
-game's own mirror rather than reasoned about.
+**THE TRAP IS NOT THE BUG, IT IS THE HALF-MEASUREMENT.** 14z-107 (12) saw only
+Left and Down (they are the only directions `36_pick_tenant_cell` presses) and
+inferred a two-bit SWAP leaving Up and Right untouched, from the translator's
+docstring. That inference fitted both data points and was WRONG: Up arrives as
+Right. **A two-bit fix would have left half the defect in the tree and the
+gate would have frozen it.** Two data points cannot distinguish a swap from a
+reversal; the four-direction probe replay exists so the question is never
+asked from two again.
 
-**Gate consequence, do not do this quietly.** `tests/test_rpl2siminputs.sh`
-freezes the sha1 of the `05_timeout_idle` translation
-(`eb3e1d04e58b3a2b7bf713d40c4d6ac4796e550c`) and a frozen bit-map vector. A
-bit-map fix MOVES both. Re-derive them deliberately, with the mechanism named
-in the gate header — a frozen expectation that moves silently is the failure
-this project has a rule against.
+**WHAT IT COST.** The run built to prove obj bank 4 — the tenants' fighter art
+— is fetched returned exactly zero, in-match included, with the RTL innocent
+in every respect. The cursor moved on every press, just not where asked; it
+landed on Victor; the core drew the character it was handed. The RENDERED
+frame cracked it — a VS screen showing Demitri vs Victor against a replay that
+asks for a tenant. The counters alone read as "D3 does not fetch", which is a
+conclusion about the RTL drawn from a defect in the harness.
 
-**The fourth input-path defect in this lane**, after the forked frame writer
+**THE CHAIN CHECKED OUT ON PAPER, WHICH IS THE POINT.** The translator's map
+matched `parse_inputs` line for line; no `JTFRAME_JOY_*` override is defined,
+so the default path applies; `in0 <= {joystick2[7:0], joystick1[7:0]}` puts
+the directions on `in0[3:0]`. Every step reads correct. The one thing nobody
+checked was which END of the nibble the port counts from. **Derive an input
+map from the bit ORDER, then confirm it against the game's own mirror — never
+from a macro name.**
+
+**FAULT ATTRIBUTION: ours, not jtframe's**, unlike the three input-path
+defects before it. jtframe documents no `sim_inputs.hex` direction spec; the
+nibble is simply `joy[3:0]`. Fix = one dict, no fork commit, no RTL.
+
+**GATE CONSEQUENCE.** `tests/test_rpl2siminputs.sh` freezes a bit-map vector
+and the sha1 of the `05_timeout_idle` translation. **Only the vector moved**
+(`111 6ee 000 000 080` -> `181 67e 000 000 010`); the sha1
+`eb3e1d04e58b3a2b7bf713d40c4d6ac4796e550c` is unchanged and cannot change,
+because that replay scripts no direction token — which also means
+`test_mister_sim_anchor`'s frozen anchor could not move. The record said BOTH
+would move; it was wrong, and that mattered, because "expect it to move" is
+how a hash gets re-frozen without anyone asking why.
+
+**THE FOURTH INPUT-PATH DEFECT IN THIS LANE**, after the forked frame writer
 rewinding `sim_inputs.hex`, P1's buttons 5/6 held down, and P2's held too.
 Three of the four were invisible until a replay first needed the feature:
 **the sim input path is only ever as tested as the last replay that used it.**
-

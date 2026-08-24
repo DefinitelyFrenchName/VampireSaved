@@ -6,9 +6,39 @@ FORMAT (jtframe v1.7.3, modules/jtframe/hdl/ver/test.cpp `SimInputs`):
 one hex word per line = one video frame, applied when the core ENTERS
 vertical blanking (`sim_inputs.next()` on LVBL falling edge). Active-HIGH
 bits in the file (test.cpp inverts): bit0 coin1, bit1 coin2, bit2 start1,
-bit3 start2, bits4-7 P1 directions in JTFRAME_JOY order (default UDLR:
-bit4=Up bit5=Down bit6=Left bit7=Right), bits8-11 P1 buttons 1-4, bit11 is
-ALSO dip_test in that harness (so button 4 = test switch — refused here).
+bit3 start2, bits4-7 P1 directions (see below), bits8-11 P1 buttons 1-4,
+bit11 is ALSO dip_test in that harness (so button 4 = test switch — refused
+here).
+
+THE DIRECTION NIBBLE IS MSB-FIRST, AND GETTING THAT BACKWARDS COST THE
+MiSTer ARC A SESSION (14z-108). `test.cpp:380` copies the file's bits 4-7
+STRAIGHT ONTO `joystick1[3:0]` — file bit4 -> joy[0], bit5 -> [1], bit6 ->
+[2], bit7 -> [3] — and jtframe's joystick port is MSB-FIRST: `joy[3]=Up
+[2]=Down [1]=Left [0]=Right` (`modules/jtframe/hdl/keyboard/
+jtframe_keyboard.v:107-110`, the authoritative bit order; the
+`JTFRAME_JOY_*` macro NAMES list directions MSB-first too, which is why
+`_JTFRAME_JOY_RLDU` at test.cpp:384 is a full nibble reversal). So:
+
+    file bit4 = RIGHT   bit5 = LEFT   bit6 = DOWN   bit7 = UP
+
+THIS FILE HAD IT REVERSED FROM BIRTH — it read the macro NAME "UDLR" as
+"bit4=Up ... bit7=Right" and every direction a replay ever asked the
+simulator for arrived as its OPPOSITE. Measured 14z-108 on the game's own
+P1 input mirror `RAM:$FF8058.w`, four presses on stock `vsavj`,
+`tests/replays/107_four_directions.rpl`, MAME vs `cps2w` under Verilator:
+
+    asked   MAME    core (pre-fix)   the core actually delivered
+    Up      0x0008  0x0001           Right
+    Down    0x0004  0x0002           Left
+    Left    0x0002  0x0004           Down
+    Right   0x0001  0x0008           Up
+
+14z-107 (12) had seen only the Left/Down half and INFERRED a two-bit swap
+that left Up and Right untouched. That inference was WRONG and a two-bit
+fix would have left half the defect in place. Derive an input map from the
+bit ORDER and confirm it against the game's own mirror; never from a macro
+name (docs/platform/gotchas.md, THE INSTRUMENT PROTOCOL).
+
 P2 and buttons 5/6 are NOT EXPRESSIBLE in that harness: a replay that uses
 them is refused LOUDLY rather than silently truncated (the 14z-102 gotcha:
 identify moves by measured effects, never by what the script was meant
@@ -38,7 +68,9 @@ Prints the sha1 of what it read and wrote.
 """
 import argparse, hashlib, re, sys
 
-DIRS = {"U": 1 << 4, "D": 1 << 5, "L": 1 << 6, "R": 1 << 7}
+# MSB-FIRST: file bit7=Up bit6=Down bit5=Left bit4=Right. Measured, not
+# assumed — see "THE DIRECTION NIBBLE IS MSB-FIRST" above.
+DIRS = {"U": 1 << 7, "D": 1 << 6, "L": 1 << 5, "R": 1 << 4}
 BTNS = {"1": 1 << 8, "2": 1 << 9, "3": 1 << 10}
 SYS = {"C1": 1 << 0, "C2": 1 << 1, "S1": 1 << 2, "S2": 1 << 3}
 TOK = re.compile(r"^(\d+)(?:-(\d+))?\s+(.*)$")

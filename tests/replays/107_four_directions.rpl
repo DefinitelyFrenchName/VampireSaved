@@ -1,0 +1,39 @@
+# 107: THE FOUR-DIRECTION INSTRUMENT PROBE (14z-108). Not a gameplay replay —
+# it exists to measure WHICH JOYSTICK BIT EACH DIRECTION TOKEN REACHES on a
+# given implementation, by pressing one direction at a time and reading the
+# game's own P1 input mirror RAM:$FF8058.w.
+#
+# WHY IT EXISTS: 14z-107 (12) measured the simulator's direction bits as
+# TRANSPOSED (a replay asking for Left arrived as Down and vice versa) from
+# TWO data points on 36_pick_tenant_cell. Up and Right were never exercised,
+# and the two candidate mechanisms — a Down/Left swap, or a full nibble
+# REVERSAL of the sim_inputs.hex direction field — are indistinguishable on
+# those two points and differ exactly on Up and Right.
+#
+# WHAT IT ANSWERED (14z-108): the REVERSAL. Up arrives as Right and Right as
+# Up, so the two-point inference was wrong and a two-bit fix would have left
+# half the defect in the tree. Measured $FF8058.w, MAME vs cps2w:
+#     asked   MAME    core (pre-fix)
+#     Up      0x0008  0x0001   (Right)
+#     Down    0x0004  0x0002   (Left)
+#     Left    0x0002  0x0004   (Down)
+#     Right   0x0001  0x0008   (Up)
+# KEEP THIS REPLAY. It is the regression rig for the input path, and the sim
+# input path is only ever as tested as the last replay that used it.
+#
+# DESIGN NOTES, so this can be re-run and trusted:
+#   * ATTRACT ONLY. No coin, no start: the mirror is live from ~frame 92
+#     (measured 14z-107 (8), MAME frame index) and needs no credit, so this
+#     probe costs a few hundred frames instead of a boot-to-select run and
+#     depends on no roster content — it runs on STOCK vsavj.
+#   * ONE direction at a time, 40 frames apart, held 5 frames. The presses
+#     are identified by ORDER, not by absolute frame, so the residual
+#     MAME/sim frame skew cannot misattribute one.
+#   * No buttons: buttons 4-6 and P2 are not expressible in jtframe v1.7.3
+#     sim_inputs.hex (tools/rpl2siminputs.py refuses them), and this probe
+#     must translate cleanly on both legs.
+200-204 p1=U
+240-244 p1=D
+280-284 p1=L
+320-324 p1=R
+400 wait

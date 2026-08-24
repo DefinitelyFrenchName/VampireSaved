@@ -34,7 +34,7 @@ count is now seven, and four of them are the INPUT PATH alone.
 | 4 | `JTFRAME_SIM_WRAMDUMP_OFF` hard-coded to bank 0 byte `0x600000` — work RAM on `cps2`, **VRAM on `cps2w` after D2's re-pack** (14z-107 (9)) | "`test_mister_wide_inert` is red, so D2 broke inertness" — 101 frames of 101, comparing one core's work RAM against the other's VRAM | VRAM is a plausible 64 KB of changing bytes, so the non-constancy check passed; **any instrument naming a PHYSICAL address is invalidated by a memory-map change, and a placement slice IS one** |
 | 5 | the PRG probe's first draft split its window on `rom_addr[21]` — `rom_addr` is `[22:1]` driven `A[22:1]`, so its INDEX is the address bit and `[21]` is `A[21]` (14z-107 (11)) | "2,560 reads above `$400000`" — a healthy-looking COUNT at `$38C2A0-$3D8256`, which is the third megabyte | only the ADDRESSES contradicted the label, and only because the probe logged them beside the classification |
 | 6 | `tools/prgprobe_verdict.py` judged only the RAW SDRAM word (14z-107 (11)) | **"D4 WORKS"** — over ten fetches the CPU received as garbage. A verdict bug of exactly the kind CLAUDE.md §4 forbids | the DATA half of the probe logged the latched word too, so the tool could be caught disagreeing with itself |
-| 7 | the sim harness's DIRECTION BITS are TRANSPOSED — Left and Down swap (14z-107 (12)) | **"D3 does not fetch"** — the obj-bank-4 measurement returned exactly zero reads, in-match included, with the RTL innocent in every respect | the RENDERED frame: a VS screen showing a LEGACY character against a replay that asks for a tenant. The counters alone said the promote was dead |
+| 7 | the sim harness's DIRECTION BITS are REVERSED end for end — measured on all four 14z-108; 14z-107 (12) saw only the Left/Down half and inferred a two-bit swap | **"D3 does not fetch"** — the obj-bank-4 measurement returned exactly zero reads, in-match included, with the RTL innocent in every respect | the RENDERED frame: a VS screen showing a LEGACY character against a replay that asks for a tenant. The counters alone said the promote was dead |
 
 **Two more were found INSIDE a gate on its own first real measurement**
 (`test_mister_gfxc_fetch`, 14z-107 (11)), both fixed: the tile code computed
@@ -186,7 +186,7 @@ can be selected on the core.
 `tests/test_mister_gfxc_fetch.sh`'s WHEEL half is GREEN and its FIGHTER half
 is RED. The replay was written and run — `36_pick_tenant_cell` on `cps2w` with
 the WIDE romset, into a match — and it fetched **exactly zero** from obj bank
-4. **The simulator's direction bits are TRANSPOSED**, measured on the core's
+4. **The simulator's direction bits are TRANSPOSED** *[CORRECTED 14z-108: REVERSED END FOR END — all four, not two; see the correction block below]*, measured on the core's
 own copy of the game's input mirror (leg E: 811 integrity-checked work-RAM
 dumps across the cursor-press window):
 
@@ -206,11 +206,27 @@ and Right untouched) — **Up and Right are NOT exercised by those samples and
 that half is untested. Measure all four before changing one bit.** The whole
 chain checks out on paper, which is the point.
 
+> **[CORRECTED 14z-108 — the inference in this paragraph is REFUTED, and the
+> instruction above it was right.** Measured on all four directions
+> (`tests/replays/107_four_directions.rpl`, stock `vsavj`, MAME vs `cps2w`,
+> both dump sets integrity-checked): the nibble is **REVERSED END FOR END**,
+> not swapped in two. Up arrives as `0x0001` (Right) and Right as `0x0008`
+> (Up), so the "leaves Up and Right untouched" half is false and a two-bit fix
+> would have left half the defect in the tree. Mechanism: jtframe's joystick
+> port is MSB-FIRST (`jtframe_keyboard.v:107-110`) while `test.cpp:380` copies
+> file bits 4-7 straight onto `joystick1[3:0]`, so the file map is
+> bit4=Right … bit7=Up. Fixed in `tools/rpl2siminputs.py`; no fork commit.
+> **Also corrected: "A bit-map fix MOVES BOTH" below is wrong** — only the
+> vector moved. See the 14z-108 entry.]**
+
 **GATE CONSEQUENCE, recorded so it cannot be done quietly:**
 `tests/test_rpl2siminputs.sh` freezes the bit-map vector `111 6ee 000 000 080`
 and the `05_timeout_idle` translation sha1
 `eb3e1d04e58b3a2b7bf713d40c4d6ac4796e550c`. A bit-map fix MOVES BOTH, and they
 must be re-derived DELIBERATELY with the mechanism named in the gate header.
+**[CORRECTED 14z-108: it moved ONE.** The vector became `181 67e 000 000 010`;
+the sha1 did NOT move and cannot, because `05_timeout_idle` scripts no
+direction token — which is also why the frozen sim anchor could not move.]**
 
 **A TENANT HAS STILL NEVER FOUGHT ON THE CORE, and nothing in this lane has
 ever run on HARDWARE.** Everything above is Verilator.
