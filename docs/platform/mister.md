@@ -1089,10 +1089,14 @@ group-C windows and on both vanilla obj banks:
 | **2242** | **the machine RESETS — the RAM test starts over at `WORK`** |
 
 The cycle is ~1,580 frames (26 s) and it repeats. **No sprite is ever drawn**:
-the probe counts ZERO reads in SDRAM bank 2 (vanilla obj banks 0 and 2) as
-well as zero in both group-C windows, while bank 3 carries a steady
-25-34k words/frame of scroll traffic. For comparison, MAME running the SAME
-romset and the SAME replay is at the character-select screen by frame 930.
+over 4,000 simulated frames the probe counts ZERO reads in SDRAM bank 2
+(vanilla obj banks 0 and 2) and zero in both group-C windows, while bank 3
+takes 94,692,120 word reads over **264 distinct 128-byte blocks**, all inside
+its first 4 MB — a tiny scroll working set drawn over and over. The same probe
+on the STOCK image counts **313,024 reads over 372 distinct blocks in bank 2**
+and **2,482 distinct blocks in bank 3**, reaching `0x9C177E`. For comparison,
+MAME running the SAME romset and the SAME replay is at the character-select
+screen by frame 930.
 
 **AND HERE IS THE SHARPEST FORM OF IT: THE TWO BOOTS ARE TRAFFIC-IDENTICAL
 FOR 448 FRAMES AND THEN DIVERGE.** The same core (`cps2w`), the same replay,
@@ -1120,9 +1124,18 @@ where a work-RAM differential against MAME should be taken.
 * **It is not any of the eight `wide_en`-gated sites.** The identical run with
   header byte 41 set to `0xFF` (profile OFF) produces a **frame-for-frame
   identical** traffic trace: the same transitions at the same frames, the same
-  reset at 2242. With the profile clear the promote is zero, the group-C
-  redirect and read select are off, the QSound split is off and the 6 MB
-  decode is off. All of that changes nothing.
+  reset at 2242 — 94,691,928 bank-3 reads against 94,692,120. With the profile
+  clear the promote is zero, the group-C redirect and read select are off, the
+  QSound split is off and the 6 MB decode is off. All of that changes nothing.
+  **AND THE WORK RAM SAYS THE SAME THING, ON THE PROJECT'S OWN MASKED BASIS.**
+  Both legs dump `RAM:$FF0000-$FFFFFF` over frames 3400-3620. Of 221 frames,
+  156 differ — and every differing byte is in one of the TWO WINDOWS CLAUDE.md
+  §4 masks: the dead stack `$FF7F00-$FF7FFF`, and `$FF043C`, the 68k↔QSound
+  handshake latch (28 frames, `08` against `04`, which `atlas/ram.md:65`
+  records as a one-frame phase). Nowhere else, and never more than 64 bytes of
+  65,536 in a frame. **On the masked basis the two profile states produce
+  BIT-IDENTICAL work RAM**, which means the program never reaches the code
+  that reads above 4 MB before it dies.
 * **It is not the download.** `tests/test_mister_sdram_census.sh` compares all
   67,108,864 bytes of all four banks against the map on this exact image and
   core, and passes. The two parts of the image a census cannot see are the

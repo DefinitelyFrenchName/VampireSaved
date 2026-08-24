@@ -366,6 +366,10 @@ probes armed, 4,000 simulated frames:
 
 **Zero reads in SDRAM bank 2 across the whole run** — vanilla obj banks 0 and
 2, so not one sprite of any kind is drawn — and zero in both group-C windows.
+Bank 3 sees 94,692,120 word reads over **264 distinct 128-byte blocks**, all
+inside its first 4 MB: a tiny scroll working set drawn over and over. The same
+probe on the STOCK image counts **313,024 reads over 372 distinct blocks in
+bank 2** and 2,482 distinct blocks in bank 3, reaching `0x9C177E`.
 
 **THE SHARPEST FORM OF IT: THE STOCK AND WIDE BOOTS ARE TRAFFIC-IDENTICAL FOR
 448 FRAMES AND THEN DIVERGE.** Same core, same replay, same probes, frames
@@ -378,12 +382,17 @@ can put around the fault today.
 
 **THE ELIMINATIONS ARE THE USEFUL PART.**
 
-* **Not the profile.** The identical run with header byte 41 set to `0xFF`
-  produces a **frame-for-frame identical** trace — the same transitions at the
-  same frames, the same reset at 2242. With the profile clear the promote is
-  zero, both download redirects are off, both read selects are off and the
-  6 MB decode is off. **None of the eight gated sites is the cause — which
-  also means the failure exists at the D2 pin and has simply never been
+* **Not the profile, AND THE WORK RAM SAYS SO ON THE PROJECT'S OWN MASKED
+  BASIS.** The identical run with header byte 41 set to `0xFF` produces a
+  frame-for-frame identical trace — the same transitions at the same frames,
+  the same reset at 2242, 94,691,928 bank-3 reads against 94,692,120. Both
+  legs also dump `RAM:$FF0000-$FFFFFF` over frames 3400-3620: of 221 frames
+  156 differ, and **every differing byte is in one of the two windows
+  CLAUDE.md §4 masks** — the dead stack `$FF7F00-$FF7FFF`, and `$FF043C`, the
+  68k↔QSound handshake latch (28 frames, `08` against `04`, which
+  `atlas/ram.md:65` records as a one-frame phase). Nowhere else, never more
+  than 64 bytes of 65,536. **None of the eight gated sites is the cause —
+  which also means the failure exists at the D2 pin and has simply never been
   visible**, because nothing had ever run the WIDE image past the download.
 * **Not the core.** `cps2w` runs the STOCK romset to the frozen match-start
   anchor and to bit-identical work RAM against `cps2` (above).

@@ -50,6 +50,16 @@
 # group-C slot sits in are read out of cores/cps2w/hdl/jtcps1_sdram.v on every
 # run.
 #
+# STATUS: RED, AND RED FOR THE RIGHT REASON (14z-107 (10)). The WIDE romset
+# does not get past its own boot sequence on the core — it loops, and not one
+# sprite of ANY kind is drawn, so both group-C windows read zero and so does
+# the vanilla obj bank this gate arms as its own positive control. That
+# failure is NOT the promote's: it reproduces frame-for-frame with the profile
+# bit clear, it does not happen with the stock romset on the same core, and
+# the whole-image census passes on the same image. See
+# docs/platform/mister.md "THE WIDE ROMSET DOES NOT BOOT ON THE CORE YET".
+# This gate is what will confirm the fix; do not weaken it to make it green.
+#
 # Usage:
 #   ROMDIR=... [JTSIM_SCRATCH=...] tests/test_mister_gfxc_fetch.sh [OUTDIR]
 #         [--frames N] [--build DIR] [--rpl FILE]
