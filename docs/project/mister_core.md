@@ -784,6 +784,28 @@ rather than a D1 edit.
 
 ---
 
+## 12. The holes — what has never been tried
+
+**A map that hides its gaps is worse than no map.** §9 lists the instruments
+and what each one holds; this section lists what NOTHING holds. It exists
+because its absence cost a session: D3's demonstration was planned from §9 and
+§10 on the reasonable-looking assumption that the lane was proven end to end,
+and it was not — **nothing had ever run the WIDE image past the ROM download.**
+Read this section before planning any measurement, and add to it whenever a
+slice reveals a new hole.
+
+| what | status |
+|---|---|
+| **The WIDE romset booting on the core** | **FAILS, and the fault predates D3.** The image loops its own boot — RAM test, two screens, RAM test again, QSound legal screen, reset — and never reaches select. Eliminated as causes, each measured: the profile bit (the same `.rom` with byte 41 = `0xFF` is frame-for-frame identical, and the work RAM is bit-identical on CLAUDE.md §4's masked basis), the core (stock `vsavj` reaches the frozen anchor), the download (the image census passes), the romset (MAME reaches select by frame 930) and the probe (313,024 obj reads on the stock image). Stock and WIDE are traffic-identical for 448 frames and diverge at ~449. Root-cause recipe in `docs/platform/mister.md`. |
+| **A tenant sprite fetched or drawn on the core** | never happened. D3 makes it possible; the boot fault makes it unreachable. |
+| **Bank 0's traffic under the redirect** | unmeasured, and unmeasurable until the boot fault clears — obj bank 5 traffic needs the select screen. Bank 0 peaks at 44.0% of its all-miss ceiling on the looping boot; bank 2 reads exactly zero, which is a symptom of the loop, not a result. |
+| **The QSound extension heard** | banks `0x80-0x8E` are placed and addressable after D1's width fix; no sample from them has ever been played on the core. |
+| **The scroll path with a wide GFX map** | untouched and untested. Scroll is capped at 8 MB with no bank input anywhere in its chain (§7); nothing has exercised it against the repacked banks. |
+| **Video compared against MAME** | never. Every cross-implementation verdict to date is work-RAM fields at a sync anchor; no frame has been compared, so "the picture looks right" has never been a checked claim. |
+| **Any of this on HARDWARE** | never. Everything is Verilator. The MiSTer field test is the ruling's second half and has not begun. |
+| **The 128 MB module's chip select** | the XL fallback (§4) assumes the module inverts chip 1's `/CS`. That is INFERRED from jtframe's RTL, never seen on a schematic. If XL is ever taken, confirm which module is in hand first. |
+| **The three ungated width changes** | declared inert and measured so by `test_mister_wide_inert` — but only on STOCK content, which is the only content that currently boots. |
+
 ## Where to go from here
 
 | if you want | read |
