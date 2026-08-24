@@ -12,7 +12,7 @@
 +//   1. `qsnd_addr` 23 -> 24 bits;
 +//   2. `wide_en` decoded from the ROM header by jtcps2w_profile;
 +//   3. that wire routed into jtcps15_sound;
-+//   4. the PCM slot fed with qsnd_addr[22:0].
++//   4. the full 24-bit qsnd_addr handed to jtcps1_sdram, which SPLITS it.
 +// On (4) — and it CORRECTS the design note that said `PCM_AW` 23 -> 24:
 +// jtframe's 8-bit SDRAM slot CANNOT be widened past SDRAMW. `sdram_addr =
 +// offset + { {SDRAMW-AW{1'b0}}, addr_req>>(DW==8) }`
@@ -20,15 +20,26 @@
 +// which is a hard Verilator error, not a warning. That is also why the
 +// placement map splits QSound across two banks rather than growing one slot:
 +// bank 1 keeps the stock 8 MB at 23 bits and the 0x80+ extension gets its own
-+// 1 MB window in bank 0 (slice D2). Until then bit 23 is produced, gated and
-+// unrouted; with wide_en LOW it is constant 0, so the PCM address the slot
-+// sees is bit-for-bit the reference core's.
++// 1 MB window in bank 0. SLICE D2 IS WHERE THAT SPLIT LANDED: the game top
++// now passes all 24 bits and cores/cps2w/hdl/jtcps1_sdram.v routes bit 23.
++//
++// SLICE D2 adds three more deltas, all of them one line each:
++//   5. `wide_en` routed into jtcps1_sdram (the download redirects and the two
++//      read-side selects all take it there);
++//   6. the SDRAM instance resolves to cores/cps2w/hdl/jtcps1_sdram.v;
++//   7. `rom0_bank` widened to 3 bits at the SDRAM port, with bit 2 TIED LOW —
++//      that bit is the CPS-2 Turbo obj promote and it is slice D3's. Until
++//      then the two group-C read slots are provably unreachable and D2's
++//      evidence is the SDRAM image census, not a fetch.
 +// ---------------------------------------------------------------------------
 -wire [22:0] qsnd_addr;
 +wire [23:0] qsnd_addr;   // CPS-2 WIDE: [23] = DSP sample bank 0x80+
++// CPS-2 WIDE: the SDRAM side takes THREE bank bits. Bit 2 selects GFX group C
++// and is driven by the obj promote in slice D3; it is tied low here so D2
++// changes no fetch at all.
++wire [ 2:0] rom0_bank_sdram = { 1'b0, rom0_bank };
 +wire        wide_en;   // CPS-2 WIDE profile, from the ROM header
 +    .wide_en    ( wide_en           ),
-+
 +// CPS-2 WIDE: the runtime profile gate. Header byte 41, ACTIVE LOW, so a
 +// stock MRA (whose header is 0xFF-filled) runs this RBF as a stock machine.
 +jtcps2w_profile u_profile(
@@ -39,10 +50,13 @@
 +    .ioctl_ram  ( ioctl_ram     ),
 +    .wide_en    ( wide_en       )
 +);
--    .pcm_addr    ( qsnd_addr     ),
-+    // [23] is the WIDE extension bank bit; the split that consumes it is
-+    // slice D2. It is 0 whenever wide_en is 0.
-+    .pcm_addr    ( qsnd_addr[22:0] ),
++
++    .wide_en     ( wide_en       ),
++    // [23] is the WIDE extension bank bit and jtcps1_sdram SPLITS on it
++    // (slice D2): 0 -> bank 1 offset 0, the stock 8 MB; 1 -> the 1 MB window
++    // in bank 0. It is 0 whenever wide_en is 0.
+-    .rom0_bank   ( rom0_bank     ),
++    .rom0_bank   ( rom0_bank_sdram ),
 === jtcps15_sound.v : cores/cps15/hdl -> cores/cps2w/hdl ===
 +
 +// ---------------------------------------------------------------------------
@@ -102,3 +116,247 @@
 +    .dsp_ab     ( dsp_ab        ),
 +    .bank       ( qsnd_bank     )
 +);
+=== jtcps1_sdram.v : cores/cps1/hdl -> cores/cps2w/hdl ===
++
++// ---------------------------------------------------------------------------
++// CPS-2 WIDE (Vampire Saved) OVERRIDE of cores/cps1/hdl/jtcps1_sdram.v.
++// Copied at jtcores v1.7.3 (slice D2) because the SDRAM PLACEMENT changes and
++// the file is SHARED with cores/cps1, cores/cps15 and cores/cps2 — editing it
++// in place would change the reference cores. The diff against the original IS
++// the trust surface (CLAUDE.md rule 1 v2) and is frozen line by line by
++// tests/test_mister_wide_gate.sh. Everything here implements
++// docs/project/mister_map.md section 5, "THE MAP".
++//
++// WHAT MOVES, AND WHAT IS GATED. Three of the four changes are BEHAVIOURAL and
++// every one of them is behind `wide_en` (MRA header byte 41, slice D1):
++//   * the QSound READ split on pcm_addr[23]  (`pcmh_sel`),
++//   * the group-C obj READ select on rom0_bank[2]  (`gfxc_sel`),
++//   * the download-side redirects, passed to jtcps1_prom_we as `wide_en`.
++// The fourth is the BANK-0 RE-PACK — VRAM/ORAM/WRAM/SND move up to make room
++// for a 6 MB PRG region. That one is UNCONDITIONAL, because SLOTn_OFFSET are
++// elaboration-time parameters of the jtframe slot modules and cannot be
++// switched at run time. It is a RELOCATION and not a behaviour change: the
++// 68k sees identical data at identical 68k addresses; VRAM/ORAM/WRAM are
++// never downloaded; the Z80 region's download and read use the SAME constant;
++// and bank 0 is the one bank with `JTFRAME_BA0_AUTOPRECH=1`
++// (cores/cps1/cfg/common.def), so its per-access latency is address-
++// independent by construction and no row-locality pattern can shift. That
++// argument is not left as an argument: tests/test_mister_wide_inert.sh
++// compares cps2 and cps2w work RAM BIT-IDENTICALLY, frame by frame, on the
++// same stock download.
++//
++// SLOT COUNTS. Bank 0 goes from 5 to 7 slots (jtframe_ram1_7slots, ADDED to
++// jtframe as a mechanical member of the ram1_Nslots family) and bank 1 from 1
++// to 2 (jtframe_rom_2slots, which already exists). Map section 5, option A.
++//
++// WHAT IS *NOT* HERE, AND IS SLICE D3: the OBJ PROMOTE. `rom0_bank` is three
++// bits wide at this port, but the game top drives {1'b0, rom0_bank} — the
++// object table's 3-bit CPS-2 Turbo bank is D3. So in D2 `gfxc_sel` is
++// constant 0, the two group-C read slots are provably unreachable, and what
++// D2 proves is the PLACEMENT (the SDRAM image census), not the fetch.
++// ---------------------------------------------------------------------------
++    input           wide_en,    // CPS-2 WIDE profile (cores/cps2w/hdl/jtcps2w_profile.v)
+-    input [PCM_AW-1:0] pcm_addr,
++    // CPS-2 WIDE: ONE BIT WIDER than the slot. jtframe's 8-bit SDRAM slot
++    // caps at SDRAMW (jtframe_romrq_bcache.v:74), so the QSound region is two
++    // slots in two banks and pcm_addr[PCM_AW] is the bank-select, not an
++    // address bit of either slot.
++    input [PCM_AW  :0] pcm_addr,
+-    input    [ 1:0] rom0_bank,
++    // CPS-2 WIDE: 3 bits. Bit 2 selects GFX group C and is driven by the obj
++    // promote in slice D3; the game top ties it low until then.
++    input    [ 2:0] rom0_bank,
++// CPS-2 WIDE bank-0 map (docs/project/mister_map.md section 5). All of these
++// are 23-bit WORD offsets; the byte offset is twice the constant.
++//   byte 0x000000  68k PRG                    6 MB   (D4 widens the slot)
++//   byte 0x600000  VRAM                     256 KB
++//   byte 0x640000  OBJ RAM                   32 KB
++//   byte 0x648000  work RAM RAM:$FF0000       64 KB
++//   byte 0x658000  Z80 program              512 KB
++//   byte 0x6E0000  QSound DSP banks 0x80+      1 MB   NEW
++//   byte 0x7E0000  GFX group C, obj bank 5  7.995 MB NEW
++// The CPS1 column keeps the reference values: this file is compiled only by
++// cores/cps2w (CPS==2), and a CPS1 build of it must not silently re-place.
+-                  VRAM_OFFSET  = 23'h20_0000,
+-                  ORAM_OFFSET  = 23'h28_0000,
+-                  WRAM_OFFSET  = 23'h30_0000,
+-                  SND_OFFSET   = 23'h38_0000,
++                  VRAM_OFFSET  = CPS==2 ? 23'h30_0000 : 23'h20_0000,
++                  ORAM_OFFSET  = CPS==2 ? 23'h32_0000 : 23'h28_0000,
++                  WRAM_OFFSET  = CPS==2 ? 23'h32_4000 : 23'h30_0000,
++                  SND_OFFSET   = CPS==2 ? 23'h32_C000 : 23'h38_0000,
++                  PCMH_OFFSET  = 23'h37_0000,   // QSound high window, bank 0
++                  GFXC5_OFFSET = 23'h3F_0000,   // group C obj bank 5, bank 0
++                  GFXC4_OFFSET = 23'h40_0000,   // group C obj bank 4, bank 1
++// ---- CPS-2 WIDE, slice D2 ------------------------------------------------
++wire        gfxc_sel, gfxc4_cs, gfxc5_cs, gfxc4_ok, gfxc5_ok;
++wire [31:0] gfxc4_dout, gfxc5_dout;
++wire        pcmh_sel, pcmh_cs, pcm_lo_cs, pcmh_ok, pcm_lo_ok;
++wire [ 7:0] pcmh_data, pcm_lo_data;
++wire [19:0] pcmh_addr;
++// CPS-2 WIDE: the QSound region is SPLIT on pcm_addr[PCM_AW] (= [23] on
++// CPS-2). Banks 0x00-0x7F stay in SDRAM bank 1 at offset 0, byte-identical to
++// stock jtcps2; banks 0x80+ read the 1 MB window in bank 0, MASKED to it.
++assign pcmh_sel    = wide_en & pcm_addr[PCM_AW];
++assign pcmh_cs     = pcm_cs &  pcmh_sel;
++assign pcm_lo_cs   = pcm_cs & ~pcmh_sel;
++assign pcm_ok      = pcmh_sel ? pcmh_ok   : pcm_lo_ok;
++assign pcm_data    = pcmh_sel ? pcmh_data : pcm_lo_data;
++/* verilator lint_off WIDTH */
++assign pcmh_addr   = pcm_addr[PCM_AW-1:0];
++/* verilator lint_on WIDTH */
+-    .SND_OFFSET ( SND_OFFSET    )
++    .SND_OFFSET ( SND_OFFSET    ),
++    // CPS-2 WIDE download-side placement; dead unless wide_en is high
++    .PCMH_OFFSET ( PCMH_OFFSET  ),
++    .GFXC4_OFFSET( GFXC4_OFFSET ),
++    .GFXC5_OFFSET( GFXC5_OFFSET )
++    .wide_en        ( wide_en       ),
+-jtframe_ram1_5slots #(
++// CPS-2 WIDE: seven slots. jtframe_ram1_7slots is an ADDITION to
++// modules/jtframe/hdl/sdram — a mechanical member of the ram1_Nslots family,
++// which upstream stops at 5 (docs/project/mister_map.md section 5, option A).
++jtframe_ram1_7slots #(
+-    .SLOT4_OFFSET(  SND_OFFSET   )
++    .SLOT4_OFFSET(  SND_OFFSET   ),
++
++    .SLOT5_AW    ( 20            ), // CPS-2 WIDE: QSound high window, 1 MB
++    .SLOT5_DW    (  8            ),
++    .SLOT5_OFFSET(  PCMH_OFFSET  ),
++
++    .SLOT6_AW    ( 22            ), // CPS-2 WIDE: GFX group C, obj bank 5
++    .SLOT6_DW    ( 32            ),
++    .SLOT6_LATCH (  OBJ_LATCH    ),
++    .SLOT6_DOUBLE(  1            ),
++    .SLOT6_OFFSET( GFXC5_OFFSET  )
++    .slot5_cs    ( pcmh_cs       ),
++    .slot5_clr   ( 1'b0          ),
++    .slot6_cs    ( gfxc5_cs      ),
++    .slot6_clr   ( 1'b0          ),
++    .slot5_ok    ( pcmh_ok       ),
++    .slot6_ok    ( gfxc5_ok      ),
++    .slot5_addr  ( pcmh_addr     ),
++    .slot6_addr  ( gfx0_addr     ),
++    .slot5_dout  ( pcmh_data     ),
++    .slot6_dout  ( gfxc5_dout    ),
+-jtframe_rom_1slot #(
++// CPS-2 WIDE: bank 1 carries the stock 8 MB of PCM at offset 0 — untouched —
++// plus GFX group C obj bank 4 above it. Two streams, which is exactly what
++// tests/audit_sdram_bank_load.sh modelled when it returned GO.
++jtframe_rom_2slots #(
+-    .SLOT0_AW    ( PCM_AW        ), // PCM
+-    .SLOT0_DW    (  8            )
++    .SLOT0_AW    ( PCM_AW        ), // PCM, DSP sample banks 0x00-0x7F
++    .SLOT0_DW    (  8            ),
++
++    .SLOT1_AW    ( 22            ), // CPS-2 WIDE: GFX group C, obj bank 4
++    .SLOT1_DW    ( 32            ),
++    .SLOT1_LATCH ( OBJ_LATCH     ),
++    .SLOT1_DOUBLE( 1             ),
++    .SLOT1_OFFSET( GFXC4_OFFSET  )
+-    .slot0_cs    ( pcm_cs        ),
+-    .slot0_ok    ( pcm_ok        ),
+-    .slot0_addr  ( pcm_addr      ),
+-    .slot0_dout  ( pcm_data      ),
++    .slot0_cs    ( pcm_lo_cs     ),
++    .slot0_ok    ( pcm_lo_ok     ),
++    .slot0_addr  ( pcm_addr[PCM_AW-1:0] ),
++    .slot0_dout  ( pcm_lo_data   ),
++
++    .slot1_cs    ( gfxc4_cs      ),
++    .slot1_ok    ( gfxc4_ok      ),
++    .slot1_addr  ( gfx0_addr     ),
++    .slot1_dout  ( gfxc4_dout    ),
+-    assign objgfx_cs = {2{rom0_cs}} & { rom0_bank[0], ~rom0_bank[0] };
++    // CPS-2 WIDE: obj banks 4 and 5 (rom0_bank[2]=1) are GROUP C and live in
++    // SDRAM banks 1 and 0. Bank 4 -> ba1 (in-match fighter art), bank 5 -> ba0
++    // (select/wheel art, cold during a match). rom0_bank[1] is 0 for both, so
++    // the 22-bit gfx0_addr covers each 8 MB slice on its own.
++    // With wide_en LOW — and, until slice D3, with rom0_bank[2] tied low by
++    // the game top — gfxc_sel is 0 and all four lines below are the reference
++    // core's expressions exactly.
++    assign gfxc_sel  = wide_en & rom0_bank[2];
++    assign objgfx_cs = {2{rom0_cs & ~gfxc_sel}} & { rom0_bank[0], ~rom0_bank[0] };
++    assign gfxc4_cs  = rom0_cs &  gfxc_sel & ~rom0_bank[0];
++    assign gfxc5_cs  = rom0_cs &  gfxc_sel &  rom0_bank[0];
+-        rom0_ok   = rom0_bank[0] ? objgfx_ok[1] : objgfx_ok[0];
+-        rom0_data = rom0_bank[0] ? objgfx_dout1 : objgfx_dout0;
++        if( gfxc_sel ) begin
++            rom0_ok   = rom0_bank[0] ? gfxc5_ok   : gfxc4_ok;
++            rom0_data = rom0_bank[0] ? gfxc5_dout : gfxc4_dout;
++        end else begin
++            rom0_ok   = rom0_bank[0] ? objgfx_ok[1] : objgfx_ok[0];
++            rom0_data = rom0_bank[0] ? objgfx_dout1 : objgfx_dout0;
++        end
++    // CPS-2 WIDE is CPS-2 only; tie the group-C read path off on CPS1
++    assign gfxc_sel = 0;
++    assign gfxc4_cs = 0;
++    assign gfxc5_cs = 0;
+=== jtcps1_prom_we.v : cores/cps1/hdl -> cores/cps2w/hdl ===
++
++// ---------------------------------------------------------------------------
++// CPS-2 WIDE (Vampire Saved) OVERRIDE of cores/cps1/hdl/jtcps1_prom_we.v.
++// Copied at jtcores v1.7.3 (slice D2) because the DOWNLOAD-side placement has
++// to change and the file is SHARED with cores/cps1, cores/cps15 and
++// cores/cps2 — editing it in place would change the reference cores. The diff
++// against the original IS the trust surface (CLAUDE.md rule 1 v2) and is
++// frozen line by line by tests/test_mister_wide_gate.sh.
++//
++// TWO redirects, BOTH behind `wide_en` (the runtime profile bit decoded from
++// MRA header byte 41 by jtcps2w_profile.v, slice D1). With `wide_en` LOW both
++// `is_gfxc` and `is_pcmhi` are constant 0 and every expression below reduces
++// to the reference core's, character for character:
++//
++//   1. GFX GROUP C -> SDRAM banks 0 and 1. Vanilla's own 32 MB of art fills
++//      banks 2+3 exactly (docs/project/mister_map.md section 4), so the
++//      profile's group C — GFX region bytes 32-48 MB, i.e. gfx_addr[25]=1 —
++//      has nowhere to go there. Obj bank 4 (gfx_addr[23]=0, the three fighter
++//      bands) goes to bank 1 above the 8 MB of QSound; obj bank 5
++//      (gfx_addr[23]=1, select/wheel art) goes to bank 0. Note gfx_addr[25:21]
++//      pass through the CPS-2 address scramble at :105 unchanged, so the test
++//      reads the same bit before and after it.
++//   2. QSOUND SPLIT on pcm_addr[23]. DSP sample banks 0x00-0x7F (the stock
++//      8 MB) stay at bank 1 offset 0 — byte-identical to stock jtcps2 — and
++//      banks 0x80+ (which exist only in the WIDE profile) go to a 1 MB window
++//      in bank 0. This is not cosmetic: jtframe's 8-bit SDRAM slot caps at
++//      SDRAMW=23 = 8 MB (jtframe_romrq_bcache.v:74), so 8.9375 MB is only
++//      reachable as TWO slots in two banks. The window is MASKED to its 1 MB
++//      so that a region longer than 0x8FFFFF would alias inside the extension
++//      instead of overwriting group-C art.
++//
++// The read side of both is cores/cps2w/hdl/jtcps1_sdram.v.
++// ---------------------------------------------------------------------------
++                 // CPS-2 WIDE placement (slice D2). All three are 23-bit WORD
++                 // offsets, like the four above, and all three are dead
++                 // unless wide_en is high.
++                 PCMH_OFFSET  =23'h0, // QSound DSP sample banks 0x80+
++                 GFXC4_OFFSET =23'h0, // GFX group C, obj bank 4
++                 GFXC5_OFFSET =23'h0, // GFX group C, obj bank 5
++    input                wide_en,   // CPS-2 WIDE profile (jtcps2w_profile.v)
++// ---- CPS-2 WIDE (Vampire Saved), slice D2 --------------------------------
++reg  [22:0] gfxc_addr, pcmh_addr;
++reg  [ 1:0] gfxc_ba;
++// group C is GFX region bytes 32-48 MB; is_gfx already bounds the region
++wire is_gfxc  = wide_en & gfx_addr[25];
++// DSP sample bank 0x80+; is_oki already bounds the region
++wire is_pcmhi = wide_en & pcm_addr[23];
++
++end
++
++always @(*) begin
++    // obj bank 5 -> SDRAM bank 0, obj bank 4 -> SDRAM bank 1
++    gfxc_ba   = gfx_addr[23] ? 2'd0 : 2'd1;
++    gfxc_addr = {1'b0, gfx_addr[22:1]} +
++                (gfx_addr[23] ? GFXC5_OFFSET : GFXC4_OFFSET);
++    // the high window is 1 MB and the address is masked to it
++    pcmh_addr = {4'd0, pcm_addr[19:1]} + PCMH_OFFSET;
++        // CPS-2 WIDE: the two `is_pcmhi`/`is_gfxc` arms are the ONLY
++        // difference from the reference core, and both are 0 when wide_en is 0
+-                     is_oki ?  pcm_addr[23:1] + PCM_OFFSET :
+-                     is_gfx ?  {gfx_addr[24],gfx_addr[22:1]} + GFX_OFFSET : {10'd0, bulk_addr[12:0]}));
+-        prog_ba   <= (is_cpu||is_snd) ? 2'd0 : ( is_gfx ? gfx_bank : 2'd1 );
++                     is_oki ? (is_pcmhi ? pcmh_addr : pcm_addr[23:1] + PCM_OFFSET) :
++                     is_gfx ? (is_gfxc  ? gfxc_addr : {gfx_addr[24],gfx_addr[22:1]} + GFX_OFFSET) : {10'd0, bulk_addr[12:0]}));
++        prog_ba   <= (is_cpu||is_snd) ? 2'd0 : (
++                      is_gfx ? (is_gfxc ? gfxc_ba : gfx_bank) : (
++                      (is_oki & is_pcmhi) ? 2'd0 : 2'd1 ));

@@ -1,6 +1,7 @@
 #!/bin/sh
 # test_mister_wide_gate.sh — THE CPS-2 WIDE RUNTIME PROFILE GATE, on MiSTer.
-# 14z-107 (6), slice D1. ROM-free; seconds without Verilator, ~30 s with it.
+# 14z-107 (6), slice D1; EXTENDED 14z-107 (9) for slice D2. ROM-free; seconds
+# without Verilator, ~30 s with it.
 #
 # WHAT THIS GATE IS FOR. Slice D1 is the first time `cores/cps2w` carries RTL,
 # so it is the first time the MiSTer leg has a trust surface at all. Rule 1 v2
@@ -28,9 +29,16 @@
 #       0xFF fill must leave the profile OFF, byte 41 = 0xFE must raise it,
 #       every other address and the NVRAM path must be inert, and it must
 #       re-default on the next download.
-#  4. REACHABLE — `jtframe files` must resolve cps2w to OUR four files and to
-#     neither shared original, and cps2 to the originals and to none of ours.
-#     A gate that proves an unreachable module is worth nothing.
+#  4. REACHABLE — `jtframe files` must resolve cps2w to OUR six files and to
+#     none of the four shared originals, and cps2 to the originals and to none
+#     of ours. A gate that proves an unreachable module is worth nothing.
+#  5. AND SINCE SLICE D2, DECLARATIVE ABOUT PLACEMENT (section 7 below). The
+#     SDRAM map exists in TWO places — docs/project/mister_map.md section 5 and
+#     the localparams in cores/cps2w/hdl/jtcps1_sdram.v — and a disagreement
+#     between them is invisible until a bring-up. Every offset the map names is
+#     re-read from the RTL here, in BYTES, and compared against the frozen
+#     table. The live end-to-end proof that the download honours them is
+#     tests/test_mister_sdram_census.sh; this is the cheap static twin of it.
 #
 # MUST-FIRE CONTROLS (four, all perturbations of the REAL module sources into
 # a temp dir; the originals are never touched):
@@ -92,6 +100,10 @@ PYD
     delta "$SRC/cores/cps2/hdl/jtcps2_game.v"    "$HDL/jtcps2_game.v"
     echo "=== jtcps15_sound.v : cores/cps15/hdl -> cores/cps2w/hdl ==="
     delta "$SRC/cores/cps15/hdl/jtcps15_sound.v" "$HDL/jtcps15_sound.v"
+    echo "=== jtcps1_sdram.v : cores/cps1/hdl -> cores/cps2w/hdl ==="
+    delta "$SRC/cores/cps1/hdl/jtcps1_sdram.v"   "$HDL/jtcps1_sdram.v"
+    echo "=== jtcps1_prom_we.v : cores/cps1/hdl -> cores/cps2w/hdl ==="
+    delta "$SRC/cores/cps1/hdl/jtcps1_prom_we.v" "$HDL/jtcps1_prom_we.v"
 } > "$W/delta.txt"
 if cmp -s "$W/delta.txt" "$REPO/tests/expect/cps2w_rtl_delta.txt"; then
     ok "1 the RTL override delta is the frozen one ($(grep -c '^[+-]' "$W/delta.txt") changed lines)"
@@ -112,6 +124,10 @@ else
         delta "$SRC/cores/cps2/hdl/jtcps2_game.v"    "$W/perturbed.v"
         echo "=== jtcps15_sound.v : cores/cps15/hdl -> cores/cps2w/hdl ==="
         delta "$SRC/cores/cps15/hdl/jtcps15_sound.v" "$HDL/jtcps15_sound.v"
+        echo "=== jtcps1_sdram.v : cores/cps1/hdl -> cores/cps2w/hdl ==="
+        delta "$SRC/cores/cps1/hdl/jtcps1_sdram.v"   "$HDL/jtcps1_sdram.v"
+        echo "=== jtcps1_prom_we.v : cores/cps1/hdl -> cores/cps2w/hdl ==="
+        delta "$SRC/cores/cps1/hdl/jtcps1_prom_we.v" "$HDL/jtcps1_prom_we.v"
     } > "$W/delta_ctlD.txt"
     cmp -s "$W/delta_ctlD.txt" "$REPO/tests/expect/cps2w_rtl_delta.txt" \
         && bad "1D control did NOT fire: a one-width perturbation still matched the frozen delta" \
@@ -144,8 +160,11 @@ grep -q "output     \[23:0\] qsnd_addr" "$HDL/jtcps15_sound.v" \
     && ok "3a jtcps15_sound exports a 24-bit qsnd_addr" || bad "3a qsnd_addr is not [23:0]"
 grep -q "wire \[23:0\] qsnd_addr;" "$HDL/jtcps2_game.v" \
     && ok "3b the game top carries a 24-bit qsnd_addr" || bad "3b the game top's qsnd_addr is not [23:0]"
-grep -q "\.pcm_addr    ( qsnd_addr\[22:0\] )" "$HDL/jtcps2_game.v" \
-    && ok "3c the PCM slot is fed qsnd_addr[22:0] (bit 23 is slice D2's)" \
+# CHANGED AT D2 AND THAT IS THE POINT. D1 fed the slot qsnd_addr[22:0] and
+# left bit 23 produced-but-unrouted; D2 hands jtcps1_sdram the FULL 24 bits and
+# the split on bit 23 happens there (checks 7i/7l below).
+grep -q "\.pcm_addr    ( qsnd_addr     )" "$HDL/jtcps2_game.v" \
+    && ok "3c the game top hands jtcps1_sdram the full 24-bit qsnd_addr (D2 splits on bit 23)" \
     || bad "3c the PCM slot connection changed"
 # THE MEASURED CORRECTION. cps2_wide.md and mister.md both said the fix was
 # "PCM_AW 23 -> 24". It is not, and the failure is a BUILD failure:
@@ -214,28 +233,29 @@ if [ -n "$JTF" ]; then
         ( cd "$W" && rm -f game.f && "$JTF" files sim "$core" -t mister >/dev/null 2>&1 )
         sed "s|$SRC/||" "$W/game.f" > "$W/list_$core.txt" 2>/dev/null
     done
-    want_own="cores/cps2w/hdl/jtcps15_sound.v cores/cps2w/hdl/jtcps2_game.v cores/cps2w/hdl/jtcps2w_profile.v cores/cps2w/hdl/jtcps2w_qsnd_bank.v"
+    want_own="cores/cps2w/hdl/jtcps15_sound.v cores/cps2w/hdl/jtcps2_game.v cores/cps2w/hdl/jtcps1_sdram.v cores/cps2w/hdl/jtcps1_prom_we.v cores/cps2w/hdl/jtcps2w_profile.v cores/cps2w/hdl/jtcps2w_qsnd_bank.v modules/jtframe/hdl/sdram/jtframe_ram1_7slots.v"
+    shared_orig="cores/cps2/hdl/jtcps2_game.v cores/cps15/hdl/jtcps15_sound.v cores/cps1/hdl/jtcps1_sdram.v cores/cps1/hdl/jtcps1_prom_we.v"
     a=0
     for f in $want_own; do grep -qx "$f" "$W/list_cps2w.txt" || a=1; done
-    grep -qx "cores/cps2/hdl/jtcps2_game.v"    "$W/list_cps2w.txt" && a=2
-    grep -qx "cores/cps15/hdl/jtcps15_sound.v" "$W/list_cps2w.txt" && a=2
+    for f in $shared_orig; do grep -qx "$f" "$W/list_cps2w.txt" && a=2; done
     case "$a" in
-        0) ok "5a cps2w compiles OUR four files and NEITHER shared original" ;;
-        1) bad "5a cps2w does not compile all four override files" ;;
+        0) ok "5a cps2w compiles OUR six overrides + the new jtframe slot module, and NONE of the four shared originals" ;;
+        1) bad "5a cps2w does not compile all seven of its own files" ;;
         2) bad "5a cps2w compiles a shared original TOO — duplicate module, and the override is not overriding" ;;
     esac
     b=0
-    grep -qx "cores/cps2/hdl/jtcps2_game.v"    "$W/list_cps2.txt" || b=1
-    grep -qx "cores/cps15/hdl/jtcps15_sound.v" "$W/list_cps2.txt" || b=1
-    grep -q  "cores/cps2w/"                    "$W/list_cps2.txt" && b=2
+    for f in $shared_orig; do grep -qx "$f" "$W/list_cps2.txt" || b=1; done
+    grep -q  "cores/cps2w/"                 "$W/list_cps2.txt" && b=2
+    grep -q  "jtframe_ram1_7slots"          "$W/list_cps2.txt" && b=3
     case "$b" in
-        0) ok "5b the reference core cps2 still compiles the originals and none of ours" ;;
+        0) ok "5b the reference core cps2 still compiles the originals, none of ours, and NOT the new jtframe module" ;;
         1) bad "5b cps2 lost one of its own files" ;;
         2) bad "5b cps2 pulled a cps2w file — the profile leaked into the reference core" ;;
+        3) bad "5b cps2 pulled jtframe_ram1_7slots — the new module was added to a SHARED jtframe yaml" ;;
     esac
     d="$(diff "$W/list_cps2.txt" "$W/list_cps2w.txt" | grep -c '^[<>]')"
-    [ "$d" = "6" ] && ok "5c the two cores' file lists differ in exactly 6 entries (2 out, 4 in)" \
-                   || bad "5c the file lists differ in $d entries, expected 6"
+    [ "$d" = "11" ] && ok "5c the two cores' file lists differ in exactly 11 entries (4 out, 7 in)" \
+                    || bad "5c the file lists differ in $d entries, expected 11"
 else
     note "5 no built jtframe tool (tools/setup_jtcores.sh); reachability not checked"
 fi
@@ -284,6 +304,60 @@ if command -v verilator >/dev/null 2>&1; then
 else
     note "6 verilator not installed; the gated modules were not simulated"
 fi
+
+# ── 7. THE PLACEMENT MAP, IN THE RTL AND IN THE DOCUMENT (slice D2) ────────
+# The map lives in two places and they must not drift. The RTL constants are
+# 23-bit WORD offsets; the map's tables are in BYTES, so the check converts and
+# compares in bytes — which is also how a reader of either document sees them.
+# A missing constant fails as loudly as a wrong one.
+SD="$HDL/jtcps1_sdram.v"
+want_off() {   # want_off <NAME> <byte offset> <what it is>
+    # two shapes: a plain `NAME = 23'hXX` and the re-pack's
+    # `NAME = CPS==2 ? 23'hWIDE : 23'hREFERENCE` (the CPS-2 arm is ours)
+    _v="$(sed -n "s/.*$1 *= *CPS==2 ? 23'h\([0-9A-Fa-f_]*\).*/\1/p" "$SD" | head -1 | tr -d '_')"
+    [ -n "$_v" ] || _v="$(sed -n "s/.*$1 *= *23'h\([0-9A-Fa-f_]*\).*/\1/p" "$SD" | head -1 | tr -d '_')"
+    if [ -z "$_v" ]; then bad "7 $1 is not defined in cores/cps2w/hdl/jtcps1_sdram.v"; return; fi
+    _b=$(( 0x$_v * 2 ))
+    if [ "$_b" = "$2" ]; then
+        ok "7 $1 = 23'h$_v = byte $(printf '%#08x' "$2") — $3"
+    else
+        bad "7 $1 = 23'h$_v = byte $(printf '%#x' "$_b"), the map says $(printf '%#x' "$2") — $3"
+    fi
+}
+want_off VRAM_OFFSET  $((0x600000)) "VRAM, above the 6 MB PRG region"
+want_off ORAM_OFFSET  $((0x640000)) "OBJ RAM"
+want_off WRAM_OFFSET  $((0x648000)) "68k work RAM (RAM:\$FF0000)"
+want_off SND_OFFSET   $((0x658000)) "Z80 program"
+want_off PCMH_OFFSET  $((0x6E0000)) "QSound DSP sample banks 0x80+, 1 MB window"
+want_off GFXC5_OFFSET $((0x7E0000)) "GFX group C obj bank 5, bank 0"
+want_off GFXC4_OFFSET $((0x400000 * 2)) "GFX group C obj bank 4, bank 1 byte 0x800000"
+# the CPS1 column of the re-pack must still be the reference values, or a CPS1
+# build of this copy would silently re-place
+grep -q "VRAM_OFFSET  = CPS==2 ? 23'h30_0000 : 23'h20_0000" "$SD" \
+    && ok "7h the re-pack is CPS==2 only; a CPS1 build keeps the reference offsets" \
+    || bad "7h the CPS1 arm of the bank-0 re-pack is gone — a CPS1 build would silently re-place"
+# the two behavioural selects must both be ANDed with wide_en
+grep -q "assign pcmh_sel    = wide_en & pcm_addr\[PCM_AW\];" "$SD" \
+    && ok "7i the QSound read split is gated (wide_en & pcm_addr[PCM_AW])" \
+    || bad "7i the QSound read split is not gated on wide_en"
+grep -q "assign gfxc_sel  = wide_en & rom0_bank\[2\];" "$SD" \
+    && ok "7j the group-C read select is gated (wide_en & rom0_bank[2])" \
+    || bad "7j the group-C read select is not gated on wide_en"
+PW="$HDL/jtcps1_prom_we.v"
+grep -q "wire is_gfxc  = wide_en & gfx_addr\[25\];" "$PW" \
+    && ok "7k the download-side group-C redirect is gated (wide_en & gfx_addr[25])" \
+    || bad "7k the download-side group-C redirect is not gated on wide_en"
+grep -q "wire is_pcmhi = wide_en & pcm_addr\[23\];" "$PW" \
+    && ok "7l the download-side QSound split is gated (wide_en & pcm_addr[23])" \
+    || bad "7l the download-side QSound split is not gated on wide_en"
+# D2 provides the DESTINATION, not the promote: bit 2 must still be tied low
+grep -q "wire \[ 2:0\] rom0_bank_sdram = { 1'b0, rom0_bank };" "$HDL/jtcps2_game.v" \
+    && ok "7m the obj promote is still slice D3's — rom0_bank[2] is tied low in the game top" \
+    || bad "7m rom0_bank[2] is no longer tied low; that is slice D3 and it needs D3's gate"
+# and the new slot module must be an ADDITION, never a change to a shared list
+grep -q "jtframe_ram1_7slots" "$SRC/modules/jtframe/hdl/sdram/jtframe_sdram64.yaml" \
+    && bad "7n jtframe_ram1_7slots was added to the SHARED jtframe_sdram64.yaml — every core would compile it" \
+    || ok "7n jtframe_ram1_7slots is pulled by cores/cps2w alone, not by a shared jtframe yaml"
 
 [ $fail = 0 ] && echo "PASS test_mister_wide_gate" \
               || { echo "FAIL test_mister_wide_gate"; exit 1; }

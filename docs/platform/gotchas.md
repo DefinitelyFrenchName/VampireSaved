@@ -1473,6 +1473,79 @@ target carries 27 bits (`jtframe_emu.sv:334`), and each header start word is
   moved when the inputs were corrected. The COVERAGE half (making buttons
   5/6 and P2 SCRIPTABLE) stays deferred by maintainer ruling;
   `tools/rpl2siminputs.py` still refuses them loudly.
+- **OVERRIDING ONE SHARED FILE COSTS YOU THE WHOLE `.yaml` THAT PULLED IT,
+  AND IT COMPOUNDS (14z-107 (6) and (9)).** `jtframe files` deduplicates by
+  FULL PATH, so a core cannot both `get:` a yaml and override a file that
+  yaml pulls: the two copies of the module would both compile and the
+  override would not override. The only way out is to INLINE the pulled yaml
+  into the core's own `game.yaml` minus the overridden file. Slice D1 paid it
+  for `cores/cps15/cfg/qsound.yaml` (one file). Slice D2 paid it again for
+  `cores/cps1/cfg/common.yaml`, which pulls twenty files, so overriding TWO
+  of them (`jtcps1_sdram.v`, `jtcps1_prom_we.v`) meant transcribing the other
+  eighteen plus that yaml's `jtframe:` and `modules:` sections. **The bill
+  is not the override, it is the transcription — and it has to be re-paid by
+  hand at every uprev.** Budget it before deciding a file "must differ", and
+  check `jtframe files sim <core>` against the reference core's list
+  afterwards: the diff should be exactly (files out) + (files in) and nothing
+  else. It is also why a same-name override is worth its cost only when the
+  frozen line-by-line delta against the original is the thing you want to
+  review; a renamed module would avoid the yaml surgery entirely and lose
+  that.
+- **ADDING A MODULE TO jtframe: pull it from the CORE, never from jtframe's
+  own shared list (14z-107 (9)).** `modules/jtframe/hdl/sdram/
+  jtframe_sdram64.yaml` enumerates the `ram1_Nslots` / `rom_Nslots` family
+  and is included by every core that uses the 64 MB SDRAM front end. Adding
+  a new family member's filename there is the obvious move and it is wrong:
+  it puts the module on EVERY core's compile list, including the reference
+  core the whole separate-core mechanism exists to keep untouched. Put the
+  file with its family (so it can be diffed against its sibling) and pull it
+  from the core's `game.yaml` with `- from: sdram / get: - <file>.v`, the
+  same way `cores/cps1/cfg/common.yaml` pulls `jtframe_romrq.v`. Assert the
+  absence, not just the presence: `test_mister_wide_gate` 5b greps the
+  REFERENCE core's file list for the new module and fails if it is there.
+- **A DOWNLOAD-SIDE `?:` CHAIN HAS A FALL-THROUGH ARM THAT MORE REGIONS
+  REACH THAN YOU THINK (14z-107 (9)).** `jtcps1_prom_we.v`'s `prog_ba` ends
+  in a bare `2'd1`, which is reached by the QSound region AND by the CPS-2
+  firmware region (`is_qsnd`). The region-relative addresses it computes are
+  WRAPPED SUBTRACTIONS outside their own region — for the firmware region
+  `pcm_addr` happens to have bit 23 SET — so a new condition written as
+  `pcm_addr[23] ? ba0 : ba1` silently re-banks the firmware too. It writes
+  nothing there (`prog_we` is 0 for `is_qsnd`), so it would never have been
+  observable. Qualify the condition with its own region's `is_*` anyway:
+  **a signal that is correct only because its write-enable happens to be low
+  is a defect waiting for a refactor**, and the census cannot see it.
+- **THE SIM's RAM-DUMP HOOK ADDRESSES *SDRAM*, NOT THE 68k BUS — AND SLICE D2
+  MOVED WORK RAM (14z-107 (9)).** `JTFRAME_SIM_WRAMDUMP_OFF` is a BANK BYTE
+  OFFSET. On the reference core `RAM:$FF0000-$FFFFFF` is bank 0 byte
+  `0x600000`; on `cores/cps2w` the D2 bank-0 re-pack put it at `0x648000`,
+  and `0x600000` there is **VRAM**. Dumping the stale constant does not error,
+  does not look empty and does not look constant — VRAM is a perfectly
+  plausible 64 KB of changing bytes — so `tests/test_mister_wide_inert.sh`
+  went RED in **101 frames of 101** with the RTL completely innocent, and it
+  read exactly like "the profile is not inert". **The general rule: any
+  instrument that names a PHYSICAL address is invalidated by a memory-map
+  change, and a memory-map change is precisely what a placement slice is.**
+  Grep for the constant when you move a region. `tools/run_sim_jtcps2.sh` now
+  selects the offset from `--core` and PRINTS which one it used, so the run's
+  own log says what it dumped.
+  Worth keeping for the shape of it: the gate that went red was measuring the
+  right thing badly, and the two ways to tell them apart cost nothing — the
+  SDRAM census (which compared the same core's image against the map and
+  passed) and the run's own banner.
+- **EDITING A RUNNING SHELL SCRIPT DERAILS IT — PAID FOR A THIRD TIME,
+  14z-107 (9), on a COMMENT-ONLY edit.** `sh` reads by BYTE OFFSET, so
+  inserting two comment lines near the top of `tools/run_sim_jtcps2.sh` while
+  a gate was blocked inside it moved everything after the interpreter's saved
+  position: when the simulation returned, the shell resumed mid-token and died
+  with `line 440: unexpected EOF while looking for matching '"'`. The
+  MEASUREMENT survived — the Verilator run had already written its four
+  16 MB bank images into the core's `ver/game` — so the leg was recovered by
+  copying them out by hand rather than paying another 11 minutes.
+  **Two rules, both cheap:** freeze `tests/*.sh` and `tools/*.sh` for the
+  whole duration of a long run, and if you slip, **REVERT THE EDIT
+  IMMEDIATELY** — restoring the exact previous bytes re-aligns the
+  interpreter, and the two runs that had not yet resumed reading survived
+  untouched because of it.
 - **A scratch clone re-pointed at a public `origin` cannot reach a
   LOCAL-ONLY commit.** `tools/run_sim_jtcps2.sh` clones from
   `emu/jtcores` and then sets `origin` to the GitHub fork URL, so

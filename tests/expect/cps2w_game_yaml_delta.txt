@@ -1,0 +1,68 @@
+>   - from: cps2w
+>     get:
+>       - jtcps2_game.v          # OVERRIDE of cores/cps2/hdl
+>       - jtcps15_sound.v        # OVERRIDE of cores/cps15/hdl
+>       - jtcps1_sdram.v         # OVERRIDE of cores/cps1/hdl  (D2)
+>       - jtcps1_prom_we.v       # OVERRIDE of cores/cps1/hdl  (D2)
+>       - jtcps2w_profile.v      # new
+>       - jtcps2w_qsnd_bank.v    # new
+<       - jtcps2_game.v
+<       - common.yaml
+<   - from: cps15
+<     get:
+<       - qsound.yaml
+>       - jtcps1_video.v
+>       - jtcps1_scroll.v
+>       - jtcps1_timing.v
+>       - jtcps1_tilemap.v
+>       - jtcps1_colmix.v
+>       - jtcps1_pal.v
+>       - jtcps1_mmr.v
+>       - jtcps1_obj_line_table.v
+>       - jtcps1_obj_tile_match.v
+>       - jtcps1_obj_draw.v
+>       - jtcps1_obj_line.v
+>       - jtcps1_stars.v
+>       - jtcps1_gfx_mappers.v
+>       - jtcps1_cpucen.v
+>       - jtcps1_dma.v
+>       - jtcps1_watch.v
+< 
+>       - jtframe_dual_ram.v
+>       - jtframe_ram.v
+>   - from: cpu
+>     get:
+>       - jtframe_z80.yaml
+>       - jtframe_virq.v
+>       - jtframe_m68k.yaml
+>       - jtframe_kabuki.v
+>   - from: sdram
+>     get:
+>       - jtframe_romrq.v
+>       - jtframe_ram_rq.v
+>       - jtframe_ram1_7slots.v    # ADDED to jtframe by this project (D2)
+>   - from: video
+>     get:
+>       - jtframe_credits.v
+>   - from: keyboard
+>     get:
+>       - jt4701.v
+>       - jtframe_dial.v
+>   - from: clocking
+>     get:
+>       - jtframe_cen48.v
+>       - jtframe_cen96.v
+>       - jtframe_frac_cen.v
+>   - from: sound
+>     get:
+>       - jtframe_mixer.v
+>       - jtframe_fir.v
+>       - jtframe_uprate2_fir.v
+> modules:
+>   jt:
+>     - name: jtdsp16
+>   other:
+>     - from: jteeprom/hdl
+>       get:
+>       - jt9346_16b8b.v
+>       - jt9346.v

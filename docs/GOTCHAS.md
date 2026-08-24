@@ -470,6 +470,33 @@ is a GAME gotcha if it is true of the game regardless of the port.
   byte-identical to MAME with those four buttons physically held. Fork
   commit 10 (`& ~0xf`, `0x3ff`) fixes it and re-freezes the §4 anchor; the
   COVERAGE half (scripting them) stays deferred by maintainer ruling.
+- **14z-107 (9) (platform):** **overriding one shared file costs you the
+  whole `.yaml` that pulled it** — `jtframe files` dedups by path, so a core
+  cannot include a yaml and override a file that yaml pulls. D1 paid it for
+  `qsound.yaml` (1 file), D2 for `common.yaml` (20). And **a NEW jtframe
+  module must be pulled by the CORE, not added to jtframe's shared
+  `jtframe_sdram64.yaml`**, or every core compiles it — the reference core
+  included. Assert the ABSENCE from the reference core's file list, not just
+  the presence in yours.
+- **14z-107 (9) (platform):** **the sim's RAM-dump hook addresses SDRAM, not
+  the 68k bus, and slice D2 MOVED work RAM** (bank 0 byte `0x600000` on
+  `cps2`, `0x648000` on `cps2w`; `0x600000` there is VRAM). Dumping the stale
+  constant produced 64 KB of plausible changing bytes and turned
+  `test_mister_wide_inert` red in 101 frames of 101 with the RTL innocent.
+  **Any instrument naming a PHYSICAL address is invalidated by a memory-map
+  change — and a placement slice IS a memory-map change.**
+- **14z-107 (9) (project):** editing a running shell script derails it —
+  **paid a THIRD time, on a COMMENT-ONLY edit** (`line 440: unexpected EOF`).
+  The measurement survived in the simulator's own output files and was
+  recovered by hand. Reverting the edit at once re-aligns the interpreter and
+  saved the two runs that had not yet resumed reading.
+- **14z-107 (9) (platform):** `jtcps1_prom_we`'s `prog_ba` fall-through arm
+  is reached by the FIRMWARE region as well as QSound, and the
+  region-relative addresses are wrapped subtractions outside their own
+  region — so a new `pcm_addr[23] ? … : …` condition silently re-banks the
+  firmware. Harmless (its `prog_we` is 0) and qualified anyway: a signal
+  that is right only because its enable is off is a defect waiting for a
+  refactor.
 - **14z-107 (7) (project):** **editing a shell script while it is running
   derails it** — `sh` reads by BYTE OFFSET, so even a comment-only edit
   moves the ground under the interpreter. Three 45-minute simulations and a

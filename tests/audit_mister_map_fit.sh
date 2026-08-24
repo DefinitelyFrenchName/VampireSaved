@@ -3,29 +3,44 @@
 # content extents it depends on have not moved. (14z-107 (4);
 # docs/project/mister_map.md is the design this gate defends.)
 #
-# WHY IT EXISTS. The bank-repack map fits the 64 MB tier with **0.708 MB of
-# slack**, and the fit is a function of THREE frozen content extents plus one
-# structural size:
+# WHY IT EXISTS. The bank-repack map has to fit the 64 MB tier, and the fit is
+# a function of the DECLARED REGION SIZES the MRA downloads. It also freezes
+# four content extents, which bound where content LIVES:
 #   * group C obj bank 4's highest tile code   (Donovan's band+shelf top)
 #   * group C obj bank 5's highest tile code   (the ported effect set)
 #   * the QSound extension's live extent       (the M5 voice batch)
 #   * the 68k PRG region                       (6 MB, pinned by the 30-byte
 #                                               facing-alias thunk at 0x5FFF00)
 # A tile code IS its SDRAM address on CPS-2 (the download scramble at
-# jtcps1_prom_we.v:105 undoes the .rom's 4-way interleave), so ONE new tenant
-# tile above the frozen ceiling silently overflows a bank. That failure would
-# not appear until a MiSTer bring-up, months from the commit that caused it.
+# jtcps1_prom_we.v:105 undoes the .rom's 4-way interleave), which is the
+# identity section 6 below re-checks.
+#
+# **CORRECTED 14z-107 (9) BY THE SDRAM IMAGE CENSUS, AND THE CORRECTION IS THE
+# WHOLE POINT OF HAVING RUN ONE.** This gate used to size the two group-C obj
+# banks by their live ADDRESS FOOTPRINT (7.452 + 7.996 MB) and reported
+# 0.708 MB of slack. The download does not work that way: the MRA maps the
+# WHOLE declared 48 MB GFX region, so each group-C obj bank occupies its FULL
+# 8 MB in SDRAM whatever the art does inside it. Measured on the real image
+# (tests/test_mister_sdram_census.sh): **SDRAM bank 1 is EXACTLY FULL (8 MB
+# PCM + 8 MB obj bank 4 = 16,777,216 B, zero free) and bank 0 has 131,072 B
+# free.** Total slack is 0.125 MB, not 0.708 MB. It still fits, and the fit is
+# now decided by REGION sizes rather than by tile ceilings — so a new tenant
+# tile inside the existing 16 MB costs nothing, while growing the group-C
+# ROMSET region past 16 MB does not fit at all. The extents below stay frozen
+# because they bound the content and because they are what a future group-C
+# MRA trim would have to work from; they are no longer what decides the fit.
 #
 # THE TRAP THIS GATE ALSO CLOSES. "6.39 MB of tenant art" is a LIVE-BYTE
 # count, not an address footprint; the footprint is 15.45 MB because the art
-# is sparse across both group-C obj banks. Freezing the maxima is what keeps
-# that distinction from being re-lost.
+# is sparse across both group-C obj banks; and the SDRAM RESERVATION is
+# 16 MB, because the region is downloaded whole. Three different numbers for
+# one thing, and each has been mistaken for another at least once.
 #
 # VERDICT CONTROLS (a fit check with no control asserts nothing):
 #   A. the UNTRIMMED 16 MB QSound region must overflow BOTH the 26-bit
 #      ioctl_addr port and the 16-bit header start word — i.e. the arithmetic
 #      is able to say no;
-#   B. one extra megabyte of obj-bank-5 footprint must overflow SDRAM bank 0;
+#   B. one extra megabyte of the obj-bank-5 REGION must overflow SDRAM bank 0;
 #   C. the "tile code IS its SDRAM address" identity must FAIL when the CPS-2
 #      scramble is removed — otherwise the identity check is testing nothing.
 #
@@ -57,7 +72,7 @@ def bad(m):
 def frozen(label, got, want):
     if got != want:
         bad(f"{label} = {got:#x}, frozen {want:#x} — the map's slack is "
-            "0.708 MB; re-run the fit arithmetic before absorbing this")
+            "0.125 MB; re-run the fit arithmetic before absorbing this")
     else:
         print(f"  ok {label} = {got:#x}")
 
@@ -176,25 +191,57 @@ for name, s in zip(("audiocpu", "qsound", "gfx", "firmware"), starts):
         bad(f"region {name} starts at {s:#x}, not 1 KiB-aligned — the Go "
             "generator's +20 key offset then puts the header word off by one")
 
-# ── 5. the SDRAM banks ─────────────────────────────────────────────────
+# ── 5. the SDRAM banks, AS PLACED ──────────────────────────────────────
+# The offsets are the localparams in cores/cps2w/hdl/jtcps1_sdram.v, in BYTES
+# (they are 23-bit WORD constants there). The LENGTHS are what the download
+# WRITES, which for the two group-C obj banks is the full 8 MB of the declared
+# region and NOT the live footprint — the correction the census forced.
 BANK = 16 << 20
 VRAM, ORAM, WRAM, Z80W = 0x40000, 0x8000, 0x10000, 0x80000
 PCM_HIGH = 0x100000          # the 1 MB window for DSP banks 0x80-0x8F
+GROUPC_BANK = 0x800000       # each group-C obj bank is 8 MB of the .rom
 
 
-def banks(foot4, foot5, qs_placed):
-    ba0 = PRG_LEN + VRAM + ORAM + WRAM + Z80W + PCM_HIGH + foot5
-    ba1 = min(qs_placed, 0x800000) + foot4
-    return ba0, ba1
+def placement(qs_placed, c5_len=GROUPC_BANK, c4_len=GROUPC_BANK):
+    # [(name, bank, byte offset, length)] — mister_map.md section 5
+    return [
+        ("68k PRG",           0, 0x000000, PRG_LEN),
+        ("VRAM",              0, 0x600000, VRAM),
+        ("OBJ RAM",           0, 0x640000, ORAM),
+        ("work RAM",          0, 0x648000, WRAM),
+        ("Z80 program",       0, 0x658000, Z80W),
+        ("QSound PCM high",   0, 0x6E0000, PCM_HIGH),
+        ("GFX group C obj 5", 0, 0x7E0000, c5_len),
+        ("QSound PCM low",    1, 0x000000, min(qs_placed, 0x800000)),
+        ("GFX group C obj 4", 1, 0x800000, c4_len),
+    ]
 
 
-ba0, ba1 = banks(FOOT4, FOOT5, QS_PLACED)
-print(f"  bank 0 {ba0} B of {BANK} (slack {BANK-ba0} B); "
-      f"bank 1 {ba1} B of {BANK} (slack {BANK-ba1} B)")
+def bank_tops(rows):
+    top = {0: 0, 1: 0}
+    for _, b, off, ln in rows:
+        top[b] = max(top[b], off + ln)
+    return top[0], top[1]
+
+
+rows = placement(QS_PLACED)
+for i, (n1, b1, o1, l1) in enumerate(rows):
+    for n2, b2, o2, l2 in rows[i + 1:]:
+        if b1 == b2 and o1 < o2 + l2 and o2 < o1 + l1:
+            bad(f"{n1} and {n2} OVERLAP in bank {b1}")
+ba0, ba1 = bank_tops(rows)
+print(f"  bank 0 used to {ba0:#x} of {BANK:#x} (free {BANK-ba0} B); "
+      f"bank 1 used to {ba1:#x} of {BANK:#x} (free {BANK-ba1} B)")
+print(f"  live-byte footprints, for reference only: obj bank 4 "
+      f"{FOOT4/2**20:.3f} MB, obj bank 5 {FOOT5/2**20:.3f} MB, each inside "
+      f"its 8.000 MB region")
 if ba0 > BANK:
     bad(f"SDRAM bank 0 overflows by {ba0-BANK} B")
 if ba1 > BANK:
     bad(f"SDRAM bank 1 overflows by {ba1-BANK} B")
+for name, foot in (("obj bank 4", FOOT4), ("obj bank 5", FOOT5)):
+    if foot > GROUPC_BANK:
+        bad(f"group C {name} footprint {foot:#x} exceeds its 8 MB region")
 if QS_PLACED - 0x800000 > PCM_HIGH:
     bad("the QSound high window is larger than the 1 MB placed in bank 0")
 
@@ -255,16 +302,17 @@ else:
     print(f"  ok control A fired ({csize/2**20:.2f} MB > 64 MB, and "
           f"qsnd_start {cwords['firmware']} KiB > 65535)")
 
-print("== control B: +1 MB of obj-bank-5 footprint must overflow bank 0 ==")
-cb0, _ = banks(FOOT4, FOOT5 + (1 << 20), QS_PLACED)
+print("== control B: +1 MB of the obj-bank-5 REGION must overflow bank 0 ==")
+cb0, _ = bank_tops(placement(QS_PLACED, c5_len=GROUPC_BANK + (1 << 20)))
 if cb0 <= BANK:
-    bad(f"control B did not fire: bank 0 still fits at {cb0} B")
+    bad(f"control B did not fire: bank 0 still fits at {cb0:#x}")
 else:
     print(f"  ok control B fired (bank 0 would need {cb0-BANK} B more)")
 
 if errs:
     print(f"\nFAIL: MiSTer map fit — {len(errs)} problem(s)")
     sys.exit(1)
-print("\nPASS: the MiSTer SDRAM placement map fits, and every extent it "
-      "depends on is frozen (docs/project/mister_map.md)")
+print("\nPASS: the MiSTer SDRAM placement map fits AS PLACED (bank 1 exactly "
+      "full, bank 0 with 131,072 B free), and every content extent it "
+      "records is frozen (docs/project/mister_map.md)")
 PY

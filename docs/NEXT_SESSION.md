@@ -1,4 +1,50 @@
-# NEXT SESSION — orientation (rewritten at the 14z-107 (8) close, 2026-08-23)
+# NEXT SESSION — orientation (rewritten at the 14z-107 (9) close, 2026-08-24)
+
+> ## **NEWEST FIRST — 14z-107 (9): MiSTer SLICE D2 IS DONE. THE WIDE ROMSET
+> ## HAS A PLACE IN SDRAM AND EVERY BYTE OF IT WAS COUNTED.** Fork commit
+> ## `0df6f000`, **PUSHED** (fork pushes are standing-authorised now; the
+> ## MAIN repo is still never pushed). `cores/cps1`/`cps2`/`cps15`
+> ## BYTE-UNTOUCHED.
+> ## **WHAT SHIPPED:** the bank-0 re-pack (VRAM `0x600000`, ORAM `0x640000`,
+> ## WRAM `0x648000`, Z80 `0x658000`, making room for a 6 MB PRG), the
+> ## group-C GFX redirect (obj bank 4 → SDRAM bank 1, obj bank 5 → bank 0),
+> ## the QSound split across two banks on `pcm_addr[23]`, the PCM-high slot
+> ## and the two GFX slots, and **ONE new jtframe file**
+> ## `hdl/sdram/jtframe_ram1_7slots.v` — a mechanical sibling of
+> ## `ram1_5slots.v`, pulled by `cores/cps2w`'s own `game.yaml` and NOT added
+> ## to jtframe's shared `jtframe_sdram64.yaml` (that list is included by
+> ## every core). `cores/cps2w/hdl` goes from four files to six.
+> ## **EVERYTHING BEHAVIOURAL IS GATED — five `wide_en` sites now.** The one
+> ## exception is declared, not hidden: the bank-0 re-pack is unconditional
+> ## because `SLOTn_OFFSET` are elaboration-time parameters. It is a
+> ## RELOCATION with no behavioural surface, and `test_mister_wide_inert`
+> ## measures that (`cps2w` == `cps2`, bit-identical work RAM 540-640).
+> ## **THE EVIDENCE IS AN SDRAM IMAGE CENSUS, NOT A REPLAY** — and it has to
+> ## be: `rom0_bank[2]` is TIED LOW until D3, so D2 changes no fetch at all.
+> ## `tools/mister_sdram_census.py` replays the download mapping (regions,
+> ## the QSound split, the group-C redirect, the CPS-2 GFX scramble) and
+> ## compares **all 67,108,864 bytes of all four banks**. PASS on every bank
+> ## on the WIDE image (66,265,152 B, transfer complete at simulated frame
+> ## 659). Controls: a 1 KiB shift of any constant is rejected; banks 1/2/3
+> ## byte-identical between the two cores on a stock image with bank 0
+> ## differing; banks 2+3 DIFFERING between them on the WIDE image, because
+> ## without the redirect group C aliases onto vanilla's art.
+> ## **AND THE CENSUS CONTRADICTED THE MAP. THE CENSUS WON.** The fit's slack
+> ## is **0.125 MB, not 0.708**, and **SDRAM bank 1 is EXACTLY FULL**. The map
+> ## sized the group-C obj banks by the art's live FOOTPRINT; the MRA
+> ## downloads the whole declared region, so each reserves its full 8 MB.
+> ## Both consequences point opposite ways: tenant art may now grow freely
+> ## inside the existing 16 MB (one more tile overflows nothing), and the
+> ## group-C ROMSET REGION cannot grow at all. Corrected in place in
+> ## `mister_map.md` and in `tests/audit_mister_map_fit.sh`.
+> ## **STOCK LEG GREEN:** `test_mister_sim_anchor` 2146 / 2609 / 463 on
+> ## `cps2w`; `test_mister_wide_inert` bit-identical.
+> ## **NEXT: slice D3** — the obj promote (`jtcps2_obj_scan.v:152`
+> ## `st3_bank <= {table_y[12], table_y[14:13]}`, the CPS-2 Turbo rule) and
+> ## the `dr_bank`/`obj_bank`/`rom_bank`/`rom0_bank` chain widened to 3 bits.
+> ## D2 built the destination and the plumbing; D3 drives `rom0_bank[2]`.
+
+
 
 > ## **NEWEST FIRST — 14z-107 (8): THE SIMULATED CONTROLLER WAS PRESSING
 > ## FOUR BUTTONS NOBODY SCRIPTED.** jtframe v1.7.3's `SimInputs` held
@@ -171,7 +217,8 @@
 
 
 > ## **14z-107 (4): THE MiSTer SDRAM PLACEMENT MAP EXISTS
-> ## AND IT FITS, by 0.708 MB of 64.** Read `docs/project/mister_map.md`
+> ## AND IT FITS, by 0.125 MB of 64 (0.708 MB RETRACTED 14z-107 (9) —
+> ## see below).** Read `docs/project/mister_map.md`
 > ## before any MiSTer RTL. Three things in it change what earlier
 > ## entries below say:
 > ## **(1) "6.39 MB of tenant art into bank 1's 7.1 MB spare" IS WRONG.**

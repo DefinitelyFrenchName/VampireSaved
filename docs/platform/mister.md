@@ -22,7 +22,7 @@ field test. Distribution = MRA + RBF over the same release members as
 |---|---|
 | the fork | https://github.com/DefinitelyFrenchName/jtcores, branch `vampire-saved`, from upstream tag `v1.7.3` = `63688ce5` |
 | pinned here | submodule `emu/jtcores` (branch `vampire-saved`); `tools/setup_jtcores.sh` checks the pin, inits the five modules the cps2 yaml chain pulls, and regenerates `emu/jtcores-patches/` as a PATCH SERIES, one file per fork commit (`modules/jtframe/target/pocket` is a PRIVATE ssh submodule — never init it) |
-| the fork's commits | `b9d0565` `cores/cps2w` scaffold (14z-106) · `553dd56` sim work-RAM dumps · `6c32be8` sim SDRAM top address bit · `4f25cc7` sim model clock · `74ed17d` sim SDRAM stats · `38acc638` the WIDE machine entry + the MANDATORY QSound trim in the MRA (14z-107 (5), slice D0) · `4840df8a` **THE FIRST RTL COMMIT — the QSound sample-bank width, RUNTIME-GATED** (14z-107 (6), slice D1). Commits 1-6 touched no RTL. The mirrored series is `emu/jtcores-patches/0001`-`0007` |
+| the fork's commits | `b9d0565` `cores/cps2w` scaffold (14z-106) · `553dd56` sim work-RAM dumps · `6c32be8` sim SDRAM top address bit · `4f25cc7` sim model clock · `74ed17d` sim SDRAM stats · `38acc638` the WIDE machine entry + the MANDATORY QSound trim in the MRA (14z-107 (5), slice D0) · `4840df8a` **THE FIRST RTL COMMIT — the QSound sample-bank width, RUNTIME-GATED** (14z-107 (6), slice D1) · `692ba4d6` + `7cf1eedb` the frame writer made optional and its child made `_exit` (14z-107 (7)) · `519aff8b` the joystick top bits (14z-107 (8)) · `0df6f000` **THE SDRAM PLACEMENT** (14z-107 (9), slice D2). Commits 1-6 touched no RTL. The mirrored series is `emu/jtcores-patches/0001`-`0011` |
 | the new core | `cores/cps2w/` in the fork → RBF `jtcps2w.rbf` (jtframe names the RBF `"jt" + <core dir>`; `CORENAME=JTCPS2W` is what the MRA's `<rbf>` is matched against, upper-cased) |
 | the reference core | `cores/cps2/` — untouched, by design |
 | jtframe | `modules/jtframe` is VENDORED in the jtcores tree at v1.7.3 (not a submodule); its Go tool builds with `cd modules/jtframe/src/jtframe && go build -o jtframe .` (Go ≥ 1.2x; `brew install go`). The `bin/jtframe` wrapper uses GNU `date -d` / `stat -c` and needs coreutils on macOS — call the built binary directly instead |
@@ -41,18 +41,44 @@ separate-core mechanism**: `cores/cps15` exists exactly this way (its
 and a file is copied into `cores/cps2w/hdl` only when it must differ; the
 diff between the two core dirs IS the trust surface.
 
-**SINCE SLICE D1 (14z-107 (6)) cps2w EXERCISES THAT MECHANISM.** Its
-`game.yaml` was cps2's verbatim through D0; it now pulls FOUR files from
-`cores/cps2w/hdl` — two overrides of SHARED files (`jtcps2_game.v` from
-cps2, `jtcps15_sound.v` from cps15) and two new ones — and DROPS those two
-from the reference cores' lists, because `jtframe files` deduplicates by
-full path and would otherwise compile both copies of the same module
-(measured: `jtframe files sim cps2w` lists ours and neither original;
-`... cps2` lists the originals and none of ours; the two lists differ in
-exactly six entries). `cores/cps1`, `cores/cps2` and `cores/cps15` are
+**SINCE SLICE D1 (14z-107 (6)) cps2w EXERCISES THAT MECHANISM, AND SLICE D2
+(14z-107 (9)) DOUBLED IT.** Its `game.yaml` was cps2's verbatim through D0;
+it now pulls SIX files from `cores/cps2w/hdl` — FOUR overrides of SHARED
+files (`jtcps2_game.v` from cps2, `jtcps15_sound.v` from cps15,
+`jtcps1_sdram.v` and `jtcps1_prom_we.v` from cps1) and two new ones — and
+DROPS those four from the reference cores' lists, because `jtframe files`
+deduplicates by full path and would otherwise compile both copies of the
+same module (measured: `jtframe files sim cps2w` lists ours and NONE of the
+four originals; `... cps2` lists the originals and none of ours; the two
+lists differ in exactly **eleven** entries — 4 out, and 6 overrides plus
+1 new jtframe module in). `cores/cps1`, `cores/cps2` and `cores/cps15` are
 BYTE-UNTOUCHED against upstream `v1.7.3` — `tests/test_jtcores_twin.sh` 2e
-asserts it with `git diff`, and `tests/test_mister_wide_gate.sh` freezes the
-override delta line by line.
+asserts it with `git diff`, 2f holds the fork's WHOLE-TREE delta to a
+declared 18 paths, and `tests/test_mister_wide_gate.sh` freezes the override
+delta line by line.
+
+**THE COST OF AN OVERRIDE IS THE YAML THAT PULLED IT, AND IT COMPOUNDS.**
+A file reachable only through a pulled yaml cannot be overridden and have
+that yaml included: jtframe dedups by PATH, so both copies of the module
+would compile. D1 paid this once — `cores/cps15/cfg/qsound.yaml` had to be
+INLINED into cps2w's `game.yaml` minus `jtcps15_sound.v`. D2 paid it again
+and larger: `jtcps1_sdram.v` and `jtcps1_prom_we.v` come from
+`cores/cps1/cfg/common.yaml`, so that yaml is now inlined too, minus those
+two. cps2w's `game.yaml` is consequently 68 lines different from cps2's and
+is frozen in `tests/expect/cps2w_game_yaml_delta.txt` rather than in a shell
+string. **The rule to carry forward: overriding one shared file costs you
+the whole yaml that pulled it, and the two copies then have to be kept in
+step by hand at every uprev.**
+
+**AND A NEW jtframe MODULE IS PULLED BY THE CORE, NOT BY jtframe.** D2 adds
+`modules/jtframe/hdl/sdram/jtframe_ram1_7slots.v` (bank 0 needs seven
+streams; upstream's `ram1_Nslots` family stops at five). jtframe's own
+`hdl/sdram/jtframe_sdram64.yaml` lists that family — and it is SHARED, so a
+line there would put the new module on EVERY jtcores core's compile list,
+the reference `cps2` included. Instead cps2w's `game.yaml` pulls it with
+`- from: sdram / get: - jtframe_ram1_7slots.v`, exactly the way
+`cores/cps1/cfg/common.yaml` pulls `jtframe_romrq.v`. Measured: it is absent
+from `jtframe files sim cps2`. Gate: `test_mister_wide_gate` 5b/7n.
 
 `cfg/macros.def` (cps2): `include ../../cps1/cfg/common.def`, `CPS2`,
 `GAMETOP=jtcps2_game`, `CORENAME=JTCPS2`, `JTFRAME_SDRAM_LARGE`,
@@ -857,8 +883,17 @@ no longer blocked on this.
 running core.** `jtcps1_sdram.v:158-164` `WRAM_OFFSET = 23'h30_0000` in 16-bit
 WORDS; `jtcps2_main.v:127,185` `pre_ram_cs = &A[23:16]` (i.e. `$FFxxxx`) and
 `addr = ram_cs ? {2'b0,A[15:1]} : A[17:1]`; `jtframe_ram_rq.v:94` composes
-`sdram_addr = addr + offset`. So **`RAM:$FF0000-$FFFFFF` = SDRAM bank 0 byte
-offset `0x600000`, 64 KB**. Confirmed by dumping the WHOLE 16 MB bank at a
+`sdram_addr = addr + offset`. So **on the REFERENCE core `RAM:$FF0000-$FFFFFF`
+= SDRAM bank 0 byte offset `0x600000`, 64 KB**. **QUALIFIED 14z-107 (9): THAT
+OFFSET IS PER CORE NOW.** Slice D2 re-packed bank 0 to make room for a 6 MB
+PRG region, so on `cores/cps2w` work RAM is at byte **`0x648000`**
+(`WRAM_OFFSET` word `0x32_4000`) and `0x600000` is **VRAM**. The dump hook
+addresses SDRAM, not the 68k bus, so the constant has to follow the core:
+`tools/run_sim_jtcps2.sh` selects it from `--core` and prints which one it
+used. Getting it wrong does not announce itself — VRAM is a perfectly
+plausible-looking 64 KB of changing bytes, and it turned
+`tests/test_mister_wide_inert.sh` red in 101 frames of 101 with the RTL
+entirely innocent (measured 14z-107 (9)). Confirmed by dumping the WHOLE 16 MB bank at a
 boot frame and diffing it against the post-download image: the only regions
 the 68k had touched were `0x400000-0x42FFFF` (VRAM/ORAM) and **exactly 297
 bytes at `0x600000`** — the same 297 bytes MAME's `$FF0000-$FFFFFF` carries at
@@ -1016,6 +1051,53 @@ Only `test.cpp` includes `defmacros.h`, so changing the dump window rebuilds
 one object and relinks — it does NOT re-verilate the model. A per-window
 rebuild is ~4 s, not minutes.
 
+## THE SDRAM IMAGE CENSUS: reading the download back out (14z-107 (9))
+
+Platform mechanics, true of any jtcores core. Slice D2 places a romset in
+SDRAM and changes no fetch at all, so the only thing that can be checked is
+the IMAGE — and the image was already reachable; the lane was throwing it
+away.
+
+- **`test.cpp` dumps all four banks, once, the instant a FULL download
+  ends.** `test.cpp:915` `if( dwn.FullDownload() ) sdram.dump();`, and
+  `SDRAM::dump()` writes `sdram_bank0-3.bin` (4 x 16 MB under
+  `_JTFRAME_SDRAM_BANKS`) into `cores/<core>/ver/game`. Because it fires at
+  the end of the transfer and the core is held in reset until then, the image
+  is PURE download: nothing the 68k does has happened yet.
+  `tools/run_sim_jtcps2.sh --keep-banks` collects them; without it the tool
+  still deletes them, because 64 MB of ROM-derived litter per run was the
+  reason they were being deleted in the first place.
+- **So a census run costs the download and NOTHING else.**
+  `--post-frames 2` simulates two frames after the transfer, which is why the
+  gate is ~10 min per leg rather than ~50. `--post-frames` exists because
+  `--frames` is ABSOLUTE and assumes the 462-frame stock transfer; the WIDE
+  image is 66 MB and takes about 660.
+- **HOW A `.rom` BYTE REACHES A DUMP BYTE.** Three steps, each read from the
+  source: `jtcps1_prom_we.v:137` `prog_mask <= !ioctl_addr[0] ? 2'b10 :
+  2'b01` with ACTIVE-LOW masks, so an EVEN region byte goes to the LOW half
+  of the 16-bit word; `write_bank16` stores through an `int16_t*` on a
+  little-endian host, so word W's low byte is `banks[k][2W]`; and `dump()`
+  writes `out[j^1] = banks[k][j]`. Composing them, a region byte at region
+  offset `r` placed at 16-bit WORD offset `OFF` lands at dump index
+  `2*OFF + (r ^ 1)` — i.e. **each region appears at its byte offset with the
+  16-bit words byte-swapped**. That is the same composition that makes
+  `sdram_bank0.bin == byteswap(rom body)` on a stock image, which this file
+  already recorded as a cross-check; now it is the census's arithmetic.
+- **The GFX scramble is contained in 2 MB and is therefore sixteen slice
+  copies, not two million lookups.** `jtcps1_prom_we.v:105` is
+  `g = { a[25:21], a[3], a[20:4], a[2:0] }`. Writing `g`'s low 21 bits as
+  `(t, m, n) = (g[20], g[19:3], g[2:0])` gives `a = m*16 + t*8 + n`, so for a
+  FIXED `n` both the source and destination indices are arithmetic
+  progressions. `tools/mister_sdram_census.py:unscramble_block` does the
+  whole permutation with 16 strided slice assignments per 2 MB block, which
+  is what makes a full 67 MB byte-exact census a few seconds of pure Python
+  with no numpy dependency.
+- **`tools/mister_mra.sh` is what makes a WIDE leg possible at all.** The
+  WIDE set is a CLONE whose parent is the BUILD's `vsav.zip` while the stock
+  leg needs the pristine one, and `jtframe mra` reads a hard-coded
+  `$HOME/.mame/roms`. `run_sim_jtcps2.sh --wide <build>` delegates to that
+  script, which stages a private `$HOME` per run.
+
 ## The per-bank SDRAM traffic profile (measured 14z-107 (3))
 
 Stock `vsavj` on the stock `cps2` core, `05_timeout_idle`, 2,800 frames,
@@ -1076,13 +1158,15 @@ and diffs them.
 **Since 14z-107 (6) the twin is a TWO-PART claim and both parts are gated.**
 The MRA twin above is unchanged and still exact. What changed is the CORE
 DIR: cps2w carries RTL, so "identical modulo CORENAME" became "identical
-modulo an ENUMERATED delta" — four files in `cores/cps2w/hdl`, a frozen
-line-by-line diff for the two that override shared files
-(`tests/test_mister_wide_gate.sh` check 1), and `git diff` proving
+modulo an ENUMERATED delta" — **six** files in `cores/cps2w/hdl` since slice
+D2 (it was four at D1), a frozen line-by-line diff for the FOUR that override
+shared files (`tests/test_mister_wide_gate.sh` check 1), `git diff` proving
 `cores/cps1`, `cores/cps2`, `cores/cps15` never moved
-(`tests/test_jtcores_twin.sh` 2e). The gate that used to say "game.yaml
-identical (no RTL override)" was moved DELIBERATELY, the way check 2c was
-moved at D0.
+(`tests/test_jtcores_twin.sh` 2e), and — added at D2, because D2 puts a file
+OUTSIDE `cores/` for the first time — the fork's WHOLE-TREE `git diff
+--name-status` held to a declared 18 paths (2f). The gate that used to say
+"game.yaml identical (no RTL override)" was moved DELIBERATELY, the way check
+2c was moved at D0.
 
 ## HOW THE MRA AND THE `.rom` ARE MADE (measured 14z-107 (5))
 

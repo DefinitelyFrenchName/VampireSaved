@@ -42,6 +42,15 @@
 # v1.7.3 SimInputs held player buttons 5 and 6 DOWN on every 6-button core --
 # `&0xf0` on a [9:0] ACTIVE-LOW port, plus a 0xff seed parse_inputs never
 # corrects for players 2-4. It re-freezes tests/test_mister_sim_anchor.sh.
+# 14z-107 (9) added 0011, SLICE D2 — THE PLACEMENT. cores/cps2w/hdl gains
+# OVERRIDES of two more SHARED files (jtcps1_sdram.v, jtcps1_prom_we.v: the
+# bank-0 re-pack, the group-C GFX redirect, the QSound split across two banks,
+# and the two new slot counts), and jtframe gains ONE NEW FILE,
+# hdl/sdram/jtframe_ram1_7slots.v — a mechanical member of the ram1_Nslots
+# family, which upstream stops at 5. It is pulled by cores/cps2w's game.yaml
+# alone, NOT by jtframe's shared jtframe_sdram64.yaml, so no other core's
+# compile list moves. cores/cps1, cores/cps2 and cores/cps15 stay
+# BYTE-UNTOUCHED. Gate: tests/test_mister_sdram_census.sh.
 #
 # Simulation lane deps (brew): go coreutils gnu-sed xmlstarlet verilator
 # imagemagick — docs/platform/mister.md "Recipe".
@@ -54,7 +63,7 @@ set -eu
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 SRC="$REPO/emu/jtcores"
 UPSTREAM_TAG_SHA="63688ce5f4de9b92ac4d2ea4b306009b8ba4bcdb"   # jotego/jtcores v1.7.3
-PINNED="519aff8bc401c3eca8deae61f5b9b385a7760c45"             # fork branch vampire-saved
+PINNED="0df6f0000a8a0d315034b6923671ef1b81d900e7"             # fork branch vampire-saved
 FORK_URL="https://github.com/DefinitelyFrenchName/jtcores"
 
 if [ ! -f "$SRC/.gitmodules" ]; then
@@ -81,7 +90,7 @@ echo "jtcores @ $HEAD (fork of v1.7.3 $UPSTREAM_TAG_SHA); jtdsp16 $(git -C "$SRC
 # The reviewable mirror of the fork's delta, one file per commit IN ORDER.
 # The names are declared here (not derived from the commit subject) so the
 # in-tree filenames stay stable and greppable; the gate reads this same list.
-PATCH_NAMES="0001-cps2w-scaffold.patch 0002-jtframe-sim-wramdump.patch 0003-jtframe-sim-sdram-top-address-bit.patch 0004-jtframe-sim-advance-model-time.patch 0005-jtframe-sim-sdram-stats-raw.patch 0006-cps2w-wide-mra-trim.patch 0007-cps2w-qsound-width-runtime-gate.patch 0008-jtframe-sim-optional-frame-writer.patch 0009-jtframe-sim-child-must-exit-hard.patch 0010-jtframe-sim-joystick-top-bits.patch"
+PATCH_NAMES="0001-cps2w-scaffold.patch 0002-jtframe-sim-wramdump.patch 0003-jtframe-sim-sdram-top-address-bit.patch 0004-jtframe-sim-advance-model-time.patch 0005-jtframe-sim-sdram-stats-raw.patch 0006-cps2w-wide-mra-trim.patch 0007-cps2w-qsound-width-runtime-gate.patch 0008-jtframe-sim-optional-frame-writer.patch 0009-jtframe-sim-child-must-exit-hard.patch 0010-jtframe-sim-joystick-top-bits.patch 0011-cps2w-sdram-placement.patch"
 i=1
 for name in $PATCH_NAMES; do
     sha="$(git -C "$SRC" rev-list --reverse "$UPSTREAM_TAG_SHA..$PINNED" | sed -n "${i}p")"

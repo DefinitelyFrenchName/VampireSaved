@@ -1,5 +1,200 @@
 # STATE — living progress log
 
+## Session 14z-107 (9) — MiSTer SLICE D2: THE PLACEMENT IS IN THE RTL AND
+## THE SDRAM IMAGE WAS COUNTED, ALL 67,108,864 BYTES OF IT. The bank-0
+## re-pack, the group-C GFX redirect, the QSound split across two banks and
+## two new slot counts ship behind `wide_en`; jtframe gains ONE new file.
+## Fork commit `0df6f000`, **PUSHED** (fork pushes are standing-authorised
+## now; the main repo is still never pushed). `cores/cps1`/`cps2`/`cps15`
+## BYTE-UNTOUCHED. **THE CENSUS CONTRADICTED THE MAP'S SLACK BY A FACTOR OF
+## SIX (section E), AND THE INERT GATE WENT RED FOR A REASON THAT WAS NOT
+## THE RTL (section D).**
+
+**The one line:** the WIDE romset now has a place in SDRAM, every byte of it
+was checked against the map rather than argued for, and the checking found
+two things the design did not know — one about the map, one about the
+instrument.
+
+**A. WHAT SHIPPED, AND WHAT IS AN ADDITION VS A COPY.**
+
+| file | new or copied | why |
+|---|---|---|
+| `modules/jtframe/hdl/sdram/jtframe_ram1_7slots.v` | **NEW — an ADDITION to jtframe** | bank 0 needs seven streams (RAM/VRAM/ORAM RW, VRAM DMA, gfx-ORAM, main ROM, Z80, QSound high, group-C obj bank 5) and upstream's `ram1_Nslots` family stops at five. Mechanically `ram1_5slots.v` plus two `jtframe_romrq` instances and nothing else, so a reviewer diffs it against its sibling. Maintainer-ruled option A (`mister_map.md` §5). |
+| `cores/cps2w/hdl/jtcps1_sdram.v` | **COPIED from `cores/cps1/hdl`** | the bank-0 re-pack, the QSound read split, the group-C read select, the two new slot counts. SHARED with cps1/cps15/cps2, so it cannot be edited in place. |
+| `cores/cps2w/hdl/jtcps1_prom_we.v` | **COPIED from `cores/cps1/hdl`** | the DOWNLOAD-side group-C redirect and QSound split. Same reason. |
+| `cores/cps2w/hdl/jtcps2_game.v` | already a copy (D1); extended | `wide_en` routed to the SDRAM block, the full 24-bit `qsnd_addr` handed over for the split, `rom0_bank` presented as `{1'b0, rom0_bank}`. |
+| `cores/cps2w/cfg/game.yaml` | rewritten | `cores/cps1/cfg/common.yaml` INLINED minus the two overridden files, plus the new jtframe module. 68 lines of delta, frozen in `tests/expect/cps2w_game_yaml_delta.txt`. |
+
+**WHERE THE NEW jtframe FILE WENT, AND WHY IT IS AN ADDITION AND NOT A
+MODIFICATION.** With its family in `modules/jtframe/hdl/sdram/`, so it can be
+read side by side with `jtframe_ram1_5slots.v` — but pulled by
+**`cores/cps2w/cfg/game.yaml` alone** and deliberately NOT added to jtframe's
+own `hdl/sdram/jtframe_sdram64.yaml`, which is SHARED and would have put the
+module on every jtcores core's compile list, the reference `cps2` included.
+Measured: `jtframe files sim cps2` does not contain it, and the two cores'
+lists differ in exactly **11** entries (4 shared originals out; 6 overrides +
+1 new jtframe module in). Gate: `test_mister_wide_gate` 5a/5b/5c/7n.
+
+**B. EVERYTHING WITH A BEHAVIOURAL SURFACE IS GATED — five sites now.**
+`is_gfxc = wide_en & gfx_addr[25]` and `is_pcmhi = wide_en & pcm_addr[23]`
+(download), `pcmh_sel = wide_en & pcm_addr[PCM_AW]` and
+`gfxc_sel = wide_en & rom0_bank[2]` (read), plus D1's bank latch. With
+`wide_en` low every expression collapses to the reference core's, character
+for character; `test_mister_wide_gate` 7i-7l re-read all four verbatim, and
+7 re-reads every placement constant in BYTES against `mister_map.md` §5.
+**THE ONE UNGATED CHANGE IS DECLARED, NOT HIDDEN:** the bank-0 re-pack.
+`SLOTn_OFFSET` are elaboration-time parameters and cannot switch at run time.
+It is a RELOCATION with no behavioural surface — identical data at identical
+68k addresses, nothing downloaded to VRAM/ORAM/WRAM, one constant shared by
+the Z80 region's download and read, and `JTFRAME_BA0_AUTOPRECH=1` making bank
+0's per-access latency address-independent — and it is the one D2 claim that
+is MEASURED rather than constructed (section D).
+
+**C. THE CENSUS — D2's core evidence, and it is a WHOLE-IMAGE check.**
+`tools/mister_sdram_census.py` (new) replays the download mapping in Python —
+regions, the QSound split on `pcm_addr[23]`, the group-C redirect, and the
+CPS-2 GFX address scramble, which it un-permutes with sixteen strided slice
+copies per 2 MB block — and compares **all 67,108,864 bytes of all four
+banks**. Pure stdlib; a full census is under a second. The instrument is the
+EXISTING lane: `tools/run_sim_jtcps2.sh` gained `--wide BUILD` (delegates the
+`.rom` to `tools/mister_mra.sh`), `--post-frames N` (counted from the END of
+the transfer, because `--frames` assumes the 462-frame stock download and the
+66 MB WIDE image takes **659**) and `--keep-banks` (collects the four bank
+images `test.cpp` dumps the instant a FULL download completes). A census run
+therefore costs the download and nothing else, ~11 min.
+
+**FOUR LEGS, `tests/test_mister_sdram_census.sh`, ALL GREEN:**
+
+| leg | core + image | vs map | verdict |
+|---|---|---|---|
+| A | `cps2w` + WIDE `vsavjw.rom` (66,265,152 B, sha1 `d462e55a…`) | wide | **PASS, all four banks** — ba0 6,359,055 non-zero (37.9%), ba1 12,879,645 (76.8%), ba2 14,873,334 (88.7%), ba3 14,426,104 (86.0%) |
+| B | `cps2` + the SAME WIDE image | stock | **PASS, all four banks** — the reference core places it the reference way, group-C aliasing included |
+| B | `cps2` + the SAME WIDE image | wide | **FAILS, all four banks** (1,516,787 / 5,524,983 / 6,714,491 / 6,529,272 bytes) — as it must |
+| C | `cps2w` + stock `vsavj.rom` | wide | **PASS** — PRG at 0, Z80 at the NEW `0x658000`, no group C, no PCM high, banks 2+3 exactly vanilla |
+| D | `cps2` + stock `vsavj.rom` | stock | **PASS** — the calibration leg: the tool checked against a mapping nobody changed |
+
+Region by region, every one at its §5 offset: 68k PRG ba0 `0x000000` 6 MB;
+Z80 ba0 `0x658000` 256 KB; QSound PCM low ba1 `0x000000` 8 MB; QSound PCM
+high ba0 `0x6E0000` `0xF0000` B; GFX group C obj bank 5 ba0 `0x7E0000` 8 MB;
+obj bank 4 ba1 `0x800000` 8 MB; GFX obj banks 0/2 in ba2 and 1/3 in ba3 at
+`0x000000`/`0x800000`. The firmware region is `prom_we`, never SDRAM, and the
+census asserts that by expecting ZERO everywhere nothing is placed.
+
+**EVERY CONTROL FIRED.** A 1 KiB shift of any placement constant is rejected:
+`z80` 206,536 bytes differ (first at `0x658000`), `pcm_hi` 714,457 (first at
+`0x6E0002`), `gfxc5` 675,767 (first at `0x7E0080`), `prg` 3,768,659 (first at
+`0x0`), `pcm_lo` in bank 1. And the two cross-checks that do not depend on the
+tool's model at all: **banks 1, 2 and 3 BYTE-IDENTICAL between `cps2` and
+`cps2w` on the same stock image** with bank 0 DIFFERING (the re-pack is
+confined to bank 0, and the comparison is not vacuous), and **banks 2+3
+DIFFERING between the two cores on the WIDE image** — without the redirect
+group C aliases onto vanilla's own art, which is what the redirect exists to
+prevent.
+
+**C2. AND THE GATE'S FIRST RUN FOUND THAT THE REFERENCE CORE CANNOT *BUILD*
+THE WIDE IMAGE.** Leg B was written as `mister_mra.sh --core cps2 --wide` and
+got *no `vsavjw.rom` was produced*. That is slice D0's profile gate working
+exactly as designed: `cores/cps2` parses `sourcefile=["cps2.cpp"]` and the
+WIDE machine entry is tagged `cps2w.cpp`, so the reference core emits no WIDE
+MRA at all. `run_sim_jtcps2.sh --wide` now always GENERATES the image with
+`cps2w` and only SIMULATES with `--core` — the right shape for a control
+anyway: "hand the reference core the WIDE download image", not "ask it to
+build one". Two more gate defects were found the same way and fixed: the
+`--perturb` wrapper expected the wrong exit polarity (the tool exits 0 when
+its own control fires), and the A-vs-B cross-check would have passed
+VACUOUSLY on the missing leg, because `cmp -s` on an absent file reports
+"differ".
+
+**D. THE INERT GATE WENT RED IN 101 FRAMES OF 101 — AND THE RTL WAS
+INNOCENT.** `test_mister_wide_inert` reported "cps2w differs from cps2 in 101
+of 101 frames — the D1 profile is NOT inert". Root cause, found by reading the
+run's own command line rather than by theorising: **the RAM-dump hook
+addresses SDRAM, not the 68k bus, and D2 MOVED work RAM.**
+`JTFRAME_SIM_WRAMDUMP_OFF` was the hard-coded `0x600000`, which is where
+`RAM:$FF0000` lives on the reference core — and on `cps2w`, after the bank-0
+re-pack, `0x600000` is **VRAM** and work RAM is at `0x648000`. The gate was
+comparing cps2's work RAM against cps2w's VRAM. It does not announce itself:
+VRAM is a perfectly plausible 64 KB of changing bytes, so the window was
+NON-CONSTANT and every other assertion passed.
+**Fixed in `tools/run_sim_jtcps2.sh`** (the offset is selected from `--core`
+and PRINTED, so the run's own log says what it dumped), and **re-run with
+nothing else changed: `cps2w` == `cps2`, BIT-IDENTICAL work RAM in all 101
+frames of 540-640**, window non-constant, one-frame-shift control firing.
+That is the direct measurement of the un-gated re-pack's inertness, and
+changing only the instrument is what makes it a measurement rather than a
+story. Filed in `docs/platform/gotchas.md`: **any instrument that names a
+PHYSICAL address is invalidated by a memory-map change, and a placement slice
+IS a memory-map change.**
+
+**D2. AND THE IN-FLIGHT-EDIT TRAP WAS PAID A THIRD TIME, ON A COMMENT.**
+Two comment lines added to `tools/run_sim_jtcps2.sh` while a gate was blocked
+inside it moved every byte after the interpreter's saved offset; when the
+simulation returned, the shell resumed mid-token and died with `line 440:
+unexpected EOF while looking for matching '"'`. **The MEASUREMENT survived** —
+the Verilator run had already written its four 16 MB bank images into the
+core's `ver/game` — so the leg was recovered by copying them out by hand
+instead of paying another 11 minutes, and the census gate then went green on
+the recovered images. Reverting the edit at once re-aligned the interpreter
+and the two runs that had not yet resumed reading were untouched. Recorded in
+`docs/platform/gotchas.md` with that recovery, because the recovery is the
+part that was not obvious.
+
+**E. THE CENSUS CONTRADICTED THE MAP, AND THE CENSUS WON.**
+`mister_map.md` said the fit had **0.708 MB** of slack. It has **0.125 MB**,
+and **SDRAM bank 1 is EXACTLY FULL** (8 MB PCM + 8 MB obj bank 4 =
+16,777,216 B to the byte). Bank 0 is used to `0xFE0000`, leaving 131,072 B.
+The error was one of KIND, not arithmetic: the map sized the two group-C obj
+banks by the art's live ADDRESS FOOTPRINT (7.452 + 7.996 MB), and the MRA
+downloads the WHOLE declared 48 MB GFX region, so each obj bank reserves its
+full 8 MB whatever the art does inside it. Corrected in place in
+`mister_map.md` (the up-front verdict, both §5 bank tables, the whole-tier
+arithmetic, the "two moves" argument, open question 5, §11),
+`mister_fit.md`, `NEXT_SESSION.md`, `HANDOFF.md`, `tests/ci_static.txt` and
+`tests/audit_mister_map_fit.sh` — which now models the banks from the PLACED
+offsets and lengths with an overlap check, and whose control B perturbs the
+REGION rather than the footprint.
+
+**Both consequences, because they point opposite ways:**
+- **Tenant art can now grow freely inside the existing 16 MB.** A new tile
+  above `0xEE73` or `0xFFDB` no longer overflows anything — the silent
+  months-later bring-up failure open question 5 was written about cannot
+  happen by that route.
+- **The group-C ROMSET REGION cannot grow at all.** A fifth group-C member,
+  or anything past 16 MB, overflows immediately and there is nowhere to put
+  it: bank 1 has zero free and bank 0 has 131,072 B.
+- What the footprints still say is how much of each region is DEAD — 0.548 MB
+  in obj bank 4, 0.004 MB in obj bank 5 — i.e. what a group-C MRA trim could
+  recover. **That trim is not the flat `length=` truncation QSound's was:**
+  the GFX region is a 4-way 64-bit interleave and the download scramble turns
+  a contiguous tail of tile codes into a NON-contiguous set of `.rom` offsets.
+  Unmeasured, recorded, not needed today.
+
+**F. TWO MORE THINGS THE SLICE PAID FOR, both in `docs/platform/gotchas.md`.**
+1. **Overriding one shared file costs you the whole `.yaml` that pulled it.**
+   `jtframe files` dedups by full path, so a core cannot include a yaml and
+   override a file that yaml pulls. D1 paid it for `qsound.yaml` (1 file); D2
+   paid it for `common.yaml` (20 files transcribed to override 2). The bill is
+   the transcription, and it is re-paid by hand at every uprev.
+2. **A new jtframe module must be pulled by the CORE**, never added to
+   jtframe's shared `jtframe_sdram64.yaml` — that list is included by every
+   core. Assert the ABSENCE from the reference core's file list, not just the
+   presence in yours.
+   Plus a smaller one: `jtcps1_prom_we`'s `prog_ba` fall-through arm is
+   reached by the FIRMWARE region as well as QSound, whose region-relative
+   `pcm_addr` is a wrapped subtraction with bit 23 SET — so an unqualified
+   `pcm_addr[23] ? …` silently re-banks it. Harmless (`prog_we` is 0 there)
+   and qualified with `is_oki` anyway: a signal that is right only because
+   its enable is off is a defect waiting for a refactor.
+
+**G. WHAT IS STUBBED UNTIL D3, stated plainly.** `rom0_bank` is three bits at
+the `jtcps1_sdram` port, but the game top drives `{1'b0, rom0_bank}`. So
+`gfxc_sel` is constant 0, the two group-C read slots are provably unreachable,
+and **D2 changes no fetch in the running game at all** — which is exactly why
+its evidence is the image and not a replay. D3 is the obj promote
+(`jtcps2_obj_scan.v:152` `st3_bank <= {table_y[12], table_y[14:13]}`, the
+CPS-2 Turbo rule, plus the `dr_bank`/`obj_bank`/`rom_bank`/`rom0_bank` chain
+widened to 3 bits); it lands on the destination and the plumbing D2 built.
+
 ## Session 14z-107 (8) — THE SIMULATED CONTROLLER WAS PRESSING FOUR BUTTONS
 ## NOBODY SCRIPTED, AND NOW IT ISN'T. jtframe v1.7.3's `SimInputs` held P1's
 ## AND P2's buttons 5 and 6 down on every 6-button core — two 8-bit

@@ -7,9 +7,36 @@ pin `74ed17d`). Platform facts live in `docs/platform/mister.md`; the
 region-by-region content measurements live in `docs/project/mister_fit.md`;
 the profile itself is `docs/project/cps2_wide.md`.
 
-**Verdict up front: IT FITS — with 0.708 MB of slack in 64 MB, and only if
-four things hold at once.** It does not fit the way the route was framed.
-See §1 for the correction, §5 for the map, §9 for what is still open.
+**Verdict up front: IT FITS — with 0.125 MB of slack in 64 MB, and SDRAM
+bank 1 EXACTLY FULL.** It does not fit the way the route was framed.
+See §1 for the first correction, §5 for the map, §9 for what is still open.
+
+**THE 0.708 MB THIS DOCUMENT USED TO CLAIM IS RETRACTED — measured by the
+slice-D2 SDRAM image census, 14z-107 (9).** Every slack figure below was
+computed from the group-C art's live ADDRESS FOOTPRINT (7.452 + 7.996 MB).
+The download does not work that way: the MRA maps the WHOLE declared 48 MB
+GFX region, so each group-C obj bank reserves its FULL 8 MB in SDRAM
+regardless of what the art does inside it. Measured on the real image:
+**bank 0 is used to `0xFE0000` (131,072 B free) and bank 1 to `0x1000000`
+(ZERO free).** It still fits — and the fit is now decided by REGION SIZES
+rather than by tile ceilings, which is a better place to be for the art (one
+more tenant tile inside the existing 16 MB costs nothing) and a worse one for
+headroom (the group-C romset region cannot grow past 16 MB at all). §5's
+tables carry the correction in place.
+
+**SLICE D2 IS DONE (14z-107 (9)): THE PLACEMENT IS IN THE RTL AND THE
+IMAGE WAS COUNTED.** Fork commit `0df6f000` (pushed). The bank-0 re-pack,
+the group-C GFX redirect, the QSound split across two banks and the two new
+slot counts all ship; `cores/cps2w/hdl` grows from four files to six with
+OVERRIDES of `jtcps1_sdram.v` and `jtcps1_prom_we.v`, and jtframe gains ONE
+new file, `hdl/sdram/jtframe_ram1_7slots.v` (maintainer-ruled option A, §5;
+open question 4 is answered). The obj PROMOTE is still D3: `rom0_bank[2]` is
+tied low in the game top, so D2 changes no fetch at all — which is why its
+evidence is an SDRAM IMAGE CENSUS and not a replay. Section 5's table was
+measured byte for byte against a real download and is unchanged;
+`tests/test_mister_sdram_census.sh` is the gate, and §10's D2 row carries the
+numbers. Section 6, which said "None of this is implemented", is now the
+as-built record.
 
 **SLICE D1 IS DONE (14z-107 (6)): the QSound sample-bank width, RUNTIME-
 GATED, and `cores/cps2w` now carries RTL.** Fork commit `4840df8a`. The
@@ -379,23 +406,27 @@ arbitrary at word granularity, with no power-of-two alignment requirement.
 | `0x648000` | work RAM (`RAM:$FF0000-$FFFFFF`) | 64 KB | `WRAM_OFFSET = 23'h324000` |
 | `0x658000` | Z80 program | 512 KB | `SND_OFFSET = 23'h32C000` |
 | `0x6E0000` | **QSound PCM HIGH** — a 1 MB window for DSP sample banks `0x80-0x8F`, of which `0x80-0x8E` (`0xF0000` B) are downloaded | 1 MB | NEW `PCMH_OFFSET = 23'h370000` |
-| `0x7E0000` | **GFX group C, obj bank 5** | `0x7FEE00` (7.995 MB) | NEW `GFXC5_OFFSET = 23'h3F0000` |
-| `0xFDEE00` | free | 135,680 B (0.129 MB) | |
+| `0x7E0000` | **GFX group C, obj bank 5** | `0x800000` (8 MB, of which `0x7FEE00` carries art) | NEW `GFXC5_OFFSET = 23'h3F0000` |
+| `0xFE0000` | free | **131,072 B (0.125 MB)** | |
 
-Bank 0, sum of regions: **16,608,768 of 16,777,216 B** (168,448 B
-unallocated). With the 32 KB alignment gap before `PCMH_OFFSET` the highest
-byte used is `0xFDEDFF`, so the free tail is 135,680 B.
+Bank 0 is used to byte `0xFE0000` of `0x1000000`: **131,072 B free.**
+**CORRECTED 14z-107 (9) by the census** — this table used to end obj bank 5
+at `0xFDEE00` and claim a 135,680 B tail, because it sized the region by the
+art's live footprint. The download writes the whole 8 MB region, art or no
+art. The 32 KB alignment gap before `PCMH_OFFSET` is unchanged and real.
 
 ### Bank 1 — 16 MB, read-only
 
 | byte offset | region | size | how it gets there |
 |---|---|---|---|
 | `0x000000` | **QSound PCM LOW** — DSP sample banks `0x00-0x7F` | 8 MB | `PCM_OFFSET = 0` (unchanged) |
-| `0x800000` | **GFX group C, obj bank 4** | `0x773A00` (7.452 MB) | NEW `GFXC4_OFFSET = 23'h400000` |
-| `0xF73A00` | free | 574,976 B (0.548 MB) | |
+| `0x800000` | **GFX group C, obj bank 4** | `0x800000` (8 MB, of which `0x773A00` carries art) | NEW `GFXC4_OFFSET = 23'h400000` |
+| — | free | **0 B** | |
 
-Bank 1, sum of regions: **16,202,240 of 16,777,216 B** (574,976 B free
-at the top).
+**Bank 1 is EXACTLY FULL: 8 MB of PCM + 8 MB of obj bank 4 = 16,777,216 B,
+to the byte.** **CORRECTED 14z-107 (9) by the census** — this table used to
+claim 574,976 B free, from the same footprint-vs-region error as bank 0's.
+Nothing overflows, and nothing else can be added to bank 1 either.
 
 ### Banks 2 and 3 — 16 MB each, **UNCHANGED, byte-for-byte** (§4)
 
@@ -408,6 +439,8 @@ at the top).
 
 ### The whole-tier arithmetic
 
+**CORRECTED 14z-107 (9): the group-C rows are REGIONS, not footprints.**
+
 ```
   stock GFX (banks 2+3)                            32.000 MB   (measured: full)
   68k PRG, WIDE v1 declared                         6.000 MB   (mister_fit §1: live
@@ -416,13 +449,27 @@ at the top).
   VRAM + OBJ RAM + work RAM + Z80 windows            0.844 MB   (slot geometries, §5)
   QSound: 8 MB in ba1 + a 1 MB window in ba0         9.000 MB   (.rom carries 8.9375 MB;
                                                                 live to 0x8E57F0)
-  GFX group C, obj bank 4                            7.452 MB   (highest code 0xEE73)
-  GFX group C, obj bank 5                            7.995 MB   (highest code 0xFFDB)
+  GFX group C, obj bank 4 REGION                     8.000 MB   (art to 0xEE73 = 7.452 MB)
+  GFX group C, obj bank 5 REGION                     8.000 MB   (art to 0xFFDB = 7.996 MB)
+  + the 32 KB alignment gap before PCMH_OFFSET       0.031 MB
   ------------------------------------------------------------
-  total placed                                      63.292 MB
+  total reserved                                    63.875 MB
+    (= banks 2+3 full, 32.000; bank 0 used to 0xFE0000, 15.875;
+       bank 1 used to 0x1000000, 16.000)
   tier (JTFRAME_SDRAM_LARGE, 4 x 16 MB)             64.000 MB
-  slack                                              0.708 MB   (0.161 in ba0, 0.548 in ba1)
+  slack                                              0.125 MB   (ALL of it in ba0; ba1 is
+                                                                exactly full)
 ```
+
+The old figure was 63.292 MB placed / 0.708 MB slack. It counted the art's
+address footprint where SDRAM reserves the whole region, and the census is
+what caught it. What the footprints still tell you is how much of each 8 MB
+region is dead — 0.548 MB in obj bank 4 and 0.004 MB in obj bank 5 — i.e.
+what a group-C MRA trim could in principle recover. **That trim is NOT the
+flat `length=` truncation the QSound one was**: the GFX region is a 4-way
+64-bit interleave and the download scramble turns a contiguous tail of tile
+codes into a NON-contiguous set of `.rom` offsets, so recovering the 0.548 MB
+would need its own measurement. Unmeasured, and not needed today.
 
 ### The two moves that make it fit, stated plainly
 
@@ -436,12 +483,16 @@ at the top).
    DSP sample banks `0x00-0x7F` (the stock 8 MB) stay at bank 1 offset 0 —
    *byte-identical to stock jtcps2* — and banks `0x80+` (the WIDE extension,
    which is the part the profile added) go to bank 0. This is not cosmetic:
-   with QSound whole in bank 1, bank 1's spare is 7.06 MB and the SMALLER of
-   the two group-C obj banks needs 7.45 MB. **Best case with QSound whole is
-   an overflow of 0.39 MB**, and no rearrangement of PRG, Z80 or the RAM
-   windows closes it, because the deficit is strictly bank 1's and PCM is
-   the only thing in bank 1. The split bit is exactly the stock/WIDE
-   boundary, which is a nice property to have on the superset invariant.
+   with QSound whole in bank 1, bank 1's spare is 7.0625 MB and a group-C obj
+   bank REGION is 8 MB. **Best case with QSound whole is an overflow of
+   0.9375 MB**, and no rearrangement of PRG, Z80 or the RAM windows closes
+   it, because the deficit is strictly bank 1's and PCM is the only thing in
+   bank 1. (This paragraph used to say "the smaller obj bank needs 7.45 MB"
+   and "overflow of 0.39 MB" — the same footprint-for-region error the census
+   corrected everywhere else, 14z-107 (9). The conclusion is unchanged and
+   the margin against it is now larger.) The split bit is exactly the
+   stock/WIDE boundary, which is a nice property to have on the superset
+   invariant.
 2. **Group C is split one obj bank per SDRAM bank**, keyed on
    `gfx_addr[23]` at download time and `rom0_bank[0]` at read time. Obj bank
    **4** — the three fighter bands, i.e. the in-match traffic — goes to
@@ -454,25 +505,43 @@ at the top).
 
 | bank | slots after the change | module |
 |---|---|---|
-| 0 | 7 (RAM/VRAM/ORAM RW, VRAM-DMA, gfx-ORAM, main ROM, Z80, PCM-high, obj bank 5) | **`jtframe_ram1_7slots` does not exist** — upstream has `ram1_1..5slots` and `ram2_4..6slots` |
+| 0 | 7 (RAM/VRAM/ORAM RW, VRAM-DMA, gfx-ORAM, main ROM, Z80, PCM-high, obj bank 5) | **`jtframe_ram1_7slots` did not exist** — upstream has `ram1_1..5slots` and `ram2_4..6slots`. **ADDED in D2** as `modules/jtframe/hdl/sdram/jtframe_ram1_7slots.v`, option A below |
 | 1 | 2 (PCM low, obj bank 4) | `jtframe_rom_2slots` ✔ exists |
 
 Two ways out, both honest:
 
-- **(A, recommended)** add `jtframe_ram1_7slots.v` to the fork — a mechanical
-  member of an existing formulaic family. Keeps bank 1 to exactly the two
-  streams (`PCM` + `obj`) that the GO measurement modelled.
+- **(A, RULED AND SHIPPED — maintainer, 2026-08-23; landed in D2)** add
+  `jtframe_ram1_7slots.v` to the fork — a mechanical member of an existing
+  formulaic family. Keeps bank 1 to exactly the two streams (`PCM` + `obj`)
+  that the GO measurement modelled.
 - **(B)** move the Z80 to bank 1. Bank 0 drops to 6 slots
   (`jtframe_ram2_6slots`, second write port tied off) and bank 1 becomes
   `jtframe_rom_3slots` — zero new jtframe files, but bank 1 then carries
   three streams, which is beyond what was measured.
 
+**WHERE OPTION A PUT THE FILE, and why it is an addition rather than a
+change.** `modules/jtframe/hdl/sdram/jtframe_ram1_7slots.v` — with the
+family, so a reviewer can diff it against `jtframe_ram1_5slots.v` and see
+that it is that file plus two `jtframe_romrq` instances and nothing else.
+It is pulled by **`cores/cps2w/cfg/game.yaml` alone** and deliberately NOT
+added to jtframe's own `hdl/sdram/jtframe_sdram64.yaml`: that list is
+SHARED, and a line there would put the new module on every jtcores core's
+compile list, including the reference `cps2`. Measured: `jtframe files sim
+cps2` does not contain it and the two cores' file lists differ in exactly 11
+entries (4 shared originals out, 6 overrides + 1 new jtframe module in).
+`tests/test_mister_wide_gate.sh` 5b/7n hold both halves.
+
 ---
 
-## 6. The download-side and read-side changes this map implies
+## 6. The download-side and read-side changes — **AS BUILT (slice D2)**
 
-Declarative, profile-gated, and listed here so the RTL arc can be costed.
-**None of this is implemented.**
+Declarative and profile-gated. **This section described a proposal until
+14z-107 (9); it is now the as-built record, and the RTL below is what the
+fork carries** (`cores/cps2w/hdl/jtcps1_prom_we.v`,
+`cores/cps2w/hdl/jtcps1_sdram.v`, fork commit `0df6f000`). The sketch that
+was here is reproduced verbatim because it survived contact: the shipped
+expressions are the same ones, with `wide_en` spelled out and two details
+the sketch left implicit (below).
 
 ```verilog
 // jtcps1_prom_we.v, in the `always @(*)` at :102-110  — GROUP C REDIRECT
@@ -494,7 +563,49 @@ Read side: `jtcps1_sdram.v` gains one slot in bank 0 (obj bank 5, `SLOT_AW`
 22, `DW` 32, `OFFSET = GFXC5_OFFSET`) and one in bank 1 (obj bank 4, same
 shape, `OFFSET = GFXC4_OFFSET`), plus the PCM-high slot in bank 0
 (`AW` 20 byte, `DW` 8, `OFFSET = PCMH_OFFSET`). `rom0_bank` widens to 3 bits
-(slice D3, §10) and `rom0_bank[2]` selects the group-C pair.
+— **that widening is D2's, at the `jtcps1_sdram` port; what is D3's is
+DRIVING bit 2**, and until then the game top passes `{1'b0, rom0_bank}` so
+`gfxc_sel` is constant 0 and the two group-C slots are provably unreachable.
+
+### The three things the sketch left implicit, all settled in D2
+
+1. **Every one of those expressions is ANDed with `wide_en`**:
+   `is_gfxc = wide_en & gfx_addr[25]`, `is_pcmhi = wide_en & pcm_addr[23]`
+   on the download side, `pcmh_sel = wide_en & pcm_addr[PCM_AW]` and
+   `gfxc_sel = wide_en & rom0_bank[2]` on the read side. With the profile
+   clear every expression collapses to the reference core's, character for
+   character. `tests/test_mister_wide_gate.sh` 7i-7l re-read all four.
+2. **The PCM-high window is MASKED to its 1 MB on BOTH sides** —
+   `{4'd0, pcm_addr[19:1]} + PCMH_OFFSET` at download, `pcm_addr[19:0]` at
+   the slot — which is §7's "mask the high window" recommendation, applied.
+   A QSound region longer than `0x8FFFFF` therefore aliases INSIDE the
+   extension instead of overwriting group-C art.
+3. **`prog_ba`'s fall-through arm needed qualifying with `is_oki`.** The
+   firmware (`is_qsnd`) region also falls through that arm, and its
+   `pcm_addr` — a wrapped subtraction, not a real region offset — has bit 23
+   SET, so an unqualified `is_pcmhi` would have re-banked it. It writes
+   nothing (`prog_we` is 0 for `is_qsnd`, `prom_we` is 1), so it would never
+   have been observable; it is qualified anyway, because a signal that is
+   right only because its enable is off is a defect waiting for a refactor.
+
+### The bank-0 re-pack is the ONE thing that is NOT gated, and why
+
+`SLOTn_OFFSET` are elaboration-time parameters of the jtframe slot modules,
+so VRAM/ORAM/WRAM/SND cannot move at run time. They move unconditionally on
+CPS-2 (the CPS-1 arm of each ternary keeps the reference value). That is a
+RELOCATION, not a behaviour change, and the argument is structural: the 68k
+sees identical data at identical 68k addresses; VRAM/ORAM/WRAM are never
+downloaded at all; the Z80 region's download and read take the SAME
+constant; and bank 0 is the one bank carrying `JTFRAME_BA0_AUTOPRECH=1`
+(`cores/cps1/cfg/common.def`), so `jtframe_sdram64_bank.v:170`'s row-match
+short-circuit never applies to it and its per-access latency is
+address-independent — no row-locality pattern can shift. It is also the one
+claim in D2 that is MEASURED rather than constructed, by
+`tests/test_mister_wide_inert.sh` (cps2 vs cps2w, bit-identical work RAM
+frame by frame) and by the census's C-vs-D cross-check (banks 1, 2 and 3
+byte-identical between the two cores on the same stock image; bank 0
+differing, which is the control that keeps that comparison from being
+vacuous).
 
 ---
 
@@ -653,15 +764,30 @@ slice as the decode.
    there and NOT fixed: MAME models a ONE-READ bank latency that jtcps15 does
    not — a pre-existing difference in the reference core, unchanged by the
    width fix, out of D1's scope (`docs/platform/mister.md`).*
-4. **`jtframe_ram1_7slots` (new fork file) or move the Z80 to bank 1?**
-   §5 option A vs B. This is a maintainer call about fork surface.
-5. **The fit has 0.708 MB of slack in 64 MB and depends on four frozen
-   extents** (obj bank 4 ≤ `0xEE73`, obj bank 5 ≤ `0xFFDB`, QSound live
-   ≤ `0x8E57F0`, PRG live ≤ `0x5FFF1E`). Any growth in tenant art breaks the
-   map silently, months before a bring-up would notice.
-   `tests/audit_mister_map_fit.sh` (added this session, static tier) freezes
-   all four, re-checks the scramble identity §1 rests on, and carries three
-   must-fire controls.
+4. ~~**`jtframe_ram1_7slots` (new fork file) or move the Z80 to bank 1?**~~
+   **RULED: option A (maintainer, 2026-08-23), and SHIPPED in D2.** The file
+   is `modules/jtframe/hdl/sdram/jtframe_ram1_7slots.v` — with the family,
+   mechanically derived from `jtframe_ram1_5slots.v`, and pulled by
+   `cores/cps2w/cfg/game.yaml` alone so no other core's compile list moves.
+   See §5, "Where option A put the file".
+5. ~~**The fit has 0.708 MB of slack and depends on four frozen extents.**~~
+   **RE-STATED 14z-107 (9), measured: the fit has 0.125 MB of slack, bank 1
+   is EXACTLY FULL, and it does NOT depend on the tenant-art extents at
+   all.** The MRA downloads the whole declared region, so each group-C obj
+   bank reserves 8 MB whatever the art does inside it. Consequences, both
+   ways round:
+   * **Tenant art can grow freely inside the existing 16 MB** — a new tile
+     above `0xEE73` or `0xFFDB` no longer overflows anything. The silent
+     months-later bring-up failure this question was written about cannot
+     happen by that route.
+   * **The group-C ROMSET REGION cannot grow at all.** A fifth group-C
+     member, or widening it past 16 MB, overflows immediately and there is
+     nowhere to put the excess: bank 1 has zero free and bank 0 has 131,072 B.
+   * The four extents stay frozen in `tests/audit_mister_map_fit.sh` because
+     they bound the content and are what a group-C MRA trim would work from;
+     they are no longer what decides the fit. That gate now models the banks
+     from the PLACED offsets and lengths, with an overlap check, and its
+     control B perturbs the REGION rather than the footprint.
 6. **Does the MiSTer DDR staging path (`ddr_load=true`,
    `address="0x30000000"`, `corerom.go:23-35`) impose its own size limit at
    63.2 MB?** Unread.
@@ -712,7 +838,7 @@ self-contained piece. Two changes:
 |---|---|---|---|---|
 | **D0 — DONE 14z-107 (5)**, fork commit `38acc638` | `cores/cps2w/cfg/mame2mra.toml`: the `qsoundw` trim region + the `cps2w.cpp` sourcefile opt-in, and the `vsavjw` entry in `doc/mame.xml`. **No RTL.** | DONE: `rom/vsavjw.rom` = **66,265,152 B**, header words **6144 / 6400 / 15552 / 64704**, every region start 1 KiB-aligned, every region byte-for-byte the romset's. | BOTH FIRED. (A) untrimmed → 73,670,720 B and `qsnd_start` 71,936 KiB, and the generator **silently writes the wrapped word 6400**. (B) `length` +0x400 → the frozen table fails. | HELD: stock `vsavj` MRA from `cps2w` is byte-identical to `cps2`'s except `<rbf>`, `cps2` emits **no** WIDE MRA at all, and stock `vsavj.rom` is still 46,407,744 B. Gates `test_jtcores_twin` + `test_mister_mra_map`. |
 | **D1 — DONE 14z-107 (6)**, fork commit `4840df8a` | QSound sample-bank width, RUNTIME-GATED. `cores/cps2w/hdl/` gains `jtcps2w_profile.v` (header byte 41 → `wide_en`) and `jtcps2w_qsnd_bank.v` (the gated latch), plus OVERRIDES of the two SHARED files it needs (`jtcps15_sound.v` from cps15, `jtcps2_game.v` from cps2). `PCM_AW` STAYS 23 — 24 does not compile (§7). No placement change. | DONE, and stronger than the row planned: the gated latch is simulated over **all 65,536 values of `dsp_ab` in both profile states** — with `wide_en` low `qsnd_addr[23]` is stuck at 0 and bits [22:16] equal the stock expression; with it high, bit 23 moves (16,384 vectors). Plus: `jtframe files` resolves cps2w to our four files and to NEITHER shared original, and the frozen line-by-line override delta. | FOUR FIRED. (A) the latch with the gate bypassed fails the `wide_en`-low leg; (B) the profile byte moved to 40 (jtframe's `JOY_BYTE`) fails; (C) the polarity flipped — so a 0xFF-filled stock header would arm the profile — fails; (D) a one-width perturbation of an override breaks the frozen delta. Gate `test_mister_wide_gate` (ci_portable). | `tests/test_mister_sim_anchor.sh` runs on **cps2w**, stock `vsavj`, against the cps2 expectations. It went RED first, at 2609/463, and root-causing it is the story of the slice: a 2x2 factorial over {stock RTL, D1 RTL} x {`pal_lut.hex` present, absent} showed the RTL axis changes NOTHING and the missing palette LUT changes EVERYTHING. (**Completed 14z-107 (7)**: the palette LUT changed only the NUMBER OF FORKS, and each fork's `exit(0)` rewound the parent's `sim_inputs.hex` — the simulated controller was being replayed. Fixed in the fork.) The new instrument is `tests/test_mister_wide_inert.sh` — cps2 vs cps2w, same download, BIT-IDENTICAL work RAM frame by frame. See STATE 14z-107 (6) G4-G7. |
-| **D2** | Placement: bank-0 offsets re-packed for PRG 6 MB, the group-C redirect in `jtcps1_prom_we`, the QSound bank split on the ALREADY-GATED `qsnd_addr[23]` (D1 produces it; D2 routes it), the two new GFX slots + the PCM-high slot, `jtframe_ram1_7slots` (maintainer-ruled option A, 2026-08-23 — not written yet, D1 needed no new slot). **Every gated site takes the `wide_en` wire D1 built; `jtcps1_prom_we.v` and `jtcps1_sdram.v` are SHARED with the reference cores, so D2 is where they get copied into `cores/cps2w/hdl` and the frozen delta grows.** | An SDRAM image census after download: dump all four banks and assert every region begins at its §5 offset, that banks 2+3 are **byte-identical to the stock `cps2` core's** on the same romset, and that the group-C obj banks are non-zero where the manifests say tiles are. | Perturb one offset constant by 1 KiB → the census must fail. And: zero-fill group C in the romset → banks 2+3 must still be byte-identical (isolates the redirect from the content). | anchor gate unchanged on stock `vsavj`; banks 2+3 byte-identical is itself the structural leg. |
+| **D2 — DONE 14z-107 (9)**, fork commit `0df6f000` | Placement, AS SHIPPED: bank-0 offsets re-packed for PRG 6 MB (VRAM `0x600000`, ORAM `0x640000`, WRAM `0x648000`, Z80 `0x658000`), the group-C redirect and the QSound split in `cores/cps2w/hdl/jtcps1_prom_we.v`, their read sides + the PCM-high slot + the two GFX slots in `cores/cps2w/hdl/jtcps1_sdram.v`, and `modules/jtframe/hdl/sdram/jtframe_ram1_7slots.v` (option A, pulled by cps2w's `game.yaml` alone). `rom0_bank` is 3 bits at the SDRAM port but bit 2 is TIED LOW — the promote is D3, so D2 changes no fetch. The frozen override delta grew from 2 files to 4. | **DONE, and it is a WHOLE-IMAGE census, not a spot check.** `tests/test_mister_sdram_census.sh` + `tools/mister_sdram_census.py` replay the download mapping (regions, the QSound split, the group-C redirect and the CPS-2 GFX scramble) and compare **all 67,108,864 bytes of all four banks** against §5. Result on the WIDE image (`vsavjw.rom`, 66,265,152 B, sha1 `d462e55a…`, transfer complete at simulated frame **659**): **PASS on every bank** — ba0 6,359,055 non-zero (37.9%), ba1 12,879,645 (76.8%), ba2 14,873,334 (88.7%), ba3 14,426,104 (86.0%). | FIRED. A 1 KiB shift of ANY placement constant is rejected: `z80` (206,536 bytes differ, first at `0x658000`), `pcm_hi` (714,457, first at `0x6E0002`), `gfxc5` (675,767, first at `0x7E0080`), `prg` (3,768,659, first at `0x0`), `pcm_lo` (bank 1). Plus the cross-checks in the gate: banks 1/2/3 byte-identical between cps2 and cps2w on the same stock image with bank 0 DIFFERING (the re-pack is confined to bank 0, and the comparison is not vacuous), and banks 2+3 DIFFERING between the two cores on the WIDE image (without the redirect group C aliases onto vanilla's art). | `tests/test_mister_sim_anchor.sh` GREEN on `cps2w` at MAME 2146 / sim 2609 / skew 463; `tests/test_mister_wide_inert.sh` GREEN (`cps2w` == `cps2`, bit-identical work RAM 540-640). **The census also CONTRADICTED this document and the census won** — see the retraction box at the top: the slack is 0.125 MB, not 0.708 MB, and bank 1 is exactly full. |
 | **D3** | The obj promote: `jtcps2_obj_scan.v:152` `st3_bank <= {table_y[12], table_y[14:13]}` (the CPS-2 Turbo rule, applied *after* the `:141` terminator check), `dr_bank`/`obj_bank`/`rom_bank`/`rom0_bank` widened to 3 bits, `rom0_bank[2]` routed to the group-C slots. | **The MiSTer twin of the FBNeo B4 canary**: a test-only flag that ORs `0x1000` into the y-word of bank-2/3 sprites, with group C loaded as a byte copy of group B, running the STOCK rom. Work RAM is bit-identical by construction; the *frames* must be pixel-identical. | Zero-fill group C → the frames must DIFFER. (`cps2_wide.md` records that FBNeo's first attempt passed this test vacuously because the member never arrived; the control is the whole point.) | RAM identity is guaranteed by the canary design; the anchor gate still runs. |
 | **D4** | The PRG window: `rom_cs`/`rom_addr`/`one_wait` (§8), `main_rom_addr`, `SLOT3_AW` 22. | Relocate a real data block above `CPU:$400000` and repoint one pointer — RAM must stay identical, and the zeros variant must diverge (the B4-prg discipline: a pass with no negative control is not evidence). | The same rows pointed at zero fill → RAM MUST diverge. | anchor gate unchanged on stock `vsavj` — this is the slice where a widened decode could most easily perturb legacy behaviour. |
 
@@ -725,8 +851,9 @@ ruling asked for.
 
 ## 11. If it did not fit — what the fallback implies
 
-It does fit, by 0.708 MB (743,424 B). Recorded here anyway, because the margin is thin and
-open question 5 is a real risk:
+It does fit, by **0.125 MB (131,072 B), with bank 1 exactly full** —
+0.708 MB is RETRACTED, see the box at the top and §5. Recorded here
+anyway, because the margin is now thinner still:
 
 `JTFRAME_SDRAM_XL` (`jtframe_emu.sv:175-181` on upstream master) is a 128 MB
 tier built from **two chips on one module**, chip-selected by nCS polarity. It

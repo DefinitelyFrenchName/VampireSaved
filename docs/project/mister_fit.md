@@ -86,8 +86,18 @@ PCM)~~ **CORRECTED 14z-107 (4): not bank 1 alone.** The table above is a
 LIVE-BYTE count; the ADDRESS FOOTPRINT of group C is **15.45 MB** (up to
 code `0xEE73` in obj bank 4 and `0xFFDB` in obj bank 5 — a CPS-2 tile code
 IS its SDRAM address), so it takes the spare of banks 0 AND 1 plus the
-QSound extension moved out of bank 1. It still fits, by 0.708 MB of 64:
+QSound extension moved out of bank 1. It still fits, by **0.125 MB** of 64:
 `docs/project/mister_map.md`.
+
+**AND CORRECTED AGAIN 14z-107 (9), BY THE SDRAM IMAGE CENSUS: the slack is
+0.125 MB, not 0.708, and SDRAM bank 1 is EXACTLY FULL.** The 15.45 MB
+footprint is the right number for where the ART lives; it is the WRONG number
+for what SDRAM RESERVES. The MRA maps the whole declared 48 MB GFX region, so
+each group-C obj bank occupies its full 8 MB — 16 MB, not 15.45 — whatever
+the art does inside it. Measured byte for byte on the real image; see
+`docs/project/mister_map.md` §5. Two consequences that point opposite ways:
+tenant art may now grow freely inside the existing 16 MB, and the group-C
+ROMSET REGION cannot grow past 16 MB at all.
 
 ## 4. Z80
 
@@ -214,7 +224,10 @@ expression of the profile-gated 19-bit promote CPS-2 WIDE v1 already makes on
 FBNeo. ~~6.39 MB into ~7.1 MB of spare.~~ **CORRECTED 14z-107 (4): the art's
 ADDRESS FOOTPRINT is 15.45 MB, not 6.39 MB, and it needs BOTH banks' spare —
 one group-C obj bank each, plus the QSound extension moved out of bank 1 into
-bank 0.** It still fits, by 0.708 MB of 64. The placement map, the
+bank 0.** It still fits, by **0.125 MB** of 64 — ~~0.708 MB~~, **corrected
+14z-107 (9) by the SDRAM image census: SDRAM bank 1 is EXACTLY FULL**,
+because the download reserves each group-C obj bank's whole 8 MB REGION and
+not just the art's 15.45 MB footprint. The placement map, the
 arithmetic, the PRG decode proposal and the slice plan are
 `docs/project/mister_map.md`; the extents the fit depends on are frozen by
 `tests/audit_mister_map_fit.sh`.
