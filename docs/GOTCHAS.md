@@ -14,6 +14,17 @@ one your current task belongs to. A trap you hit while porting Huitzil
 is a GAME gotcha if it is true of the game regardless of the port.
 
 
+### appended 14z-107 (platform + project buckets — the MiSTer arc: the oracle, D0-D2)
+**The session's own headline: SUSPECT THE INSTRUMENT BEFORE THE THING UNDER TEST.** Three separate instruments produced false verdicts here while the subject was innocent, and a fourth nearly did. Full entries in the bucket sections below.
+- A forked child that calls `exit()` REWINDS ITS PARENT'S INPUT FILE (stdio cleanup `fclose()`s the inherited `FILE*`; POSIX repositions the SHARED description) — jtframe's harness forks one per CHANGED frame, so the simulated controller was replayed once per fork and **the FROZEN anchor was the artifact while the RED one was right**
+- A measuring harness that drives a port ASSERTS EVERY BIT OF IT: `SimInputs` held P1's AND P2's buttons 5+6 down on a `[9:0]` ACTIVE-LOW port, so the two legs of the oracle had never run the same inputs
+- A SIZE tells you how many bits are missing, never WHICH one — the Verilator SDRAM model dropped `addr[22]` (a COLUMN bit riding `sdram_a[9]`), and the "obvious" `addr[9]` fix would have made a different wrong map
+- Any instrument that names a PHYSICAL address is invalidated by a memory-map change — and a placement slice IS a memory-map change (the RAM-dump hook dumped VRAM after D2 re-packed bank 0, red in 101 frames of 101, RTL innocent)
+- Editing a shell script WHILE it runs derails it — `sh` reads by BYTE OFFSET, so even a COMMENT-ONLY edit does it. **Paid THREE times this session.** The measurements usually survive in the simulator's own output; revert the edit at once and copy them out by hand
+- The same art has THREE sizes — live bytes / address footprint / DECLARED REGION — and only the last is what SDRAM spends
+- A tier MACRO is not a tier (`JTFRAME_SDRAM_XL` without `JTFRAME_SDRAM_CACHE` compiles, validates and silently aliases); a grep proves a fact about the tree you grepped, and a pin is a tree
+- jtframe finds zip members by CRC32 ALONE (no name fallback, unlike FBNeo/MAME), `jtframe files` dedups by FULL PATH (overriding one shared file costs you the whole yaml that pulled it), and a new jtframe module must be pulled by the CORE, never added to jtframe's shared list
+- `JTFRAME_SIM_IODUMP` on CPS-2 dumps the 128-byte EEPROM, not work RAM; `-load` is mandatory (the download latches the decryption key) and a preloaded run boots into ciphertext whose all-zero RAM still "agrees" with MAME on 99.2% of bytes — **check NON-CONSTANCY before any agreement number**
 ### appended 14z-105 (platform bucket — the window: Oboro hook + version string)
 - `gfx_tiles.decode` mirrored every 8-pixel half (plane bit i = pixel 7-i, not i) and no consumer had ever read pixel ORDER; the first AUTHORED tile exposed it — verify synthesized tiles at the RENDER layer, the byte round-trip only proves self-consistency. Transparent pen is 15. OBJ (x,y) -> screen (x-64, y-16)
 ### appended 14z-98 (project bucket — the #103 close)
@@ -388,15 +399,22 @@ is a GAME gotcha if it is true of the game regardless of the port.
   Bonus: advancing the model clock naively (`time() += semi_period`)
   aborts the run — a delay deadline is not on the clock grid, so the step
   must land on each pending slot via `eventsPending()`/`nextTimeSlot()`.
-- **14z-107 (platform):** on CPS-2 a **tile code IS its SDRAM address** —
-  the download scramble (`jtcps1_prom_we.v:105`) exactly cancels the
-  `.rom`'s 4-way interleave, so code `c` lands at `c*128`. Therefore
-  **live bytes are not an address footprint**: 6.39 MB of art scattered up
-  to code `0xFFDB` costs 15.45 MB of SDRAM. And do not re-derive the
-  tile→member mapping — a plausible derivation gave 978/722/775/977 blank
-  tiles where the canonical `tools/gfx_tiles.py` gives the frozen
-  418/2917/51/642. **Reproduce a number somebody already measured before
-  trusting a new address map.**
+- **14z-107 (platform), third size added 14z-107 (9):** on CPS-2 a **tile
+  code IS its SDRAM address** — the download scramble
+  (`jtcps1_prom_we.v:105`) exactly cancels the `.rom`'s 4-way interleave, so
+  code `c` lands at `c*128`. **The same art therefore has THREE sizes, and
+  this project has published a wrong figure from each of the first two:**
+  live bytes **6.39 MB**, address footprint **15.45 MB** (the code space
+  between the tiles is address space the set owns), declared region
+  **16 MB** — and the DECLARED REGION is what SDRAM spends, because the MRA
+  downloads the whole region whatever the art does inside it. Sizing the two
+  group-C obj banks by their footprint claimed 0.708 MB of slack where the
+  whole-image census measured **0.125 MB with bank 1 exactly full**. Growth
+  INSIDE the region is free; growth OF the region is immediately fatal. And
+  do not re-derive the tile→member mapping — a plausible derivation gave
+  978/722/775/977 blank tiles where the canonical `tools/gfx_tiles.py` gives
+  the frozen 418/2917/51/642. **Reproduce a number somebody already measured
+  before trusting a new address map.**
 - **14z-107 (platform), extended 14z-107 (5):** jtframe's MRA generator has
   FOUR silent traps — `rom_len` smaller than the file truncates the bytes but
   still advances `pos` by the full size (use `parts=` to shorten); on CPS-2

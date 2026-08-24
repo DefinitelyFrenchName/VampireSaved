@@ -172,7 +172,15 @@ the patch artifact does not change shape for it.
 
 ## MiSTer (14z-106/107) — the jtcps2w core + the simulation oracle
 
-Read `docs/platform/mister.md` first. The deliverable is a SEPARATE core
+**Read `docs/project/mister_core.md` FIRST** — the synthesis: what is TRUE
+about this core, in CAUSAL order, with the logs it quotes named as its
+provenance (`mister_fit.md`, `mister_map.md`, `docs/platform/mister.md`), and
+the standing rule that where it and one of them disagree, THE LOG WINS. Its
+diagrams are drawn by `tools/mk_mister_page.py` — a committed GENERATOR whose
+`--check` mode re-derives every figure in the document (17 of them) from the
+same constants the gates freeze, so the page cannot go stale silently; the
+rendered page is never committed. Then `docs/platform/mister.md` for the
+platform detail. The deliverable is a SEPARATE core
 `jtcps2w` in a public GPL-3.0 fork of jotego/jtcores
 (https://github.com/DefinitelyFrenchName/jtcores, branch `vampire-saved`
 from v1.7.3), pinned as submodule `emu/jtcores` with the delta mirrored
@@ -248,10 +256,22 @@ silently alias (platform gotcha). Independently, the CPS-2 core caps GFX at
 32 MB in the OBJECT FORMAT, the 68k at a flat 4 MB `rom_cs`, scroll at 8 MB
 and QSound at a 7-bit latch — **no SDRAM tier lifts any of those**. And the
 roster's total is **~56.1 MB against a 64 MB tier**: PRG 6 MB fits bank 0
-today, QSound 16 MB fits bank 1 today, only GFX overflows by ~6.4 MB. The
-route (uprev to master + XL, vs bank-repack inside the pin) is a pending
-decision in STATE, **THE MiSTer MEMORY-MAP ROUTE**. Full argument with every
-file:line: `docs/platform/mister.md`; the arithmetic: `mister_fit.md` §6.
+today, QSound 16 MB fits bank 1 today, only GFX overflows. **THE ROUTE IS
+DECIDED (maintainer, 2026-08-23): the BANK REPACK at our pin, measuring
+first; `JTFRAME_SDRAM_XL` is the FALLBACK if it fails.** The measurement the
+ruling required returned **GO** the same day
+(`tests/audit_sdram_bank_load.sh` — bank 1's PCM is already at a 98.8%
+in-match row-miss rate, so it has no locality left to lose, and the worst
+case runs at 26.3% of one bank against the 32.9% bank 0 already sustains in
+stock shipping configuration), and D2 SHIPPED the repack. **Beware "how big
+is the art": it has THREE sizes and this project has published a wrong figure
+from two of them** — live bytes **6.39 MB**, address footprint **15.45 MB**
+(a CPS-2 tile code IS its SDRAM address), declared region **16 MB** (the MRA
+downloads the whole region, so each group-C obj bank reserves its full 8 MB).
+The last one is what SDRAM actually spends, which is why the fit has 0.125 MB
+of slack and not 0.708. Full argument with every
+file:line: `docs/platform/mister.md`; the arithmetic: `mister_fit.md` §6;
+the synthesis: `docs/project/mister_core.md`.
 
 **Running the simulation lane** (14z-107; needs `brew install go coreutils
 gnu-sed xmlstarlet verilator imagemagick`, ~1.0-1.2 s per simulated frame):
@@ -345,6 +365,7 @@ see `docs/platform/gotchas.md` "`jtsim -verilator -stats` reports nothing".
 | `tests/audit_mister_map_fit.sh` | ci_static (~5 s) | the SDRAM PLACEMENT MAP fits the 64 MB tier **AS PLACED — by 0.125 MB, with bank 1 EXACTLY FULL (corrected 14z-107 (9) by the census; the old 0.708 MB sized the group-C obj banks by the art's footprint where the download reserves the whole 8 MB region)** — the banks are modelled from the placed offsets and lengths with an overlap check, and the four content extents are frozen: group-C obj bank 4 ceiling `0xEE73`, obj bank 5 ceiling `0xFFDB`, QSound live `0x8E57F0`, PRG live `0x5FFF1E`. Also checks the `.rom` against the 26-bit `ioctl_addr` and the 16-bit header words. Re-checks the "tile code IS its SDRAM address" scramble identity §1 rests on. THREE must-fire controls (untrimmed QSound must be rejected; +1 MB of the obj-bank-5 REGION must overflow bank 0; the identity must fail without the scramble). Design: `docs/project/mister_map.md` |
 | `tests/test_mister_mra_map.sh` | ci_static (~15 s) | **SLICE D0**: the WIDE `.rom` is EXACTLY `mister_map.md` §3 — 66,265,152 B, header words 6144/6400/15552/64704, every region 1 KiB-aligned and byte-for-byte the romset's, the trimmed QSound region a PURE truncation. Also: the stock `vsavj` MRA from `cps2w` == `cps2`'s except `<rbf>`, `cps2` emits NO WIDE MRA (the `cps2w.cpp` sourcefile gate), stock `vsavj.rom` still BIT-IDENTICAL (46,407,744 B, sha1 `f9dc2987…`), and the fork's catalogue entry names the CURRENT build's CRCs. TWO must-fire controls: untrimmed -> 73,670,720 B / `qsnd_start` 71,936 KiB (and the generator SILENTLY writes the wrapped word); `length` +0x400 -> the frozen table fails |
 | `tests/test_mister_wide_gate.sh` | ci_portable (~30 s with Verilator, seconds without) | **SLICE D1, the RTL trust surface.** The frozen line-by-line delta of the two OVERRIDDEN files vs the shared originals (`tests/expect/cps2w_rtl_delta.txt`); the profile byte agreeing in all three copies (TOML `offset=41 data="fe"`, RTL `PROFILE_BYTE=6'd41`, `~profile[0]`) plus the `fill=0xff` and `JOY_BYTE` facts the polarity rests on; the widths, and that `PCM_AW` is NOT widened (it cannot be — `jtframe_romrq_bcache.v:74`); MAME's three qsound.cpp lines that validate `dsp_ab[7]`; and `jtframe files` resolving cps2w to OUR six + the new jtframe slot module and cps2 to NONE of ours (the two lists differ in exactly 11 entries). Then Verilator: `jtcps2w_qsnd_bank` over **all 65,536 `dsp_ab` values in both profile states** (bank[7] stuck at 0 with `wide_en` low, moving 16,384 times with it high) and `jtcps2w_profile` over a real 64-byte header stream. FOUR must-fire controls: gate bypassed; profile byte moved to 40; polarity flipped; an override perturbed by one width. **EXTENDED AT D2 (section 7)**: every SDRAM placement constant re-read from `jtcps1_sdram.v` in BYTES and compared against `mister_map.md` §5 (VRAM `0x600000`, ORAM `0x640000`, WRAM `0x648000`, Z80 `0x658000`, PCM-high `0x6E0000`, group-C obj bank 5 `0x7E0000`, obj bank 4 bank-1 `0x800000`); all four `wide_en` conjunctions re-read verbatim; `rom0_bank[2]` still tied low (the promote is D3); the CPS1 arm of the re-pack still the reference values; and `jtframe_ram1_7slots` NOT in jtframe's shared `jtframe_sdram64.yaml` |
+| `tests/test_mister_page.sh` | ci_portable (~8 s) | **THE SYNTHESIS CANNOT GO STALE.** `tools/mk_mister_page.py --check` re-derives every figure `docs/project/mister_core.md` states (17 checks) from the same constants the other gates freeze — the roster's live bytes and address footprint, the declared-region arithmetic, the four bank extents and the 0.125 MB slack, the `.rom` size and header words, the anchor and its band — and recounts the group-C ceilings from the romset. The rendered page is NEVER committed (`.gitignore`); the generator is. Written as the living-documentation pilot (14z-107 (10)) |
 | `tests/test_mister_sdram_census.sh` | **manual/emulator (~45 min)** | **SLICE D2'S CORE EVIDENCE.** Downloads a `.rom` in the simulator, dumps all four 16 MB banks and checks every one of the 67,108,864 bytes against `mister_map.md` §5 with `tools/mister_sdram_census.py` (which replays the download mapping, CPS-2 GFX scramble included). FOUR legs: A cps2w+WIDE vs the WIDE map (THE census), B cps2+WIDE vs the STOCK map, C cps2w+stock vs the WIDE map, D cps2+stock vs the STOCK map (the calibration leg — the tool checked against a mapping nobody changed). Cross-checks independent of the tool: C vs D banks 1/2/3 BYTE-IDENTICAL and bank 0 differing; A vs B banks 2+3 DIFFERING (without the redirect group C aliases onto vanilla's art). Must-fire: leg B must FAIL the WIDE map, and A re-run with one expected constant moved 1 KiB must be rejected (twice, one per bank). `CENSUS_KEEP=<dir>` caches the bank images |
 | `tests/test_mister_wide_inert.sh` | **manual/emulator (~22 min)** | **THE FPGA SUPERSET INVARIANT, MEASURED DIRECTLY**: `cps2` and `cps2w` run the SAME stock `vsavj` download under Verilator and their 68k work RAM must be BIT-IDENTICAL at every frame of the window (default 540-640, `WINDOW_FIRST`/`WINDOW_LAST` to move it). Asserts the window is NON-CONSTANT first; control = the same dumps compared against themselves SHIFTED BY ONE FRAME, which must FAIL, proving the comparison would catch a one-frame timing skew. Both legs run with host frame output OFF (the default since 14z-107 (7)) and their dump sets are asserted complete by the producer. This is the inertness instrument; the anchor gate below is a cross-IMPLEMENTATION oracle and is a poor substitute for it |
 | `tests/test_mister_sim_anchor.sh` | **manual/emulator (~50 min)** | THE ORACLE: MAME and the core under test (**`cps2w` since D1**, `SIM_CORE=cps2` for the reference leg) agree on every mapped §4 field at the round-1 match-start anchor of `05_timeout_idle` (MAME **2146** / sim **2609**, skew **463 ± 30** — RE-MEASURED 14z-107 (7) with host frame output OFF. It read 2502/356 and 2507/361 on runs whose input script the harness's frame writer was replaying, and 2606/460 before that, which was the BOOT offset rather than the anchor). Runs with `--frame-output off` and ASSERTS that mode from the run's own log banner; asserts BOTH dump sets are COMPLETE (`tools/check_wram_dumps.py`) and the sim window NON-CONSTANT before computing any anchor; then the byte-swap, hook-inertness and punched-hole controls |

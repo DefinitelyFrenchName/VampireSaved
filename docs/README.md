@@ -12,15 +12,30 @@ Yes, about Vampire Savior -> `game/`. Yes, about CPS-2 or the emulators
 | | what lives there | outlives the project? |
 |---|---|---|
 | [`game/`](game/) | how Vampire Savior works: engine subsystems, the ROM/RAM atlas, per-character data, modes and their costs | yes — useful to anyone working on `vsav`/`vsav2`/`vhunt2` |
-| [`platform/`](platform/) | CPS-2 hardware, encryption and gfx addressing; MAME and FBNeo behaviour and their builds | yes — useful to any CPS-2 work |
-| [`project/`](project/) | the port itself: build pipeline, patch notes and index, manifests, the WIDE profile, milestone plans, playtest records | no — dies with the project |
+| [`platform/`](platform/) | CPS-2 hardware, encryption and gfx addressing; MAME, FBNeo and the MiSTer/jtcores core — their behaviour and their builds | yes — useful to any CPS-2 work |
+| [`project/`](project/) | the port itself: build pipeline, patch notes and index, manifests, the WIDE profile, the MiSTer core we are building, milestone plans, playtest records | no — dies with the project |
+
+**IF YOU WANT TO KNOW X, READ Y** (the routing table — start here rather
+than guessing a filename):
+
+| if you want to know… | read |
+|---|---|
+| where the project stands and what to do next | [`NEXT_SESSION.md`](NEXT_SESSION.md), then `../HANDOFF.md` |
+| how the game works, by subsystem | [`game/engine_internals.md`](game/engine_internals.md) → the `game/atlas/` rows it names |
+| what a specific address IS | [`game/atlas/`](game/atlas/) — `ram.md`, `character_tables.md`, `id_space.md`, `select_screen.md`, `sprite_lists.md`, `venue_assets.md` |
+| **what is true about the MiSTer core and why** | **[`project/mister_core.md`](project/mister_core.md) — the synthesis, in causal order. Read it BEFORE any MiSTer work**; its logs are `project/mister_map.md` (the SDRAM placement), `project/mister_fit.md` (what the roster needs) and [`platform/mister.md`](platform/mister.md) (jtcores, the simulation lane). Where the synthesis and a log disagree, THE LOG WINS |
+| what the extended hardware profile is and what rule 1 v2 permits | [`project/cps2_wide.md`](project/cps2_wide.md) |
+| what a change did, byte by byte | `project/patch_notes.md`; the registry is `project/patch_index.md` |
+| why something that "should work" does not | [`GOTCHAS.md`](GOTCHAS.md) — always check before re-deriving |
 
 Entry points at this level, deliberately not in a bucket:
 - [`NEXT_SESSION.md`](NEXT_SESSION.md) — 60-second orientation, rewritten
   at session end. Session state, not knowledge.
-- [`GOTCHAS.md`](GOTCHAS.md) — the index of all 145 traps, grouped by
-  bucket, linking to `*/gotchas.md`. ~195 places in the repo cite
-  `docs/GOTCHAS.md`; they all still land somewhere useful.
+- [`GOTCHAS.md`](GOTCHAS.md) — the index of every trap paid for, grouped
+  by bucket, linking to `*/gotchas.md` (304 entries across the three
+  bucket files at the 14z-107 close: 46 game / 79 platform / 179 project —
+  one `##` heading each, so `grep -c '^## '` is the count). ~195 places in
+  the repo cite `docs/GOTCHAS.md`; they all still land somewhere useful.
 - `checksums.txt` — machine-read by `tools/audit_roms.py`. A data
   manifest, not documentation; its path is deliberately stable.
 
@@ -67,8 +82,11 @@ Entry points at this level, deliberately not in a bucket:
 - [`mister_map.md`](project/mister_map.md) — the MiSTer SDRAM PLACEMENT MAP:
   which region lands in which bank at which offset and why it fits, the
   `.rom` layout against the 26-bit `ioctl_addr`, the QSound split, the 6 MB
-  PRG decode proposal, and the RTL slice plan D0-D4 (**D0 done 14z-107 (5)**
-  — the MRA trim, with §3's proposed TOML row corrected in place)
+  PRG decode proposal, and the RTL slice plan D0-D4 (**D0, D1 and D2 done —
+  14z-107 (5)/(6)/(9)**: the MRA trim with §3's proposed TOML row corrected
+  in place, the runtime profile gate + QSound width, and the placement
+  itself, whose whole-image census corrected this document's own slack
+  figure from 0.708 MB to 0.125 MB. **D3, the obj promote, is next.**)
 - `tenant_manifest.md`, `tables/` — port config; community-reviewable
   behavioural tables
 - `M1_acceptance.md`, `M2_feasibility.md`, `M3b_plan.md` — milestones

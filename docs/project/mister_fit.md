@@ -244,10 +244,16 @@ target (`jtcps1_sdram.v:167-175`, `OBJ_LATCH` 0 on MiSTer "to increase object
 throughput"). **It is UNMEASURED.**
 
 The alternative — upstream's `JTFRAME_SDRAM_XL` 128 MB tier — is real but is
-not at our pin and is not a flag (`docs/platform/mister.md`). Both options,
+not at our pin and is not a flag (`docs/platform/mister.md`). ~~Both options,
 with their costs, are the pending decision **THE MiSTer MEMORY-MAP ROUTE** in
-STATE. **Either route still requires the core-side format work**: the GFX
-tile-code promote, the 68k `rom_cs` window, and the QSound latch/width fix.
+STATE.~~ **DECIDED (maintainer, 2026-08-23): the BANK REPACK at our pin,
+measuring first; XL is the FALLBACK. The measurement returned GO the same day
+(`tests/audit_sdram_bank_load.sh`) and the repack SHIPPED in slice D2
+(14z-107 (9), fork commit `0df6f000`) — the placement is
+`docs/project/mister_map.md` §5.** **Either route still requires the
+core-side format work**: the GFX tile-code promote, the 68k `rom_cs` window,
+and the QSound latch/width fix — of which the QSound width fix shipped in D1
+and the promote is D3.
 
 **Superseded here, kept for the record:** section 5's SDRAM row ("**128 MB
 tier** (`SDRAMW` 23 -> 24, bank/prog/ioctl ports +1 bit)") and its closing

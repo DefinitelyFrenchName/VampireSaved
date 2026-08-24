@@ -1255,7 +1255,7 @@ PHASE of the run do". Fork commit 5 adds a raw counter line
 rate and a running average, it is a dashboard, not a measurement** — check
 that the raw counters are reachable before planning an analysis on it.
 
-## A CPS-2 tile code IS its SDRAM address — so LIVE BYTES are not a FOOTPRINT (14z-107)
+## A CPS-2 tile code IS its SDRAM address — and the SAME ART HAS THREE SIZES (14z-107, third size added 14z-107 (9))
 
 The `.rom` stores GFX in the MAME 4-way 64-bit interleave (`[rom] { name="gfx",
 width=64 }`), and `cores/cps1/hdl/jtcps1_prom_we.v:105` applies a CPS-2
@@ -1283,6 +1283,23 @@ Two consequences that are easy to get wrong, and both were:
    418/2917/51/642, the figures every earlier census froze. **A derived
    address map is worth nothing until it reproduces a number somebody already
    measured.** Run the known census first, then trust the derivation.
+
+3. **And the size SDRAM actually SPENDS is a THIRD number: the DECLARED
+   REGION** (added 14z-107 (9), found by the whole-image census). The MRA
+   downloads the whole `[rom]` region the machine entry declares, so each
+   8 MB group-C obj bank reserves its full 8 MB whatever the art does inside
+   it — the footprint does not shrink the reservation. The placement map had
+   sized those two banks by their FOOTPRINT and claimed **0.708 MB** of slack
+   in the 64 MB tier; the census says **0.125 MB, with SDRAM bank 1 EXACTLY
+   FULL**. So one roster's art has three sizes: **live bytes 6.39 MB <
+   address footprint 15.45 MB < declared region 16 MB** — and this project
+   has published a wrong figure derived from each of the first two.
+   **Ask which of the three a number is before you spend it.** The two
+   consequences point opposite ways and both matter: growth INSIDE the
+   declared region is free (a new tile above the current ceiling overflows
+   nothing), and growth OF the region is immediately fatal (a fifth group-C
+   member has nowhere to go — bank 1 has zero free and bank 0 has
+   131,072 B).
 
 ## jtframe `mame2mra`: four silent traps in the MRA generator (14z-107, extended 14z-107 (5))
 

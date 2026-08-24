@@ -841,6 +841,10 @@ with `(BANK_LEN>>1)-1 = 0x7fffff`.
 
 - **Regression — the oracle still passes, and the anchor moved FIVE FRAMES
   (2507 -> 2502, skew +361 -> +356), which is a real finding.**
+  **[BOTH ABSOLUTES RETRACTED 14z-107 (7) — they were measured while the
+  harness's frame writer was rewinding `sim_inputs.hex`; the clean anchor is
+  2609 / skew 463. The five-frame MOVE and its mechanism stand: it was
+  measured as a DIFFERENCE between two runs that shared the corruption.]**
   `tests/test_mister_sim_anchor.sh` is GREEN: the shift is inside the frozen
   +/- 30 band (not widened — the band is unchanged and the centre was
   re-measured), every mapped field agrees exactly at the anchor and at
@@ -1276,12 +1280,15 @@ any core.
   bit" is NOT the shape of the work: at our pin there is no 24-bit map to
   reach (row/column/pins are saturated), the 128 MB tier exists only
   upstream and only in the cache-lane branch, and the CPS-2 core carries
-  format caps that no SDRAM tier lifts. The route is now its own pending
-  decision — **THE MiSTer MEMORY-MAP ROUTE** in STATE "Decisions pending":
+  format caps that no SDRAM tier lifts. ~~The route is now its own pending
+  decision — **THE MiSTer MEMORY-MAP ROUTE** in STATE "Decisions pending":~~
+  **RULED (maintainer, 2026-08-23) — option (2):**
   (1) uprev to upstream master + `JTFRAME_SDRAM_XL` + cache lanes, or
-  (2) stay at the pin and BANK-REPACK inside 64 MB (tenant art into bank 1
-  beside the PCM, reached by the promoted tile-code bit). Either way the
-  core-side format work of "What the CPS-2 CORE caps" is required.
+  **(2) stay at the pin and BANK-REPACK inside 64 MB** (tenant art into bank 1
+  beside the PCM, reached by the promoted tile-code bit) — **measuring first,
+  with XL as the FALLBACK.** The measurement returned **GO**
+  (`tests/audit_sdram_bank_load.sh`) and the repack SHIPPED in slice D2. Either
+  way the core-side format work of "What the CPS-2 CORE caps" is required.
 - ~~**The Verilator SDRAM model's 8 MB-per-bank decode** (the caveat next to
   the Recipe) is a prerequisite for simulating any widened set, and is
   three constants. Not started.~~ **DONE 14z-107 (3), fork commit 3** — and

@@ -560,10 +560,12 @@ bank-1 codes (374 codes as of m3a) — not a constraint.
     - **So: right about the framework, wrong about the version we pinned.**
       And XL is not a flag — it lives only in the `JTFRAME_SDRAM_CACHE`
       branch, which nothing forces you to enable (a silent-aliasing trap,
-      filed in `docs/platform/gotchas.md`). The route question — uprev to
+      filed in `docs/platform/gotchas.md`). ~~The route question — uprev to
       master, or bank-repack inside the 64 MB pin — is a pending decision in
-      STATE ("THE MiSTer MEMORY-MAP ROUTE"). Full argument, with every
-      file:line: `docs/platform/mister.md`.
+      STATE ("THE MiSTer MEMORY-MAP ROUTE").~~ **DECIDED (maintainer,
+      2026-08-23): BANK-REPACK inside the 64 MB pin, measuring first, with XL
+      as the fallback; measured GO and SHIPPED in slice D2.** Full argument,
+      with every file:line: `docs/platform/mister.md`.
   - Consequence for M5: sfx restored at banks < 0x80 (the 14z-86
     ejection pilot rides vsav's own image at bank 0x18) are
     MiSTer-compatible as-is; only content placed in the QSound

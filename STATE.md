@@ -1,5 +1,226 @@
 # STATE — living progress log
 
+## Session 14z-107 CLOSE — ritual complete. THE MiSTer ARC'S THREE
+## PLACEMENT SLICES ARE DONE (D0 the MRA, D1 the runtime profile gate +
+## QSound width, D2 the SDRAM placement), the CLAUDE.md §4 oracle now runs
+## on a THIRD implementation and AGREES, and the most transferable result
+## of the session is a methodological one: **THREE SEPARATE INSTRUMENTS
+## PRODUCED FALSE VERDICTS WHILE THE THING UNDER TEST WAS INNOCENT.**
+## Twenty commits of session work plus this close = **21, ALL LOCAL** —
+## every one is MiSTer work, so none qualifies for the pre-MiSTer push
+## exception. The FORK is fully public:
+## `origin/vampire-saved` = the pin = `0df6f000`, eleven commits.
+
+**The session, in one line:** the MiSTer arc went from "the oracle might
+be buildable" to "the WIDE romset has a byte-exact place in 64 MB of
+SDRAM, gated at runtime, with every byte of the image counted" — and it
+got there by fixing its own instruments three times, each of which had
+already published a wrong number.
+
+**THE LESSON FIRST, BECAUSE IT IS THE PART THAT TRANSFERS.** In one
+session, three defects in the MEASURING APPARATUS produced verdicts about
+things that were not defective. None was found by theorising; each was
+found by changing ONLY the instrument and re-running.
+
+| # | the instrument | the false verdict it produced | the innocent subject | how it was caught |
+|---|---|---|---|---|
+| 1 | the Verilator SDRAM model dropped `addr[22]` (it rides `sdram_a[9]` as the tenth COLUMN bit; `addr[9]` is a ROW bit) — 14z-107 (3) | GFX banks 2/3 were HALF-ALIASED, so 14z-106 slice C's "frames showed sprites" read as evidence that GFX addressing was faithful when it only proved the core runs — no video or sprite result from the lane was trustworthy for wide GFX at all | jtcps2's GFX addressing, and the lane's own credibility | derive from the RTL instead of from the SIZE — *a size tells you how many bits are missing, never which one* |
+| 2 | the forked frame writer `exit(0)`'d, `fclose()`ing the parent's inherited `sim_inputs.hex` `FILE*`; POSIX rewinds the SHARED offset — 14z-107 (7) | slice D1's anchor read RED (2609/463) against a frozen 2502/356, and the RTL was blamed for four 50-minute runs | `cores/cps2w`'s D1 RTL — and the FROZEN number was the artifact, not the red one | a 2x2 factorial on `pal_lut.hex` x frame-output, 681 dumps a leg: the RTL axis moved nothing, the HOST axis moved everything |
+| 3 | jtframe's `SimInputs` held P1's **and P2's** buttons 5 and 6 down — two 8-bit constants on a `[9:0]` ACTIVE-LOW port — 14z-107 (8) | the two legs of the §4 oracle had never run the same inputs, so every agreement it reported was an agreement about a different machine | both legs; the fields agreed anyway | a MAME hold-vs-not differential located the game's own input mirror (`$FF8058/5A/5C/5E`) and the pre-fix sim block was BYTE-IDENTICAL to MAME with four buttons held |
+
+**And a fourth, in D2, of the same family:** `JTFRAME_SIM_WRAMDUMP_OFF`
+was hard-coded to bank 0 byte `0x600000` — work RAM on `cps2`, **VRAM on
+`cps2w` after the re-pack** — so `test_mister_wide_inert` went red in 101
+frames of 101 while comparing one core's work RAM against the other's
+VRAM. It does not announce itself: VRAM is a plausible 64 KB of changing
+bytes, so the window was non-constant and every other assertion passed.
+**Any instrument that names a PHYSICAL address is invalidated by a
+memory-map change, and a placement slice IS a memory-map change.**
+The standing rule that came out of all four, now in
+`docs/platform/gotchas.md` and in the NEXT_SESSION banner: **suspect the
+instrument before the RTL** — and never blame a red anchor on RTL until a
+core-vs-core RAM comparison says so, which is what
+`test_mister_wide_inert` exists for.
+
+**AND THE HONEST LIMIT ON D2, STATED BEFORE THE ACHIEVEMENTS.** D2's
+evidence is the SDRAM IMAGE, not a replay, and it has to be:
+`rom0_bank[2]` is tied low until D3, `gfxc_sel` is therefore constant 0,
+the two group-C read slots are provably unreachable, and **no tenant art
+has ever been FETCHED on the core.** D2 built the destination and the
+plumbing; nothing has driven them yet. The bandwidth verdict is the same
+shape: it BOUNDS the headroom (only stock traffic is measurable — a WIDE
+romset does not load on the stock core), it does not prove the repacked
+design.
+
+**WHAT THE SESSION SHIPPED, slice by slice**
+- **The §4 oracle on a third implementation** (entry at the bottom of this
+  group): work RAM had NO dump path on this core, so one was built —
+  `JTFRAME_SIM_WRAMDUMP`, 64 macro-gated lines in the Verilator TESTBENCH.
+  MAME and stock jtcps2 agree on every mapped field at the round-1
+  match-start anchor of `05_timeout_idle`; the single disagreement is the
+  game's own sound-state-fed 1P arcade draw, excluded by name.
+- **Two 14z-106 claims RETRACTED** (`JTFRAME_SIM_IODUMP` reaches the
+  EEPROM, not work RAM; `JTFRAME_SAVESDRAM` is Verilog-model-only), and
+  later a **retraction-of-a-retraction**: the XL tier does not exist at
+  our pin and DOES exist upstream. *A grep proves a fact about the tree you
+  grepped, and a pin is a tree.*
+- **The memory-map truth** — at `v1.7.3`, 64 MB is PHYSICAL;
+  `JTFRAME_SDRAM_XL` is real, upstream-only, two chips on nCS polarity, and
+  reachable only inside the `JTFRAME_SDRAM_CACHE` branch (setting it today
+  would compile, validate and silently alias). **RULED: BANK REPACK at the
+  pin, XL as fallback.**
+- **The bandwidth measurement: GO** — bank 1's PCM is already at a 98.8%
+  in-match row-miss rate, so it has no locality left to lose; the worst
+  case runs at 26.3% of one bank against the **32.9% bank 0 already
+  sustains in stock shipping configuration**.
+- **The placement map** (`docs/project/mister_map.md`) + `audit_mister_map_fit`.
+- **D0** — the MRA trim that makes the WIDE image downloadable at all:
+  `vsavjw.rom` = **66,265,152 B**, header words **6144/6400/15552/64704**,
+  every region verified byte-for-byte against the romset. Stock leg still
+  **46,407,744 B / sha1 `f9dc2987…`**, bit-identical.
+- **D1** — the QSound sample-bank width fix behind a **RUNTIME** profile
+  gate (MRA header byte 41, bit 0, ACTIVE LOW: the generator's own
+  `fill=0xff` means profile OFF, the WIDE MRA writes `0xfe`). That is what
+  makes rule 1 v2's "profile-gated ... stock `vsavj` untouched BY
+  CONSTRUCTION" a FACT on FPGA rather than an inertness argument.
+- **D2** — the placement in RTL (bank-0 re-pack, group-C GFX redirect,
+  QSound split on `pcm_addr[23]`, two new slot counts, ONE new jtframe file
+  `hdl/sdram/jtframe_ram1_7slots.v`), gated by a census over **all
+  67,108,864 bytes of all four banks**, four legs, every control firing.
+- **The synthesis document + its generator** — `docs/project/mister_core.md`
+  states what is TRUE about the core in CAUSAL order and names the logs as
+  its provenance; `tools/mk_mister_page.py` draws the geometry rather than
+  asserting it, with `--check` re-deriving all 17 figures. The
+  maintainer's requested living-documentation pilot.
+- Throughout: `cores/cps1`, `cores/cps2` and `cores/cps15` are
+  **BYTE-UNTOUCHED**, and since D1 that is a `git diff` assertion
+  (`test_jtcores_twin` 2e), with the fork's whole-tree delta held to a
+  declared 18 paths (2f).
+
+**THE PLACEMENT'S MARGINS ARE THIN, and the census is why we know:** the
+map claimed 0.708 MB of slack and the truth is **0.125 MB — SDRAM bank 1
+is EXACTLY FULL** (8 MB PCM + 8 MB obj bank 4 = 16,777,216 B to the byte)
+and bank 0 has **131,072 B** free. The error was of KIND, not arithmetic:
+the map sized the group-C obj banks by the art's ADDRESS FOOTPRINT
+while the MRA downloads the WHOLE declared region, so each obj bank
+reserves its full 8 MB whatever the art does inside it. **Three sizes of
+the same art — live bytes (6.39 MB), address footprint (15.45 MB),
+declared region (16 MB) — and this project has now published a wrong
+figure from each of the first two.** Both consequences point opposite
+ways: tenant art may grow freely inside the existing 16 MB, and the
+group-C ROMSET REGION cannot grow at all.
+
+**MAINTAINER RULINGS TAKEN THIS SESSION** (all marked DECIDED in place in
+Decisions pending): the MEMORY-MAP ROUTE (bank repack, measuring first;
+XL fallback); the BANK-0 SLOT COUNT (option A — add `jtframe_ram1_7slots`
+so bank 1 stays at the two streams the GO measurement modelled); the
+PROFILE SELECTED AT RUNTIME from a spare MRA header bit rather than by
+`ifdef`; SOURCE SEPARATION (the core stays unmixed; the shared `tools/`
+and `tests/` stay as they are and are not to be tidied later);
+FORK-PUSH STANDING AUTHORISATION (2026-08-24; the main repo is still never
+pushed). Plus two FUTURE DIRECTIONS recorded, nothing scheduled: the
+LIVING-DOCUMENTATION EFFORT (and the option it creates — a rebuild from
+the docs after the MiSTer core is finished) and DISTILLING AI SKILLS from
+the project's learnings, scoped by subject.
+
+**RITUAL**
+- **STATE**: this entry, session entries (1)-(9), the two FUTURE-direction
+  entries, and every ruling marked DECIDED in place. **The ROLLOVER
+  executed**: three groups were kept by the group rule (14z-107, 14z-106,
+  14z-105), so nothing was DUE by it — but the file stood at **208 KiB
+  against the ~150 KB the rule names**, so the SIZE arm applied and the
+  oldest kept group, **14z-105 and only it** (4 entries, 235 lines), moved
+  VERBATIM to the top of `STATE_HISTORY.md`'s body with its ledger line
+  here. Verified lossless: the extracted block is byte-verbatim in the
+  archive and absent from this file. 14z-107 and 14z-106 stay. **This file
+  is STILL over the size guide** — 211 KiB with this entry written, because
+  the 14z-107 group alone is 1,803 lines / 113 KiB — **so 14z-106 rolls at
+  the next close.**
+  Recorded here so the next session does not have to re-derive it.
+- **`docs/NEXT_SESSION.md`**: rewritten. The banner carries the arc state
+  (D0-D2 done, **D3 the obj promote is the opener**), the frozen anchor
+  (MAME 2146 / sim 2609 / skew 463 ± 30), the fork pin and the push
+  policy, the placement's thin margins, and the two standing warnings —
+  suspect the instrument before the RTL, and never edit a script while a
+  run is in flight.
+- **`HANDOFF.md`**: the MiSTer block brought current — it now opens on
+  `mister_core.md` rather than `platform/mister.md`; the SIX tools this
+  session added (`run_sim_jtcps2.sh`, `mister_mra.sh`, `gen_vsavjw_xml.py`,
+  `check_wram_dumps.py`, `mister_sdram_census.py`, `mk_mister_page.py`) are
+  all named with their commands, and the gate table carries tier and runtime
+  for all **eleven** MiSTer gates (`test_mister_page` was the row the
+  synthesis commit had not added). **Two things it asserted that this
+  session made false are fixed:** it still called THE MiSTer MEMORY-MAP
+  ROUTE a pending decision, and it still framed the GFX overflow as
+  "~6.4 MB into bank 1's spare" — the three-sizes correction.
+- **`docs/README.md`**: `mister_core.md` was already indexed (the synthesis
+  commit did that), but it was NOT DISCOVERABLE — neither bucket
+  description named MiSTer, so a reader who did not already know the file
+  existed had no route to it. Fixed by adding an **IF YOU WANT TO KNOW X,
+  READ Y routing table** at the entry point (the shape the
+  living-documentation direction asks for), with the MiSTer row naming the
+  synthesis first and its three logs after it, and by naming MiSTer in the
+  `platform/` and `project/` bucket descriptions. Also fixed: the stale
+  trap count (145 -> a measured 304).
+- **GOTCHAS**: every trap this session paid for is filed in
+  `docs/{platform,project}/gotchas.md` and indexed — the in-flight script
+  edit (paid THREE times, the third on a COMMENT-ONLY edit), the
+  forked-child stream rewind, IODUMP-is-the-EEPROM, the 32 MB Verilator
+  SDRAM model, XL-without-cache silent aliasing, jtframe resolving zip
+  members by CRC32 alone, the missing `pal_lut.hex` black screen, the
+  `jtframe files` path-dedup bill, the SDRAM-addressed dump hook, the
+  `prog_ba` fall-through, and the three sizes of the same art.
+- **GATES RUN AT THE CLOSE**: `run_all_static.sh --strict` **PASS 106 /
+  SKIP 0 / FAIL 0 / MISSING 0** — run TWICE, once before the documentation
+  pass and once after it on the final tree, with the same result;
+  `tools/audit_roms.py` **76/76 members match `docs/checksums.txt`**;
+  `tools/mk_mister_page.py --check` **PASS, all 17 figures re-derived**;
+  `tests/test_jtcores_twin.sh` standalone **PASS** (pin `0df6f000`, the
+  series 11 files == 11 commits with each `== format-patch -1`, the fork's
+  whole-tree delta exactly the declared 18 paths, and
+  `cores/cps1`/`cps2`/`cps15` BYTE-UNTOUCHED vs v1.7.3). Only `STATE.md`
+  and `docs/README.md` moved after the second full run — no gate reads
+  either (grep'd) — and `--tier portable` was re-run afterwards anyway:
+  **PASS 51/0/0**.
+- **COMMITS**: twenty of session work, `a2585bb`..`3dc9604`, plus this
+  close = 21, **all LOCAL** (`git log 4156283..HEAD`). Fork:
+  eleven commits, **all PUSHED** (`origin/vampire-saved` = `0df6f000` =
+  the submodule pin, verified with `git ls-remote`).
+
+**RETRACTIONS EXECUTED AT THE CLOSE (grep'd for the CLAIM, not for the
+files I remembered).** The route ruling of 2026-08-23 had been recorded in
+STATE and acted on in D2, but **four live documents still called it a
+PENDING DECISION** — `HANDOFF.md`, `docs/project/mister_fit.md`,
+`docs/platform/mister.md` and `docs/project/cps2_wide.md` — plus the
+14z-107 (2) banner block in `NEXT_SESSION.md`. All five marked DECIDED in
+place, superseded text kept and struck. Also fixed in place: HANDOFF's
+"only GFX overflows by ~6.4 MB" (the three-sizes correction); the 14z-107
+(4) slice-plan line still telling every slice to re-run the anchor gate at
+`2146 / 2502 / 356` (the numbers were retracted in (7), the instruction
+stands); `mister.md`'s SDRAM-model control paragraph, which stated the
+2507 -> 2502 move without its retraction beside it (the MOVE and its
+mechanism stand — it was measured as a DIFFERENCE between two runs that
+shared the corruption — only the absolutes fall); the 14z-107 (1) and
+14z-106 CLOSE lines still calling the PROFILE SHAPE ruling pending; the
+five `NEXT_SESSION` banner blocks that all still claimed to be "NEWEST
+FIRST"; and `docs/README.md`'s trap count, stale at 145 against a measured
+304. **Re-grepped afterwards: every surviving hit is inside a struck span
+or an explicitly historical entry.**
+
+**NEXT OPENER: SLICE D3 — THE OBJ PROMOTE.**
+`jtcps2_obj_scan.v:152` `st3_bank <= {table_y[12], table_y[14:13]}` (the
+CPS-2 Turbo rule, the MiSTer twin of the ratified 19-bit promote WIDE v1
+already makes in FBNeo's `Cps2ObjDraw`), plus the
+`dr_bank`/`obj_bank`/`rom_bank`/`rom0_bank` chain widened to 3 bits. It
+lands on the destination and the plumbing D2 built, and it is the slice
+that first DRIVES `rom0_bank[2]` — i.e. the first time tenant art is
+fetched on the core at all. Gate: the MiSTer twin of the FBNeo B4 canary.
+D4 (the 6 MB PRG window) follows.
+
+**STILL OPEN FOR THE MAINTAINER:** MiSTer PACKAGING (which MRA is the
+core's MAIN one; how a release carries both `vsav.zip` flavours) — neither
+blocks D3/D4, both must be answered before a release.
+
 ## Session 14z-107 (9) — MiSTer SLICE D2: THE PLACEMENT IS IN THE RTL AND
 ## THE SDRAM IMAGE WAS COUNTED, ALL 67,108,864 BYTES OF IT. The bank-0
 ## re-pack, the group-C GFX redirect, the QSound split across two banks and
@@ -1061,7 +1282,10 @@ by an SDRAM image census whose control is a 1 KiB offset perturbation;
 **D3** the obj promote, gated by the MiSTer twin of the FBNeo B4 canary;
 **D4** the PRG window, gated by the B4-prg relocate-and-repoint control.
 Every slice re-runs `tests/test_mister_sim_anchor.sh` on stock `vsavj`
-(2146 / 2502 / 356 ± 30) as the emulator superset leg.
+(2146 / ~~2502 / 356~~ **2609 / 463**, ± 30) as the emulator superset leg.
+**[Corrected in place 14z-107 CLOSE: 2502/356 was measured while the
+harness's frame writer was rewinding `sim_inputs.hex` (14z-107 (7)); the
+instruction stands, the numbers did not.]**
 
 **NOT DONE, deliberately:** no RTL, no MRA row written, no core built. The
 brief said design and measure.
@@ -1575,6 +1799,10 @@ the dumps were still in the scratch clone. Filed in platform gotchas.
   was about the oracle, not input coverage.
 - The MiSTer PROFILE SHAPE ruling is still **pending** (recommendation
   unchanged: WIDE v1 verbatim on a 128 MB tier). No RTL was touched.
+  **[RULED 2026-08-23, marked in place: WIDE v1 VERBATIM, one romset across
+  FBNeo/MAME/MiSTer. The "128 MB tier" half of the recommendation is
+  SUPERSEDED — 14z-107 (2) found that tier does not exist at our pin, and
+  the route was ruled BANK REPACK inside 64 MB.]**
 
 ## Session 14z-106 CLOSE — ritual complete
 
@@ -1599,7 +1827,9 @@ next run, 101). Four commits LOCAL (b4a7d15, 1622522, 0d16a0b, ad25cdc);
 PUSH pending the maintainer's word.
 
 **Decisions pending for the maintainer:** THE MiSTer PROFILE SHAPE
-(recommendation: WIDE v1 verbatim on a 128 MB tier). Next opener: the
+(recommendation: WIDE v1 verbatim on a 128 MB tier). **[RULED 2026-08-23:
+WIDE v1 verbatim, one romset — DECIDED in place in the Decisions section;
+the "128 MB tier" half is superseded, see 14z-107 (2).]** Next opener: the
 RAM comparison at a §4 anchor on the STOCK core (mister.md recipe; the
 `-setname`/sdram-reuse question first). Model note (maintainer asked):
 the opener is mechanical — any current model; the RTL width surgery
@@ -1749,242 +1979,6 @@ lift + the QSound width fix + a MiSTer-shaped WIDE profile, GFX <= 32 MB).
 The alignment questions are under "Decisions pending — MiSTer alignment";
 no RTL is touched before they are answered.
 
-## Session 14z-105 CLOSE (final) — ritual complete
-
-The session, in one line: the maintainer-directed window executed end to
-end — the Oboro select hook (vanilla's Gallon-variant idiom one cell
-over; the Start bit measured before authoring) and the "M6" version mark
-(authored glyphs, pixel-exact; the tile codec's 14-session half-mirror
-found and fixed on the way) — frozen as donovan-m11 / huitzil-m20 /
-pyron-m14 / merged-m6 with every gate and both soaks green, field-
-confirmed ("Tests confirm Oboro Bishamon and the M6 mark") and pushed;
-then RELEASE PACKAGING landed the same session (`release/merged-m6/`, no
-ROM bytes, deterministic, verifying applier, gated), ruled in-tree until
-MiSTer, pushed.
-
-The ritual's items, each done this close:
-- **STATE**: this entry; the ROLLOVER executed (the 14z-102 group, 7
-  entries, moved verbatim to STATE_HISTORY with a ledger line; verified
-  lossless by byte-verbatim + size accounting).
-- **NEXT_SESSION**: rewritten (the window shipped, the codec finding, the
-  dead prediction, packaging done + the in-tree ruling; MiSTer next).
-- **HANDOFF**: current-builds block, registry row, gate rows, the release
-  packaging section, SUITE_ONLY.
-- **GOTCHAS**: one paid (platform: the gfx_tiles half-mirror / pen 15 /
-  OBJ->screen offsets).
-- **patch docs**: patch_notes 14z-105 section; patch_index rows + the
-  packaging tooling paragraph.
-- **Issues**: none opened; tracker clean.
-- **Suite**: run_all_static --strict PASS 99/0/0 at close (97 -> 99:
-  test_gfx_tile_codec, test_release_roundtrip).
-- Everything pushed; the tree is clean.
-
-Where the next session starts: NEXT_SESSION's banner — MiSTer core
-surgery (the maintainer's sequencing: packaging first, done).
-
-## Session 14z-105 (2) — RELEASE PACKAGING (maintainer: packaging
-## before MiSTer; "why not this session") — `release/merged-m6/` built,
-## gated, deterministic; no ROM byte in the package
-
-**The design constraint first (rule 7):** the WIDE members (`vsw.*`) are
-NEW files made largely of vs2/vhunt2 content, so a patch "against
-nothing" would embed ROM bytes. Every delta is therefore computed by
-xdelta3 against ONE source blob — the four reference dumps' members
-concatenated in a fixed documented order (sha1 954d883c…) — so copies
-out of any dump are copy instructions and only generated/authored bytes
-are literal. Secondary compression OFF so the scan below sees the
-payload. Measured: 20 patched members (the four vm3j program members,
-the twelve vsw.* WIDE members, and vm3.13m/15m/17m/19m — four GROUP-A
-gfx members the effect-tail anchors write, so the rompath `vsav.zip` is
-NOT entirely pristine; the 14z-62e option-A prose that said so is
-corrected in place) + 22 pristine copies; 2,592,654 patch bytes total.
-
-**Tools:** `tools/package_release.py` (deterministic — two runs byte-
-identical), `tools/apply_release.py` (shipped in the package; verifies
-every reference member, rebuilds the source, applies, refuses to write
-unless every target sha1 matches). **Gate `tests/test_release_roundtrip.sh`
-(ci_static) PASS:** 42/42 members byte-identical after the round trip,
-fingerprint 64426955 + whole-artifact manifest reproduced; corrupted
-patch / wrong target sha1 / one-bit-wrong dump each REFUSED with nothing
-written; rule-7 scan: 2.59 MB of patch bytes against 1,384,723 indexed
-64-byte reference chunks, zero hits, must-fire control caught (2 hits).
-Dependency: `xdelta3` (brew install xdelta) — the gate SKIPs without it.
-
-**Release unit decision (mine, open to veto):** merged-m6 only — the
-solos are instruments, the stock twin is never distributed.
-**RULED (maintainer, 2026-08-22): the package stays IN-TREE until
-MiSTer; a tagged GitHub release then covers both.** Pushed.
-
-## Session 14z-105 CLOSE — the freeze is GREEN end to end; commits
-## LOCAL, awaiting the maintainer's field test before push
-
-**Every verification of the 14z-105 freeze, final:**
-- run_suite: the three solo sets re-frozen (SUITE_ONLY targeted freeze of
-  the 9/10/11 self-frozen `.sha1` replays — every select-reaching tenant
-  replay moved, as the two added sprites require) and then the FULL
-  unfiltered verify on don_m11 / hui47 / pyron31: **SUITE GREEN x3**, 0
-  FAIL, 0 NONDETERMINISTIC; all 148 window/composite specs on their
-  frozen lines.
-- test_m3a_reproducible: all five artifacts rebuild bit-exact on the new
-  pins; whole-artifact manifests match (42/30/42/42/42).
-- Merged gates on m3b_merged13: test_version_string, test_oboro_select,
-  test_wheel_bank5 (AUTHORED 2), audit_select_bank_gates,
-  audit_roster_pairings 111/111, test_tenant_pairings 6/6, audit_trap_
-  parity, audit_fg_parity (native-parity), audit_clone_beam_lines,
-  audit_hui_grunt, test_dualtrack (frozen onsets held), test_fbneo_
-  legacy_oracle (frozen offset inventories held), test_merged_render_
-  content (bands byte-equal to the NEW solos) — ALL PASS.
-- Static: test_pcrel_escapes (solo + merged, control alive),
-  test_region_overlap (2033 held), test_pointer_flow (4 new baselines),
-  test_escape_triage (re-frozen, verdicts identical), test_manifest_merge
-  (re-pinned), test_tenant_loop (re-pinned), test_gfx_tile_codec (new).
-- run_all_static --strict: **PASS 98 / SKIP 0 / FAIL 0** (the suite grew
-  97 -> 98: test_gfx_tile_codec). An earlier run showed 2 FAILs that were
-  a RACE with my in-flight edits (the manifest_merge pin landing mid-run;
-  tenant_row_owner edits the generator in place) — both PASS alone and
-  in the clean re-run.
-- run_battery_m2: 23 PASS + the wide-render self-skip, which was then
-  run directly on the m5_stock6/don_m11 pair: PASS (the 14z-102 shape —
-  effectively 24/24).
-- audit_guard_corpus and audit_merged_legacy: run AFTER the close entry
-  while the maintainer tested — both PASS (see the post-freeze note).
-
-**Post-freeze, while the maintainer tests (2026-08-22):** the Oboro pick
-measured on FBNeo too — id 0x18 / base 0x0B3450 with Start, 0x08 /
-0x0A6418 without, field-for-field what MAME reads (the §4 dual-emulator
-agreement for new content); frozen as leg F of test_oboro_select.sh.
-The two long soaks were then run: **audit_merged_legacy PASS (rc=0)** —
-leg a 47/47 legacy replays on their exact frozen classes, leg b guard-
-clean vs the new solos; **audit_guard_corpus PASS — 316/316 guarded runs, zero vectors** on merged-m6 under every tenant forcing. Every verification the 14z-102 freeze had is now green on 14z-105 too.
-
-**FIELD-CONFIRMED AND PUSHED (maintainer, 2026-08-22):** "Tests confirm
-Oboro Bishamon and the M6 mark." Observation recorded: Oboro's pre-match
-INTRO is very long — vanilla vsavj's own boss intro, not ours, and he is
-not tournament-legal, so accepted as-is (no item). main + the four
-freeze tags pushed (cfb6bd3..f1db172).
-
-**Where the maintainer looks:** `tools/run_wide.sh build/m3b_merged13
-fbneo` — "M6" bottom-right on select; Bishamon + Start held -> Oboro.
-
-## Session 14z-105 — THE WINDOW EXECUTED: W1 THE OBORO SELECT HOOK +
-## W2 THE VERSION STRING, one freeze — donovan-m11 / huitzil-m20 /
-## pyron-m14 / merged-m6 (maintainer "happy with the plan, I'll test
-## before we push", 2026-08-22). Every gate that has finished is GREEN;
-## the suite re-freeze and the long merged batch run at close.
-
-**The opening measurement (RH-1, before a byte was authored):** on
-vanilla vsavj, with P1 Start held on the select screen, the player
-struct's input word `+0x394` reads `$8000` (`$0000` without) — so the
-`btst #7,$394(a6)` in vanilla's Gallon-variant confirm path at
-`PRG:0x020B9C` IS the Start test, and the template is exact; `$FF8060`
-reads 1 at the same time (the 14z-104 "is it live at select?" question:
-yes). The committed id stays 0x08 on vanilla (no Oboro path, as
-expected).
-
-**W1 — `oboro_select_hook`:** a 30-byte profile-gated `site_thunk`
-displacing the `cmpi.b #$2,$382(a6)` at 0x020B9C: Bishamon? / Start? /
-`move.b #$18,$382(a6)` / re-execute the displaced cmpi (its flags feed
-vanilla's `bne`) / rts. Declared identically in all three manifests
-(ENGINE-SITE, deduped to one; +2 ops at every N). Generator gained a
-`profile` key on site_thunk (mirrors select_wheel/sound_table; inert
-for every existing row) and `id_literal_ok` carries the deliberate
-0x08/0x02 compares. MEASURED on the probe and frozen as
-`tests/test_oboro_select.sh` (5 legs): P1 hold -> 0x18 + base
-`0x0B3450` in-match; no-hold -> 0x08 / `0x0A6418`; Start on Demitri ->
-0x01; P2 (default cell 0x05, D D L L) -> 0x18 / `0x0B3450`, P1
-untouched; STOCK twin -> 0x08. Stock rebuilt under the new rows =
-`883e7d17` = m5_stock5, whole-artifact manifest identical (30/30).
-
-**W2 — the version string:** `version_text/font/x/y/pal/base` knobs on
-`[[select_wheel]] roster21` (all three manifests, identical); the
-generator appends one 1x1 glyph entry per character to the copied
-wheel record (count 20 -> 22, budget 0x55 carried over and now
-asserted >= entries) and encodes `build/manifest/version_font.json`
-(5x7, 0-9 A-Z - . space, authored, NEW provenance) 2x into 16x16
-tiles handed to build_gfx through `wheel_bank5.json["authored"]`
-(place() same-source-or-fail; audit_gfx_merged + check_wheel_bank5
-know the kind). "M6" at screen (340,202) — the empty bottom-right
-corner, chosen from snapshots — pal row 0x19 (Phobos' medallion row,
-thunk-re-asserted every select frame, ink pen 7 = 0xFF8), codes
-0x1FE40/41 (free in the merged-m5 group C ledger). 0 ops.
-
-**THE CODEC FINDING (platform gotcha, gate `test_gfx_tile_codec.sh`):**
-the first probe drew the glyphs MIRRORED per 8-pixel half inside an
-opaque black box. The OBJ list had the sprites exactly where intended
-(x=0x194/0x1a4, y=0xCA, bank 5, pal 0x19, codes fe40/fe41), so the
-defect was in the tile bytes: `gfx_tiles.decode` had mapped plane bit i
-to pixel i since the module was written, and nothing had ever consumed
-pixel ORDER (cmd_match and BLANK compare raw bytes) — the first tile
-this project ever SYNTHESIZED exposed it, and only because "M6" is not
-symmetric ("M" looked right). Fixed both ways (bit i = pixel 7-i),
-transparent pen 15, and the OBJ->screen transform measured as
-(x-64, y-16). Re-probed: the MAME snapshot pixel-matches the intended
-bitmap with ZERO mismatches at (340,202) and zero opaque pen-0 pixels
-(`tests/test_version_string.sh` §2 — the render-layer check that a byte
-round-trip cannot replace).
-
-**The freeze (the 14z-99/102 rhythm):** op counts re-frozen with
-attribution (325/365/298; 600/652; 806/907); `build/merged_probe_w6`
-rehearsed, then don_m11 `1de9a027` (325) / hui47 `24a27940` (365) /
-pyron31 `6bf265ab` (298) / m5_stock6 `883e7d17` (UNCHANGED) /
-m3b_merged13 `64426955` (806, BIT-FOR-BIT the probe) built from the
-tree; expectation sets carried-renamed m10->m11, m19->m20, m13->m14 +
-registry rows; m3a pins + whole-artifact manifests moved (attributed:
-program members + the four GROUP C members = the glyph tiles; no
-QSound member). **Placements moved:** the thunk allocates per tenant
-iteration ahead of the regions, so every huitzil placement is +0x10
-and every pyron one +0x30 — bases.tsv re-derived from merged13's own
-table (phobos 0x4595b0, pyron 0x4ac90c, donovan held), pcrel
-[merged_*] + solo sections re-pointed (inventory unchanged 69/10/10),
-pointer_flow baselines re-frozen for all four (the +1 `data:long` is
-the record's count word; the merged pairs had silently stayed on
-merged11 since 14z-100 — the #94 class, now current). The standing
-re-point sweep executed: ~70 BUILD defaults (the m3b_merged11
-one-back set, the 14z-103/104 audits, tripwire/guard-corpus/
-projectile-clash, dualtrack, render-content D/H/P, region_overlap trio
-(section 5 re-measured: still 2033), identity PLAY pin, battery stock
-path, voice_row_range, hui_grunt per-build row, decode_stage_banners'
-donovan clean leg).
-
-**Green so far on the new artifacts:** test_oboro_select,
-test_version_string, test_wheel_bank5 (AUTHORED 2), audit_select_bank_
-gates, test_pcrel_escapes (solo + merged, control alive),
-test_region_overlap, test_pointer_flow, test_tenant_loop, test_gfx_
-tile_codec; m3a_reproducible and the long merged batch (roster
-pairings, tenant pairings, trap/FG parity, clone-beam lines, hui grunt,
-dualtrack, FBNeo oracle, render content) + the three run_suite
-re-freezes run at close — results in the CLOSE entry below.
-
-**Re-freezes the window forced, each attributed:** `test_manifest_merge`
-site_thunk counts (19,14,6)/30/5 -> (20,15,7)/31/6 (one row per manifest,
-dedupes to one); `tests/expected/escape_triage.txt` re-frozen in the
-gate's sorted form — the 25 verdicts are IDENTICAL, only the merged
-addresses moved (+0x10/+0x30) and with them the sort order;
-`test_region_overlap` section 5 re-measured UNCHANGED (2033).
-**The select-window specs did NOT move:** `propose_masked_specs` over
-all 148 window/composite specs of the three carried sets proposed the
-frozen line verbatim — the 14z-104 prediction ("more sprites shift the
-window end") is retracted; the end is the VS-phase re-init. Only the
-self-frozen `.sha1` replays were re-frozen, via a new `SUITE_ONLY=`
-authoring filter on `run_suite.sh` (prints FILTERED; never a verdict —
-the acceptance is the unfiltered verify run, which ran for all three
-builds at close).
-
-**N-2 policy applied (the 14z-102 standing rule):** build/don_m9,
-don_m9_s4, hui45, pyron29, m3b_merged11, m5_stock4 deleted (tracked
-metadata removed in this commit; recoverable via git history + the
-freeze tags); every live reference had been re-pointed first (only a
-per-build history row in audit_hui_grunt and a docstring still name
-them). The rehearsal probes merged_probe_w6 / probe_stock_w6 stay
-(evidence; the next attic pass takes them). [DONE 14z-106: moved to
-`../build_attic_14z105`.]
-
-**Retractions executed (grep'd):** "no in-game version string" (platform
-gotcha §3 + test_build_identity_distinct header); "Oboro's entry path
-is unlocated" qualified in id_space.md / select_screen.md — VANILLA's
-stays unlocated and irrelevant; the port has its own. 0x18 stays
-RESERVED for tenants (it is Oboro's).
-
 **SPLIT 2026-08-20 (14z-99 post-freeze close, maintainer-approved): this
 file holds the RECENT session groups + THE LEDGER; the full detail of every
 older session lives verbatim in `STATE_HISTORY.md`.** How to work with it:
@@ -2008,6 +2002,7 @@ Full detail for every line: `STATE_HISTORY.md` (verbatim; grep the session
 tag or any phrase below). `[+N more entries]` = the group has N further
 session records in the archive beyond the headline shown.
 
+- Session 14z-105 CLOSE (final) — THE MAINTAINER-DIRECTED WINDOW EXECUTED END TO END and field-confirmed: W1 the OBORO SELECT HOOK (cursor on Bishamon + hold START -> vanilla vsavj's Oboro, id 0x18, P1 and P2, vanilla's own Gallon-variant idiom one cell over) and W2 the VERSION STRING ("M6" at the select screen, the naked-eye A/B tell CLAUDE.md §5 had wanted since 14z-92, authored glyphs pixel-exact) — frozen as donovan-m11 / huitzil-m20 / pyron-m14 / merged-m6 with the stock twin m5_stock6 = `883e7d17` BIT-IDENTICAL, every gate and both soaks green, pushed 2026-08-22; the GFX TILE CODEC was found MIRRORED on the way (plane bit i draws at pixel 7-i; 14 sessions old, nothing had ever read pixel ORDER until the first authored tile) and the 14z-104 prediction that more sprites would move the select-window specs DIED by measurement over all 148 specs; RELEASE PACKAGING landed (`release/merged-m6/`, xdelta3 against the reference dumps, no ROM byte in the package) and was ruled IN-TREE until MiSTer  [+3 more entries]  [rolled 14z-107 close]
 - Session 14z-104 CLOSE — THE §4 COVERAGE DEBT TACKLED end to end (maintainer-directed): the mandate measured cell by cell, six new audits built and green on merged-m5 and the matrix documented as a maintained artifact; THE PURSUIT answered and instrumented (audit_pursuit_leap); coverage gap 1 (tech roll + throw tech, both directions) and gap 2 closed; THE OBORO QUESTION answered with a live demonstration; the 14z-105 window (Oboro hook + version string) prepped in NEXT_SESSION  [+4 more entries]  [rolled 14z-107 close]
 - Session 14z-103 — THE A4 PIN-CLEANUP PASS EXECUTED (every stale reference re-pointed, run green, or ruled a deliberate pin) plus the three findings it surfaced (the gate_failures litter class, GitHub #110, four LEGACY replays promoted off self-frozen .sha1); #110 FIXED AND CLOSED — the mechanism was the ARCADE DRAW, not cycle drift, both audits re-derived on pinned-opponent rigs and green on merged-m5; the Circuit Scrapper report measured and not reproduced  [+1 more entry]  [rolled 14z-107 close]
 - Session 14z-102 CLOSE — THE #107+#109 WINDOW frozen as donovan-m10/huitzil-m19/pyron-m13/merged-m5 (#109 re-derived from scratch to effect-class ROW 31, the DF clone-mode beam emitter vsavj stubbed; #107 row flip; gold tint kept; build-dir triage 8.1 GB atticked; N-2 deletion policy adopted)  [+6 more entries]  [rolled 14z-105 close]

@@ -19,6 +19,242 @@ Rules of this file:
 - References of the form "STATE 14z-XX": look in STATE.md first, then here
   — section names are preserved verbatim, so the reference always resolves.
 
+## Session 14z-105 CLOSE (final) — ritual complete
+
+The session, in one line: the maintainer-directed window executed end to
+end — the Oboro select hook (vanilla's Gallon-variant idiom one cell
+over; the Start bit measured before authoring) and the "M6" version mark
+(authored glyphs, pixel-exact; the tile codec's 14-session half-mirror
+found and fixed on the way) — frozen as donovan-m11 / huitzil-m20 /
+pyron-m14 / merged-m6 with every gate and both soaks green, field-
+confirmed ("Tests confirm Oboro Bishamon and the M6 mark") and pushed;
+then RELEASE PACKAGING landed the same session (`release/merged-m6/`, no
+ROM bytes, deterministic, verifying applier, gated), ruled in-tree until
+MiSTer, pushed.
+
+The ritual's items, each done this close:
+- **STATE**: this entry; the ROLLOVER executed (the 14z-102 group, 7
+  entries, moved verbatim to STATE_HISTORY with a ledger line; verified
+  lossless by byte-verbatim + size accounting).
+- **NEXT_SESSION**: rewritten (the window shipped, the codec finding, the
+  dead prediction, packaging done + the in-tree ruling; MiSTer next).
+- **HANDOFF**: current-builds block, registry row, gate rows, the release
+  packaging section, SUITE_ONLY.
+- **GOTCHAS**: one paid (platform: the gfx_tiles half-mirror / pen 15 /
+  OBJ->screen offsets).
+- **patch docs**: patch_notes 14z-105 section; patch_index rows + the
+  packaging tooling paragraph.
+- **Issues**: none opened; tracker clean.
+- **Suite**: run_all_static --strict PASS 99/0/0 at close (97 -> 99:
+  test_gfx_tile_codec, test_release_roundtrip).
+- Everything pushed; the tree is clean.
+
+Where the next session starts: NEXT_SESSION's banner — MiSTer core
+surgery (the maintainer's sequencing: packaging first, done).
+
+## Session 14z-105 (2) — RELEASE PACKAGING (maintainer: packaging
+## before MiSTer; "why not this session") — `release/merged-m6/` built,
+## gated, deterministic; no ROM byte in the package
+
+**The design constraint first (rule 7):** the WIDE members (`vsw.*`) are
+NEW files made largely of vs2/vhunt2 content, so a patch "against
+nothing" would embed ROM bytes. Every delta is therefore computed by
+xdelta3 against ONE source blob — the four reference dumps' members
+concatenated in a fixed documented order (sha1 954d883c…) — so copies
+out of any dump are copy instructions and only generated/authored bytes
+are literal. Secondary compression OFF so the scan below sees the
+payload. Measured: 20 patched members (the four vm3j program members,
+the twelve vsw.* WIDE members, and vm3.13m/15m/17m/19m — four GROUP-A
+gfx members the effect-tail anchors write, so the rompath `vsav.zip` is
+NOT entirely pristine; the 14z-62e option-A prose that said so is
+corrected in place) + 22 pristine copies; 2,592,654 patch bytes total.
+
+**Tools:** `tools/package_release.py` (deterministic — two runs byte-
+identical), `tools/apply_release.py` (shipped in the package; verifies
+every reference member, rebuilds the source, applies, refuses to write
+unless every target sha1 matches). **Gate `tests/test_release_roundtrip.sh`
+(ci_static) PASS:** 42/42 members byte-identical after the round trip,
+fingerprint 64426955 + whole-artifact manifest reproduced; corrupted
+patch / wrong target sha1 / one-bit-wrong dump each REFUSED with nothing
+written; rule-7 scan: 2.59 MB of patch bytes against 1,384,723 indexed
+64-byte reference chunks, zero hits, must-fire control caught (2 hits).
+Dependency: `xdelta3` (brew install xdelta) — the gate SKIPs without it.
+
+**Release unit decision (mine, open to veto):** merged-m6 only — the
+solos are instruments, the stock twin is never distributed.
+**RULED (maintainer, 2026-08-22): the package stays IN-TREE until
+MiSTer; a tagged GitHub release then covers both.** Pushed.
+
+## Session 14z-105 CLOSE — the freeze is GREEN end to end; commits
+## LOCAL, awaiting the maintainer's field test before push
+
+**Every verification of the 14z-105 freeze, final:**
+- run_suite: the three solo sets re-frozen (SUITE_ONLY targeted freeze of
+  the 9/10/11 self-frozen `.sha1` replays — every select-reaching tenant
+  replay moved, as the two added sprites require) and then the FULL
+  unfiltered verify on don_m11 / hui47 / pyron31: **SUITE GREEN x3**, 0
+  FAIL, 0 NONDETERMINISTIC; all 148 window/composite specs on their
+  frozen lines.
+- test_m3a_reproducible: all five artifacts rebuild bit-exact on the new
+  pins; whole-artifact manifests match (42/30/42/42/42).
+- Merged gates on m3b_merged13: test_version_string, test_oboro_select,
+  test_wheel_bank5 (AUTHORED 2), audit_select_bank_gates,
+  audit_roster_pairings 111/111, test_tenant_pairings 6/6, audit_trap_
+  parity, audit_fg_parity (native-parity), audit_clone_beam_lines,
+  audit_hui_grunt, test_dualtrack (frozen onsets held), test_fbneo_
+  legacy_oracle (frozen offset inventories held), test_merged_render_
+  content (bands byte-equal to the NEW solos) — ALL PASS.
+- Static: test_pcrel_escapes (solo + merged, control alive),
+  test_region_overlap (2033 held), test_pointer_flow (4 new baselines),
+  test_escape_triage (re-frozen, verdicts identical), test_manifest_merge
+  (re-pinned), test_tenant_loop (re-pinned), test_gfx_tile_codec (new).
+- run_all_static --strict: **PASS 98 / SKIP 0 / FAIL 0** (the suite grew
+  97 -> 98: test_gfx_tile_codec). An earlier run showed 2 FAILs that were
+  a RACE with my in-flight edits (the manifest_merge pin landing mid-run;
+  tenant_row_owner edits the generator in place) — both PASS alone and
+  in the clean re-run.
+- run_battery_m2: 23 PASS + the wide-render self-skip, which was then
+  run directly on the m5_stock6/don_m11 pair: PASS (the 14z-102 shape —
+  effectively 24/24).
+- audit_guard_corpus and audit_merged_legacy: run AFTER the close entry
+  while the maintainer tested — both PASS (see the post-freeze note).
+
+**Post-freeze, while the maintainer tests (2026-08-22):** the Oboro pick
+measured on FBNeo too — id 0x18 / base 0x0B3450 with Start, 0x08 /
+0x0A6418 without, field-for-field what MAME reads (the §4 dual-emulator
+agreement for new content); frozen as leg F of test_oboro_select.sh.
+The two long soaks were then run: **audit_merged_legacy PASS (rc=0)** —
+leg a 47/47 legacy replays on their exact frozen classes, leg b guard-
+clean vs the new solos; **audit_guard_corpus PASS — 316/316 guarded runs, zero vectors** on merged-m6 under every tenant forcing. Every verification the 14z-102 freeze had is now green on 14z-105 too.
+
+**FIELD-CONFIRMED AND PUSHED (maintainer, 2026-08-22):** "Tests confirm
+Oboro Bishamon and the M6 mark." Observation recorded: Oboro's pre-match
+INTRO is very long — vanilla vsavj's own boss intro, not ours, and he is
+not tournament-legal, so accepted as-is (no item). main + the four
+freeze tags pushed (cfb6bd3..f1db172).
+
+**Where the maintainer looks:** `tools/run_wide.sh build/m3b_merged13
+fbneo` — "M6" bottom-right on select; Bishamon + Start held -> Oboro.
+
+## Session 14z-105 — THE WINDOW EXECUTED: W1 THE OBORO SELECT HOOK +
+## W2 THE VERSION STRING, one freeze — donovan-m11 / huitzil-m20 /
+## pyron-m14 / merged-m6 (maintainer "happy with the plan, I'll test
+## before we push", 2026-08-22). Every gate that has finished is GREEN;
+## the suite re-freeze and the long merged batch run at close.
+
+**The opening measurement (RH-1, before a byte was authored):** on
+vanilla vsavj, with P1 Start held on the select screen, the player
+struct's input word `+0x394` reads `$8000` (`$0000` without) — so the
+`btst #7,$394(a6)` in vanilla's Gallon-variant confirm path at
+`PRG:0x020B9C` IS the Start test, and the template is exact; `$FF8060`
+reads 1 at the same time (the 14z-104 "is it live at select?" question:
+yes). The committed id stays 0x08 on vanilla (no Oboro path, as
+expected).
+
+**W1 — `oboro_select_hook`:** a 30-byte profile-gated `site_thunk`
+displacing the `cmpi.b #$2,$382(a6)` at 0x020B9C: Bishamon? / Start? /
+`move.b #$18,$382(a6)` / re-execute the displaced cmpi (its flags feed
+vanilla's `bne`) / rts. Declared identically in all three manifests
+(ENGINE-SITE, deduped to one; +2 ops at every N). Generator gained a
+`profile` key on site_thunk (mirrors select_wheel/sound_table; inert
+for every existing row) and `id_literal_ok` carries the deliberate
+0x08/0x02 compares. MEASURED on the probe and frozen as
+`tests/test_oboro_select.sh` (5 legs): P1 hold -> 0x18 + base
+`0x0B3450` in-match; no-hold -> 0x08 / `0x0A6418`; Start on Demitri ->
+0x01; P2 (default cell 0x05, D D L L) -> 0x18 / `0x0B3450`, P1
+untouched; STOCK twin -> 0x08. Stock rebuilt under the new rows =
+`883e7d17` = m5_stock5, whole-artifact manifest identical (30/30).
+
+**W2 — the version string:** `version_text/font/x/y/pal/base` knobs on
+`[[select_wheel]] roster21` (all three manifests, identical); the
+generator appends one 1x1 glyph entry per character to the copied
+wheel record (count 20 -> 22, budget 0x55 carried over and now
+asserted >= entries) and encodes `build/manifest/version_font.json`
+(5x7, 0-9 A-Z - . space, authored, NEW provenance) 2x into 16x16
+tiles handed to build_gfx through `wheel_bank5.json["authored"]`
+(place() same-source-or-fail; audit_gfx_merged + check_wheel_bank5
+know the kind). "M6" at screen (340,202) — the empty bottom-right
+corner, chosen from snapshots — pal row 0x19 (Phobos' medallion row,
+thunk-re-asserted every select frame, ink pen 7 = 0xFF8), codes
+0x1FE40/41 (free in the merged-m5 group C ledger). 0 ops.
+
+**THE CODEC FINDING (platform gotcha, gate `test_gfx_tile_codec.sh`):**
+the first probe drew the glyphs MIRRORED per 8-pixel half inside an
+opaque black box. The OBJ list had the sprites exactly where intended
+(x=0x194/0x1a4, y=0xCA, bank 5, pal 0x19, codes fe40/fe41), so the
+defect was in the tile bytes: `gfx_tiles.decode` had mapped plane bit i
+to pixel i since the module was written, and nothing had ever consumed
+pixel ORDER (cmd_match and BLANK compare raw bytes) — the first tile
+this project ever SYNTHESIZED exposed it, and only because "M6" is not
+symmetric ("M" looked right). Fixed both ways (bit i = pixel 7-i),
+transparent pen 15, and the OBJ->screen transform measured as
+(x-64, y-16). Re-probed: the MAME snapshot pixel-matches the intended
+bitmap with ZERO mismatches at (340,202) and zero opaque pen-0 pixels
+(`tests/test_version_string.sh` §2 — the render-layer check that a byte
+round-trip cannot replace).
+
+**The freeze (the 14z-99/102 rhythm):** op counts re-frozen with
+attribution (325/365/298; 600/652; 806/907); `build/merged_probe_w6`
+rehearsed, then don_m11 `1de9a027` (325) / hui47 `24a27940` (365) /
+pyron31 `6bf265ab` (298) / m5_stock6 `883e7d17` (UNCHANGED) /
+m3b_merged13 `64426955` (806, BIT-FOR-BIT the probe) built from the
+tree; expectation sets carried-renamed m10->m11, m19->m20, m13->m14 +
+registry rows; m3a pins + whole-artifact manifests moved (attributed:
+program members + the four GROUP C members = the glyph tiles; no
+QSound member). **Placements moved:** the thunk allocates per tenant
+iteration ahead of the regions, so every huitzil placement is +0x10
+and every pyron one +0x30 — bases.tsv re-derived from merged13's own
+table (phobos 0x4595b0, pyron 0x4ac90c, donovan held), pcrel
+[merged_*] + solo sections re-pointed (inventory unchanged 69/10/10),
+pointer_flow baselines re-frozen for all four (the +1 `data:long` is
+the record's count word; the merged pairs had silently stayed on
+merged11 since 14z-100 — the #94 class, now current). The standing
+re-point sweep executed: ~70 BUILD defaults (the m3b_merged11
+one-back set, the 14z-103/104 audits, tripwire/guard-corpus/
+projectile-clash, dualtrack, render-content D/H/P, region_overlap trio
+(section 5 re-measured: still 2033), identity PLAY pin, battery stock
+path, voice_row_range, hui_grunt per-build row, decode_stage_banners'
+donovan clean leg).
+
+**Green so far on the new artifacts:** test_oboro_select,
+test_version_string, test_wheel_bank5 (AUTHORED 2), audit_select_bank_
+gates, test_pcrel_escapes (solo + merged, control alive),
+test_region_overlap, test_pointer_flow, test_tenant_loop, test_gfx_
+tile_codec; m3a_reproducible and the long merged batch (roster
+pairings, tenant pairings, trap/FG parity, clone-beam lines, hui grunt,
+dualtrack, FBNeo oracle, render content) + the three run_suite
+re-freezes run at close — results in the CLOSE entry below.
+
+**Re-freezes the window forced, each attributed:** `test_manifest_merge`
+site_thunk counts (19,14,6)/30/5 -> (20,15,7)/31/6 (one row per manifest,
+dedupes to one); `tests/expected/escape_triage.txt` re-frozen in the
+gate's sorted form — the 25 verdicts are IDENTICAL, only the merged
+addresses moved (+0x10/+0x30) and with them the sort order;
+`test_region_overlap` section 5 re-measured UNCHANGED (2033).
+**The select-window specs did NOT move:** `propose_masked_specs` over
+all 148 window/composite specs of the three carried sets proposed the
+frozen line verbatim — the 14z-104 prediction ("more sprites shift the
+window end") is retracted; the end is the VS-phase re-init. Only the
+self-frozen `.sha1` replays were re-frozen, via a new `SUITE_ONLY=`
+authoring filter on `run_suite.sh` (prints FILTERED; never a verdict —
+the acceptance is the unfiltered verify run, which ran for all three
+builds at close).
+
+**N-2 policy applied (the 14z-102 standing rule):** build/don_m9,
+don_m9_s4, hui45, pyron29, m3b_merged11, m5_stock4 deleted (tracked
+metadata removed in this commit; recoverable via git history + the
+freeze tags); every live reference had been re-pointed first (only a
+per-build history row in audit_hui_grunt and a docstring still name
+them). The rehearsal probes merged_probe_w6 / probe_stock_w6 stay
+(evidence; the next attic pass takes them). [DONE 14z-106: moved to
+`../build_attic_14z105`.]
+
+**Retractions executed (grep'd):** "no in-game version string" (platform
+gotcha §3 + test_build_identity_distinct header); "Oboro's entry path
+is unlocated" qualified in id_space.md / select_screen.md — VANILLA's
+stays unlocated and irrelevant; the port has its own. 0x18 stays
+RESERVED for tenants (it is Oboro's).
+
 ## Session 14z-104 CLOSE — ritual complete
 
 The session, in one line: the §4 coverage debt was RETIRED end to end

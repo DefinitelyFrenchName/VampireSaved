@@ -1,6 +1,118 @@
-# NEXT SESSION — orientation (rewritten at the 14z-107 (9) close, 2026-08-24)
+# NEXT SESSION — orientation (rewritten at the 14z-107 CLOSE, 2026-08-24)
 
-> ## **NEWEST FIRST — 14z-107 (9): MiSTer SLICE D2 IS DONE. THE WIDE ROMSET
+> ## **START HERE — 14z-107 CLOSE. THE ARC IS MiSTer, AND ITS PLACEMENT
+> ## SLICES ARE DONE: D0 (the MRA), D1 (the runtime profile gate + the
+> ## QSound width), D2 (the SDRAM placement). THE OPENER IS SLICE D3 —
+> ## THE OBJ PROMOTE.**
+> ## `jtcps2_obj_scan.v:152` `st3_bank <= {table_y[12], table_y[14:13]}`
+> ## (the CPS-2 Turbo rule — the MiSTer twin of the 19-bit promote WIDE v1
+> ## already makes in FBNeo's `Cps2ObjDraw`, rule 1 v2), plus the
+> ## `dr_bank`/`obj_bank`/`rom_bank`/`rom0_bank` chain widened to 3 bits.
+> ## Gate: the MiSTer twin of the FBNeo B4 canary. Then D4, the 6 MB PRG
+> ## window. **Read `docs/project/mister_core.md` FIRST** — the synthesis,
+> ## in causal order; `mister_map.md` / `mister_fit.md` /
+> ## `platform/mister.md` are the logs it quotes, and where it and a log
+> ## disagree, THE LOG WINS.
+> ##
+> ## **D3 IS THE FIRST SLICE THAT FETCHES A TENANT TILE.** D2 built the
+> ## destination and the plumbing and nothing more: `rom0_bank[2]` is TIED
+> ## LOW, so `gfxc_sel` is constant 0, the two group-C read slots are
+> ## provably unreachable, and **D2 changes no fetch in the running game
+> ## at all.** That is why its evidence is an SDRAM IMAGE CENSUS and not a
+> ## replay. Do not read "the placement is proven" as "the art has been
+> ## fetched" — it has not, on any core, ever.
+> ##
+> ## **THE FROZEN §4 ANCHOR: MAME 2146 / sim 2609 / skew 463 ± 30**
+> ## (`tests/test_mister_sim_anchor.sh`, `05_timeout_idle`, round-1
+> ## match start). Measured on the REFERENCE core, host frame output OFF,
+> ## over 2100-3000 so the window could not box the answer in. Three
+> ## earlier numbers are RETRACTED and will still be found in old prose:
+> ## 2606/460 (that is the BOOT offset, not the anchor), 2507/361 and
+> ## 2502/356 (both measured while the harness was replaying the input
+> ## script). The band has never been widened.
+> ##
+> ## **THE PLACEMENT'S MARGINS ARE THIN — CHECK THEM BEFORE ADDING ART.**
+> ## The fit has **0.125 MB of slack in 64 MB**. **SDRAM bank 1 is EXACTLY
+> ## FULL** (8 MB PCM + 8 MB group-C obj bank 4 = 16,777,216 B to the
+> ## byte) and **bank 0 has 131,072 B free**. Two consequences that point
+> ## opposite ways: tenant art may grow FREELY inside the existing 16 MB
+> ## (a new tile above `0xEE73`/`0xFFDB` overflows nothing — the download
+> ## reserves the whole declared region either way), and the group-C
+> ## ROMSET REGION cannot grow AT ALL — a fifth group-C member overflows
+> ## immediately and there is nowhere to put it. Gate:
+> ## `tests/audit_mister_map_fit.sh` (ci_static, ~5 s), which models the
+> ## banks from the PLACED offsets and lengths with an overlap check.
+> ## **Three sizes of the same art, and this project has published a wrong
+> ## figure from each of the first two:** live bytes 6.39 MB, address
+> ## footprint 15.45 MB, declared region 16 MB.
+> ##
+> ## **THE FORK: `DefinitelyFrenchName/jtcores@vampire-saved`, pin
+> ## `0df6f000`, ELEVEN commits, FULLY PUSHED.** Fork pushes are
+> ## STANDING-AUTHORISED (maintainer, 2026-08-24) and the pin should be
+> ## bumped and pushed together. **THE MAIN VampireSaved REPO IS NEVER
+> ## PUSHED** — 20 local commits sit on `main` at this close and that is
+> ## correct. `cores/cps1`, `cores/cps2` and `cores/cps15` are
+> ## BYTE-UNTOUCHED and that is a `git diff` assertion
+> ## (`test_jtcores_twin` 2e); the whole-tree fork delta is held to a
+> ## declared 18 paths (2f).
+> ##
+> ## **TWO STANDING WARNINGS. BOTH WERE PAID FOR IN THIS SESSION, ONE OF
+> ## THEM THREE TIMES.**
+> ## **(1) SUSPECT THE INSTRUMENT BEFORE THE RTL.** Three separate
+> ## instruments produced false verdicts here while the thing under test
+> ## was innocent: the Verilator SDRAM model dropped `addr[22]`; the
+> ## forked frame writer `exit(0)`'d and REWOUND the parent's
+> ## `sim_inputs.hex` (so the simulated controller was replayed, once per
+> ## fork, and the FROZEN anchor was the artifact while the red one was
+> ## right); and `SimInputs` held P1's AND P2's buttons 5 and 6 down. A
+> ## fourth, in D2: the RAM-dump hook names an SDRAM ADDRESS, and D2 MOVED
+> ## work RAM (`RAM:$FF0000` = bank 0 byte `0x600000` on `cps2`,
+> ## **`0x648000` on `cps2w`**, where `0x600000` is now VRAM) — the gate
+> ## went red in 101 frames of 101 comparing work RAM against VRAM.
+> ## **Never blame a red anchor on RTL until a core-vs-core RAM comparison
+> ## says so** — that is `tests/test_mister_wide_inert.sh`'s job; the
+> ## anchor gate is a cross-IMPLEMENTATION oracle and a poor inertness
+> ## test. And any instrument naming a PHYSICAL address is invalidated by
+> ## a memory-map change.
+> ## **(2) NEVER EDIT A SCRIPT WHILE A RUN IS IN FLIGHT.** `sh` reads by
+> ## BYTE OFFSET, so even a COMMENT-ONLY edit derails the running
+> ## interpreter (`unexpected token 'else'`, `unexpected EOF`). Paid three
+> ## times this session, costing three 45-minute simulations and two gate
+> ## verdicts. The MEASUREMENTS usually survive — the Verilator run is a
+> ## separate process and has already written its dumps into the scratch
+> ## clone, so copy `cores/<core>/ver/game/{wram,sdram_bank?.bin}` out by
+> ## hand rather than paying the download again — and reverting the edit
+> ## AT ONCE re-aligns the interpreter for any run that has not yet
+> ## resumed reading. Freeze `tests/*.sh` and `tools/*.sh` before
+> ## launching anything long.
+> ##
+> ## **THE LANE, IN TWO COMMANDS** (`HANDOFF.md` "MiSTer" has the rest;
+> ## `export JTSIM_SCRATCH=/tmp/vampire-saved-jtsim`, NEVER inside the
+> ## repo; ~1 s per simulated frame and the 462-frame ROM download is
+> ## unskippable because it latches the decryption key):
+> ## `tools/run_sim_jtcps2.sh <rpl> <outdir> --frames N --wram A B`
+> ## (frame output OFF by default) and
+> ## `tools/mister_mra.sh --core cps2w --wide build/m3b_merged13 --out <dir OUTSIDE the repo>`.
+> ## Every `--wram` run now asserts its own dump set is COMPLETE
+> ## (`tools/check_wram_dumps.py`) — `compare_fields.py` GLOBS, so a lost
+> ## dump used to silently move the anchor instead of failing.
+> ##
+> ## **STILL OPEN FOR THE MAINTAINER: MiSTer PACKAGING** — which MRA is
+> ## the core's MAIN one, and how a release carries both `vsav.zip`
+> ## flavours (STATE "Decisions pending"). Neither blocks D3/D4; both
+> ## must be answered before a release. **RECORDED AS FUTURE, UNSCHEDULED
+> ## (maintainer, 2026-08-24):** the LIVING-DOCUMENTATION effort — of
+> ## which `docs/project/mister_core.md` + `tools/mk_mister_page.py` are
+> ## the pilot — and DISTILLING AI SKILLS from the project's learnings,
+> ## scoped by subject. Both follow MiSTer.
+> ##
+> ## **THE GAME SIDE IS PARKED AND GREEN.** The 14z-105 window is frozen
+> ## as donovan-m11 / huitzil-m20 / pyron-m14 / merged-m6, field-confirmed
+> ## and pushed 2026-08-22; play with
+> ## `tools/run_wide.sh build/m3b_merged13 fbneo`. Release packaging is
+> ## done (`release/merged-m6/`) and stays in-tree until MiSTer, when a
+> ## tagged GitHub release covers both.
+> ## **SLICE LOG (history) — 14z-107 (9): MiSTer SLICE D2 IS DONE. THE WIDE ROMSET
 > ## HAS A PLACE IN SDRAM AND EVERY BYTE OF IT WAS COUNTED.** Fork commit
 > ## `0df6f000`, **PUSHED** (fork pushes are standing-authorised now; the
 > ## MAIN repo is still never pushed). `cores/cps1`/`cps2`/`cps15`
@@ -46,7 +158,7 @@
 
 
 
-> ## **NEWEST FIRST — 14z-107 (8): THE SIMULATED CONTROLLER WAS PRESSING
+> ## **SLICE LOG (history) — 14z-107 (8): THE SIMULATED CONTROLLER WAS PRESSING
 > ## FOUR BUTTONS NOBODY SCRIPTED.** jtframe v1.7.3's `SimInputs` held
 > ## **P1's AND P2's buttons 5 and 6 DOWN** on every 6-button core — two
 > ## 8-bit constants on a `[9:0]` **ACTIVE-LOW** port: `parse_inputs()`
@@ -85,7 +197,7 @@
 > ## slots).
 
 
-> ## **NEWEST FIRST — 14z-107 (7): THE "VIDEO-SENSITIVE ANCHOR" IS
+> ## **SLICE LOG (history) — 14z-107 (7): THE "VIDEO-SENSITIVE ANCHOR" IS
 > ## ROOT-CAUSED, AND IT INVERTED A VERDICT.** The picture never touched
 > ## the CPU. jtframe's Verilator harness forks an ImageMagick child per
 > ## CHANGED frame — ALWAYS, `-video` is not what enables it — and that
@@ -130,7 +242,7 @@
 > ## slots) — and it can now change video output without the anchor going
 > ## ambiguous, which was the whole point of this session.
 
-> ## **NEWEST FIRST — 14z-107 (6): MiSTer SLICE D1 IS DONE, and it is the
+> ## **SLICE LOG (history) — 14z-107 (6): MiSTer SLICE D1 IS DONE, and it is the
 > ## slice where `cores/cps2w` STOPS BEING cfg-ONLY.** The QSound
 > ## sample-bank width fix ships behind a **RUNTIME** profile gate: **MRA
 > ## header byte 41, bit 0, ACTIVE LOW** (`0xFF` fill = profile OFF, the
@@ -181,7 +293,7 @@
 > ## (`SIM_CORE=cps2` for the reference leg) and is a cross-IMPLEMENTATION
 > ## oracle, not an inertness test.
 
-> ## **NEWEST FIRST — 14z-107 (5): MiSTer SLICE D0 IS DONE.** The MRA that
+> ## **SLICE LOG (history) — 14z-107 (5): MiSTer SLICE D0 IS DONE.** The MRA that
 > ## makes the WIDE image downloadable at all is written, pushed to the fork
 > ## (`38acc638`) and gated. `rom/vsavjw.rom` = **66,265,152 B**, header
 > ## words **6144 / 6400 / 15552 / 64704** — `docs/project/mister_map.md`
@@ -377,10 +489,15 @@
 > ## **AND THE ROSTER FITS 64 MB BY TOTAL — ~56.1 MB** (`mister_fit.md` §6):
 > ## PRG 6 MB fits bank 0 TODAY, QSound 16 MB fits bank 1 TODAY (PCM is
 > ## alone in a 16 MB bank), and ONLY GFX overflows, by ~6.4 MB — into
-> ## bank 1's ~7.1 MB of spare. **NEW PENDING DECISION: THE MiSTer
+> ## bank 1's ~7.1 MB of spare. ~~**NEW PENDING DECISION: THE MiSTer
 > ## MEMORY-MAP ROUTE** — (1) uprev to untagged master + XL + `mem.yaml`
 > ## cache lanes, or (2) stay at the pin and BANK-REPACK inside 64 MB.
-> ## **Recommendation (2)**; both still need the core-side format work.
+> ## **Recommendation (2)**~~ **DECIDED (maintainer, 2026-08-23): (2), the
+> ## BANK REPACK, measuring first; XL is the FALLBACK. Measured GO the same
+> ## day and SHIPPED in D2.** And the "~6.4 MB into bank 1's ~7.1 MB spare"
+> ## framing is RETRACTED twice over: 6.39 MB is LIVE BYTES, the address
+> ## footprint is 15.45 MB, and the DECLARED REGION the download reserves is
+> ## 16 MB — see the top banner.
 > ## **THE SIM LANE'S SDRAM MODEL IS FIXED (14z-107 (3), fork commit 3).**
 > ## It dropped `addr[22]` — which rides on `sdram_a[9]` as the tenth COLUMN
 > ## bit, NOT `addr[9]` — so GFX banks 2/3 were half-aliased. The "~3
@@ -390,7 +507,8 @@
 > ## because `jtcps1_obj_draw.v:137` skips blank tiles, so OBJECT TIMING
 > ## DEPENDS ON GFX CONTENT. Two more harness bugs had to be
 > ## fixed before `-stats` produced anything (commits 4 and 5).
-> ## NEXT OPENER: **the MEMORY-MAP ROUTE ruling**, then the core-side format
+> ## NEXT OPENER: ~~**the MEMORY-MAP ROUTE ruling**~~ [TAKEN 2026-08-23 —
+> ## bank repack], then the core-side format
 > ## work; phase B (the round-transition anchor on the full 12,120-frame
 > ## replay, ~3.5 h), the Verilator 8 MB-per-bank fix and P2/6-button
 > ## `SimInputs` are the queued follow-ups. [8 MB-per-bank done 14z-107 (3);
