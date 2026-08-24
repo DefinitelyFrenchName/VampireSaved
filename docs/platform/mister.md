@@ -1175,10 +1175,28 @@ and differs between the images. The remaining candidates, in order:
    QSound handshake the picture would stand exactly like this. That the two
    legs behave identically argues against it — unless the sound path is
    reached only after the failure.
-2. **A work-RAM differential against MAME.** The standard §4 bug report:
-   dump `RAM:$FF0000-$FFFFFF` on the core across the legal screen and against
-   MAME at the same game frames, and name the first divergent byte. MAME
-   dumps for frames 200-760 of this replay are cheap to produce.
+2. **A work-RAM differential against MAME — THE RECOMMENDED NEXT PROBE, and
+   both halves of it are one command each.** The standard §4 bug report: dump
+   `RAM:$FF0000-$FFFFFF` on the core across the divergence and against MAME at
+   the same game frames, and name the first divergent byte. Core frame =
+   simulated frame minus 659, and the divergence is at core frame ~448, so a
+   window of core 240-740 brackets it:
+
+   ```sh
+   # the core leg, ~25 min
+   ROMDIR=... tools/run_sim_jtcps2.sh tests/replays/11_pick_donovan.rpl OUT \
+       --core cps2w --wide build/m3b_merged13 --frames 1450 --wram 900 1400
+   # the MAME leg, ~1 min
+   DUMPS="$(python3 -c "print(';'.join(f'{f}:ff0000-ffffff' for f in range(200,760)))")" \
+   MAME_BIN=$HOME/.cache/vampire-saved/mame/cps2 \
+   MAME_ROMPATH="$PWD/build/m3b_merged13/rompath;$ROMDIR" \
+       tools/run_replay_mame.sh vsavjw tests/replays/11_pick_donovan.rpl OUT2/log OUT2/sb
+   ```
+
+   Compare core frame `f` against MAME frame `f-659`, masking the two windows
+   CLAUDE.md §4 masks (`$FF7F00-$FF7FFF` and `$FF043C`) — the pos-vs-neg
+   comparison above shows those are the only places two runs of this boot
+   legitimately differ.
 3. **The EEPROM.** The core's jt9346 starts blank; a first-boot path that
    differs from MAME's is a plausible source of extra boot phases, though not
    of a reset loop.
