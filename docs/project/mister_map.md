@@ -31,22 +31,37 @@ more tenant tile inside the existing 16 MB costs nothing) and a worse one for
 headroom (the group-C romset region cannot grow past 16 MB at all). §5's
 tables carry the correction in place.
 
-**SLICES D3 AND D4 ARE IN THE RTL (14z-107 (10)) — AND "THE CORE FETCHES
-TENANT ART" IS RETRACTED (14z-107 (11)). NO TENANT TILE HAS BEEN FETCHED ON
-ANY CORE, EVER.** The CPS-2 Turbo object promote
+**SLICES D3, D4 AND D5 ARE IN THE RTL, THE WIDE ROMSET BOOTS ON THE CORE,
+AND TENANT ART HAS BEEN FETCHED — obj bank 5 only (14z-107 (11)+(12)).**
+The CPS-2 Turbo object promote
 (`{ wide_en & table_y[12], table_y[14:13] }`, lifted into
 `cores/cps2w/hdl/jtcps2w_obj_bank.v`) drives the third obj bank bit through a
-chain widened to 3 bits, and `rom0_bank[2]` is no longer tied low — so §5's
-group-C destinations are REACHABLE for the first time. D4, the 6 MB read
-decode plus the `one_wait` boundary, shipped in the same session. What has
-NOT happened is the end-to-end demonstration: **the WIDE romset does not get
-past its own boot sequence on the core** (`docs/platform/mister.md` "THE WIDE
-ROMSET DOES NOT BOOT ON THE CORE YET"), the read probe counts ZERO reads in
-both group-C windows and zero in vanilla obj bank 2 as well, and the boot
-fault reproduces frame-for-frame with the profile bit CLEAR. §10's rows carry
-what each slice is actually held to; §9 open question 1 is NOT answered — a
-looping boot never reaches a select screen, so there is no obj bank 5 traffic
-to measure.
+chain widened to 3 bits and `rom0_bank[2]` is no longer tied low; D4, the
+6 MB read decode plus the `one_wait` boundary, shipped in the same session;
+and **D5** complements the CPS-2 key's encrypted-opcode RANGE word on its way
+into `jtcps2_dec_ctrl`, profile-gated, which is what the boot failure below
+turned out to be. With all three in, the core reaches the select screen and
+the read probe counts **9,038,400 reads over 105 DISTINCT TILE CODES
+`0x74D6-0xFE41` in group-C obj bank 5** — the select-wheel tenant art — with
+the control leg at zero. **§9 open question 1 is ANSWERED, YES, WITH ROOM.**
+**WHAT IS STILL NOT DONE, and it is not a slice: obj bank 4 — the FIGHTER
+art — has never been fetched, and the reason is the HARNESS.** The simulator's
+direction bits are TRANSPOSED (Left and Down swap, measured against the game's
+own `$FF8058` mirror), so the tenant-picking replay put the cursor on a legacy
+character. **No tenant has ever been in a match on the core, no frame has been
+compared programmatically against MAME's, and nothing has run on hardware.**
+`docs/project/mister_core.md` §12 is the ledger of what has never been tried.
+**[SUPERSEDED, kept because its ELIMINATIONS stand — the state before D5:**
+"What has NOT happened is the end-to-end demonstration: the WIDE romset does
+not get past its own boot sequence on the core (`docs/platform/mister.md`
+"THE WIDE ROMSET DOES NOT BOOT ON THE CORE YET"), the read probe counts ZERO
+reads in both group-C windows and zero in vanilla obj bank 2 as well, and the
+boot fault reproduces frame-for-frame with the profile bit CLEAR." The last
+clause is CORRECTED in place elsewhere: the two profile states are not
+frame-for-frame identical — the profile-ON leg completes ten program-ROM reads
+above `$400000` and the profile-CLEAR leg zero, and the instrument that said
+"identical" could not see the window it was being asked about.**]**
+§10's rows carry what each slice is actually held to.
 
 **SLICE D2 IS DONE (14z-107 (9)): THE PLACEMENT IS IN THE RTL AND THE
 IMAGE WAS COUNTED.** Fork commit `0df6f000` (pushed). The bank-0 re-pack,
@@ -870,8 +885,9 @@ slice as the decode.
    built to bound — obj fetches interleaving with the PCM stream inside bank
    1 — is therefore STILL UNMEASURED**, and it stays unmeasured until a
    tenant can be selected on the core (see the input defect in
-   `docs/platform/mister.md`, "THE SIMULATED JOYSTICK'S DIRECTIONS NEVER REACH
-   THE GAME").
+   `docs/platform/mister.md`, "THE SIMULATED JOYSTICK'S DIRECTIONS ARE
+   TRANSPOSED" — the bits arrive and are PERMUTED, Left and Down swapping;
+   they are not lost).
    *(Superseded text kept below; its eliminations stand.)*
    **[14z-107 (10): THE INSTRUMENT NOW HAS ITS SECOND LEG
    (`--core cps2w --wide build/m3b_merged13`) AND THE QUESTION IS STILL
@@ -1002,7 +1018,7 @@ self-contained piece. Two changes:
 | **D1 — DONE 14z-107 (6)**, fork commit `4840df8a` | QSound sample-bank width, RUNTIME-GATED. `cores/cps2w/hdl/` gains `jtcps2w_profile.v` (header byte 41 → `wide_en`) and `jtcps2w_qsnd_bank.v` (the gated latch), plus OVERRIDES of the two SHARED files it needs (`jtcps15_sound.v` from cps15, `jtcps2_game.v` from cps2). `PCM_AW` STAYS 23 — 24 does not compile (§7). No placement change. | DONE, and stronger than the row planned: the gated latch is simulated over **all 65,536 values of `dsp_ab` in both profile states** — with `wide_en` low `qsnd_addr[23]` is stuck at 0 and bits [22:16] equal the stock expression; with it high, bit 23 moves (16,384 vectors). Plus: `jtframe files` resolves cps2w to our four files and to NEITHER shared original, and the frozen line-by-line override delta. | FOUR FIRED. (A) the latch with the gate bypassed fails the `wide_en`-low leg; (B) the profile byte moved to 40 (jtframe's `JOY_BYTE`) fails; (C) the polarity flipped — so a 0xFF-filled stock header would arm the profile — fails; (D) a one-width perturbation of an override breaks the frozen delta. Gate `test_mister_wide_gate` (ci_portable). | `tests/test_mister_sim_anchor.sh` runs on **cps2w**, stock `vsavj`, against the cps2 expectations. It went RED first, at 2609/463, and root-causing it is the story of the slice: a 2x2 factorial over {stock RTL, D1 RTL} x {`pal_lut.hex` present, absent} showed the RTL axis changes NOTHING and the missing palette LUT changes EVERYTHING. (**Completed 14z-107 (7)**: the palette LUT changed only the NUMBER OF FORKS, and each fork's `exit(0)` rewound the parent's `sim_inputs.hex` — the simulated controller was being replayed. Fixed in the fork.) The new instrument is `tests/test_mister_wide_inert.sh` — cps2 vs cps2w, same download, BIT-IDENTICAL work RAM frame by frame. See STATE 14z-107 (6) G4-G7. |
 | **D2 — DONE 14z-107 (9)**, fork commit `0df6f000` | Placement, AS SHIPPED: bank-0 offsets re-packed for PRG 6 MB (VRAM `0x600000`, ORAM `0x640000`, WRAM `0x648000`, Z80 `0x658000`), the group-C redirect and the QSound split in `cores/cps2w/hdl/jtcps1_prom_we.v`, their read sides + the PCM-high slot + the two GFX slots in `cores/cps2w/hdl/jtcps1_sdram.v`, and `modules/jtframe/hdl/sdram/jtframe_ram1_7slots.v` (option A, pulled by cps2w's `game.yaml` alone). `rom0_bank` is 3 bits at the SDRAM port but bit 2 is TIED LOW — the promote is D3, so D2 changes no fetch. The frozen override delta grew from 2 files to 4. | **DONE, and it is a WHOLE-IMAGE census, not a spot check.** `tests/test_mister_sdram_census.sh` + `tools/mister_sdram_census.py` replay the download mapping (regions, the QSound split, the group-C redirect and the CPS-2 GFX scramble) and compare **all 67,108,864 bytes of all four banks** against §5. Result on the WIDE image (`vsavjw.rom`, 66,265,152 B, sha1 `d462e55a…`, transfer complete at simulated frame **659**): **PASS on every bank** — ba0 6,359,055 non-zero (37.9%), ba1 12,879,645 (76.8%), ba2 14,873,334 (88.7%), ba3 14,426,104 (86.0%). | FIRED. A 1 KiB shift of ANY placement constant is rejected: `z80` (206,536 bytes differ, first at `0x658000`), `pcm_hi` (714,457, first at `0x6E0002`), `gfxc5` (675,767, first at `0x7E0080`), `prg` (3,768,659, first at `0x0`), `pcm_lo` (bank 1). Plus the cross-checks in the gate: banks 1/2/3 byte-identical between cps2 and cps2w on the same stock image with bank 0 DIFFERING (the re-pack is confined to bank 0, and the comparison is not vacuous), and banks 2+3 DIFFERING between the two cores on the WIDE image (without the redirect group C aliases onto vanilla's art). | `tests/test_mister_sim_anchor.sh` GREEN on `cps2w` at MAME 2146 / sim 2609 / skew 463; `tests/test_mister_wide_inert.sh` GREEN (`cps2w` == `cps2`, bit-identical work RAM 540-640). **The census also CONTRADICTED this document and the census won** — see the retraction box at the top: the slack is 0.125 MB, not 0.708 MB, and bank 1 is exactly full. |
 | **D3 — RTL DONE 14z-107 (10)**, fork commit `b9899fa8` | The obj promote, AS SHIPPED: the CPS-2 Turbo rule lifted into `cores/cps2w/hdl/jtcps2w_obj_bank.v` (`bank = { wide_en & table_y[12], table_y[14:13] }`) and read in the ELSE arm of the `:141` terminator check, which is the reference core's VERBATIM; `dr_bank`/`obj_bank`/`rom_bank`/`rom0_bank` widened to 3 bits across FOUR override files; the game top's `{1'b0, rom0_bank}` tie REMOVED so bit 2 reaches `gfxc_sel`. | **THE PROOF IS THE EXHAUSTIVE BENCH; THE FETCH HAS NOT HAPPENED.** ("DONE, and it is a REAL FETCH on the REAL ROMSET" — **RETRACTED 14z-107 (11)**: `tests/test_mister_gfxc_fetch.sh` is RED, and its own vanilla-obj-bank control reads zero too, because the WIDE romset never boots.) `tests/test_mister_gfxc_fetch.sh` counts the SDRAM reads the core issues into the two group-C windows (derived from the RTL, not typed in) while a tenant-picking replay runs, and checks the tile codes against the roster's frozen live extents. Plus the exhaustive bench: `jtcps2w_obj_bank` over all 65,536 y-words in both profile states, 131,072 vectors, bank[2] set 32,768 times wide / **0** stock, and the six `gfx_tiles.py` encodings each decoding to their own bank with none of them setting the terminator bit. | **THE CONTROL IS ONE BYTE.** The same `.rom` with header byte 41 changed from `0xFE` to `0xFF` must read ZERO from both group-C windows; two further probes on the VANILLA obj banks must be non-zero in BOTH legs, so a zero is evidence about the core and not about the probe. On the bench: the promote's gate bypassed, and the promote reading `y[15]` instead of `y[12]` — the profile's first draft — both fire. | `test_mister_sim_anchor` on `cps2w`, stock `vsavj`; `test_mister_wide_inert` (cps2 vs cps2w, bit-identical work RAM). **The planned canary was NOT built**: it was designed for a world where the WIDE set could not boot, and once D4 shipped in the same session the real romset became the better witness. |
-| **D4 — RTL DONE 14z-107 (10)**, fork commit `dd242a65` | The PRG window, AS SHIPPED: `cores/cps2w/hdl/jtcps2_main.v` — `rom_cs` gains `wide_en & RnW & (A[23:21]==3'b010)`, `rom_addr` widens to `A[22:1]`, `one_wait`'s boundary becomes `wide_en ? 4'h6 : 4'h5`; `main_rom_addr` `[22:1]` and bank 0's `SLOT3_AW` `CPS==2 ? 22 : 21` follow it. | **THE DECODE DELIVERS — measured 14z-107 (11)**, not "the WIDE set BOOTS AND PLAYS", which is **RETRACTED**: it does not boot. The 68k program-ROM read probe caught the 68k fetching from `CPU:$4BE7C0-$4BE7C8` — ten reads, and every RAW word is the `.rom`'s byte for byte, against 54,961,148 reads below `$400000` as the must-fire control. What the CPU RECEIVED was the decryptor's output, which is slice D5's bug and not this decode's. The control leg (`wide_en` clear, one byte of `.rom` different) completes ZERO reads there. `docs/platform/mister.md` "CAN THE 68k READ ABOVE 4 MB?". | The `wide_en`-clear leg of the same pair: with the profile bit off the decode collapses to the stock flat 4 MB and the same replay produces no group-C fetch at all. | `test_mister_sim_anchor` on stock `vsavj` — this is the slice where a widened decode could most easily perturb legacy behaviour, and it is why the read decode is qualified `RnW` and the objcfg port's `!RnW` is re-read by the gate on every run. |
+| **D4 — RTL DONE 14z-107 (10)**, fork commit `dd242a65` | The PRG window, AS SHIPPED: `cores/cps2w/hdl/jtcps2_main.v` — `rom_cs` gains `wide_en & RnW & (A[23:21]==3'b010)`, `rom_addr` widens to `A[22:1]`, `one_wait`'s boundary becomes `wide_en ? 4'h6 : 4'h5`; `main_rom_addr` `[22:1]` and bank 0's `SLOT3_AW` `CPS==2 ? 22 : 21` follow it. | **THE DECODE DELIVERS — measured 14z-107 (11).** The original claim here, "the proof is that the WIDE set BOOTS AND PLAYS", was **RETRACTED** because it was not true when written; it is *now* true of the BOOT half — with D5 in, the WIDE romset boots to the select screen — and still false of "PLAYS": no tenant has ever been in a match on the core. The 68k program-ROM read probe caught the 68k fetching from `CPU:$4BE7C0-$4BE7C8` — ten reads, and every RAW word is the `.rom`'s byte for byte, against 54,961,148 reads below `$400000` as the must-fire control. What the CPU RECEIVED was the decryptor's output, which is slice D5's bug and not this decode's. The control leg (`wide_en` clear, one byte of `.rom` different) completes ZERO reads there. `docs/platform/mister.md` "CAN THE 68k READ ABOVE 4 MB?". | The `wide_en`-clear leg of the same pair: with the profile bit off the decode collapses to the stock flat 4 MB and the same replay produces no group-C fetch at all. | `test_mister_sim_anchor` on stock `vsavj` — this is the slice where a widened decode could most easily perturb legacy behaviour, and it is why the read decode is qualified `RnW` and the objcfg port's `!RnW` is re-read by the gate on every run. |
 
 | **D5 — DONE 14z-107 (11)**, fork commit `c00d7ce7` | The DECRYPTION RANGE: `cores/cps2w/hdl/jtcps2_decrypt.v` complements the key's range word on its way into `jtcps2_dec_ctrl`, gated on `wide_en` — `rng_eff = wide_en ? { addr_rng[15:10], ~addr_rng[9:0] } : addr_rng`. `jtcps2_dec_ctrl` itself is NOT overridden; `dec_en` still comes from the uncomplemented word. | The 68k program-ROM read probe on the WIDE romset: ten opcode fetches at `CPU:$4BE7C0-$4BE7C8`, RAW words the `.rom`'s byte for byte and LATCHED words the decryptor's, against 54,961,148 reads below `$400000` whose 2,000-record sample verifies 2000/2000. `tests/test_mister_prg_window.sh` freezes the pair; `test_mister_wide_gate` section 9 re-reads the four lines and the REFERENCE comparison D5 corrects for. | The `wide_en`-clear leg of the same one-byte pair: ZERO completed reads above `$400000` and zero SDRAM reads in the same window, because the decode is gated. Plus the gate's 9G: strip `wide_en` from the range fix and the frozen delta must move; and 9e, which fails if anyone overrides `jtcps2_dec_ctrl`. | `test_mister_sim_anchor` on stock `vsavj` and `test_mister_wide_inert` — both untouched BY CONSTRUCTION, since `rng_eff` IS `addr_rng` with the profile clear. |
 

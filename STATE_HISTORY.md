@@ -19,6 +19,182 @@ Rules of this file:
 - References of the form "STATE 14z-XX": look in STATE.md first, then here
   — section names are preserved verbatim, so the reference always resolves.
 
+## Session 14z-106 CLOSE — ritual complete
+
+The session, in one line: housekeeping executed (evidence committed,
+probes attic'd, the 14z-102 attic deleted); the MiSTer framing and all
+five alignment questions ruled and recorded; the arc OPENED with no RTL
+touched — GPL-3.0 licence, the public jtcores fork with the separate
+`jtcps2w` core pinned and gated (twin proof: the vsavj MRA identical to
+stock except `<rbf>`), the fit numbers measured (a wider GFX tier is
+unavoidable: 6.39 MB of roster art vs 0.49 MB blank in vanilla; no XL
+tier exists — retracted), and the Verilator lane proven on macOS at
+~1.4 s/frame with the `.rpl` translator gated.
+
+Ritual: STATE (this + entries (2)-(4)); NEXT_SESSION rewritten (banner
+carries the whole arc state + the opener); HANDOFF MiSTer block + docs
+index; GOTCHAS: none paid beyond what mister.md's recipe records
+(four failed sim attempts, each a missing GNU tool or module — recorded
+there rather than as a gotcha because the recipe IS the fix); suite
+`run_all_static --strict` PASS 100/0/0 at the slice-A commit (the
+translator gate registered after that run; it passes alone — counts
+next run, 101). Four commits LOCAL (b4a7d15, 1622522, 0d16a0b, ad25cdc);
+PUSH pending the maintainer's word.
+
+**Decisions pending for the maintainer:** THE MiSTer PROFILE SHAPE
+(recommendation: WIDE v1 verbatim on a 128 MB tier). **[RULED 2026-08-23:
+WIDE v1 verbatim, one romset — DECIDED in place in the Decisions section;
+the "128 MB tier" half is superseded, see 14z-107 (2).]** Next opener: the
+RAM comparison at a §4 anchor on the STOCK core (mister.md recipe; the
+`-setname`/sdram-reuse question first). Model note (maintainer asked):
+the opener is mechanical — any current model; the RTL width surgery
+waits on the ruling anyway.
+
+## Session 14z-106 (4) — SLICE C: THE SIMULATION LANE WORKS ON macOS
+## (stock jtcps2 running vsavj under Verilator, frames rendered, ~1.4 s
+## per frame); the translator + its gate landed; the oracle COMPARISON
+## itself is the next session's opener
+
+- **Recipe proven** (`docs/platform/mister.md` "Recipe"): brew go coreutils
+  gnu-sed xmlstarlet verilator imagemagick; modules fx68k/jt12/jt51/
+  jteeprom/jtdsp16 (setup_jtcores.sh now inits all five); `~/.mame/roms`
+  symlinks to `$ROMDIR` (outside the tree); `jtframe mra cps2w` builds
+  `rom/vsavj.rom` (scratch only); `jtsim -verilator -sysname cps2 -setname
+  vsavj -load -video N` from `cores/cps2/ver/game` IN A SCRATCH CLONE
+  (never inside `emu/jtcores` — jtsim litters the core dir). Four
+  attempts to get there, each a missing GNU tool or module, all recorded.
+- **Measured:** Verilator builds the core; the ROM download takes 462
+  simulated frames (10'43" wall, once — dumps `sdram_bank0-3.bin`); a
+  492-frame run = 11'20" → **~1.4 s/frame**; `frame_00480.jpg` shows
+  sprites — vsavj runs. The harness prints `ERROR: SDRAM rd/wr inputs
+  should be zero during initialization` every run and continues (upstream
+  behaviour; noted, not chased).
+- **`tools/rpl2siminputs.py` + `tests/test_rpl2siminputs.sh`** (ci_
+  portable): `.rpl` → jtframe v1.7.3 `sim_inputs.hex` (one hex word per
+  frame, applied entering blanking; P1 + 3 usable buttons — button 4
+  doubles as dip_test; NO P2). Refuses what the harness cannot express,
+  loudly. Of the legacy replays, `01_attract_long` and `05_timeout_idle`
+  translate; `04_select_fuzz` / `02_demitri_vs_cpu` refuse on button 4.
+  Extending `test.cpp` (P2, 6 buttons) is fork work when needed.
+- **NOT DONE — the comparison:** running a translated replay to a §4 sync
+  anchor with `JTFRAME_SIM_IODUMP`, extracting the 68k work-RAM window
+  and comparing against the MAME expectation. Hours of simulation; it is
+  the next opener, with the `-setname`/reload question first.
+  **CORRECTED 14z-107 (in place, entry not rewritten): `JTFRAME_SIM_IODUMP`
+  does NOT reach work RAM on CPS-2 — it dumps the 128-byte EEPROM. The
+  comparison needed a new harness hook (`JTFRAME_SIM_WRAMDUMP`, fork
+  commit 2). Both the `-setname` question and the comparison are ANSWERED
+  in the 14z-107 entry; `docs/platform/mister.md` carries the retraction.**
+
+## Session 14z-106 (3) — THE MiSTer ARC OPENED: slice A (fork scaffold +
+## licence) DONE and gated; the twin proof measured; no RTL touched
+
+**Slice A, executed (maintainer rulings 2026-08-22: 128 MB SDRAM; GPL-3.0
+for everything; fork under their GitHub; core name `jtcps2w`):**
+- `LICENSE` (GPL-3.0, FSF text) + README "Licence"; the pending decision
+  marked DECIDED.
+- **The fork:** https://github.com/DefinitelyFrenchName/jtcores (public,
+  GPL-3.0), branch `vampire-saved` from upstream tag `v1.7.3` =
+  `63688ce5`; one commit `b9d0565` = `cores/cps2w/` — `cfg/` a twin of
+  `cores/cps2/cfg` with `CORENAME=JTCPS2W`, `game.yaml` VERBATIM (every
+  `from: cps2` still resolves to cps2's hdl — the cps15 precedent), the
+  MRA set restricted by `mustbe.machines=["vsav"]`, msg + README.
+- **Pinned here:** submodule `emu/jtcores` (branch `vampire-saved`, 235 MB;
+  jtdsp16 `87fef51d` inited; `modules/jtframe/target/pocket` is a PRIVATE
+  ssh submodule — never init it); `tools/setup_jtcores.sh` (literal pin +
+  pristine check + jtdsp16 init + Go build + regenerates the mirror
+  `emu/jtcores-patches/0001-cps2w-scaffold.patch` = `format-patch
+  v1.7.3..pin`); gate `tests/test_jtcores_twin.sh` (ci_portable: pin,
+  game.yaml identical, macros/toml deltas EXACT, patch mirror == format-
+  patch, must-fire control) PASS 7/7.
+- **THE TWIN PROOF (measured):** jtframe's Go tool built (`go build`;
+  the bash wrapper needs GNU coreutils — call the binary; env JTROOT/
+  JTFRAME/JTBIN/CORES/ROM). `jtframe mra cps2` → 316 MRAs; `jtframe mra
+  cps2w` → 7 (the vsav family only). The `vsavj` MRA from the two cores
+  is byte-identical except `<rbf>jtcps2</rbf>` → `<rbf>jtcps2w</rbf>` —
+  the reference-leg MRA exists and binds stock vsavj to OUR rbf, which is
+  the stock leg of the emulator superset invariant on FPGA.
+- **Facts read from the tree** (`docs/platform/mister.md`, new; indexed in
+  docs/README.md): jtframe is VENDORED at v1.7.3 (not a submodule); the
+  RBF name is `"jt"+<core dir>`; `JTFRAME_SDRAM_LARGE` = `SDRAMW=23` (64 MB)
+  and **there is NO XL tier** (RTL grep, 0 hits — the cps2_wide.md claim
+  RETRACTED in place)
+  **[CORRECTED 14z-107 (2), in place, entry not rewritten: TRUE OF THE PIN,
+  and 64 MB there is PHYSICAL — but FALSE as a claim about jtframe.
+  Upstream master carries `JTFRAME_SDRAM_XL` / `SDRAMW=24` (two chips on one
+  module, nCS polarity), so the cps2_wide.md claim is PARTIALLY
+  UN-RETRACTED with a version qualifier. See 14z-107 (2).]**;
+  MiSTer's HPS exposes `ioctl_addr[26:0]` (128 MB)
+  while the core-facing port is `[25:0]`; 68k ROM bus `[20:0]` = 4 MB;
+  stock vsav already uses the full 32 MB GFX on jtcps2; the sim lane has
+  per-frame `.cab` input scripts + IOCTL/SDRAM dumps (the `.rpl`/RAM-
+  checksum twin) and jtcores' own `reg.yaml` regression lists `vsav`.
+- Go installed (`brew install go`, 1.27). Static suite re-run at close.
+
+**SLICE B EXECUTED — `docs/project/mister_fit.md`, the numbers:**
+- PRG: live extension `0x400010-0x4D10F3` (+ the 30-byte facing-alias
+  thunk PINNED at `0x5FFF00`, which is why `vsw.44` is written while
+  `vsw.43` is empty) → the image needs **4.82 MB**, deficit vs jtcps2's
+  4 MB bus **836 KB**.
+- QSound: extension content 918 KB = banks **0x80-0x8E**, all in the
+  jtcps15 aliasing class → the width fix is REQUIRED, not optional.
+- GFX — **THE DECISIVE NUMBER:** the roster's group C is **52,347 live
+  codes = 6.39 MB** (bank 4 45,737 + bank 5 6,610, `audit_gfx_merged_
+  census` PASS); vanilla's entire 32 MB holds **4,028 blank tiles =
+  0.49 MB** (per-bank census via `gfx_tiles.BLANK`; bank 1's 2,917
+  reproduces the 14z-62e figure). 13x short — and no tenant-dropping
+  variant fits either (the smallest band alone is 3.5x the blank total).
+  **A MiSTer build of this roster REQUIRES a GFX tier wider than 32 MB.**
+- Recommendation (Decisions pending below): **WIDE v1 VERBATIM on MiSTer**
+  on the 128 MB module — the MiSTer work becomes pure WIDTH (SDRAMW
+  23→24 + bank/prog/ioctl +1 bit + the core's buses), no content
+  re-layout, one romset for all three implementations, zero gameplay
+  consequence.
+
+Instruments the exploration located, for the record: `tests/audit_gfx_merged_
+census.sh` (as-built bank4 45,737 / bank5 6,610 of 65,536; all four pools
+empty), `build/m3b_merged13/gen.log` (wide_ext high-water `0x4D1100`,
+1.24 MB spare — but `vsw.44` is WRITTEN while `vsw.43` is empty, so the
+extent is NOT the cursor; measure before quoting 5 MB), `tools/obj_
+records.py` / `build/manifest/gfx_layout3.toml` for the static bands.
+
+## Session 14z-106 — HOUSEKEEPING (maintainer-ruled), then the MiSTer
+## alignment brief (no core work until the questions below are answered)
+
+**Housekeeping, each item ruled by the maintainer 2026-08-22:**
+- The 14z-105 verification evidence committed: 15 `build/*_w6*.log` +
+  `merged13_gates*.log` (suite x3, static x3, battery, soak, m3a,
+  propose, freeze builds) and `build/guard_corpus/m3b_merged13.
+  1787401830.tsv` (the 316/316 soak) — precedent: freeze-evidence logs
+  and the merged11/12 guard TSVs are tracked.
+- The rehearsal probes `build/merged_probe_w6` (155 MB) +
+  `build/probe_stock_w6` (71 MB) moved to **`../build_attic_14z105`**
+  (reversible; 0 tracked files inside; every reference is prose and now
+  annotated — HANDOFF x2, patch_notes, test_m3a_reproducible's comment).
+- **`../build_attic_14z102` (8.1 GB) DELETED** — the 14z-102 policy
+  condition ("after the next playtest cycle confirms nothing is missed")
+  was met twice (14z-103, 14z-105). Recoverable via git history + tags.
+- `emu/fbneo` "modified content" is NOT litter: `git apply --check -R`
+  reverses both `emu/fbneo-patches/0001` and `0002` cleanly, so the
+  submodule carries exactly the applied harness + WIDE patches.
+- One-back dirs (don_m10 / hui46 / pyron30 / m3b_merged12 / m5_stock5)
+  stay — the N-2 policy fires at the NEXT freeze.
+- Tracker check: every ticket the NEXT_SESSION history tail still lists
+  as open backlog (#10/#18/#19/#20/#22/#25/#28/#31/#38/#42/#77/#93/#94/
+  #100) is CLOSED on GitHub; `gh issue list` is empty. Nothing queued.
+- Verification: ROM audit 76/76 clean; `run_all_static --strict` on the
+  pruned tree **PASS 99 / SKIP 0 / FAIL 0** (strict makes a lost input
+  fatal — nothing depended on either attic). Log: `build/static_14z106.log`.
+
+**DECIDED (maintainer, 2026-08-22): THE MiSTer FRAMING.** The MiSTer
+deliverable is an **EXTENSION OF JOTEGO'S jtcps CORE** — not an FPGA
+re-implementation of the MAME emulation. This agrees with and sharpens
+the 2026-08-15 ruling (STATE_HISTORY "MiSTer = CORE SURGERY ONLY": PRG-cap
+lift + the QSound width fix + a MiSTer-shaped WIDE profile, GFX <= 32 MB).
+The alignment questions are under "Decisions pending — MiSTer alignment";
+no RTL is touched before they are answered.
+
+
 ## Session 14z-105 CLOSE (final) — ritual complete
 
 The session, in one line: the maintainer-directed window executed end to

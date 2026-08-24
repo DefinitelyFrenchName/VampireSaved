@@ -1678,7 +1678,73 @@ bank 4 is never fetched, and **ba1's 13,890 accesses/frame are the PCM stream
 alone** — within 0.3% of the stock core's 13,926. The row-thrash risk the
 repack actually creates — object fetches interleaving with QSound inside bank
 1 — is still **UNMEASURED**, and it stays that way until a tenant can be
-selected on the core. See the input defect below.
+selected on the core. See "THE SIMULATED JOYSTICK'S DIRECTIONS ARE
+TRANSPOSED" below.
+
+## THE SIMULATED JOYSTICK'S DIRECTIONS ARE TRANSPOSED (measured 14z-107 (12))
+
+**Left and Down swap. Up and Right are untested.** Measured on the core's own
+copy of the game's input mirror, not on the source: leg E of the tenant-match
+run dumped `RAM:$FF0000-$FFFFFF` across the cursor-press window (811 frames,
+absolute 1640-2450, dump set integrity-checked) while running
+`36_pick_tenant_cell` on `cps2w` with the WIDE romset.
+
+| the replay asked for | MAME's `$FF8058.w` | the CORE's `$FF8058.w` |
+|---|---|---|
+| Left (replay frames 1000, 1040) | `0x0002` | **`0x0004`** |
+| Down (replay frames 1080, 1120) | `0x0004` | **`0x0002`** |
+
+The bits **arrive and are permuted** — they are not lost. Twelve of the 811
+frames carry a direction bit, which is exactly the count the replay scripts.
+
+**WHAT IT COST, and why it is the lane's most instructive defect yet.** The
+measurement built to prove obj bank 4 — the tenants' FIGHTER art — is fetched
+returned **exactly zero** reads, in-match included. The RTL was innocent in
+every respect: the promote fired, the window decoded, the placement held. The
+cursor moved on every press, just not in the direction asked; it landed on
+Victor; and the core faithfully drew the character it was handed. **The
+RENDERED frame is what cracked it** — a VS screen showing Demitri vs Victor,
+against a replay that asks for a tenant. The counters alone read as "D3 does
+not fetch", which is a conclusion about the RTL drawn from a defect in the
+harness.
+
+**THE LIKELY CAUSE, STATED AS INFERENCE FROM TWO DATA POINTS.**
+`tools/rpl2siminputs.py` emits bits 4-7 as **U/D/L/R** on the strength of its
+own docstring ("P1 directions in JTFRAME_JOY order (default UDLR)"). If the
+harness consumes **U/L/D/R**, Down and Left trade places and Up and Right are
+untouched — exactly the observed pattern. **Up and Right are NOT exercised by
+these samples. Measure all four before changing one bit.**
+
+**THE CHAIN CHECKS OUT ON PAPER, WHICH IS THE POINT.** The translator's bit
+map matches `test.cpp`'s `parse_inputs`; neither `cps2` nor `cps2w` defines a
+`JTFRAME_JOY_*` override, so the default path applies; `in0 <=
+{joystick2[7:0], joystick1[7:0]}` puts the directions on `in0[3:0]`. Every
+step reads correct and the result is still wrong — which is why an input path
+is measured against the game's own mirror rather than reasoned about.
+
+**GATE CONSEQUENCE, and it is not a quiet one.**
+`tests/test_rpl2siminputs.sh` freezes the bit-map vector (`111 6ee 000 000
+080`) and the sha1 of the `05_timeout_idle` translation
+(`eb3e1d04e58b3a2b7bf713d40c4d6ac4796e550c`). **A bit-map fix MOVES BOTH.**
+They must be re-derived deliberately, with the mechanism named in the gate
+header — a frozen expectation that moves silently is precisely the failure
+this project has a rule against.
+
+**THE FOURTH INPUT-PATH DEFECT IN THIS LANE**, after the forked frame writer
+rewinding `sim_inputs.hex`, P1's buttons 5/6 held down and P2's held too — and
+the SEVENTH instrument defect overall. Three of the four were invisible until
+a replay first needed the feature: **the sim input path is only ever as tested
+as the last replay that used it.** Index entry:
+`docs/platform/gotchas.md`.
+
+**THE PICTURES.** `docs/project/images/mister_select_cps2w_f2400.jpg` (the
+core, `cps2w` + the WIDE romset) and `mister_select_mame_f1741.png` (MAME, the
+same romset and replay) are the select screen on both implementations, both
+showing the extended 21-cell wheel and the authored "M6" mark. They are the
+first pictures of this project's own content produced by an FPGA
+implementation. **They are a naked-eye pair, not a verdict** — nothing
+compares them programmatically — and the cursor sits on a different cell in
+each, which is this defect drawn rather than counted.
 
 ## Measured 14z-106: the twin proof
 
