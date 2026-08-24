@@ -2290,6 +2290,43 @@ Original write-up kept below.
 
 ## Decisions pending (human)
 
+- **DISTILL AI SKILLS FROM THE PROJECT'S LEARNINGS (maintainer direction,
+  2026-08-24).** Recorded as FUTURE, UNPLANNED work — nothing scheduled.
+  As was done for Sailor Moon S, distil the project's learnings into agent
+  SKILLS, **scoped by subject rather than by task**. The maintainer's sketch:
+  at least a **CPS-II** skill separate from a **VS / VS2 / VH2** skill, and
+  **MiSTer** separate from **emulation**; exact scopes to be agreed. Stated
+  rationale: they make further work markedly easier.
+  **The precedent is concrete and observable from inside a session** — the
+  SMS project produced `romhacking-methodology` (general RE/patch discipline)
+  and `snes-romhacking` (platform-specific hard rules), and both load into
+  Claude Code sessions on this machine today.
+  **Three observations to carry into the scoping conversation:**
+  1. **The split the maintainer proposes is the one `docs/README.md` already
+     uses.** "Would this still be true if we abandoned the roster hack
+     tomorrow?" separates `platform/` (CPS-2, MAME, FBNeo, MiSTer) from
+     `game/` (Vampire Savior itself) from `project/` (this port) — and it is
+     the same question that separates a CPS-II skill from a VS/VS2/VH2 skill
+     from a port skill. A skill that mixes those scopes fails the same way a
+     doc filed by task instead of by fact does.
+  2. **A skill is loaded BEFORE the work, so it must carry what you need to
+     know before you know you need it** — laws, traps and negative controls,
+     not reference data. SMS made this split explicitly:
+     `sms_hacking_playbook.md` quotes ZERO addresses on purpose and points at
+     the checked docs instead. Skill = the discipline; docs = the facts.
+     Candidate content from this project, all paid for: measure-don't-infer,
+     probe sparsity, the negative-control rule, "identify moves by measured
+     EFFECTS not the script's input name", "a gate that stops checking reads
+     GREEN not RED", "suspect the instrument before the thing under test",
+     and the §4 vocabulary of frozen non-exact classes.
+  3. **Skills go stale exactly like docs, and need the same enforcement.**
+     SMS ships `tools/checkskills.py`, which ID-locks the human playbook to
+     the agent skill so the two cannot drift. Whatever is distilled here
+     should ship with its checker in the same commit.
+  Sequencing: this naturally follows the living-documentation effort above
+  (a skill is a distillation, so it wants the synthesis to exist first), and
+  both follow MiSTer.
+
 - **THE LIVING-DOCUMENTATION EFFORT, and the option it creates (maintainer
   direction, 2026-08-24).** Recorded as DIRECTION, not as a task — nothing is
   scheduled and MiSTer stays the current arc. In their words: an important
