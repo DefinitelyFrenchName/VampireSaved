@@ -1639,6 +1639,47 @@ Facts that matter to the bank-repack arc:
   OVER the scroll left in bank 3 — a scheduling change, not just a
   placement change.
 
+## The per-bank profile of the WIDE image, on `cps2w` (measured 14z-107 (12))
+
+The section above bounds the HEADROOM with stock content on the stock core.
+This one is the repack itself, running: `cores/cps2w` with `wide_en` SET, the
+real `vsavjw.rom`, `05_timeout_idle`, 3,500 frames,
+`tests/audit_sdram_bank_load.sh --core cps2w --wide build/m3b_merged13 --log`.
+The transfer is asserted at **659** by the script, and the run's own
+match-start anchor measures **2806** — the frozen stock 2609 plus exactly the
+197-frame transfer difference — so the four phase boundaries name the phases
+they label instead of assuming them.
+
+| phase | ba0 | ba1 (PCM) | ba2 | ba3 | data bus |
+|---|---|---|---|---|---|
+| ROM download (1-659) | 24,073 | 25,497 | 25,497 | 25,501 | 25.0% |
+| attract (661-1461) | 38,261 | 3,466 / 78.6% | 0 | 9,446 / 25.2% | 12.7% |
+| select+VS (1463-2805) | **40,717** | 13,870 / 99.0% | 357 / 84.1% | 10,917 / 37.1% | 16.4% |
+| in-match (2812-3499) | **41,535** | 13,890 / 98.0% | 296 / 39.9% | 17,335 / 34.2% | 18.2% |
+
+Peak per bank, after the download: ba0 **54,363** at frame 1488 (**43.9%** of
+the 123,825 all-miss ceiling), ba1 14,499 (11.7%), ba2 3,848 (3.1%), ba3
+18,910 (15.3%). **`WARNING: (test.cpp) SDRAM reads clashed`: zero in 3,500
+frames.**
+
+**THE ANSWER TO `mister_map.md` §9 OPEN QUESTION 1 IS YES, WITH ROOM.** Bank 0
+carries seven streams including obj bank 5, and through the select screen — the
+phase where the wheel art is actually being fetched out of it — it runs at
+40,717 accesses/frame, **32.9% of its ceiling**, against the stock core's
+39,696 in the same phase. The redirect therefore costs bank 0 about **1,000
+accesses per frame, ~2.5%**. That is the right order for what the read probe
+sees on the same screen: 6,720 burst BEATS per frame in the obj-bank-5 window,
+which at four words per BA0 access is ~1,680 accesses. Nothing saturates and
+nothing clashes.
+
+**AND THE HALF IT DOES NOT ANSWER, which is the half this instrument was built
+for.** `05_timeout_idle` picks Demitri. No tenant is ever in the match, obj
+bank 4 is never fetched, and **ba1's 13,890 accesses/frame are the PCM stream
+alone** — within 0.3% of the stock core's 13,926. The row-thrash risk the
+repack actually creates — object fetches interleaving with QSound inside bank
+1 — is still **UNMEASURED**, and it stays that way until a tenant can be
+selected on the core. See the input defect below.
+
 ## Measured 14z-106: the twin proof
 
 `jtframe mra cps2` emits 316 MRAs; `jtframe mra cps2w` emits 7 — the

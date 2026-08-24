@@ -1634,3 +1634,53 @@ target carries 27 bits (`jtframe_emu.sv:334`), and each header start word is
   keeping: when a second implementation reads the same configuration word,
   DIFF THE EXPRESSION, not the result — the two agreed on every game either had
   ever run, and disagreed on the first one that mattered.
+
+## THE SIM HARNESS'S DIRECTION BITS ARE TRANSPOSED — Left and Down swap (measured 2026-08-24, 14z-107)
+
+**Measured, on the core's own copy of the game's input mirror.** Leg E of the
+14z-107 tenant-match run dumped `RAM:$FF0000-$FFFFFF` across the cursor-press
+window (811 frames, 1640-2450 absolute, integrity-checked) while running
+`36_pick_tenant_cell` on `cps2w` + the WIDE romset:
+
+| the replay asked for | MAME's `$FF8058.w` | the CORE's `$FF8058.w` |
+|---|---|---|
+| Left (replay frames 1000, 1040) | `0x0002` | **`0x0004`** |
+| Down (replay frames 1080, 1120) | `0x0004` | **`0x0002`** |
+
+The direction bits **arrive and are permuted** — they are not lost. Twelve of
+the 811 frames carry a direction bit, which is the expected count.
+
+**What it cost.** The MiSTer measurement built to prove obj bank 4 (the
+tenants' FIGHTER art) gets fetched returned **exactly zero** reads, in-match
+included. The RTL was innocent: the cursor moved on every press, just not in
+the direction requested, so it landed on Victor and the core drew the
+character it was handed. The rendered VS screen — Demitri vs Victor — is what
+cracked it; the counters alone read as "D3 does not fetch".
+
+**The likely cause, stated as INFERENCE from two data points.**
+`tools/rpl2siminputs.py` emits bits 4-7 as **U/D/L/R** on the strength of its
+own docstring, "P1 directions in JTFRAME_JOY order (default UDLR)". If the
+harness actually consumes **U/L/D/R**, Down and Left trade places while Up and
+Right are untouched — exactly the observed pattern. **Up and Right are NOT
+exercised by these samples and that half is untested.** Measure all four
+before fixing; do not swap two bits on the strength of two data points.
+
+**The chain "checks out on paper", which is the point.** The translator's bit
+map matches `test.cpp`; neither `cps2` nor `cps2w` defines a `JTFRAME_JOY_*`
+override, so the default path applies; `in0 <= {joystick2[7:0],
+joystick1[7:0]}` puts directions on `in0[3:0]`. Every step reads correct and
+the result is still wrong — which is why an input path is measured against the
+game's own mirror rather than reasoned about.
+
+**Gate consequence, do not do this quietly.** `tests/test_rpl2siminputs.sh`
+freezes the sha1 of the `05_timeout_idle` translation
+(`eb3e1d04e58b3a2b7bf713d40c4d6ac4796e550c`) and a frozen bit-map vector. A
+bit-map fix MOVES both. Re-derive them deliberately, with the mechanism named
+in the gate header — a frozen expectation that moves silently is the failure
+this project has a rule against.
+
+**The fourth input-path defect in this lane**, after the forked frame writer
+rewinding `sim_inputs.hex`, P1's buttons 5/6 held down, and P2's held too.
+Three of the four were invisible until a replay first needed the feature:
+**the sim input path is only ever as tested as the last replay that used it.**
+

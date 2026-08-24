@@ -835,12 +835,44 @@ slice as the decode.
 
 ## 9. Open questions, stated as questions
 
-1. **Does bank 0 absorb obj bank 5's select-screen traffic?**
-   `tests/audit_sdram_bank_load.sh` bounded **bank 1** (PCM has **98.3%** row
-   misses, so no locality to lose). Bank 0 already sustains **40,976**
-   accesses/frame = 32.9% of its all-miss ceiling, and the select+VS phase
-   adds up to ~12k obj accesses/frame. ~~Unmeasured. The instrument exists; it
-   needs a `cps2w` core carrying the map.~~
+1. ~~**Does bank 0 absorb obj bank 5's select-screen traffic?**~~
+   **ANSWERED YES, 14z-107 (12), MEASURED ON A BOOTING WIDE IMAGE — bank 0
+   does not come close to saturating, and the redirect costs it about 2.5%.**
+   `tests/audit_sdram_bank_load.sh --core cps2w --wide build/m3b_merged13`,
+   `05_timeout_idle`, 3,500 frames, transfer asserted at 659, the run's own
+   match-start anchor measured at **2806** — exactly the frozen 2609 plus the
+   197-frame transfer difference, so the four phase boundaries label the
+   phases they name rather than being assumed to.
+
+   | phase | ba0 | ba1 (PCM) | ba2 | ba3 | data bus |
+   |---|---|---|---|---|---|
+   | attract (661-1461) | 38,261 | 3,466 / 78.6% | 0 | 9,446 / 25.2% | 12.7% |
+   | select+VS (1463-2805) | **40,717** | 13,870 / 99.0% | 357 / 84.1% | 10,917 / 37.1% | 16.4% |
+   | in-match (2812-3499) | **41,535** | 13,890 / 98.0% | 296 / 39.9% | 17,335 / 34.2% | 18.2% |
+
+   **The answer, in one line: bank 0 runs at 40,717 accesses/frame through the
+   select screen — 32.9% of its 123,825 all-miss ceiling — with a whole-run
+   PEAK of 54,363 (43.9%) and ZERO `SDRAM reads clashed` in 3,500 frames.**
+   Against the stock baseline (`docs/platform/mister.md`, stock `vsavj` on
+   `cores/cps2`: 39,696 select / 40,976 in-match) the redirect adds about
+   **1,000 accesses/frame**, ~2.5%, which is what obj bank 5's wheel art costs
+   when it is served out of bank 0 — the read probe counts 6,720 burst BEATS
+   per select frame in that window, and at 4 words per BA0 access that is
+   ~1,680 accesses, the right order for the delta measured here. The bus stays
+   at 16-18%. **The repack's bank-0 half is GO on measurement, not on
+   argument.**
+
+   **WHAT THIS RUN DOES *NOT* BOUND, stated because the asymmetry matters:
+   bank 1's group-C half was never fetched.** `05_timeout_idle` picks Demitri,
+   a legacy character, so obj bank 4 (the fighter art) is never touched and
+   ba1's 13,890 accesses/frame are PCM and nothing else — the same figure the
+   stock core produces. **The half of the repack risk that this instrument was
+   built to bound — obj fetches interleaving with the PCM stream inside bank
+   1 — is therefore STILL UNMEASURED**, and it stays unmeasured until a
+   tenant can be selected on the core (see the input defect in
+   `docs/platform/mister.md`, "THE SIMULATED JOYSTICK'S DIRECTIONS NEVER REACH
+   THE GAME").
+   *(Superseded text kept below; its eliminations stand.)*
    **[14z-107 (10): THE INSTRUMENT NOW HAS ITS SECOND LEG
    (`--core cps2w --wide build/m3b_merged13`) AND THE QUESTION IS STILL
    OPEN, for a reason that is not the instrument's.** The WIDE romset does
