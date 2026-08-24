@@ -28,8 +28,26 @@
 > ## masked work RAM, which is what was measured; the profile-ON leg completes
 > ## ten program-ROM reads above `$400000` and the profile-CLEAR leg zero.
 > ##
-> ## **[SUPERSEDED] THE OPENER IS NOT A SLICE — IT IS A
-> ## BUG HUNT: THE WIDE ROMSET LOOPS ON ITS OWN BOOT.**
+> ## **THE OPENER, IN PRIORITY ORDER (14z-107 (11)):**
+> ## **(1) A REPLAY THAT REACHES A MATCH.** `test_mister_gfxc_fetch` is GREEN
+> ## on obj bank 5 (the wheel art, 105 tile codes `0x74D6-0xFE41` inside the
+> ## frozen extent `0xFFDB`) and RED on obj **bank 4** — the FIGHTER art —
+> ## because `11_pick_donovan` at 2,900 frames ends at the select screen and
+> ## no match starts. That is a replay to write, not a slice, and it is the
+> ## last thing between the arc and "a tenant fighter drawn on the core".
+> ## **(2) `audit_sdram_bank_load` ON A BOOTING WIDE IMAGE.** Every per-bank
+> ## load figure in `mister_core.md` §9 is the LOOPING boot's and means
+> ## nothing; `mister_map.md` §9 open question 1 (does bank 0 absorb obj bank
+> ## 5's select-screen traffic?) is finally answerable, and it now has
+> ## 9,038,400 reads to answer with.
+> ## **(3) VIDEO AGAINST MAME.** Still never done (`mister_core.md` §12): every
+> ## cross-implementation verdict in this lane is work-RAM fields at a sync
+> ## anchor, so "the picture looks right" has never been a checked claim — and
+> ## the select screen is now reachable on both implementations.
+> ##
+> ## **[SUPERSEDED — the cause was the decryption range, see above] THE OPENER
+> ## IS NOT A SLICE — IT IS A BUG HUNT: THE WIDE ROMSET LOOPS ON ITS OWN
+> ## BOOT.**
 > ## **Read `docs/project/mister_core.md` FIRST** — the synthesis, in causal
 > ## order; `mister_map.md` / `mister_fit.md` / `platform/mister.md` are the
 > ## logs it quotes, and where it and a log disagree, THE LOG WINS. The
