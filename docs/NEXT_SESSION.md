@@ -149,9 +149,24 @@
 > ## whole-image census passes on this exact image and core. **IT IS NOT THE
 > ## ROMSET:** MAME on the same rompath and replay is at the select screen
 > ## with the full 18-character wheel by frame 930. Eliminations, remaining
-> ## candidates and the recommended next probe (a work-RAM differential
-> ## against MAME across the legal screen) are in `docs/platform/mister.md`
-> ## "THE WIDE ROMSET DOES NOT BOOT ON THE CORE YET".
+> ## candidates are in `docs/platform/mister.md` "THE WIDE ROMSET DOES NOT
+> ## BOOT ON THE CORE YET".
+> ## **AND THE PROBE WAS TAKEN — THERE IS A LEAD, NOT A BLANK PAGE. THE FIRST
+> ## LIVE DIVERGENCE FROM MAME IS THE 68k SOUND DRIVER, AT MAME FRAME 266.**
+> ## Core work RAM at simulated frames 900-1400 against MAME at the same game
+> ## frames, masked per §4: 2 live bytes (a counter/RNG phase) through frame
+> ## 265, then **14 at frame 266 — `$FF025C/D` a channel record, `$FF0462/3`
+> ## the driver's current-record pointer spill (MAME rests at `…043C`, the
+> ## core reads `…025C`), `$FF04DB-$FF04E5`** — 42 at 267 with the
+> ## per-channel arrays at `$FF04A1-$FF04B5` diverging outright, then back to
+> ## 2-3 until **frame 461, where it explodes to 748 and the boot is lost**.
+> ## Nothing outside the sound area moves in between. Two instruments now
+> ## bracket the same fault from opposite sides (traffic at core ~448, state
+> ## at core 266). Start at `PRG:0x0011DE`, the driver's dispatch prologue
+> ## (`atlas/ram.md:66`). **CAUTION:** the pos/neg pair says the 6 MB decode
+> ## changes nothing on the masked basis, so either the boot jingle's record
+> ## is still inside the base 4 MB or the fault is upstream of the profile's
+> ## relocation of the twenty sound record arrays. Measure first.
 > ## **AND THE PROFILE BIT IS PROVABLY LIVE, VISUALLY:** the same legal screen
 > ## renders correctly with byte 41 = `0xFE` and as a flat yellow field with
 > ## only the CAPCOM logo with `0xFF`, because without the download redirect

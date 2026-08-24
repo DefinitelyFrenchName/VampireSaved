@@ -416,6 +416,40 @@ the CAPCOM logo left** with `0xFF`, because without the download redirect the
 window* (`SCR_OFFSET = 0`). A two-legged experiment whose legs differ by ONE
 BYTE, and the first thing it produced was a picture that cannot be misread.
 
+### AND THE ROOT-CAUSE PROBE WAS TAKEN: THE SOUND DRIVER, AT MAME FRAME 266
+
+The §4 differential ran before the session closed. `cps2w` + the WIDE image,
+`RAM:$FF0000-$FFFFFF` at simulated frames 900-1400 (core 241-741), against
+MAME on the same romset and replay at the same game frames, masking the two
+windows §4 masks:
+
+| MAME frame | live bytes differing (of 65,536) |
+|---|---|
+| 241-265 | **2** — `$FF8003` and `$FF8080` only, a constant counter/RNG phase |
+| **266** | **14 — the onset** |
+| 267 | 42 |
+| 281-441 | back to 2-3 |
+| **461** | **748** |
+| 541-741 | ~870, steady |
+
+**The onset is entirely in the SOUND DRIVER**: `$FF025C/D` (a `$FF02xx`
+channel record), `$FF0462/3` (the current-record pointer spill `$FF0460.l` —
+MAME resting at `…043C`, the core reading `…025C`, i.e. mid-scan),
+`$FF04DB-$FF04E5`, and the two counter bytes that were already off. At frame
+267 the per-channel arrays at `$FF04A1-$FF04B5` diverge outright. **Nothing
+outside the sound area moves until frame 461**, when it explodes and the boot
+is lost.
+
+Two independent instruments now bracket the same fault from opposite sides:
+the SDRAM traffic diverges at core frame ~448, and the 68k STATE diverges at
+core frame 266 and stays contained in the sound driver for ~180 frames first.
+And the sound path is exactly what the profile touched hardest — WIDE v1
+relocated **all twenty per-character sound record arrays** above
+`CPU:$400000`. **Caution before acting on that**: the pos/neg comparison says
+the 6 MB decode changes nothing on the masked basis, so either the boot
+jingle uses a record still inside the base 4 MB, or the fault is upstream of
+the relocation. Measure first.
+
 ### THE BANK-0 TRAFFIC ANSWER: STILL OPEN, AND NOW FOR A NAMED REASON
 
 `mister_map.md` §9 open question 1 asked whether bank 0 absorbs obj bank 5's
@@ -448,14 +482,13 @@ the override delta is frozen line by line. The profile is complete: every
 format cap CPS-2 WIDE v1 needs is lifted, gated, and proven at the expression
 level.
 
-**The next session opens on a BUG HUNT, not a slice.** The WIDE romset loops
-on its own boot, the divergence from the stock boot is bracketed to core frame
-~448, and the eliminations above rule out the profile, the core, the download
-and the romset. The recommended probe is the project's own standard one: dump
-`RAM:$FF0000-$FFFFFF` on the core across core frames ~240-740 and against MAME
-at the same game frames, and name the first divergent byte. MAME dumps for
-frames 200-760 of `11_pick_donovan` on `build/m3b_merged13` cost about a
-minute to produce.
+**The next session opens on a BUG HUNT, not a slice — and it opens with a
+LEAD, not a blank page.** The WIDE romset loops on its own boot; the
+eliminations rule out the profile, the core, the download, the romset and the
+probe; and the §4 differential names the **68k SOUND DRIVER at MAME frame
+266** as the first live divergence, contained there for ~180 frames before it
+becomes fatal. Start at `PRG:0x0011DE` (the driver's dispatch prologue,
+`atlas/ram.md:66`) and at what the boot jingle's record chain reads.
 
 **AND THE HONEST HEADLINE:** D3 was scoped as "the payoff slice — the first
 time a tenant tile is fetched on the core". It is not that. It is the slice

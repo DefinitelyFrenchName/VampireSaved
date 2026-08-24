@@ -1164,11 +1164,52 @@ where a work-RAM differential against MAME should be taken.
 elimination worth trusting: the same two legs render the legal screen
 differently (see "the cheapest proof that the profile bit is live" below).
 
+### THE FIRST DIVERGENT BYTE: THE SOUND DRIVER, AT MAME FRAME 266
+
+**The §4 differential was taken and it names a subsystem.** `cps2w` with the
+WIDE image, `RAM:$FF0000-$FFFFFF` dumped at simulated frames 900-1400 (core
+frames 241-741), against MAME on the same romset and replay at the same game
+frames, masking the two windows CLAUDE.md §4 masks:
+
+| MAME frame | live bytes differing (of 65,536) |
+|---|---|
+| 241-265 | **2** — `$FF8003` and `$FF8080` only, a constant frame-counter/RNG phase |
+| **266** | **14, and this is the onset** |
+| 267 | 42 |
+| 281-441 | back to 2-3 |
+| **461** | **748** |
+| 541-741 | ~870, steady |
+
+**The onset is entirely in the SOUND DRIVER.** At MAME frame 266 the fourteen
+bytes are `$FF025C/D` (a `$FF02xx` channel record — `atlas/ram.md:66` names
+the 0x20-stride records at `$025C/$027C/$029C…`), `$FF0462/3` (the driver's
+current-record pointer spill `$FF0460.l`: MAME rests at `…043C`, the core
+reads `…025C`, i.e. mid-scan), `$FF04DB-$FF04E5`, and the two counter bytes
+that were already off. At frame 267 the driver's per-channel arrays at
+`$FF04A1-$FF04B5` diverge outright — the core holding `C0` where MAME holds
+an alternating `00/01`. Nothing outside the sound area moves until frame 461,
+when the divergence explodes and the boot is lost.
+
+**That is the strongest single lead in this file**, and it corroborates the
+traffic bracket from the other side: the traffic divergence is at core frame
+~448 and the STATE divergence starts at core frame 266 in the sound driver
+and stays contained there for ~180 frames before it becomes fatal. The 68k
+sound path is also exactly what the profile touched hardest — WIDE v1
+relocated **all twenty per-character sound record arrays** above
+`CPU:$400000` (`cps2_wide.md` "B4 prg").
+
+**One caution before acting on it.** The pos/neg comparison shows the 6 MB
+decode changes nothing on the masked basis, so if the driver were failing
+*because* it cannot read a relocated array, turning the decode on ought to
+have changed something. Either the boot jingle uses a record still inside the
+base 4 MB, or the fault is upstream of the relocation. Measure before
+theorising; the dumps to do it with are one command each (below).
+
 **WHERE TO LOOK NEXT.** The failure is shared between the two profile states
 and specific to the WIDE image, so it is in a path that is the same in both
 and differs between the images. The remaining candidates, in order:
 
-1. **The sound path.** The legal screen is where the Capcom jingle plays, and
+1. **The sound path — NOW THE MEASURED LEAD, see above.** The legal screen is where the Capcom jingle plays, and
    the profile RELOCATED all twenty per-character sound record arrays above
    `CPU:$400000` (`cps2_wide.md` "B4 prg"). With the profile clear those reads
    return `0xFFFF`; with it set they return ROM. If the 68k blocks on the
