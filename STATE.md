@@ -487,7 +487,26 @@ LEAD, not a blank page.** The WIDE romset loops on its own boot; the
 eliminations rule out the profile, the core, the download, the romset and the
 probe; and the §4 differential names the **68k SOUND DRIVER at MAME frame
 266** as the first live divergence, contained there for ~180 frames before it
-becomes fatal. Start at `PRG:0x0011DE` (the driver's dispatch prologue,
+becomes fatal. **BEFORE the driver trace, run the THREE-WAY DISCRIMINATOR (added
+14z-107 (10) review) — it is one probe and it can invalidate the trace.**
+The report reads "profile-on and profile-off are frame-for-frame identical"
+as ELIMINATING the profile. A third reading fits the same evidence and was
+not named: **if D4's 6 MB decode does not actually function, then `wide_en`
+set behaves exactly like `wide_en` clear for every read above `CPU:$400000`,
+and the two runs are identical FOR THAT REASON.** This matters because
+WIDE v1 relocated all twenty per-character sound record arrays above
+`$400000`, and the sound driver is precisely the subsystem that diverges.
+The census proves the DATA is placed; nothing yet proves the 68k can READ
+it. So instrument `rom_cs`/`main_rom_addr` for `A >= $400000` across the
+boot window with `wide_en` SET, and split three ways:
+  * **zero such reads** -> the relocation is not implicated in the boot
+    fault, the fault is elsewhere, and D4 stays UNPROVEN (a §12 hole);
+  * **reads occur, bytes correct** -> D4 works, the sound path is the
+    right hunt, proceed to the trace;
+  * **reads occur, bytes wrong** -> **D4 IS THE BUG** and the sound-driver
+    divergence is a downstream symptom; the trace would have burned hours
+    on a consequence.
+Only after that, start at `PRG:0x0011DE` (the driver's dispatch prologue,
 `atlas/ram.md:66`) and at what the boot jingle's record chain reads.
 
 **AND THE HONEST HEADLINE:** D3 was scoped as "the payoff slice — the first
