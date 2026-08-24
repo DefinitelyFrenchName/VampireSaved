@@ -29,9 +29,19 @@
 #   * `WARNING: (test.cpp) SDRAM reads clashed` lines, a direct contention
 #     signal from the harness (it prints at most 25).
 #
-# WHAT IT CANNOT DO, stated up front: a WIDE romset does not load on the stock
-# core, so this bounds the HEADROOM of the repack; it does not prove the
-# repacked design. The extrapolation is written out in the report it prints.
+# WHAT IT COULD NOT DO UNTIL SLICE D3, stated up front because the sentence
+# stood here for four sessions: a WIDE romset does not load on the STOCK core,
+# so a cps2 run bounds the HEADROOM of the repack and does not prove the
+# repacked design. `--core cps2w --wide BUILD_DIR` is the other leg, and it is
+# what answers docs/project/mister_map.md section 9 open question 1 — whether
+# bank 0 absorbs obj bank 5's select-screen traffic — because only a core
+# carrying the obj promote can produce that traffic at all.
+#
+# READ THE PEAK TABLE, NOT ONLY THE PHASE TABLE. Saturation is a property of
+# the WORST interval, not of a phase average, and the phase boundaries are
+# frozen constants that a different romset can invalidate. The peak table is
+# derived from the run's own reporter intervals and needs no boundary to be
+# right.
 #
 # TIER: emulator/manual. Needs ROMDIR + Verilator + ~50 min. NOT ci_portable,
 # NOT ci_static; HANDOFF.md indexes it with test_mister_sim_anchor.sh.
@@ -57,10 +67,12 @@ REPO="$(cd "$(dirname "$0")/.." && pwd)"
 
 RPL="$REPO/tests/replays/05_timeout_idle.rpl"
 FRAMES=2800
-LOG=""; TSV=""; OUTDIR=""
+LOG=""; TSV=""; OUTDIR=""; CORE=cps2; WIDEBUILD=""
 while [ $# -gt 0 ]; do
     case "$1" in
     --frames) shift; FRAMES="${1:?--frames needs N}" ;;
+    --core)   shift; CORE="${1:?--core needs cps2|cps2w}" ;;
+    --wide)   shift; WIDEBUILD="${1:?--wide needs a build dir}" ;;
     --log)    shift; LOG="${1:?--log needs a file}" ;;
     --tsv)    shift; TSV="${1:?--tsv needs a file}" ;;
     -h|--help) sed -n '2,50p' "$0"; exit 0 ;;
@@ -97,12 +109,28 @@ ATTRACT_END=1265    # MAME 800-803 start press + 462
 SELECT_END=2608     # one frame before the match-start anchor
 MATCH_START=2614    # a few frames inside the match
 
+# THE WIDE IMAGE IS 66,265,152 B RATHER THAN 46,407,744, so its transfer is
+# longer and EVERY boundary above moves with it — the four constants are
+# absolute simulated frames and the replay is shifted by the transfer length
+# (tools/run_sim_jtcps2.sh --offset). Measured 14z-107 (9): "ROM file
+# transfered (frame 659)". The shift is applied, not assumed: the run's own log
+# is checked against it below, and the PEAK table does not depend on any of
+# these four numbers.
+WIDE_DL_END=659
+if [ -n "$WIDEBUILD" ]; then
+    SHIFT=$((WIDE_DL_END - DL_END))
+    DL_END=$WIDE_DL_END
+    ATTRACT_END=$((ATTRACT_END + SHIFT))
+    SELECT_END=$((SELECT_END + SHIFT))
+    MATCH_START=$((MATCH_START + SHIFT))
+fi
+
 if [ -z "$LOG" ]; then
     [ -n "${ROMDIR:-}" ] || { echo "SKIP: ROMDIR unset (this instrument runs the real romset)"; exit 77; }
     command -v verilator >/dev/null 2>&1 || { echo "SKIP: verilator not installed (docs/platform/mister.md Recipe)"; exit 77; }
     [ -e "$REPO/emu/jtcores/.git" ] || { echo "SKIP: emu/jtcores not initialised (tools/setup_jtcores.sh)"; exit 77; }
     if [ -z "$OUTDIR" ]; then OUTDIR="$(mktemp -d)"; fi
-    echo "== sim leg (stock jtcps2 under Verilator, -stats; ~50 min) =="
+    echo "== sim leg (core $CORE under Verilator, ${WIDEBUILD:+WIDE romset, }-stats; ~50 min) =="
     # --frame-output off is the default, and is passed explicitly because this
     # instrument READS THE LOG: jtframe's frame writer forks a child per
     # changed frame, and a child's exit(0) flushes a COPY of the parent's
@@ -110,9 +138,19 @@ if [ -z "$LOG" ]; then
     # DUPLICATED once per fork (measured 14z-107 (7): 14 forks -> 14 copies of
     # one line). The parser below de-duplicates anyway, but a run that never
     # forks has nothing to de-duplicate.
-    "$REPO/tools/run_sim_jtcps2.sh" "$RPL" "$OUTDIR" --core cps2 --frame-output off \
+    "$REPO/tools/run_sim_jtcps2.sh" "$RPL" "$OUTDIR" --core "$CORE" --frame-output off \
+        ${WIDEBUILD:+--wide "$WIDEBUILD"} \
         --frames "$FRAMES" --stats || { echo "FAIL: the sim leg did not complete"; exit 1; }
     LOG="$OUTDIR/jtsim.log"
+fi
+# THE TRANSFER LENGTH IS ASSERTED, NOT ASSUMED. Every phase boundary above is
+# an absolute frame, so a transfer of a different length silently mislabels
+# all four of them.
+xfer="$(sed -n 's/.*ROM file transfered (frame \([0-9]*\)).*/\1/p' "$LOG" | head -1)"
+if [ -n "$xfer" ] && [ "$xfer" != "$DL_END" ]; then
+    echo "FAIL: the log says the transfer ended at frame $xfer, the phase"
+    echo "      boundaries assume $DL_END. Every phase below would be mislabelled."
+    exit 1
 fi
 [ -s "$LOG" ] || { echo "FAIL: no log at $LOG"; exit 1; }
 
@@ -186,6 +224,29 @@ if not all(b["t"] > a["t"] for a, b in zip(rows, rows[1:])):
     print("FAIL: stats timestamps are not strictly increasing after de-duplication —")
     print("      the log is not a faithful record of one run.")
     sys.exit(1)
+
+# ...AND THE COUNTERS MUST BE MONOTONIC TOO (14z-107 (10)). The check above
+# has always guarded the TIME axis; the counters are cumulative and were
+# taken on trust. They cannot be: the reporter writes on block-buffered
+# stdout into a log the frame counter also writes, so a line can be TORN and
+# still match the regex with one field carrying a spliced value. A phase
+# figure survives that (it is a first/last difference over hundreds of
+# intervals) but a PEAK does not — one bad row produced a ba3 peak of
+# 16,870,809 accesses per frame, 13,624% of the physical ceiling, and it was
+# reported without comment. Drop any row that decreases a cumulative counter.
+kept, drops = [], 0
+for r in rows:
+    if kept and any(r[k][b] < kept[-1][k][b]
+                    for k in ("count", "samerow", "rd", "wr") for b in range(4)):
+        drops += 1
+        continue
+    kept.append(r)
+if drops:
+    print(f"NOTE: {drops} stats line(s) dropped as NON-MONOTONIC — a torn line "
+          "that still parses.\n      Phase figures are first/last differences "
+          "and are unaffected; the PEAK table is not, which is why this check "
+          "exists.")
+rows = kept
 
 if not rows:
     print("FAIL: no well-formed SDRAM_STATS_RAW lines in the log (%d tokens seen)." % seen)
@@ -287,6 +348,44 @@ for name, f0, f1 in phases:
           "%.0f MHz x 16 bit" % ("", "", "ALL", w["tot"]/fr, 100.0, tot_kibs,
                                  w["tot_act"]/fr, util, SDRAM_HZ/1e6))
     print()
+
+# --- THE PEAK, which is what saturation actually means ---------------------
+# A phase average hides a spike, and the phase boundaries are frozen constants
+# that a different romset can invalidate. This table is derived from the run's
+# own consecutive reporter intervals and depends on no boundary at all.
+#   The all-miss ceiling: one transaction costs STW = 13 SDRAM clocks
+#   (jtframe_sdram64_bank.v), so a bank can serve
+#   96e6 * FRAME_PS/1e12 / 13 transactions in one video frame.
+CEIL = SDRAM_HZ * (FRAME_PS/1e12) / 13
+print("== PEAK interval, per bank — the saturation answer ==")
+print(f"  all-miss ceiling = {CEIL:,.0f} transactions per video frame "
+      f"(STW 13 at {SDRAM_HZ/1e6:.0f} MHz)")
+print(f"  AFTER the ROM download (frame > {dl_end}), which is one command per")
+print( "  byte and saturates every bank by construction — it is a command-rate")
+print( "  baseline, not a load the running game ever produces.")
+print(f"{'ba':>3} {'peak acc/fr':>12} {'% ceiling':>10} {'at frame':>9} "
+      f"{'peak ACT/fr':>12} {'% ceiling':>10} {'at frame':>9}")
+for k in range(4):
+    best_acc = (0.0, 0.0); best_act = (0.0, 0.0)
+    for a, b in zip(rows, rows[1:]):
+        if a["frame"] <= dl_end: continue
+        df = (b["t"] - a["t"]) / FRAME_PS
+        # A PEAK IS A RATIO, SO GUARD ITS DENOMINATOR. The reporter's lines
+        # are block-buffered into a log that the frame counter also writes,
+        # so a torn line can leave two surviving rows a few nanoseconds
+        # apart; dividing by that produces a "peak" of millions per frame
+        # (measured 14z-107 (10): ba3 at 16,870,809/frame, 13,624% of the
+        # ceiling). One interval is ~0.994 video frames, so anything under
+        # half a frame is not an interval.
+        if df < 0.5: continue
+        acc = ((b["rd"][k]-a["rd"][k]) + (b["wr"][k]-a["wr"][k])) / df
+        act = (b["count"][k]-a["count"][k]) / df
+        if acc > best_acc[0]: best_acc = (acc, b["frame"])
+        if act > best_act[0]: best_act = (act, b["frame"])
+    print("%3d %12.0f %9.1f%% %9.0f %12.0f %9.1f%% %9.0f" % (
+        k, best_acc[0], 100.0*best_acc[0]/CEIL, best_acc[1],
+        best_act[0], 100.0*best_act[0]/CEIL, best_act[1]))
+print()
 
 print("NOTES")
 print("  * access/fr = READ+WRITE commands per video frame. ACT/fr = ACTIVE")

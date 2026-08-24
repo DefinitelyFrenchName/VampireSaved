@@ -27,18 +27,41 @@
 +//   5. `wide_en` routed into jtcps1_sdram (the download redirects and the two
 +//      read-side selects all take it there);
 +//   6. the SDRAM instance resolves to cores/cps2w/hdl/jtcps1_sdram.v;
-+//   7. `rom0_bank` widened to 3 bits at the SDRAM port, with bit 2 TIED LOW —
-+//      that bit is the CPS-2 Turbo obj promote and it is slice D3's. Until
-+//      then the two group-C read slots are provably unreachable and D2's
-+//      evidence is the SDRAM image census, not a fetch.
++//   7. `rom0_bank` widened to 3 bits at the SDRAM port. D2 left bit 2 TIED
++//      LOW, so the two group-C read slots were provably unreachable and D2's
++//      evidence was the SDRAM image census rather than a fetch.
++//
++// SLICE D3 UNTIES IT, and that is the whole of the slice at this level:
++//   8. `rom0_bank` is now the 3-bit bank the object engine produces, driven
++//      end to end from cores/cps2w/hdl/jtcps2_obj_scan.v's CPS-2 Turbo
++//      promote through jtcps2_obj and jtcps1_video. Bit 2 selects GFX group C
++//      — the three tenants' art — and reaches jtcps1_sdram's `gfxc_sel`,
++//      which is itself ANDed with wide_en. THIS IS THE FIRST SLICE IN WHICH
++//      THE CORE CAN FETCH A TENANT TILE.
++//   9. `wide_en` routed into jtcps1_video, which passes it to the object
++//      scanner: the promote is gated at its source as well as at its
++//      destination, so with the profile clear bit 2 is 0 by construction and
++//      every downstream expression collapses to the reference core's.
++//
++// SLICE D4 adds the 6 MB PROGRAM WINDOW:
++//  10. `main_rom_addr` widened from [21:1] to [22:1] — 8 MB of reach, 6 MB
++//      loaded — and `SLOT3_AW` follows it in jtcps1_sdram. The extra bit is 0
++//      for every stock address, so the word address is unchanged there.
++//  11. `wide_en` routed into jtcps2_main, which is where the read decode and
++//      the wait-state boundary are gated.
 +// ---------------------------------------------------------------------------
 -wire [22:0] qsnd_addr;
 +wire [23:0] qsnd_addr;   // CPS-2 WIDE: [23] = DSP sample bank 0x80+
-+// CPS-2 WIDE: the SDRAM side takes THREE bank bits. Bit 2 selects GFX group C
-+// and is driven by the obj promote in slice D3; it is tied low here so D2
-+// changes no fetch at all.
-+wire [ 2:0] rom0_bank_sdram = { 1'b0, rom0_bank };
+-wire [21:1] main_rom_addr;
++wire [22:1] main_rom_addr;   // CPS-2 WIDE: 6 MB of program (slice D4)
+-wire [ 1:0] rom0_bank;
++// CPS-2 WIDE: THREE bank bits, from the CPS-2 Turbo obj promote (slice D3).
++// Bit 2 selects GFX group C and is 0 unless wide_en is set, because the
++// promote that produces it is gated in jtcps2_obj_scan.
++wire [ 2:0] rom0_bank;
 +wire        wide_en;   // CPS-2 WIDE profile, from the ROM header
++    .wide_en    ( wide_en           ),
++    .wide_en        ( wide_en       ),
 +    .wide_en    ( wide_en           ),
 +// CPS-2 WIDE: the runtime profile gate. Header byte 41, ACTIVE LOW, so a
 +// stock MRA (whose header is 0xFF-filled) runs this RBF as a stock machine.
@@ -55,8 +78,6 @@
 +    // [23] is the WIDE extension bank bit and jtcps1_sdram SPLITS on it
 +    // (slice D2): 0 -> bank 1 offset 0, the stock 8 MB; 1 -> the 1 MB window
 +    // in bank 0. It is 0 whenever wide_en is 0.
--    .rom0_bank   ( rom0_bank     ),
-+    .rom0_bank   ( rom0_bank_sdram ),
 === jtcps15_sound.v : cores/cps15/hdl -> cores/cps2w/hdl ===
 +
 +// ---------------------------------------------------------------------------
@@ -156,6 +177,8 @@
 +// D2 proves is the PLACEMENT (the SDRAM image census), not the fetch.
 +// ---------------------------------------------------------------------------
 +    input           wide_en,    // CPS-2 WIDE profile (cores/cps2w/hdl/jtcps2w_profile.v)
+-    input    [20:0] main_rom_addr,
++    input    [21:0] main_rom_addr,   // CPS-2 WIDE: 6 MB of program (slice D4)
 -    input [PCM_AW-1:0] pcm_addr,
 +    // CPS-2 WIDE: ONE BIT WIDER than the slot. jtframe's 8-bit SDRAM slot
 +    // caps at SDRAMW (jtframe_romrq_bcache.v:74), so the QSound region is two
@@ -217,6 +240,12 @@
 +// modules/jtframe/hdl/sdram — a mechanical member of the ram1_Nslots family,
 +// which upstream stops at 5 (docs/project/mister_map.md section 5, option A).
 +jtframe_ram1_7slots #(
+-    .SLOT3_AW    ( 21            ), // Main CPU ROM
++    .SLOT3_AW    ( CPS==2 ? 22 : 21 ), // Main CPU ROM. CPS-2 WIDE declares 6 MB,
++                                  // so the slot has to reach past 4 MB. The
++                                  // extra bit is 0 for every stock address and
++                                  // SLOT3_OFFSET is unchanged, so a stock read
++                                  // lands on the same SDRAM word.
 -    .SLOT4_OFFSET(  SND_OFFSET   )
 +    .SLOT4_OFFSET(  SND_OFFSET   ),
 +
@@ -360,3 +389,177 @@
 +        prog_ba   <= (is_cpu||is_snd) ? 2'd0 : (
 +                      is_gfx ? (is_gfxc ? gfxc_ba : gfx_bank) : (
 +                      (is_oki & is_pcmhi) ? 2'd0 : 2'd1 ));
+=== jtcps2_obj_scan.v : cores/cps2/hdl -> cores/cps2w/hdl ===
++// ---------------------------------------------------------------------------
++// CPS-2 WIDE (Vampire Saved) OVERRIDE of cores/cps2/hdl/jtcps2_obj_scan.v.
++// SLICE D3 — THE OBJ PROMOTE. Copied at jtcores v1.7.3; the file is SHARED
++// with cores/cps2, so editing it in place would change the reference core.
++// The diff against the original IS the trust surface (CLAUDE.md rule 1 v2)
++// and is frozen line by line by tests/test_mister_wide_gate.sh.
++//
++// WHAT CHANGES, AND WHY IT IS THE ONLY SHAPE THAT WORKS. Stock CPS-2 reads the
++// object's GFX bank from two bits of the frame table's y-word,
++// `st3_bank <= table_y[14:13]`, so a 16-bit tile code plus a 2-bit bank is an
++// 18-bit tile address = 32 MB of graphics. CPS-2 WIDE v1 needs 48 MB, i.e. a
++// THIRD bank bit, and the free bit is y bit 12 — but it can only be read
++// AFTER the sprite-list terminator test above, and that ordering is the whole
++// of the rule:
++//
++//   * y bit 15 is the sprite-list TERMINATOR (`:141` below, unchanged). The
++//     profile's first draft proposed reading bank bit 2 from bit 15 directly;
++//     setting that bit on a live sprite ENDS THE LIST and drops every later
++//     sprite (docs/project/cps2_wide.md, Correction A2).
++//   * Capcom hit the same wall on CPS-2 Turbo and solved it the same way:
++//     test bit 15 first, THEN promote bit 12 into it, then read a 3-bit bank
++//     from bits 15:13. Inside the `else` arm below bit 15 is known to be 0,
++//     so the promoted bank is exactly { y[12], y[14:13] }.
++//   * That is why the build emits bank 4 as y-word 0x1000 and bank 5 as
++//     0x3000 (tools/gfx_tiles.py `bank_word`) and NOT `bank << 13`, which
++//     would be 0x8000 — a terminator.
++//
++// GATED. The promote is ANDed with `wide_en` (the runtime MRA header bit,
++// slice D1), so with the profile clear `st3_bank[2]` is 0 and bits [1:0] are
++// the stock expression, character for character. The reference core is
++// untouched by construction, not by measurement.
++// ---------------------------------------------------------------------------
++    input              wide_en,     // CPS-2 WIDE profile (jtcps2w_profile.v)
+-    output reg [ 1:0]  dr_bank
++    output reg [ 2:0]  dr_bank
+-reg  [ 1:0] st3_bank, st4_bank;
++reg  [ 2:0] st3_bank, st4_bank;
++wire [ 2:0] promoted_bank;   // CPS-2 WIDE: the 3-bit obj bank, gated
++
++// CPS-2 WIDE: the CPS-2 Turbo promote. It is READ in the `else` arm of the
++// terminator test below, so bit 15 is known to be 0 there — which is the
++// whole of the rule. See cores/cps2w/hdl/jtcps2w_obj_bank.v.
++jtcps2w_obj_bank u_objbank(
++    .wide_en    ( wide_en       ),
++    .table_y    ( table_y       ),
++    .bank       ( promoted_bank )
++);
+-                st3_bank <= table_y[14:13];
++                // CPS-2 WIDE: the 19th tile-address bit, promoted from y[12]
++                // AFTER the terminator test above (which is why it is not read
++                // from y[15]). Lifted into its own module so it can be swept
++                // exhaustively; wide_en clear => the stock 2-bit bank.
++                st3_bank <= promoted_bank;
+=== jtcps2_obj.v : cores/cps2/hdl -> cores/cps2w/hdl ===
++// ---------------------------------------------------------------------------
++// CPS-2 WIDE (Vampire Saved) OVERRIDE of cores/cps2/hdl/jtcps2_obj.v.
++// SLICE D3. Copied at jtcores v1.7.3 for one reason only: the object GFX bank
++// is three bits wide once the promote in jtcps2_obj_scan is live, so the wire
++// that carries it from the scanner to the drawer and the port that carries it
++// out to jtcps1_sdram both have to widen. `wide_en` passes through to the
++// scanner, which is where the promote is gated. No other behaviour changes.
++// ---------------------------------------------------------------------------
++    input              wide_en,     // CPS-2 WIDE profile (jtcps2w_profile.v)
+-    output     [ 1:0]  rom_bank,
++    output     [ 2:0]  rom_bank,
+-wire [ 1:0] dr_bank;
++wire [ 2:0] dr_bank;
++    .wide_en    ( wide_en       ),
+=== jtcps1_obj_draw.v : cores/cps1/hdl -> cores/cps2w/hdl ===
++// ---------------------------------------------------------------------------
++// CPS-2 WIDE (Vampire Saved) OVERRIDE of cores/cps1/hdl/jtcps1_obj_draw.v.
++// SLICE D3, and it is a PURE WIDTH change: `obj_bank` in and `rom_bank` out
++// go from 2 bits to 3, because the CPS-2 Turbo promote in
++// cores/cps2w/hdl/jtcps2_obj_scan.v makes the object GFX bank 3 bits wide.
++// Nothing here decides anything: the drawer latches the bank it is handed and
++// hands it on. Copied rather than edited because the file is SHARED with
++// cores/cps1 and cores/cps15, which stay byte-untouched; the diff against the
++// original is frozen by tests/test_mister_wide_gate.sh.
++// ---------------------------------------------------------------------------
++
+-    input      [ 1:0]  obj_bank,
++    input      [ 2:0]  obj_bank,
+-    output reg [ 1:0]  rom_bank,
++    output reg [ 2:0]  rom_bank,
+-        rom_bank   <= 2'd0;
++        rom_bank   <= 3'd0;
+-                rom_bank <= 2'd0;
++                rom_bank <= 3'd0;
+=== jtcps1_video.v : cores/cps1/hdl -> cores/cps2w/hdl ===
++
++// ---------------------------------------------------------------------------
++// CPS-2 WIDE (Vampire Saved) OVERRIDE of cores/cps1/hdl/jtcps1_video.v.
++// SLICE D3. The video block is the only path between the game top and the
++// object engine, so two things have to pass through it and nothing else
++// changes:
++//   * `rom0_bank` out widens from 2 bits to 3 (the CPS-2 Turbo obj promote in
++//     cores/cps2w/hdl/jtcps2_obj_scan.v);
++//   * `wide_en` in, routed to jtcps2_obj -> jtcps2_obj_scan, which is where
++//     the promote is gated.
++// The CPS-1 arm keeps its constant bank, widened to match the port. Copied
++// rather than edited because the file is SHARED with cores/cps1, cores/cps15
++// and cores/cps2, which stay byte-untouched; the diff against the original is
++// frozen by tests/test_mister_wide_gate.sh.
++// ---------------------------------------------------------------------------
++    input              wide_en,     // CPS-2 WIDE profile (jtcps2w_profile.v)
+-    output     [ 1:0]  rom0_bank,
++    output     [ 2:0]  rom0_bank,
+-    assign rom0_bank = 2'b10;
++    assign rom0_bank = 3'b010;
++        .wide_en    ( wide_en       ),
+=== jtcps2_main.v : cores/cps2/hdl -> cores/cps2w/hdl ===
++// ---------------------------------------------------------------------------
++// CPS-2 WIDE (Vampire Saved) OVERRIDE of cores/cps2/hdl/jtcps2_main.v.
++// SLICE D4 — THE 6 MB PROGRAM WINDOW. Copied at jtcores v1.7.3; the file is
++// SHARED with cores/cps2, so editing it in place would change the reference
++// core. The diff against the original IS the trust surface (CLAUDE.md rule 1
++// v2) and is frozen line by line by tests/test_mister_wide_gate.sh.
++//
++// WHAT CHANGES. Stock CPS-2 decodes a FLAT 4 MB of program ROM,
++// `rom_cs <= A[23:22] == 2'b00`, and CPS-2 WIDE v1 declares 6 MB
++// (docs/project/mister_map.md section 8). Three lines:
++//   * `rom_cs` gains `$400000-$5FFFFF`, READS ONLY;
++//   * `rom_addr` widens from A[21:1] to A[22:1];
++//   * `one_wait`'s boundary moves from 4'h5 to 4'h6.
++// All three are ANDed with / selected by `wide_en`, so with the profile clear
++// the expressions are the reference core's character for character.
++//
++// WHY READ-ONLY, AND WHY THAT IS ENOUGH. `objcfg_cs` at :190 decodes a WHOLE
++// megabyte at `$400000-$4FFFFF` — the RTL is looser than the hardware — but it
++// is qualified `&& !RnW`. So a READ anywhere in that window asserts nothing
++// today and asserts only `rom_cs` after this change: there is no read
++// collision, and a WRITE still reaches only `objcfg_cs`. `cps2_wide.md`
++// reserves `$400000-$40000F` and forbids allocating there, which is what makes
++// that safe; the build's allocator honours it (`wide_ext` starts at
++// `0x400010`).
++//
++// THE WAIT STATE IS NOT COSMETIC AND IT SHIPS HERE ON PURPOSE. `:167` gives
++// `A[23:20] < 4'h5` one wait state, so the first megabyte of the extension
++// would be one-wait like every other byte of program ROM while the SECOND
++// (`$500000-$5FFFFF`) would be ZERO-wait — a different bus timing for part of
++// the same region. Today the profile puts only the 30-byte facing-alias thunk
++// at `$5FFF00` there, so nothing would be seen, which is exactly how this kind
++// of defect survives. Found while reading for slice D2 and recorded in
++// mister_map.md section 8 as "must ship in the same slice as the decode".
++//
++// NOT DECRYPTED, AND THAT IS CORRECT. `jtcps2_dec_ctrl.v:44` decodes only
++// OPCODE fetches (`fc[1:0]==2'b10`) below the key header's range word, which
++// for this game is `$000000-$0FFFFF`. Everything above `PRG:0x0FFFFF` is
++// outside the encryption window, which is why the profile writes extension
++// content RAW (cps2_wide.md). The two agree without either being changed.
++// ---------------------------------------------------------------------------
++
++    input              wide_en,     // CPS-2 WIDE profile (jtcps2w_profile.v)
+-    output reg  [21:1] rom_addr,
++    output reg  [22:1] rom_addr,
+-always @(*) begin // below 5MB and above 8MB
+-    one_wait = !ASn && BGACKn && (A[23:20]<4'h5 || A[23:20]>=4'h8);
++// CPS-2 WIDE: below 5 MB and above 8 MB on stock; below SIX on the profile,
++// so the second megabyte of the program extension runs at the same bus timing
++// as every other byte of program ROM. See the header.
++always @(*) begin
++    one_wait = !ASn && BGACKn &&
++        (A[23:20] < (wide_en ? 4'h6 : 4'h5) || A[23:20]>=4'h8);
+-        rom_addr     <= 21'd0;
++        rom_addr     <= 22'd0;
+-            rom_addr    <= A[21:1];
+-            rom_cs      <= A[23:22] == 2'b00;
++            rom_addr    <= A[22:1];
++            // CPS-2 WIDE: the stock flat 4 MB, plus $400000-$5FFFFF on READS
++            // only. The objcfg port above overlaps the first megabyte but is
++            // qualified !RnW, so there is no collision. See the header.
++            rom_cs      <= (A[23:22] == 2'b00) |
++                           (wide_en & RnW & (A[23:21] == 3'b010));

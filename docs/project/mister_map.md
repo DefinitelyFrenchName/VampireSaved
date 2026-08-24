@@ -31,6 +31,18 @@ more tenant tile inside the existing 16 MB costs nothing) and a worse one for
 headroom (the group-C romset region cannot grow past 16 MB at all). §5's
 tables carry the correction in place.
 
+**SLICES D3 AND D4 ARE DONE (14z-107 (10)): THE CORE FETCHES TENANT ART.**
+The CPS-2 Turbo object promote (`{ wide_en & table_y[12], table_y[14:13] }`,
+lifted into `cores/cps2w/hdl/jtcps2w_obj_bank.v`) drives the third obj bank
+bit through a chain widened to 3 bits, and `rom0_bank[2]` is no longer tied
+low — so §5's group-C destinations are reachable for the first time. D4, the
+6 MB read decode plus the `one_wait` boundary, shipped in the same session
+and had to: the select screen's roster record is allocated in `wide_ext`
+above `CPU:$400000`, so with a 4 MB decode the core cannot read the table
+that names the tenant cells and the promote has nothing to promote. §10's
+rows carry the evidence; §9 open question 1 is answered from a `cps2w`
+`audit_sdram_bank_load` run on the WIDE romset.
+
 **SLICE D2 IS DONE (14z-107 (9)): THE PLACEMENT IS IN THE RTL AND THE
 IMAGE WAS COUNTED.** Fork commit `0df6f000` (pushed). The bank-0 re-pack,
 the group-C GFX redirect, the QSound split across two banks and the two new
@@ -573,6 +585,49 @@ shape, `OFFSET = GFXC4_OFFSET`), plus the PCM-high slot in bank 0
 — **that widening is D2's, at the `jtcps1_sdram` port; what is D3's is
 DRIVING bit 2**, and until then the game top passes `{1'b0, rom0_bank}` so
 `gfxc_sel` is constant 0 and the two group-C slots are provably unreachable.
+**[D3 DRIVES IT, 14z-107 (10): the tie is gone and `rom0_bank` is the object
+engine's own 3-bit bank. See "The promote — AS BUILT" below.]**
+
+### The promote — **AS BUILT (slice D3)**
+
+```verilog
+// cores/cps2w/hdl/jtcps2w_obj_bank.v — the WHOLE behavioural surface of D3
+assign bank = { wide_en & table_y[12], table_y[14:13] };
+
+// cores/cps2w/hdl/jtcps2_obj_scan.v, in the ELSE arm of the :141 terminator
+// test — which is UNCHANGED from the reference core, and has to be
+st3_bank <= promoted_bank;
+```
+
+Four things about that, in the order they matter.
+
+1. **The order is the rule, not the bit.** `table_y[15]` is the sprite-list
+   terminator and the test above is byte-identical to `cores/cps2`'s. Inside
+   the `else` arm bit 15 is known to be 0, so promoting bit 12 into it and
+   reading bits 15:13 reduces to `{ y[12], y[14:13] }`. Reading bit 15
+   directly — the profile's first draft — would end the list at the first
+   tenant sprite. `tests/test_mister_wide_gate.sh` 8b asserts BOTH halves:
+   the terminator test is the reference core's verbatim, and the promote is
+   read at a LATER LINE than it.
+2. **The encoding is a contract with the build, and now it is checked.**
+   `tools/gfx_tiles.py`'s `bank_word` emits `0x1000` for bank 4 and `0x3000`
+   for bank 5, not `bank << 13` (which would be `0x8000` — a terminator).
+   `tests/rtl/tb_obj_bank.v` transcribes that table and requires each of the
+   six y-words to decode to its own bank, with a must-fire control that reads
+   bit 2 from `y[15]` and fails it.
+3. **It cost four override files for one expression**, because a 3-bit bank
+   has to be three bits wide at every port between the frame table and SDRAM:
+   `jtcps2_obj_scan.v` (the promote), `jtcps2_obj.v`, `jtcps1_obj_draw.v` and
+   `jtcps1_video.v`. The last three change nothing but a width — and a width
+   left at 2 in any of them would drop bank bit 2 and fetch vanilla art for
+   every tenant sprite, which is a picture bug and not a build error. Gate
+   checks 8c enumerate all six declarations.
+4. **`wide_en` had to be routed into the video block to reach the scanner.**
+   `gfxc_sel` already gates the destination, so an ungated promote would have
+   been inert anyway; gating the source as well makes bank bit 2 *provably
+   zero* with the profile clear rather than *harmlessly ignored*, and makes
+   the expression exhaustively testable on its own (131,072 vectors, both
+   profile states, bank[2] set 32,768 times wide / 0 stock).
 
 ### The three things the sketch left implicit, all settled in D2
 
@@ -705,7 +760,7 @@ looser than the hardware here — but because it is qualified with `!RnW`, a
 only `rom_cs` after the change. So there is no read collision at all, and a
 write still reaches only `objcfg_cs`.
 
-### The minimal, profile-gated proposal (NOT implemented)
+### The minimal, profile-gated proposal — **IMPLEMENTED, slice D4**
 
 ```verilog
 // jtcps2_main.v:183-184
@@ -718,6 +773,24 @@ one_wait  = !ASn && BGACKn && (A[23:20] < (CPS2W ? 4'h6 : 4'h5) || A[23:20] >= 4
 ```
 plus `main_rom_addr` `[21:1] → [22:1]` (`jtcps2_game.v:35`) and `SLOT3_AW`
 `21 → 22` (`jtcps1_sdram.v:274`).
+
+**AS SHIPPED (14z-107 (10), `cores/cps2w/hdl/jtcps2_main.v`) the three lines
+are exactly the sketch above, with `CPS2W` spelled `wide_en`** — the runtime
+profile bit, not a macro — and `SLOT3_AW` written `CPS==2 ? 22 : 21` so a
+CPS-1 build of the same copy keeps the reference width. Two things the sketch
+did not say and the slice had to settle:
+
+* **The extension is NOT decrypted, and that is correct rather than lucky.**
+  `jtcps2_dec_ctrl.v:44` is
+  `en_latch <= op_fetch && en && (addr[23:14] <= range[9:0])` — OPCODE fetches
+  only, below the key header's range word, which for this game ends at
+  `$0FFFFF`. `cps2_wide.md` writes extension content RAW for exactly that
+  reason. The two halves agreed without either being touched, and the gate
+  now re-reads the `!RnW` qualifier on `objcfg_cs` as well, because the
+  read decode is collision-free only while that qualifier stands.
+* **`SLOT3_AW` had to move with `main_rom_addr` or the top address bit would
+  be dropped silently** — a 22-bit address into a 21-bit slot port truncates.
+  `tests/test_mister_wide_gate.sh` 8j/8k check both halves.
 
 ### Is the reserved 16 bytes enough? — yes, and it is now load-bearing three times
 
@@ -749,8 +822,33 @@ slice as the decode.
    `tests/audit_sdram_bank_load.sh` bounded **bank 1** (PCM has **98.3%** row
    misses, so no locality to lose). Bank 0 already sustains **40,976**
    accesses/frame = 32.9% of its all-miss ceiling, and the select+VS phase
-   adds up to ~12k obj accesses/frame. Unmeasured. The instrument exists; it
-   needs a `cps2w` core carrying the map.
+   adds up to ~12k obj accesses/frame. ~~Unmeasured. The instrument exists; it
+   needs a `cps2w` core carrying the map.~~
+   **[14z-107 (10): THE INSTRUMENT NOW HAS ITS SECOND LEG
+   (`--core cps2w --wide build/m3b_merged13`) AND THE QUESTION IS STILL
+   OPEN, for a reason that is not the instrument's.** The WIDE romset does
+   not get past its own boot sequence on the core (`docs/platform/mister.md`
+   "THE WIDE ROMSET DOES NOT BOOT ON THE CORE YET"), so a run on it never
+   reaches a select screen or a match: its four frozen phase boundaries
+   label a looping boot, and **no obj bank 5 traffic exists to measure**.
+   The leg is written, gated on the transfer length, and prints a PEAK
+   per-bank table that depends on no boundary at all — so the moment the
+   boot failure is fixed the answer is one run away. Until then the honest
+   status is UNMEASURED, and the D2-era headroom bound is all there is.
+   **What the run DID measure, on the phases the core reaches: bank 0 peaks
+   at 54,422 accesses/frame = 44.0% of its all-miss ceiling, bank 1 at
+   12,043 (9.7%), bank 3 at 8,548 (6.9%), and bank 2 at exactly ZERO** —
+   that last figure being the boot failure expressed as a number, since
+   bank 2 is vanilla obj banks 0 and 2 and not one sprite is ever drawn.
+   Zero `SDRAM reads clashed` in 2,800 frames.
+   **The run also found a defect in the instrument**, which is now fixed:
+   the reporter's lines are block-buffered into a log the frame counter also
+   writes, so a TORN line can still parse with one spliced field. A phase
+   figure survives that (it is a first/last difference over hundreds of
+   intervals); a PEAK does not, and one bad row reported a bank-3 peak of
+   16,870,809 accesses/frame — **13,624% of the physical ceiling** — without
+   comment. The gate now requires the cumulative counters to be MONOTONIC as
+   well as the timestamps, drops the rows that are not and says how many.]**
    **[CORRECTED 14z-107 (10): this paragraph carried 98.8% / 40,797, the
    figures measured BEFORE the anchor moved 2502 -> 2609. `mister.md`
    re-derived the whole table at 14z-107 (7) from the same committed log
@@ -854,13 +952,21 @@ self-contained piece. Two changes:
 | **D0 — DONE 14z-107 (5)**, fork commit `38acc638` | `cores/cps2w/cfg/mame2mra.toml`: the `qsoundw` trim region + the `cps2w.cpp` sourcefile opt-in, and the `vsavjw` entry in `doc/mame.xml`. **No RTL.** | DONE: `rom/vsavjw.rom` = **66,265,152 B**, header words **6144 / 6400 / 15552 / 64704**, every region start 1 KiB-aligned, every region byte-for-byte the romset's. | BOTH FIRED. (A) untrimmed → 73,670,720 B and `qsnd_start` 71,936 KiB, and the generator **silently writes the wrapped word 6400**. (B) `length` +0x400 → the frozen table fails. | HELD: stock `vsavj` MRA from `cps2w` is byte-identical to `cps2`'s except `<rbf>`, `cps2` emits **no** WIDE MRA at all, and stock `vsavj.rom` is still 46,407,744 B. Gates `test_jtcores_twin` + `test_mister_mra_map`. |
 | **D1 — DONE 14z-107 (6)**, fork commit `4840df8a` | QSound sample-bank width, RUNTIME-GATED. `cores/cps2w/hdl/` gains `jtcps2w_profile.v` (header byte 41 → `wide_en`) and `jtcps2w_qsnd_bank.v` (the gated latch), plus OVERRIDES of the two SHARED files it needs (`jtcps15_sound.v` from cps15, `jtcps2_game.v` from cps2). `PCM_AW` STAYS 23 — 24 does not compile (§7). No placement change. | DONE, and stronger than the row planned: the gated latch is simulated over **all 65,536 values of `dsp_ab` in both profile states** — with `wide_en` low `qsnd_addr[23]` is stuck at 0 and bits [22:16] equal the stock expression; with it high, bit 23 moves (16,384 vectors). Plus: `jtframe files` resolves cps2w to our four files and to NEITHER shared original, and the frozen line-by-line override delta. | FOUR FIRED. (A) the latch with the gate bypassed fails the `wide_en`-low leg; (B) the profile byte moved to 40 (jtframe's `JOY_BYTE`) fails; (C) the polarity flipped — so a 0xFF-filled stock header would arm the profile — fails; (D) a one-width perturbation of an override breaks the frozen delta. Gate `test_mister_wide_gate` (ci_portable). | `tests/test_mister_sim_anchor.sh` runs on **cps2w**, stock `vsavj`, against the cps2 expectations. It went RED first, at 2609/463, and root-causing it is the story of the slice: a 2x2 factorial over {stock RTL, D1 RTL} x {`pal_lut.hex` present, absent} showed the RTL axis changes NOTHING and the missing palette LUT changes EVERYTHING. (**Completed 14z-107 (7)**: the palette LUT changed only the NUMBER OF FORKS, and each fork's `exit(0)` rewound the parent's `sim_inputs.hex` — the simulated controller was being replayed. Fixed in the fork.) The new instrument is `tests/test_mister_wide_inert.sh` — cps2 vs cps2w, same download, BIT-IDENTICAL work RAM frame by frame. See STATE 14z-107 (6) G4-G7. |
 | **D2 — DONE 14z-107 (9)**, fork commit `0df6f000` | Placement, AS SHIPPED: bank-0 offsets re-packed for PRG 6 MB (VRAM `0x600000`, ORAM `0x640000`, WRAM `0x648000`, Z80 `0x658000`), the group-C redirect and the QSound split in `cores/cps2w/hdl/jtcps1_prom_we.v`, their read sides + the PCM-high slot + the two GFX slots in `cores/cps2w/hdl/jtcps1_sdram.v`, and `modules/jtframe/hdl/sdram/jtframe_ram1_7slots.v` (option A, pulled by cps2w's `game.yaml` alone). `rom0_bank` is 3 bits at the SDRAM port but bit 2 is TIED LOW — the promote is D3, so D2 changes no fetch. The frozen override delta grew from 2 files to 4. | **DONE, and it is a WHOLE-IMAGE census, not a spot check.** `tests/test_mister_sdram_census.sh` + `tools/mister_sdram_census.py` replay the download mapping (regions, the QSound split, the group-C redirect and the CPS-2 GFX scramble) and compare **all 67,108,864 bytes of all four banks** against §5. Result on the WIDE image (`vsavjw.rom`, 66,265,152 B, sha1 `d462e55a…`, transfer complete at simulated frame **659**): **PASS on every bank** — ba0 6,359,055 non-zero (37.9%), ba1 12,879,645 (76.8%), ba2 14,873,334 (88.7%), ba3 14,426,104 (86.0%). | FIRED. A 1 KiB shift of ANY placement constant is rejected: `z80` (206,536 bytes differ, first at `0x658000`), `pcm_hi` (714,457, first at `0x6E0002`), `gfxc5` (675,767, first at `0x7E0080`), `prg` (3,768,659, first at `0x0`), `pcm_lo` (bank 1). Plus the cross-checks in the gate: banks 1/2/3 byte-identical between cps2 and cps2w on the same stock image with bank 0 DIFFERING (the re-pack is confined to bank 0, and the comparison is not vacuous), and banks 2+3 DIFFERING between the two cores on the WIDE image (without the redirect group C aliases onto vanilla's art). | `tests/test_mister_sim_anchor.sh` GREEN on `cps2w` at MAME 2146 / sim 2609 / skew 463; `tests/test_mister_wide_inert.sh` GREEN (`cps2w` == `cps2`, bit-identical work RAM 540-640). **The census also CONTRADICTED this document and the census won** — see the retraction box at the top: the slack is 0.125 MB, not 0.708 MB, and bank 1 is exactly full. |
-| **D3** | The obj promote: `jtcps2_obj_scan.v:152` `st3_bank <= {table_y[12], table_y[14:13]}` (the CPS-2 Turbo rule, applied *after* the `:141` terminator check), `dr_bank`/`obj_bank`/`rom_bank`/`rom0_bank` widened to 3 bits, `rom0_bank[2]` routed to the group-C slots. | **The MiSTer twin of the FBNeo B4 canary**: a test-only flag that ORs `0x1000` into the y-word of bank-2/3 sprites, with group C loaded as a byte copy of group B, running the STOCK rom. Work RAM is bit-identical by construction; the *frames* must be pixel-identical. | Zero-fill group C → the frames must DIFFER. (`cps2_wide.md` records that FBNeo's first attempt passed this test vacuously because the member never arrived; the control is the whole point.) | RAM identity is guaranteed by the canary design; the anchor gate still runs. |
-| **D4** | The PRG window: `rom_cs`/`rom_addr`/`one_wait` (§8), `main_rom_addr`, `SLOT3_AW` 22. | Relocate a real data block above `CPU:$400000` and repoint one pointer — RAM must stay identical, and the zeros variant must diverge (the B4-prg discipline: a pass with no negative control is not evidence). | The same rows pointed at zero fill → RAM MUST diverge. | anchor gate unchanged on stock `vsavj` — this is the slice where a widened decode could most easily perturb legacy behaviour. |
+| **D3 — DONE 14z-107 (10)**, fork commit `b9899fa8` | The obj promote, AS SHIPPED: the CPS-2 Turbo rule lifted into `cores/cps2w/hdl/jtcps2w_obj_bank.v` (`bank = { wide_en & table_y[12], table_y[14:13] }`) and read in the ELSE arm of the `:141` terminator check, which is the reference core's VERBATIM; `dr_bank`/`obj_bank`/`rom_bank`/`rom0_bank` widened to 3 bits across FOUR override files; the game top's `{1'b0, rom0_bank}` tie REMOVED so bit 2 reaches `gfxc_sel`. | **DONE, and it is a REAL FETCH on the REAL ROMSET rather than the planned canary.** `tests/test_mister_gfxc_fetch.sh` counts the SDRAM reads the core issues into the two group-C windows (derived from the RTL, not typed in) while a tenant-picking replay runs, and checks the tile codes against the roster's frozen live extents. Plus the exhaustive bench: `jtcps2w_obj_bank` over all 65,536 y-words in both profile states, 131,072 vectors, bank[2] set 32,768 times wide / **0** stock, and the six `gfx_tiles.py` encodings each decoding to their own bank with none of them setting the terminator bit. | **THE CONTROL IS ONE BYTE.** The same `.rom` with header byte 41 changed from `0xFE` to `0xFF` must read ZERO from both group-C windows; two further probes on the VANILLA obj banks must be non-zero in BOTH legs, so a zero is evidence about the core and not about the probe. On the bench: the promote's gate bypassed, and the promote reading `y[15]` instead of `y[12]` — the profile's first draft — both fire. | `test_mister_sim_anchor` on `cps2w`, stock `vsavj`; `test_mister_wide_inert` (cps2 vs cps2w, bit-identical work RAM). **The planned canary was NOT built**: it was designed for a world where the WIDE set could not boot, and once D4 shipped in the same session the real romset became the better witness. |
+| **D4 — DONE 14z-107 (10)**, fork commit `dd242a65` | The PRG window, AS SHIPPED: `cores/cps2w/hdl/jtcps2_main.v` — `rom_cs` gains `wide_en & RnW & (A[23:21]==3'b010)`, `rom_addr` widens to `A[22:1]`, `one_wait`'s boundary becomes `wide_en ? 4'h6 : 4'h5`; `main_rom_addr` `[22:1]` and bank 0's `SLOT3_AW` `CPS==2 ? 22 : 21` follow it. | **DONE, and the proof is that the WIDE set BOOTS AND PLAYS**: the select screen's roster record is allocated in `wide_ext` above `CPU:$400000`, so nothing tenant-shaped is reachable without this decode. `test_mister_gfxc_fetch`'s positive leg is therefore D4's evidence as much as D3's. | The `wide_en`-clear leg of the same pair: with the profile bit off the decode collapses to the stock flat 4 MB and the same replay produces no group-C fetch at all. | `test_mister_sim_anchor` on stock `vsavj` — this is the slice where a widened decode could most easily perturb legacy behaviour, and it is why the read decode is qualified `RnW` and the objcfg port's `!RnW` is re-read by the gate on every run. |
 
-Only after D0–D4 does a WIDE set boot; the first *whole-system* gate is
-`tests/audit_sdram_bank_load.sh` re-run on the `cps2w` core carrying the map,
-which is both the answer to open question 1 and the go/no-go the bank-repack
-ruling asked for.
+**Only after D0–D4 does a WIDE set boot — and that sentence turned out to be
+the load-bearing one in this section.** It was written as a summary; it is
+also the reason D3 could not be demonstrated on its own, because the select
+screen's roster record is allocated above `CPU:$400000` and D3 without D4
+leaves the core unable to read the table that names the tenant cells. The two
+slices therefore shipped in the same session, as separate fork commits with
+separate gates.
+
+The first *whole-system* gate is `tests/audit_sdram_bank_load.sh` re-run on
+the `cps2w` core carrying the map **and the WIDE romset**
+(`--core cps2w --wide build/m3b_merged13`), which is both the answer to open
+question 1 and the go/no-go the bank-repack ruling asked for.
 
 ---
 

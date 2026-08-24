@@ -18,7 +18,7 @@
 #     build time and catastrophic at run time: it would either leave the WIDE
 #     set running as stock, or — the polarity failure — turn the profile ON
 #     for every stock MRA, which is a superset-invariant break.
-#  3. PROFILE-GATED — the two gated modules are SIMULATED, exhaustively:
+#  3. PROFILE-GATED — the THREE gated modules are SIMULATED, exhaustively:
 #     * jtcps2w_qsnd_bank over ALL 65,536 values of dsp_ab in BOTH profile
 #       states: with wide_en low, bank[7] (= qsnd_addr[23]) must be STUCK AT
 #       ZERO and bank[6:0] must equal the stock expression; with wide_en high
@@ -29,9 +29,15 @@
 #       0xFF fill must leave the profile OFF, byte 41 = 0xFE must raise it,
 #       every other address and the NVRAM path must be inert, and it must
 #       re-default on the next download.
-#  4. REACHABLE — `jtframe files` must resolve cps2w to OUR six files and to
-#     none of the four shared originals, and cps2 to the originals and to none
-#     of ours. A gate that proves an unreachable module is worth nothing.
+#     * jtcps2w_obj_bank (slice D3) over ALL 65,536 y-words in both profile
+#       states: with wide_en low bank[2] is STUCK AT ZERO and bank[1:0] is the
+#       stock expression; with it high bank[2] == y[12] and DOES move; and the
+#       six y-words tools/gfx_tiles.py emits for banks 0-5 each decode to
+#       their own bank, none of them setting y bit 15 — the sprite-list
+#       TERMINATOR, which is the trap the promote exists to avoid.
+#  4. REACHABLE — `jtframe files` must resolve cps2w to OUR files and to none
+#     of the shared originals, and cps2 to the originals and to none of ours.
+#     A gate that proves an unreachable module is worth nothing.
 #  5. AND SINCE SLICE D2, DECLARATIVE ABOUT PLACEMENT (section 7 below). The
 #     SDRAM map exists in TWO places — docs/project/mister_map.md section 5 and
 #     the localparams in cores/cps2w/hdl/jtcps1_sdram.v — and a disagreement
@@ -48,7 +54,12 @@
 #      that would silently collide with jtframe's JOY_BYTE — must FAIL;
 #   C. the profile decoder with the polarity FLIPPED must FAIL, because a
 #      0xFF-filled stock header would then turn the profile on;
-#   D. a perturbed copy of an overridden file must FAIL the frozen delta.
+#   D. a perturbed copy of an overridden file must FAIL the frozen delta;
+#   E. (D3) the obj promote with the gate BYPASSED must FAIL the wide_en-low
+#      leg — the superset-invariant failure;
+#   F. (D3) the obj promote reading bank bit 2 from y[15] instead of y[12] —
+#      the profile's FIRST DRAFT, which would end the sprite list at the first
+#      tenant sprite — must FAIL the encoding contract.
 #
 # CHECK 3g EXISTS BECAUSE OF A REAL FAILURE. `cores/cps2w/hdl` shipped without
 # `pal_lut.hex` and the core rendered a BLACK SCREEN — and, through the
@@ -104,6 +115,16 @@ PYD
     delta "$SRC/cores/cps1/hdl/jtcps1_sdram.v"   "$HDL/jtcps1_sdram.v"
     echo "=== jtcps1_prom_we.v : cores/cps1/hdl -> cores/cps2w/hdl ==="
     delta "$SRC/cores/cps1/hdl/jtcps1_prom_we.v" "$HDL/jtcps1_prom_we.v"
+    echo "=== jtcps2_obj_scan.v : cores/cps2/hdl -> cores/cps2w/hdl ==="
+    delta "$SRC/cores/cps2/hdl/jtcps2_obj_scan.v" "$HDL/jtcps2_obj_scan.v"
+    echo "=== jtcps2_obj.v : cores/cps2/hdl -> cores/cps2w/hdl ==="
+    delta "$SRC/cores/cps2/hdl/jtcps2_obj.v"      "$HDL/jtcps2_obj.v"
+    echo "=== jtcps1_obj_draw.v : cores/cps1/hdl -> cores/cps2w/hdl ==="
+    delta "$SRC/cores/cps1/hdl/jtcps1_obj_draw.v" "$HDL/jtcps1_obj_draw.v"
+    echo "=== jtcps1_video.v : cores/cps1/hdl -> cores/cps2w/hdl ==="
+    delta "$SRC/cores/cps1/hdl/jtcps1_video.v"    "$HDL/jtcps1_video.v"
+    echo "=== jtcps2_main.v : cores/cps2/hdl -> cores/cps2w/hdl ==="
+    delta "$SRC/cores/cps2/hdl/jtcps2_main.v"     "$HDL/jtcps2_main.v"
 } > "$W/delta.txt"
 if cmp -s "$W/delta.txt" "$REPO/tests/expect/cps2w_rtl_delta.txt"; then
     ok "1 the RTL override delta is the frozen one ($(grep -c '^[+-]' "$W/delta.txt") changed lines)"
@@ -128,6 +149,16 @@ else
         delta "$SRC/cores/cps1/hdl/jtcps1_sdram.v"   "$HDL/jtcps1_sdram.v"
         echo "=== jtcps1_prom_we.v : cores/cps1/hdl -> cores/cps2w/hdl ==="
         delta "$SRC/cores/cps1/hdl/jtcps1_prom_we.v" "$HDL/jtcps1_prom_we.v"
+        echo "=== jtcps2_obj_scan.v : cores/cps2/hdl -> cores/cps2w/hdl ==="
+        delta "$SRC/cores/cps2/hdl/jtcps2_obj_scan.v" "$HDL/jtcps2_obj_scan.v"
+        echo "=== jtcps2_obj.v : cores/cps2/hdl -> cores/cps2w/hdl ==="
+        delta "$SRC/cores/cps2/hdl/jtcps2_obj.v"      "$HDL/jtcps2_obj.v"
+        echo "=== jtcps1_obj_draw.v : cores/cps1/hdl -> cores/cps2w/hdl ==="
+        delta "$SRC/cores/cps1/hdl/jtcps1_obj_draw.v" "$HDL/jtcps1_obj_draw.v"
+        echo "=== jtcps1_video.v : cores/cps1/hdl -> cores/cps2w/hdl ==="
+        delta "$SRC/cores/cps1/hdl/jtcps1_video.v"    "$HDL/jtcps1_video.v"
+        echo "=== jtcps2_main.v : cores/cps2/hdl -> cores/cps2w/hdl ==="
+        delta "$SRC/cores/cps2/hdl/jtcps2_main.v"     "$HDL/jtcps2_main.v"
     } > "$W/delta_ctlD.txt"
     cmp -s "$W/delta_ctlD.txt" "$REPO/tests/expect/cps2w_rtl_delta.txt" \
         && bad "1D control did NOT fire: a one-width perturbation still matched the frozen delta" \
@@ -233,14 +264,14 @@ if [ -n "$JTF" ]; then
         ( cd "$W" && rm -f game.f && "$JTF" files sim "$core" -t mister >/dev/null 2>&1 )
         sed "s|$SRC/||" "$W/game.f" > "$W/list_$core.txt" 2>/dev/null
     done
-    want_own="cores/cps2w/hdl/jtcps15_sound.v cores/cps2w/hdl/jtcps2_game.v cores/cps2w/hdl/jtcps1_sdram.v cores/cps2w/hdl/jtcps1_prom_we.v cores/cps2w/hdl/jtcps2w_profile.v cores/cps2w/hdl/jtcps2w_qsnd_bank.v modules/jtframe/hdl/sdram/jtframe_ram1_7slots.v"
-    shared_orig="cores/cps2/hdl/jtcps2_game.v cores/cps15/hdl/jtcps15_sound.v cores/cps1/hdl/jtcps1_sdram.v cores/cps1/hdl/jtcps1_prom_we.v"
+    want_own="cores/cps2w/hdl/jtcps15_sound.v cores/cps2w/hdl/jtcps2_game.v cores/cps2w/hdl/jtcps1_sdram.v cores/cps2w/hdl/jtcps1_prom_we.v cores/cps2w/hdl/jtcps2_obj_scan.v cores/cps2w/hdl/jtcps2_obj.v cores/cps2w/hdl/jtcps1_obj_draw.v cores/cps2w/hdl/jtcps1_video.v cores/cps2w/hdl/jtcps2_main.v cores/cps2w/hdl/jtcps2w_profile.v cores/cps2w/hdl/jtcps2w_qsnd_bank.v cores/cps2w/hdl/jtcps2w_obj_bank.v modules/jtframe/hdl/sdram/jtframe_ram1_7slots.v"
+    shared_orig="cores/cps2/hdl/jtcps2_game.v cores/cps15/hdl/jtcps15_sound.v cores/cps1/hdl/jtcps1_sdram.v cores/cps1/hdl/jtcps1_prom_we.v cores/cps2/hdl/jtcps2_obj_scan.v cores/cps2/hdl/jtcps2_obj.v cores/cps1/hdl/jtcps1_obj_draw.v cores/cps1/hdl/jtcps1_video.v cores/cps2/hdl/jtcps2_main.v"
     a=0
     for f in $want_own; do grep -qx "$f" "$W/list_cps2w.txt" || a=1; done
     for f in $shared_orig; do grep -qx "$f" "$W/list_cps2w.txt" && a=2; done
     case "$a" in
-        0) ok "5a cps2w compiles OUR six overrides + the new jtframe slot module, and NONE of the four shared originals" ;;
-        1) bad "5a cps2w does not compile all seven of its own files" ;;
+        0) ok "5a cps2w compiles OUR nine overrides, its three new modules and the new jtframe slot module, and NONE of the nine shared originals" ;;
+        1) bad "5a cps2w does not compile all thirteen of its own files" ;;
         2) bad "5a cps2w compiles a shared original TOO — duplicate module, and the override is not overriding" ;;
     esac
     b=0
@@ -254,8 +285,8 @@ if [ -n "$JTF" ]; then
         3) bad "5b cps2 pulled jtframe_ram1_7slots — the new module was added to a SHARED jtframe yaml" ;;
     esac
     d="$(diff "$W/list_cps2.txt" "$W/list_cps2w.txt" | grep -c '^[<>]')"
-    [ "$d" = "11" ] && ok "5c the two cores' file lists differ in exactly 11 entries (4 out, 7 in)" \
-                    || bad "5c the file lists differ in $d entries, expected 11"
+    [ "$d" = "22" ] && ok "5c the two cores' file lists differ in exactly 22 entries (9 out, 13 in)" \
+                    || bad "5c the file lists differ in $d entries, expected 22"
 else
     note "5 no built jtframe tool (tools/setup_jtcores.sh); reachability not checked"
 fi
@@ -284,6 +315,7 @@ if command -v verilator >/dev/null 2>&1; then
     }
     run_tb bank    "$REPO/tests/rtl/tb_qsnd_bank.v" "$HDL/jtcps2w_qsnd_bank.v" pass
     run_tb profile "$REPO/tests/rtl/tb_profile.v"   "$HDL/jtcps2w_profile.v"   pass
+    run_tb objbank "$REPO/tests/rtl/tb_obj_bank.v"  "$HDL/jtcps2w_obj_bank.v"  pass
     # control A: bypass the gate
     sed "s/bank <= wide_en ? dsp_ab\[7:0\]/bank <= 1'b1 ? dsp_ab[7:0]/" \
         "$HDL/jtcps2w_qsnd_bank.v" > "$W/ctlA.v"
@@ -301,6 +333,22 @@ if command -v verilator >/dev/null 2>&1; then
     cmp -s "$HDL/jtcps2w_profile.v" "$W/ctlC.v" \
         && bad "6C control could not flip the polarity" \
         || run_tb ctlC "$REPO/tests/rtl/tb_profile.v" "$W/ctlC.v" fail
+    # control E (D3): the promote with the gate bypassed — the same
+    # superset-invariant failure, in the object path
+    sed "s/{ wide_en & table_y\[12\], table_y\[14:13\] }/{ table_y[12], table_y[14:13] }/" \
+        "$HDL/jtcps2w_obj_bank.v" > "$W/ctlE.v"
+    cmp -s "$HDL/jtcps2w_obj_bank.v" "$W/ctlE.v" \
+        && bad "6E control could not bypass the promote's gate" \
+        || run_tb ctlE "$REPO/tests/rtl/tb_obj_bank.v" "$W/ctlE.v" fail
+    # control F (D3): THE FIRST DRAFT. Reading bank bit 2 from y[15] rather
+    # than promoting y[12] is the mistake Correction A2 exists to record: y[15]
+    # is the sprite-list terminator, so bank 4 would end the list at the first
+    # tenant sprite. It must break the encoding contract with gfx_tiles.py.
+    sed "s/{ wide_en & table_y\[12\], table_y\[14:13\] }/{ wide_en \& table_y[15], table_y[14:13] }/" \
+        "$HDL/jtcps2w_obj_bank.v" > "$W/ctlF.v"
+    cmp -s "$HDL/jtcps2w_obj_bank.v" "$W/ctlF.v" \
+        && bad "6F control could not move the promoted bit to y[15]" \
+        || run_tb ctlF "$REPO/tests/rtl/tb_obj_bank.v" "$W/ctlF.v" fail
 else
     note "6 verilator not installed; the gated modules were not simulated"
 fi
@@ -350,14 +398,78 @@ grep -q "wire is_gfxc  = wide_en & gfx_addr\[25\];" "$PW" \
 grep -q "wire is_pcmhi = wide_en & pcm_addr\[23\];" "$PW" \
     && ok "7l the download-side QSound split is gated (wide_en & pcm_addr[23])" \
     || bad "7l the download-side QSound split is not gated on wide_en"
-# D2 provides the DESTINATION, not the promote: bit 2 must still be tied low
-grep -q "wire \[ 2:0\] rom0_bank_sdram = { 1'b0, rom0_bank };" "$HDL/jtcps2_game.v" \
-    && ok "7m the obj promote is still slice D3's — rom0_bank[2] is tied low in the game top" \
-    || bad "7m rom0_bank[2] is no longer tied low; that is slice D3 and it needs D3's gate"
+# 7m WAS "rom0_bank[2] is still tied low" until slice D3. D2 built the
+# destination and deliberately left it unreachable; D3 DRIVES it, so the check
+# inverts: the tie must be GONE and the bank must be the object engine's.
+code "$HDL/jtcps2_game.v" | grep -q "rom0_bank_sdram" \
+    && bad "7m the game top still ties rom0_bank[2] low — slice D3 unties it" \
+    || ok "7m the D2 tie on rom0_bank[2] is gone (slice D3 drives it)"
+grep -q "wire \[ 2:0\] rom0_bank;" "$HDL/jtcps2_game.v" \
+    && ok "7m2 the game top's rom0_bank is the object engine's 3-bit bank" \
+    || bad "7m2 the game top's rom0_bank is not 3 bits"
 # and the new slot module must be an ADDITION, never a change to a shared list
 grep -q "jtframe_ram1_7slots" "$SRC/modules/jtframe/hdl/sdram/jtframe_sdram64.yaml" \
     && bad "7n jtframe_ram1_7slots was added to the SHARED jtframe_sdram64.yaml — every core would compile it" \
     || ok "7n jtframe_ram1_7slots is pulled by cores/cps2w alone, not by a shared jtframe yaml"
+
+# ── 8. THE D3 PROMOTE AND THE D4 PROGRAM WINDOW, re-read in the RTL ────────
+# Section 6 proves the promote's EXPRESSION exhaustively; this proves the
+# expression is the one the object scanner actually uses, and that the chain
+# from it to SDRAM is three bits wide the whole way. A width that stayed at 2
+# anywhere in between would silently drop bank bit 2 and the core would fetch
+# vanilla art for every tenant sprite — a picture bug, not a build error.
+OS="$HDL/jtcps2_obj_scan.v"
+grep -q "st3_bank <= promoted_bank;" "$OS" \
+    && ok "8a the obj scanner takes its bank from jtcps2w_obj_bank" \
+    || bad "8a jtcps2_obj_scan does not use the gated promote module"
+# THE ORDER IS THE WHOLE RULE. The promote may only be read AFTER the
+# sprite-list terminator test, and that test must be UNCHANGED from the
+# reference core — if it moved, bit 15 could be consumed as a bank bit and the
+# list would end at the first tenant sprite (cps2_wide.md Correction A2).
+term="if( table_y\[15\] || table_attr\[15:8\]==8'hff || &table_addr ) begin"
+if grep -q "$term" "$OS" && grep -q "$term" "$SRC/cores/cps2/hdl/jtcps2_obj_scan.v"; then
+    a="$(grep -n "$term" "$OS" | cut -d: -f1)"
+    b="$(grep -n "st3_bank <= promoted_bank;" "$OS" | cut -d: -f1)"
+    [ "$b" -gt "$a" ] \
+        && ok "8b the terminator test is the reference core's, VERBATIM, and the promote is read after it (line $a < $b)" \
+        || bad "8b the promote is read at line $b, BEFORE the terminator test at $a"
+else
+    bad "8b the sprite-list terminator test is not the reference core's — bit 15 must stay the terminator"
+fi
+for pair in "jtcps2_obj_scan.v:output reg \[ 2:0\]  dr_bank" \
+            "jtcps2_obj.v:output     \[ 2:0\]  rom_bank," \
+            "jtcps2_obj.v:wire \[ 2:0\] dr_bank;" \
+            "jtcps1_obj_draw.v:input      \[ 2:0\]  obj_bank," \
+            "jtcps1_obj_draw.v:output reg \[ 2:0\]  rom_bank," \
+            "jtcps1_video.v:output     \[ 2:0\]  rom0_bank,"; do
+    f="${pair%%:*}"; pat="${pair#*:}"
+    grep -q "$pat" "$HDL/$f" \
+        && ok "8c $f: $pat" \
+        || bad "8c $f does not carry a 3-bit bank ($pat) — bank bit 2 would be dropped here"
+done
+# wide_en must reach the scanner, or the promote is gated by nothing
+grep -q "\.wide_en    ( wide_en       )," "$HDL/jtcps2_obj.v" \
+    && ok "8d wide_en reaches the object scanner" || bad "8d wide_en does not reach the object scanner"
+grep -q "\.wide_en        ( wide_en       )," "$HDL/jtcps2_game.v" \
+    && ok "8e wide_en reaches the video block" || bad "8e wide_en does not reach jtcps1_video"
+# --- D4, the program window
+MN="$HDL/jtcps2_main.v"
+grep -q "(wide_en & RnW & (A\[23:21\] == 3'b010))" "$MN" \
+    && ok "8f the 6 MB program decode is gated AND read-only (wide_en & RnW)" \
+    || bad "8f jtcps2_main's extended rom_cs is not 'wide_en & RnW & A[23:21]==3'b010'"
+grep -q "rom_addr    <= A\[22:1\];" "$MN" \
+    && ok "8g rom_addr is 22 bits (8 MB reach, 6 MB loaded)" || bad "8g rom_addr was not widened"
+grep -q "A\[23:20\] < (wide_en ? 4'h6 : 4'h5)" "$MN" \
+    && ok "8h the wait-state boundary moves with the profile — no zero-wait megabyte inside PRG" \
+    || bad "8h one_wait still stops at 4'h5; \$500000-\$5FFFFF would be ZERO-wait while the rest of PRG is one-wait"
+grep -q "objcfg_cs   <= ((dec_en && A\[23:20\] == 4'h4) || (!dec_en && A\[23:4\] == ~20'h0)) && !RnW;" "$MN" \
+    && ok "8i the objcfg port is still WRITE-ONLY — which is what makes the read decode collision-free" \
+    || bad "8i objcfg_cs lost its !RnW qualifier — the 6 MB read decode now COLLIDES with it"
+grep -q "wire \[22:1\] main_rom_addr;" "$HDL/jtcps2_game.v" \
+    && ok "8j the game top carries a 22-bit main_rom_addr" || bad "8j main_rom_addr is not [22:1]"
+grep -q "\.SLOT3_AW    ( CPS==2 ? 22 : 21 )" "$HDL/jtcps1_sdram.v" \
+    && ok "8k bank 0's program slot reaches 6 MB on CPS-2 and is unchanged on CPS-1" \
+    || bad "8k SLOT3_AW did not follow main_rom_addr — the top address bit would be dropped"
 
 [ $fail = 0 ] && echo "PASS test_mister_wide_gate" \
               || { echo "FAIL test_mister_wide_gate"; exit 1; }

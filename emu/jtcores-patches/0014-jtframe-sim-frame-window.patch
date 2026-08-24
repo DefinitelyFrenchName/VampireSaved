@@ -1,0 +1,66 @@
+From fd454393ba82bd1b5f44264e989ffb03f0c7e507 Mon Sep 17 00:00:00 2001
+From: Chaton <definitelyfrenchname@gmail.com>
+Date: Mon, 24 Aug 2026 12:36:26 +0200
+Subject: [PATCH] jtframe/sim: bound the frame writer to a frame window
+
+The Verilator harness forks an ImageMagick child for every CHANGED frame,
+which is right for a short run and wrong for a long one: a 3,700-frame
+simulation writes ~3,000 jpgs nobody asked for and pays minutes of CPU for
+them, and the one frame the run was launched to look at is somewhere in the
+middle.
+
+Three optional macros pick the frames the writer may write:
+JTFRAME_SIM_VIDEO_FIRST, _LAST and _STRIDE. The defaults are 0, INT_MAX and
+1, i.e. exactly the behaviour that was there before. STRIDE also gives a cheap
+filmstrip across a long run.
+
+Nothing else changes: the frame buffers are still swapped and compared every
+frame, so the simulation's state does not depend on which frames are written.
+---
+ modules/jtframe/hdl/ver/test.cpp | 23 +++++++++++++++++++++++
+ 1 file changed, 23 insertions(+)
+
+diff --git a/modules/jtframe/hdl/ver/test.cpp b/modules/jtframe/hdl/ver/test.cpp
+index f34eadfd5..584647366 100644
+--- a/modules/jtframe/hdl/ver/test.cpp
++++ b/modules/jtframe/hdl/ver/test.cpp
+@@ -251,6 +251,19 @@ static void rdprobe_report() {
+ }
+ #endif
+ 
++// Vampire Saved (VS fork): which frames the image writer above may write.
++// Defaults are upstream's behaviour — every changed frame, from the first to
++// the last.
++#ifndef _JTFRAME_SIM_VIDEO_FIRST
++    #define _JTFRAME_SIM_VIDEO_FIRST 0
++#endif
++#ifndef _JTFRAME_SIM_VIDEO_LAST
++    #define _JTFRAME_SIM_VIDEO_LAST 0x7fffffff
++#endif
++#ifndef _JTFRAME_SIM_VIDEO_STRIDE
++    #define _JTFRAME_SIM_VIDEO_STRIDE 1
++#endif
++
+ #define ANSI_COLOR_RED     "\x1b[31m"
+ #define ANSI_COLOR_GREEN   "\x1b[32m"
+ #define ANSI_COLOR_YELLOW  "\x1b[33m"
+@@ -1182,6 +1195,16 @@ void JTSim::video_dump() {
+                 // docs/platform/mister.md. Absent the macro this is
+                 // upstream's code, byte for byte, plus the reap below.
+ #ifndef _JTFRAME_SIM_NOVIDEO
++                // Vampire Saved (VS fork): and even when the writer is
++                // compiled in, only write the frames a run actually wants.
++                // A picture is worth one jpg, not three thousand: without
++                // this a 3,700-frame run forks an ImageMagick child for every
++                // changed frame, which is minutes of CPU and a directory
++                // nobody can find anything in. FIRST/LAST/STRIDE default to
++                // "every frame", i.e. upstream's behaviour.
++                if( frame_cnt >= _JTFRAME_SIM_VIDEO_FIRST &&
++                    frame_cnt <= _JTFRAME_SIM_VIDEO_LAST   &&
++                    (frame_cnt % _JTFRAME_SIM_VIDEO_STRIDE)==0 )
+                 if( dump.diff() ) {
+                     // converts image to jpg in a different fork
+                     // I suppose a thread would be faster...
+-- 
+2.50.1 (Apple Git-155)
+

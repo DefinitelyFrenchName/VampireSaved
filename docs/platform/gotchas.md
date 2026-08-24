@@ -1572,3 +1572,27 @@ target carries 27 bits (`jtframe_emu.sv:334`), and each header start word is
   '+refs/heads/*:refs/remotes/local/*'`). It only bites when fork commits are
   held back from a push — which is exactly when RTL is being developed.
 
+- **A WIDENED BUS IS ONLY AS WIDE AS ITS NARROWEST PORT, AND VERILOG SAYS
+  NOTHING (14z-107 (10), MiSTer slice D3).** The CPS-2 object bank goes from
+  2 bits to 3 in `jtcps2_obj_scan`, but the value crosses FOUR module
+  boundaries on its way to SDRAM — `jtcps2_obj_scan` -> `jtcps2_obj` ->
+  `jtcps1_obj_draw` -> `jtcps1_video` -> `jtcps1_sdram`. A port left at
+  `[1:0]` anywhere in that chain TRUNCATES the top bit, and Verilog's answer
+  to a 3-bit signal driving a 2-bit port is a width WARNING at worst. The
+  failure that produces is not a build error, it is a PICTURE: every tenant
+  sprite silently fetches vanilla art from bank 0 or 1, which looks like a
+  content bug and sends you to the romset. Three of slice D3's four override
+  files exist for nothing but this, and
+  `tests/test_mister_wide_gate.sh` 8c asserts all six declarations by name.
+- **THE WIDE DOWNLOAD IS 197 FRAMES LONGER THAN THE STOCK ONE, AND EVERY
+  ABSOLUTE FRAME NUMBER IN THE LANE MOVES WITH IT (14z-107 (10)).**
+  `sim_inputs.hex` advances on every LVBL fall, download frames INCLUDED,
+  so a replay is shifted by the transfer length: 462 frames for `vsavj.rom`
+  (46,407,744 B) and **659** for `vsavjw.rom` (66,265,152 B). A `--frames` or
+  `--offset` computed for the stock image starts the WIDE replay ~200 frames
+  early and every anchor derived from it is wrong — quietly, because the game
+  still boots and still reaches a select screen. `tools/run_sim_jtcps2.sh`
+  picks the right constant from `--wide` and prints it;
+  `tests/audit_sdram_bank_load.sh` shifts its four phase boundaries and then
+  ASSERTS the transfer length from the run's own "ROM file transfered (frame
+  N)" line rather than trusting the constant.

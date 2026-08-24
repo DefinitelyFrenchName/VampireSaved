@@ -4,14 +4,22 @@
 >       - jtcps15_sound.v        # OVERRIDE of cores/cps15/hdl
 >       - jtcps1_sdram.v         # OVERRIDE of cores/cps1/hdl  (D2)
 >       - jtcps1_prom_we.v       # OVERRIDE of cores/cps1/hdl  (D2)
+>       - jtcps2_obj_scan.v      # OVERRIDE of cores/cps2/hdl  (D3)
+>       - jtcps2_obj.v           # OVERRIDE of cores/cps2/hdl  (D3)
+>       - jtcps1_obj_draw.v      # OVERRIDE of cores/cps1/hdl  (D3)
+>       - jtcps1_video.v         # OVERRIDE of cores/cps1/hdl  (D3)
+>       - jtcps2_main.v          # OVERRIDE of cores/cps2/hdl  (D4)
 >       - jtcps2w_profile.v      # new
 >       - jtcps2w_qsnd_bank.v    # new
+>       - jtcps2w_obj_bank.v     # new  (D3)
 <       - jtcps2_game.v
+<       - jtcps2_main.v
+<       - jtcps2_obj.v
+<       - jtcps2_obj_scan.v
 <       - common.yaml
 <   - from: cps15
 <     get:
 <       - qsound.yaml
->       - jtcps1_video.v
 >       - jtcps1_scroll.v
 >       - jtcps1_timing.v
 >       - jtcps1_tilemap.v
@@ -20,7 +28,6 @@
 >       - jtcps1_mmr.v
 >       - jtcps1_obj_line_table.v
 >       - jtcps1_obj_tile_match.v
->       - jtcps1_obj_draw.v
 >       - jtcps1_obj_line.v
 >       - jtcps1_stars.v
 >       - jtcps1_gfx_mappers.v

@@ -1,0 +1,1606 @@
+From b9899fa81aa55730a720755569023ba1d94677bf Mon Sep 17 00:00:00 2001
+From: Chaton <definitelyfrenchname@gmail.com>
+Date: Mon, 24 Aug 2026 12:34:08 +0200
+Subject: [PATCH] =?UTF-8?q?cps2w:=20the=20CPS-2=20Turbo=20object=20promote?=
+ =?UTF-8?q?=20=E2=80=94=20a=203-bit=20GFX=20bank=20(slice=20D3)?=
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Stock CPS-2 reads an object's graphics bank from two bits of the frame
+table's y-word (`st3_bank <= table_y[14:13]`), so a 16-bit tile code plus a
+2-bit bank is an 18-bit tile address: 32 MB of graphics, and that is the cap.
+CPS-2 WIDE needs 48 MB, i.e. a third bank bit.
+
+The free bit is y bit 12, and it can only be read AFTER the sprite-list
+terminator test, which is the whole of the rule. y bit 15 IS the terminator:
+setting it on a live sprite ends the list and drops every later sprite. Capcom
+solved the same problem the same way on CPS-2 Turbo — test bit 15 first, then
+promote bit 12 into it, then read a 3-bit bank from bits 15:13. Inside the
+else arm of the terminator test bit 15 is known to be zero, so the promoted
+bank is exactly { y[12], y[14:13] }.
+
+  cores/cps2w/hdl/jtcps2_obj_scan.v  the promote, ANDed with wide_en
+  cores/cps2w/hdl/jtcps2_obj.v       the 3-bit bank wire and output
+  cores/cps2w/hdl/jtcps1_obj_draw.v  3-bit bank in and out; width only
+  cores/cps2w/hdl/jtcps1_video.v     3-bit rom0_bank out, wide_en in
+  cores/cps2w/hdl/jtcps2_game.v      rom0_bank[2] untied; wide_en to video
+
+Bit 2 reaches jtcps1_sdram's `gfxc_sel`, which the previous commit placed and
+gated but left unreachable because the game top tied that bit low. It is now
+driven, so the two group-C read slots — the tenant graphics in SDRAM banks 1
+and 0 — are reachable for the first time.
+
+Gated twice over: the promote itself is ANDed with wide_en (the runtime MRA
+header bit), so with the profile clear bit 2 is zero at its source, and
+gfxc_sel is ANDed with wide_en at its destination. The reference cores
+cores/cps1, cores/cps2 and cores/cps15 stay byte-untouched; every file that
+had to differ is a copy under cores/cps2w/hdl and the diff against the
+original is the whole of the change.
+---
+ cores/cps2w/cfg/game.yaml          |  19 +-
+ cores/cps2w/hdl/jtcps1_obj_draw.v  | 165 +++++++
+ cores/cps2w/hdl/jtcps1_video.v     | 694 +++++++++++++++++++++++++++++
+ cores/cps2w/hdl/jtcps2_game.v      |  31 +-
+ cores/cps2w/hdl/jtcps2_obj.v       | 224 ++++++++++
+ cores/cps2w/hdl/jtcps2_obj_scan.v  | 243 ++++++++++
+ cores/cps2w/hdl/jtcps2w_obj_bank.v |  66 +++
+ 7 files changed, 1428 insertions(+), 14 deletions(-)
+ create mode 100644 cores/cps2w/hdl/jtcps1_obj_draw.v
+ create mode 100644 cores/cps2w/hdl/jtcps1_video.v
+ create mode 100644 cores/cps2w/hdl/jtcps2_obj.v
+ create mode 100644 cores/cps2w/hdl/jtcps2_obj_scan.v
+ create mode 100644 cores/cps2w/hdl/jtcps2w_obj_bank.v
+
+diff --git a/cores/cps2w/cfg/game.yaml b/cores/cps2w/cfg/game.yaml
+index 1226fb41c..80f01db6a 100644
+--- a/cores/cps2w/cfg/game.yaml
++++ b/cores/cps2w/cfg/game.yaml
+@@ -19,9 +19,19 @@
+ #                      new slot counts (7 in bank 0, 2 in bank 1).
+ #   jtcps1_prom_we.v — SLICE D2: the DOWNLOAD-side group-C redirect and the
+ #                      QSound bank split, both gated by wide_en.
++#   jtcps2_obj_scan.v— SLICE D3: THE OBJ PROMOTE. The CPS-2 Turbo rule — after
++#                      the sprite-list terminator test, promote y bit 12 and
++#                      read a 3-bit GFX bank — gated by wide_en.
++#   jtcps2_obj.v     — SLICE D3: the 3-bit bank wire and output port.
++#   jtcps1_obj_draw.v— SLICE D3: the 3-bit bank in and out. Width only.
++#   jtcps1_video.v   — SLICE D3: the 3-bit rom0_bank out, and wide_en in on
++#                      its way to the object scanner.
+ # THE NEW FILES:
+ #   jtcps2w_profile.v    — decodes the CPS-2 WIDE bit out of the ROM header.
+ #   jtcps2w_qsnd_bank.v  — the gated sample-bank latch (the D1 trust surface).
++#   jtcps2w_obj_bank.v   — the gated CPS-2 Turbo obj promote (the D3 trust
++#                          surface), lifted out of jtcps2_obj_scan so it can be
++#                          swept over all 65,536 y-words in both profile states.
+ #
+ # THE `common.yaml` BLOCK below is cores/cps1/cfg/common.yaml INLINED minus
+ # jtcps1_sdram.v and jtcps1_prom_we.v, for exactly the reason the `qsound.yaml`
+@@ -41,15 +51,18 @@ game:
+       - jtcps15_sound.v        # OVERRIDE of cores/cps15/hdl
+       - jtcps1_sdram.v         # OVERRIDE of cores/cps1/hdl  (D2)
+       - jtcps1_prom_we.v       # OVERRIDE of cores/cps1/hdl  (D2)
++      - jtcps2_obj_scan.v      # OVERRIDE of cores/cps2/hdl  (D3)
++      - jtcps2_obj.v           # OVERRIDE of cores/cps2/hdl  (D3)
++      - jtcps1_obj_draw.v      # OVERRIDE of cores/cps1/hdl  (D3)
++      - jtcps1_video.v         # OVERRIDE of cores/cps1/hdl  (D3)
+       - jtcps2w_profile.v      # new
+       - jtcps2w_qsnd_bank.v    # new
++      - jtcps2w_obj_bank.v     # new  (D3)
+   - from: cps2
+     get:
+       - jtcps2_main.v
+-      - jtcps2_obj.v
+       - jtcps2_objram.v
+       - jtcps2_obj_frame.v
+-      - jtcps2_obj_scan.v
+       - jtcps2_colmix.v
+       - jtcps2_raster.v
+       - jtcps2_dtack.v
+@@ -64,7 +77,6 @@ game:
+   # --- from cores/cps1/cfg/common.yaml, minus the two overridden files ---
+   - from: cps1
+     get:
+-      - jtcps1_video.v
+       - jtcps1_scroll.v
+       - jtcps1_timing.v
+       - jtcps1_tilemap.v
+@@ -73,7 +85,6 @@ game:
+       - jtcps1_mmr.v
+       - jtcps1_obj_line_table.v
+       - jtcps1_obj_tile_match.v
+-      - jtcps1_obj_draw.v
+       - jtcps1_obj_line.v
+       - jtcps1_stars.v
+       - jtcps1_gfx_mappers.v
+diff --git a/cores/cps2w/hdl/jtcps1_obj_draw.v b/cores/cps2w/hdl/jtcps1_obj_draw.v
+new file mode 100644
+index 000000000..1981a618a
+--- /dev/null
++++ b/cores/cps2w/hdl/jtcps1_obj_draw.v
+@@ -0,0 +1,165 @@
++/*  This file is part of JTCORES1.
++    JTCORES1 program is free software: you can redistribute it and/or modify
++    it under the terms of the GNU General Public License as published by
++    the Free Software Foundation, either version 3 of the License, or
++    (at your option) any later version.
++
++    JTCORES1 program is distributed in the hope that it will be useful,
++    but WITHOUT ANY WARRANTY; without even the implied warranty of
++    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++    GNU General Public License for more details.
++
++    You should have received a copy of the GNU General Public License
++    along with JTCORES1.  If not, see <http://www.gnu.org/licenses/>.
++
++    Author: Jose Tejada Gomez. Twitter: @topapate
++    Version: 2.0
++    Date: 23-1-2021 */
++
++// ---------------------------------------------------------------------------
++// CPS-2 WIDE (Vampire Saved) OVERRIDE of cores/cps1/hdl/jtcps1_obj_draw.v.
++// SLICE D3, and it is a PURE WIDTH change: `obj_bank` in and `rom_bank` out
++// go from 2 bits to 3, because the CPS-2 Turbo promote in
++// cores/cps2w/hdl/jtcps2_obj_scan.v makes the object GFX bank 3 bits wide.
++// Nothing here decides anything: the drawer latches the bank it is handed and
++// hands it on. Copied rather than edited because the file is SHARED with
++// cores/cps1 and cores/cps15, which stay byte-untouched; the diff against the
++// original is frozen by tests/test_mister_wide_gate.sh.
++// ---------------------------------------------------------------------------
++
++module jtcps1_obj_draw (
++    input              rst,
++    input              clk,
++
++    input      [15:0]  obj_code,
++    input      [15:0]  obj_attr,
++    input      [ 8:0]  obj_hpos,
++    input      [ 2:0]  obj_bank,
++    `ifdef CPS2
++    input      [ 2:0]  obj_prio,
++    output reg [ 2:0]  buf_prio,
++    `endif
++
++    input              start,
++    output reg         idle,
++    // Line buffer
++    output reg [ 8:0]  buf_addr,
++    output reg [ 8:0]  buf_data,
++    output reg         buf_wr,
++
++    // ROM interface
++    output reg [19:0]  rom_addr,    // up to 1 MB
++    output reg [ 2:0]  rom_bank,
++    output reg         rom_half,    // selects which half to read
++    input      [31:0]  rom_data,
++    output reg         rom_cs,
++    input              rom_ok
++);
++
++wire [ 3:0] vsub;
++wire [ 4:0] next_pal;
++reg  [ 4:0] pal;
++wire        next_hflip;
++reg         hflip;
++reg         wait_cycle;
++reg  [ 7:0] draw_cnt;
++reg  [ 8:0] next_buf;
++reg         draw, half;
++reg  [31:0] pxl_data;
++wire        rom_good;
++
++assign vsub     = obj_attr[11:8];
++//     vflip    = obj_attr[6];
++assign next_hflip = obj_attr[5];
++assign next_pal = obj_attr[4:0];
++assign rom_good = rom_ok && !wait_cycle;
++
++function [3:0] colour;
++    input [31:0] c;
++    input        flip;
++    colour = flip ? { c[24], c[16], c[ 8], c[0] } :
++                    { c[31], c[23], c[15], c[7] };
++endfunction
++
++`ifdef SIMULATION
++wire skipped = draw && draw_cnt[0] && &pxl_data;
++`endif
++
++always @(posedge clk, posedge rst) begin
++    if( rst ) begin
++        rom_addr   <= 20'd0;
++        rom_half   <= 1'd0;
++        buf_wr     <= 1'b0;
++        buf_data   <= 9'd0;
++        buf_addr   <= 9'd0;
++        rom_cs     <= 1'b0;
++        idle       <= 1;
++        draw       <= 0;
++        wait_cycle <= 0;
++        draw_cnt   <= 8'h0;
++        rom_bank   <= 3'd0;
++    end else begin
++        wait_cycle <= 0;
++        if( idle ) begin
++            if( start && obj_hpos>9'h20 && obj_hpos<9'h1d0 ) begin
++                idle       <= 0;
++                rom_cs     <= 1;
++                rom_addr   <= { obj_code, vsub };
++                rom_bank   <= obj_bank;
++                next_buf   <= obj_hpos;
++                rom_half   <= next_hflip;
++                wait_cycle <= 1;
++                half       <= 1;    // which half are we drawing?
++            end else begin
++                rom_cs   <= 0;
++                rom_bank <= 3'd0;
++            end
++        end
++        if( draw ) begin
++            buf_wr   <= 1;
++            buf_addr <= buf_addr+9'd1;
++            buf_data <= { pal, colour(pxl_data, hflip) };
++            pxl_data <= hflip ? {1'b1,pxl_data[31:1]} : {pxl_data[30:0],1'b1};
++            draw_cnt <= draw_cnt>>1;
++            if( draw_cnt[0] ) begin
++                draw <= 0;
++            end
++        end else begin
++            buf_wr <= 0;
++        end
++        if( !draw && !idle) begin
++            if( rom_good ) begin
++                pxl_data <= rom_data;
++                half     <= 0;
++                if( half ) begin
++                    rom_half <= ~rom_half;
++                    // copy new object data
++                    buf_addr <= next_buf;
++                    `ifdef CPS2
++                    buf_prio <= obj_prio;
++                    `endif
++                    pal      <= next_pal;
++                    hflip    <= next_hflip;
++                end else begin
++                    rom_cs <= 0;
++                    idle   <= 1; // accept new requests
++                end
++
++                if( &rom_data ) begin
++                    // skip blank pixels
++                    wait_cycle <= 1;
++                    buf_addr   <= (half ? next_buf : buf_addr) + 9'd8;
++                    if( !half ) begin
++                        rom_cs <= 0;
++                        idle   <= 1;
++                    end
++                end else begin
++                    draw <= 1;
++                    draw_cnt <= 8'h80;
++                end
++            end
++        end
++    end
++end
++
++endmodule
+\ No newline at end of file
+diff --git a/cores/cps2w/hdl/jtcps1_video.v b/cores/cps2w/hdl/jtcps1_video.v
+new file mode 100644
+index 000000000..949389496
+--- /dev/null
++++ b/cores/cps2w/hdl/jtcps1_video.v
+@@ -0,0 +1,694 @@
++/*  This file is part of JTCORES1.
++    JTCORES1 program is free software: you can redistribute it and/or modify
++    it under the terms of the GNU General Public License as published by
++    the Free Software Foundation, either version 3 of the License, or
++    (at your option) any later version.
++
++    JTCORES1 program is distributed in the hope that it will be useful,
++    but WITHOUT ANY WARRANTY; without even the implied warranty of
++    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++    GNU General Public License for more details.
++
++    You should have received a copy of the GNU General Public License
++    along with JTCORES1.  If not, see <http://www.gnu.org/licenses/>.
++
++    Author: Jose Tejada Gomez. Twitter: @topapate
++    Version: 1.0
++    Date: 13-1-2020 */
++
++
++// Scroll 1 is 512x512, 8x8 tiles
++// Scroll 2 is 1024x1024 16x16 tiles
++// Scroll 3 is 2048x2048 32x32 tiles
++
++// ---------------------------------------------------------------------------
++// CPS-2 WIDE (Vampire Saved) OVERRIDE of cores/cps1/hdl/jtcps1_video.v.
++// SLICE D3. The video block is the only path between the game top and the
++// object engine, so two things have to pass through it and nothing else
++// changes:
++//   * `rom0_bank` out widens from 2 bits to 3 (the CPS-2 Turbo obj promote in
++//     cores/cps2w/hdl/jtcps2_obj_scan.v);
++//   * `wide_en` in, routed to jtcps2_obj -> jtcps2_obj_scan, which is where
++//     the promote is gated.
++// The CPS-1 arm keeps its constant bank, widened to match the port. Copied
++// rather than edited because the file is SHARED with cores/cps1, cores/cps15
++// and cores/cps2, which stay byte-untouched; the diff against the original is
++// frozen by tests/test_mister_wide_gate.sh.
++// ---------------------------------------------------------------------------
++
++module jtcps1_video(
++    input              rst,
++    input              clk,
++    input              clk_cpu,
++    input              pxl2_cen,        // pixel clock enable
++    input              pxl_cen,        // pixel clock enable
++
++    output     [ 8:0]  vdump,
++    output     [ 8:0]  vrender,
++    output     [ 8:0]  hdump,
++    input      [ 3:0]  gfx_en,
++    input      [ 7:0]  debug_bus,
++
++    `ifdef CPS2
++    input              wide_en,     // CPS-2 WIDE profile (jtcps2w_profile.v)
++    input              objcfg_cs,
++    input              obank,
++    output     [12:0]  oram_addr,
++    input              oram_ok,
++    output             oram_clr,
++    output             oram_cs,
++    input      [15:0]  oram_data,
++    `endif
++
++    // CPU interface
++    input              ppu_rstn,
++    input              ppu1_cs,
++    input              ppu2_cs,
++    input   [12:1]     addr,
++    input   [ 1:0]     dsn,      // data select, active low
++    input   [15:0]     cpu_dout,
++    output  [15:0]     mmr_dout,
++    output             cpu_speed,
++    output             charger,
++    output             kabuki_en,
++    output             raster,
++    output             star_bank,
++
++    // BUS sharing
++    output             busreq,
++    input              busack,
++
++    // CPS-B Registers
++    input              cfg_we,
++    input      [ 7:0]  cfg_data,
++
++    // Extra inputs read through the C-Board
++    input   [ 3:0]  cab_1p,
++    input   [ 3:0]  coin,
++    input   [ 9:0]  joystick1,
++    input   [ 9:0]  joystick2,
++    input   [ 9:0]  joystick3,
++    input   [ 9:0]  joystick4,
++
++    // Video RAM interface
++    output     [17:1]  vram_dma_addr,
++    input      [15:0]  vram_dma_data,
++    input              vram_dma_ok,
++    output             vram_dma_cs,
++    output             vram_dma_clr,
++    output             vram_rfsh_en,
++
++    // Video signal
++    output             HS,
++    output             VS,
++    output             LHBL,
++    output             LVBL,
++    output     [ 7:0]  red,
++    output     [ 7:0]  green,
++    output     [ 7:0]  blue,
++    output             flip,
++
++    // GFX ROM interface
++    output     [19:0]  rom1_addr,
++    output             rom1_half,    // selects which half to read
++    input      [31:0]  rom1_data,
++    output             rom1_cs,
++    input              rom1_ok,
++
++    output     [19:0]  rom0_addr,
++    output     [ 2:0]  rom0_bank,
++    output             rom0_half,    // selects which half to read
++    input      [31:0]  rom0_data,
++    output             rom0_cs,
++    input              rom0_ok,
++
++    output     [12:0]  star0_addr,
++    input      [31:0]  star0_data,
++    output             star0_cs,
++    input              star0_ok,
++
++    output     [12:0]  star1_addr,
++    input      [31:0]  star1_data,
++    output             star1_cs,
++    input              star1_ok,
++
++    input              watch_vram_cs,
++    output             watch
++
++    `ifdef CPS1
++    // EEPROM
++    ,output            sclk,
++    output             sdi,
++    output             scs,
++    input              sdo
++    `endif
++);
++
++parameter REGSIZE=24;
++
++`ifdef CPS2
++localparam OBJW=12, BLNK_DLY=5;
++`else
++localparam OBJW=9, BLNK_DLY=4;
++`endif
++
++// use for CPU only simulations:
++`ifdef NOVIDEO
++`define NOSCROLL
++`define NOOBJ
++`define NOCOLMIX
++`endif
++
++wire [    11:0] pal_addr, merge_pxl, final_pxl;
++wire [    10:0] scr1_pxl, scr2_pxl, scr3_pxl;
++wire [     6:0] star1_pxl, star0_pxl;
++wire [     8:0] vrender1;
++wire [    15:0] ppu_ctrl, pal_raw;
++wire [    17:1] vram_pal_addr;
++wire            line_start, frame_start, preVB;
++wire            busack_obj, busack_pal;
++wire [OBJW-1:0] obj_pxl;
++wire [     1:0] star_en;
++
++// Register configuration
++// Scroll
++wire       [15:0]  hpos1, hpos2, hpos3, vpos1, vpos2, vpos3, hstar1, hstar0, vstar1, vstar0;
++// VRAM position
++wire       [15:0]  vram1_base, vram2_base, vram3_base, vram_obj_base, vram_row_base, row_offset;
++// Layer priority
++wire       [15:0]  layer_ctrl, prio0, prio1, prio2, prio3;
++wire       [ 7:0]  layer_mask0, layer_mask1, layer_mask2, layer_mask3, layer_mask4;
++// palette control
++wire       [15:0]  pal_base;
++wire               pal_dma_ok;
++wire       [ 5:0]  pal_page_en; // which palette pages to copy
++// ROM banks
++wire       [ 5:0]  game;
++wire       [15:0]  bank_offset;
++wire       [15:0]  bank_mask;
++
++wire       [ 7:0]  tile_addr;
++wire       [15:0]  tile_data, row_scr;
++wire       [ 9:0]  obj_cache_addr;
++wire               obj_dma_ok;
++wire       [15:0]  objtable_data;
++
++wire               objdma_en, row_en;
++wire       [ 3:1]  scrdma_en;
++wire               star1_precs, star0_precs;
++wire               line_inc, VB, HB;
++
++`ifdef CPS2
++    assign obj_dma_ok = 0;
++    assign star1_cs   = 0;
++    assign star0_cs   = 0;
++`else
++    assign star1_cs   = ~VB & star1_precs;// & star_en[1];
++    assign star0_cs   = ~VB & star0_precs;// & star_en[0];
++`endif
++
++wire               watch_scr1, watch_scr2, watch_scr3,
++                   watch_pal, watch_row, watch_obj;
++
++`ifdef CPS2
++assign objdma_en = 0; // People said that Progear was too slow
++`else
++assign objdma_en = 1; // does this signal exist?
++`endif
++assign scrdma_en = ppu_ctrl[3:1];
++assign row_en    = ppu_ctrl[0];
++assign flip      = ppu_ctrl[15];
++
++`ifdef JTCPS_WATCH
++jtcps1_watch u_watch(
++    .rst            ( rst           ),
++    .clk            ( clk           ),
++    .pxl_cen        ( pxl_cen       ),
++    .HB             ( HB            ),
++    .VB             ( VB            ),
++
++    .watch_scr1     ( watch_scr1    ),
++    .watch_scr2     ( watch_scr2    ),
++    .watch_scr3     ( watch_scr3    ),
++    .watch_pal      ( watch_pal     ),
++    .watch_row      ( watch_row     ),
++    .watch_obj      ( watch_obj     ),
++    .watch_vram_cs  ( watch_vram_cs ),
++    .pal_dma_ok     ( pal_dma_ok    ),
++
++    .raster         ( raster        ),
++
++    .ppu1_cs        ( ppu1_cs       ),
++    .ppu2_cs        ( ppu2_cs       ),
++    .objcfg_cs      ( objcfg_cs     ),
++
++    .watch          ( watch         )
++);
++`else
++assign watch=0;
++`endif
++
++jtcps1_dma u_dma(
++    .rst            ( rst               ),
++    .clk            ( clk               ),
++    .pxl2_cen       ( pxl2_cen          ),
++    .pxl_cen        ( pxl_cen           ),
++    .HB             ( HB                ),
++    .vrender1       ( vrender1          ),
++    .flip           ( flip              ),
++
++    .tile_addr      ( tile_addr         ),
++    .tile_data      ( tile_data         ),
++
++    .scrdma_en      ( scrdma_en         ),
++    .vram1_base     ( vram1_base        ),
++    .hpos1          ( hpos1             ),
++    .vpos1          ( vpos1             ),
++
++    .vram2_base     ( vram2_base        ),
++    .hpos2          ( hpos2             ),
++    .vpos2          ( vpos2             ),
++
++    .vram3_base     ( vram3_base        ),
++    .hpos3          ( hpos3             ),
++    .vpos3          ( vpos3             ),
++
++    // Row Scroll
++    .vram_row_base  ( vram_row_base     ),
++    .row_offset     ( row_offset        ),
++    .row_en         ( row_en            ),
++    .row_scr        ( row_scr           ),
++
++    // Palette
++    .vram_pal_base  ( pal_base          ),
++    .pal_dma_ok     ( pal_dma_ok        ),
++    .pal_page_en    ( pal_page_en       ),
++    .pal_data       ( pal_raw           ),
++    .colmix_addr    ( pal_addr          ),
++
++    // Objects
++    .objdma_en      ( objdma_en         ),
++    .vram_obj_base  ( vram_obj_base     ),
++    `ifdef CPS2
++        .obj_table_addr ( 10'd0         ),
++    `else
++        .obj_table_addr (obj_cache_addr ),
++    `endif
++    .obj_table_data ( objtable_data     ),
++    .obj_dma_ok     ( obj_dma_ok        ),
++
++    .br             ( busreq            ),
++    .bg             ( busack            ),
++    .vram_addr      ( vram_dma_addr     ),
++    .vram_data      ( vram_dma_data     ),
++    .vram_ok        ( vram_dma_ok       ),
++    .vram_clr       ( vram_dma_clr      ),
++    .vram_cs        ( vram_dma_cs       ),
++    .rfsh_en        ( vram_rfsh_en      ),
++
++    // watched signals
++    .watch_scr1     ( watch_scr1        ),
++    .watch_scr2     ( watch_scr2        ),
++    .watch_scr3     ( watch_scr3        ),
++    .watch_pal      ( watch_pal         ),
++    .watch_row      ( watch_row         ),
++    .watch_obj      ( watch_obj         )
++);
++
++jtcps1_timing u_timing(
++    .clk            ( clk               ),
++    .cen8           ( pxl_cen           ),
++
++    .vdump          ( vdump             ),
++    .hdump          ( hdump             ),
++    .vrender1       ( vrender1          ),
++    .vrender        ( vrender           ),
++    .line_inc       ( line_inc          ),
++    .line_start     ( line_start        ),
++    .frame_start    ( frame_start       ),
++    // to video output
++    .HS             ( HS                ),
++    .VS             ( VS                ),
++    .VB             ( VB                ),
++    .preVB          ( preVB             ),
++    .HB             ( HB                ),
++    .debug_bus      ( debug_bus         )
++);
++
++// initial begin
++//     $display("OFFSET=%X",`OFFSET);
++// end
++
++jtcps1_mmr #(REGSIZE) u_mmr(
++    .rst            ( rst               ),
++    .clk            ( clk               ),
++    .pxl_cen        ( pxl_cen           ),
++    .ppu_rstn       ( ppu_rstn          ),  // controlled by CPU
++
++    .frame_start    ( frame_start       ),
++    .line_inc       ( line_inc          ),
++    .raster         ( raster            ),
++    //.debug_bus      ( debug_bus         ),
++
++    .ppu1_cs        ( ppu1_cs           ),
++    .ppu2_cs        ( ppu2_cs           ),
++    .addr           ( addr[5:1]         ),
++    .dsn            ( dsn               ),      // data select, active low
++    .cpu_dout       ( cpu_dout          ),
++    .mmr_dout       ( mmr_dout          ),
++    // registers
++    .ppu_ctrl       ( ppu_ctrl          ),
++    .star_bank      ( star_bank         ),
++    // Scroll
++    .hpos1          ( hpos1             ),
++    .hpos2          ( hpos2             ),
++    .hpos3          ( hpos3             ),
++    .vpos1          ( vpos1             ),
++    .vpos2          ( vpos2             ),
++    .vpos3          ( vpos3             ),
++    .hstar1         ( hstar0            ),
++    .hstar2         ( hstar1            ),
++    .vstar1         ( vstar0            ),
++    .vstar2         ( vstar1            ),
++
++    .cpu_speed      ( cpu_speed         ),
++    .charger        ( charger           ),
++    .kabuki_en      ( kabuki_en         ),
++
++    // OBJ DMA
++    `ifndef CPS2
++        `ifndef NOMAIN
++            .obj_dma_ok ( obj_dma_ok    ),
++        `else
++            .obj_dma_ok (               ),
++        `endif
++    `else
++        .obj_dma_ok (                   ),
++    `endif
++
++    .cab_1p   ( cab_1p      ),
++    .coin     ( coin        ),
++    .joystick1      ( joystick1         ),
++    .joystick2      ( joystick2         ),
++    .joystick3      ( joystick3         ),
++    .joystick4      ( joystick4         ),
++
++    // ROM banks
++    .game           ( game              ),
++    .bank_offset    ( bank_offset       ),
++    .bank_mask      ( bank_mask         ),
++
++    // VRAM position
++    .vram1_base     ( vram1_base        ),
++    .vram2_base     ( vram2_base        ),
++    .vram3_base     ( vram3_base        ),
++    .vram_obj_base  ( vram_obj_base     ),
++    .vram_row_base  ( vram_row_base     ),
++    .row_offset     ( row_offset        ),
++    .pal_base       ( pal_base          ),
++`ifndef NOMAIN
++    .pal_copy       ( pal_dma_ok        ),
++`else
++    .pal_copy       (                   ),
++`endif
++
++    // CPS-B Registers
++    .cfg_we         ( cfg_we            ),
++    .cfg_data       ( cfg_data          ),
++
++    .layer_ctrl     ( layer_ctrl        ),
++    .layer_mask0    ( layer_mask0       ),
++    .layer_mask1    ( layer_mask1       ),
++    .layer_mask2    ( layer_mask2       ),
++    .layer_mask3    ( layer_mask3       ),
++    .layer_mask4    ( layer_mask4       ),
++    .prio0          ( prio0             ),
++    .prio1          ( prio1             ),
++    .prio2          ( prio2             ),
++    .prio3          ( prio3             ),
++    .pal_page_en    ( pal_page_en       )
++    `ifdef CPS1
++    ,.sclk          ( sclk              ),
++    .sdi            ( sdi               ),
++    .sdo            ( sdo               ),
++    .scs            ( scs               )
++    `endif
++);
++
++//`define NOSCROLL1
++`ifndef NOSCROLL
++jtcps1_scroll u_scroll(
++    .rst        ( rst           ),
++    .clk        ( clk           ),
++    .pxl_cen    ( pxl_cen       ),
++    .gfx_en     ( gfx_en        ),
++    .flip       ( flip          ),
++
++    .vrender    ( vrender       ),
++    .vdump      ( vdump         ),
++    .hdump      ( hdump         ),
++    .preVB      ( preVB         ),
++    .VB         ( VB            ),
++    .HB         ( HB            ),
++    .HS         ( HS            ),
++
++    .hpos1      ( hpos1         ),
++    .vpos1      ( vpos1         ),
++
++    .hpos2      ( row_scr       ),
++    .vpos2      ( vpos2         ),
++
++    .hpos3      ( hpos3         ),
++    .vpos3      ( vpos3         ),
++
++    .hstar0     ( hstar0        ),
++    .vstar0     ( vstar0        ),
++    .hstar1     ( hstar1        ),
++    .vstar1     ( vstar1        ),
++
++    // ROM banks
++    .game       ( game          ),
++    .bank_offset( bank_offset   ),
++    .bank_mask  ( bank_mask     ),
++
++    .start      ( line_start    ),
++
++    .tile_addr  ( tile_addr     ),
++    .tile_data  ( tile_data     ),
++
++    .rom_addr   ( rom1_addr     ),
++    .rom_data   ( rom1_data     ),
++    .rom_cs     ( rom1_cs       ),
++    .rom_ok     ( rom1_ok       ),
++    .rom_half   ( rom1_half     ),
++
++    .star0_addr ( star0_addr    ),
++    .star0_data ( star0_data    ),
++    .star0_ok   ( star0_ok      ),
++    .star0_cs   ( star0_precs   ),
++
++    .star1_addr ( star1_addr    ),
++    .star1_data ( star1_data    ),
++    .star1_ok   ( star1_ok      ),
++    .star1_cs   ( star1_precs   ),
++
++    .scr1_pxl   ( scr1_pxl      ),
++    .scr2_pxl   ( scr2_pxl      ),
++    .scr3_pxl   ( scr3_pxl      ),
++
++    .star0_pxl  ( star0_pxl     ),
++    .star1_pxl  ( star1_pxl     ),
++    .debug_bus  ( debug_bus     )
++);
++`else
++assign rom1_cs    = 1'b0;
++assign rom1_addr  = 20'd0;
++assign scr1_pxl   = 11'h1ff;
++assign scr2_pxl   = 11'h1ff;
++assign scr3_pxl   = 11'h1ff;
++`endif
++
++// Objects
++`ifndef CPS2
++    jtcps1_obj u_obj(
++        .rst        ( rst           ),
++        .clk        ( clk           ),
++        .pxl_cen    ( pxl_cen       ),
++        .flip       ( flip          ),
++
++        // Cache access
++        .frame_addr ( obj_cache_addr),
++        .frame_data ( objtable_data ),
++
++        .start      ( line_start    ),
++        .vrender    ( vrender       ),
++        .vdump      ( vdump         ),
++        .hdump      ( hdump         ),
++
++        // ROM banks
++        .game       ( game          ),
++        .bank_offset( bank_offset   ),
++        .bank_mask  ( bank_mask     ),
++
++        // ROM data
++        .rom_addr   ( rom0_addr     ),
++        .rom_data   ( rom0_data     ),
++        .rom_cs     ( rom0_cs       ),
++        .rom_ok     ( rom0_ok       ),
++        .rom_half   ( rom0_half     ),
++
++        .pxl        ( obj_pxl       )
++    );
++
++    assign rom0_bank = 3'b010;
++`else
++    jtcps2_obj u_obj(
++        .rst        ( rst           ),
++        .clk        ( clk           ),
++        .clk_cpu    ( clk_cpu       ),
++        .pxl_cen    ( pxl_cen       ),
++        .flip       ( flip          ),
++        .wide_en    ( wide_en       ),
++        .LVBL       ( ~VB           ),
++
++        .objcfg_cs  ( objcfg_cs     ),
++        .addr       ( addr[3:1]     ),
++        .dsn        ( dsn           ),
++        .cpu_dout   ( cpu_dout      ),
++
++        .obank      ( obank         ),
++        // Interface with SDRAM for OBJRAM
++        .oram_addr  ( oram_addr     ),
++        .oram_ok    ( oram_ok       ),
++        .oram_data  ( oram_data     ),
++        .oram_clr   ( oram_clr      ),
++        .oram_cs    ( oram_cs       ),
++
++        .start      ( line_start    ),
++        .vrender1   ( vrender1      ),
++        .vdump      ( vdump         ),
++        .hdump      ( hdump         ),
++
++        // ROM data
++        .rom_addr   ( rom0_addr     ),
++        .rom_bank   ( rom0_bank     ),
++        .rom_data   ( rom0_data     ),
++        .rom_cs     ( rom0_cs       ),
++        .rom_ok     ( rom0_ok       ),
++        .rom_half   ( rom0_half     ),
++
++        .pxl        ( obj_pxl       )
++    );
++`endif
++
++`ifndef NOCOLMIX
++jtcps1_colmix u_colmix(
++    .rst        ( rst           ),
++    .clk        ( clk           ),
++    .pxl_cen    ( pxl_cen       ),
++
++    .gfx_en     ( gfx_en        ),
++    .scrdma_en  ( scrdma_en     ),
++    .star_en    ( star_en       ),
++
++    // Layer priority
++    .layer_ctrl ( layer_ctrl    ),
++    .layer_mask0( layer_mask0   ),
++    .layer_mask1( layer_mask1   ),
++    .layer_mask2( layer_mask2   ),
++    .layer_mask3( layer_mask3   ),
++    .layer_mask4( layer_mask4   ),
++    .prio0      ( prio0         ),
++    .prio1      ( prio1         ),
++    .prio2      ( prio2         ),
++    .prio3      ( prio3         ),
++
++    // Pixel layers data
++    .scr1_pxl   ( scr1_pxl      ),
++    .scr2_pxl   ( scr2_pxl      ),
++    .scr3_pxl   ( scr3_pxl      ),
++    .star0_pxl  ( star0_pxl     ),
++    .star1_pxl  ( star1_pxl     ),
++    `ifndef CPS2
++    .obj_pxl    ( obj_pxl       ),
++    `else
++    .obj_pxl    ( 9'h00f        ),
++    `endif
++
++    .pxl        ( merge_pxl     )
++);
++
++`ifdef CPS2
++jtcps2_colmix u_objmix(
++    .rst        ( rst           ),
++    .clk        ( clk           ),
++    .pxl_cen    ( pxl_cen       ),
++
++    .objcfg_cs  ( objcfg_cs     ),
++    .addr       ( addr[3:1]     ),
++    .cpu_dout   ( cpu_dout      ),
++    .dsn        ( dsn           ),
++    .layer_ctrl ( layer_ctrl    ),
++
++    .scr_pxl    ( merge_pxl     ),
++    .obj_pxl    ( obj_pxl       ),
++    .obj_en     ( gfx_en[3]     ),
++    .pxl        ( final_pxl     ),
++    .debug_bus  ( debug_bus     )
++);
++`else
++assign final_pxl = merge_pxl;
++`endif
++
++jtcps1_pal #(.BLNK_DLY(BLNK_DLY)) u_pal(
++    .rst        ( rst           ),
++    .clk        ( clk           ),
++    .pxl_cen    ( pxl_cen       ),
++
++    .vb         ( VB            ),
++    .hb         ( HB            ),
++    .LHBL       ( LHBL          ),
++    .LVBL       ( LVBL          ),
++
++    // Palette RAM
++    .pxl_in     ( final_pxl     ),
++    .pal_addr   ( pal_addr      ),
++    .pal_raw    ( pal_raw       ),
++
++    // Video
++    .red        ( red           ),
++    .green      ( green         ),
++    .blue       ( blue          )
++);
++
++`else
++assign red_colmix  = 8'b0;
++assign green_colmix= 8'b0;
++assign blue_colmix = 8'b0;
++assign LHBL_colmix = ~HB;
++assign LVBL_colmix = ~VB;
++assign vpal_cs   = 1'b0;
++assign vpal_addr = 17'd0;
++assign LVBL_dly  = ~VB;
++assign LHBL_dly  = ~HB;
++`endif
++
++// Fake DMA signals to allow for video-only simulation
++`ifdef  NOMAIN
++reg fake_pal, last_VB;
++
++assign pal_dma_ok = fake_pal;
++assign obj_dma_ok = fake_pal;
++
++always @(posedge clk or posedge rst) begin
++    if( rst ) begin
++        fake_pal <= 0;
++        last_VB  <= 1;
++    end else if(pxl_cen) begin
++        last_VB  <= VB;
++        fake_pal <= VB && !last_VB;
++    end
++end
++`endif
++
++endmodule
+\ No newline at end of file
+diff --git a/cores/cps2w/hdl/jtcps2_game.v b/cores/cps2w/hdl/jtcps2_game.v
+index d2ba2bf28..2e946833d 100644
+--- a/cores/cps2w/hdl/jtcps2_game.v
++++ b/cores/cps2w/hdl/jtcps2_game.v
+@@ -45,10 +45,21 @@ module jtcps2_game(
+ //   5. `wide_en` routed into jtcps1_sdram (the download redirects and the two
+ //      read-side selects all take it there);
+ //   6. the SDRAM instance resolves to cores/cps2w/hdl/jtcps1_sdram.v;
+-//   7. `rom0_bank` widened to 3 bits at the SDRAM port, with bit 2 TIED LOW —
+-//      that bit is the CPS-2 Turbo obj promote and it is slice D3's. Until
+-//      then the two group-C read slots are provably unreachable and D2's
+-//      evidence is the SDRAM image census, not a fetch.
++//   7. `rom0_bank` widened to 3 bits at the SDRAM port. D2 left bit 2 TIED
++//      LOW, so the two group-C read slots were provably unreachable and D2's
++//      evidence was the SDRAM image census rather than a fetch.
++//
++// SLICE D3 UNTIES IT, and that is the whole of the slice at this level:
++//   8. `rom0_bank` is now the 3-bit bank the object engine produces, driven
++//      end to end from cores/cps2w/hdl/jtcps2_obj_scan.v's CPS-2 Turbo
++//      promote through jtcps2_obj and jtcps1_video. Bit 2 selects GFX group C
++//      — the three tenants' art — and reaches jtcps1_sdram's `gfxc_sel`,
++//      which is itself ANDed with wide_en. THIS IS THE FIRST SLICE IN WHICH
++//      THE CORE CAN FETCH A TENANT TILE.
++//   9. `wide_en` routed into jtcps1_video, which passes it to the object
++//      scanner: the promote is gated at its source as well as at its
++//      destination, so with the profile clear bit 2 is 0 by construction and
++//      every downstream expression collapses to the reference core's.
+ // ---------------------------------------------------------------------------
+ 
+ wire        clk_gfx, rst_gfx;
+@@ -69,11 +80,10 @@ wire        main_rom_ok, main_ram_ok;
+ wire        ppu1_cs, ppu2_cs, ppu_rstn, objcfg_cs;
+ wire        raster;
+ wire [19:0] rom1_addr, rom0_addr;
+-wire [ 1:0] rom0_bank;
+-// CPS-2 WIDE: the SDRAM side takes THREE bank bits. Bit 2 selects GFX group C
+-// and is driven by the obj promote in slice D3; it is tied low here so D2
+-// changes no fetch at all.
+-wire [ 2:0] rom0_bank_sdram = { 1'b0, rom0_bank };
++// CPS-2 WIDE: THREE bank bits, from the CPS-2 Turbo obj promote (slice D3).
++// Bit 2 selects GFX group C and is 0 unless wide_en is set, because the
++// promote that produces it is gated in jtcps2_obj_scan.
++wire [ 2:0] rom0_bank;
+ wire [31:0] rom0_data, rom1_data;
+ // Video RAM interface
+ wire [17:1] vram_dma_addr;
+@@ -287,6 +297,7 @@ assign dip_flip = video_flip;
+ 
+ jtcps1_video #(REGSIZE) u_video(
+     .rst            ( rst_video     ),
++    .wide_en        ( wide_en       ),
+     .clk            ( clk_gfx       ),
+     .clk_cpu        ( clk48         ),
+     .pxl2_cen       ( pxl2_cen      ),
+@@ -560,7 +571,7 @@ jtcps1_sdram #(.CPS(2), .REGSIZE(REGSIZE)) u_sdram (
+     .rom1_ok     ( rom1_ok       ),
+ 
+     .rom0_addr   ( rom0_addr     ),
+-    .rom0_bank   ( rom0_bank_sdram ),
++    .rom0_bank   ( rom0_bank     ),
+     .rom1_addr   ( rom1_addr     ),
+ 
+     .rom0_half   ( rom0_half     ),
+diff --git a/cores/cps2w/hdl/jtcps2_obj.v b/cores/cps2w/hdl/jtcps2_obj.v
+new file mode 100644
+index 000000000..8d4867340
+--- /dev/null
++++ b/cores/cps2w/hdl/jtcps2_obj.v
+@@ -0,0 +1,224 @@
++/*  This file is part of JTCORES1.
++    JTCORES1 program is free software: you can redistribute it and/or modify
++    it under the terms of the GNU General Public License as published by
++    the Free Software Foundation, either version 3 of the License, or
++    (at your option) any later version.
++
++    JTCORES1 program is distributed in the hope that it will be useful,
++    but WITHOUT ANY WARRANTY; without even the implied warranty of
++    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++    GNU General Public License for more details.
++
++    You should have received a copy of the GNU General Public License
++    along with JTCORES1.  If not, see <http://www.gnu.org/licenses/>.
++
++    Author: Jose Tejada Gomez. Twitter: @topapate
++    Version: 1.0
++    Date: 24-1-2021 */
++
++// ---------------------------------------------------------------------------
++// CPS-2 WIDE (Vampire Saved) OVERRIDE of cores/cps2/hdl/jtcps2_obj.v.
++// SLICE D3. Copied at jtcores v1.7.3 for one reason only: the object GFX bank
++// is three bits wide once the promote in jtcps2_obj_scan is live, so the wire
++// that carries it from the scanner to the drawer and the port that carries it
++// out to jtcps1_sdram both have to widen. `wide_en` passes through to the
++// scanner, which is where the promote is gated. No other behaviour changes.
++// ---------------------------------------------------------------------------
++
++module jtcps2_obj(
++    input              rst,
++    input              clk,
++    input              clk_cpu,
++    input              pxl_cen,
++    input              flip,
++    input              wide_en,     // CPS-2 WIDE profile (jtcps2w_profile.v)
++    input              LVBL,
++
++    // Configuration
++    input              objcfg_cs,
++    input      [15:0]  cpu_dout,
++    input      [ 1:0]  dsn,
++    input      [ 3:1]  addr,
++
++    // Interface with SDRAM for ORAM data
++    output     [12:0]  oram_addr,
++    input              oram_ok,
++    output             oram_clr,
++    output             oram_cs,
++    input      [15:0]  oram_data,
++
++    input              obank,
++
++    input              start,
++    input      [ 8:0]  vrender1,  // 1 line  ahead of vdump
++    input      [ 8:0]  vdump,
++    input      [ 8:0]  hdump,
++
++    output     [19:0]  rom_addr,    // up to 1 MB
++    output     [ 2:0]  rom_bank,
++    output             rom_half,    // selects which half to read
++    input      [31:0]  rom_data,
++    output             rom_cs,
++    input              rom_ok,
++
++    output     [11:0]  pxl
++);
++
++wire [15:0] dr_code, dr_attr;
++wire [ 8:0] dr_hpos;
++wire [ 2:0] dr_prio, buf_prio;
++wire [ 2:0] dr_bank;
++
++wire        dr_start, dr_idle;
++
++wire [15:0] line_data;
++wire [ 8:0] line_addr;
++
++wire [ 8:0] hdump_dly;
++
++wire [ 8:0] buf_addr, buf_data;
++wire [11:0] prio_data;
++wire        buf_wr;
++
++wire [ 9:0] off_x, off_y;
++
++wire        obank_frame, oframe_we, line;
++
++// shadow RAM interface
++wire [ 9:0] table_attr;
++wire [15:0] obj_x, obj_y, obj_code, obj_attr;
++
++assign prio_data = { buf_prio, buf_data };
++
++jtcps2_obj_frame u_frame(
++    .rst        ( rst           ),
++    .clk        ( clk           ),
++    .pxl_cen    ( pxl_cen       ),
++    .LVBL       ( LVBL          ),
++
++    .vdump      ( vdump         ),
++    .obank      ( obank         ),
++
++    // Interface with SDRAM for ORAM data
++    .oram_addr  ( oram_addr     ),
++    .oram_ok    ( oram_ok       ),
++    .oram_clr   ( oram_clr      ),
++    .oram_cs    ( oram_cs       ),
++
++    // Interface with ORAM frame buffer
++    .oframe_we  ( oframe_we     ),
++    .obank_frame( obank_frame   )
++);
++
++jtcps2_objram u_objram(
++    .rst        ( rst           ),
++    .clk_cpu    ( clk           ),  // use GFX as it is driven by u_frame
++    .clk_gfx    ( clk           ),
++
++    .obank      ( obank_frame   ),
++
++    // OBJ config
++    .objcfg_cs  ( objcfg_cs     ),
++    .cfg_addr   ( addr          ),
++    .cpu_dout   ( cpu_dout      ),
++    .cfg_dsn    ( dsn           ),
++
++    .off_x      ( off_x         ),
++    .off_y      ( off_y         ),
++
++    // Interface with CPU
++    .cs         ( oframe_we     ),
++    .ok         (               ),
++    .dsn        ( 2'd0          ),
++    .oram_din   ( oram_data     ),
++    .main_addr  ( {1'b0, oram_addr[11:0] } ),
++
++    // Interface with OBJ engine
++    .obj_addr   ( table_attr    ),
++    .obj_x      ( obj_x         ),
++    .obj_y      ( obj_y         ),
++    .obj_code   ( obj_code      ),
++    .obj_attr   ( obj_attr      )
++);
++
++jtcps2_obj_scan u_scan(
++    .rst        ( rst           ),
++    .clk        ( clk           ),
++    .flip       ( flip          ),
++    .wide_en    ( wide_en       ),
++
++    .hdump      ( hdump         ),
++    .vrender1   ( vrender1      ),
++    .line       ( line          ),
++
++    .off_x      ( off_x         ),
++    .off_y      ( off_y         ),
++
++    // interface with frame table
++    .table_addr ( table_attr    ),
++    .table_x    ( obj_x         ),
++    .table_y    ( obj_y         ),
++    .table_code ( obj_code      ),
++    .table_attr ( obj_attr      ),
++
++    // interface with renderer
++    .dr_start   ( dr_start      ),
++    .dr_idle    ( dr_idle       ),
++
++    .dr_code    ( dr_code       ),
++    .dr_attr    ( dr_attr       ),
++    .dr_hpos    ( dr_hpos       ),
++    .dr_prio    ( dr_prio       ),
++    .dr_bank    ( dr_bank       )
++);
++
++jtcps1_obj_draw u_draw(
++    .rst        ( rst           ),
++    .clk        ( clk           ),
++
++    .start      ( dr_start      ),
++    .idle       ( dr_idle       ),
++
++    .obj_code   ( dr_code       ),
++    .obj_attr   ( dr_attr       ),
++    .obj_hpos   ( dr_hpos       ),
++    .obj_bank   ( dr_bank       ),
++
++    .obj_prio   ( dr_prio       ),
++    .buf_prio   ( buf_prio      ),
++
++    .buf_addr   ( buf_addr      ),
++    .buf_data   ( buf_data      ),
++    .buf_wr     ( buf_wr        ),
++
++    .rom_addr   ( rom_addr[19:0]),
++    .rom_half   ( rom_half      ),
++    .rom_bank   ( rom_bank      ),
++    .rom_data   ( rom_data      ),
++    .rom_cs     ( rom_cs        ),
++    .rom_ok     ( rom_ok        )
++);
++
++jtframe_sh #(.W(9),.L(3)) u_sh(
++    .clk    ( clk       ),
++    .clk_en ( pxl_cen   ),
++    .din    ( hdump     ),
++    .drop   ( hdump_dly )
++);
++
++jtcps1_obj_line #(.DW(12)) u_line(
++    .clk        ( clk           ),
++    .pxl_cen    ( pxl_cen       ),
++    .flip       ( flip          ),
++
++    .vdump      ( line          ),
++    .hdump      ( hdump_dly     ),
++
++    .buf_addr   ( buf_addr      ),
++    .buf_data   ( prio_data     ),
++    .buf_wr     ( buf_wr        ),
++
++    .pxl        ( pxl           )
++);
++
++endmodule
+\ No newline at end of file
+diff --git a/cores/cps2w/hdl/jtcps2_obj_scan.v b/cores/cps2w/hdl/jtcps2_obj_scan.v
+new file mode 100644
+index 000000000..f858cf743
+--- /dev/null
++++ b/cores/cps2w/hdl/jtcps2_obj_scan.v
+@@ -0,0 +1,243 @@
++/*  This file is part of JTCORES1.
++    JTCORES1 program is free software: you can redistribute it and/or modify
++    it under the terms of the GNU General Public License as published by
++    the Free Software Foundation, either version 3 of the License, or
++    (at your option) any later version.
++
++    JTCORES1 program is distributed in the hope that it will be useful,
++    but WITHOUT ANY WARRANTY; without even the implied warranty of
++    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++    GNU General Public License for more details.
++
++    You should have received a copy of the GNU General Public License
++    along with JTCORES1.  If not, see <http://www.gnu.org/licenses/>.
++
++    Author: Jose Tejada Gomez. Twitter: @topapate
++    Version: 1.0
++    Date: 24-1-2021 */
++
++// ---------------------------------------------------------------------------
++// CPS-2 WIDE (Vampire Saved) OVERRIDE of cores/cps2/hdl/jtcps2_obj_scan.v.
++// SLICE D3 — THE OBJ PROMOTE. Copied at jtcores v1.7.3; the file is SHARED
++// with cores/cps2, so editing it in place would change the reference core.
++// The diff against the original IS the trust surface (CLAUDE.md rule 1 v2)
++// and is frozen line by line by tests/test_mister_wide_gate.sh.
++//
++// WHAT CHANGES, AND WHY IT IS THE ONLY SHAPE THAT WORKS. Stock CPS-2 reads the
++// object's GFX bank from two bits of the frame table's y-word,
++// `st3_bank <= table_y[14:13]`, so a 16-bit tile code plus a 2-bit bank is an
++// 18-bit tile address = 32 MB of graphics. CPS-2 WIDE v1 needs 48 MB, i.e. a
++// THIRD bank bit, and the free bit is y bit 12 — but it can only be read
++// AFTER the sprite-list terminator test above, and that ordering is the whole
++// of the rule:
++//
++//   * y bit 15 is the sprite-list TERMINATOR (`:141` below, unchanged). The
++//     profile's first draft proposed reading bank bit 2 from bit 15 directly;
++//     setting that bit on a live sprite ENDS THE LIST and drops every later
++//     sprite (docs/project/cps2_wide.md, Correction A2).
++//   * Capcom hit the same wall on CPS-2 Turbo and solved it the same way:
++//     test bit 15 first, THEN promote bit 12 into it, then read a 3-bit bank
++//     from bits 15:13. Inside the `else` arm below bit 15 is known to be 0,
++//     so the promoted bank is exactly { y[12], y[14:13] }.
++//   * That is why the build emits bank 4 as y-word 0x1000 and bank 5 as
++//     0x3000 (tools/gfx_tiles.py `bank_word`) and NOT `bank << 13`, which
++//     would be 0x8000 — a terminator.
++//
++// GATED. The promote is ANDed with `wide_en` (the runtime MRA header bit,
++// slice D1), so with the profile clear `st3_bank[2]` is 0 and bits [1:0] are
++// the stock expression, character for character. The reference core is
++// untouched by construction, not by measurement.
++// ---------------------------------------------------------------------------
++
++module jtcps2_obj_scan(
++    input              rst,
++    input              clk,
++    input              flip,
++    input              wide_en,     // CPS-2 WIDE profile (jtcps2w_profile.v)
++
++    input      [ 8:0]  vrender1, // 2 lines ahead of vdump
++    input      [ 8:0]  hdump,
++    output reg         line,
++
++    input      [ 9:0]  off_x,
++    input      [ 9:0]  off_y,
++
++    // interface with frame table
++    output reg [ 9:0]  table_addr,
++    input      [15:0]  table_x,
++    input      [15:0]  table_y,
++    input      [15:0]  table_code,
++    input      [15:0]  table_attr,
++
++    // interface with renderer
++    output reg         dr_start,    // dr for "draw"
++    input              dr_idle,
++
++    output reg [15:0]  dr_code,
++    output reg [15:0]  dr_attr,
++    output reg [ 8:0]  dr_hpos,
++    output reg [ 2:0]  dr_prio,
++    output reg [ 2:0]  dr_bank
++);
++
++reg  [ 9:0] mapper_in;
++reg  [ 8:0] vrenderf;
++
++reg  [ 9:0] obj_y, obj_x;
++wire [15:0] code_mn;
++wire [ 9:0] st4_effx;
++reg  [ 2:0] st3_bank, st4_bank;
++reg  [ 2:0] st3_prio, st4_prio;
++wire        start;
++
++reg         done;
++wire [ 3:0] st3_tile_n, st4_tile_n, st3_tile_m;
++reg  [ 3:0] npos;  // tile expansion n==horizontal, m==vertical
++wire [ 2:0] promoted_bank;   // CPS-2 WIDE: the 3-bit obj bank, gated
++reg  [ 4:0] n;
++wire [ 3:0] subn;
++wire [ 3:0] st4_vsub;
++wire        inzone, inzonex, st3_vflip;
++reg  [ 2:0] wait_cycle;
++reg         last_tile;
++reg         last_start;
++wire        stall, nstall;
++reg         cen=0;
++
++reg  [15:0] st3_code, st3_attr, st4_attr;
++reg  [ 9:0] st3_y, st3_x, st4_x;
++
++// CPS-2 WIDE: the CPS-2 Turbo promote. It is READ in the `else` arm of the
++// terminator test below, so bit 15 is known to be 0 there — which is the
++// whole of the rule. See cores/cps2w/hdl/jtcps2w_obj_bank.v.
++jtcps2w_obj_bank u_objbank(
++    .wide_en    ( wide_en       ),
++    .table_y    ( table_y       ),
++    .bank       ( promoted_bank )
++);
++
++jtcps1_obj_tile_match u_tile_match(
++    .rst        ( rst        ),
++    .clk        ( clk        ),
++    .cen        ( ~stall & cen    ),
++
++    .obj_code   ( st3_code   ),
++    .tile_m     ( st3_tile_m ),
++    .tile_n     ( st3_tile_n ),
++    .n          ( 4'd0       ),
++
++    .vflip      ( st3_vflip  ),
++    .vrenderf   ( vrenderf   ),
++    .obj_y      ( st3_y      ),
++
++    .vsub       ( st4_vsub   ),
++    .inzone     ( inzone     ),
++    .code_mn    ( code_mn    )
++);
++
++assign      start      = hdump == 'h1d0;
++
++assign      st3_tile_m = st3_attr[15:12];
++assign      st3_tile_n = st3_attr[11: 8];
++assign      st3_vflip  = st3_attr[6];
++
++assign      st4_tile_n = st4_attr[11: 8];
++wire        st4_hflip  = st4_attr[5];
++assign      subn       = (st4_hflip ? ( st4_tile_n - n[3:0] ) : n[3:0]);
++assign      st4_effx   = st4_x + { 2'b0, subn, 4'd0 }; // effective x value for multi tile objects
++assign      nstall     = n<={1'b0,st4_tile_n} && st4_tile_n!=0;
++assign      stall      = (inzone && (!dr_idle || nstall));// || dr_start;
++
++// the div-2 clock enable is needed because of the table_* signal latency
++// If the OBJ RAM didn't have an output latch, or if the latch had a clock enable
++// to control with the stall signal, the cen could be removed
++always @(posedge clk) cen <= ~cen;
++
++always @(posedge clk, posedge rst) begin
++    if( rst ) begin
++        table_addr <= 0;
++        n          <= 0;
++        npos       <= 0;
++        dr_start   <= 0;
++        dr_code    <= 0;
++        dr_attr    <= 0;
++        dr_hpos    <= 0;
++        dr_prio    <= 0;
++        last_start <= 0;
++        line       <= 0;
++        done       <= 1;
++
++        st3_x      <= 0;
++        st4_x      <= 0;
++        st3_y      <= 0;
++        // st4_y      <= 0;
++        st3_code   <= 0;
++        st3_attr   <= 0;
++        st4_attr   <= 0;
++    end else if(cen) begin
++        last_start <= start;
++
++        if( !stall ) begin
++        // I
++            table_addr <= done ? 10'd0 : (table_addr+1'd1);
++        // II
++            if( table_y[15] || table_attr[15:8]==8'hff || &table_addr ) begin
++                done     <= 1;
++                st3_x    <= 0;
++                st3_y    <= 0;
++                st3_attr <= 0;
++            end else begin
++                st3_code <= table_code;
++                st3_x    <= done ? 10'd0 : table_x[9:0] + 10'h40 - (table_attr[7] ? 10'd0 : off_x);
++                st3_y    <= done ? 10'd0 : table_y[9:0] + 10'h10 - (table_attr[7] ? 10'd0 : off_y);
++                st3_attr <= done ? 16'd0 : table_attr;
++                st3_prio <= table_x[15:13];
++                // CPS-2 WIDE: the 19th tile-address bit, promoted from y[12]
++                // AFTER the terminator test above (which is why it is not read
++                // from y[15]). Lifted into its own module so it can be swept
++                // exhaustively; wide_en clear => the stock 2-bit bank.
++                st3_bank <= promoted_bank;
++            end
++        // III
++            st4_attr <= st3_attr;
++            st4_x    <= st3_x;
++            // st4_y    <= st3_y;
++            st4_bank <= st3_bank;
++            st4_prio <= st3_prio;
++        end
++        // IV
++        if( inzone ) begin
++            if( dr_idle ) begin
++                dr_attr  <= { 4'd0, st4_vsub, st4_attr[7:0] };
++                dr_code  <= { code_mn[15:4], code_mn[3:0]+n[3:0]};
++                dr_hpos  <= st4_effx[8:0] - 9'd1;
++                dr_prio  <= st4_prio;
++                dr_bank  <= st4_bank;
++                dr_start <= n <= {1'b0,st4_tile_n} && !st4_effx[9];
++                if( !nstall ) begin
++                    n    <= 0;
++                    npos <= 0;
++                end else begin
++                    n    <= n+1'd1;
++                    npos <= st4_hflip ? npos-4'd1 : npos+4'd1;
++                end
++            end else begin
++                dr_start <= 0;
++            end
++        end else begin
++            dr_start <= 0;
++        end
++
++        // This must be at the end
++        if( start && !last_start ) begin
++            line       <= ~line;
++            vrenderf   <= vrender1 ^ {1'b0,{8{flip}}};
++            n          <= 0;
++            npos       <= 0;
++            done       <= 0;
++            table_addr <= 0;
++        end
++    end
++end
++
++endmodule
+diff --git a/cores/cps2w/hdl/jtcps2w_obj_bank.v b/cores/cps2w/hdl/jtcps2w_obj_bank.v
+new file mode 100644
+index 000000000..5a3bef330
+--- /dev/null
++++ b/cores/cps2w/hdl/jtcps2w_obj_bank.v
+@@ -0,0 +1,66 @@
++/*  This file is part of JTCORES1.
++    JTCORES1 program is free software: you can redistribute it and/or modify
++    it under the terms of the GNU General Public License as published by
++    the Free Software Foundation, either version 3 of the License, or
++    (at your option) any later version.
++
++    JTCORES1 program is distributed in the hope that it will be useful,
++    but WITHOUT ANY WARRANTY; without even the implied warranty of
++    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++    GNU General Public License for more details.
++
++    You should have received a copy of the GNU General Public License
++    along with JTCORES1.  If not, see <http://www.gnu.org/licenses/>.
++
++    Author: the Vampire Saved project (CPS-2 WIDE), 2026
++    Date: 24-8-2026 */
++
++// jtcps2w_obj_bank — THE OBJECT GFX BANK, PROMOTED AND PROFILE-GATED.
++//
++// THE CAP IT LIFTS. Stock CPS-2 reads an object's graphics bank from two bits
++// of the frame table's y-word — `st3_bank <= table_y[14:13]` in
++// cores/cps2/hdl/jtcps2_obj_scan.v — so a 16-bit tile code plus a 2-bit bank
++// is an 18-bit tile address: 2^18 tiles x 128 B = 32 MB, and that is the whole
++// of the graphics the object engine can reach. CPS-2 WIDE v1 declares 48 MB,
++// so it needs a THIRD bank bit.
++//
++// WHY BIT 12, AND WHY THE ORDER MATTERS MORE THAN THE BIT. y bit 15 is the
++// sprite-list TERMINATOR (jtcps2_obj_scan.v:141, `if( table_y[15] || ... )
++// done <= 1`). The profile's first draft proposed simply widening the mask to
++// read bits 15:13 as the bank; setting bit 15 on a live sprite ENDS THE LIST
++// and drops every later sprite, so bank values 4-7 would have been unusable
++// (docs/project/cps2_wide.md, Correction A2). Capcom hit the same wall on
++// CPS-2 Turbo and solved it by PROMOTING: test bit 15 first, then copy bit 12
++// into it, then read a 3-bit bank. This module is the second and third steps;
++// the caller has already done the first, so inside it bit 15 is known to be 0
++// and the promoted bank is exactly { y[12], y[14:13] }.
++//
++// THE ENCODING THIS PRODUCES, and the one it does NOT:
++//
++//     bank 0 -> y 0x0000    bank 4 -> y 0x1000    (NOT 0x8000)
++//     bank 1 -> y 0x2000    bank 5 -> y 0x3000    (NOT 0xA000)
++//     bank 2 -> y 0x4000
++//     bank 3 -> y 0x6000
++//
++// `bank << 13` would put bank 4 at 0x8000, which IS the terminator — the
++// sprite list would end at the first tenant sprite. tools/gfx_tiles.py's
++// `bank_word` emits the left column and says so in its own docstring; this
++// module is the hardware half of that contract and the two are checked
++// against each other in tests/rtl/tb_obj_bank.v.
++//
++// WHY IT IS ITS OWN MODULE. Same reason as jtcps2w_qsnd_bank: it is the whole
++// behavioural surface of slice D3 in one expression, so it can be exercised
++// over its ENTIRE input space — all 65,536 y-words in both profile states —
++// rather than at whatever sprites one 60-minute core simulation happens to
++// draw. With `wide_en` LOW bit 2 is zero for every input, so the reference
++// core's 2-bit bank is preserved BY CONSTRUCTION.
++
++module jtcps2w_obj_bank(
++    input             wide_en,    // the profile gate; see jtcps2w_profile.v
++    input      [15:0] table_y,    // the OBJ frame table's y-word
++    output     [ 2:0] bank        // GFX bank, 0-7 (WIDE v1 declares 0-5)
++);
++
++assign bank = { wide_en & table_y[12], table_y[14:13] };
++
++endmodule
+-- 
+2.50.1 (Apple Git-155)
+

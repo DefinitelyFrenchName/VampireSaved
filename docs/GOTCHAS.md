@@ -523,3 +523,22 @@ is a GAME gotcha if it is true of the game regardless of the port.
   separate process had already written them; only the shell wrapper's
   post-processing died. Freeze `tests/*.sh` and `tools/*.sh` before
   launching a long run.
+- **14z-107 (10) (platform):** a widened bus is only as wide as its
+  narrowest PORT. The CPS-2 object bank crosses four module boundaries
+  between the frame table and SDRAM; a port left at `[1:0]` anywhere
+  truncates the promoted bit, and Verilog answers with a warning at worst.
+  The symptom is a PICTURE — every tenant sprite fetching vanilla art — which
+  looks like a content bug and sends you to the romset.
+- **14z-107 (10) (platform):** the WIDE download image takes **659**
+  simulated frames to transfer against the stock image's **462**, and
+  `sim_inputs.hex` advances during the download — so every absolute frame
+  number in the simulation lane shifts by 197. Getting it wrong starts the
+  replay ~200 frames early and still boots, still reaches a select screen,
+  and silently invalidates every anchor.
+- **14z-107 (10) (project):** slice D3 (the object promote) is PROVABLE on
+  its own and not DEMONSTRABLE on its own. The select screen's roster record
+  is allocated above `CPU:$400000`, so without D4's program window the core
+  cannot read the table that names the tenant cells and no tenant sprite is
+  ever emitted. "The slice is inert" and "the slice cannot be exercised" look
+  identical from the fetch side; check what the ROMSET needs before designing
+  the demonstration.

@@ -1,26 +1,23 @@
 # NEXT SESSION — orientation (rewritten at the 14z-107 CLOSE, 2026-08-24)
 
-> ## **START HERE — 14z-107 CLOSE. THE ARC IS MiSTer, AND ITS PLACEMENT
-> ## SLICES ARE DONE: D0 (the MRA), D1 (the runtime profile gate + the
-> ## QSound width), D2 (the SDRAM placement). THE OPENER IS SLICE D3 —
-> ## THE OBJ PROMOTE.**
-> ## `jtcps2_obj_scan.v:152` `st3_bank <= {table_y[12], table_y[14:13]}`
-> ## (the CPS-2 Turbo rule — the MiSTer twin of the 19-bit promote WIDE v1
-> ## already makes in FBNeo's `Cps2ObjDraw`, rule 1 v2), plus the
-> ## `dr_bank`/`obj_bank`/`rom_bank`/`rom0_bank` chain widened to 3 bits.
-> ## Gate: the MiSTer twin of the FBNeo B4 canary. Then D4, the 6 MB PRG
-> ## window. **Read `docs/project/mister_core.md` FIRST** — the synthesis,
-> ## in causal order; `mister_map.md` / `mister_fit.md` /
-> ## `platform/mister.md` are the logs it quotes, and where it and a log
-> ## disagree, THE LOG WINS.
+> ## **START HERE — 14z-107 (10). THE ARC IS MiSTer, AND ALL FIVE RTL
+> ## SLICES ARE IN: D0 (the MRA), D1 (the runtime profile gate + the QSound
+> ## width), D2 (the SDRAM placement), D3 (the CPS-2 Turbo object promote)
+> ## and D4 (the 6 MB program window). THE OPENER IS NOT A SLICE — IT IS A
+> ## BUG HUNT: THE WIDE ROMSET LOOPS ON ITS OWN BOOT.**
+> ## **Read `docs/project/mister_core.md` FIRST** — the synthesis, in causal
+> ## order; `mister_map.md` / `mister_fit.md` / `platform/mister.md` are the
+> ## logs it quotes, and where it and a log disagree, THE LOG WINS. The
+> ## boot failure's trace, eliminations and next probe are in
+> ## `docs/platform/mister.md` "THE WIDE ROMSET DOES NOT BOOT ON THE CORE
+> ## YET"; the one-screen version is the 14z-107 (10) slice log below.
 > ##
-> ## **D3 IS THE FIRST SLICE THAT FETCHES A TENANT TILE.** D2 built the
-> ## destination and the plumbing and nothing more: `rom0_bank[2]` is TIED
-> ## LOW, so `gfxc_sel` is constant 0, the two group-C read slots are
-> ## provably unreachable, and **D2 changes no fetch in the running game
-> ## at all.** That is why its evidence is an SDRAM IMAGE CENSUS and not a
-> ## replay. Do not read "the placement is proven" as "the art has been
-> ## fetched" — it has not, on any core, ever.
+> ## **NO TENANT TILE HAS BEEN FETCHED ON ANY CORE, EVER — and D3 is not
+> ## what is stopping it.** D3's promote is proven over its whole input
+> ## space (131,072 vectors, both profile states, two must-fire controls)
+> ## and its destination is reachable by construction. What is missing is
+> ## the END-TO-END demonstration, and it is blocked behind a boot failure
+> ## that reproduces IDENTICALLY with the profile bit clear.
 > ##
 > ## **THE FROZEN §4 ANCHOR: MAME 2146 / sim 2609 / skew 463 ± 30**
 > ## (`tests/test_mister_sim_anchor.sh`, `05_timeout_idle`, round-1
@@ -112,6 +109,73 @@
 > ## `tools/run_wide.sh build/m3b_merged13 fbneo`. Release packaging is
 > ## done (`release/merged-m6/`) and stays in-tree until MiSTer, when a
 > ## tagged GitHub release covers both.
+> ## **SLICE LOG — 14z-107 (10): MiSTer SLICES D3 AND D4 ARE IN THE RTL, AND
+> ## THE WIDE ROMSET DOES NOT BOOT ON THE CORE.** Two results, and the second
+> ## one is the one that decides the next session.
+> ## **WHAT SHIPPED (fork commits `17a5dc2b`, `b9899fa8`, `fd454393`,
+> ## `dd242a65`; pin `dd242a65`, FIFTEEN commits):**
+> ## **D3, the CPS-2 Turbo object promote** —
+> ## `cores/cps2w/hdl/jtcps2w_obj_bank.v`
+> ## `assign bank = { wide_en & table_y[12], table_y[14:13] };` read in the
+> ## ELSE arm of the sprite-list terminator test, which is the reference
+> ## core's VERBATIM (the ORDER is the rule: `table_y[15]` IS the terminator).
+> ## `rom0_bank[2]` is UNTIED and the bank is three bits wide at every port
+> ## from the frame table to SDRAM — which cost FOUR override files, three of
+> ## them nothing but a width. **Proven over its whole input space:** 131,072
+> ## vectors, bank[2] set 32,768 times wide / **0** stock, the six
+> ## `gfx_tiles.py` encodings each decoding to their own bank, none of them
+> ## setting y bit 15. Two must-fire controls fire.
+> ## **D4, the 6 MB program window** — `wide_en & RnW & (A[23:21]==3'b010)`,
+> ## `rom_addr`/`main_rom_addr`/`SLOT3_AW` 21->22, and the `one_wait`
+> ## boundary `wide_en ? 4'h6 : 4'h5`. **It shipped WITH D3 because D3 cannot
+> ## be demonstrated without it:** the select screen's roster record is
+> ## allocated in `wide_ext` above `CPU:$400000`, so a 4 MB decode cannot read
+> ## the table that names the tenant cells and the promote has nothing to
+> ## promote.
+> ## **THE STOCK LEG IS GREEN:** `test_mister_wide_inert` bit-identical work
+> ## RAM in all 101 frames, control firing.
+> ##
+> ## **THE OPENER IS A BUG HUNT, NOT A SLICE. THE WIDE ROMSET LOOPS ON ITS
+> ## OWN BOOT.** Measured on `11_pick_donovan`, `cps2w`, the real
+> ## `vsavjw.rom`: reset at simulated frame 659, the CPS-2 RAM test draws
+> ## 660-925, the QSound/Capcom legal screen stands from 1578, and at **2242
+> ## the machine RESETS and the RAM test starts over** — a ~1,580-frame cycle
+> ## that repeats. **No sprite is ever drawn** (the new SDRAM read probe sees
+> ## ZERO reads in vanilla obj bank 2 as well as in both group-C windows), so
+> ## no tenant tile is fetched and D3's demonstration is BLOCKED behind this.
+> ## **IT IS NOT THE PROFILE:** the identical run with header byte 41 set to
+> ## `0xFF` produces a FRAME-FOR-FRAME identical traffic trace, so none of the
+> ## eight `wide_en`-gated sites is the cause. **IT IS NOT THE DOWNLOAD:** the
+> ## whole-image census passes on this exact image and core. **IT IS NOT THE
+> ## ROMSET:** MAME on the same rompath and replay is at the select screen
+> ## with the full 18-character wheel by frame 930. Eliminations, remaining
+> ## candidates and the recommended next probe (a work-RAM differential
+> ## against MAME across the legal screen) are in `docs/platform/mister.md`
+> ## "THE WIDE ROMSET DOES NOT BOOT ON THE CORE YET".
+> ## **AND THE PROFILE BIT IS PROVABLY LIVE, VISUALLY:** the same legal screen
+> ## renders correctly with byte 41 = `0xFE` and as a flat yellow field with
+> ## only the CAPCOM logo with `0xFF`, because without the download redirect
+> ## the tenant art aliases over vanilla's obj banks 0/1 AND the scroll
+> ## window. That picture is the cheapest evidence in the whole lane.
+> ##
+> ## **TWO NEW INSTRUMENTS, both harness-only (no RTL):**
+> ## `JTFRAME_SIM_RDPROBE` — FOUR SDRAM read counters, each a bank plus a
+> ## half-open byte window, reporting reads / DISTINCT 128-byte blocks (which
+> ## on CPS-2 graphics IS a tile-code list) / first frame / address range.
+> ## Four slots and not two on purpose: two arm the windows under test and two
+> ## arm windows that MUST see traffic, so a zero is evidence about the CORE
+> ## and not about the probe. Units are burst BEATS, not ACTIVATEs.
+> ## `JTFRAME_SIM_VIDEO_FIRST/_LAST/_STRIDE` — bound the frame writer, so a
+> ## 4,000-frame run writes a filmstrip instead of ~3,000 jpgs.
+> ## **AND A TRAP THE LANE NOW CARRIES:** the WIDE transfer is **659** frames
+> ## against the stock image's **462**, and `sim_inputs.hex` advances during
+> ## the download — so every absolute frame number moves by 197. Getting it
+> ## wrong starts the replay ~200 frames early, still boots, and silently
+> ## invalidates every anchor.
+> ## **NEW GATE:** `tests/test_mister_gfxc_fetch.sh` (emulator, 2 x 65 min) —
+> ## the demonstration, two legs whose `.rom` files differ by ONE BYTE. It is
+> ## RED today, and it is red for the right reason.
+
 > ## **SLICE LOG (history) — 14z-107 (9): MiSTer SLICE D2 IS DONE. THE WIDE ROMSET
 > ## HAS A PLACE IN SDRAM AND EVERY BYTE OF IT WAS COUNTED.** Fork commit
 > ## `0df6f000`, **PUSHED** (fork pushes are standing-authorised now; the

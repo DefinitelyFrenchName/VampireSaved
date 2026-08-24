@@ -9,10 +9,10 @@
 #     macros.def; in mame2mra.toml the `vsav` mustbe, the cps2w.cpp sourcefile
 #     opt-in, the `qsoundw` trim region (slice D0) and the profile header byte
 #     (slice D1); and in game.yaml the RTL override set, which slice D2 grew
-#     from four files to six and which is now frozen in
-#     tests/expect/cps2w_game_yaml_delta.txt rather than inline (the D2 list
-#     inlines cores/cps1/cfg/common.yaml minus the two files it overrides, so
-#     it runs to 68 lines and a shell string stopped being readable).
+#     from four files to six and slice D3 to eleven and slice D4 to TWELVE, and which is frozen in
+#     tests/expect/cps2w_game_yaml_delta.txt rather than inline (the list
+#     inlines cores/cps1/cfg/common.yaml minus the files it overrides, so
+#     it runs to 75 lines and a shell string stopped being readable).
 #     **MOVED DELIBERATELY 14z-107 (6), and this is the governance milestone:
 #     check 2a used to read "game.yaml identical (no RTL override)".** cps2w
 #     now carries RTL, so the declaration grows from "nothing" to an ENUMERATED
@@ -56,7 +56,7 @@ A="$SRC/cores/cps2/cfg"; B="$SRC/cores/cps2w/cfg"
 # together"), and the two halves below have to agree: what is on disk, and
 # what game.yaml pulls. An undeclared file in either place fails here.
 hdl="$(ls "$SRC/cores/cps2w/hdl" 2>/dev/null | tr '\n' ' ')"
-want='jtcps15_sound.v jtcps1_prom_we.v jtcps1_sdram.v jtcps2_game.v jtcps2w_profile.v jtcps2w_qsnd_bank.v pal_lut.hex '
+want='jtcps15_sound.v jtcps1_obj_draw.v jtcps1_prom_we.v jtcps1_sdram.v jtcps1_video.v jtcps2_game.v jtcps2_main.v jtcps2_obj.v jtcps2_obj_scan.v jtcps2w_obj_bank.v jtcps2w_profile.v jtcps2w_qsnd_bank.v pal_lut.hex '
 [ "$hdl" = "$want" ] && ok "2a cores/cps2w/hdl holds exactly the declared override set" \
                      || bad "2a cores/cps2w/hdl holds [$hdl], declared [$want]"
 EXP="$REPO/tests/expect/cps2w_game_yaml_delta.txt"
@@ -99,9 +99,15 @@ A cores/cps2w/cfg/macros.def
 A cores/cps2w/cfg/mame2mra.toml
 A cores/cps2w/cfg/msg
 A cores/cps2w/hdl/jtcps15_sound.v
+A cores/cps2w/hdl/jtcps1_obj_draw.v
 A cores/cps2w/hdl/jtcps1_prom_we.v
 A cores/cps2w/hdl/jtcps1_sdram.v
+A cores/cps2w/hdl/jtcps1_video.v
 A cores/cps2w/hdl/jtcps2_game.v
+A cores/cps2w/hdl/jtcps2_main.v
+A cores/cps2w/hdl/jtcps2_obj.v
+A cores/cps2w/hdl/jtcps2_obj_scan.v
+A cores/cps2w/hdl/jtcps2w_obj_bank.v
 A cores/cps2w/hdl/jtcps2w_profile.v
 A cores/cps2w/hdl/jtcps2w_qsnd_bank.v
 A cores/cps2w/hdl/pal_lut.hex
@@ -113,7 +119,7 @@ M modules/jtframe/hdl/sdram/jtframe_sdram_stats_sim.v
 M modules/jtframe/hdl/ver/test.cpp
 TREE
 if cmp -s "$W/tree_want.txt" "$W/tree_got.txt"; then
-    ok "2f the fork's whole-tree delta is exactly the declared 18 paths (1 ADDED jtframe file, 3 modified, the rest cores/cps2w)"
+    ok "2f the fork's whole-tree delta is exactly the declared 24 paths (1 ADDED jtframe file, 3 modified, the rest cores/cps2w)"
 else
     bad "2f the fork touched something nobody declared:"
     diff "$W/tree_want.txt" "$W/tree_got.txt" | head -12 | sed 's/^/       /'

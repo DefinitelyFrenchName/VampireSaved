@@ -324,7 +324,7 @@ GROUPC_OCC = {
 }
 
 # ---- the address path ------------------------------------------------------
-# The OBJ table y-word, bit by bit. role: what each bit does once D3 lands.
+# The OBJ table y-word, bit by bit. role: what each bit does (as built, D3).
 YWORD = [(15, "term", "T", "sprite-list TERMINATOR — the promote must happen AFTER this is tested"),
          (14, "bank", "B1", "obj bank bit 1 (stock)"),
          (13, "bank", "B0", "obj bank bit 0 (stock)"),
@@ -358,9 +358,9 @@ SLICES = [
     ("D2", "placement", "every region where the map says, checked across all "
      "67,108,864 bytes of the image", "done", "0df6f000"),
     ("D3", "the promote", "the 3-bit obj bank going live — the first slice "
-     "where tenant art is actually fetchable", "next", None),
+     "where tenant art is actually FETCHED", "done", "b9899fa8"),
     ("D4", "the PRG window", "the 6 MB read decode, and the wait-state line "
-     "with it", "queued", None),
+     "with it", "done", "dd242a65"),
 ]
 
 # ---- the traffic measurement, per video frame, in-match phase ---------------
@@ -1552,9 +1552,10 @@ expressions the profile does not touch and land in banks 2 and 3 exactly as
 they always have, and that only the promoted values 4 and 5 — which vanilla
 cannot produce, because it never sets bit 12 on a live sprite, measured across
 the full legacy corpus with a control proving the probe was not blind — are
-redirected. <b>What it does not claim:</b> that this is live. The promote is
-slice D3; today the game top ties the third bank bit low, so the two group-C
-read slots are provably unreachable.</figcaption></figure>
+redirected. <b>What it is now known to DO:</b> slice D3 drives the third bank
+bit and the core has been measured fetching tenant tiles out of both group-C
+windows on the real romset, with the same image and the profile bit clear
+reading zero from them.</figcaption></figure>
 </section>
 
 <section id="slices">
@@ -1565,8 +1566,11 @@ must-fire control, and re-runs the match-start anchor oracle on stock
 <figure><div class="scroller">{svg_slices()}</div>
 <figcaption><b>What the picture claims:</b> the order, and which slices have
 landed. D2 before D3 is not a preference — you cannot prove the promote until
-the art is placed. <b>What it does not claim:</b> that D0-D2 make a WIDE set
-boot. They do not; nothing fetches from group C until D3.</figcaption></figure>
+the art is placed, and D3 before D4 is not one either: the promote is provable
+alone but not demonstrable alone, because the select screen's roster record
+lives above CPU:$400000 and needs D4's read decode.
+<b>What it does not claim:</b> that any one of D0-D3 makes a WIDE set boot.
+Only the whole ladder does.</figcaption></figure>
 <div class="col">
 <div class="callout-box"><p class="tag">The image had to be trimmed first</p>
 <p>Mapped verbatim, the WIDE download image is

@@ -99,6 +99,14 @@
 #                          <outdir>/frames. jtsim builds an mp4 once more than
 #                          250 jpgs exist, so keep the window short.
 #   --video      alias for --frame-output collect.
+#   --frame-window FIRST LAST [STRIDE]
+#                which frames the image writer may write (ABSOLUTE frames,
+#                download included). Only meaningful with --frame-output
+#                fork|collect. Without it every CHANGED frame is written,
+#                which on a 3,700-frame run is ~3,000 forks, ~3,000
+#                ImageMagick invocations and a directory nobody can find
+#                anything in. STRIDE defaults to 1; use it for a filmstrip
+#                across a whole run (e.g. 0 999999 20).
 #   --wide BUILD_DIR
 #                run the CPS-2 WIDE romset (`vsavjw`) instead of stock
 #                `vsavj`. The WIDE set is a CLONE whose PARENT is the BUILD's
@@ -120,6 +128,26 @@
 #                does not assume the transfer is DWNLD_FRAMES long, which the
 #                WIDE image's is not (66 MB vs 46 MB). Use it when what you
 #                want is the post-download SDRAM image and nothing else.
+#   --rdprobe BANK LO HI
+#                arm one SDRAM READ PROBE: count every 16-bit word the CORE
+#                reads from bank BANK at a byte offset in [LO,HI). Repeatable,
+#                at most FOUR times (the harness carries four slots — enough to
+#                arm the windows under test AND one that MUST see traffic, so a
+#                zero result is evidence about the core, not about the probe).
+#                Writes
+#                `RDPROBE frame N p0 .. p1 ..` lines into jtsim.log for every
+#                frame with traffic, a `RDPROBE SUMMARY` line per probe at the
+#                end, and <outdir>/rdprobe_<k>.txt listing the DISTINCT 128-byte
+#                blocks touched — on CPS-2 GFX that list IS the list of tile
+#                codes fetched, because a tile code is its own SDRAM address
+#                (docs/project/mister_core.md section 5).
+#                THIS IS A FETCH-SIDE OBSERVABLE: it answers "did the core read
+#                those bytes", which a rendered frame only implies. Units are
+#                BURST BEATS, not ACTIVATE commands — do not compare them with
+#                `--stats` numbers without dividing by the burst length.
+#                THE WINDOW IS A PHYSICAL ADDRESS, so it is invalidated by any
+#                memory-map change: derive it from the RTL constants, never
+#                from memory (14z-107 (9) paid for that rule twice).
 #   --keep-banks collect the four post-download SDRAM bank images into
 #                <outdir>/sdram/sdram_bank[0-3].bin. test.cpp writes them once,
 #                right after a FULL download (test.cpp:915 `if(
@@ -146,9 +174,15 @@ REPO="$(cd "$(dirname "$0")/.." && pwd)"
 # The ROM transfer takes this many simulated frames on jtcps2 with vsavj —
 # log line "ROM file transfered (frame 462)", measured 14z-106 and 14z-107.
 DWNLD_FRAMES=462
+# ...and the WIDE image is 66,265,152 B rather than 46,407,744 B, so its
+# transfer is longer. Measured 14z-107 (9) on the SDRAM image census: "ROM file
+# transfered (frame 659)". A run with --wide asserts the log against this.
+DWNLD_FRAMES_WIDE=659
 RPL=""; OUTDIR=""; FRAMES=""; WFIRST=""; WLAST=""; CORE=cps2; OFFSET=""; LOAD=1
 RBANK=""; ROFF=""; RLEN=""; RADDR=""; FRAMEOUT=off; STATS=0
 WIDEBUILD=""; SETNAME=vsavj; POSTFRAMES=""; KEEPBANKS=0
+NPROBE=0; PBANK=""; PLO=""; PHI=""
+VFIRST=""; VLAST=""; VSTRIDE=""
 while [ $# -gt 0 ]; do
     case "$1" in
     --frames) shift; FRAMES="${1:?--frames needs N}" ;;
@@ -157,11 +191,21 @@ while [ $# -gt 0 ]; do
     --offset) shift; OFFSET="${1:?--offset needs K}" ;;
     --no-load) LOAD=0 ;;
     --video)  FRAMEOUT=collect ;;
+    --frame-window) shift; VFIRST="${1:?--frame-window needs FIRST LAST [STRIDE]}"; shift
+              VLAST="${1:?--frame-window needs FIRST LAST [STRIDE]}"
+              case "${2:-}" in [0-9]*) shift; VSTRIDE="$1" ;; esac ;;
     --frame-output) shift; FRAMEOUT="${1:?--frame-output needs off|fork|collect}" ;;
     --stats)  STATS=1 ;;
     --wide)   shift; WIDEBUILD="${1:?--wide needs a build dir}"; SETNAME=vsavjw ;;
     --post-frames) shift; POSTFRAMES="${1:?--post-frames needs N}" ;;
     --keep-banks)  KEEPBANKS=1 ;;
+    --rdprobe) shift
+              _b="${1:?--rdprobe needs BANK LO HI}"; shift
+              _l="${1:?--rdprobe needs BANK LO HI}"; shift
+              _h="${1:?--rdprobe needs BANK LO HI}"
+              [ "$NPROBE" -lt 4 ] || { echo "at most four --rdprobe windows (the harness has four slots)" >&2; exit 2; }
+              PBANK="$PBANK $_b"; PLO="$PLO $_l"; PHI="$PHI $_h"
+              NPROBE=$((NPROBE + 1)) ;;
     --region) shift; RBANK="${1:?--region needs BANK OFF LEN ADDR}"; shift
               ROFF="${1:?--region needs BANK OFF LEN ADDR}"; shift
               RLEN="${1:?--region needs BANK OFF LEN ADDR}"; shift
@@ -206,8 +250,14 @@ esac
 if [ -n "$RBANK" ]; then
     WRAM_BANK="$RBANK"; WRAM_OFF="$ROFF"; WRAM_LEN="$RLEN"; WRAM_ADDR="$RADDR"
 fi
+# THE INPUT SCRIPT IS SHIFTED BY THE TRANSFER, and the transfer is longer on
+# the WIDE image. sim_inputs.hex advances on every LVBL fall, download frames
+# included, so a --wide run that used the stock 462 would start the replay ~200
+# frames early and every anchor derived from it would be wrong.
+XFER=$DWNLD_FRAMES
+[ -n "$WIDEBUILD" ] && XFER=$DWNLD_FRAMES_WIDE
 if [ -z "$OFFSET" ]; then
-    if [ "$LOAD" = 1 ]; then OFFSET=$DWNLD_FRAMES; else OFFSET=0; fi
+    if [ "$LOAD" = 1 ]; then OFFSET=$XFER; else OFFSET=0; fi
 fi
 
 mkdir -p "$OUTDIR"
@@ -375,9 +425,9 @@ if [ -n "$POSTFRAMES" ]; then
     SIMARGS="$SIMARGS -frame $POSTFRAMES"
 elif [ -n "$FRAMES" ]; then
     if [ "$LOAD" = 1 ]; then
-        JTF_FRAMES=$((FRAMES - DWNLD_FRAMES))
+        JTF_FRAMES=$((FRAMES - XFER))
         if [ "$JTF_FRAMES" -le 0 ]; then
-            echo "--frames $FRAMES is inside the $DWNLD_FRAMES-frame download" >&2; exit 2
+            echo "--frames $FRAMES is inside the $XFER-frame download" >&2; exit 2
         fi
     else
         JTF_FRAMES="$FRAMES"
@@ -391,6 +441,29 @@ if [ -n "$WFIRST" ]; then
     say "RAM dump frames $WFIRST..$WLAST (ABSOLUTE, download included) from $CORE SDRAM bank $WRAM_BANK byte $WRAM_OFF -> wram/dump_<frame>_${WRAM_ADDR#0x}.bin"
 else
     say "NO --wram: the harness hook stays compiled out (negative control)"
+fi
+if [ -n "$VFIRST" ]; then
+    if [ "$FRAMEOUT" = off ]; then
+        echo "--frame-window needs --frame-output fork or collect" >&2; exit 2
+    fi
+    SIMARGS="$SIMARGS -d JTFRAME_SIM_VIDEO_FIRST=$VFIRST -d JTFRAME_SIM_VIDEO_LAST=$VLAST"
+    [ -n "$VSTRIDE" ] && SIMARGS="$SIMARGS -d JTFRAME_SIM_VIDEO_STRIDE=$VSTRIDE"
+    say "frame writer bounded to frames $VFIRST..$VLAST stride ${VSTRIDE:-1}"
+fi
+if [ "$NPROBE" -gt 0 ]; then
+    SIMARGS="$SIMARGS -d JTFRAME_SIM_RDPROBE=1"
+    k=0
+    for _b in $PBANK; do
+        _l="$(echo $PLO | cut -d' ' -f$((k + 1)))"
+        _h="$(echo $PHI | cut -d' ' -f$((k + 1)))"
+        SIMARGS="$SIMARGS -d JTFRAME_SIM_RDPROBE${k}_BANK=$_b"
+        SIMARGS="$SIMARGS -d JTFRAME_SIM_RDPROBE${k}_LO=$_l -d JTFRAME_SIM_RDPROBE${k}_HI=$_h"
+        say "SDRAM read probe $k: bank $_b bytes $_l..$_h"
+        k=$((k + 1))
+    done
+    rm -f "$GAME"/rdprobe_?.txt
+else
+    say "NO --rdprobe: the read probe stays compiled out (negative control)"
 fi
 say "jtsim $SIMARGS"
 T0="$(date +%s)"
@@ -436,6 +509,13 @@ if [ "$FRAMEOUT" = collect ] && [ -d "$GAME/frames" ]; then
 fi
 if [ "$STATS" = 1 ]; then
     say "$(grep -ac 'BA STATS' "$OUTDIR/jtsim.log" || true) SDRAM stats lines in $OUTDIR/jtsim.log"
+fi
+if [ "$NPROBE" -gt 0 ]; then
+    for k in 0 1 2 3; do
+        [ -f "$GAME/rdprobe_$k.txt" ] && mv "$GAME/rdprobe_$k.txt" "$OUTDIR/"
+    done
+    grep -a "^RDPROBE SUMMARY" "$OUTDIR/jtsim.log" | sed 's/^/[run_sim_jtcps2] /' || \
+        say "NO RDPROBE SUMMARY line in the log — the probe did not run"
 fi
 cp "$GAME/sim_inputs.hex" "$OUTDIR/sim_inputs.hex"
 say "done: $OUTDIR"

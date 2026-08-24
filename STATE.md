@@ -221,6 +221,243 @@ D4 (the 6 MB PRG window) follows.
 core's MAIN one; how a release carries both `vsav.zip` flavours) — neither
 blocks D3/D4, both must be answered before a release.
 
+## Session 14z-107 (10) — MiSTer SLICES D3 AND D4: THE CPS-2 TURBO OBJECT
+## PROMOTE GOES LIVE AND THE 6 MB PROGRAM WINDOW WITH IT. `rom0_bank[2]` is
+## untied, the third obj bank bit runs end to end from the frame table to
+## SDRAM, and the 68k can read `CPU:$400000-$5FFFFF`. Fork commits
+## `17a5dc2b` (the harness SDRAM READ PROBE), `b9899fa8` (**D3**),
+## `fd454393` (the harness frame window) and `dd242a65` (**D4**); the pin is
+## `dd242a65`, FIFTEEN commits.
+
+### D3 AND D4 SHIPPED TOGETHER, AND THE REASON IS A FACT ABOUT THE ROMSET
+
+The slice plan queued D4 after D3. It cannot be run that way, and the reason
+was already written in `mister_map.md` §10 as a summary sentence — "only
+after D0-D4 does a WIDE set boot" — without anyone noticing it was
+load-bearing. **The select screen's roster record is allocated in
+`wide_ext`, above `CPU:$400000`** (`build/manifest/*.toml`
+`[[select_wheel]] roster21`, `hole = "wide_ext"`; `build/m3b_merged13/gen.log`
+puts `wide_ext` at `0x400010-0x4D1100`). With only the stock 4 MB decode the
+core cannot READ the table that names the tenant cells, so no tenant sprite
+is ever emitted and **the promote has nothing to promote**. D3 is PROVABLE on
+its own — the expression is swept exhaustively — but it is not DEMONSTRABLE
+on its own. The two are separate fork commits with separate gate sections;
+they are one session's work.
+
+`mister_map.md` §10 had planned a synthetic canary for D3 (the MiSTer twin of
+FBNeo's B4 canary: a test flag ORing `0x1000` into bank-2/3 sprites with
+group C loaded as a byte copy of group B, on the STOCK rom). **It was not
+built.** It was designed for a world in which the WIDE set could not boot;
+with D4 in the same session the real romset is the better witness, and the
+canary would have proved a weaker statement about a doctored image.
+
+### THE RTL, AND WHY ONE EXPRESSION COST FIVE FILES
+
+**D3** — `cores/cps2w/hdl/jtcps2w_obj_bank.v` is the whole behavioural
+surface:
+
+```verilog
+assign bank = { wide_en & table_y[12], table_y[14:13] };
+```
+
+read in the ELSE arm of `jtcps2_obj_scan`'s sprite-list terminator test,
+which is the reference core's VERBATIM. **The order is the rule, not the
+bit**: `table_y[15]` IS the terminator, so the profile's first draft (read
+bits 15:13 as the bank) would have ended the list at the first tenant sprite.
+Capcom solved it the same way on CPS-2 Turbo. Inside the else arm bit 15 is
+known to be 0, so the promoted bank is exactly `{ y[12], y[14:13] }` — which
+is why `tools/gfx_tiles.py`'s `bank_word` emits `0x1000` for bank 4 and
+`0x3000` for bank 5 and not `bank << 13` (= `0x8000`, a terminator).
+
+That one expression pulled in FOUR override files, three of which change
+nothing but a WIDTH: `jtcps2_obj_scan.v`, `jtcps2_obj.v`,
+`jtcps1_obj_draw.v`, `jtcps1_video.v`. A 3-bit bank has to be three bits wide
+at every port between the frame table and SDRAM, and **Verilog answers a
+3-bit signal driving a 2-bit port with a warning at worst** — the failure it
+produces is a PICTURE (every tenant sprite fetching vanilla art), which looks
+like a content bug and sends you to the romset. New platform gotcha; gate
+check 8c asserts all six declarations by name.
+
+**D4** — `cores/cps2w/hdl/jtcps2_main.v`, three lines, all gated:
+`rom_cs` gains `wide_en & RnW & (A[23:21]==3'b010)`; `rom_addr` widens to
+`A[22:1]` (with `main_rom_addr` and bank 0's `SLOT3_AW` following); and
+`one_wait`'s boundary becomes `wide_en ? 4'h6 : 4'h5` — the defect found
+while reading for D2, where the second megabyte of the extension would have
+run ZERO-wait while every other byte of program ROM is one-wait. **The read
+decode is collision-free only because `objcfg_cs` is qualified `!RnW`**, so
+the gate re-reads that qualifier on every run (8i). And the extension is NOT
+decrypted, correctly: `jtcps2_dec_ctrl` decodes only OPCODE fetches below the
+key header's range word, which for this game ends at `$0FFFFF`, and the
+profile writes extension content RAW for exactly that reason. The two halves
+agreed without either being touched.
+
+**EIGHT `wide_en` SITES NOW**, all re-read verbatim by
+`tests/test_mister_wide_gate.sh`, and three ungated WIDTH changes declared
+rather than hidden (the bank wires 2->3 bits, `rom_addr`/`main_rom_addr`/
+`SLOT3_AW` 21->22): each is behaviourally identical with the profile clear
+because the extra bit is driven to 0 by a gated expression.
+**THE PROMOTE IS GATED AT BOTH ENDS DELIBERATELY.** `gfxc_sel` already ANDs
+`wide_en`, so an ungated promote would have been inert anyway — obj bank 4
+selects the same read slot as bank 0. Gating the SOURCE too makes bank bit 2
+*provably zero* with the profile clear rather than *harmlessly ignored*, and
+it is what makes the expression testable on its own.
+
+### THE INSTRUMENTS BUILT FOR THIS SLICE
+
+- **`JTFRAME_SIM_RDPROBE`** (fork commit 12), the harness's SDRAM READ PROBE:
+  four optional counters on the one line in `SDRAM::update()` that serves a
+  burst beat. Each takes a bank and a half-open byte window and reports reads,
+  DISTINCT 128-byte blocks (which on CPS-2 graphics is a TILE-CODE list,
+  because a tile code is its own SDRAM address), the first frame and address
+  and the range. No RTL; absent the macro every line compiles out — the
+  `JTFRAME_SIM_WRAMDUMP` precedent exactly. **Four slots and not two, on
+  purpose:** two arm the windows under test and two arm windows that MUST see
+  traffic, so a zero is evidence about the CORE and not about the probe.
+  Units are burst BEATS, not ACTIVATE commands — do not compare them with
+  `--stats` numbers without dividing by the burst length.
+- **`JTFRAME_SIM_VIDEO_FIRST/_LAST/_STRIDE`** (fork commit 14): the frame
+  writer forks an ImageMagick child per CHANGED frame, which is right for a
+  short run and wrong for a 4,000-frame one. Defaults are upstream's.
+- **`tests/rtl/tb_obj_bank.v`**: 131,072 vectors — all 65,536 y-words in both
+  profile states. bank[2] set **32,768 times wide / 0 stock**; bank[1:0]
+  equal to `y[14:13]` throughout; and the six `gfx_tiles.py` encodings each
+  decode to their own bank with **none of them setting y bit 15**. Two
+  must-fire controls fire: the gate bypassed, and bit 2 read from `y[15]`.
+- **`tests/test_mister_gfxc_fetch.sh`**: the demonstration gate. Derives its
+  windows FROM THE RTL (`GFXC4_OFFSET`/`GFXC5_OFFSET` and the bank each
+  group-C slot sits in) because an instrument that names a physical address is
+  invalidated by a memory-map change — the rule 14z-107 (9) paid for twice.
+- **`tests/audit_sdram_bank_load.sh --core cps2w --wide BUILD`**: the second
+  leg of the traffic instrument, plus a **PEAK per-bank table** derived from
+  the run's own reporter intervals, because saturation is a property of the
+  worst interval and not of a phase average.
+
+### THE STOCK LEG IS GREEN — THE FPGA SUPERSET INVARIANT HOLDS WITH THE
+### PROMOTE AND THE PROGRAM WINDOW IN
+
+- `tests/test_mister_sim_anchor.sh` **PASS** on `cps2w` with stock `vsavj`:
+  MAME **2146** / sim **2609** / skew **463** (band ±30, untouched), every
+  mapped §4 field agreeing, and all four controls firing (byte-swapped dumps
+  rejected, a lost dump rejected before any anchor is computed, no `wram/`
+  without the macro, the window non-constant). **A round-1 match start means
+  thousands of sprites were drawn through the widened bank chain**, so D3's
+  four override files are exercised rather than merely compiled.
+- `tests/test_mister_wide_inert.sh` **PASS**: `cps2w` == `cps2`, bit-identical
+  work RAM in **101 frames of 101**, with the one-frame-shift control firing.
+- `test_jtcores_twin`, `test_mister_wide_gate` (six controls),
+  `test_mister_mra_map`, `audit_mister_map_fit`, `mk_mister_page --check` all
+  PASS; `tests/run_all_static.sh --strict` **GREEN, 106/0/0**.
+
+### THE DEMONSTRATION IS RED, AND IT IS RED FOR A REASON THAT IS NOT D3's
+
+**No tenant tile has been fetched. No tile of ANY kind has.**
+`11_pick_donovan` on `cps2w` with the real `vsavjw.rom`, four SDRAM read
+probes armed, 4,000 simulated frames:
+
+| simulated frame | what the core is doing |
+|---|---|
+| 0-659 | the ROM transfer (the WIDE image takes 659 frames, not the stock 462) |
+| 660-925 | the CPS-2 RAM test draws line by line — `WORK / CPS0 / CPS1 / CPS2 / OBJECT` |
+| 928-1107 | a second boot screen |
+| 1108-1377 | **the test screen draws AGAIN** |
+| 1380-1559 | the second screen again |
+| 1578-2241 | the QSound / Capcom legal screen, static for 664 frames |
+| **2242** | **the machine RESETS — the RAM test starts over.** The cycle repeats |
+
+**Zero reads in SDRAM bank 2 across the whole run** — vanilla obj banks 0 and
+2, so not one sprite of any kind is drawn — and zero in both group-C windows.
+
+**THE SHARPEST FORM OF IT: THE STOCK AND WIDE BOOTS ARE TRAFFIC-IDENTICAL FOR
+448 FRAMES AND THEN DIVERGE.** Same core, same replay, same probes, frames
+counted from reset: the RAM-test ramp is the same values at the same frames,
+then 178 frames of 26,848, then 180 frames of 33,984 — identical — and at core
+frame **462 the stock image shows the TITLE SCREEN with `CREDITS:1`** while at
+core frame **449 the WIDE image starts its boot test over**. The divergence is
+at the end of the third boot phase, and that is the narrowest window this lane
+can put around the fault today.
+
+**THE ELIMINATIONS ARE THE USEFUL PART.**
+
+* **Not the profile.** The identical run with header byte 41 set to `0xFF`
+  produces a **frame-for-frame identical** trace — the same transitions at the
+  same frames, the same reset at 2242. With the profile clear the promote is
+  zero, both download redirects are off, both read selects are off and the
+  6 MB decode is off. **None of the eight gated sites is the cause — which
+  also means the failure exists at the D2 pin and has simply never been
+  visible**, because nothing had ever run the WIDE image past the download.
+* **Not the core.** `cps2w` runs the STOCK romset to the frozen match-start
+  anchor and to bit-identical work RAM against `cps2` (above).
+* **Not the download.** `test_mister_sdram_census` compares all 67,108,864
+  bytes of all four banks against the map on this exact image and core, and
+  passes. The two things a census cannot see — the CPS-2 key and the DSP
+  firmware — are byte-identical to the stock image's.
+* **Not the romset.** MAME on the same `build/m3b_merged13/rompath`, the same
+  replay and a fresh sandbox is at the character-select screen with the full
+  18-character wheel and the M6 mark by frame 930.
+* **Not the probe.** The same probe, the same binary and the same replay on
+  the STOCK image count **313,024 reads over 372 distinct tiles in SDRAM
+  bank 2**, first at simulated frame 1544. On the WIDE image that window reads
+  zero. A zero here is a fact about the core.
+
+**AND THE PROFILE BIT IS PROVABLY LIVE — VISUALLY, WHICH IS WHY THE FIRST
+ELIMINATION CAN BE TRUSTED.** The two legs render the same legal screen
+differently: correct with byte 41 = `0xFE`, and **a flat yellow field with only
+the CAPCOM logo left** with `0xFF`, because without the download redirect the
+16 MB of tenant art aliases over vanilla's obj banks 0/1 *and the whole scroll
+window* (`SCR_OFFSET = 0`). A two-legged experiment whose legs differ by ONE
+BYTE, and the first thing it produced was a picture that cannot be misread.
+
+### THE BANK-0 TRAFFIC ANSWER: STILL OPEN, AND NOW FOR A NAMED REASON
+
+`mister_map.md` §9 open question 1 asked whether bank 0 absorbs obj bank 5's
+select-screen traffic. The instrument's second leg exists and ran
+(`--core cps2w --wide build/m3b_merged13`, 2,800 frames, **zero `SDRAM reads
+clashed`**), but a run on a looping boot never reaches a select screen, so
+**there is no obj bank 5 traffic to measure and the question stays open**.
+What the run did measure, from its own reporter intervals and no frozen
+boundary: **bank 0 peaks at 54,422 accesses per video frame = 44.0% of its
+all-miss ceiling**, bank 1 at 12,043 (9.7%), bank 3 at 8,548 (6.9%) — and
+**bank 2 at exactly ZERO**, the boot failure expressed as a number.
+
+**AND THE RUN FOUND A DEFECT IN THE INSTRUMENT, now fixed.** The reporter's
+lines are block-buffered into a log the frame counter also writes, so a TORN
+line can still match the regex with one spliced field. A phase figure survives
+that; a PEAK does not, and one bad row reported a bank-3 peak of **16,870,809
+accesses/frame — 13,624% of the physical ceiling** — without comment. The gate
+now requires the cumulative counters to be MONOTONIC as well as the
+timestamps, drops the rows that are not, and says how many. The peak table is
+also restricted to AFTER the download, which is one command per byte and
+saturates every bank by construction (81.3% of the ceiling — a command-rate
+baseline, not a load the running game produces).
+
+### WHAT IS NOW TRUE, AND WHAT THE NEXT SESSION OPENS ON
+
+**All five RTL slices are in.** `cores/cps2w/hdl` holds TWELVE files — nine
+overrides of shared modules and three of our own — the fork's whole-tree delta
+is a declared 24 paths, `cores/cps1`/`cps2`/`cps15` are BYTE-UNTOUCHED, and
+the override delta is frozen line by line. The profile is complete: every
+format cap CPS-2 WIDE v1 needs is lifted, gated, and proven at the expression
+level.
+
+**The next session opens on a BUG HUNT, not a slice.** The WIDE romset loops
+on its own boot, the divergence from the stock boot is bracketed to core frame
+~448, and the eliminations above rule out the profile, the core, the download
+and the romset. The recommended probe is the project's own standard one: dump
+`RAM:$FF0000-$FFFFFF` on the core across core frames ~240-740 and against MAME
+at the same game frames, and name the first divergent byte. MAME dumps for
+frames 200-760 of `11_pick_donovan` on `build/m3b_merged13` cost about a
+minute to produce.
+
+**AND THE HONEST HEADLINE:** D3 was scoped as "the payoff slice — the first
+time a tenant tile is fetched on the core". It is not that. It is the slice
+that makes the fetch POSSIBLE and proves the mechanism exhaustively; the fetch
+itself is blocked behind a fault that predates it and that this session
+located, bracketed and eliminated four candidates for.
+
+**STILL OPEN FOR THE MAINTAINER:** MiSTer PACKAGING (which MRA is the core's
+MAIN one; how a release carries both `vsav.zip` flavours) — unchanged, and
+still not blocking.
+
 ## Session 14z-107 (9) — MiSTer SLICE D2: THE PLACEMENT IS IN THE RTL AND
 ## THE SDRAM IMAGE WAS COUNTED, ALL 67,108,864 BYTES OF IT. The bank-0
 ## re-pack, the group-C GFX redirect, the QSound split across two banks and

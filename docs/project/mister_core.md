@@ -22,8 +22,8 @@ keeps the conclusions and names them as the provenance.
 > the figure as unverified and say so rather than propagating it.
 
 **Ground truth.** jtcores fork `DefinitelyFrenchName/jtcores` branch
-`vampire-saved`, pinned at `emu/jtcores` = `0df6f0000a8a0d31` (upstream tag
-`v1.7.3` = `63688ce5`, plus eleven fork commits). The romset is the merged
+`vampire-saved`, pinned at `emu/jtcores` = `dd242a653c2797d3` (upstream tag
+`v1.7.3` = `63688ce5`, plus fifteen fork commits). The romset is the merged
 build `build/m3b_merged13`. Two download images anchor everything measured
 here: stock `vsavj.rom` **46,407,744 B** sha1 `f9dc2987…`, and the WIDE
 `vsavjw.rom` **66,265,152 B** sha1 `d462e55a…`.
@@ -80,9 +80,9 @@ test. Distribution is MRA + RBF over the same release members as
 from `cores/cps1` and the QSound block from `cores/cps15`; `cores/cps15`
 exists the same way. A file is copied into `cores/cps2w/hdl` only when it
 must differ, and **the diff between the two core directories IS the trust
-surface**. As of slice D2 that diff is six files — four overrides of shared
-modules plus two new ones — and one addition to jtframe, all enumerated and
-frozen line by line (§9).
+surface**. As of slice D4 that diff is twelve files — nine overrides of shared modules
+plus three new ones — and one addition to jtframe, all enumerated and frozen
+line by line (§9).
 
 That mechanism has a price, and it compounds: **overriding one shared file
 costs you the whole `.yaml` that pulled it.** `jtframe files` deduplicates by
@@ -90,9 +90,19 @@ full path, so a core cannot both include a yaml and override a file that yaml
 pulls — both copies would compile. Slice D1 paid this once for
 `qsound.yaml` (one file transcribed); slice D2 paid it again for
 `common.yaml` (twenty files transcribed to override two). `cps2w`'s
-`game.yaml` is consequently 68 lines different from `cps2`'s, frozen in
+`game.yaml` is consequently 73 lines different from `cps2`'s, frozen in
 `tests/expect/cps2w_game_yaml_delta.txt`, and the two copies have to be kept
 in step by hand at every uprev.
+
+**And the price is paid per FILE, which is what makes the trust surface grow
+in steps rather than smoothly.** Slice D3 needed ONE expression in the object
+scanner, and it cost FOUR override files: the scanner, the object wrapper
+around it, the drawer it hands the bank to, and the video block the bank
+leaves through. A 3-bit bank has to be three bits wide at every port between
+the frame table and SDRAM, and a width left at 2 anywhere in between would
+silently drop bank bit 2 and fetch vanilla art for every tenant sprite. Three
+of those four files change nothing but a width, and the fourth is the
+promote.
 
 ---
 
@@ -430,8 +440,12 @@ figures per video frame, in-match phase, re-derived 14z-107 (7)):
 
 **What this bounds and what it does not.** It bounds the *headroom*; it does
 not prove the repacked design. Bank 0's ability to absorb obj bank 5's
-select-screen traffic is `mister_map.md` open question 1 and is **unmeasured**
-— the instrument exists and needs a `cps2w` core carrying the promote.
+select-screen traffic is `mister_map.md` open question 1 and is **still
+unmeasured after D3** — not for want of an instrument. `audit_sdram_bank_load`
+now has a `--core cps2w --wide` leg, but the WIDE romset does not get past its
+own boot on the core (§10), so a run on it never reaches a select screen and
+there is no obj bank 5 traffic to measure. The measurement is one run away
+from whenever that is fixed.
 
 ---
 
@@ -449,6 +463,11 @@ anything.
 | **program stops at 4 MB** | `rom_cs <= A[23:22] == 2'b00` — flat, with the OBJ config port at `$400000`, QSound at `$600000`, ORAM at `$700000`, I/O at `$800000` above it | a **read-only** decode extending into `$400000-$5FFFFF`; the objcfg port is qualified `&& !RnW`, so there is no read collision | the FBNeo/MAME B3 + B4(prg) steps, both PASS with a firing negative control |
 | **samples alias above 8 MB** | `qsnd_addr[22:16] <= dsp_ab[6:0]` keeps seven bank bits, so DSP bank `0x8N` plays as `0x0N` and **mis-plays legacy audio** rather than going silent | latch the eighth bit — `qsnd_addr[23:16] <= dsp_ab[7:0]` | the 14z-86 finding; the bit is `dsp_ab[7]`, **validated** against MAME's low-level QSound device, not assumed |
 | **scroll stops at 8 MB** | `rom1_addr[19:0]` → `gfx1_addr = {rom1_addr, rom1_half, 1'b0}` = 22 bits, with `SCR_OFFSET = 0` and **no bank input anywhere in the chain** | nothing — scroll is not part of WIDE v1 and does not need to grow | — |
+
+**Three of those four are now IMPLEMENTED on the core**: the QSound width in
+slice D1, the object promote in D3 and the program window in D4. §10 has the
+slice records; the rest of this section is why each one is shaped the way it
+is, and stays true whether or not it has shipped.
 
 **Two more constraints that look like memory questions and are not.**
 
@@ -475,7 +494,7 @@ anything.
   mapped and stays in the set for FBNeo and MAME.
 
 ```
-  tile code path, once D3 lands
+  tile code path, AS BUILT (slice D3)
 
     OBJ table y-word          15 14 13 12 | 11 ................ 0
                               T  B1 B0 P  |   y position, 10 bits
@@ -543,10 +562,27 @@ bit clear, so every gated expression collapses to the reference core's,
 character for character. CLAUDE.md rule 1 v2's *"profile-gated so stock
 `vsavj` is untouched BY CONSTRUCTION"* is a fact about the circuit on FPGA,
 not an inertness argument — exactly as the driver flag makes it one on FBNeo.
-Five sites are gated as of slice D2: `is_gfxc = wide_en & gfx_addr[25]` and
-`is_pcmhi = wide_en & pcm_addr[23]` on the download side,
-`pcmh_sel = wide_en & pcm_addr[PCM_AW]` and
-`gfxc_sel = wide_en & rom0_bank[2]` on the read side, plus D1's bank latch.
+**Eight sites are gated as of slice D4**, and `tests/test_mister_wide_gate.sh`
+re-reads every one of them verbatim:
+
+| site | where | slice |
+|---|---|---|
+| `bank <= wide_en ? dsp_ab[7:0] : {1'b0, dsp_ab[6:0]}` | `jtcps2w_qsnd_bank.v` | D1 |
+| `is_gfxc  = wide_en & gfx_addr[25]` | `jtcps1_prom_we.v`, download | D2 |
+| `is_pcmhi = wide_en & pcm_addr[23]` | `jtcps1_prom_we.v`, download | D2 |
+| `pcmh_sel = wide_en & pcm_addr[PCM_AW]` | `jtcps1_sdram.v`, read | D2 |
+| `gfxc_sel = wide_en & rom0_bank[2]` | `jtcps1_sdram.v`, read | D2 |
+| `bank = { wide_en & table_y[12], table_y[14:13] }` | `jtcps2w_obj_bank.v` | D3 |
+| `rom_cs \|= wide_en & RnW & (A[23:21]==3'b010)` | `jtcps2_main.v` | D4 |
+| `one_wait` boundary `wide_en ? 4'h6 : 4'h5` | `jtcps2_main.v` | D4 |
+
+**The obj promote is gated at BOTH ends and that is deliberate.** `gfxc_sel`
+already ANDs `wide_en`, so an ungated promote would still have been inert —
+bank 4 would select the same slot as bank 0. Gating it at the source as well
+makes the third bank bit *provably zero* with the profile clear rather than
+*harmlessly ignored*, which is the difference between rule 1 v2's "untouched
+by construction" and an inertness argument. It also makes the promote
+exhaustively testable on its own (§9).
 
 **The one ungated change is declared rather than hidden: the bank-0
 re-pack.** `SLOTn_OFFSET` are elaboration-time parameters and cannot switch
@@ -578,11 +614,12 @@ instrument carries a control that proves it can still fail.
 | gate | tier | the claim it holds | its must-fire control |
 |---|---|---|---|
 | `test_jtcores_twin` | ci_portable | the three reference cores are byte-untouched, the fork's whole-tree delta is 18 declared paths, and the stock `vsavj` MRA from `cps2w` is `cps2`'s except `<rbf>` | the delta list is exact — an undeclared path fails |
-| `test_mister_wide_gate` | ci_portable | every gated site, re-read verbatim; the placement constants in BYTES against §6; the gated QSound latch simulated over **all 65,536 values of `dsp_ab` in both profile states**; the new jtframe module absent from the reference core's file list | four fired at D1: gate bypassed, byte moved to 40, polarity flipped, and a one-width perturbation of an override |
+| `test_mister_wide_gate` | ci_portable | every gated site, re-read verbatim; the placement constants in BYTES against §6; the gated QSound latch AND the gated obj promote each simulated over **all 65,536 of their inputs in both profile states**; the promote read AFTER a terminator test proven identical to the reference core's; the 3-bit bank asserted at every port between the frame table and SDRAM; the new jtframe module absent from the reference core's file list | six: gate bypassed (D1), byte moved to 40, polarity flipped, a one-width perturbation of an override, the PROMOTE's gate bypassed (D3), and the promote reading `y[15]` instead of `y[12]` — the profile's first draft, which would end the sprite list at the first tenant sprite |
 | `test_sim_wram_contract` | ci_portable | the work-RAM dump hook's naming, byte order, skew absorption and rule-7 refusals, and a static proof that every added line sits inside its `#ifdef` | two, plus the fork-rewind ground truth (a parent reading a file while forking `exit()`ing children ends at line 278 of 3,000; with `_exit()`, at 3000) |
 | `test_rpl2siminputs` | ci_portable | the replay→`sim_inputs.hex` translator and its loud refusals (P2, buttons 4-6, service-test) | the refusals are asserted to fire |
 | `audit_mister_map_fit` | ci_static | the fit itself, the four frozen content extents, and the scramble∘interleave identity §5 rests on | three: the untrimmed image must overflow **both** ceilings; +1 MB of the obj-bank-5 REGION must overflow bank 0; the identity must FAIL with the scramble removed |
 | `test_mister_mra_map` | ci_static | the `.rom` is byte-for-byte the map, region by region, against the romset — not recomputed | two: untrimmed → 73,670,720 B and a silently wrapped header word; `length` +0x400 → the frozen table breaks |
+| `test_mister_gfxc_fetch` | emulator | **the payoff**: the core ISSUES SDRAM READS into the group-C destinations, with the tile codes inside the roster's frozen live extents. Two legs whose `.rom` files differ by ONE BYTE — header byte 41, `0xFE` vs the `0xFF` fill — so the control is the profile bit itself and nothing else | the control leg must read ZERO from both group-C windows; and two further probes on the VANILLA obj banks must be non-zero **in both legs**, so a zero is evidence about the core and not about the probe |
 | `test_mister_sdram_census` | emulator | **all 67,108,864 bytes of all four banks** against §6, on four legs (our core + WIDE image, reference core + WIDE image, our core + stock image, reference core + stock image) | a 1 KiB shift of **any** placement constant is rejected; plus two cross-checks that do not use the tool's model at all |
 | `test_mister_wide_inert` | emulator | with the profile bit clear, `cps2w` and `cps2` produce **bit-identical work RAM frame by frame** | the window must be non-constant, and a one-frame shift must fail |
 | `test_mister_sim_anchor` | emulator | MAME and the core agree on every mapped gameplay field at the round-1 match-start anchor and at +60/+180, on stock content — MAME 2146 / sim **2609** / skew **+463**, band ±30 | the dump set must be complete and non-constant |
@@ -651,25 +688,53 @@ as the emulator superset leg.
        |
        v
   D3  the promote      the 3-bit obj bank going live — the first slice
-      the destination  where tenant art is actually FETCHABLE           NEXT
+      the destination  where tenant art is actually FETCHED             DONE
        |
        v
-  D4  the PRG window   the 6 MB read decode, and one_wait with it     QUEUED
+  D4  the PRG window   the 6 MB read decode, and one_wait with it       DONE
 ```
+
+> **D3 AND D4 SHIPPED TOGETHER, AND THE REASON IS A FACT ABOUT THE ROMSET
+> RATHER THAN ABOUT THE RTL.** They are separate fork commits and separate
+> gates, but D3 cannot be *demonstrated* alone: the select screen's roster
+> record is allocated in `wide_ext`, i.e. above `CPU:$400000`
+> (`build/manifest/*.toml` `[[select_wheel]] roster21`, `hole = "wide_ext"`;
+> `build/m3b_merged13/gen.log` puts `wide_ext` at `0x400010-0x4D1100`). With
+> only a 4 MB decode the core cannot READ the table that names the tenant
+> cells, so no tenant sprite is ever emitted and the promote has nothing to
+> promote. `mister_map.md` §10 had said as much in one line — "only after
+> D0–D4 does a WIDE set boot" — and prescribed a synthetic canary for D3
+> instead. The canary was not needed once D4 was in: the real romset is the
+> better witness.
 
 | slice | scope | what proves it | status |
 |---|---|---|---|
 | **D0** | `mame2mra.toml`: the `qsoundw` trim region and the `cps2w.cpp` sourcefile opt-in; the `vsavjw` entry in `doc/mame.xml`. No RTL | the `.rom` is 66,265,152 B with header words 6144 / 6400 / 15552 / 64704, every region byte-for-byte the romset's | **DONE**, fork `38acc638` |
 | **D1** | the QSound sample-bank width, runtime-gated: `jtcps2w_profile.v` + `jtcps2w_qsnd_bank.v`, plus overrides of the two shared files they need. `PCM_AW` **stays 23** | the gated latch over all 65,536 `dsp_ab` values in both profile states | **DONE**, fork `4840df8a` |
 | **D2** | the bank-0 re-pack, the group-C redirect, the QSound split, two new slot counts, and `jtframe_ram1_7slots.v` — bank 0 needs seven streams and upstream's family stops at five | the whole-image SDRAM census, four legs | **DONE**, fork `0df6f000` |
-| **D3** | the obj promote: `st3_bank <= {table_y[12], table_y[14:13]}` and the `dr_bank`/`obj_bank`/`rom_bank`/`rom0_bank` chain widened to 3 bits | the MiSTer twin of the FBNeo B4 canary — a test flag that ORs `0x1000` into bank-2/3 sprites with group C loaded as a byte copy of group B, running the STOCK rom: RAM identical by construction, *frames* must be pixel-identical | **NEXT** |
-| **D4** | the PRG window: `rom_cs` / `rom_addr` / `one_wait`, `main_rom_addr`, `SLOT3_AW` 22 | relocate a real data block above `CPU:$400000` and repoint one pointer — RAM identical, and the zeros variant must diverge | **QUEUED** |
+| **D3** | the obj promote, lifted into `jtcps2w_obj_bank.v` and read in the ELSE arm of the terminator test; the bank widened to 3 bits across four override files; `rom0_bank[2]` untied | the expression over its WHOLE input space — 131,072 vectors, both profile states, bank[2] set 32,768 times wide and **0** stock, plus the six `gfx_tiles.py` encodings each decoding to their own bank with none of them setting y bit 15. Two must-fire controls: the gate bypassed, and bit 2 read from `y[15]` | **DONE**, fork `b9899fa8` |
+| **D4** | the PRG window: `rom_cs` / `rom_addr` / `one_wait` gated on `wide_en`, `main_rom_addr` and `SLOT3_AW` 22 | every line re-read in the RTL, including the `!RnW` on `objcfg_cs` that makes the read decode collision-free; and the stock leg unmoved | **DONE**, fork `dd242a65` |
 
-**What D2 deliberately left stubbed.** `rom0_bank` is three bits at the
-`jtcps1_sdram` port but the game top drives `{1'b0, rom0_bank}`, so
-`gfxc_sel` is constant 0, the two group-C read slots are provably
-unreachable, and **D2 changes no fetch in the running game at all**. That is
-exactly why its evidence is an image census and not a replay.
+**What D2 deliberately left stubbed, and D3 unstubbed.** `rom0_bank` was
+three bits at the `jtcps1_sdram` port with the game top driving
+`{1'b0, rom0_bank}`, so `gfxc_sel` was constant 0 and the two group-C read
+slots were provably unreachable — which is why D2's evidence is an image
+census and not a replay. D3 removes the tie and drives the bank from the
+object engine, so the slots are reachable and the profile is complete.
+
+> **AND THE END-TO-END DEMONSTRATION IS STILL MISSING, FOR A REASON THAT IS
+> NOT D3's.** With every slice in, the WIDE romset does not get past its own
+> boot sequence on the core: the CPS-2 RAM test draws, the QSound/Capcom legal
+> screen stands for ~660 frames, and the machine RESETS and starts over — a
+> ~1,580-frame cycle. **No sprite is drawn at all** — the SDRAM read probe
+> counts zero reads in vanilla obj bank 2 as well as in both group-C windows —
+> so no tenant tile has been fetched on any core, ever. The same run with the
+> profile bit CLEAR is frame-for-frame identical, which eliminates all eight
+> gated sites; the whole-image census passes on the same image and core, which
+> eliminates the download; and MAME on the same romset and replay reaches the
+> select screen. `docs/platform/mister.md` "THE WIDE ROMSET DOES NOT BOOT ON
+> THE CORE YET" carries the trace, the eliminations and the next probe. **This
+> is the first thing to fix, and it is a bug hunt rather than a slice.**
 
 **Two findings recorded while reading, not acted on.** The wait-state line
 `jtcps2_main.v:167` gives `A[23:20] < 4'h5` one wait state, so the second
