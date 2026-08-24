@@ -552,3 +552,4 @@ is a GAME gotcha if it is true of the game regardless of the port.
   identical from the fetch side; check what the ROMSET needs before designing
   the demonstration.
 - **THE INSTRUMENT PROTOCOL** — the author of an instrument cannot judge its output; prove it fires AND fails before its first real use; a hardcoded physical constant is a check with an unwritten expiry date. [project](project/gotchas.md)
+- **A replay's name is a claim about the build** — `11_pick_donovan` picks Jedah on every post-M3a build; the filename outlived the substitution. [project](project/gotchas.md)

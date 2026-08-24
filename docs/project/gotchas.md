@@ -2923,3 +2923,41 @@ green one.
 Strong candidate for the skill distillation recorded under STATE "Decisions
 pending", since it is discipline rather than reference data.
 
+## A REPLAY'S NAME IS A CLAIM ABOUT THE BUILD (paid: 2026-08-24, 14z-107)
+
+`tests/replays/11_pick_donovan.rpl` **does not pick Donovan** on any build
+after 14z-64's M3a de-substitution. It walks to wheel slot `0x0F`, which was
+Donovan only while he was SUBSTITUTED over Jedah; post-M3a the tenants sit at
+their native ids (Donovan `0x13`, Huitzil `0x10`, Pyron `0x11`) on appended
+cells, and slot `0x0F` is plain **Jedah** again. The filename outlived the
+fact by dozens of generations.
+
+**How it cost time:** a MiSTer measurement was scoped to prove obj bank 4 —
+the tenants' FIGHTER art — gets fetched on the core, using replay 11 on the
+reasoning that it "runs past match start". It does run past match start; it
+was simply never going to pick a tenant, so obj bank 4 was unreachable by
+that replay at ANY window length. Caught before the 70-minute run by
+measuring instead: on MAME + the WIDE romset replay 11 anchors at
+`p1_char_id = 0x0F` with `p1_hitbox_base` in VANILLA space, while
+`36_pick_tenant_cell` anchors at `0x13` with a base in TENANT space.
+
+**The header said so and was read past.** It opens "pick slot 0x0F (Jedah in
+vanilla; Donovan after the M2 port)" — accurate about its own era, on a tree
+now many generations past M2. Build-dependence was documented; the reader
+generalised anyway.
+
+**The rule.** This is the sibling of "identify moves by measured EFFECTS,
+never the script's input name" (14z-102), one level up: **an artifact whose
+meaning depends on the build is a CLAIM about the build, and needs asserting
+like any other.** A replay named for a character is exactly as trustworthy as
+a hardcoded `0x600000` — see THE INSTRUMENT PROTOCOL's rule 3, which this
+instance generalises from instruments to fixtures. The cheap assertions
+already exist and were not consulted: the expectation class
+(`tests/expected/donovan-m11/11_pick_donovan.masked` is a LEGACY class, not a
+tenant one) and `tests/test_select_arrays.sh:85`, which says in words
+"11_pick_donovan … ending on Jedah".
+
+**Practical:** to reach a tenant on a current build use
+`36_pick_tenant_cell` (Donovan `0x13`), `37_pick_huitzil_cell` (`0x10`) or
+`40_pick_pyron_cell` (`0x11`). All three tenants carry `gfx_bank: 4`.
+
