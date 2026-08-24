@@ -291,6 +291,20 @@ those replays. A pass with no negative control is not evidence. With all
 20 rows relocated, the zeros variant DOES diverge, so the identical
 result is real: **the 68k is genuinely fetching data from above 4MB.**
 
+**MiSTer NOTE, added 14z-107 (11): that is true of the HARDWARE, of MAME and
+of FBNeo — and it is NOT true of Jotego's reference `jtcps2` core.** The CPS-2
+key's range word is stored COMPLEMENTED (`~decoded[9] & 0x3ff`, FBNeo
+`cps2_crpt.cpp:771`) and `jtcps2_dec_ctrl.v:44` compares against it
+uncomplemented, so that core decrypts opcode fetches to `CPU:$F03FFF`.
+Executable extension content therefore arrives at the 68k as the decryptor's
+output. MiSTer slice D5 fixes it, profile-gated, in
+`cores/cps2w/hdl/jtcps2_decrypt.v`; the reservation and the RAW-authoring rule
+below are unchanged. **And it is why B4 (prg) below proved less than it
+looked:** B4 relocated DATA tables, and data reads bypass the decryptor on
+every implementation — nothing had ever EXECUTED from above 4 MB on a core
+that decrypts by address. See `docs/platform/mister.md` "CAN THE 68k READ
+ABOVE 4 MB?".
+
 Note for authors: everything above `PRG:0x0FFFFF` is outside the
 encryption window, so extension content is written RAW (no re-encryption)
 — but it must still be laid out in FILE byte order, i.e. converted with

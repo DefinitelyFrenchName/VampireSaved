@@ -428,6 +428,15 @@ is a GAME gotcha if it is true of the game regardless of the port.
   produce no `.rom` at all. Ceilings: the GAME-side `ioctl_addr` is `[25:0]`
   = 64 MB even though the MiSTer target has 27 bits, and each header start
   word is 16 bits in KiB units.
+- **14z-107 (11) (platform):** the CPS-2 key's encrypted-opcode RANGE word is
+  stored COMPLEMENTED; `jtcps2_dec_ctrl` reads it straight, so the reference
+  core decrypts opcode fetches to `CPU:$F03FFF` where MAME/FBNeo stop at
+  `$0FFFFF`. Invisible on every stock game; fatal for code above 4 MB.
+- **14z-107 (11) (platform):** a `[22:1]` vector's INDEX is the address bit —
+  a read probe that split its window on `rom_addr[21]` (reasoning from the
+  WIDTH) reported 2,560 reads "above `$400000`" at `$38C2A0-$3D8256`. Log the
+  raw quantity beside the classification, and make the consumer REFUSE when the
+  two disagree.
 - **14z-107 (6) (platform):** jtframe's RTL plumbing has three traps that
   cost real time in slice D1. An 8-bit SDRAM slot **cannot** be widened past
   `SDRAMW` — `{SDRAMW-AW{1'b0}}` (`jtframe_romrq_bcache.v:74`) is a

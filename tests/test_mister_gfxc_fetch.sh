@@ -1,5 +1,6 @@
 #!/bin/sh
-# test_mister_gfxc_fetch.sh — THE PAYOFF: the core FETCHES a tenant tile.
+# test_mister_gfxc_fetch.sh — THE PAYOFF GATE: it goes green the day the core
+# FETCHES a tenant tile. IT IS RED, AND HAS NEVER BEEN GREEN (see STATUS).
 # 14z-107 (10), MiSTer slice D3 (+D4). Emulator tier: ROMDIR + Verilator +
 # ~2 x 65 min. NOT ci_portable, NOT ci_static.
 #

@@ -148,6 +148,20 @@
 #                THE WINDOW IS A PHYSICAL ADDRESS, so it is invalidated by any
 #                memory-map change: derive it from the RTL constants, never
 #                from memory (14z-107 (9) paid for that rule twice).
+#   --prgprobe   arm the 68k PROGRAM-ROM READ PROBE in cores/cps2w (slice D4's
+#                discriminator, 14z-107 (11)): -d JTCPS2W_PRGPROBE=1. It
+#                classifies every 68k BUS CYCLE by A[23:21] — decode-independent,
+#                so it still speaks when `wide_en` is CLEAR and `rom_cs` cannot
+#                assert in the window — and logs every COMPLETED program-ROM
+#                read with the word the CPU LATCHED and the raw SDRAM word
+#                behind it. Writes `PRGPROBE frame ...` lines into jtsim.log
+#                (the last one is the run's summary) and <outdir>/prgprobe.txt
+#                with the per-access records. Reads BELOW CPU:$400000 are
+#                counted and sampled in the SAME counters: that is the probe's
+#                own must-fire control, and comparing those bytes against the
+#                .rom validates the comparison procedure on addresses the game
+#                is provably executing from. cps2w only — cores/cps2 has no
+#                such block, by construction.
 #   --keep-banks collect the four post-download SDRAM bank images into
 #                <outdir>/sdram/sdram_bank[0-3].bin. test.cpp writes them once,
 #                right after a FULL download (test.cpp:915 `if(
@@ -181,7 +195,7 @@ DWNLD_FRAMES_WIDE=659
 RPL=""; OUTDIR=""; FRAMES=""; WFIRST=""; WLAST=""; CORE=cps2; OFFSET=""; LOAD=1
 RBANK=""; ROFF=""; RLEN=""; RADDR=""; FRAMEOUT=off; STATS=0
 WIDEBUILD=""; SETNAME=vsavj; POSTFRAMES=""; KEEPBANKS=0
-NPROBE=0; PBANK=""; PLO=""; PHI=""
+NPROBE=0; PBANK=""; PLO=""; PHI=""; PRGPROBE=0
 VFIRST=""; VLAST=""; VSTRIDE=""
 while [ $# -gt 0 ]; do
     case "$1" in
@@ -196,6 +210,7 @@ while [ $# -gt 0 ]; do
               case "${2:-}" in [0-9]*) shift; VSTRIDE="$1" ;; esac ;;
     --frame-output) shift; FRAMEOUT="${1:?--frame-output needs off|fork|collect}" ;;
     --stats)  STATS=1 ;;
+    --prgprobe) PRGPROBE=1 ;;
     --wide)   shift; WIDEBUILD="${1:?--wide needs a build dir}"; SETNAME=vsavjw ;;
     --post-frames) shift; POSTFRAMES="${1:?--post-frames needs N}" ;;
     --keep-banks)  KEEPBANKS=1 ;;
@@ -210,7 +225,7 @@ while [ $# -gt 0 ]; do
               ROFF="${1:?--region needs BANK OFF LEN ADDR}"; shift
               RLEN="${1:?--region needs BANK OFF LEN ADDR}"; shift
               RADDR="${1:?--region needs BANK OFF LEN ADDR}" ;;
-    -h|--help) sed -n '2,113p' "$0"; exit 0 ;;
+    -h|--help) sed -n '2,184p' "$0"; exit 0 ;;
     -*) echo "unknown option '$1' (try --help)" >&2; exit 2 ;;
     *)  if [ -z "$RPL" ]; then RPL="$1"; elif [ -z "$OUTDIR" ]; then OUTDIR="$1";
         else echo "unexpected argument '$1'" >&2; exit 2; fi ;;
@@ -218,6 +233,12 @@ while [ $# -gt 0 ]; do
     shift
 done
 [ -n "$RPL" ] && [ -n "$OUTDIR" ] || { echo "usage: run_sim_jtcps2.sh <replay.rpl> <outdir> [opts]" >&2; exit 2; }
+# CHECKED BEFORE ROMDIR, so a clean checkout can assert the refusal.
+if [ "$PRGPROBE" = 1 ] && [ "$CORE" != cps2w ]; then
+    echo "--prgprobe needs --core cps2w (the block lives in cores/cps2w/hdl/jtcps2_main.v);" >&2
+    echo "  asking cores/cps2 for it would compile out silently and report a zero." >&2
+    exit 2
+fi
 ROMDIR="${ROMDIR:?set ROMDIR to the reference-set directory}"
 ROMDIR="$(CDPATH= cd "$ROMDIR" && pwd)"
 RPL="$(CDPATH= cd "$(dirname "$RPL")" && pwd)/$(basename "$RPL")"
@@ -465,6 +486,13 @@ if [ "$NPROBE" -gt 0 ]; then
 else
     say "NO --rdprobe: the read probe stays compiled out (negative control)"
 fi
+if [ "$PRGPROBE" = 1 ]; then
+    SIMARGS="$SIMARGS -d JTCPS2W_PRGPROBE=1"
+    say "68k program-ROM read probe ARMED (prgprobe.txt + PRGPROBE lines in jtsim.log)"
+    rm -f "$GAME/prgprobe.txt"
+else
+    say "NO --prgprobe: the 68k read probe stays compiled out (negative control)"
+fi
 say "jtsim $SIMARGS"
 T0="$(date +%s)"
 bash "$JTFRAME/bin/jtsim" $SIMARGS > "$OUTDIR/jtsim.log" 2>&1 \
@@ -516,6 +544,16 @@ if [ "$NPROBE" -gt 0 ]; then
     done
     grep -a "^RDPROBE SUMMARY" "$OUTDIR/jtsim.log" | sed 's/^/[run_sim_jtcps2] /' || \
         say "NO RDPROBE SUMMARY line in the log — the probe did not run"
+fi
+if [ "$PRGPROBE" = 1 ]; then
+    if [ -s "$GAME/prgprobe.txt" ]; then
+        mv "$GAME/prgprobe.txt" "$OUTDIR/prgprobe.txt"
+        say "collected $(wc -l < "$OUTDIR/prgprobe.txt" | tr -d ' ') prgprobe records into $OUTDIR/prgprobe.txt"
+    else
+        echo "FAIL: --prgprobe produced no prgprobe.txt — the probe did not run" >&2; exit 1
+    fi
+    grep -a "^PRGPROBE frame" "$OUTDIR/jtsim.log" | tail -1 | sed 's/^/[run_sim_jtcps2] /' || \
+        say "NO PRGPROBE line in the log"
 fi
 cp "$GAME/sim_inputs.hex" "$OUTDIR/sim_inputs.hex"
 say "done: $OUTDIR"

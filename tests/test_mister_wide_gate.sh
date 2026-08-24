@@ -125,6 +125,8 @@ PYD
     delta "$SRC/cores/cps1/hdl/jtcps1_video.v"    "$HDL/jtcps1_video.v"
     echo "=== jtcps2_main.v : cores/cps2/hdl -> cores/cps2w/hdl ==="
     delta "$SRC/cores/cps2/hdl/jtcps2_main.v"     "$HDL/jtcps2_main.v"
+    echo "=== jtcps2_decrypt.v : cores/cps2/hdl -> cores/cps2w/hdl ==="
+    delta "$SRC/cores/cps2/hdl/jtcps2_decrypt.v"  "$HDL/jtcps2_decrypt.v"
 } > "$W/delta.txt"
 if cmp -s "$W/delta.txt" "$REPO/tests/expect/cps2w_rtl_delta.txt"; then
     ok "1 the RTL override delta is the frozen one ($(grep -c '^[+-]' "$W/delta.txt") changed lines)"
@@ -159,6 +161,8 @@ else
         delta "$SRC/cores/cps1/hdl/jtcps1_video.v"    "$HDL/jtcps1_video.v"
         echo "=== jtcps2_main.v : cores/cps2/hdl -> cores/cps2w/hdl ==="
         delta "$SRC/cores/cps2/hdl/jtcps2_main.v"     "$HDL/jtcps2_main.v"
+        echo "=== jtcps2_decrypt.v : cores/cps2/hdl -> cores/cps2w/hdl ==="
+        delta "$SRC/cores/cps2/hdl/jtcps2_decrypt.v"  "$HDL/jtcps2_decrypt.v"
     } > "$W/delta_ctlD.txt"
     cmp -s "$W/delta_ctlD.txt" "$REPO/tests/expect/cps2w_rtl_delta.txt" \
         && bad "1D control did NOT fire: a one-width perturbation still matched the frozen delta" \
@@ -270,7 +274,7 @@ if [ -n "$JTF" ]; then
     for f in $want_own; do grep -qx "$f" "$W/list_cps2w.txt" || a=1; done
     for f in $shared_orig; do grep -qx "$f" "$W/list_cps2w.txt" && a=2; done
     case "$a" in
-        0) ok "5a cps2w compiles OUR nine overrides, its three new modules and the new jtframe slot module, and NONE of the nine shared originals" ;;
+        0) ok "5a cps2w compiles OUR ten overrides, its three new modules and the new jtframe slot module, and NONE of the ten shared originals" ;;
         1) bad "5a cps2w does not compile all thirteen of its own files" ;;
         2) bad "5a cps2w compiles a shared original TOO — duplicate module, and the override is not overriding" ;;
     esac
@@ -285,8 +289,8 @@ if [ -n "$JTF" ]; then
         3) bad "5b cps2 pulled jtframe_ram1_7slots — the new module was added to a SHARED jtframe yaml" ;;
     esac
     d="$(diff "$W/list_cps2.txt" "$W/list_cps2w.txt" | grep -c '^[<>]')"
-    [ "$d" = "22" ] && ok "5c the two cores' file lists differ in exactly 22 entries (9 out, 13 in)" \
-                    || bad "5c the file lists differ in $d entries, expected 22"
+    [ "$d" = "24" ] && ok "5c the two cores' file lists differ in exactly 24 entries (10 out, 14 in)" \
+                    || bad "5c the file lists differ in $d entries, expected 24"
 else
     note "5 no built jtframe tool (tools/setup_jtcores.sh); reachability not checked"
 fi
@@ -470,6 +474,57 @@ grep -q "wire \[22:1\] main_rom_addr;" "$HDL/jtcps2_game.v" \
 grep -q "\.SLOT3_AW    ( CPS==2 ? 22 : 21 )" "$HDL/jtcps1_sdram.v" \
     && ok "8k bank 0's program slot reaches 6 MB on CPS-2 and is unchanged on CPS-1" \
     || bad "8k SLOT3_AW did not follow main_rom_addr — the top address bit would be dropped"
+
+# ── 9. (D5) THE DECRYPTION RANGE ───────────────────────────────────────────
+# The CPS-2 key's encrypted-opcode RANGE word is stored COMPLEMENTED. MAME and
+# FBNeo read it that way (`~decoded[9] & 0x3ff`); jtcps2_dec_ctrl does not, so
+# the reference core decrypts opcode fetches FIFTEEN TIMES further than the
+# hardware does — CPU:$000000-$F03FFF instead of $000000-$0FFFFF on vsavj. No
+# stock game notices: only Capcom's own encrypted code ever executes, and DATA
+# reads are never decrypted either way. CPS-2 WIDE is the first thing to put
+# EXECUTABLE content above the window. Measured 14z-107 (11): five opcode
+# fetches at CPU:$4BE7C0-$4BE7C8 whose RAW words matched the .rom byte for byte
+# and whose LATCHED words were the decryptor's output.
+DEC="$HDL/jtcps2_decrypt.v"
+if [ ! -f "$DEC" ]; then
+    bad "9 no $DEC — slice D5's override is missing"
+else
+    grep -q 'wire \[15:0\] rng_eff = wide_en ? { addr_rng\[15:10\], ~addr_rng\[9:0\] } : addr_rng;' "$DEC" \
+      && ok "9a the range word is complemented ONLY with the profile on (rng_eff)" \
+      || bad "9a jtcps2_decrypt's gated range expression is not the frozen one"
+    grep -q '\.range     ( rng_eff       ),' "$DEC" \
+      && ok "9b jtcps2_dec_ctrl is fed rng_eff, not addr_rng" \
+      || bad "9b the decrypt controller is still fed the raw range word"
+    grep -q 'input             wide_en,' "$DEC" \
+      && ok "9c jtcps2_decrypt takes wide_en" || bad "9c jtcps2_decrypt has no wide_en port"
+    grep -q '\.wide_en    ( wide_en   ),' "$HDL/jtcps2_main.v" \
+      && ok "9d the game's 68k block routes wide_en into the decryptor" \
+      || bad "9d wide_en does not reach u_decrypt"
+    # jtcps2_dec_ctrl itself stays a REFERENCE file on purpose: the fix sits
+    # one level UPSTREAM of the comparison, so the comparison nobody validated
+    # for the rest of the CPS-2 library is left exactly as it was.
+    if [ -f "$HDL/jtcps2_dec_ctrl.v" ]; then
+        bad "9e cores/cps2w overrides jtcps2_dec_ctrl — the D5 fix is meant to leave it alone"
+    else
+        ok "9e jtcps2_dec_ctrl is NOT overridden (the fix is one expression upstream of it)"
+    fi
+    grep -q 'en_latch <= op_fetch && en && (addr\[14+:10\] <= range\[9:0\]);' \
+        "$SRC/cores/cps2/hdl/jtcps2_dec_ctrl.v" \
+      && ok "9f the reference comparison is still the UNcomplemented one D5 corrects for" \
+      || bad "9f cores/cps2/hdl/jtcps2_dec_ctrl.v changed — re-derive D5 before trusting it"
+    # 9G MUST-FIRE: strip wide_en from the range fix and the frozen delta must move.
+    sed 's/wide_en ? { addr_rng\[15:10\], ~addr_rng\[9:0\] } : addr_rng/{ addr_rng[15:10], ~addr_rng[9:0] }/' \
+        "$DEC" > "$W/dec_ungated.v"
+    if cmp -s "$DEC" "$W/dec_ungated.v"; then
+        bad "9G control could not perturb the gated expression"
+    else
+        delta "$SRC/cores/cps2/hdl/jtcps2_decrypt.v" "$W/dec_ungated.v" > "$W/dec_ungated.delta"
+        delta "$SRC/cores/cps2/hdl/jtcps2_decrypt.v" "$DEC" > "$W/dec_real.delta"
+        cmp -s "$W/dec_ungated.delta" "$W/dec_real.delta" \
+          && bad "9G control did NOT fire: an UNGATED range fix produced the same delta" \
+          || ok "9G control fired (removing wide_en from the range fix changes the frozen delta)"
+    fi
+fi
 
 [ $fail = 0 ] && echo "PASS test_mister_wide_gate" \
               || { echo "FAIL test_mister_wide_gate"; exit 1; }

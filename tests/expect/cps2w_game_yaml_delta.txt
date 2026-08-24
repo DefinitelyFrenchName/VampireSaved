@@ -9,6 +9,7 @@
 >       - jtcps1_obj_draw.v      # OVERRIDE of cores/cps1/hdl  (D3)
 >       - jtcps1_video.v         # OVERRIDE of cores/cps1/hdl  (D3)
 >       - jtcps2_main.v          # OVERRIDE of cores/cps2/hdl  (D4)
+>       - jtcps2_decrypt.v       # OVERRIDE of cores/cps2/hdl  (D5)
 >       - jtcps2w_profile.v      # new
 >       - jtcps2w_qsnd_bank.v    # new
 >       - jtcps2w_obj_bank.v     # new  (D3)
@@ -16,6 +17,7 @@
 <       - jtcps2_main.v
 <       - jtcps2_obj.v
 <       - jtcps2_obj_scan.v
+<       - jtcps2_decrypt.v
 <       - common.yaml
 <   - from: cps15
 <     get:

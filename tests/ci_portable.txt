@@ -90,3 +90,14 @@ test_mister_wide_gate
 # image are present, and SKIPs those two otherwise. Three must-fire controls.
 # ROM-free, no emulator, ~5 s. tools/mk_mister_page.py --check
 test_mister_page
+
+# 14z-107 (11): the ROM-free half of the slice D4 discriminator. Locks the 68k
+# program-ROM read probe's contract — it is inert unless JTCPS2W_PRGPROBE is
+# defined (with the hoisted-line control); its window bit IS the decode's
+# window bit, both re-read from the RTL; its ADDRESS half carries no chip
+# select, which is what makes it speak on the profile-CLEAR leg. And the
+# verdict logic is itself tested on synthetic logs: all three answers plus
+# THREE refusals — a silent control, a control whose bytes do not verify, and
+# a probe whose HI records sit below $400000 (the defect the first draft
+# shipped with). ROM-free, no emulator, ~3 s.
+test_mister_prg_probe

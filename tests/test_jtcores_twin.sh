@@ -56,7 +56,7 @@ A="$SRC/cores/cps2/cfg"; B="$SRC/cores/cps2w/cfg"
 # together"), and the two halves below have to agree: what is on disk, and
 # what game.yaml pulls. An undeclared file in either place fails here.
 hdl="$(ls "$SRC/cores/cps2w/hdl" 2>/dev/null | tr '\n' ' ')"
-want='jtcps15_sound.v jtcps1_obj_draw.v jtcps1_prom_we.v jtcps1_sdram.v jtcps1_video.v jtcps2_game.v jtcps2_main.v jtcps2_obj.v jtcps2_obj_scan.v jtcps2w_obj_bank.v jtcps2w_profile.v jtcps2w_qsnd_bank.v pal_lut.hex '
+want='jtcps15_sound.v jtcps1_obj_draw.v jtcps1_prom_we.v jtcps1_sdram.v jtcps1_video.v jtcps2_decrypt.v jtcps2_game.v jtcps2_main.v jtcps2_obj.v jtcps2_obj_scan.v jtcps2w_obj_bank.v jtcps2w_profile.v jtcps2w_qsnd_bank.v pal_lut.hex '
 [ "$hdl" = "$want" ] && ok "2a cores/cps2w/hdl holds exactly the declared override set" \
                      || bad "2a cores/cps2w/hdl holds [$hdl], declared [$want]"
 EXP="$REPO/tests/expect/cps2w_game_yaml_delta.txt"
@@ -103,6 +103,7 @@ A cores/cps2w/hdl/jtcps1_obj_draw.v
 A cores/cps2w/hdl/jtcps1_prom_we.v
 A cores/cps2w/hdl/jtcps1_sdram.v
 A cores/cps2w/hdl/jtcps1_video.v
+A cores/cps2w/hdl/jtcps2_decrypt.v
 A cores/cps2w/hdl/jtcps2_game.v
 A cores/cps2w/hdl/jtcps2_main.v
 A cores/cps2w/hdl/jtcps2_obj.v
@@ -119,7 +120,7 @@ M modules/jtframe/hdl/sdram/jtframe_sdram_stats_sim.v
 M modules/jtframe/hdl/ver/test.cpp
 TREE
 if cmp -s "$W/tree_want.txt" "$W/tree_got.txt"; then
-    ok "2f the fork's whole-tree delta is exactly the declared 24 paths (1 ADDED jtframe file, 3 modified, the rest cores/cps2w)"
+    ok "2f the fork's whole-tree delta is exactly the declared 25 paths (1 ADDED jtframe file, 3 modified, the rest cores/cps2w)"
 else
     bad "2f the fork touched something nobody declared:"
     diff "$W/tree_want.txt" "$W/tree_got.txt" | head -12 | sed 's/^/       /'

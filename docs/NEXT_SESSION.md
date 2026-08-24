@@ -1,9 +1,34 @@
-# NEXT SESSION — orientation (rewritten at the 14z-107 CLOSE, 2026-08-24)
+# NEXT SESSION — orientation (rewritten 14z-107 (11), 2026-08-24)
 
-> ## **START HERE — 14z-107 (10). THE ARC IS MiSTer, AND ALL FIVE RTL
-> ## SLICES ARE IN: D0 (the MRA), D1 (the runtime profile gate + the QSound
-> ## width), D2 (the SDRAM placement), D3 (the CPS-2 Turbo object promote)
-> ## and D4 (the 6 MB program window). THE OPENER IS NOT A SLICE — IT IS A
+> ## **START HERE — 14z-107 (11). THE ARC IS MiSTer, AND SIX RTL SLICES ARE
+> ## IN: D0 (the MRA), D1 (the runtime profile gate + the QSound width),
+> ## D2 (the SDRAM placement), D3 (the CPS-2 Turbo object promote), D4 (the
+> ## 6 MB program window) and D5 (THE DECRYPTION RANGE).**
+> ##
+> ## **THE BOOT FAILURE IS ROOT-CAUSED AND FIXED, AND A TENANT TILE HAS BEEN
+> ## FETCHED ON THE CORE.** The CPS-2 key's encrypted-opcode RANGE word is
+> ## stored COMPLEMENTED (`~decoded[9] & 0x3ff` in MAME and FBNeo) and
+> ## `jtcps2_dec_ctrl.v:44` compares against it UNCOMPLEMENTED, so the
+> ## reference core decrypts opcode fetches to `CPU:$F03FFF` where the two
+> ## emulators stop at `$0FFFFF`. Every stock CPS-2 game hides it: only
+> ## Capcom's own encrypted code executes, and DATA reads are never decrypted
+> ## anywhere — which is also why 14z-56's B4 (prg) passed while proving less
+> ## than it looked. CPS-2 WIDE is the first thing to put EXECUTABLE content
+> ## above the window. Slice D5 (`cores/cps2w/hdl/jtcps2_decrypt.v`, fork
+> ## `c00d7ce7`) complements it PROFILE-GATED, leaving `jtcps2_dec_ctrl`
+> ## itself untouched. With it in: the boot reaches the select screen and the
+> ## group-C read probe counts **6,720 reads in obj bank 5** — the
+> ## select-wheel tenant art. Measurement, instruments, byte comparison and
+> ## the two instrument defects paid for on the way:
+> ## `docs/platform/mister.md` "CAN THE 68k READ ABOVE 4 MB?".
+> ##
+> ## **The pre-D5 bug-hunt text below is KEPT for its eliminations, which
+> ## stand — with one CORRECTED IN PLACE: the two profile states are NOT
+> ## frame-for-frame identical.** They are identical in bank-3 traffic and in
+> ## masked work RAM, which is what was measured; the profile-ON leg completes
+> ## ten program-ROM reads above `$400000` and the profile-CLEAR leg zero.
+> ##
+> ## **[SUPERSEDED] THE OPENER IS NOT A SLICE — IT IS A
 > ## BUG HUNT: THE WIDE ROMSET LOOPS ON ITS OWN BOOT.**
 > ## **Read `docs/project/mister_core.md` FIRST** — the synthesis, in causal
 > ## order; `mister_map.md` / `mister_fit.md` / `platform/mister.md` are the
@@ -44,14 +69,14 @@
 > ## footprint 15.45 MB, declared region 16 MB.
 > ##
 > ## **THE FORK: `DefinitelyFrenchName/jtcores@vampire-saved`, pin
-> ## `0df6f000`, ELEVEN commits, FULLY PUSHED.** Fork pushes are
+> ## `c00d7ce7`, SEVENTEEN commits.** Fork pushes are
 > ## STANDING-AUTHORISED (maintainer, 2026-08-24) and the pin should be
 > ## bumped and pushed together. **THE MAIN VampireSaved REPO IS NEVER
 > ## PUSHED** — 20 local commits sit on `main` at this close and that is
 > ## correct. `cores/cps1`, `cores/cps2` and `cores/cps15` are
 > ## BYTE-UNTOUCHED and that is a `git diff` assertion
 > ## (`test_jtcores_twin` 2e); the whole-tree fork delta is held to a
-> ## declared 18 paths (2f).
+> ## declared 25 paths (2f).
 > ##
 > ## **TWO STANDING WARNINGS. BOTH WERE PAID FOR IN THIS SESSION, ONE OF
 > ## THEM THREE TIMES.**

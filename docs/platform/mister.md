@@ -1068,7 +1068,22 @@ Only `test.cpp` includes `defmacros.h`, so changing the dump window rebuilds
 one object and relinks — it does NOT re-verilate the model. A per-window
 rebuild is ~4 s, not minutes.
 
-## THE WIDE ROMSET DOES NOT BOOT ON THE CORE YET (measured 14z-107 (10))
+## THE WIDE ROMSET DOES NOT BOOT ON THE CORE YET — **RESOLVED 14z-107 (11),
+## SLICE D5.** (measured 14z-107 (10))
+
+> **THE CAUSE WAS THE CPS-2 DECRYPTION RANGE, and the section below is the
+> symptom and the eliminations, kept verbatim.** With slice D5 in
+> (`cores/cps2w/hdl/jtcps2_decrypt.v`, fork `c00d7ce7`) the WIDE romset boots
+> to the select screen and the core FETCHES tenant art. See "CAN THE 68k READ
+> ABOVE 4 MB?" below for the measurement.
+>
+> **ONE ELIMINATION BELOW IS CORRECTED IN PLACE, not withdrawn:** "the same
+> `.rom` with byte 41 = `0xFF` produces a frame-for-frame identical traffic
+> trace" is true of bank-3 traffic and of masked work RAM, which is what was
+> measured — and the two legs are NOT identical. The profile-ON leg completes
+> **ten** program-ROM reads above `CPU:$400000` and the profile-CLEAR leg
+> **zero**. The instrument that said "identical" could not see the window it
+> was being asked about.
 
 **This is the finding slice D3 was supposed to demonstrate against, and it is
 the reason the demonstration is not green.** Everything the profile needs is
@@ -1261,6 +1276,190 @@ level over its whole input space, and D3's destination is proven reachable by
 construction (`rom0_bank[2]` is driven, the chain is three bits wide at every
 port, `gfxc_sel` is the only gate). What is missing is the END-TO-END
 demonstration, and it is blocked behind this.
+
+## CAN THE 68k READ ABOVE 4 MB? YES — AND WHAT IT GETS IS THE DECRYPTOR'S OUTPUT (14z-107 (11))
+
+**THE THREE-WAY DISCRIMINATOR WAS RUN AND THE ANSWER IS THE THIRD ONE.** The
+question was whether slice D4's 6 MB program decode actually functions, because
+if it did not, `wide_en` SET would behave exactly like `wide_en` CLEAR for every
+read above `CPU:$400000` and the "profile-on and profile-off are frame-for-frame
+identical" elimination would be explained by a DEAD DECODE rather than by an
+innocent profile. It is neither: **the decode works, the SDRAM returns the
+romset's bytes, and the CPS-2 DECRYPTOR corrupts them on the way to the 68k.**
+
+**THE INSTRUMENT** is `JTCPS2W_PRGPROBE` in `cores/cps2w/hdl/jtcps2_main.v`
+(fork commit 16), armed by `tools/run_sim_jtcps2.sh --prgprobe` and read by
+`tools/prgprobe_verdict.py`. It is deliberately two instruments: an ADDRESS half
+that classifies every 68k bus cycle by `A[23:21]` with no chip select in the
+condition — which is what still speaks when `wide_en` is clear and `rom_cs`
+cannot assert in the window at all — and a DATA half that logs every COMPLETED
+program-ROM read with the word the CPU LATCHED (`rom_dec`, what `cpu_din`
+takes) and the RAW SDRAM word behind it. Both legs also carried the SDRAM read
+probe on bank 0 as an independent second layer.
+
+**THE PAIR** (`11_pick_donovan`, `cps2w`, the real `vsavjw.rom` sha1
+`d462e55a…`, 2,300 simulated frames = 1,641 after reset, so the boot's own
+reset at 2242 is inside the window). The two legs differ by ONE BYTE of the
+`.rom` — header byte 41, `0xFE` against `0xFF`:
+
+| | `wide_en` = 1 | `wide_en` = 0 |
+|---|---|---|
+| 68k bus cycles, all | 71,326,093 | 71,315,522 |
+| ...targeting `$400000-$5FFFFF`, READS | **10** | 4 |
+| ...targeting `$400000-$5FFFFF`, WRITES | 7,198 | 7,198 |
+| COMPLETED program-ROM reads above `$400000` | **10** | **0** |
+| ...below `$400000` (the must-fire control) | 54,961,148 | 54,954,608 |
+| SDRAM read probe, bank 0 `0x400000-0x600000` | **16 word reads**, 1 block, `0x4BE7C0-0x4BE7CE` | **0** |
+| SDRAM read probe, bank 0 `0x000000-0x400000` | 62,934,136 reads, 277 blocks | 62,924,028, 277 |
+
+**THE TEN RECORDS, AND THEY ARE THE WHOLE FINDING.** All ten are at
+`CPU:$4BE7C0-$4BE7C8` — five at simulated frame **1119** and the same five again
+at **2246**, i.e. once per turn of the boot loop. All ten carry **`fc = 2`,
+USER PROGRAM: they are OPCODE FETCHES.** The 68k is EXECUTING from the program
+extension. And:
+
+* every one of the ten RAW words is the `.rom`'s byte for byte;
+* every one of the ten LATCHED words is **different** — `7EDD` where memory
+  holds `4DED`, and so on for all five.
+
+**THE MUST-FIRE EVIDENCE, in the same run and the same counters.** 54,961,148
+reads below `$400000`, of which the first 2,000 are logged with their bytes:
+**2,000 of 2,000 match the `.rom`**, and they split exactly along the CPS-2
+rule — `fc = 5` (supervisor DATA) 824 records, **none** decrypted; `fc = 6`
+(supervisor PROGRAM) 1,176 records, **all** decrypted. A zero above the line
+would have meant nothing without that; and the same sample is what CALIBRATES
+the byte order (`rom[off+1]<<8 | rom[off]` scores 2000/2000, the other order
+59/2000), so the comparison is derived rather than assumed.
+
+### WITH SLICE D5 IN: THE BOOT SURVIVES, AND A TENANT TILE IS FETCHED
+
+Same core, same `.rom`, same replay, 2,900 simulated frames, `cps2w` carrying
+D5 (fork `c00d7ce7`). The read probe was re-armed on the FOUR windows
+`tests/test_mister_gfxc_fetch.sh` uses, so this one run is both the boot
+verdict and the D3 demonstration.
+
+* **The same five opcodes at `$4BE7C0` now arrive as memory holds them** —
+  `4ded 4ded`, `3800 3800`, `1b7c 1b7c`, `0020 0020`, `00b5 00b5` — and the
+  68k keeps going instead of stopping at the fifth.
+* Completed program-ROM reads above `$400000`: **10 → 1,189,750**, spanning
+  `CPU:$412BA0-$4D100E`, which is `wide_ext` (`0x400010-0x4D1100`) to the byte.
+* The boot passes the point it used to die at, reaches the title screen (bank 3
+  at 48,928 words/frame — the STOCK image's own title-screen figure) and then
+  the select screen.
+
+| read probe window | reads | distinct 128-byte blocks | first frame | range |
+|---|---|---|---|---|
+| ba1 `0x800000+` — group C obj **bank 4** (fighter art) | 0 | 0 | — | — |
+| ba0 `0x7E0000+` — group C obj **bank 5** (wheel art) | **9,038,400** | **105** | 1556 | `0xB86B00-0xFD20FE` |
+| ba2 whole bank — vanilla obj banks 0/2 | 2,316,480 | **372** | 1741 | `0x817600-0xA3E4FE` |
+| ba3 whole bank — vanilla obj banks 1/3 + scroll | 97,797,780 | 2,423 | 659 | `0x000000-0x9C177E` |
+
+**Two things to read off that table.** The group-C bank-5 window — 8 MB of
+SDRAM that had NEVER been read on any core — is being fetched from, 105
+distinct tile codes, and every one of them is inside the roster's frozen live
+extent for that bank (`0xFFDB`; the highest code touched is `≈0xEA41`). **That
+is a tenant tile fetched on the core, and it is the first one ever.** And the
+vanilla banks now read what the STOCK image reads on a healthy boot — **372
+distinct blocks in bank 2 and bank 3 reaching `0x9C177E`, the same figures
+recorded for the stock leg in the section below.** Obj bank 4 stays at zero
+because this replay window ends before a match starts; the fighter art is the
+next thing to reach.
+
+**The stock legs are unmoved, which is the superset invariant on the one change
+that could have broken it.** `tests/test_mister_wide_inert.sh` PASSES — `cps2w`
+against `cps2`, BIT-IDENTICAL work RAM in all 101 frames, control firing — and
+`tests/test_mister_sim_anchor.sh` PASSES at **sim 2609 / MAME 2146 / skew 463**
+(frozen 463 ± 30) with every mapped field agreeing and all four controls
+firing. Both are true by construction as well as by measurement: `rng_eff` IS
+`addr_rng` with `wide_en` clear.
+
+### THE MECHANISM: THE CPS-2 KEY'S RANGE WORD IS STORED COMPLEMENTED
+
+The CPS-2 key's last decoded word carries the encrypted-OPCODE range. **MAME
+and FBNeo both read it complemented** — `cps2_crpt.cpp:771`:
+
+```c
+upper = (((~decoded[9] & 0x3ff) << 14) | 0x3fff) + 1;
+```
+
+**`jtcps2_dec_ctrl.v:44` does not:**
+
+```verilog
+en_latch <= op_fetch && en && (addr[14+:10] <= range[9:0]);
+```
+
+For `vsavj` the word is **`0x03C0`** (computed two independent ways from the
+same 20 key bytes: jtframe's `jtcps2_keyload` permutation, and FBNeo's
+`(317-b) % 160` permutation — they agree). So the two implementations disagree
+by a factor of fifteen:
+
+| | encrypted-opcode window | blocks of 16 KB |
+|---|---|---|
+| MAME / FBNeo | `CPU:$000000-$0FFFFF` | `~0x3C0 & 0x3FF` = **63** |
+| jtcps2 (reference core) | `CPU:$000000-$F03FFF` | `0x3C0` = **960** |
+
+**EVERY STOCK CPS-2 GAME HIDES THIS, and that is why it has survived.** The only
+code that ever executes is the code Capcom encrypted, which is inside the real
+window either way; the region above it holds DATA, and data reads are not opcode
+fetches, so neither implementation decrypts them. **CPS-2 WIDE is the first
+thing to put EXECUTABLE content above the window** — `build/m3b_merged13`
+allocates `wide_ext` from `0x400010`, and `$4BE7C0` is inside it.
+
+This also explains why 14z-56's **B4 (prg) passed on FBNeo**: B4 relocated
+*data* tables (the twenty per-character sound record arrays) and data reads
+bypass the decryptor on every implementation. Nothing had ever EXECUTED from
+above 4 MB on a core that decrypts by address.
+
+### SLICE D5: THE FIX, AND WHAT IT DOES NOT TOUCH
+
+`cores/cps2w/hdl/jtcps2_decrypt.v` (fork commit 17) complements the range word
+on its way IN, profile-gated:
+
+```verilog
+wire [15:0] rng_eff = wide_en ? { addr_rng[15:10], ~addr_rng[9:0] } : addr_rng;
+```
+
+* **`jtcps2_dec_ctrl.v` is NOT overridden.** The fix sits one level upstream of
+  the comparison, so the comparison nobody has validated for the rest of the
+  CPS-2 library is left exactly as it was.
+* **`dec_en` is unaffected**: `jtcps2_keyload` computes it from the
+  UNcomplemented word (`addr_rng != ~16'h0`) and still sees that word.
+* With `wide_en` clear `rng_eff` IS `addr_rng`, so stock `vsavj` on our own RBF
+  and every other CPS-2 game are untouched BY CONSTRUCTION (CLAUDE.md rule 1
+  v2).
+* It is gated rather than fixed outright because fixing it for the whole CPS-2
+  library is a claim this project cannot validate. **It is a defect in the
+  reference core and worth reporting upstream.**
+
+`tests/test_mister_wide_gate.sh` section 9 re-reads all four lines, asserts
+`jtcps2_dec_ctrl` is NOT overridden, re-reads the REFERENCE comparison D5
+corrects for (so an upstream change surfaces instead of double-applying), and
+carries a must-fire control: strip `wide_en` from the range fix and the frozen
+delta must move.
+
+### TWO INSTRUMENT DEFECTS PAID FOR ON THE WAY, BOTH CAUGHT BY THE DATA
+
+Recorded because they are the session's transferable part, and because this
+lane has now produced six.
+
+1. **The probe's first draft split the window on `rom_addr[21]`.** `rom_addr`
+   is declared `[22:1]` and driven `A[22:1]`, so its INDEX is the address bit
+   and `[21]` is `A[21]` — set for `$200000-$3FFFFF`. It reported **2,560 reads
+   "above `$400000`" at addresses `$38C2A0-$3D8256`**, in the very first frame
+   it fired. Nothing about the COUNT looked wrong; only the addresses
+   contradicted the label, and only because the probe logged them.
+   `tools/prgprobe_verdict.py` now REFUSES any record outside the window its
+   label claims, before any verdict.
+2. **The verdict tool judged only the RAW word and reported "D4 WORKS"** over
+   ten fetches the CPU received as garbage. It now requires BOTH — the raw word
+   is the `.rom`'s AND the CPU received that raw word — and names the decryptor
+   when the failing records are all opcode fetches.
+   `tests/test_mister_prg_probe.sh` 4g freezes the real case as a fixture.
+
+**WHAT THIS RETRACTS.** `mister_map.md` §8's "NOT DECRYPTED, AND THAT IS
+CORRECT … the two agree without either being changed" was true of the HARDWARE,
+of MAME and of FBNeo, and FALSE of jtcps2. The same sentence is in slice D4's
+fork-commit message and in the `jtcps2_main.v` override header.
 
 ## THE SDRAM READ PROBE: watching the core FETCH (14z-107 (10), fork commit 12)
 

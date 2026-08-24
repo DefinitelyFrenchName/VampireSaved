@@ -1,0 +1,220 @@
+From c00d7ce78a10bb9581a993dcb4e2c29c1d4ff8ab Mon Sep 17 00:00:00 2001
+From: Chaton <definitelyfrenchname@gmail.com>
+Date: Mon, 24 Aug 2026 15:50:18 +0200
+Subject: [PATCH] cps2w: the CPS-2 decryption RANGE is stored complemented
+ (slice D5)
+
+The CPS-2 key's last decoded word carries the encrypted-OPCODE range, and it
+is stored COMPLEMENTED. MAME and FBNeo both read it that way:
+
+    cps2_crpt.cpp:771  upper = (((~decoded[9] & 0x3ff) << 14) | 0x3fff) + 1
+
+jtcps2_dec_ctrl.v:44 does not complement it:
+
+    en_latch <= op_fetch && en && (addr[14+:10] <= range[9:0])
+
+For vsavj the word is 0x03C0, so the two disagree by a factor of fifteen.
+FBNeo and MAME decrypt opcode fetches in CPU:$000000-$0FFFFF (~0x3C0 & 0x3FF
+= 63 blocks of 16 KB). jtcps2 decrypts them all the way to $F03FFF (0x3C0 =
+960 blocks).
+
+EVERY STOCK CPS-2 GAME HIDES THIS, and that is why it has survived: the only
+code that ever executes is the code Capcom encrypted, which is inside the real
+window either way, and the region above it holds DATA -- and data reads are
+not opcode fetches, so neither implementation decrypts them. CPS-2 WIDE is the
+first thing to put EXECUTABLE content above the window.
+
+MEASURED, not inferred (Vampire Saved 14z-107 (11), the 68k program-ROM read
+probe of the previous commit, running the WIDE romset on cores/cps2w):
+
+  * 5 opcode fetches (fc=2, USER PROGRAM) at CPU:$4BE7C0-$4BE7C8, simulated
+    frame 1119, and none anywhere else in 2,300 frames;
+  * every one of their RAW SDRAM words matched the .rom byte for byte;
+  * every one of the words the CPU LATCHED was different -- the decryptor's
+    output;
+  * in the same run, 41.8 M reads below $400000: fc=5 (supervisor DATA) never
+    decrypted, fc=6 (supervisor PROGRAM) always. The pattern is exactly the
+    op_fetch rule, so the sampling is sound;
+  * the profile-CLEAR leg issues 2 read cycles into the window and completes
+    0 of them, which is the gated decode behaving as designed.
+
+The boot loses itself nine frames later, and this is the first live divergence
+that is not in the sound driver.
+
+THE FIX IS ONE GATED EXPRESSION AND IT DOES NOT TOUCH jtcps2_dec_ctrl. The
+range word is complemented on its way IN, and only with the profile on:
+
+    wire [15:0] rng_eff = wide_en ? { addr_rng[15:10], ~addr_rng[9:0] } : addr_rng;
+
+With wide_en clear rng_eff IS addr_rng, so the reference core's behaviour is
+reproduced character for character and every other CPS-2 game -- and stock
+vsavj on this same RBF -- is untouched by construction. dec_en is unaffected:
+jtcps2_keyload computes it from the uncomplemented word and still sees it.
+
+Gated rather than fixed outright because fixing it for the whole CPS-2 library
+is a claim this project cannot validate. It is a defect in the reference core
+and worth reporting upstream.
+
+Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_01C93kTvSDUfHLL5sbjrArzn
+---
+ cores/cps2w/cfg/game.yaml        | 12 ++++-
+ cores/cps2w/hdl/jtcps2_decrypt.v | 90 ++++++++++++++++++++++++++++++++
+ cores/cps2w/hdl/jtcps2_main.v    |  6 +++
+ 3 files changed, 107 insertions(+), 1 deletion(-)
+ create mode 100644 cores/cps2w/hdl/jtcps2_decrypt.v
+
+diff --git a/cores/cps2w/cfg/game.yaml b/cores/cps2w/cfg/game.yaml
+index 8e6147f7e..22749befd 100644
+--- a/cores/cps2w/cfg/game.yaml
++++ b/cores/cps2w/cfg/game.yaml
+@@ -29,6 +29,16 @@
+ #   jtcps2_main.v    — SLICE D4: the 6 MB program window — a READ-ONLY decode
+ #                      into CPU:$400000-$5FFFFF, the widened rom_addr and the
+ #                      wait-state boundary, all gated by wide_en.
++#   jtcps2_decrypt.v — SLICE D5: THE DECRYPTION RANGE. The CPS-2 key's range
++#                      word is stored COMPLEMENTED (MAME/FBNeo
++#                      `~decoded[9] & 0x3ff`) and jtcps2_dec_ctrl compares
++#                      against it UNcomplemented, so the reference core
++#                      decrypts opcode fetches to CPU:$F03FFF where the two
++#                      emulators stop at $0FFFFF. Invisible on every stock
++#                      game — only Capcom's own encrypted code ever executes,
++#                      and data reads are never decrypted — and fatal for a
++#                      profile that puts CODE above 4 MB. One gated
++#                      expression; jtcps2_dec_ctrl itself is untouched.
+ # THE NEW FILES:
+ #   jtcps2w_profile.v    — decodes the CPS-2 WIDE bit out of the ROM header.
+ #   jtcps2w_qsnd_bank.v  — the gated sample-bank latch (the D1 trust surface).
+@@ -59,6 +69,7 @@ game:
+       - jtcps1_obj_draw.v      # OVERRIDE of cores/cps1/hdl  (D3)
+       - jtcps1_video.v         # OVERRIDE of cores/cps1/hdl  (D3)
+       - jtcps2_main.v          # OVERRIDE of cores/cps2/hdl  (D4)
++      - jtcps2_decrypt.v       # OVERRIDE of cores/cps2/hdl  (D5)
+       - jtcps2w_profile.v      # new
+       - jtcps2w_qsnd_bank.v    # new
+       - jtcps2w_obj_bank.v     # new  (D3)
+@@ -71,7 +82,6 @@ game:
+       - jtcps2_dtack.v
+         # Encryption
+       - jtcps2_keyload.v
+-      - jtcps2_decrypt.v
+       - jtcps2_fn1.v
+       - jtcps2_fn2.v
+       - jtcps2_fn_sbox.v
+diff --git a/cores/cps2w/hdl/jtcps2_decrypt.v b/cores/cps2w/hdl/jtcps2_decrypt.v
+new file mode 100644
+index 000000000..2dd6910cd
+--- /dev/null
++++ b/cores/cps2w/hdl/jtcps2_decrypt.v
+@@ -0,0 +1,90 @@
++/*  This file is part of JTCORES1.
++    JTCORES1 program is free software: you can redistribute it and/or modify
++    it under the terms of the GNU General Public License as published by
++    the Free Software Foundatinsion, either version 3 of the License, or
++    (at your option) any later version.
++
++    JTCORES1 program is distributed in the hope that it will be useful,
++    but WITHOUT ANY WARRANTY; without even the implied warranty of
++    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++    GNU General Public License for more details.
++
++    You should have received a copy of the GNU General Public License
++    along with JTCORES1.  If not, see <http://www.gnu.org/licenses/>.
++
++    Author: Jose Tejada Gomez. Twitter: @topapate
++    Version: 1.0
++    Date: 18-1-2021 */
++
++module jtcps2_decrypt(
++    input             rst,
++    input             clk,
++    input             wide_en,   // CPS-2 WIDE profile (jtcps2w_profile.v)
++
++    // Key load
++    input      [ 7:0] prog_din,
++    input             prog_we,
++
++    // Encryption control
++    input      [ 2:0] fc,
++    output            dec_en,
++
++    // Decoding
++    input             rom_ok,
++    output            rom_ok_out,
++    input      [23:1] addr,
++    input      [15:0] din,
++    output     [15:0] dout
++);
++
++wire [63:0] master_key;
++wire [15:0] addr_rng, dec_data, addr_key;
++
++jtcps2_keyload u_keyload(
++    .rst       ( rst           ),
++    .clk       ( clk           ),
++
++    .din       ( prog_din      ),
++    .din_we    ( prog_we       ),
++
++    .addr_rng  ( addr_rng      ),
++    .key       ( master_key    ),
++
++    .dec_en    ( dec_en        )
++);
++
++jtcps2_fn1 u_fn1(
++    .clk       ( clk           ),
++    .din       ( addr[16:1]    ),
++    .key       ( master_key    ),
++    .dout      ( addr_key      )
++);
++
++jtcps2_fn2 u_fn2(
++    .clk       ( clk           ),
++    .din       ( din           ),
++    .master_key( master_key    ),
++    .key       ( addr_key      ),
++    .dout      ( dec_data      )
++);
++
++// CPS-2 WIDE: the key's range word is stored COMPLEMENTED (MAME/FBNeo
++// `~decoded[9] & 0x3ff`); jtcps2_dec_ctrl compares against it uncomplemented.
++// Complement it here, PROFILE-GATED, so the reference behaviour is identical
++// with wide_en clear. See the header.
++wire [15:0] rng_eff = wide_en ? { addr_rng[15:10], ~addr_rng[9:0] } : addr_rng;
++
++jtcps2_dec_ctrl u_ctrl(
++    .clk       ( clk           ),
++    .rom_ok    ( rom_ok        ),
++    .rom_ok_out( rom_ok_out    ),
++    .fc        ( fc            ),
++    .en        ( dec_en        ),
++    .addr      ( addr          ),
++    .range     ( rng_eff       ),
++    .din       ( din           ),
++    .dec       ( dec_data      ),
++    .dout      ( dout          )
++);
++
++endmodule
+\ No newline at end of file
+diff --git a/cores/cps2w/hdl/jtcps2_main.v b/cores/cps2w/hdl/jtcps2_main.v
+index f938a8c97..c6ff128d8 100644
+--- a/cores/cps2w/hdl/jtcps2_main.v
++++ b/cores/cps2w/hdl/jtcps2_main.v
+@@ -425,6 +425,12 @@ jtcps2_dtack u_dtack(
+ jtcps2_decrypt u_decrypt(
+     .rst        ( 1'b0      ), // must be on during ROM download
+     .clk        ( clk_rom   ),
++    // CPS-2 WIDE (slice D5): the key's encrypted-opcode RANGE word is stored
++    // complemented and jtcps2_dec_ctrl compares against it uncomplemented, so
++    // the reference core decrypts opcode fetches to CPU:$F03FFF where MAME and
++    // FBNeo stop at $0FFFFF. Harmless on every stock game (nothing executes
++    // above the window); fatal for a profile that puts CODE at $400000+.
++    .wide_en    ( wide_en   ),
+ 
+     // Key download
+     .prog_din   ( prog_din  ),
+-- 
+2.50.1 (Apple Git-155)
+

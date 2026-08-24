@@ -1596,3 +1596,41 @@ target carries 27 bits (`jtframe_emu.sv:334`), and each header start word is
   `tests/audit_sdram_bank_load.sh` shifts its four phase boundaries and then
   ASSERTS the transfer length from the run's own "ROM file transfered (frame
   N)" line rather than trusting the constant.
+- **A `[22:1]` VECTOR'S INDEX IS THE ADDRESS BIT, AND A PROBE THAT FORGETS
+  THAT PRODUCES HEALTHY-LOOKING NONSENSE (14z-107 (11)).** `jtcps2_main`
+  declares `output reg [22:1] rom_addr` and drives it `A[22:1]`, so
+  `rom_addr[k] == A[k]` and the byte address is `{rom_addr,1'b0}`. The first
+  draft of the 68k program-ROM read probe split "above `CPU:$400000`" from
+  "below" on `rom_addr[21]` — reasoning from the vector's WIDTH (22 bits, so
+  "the top bit is 21") instead of from its INDEX. `rom_addr[21]` is `A[21]`,
+  which is set for `$200000-$3FFFFF`. The probe's very first reporting frame
+  claimed **2,560 reads above `$400000`** — and printed their addresses as
+  `$38C2A0-$3D8256`. Nothing about the COUNT looked wrong; only the addresses
+  contradicted the label, and only because the probe logged them. Two lessons,
+  both cheap: **log the raw quantity next to the classification**, so the
+  instrument can be caught disagreeing with itself; and make the consumer
+  REFUSE on that disagreement rather than report it — `tools/prgprobe_verdict.py`
+  now rejects any record outside the window it claims, before any verdict, and
+  `tests/test_mister_prg_probe.sh` 4e holds it to that with a fixture built
+  from the real broken numbers. This is the same family as the four
+  instrument defects of 14z-107: **suspect the instrument before the RTL.**
+- **THE CPS-2 KEY'S ENCRYPTED-OPCODE RANGE IS STORED COMPLEMENTED, AND
+  `jtcps2` READS IT STRAIGHT (14z-107 (11), MiSTer slice D5).** MAME and FBNeo
+  both take `~decoded[9] & 0x3ff` (`cps2_crpt.cpp:771`); `jtcps2_dec_ctrl.v:44`
+  is `en_latch <= op_fetch && en && (addr[14+:10] <= range[9:0])`, with no
+  complement. For `vsavj` the word is `0x03C0`, so the emulators decrypt opcode
+  fetches in `CPU:$000000-$0FFFFF` (63 blocks of 16 KB) and the reference core
+  runs on to `$F03FFF` (960). **Every stock CPS-2 game hides it**, for two
+  reasons that stack: the only code that ever executes is the code Capcom
+  encrypted, which is inside the real window either way; and DATA reads are not
+  opcode fetches, so no implementation decrypts them at any address. A profile
+  that puts EXECUTABLE content above 4 MB is the first thing that can see it,
+  and what it sees is not a subtle drift — the 68k fetches an opcode and gets a
+  different 16-bit word. **The same fact retroactively weakens an old result:**
+  14z-56's B4 (prg) "the 68k is genuinely fetching data from above 4 MB" is
+  still true and still has its negative control, but it relocated DATA tables,
+  and data reads bypass the decryptor everywhere. **Nothing had ever EXECUTED
+  from above 4 MB on a core that decrypts by address.** Generalisation worth
+  keeping: when a second implementation reads the same configuration word,
+  DIFF THE EXPRESSION, not the result — the two agreed on every game either had
+  ever run, and disagreed on the first one that mattered.

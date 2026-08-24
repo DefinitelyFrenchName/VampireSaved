@@ -463,11 +463,26 @@ anything.
 | **program stops at 4 MB** | `rom_cs <= A[23:22] == 2'b00` — flat, with the OBJ config port at `$400000`, QSound at `$600000`, ORAM at `$700000`, I/O at `$800000` above it | a **read-only** decode extending into `$400000-$5FFFFF`; the objcfg port is qualified `&& !RnW`, so there is no read collision | the FBNeo/MAME B3 + B4(prg) steps, both PASS with a firing negative control |
 | **samples alias above 8 MB** | `qsnd_addr[22:16] <= dsp_ab[6:0]` keeps seven bank bits, so DSP bank `0x8N` plays as `0x0N` and **mis-plays legacy audio** rather than going silent | latch the eighth bit — `qsnd_addr[23:16] <= dsp_ab[7:0]` | the 14z-86 finding; the bit is `dsp_ab[7]`, **validated** against MAME's low-level QSound device, not assumed |
 | **scroll stops at 8 MB** | `rom1_addr[19:0]` → `gfx1_addr = {rom1_addr, rom1_half, 1'b0}` = 22 bits, with `SCR_OFFSET = 0` and **no bank input anywhere in the chain** | nothing — scroll is not part of WIDE v1 and does not need to grow | — |
+| **the ENCRYPTED-OPCODE window is fifteen times too wide** (added 14z-107 (11)) | the CPS-2 key's range word is stored **COMPLEMENTED** and `jtcps2_dec_ctrl.v:44` compares against it uncomplemented: `addr[14+:10] <= range[9:0]`. For `vsavj` the word is `0x03C0`, so the core decrypts opcode fetches to `CPU:$F03FFF` where the hardware stops at `$0FFFFF` | complement it, profile-gated, on its way in: `rng_eff = wide_en ? { addr_rng[15:10], ~addr_rng[9:0] } : addr_rng` | MAME and FBNeo already do it — `cps2_crpt.cpp:771` `~decoded[9] & 0x3ff`. This cap is a DEFECT IN THE REFERENCE CORE rather than a hardware format, and it is the only one of the five that is |
 
-**Three of those four are now IMPLEMENTED on the core**: the QSound width in
-slice D1, the object promote in D3 and the program window in D4. §10 has the
-slice records; the rest of this section is why each one is shaped the way it
-is, and stays true whether or not it has shipped.
+**FOUR of those five are now IMPLEMENTED on the core**: the QSound width in
+slice D1, the object promote in D3, the program window in D4 and the
+decryption range in D5. §10 has the slice records; the rest of this section is
+why each one is shaped the way it is, and stays true whether or not it has
+shipped.
+
+**THE FIFTH CAP IS THE ONE NOBODY PREDICTED, AND IT IS WORTH THE PARAGRAPH.**
+Four of these are FORMAT: the hardware genuinely stops there and Capcom's own
+CPS-2 Turbo lifted the same limits. The decryption range is not — it is a
+one-token disagreement between the reference core and both emulators, and
+**every stock CPS-2 game hides it** because the only code that ever executes is
+the code Capcom encrypted, and DATA reads are never decrypted on any
+implementation. CPS-2 WIDE is the first thing to put EXECUTABLE content above
+the window. It is also why 14z-56's B4 (prg) passed on FBNeo and proved less
+than it looked: B4 relocated DATA tables, and data reads bypass the decryptor
+everywhere. **Nothing had ever EXECUTED from above 4 MB on a core that
+decrypts by address**, and the first time anything did — ten opcode fetches at
+`CPU:$4BE7C0`, simulated frame 1119 — the boot lost itself nine frames later.
 
 **Two more constraints that look like memory questions and are not.**
 
@@ -562,7 +577,7 @@ bit clear, so every gated expression collapses to the reference core's,
 character for character. CLAUDE.md rule 1 v2's *"profile-gated so stock
 `vsavj` is untouched BY CONSTRUCTION"* is a fact about the circuit on FPGA,
 not an inertness argument — exactly as the driver flag makes it one on FBNeo.
-**Eight sites are gated as of slice D4**, and `tests/test_mister_wide_gate.sh`
+**Nine sites are gated as of slice D5**, and `tests/test_mister_wide_gate.sh`
 re-reads every one of them verbatim:
 
 | site | where | slice |
@@ -575,6 +590,7 @@ re-reads every one of them verbatim:
 | `bank = { wide_en & table_y[12], table_y[14:13] }` | `jtcps2w_obj_bank.v` | D3 |
 | `rom_cs \|= wide_en & RnW & (A[23:21]==3'b010)` | `jtcps2_main.v` | D4 |
 | `one_wait` boundary `wide_en ? 4'h6 : 4'h5` | `jtcps2_main.v` | D4 |
+| `rng_eff = wide_en ? { addr_rng[15:10], ~addr_rng[9:0] } : addr_rng` | `jtcps2_decrypt.v` | D5 |
 
 **The obj promote is gated at BOTH ends and that is deliberate.** `gfxc_sel`
 already ANDs `wide_en`, so an ungated promote would still have been inert —
@@ -613,6 +629,8 @@ instrument carries a control that proves it can still fail.
 
 | gate | tier | the claim it holds | its must-fire control |
 |---|---|---|---|
+| `test_mister_prg_probe` | ci_portable | the 68k program-ROM read probe's contract: it is INERT unless `JTCPS2W_PRGPROBE` is defined; its window bit IS the decode's window bit, both re-read from the RTL; its ADDRESS half carries no chip select, which is what makes it speak on the profile-CLEAR leg; and `tools/prgprobe_verdict.py`'s verdict logic, on synthetic logs whose answer is known by construction | seven: a line hoisted above the guard; and all three answers plus **four refusals** — a silent control, a control whose bytes do not verify, a probe whose HI records sit BELOW `$400000` (the defect the first draft shipped with), and raw-right/latched-wrong, which the first version of the tool scored as a PASS |
+| `test_mister_prg_window` | emulator | the measured pair itself, frozen: with the profile ON the 68k completes ten reads above `CPU:$400000` and SDRAM serves 16 words there; with it CLEAR, zero and zero — on `.rom` images that differ in ONE BYTE | the control leg is the must-fire, and the gate additionally REFUSES to conclude anything unless the below-`$400000` count is in the tens of millions and its sampled bytes verify |
 | `test_jtcores_twin` | ci_portable | the three reference cores are byte-untouched, the fork's whole-tree delta is 18 declared paths, and the stock `vsavj` MRA from `cps2w` is `cps2`'s except `<rbf>` | the delta list is exact — an undeclared path fails |
 | `test_mister_wide_gate` | ci_portable | every gated site, re-read verbatim; the placement constants in BYTES against §6; the gated QSound latch AND the gated obj promote each simulated over **all 65,536 of their inputs in both profile states**; the promote read AFTER a terminator test proven identical to the reference core's; the 3-bit bank asserted at every port between the frame table and SDRAM; the new jtframe module absent from the reference core's file list | six: gate bypassed (D1), byte moved to 40, polarity flipped, a one-width perturbation of an override, the PROMOTE's gate bypassed (D3), and the promote reading `y[15]` instead of `y[12]` — the profile's first draft, which would end the sprite list at the first tenant sprite |
 | `test_sim_wram_contract` | ci_portable | the work-RAM dump hook's naming, byte order, skew absorption and rule-7 refusals, and a static proof that every added line sits inside its `#ifdef` | two, plus the fork-rewind ground truth (a parent reading a file while forking `exit()`ing children ends at line 278 of 3,000; with `_exit()`, at 3000) |
@@ -687,11 +705,18 @@ as the emulator superset leg.
       no fetch moves   all 67,108,864 bytes of the image                DONE
        |
        v
-  D3  the promote      the 3-bit obj bank going live — the first slice
-      the destination  where tenant art is actually FETCHED             DONE
+  D3  the promote      the 3-bit obj bank going live — the slice that
+      the destination  makes a tenant FETCH possible                    DONE
        |
        v
   D4  the PRG window   the 6 MB read decode, and one_wait with it       DONE
+       |               (the decode PROVEN 14z-107 (11): ten fetches
+       |                above $400000, raw words byte-perfect)
+       v
+  D5  the decrypt      the CPS-2 key's RANGE word is stored COMPLEMENTED
+      range            and the reference core reads it straight — so
+      NOT a format     every opcode the 68k fetched from the extension
+                       reached it as the DECRYPTOR'S output             DONE
 ```
 
 > **D3 AND D4 SHIPPED TOGETHER, AND THE REASON IS A FACT ABOUT THE ROMSET
@@ -713,7 +738,8 @@ as the emulator superset leg.
 | **D1** | the QSound sample-bank width, runtime-gated: `jtcps2w_profile.v` + `jtcps2w_qsnd_bank.v`, plus overrides of the two shared files they need. `PCM_AW` **stays 23** | the gated latch over all 65,536 `dsp_ab` values in both profile states | **DONE**, fork `4840df8a` |
 | **D2** | the bank-0 re-pack, the group-C redirect, the QSound split, two new slot counts, and `jtframe_ram1_7slots.v` — bank 0 needs seven streams and upstream's family stops at five | the whole-image SDRAM census, four legs | **DONE**, fork `0df6f000` |
 | **D3** | the obj promote, lifted into `jtcps2w_obj_bank.v` and read in the ELSE arm of the terminator test; the bank widened to 3 bits across four override files; `rom0_bank[2]` untied | the expression over its WHOLE input space — 131,072 vectors, both profile states, bank[2] set 32,768 times wide and **0** stock, plus the six `gfx_tiles.py` encodings each decoding to their own bank with none of them setting y bit 15. Two must-fire controls: the gate bypassed, and bit 2 read from `y[15]` | **DONE**, fork `b9899fa8` |
-| **D4** | the PRG window: `rom_cs` / `rom_addr` / `one_wait` gated on `wide_en`, `main_rom_addr` and `SLOT3_AW` 22 | every line re-read in the RTL, including the `!RnW` on `objcfg_cs` that makes the read decode collision-free; and the stock leg unmoved | **DONE**, fork `dd242a65` |
+| **D4** | the PRG window: `rom_cs` / `rom_addr` / `one_wait` gated on `wide_en`, `main_rom_addr` and `SLOT3_AW` 22 | **the 68k program-ROM read probe, on the real romset** (14z-107 (11)): ten fetches at `CPU:$4BE7C0-$4BE7C8`, every RAW word the `.rom`'s byte for byte, against 54,961,148 reads below `$400000` as the must-fire control and a `wide_en`-clear leg that completes zero | **DONE**, fork `dd242a65`; the decode PROVEN 14z-107 (11) |
+| **D5** | the decryption range: `jtcps2_decrypt.v` complements the key's range word on its way into `jtcps2_dec_ctrl`, gated on `wide_en`. `jtcps2_dec_ctrl` itself untouched, and `dec_en` still comes from the uncomplemented word | the same probe: all ten of those fetches reached the CPU as the decryptor's output rather than as memory's, and all ten carry `fc = 2` — an OPCODE fetch, which is exactly what `jtcps2_dec_ctrl` gates on | **DONE**, fork `c00d7ce7` |
 
 **What D2 deliberately left stubbed, and D3 unstubbed.** `rom0_bank` was
 three bits at the `jtcps1_sdram` port with the game top driving
@@ -722,6 +748,18 @@ slots were provably unreachable — which is why D2's evidence is an image
 census and not a replay. D3 removes the tie and drives the bank from the
 object engine, so the slots are reachable and the profile is complete.
 
+> **AND THE END-TO-END DEMONSTRATION WAS MISSING FOR A REASON THAT IS NOT
+> D3's — AND 14z-107 (11) NAMED IT.** The paragraph below is the state before
+> slice D5; read it for the eliminations, which stand, and then read
+> `docs/platform/mister.md` "CAN THE 68k READ ABOVE 4 MB?" for the cause.
+> **One correction to it in place: the two profile states are NOT
+> frame-for-frame identical.** They are identical in bank-3 traffic and in
+> masked work RAM, which is what was measured — but the profile-ON leg issues
+> **ten** completed program-ROM reads above `CPU:$400000` and the
+> profile-CLEAR leg **zero**, and the SDRAM read probe on the same window
+> counts 16 word reads against 0. The instrument that said "identical" could
+> not see the window it was being asked about.
+>
 > **AND THE END-TO-END DEMONSTRATION IS STILL MISSING, FOR A REASON THAT IS
 > NOT D3's.** With every slice in, the WIDE romset does not get past its own
 > boot sequence on the core: the CPS-2 RAM test draws, the QSound/Capcom legal
@@ -796,13 +834,16 @@ slice reveals a new hole.
 
 | what | status |
 |---|---|
-| **The WIDE romset booting on the core** | **FAILS, and the fault predates D3.** The image loops its own boot — RAM test, two screens, RAM test again, QSound legal screen, reset — and never reaches select. Eliminated as causes, each measured: the profile bit (the same `.rom` with byte 41 = `0xFF` is frame-for-frame identical, and the work RAM is bit-identical on CLAUDE.md §4's masked basis), the core (stock `vsavj` reaches the frozen anchor), the download (the image census passes), the romset (MAME reaches select by frame 930) and the probe (313,024 obj reads on the stock image). Stock and WIDE are traffic-identical for 448 frames and diverge at ~449. Root-cause recipe in `docs/platform/mister.md`. |
-| **A tenant sprite fetched or drawn on the core** | never happened. D3 makes it possible; the boot fault makes it unreachable. |
-| **Bank 0's traffic under the redirect** | unmeasured, and unmeasurable until the boot fault clears — obj bank 5 traffic needs the select screen. Bank 0 peaks at 44.0% of its all-miss ceiling on the looping boot; bank 2 reads exactly zero, which is a symptom of the loop, not a result. |
+| **The WIDE romset booting on the core** | **ROOT-CAUSED AND FIXED 14z-107 (11), SLICE D5 — the WIDE romset now boots to the select screen.** The 68k EXECUTES from the program extension (ten opcode fetches at `CPU:$4BE7C0-$4BE7C8`, simulated frame 1119) and receives the CPS-2 DECRYPTOR'S OUTPUT, because the key's range word is stored complemented and `jtcps2_dec_ctrl` reads it straight. The eliminations from 14z-107 (10) all stand and none of them covered this: they were measured on bank-3 traffic and masked work RAM, neither of which can see ten reads in a 2 MB window. **One of them is CORRECTED in place: the two profile states are not frame-for-frame identical** — ten completed reads above `$400000` against zero. |
+| **A tenant sprite FETCHED on the core** | **HAPPENED 14z-107 (11)**, and it is no longer a hole: with D5 in, the read probe counts **9,038,400 reads over 105 distinct tile codes** in group-C obj bank 5 (the select-wheel art), first at simulated frame 1556, every code inside the roster's frozen live extent. Obj **bank 4** (the fighter art) is still zero — the replay window ends before a match starts. |
+| **A tenant sprite DRAWN, and checked as a picture** | never. The fetch is a memory-bus fact; no frame of the select screen has been compared against MAME's. |
+| **Bank 0's traffic under the redirect** | **now MEASURABLE and not yet measured.** The boot reaches the select screen since D5, so obj bank 5 traffic exists — 9,038,400 word reads in the run that proved it — but `audit_sdram_bank_load` has not been re-run on a booting WIDE image, so the per-bank load figures in §9 are still the looping boot's and mean nothing. **This is the cheapest big result left on the table.** |
 | **The QSound extension heard** | banks `0x80-0x8E` are placed and addressable after D1's width fix; no sample from them has ever been played on the core. |
 | **The scroll path with a wide GFX map** | untouched and untested. Scroll is capped at 8 MB with no bank input anywhere in its chain (§7); nothing has exercised it against the repacked banks. |
 | **Video compared against MAME** | never. Every cross-implementation verdict to date is work-RAM fields at a sync anchor; no frame has been compared, so "the picture looks right" has never been a checked claim. |
 | **Any of this on HARDWARE** | never. Everything is Verilator. The MiSTer field test is the ruling's second half and has not begun. |
+| **The rest of the CPS-2 library under D5's range fix** | untested and deliberately unreached: D5 is profile-gated, so `wide_en` clear leaves `jtcps2_dec_ctrl` fed the same word the reference core feeds it. Whether the reference core's uncomplemented comparison breaks any OTHER CPS-2 game is an upstream question this project has not asked. |
+| **The 68k EXECUTING from the extension after D5** | the probe proves the ten fetches happen and that the raw words are right; what it cannot say is whether the code at `CPU:$4BE7C0` then does the right thing. That needs the boot to survive it. |
 | **The 128 MB module's chip select** | the XL fallback (§4) assumes the module inverts chip 1's `/CS`. That is INFERRED from jtframe's RTL, never seen on a schematic. If XL is ever taken, confirm which module is in hand first. |
 | **The three ungated width changes** | declared inert and measured so by `test_mister_wide_inert` — but only on STOCK content, which is the only content that currently boots. |
 

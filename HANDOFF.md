@@ -189,7 +189,9 @@ in `emu/jtcores-patches/` as a PATCH SERIES, one file per fork commit.
 yaml chain pulls, builds jtframe's Go tool and regenerates the series;
 `tests/test_jtcores_twin.sh` (ci_portable) locks pin, twin and series.
 **SINCE SLICE D1 (14z-107 (6)) cps2w CARRIES RTL; D2 CARRIES THE PLACEMENT;
-AND SINCE D3+D4 (14z-107 (10)) THE CORE FETCHES TENANT ART.** The FIFTEEN
+AND D3+D4 (14z-107 (10)) MAKE A TENANT FETCH POSSIBLE. NO TENANT TILE HAS
+BEEN FETCHED ON ANY CORE, EVER** — "the core fetches tenant art" is
+RETRACTED (14z-107 (11)); the WIDE romset does not boot, see below. The SEVENTEEN
 fork commits are `b9d0565` (the `cps2w` cfg scaffold), nine
 Verilator-TESTBENCH changes (`553dd56` `JTFRAME_SIM_WRAMDUMP`, `6c32be8` the
 SDRAM model's dropped top address bit, `4f25cc7` the model clock, `74ed17d`
@@ -205,10 +207,18 @@ counts, and ONE new jtframe file `hdl/sdram/jtframe_ram1_7slots.v`),
 `b9899fa8` (**slice D3**: THE CPS-2 TURBO OBJECT PROMOTE — a 3-bit GFX bank,
 `rom0_bank[2]` untied, four override files for one gated expression) and
 `dd242a65` (**slice D4**: the 6 MB PROGRAM WINDOW — a read-only decode into
-`CPU:$400000-$5FFFFF` plus the `one_wait` boundary). **`cores/cps1`,
+`CPU:$400000-$5FFFFF` plus the `one_wait` boundary), `72738d51` (the
+SIM-ONLY 68k PROGRAM-ROM READ PROBE, 14z-107 (11) — compiled out unless
+`JTCPS2W_PRGPROBE` is defined; it is what D4 and D5 are measured with) and
+`c00d7ce7` (**slice D5**: THE DECRYPTION RANGE — the CPS-2 key's
+encrypted-opcode range word is stored COMPLEMENTED and `jtcps2_dec_ctrl`
+reads it straight, so the reference core decrypts opcode fetches to
+`CPU:$F03FFF` where MAME/FBNeo stop at `$0FFFFF`; one profile-gated
+expression in a new `jtcps2_decrypt.v` override, with `jtcps2_dec_ctrl`
+itself untouched). **`cores/cps1`,
 `cores/cps2` and `cores/cps15` are still BYTE-UNTOUCHED** — that is a
 `git diff` assertion (`test_jtcores_twin` 2e), the fork's WHOLE-TREE delta is
-held to a declared 24 paths (2f), and the TWELVE files in `cores/cps2w/hdl`
+held to a declared 25 paths (2f), and the THIRTEEN files in `cores/cps2w/hdl`
 are enumerated with a frozen line-by-line delta (`test_mister_wide_gate` 1).
 **Fork pushes are STANDING-AUTHORISED by the maintainer (2026-08-24); the
 MAIN repo is still never pushed.**
@@ -224,10 +234,25 @@ produced by `jtframe mra cps2w` (byte-identical to stock cps2's except
 `docs/project/mister_fit.md`; the placement map is
 `docs/project/mister_map.md`.
 
-**RUNNING THE WIDE ROMSET ON THE CORE (slices D3+D4, 14z-107 (10)) — AND
-THE STATE OF IT.** The core now carries everything the profile needs: the
-object promote, the 6 MB program window, the placement and the QSound width.
-**It does not yet BOOT the WIDE romset.** Measured on `11_pick_donovan`,
+**RUNNING THE WIDE ROMSET ON THE CORE — ROOT-CAUSED 14z-107 (11), FIXED IN
+SLICE D5.** The boot failure below is the state BEFORE D5; its eliminations
+stand and its trace is still the best description of the symptom. **What it
+did not know:** the 68k EXECUTES from the program extension (ten opcode
+fetches at `CPU:$4BE7C0-$4BE7C8`, simulated frame 1119) and receives the
+CPS-2 DECRYPTOR'S OUTPUT, because the key's encrypted-opcode range word is
+stored COMPLEMENTED and `jtcps2_dec_ctrl` reads it straight — the reference
+core decrypts to `CPU:$F03FFF` where MAME and FBNeo stop at `$0FFFFF`. Every
+stock CPS-2 game hides it; CPS-2 WIDE is the first thing to put executable
+content above the window. Fork commit `c00d7ce7` complements the word,
+profile-gated, in `cores/cps2w/hdl/jtcps2_decrypt.v`. **One claim below is
+CORRECTED IN PLACE: the two profile states are NOT frame-for-frame
+identical** — profile-ON completes ten reads above `$400000` and profile-CLEAR
+zero. Measurement, instruments and the byte comparison:
+`docs/platform/mister.md` "CAN THE 68k READ ABOVE 4 MB?".
+
+**THE PRE-D5 TRACE, KEPT (slices D3+D4, 14z-107 (10)).** The core carries
+everything the profile needs: the object promote, the 6 MB program window, the
+placement and the QSound width. **It did not BOOT the WIDE romset.** Measured on `11_pick_donovan`,
 `cps2w`, the real `vsavjw.rom`: reset at simulated frame 659, the CPS-2 RAM
 test draws 660-925, the QSound/Capcom legal screen stands from 1578, and at
 **2242 the machine RESETS and the RAM test starts over** — a ~1,580-frame
@@ -398,6 +423,8 @@ see `docs/platform/gotchas.md` "`jtsim -verilator -stats` reports nothing".
 | `tests/test_mister_wide_gate.sh` | ci_portable (~30 s with Verilator, seconds without) | **SLICE D1, the RTL trust surface.** The frozen line-by-line delta of the two OVERRIDDEN files vs the shared originals (`tests/expect/cps2w_rtl_delta.txt`); the profile byte agreeing in all three copies (TOML `offset=41 data="fe"`, RTL `PROFILE_BYTE=6'd41`, `~profile[0]`) plus the `fill=0xff` and `JOY_BYTE` facts the polarity rests on; the widths, and that `PCM_AW` is NOT widened (it cannot be — `jtframe_romrq_bcache.v:74`); MAME's three qsound.cpp lines that validate `dsp_ab[7]`; and `jtframe files` resolving cps2w to OUR nine overrides + three new modules + the new jtframe slot module, and cps2 to NONE of ours (the two lists differ in exactly 22 entries). Then Verilator: `jtcps2w_qsnd_bank` over **all 65,536 `dsp_ab` values in both profile states** (bank[7] stuck at 0 with `wide_en` low, moving 16,384 times with it high) and `jtcps2w_profile` over a real 64-byte header stream. FOUR must-fire controls: gate bypassed; profile byte moved to 40; polarity flipped; an override perturbed by one width. **EXTENDED AT D2 (section 7)**: every SDRAM placement constant re-read from `jtcps1_sdram.v` in BYTES and compared against `mister_map.md` §5 (VRAM `0x600000`, ORAM `0x640000`, WRAM `0x648000`, Z80 `0x658000`, PCM-high `0x6E0000`, group-C obj bank 5 `0x7E0000`, obj bank 4 bank-1 `0x800000`); all four `wide_en` conjunctions re-read verbatim; the CPS1 arm of the re-pack still the reference values; and `jtframe_ram1_7slots` NOT in jtframe's shared `jtframe_sdram64.yaml`. **EXTENDED AGAIN AT D3+D4 (section 8)**: a third Verilator bench, `jtcps2w_obj_bank` over **all 65,536 y-words in both profile states** (bank[2] stuck at 0 with `wide_en` low, set 32,768 times with it high) which also transcribes `tools/gfx_tiles.py`'s `bank_word` table and requires each of the six encodings to decode to its own bank with none of them setting y bit 15 — the sprite-list TERMINATOR; the sprite-list terminator test in the override asserted IDENTICAL to the reference core's AND at an earlier line than the promote; the 3-bit bank asserted at all six ports between the frame table and SDRAM; `rom0_bank[2]` now UNTIED; and D4's `wide_en & RnW` read decode, 22-bit `rom_addr`/`main_rom_addr`/`SLOT3_AW`, the `4'h6` wait-state boundary and the surviving `!RnW` on `objcfg_cs`. TWO more must-fire controls: the promote's gate bypassed, and the promote reading `y[15]` instead of `y[12]` — the profile's first draft |
 | `tests/test_mister_page.sh` | ci_portable (~8 s) | **THE SYNTHESIS CANNOT GO STALE.** `tools/mk_mister_page.py --check` re-derives every figure `docs/project/mister_core.md` states (17 checks) from the same constants the other gates freeze — the roster's live bytes and address footprint, the declared-region arithmetic, the four bank extents and the 0.125 MB slack, the `.rom` size and header words, the anchor and its band — and recounts the group-C ceilings from the romset. The rendered page is NEVER committed (`.gitignore`); the generator is. Written as the living-documentation pilot (14z-107 (10)) |
 | `tests/test_mister_sdram_census.sh` | **manual/emulator (~45 min)** | **SLICE D2'S CORE EVIDENCE.** Downloads a `.rom` in the simulator, dumps all four 16 MB banks and checks every one of the 67,108,864 bytes against `mister_map.md` §5 with `tools/mister_sdram_census.py` (which replays the download mapping, CPS-2 GFX scramble included). FOUR legs: A cps2w+WIDE vs the WIDE map (THE census), B cps2+WIDE vs the STOCK map, C cps2w+stock vs the WIDE map, D cps2+stock vs the STOCK map (the calibration leg — the tool checked against a mapping nobody changed). Cross-checks independent of the tool: C vs D banks 1/2/3 BYTE-IDENTICAL and bank 0 differing; A vs B banks 2+3 DIFFERING (without the redirect group C aliases onto vanilla's art). Must-fire: leg B must FAIL the WIDE map, and A re-run with one expected constant moved 1 KiB must be rejected (twice, one per bank). `CENSUS_KEEP=<dir>` caches the bank images |
+| `tests/test_mister_prg_probe.sh` | ci_portable (~3 s) | **SLICE D4/D5's ROM-FREE HALF.** Locks the 68k program-ROM read probe's contract without a ROM or a simulator: every code line the probe adds to `jtcps2_main.v` sits inside `` `ifdef JTCPS2W_PRGPROBE `` (with the hoisted-line control); its window bit IS the decode's window bit, both re-read from the RTL; its ADDRESS half carries no chip select, which is what lets it speak on the profile-CLEAR leg where `rom_cs` cannot assert at all. Then the verdict logic itself (CLAUDE.md §4), on synthetic logs whose answer is known by construction: **all three answers plus FOUR refusals** — a silent control, a control whose bytes do not verify, a probe whose HI records sit BELOW `$400000` (the defect the probe's first draft shipped with, frozen from the real numbers), and raw-right/latched-wrong, which the tool's first version scored as a PASS over ten fetches the CPU received as garbage. Also asserts the byte order is DERIVED from the control rather than hard-coded, and that `--prgprobe` refuses `--core cps2` |
+| `tests/test_mister_prg_window.sh` | **manual/emulator (~2 x 40 min)** | **THE MEASURED PAIR, FROZEN.** Runs `11_pick_donovan` on `cps2w` with the WIDE romset twice, on `.rom` images that differ in ONE BYTE (header 41 `0xFE`/`0xFF`), and freezes the probe's own last per-frame report for each leg in `tests/expect/mister_prg_window.txt`. Structural assertions independent of the frozen numbers: `wide_en` really is 1 and 0; the must-fire count below `$400000` is in the tens of millions in BOTH legs; the CONTROL leg completes exactly ZERO reads above `$400000` (the decode is gated by construction); and both legs issue the same number of 68k bus READ cycles into the window. `--pos-log DIR --neg-log DIR` re-analyses finished runs; `--freeze` rewrites the expectation deliberately |
 | `tests/test_mister_gfxc_fetch.sh` | **manual/emulator (~2 x 65 min)** | **SLICE D3'S PAYOFF, and the first VIDEO-adjacent verdict in this lane.** Runs a tenant-picking replay (`11_pick_donovan`) on `cps2w` with the WIDE romset and counts the SDRAM READS the core issues into the group-C destinations, using the harness's read probe (`JTFRAME_SIM_RDPROBE`, fork commit 12). The windows are DERIVED FROM THE RTL (`GFXC4_OFFSET`/`GFXC5_OFFSET` and the bank each group-C slot sits in) because an instrument that names a physical address is invalidated by a memory-map change. The distinct-block list IS a tile-code list (a CPS-2 tile code is its own SDRAM address), and every code must be inside the roster's frozen live extent. **The control leg is the SAME `.rom` with header byte 41 changed from `0xFE` to `0xFF`** — one byte, the runtime profile bit — and must read ZERO from both group-C windows; two further probes on the VANILLA obj banks must be non-zero in BOTH legs, so a zero is evidence about the core rather than about the probe. `--pos-log DIR --neg-log DIR` re-analyses two finished run dirs |
 | `tests/test_mister_wide_inert.sh` | **manual/emulator (~22 min)** | **THE FPGA SUPERSET INVARIANT, MEASURED DIRECTLY**: `cps2` and `cps2w` run the SAME stock `vsavj` download under Verilator and their 68k work RAM must be BIT-IDENTICAL at every frame of the window (default 540-640, `WINDOW_FIRST`/`WINDOW_LAST` to move it). Asserts the window is NON-CONSTANT first; control = the same dumps compared against themselves SHIFTED BY ONE FRAME, which must FAIL, proving the comparison would catch a one-frame timing skew. Both legs run with host frame output OFF (the default since 14z-107 (7)) and their dump sets are asserted complete by the producer. This is the inertness instrument; the anchor gate below is a cross-IMPLEMENTATION oracle and is a poor substitute for it |
 | `tests/test_mister_sim_anchor.sh` | **manual/emulator (~50 min)** | THE ORACLE: MAME and the core under test (**`cps2w` since D1**, `SIM_CORE=cps2` for the reference leg) agree on every mapped §4 field at the round-1 match-start anchor of `05_timeout_idle` (MAME **2146** / sim **2609**, skew **463 ± 30** — RE-MEASURED 14z-107 (7) with host frame output OFF. It read 2502/356 and 2507/361 on runs whose input script the harness's frame writer was replaying, and 2606/460 before that, which was the BOOT offset rather than the anchor). Runs with `--frame-output off` and ASSERTS that mode from the run's own log banner; asserts BOTH dump sets are COMPLETE (`tools/check_wram_dumps.py`) and the sim window NON-CONSTANT before computing any anchor; then the byte-swap, hook-inertness and punched-hole controls |
