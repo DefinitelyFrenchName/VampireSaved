@@ -746,11 +746,19 @@ slice as the decode.
 ## 9. Open questions, stated as questions
 
 1. **Does bank 0 absorb obj bank 5's select-screen traffic?**
-   `tests/audit_sdram_bank_load.sh` bounded **bank 1** (PCM has 98.8% row
-   misses, so no locality to lose). Bank 0 already sustains 40,797
+   `tests/audit_sdram_bank_load.sh` bounded **bank 1** (PCM has **98.3%** row
+   misses, so no locality to lose). Bank 0 already sustains **40,976**
    accesses/frame = 32.9% of its all-miss ceiling, and the select+VS phase
    adds up to ~12k obj accesses/frame. Unmeasured. The instrument exists; it
    needs a `cps2w` core carrying the map.
+   **[CORRECTED 14z-107 (10): this paragraph carried 98.8% / 40,797, the
+   figures measured BEFORE the anchor moved 2502 -> 2609. `mister.md`
+   re-derived the whole table at 14z-107 (7) from the same committed log
+   (`build/sdram_bank_load_14z107.log`) once the fork-rewind defect was
+   fixed; in-match is 98.3% / 40,976. Every figure moved by well under 1%
+   and NO conclusion changed — the GO verdict stands on the re-derived
+   numbers. Found by `docs/project/mister_core.md`, which quotes the
+   corrected pair.]**
 2. ~~**Does `parts=` with `map="12"` reproduce the untrimmed qsound region
    byte-for-byte?**~~ **ANSWERED YES, 14z-107 (5), and it cost a design
    change on the way.** `parts=` on the WHOLE qsound region does not work at
