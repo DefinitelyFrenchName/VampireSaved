@@ -7,6 +7,13 @@ pin `74ed17d`). Platform facts live in `docs/platform/mister.md`; the
 region-by-region content measurements live in `docs/project/mister_fit.md`;
 the profile itself is `docs/project/cps2_wide.md`.
 
+> **The SYNTHESIS of this material — what is true, in causal order, without
+> the retraction history — is `docs/project/mister_core.md`.** This file is
+> the derivation and stays the authority: where the two disagree, this one
+> wins and the synthesis is the thing to fix.
+> `tools/mk_mister_page.py --check` re-derives section 5's offsets and
+> section 3's header words on every `tests/run_all_static.sh`.
+
 **Verdict up front: IT FITS — with 0.125 MB of slack in 64 MB, and SDRAM
 bank 1 EXACTLY FULL.** It does not fit the way the route was framed.
 See §1 for the first correction, §5 for the map, §9 for what is still open.

@@ -132,3 +132,9 @@ vsw.*
 # `??` noise, which is the same disease as GitHub #97: a test run should not
 # leave the tree looking dirty, or people learn to scroll past git status.
 replay_checksums.txt
+
+# GENERATED, NEVER COMMITTED (14z-107 (10)). docs/project/mister_core.md
+# carries the ASCII figures; the rich page is emitted by the committed
+# generator tools/mk_mister_page.py, because a hand-copied artifact goes
+# stale silently and this one draws a memory map whose slack is 0.2%.
+docs/project/mister_core.html

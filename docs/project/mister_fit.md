@@ -5,6 +5,12 @@ fingerprint `64426955`) and the pristine `vsav.zip` in `$ROMDIR`. Every
 figure names its instrument; re-run them before quoting. The platform
 facts (bus widths, tiers) are in `docs/platform/mister.md`.
 
+> **This file measures DEMAND — what the roster needs, region by region.**
+> What that demand implies, in causal order, is
+> `docs/project/mister_core.md`; where it lands in SDRAM is
+> `docs/project/mister_map.md`. Where the synthesis and this file disagree,
+> this file wins: it is the measurement.
+
 ## 1. Program ROM (68k)
 
 Instrument: a non-0xFF run scan of `vsw.41-44` in `vsavjw.zip` (python,

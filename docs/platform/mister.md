@@ -5,6 +5,13 @@ hack exists). Opened 14z-106 (2026-08-22) when the MiSTer arc was framed.
 Every figure below names its source; "read 2026-08-22" means the jtcores
 tree at tag `v1.7.3` (commit `63688ce5`) unless stated.
 
+> **THIS FILE IS A LOG, AND IT IS MEANT TO BE.** It records what was
+> measured, when, and what each measurement retracted. The SYNTHESIS — the
+> same material in CAUSAL order, stating what is true and why it follows —
+> is `docs/project/mister_core.md`. Read that one first if you want the
+> shape of the thing; read this one for the provenance of a number.
+> Where the two disagree, **this file wins**: it is the measurement.
+
 ## The ruling this file serves (maintainer, 2026-08-22)
 
 The MiSTer deliverable is an **extension of Jotego's jtcps core** — a

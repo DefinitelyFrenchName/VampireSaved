@@ -81,3 +81,12 @@ test_jtcores_twin
 test_rpl2siminputs
 test_sim_wram_contract
 test_mister_wide_gate
+
+# 14z-107 (10): the MiSTer SYNTHESIS document and its drawn page still
+# describe the map tests/audit_mister_map_fit.sh defends. Re-derives every
+# placement offset/length, the frozen extents, the .rom arithmetic and the
+# ASCII figures embedded in docs/project/mister_core.md; recounts the group-C
+# occupancy census and re-reads the palette when the build and the decrypted
+# image are present, and SKIPs those two otherwise. Three must-fire controls.
+# ROM-free, no emulator, ~5 s. tools/mk_mister_page.py --check
+test_mister_page
