@@ -2290,6 +2290,48 @@ Original write-up kept below.
 
 ## Decisions pending (human)
 
+- **THE LIVING-DOCUMENTATION EFFORT, and the option it creates (maintainer
+  direction, 2026-08-24).** Recorded as DIRECTION, not as a task — nothing is
+  scheduled and MiSTer stays the current arc. In their words: an important
+  documentation effort is coming, "not replacing your logs, but creating a
+  living documentation that can easily be referenced by you or me, doesn't go
+  stale or lost in a statistically never read file." The SailorMoonS project's
+  documentation AND WORK DISCIPLINE are the reference; formats, document types
+  and visualisations are to be chosen as the best fit for THIS project rather
+  than copied. Motivation: the emulator side is now essentially fully mapped.
+  **The option it opens:** after the MiSTer core is finished, potentially
+  "go back to the canvas, with all the documentation, and redo the project
+  from the docs, because it might create a cleaner, more consistent extended
+  codebase." Explicitly a possibility to preserve, not a commitment.
+  **Two things worth holding on to when it is scheduled:**
+  1. **Staleness is defeated by ENFORCEMENT, not by format.** What keeps the
+     SMS docs alive is `tools/checkdocs.py` re-deriving documented addresses
+     from the cartridge, `--check` modes on every generator, `health.sh` in
+     CI, and the rule that no number reaches a doc without a run that produced
+     it in that session ("an unquoted address is a claim nobody can falsify").
+     The prose should be shaped so it CAN be checked. Being lost in an unread
+     file is a SEPARATE problem with a separate fix — routing: "if you want to
+     know X, read Y" tables at every entry point, and every synthesis document
+     naming its journal twin and vice versa.
+  2. **A rebuild here is unusually provable, and its feasibility is
+     MEASURABLE TODAY.** The harness compares ROM BEHAVIOUR, not source
+     structure, so a rebuilt artifact has a real acceptance test that already
+     exists: bit-identical to vanilla on the legacy corpus, field-identical to
+     the current build on tenant content, same replays, same frozen
+     expectations. What decides it is not the docs but **how much of the build
+     is DATA versus CODE** — the artifact encodes hundreds of measured facts
+     (reconciliation rows, planted tripwires, pc-rel escapes, the ~70 re-point
+     defaults, the op-count freezes), and a rebuild that does not carry them
+     re-pays every debugging session that produced them. CLAUDE.md rule 5
+     already requires behavioural values to live in documented tables rather
+     than in code, so feasibility is essentially the degree to which rule 5
+     has been honoured — which can be MEASURED rather than estimated.
+     RECOMMENDATION when the effort is scheduled: make the first structural
+     deliverable the EXTRACTION of measured facts from manifests/generators
+     into reviewable tables with provenance. It makes the current codebase
+     auditable whether or not the rebuild happens, and it is the precondition
+     that turns the rebuild from a hope into an option.
+
 - ~~**MiSTer SOURCE SEPARATION — how far does "unmixed" reach? (14z-107 (8))**~~
   **DECIDED (maintainer, 2026-08-23): the CORE stays unmixed; SHARED
   `tools/` and `tests/` STAY AS THEY ARE** — *"shared /tools and /tests are
