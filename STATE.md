@@ -106,7 +106,23 @@ Same core, same romset, same replay, with D5 in:
   (the fighter art) is still zero: this replay window ends before a match
   starts.
 * completed program-ROM reads above `$400000` over the full run: **1,189,750**,
-  spanning `CPU:$412BA0-$4D100E`.
+  spanning `CPU:$412BA0-$4D100E`, and **20,000 of 20,000 sampled records have
+  `cpu_word == raw_word == the .rom`** — the CPU now receives exactly what
+  memory holds.
+* **`tests/test_mister_gfxc_fetch.sh`'s WHEEL half is GREEN**: codes
+  `0x74D6-0xFE41`, all inside the frozen extent `0xFFDB`, control at zero.
+  **Its FIGHTER half (obj bank 4) is still RED and stays red** — this replay
+  ends at the select screen and no match starts, so no fighter sprite is
+  emitted. A gate green on evidence it does not have is worse than a red one.
+  **Its first real measurement found two defects IN THE GATE**, both fixed:
+  the tile code was computed from the ABSOLUTE SDRAM address instead of
+  relative to the armed window's base (a correct promote read as
+  `0x170D6-0x1FA41`), and its liveness control demanded vanilla obj traffic in
+  the CONTROL leg — an image that cannot boot by construction, because with
+  the profile clear its group-C art aliases over vanilla's obj banks.
+* `tests/test_mister_prg_window.sh` freezes the pair and PASSES;
+  `tests/run_all_static.sh --strict` is **GREEN at PASS 107 / SKIP 0 / FAIL
+  0** (106 before, plus `test_mister_prg_probe`).
 
 **BOTH STOCK LEGS ARE GREEN WITH D5 IN**, which is the superset invariant on
 the one change that could have moved it: `tests/test_mister_wide_inert.sh`

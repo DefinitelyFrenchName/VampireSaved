@@ -51,15 +51,30 @@
 # group-C slot sits in are read out of cores/cps2w/hdl/jtcps1_sdram.v on every
 # run.
 #
-# STATUS: RED, AND RED FOR THE RIGHT REASON (14z-107 (10)). The WIDE romset
-# does not get past its own boot sequence on the core — it loops, and not one
-# sprite of ANY kind is drawn, so both group-C windows read zero and so does
-# the vanilla obj bank this gate arms as its own positive control. That
-# failure is NOT the promote's: it reproduces frame-for-frame with the profile
-# bit clear, it does not happen with the stock romset on the same core, and
-# the whole-image census passes on the same image. See
-# docs/platform/mister.md "THE WIDE ROMSET DOES NOT BOOT ON THE CORE YET".
-# This gate is what will confirm the fix; do not weaken it to make it green.
+# STATUS 14z-107 (11): THE WHEEL HALF IS GREEN — THE CORE FETCHES TENANT ART —
+# AND THE FIGHTER HALF IS STILL RED, HONESTLY. Slice D5 (the CPS-2 decryption
+# range) unblocked the boot, and on `11_pick_donovan` over 2,900 simulated
+# frames this gate now measures:
+#   * obj bank 5 (the select-wheel art): 9,038,400 reads over 105 DISTINCT
+#     TILE CODES, first at frame 1556, codes 0x74D6-0xFE41 — all inside the
+#     roster's frozen live extent 0xFFDB. The control leg reads ZERO.
+#   * obj bank 4 (the fighter art): ZERO, in both legs. **That is the replay,
+#     not the RTL**: the window ends at the select screen and no match starts,
+#     so no fighter sprite is ever emitted. It stays RED and this gate stays
+#     failing until a replay that reaches a match is run, because a gate that
+#     is green on evidence it does not have is worse than a red one.
+# Previous status, for the record: RED on every leg (14z-107 (10)), because the
+# WIDE romset did not get past its own boot sequence and not one sprite of ANY
+# kind was drawn. Root cause and fix: docs/platform/mister.md "CAN THE 68k READ
+# ABOVE 4 MB?".
+# TWO DEFECTS IN THIS GATE were found by its first real measurement, both
+# corrected below: the tile code was computed from the ABSOLUTE SDRAM address
+# rather than relative to the armed window's base (so a correct promote read as
+# 0x170D6-0x1FA41 against an extent of 0xFFDB), and the instrument's own
+# positive control demanded vanilla obj traffic in the CONTROL leg — an image
+# whose group-C art aliases over vanilla's obj banks by construction, and which
+# therefore cannot boot at all.
+# Do not weaken this gate to make it green.
 #
 # Usage:
 #   ROMDIR=... [JTSIM_SCRATCH=...] tests/test_mister_gfxc_fetch.sh [OUTDIR]
@@ -220,7 +235,15 @@ print("== the fetch ==")
 for k, name in ((0, "group C obj bank 4 (fighter art)"), (1, "group C obj bank 5 (wheel art)")):
     p = P[k]
     if p["reads"] > 0:
-        code_lo, code_hi = p["lo_hit"] >> 7, p["hi_hit"] >> 7
+        # THE TILE CODE IS RELATIVE TO THE WINDOW'S BASE. A CPS-2 tile code is
+        # its SDRAM address only INSIDE its own obj bank, and group C's banks
+        # do not start at 0 (GFXC5_OFFSET = 0x7E0000, GFXC4_OFFSET = 0x800000
+        # in bank 1). Subtracting the armed window's LO is what turns an SDRAM
+        # address back into a code the roster's frozen extent can be compared
+        # against. (Fixed 14z-107 (11): without it the first real fetch this
+        # gate ever saw reported codes 0x170D6-0x1FA41 against an extent of
+        # 0xFFDB and called a correct promote a defect.)
+        code_lo, code_hi = (p["lo_hit"] - p["lo"]) >> 7, (p["hi_hit"] - p["lo"]) >> 7
         ok("%s: %d reads, %d distinct tiles, first at frame %d, tile codes 0x%04X-0x%04X"
            % (name, p["reads"], p["distinct"], p["first_frame"], code_lo, code_hi))
         if code_hi <= EXTENT[k]:
@@ -239,15 +262,41 @@ for k, name in ((0, "group C obj bank 4"), (1, "group C obj bank 5")):
         no("%s: %d reads with wide_en CLEAR — the profile gate is not gating"
            % (name, N[k]["reads"]))
 
+# THE INSTRUMENT'S OWN POSITIVE CONTROL, and the two legs are held to DIFFERENT
+# things on purpose (corrected 14z-107 (11) — the original demanded vanilla obj
+# traffic in BOTH legs, which is impossible by construction).
+#   * The POSITIVE leg boots, so BOTH vanilla obj banks must see traffic.
+#   * The CONTROL leg is a WIDE image with the profile CLEAR, i.e. an image
+#     whose 16 MB of group-C art ALIASES over vanilla's obj banks 0/1 and the
+#     whole scroll window, because the download redirect is off. That machine
+#     cannot boot and never could: it renders a flat yellow field with the
+#     CAPCOM logo and loops. Requiring obj-bank-2 traffic there was asking a
+#     deliberately-broken image to behave like a working one. What the control
+#     leg CAN be held to, and is, is that the probe is demonstrably counting
+#     (bank 3 is millions of reads) and that its working set is the LOOPING
+#     boot's rather than a healthy one's — far fewer distinct blocks than the
+#     positive leg's. Both are assertions about the same probe in the same run.
 print("== the instrument's own positive control ==")
-for leg, S in (("positive", P), ("control", N)):
-    for k in (2, 3):
-        if S[k]["reads"] > 0:
-            ok("%s leg, SDRAM bank %d (vanilla obj): %d reads — the probe counts in this run"
-               % (leg, S[k]["bank"], S[k]["reads"]))
-        else:
-            no("%s leg, SDRAM bank %d: 0 reads. Vanilla object traffic cannot be zero;"
-               " a zero on p0/p1 would prove nothing" % (leg, S[k]["bank"]))
+for k in (2, 3):
+    if P[k]["reads"] > 0:
+        ok("positive leg, SDRAM bank %d (vanilla obj): %d reads — the probe counts in this run"
+           % (P[k]["bank"], P[k]["reads"]))
+    else:
+        no("positive leg, SDRAM bank %d: 0 reads. The positive leg BOOTS, so vanilla object"
+           " traffic cannot be zero; a zero on p0/p1 would prove nothing" % P[k]["bank"])
+if N[3]["reads"] > 0:
+    ok("control leg, SDRAM bank %d: %d reads — the probe counts in the control run too"
+       % (N[3]["bank"], N[3]["reads"]))
+else:
+    no("control leg, SDRAM bank %d: 0 reads. The probe is not counting there, so its"
+       " zeros on p0/p1 prove nothing" % N[3]["bank"])
+if N[3]["distinct"] < P[3]["distinct"]:
+    ok("control leg's working set is the LOOPING boot's: %d distinct blocks against the"
+       " positive leg's %d" % (N[3]["distinct"], P[3]["distinct"]))
+else:
+    no("control leg touched %d distinct blocks against the positive leg's %d — it is not"
+       " looping, so the two legs are not the experiment this gate describes"
+       % (N[3]["distinct"], P[3]["distinct"]))
 sys.exit(1 if bad else 0)
 PY
 

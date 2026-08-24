@@ -1365,6 +1365,26 @@ recorded for the stock leg in the section below.** Obj bank 4 stays at zero
 because this replay window ends before a match starts; the fighter art is the
 next thing to reach.
 
+**And the 105 tile codes were checked, not just counted.** Re-run through
+`tests/test_mister_gfxc_fetch.sh --pos-log … --neg-log …`, the wheel-art half
+is GREEN: codes **`0x74D6-0xFE41`**, all inside the roster's frozen live extent
+`0xFFDB` for that bank, with the control leg at zero. **The fighter-art half
+(obj bank 4) is still RED and stays red**: this replay window ends at the
+select screen and no match starts, so no fighter sprite is emitted. A gate that
+went green on evidence it does not have would be worse than a red one.
+
+**THE GATE'S OWN FIRST REAL MEASUREMENT FOUND TWO DEFECTS IN THE GATE**, which
+is what a gate that has never actually fired should be expected to produce:
+* it computed the tile code from the **absolute** SDRAM address rather than
+  relative to the armed window's base, so a correct promote reported
+  `0x170D6-0x1FA41` against an extent of `0xFFDB` and read as a defect;
+* its instrument-liveness control demanded vanilla obj traffic in the CONTROL
+  leg — an image whose group-C art ALIASES over vanilla's obj banks by
+  construction (the download redirect is off), which therefore cannot boot and
+  never could. The control leg is now held to what it can be held to: the probe
+  counting millions of reads in bank 3, and a working set that is the LOOPING
+  boot's (263 distinct blocks against the positive leg's 2,423).
+
 **The stock legs are unmoved, which is the superset invariant on the one change
 that could have broken it.** `tests/test_mister_wide_inert.sh` PASSES — `cps2w`
 against `cps2`, BIT-IDENTICAL work RAM in all 101 frames, control firing — and
