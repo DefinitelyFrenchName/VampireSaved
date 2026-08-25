@@ -1,5 +1,130 @@
 # STATE — living progress log
 
+## Session 14z-108 — **THE SIM HARNESS'S DIRECTION BITS WERE REVERSED END FOR
+## END, NOT TRANSPOSED IN TWO — measured on all four before one bit was
+## changed, and the half nobody had exercised is where the previous reading
+## was wrong.** `tools/rpl2siminputs.py` fixed (one dict, no fork commit, no
+## RTL), verified against the game's own input mirror on both
+## implementations, and the gate rebuilt with a per-direction lock and a
+## must-fire control. **One of the two frozen expectations the record said
+## would move DID NOT MOVE AND COULD NOT** — which also means the frozen sim
+## anchor could not move. Obj bank 4 is unblocked and running.
+
+**The opener, and it was the whole point of doing it in the stated order.**
+`docs/NEXT_SESSION.md` said: measure all four directions BEFORE changing
+anything, because what existed was two data points and the inference on the
+table was an inference. It was wrong, and the order caught it.
+
+### THE MEASUREMENT
+
+`tests/replays/107_four_directions.rpl` — U, D, L, R one at a time, 5 frames
+each, 40 frames apart, **attract only: no coin, no start, no roster
+content**, so this is a property of the INSTRUMENT and runs on stock `vsavj`
+in ~15 min instead of a boot-to-select run on the WIDE image. Read off the
+game's own P1 input mirror `RAM:$FF8058.w` on both implementations, MAME
+against `cps2w` under Verilator, both dump sets integrity-checked (151 and
+176 frames), **20 nonzero frames on each leg = exactly the 4 presses x 5
+frames the replay scripts**:
+
+| asked | MAME | core, pre-fix | delivered | core, post-fix |
+|---|---|---|---|---|
+| Up    | `0x0008` | `0x0001` | Right | **`0x0008`** |
+| Down  | `0x0004` | `0x0002` | Left  | **`0x0004`** |
+| Left  | `0x0002` | `0x0004` | Down  | **`0x0002`** |
+| Right | `0x0001` | `0x0008` | Up    | **`0x0001`** |
+
+**THE NIBBLE IS REVERSED END FOR END.** 14z-107 (12) had seen only Left and
+Down — the only directions `36_pick_tenant_cell` presses — and inferred a
+two-bit SWAP leaving Up and Right untouched, on the strength of the
+translator's own docstring. **Up is not untouched: it arrives as Right.** A
+two-bit fix would have left half the defect in the tree and the gate would
+have frozen it.
+
+**MECHANISM, derived from the bit ORDER and then confirmed.**
+`test.cpp:380` copies the file's bits 4-7 straight onto `joystick1[3:0]`, and
+jtframe's joystick port is **MSB-FIRST** — `joy[3]=Up [2]=Down [1]=Left
+[0]=Right` (`jtframe_keyboard.v:107-110`, the authoritative order;
+`_JTFRAME_JOY_RLDU` being a full nibble reversal is only consistent with
+that). So the file map is `bit4=Right bit5=Left bit6=Down bit7=Up`, and the
+translator had read the macro NAME "UDLR" as "bit4=Up … bit7=Right".
+
+**FAULT ATTRIBUTION: OURS, NOT jtframe's** — unlike the three input-path
+defects before it, which were upstream and fixed in the fork. jtframe
+documents no `sim_inputs.hex` direction spec; the nibble is simply
+`joy[3:0]`. **Fix = one dict. No fork commit, no RTL.** The fork pin is
+unchanged at `7b9a0d2d`.
+
+### THE FROZEN EXPECTATIONS: ONE MOVED, ONE COULD NOT
+
+The record said in FIVE places that a bit-map fix would move both of
+`test_rpl2siminputs`'s frozen values. **It moved one.**
+
+* check 1's vector: `111 6ee 000 000 080` -> **`181 67e 000 000 010`**,
+  re-derived by hand with the mechanism named in the gate header.
+* check 3's `05_timeout_idle` sha1 `eb3e1d04e58b3a2b7bf713d40c4d6ac4796e550c`
+  **did not move and cannot**: that replay scripts a coin, a start and one
+  button-1 tap and **no direction token**.
+* **Therefore `test_mister_sim_anchor`'s frozen anchor (MAME 2146 / sim 2609 /
+  skew 463) could not move either** — its replay is `05_timeout_idle`, whose
+  `sim_inputs.hex` is byte-identical across the fix. It was NOT re-run, and
+  the gate header states that as the reason rather than leaving it to be
+  assumed. That is a 45-minute gate not run on evidence, not on convenience.
+
+Corrected in place in `STATE.md` (the 14z-107 entry), `NEXT_SESSION`,
+`docs/platform/mister.md`, `docs/platform/gotchas.md`, `docs/GOTCHAS.md` and
+`HANDOFF.md`. **It mattered: "expect it to move" is how a hash gets re-frozen
+without anyone asking why.**
+
+### THE GATE, REBUILT (11 checks, all green)
+
+* **check 5** locks each direction to its measured file bit individually.
+  Check 1 presses three directions at once and would pass under ANY
+  permutation of the four — which is exactly how the reversal survived.
+* **check 5b** is a MUST-FIRE CONTROL: it rebuilds the pre-14z-108 reversed
+  map and requires check 5 to reject it.
+* **check 6** asserts the anchor-independence MECHANISM directly (05 sets no
+  direction bit) instead of resting on a hash, with **6b** its positive
+  control.
+* **AND 6 PASSED FOR THE WRONG REASON IN ITS FIRST DRAFT** — it used gawk's
+  `and()`/`strtonum()` on a BWK awk, so awk exited 2 and the `else` arm read
+  as success. Caught by writing the control before trusting the check. THE
+  INSTRUMENT PROTOCOL, working on the session that wrote it into a gate.
+
+### THE BANK-LOAD AUDIT CAN NOW TAKE A REPLAY, AND REFUSES TO MISLABEL IT
+
+`tests/audit_sdram_bank_load.sh --rpl FILE` (+ `--stats` on both legs of
+`test_mister_gfxc_fetch`), so the tenant match answers the FETCH question and
+the BANK-1-UNDER-LOAD question from ONE simulation instead of a third
+70-minute run. The four phase boundaries are absolute frames keyed to
+`05_timeout_idle`'s anchor, so with `--rpl` the phase table is **REFUSED**
+and whole-run figures + the clash count are reported instead.
+
+**THE NEW BLOCK WAS WRONG FOUR TIMES AND EVERY ONE WAS CAUGHT BEFORE USE** —
+cumulative counters read as per-interval (means in the tens of millions);
+`t` read as a reporter index rather than picoseconds (frame numbers in the
+billions); the bare substring `SDRAM reads clashed` counted, which scores
+this report's OWN PROSE as evidence (and
+`build/sdram_bank_load_14z107.log` is exactly such a file — it is a REPORT,
+not a `jtsim.log`); and a "peak" of 100,614 acc/frame IDENTICAL on all four
+banks, which is the ROM DOWNLOAD — one write command per byte at a constant
+rate to one bank at a time. Validated by construction on synthetic logs
+(rates of exactly 10/5/2/3 per frame read back exactly; a pre-transfer
+sample that must be dropped, and is; 3 real WARNING lines counted as 3, the
+same text as prose counted as 0), and the default path still reproduces the
+frozen 14z-107 table unchanged.
+
+### RITUAL
+
+- **THE ROLLOVER EXECUTED, exactly as the 14z-107 CLOSE (final) specified
+  it**: the 14z-107 sub-entries **(1)-(9)**, nine sections and 1,582 lines,
+  moved BYTE-VERBATIM to the top of `STATE_HISTORY.md`'s body. Verified
+  lossless (identical sha256 in the archive; no rolled header remains here).
+  **STATE.md 261,112 -> 160,634 B** — the first time since the split that it
+  is near the ~150 KB the rule names. **First time a group's SUB-ENTRIES have
+  rolled while the group stays live**, which the rule does not contemplate:
+  it speaks of whole groups and THE LEDGER carries one line per group, so
+  nothing was added to the ledger and a pointer paragraph names all nine.
+
 ## Session 14z-107 CLOSE (final) — ritual complete. **THE WIDE ROMSET BOOTS
 ## ON THE CORE, DRAWS OUR SELECT SCREEN AND FETCHES OUR WHEEL ART — AND NO
 ## TENANT HAS EVER FOUGHT ON IT.** Six RTL slices are in (D0-D5), the boot
