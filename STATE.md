@@ -324,6 +324,42 @@ SCROLL2 `$908000`, PALETTE `$90C000`, row-scroll `$90E800`, and
    differences sit in THREE ENABLED SCROLL LAYERS AND THE PALETTE, with the
    palette the worst at 52.7%. Live surfaces, not dead ones.
 
+**THE LEGACY CONTROL WAS RUN, AND IT SETTLES IT: THE DIFFERENCE IS NOT OURS.**
+Same core (`cps2w`), same VRAM region, same comparison — but STOCK `vsavj`
+and the LEGACY replay `05_timeout_idle`, with the roster nowhere in sight
+(MAME 2146 vs core 2609, the frozen skew 463):
+
+| region | LEGACY (stock) | tenant (WIDE) |
+|---|---|---|
+| scroll1 | **35.4%** | 22.3% |
+| scroll3 | **3.8%** | 2.9% |
+| scroll2 | **15.1%** | 17.7% |
+| palette | **51.2%** | 52.7% |
+| row-scroll | **0%** | 0% |
+| unclaimed | **0%** | 0% |
+
+**Same pattern, same magnitudes, on VANILLA CONTENT.** So the palette and
+scroll differences are a GENERAL MAME-vs-jtcps2 implementation difference and
+say **nothing** about CPS-2 WIDE, the roster, or any slice. The alarm in the
+subsection above is answered in the benign direction, and the hedge was the
+right call.
+
+**THE USEFUL NEGATIVE RESULT: VRAM IS NOT A VIABLE CROSS-IMPLEMENTATION VIDEO
+ORACLE.** Two unrelated implementations legitimately hold different bytes in
+the palette and all three scroll tilemaps — the palette by HALF — so
+comparing that surface can never distinguish "our port broke something" from
+"these are different implementations". Any future attempt at "compare video
+against MAME" must use a different surface: rendered frames, the OBJ list, or
+the palette AFTER the hardware's own conversion. **This closes off an
+approach that looked promising, which is worth more than the measurement
+was.**
+
+**AND ONE POSITIVE SIGNAL INSIDE IT:** row-scroll and every unclaimed region
+are BYTE-IDENTICAL in BOTH runs — 204,800 bytes, non-zero, across two
+different romsets and two different replays. So the VRAM transfer and the
+dump path themselves are sound; the differences are real content
+differences, not an artefact of how either side is captured.
+
 **WHAT STILL STOPS IT BEING CALLED A DEFECT, stated so the next session does
 not over-swing the other way.** Two things are unmeasured: whether the
 differing bytes fall in the VISIBLE portion of each tilemap (the layers are

@@ -133,16 +133,25 @@
 > ## earlier reading calling the identical 128 KB "scroll tilemap" was
 > ## WRONG: no layer base points there.
 > ##
-> ## **THE NEXT STEP IS THE CONTROL NOBODY HAS RUN: the SAME VRAM
-> ## comparison on a LEGACY replay with the STOCK romset** (~60 min, one
-> ## sim leg). If MAME and jtcps2 differ there too, this is a general
-> ## implementation difference and says NOTHING about the roster — which
-> ## is the single cheapest way to find out whether any of this matters.
-> ## Also unmeasured: whether the differing bytes fall in the VISIBLE
-> ## portion of each tilemap (the layers are larger than the screen and
-> ## the scroll X/Y registers select the window). **Do not call it a
-> ## defect or benign until at least the legacy control is in.**
-> ## **PIXELS remain never compared.**
+> ## **THE LEGACY CONTROL WAS RUN AND IT SETTLES IT: THE DIFFERENCE IS
+> ## NOT OURS.** Same core, same region, but STOCK `vsavj` and the legacy
+> ## replay `05_timeout_idle` — scroll1 35.4%, scroll3 3.8%, scroll2
+> ## 15.1%, palette 51.2%, row-scroll and unclaimed 0%. **Same pattern,
+> ## same magnitudes, on vanilla content with the roster nowhere in
+> ## sight.** A general MAME-vs-jtcps2 implementation difference; it says
+> ## nothing about the profile, the roster or any slice.
+> ## **THE USEFUL NEGATIVE RESULT — DO NOT REPEAT THIS APPROACH: VRAM IS
+> ## NOT A VIABLE CROSS-IMPLEMENTATION VIDEO ORACLE.** Two unrelated
+> ## implementations legitimately hold different bytes in the palette and
+> ## all three scroll tilemaps (the palette by HALF), so that surface can
+> ## never separate "our port broke something" from "these are different
+> ## implementations". **A future video oracle needs a DIFFERENT surface:
+> ## rendered frames, the OBJ list, or the palette AFTER the hardware's
+> ## own conversion.** Row-scroll and every unclaimed region are
+> ## byte-identical in BOTH runs (204,800 non-zero bytes, two romsets, two
+> ## replays), so the transfer and dump paths are sound.
+> ## **PIXELS remain never compared — and the cheapest route to that is
+> ## now the FIELD TEST, where you simply look at the screen.**
 > ##
 > ## **THE SEED SWEEP IS DONE and is what produced the finding above.**
 > ## It was commissioned because the attribution showed a five-path
