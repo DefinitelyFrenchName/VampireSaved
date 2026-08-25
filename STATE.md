@@ -244,6 +244,59 @@ anchors and skew frozen, the tenant-record assertion on both legs, and the two
 controls above plus a third that removes the skip list and requires the legs
 to disagree.
 
+### THE QSOUND EXTENSION IS FETCHED ON THE CORE — the last zero-coverage subsystem
+
+**Stock CPS-2 cannot address these banks at all**: `qsnd_addr[22:16] <=
+dsp_ab[6:0]` keeps seven bank bits, so bank `0x8N` plays as `0x0N`. Reaching
+them needs slice **D1**'s sample-bank width fix AND slice **D2**'s QSound
+split across two SDRAM banks. Until now nothing had ever fetched one on an
+FPGA implementation.
+
+`108_tenant_voice.rpl` (36's wheel walk to the tenant, then walk-forward and
+mash so the tenant throws attacks that CONNECT), 4,400 frames, `cps2w` + the
+WIDE romset:
+
+| probe | window | positive | control (profile bit CLEAR) |
+|---|---|---|---|
+| **QSound HIGH — the extension** | ba0 `0x6E0000`, 1 MB | **210,180 reads / 76 distinct / first frame 3783** | **0** |
+| QSound LOW (liveness) | ba1 `0`, 8 MB | 86,746,380 | **54,113,994** |
+| bank 3 (liveness) | ba3 | 171,296,680 | 105,056,248 |
+
+**The addresses are `0x830AA0-0x83FFFE` — DSP bank `0x83`**, inside the
+ledger's extension range `0x80-0x8E` and overlapping 8 of its 58 samples. The
+first read lands **224 frames INTO the match, during the mash** — where an
+attack voice belongs, not at boot.
+
+**THE CONTROL IS WHAT MAKES THE ZERO MEAN SOMETHING.** With `wide_en` clear
+the core still issues **54 million** QSound LOW reads — the DSP is
+demonstrably streaming samples — and **zero** into the extension. So the zero
+is about the PROFILE, not about a silent DSP or a dead probe.
+
+**AND IT CONFIRMS THE `SLOT5_AW=20` TRUNCATION IS SAFE IN PRACTICE, not just
+on paper.** Quartus warning 10230 flags `pcmh_addr = pcm_addr[PCM_AW-1:0]`
+narrowing 23 bits to 20; that is the window MASK, lossless only while the
+extension stays inside 1 MB. **Every address observed has
+`pcm_addr[22:20] == 0`**, which is exactly the condition, and the gate
+asserts it rather than trusting the arithmetic.
+
+**THE RIG WAS CONFIRMED ON MAME FIRST**, because `36_pick_tenant_cell`
+presses nothing after the match starts and a tenant that never attacks would
+have produced a meaningless zero — the same ambiguity that cost 14z-107 (12)
+its obj-bank-4 measurement. On MAME the new replay drives P2's HP from
+`0x120` to `0x00EC`. **Two instrument notes recorded in the replay header:
+`p1_attack_id` at `+0x0A` reads 0 for the whole window even at PER-FRAME
+sampling, so it is not the indicator to use — `anim_ptr` and the opponent's
+HP are; and a 20-frame stride aliases the attacks away entirely and makes a
+working rig look dead.** My first pass printed "WEAK RIG" from exactly that
+aliased read while its own HP figures said otherwise.
+
+**CAPTURED AS A GATE**: `tests/test_mister_qsound_ext.sh` (emulator tier, two
+~75 min legs). It derives the window from the RTL (`PCMH_OFFSET`, `SLOT5_AW`,
+and which `u_bankN` carries `pcmh_cs`) rather than hard-coding it, and
+**PROVEN ABLE TO FAIL on four fabricated defects**: a control leg that leaks,
+a positive leg reading zero, an address outside `0x80-0x8E`, and a dead
+liveness probe.
+
 ### THE CORE SYNTHESISES AND FITS — BUT TIMING IS SEED-DEPENDENT AND TWO SEEDS IN FOUR MISS
 
 > **[THE HEADLINE BELOW WAS WRITTEN FROM A SINGLE SEED AND IS SUPERSEDED.

@@ -73,13 +73,21 @@
 > ## measured reason and proven LIVE by a control. Gate:
 > ## `tests/test_mister_tenant_oracle.sh` (emulator, ~65 min).
 > ##
-> ## **WHAT IS LEFT IN SIMULATION, in value order.** The QSound extension
-> ## HEARD (banks `0x80-0x8E` are placed and now proven to FIT the 1 MB
-> ## window — `SLOT5_AW` 20 against `0xF0000` of samples — but no sample
-> ## from them has ever played); the scroll path with a wide GFX map
-> ## (untouched, capped at 8 MB with no bank input anywhere in its chain);
-> ## and a frame compared PROGRAMMATICALLY against MAME's (never — the
-> ## committed select-screen images are a naked-eye pair, not a verdict).
+> ## **THE QSOUND EXTENSION IS FETCHED — 14z-108.** 210,180 reads over 76
+> ## distinct blocks in the 1 MB HIGH window, DSP bank `0x83`, first at
+> ## frame 3783 (inside the match, during the mash); control leg ZERO
+> ## while still issuing 54 M QSound LOW reads. Confirms D1's width fix
+> ## and D2's split end to end, and that the `SLOT5_AW=20` mask is
+> ## lossless in practice. Gate: `tests/test_mister_qsound_ext.sh`.
+> ## **FETCHED IS NOT HEARD** — no audio has been rendered or compared,
+> ## and nothing in this lane ever has.
+> ##
+> ## **WHAT IS LEFT IN SIMULATION, and it is now two things.** The scroll
+> ## path with a wide GFX map (untouched, capped at 8 MB with no bank
+> ## input anywhere in its chain) and a frame compared PROGRAMMATICALLY
+> ## against MAME's (never — the committed select-screen images are a
+> ## naked-eye pair, not a verdict). Everything else in the profile has
+> ## been exercised at least once.
 > ##
 > ## **THE SEED SWEEP IS DONE and is what produced the finding above.**
 > ## It was commissioned because the attribution showed a five-path
