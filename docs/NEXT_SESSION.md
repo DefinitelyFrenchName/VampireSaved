@@ -37,6 +37,14 @@
 > ## DO NOT MODIFY RTL**: retiming a path is a design decision governed by
 > ## Rule 1 v2 and is the maintainer's to ratify.
 > ##
+> ## **QUEUED, ONE FORK COMMIT: `cores/cps2w/README.md` IS STALE.** It
+> ## still says "Status: slice D1" and calls D2-D4 "not here yet", with a
+> ## file table of FIVE `hdl/` files against the tree's THIRTEEN — written
+> ## at `4840df8a` and never updated after `0df6f000`. Found by the
+> ## Quartus session, which stopped and asked before building. Not fixed
+> ## during 14z-108 because a README commit moves the pin out from under
+> ## a build in flight; do it once the synthesis numbers land.
+> ##
 > ## **WHAT 14z-108 MEASURED, so it is not re-measured.**
 > ## **(1) THE SIM HARNESS'S DIRECTION BITS WERE REVERSED END FOR END**,
 > ## not transposed in two. Measured on ALL FOUR against the game's own P1

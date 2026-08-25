@@ -188,6 +188,35 @@ Quartus is Linux/Windows only, so it cannot run on this Mac. Also still
 never: the QSound extension heard, the scroll path with a wide GFX map, and
 any frame compared programmatically against MAME's.
 
+### A STALE README IN THE PUBLIC FORK, FOUND BY THE QUARTUS SESSION
+
+`emu/jtcores` `cores/cps2w/README.md` at pin `7b9a0d2d` still says
+**"Status: slice D1 — the QSound sample-bank width"** and lists the
+placement, the object promote and the 68k PRG window as "slices D2-D4 and
+not here yet". Its file table lists FIVE `hdl/` files; the tree holds
+THIRTEEN. It was written at `4840df8a` (D1) and never updated after
+`0df6f000` (D2).
+
+**Found by the Windows Quartus session, which stopped and asked before
+building rather than trusting either document.** That is the right
+instinct and the reason it matters: a synthesis report reading "slice D1"
+would have been filed as a green light for a design four slices larger
+than the one measured.
+
+Verified against the tree, not from memory: five slice commits sit above D1
+on `cores/cps2w`, and each slice's characteristic expression is present
+(`jtcps1_sdram.v:221-222` the group-C offsets; `jtcps2w_obj_bank.v:64` the
+promote; `jtcps2_main.v:240/219/116` the decode, the `one_wait` boundary and
+the widened `rom_addr`; `jtcps2_decrypt.v:75` `rng_eff`). Stronger still,
+this same pin demonstrably RAN the full design in the tenant-match
+measurement above, which requires D2, D3, D4 and D5 jointly.
+
+**NOT FIXED IN THIS SESSION, deliberately: a README commit moves the fork
+pin out from under a build in flight.** It is queued for after the Quartus
+numbers land. **This is the retraction rule pointing at our own public
+artifact** — the fork's README is a header a stranger reads first, and it
+is confidently wrong.
+
 ### RITUAL
 
 - **THE ROLLOVER EXECUTED, exactly as the 14z-107 CLOSE (final) specified
