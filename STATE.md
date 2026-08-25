@@ -244,11 +244,19 @@ anchors and skew frozen, the tenant-record assertion on both legs, and the two
 controls above plus a third that removes the skip list and requires the legs
 to disagree.
 
-### THE CORE SYNTHESISES, FITS AND CLOSES TIMING — MEASURED ON QUARTUS
+### THE CORE SYNTHESISES AND FITS — BUT TIMING IS SEED-DEPENDENT AND TWO SEEDS IN FOUR MISS
 
-**The largest unknown in the arc is answered, and the answer is (a): `cps2w`
-FITS AND CLOSES TIMING.** Run on a Windows box by a peer Claude session from
-`docs/project/quartus_brief.md`, at pin `7b9a0d2d`, Quartus Prime 20.1.1 Lite
+> **[THE HEADLINE BELOW WAS WRITTEN FROM A SINGLE SEED AND IS SUPERSEDED.
+> The seed sweep the maintainer approved the same day found that `cps2w`
+> does NOT reliably close timing. The corrected verdict is the subsection
+> "THE SEED SWEEP INVERTS THE TIMING HALF" further down; FIT is unaffected
+> and stands. The single-seed measurement was not WRONG — it is a true
+> report of that draw — but read alone it overstates the design's health,
+> and the reason it could is `jtseed`, below.]**
+
+**FIT is answered and unambiguous; TIMING is not.** Run on a Windows box by
+a peer Claude session from `docs/project/quartus_brief.md`. The
+original single-seed reading was taken at pin `7b9a0d2d`, Quartus Prime 20.1.1 Lite
 via Jotego's `jotego/jtcore20x` image, device **Cyclone V 5CSEBA6U23I7**,
 target mister. **`cps2` was built FIRST as the reference leg**, so every
 figure below is an attribution and not just a number.
@@ -301,6 +309,85 @@ are downloaded — `0xF0000` B = 15 banks x 64 KB = 983,040 B against
 honest, and the arithmetic closes with exactly ONE spare bank. The constraint
 it encodes — sample banks above `0x8F` alias silently — is the same
 thin-margin story as the rest of the placement.
+
+### THE SEED SWEEP INVERTS THE TIMING HALF — TWO SEEDS IN FOUR MISS
+
+**Commissioned because the attribution showed a five-path cluster at the
+limit on a term that is ROUTING, and routing is what seeds vary. It was the
+right call: a single build would never have shown this.**
+
+| core | seed | jtframe gate | SDRAM 96 MHz slack | TNS | ALMs |
+|---|---|---|---|---|---|
+| `cps2w` | 18269 (base) | **PASS** | +0.066 | 0.000 | 18,464 |
+| `cps2w` | 1001 | **PASS** | +0.067 | 0.000 | 18,432 |
+| `cps2w` | 2002 | **FAIL** | **-0.110** | -0.260 | 18,436 |
+| `cps2w` | 3003 | **FAIL** | **-0.545** | -1.026 | 18,428 |
+| `cps2` | 21287 (base) | PASS | +0.144 | 0.000 | 18,258 |
+| `cps2` | 4004 | PASS | +0.431 | 0.000 | 18,226 |
+
+**`cps2w` spread -0.545 .. +0.067 — 0.612 ns, STRADDLING ZERO. `cps2`
+spread +0.144 .. +0.431 — 0.287 ns, entirely above it.**
+
+**THESE ARE REAL TIMING FAILURES, NOT CRASHES.** Quartus reported "Full
+Compilation was successful, 0 errors" on both failing seeds — the fitter
+placed and routed fine. **The FAIL verdict is jtframe's OWN timing gate**,
+the same one that prints PASS on the passing seeds. It is jtcores'
+pass/fail criterion, not an interpretation of a slack number.
+
+**THE CLUSTER RESHUFFLES; IT DOES NOT MOVE AS A BODY.** Different source
+register AND different destination pin every seed (`u_bank1|post_act` ->
+`sdram_a[11]`; `u_prog|actd` -> `sdram_a[7]`; `u_bank2|post_act` ->
+`sdram_a[8]`; `u_bank1|st[0]~DUPLICATE` -> `sdram_a[11]`). Every failing
+path is still inside `jtframe_sdram64`, terminating at an SDRAM address
+pin. **What is marginal is not one path but the SDRAM controller's
+ADDRESS-GENERATION CONE AS A WHOLE.** WIDE loads that cone enough to lose
+the seed lottery; the control keeps enough margin to absorb the same
+variance.
+
+**AND THE REASON A SINGLE BUILD LOOKED HEALTHY: `jtseed` RETRIES UNTIL IT
+PASSES.** `xjtcore.sh` calls `jtseed 4`, which loops `jtcore --seed
+$RANDOM` and **BREAKS ON FIRST SUCCESS**. So a green `xjtcore.sh` run does
+not mean the design closes timing — **it means at least one of up to four
+random draws closed.** The +0.066 baseline was such a draw. **Any future
+"the build passed" from the normal flow carries the same caveat**, and this
+is the single most important thing to know about reading jtcores build
+results.
+
+**THE VERDICT, not forced into the brief's four boxes because it does not
+fit one.** FIT is unambiguous — `cps2w` FITS at 44% ALMs, and (d) is firmly
+excluded. TIMING is seed-dependent: (a) on passing seeds, (c) on failing
+ones. **It is NEVER (b)** — the control closed on every seed tried, so
+there is no inherited failure to attribute this to. The failure IS
+attributable to the fork in the sense that the control does not exhibit it,
+but it is **NOT located in WIDE's own logic**: every failing path is in
+shared jtframe infrastructure the fork does not touch. With n=4 no pass
+RATE is quoted; 2-of-4 is not "50%" at this sample size. **What is robust,
+from two independent failures: `cps2w` does not reliably close timing at
+96 MHz on this toolchain, and `cps2` does.**
+
+**A HAZARD CAUGHT AND FIXED, and it bears on the field test.** **A FAILING
+SEED STILL EMITS AN `.rbf`** — Quartus completes and writes a bitstream
+even when jtframe's gate says FAIL. The sweep OVERWROTE
+`release/mister/jtcps2w.rbf` with seed 3003's output, the worst-failing
+seed at -0.545 ns. Anyone pulling that path for an SD card in that window
+would have flashed a build that misses timing. The baselines were archived
+before the sweep, restored afterwards, and re-hashed to the published
+values (`46fc74af…` / `43b94cb1…`); the sweep bitstreams are preserved, not
+discarded. **VERIFY THE HASH BEFORE FLASHING ANYTHING FROM THAT TREE.**
+
+**CONSTRAINTS HELD:** only `--seed` varied, `set_global_assignment -name
+seed <S>` confirmed in the `.qsf` each run, no fitter/physical-synthesis/
+optimisation-effort changes, and **no failing seed was re-run hoping for a
+pass**. HEAD `7b9a0d2d`, 0 tracked and 0 RTL files modified.
+
+**WHAT IT MEANS, stated plainly.** It does NOT block shipping by itself: we
+distribute a PREBUILT `.rbf`, and the baseline bitstream is a passing draw.
+It DOES mean the +0.066 ns is not real headroom — **a future slice cannot
+assume it**, any rebuild is a lottery, and a jtframe uprev or a Quartus
+version change could move the design from mostly-passing to mostly-failing.
+**Whether to spend margin back (pipelining the SDRAM address path, reducing
+the load WIDE puts on that cone) is a DESIGN decision under Rule 1 v2 and
+is the maintainer's**, not something to fix by seed-hunting.
 
 **WHERE THE 0.078 ns WENT — ATTRIBUTED, AND THE ANSWER IS THE REASSURING
 ONE.** Obtained by re-running `quartus_sta` with `report_timing -setup

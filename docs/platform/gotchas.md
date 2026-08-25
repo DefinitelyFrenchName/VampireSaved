@@ -1751,3 +1751,42 @@ private or gone — and is irrelevant to a Cyclone V build; skip it with
 
 **A SILENT STALL IS WORSE THAN A FAILURE**, and a pin is a property of the
 tree you checked out, not of the clone command you typed.
+
+## `xjtcore.sh` RETRIES UNTIL A SEED PASSES, SO "THE BUILD PASSED" IS NOT "THE DESIGN CLOSES TIMING" (measured 2026-08-25, 14z-108)
+
+`xjtcore.sh` calls **`jtseed 4`**, which loops `jtcore --seed $RANDOM` and
+**BREAKS ON FIRST SUCCESS**. A green run therefore means *at least one of up
+to four random placement draws met timing* — not that the design does.
+
+**Measured on `cores/cps2w` at pin `7b9a0d2d`** (Quartus 20.1.1, Cyclone V
+5CSEBA6U23I7, SDRAM 96 MHz, slow corner):
+
+| core | seed | jtframe gate | slack |
+|---|---|---|---|
+| `cps2w` | 18269 | PASS | +0.066 |
+| `cps2w` | 1001 | PASS | +0.067 |
+| `cps2w` | 2002 | **FAIL** | **-0.110** |
+| `cps2w` | 3003 | **FAIL** | **-0.545** |
+| `cps2` (control) | 21287 | PASS | +0.144 |
+| `cps2` (control) | 4004 | PASS | +0.431 |
+
+**The first measurement of this core reported "+0.066 ns, fits and closes
+timing" and was published in five documents before the sweep contradicted
+it.** That reading was a TRUE report of one draw; as a claim about the design
+it was wrong, and nothing in the flow's output says so.
+
+**RULES.**
+1. **Never report a jtcores build as "closes timing" from one run.** Sweep
+   seeds, and state the SPREAD. `cps2w` spans 0.612 ns and straddles zero;
+   the control spans 0.287 ns entirely above it.
+2. **Always build the reference core on the same toolchain.** Without it a
+   failure cannot be told from an inherited one — here the control passed on
+   every seed, which is what makes the finding attributable at all.
+3. **A FAILING SEED STILL EMITS AN `.rbf`.** Quartus completes and writes a
+   bitstream even when jtframe's gate says FAIL, and a sweep will OVERWRITE
+   `release/mister/<core>.rbf` with whatever ran last. **Verify the hash
+   before flashing anything.** This one nearly put a -0.545 ns bitstream
+   where a field test would have picked it up.
+4. Failing paths that RESHUFFLE between seeds (different source register and
+   destination pin each time) indicate a marginal CONE, not a slow path.
+   Fixing that is a design change, not a seed hunt.

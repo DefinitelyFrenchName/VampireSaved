@@ -1,28 +1,55 @@
 # NEXT SESSION — orientation (rewritten at the 14z-108 CLOSE, 2026-08-25)
 
 > ## **START HERE. THE ARC IS MiSTer. A TENANT HAS FOUGHT ON THE CORE,
-> ## AND THE CORE FITS A CYCLONE V AND CLOSES TIMING.**
+> ## AND THE CORE FITS A CYCLONE V — BUT DOES NOT RELIABLY CLOSE TIMING.**
 > ## Download -> boot -> select -> the extended wheel -> a tenant picked ->
 > ## a tenant FIGHTING, with its fighter art coming out of SDRAM. Six RTL
 > ## slices (D0-D5), the stock legs green, every control firing — and as of
-> ## 14z-108 it SYNTHESISES, with +206 ALMs and +0.066 ns of slack.
+> ## 14z-108 it SYNTHESISES and FITS, at +206 ALMs — but TWO SEEDS IN FOUR
+> ## MISS TIMING, and the flow's own retry-until-pass hid that.
 > ## **WHAT HAS NEVER HAPPENED IS HARDWARE.** No `.rbf` has been loaded
 > ## onto a DE10-Nano, no MRA has run on real silicon, no analog output
 > ## has been seen. Read those two halves together: the design is proven
 > ## CORRECT in simulation and BUILDABLE on the toolchain, and it has
 > ## never been switched on.
 > ##
-> ## **QUARTUS IS DONE — 14z-108, AND THE ANSWER IS (a): IT FITS AND
-> ## CLOSES TIMING.** Cyclone V 5CSEBA6U23I7, Quartus 20.1.1 Lite via
-> ## `jotego/jtcore20x`, pin `7b9a0d2d`, **`cps2` built FIRST as the
-> ## reference leg**. WIDE costs **+206 ALMs (+1.1%)** and +2,048 memory
-> ## bits; RAM blocks, DSPs and PLLs unchanged; nothing near overflow.
-> ## **SDRAM 96 MHz, slow corner: `cps2` +0.144 ns / `cps2w` +0.066 ns.**
-> ## Zero failing paths, TNS 0.000 everywhere, `.rbf` produced for both.
-> ## **CARRY THIS NUMBER: the SDRAM domain is the critical path in BOTH
-> ## cores and WIDE eats 0.078 ns of the control's 0.144 — over half the
-> ## margin. A PASS, NOT A WARNING, and the figure ANY FUTURE SLICE MUST
-> ## RE-MEASURE.** `cps2` at +0.144 shows the margin was modest already.
+> ## **QUARTUS IS DONE — 14z-108. FIT: YES. TIMING: NOT RELIABLY.**
+> ## Cyclone V 5CSEBA6U23I7, Quartus 20.1.1 Lite via `jotego/jtcore20x`,
+> ## pin `7b9a0d2d`, **`cps2` built FIRST as the reference leg**.
+> ## **FIT IS UNAMBIGUOUS AND GOOD:** +206 ALMs (+1.1%, 44% of 41,910),
+> ## +2,048 memory bits, RAM blocks / DSPs / PLLs UNCHANGED, nothing near
+> ## overflow. That half is settled.
+> ## **TIMING IS A SEED LOTTERY.** Four `cps2w` seeds: +0.066 PASS,
+> ## +0.067 PASS, **-0.110 FAIL**, **-0.545 FAIL**. Two `cps2` control
+> ## seeds: +0.144 and +0.431, both PASS. `cps2w` spreads -0.545..+0.067
+> ## and STRADDLES ZERO; the control spreads +0.144..+0.431, entirely
+> ## above it. The FAILs are jtframe's OWN timing gate, on runs Quartus
+> ## reported as "Full Compilation successful, 0 errors".
+> ## **AND THE REASON ONE BUILD LOOKED HEALTHY: `xjtcore.sh` CALLS
+> ## `jtseed 4`, WHICH RETRIES `--seed $RANDOM` AND BREAKS ON FIRST
+> ## SUCCESS.** A green run does NOT mean the design closes timing — it
+> ## means at least one of up to four random draws closed. **Every future
+> ## "the build passed" from the normal flow carries that caveat.**
+> ## **WHERE IT IS MARGINAL:** every failing path is inside
+> ## `jtframe_sdram64`, terminating at an SDRAM address pin, and the
+> ## worst path RESHUFFLES between seeds (different source register AND
+> ## destination pin each time). So it is not one slow path but the SDRAM
+> ## controller's ADDRESS-GENERATION CONE AS A WHOLE — shared jtframe
+> ## infrastructure the fork does not touch. **NOT WIDE's own logic**;
+> ## WIDE loads that cone enough to lose the lottery, the control keeps
+> ## enough margin to absorb the same variance.
+> ## **WHAT IT DOES AND DOES NOT BLOCK.** It does NOT block shipping by
+> ## itself — we distribute a PREBUILT `.rbf` and the baseline is a
+> ## passing draw. It DOES mean +0.066 is not real headroom: a future
+> ## slice cannot assume it, any rebuild is a lottery, and a jtframe
+> ## uprev or Quartus version change could move it to mostly-failing.
+> ## **Spending margin back (pipelining the SDRAM address path, reducing
+> ## WIDE's load on that cone) is a DESIGN decision under Rule 1 v2 and
+> ## is the MAINTAINER'S — not something to fix by seed-hunting.**
+> ## **A FAILING SEED STILL EMITS AN `.rbf`.** The sweep overwrote
+> ## `release/mister/jtcps2w.rbf` with the WORST failing seed before it
+> ## was restored. **VERIFY THE HASH BEFORE FLASHING:** the passing
+> ## baseline is `46fc74afb6a6c5c6143db64d9c9f5d2e298cdd5c79449bb0370fbe9c2b3df66f`.
 > ##
 > ## **THE OPENER IS NOW HARDWARE — AND IT IS THE MAINTAINER'S, NOT
 > ## MINE.** Synthesis settles BUILDABILITY and nothing else: no `.rbf`
@@ -54,15 +81,12 @@
 > ## and a frame compared PROGRAMMATICALLY against MAME's (never — the
 > ## committed select-screen images are a naked-eye pair, not a verdict).
 > ##
-> ## **PENDING OFF-MACHINE: a FITTER SEED SWEEP** (3 `cps2w` seeds + 1
-> ## `cps2` control), maintainer-approved 2026-08-25 and running on the
-> ## Windows box. It exists because the attribution showed `cps2w` has
-> ## FIVE bank-arbitration paths inside 0.065 ns where the control has ONE
-> ## outlier with a 0.27 ns gap behind it, and the dominant delay term is
-> ## ROUTING to a pin — which is exactly what varies between seeds. A
-> ## single-seed +0.066 ns is least informative in that configuration. The
-> ## control seed is the one to keep if only some run: without it a
-> ## `cps2w` spread cannot be told from a TOOL spread.
+> ## **THE SEED SWEEP IS DONE and is what produced the finding above.**
+> ## It was commissioned because the attribution showed a five-path
+> ## cluster at the limit on a term that is ROUTING. That reasoning was
+> ## right and a single build would never have shown it. **More seeds are
+> ## cheap (~12 min each) if the failing fraction is ever worth pinning
+> ## down properly; with n=4 no pass RATE is quoted.**
 > ##
 > ## **QUEUED, ONE FORK COMMIT: `cores/cps2w/README.md` IS STALE.** It
 > ## still says "Status: slice D1" and calls D2-D4 "not here yet", with a
