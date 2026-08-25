@@ -188,6 +188,62 @@ Quartus is Linux/Windows only, so it cannot run on this Mac. Also still
 never: the QSound extension heard, the scroll path with a wide GFX map, and
 any frame compared programmatically against MAME's.
 
+### AND THE TENANT FIGHTS *CORRECTLY* — THE §4 ORACLE ON AUTHORED CONTENT
+
+**Fetching art is plumbing; this is the first evidence the tenant BEHAVES.**
+CLAUDE.md §4 requires new-character content — for which no vanilla oracle can
+exist — to agree with a second implementation on mapped gameplay state at
+sync anchors. That protocol had never been run on tenant content against the
+core. It has now, and it AGREES.
+
+`36_pick_tenant_cell`, the WIDE romset, MAME against `cps2w` under Verilator,
+both dump sets integrity-checked (301 and 351 frames):
+
+| | anchor | |
+|---|---|---|
+| MAME | **2886** | |
+| sim (absolute) | **3546** | |
+| skew | **660** | = the 659-frame WIDE transfer **PLUS ONE** |
+
+**THAT +1 IS A RESULT IN ITSELF.** The legacy replay shows skew 463 on a
+462-frame transfer — also +1. Two different replays, two different romset
+sizes, the same one-frame offset: **the boot-phase difference between MAME
+and the core is a CONSTANT, not a function of the content.**
+
+**P1 IS THE TENANT ON BOTH SIDES, byte-identical:**
+
+| field | MAME @2886 | `cps2w` @3546 | |
+|---|---|---|---|
+| `p1_hitbox_base` | `0x003FA9D0` | `0x003FA9D0` | the RELOCATED tenant record, in `wide_ext` |
+| `p1_ptr64` | `0x003FA790` | `0x003FA790` | likewise |
+| `p1_hp` / `p2_hp` / `p1_white_hp` | `0x0120` | `0x0120` | |
+| timer / `p1_x` / `p1_y` / meter / word132 | — | — | all agree |
+| `p2_hitbox_base` | `0x000ABD74` | `0x0009769E` | **EXCLUDED BY NAME** |
+
+**The core did not merely fetch tenant tiles — it LOADED THE TENANT'S
+RELOCATED CHARACTER RECORD from above `CPU:$400000` and ran the match on it.**
+`compare_fields` reports "all compared fields agree".
+
+**THE ONE DISAGREEMENT IS THE DOCUMENTED ONE, AND ITS BEING LIVE IS USEFUL.**
+`p2_hitbox_base` differs because the CPU opponent is a SOUND-STATE-FED lottery
+(`ram.md:99`, the #110 mechanism) — the same class as the legacy anchor's
+`$0AE9D4` vs `$0A9518`. It is in the skip list for a measured reason. That it
+FIRES here proves the field set is not passing vacuously.
+
+**THE COMPARISON WAS PROVEN ABLE TO FAIL BEFORE ITS PASS WAS BELIEVED.** The
+first control tried was a byte-swap of the sim dumps — it "fired", but for the
+wrong reason: the swapped data has NO ANCHOR, so the field comparison never
+ran at all. **A control that never reaches the code under test is not a
+control.** Replaced with a perturbation of the TIMER — compared, but not an
+input to the anchor predicate — which keeps both anchors intact and is then
+caught and NAMED at all three follow offsets. Both controls are in the gate.
+
+**CAPTURED AS A GATE**, per the persistent-suite doctrine:
+`tests/test_mister_tenant_oracle.sh` (emulator tier, ~65 min), with the
+anchors and skew frozen, the tenant-record assertion on both legs, and the two
+controls above plus a third that removes the skip list and requires the legs
+to disagree.
+
 ### THE CORE SYNTHESISES, FITS AND CLOSES TIMING — MEASURED ON QUARTUS
 
 **The largest unknown in the arc is answered, and the answer is (a): `cps2w`
