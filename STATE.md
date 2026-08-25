@@ -219,6 +219,17 @@ is confidently wrong.
 
 ### RITUAL
 
+- **SCRATCH HYGIENE: the 14z-107 direction evidence is SWEPT, 503 MB.**
+  `docs/NEXT_SESSION.md` at the 14z-107 close said to keep
+  `/tmp/vs14z107_*` — leg E's 811 work-RAM dumps, the MAME comparison legs
+  and the two rendered frames — **until the direction fix was verified**.
+  It is verified (all four directions match MAME post-fix), and the finding
+  those dumps supported has been SUPERSEDED by the four-direction
+  measurement, which has its own evidence. Swept after confirming the two
+  rendered frames are committed under `docs/project/images/` (they are, and
+  `git ls-files` says so — the durable copies, per rule 7 the dumps
+  themselves could never be). `/tmp/vampire-saved-jtsim-14z108` was left
+  alone: it is the live simulation clone.
 - **THE ROLLOVER EXECUTED, exactly as the 14z-107 CLOSE (final) specified
   it**: the 14z-107 sub-entries **(1)-(9)**, nine sections and 1,582 lines,
   moved BYTE-VERBATIM to the top of `STATE_HISTORY.md`'s body. Verified
