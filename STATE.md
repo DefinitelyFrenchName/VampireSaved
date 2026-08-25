@@ -86,6 +86,29 @@ ran. **A control that never reaches the code under test is not a control.**
 - **THREE MAINTAINER RULINGS** taken and marked DECIDED in place: the
   timing-margin response, MiSTer packaging (option A now, B later), and the
   field test scheduled.
+- **A STANDING WARNING I BROKE THREE TIMES TODAY, recorded because the
+  pattern is the point.** "Do not touch the tree while something long is
+  reading it" exists because `sh` reads scripts by byte offset — and while I
+  never edited a script mid-run, I edited STATE.md/HANDOFF.md under a running
+  `run_all_static.sh` three separate times, each of which made the suite
+  report the working tree as DIRTIED. Harmless every time (the gates were
+  clean; the dirt was mine), which is exactly why it kept happening: a
+  warning whose violation is usually harmless is one that erodes. The
+  discipline that actually works is the one 14z-107 used — **commit first,
+  then run the suite, then do not type until it finishes.**
+- **SCRATCH HYGIENE — one clone DELIBERATELY KEPT, against the 14z-107
+  precedent.** `/tmp/vampire-saved-jtsim-14z108` (1.3 GB) is rebuild litter by
+  the project's own standard and 14z-107 swept eleven such clones. **It is
+  kept because a FIELD TEST is imminent and any surprise from it is most
+  cheaply diagnosed by a follow-up simulation**, which this clone makes
+  immediate instead of costing a full ROM build first. Stated rather than
+  left silent so it is a decision and not an omission; sweep it once the
+  field test has reported. The session scratchpad (163 MB of dumps, probe
+  logs and comparison legs) is ephemeral by construction and every
+  conclusion drawn from it is in this entry or the live docs.
+  **`../mister_fieldtest_14z108/` (28 MB) is DURABLE and must not be swept**
+  — it is the field-test bundle, and it lives outside the repo because it
+  carries ROM content (rule 7).
 
 ## Session 14z-108 — **THE SIM HARNESS'S DIRECTION BITS WERE REVERSED END FOR
 ## END, NOT TRANSPOSED IN TWO — measured on all four before one bit was
