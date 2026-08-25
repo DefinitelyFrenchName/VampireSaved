@@ -101,3 +101,12 @@ test_mister_page
 # a probe whose HI records sit below $400000 (the defect the first draft
 # shipped with). ROM-free, no emulator, ~3 s.
 test_mister_prg_probe
+
+# test_mra_parts — ground truth for tools/check_mra_parts.py. jtframe resolves
+# zip members by CRC32 ALONE and 0xFF-FILLS a part it cannot resolve rather
+# than refusing, so an MRA can look complete and hand the machine a holed ROM.
+# The checker's verdict logic is exercised on fixtures whose answer is known by
+# construction: a clean resolve, plus THREE refusals — one bogus CRC (named in
+# the report, not just counted), an absent zip, and the count excluding inline
+# literal parts. ROM-free, ~1 s.
+test_mra_parts

@@ -29,7 +29,35 @@
 > ## survives real SDRAM, real timing and the analog chain.
 > ## **IF IT DOES NOT BOOT, report the failure MODE** — black screen vs
 > ## RAM-test pattern vs a boot loop and its period. A ~1,580-frame loop is
-> ## what the pre-D5 decryption bug looked like.
+> ## what the pre-D5 decryption bug looked like (**= about 26.5 s at the
+> ## real 59.6374 Hz — a stopwatch is a valid instrument for this**).
+> ##
+> ## **UPDATED 14z-109: THE BUNDLE NOW CARRIES A NEGATIVE CONTROL AND A
+> ## TRIAGE CARD.** The field test was about to be run WITHOUT a control,
+> ## which by this project's own standard is not a measurement.
+> ## `_Arcade/Vampire Savior (Japan 970519) [STOCK CONTROL].mra` runs stock
+> ## `vsavj` on the SAME `.rbf` with the profile bit left at the `0xFF`
+> ## fill, so **"does STOCK boot?"** separates a fault in our profile from
+> ## one in the bitstream, the card, the SDRAM module or the video chain.
+> ## `games/mame/vsavj.zip` added (1.5 MB); the control ALSO needs the
+> ## maintainer's PRISTINE `vsav.zip` in place of the bundled patched one.
+> ## **MEASURED, not assumed: against the bundle as shipped that MRA loses
+> ## 8 of its 22 parts** — the four patched art members AND four program
+> ## members — and unresolved parts are `0xFF`-filled rather than refused,
+> ## so it would "run" and show nonsense. Both configurations were then
+> ## checked part-by-part: **WIDE 31/31 resolve, STOCK 22/22 after the
+> ## swap.** New `tools/check_mra_parts.py` + gate `tests/test_mra_parts.sh`
+> ## (ci_portable, verdict logic ground-truthed with three refusals).
+> ## `FIELD_TRIAGE.txt` is the symptom -> meaning -> next-action card.
+> ## **AND THE BUNDLE README'S ITEM 5 WAS STALE AND IS FIXED** — it still
+> ## called the identical 128 KB "scroll tilemap", still said the
+> ## layer-enable registers were undocumented, and still invited the
+> ## maintainer to treat a wrong-looking background as "the first hard
+> ## evidence either way". All three were corrected LATER in 14z-108 than
+> ## the README was written. **The bundle lives OUTSIDE the repo, so the
+> ## retraction-discipline grep over `docs tests` could never have found
+> ## it** — when a claim is corrected, the sweep has to cover artifacts
+> ## that have already left the tree.
 > ##
 
 > ## **START HERE. THE ARC IS MiSTer. A TENANT HAS FOUGHT ON THE CORE,

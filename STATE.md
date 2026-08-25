@@ -487,6 +487,15 @@ documented** — `grep` for layer control across the atlas and
 `engine_internals.md` returns nothing. That is the gap to close before the
 window can be judged, and it is now the concrete next step for the video
 question rather than "compare frames somehow".
+**[RESOLVED LATER THE SAME SESSION — both halves of this paragraph are
+answered by the two subsections immediately below, and it is kept only as
+the reasoning that got there. The registers ARE now documented
+(`atlas/ram.md`, "CPS-2 VIDEO REGISTERS"): at the match anchor
+`layer_control 0x2d0e`, all three scroll layers ENABLED. And the control
+this paragraph called for WAS run: the difference is NOT ours — stock
+`vsavj` on a legacy replay reproduces the same pattern and magnitudes, so
+VRAM is not a viable cross-implementation video oracle at all. Do not act
+on "the gap to close" above; it is closed. Marked 14z-109.]**
 
 ### THE QSOUND EXTENSION IS FETCHED ON THE CORE — the last zero-coverage subsystem
 
