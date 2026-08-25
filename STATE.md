@@ -8,7 +8,13 @@
 ## implementations, and the gate rebuilt with a per-direction lock and a
 ## must-fire control. **One of the two frozen expectations the record said
 ## would move DID NOT MOVE AND COULD NOT** — which also means the frozen sim
-## anchor could not move. Obj bank 4 is unblocked and running.
+## anchor could not move. **AND THE PAYOFF LANDED THE SAME SESSION: OBJ BANK 4
+## — THE FIGHTER ART — IS FETCHED FOR THE FIRST TIME ON ANY FPGA
+## IMPLEMENTATION, 843 OF ITS TRAFFIC FRAMES INSIDE A MATCH. A TENANT HAS
+## FOUGHT ON THE CORE.** Bank 1 under load answered from the same run and it
+## is GO. **Still never: HARDWARE — and no Quartus synthesis has ever been
+## run, so resource fit and timing closure are unknown. That is now the
+## largest gap in the arc.**
 
 **The opener, and it was the whole point of doing it in the stated order.**
 `docs/NEXT_SESSION.md` said: measure all four directions BEFORE changing
@@ -112,6 +118,75 @@ rate to one bank at a time. Validated by construction on synthetic logs
 sample that must be dropped, and is; 3 real WARNING lines counted as 3, the
 same text as prose counted as 0), and the default path still reproduces the
 frozen 14z-107 table unchanged.
+
+### THE PAYOFF: A TENANT HAS FOUGHT ON THE CORE
+
+`tests/test_mister_gfxc_fetch.sh --rpl tests/replays/36_pick_tenant_cell.rpl
+--frames 4400` — **PASS in full**, both halves, both controls, 93m26s a leg.
+
+| probe | window | reads | distinct codes | first frame | codes | frozen extent |
+|---|---|---|---|---|---|---|
+| p0 **obj bank 4, FIGHTER art** | ba1 `800000` | **9,388,928** | **1,735** | 1781 | `0xAD8F-0xEE42` | `0xEE73` INSIDE |
+| p1 obj bank 5, wheel art | ba0 `7E0000` | 19,246,336 | 206 | 1556 | `0x74D6-0xFE41` | `0xFFDB` INSIDE |
+
+**Obj bank 4 had never been non-zero on any core.** 843 of its 2,331 traffic
+frames are AFTER match start (absolute 3559 = MAME's replay-frame ~2900 plus
+the 659-frame WIDE transfer), running to the replay's last frame.
+
+**THE COHERENCE IS THE EVIDENCE, more than either count.** The two group-C
+probes behave according to their CONTENT: the wheel art stops at the
+select/VS boundary (last traffic frame 3498, zero after) and the fighter art
+carries through the match. A promote addressing the wrong thing does not
+produce that split.
+
+**THE CONTROL LEG READS ZERO** from both group-C windows — the SAME `.rom`
+with header byte 41 `0xFE`->`0xFF`, one byte, the runtime profile bit — while
+still issuing 105,418,104 reads in bank 3, and its working set is the LOOPING
+boot's 263 distinct blocks against the positive leg's 6,208. So the zero is
+about the profile, not about the probe.
+
+**AND THE REPLAY WAS CONFIRMED ON MAME FIRST**, before 2.5 hours of
+simulation were spent on it: `36_pick_tenant_cell` on the WIDE romset under
+the source-built MAME reaches **P1 `+0x382 = 0x13`** — the tenant's native
+vs2 id — with hitbox base `+0x60.l = 0x03FA9D0` (relocated tenant data) and
+the match live from replay frame ~2900. So a zero from the sim would have
+been a finding about the CORE, not about the replay. That is the
+rig-produces-the-real-event discipline, applied before the cost was paid
+rather than after.
+
+### BANK 1 UNDER LOAD: ANSWERED FROM THE SAME RUN, AND IT IS GO
+
+`--stats` on the fetch gate's legs (14z-108) means the tenant match answers
+`mister_core.md` §12's other open question without a third 70-minute run.
+Whole run, 3,738 post-transfer frames:
+
+| bank | acc/frame | peak | % ceiling at peak |
+|---|---|---|---|
+| ba0 | 40,985 | 54,363 | 43.9% |
+| **ba1 (PCM + group-C obj bank 4)** | 11,905 | **15,496** | **12.5%** |
+| ba2 | 149 | 3,336 | — |
+| ba3 | 3,765 | 6,161 | — |
+
+**ZERO `SDRAM reads clashed` warnings in 3,738 frames.** The 14z-107 (12) run
+measured ba1 at 13,890/frame with PCM ALONE (it picked Demitri); the tenant's
+fighter art now shares the bank and adds ~1,600 accesses/frame at peak
+without contending. **The repack's bank-1 half is GO on measurement.**
+Caveat: ONE replay, ONE tenant, one opponent.
+
+### WHAT IS STILL NEVER
+
+**HARDWARE.** Nothing in this lane has left Verilator, and — recorded here
+because it had never been named as a gap — **no Quartus synthesis has ever
+been run on any slice**, so neither RESOURCE FIT nor TIMING CLOSURE is known
+for `cps2w` or, for that matter, for the reference `cps2` on the same
+toolchain. Functional simulation says nothing about either. That is now the
+largest unknown in the arc and it needs no hardware to answer: Jotego ships
+the toolchain as a Docker image (`jotego/jtcore20x`,
+`.github/workflows/q20.yaml:51`), so `xjtcore.sh cps2w mister` plus the same
+for `cps2` as the REFERENCE LEG produces fmax and utilisation for both.
+Quartus is Linux/Windows only, so it cannot run on this Mac. Also still
+never: the QSound extension heard, the scroll path with a wide GFX map, and
+any frame compared programmatically against MAME's.
 
 ### RITUAL
 

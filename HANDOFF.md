@@ -195,9 +195,15 @@ TENANT WHEEL ART** — 105 distinct group-C tile codes out of obj bank 5, with
 the control leg at zero, and a rendered select screen showing the extended
 wheel and the authored "M6" mark
 (`docs/project/images/mister_select_cps2w_f2400.jpg`, beside MAME's
-`mister_select_mame_f1741.png`). **Do not read more into it than that: obj
-bank 4 — the FIGHTER art — has never been fetched, NO TENANT HAS EVER FOUGHT
-ON THE CORE, and nothing in this lane has ever run on HARDWARE.** The reason
+`mister_select_mame_f1741.png`). **AND SINCE 14z-108 A TENANT HAS FOUGHT ON THE CORE**: with the input path
+fixed, `36_pick_tenant_cell` over 4,400 frames fetches **obj bank 4 — the
+FIGHTER art — 9,388,928 reads over 1,735 distinct tile codes, 843 frames of
+them AFTER match start**, every code inside the frozen extent, with the
+control leg at zero on both group-C windows. `test_mister_gfxc_fetch` PASSES
+in full, and the same run answered bank 1 under load (peak 15,496 acc/frame,
+12.5% of ceiling, ZERO clashes). **What is still never: HARDWARE — nothing in
+this lane has ever left Verilator, and no Quartus synthesis has ever been run,
+so neither resource fit nor timing closure is known.** The reason
 bank 4 is still zero is the HARNESS, not the RTL: the simulator's direction
 bits were **REVERSED end for end** — measured in full 14z-108 against the
 game's own `$FF8058` mirror, all four directions, on a four-direction probe

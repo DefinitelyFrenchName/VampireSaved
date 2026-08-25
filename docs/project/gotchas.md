@@ -2988,3 +2988,37 @@ mention it in a brief).
 **Sibling:** sweep leftover `obj_dir/sim` processes at session end — the
 simulation lane is the one thing here that reliably leaves orphans.
 
+## macOS's awk HAS NO `and()` OR `strtonum()`, AND A GATE CHECK THAT USES THEM PASSES BY ERRORING (2026-08-25, 14z-108)
+
+**The shape, which is the dangerous part.** A gate check was written as
+
+    if awk '{ if (and(strtonum("0x" $0), 0xf0)) c++ } END { exit (c ? 0 : 1) }' "$f"; then
+        bad "the file DOES set a direction bit"
+    else
+        ok  "the file sets no direction bit"
+    fi
+
+`and()` and `strtonum()` are **GAWK** builtins. macOS ships BWK awk ("one true
+awk", version 20200816), where `and` is an undefined function: awk prints
+`calling undefined function and` to stderr and **exits 2**. Non-zero, so the
+`else` arm runs, so the check REPORTS SUCCESS. It passed on the first run and
+would have passed on every future run, on a property it never evaluated.
+
+**How it was caught: by writing the POSITIVE CONTROL before trusting the
+check.** Feeding it a file that demonstrably DOES contain the bit still
+produced "pass" — and the stderr said why. Cost: minutes, because the control
+was written first. Cost if it had shipped: a frozen expectation defended by a
+check that cannot fail, which is worse than no check.
+
+**RULES.**
+1. **Never use `and`/`or`/`xor`/`strtonum`/`gensub` in this repo's shell
+   gates.** They are gawk-only. Use `python3` — it is already a hard
+   dependency of every gate here — or POSIX awk arithmetic.
+2. **A shell `if` on a command's exit status treats a CRASH as the FALSE
+   branch.** Any check written as `if <tool> ...; then bad; else ok; fi` reads
+   tool failure as evidence of success. Prefer capturing the value and
+   comparing it (`n="$(...)"; [ "$n" = 0 ]`), so a crash produces an empty
+   string and fails the comparison instead of silently satisfying it.
+3. This is THE INSTRUMENT PROTOCOL's "prove it FAILS before its first real
+   use", in its cheapest possible form. The protocol paid for itself the same
+   session it was applied.

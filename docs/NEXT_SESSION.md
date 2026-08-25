@@ -1,220 +1,133 @@
-# NEXT SESSION — orientation (rewritten at the 14z-107 CLOSE (final), 2026-08-24)
+# NEXT SESSION — orientation (rewritten at the 14z-108 CLOSE, 2026-08-25)
 
-> ## **START HERE. THE ARC IS MiSTer. SIX RTL SLICES ARE IN (D0-D5), THE
-> ## WIDE ROMSET BOOTS ON THE CORE, DRAWS OUR SELECT SCREEN AND FETCHES
-> ## OUR WHEEL ART — AND NO TENANT HAS EVER FOUGHT ON IT.**
-> ## Read those two halves together. The core reaches the select screen,
-> ## 105 distinct group-C tile codes come out of obj bank 5 with the
-> ## control leg at zero, and there is a rendered frame of the extended
-> ## wheel with the authored "M6" mark on it
-> ## (`docs/project/images/mister_select_cps2w_f2400.jpg`, beside MAME's
-> ## `mister_select_mame_f1741.png` — a naked-eye pair, not a verdict).
-> ## **Obj bank 4 — the FIGHTER art — has never been fetched, no tenant
-> ## has ever been in a match on the core, no frame has been compared
-> ## programmatically against MAME's, and nothing in this lane has ever
-> ## run on HARDWARE.** `docs/project/mister_core.md` §12 is the honest
-> ## ledger of what has never been tried; read it before planning any
-> ## measurement.
+> ## **START HERE. THE ARC IS MiSTer. A TENANT HAS FOUGHT ON THE CORE —
+> ## THE FUNCTIONAL CHAIN IS COMPLETE IN SIMULATION, END TO END.**
+> ## Download -> boot -> select -> the extended wheel -> a tenant picked ->
+> ## a tenant FIGHTING, with its fighter art coming out of SDRAM. Six RTL
+> ## slices (D0-D5), the stock legs green, every control firing.
+> ## **AND NOTHING HAS EVER BEEN SYNTHESISED.** Read those two sentences
+> ## together; the second is the whole of what is left.
 > ##
-> ## **THE OPENER: FIX THE SIMULATOR'S DIRECTION BITS.**
-> ## They are TRANSPOSED. Measured against the game's own input mirror
-> ## `RAM:$FF8058.w` on `36_pick_tenant_cell` (`cps2w` + the WIDE romset,
-> ## 811 integrity-checked work-RAM dumps): a replay asking for **Left**
-> ## arrives as `0x0004` (Down) and a replay asking for **Down** arrives
-> ## as `0x0002` (Left), where MAME reads the requested bit both times.
-> ## The bits ARRIVE and are PERMUTED — they are not lost, and 12 of the
-> ## 811 frames carry a direction, exactly the count the replay scripts.
-> ## Full write-up: `docs/platform/mister.md` "THE SIMULATED JOYSTICK'S
-> ## DIRECTIONS ARE TRANSPOSED"; index entry in `docs/platform/gotchas.md`.
+> ## **THE OPENER: RUN QUARTUS. IT NEEDS NO HARDWARE.**
+> ## No slice has ever been through a fitter or a timing analyser, so
+> ## **neither RESOURCE FIT nor TIMING CLOSURE is known** — not for
+> ## `cps2w`, and not for the reference `cps2` on the same toolchain.
+> ## Verilator proves behaviour and says NOTHING about either. D2 added a
+> ## seven-slot arbiter to bank 0, D3 widened a bank through the whole
+> ## fetch chain, D4 widened address paths, D5 inserted a stage into the
+> ## decrypt path: every one of those is a plausible fmax cost on a
+> ## Cyclone V, and none has been costed.
+> ## **YOU DO NOT NEED TO INSTALL QUARTUS.** Jotego ships the toolchain as
+> ## a Docker image — `.github/workflows/q20.yaml:51`:
+> ##     docker run --rm -v ${PWD}:/jtcores jotego/jtcore20x \
+> ##            xjtcore.sh cps2w mister
+> ## **RUN `cps2` THE SAME WAY. IT IS NOT OPTIONAL.** jtcps2 is a large
+> ## core and may already be tight upstream; without the reference leg a
+> ## timing failure on `cps2w` cannot be attributed to our slices. The
+> ## four verdicts to distinguish: (a) fits and closes; (b) misses, and
+> ## `cps2` misses too -> INHERITED; (c) misses and `cps2` closes -> OURS;
+> ## (d) does not fit -> name the resource that overflowed.
+> ## **QUARTUS IS LINUX/WINDOWS ONLY — it cannot run on the dev Mac**, and
+> ## the image is x86-64, so an ARM Mac would emulate it uselessly slowly.
+> ## The maintainer has a Windows box (Ryzen 9 3900X / 32 GB) for this.
+> ## **NOTHING NEEDS COPYING**: the fork is public and the pin is exact
+> ## (`git checkout 7b9a0d2d`), synthesis needs no ROM and no VampireSaved
+> ## repo. A briefing document for a session on that machine was written
+> ## at the 14z-108 close — its hard constraint is **MEASURE AND REPORT,
+> ## DO NOT MODIFY RTL**: retiming a path is a design decision governed by
+> ## Rule 1 v2 and is the maintainer's to ratify.
 > ##
-> ## **DO IT IN THIS ORDER, AND DO NOT SKIP STEP 1.**
-> ## **(1) MEASURE ALL FOUR DIRECTIONS BEFORE CHANGING ANYTHING.** What
-> ## exists is TWO data points. **Up and Right are untested.** The
-> ## inference on the table — `tools/rpl2siminputs.py` emits bits 4-7 as
-> ## U/D/L/R per its own docstring while the harness consumes U/L/D/R,
-> ## which swaps Down and Left and leaves Up and Right alone — fits both
-> ## points and is still an inference. Author a four-direction replay,
-> ## dump work RAM across the presses, read `$FF8058.w` on both
-> ## implementations, and let the measurement name the permutation.
-> ## **(2) THE FIX MOVES TWO FROZEN EXPECTATIONS.**
-> ## `tests/test_rpl2siminputs.sh` freezes the bit-map vector
-> ## **`111 6ee 000 000 080`** (check 1) and the sha1 of the
-> ## `05_timeout_idle` translation
-> ## **`eb3e1d04e58b3a2b7bf713d40c4d6ac4796e550c`** (check 3). A bit-map
-> ## fix moves BOTH. **Re-derive them DELIBERATELY, with the mechanism
-> ## named in the gate header** — a frozen expectation that moves
-> ## silently is exactly the failure this project has a rule against.
-> ## Everything downstream of `sim_inputs.hex` shifts with it, so re-run
-> ## `test_mister_sim_anchor` afterwards and expect to defend the anchor,
-> ## not to assume it.
-> ## **(3) THEN RUN THE TENANT MATCH, ONCE, FOR TWO ANSWERS AT A TIME.**
-> ## `tests/test_mister_gfxc_fetch.sh`'s FIGHTER half (obj bank 4) is the
-> ## first — the last thing between this arc and "a tenant fighter drawn
-> ## on the core". The SAME run also answers `mister_core.md` §12's
-> ## "bank 1's group-C half under load": the 14z-107 (12) bank-load run
-> ## picked Demitri, so ba1's 13,890 accesses/frame were PCM ALONE, and
-> ## the repack risk the instrument was actually built for — obj fetches
-> ## interleaving with the QSound stream INSIDE bank 1 — is still
-> ## unmeasured. Run `audit_sdram_bank_load --core cps2w --wide` on the
-> ## tenant replay and both fall out together.
+> ## **WHAT 14z-108 MEASURED, so it is not re-measured.**
+> ## **(1) THE SIM HARNESS'S DIRECTION BITS WERE REVERSED END FOR END**,
+> ## not transposed in two. Measured on ALL FOUR against the game's own P1
+> ## mirror `RAM:$FF8058.w` (`tests/replays/107_four_directions.rpl`,
+> ## attract-only on STOCK `vsavj`, MAME vs `cps2w`, both dump sets
+> ## integrity-checked): Up arrived as Right, Down as Left, Left as Down,
+> ## Right as Up. 14z-107 (12) had two data points and inferred a two-bit
+> ## SWAP leaving Up and Right untouched — **that was wrong, and a two-bit
+> ## fix would have left half the defect in the tree.** Mechanism:
+> ## `test.cpp:380` copies file bits 4-7 straight onto `joystick1[3:0]`
+> ## and jtframe's port is MSB-FIRST (`jtframe_keyboard.v:107-110`), so
+> ## the file map is `bit4=Right bit5=Left bit6=Down bit7=Up`. Fault is
+> ## OURS, not jtframe's — one dict in `tools/rpl2siminputs.py`, no fork
+> ## commit, no RTL. **The fork pin is unchanged at `7b9a0d2d`.**
+> ## **(2) A TENANT FIGHTING.** `test_mister_gfxc_fetch --rpl
+> ## 36_pick_tenant_cell --frames 4400` PASSES in full: obj bank 4
+> ## **9,388,928 reads / 1,735 distinct codes `0xAD8F-0xEE42`**, 843
+> ## traffic frames after match start; obj bank 5 206 codes; both inside
+> ## their frozen extents; the control leg (header byte 41 `0xFE`->`0xFF`)
+> ## at ZERO on both windows while still reading 105 M in bank 3.
+> ## **(3) BANK 1 UNDER LOAD: GO.** Same run, `--stats`: ba1 peaks at
+> ## 15,496 acc/frame (**12.5%** of ceiling) with the fighter art sharing
+> ## the bank with QSound, and **ZERO `SDRAM reads clashed` in 3,738
+> ## frames**. ba0 peaks 54,363 (43.9%), unchanged from stock.
 > ##
-> ## **THE ARC'S HEADLINE, AND IT IS METHODOLOGICAL: SEVEN INSTRUMENT AND
-> ## HARNESS DEFECTS HAVE BEEN FOUND IN THIS LANE, AND EVERY ONE OF THEM
-> ## WOULD HAVE READ AS AN RTL FAULT.** The Verilator SDRAM model dropping
-> ## `addr[22]`; the forked frame writer `exit(0)`-ing and REWINDING the
-> ## parent's `sim_inputs.hex`; `SimInputs` holding P1's AND P2's buttons
-> ## 5 and 6 down; the RAM-dump hook hard-coded to an SDRAM address a
-> ## placement slice had MOVED; the program probe splitting its window on
-> ## `rom_addr[21]` (which is `A[21]`); the verdict tool scoring only the
-> ## RAW word and reporting "D4 WORKS" over ten fetches the CPU received
-> ## as garbage; and now the transposed directions. Four of the seven are
-> ## the INPUT PATH, and three of those four were invisible until a replay
-> ## first needed the feature — **the sim input path is only ever as
-> ## tested as the last replay that used it.**
-> ## **D5 IS THE COUNTER-EXAMPLE, AND IT IS WHY THE RULE IS "SUSPECT",
-> ## NOT "BLAME".** There the RTL genuinely was at fault: the CPS-2 key's
-> ## encrypted-opcode RANGE word is stored COMPLEMENTED (`~decoded[9] &
-> ## 0x3ff` in MAME and FBNeo) and `jtcps2_dec_ctrl.v:44` compares against
-> ## it UNCOMPLEMENTED, so the reference core decrypts opcode fetches to
-> ## `CPU:$F03FFF` where the two emulators stop at `$0FFFFF`. Invisible
-> ## for the core's whole life because no stock CPS-2 game executes above
-> ## the window — **CPS-2 WIDE is the first thing ever to put executable
-> ## code there.** Fixed PROFILE-GATED (`cores/cps2w/hdl/jtcps2_decrypt.v`,
-> ## `rng_eff = wide_en ? { addr_rng[15:10], ~addr_rng[9:0] } : addr_rng`)
-> ## so `jtcps2_dec_ctrl` is left exactly as it was and the stock leg
-> ## stays a true control: the buggy path is unreachable on stock content,
-> ## so gating costs nothing and buys a clean reference. **Framing ruled
-> ## by the maintainer 2026-08-24: a LATENT IMPLEMENTATION DIVERGENCE, not
-> ## a defect** — no software in thirty years created the condition that
-> ## exposes it. **And note what it rests on** (`mister_core.md` §12): that
-> ## real CPS-2 SILICON decrypts only the first 1 MB is INFERRED, never
-> ## measured, and MAME and FBNeo share one research heritage rather than
-> ## being two independent witnesses.
+> ## **THE ANCHOR DID NOT MOVE, AND THAT WAS PROVEN RATHER THAN ASSUMED.**
+> ## `test_rpl2siminputs` freezes two values and the record said a bit-map
+> ## fix moved BOTH. **It moved one.** `05_timeout_idle` scripts NO
+> ## direction token, so its sha1 `eb3e1d04…` cannot change — and since
+> ## that is `test_mister_sim_anchor`'s replay, its `sim_inputs.hex` is
+> ## byte-identical across the fix and the frozen anchor (MAME 2146 / sim
+> ## 2609 / skew 463) **could not move**. The 45-minute gate was NOT
+> ## re-run, and the gate header states that as the reason. Corrected in
+> ## five documents.
 > ##
-> ## **TWO STANDING WARNINGS. BOTH PAID FOR REPEATEDLY IN THIS SESSION.**
-> ## **(1) SUSPECT THE INSTRUMENT BEFORE THE RTL.** Seven times now. Never
-> ## blame a red anchor on RTL until a core-vs-core RAM comparison says so
-> ## — that is `tests/test_mister_wide_inert.sh`'s job; the anchor gate is
-> ## a cross-IMPLEMENTATION oracle and a poor inertness test. And any
-> ## instrument naming a PHYSICAL address is invalidated by a memory-map
-> ## change. The protocol distilled from all of it is
-> ## `docs/project/gotchas.md` "THE INSTRUMENT PROTOCOL": the author of an
-> ## instrument cannot judge its own output; prove it FIRES and prove it
-> ## FAILS before its first real use; log the raw quantity beside the
-> ## classification so the instrument can be caught disagreeing with
-> ## itself; a hard-coded physical constant is a check with an unwritten
-> ## expiry date.
-> ## **(2) NEVER EDIT A SCRIPT WHILE A RUN IS IN FLIGHT.** `sh` reads by
-> ## BYTE OFFSET, so even a COMMENT-ONLY edit derails the running
-> ## interpreter (`unexpected token 'else'`, `unexpected EOF`). Paid three
-> ## times in 14z-107, costing three 45-minute simulations and two gate
-> ## verdicts. The MEASUREMENTS usually survive — the Verilator run is a
-> ## separate process and has already written its dumps into the scratch
-> ## clone, so copy `cores/<core>/ver/game/{wram,sdram_bank?.bin}` out by
-> ## hand rather than paying the download again — and reverting the edit
-> ## AT ONCE re-aligns the interpreter for any run that has not yet
-> ## resumed reading. Freeze `tests/*.sh` and `tools/*.sh` before
-> ## launching anything long. Related: **`pgrep -f` waiters match their
-> ## OWN command line and never exit** — wait on a recorded PID with
-> ## `kill -0`, or on a marker file (`docs/project/gotchas.md`).
+> ## **STANDING WARNINGS. ALL PAID FOR AGAIN THIS SESSION.**
+> ## **(1) SUSPECT THE INSTRUMENT BEFORE THE RTL** — the count is now
+> ## EIGHT, and 14z-108 added four more caught BEFORE use, all in one new
+> ## analysis block: cumulative counters read as per-interval; a
+> ## picosecond timestamp read as an index; a clash counter matching this
+> ## report's OWN PROSE about clashes; and a "peak" that was the ROM
+> ## DOWNLOAD on all four banks at once. A fifth — a `05`-independence
+> ## check that PASSED because gawk's `and()`/`strtonum()` do not exist on
+> ## BWK awk, so awk exited 2 and the `else` arm read as success — was
+> ## caught only by writing its positive control first. **THE INSTRUMENT
+> ## PROTOCOL (`docs/project/gotchas.md`) IS THE MOST LOAD-BEARING
+> ## DOCUMENT IN THIS LANE.**
+> ## **(2) NEVER EDIT A SCRIPT WHILE A RUN IS IN FLIGHT** — `sh` reads by
+> ## byte offset. `tests/` and `tools/` were frozen for the whole 2.5-hour
+> ## tenant run and all edits were made before it launched.
+> ## **(3) CONFIRM THE RIG ON MAME BEFORE PAYING FOR THE SIM.**
+> ## `36_pick_tenant_cell` was verified to reach P1 `+0x382 = 0x13` under
+> ## MAME (a ~2-minute run) BEFORE the 2.5-hour simulation, so a zero from
+> ## the sim would have been a finding about the CORE rather than about
+> ## the replay.
 > ##
-> ## **THE FROZEN §4 ANCHOR: MAME 2146 / sim 2609 / skew 463 ± 30**
-> ## (`tests/test_mister_sim_anchor.sh`, `05_timeout_idle`, round-1 match
-> ## start). Measured on the REFERENCE core, host frame output OFF, over
-> ## 2100-3000 so the window could not box the answer in. Three earlier
-> ## numbers are RETRACTED and will still be found in old prose: 2606/460
-> ## (that is the BOOT offset, not the anchor), 2507/361 and 2502/356
-> ## (both measured while the harness was replaying the input script). The
-> ## band has never been widened.
-> ##
-> ## **THE WIDE TRANSFER IS 659 FRAMES, NOT 462 — and `sim_inputs.hex`
-> ## advances during the download, so every absolute frame number in the
-> ## lane moves by 197.** Getting it wrong starts the replay ~200 frames
-> ## early, still boots, still reaches a select screen, and silently
-> ## invalidates every anchor. `run_sim_jtcps2.sh` picks the constant from
-> ## `--wide` and PRINTS it; `audit_sdram_bank_load.sh` ASSERTS it from
-> ## the run's own log before labelling a phase. That is why the 14z-107
-> ## (12) bank-load run's own match-start anchor at **2806** is
-> ## corroboration and not a coincidence: 2609 + 197.
-> ##
-> ## **AND THE OTHER PER-CORE CONSTANT THAT WILL BITE: `--wram` DUMPS AN
-> ## SDRAM ADDRESS.** D2 re-packed bank 0, so `RAM:$FF0000` is bank 0 byte
-> ## `0x600000` on `cps2` and **`0x648000` on `cps2w`**, where `0x600000`
-> ## is now VRAM. `run_sim_jtcps2.sh` picks it from `--core` and prints
-> ## it; the run's own log says what it dumped.
-> ##
-> ## **THE FORK: `DefinitelyFrenchName/jtcores@vampire-saved`, pin
-> ## `7b9a0d2d`, EIGHTEEN commits, PUBLIC AND CURRENT.** Fork pushes are
-> ## STANDING-AUTHORISED (maintainer, 2026-08-24) and the pin should be
-> ## bumped and pushed together. **THE MAIN VampireSaved REPO IS NEVER
-> ## PUSHED** — **36 local commits** sit on `main` at this close (21 from the
-> ## first close of 14z-107, 15 from the second) and that is correct. `cores/cps1`, `cores/cps2` and `cores/cps15` are
-> ## BYTE-UNTOUCHED and that is a `git diff` assertion
-> ## (`test_jtcores_twin` 2e); the whole-tree fork delta is held to a
-> ## declared 25 paths (2f).
-> ##
-> ## **THE PLACEMENT'S MARGINS ARE THIN — CHECK THEM BEFORE ADDING ART.**
-> ## The fit has **0.125 MB of slack in 64 MB**. **SDRAM bank 1 is EXACTLY
-> ## FULL** (8 MB PCM + 8 MB group-C obj bank 4 = 16,777,216 B to the
-> ## byte) and **bank 0 has 131,072 B free**. Two consequences that point
-> ## opposite ways: tenant art may grow FREELY inside the existing 16 MB
-> ## (a new tile above `0xEE73`/`0xFFDB` overflows nothing — the download
-> ## reserves the whole declared region either way, though
-> ## `audit_mister_map_fit` still goes RED because those extents are
-> ## FROZEN and must be re-derived deliberately), and the group-C ROMSET
-> ## REGION cannot grow AT ALL — a fifth group-C member overflows
-> ## immediately and there is nowhere to put it. Gate:
-> ## `tests/audit_mister_map_fit.sh` (ci_static, ~5 s).
-> ## **Three sizes of the same art, and this project has published a wrong
-> ## figure from each of the first two:** live bytes 6.39 MB, address
-> ## footprint 15.45 MB, declared region 16 MB.
-> ##
-> ## **THE LANE, IN TWO COMMANDS** (`HANDOFF.md` "MiSTer" has the rest;
-> ## `export JTSIM_SCRATCH=/tmp/vampire-saved-jtsim`, NEVER inside the
-> ## repo; ~1 s per simulated frame and the ROM download is unskippable
-> ## because it latches the decryption key):
-> ## `tools/run_sim_jtcps2.sh <rpl> <outdir> --frames N --wram A B`
-> ## (frame output OFF by default) and
-> ## `tools/mister_mra.sh --core cps2w --wide build/m3b_merged13 --out <dir OUTSIDE the repo>`.
-> ## Every `--wram` run asserts its own dump set is COMPLETE
-> ## (`tools/check_wram_dumps.py`) — `compare_fields.py` GLOBS, so a lost
-> ## dump used to silently move the anchor instead of failing.
-> ##
-> ## **THE EVIDENCE FOR THE DIRECTION FINDING IS IN `/tmp`, WHICH IS
-> ## VOLATILE. KEEP IT UNTIL THE FIX IS VERIFIED.**
-> ## `/tmp/vs14z107_out/E/wram` — leg E's **811** work-RAM dumps (integrity
-> ## asserted: frames 1640-2450, 65,536 B each at `$FF0000`), the run that
-> ## produced the transposition table; `/tmp/vs14z107_out/E/frames` holds its
-> ## 34 rendered frames, one of which is the VS screen that cracked it;
-> ## `/tmp/vs14z107_out/E.launch` and `E/jtsim.log` say exactly how it was run
-> ## (`36_pick_tenant_cell`, `cps2w`, `--wram 1640 2450`, 47m11s);
-> ## `/tmp/vs14z107_keep_select.jpg` and `/tmp/vs14z107_keep_match.jpg`
-> ## are the two rendered frames (the committed copies under
-> ## `docs/project/images/` are the durable ones); `/tmp/vs14z107_mame36`
-> ## and `/tmp/vs14z107_mameinp` are the MAME legs of the same
-> ## comparison (251 MB in total). **`/tmp` does not survive a reboot** — if the fix is not
-> ## being done this session, copy them somewhere durable OUTSIDE the repo
-> ## first (they are work-RAM dumps of a patched ROM: rule 7 keeps them
-> ## out of the tree). **ELEVEN jtcores scratch clones — 9.5 GB — were swept
-> ## at the close** (`/tmp/vs14z107_{A,B,C,D,stage}` and the six
-> ## `/tmp/vampire-saved-jtsim-*`); they are rebuild litter and
-> ## `run_sim_jtcps2.sh` remakes them, at the cost of one ROM build.
+> ## **AFTER QUARTUS, IN ORDER.** The QSound extension has never been
+> ## heard; the scroll path with a wide GFX map is untouched; no frame has
+> ## ever been compared programmatically against MAME's (the two committed
+> ## select-screen images are a naked-eye pair, not a verdict);
+> ## `mister_core.md` §12 is the honest ledger of all of it. **And the
+> ## placement's margins remain thin: 0.125 MB of slack in 64 MB, SDRAM
+> ## bank 1 EXACTLY FULL, and the group-C ROMSET REGION cannot grow at
+> ## all** — tenant art may grow freely inside the existing 16 MB, but a
+> ## fifth group-C member has nowhere to go.
 > ##
 > ## **STILL OPEN FOR THE MAINTAINER: MiSTer PACKAGING** — which MRA is
 > ## the core's MAIN one, and how a release carries both `vsav.zip`
-> ## flavours (STATE "Decisions pending"). Nothing in the opener blocks on
-> ## it; both must be answered before a release. **RECORDED AS FUTURE,
-> ## UNSCHEDULED (maintainer, 2026-08-24):** the LIVING-DOCUMENTATION
-> ## effort — of which `docs/project/mister_core.md` +
-> ## `tools/mk_mister_page.py` are the pilot — and DISTILLING AI SKILLS
-> ## from the project's learnings, scoped by subject. Both follow MiSTer.
+> ## flavours (STATE "Decisions pending"). Both must be answered before a
+> ## release; nothing above blocks on them. **FUTURE, UNSCHEDULED:** the
+> ## LIVING-DOCUMENTATION effort and DISTILLING AI SKILLS from the
+> ## project's learnings. Both follow MiSTer.
 > ##
-> ## **THE GAME SIDE IS PARKED AND GREEN.** The 14z-105 window is frozen
-> ## as donovan-m11 / huitzil-m20 / pyron-m14 / merged-m6, field-confirmed
-> ## and pushed 2026-08-22; play with
-> ## `tools/run_wide.sh build/m3b_merged13 fbneo`. Release packaging is
-> ## done (`release/merged-m6/`) and stays in-tree until MiSTer, when a
-> ## tagged GitHub release covers both.
+> ## **THE GAME SIDE IS PARKED AND GREEN.** 14z-105 frozen as donovan-m11
+> ## / huitzil-m20 / pyron-m14 / merged-m6, field-confirmed and pushed
+> ## 2026-08-22; play with `tools/run_wide.sh build/m3b_merged13 fbneo`.
+> ## Release packaging is done (`release/merged-m6/`).
+> ##
+> ## **THE LANE, IN TWO COMMANDS** (`HANDOFF.md` "MiSTer" has the rest;
+> ## `export JTSIM_SCRATCH=/tmp/vampire-saved-jtsim`, NEVER inside the
+> ## repo; ~1 s per simulated frame; the WIDE transfer is **659** frames
+> ## and the stock one 462, so every absolute frame moves by 197; and
+> ## `--wram` dumps an SDRAM address — `RAM:$FF0000` is bank 0 byte
+> ## `0x600000` on `cps2`, **`0x648000` on `cps2w`**):
+> ## `tools/run_sim_jtcps2.sh <rpl> <outdir> --frames N --wram A B` and
+> ## `tools/mister_mra.sh --core cps2w --wide build/m3b_merged13 --out <dir OUTSIDE the repo>`.
+> ## **THE FORK: `DefinitelyFrenchName/jtcores@vampire-saved`, pin
+> ## `7b9a0d2d`, EIGHTEEN commits, PUBLIC AND CURRENT** — unchanged by
+> ## 14z-108, which touched no RTL. Fork pushes are standing-authorised;
+> ## **the MAIN repo is NEVER pushed** (41 local commits on `main`).
+
 
 > ## **SLICE LOG — 14z-107 (11)+(12): THE BOOT FAILURE ROOT-CAUSED AND
 > ## FIXED (D5), THE FIRST TENANT TILE EVER FETCHED, BANK 0 ANSWERED, AND
