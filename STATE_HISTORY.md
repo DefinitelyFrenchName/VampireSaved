@@ -19,6 +19,1095 @@ Rules of this file:
 - References of the form "STATE 14z-XX": look in STATE.md first, then here
   — section names are preserved verbatim, so the reference always resolves.
 
+## Session 14z-107 CLOSE (final) — ritual complete. **THE WIDE ROMSET BOOTS
+## ON THE CORE, DRAWS OUR SELECT SCREEN AND FETCHES OUR WHEEL ART — AND NO
+## TENANT HAS EVER FOUGHT ON IT.** Six RTL slices are in (D0-D5), the boot
+## failure is root-caused and fixed, obj bank 5's 105 tenant tile codes are
+## measured, bank 0's traffic under the redirect is ANSWERED, and obj bank 4
+## is still zero for a reason that is the HARNESS.
+## **THE ARC'S HEADLINE IS METHODOLOGICAL: SEVEN INSTRUMENT AND HARNESS
+## DEFECTS HAVE BEEN FOUND IN THIS LANE, AND EVERY ONE OF THEM WOULD HAVE
+## READ AS AN RTL FAULT. D5 IS THE COUNTER-EXAMPLE, WHERE THE RTL GENUINELY
+## WAS AT FAULT.**
+## This is the SECOND close of 14z-107; the first (below) covered slices
+## D0-D2, and FOURTEEN commits stand between them.
+
+**The session since the first close, in one line:** the MiSTer arc went from
+"the placement is in the RTL and nothing has ever driven it" to "the WIDE
+romset boots, the select screen renders with our extended wheel and our
+authored M6 mark on it, and 105 distinct tenant tile codes come out of SDRAM"
+— and the last thing between it and a tenant FIGHTING on the core turned out
+to be two swapped bits in the simulator's joystick.
+
+### THE HEADLINE, BECAUSE IT IS THE PART THAT TRANSFERS
+
+**Seven defects in the MEASURING APPARATUS, every one of which presented as a
+defect in the thing being measured.** The first close reported three; the
+count is now seven, and four of them are the INPUT PATH alone.
+
+| # | the instrument | the false verdict it would have supported | how it was caught |
+|---|---|---|---|
+| 1 | the Verilator SDRAM model dropped `addr[22]` — it rides `sdram_a[9]` as the tenth COLUMN bit, not `addr[9]` (14z-107 (3)) | "jtcps2's GFX addressing is faithful"; no video or sprite result from the lane was trustworthy for wide GFX at all | derive from the RTL, not from the SIZE — *a size tells you how many bits are missing, never which one* |
+| 2 | the forked frame writer `exit(0)`'d, `fclose()`ing the parent's inherited `sim_inputs.hex` `FILE*`; POSIX rewinds the SHARED offset (14z-107 (7)) | "D1's RTL moved the anchor" — four 50-minute runs blamed the RTL, and the FROZEN number was the artifact | a 2x2 factorial on `pal_lut.hex` x frame-output, 681 dumps a leg: the RTL axis moved nothing, the HOST axis moved everything |
+| 3 | jtframe's `SimInputs` held P1's **and P2's** buttons 5 and 6 down — two 8-bit constants on a `[9:0]` ACTIVE-LOW port (14z-107 (8)) | every agreement the §4 oracle had ever reported was an agreement about a different machine | a MAME hold-vs-not differential located the game's own input mirror `$FF8058`, and the pre-fix sim block was BYTE-IDENTICAL to MAME with four buttons held |
+| 4 | `JTFRAME_SIM_WRAMDUMP_OFF` hard-coded to bank 0 byte `0x600000` — work RAM on `cps2`, **VRAM on `cps2w` after D2's re-pack** (14z-107 (9)) | "`test_mister_wide_inert` is red, so D2 broke inertness" — 101 frames of 101, comparing one core's work RAM against the other's VRAM | VRAM is a plausible 64 KB of changing bytes, so the non-constancy check passed; **any instrument naming a PHYSICAL address is invalidated by a memory-map change, and a placement slice IS one** |
+| 5 | the PRG probe's first draft split its window on `rom_addr[21]` — `rom_addr` is `[22:1]` driven `A[22:1]`, so its INDEX is the address bit and `[21]` is `A[21]` (14z-107 (11)) | "2,560 reads above `$400000`" — a healthy-looking COUNT at `$38C2A0-$3D8256`, which is the third megabyte | only the ADDRESSES contradicted the label, and only because the probe logged them beside the classification |
+| 6 | `tools/prgprobe_verdict.py` judged only the RAW SDRAM word (14z-107 (11)) | **"D4 WORKS"** — over ten fetches the CPU received as garbage. A verdict bug of exactly the kind CLAUDE.md §4 forbids | the DATA half of the probe logged the latched word too, so the tool could be caught disagreeing with itself |
+| 7 | the sim harness's DIRECTION BITS are REVERSED end for end — measured on all four 14z-108; 14z-107 (12) saw only the Left/Down half and inferred a two-bit swap | **"D3 does not fetch"** — the obj-bank-4 measurement returned exactly zero reads, in-match included, with the RTL innocent in every respect | the RENDERED frame: a VS screen showing a LEGACY character against a replay that asks for a tenant. The counters alone said the promote was dead |
+
+**Two more were found INSIDE a gate on its own first real measurement**
+(`test_mister_gfxc_fetch`, 14z-107 (11)), both fixed: the tile code computed
+from the ABSOLUTE SDRAM address instead of relative to the armed window's base
+(a correct promote read as `0x170D6-0x1FA41`), and a liveness control that
+demanded vanilla obj traffic in the CONTROL leg — an image that cannot boot by
+construction, because with the profile clear its group-C art aliases over
+vanilla's obj banks.
+
+**AND D5 IS THE COUNTER-EXAMPLE, WHICH IS WHY THE STANDING RULE IS "SUSPECT
+THE INSTRUMENT", NOT "BLAME THE INSTRUMENT".** There the reference RTL
+genuinely was at fault, and no amount of instrument hygiene would have found
+it — only a byte-level comparison of what the CPU LATCHED against what memory
+HELD.
+
+**The protocol distilled from all of it** is `docs/project/gotchas.md` "THE
+INSTRUMENT PROTOCOL" (adopted 14z-107 (11), maintainer-directed): the author
+of an instrument cannot judge its own output; prove it FIRES and prove it
+FAILS before its first real use; log the raw quantity beside the
+classification; a hard-coded physical constant is a check with an unwritten
+expiry date.
+
+### WHAT SHIPPED SINCE THE FIRST CLOSE
+
+- **D3, the CPS-2 Turbo object promote** (fork `b9899fa8`) —
+  `cores/cps2w/hdl/jtcps2w_obj_bank.v`,
+  `assign bank = { wide_en & table_y[12], table_y[14:13] };` read in the ELSE
+  arm of the sprite-list terminator test, which is the reference core's
+  VERBATIM (the ORDER is the rule: `table_y[15]` IS the terminator).
+  `rom0_bank[2]` UNTIED and the bank three bits wide at every port from the
+  frame table to SDRAM — four override files for one expression, three of them
+  nothing but a width. **Swept exhaustively:** 131,072 vectors, bank[2] set
+  32,768 times wide and **0** stock, the six `gfx_tiles.py` encodings each
+  decoding to their own bank with none setting y bit 15. Two must-fire
+  controls fire.
+- **D4, the 6 MB program window** (fork `dd242a65`) —
+  `wide_en & RnW & (A[23:21]==3'b010)`,
+  `rom_addr`/`main_rom_addr`/`SLOT3_AW` 21->22, and the `one_wait` boundary
+  `wide_en ? 4'h6 : 4'h5`. **Shipped WITH D3 because D3 cannot be demonstrated
+  without it:** the select screen's roster record is allocated in `wide_ext`
+  above `CPU:$400000`, so a 4 MB decode cannot read the table that names the
+  tenant cells and the promote has nothing to promote.
+- **D5, THE DECRYPTION RANGE — the finding of the arc** (fork `c00d7ce7`).
+  The CPS-2 key's encrypted-opcode RANGE word is stored **COMPLEMENTED**
+  (`upper = (((~decoded[9] & 0x3ff) << 14) | 0x3fff) + 1`, FBNeo
+  `cps2_crpt.cpp:771`; MAME the same) and `jtcps2_dec_ctrl.v:44` compares
+  against it UNCOMPLEMENTED, so for `vsavj` (range word `0x03C0`, computed two
+  independent ways from the same 20 key bytes) the reference core decrypts
+  opcode fetches to `CPU:$F03FFF` where MAME and FBNeo stop at `$0FFFFF`.
+  **Every stock CPS-2 game hides it, for two reasons that stack:** the only
+  code that ever executes is the code Capcom encrypted, which is inside the
+  real window either way; and DATA reads are not opcode fetches, so no
+  implementation decrypts them at any address. **CPS-2 WIDE is the first thing
+  in thirty years to put EXECUTABLE code above the window.**
+  The fix is ONE gated expression in a new
+  `cores/cps2w/hdl/jtcps2_decrypt.v`:
+  `rng_eff = wide_en ? { addr_rng[15:10], ~addr_rng[9:0] } : addr_rng`.
+  **`jtcps2_dec_ctrl` is deliberately NOT overridden** — the fix sits one
+  level upstream of the comparison, so the comparison nobody has validated for
+  the rest of the CPS-2 library is left exactly as it was, and `dec_en` still
+  comes from the uncomplemented word.
+  **WHY IT IS GATED AT ALL, since the maintainer asked:** with `wide_en` clear
+  `rng_eff` IS `addr_rng`, so stock `vsavj` and every other CPS-2 game are
+  untouched BY CONSTRUCTION and the stock leg stays a TRUE CONTROL. The buggy
+  path is unreachable on stock content, so the gate costs nothing and buys a
+  reference leg that is provably the reference core. Fixing it for the whole
+  CPS-2 library is a claim this project cannot validate.
+  **FRAMING RULED (maintainer, 2026-08-24): a LATENT IMPLEMENTATION
+  DIVERGENCE, not a defect** — no software in thirty years created the
+  condition that exposes it. Worth reporting upstream on those terms.
+- **The 68k program-ROM read probe** (fork `72738d51`, sim-only, compiled out
+  unless `JTCPS2W_PRGPROBE` is defined) — deliberately TWO instruments: an
+  ADDRESS half classifying every 68k bus cycle by `A[23:21]` with **no chip
+  select in the condition** (which is what still speaks when `wide_en` is
+  clear and `rom_cs` cannot assert at all), and a DATA half logging every
+  COMPLETED read with the word the CPU LATCHED beside the RAW SDRAM word.
+- **The retraction commit** (fork `7b9a0d2d`, comment only) — the
+  `jtcps2_main.v` override header still claimed the extension is not
+  decrypted. **THE PIN IS `7b9a0d2d`, EIGHTEEN commits, PUBLIC AND CURRENT.**
+
+### WHAT WAS MEASURED
+
+**THE BOOT, AND THE FIRST TENANT TILE EVER FETCHED ON AN FPGA
+IMPLEMENTATION.** With D5 in: the ten fetches at `CPU:$4BE7C0-$4BE7C8` arrive
+as memory holds them; completed program-ROM reads above `$400000` go from
+**10** to **1,189,750** over the full run, spanning `CPU:$412BA0-$4D100E`
+which is `wide_ext` (`0x400010-0x4D1100`) to the byte, with **20,000 of
+20,000** sampled records showing `cpu_word == raw_word == the .rom`; the boot
+passes the point it used to die at, reaches the title screen (bank 3 at 48,928
+words/frame, the stock image's own figure) and then the select screen; and the
+group-C read probe counts **9,038,400 reads over 105 DISTINCT TILE CODES
+`0x74D6-0xFE41` in obj bank 5** — the select-wheel tenant art — first at
+simulated frame 1556, every code inside the roster's frozen live extent
+`0xFFDB`, control leg at zero. The vanilla banks read what the STOCK image
+reads on a healthy boot (372 distinct blocks in bank 2, bank 3 reaching
+`0x9C177E`).
+
+**AND THERE IS A PICTURE.** `docs/project/images/mister_select_cps2w_f2400.jpg`
+is the core's select screen — the extended wheel, the tenant cells, and the
+authored **"M6"** mark bottom-right — the first image of this project's own
+content produced by an FPGA implementation; `mister_select_mame_f1741.png` is
+MAME's frame of the same screen beside it. **They are a naked-eye pair, not a
+verdict:** nothing compares them programmatically, there is no golden and no
+gate, and §12 records them as such. (Rendered frames are outside rule 7,
+CLAUDE.md §2, ruled 14z-91 — which is why they are committed.)
+
+**BOTH STOCK LEGS GREEN WITH D5 IN**, which is the FPGA superset invariant on
+the one change that could have moved it: `tests/test_mister_wide_inert.sh`
+bit-identical work RAM in **101 frames of 101** with its control firing, and
+`tests/test_mister_sim_anchor.sh` at **sim 2609 / MAME 2146 / skew 463**
+(frozen 463 ± 30), every mapped field agreeing, all four controls firing. Both
+are true by construction as well as by measurement.
+
+**BANK 0 UNDER THE REDIRECT: ANSWERED, AND IT IS GO** (14z-107 (12);
+`mister_map.md` §9 open question 1, open since the map was written).
+`audit_sdram_bank_load --core cps2w --wide build/m3b_merged13` on a BOOTING
+WIDE image, `05_timeout_idle`, 3,500 frames:
+
+| phase | ba0 | ba1 (PCM) | ba2 | ba3 | data bus |
+|---|---|---|---|---|---|
+| attract (661-1461) | 38,261 | 3,466 / 78.6% | 0 | 9,446 / 25.2% | 12.7% |
+| select+VS (1463-2805) | **40,717** | 13,870 / 99.0% | 357 / 84.1% | 10,917 / 37.1% | 16.4% |
+| in-match (2812-3499) | **41,535** | 13,890 / 98.0% | 296 / 39.9% | 17,335 / 34.2% | 18.2% |
+
+Bank 0 runs at **32.9% of its 123,825 all-miss ceiling** through the select
+screen — the phase where the wheel art is actually being fetched out of it —
+with a whole-run PEAK of 54,363 (**43.9%**) and **ZERO `SDRAM reads clashed`
+in 3,500 frames**. Against the stock baseline (39,696 select / 40,976
+in-match) the redirect costs about **1,000 accesses/frame, ~2.5%**, which is
+the right order for the 6,720 burst BEATS per select frame the read probe sees
+in that window (~1,680 BA0 accesses at four words each). **The repack's bank-0
+half is GO on measurement, not on argument.**
+
+**AND THE INSTRUMENT VERIFIED ITS OWN PHASE BOUNDARIES**, which is why the
+figures can be trusted: the transfer was asserted at **659** from the run's
+own log, and the run's own match-start anchor measured **2806** — exactly the
+frozen 2609 plus the 197-frame WIDE/stock transfer difference. The four phase
+boundaries label the phases they name rather than being assumed to.
+
+**THE HALF IT DOES NOT ANSWER, stated because the asymmetry matters.**
+`05_timeout_idle` picks Demitri, so obj bank 4 is never fetched and ba1's
+13,890 accesses/frame are the PCM stream ALONE — within 0.3% of stock. **The
+repack risk this instrument was actually built for — obj fetches interleaving
+with QSound INSIDE bank 1 — is still UNMEASURED**, and stays so until a tenant
+can be selected on the core.
+
+### OBJ BANK 4 IS STILL UNPROVEN, AND THE REASON IS A HARNESS DEFECT
+
+`tests/test_mister_gfxc_fetch.sh`'s WHEEL half is GREEN and its FIGHTER half
+is RED. The replay was written and run — `36_pick_tenant_cell` on `cps2w` with
+the WIDE romset, into a match — and it fetched **exactly zero** from obj bank
+4. **The simulator's direction bits are TRANSPOSED** *[CORRECTED 14z-108: REVERSED END FOR END — all four, not two; see the correction block below]*, measured on the core's
+own copy of the game's input mirror (leg E: 811 integrity-checked work-RAM
+dumps across the cursor-press window):
+
+| the replay asked for | MAME's `$FF8058.w` | the CORE's `$FF8058.w` |
+|---|---|---|
+| Left (replay frames 1000, 1040) | `0x0002` | **`0x0004`** |
+| Down (replay frames 1080, 1120) | `0x0004` | **`0x0002`** |
+
+The bits ARRIVE and are PERMUTED — they are not lost, and 12 of the 811 frames
+carry a direction, exactly the count the replay scripts. The cursor moved on
+every press, just not where asked; it landed on Victor; and the core drew the
+legacy character it was handed. **The zero is a true reading of a run that
+never selected a tenant.** The likely cause is INFERENCE from two data points
+(`tools/rpl2siminputs.py` emits U/D/L/R per its own docstring where the
+harness appears to consume U/L/D/R, which swaps Down and Left and leaves Up
+and Right untouched) — **Up and Right are NOT exercised by those samples and
+that half is untested. Measure all four before changing one bit.** The whole
+chain checks out on paper, which is the point.
+
+> **[CORRECTED 14z-108 — the inference in this paragraph is REFUTED, and the
+> instruction above it was right.** Measured on all four directions
+> (`tests/replays/107_four_directions.rpl`, stock `vsavj`, MAME vs `cps2w`,
+> both dump sets integrity-checked): the nibble is **REVERSED END FOR END**,
+> not swapped in two. Up arrives as `0x0001` (Right) and Right as `0x0008`
+> (Up), so the "leaves Up and Right untouched" half is false and a two-bit fix
+> would have left half the defect in the tree. Mechanism: jtframe's joystick
+> port is MSB-FIRST (`jtframe_keyboard.v:107-110`) while `test.cpp:380` copies
+> file bits 4-7 straight onto `joystick1[3:0]`, so the file map is
+> bit4=Right … bit7=Up. Fixed in `tools/rpl2siminputs.py`; no fork commit.
+> **Also corrected: "A bit-map fix MOVES BOTH" below is wrong** — only the
+> vector moved. See the 14z-108 entry.]**
+
+**GATE CONSEQUENCE, recorded so it cannot be done quietly:**
+`tests/test_rpl2siminputs.sh` freezes the bit-map vector `111 6ee 000 000 080`
+and the `05_timeout_idle` translation sha1
+`eb3e1d04e58b3a2b7bf713d40c4d6ac4796e550c`. A bit-map fix MOVES BOTH, and they
+must be re-derived DELIBERATELY with the mechanism named in the gate header.
+**[CORRECTED 14z-108: it moved ONE.** The vector became `181 67e 000 000 010`;
+the sha1 did NOT move and cannot, because `05_timeout_idle` scripts no
+direction token — which is also why the frozen sim anchor could not move.]**
+
+**A TENANT HAS STILL NEVER FOUGHT ON THE CORE, and nothing in this lane has
+ever run on HARDWARE.** Everything above is Verilator.
+
+### WORKING DISCIPLINE ADDED THIS SESSION
+
+- **THE INSTRUMENT PROTOCOL** (`e92faf9`, maintainer-directed) —
+  `docs/project/gotchas.md`, indexed in `docs/GOTCHAS.md`.
+- **A replay's name is a claim about the build** (`7ef3b13`) —
+  `11_pick_donovan` picks Jedah on every post-M3a build; the filename outlived
+  the substitution.
+- **`pgrep -f` waiters match their own command line and never exit**
+  (`e6bcd9e`) — paid four times in one task; wait on a recorded PID with
+  `kill -0`, or on a marker file. Finally in the tree.
+- **§12 gained the SILICON ASSUMPTION D5 rests on** (`8be8d15`) — that real
+  CPS-2 silicon decrypts only the first 1 MB is **INFERRED, never measured**,
+  and MAME and FBNeo share one research heritage rather than being two
+  independent witnesses. It matters beyond MiSTer: WIDE puts executable code
+  above the window, so a real CPS-2 board must also leave that region
+  undecrypted for the roster to run on hardware.
+- **The transposed direction bits** (`34c7feb`) — `docs/platform/gotchas.md`,
+  indexed.
+
+### RITUAL
+
+- **STATE**: this entry, plus session entries 14z-107 (10) and (11) written
+  during the session. The 14z-107 (12) work — the bank-0 answer and the
+  transposed directions — has no separate entry and is recorded HERE, which is
+  where "STATE 14z-107 (12)" references (in `mister_core.md` §12,
+  `mister_map.md` §9 and `docs/platform/mister.md`) resolve.
+  **The ROLLOVER executed as the first close PREDICTED IT WOULD**: that entry
+  recorded "14z-106 rolls at the next close", and it did — the whole 14z-106
+  group (4 entries, 175 lines: the CLOSE, (4) slice C, (3) slice A, and the
+  HOUSEKEEPING entry) moved VERBATIM to the top of `STATE_HISTORY.md`'s body
+  with its ledger line here. **Verified lossless**: the extracted block is
+  byte-verbatim in the archive and the string `## Session 14z-106` no longer
+  occurs in this file. 14z-105 rolled at the first close, so **exactly ONE
+  session group is now kept — 14z-107 — plus THE LEDGER and the standing
+  sections.** The GROUP arm of the rule is therefore satisfied with two
+  groups to spare. **The SIZE arm is NOT, and it cannot be:** this file is
+  **252 KiB** against the ~150 KB the rule names, and the only group left to
+  roll is the CURRENT session's own, which the rule does not contemplate and
+  which would put the live state in the archive. **Recorded here so the next
+  session does not re-derive it: the next close should roll the 14z-107
+  group's OLDER sub-entries** — the (1)-(9) blocks, whose findings are all
+  restated in this entry, in the first close, or in the live docs — and keep
+  the two closes plus (10)-(12). That is the first time this project has hit
+  the rule's edge, and the edge is real: one session produced 15 entries.
+- **`docs/NEXT_SESSION.md`**: rewritten. The opener is THE DIRECTION-BIT FIX
+  in three ordered steps (measure all four first; the two frozen expectations
+  the fix moves; then the tenant match, which answers obj bank 4 and bank 1's
+  group-C traffic in one run). The banner also carries the honest state (boots,
+  draws, fetches the wheel art / no tenant has fought / no hardware), the seven
+  instrument defects with D5 as the counter-example, the frozen anchor
+  (2146 / 2609 / 463 ± 30), the 659-frame WIDE transfer and its 197-frame
+  consequence, the per-core `--wram` offset, the fork pin and the push policy,
+  the thin margins, the two standing warnings, and where the `/tmp` evidence
+  is with a warning that `/tmp` is volatile.
+- **`HANDOFF.md`**: the MiSTer block brought current. **Two things it asserted
+  that this session made false are fixed**: "NO TENANT TILE HAS BEEN FETCHED
+  ON ANY CORE, EVER" and "the WIDE romset does not boot" — both true when
+  written, both false now — replaced with the fetch result AND the three
+  things that are still never (bank 4, a tenant in a match, hardware). The
+  fork commit list goes SEVENTEEN -> EIGHTEEN with `7b9a0d2d` named and the
+  pin stated. Gate rows updated with tier and runtime: `test_rpl2siminputs`
+  now carries the WARNING that the bit map it freezes is wrong and that both
+  frozen values move when it is fixed; `audit_sdram_bank_load` carries the
+  WIDE leg's real answer; `test_mister_gfxc_fetch` carries the split verdict
+  and the two defects it found in itself; `test_mister_prg_probe` names
+  `tools/prgprobe_verdict.py` as the verdict logic under test.
+- **`docs/project/mister_core.md` §12 (the holes)**: made accurate.
+  **Bank 0's traffic moves OUT** — struck and marked ANSWERED with the
+  numbers, kept in place so the question's provenance stays findable.
+  **Obj bank 4 stays IN, with the HARNESS reason** (the old text said "a
+  replay to write, not a slice"; the replay exists and ran). **Three rows
+  added or rewritten**: "A tenant SELECTED on the core" (blocked by the
+  transposed directions, with the measured table and the untested half named),
+  "A tenant FIGHTING on the core" (never; everything below it in the stack is
+  proven), and "A tenant sprite DRAWN, and checked as a picture" (DRAWN, NOT
+  CHECKED — the two committed images named as a naked-eye pair).
+  `tools/mk_mister_page.py --check` re-run after the edits.
+- **GOTCHAS**: every trap this session paid for is filed in
+  `docs/{platform,project}/gotchas.md` AND indexed in `docs/GOTCHAS.md` —
+  verified at the close, all four of the new ones present in both places.
+- **RETRACTIONS AND INCONSISTENCIES FIXED AT THE CLOSE** (grep'd for the
+  CLAIM, not for the files I remembered):
+  * `mister_map.md` §9 referenced a `docs/platform/mister.md` section titled
+    "THE SIMULATED JOYSTICK'S DIRECTIONS NEVER REACH THE GAME" **that did not
+    exist**, and whose title asserts something the measurement contradicts —
+    the directions DO reach the game, permuted. The section now exists as
+    **"THE SIMULATED JOYSTICK'S DIRECTIONS ARE TRANSPOSED"** with the measured
+    table, the cost, the inference, the gate consequence and the pictures; the
+    map's reference is corrected; `grep -rn "DIRECTIONS NEVER REACH"` is
+    empty.
+  * `docs/platform/mister.md`'s own bank-0 section said "See the input defect
+    below" with nothing below it. Now points at the section by name.
+  * **The two committed images were referenced NOWHERE** — a durable artifact
+    with no prose route to it. Now named in `mister_core.md` §12,
+    `docs/platform/mister.md` and `HANDOFF.md`.
+- **SCRATCH HYGIENE**: **ELEVEN jtcores scratch CLONES swept, 9.5 GB** —
+  `/tmp/vs14z107_{A,B,C,D,stage}` and `/tmp/vampire-saved-jtsim-{ab,d1,inert,mra,ord,pal}`.
+  Pure rebuild litter: every one is remade by `run_sim_jtcps2.sh`, and leg E's
+  launch record confirms its outputs were COLLECTED out of the clone before it
+  was touched. **251 MB of EVIDENCE kept until the direction fix is verified**:
+  `/tmp/vs14z107_out` (leg E's **811** work-RAM dumps at `E/wram`, integrity
+  asserted 1640-2450 x 65,536 B at `$FF0000`; its 34 rendered frames at
+  `E/frames`; every leg's `.launch` and `jtsim.log`; the bank-load TSV), the
+  two rendered frames `/tmp/vs14z107_keep_{select,match}.jpg`, and the MAME
+  legs `/tmp/vs14z107_mame{36,inp,11,pre,sel,snap}` that are the other half of
+  the transposition comparison. **`/tmp` IS VOLATILE and NEXT_SESSION says so
+  — the durable copies of the two pictures are the ones committed under
+  `docs/project/images/`.**
+
+**GATES RUN AT THE CLOSE:**
+- `ROMDIR=... tests/run_all_static.sh --strict` — **PASS 107 / SKIP 0 /
+  FAIL 0 / MISSING 0**, registry coverage clean (every emulator-free gate
+  registered). Run TWICE, once mid-documentation-pass and once on the final
+  tree, with the same result. *(The first run's working-tree check flagged
+  `docs/NEXT_SESSION.md` as "dirtied by the run" — that was ME editing it
+  while the run was in flight, not a gate writing into a tracked path. The
+  second run is clean. It is also a small demonstration of standing warning
+  (2): do not touch the tree while something long is reading it.)*
+- `python3 tools/audit_roms.py $ROMDIR` — **76 of 76 members match
+  `docs/checksums.txt`**.
+- `python3 tools/mk_mister_page.py --check` — **PASS, all 17 figures
+  re-derived** (run after the §12 edits).
+- `tests/test_jtcores_twin.sh` standalone — **PASS**: pin `7b9a0d2d`, the
+  series is **18 files == 18 commits** with each `== format-patch -1`, the
+  fork's whole-tree delta exactly the declared 25 paths, `cores/cps2w/hdl`
+  exactly the declared override set, and `cores/cps1`/`cps2`/`cps15`
+  BYTE-UNTOUCHED vs v1.7.3. Both must-fire controls fired.
+- `git ls-remote` confirms `origin/vampire-saved` = the submodule pin =
+  `7b9a0d2d05eedf7fc9625df9ca6ea1d0278f8ef1`. **The fork is public and
+  current; the main repo is not pushed.**
+
+**COMMITS**: **FOURTEEN** of session work since the first close,
+`516ad9f`..`34c7feb` (`git rev-list --count cd0c614..HEAD`), plus this close =
+fifteen. Counting from the 14z-106 close the branch is **36 commits ahead of
+`origin/main`** — the 21 of the first close plus these 15. **ALL LOCAL: the
+main repo is NEVER pushed** *[CORRECTED 14z-108: true when written; a push
+has since happened and `origin/main` now holds this close's own commit
+`a93e071`, confirmed by `git ls-remote` and the reflog. Check the remote, not
+this line.]*, and every commit in the range is MiSTer work, so
+none qualifies for the pre-MiSTer push exception. The FORK is public and
+current: `origin/vampire-saved` = the submodule pin =
+`7b9a0d2d05eedf7fc9625df9ca6ea1d0278f8ef1`, **eighteen** commits, confirmed
+with `git ls-remote`.
+
+**NEXT OPENER: THE DIRECTION-BIT FIX**, in the order `docs/NEXT_SESSION.md`
+states it. Measure all four directions first.
+
+**STILL OPEN FOR THE MAINTAINER:** MiSTer PACKAGING (which MRA is the core's
+MAIN one; how a release carries both `vsav.zip` flavours). **FUTURE,
+UNSCHEDULED (maintainer, 2026-08-24):** the LIVING-DOCUMENTATION effort (of
+which `mister_core.md` + `mk_mister_page.py` are the pilot) and DISTILLING AI
+SKILLS from the project's learnings, scoped by subject. Both follow MiSTer.
+
+## Session 14z-107 (11) — **THE WIDE ROMSET'S BOOT FAILURE IS ROOT-CAUSED AND
+## FIXED. The CPS-2 key's ENCRYPTED-OPCODE RANGE WORD IS STORED COMPLEMENTED,
+## and `jtcps2_dec_ctrl` reads it straight — so the reference core decrypts
+## opcode fetches to `CPU:$F03FFF` where MAME and FBNeo stop at `$0FFFFF`.**
+## Every stock CPS-2 game hides it. CPS-2 WIDE is the first thing to put
+## EXECUTABLE content above the window, and the first ten opcodes it fetched
+## there arrived as the decryptor's output. Slice **D5** (fork `c00d7ce7`)
+## complements the word, profile-gated. **AND THE PAYOFF LANDED WITH IT: a
+## TENANT TILE HAS BEEN FETCHED ON THE CORE, for the first time ever.**
+## (This section post-dates the 14z-107 CLOSE below.)
+
+**THE TASK WAS ONE QUESTION WITH THREE POSSIBLE ANSWERS**, recorded in the
+14z-107 (10) review commit `eac3a73`: does slice D4's 6 MB program decode
+actually FUNCTION? Because if it does not, `wide_en` SET behaves exactly like
+`wide_en` CLEAR for every read above `CPU:$400000`, and the "profile-on and
+profile-off are frame-for-frame identical" elimination is explained by a DEAD
+DECODE rather than by an innocent profile. **The answer is the third one, in a
+form nobody listed: the decode works, SDRAM returns the romset's bytes, and
+something BETWEEN SDRAM AND THE 68k corrupts them.**
+
+### THE MEASUREMENT
+
+A sim-only probe on the 68k program-ROM read path
+(`cores/cps2w/hdl/jtcps2_main.v`, `JTCPS2W_PRGPROBE`, fork commit 16),
+deliberately TWO instruments: an ADDRESS half that classifies every 68k bus
+cycle by `A[23:21]` with **no chip select in the condition** — which is what
+still speaks when `wide_en` is clear and `rom_cs` cannot assert in the window
+at all — and a DATA half that logs every COMPLETED read with the word the CPU
+LATCHED and the RAW SDRAM word behind it. `11_pick_donovan`, `cps2w`, the real
+`vsavjw.rom` (sha1 `d462e55a…`), 2,300 simulated frames so the boot's own
+reset at 2242 is inside the window. The two legs differ by ONE BYTE — header
+byte 41, `0xFE` against `0xFF`:
+
+| | `wide_en` = 1 | `wide_en` = 0 |
+|---|---|---|
+| 68k bus READ cycles into `$400000-$5FFFFF` | **10** | 4 |
+| ...WRITE cycles (the objcfg port at `$400000-$40000A`) | 7,198 | 7,198 |
+| COMPLETED program-ROM reads above `$400000` | **10** | **0** |
+| ...below `$400000` (the must-fire control) | 54,961,148 | 54,954,608 |
+| SDRAM read probe, bank 0 `0x400000-0x600000` | **16 words**, `0x4BE7C0-0x4BE7CE` | **0** |
+
+**The ten records ARE the finding.** All at `CPU:$4BE7C0-$4BE7C8`, five at
+simulated frame **1119** and the same five at **2246** — once per turn of the
+boot loop. All ten carry **`fc = 2`, USER PROGRAM: they are OPCODE FETCHES**,
+so the 68k is EXECUTING from the extension. Every raw word is the `.rom`'s
+byte for byte; **every latched word is different.**
+
+**The must-fire evidence is in the same counters.** 54.9 M reads below
+`$400000`, first 2,000 logged with bytes: **2000/2000 match the `.rom`**, and
+they split exactly along the CPS-2 rule — `fc=5` (supervisor DATA) 824
+records, none decrypted; `fc=6` (supervisor PROGRAM) 1,176, all decrypted. The
+same sample CALIBRATES the byte order (`rom[off+1]<<8|rom[off]` 2000/2000, the
+other order 59/2000), so the comparison is derived rather than assumed.
+
+### THE MECHANISM, AND WHY IT SURVIVED THIRTY YEARS OF CPS-2 EMULATION
+
+FBNeo `cps2_crpt.cpp:771`: `upper = (((~decoded[9] & 0x3ff) << 14) | 0x3fff) + 1`.
+`jtcps2_dec_ctrl.v:44`: `en_latch <= op_fetch && en && (addr[14+:10] <= range[9:0])`
+— **no complement.** For `vsavj` the word is `0x03C0` (computed two
+independent ways from the same 20 key bytes — jtframe's `jtcps2_keyload`
+permutation and FBNeo's `(317-b)%160` — and they agree), so MAME/FBNeo decrypt
+`$000000-$0FFFFF` (63 blocks of 16 KB) and jtcps2 runs on to `$F03FFF` (960).
+
+**Every stock CPS-2 game hides it, for two reasons that stack:** the only code
+that ever executes is the code Capcom encrypted, which is inside the real
+window either way; and DATA reads are not opcode fetches, so no implementation
+decrypts them at any address. **That also retroactively weakens 14z-56's
+B4 (prg)**: it relocated DATA tables, and data reads bypass the decryptor
+everywhere. Nothing had ever EXECUTED from above 4 MB on a core that decrypts
+by address.
+
+### SLICE D5, AND WHAT IT DELIBERATELY DOES NOT TOUCH
+
+`cores/cps2w/hdl/jtcps2_decrypt.v` (fork `c00d7ce7`), one gated expression:
+`rng_eff = wide_en ? { addr_rng[15:10], ~addr_rng[9:0] } : addr_rng`.
+`jtcps2_dec_ctrl` is **not** overridden — the fix sits one level upstream of
+the comparison, so the comparison nobody has validated for the rest of the
+CPS-2 library is left exactly as it was. `dec_en` is unaffected (keyload still
+sees the uncomplemented word). With `wide_en` clear `rng_eff` IS `addr_rng`,
+so stock `vsavj` and every other CPS-2 game are untouched BY CONSTRUCTION.
+**Gated rather than fixed outright because fixing it for the whole CPS-2
+library is a claim this project cannot validate — it is a defect in the
+reference core and worth reporting upstream.**
+
+### WHAT THE FIX PRODUCED — AND IT IS THE THING THE ARC HAS BEEN AFTER
+
+Same core, same romset, same replay, with D5 in:
+
+* **the same five opcodes at `$4BE7C0` now arrive as memory holds them**
+  (`4ded 4ded`, `3800 3800`, …) and the 68k keeps going;
+* completed reads above `$400000` go from **10** to **343,806** by frame 1789,
+  spanning `$412BA0-$4D100E` — which is `wide_ext` (`0x400010-0x4D1100`) to
+  the byte;
+* the boot **passes the point it used to die at**, reaches the title screen
+  (bank 3 at 48,928 words/frame, the stock image's own title-screen figure)
+  and then the select screen;
+* **and the group-C read probe lights up. Over 2,900 simulated frames:
+  9,038,400 reads over 105 DISTINCT TILE CODES in obj bank 5 (the select-wheel
+  tenant art), first at frame 1556, every code inside the roster's frozen live
+  extent for that bank. A TENANT TILE HAS BEEN FETCHED ON THE CORE, for the
+  first time in the arc.** The vanilla banks now read what the STOCK image
+  reads on a healthy boot — 372 distinct blocks in bank 2, bank 3 reaching
+  `0x9C177E` — which are the same figures the stock leg produced. Obj bank 4
+  (the fighter art) is still zero: this replay window ends before a match
+  starts.
+* completed program-ROM reads above `$400000` over the full run: **1,189,750**,
+  spanning `CPU:$412BA0-$4D100E`, and **20,000 of 20,000 sampled records have
+  `cpu_word == raw_word == the .rom`** — the CPU now receives exactly what
+  memory holds.
+* **`tests/test_mister_gfxc_fetch.sh`'s WHEEL half is GREEN**: codes
+  `0x74D6-0xFE41`, all inside the frozen extent `0xFFDB`, control at zero.
+  **Its FIGHTER half (obj bank 4) is still RED and stays red** — this replay
+  ends at the select screen and no match starts, so no fighter sprite is
+  emitted. A gate green on evidence it does not have is worse than a red one.
+  **Its first real measurement found two defects IN THE GATE**, both fixed:
+  the tile code was computed from the ABSOLUTE SDRAM address instead of
+  relative to the armed window's base (a correct promote read as
+  `0x170D6-0x1FA41`), and its liveness control demanded vanilla obj traffic in
+  the CONTROL leg — an image that cannot boot by construction, because with
+  the profile clear its group-C art aliases over vanilla's obj banks.
+* `tests/test_mister_prg_window.sh` freezes the pair and PASSES;
+  `tests/run_all_static.sh --strict` is **GREEN at PASS 107 / SKIP 0 / FAIL
+  0** (106 before, plus `test_mister_prg_probe`).
+
+**BOTH STOCK LEGS ARE GREEN WITH D5 IN**, which is the superset invariant on
+the one change that could have moved it: `tests/test_mister_wide_inert.sh`
+PASSES (`cps2w == cps2`, BIT-IDENTICAL work RAM in all 101 frames, control
+firing) and `tests/test_mister_sim_anchor.sh` PASSES at **sim 2609 / MAME 2146
+/ skew 463** (frozen 463 ± 30), every mapped field agreeing, all four controls
+firing. Both are true by construction as well as by measurement — `rng_eff` IS
+`addr_rng` with `wide_en` clear.
+
+### TWO INSTRUMENT DEFECTS, BOTH CAUGHT BY THE DATA (this lane's total is now SIX)
+
+1. **The probe's first draft split the window on `rom_addr[21]`.** `rom_addr`
+   is declared `[22:1]` and driven `A[22:1]`, so its INDEX is the address bit
+   and `[21]` is `A[21]` — set for `$200000-$3FFFFF`. It reported **2,560
+   reads "above `$400000`" at `$38C2A0-$3D8256`** in the first frame it fired.
+   The COUNT looked healthy; only the addresses contradicted the label, and
+   only because the probe logged them.
+2. **The verdict tool judged only the RAW word and reported "D4 WORKS"** over
+   ten fetches the CPU received as garbage — a verdict bug of exactly the kind
+   CLAUDE.md §4 forbids.
+
+Both are now REFUSALS in `tools/prgprobe_verdict.py` and fixtures in
+`tests/test_mister_prg_probe.sh` (4e and 4g), the second built from the real
+numbers. **Generalisation worth keeping: log the raw quantity beside the
+classification, so the instrument can be caught disagreeing with itself; and
+when a second implementation reads the same configuration word, DIFF THE
+EXPRESSION, not the result.**
+
+### WHAT WAS RETRACTED
+
+* `mister_map.md` §8 "the extension is NOT decrypted, and that is correct" —
+  true of the hardware, MAME and FBNeo; FALSE of jtcps2. Corrected in place,
+  and in the `jtcps2_main.v` override header (fork `7b9a0d2d`, comment only).
+* `mister_map.md` §10 D4 "the proof is that the WIDE set BOOTS AND PLAYS" and
+  D3 "it is a REAL FETCH on the REAL ROMSET" — neither was true when written.
+* `HANDOFF.md` "SINCE D3+D4 THE CORE FETCHES TENANT ART" and `mister_map.md`'s
+  §0 header of the same claim.
+* **One elimination CORRECTED rather than withdrawn:** the two profile states
+  are NOT frame-for-frame identical. They are identical in bank-3 traffic and
+  in masked work RAM — which is what was measured — but the profile-ON leg
+  issues ten completed reads above `$400000` and the profile-CLEAR leg zero.
+  The instrument that said "identical" could not see the window it was being
+  asked about.
+
+## Session 14z-107 CLOSE — ritual complete. THE MiSTer ARC'S THREE
+## PLACEMENT SLICES ARE DONE (D0 the MRA, D1 the runtime profile gate +
+## QSound width, D2 the SDRAM placement), the CLAUDE.md §4 oracle now runs
+## on a THIRD implementation and AGREES, and the most transferable result
+## of the session is a methodological one: **THREE SEPARATE INSTRUMENTS
+## PRODUCED FALSE VERDICTS WHILE THE THING UNDER TEST WAS INNOCENT.**
+## Twenty commits of session work plus this close = **21, ALL LOCAL** —
+## every one is MiSTer work, so none qualifies for the pre-MiSTer push
+## exception. The FORK is fully public:
+## `origin/vampire-saved` = the pin = `0df6f000`, eleven commits.
+
+**The session, in one line:** the MiSTer arc went from "the oracle might
+be buildable" to "the WIDE romset has a byte-exact place in 64 MB of
+SDRAM, gated at runtime, with every byte of the image counted" — and it
+got there by fixing its own instruments three times, each of which had
+already published a wrong number.
+
+**THE LESSON FIRST, BECAUSE IT IS THE PART THAT TRANSFERS.** In one
+session, three defects in the MEASURING APPARATUS produced verdicts about
+things that were not defective. None was found by theorising; each was
+found by changing ONLY the instrument and re-running.
+
+| # | the instrument | the false verdict it produced | the innocent subject | how it was caught |
+|---|---|---|---|---|
+| 1 | the Verilator SDRAM model dropped `addr[22]` (it rides `sdram_a[9]` as the tenth COLUMN bit; `addr[9]` is a ROW bit) — 14z-107 (3) | GFX banks 2/3 were HALF-ALIASED, so 14z-106 slice C's "frames showed sprites" read as evidence that GFX addressing was faithful when it only proved the core runs — no video or sprite result from the lane was trustworthy for wide GFX at all | jtcps2's GFX addressing, and the lane's own credibility | derive from the RTL instead of from the SIZE — *a size tells you how many bits are missing, never which one* |
+| 2 | the forked frame writer `exit(0)`'d, `fclose()`ing the parent's inherited `sim_inputs.hex` `FILE*`; POSIX rewinds the SHARED offset — 14z-107 (7) | slice D1's anchor read RED (2609/463) against a frozen 2502/356, and the RTL was blamed for four 50-minute runs | `cores/cps2w`'s D1 RTL — and the FROZEN number was the artifact, not the red one | a 2x2 factorial on `pal_lut.hex` x frame-output, 681 dumps a leg: the RTL axis moved nothing, the HOST axis moved everything |
+| 3 | jtframe's `SimInputs` held P1's **and P2's** buttons 5 and 6 down — two 8-bit constants on a `[9:0]` ACTIVE-LOW port — 14z-107 (8) | the two legs of the §4 oracle had never run the same inputs, so every agreement it reported was an agreement about a different machine | both legs; the fields agreed anyway | a MAME hold-vs-not differential located the game's own input mirror (`$FF8058/5A/5C/5E`) and the pre-fix sim block was BYTE-IDENTICAL to MAME with four buttons held |
+
+**And a fourth, in D2, of the same family:** `JTFRAME_SIM_WRAMDUMP_OFF`
+was hard-coded to bank 0 byte `0x600000` — work RAM on `cps2`, **VRAM on
+`cps2w` after the re-pack** — so `test_mister_wide_inert` went red in 101
+frames of 101 while comparing one core's work RAM against the other's
+VRAM. It does not announce itself: VRAM is a plausible 64 KB of changing
+bytes, so the window was non-constant and every other assertion passed.
+**Any instrument that names a PHYSICAL address is invalidated by a
+memory-map change, and a placement slice IS a memory-map change.**
+The standing rule that came out of all four, now in
+`docs/platform/gotchas.md` and in the NEXT_SESSION banner: **suspect the
+instrument before the RTL** — and never blame a red anchor on RTL until a
+core-vs-core RAM comparison says so, which is what
+`test_mister_wide_inert` exists for.
+
+**AND THE HONEST LIMIT ON D2, STATED BEFORE THE ACHIEVEMENTS.** D2's
+evidence is the SDRAM IMAGE, not a replay, and it has to be:
+`rom0_bank[2]` is tied low until D3, `gfxc_sel` is therefore constant 0,
+the two group-C read slots are provably unreachable, and **no tenant art
+has ever been FETCHED on the core.** D2 built the destination and the
+plumbing; nothing has driven them yet. The bandwidth verdict is the same
+shape: it BOUNDS the headroom (only stock traffic is measurable — a WIDE
+romset does not load on the stock core), it does not prove the repacked
+design.
+
+**WHAT THE SESSION SHIPPED, slice by slice**
+- **The §4 oracle on a third implementation** (entry at the bottom of this
+  group): work RAM had NO dump path on this core, so one was built —
+  `JTFRAME_SIM_WRAMDUMP`, 64 macro-gated lines in the Verilator TESTBENCH.
+  MAME and stock jtcps2 agree on every mapped field at the round-1
+  match-start anchor of `05_timeout_idle`; the single disagreement is the
+  game's own sound-state-fed 1P arcade draw, excluded by name.
+- **Two 14z-106 claims RETRACTED** (`JTFRAME_SIM_IODUMP` reaches the
+  EEPROM, not work RAM; `JTFRAME_SAVESDRAM` is Verilog-model-only), and
+  later a **retraction-of-a-retraction**: the XL tier does not exist at
+  our pin and DOES exist upstream. *A grep proves a fact about the tree you
+  grepped, and a pin is a tree.*
+- **The memory-map truth** — at `v1.7.3`, 64 MB is PHYSICAL;
+  `JTFRAME_SDRAM_XL` is real, upstream-only, two chips on nCS polarity, and
+  reachable only inside the `JTFRAME_SDRAM_CACHE` branch (setting it today
+  would compile, validate and silently alias). **RULED: BANK REPACK at the
+  pin, XL as fallback.**
+- **The bandwidth measurement: GO** — bank 1's PCM is already at a 98.8%
+  in-match row-miss rate, so it has no locality left to lose; the worst
+  case runs at 26.3% of one bank against the **32.9% bank 0 already
+  sustains in stock shipping configuration**.
+- **The placement map** (`docs/project/mister_map.md`) + `audit_mister_map_fit`.
+- **D0** — the MRA trim that makes the WIDE image downloadable at all:
+  `vsavjw.rom` = **66,265,152 B**, header words **6144/6400/15552/64704**,
+  every region verified byte-for-byte against the romset. Stock leg still
+  **46,407,744 B / sha1 `f9dc2987…`**, bit-identical.
+- **D1** — the QSound sample-bank width fix behind a **RUNTIME** profile
+  gate (MRA header byte 41, bit 0, ACTIVE LOW: the generator's own
+  `fill=0xff` means profile OFF, the WIDE MRA writes `0xfe`). That is what
+  makes rule 1 v2's "profile-gated ... stock `vsavj` untouched BY
+  CONSTRUCTION" a FACT on FPGA rather than an inertness argument.
+- **D2** — the placement in RTL (bank-0 re-pack, group-C GFX redirect,
+  QSound split on `pcm_addr[23]`, two new slot counts, ONE new jtframe file
+  `hdl/sdram/jtframe_ram1_7slots.v`), gated by a census over **all
+  67,108,864 bytes of all four banks**, four legs, every control firing.
+- **The synthesis document + its generator** — `docs/project/mister_core.md`
+  states what is TRUE about the core in CAUSAL order and names the logs as
+  its provenance; `tools/mk_mister_page.py` draws the geometry rather than
+  asserting it, with `--check` re-deriving all 17 figures. The
+  maintainer's requested living-documentation pilot.
+- Throughout: `cores/cps1`, `cores/cps2` and `cores/cps15` are
+  **BYTE-UNTOUCHED**, and since D1 that is a `git diff` assertion
+  (`test_jtcores_twin` 2e), with the fork's whole-tree delta held to a
+  declared 18 paths (2f).
+
+**THE PLACEMENT'S MARGINS ARE THIN, and the census is why we know:** the
+map claimed 0.708 MB of slack and the truth is **0.125 MB — SDRAM bank 1
+is EXACTLY FULL** (8 MB PCM + 8 MB obj bank 4 = 16,777,216 B to the byte)
+and bank 0 has **131,072 B** free. The error was of KIND, not arithmetic:
+the map sized the group-C obj banks by the art's ADDRESS FOOTPRINT
+while the MRA downloads the WHOLE declared region, so each obj bank
+reserves its full 8 MB whatever the art does inside it. **Three sizes of
+the same art — live bytes (6.39 MB), address footprint (15.45 MB),
+declared region (16 MB) — and this project has now published a wrong
+figure from each of the first two.** Both consequences point opposite
+ways: tenant art may grow freely inside the existing 16 MB, and the
+group-C ROMSET REGION cannot grow at all.
+
+**MAINTAINER RULINGS TAKEN THIS SESSION** (all marked DECIDED in place in
+Decisions pending): the MEMORY-MAP ROUTE (bank repack, measuring first;
+XL fallback); the BANK-0 SLOT COUNT (option A — add `jtframe_ram1_7slots`
+so bank 1 stays at the two streams the GO measurement modelled); the
+PROFILE SELECTED AT RUNTIME from a spare MRA header bit rather than by
+`ifdef`; SOURCE SEPARATION (the core stays unmixed; the shared `tools/`
+and `tests/` stay as they are and are not to be tidied later);
+FORK-PUSH STANDING AUTHORISATION (2026-08-24; the main repo is still never
+pushed). Plus two FUTURE DIRECTIONS recorded, nothing scheduled: the
+LIVING-DOCUMENTATION EFFORT (and the option it creates — a rebuild from
+the docs after the MiSTer core is finished) and DISTILLING AI SKILLS from
+the project's learnings, scoped by subject.
+
+**RITUAL**
+- **STATE**: this entry, session entries (1)-(9), the two FUTURE-direction
+  entries, and every ruling marked DECIDED in place. **The ROLLOVER
+  executed**: three groups were kept by the group rule (14z-107, 14z-106,
+  14z-105), so nothing was DUE by it — but the file stood at **208 KiB
+  against the ~150 KB the rule names**, so the SIZE arm applied and the
+  oldest kept group, **14z-105 and only it** (4 entries, 235 lines), moved
+  VERBATIM to the top of `STATE_HISTORY.md`'s body with its ledger line
+  here. Verified lossless: the extracted block is byte-verbatim in the
+  archive and absent from this file. 14z-107 and 14z-106 stay. **This file
+  is STILL over the size guide** — 211 KiB with this entry written, because
+  the 14z-107 group alone is 1,803 lines / 113 KiB — **so 14z-106 rolls at
+  the next close.**
+  Recorded here so the next session does not have to re-derive it.
+- **`docs/NEXT_SESSION.md`**: rewritten. The banner carries the arc state
+  (D0-D2 done, **D3 the obj promote is the opener**), the frozen anchor
+  (MAME 2146 / sim 2609 / skew 463 ± 30), the fork pin and the push
+  policy, the placement's thin margins, and the two standing warnings —
+  suspect the instrument before the RTL, and never edit a script while a
+  run is in flight.
+- **`HANDOFF.md`**: the MiSTer block brought current — it now opens on
+  `mister_core.md` rather than `platform/mister.md`; the SIX tools this
+  session added (`run_sim_jtcps2.sh`, `mister_mra.sh`, `gen_vsavjw_xml.py`,
+  `check_wram_dumps.py`, `mister_sdram_census.py`, `mk_mister_page.py`) are
+  all named with their commands, and the gate table carries tier and runtime
+  for all **eleven** MiSTer gates (`test_mister_page` was the row the
+  synthesis commit had not added). **Two things it asserted that this
+  session made false are fixed:** it still called THE MiSTer MEMORY-MAP
+  ROUTE a pending decision, and it still framed the GFX overflow as
+  "~6.4 MB into bank 1's spare" — the three-sizes correction.
+- **`docs/README.md`**: `mister_core.md` was already indexed (the synthesis
+  commit did that), but it was NOT DISCOVERABLE — neither bucket
+  description named MiSTer, so a reader who did not already know the file
+  existed had no route to it. Fixed by adding an **IF YOU WANT TO KNOW X,
+  READ Y routing table** at the entry point (the shape the
+  living-documentation direction asks for), with the MiSTer row naming the
+  synthesis first and its three logs after it, and by naming MiSTer in the
+  `platform/` and `project/` bucket descriptions. Also fixed: the stale
+  trap count (145 -> a measured 304).
+- **GOTCHAS**: every trap this session paid for is filed in
+  `docs/{platform,project}/gotchas.md` and indexed — the in-flight script
+  edit (paid THREE times, the third on a COMMENT-ONLY edit), the
+  forked-child stream rewind, IODUMP-is-the-EEPROM, the 32 MB Verilator
+  SDRAM model, XL-without-cache silent aliasing, jtframe resolving zip
+  members by CRC32 alone, the missing `pal_lut.hex` black screen, the
+  `jtframe files` path-dedup bill, the SDRAM-addressed dump hook, the
+  `prog_ba` fall-through, and the three sizes of the same art.
+- **GATES RUN AT THE CLOSE**: `run_all_static.sh --strict` **PASS 106 /
+  SKIP 0 / FAIL 0 / MISSING 0** — run TWICE, once before the documentation
+  pass and once after it on the final tree, with the same result;
+  `tools/audit_roms.py` **76/76 members match `docs/checksums.txt`**;
+  `tools/mk_mister_page.py --check` **PASS, all 17 figures re-derived**;
+  `tests/test_jtcores_twin.sh` standalone **PASS** (pin `0df6f000`, the
+  series 11 files == 11 commits with each `== format-patch -1`, the fork's
+  whole-tree delta exactly the declared 18 paths, and
+  `cores/cps1`/`cps2`/`cps15` BYTE-UNTOUCHED vs v1.7.3). Only `STATE.md`
+  and `docs/README.md` moved after the second full run — no gate reads
+  either (grep'd) — and `--tier portable` was re-run afterwards anyway:
+  **PASS 51/0/0**.
+- **COMMITS**: twenty of session work, `a2585bb`..`3dc9604`, plus this
+  close = 21, **all LOCAL** (`git log 4156283..HEAD`). Fork:
+  eleven commits, **all PUSHED** (`origin/vampire-saved` = `0df6f000` =
+  the submodule pin, verified with `git ls-remote`).
+
+**RETRACTIONS EXECUTED AT THE CLOSE (grep'd for the CLAIM, not for the
+files I remembered).** The route ruling of 2026-08-23 had been recorded in
+STATE and acted on in D2, but **four live documents still called it a
+PENDING DECISION** — `HANDOFF.md`, `docs/project/mister_fit.md`,
+`docs/platform/mister.md` and `docs/project/cps2_wide.md` — plus the
+14z-107 (2) banner block in `NEXT_SESSION.md`. All five marked DECIDED in
+place, superseded text kept and struck. Also fixed in place: HANDOFF's
+"only GFX overflows by ~6.4 MB" (the three-sizes correction); the 14z-107
+(4) slice-plan line still telling every slice to re-run the anchor gate at
+`2146 / 2502 / 356` (the numbers were retracted in (7), the instruction
+stands); `mister.md`'s SDRAM-model control paragraph, which stated the
+2507 -> 2502 move without its retraction beside it (the MOVE and its
+mechanism stand — it was measured as a DIFFERENCE between two runs that
+shared the corruption — only the absolutes fall); the 14z-107 (1) and
+14z-106 CLOSE lines still calling the PROFILE SHAPE ruling pending; the
+five `NEXT_SESSION` banner blocks that all still claimed to be "NEWEST
+FIRST"; and `docs/README.md`'s trap count, stale at 145 against a measured
+304. **Re-grepped afterwards: every surviving hit is inside a struck span
+or an explicitly historical entry.**
+
+**NEXT OPENER: SLICE D3 — THE OBJ PROMOTE.**
+`jtcps2_obj_scan.v:152` `st3_bank <= {table_y[12], table_y[14:13]}` (the
+CPS-2 Turbo rule, the MiSTer twin of the ratified 19-bit promote WIDE v1
+already makes in FBNeo's `Cps2ObjDraw`), plus the
+`dr_bank`/`obj_bank`/`rom_bank`/`rom0_bank` chain widened to 3 bits. It
+lands on the destination and the plumbing D2 built, and it is the slice
+that first DRIVES `rom0_bank[2]` — i.e. the first time tenant art is
+fetched on the core at all. Gate: the MiSTer twin of the FBNeo B4 canary.
+D4 (the 6 MB PRG window) follows.
+
+**STILL OPEN FOR THE MAINTAINER:** MiSTer PACKAGING (which MRA is the
+core's MAIN one; how a release carries both `vsav.zip` flavours) — neither
+blocks D3/D4, both must be answered before a release.
+
+## Session 14z-107 (10) — MiSTer SLICES D3 AND D4: THE CPS-2 TURBO OBJECT
+## PROMOTE GOES LIVE AND THE 6 MB PROGRAM WINDOW WITH IT. `rom0_bank[2]` is
+## untied, the third obj bank bit runs end to end from the frame table to
+## SDRAM, and the 68k can read `CPU:$400000-$5FFFFF`. Fork commits
+## `17a5dc2b` (the harness SDRAM READ PROBE), `b9899fa8` (**D3**),
+## `fd454393` (the harness frame window) and `dd242a65` (**D4**); the pin is
+## `dd242a65`, FIFTEEN commits.
+
+### D3 AND D4 SHIPPED TOGETHER, AND THE REASON IS A FACT ABOUT THE ROMSET
+
+The slice plan queued D4 after D3. It cannot be run that way, and the reason
+was already written in `mister_map.md` §10 as a summary sentence — "only
+after D0-D4 does a WIDE set boot" — without anyone noticing it was
+load-bearing. **The select screen's roster record is allocated in
+`wide_ext`, above `CPU:$400000`** (`build/manifest/*.toml`
+`[[select_wheel]] roster21`, `hole = "wide_ext"`; `build/m3b_merged13/gen.log`
+puts `wide_ext` at `0x400010-0x4D1100`). With only the stock 4 MB decode the
+core cannot READ the table that names the tenant cells, so no tenant sprite
+is ever emitted and **the promote has nothing to promote**. D3 is PROVABLE on
+its own — the expression is swept exhaustively — but it is not DEMONSTRABLE
+on its own. The two are separate fork commits with separate gate sections;
+they are one session's work.
+
+`mister_map.md` §10 had planned a synthetic canary for D3 (the MiSTer twin of
+FBNeo's B4 canary: a test flag ORing `0x1000` into bank-2/3 sprites with
+group C loaded as a byte copy of group B, on the STOCK rom). **It was not
+built.** It was designed for a world in which the WIDE set could not boot;
+with D4 in the same session the real romset is the better witness, and the
+canary would have proved a weaker statement about a doctored image.
+
+### THE RTL, AND WHY ONE EXPRESSION COST FIVE FILES
+
+**D3** — `cores/cps2w/hdl/jtcps2w_obj_bank.v` is the whole behavioural
+surface:
+
+```verilog
+assign bank = { wide_en & table_y[12], table_y[14:13] };
+```
+
+read in the ELSE arm of `jtcps2_obj_scan`'s sprite-list terminator test,
+which is the reference core's VERBATIM. **The order is the rule, not the
+bit**: `table_y[15]` IS the terminator, so the profile's first draft (read
+bits 15:13 as the bank) would have ended the list at the first tenant sprite.
+Capcom solved it the same way on CPS-2 Turbo. Inside the else arm bit 15 is
+known to be 0, so the promoted bank is exactly `{ y[12], y[14:13] }` — which
+is why `tools/gfx_tiles.py`'s `bank_word` emits `0x1000` for bank 4 and
+`0x3000` for bank 5 and not `bank << 13` (= `0x8000`, a terminator).
+
+That one expression pulled in FOUR override files, three of which change
+nothing but a WIDTH: `jtcps2_obj_scan.v`, `jtcps2_obj.v`,
+`jtcps1_obj_draw.v`, `jtcps1_video.v`. A 3-bit bank has to be three bits wide
+at every port between the frame table and SDRAM, and **Verilog answers a
+3-bit signal driving a 2-bit port with a warning at worst** — the failure it
+produces is a PICTURE (every tenant sprite fetching vanilla art), which looks
+like a content bug and sends you to the romset. New platform gotcha; gate
+check 8c asserts all six declarations by name.
+
+**D4** — `cores/cps2w/hdl/jtcps2_main.v`, three lines, all gated:
+`rom_cs` gains `wide_en & RnW & (A[23:21]==3'b010)`; `rom_addr` widens to
+`A[22:1]` (with `main_rom_addr` and bank 0's `SLOT3_AW` following); and
+`one_wait`'s boundary becomes `wide_en ? 4'h6 : 4'h5` — the defect found
+while reading for D2, where the second megabyte of the extension would have
+run ZERO-wait while every other byte of program ROM is one-wait. **The read
+decode is collision-free only because `objcfg_cs` is qualified `!RnW`**, so
+the gate re-reads that qualifier on every run (8i). And the extension is NOT
+decrypted, correctly: `jtcps2_dec_ctrl` decodes only OPCODE fetches below the
+key header's range word, which for this game ends at `$0FFFFF`, and the
+profile writes extension content RAW for exactly that reason. The two halves
+agreed without either being touched.
+
+**EIGHT `wide_en` SITES NOW**, all re-read verbatim by
+`tests/test_mister_wide_gate.sh`, and three ungated WIDTH changes declared
+rather than hidden (the bank wires 2->3 bits, `rom_addr`/`main_rom_addr`/
+`SLOT3_AW` 21->22): each is behaviourally identical with the profile clear
+because the extra bit is driven to 0 by a gated expression.
+**THE PROMOTE IS GATED AT BOTH ENDS DELIBERATELY.** `gfxc_sel` already ANDs
+`wide_en`, so an ungated promote would have been inert anyway — obj bank 4
+selects the same read slot as bank 0. Gating the SOURCE too makes bank bit 2
+*provably zero* with the profile clear rather than *harmlessly ignored*, and
+it is what makes the expression testable on its own.
+
+### THE INSTRUMENTS BUILT FOR THIS SLICE
+
+- **`JTFRAME_SIM_RDPROBE`** (fork commit 12), the harness's SDRAM READ PROBE:
+  four optional counters on the one line in `SDRAM::update()` that serves a
+  burst beat. Each takes a bank and a half-open byte window and reports reads,
+  DISTINCT 128-byte blocks (which on CPS-2 graphics is a TILE-CODE list,
+  because a tile code is its own SDRAM address), the first frame and address
+  and the range. No RTL; absent the macro every line compiles out — the
+  `JTFRAME_SIM_WRAMDUMP` precedent exactly. **Four slots and not two, on
+  purpose:** two arm the windows under test and two arm windows that MUST see
+  traffic, so a zero is evidence about the CORE and not about the probe.
+  Units are burst BEATS, not ACTIVATE commands — do not compare them with
+  `--stats` numbers without dividing by the burst length.
+- **`JTFRAME_SIM_VIDEO_FIRST/_LAST/_STRIDE`** (fork commit 14): the frame
+  writer forks an ImageMagick child per CHANGED frame, which is right for a
+  short run and wrong for a 4,000-frame one. Defaults are upstream's.
+- **`tests/rtl/tb_obj_bank.v`**: 131,072 vectors — all 65,536 y-words in both
+  profile states. bank[2] set **32,768 times wide / 0 stock**; bank[1:0]
+  equal to `y[14:13]` throughout; and the six `gfx_tiles.py` encodings each
+  decode to their own bank with **none of them setting y bit 15**. Two
+  must-fire controls fire: the gate bypassed, and bit 2 read from `y[15]`.
+- **`tests/test_mister_gfxc_fetch.sh`**: the demonstration gate. Derives its
+  windows FROM THE RTL (`GFXC4_OFFSET`/`GFXC5_OFFSET` and the bank each
+  group-C slot sits in) because an instrument that names a physical address is
+  invalidated by a memory-map change — the rule 14z-107 (9) paid for twice.
+- **`tests/audit_sdram_bank_load.sh --core cps2w --wide BUILD`**: the second
+  leg of the traffic instrument, plus a **PEAK per-bank table** derived from
+  the run's own reporter intervals, because saturation is a property of the
+  worst interval and not of a phase average.
+
+### THE STOCK LEG IS GREEN — THE FPGA SUPERSET INVARIANT HOLDS WITH THE
+### PROMOTE AND THE PROGRAM WINDOW IN
+
+- `tests/test_mister_sim_anchor.sh` **PASS** on `cps2w` with stock `vsavj`:
+  MAME **2146** / sim **2609** / skew **463** (band ±30, untouched), every
+  mapped §4 field agreeing, and all four controls firing (byte-swapped dumps
+  rejected, a lost dump rejected before any anchor is computed, no `wram/`
+  without the macro, the window non-constant). **A round-1 match start means
+  thousands of sprites were drawn through the widened bank chain**, so D3's
+  four override files are exercised rather than merely compiled.
+- `tests/test_mister_wide_inert.sh` **PASS**: `cps2w` == `cps2`, bit-identical
+  work RAM in **101 frames of 101**, with the one-frame-shift control firing.
+- `test_jtcores_twin`, `test_mister_wide_gate` (six controls),
+  `test_mister_mra_map`, `audit_mister_map_fit`, `mk_mister_page --check` all
+  PASS; `tests/run_all_static.sh --strict` **GREEN, 106/0/0**.
+
+### THE DEMONSTRATION IS RED, AND IT IS RED FOR A REASON THAT IS NOT D3's
+
+**No tenant tile has been fetched. No tile of ANY kind has.**
+`11_pick_donovan` on `cps2w` with the real `vsavjw.rom`, four SDRAM read
+probes armed, 4,000 simulated frames:
+
+| simulated frame | what the core is doing |
+|---|---|
+| 0-659 | the ROM transfer (the WIDE image takes 659 frames, not the stock 462) |
+| 660-925 | the CPS-2 RAM test draws line by line — `WORK / CPS0 / CPS1 / CPS2 / OBJECT` |
+| 928-1107 | a second boot screen |
+| 1108-1377 | **the test screen draws AGAIN** |
+| 1380-1559 | the second screen again |
+| 1578-2241 | the QSound / Capcom legal screen, static for 664 frames |
+| **2242** | **the machine RESETS — the RAM test starts over.** The cycle repeats |
+
+**Zero reads in SDRAM bank 2 across the whole run** — vanilla obj banks 0 and
+2, so not one sprite of any kind is drawn — and zero in both group-C windows.
+Bank 3 sees 94,692,120 word reads over **264 distinct 128-byte blocks**, all
+inside its first 4 MB: a tiny scroll working set drawn over and over. The same
+probe on the STOCK image counts **313,024 reads over 372 distinct blocks in
+bank 2** and 2,482 distinct blocks in bank 3, reaching `0x9C177E`.
+
+**THE SHARPEST FORM OF IT: THE STOCK AND WIDE BOOTS ARE TRAFFIC-IDENTICAL FOR
+448 FRAMES AND THEN DIVERGE.** Same core, same replay, same probes, frames
+counted from reset: the RAM-test ramp is the same values at the same frames,
+then 178 frames of 26,848, then 180 frames of 33,984 — identical — and at core
+frame **462 the stock image shows the TITLE SCREEN with `CREDITS:1`** while at
+core frame **449 the WIDE image starts its boot test over**. The divergence is
+at the end of the third boot phase, and that is the narrowest window this lane
+can put around the fault today.
+
+**THE ELIMINATIONS ARE THE USEFUL PART.**
+
+* **Not the profile, AND THE WORK RAM SAYS SO ON THE PROJECT'S OWN MASKED
+  BASIS.** The identical run with header byte 41 set to `0xFF` produces a
+  frame-for-frame identical trace — the same transitions at the same frames,
+  the same reset at 2242, 94,691,928 bank-3 reads against 94,692,120. Both
+  legs also dump `RAM:$FF0000-$FFFFFF` over frames 3400-3620: of 221 frames
+  156 differ, and **every differing byte is in one of the two windows
+  CLAUDE.md §4 masks** — the dead stack `$FF7F00-$FF7FFF`, and `$FF043C`, the
+  68k↔QSound handshake latch (28 frames, `08` against `04`, which
+  `atlas/ram.md:65` records as a one-frame phase). Nowhere else, never more
+  than 64 bytes of 65,536. **None of the eight gated sites is the cause —
+  which also means the failure exists at the D2 pin and has simply never been
+  visible**, because nothing had ever run the WIDE image past the download.
+* **Not the core.** `cps2w` runs the STOCK romset to the frozen match-start
+  anchor and to bit-identical work RAM against `cps2` (above).
+* **Not the download.** `test_mister_sdram_census` compares all 67,108,864
+  bytes of all four banks against the map on this exact image and core, and
+  passes. The two things a census cannot see — the CPS-2 key and the DSP
+  firmware — are byte-identical to the stock image's.
+* **Not the romset.** MAME on the same `build/m3b_merged13/rompath`, the same
+  replay and a fresh sandbox is at the character-select screen with the full
+  18-character wheel and the M6 mark by frame 930.
+* **Not the probe.** The same probe, the same binary and the same replay on
+  the STOCK image count **313,024 reads over 372 distinct tiles in SDRAM
+  bank 2**, first at simulated frame 1544. On the WIDE image that window reads
+  zero. A zero here is a fact about the core.
+
+**AND THE PROFILE BIT IS PROVABLY LIVE — VISUALLY, WHICH IS WHY THE FIRST
+ELIMINATION CAN BE TRUSTED.** The two legs render the same legal screen
+differently: correct with byte 41 = `0xFE`, and **a flat yellow field with only
+the CAPCOM logo left** with `0xFF`, because without the download redirect the
+16 MB of tenant art aliases over vanilla's obj banks 0/1 *and the whole scroll
+window* (`SCR_OFFSET = 0`). A two-legged experiment whose legs differ by ONE
+BYTE, and the first thing it produced was a picture that cannot be misread.
+
+### AND THE ROOT-CAUSE PROBE WAS TAKEN: THE SOUND DRIVER, AT MAME FRAME 266
+
+The §4 differential ran before the session closed. `cps2w` + the WIDE image,
+`RAM:$FF0000-$FFFFFF` at simulated frames 900-1400 (core 241-741), against
+MAME on the same romset and replay at the same game frames, masking the two
+windows §4 masks:
+
+| MAME frame | live bytes differing (of 65,536) |
+|---|---|
+| 241-265 | **2** — `$FF8003` and `$FF8080` only, a constant counter/RNG phase |
+| **266** | **14 — the onset** |
+| 267 | 42 |
+| 281-441 | back to 2-3 |
+| **461** | **748** |
+| 541-741 | ~870, steady |
+
+**The onset is entirely in the SOUND DRIVER**: `$FF025C/D` (a `$FF02xx`
+channel record), `$FF0462/3` (the current-record pointer spill `$FF0460.l` —
+MAME resting at `…043C`, the core reading `…025C`, i.e. mid-scan),
+`$FF04DB-$FF04E5`, and the two counter bytes that were already off. At frame
+267 the per-channel arrays at `$FF04A1-$FF04B5` diverge outright. **Nothing
+outside the sound area moves until frame 461**, when it explodes and the boot
+is lost.
+
+Two independent instruments now bracket the same fault from opposite sides:
+the SDRAM traffic diverges at core frame ~448, and the 68k STATE diverges at
+core frame 266 and stays contained in the sound driver for ~180 frames first.
+And the sound path is exactly what the profile touched hardest — WIDE v1
+relocated **all twenty per-character sound record arrays** above
+`CPU:$400000`. **Caution before acting on that**: the pos/neg comparison says
+the 6 MB decode changes nothing on the masked basis, so either the boot
+jingle uses a record still inside the base 4 MB, or the fault is upstream of
+the relocation. Measure first.
+
+### THE BANK-0 TRAFFIC ANSWER: STILL OPEN, AND NOW FOR A NAMED REASON
+
+`mister_map.md` §9 open question 1 asked whether bank 0 absorbs obj bank 5's
+select-screen traffic. The instrument's second leg exists and ran
+(`--core cps2w --wide build/m3b_merged13`, 2,800 frames, **zero `SDRAM reads
+clashed`**), but a run on a looping boot never reaches a select screen, so
+**there is no obj bank 5 traffic to measure and the question stays open**.
+What the run did measure, from its own reporter intervals and no frozen
+boundary: **bank 0 peaks at 54,422 accesses per video frame = 44.0% of its
+all-miss ceiling**, bank 1 at 12,043 (9.7%), bank 3 at 8,548 (6.9%) — and
+**bank 2 at exactly ZERO**, the boot failure expressed as a number.
+
+**AND THE RUN FOUND A DEFECT IN THE INSTRUMENT, now fixed.** The reporter's
+lines are block-buffered into a log the frame counter also writes, so a TORN
+line can still match the regex with one spliced field. A phase figure survives
+that; a PEAK does not, and one bad row reported a bank-3 peak of **16,870,809
+accesses/frame — 13,624% of the physical ceiling** — without comment. The gate
+now requires the cumulative counters to be MONOTONIC as well as the
+timestamps, drops the rows that are not, and says how many. The peak table is
+also restricted to AFTER the download, which is one command per byte and
+saturates every bank by construction (81.3% of the ceiling — a command-rate
+baseline, not a load the running game produces).
+
+### WHAT IS NOW TRUE, AND WHAT THE NEXT SESSION OPENS ON
+
+**All five RTL slices are in.** `cores/cps2w/hdl` holds TWELVE files — nine
+overrides of shared modules and three of our own — the fork's whole-tree delta
+is a declared 24 paths, `cores/cps1`/`cps2`/`cps15` are BYTE-UNTOUCHED, and
+the override delta is frozen line by line. The profile is complete: every
+format cap CPS-2 WIDE v1 needs is lifted, gated, and proven at the expression
+level.
+
+**The next session opens on a BUG HUNT, not a slice — and it opens with a
+LEAD, not a blank page.** The WIDE romset loops on its own boot; the
+eliminations rule out the profile, the core, the download, the romset and the
+probe; and the §4 differential names the **68k SOUND DRIVER at MAME frame
+266** as the first live divergence, contained there for ~180 frames before it
+becomes fatal. **[DONE 14z-107 (11) — THE DISCRIMINATOR RAN AND IT ANSWERED
+THREE: the decode works, the raw words are the `.rom`'s, and the CPS-2
+DECRYPTOR corrupts every opcode fetched above `$0FFFFF`. Slice D5 fixes it;
+the driver trace was never needed. See the 14z-107 (11) section at the top
+of this file.]** **BEFORE the driver trace, run the THREE-WAY DISCRIMINATOR (added
+14z-107 (10) review) — it is one probe and it can invalidate the trace.**
+The report reads "profile-on and profile-off are frame-for-frame identical"
+as ELIMINATING the profile. A third reading fits the same evidence and was
+not named: **if D4's 6 MB decode does not actually function, then `wide_en`
+set behaves exactly like `wide_en` clear for every read above `CPU:$400000`,
+and the two runs are identical FOR THAT REASON.** This matters because
+WIDE v1 relocated all twenty per-character sound record arrays above
+`$400000`, and the sound driver is precisely the subsystem that diverges.
+The census proves the DATA is placed; nothing yet proves the 68k can READ
+it. So instrument `rom_cs`/`main_rom_addr` for `A >= $400000` across the
+boot window with `wide_en` SET, and split three ways:
+  * **zero such reads** -> the relocation is not implicated in the boot
+    fault, the fault is elsewhere, and D4 stays UNPROVEN (a §12 hole);
+  * **reads occur, bytes correct** -> D4 works, the sound path is the
+    right hunt, proceed to the trace;
+  * **reads occur, bytes wrong** -> **D4 IS THE BUG** and the sound-driver
+    divergence is a downstream symptom; the trace would have burned hours
+    on a consequence.
+Only after that, start at `PRG:0x0011DE` (the driver's dispatch prologue,
+`atlas/ram.md:66`) and at what the boot jingle's record chain reads.
+
+**AND THE HONEST HEADLINE:** D3 was scoped as "the payoff slice — the first
+time a tenant tile is fetched on the core". It is not that. It is the slice
+that makes the fetch POSSIBLE and proves the mechanism exhaustively; the fetch
+itself is blocked behind a fault that predates it and that this session
+located, bracketed and eliminated four candidates for.
+
+**STILL OPEN FOR THE MAINTAINER:** MiSTer PACKAGING (which MRA is the core's
+MAIN one; how a release carries both `vsav.zip` flavours) — unchanged, and
+still not blocking.
+
+**THE 14z-107 SUB-ENTRIES (1)-(9) ARE IN `STATE_HISTORY.md`** — rolled at the
+14z-108 close, exactly as the 14z-107 CLOSE (final) said they should be:
+their findings are all restated in the two CLOSE entries above, in (10)-(12),
+or in the live docs. Nine sections, 1,582 lines, moved BYTE-VERBATIM to the
+top of the archive's body: slice D2 (9), the four held buttons (8), the
+video-sensitive anchor (7), slice D1 (6), slice D0 (5), the placement map (4),
+the SDRAM model's dropped address bit (3), the memory-map truth (2), and the
+session that first ran the §4 oracle on a third implementation (1).
+**This is the first time a group's SUB-ENTRIES have been rolled while the
+group itself stays live**, which the rollover rule does not contemplate: the
+rule speaks of whole groups and THE LEDGER carries one line per group, so
+nothing was added to the ledger — 14z-107 is still a live group here. Look
+them up by section name in `STATE_HISTORY.md`, as with any archived entry.
+
+
 ## Session 14z-107 (9) — MiSTer SLICE D2: THE PLACEMENT IS IN THE RTL AND
 ## THE SDRAM IMAGE WAS COUNTED, ALL 67,108,864 BYTES OF IT. The bank-0
 ## re-pack, the group-C GFX redirect, the QSound split across two banks and

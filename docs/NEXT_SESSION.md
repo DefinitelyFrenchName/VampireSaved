@@ -1,5 +1,37 @@
 # NEXT SESSION — orientation (rewritten at the 14z-108 CLOSE, 2026-08-25)
 
+> ## **THE OPENER IS THE FIELD TEST, AND IT IS THE MAINTAINER'S.**
+> ## Simulation is EXHAUSTED for this arc. A tenant fights on the core and
+> ## fights CORRECTLY against MAME; the QSound extension is fetched; bank 1
+> ## under load is GO; scroll is structurally cleared; the core fits a
+> ## Cyclone V. **Nothing further in Verilator moves the arc** — the three
+> ## things still never done all need hardware or a different surface:
+> ## PIXELS compared, a tenant's voice HEARD, and anything at all on real
+> ## silicon.
+> ## **THE BUNDLE IS BUILT AND VERIFIED**: `../mister_fieldtest_14z108/`
+> ## (outside the repo, rule 7) — the WIDE MRA, `vsavjw.zip`, the PATCHED
+> ## `vsav.zip`, `qsound.zip`, and a README. All 31 CRC-identified parts
+> ## were checked to resolve, because an unresolved part is filled with
+> ## `0xFF` rather than refused.
+> ## **THE `.rbf` IS NOT IN IT** — it comes from the Windows box, and its
+> ## sha256 must be checked first (`46fc74af…`, seed 18269): **a
+> ## timing-FAILING seed emits a bitstream indistinguishable from a good
+> ## one**, and 4 of 12 seeds fail.
+> ## **AND THE BUNDLED `vsav.zip` IS PATCHED** — four members carry the
+> ## ported art, everything resolves by CRC, so a stock CPS-2 MRA pointed
+> ## at it gets wrong art SILENTLY. Back up the pristine copy first.
+> ##
+> ## **WHAT THE FIELD TEST ANSWERS THAT NOTHING HERE CAN:** whether a
+> ## tenant's VOICE PLAYS (we have proved those samples are FETCHED out of
+> ## DSP bank `0x83`; "heard" is not reachable from simulation), whether
+> ## the picture is right (no frame has ever been compared and VRAM turned
+> ## out to be a dead end for that — see below), and whether any of it
+> ## survives real SDRAM, real timing and the analog chain.
+> ## **IF IT DOES NOT BOOT, report the failure MODE** — black screen vs
+> ## RAM-test pattern vs a boot loop and its period. A ~1,580-frame loop is
+> ## what the pre-D5 decryption bug looked like.
+> ##
+
 > ## **START HERE. THE ARC IS MiSTer. A TENANT HAS FOUGHT ON THE CORE,
 > ## AND THE CORE FITS A CYCLONE V — BUT DOES NOT RELIABLY CLOSE TIMING.**
 > ## Download -> boot -> select -> the extended wheel -> a tenant picked ->
@@ -110,15 +142,14 @@
 > ## **D2 cannot have moved scroll, by construction.** Rendering is still
 > ## untested.
 > ## **VIDEO — the first cross-implementation comparison of a
-> ## video-determining surface.** Pixels need infrastructure neither side
-> ## has, but VRAM `$900000-$93FFFF` (palette + scroll tilemaps) is
-> ## dumpable on both — by address on MAME, and on the core because D2
-> ## maps it to bank 0 byte `0x600000`. At the frozen anchors
-> ## **`$910000-$92FFFF`, 128 KB of scroll tilemap, is BIT-IDENTICAL**,
-> ## as is `$900000-$901FFF`; `$930000-$93FFFF` is zero on both, matching
-> ## the RTL decode. **`$902000-$90FFFF` differs by 10,274 bytes (3.92%)
-> ## and it is NOT a phase artefact** — flat across ±20 frames,
-> ## near-static in both legs, near-identical word histograms.
+> ## video-determining surface, and it ended as a DEAD END worth
+> ## knowing about.** Pixels need infrastructure neither side has, but
+> ## VRAM `$900000-$93FFFF` is dumpable on both — by address on MAME, and
+> ## on the core because D2 maps it to bank 0 byte `0x600000`. Compared
+> ## at the frozen anchors, then RE-CUT along the real layer map once the
+> ## video registers were documented. **(An intermediate reading called
+> ## the identical `$910000-$92FFFF` "scroll tilemap" — that was WRONG:
+> ## no layer base points there, it is UNCLAIMED VRAM.)**
 > ##
 > ## **THE VIDEO REGISTERS ARE NOW DOCUMENTED** (`atlas/ram.md`, "CPS-2
 > ## VIDEO REGISTERS"): CPS-A at `$804100` is **WRITE-ONLY** so it needs

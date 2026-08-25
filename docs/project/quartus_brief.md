@@ -1,3 +1,14 @@
+> **STATUS: EXECUTED 2026-08-25 (14z-108). This brief is HISTORICAL — kept
+> because it is the reproducible statement of what was asked and why, and
+> because the four-verdict framing below is reusable. THE ANSWER DID NOT FIT
+> ONE OF ITS FOUR BOXES:** `cps2w` **FITS** (+206 ALMs, 44%, nothing near
+> overflow) but **DOES NOT RELIABLY CLOSE TIMING** — 4 of 12 fitter seeds
+> fail, median +0.038 ns against the control's +0.431. On passing seeds it is
+> (a); on failing seeds (c); it is NEVER (b), because the reference core
+> closed on every seed tried. Full result: STATE 14z-108, and the two
+> platform gotchas it produced (`xjtcore.sh` retries until a seed passes; a
+> jtcores bitstream carries a BUILD datestamp).
+
 # BRIEF — Quartus synthesis of jtcps2w (CPS-2 WIDE on MiSTer)
 
 You are running on a Windows 10 box (Ryzen 9 3900X, 32 GB) to answer ONE
