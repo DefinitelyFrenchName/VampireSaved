@@ -378,8 +378,36 @@ right call: a single build would never have shown this.**
 | `cps2` | 21287 (base) | PASS | +0.144 | 0.000 | 18,258 |
 | `cps2` | 4004 | PASS | +0.431 | 0.000 | 18,226 |
 
-**`cps2w` spread -0.545 .. +0.067 — 0.612 ns, STRADDLING ZERO. `cps2`
-spread +0.144 .. +0.431 — 0.287 ns, entirely above it.**
+**EXTENDED TO 17 BUILDS — `cps2w` n=12, `cps2` n=5 — and the failing
+fraction is now PINNED DOWN rather than merely demonstrated:**
+
+    cps2w (n=12):  -0.545 -0.313 -0.110 -0.039 | 0.008 0.009 0.066 0.067
+                                                 0.147 0.167 0.202 0.396
+    cps2  (n=5) :                                0.144 0.287 0.431 0.511 0.665
+                                               ^ zero
+
+    failed   cps2w 4/12          cps2 0/5
+    median   cps2w +0.038        cps2 +0.431
+    range    cps2w 0.941 ns      cps2 0.521 ns
+
+**THREE COMPARISONS CARRY IT.** The BEST of twelve `cps2w` seeds (+0.396)
+is worse than the MEDIAN of five `cps2` seeds (+0.431); `cps2`'s WORST
+seed (+0.144) beats EIGHT of twelve `cps2w` seeds; and the medians differ
+by more than an order of magnitude. **And two of the eight `cps2w` passes
+are +0.008 and +0.009 — a quarter of the passing placements clear the gate
+by under 10 PICOSECONDS, which is a pass in the report and not margin in
+any engineering sense.**
+
+Observed failure rate 4/12 = 33%, 95% CI roughly **14%-61%** at this n, so
+the honest phrasing is "commonly, between about one seed in seven and
+three in five", NOT "exactly a third". The DIRECTION is not in doubt.
+
+**THE ATTRIBUTION HOLDS AT n=12, and this is a verified negative:** across
+all twelve `cps2w` seeds **the number of failing paths OUTSIDE
+`jtframe_sdram64` is ZERO** — checked by grepping every negative-slack row
+of every seed's path report, not by sampling. The worst path is a
+different register on nearly every seed (`post_act`, `in_busy`, `br`,
+`st[0]`, `actd`, `rfsh|help`) landing on `sdram_a[7]`, `[8]` or `[11]`.
 
 **THESE ARE REAL TIMING FAILURES, NOT CRASHES.** Quartus reported "Full
 Compilation was successful, 0 errors" on both failing seeds — the fitter
@@ -399,12 +427,18 @@ variance.
 
 **AND THE REASON A SINGLE BUILD LOOKED HEALTHY: `jtseed` RETRIES UNTIL IT
 PASSES.** `xjtcore.sh` calls `jtseed 4`, which loops `jtcore --seed
-$RANDOM` and **BREAKS ON FIRST SUCCESS**. So a green `xjtcore.sh` run does
-not mean the design closes timing — **it means at least one of up to four
-random draws closed.** The +0.066 baseline was such a draw. **Any future
-"the build passed" from the normal flow carries the same caveat**, and this
-is the single most important thing to know about reading jtcores build
-results.
+$RANDOM` and **BREAKS ON FIRST SUCCESS**. The +0.066 baseline was such a
+draw.
+
+**BE PRECISE ABOUT WHAT THAT HIDES — the first statement of this, mine and
+the measuring session's, was stronger than the evidence and was sharpened
+at n=12.** It does NOT mean the flow ships failing bitstreams: at a 33%
+per-seed failure rate the chance all four draws fail is ~1%, so **roughly
+99% of invocations produce a gate-passing `.rbf`**. What it hides is
+**FRAGILITY, not correctness** — the artifact is a CHERRY-PICKED
+PLACEMENT, the first of up to four random draws that closed. **A green run
+certifies "one placement was found that closes"; it never certifies "this
+design closes with margin".** Only the second is a basis for building on.
 
 **THE VERDICT, not forced into the brief's four boxes because it does not
 fit one.** FIT is unambiguous — `cps2w` FITS at 44% ALMs, and (d) is firmly

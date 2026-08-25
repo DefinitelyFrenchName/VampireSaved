@@ -19,17 +19,24 @@
 > ## **FIT IS UNAMBIGUOUS AND GOOD:** +206 ALMs (+1.1%, 44% of 41,910),
 > ## +2,048 memory bits, RAM blocks / DSPs / PLLs UNCHANGED, nothing near
 > ## overflow. That half is settled.
-> ## **TIMING IS A SEED LOTTERY.** Four `cps2w` seeds: +0.066 PASS,
-> ## +0.067 PASS, **-0.110 FAIL**, **-0.545 FAIL**. Two `cps2` control
-> ## seeds: +0.144 and +0.431, both PASS. `cps2w` spreads -0.545..+0.067
-> ## and STRADDLES ZERO; the control spreads +0.144..+0.431, entirely
-> ## above it. The FAILs are jtframe's OWN timing gate, on runs Quartus
-> ## reported as "Full Compilation successful, 0 errors".
-> ## **AND THE REASON ONE BUILD LOOKED HEALTHY: `xjtcore.sh` CALLS
-> ## `jtseed 4`, WHICH RETRIES `--seed $RANDOM` AND BREAKS ON FIRST
-> ## SUCCESS.** A green run does NOT mean the design closes timing — it
-> ## means at least one of up to four random draws closed. **Every future
-> ## "the build passed" from the normal flow carries that caveat.**
+> ## **TIMING IS A SEED LOTTERY, MEASURED AT n=12.**
+> ##   `cps2w` (12): -0.545 -0.313 -0.110 -0.039 | 0.008 0.009 0.066
+> ##                 0.067 0.147 0.167 0.202 0.396   -> 4 FAIL, med +0.038
+> ##   `cps2`  ( 5):                 0.144 0.287 0.431 0.511 0.665
+> ##                                                  -> 0 FAIL, med +0.431
+> ## **The BEST of twelve `cps2w` seeds is worse than the MEDIAN of five
+> ## `cps2` seeds; `cps2`'s WORST beats EIGHT of twelve.** Two `cps2w`
+> ## passes are +0.008 and +0.009 — a quarter of the passing placements
+> ## clear by under 10 PICOSECONDS. Failure rate 4/12, 95% CI ~14-61%:
+> ## say "commonly", not "a third". FAILs are jtframe's OWN gate on runs
+> ## Quartus called "successful, 0 errors".
+> ## **`xjtcore.sh` CALLS `jtseed 4`, WHICH RETRIES AND BREAKS ON FIRST
+> ## SUCCESS — AND BE PRECISE ABOUT WHAT THAT HIDES.** It does NOT ship
+> ## failing bitstreams (~99% of invocations produce a passing `.rbf`).
+> ## **It hides FRAGILITY: the artifact is a CHERRY-PICKED PLACEMENT.** A
+> ## green run certifies "one placement was found that closes", never
+> ## "this design closes with margin" — and only the second is a basis
+> ## for building on.
 > ## **WHERE IT IS MARGINAL:** every failing path is inside
 > ## `jtframe_sdram64`, terminating at an SDRAM address pin, and the
 > ## worst path RESHUFFLES between seeds (different source register AND

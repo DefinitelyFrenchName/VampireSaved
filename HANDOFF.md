@@ -205,13 +205,17 @@ in full, and the same run answered bank 1 under load (peak 15,496 acc/frame,
 `5CSEBA6U23I7`, target mister, with `cps2` built FIRST as the reference leg —
 `cps2w` costs **+206 ALMs (+1.1%)** and +2,048 memory bits with RAM blocks,
 DSPs and PLLs unchanged — **that half is settled and good**. **TIMING IS
-NOT: it is a SEED LOTTERY.** Four `cps2w` seeds gave +0.066 PASS, +0.067
-PASS, **-0.110 FAIL** and **-0.545 FAIL**, while both `cps2` control seeds
-passed (+0.144, +0.431). `cps2w` straddles zero; the control does not. The
+NOT: it is a SEED LOTTERY.** Twelve `cps2w` seeds span **-0.545 .. +0.396**, four of them
+FAILING, while five `cps2` control seeds span **+0.144 .. +0.665**, none
+failing. `cps2w` straddles zero; the control does not. The
 FAILs are jtframe's OWN gate on runs Quartus called "successful, 0 errors".
 **AND `xjtcore.sh` CALLS `jtseed 4`, WHICH RETRIES `--seed $RANDOM` AND
-BREAKS ON FIRST SUCCESS — so a green build does NOT mean the design closes
-timing, only that one of up to four draws did.** Every failing path is
+BREAKS ON FIRST SUCCESS.** Precisely: that does NOT ship failing bitstreams
+(~99% of invocations produce a gate-passing `.rbf`) — **it hides FRAGILITY.
+A green build certifies "one placement was found that closes", never "this
+design closes with margin".** At n=12 `cps2w` fails **4/12** with median
+**+0.038 ns** (two passes under 10 ps) against `cps2`'s **0/5**, median
+**+0.431 ns**; the BEST cps2w seed is worse than the MEDIAN cps2 seed. Every failing path is
 inside `jtframe_sdram64` at an SDRAM address pin and RESHUFFLES between
 seeds, so what is marginal is that controller's ADDRESS-GENERATION CONE as a
 whole — shared infrastructure the fork does not touch, NOT WIDE's own logic.
