@@ -56,10 +56,20 @@
 #
 # Usage:
 #   ROMDIR=... [JTSIM_SCRATCH=...] tests/audit_sdram_bank_load.sh [OUTDIR]
-#       [--frames N] [--log FILE] [--tsv FILE]
+#       [--frames N] [--log FILE] [--tsv FILE] [--rpl FILE]
 #   --log FILE   skip the simulation and re-analyse an existing jtsim log
 #                (that is how build/sdram_bank_load_14z107.log is re-derived).
 #   --tsv FILE   also write the per-interval raw counters as a TSV.
+#   --rpl FILE   run (or re-analyse) a DIFFERENT replay. **THE FOUR PHASE
+#                BOUNDARIES BELOW ARE MEASURED FOR `05_timeout_idle` AND FOR
+#                NOTHING ELSE** — they are absolute simulated frames keyed to
+#                that replay's frozen match-start anchor. With any other
+#                replay this script REFUSES to print the phase table and
+#                reports WHOLE-RUN figures plus the clash count instead
+#                (added 14z-108). That is deliberate: a phase table whose
+#                labels are wrong is worse than no phase table, and the
+#                14z-107 (12) run is on record precisely because it verified
+#                its own boundaries before labelling anything.
 # The default OUTDIR is a temp dir OUTSIDE the repo (rule 7: RAM/ROM-derived
 # output never lands in the tree).
 set -u
@@ -67,13 +77,14 @@ REPO="$(cd "$(dirname "$0")/.." && pwd)"
 
 RPL="$REPO/tests/replays/05_timeout_idle.rpl"
 FRAMES=2800
-LOG=""; TSV=""; OUTDIR=""; CORE=cps2; WIDEBUILD=""
+LOG=""; TSV=""; OUTDIR=""; CORE=cps2; WIDEBUILD=""; RPL_OVERRIDE=0
 while [ $# -gt 0 ]; do
     case "$1" in
     --frames) shift; FRAMES="${1:?--frames needs N}" ;;
     --core)   shift; CORE="${1:?--core needs cps2|cps2w}" ;;
     --wide)   shift; WIDEBUILD="${1:?--wide needs a build dir}" ;;
     --log)    shift; LOG="${1:?--log needs a file}" ;;
+    --rpl)    shift; RPL="${1:?--rpl needs a file}"; RPL_OVERRIDE=1 ;;
     --tsv)    shift; TSV="${1:?--tsv needs a file}" ;;
     -h|--help) sed -n '2,50p' "$0"; exit 0 ;;
     -*) echo "unknown option '$1'" >&2; exit 2 ;;
@@ -143,6 +154,84 @@ if [ -z "$LOG" ]; then
         --frames "$FRAMES" --stats || { echo "FAIL: the sim leg did not complete"; exit 1; }
     LOG="$OUTDIR/jtsim.log"
 fi
+# ── THE PHASE TABLE IS REPLAY-SPECIFIC, AND IT SAYS SO (added 14z-108) ──────
+# ATTRACT_END/SELECT_END/MATCH_START are absolute simulated frames derived
+# from `05_timeout_idle`'s frozen match-start anchor. On any other replay they
+# label phases that are not there. The 14z-107 (12) run is trustworthy because
+# it ASSERTED its own boundaries before using them; the same standard applied
+# here means refusing, not guessing.
+if [ "$RPL_OVERRIDE" = 1 ]; then
+    echo "== WHOLE-RUN figures only: --rpl was given =="
+    echo "   The four phase boundaries are measured for 05_timeout_idle and for"
+    echo "   nothing else, so the phase table is REFUSED for $(basename "$RPL")."
+    echo "   What follows is the whole run plus the clash count, which is what"
+    echo "   bounds the repack risk (group-C obj fetches sharing bank 1 with the"
+    echo "   QSound stream) without needing a phase label at all."
+    python3 - "$LOG" <<'PY2'
+import re, sys
+raw = open(sys.argv[1], "rb").read().decode("utf-8", "replace")
+# Same line format, same semantics as the phase analysis below: the counters
+# are CUMULATIVE and `t` is picoseconds from the sim's origin, so a RATE is a
+# difference over a frame span. (Both were got wrong in this block's first
+# draft, which reported means in the tens of millions and a frame index in the
+# billions -- caught by running it against build/sdram_bank_load_14z107.log,
+# whose real figures are known. THE INSTRUMENT PROTOCOL.)
+FRAME_PS = 512 * 262 * 1_000_000 // 8
+BA = r"(\d+),(\d+),(\d+),(\d+),(\d+)"
+pat = re.compile(r"SDRAM_STATS_RAW t=(\d+) ba0=" + BA + " ba1=" + BA +
+                 " ba2=" + BA + " ba3=" + BA)
+seen = {}
+for m in pat.finditer(raw):
+    g = [int(x) for x in m.groups()]
+    b = [g[1 + 5*k: 6 + 5*k] for k in range(4)]
+    seen[g[0]] = ([b[k][0] for k in range(4)], [b[k][1] for k in range(4)])
+if len(seen) < 2:
+    sys.exit("FAIL: fewer than 2 SDRAM_STATS_RAW samples in the log "
+             "(was --stats passed to the run?)")
+# THE ROM DOWNLOAD IS EXCLUDED, and it has to be. It is WRITES, one command
+# per byte, at a constant rate to one bank at a time -- so it produces the
+# run's highest "acc/frame" on EVERY bank and the same figure on each, which
+# is what the first draft reported as a peak (100614/fr on all four, all of it
+# inside frames 16-262). The phase analysis below carries the same warning:
+# the download is a command-rate baseline, not bandwidth.
+m = re.search(r"ROM file transfered \(frame (\d+)\)", raw)
+if not m:
+    sys.exit("FAIL: the log does not say when the ROM transfer ended, so the "
+             "download cannot be excluded and every figure below would "
+             "include it")
+xfer = int(m.group(1))
+ts = [t for t in sorted(seen) if t / FRAME_PS > xfer]
+if len(ts) < 2:
+    sys.exit("FAIL: fewer than 2 stats samples AFTER the transfer (frame %d)"
+             % xfer)
+f0, f1 = ts[0] / FRAME_PS, ts[-1] / FRAME_PS
+print("   %d stats samples POST-TRANSFER (download ended frame %d), "
+      "simulated frames %.0f..%.0f (%.0f frames)"
+      % (len(ts), xfer, f0, f1, f1 - f0))
+print("   bank | acc/frame (whole run) |  peak acc/frame | same-row %")
+for k in range(4):
+    tot = seen[ts[-1]][0][k] - seen[ts[0]][0][k]
+    srt = seen[ts[-1]][1][k] - seen[ts[0]][1][k]
+    peak = 0.0
+    for a, b in zip(ts, ts[1:]):
+        df = (b - a) / FRAME_PS
+        if df > 0:
+            peak = max(peak, (seen[b][0][k] - seen[a][0][k]) / df)
+    print("   ba%-3d| %21.0f | %15.0f | %8.1f"
+          % (k, tot / (f1 - f0), peak, (100.0 * srt / tot) if tot else 0.0))
+# ANCHORED TO THE LINE, not to the words. This report's own output quotes the
+# warning text in prose, and build/sdram_bank_load_14z107.log (a REPORT, not a
+# raw jtsim.log) proves such a file exists: a bare substring count scores that
+# commentary as evidence. Match only a line that BEGINS with the warning,
+# which is how test.cpp emits it.
+clash = len(re.findall(r"(?m)^WARNING: \(test\.cpp\) SDRAM reads clashed", raw))
+print("   'SDRAM reads clashed' WARNINGS: %d%s"
+      % (clash, "  (none - no read contention in this run)" if clash == 0
+                else "  (test.cpp prints at most 25)"))
+PY2
+    exit $?
+fi
+
 # THE TRANSFER LENGTH IS ASSERTED, NOT ASSUMED. Every phase boundary above is
 # an absolute frame, so a transfer of a different length silently mislabels
 # all four of them.

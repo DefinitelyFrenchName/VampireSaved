@@ -142,6 +142,13 @@ printf '  windows from the RTL: obj bank 4 -> SDRAM ba%d byte %#x, obj bank 5 ->
 probe_args="--rdprobe $GFXC4_BANK $GFXC4_BYTE $((GFXC4_BYTE + SPAN))"
 probe_args="$probe_args --rdprobe $GFXC5_BANK $GFXC5_BYTE $((GFXC5_BYTE + SPAN))"
 probe_args="$probe_args --rdprobe 2 0 $((16 * 1024 * 1024)) --rdprobe 3 0 $((16 * 1024 * 1024))"
+# --stats costs this run nothing and buys the SDRAM bank-load figures out of
+# the SAME leg (14z-108). The repack risk that `audit_sdram_bank_load` was
+# built to bound — group-C obj fetches interleaving with the QSound stream
+# INSIDE bank 1 — needs a tenant in a match, which is exactly the run this
+# gate makes when it is pointed at a tenant-picking replay. Re-analyse the
+# positive leg's jtsim.log with `audit_sdram_bank_load.sh --log`.
+probe_args="$probe_args --stats"
 
 # ── the two legs ───────────────────────────────────────────────────────────
 if [ -z "$POSLOG" ] || [ -z "$NEGLOG" ]; then
