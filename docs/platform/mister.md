@@ -1966,3 +1966,63 @@ any core.
 - **Input coverage's remaining half is unchanged**: `SimInputs` is still
   P1-only for buttons 5/6 and P2 (the FIDELITY defect is fixed; the
   SCRIPTABILITY is deferred by ruling).
+
+## SYNTHESISING THE CORE — the VERIFIED recipe (14z-108)
+
+**Quartus is Linux/Windows only and the toolchain image is x86-64, so this
+cannot run on the dev Mac.** It needs no hardware and no Quartus install:
+Jotego ships the whole toolchain as a Docker image
+(`.github/workflows/q20.yaml:51`).
+
+**This sequence was RE-RUN FROM A CLEAN SLATE and the resulting tree checked
+against the tree the numbers came from** — same HEAD `7b9a0d2d`, byte-identical
+`git submodule status --recursive`, `diff -r cores/cps2w` clean but for build
+artifacts. It is a tested recipe, not a tidied-up transcript of what actually
+happened (which involved a hang, a kill and two repairs).
+
+```sh
+# 1. toolchain — elevated PowerShell on Windows 10 Home, then REBOOT
+wsl --install -d Ubuntu
+
+# then inside the distro, as root
+apt-get update && apt-get install -y docker.io
+systemctl start docker
+usermod -aG docker <your-user>
+docker pull jotego/jtcore20x
+
+# 2. source — as your normal user, into the distro's ext4, NOT /mnt/c
+git config --global url.https://github.com/.insteadOf git@github.com:
+git clone https://github.com/DefinitelyFrenchName/jtcores ~/jtcores
+cd ~/jtcores
+git checkout 7b9a0d2d
+git config submodule."modules/jtframe/target/pocket".update none
+GIT_TERMINAL_PROMPT=0 git submodule update --init --recursive
+
+# 3. build — the CONTROL FIRST, deliberately
+docker run --rm --network host -v $HOME/jtcores:/jtcores jotego/jtcore20x xjtcore.sh cps2  mister
+docker run --rm --network host -v $HOME/jtcores:/jtcores jotego/jtcore20x xjtcore.sh cps2w mister
+```
+
+**FOUR LOAD-BEARING DETAILS, none cosmetic:**
+1. **`git clone` is NOT `--recursive`, and `git checkout 7b9a0d2d` comes
+   BEFORE the submodule pass.** `--recursive` resolves submodules against the
+   DEFAULT BRANCH, and jtcores master registers `modules/jt539`, which does
+   not exist — git then hangs FOREVER on a credential prompt with no error.
+   The fix is ORDERING, not a flag. (`docs/platform/gotchas.md`.)
+2. **`GIT_TERMINAL_PROMPT=0`** turns any other dead repository from a silent
+   stall into a fast failure.
+3. **`--network host` or `quartus_map` SEGFAULTS** in FlexLM's host-id path —
+   and reports it as a MEMORY error at 487 MB peak against 15 GB free
+   (`docs/platform/gotchas.md`).
+4. **Build `cps2` FIRST.** It is the reference leg: without it a timing
+   failure on `cps2w` cannot be attributed to our slices. Ordering it first
+   also means a flow failure cannot be misread as a `cps2w` result.
+
+**On the two `git config` lines:** `url.https://github.com/.insteadOf` needs
+no quoting (git splits the key on the first and last dot, so the URL survives
+as the subsection); the `submodule."…".update` line DOES need its quotes,
+because of the slashes. The pocket skip is only needed while `jotego/pocket`
+is inaccessible.
+
+**`BETAKEY` is NOT required** — the flow warns "remote compilation with no
+beta key. Assigning random one" and proceeds.
