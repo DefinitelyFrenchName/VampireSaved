@@ -1,0 +1,60 @@
+# 108: THE TENANT MAKES NOISE — a rig for the QSound EXTENSION (14z-108).
+#
+# WHY IT EXISTS. The roster's own voices live in DSP sample banks 0x80-0x8E,
+# which are the CPS-2 WIDE QSound extension. The build's ledger says exactly
+# what is there: 58 samples, image bytes 0x800000-0x8E5800 = 0.896 MB, banks
+# 0x80..0x8E (tools/qs_ledger.py on the WIDE romset). On the MiSTer core that
+# region is reached through slice D1's sample-bank WIDTH fix and slice D2's
+# QSound SPLIT across two SDRAM banks (pcmh_sel = wide_en & pcm_addr[23],
+# a 1 MB window at PCMH_OFFSET). NO SAMPLE FROM IT HAS EVER BEEN FETCHED on
+# any FPGA implementation -- the last major subsystem of the profile at zero
+# coverage (docs/project/mister_core.md section 12).
+#
+# WHAT IT DOES. 36_pick_tenant_cell's wheel walk to the tenant at cell 0x13,
+# then 104_1p_auto_ko_win's idiom in the match: WALK FORWARD and MASH, so the
+# tenant throws attacks that CONNECT rather than whiffing at range. Buttons
+# 1-3 only and P1 only, because that is all jtframe v1.7.3's sim_inputs.hex
+# can express (tools/rpl2siminputs.py refuses the rest, loudly).
+#
+# READ THIS BEFORE TRUSTING A ZERO. A quiet run does not distinguish "the
+# extension is unreachable" from "the tenant never made an ext-backed sound".
+# That ambiguity is exactly what cost 14z-107 (12) an obj-bank-4 measurement:
+# the replay put the cursor on Victor and the zero was true but meaningless.
+# So this replay is written to maximise voiced events, and any zero result
+# must be reported as AMBIGUOUS until a sound is proven to have been
+# requested. The 36_pick_tenant_cell path is unchanged and MAME-confirmed to
+# reach P1 +0x382 = 0x13 with the match live from ~2900.
+#
+# RIG CONFIRMED ON MAME BEFORE ANY SIM TIME WAS SPENT (14z-108): over
+# frames 2955-3104 sampled EVERY FRAME, P1's anim_ptr takes 37 distinct
+# values and P2's HP falls 0x120 -> 0x011b; across the whole window
+# 2900-3600 P2 falls 0x120 -> 0x00ec. The tenant attacks and CONNECTS.
+# NOTE for anyone re-deriving this: p1_attack_id at +0x0A reads 0 for the
+# whole window even at per-frame sampling, so it is NOT the indicator to
+# use here -- anim_ptr and the opponent's HP are. A 20-frame stride also
+# aliases the attacks away entirely and makes a working rig look dead.
+300-305 sys=C1
+800-803 sys=S1
+1000-1002 p1=L
+1040-1042 p1=L
+1080-1082 p1=D
+1120-1122 p1=D
+1700-1702 p1=1
+2950-3600 p1=R
+2960-2962 p1=1
+3000-3002 p1=2
+3040-3042 p1=3
+3080-3082 p1=1
+3120-3122 p1=2
+3160-3162 p1=3
+3200-3202 p1=1
+3240-3242 p1=2
+3280-3282 p1=3
+3320-3322 p1=1
+3360-3362 p1=2
+3400-3402 p1=3
+3440-3442 p1=1
+3480-3482 p1=2
+3520-3522 p1=3
+3560-3562 p1=1
+3700 wait
