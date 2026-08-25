@@ -126,7 +126,17 @@
 > ## **THE FORK: `DefinitelyFrenchName/jtcores@vampire-saved`, pin
 > ## `7b9a0d2d`, EIGHTEEN commits, PUBLIC AND CURRENT** — unchanged by
 > ## 14z-108, which touched no RTL. Fork pushes are standing-authorised;
-> ## **the MAIN repo is NEVER pushed** (41 local commits on `main`).
+> ## **THE MAIN REPO'S PUSH STATE, CORRECTED 14z-108 BY CHECKING THE
+> ## REMOTE RATHER THAN THE RECORD:** `origin/main` HAS been pushed and
+> ## holds `a93e071`, the 14z-107 CLOSE (final) — `git ls-remote`
+> ## confirms it and the reflog says `update by push`. The 14z-107 close
+> ## recorded "36 commits ahead, ALL LOCAL, the main repo is NEVER
+> ## pushed", which was true WHEN WRITTEN and is not true now; a push
+> ## happened after it. **Only 14z-108's FIVE commits are local.** Push
+> ## policy is the maintainer's call and nothing was pushed by this
+> ## session — but do not repeat the "never pushed" figure from prose.
+> ## CHECK `git ls-remote` INSTEAD: a tracking ref is a claim about the
+> ## last fetch, and prose is a claim about the day it was written.
 
 
 > ## **SLICE LOG — 14z-107 (11)+(12): THE BOOT FAILURE ROOT-CAUSED AND
@@ -211,7 +221,8 @@
 > ## **SLICE LOG (history) — 14z-107 (9): MiSTer SLICE D2 IS DONE. THE WIDE ROMSET
 > ## HAS A PLACE IN SDRAM AND EVERY BYTE OF IT WAS COUNTED.** Fork commit
 > ## `0df6f000`, **PUSHED** (fork pushes are standing-authorised now; the
-> ## MAIN repo is still never pushed). `cores/cps1`/`cps2`/`cps15`
+> ## MAIN repo is still never pushed *[CORRECTED 14z-108: not true any
+> ## more — see the banner]*). `cores/cps1`/`cps2`/`cps15`
 > ## BYTE-UNTOUCHED.
 > ## **WHAT SHIPPED:** the bank-0 re-pack (VRAM `0x600000`, ORAM `0x640000`,
 > ## WRAM `0x648000`, Z80 `0x658000`, making room for a 6 MB PRG), the

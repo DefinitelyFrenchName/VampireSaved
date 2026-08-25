@@ -69,7 +69,7 @@ Then say plainly which of these is true:
 
 ## CONTEXT YOU DO NOT HAVE
 
-You do not have the project repo (it is private and never pushed) and you
+You do not have the project repo (it is private; you do not need it) and you
 do not have the session that sent you. You do not need either: synthesis
 needs only this fork, and no ROM content is involved. If something seems
 to require the game's data, stop -- it does not, and that would be a sign

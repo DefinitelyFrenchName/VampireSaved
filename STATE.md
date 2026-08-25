@@ -566,7 +566,10 @@ ever run on HARDWARE.** Everything above is Verilator.
 `516ad9f`..`34c7feb` (`git rev-list --count cd0c614..HEAD`), plus this close =
 fifteen. Counting from the 14z-106 close the branch is **36 commits ahead of
 `origin/main`** — the 21 of the first close plus these 15. **ALL LOCAL: the
-main repo is NEVER pushed**, and every commit in the range is MiSTer work, so
+main repo is NEVER pushed** *[CORRECTED 14z-108: true when written; a push
+has since happened and `origin/main` now holds this close's own commit
+`a93e071`, confirmed by `git ls-remote` and the reflog. Check the remote, not
+this line.]*, and every commit in the range is MiSTer work, so
 none qualifies for the pre-MiSTer push exception. The FORK is public and
 current: `origin/vampire-saved` = the submodule pin =
 `7b9a0d2d05eedf7fc9625df9ca6ea1d0278f8ef1`, **eighteen** commits, confirmed
