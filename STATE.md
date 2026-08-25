@@ -2063,6 +2063,62 @@ Original write-up kept below.
 
 ## Decisions pending (human)
 
+- **~~THE TIMING-MARGIN RESPONSE~~ DECIDED (maintainer, 2026-08-25).**
+  `cps2w` fails 4 of 12 fitter seeds (14z-108). Options were laid out A-E.
+  **RULED: A + B, with C IN RESERVE. D is ACCEPTABLE. E is OPPOSED unless
+  there is no better choice.**
+  * **A — do nothing to the RTL.** We distribute a PREBUILT `.rbf`, so the
+    fragility is ours and not the users'.
+  * **B — PIN THE SEED AT RELEASE.** Every shipped bitstream is built from a
+    NAMED seed with its slack and sha256 recorded and verified, never from
+    an `xjtcore.sh` random draw. The current baseline is **seed 18269,
+    +0.066 ns, sha256 `46fc74af…`**. Costs nothing and converts "we got a
+    lucky draw" into "we know which draw, and we check it".
+  * **C — shed load on the SDRAM address cone** (bank 0 carries SEVEN slots
+    since D2; the rejected 14z-107 alternative was moving the Z80 out).
+    HELD IN RESERVE: it is the only fix that stays inside Rule 1 v2 and
+    touches no shared infrastructure, but it would invalidate the bank-1
+    bandwidth measurement, so it is not to be spent on headroom we do not
+    currently need. **Revisit BEFORE the next RTL slice, not after.**
+  * **D — pipeline the SDRAM address path.** ACCEPTABLE if C is not enough.
+    Note it means overriding jtframe's shared controller in `cores/cps2w`.
+  * **E — lower the SDRAM clock.** OPPOSED unless nothing else works: bank 0
+    already peaks at 43.9% of its 96 MHz ceiling, so the clock is buying
+    headroom we are using.
+
+- **~~MiSTer PACKAGING: which MRA is MAIN, and how a release carries both
+  `vsav.zip` flavours~~ DECIDED (maintainer, 2026-08-25): OPTION A, a
+  WIDE-ONLY RELEASE, with option B as the eventual target.**
+  **The collision, named exactly (14z-108):** the four ported-art members
+  are `vm3.13m/.15m/.17m/.19m`, and they live in **`vsav.zip`, not
+  `vsavjw.zip`**. So the WIDE MRA needs a PATCHED `vsav.zip` while every
+  stock MRA needs the PRISTINE one — same filename, one `games/mame/`
+  folder — and jtframe resolves members **by CRC32 alone**, so the wrong one
+  is silently filled rather than refused.
+  **Ruled: ship the WIDE MRA only.** The maintainer's reasoning, recorded
+  because it settles the "which MRA is main" half too: **Jotego's own
+  `jtcps2` core already runs vanilla**, so our core does not need to, and
+  the stock regional MRAs are a development reference leg rather than a user
+  feature. The generator currently makes the **Euro** set the main MRA and
+  buries the WIDE entry in `_alternatives/`, which is backwards for a core
+  whose purpose is the roster.
+  **Option B stays the target shape "in time"**: move those four members
+  INTO `vsavjw.zip` so `vsav.zip` can stay pristine and a user's existing
+  romset folder works untouched. Not done now because it is a build-pipeline
+  change touching the hash-shadowing class that cost two sessions in
+  14z-60z/61, and it must not sit between the maintainer and a field test.
+
+- **~~THE FIELD TEST~~ SCHEDULED (maintainer, 2026-08-25): "tonight unless
+  I struggle building".** Bundle assembled and verified OUTSIDE the repo at
+  `../mister_fieldtest_14z108/` — the WIDE MRA, `vsavjw.zip`, the PATCHED
+  `vsav.zip`, `qsound.zip`, and a README. **All 31 CRC-identified parts the
+  MRA declares were verified to resolve from those three zips**, because an
+  unresolved part is filled with `0xFF` rather than refused. The `.rbf` is
+  NOT in the bundle — it comes from the Windows box and its sha256 must be
+  checked first, since a timing-FAILING seed emits a bitstream
+  indistinguishable from a good one.
+
+
 - **DISTILL AI SKILLS FROM THE PROJECT'S LEARNINGS (maintainer direction,
   2026-08-24).** Recorded as FUTURE, UNPLANNED work — nothing scheduled.
   As was done for Sailor Moon S, distil the project's learnings into agent

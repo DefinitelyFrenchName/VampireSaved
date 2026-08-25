@@ -2047,6 +2047,13 @@ jtcore cps2w -mister --nodbg --seed 18269      # the 14z-108 shipping baseline
   its hash do not. **The hash identifies the ARTIFACT; the seed identifies
   the RESULT.** Never read a hash mismatch as a failed reproduction — check
   the seed and the reported slack.
+* **RELEASE POLICY, RULED 2026-08-25 (decision B): A SHIPPED BITSTREAM IS
+  BUILT FROM A NAMED SEED, NEVER FROM AN `xjtcore.sh` DRAW.** Record the
+  seed, the reported slack and the sha256 with the artifact, and verify the
+  hash before it goes anywhere. `xjtcore.sh` is for development; releases
+  use `jtcore <core> -mister --nodbg --seed <S>`. This costs nothing and is
+  the whole of the project's answer to a design that wins the placement
+  lottery about two times in three.
 * **A FAILING SEED EMITS AN `.rbf` INDISTINGUISHABLE FROM A GOOD ONE** —
   same size class, same filename, same published path — and a sweep
   overwrites `release/mister/<core>.rbf` with whatever ran last. The only

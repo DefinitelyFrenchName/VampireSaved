@@ -222,7 +222,10 @@ whole — shared infrastructure the fork does not touch, NOT WIDE's own logic.
 **Consequence: +0.066 is not headroom a future slice may assume.** Spending
 margin back is a Rule 1 v2 design decision for the maintainer, not a
 seed-hunt. **A FAILING SEED STILL EMITS AN `.rbf` — verify the hash before
-flashing; the passing baseline is `46fc74af…`.** **What is still never: HARDWARE — no `.rbf` has been
+flashing; the passing baseline is `46fc74af…`.** **RELEASE POLICY (ruled
+2026-08-25): a shipped bitstream is built from a NAMED SEED — currently
+**18269** — with its slack and sha256 recorded and verified, never from an
+`xjtcore.sh` random draw. `jtcore cps2w -mister --nodbg --seed 18269`.** **What is still never: HARDWARE — no `.rbf` has been
 loaded onto a DE10-Nano, no MRA has run on real silicon, and no analog
 output has been seen. An `.rbf` existing is not a field test.** The reason
 bank 4 is still zero is the HARNESS, not the RTL: the simulator's direction
