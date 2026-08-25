@@ -261,3 +261,60 @@ an embedded dispatcher INSIDE the x088512 span (src 0x8B988 =
 x088512+0x3476, hui/pyron copies) with its OWN table at x088512+0x3494 —
 its +0x02 type bytes are a SEPARATE small numbering space (0..~23),
 nothing to do with the 0x5E556 table's numbers.
+
+## CPS-2 VIDEO REGISTERS — CPS-A and CPS-B (documented 14z-108)
+
+**This was a hole in the atlas until 14z-108** — grepping for layer control
+returned nothing, and it is what decides whether a VRAM difference is
+visible. Authority: MAME 0288 `src/mame/capcom/cps1.h:175-190` (CPS-A
+indices), `cps1_v.cpp:499` (`CPS_B_21_DEF`, which **every CPS-2 game shares**
+— `cps1_v.cpp:2034` maps the whole platform to the `"cps2"` config), and
+`cps2.cpp:1289-1299` (the bus windows).
+
+**THE BUS WINDOWS.** CPS-A `$800100-$80013F` (mirror) and `$804100-$80413F`;
+CPS-B `$800140-$80017F` (mirror) and `$804140-$80417F`.
+**CPS-A IS WRITE-ONLY** (`.w(...)`, not `.rw(...)`) — the 68k cannot read it
+back, so it cannot be captured with a bus dump and the game must keep its own
+copy. Reading it needs the emulator's memory SHARE (`cps_a_regs`), which is
+how the values below were taken. CPS-B is read/write.
+
+**CPS-A REGISTERS** (index = byte offset from `$804100`; **the register value
+x 256 IS the 68k address**, e.g. `0x9080` -> `$908000`):
+
+| off | name | note |
+|---|---|---|
+| `+00` | OBJ_BASE | |
+| `+02` | SCROLL1_BASE | 8x8 layer |
+| `+04` | SCROLL2_BASE | 16x16 |
+| `+06` | SCROLL3_BASE | 32x32 |
+| `+08` | OTHER_BASE | row-scroll table |
+| `+0A` | PALETTE_BASE | |
+| `+0C`/`+0E` | SCROLL1 X / Y | |
+| `+10`/`+12` | SCROLL2 X / Y | |
+| `+14`/`+16` | SCROLL3 X / Y | |
+
+**CPS-B LAYER CONTROL is `+26`** (i.e. `$804166`), and the enable masks for
+CPS-2 are **scroll1 `0x02`, scroll2 `0x04`, scroll3 `0x08`** (stars share
+`0x30`). scroll2 and scroll3 additionally require videocontrol bits 2 and 3
+(`cps1_v.cpp:2331-2335`).
+
+**MEASURED ON `36_pick_tenant_cell` AT THE ROUND-1 MATCH ANCHOR (MAME frame
+2886, the WIDE romset):**
+
+| register | value | resolves to |
+|---|---|---|
+| OBJ_BASE | `0x9000` | `$900000` |
+| SCROLL1_BASE | `0x9000` | `$900000` |
+| SCROLL3_BASE | `0x9040` | `$904000` |
+| SCROLL2_BASE | `0x9080` | `$908000` |
+| PALETTE_BASE | `0x90c0` | `$90C000` |
+| OTHER_BASE | `0x90e8` | `$90E800` |
+| SCROLL1 X/Y | `0x0180` / `0x0100` | |
+| SCROLL2 X/Y | `0x00c0` / `0x0300` | |
+| SCROLL3 X/Y | `0x0180` / `0x0700` | |
+| **CPS-B `+26` layer_control** | **`0x2d0e`** | **scroll1, scroll2 and scroll3 ALL ENABLED** |
+
+So at a match anchor the live VRAM map is **scroll1 `$900000-$903FFF`,
+scroll3 `$904000-$907FFF`, scroll2 `$908000-$90BFFF`, palette
+`$90C000-$90D7FF`, row-scroll `$90E800`** — and everything from `$910000` up
+is UNCLAIMED at that moment.

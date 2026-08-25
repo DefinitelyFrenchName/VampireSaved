@@ -264,12 +264,15 @@ anchors (MAME 2886 / core 3546).
 | **`$920000-$92FFFF`** | **0 / 65,536** | **identical** |
 | `$930000-$93FFFF` | 0 / 65,536 | zero on both |
 
-**THE HEADLINE IS THE ZEROES. 128 KB of scroll tilemap is BIT-IDENTICAL
-across two unrelated implementations**, as is the first 8 KB. That is the
-first video-determining data this project has ever compared, and it agrees.
-It also corroborates the structural scroll finding above from a completely
-different direction: the RTL says D2 cannot have moved scroll, and the data
-says MAME and the core hold the same tilemaps byte for byte.
+**[CORRECTED LATER THE SAME SESSION — READ THE SUBSECTION BELOW. I called
+the identical 128 KB "scroll tilemap"; the CPS-A registers say NO LAYER BASE
+POINTS THERE at a match anchor, so it is UNCLAIMED VRAM. The agreement is
+real and not vacuous — 32,407 nonzero bytes, identical — but it is not what
+I said it was, and the regions that DO carry live layers are the ones that
+DIFFER.]**
+
+The first video-determining data this project has ever compared, cut at the
+time along arbitrary 8/16/32 KB boundaries rather than along the layer map.
 
 **AND `$930000-$93FFFF` IS ZERO ON BOTH** — which matches
 `pre_vram_cs <= A[23:18]==6'b1001_00 && A[17:16]!=2'b11`, the RTL decoding
@@ -285,6 +288,51 @@ over 20 frames). The word histograms are nearly IDENTICAL — `0x0000`
 `0x0382` 2,464 vs 2,467 — so it is the same KIND of content in both, differing
 in specifics across 1,114 contiguous runs. Where MAME holds `0x0020,0x0000`
 pairs the core holds live tile codes (`0x0b91,0x018d`).
+
+### THE VIDEO REGISTERS ARE NOW DOCUMENTED, AND THEY RE-CUT THE RESULT
+
+**The atlas had no entry for layer control at all** — that gap WAS the reason
+the VRAM window could not be judged. Closed in `docs/game/atlas/ram.md`,
+"CPS-2 VIDEO REGISTERS", from MAME 0288 as authority: CPS-A is at
+`$804100` and is **WRITE-ONLY** (so it cannot be captured with a bus dump —
+it needs the emulator's `cps_a_regs` SHARE, which is how these were taken),
+CPS-B layer control is `+26`, and **every CPS-2 game shares one config**
+(`CPS_B_21_DEF`).
+
+**MEASURED AT THE MATCH ANCHOR:** SCROLL1 `$900000`, SCROLL3 `$904000`,
+SCROLL2 `$908000`, PALETTE `$90C000`, row-scroll `$90E800`, and
+**layer_control `0x2d0e` — scroll1, scroll2 and scroll3 ALL ENABLED.**
+
+**RE-CUTTING THE VRAM DIFF ALONG THOSE BOUNDARIES CHANGES THE READING:**
+
+| region | differing | |
+|---|---|---|
+| scroll1 `$900000` | 3,659 / 16,384 | 22.3% |
+| scroll3 `$904000` | 475 / 16,384 | 2.9% |
+| scroll2 `$908000` | 2,901 / 16,384 | 17.7% |
+| **palette `$90C000`** | **3,239 / 6,144** | **52.7%** |
+| row-scroll `$90E800` | 0 / 2,048 | identical |
+| unclaimed `$90D800`, `$90F000`, `$910000+` | 0 / 204,800 | identical, and NOT zero |
+
+**TWO CORRECTIONS TO WHAT I WROTE EARLIER TODAY.**
+1. **The identical 128 KB is NOT "scroll tilemap".** No layer base points
+   above `$910000` at this frame. It is UNCLAIMED VRAM. The agreement is
+   real — 32,407 nonzero bytes, byte-identical — but I named it wrong, and
+   naming it "tilemap" made it sound like the layers agreed when the
+   opposite is true.
+2. **"Neither a defect nor benign" is no longer the right hedge.** The
+   differences sit in THREE ENABLED SCROLL LAYERS AND THE PALETTE, with the
+   palette the worst at 52.7%. Live surfaces, not dead ones.
+
+**WHAT STILL STOPS IT BEING CALLED A DEFECT, stated so the next session does
+not over-swing the other way.** Two things are unmeasured: whether the
+differing bytes fall in the VISIBLE portion of each tilemap (the layers are
+larger than the screen, and the scroll X/Y registers select the window), and
+**whether this difference is specific to our content at all.** The obvious
+control has not been run: **the same VRAM comparison on a LEGACY replay with
+the stock romset.** If MAME and jtcps2 differ there too, this is a general
+implementation difference and says nothing about the roster. That control is
+the next step and it is one ~60-minute sim leg.
 
 **NOT CALLED A DEFECT AND NOT CALLED BENIGN.** Whether stale or differing
 tilemap content is VISIBLE depends on the layer-enable and scroll-base

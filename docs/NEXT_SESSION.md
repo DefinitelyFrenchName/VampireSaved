@@ -120,13 +120,29 @@
 > ## and it is NOT a phase artefact** — flat across ±20 frames,
 > ## near-static in both legs, near-identical word histograms.
 > ##
-> ## **THE NEXT STEP FOR VIDEO IS NOW SPECIFIC, not "compare frames
-> ## somehow": DOCUMENT THE LAYER-ENABLE AND SCROLL-BASE REGISTERS.**
-> ## Whether that differing window is VISIBLE depends on them, and this
-> ## project has never documented them — grepping the atlas and
-> ## `engine_internals.md` for layer control returns NOTHING. Until they
-> ## are known the window is neither a defect nor benign, and it must not
-> ## be recorded as either. **PIXELS remain never compared.**
+> ## **THE VIDEO REGISTERS ARE NOW DOCUMENTED** (`atlas/ram.md`, "CPS-2
+> ## VIDEO REGISTERS"): CPS-A at `$804100` is **WRITE-ONLY** so it needs
+> ## the emulator's `cps_a_regs` SHARE, not a bus dump; CPS-B layer
+> ## control is `+26`; every CPS-2 game shares one config. At the match
+> ## anchor: scroll1 `$900000`, scroll3 `$904000`, scroll2 `$908000`,
+> ## palette `$90C000`, **layer_control `0x2d0e` = ALL THREE SCROLL
+> ## LAYERS ENABLED.**
+> ## **RE-CUT ALONG THAT MAP, the diff reads: scroll1 22.3%, scroll3
+> ## 2.9%, scroll2 17.7%, PALETTE 52.7% — and row-scroll plus every
+> ## UNCLAIMED region (204,800 bytes, not zero) BYTE-IDENTICAL.** An
+> ## earlier reading calling the identical 128 KB "scroll tilemap" was
+> ## WRONG: no layer base points there.
+> ##
+> ## **THE NEXT STEP IS THE CONTROL NOBODY HAS RUN: the SAME VRAM
+> ## comparison on a LEGACY replay with the STOCK romset** (~60 min, one
+> ## sim leg). If MAME and jtcps2 differ there too, this is a general
+> ## implementation difference and says NOTHING about the roster — which
+> ## is the single cheapest way to find out whether any of this matters.
+> ## Also unmeasured: whether the differing bytes fall in the VISIBLE
+> ## portion of each tilemap (the layers are larger than the screen and
+> ## the scroll X/Y registers select the window). **Do not call it a
+> ## defect or benign until at least the legacy control is in.**
+> ## **PIXELS remain never compared.**
 > ##
 > ## **THE SEED SWEEP IS DONE and is what produced the finding above.**
 > ## It was commissioned because the attribution showed a five-path
