@@ -53,10 +53,21 @@
 > ## **Spending margin back (pipelining the SDRAM address path, reducing
 > ## WIDE's load on that cone) is a DESIGN decision under Rule 1 v2 and
 > ## is the MAINTAINER'S — not something to fix by seed-hunting.**
-> ## **A FAILING SEED STILL EMITS AN `.rbf`.** The sweep overwrote
-> ## `release/mister/jtcps2w.rbf` with the WORST failing seed before it
-> ## was restored. **VERIFY THE HASH BEFORE FLASHING:** the passing
-> ## baseline is `46fc74afb6a6c5c6143db64d9c9f5d2e298cdd5c79449bb0370fbe9c2b3df66f`.
+> ## **A FAILING SEED STILL EMITS AN `.rbf`**, indistinguishable from a
+> ## good one by inspection — same size class, same filename, same
+> ## published path. A sweep overwrote `release/mister/jtcps2w.rbf` with
+> ## the WORST failing seed before it was restored. **VERIFY BEFORE
+> ## FLASHING.** The shipping baseline is sha256 `46fc74af…`, **SEED
+> ## 18269**, slack +0.066, gate PASS — jtseed's own random draw and the
+> ## +0.066 row of the n=12 table, i.e. a passing draw from the
+> ## distribution in which a third fail, NOT a privileged build.
+> ## Rebuild it with `jtcore cps2w -mister --nodbg --seed 18269`, NOT
+> ## with `xjtcore.sh` (which re-draws at random).
+> ## **AND THE HASH WILL NOT MATCH ON A DIFFERENT DAY:** `build_id.tcl`
+> ## compiles a `%y%m%d` datestamp in (`260825` here), so the same seed
+> ## reproduces the PLACEMENT and TIMING exactly and a different
+> ## bitstream. **The hash identifies the ARTIFACT, the seed identifies
+> ## the RESULT** — never read a hash mismatch as a failed reproduction.
 > ##
 > ## **THE OPENER IS NOW HARDWARE — AND IT IS THE MAINTAINER'S, NOT
 > ## MINE.** Synthesis settles BUILDABILITY and nothing else: no `.rbf`

@@ -1806,3 +1806,27 @@ in five", NOT "exactly a third". The DIRECTION is not in doubt.
    paths outside `jtframe_sdram64` was ZERO across all twelve** — verified
    by grepping every negative-slack row of every seed, not by sampling.
    Fixing that is a design change, not a seed hunt.
+
+## A jtcores BITSTREAM CARRIES A BUILD DATESTAMP, SO THE SAME SEED REBUILDS TO A DIFFERENT HASH ON A DIFFERENT DAY (measured 2026-08-25, 14z-108)
+
+`modules/jtframe/target/mister/sys/build_id.tcl` compiles a datestamp into
+the design:
+
+    set buildDate "`define BUILD_DATE \"[clock format [clock seconds] -format %y%m%d]\""
+
+The granularity is **DAYS**, and the file is only rewritten when the value
+changes (`if {$buildDate ne $fileData}`). So a rebuild from the SAME pin with
+the SAME seed reproduces the PLACEMENT and the TIMING exactly, and produces a
+**different bitstream and a different sha256**, purely because the macro moved.
+A same-day rebuild plausibly IS bit-identical; a next-day one certainly is not.
+
+**THE RULE THAT FOLLOWS: THE HASH IDENTIFIES THE ARTIFACT, THE SEED
+IDENTIFIES THE RESULT.** Never read a hash mismatch as a failed reproduction
+— check the SEED and the reported SLACK instead. This is the same shape as
+the green-build trap above: two different claims that look like one.
+
+**Concretely, for the 14z-108 shipping baseline:** `jtcps2w.rbf` sha256
+`46fc74af…` was built at pin `7b9a0d2d` from **seed 18269** on **2026-08-25**
+(`build_id.v` reads `260825`), slack +0.066 ns, jtframe gate PASS. Rebuild
+with `jtcore cps2w -mister --nodbg --seed 18269`; expect the timing to match
+and the hash not to, unless it is the same calendar day.

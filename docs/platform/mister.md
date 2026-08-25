@@ -2026,3 +2026,28 @@ is inaccessible.
 
 **`BETAKEY` is NOT required** — the flow warns "remote compilation with no
 beta key. Assigning random one" and proceeds.
+
+**REPRODUCING THE SHIPPING BITSTREAM, and the two ways that goes wrong.**
+`xjtcore.sh` does NOT build a deterministic artifact: it calls `jtseed 4`,
+which draws `--seed $RANDOM` and stops at the first success. To rebuild a
+NAMED result, bypass it:
+
+```sh
+jtcore cps2w -mister --nodbg --seed 18269      # the 14z-108 shipping baseline
+```
+
+* **Seed 18269** produced `jtcps2w.rbf` sha256 `46fc74af…`, slack +0.066 ns,
+  jtframe gate PASS. It was jtseed's own random draw, and it IS the +0.066
+  row of the n=12 sweep — **a passing draw from a distribution in which a
+  third fail, not a privileged build.**
+* **THE HASH WILL NOT MATCH ON A DIFFERENT DAY.**
+  `modules/jtframe/target/mister/sys/build_id.tcl` compiles a `%y%m%d`
+  datestamp into the design; this bitstream carries `260825`. Same seed,
+  same pin: the PLACEMENT and TIMING reproduce exactly, the bitstream and
+  its hash do not. **The hash identifies the ARTIFACT; the seed identifies
+  the RESULT.** Never read a hash mismatch as a failed reproduction — check
+  the seed and the reported slack.
+* **A FAILING SEED EMITS AN `.rbf` INDISTINGUISHABLE FROM A GOOD ONE** —
+  same size class, same filename, same published path — and a sweep
+  overwrites `release/mister/<core>.rbf` with whatever ran last. The only
+  defences are the seed record and the hash. **Verify before flashing.**

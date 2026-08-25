@@ -522,8 +522,21 @@ where a lone outlier has one. **A single-seed +0.066 is least informative
 precisely in this configuration.** A FITTER SEED SWEEP is therefore the
 natural follow-up; it costs real build hours and is the maintainer's call.
 
-**THE ARTIFACTS.** `release/mister/jtcps2w.rbf`, **3,111,944 B**, sha256
-`46fc74afb6a6c5c6143db64d9c9f5d2e298cdd5c79449bb0370fbe9c2b3df66f`; control
+**THE ARTIFACTS, AND THE SEED BEHIND THEM.** `release/mister/jtcps2w.rbf`, **3,111,944 B**, sha256
+`46fc74afb6a6c5c6143db64d9c9f5d2e298cdd5c79449bb0370fbe9c2b3df66f`, built from **SEED 18269**, slack +0.066 ns,
+gate PASS — jtseed's own RANDOM draw during the original run, not a chosen
+seed, and **it IS the +0.066 row of the n=12 table**. So the artifact a field
+test would use is a PASSING DRAW FROM THE DISTRIBUTION IN WHICH A THIRD
+FAIL — not a separate or privileged build. Rebuild:
+`jtcore cps2w -mister --nodbg --seed 18269`.
+**BUT THE HASH WILL NOT REPRODUCE UNLESS IT IS THE SAME CALENDAR DAY.**
+`modules/jtframe/target/mister/sys/build_id.tcl` compiles a `%y%m%d`
+datestamp into the design (this bitstream carries `260825`; verified in our
+own checkout, day granularity, rewritten only when the value changes). Same
+seed reproduces the PLACEMENT and the TIMING exactly and a DIFFERENT hash.
+**THE HASH IDENTIFIES THE ARTIFACT; THE SEED IDENTIFIES THE RESULT.** Never
+read a hash mismatch as a failed reproduction — check the seed and the
+reported slack. Control: control
 `release/mister/jtcps2.rbf`, 3,162,828 B, sha256
 `43b94cb1e4ca59606912ad638a7b1f45370c897f08f2d1100f10efcf0df0f15f`. Each
 `release/` copy hashes identically to the fitter output under
