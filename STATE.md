@@ -246,6 +246,63 @@ honest, and the arithmetic closes with exactly ONE spare bank. The constraint
 it encodes — sample banks above `0x8F` alias silently — is the same
 thin-margin story as the rest of the placement.
 
+**WHERE THE 0.078 ns WENT — ATTRIBUTED, AND THE ANSWER IS THE REASSURING
+ONE.** Obtained by re-running `quartus_sta` with `report_timing -setup
+-npaths 5 -detail full_path` against the EXISTING fitted netlist (6 s a core,
+no re-synthesis, no re-fit, the same placement the numbers describe) — the
+`.sta.rpt` itself carries only per-clock summaries and no path listing.
+
+| # | `cps2` (control) | | `cps2w` | |
+|---|---|---|---|---|
+| 1 | **+0.144** | `all_dbusy` -> `sdram_a[11]` | **+0.066** | `u_bank1\|post_act` -> `sdram_a[11]` |
+| 2 | +0.418 | `u_bank3\|in_busy~DUP` -> `sdram_a[7]` | +0.079 | `u_rfsh\|rfshing` -> `sdram_a[11]` |
+| 3 | +0.427 | `all_dbusy` -> `sdram_a[11]~D1` | +0.103 | `u_bank0\|in_busy` -> `sdram_a[11]` |
+| 4 | +0.436 | `all_dbusy` -> `sdram_a[11]` | +0.112 | `u_bank2\|post_act` -> `sdram_a[11]` |
+| 5 | +0.449 | `u_bank1\|in_busy` -> `sdram_a[11]` | +0.131 | `u_bank3\|in_busy` -> `sdram_a[11]` |
+
+**THE COST IS NOT IN ANY SLICE.** All ten paths live in `jtframe_sdram64` —
+jtframe's own SDRAM controller, SHARED with the control and UNTOUCHED by the
+fork. Grepping the table for `jtcps2w_obj_bank`, `jtcps2_main`,
+`jtcps2_decrypt`, `jtcps2w_profile` or `jtcps2w_qsnd_bank` returns **zero
+matches**, and path #1's full node chain traverses only `jtframe_mister` ->
+`jtframe_board` -> `jtframe_sdram64` -> `jtframe_sdram64_bank`. **D2's
+seven-slot arbiter, D3's third bank bit and D5's decrypt stage are NOT on the
+critical path.**
+
+Worst-path structure, control -> `cps2w`: **same destination pin, same
+DDIOOUTCELL, same site** (`sdram_a[11]` via `DDIOOUTCELL_X62_Y0_N10`); data
+delay 10.658 -> 10.758 ns (+0.100); combinational levels 6 -> 7 (**+1**); and
+the **dominant term is UNCHANGED at ~4.22 ns** — a single interconnect hop
+from the fabric (X46,Y26) to the I/O column (X62,Y0), **39% of the whole data
+path, and it is routing distance to a pin rather than logic.** WIDE added one
+level to the bank-arbitration cloud and did not touch what actually dominates.
+
+**AND THE DISTRIBUTION MATTERS MORE THAN THE SCALAR, which is the finding:**
+
+    cps2 :  0.144 | 0.418  0.427  0.436  0.449   one outlier, then a 0.27 ns gap
+    cps2w:  0.066   0.079  0.103  0.112  0.131   FIVE paths inside 0.065 ns
+
+In the control the margin is held by ONE path with room behind it. In `cps2w`
+five bank-arbitration paths sit in a tight cluster at the limit. **WIDE did
+not shift one path; it pulled a whole front down together.** The verdict is
+unchanged — all positive, TNS 0.000 — but the RISK PROFILE is not: the
+dominant delay term is routing to a pin, routing is exactly what varies
+between fitter seeds, and a five-path cluster has five chances to go negative
+where a lone outlier has one. **A single-seed +0.066 is least informative
+precisely in this configuration.** A FITTER SEED SWEEP is therefore the
+natural follow-up; it costs real build hours and is the maintainer's call.
+
+**THE ARTIFACTS.** `release/mister/jtcps2w.rbf`, **3,111,944 B**, sha256
+`46fc74afb6a6c5c6143db64d9c9f5d2e298cdd5c79449bb0370fbe9c2b3df66f`; control
+`release/mister/jtcps2.rbf`, 3,162,828 B, sha256
+`43b94cb1e4ca59606912ad638a7b1f45370c897f08f2d1100f10efcf0df0f15f`. Each
+`release/` copy hashes identically to the fitter output under
+`cores/<core>/mister/output_files/`, so `release/` is a true copy and not a
+re-emit. **NOT transferred anywhere**; they live on the build machine. An
+`.rbf` carries no ROM content — it is our own GPL-3.0 core — so unlike
+everything else in this project it is an artifact that CAN be moved, and it
+is what a field test needs on the SD card.
+
 **PROVENANCE AND DISCLOSURE, recorded because it belongs in the record even
 though it does not affect the answer.** The measuring session verified the
 D0-D5 evidence independently rather than taking it on trust (all nine `cps2w`
