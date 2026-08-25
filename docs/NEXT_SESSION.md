@@ -100,12 +100,33 @@
 > ## **FETCHED IS NOT HEARD** — no audio has been rendered or compared,
 > ## and nothing in this lane ever has.
 > ##
-> ## **WHAT IS LEFT IN SIMULATION, and it is now two things.** The scroll
-> ## path with a wide GFX map (untouched, capped at 8 MB with no bank
-> ## input anywhere in its chain) and a frame compared PROGRAMMATICALLY
-> ## against MAME's (never — the committed select-screen images are a
-> ## naked-eye pair, not a verdict). Everything else in the profile has
-> ## been exercised at least once.
+> ## **BOTH REMAINING SIMULATION ITEMS WERE ADVANCED 14z-108.**
+> ## **SCROLL — structurally cleared.** Every scroll-path line in
+> ## `cps2w`'s `jtcps1_sdram.v` override (`SCR_OFFSET = 0`, `rom1_cs`,
+> ## `rom1_addr[19:0]`, `gfx1_addr`, the `slot1_*` bindings) is
+> ## byte-identical to the shared `cores/cps1` original, and the scroll
+> ## slot still sits in `u_bank2`/`u_bank3` in BOTH. The only slot1 the
+> ## fork adds anywhere is `gfxc4_cs` on `u_bank1` — a different bank.
+> ## **D2 cannot have moved scroll, by construction.** Rendering is still
+> ## untested.
+> ## **VIDEO — the first cross-implementation comparison of a
+> ## video-determining surface.** Pixels need infrastructure neither side
+> ## has, but VRAM `$900000-$93FFFF` (palette + scroll tilemaps) is
+> ## dumpable on both — by address on MAME, and on the core because D2
+> ## maps it to bank 0 byte `0x600000`. At the frozen anchors
+> ## **`$910000-$92FFFF`, 128 KB of scroll tilemap, is BIT-IDENTICAL**,
+> ## as is `$900000-$901FFF`; `$930000-$93FFFF` is zero on both, matching
+> ## the RTL decode. **`$902000-$90FFFF` differs by 10,274 bytes (3.92%)
+> ## and it is NOT a phase artefact** — flat across ±20 frames,
+> ## near-static in both legs, near-identical word histograms.
+> ##
+> ## **THE NEXT STEP FOR VIDEO IS NOW SPECIFIC, not "compare frames
+> ## somehow": DOCUMENT THE LAYER-ENABLE AND SCROLL-BASE REGISTERS.**
+> ## Whether that differing window is VISIBLE depends on them, and this
+> ## project has never documented them — grepping the atlas and
+> ## `engine_internals.md` for layer control returns NOTHING. Until they
+> ## are known the window is neither a defect nor benign, and it must not
+> ## be recorded as either. **PIXELS remain never compared.**
 > ##
 > ## **THE SEED SWEEP IS DONE and is what produced the finding above.**
 > ## It was commissioned because the attribution showed a five-path

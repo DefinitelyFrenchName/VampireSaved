@@ -244,6 +244,56 @@ anchors and skew frozen, the tenant-record assertion on both legs, and the two
 controls above plus a third that removes the skip list and requires the legs
 to disagree.
 
+### FIRST CROSS-IMPLEMENTATION COMPARISON OF A VIDEO-DETERMINING SURFACE
+
+**"Video compared against MAME" has been NEVER for the whole arc.** Pixels
+need infrastructure neither side has, but `$900000-$93FFFF` is VRAM — the
+palette and the scroll tilemaps, the data that DETERMINES the frame — and it
+is dumpable on both: by address on MAME, and on the core because D2 maps it
+to SDRAM bank 0 byte `0x600000` (`VRAM_OFFSET = 23'h30_0000`). 256 KB a
+frame, 21 frames a leg, both integrity-checked, compared at the frozen
+anchors (MAME 2886 / core 3546).
+
+| region | differing bytes | |
+|---|---|---|
+| `$900000-$901FFF` | **0 / 8,192** | identical |
+| `$902000-$903FFF` | 3,659 / 8,192 | 44.7% |
+| `$904000-$907FFF` | 475 / 16,384 | 2.9% |
+| `$908000-$90FFFF` | 6,140 / 32,768 | 18.7% |
+| **`$910000-$91FFFF`** | **0 / 65,536** | **identical** |
+| **`$920000-$92FFFF`** | **0 / 65,536** | **identical** |
+| `$930000-$93FFFF` | 0 / 65,536 | zero on both |
+
+**THE HEADLINE IS THE ZEROES. 128 KB of scroll tilemap is BIT-IDENTICAL
+across two unrelated implementations**, as is the first 8 KB. That is the
+first video-determining data this project has ever compared, and it agrees.
+It also corroborates the structural scroll finding above from a completely
+different direction: the RTL says D2 cannot have moved scroll, and the data
+says MAME and the core hold the same tilemaps byte for byte.
+
+**AND `$930000-$93FFFF` IS ZERO ON BOTH** — which matches
+`pre_vram_cs <= A[23:18]==6'b1001_00 && A[17:16]!=2'b11`, the RTL decoding
+that quarter out. The two implementations agree on the region's SHAPE before
+a byte of content is compared.
+
+**THE DIFFERING WINDOW IS `$902000-$90FFFF`, 10,274 bytes = 3.92% of VRAM,
+AND IT IS NOT A PHASE ARTEFACT.** Swept across ±20 frames of core dumps
+against the fixed MAME anchor the count is FLAT (10,267-10,305), so it is not
+the one-frame skew. Both legs are near-static there (a few dozen bytes move
+over 20 frames). The word histograms are nearly IDENTICAL — `0x0000`
+9,427 vs 9,578, `0x00c0` **4,096 vs 4,096**, `0x0060` 3,575 vs 3,576,
+`0x0382` 2,464 vs 2,467 — so it is the same KIND of content in both, differing
+in specifics across 1,114 contiguous runs. Where MAME holds `0x0020,0x0000`
+pairs the core holds live tile codes (`0x0b91,0x018d`).
+
+**NOT CALLED A DEFECT AND NOT CALLED BENIGN.** Whether stale or differing
+tilemap content is VISIBLE depends on the layer-enable and scroll-base
+registers, which VRAM does not carry and **which this project has never
+documented** — `grep` for layer control across the atlas and
+`engine_internals.md` returns nothing. That is the gap to close before the
+window can be judged, and it is now the concrete next step for the video
+question rather than "compare frames somehow".
+
 ### THE QSOUND EXTENSION IS FETCHED ON THE CORE — the last zero-coverage subsystem
 
 **Stock CPS-2 cannot address these banks at all**: `qsnd_addr[22:16] <=
