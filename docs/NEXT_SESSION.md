@@ -313,20 +313,26 @@
 > ## `0x600000` on `cps2`, **`0x648000` on `cps2w`**):
 > ## `tools/run_sim_jtcps2.sh <rpl> <outdir> --frames N --wram A B` and
 > ## `tools/mister_mra.sh --core cps2w --wide build/m3b_merged13 --out <dir OUTSIDE the repo>`.
-> ## **THE FORK: `DefinitelyFrenchName/jtcores@vampire-saved`, pin
-> ## `7b9a0d2d`, EIGHTEEN commits, PUBLIC AND CURRENT** — unchanged by
-> ## 14z-108, which touched no RTL. Fork pushes are standing-authorised;
-> ## **THE MAIN REPO'S PUSH STATE, CORRECTED 14z-108 BY CHECKING THE
-> ## REMOTE RATHER THAN THE RECORD:** `origin/main` HAS been pushed and
-> ## holds `a93e071`, the 14z-107 CLOSE (final) — `git ls-remote`
-> ## confirms it and the reflog says `update by push`. The 14z-107 close
-> ## recorded "36 commits ahead, ALL LOCAL, the main repo is NEVER
-> ## pushed", which was true WHEN WRITTEN and is not true now; a push
-> ## happened after it. **Only 14z-108's FIVE commits are local.** Push
-> ## policy is the maintainer's call and nothing was pushed by this
-> ## session — but do not repeat the "never pushed" figure from prose.
-> ## CHECK `git ls-remote` INSTEAD: a tracking ref is a claim about the
-> ## last fetch, and prose is a claim about the day it was written.
+> ## **THE FORK: `DefinitelyFrenchName/jtcores@vampire-saved`, remote
+> ## still at `7b9a0d2d`, EIGHTEEN commits public.** **LOCAL FORK HEAD IS
+> ## AHEAD: `c97e3d14`** (14z-109, the README brought to D0-D5) — docs
+> ## only, no RTL, and **DELIBERATELY NOT PUSHED** at the maintainer's
+> ## instruction. Fork pushes are otherwise standing-authorised.
+> ## **THE MAIN REPO'S PUSH STATE — RE-CHECKED AGAINST THE REMOTE
+> ## 14z-109, and it MOVED AGAIN:** `origin/main` now holds **`cc4508f`**
+> ## (the 14z-109 field-test control + triage card + part checker).
+> ## `git ls-remote` confirms it. **EXACTLY ONE COMMIT IS LOCAL —
+> ## `f84683d`, the fork README and the submodule PIN BUMP to
+> ## `c97e3d14`.** It is held back ON PURPOSE and the two facts are one
+> ## fact: pushing it would point public `origin/main` at a fork commit
+> ## the fork remote does not have, and a fresh clone's
+> ## `git submodule update` would fail. **So push the FORK first, then
+> ## that commit — never that commit alone.**
+> ## The 14z-107 close recorded "the main repo is NEVER pushed", which was
+> ## true WHEN WRITTEN and has now been false twice over. Do not repeat a
+> ## push figure from prose — **CHECK `git ls-remote`**: a tracking ref is
+> ## a claim about the last fetch, and prose is a claim about the day it
+> ## was written. This paragraph is prose too.
 
 
 > ## **SLICE LOG — 14z-107 (11)+(12): THE BOOT FAILURE ROOT-CAUSED AND

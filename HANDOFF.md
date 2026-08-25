@@ -269,7 +269,7 @@ decrypted, which D5 proved false of this core). **THE PIN IS `7b9a0d2d`.**
 held to a declared 25 paths (2f), and the THIRTEEN files in `cores/cps2w/hdl`
 are enumerated with a frozen line-by-line delta (`test_mister_wide_gate` 1).
 **Fork pushes are STANDING-AUTHORISED by the maintainer (2026-08-24); the
-MAIN repo's push state is NOT a standing 'never' — CORRECTED 14z-108: `origin/main` holds `a93e071` (the 14z-107 close) and `git ls-remote` plus the reflog's `update by push` confirm it. Check the remote, not this sentence; pushing remains the maintainer's call.**
+MAIN repo's push state is NOT a standing 'never' — RE-CHECKED 14z-109: `origin/main` holds `cc4508f` (the 14z-109 field-test control), confirmed by `git ls-remote`. **EXACTLY ONE COMMIT IS LOCAL, `f84683d`, and it is held back ON PURPOSE**: it bumps the `emu/jtcores` pin to `c97e3d14`, a fork commit the fork remote does not carry (the maintainer asked for the README not to be pushed), so publishing it would break a fresh clone's `git submodule update`. Push the FORK first, then that commit — never that commit alone. Check the remote, not this sentence; pushing remains the maintainer's call.**
 The RTL benches live in **`tests/rtl/*.v`** (this repo, not the fork) and the
 frozen override delta in **`tests/expect/cps2w_rtl_delta.txt`**;
 `tests/test_mister_wide_gate.sh` compiles the benches against the fork's real
