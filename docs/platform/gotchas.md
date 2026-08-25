@@ -1705,3 +1705,49 @@ how a hash gets re-frozen without anyone asking why.
 rewinding `sim_inputs.hex`, P1's buttons 5/6 held down, and P2's held too.
 Three of the four were invisible until a replay first needed the feature:
 **the sim input path is only ever as tested as the last replay that used it.**
+
+## QUARTUS 20.1 IN DOCKER DIES WITHOUT `--network host`, AND THE ERROR MESSAGE LIES (measured 2026-08-25, 14z-108)
+
+**Symptom:** `quartus_map` dies after ~3 seconds with
+
+    Error (293007): ... ended unexpectedly. Verify that you have sufficient
+    memory available to compile the design.
+
+**That message is a red herring.** Peak virtual memory was **487 MB against
+15 GB free**. The real failure is `realloc(): invalid pointer` -> Segment
+Violation at `(nil)` inside `CPT_FLEXLM_MGR::get_local_hostid ->
+cpt_get_unique_id()`: Quartus 20.1's licence-manager host-id code corrupts
+its own heap when the container has only a bridge `veth eth0`.
+
+**Fix: keep `--network host` on the `docker run`.** Jotego's CI line carries
+it (`.github/workflows/q20.yaml:51`) and it is LOAD-BEARING, not Linux
+boilerplate — it was dropped once as "meaningless on this backend" and cost
+the first build.
+
+**The generalisable part:** a memory error from a process using 3% of
+available memory is not a memory error. Read the crash, not the message it
+chose to print. Anyone who trusts this one goes and tunes `.wslconfig` for an
+afternoon.
+
+## `git clone --recursive` RESOLVES SUBMODULES AGAINST THE DEFAULT BRANCH, NOT YOUR PIN — AND HANGS SILENTLY (measured 2026-08-25, 14z-108)
+
+Cloning `jtcores` and checking out pin `7b9a0d2d` AFTERWARDS is not the same
+as `--recursive`, because `--recursive` initialises the submodules recorded
+on the DEFAULT BRANCH. jtcores' master registers `modules/jt539`, which does
+not exist (`jotego/jt539` 404s), and git **stalls forever on a credential
+prompt** — no error, no timeout, just a hang that reads like a slow network.
+
+**Fix, and it is an ORDERING fix:**
+
+    git clone https://github.com/DefinitelyFrenchName/jtcores   # NOT --recursive
+    cd jtcores && git checkout 7b9a0d2d
+    GIT_TERMINAL_PROMPT=0 git submodule update --init --recursive
+
+`GIT_TERMINAL_PROMPT=0` turns a dead repository into a fast failure instead
+of an indefinite prompt. At our pin `jt539` is not a submodule at all.
+(`modules/jtframe/target/pocket` is also unreachable — `jotego/pocket` is
+private or gone — and is irrelevant to a Cyclone V build; skip it with
+`git config submodule.<path>.update none`.)
+
+**A SILENT STALL IS WORSE THAN A FAILURE**, and a pin is a property of the
+tree you checked out, not of the clone command you typed.

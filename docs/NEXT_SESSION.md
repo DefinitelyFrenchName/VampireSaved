@@ -1,41 +1,47 @@
 # NEXT SESSION — orientation (rewritten at the 14z-108 CLOSE, 2026-08-25)
 
-> ## **START HERE. THE ARC IS MiSTer. A TENANT HAS FOUGHT ON THE CORE —
-> ## THE FUNCTIONAL CHAIN IS COMPLETE IN SIMULATION, END TO END.**
+> ## **START HERE. THE ARC IS MiSTer. A TENANT HAS FOUGHT ON THE CORE,
+> ## AND THE CORE FITS A CYCLONE V AND CLOSES TIMING.**
 > ## Download -> boot -> select -> the extended wheel -> a tenant picked ->
 > ## a tenant FIGHTING, with its fighter art coming out of SDRAM. Six RTL
-> ## slices (D0-D5), the stock legs green, every control firing.
-> ## **AND NOTHING HAS EVER BEEN SYNTHESISED.** Read those two sentences
-> ## together; the second is the whole of what is left.
+> ## slices (D0-D5), the stock legs green, every control firing — and as of
+> ## 14z-108 it SYNTHESISES, with +206 ALMs and +0.066 ns of slack.
+> ## **WHAT HAS NEVER HAPPENED IS HARDWARE.** No `.rbf` has been loaded
+> ## onto a DE10-Nano, no MRA has run on real silicon, no analog output
+> ## has been seen. Read those two halves together: the design is proven
+> ## CORRECT in simulation and BUILDABLE on the toolchain, and it has
+> ## never been switched on.
 > ##
-> ## **THE OPENER: RUN QUARTUS. IT NEEDS NO HARDWARE.**
-> ## No slice has ever been through a fitter or a timing analyser, so
-> ## **neither RESOURCE FIT nor TIMING CLOSURE is known** — not for
-> ## `cps2w`, and not for the reference `cps2` on the same toolchain.
-> ## Verilator proves behaviour and says NOTHING about either. D2 added a
-> ## seven-slot arbiter to bank 0, D3 widened a bank through the whole
-> ## fetch chain, D4 widened address paths, D5 inserted a stage into the
-> ## decrypt path: every one of those is a plausible fmax cost on a
-> ## Cyclone V, and none has been costed.
-> ## **YOU DO NOT NEED TO INSTALL QUARTUS.** Jotego ships the toolchain as
-> ## a Docker image — `.github/workflows/q20.yaml:51`:
-> ##     docker run --rm -v ${PWD}:/jtcores jotego/jtcore20x \
-> ##            xjtcore.sh cps2w mister
-> ## **RUN `cps2` THE SAME WAY. IT IS NOT OPTIONAL.** jtcps2 is a large
-> ## core and may already be tight upstream; without the reference leg a
-> ## timing failure on `cps2w` cannot be attributed to our slices. The
-> ## four verdicts to distinguish: (a) fits and closes; (b) misses, and
-> ## `cps2` misses too -> INHERITED; (c) misses and `cps2` closes -> OURS;
-> ## (d) does not fit -> name the resource that overflowed.
-> ## **QUARTUS IS LINUX/WINDOWS ONLY — it cannot run on the dev Mac**, and
-> ## the image is x86-64, so an ARM Mac would emulate it uselessly slowly.
-> ## The maintainer has a Windows box (Ryzen 9 3900X / 32 GB) for this.
-> ## **NOTHING NEEDS COPYING**: the fork is public and the pin is exact
-> ## (`git checkout 7b9a0d2d`), synthesis needs no ROM and no VampireSaved
-> ## repo. A briefing document for a session on that machine was written
-> ## at the 14z-108 close — its hard constraint is **MEASURE AND REPORT,
-> ## DO NOT MODIFY RTL**: retiming a path is a design decision governed by
-> ## Rule 1 v2 and is the maintainer's to ratify.
+> ## **QUARTUS IS DONE — 14z-108, AND THE ANSWER IS (a): IT FITS AND
+> ## CLOSES TIMING.** Cyclone V 5CSEBA6U23I7, Quartus 20.1.1 Lite via
+> ## `jotego/jtcore20x`, pin `7b9a0d2d`, **`cps2` built FIRST as the
+> ## reference leg**. WIDE costs **+206 ALMs (+1.1%)** and +2,048 memory
+> ## bits; RAM blocks, DSPs and PLLs unchanged; nothing near overflow.
+> ## **SDRAM 96 MHz, slow corner: `cps2` +0.144 ns / `cps2w` +0.066 ns.**
+> ## Zero failing paths, TNS 0.000 everywhere, `.rbf` produced for both.
+> ## **CARRY THIS NUMBER: the SDRAM domain is the critical path in BOTH
+> ## cores and WIDE eats 0.078 ns of the control's 0.144 — over half the
+> ## margin. A PASS, NOT A WARNING, and the figure ANY FUTURE SLICE MUST
+> ## RE-MEASURE.** `cps2` at +0.144 shows the margin was modest already.
+> ##
+> ## **THE OPENER IS NOW HARDWARE — AND IT IS THE MAINTAINER'S, NOT
+> ## MINE.** Synthesis settles BUILDABILITY and nothing else: no `.rbf`
+> ## has been loaded onto a DE10-Nano, no MRA has run on real silicon, no
+> ## analog output has been seen. That is a field test (`mister_core.md`
+> ## §1: MiSTer + 128 MB module + Jammix -> CRT at native timing) and it
+> ## needs the maintainer at the board. **Before it: MiSTer PACKAGING is
+> ## still unanswered** — which MRA is the core's MAIN one, and how a
+> ## release carries both `vsav.zip` flavours (STATE "Decisions
+> ## pending"). Both must be settled before anything ships.
+> ##
+> ## **WHAT IS LEFT IN SIMULATION, in value order.** The §4 tenant oracle
+> ## (a tenant fights on the core — but is it fighting CORRECTLY? mapped
+> ## fields vs MAME at the match anchor, MAME's is frame 2886 on
+> ## `36_pick_tenant_cell`); the QSound extension HEARD (banks
+> ## `0x80-0x8E` are placed and now proven to FIT the 1 MB window, but no
+> ## sample from them has ever played); the scroll path with a wide GFX
+> ## map (untouched); and a frame compared PROGRAMMATICALLY against
+> ## MAME's (never — the committed images are a naked-eye pair).
 > ##
 > ## **QUEUED, ONE FORK COMMIT: `cores/cps2w/README.md` IS STALE.** It
 > ## still says "Status: slice D1" and calls D2-D4 "not here yet", with a

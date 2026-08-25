@@ -188,6 +188,84 @@ Quartus is Linux/Windows only, so it cannot run on this Mac. Also still
 never: the QSound extension heard, the scroll path with a wide GFX map, and
 any frame compared programmatically against MAME's.
 
+### THE CORE SYNTHESISES, FITS AND CLOSES TIMING — MEASURED ON QUARTUS
+
+**The largest unknown in the arc is answered, and the answer is (a): `cps2w`
+FITS AND CLOSES TIMING.** Run on a Windows box by a peer Claude session from
+`docs/project/quartus_brief.md`, at pin `7b9a0d2d`, Quartus Prime 20.1.1 Lite
+via Jotego's `jotego/jtcore20x` image, device **Cyclone V 5CSEBA6U23I7**,
+target mister. **`cps2` was built FIRST as the reference leg**, so every
+figure below is an attribution and not just a number.
+
+| resource | `cps2` (control) | `cps2w` | delta |
+|---|---|---|---|
+| ALMs | 18,258 / 41,910 (44%) | 18,464 / 41,910 (44%) | **+206 (+1.1%)** |
+| Registers | 27,860 | 28,426 | +566 |
+| Block memory bits | 1,095,825 / 5,662,720 (19%) | 1,097,873 (19%) | +2,048 |
+| RAM blocks | 156 / 553 (28%) | 156 / 553 (28%) | 0 |
+| DSP blocks | 38 / 112 (34%) | 38 / 112 (34%) | 0 |
+| PLLs | 3 / 6 | 3 / 6 | 0 |
+
+**The entire CPS-2 WIDE feature set costs 206 ALMs and 2,048 memory bits.**
+Nothing overflowed; nothing is close to overflowing.
+
+**TIMING, and this is the number to carry forward.** SDRAM 96 MHz domain,
+setup, slow corner:
+
+| | slack | Fmax |
+|---|---|---|
+| `cps2` (control) | **+0.144 ns** | 97.35 MHz |
+| `cps2w` | **+0.066 ns** | 96.62 MHz |
+
+Every other domain positive on both cores; TNS 0.000 for every domain and
+every analysis type; hold/recovery/removal/min-pulse-width all positive;
+**ZERO failing paths** (both `.sta.rpt` grepped for negative slack and for
+"timing requirements not met"); fitter 0 errors, 0 critical warnings.
+
+**THE HONEST FRAMING, IN THE MEASURING SESSION'S OWN WORDS: the SDRAM domain
+is the critical path in BOTH cores, and WIDE eats 0.078 ns of the control's
+0.144 ns — a little over half the margin. That is a PASS, NOT A WARNING. But
+it is a thin pass on the domain that matters, and it is the number to
+re-measure after any future slice.** `cps2` at +0.144 ns shows the margin was
+already modest before WIDE touched it.
+
+**CORNER, corrected by the measuring session rather than substituted
+silently:** the brief asked for 1100 mV / 85 C. That corner does not exist for
+this device — `5CSEBA6U23I7` is INDUSTRIAL grade, so Quartus's slow corner is
+1100 mV / **100 C**, which is what the numbers above are. **More conservative
+than what was asked for, not less.**
+
+**WARNING (10230) at `jtcps1_sdram.v:284`, flagged by the measuring session
+and ANSWERED here:** `assign pcmh_addr = pcm_addr[PCM_AW-1:0]` narrows 23
+bits to a 20-bit target. **Benign and intentional.** `SLOT5_AW` is 20 because
+the QSound HIGH window IS 1 MB (`PCMH_OFFSET = 23'h37_0000`), and
+`mister_map.md:448` covers DSP sample banks `0x80-0x8F` of which `0x80-0x8E`
+are downloaded — `0xF0000` B = 15 banks x 64 KB = 983,040 B against
+1,048,576 B. **The truncation IS the mask**, the `lint_off WIDTH` pragma is
+honest, and the arithmetic closes with exactly ONE spare bank. The constraint
+it encodes — sample banks above `0x8F` alias silently — is the same
+thin-margin story as the rest of the placement.
+
+**PROVENANCE AND DISCLOSURE, recorded because it belongs in the record even
+though it does not affect the answer.** The measuring session verified the
+D0-D5 evidence independently rather than taking it on trust (all nine `cps2w`
+commits, 13 `.v` files, all four characteristic expressions at the cited
+lines, `README:35` stale as described). It also disclosed unprompted that it
+touched the tree mid-run: an over-broad `rm -rf` while clearing master-only
+submodule artifacts deleted the tracked `modules/jt680x` (restored with
+`git checkout --`), and `modules/jttms` had staged deletions after a killed
+clone (reset to `fabcbc36`). Both repaired and verified before the builds
+ran; final state HEAD `7b9a0d2d`, 0 tracked files modified, 0 RTL files
+modified, nothing pushed. **BETAKEY is NOT needed** (the flow warns and
+assigns a random one). Full report on that machine at
+`C:\Claude\VampireSaved\quartus_report.md`.
+
+**WHAT THIS DOES AND DOES NOT SETTLE.** It settles BUILDABILITY: the design
+fits a Cyclone V with room and meets its clock. It does NOT settle hardware —
+nothing has been loaded onto a DE10-Nano, no MRA has been run on real
+silicon, and no analog output has been seen. An `.rbf` existing is not a
+field test.
+
 ### A STALE README IN THE PUBLIC FORK, FOUND BY THE QUARTUS SESSION
 
 `emu/jtcores` `cores/cps2w/README.md` at pin `7b9a0d2d` still says

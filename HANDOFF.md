@@ -201,9 +201,17 @@ FIGHTER art — 9,388,928 reads over 1,735 distinct tile codes, 843 frames of
 them AFTER match start**, every code inside the frozen extent, with the
 control leg at zero on both group-C windows. `test_mister_gfxc_fetch` PASSES
 in full, and the same run answered bank 1 under load (peak 15,496 acc/frame,
-12.5% of ceiling, ZERO clashes). **What is still never: HARDWARE — nothing in
-this lane has ever left Verilator, and no Quartus synthesis has ever been run,
-so neither resource fit nor timing closure is known.** The reason
+12.5% of ceiling, ZERO clashes). **AND SINCE 14z-108 IT SYNTHESISES**: Quartus 20.1.1 Lite, Cyclone V
+`5CSEBA6U23I7`, target mister, with `cps2` built FIRST as the reference leg —
+`cps2w` costs **+206 ALMs (+1.1%)** and +2,048 memory bits with RAM blocks,
+DSPs and PLLs unchanged, and closes the 96 MHz SDRAM domain at **+0.066 ns**
+against the control's **+0.144 ns** (zero failing paths, TNS 0.000 every
+domain, `.rbf` produced). **Carry that figure: WIDE eats 0.078 ns of the
+control's 0.144 — over half the margin on the domain that is the critical
+path in BOTH cores. A pass, not a warning, and the number any future slice
+must re-measure.** **What is still never: HARDWARE — no `.rbf` has been
+loaded onto a DE10-Nano, no MRA has run on real silicon, and no analog
+output has been seen. An `.rbf` existing is not a field test.** The reason
 bank 4 is still zero is the HARNESS, not the RTL: the simulator's direction
 bits were **REVERSED end for end** — measured in full 14z-108 against the
 game's own `$FF8058` mirror, all four directions, on a four-direction probe
