@@ -34,14 +34,35 @@
 > ## release carries both `vsav.zip` flavours (STATE "Decisions
 > ## pending"). Both must be settled before anything ships.
 > ##
-> ## **WHAT IS LEFT IN SIMULATION, in value order.** The §4 tenant oracle
-> ## (a tenant fights on the core — but is it fighting CORRECTLY? mapped
-> ## fields vs MAME at the match anchor, MAME's is frame 2886 on
-> ## `36_pick_tenant_cell`); the QSound extension HEARD (banks
-> ## `0x80-0x8E` are placed and now proven to FIT the 1 MB window, but no
-> ## sample from them has ever played); the scroll path with a wide GFX
-> ## map (untouched); and a frame compared PROGRAMMATICALLY against
-> ## MAME's (never — the committed images are a naked-eye pair).
+> ## **THE §4 TENANT ORACLE IS DONE — 14z-108, AND IT AGREES.** A tenant
+> ## does not merely fetch art on the core, it FIGHTS CORRECTLY: MAME
+> ## anchor 2886, sim 3546, skew 660 (= the 659-frame transfer PLUS ONE,
+> ## the same +1 the legacy replay shows on a 462-frame transfer, so the
+> ## boot offset is a CONSTANT). **`p1_hitbox_base` is `0x003FA9D0` on
+> ## BOTH legs** — the core loaded the tenant's RELOCATED character record
+> ## from above `CPU:$400000`. HP, white HP, timer, position, meter,
+> ## `ptr64` and `word132` all agree; the only disagreement is
+> ## `p2_hitbox_base`, the sound-fed CPU draw, excluded by name for a
+> ## measured reason and proven LIVE by a control. Gate:
+> ## `tests/test_mister_tenant_oracle.sh` (emulator, ~65 min).
+> ##
+> ## **WHAT IS LEFT IN SIMULATION, in value order.** The QSound extension
+> ## HEARD (banks `0x80-0x8E` are placed and now proven to FIT the 1 MB
+> ## window — `SLOT5_AW` 20 against `0xF0000` of samples — but no sample
+> ## from them has ever played); the scroll path with a wide GFX map
+> ## (untouched, capped at 8 MB with no bank input anywhere in its chain);
+> ## and a frame compared PROGRAMMATICALLY against MAME's (never — the
+> ## committed select-screen images are a naked-eye pair, not a verdict).
+> ##
+> ## **PENDING OFF-MACHINE: a FITTER SEED SWEEP** (3 `cps2w` seeds + 1
+> ## `cps2` control), maintainer-approved 2026-08-25 and running on the
+> ## Windows box. It exists because the attribution showed `cps2w` has
+> ## FIVE bank-arbitration paths inside 0.065 ns where the control has ONE
+> ## outlier with a 0.27 ns gap behind it, and the dominant delay term is
+> ## ROUTING to a pin — which is exactly what varies between seeds. A
+> ## single-seed +0.066 ns is least informative in that configuration. The
+> ## control seed is the one to keep if only some run: without it a
+> ## `cps2w` spread cannot be told from a TOOL spread.
 > ##
 > ## **QUEUED, ONE FORK COMMIT: `cores/cps2w/README.md` IS STALE.** It
 > ## still says "Status: slice D1" and calls D2-D4 "not here yet", with a
